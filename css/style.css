@@ -356,6 +356,232 @@ header p {
     color: var(--primary-color);
 }
 
+/* Blueprint Builder */
+.blueprint-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.blueprint-step {
+    display: none;
+    padding: 30px;
+    background: #f7fafc;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    border: 2px solid #e2e8f0;
+}
+
+.blueprint-step.active {
+    display: block;
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-left: 15px;
+}
+
+.step-header h3 {
+    margin: 0;
+    color: var(--dark);
+    font-size: 1.3em;
+}
+
+.step-desc {
+    color: #718096;
+    font-style: italic;
+    margin-bottom: 25px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #cbd5e0;
+    border-radius: var(--border-radius);
+    font-family: inherit;
+    font-size: 1em;
+    resize: vertical;
+    direction: rtl;
+    unicode-bidi: bidi-override;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+input[type="text"],
+input[type="range"],
+select {
+    padding: 10px;
+    border: 2px solid #cbd5e0;
+    border-radius: var(--border-radius);
+    font-size: 1em;
+}
+
+input[type="text"]:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+input[type="range"] {
+    width: 100%;
+    cursor: pointer;
+}
+
+.blueprint-questions {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.q-card {
+    background: white;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--warning-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.q-card label {
+    display: block;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 10px;
+}
+
+.q-card select {
+    width: 100%;
+}
+
+.q-card textarea,
+.q-card input[type="text"] {
+    width: 100%;
+}
+
+.gap-reframe {
+    border-left-color: var(--success-color);
+    background: #f0fff4;
+}
+
+.reframe-box {
+    background: white;
+    padding: 15px;
+    border-radius: 4px;
+    font-style: italic;
+    color: var(--success-color);
+    line-height: 1.8;
+}
+
+#ability-display {
+    display: inline-block;
+    margin-right: 10px;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.step-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.final-blueprint-display {
+    background: white;
+    padding: 25px;
+    border-radius: var(--border-radius);
+    margin-bottom: 25px;
+    border: 2px solid var(--success-color);
+}
+
+.final-blueprint-display .blueprint-section {
+    margin-bottom: 25px;
+}
+
+.final-blueprint-display h4 {
+    color: var(--success-color);
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.final-blueprint-display p,
+.final-blueprint-display ul {
+    margin: 10px 0;
+    line-height: 1.8;
+}
+
+.final-blueprint-display ul {
+    margin-left: 20px;
+}
+
+.final-blueprint-display li {
+    margin-bottom: 8px;
+}
+
+.next-action,
+.if-stuck {
+    background: white;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+}
+
+.next-action {
+    border-left: 5px solid var(--success-color);
+}
+
+.next-action h4 {
+    color: var(--success-color);
+}
+
+.next-action p {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.if-stuck {
+    border-left: 5px solid var(--warning-color);
+}
+
+.if-stuck h4 {
+    color: var(--warning-color);
+}
+
+.if-stuck p {
+    line-height: 1.8;
+    color: #4a5568;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
 /* Footer */
 .footer-text {
     text-align: center;

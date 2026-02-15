@@ -17,6 +17,7 @@
             <button class="tab-btn active" data-tab="home">בית</button>
             <button class="tab-btn" data-tab="categories">קטגוריות</button>
             <button class="tab-btn" data-tab="practice">תרגול</button>
+            <button class="tab-btn" data-tab="blueprint">Blueprint Builder</button>
             <button class="tab-btn" data-tab="about">על הפרויקט</button>
         </nav>
 
@@ -79,6 +80,172 @@
 
                     <div class="practice-stats">
                         <p>תרגולים שבוצעו: <span id="practice-count">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BLUEPRINT BUILDER TAB -->
+        <section id="blueprint" class="tab-content">
+            <div class="blueprint-container">
+                <div class="card">
+                    <h2>🏗️ Blueprint Builder - הפוך פעולה בעמומה לתוכנית ביצוע</h2>
+                    <p>הקלד פעולה שצריך לעשות, ואנחנו נהפוך אותה לתוכנית מפורטת עם צעדים, תנאים, וחלופות.</p>
+
+                    <!-- STEP 1: CAPTURE -->
+                    <div id="blueprint-step-1" class="blueprint-step active">
+                        <div class="step-header">
+                            <span class="step-number">1</span>
+                            <h3>מה אתה אומר לעצמך לעשות?</h3>
+                        </div>
+                        <p class="step-desc">הקלד את הפעולה בשפה טבעית - בדיוק כמו שהיית אומר לעצמך או שמישהו אמר לך.</p>
+                        
+                        <div class="input-group">
+                            <textarea id="action-input" 
+                                      placeholder="דוגמה: 'תתרגל את ה-JavaScript שלי' או 'תסגור את הפרויקט'"
+                                      rows="4"></textarea>
+                        </div>
+
+                        <div class="step-buttons">
+                            <button id="extract-btn" class="btn btn-primary">חלץ ובנה Blueprint →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: EXTRACT & SPECIFY -->
+                    <div id="blueprint-step-2" class="blueprint-step hidden">
+                        <div class="step-header">
+                            <span class="step-number">2</span>
+                            <h3>פירוק הפעולה</h3>
+                        </div>
+
+                        <div class="blueprint-questions">
+                            <div class="q-card">
+                                <label>מה התוצאה בדיוק? (איך זה נראה בהצלחה?)</label>
+                                <textarea id="q-success" placeholder="תופסתי את הקונספט של async/await"></textarea>
+                            </div>
+
+                            <div class="q-card">
+                                <label>מה הצעד הראשון הקטן ביותר?</label>
+                                <textarea id="q-first-step" placeholder="פתח טאב ב-VSCode ויצור קובץ test.js"></textarea>
+                            </div>
+
+                            <div class="q-card">
+                                <label>מה הצעד האחרון - איך תדע שסיימת?</label>
+                                <textarea id="q-last-step" placeholder="אוכל להשרות קוד async וקוד सinc בלי טעויות"></textarea>
+                            </div>
+
+                            <div class="q-card">
+                                <label>איזה 3-5 שלבים באמצע?</label>
+                                <textarea id="q-middle-steps" placeholder="1. קרא מאמר | 2. צפה בוידאו | 3. כתוב דוגמה | 4. בדוק בקונסול"></textarea>
+                            </div>
+
+                            <div class="q-card">
+                                <label>מה צריך להיות נכון לפני התחלה? (מקום, ציוד, זמן, אישורים)</label>
+                                <textarea id="q-prerequisites" placeholder="שעה חופשית, VSCode פתוח, חיבור אינטרנט"></textarea>
+                            </div>
+
+                            <div class="q-card">
+                                <label>איפה אתה בדרך כלל נתקע?</label>
+                                <textarea id="q-friction" placeholder="אני לא מבין מתי promises מסתיימות"></textarea>
+                            </div>
+
+                            <div class="q-card">
+                                <label>מה Plan B כשנתקע? (חלופה, קיצור דרך, עזרה)</label>
+                                <textarea id="q-alternatives" placeholder="אבקש עזרה ב-Stack Overflow או אחזור ל-callbacks"></textarea>
+                            </div>
+
+                            <div class="q-card">
+                                <label>כמה זמן זה אמור לקחת? (מינימום 70% משימה)</label>
+                                <input type="text" id="q-time" placeholder="45 דקות">
+                            </div>
+                        </div>
+
+                        <div class="step-buttons">
+                            <button id="back-to-capture-btn" class="btn btn-secondary">← חזור</button>
+                            <button id="gap-analysis-btn" class="btn btn-primary">בדיקת פער ציפיות →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: EXPECTATION GAP -->
+                    <div id="blueprint-step-3" class="blueprint-step hidden">
+                        <div class="step-header">
+                            <span class="step-number">3</span>
+                            <h3>פער ציפיות vs יכולת</h3>
+                        </div>
+                        <p class="step-desc">בואן נבחן את הפער בין מה שמצפים ממך לבין מה אתה יכול לעשות כרגע.</p>
+
+                        <div class="blueprint-questions">
+                            <div class="q-card">
+                                <label>מי מצפה? (אתה / מישהו אחר / מערכת)</label>
+                                <select id="q-who-expects">
+                                    <option value="">בחר...</option>
+                                    <option value="self">אני בעצמי</option>
+                                    <option value="other">מישהו אחר</option>
+                                    <option value="system">מערכת/חוק/דדליין</option>
+                                </select>
+                            </div>
+
+                            <div class="q-card">
+                                <label>מה בדיוק הציפייה?</label>
+                                <textarea id="q-expectation" placeholder="אני אמור להתפקד כ-JavaScript expert"></textarea>
+                            </div>
+
+                            <div class="q-card">
+                                <label>איזו הנחה סמויה כאן? (על מה הציפיה מניחה?)</label>
+                                <textarea id="q-assumption" placeholder="'זה וודאי קל', 'כולם יודעים את זה', 'צריך 5 דקות'"></textarea>
+                            </div>
+
+                            <div class="q-card">
+                                <label>יכולת כרגע (0-10, כש-10 זה מושלם)</label>
+                                <input type="range" id="q-ability" min="0" max="10" value="5">
+                                <span id="ability-display">5</span>
+                            </div>
+
+                            <div class="q-card">
+                                <label>מה חסר לך כדי לעלות נקודה אחת?</label>
+                                <textarea id="q-gap" placeholder="15 דקות דוקומנטציה / כלי ניתונים / אישור / קונה דעת"></textarea>
+                            </div>
+
+                            <div class="q-card gap-reframe">
+                                <label>🎯 ניסוח מחדש (לא-מאשים):</label>
+                                <div id="q-reframe" class="reframe-box">
+                                    (ה-הודעה תתעדכן אוטומטית)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step-buttons">
+                            <button id="back-to-specify-btn" class="btn btn-secondary">← חזור</button>
+                            <button id="next-step-btn" class="btn btn-primary">צעד הבא ותוכנית →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: FINAL PLAN -->
+                    <div id="blueprint-step-4" class="blueprint-step hidden">
+                        <div class="step-header">
+                            <span class="step-number">4</span>
+                            <h3>תוכנית הביצוע סופית ✨</h3>
+                        </div>
+
+                        <div id="final-blueprint" class="final-blueprint-display">
+                            <!-- Blueprint output will go here -->
+                        </div>
+
+                        <div id="next-action-box" class="next-action">
+                            <h4>🎯 הצעד שלך הבא:</h4>
+                            <p id="next-physical-action"></p>
+                        </div>
+
+                        <div id="if-stuck-box" class="if-stuck">
+                            <h4>אם נתקעת:</h4>
+                            <p id="if-stuck-content"></p>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button id="export-json-btn" class="btn btn-secondary">📥 ייצא JSON</button>
+                            <button id="start-over-btn" class="btn btn-secondary">🔄 Blueprint חדש</button>
+                            <button id="do-it-now-btn" class="btn btn-primary">⏱️ בואן נעשה את זה ב-10 דקות!</button>
+                        </div>
                     </div>
                 </div>
             </div>
