@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupTabNavigation();
     setupPracticeMode();
     setupBlueprintBuilder();
+    setupPrismModule();
 });
 
 // Load Meta Model data from JSON
@@ -22,8 +23,16 @@ async function loadMetaModelData() {
         
         // Populate category select in practice
         populateCategorySelect();
+        
+        // Initialize Prism Lab (after data loads)
+        if (document.getElementById('prism-library')) {
+            renderPrismLibrary();
+        }
+        
+        hideLoadingIndicator();
     } catch (error) {
         console.error('Error loading data:', error);
+        showErrorMessage('שגיאה בטעינת הנתונים');
     }
 }
 
@@ -440,9 +449,15 @@ function logMetaModelData() {
 function setupPrismModule() {
     renderPrismLibrary();
 
+    // Ensure prism-detail starts hidden
+    const prismDetail = document.getElementById('prism-detail');
+    if (prismDetail) prismDetail.classList.add('hidden');
+    const prismLibrary = document.getElementById('prism-library');
+    if (prismLibrary) prismLibrary.classList.remove('hidden');
+
     // Listeners for dynamic elements
     document.addEventListener('click', (e) => {
-        if (e.target && e.target.matches('.prism-open-btn')) {
+        if (e.target && e.target.classList.contains('prism-open-btn')) {
             const id = e.target.getAttribute('data-id');
             openPrism(id);
         }
@@ -592,3 +607,57 @@ function exportPrismSession() {
     const a = document.createElement('a'); a.href = url; a.download = `prism_sessions_${Date.now()}.json`; a.click(); URL.revokeObjectURL(url);
 }
 
+// ==================== UI HELPERS ====================
+
+function showLoadingIndicator() {
+    let loader = document.getElementById('app-loader');
+    if (!loader) {
+        loader = document.createElement('div');
+        loader.id = 'app-loader';
+        loader.innerHTML = '<div class="loader-box"><p>📚 טעינת כלים...</p></div>';
+        document.body.insertBefore(loader, document.body.firstChild);
+    }
+    loader.style.display = 'flex';
+}
+
+function hideLoadingIndicator() {
+    const loader = document.getElementById('app-loader');
+    if (loader) loader.style.display = 'none';
+}
+
+function showErrorMessage(msg) {
+    alert('❌ ' + msg);
+}
+
+function showHint(text) {
+    const box = document.getElementById('hint-box');
+    const hintText = document.getElementById('hint-text');
+    if (box && hintText) {
+        hintText.textContent = text;
+        box.style.display = 'flex';
+        setTimeout(() => { if (box) box.style.display = 'none'; }, 6000);
+    }
+}
+
+function closeHint() {
+    const box = document.getElementById('hint-box');
+    if (box) box.style.display = 'none';
+}
+
+function navigateTo(tabName) {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+    
+    tabs.forEach(t => t.classList.remove('active'));
+    contents.forEach(c => c.classList.remove('active'));
+    
+    const btn = document.querySelector(`[data-tab="${tabName}"]`);
+    if (btn) btn.classList.add('active');
+    
+    const content = document.getElementById(tabName);
+    if (content) content.classList.add('active');
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ==================== END OF APP ===================

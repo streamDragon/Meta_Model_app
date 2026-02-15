@@ -11,6 +11,10 @@
         <header>
             <h1>🧠 Meta Model - כלי תרגול</h1>
             <p>תרגל שאול מטה מודל של Richard Bandler על פי הכללים של NLP</p>
+            <div class="onboarding-hint" id="hint-box" style="display:none">
+                <small id="hint-text"></small>
+                <button onclick="closeHint()" class="close-hint">✕</button>
+            </div>
         </header>
 
         <nav class="tabs">
@@ -40,6 +44,17 @@
                     <div class="intro-item">
                         <h3>✨ כיצד להשתמש?</h3>
                         <p>בחר קטגוריה ללמוד או עבור לתרגול כדי להתאמן בשאול שאלות.</p>
+                    </div>
+                </div>
+
+                <div class="cta-section">
+                    <h3>🚀 בואן נתחיל!</h3>
+                    <p>בחר מה ברצונך לעשות:</p>
+                    <div class="cta-buttons">
+                        <button class="btn btn-primary cta-btn" onclick="navigateTo('categories')">📚 לומד קטגוריות</button>
+                        <button class="btn btn-primary cta-btn" onclick="navigateTo('blueprint')">🏗️ בנה Blueprint</button>
+                        <button class="btn btn-primary cta-btn" onclick="navigateTo('prismlab')">🔍 סרוק פריזמות</button>
+                        <button class="btn btn-secondary cta-btn" onclick="navigateTo('practice')">🎮 תרגול חופשי</button>
                     </div>
                 </div>
             </div>

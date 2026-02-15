@@ -50,6 +50,59 @@ header p {
     opacity: 0.9;
 }
 
+.onboarding-hint {
+    background: rgba(255,255,255,0.2);
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-top: 12px;
+    font-size: 0.95em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-hint {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2em;
+}
+
+/* Loading Indicator */
+#app-loader {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.3);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loader-box {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.loader-box p {
+    margin: 0;
+    font-weight: 600;
+    color: var(--primary-color);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
 /* Navigation Tabs */
 .tabs {
     display: flex;
@@ -156,6 +209,39 @@ header p {
 .intro-item h3 {
     margin-top: 0;
     margin-bottom: 10px;
+}
+
+/* CTA Section */
+.cta-section {
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    margin-top: 30px;
+    border: 2px dashed var(--primary-color);
+}
+
+.cta-section h3 {
+    color: var(--primary-color);
+    margin-top: 0;
+    text-align: center;
+}
+
+.cta-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.cta-btn {
+    padding: 14px 16px;
+    font-size: 0.95em;
+    text-align: center;
+}
+
+.cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
 }
 
 /* Categories */
@@ -339,7 +425,7 @@ header p {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .practice-stats {
