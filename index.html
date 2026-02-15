@@ -57,6 +57,40 @@
                         <button class="btn btn-secondary cta-btn" onclick="navigateTo('practice')">🎮 תרגול חופשי</button>
                     </div>
                 </div>
+
+                <!-- PROGRESS HUB -->
+                <div class="progress-hub">
+                    <h3>📊 ההתקדמות שלך</h3>
+                    <div class="progress-grid">
+                        <div class="progress-card">
+                            <span class="progress-icon">🔥</span>
+                            <p class="progress-label">Streak</p>
+                            <p class="progress-value" id="streak-count">0 ימים</p>
+                            <small id="streak-date">היום הראשון!</small>
+                        </div>
+                        <div class="progress-card">
+                            <span class="progress-icon">⭐</span>
+                            <p class="progress-label">XP Total</p>
+                            <p class="progress-value" id="xp-count">0</p>
+                            <small>כל משימה = נקודות</small>
+                        </div>
+                        <div class="progress-card">
+                            <span class="progress-icon">🏆</span>
+                            <p class="progress-label">Badges</p>
+                            <p class="progress-value" id="badge-count">0</p>
+                            <small>פרסים שהצברת</small>
+                        </div>
+                        <div class="progress-card">
+                            <span class="progress-icon">📈</span>
+                            <p class="progress-label">Sessions</p>
+                            <p class="progress-value" id="session-count">0</p>
+                            <small>סשנים שהשלמת</small>
+                        </div>
+                    </div>
+                    <div id="badges-display" class="badges-display">
+                        <!-- Badges will render here -->
+                    </div>
+                </div>
             </div>
         </section>
 

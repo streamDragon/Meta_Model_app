@@ -53,8 +53,20 @@ function setupTabNavigation() {
             // Show corresponding content
             const tabName = btn.getAttribute('data-tab');
             document.getElementById(tabName).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     });
+}
+
+// Helper function to switch tabs from buttons
+function switchTab(tabName) {
+    const btn = document.querySelector(`[data-tab="${tabName}"]`);
+    if (btn) btn.click();
+}
+
+// Alias for switchTab
+function navigateTo(tabName) {
+    switchTab(tabName);
 }
 
 // Populate Categories Section
