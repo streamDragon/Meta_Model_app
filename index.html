@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Model - כלי תרגול שאול מטה מודל</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 Meta Model - כלי תרגול</h1>
+            <p>תרגל שאול מטה מודל של Richard Bandler על פי הכללים של NLP</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="home">בית</button>
+            <button class="tab-btn" data-tab="categories">קטגוריות</button>
+            <button class="tab-btn" data-tab="practice">תרגול</button>
+            <button class="tab-btn" data-tab="about">על הפרויקט</button>
+        </nav>
+
+        <!-- HOME TAB -->
+        <section id="home" class="tab-content active">
+            <div class="card">
+                <h2>ברוכים הבאים! 👋</h2>
+                <p>Meta Model היא טכניקה ב-NLP המסייעת לזיהוי ותיקון הפרות שפה שמגבילות אותנו.</p>
+                
+                <div class="intro-grid">
+                    <div class="intro-item">
+                        <h3>🎯 מה זה Meta Model?</h3>
+                        <p>מודל שפה המזהה 3 עיוותים: מחיקה, עיוות והכללה.</p>
+                    </div>
+                    <div class="intro-item">
+                        <h3>📚 למה זה חשוב?</h3>
+                        <p>זוהי כלי חזקה לתרגול עומק, כדי להבין ולשנות דפוסים של חשיבה.</p>
+                    </div>
+                    <div class="intro-item">
+                        <h3>✨ כיצד להשתמש?</h3>
+                        <p>בחר קטגוריה ללמוד או עבור לתרגול כדי להתאמן בשאול שאלות.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CATEGORIES TAB -->
+        <section id="categories" class="tab-content">
+            <div id="categories-container"></div>
+        </section>
+
+        <!-- PRACTICE TAB -->
+        <section id="practice" class="tab-content">
+            <div class="practice-container">
+                <div class="card">
+                    <h2>תרגול דינאמי 🎮</h2>
+                    
+                    <div class="practice-filters">
+                        <label>בחר קטגוריה:</label>
+                        <select id="category-select">
+                            <option value="">הכל</option>
+                        </select>
+                    </div>
+
+                    <div id="practice-statement" class="statement-box">
+                        <p class="instruction">לחץ על "הבא" כדי לקבל משפט לתרגול</p>
+                    </div>
+
+                    <div class="practice-buttons">
+                        <button id="next-btn" class="btn btn-primary">הבא →</button>
+                        <button id="show-answer-btn" class="btn btn-secondary">הראה תשובה</button>
+                        <button id="hint-btn" class="btn btn-secondary">טיפ</button>
+                    </div>
+
+                    <div id="practice-answer" class="answer-box hidden">
+                        <h3>תשובה המוצעת:</h3>
+                        <p id="answer-text"></p>
+                        <p id="answer-explanation" class="explanation"></p>
+                    </div>
+
+                    <div class="practice-stats">
+                        <p>תרגולים שבוצעו: <span id="practice-count">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT TAB -->
+        <section id="about" class="tab-content">
+            <div class="card">
+                <h2>על הפרויקט 📖</h2>
+                <p><strong>Meta Model - כלי תרגול מטה מודל</strong></p>
+                <p>פרויקט זה מעוצב כדי לעזור ללומדים של NLP (Neuro-Linguistic Programming) ליישום טכניקות Meta Model של Richard Bandler ו-John Grinder.</p>
+                
+                <h3>הקטגוריות העיקריות:</h3>
+                <ul>
+                    <li><strong>DELETION (מחיקה)</strong> - מחיקת מידע חשוב</li>
+                    <li><strong>DISTORTION (עיוות)</strong> - שינוי המציאות</li>
+                    <li><strong>GENERALIZATION (הכללה)</strong> - הרחבה מעבר לצריך</li>
+                </ul>
+
+                <h3>המקורות:</h3>
+                <ul>
+                    <li>Richard Bandler & John Grinder - Founders of NLP</li>
+                    <li><a href="https://github.com/streamDragon/Meta_Model_app" target="_blank">GitHub Repository</a></li>
+                </ul>
+
+                <p class="footer-text">פיתוח על ידי: streamDragon | 2026</p>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
