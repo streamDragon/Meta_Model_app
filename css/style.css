@@ -582,6 +582,32 @@ input[type="range"] {
     flex-wrap: wrap;
 }
 
+/* Prism Lab styles */
+.prism-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.prism-card {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.prism-card h4 { margin: 0 0 8px 0; }
+
+.prism-detail .anchor-box { background: #fff8e6; padding: 10px; border-radius: 6px; margin: 12px 0; }
+.anchor-question { font-weight: 700; color: var(--dark); }
+
+.level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.level-item label { display:block; font-weight:600; margin-bottom:6px }
+.level-item input { width:100%; padding:8px; border:1px solid #e2e8f0; border-radius:6px }
+
+.muted { color:#718096; font-style: italic; margin-bottom:10px }
+
 /* Footer */
 .footer-text {
     text-align: center;

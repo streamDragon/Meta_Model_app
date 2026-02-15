@@ -281,5 +281,98 @@
       }
     ]
   }
+  ,
+  "prisms": [
+    {
+      "id": "cause_effect",
+      "name_he": "סיבה–תוצאה",
+      "name_en": "Cause-Effect",
+      "meta_model_category": "DISTORTION",
+      "linguistic_triggers": ["גורם", "גורם ל", "עושה לי"],
+      "anchor_question_templates": ["איך בדיוק X גורם ל-Y?","מה המנגנון שגורם לזה?"],
+      "philosophy_core": "העצמה חיצונית - תחושת קורבן דטרמיניסטית",
+      "therapist_intent": "למפות איפה המטופל ממקם את האג'נסי ולחפש נקודת התערבות נמוכה",
+      "examples": ["הוא גורם לי לחוש אפס","המבט שלו עושה לי נזק"],
+      "anti_patterns": ["לתקן במהירות בלי מיפוי","להתרכז בזהות מיד"] ,
+      "level_hints": {"E":"הקשר/סביבה","B":"פעולה/טריגר","C":"מיומנות/אסטרטגיה","V":"אמונה/חוק","I":"זהות","S":"שייכות"},
+      "recommended_interventions_by_level": {"E":"שינוי תנאי סביבה (small win)","B":"שינוי התנהגותי/הגבלה","C":"תרגול מיומנות קצרה","V":"שיחה על אמונות","I":"עבודה ארוכת טווח","S":"שיקום קשרים"},
+      "tags": ["גורם","סיבה","אג'נסי"]
+    },
+    {
+      "id": "comparisons",
+      "name_he": "השוואות/השמטת בסיס ההשוואה",
+      "name_en": "Comparisons",
+      "meta_model_category": "DELETION",
+      "linguistic_triggers": ["יותר מ", "טוב יותר", "חכם ממני"],
+      "anchor_question_templates": ["טוב יותר ביחס למה?","באיזה היבט הוא יותר טוב?"],
+      "philosophy_core": "קיום יחסי - מציאות נבנית כהשוואה",
+      "therapist_intent": "לחשוף את הקריטריון המושווה ולמצוא צעד בר השגה",
+      "examples": ["היא טובה יותר ממני","אתה לא מספיק"],
+      "anti_patterns": ["להצדיק השוואות כעובדות"],
+      "level_hints": {"E":"הקשר להשוואה","B":"פעולות שמושוות","C":"מיומנויות","V":"ערכי הצלחה","I":"תוויות עצמי","S":"נורמות חברתיות"},
+      "recommended_interventions_by_level": {"E":"שינוי סביבה/הקשר","B":"מדידת ביצועים פשוטה","C":"תרגול ממוקד","V":"בחינת קריטריונים","I":"בניית זהות חלופית"},
+      "tags": ["השוואה","קריטריון"]
+    },
+    {
+      "id": "nominalization",
+      "name_he": "נומינליזציה",
+      "name_en": "Nominalization",
+      "meta_model_category": "DISTORTION",
+      "linguistic_triggers": ["ניתוק","קפאון","בעיה"],
+      "anchor_question_templates": ["איך בדיוק ה'X' הזה מתרחש?","מה עושה את ה'X' להיות כזה?"],
+      "philosophy_core": "הפיכת תהליך לחפץ - קיבוע תנועה",
+      "therapist_intent": "להחזיר שם לעצם לצורת פעולה ולפרק למרכיבים מעשיים",
+      "examples": ["יש בינינו ניתוק מוחלט","הבעיה פשוט לא נפתרת"],
+      "anti_patterns": ["להתעקש על הגדרה בלי לחקור מרכיבים"],
+      "level_hints": {"E":"מרכיבי סביבה","B":"רצף פעולות","C":"מיומנויות","V":"ערכים שמשמרים את הקפאון","I":"הגדרה עצמית","S":"סמלים חברתיים"},
+      "recommended_interventions_by_level": {"B":"פרוק הפעולות","C":"תרגול שפה משותפת","E":"שינוי מרחב"},
+      "tags": ["הקפאה","שם עצם"]
+    },
+    {
+      "id": "modal_operators",
+      "name_he": "אופרטורים מודלים (חובה/איסור)",
+      "name_en": "Modal Operators",
+      "meta_model_category": "GENERALIZATION",
+      "linguistic_triggers": ["חייב","לא יכול","אין לי דרך"],
+      "anchor_question_templates": ["למה זה חייב להיות כך?","מה היה קורה אם אפשרות אחרת הייתה קיימת?"],
+      "philosophy_core": "חסימות על בסיס הנחות צריך/אי-יכולת",
+      "therapist_intent": "לפתוח מרחב אפשרויות ולמפות אילוצים",
+      "examples": ["אני לא יכול לשנות את זה","זה חייב להישאר כך"],
+      "anti_patterns": ["להיאחז ב'אי אפשר' בלי בדיקה"],
+      "level_hints": {"C":"מיומנויות חסרות","V":"חוקים פנימיים","I":"תיאורי עצמיות מדכאים"},
+      "recommended_interventions_by_level": {"C":"תרגול מיידי","V":"בחינת האמונות","B":"צעדים קטנים"},
+      "tags": ["חייב","אי אפשר"]
+    },
+    {
+      "id": "universal_quantifiers",
+      "name_he": "כמותים כלליים",
+      "name_en": "Universal Quantifiers",
+      "meta_model_category": "GENERALIZATION",
+      "linguistic_triggers": ["תמיד","אף פעם","אף אחד"],
+      "anchor_question_templates": ["באמת תמיד? תן דוגמה אחת שונה"],
+      "philosophy_core": "הכללה שמוצרת סגירות אופקית",
+      "therapist_intent": "לחקור יוצאי דופן ולפתוח חריצי פעולה",
+      "examples": ["אני לעולם לא מצליח","אף אחד לא אוהב אותי"],
+      "anti_patterns": ["להכריח זיהוי סתירות ללא אמפתיה"],
+      "level_hints": {"E":"תנאים יוצאי דופן","B":"מעשים חריגים","C":"כישורים זמניים","V":"חוקי חיים"},
+      "recommended_interventions_by_level": {"B":"נצחונות קטנות","E":"שינוי תנאי","C":"תרגול עקבי"},
+      "tags": ["תמיד","אף פעם"]
+    },
+    {
+      "id": "mind_reading",
+      "name_he": "קריאת מחשבות",
+      "name_en": "Mind Reading",
+      "meta_model_category": "DISTORTION",
+      "linguistic_triggers": ["אני יודע שהם חושבים","הוא בטח...","היא לא רוצה"],
+      "anchor_question_templates": ["איך בדיוק אתה יודע מה הוא חושב?","איזה ראיות יש לך לכך?"],
+      "philosophy_core": "השמטת מקור הידע והנחות על אחרים",
+      "therapist_intent": "להחזיר ראיות ולהשיב ספקנות בונה",
+      "examples": ["אני יודע שהוא שונא אותי","הם בטח חושבים שאני טיפש"],
+      "anti_patterns": ["להתקיף על אמונות ללא בדיקה"],
+      "level_hints": {"E":"הקשרים חיצוניים","B":"תגובות אחרים","C":"מיומנות קריאת מצבים","V":"חוקים חברתיים"},
+      "recommended_interventions_by_level": {"B":"בדיקה התנהגותית","E":"הבאת ראיות","C":"תרגול בירור"},
+      "tags": ["חיזוי","השערות"]
+    }
+  ]
 }
 

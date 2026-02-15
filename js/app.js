@@ -434,3 +434,161 @@ function logMetaModelData() {
     console.log('Total categories:', metaModelData.categories?.length || 0);
     console.log('Total practice statements:', metaModelData.practice_statements?.length || 0);
 }
+
+// ==================== PRISM LAB MODULE ====================
+
+function setupPrismModule() {
+    renderPrismLibrary();
+
+    // Listeners for dynamic elements
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.matches('.prism-open-btn')) {
+            const id = e.target.getAttribute('data-id');
+            openPrism(id);
+        }
+    });
+
+    const cancelBtn = document.getElementById('prism-cancel');
+    if (cancelBtn) cancelBtn.addEventListener('click', () => {
+        document.getElementById('prism-detail').classList.add('hidden');
+        document.getElementById('prism-library').classList.remove('hidden');
+    });
+
+    const prismSubmit = document.getElementById('prism-submit');
+    if (prismSubmit) prismSubmit.addEventListener('click', handlePrismSubmit);
+
+    const emo = document.getElementById('prism-emotion');
+    const emoD = document.getElementById('emotion-display');
+    if (emo) emo.addEventListener('input', (e) => emoD.textContent = e.target.value);
+    const res = document.getElementById('prism-resistance');
+    const resD = document.getElementById('resistance-display');
+    if (res) res.addEventListener('input', (e) => resD.textContent = e.target.value);
+}
+
+function renderPrismLibrary() {
+    const lib = document.getElementById('prism-library');
+    if (!lib || !metaModelData.prisms) return;
+    lib.innerHTML = '';
+    metaModelData.prisms.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'prism-card';
+        div.innerHTML = `
+            <h4>${p.name_he}</h4>
+            <p>${p.philosophy_core}</p>
+            <p><strong>שאלת עוגן:</strong> ${p.anchor_question_templates[0]}</p>
+            <div style="margin-top:10px"><button class="btn prism-open-btn" data-id="${p.id}">בחר פריזמה</button></div>
+        `;
+        lib.appendChild(div);
+    });
+}
+
+function openPrism(id) {
+    const prism = (metaModelData.prisms || []).find(x => x.id === id);
+    if (!prism) return alert('פריזמה לא נמצאה');
+    document.getElementById('prism-library').classList.add('hidden');
+    const detail = document.getElementById('prism-detail');
+    detail.classList.remove('hidden');
+    document.getElementById('prism-name').textContent = prism.name_he + ' — ' + prism.name_en;
+    document.getElementById('prism-desc').textContent = prism.philosophy_core;
+    document.getElementById('prism-anchor').textContent = prism.anchor_question_templates[0];
+    // clear previous answers
+    ['E','B','C','V','I','S'].forEach(l => { const el = document.getElementById('ans-'+l); if (el) el.value=''; });
+    document.getElementById('prism-emotion').value = 3; document.getElementById('emotion-display').textContent='3';
+    document.getElementById('prism-resistance').value = 2; document.getElementById('resistance-display').textContent='2';
+    // store current prism in a temp
+    detail.setAttribute('data-prism-id', id);
+}
+
+function handlePrismSubmit() {
+    const id = document.getElementById('prism-detail').getAttribute('data-prism-id');
+    const prism = (metaModelData.prisms || []).find(x => x.id === id);
+    if (!prism) return alert('אין פריזמה פעילה');
+    const answers = [];
+    ['E','B','C','V','I','S'].forEach(l => {
+        const v = document.getElementById('ans-'+l).value.trim();
+        if (v) answers.push({ level: l, text: v });
+    });
+    const emotion = parseInt(document.getElementById('prism-emotion').value || '3');
+    const resistance = parseInt(document.getElementById('prism-resistance').value || '2');
+
+    const session = {
+        datetime: new Date().toISOString(),
+        prism_id: prism.id,
+        prism_name: prism.name_he,
+        anchor: prism.anchor_question_templates[0],
+        answers: answers,
+        emotion: emotion,
+        resistance: resistance
+    };
+
+    const recommendation = computePivotRecommendation(session);
+    renderPrismResult(session, recommendation);
+    savePrismSession(session, recommendation);
+}
+
+function computePivotRecommendation(session) {
+    // simple heuristic per spec: choose level with most answers, but prefer lower-level small wins
+    const counts = {E:0,B:0,C:0,V:0,I:0,S:0};
+    session.answers.forEach(a => { if (counts[a.level] !== undefined) counts[a.level]++; });
+    // rank levels low->high for small wins: E,B,C,V,I,S
+    const order = ['E','B','C','V','I','S'];
+    // if identity-heavy and high resistance -> recommend lower level available
+    const totalAnswers = session.answers.length;
+    const identityCount = counts['I'];
+    if (identityCount > 0 && session.resistance >= 4) {
+        // find first lower-level that has at least one answer (E/B/C)
+        for (const l of ['B','C','E']) {
+            if (counts[l] > 0) return { pivot: l, reason: 'מאמץ מזערי — מומלץ להתחיל ברמה נמוכה כדי ליצור Small Win' };
+        }
+    }
+    // otherwise pick level with max count, tie-break to lower level
+    let best = 'E'; let bestCount = -1;
+    for (const l of order) {
+        if (counts[l] > bestCount) { best = l; bestCount = counts[l]; }
+    }
+    const levelNames = {E:'סביבה (E)',B:'התנהגות (B)',C:'יכולות (C)',V:'ערכים/אמונות (V)',I:'זהות (I)',S:'שייכות (S)'};
+    const reason = bestCount>0 ? `הרבה תשובות נופלות ב${levelNames[best]} — זהו מקום הגיוני למקד Small Win` : 'לא נמצאו תשובות — שקול להתחיל ב-B או ב-E עם צעד קטן';
+    return { pivot: best, reason };
+}
+
+function renderPrismResult(session, recommendation) {
+    const out = document.getElementById('prism-result');
+    out.classList.remove('hidden');
+    out.innerHTML = `
+        <h4>מפת תשובות — ${session.prism_name}</h4>
+        <p><strong>שאלת עוגן:</strong> ${session.anchor}</p>
+        <div class="blueprint-section">
+            <h4>תשובות לפי רמות</h4>
+            <ul>
+                ${session.answers.map(a => `<li><strong>${a.level}:</strong> ${a.text}</li>`).join('')}
+            </ul>
+        </div>
+        <div class="blueprint-section">
+            <h4>המלצת Pivot</h4>
+            <p><strong>${recommendation.pivot}</strong> — ${recommendation.reason}</p>
+            <p>עוצמת רגש: ${session.emotion}, התנגדות: ${session.resistance}</p>
+        </div>
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="exportPrismSession()">📥 ייצא סשן JSON</button>
+        </div>
+    `;
+}
+
+function savePrismSession(session, recommendation) {
+    // keep last 10 sessions in localStorage
+    const key = 'prism_sessions';
+    const raw = localStorage.getItem(key);
+    const arr = raw ? JSON.parse(raw) : [];
+    arr.unshift(Object.assign({}, session, { recommendation }));
+    while (arr.length > 10) arr.pop();
+    localStorage.setItem(key, JSON.stringify(arr));
+}
+
+function exportPrismSession() {
+    const key = 'prism_sessions';
+    const raw = localStorage.getItem(key) || '[]';
+    const blob = new Blob([raw], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `prism_sessions_${Date.now()}.json`; a.click(); URL.revokeObjectURL(url);
+}
+

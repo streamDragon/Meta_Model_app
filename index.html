@@ -18,6 +18,7 @@
             <button class="tab-btn" data-tab="categories">קטגוריות</button>
             <button class="tab-btn" data-tab="practice">תרגול</button>
             <button class="tab-btn" data-tab="blueprint">Blueprint Builder</button>
+            <button class="tab-btn" data-tab="prismlab">מעבדת פריזמות</button>
             <button class="tab-btn" data-tab="about">על הפרויקט</button>
         </nav>
 
@@ -39,6 +40,59 @@
                     <div class="intro-item">
                         <h3>✨ כיצד להשתמש?</h3>
                         <p>בחר קטגוריה ללמוד או עבור לתרגול כדי להתאמן בשאול שאלות.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRISM LAB TAB -->
+        <section id="prismlab" class="tab-content">
+            <div class="prism-container">
+                <div class="card">
+                    <h2>🔍 מעבדת פריזמות (Prism Lab)</h2>
+                    <p>בחר פריזמה לסריקה, הוצב שאלת עוגן אחת, ומפה את התשובות על רמות לוגיות.</p>
+
+                    <div class="prism-grid" id="prism-library">
+                        <!-- Prism cards will be rendered here -->
+                    </div>
+
+                    <div id="prism-detail" class="prism-detail hidden">
+                        <h3 id="prism-name"></h3>
+                        <p id="prism-desc"></p>
+                        <div class="anchor-box">
+                            <strong>שאלת העוגן:</strong>
+                            <p id="prism-anchor" class="anchor-question"></p>
+                        </div>
+
+                        <div class="mapping-form">
+                            <p class="muted">מלא תשובות למפה לפי רמות (E,B,C,V,I,S)</p>
+                            <div class="level-grid">
+                                <div class="level-item"><label>Environment (E)</label><input id="ans-E" /></div>
+                                <div class="level-item"><label>Behavior (B)</label><input id="ans-B" /></div>
+                                <div class="level-item"><label>Capabilities (C)</label><input id="ans-C" /></div>
+                                <div class="level-item"><label>Values/Beliefs (V)</label><input id="ans-V" /></div>
+                                <div class="level-item"><label>Identity (I)</label><input id="ans-I" /></div>
+                                <div class="level-item"><label>Belonging (S)</label><input id="ans-S" /></div>
+                            </div>
+
+                            <div class="q-card">
+                                <label>עוצמת רגש (1-5)</label>
+                                <input type="range" id="prism-emotion" min="1" max="5" value="3" /> <span id="emotion-display">3</span>
+                            </div>
+                            <div class="q-card">
+                                <label>התנגדות (1-5)</label>
+                                <input type="range" id="prism-resistance" min="1" max="5" value="2" /> <span id="resistance-display">2</span>
+                            </div>
+
+                            <div class="step-buttons">
+                                <button id="prism-cancel" class="btn btn-secondary">← חזור לספריה</button>
+                                <button id="prism-submit" class="btn btn-primary">מפה והמלץ Pivot →</button>
+                            </div>
+                        </div>
+
+                        <div id="prism-result" class="final-blueprint-display hidden">
+                            <!-- Result: pivot recommendation and map -->
+                        </div>
                     </div>
                 </div>
             </div>
