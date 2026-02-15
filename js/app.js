@@ -2,14 +2,18 @@
 let metaModelData = {};
 let practiceCount = 0;
 let currentStatementIndex = 0;
+let userProgress = { xp: 0, streak: 0, badges: [], sessions: 0, lastSessionDate: null };
 
 // Load data on page load
 document.addEventListener('DOMContentLoaded', () => {
+    loadUserProgress();
     loadMetaModelData();
     setupTabNavigation();
     setupPracticeMode();
     setupBlueprintBuilder();
     setupPrismModule();
+    initializeProgressHub();
+    showLoadingIndicator();
 });
 
 // Load Meta Model data from JSON
@@ -671,5 +675,115 @@ function navigateTo(tabName) {
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// ==================== PROGRESS TRACKING & GAMIFICATION ====================
+
+function loadUserProgress() {
+    const saved = localStorage.getItem('userProgress');
+    if (saved) {
+        userProgress = JSON.parse(saved);
+    }
+}
+
+function saveUserProgress() {
+    localStorage.setItem('userProgress', JSON.stringify(userProgress));
+}
+
+function addXP(amount) {
+    userProgress.xp += amount;
+    updateStreak();
+    checkAndAwardBadges();
+    saveUserProgress();
+    updateProgressHub();
+}
+
+function updateStreak() {
+    const today = new Date().toISOString().split('T')[0];
+    if (userProgress.lastSessionDate === today) return; // Already counted today
+    
+    if (userProgress.lastSessionDate === null) {
+        userProgress.streak = 1;
+    } else {
+        const lastDate = new Date(userProgress.lastSessionDate);
+        const now = new Date();
+        const diff = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+        
+        if (diff === 1) {
+            userProgress.streak += 1;
+        } else if (diff > 1) {
+            userProgress.streak = 1; // Reset streak if missed a day
+        }
+    }
+    userProgress.lastSessionDate = today;
+}
+
+function checkAndAwardBadges() {
+    const badgesList = [
+        { id: 'first_step', name: 'צעד ראשון', icon: '👣', condition: () => userProgress.xp >= 10 },
+        { id: 'fire_10', name: 'להט 🔥', icon: '🔥', condition: () => userProgress.streak >= 10 },
+        { id: 'xp_100', name: '100 XP', icon: '⭐', condition: () => userProgress.xp >= 100 },
+        { id: 'xp_500', name: '500 XP', icon: '✨', condition: () => userProgress.xp >= 500 },
+        { id: 'sessions_10', name: '10 סשנים', icon: '📊', condition: () => userProgress.sessions >= 10 },
+    ];
+    
+    badgesList.forEach(badge => {
+        if (badge.condition() && !userProgress.badges.find(b => b.id === badge.id)) {
+            userProgress.badges.push({ id: badge.id, name: badge.name, icon: badge.icon, earned: new Date().toISOString() });
+            showHint(`🏆 כבר רכשת את התג: ${badge.name}`);
+        }
+    });
+}
+
+function recordSession() {
+    userProgress.sessions += 1;
+    updateStreak();
+    checkAndAwardBadges();
+    saveUserProgress();
+    updateProgressHub();
+}
+
+function initializeProgressHub() {
+    updateProgressHub();
+}
+
+function updateProgressHub() {
+    const streakEl = document.getElementById('streak-count');
+    const xpEl = document.getElementById('xp-count');
+    const badgeCountEl = document.getElementById('badge-count');
+    const sessionEl = document.getElementById('session-count');
+    const badgesDisplay = document.getElementById('badges-display');
+    
+    if (streakEl) streakEl.textContent = `${userProgress.streak} ימים`;
+    if (xpEl) xpEl.textContent = userProgress.xp;
+    if (badgeCountEl) badgeCountEl.textContent = userProgress.badges.length;
+    if (sessionEl) sessionEl.textContent = userProgress.sessions;
+    
+    if (badgesDisplay) {
+        badgesDisplay.innerHTML = userProgress.badges.map(b => `
+            <div class="badge" title="${b.name}">
+                <span class="badge-icon">${b.icon}</span>
+                <span>${b.name}</span>
+            </div>
+        `).join('');
+    }
+}
+
+// اهوك XP acquisition على actions
+function onPracticeComplete() {
+    addXP(5);
+    recordSession();
+}
+
+function onBlueprintComplete() {
+    addXP(20);
+    recordSession();
+}
+
+function onPrismComplete() {
+    addXP(15);
+    recordSession();
+}
+
+// ==================== END OF APP ===================
 
 // ==================== END OF APP ===================

@@ -797,6 +797,88 @@ a:hover {
     text-decoration: underline;
 }
 
+/* Progress Hub & Gamification */
+.progress-hub {
+    background: linear-gradient(135deg, #fef5e7 0%, #fef9e7 100%);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    margin-top: 25px;
+    border: 2px solid #f9d56e;
+}
+
+.progress-hub h3 {
+    color: var(--dark);
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.progress-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.progress-card {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    border: 2px solid #f9d56e;
+}
+
+.progress-icon {
+    display: block;
+    font-size: 2em;
+    margin-bottom: 8px;
+}
+
+.progress-label {
+    font-size: 0.85em;
+    color: #718096;
+    margin: 0;
+}
+
+.progress-value {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 6px 0;
+}
+
+.progress-card small {
+    display: block;
+    font-size: 0.75em;
+    color: #cbd5e0;
+}
+
+.badges-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.badge {
+    background: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 2px solid var(--success-color);
+    font-size: 0.8em;
+    font-weight: 600;
+    color: var(--success-color);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 4px rgba(72, 187, 120, 0.2);
+}
+
+.badge-icon {
+    font-size: 1.2em;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     header h1 {
