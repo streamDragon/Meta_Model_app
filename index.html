@@ -157,6 +157,7 @@
             <div class="practice-container">
                 <div class="card">
                     <h2>תרגול דינאמי 🎮</h2>
+                    <p class="subtitle">בחר קטגוריה וענ על שאלות אינטראקטיביות עם משוב מידי</p>
                     
                     <div class="practice-filters">
                         <label>בחר קטגוריה:</label>
@@ -165,24 +166,49 @@
                         </select>
                     </div>
 
-                    <div id="practice-statement" class="statement-box">
-                        <p class="instruction">לחץ על "הבא" כדי לקבל משפט לתרגול</p>
+                    <!-- TRAINER MODE INTERFACE -->
+                    <div id="trainer-mode" class="trainer-mode hidden">
+                        <!-- QUESTION DISPLAY -->
+                        <div class="question-display">
+                            <div class="question-header">
+                                <span class="question-counter">שאלה <span id="current-q">1</span> מתוך <span id="total-q">10</span></span>
+                                <span class="xp-badge">+10 XP</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div id="progress-fill" class="progress-fill"></div>
+                            </div>
+                            <p class="question-text" id="question-text"></p>
+                        </div>
+
+                        <!-- MCQ OPTIONS (Expandable) -->
+                        <div class="mcq-options" id="mcq-options">
+                            <!-- Options generated dynamically -->
+                        </div>
+
+                        <!-- FEEDBACK SECTION -->
+                        <div id="feedback-section" class="feedback-section hidden">
+                            <div id="feedback-content" class="feedback-box"></div>
+                            <button id="next-question-btn" class="btn btn-primary">השאלה הבאה →</button>
+                        </div>
+
+                        <!-- HINTS SECTION -->
+                        <div class="trainer-hints">
+                            <button id="hint-trigger" class="btn btn-secondary hint-button">💡 רמז</button>
+                            <div id="hint-display" class="hint-display hidden"></div>
+                        </div>
                     </div>
 
-                    <div class="practice-buttons">
-                        <button id="next-btn" class="btn btn-primary">הבא →</button>
-                        <button id="show-answer-btn" class="btn btn-secondary">הראה תשובה</button>
-                        <button id="hint-btn" class="btn btn-secondary">טיפ</button>
+                    <!-- START TRAINER BUTTON -->
+                    <div id="trainer-start" class="start-section">
+                        <p class="instruction">בחר קטגוריה ולחץ כדי להתחיל</p>
+                        <button id="start-trainer-btn" class="btn btn-primary btn-large">🎮 התחל תרגול</button>
                     </div>
 
-                    <div id="practice-answer" class="answer-box hidden">
-                        <h3>תשובה המוצעת:</h3>
-                        <p id="answer-text"></p>
-                        <p id="answer-explanation" class="explanation"></p>
-                    </div>
-
+                    <!-- STATS -->
                     <div class="practice-stats">
-                        <p>תרגולים שבוצעו: <span id="practice-count">0</span></p>
+                        <p>✅ תשובות נכונות: <span id="correct-count">0</span></p>
+                        <p>📊 קצב הצלחה: <span id="success-rate">0%</span></p>
+                        <p>⭐ הרוויח XP: <span id="session-xp">0</span></p>
                     </div>
                 </div>
             </div>

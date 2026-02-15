@@ -230,6 +230,307 @@ function hideAnswer() {
     answerBox.classList.add('hidden');
 }
 
+// ==================== TRAINER MODE (INTERACTIVE MCQ) ====================
+
+function setupTrainerMode() {
+    const startBtn = document.getElementById('start-trainer-btn');
+    const categorySelect = document.getElementById('category-select');
+    const hintTrigger = document.getElementById('hint-trigger');
+    
+    startBtn.addEventListener('click', () => {
+        const selectedCategory = categorySelect.value;
+        if (!selectedCategory) {
+            showHintMessage('בחר קטגוריה תחילה!');
+            return;
+        }
+        startTrainer(selectedCategory);
+    });
+    
+    if (hintTrigger) {
+        hintTrigger.addEventListener('click', showTrainerHint);
+    }
+}
+
+function showHintMessage(message) {
+    const hintBox = document.getElementById('hint-box');
+    const hintText = document.getElementById('hint-text');
+    hintText.textContent = message;
+    hintBox.style.display = 'block';
+    setTimeout(() => closeHint(), 4000);
+}
+
+function startTrainer(categoryId) {
+    // Get statements for category
+    let statements = metaModelData.practice_statements;
+    
+    if (categoryId) {
+        const categoryName = getCategoryName(categoryId);
+        statements = statements.filter(s => s.category === categoryName);
+    }
+    
+    if (statements.length === 0) {
+        showHintMessage('אין משפטים לקטגוריה זו');
+        return;
+    }
+    
+    // Initialize trainer state
+    trainerState = {
+        isActive: true,
+        currentQuestion: 0,
+        questions: statements.slice(0, 10), // Up to 10 questions
+        selectedCategory: categoryId,
+        correctCount: 0,
+        sessionXP: 0,
+        answered: false
+    };
+    
+    // Show trainer UI, hide start section
+    document.getElementById('trainer-start').classList.add('hidden');
+    document.getElementById('trainer-mode').classList.remove('hidden');
+    
+    // Load first question
+    loadNextQuestion();
+}
+
+function loadNextQuestion() {
+    if (trainerState.currentQuestion >= trainerState.questions.length) {
+        endTrainerSession();
+        return;
+    }
+    
+    const question = trainerState.questions[trainerState.currentQuestion];
+    trainerState.answered = false;
+    
+    // Update progress
+    const progress = ((trainerState.currentQuestion) / trainerState.questions.length) * 100;
+    document.getElementById('progress-fill').style.width = progress + '%';
+    document.getElementById('current-q').textContent = trainerState.currentQuestion + 1;
+    document.getElementById('total-q').textContent = trainerState.questions.length;
+    
+    // Display question
+    document.getElementById('question-text').textContent = question.statement;
+    
+    // Hide feedback
+    document.getElementById('feedback-section').classList.remove('visible');
+    document.getElementById('hint-display').classList.remove('visible');
+    
+    // Generate MCQ options
+    generateMCQOptions(question);
+}
+
+function generateMCQOptions(question) {
+    const allStatements = metaModelData.practice_statements;
+    const violations = [
+        'DELETION',
+        'DISTORTION',
+        'GENERALIZATION'
+    ];
+    
+    // Correct answer
+    const correctViolation = question.violation;
+    
+    // Get 3 other violations as distractors
+    const incorrectOptions = violations.filter(v => v !== correctViolation);
+    
+    // Shuffle options
+    const options = [correctViolation, ...incorrectOptions];
+    const shuffled = options.sort(() => Math.random() - 0.5);
+    
+    // Render options
+    const mcqContainer = document.getElementById('mcq-options');
+    mcqContainer.innerHTML = '';
+    
+    shuffled.forEach((option, index) => {
+        const optionId = `option-${index}`;
+        const label = {
+            'DELETION': 'מחיקה (Deletion)',
+            'DISTORTION': 'עיוות (Distortion)',
+            'GENERALIZATION': 'הכללה (Generalization)'
+        }[option];
+        
+        const optionHTML = `
+            <div class="mcq-option">
+                <input type="radio" id="${optionId}" class="option-input" name="mcq" value="${option}">
+                <label for="${optionId}" class="option-label">
+                    <span class="option-radio"></span>
+                    <span class="option-text">${label}</span>
+                </label>
+            </div>
+        `;
+        
+        mcqContainer.innerHTML += optionHTML;
+        
+        // Add change event listener
+        document.getElementById(optionId).addEventListener('change', (e) => {
+            handleMCQSelection(e, question, option);
+        });
+    });
+}
+
+function handleMCQSelection(event, question, selectedOption) {
+    if (trainerState.answered) return;
+    
+    trainerState.answered = true;
+    
+    const isCorrect = selectedOption === question.violation;
+    
+    // Award XP for correct answer
+    if (isCorrect) {
+        trainerState.correctCount++;
+        trainerState.sessionXP += 10;
+        addXP(10); // Add to user progress
+    }
+    
+    // Show feedback
+    showFeedback(isCorrect, question, selectedOption);
+    
+    // Update stats
+    updateTrainerStats();
+}
+
+function showFeedback(isCorrect, question, selectedViolation) {
+    const feedbackSection = document.getElementById('feedback-section');
+    const feedbackContent = document.getElementById('feedback-content');
+    
+    const correctLabel = {
+        'DELETION': 'מחיקה (Deletion)',
+        'DISTORTION': 'עיוות (Distortion)',
+        'GENERALIZATION': 'הכללה (Generalization)'
+    };
+    
+    let feedbackHTML = '';
+    
+    if (isCorrect) {
+        feedbackHTML = `
+            <div class="correct">
+                <strong>✅ נכון!</strong>
+                <p class="explanation">
+                    <strong>קטגוריה:</strong> ${correctLabel[question.violation]}<br>
+                    <strong>שאלה מוצעת:</strong> "${question.suggested_question}"<br>
+                    <strong>הסבר:</strong> ${question.explanation}
+                </p>
+                <p style="margin-top: 15px; color: #28a745; font-weight: bold;">+10 XP 🎉</p>
+            </div>
+        `;
+    } else {
+        feedbackHTML = `
+            <div class="incorrect">
+                <strong>❌ לא נכון</strong>
+                <p class="explanation">
+                    <strong>בחרת:</strong> ${correctLabel[selectedViolation]}<br>
+                    <strong>התשובה הנכונה:</strong> ${correctLabel[question.violation]}<br>
+                    <strong>שאלה מוצעת:</strong> "${question.suggested_question}"<br>
+                    <strong>הסבר:</strong> ${question.explanation}
+                </p>
+            </div>
+        `;
+    }
+    
+    feedbackContent.innerHTML = feedbackHTML;
+    feedbackSection.classList.add('visible');
+    
+    // Add next button handler
+    document.getElementById('next-question-btn').onclick = () => {
+        trainerState.currentQuestion++;
+        loadNextQuestion();
+    };
+}
+
+function updateTrainerStats() {
+    const total = trainerState.currentQuestion + 1;
+    const successRate = Math.round((trainerState.correctCount / total) * 100);
+    
+    document.getElementById('correct-count').textContent = trainerState.correctCount;
+    document.getElementById('success-rate').textContent = successRate + '%';
+    document.getElementById('session-xp').textContent = trainerState.sessionXP;
+}
+
+function showTrainerHint() {
+    if (trainerState.currentQuestion >= trainerState.questions.length) return;
+    
+    const question = trainerState.questions[trainerState.currentQuestion];
+    
+    const hints = {
+        'DELETION': '🔍 המידע חסר - מי? מה? כמה? לפי מי? איפה?',
+        'DISTORTION': '🔄 יש כאן הנחה או שינוי בלי ראיות - מה מוכן? אילו מילים חשודות?',
+        'GENERALIZATION': '📈 יש הכללה חזקה - באמת תמיד? באמת אף פעם? תמיד לכולם?'
+    };
+    
+    const difficultyHint = {
+        'easy': 'הפרה בסיסית - חשוב על השפה',
+        'medium': 'הפרה בינונית - צריך להעמיק',
+        'hard': 'הפרה מורכבת - קורא קשיבה'
+    };
+    
+    let hintText = `${hints[question.category] || ''}\n\nרמת קשיות: ${difficultyHint[question.difficulty]}`;
+    
+    const hintDisplay = document.getElementById('hint-display');
+    hintDisplay.innerHTML = `<p>${hintText.replace(/\n/g, '<br>')}</p>`;
+    hintDisplay.classList.add('visible');
+}
+
+function endTrainerSession() {
+    // Show completion message
+    const feedbackSection = document.getElementById('feedback-section');
+    const feedbackContent = document.getElementById('feedback-content');
+    
+    const successRate = Math.round((trainerState.correctCount / trainerState.questions.length) * 100);
+    
+    let message = '';
+    if (successRate === 100) {
+        message = '🏆 מושלם! קיבלת את הכל נכון!';
+    } else if (successRate >= 80) {
+        message = '🎉 מעולה! הצלחת 80% ויותר!';
+    } else if (successRate >= 60) {
+        message = '👍 טוב! המשך להתרגל!';
+    } else {
+        message = '💪 עדיין יש מה ללמוד - המשך!';
+    }
+    
+    feedbackContent.innerHTML = `
+        <div class="correct" style="text-align: center;">
+            <h2>${message}</h2>
+            <p style="font-size: 1.15em;">
+                <strong>ציון סופי:</strong> ${trainerState.correctCount} / ${trainerState.questions.length}<br>
+                <strong>קצב הצלחה:</strong> ${successRate}%<br>
+                <strong>XP שהרווחת:</strong> +${trainerState.sessionXP}
+            </p>
+            <button class="btn btn-primary" onclick="resetTrainer()" style="margin-top: 20px; width: 100%;">תרגול נוסף →</button>
+        </div>
+    `;
+    
+    // Hide questions, show completion
+    document.getElementById('question-display').style.display = 'none';
+    document.getElementById('mcq-options').style.display = 'none';
+    document.getElementById('trainer-hints').style.display = 'none';
+    feedbackSection.classList.add('visible');
+}
+
+function resetTrainer() {
+    // Reset UI
+    document.getElementById('trainer-mode').classList.add('hidden');
+    document.getElementById('trainer-start').classList.remove('hidden');
+    document.getElementById('question-display').style.display = 'block';
+    document.getElementById('mcq-options').style.display = 'flex';
+    document.getElementById('trainer-hints').style.display = 'block';
+    
+    // Reset stats
+    document.getElementById('correct-count').textContent = '0';
+    document.getElementById('success-rate').textContent = '0%';
+    document.getElementById('session-xp').textContent = '0';
+    
+    // Reset state
+    trainerState = {
+        isActive: false,
+        currentQuestion: 0,
+        questions: [],
+        selectedCategory: '',
+        correctCount: 0,
+        sessionXP: 0,
+        answered: false
+    };
+}
+
 // ==================== BLUEPRINT BUILDER ====================
 
 let blueprintData = {};
