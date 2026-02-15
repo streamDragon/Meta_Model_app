@@ -98,6 +98,128 @@ header p {
     animation: pulse 1.5s ease-in-out infinite;
 }
 
+/* SPLASH SCREEN */
+#splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: splashFadeOut 0.6s ease-in-out 3s forwards;
+}
+
+.splash-content {
+    text-align: center;
+    color: white;
+}
+
+.splash-logo {
+    font-size: 5em;
+    margin-bottom: 20px;
+    animation: splashBounce 1s ease-in-out infinite;
+}
+
+.splash-title {
+    font-size: 3em;
+    font-weight: 700;
+    margin: 0;
+    animation: splashSlideDown 0.8s ease-out 0.3s backwards;
+    letter-spacing: 2px;
+}
+
+.splash-subtitle {
+    font-size: 1.3em;
+    margin: 10px 0 30px 0;
+    opacity: 0.95;
+    animation: splashSlideUp 0.8s ease-out 0.5s backwards;
+}
+
+.splash-loading {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: flex-end;
+    height: 40px;
+}
+
+.splash-dot {
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    animation: splashDot 1.4s ease-in-out infinite;
+}
+
+.splash-dot:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.splash-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.splash-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes splashBounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes splashSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes splashSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes splashDot {
+    0%, 100% {
+        transform: scaleY(0.5);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scaleY(1);
+        opacity: 1;
+    }
+}
+
+@keyframes splashFadeOut {
+    from {
+        opacity: 1;
+        visibility: visible;
+    }
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }

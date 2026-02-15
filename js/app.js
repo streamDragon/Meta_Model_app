@@ -3,13 +3,75 @@ let metaModelData = {};
 let practiceCount = 0;
 let currentStatementIndex = 0;
 let userProgress = { xp: 0, streak: 0, badges: [], sessions: 0, lastSessionDate: null };
+let trainerState = {
+    isActive: false,
+    currentQuestion: 0,
+    questions: [],
+    selectedCategory: '',
+    correctCount: 0,
+    sessionXP: 0,
+    answered: false
+};
+
+// Play Opening Music using Web Audio API
+function playOpeningMusic() {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Create a pleasant opening chord sequence
+        const now = audioContext.currentTime;
+        const notes = [
+            { freq: 523.25, duration: 0.5, delay: 0 },     // C5
+            { freq: 659.25, duration: 0.5, delay: 0.2 },   // E5
+            { freq: 783.99, duration: 0.5, delay: 0.4 },   // G5
+            { freq: 1046.50, duration: 0.8, delay: 0.6 }   // C6
+        ];
+        
+        notes.forEach(note => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            osc.frequency.value = note.freq;
+            osc.type = 'sine';
+            
+            gain.gain.setValueAtTime(0.1, now + note.delay);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + note.delay + note.duration);
+            
+            osc.start(now + note.delay);
+            osc.stop(now + note.delay + note.duration);
+        });
+    } catch (e) {
+        // Silently fail if audio context is not supported
+        console.log('Audio not supported');
+    }
+}
+
+// Hide Splash Screen
+function hideSplashScreen() {
+    const splashScreen = document.getElementById('splash-screen');
+    // The animation handles the fade out after 3 seconds
+    // Just ensure it's hidden after animation
+    setTimeout(() => {
+        splashScreen.style.display = 'none';
+    }, 3600);
+}
 
 // Load data on page load
 document.addEventListener('DOMContentLoaded', () => {
+    // Play opening music
+    playOpeningMusic();
+    
+    // Hide splash after animation
+    hideSplashScreen();
+    
     loadUserProgress();
     loadMetaModelData();
     setupTabNavigation();
     setupPracticeMode();
+    setupTrainerMode();
     setupBlueprintBuilder();
     setupPrismModule();
     initializeProgressHub();
