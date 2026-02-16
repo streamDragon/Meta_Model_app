@@ -191,7 +191,7 @@
                     <!-- TRAINER MODE INTERFACE -->
                     <div id="trainer-mode" class="trainer-mode hidden">
                         <!-- QUESTION DISPLAY -->
-                        <div class="question-display">
+                        <div id="question-display" class="question-display">
                             <div class="question-header">
                                 <span class="question-counter">שאלה <span id="current-q">1</span> מתוך <span id="total-q">10</span></span>
                                 <span class="xp-badge">+10 XP</span>
@@ -200,6 +200,7 @@
                                 <div id="progress-fill" class="progress-fill"></div>
                             </div>
                             <p class="question-text" id="question-text"></p>
+                            <p id="progress-note" class="progress-note"></p>
                         </div>
 
                         <!-- MCQ OPTIONS (Expandable) -->
@@ -208,15 +209,23 @@
                         </div>
 
                         <!-- FEEDBACK SECTION -->
-                        <div id="feedback-section" class="feedback-section hidden">
+                        <div id="feedback-section" class="feedback-section">
                             <div id="feedback-content" class="feedback-box"></div>
                             <button id="next-question-btn" class="btn btn-primary">השאלה הבאה →</button>
                         </div>
 
                         <!-- HINTS SECTION -->
-                        <div class="trainer-hints">
-                            <button id="hint-trigger" class="btn btn-secondary hint-button">💡 רמז</button>
+                        <div id="trainer-hints" class="trainer-hints">
+                            <div class="trainer-tools">
+                                <button id="hint-trigger" class="btn btn-secondary hint-button">💡 רמז</button>
+                                <button id="why-trigger" class="btn btn-secondary hint-button">❓ למה חשוב?</button>
+                                <button id="depth-trigger" class="btn btn-secondary hint-button">🔎 עומק</button>
+                                <button id="skip-question-btn" class="btn btn-secondary hint-button">⏭ דלג</button>
+                                <button id="audio-mute-btn" class="btn btn-secondary hint-button">🔊 סאונד פעיל</button>
+                            </div>
                             <div id="hint-display" class="hint-display hidden"></div>
+                            <div id="why-display" class="hint-display hidden"></div>
+                            <div id="depth-display" class="hint-display hidden"></div>
                         </div>
                     </div>
 

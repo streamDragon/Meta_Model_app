@@ -10,13 +10,144 @@ let trainerState = {
     selectedCategory: '',
     correctCount: 0,
     sessionXP: 0,
-    answered: false
+    answered: false,
+    hintLevel: 0,
+    skippedCount: 0
 };
 
-// Play Opening Music using Web Audio API
-function playOpeningMusic() {
+let audioState = {
+    context: null,
+    muted: false,
+    openingPlayed: false
+};
+
+const TRAINER_CATEGORY_LABELS = {
+    DELETION: 'מחיקה (Deletion)',
+    DISTORTION: 'עיוות (Distortion)',
+    GENERALIZATION: 'הכללה (Generalization)'
+};
+
+const SUBCATEGORY_TO_CATEGORY = {
+    SIMPLE_DELETION: 'DELETION',
+    COMPARATIVE_DELETION: 'DELETION',
+    LACK_REFERENTIAL_INDEX: 'DELETION',
+    LACK_OF_REFERENTIAL_INDEX: 'DELETION',
+    NOMINALIZATION: 'DISTORTION',
+    'CAUSE-EFFECT': 'DISTORTION',
+    MIND_READING: 'DISTORTION',
+    LOST_PERFORMATIVE: 'DISTORTION',
+    PRESUPPOSITION: 'DISTORTION',
+    COMPLEX_EQUIVALENCE: 'DISTORTION',
+    UNIVERSAL_QUANTIFIER: 'GENERALIZATION',
+    MODAL_OPERATOR: 'GENERALIZATION'
+};
+
+function shuffleArray(items) {
+    const arr = [...items];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function getQuestionCategoryKey(question) {
+    const directCategory = (question.category || '').toUpperCase().trim();
+    if (TRAINER_CATEGORY_LABELS[directCategory]) return directCategory;
+
+    const directViolation = (question.violation || '').toUpperCase().trim();
+    if (TRAINER_CATEGORY_LABELS[directViolation]) return directViolation;
+
+    const normalizedViolation = directViolation.replace(/\s+/g, '_');
+    return SUBCATEGORY_TO_CATEGORY[normalizedViolation] || '';
+}
+
+function loadAudioSettings() {
+    const saved = localStorage.getItem('meta_audio_muted');
+    audioState.muted = saved === 'true';
+}
+
+function ensureAudioContext() {
+    if (audioState.context) return audioState.context;
     try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioState.context = new (window.AudioContext || window.webkitAudioContext)();
+        return audioState.context;
+    } catch (e) {
+        return null;
+    }
+}
+
+function updateMuteButtonUI() {
+    const btn = document.getElementById('audio-mute-btn');
+    if (!btn) return;
+    btn.textContent = audioState.muted ? '🔇 סאונד כבוי' : '🔊 סאונד פעיל';
+    btn.classList.toggle('is-muted', audioState.muted);
+}
+
+function setMutedAudio(isMuted) {
+    audioState.muted = isMuted;
+    localStorage.setItem('meta_audio_muted', String(isMuted));
+    updateMuteButtonUI();
+}
+
+function toggleAudioMute() {
+    setMutedAudio(!audioState.muted);
+}
+
+function playTone(frequency, duration = 0.12, type = 'sine', volume = 0.05, delay = 0) {
+    if (audioState.muted) return;
+    const ctx = ensureAudioContext();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const now = ctx.currentTime + delay;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.frequency.value = frequency;
+    osc.type = type;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(volume, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    osc.start(now);
+    osc.stop(now + duration + 0.01);
+}
+
+function playUISound(kind) {
+    if (audioState.muted) return;
+    if (kind === 'correct') {
+        playTone(660, 0.12, 'triangle', 0.06, 0);
+        playTone(880, 0.14, 'triangle', 0.06, 0.08);
+    } else if (kind === 'wrong') {
+        playTone(220, 0.14, 'sawtooth', 0.05, 0);
+        playTone(165, 0.16, 'sawtooth', 0.05, 0.08);
+    } else if (kind === 'hint') {
+        playTone(540, 0.08, 'sine', 0.04, 0);
+        playTone(620, 0.08, 'sine', 0.04, 0.06);
+    } else if (kind === 'skip') {
+        playTone(380, 0.08, 'square', 0.04, 0);
+    } else if (kind === 'next') {
+        playTone(520, 0.08, 'triangle', 0.04, 0);
+    } else if (kind === 'start') {
+        playTone(523.25, 0.12, 'sine', 0.04, 0);
+        playTone(659.25, 0.12, 'sine', 0.04, 0.1);
+    } else if (kind === 'finish') {
+        playTone(523.25, 0.11, 'triangle', 0.05, 0);
+        playTone(659.25, 0.11, 'triangle', 0.05, 0.08);
+        playTone(783.99, 0.15, 'triangle', 0.05, 0.16);
+    }
+}
+
+// Play opening music using Web Audio API
+function playOpeningMusic() {
+    if (audioState.muted || audioState.openingPlayed) return;
+    try {
+        const audioContext = ensureAudioContext();
+        if (!audioContext) return;
+        if (audioContext.state === 'suspended') audioContext.resume();
         
         // Create a pleasant opening chord sequence
         const now = audioContext.currentTime;
@@ -43,6 +174,8 @@ function playOpeningMusic() {
             osc.start(now + note.delay);
             osc.stop(now + note.delay + note.duration);
         });
+
+        audioState.openingPlayed = true;
     } catch (e) {
         // Silently fail if audio context is not supported
         console.log('Audio not supported');
@@ -65,6 +198,15 @@ function hideSplashScreen() {
 
 // Load data on page load
 document.addEventListener('DOMContentLoaded', () => {
+    loadAudioSettings();
+    updateMuteButtonUI();
+
+    // Browsers usually require user interaction before audio starts.
+    document.addEventListener('pointerdown', () => {
+        ensureAudioContext();
+        playOpeningMusic();
+    }, { once: true });
+
     // Play opening music
     playOpeningMusic();
     
@@ -307,6 +449,10 @@ function setupTrainerMode() {
     const startBtn = document.getElementById('start-trainer-btn');
     const categorySelect = document.getElementById('category-select');
     const hintTrigger = document.getElementById('hint-trigger');
+    const whyTrigger = document.getElementById('why-trigger');
+    const depthTrigger = document.getElementById('depth-trigger');
+    const skipBtn = document.getElementById('skip-question-btn');
+    const muteBtn = document.getElementById('audio-mute-btn');
 
     if (!startBtn || !categorySelect) return;
     
@@ -319,14 +465,19 @@ function setupTrainerMode() {
         startTrainer(selectedCategory);
     });
     
-    if (hintTrigger) {
-        hintTrigger.addEventListener('click', showTrainerHint);
-    }
+    if (hintTrigger) hintTrigger.addEventListener('click', showTrainerHint);
+    if (whyTrigger) whyTrigger.addEventListener('click', showTrainerImportance);
+    if (depthTrigger) depthTrigger.addEventListener('click', showTrainerDepth);
+    if (skipBtn) skipBtn.addEventListener('click', skipCurrentQuestion);
+    if (muteBtn) muteBtn.addEventListener('click', toggleAudioMute);
+
+    updateMuteButtonUI();
 }
 
 function showHintMessage(message) {
     const hintBox = document.getElementById('hint-box');
     const hintText = document.getElementById('hint-text');
+    if (!hintBox || !hintText) return;
     hintText.textContent = message;
     hintBox.style.display = 'block';
     setTimeout(() => closeHint(), 4000);
@@ -346,23 +497,58 @@ function startTrainer(categoryId) {
         return;
     }
     
+    const selectedQuestions = shuffleArray(statements).slice(0, Math.min(10, statements.length));
+
     // Initialize trainer state
     trainerState = {
         isActive: true,
         currentQuestion: 0,
-        questions: statements.slice(0, 10), // Up to 10 questions
+        questions: selectedQuestions,
         selectedCategory: categoryId,
         correctCount: 0,
         sessionXP: 0,
-        answered: false
+        answered: false,
+        hintLevel: 0,
+        skippedCount: 0
     };
     
     // Show trainer UI, hide start section
     document.getElementById('trainer-start').classList.add('hidden');
     document.getElementById('trainer-mode').classList.remove('hidden');
+
+    playUISound('start');
     
     // Load first question
     loadNextQuestion();
+}
+
+function setPanelContent(panelId, html) {
+    const panel = document.getElementById(panelId);
+    if (!panel) return;
+    panel.innerHTML = html;
+    panel.classList.remove('hidden');
+    panel.classList.add('visible');
+}
+
+function hidePanel(panelId) {
+    const panel = document.getElementById(panelId);
+    if (!panel) return;
+    panel.classList.remove('visible');
+    panel.classList.add('hidden');
+}
+
+function hideTrainerInfoPanels() {
+    hidePanel('hint-display');
+    hidePanel('why-display');
+    hidePanel('depth-display');
+}
+
+function updateTrainerProgressNote() {
+    const noteEl = document.getElementById('progress-note');
+    if (!noteEl) return;
+    const remaining = trainerState.questions.length - trainerState.currentQuestion - 1;
+    const answeredCount = trainerState.currentQuestion - trainerState.skippedCount + (trainerState.answered ? 1 : 0);
+    noteEl.textContent = `נשארו ${Math.max(remaining, 0)} שאלות | נענו: ${Math.max(answeredCount, 0)} | דולגו: ${trainerState.skippedCount}`;
 }
 
 function loadNextQuestion() {
@@ -373,6 +559,7 @@ function loadNextQuestion() {
     
     const question = trainerState.questions[trainerState.currentQuestion];
     trainerState.answered = false;
+    trainerState.hintLevel = 0;
     
     // Update progress
     const progress = ((trainerState.currentQuestion) / trainerState.questions.length) * 100;
@@ -385,42 +572,26 @@ function loadNextQuestion() {
     
     // Hide feedback
     document.getElementById('feedback-section').classList.remove('visible');
-    document.getElementById('hint-display').classList.remove('visible');
+    document.getElementById('feedback-section').classList.add('hidden');
+    hideTrainerInfoPanels();
+    updateTrainerProgressNote();
     
     // Generate MCQ options
     generateMCQOptions(question);
 }
 
+// --- Trainer flow: improved progression, hints, depth and explanations ---
 function generateMCQOptions(question) {
-    const allStatements = metaModelData.practice_statements;
-    const violations = [
-        'DELETION',
-        'DISTORTION',
-        'GENERALIZATION'
-    ];
-    
-    // Correct answer
-    const correctViolation = question.violation;
-    
-    // Get 3 other violations as distractors
-    const incorrectOptions = violations.filter(v => v !== correctViolation);
-    
-    // Shuffle options
-    const options = [correctViolation, ...incorrectOptions];
-    const shuffled = options.sort(() => Math.random() - 0.5);
-    
-    // Render options
+    const violations = ['DELETION', 'DISTORTION', 'GENERALIZATION'];
+    const shuffled = shuffleArray(violations);
     const mcqContainer = document.getElementById('mcq-options');
+    if (!mcqContainer) return;
     mcqContainer.innerHTML = '';
-    
+
     shuffled.forEach((option, index) => {
         const optionId = `option-${index}`;
-        const label = {
-            'DELETION': 'מחיקה (Deletion)',
-            'DISTORTION': 'עיוות (Distortion)',
-            'GENERALIZATION': 'הכללה (Generalization)'
-        }[option];
-        
+        const label = TRAINER_CATEGORY_LABELS[option] || option;
+
         const optionHTML = `
             <div class="mcq-option">
                 <input type="radio" id="${optionId}" class="option-input" name="mcq" value="${option}">
@@ -430,10 +601,8 @@ function generateMCQOptions(question) {
                 </label>
             </div>
         `;
-        
+
         mcqContainer.innerHTML += optionHTML;
-        
-        // Add change event listener
         document.getElementById(optionId).addEventListener('change', (e) => {
             handleMCQSelection(e, question, option);
         });
@@ -442,47 +611,46 @@ function generateMCQOptions(question) {
 
 function handleMCQSelection(event, question, selectedOption) {
     if (trainerState.answered) return;
-    
     trainerState.answered = true;
-    
-    const isCorrect = selectedOption === question.violation;
-    
-    // Award XP for correct answer
+
+    const correctCategory = getQuestionCategoryKey(question);
+    const isCorrect = selectedOption === correctCategory;
+
     if (isCorrect) {
         trainerState.correctCount++;
         trainerState.sessionXP += 10;
-        addXP(10); // Add to user progress
+        addXP(10);
+        playUISound('correct');
+    } else {
+        playUISound('wrong');
     }
-    
-    // Show feedback
+
     showFeedback(isCorrect, question, selectedOption);
-    
-    // Update stats
     updateTrainerStats();
 }
 
 function showFeedback(isCorrect, question, selectedViolation) {
     const feedbackSection = document.getElementById('feedback-section');
     const feedbackContent = document.getElementById('feedback-content');
-    
-    const correctLabel = {
-        'DELETION': 'מחיקה (Deletion)',
-        'DISTORTION': 'עיוות (Distortion)',
-        'GENERALIZATION': 'הכללה (Generalization)'
-    };
-    
+    if (!feedbackSection || !feedbackContent) return;
+
+    const correctCategory = getQuestionCategoryKey(question);
+    const selectedLabel = TRAINER_CATEGORY_LABELS[selectedViolation] || selectedViolation;
+    const correctLabel = TRAINER_CATEGORY_LABELS[correctCategory] || correctCategory;
+    const violationName = question.violation || question.subcategory || 'לא צוין';
+
     let feedbackHTML = '';
-    
     if (isCorrect) {
         feedbackHTML = `
             <div class="correct">
                 <strong>✅ נכון!</strong>
                 <p class="explanation">
-                    <strong>קטגוריה:</strong> ${correctLabel[question.violation]}<br>
-                    <strong>שאלה מוצעת:</strong> "${question.suggested_question}"<br>
+                    <strong>קטגוריה:</strong> ${correctLabel}<br>
+                    <strong>סוג הפרה:</strong> ${violationName}<br>
+                    <strong>שאלת עומק מוצעת:</strong> "${question.suggested_question}"<br>
                     <strong>הסבר:</strong> ${question.explanation}
                 </p>
-                <p style="margin-top: 15px; color: #28a745; font-weight: bold;">+10 XP 🎉</p>
+                <p style="margin-top: 15px; color: #28a745; font-weight: bold;">+10 XP</p>
             </div>
         `;
     } else {
@@ -490,109 +658,191 @@ function showFeedback(isCorrect, question, selectedViolation) {
             <div class="incorrect">
                 <strong>❌ לא נכון</strong>
                 <p class="explanation">
-                    <strong>בחרת:</strong> ${correctLabel[selectedViolation]}<br>
-                    <strong>התשובה הנכונה:</strong> ${correctLabel[question.violation]}<br>
-                    <strong>שאלה מוצעת:</strong> "${question.suggested_question}"<br>
+                    <strong>בחרת:</strong> ${selectedLabel}<br>
+                    <strong>התשובה הנכונה:</strong> ${correctLabel}<br>
+                    <strong>סוג הפרה:</strong> ${violationName}<br>
+                    <strong>שאלת עומק מוצעת:</strong> "${question.suggested_question}"<br>
                     <strong>הסבר:</strong> ${question.explanation}
                 </p>
             </div>
         `;
     }
-    
+
     feedbackContent.innerHTML = feedbackHTML;
+    feedbackSection.classList.remove('hidden');
     feedbackSection.classList.add('visible');
-    
-    // Add next button handler
-    document.getElementById('next-question-btn').onclick = () => {
-        trainerState.currentQuestion++;
-        loadNextQuestion();
-    };
+
+    const nextBtn = document.getElementById('next-question-btn');
+    if (nextBtn) {
+        nextBtn.onclick = () => {
+            playUISound('next');
+            trainerState.currentQuestion++;
+            loadNextQuestion();
+        };
+    }
+
+    updateTrainerProgressNote();
 }
 
 function updateTrainerStats() {
-    const total = trainerState.currentQuestion + 1;
-    const successRate = Math.round((trainerState.correctCount / total) * 100);
-    
+    const attempted = trainerState.currentQuestion + (trainerState.answered ? 1 : 0) - trainerState.skippedCount;
+    const safeAttempted = Math.max(attempted, 1);
+    const successRate = Math.round((trainerState.correctCount / safeAttempted) * 100);
+
     document.getElementById('correct-count').textContent = trainerState.correctCount;
-    document.getElementById('success-rate').textContent = successRate + '%';
+    document.getElementById('success-rate').textContent = `${successRate}%`;
     document.getElementById('session-xp').textContent = trainerState.sessionXP;
 }
 
 function showTrainerHint() {
     if (trainerState.currentQuestion >= trainerState.questions.length) return;
-    
     const question = trainerState.questions[trainerState.currentQuestion];
-    
-    const hints = {
-        'DELETION': '🔍 המידע חסר - מי? מה? כמה? לפי מי? איפה?',
-        'DISTORTION': '🔄 יש כאן הנחה או שינוי בלי ראיות - מה מוכן? אילו מילים חשודות?',
-        'GENERALIZATION': '📈 יש הכללה חזקה - באמת תמיד? באמת אף פעם? תמיד לכולם?'
-    };
-    
-    const difficultyHint = {
-        'easy': 'הפרה בסיסית - חשוב על השפה',
-        'medium': 'הפרה בינונית - צריך להעמיק',
-        'hard': 'הפרה מורכבת - קורא קשיבה'
-    };
-    
-    let hintText = `${hints[question.category] || ''}\n\nרמת קשיות: ${difficultyHint[question.difficulty]}`;
-    
-    const hintDisplay = document.getElementById('hint-display');
-    hintDisplay.innerHTML = `<p>${hintText.replace(/\n/g, '<br>')}</p>`;
-    hintDisplay.classList.add('visible');
+    const categoryKey = getQuestionCategoryKey(question);
+    const statementText = question.statement || '';
+
+    trainerState.hintLevel = Math.min(trainerState.hintLevel + 1, 3);
+
+    const categoryHint = {
+        DELETION: 'בדוק מה חסר במשפט: מי? מה? מתי? לפי מה?',
+        DISTORTION: 'בדוק איפה יש הנחה או קשר סיבה-תוצאה שלא הוכח.',
+        GENERALIZATION: 'בדוק מילים מוחלטות כמו תמיד/אף פעם/כולם/אי אפשר.'
+    }[categoryKey] || 'בדוק איזו מילה במשפט סוגרת אפשרויות.';
+
+    const triggerWords = ['תמיד', 'אף פעם', 'כולם', 'חייב', 'לא יכול', 'גרם לי', 'יודע ש', 'ברור ש']
+        .filter(word => statementText.includes(word));
+    const triggerLine = triggerWords.length
+        ? `מילות טריגר במשפט: ${triggerWords.join(', ')}`
+        : 'נסה לזהות מילה שמקבעת מסקנה בלי פירוט.';
+
+    let hintHtml = '';
+    if (trainerState.hintLevel === 1) {
+        hintHtml = `<p><strong>רמז 1/3:</strong> ${categoryHint}</p>`;
+    } else if (trainerState.hintLevel === 2) {
+        hintHtml = `<p><strong>רמז 2/3:</strong> ${triggerLine}</p><p>עכשיו נסח שאלה קצרה שתפרק את ההנחה.</p>`;
+    } else {
+        hintHtml = `<p><strong>רמז 3/3:</strong> הקטגוריה היא <strong>${TRAINER_CATEGORY_LABELS[categoryKey] || categoryKey}</strong>.</p><p>שאלה מוצעת: "${question.suggested_question}"</p>`;
+    }
+
+    setPanelContent('hint-display', hintHtml);
+    playUISound('hint');
+}
+
+function showTrainerImportance() {
+    if (trainerState.currentQuestion >= trainerState.questions.length) return;
+    const question = trainerState.questions[trainerState.currentQuestion];
+    const categoryKey = getQuestionCategoryKey(question);
+
+    const importanceText = {
+        DELETION: 'כשמידע נמחק, המסקנה נבנית על חוסר נתונים. השאלה מחזירה פרטים הכרחיים.',
+        DISTORTION: 'כשיש עיוות, פירוש הופך לעובדה. השאלה מפרידה בין פרשנות למציאות.',
+        GENERALIZATION: 'כשיש הכללה, מקרה אחד הופך לחוק. השאלה פותחת יותר אפשרויות תגובה.'
+    }[categoryKey] || 'השאלה מחזירה דיוק ומאפשרת תגובה טובה יותר.';
+
+    setPanelContent('why-display', `
+        <p><strong>למה זה חשוב בשאלה הזו?</strong></p>
+        <p>${importanceText}</p>
+        <p><strong>מה המטרה כאן?</strong> להפוך אמירה כללית למידע מדויק שאפשר לעבוד איתו.</p>
+    `);
+    playUISound('hint');
+}
+
+function showTrainerDepth() {
+    if (trainerState.currentQuestion >= trainerState.questions.length) return;
+    const question = trainerState.questions[trainerState.currentQuestion];
+    const depthTrack = {
+        easy: ['שלב 1: זהה מילה בעייתית.', 'שלב 2: שאל מה חסר.', 'שלב 3: נסח שאלה אחת מדויקת.'],
+        medium: ['שלב 1: זהה הנחה סמויה.', 'שלב 2: בדוק ראיות.', 'שלב 3: נסח חלופה מדויקת.'],
+        hard: ['שלב 1: זהה דפוס שפה.', 'שלב 2: מפה E/B/C/V/I/S בקצרה.', 'שלב 3: בחר Small Win להתקדמות.']
+    }[question.difficulty] || ['שלב 1: זהה דפוס.', 'שלב 2: שאל מה חסר.', 'שלב 3: בנה שאלה מדויקת.'];
+
+    setPanelContent('depth-display', `
+        <p><strong>עומק מומלץ לשאלה:</strong></p>
+        <ul>${depthTrack.map(step => `<li>${step}</li>`).join('')}</ul>
+        <p><strong>דוגמת שאלה:</strong> "${question.suggested_question}"</p>
+    `);
+    playUISound('hint');
+}
+
+function skipCurrentQuestion() {
+    if (trainerState.currentQuestion >= trainerState.questions.length) return;
+    trainerState.skippedCount++;
+    showHintMessage('דילגת לשאלה הבאה');
+    playUISound('skip');
+    trainerState.currentQuestion++;
+    loadNextQuestion();
 }
 
 function endTrainerSession() {
-    // Show completion message
     const feedbackSection = document.getElementById('feedback-section');
     const feedbackContent = document.getElementById('feedback-content');
-    
-    const successRate = Math.round((trainerState.correctCount / trainerState.questions.length) * 100);
-    
+    if (!feedbackSection || !feedbackContent) return;
+
+    const totalQuestions = trainerState.questions.length || 1;
+    const successRate = Math.round((trainerState.correctCount / totalQuestions) * 100);
+
     let message = '';
     if (successRate === 100) {
-        message = '🏆 מושלם! קיבלת את הכל נכון!';
+        message = 'מושלם! כל התשובות נכונות';
     } else if (successRate >= 80) {
-        message = '🎉 מעולה! הצלחת 80% ויותר!';
+        message = 'מעולה! רמת דיוק גבוהה מאוד';
     } else if (successRate >= 60) {
-        message = '👍 טוב! המשך להתרגל!';
+        message = 'טוב מאוד, עוד חידוד קטן ואתה שם';
     } else {
-        message = '💪 עדיין יש מה ללמוד - המשך!';
+        message = 'התחלה טובה, ממשיכים לתרגול נוסף';
     }
-    
+
     feedbackContent.innerHTML = `
         <div class="correct" style="text-align: center;">
             <h2>${message}</h2>
-            <p style="font-size: 1.15em;">
+            <p style="font-size: 1.05em;">
                 <strong>ציון סופי:</strong> ${trainerState.correctCount} / ${trainerState.questions.length}<br>
                 <strong>קצב הצלחה:</strong> ${successRate}%<br>
-                <strong>XP שהרווחת:</strong> +${trainerState.sessionXP}
+                <strong>XP שהרווחת:</strong> +${trainerState.sessionXP}<br>
+                <strong>דילוגים:</strong> ${trainerState.skippedCount}
             </p>
             <button class="btn btn-primary" onclick="resetTrainer()" style="margin-top: 20px; width: 100%;">תרגול נוסף →</button>
         </div>
     `;
-    
-    // Hide questions, show completion
-    document.getElementById('question-display').style.display = 'none';
-    document.getElementById('mcq-options').style.display = 'none';
-    document.getElementById('trainer-hints').style.display = 'none';
+
+    const questionDisplay = document.getElementById('question-display');
+    const optionsDisplay = document.getElementById('mcq-options');
+    const trainerHints = document.getElementById('trainer-hints');
+    if (questionDisplay) questionDisplay.style.display = 'none';
+    if (optionsDisplay) optionsDisplay.style.display = 'none';
+    if (trainerHints) trainerHints.style.display = 'none';
+
+    feedbackSection.classList.remove('hidden');
     feedbackSection.classList.add('visible');
+    document.getElementById('progress-fill').style.width = '100%';
+    playUISound('finish');
+    recordSession();
 }
 
 function resetTrainer() {
-    // Reset UI
     document.getElementById('trainer-mode').classList.add('hidden');
     document.getElementById('trainer-start').classList.remove('hidden');
-    document.getElementById('question-display').style.display = 'block';
-    document.getElementById('mcq-options').style.display = 'flex';
-    document.getElementById('trainer-hints').style.display = 'block';
-    
-    // Reset stats
+
+    const questionDisplay = document.getElementById('question-display');
+    const optionsDisplay = document.getElementById('mcq-options');
+    const trainerHints = document.getElementById('trainer-hints');
+    if (questionDisplay) questionDisplay.style.display = 'block';
+    if (optionsDisplay) optionsDisplay.style.display = 'flex';
+    if (trainerHints) trainerHints.style.display = 'block';
+
+    hideTrainerInfoPanels();
+    const feedbackSection = document.getElementById('feedback-section');
+    if (feedbackSection) {
+        feedbackSection.classList.add('hidden');
+        feedbackSection.classList.remove('visible');
+    }
+
     document.getElementById('correct-count').textContent = '0';
     document.getElementById('success-rate').textContent = '0%';
     document.getElementById('session-xp').textContent = '0';
-    
-    // Reset state
+    document.getElementById('progress-fill').style.width = '0%';
+    const noteEl = document.getElementById('progress-note');
+    if (noteEl) noteEl.textContent = '';
+
     trainerState = {
         isActive: false,
         currentQuestion: 0,
@@ -600,7 +850,9 @@ function resetTrainer() {
         selectedCategory: '',
         correctCount: 0,
         sessionXP: 0,
-        answered: false
+        answered: false,
+        hintLevel: 0,
+        skippedCount: 0
     };
 }
 

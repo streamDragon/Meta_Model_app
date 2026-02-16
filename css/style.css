@@ -1115,6 +1115,13 @@ a:hover {
     margin: 0;
 }
 
+.progress-note {
+    margin-top: 10px;
+    font-size: 0.86em;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
 /* MCQ OPTIONS */
 .mcq-options {
     display: flex;
@@ -1240,8 +1247,15 @@ a:hover {
     margin-bottom: 15px;
 }
 
+.trainer-tools {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+}
+
 .hint-button {
     width: 100%;
+    margin-bottom: 0;
 }
 
 .hint-display {
@@ -1258,6 +1272,11 @@ a:hover {
 
 .hint-display.visible {
     display: block;
+}
+
+#audio-mute-btn.is-muted {
+    background: #fed7d7;
+    color: #742a2a;
 }
 
 #next-question-btn {
