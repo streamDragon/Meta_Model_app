@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     hideSplashScreen();
     
     loadUserProgress();
+    showLoadingIndicator();
     loadMetaModelData();
     setupTabNavigation();
     setupPracticeMode();
@@ -79,13 +80,13 @@ document.addEventListener('DOMContentLoaded', () => {
     setupBlueprintBuilder();
     setupPrismModule();
     initializeProgressHub();
-    showLoadingIndicator();
 });
 
 // Load Meta Model data from JSON
 async function loadMetaModelData() {
     try {
         const response = await fetch('data/meta-model-violations.json');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         metaModelData = await response.json();
         
         // Populate categories
@@ -102,6 +103,7 @@ async function loadMetaModelData() {
         hideLoadingIndicator();
     } catch (error) {
         console.error('Error loading data:', error);
+        hideLoadingIndicator();
         showErrorMessage('שגיאה בטעינת הנתונים');
     }
 }
@@ -187,7 +189,10 @@ function setupPracticeMode() {
     const nextBtn = document.getElementById('next-btn');
     const showAnswerBtn = document.getElementById('show-answer-btn');
     const hintBtn = document.getElementById('hint-btn');
-    
+
+    // Legacy practice controls may not exist in the current UI.
+    if (!nextBtn || !showAnswerBtn || !hintBtn) return;
+
     nextBtn.addEventListener('click', getNextStatement);
     showAnswerBtn.addEventListener('click', showAnswer);
     hintBtn.addEventListener('click', showHint);
@@ -302,6 +307,8 @@ function setupTrainerMode() {
     const startBtn = document.getElementById('start-trainer-btn');
     const categorySelect = document.getElementById('category-select');
     const hintTrigger = document.getElementById('hint-trigger');
+
+    if (!startBtn || !categorySelect) return;
     
     startBtn.addEventListener('click', () => {
         const selectedCategory = categorySelect.value;
@@ -840,10 +847,11 @@ function setupPrismModule() {
 
     // Listeners for dynamic elements
     document.addEventListener('click', (e) => {
-        if (e.target && e.target.classList.contains('prism-open-btn')) {
-            const id = e.target.getAttribute('data-id');
-            openPrism(id);
-        }
+        const targetEl = e.target && e.target.nodeType === 1 ? e.target : e.target.parentElement;
+        const openBtn = targetEl && targetEl.closest('.prism-open-btn');
+        if (!openBtn) return;
+        const id = openBtn.getAttribute('data-id');
+        openPrism(id);
     });
 
     const cancelBtn = document.getElementById('prism-cancel');
@@ -876,6 +884,15 @@ function renderPrismLibrary() {
             <p><strong>שאלת עוגן:</strong> ${p.anchor_question_templates[0]}</p>
             <div style="margin-top:10px"><button class="btn prism-open-btn" data-id="${p.id}">בחר פריזמה</button></div>
         `;
+        // Direct binding fallback (helps in some embedded hosts).
+        const openBtn = div.querySelector('.prism-open-btn');
+        if (openBtn) {
+            openBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openPrism(p.id);
+            });
+        }
+
         lib.appendChild(div);
     });
 }
