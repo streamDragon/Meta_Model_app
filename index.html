@@ -258,7 +258,7 @@
                         </div>
 
                         <div class="step-buttons">
-                            <button id="extract-btn" class="btn btn-primary">חלץ ובנה Blueprint →</button>
+                            <button id="extract-btn" class="btn btn-primary" onclick="extractAndMoveToStep2()">חלץ ובנה Blueprint →</button>
                         </div>
                     </div>
 
@@ -312,8 +312,8 @@
                         </div>
 
                         <div class="step-buttons">
-                            <button id="back-to-capture-btn" class="btn btn-secondary">← חזור</button>
-                            <button id="gap-analysis-btn" class="btn btn-primary">בדיקת פער ציפיות →</button>
+                            <button id="back-to-capture-btn" class="btn btn-secondary" onclick="goToStep(1)">← חזור</button>
+                            <button id="gap-analysis-btn" class="btn btn-primary" onclick="extractAndMoveToStep3()">בדיקת פער ציפיות →</button>
                         </div>
                     </div>
 
@@ -366,8 +366,8 @@
                         </div>
 
                         <div class="step-buttons">
-                            <button id="back-to-specify-btn" class="btn btn-secondary">← חזור</button>
-                            <button id="next-step-btn" class="btn btn-primary">צעד הבא ותוכנית →</button>
+                            <button id="back-to-specify-btn" class="btn btn-secondary" onclick="goToStep(2)">← חזור</button>
+                            <button id="next-step-btn" class="btn btn-primary" onclick="extractAndMoveToStep4()">צעד הבא ותוכנית →</button>
                         </div>
                     </div>
 
@@ -393,9 +393,9 @@
                         </div>
 
                         <div class="action-buttons">
-                            <button id="export-json-btn" class="btn btn-secondary">📥 ייצא JSON</button>
-                            <button id="start-over-btn" class="btn btn-secondary">🔄 Blueprint חדש</button>
-                            <button id="do-it-now-btn" class="btn btn-primary">⏱️ בואן נעשה את זה ב-10 דקות!</button>
+                            <button id="export-json-btn" class="btn btn-secondary" onclick="exportBlueprint()">📥 ייצא JSON</button>
+                            <button id="start-over-btn" class="btn btn-secondary" onclick="goToStep(1)">🔄 Blueprint חדש</button>
+                            <button id="do-it-now-btn" class="btn btn-primary" onclick="startTenMinuteTimer()">⏱️ בואן נעשה את זה ב-10 דקות!</button>
                         </div>
                     </div>
                 </div>

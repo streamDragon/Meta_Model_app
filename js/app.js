@@ -52,10 +52,14 @@ function playOpeningMusic() {
 // Hide Splash Screen
 function hideSplashScreen() {
     const splashScreen = document.getElementById('splash-screen');
+    if (!splashScreen) return;
     // The animation handles the fade out after 3 seconds
     // Just ensure it's hidden after animation
     setTimeout(() => {
-        splashScreen.style.display = 'none';
+        if (splashScreen) {
+            splashScreen.classList.add('hidden');
+            splashScreen.style.pointerEvents = 'none'; // Ensure clicks pass through
+        }
     }, 3600);
 }
 

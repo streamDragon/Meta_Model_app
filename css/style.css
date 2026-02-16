@@ -111,6 +111,15 @@ header p {
     align-items: center;
     z-index: 10000;
     animation: splashFadeOut 0.6s ease-in-out 3s forwards;
+    pointer-events: auto;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+#splash-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    display: none !important;
 }
 
 .splash-content {
@@ -491,6 +500,8 @@ header p {
     transition: all 0.3s ease;
     margin-right: 10px;
     margin-bottom: 10px;
+    user-select: none;
+    pointer-events: auto;
 }
 
 .btn:hover {
