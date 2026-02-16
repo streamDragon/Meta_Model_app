@@ -1382,6 +1382,317 @@ a:hover {
     font-size: 0.95em;
 }
 
+/* Scenario Trainer */
+.scenario-trainer-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.scenario-trainer-card .subtitle {
+    margin-bottom: 18px;
+}
+
+.scenario-safety-notice {
+    background: #fff5f5;
+    color: #742a2a;
+    border-right: 5px solid #e53e3e;
+    border-radius: var(--border-radius);
+    padding: 14px;
+    margin-bottom: 14px;
+    font-weight: 600;
+    line-height: 1.7;
+}
+
+.scenario-screen {
+    animation: fadeIn 0.3s ease;
+}
+
+.scenario-home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.scenario-home-btn {
+    min-height: 62px;
+    font-size: 1rem;
+}
+
+.scenario-home-stats {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--border-radius);
+    padding: 14px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+.scenario-stat-item {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 10px;
+    border-right: 4px solid var(--primary-color);
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.scenario-pick-grid {
+    margin-bottom: 0;
+}
+
+.scenario-session-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.scenario-counter {
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.scenario-session-meta {
+    color: #4a5568;
+    font-weight: 600;
+}
+
+.scenario-story-card {
+    margin-top: 14px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.scenario-role {
+    display: inline-block;
+    background: #ebf8ff;
+    color: #2c5282;
+    border-radius: 999px;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.scenario-story-lines p {
+    margin-bottom: 8px;
+}
+
+.scenario-unspecified-line {
+    margin-top: 10px;
+    background: #fffaf0;
+    border-right: 4px solid #d69e2e;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.scenario-options-container {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+}
+
+.scenario-option-btn {
+    width: 100%;
+    min-height: 64px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 12px;
+    line-height: 1.4;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.scenario-option-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.scenario-option-btn.red {
+    background: #fff5f5;
+    color: #742a2a;
+    border: 1px solid #fed7d7;
+}
+
+.scenario-option-btn.green {
+    background: #f0fff4;
+    color: #22543d;
+    border: 1px solid #c6f6d5;
+}
+
+.scenario-feedback-mark {
+    width: 92px;
+    height: 92px;
+    margin: 10px auto 16px auto;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    font-weight: 800;
+    opacity: 0;
+    transform: scale(0.6);
+}
+
+.scenario-feedback-mark.success {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.scenario-feedback-mark.fail {
+    background: #fed7d7;
+    color: #742a2a;
+}
+
+.scenario-feedback-mark.animate {
+    animation: scenarioPop 0.9s ease forwards;
+}
+
+@keyframes scenarioPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+    70% {
+        opacity: 1;
+        transform: scale(1.08);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.scenario-blueprint-display {
+    margin-bottom: 15px;
+}
+
+.scenario-green-box {
+    background: #ebf8ff;
+    border-right: 5px solid #3182ce;
+    border-radius: var(--border-radius);
+    padding: 14px;
+    margin-bottom: 14px;
+}
+
+.scenario-green-box h4 {
+    color: #2b6cb0;
+    margin: 0 0 8px 0;
+}
+
+.scenario-green-box p {
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.scenario-prism-wheel {
+    background: #faf5ff;
+    border: 1px solid #e9d8fd;
+    border-radius: var(--border-radius);
+    padding: 14px;
+    margin-bottom: 14px;
+}
+
+.scenario-prism-wheel h4 {
+    margin-top: 0;
+    color: #553c9a;
+}
+
+.scenario-prism-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+}
+
+.scenario-prism-item {
+    background: white;
+    border: 1px solid #d6bcfa;
+    color: #553c9a;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.scenario-prism-item:hover {
+    background: #f3e8ff;
+}
+
+.scenario-prism-detail {
+    margin-top: 10px;
+    background: white;
+    border: 1px solid #e9d8fd;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.scenario-stars-row {
+    font-size: 1.6rem;
+    margin-bottom: 12px;
+    color: #d69e2e;
+}
+
+.scenario-score-line {
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.scenario-next-green-line {
+    color: #2f855a;
+    font-weight: 600;
+}
+
+.scenario-history-list {
+    margin-top: 12px;
+    display: grid;
+    gap: 10px;
+}
+
+.scenario-history-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-right: 4px solid #63b3ed;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.scenario-history-item strong {
+    color: #2d3748;
+}
+
+.scenario-history-item .meta {
+    color: #4a5568;
+    margin-top: 6px;
+    font-size: 0.92rem;
+}
+
+.scenario-history-empty {
+    background: #f7fafc;
+    border: 1px dashed #cbd5e0;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.scenario-toggle-row {
+    display: grid;
+    gap: 10px;
+}
+
+.scenario-toggle-row label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     header h1 {
@@ -1412,5 +1723,15 @@ a:hover {
 
     .practice-filters select {
         width: 100%;
+    }
+
+    .scenario-session-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .scenario-option-btn {
+        min-height: 72px;
+        font-size: 0.96rem;
     }
 }

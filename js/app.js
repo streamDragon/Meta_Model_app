@@ -15,6 +15,56 @@ let trainerState = {
     skippedCount: 0
 };
 
+let scenarioTrainerData = {
+    domains: [],
+    difficulties: [],
+    optionTemplates: {
+        red: [],
+        green: null
+    },
+    scenarios: [],
+    prismWheel: [],
+    safetyKeywords: []
+};
+
+const SCENARIO_STORAGE_KEYS = {
+    settings: 'scenario_trainer_settings_v1',
+    progress: 'scenario_trainer_progress_v1'
+};
+
+const SCENARIO_STATES = {
+    HOME: 'HOME',
+    DOMAIN_PICK: 'DOMAIN_PICK',
+    SCENARIO: 'SCENARIO',
+    OPTION_PICK: 'OPTION_PICK',
+    FEEDBACK: 'FEEDBACK',
+    BLUEPRINT: 'BLUEPRINT',
+    SCORE: 'SCORE',
+    NEXT_SCENARIO: 'NEXT_SCENARIO'
+};
+
+const SCENARIO_ALLOWED_TRANSITIONS = {
+    [SCENARIO_STATES.HOME]: [SCENARIO_STATES.DOMAIN_PICK],
+    [SCENARIO_STATES.DOMAIN_PICK]: [SCENARIO_STATES.SCENARIO, SCENARIO_STATES.HOME],
+    [SCENARIO_STATES.SCENARIO]: [SCENARIO_STATES.OPTION_PICK, SCENARIO_STATES.HOME],
+    [SCENARIO_STATES.OPTION_PICK]: [SCENARIO_STATES.FEEDBACK],
+    [SCENARIO_STATES.FEEDBACK]: [SCENARIO_STATES.BLUEPRINT],
+    [SCENARIO_STATES.BLUEPRINT]: [SCENARIO_STATES.SCORE, SCENARIO_STATES.HOME],
+    [SCENARIO_STATES.SCORE]: [SCENARIO_STATES.NEXT_SCENARIO, SCENARIO_STATES.HOME],
+    [SCENARIO_STATES.NEXT_SCENARIO]: [SCENARIO_STATES.SCENARIO, SCENARIO_STATES.HOME]
+};
+
+let scenarioTrainer = {
+    state: SCENARIO_STATES.HOME,
+    settings: null,
+    progress: null,
+    session: null,
+    activeScenario: null,
+    selectedOption: null,
+    safetyLocked: false,
+    didRecordSession: false
+};
+
 let audioState = {
     context: null,
     muted: false,
@@ -250,6 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupTrainerMode();
     setupBlueprintBuilder();
     setupPrismModule();
+    setupScenarioTrainerModule();
     initializeProgressHub();
 });
 
@@ -882,6 +933,796 @@ function resetTrainer() {
         hintLevel: 0,
         skippedCount: 0
     };
+}
+
+// ==================== SCENARIO TRAINER ====================
+
+function getDefaultScenarioSettings() {
+    return {
+        soundEnabled: true,
+        defaultDifficulty: 'all',
+        defaultDomain: 'all',
+        prismWheelEnabled: true
+    };
+}
+
+function getDefaultScenarioProgress() {
+    return {
+        completed: 0,
+        greenCount: 0,
+        stars: 0,
+        currentGreenStreak: 0,
+        bestGreenStreak: 0,
+        history: [],
+        updatedAt: null
+    };
+}
+
+function loadScenarioTrainerSettings() {
+    const defaults = getDefaultScenarioSettings();
+    try {
+        const raw = localStorage.getItem(SCENARIO_STORAGE_KEYS.settings);
+        if (!raw) return defaults;
+        const parsed = JSON.parse(raw);
+        return { ...defaults, ...(parsed || {}) };
+    } catch (error) {
+        console.error('Scenario settings parse error', error);
+        return defaults;
+    }
+}
+
+function saveScenarioTrainerSettings() {
+    localStorage.setItem(SCENARIO_STORAGE_KEYS.settings, JSON.stringify(scenarioTrainer.settings));
+}
+
+function loadScenarioTrainerProgress() {
+    const defaults = getDefaultScenarioProgress();
+    try {
+        const raw = localStorage.getItem(SCENARIO_STORAGE_KEYS.progress);
+        if (!raw) return defaults;
+        const parsed = JSON.parse(raw);
+        const history = Array.isArray(parsed?.history) ? parsed.history : [];
+        return {
+            ...defaults,
+            ...(parsed || {}),
+            history: history.slice(0, 300)
+        };
+    } catch (error) {
+        console.error('Scenario progress parse error', error);
+        return defaults;
+    }
+}
+
+function saveScenarioTrainerProgress() {
+    scenarioTrainer.progress.updatedAt = new Date().toISOString();
+    localStorage.setItem(SCENARIO_STORAGE_KEYS.progress, JSON.stringify(scenarioTrainer.progress));
+}
+
+async function loadScenarioTrainerData() {
+    try {
+        const response = await fetch('data/scenario-trainer-scenarios.json');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        scenarioTrainerData = {
+            domains: Array.isArray(data.domains) ? data.domains : [],
+            difficulties: Array.isArray(data.difficulties) ? data.difficulties : [],
+            optionTemplates: data.optionTemplates || { red: [], green: null },
+            scenarios: Array.isArray(data.scenarios) ? data.scenarios : [],
+            prismWheel: Array.isArray(data.prismWheel) ? data.prismWheel : [],
+            safetyKeywords: Array.isArray(data.safetyKeywords) ? data.safetyKeywords : []
+        };
+        return true;
+    } catch (error) {
+        console.error('Scenario data load failed', error);
+        showHint('לא הצלחנו לטעון את סצנות ה-Scenario Trainer');
+        return false;
+    }
+}
+
+function scenarioTransitionTo(nextState, force = false) {
+    if (force) {
+        scenarioTrainer.state = nextState;
+        return true;
+    }
+
+    const allowed = SCENARIO_ALLOWED_TRANSITIONS[scenarioTrainer.state] || [];
+    if (!allowed.includes(nextState)) return false;
+    scenarioTrainer.state = nextState;
+    return true;
+}
+
+function showScenarioScreen(screenName) {
+    const screens = document.querySelectorAll('#scenario-trainer .scenario-screen');
+    screens.forEach(screen => screen.classList.add('hidden'));
+    const target = document.getElementById(`scenario-screen-${screenName}`);
+    if (target) target.classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function playScenarioSound(kind) {
+    if (!scenarioTrainer.settings?.soundEnabled) return;
+    if (kind === 'green') playUISound('correct');
+    else if (kind === 'red') playUISound('wrong');
+    else if (kind === 'next') playUISound('next');
+    else if (kind === 'finish') playUISound('finish');
+    else playUISound('hint');
+}
+
+function setScenarioSafetyNoticeVisible(visible) {
+    const notice = document.getElementById('scenario-safety-notice');
+    if (!notice) return;
+    notice.classList.toggle('hidden', !visible);
+
+    const scenesBtn = document.getElementById('scenario-home-scenes');
+    if (scenesBtn) scenesBtn.disabled = !!visible;
+}
+
+function containsScenarioSafetyRisk(text) {
+    if (!text) return false;
+    const value = String(text).toLowerCase();
+    const keywords = scenarioTrainerData.safetyKeywords.length
+        ? scenarioTrainerData.safetyKeywords
+        : ['להתאבד', 'לפגוע בעצמי', 'למות', 'suicide', 'kill myself', 'self harm'];
+    return keywords.some(keyword => value.includes(String(keyword).toLowerCase()));
+}
+
+function lockScenarioFlowForSafety() {
+    scenarioTrainer.safetyLocked = true;
+    scenarioTrainer.session = null;
+    scenarioTrainer.activeScenario = null;
+    scenarioTrainer.selectedOption = null;
+    setScenarioSafetyNoticeVisible(true);
+    scenarioTransitionTo(SCENARIO_STATES.HOME, true);
+    showScenarioScreen('home');
+}
+
+function bindScenarioClick(id, handler) {
+    const el = document.getElementById(id);
+    if (!el || el.dataset.scenarioBound === 'true') return;
+    el.dataset.scenarioBound = 'true';
+    el.addEventListener('click', handler);
+}
+
+function populateScenarioSelects() {
+    const domainSelect = document.getElementById('scenario-domain-select');
+    const settingsDomainSelect = document.getElementById('scenario-setting-domain');
+    const difficultySelect = document.getElementById('scenario-difficulty-select');
+    const settingsDifficultySelect = document.getElementById('scenario-setting-difficulty');
+
+    const domainOptions = [{ id: 'all', label: 'כל התחומים' }, ...scenarioTrainerData.domains];
+    const difficultyOptions = [{ id: 'all', label: 'כל הרמות' }, ...scenarioTrainerData.difficulties];
+
+    const renderOptions = (selectEl, items) => {
+        if (!selectEl) return;
+        selectEl.innerHTML = '';
+        items.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = item.label;
+            selectEl.appendChild(option);
+        });
+    };
+
+    renderOptions(domainSelect, domainOptions);
+    renderOptions(settingsDomainSelect, domainOptions);
+    renderOptions(difficultySelect, difficultyOptions);
+    renderOptions(settingsDifficultySelect, difficultyOptions);
+
+    applyScenarioSettingsToControls();
+}
+
+function applyScenarioSettingsToControls() {
+    const domainSelect = document.getElementById('scenario-domain-select');
+    const settingsDomainSelect = document.getElementById('scenario-setting-domain');
+    const difficultySelect = document.getElementById('scenario-difficulty-select');
+    const settingsDifficultySelect = document.getElementById('scenario-setting-difficulty');
+    const soundToggle = document.getElementById('scenario-setting-sound');
+    const prismToggle = document.getElementById('scenario-setting-prism');
+
+    if (domainSelect) domainSelect.value = scenarioTrainer.settings.defaultDomain || 'all';
+    if (settingsDomainSelect) settingsDomainSelect.value = scenarioTrainer.settings.defaultDomain || 'all';
+    if (difficultySelect) difficultySelect.value = scenarioTrainer.settings.defaultDifficulty || 'all';
+    if (settingsDifficultySelect) settingsDifficultySelect.value = scenarioTrainer.settings.defaultDifficulty || 'all';
+    if (soundToggle) soundToggle.checked = scenarioTrainer.settings.soundEnabled !== false;
+    if (prismToggle) prismToggle.checked = scenarioTrainer.settings.prismWheelEnabled !== false;
+}
+
+function renderScenarioHomeStats() {
+    const el = document.getElementById('scenario-home-stats');
+    if (!el) return;
+
+    const completed = scenarioTrainer.progress.completed || 0;
+    const greens = scenarioTrainer.progress.greenCount || 0;
+    const successRate = completed ? Math.round((greens / completed) * 100) : 0;
+    const bestStreak = scenarioTrainer.progress.bestGreenStreak || 0;
+    const stars = scenarioTrainer.progress.stars || 0;
+
+    const stats = [
+        `סה"כ סצנות: ${completed}`,
+        `אחוז ירוק: ${successRate}%`,
+        `רצף שיא: ${bestStreak}`,
+        `כוכבים: ${stars}`
+    ];
+
+    el.innerHTML = '';
+    stats.forEach(text => {
+        const div = document.createElement('div');
+        div.className = 'scenario-stat-item';
+        div.textContent = text;
+        el.appendChild(div);
+    });
+}
+
+function openScenarioHome() {
+    scenarioTransitionTo(SCENARIO_STATES.HOME, true);
+    showScenarioScreen('home');
+    renderScenarioHomeStats();
+    setScenarioSafetyNoticeVisible(scenarioTrainer.safetyLocked);
+}
+
+function openScenarioDomainPicker() {
+    if (scenarioTrainer.safetyLocked) {
+        setScenarioSafetyNoticeVisible(true);
+        return;
+    }
+    if (!scenarioTrainerData.scenarios.length) {
+        showHint('אין סצנות זמינות כרגע');
+        return;
+    }
+    scenarioTransitionTo(SCENARIO_STATES.DOMAIN_PICK, true);
+    applyScenarioSettingsToControls();
+    showScenarioScreen('domain');
+}
+
+function openScenarioHistoryScreen() {
+    renderScenarioHistoryList();
+    showScenarioScreen('history');
+}
+
+function openScenarioSettingsScreen() {
+    applyScenarioSettingsToControls();
+    showScenarioScreen('settings');
+}
+
+function buildScenarioQueue(domainId, difficultyId, runSize) {
+    const all = scenarioTrainerData.scenarios || [];
+    if (!all.length) return [];
+
+    let filtered = all.filter(item => {
+        const domainMatch = domainId === 'all' ? true : item.domain === domainId;
+        const difficultyMatch = difficultyId === 'all' ? true : item.difficulty === difficultyId;
+        return domainMatch && difficultyMatch;
+    });
+
+    if (!filtered.length) filtered = all;
+
+    const queue = [];
+    let pool = shuffleArray(filtered);
+    let cursor = 0;
+    const targetSize = Math.max(1, Math.min(runSize || 10, 10));
+
+    while (queue.length < targetSize && pool.length) {
+        queue.push(pool[cursor % pool.length]);
+        cursor += 1;
+        if (cursor % pool.length === 0 && queue.length < targetSize) {
+            pool = shuffleArray(filtered);
+        }
+    }
+    return queue;
+}
+
+function getScenarioOptions(scenario) {
+    if (Array.isArray(scenario?.options) && scenario.options.length >= 5) {
+        return scenario.options;
+    }
+
+    const defaultRed = (scenarioTrainerData.optionTemplates?.red || [
+        { id: 'A', emoji: '😡', text: 'מה הבעיה איתך? אתה עצלן.', type: 'red_identity_blame', score: 0, feedback: 'מאשים זהות במקום למפות חסר.' },
+        { id: 'B', emoji: '🙄', text: 'בגילך כבר הייתי יודע לעשות את זה.', type: 'red_comparison_shame', score: 0, feedback: 'השוואה מעלה בושה ומורידה פתרון.' },
+        { id: 'C', emoji: '🥴', text: 'עזוב, אני אעשה את זה במקום.', type: 'red_overtake', score: 0, feedback: 'לקיחת משימה במקומך מונעת למידה.' },
+        { id: 'D', emoji: '😬', text: 'כן כן, אחר כך נטפל בזה.', type: 'red_avoid_pretend', score: 0, feedback: 'דחייה בלי פירוק מגדילה תקיעות.' }
+    ]).slice(0, 4);
+
+    const greenTemplate = scenarioTrainerData.optionTemplates?.green || {
+        id: 'E',
+        emoji: '✅🙂',
+        text: 'בוא נפרק: מה ניסית? איפה נתקעת? מה הצעד הראשון?',
+        type: 'green_meta_model',
+        score: 1,
+        feedback: 'מפרק הוראה עמומה לצעדים ניתנים לביצוע.'
+    };
+
+    const greenText = scenario?.greenSentence || greenTemplate.text;
+    const redOptions = defaultRed.map((option, index) => ({
+        ...option,
+        id: option.id || ['A', 'B', 'C', 'D'][index]
+    }));
+
+    return [
+        ...redOptions,
+        {
+            ...greenTemplate,
+            id: greenTemplate.id || 'E',
+            text: greenText
+        }
+    ];
+}
+
+function startScenarioRun() {
+    if (scenarioTrainer.safetyLocked) {
+        setScenarioSafetyNoticeVisible(true);
+        return;
+    }
+    if (!scenarioTrainerData.scenarios.length) {
+        showHint('נתוני הסצנות עדיין לא נטענו');
+        return;
+    }
+
+    const domainSelect = document.getElementById('scenario-domain-select');
+    const difficultySelect = document.getElementById('scenario-difficulty-select');
+    const runSizeInput = document.getElementById('scenario-run-size');
+    const domain = domainSelect?.value || scenarioTrainer.settings.defaultDomain || 'all';
+    const difficulty = difficultySelect?.value || scenarioTrainer.settings.defaultDifficulty || 'all';
+    const runSize = parseInt(runSizeInput?.value || '10', 10);
+
+    scenarioTrainer.settings.defaultDomain = domain;
+    scenarioTrainer.settings.defaultDifficulty = difficulty;
+    saveScenarioTrainerSettings();
+
+    const queue = buildScenarioQueue(domain, difficulty, runSize);
+    if (!queue.length) {
+        showHint('לא נמצאו סצנות למסנן שבחרת');
+        return;
+    }
+
+    scenarioTrainer.session = {
+        domain,
+        difficulty,
+        queue,
+        index: 0,
+        score: 0,
+        stars: 0,
+        streak: 0,
+        completed: []
+    };
+    scenarioTrainer.didRecordSession = false;
+    scenarioTrainer.activeScenario = null;
+    scenarioTrainer.selectedOption = null;
+
+    scenarioTransitionTo(SCENARIO_STATES.SCENARIO, true);
+    renderScenarioPlayScreen();
+    playScenarioSound('next');
+}
+
+function renderScenarioPlayScreen() {
+    if (!scenarioTrainer.session) return;
+    const scenario = scenarioTrainer.session.queue[scenarioTrainer.session.index];
+    if (!scenario) return;
+
+    scenarioTrainer.activeScenario = scenario;
+    scenarioTrainer.selectedOption = null;
+
+    const currentIndex = scenarioTrainer.session.index + 1;
+    const total = scenarioTrainer.session.queue.length;
+    const progress = Math.round(((currentIndex - 1) / total) * 100);
+    const storyContainer = document.getElementById('scenario-story-lines');
+    const optionsContainer = document.getElementById('scenario-options-container');
+    const roleLabel = scenario?.expectation?.speaker || scenario?.role || 'דובר';
+
+    const currentIndexEl = document.getElementById('scenario-current-index');
+    const totalCountEl = document.getElementById('scenario-total-count');
+    const sessionScoreEl = document.getElementById('scenario-session-score');
+    const sessionStreakEl = document.getElementById('scenario-session-streak');
+    const progressFill = document.getElementById('scenario-progress-fill');
+    const roleEl = document.getElementById('scenario-role');
+    const titleEl = document.getElementById('scenario-title');
+    const unspecifiedEl = document.getElementById('scenario-unspecified-verb');
+
+    if (currentIndexEl) currentIndexEl.textContent = String(currentIndex);
+    if (totalCountEl) totalCountEl.textContent = String(total);
+    if (sessionScoreEl) sessionScoreEl.textContent = String(scenarioTrainer.session.score);
+    if (sessionStreakEl) sessionStreakEl.textContent = String(scenarioTrainer.session.streak);
+    if (progressFill) progressFill.style.width = `${progress}%`;
+    if (roleEl) roleEl.textContent = `תפקיד: ${roleLabel}`;
+    if (titleEl) titleEl.textContent = scenario.title || 'סצנה';
+    if (unspecifiedEl) unspecifiedEl.textContent = `נו, פשוט ${scenario.unspecifiedVerb || 'תעשה את זה'}`;
+
+    if (storyContainer) {
+        storyContainer.innerHTML = '';
+        (scenario.story || []).forEach(line => {
+            const p = document.createElement('p');
+            p.textContent = line;
+            storyContainer.appendChild(p);
+        });
+    }
+
+    if (optionsContainer) {
+        optionsContainer.innerHTML = '';
+        getScenarioOptions(scenario).forEach(option => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `scenario-option-btn ${String(option.type).includes('green') ? 'green' : 'red'}`;
+            btn.textContent = `${option.emoji || ''} ${option.text || ''}`.trim();
+            btn.setAttribute('data-option-id', option.id);
+            btn.addEventListener('click', () => pickScenarioOption(option.id));
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    showScenarioScreen('play');
+}
+
+function pickScenarioOption(optionId) {
+    if (!scenarioTrainer.activeScenario || scenarioTrainer.state !== SCENARIO_STATES.SCENARIO) return;
+    if (!scenarioTransitionTo(SCENARIO_STATES.OPTION_PICK)) return;
+
+    const option = getScenarioOptions(scenarioTrainer.activeScenario).find(item => item.id === optionId);
+    if (!option) return;
+    scenarioTrainer.selectedOption = option;
+
+    const isGreen = Number(option.score) === 1 || String(option.type).includes('green');
+    if (isGreen) {
+        scenarioTrainer.session.score += 1;
+        scenarioTrainer.session.stars += 1;
+        scenarioTrainer.session.streak += 1;
+        playScenarioSound('green');
+    } else {
+        scenarioTrainer.session.streak = 0;
+        playScenarioSound('red');
+    }
+
+    scenarioTransitionTo(SCENARIO_STATES.FEEDBACK, true);
+    renderScenarioFeedback(option, isGreen);
+}
+
+function renderScenarioFeedback(option, isGreen) {
+    const mark = document.getElementById('scenario-feedback-mark');
+    const title = document.getElementById('scenario-feedback-title');
+    const text = document.getElementById('scenario-feedback-text');
+
+    if (mark) {
+        mark.textContent = isGreen ? '✓' : 'X';
+        mark.className = `scenario-feedback-mark ${isGreen ? 'success' : 'fail'}`;
+        // Restart animation each feedback screen.
+        void mark.offsetWidth;
+        mark.classList.add('animate');
+    }
+    if (title) title.textContent = isGreen ? 'תגובה ירוקה: פירוק לתהליך' : 'תגובה אדומה: האשמה/התחמקות';
+    if (text) text.textContent = option.feedback || '';
+
+    showScenarioScreen('feedback');
+}
+
+function getScenarioGreenOptionText(scenario) {
+    if (!scenario) return '';
+    const green = getScenarioOptions(scenario).find(opt => String(opt.type).includes('green'));
+    return green?.text || '';
+}
+
+function showScenarioBlueprint() {
+    if (!scenarioTrainer.activeScenario || !scenarioTrainer.selectedOption) return;
+    if (!scenarioTransitionTo(SCENARIO_STATES.BLUEPRINT, true)) return;
+
+    const scenario = scenarioTrainer.activeScenario;
+    const bp = scenario.greenBlueprint || {};
+    const stepsEl = document.getElementById('scenario-blueprint-steps');
+    const noteEl = document.getElementById('scenario-user-note');
+
+    const goalEl = document.getElementById('scenario-blueprint-goal');
+    const firstStepEl = document.getElementById('scenario-blueprint-first-step');
+    const stuckEl = document.getElementById('scenario-blueprint-stuck');
+    const planBEl = document.getElementById('scenario-blueprint-planb');
+    const doneEl = document.getElementById('scenario-blueprint-done');
+    const greenSentenceEl = document.getElementById('scenario-green-sentence');
+
+    if (goalEl) goalEl.textContent = bp.goal || '';
+    if (firstStepEl) firstStepEl.textContent = bp.firstStep || '';
+    if (stuckEl) stuckEl.textContent = bp.stuckPoint || scenario.stuckPointHint || '';
+    if (planBEl) planBEl.textContent = bp.planB || '';
+    if (doneEl) doneEl.textContent = bp.doneDefinition || '';
+    if (greenSentenceEl) greenSentenceEl.textContent = getScenarioGreenOptionText(scenario);
+    if (noteEl) noteEl.value = '';
+
+    if (stepsEl) {
+        stepsEl.innerHTML = '';
+        (bp.steps || []).forEach(step => {
+            const li = document.createElement('li');
+            li.textContent = step;
+            stepsEl.appendChild(li);
+        });
+    }
+
+    renderScenarioPrismWheel();
+    showScenarioScreen('blueprint');
+}
+
+function renderScenarioPrismWheel() {
+    const wheel = document.getElementById('scenario-prism-wheel');
+    const itemsEl = document.getElementById('scenario-prism-items');
+    const detailEl = document.getElementById('scenario-prism-detail');
+    if (!wheel || !itemsEl || !detailEl) return;
+
+    const isGreen = Number(scenarioTrainer.selectedOption?.score) === 1 || String(scenarioTrainer.selectedOption?.type || '').includes('green');
+    if (!scenarioTrainer.settings.prismWheelEnabled || !isGreen) {
+        wheel.classList.add('hidden');
+        detailEl.classList.add('hidden');
+        return;
+    }
+
+    wheel.classList.remove('hidden');
+    itemsEl.innerHTML = '';
+    detailEl.classList.add('hidden');
+    detailEl.innerHTML = '';
+
+    (scenarioTrainerData.prismWheel || []).forEach(item => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'scenario-prism-item';
+        btn.textContent = item.label || item.id;
+        btn.addEventListener('click', () => {
+            detailEl.classList.remove('hidden');
+            detailEl.innerHTML = '';
+
+            const q = document.createElement('p');
+            q.innerHTML = `<strong>שאלת Meta:</strong> ${item.question || ''}`;
+            const ex = document.createElement('p');
+            ex.innerHTML = `<strong>דוגמה:</strong> ${item.example || ''}`;
+            detailEl.appendChild(q);
+            detailEl.appendChild(ex);
+            playScenarioSound('next');
+        });
+        itemsEl.appendChild(btn);
+    });
+}
+
+async function copyScenarioGreenSentence() {
+    const sentence = getScenarioGreenOptionText(scenarioTrainer.activeScenario);
+    if (!sentence) return;
+    try {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(sentence);
+        } else {
+            const helper = document.createElement('textarea');
+            helper.value = sentence;
+            document.body.appendChild(helper);
+            helper.select();
+            document.execCommand('copy');
+            helper.remove();
+        }
+        showHint('המשפט הירוק הועתק');
+    } catch (error) {
+        console.error('Copy failed', error);
+        showHint('לא הצלחנו להעתיק. אפשר להעתיק ידנית.');
+    }
+}
+
+function buildScenarioHistoryEntry(note = '') {
+    const scenario = scenarioTrainer.activeScenario;
+    const option = scenarioTrainer.selectedOption;
+    if (!scenario || !option) return null;
+
+    const score = Number(option.score) === 1 ? 1 : 0;
+    return {
+        timestamp: new Date().toISOString(),
+        scenarioId: scenario.scenarioId,
+        domain: scenario.domainLabel || scenario.domain,
+        difficulty: scenario.difficulty,
+        title: scenario.title,
+        selectedOptionId: option.id,
+        selectedOptionType: option.type,
+        selectedOptionText: option.text,
+        feedback: option.feedback || '',
+        score,
+        stars: score ? 1 : 0,
+        greenSentence: getScenarioGreenOptionText(scenario),
+        note: note || ''
+    };
+}
+
+function applyScenarioResult(entry) {
+    if (!entry) return;
+
+    scenarioTrainer.session.completed.push(entry);
+
+    scenarioTrainer.progress.completed += 1;
+    scenarioTrainer.progress.greenCount += entry.score;
+    scenarioTrainer.progress.stars += entry.stars;
+    scenarioTrainer.progress.currentGreenStreak = entry.score ? scenarioTrainer.progress.currentGreenStreak + 1 : 0;
+    scenarioTrainer.progress.bestGreenStreak = Math.max(
+        scenarioTrainer.progress.bestGreenStreak || 0,
+        scenarioTrainer.progress.currentGreenStreak
+    );
+    scenarioTrainer.progress.history.unshift(entry);
+    scenarioTrainer.progress.history = scenarioTrainer.progress.history.slice(0, 300);
+    saveScenarioTrainerProgress();
+    renderScenarioHomeStats();
+
+    addXP(entry.score ? 8 : 4);
+}
+
+function finishScenarioBlueprint() {
+    const note = (document.getElementById('scenario-user-note')?.value || '').trim();
+    if (containsScenarioSafetyRisk(note)) {
+        lockScenarioFlowForSafety();
+        return;
+    }
+
+    const entry = buildScenarioHistoryEntry(note);
+    if (!entry) return;
+
+    applyScenarioResult(entry);
+    scenarioTransitionTo(SCENARIO_STATES.SCORE, true);
+    renderScenarioScore(entry);
+}
+
+function renderScenarioScore(entry) {
+    const starsRow = document.getElementById('scenario-stars-row');
+    const scoreLine = document.getElementById('scenario-score-line');
+    const greenLine = document.getElementById('scenario-next-green-line');
+    const nextBtn = document.getElementById('scenario-next-scene-btn');
+
+    const playedCount = scenarioTrainer.session.index + 1;
+    const starVisual = '⭐'.repeat(scenarioTrainer.session.stars) + '☆'.repeat(Math.max(playedCount - scenarioTrainer.session.stars, 0));
+
+    if (starsRow) starsRow.textContent = starVisual || '☆☆☆☆☆';
+    if (scoreLine) {
+        scoreLine.textContent = `סיימת סצנה ${playedCount}/${scenarioTrainer.session.queue.length}. נקודות סשן: ${scenarioTrainer.session.score}`;
+    }
+    if (greenLine) greenLine.textContent = `בפעם הבאה: "${entry.greenSentence}"`;
+
+    const isLast = scenarioTrainer.session.index >= scenarioTrainer.session.queue.length - 1;
+    if (nextBtn) nextBtn.textContent = isLast ? 'סיום סשן וחזרה לבית' : 'המשך לסצנה הבאה';
+
+    showScenarioScreen('score');
+}
+
+function moveToNextScenario() {
+    if (!scenarioTrainer.session) {
+        openScenarioHome();
+        return;
+    }
+
+    const isLast = scenarioTrainer.session.index >= scenarioTrainer.session.queue.length - 1;
+    if (isLast) {
+        if (!scenarioTrainer.didRecordSession) {
+            recordSession();
+            scenarioTrainer.didRecordSession = true;
+        }
+        playScenarioSound('finish');
+        openScenarioHome();
+        showHint('סשן הושלם. המשך מעולה!');
+        return;
+    }
+
+    scenarioTransitionTo(SCENARIO_STATES.NEXT_SCENARIO, true);
+    scenarioTrainer.session.index += 1;
+    scenarioTransitionTo(SCENARIO_STATES.SCENARIO, true);
+    renderScenarioPlayScreen();
+    playScenarioSound('next');
+}
+
+function renderScenarioHistoryList() {
+    const list = document.getElementById('scenario-history-list');
+    if (!list) return;
+    list.innerHTML = '';
+
+    const history = scenarioTrainer.progress.history || [];
+    if (!history.length) {
+        const empty = document.createElement('div');
+        empty.className = 'scenario-history-empty';
+        empty.textContent = 'עדיין אין היסטוריה. שחק/י סצנה ראשונה כדי להתחיל.';
+        list.appendChild(empty);
+        return;
+    }
+
+    history.forEach(entry => {
+        const card = document.createElement('div');
+        card.className = 'scenario-history-item';
+
+        const title = document.createElement('strong');
+        title.textContent = `${entry.title} (${entry.domain})`;
+
+        const meta = document.createElement('p');
+        meta.className = 'meta';
+        const scoreBadge = entry.score ? '✓ ירוק' : 'X אדום';
+        const date = new Date(entry.timestamp).toLocaleString('he-IL');
+        meta.textContent = `${scoreBadge} | ${entry.selectedOptionText} | ${date}`;
+
+        card.appendChild(title);
+        card.appendChild(meta);
+
+        if (entry.note) {
+            const note = document.createElement('p');
+            note.className = 'meta';
+            note.textContent = `הערה: ${entry.note}`;
+            card.appendChild(note);
+        }
+
+        list.appendChild(card);
+    });
+}
+
+function exportScenarioHistory() {
+    const payload = {
+        exportedAt: new Date().toISOString(),
+        progress: scenarioTrainer.progress,
+        history: scenarioTrainer.progress.history || []
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `scenario_trainer_history_${Date.now()}.json`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+}
+
+function clearScenarioHistory() {
+    const ok = window.confirm('לנקות את כל היסטוריית הסצנות?');
+    if (!ok) return;
+    scenarioTrainer.progress = getDefaultScenarioProgress();
+    saveScenarioTrainerProgress();
+    renderScenarioHomeStats();
+    renderScenarioHistoryList();
+}
+
+function saveScenarioSettingsFromForm() {
+    const domain = document.getElementById('scenario-setting-domain')?.value || 'all';
+    const difficulty = document.getElementById('scenario-setting-difficulty')?.value || 'all';
+    const soundEnabled = !!document.getElementById('scenario-setting-sound')?.checked;
+    const prismWheelEnabled = !!document.getElementById('scenario-setting-prism')?.checked;
+
+    scenarioTrainer.settings = {
+        ...scenarioTrainer.settings,
+        defaultDomain: domain,
+        defaultDifficulty: difficulty,
+        soundEnabled,
+        prismWheelEnabled
+    };
+    saveScenarioTrainerSettings();
+    applyScenarioSettingsToControls();
+    showHint('הגדרות Scenario נשמרו');
+    openScenarioHome();
+}
+
+async function setupScenarioTrainerModule() {
+    if (!document.getElementById('scenario-trainer')) return;
+
+    scenarioTrainer.settings = loadScenarioTrainerSettings();
+    scenarioTrainer.progress = loadScenarioTrainerProgress();
+
+    bindScenarioClick('scenario-home-scenes', openScenarioDomainPicker);
+    bindScenarioClick('scenario-home-prisms', () => navigateTo('prismlab'));
+    bindScenarioClick('scenario-home-history', openScenarioHistoryScreen);
+    bindScenarioClick('scenario-home-settings', openScenarioSettingsScreen);
+    bindScenarioClick('scenario-back-home-from-domain', openScenarioHome);
+    bindScenarioClick('scenario-back-home-from-history', openScenarioHome);
+    bindScenarioClick('scenario-back-home-from-settings', openScenarioHome);
+    bindScenarioClick('scenario-start-run-btn', startScenarioRun);
+    bindScenarioClick('scenario-show-blueprint-btn', showScenarioBlueprint);
+    bindScenarioClick('scenario-copy-green-btn', copyScenarioGreenSentence);
+    bindScenarioClick('scenario-finish-scene-btn', finishScenarioBlueprint);
+    bindScenarioClick('scenario-next-scene-btn', moveToNextScenario);
+    bindScenarioClick('scenario-back-home-btn', openScenarioHome);
+    bindScenarioClick('scenario-export-history-btn', exportScenarioHistory);
+    bindScenarioClick('scenario-clear-history-btn', clearScenarioHistory);
+    bindScenarioClick('scenario-save-settings-btn', saveScenarioSettingsFromForm);
+
+    const runSlider = document.getElementById('scenario-run-size');
+    const runValue = document.getElementById('scenario-run-size-value');
+    if (runSlider && runValue && runSlider.dataset.scenarioBound !== 'true') {
+        runSlider.dataset.scenarioBound = 'true';
+        runValue.textContent = runSlider.value;
+        runSlider.addEventListener('input', () => {
+            runValue.textContent = runSlider.value;
+        });
+    }
+
+    const loaded = await loadScenarioTrainerData();
+    if (loaded) populateScenarioSelects();
+    renderScenarioHomeStats();
+    setScenarioSafetyNoticeVisible(false);
+    openScenarioHome();
 }
 
 // ==================== BLUEPRINT BUILDER ====================
