@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+
+<defs>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0B1220" flood-opacity="0.18"/>
+  </filter>
+  <pattern id="halftone" width="16" height="16" patternUnits="userSpaceOnUse">
+    <circle cx="3" cy="3" r="1.2" fill="#0B1220" opacity="0.10"/>
+    <circle cx="11" cy="9" r="1.2" fill="#0B1220" opacity="0.10"/>
+  </pattern>
+</defs>
+
+<g transform="translate(38,16) scale(1.0)">
+  <g filter="url(#shadow)">
+    <circle cx="90" cy="70" r="48" fill="#F2C9A0" stroke="#0B1220" stroke-width="6"/>
+    <path d="M46 74c10-50 118-50 128 0" fill="#0F172A" stroke="#0B1220" stroke-width="6" stroke-linejoin="round"/>
+    <rect x="36" y="126" width="108" height="92" rx="30" fill="#7C3AED" stroke="#0B1220" stroke-width="6"/>
+    <rect x="64" y="118" width="52" height="38" rx="18" fill="#F2C9A0" stroke="#0B1220" stroke-width="6"/>
+    <circle cx="74" cy="74" r="5" fill="#0B1220"/>
+    <circle cx="106" cy="74" r="5" fill="#0B1220"/>
+    <path d="M76 98c8 10 20 10 28 0" fill="none" stroke="#0B1220" stroke-width="6" stroke-linecap="round"/>
+  </g>
+<text x="90" y="246" font-family="Rubik, Arial, sans-serif" font-size="16" font-weight="800" fill="#6B7280" text-anchor="middle" direction="rtl" unicode-bidi="plaintext">עידו</text></g>
+</svg>

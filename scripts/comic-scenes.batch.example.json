@@ -1,0 +1,35 @@
+[
+  {
+    "SceneName": "כסף_ארנונה",
+    "Template": "assets/svg/comics/scenes/ביורוקרטיה_טופס.svg",
+    "Domain": "כסף",
+    "StoryLine1": "עירייה: \"תשלם ארנונה עד היום\"",
+    "StoryLine2": "את/ה: \"אין לי קוד משלם\"",
+    "GreenLine": "✅ מה המספר תשלום ומה הצעד הראשון?",
+    "CharacterTop": "מאיה.svg",
+    "CharacterBottom": "יוסף.svg",
+    "Force": true
+  },
+  {
+    "SceneName": "בריאות_תור",
+    "Template": "assets/svg/comics/scenes/ביורוקרטיה_טופס.svg",
+    "Domain": "בריאות",
+    "StoryLine1": "מוקד: \"פשוט תקבע תור\"",
+    "StoryLine2": "את/ה: \"אין לי הפניה בתיק\"",
+    "GreenLine": "✅ מה חסר: הפניה, קופה, או חלון זמן?",
+    "CharacterTop": "אדל.svg",
+    "CharacterBottom": "לירון.svg",
+    "Force": true
+  },
+  {
+    "SceneName": "לימודים_עבודה",
+    "Template": "assets/svg/comics/scenes/עבודה_מצגת.svg",
+    "Domain": "לימודים",
+    "StoryLine1": "מרצה: \"תסגור עבודה עד חמישי\"",
+    "StoryLine2": "את/ה: \"אין לי מבנה להגשה\"",
+    "GreenLine": "✅ מה פורמט ההגשה ומה הסעיף הראשון?",
+    "CharacterTop": "נועם.svg",
+    "CharacterBottom": "ספיר.svg",
+    "Force": true
+  }
+]

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+
+<defs>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0B1220" flood-opacity="0.18"/>
+  </filter>
+  <pattern id="halftone" width="16" height="16" patternUnits="userSpaceOnUse">
+    <circle cx="3" cy="3" r="1.2" fill="#0B1220" opacity="0.10"/>
+    <circle cx="11" cy="9" r="1.2" fill="#0B1220" opacity="0.10"/>
+  </pattern>
+</defs>
+<rect width="160" height="160" fill="none"/>
+<g filter="url(#shadow)">
+  <rect x="34" y="22" width="92" height="112" rx="14" fill="#FFFFFF" stroke="#0B1220" stroke-width="6"/>
+  <path d="M50 56l8 8 16-20" fill="none" stroke="#16A34A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="76" y="50" width="40" height="10" rx="5" fill="#6B7280" opacity="0.35"/>
+  <path d="M50 86l8 8 16-20" fill="none" stroke="#16A34A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="76" y="80" width="40" height="10" rx="5" fill="#6B7280" opacity="0.35"/>
+</g>
+<text x="80" y="150" font-family="Rubik, Arial, sans-serif" font-size="14" font-weight="800" fill="#6B7280" text-anchor="middle" direction="rtl" unicode-bidi="plaintext">צ׳ק-ליסט</text>
+</svg>

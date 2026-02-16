@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="120" viewBox="0 0 320 120">
+
+<defs>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0B1220" flood-opacity="0.18"/>
+  </filter>
+  <pattern id="halftone" width="16" height="16" patternUnits="userSpaceOnUse">
+    <circle cx="3" cy="3" r="1.2" fill="#0B1220" opacity="0.10"/>
+    <circle cx="11" cy="9" r="1.2" fill="#0B1220" opacity="0.10"/>
+  </pattern>
+</defs>
+<rect width="320" height="120" fill="none"/><g filter="url(#shadow)"><rect x="12" y="18" width="296" height="84" rx="28" fill="#16A34A" stroke="#0B1220" stroke-width="6"/></g><text x="296" y="72" font-family="Rubik, Arial, sans-serif" font-size="24" font-weight="900" fill="#fff" text-anchor="end" direction="rtl" unicode-bidi="plaintext">סקרנות מטה־מודל</text><text x="50" y="78" font-family="Rubik, Arial, sans-serif" font-size="34" font-weight="900" fill="#fff" text-anchor="middle">✅</text>
+</svg>

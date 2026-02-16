@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="220" viewBox="0 0 420 220">
+
+<defs>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0B1220" flood-opacity="0.18"/>
+  </filter>
+  <pattern id="halftone" width="16" height="16" patternUnits="userSpaceOnUse">
+    <circle cx="3" cy="3" r="1.2" fill="#0B1220" opacity="0.10"/>
+    <circle cx="11" cy="9" r="1.2" fill="#0B1220" opacity="0.10"/>
+  </pattern>
+</defs>
+<rect width="420" height="220" fill="none"/><g filter="url(#shadow)"><rect x="40" y="30" width="340" height="140" rx="24" fill="#FFF7ED" stroke="#0B1220" stroke-width="6"/><path d="M180.0 164 L210.0 208 L240.0 164 Z" fill="#FFF7ED" stroke="#0B1220" stroke-width="6" stroke-linejoin="round"/></g><text x="370" y="90" font-family="Rubik, Arial, sans-serif" font-size="22" font-weight="900" fill="#111827" text-anchor="end" direction="rtl" unicode-bidi="plaintext">כאן טקסט</text><text x="370" y="125" font-family="Rubik, Arial, sans-serif" font-size="18" font-weight="700" fill="#6B7280" text-anchor="end" direction="rtl" unicode-bidi="plaintext">בועת דיבור לעריכה</text>
+</svg>

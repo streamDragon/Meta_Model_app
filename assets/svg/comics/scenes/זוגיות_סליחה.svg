@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+
+<defs>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0B1220" flood-opacity="0.18"/>
+  </filter>
+  <pattern id="halftone" width="16" height="16" patternUnits="userSpaceOnUse">
+    <circle cx="3" cy="3" r="1.2" fill="#0B1220" opacity="0.10"/>
+    <circle cx="11" cy="9" r="1.2" fill="#0B1220" opacity="0.10"/>
+  </pattern>
+</defs>
+<rect width="1200" height="760" fill="#F6F7FB"/>
+<g filter="url(#shadow)">
+  <rect x="30" y="24" width="1140" height="84" rx="26" fill="#FFFFFF" stroke="#0B1220" stroke-width="6"/>
+</g>
+<text x="1140" y="70" font-family="Rubik, Arial, sans-serif" font-size="30" font-weight="900" fill="#111827" text-anchor="end" direction="rtl" unicode-bidi="plaintext">זוגיות_סליחה</text><text x="1140" y="98" font-family="Rubik, Arial, sans-serif" font-size="16" font-weight="700" fill="#6B7280" text-anchor="end" direction="rtl" unicode-bidi="plaintext">תחום: זוגיות  •  מצב סיפור</text>
+<g filter="url(#shadow)">
+  <rect x="30" y="128" width="1140" height="590" rx="26" fill="#FFFFFF" stroke="#0B1220" stroke-width="6"/>
+</g>
+<g filter="url(#shadow)"><rect x="90" y="190" width="720" height="220" rx="24" fill="#FFF7ED" stroke="#0B1220" stroke-width="6"/><path d="M130 380 L72 420 L154 400 Z" fill="#FFF7ED" stroke="#0B1220" stroke-width="6" stroke-linejoin="round"/></g><text x="780" y="252" font-family="Rubik, Arial, sans-serif" font-size="24" font-weight="700" fill="#111827" text-anchor="end" direction="rtl" unicode-bidi="plaintext">בן/בת הזוג: "תבקש סליחה."</text><text x="780" y="292" font-family="Rubik, Arial, sans-serif" font-size="24" font-weight="700" fill="#111827" text-anchor="end" direction="rtl" unicode-bidi="plaintext">את/ה: "אבל לא עשיתי כלום!"</text>
+<g filter="url(#shadow)">
+  <rect x="870" y="190" width="270" height="430" rx="26" fill="#F6F7FB" stroke="#0B1220" stroke-width="6"/>
+</g>
+<image href="../../characters/מיכל.svg" x="910" y="220" width="190" height="190"/><image href="../../characters/יוסף.svg" x="910" y="410" width="190" height="190"/><g filter="url(#shadow)"><rect x="90" y="440" width="190" height="90" rx="26" fill="#EF4444" stroke="#0B1220" stroke-width="6"/></g><text x="134" y="498" font-family="Rubik, Arial, sans-serif" font-size="34" font-weight="900" fill="#fff" text-anchor="middle">😡</text><text x="264" y="504" font-family="Rubik, Arial, sans-serif" font-size="18" font-weight="900" fill="#fff" text-anchor="end" direction="rtl" unicode-bidi="plaintext">כעס</text><g filter="url(#shadow)"><rect x="300" y="440" width="190" height="90" rx="26" fill="#F59E0B" stroke="#0B1220" stroke-width="6"/></g><text x="344" y="498" font-family="Rubik, Arial, sans-serif" font-size="34" font-weight="900" fill="#fff" text-anchor="middle">🙄</text><text x="474" y="504" font-family="Rubik, Arial, sans-serif" font-size="18" font-weight="900" fill="#fff" text-anchor="end" direction="rtl" unicode-bidi="plaintext">לעג</text><g filter="url(#shadow)"><rect x="510" y="440" width="190" height="90" rx="26" fill="#7C3AED" stroke="#0B1220" stroke-width="6"/></g><text x="554" y="498" font-family="Rubik, Arial, sans-serif" font-size="34" font-weight="900" fill="#fff" text-anchor="middle">🫣</text><text x="684" y="504" font-family="Rubik, Arial, sans-serif" font-size="18" font-weight="900" fill="#fff" text-anchor="end" direction="rtl" unicode-bidi="plaintext">הצלה</text><g filter="url(#shadow)"><rect x="720" y="440" width="190" height="90" rx="26" fill="#6B7280" stroke="#0B1220" stroke-width="6"/></g><text x="764" y="498" font-family="Rubik, Arial, sans-serif" font-size="34" font-weight="900" fill="#fff" text-anchor="middle">😬</text><text x="894" y="504" font-family="Rubik, Arial, sans-serif" font-size="18" font-weight="900" fill="#fff" text-anchor="end" direction="rtl" unicode-bidi="plaintext">התחמקות</text><g filter="url(#shadow)"><rect x="930" y="440" width="190" height="90" rx="26" fill="#16A34A" stroke="#0B1220" stroke-width="6"/></g><text x="974" y="498" font-family="Rubik, Arial, sans-serif" font-size="34" font-weight="900" fill="#fff" text-anchor="middle">✅</text><text x="1104" y="504" font-family="Rubik, Arial, sans-serif" font-size="18" font-weight="900" fill="#fff" text-anchor="end" direction="rtl" unicode-bidi="plaintext">מטה־מודל</text>
+<g filter="url(#shadow)">
+  <rect x="90" y="552" width="1050" height="128" rx="26" fill="#F6F7FB" stroke="#0B1220" stroke-width="6"/>
+</g>
+<image href="../../stickers/badges/סקרנות_מטה_מודל.svg" x="100" y="572" width="260" height="88"/><text x="1120" y="608" font-family="Rubik, Arial, sans-serif" font-size="20" font-weight="700" fill="#111827" text-anchor="end" direction="rtl" unicode-bidi="plaintext">התגובה הירוקה:</text><text x="1120" y="644" font-family="Rubik, Arial, sans-serif" font-size="22" font-weight="700" fill="#6B7280" text-anchor="end" direction="rtl" unicode-bidi="plaintext">✅ מה הכוונה שלך? איך תדע שסיימת?</text>
+</svg>

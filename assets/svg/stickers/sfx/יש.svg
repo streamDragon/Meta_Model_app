@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+
+<defs>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0B1220" flood-opacity="0.18"/>
+  </filter>
+  <pattern id="halftone" width="16" height="16" patternUnits="userSpaceOnUse">
+    <circle cx="3" cy="3" r="1.2" fill="#0B1220" opacity="0.10"/>
+    <circle cx="11" cy="9" r="1.2" fill="#0B1220" opacity="0.10"/>
+  </pattern>
+</defs>
+<rect width="256" height="256" fill="none"/><polygon points="128.0,42.0 149.9,67.9 183.3,62.1 183.4,96.0 212.7,113.1 191.0,139.1 202.5,171.0 169.1,177.0 157.4,208.8 128.0,192.0 98.6,208.8 86.9,177.0 53.5,171.0 65.0,139.1 43.3,113.1 72.6,96.0 72.7,62.1 106.1,67.9" fill="#16A34A" stroke="#0B1220" stroke-width="8" stroke-linejoin="round" filter="url(#shadow)"/><circle cx="128" cy="128" r="74" fill="url(#halftone)" opacity="0.9"/><text x="128" y="138" font-family="Rubik, Arial, sans-serif" font-size="34" font-weight="900" fill="#fff" text-anchor="middle" direction="rtl" unicode-bidi="plaintext">יש!</text>
+</svg>

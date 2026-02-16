@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+
+<defs>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0B1220" flood-opacity="0.18"/>
+  </filter>
+  <pattern id="halftone" width="16" height="16" patternUnits="userSpaceOnUse">
+    <circle cx="3" cy="3" r="1.2" fill="#0B1220" opacity="0.10"/>
+    <circle cx="11" cy="9" r="1.2" fill="#0B1220" opacity="0.10"/>
+  </pattern>
+</defs>
+<rect width="160" height="160" fill="none"/>
+<g filter="url(#shadow)">
+  <rect x="28" y="28" width="104" height="72" rx="12" fill="#FFFFFF" stroke="#0B1220" stroke-width="6"/>
+  <rect x="40" y="40" width="80" height="48" rx="8" fill="#F6F7FB" stroke="#0B1220" stroke-width="4"/>
+  <rect x="22" y="104" width="116" height="18" rx="9" fill="#6B7280" stroke="#0B1220" stroke-width="6"/>
+</g>
+<text x="80" y="150" font-family="Rubik, Arial, sans-serif" font-size="14" font-weight="800" fill="#6B7280" text-anchor="middle" direction="rtl" unicode-bidi="plaintext">מחשב</text>
+</svg>
