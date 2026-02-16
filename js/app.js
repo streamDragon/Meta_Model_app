@@ -2,7 +2,22 @@
 let metaModelData = {};
 let practiceCount = 0;
 let currentStatementIndex = 0;
-let userProgress = { xp: 0, streak: 0, badges: [], sessions: 0, lastSessionDate: null };
+const MAX_STREAK_CHARGES = 3;
+const DEFAULT_DAILY_GOAL = 3;
+const DEFAULT_USER_PROGRESS = {
+    xp: 0,
+    streak: 0,
+    badges: [],
+    sessions: 0,
+    lastSessionDate: null,
+    dailyGoal: DEFAULT_DAILY_GOAL,
+    todayActions: 0,
+    todayDate: null,
+    streakCharges: 0,
+    lastChargeAwardedDate: null,
+    lastChargeUsedDate: null
+};
+let userProgress = { ...DEFAULT_USER_PROGRESS };
 let trainerState = {
     isActive: false,
     currentQuestion: 0,
@@ -3490,7 +3505,7 @@ function navigateTo(tabName) {
 
 // ==================== PROGRESS TRACKING & GAMIFICATION ====================
 
-function loadUserProgress() {
+function legacyLoadUserProgress() {
     const saved = localStorage.getItem('userProgress');
     if (saved) {
         userProgress = JSON.parse(saved);
@@ -3501,7 +3516,7 @@ function saveUserProgress() {
     localStorage.setItem('userProgress', JSON.stringify(userProgress));
 }
 
-function addXP(amount) {
+function legacyAddXP(amount) {
     userProgress.xp += amount;
     updateStreak();
     checkAndAwardBadges();
@@ -3509,7 +3524,7 @@ function addXP(amount) {
     updateProgressHub();
 }
 
-function updateStreak() {
+function legacyUpdateStreak() {
     const today = new Date().toISOString().split('T')[0];
     if (userProgress.lastSessionDate === today) return; // Already counted today
     
@@ -3529,7 +3544,7 @@ function updateStreak() {
     userProgress.lastSessionDate = today;
 }
 
-function checkAndAwardBadges() {
+function legacyCheckAndAwardBadges() {
     const badgesList = [
         { id: 'first_step', name: 'צעד ראשון', icon: '👣', condition: () => userProgress.xp >= 10 },
         { id: 'fire_10', name: 'להט 🔥', icon: '🔥', condition: () => userProgress.streak >= 10 },
@@ -3558,7 +3573,7 @@ function initializeProgressHub() {
     updateProgressHub();
 }
 
-function updateProgressHub() {
+function legacyUpdateProgressHub() {
     const streakEl = document.getElementById('streak-count');
     const xpEl = document.getElementById('xp-count');
     const badgeCountEl = document.getElementById('badge-count');
@@ -3594,6 +3609,210 @@ function onBlueprintComplete() {
 function onPrismComplete() {
     addXP(15);
     recordSession();
+}
+
+// --- Progress v2: daily goal + streak charge ---
+function toLocalDateKey(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function parseDateKey(dateKey) {
+    if (!dateKey || typeof dateKey !== 'string') return null;
+    const [year, month, day] = dateKey.split('-').map(Number);
+    if (!year || !month || !day) return null;
+    return new Date(year, month - 1, day);
+}
+
+function getDaysDiff(fromKey, toKey) {
+    const from = parseDateKey(fromKey);
+    const to = parseDateKey(toKey);
+    if (!from || !to) return 0;
+    from.setHours(0, 0, 0, 0);
+    to.setHours(0, 0, 0, 0);
+    return Math.floor((to - from) / (1000 * 60 * 60 * 24));
+}
+
+function clampNumber(value, min, max, fallback = min) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return fallback;
+    return Math.min(max, Math.max(min, parsed));
+}
+
+function normalizeUserProgress(raw) {
+    const merged = { ...DEFAULT_USER_PROGRESS, ...(raw || {}) };
+    merged.badges = Array.isArray(merged.badges) ? merged.badges : [];
+    merged.xp = Math.max(0, Math.floor(Number(merged.xp) || 0));
+    merged.streak = Math.max(0, Math.floor(Number(merged.streak) || 0));
+    merged.sessions = Math.max(0, Math.floor(Number(merged.sessions) || 0));
+    merged.dailyGoal = clampNumber(merged.dailyGoal, 1, 10, DEFAULT_DAILY_GOAL);
+    merged.todayActions = Math.max(0, Math.floor(Number(merged.todayActions) || 0));
+    merged.streakCharges = clampNumber(merged.streakCharges, 0, MAX_STREAK_CHARGES, 0);
+    merged.lastSessionDate = typeof merged.lastSessionDate === 'string' ? merged.lastSessionDate : null;
+    merged.todayDate = typeof merged.todayDate === 'string' ? merged.todayDate : null;
+    merged.lastChargeAwardedDate = typeof merged.lastChargeAwardedDate === 'string' ? merged.lastChargeAwardedDate : null;
+    merged.lastChargeUsedDate = typeof merged.lastChargeUsedDate === 'string' ? merged.lastChargeUsedDate : null;
+    return merged;
+}
+
+function syncDailyProgressWindow() {
+    const today = toLocalDateKey();
+    if (userProgress.todayDate !== today) {
+        userProgress.todayDate = today;
+        userProgress.todayActions = 0;
+    }
+}
+
+function tryAwardStreakCharge() {
+    const reachedGoal = userProgress.todayActions >= userProgress.dailyGoal;
+    const alreadyAwardedToday = userProgress.lastChargeAwardedDate === userProgress.todayDate;
+    if (!reachedGoal || alreadyAwardedToday) return;
+
+    if (userProgress.streakCharges >= MAX_STREAK_CHARGES) {
+        userProgress.lastChargeAwardedDate = userProgress.todayDate;
+        return;
+    }
+
+    userProgress.streakCharges += 1;
+    userProgress.lastChargeAwardedDate = userProgress.todayDate;
+    showHint(`🛡️ קיבלת Streak Charge (${userProgress.streakCharges}/${MAX_STREAK_CHARGES})`);
+}
+
+function registerDailyAction(amount = 1) {
+    syncDailyProgressWindow();
+    const delta = Math.max(0, Math.floor(Number(amount) || 0));
+    if (!delta) return;
+    userProgress.todayActions += delta;
+    tryAwardStreakCharge();
+}
+
+function loadUserProgress() {
+    const saved = localStorage.getItem('userProgress');
+    if (!saved) {
+        userProgress = normalizeUserProgress(DEFAULT_USER_PROGRESS);
+        syncDailyProgressWindow();
+        saveUserProgress();
+        return;
+    }
+    try {
+        userProgress = normalizeUserProgress(JSON.parse(saved));
+    } catch (error) {
+        console.warn('Failed to parse user progress. Resetting defaults.', error);
+        userProgress = normalizeUserProgress(DEFAULT_USER_PROGRESS);
+    }
+    syncDailyProgressWindow();
+    saveUserProgress();
+}
+
+function addXP(amount) {
+    const delta = Math.floor(Number(amount) || 0);
+    if (delta <= 0) return;
+    userProgress.xp += delta;
+    registerDailyAction(1);
+    updateStreak();
+    checkAndAwardBadges();
+    saveUserProgress();
+    updateProgressHub();
+}
+
+function updateStreak() {
+    const today = toLocalDateKey();
+    if (userProgress.lastSessionDate === today) return;
+
+    if (!userProgress.lastSessionDate) {
+        userProgress.streak = 1;
+    } else {
+        const diff = getDaysDiff(userProgress.lastSessionDate, today);
+        if (diff <= 1) {
+            userProgress.streak += 1;
+        } else if (diff === 2 && userProgress.streakCharges > 0) {
+            userProgress.streakCharges -= 1;
+            userProgress.streak += 1;
+            userProgress.lastChargeUsedDate = today;
+            showHint(`🛡️ השתמשת ב-Streak Charge. נשארו ${userProgress.streakCharges}/${MAX_STREAK_CHARGES}`);
+        } else {
+            userProgress.streak = 1;
+        }
+    }
+
+    userProgress.lastSessionDate = today;
+}
+
+function checkAndAwardBadges() {
+    const badgesList = [
+        { id: 'first_step', name: 'צעד ראשון', icon: '👣', condition: () => userProgress.xp >= 10 },
+        { id: 'fire_10', name: 'להט 🔥', icon: '🔥', condition: () => userProgress.streak >= 10 },
+        { id: 'xp_100', name: '100 XP', icon: '⭐', condition: () => userProgress.xp >= 100 },
+        { id: 'xp_500', name: '500 XP', icon: '✨', condition: () => userProgress.xp >= 500 },
+        { id: 'sessions_10', name: '10 סשנים', icon: '📊', condition: () => userProgress.sessions >= 10 },
+        { id: 'daily_goal', name: 'יעד יומי', icon: '🎯', condition: () => userProgress.lastChargeAwardedDate === userProgress.todayDate },
+        { id: 'charge_full', name: 'Charge Full', icon: '🛡️', condition: () => userProgress.streakCharges >= MAX_STREAK_CHARGES },
+    ];
+
+    badgesList.forEach(badge => {
+        if (badge.condition() && !userProgress.badges.find(b => b.id === badge.id)) {
+            userProgress.badges.push({ id: badge.id, name: badge.name, icon: badge.icon, earned: new Date().toISOString() });
+            showHint(`🏆 כבר רכשת את התג: ${badge.name}`);
+        }
+    });
+}
+
+function updateProgressHub() {
+    const streakEl = document.getElementById('streak-count');
+    const streakDateEl = document.getElementById('streak-date');
+    const xpEl = document.getElementById('xp-count');
+    const badgeCountEl = document.getElementById('badge-count');
+    const sessionEl = document.getElementById('session-count');
+    const dailyGoalCard = document.getElementById('daily-goal-card');
+    const dailyGoalValueEl = document.getElementById('daily-goal-value');
+    const dailyGoalFillEl = document.getElementById('daily-goal-fill');
+    const dailyGoalNoteEl = document.getElementById('daily-goal-note');
+    const streakChargeValueEl = document.getElementById('streak-charge-value');
+    const streakChargeNoteEl = document.getElementById('streak-charge-note');
+    const badgesDisplay = document.getElementById('badges-display');
+
+    syncDailyProgressWindow();
+
+    if (streakEl) streakEl.textContent = `${userProgress.streak} ימים`;
+    if (xpEl) xpEl.textContent = userProgress.xp;
+    if (badgeCountEl) badgeCountEl.textContent = userProgress.badges.length;
+    if (sessionEl) sessionEl.textContent = userProgress.sessions;
+    if (streakDateEl) {
+        if (!userProgress.lastSessionDate) {
+            streakDateEl.textContent = 'היום הראשון!';
+        } else if (userProgress.lastChargeUsedDate === userProgress.lastSessionDate) {
+            streakDateEl.textContent = 'הרצף נשמר עם Charge';
+        } else {
+            streakDateEl.textContent = `פעילות אחרונה: ${userProgress.lastSessionDate}`;
+        }
+    }
+
+    const goalRatio = userProgress.todayActions / userProgress.dailyGoal;
+    const goalPercent = Math.min(100, Math.round(goalRatio * 100));
+    const remaining = Math.max(userProgress.dailyGoal - userProgress.todayActions, 0);
+    const completed = remaining === 0;
+    if (dailyGoalValueEl) dailyGoalValueEl.textContent = `${Math.min(userProgress.todayActions, userProgress.dailyGoal)}/${userProgress.dailyGoal}`;
+    if (dailyGoalFillEl) dailyGoalFillEl.style.width = `${goalPercent}%`;
+    if (dailyGoalNoteEl) dailyGoalNoteEl.textContent = completed ? 'היעד היומי הושלם' : `עוד ${remaining} פעולות להשלמה`;
+    if (dailyGoalCard) dailyGoalCard.classList.toggle('is-goal-complete', completed);
+
+    if (streakChargeValueEl) streakChargeValueEl.textContent = `${userProgress.streakCharges}/${MAX_STREAK_CHARGES}`;
+    if (streakChargeNoteEl) {
+        streakChargeNoteEl.textContent = userProgress.streakCharges > 0
+            ? 'שומר על הרצף ביום פספוס אחד'
+            : 'סיים יעד יומי כדי למלא Charge';
+    }
+
+    if (badgesDisplay) {
+        badgesDisplay.innerHTML = userProgress.badges.map(b => `
+            <div class="badge" title="${b.name}">
+                <span class="badge-icon">${b.icon}</span>
+                <span>${b.name}</span>
+            </div>
+        `).join('');
+    }
 }
 
 // ==================== END OF APP ===================
