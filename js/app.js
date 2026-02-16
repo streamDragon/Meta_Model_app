@@ -891,6 +891,9 @@ function openPrism(id) {
     document.getElementById('prism-resistance').value = 2; document.getElementById('resistance-display').textContent='2';
     // store current prism in a temp
     detail.setAttribute('data-prism-id', id);
+    // Populate prepared items and enable drag/drop into level inputs
+    populatePreparedItems(prism);
+    attachMappingDropHandlers();
 }
 
 function handlePrismSubmit() {
@@ -984,6 +987,71 @@ function exportPrismSession() {
     const blob = new Blob([raw], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = `prism_sessions_${Date.now()}.json`; a.click(); URL.revokeObjectURL(url);
+}
+
+// Populate prepared items for drag-and-drop into the mapping inputs
+function populatePreparedItems(prism) {
+    const list = document.getElementById('prepared-list');
+    if (!list) return;
+    list.innerHTML = '';
+
+    let items = [];
+    if (prism.examples && prism.examples.length) items = items.concat(prism.examples);
+    if (prism.recommended_interventions_by_level) {
+        Object.keys(prism.recommended_interventions_by_level).forEach(k => {
+            items.push(`${k}: ${prism.recommended_interventions_by_level[k]}`);
+        });
+    }
+    if (prism.level_hints) {
+        Object.keys(prism.level_hints).forEach(k => {
+            items.push(`${k}: ${prism.level_hints[k]}`);
+        });
+    }
+
+    // Deduplicate and limit
+    items = Array.from(new Set(items)).filter(Boolean).slice(0, 12);
+
+    items.forEach(text => {
+        const div = document.createElement('div');
+        div.className = 'prepared-item';
+        div.textContent = text;
+        div.title = text;
+        div.setAttribute('draggable', 'true');
+
+        div.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', text);
+        });
+
+        // click to copy into focused or first empty input
+        div.addEventListener('click', () => copyPreparedToFocusedOrEmpty(text));
+
+        list.appendChild(div);
+    });
+}
+
+function attachMappingDropHandlers() {
+    const inputs = document.querySelectorAll('.mapping-input');
+    inputs.forEach(inp => {
+        inp.addEventListener('dragover', (e) => e.preventDefault());
+        inp.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const txt = e.dataTransfer.getData('text/plain');
+            if (txt) inp.value = txt;
+        });
+        inp.addEventListener('focus', () => {
+            document.querySelectorAll('.mapping-input').forEach(i => i.classList.remove('focused'));
+            inp.classList.add('focused');
+        });
+    });
+}
+
+function copyPreparedToFocusedOrEmpty(text) {
+    const focused = document.querySelector('.mapping-input.focused');
+    if (focused) { focused.value = text; focused.focus(); return; }
+    const empty = Array.from(document.querySelectorAll('.mapping-input')).find(i => !i.value);
+    if (empty) { empty.value = text; empty.focus(); return; }
+    const first = document.querySelector('.mapping-input');
+    if (first) { first.value = text; first.focus(); }
 }
 
 // ==================== UI HELPERS ====================
