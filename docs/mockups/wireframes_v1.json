@@ -1,0 +1,83 @@
+{
+  "version": "1.0.0",
+  "canvas": {
+    "unit": "px",
+    "phoneFrame": { "width": 300, "height": 560, "radius": 24, "headerHeight": 64, "footerHeight": 56 },
+    "theme": {
+      "primary": "#2B6CB0",
+      "secondary": "#4C51BF",
+      "success": "#2F855A",
+      "danger": "#C53030",
+      "warning": "#D69E2E",
+      "surface": "#FFFFFF",
+      "surfaceAlt": "#F7FAFC"
+    }
+  },
+  "stateMachine": [
+    "HOME",
+    "DOMAIN_PICK",
+    "SCENARIO",
+    "OPTION_PICK",
+    "FEEDBACK",
+    "BLUEPRINT",
+    "SCORE",
+    "NEXT_SCENARIO"
+  ],
+  "screens": [
+    {
+      "id": "HOME",
+      "title": "בחר תחום",
+      "blocks": [
+        { "type": "domainButton", "id": "domain_parenting", "label": "הורות", "emoji": "❤️" },
+        { "type": "domainButton", "id": "domain_relationships", "label": "זוגיות", "emoji": "💗" },
+        { "type": "domainButton", "id": "domain_work", "label": "עבודה", "emoji": "💼" },
+        { "type": "domainButton", "id": "domain_bureaucracy", "label": "ביורוקרטיה", "emoji": "🧾" },
+        { "type": "domainButton", "id": "domain_home_tech", "label": "טכני/בית", "emoji": "🛠️" },
+        { "type": "control", "id": "difficulty", "kind": "segmented", "values": ["קל", "בינוני", "קשה"] },
+        { "type": "primaryAction", "id": "start", "label": "התחל >>" }
+      ]
+    },
+    {
+      "id": "SCENARIO",
+      "title": "שיעורי בית",
+      "blocks": [
+        { "type": "avatarRow", "id": "participants", "avatars": ["parent", "child"] },
+        { "type": "storyCard", "id": "story", "lines": 2 },
+        { "type": "optionButton", "id": "opt_A", "tone": "danger", "emoji": "😡", "label": "זהות מאשימה" },
+        { "type": "optionButton", "id": "opt_B", "tone": "danger", "emoji": "🙄", "label": "השוואה מביישת" },
+        { "type": "optionButton", "id": "opt_C", "tone": "warning", "emoji": "🥴", "label": "לעשות במקומו" },
+        { "type": "optionButton", "id": "opt_D", "tone": "warning", "emoji": "😬", "label": "להתחמק" },
+        { "type": "optionButton", "id": "opt_E", "tone": "success", "emoji": "✅", "label": "פירוק לתהליך" }
+      ]
+    },
+    {
+      "id": "FEEDBACK",
+      "title": "כל הכבוד",
+      "blocks": [
+        { "type": "resultBadge", "id": "result", "variant": "success", "icon": "✓" },
+        { "type": "feedbackCard", "id": "feedback", "lines": 2 },
+        { "type": "primaryAction", "id": "to_blueprint", "label": "הראה את הפירוק >>" }
+      ]
+    },
+    {
+      "id": "BLUEPRINT",
+      "title": "תכנית פעולה",
+      "blocks": [
+        { "type": "checkList", "id": "plan", "items": ["מטרה", "צעד ראשון (10 דק')", "שלבים", "תקיעה", "Plan B", "Done"] },
+        { "type": "copyBox", "id": "green_sentence", "label": "העתק משפט ירוק" },
+        { "type": "primaryAction", "id": "confirm", "label": "תמשיך >>" }
+      ]
+    },
+    {
+      "id": "SCORE",
+      "title": "כל הכבוד!",
+      "blocks": [
+        { "type": "stars", "id": "stars", "count": 3 },
+        { "type": "scoreLine", "id": "xp", "label": "+1 נקודה" },
+        { "type": "scoreLine", "id": "streak", "label": "רצף מעולה" },
+        { "type": "progressBar", "id": "session_progress", "value": 30 },
+        { "type": "primaryAction", "id": "next", "label": "לסצנה הבאה >>" }
+      ]
+    }
+  ]
+}

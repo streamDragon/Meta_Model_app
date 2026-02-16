@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="gBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="gGreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="100%" stop-color="#16a34a"/>
+    </linearGradient>
+    <linearGradient id="gRed" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f87171"/>
+      <stop offset="100%" stop-color="#dc2626"/>
+    </linearGradient>
+    <linearGradient id="gYellow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.16"/>
+    </filter>
+    <style>
+      .h1 { font-family: "Segoe UI", Arial, sans-serif; font-size: 56px; font-weight: 800; fill: #1e293b; }
+      .h2 { font-family: "Segoe UI", Arial, sans-serif; font-size: 38px; font-weight: 800; fill: #1e293b; }
+      .label { font-family: "Segoe UI", Arial, sans-serif; font-size: 26px; font-weight: 700; fill: #334155; }
+      .txt { font-family: "Segoe UI", Arial, sans-serif; font-size: 24px; fill: #1f2937; }
+      .btnText { font-family: "Segoe UI", Arial, sans-serif; font-size: 34px; font-weight: 800; fill: #ffffff; }
+      .small { font-family: "Segoe UI", Arial, sans-serif; font-size: 20px; fill: #334155; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="980" fill="url(#paper)"/>
+  <text x="800" y="76" text-anchor="middle" class="h1">Scenario Trainer - UI Kit</text>
+
+  <!-- Character avatars -->
+  <text x="80" y="150" class="h2">Characters</text>
+  <g transform="translate(80,180)" filter="url(#shadow)">
+    <circle cx="80" cy="80" r="70" fill="#93c5fd"/>
+    <circle cx="80" cy="70" r="30" fill="#fde68a"/>
+    <path d="M45 112 Q80 142 115 112" fill="#2563eb"/>
+    <text x="80" y="172" text-anchor="middle" class="small">Boy</text>
+
+    <circle cx="260" cy="80" r="70" fill="#f9a8d4"/>
+    <circle cx="260" cy="70" r="30" fill="#fde68a"/>
+    <path d="M220 112 Q260 146 300 112" fill="#db2777"/>
+    <text x="260" y="172" text-anchor="middle" class="small">Girl</text>
+
+    <circle cx="440" cy="80" r="70" fill="#86efac"/>
+    <circle cx="440" cy="70" r="30" fill="#fde68a"/>
+    <path d="M405 112 Q440 140 475 112" fill="#16a34a"/>
+    <text x="440" y="172" text-anchor="middle" class="small">Guide</text>
+  </g>
+
+  <!-- Emotion chips -->
+  <text x="680" y="150" class="h2">Emotion Chips</text>
+  <g transform="translate(680,180)" filter="url(#shadow)">
+    <circle cx="90" cy="80" r="68" fill="url(#gRed)"/>
+    <text x="90" y="96" text-anchor="middle" class="btnText">😡</text>
+    <text x="90" y="178" text-anchor="middle" class="small">Angry</text>
+
+    <circle cx="270" cy="80" r="68" fill="url(#gYellow)"/>
+    <text x="270" y="96" text-anchor="middle" class="btnText">🙄</text>
+    <text x="270" y="178" text-anchor="middle" class="small">Mocking</text>
+
+    <circle cx="450" cy="80" r="68" fill="#94a3b8"/>
+    <text x="450" y="96" text-anchor="middle" class="btnText">😬</text>
+    <text x="450" y="178" text-anchor="middle" class="small">Avoiding</text>
+  </g>
+
+  <!-- Cards -->
+  <text x="80" y="430" class="h2">Cards</text>
+  <g transform="translate(80,460)" filter="url(#shadow)">
+    <rect x="0" y="0" width="360" height="180" rx="22" fill="#ffffff" stroke="#cbd5e1"/>
+    <rect x="0" y="0" width="360" height="52" rx="22" fill="url(#gBlue)"/>
+    <text x="180" y="36" text-anchor="middle" class="btnText" style="font-size:28px;">Scenario</text>
+    <text x="26" y="92" class="txt">Role + story lines (2-5)</text>
+    <text x="26" y="126" class="txt">"נו, פשוט תעשה X"</text>
+    <text x="26" y="160" class="small">compact and readable</text>
+  </g>
+
+  <g transform="translate(470,460)" filter="url(#shadow)">
+    <rect x="0" y="0" width="360" height="180" rx="22" fill="#ffffff" stroke="#cbd5e1"/>
+    <rect x="0" y="0" width="360" height="52" rx="22" fill="url(#gYellow)"/>
+    <text x="180" y="36" text-anchor="middle" class="btnText" style="font-size:28px;">Feedback</text>
+    <text x="26" y="96" class="txt">X / ✓ animation (1s)</text>
+    <text x="26" y="132" class="txt">1-2 lines why</text>
+    <text x="26" y="164" class="small">red vs green explanation</text>
+  </g>
+
+  <g transform="translate(860,460)" filter="url(#shadow)">
+    <rect x="0" y="0" width="360" height="180" rx="22" fill="#ffffff" stroke="#cbd5e1"/>
+    <rect x="0" y="0" width="360" height="52" rx="22" fill="url(#gBlue)"/>
+    <text x="180" y="36" text-anchor="middle" class="btnText" style="font-size:28px;">Plan Blueprint</text>
+    <text x="26" y="88" class="txt">✓ goal</text>
+    <text x="26" y="118" class="txt">✓ first step (10 min)</text>
+    <text x="26" y="148" class="txt">✓ steps + stuck + plan B</text>
+  </g>
+
+  <!-- Buttons -->
+  <text x="80" y="726" class="h2">Buttons</text>
+  <g transform="translate(80,748)" filter="url(#shadow)">
+    <rect x="0" y="0" width="280" height="72" rx="18" fill="url(#gRed)"/>
+    <text x="140" y="47" text-anchor="middle" class="btnText">✖ BAD IDEA</text>
+
+    <rect x="310" y="0" width="320" height="72" rx="18" fill="url(#gGreen)"/>
+    <text x="470" y="47" text-anchor="middle" class="btnText">✔ LET'S PLAN</text>
+
+    <rect x="660" y="0" width="180" height="72" rx="18" fill="#64748b"/>
+    <text x="750" y="47" text-anchor="middle" class="btnText">SKIP</text>
+
+    <rect x="870" y="0" width="280" height="72" rx="18" fill="url(#gBlue)"/>
+    <text x="1010" y="47" text-anchor="middle" class="btnText">↩ BACK</text>
+  </g>
+
+  <!-- Progress + reward -->
+  <text x="80" y="910" class="h2">Progress + Reward</text>
+  <g transform="translate(520,858)" filter="url(#shadow)">
+    <text x="-410" y="40" class="h2" style="font-size:48px;">⭐ ⭐ ⭐</text>
+    <rect x="0" y="0" width="480" height="44" rx="16" fill="#cbd5e1"/>
+    <rect x="0" y="0" width="326" height="44" rx="16" fill="url(#gBlue)"/>
+    <text x="12" y="30" class="label" fill="#fff176">XP</text>
+    <rect x="500" y="-2" width="148" height="50" rx="14" fill="url(#gGreen)"/>
+    <text x="574" y="31" text-anchor="middle" class="btnText" style="font-size:26px;">SUCCESS!</text>
+  </g>
+</svg>
