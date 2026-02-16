@@ -363,6 +363,7 @@ async function loadMetaModelData() {
 function setupTabNavigation() {
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
+    const mobileTabSelect = document.getElementById('mobile-tab-select');
     
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -376,12 +377,28 @@ function setupTabNavigation() {
             // Show corresponding content
             const tabName = btn.getAttribute('data-tab');
             document.getElementById(tabName).classList.add('active');
+            if (mobileTabSelect) mobileTabSelect.value = tabName;
             const scenarioContext = tabName === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
             renderGlobalComicStrip(tabName, scenarioContext);
             window.scrollTo({ top: 0, behavior: 'smooth' });
             playUISound('next');
         });
     });
+
+    if (mobileTabSelect) {
+        mobileTabSelect.innerHTML = Array.from(tabBtns)
+            .map(btn => `<option value="${btn.getAttribute('data-tab')}">${btn.textContent.trim()}</option>`)
+            .join('');
+
+        const activeBtn = document.querySelector('.tab-btn.active');
+        if (activeBtn) mobileTabSelect.value = activeBtn.getAttribute('data-tab');
+
+        mobileTabSelect.addEventListener('change', () => {
+            const targetTab = mobileTabSelect.value;
+            const btn = document.querySelector(`.tab-btn[data-tab="${targetTab}"]`);
+            if (btn) btn.click();
+        });
+    }
 }
 
 // Helper function to switch tabs from buttons

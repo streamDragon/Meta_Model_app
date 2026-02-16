@@ -267,6 +267,34 @@ header p {
     border-bottom-color: var(--primary-color);
 }
 
+.mobile-tab-nav {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.mobile-tab-nav label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #4a5568;
+    white-space: nowrap;
+}
+
+.mobile-tab-select {
+    flex: 1;
+    min-height: 42px;
+    border: 1px solid #cbd5e0;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #1f2937;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 8px 10px;
+}
+
 .global-comic-strip {
     padding: 14px 20px;
     border-bottom: 1px solid #dbe6f5;
@@ -2239,6 +2267,14 @@ a:hover {
 }
 
 @media (max-width: 768px) {
+    .tabs {
+        display: none;
+    }
+
+    .mobile-tab-nav {
+        display: flex;
+    }
+
     header h1 {
         font-size: 1.8em;
     }
@@ -2267,15 +2303,6 @@ a:hover {
 
     .practice-filters select {
         width: 100%;
-    }
-
-    .tabs {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .tab-btn {
-        min-height: 52px;
-        font-size: 0.9em;
     }
 
     .progress-grid {
@@ -2348,9 +2375,17 @@ a:hover {
         border-radius: 6px;
     }
 
-    .tab-btn {
-        font-size: 0.84em;
-        line-height: 1.2;
+    .mobile-tab-nav {
+        padding: 8px 10px;
+    }
+
+    .mobile-tab-nav label {
+        display: none;
+    }
+
+    .mobile-tab-select {
+        font-size: 0.9rem;
+        min-height: 40px;
     }
 
     .progress-grid {
