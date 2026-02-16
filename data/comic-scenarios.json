@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "scenarios": [
+    {
+      "id": "parent_homework_01",
+      "domain": "הורות",
+      "title": "אי אפשר לעשות שיעורים",
+      "characters": {
+        "left": { "name": "ילד/ה", "sprite": "assets/svg/characters/נועם.svg" },
+        "right": { "name": "הורה", "sprite": "assets/svg/characters/מאיה.svg" }
+      },
+      "dialog": [
+        { "speaker": "left", "text": "אי אפשר... לא הבנתי כלום." },
+        { "speaker": "right", "text": "מה הבעיה? פשוט תעשה." }
+      ],
+      "choices": [
+        {
+          "id": "angry",
+          "label": "כעס",
+          "badge": "assets/svg/stickers/badges/תגובה_נאיבית.svg",
+          "sfx": "assets/svg/stickers/sfx/בום.svg",
+          "say": "מה נסגר איתך?! בגילך כבר ידעתי לבד.",
+          "tone": "danger"
+        },
+        {
+          "id": "mock",
+          "label": "לעג",
+          "badge": "assets/svg/stickers/badges/לעג_והשוואה.svg",
+          "sfx": "assets/svg/stickers/sfx/אוף.svg",
+          "say": "באמת? זה כזה קל...",
+          "tone": "warn"
+        },
+        {
+          "id": "rescue",
+          "label": "הצלה",
+          "badge": "assets/svg/stickers/badges/הצלה_במקום.svg",
+          "sfx": "assets/svg/stickers/sfx/רגע.svg",
+          "say": "עזוב, אני אעשה בשבילך.",
+          "tone": "purple"
+        },
+        {
+          "id": "avoid",
+          "label": "התחמקות",
+          "badge": "assets/svg/stickers/badges/תגובה_נאיבית.svg",
+          "sfx": "assets/svg/stickers/sfx/ששש.svg",
+          "say": "טוב... אחר כך...",
+          "tone": "muted"
+        },
+        {
+          "id": "meta",
+          "label": "מטה-מודל",
+          "badge": "assets/svg/stickers/badges/סקרנות_מטה_מודל.svg",
+          "sfx": "assets/svg/stickers/sfx/יש.svg",
+          "say": "בוא נפרק: מה ניסית? באיזה שלב נתקעת?",
+          "tone": "good",
+          "blueprint": {
+            "goal": "לסיים שיעורי בית בצורה שמובנת",
+            "first_step": "להוציא מחברת ולסמן שאלה אחת בלבד להתחלה",
+            "last_step": "לבדוק שסיימתי + לשים בתיק",
+            "middle_steps": [
+              "להבין מה ההוראה בשאלה",
+              "לנסות דוגמה אחת",
+              "אם לא עובד: לשאול מה חסר לי להבין"
+            ],
+            "preconditions": [
+              "יש מחברת/ספר",
+              "יש זמן של 15 דקות ללא מסך"
+            ],
+            "alternatives": [
+              "אם לא מבינים: לבקש הסבר על דוגמה דומה",
+              "אם אין ספר: לצלם מחבר/כיתה",
+              "אם קשה רגשית: להתחיל רק ב-2 דקות"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "bureaucracy_222_01",
+      "domain": "ביורוקרטיה",
+      "title": "אין אפשרות למלא סעיף 222",
+      "characters": {
+        "left": { "name": "את/ה", "sprite": "assets/svg/characters/יוסף.svg" },
+        "right": { "name": "פקיד/ה", "sprite": "assets/svg/characters/ספיר.svg" }
+      },
+      "dialog": [
+        { "speaker": "right", "text": "תמלא סעיף 222 ותשלח היום." },
+        { "speaker": "left", "text": "אין אפשרות... אני לא מבין מה זה." }
+      ],
+      "choices": [
+        {
+          "id": "angry",
+          "label": "כעס",
+          "badge": "assets/svg/stickers/badges/תגובה_נאיבית.svg",
+          "sfx": "assets/svg/stickers/sfx/בום.svg",
+          "say": "למה הכל תמיד מסובך?!",
+          "tone": "danger"
+        },
+        {
+          "id": "mock",
+          "label": "לעג",
+          "badge": "assets/svg/stickers/badges/לעג_והשוואה.svg",
+          "sfx": "assets/svg/stickers/sfx/אופס.svg",
+          "say": "מה קשה? כולם מסתדרים...",
+          "tone": "warn"
+        },
+        {
+          "id": "rescue",
+          "label": "הצלה",
+          "badge": "assets/svg/stickers/badges/הצלה_במקום.svg",
+          "sfx": "assets/svg/stickers/sfx/רגע.svg",
+          "say": "תן לי, אני אמלא מהר.",
+          "tone": "purple"
+        },
+        {
+          "id": "avoid",
+          "label": "התחמקות",
+          "badge": "assets/svg/stickers/badges/תגובה_נאיבית.svg",
+          "sfx": "assets/svg/stickers/sfx/ששש.svg",
+          "say": "אשלח מחר...",
+          "tone": "muted"
+        },
+        {
+          "id": "meta",
+          "label": "מטה-מודל",
+          "badge": "assets/svg/stickers/badges/סקרנות_מטה_מודל.svg",
+          "sfx": "assets/svg/stickers/sfx/יש.svg",
+          "say": "מה בדיוק כתוב ליד סעיף 222? איזה שדה מופיע לך?",
+          "tone": "good",
+          "blueprint": {
+            "goal": "להגיש טופס נכון בלי לנחש",
+            "first_step": "לצלם/להעתיק את הטקסט של סעיף 222",
+            "last_step": "להגיש ולשמור אישור שליחה",
+            "middle_steps": [
+              "לברר הגדרה של המונח בשורה אחת",
+              "לבדוק דוגמה או FAQ",
+              "למלא טיוטה ולוודא מול מקור"
+            ],
+            "preconditions": [
+              "גישה לחשבון/אתר",
+              "מספר תיק או תעודת זהות"
+            ],
+            "alternatives": [
+              "אם אין תשובה: להתקשר ולשאול מה נחשב מחזור",
+              "אם לא בטוח: לשלוח צילום למסייע/AI"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

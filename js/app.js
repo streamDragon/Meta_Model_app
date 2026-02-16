@@ -302,6 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupBlueprintBuilder();
     setupPrismModule();
     setupScenarioTrainerModule();
+    setupComicEngine2();
     initializeProgressHub();
 });
 
@@ -1769,6 +1770,259 @@ async function setupScenarioTrainerModule() {
     renderScenarioHomeStats();
     setScenarioSafetyNoticeVisible(false);
     openScenarioHome();
+}
+
+// ==================== COMIC ENGINE 2.0 ====================
+
+const COMIC_ENGINE_STORAGE_KEY = 'comic_engine_progress_v1';
+
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function getComicToneClass(tone) {
+    const allowed = new Set(['danger', 'warn', 'purple', 'muted', 'good']);
+    const normalized = String(tone || 'muted').toLowerCase();
+    return `tone-${allowed.has(normalized) ? normalized : 'muted'}`;
+}
+
+function getComicOutcome(choiceId) {
+    const map = {
+        angry: 'הטון עולה, השיחה נסגרת, ונוצרת יותר התנגדות.',
+        mock: 'נוצרת בושה והצד השני מפסיק לשתף מידע אמיתי.',
+        rescue: 'הבעיה נפתרת רגעית, אבל היכולת של הצד השני לא נבנית.',
+        avoid: 'התקיעות נדחית וחוזרת אחר כך עם יותר לחץ.',
+        meta: 'העמימות יורדת והופכת לתהליך שאפשר לבצע.'
+    };
+    return map[choiceId] || 'בחירה זו משנה את הכיוון של הסצנה.';
+}
+
+function buildComicBlueprintHtml(blueprint) {
+    if (!blueprint) return '';
+
+    const toList = (items) => (items || [])
+        .map(item => `<li>${escapeHtml(item)}</li>`)
+        .join('');
+
+    return `
+        <div class="blueprint">
+            <h3>Blueprint (פירוק פעולה)</h3>
+            <div><b>מטרה:</b> ${escapeHtml(blueprint.goal || '')}</div>
+            <div><b>צעד ראשון:</b> ${escapeHtml(blueprint.first_step || '')}</div>
+            <div><b>צעד אחרון:</b> ${escapeHtml(blueprint.last_step || '')}</div>
+
+            <div style="margin-top:8px"><b>שלבי ביניים:</b></div>
+            <ul>${toList(blueprint.middle_steps)}</ul>
+
+            <div style="margin-top:8px"><b>תנאים מקדימים:</b></div>
+            <ul>${toList(blueprint.preconditions)}</ul>
+
+            <div style="margin-top:8px"><b>אלטרנטיבות כשנתקעים:</b></div>
+            <ul>${toList(blueprint.alternatives)}</ul>
+        </div>
+    `;
+}
+
+async function setupComicEngine2() {
+    const els = {
+        root: document.getElementById('comicEngine'),
+        title: document.getElementById('comicTitle'),
+        meta: document.getElementById('comicMeta'),
+        charLeft: document.getElementById('charLeft'),
+        charRight: document.getElementById('charRight'),
+        dialog: document.getElementById('comicDialog'),
+        choices: document.getElementById('comicChoices'),
+        feedback: document.getElementById('comicFeedback'),
+        feedbackLeft: document.getElementById('comicFeedbackLeft'),
+        feedbackRight: document.getElementById('comicFeedbackRight'),
+        btnNext: document.getElementById('btnNextScene')
+    };
+
+    if (!els.root || !els.title || !els.choices) return;
+
+    let payload = null;
+    try {
+        const response = await fetch('data/comic-scenarios.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        payload = await response.json();
+    } catch (error) {
+        console.error('Cannot load data/comic-scenarios.json', error);
+        els.title.textContent = 'שגיאה בטעינת סצנות קומיקס';
+        if (els.meta) els.meta.textContent = '';
+        return;
+    }
+
+    const scenarios = Array.isArray(payload?.scenarios) ? payload.scenarios : [];
+    if (!scenarios.length) {
+        els.title.textContent = 'אין סצנות קומיקס כרגע';
+        if (els.meta) els.meta.textContent = '';
+        return;
+    }
+
+    let idx = 0;
+    try {
+        const saved = JSON.parse(localStorage.getItem(COMIC_ENGINE_STORAGE_KEY) || '{}');
+        if (Number.isInteger(saved?.index) && saved.index >= 0 && saved.index < scenarios.length) {
+            idx = saved.index;
+        }
+    } catch (error) {
+        console.error('Comic engine progress parse failed', error);
+    }
+
+    const rememberComicProgress = () => {
+        localStorage.setItem(COMIC_ENGINE_STORAGE_KEY, JSON.stringify({
+            index: idx,
+            updatedAt: new Date().toISOString()
+        }));
+    };
+
+    const imgTag = (src, alt = '') => {
+        const safeSrc = escapeHtml(src || '');
+        const safeAlt = escapeHtml(alt || '');
+        return `<img src="${safeSrc}" alt="${safeAlt}" loading="lazy">`;
+    };
+
+    const renderScenario = (scenario) => {
+        if (!scenario) return;
+
+        if (els.feedback) els.feedback.hidden = true;
+        if (els.btnNext) {
+            els.btnNext.disabled = true;
+            els.btnNext.onclick = null;
+        }
+
+        els.title.textContent = scenario.title || 'סצנה';
+        if (els.meta) els.meta.textContent = `תחום: ${scenario.domain || 'לא צוין'}`;
+
+        const left = scenario?.characters?.left || {};
+        const right = scenario?.characters?.right || {};
+
+        if (els.charLeft) {
+            els.charLeft.innerHTML = `
+                <div style="text-align:center">
+                    ${imgTag(left.sprite, left.name)}
+                    <div style="color:#6B7280;font-weight:900;margin-top:6px">${escapeHtml(left.name || '')}</div>
+                </div>
+            `;
+        }
+
+        if (els.charRight) {
+            els.charRight.innerHTML = `
+                <div style="text-align:center">
+                    ${imgTag(right.sprite, right.name)}
+                    <div style="color:#6B7280;font-weight:900;margin-top:6px">${escapeHtml(right.name || '')}</div>
+                </div>
+            `;
+        }
+
+        const dialogLines = (scenario.dialog || []).map(line => {
+            const speaker = line?.speaker === 'left' ? left.name : right.name;
+            return `
+                <div class="comic-line">
+                    <div class="who">${escapeHtml(speaker || '')}</div>
+                    <div class="comic-line-text">${escapeHtml(line?.text || '')}</div>
+                </div>
+            `;
+        }).join('');
+
+        if (els.dialog) els.dialog.innerHTML = dialogLines;
+
+        const choices = Array.isArray(scenario.choices) ? scenario.choices : [];
+        els.choices.innerHTML = choices.map(choice => {
+            const icon = choice.sfx || choice.badge || '';
+            return `
+                <button class="choice-btn ${getComicToneClass(choice.tone)}" data-choice="${escapeHtml(choice.id)}">
+                    <span style="text-align:right">${escapeHtml(choice.label || '')}</span>
+                    ${icon ? imgTag(icon, choice.label || '') : ''}
+                </button>
+            `;
+        }).join('');
+
+        els.choices.onclick = (event) => {
+            const btn = event.target.closest('button[data-choice]');
+            if (!btn) return;
+
+            const choiceId = btn.getAttribute('data-choice');
+            const selected = choices.find(item => item.id === choiceId);
+            if (!selected) return;
+
+            applyChoice(scenario, selected, right);
+        };
+    };
+
+    const applyChoice = (scenario, choice, rightCharacter) => {
+        if (els.feedback) els.feedback.hidden = false;
+
+        const badge = choice.badge ? imgTag(choice.badge, 'badge') : '';
+        const sfx = choice.sfx ? imgTag(choice.sfx, 'sfx') : '';
+        if (els.feedbackLeft) {
+            els.feedbackLeft.innerHTML = `
+                <div style="display:grid;gap:10px">
+                    ${badge}
+                    ${sfx}
+                </div>
+            `;
+        }
+
+        const outcome = choice.outcome || getComicOutcome(choice.id);
+        let rightHtml = `
+            <div style="font-size:18px;line-height:1.35">
+                <div style="color:#6B7280;font-weight:900;margin-bottom:6px">התגובה שלך</div>
+                <div style="font-weight:900">${escapeHtml(choice.say || '')}</div>
+                <div style="margin-top:10px; color:#1f2937;">${escapeHtml(outcome)}</div>
+            </div>
+        `;
+
+        if (choice.blueprint) {
+            rightHtml += buildComicBlueprintHtml(choice.blueprint);
+        }
+
+        if (els.feedbackRight) els.feedbackRight.innerHTML = rightHtml;
+
+        if (els.btnNext) {
+            els.btnNext.disabled = false;
+            els.btnNext.onclick = () => {
+                idx = (idx + 1) % scenarios.length;
+                rememberComicProgress();
+                renderScenario(scenarios[idx]);
+                els.root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+        }
+
+        const altChars = [
+            'assets/svg/characters/דניאל.svg',
+            'assets/svg/characters/לירון.svg',
+            'assets/svg/characters/עדן.svg'
+        ];
+        const calmChar = 'assets/svg/characters/שירי.svg';
+
+        const rightImg = els.charRight?.querySelector('img');
+        if (!rightImg) return;
+
+        const override = choice.rightSpriteOverride;
+        if (override) {
+            rightImg.setAttribute('src', override);
+            rightImg.setAttribute('alt', rightCharacter?.name || '');
+            return;
+        }
+
+        if (choice.id === 'meta') {
+            rightImg.setAttribute('src', calmChar);
+            rightImg.setAttribute('alt', rightCharacter?.name || '');
+        } else {
+            const pick = altChars[Math.floor(Math.random() * altChars.length)];
+            rightImg.setAttribute('src', pick);
+            rightImg.setAttribute('alt', rightCharacter?.name || '');
+        }
+    };
+
+    renderScenario(scenarios[idx]);
 }
 
 // ==================== BLUEPRINT BUILDER ====================

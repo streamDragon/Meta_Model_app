@@ -34,6 +34,7 @@
         <nav class="tabs">
             <button class="tab-btn active" data-tab="home">בית</button>
             <button class="tab-btn" data-tab="scenario-trainer">סצנות Execution</button>
+            <button class="tab-btn" data-tab="comic-engine">Comic Engine</button>
             <button class="tab-btn" data-tab="categories">קטגוריות</button>
             <button class="tab-btn" data-tab="practice">תרגול</button>
             <button class="tab-btn" data-tab="blueprint">Blueprint Builder</button>
@@ -67,6 +68,7 @@
                     <p>בחר מה ברצונך לעשות:</p>
                     <div class="cta-buttons">
                         <button class="btn btn-primary cta-btn" onclick="navigateTo('scenario-trainer')">🎬 סצנות Execution</button>
+                        <button class="btn btn-primary cta-btn" onclick="navigateTo('comic-engine')">🧩 Comic Engine 2.0</button>
                         <button class="btn btn-secondary cta-btn" onclick="window.open('assets/svg/demo/index.html', '_blank')">🎨 Comic Kit Demo</button>
                         <button class="btn btn-primary cta-btn" onclick="navigateTo('categories')">📚 לומד קטגוריות</button>
                         <button class="btn btn-primary cta-btn" onclick="navigateTo('blueprint')">🏗️ בנה Blueprint</button>
@@ -292,6 +294,38 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- COMIC ENGINE TAB -->
+        <section id="comic-engine" class="tab-content">
+            <div class="card">
+                <h2>🧩 Comic Engine 2.0</h2>
+                <p class="subtitle">נתונים → רנדר סצנה → בחירה → החלפת הבעות → משוב → Blueprint.</p>
+
+                <section id="comicEngine" class="comic-engine">
+                    <header class="comic-header">
+                        <h2 id="comicTitle">סצנה</h2>
+                        <div id="comicMeta" class="comic-meta"></div>
+                    </header>
+
+                    <div class="comic-stage">
+                        <div class="comic-character" id="charLeft"></div>
+                        <div class="comic-dialog" id="comicDialog"></div>
+                        <div class="comic-character" id="charRight"></div>
+                    </div>
+
+                    <div class="comic-choices" id="comicChoices"></div>
+
+                    <div class="comic-feedback" id="comicFeedback" hidden>
+                        <div class="comic-feedback-left" id="comicFeedbackLeft"></div>
+                        <div class="comic-feedback-right" id="comicFeedbackRight"></div>
+                    </div>
+
+                    <div class="comic-controls">
+                        <button id="btnNextScene" class="btn-next" disabled>סצנה הבאה</button>
+                    </div>
+                </section>
             </div>
         </section>
 
