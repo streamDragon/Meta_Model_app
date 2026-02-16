@@ -1,0 +1,31 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#fffaf0"/>
+  <rect y="450" width="800" height="150" fill="#feebc8"/>
+  
+  <circle cx="400" cy="100" r="40" fill="white" stroke="#2d3748" stroke-width="3"/>
+  <line x1="400" y1="100" x2="400" y2="70" stroke="#e53e3e" stroke-width="2"/>
+  <line x1="400" y1="100" x2="420" y2="100" stroke="#2d3748" stroke-width="2"/>
+
+  <g transform="translate(550, 250)">
+    <rect x="20" y="60" width="70" height="200" rx="10" fill="#dd6b20"/>
+    <circle cx="55" cy="30" r="40" fill="#fbd38d"/>
+  </g>
+
+  <g transform="translate(200, 320)">
+    <rect x="20" y="50" width="50" height="130" rx="10" fill="#3182ce"/>
+    <circle cx="45" cy="30" r="30" fill="#bee3f8"/>
+  </g>
+
+  <g transform="translate(450, 150)">
+    <path d="M0,0 h200 a10,10 0 0 1 10,10 v60 a10,10 0 0 1 -10,10 h-150 l-20,20 l-20,-20 h-10 a10,10 0 0 1 -10,-10 v-60 a10,10 0 0 1 10,-10 z" fill="white" stroke="#cbd5e0" stroke-width="2"/>
+    <text x="100" y="40" text-anchor="middle" font-family="Arial" font-size="18" fill="#2d3748" direction="rtl">אנחנו מאחרים! זוז כבר!</text>
+  </g>
+
+  <g transform="translate(150, 200)">
+    <path d="M0,0 h200 a10,10 0 0 1 10,10 v60 a10,10 0 0 1 -10,10 h-50 l-20,20 l-20,-20 h-130 a10,10 0 0 1 -10,-10 v-60 a10,10 0 0 1 10,-10 z" fill="white" stroke="#cbd5e0" stroke-width="2"/>
+    <text x="100" y="40" text-anchor="middle" font-family="Arial" font-size="18" fill="#2d3748" direction="rtl">אני לא מוצא את הנעליים...</text>
+  </g>
+
+  <rect y="540" width="800" height="60" fill="#48bb78"/>
+  <text x="400" y="580" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="white" direction="rtl">בוקר רגוע מתחיל בהכנה מראש</text>
+</svg>

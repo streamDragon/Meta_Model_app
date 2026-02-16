@@ -1,0 +1,29 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#ebf8ff"/>
+  <rect y="450" width="800" height="150" fill="#bee3f8"/>
+  
+  <rect x="150" y="380" width="500" height="100" fill="#2c5282" rx="10"/>
+
+  <g transform="translate(250, 300)">
+    <rect x="0" y="50" width="60" height="100" rx="10" fill="#ed64a6"/>
+    <circle cx="30" cy="20" r="30" fill="#fbb6ce"/>
+  </g>
+
+  <g transform="translate(450, 300)">
+    <rect x="0" y="50" width="60" height="100" rx="10" fill="#4299e1"/>
+    <circle cx="30" cy="20" r="30" fill="#bee3f8"/>
+  </g>
+
+  <g transform="translate(150, 100)">
+    <path d="M0,0 h250 a10,10 0 0 1 10,10 v60 a10,10 0 0 1 -10,10 h-100 l-20,20 l-20,-20 h-130 a10,10 0 0 1 -10,-10 v-60 a10,10 0 0 1 10,-10 z" fill="white" stroke="#cbd5e0" stroke-width="2"/>
+    <text x="125" y="40" text-anchor="middle" font-family="Arial" font-size="18" fill="#2d3748" direction="rtl">אנחנו בקושי מדברים לאחרונה.</text>
+  </g>
+
+  <g transform="translate(450, 150)">
+    <path d="M0,0 h250 a10,10 0 0 1 10,10 v60 a10,10 0 0 1 -10,10 h-180 l-20,20 l-20,-20 h-50 a10,10 0 0 1 -10,-10 v-60 a10,10 0 0 1 10,-10 z" fill="white" stroke="#cbd5e0" stroke-width="2"/>
+    <text x="125" y="40" text-anchor="middle" font-family="Arial" font-size="18" fill="#2d3748" direction="rtl">בואי נקח 15 דקות הערב, בלי מסכים.</text>
+  </g>
+
+  <rect y="540" width="800" height="60" fill="#48bb78"/>
+  <text x="400" y="580" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="white" direction="rtl">תקשורת יזומה מונעת ריחוק</text>
+</svg>

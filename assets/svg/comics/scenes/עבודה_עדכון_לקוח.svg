@@ -1,0 +1,28 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#f0f4f8"/>
+  <rect y="450" width="800" height="150" fill="#d9e2ec"/>
+  
+  <g transform="translate(200, 250)">
+    <rect x="20" y="60" width="60" height="190" rx="10" fill="#4a5568"/>
+    <circle cx="50" cy="30" r="35" fill="#cbd5e0"/>
+    <rect x="60" y="100" width="40" height="60" fill="white" stroke="#2d3748" stroke-width="2"/>
+  </g>
+
+  <g transform="translate(500, 250)">
+    <rect x="20" y="60" width="60" height="190" rx="10" fill="#2b6cb0"/>
+    <circle cx="50" cy="30" r="35" fill="#bee3f8"/>
+  </g>
+
+  <g transform="translate(480, 100)">
+    <path d="M0,0 h220 a10,10 0 0 1 10,10 v80 a10,10 0 0 1 -10,10 h-100 l-20,20 l-20,-20 h-80 a10,10 0 0 1 -10,-10 v-80 a10,10 0 0 1 10,-10 z" fill="white" stroke="#cbd5e0" stroke-width="2"/>
+    <text x="110" y="40" text-anchor="middle" font-family="Arial" font-size="18" fill="#2d3748" direction="rtl">מה קורה עם העדכון ללקוח?</text>
+  </g>
+
+  <g transform="translate(150, 150)">
+    <path d="M0,0 h250 a10,10 0 0 1 10,10 v80 a10,10 0 0 1 -10,10 h-180 l-20,20 l-20,-20 h-30 a10,10 0 0 1 -10,-10 v-80 a10,10 0 0 1 10,-10 z" fill="white" stroke="#cbd5e0" stroke-width="2"/>
+    <text x="125" y="40" text-anchor="middle" font-family="Arial" font-size="18" fill="#2d3748" direction="rtl">מתלבט: מייל מפורט או שיחה קצרה?</text>
+  </g>
+
+  <rect y="540" width="800" height="60" fill="#48bb78"/>
+  <text x="400" y="580" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="white" direction="rtl">בחירת ערוץ תקשורת: דחיפות מול פירוט</text>
+</svg>

@@ -166,6 +166,7 @@
     {
       "scenarioId": "parenting_morning_002",
       "domain": "parenting",
+      "sceneArt": "assets/svg/comics/scenes/הורות_בוקר.svg",
       "domainLabel": "הורות",
       "level": 2,
       "difficulty": "medium",
@@ -189,6 +190,7 @@
     {
       "scenarioId": "parenting_room_003",
       "domain": "parenting",
+      "sceneArt": "assets/svg/comics/scenes/הורות_סידור_חדר.svg",
       "domainLabel": "הורות",
       "level": 3,
       "difficulty": "hard",
@@ -235,6 +237,7 @@
     {
       "scenarioId": "relationships_on_time_002",
       "domain": "relationships",
+      "sceneArt": "assets/svg/comics/scenes/זוגיות_בזמן.svg",
       "domainLabel": "זוגיות",
       "level": 2,
       "difficulty": "medium",
@@ -258,6 +261,7 @@
     {
       "scenarioId": "relationships_talk_003",
       "domain": "relationships",
+      "sceneArt": "assets/svg/comics/scenes/זוגיות_שיחה.svg",
       "domainLabel": "זוגיות",
       "level": 3,
       "difficulty": "hard",
@@ -304,6 +308,7 @@
     {
       "scenarioId": "work_client_update_002",
       "domain": "work",
+      "sceneArt": "assets/svg/comics/scenes/עבודה_עדכון_לקוח.svg",
       "domainLabel": "עבודה",
       "level": 2,
       "difficulty": "medium",
@@ -327,6 +332,7 @@
     {
       "scenarioId": "work_bugfix_003",
       "domain": "work",
+      "sceneArt": "assets/svg/comics/scenes/עבודה_סגירת_באג.svg",
       "domainLabel": "עבודה",
       "level": 3,
       "difficulty": "hard",
@@ -373,6 +379,7 @@
     {
       "scenarioId": "bureaucracy_upload_docs_002",
       "domain": "bureaucracy",
+      "sceneArt": "assets/svg/comics/scenes/ביורוקרטיה_העלאת_מסמכים.svg",
       "domainLabel": "ביורוקרטיה",
       "level": 2,
       "difficulty": "medium",
@@ -442,6 +449,7 @@
     {
       "scenarioId": "home_driver_linux_002",
       "domain": "home_tech",
+      "sceneArt": "assets/svg/comics/scenes/טכני_דרייבר_לינוקס.svg",
       "domainLabel": "טכני/בית",
       "level": 2,
       "difficulty": "medium",
