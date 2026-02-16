@@ -1088,6 +1088,225 @@ function logMetaModelData() {
 
 // ==================== PRISM LAB MODULE ====================
 
+const LOGICAL_LEVEL_INFO = {
+    E: {
+        name: 'Environment (E)',
+        hebrew: 'סביבה',
+        prompt: 'איפה, מתי, עם מי ובאיזה הקשר זה קורה?'
+    },
+    B: {
+        name: 'Behavior (B)',
+        hebrew: 'התנהגות',
+        prompt: 'מה האדם עושה בפועל? מה הפעולה הנצפית?'
+    },
+    C: {
+        name: 'Capabilities (C)',
+        hebrew: 'יכולות',
+        prompt: 'איזו מיומנות או אסטרטגיה נדרשת כאן?'
+    },
+    V: {
+        name: 'Values/Beliefs (V)',
+        hebrew: 'ערכים/אמונות',
+        prompt: 'מה חשוב כאן? איזו אמונה מנהלת את ההתנהגות?'
+    },
+    I: {
+        name: 'Identity (I)',
+        hebrew: 'זהות',
+        prompt: 'מה זה אומר על הזהות: מי אני? איזה אדם אני?'
+    },
+    S: {
+        name: 'Belonging (S)',
+        hebrew: 'שייכות',
+        prompt: 'לאיזו קבוצה/קהילה/שייכות זה מתחבר?'
+    }
+};
+
+const LOGICAL_LEVEL_KEYWORDS = {
+    E: ['סביבה', 'מקום', 'זמן', 'הקשר', 'בחדר', 'בעבודה', 'בבית', 'מתי', 'איפה'],
+    B: ['עושה', 'עשיתי', 'ביצוע', 'פעולה', 'התנהגות', 'מגיב', 'אומר', 'שואל'],
+    C: ['יכולת', 'מיומנות', 'אסטרטגיה', 'כלי', 'ללמוד', 'להתאמן', 'לתרגל', 'מסוגל'],
+    V: ['חשוב', 'ערך', 'אמונה', 'מאמין', 'צריך', 'נכון', 'לא נכון', 'עיקרון'],
+    I: ['אני', 'עצמי', 'זהות', 'מי אני', 'טיפש', 'מצליחן', 'כישלון', 'בן אדם'],
+    S: ['אנחנו', 'קבוצה', 'קהילה', 'צוות', 'משפחה', 'שייכות', 'חברה', 'ארגון']
+};
+
+function getPrismById(prismId) {
+    return (metaModelData.prisms || []).find(x => x.id === prismId);
+}
+
+function getLevelDisplay(level) {
+    const info = LOGICAL_LEVEL_INFO[level];
+    return info ? `${info.hebrew} (${level})` : level;
+}
+
+function getExpectedLevelFromInput(inputEl) {
+    if (!inputEl || !inputEl.id) return '';
+    const parts = inputEl.id.split('-');
+    const level = (parts[1] || '').toUpperCase();
+    return LOGICAL_LEVEL_INFO[level] ? level : '';
+}
+
+function parseLevelPrefixedText(rawText) {
+    const text = (rawText || '').trim();
+    const prefixed = text.match(/^([EBCVIS])\s*:\s*(.+)$/i);
+    if (!prefixed) return { level: '', cleanText: text };
+    return { level: prefixed[1].toUpperCase(), cleanText: prefixed[2].trim() };
+}
+
+function inferLogicalLevel(text) {
+    const source = (text || '').toLowerCase();
+    if (!source) return { level: '', confidence: 0, reason: 'אין טקסט לניתוח.' };
+
+    let bestLevel = '';
+    let bestScore = 0;
+    Object.entries(LOGICAL_LEVEL_KEYWORDS).forEach(([level, keywords]) => {
+        const score = keywords.reduce((sum, keyword) => sum + (source.includes(keyword.toLowerCase()) ? 1 : 0), 0);
+        if (score > bestScore) {
+            bestScore = score;
+            bestLevel = level;
+        }
+    });
+
+    if (!bestLevel || bestScore === 0) {
+        return { level: '', confidence: 0, reason: 'לא זוהו מילות מפתח חד-משמעיות.' };
+    }
+    if (bestScore === 1) {
+        return { level: bestLevel, confidence: 1, reason: `זוהתה מילה אחת שמתאימה לרמת ${getLevelDisplay(bestLevel)}.` };
+    }
+    return { level: bestLevel, confidence: 2, reason: `זוהו כמה רמזים שמתאימים לרמת ${getLevelDisplay(bestLevel)}.` };
+}
+
+function getLevelImprovementTip(level, prism) {
+    if (prism && prism.level_hints && prism.level_hints[level]) {
+        return `מיקוד מומלץ לרמה זו: ${prism.level_hints[level]}`;
+    }
+    const info = LOGICAL_LEVEL_INFO[level];
+    return info ? info.prompt : 'מומלץ לדייק את הניסוח לרמה הלוגית המתאימה.';
+}
+
+function clearMappingInputStatus(inputEl) {
+    if (!inputEl) return;
+    inputEl.classList.remove('invalid-level', 'valid-level', 'uncertain-level');
+    inputEl.removeAttribute('title');
+}
+
+function setMappingInputStatus(inputEl, status, message) {
+    if (!inputEl) return;
+    clearMappingInputStatus(inputEl);
+    if (status === 'mismatch') inputEl.classList.add('invalid-level');
+    if (status === 'ok') inputEl.classList.add('valid-level');
+    if (status === 'uncertain') inputEl.classList.add('uncertain-level');
+    if (message) inputEl.title = message;
+}
+
+function validateMappingEntry(expectedLevel, rawText, suggestedLevel, prism) {
+    const parsed = parseLevelPrefixedText(rawText);
+    const cleanText = parsed.cleanText;
+    const explicitLevel = parsed.level || (suggestedLevel || '').toUpperCase();
+    const improvement = getLevelImprovementTip(expectedLevel, prism);
+
+    if (!cleanText) {
+        return {
+            expectedLevel,
+            cleanText: '',
+            detectedLevel: '',
+            effectiveLevel: expectedLevel,
+            status: 'empty',
+            reason: 'השדה ריק.',
+            improvement
+        };
+    }
+
+    if (explicitLevel && explicitLevel !== expectedLevel) {
+        return {
+            expectedLevel,
+            cleanText,
+            detectedLevel: explicitLevel,
+            effectiveLevel: explicitLevel,
+            status: 'mismatch',
+            reason: `הטקסט מסומן כרמת ${getLevelDisplay(explicitLevel)} אבל הוזן בשדה ${getLevelDisplay(expectedLevel)}.`,
+            improvement
+        };
+    }
+
+    if (explicitLevel && explicitLevel === expectedLevel) {
+        return {
+            expectedLevel,
+            cleanText,
+            detectedLevel: explicitLevel,
+            effectiveLevel: expectedLevel,
+            status: 'ok',
+            reason: `הטקסט מתאים לשדה ${getLevelDisplay(expectedLevel)}.`,
+            improvement
+        };
+    }
+
+    const inferred = inferLogicalLevel(cleanText);
+    if (inferred.level && inferred.level !== expectedLevel && inferred.confidence >= 2) {
+        return {
+            expectedLevel,
+            cleanText,
+            detectedLevel: inferred.level,
+            effectiveLevel: inferred.level,
+            status: 'mismatch',
+            reason: `${inferred.reason} לכן יש סבירות גבוהה לשיבוץ שגוי בשדה ${getLevelDisplay(expectedLevel)}.`,
+            improvement
+        };
+    }
+
+    if (inferred.level === expectedLevel && inferred.confidence > 0) {
+        return {
+            expectedLevel,
+            cleanText,
+            detectedLevel: inferred.level,
+            effectiveLevel: expectedLevel,
+            status: 'ok',
+            reason: inferred.reason,
+            improvement
+        };
+    }
+
+    return {
+        expectedLevel,
+        cleanText,
+        detectedLevel: inferred.level || '',
+        effectiveLevel: expectedLevel,
+        status: 'uncertain',
+        reason: inferred.reason || 'לא ניתן להכריע אוטומטית אם השיבוץ מדויק.',
+        improvement
+    };
+}
+
+function computePrismScore(answerChecks) {
+    const answered = answerChecks.filter(a => a.status !== 'empty');
+    const answeredCount = answered.length;
+    if (answeredCount === 0) {
+        return {
+            total: 0,
+            coverage: 0,
+            alignment: 0,
+            clarity: 0,
+            grade: 'אין מספיק מידע לציון'
+        };
+    }
+
+    const matched = answered.filter(a => a.status === 'ok').length;
+    const uncertain = answered.filter(a => a.status === 'uncertain').length;
+    const sufficientlyDetailed = answered.filter(a => (a.cleanText || '').split(/\s+/).length >= 3).length;
+
+    const coverage = Math.round((answeredCount / 6) * 40);
+    const alignment = Math.round(((matched + (uncertain * 0.5)) / answeredCount) * 40);
+    const clarity = Math.round((sufficientlyDetailed / answeredCount) * 20);
+    const total = Math.min(100, coverage + alignment + clarity);
+
+    let grade = 'טעון שיפור משמעותי';
+    if (total >= 85) grade = 'מצוין';
+    else if (total >= 70) grade = 'טוב מאוד';
+    else if (total >= 55) grade = 'בינוני';
+
+    return { total, coverage, alignment, clarity, grade };
+}
+
 function setupPrismModule() {
     renderPrismLibrary();
 
@@ -1159,9 +1378,20 @@ function openPrism(id) {
     document.getElementById('prism-desc').textContent = prism.philosophy_core;
     document.getElementById('prism-anchor').textContent = prism.anchor_question_templates[0];
     // clear previous answers
-    ['E','B','C','V','I','S'].forEach(l => { const el = document.getElementById('ans-'+l); if (el) el.value=''; });
+    ['E','B','C','V','I','S'].forEach(l => {
+        const el = document.getElementById(`ans-${l}`);
+        if (!el) return;
+        el.value = '';
+        delete el.dataset.suggestedLevel;
+        clearMappingInputStatus(el);
+    });
     document.getElementById('prism-emotion').value = 3; document.getElementById('emotion-display').textContent='3';
     document.getElementById('prism-resistance').value = 2; document.getElementById('resistance-display').textContent='2';
+    const resultBox = document.getElementById('prism-result');
+    if (resultBox) {
+        resultBox.classList.add('hidden');
+        resultBox.innerHTML = '';
+    }
     // store current prism in a temp
     detail.setAttribute('data-prism-id', id);
     // Populate prepared items and enable drag/drop into level inputs
@@ -1171,24 +1401,58 @@ function openPrism(id) {
 
 function handlePrismSubmit() {
     const id = document.getElementById('prism-detail').getAttribute('data-prism-id');
-    const prism = (metaModelData.prisms || []).find(x => x.id === id);
+    const prism = getPrismById(id);
     if (!prism) return alert('אין פריזמה פעילה');
-    const answers = [];
-    ['E','B','C','V','I','S'].forEach(l => {
-        const v = document.getElementById('ans-'+l).value.trim();
-        if (v) answers.push({ level: l, text: v });
+
+    const answerChecks = [];
+    ['E','B','C','V','I','S'].forEach(level => {
+        const inputEl = document.getElementById(`ans-${level}`);
+        if (!inputEl) return;
+
+        const rawValue = inputEl.value.trim();
+        const suggestedLevel = inputEl.dataset.suggestedLevel || '';
+        const check = validateMappingEntry(level, rawValue, suggestedLevel, prism);
+
+        if (check.cleanText) inputEl.value = check.cleanText;
+        setMappingInputStatus(inputEl, check.status, check.reason);
+
+        if (!check.cleanText) {
+            delete inputEl.dataset.suggestedLevel;
+        } else if (check.detectedLevel) {
+            inputEl.dataset.suggestedLevel = check.detectedLevel;
+        }
+
+        if (check.status !== 'empty') {
+            answerChecks.push({
+                level: level,
+                text: check.cleanText,
+                detectedLevel: check.detectedLevel,
+                effectiveLevel: check.effectiveLevel,
+                status: check.status,
+                reason: check.reason,
+                improvement: check.improvement
+            });
+        }
     });
+
+    if (answerChecks.length === 0) {
+        showHintMessage('יש להזין לפחות תשובה אחת כדי לקבל אבחון וציון.');
+        return;
+    }
+
     const emotion = parseInt(document.getElementById('prism-emotion').value || '3');
     const resistance = parseInt(document.getElementById('prism-resistance').value || '2');
+    const score = computePrismScore(answerChecks);
 
     const session = {
         datetime: new Date().toISOString(),
         prism_id: prism.id,
         prism_name: prism.name_he,
         anchor: prism.anchor_question_templates[0],
-        answers: answers,
+        answers: answerChecks,
         emotion: emotion,
-        resistance: resistance
+        resistance: resistance,
+        score: score
     };
 
     const recommendation = computePivotRecommendation(session);
@@ -1197,49 +1461,143 @@ function handlePrismSubmit() {
 }
 
 function computePivotRecommendation(session) {
-    // simple heuristic per spec: choose level with most answers, but prefer lower-level small wins
     const counts = {E:0,B:0,C:0,V:0,I:0,S:0};
-    session.answers.forEach(a => { if (counts[a.level] !== undefined) counts[a.level]++; });
-    // rank levels low->high for small wins: E,B,C,V,I,S
+    session.answers.forEach(a => {
+        const effective = a.effectiveLevel || a.level;
+        if (counts[effective] !== undefined) counts[effective]++;
+    });
+
     const order = ['E','B','C','V','I','S'];
-    // if identity-heavy and high resistance -> recommend lower level available
-    const totalAnswers = session.answers.length;
-    const identityCount = counts['I'];
-    if (identityCount > 0 && session.resistance >= 4) {
-        // find first lower-level that has at least one answer (E/B/C)
-        for (const l of ['B','C','E']) {
-            if (counts[l] > 0) return { pivot: l, reason: 'מאמץ מזערי — מומלץ להתחיל ברמה נמוכה כדי ליצור Small Win' };
+    let best = 'E';
+    let bestCount = -1;
+    for (const level of order) {
+        if (counts[level] > bestCount) {
+            best = level;
+            bestCount = counts[level];
         }
     }
-    // otherwise pick level with max count, tie-break to lower level
-    let best = 'E'; let bestCount = -1;
-    for (const l of order) {
-        if (counts[l] > bestCount) { best = l; bestCount = counts[l]; }
+
+    if (counts.I > 0 && session.resistance >= 4) {
+        for (const level of ['E', 'B', 'C']) {
+            if (counts[level] > 0) {
+                best = level;
+                break;
+            }
+        }
     }
-    const levelNames = {E:'סביבה (E)',B:'התנהגות (B)',C:'יכולות (C)',V:'ערכים/אמונות (V)',I:'זהות (I)',S:'שייכות (S)'};
-    const reason = bestCount>0 ? `הרבה תשובות נופלות ב${levelNames[best]} — זהו מקום הגיוני למקד Small Win` : 'לא נמצאו תשובות — שקול להתחיל ב-B או ב-E עם צעד קטן';
-    return { pivot: best, reason };
+
+    const prism = getPrismById(session.prism_id);
+    const mismatches = session.answers.filter(a => a.status === 'mismatch').length;
+    const intervention = prism?.recommended_interventions_by_level?.[best] || 'מומלץ להתחיל בצעד קטן וברור שניתן לבצע השבוע.';
+    const levelSummary = getLevelDisplay(best);
+    const reasonParts = [];
+
+    if (bestCount > 0) {
+        reasonParts.push(`הריכוז הגבוה ביותר של תשובות נמצא ברמת ${levelSummary} (${bestCount} תשובות).`);
+    } else {
+        reasonParts.push('אין מספיק תשובות ממוקדות, לכן נבחרה רמת התחלה מעשית.');
+    }
+    if (mismatches > 0) {
+        reasonParts.push(`זוהו ${mismatches} שיבוצים לא מדויקים, ולכן חשוב להתחיל בסידור הרמות לפני התערבות עמוקה.`);
+    }
+    if (session.resistance >= 4) {
+        reasonParts.push('רמת התנגדות גבוהה מצביעה על עדיפות להתחלה ברמה פרקטית ונמוכה יותר.');
+    }
+
+    const followUpQuestions = {
+        E: 'איזה שינוי קטן בסביבה יכול להפוך את ההתנהגות לקלה יותר כבר מחר?',
+        B: 'איזו פעולה אחת ספציפית תבצע בפועל במהלך 24 השעות הקרובות?',
+        C: 'איזו מיומנות אחת חסרה, ואיך תתרגל אותה 10 דקות ביום?',
+        V: 'איזו אמונה מרכזית מנהלת את המצב, ומה יקרה אם ננסח אותה מחדש?',
+        I: 'איזה סיפור זהות מופעל כאן, ואיזה ניסוח זהות חלופי יעזור להתקדם?',
+        S: 'מי במעגל שלך יכול לתמוך במהלך, ואיך תחבר אותו לתהליך?'
+    };
+
+    return {
+        pivot: best,
+        levelName: levelSummary,
+        reason: reasonParts.join(' '),
+        counts,
+        intervention,
+        followUpQuestion: followUpQuestions[best]
+    };
 }
 
 function renderPrismResult(session, recommendation) {
     const out = document.getElementById('prism-result');
+    if (!out) return;
     out.classList.remove('hidden');
+
+    const score = session.score || computePrismScore(session.answers || []);
+    const statusMap = {
+        ok: { label: 'תואם', className: 'status-ok' },
+        mismatch: { label: 'שיבוץ שגוי', className: 'status-bad' },
+        uncertain: { label: 'דורש חידוד', className: 'status-warn' }
+    };
+
+    const mismatchCount = (session.answers || []).filter(a => a.status === 'mismatch').length;
+    const countsHtml = ['E','B','C','V','I','S']
+        .map(level => `<li><strong>${getLevelDisplay(level)}:</strong> ${recommendation.counts[level] || 0}</li>`)
+        .join('');
+
+    const answersHtml = (session.answers || []).map(answer => {
+        const status = statusMap[answer.status] || statusMap.uncertain;
+        const movedLevelNote = answer.effectiveLevel && answer.effectiveLevel !== answer.level
+            ? `<p><strong>מיקום מומלץ:</strong> ${getLevelDisplay(answer.effectiveLevel)}</p>`
+            : '';
+
+        return `
+            <li class="prism-check-item ${status.className}">
+                <p><strong>שדה שהוזן:</strong> ${getLevelDisplay(answer.level)}</p>
+                <p><strong>סטטוס:</strong> ${status.label}</p>
+                <p><strong>תוכן:</strong> ${answer.text}</p>
+                ${movedLevelNote}
+                <p><strong>למה:</strong> ${answer.reason}</p>
+                <p><strong>איך לשפר:</strong> ${answer.improvement}</p>
+            </li>
+        `;
+    }).join('');
+
     out.innerHTML = `
-        <h4>מפת תשובות — ${session.prism_name}</h4>
+        <h4>מפת תשובות מפורטת - ${session.prism_name}</h4>
         <p><strong>שאלת עוגן:</strong> ${session.anchor}</p>
+
+        <div class="blueprint-section prism-score-box">
+            <h4>ציון ואבחון</h4>
+            <p><strong>ציון כללי:</strong> ${score.total}/100 (${score.grade})</p>
+            <p>פירוק הציון: כיסוי ${score.coverage}/40 | דיוק שיבוץ ${score.alignment}/40 | בהירות ניסוח ${score.clarity}/20</p>
+            <p><strong>שיבוצים שגויים שסומנו באדום:</strong> ${mismatchCount}</p>
+        </div>
+
         <div class="blueprint-section">
-            <h4>תשובות לפי רמות</h4>
-            <ul>
-                ${session.answers.map(a => `<li><strong>${a.level}:</strong> ${a.text}</li>`).join('')}
+            <h4>בדיקת נכונות לכל תשובה</h4>
+            <ul class="prism-check-list">
+                ${answersHtml}
             </ul>
         </div>
-        <div class="blueprint-section">
-            <h4>המלצת Pivot</h4>
-            <p><strong>${recommendation.pivot}</strong> — ${recommendation.reason}</p>
-            <p>עוצמת רגש: ${session.emotion}, התנגדות: ${session.resistance}</p>
+
+        <div class="blueprint-section prism-pivot-box">
+            <h4>המלצת Pivot - הסבר מעמיק</h4>
+            <p><strong>Pivot מומלץ:</strong> ${recommendation.levelName}</p>
+            <p><strong>למה זה נבחר:</strong> ${recommendation.reason}</p>
+            <p><strong>התערבות מוצעת:</strong> ${recommendation.intervention}</p>
+            <p><strong>שאלת המשך לעומק:</strong> ${recommendation.followUpQuestion}</p>
+            <p><strong>עוצמת רגש:</strong> ${session.emotion} | <strong>התנגדות:</strong> ${session.resistance}</p>
+            <p><strong>פיזור תשובות לפי רמות (לאחר נרמול):</strong></p>
+            <ul>${countsHtml}</ul>
         </div>
+
+        <div class="blueprint-section">
+            <h4>איך לשפר לציון גבוה יותר בתרגול הבא</h4>
+            <ol>
+                <li>בכל שדה כתוב משפט אחד ברור שמתאים רק לרמה של אותו שדה.</li>
+                <li>אם אתה מעתיק פריט מוכן, ודא שהאות של הפריט תואמת לשדה.</li>
+                <li>הימנע ממשפטים כלליים מאוד; כתיבה קונקרטית משפרת את ציון הבהירות.</li>
+            </ol>
+        </div>
+
         <div class="action-buttons">
-            <button class="btn btn-secondary" onclick="exportPrismSession()">📥 ייצא סשן JSON</button>
+            <button class="btn btn-secondary" onclick="exportPrismSession()">ייצא סשן JSON</button>
         </div>
     `;
 }
@@ -1286,17 +1644,22 @@ function populatePreparedItems(prism) {
 
     items.forEach(text => {
         const div = document.createElement('div');
+        const parsed = parseLevelPrefixedText(text);
+        const cleanText = parsed.cleanText || text;
         div.className = 'prepared-item';
         div.textContent = text;
         div.title = text;
+        div.dataset.level = parsed.level || '';
+        div.dataset.cleanText = cleanText;
         div.setAttribute('draggable', 'true');
 
         div.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', text);
+            e.dataTransfer.setData('text/plain', cleanText);
+            e.dataTransfer.setData('text/meta-model-level', parsed.level || '');
         });
 
         // click to copy into focused or first empty input
-        div.addEventListener('click', () => copyPreparedToFocusedOrEmpty(text));
+        div.addEventListener('click', () => copyPreparedToFocusedOrEmpty(cleanText, parsed.level));
 
         list.appendChild(div);
     });
@@ -1305,26 +1668,70 @@ function populatePreparedItems(prism) {
 function attachMappingDropHandlers() {
     const inputs = document.querySelectorAll('.mapping-input');
     inputs.forEach(inp => {
+        if (inp.dataset.boundDragDrop === 'true') return;
+        inp.dataset.boundDragDrop = 'true';
+
         inp.addEventListener('dragover', (e) => e.preventDefault());
         inp.addEventListener('drop', (e) => {
             e.preventDefault();
             const txt = e.dataTransfer.getData('text/plain');
-            if (txt) inp.value = txt;
+            const suggestedLevel = e.dataTransfer.getData('text/meta-model-level');
+            if (txt) applyPreparedTextToInput(inp, txt, suggestedLevel);
         });
         inp.addEventListener('focus', () => {
             document.querySelectorAll('.mapping-input').forEach(i => i.classList.remove('focused'));
             inp.classList.add('focused');
         });
+        inp.addEventListener('input', () => {
+            const parsed = parseLevelPrefixedText(inp.value);
+            if (parsed.level) {
+                inp.value = parsed.cleanText;
+                inp.dataset.suggestedLevel = parsed.level;
+            }
+            if (!inp.value.trim()) {
+                delete inp.dataset.suggestedLevel;
+                clearMappingInputStatus(inp);
+                return;
+            }
+
+            const expectedLevel = getExpectedLevelFromInput(inp);
+            if (inp.dataset.suggestedLevel && inp.dataset.suggestedLevel !== expectedLevel) {
+                setMappingInputStatus(inp, 'mismatch', `התוכן נראה כמו ${getLevelDisplay(inp.dataset.suggestedLevel)} ולא ${getLevelDisplay(expectedLevel)}.`);
+            } else {
+                clearMappingInputStatus(inp);
+            }
+        });
     });
 }
 
-function copyPreparedToFocusedOrEmpty(text) {
+function applyPreparedTextToInput(inputEl, text, suggestedLevel = '') {
+    if (!inputEl) return;
+    const parsed = parseLevelPrefixedText(text);
+    const cleanText = parsed.cleanText || text;
+    const level = (suggestedLevel || parsed.level || '').toUpperCase();
+
+    inputEl.value = cleanText;
+    if (level && LOGICAL_LEVEL_INFO[level]) {
+        inputEl.dataset.suggestedLevel = level;
+    } else {
+        delete inputEl.dataset.suggestedLevel;
+    }
+
+    const expectedLevel = getExpectedLevelFromInput(inputEl);
+    if (level && expectedLevel && level !== expectedLevel) {
+        setMappingInputStatus(inputEl, 'mismatch', `התוכן שויך ל-${getLevelDisplay(level)} אך הוזן בשדה ${getLevelDisplay(expectedLevel)}.`);
+    } else {
+        clearMappingInputStatus(inputEl);
+    }
+}
+
+function copyPreparedToFocusedOrEmpty(text, suggestedLevel = '') {
     const focused = document.querySelector('.mapping-input.focused');
-    if (focused) { focused.value = text; focused.focus(); return; }
+    if (focused) { applyPreparedTextToInput(focused, text, suggestedLevel); focused.focus(); return; }
     const empty = Array.from(document.querySelectorAll('.mapping-input')).find(i => !i.value);
-    if (empty) { empty.value = text; empty.focus(); return; }
+    if (empty) { applyPreparedTextToInput(empty, text, suggestedLevel); empty.focus(); return; }
     const first = document.querySelector('.mapping-input');
-    if (first) { first.value = text; first.focus(); }
+    if (first) { applyPreparedTextToInput(first, text, suggestedLevel); first.focus(); }
 }
 
 // ==================== UI HELPERS ====================
