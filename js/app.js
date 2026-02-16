@@ -22,6 +22,7 @@ let scenarioTrainerData = {
         red: [],
         green: null
     },
+    consequenceTemplates: {},
     scenarios: [],
     prismWheel: [],
     safetyKeywords: []
@@ -1007,6 +1008,7 @@ async function loadScenarioTrainerData() {
             domains: Array.isArray(data.domains) ? data.domains : [],
             difficulties: Array.isArray(data.difficulties) ? data.difficulties : [],
             optionTemplates: data.optionTemplates || { red: [], green: null },
+            consequenceTemplates: data.consequenceTemplates || {},
             scenarios: Array.isArray(data.scenarios) ? data.scenarios : [],
             prismWheel: Array.isArray(data.prismWheel) ? data.prismWheel : [],
             safetyKeywords: Array.isArray(data.safetyKeywords) ? data.safetyKeywords : []
@@ -1379,6 +1381,10 @@ function renderScenarioFeedback(option, isGreen) {
     const mark = document.getElementById('scenario-feedback-mark');
     const title = document.getElementById('scenario-feedback-title');
     const text = document.getElementById('scenario-feedback-text');
+    const consequenceBox = document.getElementById('scenario-consequence-box');
+    const consequenceTitle = document.getElementById('scenario-consequence-title');
+    const consequenceAction = document.getElementById('scenario-consequence-action');
+    const consequenceResult = document.getElementById('scenario-consequence-result');
 
     if (mark) {
         mark.textContent = isGreen ? '✓' : 'X';
@@ -1389,8 +1395,48 @@ function renderScenarioFeedback(option, isGreen) {
     }
     if (title) title.textContent = isGreen ? 'תגובה ירוקה: פירוק לתהליך' : 'תגובה אדומה: האשמה/התחמקות';
     if (text) text.textContent = option.feedback || '';
+    renderScenarioConsequence(option, isGreen, consequenceBox, consequenceTitle, consequenceAction, consequenceResult);
 
     showScenarioScreen('feedback');
+}
+
+function resolveScenarioConsequence(option, isGreen) {
+    const scenario = scenarioTrainer.activeScenario || {};
+    const type = option?.type || '';
+    const direct = scenario?.consequences?.[type];
+    if (direct && typeof direct === 'object') return direct;
+
+    const pool = scenarioTrainerData.consequenceTemplates?.[type];
+    if (Array.isArray(pool) && pool.length) {
+        return pool[0];
+    }
+
+    if (isGreen) {
+        return {
+            icon: '🛠️',
+            title: 'מה קורה אחרי בחירה ירוקה?',
+            action: 'שואלים שאלת פירוק במקום להאשים.',
+            result: 'המשימה הופכת לצעד ראשון שאפשר לבצע.'
+        };
+    }
+
+    return {
+        icon: '💥',
+        title: 'מה קורה אם ממשיכים בדרך הישנה?',
+        action: 'ממשיכים לנחש/להאשים בלי לבדוק מה נתקע.',
+        result: 'המשימה נתקעת, הלחץ עולה, ולעיתים נוצרת תקלה אמיתית.'
+    };
+}
+
+function renderScenarioConsequence(option, isGreen, box, titleEl, actionEl, resultEl) {
+    if (!box || !titleEl || !actionEl || !resultEl) return;
+
+    const consequence = resolveScenarioConsequence(option, isGreen);
+    box.classList.remove('hidden', 'red', 'green');
+    box.classList.add(isGreen ? 'green' : 'red');
+    titleEl.textContent = `${consequence.icon || ''} ${consequence.title || ''}`.trim();
+    actionEl.innerHTML = `<strong>מה קורה מיד אחרי זה:</strong> ${consequence.action || ''}`;
+    resultEl.innerHTML = `<strong>התוצאה בפועל:</strong> ${consequence.result || ''}`;
 }
 
 function getScenarioGreenOptionText(scenario) {

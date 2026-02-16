@@ -26,6 +26,7 @@ Rules:
 - Scenario card: תפקיד/כותרת/סיפור קצר + משפט לא-מפורש.
 - Option buttons: גדולים עם אימוג'י; נגישים למובייל.
 - Feedback: חיווי חזותי 1s עם הסבר 1-2 שורות.
+- Feedback consequence: הצגת "מה קרה מיד אחרי הבחירה" + תוצאה בפועל.
 - Blueprint: תצוגה קומפקטית; כפתור העתקת משפט ירוק.
 - Prism mini-wheel: מופיע רק אחרי תשובה ירוקה (אם מאופשר בהגדרות).
 - History: רשימת סצנות שהושלמו + הערות משתמש + ייצוא JSON.
@@ -78,6 +79,7 @@ Rules:
 6. Export JSON file includes completed scenarios and user notes.
 7. UI is RTL and readable on <=768px width.
 8. If note contains a safety keyword, flow stops and safety notice is shown.
+9. Red answer shows practical consequence card (not only explanation text).
 
 ## Manual QA Checklist
 1. Open tab `Scenario Trainer` from navigation and from home CTA.

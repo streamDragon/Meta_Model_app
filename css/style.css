@@ -1555,6 +1555,48 @@ a:hover {
     animation: scenarioPop 0.9s ease forwards;
 }
 
+.scenario-consequence-box {
+    margin: 14px 0;
+    border-radius: var(--border-radius);
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    text-align: right;
+    animation: fadeIn 0.25s ease;
+}
+
+.scenario-consequence-box h4 {
+    margin: 0 0 8px 0;
+    font-size: 1rem;
+}
+
+.scenario-consequence-box p {
+    margin: 0 0 6px 0;
+    line-height: 1.7;
+}
+
+.scenario-consequence-box p:last-child {
+    margin-bottom: 0;
+}
+
+.scenario-consequence-box.red {
+    background: #fff5f5;
+    border-right: 5px solid #e53e3e;
+}
+
+.scenario-consequence-box.red h4 {
+    color: #9b2c2c;
+}
+
+.scenario-consequence-box.green {
+    background: #f0fff4;
+    border-right: 5px solid #2f855a;
+}
+
+.scenario-consequence-box.green h4 {
+    color: #276749;
+}
+
 @keyframes scenarioPop {
     0% {
         opacity: 0;

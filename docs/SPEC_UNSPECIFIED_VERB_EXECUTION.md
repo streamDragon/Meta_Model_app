@@ -65,6 +65,10 @@ Behavior notes:
 - 1-2 lines feedback:
   - why red is identity/shame/avoidance
   - why green is process mapping
+- Consequence simulation card:
+  - show immediate behavior after the chosen response
+  - show practical outcome (not only moral explanation)
+  - for red choices, emphasize "old path -> concrete failure/risk"
 
 ### 4.5 Blueprint
 Compact blueprint with:

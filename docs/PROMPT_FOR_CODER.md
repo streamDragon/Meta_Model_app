@@ -39,6 +39,10 @@ reduce anger/shame responses by turning vague instructions into step-by-step exe
   - 4 red archetypes
   - 1 green meta-model
 - Feedback screen: red X / green check animation (~1s) + 1-2 lines explanation
+- After each choice, add a "what happens next" consequence card:
+  - immediate action taken by the character
+  - practical result of that path
+  - for red options, show concrete negative consequence
 - Blueprint screen:
   - goal
   - first step (10 min)
