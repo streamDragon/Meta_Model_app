@@ -298,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMetaModelData();
     setupTabNavigation();
     setupPracticeMode();
+    setupQuestionDrill();
     setupTrainerMode();
     setupBlueprintBuilder();
     setupPrismModule();
@@ -424,6 +425,125 @@ function setupPracticeMode() {
     nextBtn.addEventListener('click', getNextStatement);
     showAnswerBtn.addEventListener('click', showAnswer);
     hintBtn.addEventListener('click', showHint);
+}
+
+const QUESTION_DRILL_PACK = [
+    {
+        id: 'question1',
+        statement: 'הבוס אמר שהלקוח לא מבין למה זה לא אפשרי כעת.',
+        focus: ['DISTORTION']
+    },
+    {
+        id: 'question2',
+        statement: 'אני תמיד מאחר כי הרבה עומס.',
+        focus: ['GENERALIZATION']
+    },
+    {
+        id: 'question3',
+        statement: 'הם שואלים אותי מה בדיוק חסר.',
+        focus: ['DELETION']
+    },
+    {
+        id: 'question4',
+        statement: 'כולם אומרים שזה לא עומד להשתנות.',
+        focus: ['GENERALIZATION']
+    },
+    {
+        id: 'question5',
+        statement: 'הם טוענים שכבר ניסו הכל על סמך הרגשה.',
+        focus: ['DISTORTION']
+    }
+];
+
+const QUESTION_DRILL_KEYWORDS = {
+    DELETION: ['מה', 'איך', 'איזה', 'מי', 'האם', 'למה', 'כמה'],
+    DISTORTION: ['האם זה אומר', 'לפי מה', 'איך אתה יודע', 'זה בטוח', 'ממה אתה מסיק', 'לפי ההרגשה'],
+    GENERALIZATION: ['תמיד', 'כל אחד', 'כולם', 'לעולם', 'אין', 'תמיד', 'כל', 'כל הזמן']
+};
+
+const questionDrillState = {
+    current: null,
+    attempts: 0,
+    hits: 0,
+    elements: {}
+};
+
+function setupQuestionDrill() {
+    const drillRoot = document.getElementById('question-drill');
+    if (!drillRoot) return;
+
+    questionDrillState.elements = {
+        statement: document.getElementById('question-drill-statement'),
+        input: document.getElementById('question-drill-input'),
+        category: document.getElementById('question-drill-category'),
+        feedback: document.getElementById('question-drill-feedback'),
+        attempts: document.getElementById('question-drill-attempts'),
+        hits: document.getElementById('question-drill-hits')
+    };
+
+    document.getElementById('question-drill-check')?.addEventListener('click', evaluateQuestionDrill);
+    document.getElementById('question-drill-next')?.addEventListener('click', loadNextQuestionDrill);
+    loadNextQuestionDrill();
+}
+
+function loadNextQuestionDrill() {
+    if (!QUESTION_DRILL_PACK.length) return;
+    const next = QUESTION_DRILL_PACK[Math.floor(Math.random() * QUESTION_DRILL_PACK.length)];
+    questionDrillState.current = next;
+    questionDrillState.elements.statement.textContent = next.statement;
+    questionDrillState.elements.input.value = '';
+    questionDrillState.elements.feedback.textContent = '';
+    questionDrillState.elements.category.value = next.focus[0] || 'DELETION';
+}
+
+function normalizeText(value) {
+    return (value || '').toLowerCase();
+}
+
+function getMatchedCategories(value) {
+    const normalized = normalizeText(value);
+    return Object.entries(QUESTION_DRILL_KEYWORDS).reduce((matches, [category, keywords]) => {
+        const found = keywords.some(keyword => normalized.includes(keyword));
+        if (found) matches.push(category);
+        return matches;
+    }, []);
+}
+
+function evaluateQuestionDrill() {
+    const input = questionDrillState.elements.input;
+    const feedbackEl = questionDrillState.elements.feedback;
+    if (!input || !feedbackEl || !questionDrillState.current) return;
+
+    const text = input.value.trim();
+    if (!text) {
+        feedbackEl.textContent = 'כתבו שאלה לפני שבודקים.';
+        return;
+    }
+
+    const selected = questionDrillState.elements.category.value || 'DELETION';
+    const matched = getMatchedCategories(text);
+    const expected = questionDrillState.current.focus || [];
+    const focusMatchesExpected = expected.length === 0 || expected.includes(selected);
+    const keywordMatches = matched.includes(selected);
+    const success = focusMatchesExpected && keywordMatches;
+
+    questionDrillState.attempts += 1;
+    if (success) questionDrillState.hits += 1;
+    updateQuestionDrillStats();
+
+    if (success) {
+        feedbackEl.textContent = `מצוין! השאלה פגעה ב-${selected} וכוללת ביטוי שמבהיר את ההנחה.`;
+    } else {
+        const missing = !keywordMatches ? 'הוסיפו מילות מפתח כמו ' + QUESTION_DRILL_KEYWORDS[selected].slice(0, 3).join(', ') : '';
+        const expectedMessage = expected.length ? ` הכי ראוי לכיוון ${expected.join(' / ')}` : '';
+        feedbackEl.textContent = `נסה/ניסי שוב. ${missing} ${expectedMessage}`.trim();
+    }
+}
+
+function updateQuestionDrillStats() {
+    if (!questionDrillState.elements.attempts || !questionDrillState.elements.hits) return;
+    questionDrillState.elements.attempts.textContent = String(questionDrillState.attempts);
+    questionDrillState.elements.hits.textContent = String(questionDrillState.hits);
 }
 
 // Get Next Practice Statement

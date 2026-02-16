@@ -440,6 +440,32 @@
                         </select>
                     </div>
 
+                    <div id="question-drill" class="card question-drill-card">
+                        <div class="question-drill-header">
+                            <h3>תרגיל בניית שאלות</h3>
+                            <small>בחרו את המשפט, כתבו שאלה ותייגו את הכיוון (מחיקה/עיוות/הכללה).</small>
+                        </div>
+                        <p id="question-drill-statement" class="question-drill-statement"></p>
+                        <textarea id="question-drill-input" rows="3" placeholder="כתוב/י כאן את השאלה שמחפשת את ההנחה הנסתרת..."></textarea>
+                        <div class="question-drill-controls">
+                            <label>
+                                <span>ממוקד ב-</span>
+                                <select id="question-drill-category">
+                                    <option value="DELETION">Deletion</option>
+                                    <option value="DISTORTION">Distortion</option>
+                                    <option value="GENERALIZATION">Generalization</option>
+                                </select>
+                            </label>
+                            <button id="question-drill-check" class="btn btn-primary">בדוק שאלה</button>
+                            <button id="question-drill-next" class="btn btn-secondary">משפט חדש</button>
+                        </div>
+                        <div id="question-drill-feedback" class="question-drill-feedback"></div>
+                        <div class="question-drill-stats">
+                            <span>ניסיונות: <strong id="question-drill-attempts">0</strong></span>
+                            <span>פגיעות: <strong id="question-drill-hits">0</strong></span>
+                        </div>
+                    </div>
+
                     <!-- TRAINER MODE INTERFACE -->
                     <div id="trainer-mode" class="trainer-mode hidden">
                         <!-- QUESTION DISPLAY -->

@@ -706,6 +706,73 @@ header p {
     color: var(--primary-color);
 }
 
+.question-drill-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--border-radius);
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.question-drill-header h3 {
+    margin: 0;
+    color: #1d4ed8;
+}
+
+.question-drill-header small {
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+.question-drill-statement {
+    min-height: 60px;
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px dashed #cbd5e0;
+    margin: 12px 0;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.question-drill-card textarea {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    padding: 10px;
+    resize: vertical;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+}
+
+.question-drill-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.question-drill-controls label {
+    display: flex;
+    gap: 6px;
+    font-weight: 600;
+    align-items: center;
+}
+
+.question-drill-feedback {
+    min-height: 40px;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.question-drill-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 0.85rem;
+    color: #475569;
+}
 /* Blueprint Builder */
 .blueprint-container {
     max-width: 900px;
@@ -2182,3 +2249,5 @@ a:hover {
         grid-template-columns: 1fr;
     }
 }
+
+
