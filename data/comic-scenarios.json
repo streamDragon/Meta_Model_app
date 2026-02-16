@@ -20,7 +20,8 @@
           "badge": "assets/svg/stickers/badges/תגובה_נאיבית.svg",
           "sfx": "assets/svg/stickers/sfx/בום.svg",
           "say": "מה נסגר איתך?! בגילך כבר ידעתי לבד.",
-          "tone": "danger"
+          "tone": "danger",
+          "rightSpriteOverride": "assets/svg/characters_states/מאיה_angry.svg"
         },
         {
           "id": "mock",
@@ -28,7 +29,8 @@
           "badge": "assets/svg/stickers/badges/לעג_והשוואה.svg",
           "sfx": "assets/svg/stickers/sfx/אוף.svg",
           "say": "באמת? זה כזה קל...",
-          "tone": "warn"
+          "tone": "warn",
+          "rightSpriteOverride": "assets/svg/characters_states/מאיה_mock.svg"
         },
         {
           "id": "rescue",
@@ -36,7 +38,8 @@
           "badge": "assets/svg/stickers/badges/הצלה_במקום.svg",
           "sfx": "assets/svg/stickers/sfx/רגע.svg",
           "say": "עזוב, אני אעשה בשבילך.",
-          "tone": "purple"
+          "tone": "purple",
+          "rightSpriteOverride": "assets/svg/characters_states/מאיה_neutral.svg"
         },
         {
           "id": "avoid",
@@ -44,7 +47,8 @@
           "badge": "assets/svg/stickers/badges/תגובה_נאיבית.svg",
           "sfx": "assets/svg/stickers/sfx/ששש.svg",
           "say": "טוב... אחר כך...",
-          "tone": "muted"
+          "tone": "muted",
+          "rightSpriteOverride": "assets/svg/characters_states/מאיה_neutral.svg"
         },
         {
           "id": "meta",
@@ -53,6 +57,7 @@
           "sfx": "assets/svg/stickers/sfx/יש.svg",
           "say": "בוא נפרק: מה ניסית? באיזה שלב נתקעת?",
           "tone": "good",
+          "rightSpriteOverride": "assets/svg/characters_states/מאיה_meta.svg",
           "blueprint": {
             "goal": "לסיים שיעורי בית בצורה שמובנת",
             "first_step": "להוציא מחברת ולסמן שאלה אחת בלבד להתחלה",
@@ -94,7 +99,8 @@
           "badge": "assets/svg/stickers/badges/תגובה_נאיבית.svg",
           "sfx": "assets/svg/stickers/sfx/בום.svg",
           "say": "למה הכל תמיד מסובך?!",
-          "tone": "danger"
+          "tone": "danger",
+          "rightSpriteOverride": "assets/svg/characters_states/ספיר_angry.svg"
         },
         {
           "id": "mock",
@@ -102,7 +108,8 @@
           "badge": "assets/svg/stickers/badges/לעג_והשוואה.svg",
           "sfx": "assets/svg/stickers/sfx/אופס.svg",
           "say": "מה קשה? כולם מסתדרים...",
-          "tone": "warn"
+          "tone": "warn",
+          "rightSpriteOverride": "assets/svg/characters_states/ספיר_mock.svg"
         },
         {
           "id": "rescue",
@@ -110,7 +117,8 @@
           "badge": "assets/svg/stickers/badges/הצלה_במקום.svg",
           "sfx": "assets/svg/stickers/sfx/רגע.svg",
           "say": "תן לי, אני אמלא מהר.",
-          "tone": "purple"
+          "tone": "purple",
+          "rightSpriteOverride": "assets/svg/characters_states/ספיר_neutral.svg"
         },
         {
           "id": "avoid",
@@ -118,7 +126,8 @@
           "badge": "assets/svg/stickers/badges/תגובה_נאיבית.svg",
           "sfx": "assets/svg/stickers/sfx/ששש.svg",
           "say": "אשלח מחר...",
-          "tone": "muted"
+          "tone": "muted",
+          "rightSpriteOverride": "assets/svg/characters_states/ספיר_neutral.svg"
         },
         {
           "id": "meta",
@@ -127,6 +136,7 @@
           "sfx": "assets/svg/stickers/sfx/יש.svg",
           "say": "מה בדיוק כתוב ליד סעיף 222? איזה שדה מופיע לך?",
           "tone": "good",
+          "rightSpriteOverride": "assets/svg/characters_states/ספיר_meta.svg",
           "blueprint": {
             "goal": "להגיש טופס נכון בלי לנחש",
             "first_step": "לצלם/להעתיק את הטקסט של סעיף 222",
