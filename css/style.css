@@ -829,6 +829,8 @@ input[type="range"] {
 
 /* Mapping / Prepared items layout */
 .mapping-row { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 12px; }
+.prism-tools-row { display: flex; justify-content: flex-start; margin-bottom: 10px; }
+.prism-tools-row .btn { margin: 0; }
 .prepared-items { width: 280px; background: #f7fafc; padding: 12px; border-radius: 8px; border: 1px dashed #e2e8f0; }
 .prepared-items h4 { margin: 0 0 8px 0; color: var(--primary-color); }
 .prepared-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow: auto; }
@@ -851,6 +853,74 @@ input[type="range"] {
 
 .prism-score-box { border-right: 5px solid #2b6cb0; background: #ebf8ff; }
 .prism-pivot-box { border-right: 5px solid #805ad5; background: #faf5ff; }
+
+.prism-deep-guide {
+    background: linear-gradient(135deg, #f0f9ff 0%, #f7fafc 100%);
+    border: 1px solid #bee3f8;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 14px;
+}
+
+.prism-deep-guide h4 {
+    margin: 0 0 10px 0;
+    color: #2b6cb0;
+}
+
+.prism-deep-guide h5 {
+    margin: 0 0 8px 0;
+    color: #2c5282;
+}
+
+.prism-deep-guide p {
+    margin: 0 0 8px 0;
+}
+
+.prism-guide-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.prism-guide-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.prism-guide-card ul,
+.prism-guide-card ol {
+    margin: 0;
+    padding-inline-start: 20px;
+}
+
+.prism-level-deep-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.prism-level-deep-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 10px;
+}
+
+.prism-level-deep-item p {
+    margin: 0 0 7px 0;
+    line-height: 1.5;
+}
+
+.prism-action-plan {
+    margin: 0;
+    padding-inline-start: 22px;
+    line-height: 1.7;
+}
 
 @media (max-width: 900px) {
     .mapping-row { flex-direction: column; }
@@ -1287,7 +1357,7 @@ a:hover {
     display: block;
 }
 
-#audio-mute-btn.is-muted {
+.audio-mute-btn.is-muted {
     background: #fed7d7;
     color: #742a2a;
 }

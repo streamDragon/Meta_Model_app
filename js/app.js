@@ -78,10 +78,12 @@ function ensureAudioContext() {
 }
 
 function updateMuteButtonUI() {
-    const btn = document.getElementById('audio-mute-btn');
-    if (!btn) return;
-    btn.textContent = audioState.muted ? '🔇 סאונד כבוי' : '🔊 סאונד פעיל';
-    btn.classList.toggle('is-muted', audioState.muted);
+    const btns = document.querySelectorAll('.audio-mute-btn');
+    if (!btns.length) return;
+    btns.forEach(btn => {
+        btn.textContent = audioState.muted ? 'סאונד כבוי' : 'סאונד פעיל';
+        btn.classList.toggle('is-muted', audioState.muted);
+    });
 }
 
 function setMutedAudio(isMuted) {
@@ -92,6 +94,16 @@ function setMutedAudio(isMuted) {
 
 function toggleAudioMute() {
     setMutedAudio(!audioState.muted);
+}
+
+function setupAudioMuteButtons() {
+    const btns = document.querySelectorAll('.audio-mute-btn');
+    btns.forEach(btn => {
+        if (btn.dataset.audioBound === 'true') return;
+        btn.dataset.audioBound = 'true';
+        btn.addEventListener('click', toggleAudioMute);
+    });
+    updateMuteButtonUI();
 }
 
 function playTone(frequency, duration = 0.12, type = 'sine', volume = 0.05, delay = 0) {
@@ -138,6 +150,23 @@ function playUISound(kind) {
         playTone(523.25, 0.11, 'triangle', 0.05, 0);
         playTone(659.25, 0.11, 'triangle', 0.05, 0.08);
         playTone(783.99, 0.15, 'triangle', 0.05, 0.16);
+    } else if (kind === 'prism_open') {
+        playTone(440, 0.1, 'sine', 0.05, 0);
+        playTone(554, 0.1, 'sine', 0.05, 0.09);
+    } else if (kind === 'prism_pick') {
+        playTone(720, 0.06, 'triangle', 0.04, 0);
+    } else if (kind === 'prism_warn') {
+        playTone(240, 0.1, 'square', 0.04, 0);
+        playTone(210, 0.1, 'square', 0.04, 0.08);
+    } else if (kind === 'prism_submit') {
+        playTone(600, 0.08, 'triangle', 0.05, 0);
+        playTone(760, 0.08, 'triangle', 0.05, 0.08);
+        playTone(920, 0.12, 'triangle', 0.05, 0.16);
+    } else if (kind === 'prism_back') {
+        playTone(460, 0.08, 'sine', 0.04, 0);
+    } else if (kind === 'prism_error') {
+        playTone(180, 0.12, 'sawtooth', 0.05, 0);
+        playTone(150, 0.12, 'sawtooth', 0.05, 0.1);
     }
 }
 
@@ -199,7 +228,7 @@ function hideSplashScreen() {
 // Load data on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadAudioSettings();
-    updateMuteButtonUI();
+    setupAudioMuteButtons();
 
     // Browsers usually require user interaction before audio starts.
     document.addEventListener('pointerdown', () => {
@@ -268,6 +297,7 @@ function setupTabNavigation() {
             const tabName = btn.getAttribute('data-tab');
             document.getElementById(tabName).classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            playUISound('next');
         });
     });
 }
@@ -452,9 +482,9 @@ function setupTrainerMode() {
     const whyTrigger = document.getElementById('why-trigger');
     const depthTrigger = document.getElementById('depth-trigger');
     const skipBtn = document.getElementById('skip-question-btn');
-    const muteBtn = document.getElementById('audio-mute-btn');
 
     if (!startBtn || !categorySelect) return;
+    categorySelect.addEventListener('change', () => playUISound('hint'));
     
     startBtn.addEventListener('click', () => {
         const selectedCategory = categorySelect.value;
@@ -469,9 +499,7 @@ function setupTrainerMode() {
     if (whyTrigger) whyTrigger.addEventListener('click', showTrainerImportance);
     if (depthTrigger) depthTrigger.addEventListener('click', showTrainerDepth);
     if (skipBtn) skipBtn.addEventListener('click', skipCurrentQuestion);
-    if (muteBtn) muteBtn.addEventListener('click', toggleAudioMute);
-
-    updateMuteButtonUI();
+    setupAudioMuteButtons();
 }
 
 function showHintMessage(message) {
@@ -1307,8 +1335,151 @@ function computePrismScore(answerChecks) {
     return { total, coverage, alignment, clarity, grade };
 }
 
+function renderPrismDeepGuide(prism) {
+    const guideEl = document.getElementById('prism-deep-guide');
+    if (!guideEl || !prism) return;
+
+    const antiPatterns = (prism.anti_patterns || []).map(item => `<li>${item}</li>`).join('');
+    const examples = (prism.examples || []).map(item => `<li>${item}</li>`).join('');
+    const levelGuide = ['E', 'B', 'C', 'V', 'I', 'S']
+        .map(level => `<li><strong>${getLevelDisplay(level)}:</strong> ${LOGICAL_LEVEL_INFO[level].prompt}</li>`)
+        .join('');
+    const depthLadder = ['E', 'B', 'C', 'V', 'I', 'S']
+        .map(level => `<li><strong>${getLevelDisplay(level)}:</strong> עומק החשיבה הוא "${LOGICAL_LEVEL_INFO[level].prompt}"</li>`)
+        .join('');
+    const anchorTemplates = (prism.anchor_question_templates || [])
+        .slice(0, 2)
+        .map(item => `<li>${item}</li>`)
+        .join('');
+
+    guideEl.innerHTML = `
+        <h4>הסבר עומק על הפריזמה: ${prism.name_he}</h4>
+        <p><strong>מה הפריזמה הזו בודקת?</strong> ${prism.philosophy_core}</p>
+        <p><strong>למה זה חשוב?</strong> ${prism.therapist_intent || 'מטרת הפריזמה היא להפוך ניסוח כללי למפה ברורה שאפשר לפעול לפיה.'}</p>
+
+        <div class="prism-guide-grid">
+            <div class="prism-guide-card">
+                <h5>איך עובדים נכון ב-4 שלבים</h5>
+                <ol>
+                    <li>מנסחים את שאלת העוגן ומוודאים שהיא ברורה ומדידה.</li>
+                    <li>ממפים כל תשובה לרמה הלוגית המתאימה: E/B/C/V/I/S.</li>
+                    <li>מזהים פערים ושיבוצים שגויים כדי למנוע מסקנות לא מדויקות.</li>
+                    <li>בוחרים Pivot אחד קטן לביצוע מיידי, עם המשך עומק מדורג.</li>
+                </ol>
+            </div>
+            <div class="prism-guide-card">
+                <h5>איך להבחין בין הרמות</h5>
+                <ul>${levelGuide}</ul>
+            </div>
+            <div class="prism-guide-card">
+                <h5>מה אומר "עומק" בפריזמה</h5>
+                <p>מתחילים ב-E/B כדי לעגן עובדות בשטח, ואז עולים ל-C/V/I/S כדי להבין מנגנון פנימי וזהותי.</p>
+                <ul>${depthLadder}</ul>
+            </div>
+        </div>
+
+        <div class="prism-guide-grid">
+            <div class="prism-guide-card">
+                <h5>דוגמאות עוגן מומלצות</h5>
+                <ul>${anchorTemplates || '<li>אין דוגמאות נוספות בנתונים.</li>'}</ul>
+                <h5>דוגמאות מהחיים</h5>
+                <ul>${examples || '<li>אין דוגמאות נוספות בנתונים.</li>'}</ul>
+            </div>
+            <div class="prism-guide-card">
+                <h5>טעויות נפוצות שכדאי להימנע מהן</h5>
+                <ul>${antiPatterns || '<li>להישאר כללי ולא לבדוק ראיות.</li>'}</ul>
+                <p><strong>טיפ:</strong> אם יש ספק ברמה, קצר את המשפט לשורה אחת קונקרטית ובדוק שוב לאיזו שאלה הוא עונה.</p>
+            </div>
+        </div>
+    `;
+}
+
+function renderPrismScoreInterpretation(score, mismatchCount) {
+    const notes = [];
+    if (score.total >= 85) {
+        notes.push('המיפוי מדויק מאוד. אפשר לעבור לעבודה אסטרטגית על התערבות אחת עמוקה.');
+    } else if (score.total >= 70) {
+        notes.push('בסיס טוב מאוד. נדרש חידוד קל ברמות כדי להפוך את המיפוי לחד ומשכנע.');
+    } else if (score.total >= 55) {
+        notes.push('המיפוי חלקי. לפני Pivot עמוק, מומלץ לסדר את השיבוצים ולדייק ניסוחים.');
+    } else {
+        notes.push('המיפוי עדיין ראשוני. כדאי לחזור לשאלת העוגן ולמפות מחדש בצורה קונקרטית.');
+    }
+
+    if (mismatchCount > 0) {
+        notes.push(`זוהו ${mismatchCount} שיבוצים שגויים. זה לא כישלון אלא איתות שאפשר לשפר דיוק ולחסוך מאמץ בהמשך.`);
+    } else {
+        notes.push('לא זוהו שיבוצים שגויים מפורשים, וזה בסיס מצוין להתקדמות.');
+    }
+
+    if (score.clarity < 12) {
+        notes.push('רמת בהירות נמוכה יחסית: נסח משפטים קצרים עם פעולה, מקום או קריטריון במקום ניסוחים כלליים.');
+    }
+
+    return `<ul>${notes.map(note => `<li>${note}</li>`).join('')}</ul>`;
+}
+
+function renderPrismLevelsDeepAnalysis(prism, recommendation) {
+    const order = ['E', 'B', 'C', 'V', 'I', 'S'];
+    const items = order.map(level => {
+        const count = recommendation.counts[level] || 0;
+        const levelHint = prism?.level_hints?.[level] || LOGICAL_LEVEL_INFO[level].prompt;
+        const intervention = prism?.recommended_interventions_by_level?.[level] || 'המשך דיוק בשפה ובדיקה מול שאלת העוגן.';
+
+        let meaning = 'לא התקבלו תשובות ברמה הזו, לכן חשוב לבדוק אם נוצרה השמטה.';
+        if (count >= 3) {
+            meaning = 'הרמה הזו דומיננטית מאוד ומספקת מנוף התערבות מרכזי.';
+        } else if (count === 2) {
+            meaning = 'הרמה הזו חוזרת כמה פעמים ולכן כדאי להתייחס אליה כציר עבודה משמעותי.';
+        } else if (count === 1) {
+            meaning = 'יש סימן ראשוני לרמה הזו, אך נדרש עוד ביסוס כדי להסיק מסקנות.';
+        }
+
+        const pivotTag = recommendation.pivot === level
+            ? '<p><strong>סטטוס:</strong> זו רמת ה-Pivot המומלצת כרגע.</p>'
+            : '';
+
+        return `
+            <li class="prism-level-deep-item">
+                <p><strong>${getLevelDisplay(level)}</strong> | מופעים: ${count}</p>
+                <p><strong>משמעות:</strong> ${meaning}</p>
+                <p><strong>מה לבדוק ברמה הזו:</strong> ${levelHint}</p>
+                <p><strong>מהלך התערבות אפשרי:</strong> ${intervention}</p>
+                ${pivotTag}
+            </li>
+        `;
+    }).join('');
+
+    return `<ul class="prism-level-deep-list">${items}</ul>`;
+}
+
+function renderPrismActionPlan(session, recommendation, mismatchCount) {
+    const highResistance = session.resistance >= 4;
+    const highEmotion = session.emotion >= 4;
+    const alignmentStep = mismatchCount > 0
+        ? 'יישור שיבוצים: עבור כל פריט אדום, נסח מחדש משפט ממוקד שמתאים רק לרמה אחת.'
+        : 'שימור דיוק: השאר את הניסוח חד וקצר, ובדוק שכל משפט עונה לשאלת העוגן.';
+    const resistanceStep = highResistance
+        ? 'עבודה עם התנגדות גבוהה: התחל ב-Small Win חיצוני (E/B) לפני שינוי אמונות עמוק.'
+        : 'אפשר להתקדם לעומק: אחרי ביצוע צעד קטן, עבור לעבודה ברמות C/V/I.';
+    const emotionStep = highEmotion
+        ? 'במצב רגשי גבוה: האט קצב, אמת עובדות, ורק אז בצע פרשנות או הכללה.'
+        : 'הרגש יציב יחסית: מתאים לבניית תוכנית פעולה מדורגת לשבוע הקרוב.';
+
+    return `
+        <ol class="prism-action-plan">
+            <li><strong>צעד 1 (דיוק שפה):</strong> ${alignmentStep}</li>
+            <li><strong>צעד 2 (Pivot מעשי):</strong> בצע פעולה אחת לפי רמת ${recommendation.levelName}: ${recommendation.intervention}</li>
+            <li><strong>צעד 3 (וויסות והתמדה):</strong> ${resistanceStep}</li>
+            <li><strong>צעד 4 (עומק רגשי):</strong> ${emotionStep}</li>
+            <li><strong>שאלת המשך מחייבת:</strong> ${recommendation.followUpQuestion}</li>
+        </ol>
+    `;
+}
+
 function setupPrismModule() {
     renderPrismLibrary();
+    setupAudioMuteButtons();
 
     // Ensure prism-detail starts hidden
     const prismDetail = document.getElementById('prism-detail');
@@ -1329,6 +1500,7 @@ function setupPrismModule() {
     if (cancelBtn) cancelBtn.addEventListener('click', () => {
         document.getElementById('prism-detail').classList.add('hidden');
         document.getElementById('prism-library').classList.remove('hidden');
+        playUISound('prism_back');
     });
 
     const prismSubmit = document.getElementById('prism-submit');
@@ -1369,14 +1541,16 @@ function renderPrismLibrary() {
 }
 
 function openPrism(id) {
-    const prism = (metaModelData.prisms || []).find(x => x.id === id);
+    const prism = getPrismById(id);
     if (!prism) return alert('פריזמה לא נמצאה');
     document.getElementById('prism-library').classList.add('hidden');
     const detail = document.getElementById('prism-detail');
     detail.classList.remove('hidden');
-    document.getElementById('prism-name').textContent = prism.name_he + ' — ' + prism.name_en;
+    document.getElementById('prism-name').textContent = `${prism.name_he} - ${prism.name_en}`;
     document.getElementById('prism-desc').textContent = prism.philosophy_core;
     document.getElementById('prism-anchor').textContent = prism.anchor_question_templates[0];
+    renderPrismDeepGuide(prism);
+    playUISound('prism_open');
     // clear previous answers
     ['E','B','C','V','I','S'].forEach(l => {
         const el = document.getElementById(`ans-${l}`);
@@ -1436,6 +1610,7 @@ function handlePrismSubmit() {
     });
 
     if (answerChecks.length === 0) {
+        playUISound('prism_error');
         showHintMessage('יש להזין לפחות תשובה אחת כדי לקבל אבחון וציון.');
         return;
     }
@@ -1454,6 +1629,10 @@ function handlePrismSubmit() {
         resistance: resistance,
         score: score
     };
+
+    const mismatchesCount = answerChecks.filter(a => a.status === 'mismatch').length;
+    if (mismatchesCount > 0) playUISound('prism_warn');
+    else playUISound('prism_submit');
 
     const recommendation = computePivotRecommendation(session);
     renderPrismResult(session, recommendation);
@@ -1536,6 +1715,10 @@ function renderPrismResult(session, recommendation) {
     };
 
     const mismatchCount = (session.answers || []).filter(a => a.status === 'mismatch').length;
+    const scoreInsights = renderPrismScoreInterpretation(score, mismatchCount);
+    const prism = getPrismById(session.prism_id);
+    const levelsDeepAnalysis = renderPrismLevelsDeepAnalysis(prism, recommendation);
+    const actionPlan = renderPrismActionPlan(session, recommendation, mismatchCount);
     const countsHtml = ['E','B','C','V','I','S']
         .map(level => `<li><strong>${getLevelDisplay(level)}:</strong> ${recommendation.counts[level] || 0}</li>`)
         .join('');
@@ -1567,6 +1750,8 @@ function renderPrismResult(session, recommendation) {
             <p><strong>ציון כללי:</strong> ${score.total}/100 (${score.grade})</p>
             <p>פירוק הציון: כיסוי ${score.coverage}/40 | דיוק שיבוץ ${score.alignment}/40 | בהירות ניסוח ${score.clarity}/20</p>
             <p><strong>שיבוצים שגויים שסומנו באדום:</strong> ${mismatchCount}</p>
+            <p><strong>פענוח הציון:</strong></p>
+            ${scoreInsights}
         </div>
 
         <div class="blueprint-section">
@@ -1585,6 +1770,17 @@ function renderPrismResult(session, recommendation) {
             <p><strong>עוצמת רגש:</strong> ${session.emotion} | <strong>התנגדות:</strong> ${session.resistance}</p>
             <p><strong>פיזור תשובות לפי רמות (לאחר נרמול):</strong></p>
             <ul>${countsHtml}</ul>
+            <p><strong>משמעות מעשית:</strong> ה-Pivot הוא נקודת המינוף הכי יעילה כרגע. מיקוד נכון ברמה הזו יוצר תזוזה מהירה ואז מאפשר עבודה עמוקה יותר.</p>
+        </div>
+
+        <div class="blueprint-section">
+            <h4>פענוח עומק לפי כל רמה</h4>
+            ${levelsDeepAnalysis}
+        </div>
+
+        <div class="blueprint-section">
+            <h4>תוכנית פעולה מדורגת (לא רק ציון)</h4>
+            ${actionPlan}
         </div>
 
         <div class="blueprint-section">
@@ -1720,8 +1916,10 @@ function applyPreparedTextToInput(inputEl, text, suggestedLevel = '') {
     const expectedLevel = getExpectedLevelFromInput(inputEl);
     if (level && expectedLevel && level !== expectedLevel) {
         setMappingInputStatus(inputEl, 'mismatch', `התוכן שויך ל-${getLevelDisplay(level)} אך הוזן בשדה ${getLevelDisplay(expectedLevel)}.`);
+        playUISound('prism_warn');
     } else {
         clearMappingInputStatus(inputEl);
+        playUISound('prism_pick');
     }
 }
 
