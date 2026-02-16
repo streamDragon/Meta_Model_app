@@ -42,6 +42,23 @@
             <button class="tab-btn" data-tab="about">על הפרויקט</button>
         </nav>
 
+        <section id="global-comic-strip" class="global-comic-strip" aria-label="Comic strip preview">
+            <div class="global-comic-strip-inner">
+                <article class="global-comic-main">
+                    <img id="global-comic-main-img" src="" alt="" loading="lazy">
+                    <div class="global-comic-main-meta">
+                        <div>
+                            <p class="global-comic-eyebrow">Comic Layer</p>
+                            <h3 id="global-comic-main-title">Scene</h3>
+                            <p id="global-comic-main-subtitle"></p>
+                        </div>
+                        <a id="global-comic-main-link" class="global-comic-main-link" href="#" target="_blank" rel="noopener">Open SVG</a>
+                    </div>
+                </article>
+                <div id="global-comic-thumbs" class="global-comic-thumbs" role="list"></div>
+            </div>
+        </section>
+
         <!-- HOME TAB -->
         <section id="home" class="tab-content active">
             <div class="card">
@@ -174,6 +191,16 @@
                             <h3 id="scenario-title"></h3>
                             <div id="scenario-story-lines" class="scenario-story-lines"></div>
                             <p class="scenario-unspecified-line">המשפט הלא-מפורש: <strong id="scenario-unspecified-verb"></strong></p>
+                        </div>
+                        <div id="scenario-comic-stage" class="scenario-comic-stage" hidden>
+                            <div class="scenario-comic-image-wrap">
+                                <img id="scenario-comic-image" src="" alt="" loading="lazy">
+                            </div>
+                            <div class="scenario-comic-caption">
+                                <p class="scenario-comic-label">Comic Scene</p>
+                                <h4 id="scenario-comic-title"></h4>
+                                <p id="scenario-comic-subtitle"></p>
+                            </div>
                         </div>
                         <div id="scenario-options-container" class="scenario-options-container"></div>
                     </div>

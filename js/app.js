@@ -304,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupScenarioTrainerModule();
     setupComicEngine2();
     initializeProgressHub();
+    renderGlobalComicStrip(getActiveTabName());
 });
 
 // Load Meta Model data from JSON
@@ -349,6 +350,8 @@ function setupTabNavigation() {
             // Show corresponding content
             const tabName = btn.getAttribute('data-tab');
             document.getElementById(tabName).classList.add('active');
+            const scenarioContext = tabName === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
+            renderGlobalComicStrip(tabName, scenarioContext);
             window.scrollTo({ top: 0, behavior: 'smooth' });
             playUISound('next');
         });
@@ -1039,6 +1042,11 @@ function showScenarioScreen(screenName) {
     screens.forEach(screen => screen.classList.add('hidden'));
     const target = document.getElementById(`scenario-screen-${screenName}`);
     if (target) target.classList.remove('hidden');
+    if (document.getElementById('scenario-trainer')?.classList.contains('active')) {
+        const needsScenarioContext = new Set(['play', 'feedback', 'blueprint', 'score']);
+        const scenarioContext = needsScenarioContext.has(screenName) ? scenarioTrainer.activeScenario : null;
+        renderGlobalComicStrip('scenario-trainer', scenarioContext);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1352,6 +1360,7 @@ function renderScenarioPlayScreen() {
         });
     }
 
+    renderScenarioComicStage(scenario);
     showScenarioScreen('play');
 }
 
@@ -1772,6 +1781,226 @@ async function setupScenarioTrainerModule() {
     openScenarioHome();
 }
 
+const COMIC_SCENE_LIBRARY = [
+    {
+        key: 'work_presentation',
+        title: 'Work: Presentation',
+        subtitle: 'Clarify message, structure, and delivery.',
+        path: 'assets/svg/comics/scenes/עבודה_מצגת.svg'
+    },
+    {
+        key: 'bureaucracy_form',
+        title: 'Bureaucracy: Form',
+        subtitle: 'Translate vague instructions into clear steps.',
+        path: 'assets/svg/comics/scenes/ביורוקרטיה_טופס.svg'
+    },
+    {
+        key: 'bureaucracy_money',
+        title: 'Bureaucracy: Arnona',
+        subtitle: 'Resolve billing flow and required details.',
+        path: 'assets/svg/comics/scenes/כסף_ארנונה.svg'
+    },
+    {
+        key: 'parenting_homework',
+        title: 'Parenting: Homework',
+        subtitle: 'Break down what to do first and what is missing.',
+        path: 'assets/svg/comics/scenes/הורות_שיעורים.svg'
+    },
+    {
+        key: 'relationships_apology',
+        title: 'Relationships: Apology',
+        subtitle: 'From blame to specific repair steps.',
+        path: 'assets/svg/comics/scenes/זוגיות_סליחה.svg'
+    },
+    {
+        key: 'home_tech_cleanup',
+        title: 'Home Tech: Cleanup',
+        subtitle: 'Technical task with explicit execution steps.',
+        path: 'assets/svg/comics/scenes/טכני_ניקוי_קבצים.svg'
+    },
+    {
+        key: 'cooking_lasagna',
+        title: 'Cooking: Lasagna',
+        subtitle: 'Process thinking for everyday routines.',
+        path: 'assets/svg/comics/scenes/בישול_לזניה.svg'
+    }
+];
+
+const DOMAIN_TO_COMIC_SCENE_KEY = {
+    parenting: 'parenting_homework',
+    relationships: 'relationships_apology',
+    work: 'work_presentation',
+    bureaucracy: 'bureaucracy_form',
+    home_tech: 'home_tech_cleanup'
+};
+
+const TAB_TO_COMIC_SCENE_KEYS = {
+    home: ['work_presentation', 'parenting_homework', 'relationships_apology'],
+    'scenario-trainer': ['work_presentation', 'bureaucracy_form', 'parenting_homework'],
+    'comic-engine': ['parenting_homework', 'bureaucracy_form', 'work_presentation'],
+    categories: ['relationships_apology', 'home_tech_cleanup', 'work_presentation'],
+    practice: ['parenting_homework', 'home_tech_cleanup', 'bureaucracy_form'],
+    blueprint: ['work_presentation', 'cooking_lasagna', 'bureaucracy_form'],
+    prismlab: ['home_tech_cleanup', 'relationships_apology', 'bureaucracy_form'],
+    about: ['work_presentation', 'relationships_apology', 'cooking_lasagna']
+};
+
+function getActiveTabName() {
+    return document.querySelector('.tab-btn.active')?.getAttribute('data-tab') || 'home';
+}
+
+function getComicSceneByKey(key) {
+    return COMIC_SCENE_LIBRARY.find(scene => scene.key === key) || null;
+}
+
+function resolveComicSceneForScenario(scenario) {
+    if (!scenario || typeof scenario !== 'object') return null;
+
+    const explicitScenePath = (scenario.sceneArt || scenario.scene || scenario.sceneImage || '').trim();
+    if (explicitScenePath) {
+        return {
+            key: `custom:${explicitScenePath}`,
+            title: scenario.title || 'Scenario',
+            subtitle: 'Custom scene',
+            path: explicitScenePath
+        };
+    }
+
+    const scenarioId = String(scenario.scenarioId || scenario.id || '').toLowerCase();
+    const scenarioTitle = String(scenario.title || '').toLowerCase();
+    const domainKey = String(scenario.domain || '').toLowerCase();
+    const haystack = `${scenarioId} ${scenarioTitle} ${domainKey}`;
+
+    if (haystack.includes('presentation') || haystack.includes('client') || haystack.includes('bugfix')) {
+        return getComicSceneByKey('work_presentation');
+    }
+    if (haystack.includes('arnona')) {
+        return getComicSceneByKey('bureaucracy_money');
+    }
+    if (haystack.includes('bureaucracy') || haystack.includes('form') || haystack.includes('222')) {
+        return getComicSceneByKey('bureaucracy_form');
+    }
+    if (haystack.includes('parent') || haystack.includes('homework') || haystack.includes('morning') || haystack.includes('room')) {
+        return getComicSceneByKey('parenting_homework');
+    }
+    if (haystack.includes('relationship') || haystack.includes('apology') || haystack.includes('on_time') || haystack.includes('talk')) {
+        return getComicSceneByKey('relationships_apology');
+    }
+    if (haystack.includes('home_tech') || haystack.includes('tech') || haystack.includes('cleanup')) {
+        return getComicSceneByKey('home_tech_cleanup');
+    }
+
+    return getComicSceneByKey(DOMAIN_TO_COMIC_SCENE_KEY[domainKey] || '');
+}
+
+function getComicScenesForTab(tabName, scenario = null) {
+    const activeTab = tabName || getActiveTabName();
+    const keys = [];
+
+    const scenarioScene = resolveComicSceneForScenario(scenario);
+    if (scenarioScene) keys.push(scenarioScene.key);
+
+    const tabDefaults = TAB_TO_COMIC_SCENE_KEYS[activeTab] || TAB_TO_COMIC_SCENE_KEYS.home || [];
+    tabDefaults.forEach(key => keys.push(key));
+
+    const resolved = keys
+        .map(key => (key.startsWith('custom:') ? scenarioScene : getComicSceneByKey(key)))
+        .filter(Boolean);
+
+    const seen = new Set();
+    return resolved.filter(scene => {
+        const uniqueKey = scene.key || scene.path;
+        if (seen.has(uniqueKey)) return false;
+        seen.add(uniqueKey);
+        return true;
+    }).slice(0, 4);
+}
+
+function renderGlobalComicStrip(tabName = getActiveTabName(), scenario = null) {
+    const strip = document.getElementById('global-comic-strip');
+    const mainImg = document.getElementById('global-comic-main-img');
+    const mainTitle = document.getElementById('global-comic-main-title');
+    const mainSubtitle = document.getElementById('global-comic-main-subtitle');
+    const mainLink = document.getElementById('global-comic-main-link');
+    const thumbs = document.getElementById('global-comic-thumbs');
+    if (!strip || !mainImg || !mainTitle || !mainSubtitle || !mainLink || !thumbs) return;
+
+    const scenes = getComicScenesForTab(tabName, scenario);
+    if (!scenes.length) {
+        strip.classList.add('hidden');
+        return;
+    }
+
+    strip.classList.remove('hidden');
+    const selectedKey = strip.dataset.selectedScene || scenes[0].key;
+    const selected = scenes.find(scene => scene.key === selectedKey) || scenes[0];
+    strip.dataset.selectedScene = selected.key;
+
+    mainImg.src = selected.path;
+    mainImg.alt = selected.title;
+    mainTitle.textContent = selected.title;
+    mainSubtitle.textContent = selected.subtitle || 'Meta Model comic scene';
+    mainLink.href = selected.path;
+    mainLink.setAttribute('aria-label', `Open ${selected.title}`);
+
+    thumbs.innerHTML = '';
+    scenes.forEach(scene => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `global-comic-thumb${scene.key === selected.key ? ' active' : ''}`;
+        btn.setAttribute('role', 'listitem');
+        btn.setAttribute('aria-label', scene.title);
+        btn.addEventListener('click', () => {
+            strip.dataset.selectedScene = scene.key;
+            renderGlobalComicStrip(tabName, scenario);
+        });
+
+        const img = document.createElement('img');
+        img.src = scene.path;
+        img.alt = scene.title;
+        img.loading = 'lazy';
+
+        const textWrap = document.createElement('div');
+        const title = document.createElement('p');
+        title.className = 'global-comic-thumb-title';
+        title.textContent = scene.title;
+        const subtitle = document.createElement('p');
+        subtitle.className = 'global-comic-thumb-subtitle';
+        subtitle.textContent = scene.subtitle || '';
+
+        textWrap.appendChild(title);
+        textWrap.appendChild(subtitle);
+        btn.appendChild(img);
+        btn.appendChild(textWrap);
+        thumbs.appendChild(btn);
+    });
+}
+
+function renderScenarioComicStage(scenario) {
+    const stage = document.getElementById('scenario-comic-stage');
+    const image = document.getElementById('scenario-comic-image');
+    const title = document.getElementById('scenario-comic-title');
+    const subtitle = document.getElementById('scenario-comic-subtitle');
+    if (!stage || !image || !title || !subtitle) return;
+
+    const scene = resolveComicSceneForScenario(scenario);
+    if (!scene) {
+        stage.hidden = true;
+        return;
+    }
+
+    image.src = scene.path;
+    image.alt = scene.title;
+    title.textContent = scene.title;
+
+    const details = [];
+    if (scenario?.domainLabel || scenario?.domain) details.push(`Domain: ${scenario.domainLabel || scenario.domain}`);
+    if (scenario?.difficulty) details.push(`Difficulty: ${scenario.difficulty}`);
+    subtitle.textContent = details.join(' | ') || scene.subtitle || '';
+
+    stage.hidden = false;
+}
+
 // ==================== COMIC ENGINE 2.0 ====================
 
 const COMIC_ENGINE_STORAGE_KEY = 'comic_engine_progress_v1';
@@ -1931,7 +2160,18 @@ async function setupComicEngine2() {
             `;
         }).join('');
 
-        if (els.dialog) els.dialog.innerHTML = dialogLines;
+        const sceneArt = resolveComicSceneForScenario(scenario);
+        const scenePreview = sceneArt
+            ? `
+                <div class="comic-scene-inline">
+                    ${imgTag(sceneArt.path, sceneArt.title)}
+                    <div class="comic-scene-inline-caption">${escapeHtml(sceneArt.title || '')}</div>
+                </div>
+            `
+            : '';
+
+        if (els.dialog) els.dialog.innerHTML = `${scenePreview}${dialogLines}`;
+        renderGlobalComicStrip('comic-engine', scenario);
 
         const choices = Array.isArray(scenario.choices) ? scenario.choices : [];
         els.choices.innerHTML = choices.map(choice => {
@@ -3122,7 +3362,9 @@ function navigateTo(tabName) {
     
     const content = document.getElementById(tabName);
     if (content) content.classList.add('active');
-    
+
+    const scenarioContext = tabName === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
+    renderGlobalComicStrip(tabName, scenarioContext);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
