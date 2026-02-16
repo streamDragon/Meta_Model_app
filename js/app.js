@@ -23,11 +23,21 @@ let trainerState = {
     currentQuestion: 0,
     questions: [],
     selectedCategory: '',
-    correctCount: 0,
+    phaseCorrectCount: 0,
+    phaseSkippedCount: 0,
     sessionXP: 0,
     answered: false,
     hintLevel: 0,
-    skippedCount: 0
+    reviewMode: false,
+    reviewPool: [],
+    reviewPoolKeys: {},
+    mainTotalCount: 0,
+    mainCorrectCount: null,
+    mainSkippedCount: null,
+    reviewTotalCount: 0,
+    reviewCorrectCount: 0,
+    reviewSkippedCount: 0,
+    didRecordSession: false
 };
 
 let scenarioTrainerData = {
@@ -724,11 +734,21 @@ function startTrainer(categoryId) {
         currentQuestion: 0,
         questions: selectedQuestions,
         selectedCategory: categoryId,
-        correctCount: 0,
+        phaseCorrectCount: 0,
+        phaseSkippedCount: 0,
         sessionXP: 0,
         answered: false,
         hintLevel: 0,
-        skippedCount: 0
+        reviewMode: false,
+        reviewPool: [],
+        reviewPoolKeys: {},
+        mainTotalCount: selectedQuestions.length,
+        mainCorrectCount: null,
+        mainSkippedCount: null,
+        reviewTotalCount: 0,
+        reviewCorrectCount: 0,
+        reviewSkippedCount: 0,
+        didRecordSession: false
     };
     
     // Show trainer UI, hide start section
@@ -762,12 +782,30 @@ function hideTrainerInfoPanels() {
     hidePanel('depth-display');
 }
 
+function getTrainerQuestionKey(question) {
+    return [
+        question?.statement || '',
+        question?.violation || '',
+        question?.subcategory || '',
+        question?.difficulty || ''
+    ].join('::');
+}
+
+function addQuestionToReviewPool(question) {
+    if (!question || trainerState.reviewMode) return;
+    const key = getTrainerQuestionKey(question);
+    if (trainerState.reviewPoolKeys[key]) return;
+    trainerState.reviewPoolKeys[key] = true;
+    trainerState.reviewPool.push(question);
+}
+
 function updateTrainerProgressNote() {
     const noteEl = document.getElementById('progress-note');
     if (!noteEl) return;
     const remaining = trainerState.questions.length - trainerState.currentQuestion - 1;
-    const answeredCount = trainerState.currentQuestion - trainerState.skippedCount + (trainerState.answered ? 1 : 0);
-    noteEl.textContent = `נשארו ${Math.max(remaining, 0)} שאלות | נענו: ${Math.max(answeredCount, 0)} | דולגו: ${trainerState.skippedCount}`;
+    const answeredCount = trainerState.currentQuestion - trainerState.phaseSkippedCount + (trainerState.answered ? 1 : 0);
+    const modeLabel = trainerState.reviewMode ? 'Review Loop' : 'ריצה ראשית';
+    noteEl.textContent = `${modeLabel} | נשארו ${Math.max(remaining, 0)} שאלות | נענו: ${Math.max(answeredCount, 0)} | דולגו: ${trainerState.phaseSkippedCount}`;
 }
 
 function loadNextQuestion() {
@@ -785,6 +823,8 @@ function loadNextQuestion() {
     document.getElementById('progress-fill').style.width = progress + '%';
     document.getElementById('current-q').textContent = trainerState.currentQuestion + 1;
     document.getElementById('total-q').textContent = trainerState.questions.length;
+    const xpBadgeEl = document.getElementById('question-xp-badge');
+    if (xpBadgeEl) xpBadgeEl.textContent = trainerState.reviewMode ? '+6 XP (Review)' : '+10 XP';
     
     // Display question
     document.getElementById('question-text').textContent = question.statement;
@@ -834,21 +874,23 @@ function handleMCQSelection(event, question, selectedOption) {
 
     const correctCategory = getQuestionCategoryKey(question);
     const isCorrect = selectedOption === correctCategory;
+    const xpGain = trainerState.reviewMode ? 6 : 10;
 
     if (isCorrect) {
-        trainerState.correctCount++;
-        trainerState.sessionXP += 10;
-        addXP(10);
+        trainerState.phaseCorrectCount++;
+        trainerState.sessionXP += xpGain;
+        addXP(xpGain);
         playUISound('correct');
     } else {
+        addQuestionToReviewPool(question);
         playUISound('wrong');
     }
 
-    showFeedback(isCorrect, question, selectedOption);
+    showFeedback(isCorrect, question, selectedOption, xpGain);
     updateTrainerStats();
 }
 
-function showFeedback(isCorrect, question, selectedViolation) {
+function showFeedback(isCorrect, question, selectedViolation, xpGain = 10) {
     const feedbackSection = document.getElementById('feedback-section');
     const feedbackContent = document.getElementById('feedback-content');
     if (!feedbackSection || !feedbackContent) return;
@@ -869,7 +911,7 @@ function showFeedback(isCorrect, question, selectedViolation) {
                     <strong>שאלת עומק מוצעת:</strong> "${question.suggested_question}"<br>
                     <strong>הסבר:</strong> ${question.explanation}
                 </p>
-                <p style="margin-top: 15px; color: #28a745; font-weight: bold;">+10 XP</p>
+                <p style="margin-top: 15px; color: #28a745; font-weight: bold;">+${xpGain} XP</p>
             </div>
         `;
     } else {
@@ -904,11 +946,11 @@ function showFeedback(isCorrect, question, selectedViolation) {
 }
 
 function updateTrainerStats() {
-    const attempted = trainerState.currentQuestion + (trainerState.answered ? 1 : 0) - trainerState.skippedCount;
+    const attempted = trainerState.currentQuestion + (trainerState.answered ? 1 : 0) - trainerState.phaseSkippedCount;
     const safeAttempted = Math.max(attempted, 1);
-    const successRate = Math.round((trainerState.correctCount / safeAttempted) * 100);
+    const successRate = Math.round((trainerState.phaseCorrectCount / safeAttempted) * 100);
 
-    document.getElementById('correct-count').textContent = trainerState.correctCount;
+    document.getElementById('correct-count').textContent = trainerState.phaseCorrectCount;
     document.getElementById('success-rate').textContent = `${successRate}%`;
     document.getElementById('session-xp').textContent = trainerState.sessionXP;
 }
@@ -984,14 +1026,17 @@ function showTrainerDepth() {
 
 function skipCurrentQuestion() {
     if (trainerState.currentQuestion >= trainerState.questions.length) return;
-    trainerState.skippedCount++;
+    const question = trainerState.questions[trainerState.currentQuestion];
+    trainerState.phaseSkippedCount++;
+    addQuestionToReviewPool(question);
     showHintMessage('דילגת לשאלה הבאה');
     playUISound('skip');
     trainerState.currentQuestion++;
     loadNextQuestion();
 }
 
-function endTrainerSession() {
+function legacyEndTrainerSession() {
+    return finishTrainerSession();
     const feedbackSection = document.getElementById('feedback-section');
     const feedbackContent = document.getElementById('feedback-content');
     if (!feedbackSection || !feedbackContent) return;
@@ -1067,12 +1112,176 @@ function resetTrainer() {
         currentQuestion: 0,
         questions: [],
         selectedCategory: '',
-        correctCount: 0,
+        phaseCorrectCount: 0,
+        phaseSkippedCount: 0,
         sessionXP: 0,
         answered: false,
         hintLevel: 0,
-        skippedCount: 0
+        reviewMode: false,
+        reviewPool: [],
+        reviewPoolKeys: {},
+        mainTotalCount: 0,
+        mainCorrectCount: null,
+        mainSkippedCount: null,
+        reviewTotalCount: 0,
+        reviewCorrectCount: 0,
+        reviewSkippedCount: 0,
+        didRecordSession: false
     };
+}
+
+// Override session ending flow with Review Loop support.
+function endTrainerSession() {
+    if (!trainerState.reviewMode) {
+        trainerState.mainCorrectCount = trainerState.phaseCorrectCount;
+        trainerState.mainSkippedCount = trainerState.phaseSkippedCount;
+    } else {
+        trainerState.reviewCorrectCount = trainerState.phaseCorrectCount;
+        trainerState.reviewSkippedCount = trainerState.phaseSkippedCount;
+    }
+
+    if (!trainerState.reviewMode && trainerState.reviewPool.length > 0) {
+        const feedbackSection = document.getElementById('feedback-section');
+        const feedbackContent = document.getElementById('feedback-content');
+        if (!feedbackSection || !feedbackContent) return;
+
+        const mainTotal = trainerState.mainTotalCount || 1;
+        const mainCorrect = trainerState.mainCorrectCount || 0;
+        const mainRate = Math.round((mainCorrect / mainTotal) * 100);
+        const weakCount = trainerState.reviewPool.length;
+
+        feedbackContent.innerHTML = `
+            <div class="correct" style="text-align: center;">
+                <h2>סיימת את הסשן הראשי</h2>
+                <p style="font-size: 1.02em;">
+                    <strong>ציון ראשי:</strong> ${mainCorrect} / ${mainTotal} (${mainRate}%)<br>
+                    <strong>XP שנצבר:</strong> +${trainerState.sessionXP}<br>
+                    <strong>שאלות לחיזוק:</strong> ${weakCount}
+                </p>
+                <p style="margin-top: 12px; color: #2c5282; font-weight: 700;">Review Loop מוכן עבורך עם השאלות שדורשות חיזוק.</p>
+                <button class="btn btn-primary" onclick="startReviewLoop()" style="margin-top: 12px; width: 100%;">התחל Review Loop</button>
+                <button class="btn btn-secondary" onclick="finishTrainerSession()" style="margin-top: 10px; width: 100%;">סיים בלי Review</button>
+            </div>
+        `;
+
+        const questionDisplay = document.getElementById('question-display');
+        const optionsDisplay = document.getElementById('mcq-options');
+        const trainerHints = document.getElementById('trainer-hints');
+        if (questionDisplay) questionDisplay.style.display = 'none';
+        if (optionsDisplay) optionsDisplay.style.display = 'none';
+        if (trainerHints) trainerHints.style.display = 'none';
+
+        feedbackSection.classList.remove('hidden');
+        feedbackSection.classList.add('visible');
+        document.getElementById('progress-fill').style.width = '100%';
+        playUISound('finish');
+        return;
+    }
+
+    finishTrainerSession();
+}
+
+function startReviewLoop() {
+    if (!trainerState.reviewPool.length) {
+        finishTrainerSession();
+        return;
+    }
+
+    const reviewQuestions = shuffleArray(trainerState.reviewPool).slice(0, Math.min(6, trainerState.reviewPool.length));
+    trainerState.reviewMode = true;
+    trainerState.reviewTotalCount = reviewQuestions.length;
+    trainerState.questions = reviewQuestions;
+    trainerState.currentQuestion = 0;
+    trainerState.answered = false;
+    trainerState.hintLevel = 0;
+    trainerState.phaseCorrectCount = 0;
+    trainerState.phaseSkippedCount = 0;
+    document.getElementById('correct-count').textContent = '0';
+    document.getElementById('success-rate').textContent = '0%';
+    hideTrainerInfoPanels();
+
+    const feedbackSection = document.getElementById('feedback-section');
+    const questionDisplay = document.getElementById('question-display');
+    const optionsDisplay = document.getElementById('mcq-options');
+    const trainerHints = document.getElementById('trainer-hints');
+    if (questionDisplay) questionDisplay.style.display = 'block';
+    if (optionsDisplay) optionsDisplay.style.display = 'flex';
+    if (trainerHints) trainerHints.style.display = 'block';
+    if (feedbackSection) {
+        feedbackSection.classList.add('hidden');
+        feedbackSection.classList.remove('visible');
+    }
+
+    showHintMessage(`Review Loop התחיל: ${reviewQuestions.length} שאלות לחיזוק`);
+    playUISound('start');
+    loadNextQuestion();
+}
+
+function finishTrainerSession() {
+    const feedbackSection = document.getElementById('feedback-section');
+    const feedbackContent = document.getElementById('feedback-content');
+    if (!feedbackSection || !feedbackContent) return;
+
+    if (trainerState.mainCorrectCount === null) {
+        trainerState.mainCorrectCount = trainerState.phaseCorrectCount;
+    }
+    if (trainerState.mainSkippedCount === null) {
+        trainerState.mainSkippedCount = trainerState.phaseSkippedCount;
+    }
+
+    const mainTotal = trainerState.mainTotalCount || 1;
+    const mainCorrect = trainerState.mainCorrectCount || 0;
+    const mainRate = Math.round((mainCorrect / mainTotal) * 100);
+    const reviewTotal = trainerState.reviewTotalCount || 0;
+    const reviewCorrect = trainerState.reviewCorrectCount || 0;
+    const reviewRate = reviewTotal ? Math.round((reviewCorrect / reviewTotal) * 100) : 0;
+
+    let message = '';
+    if (reviewTotal > 0 && reviewRate >= 80) {
+        message = 'חזק מאוד. סגרת פינות קריטיות ב-Review Loop';
+    } else if (mainRate === 100) {
+        message = 'מושלם! כל התשובות נכונות';
+    } else if (mainRate >= 80) {
+        message = 'מעולה! רמת דיוק גבוהה מאוד';
+    } else if (mainRate >= 60) {
+        message = 'טוב מאוד, עוד חידוד קטן ואתה שם';
+    } else {
+        message = 'התחלה טובה, ממשיכים לתרגול נוסף';
+    }
+
+    const reviewLine = reviewTotal
+        ? `<strong>Review Loop:</strong> ${reviewCorrect} / ${reviewTotal} (${reviewRate}%)<br>`
+        : '';
+
+    feedbackContent.innerHTML = `
+        <div class="correct" style="text-align: center;">
+            <h2>${message}</h2>
+            <p style="font-size: 1.05em;">
+                <strong>ציון ריצה ראשית:</strong> ${mainCorrect} / ${mainTotal} (${mainRate}%)<br>
+                ${reviewLine}
+                <strong>XP שהרווחת:</strong> +${trainerState.sessionXP}<br>
+                <strong>דילוגים:</strong> ${trainerState.mainSkippedCount}
+            </p>
+            <button class="btn btn-primary" onclick="resetTrainer()" style="margin-top: 20px; width: 100%;">תרגול נוסף →</button>
+        </div>
+    `;
+
+    const questionDisplay = document.getElementById('question-display');
+    const optionsDisplay = document.getElementById('mcq-options');
+    const trainerHints = document.getElementById('trainer-hints');
+    if (questionDisplay) questionDisplay.style.display = 'none';
+    if (optionsDisplay) optionsDisplay.style.display = 'none';
+    if (trainerHints) trainerHints.style.display = 'none';
+
+    feedbackSection.classList.remove('hidden');
+    feedbackSection.classList.add('visible');
+    document.getElementById('progress-fill').style.width = '100%';
+    playUISound('finish');
+
+    if (!trainerState.didRecordSession) {
+        recordSession();
+        trainerState.didRecordSession = true;
+    }
 }
 
 // ==================== SCENARIO TRAINER ====================
