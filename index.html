@@ -361,9 +361,39 @@
 
                 <section id="comicEngine" class="comic-engine">
                     <header class="comic-header">
-                        <h2 id="comicTitle">סצנה</h2>
-                        <div id="comicMeta" class="comic-meta"></div>
+                        <div class="comic-header-main">
+                            <h2 id="comicTitle">סצנה</h2>
+                            <div id="comicMeta" class="comic-meta"></div>
+                        </div>
+                        <button id="comicCompactToggle" class="comic-compact-toggle" type="button" aria-pressed="false">
+                            מצב קומפקטי
+                        </button>
                     </header>
+
+                    <div id="comicQuickParams" class="comic-quick-params" aria-live="polite"></div>
+
+                    <details id="comicParamsPanel" class="comic-params-panel">
+                        <summary>פרמטרים לתצוגה</summary>
+                        <div class="comic-params-grid">
+                            <label class="comic-param-option">
+                                <input id="comicParamAutoCompact" type="checkbox" checked>
+                                כיווץ אוטומטי אחרי בחירה
+                            </label>
+                            <label class="comic-param-option">
+                                <input id="comicParamShowSceneArt" type="checkbox" checked>
+                                הצגת איור סצנה
+                            </label>
+                            <label class="comic-param-option">
+                                <input id="comicParamShowCharacters" type="checkbox" checked>
+                                הצגת דמויות צד
+                            </label>
+                            <label class="comic-param-option comic-param-range">
+                                גודל טקסט
+                                <input id="comicParamTextScale" type="range" min="90" max="115" step="5" value="100">
+                                <span id="comicParamTextScaleValue" class="comic-param-range-value">100%</span>
+                            </label>
+                        </div>
+                    </details>
 
                     <div class="comic-stage">
                         <div class="comic-character" id="charLeft"></div>

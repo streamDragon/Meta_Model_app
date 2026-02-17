@@ -2858,6 +2858,7 @@ function renderScenarioComicStage(scenario) {
 // ==================== COMIC ENGINE 2.0 ====================
 
 const COMIC_ENGINE_STORAGE_KEY = 'comic_engine_progress_v1';
+const COMIC_ENGINE_PREFS_KEY = 'comic_engine_prefs_v1';
 
 function escapeHtml(value) {
     if (value === null || value === undefined) return '';
@@ -2917,6 +2918,14 @@ async function setupComicEngine2() {
         root: document.getElementById('comicEngine'),
         title: document.getElementById('comicTitle'),
         meta: document.getElementById('comicMeta'),
+        quickParams: document.getElementById('comicQuickParams'),
+        paramsPanel: document.getElementById('comicParamsPanel'),
+        compactToggle: document.getElementById('comicCompactToggle'),
+        paramAutoCompact: document.getElementById('comicParamAutoCompact'),
+        paramShowSceneArt: document.getElementById('comicParamShowSceneArt'),
+        paramShowCharacters: document.getElementById('comicParamShowCharacters'),
+        paramTextScale: document.getElementById('comicParamTextScale'),
+        paramTextScaleValue: document.getElementById('comicParamTextScaleValue'),
         charLeft: document.getElementById('charLeft'),
         charRight: document.getElementById('charRight'),
         dialog: document.getElementById('comicDialog'),
@@ -2965,6 +2974,41 @@ async function setupComicEngine2() {
         }));
     };
 
+    const defaultPrefs = {
+        compact: window.innerWidth <= 768,
+        autoCompact: true,
+        showSceneArt: true,
+        showCharacters: true,
+        textScale: 100,
+        paramsOpen: false
+    };
+
+    const prefs = { ...defaultPrefs };
+
+    try {
+        const savedPrefs = JSON.parse(localStorage.getItem(COMIC_ENGINE_PREFS_KEY) || '{}');
+        if (typeof savedPrefs?.compact === 'boolean') prefs.compact = savedPrefs.compact;
+        if (typeof savedPrefs?.autoCompact === 'boolean') prefs.autoCompact = savedPrefs.autoCompact;
+        if (typeof savedPrefs?.showSceneArt === 'boolean') prefs.showSceneArt = savedPrefs.showSceneArt;
+        if (typeof savedPrefs?.showCharacters === 'boolean') prefs.showCharacters = savedPrefs.showCharacters;
+        if (Number.isFinite(savedPrefs?.textScale)) prefs.textScale = Math.min(115, Math.max(90, savedPrefs.textScale));
+        if (typeof savedPrefs?.paramsOpen === 'boolean') prefs.paramsOpen = savedPrefs.paramsOpen;
+    } catch (error) {
+        console.error('Comic engine prefs parse failed', error);
+    }
+
+    const rememberPrefs = () => {
+        localStorage.setItem(COMIC_ENGINE_PREFS_KEY, JSON.stringify({
+            compact: prefs.compact,
+            autoCompact: prefs.autoCompact,
+            showSceneArt: prefs.showSceneArt,
+            showCharacters: prefs.showCharacters,
+            textScale: prefs.textScale,
+            paramsOpen: prefs.paramsOpen,
+            updatedAt: new Date().toISOString()
+        }));
+    };
+
     const imgTag = (src, alt = '') => {
         const safeSrc = escapeHtml(src || '');
         const safeAlt = escapeHtml(alt || '');
@@ -2985,10 +3029,70 @@ async function setupComicEngine2() {
         </div>
     `;
 
+    let activeScenario = null;
+
+    const updateCompactToggleState = () => {
+        if (!els.compactToggle) return;
+        els.compactToggle.setAttribute('aria-pressed', prefs.compact ? 'true' : 'false');
+        els.compactToggle.textContent = prefs.compact ? 'תצוגה מלאה' : 'מצב קומפקטי';
+    };
+
+    const renderQuickParams = (scenario) => {
+        if (!els.quickParams || !scenario) return;
+
+        const dialogCount = Array.isArray(scenario.dialog) ? scenario.dialog.length : 0;
+        const choicesCount = Array.isArray(scenario.choices) ? scenario.choices.length : 0;
+        const metaChoice = (scenario.choices || []).find(choice => choice?.id === 'meta');
+        const goal = metaChoice?.blueprint?.goal || '';
+
+        const chips = [
+            `<span class="comic-param-chip"><b>תחום</b> ${escapeHtml(scenario.domain || 'לא צוין')}</span>`,
+            `<span class="comic-param-chip"><b>דיאלוג</b> ${dialogCount} שורות</span>`,
+            `<span class="comic-param-chip"><b>אפשרויות</b> ${choicesCount}</span>`,
+            `<span class="comic-param-chip"><b>תצוגה</b> ${prefs.compact ? 'קומפקטית' : 'רגילה'}</span>`
+        ];
+
+        if (goal) {
+            chips.push(`<span class="comic-param-chip"><b>מטרה</b> ${escapeHtml(goal)}</span>`);
+        }
+
+        els.quickParams.innerHTML = chips.join('');
+    };
+
+    const syncPreferenceControls = () => {
+        if (els.paramAutoCompact) els.paramAutoCompact.checked = prefs.autoCompact;
+        if (els.paramShowSceneArt) els.paramShowSceneArt.checked = prefs.showSceneArt;
+        if (els.paramShowCharacters) els.paramShowCharacters.checked = prefs.showCharacters;
+        if (els.paramTextScale) els.paramTextScale.value = String(prefs.textScale);
+        if (els.paramTextScaleValue) els.paramTextScaleValue.textContent = `${prefs.textScale}%`;
+        if (els.paramsPanel) els.paramsPanel.open = !!prefs.paramsOpen;
+        updateCompactToggleState();
+    };
+
+    const applyVisualPrefs = () => {
+        if (!els.root) return;
+
+        els.root.classList.toggle('is-compact', prefs.compact);
+        els.root.classList.toggle('hide-scene-art', !prefs.showSceneArt);
+        els.root.classList.toggle('hide-characters', !prefs.showCharacters);
+        els.root.style.setProperty('--comic-text-scale', String(prefs.textScale / 100));
+
+        syncPreferenceControls();
+        renderQuickParams(activeScenario);
+    };
+
+    const setCompact = (isCompact, { persist = true } = {}) => {
+        prefs.compact = Boolean(isCompact);
+        applyVisualPrefs();
+        if (persist) rememberPrefs();
+    };
+
     const renderScenario = (scenario) => {
         if (!scenario) return;
+        activeScenario = scenario;
 
         if (els.feedback) els.feedback.hidden = true;
+        if (els.root) els.root.classList.remove('has-selection');
         if (els.btnNext) {
             els.btnNext.disabled = true;
             els.btnNext.onclick = null;
@@ -2996,6 +3100,7 @@ async function setupComicEngine2() {
 
         els.title.textContent = scenario.title || 'סצנה';
         if (els.meta) els.meta.textContent = `תחום: ${scenario.domain || 'לא צוין'}`;
+        renderQuickParams(scenario);
 
         const left = scenario?.characters?.left || {};
         const right = scenario?.characters?.right || {};
@@ -3070,7 +3175,7 @@ async function setupComicEngine2() {
 
         const outcome = choice.outcome || getComicOutcome(choice.id);
         let rightHtml = `
-            <div style="font-size:18px;line-height:1.35">
+            <div class="comic-feedback-summary">
                 <div style="color:#6B7280;font-weight:900;margin-bottom:6px">התגובה שלך</div>
                 <div style="font-weight:900">${escapeHtml(choice.say || '')}</div>
                 <div style="margin-top:10px; color:#1f2937;">${escapeHtml(outcome)}</div>
@@ -3122,6 +3227,7 @@ async function setupComicEngine2() {
 
     const applyChoiceV2 = (scenario, choice, rightCharacter) => {
         if (els.feedback) els.feedback.hidden = false;
+        if (els.root) els.root.classList.add('has-selection');
 
         els.choices.querySelectorAll('button.choice-btn').forEach(button => {
             button.disabled = true;
@@ -3163,7 +3269,7 @@ async function setupComicEngine2() {
         }
 
         let rightHtml = `
-            <div class="comic-feedback-summary" style="font-size:18px;line-height:1.35">
+            <div class="comic-feedback-summary">
                 <div style="color:#6B7280;font-weight:900;margin-bottom:6px">התגובה שלך</div>
                 <div style="font-weight:900">${escapeHtml(choice.say || '')}</div>
                 <div style="margin-top:10px; color:#1f2937;">${escapeHtml(outcome)}</div>
@@ -3189,8 +3295,60 @@ async function setupComicEngine2() {
                 els.root.scrollIntoView({ behavior: 'smooth', block: 'start' });
             };
         }
+
+        if (prefs.autoCompact) {
+            setCompact(true, { persist: true });
+        } else {
+            renderQuickParams(scenario);
+        }
     };
 
+    if (els.compactToggle) {
+        els.compactToggle.addEventListener('click', () => {
+            setCompact(!prefs.compact, { persist: true });
+        });
+    }
+
+    if (els.paramsPanel) {
+        els.paramsPanel.addEventListener('toggle', () => {
+            prefs.paramsOpen = els.paramsPanel.open;
+            rememberPrefs();
+        });
+    }
+
+    if (els.paramAutoCompact) {
+        els.paramAutoCompact.addEventListener('change', () => {
+            prefs.autoCompact = !!els.paramAutoCompact.checked;
+            renderQuickParams(activeScenario);
+            rememberPrefs();
+        });
+    }
+
+    if (els.paramShowSceneArt) {
+        els.paramShowSceneArt.addEventListener('change', () => {
+            prefs.showSceneArt = !!els.paramShowSceneArt.checked;
+            applyVisualPrefs();
+            rememberPrefs();
+        });
+    }
+
+    if (els.paramShowCharacters) {
+        els.paramShowCharacters.addEventListener('change', () => {
+            prefs.showCharacters = !!els.paramShowCharacters.checked;
+            applyVisualPrefs();
+            rememberPrefs();
+        });
+    }
+
+    if (els.paramTextScale) {
+        els.paramTextScale.addEventListener('input', () => {
+            prefs.textScale = Number(els.paramTextScale.value) || 100;
+            applyVisualPrefs();
+            rememberPrefs();
+        });
+    }
+
+    applyVisualPrefs();
     renderScenario(scenarios[idx]);
 }
 
