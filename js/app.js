@@ -375,6 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupPrismModule();
     setupScenarioTrainerModule();
     setupComicEngine2();
+    setupCommunityFeedbackWall();
     initializeProgressHub();
     renderGlobalComicStrip(getActiveTabName());
 });
@@ -2859,6 +2860,7 @@ function renderScenarioComicStage(scenario) {
 
 const COMIC_ENGINE_STORAGE_KEY = 'comic_engine_progress_v1';
 const COMIC_ENGINE_PREFS_KEY = 'comic_engine_prefs_v1';
+const COMMUNITY_WALL_STORAGE_KEY = 'community_feedback_wall_v1';
 
 function escapeHtml(value) {
     if (value === null || value === undefined) return '';
@@ -3350,6 +3352,209 @@ async function setupComicEngine2() {
 
     applyVisualPrefs();
     renderScenario(scenarios[idx]);
+}
+
+function evaluateCommunityMessage(text) {
+    const message = String(text || '').trim();
+    const words = message.split(/\s+/).filter(Boolean);
+
+    let score = 35;
+    const tips = [];
+    const strengths = [];
+
+    const hasQuestionMark = /[?؟]/.test(message);
+    if (hasQuestionMark) {
+        score += 15;
+        strengths.push('נוסח כשאלה ברורה');
+    } else {
+        tips.push('להוסיף סימן שאלה כדי למסגר בקשה ברורה.');
+    }
+
+    const questionWords = ['מה', 'איך', 'למה', 'מתי', 'מי', 'איפה', 'איזה', 'כמה', 'באיזה', 'למי'];
+    const hasQuestionWord = questionWords.some(word => message.includes(word));
+    if (hasQuestionWord) {
+        score += 15;
+        strengths.push('יש מילת שאלה ממקדת');
+    } else {
+        tips.push('להוסיף מילת שאלה ממוקדת (מה/איך/מתי/מי/איזה).');
+    }
+
+    if (words.length >= 10) {
+        score += 20;
+        strengths.push('יש הקשר מספק');
+    } else if (words.length >= 6) {
+        score += 10;
+        tips.push('אפשר להוסיף עוד פרטי הקשר כדי לחדד.');
+    } else {
+        tips.push('הניסוח קצר מדי, חסרים פרטים משמעותיים.');
+    }
+
+    const contextSignals = ['בסיטואציה', 'במצב', 'כש', 'אחרי', 'לפני', 'מול', 'עם', 'בבית', 'בעבודה', 'בכיתה'];
+    const hasContext = contextSignals.some(word => message.includes(word));
+    if (hasContext) {
+        score += 15;
+        strengths.push('ההקשר הסיטואציוני ברור');
+    } else {
+        tips.push('להוסיף איפה/מול מי/מתי זה קורה בפועל.');
+    }
+
+    const outcomeSignals = ['כדי', 'מטרה', 'רוצה', 'רוצים', 'להשיג', 'להצליח', 'תוצאה'];
+    const hasOutcome = outcomeSignals.some(word => message.includes(word));
+    if (hasOutcome) {
+        score += 10;
+        strengths.push('יש תוצאה רצויה');
+    } else {
+        tips.push('להגדיר מה התוצאה שאתם רוצים להשיג.');
+    }
+
+    score = Math.max(15, Math.min(100, score));
+
+    let level = 'level-low';
+    let levelLabel = 'דורש חידוד';
+    let summary = 'כדאי לחדד את השאלה: מה חסר, באיזה הקשר, ומה רוצים להשיג.';
+
+    if (score >= 75) {
+        level = 'level-high';
+        levelLabel = 'מדויק מאוד';
+        summary = 'שאלה חזקה שמסייעת לחשוף מידע חסר משמעותי.';
+    } else if (score >= 55) {
+        level = 'level-mid';
+        levelLabel = 'כיוון טוב';
+        summary = 'ניסוח טוב. עוד תוספת הקשר קטנה תהפוך אותו למדויק יותר.';
+    }
+
+    return {
+        score,
+        level,
+        levelLabel,
+        summary,
+        strengths: strengths.slice(0, 2),
+        tips: tips.slice(0, 3)
+    };
+}
+
+function setupCommunityFeedbackWall() {
+    const els = {
+        root: document.getElementById('communityWall'),
+        form: document.getElementById('communityWallForm'),
+        name: document.getElementById('communityName'),
+        message: document.getElementById('communityMessage'),
+        status: document.getElementById('communityWallStatus'),
+        feed: document.getElementById('communityFeed'),
+        clearBtn: document.getElementById('communityClearBtn')
+    };
+
+    if (!els.root || !els.form || !els.message || !els.feed) return;
+
+    let entries = [];
+    try {
+        const parsed = JSON.parse(localStorage.getItem(COMMUNITY_WALL_STORAGE_KEY) || '[]');
+        if (Array.isArray(parsed)) {
+            entries = parsed.slice(0, 40);
+        }
+    } catch (error) {
+        console.error('Community wall parse failed', error);
+    }
+
+    const formatDate = (isoString) => {
+        try {
+            return new Date(isoString).toLocaleString('he-IL', {
+                day: '2-digit',
+                month: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (error) {
+            return '';
+        }
+    };
+
+    const saveEntries = () => {
+        localStorage.setItem(COMMUNITY_WALL_STORAGE_KEY, JSON.stringify(entries.slice(0, 40)));
+    };
+
+    const renderFeed = () => {
+        if (!entries.length) {
+            els.feed.innerHTML = '<div class="community-empty">עדיין אין הודעות. כתבו ראשונים וקבלו פידבק על הניסוח.</div>';
+            return;
+        }
+
+        els.feed.innerHTML = entries.map(entry => {
+            const itemClass = entry?.analysis?.level || 'level-low';
+            const score = Number.isFinite(entry?.analysis?.score) ? entry.analysis.score : 0;
+            const levelLabel = escapeHtml(entry?.analysis?.levelLabel || '');
+            const summary = escapeHtml(entry?.analysis?.summary || '');
+            const tips = Array.isArray(entry?.analysis?.tips) ? entry.analysis.tips : [];
+            const strengths = Array.isArray(entry?.analysis?.strengths) ? entry.analysis.strengths : [];
+            const author = escapeHtml(entry.author || 'משתמש/ת');
+            const message = escapeHtml(entry.message || '');
+            const date = escapeHtml(formatDate(entry.createdAt));
+
+            const tipsHtml = tips.map(tip => `<li>${escapeHtml(tip)}</li>`).join('');
+            const strengthsText = strengths.length ? `חוזקות: ${escapeHtml(strengths.join(' | '))}` : '';
+
+            return `
+                <article class="community-item ${itemClass}">
+                    <header class="community-item-header">
+                        <div class="community-item-meta">${author} · ${date}</div>
+                        <div class="community-score">${score}/100 · ${levelLabel}</div>
+                    </header>
+                    <p class="community-message">${message}</p>
+                    <p class="community-feedback">${summary}</p>
+                    ${strengthsText ? `<p class="community-feedback">${strengthsText}</p>` : ''}
+                    ${tipsHtml ? `<ul class="community-tips">${tipsHtml}</ul>` : ''}
+                </article>
+            `;
+        }).join('');
+    };
+
+    const setStatus = (text, isError = false) => {
+        if (!els.status) return;
+        els.status.textContent = text;
+        els.status.style.color = isError ? '#b91c1c' : '#334155';
+    };
+
+    els.form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const message = String(els.message.value || '').trim();
+        const author = String(els.name?.value || '').trim();
+
+        if (message.length < 6) {
+            setStatus('כתבו לפחות 6 תווים כדי לקבל פידבק שימושי.', true);
+            return;
+        }
+
+        const analysis = evaluateCommunityMessage(message);
+        const entry = {
+            id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            author: author || 'משתמש/ת',
+            message,
+            createdAt: new Date().toISOString(),
+            analysis
+        };
+
+        entries.unshift(entry);
+        entries = entries.slice(0, 40);
+        saveEntries();
+        renderFeed();
+
+        const scoreLabel = analysis.score >= 75 ? 'מצוין' : analysis.score >= 55 ? 'יפה מאוד' : 'יש כיוון';
+        setStatus(`נשמר. ציון ניסוח: ${analysis.score}/100 (${scoreLabel}).`);
+
+        els.message.value = '';
+    });
+
+    if (els.clearBtn) {
+        els.clearBtn.addEventListener('click', () => {
+            entries = [];
+            saveEntries();
+            renderFeed();
+            setStatus('הקיר נוקה.');
+        });
+    }
+
+    renderFeed();
 }
 
 // ==================== BLUEPRINT BUILDER ====================

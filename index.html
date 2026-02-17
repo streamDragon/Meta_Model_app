@@ -412,6 +412,31 @@
                         <button id="btnNextScene" class="btn-next" disabled>סצנה הבאה</button>
                     </div>
                 </section>
+
+                <section id="communityWall" class="community-wall">
+                    <div class="community-wall-header">
+                        <h3>קיר שאלות ומשוב</h3>
+                        <p>אפשר להשאיר שאלה או הודעה, ולקבל פידבק מיידי על איכות הניסוח.</p>
+                    </div>
+
+                    <form id="communityWallForm" class="community-form">
+                        <label>
+                            שם (אופציונלי)
+                            <input id="communityName" type="text" maxlength="40" placeholder="לדוגמה: נועם">
+                        </label>
+                        <label>
+                            שאלה / הודעה
+                            <textarea id="communityMessage" rows="3" maxlength="300" required placeholder="כתבו כאן שאלה שרוצים לחדד..."></textarea>
+                        </label>
+                        <div class="community-form-actions">
+                            <button type="submit" class="btn btn-primary">שלח וקבל פידבק</button>
+                            <button type="button" id="communityClearBtn" class="btn btn-secondary">נקה קיר</button>
+                        </div>
+                        <div id="communityWallStatus" class="community-status" role="status" aria-live="polite"></div>
+                    </form>
+
+                    <div id="communityFeed" class="community-feed"></div>
+                </section>
             </div>
         </section>
 
