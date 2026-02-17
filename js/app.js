@@ -37,7 +37,9 @@ let trainerState = {
     reviewTotalCount: 0,
     reviewCorrectCount: 0,
     reviewSkippedCount: 0,
-    didRecordSession: false
+    didRecordSession: false,
+    deletionCoachMode: false,
+    currentOptionSet: []
 };
 
 let scenarioTrainerData = {
@@ -726,10 +728,15 @@ function setupTrainerMode() {
     const hintTrigger = document.getElementById('hint-trigger');
     const whyTrigger = document.getElementById('why-trigger');
     const depthTrigger = document.getElementById('depth-trigger');
+    const deletionGuideTrigger = document.getElementById('deletion-guide-trigger');
+    const deletionGuideTriggerLive = document.getElementById('deletion-guide-trigger-live');
     const skipBtn = document.getElementById('skip-question-btn');
 
     if (!startBtn || !categorySelect) return;
-    categorySelect.addEventListener('change', () => playUISound('hint'));
+    categorySelect.addEventListener('change', () => {
+        playUISound('hint');
+        syncDeletionGuideEntry(categorySelect.value);
+    });
     
     startBtn.addEventListener('click', () => {
         const selectedCategory = categorySelect.value;
@@ -743,8 +750,57 @@ function setupTrainerMode() {
     if (hintTrigger) hintTrigger.addEventListener('click', showTrainerHint);
     if (whyTrigger) whyTrigger.addEventListener('click', showTrainerImportance);
     if (depthTrigger) depthTrigger.addEventListener('click', showTrainerDepth);
+    if (deletionGuideTrigger) deletionGuideTrigger.addEventListener('click', showDeletionGuideFromEntry);
+    if (deletionGuideTriggerLive) deletionGuideTriggerLive.addEventListener('click', showDeletionGuideFromLiveMode);
     if (skipBtn) skipBtn.addEventListener('click', skipCurrentQuestion);
     setupAudioMuteButtons();
+    syncDeletionGuideEntry(categorySelect.value);
+}
+
+function isDeletionCategorySelected(categoryId = '') {
+    return String(categoryId || '').toLowerCase() === 'deletion';
+}
+
+function buildDeletionGuideHtml() {
+    return `
+        <p><strong>איך עובד תרגול מחיקה (6 אפשרויות)?</strong></p>
+        <p>בכל שאלה תקבל/י 6 אפשרויות: 3 שאלות שאינן מחיקה, ו-3 שאלות מחיקה בניסוחים שונים.</p>
+        <p><strong>המטרה שלך:</strong> לבחור את שאלת המחיקה שחושפת את המידע החסר הכי משמעותי להקשר.</p>
+        <p><strong>דירוג איכות בתוך שאלות המחיקה:</strong></p>
+        <ul>
+            <li>רמה גבוהה: חושפת מידע חסר קריטי שמאפשר פעולה מיידית.</li>
+            <li>רמה בינונית: מחיקה נכונה אבל פחות מרכזית להתקדמות.</li>
+            <li>רמה נמוכה: מחיקה כללית שלא תורמת מספיק לפתרון.</li>
+        </ul>
+        <p><strong>טיפ עבודה:</strong> לפני בחירה שאל/י מה חסר כאן כדי להבין מה באמת נדרש, מי מעורב, ולפי איזה קריטריון.</p>
+    `;
+}
+
+function syncDeletionGuideEntry(categoryId = '') {
+    const entryBox = document.getElementById('deletion-guide-entry');
+    const entryDisplay = document.getElementById('deletion-guide-display');
+    const liveBtn = document.getElementById('deletion-guide-trigger-live');
+    const enabled = isDeletionCategorySelected(categoryId);
+
+    if (entryBox) entryBox.classList.toggle('hidden', !enabled);
+    if (!enabled && entryDisplay) {
+        entryDisplay.classList.add('hidden');
+        entryDisplay.classList.remove('visible');
+    }
+
+    if (liveBtn) {
+        liveBtn.classList.toggle('hidden', !enabled);
+    }
+}
+
+function showDeletionGuideFromEntry() {
+    setPanelContent('deletion-guide-display', buildDeletionGuideHtml());
+    playUISound('hint');
+}
+
+function showDeletionGuideFromLiveMode() {
+    setPanelContent('depth-display', buildDeletionGuideHtml());
+    playUISound('hint');
 }
 
 function showHintMessage(message) {
@@ -792,12 +848,18 @@ function startTrainer(categoryId) {
         reviewTotalCount: 0,
         reviewCorrectCount: 0,
         reviewSkippedCount: 0,
-        didRecordSession: false
+        didRecordSession: false,
+        deletionCoachMode: isDeletionCategorySelected(categoryId),
+        currentOptionSet: []
     };
     
     // Show trainer UI, hide start section
     document.getElementById('trainer-start').classList.add('hidden');
     document.getElementById('trainer-mode').classList.remove('hidden');
+    syncDeletionGuideEntry(categoryId);
+    if (trainerState.deletionCoachMode) {
+        showDeletionGuideFromLiveMode();
+    }
 
     playUISound('start');
     
@@ -871,7 +933,14 @@ function loadNextQuestion() {
     if (xpBadgeEl) xpBadgeEl.textContent = trainerState.reviewMode ? '+6 XP (Review)' : '+10 XP';
     
     // Display question
-    document.getElementById('question-text').textContent = question.statement;
+    const questionTextEl = document.getElementById('question-text');
+    if (questionTextEl) {
+        if (trainerState.deletionCoachMode) {
+            questionTextEl.textContent = `מטרת השאלה: לזהות את המידע החסר הכי משמעותי במשפט.\n\n${question.statement}`;
+        } else {
+            questionTextEl.textContent = question.statement;
+        }
+    }
     
     // Hide feedback
     document.getElementById('feedback-section').classList.remove('visible');
@@ -885,12 +954,40 @@ function loadNextQuestion() {
 
 // --- Trainer flow: improved progression, hints, depth and explanations ---
 function generateMCQOptions(question) {
-    const violations = ['DELETION', 'DISTORTION', 'GENERALIZATION'];
-    const shuffled = shuffleArray(violations);
     const mcqContainer = document.getElementById('mcq-options');
     if (!mcqContainer) return;
     mcqContainer.innerHTML = '';
 
+    if (trainerState.deletionCoachMode) {
+        const optionSet = buildDeletionCoachOptionSet(question);
+        trainerState.currentOptionSet = shuffleArray(optionSet.options);
+
+        trainerState.currentOptionSet.forEach((option, index) => {
+            const optionId = `option-${index}`;
+            const optionHTML = `
+                <div class="mcq-option">
+                    <input type="radio" id="${optionId}" class="option-input" name="mcq" value="${escapeHtml(option.id)}">
+                    <label for="${optionId}" class="option-label option-label-rich">
+                        <span class="option-radio"></span>
+                        <span class="option-text">
+                            <span class="option-main">${escapeHtml(option.questionText)}</span>
+                            <small class="option-purpose"><strong>מטרה:</strong> ${escapeHtml(option.purpose)}</small>
+                        </span>
+                    </label>
+                </div>
+            `;
+
+            mcqContainer.innerHTML += optionHTML;
+            document.getElementById(optionId).addEventListener('change', (e) => {
+                handleMCQSelection(e, question, option.id);
+            });
+        });
+        return;
+    }
+
+    const violations = ['DELETION', 'DISTORTION', 'GENERALIZATION'];
+    const shuffled = shuffleArray(violations);
+    trainerState.currentOptionSet = [];
     shuffled.forEach((option, index) => {
         const optionId = `option-${index}`;
         const label = TRAINER_CATEGORY_LABELS[option] || option;
@@ -912,9 +1009,170 @@ function generateMCQOptions(question) {
     });
 }
 
+function buildDeletionCoachOptionSet(question) {
+    const subtype = String(question?.subcategory || '').toLowerCase();
+    const statement = String(question?.statement || '');
+
+    let highQuestion = question?.suggested_question || 'מה בדיוק חסר כאן כדי להבין את המשפט?';
+    let mediumQuestion = 'איזה פרט חסר כאן שיכול לעזור להבין טוב יותר?';
+    let lowQuestion = 'יש עוד משהו להוסיף?';
+
+    if (subtype.includes('comparative')) {
+        highQuestion = 'לעומת מי/מה, ובאיזה מדד מדויק ההשוואה נעשית?';
+        mediumQuestion = 'באיזה הקשר ההשוואה הזו נכונה?';
+        lowQuestion = 'אפשר לתת עוד דוגמה להשוואה?';
+    } else if (subtype.includes('referential')) {
+        highQuestion = 'מי בדיוק אמר/קבע/חושב את זה, ואיזה מקור יש לכך?';
+        mediumQuestion = 'על אילו אנשים או גורמים מדובר כאן?';
+        lowQuestion = 'יש עוד מישהו שקשור לזה?';
+    } else if (subtype.includes('simple')) {
+        highQuestion = 'מה בדיוק לא טוב, לפי מי, ובאיזה קריטריון זה נמדד?';
+        mediumQuestion = 'מתי זה קורה ובאיזה מצב זה בולט יותר?';
+        lowQuestion = 'אפשר לפרט קצת יותר?';
+    }
+
+    if (statement.includes('יותר') || statement.includes('פחות')) {
+        highQuestion = 'יותר/פחות ביחס למה בדיוק, ובאיזו יחידת מדידה?';
+    }
+    if (statement.includes('כולם') || statement.includes('ידוע')) {
+        mediumQuestion = 'מי בדיוק \"כולם\", ומי מחוץ לקבוצה הזו?';
+    }
+
+    const options = [
+        {
+            id: 'D1',
+            focus: 'DELETION',
+            quality: 'high',
+            purpose: 'לחשוף את המידע החסר הקריטי שמאפשר להתקדם בפועל',
+            questionText: highQuestion,
+            why: 'מכוונת למידע שחסר באמת להקשר ולביצוע.'
+        },
+        {
+            id: 'D2',
+            focus: 'DELETION',
+            quality: 'medium',
+            purpose: 'לחשוף מחיקה אמיתית אבל פחות מרכזית',
+            questionText: mediumQuestion,
+            why: 'שאלה טובה, אך לא תמיד הפער הכי משמעותי במשפט.'
+        },
+        {
+            id: 'D3',
+            focus: 'DELETION',
+            quality: 'low',
+            purpose: 'לחשוף מחיקה כללית אך תרומה נמוכה לפתרון',
+            questionText: lowQuestion,
+            why: 'שאלה כללית מדי, לא ממקדת את המידע החסר הקריטי.'
+        },
+        {
+            id: 'N1',
+            focus: 'DISTORTION',
+            quality: 'offtrack',
+            purpose: 'בדיקת פרשנות/סיבתיות (לא מחיקה)',
+            questionText: 'איך אתה יודע שזה נכון ומה ההוכחה לכך?',
+            why: 'זו שאלה על עיוות ולא על מידע חסר.'
+        },
+        {
+            id: 'N2',
+            focus: 'GENERALIZATION',
+            quality: 'offtrack',
+            purpose: 'בדיקת הכללה גורפת (לא מחיקה)',
+            questionText: 'זה תמיד קורה, או שיש מקרים שזה אחרת?',
+            why: 'זו שאלה על הכללה, לא על השמטת פרטים.'
+        },
+        {
+            id: 'N3',
+            focus: 'NON_DELETION',
+            quality: 'offtrack',
+            purpose: 'קפיצה לפתרון בלי למפות מידע חסר',
+            questionText: 'מה כדאי לעשות עכשיו כדי לפתור את זה מהר?',
+            why: 'שאלת פתרון מוקדם בלי לחשוף קודם את המידע החסר.'
+        }
+    ];
+
+    return { options, bestId: 'D1' };
+}
+
+function evaluateDeletionCoachChoice(choice, question) {
+    const baseXp = trainerState.reviewMode ? 6 : 10;
+    const ranked = (trainerState.currentOptionSet || [])
+        .filter(item => item.focus === 'DELETION')
+        .sort((a, b) => {
+            const rank = { high: 0, medium: 1, low: 2 };
+            return (rank[a.quality] ?? 9) - (rank[b.quality] ?? 9);
+        });
+
+    if (!choice || choice.focus !== 'DELETION') {
+        return {
+            state: 'offtrack',
+            xpGain: 0,
+            countsAsCorrect: false,
+            title: 'לא מדויק',
+            message: 'נבחרה שאלה שלא מחפשת השמטה. כאן המטרה היא מחיקה בלבד.',
+            ranked
+        };
+    }
+
+    if (choice.quality === 'high') {
+        return {
+            state: 'best',
+            xpGain: baseXp,
+            countsAsCorrect: true,
+            title: 'מצוין - זו המחיקה הכי משמעותית',
+            message: 'בחרת את השאלה שמחזירה את המידע החסר הקריטי ביותר להקשר.',
+            ranked
+        };
+    }
+
+    if (choice.quality === 'medium') {
+        return {
+            state: 'partial',
+            xpGain: Math.max(2, Math.floor(baseXp * 0.5)),
+            countsAsCorrect: false,
+            title: 'כיוון נכון חלקית',
+            message: 'זו שאלה שמאתרת מחיקה, אבל לא את ההשמטה הכי משמעותית במשפט.',
+            ranked
+        };
+    }
+
+    return {
+        state: 'weak',
+        xpGain: 1,
+        countsAsCorrect: false,
+        title: 'זו מחיקה, אבל לא מועילה מספיק',
+        message: 'השאלה כללית מדי ולכן לא מקדמת הבנה או פעולה בצורה טובה.',
+        ranked
+    };
+}
+
 function handleMCQSelection(event, question, selectedOption) {
     if (trainerState.answered) return;
     trainerState.answered = true;
+
+    if (trainerState.deletionCoachMode) {
+        const selectedChoice = (trainerState.currentOptionSet || []).find(option => option.id === selectedOption);
+        const evaluation = evaluateDeletionCoachChoice(selectedChoice, question);
+
+        if (evaluation.countsAsCorrect) {
+            trainerState.phaseCorrectCount++;
+        } else {
+            addQuestionToReviewPool(question);
+        }
+
+        if (evaluation.xpGain > 0) {
+            trainerState.sessionXP += evaluation.xpGain;
+            addXP(evaluation.xpGain);
+        }
+
+        if (evaluation.state === 'best' || evaluation.state === 'partial') {
+            playUISound('correct');
+        } else {
+            playUISound('wrong');
+        }
+
+        showDeletionCoachFeedback(question, selectedChoice, evaluation);
+        updateTrainerStats();
+        return;
+    }
 
     const correctCategory = getQuestionCategoryKey(question);
     const isCorrect = selectedOption === correctCategory;
@@ -932,6 +1190,50 @@ function handleMCQSelection(event, question, selectedOption) {
 
     showFeedback(isCorrect, question, selectedOption, xpGain);
     updateTrainerStats();
+}
+
+function showDeletionCoachFeedback(question, selectedChoice, evaluation) {
+    const feedbackSection = document.getElementById('feedback-section');
+    const feedbackContent = document.getElementById('feedback-content');
+    if (!feedbackSection || !feedbackContent) return;
+
+    const rankedHtml = (evaluation.ranked || []).map((item, index) => `
+        <li>
+            <strong>${index + 1}.</strong> ${escapeHtml(item.questionText)}<br>
+            <small><strong>למה:</strong> ${escapeHtml(item.why || '')}</small>
+        </li>
+    `).join('');
+
+    const selectedText = selectedChoice?.questionText || 'לא זוהתה בחירה';
+    const boxClass = evaluation.state === 'best' ? 'correct' : 'incorrect';
+
+    feedbackContent.innerHTML = `
+        <div class="${boxClass}">
+            <strong>${escapeHtml(evaluation.title || '')}</strong>
+            <p class="explanation">
+                <strong>מטרת השאלה כאן:</strong> לאתר את המידע החסר המשמעותי ביותר בהשמטה.<br>
+                <strong>הבחירה שלך:</strong> ${escapeHtml(selectedText)}<br>
+                <strong>משוב:</strong> ${escapeHtml(evaluation.message || '')}
+            </p>
+            <p class="explanation"><strong>דירוג 3 שאלות המחיקה בשאלה הזו:</strong></p>
+            <ol class="deletion-rank-list">${rankedHtml}</ol>
+            <p style="margin-top: 12px; color: #2f855a; font-weight: bold;">+${evaluation.xpGain} XP</p>
+        </div>
+    `;
+
+    feedbackSection.classList.remove('hidden');
+    feedbackSection.classList.add('visible');
+
+    const nextBtn = document.getElementById('next-question-btn');
+    if (nextBtn) {
+        nextBtn.onclick = () => {
+            playUISound('next');
+            trainerState.currentQuestion++;
+            loadNextQuestion();
+        };
+    }
+
+    updateTrainerProgressNote();
 }
 
 function showFeedback(isCorrect, question, selectedViolation, xpGain = 10) {
@@ -1005,6 +1307,21 @@ function showTrainerHint() {
     const categoryKey = getQuestionCategoryKey(question);
     const statementText = question.statement || '';
 
+    if (trainerState.deletionCoachMode) {
+        trainerState.hintLevel = Math.min(trainerState.hintLevel + 1, 3);
+        let hintHtml = '';
+        if (trainerState.hintLevel === 1) {
+            hintHtml = '<p><strong>רמז 1/3:</strong> חפש/י מה חסר כדי להבין את המשפט ברמת ביצוע, לא רק ברמת ניסוח.</p>';
+        } else if (trainerState.hintLevel === 2) {
+            hintHtml = '<p><strong>רמז 2/3:</strong> בין 3 שאלות המחיקה, בחר/י את זו שמחזירה קריטריון/גורם/מדד שמאפשרים פעולה.</p>';
+        } else {
+            hintHtml = `<p><strong>רמז 3/3:</strong> שאלת מחיקה חזקה בדרך כלל כוללת: <em>מי בדיוק / מה בדיוק / לפי איזה קריטריון</em>.</p><p>דוגמה: "${escapeHtml(question.suggested_question || '')}"</p>`;
+        }
+        setPanelContent('hint-display', hintHtml);
+        playUISound('hint');
+        return;
+    }
+
     trainerState.hintLevel = Math.min(trainerState.hintLevel + 1, 3);
 
     const categoryHint = {
@@ -1037,6 +1354,22 @@ function showTrainerImportance() {
     const question = trainerState.questions[trainerState.currentQuestion];
     const categoryKey = getQuestionCategoryKey(question);
 
+    if (trainerState.deletionCoachMode) {
+        setPanelContent('why-display', `
+            <p><strong>מטרת השאלה כאן:</strong></p>
+            <p>לא רק לזהות שיש מחיקה, אלא לבחור את שאלת המחיקה שחושפת את המידע החסר הכי משמעותי להבנה ולפעולה.</p>
+            <p><strong>איך מודדים איכות?</strong></p>
+            <ul>
+                <li>גבוה: מחזיר פרט קריטי שחסר להחלטה/ביצוע.</li>
+                <li>בינוני: שאלה נכונה על מחיקה, אבל פחות ממוקדת במה שיקדם תוצאה.</li>
+                <li>נמוך: שאלה כללית מדי, כמעט בלי תרומה פרקטית.</li>
+            </ul>
+            <p><strong>בדיקה עצמית קצרה:</strong> האם השאלה שבחרת מוסיפה מידע שאפשר לעבוד איתו מיד?</p>
+        `);
+        playUISound('hint');
+        return;
+    }
+
     const importanceText = {
         DELETION: 'כשמידע נמחק, המסקנה נבנית על חוסר נתונים. השאלה מחזירה פרטים הכרחיים.',
         DISTORTION: 'כשיש עיוות, פירוש הופך לעובדה. השאלה מפרידה בין פרשנות למציאות.',
@@ -1054,6 +1387,23 @@ function showTrainerImportance() {
 function showTrainerDepth() {
     if (trainerState.currentQuestion >= trainerState.questions.length) return;
     const question = trainerState.questions[trainerState.currentQuestion];
+
+    if (trainerState.deletionCoachMode) {
+        setPanelContent('depth-display', `
+            <p><strong>מסגרת פתרון למחיקה (6 אפשרויות):</strong></p>
+            <ul>
+                <li>שלב 1: זהה מה חסר במשפט כדי להבין את ההקשר בפועל.</li>
+                <li>שלב 2: סנן 3 אפשרויות שאינן מחיקה.</li>
+                <li>שלב 3: בין 3 שאלות המחיקה, דרג לפי תרומה: גבוהה, בינונית, נמוכה.</li>
+                <li>שלב 4: בחר את השאלה שמחזירה מידע מדיד/בר-בדיקה/מכוון פעולה.</li>
+            </ul>
+            <p><strong>מטרת השאלה:</strong> חשיפת המידע החסר המשמעותי ביותר, לא רק \"עוד פירוט\".</p>
+            <p><strong>דוגמת מחיקה חזקה:</strong> "${escapeHtml(question.suggested_question || '')}"</p>
+        `);
+        playUISound('hint');
+        return;
+    }
+
     const depthTrack = {
         easy: ['שלב 1: זהה מילה בעייתית.', 'שלב 2: שאל מה חסר.', 'שלב 3: נסח שאלה אחת מדויקת.'],
         medium: ['שלב 1: זהה הנחה סמויה.', 'שלב 2: בדוק ראיות.', 'שלב 3: נסח חלופה מדויקת.'],
@@ -1170,8 +1520,12 @@ function resetTrainer() {
         reviewTotalCount: 0,
         reviewCorrectCount: 0,
         reviewSkippedCount: 0,
-        didRecordSession: false
+        didRecordSession: false,
+        deletionCoachMode: false,
+        currentOptionSet: []
     };
+    const categorySelect = document.getElementById('category-select');
+    syncDeletionGuideEntry(categorySelect?.value || '');
 }
 
 // Override session ending flow with Review Loop support.
