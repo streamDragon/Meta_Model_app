@@ -6,6 +6,7 @@ const MAX_STREAK_CHARGES = 3;
 const DEFAULT_DAILY_GOAL = 3;
 const DEFAULT_USER_PROGRESS = {
     xp: 0,
+    stars: 0,
     streak: 0,
     badges: [],
     sessions: 0,
@@ -26,6 +27,7 @@ let trainerState = {
     phaseCorrectCount: 0,
     phaseSkippedCount: 0,
     sessionXP: 0,
+    sessionStars: 0,
     answered: false,
     hintLevel: 0,
     reviewMode: false,
@@ -104,6 +106,14 @@ const TRAINER_CATEGORY_LABELS = {
     DISTORTION: 'עיוות (Distortion)',
     GENERALIZATION: 'הכללה (Generalization)'
 };
+
+const TRAINER_STAR_REWARDS = Object.freeze({
+    success: 3,
+    partial: 2,
+    fail: 1
+});
+
+let trainerRewardEffectTimer = null;
 
 const SUBCATEGORY_TO_CATEGORY = {
     SIMPLE_DELETION: 'DELETION',
@@ -228,6 +238,13 @@ function playUISound(kind) {
         playTone(523.25, 0.11, 'triangle', 0.05, 0);
         playTone(659.25, 0.11, 'triangle', 0.05, 0.08);
         playTone(783.99, 0.15, 'triangle', 0.05, 0.16);
+    } else if (kind === 'stars_big') {
+        playTone(659.25, 0.08, 'triangle', 0.06, 0);
+        playTone(880, 0.1, 'triangle', 0.06, 0.07);
+        playTone(1174.66, 0.12, 'triangle', 0.06, 0.15);
+    } else if (kind === 'stars_soft') {
+        playTone(520, 0.07, 'sine', 0.045, 0);
+        playTone(620, 0.08, 'sine', 0.045, 0.06);
     } else if (kind === 'prism_open') {
         playTone(440, 0.1, 'sine', 0.05, 0);
         playTone(554, 0.1, 'sine', 0.05, 0.09);
@@ -837,6 +854,7 @@ function startTrainer(categoryId) {
         phaseCorrectCount: 0,
         phaseSkippedCount: 0,
         sessionXP: 0,
+        sessionStars: 0,
         answered: false,
         hintLevel: 0,
         reviewMode: false,
@@ -1144,6 +1162,51 @@ function evaluateDeletionCoachChoice(choice, question) {
     };
 }
 
+function showTrainerRewardEffect(starGain, result = 'fail') {
+    const fx = document.getElementById('trainer-reward-fx');
+    const display = document.getElementById('question-display');
+    if (!fx || !display || starGain <= 0) return;
+
+    const mainText = `+${starGain} ⭐`;
+    const subtitle = result === 'success'
+        ? 'בונוס הצלחה!'
+        : result === 'partial'
+            ? 'כיוון טוב, ממשיכים'
+            : 'לומדים גם מזה';
+
+    fx.classList.remove('hidden', 'show', 'success', 'partial', 'fail');
+    display.classList.remove('reward-success', 'reward-partial', 'reward-fail');
+    void fx.offsetWidth;
+
+    fx.innerHTML = `
+        <span class="reward-main">${escapeHtml(mainText)}</span>
+        <small class="reward-sub">${escapeHtml(subtitle)}</small>
+    `;
+    fx.classList.add('show', result);
+    display.classList.add(`reward-${result}`);
+
+    if (trainerRewardEffectTimer) clearTimeout(trainerRewardEffectTimer);
+    trainerRewardEffectTimer = setTimeout(() => {
+        fx.classList.add('hidden');
+        fx.classList.remove('show', 'success', 'partial', 'fail');
+        display.classList.remove('reward-success', 'reward-partial', 'reward-fail');
+    }, 900);
+}
+
+function awardTrainerStars(amount, result = 'fail') {
+    const starGain = Math.max(0, Math.floor(Number(amount) || 0));
+    if (!starGain) return 0;
+
+    trainerState.sessionStars += starGain;
+    addStars(starGain);
+    showTrainerRewardEffect(starGain, result);
+
+    if (result === 'success') playUISound('stars_big');
+    else playUISound('stars_soft');
+
+    return starGain;
+}
+
 function handleMCQSelection(event, question, selectedOption) {
     if (trainerState.answered) return;
     trainerState.answered = true;
@@ -1151,6 +1214,12 @@ function handleMCQSelection(event, question, selectedOption) {
     if (trainerState.deletionCoachMode) {
         const selectedChoice = (trainerState.currentOptionSet || []).find(option => option.id === selectedOption);
         const evaluation = evaluateDeletionCoachChoice(selectedChoice, question);
+        const starResult = evaluation.state === 'best' ? 'success' : evaluation.state === 'partial' ? 'partial' : 'fail';
+        const starGain = starResult === 'success'
+            ? TRAINER_STAR_REWARDS.success
+            : starResult === 'partial'
+                ? TRAINER_STAR_REWARDS.partial
+                : TRAINER_STAR_REWARDS.fail;
 
         if (evaluation.countsAsCorrect) {
             trainerState.phaseCorrectCount++;
@@ -1168,8 +1237,9 @@ function handleMCQSelection(event, question, selectedOption) {
         } else {
             playUISound('wrong');
         }
+        awardTrainerStars(starGain, starResult);
 
-        showDeletionCoachFeedback(question, selectedChoice, evaluation);
+        showDeletionCoachFeedback(question, selectedChoice, evaluation, starGain);
         updateTrainerStats();
         return;
     }
@@ -1177,6 +1247,7 @@ function handleMCQSelection(event, question, selectedOption) {
     const correctCategory = getQuestionCategoryKey(question);
     const isCorrect = selectedOption === correctCategory;
     const xpGain = trainerState.reviewMode ? 6 : 10;
+    const starGain = isCorrect ? TRAINER_STAR_REWARDS.success : TRAINER_STAR_REWARDS.fail;
 
     if (isCorrect) {
         trainerState.phaseCorrectCount++;
@@ -1187,8 +1258,9 @@ function handleMCQSelection(event, question, selectedOption) {
         addQuestionToReviewPool(question);
         playUISound('wrong');
     }
+    awardTrainerStars(starGain, isCorrect ? 'success' : 'fail');
 
-    showFeedback(isCorrect, question, selectedOption, xpGain);
+    showFeedback(isCorrect, question, selectedOption, xpGain, starGain);
     updateTrainerStats();
 }
 
@@ -1509,6 +1581,7 @@ function resetTrainer() {
         phaseCorrectCount: 0,
         phaseSkippedCount: 0,
         sessionXP: 0,
+        sessionStars: 0,
         answered: false,
         hintLevel: 0,
         reviewMode: false,

@@ -115,6 +115,12 @@
                             <small>כל משימה = נקודות</small>
                         </div>
                         <div class="progress-card">
+                            <span class="progress-icon">🌟</span>
+                            <p class="progress-label">Stars</p>
+                            <p class="progress-value" id="stars-count">0</p>
+                            <small>בונוס מכל תשובה</small>
+                        </div>
+                        <div class="progress-card">
                             <span class="progress-icon">🏆</span>
                             <p class="progress-label">Badges</p>
                             <p class="progress-value" id="badge-count">0</p>
@@ -502,6 +508,7 @@
                             </div>
                             <p class="question-text" id="question-text"></p>
                             <p id="progress-note" class="progress-note"></p>
+                            <div id="trainer-reward-fx" class="trainer-reward-fx hidden" aria-live="polite"></div>
                         </div>
 
                         <!-- MCQ OPTIONS (Expandable) -->
@@ -546,6 +553,7 @@
                         <p>✅ תשובות נכונות: <span id="correct-count">0</span></p>
                         <p>📊 קצב הצלחה: <span id="success-rate">0%</span></p>
                         <p>⭐ הרוויח XP: <span id="session-xp">0</span></p>
+                        <p>🌟 כוכבים בסשן: <span id="session-stars">0</span></p>
                     </div>
                 </div>
             </div>
