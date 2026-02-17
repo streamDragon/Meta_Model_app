@@ -2478,6 +2478,20 @@ async function setupComicEngine2() {
         return `<img src="${safeSrc}" alt="${safeAlt}" loading="lazy">`;
     };
 
+    const buildCharacterCard = (character = {}) => `
+        <div class="comic-character-card">
+            ${imgTag(character.sprite, character.name)}
+            <div class="comic-character-name">${escapeHtml(character.name || '')}</div>
+        </div>
+    `;
+
+    const buildSpeechCard = (character = {}, text = '') => `
+        <div class="comic-speech-card" role="status" aria-live="polite">
+            <div class="comic-speech-speaker">${escapeHtml(character.name || '')}</div>
+            <div class="comic-speech-text">${escapeHtml(text || '')}</div>
+        </div>
+    `;
+
     const renderScenario = (scenario) => {
         if (!scenario) return;
 
@@ -2494,21 +2508,11 @@ async function setupComicEngine2() {
         const right = scenario?.characters?.right || {};
 
         if (els.charLeft) {
-            els.charLeft.innerHTML = `
-                <div style="text-align:center">
-                    ${imgTag(left.sprite, left.name)}
-                    <div style="color:#6B7280;font-weight:900;margin-top:6px">${escapeHtml(left.name || '')}</div>
-                </div>
-            `;
+            els.charLeft.innerHTML = buildCharacterCard(left);
         }
 
         if (els.charRight) {
-            els.charRight.innerHTML = `
-                <div style="text-align:center">
-                    ${imgTag(right.sprite, right.name)}
-                    <div style="color:#6B7280;font-weight:900;margin-top:6px">${escapeHtml(right.name || '')}</div>
-                </div>
-            `;
+            els.charRight.innerHTML = buildCharacterCard(right);
         }
 
         const dialogLines = (scenario.dialog || []).map(line => {
@@ -2553,7 +2557,7 @@ async function setupComicEngine2() {
             const selected = choices.find(item => item.id === choiceId);
             if (!selected) return;
 
-            applyChoice(scenario, selected, right);
+            applyChoiceV2(scenario, selected, right);
         };
     };
 
@@ -2620,6 +2624,77 @@ async function setupComicEngine2() {
             const pick = altChars[Math.floor(Math.random() * altChars.length)];
             rightImg.setAttribute('src', pick);
             rightImg.setAttribute('alt', rightCharacter?.name || '');
+        }
+    };
+
+    const applyChoiceV2 = (scenario, choice, rightCharacter) => {
+        if (els.feedback) els.feedback.hidden = false;
+
+        els.choices.querySelectorAll('button.choice-btn').forEach(button => {
+            button.disabled = true;
+            button.classList.add('is-locked');
+        });
+
+        const badge = choice.badge ? imgTag(choice.badge, 'badge') : '';
+        const sfx = choice.sfx ? imgTag(choice.sfx, 'sfx') : '';
+        if (els.feedbackLeft) {
+            els.feedbackLeft.innerHTML = `
+                <div style="display:grid;gap:10px">
+                    ${badge}
+                    ${sfx}
+                </div>
+            `;
+        }
+
+        const outcome = choice.outcome || getComicOutcome(choice.id);
+        const followupTitle = choice.id === 'meta'
+            ? 'דיאלוג המשך: זה מתחיל לעבוד'
+            : 'דיאלוג המשך: מתברר שזה לא עובד';
+        const noteFieldId = `comic-note-${String(scenario?.id || 'scene').replace(/[^a-z0-9_-]/gi, '').toLowerCase() || 'scene'}`;
+
+        if (els.charRight) {
+            els.charRight.innerHTML = buildSpeechCard(rightCharacter, choice.say || '');
+        }
+
+        if (els.dialog) {
+            els.dialog.innerHTML = `
+                <div class="comic-line comic-line-user-turn">
+                    <div class="who">מה שנאמר בפועל</div>
+                    <div class="comic-line-text">${escapeHtml(choice.say || '')}</div>
+                </div>
+                <div class="comic-line comic-line-followup ${choice.id === 'meta' ? 'success' : 'fail'}">
+                    <div class="who">${followupTitle}</div>
+                    <div class="comic-line-text">${escapeHtml(outcome)}</div>
+                </div>
+            `;
+        }
+
+        let rightHtml = `
+            <div class="comic-feedback-summary" style="font-size:18px;line-height:1.35">
+                <div style="color:#6B7280;font-weight:900;margin-bottom:6px">התגובה שלך</div>
+                <div style="font-weight:900">${escapeHtml(choice.say || '')}</div>
+                <div style="margin-top:10px; color:#1f2937;">${escapeHtml(outcome)}</div>
+            </div>
+            <div class="comic-explain-box">
+                <label for="${noteFieldId}">למה זה עבד או לא עבד? כתבו הסבר קצר:</label>
+                <textarea id="${noteFieldId}" rows="3" placeholder="לדוגמה: מה היה חסר, מה תקע את הצד השני, ומה אפשר לשאול במקום..."></textarea>
+            </div>
+        `;
+
+        if (choice.blueprint) {
+            rightHtml += buildComicBlueprintHtml(choice.blueprint);
+        }
+
+        if (els.feedbackRight) els.feedbackRight.innerHTML = rightHtml;
+
+        if (els.btnNext) {
+            els.btnNext.disabled = false;
+            els.btnNext.onclick = () => {
+                idx = (idx + 1) % scenarios.length;
+                rememberComicProgress();
+                renderScenario(scenarios[idx]);
+                els.root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
         }
     };
 
