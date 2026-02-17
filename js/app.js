@@ -108,9 +108,9 @@ const TRAINER_CATEGORY_LABELS = {
 };
 
 const TRAINER_STAR_REWARDS = Object.freeze({
-    success: 3,
-    partial: 2,
-    fail: 1
+    easy: Object.freeze({ success: 2, partial: 1, fail: 1 }),
+    medium: Object.freeze({ success: 3, partial: 2, fail: 1 }),
+    hard: Object.freeze({ success: 4, partial: 2, fail: 1 })
 });
 
 let trainerRewardEffectTimer = null;
@@ -1207,6 +1207,19 @@ function awardTrainerStars(amount, result = 'fail') {
     return starGain;
 }
 
+function getTrainerStarReward(question, result = 'fail') {
+    const safeResult = ['success', 'partial', 'fail'].includes(result) ? result : 'fail';
+    const difficultyKey = String(question?.difficulty || 'easy').toLowerCase();
+    const rewardSet = TRAINER_STAR_REWARDS[difficultyKey] || TRAINER_STAR_REWARDS.easy;
+    const baseReward = rewardSet[safeResult] || TRAINER_STAR_REWARDS.easy.fail;
+
+    // Review loop is for reinforcement, so rewards stay meaningful but lower.
+    if (trainerState.reviewMode) {
+        return Math.max(1, baseReward - 1);
+    }
+    return baseReward;
+}
+
 function handleMCQSelection(event, question, selectedOption) {
     if (trainerState.answered) return;
     trainerState.answered = true;
@@ -1215,11 +1228,7 @@ function handleMCQSelection(event, question, selectedOption) {
         const selectedChoice = (trainerState.currentOptionSet || []).find(option => option.id === selectedOption);
         const evaluation = evaluateDeletionCoachChoice(selectedChoice, question);
         const starResult = evaluation.state === 'best' ? 'success' : evaluation.state === 'partial' ? 'partial' : 'fail';
-        const starGain = starResult === 'success'
-            ? TRAINER_STAR_REWARDS.success
-            : starResult === 'partial'
-                ? TRAINER_STAR_REWARDS.partial
-                : TRAINER_STAR_REWARDS.fail;
+        const starGain = getTrainerStarReward(question, starResult);
 
         if (evaluation.countsAsCorrect) {
             trainerState.phaseCorrectCount++;
@@ -1247,7 +1256,7 @@ function handleMCQSelection(event, question, selectedOption) {
     const correctCategory = getQuestionCategoryKey(question);
     const isCorrect = selectedOption === correctCategory;
     const xpGain = trainerState.reviewMode ? 6 : 10;
-    const starGain = isCorrect ? TRAINER_STAR_REWARDS.success : TRAINER_STAR_REWARDS.fail;
+    const starGain = getTrainerStarReward(question, isCorrect ? 'success' : 'fail');
 
     if (isCorrect) {
         trainerState.phaseCorrectCount++;
