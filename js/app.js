@@ -1264,7 +1264,7 @@ function handleMCQSelection(event, question, selectedOption) {
     updateTrainerStats();
 }
 
-function showDeletionCoachFeedback(question, selectedChoice, evaluation) {
+function showDeletionCoachFeedback(question, selectedChoice, evaluation, starGain = 0) {
     const feedbackSection = document.getElementById('feedback-section');
     const feedbackContent = document.getElementById('feedback-content');
     if (!feedbackSection || !feedbackContent) return;
@@ -1290,6 +1290,7 @@ function showDeletionCoachFeedback(question, selectedChoice, evaluation) {
             <p class="explanation"><strong>דירוג 3 שאלות המחיקה בשאלה הזו:</strong></p>
             <ol class="deletion-rank-list">${rankedHtml}</ol>
             <p style="margin-top: 12px; color: #2f855a; font-weight: bold;">+${evaluation.xpGain} XP</p>
+            <p style="margin-top: 6px; color: #805ad5; font-weight: bold;">+${starGain} ⭐</p>
         </div>
     `;
 
@@ -1308,7 +1309,7 @@ function showDeletionCoachFeedback(question, selectedChoice, evaluation) {
     updateTrainerProgressNote();
 }
 
-function showFeedback(isCorrect, question, selectedViolation, xpGain = 10) {
+function showFeedback(isCorrect, question, selectedViolation, xpGain = 10, starGain = 0) {
     const feedbackSection = document.getElementById('feedback-section');
     const feedbackContent = document.getElementById('feedback-content');
     if (!feedbackSection || !feedbackContent) return;
@@ -1330,6 +1331,7 @@ function showFeedback(isCorrect, question, selectedViolation, xpGain = 10) {
                     <strong>הסבר:</strong> ${question.explanation}
                 </p>
                 <p style="margin-top: 15px; color: #28a745; font-weight: bold;">+${xpGain} XP</p>
+                <p style="margin-top: 6px; color: #805ad5; font-weight: bold;">+${starGain} ⭐</p>
             </div>
         `;
     } else {
@@ -1343,6 +1345,7 @@ function showFeedback(isCorrect, question, selectedViolation, xpGain = 10) {
                     <strong>שאלת עומק מוצעת:</strong> "${question.suggested_question}"<br>
                     <strong>הסבר:</strong> ${question.explanation}
                 </p>
+                <p style="margin-top: 12px; color: #744210; font-weight: bold;">+${starGain} ⭐ על הלמידה</p>
             </div>
         `;
     }
@@ -1371,6 +1374,8 @@ function updateTrainerStats() {
     document.getElementById('correct-count').textContent = trainerState.phaseCorrectCount;
     document.getElementById('success-rate').textContent = `${successRate}%`;
     document.getElementById('session-xp').textContent = trainerState.sessionXP;
+    const starsEl = document.getElementById('session-stars');
+    if (starsEl) starsEl.textContent = trainerState.sessionStars;
 }
 
 function showTrainerHint() {
@@ -1558,6 +1563,16 @@ function resetTrainer() {
     if (questionDisplay) questionDisplay.style.display = 'block';
     if (optionsDisplay) optionsDisplay.style.display = 'flex';
     if (trainerHints) trainerHints.style.display = 'block';
+    if (questionDisplay) questionDisplay.classList.remove('reward-success', 'reward-partial', 'reward-fail');
+    const rewardFx = document.getElementById('trainer-reward-fx');
+    if (rewardFx) {
+        rewardFx.classList.add('hidden');
+        rewardFx.classList.remove('show', 'success', 'partial', 'fail');
+    }
+    if (trainerRewardEffectTimer) {
+        clearTimeout(trainerRewardEffectTimer);
+        trainerRewardEffectTimer = null;
+    }
 
     hideTrainerInfoPanels();
     const feedbackSection = document.getElementById('feedback-section');
@@ -1569,6 +1584,8 @@ function resetTrainer() {
     document.getElementById('correct-count').textContent = '0';
     document.getElementById('success-rate').textContent = '0%';
     document.getElementById('session-xp').textContent = '0';
+    const sessionStarsEl = document.getElementById('session-stars');
+    if (sessionStarsEl) sessionStarsEl.textContent = '0';
     document.getElementById('progress-fill').style.width = '0%';
     const noteEl = document.getElementById('progress-note');
     if (noteEl) noteEl.textContent = '';
@@ -4468,12 +4485,14 @@ function initializeProgressHub() {
 function legacyUpdateProgressHub() {
     const streakEl = document.getElementById('streak-count');
     const xpEl = document.getElementById('xp-count');
+    const starsEl = document.getElementById('stars-count');
     const badgeCountEl = document.getElementById('badge-count');
     const sessionEl = document.getElementById('session-count');
     const badgesDisplay = document.getElementById('badges-display');
     
     if (streakEl) streakEl.textContent = `${userProgress.streak} ימים`;
     if (xpEl) xpEl.textContent = userProgress.xp;
+    if (starsEl) starsEl.textContent = userProgress.stars;
     if (badgeCountEl) badgeCountEl.textContent = userProgress.badges.length;
     if (sessionEl) sessionEl.textContent = userProgress.sessions;
     
@@ -4537,6 +4556,7 @@ function normalizeUserProgress(raw) {
     const merged = { ...DEFAULT_USER_PROGRESS, ...(raw || {}) };
     merged.badges = Array.isArray(merged.badges) ? merged.badges : [];
     merged.xp = Math.max(0, Math.floor(Number(merged.xp) || 0));
+    merged.stars = Math.max(0, Math.floor(Number(merged.stars) || 0));
     merged.streak = Math.max(0, Math.floor(Number(merged.streak) || 0));
     merged.sessions = Math.max(0, Math.floor(Number(merged.sessions) || 0));
     merged.dailyGoal = clampNumber(merged.dailyGoal, 1, 10, DEFAULT_DAILY_GOAL);
@@ -4609,6 +4629,15 @@ function addXP(amount) {
     updateProgressHub();
 }
 
+function addStars(amount) {
+    const delta = Math.floor(Number(amount) || 0);
+    if (delta <= 0) return;
+    userProgress.stars += delta;
+    checkAndAwardBadges();
+    saveUserProgress();
+    updateProgressHub();
+}
+
 function updateStreak() {
     const today = toLocalDateKey();
     if (userProgress.lastSessionDate === today) return;
@@ -4655,6 +4684,7 @@ function updateProgressHub() {
     const streakEl = document.getElementById('streak-count');
     const streakDateEl = document.getElementById('streak-date');
     const xpEl = document.getElementById('xp-count');
+    const starsEl = document.getElementById('stars-count');
     const badgeCountEl = document.getElementById('badge-count');
     const sessionEl = document.getElementById('session-count');
     const dailyGoalCard = document.getElementById('daily-goal-card');
@@ -4669,6 +4699,7 @@ function updateProgressHub() {
 
     if (streakEl) streakEl.textContent = `${userProgress.streak} ימים`;
     if (xpEl) xpEl.textContent = userProgress.xp;
+    if (starsEl) starsEl.textContent = userProgress.stars;
     if (badgeCountEl) badgeCountEl.textContent = userProgress.badges.length;
     if (sessionEl) sessionEl.textContent = userProgress.sessions;
     if (streakDateEl) {

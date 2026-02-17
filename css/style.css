@@ -1484,11 +1484,71 @@ a:hover {
 }
 
 .question-display {
+    position: relative;
+    overflow: hidden;
     background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
     padding: 25px;
     border-radius: var(--border-radius);
     margin-bottom: 25px;
     border-right: 4px solid var(--primary-color);
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.question-display.reward-success {
+    box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.45), 0 8px 20px rgba(72, 187, 120, 0.18);
+}
+
+.question-display.reward-partial {
+    box-shadow: 0 0 0 3px rgba(236, 201, 75, 0.45), 0 8px 20px rgba(236, 201, 75, 0.18);
+}
+
+.question-display.reward-fail {
+    box-shadow: 0 0 0 3px rgba(128, 90, 213, 0.35), 0 8px 20px rgba(128, 90, 213, 0.14);
+}
+
+.trainer-reward-fx {
+    position: absolute;
+    top: 12px;
+    inset-inline-start: 12px;
+    z-index: 5;
+    min-width: 130px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    color: white;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(8px) scale(0.9);
+}
+
+.trainer-reward-fx.success {
+    background: linear-gradient(135deg, #48bb78 0%, #2f855a 100%);
+}
+
+.trainer-reward-fx.partial {
+    background: linear-gradient(135deg, #f6ad55 0%, #dd6b20 100%);
+}
+
+.trainer-reward-fx.fail {
+    background: linear-gradient(135deg, #7f9cf5 0%, #6b46c1 100%);
+}
+
+.trainer-reward-fx.show {
+    animation: rewardBurst 0.9s ease forwards;
+}
+
+.trainer-reward-fx .reward-main {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+}
+
+.trainer-reward-fx .reward-sub {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.74rem;
+    opacity: 0.95;
 }
 
 .question-header {
@@ -1696,6 +1756,21 @@ a:hover {
     }
 }
 
+@keyframes rewardBurst {
+    0% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.9);
+    }
+    35% {
+        opacity: 1;
+        transform: translateY(0) scale(1.08);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-12px) scale(1);
+    }
+}
+
 /* HINTS */
 .trainer-hints {
     position: relative;
@@ -1744,7 +1819,7 @@ a:hover {
     border-radius: var(--border-radius);
     margin-top: 20px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
     gap: 10px;
     text-align: center;
 }
