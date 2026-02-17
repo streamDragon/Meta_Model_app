@@ -1995,6 +1995,24 @@ a:hover {
     font-weight: 600;
 }
 
+.scenario-result-summary {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #bee3f8;
+    background: #ebf8ff;
+}
+
+.scenario-result-summary p {
+    margin: 0 0 8px 0;
+    color: #2c5282;
+    line-height: 1.55;
+}
+
+.scenario-result-summary p:last-child {
+    margin-bottom: 0;
+}
+
 .scenario-history-list {
     margin-top: 12px;
     display: grid;

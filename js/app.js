@@ -1919,6 +1919,7 @@ function buildScenarioHistoryEntry(note = '') {
     if (!scenario || !option) return null;
 
     const score = Number(option.score) === 1 ? 1 : 0;
+    const bp = scenario.greenBlueprint || {};
     return {
         timestamp: new Date().toISOString(),
         scenarioId: scenario.scenarioId,
@@ -1931,6 +1932,8 @@ function buildScenarioHistoryEntry(note = '') {
         feedback: option.feedback || '',
         score,
         stars: score ? 1 : 0,
+        goalGeneral: bp.goal || '',
+        successMetric: bp.doneDefinition || '',
         greenSentence: getScenarioGreenOptionText(scenario),
         note: note || ''
     };
@@ -1976,6 +1979,9 @@ function renderScenarioScore(entry) {
     const starsRow = document.getElementById('scenario-stars-row');
     const scoreLine = document.getElementById('scenario-score-line');
     const greenLine = document.getElementById('scenario-next-green-line');
+    const summaryBox = document.getElementById('scenario-result-summary');
+    const goalEl = document.getElementById('scenario-result-goal');
+    const metricEl = document.getElementById('scenario-result-metric');
     const nextBtn = document.getElementById('scenario-next-scene-btn');
 
     const playedCount = scenarioTrainer.session.index + 1;
@@ -1986,6 +1992,13 @@ function renderScenarioScore(entry) {
         scoreLine.textContent = `סיימת סצנה ${playedCount}/${scenarioTrainer.session.queue.length}. נקודות סשן: ${scenarioTrainer.session.score}`;
     }
     if (greenLine) greenLine.textContent = `בפעם הבאה: "${entry.greenSentence}"`;
+    if (summaryBox) {
+        const hasGoal = Boolean(entry.goalGeneral);
+        const hasMetric = Boolean(entry.successMetric);
+        summaryBox.classList.toggle('hidden', !hasGoal && !hasMetric);
+        if (goalEl) goalEl.textContent = entry.goalGeneral || 'לא הוגדר';
+        if (metricEl) metricEl.textContent = entry.successMetric || 'לא הוגדר';
+    }
 
     const isLast = scenarioTrainer.session.index >= scenarioTrainer.session.queue.length - 1;
     if (nextBtn) nextBtn.textContent = isLast ? 'סיום סשן וחזרה לבית' : 'המשך לסצנה הבאה';
