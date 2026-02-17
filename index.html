@@ -56,12 +56,27 @@
                             <h3 id="global-comic-main-title">Scene</h3>
                             <p id="global-comic-main-subtitle"></p>
                         </div>
-                        <a id="global-comic-main-link" class="global-comic-main-link" href="#" target="_blank" rel="noopener">Open SVG</a>
+                        <div class="global-comic-main-actions">
+                            <button id="global-comic-main-preview" class="global-comic-main-link" type="button">תצוגה</button>
+                            <button id="global-comic-main-practice" class="global-comic-main-link global-comic-main-link-primary" type="button">לתרגול</button>
+                        </div>
                     </div>
                 </article>
                 <div id="global-comic-thumbs" class="global-comic-thumbs" role="list"></div>
             </div>
         </section>
+
+        <div id="comicPreviewModal" class="comic-preview-modal hidden" role="dialog" aria-modal="true" aria-labelledby="comicPreviewTitle">
+            <div class="comic-preview-dialog">
+                <button id="comicPreviewClose" class="comic-preview-close" type="button" aria-label="סגירה">✕</button>
+                <h3 id="comicPreviewTitle">תצוגת קומיקס</h3>
+                <img id="comicPreviewImage" src="" alt="" loading="lazy">
+                <p id="comicPreviewSubtitle"></p>
+                <div class="comic-preview-actions">
+                    <button id="comicPreviewGoPractice" class="btn btn-primary" type="button">מעבר לתרגול בסצנה</button>
+                </div>
+            </div>
+        </div>
 
         <!-- HOME TAB -->
         <section id="home" class="tab-content active">

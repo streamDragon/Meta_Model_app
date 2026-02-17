@@ -368,6 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showLoadingIndicator();
     loadMetaModelData();
     setupTabNavigation();
+    setupGlobalComicStripActions();
     setupPracticeMode();
     setupQuestionDrill();
     setupTrainerMode();
@@ -426,6 +427,7 @@ function setupTabNavigation() {
             document.getElementById(tabName).classList.add('active');
             if (mobileTabSelect) mobileTabSelect.value = tabName;
             const scenarioContext = tabName === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
+            closeComicPreviewModal();
             renderGlobalComicStrip(tabName, scenarioContext);
             window.scrollTo({ top: 0, behavior: 'smooth' });
             playUISound('next');
@@ -2699,6 +2701,8 @@ const TAB_TO_COMIC_SCENE_KEYS = {
     prismlab: ['home_tech_cleanup', 'relationships_apology', 'bureaucracy_form'],
     about: ['work_presentation', 'relationships_apology', 'cooking_lasagna']
 };
+const GLOBAL_COMIC_STRIP_ENABLED_TABS = new Set(['scenario-trainer', 'comic-engine']);
+let selectedGlobalComicScene = null;
 
 function getActiveTabName() {
     return document.querySelector('.tab-btn.active')?.getAttribute('data-tab') || 'home';
@@ -2771,18 +2775,87 @@ function getComicScenesForTab(tabName, scenario = null) {
     }).slice(0, 4);
 }
 
+function closeComicPreviewModal() {
+    const modal = document.getElementById('comicPreviewModal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    document.body.style.removeProperty('overflow');
+}
+
+function openComicPreviewModal(scene) {
+    if (!scene) return;
+
+    const modal = document.getElementById('comicPreviewModal');
+    const image = document.getElementById('comicPreviewImage');
+    const title = document.getElementById('comicPreviewTitle');
+    const subtitle = document.getElementById('comicPreviewSubtitle');
+    if (!modal || !image || !title || !subtitle) return;
+
+    image.src = scene.path;
+    image.alt = scene.title || 'Comic Scene';
+    title.textContent = scene.title || 'תצוגת קומיקס';
+    subtitle.textContent = scene.subtitle || '';
+
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function setupGlobalComicStripActions() {
+    const previewBtn = document.getElementById('global-comic-main-preview');
+    const practiceBtn = document.getElementById('global-comic-main-practice');
+    const modal = document.getElementById('comicPreviewModal');
+    const closeBtn = document.getElementById('comicPreviewClose');
+    const goPracticeBtn = document.getElementById('comicPreviewGoPractice');
+    if (!previewBtn || !practiceBtn || !modal || !closeBtn || !goPracticeBtn) return;
+
+    previewBtn.addEventListener('click', () => {
+        if (!selectedGlobalComicScene) return;
+        openComicPreviewModal(selectedGlobalComicScene);
+    });
+
+    practiceBtn.addEventListener('click', () => {
+        navigateTo('comic-engine');
+    });
+
+    closeBtn.addEventListener('click', closeComicPreviewModal);
+    goPracticeBtn.addEventListener('click', () => {
+        closeComicPreviewModal();
+        navigateTo('comic-engine');
+    });
+
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) closeComicPreviewModal();
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+            closeComicPreviewModal();
+        }
+    });
+}
+
 function renderGlobalComicStrip(tabName = getActiveTabName(), scenario = null) {
     const strip = document.getElementById('global-comic-strip');
     const mainImg = document.getElementById('global-comic-main-img');
     const mainTitle = document.getElementById('global-comic-main-title');
     const mainSubtitle = document.getElementById('global-comic-main-subtitle');
-    const mainLink = document.getElementById('global-comic-main-link');
+    const previewBtn = document.getElementById('global-comic-main-preview');
+    const practiceBtn = document.getElementById('global-comic-main-practice');
     const thumbs = document.getElementById('global-comic-thumbs');
-    if (!strip || !mainImg || !mainTitle || !mainSubtitle || !mainLink || !thumbs) return;
+    if (!strip || !mainImg || !mainTitle || !mainSubtitle || !previewBtn || !practiceBtn || !thumbs) return;
 
-    const scenes = getComicScenesForTab(tabName, scenario);
+    const activeTab = tabName || getActiveTabName();
+    if (!GLOBAL_COMIC_STRIP_ENABLED_TABS.has(activeTab)) {
+        strip.classList.add('hidden');
+        selectedGlobalComicScene = null;
+        closeComicPreviewModal();
+        return;
+    }
+
+    const scenes = getComicScenesForTab(activeTab, scenario);
     if (!scenes.length) {
         strip.classList.add('hidden');
+        selectedGlobalComicScene = null;
         return;
     }
 
@@ -2795,8 +2868,9 @@ function renderGlobalComicStrip(tabName = getActiveTabName(), scenario = null) {
     mainImg.alt = selected.title;
     mainTitle.textContent = selected.title;
     mainSubtitle.textContent = selected.subtitle || 'Meta Model comic scene';
-    mainLink.href = selected.path;
-    mainLink.setAttribute('aria-label', `Open ${selected.title}`);
+    selectedGlobalComicScene = selected;
+    previewBtn.setAttribute('aria-label', `תצוגה: ${selected.title}`);
+    practiceBtn.setAttribute('aria-label', `מעבר לתרגול: ${selected.title}`);
 
     thumbs.innerHTML = '';
     scenes.forEach(scene => {
@@ -2807,7 +2881,7 @@ function renderGlobalComicStrip(tabName = getActiveTabName(), scenario = null) {
         btn.setAttribute('aria-label', scene.title);
         btn.addEventListener('click', () => {
             strip.dataset.selectedScene = scene.key;
-            renderGlobalComicStrip(tabName, scenario);
+            renderGlobalComicStrip(activeTab, scenario);
         });
 
         const img = document.createElement('img');
@@ -4780,6 +4854,7 @@ function navigateTo(tabName) {
     if (content) content.classList.add('active');
 
     const scenarioContext = tabName === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
+    closeComicPreviewModal();
     renderGlobalComicStrip(tabName, scenarioContext);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
