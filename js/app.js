@@ -291,6 +291,14 @@ function playOpeningMusic() {
 function hideSplashScreen() {
     const splashScreen = document.getElementById('splash-screen');
     if (!splashScreen) return;
+
+    if (document.body.classList.contains('embed-mode')) {
+        splashScreen.classList.add('hidden');
+        splashScreen.style.pointerEvents = 'none';
+        splashScreen.style.display = 'none';
+        return;
+    }
+
     // The animation handles the fade out after 3 seconds
     // Just ensure it's hidden after animation
     setTimeout(() => {
@@ -301,8 +309,27 @@ function hideSplashScreen() {
     }, 3600);
 }
 
+function applyEmbeddedCompactMode() {
+    let embedded = false;
+    try {
+        embedded = window.self !== window.top;
+    } catch (error) {
+        embedded = true;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('compact') === '1' || params.get('embed') === '1') {
+        embedded = true;
+    }
+
+    if (embedded) {
+        document.body.classList.add('embed-mode');
+    }
+}
+
 // Load data on page load
 document.addEventListener('DOMContentLoaded', () => {
+    applyEmbeddedCompactMode();
     loadAudioSettings();
     setupAudioMuteButtons();
 
@@ -3465,7 +3492,7 @@ function handlePrismSubmit() {
     else playUISound('prism_submit');
 
     const recommendation = computePivotRecommendation(session);
-    renderPrismResult(session, recommendation);
+    renderPrismResultCompact(session, recommendation);
     savePrismSession(session, recommendation);
 }
 
@@ -3621,6 +3648,130 @@ function renderPrismResult(session, recommendation) {
                 <li>הימנע ממשפטים כלליים מאוד; כתיבה קונקרטית משפרת את ציון הבהירות.</li>
             </ol>
         </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="exportPrismSession()">ייצא סשן JSON</button>
+        </div>
+    `;
+}
+
+function renderPrismResultCompact(session, recommendation) {
+    const out = document.getElementById('prism-result');
+    if (!out) return;
+    out.classList.remove('hidden');
+
+    const score = session.score || computePrismScore(session.answers || []);
+    const statusMap = {
+        ok: { label: 'תואם', className: 'status-ok' },
+        mismatch: { label: 'שיבוץ שגוי', className: 'status-bad' },
+        uncertain: { label: 'דורש חידוד', className: 'status-warn' }
+    };
+
+    const statusCounts = { ok: 0, mismatch: 0, uncertain: 0 };
+    (session.answers || []).forEach(answer => {
+        const key = statusCounts[answer.status] !== undefined ? answer.status : 'uncertain';
+        statusCounts[key] += 1;
+    });
+
+    const mismatchCount = statusCounts.mismatch;
+    const scoreInsights = renderPrismScoreInterpretation(score, mismatchCount);
+    const prism = getPrismById(session.prism_id);
+    const levelsDeepAnalysis = renderPrismLevelsDeepAnalysis(prism, recommendation);
+    const actionPlan = renderPrismActionPlan(session, recommendation, mismatchCount);
+    const countsHtml = ['E', 'B', 'C', 'V', 'I', 'S']
+        .map(level => `<li><strong>${getLevelDisplay(level)}:</strong> ${recommendation.counts[level] || 0}</li>`)
+        .join('');
+
+    const checksCompactHtml = (session.answers || []).map(answer => {
+        const status = statusMap[answer.status] || statusMap.uncertain;
+        const targetLevel = answer.effectiveLevel && answer.effectiveLevel !== answer.level
+            ? `<p><strong>העבר לרמה:</strong> ${getLevelDisplay(answer.effectiveLevel)}</p>`
+            : '';
+
+        return `
+            <li class="prism-check-item ${status.className}">
+                <p><strong>${getLevelDisplay(answer.level)}</strong> - ${status.label}</p>
+                <p>${escapeHtml(answer.text || '')}</p>
+                ${targetLevel}
+            </li>
+        `;
+    }).join('');
+
+    const focusItems = (session.answers || [])
+        .filter(answer => answer.status === 'mismatch' || answer.status === 'uncertain')
+        .slice(0, 3)
+        .map(answer => {
+            const target = answer.effectiveLevel && answer.effectiveLevel !== answer.level
+                ? ` -> ${getLevelDisplay(answer.effectiveLevel)}`
+                : '';
+            return `<li><strong>${getLevelDisplay(answer.level)}${target}:</strong> ${escapeHtml(answer.improvement || '')}</li>`;
+        })
+        .join('');
+
+    out.innerHTML = `
+        <h4>בדיקה מהירה - ${escapeHtml(session.prism_name || '')}</h4>
+        <p><strong>שאלת עוגן:</strong> ${escapeHtml(session.anchor || '')}</p>
+
+        <div class="prism-quick-grid">
+            <article class="prism-quick-card">
+                <h5>ציון כולל</h5>
+                <p class="prism-quick-number">${score.total}/100</p>
+                <p>${escapeHtml(score.grade || '')}</p>
+            </article>
+            <article class="prism-quick-card">
+                <h5>Pivot מומלץ</h5>
+                <p class="prism-quick-number">${escapeHtml(recommendation.levelName || '')}</p>
+                <p>${escapeHtml(recommendation.intervention || '')}</p>
+            </article>
+            <article class="prism-quick-card">
+                <h5>סטטוס שיבוצים</h5>
+                <p>תואם: ${statusCounts.ok} | דורש חידוד: ${statusCounts.uncertain} | שגוי: ${statusCounts.mismatch}</p>
+                <p>רגש: ${session.emotion} | התנגדות: ${session.resistance}</p>
+            </article>
+        </div>
+
+        <div class="blueprint-section prism-focus-box">
+            <h4>מה עושים עכשיו (עד 3 צעדים)</h4>
+            <ul class="prism-action-plan">
+                ${focusItems || '<li>נראה טוב. אפשר לעבור לביצוע ה-Pivot שנבחר.</li>'}
+                <li><strong>שאלת המשך:</strong> ${escapeHtml(recommendation.followUpQuestion || '')}</li>
+            </ul>
+        </div>
+
+        <details class="prism-more-details">
+            <summary>הצג פירוט מלא</summary>
+            <div class="blueprint-section prism-score-box">
+                <h4>ציון ואבחון מלא</h4>
+                <p><strong>ציון כולל:</strong> ${score.total}/100 (${escapeHtml(score.grade || '')})</p>
+                <p>פירוק הציון: כיסוי ${score.coverage}/40 | דיוק שיבוץ ${score.alignment}/40 | בהירות ניסוח ${score.clarity}/20</p>
+                <p><strong>שיבוצים שגויים:</strong> ${mismatchCount}</p>
+                ${scoreInsights}
+            </div>
+
+            <div class="blueprint-section">
+                <h4>בדיקה לכל תשובה</h4>
+                <ul class="prism-check-list">
+                    ${checksCompactHtml}
+                </ul>
+            </div>
+
+            <div class="blueprint-section prism-pivot-box">
+                <h4>למה זה ה-Pivot המומלץ</h4>
+                <p>${escapeHtml(recommendation.reason || '')}</p>
+                <p><strong>פיזור תשובות לפי רמות:</strong></p>
+                <ul>${countsHtml}</ul>
+            </div>
+
+            <div class="blueprint-section">
+                <h4>תוכנית פעולה מדורגת</h4>
+                ${actionPlan}
+            </div>
+
+            <div class="blueprint-section">
+                <h4>פענוח עומק לפי רמות</h4>
+                ${levelsDeepAnalysis}
+            </div>
+        </details>
 
         <div class="action-buttons">
             <button class="btn btn-secondary" onclick="exportPrismSession()">ייצא סשן JSON</button>
