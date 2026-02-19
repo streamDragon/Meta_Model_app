@@ -17,7 +17,7 @@
 }
 
 body {
-    font-family: 'Assistant', 'Rubik', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: radial-gradient(circle at 15% 15%, #dbeafe 0%, #f8fafc 38%, #fefce8 100%);
     color: var(--dark);
     min-height: 100vh;
@@ -3461,6 +3461,166 @@ a:hover {
         width: 100%;
         justify-content: space-between;
     }
+}
+
+/* Minimal UI mode: cleaner layout for embeds and focused practice */
+body.minimal-ui {
+    background: #f3f4f6;
+    padding: 0;
+}
+
+body.minimal-ui .container {
+    max-width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+}
+
+body.minimal-ui header {
+    display: none;
+}
+
+body.minimal-ui .onboarding-hint {
+    display: none !important;
+}
+
+body.minimal-ui .tabs {
+    display: flex !important;
+    grid-template-columns: none;
+    gap: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-bottom: 1px solid #d1d5db;
+    background: #ffffff;
+    scrollbar-width: thin;
+}
+
+body.minimal-ui .tab-btn {
+    flex: 0 0 auto;
+    min-width: 110px;
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #475569;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+}
+
+body.minimal-ui .tab-btn:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+body.minimal-ui .tab-btn.active {
+    color: #0f172a;
+    border-bottom-color: #2563eb;
+    background: #eff6ff;
+}
+
+body.minimal-ui .mobile-tab-nav {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+body.minimal-ui .global-comic-strip {
+    display: none;
+}
+
+body.minimal-ui .tab-content {
+    padding: 14px;
+}
+
+body.minimal-ui .card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: none;
+    padding: 14px;
+    margin-bottom: 12px;
+}
+
+body.minimal-ui .card h2,
+body.minimal-ui .card h3 {
+    color: #111827;
+}
+
+body.minimal-ui .btn {
+    border-radius: 8px;
+}
+
+body.minimal-ui .btn:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+body.minimal-ui .btn-primary {
+    background: #2563eb;
+}
+
+body.minimal-ui .btn-primary:hover {
+    background: #1d4ed8;
+    opacity: 1;
+}
+
+body.minimal-ui .btn-secondary {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+body.minimal-ui .btn-secondary:hover {
+    background: #d1d5db;
+}
+
+body.minimal-ui #practice .practice-container {
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+body.minimal-ui .wrinkle-game-card {
+    background: #ffffff;
+    border: 1px solid #f59e0b;
+    box-shadow: none;
+}
+
+body.minimal-ui .wrinkle-game-header h3 {
+    color: #9a3412;
+    font-size: 1.2rem;
+}
+
+body.minimal-ui .wrinkle-game-header small {
+    color: #6b7280;
+}
+
+body.minimal-ui .wrinkle-coverage span {
+    background: #fff7ed;
+    border-color: #fed7aa;
+    color: #9a3412;
+}
+
+body.minimal-ui .wrinkle-round-box {
+    background: #ffffff;
+    border-color: #fde68a;
+}
+
+body.minimal-ui .wrinkle-statement {
+    border-color: #d1d5db;
+    background: #f9fafb;
+}
+
+body.minimal-ui .wrinkle-option-btn {
+    border-color: #d1d5db;
+}
+
+body.minimal-ui .wrinkle-self-box {
+    border-top: 1px solid #e5e7eb;
+}
+
+body.minimal-ui .wrinkle-self-box label {
+    color: #1f2937;
+}
+
+body.minimal-ui .wrinkle-self-list {
+    color: #334155;
 }
 
 

@@ -334,8 +334,15 @@ function applyEmbeddedCompactMode() {
         embedded = true;
     }
 
+    const forceSimple = params.get('simple') === '1';
+    const disableSimple = params.get('simple') === '0';
+
     if (embedded) {
         document.body.classList.add('embed-mode');
+    }
+
+    if (forceSimple || (embedded && !disableSimple)) {
+        document.body.classList.add('minimal-ui');
     }
 }
 
