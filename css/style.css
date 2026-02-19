@@ -74,15 +74,24 @@ body.embed-mode .tabs {
     position: sticky;
     top: 0;
     z-index: 20;
+    display: flex !important;
+    grid-template-columns: none;
+    overflow-x: auto;
+    overflow-y: hidden;
     background: rgba(255, 255, 255, 0.94);
     border-bottom: 1px solid #dbe7f5;
     backdrop-filter: blur(6px);
+    scrollbar-width: thin;
 }
 
 body.embed-mode .tab-btn {
+    flex: 0 0 auto;
+    min-width: 132px;
     min-height: 56px;
     font-size: 1rem;
     color: #334155;
+    border-bottom-width: 2px;
+    padding-inline: 16px;
 }
 
 body.embed-mode .tab-btn.active {
@@ -102,7 +111,7 @@ body.embed-mode .card {
 }
 
 body.embed-mode .global-comic-strip {
-    padding: 18px;
+    display: none;
 }
 
 body.embed-mode .global-comic-main img {
@@ -111,6 +120,10 @@ body.embed-mode .global-comic-main img {
 
 body.embed-mode .global-comic-thumb {
     padding: 10px;
+}
+
+body.embed-mode .progress-hub {
+    margin-top: 16px;
 }
 
 .onboarding-hint {

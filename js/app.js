@@ -339,6 +339,18 @@ function applyEmbeddedCompactMode() {
     }
 }
 
+function applyInitialTabPreference() {
+    const params = new URLSearchParams(window.location.search);
+    const requestedTab = (params.get('tab') || '').trim();
+    const defaultEmbedTab = document.body.classList.contains('embed-mode') ? 'practice' : '';
+    const targetTab = requestedTab || defaultEmbedTab;
+    if (!targetTab || !document.getElementById(targetTab)) return;
+
+    navigateTo(targetTab);
+    const mobileTabSelect = document.getElementById('mobile-tab-select');
+    if (mobileTabSelect) mobileTabSelect.value = targetTab;
+}
+
 // Load data on page load
 document.addEventListener('DOMContentLoaded', () => {
     applyEmbeddedCompactMode();
@@ -361,6 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showLoadingIndicator();
     loadMetaModelData();
     setupTabNavigation();
+    applyInitialTabPreference();
     setupGlobalComicStripActions();
     setupPracticeMode();
     setupQuestionDrill();
