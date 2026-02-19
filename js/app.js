@@ -465,8 +465,22 @@ function applyInitialTabPreference() {
     if (mobileTabSelect) mobileTabSelect.value = targetTab;
 }
 
+function setupMobileViewportSizing() {
+    const setViewportHeight = () => {
+        const height = window.innerHeight || document.documentElement.clientHeight || 0;
+        if (height > 0) {
+            document.documentElement.style.setProperty('--app-dvh', `${height}px`);
+        }
+    };
+
+    setViewportHeight();
+    window.addEventListener('resize', setViewportHeight, { passive: true });
+    window.addEventListener('orientationchange', setViewportHeight, { passive: true });
+}
+
 // Load data on page load
 document.addEventListener('DOMContentLoaded', () => {
+    setupMobileViewportSizing();
     applyEmbeddedCompactMode();
     loadAudioSettings();
     setupAudioMuteButtons();

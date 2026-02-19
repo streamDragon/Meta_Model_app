@@ -4,6 +4,10 @@
     box-sizing: border-box;
 }
 
+html {
+    min-height: 100%;
+}
+
 :root {
     --primary-color: #0f766e;
     --secondary-color: #0c4a6e;
@@ -14,13 +18,18 @@
     --light: #f7fafc;
     --border-radius: 12px;
     --shadow: 0 16px 35px rgba(15, 23, 42, 0.12);
+    --app-dvh: 100dvh;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: radial-gradient(circle at 15% 15%, #dbeafe 0%, #f8fafc 38%, #fefce8 100%);
     color: var(--dark);
-    min-height: 100vh;
+    min-height: var(--app-dvh);
     min-width: 320px;
     padding: clamp(8px, 2vw, 20px);
     line-height: 1.45;
@@ -2708,8 +2717,8 @@ a:hover {
 
 .music-toggle-btn {
     position: fixed;
-    inset-inline-end: 16px;
-    bottom: 16px;
+    inset-inline-end: calc(16px + var(--safe-right));
+    bottom: calc(16px + var(--safe-bottom));
     width: 54px;
     height: 54px;
     border: 0;
@@ -2745,8 +2754,8 @@ a:hover {
     .music-toggle-btn {
         width: 48px;
         height: 48px;
-        inset-inline-end: 12px;
-        bottom: 12px;
+        inset-inline-end: calc(12px + var(--safe-right));
+        bottom: calc(12px + var(--safe-bottom));
         font-size: 1.2rem;
     }
 }
@@ -3878,20 +3887,64 @@ a:hover {
 }
 
 @media (max-width: 768px) {
+    html,
+    body {
+        min-height: var(--app-dvh);
+    }
+
+    body {
+        padding: 0;
+    }
+
+    .container {
+        max-width: 100%;
+        min-height: var(--app-dvh);
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+    }
+
+    body.embed-mode {
+        padding: 0;
+    }
+
+    body.embed-mode .container {
+        min-height: var(--app-dvh);
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+    }
+
     .tabs {
         display: none;
     }
 
     .mobile-tab-nav {
         display: flex;
+        position: sticky;
+        top: 0;
+        z-index: 25;
+        padding-top: calc(10px + var(--safe-top));
+        padding-right: calc(14px + var(--safe-right));
+        padding-bottom: 10px;
+        padding-left: calc(14px + var(--safe-left));
     }
 
     header h1 {
         font-size: 1.8em;
     }
 
+    header {
+        padding-top: calc(28px + var(--safe-top));
+    }
+
     .tab-content {
-        padding: 20px;
+        padding: 16px calc(12px + var(--safe-right)) calc(20px + var(--safe-bottom)) calc(12px + var(--safe-left));
+    }
+
+    body.embed-mode .tab-content,
+    body.minimal-ui .tab-content {
+        padding: 16px calc(12px + var(--safe-right)) calc(20px + var(--safe-bottom)) calc(12px + var(--safe-left));
     }
 
     .card {
@@ -4024,15 +4077,18 @@ a:hover {
 
 @media (max-width: 480px) {
     body {
-        padding: 6px;
+        padding: 0;
     }
 
     .container {
-        border-radius: 6px;
+        border-radius: 0;
     }
 
     .mobile-tab-nav {
-        padding: 8px 10px;
+        padding-top: calc(8px + var(--safe-top));
+        padding-right: calc(10px + var(--safe-right));
+        padding-bottom: 8px;
+        padding-left: calc(10px + var(--safe-left));
     }
 
     .mobile-tab-nav label {
@@ -4067,10 +4123,12 @@ a:hover {
 body.minimal-ui {
     background: #f3f4f6;
     padding: 0;
+    min-height: var(--app-dvh);
 }
 
 body.minimal-ui .container {
     max-width: 100%;
+    min-height: var(--app-dvh);
     border-radius: 0;
     box-shadow: none;
     border: none;
