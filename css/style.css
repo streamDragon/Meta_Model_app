@@ -5,38 +5,40 @@
 }
 
 :root {
-    --primary-color: #667eea;
-    --secondary-color: #764ba2;
+    --primary-color: #0f766e;
+    --secondary-color: #0c4a6e;
     --success-color: #48bb78;
     --danger-color: #f56565;
-    --warning-color: #ed8936;
+    --warning-color: #d97706;
     --dark: #2d3748;
     --light: #f7fafc;
-    --border-radius: 8px;
-    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --border-radius: 12px;
+    --shadow: 0 16px 35px rgba(15, 23, 42, 0.12);
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Assistant', 'Rubik', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: radial-gradient(circle at 15% 15%, #dbeafe 0%, #f8fafc 38%, #fefce8 100%);
     color: var(--dark);
     min-height: 100vh;
     min-width: 320px;
     padding: clamp(8px, 2vw, 20px);
+    line-height: 1.45;
 }
 
 .container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1240px;
     margin: 0 auto;
     background: white;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
     overflow: hidden;
+    border: 1px solid #dbe7f5;
 }
 
 header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0f766e 0%, #0369a1 60%, #0284c7 100%);
     color: white;
     padding: 40px 20px;
     text-align: center;
@@ -54,18 +56,61 @@ header p {
 
 /* Embedded mode (e.g. Google Sites iframe): maximize usable space */
 body.embed-mode {
-    background: transparent;
-    padding: 0;
+    background: linear-gradient(155deg, #ecfeff 0%, #eff6ff 55%, #fffbeb 100%);
+    padding: 10px;
 }
 
 body.embed-mode .container {
-    max-width: 100%;
-    border-radius: 0;
-    box-shadow: none;
+    max-width: 1320px;
+    border-radius: 16px;
+    box-shadow: 0 20px 42px rgba(15, 23, 42, 0.16);
 }
 
 body.embed-mode header {
     display: none;
+}
+
+body.embed-mode .tabs {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.94);
+    border-bottom: 1px solid #dbe7f5;
+    backdrop-filter: blur(6px);
+}
+
+body.embed-mode .tab-btn {
+    min-height: 56px;
+    font-size: 1rem;
+    color: #334155;
+}
+
+body.embed-mode .tab-btn.active {
+    color: #0f766e;
+    border-bottom-color: #0f766e;
+    background: linear-gradient(180deg, rgba(15, 118, 110, 0.1), transparent);
+}
+
+body.embed-mode .tab-content {
+    padding: clamp(14px, 2.5vw, 30px);
+}
+
+body.embed-mode .card {
+    border-radius: 14px;
+    border-color: #dce7f7;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+body.embed-mode .global-comic-strip {
+    padding: 18px;
+}
+
+body.embed-mode .global-comic-main img {
+    max-height: 260px;
+}
+
+body.embed-mode .global-comic-thumb {
+    padding: 10px;
 }
 
 .onboarding-hint {
@@ -256,31 +301,33 @@ body.embed-mode header {
 .tabs {
     display: grid;
     grid-template-columns: repeat(8, minmax(0, 1fr));
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 1px solid #dbe7f5;
     overflow: hidden;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
 }
 
 .tab-btn {
     min-height: 58px;
     padding: 12px 12px;
-    background: white;
+    background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 0.98em;
-    font-weight: 600;
-    color: #718096;
+    font-size: 1em;
+    font-weight: 700;
+    color: #64748b;
     transition: all 0.3s ease;
     border-bottom: 3px solid transparent;
 }
 
 .tab-btn:hover {
-    background: #f7fafc;
+    background: #f1f5f9;
     color: var(--primary-color);
 }
 
 .tab-btn.active {
     color: var(--primary-color);
     border-bottom-color: var(--primary-color);
+    background: linear-gradient(180deg, rgba(15, 118, 110, 0.08), transparent);
 }
 
 .mobile-tab-nav {
@@ -906,19 +953,43 @@ body.embed-mode header {
 }
 
 .wrinkle-game-card {
-    background: linear-gradient(145deg, #fffdf7 0%, #fef3c7 100%);
-    border: 1px solid #facc15;
-    box-shadow: 0 8px 18px rgba(217, 119, 6, 0.12);
+    background: linear-gradient(145deg, #fffdf4 0%, #fffbeb 52%, #eff6ff 100%);
+    border: 1px solid #fbbf24;
+    box-shadow: 0 14px 28px rgba(217, 119, 6, 0.12);
     margin-bottom: 18px;
 }
 
 .wrinkle-game-header h3 {
     margin: 0;
-    color: #92400e;
+    color: #7c2d12;
+    font-size: 1.5rem;
 }
 
 .wrinkle-game-header small {
     color: #7c2d12;
+    display: block;
+    margin-top: 5px;
+    font-size: 0.95rem;
+}
+
+.wrinkle-coverage {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.wrinkle-coverage span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 999px;
+    border: 1px solid #fed7aa;
+    background: #fff7ed;
+    color: #9a3412;
+    font-weight: 800;
+    font-size: 0.82rem;
+    padding: 4px 10px;
 }
 
 .wrinkle-score-row {
@@ -928,6 +999,7 @@ body.embed-mode header {
     margin: 12px 0 14px;
     font-weight: 700;
     color: #78350f;
+    font-size: 0.95rem;
 }
 
 .wrinkle-round-box {
@@ -1019,6 +1091,7 @@ body.embed-mode header {
     margin-bottom: 8px;
     font-weight: 700;
     color: #7c2d12;
+    font-size: 0.95rem;
 }
 
 .wrinkle-self-box textarea {
