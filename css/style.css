@@ -3635,6 +3635,38 @@ body.minimal-ui .wrinkle-self-list {
     border: 1px solid #e2e8f0;
     border-radius: 14px;
     background: #ffffff;
+    position: relative;
+}
+
+.ceflow-top-actions {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.ceflow-small-btn {
+    min-height: 34px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.83rem;
+    font-weight: 800;
+}
+
+.ceflow-floating-note {
+    margin-bottom: 8px;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    padding: 8px 10px;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    animation: ceflowOverlayIn 180ms ease-out;
+}
+
+.ceflow-floating-note.is-visible {
+    box-shadow: 0 10px 22px rgba(59, 130, 246, 0.2);
 }
 
 .ceflow-principle {
@@ -3904,7 +3936,7 @@ body.minimal-ui .wrinkle-self-list {
     display: grid;
     gap: 8px;
     color: #ffffff;
-    min-height: 128px;
+    min-height: 112px;
     text-align: right;
     cursor: pointer;
     transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
@@ -3945,6 +3977,10 @@ body.minimal-ui .wrinkle-self-list {
     font-size: 0.82rem;
     line-height: 1.35;
     opacity: 0.95;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .ceflow-tone-danger { background: #ef4444; }
@@ -4041,6 +4077,41 @@ body.minimal-ui .wrinkle-self-list {
     margin: 0 0 8px;
     color: #1f2937;
     line-height: 1.45;
+}
+
+.ceflow-feedback-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.ceflow-mini-btn {
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #0f172a;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.ceflow-mini-btn:hover {
+    border-color: #94a3b8;
+    background: #f1f5f9;
+}
+
+.ceflow-feedback-note {
+    margin-top: 8px;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    padding: 8px;
+    font-size: 0.83rem;
+    line-height: 1.45;
+    animation: ceflowOverlayIn 180ms ease-out;
 }
 
 .ceflow-outcomes {
@@ -4162,6 +4233,11 @@ body.minimal-ui .wrinkle-self-list {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
+    .ceflow-choice {
+        min-height: 102px;
+        padding: 8px;
+    }
+
     .ceflow-feedback {
         grid-template-columns: 1fr;
     }
@@ -4180,12 +4256,41 @@ body.minimal-ui .wrinkle-self-list {
         padding: 8px;
     }
 
+    .ceflow-top-actions {
+        justify-content: stretch;
+    }
+
+    .ceflow-small-btn {
+        width: 100%;
+        text-align: center;
+    }
+
     .ceflow-choice-deck {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+    }
+
+    .ceflow-choice {
+        min-height: 92px;
+        gap: 6px;
+    }
+
+    .ceflow-choice-top strong {
+        font-size: 0.88rem;
+    }
+
+    .ceflow-choice-line {
+        font-size: 0.75rem;
     }
 
     .ceflow-bubble {
         max-width: 100%;
+        padding: 7px 8px;
+    }
+
+    .ceflow-feedback-actions .ceflow-mini-btn {
+        flex: 1 1 calc(50% - 4px);
+        text-align: center;
     }
 
     .ceflow-controls .btn {

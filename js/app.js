@@ -5972,7 +5972,8 @@ function ceflowToneClass(tone) {
 async function setupComicEngine2() {
     const els = {
         root: document.getElementById('comicEngine'),
-        principle: document.getElementById('ceflow-principle'),
+        infoBtn: document.getElementById('ceflow-info-btn'),
+        floatingNote: document.getElementById('ceflow-floating-note'),
         domain: document.getElementById('ceflow-domain'),
         progress: document.getElementById('ceflow-progress'),
         level: document.getElementById('ceflow-level'),
@@ -6048,12 +6049,61 @@ async function setupComicEngine2() {
         replyDraft: '',
         userReply: '',
         selectedQuestion: '',
-        generatedInfo: ''
+        generatedInfo: '',
+        floatingTimer: null,
+        feedbackTimer: null
     };
 
     const currentScenario = () => scenarios[state.index];
     const metaChoice = () => (currentScenario()?.choices || []).find(choice => choice.id === 'meta') || null;
     const activeBlueprint = () => state.selectedChoice?.blueprint || metaChoice()?.blueprint || null;
+    const compactText = (text, max = 155) => {
+        const raw = String(text || '').trim().replace(/\s+/g, ' ');
+        if (!raw) return '';
+        return raw.length > max ? `${raw.slice(0, max - 1)}...` : raw;
+    };
+    const hideFloatingNote = () => {
+        if (state.floatingTimer) {
+            clearTimeout(state.floatingTimer);
+            state.floatingTimer = null;
+        }
+        if (els.floatingNote) {
+            els.floatingNote.classList.add('hidden');
+            els.floatingNote.classList.remove('is-visible');
+            els.floatingNote.textContent = '';
+        }
+    };
+    const showFloatingNote = (text) => {
+        if (!els.floatingNote) return;
+        hideFloatingNote();
+        const msg = compactText(text, 170);
+        if (!msg) return;
+        els.floatingNote.textContent = msg;
+        els.floatingNote.classList.remove('hidden');
+        els.floatingNote.classList.add('is-visible');
+        state.floatingTimer = window.setTimeout(() => hideFloatingNote(), 6200);
+    };
+    const hideFeedbackNote = () => {
+        if (state.feedbackTimer) {
+            clearTimeout(state.feedbackTimer);
+            state.feedbackTimer = null;
+        }
+        const noteEl = els.feedbackRight?.querySelector('.ceflow-feedback-note');
+        if (noteEl) {
+            noteEl.classList.add('hidden');
+            noteEl.textContent = '';
+        }
+    };
+    const showFeedbackNote = (text) => {
+        const noteEl = els.feedbackRight?.querySelector('.ceflow-feedback-note');
+        if (!noteEl) return;
+        hideFeedbackNote();
+        const msg = compactText(text, 210);
+        if (!msg) return;
+        noteEl.textContent = msg;
+        noteEl.classList.remove('hidden');
+        state.feedbackTimer = window.setTimeout(() => hideFeedbackNote(), 6400);
+    };
 
     const persistMode = () => {
         localStorage.setItem(COMIC_ENGINE_PREFS_KEY, JSON.stringify({ mode: state.mode, updatedAt: new Date().toISOString() }));
@@ -6080,6 +6130,8 @@ async function setupComicEngine2() {
         state.userReply = '';
         state.selectedQuestion = '';
         state.generatedInfo = '';
+        hideFeedbackNote();
+        hideFloatingNote();
     };
 
     const renderCharacters = () => {
@@ -6157,18 +6209,26 @@ async function setupComicEngine2() {
     const renderFeedback = () => {
         const open = !!state.selectedChoice && !!state.userReply;
         els.feedback?.classList.toggle('hidden', !open);
-        if (!open) return;
+        if (!open) {
+            hideFeedbackNote();
+            return;
+        }
         const choice = state.selectedChoice;
         const leftBadge = choice.badge ? `<img src="${escapeHtml(choice.badge)}" alt="badge" loading="lazy">` : '';
         const leftSfx = choice.sfx ? `<img src="${escapeHtml(choice.sfx)}" alt="sfx" loading="lazy">` : '';
         if (els.feedbackLeft) els.feedbackLeft.innerHTML = `${leftBadge}${leftSfx}`;
         if (els.feedbackRight) {
+            const interpretation = compactText(choice.interpretation, 210);
+            const regulation = compactText(currentScenario().regulationNote, 220);
             els.feedbackRight.innerHTML = `
                 <p><strong>מה אמרת:</strong> ${escapeHtml(choice.say)}</p>
                 <p><strong>מה קרה:</strong></p>
                 <div class="ceflow-outcomes">${(choice.impact?.microOutcome || []).map(item => `<span>${escapeHtml(item)}</span>`).join('')}</div>
-                <p class="ceflow-interpretation"><strong>פרשנות:</strong> ${escapeHtml(choice.interpretation)}</p>
-                <p class="ceflow-regulation-note">${escapeHtml(currentScenario().regulationNote)}</p>
+                <div class="ceflow-feedback-actions">
+                    <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(interpretation)}">🔍 פרשנות</button>
+                    <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(regulation)}">🧠 ויסות סטייט</button>
+                </div>
+                <div class="ceflow-feedback-note hidden" aria-live="polite"></div>
             `;
         }
     };
@@ -6285,6 +6345,8 @@ async function setupComicEngine2() {
 
     const nextScene = () => {
         if (!state.userReply) return;
+        hideFloatingNote();
+        hideFeedbackNote();
         state.flowState = CEFLOW_STATES.NEXT_SCENE;
         els.root.classList.add('ceflow-scene-leave');
         setTimeout(() => {
@@ -6302,6 +6364,14 @@ async function setupComicEngine2() {
         const button = event.target.closest('button[data-choice-id]');
         if (!button) return;
         choose(button.getAttribute('data-choice-id'));
+    });
+    els.infoBtn?.addEventListener('click', () => {
+        if (!els.floatingNote) return;
+        if (!els.floatingNote.classList.contains('hidden')) {
+            hideFloatingNote();
+            return;
+        }
+        showFloatingNote(currentScenario()?.regulationNote || 'לכולנו יש תגובה אימפולסיבית ראשונה. כאן עוצרים רגע, מווסתים סטייט, ועוברים לשאלה מדויקת.');
     });
     els.replyQuick?.addEventListener('click', (event) => {
         const button = event.target.closest('button[data-reply-option]');
@@ -6322,6 +6392,11 @@ async function setupComicEngine2() {
         state.generatedInfo = state.selectedChoice.newInfoBubble || 'נפתח מידע חדש שאפשר לעבוד איתו.';
         state.flowState = CEFLOW_STATES.POWER_CARD;
         render();
+    });
+    els.feedbackRight?.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-feedback-note]');
+        if (!button) return;
+        showFeedbackNote(button.getAttribute('data-feedback-note') || '');
     });
     els.retry?.addEventListener('click', retry);
     els.next?.addEventListener('click', nextScene);

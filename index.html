@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meta Model - כלי תרגול שאול מטה מודל</title>
-    <link rel="stylesheet" href="css/style.css?v=20260219d">
+    <link rel="stylesheet" href="css/style.css?v=20260220a">
 </head>
 <body>
     <!-- SPLASH SCREEN -->
@@ -375,13 +375,10 @@
                 <p class="subtitle">דיאלוג חי בעמוד אחד: בחירה → תגובת צד שני → תגובה שלך → פרשנות → חלופה שכלית + ויסות סטייט.</p>
 
                 <section id="comicEngine" class="ceflow-engine" dir="rtl">
-                    <aside id="ceflow-principle" class="ceflow-principle">
-                        <h3>עיקרון העבודה</h3>
-                        <p>
-                            לכולנו יש תגובה רגשית אימפולסיבית. כאן מתרגלים מעבר מכוח הרגל לתגובה שכלית:
-                            חשיפה של הקמט, ויסות סטייט, ואז שאלה מדויקת שמחזירה זרימת מידע.
-                        </p>
-                    </aside>
+                    <div class="ceflow-top-actions">
+                        <button id="ceflow-info-btn" class="btn btn-secondary ceflow-small-btn" type="button">💡 למה זה עובד?</button>
+                    </div>
+                    <div id="ceflow-floating-note" class="ceflow-floating-note hidden" aria-live="polite"></div>
 
                     <header class="ceflow-header">
                         <div class="ceflow-chip-row">
@@ -863,6 +860,6 @@
         </section>
     </div>
 
-    <script src="js/app.js?v=20260219d"></script>
+    <script src="js/app.js?v=20260220a"></script>
 </body>
 </html>
