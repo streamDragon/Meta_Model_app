@@ -6411,3 +6411,439 @@ async function setupComicEngine2() {
     setMode(state.mode, false);
     render();
 }
+
+// ==================== WRINKLE REVEAL FLOW (OVERRIDE) ===================
+
+const WR2_STORAGE_KEY = 'wrinkle_reveal_v2';
+
+const WR2_SEED_SCENES = Object.freeze([
+    Object.freeze({
+        id: 'wr2_seed_1',
+        anchor: 'אני לא יכול',
+        visibleSentence: 'אני לא יכול להסביר לה מה אני רוצה',
+        template: 'אני לא יכול {Q} להסביר לה מה אני רוצה',
+        quantifiers: Object.freeze(['אף פעם', 'בשום מצב רגשי', 'בשום סיטואציה', 'בשום צורה']),
+        transformedSentence: 'לפעמים קשה לי להסביר לה מה אני רוצה.'
+    }),
+    Object.freeze({
+        id: 'wr2_seed_2',
+        anchor: 'אני חייב',
+        visibleSentence: 'אני חייב להספיק הכל היום',
+        template: 'אני חייב {Q} להספיק הכל היום',
+        quantifiers: Object.freeze(['בכל תנאי', 'בלי לנשום', 'גם כשאני מותש', 'לא משנה מה המחיר']),
+        transformedSentence: 'אני בוחר להתמקד במה שחשוב היום, צעד אחד בכל פעם.'
+    }),
+    Object.freeze({
+        id: 'wr2_seed_3',
+        anchor: 'אי אפשר',
+        visibleSentence: 'אי אפשר לדבר איתו',
+        template: 'אי אפשר {Q} לדבר איתו',
+        quantifiers: Object.freeze(['בשום מצב', 'עם אף אחד', 'בשום צורה', 'בכל סיטואציה']),
+        transformedSentence: 'כרגע קשה לדבר איתו, ואפשר לחפש דרך מדויקת לשיחה.'
+    }),
+    Object.freeze({
+        id: 'wr2_seed_4',
+        anchor: 'תמיד',
+        visibleSentence: 'תמיד אני נתקע כשצריך לדבר מול אנשים',
+        template: 'תמיד {Q} אני נתקע כשצריך לדבר מול אנשים',
+        quantifiers: Object.freeze(['ללא יוצא דופן', 'בכל מקום', 'עם כולם', 'בכל רמת לחץ']),
+        transformedSentence: 'לפעמים אני נתקע מול אנשים, ואפשר להתאמן כדי להשתפר.'
+    })
+]);
+
+function wr2TrimText(value, maxLen = 180) {
+    const clean = String(value || '').replace(/\s+/g, ' ').trim();
+    if (!clean) return '';
+    return clean.length > maxLen ? `${clean.slice(0, maxLen - 1)}...` : clean;
+}
+
+function wr2DetectAnchor(sentence) {
+    const s = String(sentence || '');
+    const anchors = ['לא יכול', 'אי אפשר', 'חייב', 'צריך', 'מוכרח', 'תמיד', 'כולם', 'אף פעם', 'אין ברירה'];
+    for (let i = 0; i < anchors.length; i += 1) {
+        const token = anchors[i];
+        if (s.includes(token)) return token;
+    }
+    return 'המשפט';
+}
+
+function wr2BuildTemplate(sentence) {
+    const raw = String(sentence || '').trim();
+    if (!raw) return '{Q}';
+    const anchor = wr2DetectAnchor(raw);
+    if (!anchor || anchor === 'המשפט') return `${raw} {Q}`;
+    const idx = raw.indexOf(anchor);
+    if (idx < 0) return `${raw} {Q}`;
+    const left = raw.slice(0, idx + anchor.length).trimEnd();
+    const right = raw.slice(idx + anchor.length).trimStart();
+    return `${left} {Q}${right ? ` ${right}` : ''}`;
+}
+
+function wr2InferQuantifiers(sentence) {
+    const normalized = normalizeText(sentence || '');
+    if (/(לא יכול|אי אפשר|בלתי אפשרי|אין סיכוי)/.test(normalized)) {
+        return ['אף פעם', 'בשום מצב רגשי', 'בשום סיטואציה', 'בשום צורה'];
+    }
+    if (/(תמיד|כל הזמן|אף פעם|כולם|אף אחד)/.test(normalized)) {
+        return ['בכל מצב', 'ללא יוצא דופן', 'עם כולם', 'בכל זמן'];
+    }
+    if (/(חייב|צריך|אין ברירה|מוכרח)/.test(normalized)) {
+        return ['בכל תנאי', 'ללא בחירה', 'גם כשאני עייף', 'לא משנה מה'];
+    }
+    return ['בשום מצב', 'בכל תנאי', 'בשום צורה'];
+}
+
+function wr2SoftenSentence(sentence) {
+    let text = String(sentence || '').trim();
+    if (!text) return '';
+    text = text.replace(/אני לא יכול/g, 'לפעמים קשה לי');
+    text = text.replace(/אי אפשר/g, 'כרגע זה מאתגר');
+    text = text.replace(/תמיד/g, 'לפעמים');
+    text = text.replace(/אף פעם/g, 'לפעמים');
+    text = text.replace(/כולם/g, 'חלק מהאנשים');
+    text = text.replace(/אין ברירה/g, 'יש לי כמה אפשרויות');
+    text = text.replace(/חייב/g, 'מעדיף');
+    if (!/[.!?]$/.test(text)) text += '.';
+    return text;
+}
+
+function wr2NormalizeScene(raw, idxPrefix = 'wr2_custom') {
+    if (!raw || typeof raw !== 'object') return null;
+    const visibleSentence = wr2TrimText(raw.visibleSentence || raw.statement, 160);
+    if (!visibleSentence) return null;
+    const quantifiers = (Array.isArray(raw.quantifiers) ? raw.quantifiers : [])
+        .map(value => wr2TrimText(value, 34))
+        .filter(Boolean)
+        .slice(0, 4);
+    const inferred = quantifiers.length ? quantifiers : wr2InferQuantifiers(visibleSentence);
+    return {
+        id: String(raw.id || `${idxPrefix}_${Date.now()}_${Math.random().toString(16).slice(2, 6)}`),
+        source: raw.source === 'self' ? 'self' : 'seed',
+        anchor: wr2TrimText(raw.anchor || wr2DetectAnchor(visibleSentence), 30),
+        visibleSentence,
+        template: wr2TrimText(raw.template || wr2BuildTemplate(visibleSentence), 220),
+        quantifiers: [...new Set(inferred)].slice(0, 4),
+        transformedSentence: wr2TrimText(raw.transformedSentence || wr2SoftenSentence(visibleSentence), 190),
+        createdAt: Number(raw.createdAt) || Date.now()
+    };
+}
+
+function wr2OverlayHtml(template, activeQuantifier) {
+    const parts = String(template || '').split('{Q}');
+    const q = activeQuantifier ? `[${activeQuantifier}]` : '[???]';
+    const qHtml = `<span class="wr2-q-inline">${escapeHtml(q)}</span>`;
+    if (parts.length < 2) return `${escapeHtml(template || '')} ${qHtml}`.trim();
+    return `${escapeHtml(parts[0])}${qHtml}${escapeHtml(parts.slice(1).join('{Q}'))}`;
+}
+
+function wr2TriggerFx(layer, strong = false) {
+    if (!layer) return;
+    layer.innerHTML = '';
+    const glyphs = strong ? ['✨', '🎉', '💥', '✅'] : ['✨', '🔍', '🧩'];
+    const count = strong ? 14 : 7;
+    for (let i = 0; i < count; i += 1) {
+        const star = document.createElement('span');
+        star.className = 'wr2-fx-star';
+        star.textContent = glyphs[i % glyphs.length];
+        star.style.left = `${12 + Math.random() * 76}%`;
+        star.style.top = `${30 + Math.random() * 42}%`;
+        star.style.setProperty('--x', `${Math.round((Math.random() - 0.5) * 120)}px`);
+        layer.appendChild(star);
+    }
+    setTimeout(() => {
+        if (!layer) return;
+        layer.innerHTML = '';
+    }, strong ? 820 : 620);
+}
+
+function setupWrinkleGame() {
+    const root = document.getElementById('wrinkle-game');
+    if (!root) return;
+
+    if (!document.getElementById('wr2-quantifiers')) {
+        root.className = 'card wrinkle-reveal-card';
+        root.innerHTML = `
+            <div class="wr2-topbar">
+                <span class="wr2-top-icon">🕵️‍♂️</span>
+                <h3>חשוף את הקמט!</h3>
+                <div class="wr2-score">
+                    <span>🔥 <strong id="wr2-streak">0</strong></span>
+                    <span>⭐ <strong id="wr2-points">0</strong></span>
+                </div>
+            </div>
+            <div class="wr2-headline">
+                <h4>המשפט נשמע תמים...</h4>
+                <p>אבל הבעיה האמיתית מסתתרת כאן 👇</p>
+            </div>
+            <section class="wr2-plain-box">
+                <p id="wr2-visible-sentence" class="wr2-visible-sentence"></p>
+                <small>כך זה נשמע</small>
+            </section>
+            <section class="wr2-detect-zone">
+                <p class="wr2-zone-title">קמטים סמויים</p>
+                <div id="wr2-quantifiers" class="wr2-quantifiers" role="group" aria-label="כמתים סמויים"></div>
+                <div class="wr2-overlay-box">
+                    <p id="wr2-overlay-sentence" class="wr2-overlay-sentence"></p>
+                    <p id="wr2-explain-line" class="wr2-explain-line">לחץ/י על כמת אדום כדי לחשוף טוטאליות סמויה.</p>
+                </div>
+                <p id="wr2-progress" class="wr2-progress">0 מתוך 0 קמטים חשופים</p>
+            </section>
+            <section id="wr2-release" class="wr2-release hidden">
+                <p>הבעיה אינה במילים "אני לא יכול". הבעיה היא בהכללות נסתרות שיוצרות תחושת "אין מוצא".</p>
+                <button id="wr2-unlock-btn" class="btn btn-primary wr2-unlock-btn" type="button">חשפתי את כל הקמטים! 🎉</button>
+            </section>
+            <section id="wr2-transform-zone" class="wr2-transform-zone hidden">
+                <button id="wr2-transform-btn" class="btn btn-primary wr2-transform-btn" type="button">הסר הכללה טוטאלית</button>
+                <div id="wr2-transformed" class="wr2-transformed hidden" aria-live="polite">
+                    <p class="wr2-transformed-label">ניסוח משוחרר:</p>
+                    <p id="wr2-transformed-text" class="wr2-transformed-text"></p>
+                </div>
+            </section>
+            <div class="wr2-actions">
+                <button id="wr2-next-btn" class="btn btn-secondary" type="button">משפט הבא</button>
+                <button id="wr2-self-toggle" class="btn btn-secondary" type="button">+ משפט אישי</button>
+            </div>
+            <section id="wr2-self-panel" class="wr2-self-panel hidden">
+                <label for="wr2-self-input">Self-Reference (אופציונלי)</label>
+                <textarea id="wr2-self-input" rows="2" placeholder="לדוגמה: אני לא יכול להסביר לה מה אני רוצה."></textarea>
+                <button id="wr2-self-add" class="btn btn-secondary" type="button">הוסף לתרגול</button>
+                <ul id="wr2-self-list" class="wr2-self-list"></ul>
+            </section>
+            <div id="wr2-fx-layer" class="wr2-fx-layer" aria-hidden="true"></div>
+        `;
+    }
+
+    const els = {
+        streak: document.getElementById('wr2-streak'),
+        points: document.getElementById('wr2-points'),
+        visibleSentence: document.getElementById('wr2-visible-sentence'),
+        quantifiers: document.getElementById('wr2-quantifiers'),
+        overlaySentence: document.getElementById('wr2-overlay-sentence'),
+        explainLine: document.getElementById('wr2-explain-line'),
+        progress: document.getElementById('wr2-progress'),
+        release: document.getElementById('wr2-release'),
+        unlockBtn: document.getElementById('wr2-unlock-btn'),
+        transformZone: document.getElementById('wr2-transform-zone'),
+        transformBtn: document.getElementById('wr2-transform-btn'),
+        transformed: document.getElementById('wr2-transformed'),
+        transformedText: document.getElementById('wr2-transformed-text'),
+        nextBtn: document.getElementById('wr2-next-btn'),
+        selfToggle: document.getElementById('wr2-self-toggle'),
+        selfPanel: document.getElementById('wr2-self-panel'),
+        selfInput: document.getElementById('wr2-self-input'),
+        selfAdd: document.getElementById('wr2-self-add'),
+        selfList: document.getElementById('wr2-self-list'),
+        fxLayer: document.getElementById('wr2-fx-layer')
+    };
+
+    if (!els.quantifiers || !els.visibleSentence || !els.overlaySentence) return;
+
+    let saved = {};
+    try {
+        saved = JSON.parse(localStorage.getItem(WR2_STORAGE_KEY) || '{}') || {};
+    } catch (error) {
+        saved = {};
+    }
+
+    const customScenes = (Array.isArray(saved.customScenes) ? saved.customScenes : [])
+        .map((item, i) => wr2NormalizeScene(item, `wr2_saved_${i}`))
+        .filter(Boolean)
+        .slice(0, 12);
+
+    const state = {
+        seedScenes: WR2_SEED_SCENES.map((item, i) => wr2NormalizeScene(item, `wr2_seed_${i}`)).filter(Boolean),
+        customScenes,
+        index: Math.max(0, Math.floor(Number(saved.index) || 0)),
+        streak: Math.max(0, Math.floor(Number(saved.streak) || 0)),
+        points: Math.max(0, Math.floor(Number(saved.points) || 0)),
+        revealed: [],
+        activeQuantifier: '',
+        unlocked: false,
+        transformed: false
+    };
+
+    const allScenes = () => [...state.seedScenes, ...state.customScenes];
+    const currentScene = () => {
+        const scenes = allScenes();
+        if (!scenes.length) return null;
+        if (state.index >= scenes.length) state.index = 0;
+        return scenes[state.index];
+    };
+    const allRevealed = () => {
+        const scene = currentScene();
+        if (!scene) return false;
+        return state.revealed.length >= scene.quantifiers.length;
+    };
+    const persist = () => {
+        localStorage.setItem(WR2_STORAGE_KEY, JSON.stringify({
+            index: state.index,
+            streak: state.streak,
+            points: state.points,
+            customScenes: state.customScenes
+        }));
+    };
+    const resetRound = () => {
+        state.revealed = [];
+        state.activeQuantifier = '';
+        state.unlocked = false;
+        state.transformed = false;
+    };
+    const renderSelfList = () => {
+        if (!els.selfList) return;
+        els.selfList.innerHTML = '';
+        const rows = [...state.customScenes]
+            .sort((a, b) => (Number(b.createdAt) || 0) - (Number(a.createdAt) || 0))
+            .slice(0, 5);
+        if (!rows.length) return;
+        rows.forEach((scene) => {
+            const item = document.createElement('li');
+            item.textContent = `“${scene.visibleSentence}”`;
+            els.selfList.appendChild(item);
+        });
+    };
+    const render = () => {
+        const scene = currentScene();
+        if (!scene) {
+            root.innerHTML = '<p>אין כרגע משפטים לתרגול.</p>';
+            return;
+        }
+
+        if (els.streak) els.streak.textContent = String(state.streak);
+        if (els.points) els.points.textContent = String(state.points);
+        if (els.visibleSentence) els.visibleSentence.textContent = scene.visibleSentence;
+        if (els.overlaySentence) {
+            els.overlaySentence.innerHTML = wr2OverlayHtml(scene.template, state.activeQuantifier);
+            els.overlaySentence.classList.toggle('is-active', Boolean(state.activeQuantifier));
+        }
+        if (els.explainLine) {
+            els.explainLine.textContent = state.activeQuantifier
+                ? `זה לא "${scene.anchor}". זה "${state.activeQuantifier}".`
+                : 'לחץ/י על כמת אדום כדי לחשוף טוטאליות סמויה.';
+        }
+
+        const qSet = new Set(state.revealed);
+        if (els.quantifiers) {
+            els.quantifiers.innerHTML = scene.quantifiers.map((q) => {
+                const active = state.activeQuantifier === q;
+                const seen = qSet.has(q);
+                return `<button type="button" class="wr2-quantifier${active ? ' is-active' : ''}${seen ? ' is-revealed' : ''}" data-q="${escapeHtml(q)}" aria-label="חשוף ${escapeHtml(q)}">[${escapeHtml(q)}]</button>`;
+            }).join('');
+        }
+
+        if (els.progress) {
+            els.progress.textContent = `${state.revealed.length} מתוך ${scene.quantifiers.length} קמטים חשופים`;
+        }
+
+        const revealedAll = allRevealed();
+        els.release?.classList.toggle('hidden', !revealedAll);
+        if (els.unlockBtn) {
+            els.unlockBtn.disabled = !revealedAll || state.unlocked;
+            els.unlockBtn.textContent = state.unlocked
+                ? 'מעולה, נעבור לטרנספורמציה ✅'
+                : 'חשפתי את כל הקמטים! 🎉';
+        }
+
+        const showTransform = state.unlocked || state.transformed;
+        els.transformZone?.classList.toggle('hidden', !showTransform);
+        els.transformed?.classList.toggle('hidden', !state.transformed);
+        if (els.transformedText) {
+            els.transformedText.textContent = state.transformed ? scene.transformedSentence : '';
+        }
+    };
+    const revealQuantifier = (value) => {
+        const scene = currentScene();
+        if (!scene || !scene.quantifiers.includes(value)) return;
+        state.activeQuantifier = value;
+        if (!state.revealed.includes(value)) {
+            state.revealed.push(value);
+            state.points += 2;
+            playUISound('next');
+            wr2TriggerFx(els.fxLayer, false);
+            persist();
+        }
+        if (allRevealed()) playUISound('correct');
+        render();
+    };
+    const unlock = () => {
+        if (!allRevealed()) return;
+        if (!state.unlocked) {
+            state.unlocked = true;
+            playUISound('finish');
+            wr2TriggerFx(els.fxLayer, true);
+            persist();
+        }
+        render();
+    };
+    const transform = () => {
+        const scene = currentScene();
+        if (!scene || !state.unlocked || state.transformed) return;
+        state.transformed = true;
+        state.streak += 1;
+        state.points += scene.source === 'self' ? 14 : 10;
+        addXP(scene.source === 'self' ? 12 : 10);
+        if (state.streak > 0 && state.streak % 3 === 0) addStars(1);
+        playUISound('correct');
+        wr2TriggerFx(els.fxLayer, true);
+        persist();
+        render();
+    };
+    const nextScene = () => {
+        const scenes = allScenes();
+        if (!scenes.length) return;
+        state.index = (state.index + 1) % scenes.length;
+        resetRound();
+        persist();
+        render();
+    };
+    const addSelfSentence = () => {
+        const input = String(els.selfInput?.value || '').trim();
+        if (input.length < 8) {
+            if (els.explainLine) els.explainLine.textContent = 'כתבו משפט אישי קצר (לפחות 8 תווים).';
+            return;
+        }
+        const normalized = normalizeText(input).replace(/\s+/g, ' ').trim();
+        const exists = state.customScenes.some(scene => normalizeText(scene.visibleSentence).replace(/\s+/g, ' ').trim() === normalized);
+        if (exists) {
+            if (els.explainLine) els.explainLine.textContent = 'המשפט הזה כבר קיים בתרגול.';
+            return;
+        }
+        const scene = wr2NormalizeScene({
+            id: `wr2_self_${Date.now()}`,
+            source: 'self',
+            visibleSentence: input,
+            anchor: wr2DetectAnchor(input),
+            template: wr2BuildTemplate(input),
+            quantifiers: wr2InferQuantifiers(input),
+            transformedSentence: wr2SoftenSentence(input),
+            createdAt: Date.now()
+        });
+        if (!scene) return;
+        state.customScenes.unshift(scene);
+        if (state.customScenes.length > 12) state.customScenes = state.customScenes.slice(0, 12);
+        state.index = allScenes().findIndex(item => item.id === scene.id);
+        if (state.index < 0) state.index = 0;
+        if (els.selfInput) els.selfInput.value = '';
+        resetRound();
+        persist();
+        renderSelfList();
+        render();
+        playUISound('start');
+    };
+
+    els.quantifiers.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-q]');
+        if (!button) return;
+        revealQuantifier(button.getAttribute('data-q') || '');
+    });
+    els.unlockBtn?.addEventListener('click', unlock);
+    els.transformBtn?.addEventListener('click', transform);
+    els.nextBtn?.addEventListener('click', nextScene);
+    els.selfToggle?.addEventListener('click', () => {
+        els.selfPanel?.classList.toggle('hidden');
+    });
+    els.selfAdd?.addEventListener('click', addSelfSentence);
+
+    renderSelfList();
+    resetRound();
+    render();
+}
