@@ -1513,6 +1513,211 @@ body.embed-mode .progress-hub {
         grid-template-columns: 1fr;
     }
 }
+
+/* WR2 visual pass - closer to reference mockup */
+.wrinkle-reveal-card {
+    border-color: #e1ddff;
+    box-shadow: 0 14px 30px rgba(99, 102, 241, 0.1);
+    background:
+        radial-gradient(circle at 8% -10%, rgba(199, 210, 254, 0.38) 0, transparent 45%),
+        radial-gradient(circle at 92% 110%, rgba(196, 181, 253, 0.28) 0, transparent 40%),
+        #fbfaff;
+}
+
+.wr2-topbar {
+    display: none;
+}
+
+.wr2-score-compact {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 10px 16px 0;
+    color: #475569;
+    font-weight: 800;
+    font-size: 0.84rem;
+}
+
+.wr2-headline {
+    padding-top: 8px;
+}
+
+.wr2-headline h4 {
+    color: #2f2d5f;
+    letter-spacing: 0.2px;
+    font-size: clamp(1.9rem, 6vw, 3rem);
+}
+
+.wr2-headline p {
+    color: #4c4b74;
+    font-size: clamp(1.18rem, 3.8vw, 1.8rem);
+}
+
+.wr2-sub-em {
+    color: #1f234d;
+    font-weight: 900;
+}
+
+.wr2-plain-box {
+    border: 1px solid #dad8ef;
+    box-shadow: 0 8px 16px rgba(148, 163, 184, 0.08);
+}
+
+.wr2-visible-sentence {
+    color: #27284c;
+    font-size: clamp(1.55rem, 5.4vw, 3rem);
+}
+
+.wr2-detect-zone {
+    border: 0;
+    background: transparent;
+    padding-top: 4px;
+}
+
+.wr2-zone-title {
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.92rem;
+}
+
+.wr2-quantifiers {
+    justify-content: center;
+    margin-bottom: 6px;
+}
+
+.wr2-quantifier {
+    border-style: dashed;
+    border-width: 2px;
+    border-color: #f4b4b4;
+    background: #fff5f5;
+    color: #bb2c2c;
+    box-shadow: none;
+}
+
+.wr2-quantifier.is-active {
+    transform: scale(1.15);
+    border-color: #f59e0b;
+    background: #fff8db;
+    color: #9a3412;
+    box-shadow: 0 8px 14px rgba(245, 158, 11, 0.2);
+}
+
+.wr2-overlay-box {
+    border-color: #ece7cf;
+    background: linear-gradient(180deg, #fffefb 0%, #fff9dd 100%);
+}
+
+.wr2-overlay-sentence {
+    color: #202642;
+    font-size: clamp(1.3rem, 4.7vw, 2.15rem);
+}
+
+.wr2-q-inline {
+    border-color: #d64545;
+    background: #fff7dc;
+    color: #b12727;
+    box-shadow: 0 2px 0 rgba(214, 69, 69, 0.22);
+}
+
+.wr2-explain-line {
+    border-top: 1px dashed #ebddaf;
+    padding-top: 8px;
+    color: #6b5c3a;
+}
+
+.wr2-release {
+    background: transparent;
+    border: 0;
+    padding: 2px 14px 8px;
+}
+
+.wr2-release p {
+    color: #166534;
+    font-size: 1rem;
+    margin-bottom: 9px;
+}
+
+.wr2-unlock-btn {
+    border-radius: 999px;
+    background: linear-gradient(90deg, #18a96b 0%, #168f59 100%);
+    border: 0;
+}
+
+.wr2-transform-zone {
+    background: transparent;
+    border: 0;
+    padding-top: 2px;
+}
+
+.wr2-transform-btn {
+    border-radius: 999px;
+    background: #1d4ed8;
+    border: 0;
+}
+
+.wr2-transformed {
+    border-color: #dbd8ee;
+    background: #ffffff;
+    box-shadow: 0 8px 22px rgba(99, 102, 241, 0.1);
+}
+
+.wr2-cloud-tags {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.wr2-cloud-tags span {
+    border: 1px solid #f2d9af;
+    background: #fff8db;
+    border-radius: 999px;
+    padding: 3px 9px;
+    color: #b43b3b;
+    font-size: 0.84rem;
+    font-weight: 900;
+}
+
+.wr2-cloud-sentence {
+    margin: 0 0 8px;
+    color: #1f2b52;
+    font-size: clamp(1.2rem, 4.2vw, 1.9rem);
+    font-weight: 900;
+}
+
+.wr2-transformed-text {
+    margin-top: 6px;
+    color: #1f5130;
+    background: #effcf4;
+    border: 1px solid #ccebd7;
+    border-radius: 999px;
+    padding: 9px 14px;
+    font-size: clamp(1.1rem, 4vw, 1.65rem);
+}
+
+.wr2-actions {
+    margin-top: 2px;
+}
+
+.wr2-actions .btn {
+    border-radius: 999px;
+}
+
+@media (max-width: 760px) {
+    .wr2-score-compact {
+        padding: 8px 12px 0;
+        font-size: 0.78rem;
+    }
+
+    .wr2-visible-sentence {
+        font-size: clamp(1.35rem, 7vw, 2rem);
+    }
+
+    .wr2-overlay-sentence {
+        font-size: clamp(1.15rem, 6vw, 1.65rem);
+    }
+}
 /* Blueprint Builder */
 .blueprint-container {
     width: 100%;
