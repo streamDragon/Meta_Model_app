@@ -3585,7 +3585,7 @@ function buildComicBlueprintHtml(blueprint) {
     `;
 }
 
-async function setupComicEngine2() {
+async function setupComicEngine2Legacy() {
     const els = {
         root: document.getElementById('comicEngine'),
         title: document.getElementById('comicTitle'),
@@ -5784,3 +5784,555 @@ function updateProgressHub() {
 // ==================== END OF APP ===================
 
 // ==================== END OF APP ===================
+
+// ==================== COMIC ENGINE FLOW (OVERRIDE) ===================
+
+const CEFLOW_STATES = Object.freeze({
+    SCENE_READY: 'SCENE_READY',
+    CHOICE_REVEALED: 'CHOICE_REVEALED',
+    POWER_CARD: 'POWER_CARD',
+    BLUEPRINT_OPEN: 'BLUEPRINT_OPEN',
+    NEXT_SCENE: 'NEXT_SCENE'
+});
+
+const CEFLOW_CHOICE_ORDER = Object.freeze(['angry', 'mock', 'rescue', 'avoid', 'meta']);
+
+const CEFLOW_FALLBACKS = Object.freeze({
+    angry: Object.freeze({
+        tone: 'danger', label: 'כעס', emoji: '😡',
+        counterReply: 'אני נסגר/ת כשמדברים אליי ככה.',
+        interpretation: 'תגובה אימפולסיבית הגבירה בושה וסגרה זרימת מידע.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 24, agency: 20, shame: 88 }), xrayTags: Object.freeze(['😳 בושה', '🚪 סגירה']), microOutcome: Object.freeze(['📉 זרימה', '🧱 תקיעה', '🔒 הימנעות']) })
+    }),
+    mock: Object.freeze({
+        tone: 'warn', label: 'לעג', emoji: '😏',
+        counterReply: 'טוב... אז אני כנראה סתם לא מספיק טוב/ה.',
+        interpretation: 'לעג מייצר השוואה ושיתוק, לא הבהרה.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 32, agency: 24, shame: 82 }), xrayTags: Object.freeze(['🙈 השוואה', '🧊 ניתוק']), microOutcome: Object.freeze(['📉 אמון', '📉 זרימה', '🧱 תקיעה']) })
+    }),
+    rescue: Object.freeze({
+        tone: 'purple', label: 'הצלה', emoji: '🛟',
+        counterReply: 'סבבה... אז תעשה/י במקומי.',
+        interpretation: 'הצלה פותרת רגעית אך משאירה תלות.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 46, agency: 20, shame: 50 }), xrayTags: Object.freeze(['🛟 תלות', '🧠 בלי למידה']), microOutcome: Object.freeze(['⏸️ הקלה', '🔁 תלות', '📉 אחריות']) })
+    }),
+    avoid: Object.freeze({
+        tone: 'muted', label: 'התחמקות', emoji: '🙈',
+        counterReply: 'אוקיי... אז נדחה גם את זה.',
+        interpretation: 'דחייה שומרת על נוחות רגעית ומעמיקה את התקיעות.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 30, agency: 22, shame: 62 }), xrayTags: Object.freeze(['🕳️ דחייה', '⏳ עומס']), microOutcome: Object.freeze(['📉 התקדמות', '🔁 חזרת בעיה', '🧱 תקיעה']) })
+    }),
+    meta: Object.freeze({
+        tone: 'good', label: 'מטה-מודל', emoji: '✅',
+        counterReply: 'אני נתקע/ת בצעד הראשון, לא ברור לי מאיפה להתחיל.',
+        interpretation: 'שאלה מדויקת חשפה את הקמט והחזירה סוכנות.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 86, agency: 84, shame: 24 }), xrayTags: Object.freeze(['🧩 חשיפה', '🌬️ פתיחה']), microOutcome: Object.freeze(['📈 זרימה', '🟢 סוכנות', '🔓 מידע חדש']) })
+    })
+});
+
+const CEFLOW_HL_RULES = Object.freeze([
+    Object.freeze({ type: 'generalization', label: 'הכללה', css: 'hl-generalization', tokens: Object.freeze(['כולם', 'תמיד', 'אף אחד', 'כלום', 'בשום מצב']) }),
+    Object.freeze({ type: 'modal', label: 'מודליות', css: 'hl-modal', tokens: Object.freeze(['אי אפשר', 'חייב', 'צריך', 'אסור', 'לא יכול']) }),
+    Object.freeze({ type: 'vague', label: 'עמימות פעולה', css: 'hl-vague', tokens: Object.freeze(['לעשות', 'לסדר', 'לטפל', 'להתארגן', 'להגיע']) })
+]);
+
+function ceflowClamp(value, fallback) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return fallback;
+    return Math.max(0, Math.min(100, Math.round(n)));
+}
+
+function ceflowNormBlueprint(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    return {
+        goal: String(raw.goal || '').trim(),
+        first: String(raw.first || raw.first_step || '').trim(),
+        middle: (Array.isArray(raw.middle) ? raw.middle : raw.middle_steps || []).map(v => String(v || '').trim()).filter(Boolean).slice(0, 3),
+        last: String(raw.last || raw.last_step || '').trim(),
+        alternatives: (raw.alternatives || []).map(v => String(v || '').trim()).filter(Boolean).slice(0, 2),
+        preconditions: (raw.preconditions || []).map(v => String(v || '').trim()).filter(Boolean).slice(0, 3)
+    };
+}
+
+function ceflowNormImpact(raw, id) {
+    const fallback = CEFLOW_FALLBACKS[id] || CEFLOW_FALLBACKS.meta;
+    const stats = raw?.stats || {};
+    return {
+        stats: {
+            flow: ceflowClamp(stats.flow, fallback.impact.stats.flow),
+            agency: ceflowClamp(stats.agency, fallback.impact.stats.agency),
+            shame: ceflowClamp(stats.shame, fallback.impact.stats.shame)
+        },
+        xrayTags: Array.isArray(raw?.xrayTags) && raw.xrayTags.length ? raw.xrayTags.slice(0, 3) : [...fallback.impact.xrayTags],
+        microOutcome: Array.isArray(raw?.microOutcome) && raw.microOutcome.length ? raw.microOutcome.slice(0, 3) : [...fallback.impact.microOutcome]
+    };
+}
+
+function ceflowNormChoice(raw, fallbackId) {
+    const id = String(raw?.id || fallbackId || '').toLowerCase();
+    const f = CEFLOW_FALLBACKS[id] || CEFLOW_FALLBACKS[fallbackId] || CEFLOW_FALLBACKS.meta;
+    const replyOptions = Array.isArray(raw?.replyOptions) ? raw.replyOptions.slice(0, 3) : [];
+    return {
+        id,
+        label: String(raw?.label || f.label || 'תגובה'),
+        tone: String(raw?.tone || f.tone || 'muted'),
+        emoji: String(raw?.emoji || f.emoji || '💬'),
+        say: String(raw?.say || ''),
+        counterReply: String(raw?.counterReply || f.counterReply || ''),
+        replyPrompt: String(raw?.replyPrompt || 'איך את/ה עונה עכשיו?'),
+        replyOptions: replyOptions.length ? replyOptions : [
+            'בוא/י ננשום רגע ונגדיר צעד ראשון.',
+            'איפה בדיוק נתקעת?',
+            'מה כבר כן עובד, אפילו חלקית?'
+        ],
+        interpretation: String(raw?.interpretation || f.interpretation || ''),
+        badge: String(raw?.badge || ''),
+        sfx: String(raw?.sfx || ''),
+        impact: ceflowNormImpact(raw?.impact, id),
+        powerQuestions: Array.isArray(raw?.powerQuestions) ? raw.powerQuestions.slice(0, 3).map(v => String(v || '').trim()).filter(Boolean) : [],
+        newInfoBubble: String(raw?.newInfoBubble || ''),
+        blueprint: ceflowNormBlueprint(raw?.blueprint)
+    };
+}
+
+function ceflowNormScenario(raw, i) {
+    if (!raw || typeof raw !== 'object') return null;
+    const map = new Map();
+    (raw.choices || []).forEach((choice, idx) => {
+        const idHint = CEFLOW_CHOICE_ORDER[idx] || 'meta';
+        const norm = ceflowNormChoice(choice, idHint);
+        map.set(norm.id, norm);
+    });
+    CEFLOW_CHOICE_ORDER.forEach(id => {
+        if (!map.has(id)) map.set(id, ceflowNormChoice({ id }, id));
+    });
+    const choices = CEFLOW_CHOICE_ORDER.map(id => map.get(id)).filter(Boolean);
+    const meta = choices.find(choice => choice.id === 'meta');
+    if (meta && !meta.powerQuestions.length) {
+        meta.powerQuestions = ['מה בדיוק לא ברור כרגע?', 'איזה צעד ראשון הכי קטן כן אפשרי?', 'איזה מידע חסר כדי להתקדם?'];
+    }
+    if (meta && !meta.newInfoBubble) {
+        meta.newInfoBubble = 'עכשיו זה ברור יותר: אפשר להתחיל מצעד קטן במקום להיתקע על הכול.';
+    }
+    return {
+        id: String(raw.id || `scene_${i + 1}`),
+        domain: String(raw.domain || 'כללי'),
+        title: String(raw.title || `סצנה ${i + 1}`),
+        level: String(raw.level || raw.levelTag || 'מודליות + הכללה'),
+        regulationNote: String(raw.regulationNote || 'לכולנו יש תגובה רגשית אימפולסיבית. התרגול כאן הוא לזהות אותה, לווסת סטייט, ולעבור לתגובה שכלית מבוססת שאלה.'),
+        characters: {
+            left: { name: String(raw?.characters?.left?.name || 'דמות שמאל'), sprite: String(raw?.characters?.left?.sprite || '') },
+            right: { name: String(raw?.characters?.right?.name || 'דמות ימין'), sprite: String(raw?.characters?.right?.sprite || '') }
+        },
+        dialog: (raw.dialog || []).map(item => ({
+            speaker: item?.speaker === 'right' ? 'right' : 'left',
+            text: String(item?.text || ''),
+            highlights: Array.isArray(item?.highlights) ? item.highlights : []
+        })).filter(line => line.text),
+        choices
+    };
+}
+
+function ceflowEscRe(value) {
+    return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function ceflowMarkToken(text, token, cssClass, label, mode) {
+    if (!token) return text;
+    const safe = escapeHtml(token);
+    const tip = mode === 'learn' ? ` title="${escapeHtml(label)}" data-tip="${escapeHtml(label)}"` : '';
+    const re = new RegExp(`(${ceflowEscRe(safe)})`, 'g');
+    return text.replace(re, `<span class="ceflow-hl ${cssClass}"${tip}>$1</span>`);
+}
+
+function ceflowHighlight(text, explicit, mode) {
+    let html = escapeHtml(text || '');
+    (explicit || []).forEach(item => {
+        const type = String(item?.type || '').toLowerCase();
+        const rule = CEFLOW_HL_RULES.find(r => r.type === type);
+        if (rule) html = ceflowMarkToken(html, item?.token, rule.css, rule.label, mode);
+    });
+    CEFLOW_HL_RULES.forEach(rule => {
+        rule.tokens.forEach(token => {
+            html = ceflowMarkToken(html, token, rule.css, rule.label, mode);
+        });
+    });
+    return html;
+}
+
+function ceflowToneClass(tone) {
+    const t = String(tone || 'muted').toLowerCase();
+    return t === 'danger' ? 'ceflow-tone-danger'
+        : t === 'warn' ? 'ceflow-tone-warn'
+        : t === 'purple' ? 'ceflow-tone-purple'
+        : t === 'good' ? 'ceflow-tone-good'
+        : 'ceflow-tone-muted';
+}
+
+async function setupComicEngine2() {
+    const els = {
+        root: document.getElementById('comicEngine'),
+        principle: document.getElementById('ceflow-principle'),
+        domain: document.getElementById('ceflow-domain'),
+        progress: document.getElementById('ceflow-progress'),
+        level: document.getElementById('ceflow-level'),
+        title: document.getElementById('ceflow-title'),
+        left: document.getElementById('ceflow-left-character'),
+        right: document.getElementById('ceflow-right-character'),
+        dialog: document.getElementById('ceflow-dialog'),
+        overlay: document.getElementById('ceflow-overlay'),
+        tags: document.getElementById('ceflow-xray-tags'),
+        flow: document.getElementById('ceflow-stat-flow'),
+        agency: document.getElementById('ceflow-stat-agency'),
+        shame: document.getElementById('ceflow-stat-shame'),
+        deck: document.getElementById('ceflow-choice-deck'),
+        replyBox: document.getElementById('ceflow-reply-box'),
+        replyQuick: document.getElementById('ceflow-reply-quick'),
+        replyInput: document.getElementById('ceflow-reply-input'),
+        replyConfirm: document.getElementById('ceflow-reply-confirm'),
+        replyStatus: document.getElementById('ceflow-reply-status'),
+        feedback: document.getElementById('ceflow-feedback'),
+        feedbackLeft: document.getElementById('ceflow-feedback-left'),
+        feedbackRight: document.getElementById('ceflow-feedback-right'),
+        power: document.getElementById('ceflow-power-card'),
+        powerQuestions: document.getElementById('ceflow-power-questions'),
+        newInfo: document.getElementById('ceflow-new-info'),
+        blueprint: document.getElementById('ceflow-blueprint'),
+        retry: document.getElementById('ceflow-retry'),
+        toggleMode: document.getElementById('ceflow-toggle-mode'),
+        openBlueprint: document.getElementById('ceflow-open-blueprint'),
+        openBlueprintInner: document.getElementById('ceflow-open-blueprint-inner'),
+        next: document.getElementById('ceflow-next-scene')
+    };
+    if (!els.root || !els.deck || !els.dialog) return;
+
+    let payload = null;
+    try {
+        const response = await fetch('data/comic-scenarios.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        payload = await response.json();
+    } catch (error) {
+        console.error('Cannot load data/comic-scenarios.json', error);
+        els.root.innerHTML = '<p>שגיאה בטעינת סצנות קומיקס.</p>';
+        return;
+    }
+
+    const scenarios = Array.isArray(payload?.scenarios) ? payload.scenarios.map(ceflowNormScenario).filter(Boolean) : [];
+    if (!scenarios.length) {
+        els.root.innerHTML = '<p>לא נמצאו סצנות קומיקס להצגה.</p>';
+        return;
+    }
+
+    let savedIndex = 0;
+    try {
+        const saved = JSON.parse(localStorage.getItem(COMIC_ENGINE_STORAGE_KEY) || '{}');
+        const idx = Number(saved?.index);
+        if (Number.isInteger(idx) && idx >= 0 && idx < scenarios.length) savedIndex = idx;
+    } catch (error) {
+        savedIndex = 0;
+    }
+
+    let savedMode = 'learn';
+    try {
+        const savedPrefs = JSON.parse(localStorage.getItem(COMIC_ENGINE_PREFS_KEY) || '{}');
+        if (savedPrefs?.mode === 'play') savedMode = 'play';
+    } catch (error) {
+        savedMode = 'learn';
+    }
+
+    const state = {
+        flowState: CEFLOW_STATES.SCENE_READY,
+        mode: savedMode,
+        index: savedIndex,
+        selectedChoice: null,
+        replyDraft: '',
+        userReply: '',
+        selectedQuestion: '',
+        generatedInfo: ''
+    };
+
+    const currentScenario = () => scenarios[state.index];
+    const metaChoice = () => (currentScenario()?.choices || []).find(choice => choice.id === 'meta') || null;
+    const activeBlueprint = () => state.selectedChoice?.blueprint || metaChoice()?.blueprint || null;
+
+    const persistMode = () => {
+        localStorage.setItem(COMIC_ENGINE_PREFS_KEY, JSON.stringify({ mode: state.mode, updatedAt: new Date().toISOString() }));
+    };
+    const persistIndex = () => {
+        localStorage.setItem(COMIC_ENGINE_STORAGE_KEY, JSON.stringify({ index: state.index, updatedAt: new Date().toISOString() }));
+    };
+
+    const speakerName = (line) => line.speaker === 'right' ? currentScenario()?.characters?.right?.name : currentScenario()?.characters?.left?.name;
+
+    const setMode = (mode, persist) => {
+        state.mode = mode === 'play' ? 'play' : 'learn';
+        els.root.classList.toggle('is-play-mode', state.mode === 'play');
+        if (els.toggleMode) {
+            els.toggleMode.textContent = state.mode === 'learn' ? '🎮 מצב משחק' : '📚 מצב לימוד';
+        }
+        if (persist) persistMode();
+    };
+
+    const resetRound = () => {
+        state.flowState = CEFLOW_STATES.SCENE_READY;
+        state.selectedChoice = null;
+        state.replyDraft = '';
+        state.userReply = '';
+        state.selectedQuestion = '';
+        state.generatedInfo = '';
+    };
+
+    const renderCharacters = () => {
+        const scenario = currentScenario();
+        const draw = (slot, ch) => {
+            if (!slot) return;
+            const safeName = escapeHtml(ch?.name || 'דמות');
+            const art = ch?.sprite ? `<img src="${escapeHtml(ch.sprite)}" alt="${safeName}" loading="lazy">` : '<div class="ceflow-avatar-fallback">🙂</div>';
+            slot.innerHTML = `<div class="ceflow-character-inner"><div class="ceflow-character-art">${art}</div><p class="ceflow-character-name">${safeName}</p></div>`;
+        };
+        draw(els.left, scenario?.characters?.left);
+        draw(els.right, scenario?.characters?.right);
+    };
+
+    const renderDialog = () => {
+        const scenario = currentScenario();
+        const lines = [...(scenario?.dialog || [])];
+        if (state.selectedChoice) {
+            lines.push({ speaker: 'right', text: state.selectedChoice.say, role: 'selected' });
+            lines.push({ speaker: 'left', text: state.selectedChoice.counterReply || CEFLOW_FALLBACKS[state.selectedChoice.id]?.counterReply || '', role: 'counter' });
+        }
+        if (state.userReply) lines.push({ speaker: 'right', text: state.userReply, role: 'reply' });
+        if (state.generatedInfo) lines.push({ speaker: 'left', text: state.generatedInfo, role: 'new-info' });
+
+        els.dialog.innerHTML = lines.map((line) => `
+            <article class="ceflow-bubble is-${line.speaker === 'right' ? 'right' : 'left'} ${line.role ? `is-${escapeHtml(line.role)}` : ''}">
+                <p class="ceflow-bubble-speaker">${escapeHtml(speakerName(line) || 'דמות')}</p>
+                <p class="ceflow-bubble-text">${ceflowHighlight(line.text, line.highlights, state.mode)}</p>
+            </article>
+        `).join('');
+    };
+
+    const renderOverlay = () => {
+        if (!state.selectedChoice || !els.overlay) {
+            els.overlay?.classList.add('hidden');
+            return;
+        }
+        const impact = state.selectedChoice.impact || {};
+        const stats = impact.stats || {};
+        if (els.tags) {
+            els.tags.innerHTML = (impact.xrayTags || []).map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
+        }
+        if (els.flow) els.flow.style.width = `${ceflowClamp(stats.flow, 50)}%`;
+        if (els.agency) els.agency.style.width = `${ceflowClamp(stats.agency, 50)}%`;
+        if (els.shame) els.shame.style.width = `${ceflowClamp(stats.shame, 50)}%`;
+        els.overlay.classList.remove('hidden');
+    };
+
+    const renderDeck = () => {
+        const scenario = currentScenario();
+        const locked = state.flowState !== CEFLOW_STATES.SCENE_READY;
+        els.deck.innerHTML = (scenario?.choices || []).map(choice => {
+            const selected = state.selectedChoice?.id === choice.id;
+            const icon = choice.badge ? `<img src="${escapeHtml(choice.badge)}" alt="${escapeHtml(choice.label)}" loading="lazy">` : '';
+            return `
+                <button type="button" class="ceflow-choice ${ceflowToneClass(choice.tone)}${selected ? ' is-selected' : ''}" data-choice-id="${escapeHtml(choice.id)}" ${locked ? 'disabled' : ''} aria-label="${escapeHtml(choice.label)}">
+                    <span class="ceflow-choice-top"><strong>${escapeHtml(choice.emoji)} ${escapeHtml(choice.label)}</strong>${icon}</span>
+                    <span class="ceflow-choice-line">${escapeHtml(choice.say)}</span>
+                </button>
+            `;
+        }).join('');
+    };
+
+    const renderReply = () => {
+        const open = !!state.selectedChoice && !state.userReply;
+        els.replyBox?.classList.toggle('hidden', !open);
+        if (!open) return;
+        if (els.replyQuick) {
+            els.replyQuick.innerHTML = (state.selectedChoice.replyOptions || []).map(opt => `<button type="button" class="ceflow-reply-option" data-reply-option="${escapeHtml(opt)}">${escapeHtml(opt)}</button>`).join('');
+        }
+        if (els.replyInput) els.replyInput.value = state.replyDraft || '';
+        if (els.replyStatus) els.replyStatus.textContent = '';
+    };
+
+    const renderFeedback = () => {
+        const open = !!state.selectedChoice && !!state.userReply;
+        els.feedback?.classList.toggle('hidden', !open);
+        if (!open) return;
+        const choice = state.selectedChoice;
+        const leftBadge = choice.badge ? `<img src="${escapeHtml(choice.badge)}" alt="badge" loading="lazy">` : '';
+        const leftSfx = choice.sfx ? `<img src="${escapeHtml(choice.sfx)}" alt="sfx" loading="lazy">` : '';
+        if (els.feedbackLeft) els.feedbackLeft.innerHTML = `${leftBadge}${leftSfx}`;
+        if (els.feedbackRight) {
+            els.feedbackRight.innerHTML = `
+                <p><strong>מה אמרת:</strong> ${escapeHtml(choice.say)}</p>
+                <p><strong>מה קרה:</strong></p>
+                <div class="ceflow-outcomes">${(choice.impact?.microOutcome || []).map(item => `<span>${escapeHtml(item)}</span>`).join('')}</div>
+                <p class="ceflow-interpretation"><strong>פרשנות:</strong> ${escapeHtml(choice.interpretation)}</p>
+                <p class="ceflow-regulation-note">${escapeHtml(currentScenario().regulationNote)}</p>
+            `;
+        }
+    };
+
+    const renderPower = () => {
+        const open = state.selectedChoice?.id === 'meta' && !!state.userReply && (state.flowState === CEFLOW_STATES.POWER_CARD || state.flowState === CEFLOW_STATES.BLUEPRINT_OPEN);
+        els.power?.classList.toggle('hidden', !open);
+        if (!open) return;
+        if (els.powerQuestions) {
+            els.powerQuestions.innerHTML = (state.selectedChoice.powerQuestions || []).map(q => `<button type="button" class="ceflow-power-question${state.selectedQuestion === q ? ' is-active' : ''}" data-power-question="${escapeHtml(q)}">${escapeHtml(q)}</button>`).join('');
+        }
+        if (els.newInfo) {
+            const hasInfo = !!state.generatedInfo;
+            els.newInfo.classList.toggle('hidden', !hasInfo);
+            els.newInfo.innerHTML = hasInfo
+                ? `<p><strong>שאלה:</strong> ${escapeHtml(state.selectedQuestion)}</p><p><strong>מידע חדש:</strong> ${escapeHtml(state.generatedInfo)}</p>`
+                : '';
+        }
+    };
+
+    const renderBlueprint = () => {
+        const bp = activeBlueprint();
+        const open = state.flowState === CEFLOW_STATES.BLUEPRINT_OPEN && !!bp;
+        els.blueprint?.classList.toggle('hidden', !open);
+        if (!open || !els.blueprint) return;
+        const middle = bp.middle || [];
+        const alternatives = bp.alternatives || [];
+        const preconditions = bp.preconditions || [];
+        els.blueprint.innerHTML = `
+            <h4>Blueprint קצר</h4>
+            <div class="ceflow-blueprint-grid">
+                <article class="ceflow-blueprint-step"><h5>🎯 מטרה</h5><p>${escapeHtml(bp.goal || 'לא הוגדר')}</p></article>
+                <article class="ceflow-blueprint-step"><h5>🟢 צעד ראשון</h5><p>${escapeHtml(bp.first || 'לא הוגדר')}</p></article>
+                <article class="ceflow-blueprint-step"><h5>🔁 שלבי ביניים</h5><p>${escapeHtml(middle.join(' | ') || 'עד 3 שלבים ברורים')}</p></article>
+                <article class="ceflow-blueprint-step"><h5>✅ צעד אחרון</h5><p>${escapeHtml(bp.last || 'לא הוגדר')}</p></article>
+                <article class="ceflow-blueprint-step"><h5>🧰 חלופות</h5><p>${escapeHtml(alternatives.join(' | ') || 'אין חלופות')}</p></article>
+            </div>
+            <p class="ceflow-blueprint-footnote"><strong>Preconditions:</strong> ${escapeHtml(preconditions.join(' | ') || 'אין תנאים מיוחדים')}</p>
+        `;
+    };
+
+    const renderControls = () => {
+        if (els.retry) els.retry.disabled = !state.selectedChoice;
+        if (els.next) els.next.disabled = !state.userReply;
+        const showBlueprint = !!activeBlueprint() && !!state.userReply;
+        els.openBlueprint?.classList.toggle('hidden', !showBlueprint);
+    };
+
+    const renderHeader = () => {
+        const scenario = currentScenario();
+        if (els.domain) els.domain.textContent = `תחום: ${scenario.domain}`;
+        if (els.progress) els.progress.textContent = `סצנה ${state.index + 1}/${scenarios.length}`;
+        if (els.level) els.level.textContent = `רמה: ${scenario.level}`;
+        if (els.title) els.title.textContent = scenario.title;
+        renderGlobalComicStrip('comic-engine', scenario);
+    };
+
+    const render = () => {
+        renderHeader();
+        renderCharacters();
+        renderDialog();
+        renderOverlay();
+        renderDeck();
+        renderReply();
+        renderFeedback();
+        renderPower();
+        renderBlueprint();
+        renderControls();
+        setMode(state.mode, false);
+    };
+
+    const choose = (choiceId) => {
+        if (state.flowState !== CEFLOW_STATES.SCENE_READY) return;
+        const choice = (currentScenario()?.choices || []).find(item => item.id === choiceId);
+        if (!choice) return;
+        state.selectedChoice = choice;
+        state.replyDraft = choice.replyOptions?.[0] || '';
+        state.flowState = CEFLOW_STATES.CHOICE_REVEALED;
+        state.userReply = '';
+        state.selectedQuestion = '';
+        state.generatedInfo = '';
+        playUISound(choice.id === 'meta' ? 'correct' : 'next');
+        render();
+        els.replyInput?.focus();
+    };
+
+    const confirmReply = () => {
+        const text = String(els.replyInput?.value || '').trim();
+        if (!text) {
+            if (els.replyStatus) els.replyStatus.textContent = 'כתבו תגובה קצרה לפני פרשנות.';
+            return;
+        }
+        state.userReply = text;
+        state.replyDraft = text;
+        if (state.selectedChoice?.id === 'meta') {
+            state.selectedQuestion = state.selectedChoice.powerQuestions?.[0] || '';
+            state.generatedInfo = state.selectedChoice.newInfoBubble || 'השאלה פתחה מידע חדש, ואפשר להתקדם לצעד ראשון.';
+            state.flowState = CEFLOW_STATES.POWER_CARD;
+        }
+        playUISound('finish');
+        render();
+    };
+
+    const openBlueprint = () => {
+        if (!activeBlueprint()) return;
+        state.flowState = CEFLOW_STATES.BLUEPRINT_OPEN;
+        render();
+    };
+
+    const retry = () => {
+        resetRound();
+        render();
+    };
+
+    const nextScene = () => {
+        if (!state.userReply) return;
+        state.flowState = CEFLOW_STATES.NEXT_SCENE;
+        els.root.classList.add('ceflow-scene-leave');
+        setTimeout(() => {
+            state.index = (state.index + 1) % scenarios.length;
+            persistIndex();
+            resetRound();
+            render();
+            els.root.classList.remove('ceflow-scene-leave');
+            els.root.classList.add('ceflow-scene-enter');
+            setTimeout(() => els.root.classList.remove('ceflow-scene-enter'), 190);
+        }, 130);
+    };
+
+    els.deck?.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-choice-id]');
+        if (!button) return;
+        choose(button.getAttribute('data-choice-id'));
+    });
+    els.replyQuick?.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-reply-option]');
+        if (!button || !els.replyInput) return;
+        const value = button.getAttribute('data-reply-option') || '';
+        state.replyDraft = value;
+        els.replyInput.value = value;
+        els.replyInput.focus();
+    });
+    els.replyInput?.addEventListener('input', () => {
+        state.replyDraft = String(els.replyInput.value || '');
+    });
+    els.replyConfirm?.addEventListener('click', confirmReply);
+    els.powerQuestions?.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-power-question]');
+        if (!button || !state.selectedChoice) return;
+        state.selectedQuestion = button.getAttribute('data-power-question') || '';
+        state.generatedInfo = state.selectedChoice.newInfoBubble || 'נפתח מידע חדש שאפשר לעבוד איתו.';
+        state.flowState = CEFLOW_STATES.POWER_CARD;
+        render();
+    });
+    els.retry?.addEventListener('click', retry);
+    els.next?.addEventListener('click', nextScene);
+    els.openBlueprint?.addEventListener('click', openBlueprint);
+    els.openBlueprintInner?.addEventListener('click', openBlueprint);
+    els.toggleMode?.addEventListener('click', () => {
+        state.mode = state.mode === 'learn' ? 'play' : 'learn';
+        setMode(state.mode, true);
+        render();
+    });
+
+    setMode(state.mode, false);
+    render();
+}

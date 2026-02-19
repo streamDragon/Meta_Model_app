@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meta Model - כלי תרגול שאול מטה מודל</title>
-    <link rel="stylesheet" href="css/style.css?v=20260219c">
+    <link rel="stylesheet" href="css/style.css?v=20260219d">
 </head>
 <body>
     <!-- SPLASH SCREEN -->
@@ -370,87 +370,95 @@
 
         <!-- COMIC ENGINE TAB -->
         <section id="comic-engine" class="tab-content">
-            <div class="card">
-                <h2>🧩 Comic Engine 2.0</h2>
-                <p class="subtitle">נתונים → רנדר סצנה → בחירה → החלפת הבעות → משוב → Blueprint.</p>
+            <div class="card comic-engine-shell">
+                <h2>🎭 Comic Engine Flow</h2>
+                <p class="subtitle">דיאלוג חי בעמוד אחד: בחירה → תגובת צד שני → תגובה שלך → פרשנות → חלופה שכלית + ויסות סטייט.</p>
 
-                <section id="comicEngine" class="comic-engine">
-                    <header class="comic-header">
-                        <div class="comic-header-main">
-                            <h2 id="comicTitle">סצנה</h2>
-                            <div id="comicMeta" class="comic-meta"></div>
+                <section id="comicEngine" class="ceflow-engine" dir="rtl">
+                    <aside id="ceflow-principle" class="ceflow-principle">
+                        <h3>עיקרון העבודה</h3>
+                        <p>
+                            לכולנו יש תגובה רגשית אימפולסיבית. כאן מתרגלים מעבר מכוח הרגל לתגובה שכלית:
+                            חשיפה של הקמט, ויסות סטייט, ואז שאלה מדויקת שמחזירה זרימת מידע.
+                        </p>
+                    </aside>
+
+                    <header class="ceflow-header">
+                        <div class="ceflow-chip-row">
+                            <span id="ceflow-domain" class="ceflow-chip">תחום</span>
+                            <span id="ceflow-progress" class="ceflow-chip">1/1</span>
+                            <span id="ceflow-level" class="ceflow-chip">רמה</span>
                         </div>
-                        <button id="comicCompactToggle" class="comic-compact-toggle" type="button" aria-pressed="false">
-                            מצב קומפקטי
-                        </button>
+                        <h3 id="ceflow-title" class="ceflow-title">כותרת סצנה</h3>
                     </header>
 
-                    <div id="comicQuickParams" class="comic-quick-params" aria-live="polite"></div>
+                    <div class="ceflow-stage-wrap">
+                        <article id="ceflow-left-character" class="ceflow-character-card"></article>
 
-                    <details id="comicParamsPanel" class="comic-params-panel">
-                        <summary>פרמטרים לתצוגה</summary>
-                        <div class="comic-params-grid">
-                            <label class="comic-param-option">
-                                <input id="comicParamAutoCompact" type="checkbox" checked>
-                                כיווץ אוטומטי אחרי בחירה
-                            </label>
-                            <label class="comic-param-option">
-                                <input id="comicParamShowSceneArt" type="checkbox" checked>
-                                הצגת איור סצנה
-                            </label>
-                            <label class="comic-param-option">
-                                <input id="comicParamShowCharacters" type="checkbox" checked>
-                                הצגת דמויות צד
-                            </label>
-                            <label class="comic-param-option comic-param-range">
-                                גודל טקסט
-                                <input id="comicParamTextScale" type="range" min="90" max="115" step="5" value="100">
-                                <span id="comicParamTextScaleValue" class="comic-param-range-value">100%</span>
-                            </label>
+                        <section class="ceflow-stage" aria-live="polite">
+                            <div id="ceflow-dialog" class="ceflow-dialog"></div>
+
+                            <div id="ceflow-overlay" class="ceflow-overlay hidden">
+                                <div id="ceflow-xray-tags" class="ceflow-xray-tags"></div>
+                                <div class="ceflow-stats">
+                                    <div class="ceflow-stat">
+                                        <span>Flow</span>
+                                        <div class="ceflow-bar"><span id="ceflow-stat-flow"></span></div>
+                                    </div>
+                                    <div class="ceflow-stat">
+                                        <span>Agency</span>
+                                        <div class="ceflow-bar"><span id="ceflow-stat-agency"></span></div>
+                                    </div>
+                                    <div class="ceflow-stat">
+                                        <span>Shame</span>
+                                        <div class="ceflow-bar"><span id="ceflow-stat-shame"></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <article id="ceflow-right-character" class="ceflow-character-card"></article>
+                    </div>
+
+                    <section>
+                        <h4 class="ceflow-block-title">בחר/י תגובה</h4>
+                        <div id="ceflow-choice-deck" class="ceflow-choice-deck" role="group" aria-label="אפשרויות תגובה"></div>
+                    </section>
+
+                    <section id="ceflow-reply-box" class="ceflow-reply-box hidden">
+                        <h4 class="ceflow-block-title">הצד השני הגיב. איך את/ה עונה עכשיו?</h4>
+                        <div id="ceflow-reply-quick" class="ceflow-reply-quick"></div>
+                        <label for="ceflow-reply-input" class="ceflow-input-label">תגובה שלך:</label>
+                        <textarea id="ceflow-reply-input" rows="2" placeholder="כתבו תגובה אחת מדויקת וקצרה..."></textarea>
+                        <div class="ceflow-inline-actions">
+                            <button id="ceflow-reply-confirm" class="btn btn-primary" type="button">אשר תגובה</button>
+                            <small id="ceflow-reply-status" aria-live="polite"></small>
                         </div>
-                    </details>
+                    </section>
 
-                    <div class="comic-stage">
-                        <div class="comic-character" id="charLeft"></div>
-                        <div class="comic-dialog" id="comicDialog"></div>
-                        <div class="comic-character" id="charRight"></div>
-                    </div>
+                    <section id="ceflow-feedback" class="ceflow-feedback hidden" aria-live="polite">
+                        <div id="ceflow-feedback-left" class="ceflow-feedback-left"></div>
+                        <div id="ceflow-feedback-right" class="ceflow-feedback-right"></div>
+                    </section>
 
-                    <div class="comic-choices" id="comicChoices"></div>
-
-                    <div class="comic-feedback" id="comicFeedback" hidden>
-                        <div class="comic-feedback-left" id="comicFeedbackLeft"></div>
-                        <div class="comic-feedback-right" id="comicFeedbackRight"></div>
-                    </div>
-
-                    <div class="comic-controls">
-                        <button id="btnNextScene" class="btn-next" disabled>סצנה הבאה</button>
-                    </div>
-                </section>
-
-                <section id="communityWall" class="community-wall">
-                    <div class="community-wall-header">
-                        <h3>קיר שאלות ומשוב</h3>
-                        <p>אפשר להשאיר שאלה או הודעה, ולקבל פידבק מיידי על איכות הניסוח.</p>
-                    </div>
-
-                    <form id="communityWallForm" class="community-form">
-                        <label>
-                            שם (אופציונלי)
-                            <input id="communityName" type="text" maxlength="40" placeholder="לדוגמה: נועם">
-                        </label>
-                        <label>
-                            שאלה / הודעה
-                            <textarea id="communityMessage" rows="3" maxlength="300" required placeholder="כתבו כאן שאלה שרוצים לחדד..."></textarea>
-                        </label>
-                        <div class="community-form-actions">
-                            <button type="submit" class="btn btn-primary">שלח וקבל פידבק</button>
-                            <button type="button" id="communityClearBtn" class="btn btn-secondary">נקה קיר</button>
+                    <section id="ceflow-power-card" class="ceflow-power-card hidden">
+                        <h4>Power Card: במקום תגובה אימפולסיבית</h4>
+                        <p>בחר/י שאלה מטה-מודל אחת. אחרי שאלה מדויקת, הדיאלוג נפתח מחדש.</p>
+                        <div id="ceflow-power-questions" class="ceflow-power-questions"></div>
+                        <div id="ceflow-new-info" class="ceflow-new-info hidden"></div>
+                        <div class="ceflow-inline-actions">
+                            <button id="ceflow-open-blueprint-inner" class="btn btn-secondary" type="button">בוא נבנה תוכנית</button>
                         </div>
-                        <div id="communityWallStatus" class="community-status" role="status" aria-live="polite"></div>
-                    </form>
+                    </section>
 
-                    <div id="communityFeed" class="community-feed"></div>
+                    <section id="ceflow-blueprint" class="ceflow-blueprint hidden"></section>
+
+                    <footer class="ceflow-controls">
+                        <button id="ceflow-retry" class="btn btn-secondary" type="button" disabled>↻ נסה שוב</button>
+                        <button id="ceflow-toggle-mode" class="btn btn-secondary" type="button">📚 מצב לימוד</button>
+                        <button id="ceflow-open-blueprint" class="btn btn-secondary hidden" type="button">🧭 בוא נבנה תוכנית</button>
+                        <button id="ceflow-next-scene" class="btn btn-primary" type="button" disabled>➡ סצנה הבאה</button>
+                    </footer>
                 </section>
             </div>
         </section>
@@ -855,6 +863,6 @@
         </section>
     </div>
 
-    <script src="js/app.js?v=20260219c"></script>
+    <script src="js/app.js?v=20260219d"></script>
 </body>
 </html>
