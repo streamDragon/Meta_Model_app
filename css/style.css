@@ -2706,6 +2706,51 @@ a:hover {
     color: #742a2a;
 }
 
+.music-toggle-btn {
+    position: fixed;
+    inset-inline-end: 16px;
+    bottom: 16px;
+    width: 54px;
+    height: 54px;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #4f46e5, #2563eb);
+    color: #fff;
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 10px 26px rgba(37, 99, 235, 0.34);
+    z-index: 1400;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.music-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(37, 99, 235, 0.4);
+}
+
+.music-toggle-btn.is-playing {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    box-shadow: 0 12px 28px rgba(239, 68, 68, 0.34);
+}
+
+.music-toggle-btn.is-muted {
+    background: #64748b;
+    box-shadow: 0 10px 24px rgba(100, 116, 139, 0.35);
+}
+
+@media (max-width: 768px) {
+    .music-toggle-btn {
+        width: 48px;
+        height: 48px;
+        inset-inline-end: 12px;
+        bottom: 12px;
+        font-size: 1.2rem;
+    }
+}
+
 #next-question-btn {
     width: 100%;
 }

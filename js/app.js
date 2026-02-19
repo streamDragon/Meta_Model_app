@@ -99,10 +99,12 @@ let audioState = {
     context: null,
     muted: false,
     openingPlayed: false,
-    openingTrack: null
+    openingTrack: null,
+    firstEntryDone: false
 };
 
 const OPENING_TRACK_SRC = 'assets/audio/The_Inner_Task.mp3';
+const OPENING_TRACK_FIRST_ENTRY_KEY = 'meta_opening_track_first_entry_done';
 
 const TRAINER_CATEGORY_LABELS = {
     DELETION: 'מחיקה (Deletion)',
@@ -156,6 +158,7 @@ function getQuestionCategoryKey(question) {
 function loadAudioSettings() {
     const saved = localStorage.getItem('meta_audio_muted');
     audioState.muted = saved === 'true';
+    audioState.firstEntryDone = localStorage.getItem(OPENING_TRACK_FIRST_ENTRY_KEY) === 'true';
 }
 
 function ensureAudioContext() {
@@ -174,6 +177,9 @@ function ensureOpeningTrack() {
         const track = new Audio(OPENING_TRACK_SRC);
         track.preload = 'auto';
         track.loop = false;
+        track.addEventListener('play', updateMusicToggleButtonUI);
+        track.addEventListener('pause', updateMusicToggleButtonUI);
+        track.addEventListener('ended', updateMusicToggleButtonUI);
         audioState.openingTrack = track;
         return track;
     } catch (e) {
@@ -181,13 +187,77 @@ function ensureOpeningTrack() {
     }
 }
 
+function isOpeningTrackPlaying() {
+    const track = audioState.openingTrack;
+    return !!(track && !track.paused && !track.ended);
+}
+
+function updateMusicToggleButtonUI() {
+    const btn = document.getElementById('music-toggle-btn');
+    if (!btn) return;
+
+    if (audioState.muted) {
+        btn.textContent = '🔇';
+        btn.setAttribute('aria-label', 'Enable audio and play opening music');
+        btn.setAttribute('title', 'Enable audio and play opening music');
+        btn.classList.add('is-muted');
+        btn.classList.remove('is-playing');
+        return;
+    }
+
+    if (isOpeningTrackPlaying()) {
+        btn.textContent = '⏹';
+        btn.setAttribute('aria-label', 'Stop opening music');
+        btn.setAttribute('title', 'Stop opening music');
+        btn.classList.add('is-playing');
+        btn.classList.remove('is-muted');
+        return;
+    }
+
+    btn.textContent = '🎵';
+    btn.setAttribute('aria-label', 'Play opening music');
+    btn.setAttribute('title', 'Play opening music');
+    btn.classList.remove('is-playing', 'is-muted');
+}
+
+function setupMusicToggleButton() {
+    let btn = document.getElementById('music-toggle-btn');
+    if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'music-toggle-btn';
+        btn.className = 'music-toggle-btn';
+        btn.type = 'button';
+        btn.textContent = '🎵';
+        document.body.appendChild(btn);
+    }
+
+    if (btn.dataset.audioBound !== 'true') {
+        btn.dataset.audioBound = 'true';
+        btn.addEventListener('click', async () => {
+            ensureAudioContext();
+            if (audioState.muted) setMutedAudio(false);
+            if (isOpeningTrackPlaying()) {
+                stopOpeningMusic(true);
+                return;
+            }
+            await playOpeningMusic({ force: true, markFirstEntry: false });
+        });
+    }
+
+    updateMusicToggleButtonUI();
+}
+
 function updateMuteButtonUI() {
     const btns = document.querySelectorAll('.audio-mute-btn');
-    if (!btns.length) return;
+    if (!btns.length) {
+        updateMusicToggleButtonUI();
+        return;
+    }
     btns.forEach(btn => {
         btn.textContent = audioState.muted ? 'סאונד כבוי' : 'סאונד פעיל';
         btn.classList.toggle('is-muted', audioState.muted);
     });
+    updateMusicToggleButtonUI();
 }
 
 function setMutedAudio(isMuted) {
@@ -285,18 +355,55 @@ function playUISound(kind) {
     }
 }
 
-// Play opening track exactly once per app entry.
-async function playOpeningMusic() {
-    if (audioState.muted || audioState.openingPlayed) return;
+function stopOpeningMusic(resetToStart = false) {
+    const track = audioState.openingTrack;
+    if (!track) return;
+    if (!track.paused) track.pause();
+    if (resetToStart) track.currentTime = 0;
+    updateMusicToggleButtonUI();
+}
+
+// Play opening track once on first entry, or manually via the music button.
+async function playOpeningMusic({ force = false, markFirstEntry = false } = {}) {
+    if ((audioState.muted && !force) || (audioState.openingPlayed && !force)) return false;
     try {
         const track = ensureOpeningTrack();
-        if (!track) return;
+        if (!track) return false;
         track.currentTime = 0;
         await track.play();
         audioState.openingPlayed = true;
+        if (markFirstEntry) {
+            audioState.firstEntryDone = true;
+            localStorage.setItem(OPENING_TRACK_FIRST_ENTRY_KEY, 'true');
+        }
+        updateMusicToggleButtonUI();
+        return true;
     } catch (e) {
         // Autoplay may fail until the first user interaction.
+        updateMusicToggleButtonUI();
+        return false;
     }
+}
+
+function setupOpeningMusicOnFirstEntry() {
+    if (audioState.firstEntryDone || audioState.muted) {
+        updateMusicToggleButtonUI();
+        return;
+    }
+
+    const onFirstInteraction = () => {
+        ensureAudioContext();
+        playOpeningMusic({ markFirstEntry: true });
+    };
+
+    // Browsers may block autoplay until the first user interaction.
+    document.addEventListener('pointerdown', onFirstInteraction, { once: true });
+
+    playOpeningMusic({ markFirstEntry: true }).then((started) => {
+        if (started) {
+            document.removeEventListener('pointerdown', onFirstInteraction);
+        }
+    });
 }
 
 // Hide Splash Screen
@@ -363,15 +470,8 @@ document.addEventListener('DOMContentLoaded', () => {
     applyEmbeddedCompactMode();
     loadAudioSettings();
     setupAudioMuteButtons();
-
-    // Browsers usually require user interaction before audio starts.
-    document.addEventListener('pointerdown', () => {
-        ensureAudioContext();
-        playOpeningMusic();
-    }, { once: true });
-
-    // Play opening music
-    playOpeningMusic();
+    setupMusicToggleButton();
+    setupOpeningMusicOnFirstEntry();
     
     // Hide splash after animation
     hideSplashScreen();
