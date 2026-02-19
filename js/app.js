@@ -98,8 +98,11 @@ let scenarioTrainer = {
 let audioState = {
     context: null,
     muted: false,
-    openingPlayed: false
+    openingPlayed: false,
+    openingTrack: null
 };
+
+const OPENING_TRACK_SRC = 'assets/audio/The_Inner_Task.mp3';
 
 const TRAINER_CATEGORY_LABELS = {
     DELETION: 'מחיקה (Deletion)',
@@ -165,6 +168,19 @@ function ensureAudioContext() {
     }
 }
 
+function ensureOpeningTrack() {
+    if (audioState.openingTrack) return audioState.openingTrack;
+    try {
+        const track = new Audio(OPENING_TRACK_SRC);
+        track.preload = 'auto';
+        track.loop = false;
+        audioState.openingTrack = track;
+        return track;
+    } catch (e) {
+        return null;
+    }
+}
+
 function updateMuteButtonUI() {
     const btns = document.querySelectorAll('.audio-mute-btn');
     if (!btns.length) return;
@@ -177,6 +193,10 @@ function updateMuteButtonUI() {
 function setMutedAudio(isMuted) {
     audioState.muted = isMuted;
     localStorage.setItem('meta_audio_muted', String(isMuted));
+    if (isMuted && audioState.openingTrack && !audioState.openingTrack.paused) {
+        audioState.openingTrack.pause();
+        audioState.openingTrack.currentTime = 0;
+    }
     updateMuteButtonUI();
 }
 
@@ -265,44 +285,17 @@ function playUISound(kind) {
     }
 }
 
-// Play opening music using Web Audio API
-function playOpeningMusic() {
+// Play opening track exactly once per app entry.
+async function playOpeningMusic() {
     if (audioState.muted || audioState.openingPlayed) return;
     try {
-        const audioContext = ensureAudioContext();
-        if (!audioContext) return;
-        if (audioContext.state === 'suspended') audioContext.resume();
-        
-        // Create a pleasant opening chord sequence
-        const now = audioContext.currentTime;
-        const notes = [
-            { freq: 523.25, duration: 0.5, delay: 0 },     // C5
-            { freq: 659.25, duration: 0.5, delay: 0.2 },   // E5
-            { freq: 783.99, duration: 0.5, delay: 0.4 },   // G5
-            { freq: 1046.50, duration: 0.8, delay: 0.6 }   // C6
-        ];
-        
-        notes.forEach(note => {
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-            
-            osc.connect(gain);
-            gain.connect(audioContext.destination);
-            
-            osc.frequency.value = note.freq;
-            osc.type = 'sine';
-            
-            gain.gain.setValueAtTime(0.1, now + note.delay);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + note.delay + note.duration);
-            
-            osc.start(now + note.delay);
-            osc.stop(now + note.delay + note.duration);
-        });
-
+        const track = ensureOpeningTrack();
+        if (!track) return;
+        track.currentTime = 0;
+        await track.play();
         audioState.openingPlayed = true;
     } catch (e) {
-        // Silently fail if audio context is not supported
-        console.log('Audio not supported');
+        // Autoplay may fail until the first user interaction.
     }
 }
 
