@@ -1,0 +1,40 @@
+{
+  "name": "meta_model_app",
+  "version": "1.0.0",
+  "description": "׳›׳׳™ ׳׳™׳ ׳˜׳¨׳ ׳˜ ׳׳™׳ ׳˜׳¨׳׳§׳˜׳™׳‘׳™ ׳׳×׳¨׳’׳•׳ ׳˜׳›׳ ׳™׳§׳•׳× **Meta Model** ׳©׳ NLP (Neuro-Linguistic Programming) ׳¢׳ ׳₪׳™ Richard Bandler ׳•-John Grinder.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build:web": "vite build",
+    "build": "vite build && node scripts/prepare-dist.mjs",
+    "preview": "vite preview",
+    "cap:sync": "npx cap sync",
+    "cap:android": "npx cap sync android",
+    "android:build": "npm run build && npx cap sync android",
+    "android:open": "npx cap open android"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/streamDragon/Meta_Model_app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/streamDragon/Meta_Model_app/issues"
+  },
+  "homepage": "https://github.com/streamDragon/Meta_Model_app#readme",
+  "devDependencies": {
+    "@capacitor/cli": "^8.1.0",
+    "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.1.0",
+    "@capacitor/core": "^8.1.0"
+  },
+  "private": true
+}

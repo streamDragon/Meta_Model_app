@@ -1,0 +1,6 @@
+{
+  "appId": "com.streamdragon.metamodelapp",
+  "appName": "Meta Model",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

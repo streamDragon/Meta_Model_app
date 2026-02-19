@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Meta Model</string>
+    <string name="title_activity_main">Meta Model</string>
+    <string name="package_name">com.streamdragon.metamodelapp</string>
+    <string name="custom_url_scheme">com.streamdragon.metamodelapp</string>
+</resources>

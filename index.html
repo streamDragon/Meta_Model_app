@@ -565,6 +565,37 @@
                         </div>
                     </div>
 
+                    <div id="wrinkle-game" class="card wrinkle-game-card">
+                        <div class="wrinkle-game-header">
+                            <h3>🧩 חשף את הקמט!</h3>
+                            <small>קודם חשיפה, אחר כך אתגור. בונים רפלקס מהיר לזיהוי הנחה סמויה.</small>
+                        </div>
+
+                        <div class="wrinkle-score-row">
+                            <span>🔥 רצף: <strong id="wrinkle-streak">0</strong></span>
+                            <span>⭐ נקודות: <strong id="wrinkle-points">0</strong></span>
+                            <span>⏱️ Due: <strong id="wrinkle-due-count">0</strong></span>
+                        </div>
+
+                        <div class="wrinkle-round-box">
+                            <p id="wrinkle-step-label" class="wrinkle-step-label">שלב 1/2: חשיפת הקמט</p>
+                            <p id="wrinkle-statement" class="wrinkle-statement"></p>
+                            <div id="wrinkle-options" class="wrinkle-options"></div>
+                            <div id="wrinkle-feedback" class="wrinkle-feedback"></div>
+                            <button id="wrinkle-next-btn" class="btn btn-primary hidden">משפט הבא</button>
+                            <div id="wrinkle-fx-layer" class="wrinkle-fx-layer" aria-hidden="true"></div>
+                        </div>
+
+                        <div class="wrinkle-self-box">
+                            <label for="wrinkle-self-input">Self-Referential Check: כתבו משפט שלכם לתרגול</label>
+                            <textarea id="wrinkle-self-input" rows="2" placeholder="לדוגמה: אני לא יכול להוביל את השיחה הזאת."></textarea>
+                            <div class="wrinkle-self-actions">
+                                <button id="wrinkle-add-self-btn" class="btn btn-secondary">הוסף משפט אישי למשחק</button>
+                            </div>
+                            <ul id="wrinkle-self-list" class="wrinkle-self-list"></ul>
+                        </div>
+                    </div>
+
                     <!-- TRAINER MODE INTERFACE -->
                     <div id="trainer-mode" class="trainer-mode hidden">
                         <!-- QUESTION DISPLAY -->

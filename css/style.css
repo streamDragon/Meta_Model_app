@@ -904,6 +904,179 @@ body.embed-mode header {
     font-size: 0.85rem;
     color: #475569;
 }
+
+.wrinkle-game-card {
+    background: linear-gradient(145deg, #fffdf7 0%, #fef3c7 100%);
+    border: 1px solid #facc15;
+    box-shadow: 0 8px 18px rgba(217, 119, 6, 0.12);
+    margin-bottom: 18px;
+}
+
+.wrinkle-game-header h3 {
+    margin: 0;
+    color: #92400e;
+}
+
+.wrinkle-game-header small {
+    color: #7c2d12;
+}
+
+.wrinkle-score-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 12px 0 14px;
+    font-weight: 700;
+    color: #78350f;
+}
+
+.wrinkle-round-box {
+    position: relative;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid #fbbf24;
+    border-radius: 12px;
+    padding: 14px;
+    overflow: hidden;
+}
+
+.wrinkle-step-label {
+    margin: 0 0 8px;
+    color: #1e3a8a;
+    font-weight: 700;
+}
+
+.wrinkle-statement {
+    margin: 0 0 12px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px dashed #94a3b8;
+    font-weight: 700;
+    color: #0f172a;
+    min-height: 56px;
+}
+
+.wrinkle-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.wrinkle-option-btn {
+    width: 100%;
+    margin-right: 0;
+    text-align: right;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
+}
+
+.wrinkle-option-btn:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+}
+
+.wrinkle-option-btn.is-correct {
+    background: #dcfce7;
+    border-color: #22c55e;
+    color: #14532d;
+}
+
+.wrinkle-option-btn.is-wrong {
+    background: #fee2e2;
+    border-color: #ef4444;
+    color: #7f1d1d;
+}
+
+.wrinkle-feedback {
+    min-height: 46px;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 10px;
+    background: #eef2ff;
+    color: #312e81;
+    font-size: 0.94rem;
+}
+
+.wrinkle-feedback[data-tone="success"] {
+    background: #dcfce7;
+    color: #14532d;
+}
+
+.wrinkle-feedback[data-tone="warn"] {
+    background: #fee2e2;
+    color: #7f1d1d;
+}
+
+.wrinkle-self-box {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(124, 45, 18, 0.2);
+}
+
+.wrinkle-self-box label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #7c2d12;
+}
+
+.wrinkle-self-box textarea {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #d6d3d1;
+    padding: 10px;
+    resize: vertical;
+    min-height: 60px;
+    font-size: 0.95rem;
+}
+
+.wrinkle-self-actions {
+    margin-top: 8px;
+}
+
+.wrinkle-self-list {
+    margin: 10px 0 0;
+    padding-inline-start: 20px;
+    color: #334155;
+    font-size: 0.88rem;
+    display: grid;
+    gap: 4px;
+}
+
+.wrinkle-fx-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+}
+
+.wrinkle-brick,
+.wrinkle-confetti {
+    position: absolute;
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.8);
+}
+
+.wrinkle-fx-layer.is-active .wrinkle-brick {
+    animation: wrinkleBrickBurst 760ms ease-out forwards;
+}
+
+.wrinkle-fx-layer.is-active .wrinkle-confetti {
+    animation: wrinkleConfettiDrop 980ms ease-out forwards;
+}
+
+@keyframes wrinkleBrickBurst {
+    0% { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.6) rotate(0deg); }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: translate3d(var(--x, 0), -72px, 0) scale(1) rotate(var(--r, 0deg)); }
+}
+
+@keyframes wrinkleConfettiDrop {
+    0% { opacity: 0; transform: translate3d(0, -10px, 0) rotate(0deg); }
+    15% { opacity: 1; }
+    100% { opacity: 0; transform: translate3d(var(--x, 0), 86px, 0) rotate(var(--r, 0deg)); }
+}
 /* Blueprint Builder */
 .blueprint-container {
     width: 100%;
