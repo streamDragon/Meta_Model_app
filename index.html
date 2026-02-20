@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meta Model - כלי תרגול שאול מטה מודל</title>
-    <link rel="stylesheet" href="css/style.css?v=1.0.12">
+    <link rel="stylesheet" href="css/style.css?v=1.0.13">
 </head>
 <body>
     <!-- SPLASH SCREEN -->
@@ -611,6 +611,10 @@
                                             <button id="rapid-mode-exam-btn" type="button" class="rapid-mode-btn">מבחן</button>
                                         </div>
                                         <small id="rapid-mode-note" class="rapid-mode-note">למידה: אפשר לעצור ולקבל HELP.</small>
+                                        <div class="rapid-mode-utility-row">
+                                            <button id="rapid-explain-btn" type="button" class="rapid-inline-btn">הסבר התרגיל</button>
+                                            <button id="rapid-focus-exit-btn" type="button" class="rapid-inline-btn rapid-inline-btn-ghost hidden">יציאה מפוקוס</button>
+                                        </div>
                                     </div>
 
                                     <div class="rapid-panel">
@@ -666,6 +670,24 @@
 
                                     <div id="rapid-pattern-buttons" class="rapid-pattern-buttons" role="group" aria-label="כפתורי תבניות"></div>
                                     <div id="rapid-ai-feedback" class="rapid-ai-feedback hidden" aria-live="polite"></div>
+                                </div>
+                            </div>
+
+                            <div id="rapid-explain-modal" class="rapid-explain-modal hidden" role="dialog" aria-modal="true" aria-labelledby="rapid-explain-title">
+                                <div class="rapid-explain-dialog">
+                                    <button id="rapid-explain-close-btn" type="button" class="rapid-explain-close" aria-label="סגירה">×</button>
+                                    <h4 id="rapid-explain-title">מה עושים ב-Meta Radar?</h4>
+                                    <p>התרגול מאמן זיהוי מהיר של הפרות מטה-מודל בזמן אמת, ברגע שעולה טריגר לשוני במשפט.</p>
+                                    <ol>
+                                        <li>קוראים את הפסקה (4 שורות) ושמים לב למילה המודגשת.</li>
+                                        <li>מזהים איזה סוג הפרה מופעל כאן מתוך 15 הכפתורים.</li>
+                                        <li>לוחצים מהר ובדיוק לפני שנגמר הזמן.</li>
+                                    </ol>
+                                    <p>ההיגיון: לא לנחש כפתור, אלא לבנות רפלקס של <strong>טריגר -> סוג הפרה -> בחירה</strong>.</p>
+                                    <p>בסוף התרגול אמורים לדעת לזהות מהר מה המילה המודגשת מסמנת, ולבחור תבנית מדויקת בלי להתקע.</p>
+                                    <div class="rapid-explain-actions">
+                                        <button id="rapid-explain-confirm-btn" type="button" class="btn btn-primary">הבנתי, ממשיכים</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -916,7 +938,7 @@
         </section>
     </div>
 
-    <script src="js/app.js?v=1.0.12"></script>
+    <script src="js/app.js?v=1.0.13"></script>
 </body>
 </html>
 

@@ -1399,6 +1399,42 @@ body.screen-guide-open {
     color: #475569;
 }
 
+.rapid-mode-utility-row {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.rapid-inline-btn {
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1e3a8a;
+    border-radius: 999px;
+    padding: 4px 10px;
+    min-height: 28px;
+    font-size: 0.73rem;
+    font-weight: 800;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+.rapid-inline-btn:hover {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.rapid-inline-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.rapid-inline-btn-ghost {
+    background: #f8fafc;
+    color: #334155;
+    border-color: #cbd5e1;
+}
+
 .rapid-control-select,
 #rapid-time-limit {
     width: 100%;
@@ -1655,6 +1691,83 @@ body.screen-guide-open {
     margin-bottom: 0;
 }
 
+.rapid-explain-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2600;
+    background: rgba(15, 23, 42, 0.62);
+    backdrop-filter: blur(2px);
+    display: grid;
+    place-items: center;
+    padding: 16px;
+}
+
+.rapid-explain-dialog {
+    width: min(700px, calc(100vw - 20px));
+    max-height: min(86vh, 820px);
+    overflow: auto;
+    border-radius: 14px;
+    border: 1px solid #cbd5e1;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    box-shadow: 0 24px 46px rgba(15, 23, 42, 0.3);
+    padding: clamp(14px, 2.6vw, 24px);
+    position: relative;
+}
+
+.rapid-explain-dialog h4 {
+    margin: 0 0 8px;
+    color: #0f172a;
+    font-size: clamp(1.03rem, 2.7vw, 1.32rem);
+}
+
+.rapid-explain-dialog p {
+    margin: 0 0 10px;
+    color: #1e293b;
+    line-height: 1.62;
+    font-size: 0.95rem;
+}
+
+.rapid-explain-dialog ol {
+    margin: 0 0 10px;
+    padding-right: 20px;
+    color: #0f172a;
+}
+
+.rapid-explain-dialog li {
+    margin-bottom: 6px;
+    line-height: 1.58;
+}
+
+.rapid-explain-actions {
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.rapid-explain-actions .btn {
+    margin: 0;
+}
+
+.rapid-explain-close {
+    position: sticky;
+    top: 0;
+    float: left;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #334155;
+    width: 32px;
+    height: 32px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-bottom: 6px;
+}
+
+.rapid-explain-close:hover {
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
 .rapid-pattern-buttons {
     display: grid;
     grid-template-columns: repeat(3, minmax(150px, 1fr));
@@ -1775,6 +1888,86 @@ body.screen-guide-open {
     }
 
     .rapid-pattern-side {
+        grid-template-columns: 1fr;
+    }
+}
+
+body.rapid-radar-focus header,
+body.rapid-radar-focus .tabs,
+body.rapid-radar-focus .mobile-tab-nav,
+body.rapid-radar-focus .global-comic-strip {
+    display: none !important;
+}
+
+body.rapid-radar-focus #practice-radar {
+    padding-top: 8px;
+}
+
+body.rapid-radar-focus #practice-radar .practice-container {
+    max-width: 1180px;
+}
+
+body.rapid-radar-focus #practice-radar .practice-intro-card {
+    padding: 6px;
+    margin: 0;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+body.rapid-radar-focus #practice-radar .practice-section {
+    margin: 0;
+    padding: 4px;
+    border: 0;
+    background: transparent;
+}
+
+body.rapid-radar-focus #practice-radar .practice-section-header,
+body.rapid-radar-focus #practice-radar .rapid-pattern-header,
+body.rapid-radar-focus #practice-radar .screen-read-guide {
+    display: none !important;
+}
+
+body.rapid-radar-focus #practice-radar .rapid-pattern-card {
+    margin: 0;
+}
+
+body.rapid-radar-focus #practice-radar .rapid-pattern-shell {
+    margin-top: 0;
+    gap: 10px;
+}
+
+body.rapid-radar-focus #practice-radar .rapid-panel {
+    padding: 8px;
+}
+
+body.rapid-radar-focus #practice-radar .rapid-monologue-box {
+    min-height: 126px;
+}
+
+body.rapid-radar-focus #practice-radar #rapid-focus-exit-btn {
+    display: inline-flex !important;
+}
+
+@media (max-width: 900px) {
+    body.rapid-radar-focus #practice-radar .rapid-pattern-shell {
+        grid-template-columns: 1fr;
+    }
+
+    body.rapid-radar-focus #practice-radar .rapid-pattern-main {
+        order: 1;
+    }
+
+    body.rapid-radar-focus #practice-radar .rapid-pattern-side {
+        order: 2;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+}
+
+@media (max-width: 640px) {
+    body.rapid-radar-focus #practice-radar .rapid-pattern-side {
         grid-template-columns: 1fr;
     }
 }

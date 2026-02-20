@@ -880,6 +880,10 @@ function setupTabNavigation() {
             // Show corresponding content
             const tabName = btn.getAttribute('data-tab');
             document.getElementById(tabName).classList.add('active');
+            if (tabName !== 'practice-radar') {
+                setRapidPatternFocusMode(false);
+                hideRapidPatternExplanation({ resumeIfNeeded: false });
+            }
             persistPracticeTabPreference(tabName);
             if (mobileTabSelect) mobileTabSelect.value = tabName;
             const scenarioContext = tabName === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
@@ -1365,6 +1369,8 @@ let rapidPatternArenaState = {
     active: false,
     paused: false,
     mode: 'learning',
+    pauseReason: '',
+    focusMode: false,
     pendingNextCue: false,
     pausedRemainingMs: 0,
     score: 0,
@@ -1403,13 +1409,18 @@ function setupRapidPatternArena() {
         startBtn: document.getElementById('rapid-start-btn'),
         pauseBtn: document.getElementById('rapid-pause-btn'),
         helpBtn: document.getElementById('rapid-help-btn'),
+        explainBtn: document.getElementById('rapid-explain-btn'),
+        focusExitBtn: document.getElementById('rapid-focus-exit-btn'),
         monologue: document.getElementById('rapid-monologue-text'),
         timerFill: document.getElementById('rapid-timer-fill'),
         feedback: document.getElementById('rapid-feedback'),
         buttons: document.getElementById('rapid-pattern-buttons'),
         aiFeedback: document.getElementById('rapid-ai-feedback'),
         helpPanel: document.getElementById('rapid-help-panel'),
-        helpContent: document.getElementById('rapid-help-content')
+        helpContent: document.getElementById('rapid-help-content'),
+        explainModal: document.getElementById('rapid-explain-modal'),
+        explainCloseBtn: document.getElementById('rapid-explain-close-btn'),
+        explainConfirmBtn: document.getElementById('rapid-explain-confirm-btn')
     };
 
     const timeLimit = Number(rapidPatternArenaState.elements.timeLimit?.value || 12);
@@ -1423,8 +1434,11 @@ function setupRapidPatternArena() {
     setRapidPatternButtonsDisabled(true);
     setRapidPatternPauseButtonState(false, false);
     setRapidPatternHelpButtonState(false);
+    updateRapidPatternExplainButtonState();
     clearRapidPatternAiFeedback();
     hideRapidPatternHelpPanel();
+    hideRapidPatternExplanation({ resumeIfNeeded: false });
+    setRapidPatternFocusMode(false);
 
     const savedMode = localStorage.getItem(RAPID_PATTERN_MODE_STORAGE_KEY) || 'learning';
     setRapidPatternMode(savedMode, { persist: false, announce: false });
@@ -1432,6 +1446,23 @@ function setupRapidPatternArena() {
     rapidPatternArenaState.elements.startBtn?.addEventListener('click', startRapidPatternSession);
     rapidPatternArenaState.elements.pauseBtn?.addEventListener('click', toggleRapidPatternPause);
     rapidPatternArenaState.elements.helpBtn?.addEventListener('click', showRapidPatternHelp);
+    rapidPatternArenaState.elements.explainBtn?.addEventListener('click', showRapidPatternExplanation);
+    rapidPatternArenaState.elements.focusExitBtn?.addEventListener('click', () => {
+        setRapidPatternFocusMode(false);
+        setRapidPatternFeedback('חזרתם לתצוגה מלאה.', 'info');
+    });
+    rapidPatternArenaState.elements.explainCloseBtn?.addEventListener('click', () => {
+        hideRapidPatternExplanation({ resumeIfNeeded: true });
+    });
+    rapidPatternArenaState.elements.explainConfirmBtn?.addEventListener('click', () => {
+        hideRapidPatternExplanation({ resumeIfNeeded: true });
+    });
+    rapidPatternArenaState.elements.explainModal?.addEventListener('click', (event) => {
+        if (event.target === rapidPatternArenaState.elements.explainModal) {
+            hideRapidPatternExplanation({ resumeIfNeeded: true });
+        }
+    });
+    document.addEventListener('keydown', handleRapidPatternGlobalKeydown);
     rapidPatternArenaState.elements.timeLimit?.addEventListener('input', () => {
         const value = Number(rapidPatternArenaState.elements.timeLimit?.value || 12);
         rapidPatternArenaState.timeLimitSec = Number.isFinite(value) ? Math.max(6, Math.min(25, value)) : 12;
@@ -1489,6 +1520,7 @@ function setRapidPatternMode(mode = 'learning', { persist = true, announce = tru
             rapidPatternArenaState.paused
         );
         setRapidPatternHelpButtonState(true);
+        updateRapidPatternExplainButtonState();
         if (announce) {
             setRapidPatternFeedback('מצב למידה פעיל: HELP עוצר את הסבב ומציג הסבר.', 'info');
         }
@@ -1496,11 +1528,13 @@ function setRapidPatternMode(mode = 'learning', { persist = true, announce = tru
     }
 
     hideRapidPatternHelpPanel();
+    hideRapidPatternExplanation({ resumeIfNeeded: true });
     if (rapidPatternArenaState.paused) {
         resumeRapidPatternSession();
     }
     setRapidPatternPauseButtonState(false, false);
     setRapidPatternHelpButtonState(false);
+    updateRapidPatternExplainButtonState();
     if (announce) {
         setRapidPatternFeedback('מצב מבחן פעיל: אין עצירה ואין HELP.', 'info');
     }
@@ -1513,6 +1547,86 @@ function setRapidPatternHelpButtonState(enabled = true) {
     const examMode = rapidPatternArenaState.mode === 'exam';
     btn.disabled = examMode || !enabled;
     btn.classList.toggle('is-hidden', examMode);
+}
+
+function updateRapidPatternExplainButtonState() {
+    const btn = rapidPatternArenaState.elements.explainBtn;
+    if (!btn) return;
+    const blockedInExam = rapidPatternArenaState.mode === 'exam' && rapidPatternArenaState.active;
+    btn.disabled = blockedInExam;
+    btn.setAttribute('title', blockedInExam
+        ? 'במצב מבחן ההסבר זמין בין סבבים בלבד.'
+        : 'הסבר קצר: מה עושים בתרגיל ולמה');
+}
+
+function showRapidPatternExplanation() {
+    const modal = rapidPatternArenaState.elements.explainModal;
+    if (!modal) return;
+
+    if (rapidPatternArenaState.mode === 'exam' && rapidPatternArenaState.active) {
+        setRapidPatternFeedback('במצב מבחן ההסבר זמין בין סבבים בלבד.', 'warn');
+        return;
+    }
+
+    if (rapidPatternArenaState.mode === 'learning' && rapidPatternArenaState.active) {
+        pauseRapidPatternSession('explain');
+    }
+
+    modal.classList.remove('hidden');
+    updateRapidPatternExplainButtonState();
+}
+
+function hideRapidPatternExplanation({ resumeIfNeeded = false } = {}) {
+    const modal = rapidPatternArenaState.elements.explainModal;
+    if (modal) modal.classList.add('hidden');
+
+    if (
+        resumeIfNeeded &&
+        rapidPatternArenaState.mode === 'learning' &&
+        rapidPatternArenaState.paused &&
+        rapidPatternArenaState.pauseReason === 'explain'
+    ) {
+        resumeRapidPatternSession();
+        return;
+    }
+
+    updateRapidPatternExplainButtonState();
+}
+
+function isRapidRadarTabActive() {
+    const tab = document.getElementById('practice-radar');
+    return Boolean(tab && tab.classList.contains('active'));
+}
+
+function setRapidPatternFocusMode(enabled = false) {
+    const shouldEnable = Boolean(enabled) && isRapidRadarTabActive();
+    rapidPatternArenaState.focusMode = shouldEnable;
+    document.body.classList.toggle('rapid-radar-focus', shouldEnable);
+    const root = rapidPatternArenaState.elements.root;
+    if (root) {
+        root.dataset.rapidFocus = shouldEnable ? 'on' : 'off';
+    }
+    const exitBtn = rapidPatternArenaState.elements.focusExitBtn;
+    if (exitBtn) {
+        exitBtn.classList.toggle('hidden', !shouldEnable);
+    }
+}
+
+function handleRapidPatternGlobalKeydown(event) {
+    if (event.key !== 'Escape') return;
+
+    const explainModal = rapidPatternArenaState.elements.explainModal;
+    if (explainModal && !explainModal.classList.contains('hidden')) {
+        hideRapidPatternExplanation({ resumeIfNeeded: true });
+        event.preventDefault();
+        return;
+    }
+
+    if (rapidPatternArenaState.focusMode) {
+        setRapidPatternFocusMode(false);
+        setRapidPatternFeedback('חזרתם לתצוגה מלאה.', 'info');
+        event.preventDefault();
+    }
 }
 
 function hideRapidPatternHelpPanel() {
@@ -1582,9 +1696,12 @@ function renderRapidPatternButtons() {
 function startRapidPatternSession() {
     stopRapidPatternTimer();
     clearRapidPatternNextTimer();
+    hideRapidPatternExplanation({ resumeIfNeeded: false });
+    setRapidPatternFocusMode(true);
 
     rapidPatternArenaState.active = true;
     rapidPatternArenaState.paused = false;
+    rapidPatternArenaState.pauseReason = '';
     rapidPatternArenaState.pendingNextCue = false;
     rapidPatternArenaState.pausedRemainingMs = 0;
     rapidPatternArenaState.score = 0;
@@ -1605,6 +1722,7 @@ function startRapidPatternSession() {
     }
     setRapidPatternPauseButtonState(true, false);
     setRapidPatternHelpButtonState(true);
+    updateRapidPatternExplainButtonState();
 
     moveToNextRapidPatternCue();
 }
@@ -1633,6 +1751,7 @@ function pauseRapidPatternSession(reason = 'manual') {
     if (!rapidPatternArenaState.active) return;
 
     rapidPatternArenaState.paused = true;
+    rapidPatternArenaState.pauseReason = reason;
     rapidPatternArenaState.active = false;
     rapidPatternArenaState.pausedRemainingMs = Math.max(0, rapidPatternArenaState.endsAtMs - Date.now());
     stopRapidPatternTimer();
@@ -1642,15 +1761,21 @@ function pauseRapidPatternSession(reason = 'manual') {
     if (reason === 'help') {
         setRapidPatternFeedback('HELP פתוח: הסבב בהשהיה. לחצו RESUME כדי להמשיך.', 'warn');
     }
+    if (reason === 'explain') {
+        setRapidPatternFeedback('חלון ההסבר פתוח: הסבב בהשהיה. לחצו "הבנתי, ממשיכים" כדי לחזור.', 'warn');
+    }
     setRapidPatternPauseButtonState(true, true);
+    updateRapidPatternExplainButtonState();
 }
 
 function resumeRapidPatternSession() {
     if (!rapidPatternArenaState.paused) return;
 
     rapidPatternArenaState.paused = false;
+    rapidPatternArenaState.pauseReason = '';
     rapidPatternArenaState.active = true;
     hideRapidPatternHelpPanel();
+    hideRapidPatternExplanation({ resumeIfNeeded: false });
     setRapidPatternPauseButtonState(true, false);
 
     if (!rapidPatternArenaState.currentCue || rapidPatternArenaState.pendingNextCue) {
@@ -1662,6 +1787,7 @@ function resumeRapidPatternSession() {
     const resumeMs = Math.max(200, rapidPatternArenaState.pausedRemainingMs || 0);
     rapidPatternArenaState.pausedRemainingMs = 0;
     setRapidPatternButtonsDisabled(false);
+    updateRapidPatternExplainButtonState();
     setRapidPatternFeedback('המשך סבב: זהה את התבנית לפני שהזמן נגמר.', 'info');
     startRapidPatternTimer(resumeMs);
 }
@@ -1795,6 +1921,7 @@ function moveToNextRapidPatternCue() {
     clearRapidPatternNextTimer();
     clearRapidPatternButtonStates();
     hideRapidPatternHelpPanel();
+    hideRapidPatternExplanation({ resumeIfNeeded: false });
     rapidPatternArenaState.pendingNextCue = false;
 
     const cue = pickRapidPatternCue();
@@ -1803,6 +1930,7 @@ function moveToNextRapidPatternCue() {
         setRapidPatternButtonsDisabled(true);
         setRapidPatternPauseButtonState(false);
         setRapidPatternHelpButtonState(false);
+        updateRapidPatternExplainButtonState();
         return;
     }
 
@@ -1813,6 +1941,7 @@ function moveToNextRapidPatternCue() {
     setRapidPatternTrafficLight('green');
     setRapidPatternButtonsDisabled(false);
     setRapidPatternHelpButtonState(true);
+    updateRapidPatternExplainButtonState();
     renderRapidPatternMonologue(cue);
     setRapidPatternFeedback('זהו/י את התבנית של הביטוי המודגש.', 'info');
     startRapidPatternTimer(null);
@@ -1929,12 +2058,15 @@ function finishRapidPatternRoundIfNeeded() {
     clearRapidPatternNextTimer();
     rapidPatternArenaState.active = false;
     rapidPatternArenaState.paused = false;
+    rapidPatternArenaState.pauseReason = '';
     rapidPatternArenaState.pendingNextCue = false;
     rapidPatternArenaState.pausedRemainingMs = 0;
     hideRapidPatternHelpPanel();
+    hideRapidPatternExplanation({ resumeIfNeeded: false });
     setRapidPatternButtonsDisabled(true);
     setRapidPatternPauseButtonState(false);
     setRapidPatternHelpButtonState(false);
+    updateRapidPatternExplainButtonState();
     setRapidPatternTrafficLight('green');
     setRapidPatternFeedback(`סיכום AI אחרי ${RAPID_PATTERN_FEEDBACK_INTERVAL} שאלות.`, 'info');
     if (rapidPatternArenaState.elements.startBtn) {
@@ -6951,6 +7083,10 @@ function navigateTo(tabName) {
     
     const content = document.getElementById(tabName);
     if (content) content.classList.add('active');
+    if (tabName !== 'practice-radar') {
+        setRapidPatternFocusMode(false);
+        hideRapidPatternExplanation({ resumeIfNeeded: false });
+    }
     persistPracticeTabPreference(tabName);
 
     const scenarioContext = tabName === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
