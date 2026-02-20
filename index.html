@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meta Model - כלי תרגול שאול מטה מודל</title>
-    <link rel="stylesheet" href="css/style.css?v=1.0.11">
+    <link rel="stylesheet" href="css/style.css?v=1.0.12">
 </head>
 <body>
     <!-- SPLASH SCREEN -->
@@ -604,6 +604,15 @@
 
                             <div class="rapid-pattern-shell">
                                 <aside class="rapid-pattern-side">
+                                    <div class="rapid-panel rapid-mode-panel">
+                                        <label>מצב</label>
+                                        <div class="rapid-mode-switch" role="group" aria-label="בחירת מצב Meta Radar">
+                                            <button id="rapid-mode-learning-btn" type="button" class="rapid-mode-btn is-active">למידה</button>
+                                            <button id="rapid-mode-exam-btn" type="button" class="rapid-mode-btn">מבחן</button>
+                                        </div>
+                                        <small id="rapid-mode-note" class="rapid-mode-note">למידה: אפשר לעצור ולקבל HELP.</small>
+                                    </div>
+
                                     <div class="rapid-panel">
                                         <label for="rapid-case-type">סוג מטופל</label>
                                         <select id="rapid-case-type" class="rapid-control-select">
@@ -634,6 +643,7 @@
                                     <div class="rapid-actions-row">
                                         <button id="rapid-start-btn" class="btn btn-primary">התחל סבב</button>
                                         <button id="rapid-pause-btn" class="btn btn-secondary rapid-pause-btn" disabled>PAUSE</button>
+                                        <button id="rapid-help-btn" class="btn btn-secondary rapid-help-btn" disabled>HELP!</button>
                                     </div>
                                 </aside>
 
@@ -647,6 +657,11 @@
                                             <span id="rapid-timer-fill"></span>
                                         </div>
                                         <p id="rapid-feedback" class="rapid-feedback" data-tone="info">ממתין לתחילת סבב...</p>
+                                    </div>
+
+                                    <div id="rapid-help-panel" class="rapid-help-panel hidden" aria-live="polite">
+                                        <h4>HELP · מצב למידה</h4>
+                                        <div id="rapid-help-content"></div>
                                     </div>
 
                                     <div id="rapid-pattern-buttons" class="rapid-pattern-buttons" role="group" aria-label="כפתורי תבניות"></div>
@@ -901,7 +916,7 @@
         </section>
     </div>
 
-    <script src="js/app.js?v=1.0.11"></script>
+    <script src="js/app.js?v=1.0.12"></script>
 </body>
 </html>
 

@@ -1359,6 +1359,46 @@ body.screen-guide-open {
     color: #1e3a8a;
 }
 
+.rapid-mode-panel {
+    padding: 8px 10px;
+}
+
+.rapid-mode-switch {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.rapid-mode-btn {
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    line-height: 1.2;
+}
+
+.rapid-mode-btn:hover {
+    border-color: #7dd3fc;
+    color: #0f172a;
+}
+
+.rapid-mode-btn.is-active {
+    border-color: #0369a1;
+    color: #ffffff;
+    background: linear-gradient(135deg, #0f766e 0%, #0369a1 100%);
+}
+
+.rapid-mode-note {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.74rem;
+    color: #475569;
+}
+
 .rapid-control-select,
 #rapid-time-limit {
     width: 100%;
@@ -1426,12 +1466,24 @@ body.screen-guide-open {
 
 .rapid-actions-row {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
 }
 
 .rapid-actions-row .btn {
     margin: 0;
+    min-height: 38px;
+    padding: 6px 8px;
+    font-size: 0.8rem;
+}
+
+#rapid-pattern-arena[data-rapid-mode="exam"] .rapid-actions-row {
+    grid-template-columns: 1fr;
+}
+
+#rapid-pattern-arena[data-rapid-mode="exam"] .rapid-pause-btn,
+#rapid-pattern-arena[data-rapid-mode="exam"] .rapid-help-btn {
+    display: none;
 }
 
 .rapid-pause-btn {
@@ -1447,6 +1499,16 @@ body.screen-guide-open {
 .rapid-pause-btn.is-paused {
     border-color: #0f766e;
     background: #0f766e;
+}
+
+.rapid-help-btn {
+    border: 1px solid #0c4a6e;
+    background: #e0f2fe;
+    color: #0c4a6e;
+}
+
+.rapid-help-btn:hover {
+    background: #bae6fd;
 }
 
 .rapid-pattern-main {
@@ -1567,6 +1629,31 @@ body.screen-guide-open {
 .rapid-feedback[data-tone="success"] { color: #166534; }
 .rapid-feedback[data-tone="warn"] { color: #92400e; }
 .rapid-feedback[data-tone="danger"] { color: #b91c1c; }
+
+.rapid-help-panel {
+    margin-top: 2px;
+    border: 1px solid #a5f3fc;
+    border-radius: 10px;
+    background: #ecfeff;
+    padding: 10px 12px;
+}
+
+.rapid-help-panel h4 {
+    margin: 0 0 6px;
+    color: #0f766e;
+    font-size: 0.9rem;
+}
+
+.rapid-help-panel p {
+    margin: 0 0 6px;
+    color: #0f172a;
+    font-size: 0.87rem;
+    line-height: 1.5;
+}
+
+.rapid-help-panel p:last-child {
+    margin-bottom: 0;
+}
 
 .rapid-pattern-buttons {
     display: grid;
