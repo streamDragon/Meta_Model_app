@@ -972,41 +972,185 @@ body.embed-mode .progress-hub {
 
 .screen-read-guide {
     margin-bottom: 16px;
-    padding: 12px;
-    border-radius: 14px;
-    border: 1px solid #bfdbfe;
-    background: linear-gradient(120deg, #ecfeff 0%, #eff6ff 52%, #f0f9ff 100%);
-    box-shadow: 0 8px 18px rgba(14, 116, 144, 0.12);
+    position: relative;
 }
 
 .screen-read-guide-btn {
     margin: 0;
-    border-radius: 999px;
-    padding: 12px 18px;
-    background: linear-gradient(135deg, #0284c7 0%, #0f766e 100%);
+    width: 100%;
+    min-height: 84px;
+    border-radius: 16px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #0f766e 0%, #0369a1 55%, #0284c7 100%);
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 4px;
+    box-shadow: 0 12px 22px rgba(2, 132, 199, 0.22);
+}
+
+.screen-read-guide-btn-main {
+    font-size: 1.22rem;
+    font-weight: 900;
+    letter-spacing: 0.01em;
+}
+
+.screen-read-guide-btn-sub {
+    font-size: 0.92rem;
+    font-weight: 600;
+    opacity: 0.95;
 }
 
 .screen-read-guide-btn:hover {
-    opacity: 0.96;
+    opacity: 1;
+    transform: translateY(-2px);
+    box-shadow: 0 14px 26px rgba(2, 132, 199, 0.26);
 }
 
-.screen-read-guide-panel {
-    margin-top: 10px;
-    padding: 12px 14px;
-    border-radius: 12px;
-    border: 1px solid #dbeafe;
-    border-right: 4px solid #0284c7;
-    background: #ffffff;
+.screen-read-guide-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2500;
+    background: rgba(15, 23, 42, 0.58);
+    backdrop-filter: blur(2px);
+    display: grid;
+    place-items: center;
+    padding: 20px;
 }
 
-.screen-read-guide-panel p {
+.screen-read-guide-dialog {
+    width: min(980px, calc(100vw - 26px));
+    max-height: min(88vh, 900px);
+    overflow: auto;
+    border-radius: 18px;
+    border: 1px solid #cbd5e1;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    box-shadow: 0 24px 46px rgba(15, 23, 42, 0.28);
+    padding: clamp(14px, 3.5vw, 30px);
+}
+
+.screen-read-guide-dialog h3 {
     margin: 0 0 8px;
-    color: #334155;
-    line-height: 1.55;
+    color: #0f172a;
+    font-size: clamp(1.15rem, 3.4vw, 1.52rem);
 }
 
-.screen-read-guide-panel p:last-child {
-    margin-bottom: 0;
+.screen-read-guide-lead {
+    margin: 0 0 12px;
+    color: #334155;
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+.screen-read-guide-content h4 {
+    margin: 0 0 4px;
+    color: #0f766e;
+    font-size: 1.02rem;
+}
+
+.screen-read-guide-content p {
+    margin: 0 0 12px;
+    color: #1e293b;
+    line-height: 1.72;
+    font-size: 0.97rem;
+}
+
+.screen-read-guide-steps {
+    margin: 0 0 12px;
+    padding-right: 20px;
+    color: #1e293b;
+}
+
+.screen-read-guide-steps li {
+    margin-bottom: 6px;
+    line-height: 1.6;
+}
+
+.screen-read-guide-summary {
+    border-right: 4px solid #0284c7;
+    background: #eff6ff;
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-weight: 700;
+}
+
+.screen-read-guide-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 8px;
+}
+
+.screen-read-guide-confirm {
+    margin: 0;
+    border-radius: 12px;
+}
+
+.screen-read-guide-close {
+    position: sticky;
+    top: 0;
+    float: left;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.screen-read-guide-close:hover {
+    background: #e2e8f0;
+}
+
+body.screen-guide-open {
+    overflow: hidden;
+}
+
+@media (max-width: 640px) {
+    .screen-read-guide-btn {
+        min-height: 78px;
+        padding: 14px;
+    }
+
+    .screen-read-guide-btn-main {
+        font-size: 1.08rem;
+    }
+
+    .screen-read-guide-btn-sub {
+        font-size: 0.83rem;
+    }
+
+    .screen-read-guide-modal {
+        padding: 10px;
+    }
+
+    .screen-read-guide-dialog {
+        width: calc(100vw - 10px);
+        max-height: 92vh;
+        border-radius: 14px;
+        padding: 12px;
+    }
+
+    .screen-read-guide-content p {
+        line-height: 1.64;
+        font-size: 0.93rem;
+    }
+
+    .screen-read-guide-steps {
+        padding-right: 17px;
+    }
+
+    .screen-read-guide-actions {
+        justify-content: stretch;
+    }
+
+    .screen-read-guide-confirm {
+        width: 100%;
+    }
 }
 
 .practice-buttons {

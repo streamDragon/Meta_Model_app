@@ -485,7 +485,9 @@ function setupMobileViewportSizing() {
 const DEFAULT_SCREEN_READ_GUIDE = Object.freeze({
     logic: 'התרגול בנוי מלמטה למעלה: מזהים הנחה סמויה, מדייקים שפה, ואז פועלים צעד קטן.',
     goal: 'להחליף אוטומט של האשמה/בלבול בחשיבה פרקטית שמובילה לביצוע.',
-    approach: 'עובדים לאט: קוראים את ההנחיה, עונים קצר, ובודקים האם התשובה מובילה לפעולה ברורה.'
+    approach: 'עובדים לאט: קוראים את ההנחיה, עונים קצר, ובודקים האם התשובה מובילה לפעולה ברורה.',
+    expected: 'בסיום התרגול תדע/י לזהות במהירות איפה המשפט עמום, לשאול שאלה מדויקת, ולתרגם את זה לצעד מעשי.',
+    success: 'תוכל/י להסביר לעצמך מה זיהית, למה בחרת כך, ומה הצעד הבא שבאמת אפשר לבצע.'
 });
 
 const SCREEN_READ_GUIDES = Object.freeze({
@@ -552,7 +554,9 @@ const SCREEN_READ_GUIDES = Object.freeze({
     practice: Object.freeze({
         logic: 'מתרגלים זיהוי ושאלה מדויקת בחזרתיות קצרה עד שנוצר רפלקס.',
         goal: 'לשפר מהירות דיוק ב-Meta Model.',
-        approach: 'עבוד/י בסבבים קצרים: שאלה, בדיקה, תיקון והמשך.'
+        approach: 'עבוד/י בסבבים קצרים: שאלה, בדיקה, תיקון והמשך.',
+        expected: 'בסיום תרגול ממוצע תדע/י לזהות טריגר שפה, לקשר אותו לתבנית נכונה, ולנסח שאלה שמקדמת בירור במקום ויכוח.',
+        success: 'כשאת/ה רואה משפט מודגש, את/ה לא מנחש/ת: קודם מזהה מבנה, ואז בוחר/ת תבנית במודע.'
     }),
     blueprint: Object.freeze({
         logic: 'המסך מפרק משימה עמומה ליעד, צעדים, פער ציפיות ותוכנית ביצוע.',
@@ -593,36 +597,95 @@ function buildScreenReadGuide(screenId) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'btn btn-primary screen-read-guide-btn';
-    button.textContent = 'קרא לפני שתתחיל!';
+    button.innerHTML = `
+        <span class="screen-read-guide-btn-main">קרא לפני שתתחיל!</span>
+        <span class="screen-read-guide-btn-sub">הסבר מלא: היגיון, דרך עבודה, ומה צפוי לדעת אחרי התרגול</span>
+    `;
+
+    const modal = document.createElement('div');
+    const modalId = `screen-read-guide-modal-${screenId}`;
+    modal.className = 'screen-read-guide-modal hidden';
+    modal.id = modalId;
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    button.setAttribute('aria-controls', modalId);
+    button.setAttribute('aria-haspopup', 'dialog');
     button.setAttribute('aria-expanded', 'false');
 
-    const panel = document.createElement('div');
-    panel.className = 'screen-read-guide-panel hidden';
-    panel.id = `screen-read-guide-panel-${screenId}`;
+    const title = getScreenReadGuideTitle(screenId);
+    const expected = copy.expected || `לאחר התרגול במסך הזה תדע/י: ${copy.goal}`;
+    const success = copy.success || DEFAULT_SCREEN_READ_GUIDE.success;
 
-    const makeLine = (label, text) => {
-        const p = document.createElement('p');
-        const title = document.createElement('strong');
-        title.textContent = `${label}: `;
-        p.appendChild(title);
-        p.appendChild(document.createTextNode(text));
-        return p;
+    modal.innerHTML = `
+        <div class="screen-read-guide-dialog">
+            <button type="button" class="screen-read-guide-close" aria-label="סגירה">×</button>
+            <h3>קרא לפני שתתחיל: ${escapeHtml(title)}</h3>
+            <p class="screen-read-guide-lead">המטרה כאן היא לא רק לענות נכון, אלא להבין את ההיגיון של התרגול כדי ליישם אותו גם בשיחה אמיתית מחוץ לאפליקציה.</p>
+            <div class="screen-read-guide-content">
+                <h4>מה ההיגיון של התרגול?</h4>
+                <p>${escapeHtml(copy.logic)}</p>
+                <h4>מה בדיוק המטרה במסך הזה?</h4>
+                <p>${escapeHtml(copy.goal)}</p>
+                <h4>איך לגשת לתרגול שלב-שלב?</h4>
+                <p>${escapeHtml(copy.approach)}</p>
+                <h4>סדר עבודה מומלץ כדי להפיק תוצאה אמיתית</h4>
+                <ol class="screen-read-guide-steps">
+                    <li>לעבור פעם ראשונה על המשפט או המשימה כדי להבין הקשר כללי.</li>
+                    <li>לעבור פעם שנייה ולזהות מילה/הנחה שיוצרת עמימות, לחץ או הכללה.</li>
+                    <li>לבחור תגובה או שאלה שמפרקת את העמימות לצעד ברור.</li>
+                    <li>להסתכל על המשוב, לתקן אם צריך, ואז להמשיך לסבב הבא.</li>
+                </ol>
+                <h4>מה צפוי שתדע/י לעשות אחרי התרגול?</h4>
+                <p>${escapeHtml(expected)}</p>
+                <h4>איך תזהה/י שהתקדמת?</h4>
+                <p>${escapeHtml(success)}</p>
+                <p class="screen-read-guide-summary">ציפיית התוצר בסוף התרגול: לא רק "לענות נכון", אלא לדעת להסביר לעצמך את ההיגיון מאחורי הבחירה וליישם אותו בשיחה אמיתית.</p>
+            </div>
+            <div class="screen-read-guide-actions">
+                <button type="button" class="btn btn-primary screen-read-guide-confirm">הבנתי, אפשר להתחיל תרגול</button>
+            </div>
+        </div>
+    `;
+
+    const closeBtn = modal.querySelector('.screen-read-guide-close');
+    const confirmBtn = modal.querySelector('.screen-read-guide-confirm');
+    const openModal = () => {
+        modal.classList.remove('hidden');
+        button.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('screen-guide-open');
+        playUISound('hint');
+    };
+    const closeModal = () => {
+        modal.classList.add('hidden');
+        button.setAttribute('aria-expanded', 'false');
+        if (!document.querySelector('.screen-read-guide-modal:not(.hidden)')) {
+            document.body.classList.remove('screen-guide-open');
+        }
     };
 
-    panel.appendChild(makeLine('היגיון', copy.logic));
-    panel.appendChild(makeLine('מטרה', copy.goal));
-    panel.appendChild(makeLine('איך לגשת', copy.approach));
-
-    button.addEventListener('click', () => {
-        const shouldOpen = panel.classList.contains('hidden');
-        panel.classList.toggle('hidden', !shouldOpen);
-        button.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
-        if (shouldOpen) playUISound('hint');
+    button.addEventListener('click', openModal);
+    closeBtn?.addEventListener('click', closeModal);
+    confirmBtn?.addEventListener('click', closeModal);
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+            closeModal();
+        }
     });
 
     wrapper.appendChild(button);
-    wrapper.appendChild(panel);
+    wrapper.appendChild(modal);
     return wrapper;
+}
+
+function getScreenReadGuideTitle(screenId) {
+    const screen = document.getElementById(screenId);
+    if (!screen) return 'מסך תרגול';
+    const heading = screen.querySelector('h2, h3');
+    const title = heading?.textContent?.trim();
+    return title || 'מסך תרגול';
 }
 
 function setupReadBeforeStartGuides() {
