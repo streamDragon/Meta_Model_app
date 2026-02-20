@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://meta-model.app/schemas/shadow-quantifier-evaluator.schema.json",
+  "title": "Shadow Quantifier Evaluator",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "pass",
+    "flags",
+    "score_breakdown",
+    "one_fix_suggestion",
+    "suggested_template"
+  ],
+  "properties": {
+    "pass": {
+      "type": "boolean"
+    },
+    "flags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "missing_ownership",
+          "missing_quantifier",
+          "missing_check_question",
+          "too_interpretive",
+          "unclear_target"
+        ]
+      },
+      "maxItems": 5
+    },
+    "score_breakdown": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ownership_present",
+        "quantifier_present",
+        "check_question_present",
+        "non_interpretive",
+        "clarity"
+      ],
+      "properties": {
+        "ownership_present": {
+          "type": "integer",
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "quantifier_present": {
+          "type": "integer",
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "check_question_present": {
+          "type": "integer",
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "non_interpretive": {
+          "type": "integer",
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "clarity": {
+          "type": "integer",
+          "enum": [
+            0,
+            1,
+            2
+          ]
+        }
+      }
+    },
+    "one_fix_suggestion": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 220
+    },
+    "suggested_template": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 260
+    }
+  }
+}

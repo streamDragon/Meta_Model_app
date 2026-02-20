@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://meta-model.app/schemas/shadow-quantifier-case-seed.schema.json",
+  "title": "Shadow Quantifier CaseSeed",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "case_id",
+    "hidden_shadow_quantifier",
+    "hidden_deep_sentence",
+    "intended_sensation_set",
+    "intensity_conditions",
+    "exception_example",
+    "patient_voice_style"
+  ],
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "hidden_shadow_quantifier": {
+      "type": "string",
+      "enum": [
+        "תמיד",
+        "אף פעם",
+        "אין סיכוי",
+        "זה לא ישתנה",
+        "אין טעם",
+        "כולם",
+        "אין מצב",
+        "הכול אבוד"
+      ]
+    },
+    "hidden_deep_sentence": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 220
+    },
+    "intended_sensation_set": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4,
+      "items": {
+        "type": "string",
+        "enum": [
+          "כיווץ",
+          "כבדות",
+          "חום",
+          "דחיפות",
+          "שיתוק",
+          "קור",
+          "לחץ",
+          "עייפות"
+        ]
+      }
+    },
+    "intensity_conditions": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4,
+      "items": {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 140
+      }
+    },
+    "exception_example": {
+      "type": "string",
+      "minLength": 6,
+      "maxLength": 180
+    },
+    "patient_voice_style": {
+      "type": "string",
+      "enum": [
+        "לקוני",
+        "מפורט",
+        "מבולבל",
+        "חד"
+      ]
+    }
+  }
+}

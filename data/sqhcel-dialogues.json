@@ -1,0 +1,306 @@
+{
+  "version": "1.0.0",
+  "locale": "he",
+  "dialogues": [
+    {
+      "id": "W1",
+      "topic": "work",
+      "tags": ["anxiety", "evaluation"],
+      "difficulty": 1,
+      "lines": [
+        "מחר יש לי שיחה עם המנהל.",
+        "הוא כתב לי 'בוא נדבר' בלי להסביר.",
+        "כל היום אני מריץ את זה בראש.",
+        "אני כבר מרגיש את הגוף שלי ננעל."
+      ],
+      "final_sentence": "אני כישלון מולו.",
+      "suggested_shadow_quantifier": "תמיד",
+      "suggested_exception": "כשבאתי עם דף מסודר זה היה קצת פחות נורא."
+    },
+    {
+      "id": "W2",
+      "topic": "work",
+      "tags": ["shame", "criticism"],
+      "difficulty": 2,
+      "lines": [
+        "בישיבה הוא אמר 'צריך יותר אחריות'.",
+        "הוא לא אמר את השם שלי.",
+        "אבל הסתכל לכיוון שלי.",
+        "מאז אני עם בטן מתהפכת."
+      ],
+      "final_sentence": "אין לי איך לצאת מזה טוב.",
+      "suggested_shadow_quantifier": "אין סיכוי",
+      "suggested_exception": "כשאני שואל שאלת הבהרה, זה נרגע קצת."
+    },
+    {
+      "id": "W3",
+      "topic": "work",
+      "tags": ["overload", "helplessness"],
+      "difficulty": 2,
+      "lines": [
+        "אני מסדר משימה אחת.",
+        "ואז נוחתת עוד אחת.",
+        "ואז עוד אחת.",
+        "זה מרגיש כמו דלי עם חור."
+      ],
+      "final_sentence": "אין לזה סוף.",
+      "suggested_shadow_quantifier": "זה לא ישתנה",
+      "suggested_exception": "כשאני סוגר שעה אחת רק למשימה אחת, אני מרגיש שליטה."
+    },
+    {
+      "id": "W4",
+      "topic": "work",
+      "tags": ["mind_reading", "fear"],
+      "difficulty": 3,
+      "lines": [
+        "הוא שלח לי מייל קצר: 'ראיתי'.",
+        "בלי סמיילי, בלי כלום.",
+        "מיד דמיינתי שהוא כועס.",
+        "אני כבר רוצה להתנצל."
+      ],
+      "final_sentence": "הוא בטוח מאוכזב ממני.",
+      "suggested_shadow_quantifier": "תמיד",
+      "suggested_exception": "פעם אחת 'ראיתי' היה פשוט 'קיבלתי'."
+    },
+    {
+      "id": "W5",
+      "topic": "work",
+      "tags": ["presentation", "performance"],
+      "difficulty": 1,
+      "lines": [
+        "אני מכין מצגת.",
+        "ברגע האחרון אני משנה הכול.",
+        "ואז אני מגיע עייף.",
+        "ומתחיל לפחד."
+      ],
+      "final_sentence": "אני תמיד הורס את זה לעצמי.",
+      "suggested_shadow_quantifier": "תמיד",
+      "suggested_exception": "כשאני לא משנה בלילה האחרון זה יותר יציב."
+    },
+    {
+      "id": "C1",
+      "topic": "couples",
+      "tags": ["rejection", "anxiety"],
+      "difficulty": 1,
+      "lines": [
+        "שלחתי לה הודעה בבוקר.",
+        "היא ראתה ולא ענתה.",
+        "עברו שעות.",
+        "אני כל הזמן בודק את הטלפון."
+      ],
+      "final_sentence": "אני לא מספיק בשבילה.",
+      "suggested_shadow_quantifier": "תמיד",
+      "suggested_exception": "בשבוע שעבר היא חזרה אליי אחרי יום והסבירה שהייתה בעומס."
+    },
+    {
+      "id": "C2",
+      "topic": "couples",
+      "tags": ["distance", "home"],
+      "difficulty": 1,
+      "lines": [
+        "הוא נכנס הביתה ואמר שהוא עייף.",
+        "הוא נעלם לטלפון.",
+        "אני נשארת לבד בסלון.",
+        "כל הגוף שלי נהיה כבד."
+      ],
+      "final_sentence": "משהו כאן לא הולך לשום מקום.",
+      "suggested_shadow_quantifier": "אין סיכוי",
+      "suggested_exception": "אתמול כן ישבנו ודיברנו רבע שעה ברוגע."
+    },
+    {
+      "id": "C3",
+      "topic": "couples",
+      "tags": ["argument", "identity"],
+      "difficulty": 2,
+      "lines": [
+        "בכל ריב קטן אני מתפוצץ מהר.",
+        "אחרי זה אני מתחרט.",
+        "אבל בפעם הבאה זה שוב קורה.",
+        "אני כבר מפחד לפתוח נושאים."
+      ],
+      "final_sentence": "אני בן זוג גרוע.",
+      "suggested_shadow_quantifier": "תמיד",
+      "suggested_exception": "בשיחה האחרונה עצרתי דקה לנשום וזה ירד בעוצמה."
+    },
+    {
+      "id": "C4",
+      "topic": "couples",
+      "tags": ["mind_reading", "silence"],
+      "difficulty": 2,
+      "lines": [
+        "היא מסתכלת עליי כמה דקות בלי לדבר.",
+        "אני ישר משלים שהיא מאוכזבת ממני.",
+        "אני נהיה הגנתי לפני שהיא אומרת משהו.",
+        "ואז השיחה נסגרת."
+      ],
+      "final_sentence": "היא תמיד נגד מה שאני עושה.",
+      "suggested_shadow_quantifier": "תמיד",
+      "suggested_exception": "לפעמים השתיקה שלה היא פשוט עייפות ולא כעס."
+    },
+    {
+      "id": "C5",
+      "topic": "couples",
+      "tags": ["money", "avoidance"],
+      "difficulty": 3,
+      "lines": [
+        "כשעולה נושא כסף אנחנו מיד נתקעים.",
+        "אני מרגיש שמספיק משפט אחד בשביל פיצוץ.",
+        "אז אני בוחר לשתוק.",
+        "אחר כך זה רק נהיה יותר קשה."
+      ],
+      "final_sentence": "אי אפשר לדבר איתו על כסף.",
+      "suggested_shadow_quantifier": "אין מצב",
+      "suggested_exception": "כשיש לנו זמן מוגדר וכללים ברורים השיחה פחות מתלקחת."
+    },
+    {
+      "id": "A1",
+      "topic": "anxiety",
+      "tags": ["social", "exposure"],
+      "difficulty": 1,
+      "lines": [
+        "מחר יש אירוע עם הרבה אנשים.",
+        "אני כבר שומע את עצמי נתקע במילים.",
+        "אני מדמיין מבטים מכל הכיוונים.",
+        "הבטן שלי מתכווצת."
+      ],
+      "final_sentence": "אני אעשה שם פדיחה.",
+      "suggested_shadow_quantifier": "תמיד",
+      "suggested_exception": "במפגש קטן של חמישה אנשים כן הצלחתי לדבר."
+    },
+    {
+      "id": "A2",
+      "topic": "anxiety",
+      "tags": ["body", "panic"],
+      "difficulty": 2,
+      "lines": [
+        "כשהלב דופק מהר אני ישר נלחץ.",
+        "אני משוכנע שזה עומד להחמיר.",
+        "אני מתחיל להימנע מכל מה שמפעיל אותי.",
+        "ככה השבוע שלי מצטמצם."
+      ],
+      "final_sentence": "אין לי שליטה על זה.",
+      "suggested_shadow_quantifier": "אין מצב",
+      "suggested_exception": "פעמיים השבוע הצלחתי להאט נשימה וזה נרגע מעט."
+    },
+    {
+      "id": "A3",
+      "topic": "anxiety",
+      "tags": ["future", "catastrophe"],
+      "difficulty": 3,
+      "lines": [
+        "לפני כל שיחה חשובה אני מדמיין תסריט רע.",
+        "אני בטוח שזה יסתיים במבוכה.",
+        "כבר מראש אני מרגיש קפוא.",
+        "ואז אני בא בלי אוויר."
+      ],
+      "final_sentence": "זה תמיד נגמר רע.",
+      "suggested_shadow_quantifier": "תמיד",
+      "suggested_exception": "בחודש שעבר הייתה שיחה אחת שהסתיימה הרבה יותר טוב ממה שחשבתי."
+    },
+    {
+      "id": "P1",
+      "topic": "parenting",
+      "tags": ["anger", "regret"],
+      "difficulty": 2,
+      "lines": [
+        "הילד חזר שוב עם הערה מהמורה.",
+        "אמרתי לעצמי שאשמור על קור רוח.",
+        "אבל התפרצתי מהר.",
+        "אחר כך נשארתי עם אשמה."
+      ],
+      "final_sentence": "אני הורה גרוע.",
+      "suggested_shadow_quantifier": "תמיד",
+      "suggested_exception": "אתמול כן עצרתי לפני צעקה והצלחתי לדבר רגוע יותר."
+    },
+    {
+      "id": "P2",
+      "topic": "parenting",
+      "tags": ["homework", "control"],
+      "difficulty": 1,
+      "lines": [
+        "כל ערב שיעורי הבית הופכים למאבק.",
+        "אני מתחיל יפה ואז מאבד סבלנות.",
+        "הילד נסגר ואני מעלה טון.",
+        "בסוף אף אחד לא מרוצה."
+      ],
+      "final_sentence": "אצלנו זה אף פעם לא עובד.",
+      "suggested_shadow_quantifier": "אף פעם",
+      "suggested_exception": "כשחילקנו ל-10 דקות עם הפסקה זה עבד קצת יותר טוב."
+    },
+    {
+      "id": "P3",
+      "topic": "parenting",
+      "tags": ["comparison", "pressure"],
+      "difficulty": 3,
+      "lines": [
+        "אני רואה הורים אחרים נראים בשליטה.",
+        "אצלי כל בוקר מרגיש כמו כאוס.",
+        "אני מתחיל את היום עם לחץ בחזה.",
+        "ומשם הכול נהיה קצר."
+      ],
+      "final_sentence": "כולם מסתדרים חוץ ממני.",
+      "suggested_shadow_quantifier": "כולם",
+      "suggested_exception": "יש בקרים שבהם הכנה ערב לפני כן מורידה את העומס."
+    },
+    {
+      "id": "F1",
+      "topic": "faith",
+      "tags": ["guilt", "change"],
+      "difficulty": 2,
+      "lines": [
+        "ניסיתי להתחזק והיו לי יומיים טובים.",
+        "אחר כך נפלתי שוב.",
+        "זה ישר מחזיר אותי לתחושת כישלון.",
+        "אני מרגיש שאין לי כוח להתחיל מחדש."
+      ],
+      "final_sentence": "אין לי באמת יכולת להשתנות.",
+      "suggested_shadow_quantifier": "אין סיכוי",
+      "suggested_exception": "כשהיעד היה קטן ומוגדר החזקתי מעמד יותר זמן."
+    },
+    {
+      "id": "F2",
+      "topic": "faith",
+      "tags": ["identity", "shame"],
+      "difficulty": 3,
+      "lines": [
+        "ברגע שאני מפספס יום אחד אני נשבר.",
+        "אני מפרש את זה כאילו הכול מזויף.",
+        "ואז אני מתרחק לגמרי.",
+        "זה מרגיש חסר מוצא."
+      ],
+      "final_sentence": "אם נפלתי פעם אחת, הכול אבוד.",
+      "suggested_shadow_quantifier": "הכול אבוד",
+      "suggested_exception": "היו פעמים שבהן חזרתי למסלול כבר ביום שאחרי."
+    },
+    {
+      "id": "M1",
+      "topic": "money",
+      "tags": ["stress", "planning"],
+      "difficulty": 1,
+      "lines": [
+        "אני מסדר תשלום אחד ואז מגיע עוד משהו.",
+        "אני מרגיש שאני רק מכבה שריפות.",
+        "אין לי רגע של שקט בראש.",
+        "כל הודעה מהבנק מקפיצה אותי."
+      ],
+      "final_sentence": "אין פה סוף.",
+      "suggested_shadow_quantifier": "זה לא ישתנה",
+      "suggested_exception": "בחודש שעבר היה שבוע רגוע יותר כשישבתי מראש על תקציב."
+    },
+    {
+      "id": "M2",
+      "topic": "money",
+      "tags": ["helplessness", "future"],
+      "difficulty": 2,
+      "lines": [
+        "אני מנסה לתכנן אבל הכול זז.",
+        "כל פעם יש הוצאה לא צפויה.",
+        "אני כבר לא סומך על עצמי בהחלטות.",
+        "זה מכניס אותי לקיפאון."
+      ],
+      "final_sentence": "אין טעם אפילו לנסות לתכנן.",
+      "suggested_shadow_quantifier": "אין טעם",
+      "suggested_exception": "כשאני מתכנן רק שבוע קדימה אני כן מצליח לעמוד בזה."
+    }
+  ]
+}

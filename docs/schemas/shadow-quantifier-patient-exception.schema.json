@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://meta-model.app/schemas/shadow-quantifier-patient-exception.schema.json",
+  "title": "Shadow Quantifier Patient Exception",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reply_type",
+    "reply_text",
+    "exception_or_conditions"
+  ],
+  "properties": {
+    "reply_type": {
+      "type": "string",
+      "enum": [
+        "has_exception",
+        "no_exception",
+        "provide_conditions"
+      ]
+    },
+    "reply_text": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 200
+    },
+    "exception_or_conditions": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 180
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 140
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

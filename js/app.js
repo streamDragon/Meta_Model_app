@@ -8171,6 +8171,9 @@ const WR2W_CRITERIA_LABELS = Object.freeze({
     exception: 'פריצה + משפט למידה'
 });
 
+const WR2W_DIALOGUE_PACK_URL = 'data/sqhcel-dialogues.json';
+let wr2wDialoguePackPromise = null;
+
 const WR2W_SEED_DIALOGS = Object.freeze([
     Object.freeze({
         id: 'sqhcel_1_work_manager',
@@ -8285,6 +8288,64 @@ function wr2wNormalizeScene(raw, idxPrefix = 'wr2w') {
         transformedSentence: wr2TrimText(raw.transformedSentence || wr2SoftenSentence(visibleSentence), 190),
         createdAt: Number(raw.createdAt) || Date.now()
     };
+}
+
+function wr2wMapDialoguePackEntry(entry, index = 0) {
+    if (!entry || typeof entry !== 'object') return null;
+    const visibleSentence = wr2TrimText(
+        entry.final_sentence || entry.finalSentence || entry.visibleSentence || entry.statement,
+        170
+    );
+    if (!visibleSentence) return null;
+
+    const lines = Array.isArray(entry.lines)
+        ? entry.lines.map((line) => wr2TrimText(line, 110)).filter(Boolean).slice(0, 6)
+        : [];
+    const monologueFromLines = lines.join(' ');
+    const monologue = wr2TrimText(monologueFromLines || entry.monologue || visibleSentence, 420);
+    const suggestedQuantifier = wr2TrimText(
+        entry.suggested_shadow_quantifier || entry.suggestedShadowQuantifier,
+        38
+    );
+    const quantifiers = [suggestedQuantifier, ...wr2InferQuantifiers(visibleSentence)]
+        .filter(Boolean)
+        .slice(0, 4);
+    const fallbackCondition = 'זה נהיה הכי חזק בעיקר בעומס, עייפות או חוסר ודאות.';
+    return {
+        id: String(entry.id || `sqhcel_pack_${index + 1}`),
+        source: 'seed',
+        monologue,
+        visibleSentence,
+        quantifiers: [...new Set(quantifiers)],
+        exceptionExample: wr2TrimText(
+            entry.suggested_exception || entry.suggestedException || entry.exceptionExample,
+            180
+        ) || 'כן, יש רגע שבו זה 5% פחות נכון.',
+        conditionsLine: wr2TrimText(entry.conditionsLine || fallbackCondition, 180),
+        transformedSentence: wr2TrimText(wr2SoftenSentence(visibleSentence), 190),
+        createdAt: Date.now()
+    };
+}
+
+async function wr2wLoadSeedScenesFromPack() {
+    if (wr2wDialoguePackPromise) return wr2wDialoguePackPromise;
+    wr2wDialoguePackPromise = (async () => {
+        try {
+            const response = await fetch(WR2W_DIALOGUE_PACK_URL, { cache: 'no-store' });
+            if (!response.ok) return [];
+            const payload = await response.json();
+            const list = Array.isArray(payload?.dialogues)
+                ? payload.dialogues
+                : (Array.isArray(payload) ? payload : []);
+            return list
+                .map((entry, index) => wr2wMapDialoguePackEntry(entry, index))
+                .filter(Boolean);
+        } catch (error) {
+            console.warn('Could not load SQHCEL dialogue pack:', error);
+            return [];
+        }
+    })();
+    return wr2wDialoguePackPromise;
 }
 
 function wr2wBuildHypothesisSkeleton(scene, quantifier) {
@@ -8502,6 +8563,20 @@ function setupWrinkleGame() {
         if (!scenes.length) return null;
         if (state.index >= scenes.length) state.index = 0;
         return scenes[state.index];
+    };
+
+    const hydrateSeedScenesFromPack = async () => {
+        const packedSeedScenes = await wr2wLoadSeedScenesFromPack();
+        if (!packedSeedScenes.length) return;
+        const normalizedPack = packedSeedScenes
+            .map((scene, i) => wr2wNormalizeScene(scene, `wr2w_pack_${i}`))
+            .filter(Boolean);
+        if (!normalizedPack.length) return;
+        state.seedScenes = normalizedPack;
+        if (state.index >= allScenes().length) state.index = 0;
+        resetRoundState();
+        setFeedback(`נטענו ${normalizedPack.length} דיאלוגים לחבילה המורחבת.`, 'info');
+        render();
     };
 
     const persist = () => {
@@ -8957,5 +9032,6 @@ function setupWrinkleGame() {
 
     resetRoundState();
     render();
+    hydrateSeedScenesFromPack();
 }
 
