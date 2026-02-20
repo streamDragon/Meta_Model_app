@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meta Model - כלי תרגול שאול מטה מודל</title>
-    <link rel="stylesheet" href="css/style.css?v=1.0.3">
+    <link rel="stylesheet" href="css/style.css?v=1.0.4">
 </head>
 <body>
     <!-- SPLASH SCREEN -->
@@ -535,7 +535,7 @@
         <!-- PRACTICE TAB -->
         <section id="practice" class="tab-content">
             <div class="practice-container">
-                <div class="card">
+                <div class="card practice-intro-card">
                     <h2>תרגול דינאמי 🎮</h2>
                     <p class="subtitle">בחר קטגוריה וענ על שאלות אינטראקטיביות עם משוב מידי</p>
                     
@@ -546,6 +546,11 @@
                         </select>
                     </div>
 
+                    <section class="practice-section practice-section-question" aria-label="Question Drill Section">
+                        <div class="practice-section-header">
+                            <h3>1. תרגיל בניית שאלות</h3>
+                            <p>כתבו שאלה מדויקת על המשפט וקבלו משוב מיידי.</p>
+                        </div>
                     <div id="question-drill" class="card question-drill-card">
                         <div class="question-drill-header">
                             <h3>תרגיל בניית שאלות</h3>
@@ -571,7 +576,13 @@
                             <span>פגיעות: <strong id="question-drill-hits">0</strong></span>
                         </div>
                     </div>
+                    </section>
 
+                    <section class="practice-section practice-section-radar" aria-label="Meta Radar Section">
+                        <div class="practice-section-header">
+                            <h3>2. Meta Radar</h3>
+                            <p>זיהוי מהיר של תבניות בזמן, עם ניקוד ורמזור טעויות.</p>
+                        </div>
                     <div id="rapid-pattern-arena" class="card rapid-pattern-card">
                         <div class="rapid-pattern-header">
                             <h3>⚡ Meta Radar: מונולוג + תבנית</h3>
@@ -627,7 +638,13 @@
                             </div>
                         </div>
                     </div>
+                    </section>
 
+                    <section class="practice-section practice-section-wizard" aria-label="SQHCEL Wizard Section">
+                        <div class="practice-section-header">
+                            <h3>3. SQHCEL Wizard</h3>
+                            <p>גשר בין תחושה למשפט לפני אתגור: S→Q→H→C→E/L.</p>
+                        </div>
                     <div id="wrinkle-game" class="card wrinkle-game-card">
                         <div class="wrinkle-game-header">
                             <h3>🧩 חשף את הכמת!</h3>
@@ -662,6 +679,13 @@
                             <ul id="wrinkle-self-list" class="wrinkle-self-list"></ul>
                         </div>
                     </div>
+                    </section>
+
+                    <section class="practice-section practice-section-trainer" aria-label="Trainer Mode Section">
+                        <div class="practice-section-header">
+                            <h3>4. מצב מאמן</h3>
+                            <p>תרגול מדורג עם רמזים, עומק וסטטיסטיקה.</p>
+                        </div>
 
                     <!-- TRAINER MODE INTERFACE -->
                     <div id="trainer-mode" class="trainer-mode hidden">
@@ -723,6 +747,7 @@
                         <p>⭐ הרוויח XP: <span id="session-xp">0</span></p>
                         <p>🌟 כוכבים בסשן: <span id="session-stars">0</span></p>
                     </div>
+                    </section>
                 </div>
             </div>
         </section>
@@ -918,6 +943,6 @@
         </section>
     </div>
 
-    <script src="js/app.js?v=1.0.3"></script>
+    <script src="js/app.js?v=1.0.4"></script>
 </body>
 </html>

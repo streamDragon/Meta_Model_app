@@ -806,8 +806,89 @@ body.embed-mode .progress-hub {
 /* Practice Container */
 .practice-container {
     width: 100%;
-    max-width: 800px;
+    max-width: 980px;
     margin: 0 auto;
+}
+
+.practice-intro-card {
+    margin-bottom: 16px;
+}
+
+.practice-intro-card .subtitle {
+    margin-bottom: 12px;
+}
+
+.practice-section {
+    margin-bottom: 18px;
+    padding: 14px;
+    border-radius: 16px;
+    border: 1px solid #dbeafe;
+    background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.practice-section:last-of-type {
+    margin-bottom: 0;
+}
+
+.practice-section-header {
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border-right: 4px solid #0369a1;
+    background: #eff6ff;
+}
+
+.practice-section-header h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.2rem;
+}
+
+.practice-section-header p {
+    margin: 4px 0 0;
+    color: #334155;
+    font-size: 0.95rem;
+}
+
+.practice-section > .card {
+    margin-bottom: 0;
+}
+
+.practice-section-question {
+    border-color: #bfdbfe;
+}
+
+.practice-section-question .practice-section-header {
+    border-right-color: #1d4ed8;
+    background: #eff6ff;
+}
+
+.practice-section-radar {
+    border-color: #bae6fd;
+}
+
+.practice-section-radar .practice-section-header {
+    border-right-color: #0284c7;
+    background: #ecfeff;
+}
+
+.practice-section-wizard {
+    border-color: #fed7aa;
+    background: linear-gradient(180deg, #fffef7 0%, #ffffff 100%);
+}
+
+.practice-section-wizard .practice-section-header {
+    border-right-color: #ea580c;
+    background: #fff7ed;
+}
+
+.practice-section-trainer {
+    border-color: #cbd5e1;
+}
+
+.practice-section-trainer .practice-section-header {
+    border-right-color: #475569;
+    background: #f8fafc;
 }
 
 .practice-filters {
@@ -4603,6 +4684,18 @@ a:hover {
     .practice-filters {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .practice-section {
+        padding: 10px;
+    }
+
+    .practice-section-header {
+        padding: 10px 11px;
+    }
+
+    .practice-section-header h3 {
+        font-size: 1.03rem;
     }
 
     .practice-filters select {
