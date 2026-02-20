@@ -119,6 +119,8 @@ const TRAINER_STAR_REWARDS = Object.freeze({
 });
 
 let trainerRewardEffectTimer = null;
+const PRACTICE_PAGE_STORAGE_KEY = 'practice_active_page_v1';
+const PRACTICE_PAGE_KEYS = Object.freeze(['question', 'radar', 'wizard']);
 
 const SUBCATEGORY_TO_CATEGORY = {
     SIMPLE_DELETION: 'DELETION',
@@ -552,11 +554,24 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: 'עבור/י על הדוגמאות ואז חזור/י למסך תרגול מעשי.'
     }),
     practice: Object.freeze({
-        logic: 'מתרגלים זיהוי ושאלה מדויקת בחזרתיות קצרה עד שנוצר רפלקס.',
-        goal: 'לשפר מהירות דיוק ב-Meta Model.',
-        approach: 'עבוד/י בסבבים קצרים: שאלה, בדיקה, תיקון והמשך.',
-        expected: 'בסיום תרגול ממוצע תדע/י לזהות טריגר שפה, לקשר אותו לתבנית נכונה, ולנסח שאלה שמקדמת בירור במקום ויכוח.',
-        success: 'כשאת/ה רואה משפט מודגש, את/ה לא מנחש/ת: קודם מזהה מבנה, ואז בוחר/ת תבנית במודע.'
+        logic: 'מסך התרגול פוצל ל-3 דפים: שאלות, Meta Radar, SQHCEL.',
+        goal: 'לעבוד בצורה ממוקדת - כל פעם מיומנות אחת.',
+        approach: 'בחר/י דף אחד, סיים/י סבב קצר, ורק אז עבר/י לדף הבא.'
+    }),
+    'practice-page-question': Object.freeze({
+        logic: 'הדף הזה מאמן ניסוח שאלות מדויקות במקום ניחוש.',
+        goal: 'להשתפר בזיהוי מהיר של מחיקה/עיוות/הכללה.',
+        approach: 'קרא/י את המשפט, נסח/י שאלה מדויקת, ובדוק/י עם המשוב.'
+    }),
+    'practice-page-radar': Object.freeze({
+        logic: 'הדף הזה מאמן זיהוי תבניות בזמן אמת עם לחץ זמן.',
+        goal: 'לחזק רפלקס דיוק מהיר במונולוג חי.',
+        approach: 'ראה/י את ההיילייט, בחר/י תבנית במהירות, ובדוק/י מה לתקן בסיכום.'
+    }),
+    'practice-page-wizard': Object.freeze({
+        logic: 'הדף הזה מאמן גישור בין תחושה למשפט לפני אתגור.',
+        goal: 'לבנות מיומנות SQHCEL עקבית עם אישור לפני פריצה.',
+        approach: 'עבוד/י בסדר קבוע: S -> Q -> H -> C -> E/L, וסיים/י במשפט למידה.'
     }),
     blueprint: Object.freeze({
         logic: 'המסך מפרק משימה עמומה ליעד, צעדים, פער ציפיות ותוכנית ביצוע.',
@@ -584,6 +599,9 @@ const SCREEN_READ_GUIDE_TARGET_IDS = Object.freeze([
     'prismlab',
     'categories',
     'practice',
+    'practice-page-question',
+    'practice-page-radar',
+    'practice-page-wizard',
     'blueprint',
     'about'
 ]);
@@ -763,6 +781,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMetaModelData();
     setupTabNavigation();
     setupReadBeforeStartGuides();
+    setupPracticePageRouter();
     applyInitialTabPreference();
     setupGlobalComicStripActions();
     setupPracticeMode();
@@ -888,6 +907,69 @@ function populateCategorySelect() {
         option.value = category.id;
         option.textContent = category.hebrew_name;
         select.appendChild(option);
+    });
+}
+
+function normalizePracticePageKey(pageKey = '') {
+    const key = String(pageKey || '').trim().toLowerCase();
+    if (key === 'meta-radar' || key === 'meta_radar') return 'radar';
+    if (key === 'sqhcel' || key === 'wizard') return 'wizard';
+    if (key === 'question' || key === 'questions' || key === 'drill') return 'question';
+    return PRACTICE_PAGE_KEYS.includes(key) ? key : 'question';
+}
+
+function navigateToPracticePage(pageKey = 'question') {
+    const resolved = normalizePracticePageKey(pageKey);
+    localStorage.setItem(PRACTICE_PAGE_STORAGE_KEY, resolved);
+    navigateTo('practice');
+    const root = document.getElementById('practice');
+    if (root) {
+        root.dispatchEvent(new CustomEvent('practice:open-page', {
+            detail: { pageKey: resolved }
+        }));
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function setupPracticePageRouter() {
+    const root = document.getElementById('practice');
+    if (!root || root.dataset.practicePagesBound === 'true') return;
+    root.dataset.practicePagesBound = 'true';
+
+    const buttons = Array.from(root.querySelectorAll('button[data-practice-page]'));
+    const panels = Array.from(root.querySelectorAll('[data-practice-page-panel]'));
+    if (!buttons.length || !panels.length) return;
+
+    const showPracticePage = (pageKey, shouldPersist = true) => {
+        const resolved = normalizePracticePageKey(pageKey);
+        buttons.forEach((btn) => {
+            const isActive = btn.getAttribute('data-practice-page') === resolved;
+            btn.classList.toggle('is-active', isActive);
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+        panels.forEach((panel) => {
+            const isActive = panel.getAttribute('data-practice-page-panel') === resolved;
+            panel.classList.toggle('is-active', isActive);
+            panel.hidden = !isActive;
+        });
+        if (shouldPersist) localStorage.setItem(PRACTICE_PAGE_STORAGE_KEY, resolved);
+        return resolved;
+    };
+
+    const saved = normalizePracticePageKey(localStorage.getItem(PRACTICE_PAGE_STORAGE_KEY) || 'question');
+    showPracticePage(saved, false);
+
+    buttons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-practice-page') || 'question';
+            showPracticePage(target, true);
+            playUISound('next');
+        });
+    });
+
+    root.addEventListener('practice:open-page', (event) => {
+        const requested = event?.detail?.pageKey || 'question';
+        showPracticePage(requested, true);
     });
 }
 
