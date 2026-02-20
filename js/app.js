@@ -465,6 +465,20 @@ function applyEmbeddedCompactMode() {
     }
 }
 
+function applyHeaderDensityPreference() {
+    const params = new URLSearchParams(window.location.search);
+    const forceFull = params.get('fullheader') === '1';
+    const forceCompact = params.get('compactheader') === '1';
+    const savedMode = (localStorage.getItem('header_density_v1') || 'compact').toLowerCase();
+
+    let mode = savedMode === 'full' ? 'full' : 'compact';
+    if (forceFull) mode = 'full';
+    if (forceCompact) mode = 'compact';
+
+    document.body.classList.toggle('compact-header', mode === 'compact');
+    localStorage.setItem('header_density_v1', mode);
+}
+
 function normalizeRequestedTab(tabName = '') {
     const raw = String(tabName || '').trim();
     const key = raw.toLowerCase();
@@ -792,6 +806,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAppVersionChip();
     setupMobileViewportSizing();
     applyEmbeddedCompactMode();
+    applyHeaderDensityPreference();
     loadAudioSettings();
     setupAudioMuteButtons();
     setupMusicToggleButton();
