@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meta Model - כלי תרגול שאול מטה מודל</title>
-    <link rel="stylesheet" href="css/style.css?v=1.0.8">
+    <link rel="stylesheet" href="css/style.css?v=1.0.9">
 </head>
 <body>
     <!-- SPLASH SCREEN -->
@@ -37,7 +37,9 @@
             <button class="tab-btn" data-tab="scenario-trainer">סצנות Execution</button>
             <button class="tab-btn" data-tab="comic-engine">Comic Engine</button>
             <button class="tab-btn" data-tab="categories">קטגוריות</button>
-            <button class="tab-btn" data-tab="practice">תרגול</button>
+            <button class="tab-btn" data-tab="practice-question">תרגול שאלות</button>
+            <button class="tab-btn" data-tab="practice-radar">Meta Radar</button>
+            <button class="tab-btn" data-tab="practice-wizard">SQHCEL Wizard</button>
             <button class="tab-btn" data-tab="blueprint">Blueprint Builder</button>
             <button class="tab-btn" data-tab="prismlab">מעבדת פריזמות</button>
             <button class="tab-btn" data-tab="about">על הפרויקט</button>
@@ -533,169 +535,177 @@
         <section id="categories" class="tab-content">
             <div id="categories-container"></div>
         </section>
-        <!-- PRACTICE TAB -->
-        <section id="practice" class="tab-content">
+        <!-- PRACTICE QUESTION TAB -->
+        <section id="practice-question" class="tab-content practice-tab-content">
             <div class="practice-container">
                 <div class="card practice-intro-card">
                     <h2>תרגול דינאמי 🎮</h2>
-                    <p class="subtitle">3 דפי תרגול נפרדים: כל דף מציג מיומנות אחת בלבד.</p>
+                    <p class="subtitle">דף 1 מתוך 3: בניית שאלות מדויקות על משפטי Meta Model.</p>
 
-                    <div class="practice-pages-nav" role="tablist" aria-label="בחירת דף תרגול">
-                        <button type="button" class="btn btn-secondary practice-page-btn is-active" data-practice-page="question">1. בניית שאלות</button>
-                        <button type="button" class="btn btn-secondary practice-page-btn" data-practice-page="radar">2. Meta Radar</button>
-                        <button type="button" class="btn btn-secondary practice-page-btn" data-practice-page="wizard">3. SQHCEL Wizard</button>
+                    <div class="practice-filters">
+                        <label>בחר קטגוריה:</label>
+                        <select id="category-select">
+                            <option value="">הכל</option>
+                        </select>
                     </div>
 
-                    <div id="practice-page-question" class="practice-page-panel is-active" data-practice-page-panel="question">
-                        <div class="practice-filters">
-                            <label>בחר קטגוריה:</label>
-                            <select id="category-select">
-                                <option value="">הכל</option>
-                            </select>
+                    <section class="practice-section practice-section-question" aria-label="Question Drill Section">
+                        <div class="practice-section-header">
+                            <h3>1. תרגיל בניית שאלות</h3>
+                            <p>כתבו שאלה מדויקת על המשפט וקבלו משוב מיידי.</p>
                         </div>
-
-                        <section class="practice-section practice-section-question" aria-label="Question Drill Section">
-                            <div class="practice-section-header">
-                                <h3>1. תרגיל בניית שאלות</h3>
-                                <p>כתבו שאלה מדויקת על המשפט וקבלו משוב מיידי.</p>
+                        <div id="question-drill" class="card question-drill-card">
+                            <div class="question-drill-header">
+                                <h3>תרגיל בניית שאלות</h3>
+                                <small>בחרו את המשפט, כתבו שאלה ותייגו את הכיוון (מחיקה/עיוות/הכללה).</small>
                             </div>
-                            <div id="question-drill" class="card question-drill-card">
-                                <div class="question-drill-header">
-                                    <h3>תרגיל בניית שאלות</h3>
-                                    <small>בחרו את המשפט, כתבו שאלה ותייגו את הכיוון (מחיקה/עיוות/הכללה).</small>
-                                </div>
-                                <p id="question-drill-statement" class="question-drill-statement"></p>
-                                <textarea id="question-drill-input" rows="3" placeholder="כתוב/י כאן את השאלה שמחפשת את ההנחה הנסתרת..."></textarea>
-                                <div class="question-drill-controls">
-                                    <label>
-                                        <span>ממוקד ב-</span>
-                                        <select id="question-drill-category">
-                                            <option value="DELETION">Deletion</option>
-                                            <option value="DISTORTION">Distortion</option>
-                                            <option value="GENERALIZATION">Generalization</option>
+                            <p id="question-drill-statement" class="question-drill-statement"></p>
+                            <textarea id="question-drill-input" rows="3" placeholder="כתוב/י כאן את השאלה שמחפשת את ההנחה הנסתרת..."></textarea>
+                            <div class="question-drill-controls">
+                                <label>
+                                    <span>ממוקד ב-</span>
+                                    <select id="question-drill-category">
+                                        <option value="DELETION">Deletion</option>
+                                        <option value="DISTORTION">Distortion</option>
+                                        <option value="GENERALIZATION">Generalization</option>
+                                    </select>
+                                </label>
+                                <button id="question-drill-check" class="btn btn-primary">בדוק שאלה</button>
+                                <button id="question-drill-next" class="btn btn-secondary">משפט חדש</button>
+                            </div>
+                            <div id="question-drill-feedback" class="question-drill-feedback"></div>
+                            <div class="question-drill-stats">
+                                <span>ניסיונות: <strong id="question-drill-attempts">0</strong></span>
+                                <span>פגיעות: <strong id="question-drill-hits">0</strong></span>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRACTICE RADAR TAB -->
+        <section id="practice-radar" class="tab-content practice-tab-content">
+            <div class="practice-container">
+                <div class="card practice-intro-card">
+                    <h2>Meta Radar ⚡</h2>
+                    <p class="subtitle">דף 2 מתוך 3: זיהוי מהיר של תבניות בזמן אמת, עם ניקוד ומשוב.</p>
+
+                    <section class="practice-section practice-section-radar" aria-label="Meta Radar Section">
+                        <div class="practice-section-header">
+                            <h3>2. Meta Radar</h3>
+                            <p>זיהוי מהיר של תבניות בזמן, עם ניקוד ורמזור טעויות.</p>
+                        </div>
+                        <div id="rapid-pattern-arena" class="card rapid-pattern-card">
+                            <div class="rapid-pattern-header">
+                                <h3>⚡ Meta Radar: מונולוג + תבנית</h3>
+                                <small>המילה/ביטוי המודגש הוא הטריגר. לחצו על אחת מ-15 התבניות לפני שנגמר הזמן.</small>
+                            </div>
+
+                            <div class="rapid-pattern-shell">
+                                <aside class="rapid-pattern-side">
+                                    <div class="rapid-panel">
+                                        <label for="rapid-case-type">סוג מטופל</label>
+                                        <select id="rapid-case-type" class="rapid-control-select">
+                                            <option value="random">רנדומלי</option>
                                         </select>
-                                    </label>
-                                    <button id="question-drill-check" class="btn btn-primary">בדוק שאלה</button>
-                                    <button id="question-drill-next" class="btn btn-secondary">משפט חדש</button>
-                                </div>
-                                <div id="question-drill-feedback" class="question-drill-feedback"></div>
-                                <div class="question-drill-stats">
-                                    <span>ניסיונות: <strong id="question-drill-attempts">0</strong></span>
-                                    <span>פגיעות: <strong id="question-drill-hits">0</strong></span>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-
-                    <div id="practice-page-radar" class="practice-page-panel" data-practice-page-panel="radar" hidden>
-                        <section class="practice-section practice-section-radar" aria-label="Meta Radar Section">
-                            <div class="practice-section-header">
-                                <h3>2. Meta Radar</h3>
-                                <p>זיהוי מהיר של תבניות בזמן, עם ניקוד ורמזור טעויות.</p>
-                            </div>
-                            <div id="rapid-pattern-arena" class="card rapid-pattern-card">
-                                <div class="rapid-pattern-header">
-                                    <h3>⚡ Meta Radar: מונולוג + תבנית</h3>
-                                    <small>המילה/ביטוי המודגש הוא הטריגר. לחצו על אחת מ-15 התבניות לפני שנגמר הזמן.</small>
-                                </div>
-
-                                <div class="rapid-pattern-shell">
-                                    <aside class="rapid-pattern-side">
-                                        <div class="rapid-panel">
-                                            <label for="rapid-case-type">סוג מטופל</label>
-                                            <select id="rapid-case-type" class="rapid-control-select">
-                                                <option value="random">רנדומלי</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="rapid-panel">
-                                            <label for="rapid-time-limit">רמת קושי (זמן): <strong id="rapid-time-limit-value">12</strong> שנ׳</label>
-                                            <input id="rapid-time-limit" type="range" min="6" max="25" value="12" />
-                                        </div>
-
-                                        <div class="rapid-panel">
-                                            <label>רמזור טעויות</label>
-                                            <div id="rapid-traffic-light" class="rapid-traffic-light" data-state="green" aria-label="רמזור מצב">
-                                                <span class="rapid-light rapid-light-red" aria-hidden="true"></span>
-                                                <span class="rapid-light rapid-light-yellow" aria-hidden="true"></span>
-                                                <span class="rapid-light rapid-light-green" aria-hidden="true"></span>
-                                            </div>
-                                            <small id="rapid-errors-label">טעויות בשאלה: 0/2</small>
-                                        </div>
-
-                                        <div class="rapid-panel rapid-score-panel">
-                                            <p>ניקוד: <strong id="rapid-score">0</strong></p>
-                                            <p>רצף: <strong id="rapid-streak">0</strong></p>
-                                            <p>שאלה: <strong id="rapid-round">0</strong></p>
-                                        </div>
-                                        <div class="rapid-actions-row">
-                                            <button id="rapid-start-btn" class="btn btn-primary">התחל סבב</button>
-                                            <button id="rapid-pause-btn" class="btn btn-secondary rapid-pause-btn" disabled>PAUSE</button>
-                                        </div>
-                                    </aside>
-
-                                    <div class="rapid-pattern-main">
-                                        <div class="rapid-monologue-box">
-                                            <p id="rapid-monologue-text" class="rapid-monologue-text">לחצו על "התחל סבב" כדי להתחיל זיהוי תבניות בזמן אמת.</p>
-                                        </div>
-
-                                        <div class="rapid-timer-row">
-                                            <div class="rapid-timer-bar" aria-label="מד התקדמות זמן">
-                                                <span id="rapid-timer-fill"></span>
-                                            </div>
-                                            <p id="rapid-feedback" class="rapid-feedback" data-tone="info">ממתין לתחילת סבב...</p>
-                                        </div>
-
-                                        <div id="rapid-pattern-buttons" class="rapid-pattern-buttons" role="group" aria-label="כפתורי תבניות"></div>
-                                        <div id="rapid-ai-feedback" class="rapid-ai-feedback hidden" aria-live="polite"></div>
                                     </div>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
 
-                    <div id="practice-page-wizard" class="practice-page-panel" data-practice-page-panel="wizard" hidden>
-                        <section class="practice-section practice-section-wizard" aria-label="SQHCEL Wizard Section">
-                            <div class="practice-section-header">
-                                <h3>3. SQHCEL Wizard</h3>
-                                <p>גשר בין תחושה למשפט לפני אתגור: S→Q→H→C→E/L.</p>
-                            </div>
-                            <div id="wrinkle-game" class="card wrinkle-game-card">
-                                <div class="wrinkle-game-header">
-                                    <h3>🧩 חשף את הכמת!</h3>
-                                    <small>קודם חשיפה, אחר כך אתגור. בונים רפלקס מהיר לזיהוי הנחה סמויה.</small>
-                                    <div class="wrinkle-coverage">
-                                        <span>🟢 עד כמתים סמויים</span>
-                                        <span>🟢 עד Self-Reference אישי</span>
+                                    <div class="rapid-panel">
+                                        <label for="rapid-time-limit">רמת קושי (זמן): <strong id="rapid-time-limit-value">12</strong> שנ׳</label>
+                                        <input id="rapid-time-limit" type="range" min="6" max="25" value="12" />
                                     </div>
-                                </div>
 
-                                <div class="wrinkle-score-row">
-                                    <span>🔥 רצף: <strong id="wrinkle-streak">0</strong></span>
-                                    <span>⭐ נקודות: <strong id="wrinkle-points">0</strong></span>
-                                    <span>⏱️ Due: <strong id="wrinkle-due-count">0</strong></span>
-                                </div>
-
-                                <div class="wrinkle-round-box">
-                                    <p id="wrinkle-step-label" class="wrinkle-step-label">שלב 1/2: חשיפת הכמת</p>
-                                    <p id="wrinkle-statement" class="wrinkle-statement"></p>
-                                    <div id="wrinkle-options" class="wrinkle-options"></div>
-                                    <div id="wrinkle-feedback" class="wrinkle-feedback"></div>
-                                    <button id="wrinkle-next-btn" class="btn btn-primary hidden">משפט הבא</button>
-                                    <div id="wrinkle-fx-layer" class="wrinkle-fx-layer" aria-hidden="true"></div>
-                                </div>
-
-                                <div class="wrinkle-self-box">
-                                    <label for="wrinkle-self-input">בדיקת Self-Reference: כתבו משפט אישי לתרגול</label>
-                                    <textarea id="wrinkle-self-input" rows="2" placeholder="לדוגמה: אני לא יכול להוביל את השיחה הזאת."></textarea>
-                                    <div class="wrinkle-self-actions">
-                                        <button id="wrinkle-add-self-btn" class="btn btn-secondary">הוסף משפט אישי למשחק</button>
+                                    <div class="rapid-panel">
+                                        <label>רמזור טעויות</label>
+                                        <div id="rapid-traffic-light" class="rapid-traffic-light" data-state="green" aria-label="רמזור מצב">
+                                            <span class="rapid-light rapid-light-red" aria-hidden="true"></span>
+                                            <span class="rapid-light rapid-light-yellow" aria-hidden="true"></span>
+                                            <span class="rapid-light rapid-light-green" aria-hidden="true"></span>
+                                        </div>
+                                        <small id="rapid-errors-label">טעויות בשאלה: 0/2</small>
                                     </div>
-                                    <ul id="wrinkle-self-list" class="wrinkle-self-list"></ul>
+
+                                    <div class="rapid-panel rapid-score-panel">
+                                        <p>ניקוד: <strong id="rapid-score">0</strong></p>
+                                        <p>רצף: <strong id="rapid-streak">0</strong></p>
+                                        <p>שאלה: <strong id="rapid-round">0</strong></p>
+                                    </div>
+                                    <div class="rapid-actions-row">
+                                        <button id="rapid-start-btn" class="btn btn-primary">התחל סבב</button>
+                                        <button id="rapid-pause-btn" class="btn btn-secondary rapid-pause-btn" disabled>PAUSE</button>
+                                    </div>
+                                </aside>
+
+                                <div class="rapid-pattern-main">
+                                    <div class="rapid-monologue-box">
+                                        <p id="rapid-monologue-text" class="rapid-monologue-text">לחצו על "התחל סבב" כדי להתחיל זיהוי תבניות בזמן אמת.</p>
+                                    </div>
+
+                                    <div class="rapid-timer-row">
+                                        <div class="rapid-timer-bar" aria-label="מד התקדמות זמן">
+                                            <span id="rapid-timer-fill"></span>
+                                        </div>
+                                        <p id="rapid-feedback" class="rapid-feedback" data-tone="info">ממתין לתחילת סבב...</p>
+                                    </div>
+
+                                    <div id="rapid-pattern-buttons" class="rapid-pattern-buttons" role="group" aria-label="כפתורי תבניות"></div>
+                                    <div id="rapid-ai-feedback" class="rapid-ai-feedback hidden" aria-live="polite"></div>
                                 </div>
                             </div>
-                        </section>
-                    </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRACTICE WIZARD TAB -->
+        <section id="practice-wizard" class="tab-content practice-tab-content">
+            <div class="practice-container">
+                <div class="card practice-intro-card">
+                    <h2>SQHCEL Wizard 🧠</h2>
+                    <p class="subtitle">דף 3 מתוך 3: גישור תחושה-שפה לפי S→Q→H→C→E/L לפני אתגור.</p>
+
+                    <section class="practice-section practice-section-wizard" aria-label="SQHCEL Wizard Section">
+                        <div class="practice-section-header">
+                            <h3>3. SQHCEL Wizard</h3>
+                            <p>גשר בין תחושה למשפט לפני אתגור: S→Q→H→C→E/L.</p>
+                        </div>
+                        <div id="wrinkle-game" class="card wrinkle-game-card">
+                            <div class="wrinkle-game-header">
+                                <h3>🧩 חשף את הכמת!</h3>
+                                <small>קודם חשיפה, אחר כך אתגור. בונים רפלקס מהיר לזיהוי הנחה סמויה.</small>
+                                <div class="wrinkle-coverage">
+                                    <span>🎢 עד כמתים סמויים</span>
+                                    <span>🎢 עד Self-Reference אישי</span>
+                                </div>
+                            </div>
+
+                            <div class="wrinkle-score-row">
+                                <span>🔥 רצף: <strong id="wrinkle-streak">0</strong></span>
+                                <span>⭐ נקודות: <strong id="wrinkle-points">0</strong></span>
+                                <span>⏱️ Due: <strong id="wrinkle-due-count">0</strong></span>
+                            </div>
+
+                            <div class="wrinkle-round-box">
+                                <p id="wrinkle-step-label" class="wrinkle-step-label">שלב 1/2: חשיפת הכמת</p>
+                                <p id="wrinkle-statement" class="wrinkle-statement"></p>
+                                <div id="wrinkle-options" class="wrinkle-options"></div>
+                                <div id="wrinkle-feedback" class="wrinkle-feedback"></div>
+                                <button id="wrinkle-next-btn" class="btn btn-primary hidden">משפט הבא</button>
+                                <div id="wrinkle-fx-layer" class="wrinkle-fx-layer" aria-hidden="true"></div>
+                            </div>
+
+                            <div class="wrinkle-self-box">
+                                <label for="wrinkle-self-input">בדיקת Self-Reference: כתבו משפט אישי לתרגול</label>
+                                <textarea id="wrinkle-self-input" rows="2" placeholder="לדוגמה: אני לא יכול להוביל את השיחה הזאת."></textarea>
+                                <div class="wrinkle-self-actions">
+                                    <button id="wrinkle-add-self-btn" class="btn btn-secondary">הוסף משפט אישי למשחק</button>
+                                </div>
+                                <ul id="wrinkle-self-list" class="wrinkle-self-list"></ul>
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </div>
         </section>
@@ -891,7 +901,7 @@
         </section>
     </div>
 
-    <script src="js/app.js?v=1.0.8"></script>
+    <script src="js/app.js?v=1.0.9"></script>
 </body>
 </html>
 

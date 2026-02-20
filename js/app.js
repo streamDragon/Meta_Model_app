@@ -119,8 +119,14 @@ const TRAINER_STAR_REWARDS = Object.freeze({
 });
 
 let trainerRewardEffectTimer = null;
-const PRACTICE_PAGE_STORAGE_KEY = 'practice_active_page_v1';
 const PRACTICE_PAGE_KEYS = Object.freeze(['question', 'radar', 'wizard']);
+const PRACTICE_ACTIVE_TAB_STORAGE_KEY = 'practice_active_tab_v1';
+const PRACTICE_TAB_BY_PAGE_KEY = Object.freeze({
+    question: 'practice-question',
+    radar: 'practice-radar',
+    wizard: 'practice-wizard'
+});
+const PRACTICE_TAB_IDS = Object.freeze(Object.values(PRACTICE_TAB_BY_PAGE_KEY));
 
 const SUBCATEGORY_TO_CATEGORY = {
     SIMPLE_DELETION: 'DELETION',
@@ -459,13 +465,32 @@ function applyEmbeddedCompactMode() {
     }
 }
 
+function normalizeRequestedTab(tabName = '') {
+    const raw = String(tabName || '').trim();
+    const key = raw.toLowerCase();
+    if (!raw) return '';
+    if (key === 'practice' || key === 'practice-question' || key === 'question') return 'practice-question';
+    if (key === 'practice-radar' || key === 'radar' || key === 'meta-radar' || key === 'meta_radar') return 'practice-radar';
+    if (key === 'practice-wizard' || key === 'wizard' || key === 'sqhcel') return 'practice-wizard';
+    return raw;
+}
+
+function persistPracticeTabPreference(tabName = '') {
+    const normalized = normalizeRequestedTab(tabName);
+    if (PRACTICE_TAB_IDS.includes(normalized)) {
+        localStorage.setItem(PRACTICE_ACTIVE_TAB_STORAGE_KEY, normalized);
+    }
+}
+
 function applyInitialTabPreference() {
     const params = new URLSearchParams(window.location.search);
-    const requestedTab = (params.get('tab') || '').trim();
-    const defaultEmbedTab = document.body.classList.contains('embed-mode') ? 'practice' : '';
+    const requestedTab = normalizeRequestedTab(params.get('tab') || '');
+    const savedPracticeTab = normalizeRequestedTab(localStorage.getItem(PRACTICE_ACTIVE_TAB_STORAGE_KEY) || '');
+    const defaultEmbedTab = document.body.classList.contains('embed-mode') ? (savedPracticeTab || 'practice-question') : '';
     const targetTab = requestedTab || defaultEmbedTab;
     if (!targetTab || !document.getElementById(targetTab)) return;
 
+    persistPracticeTabPreference(targetTab);
     navigateTo(targetTab);
     const mobileTabSelect = document.getElementById('mobile-tab-select');
     if (mobileTabSelect) mobileTabSelect.value = targetTab;
@@ -558,17 +583,17 @@ const SCREEN_READ_GUIDES = Object.freeze({
         goal: 'לעבוד בצורה ממוקדת - כל פעם מיומנות אחת.',
         approach: 'בחר/י דף אחד, סיים/י סבב קצר, ורק אז עבר/י לדף הבא.'
     }),
-    'practice-page-question': Object.freeze({
+    'practice-question': Object.freeze({
         logic: 'הדף הזה מאמן ניסוח שאלות מדויקות במקום ניחוש.',
         goal: 'להשתפר בזיהוי מהיר של מחיקה/עיוות/הכללה.',
         approach: 'קרא/י את המשפט, נסח/י שאלה מדויקת, ובדוק/י עם המשוב.'
     }),
-    'practice-page-radar': Object.freeze({
+    'practice-radar': Object.freeze({
         logic: 'הדף הזה מאמן זיהוי תבניות בזמן אמת עם לחץ זמן.',
         goal: 'לחזק רפלקס דיוק מהיר במונולוג חי.',
         approach: 'ראה/י את ההיילייט, בחר/י תבנית במהירות, ובדוק/י מה לתקן בסיכום.'
     }),
-    'practice-page-wizard': Object.freeze({
+    'practice-wizard': Object.freeze({
         logic: 'הדף הזה מאמן גישור בין תחושה למשפט לפני אתגור.',
         goal: 'לבנות מיומנות SQHCEL עקבית עם אישור לפני פריצה.',
         approach: 'עבוד/י בסדר קבוע: S -> Q -> H -> C -> E/L, וסיים/י במשפט למידה.'
@@ -598,10 +623,9 @@ const SCREEN_READ_GUIDE_TARGET_IDS = Object.freeze([
     'comic-engine',
     'prismlab',
     'categories',
-    'practice',
-    'practice-page-question',
-    'practice-page-radar',
-    'practice-page-wizard',
+    'practice-question',
+    'practice-radar',
+    'practice-wizard',
     'blueprint',
     'about'
 ]);
@@ -781,7 +805,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMetaModelData();
     setupTabNavigation();
     setupReadBeforeStartGuides();
-    setupPracticePageRouter();
     applyInitialTabPreference();
     setupGlobalComicStripActions();
     setupPracticeMode();
@@ -842,6 +865,7 @@ function setupTabNavigation() {
             // Show corresponding content
             const tabName = btn.getAttribute('data-tab');
             document.getElementById(tabName).classList.add('active');
+            persistPracticeTabPreference(tabName);
             if (mobileTabSelect) mobileTabSelect.value = tabName;
             const scenarioContext = tabName === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
             closeComicPreviewModal();
@@ -918,59 +942,16 @@ function normalizePracticePageKey(pageKey = '') {
     return PRACTICE_PAGE_KEYS.includes(key) ? key : 'question';
 }
 
-function navigateToPracticePage(pageKey = 'question') {
-    const resolved = normalizePracticePageKey(pageKey);
-    localStorage.setItem(PRACTICE_PAGE_STORAGE_KEY, resolved);
-    navigateTo('practice');
-    const root = document.getElementById('practice');
-    if (root) {
-        root.dispatchEvent(new CustomEvent('practice:open-page', {
-            detail: { pageKey: resolved }
-        }));
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+function getPracticeTabIdFromPageKey(pageKey = 'question') {
+    const resolvedPage = normalizePracticePageKey(pageKey);
+    return PRACTICE_TAB_BY_PAGE_KEY[resolvedPage] || PRACTICE_TAB_BY_PAGE_KEY.question;
 }
 
-function setupPracticePageRouter() {
-    const root = document.getElementById('practice');
-    if (!root || root.dataset.practicePagesBound === 'true') return;
-    root.dataset.practicePagesBound = 'true';
-
-    const buttons = Array.from(root.querySelectorAll('button[data-practice-page]'));
-    const panels = Array.from(root.querySelectorAll('[data-practice-page-panel]'));
-    if (!buttons.length || !panels.length) return;
-
-    const showPracticePage = (pageKey, shouldPersist = true) => {
-        const resolved = normalizePracticePageKey(pageKey);
-        buttons.forEach((btn) => {
-            const isActive = btn.getAttribute('data-practice-page') === resolved;
-            btn.classList.toggle('is-active', isActive);
-            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
-        });
-        panels.forEach((panel) => {
-            const isActive = panel.getAttribute('data-practice-page-panel') === resolved;
-            panel.classList.toggle('is-active', isActive);
-            panel.hidden = !isActive;
-        });
-        if (shouldPersist) localStorage.setItem(PRACTICE_PAGE_STORAGE_KEY, resolved);
-        return resolved;
-    };
-
-    const saved = normalizePracticePageKey(localStorage.getItem(PRACTICE_PAGE_STORAGE_KEY) || 'question');
-    showPracticePage(saved, false);
-
-    buttons.forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const target = btn.getAttribute('data-practice-page') || 'question';
-            showPracticePage(target, true);
-            playUISound('next');
-        });
-    });
-
-    root.addEventListener('practice:open-page', (event) => {
-        const requested = event?.detail?.pageKey || 'question';
-        showPracticePage(requested, true);
-    });
+function navigateToPracticePage(pageKey = 'question') {
+    const targetTab = getPracticeTabIdFromPageKey(pageKey);
+    persistPracticeTabPreference(targetTab);
+    navigateTo(targetTab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Setup Practice Mode
@@ -4638,7 +4619,9 @@ const TAB_TO_COMIC_SCENE_KEYS = {
     'scenario-trainer': ['work_presentation', 'bureaucracy_form', 'parenting_homework'],
     'comic-engine': ['parenting_homework', 'bureaucracy_form', 'work_presentation'],
     categories: ['relationships_apology', 'home_tech_cleanup', 'work_presentation'],
-    practice: ['parenting_homework', 'home_tech_cleanup', 'bureaucracy_form'],
+    'practice-question': ['parenting_homework', 'home_tech_cleanup', 'bureaucracy_form'],
+    'practice-radar': ['parenting_homework', 'home_tech_cleanup', 'bureaucracy_form'],
+    'practice-wizard': ['parenting_homework', 'home_tech_cleanup', 'bureaucracy_form'],
     blueprint: ['work_presentation', 'cooking_lasagna', 'bureaucracy_form'],
     prismlab: ['home_tech_cleanup', 'relationships_apology', 'bureaucracy_form'],
     about: ['work_presentation', 'relationships_apology', 'cooking_lasagna']
@@ -6817,6 +6800,7 @@ function navigateTo(tabName) {
     
     const content = document.getElementById(tabName);
     if (content) content.classList.add('active');
+    persistPracticeTabPreference(tabName);
 
     const scenarioContext = tabName === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
     closeComicPreviewModal();

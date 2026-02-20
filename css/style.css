@@ -5253,7 +5253,7 @@ body.minimal-ui .btn-secondary:hover {
     background: #d1d5db;
 }
 
-body.minimal-ui #practice .practice-container {
+body.minimal-ui .practice-tab-content .practice-container {
     max-width: 980px;
     margin: 0 auto;
 }
