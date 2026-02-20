@@ -7802,3 +7802,827 @@ function setupWrinkleGame() {
     resetRound();
     render();
 }
+
+// ==================== WR2 SQHCEL WIZARD (FINAL OVERRIDE) ===================
+
+const WR2_SQHCEL_STORAGE_KEY = 'wr2_sqhcel_v1';
+
+const WR2W_FLOW_STEPS = Object.freeze([
+    Object.freeze({ id: 'S', label: 'S תחושה', criterion: 'signal' }),
+    Object.freeze({ id: 'Q', label: 'Q כמת-צל', criterion: 'quantifier' }),
+    Object.freeze({ id: 'H', label: 'H היפותזה', criterion: 'hypothesis' }),
+    Object.freeze({ id: 'C', label: 'C אישור', criterion: 'confirm' }),
+    Object.freeze({ id: 'E', label: 'E/L חריג-למידה', criterion: 'exception' })
+]);
+
+const WR2W_BREAKOUT_STEPS = Object.freeze([
+    Object.freeze({ id: 0, label: 'בדיקה ישירה', prompt: 'האם יש מקרה שבו זה לא נכון לגמרי?' }),
+    Object.freeze({ id: 1, label: 'מדרגה 1', prompt: 'היה פעם שזה היה 5% פחות נכון?' }),
+    Object.freeze({ id: 2, label: 'מדרגה 2', prompt: 'אם לא 5% - אז 1% פחות נכון?' }),
+    Object.freeze({ id: 3, label: 'מדרגה 3', prompt: 'באיזה תנאים זה נהיה הכי חזק? (מתי/איפה/עם מי)' })
+]);
+
+const WR2W_FEELINGS = Object.freeze([
+    'לחץ',
+    'בושה',
+    'פחד',
+    'כעס',
+    'עצב',
+    'בלבול'
+]);
+
+const WR2W_CRITERIA_LABELS = Object.freeze({
+    signal: 'זיהוי תחושה',
+    quantifier: 'בחירת כמת-צל',
+    hypothesis: 'היפותזה עם בעלות+בדיקה',
+    confirm: 'אישור לפני אתגור',
+    exception: 'פריצה + משפט למידה'
+});
+
+const WR2W_SEED_DIALOGS = Object.freeze([
+    Object.freeze({
+        id: 'sqhcel_1_work_manager',
+        monologue: 'מחר יש לי שיחה עם המנהל. הוא ביקש "להבהיר דברים". אני כבר מדמיין את הטון שלו ואני ננעל.',
+        visibleSentence: 'אני כישלון מולו.',
+        quantifiers: Object.freeze(['תמיד', 'בכל שיחה', 'מול כל סמכות', 'בלי יוצא דופן']),
+        exceptionExample: 'בשיחה האחרונה כן הצלחתי להסביר נקודה אחת בצורה עניינית.',
+        conditionsLine: 'זה נהיה הכי חזק כשיש ביקורת פתאומית ומעט זמן לחשוב.'
+    }),
+    Object.freeze({
+        id: 'sqhcel_2_work_meeting',
+        monologue: 'בישיבה כולם שתקו ואז הוא אמר "צריך יותר רצינות". הוא לא הסתכל עליי, אבל זה התיישב לי ישר בבטן.',
+        visibleSentence: 'אין לי איך לצאת מזה טוב.',
+        quantifiers: Object.freeze(['אין מצב', 'בשום דרך', 'תמיד', 'מול כולם']),
+        exceptionExample: 'כשהכנתי מראש שלוש נקודות - כן יצאתי מזה סביר.',
+        conditionsLine: 'זה הכי חזק כשהמסר עקיף ואני משלים את החסר לבד.'
+    }),
+    Object.freeze({
+        id: 'sqhcel_3_relationship_texts',
+        monologue: 'שלחתי לה הודעה בבוקר. היא ראתה ולא ענתה כל היום. הראש שלי לא הפסיק לרוץ.',
+        visibleSentence: 'אני לא מספיק בשבילה.',
+        quantifiers: Object.freeze(['תמיד', 'בשום מצב', 'מול כל בן/בת זוג', 'לגמרי']),
+        exceptionExample: 'בשבוע שעבר היא כן אמרה שהיא מעריכה אותי מאוד.',
+        conditionsLine: 'זה הכי חזק כשיש שתיקה ארוכה ואני כבר עייף.'
+    }),
+    Object.freeze({
+        id: 'sqhcel_4_relationship_home',
+        monologue: 'הוא נכנס הביתה, אמר שהוא עייף, ונעלם לטלפון. אני נשארתי לבד עם הסיפור בראש.',
+        visibleSentence: 'זה לא הולך לשום מקום.',
+        quantifiers: Object.freeze(['בשום מקום', 'תמיד', 'לנצח', 'בלי סיכוי']),
+        exceptionExample: 'אתמול כן דיברנו רבע שעה והרגשתי חיבור.',
+        conditionsLine: 'זה הכי חזק כשאנחנו חוזרים הביתה מותשים וללא זמן מעבר.'
+    }),
+    Object.freeze({
+        id: 'sqhcel_5_social',
+        monologue: 'מחר אירוע. אני כבר רואה מבטים ושומע את עצמי נתקע במשפט הראשון.',
+        visibleSentence: 'אני אעשה שם פדיחה.',
+        quantifiers: Object.freeze(['בטוח', 'תמיד', 'מול כולם', 'בלי יוצא דופן']),
+        exceptionExample: 'בשתי פגישות קטנות דווקא הצלחתי לפתוח שיחה סבירה.',
+        conditionsLine: 'זה הכי חזק כשאני מגיע בלי הכנה ועם הרבה רעש מסביב.'
+    }),
+    Object.freeze({
+        id: 'sqhcel_6_self_image',
+        monologue: 'התחלתי משהו בהתלהבות ואז ויתרתי באמצע, שוב. אני מרגיש שזה חוזר על עצמו.',
+        visibleSentence: 'אני פשוט לא מסוגל להתמיד.',
+        quantifiers: Object.freeze(['לעולם לא', 'תמיד', 'בשום פרויקט', 'בלי סיכוי']),
+        exceptionExample: 'הצלחתי להתמיד שלושה שבועות בתרגול קצר בבוקר.',
+        conditionsLine: 'זה הכי חזק כשהיעד גדול מדי ואין צעד ראשון קטן.'
+    }),
+    Object.freeze({
+        id: 'sqhcel_7_parenting',
+        monologue: 'הילד שוב חזר עם הערה. אמרתי לעצמי שאשמור על רוגע, אבל התפרצתי.',
+        visibleSentence: 'אני הורה גרוע.',
+        quantifiers: Object.freeze(['תמיד', 'בכל מצב', 'בלי יוצא דופן', 'מול כל קושי']),
+        exceptionExample: 'אתמול דווקא עצרתי בזמן ושיניתי טון.',
+        conditionsLine: 'זה הכי חזק כשאני מוצף ועובר ישר למצב תגובה.'
+    }),
+    Object.freeze({
+        id: 'sqhcel_8_change',
+        monologue: 'ניסיתי להתחזק, היו יומיים טובים, ואז נפלתי. זה מיד הפך לסיפור כולל.',
+        visibleSentence: 'אין לי באמת יכולת להשתנות.',
+        quantifiers: Object.freeze(['אין יכולת', 'בשום שלב', 'לעולם לא', 'תמיד חוזר']),
+        exceptionExample: 'כשעבדתי עם מסגרת קצרה כן נוצר שינוי קטן.',
+        conditionsLine: 'זה הכי חזק כשיש מעידה ואני מתרגם אותה לזהות קבועה.'
+    }),
+    Object.freeze({
+        id: 'sqhcel_9_health',
+        monologue: 'עשיתי שבוע מסודר ואז לילה אחד התפרקתי. הראש אמר שהכול נמחק.',
+        visibleSentence: 'זה חסר סיכוי.',
+        quantifiers: Object.freeze(['חסר סיכוי', 'בשום מצב', 'תמיד', 'לגמרי']),
+        exceptionExample: 'אחרי הלילה הזה חזרתי למסלול כבר למחרת בצהריים.',
+        conditionsLine: 'זה הכי חזק כשאני עייף ומסתכל על אירוע אחד כאילו הוא מגדיר הכול.'
+    }),
+    Object.freeze({
+        id: 'sqhcel_10_money',
+        monologue: 'אני מסדר משהו ואז מגיע עוד סידור. מרגיש שאני כל הזמן רק מכבה שריפות.',
+        visibleSentence: 'אין פה סוף.',
+        quantifiers: Object.freeze(['לעולם לא', 'תמיד', 'בכל חודש', 'בלי הפסקה']),
+        exceptionExample: 'בחודש שעבר היה שבוע רגוע יותר עם פחות כיבוי שריפות.',
+        conditionsLine: 'זה הכי חזק סביב מועדי תשלום ולחץ זמן מקביל.'
+    })
+]);
+
+function wr2wHash(value) {
+    const text = String(value || '');
+    let hash = 0;
+    for (let i = 0; i < text.length; i += 1) {
+        hash = ((hash * 31) + text.charCodeAt(i)) % 2147483647;
+    }
+    return Math.abs(hash);
+}
+
+function wr2wNormalizeScene(raw, idxPrefix = 'wr2w') {
+    if (!raw || typeof raw !== 'object') return null;
+    const visibleSentence = wr2TrimText(raw.visibleSentence || raw.statement, 170);
+    if (!visibleSentence) return null;
+    const monologue = wr2TrimText(raw.monologue || visibleSentence, 420);
+    const quantifiers = (Array.isArray(raw.quantifiers) ? raw.quantifiers : [])
+        .map(item => wr2TrimText(item, 38))
+        .filter(Boolean)
+        .slice(0, 4);
+    const inferredQuantifiers = quantifiers.length ? quantifiers : wr2InferQuantifiers(visibleSentence);
+    return {
+        id: String(raw.id || `${idxPrefix}_${Date.now()}_${Math.random().toString(16).slice(2, 6)}`),
+        source: raw.source === 'self' ? 'self' : 'seed',
+        monologue,
+        visibleSentence,
+        anchor: wr2TrimText(raw.anchor || wr2DetectAnchor(visibleSentence), 36),
+        quantifiers: [...new Set(inferredQuantifiers)].slice(0, 4),
+        exceptionExample: wr2TrimText(raw.exceptionExample || 'היה רגע קצר שזה היה קצת פחות נכון.', 180),
+        conditionsLine: wr2TrimText(raw.conditionsLine || 'זה נהיה הכי חזק בתנאים של לחץ/עייפות/חוסר ודאות.', 180),
+        transformedSentence: wr2TrimText(raw.transformedSentence || wr2SoftenSentence(visibleSentence), 190),
+        createdAt: Number(raw.createdAt) || Date.now()
+    };
+}
+
+function wr2wBuildHypothesisSkeleton(scene, quantifier) {
+    const q = quantifier || '___';
+    return `כשאת/ה אומר/ת "${scene.visibleSentence}", עולה לי כאילו יש כאן "${q}" לגבי ___. זה קרוב למה שאתה מתכוון, או שאני משלים?`;
+}
+
+const WR2W_OWNERSHIP_REGEX = /(עולה לי|כשאני שומע|אני קולט כאילו|נדמה לי|מרגיש לי)/;
+const WR2W_CHECK_REGEX = /(זה קרוב|או שאני משלים|זה מדויק|זה מתאים|אני מפספס)/;
+const WR2W_ABSOLUTE_REGEX = /(תמיד|אף פעם|בשום|כולם|אין מצב|לגמרי|לעולם)/;
+
+const wr2wPatientAgent = Object.freeze({
+    confirmHypothesis(scene, hypothesisText, selectedQuantifier) {
+        const normalized = normalizeText(hypothesisText);
+        const hasQuantifier = selectedQuantifier
+            ? normalized.includes(normalizeText(selectedQuantifier))
+            : false;
+        if (!hasQuantifier) {
+            return Object.freeze({
+                status: 'no',
+                text: 'לא ממש. אני לא שומע כאן את ההשלמה שאני מרגיש בפנים.'
+            });
+        }
+
+        const profile = wr2wHash(scene.id) % 3;
+        if (profile === 0) {
+            return Object.freeze({
+                status: 'yes',
+                text: 'כן, זה קרוב למה שקורה לי. זה בדיוק הקול הפנימי.'
+            });
+        }
+        if (profile === 1) {
+            return Object.freeze({
+                status: 'partial',
+                text: 'בערך. זה נכון בעיקר במצבים מסוימים, לא תמיד.'
+            });
+        }
+        return Object.freeze({
+            status: 'no',
+            text: 'לא לגמרי. זה נשמע יותר עומס רגעי מאשר כלל קבוע.'
+        });
+    },
+    probeException(scene, level) {
+        const profile = wr2wHash(`${scene.id}:${level}`) % 4;
+        if (level === 0 && profile <= 2) {
+            return Object.freeze({ found: false, text: 'כרגע לא עולה לי חריג ברור.' });
+        }
+        if (level === 1 && profile <= 1) {
+            return Object.freeze({ found: false, text: 'גם 5% פחות נכון קשה לי לזהות.' });
+        }
+        if (level === 2 && profile === 0) {
+            return Object.freeze({ found: false, text: 'אפילו 1% פחות נכון לא עולה לי כרגע.' });
+        }
+        if (level <= 2) {
+            return Object.freeze({ found: true, text: scene.exceptionExample });
+        }
+        return Object.freeze({ found: true, text: scene.conditionsLine });
+    }
+});
+
+const wr2wEvaluatorAgent = Object.freeze({
+    evaluateHypothesis(text, selectedQuantifier) {
+        const normalized = normalizeText(text);
+        const hasOwnership = WR2W_OWNERSHIP_REGEX.test(normalized);
+        const hasQuantifier = selectedQuantifier
+            ? normalized.includes(normalizeText(selectedQuantifier))
+            : false;
+        const hasCheck = WR2W_CHECK_REGEX.test(normalized);
+        return Object.freeze({
+            ok: hasOwnership && hasQuantifier && hasCheck,
+            hasOwnership,
+            hasQuantifier,
+            hasCheck
+        });
+    },
+    evaluateLearning(text) {
+        const normalized = normalizeText(text);
+        const hasCondition = /(בעיקר כש|לפעמים|בתנאים|כאשר|כש)/.test(normalized);
+        const avoidsAbsolutes = !WR2W_ABSOLUTE_REGEX.test(normalized);
+        return Object.freeze({
+            ok: hasCondition && avoidsAbsolutes,
+            hasCondition,
+            avoidsAbsolutes
+        });
+    }
+});
+
+function wr2wProcessCount(criteria) {
+    return Object.values(criteria || {}).filter(Boolean).length;
+}
+
+function setupWrinkleGame() {
+    const root = document.getElementById('wrinkle-game');
+    if (!root || root.dataset.wr2WizardBound === 'true') return;
+    root.dataset.wr2WizardBound = 'true';
+    root.className = 'card wrinkle-reveal-card wr2w-card';
+
+    root.innerHTML = `
+        <div class="wr2w-shell">
+            <div class="wr2w-topbar">
+                <h3>SQHCEL Wizard</h3>
+                <div class="wr2w-score">
+                    <span>תהליך: <strong id="wr2w-process-score">0/5</strong></span>
+                    <span>🔥 רצף: <strong id="wr2w-streak">0</strong></span>
+                    <span>⭐ נקודות: <strong id="wr2w-points">0</strong></span>
+                </div>
+            </div>
+
+            <section class="wr2w-principle">
+                <h4>איתות אי-הלימה</h4>
+                <p>כשאני מרגיש חזק יותר ממה שנאמר במשפט - זה איתות לכמת-צל או כלל סמוי. קודם מכיילים, ורק אחר כך מאתגרים.</p>
+                <p class="wr2w-flow">S → Q → H → C → E/L</p>
+            </section>
+
+            <section class="wr2w-scene-box">
+                <p class="wr2w-kicker">מונולוג</p>
+                <p id="wr2w-monologue" class="wr2w-monologue"></p>
+                <p class="wr2w-kicker">משפט גלוי</p>
+                <p id="wr2w-visible-sentence" class="wr2w-visible-sentence"></p>
+            </section>
+
+            <div id="wr2w-step-chips" class="wr2w-step-chips"></div>
+
+            <section class="wr2w-step-panel">
+                <h4 id="wr2w-step-title"></h4>
+                <p id="wr2w-step-instruction" class="wr2w-step-instruction"></p>
+                <div id="wr2w-step-body" class="wr2w-step-body"></div>
+                <p id="wr2w-feedback" class="wr2w-feedback" data-tone="info"></p>
+            </section>
+
+            <div class="wr2w-actions">
+                <button id="wr2w-next-scene" class="btn btn-secondary" type="button">משפט הבא</button>
+                <button id="wr2w-reset-round" class="btn btn-secondary" type="button">איפוס סבב</button>
+                <button id="wr2w-self-toggle" class="btn btn-secondary" type="button">+ משפט אישי</button>
+            </div>
+
+            <section id="wr2w-self-panel" class="wr2w-self-panel hidden">
+                <label for="wr2w-self-input">Self-Reference (אופציונלי)</label>
+                <textarea id="wr2w-self-input" rows="2" placeholder="לדוגמה: אני לא יכול להסביר לה מה אני רוצה."></textarea>
+                <button id="wr2w-self-add" class="btn btn-secondary" type="button">הוסף לתרגול</button>
+                <ul id="wr2w-self-list" class="wr2w-self-list"></ul>
+            </section>
+        </div>
+    `;
+
+    const els = {
+        processScore: document.getElementById('wr2w-process-score'),
+        streak: document.getElementById('wr2w-streak'),
+        points: document.getElementById('wr2w-points'),
+        monologue: document.getElementById('wr2w-monologue'),
+        visibleSentence: document.getElementById('wr2w-visible-sentence'),
+        stepChips: document.getElementById('wr2w-step-chips'),
+        stepTitle: document.getElementById('wr2w-step-title'),
+        stepInstruction: document.getElementById('wr2w-step-instruction'),
+        stepBody: document.getElementById('wr2w-step-body'),
+        feedback: document.getElementById('wr2w-feedback'),
+        nextScene: document.getElementById('wr2w-next-scene'),
+        resetRound: document.getElementById('wr2w-reset-round'),
+        selfToggle: document.getElementById('wr2w-self-toggle'),
+        selfPanel: document.getElementById('wr2w-self-panel'),
+        selfInput: document.getElementById('wr2w-self-input'),
+        selfAdd: document.getElementById('wr2w-self-add'),
+        selfList: document.getElementById('wr2w-self-list')
+    };
+    if (!els.stepBody || !els.visibleSentence) return;
+
+    const createRoundState = () => ({
+        step: 'S',
+        feeling: '',
+        selectedQuantifier: '',
+        hypothesisDraft: '',
+        hypothesisFinal: '',
+        confirmation: null,
+        breakoutLevel: 0,
+        lastProbe: null,
+        breakoutFound: false,
+        learningDraft: '',
+        learningFinal: '',
+        roundScore: 0,
+        completedCount: 0,
+        criteria: {
+            signal: false,
+            quantifier: false,
+            hypothesis: false,
+            confirm: false,
+            exception: false
+        },
+        feedback: 'בחר/י תחושה חזקה שמופיעה מעבר למילים.',
+        feedbackTone: 'info'
+    });
+
+    let saved = {};
+    try {
+        saved = JSON.parse(localStorage.getItem(WR2_SQHCEL_STORAGE_KEY) || '{}') || {};
+    } catch (error) {
+        saved = {};
+    }
+
+    const state = {
+        seedScenes: WR2W_SEED_DIALOGS.map((scene, i) => wr2wNormalizeScene(scene, `wr2w_seed_${i}`)).filter(Boolean),
+        customScenes: (Array.isArray(saved.customScenes) ? saved.customScenes : [])
+            .map((scene, i) => wr2wNormalizeScene(scene, `wr2w_saved_${i}`))
+            .filter(Boolean)
+            .slice(0, 16),
+        index: Math.max(0, Math.floor(Number(saved.index) || 0)),
+        streak: Math.max(0, Math.floor(Number(saved.streak) || 0)),
+        points: Math.max(0, Math.floor(Number(saved.points) || 0)),
+        round: createRoundState()
+    };
+
+    const allScenes = () => [...state.seedScenes, ...state.customScenes];
+
+    const currentScene = () => {
+        const scenes = allScenes();
+        if (!scenes.length) return null;
+        if (state.index >= scenes.length) state.index = 0;
+        return scenes[state.index];
+    };
+
+    const persist = () => {
+        localStorage.setItem(WR2_SQHCEL_STORAGE_KEY, JSON.stringify({
+            index: state.index,
+            streak: state.streak,
+            points: state.points,
+            customScenes: state.customScenes
+        }));
+    };
+
+    const setFeedback = (message, tone = 'info') => {
+        state.round.feedback = message;
+        state.round.feedbackTone = tone;
+    };
+
+    const markCriterion = (criterionKey) => {
+        if (state.round.criteria[criterionKey]) return;
+        state.round.criteria[criterionKey] = true;
+        playUISound('next');
+    };
+
+    const resetRoundState = () => {
+        state.round = createRoundState();
+        const scene = currentScene();
+        if (scene) {
+            state.round.hypothesisDraft = wr2wBuildHypothesisSkeleton(scene, '___');
+        }
+    };
+
+    const finalizeRound = (scene) => {
+        const completed = wr2wProcessCount(state.round.criteria);
+        const earned = (completed * 6) + (completed === 5 ? 8 : 0);
+        state.round.completedCount = completed;
+        state.round.roundScore = earned;
+        state.points += earned;
+
+        if (completed === 5) {
+            state.streak += 1;
+            playUISound('correct');
+            if (state.streak > 0 && state.streak % 3 === 0) {
+                addStars(1);
+                playUISound('stars_soft');
+            }
+        } else {
+            state.streak = 0;
+            playUISound('hint');
+        }
+
+        addXP(Math.max(4, completed * 2));
+        state.round.step = 'DONE';
+        setFeedback(`סיכום סבב: ${completed}/5 קריטריונים, +${earned} נקודות.`, 'success');
+        persist();
+
+        if (!state.round.learningFinal && scene?.transformedSentence) {
+            state.round.learningFinal = scene.transformedSentence;
+        }
+    };
+
+    const renderSelfList = () => {
+        if (!els.selfList) return;
+        els.selfList.innerHTML = '';
+        const rows = [...state.customScenes]
+            .sort((a, b) => (Number(b.createdAt) || 0) - (Number(a.createdAt) || 0))
+            .slice(0, 5);
+        if (!rows.length) return;
+        rows.forEach((scene) => {
+            const li = document.createElement('li');
+            li.textContent = `“${scene.visibleSentence}”`;
+            els.selfList.appendChild(li);
+        });
+    };
+
+    const renderStepChips = () => {
+        const criteria = state.round.criteria;
+        const activeId = state.round.step === 'DONE' ? 'E' : state.round.step;
+        els.stepChips.innerHTML = WR2W_FLOW_STEPS.map((step) => {
+            const done = Boolean(criteria[step.criterion]);
+            const active = step.id === activeId;
+            return `<span class="wr2w-chip${done ? ' is-done' : ''}${active ? ' is-active' : ''}">${escapeHtml(step.label)}</span>`;
+        }).join('');
+    };
+
+    const renderStepContent = (scene) => {
+        if (!scene) return '';
+        const step = state.round.step;
+        if (step === 'S') {
+            return `
+                <div class="wr2w-option-grid">
+                    ${WR2W_FEELINGS.map((feeling) => `
+                        <button type="button" class="wr2w-option-btn${state.round.feeling === feeling ? ' is-selected' : ''}" data-action="select-feeling" data-feeling="${escapeHtml(feeling)}">${escapeHtml(feeling)}</button>
+                    `).join('')}
+                </div>
+                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-q" ${state.round.feeling ? '' : 'disabled'}>המשך לשלב Q</button>
+            `;
+        }
+        if (step === 'Q') {
+            return `
+                <div class="wr2w-option-grid">
+                    ${scene.quantifiers.map((q) => `
+                        <button type="button" class="wr2w-option-btn${state.round.selectedQuantifier === q ? ' is-selected' : ''}" data-action="select-quantifier" data-quantifier="${escapeHtml(q)}">${escapeHtml(q)}</button>
+                    `).join('')}
+                </div>
+                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-h" ${state.round.selectedQuantifier ? '' : 'disabled'}>המשך לשלב H</button>
+            `;
+        }
+        if (step === 'H') {
+            return `
+                <p class="wr2w-template-note">טמפלט קשיח: בעלות ("עולה לי...") + כמת + בדיקה ("זה קרוב... או שאני משלים?").</p>
+                <textarea id="wr2w-hypothesis-input" class="wr2w-textarea" rows="4">${escapeHtml(state.round.hypothesisDraft)}</textarea>
+                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="submit-hypothesis">בדיקת Evaluator</button>
+            `;
+        }
+        if (step === 'C') {
+            const confirmation = state.round.confirmation;
+            return `
+                <div class="wr2w-quote-box">
+                    <strong>היפותזה שנשלחת:</strong>
+                    <p>${escapeHtml(state.round.hypothesisFinal || state.round.hypothesisDraft)}</p>
+                </div>
+                ${confirmation ? `
+                    <div class="wr2w-patient-box" data-status="${escapeHtml(confirmation.status)}">
+                        <strong>מטופל:</strong>
+                        <p>${escapeHtml(confirmation.text)}</p>
+                    </div>
+                    <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-e">המשך לשלב E/L</button>
+                ` : `
+                    <button type="button" class="btn btn-primary wr2w-main-btn" data-action="send-hypothesis">שלח היפותזה למטופל</button>
+                `}
+            `;
+        }
+        if (step === 'E') {
+            return `
+                <div class="wr2w-ladder">
+                    ${WR2W_BREAKOUT_STEPS.map((item) => `
+                        <button type="button" class="wr2w-ladder-btn${state.round.breakoutLevel === item.id ? ' is-selected' : ''}" data-action="set-breakout-level" data-level="${item.id}">
+                            ${escapeHtml(item.label)}
+                        </button>
+                    `).join('')}
+                </div>
+                <p class="wr2w-ladder-prompt">${escapeHtml(WR2W_BREAKOUT_STEPS[state.round.breakoutLevel].prompt)}</p>
+                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="send-breakout">שאל/י את המטופל</button>
+
+                ${state.round.lastProbe ? `
+                    <div class="wr2w-patient-box" data-status="${state.round.lastProbe.found ? 'yes' : 'no'}">
+                        <strong>מטופל:</strong>
+                        <p>${escapeHtml(state.round.lastProbe.text)}</p>
+                    </div>
+                ` : ''}
+
+                ${state.round.breakoutFound ? `
+                    <p class="wr2w-template-note">נסחו משפט למידה: "זה לא תמיד, זה בעיקר כש___".</p>
+                    <textarea id="wr2w-learning-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningDraft)}</textarea>
+                    <button type="button" class="btn btn-primary wr2w-main-btn" data-action="finish-round">סיים סבב</button>
+                ` : ''}
+            `;
+        }
+
+        const items = Object.entries(state.round.criteria).map(([key, done]) => `
+            <li class="${done ? 'is-done' : ''}">
+                ${done ? '✅' : '▫️'} ${escapeHtml(WR2W_CRITERIA_LABELS[key] || key)}
+            </li>
+        `).join('');
+        return `
+            <div class="wr2w-done-box">
+                <p><strong>ניקוד סבב:</strong> +${state.round.roundScore} | <strong>תהליך:</strong> ${state.round.completedCount}/5</p>
+                <p><strong>משפט למידה:</strong> ${escapeHtml(state.round.learningFinal || scene.transformedSentence)}</p>
+                <ul class="wr2w-criteria-list">${items}</ul>
+                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="next-scene-inline">מעבר למשפט הבא</button>
+            </div>
+        `;
+    };
+
+    const render = () => {
+        const scene = currentScene();
+        if (!scene) {
+            root.innerHTML = '<p>אין כרגע משפטים זמינים לתרגול.</p>';
+            return;
+        }
+
+        const processCount = wr2wProcessCount(state.round.criteria);
+        if (els.processScore) els.processScore.textContent = `${processCount}/5`;
+        if (els.streak) els.streak.textContent = String(state.streak);
+        if (els.points) els.points.textContent = String(state.points);
+        if (els.monologue) els.monologue.textContent = scene.monologue;
+        if (els.visibleSentence) els.visibleSentence.textContent = scene.visibleSentence;
+
+        const stepMeta = {
+            S: {
+                title: 'S | תחושה לפני ערעור',
+                instruction: 'כשיש רגש חזק מהמשפט, זה איתות למבנה סמוי. בחר/י את התחושה הדומיננטית.'
+            },
+            Q: {
+                title: 'Q | בחירת כמת-צל',
+                instruction: 'בחר/י את הכמת הסביר שמחבר בין המשפט לחוויה. לא ניחוש "נכון", אלא התאמה סבירה.'
+            },
+            H: {
+                title: 'H | Hypothesis Mirror',
+                instruction: 'נסח/י השערה עם בעלות + כמת + בדיקה. בלי בעלות או בלי בדיקה - אין התקדמות.'
+            },
+            C: {
+                title: 'C | Calibration Before Challenge',
+                instruction: 'לא מערערים עדיין. קודם שולחים את ההיפותזה ומבקשים אישור/תיקון מהמטופל.'
+            },
+            E: {
+                title: 'E/L | חריג + למידה',
+                instruction: 'אם אין חריג, עולים בסולם: 5% → 1% → תנאים. מסיימים במשפט למידה מותנה.'
+            },
+            DONE: {
+                title: 'סיכום סבב',
+                instruction: 'הציון נקבע לפי איכות התהליך, לא לפי ניחוש חד-פעמי.'
+            }
+        };
+
+        const currentStepKey = stepMeta[state.round.step] ? state.round.step : 'DONE';
+        if (els.stepTitle) els.stepTitle.textContent = stepMeta[currentStepKey].title;
+        if (els.stepInstruction) els.stepInstruction.textContent = stepMeta[currentStepKey].instruction;
+        if (els.stepBody) els.stepBody.innerHTML = renderStepContent(scene);
+        if (els.feedback) {
+            els.feedback.textContent = state.round.feedback || '';
+            els.feedback.setAttribute('data-tone', state.round.feedbackTone || 'info');
+        }
+
+        renderStepChips();
+        renderSelfList();
+        persist();
+    };
+
+    const nextScene = () => {
+        const scenes = allScenes();
+        if (!scenes.length) return;
+        state.index = (state.index + 1) % scenes.length;
+        resetRoundState();
+        setFeedback('סבב חדש. מתחילים שוב בזיהוי תחושה (S).', 'info');
+        render();
+    };
+
+    const addSelfSentence = () => {
+        const raw = String(els.selfInput?.value || '').trim();
+        if (raw.length < 8) {
+            setFeedback('כתוב/י משפט אישי קצר (לפחות 8 תווים).', 'warn');
+            render();
+            return;
+        }
+        const normalized = normalizeText(raw).replace(/\s+/g, ' ').trim();
+        const exists = state.customScenes.some((scene) => normalizeText(scene.visibleSentence).replace(/\s+/g, ' ').trim() === normalized);
+        if (exists) {
+            setFeedback('המשפט הזה כבר קיים בתרגול.', 'warn');
+            render();
+            return;
+        }
+
+        const scene = wr2wNormalizeScene({
+            id: `wr2w_self_${Date.now()}`,
+            source: 'self',
+            monologue: raw,
+            visibleSentence: raw,
+            quantifiers: wr2InferQuantifiers(raw),
+            exceptionExample: 'כן, היה רגע קטן שזה היה פחות נכון.',
+            conditionsLine: 'זה הכי חזק כשיש לחץ/עייפות/אי-ודאות.',
+            transformedSentence: wr2SoftenSentence(raw),
+            createdAt: Date.now()
+        }, 'wr2w_self');
+        if (!scene) return;
+
+        state.customScenes.unshift(scene);
+        if (state.customScenes.length > 16) state.customScenes = state.customScenes.slice(0, 16);
+        state.index = allScenes().findIndex((item) => item.id === scene.id);
+        if (state.index < 0) state.index = 0;
+        if (els.selfInput) els.selfInput.value = '';
+        resetRoundState();
+        setFeedback('המשפט האישי נוסף. מתחילים ב-S עם איתות אי-הלימה.', 'success');
+        playUISound('start');
+        render();
+    };
+
+    const handleAction = (event) => {
+        const button = event.target.closest('[data-action]');
+        if (!button) return;
+        const action = button.getAttribute('data-action');
+        const scene = currentScene();
+        if (!scene) return;
+
+        if (action === 'select-feeling') {
+            state.round.feeling = button.getAttribute('data-feeling') || '';
+            markCriterion('signal');
+            setFeedback(`נרשמה תחושה: ${state.round.feeling}.`, 'success');
+            render();
+            return;
+        }
+        if (action === 'goto-q') {
+            if (!state.round.feeling) {
+                setFeedback('בחר/י תחושה לפני המעבר ל-Q.', 'warn');
+                render();
+                return;
+            }
+            state.round.step = 'Q';
+            setFeedback('מעולה. עכשיו בוחרים כמת-צל סביר.', 'info');
+            render();
+            return;
+        }
+        if (action === 'select-quantifier') {
+            state.round.selectedQuantifier = button.getAttribute('data-quantifier') || '';
+            markCriterion('quantifier');
+            setFeedback(`נבחר כמת-צל: ${state.round.selectedQuantifier}.`, 'success');
+            render();
+            return;
+        }
+        if (action === 'goto-h') {
+            if (!state.round.selectedQuantifier) {
+                setFeedback('בחר/י כמת-צל לפני המעבר ל-H.', 'warn');
+                render();
+                return;
+            }
+            state.round.step = 'H';
+            if (!state.round.hypothesisDraft || state.round.hypothesisDraft.includes('___')) {
+                state.round.hypothesisDraft = wr2wBuildHypothesisSkeleton(scene, state.round.selectedQuantifier);
+            }
+            setFeedback('נסח/י לפי הטמפלט וגש/י לבדיקת Evaluator.', 'info');
+            render();
+            return;
+        }
+        if (action === 'submit-hypothesis') {
+            const draft = String(state.round.hypothesisDraft || '').trim();
+            if (draft.length < 20) {
+                setFeedback('נדרש ניסוח מלא יותר של היפותזה.', 'warn');
+                render();
+                return;
+            }
+            const evalResult = wr2wEvaluatorAgent.evaluateHypothesis(draft, state.round.selectedQuantifier);
+            if (!evalResult.ok) {
+                const missing = [];
+                if (!evalResult.hasOwnership) missing.push('בעלות (למשל: "עולה לי...")');
+                if (!evalResult.hasQuantifier) missing.push('הכמת שנבחר');
+                if (!evalResult.hasCheck) missing.push('בדיקה (למשל: "זה קרוב... או שאני משלים?")');
+                setFeedback(`צריך להשלים: ${missing.join(' | ')}.`, 'warn');
+                render();
+                return;
+            }
+            state.round.hypothesisFinal = draft;
+            markCriterion('hypothesis');
+            state.round.step = 'C';
+            setFeedback('מעולה. עכשיו שולחים למטופל לקבל אישור/תיקון.', 'success');
+            render();
+            return;
+        }
+        if (action === 'send-hypothesis') {
+            if (!state.round.hypothesisFinal) {
+                setFeedback('קודם בצע/י בדיקת Evaluator בשלב H.', 'warn');
+                render();
+                return;
+            }
+            state.round.confirmation = wr2wPatientAgent.confirmHypothesis(
+                scene,
+                state.round.hypothesisFinal,
+                state.round.selectedQuantifier
+            );
+            markCriterion('confirm');
+            const tone = state.round.confirmation.status === 'yes'
+                ? 'success'
+                : state.round.confirmation.status === 'partial'
+                    ? 'info'
+                    : 'warn';
+            setFeedback('התקבל אישור/תיקון. אפשר להתקדם ל-E/L.', tone);
+            render();
+            return;
+        }
+        if (action === 'goto-e') {
+            if (!state.round.confirmation) {
+                setFeedback('שלח/י קודם היפותזה למטופל.', 'warn');
+                render();
+                return;
+            }
+            state.round.step = 'E';
+            setFeedback('אם אין חריג - עוברים מדרגה בסולם הפריצה.', 'info');
+            render();
+            return;
+        }
+        if (action === 'set-breakout-level') {
+            state.round.breakoutLevel = Math.max(0, Math.min(3, Number(button.getAttribute('data-level') || 0)));
+            setFeedback(`נבחרה ${WR2W_BREAKOUT_STEPS[state.round.breakoutLevel].label}.`, 'info');
+            render();
+            return;
+        }
+        if (action === 'send-breakout') {
+            state.round.lastProbe = wr2wPatientAgent.probeException(scene, state.round.breakoutLevel);
+            if (state.round.lastProbe.found) {
+                state.round.breakoutFound = true;
+                setFeedback('נמצא חריג/תנאי. עכשיו מנסחים משפט למידה.', 'success');
+            } else if (state.round.breakoutLevel < 3) {
+                setFeedback('עוד לא נמצא חריג. עבור/י למדרגה הבאה בסולם.', 'warn');
+            } else {
+                setFeedback('גם בלי חריג חד - נסח/י תנאים שבהם זה הכי חזק.', 'warn');
+                state.round.breakoutFound = true;
+            }
+            render();
+            return;
+        }
+        if (action === 'finish-round') {
+            const learning = String(state.round.learningDraft || '').trim();
+            if (learning.length < 12) {
+                setFeedback('נדרש משפט למידה מלא יותר.', 'warn');
+                render();
+                return;
+            }
+            const learningEval = wr2wEvaluatorAgent.evaluateLearning(learning);
+            if (!learningEval.ok) {
+                const reasons = [];
+                if (!learningEval.hasCondition) reasons.push('הוסף/י תנאי (בעיקר כש/לפעמים כש/בתנאים).');
+                if (!learningEval.avoidsAbsolutes) reasons.push('הסר/י ניסוח טוטאלי (תמיד/אף פעם/כולם...).');
+                setFeedback(reasons.join(' '), 'warn');
+                render();
+                return;
+            }
+            state.round.learningFinal = learning;
+            markCriterion('exception');
+            finalizeRound(scene);
+            render();
+            return;
+        }
+        if (action === 'next-scene-inline') {
+            nextScene();
+        }
+    };
+
+    els.stepBody.addEventListener('click', handleAction);
+    els.stepBody.addEventListener('input', (event) => {
+        const target = event.target;
+        if (target.id === 'wr2w-hypothesis-input') {
+            state.round.hypothesisDraft = String(target.value || '');
+        } else if (target.id === 'wr2w-learning-input') {
+            state.round.learningDraft = String(target.value || '');
+        }
+    });
+
+    els.nextScene?.addEventListener('click', () => {
+        nextScene();
+    });
+
+    els.resetRound?.addEventListener('click', () => {
+        resetRoundState();
+        setFeedback('הסבב אופס. מתחילים שוב ב-S.', 'info');
+        render();
+    });
+
+    els.selfToggle?.addEventListener('click', () => {
+        els.selfPanel?.classList.toggle('hidden');
+    });
+
+    els.selfAdd?.addEventListener('click', () => {
+        addSelfSentence();
+    });
+
+    resetRoundState();
+    render();
+}
