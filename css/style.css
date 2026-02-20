@@ -77,6 +77,23 @@ header p {
     font-size: 0.9rem;
 }
 
+.app-version-floating {
+    position: fixed;
+    left: 12px;
+    bottom: max(12px, calc(var(--safe-bottom) + 8px));
+    z-index: 1600;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    background: rgba(15, 23, 42, 0.86);
+    color: #f8fafc;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    direction: ltr;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.24);
+}
+
 /* Embedded mode (e.g. Google Sites iframe): maximize usable space */
 body.embed-mode {
     background: linear-gradient(155deg, #ecfeff 0%, #eff6ff 55%, #fffbeb 100%);

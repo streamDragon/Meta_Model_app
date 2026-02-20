@@ -656,12 +656,30 @@ async function resolveAppVersion() {
     return getVersionFromAppScriptQuery() || 'unknown';
 }
 
-async function setupAppVersionChip() {
+function applyAppVersion(version) {
     const chip = document.getElementById('app-version-chip');
-    if (!chip) return;
+    if (chip) {
+        chip.textContent = `גרסה: ${version}`;
+        chip.setAttribute('title', `Build ${version}`);
+    }
+
+    const floating = document.getElementById('app-version-floating');
+    if (floating) {
+        floating.textContent = `v${version}`;
+        floating.setAttribute('title', `Build ${version}`);
+    }
+}
+
+async function setupAppVersionChip() {
+    const hasChip = Boolean(document.getElementById('app-version-chip'));
+    const hasFloating = Boolean(document.getElementById('app-version-floating'));
+    if (!hasChip && !hasFloating) return;
+
+    const immediateVersion = getVersionFromAppScriptQuery();
+    if (immediateVersion) applyAppVersion(immediateVersion);
+
     const version = await resolveAppVersion();
-    chip.textContent = `גרסה: ${version}`;
-    chip.setAttribute('title', `Build ${version}`);
+    applyAppVersion(version);
 }
 
 // Load data on page load
