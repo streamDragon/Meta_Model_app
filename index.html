@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meta Model - כלי תרגול שאול מטה מודל</title>
-    <link rel="stylesheet" href="css/style.css?v=20260220e">
+    <link rel="stylesheet" href="css/style.css?v=1.0.1">
 </head>
 <body>
     <!-- SPLASH SCREEN -->
@@ -46,7 +46,7 @@
             <select id="mobile-tab-select" class="mobile-tab-select" aria-label="מעבר בין מסכים"></select>
         </div>
 
-        <section id="global-comic-strip" class="global-comic-strip" aria-label="Comic strip preview">
+        <section id="global-comic-strip" class="global-comic-strip hidden" aria-label="Comic strip preview">
             <div class="global-comic-strip-inner">
                 <article class="global-comic-main">
                     <img id="global-comic-main-img" src="" alt="" loading="lazy">
@@ -82,6 +82,7 @@
         <section id="home" class="tab-content active">
             <div class="card">
                 <h2>ברוכים הבאים! 👋</h2>
+                <p id="app-version-chip" class="app-version-chip">גרסה: נטען...</p>
                 <p>Meta Model היא טכניקה ב-NLP המסייעת לזיהוי ותיקון הפרות שפה שמגבילות אותנו.</p>
                 
                 <div class="intro-grid">
@@ -570,12 +571,68 @@
                         </div>
                     </div>
 
+                    <div id="rapid-pattern-arena" class="card rapid-pattern-card">
+                        <div class="rapid-pattern-header">
+                            <h3>⚡ Meta Radar: מונולוג + תבנית</h3>
+                            <small>המילה/ביטוי המודגש הוא הטריגר. לחצו על אחת מ-15 התבניות לפני שנגמר הזמן.</small>
+                        </div>
+
+                        <div class="rapid-pattern-shell">
+                            <aside class="rapid-pattern-side">
+                                <div class="rapid-panel">
+                                    <label for="rapid-case-type">סוג מטופל</label>
+                                    <select id="rapid-case-type" class="rapid-control-select">
+                                        <option value="random">רנדומלי</option>
+                                    </select>
+                                </div>
+
+                                <div class="rapid-panel">
+                                    <label for="rapid-time-limit">רמת קושי (זמן): <strong id="rapid-time-limit-value">12</strong> שנ׳</label>
+                                    <input id="rapid-time-limit" type="range" min="6" max="25" value="12" />
+                                </div>
+
+                                <div class="rapid-panel">
+                                    <label>רמזור טעויות</label>
+                                    <div id="rapid-traffic-light" class="rapid-traffic-light" data-state="green" aria-label="רמזור מצב">
+                                        <span class="rapid-light rapid-light-red" aria-hidden="true"></span>
+                                        <span class="rapid-light rapid-light-yellow" aria-hidden="true"></span>
+                                        <span class="rapid-light rapid-light-green" aria-hidden="true"></span>
+                                    </div>
+                                    <small id="rapid-errors-label">טעויות בשאלה: 0/2</small>
+                                </div>
+
+                                <div class="rapid-panel rapid-score-panel">
+                                    <p>ניקוד: <strong id="rapid-score">0</strong></p>
+                                    <p>רצף: <strong id="rapid-streak">0</strong></p>
+                                    <p>שאלה: <strong id="rapid-round">0</strong></p>
+                                </div>
+
+                                <button id="rapid-start-btn" class="btn btn-primary">התחל סבב</button>
+                            </aside>
+
+                            <div class="rapid-pattern-main">
+                                <div class="rapid-monologue-box">
+                                    <p id="rapid-monologue-text" class="rapid-monologue-text">לחצו על "התחל סבב" כדי להתחיל זיהוי תבניות בזמן אמת.</p>
+                                </div>
+
+                                <div class="rapid-timer-row">
+                                    <div class="rapid-timer-bar" aria-label="מד התקדמות זמן">
+                                        <span id="rapid-timer-fill"></span>
+                                    </div>
+                                    <p id="rapid-feedback" class="rapid-feedback" data-tone="info">ממתין לתחילת סבב...</p>
+                                </div>
+
+                                <div id="rapid-pattern-buttons" class="rapid-pattern-buttons" role="group" aria-label="כפתורי תבניות"></div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="wrinkle-game" class="card wrinkle-game-card">
                         <div class="wrinkle-game-header">
-                            <h3>🧩 חשף את הקמט!</h3>
+                            <h3>🧩 חשף את הכמת!</h3>
                             <small>קודם חשיפה, אחר כך אתגור. בונים רפלקס מהיר לזיהוי הנחה סמויה.</small>
                             <div class="wrinkle-coverage">
-                                <span>✓ קמטים נסתרים</span>
+                                <span>✓ כמתים סמויים</span>
                                 <span>✓ Self-Reference אישי</span>
                             </div>
                         </div>
@@ -587,7 +644,7 @@
                         </div>
 
                         <div class="wrinkle-round-box">
-                            <p id="wrinkle-step-label" class="wrinkle-step-label">שלב 1/2: חשיפת הקמט</p>
+                            <p id="wrinkle-step-label" class="wrinkle-step-label">שלב 1/2: חשיפת הכמת</p>
                             <p id="wrinkle-statement" class="wrinkle-statement"></p>
                             <div id="wrinkle-options" class="wrinkle-options"></div>
                             <div id="wrinkle-feedback" class="wrinkle-feedback"></div>
@@ -860,6 +917,6 @@
         </section>
     </div>
 
-    <script src="js/app.js?v=20260220e"></script>
+    <script src="js/app.js?v=1.0.1"></script>
 </body>
 </html>

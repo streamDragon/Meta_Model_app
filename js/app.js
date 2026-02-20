@@ -328,6 +328,10 @@ function playUISound(kind) {
         playTone(523.25, 0.11, 'triangle', 0.05, 0);
         playTone(659.25, 0.11, 'triangle', 0.05, 0.08);
         playTone(783.99, 0.15, 'triangle', 0.05, 0.16);
+    } else if (kind === 'buzzer') {
+        playTone(980, 0.06, 'square', 0.06, 0);
+        playTone(740, 0.08, 'square', 0.06, 0.06);
+        playTone(190, 0.22, 'sawtooth', 0.065, 0.14);
     } else if (kind === 'stars_big') {
         playTone(659.25, 0.08, 'triangle', 0.06, 0);
         playTone(880, 0.1, 'triangle', 0.06, 0.07);
@@ -478,8 +482,191 @@ function setupMobileViewportSizing() {
     window.addEventListener('orientationchange', setViewportHeight, { passive: true });
 }
 
+const DEFAULT_SCREEN_READ_GUIDE = Object.freeze({
+    logic: 'התרגול בנוי מלמטה למעלה: מזהים הנחה סמויה, מדייקים שפה, ואז פועלים צעד קטן.',
+    goal: 'להחליף אוטומט של האשמה/בלבול בחשיבה פרקטית שמובילה לביצוע.',
+    approach: 'עובדים לאט: קוראים את ההנחיה, עונים קצר, ובודקים האם התשובה מובילה לפעולה ברורה.'
+});
+
+const SCREEN_READ_GUIDES = Object.freeze({
+    home: Object.freeze({
+        logic: 'המסך מרכז את כל מסלולי התרגול במקום אחד כדי לבחור מה נכון לך עכשיו.',
+        goal: 'להתחיל עבודה ממוקדת בלי לקפוץ בין כלים.',
+        approach: 'בחר/י מסלול אחד, סיים/י אותו, ואז חזור/י לבית למסלול הבא.'
+    }),
+    'scenario-screen-home': Object.freeze({
+        logic: 'מתרגלים מעבר ממשפט עמום לתגובה שמקדמת פעולה.',
+        goal: 'להוריד אשמה ולהעלות בהירות בתוך אינטראקציה אמיתית.',
+        approach: 'התחל/י מסצנות, עבר/י למסך בחירה, ואז קבל/י משוב ובנה/י פירוק.'
+    }),
+    'scenario-screen-domain': Object.freeze({
+        logic: 'סינון תחום ורמה מתאים את הסצנות לעומס הרגשי ולשלב הלמידה שלך.',
+        goal: 'לתרגל בדיוק ברמת קושי נכונה.',
+        approach: 'בחר/י תחום, רמה וכמות סצנות ואז התחל/י ריצה רציפה.'
+    }),
+    'scenario-screen-play': Object.freeze({
+        logic: 'כל סצנה מציגה משפט לא-מפורש ודורשת בחירה בין תגובה אדומה לירוקה.',
+        goal: 'לזהות מהר מה תוקע ומה מקדם.',
+        approach: 'קרא/י את הסיפור, סמן/י תגובה אחת, ושים/י לב להשפעה שלה.'
+    }),
+    'scenario-screen-feedback': Object.freeze({
+        logic: 'המשוב מחבר בין בחירה לבין תוצאה מיידית ולא רק "נכון/לא נכון".',
+        goal: 'לבנות אינטואיציה של סיבה-תוצאה בשיחה.',
+        approach: 'קרא/י את ההסבר עד הסוף ורק אז התקדם/י לפירוק.'
+    }),
+    'scenario-screen-blueprint': Object.freeze({
+        logic: 'אחרי בחירה טובה מפרקים אותה לתוכנית ביצוע קצרה וישימה.',
+        goal: 'לתרגם תובנה לפעולה שתוכל/י לבצע בעולם האמיתי.',
+        approach: 'התמקד/י בצעד ראשון, נקודת תקיעה ו-Plan B ברור.'
+    }),
+    'scenario-screen-score': Object.freeze({
+        logic: 'סיכום הסצנה נועד לקבע דפוס חשיבה לפני מעבר לסצנה הבאה.',
+        goal: 'להפוך שיפור רגעי להרגל.',
+        approach: 'קרא/י את המשפט הירוק הבא והחליט/י אם ממשיכים או מסיימים סשן.'
+    }),
+    'scenario-screen-history': Object.freeze({
+        logic: 'היסטוריה חושפת מגמות ולא רק הצלחה נקודתית.',
+        goal: 'לראות איפה יש שיפור עקבי ואיפה עדיין נתקעים.',
+        approach: 'סקור/י רשומות קצרות, ואז החלט/י על מוקד תרגול הבא.'
+    }),
+    'scenario-screen-settings': Object.freeze({
+        logic: 'הגדרות שומרות ברירת מחדל כדי לחסוך חיכוך בכל כניסה מחדש.',
+        goal: 'להתחיל תרגול מהר עם פחות קליקים.',
+        approach: 'קבע/י תחום, רמה והעדפות סאונד/פריזמה לפי איך שנוח לך.'
+    }),
+    'comic-engine': Object.freeze({
+        logic: 'הזרימה מדמה דיאלוג אמיתי: בחירה, תגובת נגד, ניסוח מחדש ופירוק.',
+        goal: 'ללמוד תגובה מדויקת תחת לחץ שיח.',
+        approach: 'בחר/י תגובה, אשר/י ניסוח קצר, ואז פתח/י Power Card ו-Blueprint.'
+    }),
+    prismlab: Object.freeze({
+        logic: 'המיפוי בודק באיזו רמה לוגית יושבת הבעיה כדי לבחור Pivot נכון.',
+        goal: 'להפסיק לטפל בסימפטום ולפגוע בשורש.',
+        approach: 'מלא/י תשובות לכל רמה, אשר/י מיפוי וקרא/י את ההמלצה המעשית.'
+    }),
+    categories: Object.freeze({
+        logic: 'זהו מסך ידע: מחיקה, עיוות והכללה כמפת ניווט לתרגול.',
+        goal: 'לזהות מהר איזה סוג הפרה מופיע במשפט.',
+        approach: 'עבור/י על הדוגמאות ואז חזור/י למסך תרגול מעשי.'
+    }),
+    practice: Object.freeze({
+        logic: 'מתרגלים זיהוי ושאלה מדויקת בחזרתיות קצרה עד שנוצר רפלקס.',
+        goal: 'לשפר מהירות דיוק ב-Meta Model.',
+        approach: 'עבוד/י בסבבים קצרים: שאלה, בדיקה, תיקון והמשך.'
+    }),
+    blueprint: Object.freeze({
+        logic: 'המסך מפרק משימה עמומה ליעד, צעדים, פער ציפיות ותוכנית ביצוע.',
+        goal: 'לעבור מ"צריך לעשות" ל"מה עושים עכשיו".',
+        approach: 'התקדם/י צעד-צעד, מלא/י רק מה שצריך, וודא/י שיש צעד ראשון ברור.'
+    }),
+    about: Object.freeze({
+        logic: 'המסך מסביר את הרקע המתודולוגי ואת מקור הכלים בפרויקט.',
+        goal: 'לחבר בין התרגול לבין עקרונות ה-NLP שמאחוריו.',
+        approach: 'קרא/י בקצרה וחזור/י למסכי התרגול ליישום בפועל.'
+    })
+});
+
+const SCREEN_READ_GUIDE_TARGET_IDS = Object.freeze([
+    'home',
+    'scenario-screen-home',
+    'scenario-screen-domain',
+    'scenario-screen-play',
+    'scenario-screen-feedback',
+    'scenario-screen-blueprint',
+    'scenario-screen-score',
+    'scenario-screen-history',
+    'scenario-screen-settings',
+    'comic-engine',
+    'prismlab',
+    'categories',
+    'practice',
+    'blueprint',
+    'about'
+]);
+
+function buildScreenReadGuide(screenId) {
+    const copy = SCREEN_READ_GUIDES[screenId] || DEFAULT_SCREEN_READ_GUIDE;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'screen-read-guide';
+    wrapper.dataset.screenGuide = screenId;
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn btn-primary screen-read-guide-btn';
+    button.textContent = 'קרא לפני שתתחיל!';
+    button.setAttribute('aria-expanded', 'false');
+
+    const panel = document.createElement('div');
+    panel.className = 'screen-read-guide-panel hidden';
+    panel.id = `screen-read-guide-panel-${screenId}`;
+
+    const makeLine = (label, text) => {
+        const p = document.createElement('p');
+        const title = document.createElement('strong');
+        title.textContent = `${label}: `;
+        p.appendChild(title);
+        p.appendChild(document.createTextNode(text));
+        return p;
+    };
+
+    panel.appendChild(makeLine('היגיון', copy.logic));
+    panel.appendChild(makeLine('מטרה', copy.goal));
+    panel.appendChild(makeLine('איך לגשת', copy.approach));
+
+    button.addEventListener('click', () => {
+        const shouldOpen = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden', !shouldOpen);
+        button.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+        if (shouldOpen) playUISound('hint');
+    });
+
+    wrapper.appendChild(button);
+    wrapper.appendChild(panel);
+    return wrapper;
+}
+
+function setupReadBeforeStartGuides() {
+    SCREEN_READ_GUIDE_TARGET_IDS.forEach((screenId) => {
+        const screen = document.getElementById(screenId);
+        if (!screen) return;
+        if (screen.querySelector(`.screen-read-guide[data-screen-guide="${screenId}"]`)) return;
+        screen.prepend(buildScreenReadGuide(screenId));
+    });
+}
+
+function getVersionFromAppScriptQuery() {
+    const appScript = document.querySelector('script[src*="js/app.js"]');
+    const src = appScript?.getAttribute('src') || '';
+    const match = src.match(/[?&]v=([^&]+)/i);
+    return match ? decodeURIComponent(match[1]).trim() : '';
+}
+
+async function resolveAppVersion() {
+    try {
+        const response = await fetch('package.json', { cache: 'no-store' });
+        if (response.ok) {
+            const pkg = await response.json();
+            const version = typeof pkg?.version === 'string' ? pkg.version.trim() : '';
+            if (version) return version;
+        }
+    } catch (error) {
+        console.warn('Could not read package.json version:', error);
+    }
+
+    return getVersionFromAppScriptQuery() || 'unknown';
+}
+
+async function setupAppVersionChip() {
+    const chip = document.getElementById('app-version-chip');
+    if (!chip) return;
+    const version = await resolveAppVersion();
+    chip.textContent = `גרסה: ${version}`;
+    chip.setAttribute('title', `Build ${version}`);
+}
+
 // Load data on page load
 document.addEventListener('DOMContentLoaded', () => {
+    setupAppVersionChip();
     setupMobileViewportSizing();
     applyEmbeddedCompactMode();
     loadAudioSettings();
@@ -494,10 +681,12 @@ document.addEventListener('DOMContentLoaded', () => {
     showLoadingIndicator();
     loadMetaModelData();
     setupTabNavigation();
+    setupReadBeforeStartGuides();
     applyInitialTabPreference();
     setupGlobalComicStripActions();
     setupPracticeMode();
     setupQuestionDrill();
+    setupRapidPatternArena();
     setupWrinkleGame();
     setupTrainerMode();
     setupBlueprintBuilder();
@@ -578,17 +767,6 @@ function setupTabNavigation() {
     }
 }
 
-// Helper function to switch tabs from buttons
-function switchTab(tabName) {
-    const btn = document.querySelector(`[data-tab="${tabName}"]`);
-    if (btn) btn.click();
-}
-
-// Alias for switchTab
-function navigateTo(tabName) {
-    switchTab(tabName);
-}
-
 // Populate Categories Section
 function populateCategories() {
     const container = document.getElementById('categories-container');
@@ -643,7 +821,7 @@ function setupPracticeMode() {
 
     nextBtn.addEventListener('click', getNextStatement);
     showAnswerBtn.addEventListener('click', showAnswer);
-    hintBtn.addEventListener('click', showHint);
+    hintBtn.addEventListener('click', showLegacyPracticeHint);
 }
 
 const QUESTION_DRILL_PACK = [
@@ -763,6 +941,628 @@ function updateQuestionDrillStats() {
     if (!questionDrillState.elements.attempts || !questionDrillState.elements.hits) return;
     questionDrillState.elements.attempts.textContent = String(questionDrillState.attempts);
     questionDrillState.elements.hits.textContent = String(questionDrillState.hits);
+}
+
+const RAPID_PATTERN_BUTTONS = Object.freeze([
+    Object.freeze({ id: 'lost_performative', label: 'Lost Performative', hint: 'שלשה 1 | שמאל' }),
+    Object.freeze({ id: 'assumptions', label: 'Assumptions +1', hint: 'שלשה 1 | מרכז' }),
+    Object.freeze({ id: 'mind_reading', label: 'Mind Reading', hint: 'שלשה 1 | ימין' }),
+    Object.freeze({ id: 'universal_quantifier', label: 'Universal Quantifier', hint: 'שלשה 2 | שמאל' }),
+    Object.freeze({ id: 'modal_operator', label: 'Modal Operator', hint: 'שלשה 2 | מרכז' }),
+    Object.freeze({ id: 'cause_effect', label: 'Cause & Effect', hint: 'שלשה 2 | ימין' }),
+    Object.freeze({ id: 'nominalisations', label: 'Nominalisations', hint: 'שלשה 3 | שמאל' }),
+    Object.freeze({ id: 'identity_predicates', label: 'Identity Predicates', hint: 'שלשה 3 | מרכז' }),
+    Object.freeze({ id: 'complex_equivalence', label: 'Complex Equivalence', hint: 'שלשה 3 | ימין' }),
+    Object.freeze({ id: 'comparative_deletion', label: 'Comparative Deletion', hint: 'שלשה 4 | שמאל' }),
+    Object.freeze({ id: 'time_space_predicates', label: 'Time & Space Predicates', hint: 'שלשה 4 | מרכז' }),
+    Object.freeze({ id: 'lack_referential_index', label: 'Lack of Referential Index', hint: 'שלשה 4 | ימין' }),
+    Object.freeze({ id: 'non_referring_nouns', label: 'Non-referring nouns', hint: 'שלשה 5 | שמאל' }),
+    Object.freeze({ id: 'sensory_predicates', label: 'Sensory Predicates', hint: 'שלשה 5 | מרכז' }),
+    Object.freeze({ id: 'unspecified_verbs', label: 'Unspecified Verbs', hint: 'שלשה 5 | ימין' })
+]);
+
+const RAPID_PATTERN_ALIASES = Object.freeze({
+    simple_deletion: 'assumptions',
+    presupposition: 'assumptions',
+    modal_necessity: 'modal_operator',
+    modal_possibility: 'modal_operator',
+    nominalization: 'nominalisations',
+    unspecified_noun: 'non_referring_nouns',
+    unspecified_verb: 'unspecified_verbs'
+});
+
+function normalizeRapidPatternId(patternId) {
+    const raw = String(patternId || '').trim().toLowerCase().replace(/\s+/g, '_');
+    if (!raw) return '';
+    return RAPID_PATTERN_ALIASES[raw] || raw;
+}
+
+const RAPID_PATTERN_CUES = Object.freeze([
+    Object.freeze({
+        id: 'rp_work_1',
+        type: 'עבודה',
+        monologue: 'אני פותח את היום עם עשר משימות, עוד לפני קפה כבר יש לחץ, והמנהל אמר לי שחייב לסיים הכל היום אחרת אין לי מה לבוא מחר.',
+        highlight: 'חייב לסיים הכל היום',
+        patternId: 'modal_necessity',
+        acceptedPatterns: ['modal_necessity', 'modal_operator']
+    }),
+    Object.freeze({
+        id: 'rp_work_2',
+        type: 'עבודה',
+        monologue: 'כששני אנשים מהצוות דיברו בצד ליד הלוח, ישר היה לי ברור שהם חושבים שאני חלש מקצועית וזה שיתק אותי.',
+        highlight: 'הם חושבים שאני חלש מקצועית',
+        patternId: 'mind_reading',
+        acceptedPatterns: ['mind_reading']
+    }),
+    Object.freeze({
+        id: 'rp_work_3',
+        type: 'עבודה',
+        monologue: 'אם הלקוח לא עונה לי תוך שעה, זה אומר שאין לו אמון בי, ואז אני כבר מאבד קצב ולא שולח כלום.',
+        highlight: 'זה אומר שאין לו אמון בי',
+        patternId: 'complex_equivalence',
+        acceptedPatterns: ['complex_equivalence']
+    }),
+    Object.freeze({
+        id: 'rp_work_4',
+        type: 'עבודה',
+        monologue: 'במחלקה שלנו כולם תמיד יודעים מה לעשות, ורק אני איכשהו נתקע בכל פעם שהפרויקט מתהדק.',
+        highlight: 'כולם תמיד יודעים מה לעשות',
+        patternId: 'universal_quantifier',
+        acceptedPatterns: ['universal_quantifier']
+    }),
+    Object.freeze({
+        id: 'rp_work_5',
+        type: 'עבודה',
+        monologue: 'קיבלתי פידבק שזה לא מספיק טוב, ומאז אני לא בטוח מה לתקן קודם אז אני פשוט קופא.',
+        highlight: 'זה לא מספיק טוב',
+        patternId: 'simple_deletion',
+        acceptedPatterns: ['simple_deletion']
+    }),
+    Object.freeze({
+        id: 'rp_work_6',
+        type: 'עבודה',
+        monologue: 'כל היום אני אומר לעצמי שצריך לטפל בזה כבר, אבל בפועל אני לא יודע מה הפעולה הראשונה שאני אמור לבצע.',
+        highlight: 'לטפל בזה כבר',
+        patternId: 'unspecified_verb',
+        acceptedPatterns: ['unspecified_verb', 'simple_deletion']
+    }),
+    Object.freeze({
+        id: 'rp_work_7',
+        type: 'עבודה',
+        monologue: 'הטון שלו הוריד לי את כל המוטיבציה, וברגע שזה קרה לא הצלחתי לכתוב אפילו עדכון אחד קטן.',
+        highlight: 'הוריד לי את כל המוטיבציה',
+        patternId: 'cause_effect',
+        acceptedPatterns: ['cause_effect']
+    }),
+    Object.freeze({
+        id: 'rp_relationship_1',
+        type: 'זוגיות',
+        monologue: 'אם אני מאחר לפגישה אחת, זה אומר שאני לא אוהב באמת, ואז כל השיחה נהיית מתגוננת ולא עניינית.',
+        highlight: 'זה אומר שאני לא אוהב באמת',
+        patternId: 'complex_equivalence',
+        acceptedPatterns: ['complex_equivalence']
+    }),
+    Object.freeze({
+        id: 'rp_relationship_2',
+        type: 'זוגיות',
+        monologue: 'היא מסתכלת בטלפון לכמה דקות ואני ישר יודע שהיא כבר כועסת עליי, עוד לפני שאמרה מילה.',
+        highlight: 'אני ישר יודע שהיא כבר כועסת עליי',
+        patternId: 'mind_reading',
+        acceptedPatterns: ['mind_reading']
+    }),
+    Object.freeze({
+        id: 'rp_relationship_3',
+        type: 'זוגיות',
+        monologue: 'בבית זה פשוט לא נכון לדבר ככה, נקודה, ואין בכלל על מה לדון או לבדוק.',
+        highlight: 'זה פשוט לא נכון לדבר ככה',
+        patternId: 'lost_performative',
+        acceptedPatterns: ['lost_performative']
+    }),
+    Object.freeze({
+        id: 'rp_relationship_4',
+        type: 'זוגיות',
+        monologue: 'מתי תפסיק שוב להרוס לעצמך את הקשר? זו שאלה שרצה לי בראש כל פעם שיש ויכוח קטן.',
+        highlight: 'מתי תפסיק שוב להרוס לעצמך את הקשר',
+        patternId: 'presupposition',
+        acceptedPatterns: ['presupposition']
+    }),
+    Object.freeze({
+        id: 'rp_relationship_5',
+        type: 'זוגיות',
+        monologue: 'אי אפשר לדבר איתו על כסף בלי פיצוץ, אז אני כבר מראש מוותר ונכנס לשקט.',
+        highlight: 'אי אפשר לדבר איתו על כסף',
+        patternId: 'modal_possibility',
+        acceptedPatterns: ['modal_possibility', 'modal_operator']
+    }),
+    Object.freeze({
+        id: 'rp_parent_1',
+        type: 'הורות',
+        monologue: 'אומרים לי שאני הורה לא עקבי, ואני נלחץ כי לא ברור מי בדיוק אומר את זה ועל מה הוא נשען.',
+        highlight: 'אומרים לי שאני הורה לא עקבי',
+        patternId: 'lack_referential_index',
+        acceptedPatterns: ['lack_referential_index']
+    }),
+    Object.freeze({
+        id: 'rp_parent_2',
+        type: 'הורות',
+        monologue: 'כולם בבית אומרים שהדרך הזאת יותר טובה לילד, אבל אף אחד לא מסביר יותר טובה ביחס למה.',
+        highlight: 'יותר טובה לילד',
+        patternId: 'comparative_deletion',
+        acceptedPatterns: ['comparative_deletion']
+    }),
+    Object.freeze({
+        id: 'rp_parent_3',
+        type: 'הורות',
+        monologue: 'יש בבית עניין שחוזר כל ערב סביב שיעורים, ואני מרגיש שאני מאבד שליטה עוד לפני שמתחילים.',
+        highlight: 'עניין שחוזר כל ערב',
+        patternId: 'unspecified_noun',
+        acceptedPatterns: ['unspecified_noun', 'simple_deletion']
+    }),
+    Object.freeze({
+        id: 'rp_parent_4',
+        type: 'הורות',
+        monologue: 'אחרי כל ריב קטן אני מרגיש שהתקשורת בבית נשברה לגמרי, ואין כבר דרך לשקם את זה.',
+        highlight: 'התקשורת בבית נשברה',
+        patternId: 'nominalization',
+        acceptedPatterns: ['nominalization']
+    }),
+    Object.freeze({
+        id: 'rp_self_1',
+        type: 'ביטחון עצמי',
+        monologue: 'כשאני צריך לדבר מול קבוצה, המשפט שעולה מיד הוא שאני לא יכול לעמוד מול אנשים וזה עוצר אותי לגמרי.',
+        highlight: 'אני לא יכול לעמוד מול אנשים',
+        patternId: 'modal_possibility',
+        acceptedPatterns: ['modal_possibility', 'modal_operator']
+    }),
+    Object.freeze({
+        id: 'rp_self_2',
+        type: 'ביטחון עצמי',
+        monologue: 'מאז הטעות האחרונה הביטחון שלי נהרס, ומאותו רגע אני נמנע מיוזמות חדשות בעבודה.',
+        highlight: 'הביטחון שלי נהרס',
+        patternId: 'nominalization',
+        acceptedPatterns: ['nominalization']
+    }),
+    Object.freeze({
+        id: 'rp_self_3',
+        type: 'ביטחון עצמי',
+        monologue: 'אני פחות טוב מהם אז עדיף לא לנסות להוביל שום דבר כדי לא להיחשף שוב לכישלון.',
+        highlight: 'אני פחות טוב מהם',
+        patternId: 'comparative_deletion',
+        acceptedPatterns: ['comparative_deletion']
+    }),
+    Object.freeze({
+        id: 'rp_money_1',
+        type: 'כסף',
+        monologue: 'כשאני מסתכל על חשבון הבנק, זה תמיד קורה לי דווקא בזמן הכי לא נוח ואני מתנתק מכל תכנון.',
+        highlight: 'זה תמיד קורה לי',
+        patternId: 'universal_quantifier',
+        acceptedPatterns: ['universal_quantifier']
+    }),
+    Object.freeze({
+        id: 'rp_money_2',
+        type: 'כסף',
+        monologue: 'אני אומר לעצמי שזה חייב להיות ככה ואין שום אפשרות אחרת, אז אני לא בודק חלופות בכלל.',
+        highlight: 'זה חייב להיות ככה ואין שום אפשרות אחרת',
+        patternId: 'modal_operator',
+        acceptedPatterns: ['modal_operator', 'modal_necessity', 'modal_possibility']
+    }),
+    Object.freeze({
+        id: 'rp_health_1',
+        type: 'בריאות',
+        monologue: 'אחרי ביקור קצר יצאתי עם משפט שזה בסדר יחסית, אבל לא הבנתי בסדר ביחס למה ומה בכלל המדד.',
+        highlight: 'זה בסדר יחסית',
+        patternId: 'comparative_deletion',
+        acceptedPatterns: ['comparative_deletion', 'simple_deletion']
+    }),
+    Object.freeze({
+        id: 'rp_health_2',
+        type: 'בריאות',
+        monologue: 'כולם אומרים שצריך לעשות שינוי עכשיו, ואני נכנס לפחד לפני שבכלל ביררתי מה רלוונטי אליי.',
+        highlight: 'כולם אומרים שצריך לעשות שינוי עכשיו',
+        patternId: 'lack_referential_index',
+        acceptedPatterns: ['lack_referential_index', 'universal_quantifier']
+    }),
+    Object.freeze({
+        id: 'rp_general_1',
+        type: 'כללי',
+        monologue: 'אם לא הצלחתי היום, זה אומר שאני לא בנוי לזה, ואז אני דוחה שוב את כל הניסיון הבא.',
+        highlight: 'אם לא הצלחתי היום, זה אומר שאני לא בנוי לזה',
+        patternId: 'complex_equivalence',
+        acceptedPatterns: ['complex_equivalence']
+    }),
+    Object.freeze({
+        id: 'rp_identity_1',
+        type: 'כללי',
+        monologue: 'ברגע שאני נתקע במשימה אחת, אני מיד אומר לעצמי שאני פשוט אדם לא מאורגן וזה הסיפור שלי.',
+        highlight: 'אני פשוט אדם לא מאורגן',
+        patternId: 'identity_predicates',
+        acceptedPatterns: ['identity_predicates']
+    }),
+    Object.freeze({
+        id: 'rp_time_space_1',
+        type: 'עבודה',
+        monologue: 'בישיבות של יום ראשון בבוקר, בחדר הזה ספציפית, אני תמיד קופא ולא מצליח לדבר חופשי.',
+        highlight: 'בישיבות של יום ראשון בבוקר, בחדר הזה ספציפית',
+        patternId: 'time_space_predicates',
+        acceptedPatterns: ['time_space_predicates']
+    }),
+    Object.freeze({
+        id: 'rp_sensory_1',
+        type: 'זוגיות',
+        monologue: 'אני מרגיש שזה לא נכון בינינו, אבל אין לי שום תמונה ברורה של מה בדיוק אני רואה או שומע שקורה שם.',
+        highlight: 'מרגיש שזה לא נכון בינינו',
+        patternId: 'sensory_predicates',
+        acceptedPatterns: ['sensory_predicates']
+    })
+]);
+
+const RAPID_PATTERN_NEXT_DELAY_MS = 1050;
+const RAPID_PATTERN_WARNING_RATIO = 0.34;
+
+let rapidPatternArenaState = {
+    active: false,
+    score: 0,
+    streak: 0,
+    round: 0,
+    errors: 0,
+    currentCue: null,
+    lastCueId: '',
+    timeLimitSec: 12,
+    startedAtMs: 0,
+    endsAtMs: 0,
+    tickTimer: null,
+    nextTimer: null,
+    elements: {}
+};
+
+function setupRapidPatternArena() {
+    const root = document.getElementById('rapid-pattern-arena');
+    if (!root || root.dataset.rapidBound === 'true') return;
+    root.dataset.rapidBound = 'true';
+
+    rapidPatternArenaState.elements = {
+        root,
+        typeSelect: document.getElementById('rapid-case-type'),
+        timeLimit: document.getElementById('rapid-time-limit'),
+        timeLimitValue: document.getElementById('rapid-time-limit-value'),
+        traffic: document.getElementById('rapid-traffic-light'),
+        errorsLabel: document.getElementById('rapid-errors-label'),
+        score: document.getElementById('rapid-score'),
+        streak: document.getElementById('rapid-streak'),
+        round: document.getElementById('rapid-round'),
+        startBtn: document.getElementById('rapid-start-btn'),
+        monologue: document.getElementById('rapid-monologue-text'),
+        timerFill: document.getElementById('rapid-timer-fill'),
+        feedback: document.getElementById('rapid-feedback'),
+        buttons: document.getElementById('rapid-pattern-buttons')
+    };
+
+    const timeLimit = Number(rapidPatternArenaState.elements.timeLimit?.value || 12);
+    rapidPatternArenaState.timeLimitSec = Number.isFinite(timeLimit) ? Math.max(6, Math.min(25, timeLimit)) : 12;
+    updateRapidPatternTimeLabel();
+    populateRapidPatternTypes();
+    renderRapidPatternButtons();
+    setRapidPatternTrafficLight('green');
+    updateRapidPatternScoreboard();
+    setRapidPatternFeedback('ממתין לתחילת סבב...', 'info');
+    setRapidPatternButtonsDisabled(true);
+
+    rapidPatternArenaState.elements.startBtn?.addEventListener('click', startRapidPatternSession);
+    rapidPatternArenaState.elements.timeLimit?.addEventListener('input', () => {
+        const value = Number(rapidPatternArenaState.elements.timeLimit?.value || 12);
+        rapidPatternArenaState.timeLimitSec = Number.isFinite(value) ? Math.max(6, Math.min(25, value)) : 12;
+        updateRapidPatternTimeLabel();
+    });
+    rapidPatternArenaState.elements.buttons?.addEventListener('click', handleRapidPatternButtonClick);
+}
+
+function updateRapidPatternTimeLabel() {
+    const valueEl = rapidPatternArenaState.elements.timeLimitValue;
+    if (!valueEl) return;
+    valueEl.textContent = String(rapidPatternArenaState.timeLimitSec);
+}
+
+function populateRapidPatternTypes() {
+    const select = rapidPatternArenaState.elements.typeSelect;
+    if (!select) return;
+    const selected = select.value || 'random';
+    const uniqueTypes = Array.from(new Set(RAPID_PATTERN_CUES.map(item => item.type))).sort((a, b) => a.localeCompare(b, 'he'));
+    select.innerHTML = '<option value="random">רנדומלי</option>';
+    uniqueTypes.forEach((type) => {
+        const option = document.createElement('option');
+        option.value = type;
+        option.textContent = type;
+        select.appendChild(option);
+    });
+    select.value = uniqueTypes.includes(selected) || selected === 'random' ? selected : 'random';
+}
+
+function renderRapidPatternButtons() {
+    const container = rapidPatternArenaState.elements.buttons;
+    if (!container) return;
+    container.innerHTML = RAPID_PATTERN_BUTTONS.map(item => `
+        <button type="button" class="rapid-pattern-btn" data-rapid-pattern-id="${escapeHtml(item.id)}">
+            ${escapeHtml(item.label)}
+            <span class="rapid-pattern-sub">${escapeHtml(item.hint)}</span>
+        </button>
+    `).join('');
+}
+
+function startRapidPatternSession() {
+    stopRapidPatternTimer();
+    clearRapidPatternNextTimer();
+
+    rapidPatternArenaState.active = true;
+    rapidPatternArenaState.score = 0;
+    rapidPatternArenaState.streak = 0;
+    rapidPatternArenaState.round = 0;
+    rapidPatternArenaState.errors = 0;
+    rapidPatternArenaState.currentCue = null;
+    rapidPatternArenaState.lastCueId = '';
+    updateRapidPatternScoreboard();
+    setRapidPatternTrafficLight('green');
+    playUISound('start');
+
+    if (rapidPatternArenaState.elements.startBtn) {
+        rapidPatternArenaState.elements.startBtn.textContent = 'איפוס והתחלה מחדש';
+    }
+
+    moveToNextRapidPatternCue();
+}
+
+function handleRapidPatternButtonClick(event) {
+    const button = event.target.closest('button[data-rapid-pattern-id]');
+    if (!button || button.disabled) return;
+    if (!rapidPatternArenaState.active || !rapidPatternArenaState.currentCue) return;
+
+    const chosenPattern = normalizeRapidPatternId(button.getAttribute('data-rapid-pattern-id') || '');
+    if (!chosenPattern) return;
+
+    const cue = rapidPatternArenaState.currentCue;
+    const accepted = (Array.isArray(cue.acceptedPatterns) && cue.acceptedPatterns.length
+        ? cue.acceptedPatterns
+        : [cue.patternId]).map(normalizeRapidPatternId).filter(Boolean);
+    const isCorrect = accepted.includes(chosenPattern);
+
+    if (isCorrect) {
+        handleRapidPatternCorrectAnswer(button, cue, chosenPattern);
+        return;
+    }
+    handleRapidPatternWrongAnswer(button, cue);
+}
+
+function handleRapidPatternCorrectAnswer(button, cue, resolvedPatternId = '') {
+    stopRapidPatternTimer();
+    setRapidPatternButtonsDisabled(true);
+
+    const totalMs = Math.max(1000, rapidPatternArenaState.timeLimitSec * 1000);
+    const remainingMs = Math.max(0, rapidPatternArenaState.endsAtMs - Date.now());
+    const speedBonus = Math.round((remainingMs / totalMs) * 6);
+    const normalizedPatternId = normalizeRapidPatternId(resolvedPatternId || cue.patternId);
+    const assumptionsBonus = normalizedPatternId === 'assumptions' ? 1 : 0;
+    const gained = 8 + Math.max(0, speedBonus) + assumptionsBonus;
+
+    rapidPatternArenaState.score += gained;
+    rapidPatternArenaState.streak += 1;
+    button.classList.add('is-correct');
+    setRapidPatternTrafficLight('green');
+    setRapidPatternFeedback(`מעולה! זיהוי מדויק (+${gained} נק׳).`, 'success');
+    playUISound('correct');
+    addXP(Math.max(2, Math.min(8, Math.round(gained / 2))));
+    if (rapidPatternArenaState.streak > 0 && rapidPatternArenaState.streak % 5 === 0) {
+        addStars(1);
+        playUISound('stars_soft');
+    }
+
+    updateRapidPatternScoreboard();
+    queueNextRapidPatternCue();
+}
+
+function handleRapidPatternWrongAnswer(button, cue) {
+    rapidPatternArenaState.errors += 1;
+    rapidPatternArenaState.streak = 0;
+    button.classList.add('is-wrong');
+    playUISound('wrong');
+
+    if (rapidPatternArenaState.errors >= 2) {
+        stopRapidPatternTimer();
+        setRapidPatternButtonsDisabled(true);
+        revealRapidPatternCorrectButton(normalizeRapidPatternId(cue.patternId));
+        setRapidPatternTrafficLight('red');
+        setRapidPatternFeedback(`טעות שנייה. התשובה הייתה: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`, 'danger');
+        updateRapidPatternScoreboard();
+        queueNextRapidPatternCue();
+        return;
+    }
+
+    setRapidPatternTrafficLight('yellow');
+    setRapidPatternFeedback('טעות ראשונה. נסו שוב לפני שנגמר הזמן.', 'warn');
+    updateRapidPatternScoreboard();
+}
+
+function handleRapidPatternTimeout() {
+    const cue = rapidPatternArenaState.currentCue;
+    if (!rapidPatternArenaState.active || !cue) return;
+    stopRapidPatternTimer();
+
+    rapidPatternArenaState.errors = 2;
+    rapidPatternArenaState.streak = 0;
+    setRapidPatternButtonsDisabled(true);
+    revealRapidPatternCorrectButton(normalizeRapidPatternId(cue.patternId));
+    setRapidPatternTrafficLight('red');
+    setRapidPatternFeedback(`נגמר הזמן! התשובה: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`, 'danger');
+    playUISound('buzzer');
+    updateRapidPatternScoreboard();
+    queueNextRapidPatternCue();
+}
+
+function queueNextRapidPatternCue() {
+    clearRapidPatternNextTimer();
+    rapidPatternArenaState.nextTimer = window.setTimeout(() => {
+        moveToNextRapidPatternCue();
+    }, RAPID_PATTERN_NEXT_DELAY_MS);
+}
+
+function moveToNextRapidPatternCue() {
+    stopRapidPatternTimer();
+    clearRapidPatternNextTimer();
+    clearRapidPatternButtonStates();
+
+    const cue = pickRapidPatternCue();
+    if (!cue) {
+        setRapidPatternFeedback('לא נמצאו מונולוגים זמינים למסנן שנבחר.', 'warn');
+        setRapidPatternButtonsDisabled(true);
+        return;
+    }
+
+    rapidPatternArenaState.currentCue = cue;
+    rapidPatternArenaState.errors = 0;
+    rapidPatternArenaState.round += 1;
+    updateRapidPatternScoreboard();
+    setRapidPatternTrafficLight('green');
+    setRapidPatternButtonsDisabled(false);
+    renderRapidPatternMonologue(cue);
+    setRapidPatternFeedback('זהו/י את התבנית של הביטוי המודגש.', 'info');
+    startRapidPatternTimer();
+}
+
+function getRapidPatternCuePool() {
+    const selectedType = rapidPatternArenaState.elements.typeSelect?.value || 'random';
+    if (selectedType === 'random') return RAPID_PATTERN_CUES;
+    const filtered = RAPID_PATTERN_CUES.filter(item => item.type === selectedType);
+    return filtered.length ? filtered : RAPID_PATTERN_CUES;
+}
+
+function pickRapidPatternCue() {
+    const pool = getRapidPatternCuePool();
+    if (!pool.length) return null;
+
+    let options = pool;
+    if (pool.length > 1 && rapidPatternArenaState.lastCueId) {
+        const withoutLast = pool.filter(item => item.id !== rapidPatternArenaState.lastCueId);
+        if (withoutLast.length) options = withoutLast;
+    }
+
+    const cue = options[Math.floor(Math.random() * options.length)];
+    rapidPatternArenaState.lastCueId = cue.id;
+    return cue;
+}
+
+function renderRapidPatternMonologue(cue) {
+    const el = rapidPatternArenaState.elements.monologue;
+    if (!el || !cue) return;
+    const text = String(cue.monologue || '');
+    const highlight = String(cue.highlight || '').trim();
+    if (!highlight || !text.includes(highlight)) {
+        el.textContent = text;
+        return;
+    }
+
+    const idx = text.indexOf(highlight);
+    const before = text.slice(0, idx);
+    const after = text.slice(idx + highlight.length);
+    el.innerHTML = `${escapeHtml(before)}<mark class="rapid-highlight">${escapeHtml(highlight)}</mark>${escapeHtml(after)}`;
+}
+
+function startRapidPatternTimer() {
+    stopRapidPatternTimer();
+    const totalMs = Math.max(1000, rapidPatternArenaState.timeLimitSec * 1000);
+    rapidPatternArenaState.startedAtMs = Date.now();
+    rapidPatternArenaState.endsAtMs = rapidPatternArenaState.startedAtMs + totalMs;
+    updateRapidPatternTimerVisual();
+
+    rapidPatternArenaState.tickTimer = window.setInterval(() => {
+        if (!rapidPatternArenaState.active || !rapidPatternArenaState.currentCue) return;
+        const remaining = rapidPatternArenaState.endsAtMs - Date.now();
+        if (remaining <= 0) {
+            updateRapidPatternTimerVisual(0);
+            handleRapidPatternTimeout();
+            return;
+        }
+        updateRapidPatternTimerVisual(remaining);
+    }, 90);
+}
+
+function stopRapidPatternTimer() {
+    if (rapidPatternArenaState.tickTimer) {
+        clearInterval(rapidPatternArenaState.tickTimer);
+        rapidPatternArenaState.tickTimer = null;
+    }
+}
+
+function clearRapidPatternNextTimer() {
+    if (rapidPatternArenaState.nextTimer) {
+        clearTimeout(rapidPatternArenaState.nextTimer);
+        rapidPatternArenaState.nextTimer = null;
+    }
+}
+
+function updateRapidPatternTimerVisual(remainingOverride = null) {
+    const fill = rapidPatternArenaState.elements.timerFill;
+    if (!fill) return;
+    const totalMs = Math.max(1000, rapidPatternArenaState.timeLimitSec * 1000);
+    const remaining = remainingOverride === null
+        ? Math.max(0, rapidPatternArenaState.endsAtMs - Date.now())
+        : Math.max(0, remainingOverride);
+    const ratio = Math.max(0, Math.min(1, remaining / totalMs));
+    fill.style.transform = `scaleX(${ratio})`;
+    fill.style.filter = ratio <= RAPID_PATTERN_WARNING_RATIO ? 'saturate(1.35)' : 'none';
+}
+
+function setRapidPatternFeedback(text, tone = 'info') {
+    const el = rapidPatternArenaState.elements.feedback;
+    if (!el) return;
+    el.textContent = text;
+    el.dataset.tone = tone;
+}
+
+function setRapidPatternTrafficLight(state) {
+    const traffic = rapidPatternArenaState.elements.traffic;
+    const errorsLabel = rapidPatternArenaState.elements.errorsLabel;
+    if (traffic) traffic.dataset.state = state;
+    if (errorsLabel) {
+        const errors = Math.max(0, Math.min(2, rapidPatternArenaState.errors));
+        errorsLabel.textContent = `טעויות בשאלה: ${errors}/2`;
+    }
+}
+
+function setRapidPatternButtonsDisabled(disabled) {
+    const container = rapidPatternArenaState.elements.buttons;
+    if (!container) return;
+    container.querySelectorAll('button[data-rapid-pattern-id]').forEach((btn) => {
+        btn.disabled = !!disabled;
+    });
+}
+
+function clearRapidPatternButtonStates() {
+    const container = rapidPatternArenaState.elements.buttons;
+    if (!container) return;
+    container.querySelectorAll('button[data-rapid-pattern-id]').forEach((btn) => {
+        btn.classList.remove('is-correct', 'is-wrong');
+    });
+}
+
+function revealRapidPatternCorrectButton(patternId) {
+    const container = rapidPatternArenaState.elements.buttons;
+    const resolved = normalizeRapidPatternId(patternId);
+    if (!container || !resolved) return;
+    const button = container.querySelector(`button[data-rapid-pattern-id="${resolved}"]`);
+    if (button) button.classList.add('is-correct');
+}
+
+function updateRapidPatternScoreboard() {
+    const scoreEl = rapidPatternArenaState.elements.score;
+    const streakEl = rapidPatternArenaState.elements.streak;
+    const roundEl = rapidPatternArenaState.elements.round;
+    if (scoreEl) scoreEl.textContent = String(rapidPatternArenaState.score);
+    if (streakEl) streakEl.textContent = String(rapidPatternArenaState.streak);
+    if (roundEl) roundEl.textContent = String(rapidPatternArenaState.round);
+}
+
+function getRapidPatternLabel(patternId) {
+    const resolved = normalizeRapidPatternId(patternId);
+    const found = RAPID_PATTERN_BUTTONS.find(item => item.id === resolved);
+    return found?.label || resolved || patternId;
 }
 
 const WRINKLE_GAME_STORAGE_KEY = 'wrinkle_game_v1';
@@ -1047,7 +1847,7 @@ function renderWrinkleRound() {
 
     if (wrinkleGameState.elements.stepLabel) {
         wrinkleGameState.elements.stepLabel.textContent = wrinkleGameState.phase === 'expose'
-            ? 'שלב 1/2: חשיפת הקמט'
+            ? 'שלב 1/2: חשיפת הכמת'
             : 'שלב 2/2: בחירת שאלת האתגור';
     }
 
@@ -1096,7 +1896,7 @@ function handleWrinkleExposeChoice(selectedKey, button) {
     if (selectedKey === card.foldKey) {
         button.classList.add('is-correct');
         const fold = getWrinkleFoldByKey(card.foldKey);
-        setWrinkleFeedback(`מעולה. נחשף הקמט: ${fold?.hiddenAssumption || ''} עכשיו בחר/י שאלת אתגור.`, 'success');
+        setWrinkleFeedback(`מעולה. נחשף הכמת: ${fold?.hiddenAssumption || ''} עכשיו בחר/י שאלת אתגור.`, 'success');
         playUISound('correct');
         wrinkleGameState.phase = 'challenge';
         renderWrinkleRound();
@@ -1150,7 +1950,7 @@ function completeWrinkleRound() {
         addXP(4);
         playUISound('hint');
         setWrinkleFeedback(
-            `נחשף הקמט אחרי תיקון. השאלה הנכונה: "${fold?.challengeQuestion || ''}". נחזור לזה בעוד ${WRINKLE_GAME_RETRY_MINUTES} דקות.`,
+            `נחשף הכמת אחרי תיקון. השאלה הנכונה: "${fold?.challengeQuestion || ''}". נחזור לזה בעוד ${WRINKLE_GAME_RETRY_MINUTES} דקות.`,
             'success'
         );
     } else {
@@ -1175,7 +1975,7 @@ function completeWrinkleRound() {
             : `${nextHours} שעות`;
 
         setWrinkleFeedback(
-            `קרעת את הקמט! "${fold?.challengeQuestion || ''}" נשמר להרגל אוטומטי. חזרה הבאה בעוד ${waitLabel}.`,
+            `קרעת את הכמת! "${fold?.challengeQuestion || ''}" נשמר להרגל אוטומטי. חזרה הבאה בעוד ${waitLabel}.`,
             'success'
         );
     }
@@ -1291,7 +2091,7 @@ function addSelfStatementToWrinkleGame() {
 
     input.value = '';
     const fold = getWrinkleFoldByKey(foldKey);
-    setWrinkleFeedback(`נוסף משפט אישי עם קמט משוער: ${fold?.label || 'כללי'}.`, 'success');
+    setWrinkleFeedback(`נוסף משפט אישי עם כמת משוער: ${fold?.label || 'כללי'}.`, 'success');
     playUISound('next');
 
     saveWrinkleGameState();
@@ -1342,7 +2142,7 @@ function renderWrinkleSelfList() {
     selfCards.forEach(card => {
         const fold = getWrinkleFoldByKey(card.foldKey);
         const row = document.createElement('li');
-        row.textContent = `“${card.statement}” → ${fold?.label || 'קמט כללי'}`;
+        row.textContent = `“${card.statement}” → ${fold?.label || 'כמת כללי'}`;
         list.appendChild(row);
     });
 }
@@ -1414,8 +2214,8 @@ function showAnswer() {
     answerBox.classList.remove('hidden');
 }
 
-// Show Hint
-function showHint() {
+// Show Hint (legacy practice mode)
+function showLegacyPracticeHint() {
     const categorySelect = document.getElementById('category-select');
     const selectedCategory = categorySelect.value;
     
@@ -3411,6 +4211,7 @@ const TAB_TO_COMIC_SCENE_KEYS = {
     prismlab: ['home_tech_cleanup', 'relationships_apology', 'bureaucracy_form'],
     about: ['work_presentation', 'relationships_apology', 'cooking_lasagna']
 };
+const ENABLE_GLOBAL_COMIC_STRIP = false;
 const GLOBAL_COMIC_STRIP_ENABLED_TABS = new Set(['scenario-trainer', 'comic-engine']);
 let selectedGlobalComicScene = null;
 
@@ -3511,6 +4312,8 @@ function openComicPreviewModal(scene) {
 }
 
 function setupGlobalComicStripActions() {
+    if (!ENABLE_GLOBAL_COMIC_STRIP) return;
+
     const previewBtn = document.getElementById('global-comic-main-preview');
     const practiceBtn = document.getElementById('global-comic-main-practice');
     const modal = document.getElementById('comicPreviewModal');
@@ -3553,6 +4356,13 @@ function renderGlobalComicStrip(tabName = getActiveTabName(), scenario = null) {
     const practiceBtn = document.getElementById('global-comic-main-practice');
     const thumbs = document.getElementById('global-comic-thumbs');
     if (!strip || !mainImg || !mainTitle || !mainSubtitle || !previewBtn || !practiceBtn || !thumbs) return;
+
+    if (!ENABLE_GLOBAL_COMIC_STRIP) {
+        strip.classList.add('hidden');
+        selectedGlobalComicScene = null;
+        closeComicPreviewModal();
+        return;
+    }
 
     const activeTab = tabName || getActiveTabName();
     if (!GLOBAL_COMIC_STRIP_ENABLED_TABS.has(activeTab)) {
@@ -4386,13 +5196,19 @@ function setupBlueprintBuilder() {
 }
 
 function goToStep(stepNum) {
-    // Hide all steps
+    const targetId = `blueprint-step-${stepNum}`;
     document.querySelectorAll('.blueprint-step').forEach(step => {
-        step.classList.remove('active');
+        const isTarget = step.id === targetId;
+        step.classList.toggle('active', isTarget);
+        step.classList.toggle('hidden', !isTarget);
     });
 
-    // Show target step
-    document.getElementById(`blueprint-step-${stepNum}`).classList.add('active');
+    // Defensive fallback in case target step exists but was not toggled.
+    const targetStep = document.getElementById(targetId);
+    if (targetStep) {
+        targetStep.classList.remove('hidden');
+        targetStep.classList.add('active');
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -5538,8 +6354,9 @@ function showErrorMessage(msg) {
 function showHint(text) {
     const box = document.getElementById('hint-box');
     const hintText = document.getElementById('hint-text');
+    const message = String(text || '').trim() || 'המשך/י צעד קטן אחד קדימה.';
     if (box && hintText) {
-        hintText.textContent = text;
+        hintText.textContent = message;
         box.style.display = 'flex';
         setTimeout(() => { if (box) box.style.display = 'none'; }, 6000);
     }
@@ -5551,6 +6368,12 @@ function closeHint() {
 }
 
 function navigateTo(tabName) {
+    const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+    if (tabBtn) {
+        tabBtn.click();
+        return;
+    }
+
     const tabs = document.querySelectorAll('.tab-btn');
     const contents = document.querySelectorAll('.tab-content');
     
@@ -5939,7 +6762,7 @@ const CEFLOW_FALLBACKS = Object.freeze({
     meta: Object.freeze({
         tone: 'good', label: 'מטה-מודל', emoji: '✅',
         counterReply: 'אני נתקע/ת בצעד הראשון, לא ברור לי מאיפה להתחיל.',
-        interpretation: 'שאלה מדויקת חשפה את הקמט והחזירה סוכנות.',
+        interpretation: 'שאלה מדויקת חשפה את הכמת והחזירה סוכנות.',
         impact: Object.freeze({ stats: Object.freeze({ flow: 86, agency: 84, shame: 24 }), xrayTags: Object.freeze(['🧩 חשיפה', '🌬️ פתיחה']), microOutcome: Object.freeze(['📈 זרימה', '🟢 סוכנות', '🔓 מידע חדש']) })
     })
 });
@@ -6679,7 +7502,7 @@ function setupWrinkleGame() {
         root.innerHTML = `
             <div class="wr2-topbar">
                 <span class="wr2-top-icon">🕵️‍♂️</span>
-                <h3>חשוף את הקמט!</h3>
+                <h3>חשוף את הכמת!</h3>
                 <div class="wr2-score">
                     <span>🔥 <strong id="wr2-streak">0</strong></span>
                     <span>⭐ <strong id="wr2-points">0</strong></span>
@@ -6694,17 +7517,17 @@ function setupWrinkleGame() {
                 <small>כך זה נשמע</small>
             </section>
             <section class="wr2-detect-zone">
-                <p class="wr2-zone-title">קמטים סמויים</p>
+                <p class="wr2-zone-title">כמתים סמויים</p>
                 <div id="wr2-quantifiers" class="wr2-quantifiers" role="group" aria-label="כמתים סמויים"></div>
                 <div class="wr2-overlay-box">
                     <p id="wr2-overlay-sentence" class="wr2-overlay-sentence"></p>
                     <p id="wr2-explain-line" class="wr2-explain-line">לחץ/י על כמת אדום כדי לחשוף טוטאליות סמויה.</p>
                 </div>
-                <p id="wr2-progress" class="wr2-progress">0 מתוך 0 קמטים חשופים</p>
+                <p id="wr2-progress" class="wr2-progress">0 מתוך 0 כמתים חשופים</p>
             </section>
             <section id="wr2-release" class="wr2-release hidden">
                 <p>הבעיה אינה במילים "אני לא יכול". הבעיה היא בהכללות נסתרות שיוצרות תחושת "אין מוצא".</p>
-                <button id="wr2-unlock-btn" class="btn btn-primary wr2-unlock-btn" type="button">חשפתי את כל הקמטים! 🎉</button>
+                <button id="wr2-unlock-btn" class="btn btn-primary wr2-unlock-btn" type="button">חשפתי את כל הכמתים! 🎉</button>
             </section>
             <section id="wr2-transform-zone" class="wr2-transform-zone hidden">
                 <button id="wr2-transform-btn" class="btn btn-primary wr2-transform-btn" type="button">הסר הכללה טוטאלית</button>
@@ -6845,7 +7668,7 @@ function setupWrinkleGame() {
         }
 
         if (els.progress) {
-            els.progress.textContent = `${state.revealed.length} מתוך ${scene.quantifiers.length} קמטים חשופים`;
+            els.progress.textContent = `${state.revealed.length} מתוך ${scene.quantifiers.length} כמתים חשופים`;
         }
 
         const revealedAll = allRevealed();
@@ -6854,7 +7677,7 @@ function setupWrinkleGame() {
             els.unlockBtn.disabled = !revealedAll || state.unlocked;
             els.unlockBtn.textContent = state.unlocked
                 ? 'מעולה, נעבור לטרנספורמציה ✅'
-                : 'חשפתי את כל הקמטים! 🎉';
+                : 'חשפתי את כל הכמתים! 🎉';
         }
 
         const showTransform = state.unlocked || state.transformed;
