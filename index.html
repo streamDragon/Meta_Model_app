@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meta Model - כלי תרגול שאול מטה מודל</title>
-    <link rel="stylesheet" href="css/style.css?v=1.0.4">
+    <link rel="stylesheet" href="css/style.css?v=1.0.5">
 </head>
 <body>
     <!-- SPLASH SCREEN -->
@@ -618,8 +618,10 @@
                                     <p>רצף: <strong id="rapid-streak">0</strong></p>
                                     <p>שאלה: <strong id="rapid-round">0</strong></p>
                                 </div>
-
-                                <button id="rapid-start-btn" class="btn btn-primary">התחל סבב</button>
+                                <div class="rapid-actions-row">
+                                    <button id="rapid-start-btn" class="btn btn-primary">התחל סבב</button>
+                                    <button id="rapid-pause-btn" class="btn btn-secondary rapid-pause-btn" disabled>PAUSE</button>
+                                </div>
                             </aside>
 
                             <div class="rapid-pattern-main">
@@ -635,6 +637,7 @@
                                 </div>
 
                                 <div id="rapid-pattern-buttons" class="rapid-pattern-buttons" role="group" aria-label="כפתורי תבניות"></div>
+                                <div id="rapid-ai-feedback" class="rapid-ai-feedback hidden" aria-live="polite"></div>
                             </div>
                         </div>
                     </div>
@@ -943,6 +946,6 @@
         </section>
     </div>
 
-    <script src="js/app.js?v=1.0.4"></script>
+    <script src="js/app.js?v=1.0.5"></script>
 </body>
 </html>

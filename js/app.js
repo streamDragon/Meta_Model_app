@@ -1216,15 +1216,21 @@ const RAPID_PATTERN_CUES = Object.freeze([
 
 const RAPID_PATTERN_NEXT_DELAY_MS = 1050;
 const RAPID_PATTERN_WARNING_RATIO = 0.34;
+const RAPID_PATTERN_CONTEXT_LINES = 4;
+const RAPID_PATTERN_FEEDBACK_INTERVAL = 10;
 
 let rapidPatternArenaState = {
     active: false,
+    paused: false,
+    pendingNextCue: false,
+    pausedRemainingMs: 0,
     score: 0,
     streak: 0,
     round: 0,
     errors: 0,
     currentCue: null,
     lastCueId: '',
+    history: [],
     timeLimitSec: 12,
     startedAtMs: 0,
     endsAtMs: 0,
@@ -1249,10 +1255,12 @@ function setupRapidPatternArena() {
         streak: document.getElementById('rapid-streak'),
         round: document.getElementById('rapid-round'),
         startBtn: document.getElementById('rapid-start-btn'),
+        pauseBtn: document.getElementById('rapid-pause-btn'),
         monologue: document.getElementById('rapid-monologue-text'),
         timerFill: document.getElementById('rapid-timer-fill'),
         feedback: document.getElementById('rapid-feedback'),
-        buttons: document.getElementById('rapid-pattern-buttons')
+        buttons: document.getElementById('rapid-pattern-buttons'),
+        aiFeedback: document.getElementById('rapid-ai-feedback')
     };
 
     const timeLimit = Number(rapidPatternArenaState.elements.timeLimit?.value || 12);
@@ -1264,8 +1272,11 @@ function setupRapidPatternArena() {
     updateRapidPatternScoreboard();
     setRapidPatternFeedback('ממתין לתחילת סבב...', 'info');
     setRapidPatternButtonsDisabled(true);
+    setRapidPatternPauseButtonState(false);
+    clearRapidPatternAiFeedback();
 
     rapidPatternArenaState.elements.startBtn?.addEventListener('click', startRapidPatternSession);
+    rapidPatternArenaState.elements.pauseBtn?.addEventListener('click', toggleRapidPatternPause);
     rapidPatternArenaState.elements.timeLimit?.addEventListener('input', () => {
         const value = Number(rapidPatternArenaState.elements.timeLimit?.value || 12);
         rapidPatternArenaState.timeLimitSec = Number.isFinite(value) ? Math.max(6, Math.min(25, value)) : 12;
@@ -1311,21 +1322,76 @@ function startRapidPatternSession() {
     clearRapidPatternNextTimer();
 
     rapidPatternArenaState.active = true;
+    rapidPatternArenaState.paused = false;
+    rapidPatternArenaState.pendingNextCue = false;
+    rapidPatternArenaState.pausedRemainingMs = 0;
     rapidPatternArenaState.score = 0;
     rapidPatternArenaState.streak = 0;
     rapidPatternArenaState.round = 0;
     rapidPatternArenaState.errors = 0;
     rapidPatternArenaState.currentCue = null;
     rapidPatternArenaState.lastCueId = '';
+    rapidPatternArenaState.history = [];
     updateRapidPatternScoreboard();
     setRapidPatternTrafficLight('green');
+    clearRapidPatternAiFeedback();
     playUISound('start');
 
     if (rapidPatternArenaState.elements.startBtn) {
         rapidPatternArenaState.elements.startBtn.textContent = 'איפוס והתחלה מחדש';
     }
+    setRapidPatternPauseButtonState(true);
 
     moveToNextRapidPatternCue();
+}
+
+function setRapidPatternPauseButtonState(enabled, paused = false) {
+    const btn = rapidPatternArenaState.elements.pauseBtn;
+    if (!btn) return;
+    btn.disabled = !enabled;
+    btn.classList.toggle('is-paused', !!paused);
+    btn.textContent = paused ? 'RESUME' : 'PAUSE';
+}
+
+function toggleRapidPatternPause() {
+    if (rapidPatternArenaState.paused) {
+        resumeRapidPatternSession();
+        return;
+    }
+    pauseRapidPatternSession();
+}
+
+function pauseRapidPatternSession() {
+    if (!rapidPatternArenaState.active) return;
+
+    rapidPatternArenaState.paused = true;
+    rapidPatternArenaState.active = false;
+    rapidPatternArenaState.pausedRemainingMs = Math.max(0, rapidPatternArenaState.endsAtMs - Date.now());
+    stopRapidPatternTimer();
+    clearRapidPatternNextTimer();
+    setRapidPatternButtonsDisabled(true);
+    setRapidPatternFeedback('הסבב בהשהיה. לחצו RESUME כדי להמשיך.', 'warn');
+    setRapidPatternPauseButtonState(true, true);
+}
+
+function resumeRapidPatternSession() {
+    if (!rapidPatternArenaState.paused) return;
+
+    rapidPatternArenaState.paused = false;
+    rapidPatternArenaState.active = true;
+    setRapidPatternPauseButtonState(true, false);
+
+    if (!rapidPatternArenaState.currentCue || rapidPatternArenaState.pendingNextCue) {
+        rapidPatternArenaState.pendingNextCue = false;
+        moveToNextRapidPatternCue();
+        return;
+    }
+
+    const resumeMs = Math.max(200, rapidPatternArenaState.pausedRemainingMs || 0);
+    rapidPatternArenaState.pausedRemainingMs = 0;
+    setRapidPatternButtonsDisabled(false);
+    setRapidPatternFeedback('המשך סבב: זהה את התבנית לפני שהזמן נגמר.', 'info');
+    startRapidPatternTimer(resumeMs);
 }
 
 function handleRapidPatternButtonClick(event) {
@@ -1346,7 +1412,7 @@ function handleRapidPatternButtonClick(event) {
         handleRapidPatternCorrectAnswer(button, cue, chosenPattern);
         return;
     }
-    handleRapidPatternWrongAnswer(button, cue);
+    handleRapidPatternWrongAnswer(button, cue, chosenPattern);
 }
 
 function handleRapidPatternCorrectAnswer(button, cue, resolvedPatternId = '') {
@@ -1372,11 +1438,19 @@ function handleRapidPatternCorrectAnswer(button, cue, resolvedPatternId = '') {
         playUISound('stars_soft');
     }
 
+    recordRapidPatternAttempt({
+        cue,
+        chosenPatternId: normalizedPatternId,
+        isCorrect: true,
+        outcome: 'correct',
+        remainingMs
+    });
     updateRapidPatternScoreboard();
+    if (finishRapidPatternRoundIfNeeded()) return;
     queueNextRapidPatternCue();
 }
 
-function handleRapidPatternWrongAnswer(button, cue) {
+function handleRapidPatternWrongAnswer(button, cue, chosenPattern = '') {
     rapidPatternArenaState.errors += 1;
     rapidPatternArenaState.streak = 0;
     button.classList.add('is-wrong');
@@ -1389,6 +1463,14 @@ function handleRapidPatternWrongAnswer(button, cue) {
         setRapidPatternTrafficLight('red');
         setRapidPatternFeedback(`טעות שנייה. התשובה הייתה: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`, 'danger');
         updateRapidPatternScoreboard();
+        recordRapidPatternAttempt({
+            cue,
+            chosenPatternId: normalizeRapidPatternId(chosenPattern),
+            isCorrect: false,
+            outcome: 'two_errors',
+            remainingMs: Math.max(0, rapidPatternArenaState.endsAtMs - Date.now())
+        });
+        if (finishRapidPatternRoundIfNeeded()) return;
         queueNextRapidPatternCue();
         return;
     }
@@ -1409,27 +1491,44 @@ function handleRapidPatternTimeout() {
     revealRapidPatternCorrectButton(normalizeRapidPatternId(cue.patternId));
     setRapidPatternTrafficLight('red');
     setRapidPatternFeedback(`נגמר הזמן! התשובה: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`, 'danger');
+    recordRapidPatternAttempt({
+        cue,
+        chosenPatternId: '',
+        isCorrect: false,
+        outcome: 'timeout',
+        remainingMs: 0
+    });
     playUISound('buzzer');
     updateRapidPatternScoreboard();
+    if (finishRapidPatternRoundIfNeeded()) return;
     queueNextRapidPatternCue();
 }
 
 function queueNextRapidPatternCue() {
     clearRapidPatternNextTimer();
+    rapidPatternArenaState.pendingNextCue = true;
+    if (rapidPatternArenaState.paused || !rapidPatternArenaState.active) return;
     rapidPatternArenaState.nextTimer = window.setTimeout(() => {
+        rapidPatternArenaState.pendingNextCue = false;
         moveToNextRapidPatternCue();
     }, RAPID_PATTERN_NEXT_DELAY_MS);
 }
 
 function moveToNextRapidPatternCue() {
+    if (!rapidPatternArenaState.active || rapidPatternArenaState.paused) {
+        rapidPatternArenaState.pendingNextCue = true;
+        return;
+    }
     stopRapidPatternTimer();
     clearRapidPatternNextTimer();
     clearRapidPatternButtonStates();
+    rapidPatternArenaState.pendingNextCue = false;
 
     const cue = pickRapidPatternCue();
     if (!cue) {
         setRapidPatternFeedback('לא נמצאו מונולוגים זמינים למסנן שנבחר.', 'warn');
         setRapidPatternButtonsDisabled(true);
+        setRapidPatternPauseButtonState(false);
         return;
     }
 
@@ -1441,7 +1540,7 @@ function moveToNextRapidPatternCue() {
     setRapidPatternButtonsDisabled(false);
     renderRapidPatternMonologue(cue);
     setRapidPatternFeedback('זהו/י את התבנית של הביטוי המודגש.', 'info');
-    startRapidPatternTimer();
+    startRapidPatternTimer(null);
 }
 
 function getRapidPatternCuePool() {
@@ -1471,23 +1570,193 @@ function renderRapidPatternMonologue(cue) {
     if (!el || !cue) return;
     const text = String(cue.monologue || '');
     const highlight = String(cue.highlight || '').trim();
-    if (!highlight || !text.includes(highlight)) {
-        el.textContent = text;
+    const lines = buildRapidMonologueLines(text, RAPID_PATTERN_CONTEXT_LINES, highlight);
+    const token = '__RAPID_HIGHLIGHT_TOKEN__';
+    el.innerHTML = lines.map((line) => {
+        const escaped = escapeHtml(line || '');
+        if (!highlight || !escaped.includes(token)) return escaped;
+        return escaped.replace(token, `<mark class="rapid-highlight">${escapeHtml(highlight)}</mark>`);
+    }).join('<br>');
+}
+
+function buildRapidMonologueLines(text, targetLines = 4, highlight = '') {
+    const normalizedText = String(text || '').replace(/\s+/g, ' ').trim();
+    if (!normalizedText) return [];
+    const safeTarget = Math.max(1, targetLines);
+    const token = '__RAPID_HIGHLIGHT_TOKEN__';
+    const withToken = highlight && normalizedText.includes(highlight)
+        ? normalizedText.replace(highlight, token)
+        : normalizedText;
+
+    const clauses = withToken
+        .split(/(?<=[.!?])\s+|,\s+/)
+        .map(item => item.trim())
+        .filter(Boolean);
+
+    let lines = clauses.length ? clauses : [withToken];
+    if (lines.length < safeTarget) {
+        const words = withToken.split(/\s+/).filter(Boolean);
+        const chunkSize = Math.max(3, Math.ceil(words.length / safeTarget));
+        const chunks = [];
+        for (let i = 0; i < words.length; i += chunkSize) {
+            chunks.push(words.slice(i, i + chunkSize).join(' '));
+        }
+        if (chunks.length >= lines.length) {
+            lines = chunks;
+        }
+    }
+
+    if (lines.length > safeTarget) {
+        lines = [...lines.slice(0, safeTarget - 1), lines.slice(safeTarget - 1).join(' ')];
+    }
+
+    while (lines.length < safeTarget) {
+        lines.push('');
+    }
+
+    if (highlight && !normalizedText.includes(highlight)) {
+        return lines.map(line => line.replace(token, highlight));
+    }
+    return lines;
+}
+
+function recordRapidPatternAttempt({
+    cue,
+    chosenPatternId = '',
+    isCorrect = false,
+    outcome = 'unknown',
+    remainingMs = 0
+}) {
+    if (!cue) return;
+    const resolvedCorrectPatternId = normalizeRapidPatternId(cue.patternId || '');
+    const resolvedChosenPatternId = normalizeRapidPatternId(chosenPatternId || '');
+    rapidPatternArenaState.history.push({
+        round: rapidPatternArenaState.round,
+        cueId: cue.id || '',
+        type: cue.type || '',
+        statement: String(cue.monologue || ''),
+        highlight: String(cue.highlight || ''),
+        chosenPatternId: resolvedChosenPatternId,
+        chosenPatternLabel: getRapidPatternLabel(resolvedChosenPatternId),
+        correctPatternId: resolvedCorrectPatternId,
+        correctPatternLabel: getRapidPatternLabel(resolvedCorrectPatternId),
+        isCorrect: !!isCorrect,
+        outcome,
+        remainingMs: Math.max(0, Number(remainingMs) || 0)
+    });
+}
+
+function finishRapidPatternRoundIfNeeded() {
+    if (rapidPatternArenaState.round <= 0 || rapidPatternArenaState.round % RAPID_PATTERN_FEEDBACK_INTERVAL !== 0) {
+        return false;
+    }
+    stopRapidPatternTimer();
+    clearRapidPatternNextTimer();
+    rapidPatternArenaState.active = false;
+    rapidPatternArenaState.paused = false;
+    rapidPatternArenaState.pendingNextCue = false;
+    rapidPatternArenaState.pausedRemainingMs = 0;
+    setRapidPatternButtonsDisabled(true);
+    setRapidPatternPauseButtonState(false);
+    setRapidPatternTrafficLight('green');
+    setRapidPatternFeedback(`סיכום AI אחרי ${RAPID_PATTERN_FEEDBACK_INTERVAL} שאלות.`, 'info');
+    if (rapidPatternArenaState.elements.startBtn) {
+        rapidPatternArenaState.elements.startBtn.textContent = `התחל ${RAPID_PATTERN_FEEDBACK_INTERVAL} שאלות חדשות`;
+    }
+    renderRapidPatternAiFeedback();
+    return true;
+}
+
+function clearRapidPatternAiFeedback() {
+    const panel = rapidPatternArenaState.elements.aiFeedback;
+    if (!panel) return;
+    panel.innerHTML = '';
+    panel.classList.add('hidden');
+}
+
+function renderRapidPatternAiFeedback() {
+    const panel = rapidPatternArenaState.elements.aiFeedback;
+    if (!panel) return;
+    const history = rapidPatternArenaState.history.slice(-RAPID_PATTERN_FEEDBACK_INTERVAL);
+    if (!history.length) {
+        clearRapidPatternAiFeedback();
         return;
     }
 
-    const idx = text.indexOf(highlight);
-    const before = text.slice(0, idx);
-    const after = text.slice(idx + highlight.length);
-    el.innerHTML = `${escapeHtml(before)}<mark class="rapid-highlight">${escapeHtml(highlight)}</mark>${escapeHtml(after)}`;
+    panel.innerHTML = buildRapidPatternAiFeedbackHtml(history);
+    panel.classList.remove('hidden');
 }
 
-function startRapidPatternTimer() {
+function buildRapidPatternAiFeedbackHtml(history) {
+    const rounds = history.length;
+    const correctCount = history.filter(item => item.isCorrect).length;
+    const wrongCount = rounds - correctCount;
+    const accuracy = rounds > 0 ? Math.round((correctCount / rounds) * 100) : 0;
+    const avgRemainingMs = correctCount > 0
+        ? Math.round(history.filter(item => item.isCorrect).reduce((sum, item) => sum + item.remainingMs, 0) / correctCount)
+        : 0;
+
+    const misses = history
+        .filter(item => !item.isCorrect)
+        .reduce((acc, item) => {
+            const key = item.correctPatternId || 'unknown';
+            if (!acc[key]) {
+                acc[key] = {
+                    id: key,
+                    label: item.correctPatternLabel || getRapidPatternLabel(key),
+                    count: 0,
+                    examples: []
+                };
+            }
+            acc[key].count += 1;
+            if (acc[key].examples.length < 2) {
+                acc[key].examples.push(item);
+            }
+            return acc;
+        }, {});
+
+    const topMisses = Object.values(misses).sort((a, b) => b.count - a.count).slice(0, 3);
+    const strongHits = history
+        .filter(item => item.isCorrect && item.remainingMs >= (rapidPatternArenaState.timeLimitSec * 1000 * 0.35))
+        .slice(0, 2);
+
+    const strengthsHtml = strongHits.length
+        ? `<ul class="rapid-ai-list">${strongHits.map(item => `<li>${escapeHtml(item.highlight || item.statement)} -> ${escapeHtml(item.correctPatternLabel)}</li>`).join('')}</ul>`
+        : '<p class="rapid-ai-note">עדיין אין מספיק הצלחות מהירות. נסו קודם לזהות את מילת הטריגר ורק אז לבחור כפתור.</p>';
+
+    const missesHtml = topMisses.length
+        ? `<ul class="rapid-ai-list">${topMisses.map(group => {
+            const examples = group.examples.map(example => `<li>${escapeHtml(example.highlight || example.statement)} -> תשובה נכונה: ${escapeHtml(group.label)}</li>`).join('');
+            return `<li><strong>${escapeHtml(group.label)}</strong> (${group.count})<ul class="rapid-ai-sublist">${examples}</ul></li>`;
+        }).join('')}</ul>`
+        : '<p class="rapid-ai-note">מעולה: אין טעויות בבלוק האחרון.</p>';
+
+    const missingFocus = wrongCount >= 4
+        ? 'המלצה: עצרו לחצי שנייה על המילה המודגשת לפני בחירה, זה מוריד ניחושים.'
+        : 'המלצה: המשיכו באותו קצב, אפשר גם להוריד זמן כדי לחדד דיוק.';
+
+    const avgSeconds = (avgRemainingMs / 1000).toFixed(1);
+    return `
+        <h4>AI Coach: סיכום ${rounds} שאלות</h4>
+        <p>דיוק: <strong>${accuracy}%</strong> | נכונות: <strong>${correctCount}/${rounds}</strong> | זמן ממוצע שנותר בתשובות נכונות: <strong>${avgSeconds} שנ׳</strong></p>
+        <p class="rapid-ai-title">מה חזק אצלך עכשיו</p>
+        ${strengthsHtml}
+        <p class="rapid-ai-title">מה חסר או בעייתי כרגע</p>
+        ${missesHtml}
+        <p class="rapid-ai-summary">${escapeHtml(missingFocus)}</p>
+        <p class="rapid-ai-summary">להמשך: לחצו "איפוס והתחלה מחדש" לעוד בלוק של ${RAPID_PATTERN_FEEDBACK_INTERVAL} שאלות.</p>
+    `;
+}
+
+function startRapidPatternTimer(remainingMsOverride = null) {
     stopRapidPatternTimer();
     const totalMs = Math.max(1000, rapidPatternArenaState.timeLimitSec * 1000);
-    rapidPatternArenaState.startedAtMs = Date.now();
-    rapidPatternArenaState.endsAtMs = rapidPatternArenaState.startedAtMs + totalMs;
-    updateRapidPatternTimerVisual();
+    const activeDurationMs = remainingMsOverride === null
+        ? totalMs
+        : Math.max(120, Math.min(totalMs, Number(remainingMsOverride) || totalMs));
+    rapidPatternArenaState.startedAtMs = Date.now() - (totalMs - activeDurationMs);
+    rapidPatternArenaState.endsAtMs = Date.now() + activeDurationMs;
+    updateRapidPatternTimerVisual(activeDurationMs);
 
     rapidPatternArenaState.tickTimer = window.setInterval(() => {
         if (!rapidPatternArenaState.active || !rapidPatternArenaState.currentCue) return;
@@ -8626,3 +8895,4 @@ function setupWrinkleGame() {
     resetRoundState();
     render();
 }
+

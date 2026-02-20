@@ -1234,6 +1234,31 @@ body.embed-mode .progress-hub {
     margin-bottom: 0;
 }
 
+.rapid-actions-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.rapid-actions-row .btn {
+    margin: 0;
+}
+
+.rapid-pause-btn {
+    border: 1px solid #1e293b;
+    background: #0f172a;
+    color: #f8fafc;
+}
+
+.rapid-pause-btn:hover {
+    background: #1e293b;
+}
+
+.rapid-pause-btn.is-paused {
+    border-color: #0f766e;
+    background: #0f766e;
+}
+
 .rapid-pattern-main {
     display: flex;
     flex-direction: column;
@@ -1253,6 +1278,54 @@ body.embed-mode .progress-hub {
     line-height: 1.7;
     font-size: 1.05rem;
     color: #111827;
+    min-height: calc(1.7em * 4);
+}
+
+.rapid-ai-feedback {
+    margin-top: 8px;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    background: #eff6ff;
+    padding: 12px;
+}
+
+.rapid-ai-feedback h4 {
+    margin: 0 0 6px;
+    color: #1d4ed8;
+}
+
+.rapid-ai-feedback p {
+    margin: 0 0 7px;
+    color: #1e293b;
+}
+
+.rapid-ai-title {
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.rapid-ai-summary {
+    font-weight: 700;
+}
+
+.rapid-ai-note {
+    color: #475569;
+}
+
+.rapid-ai-list,
+.rapid-ai-sublist {
+    margin: 0 0 8px;
+    padding: 0 18px 0 0;
+}
+
+.rapid-ai-sublist {
+    margin-top: 5px;
+}
+
+.rapid-ai-list li,
+.rapid-ai-sublist li {
+    margin-bottom: 4px;
+    color: #1e293b;
 }
 
 .rapid-highlight {
@@ -1368,14 +1441,63 @@ body.embed-mode .progress-hub {
     .rapid-pattern-shell {
         grid-template-columns: 1fr;
     }
+
+    .rapid-pattern-main {
+        order: 1;
+    }
+
+    .rapid-pattern-side {
+        order: 2;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .rapid-panel {
+        padding: 8px;
+    }
+
+    .rapid-actions-row {
+        grid-column: 1 / -1;
+    }
 }
 
 @media (max-width: 640px) {
     .rapid-pattern-buttons {
-        grid-template-columns: repeat(2, minmax(120px, 1fr));
+        grid-template-columns: repeat(3, minmax(90px, 1fr));
+    }
+
+    .rapid-pattern-btn {
+        min-height: 48px;
+        font-size: 0.78rem;
+        padding: 7px 6px;
+    }
+
+    .rapid-pattern-btn .rapid-pattern-sub {
+        font-size: 0.67rem;
+    }
+
+    .rapid-monologue-box {
+        min-height: 154px;
+        padding: 11px;
+    }
+
+    .rapid-monologue-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        min-height: calc(1.6em * 4);
     }
 
     .rapid-timer-row {
+        grid-template-columns: 1fr;
+    }
+
+    .rapid-feedback {
+        min-width: 0;
+        font-size: 0.88rem;
+    }
+
+    .rapid-pattern-side {
         grid-template-columns: 1fr;
     }
 }
