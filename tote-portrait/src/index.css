@@ -1,0 +1,33 @@
+:root {
+  font-family: 'Assistant', 'Segoe UI', Tahoma, sans-serif;
+  line-height: 1.4;
+  font-weight: 400;
+  color: #132038;
+  background-color: #eaf1fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  direction: rtl;
+}
+
+label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.88rem;
+  color: #2f456f;
+}
+
+button {
+  font-family: inherit;
+}

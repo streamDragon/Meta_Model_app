@@ -1,0 +1,88 @@
+import type { Slot } from '../types';
+
+export const slots: Slot[] = [
+  {
+    id: 1,
+    category: 'Trigger',
+    name: 'טריגר / סיטואציה',
+    description: 'איפה/מתי זה קורה?',
+    color: '#FF9800',
+    icon: '⚡',
+    allowedTags: ['Trigger', 'Context', 'Episode'],
+  },
+  {
+    id: 2,
+    category: 'Trigger',
+    name: 'רגע לפני (Precipitating)',
+    description: 'מה קרה ממש לפני שהתחיל?',
+    color: '#FFB74D',
+    icon: '⏰',
+    allowedTags: ['Precipitating', 'Trigger', 'Episode'],
+  },
+  {
+    id: 3,
+    category: 'Test',
+    name: 'איך אני יודע? (ראיה)',
+    description: 'מה העדות/הסימן שזה קורה?',
+    color: '#2196F3',
+    icon: '👁️',
+    allowedTags: ['Evidence', 'Test', 'Sensory'],
+  },
+  {
+    id: 4,
+    category: 'Operate',
+    name: 'מיקרו-שלב 1',
+    description: 'הצעד הראשון בתהליך',
+    color: '#4CAF50',
+    icon: '⚙️',
+    allowedTags: ['Step', 'Operate', 'Action'],
+  },
+  {
+    id: 5,
+    category: 'Operate',
+    name: 'מיקרו-שלב 2',
+    description: 'הצעד השני בתהליך',
+    color: '#4CAF50',
+    icon: '⚙️',
+    allowedTags: ['Step', 'Operate', 'Action'],
+  },
+  {
+    id: 6,
+    category: 'Operate',
+    name: 'מיקרו-שלב 3',
+    description: 'הצעד השלישי בתהליך',
+    color: '#4CAF50',
+    icon: '⚙️',
+    allowedTags: ['Step', 'Operate', 'Action'],
+  },
+  {
+    id: 7,
+    category: 'Loop',
+    name: 'חסם / פחד / אמונה',
+    description: 'מה עוצר את ה-Exit? כלל/אמונה/פחד',
+    color: '#F44336',
+    icon: '⛓️',
+    allowedTags: ['Belief', 'Fear', 'Block', 'Identity', 'Link'],
+  },
+  {
+    id: 8,
+    category: 'Loop',
+    name: 'מה קורה אוטומטית',
+    description: 'תגובה אוטומטית בגוף/רגש/מחשבה',
+    color: '#E91E63',
+    icon: '🔄',
+    allowedTags: ['Auto', 'Body', 'Emotion', 'Thought'],
+  },
+  {
+    id: 9,
+    category: 'Exit',
+    name: 'תנאי יציאה (לא תקוע)',
+    description: 'איך נראה מצב שבו זה מסתיים?',
+    color: '#4CAF50',
+    icon: '🚪',
+    allowedTags: ['Exit', 'Outcome', 'Criterion'],
+  },
+];
+
+export const slotById = (id: number): Slot | undefined => slots.find((slot) => slot.id === id);
+
