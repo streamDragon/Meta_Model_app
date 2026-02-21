@@ -4247,6 +4247,24 @@ a:hover {
     padding: 10px;
 }
 
+.scenario-predicate-panel {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    background: #f0f9ff;
+}
+
+.scenario-predicate-panel p {
+    margin: 0 0 6px;
+    color: #0f172a;
+    line-height: 1.5;
+}
+
+.scenario-predicate-panel p:last-child {
+    margin-bottom: 0;
+}
+
 .scenario-options-container {
     margin-top: 16px;
     display: grid;
@@ -4371,6 +4389,98 @@ a:hover {
 
 .scenario-blueprint-display {
     margin-bottom: 15px;
+}
+
+.scenario-tote-map {
+    margin-bottom: 14px;
+    background: #f8fafc;
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.scenario-tote-map h4 {
+    margin: 0 0 10px;
+    color: #1e3a8a;
+}
+
+.scenario-tote-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.scenario-tote-slot {
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 10px;
+}
+
+.scenario-tote-slot h5 {
+    margin: 0 0 6px;
+    color: #334155;
+    font-size: 0.9rem;
+}
+
+.scenario-tote-slot p {
+    margin: 0;
+    color: #0f172a;
+    line-height: 1.52;
+    min-height: 2.8em;
+}
+
+.scenario-question-engine {
+    margin-top: 12px;
+    border-top: 1px dashed #bfdbfe;
+    padding-top: 10px;
+}
+
+.scenario-question-engine h5 {
+    margin: 0 0 8px;
+    color: #1e3a8a;
+}
+
+.scenario-question-engine ul {
+    margin: 0 0 10px;
+    padding-right: 18px;
+}
+
+.scenario-question-engine li {
+    margin-bottom: 6px;
+    color: #1e293b;
+    line-height: 1.5;
+}
+
+.scenario-probe-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.scenario-probe-buttons .btn {
+    margin: 0;
+}
+
+.scenario-probe-output {
+    margin: 0;
+    min-height: 2.4em;
+    color: #1e3a8a;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+@media (max-width: 980px) {
+    .scenario-tote-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .scenario-tote-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .scenario-green-box {

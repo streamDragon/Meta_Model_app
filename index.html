@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meta Model - כלי תרגול שאול מטה מודל</title>
-    <link rel="stylesheet" href="css/style.css?v=1.0.13">
+    <link rel="stylesheet" href="css/style.css?v=1.0.14">
 </head>
 <body>
     <!-- SPLASH SCREEN -->
@@ -180,8 +180,8 @@
         <section id="scenario-trainer" class="tab-content">
             <div class="scenario-trainer-container">
                 <div class="card scenario-trainer-card">
-                    <h2>🎬 Scenario Trainer: פועל לא-מפורש → ביצוע</h2>
-                    <p class="subtitle">תרגול קצר מסצנה לחיים אמיתיים: פחות האשמה, יותר פירוק לתהליך.</p>
+                    <h2>🎬 Scenario Trainer: פועל לא-מפורט → תהליך (TOTE)</h2>
+                    <p class="subtitle">תרגול קצר מסצנה לחיים אמיתיים: נרמול Predicate, פירוק תהליך, ויציאה מתקיעות לצעד ביצוע ברור.</p>
 
                     <div id="scenario-safety-notice" class="scenario-safety-notice hidden" role="alert">
                         נראה שהטקסט שכתבת מצביע על מצוקה חריפה. עצרנו את התרגול כרגע.
@@ -236,7 +236,12 @@
                             <div class="scenario-role" id="scenario-role"></div>
                             <h3 id="scenario-title"></h3>
                             <div id="scenario-story-lines" class="scenario-story-lines"></div>
-                            <p class="scenario-unspecified-line">המשפט הלא-מפורש: <strong id="scenario-unspecified-verb"></strong></p>
+                            <p class="scenario-unspecified-line">Predicate לא-מפורט: <strong id="scenario-unspecified-verb"></strong></p>
+                            <div class="scenario-predicate-panel">
+                                <p><strong>סוג Predicate:</strong> <span id="scenario-predicate-type"></span></p>
+                                <p><strong>נרמול:</strong> <span id="scenario-predicate-normalized"></span></p>
+                                <p><strong>מה חסר כדי לצאת מהלולאה:</strong> <span id="scenario-predicate-missing-action"></span></p>
+                            </div>
                         </div>
                         <div id="scenario-comic-stage" class="scenario-comic-stage" hidden>
                             <div class="scenario-comic-image-wrap">
@@ -266,6 +271,57 @@
 
                     <!-- BLUEPRINT -->
                     <div id="scenario-screen-blueprint" class="scenario-screen hidden">
+                        <h3>Action Map: TOTE + Loop</h3>
+                        <div class="scenario-tote-map">
+                            <h4>מפת תהליך (9 סלוטים)</h4>
+                            <div class="scenario-tote-grid">
+                                <div class="scenario-tote-slot">
+                                    <h5>A1. Trigger / Frame</h5>
+                                    <p id="scenario-tote-trigger"></p>
+                                </div>
+                                <div class="scenario-tote-slot">
+                                    <h5>A2. מה קורה רגע לפני</h5>
+                                    <p id="scenario-tote-pre-event"></p>
+                                </div>
+                                <div class="scenario-tote-slot">
+                                    <h5>B. Test: איך יודעים שזה קורה</h5>
+                                    <p id="scenario-tote-evidence"></p>
+                                </div>
+                                <div class="scenario-tote-slot">
+                                    <h5>C1. Operate: מיקרו-צעד 1</h5>
+                                    <p id="scenario-tote-op1"></p>
+                                </div>
+                                <div class="scenario-tote-slot">
+                                    <h5>C2. Operate: מיקרו-צעד 2</h5>
+                                    <p id="scenario-tote-op2"></p>
+                                </div>
+                                <div class="scenario-tote-slot">
+                                    <h5>C3. Operate: מיקרו-צעד 3</h5>
+                                    <p id="scenario-tote-op3"></p>
+                                </div>
+                                <div class="scenario-tote-slot">
+                                    <h5>D1. Interference / חסם</h5>
+                                    <p id="scenario-tote-blocker"></p>
+                                </div>
+                                <div class="scenario-tote-slot">
+                                    <h5>D2. מה קורה אוטומטית</h5>
+                                    <p id="scenario-tote-auto"></p>
+                                </div>
+                                <div class="scenario-tote-slot">
+                                    <h5>E. Exit: איך נראה "לא תקוע"</h5>
+                                    <p id="scenario-tote-exit"></p>
+                                </div>
+                            </div>
+                            <div class="scenario-question-engine">
+                                <h5>שאלות דינמיות לפי סוג Predicate</h5>
+                                <ul id="scenario-dynamic-questions"></ul>
+                                <div class="scenario-probe-buttons">
+                                    <button id="scenario-open-box-btn" class="btn btn-secondary">פתח עוד</button>
+                                    <button id="scenario-knife-btn" class="btn btn-secondary">חתוך דבק</button>
+                                </div>
+                                <p id="scenario-probe-output" class="scenario-probe-output"></p>
+                            </div>
+                        </div>
                         <h3>Blueprint קומפקטי</h3>
                         <div class="final-blueprint-display scenario-blueprint-display">
                             <div class="blueprint-section">
@@ -938,7 +994,7 @@
         </section>
     </div>
 
-    <script src="js/app.js?v=1.0.13"></script>
+    <script src="js/app.js?v=1.0.14"></script>
 </body>
 </html>
 

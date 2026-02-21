@@ -91,6 +91,7 @@ let scenarioTrainer = {
     session: null,
     activeScenario: null,
     selectedOption: null,
+    currentPredicateAnalysis: null,
     safetyLocked: false,
     didRecordSession: false
 };
@@ -4132,6 +4133,7 @@ function lockScenarioFlowForSafety() {
     scenarioTrainer.session = null;
     scenarioTrainer.activeScenario = null;
     scenarioTrainer.selectedOption = null;
+    scenarioTrainer.currentPredicateAnalysis = null;
     setScenarioSafetyNoticeVisible(true);
     scenarioTransitionTo(SCENARIO_STATES.HOME, true);
     showScenarioScreen('home');
@@ -4349,6 +4351,7 @@ function startScenarioRun() {
     scenarioTrainer.didRecordSession = false;
     scenarioTrainer.activeScenario = null;
     scenarioTrainer.selectedOption = null;
+    scenarioTrainer.currentPredicateAnalysis = null;
 
     scenarioTransitionTo(SCENARIO_STATES.SCENARIO, true);
     renderScenarioPlayScreen();
@@ -4387,6 +4390,8 @@ function renderScenarioPlayScreen() {
     if (roleEl) roleEl.textContent = `תפקיד: ${roleLabel}`;
     if (titleEl) titleEl.textContent = scenario.title || 'סצנה';
     if (unspecifiedEl) unspecifiedEl.textContent = `נו, פשוט ${scenario.unspecifiedVerb || 'תעשה את זה'}`;
+
+    renderScenarioPredicateAnalysis(scenario);
 
     if (storyContainer) {
         storyContainer.innerHTML = '';
@@ -4505,6 +4510,233 @@ function getScenarioGreenOptionText(scenario) {
     return green?.text || '';
 }
 
+const SCENARIO_PREDICATE_TYPE_LABELS = Object.freeze({
+    action: 'פועל פעולה',
+    process: 'תהליך / קורה לי',
+    state: 'מצב / זהות מקוצרת'
+});
+
+const SCENARIO_STATE_NORMALIZATION_RULES = Object.freeze([
+    { pattern: /תקוע|תקועה/, normalizedVerb: 'להיתקע בלופ ולא להתקדם', missingAction: 'להגדיר צעד ראשון מדיד ולבצע אותו מיד' },
+    { pattern: /כישלון|כשלון|אפס/, normalizedVerb: 'להדביק זהות שלילית במקום לתאר פעולה', missingAction: 'לתאר פעולה קטנה שניתן לבצע ב-10 דקות' },
+    { pattern: /לא מסוגל|לא מסוגלת|לא יכול|לא יכולה/, normalizedVerb: 'לחסום יכולת לפני בדיקת תנאים', missingAction: 'לבדוק מה אפשר לבצע גם אם רק ב-5% הצלחה' },
+    { pattern: /אין סיכוי|חסר סיכוי|אבוד|אבודה/, normalizedVerb: 'להפוך מצב לקביעה גורלית', missingAction: 'לאתר תנאים שבהם זה קצת פחות נכון' }
+]);
+
+const SCENARIO_PROCESS_HINTS = Object.freeze([
+    { pattern: /מציף|מציפה/, normalizedVerb: 'להיות מוצף ולהפסיק לחשוב בצעדים', missingAction: 'לעצור, לנשום, ולפרק למשימת מיקרו אחת' },
+    { pattern: /נתקע|נתקעת|נתקעים/, normalizedVerb: 'להיכנס ללולאת עצירה', missingAction: 'לבחור צעד ראשון קצר עם מדד סיום ברור' },
+    { pattern: /משתלט|משתלטת/, normalizedVerb: 'לתת לתגובה אוטומטית לנהל את המהלך', missingAction: 'להחזיר שליטה דרך שאלה קונקרטית אחת' }
+]);
+
+const SCENARIO_DYNAMIC_QUESTIONS = Object.freeze({
+    action: Object.freeze([
+        'מה הצעד הראשון של הפועל הזה אצלך?',
+        'מה קורה בין ההחלטה לבין רגע הוויתור?',
+        'איך נראה סימן "בוצע" ברור?'
+    ]),
+    process: Object.freeze([
+        'מה האות הראשון בגוף שזה מתחיל?',
+        'מה קורה אוטומטית בלי החלטה מודעת?',
+        'מה אתה עושה שמגדיל או מקטין את התהליך הזה?'
+    ]),
+    state: Object.freeze([
+        'אם היינו מצלמה, מה בדיוק רואים שאתה עושה כשזה קורה?',
+        'מה לא קורה שהיית מצפה שיקרה?',
+        'ביחס למה זה "תקוע" - יעד, החלטה או פעולה מסוימת?'
+    ])
+});
+
+function getScenarioPredicateBaseText(scenario) {
+    const raw = String(scenario?.predicate || scenario?.unspecifiedVerb || '').trim();
+    return raw || 'לעשות את זה';
+}
+
+function inferScenarioPredicateType(scenario) {
+    const predicate = normalizeText(getScenarioPredicateBaseText(scenario));
+    const story = normalizeText((scenario?.story || []).join(' '));
+    const stuck = normalizeText(scenario?.stuckPointHint || '');
+    const belief = normalizeText(scenario?.expectation?.belief || '');
+    const haystack = `${predicate} ${story} ${stuck} ${belief}`;
+
+    if (
+        /תקוע|תקועה|כישלון|כשלון|אפס|לא מסוגל|לא מסוגלת|אין סיכוי|אבוד|אבודה/.test(haystack) ||
+        /^להיות\b/.test(predicate)
+    ) {
+        return 'state';
+    }
+
+    if (/נתקע|נתקעת|מציף|מציפה|משתלט|קופא|ננעל|לחוץ/.test(haystack)) {
+        return 'process';
+    }
+
+    return 'action';
+}
+
+function resolveScenarioPredicateNormalization(predicate, type, scenario) {
+    const normalizedPredicate = normalizeText(predicate);
+    const bp = scenario?.greenBlueprint || {};
+    const fallbackMissing = bp.firstStep || (scenario?.hiddenSteps || [])[0] || 'להגדיר ולבצע צעד ראשון ברור';
+
+    if (type === 'state') {
+        const matched = SCENARIO_STATE_NORMALIZATION_RULES.find((rule) => rule.pattern.test(normalizedPredicate));
+        if (matched) {
+            return {
+                normalizedVerb: matched.normalizedVerb,
+                missingAction: matched.missingAction
+            };
+        }
+        return {
+            normalizedVerb: 'להיתקע בלופ במקום פעולה מדידה',
+            missingAction: fallbackMissing
+        };
+    }
+
+    if (type === 'process') {
+        const matched = SCENARIO_PROCESS_HINTS.find((rule) => rule.pattern.test(normalizedPredicate));
+        if (matched) {
+            return {
+                normalizedVerb: matched.normalizedVerb,
+                missingAction: matched.missingAction
+            };
+        }
+        return {
+            normalizedVerb: `לנוע אוטומטית סביב "${predicate}" בלי פירוק לשלבים`,
+            missingAction: fallbackMissing
+        };
+    }
+
+    return {
+        normalizedVerb: predicate,
+        missingAction: fallbackMissing
+    };
+}
+
+function buildScenarioPredicateAnalysis(scenario) {
+    const predicate = getScenarioPredicateBaseText(scenario);
+    const type = inferScenarioPredicateType(scenario);
+    const { normalizedVerb, missingAction } = resolveScenarioPredicateNormalization(predicate, type, scenario);
+    return {
+        predicate,
+        type,
+        typeLabel: SCENARIO_PREDICATE_TYPE_LABELS[type] || SCENARIO_PREDICATE_TYPE_LABELS.action,
+        normalizedVerb,
+        missingAction
+    };
+}
+
+function renderScenarioPredicateAnalysis(scenario) {
+    const typeEl = document.getElementById('scenario-predicate-type');
+    const normalizedEl = document.getElementById('scenario-predicate-normalized');
+    const missingActionEl = document.getElementById('scenario-predicate-missing-action');
+    if (!typeEl || !normalizedEl || !missingActionEl) return;
+
+    const analysis = buildScenarioPredicateAnalysis(scenario);
+    scenarioTrainer.currentPredicateAnalysis = analysis;
+    typeEl.textContent = analysis.typeLabel;
+    normalizedEl.textContent = analysis.normalizedVerb;
+    missingActionEl.textContent = analysis.missingAction;
+}
+
+function resolveScenarioAutoLoopText(type = 'action') {
+    if (type === 'state') {
+        return 'הגדרה עצמית שלילית -> לחץ/קיפאון -> הימנעות -> יותר תקיעות.';
+    }
+    if (type === 'process') {
+        return 'טריגר פנימי -> תגובה אוטומטית -> עצירה של הביצוע.';
+    }
+    return 'החלטה כללית -> קפיצה בין שלבים -> בלי סגירת צעד ראשון.';
+}
+
+function buildScenarioToteSlots(scenario, analysis) {
+    const bp = scenario?.greenBlueprint || {};
+    const hiddenSteps = Array.isArray(scenario?.hiddenSteps) ? scenario.hiddenSteps : [];
+    const bpSteps = Array.isArray(bp.steps) ? bp.steps : [];
+    const steps = [...hiddenSteps, ...bpSteps].filter(Boolean);
+    const fallbackStep = analysis?.missingAction || bp.firstStep || 'לבחור פעולה קטנה ומדידה';
+
+    return {
+        trigger: (scenario?.story || [])[0] || scenario?.title || 'לא זוהה טריגר מפורש',
+        preEvent: (scenario?.story || [])[1] || scenario?.expectation?.pressure || 'לא זוהה אירוע מקדים',
+        evidence: scenario?.stuckPointHint || 'איך רואים שזה קורה בפועל? מה עדות מדידה?',
+        op1: steps[0] || fallbackStep,
+        op2: steps[1] || bp.firstStep || 'להמשיך בצעד שני קצר וברור',
+        op3: steps[2] || 'לסגור בדיקה קצרה: מה הושלם ומה עוד חסר',
+        blocker: scenario?.expectation?.belief || bp.stuckPoint || scenario?.stuckPointHint || 'אמונה/כלל שעוצר את ה-Exit',
+        autoLoop: resolveScenarioAutoLoopText(analysis?.type),
+        exit: bp.doneDefinition || 'יש סימן ביצוע ברור שאפשר לראות ולמדוד'
+    };
+}
+
+function renderScenarioDynamicQuestions(analysis) {
+    const listEl = document.getElementById('scenario-dynamic-questions');
+    if (!listEl) return;
+
+    const type = analysis?.type || 'action';
+    const questions = SCENARIO_DYNAMIC_QUESTIONS[type] || SCENARIO_DYNAMIC_QUESTIONS.action;
+    listEl.innerHTML = '';
+    questions.slice(0, 3).forEach((text) => {
+        const li = document.createElement('li');
+        li.textContent = text;
+        listEl.appendChild(li);
+    });
+}
+
+function renderScenarioToteMap(scenario) {
+    const analysis = scenarioTrainer.currentPredicateAnalysis || buildScenarioPredicateAnalysis(scenario);
+    const slots = buildScenarioToteSlots(scenario, analysis);
+    const bindings = {
+        trigger: 'scenario-tote-trigger',
+        preEvent: 'scenario-tote-pre-event',
+        evidence: 'scenario-tote-evidence',
+        op1: 'scenario-tote-op1',
+        op2: 'scenario-tote-op2',
+        op3: 'scenario-tote-op3',
+        blocker: 'scenario-tote-blocker',
+        autoLoop: 'scenario-tote-auto',
+        exit: 'scenario-tote-exit'
+    };
+
+    Object.entries(bindings).forEach(([key, id]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = slots[key] || '—';
+    });
+
+    renderScenarioDynamicQuestions(analysis);
+    const probeOutput = document.getElementById('scenario-probe-output');
+    if (probeOutput) probeOutput.textContent = '';
+}
+
+function getScenarioProbePrompt(kind = 'open') {
+    const analysis = scenarioTrainer.currentPredicateAnalysis || {};
+    const type = analysis.type || 'action';
+    if (kind === 'knife') {
+        if (type === 'state') {
+            return 'איזה חיבור לא הכרחי מופעל כאן? למשל: "אם לא מושלם אז אני כישלון". מה פירוש חלופי אפשרי?';
+        }
+        if (type === 'process') {
+            return 'מה גורם להסיק ש"כשהטריגר מופיע אין שליטה"? איפה זה כן עבד אחרת (אפילו 5%)?';
+        }
+        return 'איזה קשר אוטומטי נוצר בין הצעד הזה לבין כישלון? מה תנאי הקשר שבו כן אפשר להתקדם?';
+    }
+
+    if (type === 'state') {
+        return 'פתח עוד: איזה שלב פעולה חסר בין ההגדרה ("תקוע") לבין מה שקורה בפועל?';
+    }
+    if (type === 'process') {
+        return 'פתח עוד: מה האות הראשון בגוף, ומה הפעולה המידית שמתחילה את הלופ?';
+    }
+    return 'פתח עוד: איזה מיקרו-שלב נשמט בין הכוונה לבין הביצוע?';
+}
+
+function runScenarioProbe(kind = 'open') {
+    const outputEl = document.getElementById('scenario-probe-output');
+    if (!outputEl) return;
+    outputEl.textContent = getScenarioProbePrompt(kind);
+    playScenarioSound('next');
+}
+
 function showScenarioBlueprint() {
     if (!scenarioTrainer.activeScenario || !scenarioTrainer.selectedOption) return;
     if (!scenarioTransitionTo(SCENARIO_STATES.BLUEPRINT, true)) return;
@@ -4538,6 +4770,7 @@ function showScenarioBlueprint() {
         });
     }
 
+    renderScenarioToteMap(scenario);
     renderScenarioPrismWheel();
     showScenarioScreen('blueprint');
 }
@@ -4606,6 +4839,7 @@ function buildScenarioHistoryEntry(note = '') {
     const scenario = scenarioTrainer.activeScenario;
     const option = scenarioTrainer.selectedOption;
     if (!scenario || !option) return null;
+    const analysis = scenarioTrainer.currentPredicateAnalysis || buildScenarioPredicateAnalysis(scenario);
 
     const score = Number(option.score) === 1 ? 1 : 0;
     const bp = scenario.greenBlueprint || {};
@@ -4621,6 +4855,10 @@ function buildScenarioHistoryEntry(note = '') {
         feedback: option.feedback || '',
         score,
         stars: score ? 1 : 0,
+        predicate: analysis.predicate,
+        predicateType: analysis.type,
+        predicateTypeLabel: analysis.typeLabel,
+        normalizedPredicate: analysis.normalizedVerb,
         goalGeneral: bp.goal || '',
         successMetric: bp.doneDefinition || '',
         greenSentence: getScenarioGreenOptionText(scenario),
@@ -4820,6 +5058,8 @@ async function setupScenarioTrainerModule() {
     bindScenarioClick('scenario-start-run-btn', startScenarioRun);
     bindScenarioClick('scenario-show-blueprint-btn', showScenarioBlueprint);
     bindScenarioClick('scenario-copy-green-btn', copyScenarioGreenSentence);
+    bindScenarioClick('scenario-open-box-btn', () => runScenarioProbe('open'));
+    bindScenarioClick('scenario-knife-btn', () => runScenarioProbe('knife'));
     bindScenarioClick('scenario-finish-scene-btn', finishScenarioBlueprint);
     bindScenarioClick('scenario-next-scene-btn', moveToNextScenario);
     bindScenarioClick('scenario-back-home-btn', openScenarioHome);
