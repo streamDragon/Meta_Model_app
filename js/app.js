@@ -611,7 +611,7 @@ const SCREEN_READ_GUIDES = Object.freeze({
     'practice-wizard': Object.freeze({
         logic: 'הדף הזה מאמן גישור בין תחושה למשפט לפני אתגור.',
         goal: 'לבנות מיומנות SQHCEL עקבית עם אישור לפני פריצה.',
-        approach: 'עבוד/י בסדר קבוע: S -> Q -> H -> C -> E/L, וסיים/י במשפט למידה.'
+        approach: 'עבוד/י בסדר קבוע: S -> Q -> H -> C -> PATH -> E/L. הגוף מרגיש "אבסולוטי" לפני שהמילים אמרו "תמיד".'
     }),
     blueprint: Object.freeze({
         logic: 'המסך מפרק משימה עמומה ליעד, צעדים, פער ציפיות ותוכנית ביצוע.',
@@ -8597,7 +8597,7 @@ function setupWrinkleGame() {
         }
         if (els.explainLine) {
             els.explainLine.textContent = state.activeQuantifier
-                ? `זה לא "${scene.anchor}". זה "${state.activeQuantifier}".`
+                ? `זה לא בהכרח "${scene.anchor}". זה "${state.activeQuantifier}".`
                 : 'לחץ/י על כמת אדום כדי לחשוף טוטאליות סמויה.';
         }
 
@@ -8737,6 +8737,7 @@ const WR2W_FLOW_STEPS = Object.freeze([
     Object.freeze({ id: 'Q', label: 'Q כמת-צל', criterion: 'quantifier' }),
     Object.freeze({ id: 'H', label: 'H היפותזה', criterion: 'hypothesis' }),
     Object.freeze({ id: 'C', label: 'C אישור', criterion: 'confirm' }),
+    Object.freeze({ id: 'P', label: 'PATH בחירה', criterion: 'path' }),
     Object.freeze({ id: 'E', label: 'E/L חריג-למידה', criterion: 'exception' })
 ]);
 
@@ -8761,8 +8762,67 @@ const WR2W_CRITERIA_LABELS = Object.freeze({
     quantifier: 'בחירת כמת-צל',
     hypothesis: 'היפותזה עם בעלות+בדיקה',
     confirm: 'אישור לפני אתגור',
+    path: 'בחירת PATH (Agency)',
     exception: 'פריצה + משפט למידה'
 });
+
+const wr2wPathCore = (() => {
+    if (typeof window !== 'undefined' && window.wr2wPathCore) return window.wr2wPathCore;
+    return Object.freeze({
+        createDefaultAnalytics: (seed) => ({
+            pathChoices: {
+                outside: Math.max(0, Math.floor(Number(seed?.pathChoices?.outside) || 0)),
+                inside: Math.max(0, Math.floor(Number(seed?.pathChoices?.inside) || 0)),
+                both: Math.max(0, Math.floor(Number(seed?.pathChoices?.both) || 0))
+            },
+            stuck: {
+                H: Math.max(0, Math.floor(Number(seed?.stuck?.H) || 0)),
+                C: Math.max(0, Math.floor(Number(seed?.stuck?.C) || 0))
+            },
+            recentPaths: Array.isArray(seed?.recentPaths) ? seed.recentPaths.slice(-30) : []
+        }),
+        markStuck: (analytics, step) => {
+            const next = {
+                ...wr2wPathCore.createDefaultAnalytics(analytics),
+                stuck: {
+                    ...wr2wPathCore.createDefaultAnalytics(analytics).stuck
+                }
+            };
+            if (step === 'H' || step === 'C') next.stuck[step] += 1;
+            return next;
+        },
+        recordPathChoice: (analytics, path, sceneId) => {
+            const next = wr2wPathCore.createDefaultAnalytics(analytics);
+            if (path === 'outside' || path === 'inside' || path === 'both') {
+                next.pathChoices[path] += 1;
+                next.recentPaths = [...next.recentPaths, { path, sceneId: String(sceneId || ''), at: Date.now() }].slice(-30);
+            }
+            return next;
+        },
+        canEnterPath: (roundState) => Boolean(roundState?.confirmResolved),
+        canEnterException: (roundState) => Boolean(roundState?.confirmResolved && roundState?.pathChoice),
+        evaluateLearningByPath: (pathChoice, payload) => {
+            const normalized = normalizeText(payload?.singleText || payload?.outsideText || payload?.insideText || '');
+            const hasCondition = /(בעיקר כש|לפעמים|בתנאים|כאשר|כש)/.test(normalized);
+            const avoidsAbsolutes = !WR2W_ABSOLUTE_REGEX.test(normalized);
+            const ok = hasCondition && (pathChoice === 'inside' ? true : avoidsAbsolutes);
+            return {
+                ok,
+                mode: pathChoice,
+                outside: { ok, hasCondition, hasPattern: true, avoidsRigidAbsolute: avoidsAbsolutes },
+                inside: { ok, hasCondition, hasInnerFrame: true },
+                bothComplete: Boolean(payload?.outsideText && payload?.insideText && hasCondition)
+            };
+        },
+        computeRoundScore: ({ criteria, pathChoice, bothLearningComplete }) => {
+            const completed = Object.values(criteria || {}).filter(Boolean).length;
+            const base = (completed * 6) + (completed === 6 ? 8 : 0);
+            const pathPoint = criteria?.path ? 1 : 0;
+            const bothBonus = pathChoice === 'both' && bothLearningComplete ? 1 : 0;
+            return { completed, base, pathPoint, bothBonus, total: base + pathPoint + bothBonus };
+        }
+    });
+})();
 
 const WR2W_DIALOGUE_PACK_URL = 'data/sqhcel-dialogues.json';
 let wr2wDialoguePackPromise = null;
@@ -8859,6 +8919,47 @@ function wr2wHash(value) {
     return Math.abs(hash);
 }
 
+function wr2wResolveCaseSeedMeta(raw, visibleSentence, monologue) {
+    const source = raw && typeof raw === 'object' ? raw : {};
+    const normalizedText = normalizeText(`${visibleSentence || ''} ${monologue || ''}`);
+    const quantifierNatureRaw = String(
+        source.quantifier_nature
+        || source.quantifierNature
+        || ''
+    ).toLowerCase();
+    let quantifierNature = 'mixed';
+    if (['internal_climate', 'external_pattern', 'mixed'].includes(quantifierNatureRaw)) {
+        quantifierNature = quantifierNatureRaw;
+    } else if (/(מרגיש|בפנים|חרדה|לחץ|בושה|כאב|דופק)/.test(normalizedText)) {
+        quantifierNature = 'internal_climate';
+    } else if (/(בעבודה|בבית|בפגישה|בשיחה|מול|ביחסים|כסף|פרויקט)/.test(normalizedText)) {
+        quantifierNature = 'external_pattern';
+    }
+
+    const frequencyRaw = String(
+        source.external_frequency_estimate
+        || source.externalFrequencyEstimate
+        || ''
+    ).toLowerCase();
+    const externalFrequencyEstimate = ['rare', 'sometimes', 'often', 'almost_always'].includes(frequencyRaw)
+        ? frequencyRaw
+        : 'often';
+
+    const intensityRaw = Number(
+        source.internal_intensity_estimate
+        || source.internalIntensityEstimate
+    );
+    const internalIntensityEstimate = Number.isFinite(intensityRaw)
+        ? Math.max(0, Math.min(10, Math.round(intensityRaw)))
+        : ((wr2wHash(normalizedText) % 11));
+
+    return Object.freeze({
+        quantifier_nature: quantifierNature,
+        external_frequency_estimate: externalFrequencyEstimate,
+        internal_intensity_estimate: internalIntensityEstimate
+    });
+}
+
 function wr2wNormalizeScene(raw, idxPrefix = 'wr2w') {
     if (!raw || typeof raw !== 'object') return null;
     const visibleSentence = wr2TrimText(raw.visibleSentence || raw.statement, 170);
@@ -8869,6 +8970,7 @@ function wr2wNormalizeScene(raw, idxPrefix = 'wr2w') {
         .filter(Boolean)
         .slice(0, 4);
     const inferredQuantifiers = quantifiers.length ? quantifiers : wr2InferQuantifiers(visibleSentence);
+    const caseSeedMeta = wr2wResolveCaseSeedMeta(raw, visibleSentence, monologue);
     return {
         id: String(raw.id || `${idxPrefix}_${Date.now()}_${Math.random().toString(16).slice(2, 6)}`),
         source: raw.source === 'self' ? 'self' : 'seed',
@@ -8879,6 +8981,7 @@ function wr2wNormalizeScene(raw, idxPrefix = 'wr2w') {
         exceptionExample: wr2TrimText(raw.exceptionExample || 'היה רגע קצר שזה היה קצת פחות נכון.', 180),
         conditionsLine: wr2TrimText(raw.conditionsLine || 'זה נהיה הכי חזק בתנאים של לחץ/עייפות/חוסר ודאות.', 180),
         transformedSentence: wr2TrimText(raw.transformedSentence || wr2SoftenSentence(visibleSentence), 190),
+        caseSeedMeta,
         createdAt: Number(raw.createdAt) || Date.now()
     };
 }
@@ -8904,6 +9007,7 @@ function wr2wMapDialoguePackEntry(entry, index = 0) {
         .filter(Boolean)
         .slice(0, 4);
     const fallbackCondition = 'זה נהיה הכי חזק בעיקר בעומס, עייפות או חוסר ודאות.';
+    const caseSeedMeta = wr2wResolveCaseSeedMeta(entry, visibleSentence, monologue);
     return {
         id: String(entry.id || `sqhcel_pack_${index + 1}`),
         source: 'seed',
@@ -8916,6 +9020,7 @@ function wr2wMapDialoguePackEntry(entry, index = 0) {
         ) || 'כן, יש רגע שבו זה 5% פחות נכון.',
         conditionsLine: wr2TrimText(entry.conditionsLine || fallbackCondition, 180),
         transformedSentence: wr2TrimText(wr2SoftenSentence(visibleSentence), 190),
+        caseSeedMeta,
         createdAt: Date.now()
     };
 }
@@ -8949,6 +9054,8 @@ function wr2wBuildHypothesisSkeleton(scene, quantifier) {
 const WR2W_OWNERSHIP_REGEX = /(עולה לי|כשאני שומע|אני קולט כאילו|נדמה לי|מרגיש לי)/;
 const WR2W_CHECK_REGEX = /(זה קרוב|או שאני משלים|זה מדויק|זה מתאים|אני מפספס)/;
 const WR2W_ABSOLUTE_REGEX = /(תמיד|אף פעם|בשום|כולם|אין מצב|לגמרי|לעולם)/;
+const WR2W_OUTSIDE_REGEX = /(דפוס|לא עקבי|בפועל|באינטראקציה|ביחסים|גבול|בקשה|פתרון|התנהגות)/;
+const WR2W_INSIDE_REGEX = /(מרגיש|בפנים|בגוף|עוצמה|לחץ|פחד|בושה|דופק|כאב)/;
 
 const wr2wPatientAgent = Object.freeze({
     confirmHypothesis(scene, hypothesisText, selectedQuantifier) {
@@ -8956,6 +9063,7 @@ const wr2wPatientAgent = Object.freeze({
         const hasQuantifier = selectedQuantifier
             ? normalized.includes(normalizeText(selectedQuantifier))
             : false;
+        const meta = scene?.caseSeedMeta || {};
         if (!hasQuantifier) {
             return Object.freeze({
                 status: 'no',
@@ -8973,12 +9081,16 @@ const wr2wPatientAgent = Object.freeze({
         if (profile === 1) {
             return Object.freeze({
                 status: 'partial',
-                text: 'בערך. זה נכון בעיקר במצבים מסוימים, לא תמיד.'
+                text: meta.quantifier_nature === 'external_pattern'
+                    ? 'בערך. זה נראה יותר כמו דפוס חיצוני בתנאים מסוימים, לא תמיד.'
+                    : 'בערך. זה נכון בעיקר במצבים מסוימים, לא תמיד.'
             });
         }
         return Object.freeze({
             status: 'no',
-            text: 'לא לגמרי. זה נשמע יותר עומס רגעי מאשר כלל קבוע.'
+            text: meta.quantifier_nature === 'internal_climate'
+                ? 'לא לגמרי. כרגע זה מרגיש יותר אקלים פנימי חזק מאשר כלל קבוע.'
+                : 'לא לגמרי. זה נשמע יותר עומס רגעי מאשר כלל קבוע.'
         });
     },
     probeException(scene, level) {
@@ -9014,14 +9126,44 @@ const wr2wEvaluatorAgent = Object.freeze({
             hasCheck
         });
     },
-    evaluateLearning(text) {
-        const normalized = normalizeText(text);
-        const hasCondition = /(בעיקר כש|לפעמים|בתנאים|כאשר|כש)/.test(normalized);
-        const avoidsAbsolutes = !WR2W_ABSOLUTE_REGEX.test(normalized);
+    evaluateLearning(pathChoice, payload = {}) {
+        const result = wr2wPathCore.evaluateLearningByPath(pathChoice, payload);
+        if (result?.mode === 'outside') {
+            return Object.freeze({
+                ok: Boolean(result.ok),
+                mode: 'outside',
+                outside: result.outside || {
+                    hasCondition: /(בעיקר כש|לפעמים|בתנאים|כאשר|כש)/.test(normalizeText(payload.singleText || '')),
+                    hasPattern: WR2W_OUTSIDE_REGEX.test(normalizeText(payload.singleText || '')),
+                    avoidsRigidAbsolute: !WR2W_ABSOLUTE_REGEX.test(normalizeText(payload.singleText || ''))
+                        || /זה לא/.test(normalizeText(payload.singleText || ''))
+                }
+            });
+        }
+        if (result?.mode === 'inside') {
+            return Object.freeze({
+                ok: Boolean(result.ok),
+                mode: 'inside',
+                inside: result.inside || {
+                    hasCondition: /(בעיקר כש|לפעמים|בתנאים|כאשר|כש)/.test(normalizeText(payload.singleText || '')),
+                    hasInnerFrame: WR2W_INSIDE_REGEX.test(normalizeText(payload.singleText || ''))
+                }
+            });
+        }
         return Object.freeze({
-            ok: hasCondition && avoidsAbsolutes,
-            hasCondition,
-            avoidsAbsolutes
+            ok: Boolean(result?.ok),
+            mode: 'both',
+            bothComplete: Boolean(result?.bothComplete),
+            outside: result?.outside || {
+                hasCondition: /(בעיקר כש|לפעמים|בתנאים|כאשר|כש)/.test(normalizeText(payload.outsideText || '')),
+                hasPattern: WR2W_OUTSIDE_REGEX.test(normalizeText(payload.outsideText || '')),
+                avoidsRigidAbsolute: !WR2W_ABSOLUTE_REGEX.test(normalizeText(payload.outsideText || ''))
+                    || /זה לא/.test(normalizeText(payload.outsideText || ''))
+            },
+            inside: result?.inside || {
+                hasCondition: /(בעיקר כש|לפעמים|בתנאים|כאשר|כש)/.test(normalizeText(payload.insideText || '')),
+                hasInnerFrame: WR2W_INSIDE_REGEX.test(normalizeText(payload.insideText || ''))
+            }
         });
     }
 });
@@ -9041,16 +9183,19 @@ function setupWrinkleGame() {
             <div class="wr2w-topbar">
                 <h3>SQHCEL Wizard</h3>
                 <div class="wr2w-score">
-                    <span>תהליך: <strong id="wr2w-process-score">0/5</strong></span>
+                    <span>תהליך: <strong id="wr2w-process-score">0/6</strong></span>
                     <span>🔥 רצף: <strong id="wr2w-streak">0</strong></span>
                     <span>⭐ נקודות: <strong id="wr2w-points">0</strong></span>
+                    <span>PATH O/I/B: <strong id="wr2w-path-distribution">0/0/0</strong></span>
+                    <span>תקיעות H/C: <strong id="wr2w-stuck-distribution">0/0</strong></span>
                 </div>
             </div>
 
             <section class="wr2w-principle">
                 <h4>איתות אי-הלימה</h4>
                 <p>כשאני מרגיש חזק יותר ממה שנאמר במשפט - זה איתות לכמת-צל או כלל סמוי. קודם מכיילים, ורק אחר כך מאתגרים.</p>
-                <p class="wr2w-flow">S → Q → H → C → E/L</p>
+                <p>הגוף מרגיש "אבסולוטי" לפני שהמילים אמרו "תמיד".</p>
+                <p class="wr2w-flow">S → Q → H → C → PATH → E/L</p>
             </section>
 
             <section class="wr2w-scene-box">
@@ -9088,6 +9233,8 @@ function setupWrinkleGame() {
         processScore: document.getElementById('wr2w-process-score'),
         streak: document.getElementById('wr2w-streak'),
         points: document.getElementById('wr2w-points'),
+        pathDistribution: document.getElementById('wr2w-path-distribution'),
+        stuckDistribution: document.getElementById('wr2w-stuck-distribution'),
         monologue: document.getElementById('wr2w-monologue'),
         visibleSentence: document.getElementById('wr2w-visible-sentence'),
         stepChips: document.getElementById('wr2w-step-chips'),
@@ -9112,11 +9259,19 @@ function setupWrinkleGame() {
         hypothesisDraft: '',
         hypothesisFinal: '',
         confirmation: null,
+        confirmCorrections: 0,
+        confirmResolved: false,
         breakoutLevel: 0,
         lastProbe: null,
         breakoutFound: false,
+        pathChoice: '',
         learningDraft: '',
         learningFinal: '',
+        learningOutsideDraft: '',
+        learningInsideDraft: '',
+        learningOutsideFinal: '',
+        learningInsideFinal: '',
+        bothLearningComplete: false,
         roundScore: 0,
         completedCount: 0,
         criteria: {
@@ -9124,6 +9279,7 @@ function setupWrinkleGame() {
             quantifier: false,
             hypothesis: false,
             confirm: false,
+            path: false,
             exception: false
         },
         feedback: 'בחר/י תחושה חזקה שמופיעה מעבר למילים.',
@@ -9146,6 +9302,8 @@ function setupWrinkleGame() {
         index: Math.max(0, Math.floor(Number(saved.index) || 0)),
         streak: Math.max(0, Math.floor(Number(saved.streak) || 0)),
         points: Math.max(0, Math.floor(Number(saved.points) || 0)),
+        analytics: wr2wPathCore.createDefaultAnalytics(saved.analytics),
+        lastChosenPath: String(saved.lastChosenPath || saved.chosen_path || ''),
         round: createRoundState()
     };
 
@@ -9177,7 +9335,10 @@ function setupWrinkleGame() {
             index: state.index,
             streak: state.streak,
             points: state.points,
-            customScenes: state.customScenes
+            customScenes: state.customScenes,
+            analytics: state.analytics,
+            lastChosenPath: state.lastChosenPath || state.round.pathChoice || '',
+            chosen_path: state.round.pathChoice || state.lastChosenPath || ''
         }));
     };
 
@@ -9201,13 +9362,20 @@ function setupWrinkleGame() {
     };
 
     const finalizeRound = (scene) => {
-        const completed = wr2wProcessCount(state.round.criteria);
-        const earned = (completed * 6) + (completed === 5 ? 8 : 0);
+        const scoreResult = wr2wPathCore.computeRoundScore({
+            criteria: state.round.criteria,
+            pathChoice: state.round.pathChoice,
+            bothLearningComplete: state.round.bothLearningComplete
+        });
+        const completed = scoreResult.completed;
+        const earned = scoreResult.total;
         state.round.completedCount = completed;
         state.round.roundScore = earned;
         state.points += earned;
+        state.lastChosenPath = state.round.pathChoice || state.lastChosenPath;
+        state.analytics = wr2wPathCore.recordPathChoice(state.analytics, state.round.pathChoice, scene?.id);
 
-        if (completed === 5) {
+        if (completed === 6) {
             state.streak += 1;
             playUISound('correct');
             if (state.streak > 0 && state.streak % 3 === 0) {
@@ -9221,7 +9389,11 @@ function setupWrinkleGame() {
 
         addXP(Math.max(4, completed * 2));
         state.round.step = 'DONE';
-        setFeedback(`סיכום סבב: ${completed}/5 קריטריונים, +${earned} נקודות.`, 'success');
+        const bonusText = [
+            scoreResult.pathPoint ? '+1 PATH' : '',
+            scoreResult.bothBonus ? '+1 BOTH' : ''
+        ].filter(Boolean).join(' | ');
+        setFeedback(`סיכום סבב: ${completed}/6 קריטריונים, +${earned} נקודות${bonusText ? ` (${bonusText})` : ''}.`, 'success');
         persist();
 
         if (!state.round.learningFinal && scene?.transformedSentence) {
@@ -9285,6 +9457,8 @@ function setupWrinkleGame() {
         }
         if (step === 'C') {
             const confirmation = state.round.confirmation;
+            const canEnterPath = wr2wPathCore.canEnterPath(state.round);
+            const correctionsLeft = Math.max(0, 2 - Number(state.round.confirmCorrections || 0));
             return `
                 <div class="wr2w-quote-box">
                     <strong>היפותזה שנשלחת:</strong>
@@ -9295,14 +9469,52 @@ function setupWrinkleGame() {
                         <strong>מטופל:</strong>
                         <p>${escapeHtml(confirmation.text)}</p>
                     </div>
-                    <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-e">המשך לשלב E/L</button>
+                    ${canEnterPath ? `
+                        <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-path">המשך לשלב PATH</button>
+                    ` : `
+                        <p class="wr2w-template-note">נותרו עד ${correctionsLeft} תיקונים לפני מעבר PATH.</p>
+                        <button type="button" class="btn btn-secondary wr2w-main-btn" data-action="revise-hypothesis">חזור/י ל-H לתיקון</button>
+                    `}
                 ` : `
                     <button type="button" class="btn btn-primary wr2w-main-btn" data-action="send-hypothesis">שלח היפותזה למטופל</button>
                 `}
             `;
         }
-        if (step === 'E') {
+        if (step === 'P') {
+            const selected = state.round.pathChoice || '';
             return `
+                <p class="wr2w-path-explain">
+                    Sometimes "always" is an internal climate; sometimes it’s an external pattern (e.g., 97/100); sometimes both.
+                    Choose where to invest your power now.
+                </p>
+                <div class="wr2w-path-grid">
+                    <button type="button" class="wr2w-path-btn${selected === 'outside' ? ' is-selected' : ''}" data-action="select-path" data-path="outside">
+                        <strong>Outside</strong>
+                        <small>גבול / בקשה / פתרון</small>
+                    </button>
+                    <button type="button" class="wr2w-path-btn${selected === 'inside' ? ' is-selected' : ''}" data-action="select-path" data-path="inside">
+                        <strong>Inside</strong>
+                        <small>וויסות / טריגר / גוף</small>
+                    </button>
+                    <button type="button" class="wr2w-path-btn${selected === 'both' ? ' is-selected' : ''}" data-action="select-path" data-path="both">
+                        <strong>Both</strong>
+                        <small>צעד קטן בחוץ + צעד קטן בפנים</small>
+                    </button>
+                </div>
+                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-e" ${selected ? '' : 'disabled'}>המשך לשלב E/L</button>
+            `;
+        }
+        if (step === 'E') {
+            const pathChoice = state.round.pathChoice || '';
+            const pathLabel = pathChoice === 'outside'
+                ? 'Outside'
+                : pathChoice === 'inside'
+                    ? 'Inside'
+                    : pathChoice === 'both'
+                        ? 'Both'
+                        : 'לא נבחר';
+            return `
+                <p class="wr2w-template-note">PATH נבחר: <strong>${escapeHtml(pathLabel)}</strong></p>
                 <div class="wr2w-ladder">
                     ${WR2W_BREAKOUT_STEPS.map((item) => `
                         <button type="button" class="wr2w-ladder-btn${state.round.breakoutLevel === item.id ? ' is-selected' : ''}" data-action="set-breakout-level" data-level="${item.id}">
@@ -9321,8 +9533,19 @@ function setupWrinkleGame() {
                 ` : ''}
 
                 ${state.round.breakoutFound ? `
-                    <p class="wr2w-template-note">נסחו משפט למידה: "זה לא תמיד, זה בעיקר כש___".</p>
-                    <textarea id="wr2w-learning-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningDraft)}</textarea>
+                    ${pathChoice === 'outside' ? `
+                        <p class="wr2w-template-note">Outside: עברו מ"גורל" ל"דפוס פונקציונלי + תנאים". תבנית: "זה לא 'אף פעם', זה 'לא עקבי' — בעיקר כש___".</p>
+                        <textarea id="wr2w-learning-outside-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningOutsideDraft || state.round.learningDraft)}</textarea>
+                    ` : pathChoice === 'inside' ? `
+                        <p class="wr2w-template-note">Inside: שמרו את השפה החווייתית והפכו לאבסולוטי-מותנה. תבנית: "זה מרגיש 'תמיד' — בעיקר כש___".</p>
+                        <textarea id="wr2w-learning-inside-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningInsideDraft || state.round.learningDraft)}</textarea>
+                    ` : `
+                        <p class="wr2w-template-note">Both: נדרשים שני משפטים קצרים - אחד Outside ואחד Inside.</p>
+                        <label class="wr2w-learning-label" for="wr2w-learning-outside-input">Outside (דפוס/תנאים)</label>
+                        <textarea id="wr2w-learning-outside-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningOutsideDraft)}</textarea>
+                        <label class="wr2w-learning-label" for="wr2w-learning-inside-input">Inside (חוויה/תנאים)</label>
+                        <textarea id="wr2w-learning-inside-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningInsideDraft)}</textarea>
+                    `}
                     <button type="button" class="btn btn-primary wr2w-main-btn" data-action="finish-round">סיים סבב</button>
                 ` : ''}
             `;
@@ -9335,8 +9558,12 @@ function setupWrinkleGame() {
         `).join('');
         return `
             <div class="wr2w-done-box">
-                <p><strong>ניקוד סבב:</strong> +${state.round.roundScore} | <strong>תהליך:</strong> ${state.round.completedCount}/5</p>
+                <p><strong>ניקוד סבב:</strong> +${state.round.roundScore} | <strong>תהליך:</strong> ${state.round.completedCount}/6</p>
                 <p><strong>משפט למידה:</strong> ${escapeHtml(state.round.learningFinal || scene.transformedSentence)}</p>
+                ${state.round.pathChoice === 'both' ? `
+                    <p><strong>Outside:</strong> ${escapeHtml(state.round.learningOutsideFinal || state.round.learningOutsideDraft || '---')}</p>
+                    <p><strong>Inside:</strong> ${escapeHtml(state.round.learningInsideFinal || state.round.learningInsideDraft || '---')}</p>
+                ` : ''}
                 <ul class="wr2w-criteria-list">${items}</ul>
                 <button type="button" class="btn btn-primary wr2w-main-btn" data-action="next-scene-inline">מעבר למשפט הבא</button>
             </div>
@@ -9351,9 +9578,17 @@ function setupWrinkleGame() {
         }
 
         const processCount = wr2wProcessCount(state.round.criteria);
-        if (els.processScore) els.processScore.textContent = `${processCount}/5`;
+        if (els.processScore) els.processScore.textContent = `${processCount}/6`;
         if (els.streak) els.streak.textContent = String(state.streak);
         if (els.points) els.points.textContent = String(state.points);
+        if (els.pathDistribution) {
+            const pathChoices = state.analytics?.pathChoices || {};
+            els.pathDistribution.textContent = `${pathChoices.outside || 0}/${pathChoices.inside || 0}/${pathChoices.both || 0}`;
+        }
+        if (els.stuckDistribution) {
+            const stuck = state.analytics?.stuck || {};
+            els.stuckDistribution.textContent = `${stuck.H || 0}/${stuck.C || 0}`;
+        }
         if (els.monologue) els.monologue.textContent = scene.monologue;
         if (els.visibleSentence) els.visibleSentence.textContent = scene.visibleSentence;
 
@@ -9374,9 +9609,13 @@ function setupWrinkleGame() {
                 title: 'C | Calibration Before Challenge',
                 instruction: 'לא מערערים עדיין. קודם שולחים את ההיפותזה ומבקשים אישור/תיקון מהמטופל.'
             },
+            P: {
+                title: 'PATH | Choice / Agency',
+                instruction: 'אחרי אישור C בוחרים איפה להשקיע כוח עכשיו: Outside / Inside / Both.'
+            },
             E: {
                 title: 'E/L | חריג + למידה',
-                instruction: 'אם אין חריג, עולים בסולם: 5% → 1% → תנאים. מסיימים במשפט למידה מותנה.'
+                instruction: 'אם אין חריג, עולים בסולם: 5% → 1% → תנאים. הניסוח תלוי PATH שנבחר.'
             },
             DONE: {
                 title: 'סיכום סבב',
@@ -9501,6 +9740,7 @@ function setupWrinkleGame() {
             }
             const evalResult = wr2wEvaluatorAgent.evaluateHypothesis(draft, state.round.selectedQuantifier);
             if (!evalResult.ok) {
+                state.analytics = wr2wPathCore.markStuck(state.analytics, 'H');
                 const missing = [];
                 if (!evalResult.hasOwnership) missing.push('בעלות (למשל: "עולה לי...")');
                 if (!evalResult.hasQuantifier) missing.push('הכמת שנבחר');
@@ -9510,6 +9750,8 @@ function setupWrinkleGame() {
                 return;
             }
             state.round.hypothesisFinal = draft;
+            state.round.confirmation = null;
+            state.round.confirmResolved = false;
             markCriterion('hypothesis');
             state.round.step = 'C';
             setFeedback('מעולה. עכשיו שולחים למטופל לקבל אישור/תיקון.', 'success');
@@ -9527,24 +9769,83 @@ function setupWrinkleGame() {
                 state.round.hypothesisFinal,
                 state.round.selectedQuantifier
             );
-            markCriterion('confirm');
-            const tone = state.round.confirmation.status === 'yes'
+            const status = state.round.confirmation.status;
+            const tone = status === 'yes'
                 ? 'success'
-                : state.round.confirmation.status === 'partial'
+                : status === 'partial'
                     ? 'info'
                     : 'warn';
-            setFeedback('התקבל אישור/תיקון. אפשר להתקדם ל-E/L.', tone);
+            if (status === 'yes') {
+                state.round.confirmResolved = true;
+                markCriterion('confirm');
+                setFeedback('התקבל אישור. אפשר להתקדם ל-PATH.', tone);
+            } else {
+                state.analytics = wr2wPathCore.markStuck(state.analytics, 'C');
+                if (state.round.confirmCorrections < 2) {
+                    state.round.confirmCorrections += 1;
+                    if (state.round.confirmCorrections >= 2) {
+                        state.round.confirmResolved = true;
+                        markCriterion('confirm');
+                        setFeedback('הושלמו 2 תיקוני C. ממשיכים ל-PATH עם כיול זהיר.', 'info');
+                        render();
+                        return;
+                    }
+                    state.round.confirmResolved = false;
+                    const left = Math.max(0, 2 - state.round.confirmCorrections);
+                    setFeedback(`התקבל תיקון. חזור/י ל-H לשיפור (נותרו ${left} תיקונים לפני PATH).`, tone);
+                } else {
+                    state.round.confirmResolved = true;
+                    markCriterion('confirm');
+                    setFeedback('לאחר 2 תיקונים ממשיכים עם כיול חלקי. אפשר להתקדם ל-PATH.', 'info');
+                }
+            }
+            render();
+            return;
+        }
+        if (action === 'revise-hypothesis') {
+            state.round.step = 'H';
+            setFeedback('חזרה ל-H לתיקון ההיפותזה לפני PATH.', 'info');
+            render();
+            return;
+        }
+        if (action === 'goto-path') {
+            if (!wr2wPathCore.canEnterPath(state.round)) {
+                setFeedback('אי אפשר להיכנס ל-PATH לפני אישור C (עם עד 2 תיקונים).', 'warn');
+                render();
+                return;
+            }
+            state.round.step = 'P';
+            setFeedback('בחר/י PATH: Outside / Inside / Both.', 'info');
+            render();
+            return;
+        }
+        if (action === 'select-path') {
+            const pathChoice = String(button.getAttribute('data-path') || '').toLowerCase();
+            if (!['outside', 'inside', 'both'].includes(pathChoice)) return;
+            state.round.pathChoice = pathChoice;
+            markCriterion('path');
+            setFeedback(`נבחר PATH: ${pathChoice}.`, 'success');
             render();
             return;
         }
         if (action === 'goto-e') {
+            if (!wr2wPathCore.canEnterPath(state.round)) {
+                setFeedback('אי אפשר להיכנס ל-E/L לפני אישור C.', 'warn');
+                render();
+                return;
+            }
+            if (!wr2wPathCore.canEnterException(state.round)) {
+                setFeedback('בחר/י קודם PATH לפני המעבר ל-E/L.', 'warn');
+                render();
+                return;
+            }
             if (!state.round.confirmation) {
                 setFeedback('שלח/י קודם היפותזה למטופל.', 'warn');
                 render();
                 return;
             }
             state.round.step = 'E';
-            setFeedback('אם אין חריג - עוברים מדרגה בסולם הפריצה.', 'info');
+            setFeedback('אם אין חריג - עוברים מדרגה בסולם הפריצה. נסח/י למידה לפי PATH שנבחר.', 'info');
             render();
             return;
         }
@@ -9569,22 +9870,58 @@ function setupWrinkleGame() {
             return;
         }
         if (action === 'finish-round') {
-            const learning = String(state.round.learningDraft || '').trim();
-            if (learning.length < 12) {
+            const pathChoice = String(state.round.pathChoice || '').toLowerCase();
+            const singleText = pathChoice === 'outside'
+                ? String(state.round.learningOutsideDraft || state.round.learningDraft || '').trim()
+                : String(state.round.learningInsideDraft || state.round.learningDraft || '').trim();
+            const outsideText = String(state.round.learningOutsideDraft || '').trim();
+            const insideText = String(state.round.learningInsideDraft || '').trim();
+
+            if (pathChoice === 'both' && (!outsideText || !insideText)) {
+                setFeedback('בנתיב BOTH נדרשים שני משפטי למידה: Outside + Inside.', 'warn');
+                render();
+                return;
+            }
+            if ((pathChoice === 'outside' || pathChoice === 'inside') && singleText.length < 12) {
                 setFeedback('נדרש משפט למידה מלא יותר.', 'warn');
                 render();
                 return;
             }
-            const learningEval = wr2wEvaluatorAgent.evaluateLearning(learning);
+
+            const learningEval = wr2wEvaluatorAgent.evaluateLearning(pathChoice, {
+                singleText,
+                outsideText,
+                insideText
+            });
             if (!learningEval.ok) {
                 const reasons = [];
-                if (!learningEval.hasCondition) reasons.push('הוסף/י תנאי (בעיקר כש/לפעמים כש/בתנאים).');
-                if (!learningEval.avoidsAbsolutes) reasons.push('הסר/י ניסוח טוטאלי (תמיד/אף פעם/כולם...).');
+                if (learningEval.mode === 'outside') {
+                    if (!learningEval.outside?.hasCondition) reasons.push('Outside: הוסף/י תנאי (בעיקר כש/לפעמים כש/בתנאים).');
+                    if (!learningEval.outside?.hasPattern) reasons.push('Outside: נסח/י דפוס פונקציונלי (למשל "לא עקבי").');
+                    if (!learningEval.outside?.avoidsRigidAbsolute) reasons.push('Outside: החלף/י ניסוח אבסולוטי בניסוח מותנה.');
+                } else if (learningEval.mode === 'inside') {
+                    if (!learningEval.inside?.hasCondition) reasons.push('Inside: הוסף/י תנאי (בעיקר כש/לפעמים כש/בתנאים).');
+                    if (!learningEval.inside?.hasInnerFrame) reasons.push('Inside: שמור/י על מסגור חווייתי ("מרגיש/בפנים/בגוף").');
+                } else {
+                    if (!learningEval.outside?.ok) reasons.push('Outside אינו שלם עדיין (דפוס + תנאים).');
+                    if (!learningEval.inside?.ok) reasons.push('Inside אינו שלם עדיין (חוויה + תנאים).');
+                }
                 setFeedback(reasons.join(' '), 'warn');
                 render();
                 return;
             }
-            state.round.learningFinal = learning;
+            if (pathChoice === 'outside') {
+                state.round.learningOutsideFinal = singleText;
+                state.round.learningFinal = singleText;
+            } else if (pathChoice === 'inside') {
+                state.round.learningInsideFinal = singleText;
+                state.round.learningFinal = singleText;
+            } else {
+                state.round.learningOutsideFinal = outsideText;
+                state.round.learningInsideFinal = insideText;
+                state.round.bothLearningComplete = true;
+                state.round.learningFinal = `Outside: ${outsideText} | Inside: ${insideText}`;
+            }
             markCriterion('exception');
             finalizeRound(scene);
             render();
@@ -9602,6 +9939,10 @@ function setupWrinkleGame() {
             state.round.hypothesisDraft = String(target.value || '');
         } else if (target.id === 'wr2w-learning-input') {
             state.round.learningDraft = String(target.value || '');
+        } else if (target.id === 'wr2w-learning-outside-input') {
+            state.round.learningOutsideDraft = String(target.value || '');
+        } else if (target.id === 'wr2w-learning-inside-input') {
+            state.round.learningInsideDraft = String(target.value || '');
         }
     });
 

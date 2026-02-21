@@ -8,12 +8,13 @@ Train the user to bridge mismatch between a short sentence and an implicit rule 
 
 Flow:
 
-`S -> Q -> H -> C -> E/L`
+`S -> Q -> H -> C -> PATH -> E/L`
 
 - `S`: sensation signal
 - `Q`: shadow quantifier
 - `H`: hypothesis mirror (ownership + quantifier + check)
 - `C`: calibration/confirmation
+- `PATH`: choose agency focus (`outside` / `inside` / `both`)
 - `E/L`: exception ladder + learning sentence
 
 ## Components
@@ -34,6 +35,12 @@ Inputs:
 Output schema:
 
 - `docs/schemas/shadow-quantifier-case-seed.schema.json`
+
+Optional hidden consistency fields:
+
+- `quantifier_nature`: `internal_climate | external_pattern | mixed`
+- `external_frequency_estimate`: `rare | sometimes | often | almost_always`
+- `internal_intensity_estimate`: `0-10`
 
 System prompt (copy/paste):
 

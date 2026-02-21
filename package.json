@@ -1,6 +1,6 @@
 {
   "name": "meta_model_app",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "׳›׳׳™ ׳׳™׳ ׳˜׳¨׳ ׳˜ ׳׳™׳ ׳˜׳¨׳׳§׳˜׳™׳‘׳™ ׳׳×׳¨׳’׳•׳ ׳˜׳›׳ ׳™׳§׳•׳× **Meta Model** ׳©׳ NLP (Neuro-Linguistic Programming) ׳¢׳ ׳₪׳™ Richard Bandler ׳•-John Grinder.",
   "main": "index.js",
   "directories": {
@@ -10,6 +10,7 @@
     "dev": "vite",
     "build:web": "vite build",
     "build": "vite build && node scripts/prepare-dist.mjs",
+    "test:wr2w": "node --test scripts/wr2w-path-core.test.cjs",
     "test:mobile": "node scripts/test-mobile-layout.mjs",
     "preview": "vite preview",
     "cap:sync": "npx cap sync",
