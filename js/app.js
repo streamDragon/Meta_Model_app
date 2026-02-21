@@ -9096,6 +9096,42 @@ function wr2wBuildHypothesisSkeleton(scene, quantifier) {
     return `כשאת/ה אומר/ת "${scene.visibleSentence}", עולה לי כאילו יש כאן "${q}" לגבי ___. זה קרוב למה שאתה מתכוון, או שאני משלים?`;
 }
 
+function wr2wExtractConditionHint(scene, roundState = {}) {
+    const samples = [
+        roundState?.lastProbe?.text,
+        scene?.conditionsLine,
+        scene?.exceptionExample,
+        scene?.monologue
+    ];
+    for (let i = 0; i < samples.length; i += 1) {
+        const text = wr2wSanitizeText(samples[i] || '').replace(/\s+/g, ' ').trim();
+        if (!text) continue;
+        const match = text.match(/(?:בעיקר\s+כש|כש|כאשר)\s*([^.,;!?]+)/);
+        if (match && match[1]) {
+            const cleaned = match[1].replace(/["']/g, '').trim();
+            if (cleaned) return cleaned;
+        }
+    }
+    return 'יש עומס, עייפות או חוסר ודאות';
+}
+
+function wr2wComposeAutoLearning(pathChoice, scene, roundState = {}) {
+    const choice = String(pathChoice || '').toLowerCase();
+    const quantifier = wr2wSanitizeText(roundState?.selectedQuantifier || 'תמיד');
+    const conditionCore = wr2wExtractConditionHint(scene, roundState);
+    const conditionClause = conditionCore.startsWith('כש') ? conditionCore : `כש${conditionCore}`;
+    const outsideText = wr2wSanitizeText(`זה לא בהכרח "${quantifier}", זה דפוס לא עקבי — בעיקר ${conditionClause}.`);
+    const insideText = wr2wSanitizeText(`זה מרגיש "${quantifier}" — בעיקר ${conditionClause}.`);
+
+    if (choice === 'outside') {
+        return Object.freeze({ singleText: outsideText, outsideText, insideText: '' });
+    }
+    if (choice === 'inside') {
+        return Object.freeze({ singleText: insideText, outsideText: '', insideText });
+    }
+    return Object.freeze({ singleText: '', outsideText, insideText });
+}
+
 const WR2W_OWNERSHIP_REGEX = /(עולה לי|כשאני שומע|אני קולט כאילו|נדמה לי|מרגיש לי)/;
 const WR2W_CHECK_REGEX = /(זה קרוב|או שאני משלים|זה מדויק|זה מתאים|אני מפספס)/;
 const WR2W_ABSOLUTE_REGEX = /(תמיד|אף פעם|בשום|כולם|אין מצב|לגמרי|לעולם)/;
@@ -9262,10 +9298,11 @@ function setupWrinkleGame() {
             </section>
 
             <section class="wr2w-scene-box">
-                <p class="wr2w-kicker">מונולוג</p>
+                <p class="wr2w-kicker">מונולוג (ההקשר הרחב)</p>
                 <p id="wr2w-monologue" class="wr2w-monologue"></p>
-                <p class="wr2w-kicker">משפט גלוי</p>
+                <p class="wr2w-kicker">משפט גלוי (שורת הסיכום מהמונולוג)</p>
                 <p id="wr2w-visible-sentence" class="wr2w-visible-sentence"></p>
+                <p class="wr2w-template-note">קשר ביניהם: המונולוג מציג את הסיפור והנסיבות, והמשפט הגלוי הוא הקיצור הלשוני שעליו עובדים ב-SQHCEL.</p>
             </section>
 
             <div id="wr2w-step-chips" class="wr2w-step-chips"></div>
@@ -9423,6 +9460,36 @@ function setupWrinkleGame() {
         if (scene) {
             state.round.hypothesisDraft = wr2wBuildHypothesisSkeleton(scene, '___');
         }
+    };
+
+    const applyAutoLearningDrafts = (scene, force = false) => {
+        const pathChoice = String(state.round.pathChoice || '').toLowerCase();
+        if (!scene || !['outside', 'inside', 'both'].includes(pathChoice)) return false;
+
+        const generated = wr2wComposeAutoLearning(pathChoice, scene, state.round);
+        if (pathChoice === 'outside') {
+            const hasDraft = String(state.round.learningOutsideDraft || state.round.learningDraft || '').trim().length > 0;
+            if (hasDraft && !force) return false;
+            state.round.learningOutsideDraft = generated.outsideText;
+            state.round.learningDraft = generated.outsideText;
+            return true;
+        }
+        if (pathChoice === 'inside') {
+            const hasDraft = String(state.round.learningInsideDraft || state.round.learningDraft || '').trim().length > 0;
+            if (hasDraft && !force) return false;
+            state.round.learningInsideDraft = generated.insideText;
+            state.round.learningDraft = generated.insideText;
+            return true;
+        }
+
+        const hasBothDrafts = Boolean(
+            String(state.round.learningOutsideDraft || '').trim()
+            && String(state.round.learningInsideDraft || '').trim()
+        );
+        if (hasBothDrafts && !force) return false;
+        state.round.learningOutsideDraft = generated.outsideText;
+        state.round.learningInsideDraft = generated.insideText;
+        return true;
     };
 
     const finalizeRound = (scene) => {
@@ -9597,6 +9664,8 @@ function setupWrinkleGame() {
                 ` : ''}
 
                 ${state.round.breakoutFound ? `
+                    <button type="button" class="btn btn-secondary wr2w-main-btn" data-action="autofill-learning">צור ניסוח אוטומטי מהתשאול</button>
+                    <p class="wr2w-template-note">המערכת מסכמת אוטומטית לפי מה שעלה בתשאול. אפשר לערוך ידנית אם רוצים דיוק נוסף.</p>
                     ${pathChoice === 'outside' ? `
                         <p class="wr2w-template-note">Outside: עברו מ"גורל" ל"דפוס פונקציונלי + תנאים". תבנית: "זה לא 'אף פעם', זה 'לא עקבי' — בעיקר כש___".</p>
                         <textarea id="wr2w-learning-outside-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningOutsideDraft || state.round.learningDraft)}</textarea>
@@ -9679,7 +9748,7 @@ function setupWrinkleGame() {
             },
             E: {
                 title: 'E/L | חריג + למידה',
-                instruction: 'אם אין חריג, עולים בסולם: 5% → 1% → תנאים. הניסוח תלוי PATH שנבחר.'
+                instruction: 'אם אין חריג, עולים בסולם: 5% → 1% → תנאים. אפשר לייצר ניסוח אוטומטי לפי PATH ואז רק לאשר/לדייק.'
             },
             DONE: {
                 title: 'סיכום סבב',
@@ -9919,16 +9988,44 @@ function setupWrinkleGame() {
             render();
             return;
         }
+        if (action === 'autofill-learning') {
+            if (!state.round.breakoutFound) {
+                setFeedback('קודם מצאו חריג/תנאי ואז אפשר ליצור ניסוח אוטומטי.', 'warn');
+                render();
+                return;
+            }
+            const didGenerate = applyAutoLearningDrafts(scene, true);
+            setFeedback(
+                didGenerate
+                    ? 'נוצר ניסוח למידה אוטומטי. אפשר לערוך או לסיים סבב.'
+                    : 'לא נוצר ניסוח חדש - בדקו שבחרתם PATH.',
+                'info'
+            );
+            render();
+            return;
+        }
         if (action === 'send-breakout') {
             state.round.lastProbe = wr2wPatientAgent.probeException(scene, state.round.breakoutLevel);
             if (state.round.lastProbe.found) {
                 state.round.breakoutFound = true;
-                setFeedback('נמצא חריג/תנאי. עכשיו מנסחים משפט למידה.', 'success');
+                const autoBuilt = applyAutoLearningDrafts(scene, false);
+                setFeedback(
+                    autoBuilt
+                        ? 'נמצא חריג/תנאי ונבנה ניסוח למידה אוטומטי. אפשר לערוך או לסיים.'
+                        : 'נמצא חריג/תנאי. אפשר ליצור ניסוח אוטומטי או לערוך ידנית.',
+                    'success'
+                );
             } else if (state.round.breakoutLevel < 3) {
                 setFeedback('עוד לא נמצא חריג. עבור/י למדרגה הבאה בסולם.', 'warn');
             } else {
-                setFeedback('גם בלי חריג חד - נסח/י תנאים שבהם זה הכי חזק.', 'warn');
                 state.round.breakoutFound = true;
+                const autoBuilt = applyAutoLearningDrafts(scene, false);
+                setFeedback(
+                    autoBuilt
+                        ? 'לא נמצא חריג חד, אבל נבנה ניסוח אוטומטי מתנאי החוזק.'
+                        : 'לא נמצא חריג חד. אפשר ליצור ניסוח אוטומטי מתנאי החוזק.',
+                    'warn'
+                );
             }
             render();
             return;
