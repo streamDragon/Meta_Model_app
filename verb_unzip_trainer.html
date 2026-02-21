@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>פועל לא מפורט — משחק הפירוק</title>
+  <style>
+    :root{--bg:#f3f7fb;--card:#fff;--line:#d6e2ef;--txt:#173049;--muted:#56738f;--blue:#1f6feb;--green:#1f9d57;--red:#c53232;--yellow:#ffef99}
+    *{box-sizing:border-box} body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#f9fbff,#edf4fb);color:var(--txt)}
+    .app{max-width:1880px;margin:0 auto;padding:14px} .top{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:linear-gradient(90deg,#0f6ecf,#1ca7d4);color:#fff;padding:12px 14px;border-radius:14px}
+    .top h1{margin:0;font-size:clamp(1.1rem,2vw,1.45rem)} .ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    select,button{font:inherit;border-radius:10px;padding:8px 10px;border:1px solid #9ec0df} button{cursor:pointer;font-weight:700}
+    .primary{background:var(--blue);color:#fff;border-color:transparent} .secondary{background:#fff;color:#234}
+    .layout{margin-top:12px;display:grid;grid-template-columns:1.08fr 1.85fr 1.08fr;gap:12px;align-items:start}
+    .col{display:grid;gap:12px} .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:0 8px 20px rgba(20,50,88,.08)}
+    .card h2{margin:0 0 10px;font-size:1rem}
+    .qwrap{display:grid;gap:7px;max-height:70vh;overflow:auto;padding-inline-end:4px}
+    .qbtn{width:100%;text-align:right;background:#f7fbff;border:1px solid #b8cee3;color:#16476f;font-weight:700;padding:9px}
+    .qbtn small{display:block;font-size:.73rem;color:#567} .qbtn.used{background:#e9f1fb;color:#345}
+    .log{list-style:none;margin:0;padding:0;display:grid;gap:8px;max-height:200px;overflow:auto}
+    .log li{border:1px dashed #c5d7e8;border-radius:10px;background:#fbfdff;padding:8px;font-size:.88rem}
+    .log li.coach{background:#edf9f2;border-color:#b8e2c9;color:#15603a;font-weight:700}
+    .lines{display:grid;gap:8px} .line{border:1px solid #d2dfeb;background:#f8fcff;border-radius:10px;padding:9px;line-height:1.45}
+    .line.focus{border:2px solid #ffbf47;background:#fffdf3} .verb{background:var(--yellow);padding:0 4px;border-radius:6px;font-weight:800}
+    .badge{display:inline-flex;gap:8px;align-items:center;margin-top:9px;padding:8px 10px;border:1px solid #f2c147;background:#fff9df;border-radius:10px;color:#6d5400;font-weight:800;cursor:help}
+    .legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;font-size:.77rem;color:#365a7d}
+    .legend span{border:1px solid #b8cee3;background:#f3f8ff;border-radius:999px;padding:2px 8px}
+    .board{position:relative;min-height:640px;border:2px dashed #c8d9ea;border-radius:20px;background:radial-gradient(circle at 50% 50%,#fff,#f4f9ff)}
+    .center{position:absolute;right:50%;top:50%;transform:translate(50%,-50%);width:165px;height:165px;border-radius:50%;border:4px solid #0f6ecf;background:#eef6ff;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:800;z-index:2;padding:12px}
+    .slot{position:absolute;width:180px;min-height:92px;transform:translate(50%,-50%);border:2px dashed #9fbad5;border-radius:12px;padding:7px;background:#fcfeff;transition:.15s;z-index:1}
+    .slot[data-group="context"]{background:#fff8ed}.slot[data-group="steps"]{background:#eefcf2}.slot[data-group="goal"]{background:#eef6ff}.slot[data-group="done"]{background:#f7f0ff}.slot[data-group="obstacles"]{background:#fff2f6}
+    .slot.dragover{border-color:var(--blue);background:#e8f1ff;transform:translate(50%,-50%) scale(1.02)} .slot.shake{animation:shake .35s linear;border-color:var(--red)}
+    .stitle{font-size:.75rem;font-weight:800}.shelp{font-size:.67rem;color:#567;margin:3px 0 6px}.placeholder{border:1px dashed #b8cee3;border-radius:8px;font-size:.74rem;text-align:center;padding:7px;color:#5a7a99}
+    .block{border:1px solid #8fb6da;border-radius:10px;padding:8px;background:#edf5ff;color:#153f66;font-size:.84rem;line-height:1.35;box-shadow:0 4px 10px rgba(39,88,137,.15)} .block[draggable="true"]{cursor:grab}
+    .block .meta{display:block;font-size:.69rem;color:#456b8e;font-weight:700;margin-bottom:4px} .block.locked{background:#e7f8ee;border-color:#79c89c;color:#12482b;box-shadow:none}
+    .staging{min-height:220px;border:2px dashed #b6cade;border-radius:12px;background:#f8fbff;padding:10px;display:grid;gap:8px;align-content:start;max-height:52vh;overflow:auto}
+    .empty{border:1px dashed #c5d6e6;border-radius:10px;background:#fdfeff;padding:12px;text-align:center;font-size:.84rem;color:#607d98}
+    .feedback{border:1px solid #c7d8e9;border-radius:12px;background:#f8fcff;min-height:72px;padding:10px;font-size:.92rem;display:grid;align-items:center}
+    .feedback.ok{border-color:#96d4b1;background:#e8f7ef;color:#155a35}.feedback.err{border-color:#f2a8ad;background:#fdecee;color:#7f1f27}
+    .mistakes{font-weight:800;color:#6a2a2a;margin-top:10px}
+    .expand{border:1px solid #c6d8ea;border-radius:12px;background:#f7fbff;padding:10px;max-height:290px;overflow:auto;display:grid;gap:6px}
+    .expand .base{border-inline-start:4px solid #8eb7dd;padding-inline-start:8px;background:#f3f8ff;border-radius:8px}.eitem{border-inline-start:3px solid #54a5ec;padding-inline-start:8px;background:#fff;border-radius:8px}
+    .x{position:absolute;top:-14px;inset-inline-start:-12px;width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;box-shadow:0 8px 16px rgba(204,47,47,.3)}
+    .backdrop{position:fixed;inset:0;background:rgba(8,24,41,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:40}.backdrop.open{display:flex}
+    .modal{width:min(860px,100%);max-height:92vh;overflow:auto;background:#fff;border:1px solid #c8d7e8;border-radius:16px;padding:16px;box-shadow:0 24px 40px rgba(9,35,66,.35)}
+    .sum{border:1px solid #d5e1ee;border-radius:10px;background:#f9fcff;padding:10px;margin:0 0 10px}.sum h4{margin:0 0 7px;font-size:.95rem}
+    .sum ul{margin:0;padding-inline-start:18px;display:grid;gap:5px}.actions{display:flex;gap:8px;flex-wrap:wrap}
+    @keyframes shake{0%{transform:translate(50%,-50%) translateX(0)}25%{transform:translate(50%,-50%) translateX(-3px)}50%{transform:translate(50%,-50%) translateX(3px)}75%{transform:translate(50%,-50%) translateX(-2px)}100%{transform:translate(50%,-50%) translateX(0)}}
+    @media (max-width:1450px){.layout{grid-template-columns:1fr}.board{min-height:740px}.slot{width:160px}}
+    @media (max-width:900px){.top{grid-template-columns:1fr}select{min-width:180px}.board{min-height:860px}.slot{width:144px;min-height:84px;padding:6px}.stitle{font-size:.7rem}.shelp{font-size:.63rem}.block{font-size:.78rem}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <h1>פועל לא מפורט — משחק הפירוק</h1>
+      <div class="ctrl">
+        <label for="caseSelect">בחר קייס:</label>
+        <select id="caseSelect" aria-label="בחירת קייס"></select>
+        <button id="startBtn" class="primary" type="button">התחל תרגיל</button>
+        <button id="restartBtn" class="secondary" type="button">Restart case</button>
+      </div>
+    </header>
+    <main class="layout">
+      <section class="col">
+        <article class="card"><h2>שאלות המטפל (15)</h2><div id="questionsWrap" class="qwrap"></div></article>
+        <article class="card"><h2>לוג תשאול</h2><ul id="questionLog" class="log"></ul></article>
+      </section>
+      <section class="col">
+        <article class="card">
+          <h2>חלון מטופל</h2>
+          <div id="transcriptLines" class="lines"></div>
+          <div class="badge" title="זו מילה שמכווצת תהליך שלם. אנחנו פורסים אותה לצעדים/מטרה/ערך/קריטריון סיום.">⚠️ זה פועל לא מפורט (Unspecified Verb)</div>
+        </article>
+        <article class="card">
+          <h2>Schema Board</h2>
+          <div class="legend">
+            <span>Group 1: Context/Before/Trigger</span><span>Group 2: Steps</span><span>Group 3: Goal/Value/Positive Intention</span><span>Group 4: Done-Test/Criteria</span><span>Group 5: Obstacles/Automatic/Alternatives/Exceptions</span>
+          </div>
+          <div id="schemaBoard" class="board"></div>
+        </article>
+        <article class="card"><h2>הטקסט נפרס</h2><div id="expandingText" class="expand"></div></article>
+      </section>
+      <section class="col">
+        <article class="card"><h2>Staging</h2><div id="stagingArea" class="staging"></div></article>
+        <article class="card">
+          <h2>Feedback</h2>
+          <div id="feedbackBox" class="feedback">בחר שאלה מהעמודה השמאלית כדי לייצר AnswerBlock.</div>
+          <div id="mistakesCounter" class="mistakes">טעויות: 0</div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button id="summaryBtn" class="primary" type="button" disabled>סיכום</button>
+            <button id="nextCaseBtn" class="secondary" type="button">Case Next</button>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+  <div id="summaryBackdrop" class="backdrop" role="dialog" aria-modal="true" aria-labelledby="summaryTitle">
+    <div class="modal">
+      <h3 id="summaryTitle">סיכום קייס</h3>
+      <section class="sum"><h4>מה שאני מבין עד כה</h4><p id="summaryReflection"></p></section>
+      <section class="sum"><h4>מה עדיין לא ידוע</h4><ul id="summaryUnknown"></ul></section>
+      <section class="sum"><h4>צעד הבא מומלץ</h4><ul id="summarySuggestions"></ul></section>
+      <div class="actions">
+        <button id="summaryCloseBtn" class="secondary" type="button">סגור</button>
+        <button id="summaryNextCaseBtn" class="primary" type="button">תרגיל חדש (Case הבא)</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const SLOT_IDS = Object.freeze({ CONTEXT:1, PRE_BEFORE:2, TRIGGER:3, PREVIOUS_STEP:4, STEP_START:5, STEP_MIDDLE:6, STEP_END:7, GOAL:8, VALUE:9, POS_INTENTION:10, DONE_TEST:11, EMOTION_BODY:12, OBSTACLE_BELIEF:13, ALTERNATIVES:14, EXCEPTION:15 });
+    const SLOT_DEFS = Object.freeze([
+      { id:1,key:"CONTEXT",title:"1) הקשר",helper:"איפה/מתי זה קורה?",group:"context",qLabel:"הקשר",question:"איפה/מתי זה קורה? (Episode)",expand:"הקשר: {a}.",pos:{x:50,y:6}},
+      { id:2,key:"PRE_BEFORE",title:"2) רגע לפני",helper:"Precipitating",group:"context",qLabel:"רגע לפני",question:"מה היה רגע לפני? (Precipitating)",expand:"רגע לפני: {a}.",pos:{x:66,y:10}},
+      { id:3,key:"TRIGGER",title:"3) טריגר",helper:"מה מפעיל?",group:"context",qLabel:"טריגר",question:"מה הטריגר שמתחיל? (Cue)",expand:"הטריגר: {a}.",pos:{x:79,y:20}},
+      { id:4,key:"PREVIOUS_STEP",title:"4) לפני זה",helper:"Step previous",group:"steps",qLabel:"צעד קודם",question:"מה הצעד שקדם לזה? (Step - previous)",expand:"לפני זה קורה: {a}.",pos:{x:88,y:33}},
+      { id:5,key:"STEP_START",title:"5) התחלה",helper:"Step start",group:"steps",qLabel:"צעד ראשון",question:"מה הצעד הראשון? (Start)",expand:"הצעד הראשון: {a}.",pos:{x:92,y:48}},
+      { id:6,key:"STEP_MIDDLE",title:"6) אמצע",helper:"Step middle",group:"steps",qLabel:"צעד אמצע",question:"מה קורה באמצע? (Middle)",expand:"אחר כך/באמצע: {a}.",pos:{x:89,y:63}},
+      { id:7,key:"STEP_END",title:"7) סוף",helper:"Step end",group:"steps",qLabel:"צעד סופי",question:"מה הצעד הסופי? (End)",expand:"בסוף זה נראה ככה: {a}.",pos:{x:80,y:77}},
+      { id:8,key:"GOAL",title:"8) מטרה",helper:"Goal",group:"goal",qLabel:"מטרה",question:"מה המטרה של זה?",expand:"המטרה המיידית: {a}.",pos:{x:66,y:88}},
+      { id:9,key:"VALUE",title:"9) ערך",helper:"Value",group:"goal",qLabel:"ערך",question:"איזה ערך/צורך זה משרת?",expand:"הערך/הצורך: {a}.",pos:{x:50,y:93}},
+      { id:10,key:"POS_INTENTION",title:"10) כוונה חיובית",helper:"Positive intention",group:"goal",qLabel:"כוונה חיובית",question:"מה הכוונה החיובית? (גם אם לא מודעת)",expand:"הכוונה החיובית (במובן הצר): {a}.",pos:{x:34,y:88}},
+      { id:11,key:"DONE_TEST",title:"11) בדיקת סיום",helper:"Done-test",group:"done",qLabel:"קריטריון סיום",question:"איך תדע שסיימת? (Criteria)",expand:"אני אדע שסיימתי כש: {a}.",pos:{x:20,y:77}},
+      { id:12,key:"EMOTION_BODY",title:"12) גוף/רגש",helper:"Automatic response",group:"obstacles",qLabel:"גוף/רגש",question:"מה התחושה/הגוף אומר שם?",expand:"בגוף/רגש: {a}.",pos:{x:11,y:63}},
+      { id:13,key:"OBSTACLE_BELIEF",title:"13) חסם/אמונה",helper:"Obstacle/Belief",group:"obstacles",qLabel:"חסם/אמונה",question:"מה עוצר/מפחיד/האמונה שמפעילה?",expand:"מה עוצר/מפעיל: {a}.",pos:{x:8,y:48}},
+      { id:14,key:"ALTERNATIVES",title:"14) חלופות",helper:"Alternatives",group:"obstacles",qLabel:"חלופות",question:"מה אפשר לעשות אחרת שמשרת אותו ערך?",expand:"חלופה אפשרית: {a}.",pos:{x:12,y:33}},
+      { id:15,key:"EXCEPTION",title:"15) חריג",helper:"Context switch",group:"obstacles",qLabel:"יוצא מן הכלל",question:"מתי זה לא קורה? (Context switch)",expand:"יוצא מן הכלל/מתי זה לא קורה: {a}.",pos:{x:21,y:20}}
+    ]);
+    const SLOT_BY_ID = Object.freeze(Object.fromEntries(SLOT_DEFS.map((slot)=>[slot.id,slot])));
+    const buildCaseTemplates = (answers)=>SLOT_DEFS.map((slot)=>({slotId:slot.id,questionButtonLabel:slot.qLabel,questionText:slot.question,answerText:String(answers[slot.id]||"אני לא יודע"),expandSentenceTemplate:slot.expand}));
+    const CASES = Object.freeze([
+      { id:"case_1_quote", title:"תקוע עם הצעה ללקוח", patientContextLines:["מחר יש לי דדליין לשלוח הצעת מחיר ללקוח חדש.","אני יושב מול המחשב, אבל משהו לא זז.","אני מרגיש תקוע, ובסוף אני בורח לטלפון.","אחר כך אני מתבאס על עצמי.","ואז אני אומר שמחר אני אתחיל כמו שצריך."], focusLineIndex:3, verb:{text:"תקוע",start:10,end:14}, templates:buildCaseTemplates({1:"בערב, כשאני לבד בבית ומנסה להתחיל לעבוד.",2:"פתחתי את ה-Word וראיתי דף ריק.",3:"הרגע שאני רואה שאין לי התחלה טובה.",4:"אני חושב על זה כל היום ואז דוחה את הרגע של להתחיל.",5:"אני פותח מסמך חדש.",6:"אני קורא הצעות ישנות ומתחיל לערוך אותן.",7:"אני סוגר את המסמך ועובר לוואטסאפ.",8:"להימנע מלהרגיש שאני מוציא משהו לא טוב.",9:"כבוד/מצוינות.",10:"להגן עליי מבושה או ביקורת.",11:"כשיש טיוטה ראשונה של 10 שורות.",12:"לחץ בחזה ותחושת כיווץ.",13:"אם זה לא מושלם יחשבו שאני לא מקצועי.",14:"לכתוב 10 שורות גרועות בכוונה ואז לשפר.",15:"כשאני עובד עם חבר/מישהו ליד — זה זז יותר."}) },
+      { id:"case_2_manager", title:"נמנע משיחה עם המנהל", patientContextLines:["המנהל שלי ביקש לדבר איתי על התפקוד.","כל פעם שיש שיחה כזו אני מוצא תירוץ.","אני נמנע מלעלות את הנושא של העלאה בשכר.","אחרי זה אני כועס על עצמי.","ובכל זאת בפעם הבאה זה חוזר."], focusLineIndex:3, verb:{text:"נמנע",start:4,end:8}, templates:buildCaseTemplates({1:"כשאני מקבל הודעה ממנו לקבוע שיחה.",2:"אני רואה את ההודעה ומרגיש דופק.",3:"המחשבה \"הוא ישפוט אותי\".",4:"אני מתחיל להכין בראש תירוצים עוד לפני השיחה.",5:"אני פותח יומן לחפש זמן.",6:"אני דוחה את הבחירה של זמן ושולח \"אחזור אליך\".",7:"אני לא קובע ואז זה נמסמס.",8:"לא להיכנס לסיטואציה לא נעימה.",9:"אני לא יודע",10:"להגן עליי מדחייה.",11:"כשקבעתי זמן ושאלתי שאלה אחת.",12:"חום בפנים ודופק מהיר.",13:"אם אבקש העלאה יחשבו שאני חוצפן.",14:"לשלוח הודעה קצרה עם בקשה ל-10 דקות בלבד.",15:"כשאני בא אחרי הצלחה — זה קל יותר."}) }
+    ]);
+    const state={caseIndex:0,currentCase:null,askedSlotIds:new Set(),blocksById:{},stagingBlockIds:[],placedBySlotId:{},expandingBySlotId:{},logs:[],mistakes:0,feedback:{type:"neutral",text:"בחר שאלה מהעמודה השמאלית כדי לייצר AnswerBlock."}};
+    const els={caseSelect:document.getElementById("caseSelect"),startBtn:document.getElementById("startBtn"),restartBtn:document.getElementById("restartBtn"),questionsWrap:document.getElementById("questionsWrap"),questionLog:document.getElementById("questionLog"),transcriptLines:document.getElementById("transcriptLines"),schemaBoard:document.getElementById("schemaBoard"),expandingText:document.getElementById("expandingText"),stagingArea:document.getElementById("stagingArea"),feedbackBox:document.getElementById("feedbackBox"),mistakesCounter:document.getElementById("mistakesCounter"),summaryBtn:document.getElementById("summaryBtn"),nextCaseBtn:document.getElementById("nextCaseBtn"),summaryBackdrop:document.getElementById("summaryBackdrop"),summaryReflection:document.getElementById("summaryReflection"),summaryUnknown:document.getElementById("summaryUnknown"),summarySuggestions:document.getElementById("summarySuggestions"),summaryCloseBtn:document.getElementById("summaryCloseBtn"),summaryNextCaseBtn:document.getElementById("summaryNextCaseBtn")};
+    const esc=(t)=>String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#39;");
+    function highlightVerb(line,verb){if(!line||!verb)return esc(line||"");const s=Math.max(0,Math.min(line.length,Number(verb.start)||0));const e=Math.max(s,Math.min(line.length,Number(verb.end)||s));return `${esc(line.slice(0,s))}<span class="verb">${esc(line.slice(s,e)||verb.text||"")}</span>${esc(line.slice(e))}`;}
+    const getTemplate=(slotId)=>state.currentCase.templates.find((tpl)=>tpl.slotId===slotId)||null;
+    const getAnswer=(slotId)=>{const blockId=state.placedBySlotId[slotId];if(!blockId)return "אני לא יודע";const b=state.blocksById[blockId];return b?b.answerText:"אני לא יודע";};
+    const setFeedback=(type,text)=>{state.feedback={type,text};};
+    const addLog=(type,text)=>{state.logs.unshift({id:`${Date.now()}_${Math.random().toString(16).slice(2,7)}`,type,text});if(state.logs.length>22)state.logs=state.logs.slice(0,22);};
+    const isCompleted=()=>SLOT_DEFS.every((slot)=>Boolean(state.placedBySlotId[slot.id]));
+    const spawnBlock=(slotId)=>{if(!state.currentCase||state.askedSlotIds.has(slotId))return;const tpl=getTemplate(slotId);if(!tpl)return;const id=`${state.currentCase.id}_slot_${slotId}`;state.blocksById[id]={id,correctSlotId:slotId,questionText:tpl.questionText,answerText:tpl.answerText,locked:false};state.stagingBlockIds.push(id);state.askedSlotIds.add(slotId);addLog("therapist",`מטפל שואל: ${tpl.questionText}`);setFeedback("neutral",`נוצר AnswerBlock עבור: ${tpl.questionButtonLabel}. גרור/י לסלוט המתאים.`);render();};
+    const wrongDrop=(slotEl)=>{if(!slotEl)return;slotEl.classList.remove("shake");void slotEl.offsetWidth;slotEl.classList.add("shake");const m=document.createElement("span");m.className="x";m.textContent="✖";slotEl.appendChild(m);window.setTimeout(()=>{slotEl.classList.remove("shake");m.remove();},700);};
+    function placeBlock(blockId,targetSlotId,slotEl){const b=state.blocksById[blockId];if(!b||b.locked)return;if(state.placedBySlotId[targetSlotId])return;if(b.correctSlotId!==targetSlotId){state.mistakes+=1;setFeedback("error","❌ לא לשם — נסה שוב");wrongDrop(slotEl);render();return;}b.locked=true;state.stagingBlockIds=state.stagingBlockIds.filter((id)=>id!==blockId);state.placedBySlotId[targetSlotId]=blockId;const tpl=getTemplate(targetSlotId);if(tpl&&!state.expandingBySlotId[targetSlotId])state.expandingBySlotId[targetSlotId]=tpl.expandSentenceTemplate.replace("{a}",b.answerText);addLog("coach","אוקיי… וזה עדיין לא כל הסיפור.");setFeedback("success","✅ נכון");render();if(isCompleted())openSummary();}
+    function buildReflection(){const a=(id)=>getAnswer(id);return `מה שאני מבין עד כה: כש${a(1)}, רגע לפני ${a(2)}, הטריגר הוא ${a(3)}. לפני זה ${a(4)}. ואז אתה מתחיל ב-${a(5)}, ממשיך ב-${a(6)}, ומסיים ב-${a(7)}. המטרה היא ${a(8)}, כדי לשרת את הערך ${a(9)}. הכוונה החיובית היא ${a(10)}. אתה תדע שסיימת כש-${a(11)}. בגוף/רגש עולה ${a(12)}, ומה שמפעיל/עוצר הוא ${a(13)}. חלופה היא ${a(14)}, ויוצא מן הכלל: ${a(15)}.`;}
+    const buildUnknown=()=>SLOT_DEFS.filter((slot)=>getAnswer(slot.id).trim()==="אני לא יודע").map((slot)=>`${slot.title} — ${slot.helper}`);
+    function buildSuggestions(unknownIds){const out=[];if(unknownIds.includes(10))out.push("להעמיק בכוונה החיובית דרך שאלות ערך/הגנה.");if(unknownIds.includes(5)||unknownIds.includes(6)||unknownIds.includes(7))out.push("להמשיך פירוק צעדים \"וידאו\".");if(unknownIds.includes(11))out.push("להגדיר קריטריון סיום מדיד.");if(unknownIds.includes(15))out.push("לחפש הקשרים שבהם זה לא קורה כדי למצוא משאבים.");if(unknownIds.includes(10)||unknownIds.includes(9))out.push("שאלה מומלצת: מה זה מנסה להגן עליך ממנו ברגע האמת?");if(unknownIds.includes(5)||unknownIds.includes(6)||unknownIds.includes(7))out.push("שאלה מומלצת: אם היינו מצלמה, מה היינו רואים בצעד הראשון/האמצעי/האחרון?");if(unknownIds.includes(11))out.push("שאלה מומלצת: מה סימן מדיד קטן שמראה שסיימת?");if(unknownIds.includes(15))out.push("שאלה מומלצת: באיזה מצב דומה זה דווקא עובד אחרת?");if(!out.length)return ["השלב הבא: לקחת את החלופה ולתרגל אותה בקייס דומה אחד.","שאלה מומלצת: מהו צעד ניסוי קטן שאפשר לבצע עוד היום?"];return out.slice(0,3);}
+    function openSummary(){const unknown=buildUnknown();const unknownIds=SLOT_DEFS.filter((slot)=>getAnswer(slot.id).trim()==="אני לא יודע").map((slot)=>slot.id);els.summaryReflection.textContent=buildReflection();els.summaryUnknown.innerHTML="";if(!unknown.length){const li=document.createElement("li");li.textContent='אין כרגע "אני לא יודע". התמונה יחסית מלאה לקייס הזה.';els.summaryUnknown.appendChild(li);}else unknown.forEach((item)=>{const li=document.createElement("li");li.textContent=item;els.summaryUnknown.appendChild(li);});els.summarySuggestions.innerHTML="";buildSuggestions(unknownIds).forEach((item)=>{const li=document.createElement("li");li.textContent=item;els.summarySuggestions.appendChild(li);});els.summaryBackdrop.classList.add("open");}
+    const closeSummary=()=>els.summaryBackdrop.classList.remove("open");
+    function gotoNextCase(){state.caseIndex=(state.caseIndex+1)%CASES.length;els.caseSelect.value=String(state.caseIndex);startCase(state.caseIndex);}
+    function resetForCase(c){state.currentCase=c;state.askedSlotIds=new Set();state.blocksById={};state.stagingBlockIds=[];state.placedBySlotId={};state.expandingBySlotId={};state.logs=[];state.mistakes=0;setFeedback("neutral","בחר שאלה מהעמודה השמאלית כדי לייצר AnswerBlock.");}
+    function startCase(i){const idx=Math.max(0,Math.min(CASES.length-1,Number(i)||0));state.caseIndex=idx;resetForCase(CASES[idx]);addLog("coach",`התחלנו קייס: ${CASES[idx].title}`);closeSummary();render();}
+    function renderSelector(){els.caseSelect.innerHTML="";CASES.forEach((c,i)=>{const o=document.createElement("option");o.value=String(i);o.textContent=`${i+1}. ${c.title}`;if(i===state.caseIndex)o.selected=true;els.caseSelect.appendChild(o);});}
+    function renderQuestions(){els.questionsWrap.innerHTML="";SLOT_DEFS.forEach((slot)=>{const tpl=getTemplate(slot.id);const b=document.createElement("button");b.type="button";b.className=`qbtn${state.askedSlotIds.has(slot.id)?" used":""}`;b.disabled=state.askedSlotIds.has(slot.id);b.innerHTML=`<span>${slot.id}. ${esc(tpl.questionButtonLabel)}</span><small>${esc(tpl.questionText)}</small>`;b.addEventListener("click",()=>spawnBlock(slot.id));els.questionsWrap.appendChild(b);});}
+    function renderLogs(){els.questionLog.innerHTML="";if(!state.logs.length){const li=document.createElement("li");li.textContent="עדיין לא נשאלו שאלות.";els.questionLog.appendChild(li);return;}state.logs.forEach((entry)=>{const li=document.createElement("li");li.className=entry.type==="coach"?"coach":"";li.textContent=entry.text;els.questionLog.appendChild(li);});}
+    function renderTranscript(){els.transcriptLines.innerHTML="";const lines=state.currentCase.patientContextLines;const focus=Math.max(0,(Number(state.currentCase.focusLineIndex)||1)-1);lines.forEach((line,i)=>{const d=document.createElement("div");d.className=`line${i===focus?" focus":""}`;d.innerHTML=i===focus?highlightVerb(line,state.currentCase.verb):esc(line);els.transcriptLines.appendChild(d);});}
+    function createBlockEl(block,inSlot=false){const d=document.createElement("div");d.className=`block${block.locked?" locked":""}`;d.dataset.blockId=block.id;d.draggable=!block.locked&&!inSlot;d.innerHTML=`<span class="meta">${esc(SLOT_BY_ID[block.correctSlotId].title)} | AnswerBlock</span>${esc(block.answerText)}`;if(d.draggable)d.addEventListener("dragstart",(e)=>{e.dataTransfer.setData("text/plain",block.id);e.dataTransfer.effectAllowed="move";});return d;}
+    function renderBoard(){els.schemaBoard.innerHTML="";const center=document.createElement("div");center.className="center";center.innerHTML=`<div>הפועל: ${esc(state.currentCase.verb.text)}<br><small>Unspecified Verb</small></div>`;els.schemaBoard.appendChild(center);SLOT_DEFS.forEach((slot)=>{const s=document.createElement("div");s.className="slot";s.dataset.slotId=String(slot.id);s.dataset.group=slot.group;s.style.right=`${slot.pos.x}%`;s.style.top=`${slot.pos.y}%`;s.innerHTML=`<div class="stitle">${slot.title}</div><div class="shelp">${slot.helper}</div>`;const blockId=state.placedBySlotId[slot.id];if(blockId&&state.blocksById[blockId])s.appendChild(createBlockEl(state.blocksById[blockId],true));else{const p=document.createElement("div");p.className="placeholder";p.textContent="גרור לכאן";s.appendChild(p);}s.addEventListener("dragover",(e)=>{e.preventDefault();s.classList.add("dragover");});s.addEventListener("dragleave",()=>s.classList.remove("dragover"));s.addEventListener("drop",(e)=>{e.preventDefault();s.classList.remove("dragover");const bid=e.dataTransfer.getData("text/plain");if(bid)placeBlock(bid,slot.id,s);});els.schemaBoard.appendChild(s);});}
+    function renderStaging(){els.stagingArea.innerHTML="";if(!state.stagingBlockIds.length){const e=document.createElement("div");e.className="empty";e.textContent="אין כרגע בלוקים. לחץ/י על שאלה כדי לקבל תשובה מהמטופל.";els.stagingArea.appendChild(e);return;}state.stagingBlockIds.forEach((id)=>{const b=state.blocksById[id];if(b)els.stagingArea.appendChild(createBlockEl(b));});}
+    function renderExpand(){const base=state.currentCase.patientContextLines.map((line)=>`<p>${esc(line)}</p>`).join("");const items=SLOT_DEFS.map((slot)=>state.expandingBySlotId[slot.id]).filter(Boolean).map((s)=>`<p class="eitem">${esc(s)}</p>`).join("");els.expandingText.innerHTML=`<div class="base">${base}</div>${items}`;}
+    function renderFeedback(){els.feedbackBox.className=`feedback ${state.feedback.type==="success"?"ok":state.feedback.type==="error"?"err":""}`.trim();els.feedbackBox.textContent=state.feedback.text;els.mistakesCounter.textContent=`טעויות: ${state.mistakes}`;els.summaryBtn.disabled=!isCompleted();}
+    function render(){if(!state.currentCase)return;renderQuestions();renderLogs();renderTranscript();renderBoard();renderStaging();renderExpand();renderFeedback();}
+    function bind(){els.startBtn.addEventListener("click",()=>startCase(els.caseSelect.value));els.caseSelect.addEventListener("change",(e)=>{state.caseIndex=Number(e.target.value)||0;});els.restartBtn.addEventListener("click",()=>startCase(state.caseIndex));els.summaryBtn.addEventListener("click",()=>{if(isCompleted())openSummary();});els.nextCaseBtn.addEventListener("click",gotoNextCase);els.summaryCloseBtn.addEventListener("click",closeSummary);els.summaryNextCaseBtn.addEventListener("click",()=>{closeSummary();gotoNextCase();});els.summaryBackdrop.addEventListener("click",(e)=>{if(e.target===els.summaryBackdrop)closeSummary();});document.addEventListener("keydown",(e)=>{if(e.key==="Escape")closeSummary();});}
+    function init(){renderSelector();bind();startCase(0);} init();
+  </script>
+</body>
+</html>

@@ -120,12 +120,13 @@ const TRAINER_STAR_REWARDS = Object.freeze({
 });
 
 let trainerRewardEffectTimer = null;
-const PRACTICE_PAGE_KEYS = Object.freeze(['question', 'radar', 'wizard']);
+const PRACTICE_PAGE_KEYS = Object.freeze(['question', 'radar', 'wizard', 'verb-unzip']);
 const PRACTICE_ACTIVE_TAB_STORAGE_KEY = 'practice_active_tab_v1';
 const PRACTICE_TAB_BY_PAGE_KEY = Object.freeze({
     question: 'practice-question',
     radar: 'practice-radar',
-    wizard: 'practice-wizard'
+    wizard: 'practice-wizard',
+    'verb-unzip': 'practice-verb-unzip'
 });
 const PRACTICE_TAB_IDS = Object.freeze(Object.values(PRACTICE_TAB_BY_PAGE_KEY));
 
@@ -487,6 +488,7 @@ function normalizeRequestedTab(tabName = '') {
     if (key === 'practice' || key === 'practice-question' || key === 'question') return 'practice-question';
     if (key === 'practice-radar' || key === 'radar' || key === 'meta-radar' || key === 'meta_radar') return 'practice-radar';
     if (key === 'practice-wizard' || key === 'wizard' || key === 'sqhcel') return 'practice-wizard';
+    if (key === 'practice-verb-unzip' || key === 'verb-unzip' || key === 'unspecified-verb' || key === 'unzip') return 'practice-verb-unzip';
     return raw;
 }
 
@@ -594,7 +596,7 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: 'עבור/י על הדוגמאות ואז חזור/י למסך תרגול מעשי.'
     }),
     practice: Object.freeze({
-        logic: 'מסך התרגול פוצל ל-3 דפים: שאלות, Meta Radar, SQHCEL.',
+        logic: 'מסך התרגול פוצל ל-4 דפים: שאלות, Meta Radar, SQHCEL, ופועל לא מפורט.',
         goal: 'לעבוד בצורה ממוקדת - כל פעם מיומנות אחת.',
         approach: 'בחר/י דף אחד, סיים/י סבב קצר, ורק אז עבר/י לדף הבא.'
     }),
@@ -612,6 +614,11 @@ const SCREEN_READ_GUIDES = Object.freeze({
         logic: 'הדף הזה מאמן גישור בין תחושה למשפט לפני אתגור.',
         goal: 'לבנות מיומנות SQHCEL עקבית עם אישור לפני פריצה.',
         approach: 'עבוד/י בסדר קבוע: S -> Q -> H -> C -> PATH -> E/L. הגוף מרגיש "אבסולוטי" לפני שהמילים אמרו "תמיד".'
+    }),
+    'practice-verb-unzip': Object.freeze({
+        logic: 'הדף הזה מאמן פירוק פועל לא מפורט באמצעות 15 שאלות קבועות וגרירה לסכמה קשיחה.',
+        goal: 'לתרגם מילה דחוסה לתהליך מפורט, כולל טריגר, צעדים, ערך, קריטריון סיום וחריגים.',
+        approach: 'שאל/י שאלה, גרור/י את התשובה למקום הנכון, וקבל/י X אדום אם טעית. מסיימים רק כשהסכמה מלאה ואז קוראים סיכום.'
     }),
     blueprint: Object.freeze({
         logic: 'המסך מפרק משימה עמומה ליעד, צעדים, פער ציפיות ותוכנית ביצוע.',
@@ -641,6 +648,7 @@ const SCREEN_READ_GUIDE_TARGET_IDS = Object.freeze([
     'practice-question',
     'practice-radar',
     'practice-wizard',
+    'practice-verb-unzip',
     'blueprint',
     'about'
 ]);
