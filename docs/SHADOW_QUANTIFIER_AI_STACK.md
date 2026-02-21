@@ -54,6 +54,7 @@ Keep strict internal consistency between:
 - small exception (5% less true)
 No identifying details.
 If locale=he, write Hebrew.
+Write in clean, spell-checked Hebrew with no typos. Avoid accidental repeated letters.
 Return only valid JSON matching the schema.
 ```
 
@@ -77,6 +78,7 @@ Respond briefly and consistently.
 If therapist text includes ownership language + quantifier + explicit check question,
 and is non-judgmental, bias toward "yes".
 If it is interpretive/aggressive/mind-reading, bias toward "partial" or "no".
+Reply in natural, clean Hebrew without spelling errors or repeated letters.
 Return JSON only, matching schema.
 ```
 
@@ -89,6 +91,7 @@ Answer only the requested ladder level:
 2 = 1% less true
 3 = strongest conditions (when/where/with whom)
 No advice. Keep response short.
+Reply in natural, clean Hebrew without spelling errors or repeated letters.
 Return JSON only, matching schema.
 ```
 
@@ -114,6 +117,7 @@ You score structure quality, not therapeutic truth.
 Return one concise fix only.
 Prefer fixes that restore:
 ownership -> quantifier -> check-question.
+Provide suggestions in clean Hebrew without typos. Keep it short.
 Return JSON only, matching schema.
 ```
 

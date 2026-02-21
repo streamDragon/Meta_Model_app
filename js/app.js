@@ -8824,6 +8824,30 @@ const wr2wPathCore = (() => {
     });
 })();
 
+const wr2wHebrewSanitize = (() => {
+    if (typeof window !== 'undefined' && window.hebrewSanitize) return window.hebrewSanitize;
+    return Object.freeze({
+        sanitizeHebrewText: (value) => String(value || ''),
+        sanitizeHebrewJsonStrings: (value) => value,
+        hasObviousHebrewTypos: () => ({ ok: true, issues: [] })
+    });
+})();
+
+function wr2wSanitizeText(value) {
+    return wr2wHebrewSanitize.sanitizeHebrewText(String(value || ''));
+}
+
+function wr2wSanitizeJsonStrings(payload) {
+    return wr2wHebrewSanitize.sanitizeHebrewJsonStrings(payload);
+}
+
+function wr2wLogHebrewIssues(context, text) {
+    const report = wr2wHebrewSanitize.hasObviousHebrewTypos(String(text || ''));
+    if (!report.ok) {
+        console.warn(`[WR2W][HebrewSanitize:${context}]`, report.issues, text);
+    }
+}
+
 const WR2W_DIALOGUE_PACK_URL = 'data/sqhcel-dialogues.json';
 let wr2wDialoguePackPromise = null;
 
@@ -8962,63 +8986,84 @@ function wr2wResolveCaseSeedMeta(raw, visibleSentence, monologue) {
 
 function wr2wNormalizeScene(raw, idxPrefix = 'wr2w') {
     if (!raw || typeof raw !== 'object') return null;
-    const visibleSentence = wr2TrimText(raw.visibleSentence || raw.statement, 170);
+    const source = wr2wSanitizeJsonStrings(raw);
+    const visibleSentence = wr2TrimText(
+        wr2wSanitizeText(source.visibleSentence || source.statement),
+        170
+    );
     if (!visibleSentence) return null;
-    const monologue = wr2TrimText(raw.monologue || visibleSentence, 420);
-    const quantifiers = (Array.isArray(raw.quantifiers) ? raw.quantifiers : [])
-        .map(item => wr2TrimText(item, 38))
+    const monologue = wr2TrimText(
+        wr2wSanitizeText(source.monologue || visibleSentence),
+        420
+    );
+    const quantifiers = (Array.isArray(source.quantifiers) ? source.quantifiers : [])
+        .map(item => wr2TrimText(wr2wSanitizeText(item), 38))
         .filter(Boolean)
         .slice(0, 4);
     const inferredQuantifiers = quantifiers.length ? quantifiers : wr2InferQuantifiers(visibleSentence);
-    const caseSeedMeta = wr2wResolveCaseSeedMeta(raw, visibleSentence, monologue);
+    const caseSeedMeta = wr2wResolveCaseSeedMeta(source, visibleSentence, monologue);
+    wr2wLogHebrewIssues('case_seed.visibleSentence', visibleSentence);
+    wr2wLogHebrewIssues('case_seed.monologue', monologue);
     return {
-        id: String(raw.id || `${idxPrefix}_${Date.now()}_${Math.random().toString(16).slice(2, 6)}`),
-        source: raw.source === 'self' ? 'self' : 'seed',
+        id: String(source.id || `${idxPrefix}_${Date.now()}_${Math.random().toString(16).slice(2, 6)}`),
+        source: source.source === 'self' ? 'self' : 'seed',
         monologue,
         visibleSentence,
-        anchor: wr2TrimText(raw.anchor || wr2DetectAnchor(visibleSentence), 36),
+        anchor: wr2TrimText(wr2wSanitizeText(source.anchor || wr2DetectAnchor(visibleSentence)), 36),
         quantifiers: [...new Set(inferredQuantifiers)].slice(0, 4),
-        exceptionExample: wr2TrimText(raw.exceptionExample || 'היה רגע קצר שזה היה קצת פחות נכון.', 180),
-        conditionsLine: wr2TrimText(raw.conditionsLine || 'זה נהיה הכי חזק בתנאים של לחץ/עייפות/חוסר ודאות.', 180),
-        transformedSentence: wr2TrimText(raw.transformedSentence || wr2SoftenSentence(visibleSentence), 190),
+        exceptionExample: wr2TrimText(
+            wr2wSanitizeText(source.exceptionExample || 'היה רגע קצר שזה היה קצת פחות נכון.'),
+            180
+        ),
+        conditionsLine: wr2TrimText(
+            wr2wSanitizeText(source.conditionsLine || 'זה נהיה הכי חזק בתנאים של לחץ/עייפות/חוסר ודאות.'),
+            180
+        ),
+        transformedSentence: wr2TrimText(
+            wr2wSanitizeText(source.transformedSentence || wr2SoftenSentence(visibleSentence)),
+            190
+        ),
         caseSeedMeta,
-        createdAt: Number(raw.createdAt) || Date.now()
+        createdAt: Number(source.createdAt) || Date.now()
     };
 }
 
 function wr2wMapDialoguePackEntry(entry, index = 0) {
     if (!entry || typeof entry !== 'object') return null;
+    const source = wr2wSanitizeJsonStrings(entry);
     const visibleSentence = wr2TrimText(
-        entry.final_sentence || entry.finalSentence || entry.visibleSentence || entry.statement,
+        wr2wSanitizeText(source.final_sentence || source.finalSentence || source.visibleSentence || source.statement),
         170
     );
     if (!visibleSentence) return null;
 
-    const lines = Array.isArray(entry.lines)
-        ? entry.lines.map((line) => wr2TrimText(line, 110)).filter(Boolean).slice(0, 6)
+    const lines = Array.isArray(source.lines)
+        ? source.lines.map((line) => wr2TrimText(wr2wSanitizeText(line), 110)).filter(Boolean).slice(0, 6)
         : [];
     const monologueFromLines = lines.join(' ');
-    const monologue = wr2TrimText(monologueFromLines || entry.monologue || visibleSentence, 420);
+    const monologue = wr2TrimText(wr2wSanitizeText(monologueFromLines || source.monologue || visibleSentence), 420);
     const suggestedQuantifier = wr2TrimText(
-        entry.suggested_shadow_quantifier || entry.suggestedShadowQuantifier,
+        wr2wSanitizeText(source.suggested_shadow_quantifier || source.suggestedShadowQuantifier),
         38
     );
     const quantifiers = [suggestedQuantifier, ...wr2InferQuantifiers(visibleSentence)]
         .filter(Boolean)
         .slice(0, 4);
     const fallbackCondition = 'זה נהיה הכי חזק בעיקר בעומס, עייפות או חוסר ודאות.';
-    const caseSeedMeta = wr2wResolveCaseSeedMeta(entry, visibleSentence, monologue);
+    const caseSeedMeta = wr2wResolveCaseSeedMeta(source, visibleSentence, monologue);
+    wr2wLogHebrewIssues('dialogue_pack.visibleSentence', visibleSentence);
+    wr2wLogHebrewIssues('dialogue_pack.monologue', monologue);
     return {
-        id: String(entry.id || `sqhcel_pack_${index + 1}`),
+        id: String(source.id || `sqhcel_pack_${index + 1}`),
         source: 'seed',
         monologue,
         visibleSentence,
         quantifiers: [...new Set(quantifiers)],
         exceptionExample: wr2TrimText(
-            entry.suggested_exception || entry.suggestedException || entry.exceptionExample,
+            wr2wSanitizeText(source.suggested_exception || source.suggestedException || source.exceptionExample),
             180
         ) || 'כן, יש רגע שבו זה 5% פחות נכון.',
-        conditionsLine: wr2TrimText(entry.conditionsLine || fallbackCondition, 180),
+        conditionsLine: wr2TrimText(wr2wSanitizeText(source.conditionsLine || fallbackCondition), 180),
         transformedSentence: wr2TrimText(wr2SoftenSentence(visibleSentence), 190),
         caseSeedMeta,
         createdAt: Date.now()
@@ -9031,7 +9076,7 @@ async function wr2wLoadSeedScenesFromPack() {
         try {
             const response = await fetch(WR2W_DIALOGUE_PACK_URL, { cache: 'no-store' });
             if (!response.ok) return [];
-            const payload = await response.json();
+            const payload = wr2wSanitizeJsonStrings(await response.json());
             const list = Array.isArray(payload?.dialogues)
                 ? payload.dialogues
                 : (Array.isArray(payload) ? payload : []);
@@ -9065,49 +9110,67 @@ const wr2wPatientAgent = Object.freeze({
             : false;
         const meta = scene?.caseSeedMeta || {};
         if (!hasQuantifier) {
+            const rawText = 'לא ממש. אני לא שומע כאן את ההשלמה שאני מרגיש בפנים.';
+            wr2wLogHebrewIssues('patient.confirm.no_quantifier', rawText);
             return Object.freeze({
                 status: 'no',
-                text: 'לא ממש. אני לא שומע כאן את ההשלמה שאני מרגיש בפנים.'
+                text: wr2wSanitizeText(rawText)
             });
         }
 
         const profile = wr2wHash(scene.id) % 3;
         if (profile === 0) {
+            const rawText = 'כן, זה קרוב למה שקורה לי. זה בדיוק הקול הפנימי.';
+            wr2wLogHebrewIssues('patient.confirm.yes', rawText);
             return Object.freeze({
                 status: 'yes',
-                text: 'כן, זה קרוב למה שקורה לי. זה בדיוק הקול הפנימי.'
+                text: wr2wSanitizeText(rawText)
             });
         }
         if (profile === 1) {
+            const rawText = meta.quantifier_nature === 'external_pattern'
+                ? 'בערך. זה נראה יותר כמו דפוס חיצוני בתנאים מסוימים, לא תמיד.'
+                : 'בערך. זה נכון בעיקר במצבים מסוימים, לא תמיד.';
+            wr2wLogHebrewIssues('patient.confirm.partial', rawText);
             return Object.freeze({
                 status: 'partial',
-                text: meta.quantifier_nature === 'external_pattern'
-                    ? 'בערך. זה נראה יותר כמו דפוס חיצוני בתנאים מסוימים, לא תמיד.'
-                    : 'בערך. זה נכון בעיקר במצבים מסוימים, לא תמיד.'
+                text: wr2wSanitizeText(rawText)
             });
         }
+        const rawText = meta.quantifier_nature === 'internal_climate'
+            ? 'לא לגמרי. כרגע זה מרגיש יותר אקלים פנימי חזק מאשר כלל קבוע.'
+            : 'לא לגמרי. זה נשמע יותר עומס רגעי מאשר כלל קבוע.';
+        wr2wLogHebrewIssues('patient.confirm.no', rawText);
         return Object.freeze({
             status: 'no',
-            text: meta.quantifier_nature === 'internal_climate'
-                ? 'לא לגמרי. כרגע זה מרגיש יותר אקלים פנימי חזק מאשר כלל קבוע.'
-                : 'לא לגמרי. זה נשמע יותר עומס רגעי מאשר כלל קבוע.'
+            text: wr2wSanitizeText(rawText)
         });
     },
     probeException(scene, level) {
         const profile = wr2wHash(`${scene.id}:${level}`) % 4;
         if (level === 0 && profile <= 2) {
-            return Object.freeze({ found: false, text: 'כרגע לא עולה לי חריג ברור.' });
+            const rawText = 'כרגע לא עולה לי חריג ברור.';
+            wr2wLogHebrewIssues('patient.probe.level0', rawText);
+            return Object.freeze({ found: false, text: wr2wSanitizeText(rawText) });
         }
         if (level === 1 && profile <= 1) {
-            return Object.freeze({ found: false, text: 'גם 5% פחות נכון קשה לי לזהות.' });
+            const rawText = 'גם 5% פחות נכון קשה לי לזהות.';
+            wr2wLogHebrewIssues('patient.probe.level1', rawText);
+            return Object.freeze({ found: false, text: wr2wSanitizeText(rawText) });
         }
         if (level === 2 && profile === 0) {
-            return Object.freeze({ found: false, text: 'אפילו 1% פחות נכון לא עולה לי כרגע.' });
+            const rawText = 'אפילו 1% פחות נכון לא עולה לי כרגע.';
+            wr2wLogHebrewIssues('patient.probe.level2', rawText);
+            return Object.freeze({ found: false, text: wr2wSanitizeText(rawText) });
         }
         if (level <= 2) {
-            return Object.freeze({ found: true, text: scene.exceptionExample });
+            const rawText = String(scene.exceptionExample || '');
+            wr2wLogHebrewIssues('patient.probe.exception', rawText);
+            return Object.freeze({ found: true, text: wr2wSanitizeText(rawText) });
         }
-        return Object.freeze({ found: true, text: scene.conditionsLine });
+        const rawText = String(scene.conditionsLine || '');
+        wr2wLogHebrewIssues('patient.probe.conditions', rawText);
+        return Object.freeze({ found: true, text: wr2wSanitizeText(rawText) });
     }
 });
 
@@ -9193,7 +9256,7 @@ function setupWrinkleGame() {
 
             <section class="wr2w-principle">
                 <h4>איתות אי-הלימה</h4>
-                <p>כשאני מרגיש חזק יותר ממה שנאמר במשפט - זה איתות לכמת-צל או כלל סמוי. קודם מכיילים, ורק אחר כך מאתגרים.</p>
+                <p>כאשר המטפל מזהה פער בין עוצמת הרגש שהמשפט מעורר באדם לבין מה שהמשפט אומר ומכיל, או פער בין המשפט לבין המציאות כפי שהאדם מספר עליה או המטפל מכיר מחוויותיו – כאן נדלקת נורת ההתובנות הפנימית על העניין, ויש רמז שיש לנו כאן כמתי-צל בפעולה.</p>
                 <p>הגוף מרגיש "אבסולוטי" לפני שהמילים אמרו "תמיד".</p>
                 <p class="wr2w-flow">S → Q → H → C → PATH → E/L</p>
             </section>
@@ -9343,7 +9406,8 @@ function setupWrinkleGame() {
     };
 
     const setFeedback = (message, tone = 'info') => {
-        state.round.feedback = message;
+        wr2wLogHebrewIssues('ui.feedback', message);
+        state.round.feedback = wr2wSanitizeText(message);
         state.round.feedbackTone = tone;
     };
 
@@ -9589,8 +9653,8 @@ function setupWrinkleGame() {
             const stuck = state.analytics?.stuck || {};
             els.stuckDistribution.textContent = `${stuck.H || 0}/${stuck.C || 0}`;
         }
-        if (els.monologue) els.monologue.textContent = scene.monologue;
-        if (els.visibleSentence) els.visibleSentence.textContent = scene.visibleSentence;
+        if (els.monologue) els.monologue.textContent = wr2wSanitizeText(scene.monologue);
+        if (els.visibleSentence) els.visibleSentence.textContent = wr2wSanitizeText(scene.visibleSentence);
 
         const stepMeta = {
             S: {
