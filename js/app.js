@@ -9306,6 +9306,9 @@ function wr2wProcessCount(criteria) {
     return Object.values(criteria || {}).filter(Boolean).length;
 }
 
+const WR2W_WIZARD_TITLE = 'כמתים נסתרים – ההכללות שמשתמעות אבל לא נאמרות';
+const WR2W_WIZARD_FORMULA = 'חוץ (מצלמה) + כמת נסתר → עוצמה בפנים';
+
 function setupWrinkleGame() {
     const root = document.getElementById('wrinkle-game');
     if (!root || root.dataset.wr2WizardBound === 'true') return;
@@ -9315,7 +9318,7 @@ function setupWrinkleGame() {
     root.innerHTML = `
         <div class="wr2w-shell">
             <div class="wr2w-topbar">
-                <h3>SQHCEL Wizard</h3>
+                <h3>${WR2W_WIZARD_TITLE}</h3>
                 <div class="wr2w-score">
                     <span>תהליך: <strong id="wr2w-process-score">0/6</strong></span>
                     <span>🔥 רצף: <strong id="wr2w-streak">0</strong></span>
@@ -9329,6 +9332,7 @@ function setupWrinkleGame() {
                 <h4>איתות אי-הלימה</h4>
                 <p>כאשר המטפל מזהה פער בין עוצמת הרגש שהמשפט מעורר באדם לבין מה שהמשפט אומר ומכיל, או פער בין המשפט לבין המציאות כפי שהאדם מספר עליה או המטפל מכיר מחוויותיו – כאן נדלקת נורת ההתובנות הפנימית על העניין, ויש רמז שיש לנו כאן כמתי-צל בפעולה.</p>
                 <p>הגוף מרגיש "אבסולוטי" לפני שהמילים אמרו "תמיד".</p>
+                <p class="wr2w-flow">${WR2W_WIZARD_FORMULA}</p>
                 <p class="wr2w-flow">S → Q → H → C → PATH → E/L</p>
             </section>
 

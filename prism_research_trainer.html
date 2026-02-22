@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Prism Research Mode - Meta Model Trainer</title>
+  <script>
+    (function () {
+      var v = String(Date.now());
+      function withV(path) {
+        try {
+          var u = new URL(path, location.href);
+          u.searchParams.set('v', v);
+          return u.toString();
+        } catch (e) {
+          return path + (path.indexOf('?') === -1 ? '?' : '&') + 'v=' + encodeURIComponent(v);
+        }
+      }
+      function addCss(path) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = withV(path);
+        document.head.appendChild(link);
+      }
+      function addScript(path, cb) {
+        var s = document.createElement('script');
+        s.src = withV(path);
+        s.onload = function () { if (cb) cb(); };
+        document.head.appendChild(s);
+      }
+      window.__PRISM_RESEARCH_ASSET_V__ = v;
+      addCss('css/prism-research.css');
+      addScript('js/prism-research-core.js', function () {
+        addScript('js/prism-research-app.js');
+      });
+    })();
+  </script>
+</head>
+<body>
+  <div id="prism-research-app" aria-live="polite">
+    <div style="max-width:960px;margin:32px auto;padding:16px;border:1px solid #ddd;border-radius:12px;background:#fff;">
+      Loading Prism Research Mode...
+    </div>
+  </div>
+</body>
+</html>
