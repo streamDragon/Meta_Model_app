@@ -807,17 +807,28 @@ async function resolveAppVersion() {
     return getVersionFromAppScriptQuery() || 'unknown';
 }
 
+const APP_VERSION_CHIP_LABEL = '\u05d2\u05e8\u05e1\u05d4 \u05e0\u05d5\u05db\u05d7\u05d9\u05ea';
+const APP_VERSION_FLOATING_LABEL = '\u05d2\u05e8\u05e1\u05d4 \u05e4\u05e2\u05d9\u05dc\u05d4';
+
 function applyAppVersion(version) {
+    const resolvedVersion = String(version || '').trim() || 'unknown';
     const chip = document.getElementById('app-version-chip');
     if (chip) {
-        chip.textContent = `גרסה: ${version}`;
-        chip.setAttribute('title', `Build ${version}`);
+        chip.textContent = `${APP_VERSION_CHIP_LABEL}: ${resolvedVersion}`;
+        chip.dataset.version = resolvedVersion;
+        chip.setAttribute('title', `Build ${resolvedVersion}`);
     }
 
     const floating = document.getElementById('app-version-floating');
     if (floating) {
-        floating.textContent = `v${version}`;
-        floating.setAttribute('title', `Build ${version}`);
+        floating.textContent = `${APP_VERSION_FLOATING_LABEL}: ${resolvedVersion}`;
+        floating.dataset.version = resolvedVersion;
+        floating.setAttribute('title', `Build ${resolvedVersion}`);
+    }
+
+    if (typeof document.title === 'string' && document.title) {
+        const baseTitle = document.title.replace(/\s+\[v[^\]]+\]$/i, '');
+        document.title = `${baseTitle} [v${resolvedVersion}]`;
     }
 }
 

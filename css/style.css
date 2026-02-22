@@ -68,14 +68,16 @@ header p {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin: 8px 0 12px;
-    padding: 4px 10px;
+    margin: 10px 0 14px;
+    padding: 6px 12px;
     border-radius: 999px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid #93c5fd;
     background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
     color: #1e3a8a;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
 }
 
 .app-version-floating {
@@ -83,21 +85,27 @@ header p {
     left: 12px;
     bottom: max(12px, calc(var(--safe-bottom) + 8px));
     z-index: 1600;
-    padding: 6px 10px;
+    padding: 7px 12px;
     border-radius: 999px;
     border: 1px solid rgba(148, 163, 184, 0.55);
     background: rgba(15, 23, 42, 0.86);
     color: #f8fafc;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     font-weight: 700;
-    letter-spacing: 0.02em;
-    direction: ltr;
+    letter-spacing: 0;
+    direction: rtl;
+    unicode-bidi: plaintext;
+    font-variant-numeric: tabular-nums;
     box-shadow: 0 8px 20px rgba(15, 23, 42, 0.24);
+    backdrop-filter: blur(4px);
 }
 
 body.embed-mode .app-version-floating,
 body.force-mobile-view .app-version-floating {
-    display: none;
+    left: 8px;
+    bottom: max(8px, calc(var(--safe-bottom) + 6px));
+    padding: 5px 8px;
+    font-size: 0.74rem;
 }
 
 /* Embedded mode (e.g. Google Sites iframe): maximize usable space */
