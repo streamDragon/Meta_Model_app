@@ -151,7 +151,7 @@
             <button class="tab-btn" data-tab="practice-radar">Meta Radar</button>
             <button class="tab-btn" data-tab="practice-triples-radar">Triples Radar</button>
             <button class="tab-btn" data-tab="practice-wizard">SQHCEL Wizard</button>
-            <button class="tab-btn" data-tab="practice-verb-unzip">פועל לא מפורט</button>
+            <button class="tab-btn" data-tab="practice-verb-unzip">???????</button>
             <button class="tab-btn" data-tab="blueprint">Blueprint Builder</button>
             <button class="tab-btn" data-tab="prismlab">מעבדת פריזמות</button>
             <button class="tab-btn" data-tab="about">על הפרויקט</button>
@@ -294,7 +294,7 @@
             <div class="scenario-trainer-container">
                 <div class="card scenario-trainer-card">
                     <h2>🎬 Scenario Trainer: פועל לא-מפורט → תהליך (TOTE)</h2>
-                    <p class="subtitle">תרגול קצר מסצנה לחיים אמיתיים: נרמול Predicate, פירוק תהליך, ויציאה מתקיעות לצעד ביצוע ברור.</p>
+                    <p class="subtitle">????? ??? ????? ????? ???????: ????? Predicate, ????? ?????, ?????? ??????? ???? ????? ????.</p>
 
                     <div id="scenario-safety-notice" class="scenario-safety-notice hidden" role="alert">
                         נראה שהטקסט שכתבת מצביע על מצוקה חריפה. עצרנו את התרגול כרגע.
@@ -962,17 +962,53 @@
         <section id="practice-verb-unzip" class="tab-content practice-tab-content">
             <div class="practice-container">
                 <div class="card practice-intro-card">
-                    <h2>פועל לא מפורט — Unzip Trainer</h2>
-                    <p class="subtitle">תרגול ויזואלי: שאלה -> תשובת מטופל מוכנה -> Drag&Drop מדויק -> סיכום קייס.</p>
+                    <h2>??????? ?????? ? Feature Hub</h2>
+                    <p class="subtitle">????? ??????? ??? ????: ?? ???? ???? / ??? ???? ????. ???? ???? ?? Unzip Trainer ?????? ??????.</p>
                     <p style="margin:0 0 10px;color:#335a7d;">אם העמוד בתוך מסגרת צרה, אפשר לפתוח במסך מלא.</p>
-                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-                        <a class="btn btn-primary" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html" target="_blank" rel="noopener">פתח במסך מלא</a>
-                        <a class="btn btn-secondary" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html" target="_blank" rel="noopener">גרסת קובץ עצמאי</a>
-                        <a class="btn btn-secondary" href="sentence_morpher_trainer.html" data-versioned-href="sentence_morpher_trainer.html" target="_blank" rel="noopener">Sentence Morpher</a>
-                        <a class="btn btn-secondary" href="living_triples_trainer.html" data-versioned-href="living_triples_trainer.html" target="_blank" rel="noopener">Living Triples (Beta)</a>
-                        <a class="btn btn-secondary" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html" target="_blank" rel="noopener">Classic Classic (MVP)</a>
-                        <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html" target="_blank" rel="noopener">Prism Research Mode (MVP)</a>
-                    </div>
+                    
+<div class="feature-launcher" data-feature-launcher>
+    <div class="feature-launcher-head">
+        <div>
+            <strong>???? ???????</strong>
+            <p>???? ???? ???? ?????. ????? ??? ????? ????? ???? ??? ????? ????.</p>
+        </div>
+    </div>
+    <div class="feature-launcher-tabs" role="tablist" aria-label="?????? ???'???">
+        <button type="button" class="feature-launcher-tab is-active" data-feature-group-btn="without-breen" aria-selected="true">??? ???? ????</button>
+        <button type="button" class="feature-launcher-tab" data-feature-group-btn="with-breen" aria-selected="false">?? ???? ????</button>
+    </div>
+
+    <div class="feature-launcher-panel is-active" data-feature-group-panel="without-breen">
+        <div class="feature-launcher-grid">
+            <a class="btn btn-primary" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html" target="_blank" rel="noopener">Unzip Trainer (Standalone)</a>
+            <a class="btn btn-secondary" href="sentence_morpher_trainer.html" data-versioned-href="sentence_morpher_trainer.html" target="_blank" rel="noopener">Sentence Morpher</a>
+            <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html" target="_blank" rel="noopener">Prism Research</a>
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">????? ?????</button>
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">Meta Radar</button>
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">SQHCEL Wizard</button>
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">Blueprint Builder</button>
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('prismlab')">Prism Lab</button>
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">Comic Engine</button>
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('scenario-trainer')">Scenario Trainer</button>
+        </div>
+    </div>
+
+    <div class="feature-launcher-panel" data-feature-group-panel="with-breen" hidden>
+        <div class="feature-launcher-grid">
+            <button type="button" class="btn btn-primary" onclick="navigateTo('practice-triples-radar')">Triples Radar (Breen)</button>
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('categories')">???????? (???? ?????)</button>
+            <a class="btn btn-secondary" href="living_triples_trainer.html" data-versioned-href="living_triples_trainer.html" target="_blank" rel="noopener">Living Triples</a>
+            <a class="btn btn-secondary" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html" target="_blank" rel="noopener">Classic 1 ? Classic Classic</a>
+            <a class="btn btn-secondary" href="classic2_trainer.html" data-versioned-href="classic2_trainer.html" target="_blank" rel="noopener">Classic 2 ? Overview</a>
+        </div>
+        <div class="feature-launcher-note">
+            <strong>Classic 2 (React + TS)</strong>
+            <span>???? ??????????: <code>src/components/Classic2Trainer.tsx</code></span>
+        </div>
+    </div>
+</div>
+<div class="feature-launcher-embed-title">Unzip Trainer (Embed)</div>
+</div>
                     <iframe
                         title="Unzip Trainer"
                         src="about:blank"

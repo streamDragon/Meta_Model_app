@@ -844,9 +844,48 @@ async function setupAppVersionChip() {
     applyAppVersion(version);
 }
 
+function setupFeatureLauncherTabs() {
+    const launchers = document.querySelectorAll('[data-feature-launcher]');
+    if (!launchers.length) return;
+
+    launchers.forEach((launcher) => {
+        if (launcher.dataset.featureLauncherBound === '1') return;
+        launcher.dataset.featureLauncherBound = '1';
+
+        const buttons = Array.from(launcher.querySelectorAll('[data-feature-group-btn]'));
+        const panels = Array.from(launcher.querySelectorAll('[data-feature-group-panel]'));
+        if (!buttons.length || !panels.length) return;
+
+        function activate(groupName) {
+            const target = String(groupName || '').trim();
+            buttons.forEach((button) => {
+                const active = button.getAttribute('data-feature-group-btn') === target;
+                button.classList.toggle('is-active', active);
+                button.setAttribute('aria-selected', active ? 'true' : 'false');
+            });
+            panels.forEach((panel) => {
+                const active = panel.getAttribute('data-feature-group-panel') === target;
+                panel.classList.toggle('is-active', active);
+                if (active) panel.removeAttribute('hidden');
+                else panel.setAttribute('hidden', '');
+            });
+        }
+
+        buttons.forEach((button) => {
+            button.addEventListener('click', () => {
+                activate(button.getAttribute('data-feature-group-btn'));
+            });
+        });
+
+        const initialButton = buttons.find((button) => button.classList.contains('is-active')) || buttons[0];
+        activate(initialButton.getAttribute('data-feature-group-btn'));
+    });
+}
+
 // Load data on page load
 document.addEventListener('DOMContentLoaded', () => {
     setupAppVersionChip();
+    setupFeatureLauncherTabs();
     setupMobileViewportSizing();
     applyEmbeddedCompactMode();
     applyHeaderDensityPreference();

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classic 2 - Structure of Magic Trainer</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Assistant", "Heebo", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 10% 10%, #dbeafe, #f8fafc 45%, #ecfeff);
+      color: #0f172a;
+      padding: 18px;
+      line-height: 1.45;
+    }
+    .shell {
+      max-width: 980px;
+      margin: 0 auto;
+      background: #ffffffee;
+      border: 1px solid #dbe7f5;
+      border-radius: 18px;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+      padding: 18px;
+    }
+    h1 { margin: 0; font-size: 1.35rem; }
+    .sub { margin: 8px 0 0; color: #475569; }
+    blockquote {
+      margin: 12px 0;
+      padding: 10px 12px;
+      border-inline-start: 4px solid #3b82f6;
+      background: #eff6ff;
+      border-radius: 10px;
+      color: #1e3a8a;
+      font-weight: 700;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .card {
+      border: 1px solid #dbe7f5;
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px;
+    }
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+    code {
+      direction: ltr;
+      unicode-bidi: plaintext;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 2px 6px;
+      font-weight: 700;
+    }
+    ul { margin: 0; padding-inline-start: 20px; }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 800;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      background: #eff6ff;
+    }
+    .btn.secondary {
+      border-color: #cbd5e1;
+      color: #334155;
+      background: #fff;
+    }
+    @media (max-width: 760px) {
+      body { padding: 10px; }
+      .shell { padding: 14px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <h1>Classic 2 · Structure of Magic (Overview)</h1>
+    <p class="sub">
+      זהו עמוד גשר לפיצ'ר החדש. מימוש React + TypeScript המלא מוכן כקומפוננטה לשילוב בפרויקט React.
+    </p>
+
+    <blockquote>
+      This is not full therapy. This is a next-step engine: identify one violation, ask a precision question, update the surface structure toward deep structure, and propose the next step.
+    </blockquote>
+
+    <div class="grid">
+      <div class="card">
+        <h2>מה כבר מוכן</h2>
+        <ul>
+          <li>מפרט מלא של Classic 2 (story tiles + state machine + loop)</li>
+          <li>קומפוננטת React/TypeScript: <code>src/components/Classic2Trainer.tsx</code></li>
+          <li>חלוקת פיצ'רים ב-Hub הראשי: עם/בלי טבלת ברין</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>מה הפיצ'ר עושה</h2>
+        <ul>
+          <li>בחירת קטגוריה מטבלת ברין</li>
+          <li>סימון קטע נכון מתוך סיפור (tiles)</li>
+          <li>בחירת שאלת Meta Model מדויקת</li>
+          <li>Recursive Loop + Next Step Action</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="actions">
+      <a class="btn" href="classic_classic_trainer.html">פתיחת Classic 1</a>
+      <a class="btn secondary" href="index.html">חזרה לאפליקציה הראשית</a>
+    </div>
+  </div>
+</body>
+</html>
