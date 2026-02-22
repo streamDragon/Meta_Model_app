@@ -443,6 +443,14 @@ function hideSplashScreen() {
     }, 3600);
 }
 
+function normalizeViewMode(rawMode = '') {
+    const value = String(rawMode || '').trim().toLowerCase();
+    if (!value) return '';
+    if (value === 'mobile' || value === 'phone' || value === 'm') return 'mobile';
+    if (value === 'desktop' || value === 'computer' || value === 'pc' || value === 'd') return 'desktop';
+    return '';
+}
+
 function applyEmbeddedCompactMode() {
     let embedded = false;
     try {
@@ -452,12 +460,25 @@ function applyEmbeddedCompactMode() {
     }
 
     const params = new URLSearchParams(window.location.search);
-    if (params.get('compact') === '1' || params.get('embed') === '1') {
+    const viewMode = normalizeViewMode(params.get('view') || params.get('device'));
+    if (viewMode) {
+        document.body.classList.add(`view-${viewMode}`);
+        document.body.classList.remove('force-mobile-view', 'force-desktop-view');
+        document.body.classList.add(viewMode === 'mobile' ? 'force-mobile-view' : 'force-desktop-view');
+    }
+
+    if (params.get('compact') === '1' || params.get('embed') === '1' || viewMode === 'mobile') {
         embedded = true;
     }
 
-    const forceSimple = params.get('simple') === '1';
-    const disableSimple = params.get('simple') === '0';
+    let forceSimple = params.get('simple') === '1';
+    let disableSimple = params.get('simple') === '0';
+    if (viewMode === 'mobile') {
+        forceSimple = true;
+        disableSimple = false;
+    } else if (viewMode === 'desktop') {
+        disableSimple = true;
+    }
 
     if (embedded) {
         document.body.classList.add('embed-mode');

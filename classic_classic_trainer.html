@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Classic Classic - Meta Model Trainer</title>
+  <script>
+    (function () {
+      var v = String(Date.now());
+      function withV(path) {
+        try {
+          var u = new URL(path, location.href);
+          u.searchParams.set('v', v);
+          return u.toString();
+        } catch (e) {
+          return path + (path.indexOf('?') === -1 ? '?' : '&') + 'v=' + encodeURIComponent(v);
+        }
+      }
+      function addCss(path) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = withV(path);
+        document.head.appendChild(link);
+      }
+      function addScript(path, cb) {
+        var s = document.createElement('script');
+        s.src = withV(path);
+        s.onload = function () { if (cb) cb(); };
+        document.head.appendChild(s);
+      }
+      window.__CC_ASSET_V__ = v;
+      addCss('css/classic-classic.css');
+      addScript('js/classic-classic-config.js', function () {
+        addScript('js/classic-classic-rng.js', function () {
+          addScript('js/classic-classic-engine.js', function () {
+            addScript('js/classic-classic-app.js');
+          });
+        });
+      });
+    })();
+  </script>
+</head>
+<body>
+  <div id="classic-classic-app" class="cc-app-shell" aria-live="polite">
+    <div class="cc-loading">טוען Classic Classic…</div>
+  </div>
+</body>
+</html>

@@ -4,7 +4,7 @@ import path from 'node:path';
 const ROOT = process.cwd();
 const DIST_DIR = path.join(ROOT, 'dist');
 const STATIC_DIRS = ['assets', 'data', 'js', 'css'];
-const STATIC_FILES = ['package.json', 'verb_unzip_trainer.html'];
+const STATIC_FILES = ['package.json', 'verb_unzip_trainer.html', 'classic_classic_trainer.html'];
 
 async function copyStaticDir(dirName) {
   const from = path.join(ROOT, dirName);

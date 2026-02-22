@@ -4,7 +4,111 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meta Model - כלי תרגול שאול מטה מודל</title>
-    <link rel="stylesheet" href="css/style.css?v=1.0.19">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <script>
+        (function () {
+            var assetVersion = String(Date.now());
+            var appPathPrefix = window.location.pathname.replace(/[^/]*$/, '');
+
+            function withAssetVersion(path) {
+                try {
+                    var url = new URL(path, window.location.href);
+                    url.searchParams.set('v', assetVersion);
+                    return url.toString();
+                } catch (error) {
+                    var separator = path.indexOf('?') === -1 ? '?' : '&';
+                    return path + separator + 'v=' + encodeURIComponent(assetVersion);
+                }
+            }
+
+            function shouldBypassCache(url) {
+                if (!url || url.origin !== window.location.origin) {
+                    return false;
+                }
+                var path = url.pathname || '';
+                return /(^|\/)(data|js|css)\//.test(path) || /\/package\.json$/.test(path);
+            }
+
+            window.__APP_ASSET_VERSION__ = assetVersion;
+            window.__withAssetVersion = withAssetVersion;
+
+            window.addEventListener('DOMContentLoaded', function () {
+                var hrefNodes = document.querySelectorAll('[data-versioned-href]');
+                hrefNodes.forEach(function (node) {
+                    var originalHref = node.getAttribute('data-versioned-href');
+                    if (originalHref) {
+                        node.setAttribute('href', withAssetVersion(originalHref));
+                    }
+                });
+
+                var srcNodes = document.querySelectorAll('[data-versioned-src]');
+                srcNodes.forEach(function (node) {
+                    var originalSrc = node.getAttribute('data-versioned-src');
+                    if (originalSrc) {
+                        node.setAttribute('src', withAssetVersion(originalSrc));
+                    }
+                });
+            });
+
+            if (window.fetch) {
+                var originalFetch = window.fetch.bind(window);
+                window.fetch = function (resource, init) {
+                    var rawUrl = null;
+                    if (typeof resource === 'string' || resource instanceof URL) {
+                        rawUrl = String(resource);
+                    }
+
+                    if (!rawUrl) {
+                        return originalFetch(resource, init);
+                    }
+
+                    try {
+                        var url = new URL(rawUrl, window.location.href);
+                        if (!shouldBypassCache(url)) {
+                            return originalFetch(resource, init);
+                        }
+
+                        url.searchParams.set('v', assetVersion);
+
+                        var nextInit;
+                        if (!init) {
+                            nextInit = { cache: 'no-store' };
+                        } else if (!Object.prototype.hasOwnProperty.call(init, 'cache')) {
+                            nextInit = Object.assign({}, init, { cache: 'no-store' });
+                        } else {
+                            nextInit = init;
+                        }
+
+                        return originalFetch(url.toString(), nextInit);
+                    } catch (error) {
+                        return originalFetch(resource, init);
+                    }
+                };
+            }
+
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                    navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                        registrations.forEach(function (registration) {
+                            try {
+                                var scopeUrl = new URL(registration.scope);
+                                if (scopeUrl.origin === window.location.origin && scopeUrl.pathname.indexOf(appPathPrefix) === 0) {
+                                    registration.unregister().catch(function () {});
+                                }
+                            } catch (error) {}
+                        });
+                    }).catch(function () {});
+                });
+            }
+
+            var stylesheet = document.createElement('link');
+            stylesheet.rel = 'stylesheet';
+            stylesheet.href = withAssetVersion('css/style.css');
+            document.head.appendChild(stylesheet);
+        })();
+    </script>
 </head>
 <body>
     <!-- SPLASH SCREEN -->
@@ -856,12 +960,13 @@
                     <p class="subtitle">תרגול ויזואלי: שאלה -> תשובת מטופל מוכנה -> Drag&Drop מדויק -> סיכום קייס.</p>
                     <p style="margin:0 0 10px;color:#335a7d;">אם העמוד בתוך מסגרת צרה, אפשר לפתוח במסך מלא.</p>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-                        <a class="btn btn-primary" href="verb_unzip_trainer.html?v=1.0.19" target="_blank" rel="noopener">פתח במסך מלא</a>
-                        <a class="btn btn-secondary" href="verb_unzip_trainer.html?v=1.0.19" target="_blank" rel="noopener">גרסת קובץ עצמאי</a>
+                        <a class="btn btn-primary" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html" target="_blank" rel="noopener">פתח במסך מלא</a>
+                        <a class="btn btn-secondary" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html" target="_blank" rel="noopener">גרסת קובץ עצמאי</a>
                     </div>
                     <iframe
                         title="Unzip Trainer"
-                        src="verb_unzip_trainer.html?v=1.0.19"
+                        src="about:blank"
+                        data-versioned-src="verb_unzip_trainer.html"
                         style="width:100%;min-height:1450px;border:1px solid #cddbec;border-radius:12px;background:#fff;"
                         loading="lazy"></iframe>
                 </div>
@@ -1059,11 +1164,37 @@
         </section>
     </div>
 
-    <script src="js/hebrew-sanitize.js?v=1.0.19"></script>
-    <script src="js/wr2w-path-core.js?v=1.0.19"></script>
-    <script src="js/triples-radar-core.js?v=1.0.19"></script>
-    <script src="js/app.js?v=1.0.19"></script>
-    <script src="js/triples-radar.js?v=1.0.19"></script>
+    <script>
+        (function () {
+            var withAssetVersion = window.__withAssetVersion || function (path) { return path; };
+            var scriptQueue = [
+                'js/hebrew-sanitize.js',
+                'js/wr2w-path-core.js',
+                'js/triples-radar-core.js',
+                'js/app.js',
+                'js/triples-radar.js'
+            ];
+
+            function loadScript(index) {
+                if (index >= scriptQueue.length) {
+                    return;
+                }
+
+                var script = document.createElement('script');
+                script.async = false;
+                script.src = withAssetVersion(scriptQueue[index]);
+                script.onload = function () {
+                    loadScript(index + 1);
+                };
+                script.onerror = function () {
+                    console.error('Failed to load script:', scriptQueue[index]);
+                };
+                document.body.appendChild(script);
+            }
+
+            loadScript(0);
+        })();
+    </script>
 </body>
 </html>
 
