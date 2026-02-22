@@ -15,9 +15,20 @@ const readText = async (relativePath) => {
     return readFile(fullPath, 'utf8');
 };
 
+const resolvePrimaryHtmlPath = async () => {
+    try {
+        await readText('index.html');
+        return 'index.html';
+    } catch (error) {
+        await readText('index2.html');
+        return 'index2.html';
+    }
+};
+
 try {
+    const htmlPath = await resolvePrimaryHtmlPath();
     const [html, css, js] = await Promise.all([
-        readText('index.html'),
+        readText(htmlPath),
         readText('css/style.css'),
         readText('js/app.js')
     ]);
@@ -43,7 +54,7 @@ try {
     mustContain('viewport css var update in js', js, /setProperty\('--app-dvh',\s*`\$\{height\}px`\)/);
     mustContain('viewport sizing called on load', js, /DOMContentLoaded[\s\S]*setupMobileViewportSizing\(\)/);
 
-    console.log('PASS: mobile fullscreen and viewport rules verified.');
+    console.log(`PASS: mobile fullscreen and viewport rules verified (${htmlPath}).`);
 } catch (error) {
     console.error('FAIL:', error.message);
     process.exitCode = 1;

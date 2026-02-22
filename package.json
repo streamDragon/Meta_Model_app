@@ -7,8 +7,11 @@
     "doc": "docs"
   },
   "scripts": {
+    "sync:entry": "node scripts/sync-entry.mjs",
     "dev": "vite",
+    "prebuild:web": "npm run sync:entry",
     "build:web": "vite build",
+    "prebuild": "npm run sync:entry",
     "build": "vite build && node scripts/prepare-dist.mjs",
     "test:hebrew": "node --test scripts/hebrew-sanitize.test.cjs",
     "test:morpher": "node --test scripts/sentence-morpher-core.test.cjs",
@@ -16,13 +19,15 @@
     "test:classic-classic": "node --test scripts/classic-classic-engine.test.cjs",
     "test:wr2w": "node --test scripts/wr2w-path-core.test.cjs",
     "test:prism-research": "node --test scripts/prism-research-core.test.cjs",
+    "test:ui-wiring": "node scripts/test-ui-wiring.mjs",
     "test:mobile": "node scripts/test-mobile-layout.mjs",
-    "test:all": "npm run test:hebrew && npm run test:morpher && npm run test:triples-radar && npm run test:classic-classic && npm run test:wr2w && npm run test:prism-research && npm run test:mobile && npm run build:web",
+    "test:all": "npm run sync:entry && npm run test:ui-wiring && npm run test:hebrew && npm run test:morpher && npm run test:triples-radar && npm run test:classic-classic && npm run test:wr2w && npm run test:prism-research && npm run test:mobile && npm run build:web",
     "preview": "vite preview",
     "cap:sync": "npx cap sync",
     "cap:android": "npx cap sync android",
     "android:build": "npm run build && npx cap sync android",
-    "android:open": "npx cap open android"
+    "android:open": "npx cap open android",
+    "release:auto": "node scripts/release-auto.mjs"
   },
   "repository": {
     "type": "git",

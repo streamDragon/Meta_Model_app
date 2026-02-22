@@ -6,6 +6,7 @@ const DIST_DIR = path.join(ROOT, 'dist');
 const STATIC_DIRS = ['assets', 'data', 'js', 'css'];
 const STATIC_FILES = [
   'package.json',
+  'index2.html',
   'verb_unzip_trainer.html',
   'classic_classic_trainer.html',
   'prism_research_trainer.html',
