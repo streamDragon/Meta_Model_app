@@ -57,8 +57,19 @@ async function run() {
         console.log(`index.html data-app-version already ${version}`);
     }
 
-    await writeFile(INDEX2_HTML_PATH, INDEX2_REDIRECT_HTML, 'utf8');
-    console.log('Wrote index2.html compatibility redirect -> index.html');
+    let currentIndex2 = '';
+    try {
+        currentIndex2 = await readFile(INDEX2_HTML_PATH, 'utf8');
+    } catch (error) {
+        currentIndex2 = '';
+    }
+
+    if (currentIndex2 !== INDEX2_REDIRECT_HTML) {
+        await writeFile(INDEX2_HTML_PATH, INDEX2_REDIRECT_HTML, 'utf8');
+        console.log('Wrote index2.html compatibility redirect -> index.html');
+    } else {
+        console.log('index2.html compatibility redirect already up to date');
+    }
 }
 
 run().catch((error) => {
