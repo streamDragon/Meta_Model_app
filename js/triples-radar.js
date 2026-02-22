@@ -124,7 +124,9 @@
                 isSolvedRow ? 'is-solved' : ''
             ].filter(Boolean).join(' ');
 
-            const cards = row.categories.map((categoryId) => {
+            // Display order is reversed for RTL training scan (e.g., Mind Reading on the right in Row 1).
+            const displayCategories = [...row.categories].reverse();
+            const cards = displayCategories.map((categoryId) => {
                 const normalizedCategory = root.triplesRadarCore.normalizeCategoryId(categoryId);
                 const isSelected = root.triplesRadarCore.normalizeCategoryId(state.selectedCategory) === normalizedCategory;
                 const isCorrectCategory = correctCategoryNormalized === normalizedCategory;
