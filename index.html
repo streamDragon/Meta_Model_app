@@ -1,18 +1,18 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meta Model - ׳›׳׳™ ׳×׳¨׳’׳•׳ ׳©׳׳•׳ ׳׳˜׳” ׳׳•׳“׳</title>
+    <title>Meta Model - כלי תרגול שאול מטה מודל</title>
     <link rel="stylesheet" href="css/style.css?v=1.0.18">
 </head>
 <body>
     <!-- SPLASH SCREEN -->
     <div id="splash-screen" class="splash-screen">
         <div class="splash-content">
-            <div class="splash-logo">נ§ </div>
+            <div class="splash-logo">🧠</div>
             <h1 class="splash-title">Meta Model</h1>
-            <p class="splash-subtitle">׳›׳׳™ ׳×׳¨׳’׳•׳ ׳©׳׳•׳ ׳׳˜׳” ׳׳•׳“׳</p>
+            <p class="splash-subtitle">כלי תרגול שאול מטה מודל</p>
             <div class="splash-loading">
                 <span class="splash-dot"></span>
                 <span class="splash-dot"></span>
@@ -24,33 +24,31 @@
     <div id="app-version-floating" class="app-version-floating" aria-live="polite">v...</div>
     <div class="container">
         <header>
-            <h1>נ§  Meta Model - ׳›׳׳™ ׳×׳¨׳’׳•׳</h1>
-            <p>׳×׳¨׳’׳ ׳©׳׳•׳ ׳׳˜׳” ׳׳•׳“׳ ׳©׳ Richard Bandler ׳¢׳ ׳₪׳™ ׳”׳›׳׳׳™׳ ׳©׳ NLP</p>
+            <h1>🧠 Meta Model - כלי תרגול</h1>
+            <p>תרגל שאול מטה מודל של Richard Bandler על פי הכללים של NLP</p>
             <div class="onboarding-hint" id="hint-box" style="display:none">
                 <small id="hint-text"></small>
-                <button onclick="closeHint()" class="close-hint">ג•</button>
+                <button onclick="closeHint()" class="close-hint">✕</button>
             </div>
         </header>
 
         <nav class="tabs">
-            <button class="tab-btn active" data-tab="home">׳‘׳™׳×</button>
-            <button class="tab-btn" data-tab="scenario-trainer">׳¡׳¦׳ ׳•׳× Execution</button>
+            <button class="tab-btn active" data-tab="home">בית</button>
+            <button class="tab-btn" data-tab="scenario-trainer">סצנות Execution</button>
             <button class="tab-btn" data-tab="comic-engine">Comic Engine</button>
-            <button class="tab-btn" data-tab="categories">׳§׳˜׳’׳•׳¨׳™׳•׳×</button>
-            <button class="tab-btn" data-tab="practice-question">׳×׳¨׳’׳•׳ ׳©׳׳׳•׳×</button>
+            <button class="tab-btn" data-tab="categories">קטגוריות</button>
+            <button class="tab-btn" data-tab="practice-question">תרגול שאלות</button>
             <button class="tab-btn" data-tab="practice-radar">Meta Radar</button>
             <button class="tab-btn" data-tab="practice-triples-radar">Triples Radar</button>
-            <button class="tab-btn" data-tab="practice-wizard">׳›׳׳×׳™׳ ׳ ׳¡׳×׳¨׳™׳</button>
-            <button class="tab-btn" data-tab="practice-sentence-morpher">׳׳©׳₪׳˜ ׳—׳™</button>
-            <button class="tab-btn" data-tab="living-triples">Living Triples</button>
-            <button class="tab-btn" data-tab="practice-verb-unzip">׳₪׳•׳¢׳ ׳׳ ׳׳₪׳•׳¨׳˜</button>
+            <button class="tab-btn" data-tab="practice-wizard">SQHCEL Wizard</button>
+            <button class="tab-btn" data-tab="practice-verb-unzip">פועל לא מפורט</button>
             <button class="tab-btn" data-tab="blueprint">Blueprint Builder</button>
-            <button class="tab-btn" data-tab="prismlab">׳׳¢׳‘׳“׳× ׳₪׳¨׳™׳–׳׳•׳×</button>
-            <button class="tab-btn" data-tab="about">׳¢׳ ׳”׳₪׳¨׳•׳™׳§׳˜</button>
+            <button class="tab-btn" data-tab="prismlab">מעבדת פריזמות</button>
+            <button class="tab-btn" data-tab="about">על הפרויקט</button>
         </nav>
-        <div class="mobile-tab-nav" aria-label="׳ ׳™׳•׳•׳˜ ׳‘׳ ׳™׳™׳“">
-            <label for="mobile-tab-select">׳׳¢׳‘׳¨ ׳׳׳¡׳</label>
-            <select id="mobile-tab-select" class="mobile-tab-select" aria-label="׳׳¢׳‘׳¨ ׳‘׳™׳ ׳׳¡׳›׳™׳"></select>
+        <div class="mobile-tab-nav" aria-label="ניווט בנייד">
+            <label for="mobile-tab-select">מעבר למסך</label>
+            <select id="mobile-tab-select" class="mobile-tab-select" aria-label="מעבר בין מסכים"></select>
         </div>
 
         <section id="global-comic-strip" class="global-comic-strip hidden" aria-label="Comic strip preview">
@@ -64,8 +62,8 @@
                             <p id="global-comic-main-subtitle"></p>
                         </div>
                         <div class="global-comic-main-actions">
-                            <button id="global-comic-main-preview" class="global-comic-main-link" type="button">׳×׳¦׳•׳’׳”</button>
-                            <button id="global-comic-main-practice" class="global-comic-main-link global-comic-main-link-primary" type="button">׳׳×׳¨׳’׳•׳</button>
+                            <button id="global-comic-main-preview" class="global-comic-main-link" type="button">תצוגה</button>
+                            <button id="global-comic-main-practice" class="global-comic-main-link global-comic-main-link-primary" type="button">לתרגול</button>
                         </div>
                     </div>
                 </article>
@@ -75,12 +73,12 @@
 
         <div id="comicPreviewModal" class="comic-preview-modal hidden" role="dialog" aria-modal="true" aria-labelledby="comicPreviewTitle">
             <div class="comic-preview-dialog">
-                <button id="comicPreviewClose" class="comic-preview-close" type="button" aria-label="׳¡׳’׳™׳¨׳”">ג•</button>
-                <h3 id="comicPreviewTitle">׳×׳¦׳•׳’׳× ׳§׳•׳׳™׳§׳¡</h3>
+                <button id="comicPreviewClose" class="comic-preview-close" type="button" aria-label="סגירה">✕</button>
+                <h3 id="comicPreviewTitle">תצוגת קומיקס</h3>
                 <img id="comicPreviewImage" src="" alt="" loading="lazy">
                 <p id="comicPreviewSubtitle"></p>
                 <div class="comic-preview-actions">
-                    <button id="comicPreviewGoPractice" class="btn btn-primary" type="button">׳׳¢׳‘׳¨ ׳׳×׳¨׳’׳•׳ ׳‘׳¡׳¦׳ ׳”</button>
+                    <button id="comicPreviewGoPractice" class="btn btn-primary" type="button">מעבר לתרגול בסצנה</button>
                 </div>
             </div>
         </div>
@@ -88,92 +86,90 @@
         <!-- HOME TAB -->
         <section id="home" class="tab-content active">
             <div class="card">
-                <h2>׳‘׳¨׳•׳›׳™׳ ׳”׳‘׳׳™׳! נ‘‹</h2>
-                <p id="app-version-chip" class="app-version-chip">׳’׳¨׳¡׳”: ׳ ׳˜׳¢׳...</p>
-                <p>Meta Model ׳”׳™׳ ׳˜׳›׳ ׳™׳§׳” ׳‘-NLP ׳”׳׳¡׳™׳™׳¢׳× ׳׳–׳™׳”׳•׳™ ׳•׳×׳™׳§׳•׳ ׳”׳₪׳¨׳•׳× ׳©׳₪׳” ׳©׳׳’׳‘׳™׳׳•׳× ׳׳•׳×׳ ׳•.</p>
+                <h2>ברוכים הבאים! 👋</h2>
+                <p id="app-version-chip" class="app-version-chip">גרסה: נטען...</p>
+                <p>Meta Model היא טכניקה ב-NLP המסייעת לזיהוי ותיקון הפרות שפה שמגבילות אותנו.</p>
                 
                 <div class="intro-grid">
                     <div class="intro-item">
-                        <h3>נ¯ ׳׳” ׳–׳” Meta Model?</h3>
-                        <p>׳׳•׳“׳ ׳©׳₪׳” ׳”׳׳–׳”׳” 3 ׳¢׳™׳•׳•׳×׳™׳: ׳׳—׳™׳§׳”, ׳¢׳™׳•׳•׳× ׳•׳”׳›׳׳׳”.</p>
+                        <h3>🎯 מה זה Meta Model?</h3>
+                        <p>מודל שפה המזהה 3 עיוותים: מחיקה, עיוות והכללה.</p>
                     </div>
                     <div class="intro-item">
-                        <h3>נ“ ׳׳׳” ׳–׳” ׳—׳©׳•׳‘?</h3>
-                        <p>׳–׳•׳”׳™ ׳›׳׳™ ׳—׳–׳§׳” ׳׳×׳¨׳’׳•׳ ׳¢׳•׳׳§, ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳•׳׳©׳ ׳•׳× ׳“׳₪׳•׳¡׳™׳ ׳©׳ ׳—׳©׳™׳‘׳”.</p>
+                        <h3>📚 למה זה חשוב?</h3>
+                        <p>זוהי כלי חזקה לתרגול עומק, כדי להבין ולשנות דפוסים של חשיבה.</p>
                     </div>
                     <div class="intro-item">
-                        <h3>ג¨ ׳›׳™׳¦׳“ ׳׳”׳©׳×׳׳©?</h3>
-                        <p>׳‘׳—׳¨ ׳§׳˜׳’׳•׳¨׳™׳” ׳׳׳׳•׳“ ׳׳• ׳¢׳‘׳•׳¨ ׳׳×׳¨׳’׳•׳ ׳›׳“׳™ ׳׳”׳×׳׳׳ ׳‘׳©׳׳•׳ ׳©׳׳׳•׳×.</p>
+                        <h3>✨ כיצד להשתמש?</h3>
+                        <p>בחר קטגוריה ללמוד או עבור לתרגול כדי להתאמן בשאול שאלות.</p>
                     </div>
                 </div>
 
                 <div class="cta-section">
-                    <h3>נ€ ׳‘׳•׳׳ ׳ ׳×׳—׳™׳!</h3>
-                    <p>׳‘׳—׳¨ ׳׳” ׳‘׳¨׳¦׳•׳ ׳ ׳׳¢׳©׳•׳×:</p>
+                    <h3>🚀 בואן נתחיל!</h3>
+                    <p>בחר מה ברצונך לעשות:</p>
                     <div class="cta-buttons">
-                        <button class="btn btn-primary cta-btn" onclick="navigateTo('scenario-trainer')">נ¬ ׳¡׳¦׳ ׳•׳× Execution</button>
-                        <button class="btn btn-primary cta-btn" onclick="navigateTo('comic-engine')">נ§© Comic Engine 2.0</button>
-                        <button class="btn btn-secondary cta-btn" onclick="window.open('assets/svg/demo/index.html', '_blank')">נ¨ Comic Kit Demo</button>
-                        <button class="btn btn-primary cta-btn" onclick="navigateTo('categories')">נ“ ׳׳•׳׳“ ׳§׳˜׳’׳•׳¨׳™׳•׳×</button>
-                        <button class="btn btn-primary cta-btn" onclick="navigateTo('blueprint')">נ—ן¸ ׳‘׳ ׳” Blueprint</button>
-                        <button class="btn btn-primary cta-btn" onclick="navigateTo('prismlab')">נ” ׳¡׳¨׳•׳§ ׳₪׳¨׳™׳–׳׳•׳×</button>
-                        <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('question')">נ¯ ׳×׳¨׳’׳•׳ ׳©׳׳׳•׳×</button>
-                        <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('radar')">ג¡ Meta Radar</button>
+                        <button class="btn btn-primary cta-btn" onclick="navigateTo('scenario-trainer')">🎬 סצנות Execution</button>
+                        <button class="btn btn-primary cta-btn" onclick="navigateTo('comic-engine')">🧩 Comic Engine 2.0</button>
+                        <button class="btn btn-secondary cta-btn" onclick="window.open('assets/svg/demo/index.html', '_blank')">🎨 Comic Kit Demo</button>
+                        <button class="btn btn-primary cta-btn" onclick="navigateTo('categories')">📚 לומד קטגוריות</button>
+                        <button class="btn btn-primary cta-btn" onclick="navigateTo('blueprint')">🏗️ בנה Blueprint</button>
+                        <button class="btn btn-primary cta-btn" onclick="navigateTo('prismlab')">🔍 סרוק פריזמות</button>
+                        <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('question')">🎯 תרגול שאלות</button>
+                        <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('radar')">⚡ Meta Radar</button>
                         <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('triples-radar')">Triples Radar</button>
-                        <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('wizard')">נ§  ׳›׳׳×׳™׳ ׳ ׳¡׳×׳¨׳™׳</button>
-                        <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('sentence-morpher')">׳׳©׳₪׳˜ ׳—׳™</button>
-                        <button class="btn btn-secondary cta-btn" onclick="navigateTo('living-triples')">נ”÷ Living Triples</button>
+                        <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('wizard')">🧠 SQHCEL Wizard</button>
                     </div>
                 </div>
 
                 <!-- PROGRESS HUB -->
                 <div class="progress-hub">
-                    <h3>נ“ ׳”׳”׳×׳§׳“׳׳•׳× ׳©׳׳</h3>
+                    <h3>📊 ההתקדמות שלך</h3>
                     <div class="progress-grid">
                         <div class="progress-card">
-                            <span class="progress-icon">נ”¥</span>
+                            <span class="progress-icon">🔥</span>
                             <p class="progress-label">Streak</p>
-                            <p class="progress-value" id="streak-count">0 ׳™׳׳™׳</p>
-                            <small id="streak-date">׳”׳™׳•׳ ׳”׳¨׳׳©׳•׳!</small>
+                            <p class="progress-value" id="streak-count">0 ימים</p>
+                            <small id="streak-date">היום הראשון!</small>
                         </div>
                         <div class="progress-card">
-                            <span class="progress-icon">ג­</span>
+                            <span class="progress-icon">⭐</span>
                             <p class="progress-label">XP Total</p>
                             <p class="progress-value" id="xp-count">0</p>
-                            <small>׳›׳ ׳׳©׳™׳׳” = ׳ ׳§׳•׳“׳•׳×</small>
+                            <small>כל משימה = נקודות</small>
                         </div>
                         <div class="progress-card">
-                            <span class="progress-icon">נ</span>
+                            <span class="progress-icon">🌟</span>
                             <p class="progress-label">Stars</p>
                             <p class="progress-value" id="stars-count">0</p>
-                            <small>׳‘׳•׳ ׳•׳¡ ׳׳›׳ ׳×׳©׳•׳‘׳”</small>
+                            <small>בונוס מכל תשובה</small>
                         </div>
                         <div class="progress-card">
-                            <span class="progress-icon">נ†</span>
+                            <span class="progress-icon">🏆</span>
                             <p class="progress-label">Badges</p>
                             <p class="progress-value" id="badge-count">0</p>
-                            <small>׳₪׳¨׳¡׳™׳ ׳©׳”׳¦׳‘׳¨׳×</small>
+                            <small>פרסים שהצברת</small>
                         </div>
                         <div class="progress-card">
-                            <span class="progress-icon">נ“ˆ</span>
+                            <span class="progress-icon">📈</span>
                             <p class="progress-label">Sessions</p>
                             <p class="progress-value" id="session-count">0</p>
-                            <small>׳¡׳©׳ ׳™׳ ׳©׳”׳©׳׳׳×</small>
+                            <small>סשנים שהשלמת</small>
                         </div>
                         <div class="progress-card" id="daily-goal-card">
-                            <span class="progress-icon">נ¯</span>
+                            <span class="progress-icon">🎯</span>
                             <p class="progress-label">Daily Goal</p>
                             <p class="progress-value" id="daily-goal-value">0/3</p>
                             <div class="daily-goal-meter" aria-hidden="true">
                                 <div class="daily-goal-fill" id="daily-goal-fill"></div>
                             </div>
-                            <small id="daily-goal-note">׳”׳©׳׳ 3 ׳₪׳¢׳•׳׳•׳× ׳”׳™׳•׳</small>
+                            <small id="daily-goal-note">השלם 3 פעולות היום</small>
                         </div>
                         <div class="progress-card">
-                            <span class="progress-icon">נ›¡ן¸</span>
+                            <span class="progress-icon">🛡️</span>
                             <p class="progress-label">Streak Charge</p>
                             <p class="progress-value" id="streak-charge-value">0/3</p>
-                            <small id="streak-charge-note">׳©׳•׳׳¨ ׳¢׳ ׳¨׳¦׳£ ׳‘׳™׳•׳ ׳₪׳¡׳₪׳•׳¡</small>
+                            <small id="streak-charge-note">שומר על רצף ביום פספוס</small>
                         </div>
                     </div>
                     <div id="badges-display" class="badges-display">
@@ -187,109 +183,79 @@
         <section id="scenario-trainer" class="tab-content">
             <div class="scenario-trainer-container">
                 <div class="card scenario-trainer-card">
-                    <h2>נ¬ ׳׳׳׳ ׳×׳¨׳—׳™׳©׳™׳: ׳₪׳•׳¢׳ ׳׳-׳׳₪׳•׳¨׳˜ ג†’ ׳×׳”׳׳™׳ (TOTE)</h2>
-                    <p class="subtitle">׳”׳×׳¨׳’׳™׳ ׳›׳׳ ׳₪׳©׳•׳˜: ׳׳–׳”׳™׳ ׳×׳’׳•׳‘׳× ׳׳˜׳₪׳ ׳׳§׳“׳׳×, ׳•׳׳– ׳׳₪׳¨׳§׳™׳ ׳׳× ׳”׳¡׳¦׳ ׳” ׳׳¦׳¢׳“׳™׳ ׳‘׳¨׳•׳¨׳™׳ ׳©׳׳₪׳©׳¨ ׳׳‘׳¦׳¢.</p>
+                    <h2>🎬 Scenario Trainer: פועל לא-מפורט → תהליך (TOTE)</h2>
+                    <p class="subtitle">תרגול קצר מסצנה לחיים אמיתיים: נרמול Predicate, פירוק תהליך, ויציאה מתקיעות לצעד ביצוע ברור.</p>
 
                     <div id="scenario-safety-notice" class="scenario-safety-notice hidden" role="alert">
-                        ׳ ׳¨׳׳” ׳©׳”׳˜׳§׳¡׳˜ ׳©׳›׳×׳‘׳× ׳׳¦׳‘׳™׳¢ ׳¢׳ ׳׳¦׳•׳§׳” ׳—׳¨׳™׳₪׳”. ׳¢׳¦׳¨׳ ׳• ׳׳× ׳”׳×׳¨׳’׳•׳ ׳›׳¨׳’׳¢.
-                        ׳׳ ׳™׳© ׳¡׳›׳ ׳” ׳׳™׳™׳“׳™׳×: 911. ׳׳₪׳©׳¨ ׳’׳ ׳׳₪׳ ׳•׳× ׳׳§׳• 988 (24/7).
+                        נראה שהטקסט שכתבת מצביע על מצוקה חריפה. עצרנו את התרגול כרגע.
+                        אם יש סכנה מיידית: 911. אפשר גם לפנות לקו 988 (24/7).
                     </div>
 
                     <!-- HOME -->
                     <div id="scenario-screen-home" class="scenario-screen">
                         <div class="scenario-home-grid">
-                            <button id="scenario-home-scenes" class="btn btn-primary scenario-home-btn">נ¬ ׳¡׳¦׳ ׳•׳×</button>
-                            <button id="scenario-home-prisms" class="btn btn-secondary scenario-home-btn">נ§© ׳₪׳¨׳™׳–׳׳•׳× (׳’׳¨׳™׳¨׳”)</button>
-                            <button id="scenario-home-history" class="btn btn-secondary scenario-home-btn">נ•˜ ׳”׳™׳¡׳˜׳•׳¨׳™׳”</button>
-                            <button id="scenario-home-settings" class="btn btn-secondary scenario-home-btn">ג™ן¸ ׳”׳’׳“׳¨׳•׳×</button>
+                            <button id="scenario-home-scenes" class="btn btn-primary scenario-home-btn">🎬 סצנות</button>
+                            <button id="scenario-home-prisms" class="btn btn-secondary scenario-home-btn">🧩 פריזמות (Drag&Drop)</button>
+                            <button id="scenario-home-history" class="btn btn-secondary scenario-home-btn">🕘 היסטוריה</button>
+                            <button id="scenario-home-settings" class="btn btn-secondary scenario-home-btn">⚙️ הגדרות</button>
                         </div>
                         <div class="scenario-home-stats" id="scenario-home-stats"></div>
                     </div>
 
                     <!-- DOMAIN PICK -->
                     <div id="scenario-screen-domain" class="scenario-screen hidden">
-                        <h3>׳‘׳—׳™׳¨׳× ׳×׳—׳•׳ ׳•׳¨׳׳”</h3>
+                        <h3>בחירת תחום ורמה</h3>
                         <div class="blueprint-questions scenario-pick-grid">
                             <div class="q-card">
-                                <label for="scenario-domain-select">׳×׳—׳•׳</label>
+                                <label for="scenario-domain-select">תחום</label>
                                 <select id="scenario-domain-select"></select>
                             </div>
                             <div class="q-card">
-                                <label for="scenario-difficulty-select">׳¨׳׳”</label>
+                                <label for="scenario-difficulty-select">רמה</label>
                                 <select id="scenario-difficulty-select"></select>
                             </div>
                             <div class="q-card">
-                                <label for="scenario-run-size">׳›׳׳” ׳¡׳¦׳ ׳•׳× ׳‘׳¨׳¦׳£?</label>
+                                <label for="scenario-run-size">כמה סצנות ברצף?</label>
                                 <input type="range" id="scenario-run-size" min="5" max="10" value="10" />
                                 <span id="scenario-run-size-value">10</span>
                             </div>
                         </div>
                         <div class="step-buttons">
-                            <button id="scenario-start-run-btn" class="btn btn-primary">׳”׳×׳—׳ ׳¡׳©׳ ׳¡׳¦׳ ׳•׳×</button>
-                            <button id="scenario-back-home-from-domain" class="btn btn-secondary">׳—׳–׳¨׳”</button>
+                            <button id="scenario-start-run-btn" class="btn btn-primary">התחל סשן סצנות</button>
+                            <button id="scenario-back-home-from-domain" class="btn btn-secondary">חזרה</button>
                         </div>
                     </div>
 
                     <!-- SCENARIO -->
                     <div id="scenario-screen-play" class="scenario-screen hidden">
                         <div class="scenario-session-header">
-                            <p class="scenario-counter">׳¡׳¦׳ ׳” <span id="scenario-current-index">1</span>/<span id="scenario-total-count">10</span></p>
-                            <p class="scenario-session-meta">׳ ׳§׳•׳“׳•׳×: <span id="scenario-session-score">0</span> | ׳¨׳¦׳£ ׳™׳¨׳•׳§: <span id="scenario-session-streak">0</span></p>
+                            <p class="scenario-counter">סצנה <span id="scenario-current-index">1</span>/<span id="scenario-total-count">10</span></p>
+                            <p class="scenario-session-meta">נקודות: <span id="scenario-session-score">0</span> | רצף ירוק: <span id="scenario-session-streak">0</span></p>
                         </div>
                         <div class="progress-bar">
                             <div id="scenario-progress-fill" class="progress-fill"></div>
                         </div>
-                        <div class="scenario-howto-strip" role="note">
-                            <h4>׳׳” ׳¢׳•׳©׳™׳ ׳¢׳›׳©׳™׳•? (20 ׳©׳ ׳™׳•׳×)</h4>
-                            <ol>
-                                <li>׳§׳•׳¨׳׳™׳ ׳׳× ׳”׳¡׳¦׳ ׳” ׳•׳׳–׳”׳™׳ ׳׳× ׳”׳₪׳•׳¢׳ ׳”׳׳-׳׳₪׳•׳¨׳˜.</li>
-                                <li>׳‘׳•׳—׳¨׳™׳ ׳×׳’׳•׳‘׳× ׳׳˜׳₪׳ ׳׳—׳×: ׳™׳¨׳•׳§ = ׳׳§׳“׳ ׳×׳”׳׳™׳, ׳׳“׳•׳ = ׳׳—׳׳™׳¨ ׳×׳§׳™׳¢׳•׳×.</li>
-                                <li>׳׳•׳׳“׳™׳ ׳׳”׳׳©׳•׳‘ ׳•׳¢׳•׳‘׳¨׳™׳ ׳׳₪׳™׳¨׳•׳§ TOTE ׳׳¦׳¢׳“ ׳‘׳™׳¦׳•׳¢ ׳‘׳¨׳•׳¨.</li>
-                            </ol>
-                        </div>
-                        <div class="scenario-play-layout">
-                            <div class="scenario-story-card">
-                                <div class="scenario-role" id="scenario-role"></div>
-                                <h3 id="scenario-title"></h3>
-                                <div id="scenario-story-lines" class="scenario-story-lines"></div>
-                                <p class="scenario-unspecified-line">׳₪׳•׳¢׳ ׳׳-׳׳₪׳•׳¨׳˜ ׳‘׳¡׳¦׳ ׳”: <strong id="scenario-unspecified-verb"></strong></p>
-                                <div class="scenario-predicate-panel">
-                                    <p><strong>׳¡׳•׳’ ׳₪׳•׳¢׳:</strong> <span id="scenario-predicate-type"></span></p>
-                                    <p><strong>׳×׳¨׳’׳•׳ ׳×׳”׳׳™׳›׳™:</strong> <span id="scenario-predicate-normalized"></span></p>
-                                    <p><strong>׳׳” ׳—׳¡׳¨ ׳›׳“׳™ ׳׳”׳×׳§׳“׳:</strong> <span id="scenario-predicate-missing-action"></span></p>
-                                </div>
-                                <div class="scenario-context-grid">
-                                    <div class="scenario-context-item">
-                                        <h4>׳׳—׳¥/׳׳¡׳’׳¨׳×</h4>
-                                        <p id="scenario-context-pressure"></p>
-                                    </div>
-                                    <div class="scenario-context-item">
-                                        <h4>׳׳׳•׳ ׳” ׳׳₪׳¢׳™׳׳”</h4>
-                                        <p id="scenario-context-belief"></p>
-                                    </div>
-                                    <div class="scenario-context-item">
-                                        <h4>׳ ׳§׳•׳“׳× ׳×׳§׳™׳¢׳”</h4>
-                                        <p id="scenario-context-stuck"></p>
-                                    </div>
-                                </div>
-                                <p class="scenario-focus-box">
-                                    <strong>׳׳™׳§׳•׳“ ׳׳×׳¨׳’׳™׳ ׳¢׳›׳©׳™׳•:</strong>
-                                    <span id="scenario-live-focus"></span>
-                                </p>
-                            </div>
-                            <div id="scenario-comic-stage" class="scenario-comic-stage" hidden>
-                                <div class="scenario-comic-image-wrap">
-                                    <img id="scenario-comic-image" src="" alt="" loading="lazy">
-                                </div>
-                                <div class="scenario-comic-caption">
-                                    <p class="scenario-comic-label">׳¡׳¦׳ ׳× ׳§׳•׳׳™׳§׳¡</p>
-                                    <h4 id="scenario-comic-title"></h4>
-                                    <p id="scenario-comic-subtitle"></p>
-                                </div>
+                        <div class="scenario-story-card">
+                            <div class="scenario-role" id="scenario-role"></div>
+                            <h3 id="scenario-title"></h3>
+                            <div id="scenario-story-lines" class="scenario-story-lines"></div>
+                            <p class="scenario-unspecified-line">Predicate לא-מפורט: <strong id="scenario-unspecified-verb"></strong></p>
+                            <div class="scenario-predicate-panel">
+                                <p><strong>סוג Predicate:</strong> <span id="scenario-predicate-type"></span></p>
+                                <p><strong>נרמול:</strong> <span id="scenario-predicate-normalized"></span></p>
+                                <p><strong>מה חסר כדי לצאת מהלולאה:</strong> <span id="scenario-predicate-missing-action"></span></p>
                             </div>
                         </div>
-                        <h4 class="scenario-options-title">׳‘׳—׳¨/׳™ ׳×׳’׳•׳‘׳× ׳׳˜׳₪׳ ׳׳—׳×</h4>
-                        <p class="scenario-options-subtitle">׳”׳׳˜׳¨׳”: ׳׳‘׳—׳•׳¨ ׳ ׳™׳¡׳•׳— ׳©׳׳™׳™׳¦׳¨ ׳‘׳”׳™׳¨׳•׳× ׳•׳¦׳¢׳“ ׳‘׳™׳¦׳•׳¢, ׳׳ ׳”׳׳©׳׳” ׳׳• ׳“׳—׳™׳™׳”.</p>
+                        <div id="scenario-comic-stage" class="scenario-comic-stage" hidden>
+                            <div class="scenario-comic-image-wrap">
+                                <img id="scenario-comic-image" src="" alt="" loading="lazy">
+                            </div>
+                            <div class="scenario-comic-caption">
+                                <p class="scenario-comic-label">Comic Scene</p>
+                                <h4 id="scenario-comic-title"></h4>
+                                <p id="scenario-comic-subtitle"></p>
+                            </div>
+                        </div>
                         <div id="scenario-options-container" class="scenario-options-container"></div>
                     </div>
 
@@ -298,116 +264,114 @@
                         <div id="scenario-feedback-mark" class="scenario-feedback-mark"></div>
                         <h3 id="scenario-feedback-title"></h3>
                         <p id="scenario-feedback-text"></p>
-                        <p class="scenario-feedback-next-hint">׳¢׳›׳©׳™׳• ׳¢׳•׳‘׳¨׳™׳ ׳׳”׳×׳™׳׳•׳¨׳™׳” ׳׳₪׳¨׳§׳˜׳™׳§׳”: ׳׳—׳¥/׳™ ׳¢׳ "׳”׳¨׳׳” ׳׳× ׳”׳₪׳™׳¨׳•׳§".</p>
                         <div id="scenario-consequence-box" class="scenario-consequence-box hidden">
                             <h4 id="scenario-consequence-title"></h4>
                             <p id="scenario-consequence-action"></p>
                             <p id="scenario-consequence-result"></p>
                         </div>
-                        <button id="scenario-show-blueprint-btn" class="btn btn-primary">׳”׳¨׳׳” ׳׳× ׳”׳₪׳™׳¨׳•׳§</button>
+                        <button id="scenario-show-blueprint-btn" class="btn btn-primary">הראה את הפירוק</button>
                     </div>
 
                     <!-- BLUEPRINT -->
                     <div id="scenario-screen-blueprint" class="scenario-screen hidden">
-                        <h3>׳₪׳™׳¨׳•׳§ ׳×׳”׳׳™׳ (TOTE) ג€” ׳׳₪׳× ׳₪׳¢׳•׳׳”</h3>
-                        <p class="scenario-blueprint-intro">׳›׳׳ ׳”׳•׳₪׳›׳™׳ ׳׳× ׳”׳׳©׳₪׳˜ ׳”׳¢׳׳•׳ ׳׳×׳”׳׳™׳: ׳˜׳¨׳™׳’׳¨, ׳¦׳¢׳“׳™׳, ׳—׳¡׳, ׳™׳¦׳™׳׳” ׳•׳׳“׳“ ׳”׳¦׳׳—׳”.</p>
+                        <h3>Action Map: TOTE + Loop</h3>
                         <div class="scenario-tote-map">
-                            <h4>׳׳₪׳× ׳×׳”׳׳™׳ (9 ׳¡׳׳•׳˜׳™׳)</h4>
+                            <h4>מפת תהליך (9 סלוטים)</h4>
                             <div class="scenario-tote-grid">
                                 <div class="scenario-tote-slot">
-                                    <h5>A1. ׳˜׳¨׳™׳’׳¨ / ׳׳¡׳’׳¨׳×</h5>
+                                    <h5>A1. Trigger / Frame</h5>
                                     <p id="scenario-tote-trigger"></p>
                                 </div>
                                 <div class="scenario-tote-slot">
-                                    <h5>A2. ׳׳” ׳§׳•׳¨׳” ׳¨׳’׳¢ ׳׳₪׳ ׳™</h5>
+                                    <h5>A2. מה קורה רגע לפני</h5>
                                     <p id="scenario-tote-pre-event"></p>
                                 </div>
                                 <div class="scenario-tote-slot">
-                                    <h5>B. ׳¡׳™׳׳ ׳‘׳“׳™׳§׳”: ׳׳™׳ ׳™׳•׳“׳¢׳™׳ ׳©׳–׳” ׳§׳•׳¨׳”</h5>
+                                    <h5>B. Test: איך יודעים שזה קורה</h5>
                                     <p id="scenario-tote-evidence"></p>
                                 </div>
                                 <div class="scenario-tote-slot">
-                                    <h5>C1. ׳₪׳¢׳•׳׳”: ׳׳™׳§׳¨׳•-׳¦׳¢׳“ 1</h5>
+                                    <h5>C1. Operate: מיקרו-צעד 1</h5>
                                     <p id="scenario-tote-op1"></p>
                                 </div>
                                 <div class="scenario-tote-slot">
-                                    <h5>C2. ׳₪׳¢׳•׳׳”: ׳׳™׳§׳¨׳•-׳¦׳¢׳“ 2</h5>
+                                    <h5>C2. Operate: מיקרו-צעד 2</h5>
                                     <p id="scenario-tote-op2"></p>
                                 </div>
                                 <div class="scenario-tote-slot">
-                                    <h5>C3. ׳₪׳¢׳•׳׳”: ׳׳™׳§׳¨׳•-׳¦׳¢׳“ 3</h5>
+                                    <h5>C3. Operate: מיקרו-צעד 3</h5>
                                     <p id="scenario-tote-op3"></p>
                                 </div>
                                 <div class="scenario-tote-slot">
-                                    <h5>D1. ׳—׳¡׳ / ׳”׳₪׳¨׳¢׳”</h5>
+                                    <h5>D1. Interference / חסם</h5>
                                     <p id="scenario-tote-blocker"></p>
                                 </div>
                                 <div class="scenario-tote-slot">
-                                    <h5>D2. ׳׳” ׳§׳•׳¨׳” ׳׳•׳˜׳•׳׳˜׳™׳×</h5>
+                                    <h5>D2. מה קורה אוטומטית</h5>
                                     <p id="scenario-tote-auto"></p>
                                 </div>
                                 <div class="scenario-tote-slot">
-                                    <h5>E. ׳™׳¦׳™׳׳”: ׳׳™׳ ׳ ׳¨׳׳” "׳׳ ׳×׳§׳•׳¢"</h5>
+                                    <h5>E. Exit: איך נראה "לא תקוע"</h5>
                                     <p id="scenario-tote-exit"></p>
                                 </div>
                             </div>
                             <div class="scenario-question-engine">
-                                <h5>׳©׳׳׳•׳× ׳”׳©׳׳׳” ׳׳₪׳™ ׳¡׳•׳’ ׳”׳₪׳•׳¢׳</h5>
+                                <h5>שאלות דינמיות לפי סוג Predicate</h5>
                                 <ul id="scenario-dynamic-questions"></ul>
                                 <div class="scenario-probe-buttons">
-                                    <button id="scenario-open-box-btn" class="btn btn-secondary">׳₪׳×׳— ׳¢׳•׳“ ׳©׳׳׳”</button>
-                                    <button id="scenario-knife-btn" class="btn btn-secondary">׳—׳×׳•׳ ׳”׳ ׳—׳”</button>
+                                    <button id="scenario-open-box-btn" class="btn btn-secondary">פתח עוד</button>
+                                    <button id="scenario-knife-btn" class="btn btn-secondary">חתוך דבק</button>
                                 </div>
                                 <p id="scenario-probe-output" class="scenario-probe-output"></p>
                             </div>
                         </div>
-                        <h3>׳×׳•׳›׳ ׳™׳× ׳‘׳™׳¦׳•׳¢ ׳§׳¦׳¨׳”</h3>
+                        <h3>Blueprint קומפקטי</h3>
                         <div class="final-blueprint-display scenario-blueprint-display">
                             <div class="blueprint-section">
-                                <h4>נ¯ ׳׳˜׳¨׳”</h4>
+                                <h4>🎯 מטרה</h4>
                                 <p id="scenario-blueprint-goal"></p>
                             </div>
                             <div class="blueprint-section">
-                                <h4>ג±ן¸ ׳¦׳¢׳“ ׳¨׳׳©׳•׳ (10 ׳“׳§׳•׳×)</h4>
+                                <h4>⏱️ צעד ראשון (10 דקות)</h4>
                                 <p id="scenario-blueprint-first-step"></p>
                             </div>
                             <div class="blueprint-section">
-                                <h4>נ§­ ׳©׳׳‘׳™׳</h4>
+                                <h4>🧭 שלבים</h4>
                                 <ul id="scenario-blueprint-steps"></ul>
                             </div>
                             <div class="blueprint-section">
-                                <h4>נ§± ׳ ׳§׳•׳“׳× ׳×׳§׳™׳¢׳”</h4>
+                                <h4>🧱 נקודת תקיעה</h4>
                                 <p id="scenario-blueprint-stuck"></p>
                             </div>
                             <div class="blueprint-section">
-                                <h4>נ› ׳×׳—׳׳™׳£ (Plan B)</h4>
+                                <h4>🛟 Plan B / תחליף</h4>
                                 <p id="scenario-blueprint-planb"></p>
                             </div>
                             <div class="blueprint-section">
-                                <h4>ג… ׳׳“׳“ ׳”׳¦׳׳—׳” (Done)</h4>
+                                <h4>✅ מדד הצלחה (Done)</h4>
                                 <p id="scenario-blueprint-done"></p>
                             </div>
                         </div>
 
                         <div class="scenario-green-box">
-                            <h4>׳”׳׳©׳₪׳˜ ׳”׳™׳¨׳•׳§ ׳”׳׳•׳¦׳¢</h4>
+                            <h4>המשפט הירוק המוצע</h4>
                             <p id="scenario-green-sentence"></p>
-                            <button id="scenario-copy-green-btn" class="btn btn-secondary">׳”׳¢׳×׳§ ׳׳©׳₪׳˜ ׳™׳¨׳•׳§</button>
+                            <button id="scenario-copy-green-btn" class="btn btn-secondary">העתק משפט ירוק</button>
                         </div>
 
                         <div id="scenario-prism-wheel" class="scenario-prism-wheel hidden">
-                            <h4>׳’׳׳’׳ ׳₪׳¨׳™׳–׳׳•׳× ׳׳”׳™׳¨ (׳׳•׳₪׳¦׳™׳•׳ ׳׳™)</h4>
+                            <h4>גלגל פריזמות מהיר (אופציונלי)</h4>
                             <div id="scenario-prism-items" class="scenario-prism-items"></div>
                             <div id="scenario-prism-detail" class="scenario-prism-detail hidden"></div>
                         </div>
 
                         <div class="q-card">
-                            <label for="scenario-user-note">׳”׳¢׳¨׳” ׳׳™׳©׳™׳× (׳¨׳©׳•׳×): ׳׳” ׳×׳’׳™׳“/׳™ ׳‘׳₪׳¢׳ ׳”׳‘׳׳”?</label>
-                            <textarea id="scenario-user-note" rows="3" placeholder="׳›׳×׳•׳‘/׳™ ׳ ׳™׳¡׳•׳— ׳§׳¦׳¨ ׳׳• ׳×׳•׳‘׳ ׳”..."></textarea>
+                            <label for="scenario-user-note">הערה אישית (רשות): מה תגיד/י בפעם הבאה?</label>
+                            <textarea id="scenario-user-note" rows="3" placeholder="כתוב/י ניסוח קצר או תובנה..."></textarea>
                         </div>
 
                         <div class="step-buttons">
-                            <button id="scenario-finish-scene-btn" class="btn btn-primary">׳¡׳™׳•׳ ׳¡׳¦׳ ׳”</button>
+                            <button id="scenario-finish-scene-btn" class="btn btn-primary">סיום סצנה</button>
                         </div>
                     </div>
 
@@ -417,52 +381,52 @@
                         <p id="scenario-score-line" class="scenario-score-line"></p>
                         <p id="scenario-next-green-line" class="scenario-next-green-line"></p>
                         <div id="scenario-result-summary" class="scenario-result-summary hidden">
-                            <p><strong>׳׳˜׳¨׳” ׳›׳׳׳™׳×:</strong> <span id="scenario-result-goal"></span></p>
-                            <p><strong>׳׳“׳“ ׳”׳¦׳׳—׳”:</strong> <span id="scenario-result-metric"></span></p>
+                            <p><strong>מטרה כללית:</strong> <span id="scenario-result-goal"></span></p>
+                            <p><strong>מדד הצלחה:</strong> <span id="scenario-result-metric"></span></p>
                         </div>
                         <div class="step-buttons">
-                            <button id="scenario-next-scene-btn" class="btn btn-primary">׳”׳׳©׳ ׳׳¡׳¦׳ ׳” ׳”׳‘׳׳”</button>
-                            <button id="scenario-back-home-btn" class="btn btn-secondary">׳—׳–׳¨׳” ׳׳‘׳™׳× ׳”׳¡׳¦׳ ׳•׳×</button>
+                            <button id="scenario-next-scene-btn" class="btn btn-primary">המשך לסצנה הבאה</button>
+                            <button id="scenario-back-home-btn" class="btn btn-secondary">חזרה לבית הסצנות</button>
                         </div>
                     </div>
 
                     <!-- HISTORY -->
                     <div id="scenario-screen-history" class="scenario-screen hidden">
-                        <h3>׳”׳™׳¡׳˜׳•׳¨׳™׳™׳× ׳¡׳¦׳ ׳•׳×</h3>
+                        <h3>היסטוריית סצנות</h3>
                         <div class="step-buttons">
-                            <button id="scenario-export-history-btn" class="btn btn-secondary">׳™׳™׳¦׳ JSON</button>
-                            <button id="scenario-clear-history-btn" class="btn btn-secondary">׳ ׳§׳” ׳”׳™׳¡׳˜׳•׳¨׳™׳”</button>
-                            <button id="scenario-back-home-from-history" class="btn btn-primary">׳—׳–׳¨׳”</button>
+                            <button id="scenario-export-history-btn" class="btn btn-secondary">ייצא JSON</button>
+                            <button id="scenario-clear-history-btn" class="btn btn-secondary">נקה היסטוריה</button>
+                            <button id="scenario-back-home-from-history" class="btn btn-primary">חזרה</button>
                         </div>
                         <div id="scenario-history-list" class="scenario-history-list"></div>
                     </div>
 
                     <!-- SETTINGS -->
                     <div id="scenario-screen-settings" class="scenario-screen hidden">
-                        <h3>׳”׳’׳“׳¨׳•׳× ׳¡׳¦׳ ׳•׳×</h3>
+                        <h3>הגדרות סצנות</h3>
                         <div class="blueprint-questions">
                             <div class="q-card">
-                                <label for="scenario-setting-domain">׳×׳—׳•׳ ׳‘׳¨׳™׳¨׳× ׳׳—׳“׳</label>
+                                <label for="scenario-setting-domain">תחום ברירת מחדל</label>
                                 <select id="scenario-setting-domain"></select>
                             </div>
                             <div class="q-card">
-                                <label for="scenario-setting-difficulty">׳¨׳׳× ׳‘׳¨׳™׳¨׳× ׳׳—׳“׳</label>
+                                <label for="scenario-setting-difficulty">רמת ברירת מחדל</label>
                                 <select id="scenario-setting-difficulty"></select>
                             </div>
                             <div class="q-card scenario-toggle-row">
                                 <label>
                                     <input type="checkbox" id="scenario-setting-sound" checked />
-                                    ׳¦׳׳™׳׳™׳ ׳‘׳׳¡׳ ׳”׳¡׳¦׳ ׳•׳×
+                                    צלילים במסך הסצנות
                                 </label>
                                 <label>
                                     <input type="checkbox" id="scenario-setting-prism" checked />
-                                    ׳’׳׳’׳ ׳₪׳¨׳™׳–׳׳•׳× ׳׳—׳¨׳™ ׳×׳©׳•׳‘׳” ׳™׳¨׳•׳§׳”
+                                    גלגל פריזמות אחרי תשובה ירוקה
                                 </label>
                             </div>
                         </div>
                         <div class="step-buttons">
-                            <button id="scenario-save-settings-btn" class="btn btn-primary">׳©׳׳•׳¨ ׳”׳’׳“׳¨׳•׳×</button>
-                            <button id="scenario-back-home-from-settings" class="btn btn-secondary">׳—׳–׳¨׳”</button>
+                            <button id="scenario-save-settings-btn" class="btn btn-primary">שמור הגדרות</button>
+                            <button id="scenario-back-home-from-settings" class="btn btn-secondary">חזרה</button>
                         </div>
                     </div>
                 </div>
@@ -472,22 +436,22 @@
         <!-- COMIC ENGINE TAB -->
         <section id="comic-engine" class="tab-content">
             <div class="card comic-engine-shell">
-                <h2>נ­ Comic Engine Flow</h2>
-                <p class="subtitle">׳“׳™׳׳׳•׳’ ׳—׳™ ׳‘׳¢׳׳•׳“ ׳׳—׳“: ׳‘׳—׳™׳¨׳” ג†’ ׳×׳’׳•׳‘׳× ׳¦׳“ ׳©׳ ׳™ ג†’ ׳×׳’׳•׳‘׳” ׳©׳׳ ג†’ ׳₪׳¨׳©׳ ׳•׳× ג†’ ׳—׳׳•׳₪׳” ׳©׳›׳׳™׳× + ׳•׳™׳¡׳•׳× ׳¡׳˜׳™׳™׳˜.</p>
+                <h2>🎭 Comic Engine Flow</h2>
+                <p class="subtitle">דיאלוג חי בעמוד אחד: בחירה → תגובת צד שני → תגובה שלך → פרשנות → חלופה שכלית + ויסות סטייט.</p>
 
                 <section id="comicEngine" class="ceflow-engine" dir="rtl">
                     <div class="ceflow-top-actions">
-                        <button id="ceflow-info-btn" class="btn btn-secondary ceflow-small-btn" type="button">נ’¡ ׳׳׳” ׳–׳” ׳¢׳•׳‘׳“?</button>
+                        <button id="ceflow-info-btn" class="btn btn-secondary ceflow-small-btn" type="button">💡 למה זה עובד?</button>
                     </div>
                     <div id="ceflow-floating-note" class="ceflow-floating-note hidden" aria-live="polite"></div>
 
                     <header class="ceflow-header">
                         <div class="ceflow-chip-row">
-                            <span id="ceflow-domain" class="ceflow-chip">׳×׳—׳•׳</span>
+                            <span id="ceflow-domain" class="ceflow-chip">תחום</span>
                             <span id="ceflow-progress" class="ceflow-chip">1/1</span>
-                            <span id="ceflow-level" class="ceflow-chip">׳¨׳׳”</span>
+                            <span id="ceflow-level" class="ceflow-chip">רמה</span>
                         </div>
-                        <h3 id="ceflow-title" class="ceflow-title">׳›׳•׳×׳¨׳× ׳¡׳¦׳ ׳”</h3>
+                        <h3 id="ceflow-title" class="ceflow-title">כותרת סצנה</h3>
                     </header>
 
                     <div class="ceflow-stage-wrap">
@@ -519,17 +483,17 @@
                     </div>
 
                     <section>
-                        <h4 class="ceflow-block-title">׳‘׳—׳¨/׳™ ׳×׳’׳•׳‘׳”</h4>
-                        <div id="ceflow-choice-deck" class="ceflow-choice-deck" role="group" aria-label="׳׳₪׳©׳¨׳•׳™׳•׳× ׳×׳’׳•׳‘׳”"></div>
+                        <h4 class="ceflow-block-title">בחר/י תגובה</h4>
+                        <div id="ceflow-choice-deck" class="ceflow-choice-deck" role="group" aria-label="אפשרויות תגובה"></div>
                     </section>
 
                     <section id="ceflow-reply-box" class="ceflow-reply-box hidden">
-                        <h4 class="ceflow-block-title">׳”׳¦׳“ ׳”׳©׳ ׳™ ׳”׳’׳™׳‘. ׳׳™׳ ׳׳×/׳” ׳¢׳•׳ ׳” ׳¢׳›׳©׳™׳•?</h4>
+                        <h4 class="ceflow-block-title">הצד השני הגיב. איך את/ה עונה עכשיו?</h4>
                         <div id="ceflow-reply-quick" class="ceflow-reply-quick"></div>
-                        <label for="ceflow-reply-input" class="ceflow-input-label">׳×׳’׳•׳‘׳” ׳©׳׳:</label>
-                        <textarea id="ceflow-reply-input" rows="2" placeholder="׳›׳×׳‘׳• ׳×׳’׳•׳‘׳” ׳׳—׳× ׳׳“׳•׳™׳§׳× ׳•׳§׳¦׳¨׳”..."></textarea>
+                        <label for="ceflow-reply-input" class="ceflow-input-label">תגובה שלך:</label>
+                        <textarea id="ceflow-reply-input" rows="2" placeholder="כתבו תגובה אחת מדויקת וקצרה..."></textarea>
                         <div class="ceflow-inline-actions">
-                            <button id="ceflow-reply-confirm" class="btn btn-primary" type="button">׳׳©׳¨ ׳×׳’׳•׳‘׳”</button>
+                            <button id="ceflow-reply-confirm" class="btn btn-primary" type="button">אשר תגובה</button>
                             <small id="ceflow-reply-status" aria-live="polite"></small>
                         </div>
                     </section>
@@ -540,22 +504,22 @@
                     </section>
 
                     <section id="ceflow-power-card" class="ceflow-power-card hidden">
-                        <h4>Power Card: ׳‘׳׳§׳•׳ ׳×׳’׳•׳‘׳” ׳׳™׳׳₪׳•׳׳¡׳™׳‘׳™׳×</h4>
-                        <p>׳‘׳—׳¨/׳™ ׳©׳׳׳” ׳׳˜׳”-׳׳•׳“׳ ׳׳—׳×. ׳׳—׳¨׳™ ׳©׳׳׳” ׳׳“׳•׳™׳§׳×, ׳”׳“׳™׳׳׳•׳’ ׳ ׳₪׳×׳— ׳׳—׳“׳©.</p>
+                        <h4>Power Card: במקום תגובה אימפולסיבית</h4>
+                        <p>בחר/י שאלה מטה-מודל אחת. אחרי שאלה מדויקת, הדיאלוג נפתח מחדש.</p>
                         <div id="ceflow-power-questions" class="ceflow-power-questions"></div>
                         <div id="ceflow-new-info" class="ceflow-new-info hidden"></div>
                         <div class="ceflow-inline-actions">
-                            <button id="ceflow-open-blueprint-inner" class="btn btn-secondary" type="button">׳‘׳•׳ ׳ ׳‘׳ ׳” ׳×׳•׳›׳ ׳™׳×</button>
+                            <button id="ceflow-open-blueprint-inner" class="btn btn-secondary" type="button">בוא נבנה תוכנית</button>
                         </div>
                     </section>
 
                     <section id="ceflow-blueprint" class="ceflow-blueprint hidden"></section>
 
                     <footer class="ceflow-controls">
-                        <button id="ceflow-retry" class="btn btn-secondary" type="button" disabled>ג†» ׳ ׳¡׳” ׳©׳•׳‘</button>
-                        <button id="ceflow-toggle-mode" class="btn btn-secondary" type="button">נ“ ׳׳¦׳‘ ׳׳™׳׳•׳“</button>
-                        <button id="ceflow-open-blueprint" class="btn btn-secondary hidden" type="button">נ§­ ׳‘׳•׳ ׳ ׳‘׳ ׳” ׳×׳•׳›׳ ׳™׳×</button>
-                        <button id="ceflow-next-scene" class="btn btn-primary" type="button" disabled>ג¡ ׳¡׳¦׳ ׳” ׳”׳‘׳׳”</button>
+                        <button id="ceflow-retry" class="btn btn-secondary" type="button" disabled>↻ נסה שוב</button>
+                        <button id="ceflow-toggle-mode" class="btn btn-secondary" type="button">📚 מצב לימוד</button>
+                        <button id="ceflow-open-blueprint" class="btn btn-secondary hidden" type="button">🧭 בוא נבנה תוכנית</button>
+                        <button id="ceflow-next-scene" class="btn btn-primary" type="button" disabled>➡ סצנה הבאה</button>
                     </footer>
                 </section>
             </div>
@@ -565,8 +529,8 @@
         <section id="prismlab" class="tab-content">
             <div class="prism-container">
                 <div class="card">
-                    <h2>נ” ׳׳¢׳‘׳“׳× ׳₪׳¨׳™׳–׳׳•׳× (Prism Lab)</h2>
-                    <p>׳‘׳—׳¨ ׳₪׳¨׳™׳–׳׳” ׳׳¡׳¨׳™׳§׳”, ׳”׳•׳¦׳‘ ׳©׳׳׳× ׳¢׳•׳’׳ ׳׳—׳×, ׳•׳׳₪׳” ׳׳× ׳”׳×׳©׳•׳‘׳•׳× ׳¢׳ ׳¨׳׳•׳× ׳׳•׳’׳™׳•׳×.</p>
+                    <h2>🔍 מעבדת פריזמות (Prism Lab)</h2>
+                    <p>בחר פריזמה לסריקה, הוצב שאלת עוגן אחת, ומפה את התשובות על רמות לוגיות.</p>
 
                     <div class="prism-grid" id="prism-library">
                         <!-- Prism cards will be rendered here -->
@@ -576,20 +540,20 @@
                         <h3 id="prism-name"></h3>
                         <p id="prism-desc"></p>
                         <div class="anchor-box">
-                            <strong>׳©׳׳׳× ׳”׳¢׳•׳’׳:</strong>
+                            <strong>שאלת העוגן:</strong>
                             <p id="prism-anchor" class="anchor-question"></p>
                         </div>
                         <div id="prism-deep-guide" class="prism-deep-guide"></div>
 
                         <div class="mapping-form">
                             <div class="prism-tools-row">
-                                <button class="btn btn-secondary audio-mute-btn">׳¡׳׳•׳ ׳“ ׳₪׳¢׳™׳</button>
+                                <button class="btn btn-secondary audio-mute-btn">סאונד פעיל</button>
                             </div>
-                            <p class="muted">׳׳׳ ׳×׳©׳•׳‘׳•׳× ׳׳׳₪׳” ׳׳₪׳™ ׳¨׳׳•׳× (E,B,C,V,I,S)</p>
+                            <p class="muted">מלא תשובות למפה לפי רמות (E,B,C,V,I,S)</p>
                             <div class="mapping-row">
                                 <div class="prepared-items">
-                                    <h4>׳¨׳©׳•׳׳•׳× ׳׳•׳›׳ ׳•׳×</h4>
-                                    <p class="muted">׳’׳¨׳•׳¨ ׳׳ ׳”׳×׳™׳‘׳” ׳׳• ׳׳—׳¥ ׳׳”׳¢׳×׳§׳”</p>
+                                    <h4>רשומות מוכנות</h4>
+                                    <p class="muted">גרור אל התיבה או לחץ להעתקה</p>
                                     <div id="prepared-list" class="prepared-list"></div>
                                 </div>
 
@@ -604,17 +568,17 @@
                             </div>
 
                             <div class="q-card">
-                                <label>׳¢׳•׳¦׳׳× ׳¨׳’׳© (1-5)</label>
+                                <label>עוצמת רגש (1-5)</label>
                                 <input type="range" id="prism-emotion" min="1" max="5" value="3" /> <span id="emotion-display">3</span>
                             </div>
                             <div class="q-card">
-                                <label>׳”׳×׳ ׳’׳“׳•׳× (1-5)</label>
+                                <label>התנגדות (1-5)</label>
                                 <input type="range" id="prism-resistance" min="1" max="5" value="2" /> <span id="resistance-display">2</span>
                             </div>
 
                             <div class="step-buttons">
-                                <button id="prism-cancel" class="btn btn-secondary">ג† ׳—׳–׳•׳¨ ׳׳¡׳₪׳¨׳™׳”</button>
-                                <button id="prism-submit" class="btn btn-primary">׳׳₪׳” ׳•׳”׳׳׳¥ Pivot ג†’</button>
+                                <button id="prism-cancel" class="btn btn-secondary">← חזור לספריה</button>
+                                <button id="prism-submit" class="btn btn-primary">מפה והמלץ Pivot →</button>
                             </div>
                         </div>
 
@@ -634,55 +598,44 @@
         <section id="practice-question" class="tab-content practice-tab-content">
             <div class="practice-container">
                 <div class="card practice-intro-card">
-                    <h2>׳×׳¨׳’׳•׳ ׳©׳׳׳•׳×</h2>
-                    <p class="subtitle">׳׳˜׳¨׳”: ׳׳§׳—׳× ׳׳©׳₪׳˜ ׳¢׳׳•׳ ׳•׳׳ ׳¡׳— ׳©׳׳׳” ׳׳—׳× ׳©׳׳‘׳”׳™׳¨׳” ׳׳•׳×׳•.</p>
+                    <h2>תרגול דינאמי 🎮</h2>
+                    <p class="subtitle">דף 1 מתוך 3: בניית שאלות מדויקות על משפטי Meta Model.</p>
 
                     <div class="practice-filters">
-                        <label>׳‘׳—׳¨ ׳§׳˜׳’׳•׳¨׳™׳”:</label>
+                        <label>בחר קטגוריה:</label>
                         <select id="category-select">
-                            <option value="">׳”׳›׳</option>
+                            <option value="">הכל</option>
                         </select>
                     </div>
 
                     <section class="practice-section practice-section-question" aria-label="Question Drill Section">
                         <div class="practice-section-header">
-                            <h3>1. ׳׳” ׳¢׳•׳©׳™׳ ׳›׳׳?</h3>
-                            <p>׳§׳•׳¨׳׳™׳ ׳׳©׳₪׳˜, ׳›׳•׳×׳‘׳™׳ ׳©׳׳׳× ׳”׳‘׳”׳¨׳” ׳׳—׳×, ׳•׳׳§׳‘׳׳™׳ ׳׳©׳•׳‘ ׳׳™׳™׳“׳™.</p>
+                            <h3>1. תרגיל בניית שאלות</h3>
+                            <p>כתבו שאלה מדויקת על המשפט וקבלו משוב מיידי.</p>
                         </div>
-
-                        <div class="quickstart-box" role="note" aria-label="׳”׳•׳¨׳׳•׳× ׳§׳¦׳¨׳•׳×">
-                            <h4>׳”׳•׳¨׳׳•׳× ׳§׳¦׳¨׳•׳× (20 ׳©׳ ׳™׳•׳×)</h4>
-                            <ol>
-                                <li>׳§׳¨׳ ׳׳× ׳”׳׳©׳₪׳˜ ׳©׳׳•׳₪׳™׳¢ ׳‘׳×׳™׳‘׳”.</li>
-                                <li>׳›׳×׳•׳‘ ׳©׳׳׳” ׳׳—׳× ׳©׳׳‘׳¨׳¨׳× ׳׳™׳׳” ׳׳• ׳”׳ ׳—׳” ׳¢׳׳•׳׳”.</li>
-                                <li>׳‘׳—׳¨ ׳§׳˜׳’׳•׳¨׳™׳” ׳•׳׳—׳¥ ׳¢׳ "׳‘׳“׳•׳§ ׳©׳׳׳”".</li>
-                            </ol>
-                            <p>׳׳ ׳¦׳¨׳™׳, ׳׳×׳§׳ ׳™׳ ׳׳× ׳”׳©׳׳׳” ׳•׳׳ ׳¡׳™׳ ׳©׳•׳‘.</p>
-                        </div>
-
                         <div id="question-drill" class="card question-drill-card">
                             <div class="question-drill-header">
-                                <h3>׳×׳¨׳’׳™׳ ׳‘׳ ׳™׳™׳× ׳©׳׳׳•׳×</h3>
-                                <small>׳”׳׳˜׳׳”: ׳©׳׳׳” ׳׳—׳× ׳§׳¦׳¨׳” ׳•׳‘׳¨׳•׳¨׳” ׳©׳׳‘׳™׳׳” ׳׳™׳“׳¢ ׳—׳“׳©.</small>
+                                <h3>תרגיל בניית שאלות</h3>
+                                <small>בחרו את המשפט, כתבו שאלה ותייגו את הכיוון (מחיקה/עיוות/הכללה).</small>
                             </div>
                             <p id="question-drill-statement" class="question-drill-statement"></p>
-                            <textarea id="question-drill-input" rows="3" placeholder="׳›׳×׳•׳‘ ׳›׳׳ ׳׳× ׳©׳׳׳× ׳”׳”׳‘׳”׳¨׳” ׳©׳׳..."></textarea>
+                            <textarea id="question-drill-input" rows="3" placeholder="כתוב/י כאן את השאלה שמחפשת את ההנחה הנסתרת..."></textarea>
                             <div class="question-drill-controls">
                                 <label>
-                                    <span>׳”׳§׳˜׳’׳•׳¨׳™׳” ׳©׳ ׳”׳׳©׳₪׳˜:</span>
+                                    <span>ממוקד ב-</span>
                                     <select id="question-drill-category">
-                                        <option value="DELETION">׳׳—׳™׳§׳” (Deletion)</option>
-                                        <option value="DISTORTION">׳¢׳™׳•׳•׳× (Distortion)</option>
-                                        <option value="GENERALIZATION">׳”׳›׳׳׳” (Generalization)</option>
+                                        <option value="DELETION">Deletion</option>
+                                        <option value="DISTORTION">Distortion</option>
+                                        <option value="GENERALIZATION">Generalization</option>
                                     </select>
                                 </label>
-                                <button id="question-drill-check" class="btn btn-primary">׳‘׳“׳•׳§ ׳©׳׳׳”</button>
-                                <button id="question-drill-next" class="btn btn-secondary">׳׳©׳₪׳˜ ׳—׳“׳©</button>
+                                <button id="question-drill-check" class="btn btn-primary">בדוק שאלה</button>
+                                <button id="question-drill-next" class="btn btn-secondary">משפט חדש</button>
                             </div>
                             <div id="question-drill-feedback" class="question-drill-feedback"></div>
                             <div class="question-drill-stats">
-                                <span>׳ ׳™׳¡׳™׳•׳ ׳•׳×: <strong id="question-drill-attempts">0</strong></span>
-                                <span>׳₪׳’׳™׳¢׳•׳×: <strong id="question-drill-hits">0</strong></span>
+                                <span>ניסיונות: <strong id="question-drill-attempts">0</strong></span>
+                                <span>פגיעות: <strong id="question-drill-hits">0</strong></span>
                             </div>
                         </div>
                     </section>
@@ -694,64 +647,64 @@
         <section id="practice-radar" class="tab-content practice-tab-content">
             <div class="practice-container">
                 <div class="card practice-intro-card">
-                    <h2>Meta Radar ג¡</h2>
-                    <p class="subtitle">׳“׳£ 2 ׳׳×׳•׳ 3: ׳–׳™׳”׳•׳™ ׳׳”׳™׳¨ ׳©׳ ׳×׳‘׳ ׳™׳•׳× ׳‘׳–׳׳ ׳׳׳×, ׳¢׳ ׳ ׳™׳§׳•׳“ ׳•׳׳©׳•׳‘.</p>
+                    <h2>Meta Radar ⚡</h2>
+                    <p class="subtitle">דף 2 מתוך 3: זיהוי מהיר של תבניות בזמן אמת, עם ניקוד ומשוב.</p>
 
                     <section class="practice-section practice-section-radar" aria-label="Meta Radar Section">
                         <div class="practice-section-header">
                             <h3>2. Meta Radar</h3>
-                            <p>׳–׳™׳”׳•׳™ ׳׳”׳™׳¨ ׳©׳ ׳×׳‘׳ ׳™׳•׳× ׳‘׳–׳׳, ׳¢׳ ׳ ׳™׳§׳•׳“ ׳•׳¨׳׳–׳•׳¨ ׳˜׳¢׳•׳™׳•׳×.</p>
+                            <p>זיהוי מהיר של תבניות בזמן, עם ניקוד ורמזור טעויות.</p>
                         </div>
                         <div id="rapid-pattern-arena" class="card rapid-pattern-card">
                             <div class="rapid-pattern-header">
-                                <h3>ג¡ Meta Radar: ׳׳•׳ ׳•׳׳•׳’ + ׳×׳‘׳ ׳™׳×</h3>
-                                <small>׳”׳׳™׳׳”/׳‘׳™׳˜׳•׳™ ׳”׳׳•׳“׳’׳© ׳”׳•׳ ׳”׳˜׳¨׳™׳’׳¨. ׳׳—׳¦׳• ׳¢׳ ׳׳—׳× ׳-15 ׳”׳×׳‘׳ ׳™׳•׳× ׳׳₪׳ ׳™ ׳©׳ ׳’׳׳¨ ׳”׳–׳׳.</small>
+                                <h3>⚡ Meta Radar: מונולוג + תבנית</h3>
+                                <small>המילה/ביטוי המודגש הוא הטריגר. לחצו על אחת מ-15 התבניות לפני שנגמר הזמן.</small>
                             </div>
 
                             <div class="rapid-pattern-shell">
                                 <aside class="rapid-pattern-side">
                                     <div class="rapid-panel rapid-mode-panel">
-                                        <label>׳׳¦׳‘</label>
-                                        <div class="rapid-mode-switch" role="group" aria-label="׳‘׳—׳™׳¨׳× ׳׳¦׳‘ Meta Radar">
-                                            <button id="rapid-mode-learning-btn" type="button" class="rapid-mode-btn is-active">׳׳׳™׳“׳”</button>
-                                            <button id="rapid-mode-exam-btn" type="button" class="rapid-mode-btn">׳׳‘׳—׳</button>
+                                        <label>מצב</label>
+                                        <div class="rapid-mode-switch" role="group" aria-label="בחירת מצב Meta Radar">
+                                            <button id="rapid-mode-learning-btn" type="button" class="rapid-mode-btn is-active">למידה</button>
+                                            <button id="rapid-mode-exam-btn" type="button" class="rapid-mode-btn">מבחן</button>
                                         </div>
-                                        <small id="rapid-mode-note" class="rapid-mode-note">׳׳׳™׳“׳”: ׳׳₪׳©׳¨ ׳׳¢׳¦׳•׳¨ ׳•׳׳§׳‘׳ HELP.</small>
+                                        <small id="rapid-mode-note" class="rapid-mode-note">למידה: אפשר לעצור ולקבל HELP.</small>
                                         <div class="rapid-mode-utility-row">
-                                            <button id="rapid-explain-btn" type="button" class="rapid-inline-btn">׳”׳¡׳‘׳¨ ׳”׳×׳¨׳’׳™׳</button>
-                                            <button id="rapid-focus-exit-btn" type="button" class="rapid-inline-btn rapid-inline-btn-ghost hidden">׳™׳¦׳™׳׳” ׳׳₪׳•׳§׳•׳¡</button>
+                                            <button id="rapid-explain-btn" type="button" class="rapid-inline-btn">הסבר התרגיל</button>
+                                            <button id="rapid-focus-exit-btn" type="button" class="rapid-inline-btn rapid-inline-btn-ghost hidden">יציאה מפוקוס</button>
                                         </div>
                                     </div>
 
                                     <div class="rapid-panel">
-                                        <label for="rapid-case-type">׳¡׳•׳’ ׳׳˜׳•׳₪׳</label>
+                                        <label for="rapid-case-type">סוג מטופל</label>
                                         <select id="rapid-case-type" class="rapid-control-select">
-                                            <option value="random">׳¨׳ ׳“׳•׳׳׳™</option>
+                                            <option value="random">רנדומלי</option>
                                         </select>
                                     </div>
 
                                     <div class="rapid-panel">
-                                        <label for="rapid-time-limit">׳¨׳׳× ׳§׳•׳©׳™ (׳–׳׳): <strong id="rapid-time-limit-value">12</strong> ׳©׳ ׳³</label>
+                                        <label for="rapid-time-limit">רמת קושי (זמן): <strong id="rapid-time-limit-value">12</strong> שנ׳</label>
                                         <input id="rapid-time-limit" type="range" min="6" max="25" value="12" />
                                     </div>
 
                                     <div class="rapid-panel">
-                                        <label>׳¨׳׳–׳•׳¨ ׳˜׳¢׳•׳™׳•׳×</label>
-                                        <div id="rapid-traffic-light" class="rapid-traffic-light" data-state="green" aria-label="׳¨׳׳–׳•׳¨ ׳׳¦׳‘">
+                                        <label>רמזור טעויות</label>
+                                        <div id="rapid-traffic-light" class="rapid-traffic-light" data-state="green" aria-label="רמזור מצב">
                                             <span class="rapid-light rapid-light-red" aria-hidden="true"></span>
                                             <span class="rapid-light rapid-light-yellow" aria-hidden="true"></span>
                                             <span class="rapid-light rapid-light-green" aria-hidden="true"></span>
                                         </div>
-                                        <small id="rapid-errors-label">׳˜׳¢׳•׳™׳•׳× ׳‘׳©׳׳׳”: 0/2</small>
+                                        <small id="rapid-errors-label">טעויות בשאלה: 0/2</small>
                                     </div>
 
                                     <div class="rapid-panel rapid-score-panel">
-                                        <p>׳ ׳™׳§׳•׳“: <strong id="rapid-score">0</strong></p>
-                                        <p>׳¨׳¦׳£: <strong id="rapid-streak">0</strong></p>
-                                        <p>׳©׳׳׳”: <strong id="rapid-round">0</strong></p>
+                                        <p>ניקוד: <strong id="rapid-score">0</strong></p>
+                                        <p>רצף: <strong id="rapid-streak">0</strong></p>
+                                        <p>שאלה: <strong id="rapid-round">0</strong></p>
                                     </div>
                                     <div class="rapid-actions-row">
-                                        <button id="rapid-start-btn" class="btn btn-primary">׳”׳×׳—׳ ׳¡׳‘׳‘</button>
+                                        <button id="rapid-start-btn" class="btn btn-primary">התחל סבב</button>
                                         <button id="rapid-pause-btn" class="btn btn-secondary rapid-pause-btn" disabled>PAUSE</button>
                                         <button id="rapid-help-btn" class="btn btn-secondary rapid-help-btn" disabled>HELP!</button>
                                     </div>
@@ -759,40 +712,40 @@
 
                                 <div class="rapid-pattern-main">
                                     <div class="rapid-monologue-box">
-                                        <p id="rapid-monologue-text" class="rapid-monologue-text">׳׳—׳¦׳• ׳¢׳ "׳”׳×׳—׳ ׳¡׳‘׳‘" ׳›׳“׳™ ׳׳”׳×׳—׳™׳ ׳–׳™׳”׳•׳™ ׳×׳‘׳ ׳™׳•׳× ׳‘׳–׳׳ ׳׳׳×.</p>
+                                        <p id="rapid-monologue-text" class="rapid-monologue-text">לחצו על "התחל סבב" כדי להתחיל זיהוי תבניות בזמן אמת.</p>
                                     </div>
 
                                     <div class="rapid-timer-row">
-                                        <div class="rapid-timer-bar" aria-label="׳׳“ ׳”׳×׳§׳“׳׳•׳× ׳–׳׳">
+                                        <div class="rapid-timer-bar" aria-label="מד התקדמות זמן">
                                             <span id="rapid-timer-fill"></span>
                                         </div>
-                                        <p id="rapid-feedback" class="rapid-feedback" data-tone="info">׳׳׳×׳™׳ ׳׳×׳—׳™׳׳× ׳¡׳‘׳‘...</p>
+                                        <p id="rapid-feedback" class="rapid-feedback" data-tone="info">ממתין לתחילת סבב...</p>
                                     </div>
 
                                     <div id="rapid-help-panel" class="rapid-help-panel hidden" aria-live="polite">
-                                        <h4>HELP ֲ· ׳׳¦׳‘ ׳׳׳™׳“׳”</h4>
+                                        <h4>HELP · מצב למידה</h4>
                                         <div id="rapid-help-content"></div>
                                     </div>
 
-                                    <div id="rapid-pattern-buttons" class="rapid-pattern-buttons" role="group" aria-label="׳›׳₪׳×׳•׳¨׳™ ׳×׳‘׳ ׳™׳•׳×"></div>
+                                    <div id="rapid-pattern-buttons" class="rapid-pattern-buttons" role="group" aria-label="כפתורי תבניות"></div>
                                     <div id="rapid-ai-feedback" class="rapid-ai-feedback hidden" aria-live="polite"></div>
                                 </div>
                             </div>
 
                             <div id="rapid-explain-modal" class="rapid-explain-modal hidden" role="dialog" aria-modal="true" aria-labelledby="rapid-explain-title">
                                 <div class="rapid-explain-dialog">
-                                    <button id="rapid-explain-close-btn" type="button" class="rapid-explain-close" aria-label="׳¡׳’׳™׳¨׳”">ֳ—</button>
-                                    <h4 id="rapid-explain-title">׳׳” ׳¢׳•׳©׳™׳ ׳‘-Meta Radar?</h4>
-                                    <p>׳”׳×׳¨׳’׳•׳ ׳׳׳׳ ׳–׳™׳”׳•׳™ ׳׳”׳™׳¨ ׳©׳ ׳”׳₪׳¨׳•׳× ׳׳˜׳”-׳׳•׳“׳ ׳‘׳–׳׳ ׳׳׳×, ׳‘׳¨׳’׳¢ ׳©׳¢׳•׳׳” ׳˜׳¨׳™׳’׳¨ ׳׳©׳•׳ ׳™ ׳‘׳׳©׳₪׳˜.</p>
+                                    <button id="rapid-explain-close-btn" type="button" class="rapid-explain-close" aria-label="סגירה">×</button>
+                                    <h4 id="rapid-explain-title">מה עושים ב-Meta Radar?</h4>
+                                    <p>התרגול מאמן זיהוי מהיר של הפרות מטה-מודל בזמן אמת, ברגע שעולה טריגר לשוני במשפט.</p>
                                     <ol>
-                                        <li>׳§׳•׳¨׳׳™׳ ׳׳× ׳”׳₪׳¡׳§׳” (4 ׳©׳•׳¨׳•׳×) ׳•׳©׳׳™׳ ׳׳‘ ׳׳׳™׳׳” ׳”׳׳•׳“׳’׳©׳×.</li>
-                                        <li>׳׳–׳”׳™׳ ׳׳™׳–׳” ׳¡׳•׳’ ׳”׳₪׳¨׳” ׳׳•׳₪׳¢׳ ׳›׳׳ ׳׳×׳•׳ 15 ׳”׳›׳₪׳×׳•׳¨׳™׳.</li>
-                                        <li>׳׳•׳—׳¦׳™׳ ׳׳”׳¨ ׳•׳‘׳“׳™׳•׳§ ׳׳₪׳ ׳™ ׳©׳ ׳’׳׳¨ ׳”׳–׳׳.</li>
+                                        <li>קוראים את הפסקה (4 שורות) ושמים לב למילה המודגשת.</li>
+                                        <li>מזהים איזה סוג הפרה מופעל כאן מתוך 15 הכפתורים.</li>
+                                        <li>לוחצים מהר ובדיוק לפני שנגמר הזמן.</li>
                                     </ol>
-                                    <p>׳”׳”׳™׳’׳™׳•׳: ׳׳ ׳׳ ׳—׳© ׳›׳₪׳×׳•׳¨, ׳׳׳ ׳׳‘׳ ׳•׳× ׳¨׳₪׳׳§׳¡ ׳©׳ <strong>׳˜׳¨׳™׳’׳¨ -> ׳¡׳•׳’ ׳”׳₪׳¨׳” -> ׳‘׳—׳™׳¨׳”</strong>.</p>
-                                    <p>׳‘׳¡׳•׳£ ׳”׳×׳¨׳’׳•׳ ׳׳׳•׳¨׳™׳ ׳׳“׳¢׳× ׳׳–׳”׳•׳× ׳׳”׳¨ ׳׳” ׳”׳׳™׳׳” ׳”׳׳•׳“׳’׳©׳× ׳׳¡׳׳ ׳×, ׳•׳׳‘׳—׳•׳¨ ׳×׳‘׳ ׳™׳× ׳׳“׳•׳™׳§׳× ׳‘׳׳™ ׳׳”׳×׳§׳¢.</p>
+                                    <p>ההיגיון: לא לנחש כפתור, אלא לבנות רפלקס של <strong>טריגר -> סוג הפרה -> בחירה</strong>.</p>
+                                    <p>בסוף התרגול אמורים לדעת לזהות מהר מה המילה המודגשת מסמנת, ולבחור תבנית מדויקת בלי להתקע.</p>
                                     <div class="rapid-explain-actions">
-                                        <button id="rapid-explain-confirm-btn" type="button" class="btn btn-primary">׳”׳‘׳ ׳×׳™, ׳׳׳©׳™׳›׳™׳</button>
+                                        <button id="rapid-explain-confirm-btn" type="button" class="btn btn-primary">הבנתי, ממשיכים</button>
                                     </div>
                                 </div>
                             </div>
@@ -802,16 +755,16 @@
             </div>
         </section>
 
-                <section id="practice-triples-radar" class="tab-content practice-tab-content">
+        <section id="practice-triples-radar" class="tab-content practice-tab-content">
             <div class="practice-container">
                 <div class="card practice-intro-card">
                     <h2>Triples Radar — שלשות מייקל ברין</h2>
-                    <p class="subtitle">אותו עיקרון של Meta Radar, אבל דרך טבלת 5 שלשות (15 קטגוריות).</p>
+                    <p class="subtitle">זיהוי מהיר של קטגוריה מדויקת בתוך טבלת השלשות (5 שורות × 3 רכיבים).</p>
 
                     <section class="practice-section practice-section-triples-radar" aria-label="Triples Radar Section">
                         <div class="practice-section-header">
-                            <h3>אימון מהיר: קטגוריה מדויקת מתוך השלשה</h3>
-                            <p>1) קרא/י משפט. 2) בחר/י קטגוריה. 3) קבל/י משוב: מדויק / קרוב / שורה שגויה.</p>
+                            <h3>בחר/י קטגוריה מתוך השלשה</h3>
+                            <p>קרא/י משפט מטופל, בחר/י קטגוריה, וקבל/י משוב: מדויק / קרוב / שורה שגויה.</p>
                         </div>
 
                         <div id="triples-radar-root" class="triples-radar-card">
@@ -849,45 +802,44 @@
         <section id="practice-wizard" class="tab-content practice-tab-content">
             <div class="practice-container">
                 <div class="card practice-intro-card">
-                    <h2>׳›׳׳×׳™׳ ׳ ׳¡׳×׳¨׳™׳ ג€“ ׳”׳”׳›׳׳׳•׳× ׳©׳׳©׳×׳׳¢׳•׳× ׳׳‘׳ ׳׳ ׳ ׳׳׳¨׳•׳×</h2>
-                    <p class="subtitle">׳›׳©׳”׳¨׳’׳© ׳—׳–׳§ ׳™׳•׳×׳¨ ׳׳”׳׳©׳₪׳˜ ג€“ ׳™׳© ׳›׳׳× ׳ ׳¡׳×׳¨ ׳©׳׳“׳‘׳™׳§ ׳׳× ׳”׳¡׳™׳₪׳•׳¨.</p>
-                    <p class="subtitle">׳׳˜׳¨׳× ׳”׳×׳¨׳’׳™׳: ׳׳¢׳‘׳•׳¨ ׳ײ¾Spoken Map ׳§׳₪׳•׳ ׳ײ¾Integrative Map ׳“׳¨׳ 3 ׳©׳›׳‘׳•׳×: ׳₪׳ ׳™׳, ׳—׳•׳¥, ׳•׳“׳™׳‘׳•׳¨.</p>
+                    <h2>SQHCEL Wizard 🧠</h2>
+                    <p class="subtitle">דף 3 מתוך 3: גישור תחושה-שפה לפי S→Q→H→C→PATH→E/L לפני אתגור.</p>
 
-                    <section class="practice-section practice-section-wizard" aria-label="׳›׳׳×׳™׳ ׳ ׳¡׳×׳¨׳™׳">
+                    <section class="practice-section practice-section-wizard" aria-label="SQHCEL Wizard Section">
                         <div class="practice-section-header">
-                            <h3>3. ׳׳¡׳ ׳¢׳•׳’׳: ׳—׳•׳¥ + ׳₪׳ ׳™׳ + ׳›׳׳×׳™׳</h3>
-                            <p>׳”׳©׳׳‘׳™׳ ׳ ׳©׳׳¨׳™׳ ׳׳•׳×׳• ׳“׳‘׳¨: Sג†’Qג†’Hג†’Cג†’PATHג†’E/L. ׳‘׳›׳ ׳©׳׳‘ ׳©׳›׳‘׳” ׳׳—׳¨׳× ׳ ׳“׳׳§׳×.</p>
+                            <h3>3. SQHCEL Wizard</h3>
+                            <p>גשר בין תחושה למשפט לפני אתגור: S→Q→H→C→PATH→E/L. הגוף מרגיש "אבסולוטי" לפני שהמילים אמרו "תמיד".</p>
                         </div>
                         <div id="wrinkle-game" class="card wrinkle-game-card">
                             <div class="wrinkle-game-header">
-                                <h3>נ§© ׳—׳©׳£ ׳׳× ׳”׳›׳׳×!</h3>
-                                <small>׳§׳•׳“׳ ׳—׳©׳™׳₪׳”, ׳׳—׳¨ ׳›׳ ׳׳×׳’׳•׳¨. ׳‘׳•׳ ׳™׳ ׳¨׳₪׳׳§׳¡ ׳׳”׳™׳¨ ׳׳–׳™׳”׳•׳™ ׳”׳ ׳—׳” ׳¡׳׳•׳™׳”.</small>
+                                <h3>🧩 חשף את הכמת!</h3>
+                                <small>קודם חשיפה, אחר כך אתגור. בונים רפלקס מהיר לזיהוי הנחה סמויה.</small>
                                 <div class="wrinkle-coverage">
-                                    <span>נ¢ ׳¢׳“ ׳›׳׳×׳™׳ ׳¡׳׳•׳™׳™׳</span>
-                                    <span>נ¢ ׳¢׳“ Self-Reference ׳׳™׳©׳™</span>
+                                    <span>🎢 עד כמתים סמויים</span>
+                                    <span>🎢 עד Self-Reference אישי</span>
                                 </div>
                             </div>
 
                             <div class="wrinkle-score-row">
-                                <span>נ”¥ ׳¨׳¦׳£: <strong id="wrinkle-streak">0</strong></span>
-                                <span>ג­ ׳ ׳§׳•׳“׳•׳×: <strong id="wrinkle-points">0</strong></span>
-                                <span>ג±ן¸ Due: <strong id="wrinkle-due-count">0</strong></span>
+                                <span>🔥 רצף: <strong id="wrinkle-streak">0</strong></span>
+                                <span>⭐ נקודות: <strong id="wrinkle-points">0</strong></span>
+                                <span>⏱️ Due: <strong id="wrinkle-due-count">0</strong></span>
                             </div>
 
                             <div class="wrinkle-round-box">
-                                <p id="wrinkle-step-label" class="wrinkle-step-label">׳©׳׳‘ 1/2: ׳—׳©׳™׳₪׳× ׳”׳›׳׳×</p>
+                                <p id="wrinkle-step-label" class="wrinkle-step-label">שלב 1/2: חשיפת הכמת</p>
                                 <p id="wrinkle-statement" class="wrinkle-statement"></p>
                                 <div id="wrinkle-options" class="wrinkle-options"></div>
                                 <div id="wrinkle-feedback" class="wrinkle-feedback"></div>
-                                <button id="wrinkle-next-btn" class="btn btn-primary hidden">׳׳©׳₪׳˜ ׳”׳‘׳</button>
+                                <button id="wrinkle-next-btn" class="btn btn-primary hidden">משפט הבא</button>
                                 <div id="wrinkle-fx-layer" class="wrinkle-fx-layer" aria-hidden="true"></div>
                             </div>
 
                             <div class="wrinkle-self-box">
-                                <label for="wrinkle-self-input">׳‘׳“׳™׳§׳× Self-Reference: ׳›׳×׳‘׳• ׳׳©׳₪׳˜ ׳׳™׳©׳™ ׳׳×׳¨׳’׳•׳</label>
-                                <textarea id="wrinkle-self-input" rows="2" placeholder="׳׳“׳•׳’׳׳”: ׳׳ ׳™ ׳׳ ׳™׳›׳•׳ ׳׳”׳•׳‘׳™׳ ׳׳× ׳”׳©׳™׳—׳” ׳”׳–׳׳×."></textarea>
+                                <label for="wrinkle-self-input">בדיקת Self-Reference: כתבו משפט אישי לתרגול</label>
+                                <textarea id="wrinkle-self-input" rows="2" placeholder="לדוגמה: אני לא יכול להוביל את השיחה הזאת."></textarea>
                                 <div class="wrinkle-self-actions">
-                                    <button id="wrinkle-add-self-btn" class="btn btn-secondary">׳”׳•׳¡׳£ ׳׳©׳₪׳˜ ׳׳™׳©׳™ ׳׳׳©׳—׳§</button>
+                                    <button id="wrinkle-add-self-btn" class="btn btn-secondary">הוסף משפט אישי למשחק</button>
                                 </div>
                                 <ul id="wrinkle-self-list" class="wrinkle-self-list"></ul>
                             </div>
@@ -897,156 +849,20 @@
             </div>
         </section>
 
-        <section id="practice-sentence-morpher" class="tab-content practice-tab-content">
-            <div class="practice-container">
-                <div class="card practice-intro-card">
-                    <h2>׳׳©׳₪׳˜ ׳—׳™ ג€” ׳›׳׳×׳™׳ ׳©׳׳•׳¡׳™׳₪׳™׳ ׳¢׳•׳׳§</h2>
-                    <p class="subtitle">׳”׳׳©׳₪׳˜ ׳”׳•׳ ׳׳ ׳”׳‘׳¢׳™׳”.</p>
-                    <p class="subtitle">׳”׳§׳˜׳¢ ׳”׳¡׳׳•׳™ ׳”׳•׳ ׳”׳‘׳¢׳™׳”.</p>
-
-                    <section class="practice-section practice-section-sentence-morpher" aria-label="Sentence Morpher Section">
-                        <div class="practice-section-header">
-                            <h3>׳×׳¨׳’׳•׳ ׳—׳›׳: ׳›׳׳×׳™׳ ׳•׳×׳ ׳׳™׳ ׳‘׳–׳׳ ׳׳׳×</h3>
-                            <p>׳‘׳—׳¨/׳™ ׳¦׳³׳™׳₪ ׳׳›׳ ׳¦׳™׳¨, ׳•׳¨׳׳”/׳™ ׳׳™׳ ׳”׳׳©׳₪׳˜ ׳׳×׳¢׳“׳›׳ ׳•׳׳’׳׳” ׳׳× ׳”׳”׳›׳׳׳” ׳”׳ ׳¡׳×׳¨׳×.</p>
-                        </div>
-
-                        <div id="sentence-morpher-demo-root" class="sentence-morpher-root"></div>
-
-                        <div class="sentence-morpher-cta-row">
-                            <button id="sentence-morpher-cta-btn" class="btn sentence-morpher-cta-btn">׳”׳¡׳¨ ׳”׳›׳׳׳” ׳¡׳˜׳˜׳™׳¡׳˜׳™׳×</button>
-                            <p id="sentence-morpher-cta-feedback" class="sentence-morpher-cta-feedback hidden" data-tone="info"></p>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </section>
-
-        <section id="living-triples" class="tab-content practice-tab-content">
-            <div class="practice-container">
-                <div class="card practice-intro-card living-triples-card" id="living-triples-root">
-                    <h2>Living Triples ג€” ׳©׳׳©׳•׳× ׳—׳™׳•׳×</h2>
-                    <p class="subtitle">Training only: ׳§׳˜׳’׳•׳¨׳™׳” ׳׳—׳× ג†’ ׳©׳•׳¨׳” ׳׳׳׳” ג†’ ׳©׳™׳§׳•׳£ ג†’ ׳׳×׳’׳•׳¨.</p>
-
-                    <section id="lt-screen-onboarding" class="lt-screen">
-                        <div class="lt-onboarding-copy">
-                            <p>ג€׳”׳׳•׳— ׳׳ ׳¢׳•׳‘׳“ ׳‘׳“׳₪׳•׳¡ ׳׳—׳“. ׳”׳•׳ ׳¢׳•׳‘׳“ ׳‘׳©׳•׳¨׳•׳× (Triples).ג€</p>
-                            <p>ג€׳‘׳—׳¨ ׳§׳˜׳’׳•׳¨׳™׳” ׳׳—׳×, ׳•׳”׳׳¢׳¨׳›׳× ׳×׳¨׳׳” ׳׳ ׳׳× ׳©׳×׳™ ׳”׳׳—׳™׳•׳×.ג€</p>
-                            <p>ג€׳×׳©׳׳ 3 ׳©׳׳׳•׳× ׳§׳¦׳¨׳•׳× ג†’ ׳×׳§׳‘׳ ׳©׳™׳§׳•׳£ ׳©׳•׳¨׳” ג†’ ׳×׳‘׳—׳¨ ׳׳×׳’׳•׳¨ ׳׳—׳“.ג€</p>
-                        </div>
-                        <div class="lt-onboarding-actions">
-                            <button id="lt-demo-btn" class="btn btn-primary">׳“׳׳• ׳©׳ 20 ׳©׳ ׳™׳•׳× (׳׳•׳׳׳¥)</button>
-                            <button id="lt-start-btn" class="btn btn-secondary">׳”׳×׳—׳ ׳׳™׳׳•׳</button>
-                        </div>
-                        <p id="lt-demo-status" class="lt-demo-status"></p>
-                    </section>
-
-                    <section id="lt-screen-practice" class="lt-screen hidden">
-                        <div class="lt-session-bar">
-                            <p>׳¡׳¦׳ ׳”: <strong id="lt-scene-index">1</strong>/<strong id="lt-scene-total">25</strong></p>
-                            <p>׳ ׳™׳§׳•׳“ ׳¡׳©׳: <strong id="lt-session-score">0</strong></p>
-                        </div>
-
-                        <div class="lt-scenario-box">
-                            <h3 id="lt-scenario-title">׳׳©׳₪׳˜ ׳׳˜׳•׳₪׳</h3>
-                            <div id="lt-scenario-text" class="lt-scenario-text"></div>
-                            <div id="lt-scenario-highlights" class="lt-scenario-highlights"></div>
-                        </div>
-
-                        <div class="lt-step-box">
-                            <h4>1) Pick Category</h4>
-                            <p class="lt-step-sub">׳‘׳—׳¨ ׳§׳˜׳’׳•׳¨׳™׳” ׳׳—׳× ׳׳×׳•׳ ׳”ײ¾15.</p>
-                            <div id="lt-category-buttons" class="lt-category-buttons"></div>
-                            <p id="lt-category-feedback" class="lt-inline-feedback"></p>
-                        </div>
-
-                        <div id="lt-row-box" class="lt-step-box hidden">
-                            <h4>2) Row Lit</h4>
-                            <p id="lt-row-title" class="lt-row-title"></p>
-                            <div id="lt-row-chips" class="lt-row-chips"></div>
-                        </div>
-
-                        <div id="lt-reveal-box" class="lt-step-box hidden">
-                            <h4>3) Reveal</h4>
-                            <p class="lt-step-sub">Reveal ׳׳₪׳ ׳™ Challenge. ׳׳™׳ ׳“׳™׳׳•׳’ ׳¢׳ ׳©׳׳׳•׳× ׳”׳¢׳•׳’׳.</p>
-                            <div id="lt-reveal-cards" class="lt-reveal-cards"></div>
-                            <p id="lt-reveal-status" class="lt-inline-feedback"></p>
-                        </div>
-
-                        <div id="lt-reflect-box" class="lt-step-box hidden">
-                            <h4>4) Reflect</h4>
-                            <p id="lt-reflect-auto" class="lt-reflect-auto"></p>
-                            <div class="lt-reflect-actions">
-                                <button id="lt-use-auto-reflect-btn" class="btn btn-primary">׳”׳©׳×׳׳© ׳‘׳©׳™׳§׳•׳£ ׳׳•׳˜׳•׳׳˜׳™</button>
-                                <button id="lt-open-custom-reflect-btn" class="btn btn-secondary">׳›׳×׳•׳‘ ׳‘׳¢׳¦׳׳</button>
-                            </div>
-                            <div id="lt-custom-reflect-wrap" class="lt-custom-reflect-wrap hidden">
-                                <textarea id="lt-custom-reflect-input" rows="3" placeholder="׳›׳×׳•׳‘/׳™ ׳©׳™׳§׳•׳£ ׳©׳•׳¨׳” ׳§׳¦׳¨..."></textarea>
-                                <button id="lt-save-custom-reflect-btn" class="btn btn-primary">׳©׳׳•׳¨ ׳©׳™׳§׳•׳£ ׳׳™׳©׳™</button>
-                            </div>
-                            <p id="lt-reflect-status" class="lt-inline-feedback"></p>
-                        </div>
-
-                        <div id="lt-challenge-box" class="lt-step-box hidden">
-                            <h4>5) Challenge</h4>
-                            <p class="lt-step-sub">׳‘׳—׳¨ ׳¨׳›׳™׳‘ ׳¡׳₪׳¦׳™׳₪׳™ ׳•׳׳×׳’׳¨ ׳׳—׳“ ׳×׳•׳׳ ׳‘׳׳‘׳“.</p>
-                            <div id="lt-challenge-targets" class="lt-challenge-targets"></div>
-                            <div id="lt-challenge-options" class="lt-challenge-options"></div>
-                            <p id="lt-challenge-feedback" class="lt-inline-feedback"></p>
-                        </div>
-                    </section>
-
-                    <section id="lt-screen-wrap" class="lt-screen hidden">
-                        <h3>Wrap</h3>
-                        <p id="lt-wrap-score" class="lt-wrap-score"></p>
-                        <ul id="lt-score-breakdown" class="lt-score-breakdown"></ul>
-                        <p id="lt-wrap-learned" class="lt-wrap-learned"></p>
-
-                        <div id="lt-direction-box" class="lt-direction-box hidden">
-                            <h4>׳©׳׳׳× ׳›׳™׳•׳•׳</h4>
-                            <p id="lt-direction-question" class="lt-direction-question"></p>
-                            <p id="lt-client-goal" class="lt-client-goal"></p>
-                            <h4>׳”׳×׳¢׳¨׳‘׳•׳× ׳”׳™׳₪׳ ׳•׳˜׳™׳×</h4>
-                            <p id="lt-hypnotic-intervention" class="lt-hypnotic-intervention"></p>
-                            <p id="lt-remember-note" class="lt-remember-note"></p>
-                        </div>
-
-                        <div class="lt-future-pace">
-                            <h4>Future-Pace Triple</h4>
-                            <p id="lt-future-prompt" class="lt-future-prompt"></p>
-                            <p id="lt-future-example" class="lt-future-example"></p>
-                            <label for="lt-future-sign">׳׳” ׳™׳”׳™׳” ׳”׳¡׳™׳׳ ׳”׳׳•׳§׳“׳?</label>
-                            <input id="lt-future-sign" type="text" placeholder="׳׳“׳•׳’׳׳”: ׳׳ ׳™ ׳©׳•׳׳¢ '׳×׳׳™׳“' ׳‘׳׳©׳₪׳˜ ׳”׳¨׳׳©׳•׳." />
-                            <label for="lt-future-step">׳׳” ׳”׳¦׳¢׳“ ׳”׳§׳˜׳?</label>
-                            <input id="lt-future-step" type="text" placeholder="׳׳“׳•׳’׳׳”: ׳׳©׳׳•׳ ׳§׳•׳“׳ ׳©׳׳׳× ׳¢׳•׳’׳ ׳׳—׳×." />
-                            <label for="lt-future-metric">׳׳” ׳׳“׳“ ׳”׳”׳¦׳׳—׳”?</label>
-                            <input id="lt-future-metric" type="text" placeholder="׳׳“׳•׳’׳׳”: 3 ׳×׳©׳•׳‘׳•׳× Reveal ׳׳₪׳ ׳™ ׳׳×׳’׳•׳¨." />
-                            <button id="lt-save-future-btn" class="btn btn-secondary">׳©׳׳•׳¨ Future-Pace</button>
-                            <p id="lt-future-summary" class="lt-future-summary"></p>
-                        </div>
-
-                        <div class="lt-wrap-actions">
-                            <button id="lt-next-scene-btn" class="btn btn-primary">׳׳¡׳¦׳ ׳” ׳”׳‘׳׳”</button>
-                            <button id="lt-back-onboarding-btn" class="btn btn-secondary">׳—׳–׳¨׳” ׳-Onboarding</button>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </section>
-
         <section id="practice-verb-unzip" class="tab-content practice-tab-content">
             <div class="practice-container">
                 <div class="card practice-intro-card">
-                    <h2>׳₪׳•׳¢׳ ׳׳ ׳׳₪׳•׳¨׳˜ ג€” ׳׳©׳—׳§ ׳”׳₪׳™׳¨׳•׳§</h2>
-                    <p class="subtitle">׳׳” ׳¢׳•׳©׳™׳ ׳›׳׳: 1) ׳”׳׳˜׳₪׳ ׳‘׳•׳—׳¨ ׳©׳׳׳”, 2) ׳׳×׳§׳‘׳׳× ׳×׳©׳•׳‘׳× ׳׳˜׳•׳₪׳, 3) ׳׳©׳‘׳¦׳™׳ ׳׳× ׳”׳×׳©׳•׳‘׳” ׳‘׳¡׳׳•׳˜ ׳”׳ ׳›׳•׳.</p>
-                    <p style="margin:0 0 10px;color:#335a7d;">׳׳ ׳”׳¢׳׳•׳“ ׳‘׳×׳•׳ ׳׳¡׳’׳¨׳× ׳¦׳¨׳”, ׳׳₪׳©׳¨ ׳׳₪׳×׳•׳— ׳‘׳’׳¨׳¡׳× ׳“׳¡׳§׳˜׳•׳₪ ׳׳• ׳׳•׳‘׳™׳™׳ ׳‘׳§׳™׳©׳•׳¨׳™׳ ׳ ׳₪׳¨׳“׳™׳.</p>
+                    <h2>פועל לא מפורט — Unzip Trainer</h2>
+                    <p class="subtitle">תרגול ויזואלי: שאלה -> תשובת מטופל מוכנה -> Drag&Drop מדויק -> סיכום קייס.</p>
+                    <p style="margin:0 0 10px;color:#335a7d;">אם העמוד בתוך מסגרת צרה, אפשר לפתוח במסך מלא.</p>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-                        <a class="btn btn-primary" href="verb_unzip_trainer.html?v=1.0.18&view=desktop" target="_blank" rel="noopener">׳₪׳×׳— ׳“׳¡׳§׳˜׳•׳₪</a>
-                        <a class="btn btn-secondary" href="verb_unzip_trainer.html?v=1.0.18&view=mobile" target="_blank" rel="noopener">׳₪׳×׳— ׳׳•׳‘׳™׳™׳</a>
+                        <a class="btn btn-primary" href="verb_unzip_trainer.html?v=1.0.18" target="_blank" rel="noopener">פתח במסך מלא</a>
+                        <a class="btn btn-secondary" href="verb_unzip_trainer.html?v=1.0.18" target="_blank" rel="noopener">גרסת קובץ עצמאי</a>
                     </div>
                     <iframe
-                        class="unzip-embed-frame"
                         title="Unzip Trainer"
                         src="verb_unzip_trainer.html?v=1.0.18"
+                        style="width:100%;min-height:1450px;border:1px solid #cddbec;border-radius:12px;background:#fff;"
                         loading="lazy"></iframe>
                 </div>
             </div>
@@ -1056,25 +872,25 @@
         <section id="blueprint" class="tab-content">
             <div class="blueprint-container">
                 <div class="card">
-                    <h2>נ—ן¸ Blueprint Builder - ׳”׳₪׳•׳ ׳₪׳¢׳•׳׳” ׳‘׳¢׳׳•׳׳” ׳׳×׳•׳›׳ ׳™׳× ׳‘׳™׳¦׳•׳¢</h2>
-                    <p>׳”׳§׳׳“ ׳₪׳¢׳•׳׳” ׳©׳¦׳¨׳™׳ ׳׳¢׳©׳•׳×, ׳•׳׳ ׳—׳ ׳• ׳ ׳”׳₪׳•׳ ׳׳•׳×׳” ׳׳×׳•׳›׳ ׳™׳× ׳׳₪׳•׳¨׳˜׳× ׳¢׳ ׳¦׳¢׳“׳™׳, ׳×׳ ׳׳™׳, ׳•׳—׳׳•׳₪׳•׳×.</p>
+                    <h2>🏗️ Blueprint Builder - הפוך פעולה בעמומה לתוכנית ביצוע</h2>
+                    <p>הקלד פעולה שצריך לעשות, ואנחנו נהפוך אותה לתוכנית מפורטת עם צעדים, תנאים, וחלופות.</p>
 
                     <!-- STEP 1: CAPTURE -->
                     <div id="blueprint-step-1" class="blueprint-step active">
                         <div class="step-header">
                             <span class="step-number">1</span>
-                            <h3>׳׳” ׳׳×׳” ׳׳•׳׳¨ ׳׳¢׳¦׳׳ ׳׳¢׳©׳•׳×?</h3>
+                            <h3>מה אתה אומר לעצמך לעשות?</h3>
                         </div>
-                        <p class="step-desc">׳”׳§׳׳“ ׳׳× ׳”׳₪׳¢׳•׳׳” ׳‘׳©׳₪׳” ׳˜׳‘׳¢׳™׳× - ׳‘׳“׳™׳•׳§ ׳›׳׳• ׳©׳”׳™׳™׳× ׳׳•׳׳¨ ׳׳¢׳¦׳׳ ׳׳• ׳©׳׳™׳©׳”׳• ׳׳׳¨ ׳׳.</p>
+                        <p class="step-desc">הקלד את הפעולה בשפה טבעית - בדיוק כמו שהיית אומר לעצמך או שמישהו אמר לך.</p>
                         
                         <div class="input-group">
                             <textarea id="action-input" 
-                                      placeholder="׳“׳•׳’׳׳”: '׳×׳×׳¨׳’׳ ׳׳× ׳”-JavaScript ׳©׳׳™' ׳׳• '׳×׳¡׳’׳•׳¨ ׳׳× ׳”׳₪׳¨׳•׳™׳§׳˜'"
+                                      placeholder="דוגמה: 'תתרגל את ה-JavaScript שלי' או 'תסגור את הפרויקט'"
                                       rows="4"></textarea>
                         </div>
 
                         <div class="step-buttons">
-                            <button id="extract-btn" class="btn btn-primary" onclick="extractAndMoveToStep2()">׳—׳׳¥ ׳•׳‘׳ ׳” Blueprint ג†’</button>
+                            <button id="extract-btn" class="btn btn-primary" onclick="extractAndMoveToStep2()">חלץ ובנה Blueprint →</button>
                         </div>
                     </div>
 
@@ -1082,54 +898,54 @@
                     <div id="blueprint-step-2" class="blueprint-step hidden">
                         <div class="step-header">
                             <span class="step-number">2</span>
-                            <h3>׳₪׳™׳¨׳•׳§ ׳”׳₪׳¢׳•׳׳”</h3>
+                            <h3>פירוק הפעולה</h3>
                         </div>
 
                         <div class="blueprint-questions">
                             <div class="q-card">
-                                <label>׳׳” ׳”׳×׳•׳¦׳׳” ׳‘׳“׳™׳•׳§? (׳׳™׳ ׳–׳” ׳ ׳¨׳׳” ׳‘׳”׳¦׳׳—׳”?)</label>
-                                <textarea id="q-success" placeholder="׳×׳•׳₪׳¡׳×׳™ ׳׳× ׳”׳§׳•׳ ׳¡׳₪׳˜ ׳©׳ async/await"></textarea>
+                                <label>מה התוצאה בדיוק? (איך זה נראה בהצלחה?)</label>
+                                <textarea id="q-success" placeholder="תופסתי את הקונספט של async/await"></textarea>
                             </div>
 
                             <div class="q-card">
-                                <label>׳׳” ׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳ ׳”׳§׳˜׳ ׳‘׳™׳•׳×׳¨?</label>
-                                <textarea id="q-first-step" placeholder="׳₪׳×׳— ׳˜׳׳‘ ׳‘-VSCode ׳•׳™׳¦׳•׳¨ ׳§׳•׳‘׳¥ test.js"></textarea>
+                                <label>מה הצעד הראשון הקטן ביותר?</label>
+                                <textarea id="q-first-step" placeholder="פתח טאב ב-VSCode ויצור קובץ test.js"></textarea>
                             </div>
 
                             <div class="q-card">
-                                <label>׳׳” ׳”׳¦׳¢׳“ ׳”׳׳—׳¨׳•׳ - ׳׳™׳ ׳×׳“׳¢ ׳©׳¡׳™׳™׳׳×?</label>
-                                <textarea id="q-last-step" placeholder="׳׳•׳›׳ ׳׳”׳©׳¨׳•׳× ׳§׳•׳“ async ׳•׳§׳•׳“ א₪¸inc ׳‘׳׳™ ׳˜׳¢׳•׳™׳•׳×"></textarea>
+                                <label>מה הצעד האחרון - איך תדע שסיימת?</label>
+                                <textarea id="q-last-step" placeholder="אוכל להשרות קוד async וקוד सinc בלי טעויות"></textarea>
                             </div>
 
                             <div class="q-card">
-                                <label>׳׳™׳–׳” 3-5 ׳©׳׳‘׳™׳ ׳‘׳׳׳¦׳¢?</label>
-                                <textarea id="q-middle-steps" placeholder="1. ׳§׳¨׳ ׳׳׳׳¨ | 2. ׳¦׳₪׳” ׳‘׳•׳™׳“׳׳• | 3. ׳›׳×׳•׳‘ ׳“׳•׳’׳׳” | 4. ׳‘׳“׳•׳§ ׳‘׳§׳•׳ ׳¡׳•׳"></textarea>
+                                <label>איזה 3-5 שלבים באמצע?</label>
+                                <textarea id="q-middle-steps" placeholder="1. קרא מאמר | 2. צפה בוידאו | 3. כתוב דוגמה | 4. בדוק בקונסול"></textarea>
                             </div>
 
                             <div class="q-card">
-                                <label>׳׳” ׳¦׳¨׳™׳ ׳׳”׳™׳•׳× ׳ ׳›׳•׳ ׳׳₪׳ ׳™ ׳”׳×׳—׳׳”? (׳׳§׳•׳, ׳¦׳™׳•׳“, ׳–׳׳, ׳׳™׳©׳•׳¨׳™׳)</label>
-                                <textarea id="q-prerequisites" placeholder="׳©׳¢׳” ׳—׳•׳₪׳©׳™׳×, VSCode ׳₪׳×׳•׳—, ׳—׳™׳‘׳•׳¨ ׳׳™׳ ׳˜׳¨׳ ׳˜"></textarea>
+                                <label>מה צריך להיות נכון לפני התחלה? (מקום, ציוד, זמן, אישורים)</label>
+                                <textarea id="q-prerequisites" placeholder="שעה חופשית, VSCode פתוח, חיבור אינטרנט"></textarea>
                             </div>
 
                             <div class="q-card">
-                                <label>׳׳™׳₪׳” ׳׳×׳” ׳‘׳“׳¨׳ ׳›׳׳ ׳ ׳×׳§׳¢?</label>
-                                <textarea id="q-friction" placeholder="׳׳ ׳™ ׳׳ ׳׳‘׳™׳ ׳׳×׳™ promises ׳׳¡׳×׳™׳™׳׳•׳×"></textarea>
+                                <label>איפה אתה בדרך כלל נתקע?</label>
+                                <textarea id="q-friction" placeholder="אני לא מבין מתי promises מסתיימות"></textarea>
                             </div>
 
                             <div class="q-card">
-                                <label>׳׳” Plan B ׳›׳©׳ ׳×׳§׳¢? (׳—׳׳•׳₪׳”, ׳§׳™׳¦׳•׳¨ ׳“׳¨׳, ׳¢׳–׳¨׳”)</label>
-                                <textarea id="q-alternatives" placeholder="׳׳‘׳§׳© ׳¢׳–׳¨׳” ׳‘-Stack Overflow ׳׳• ׳׳—׳–׳•׳¨ ׳-callbacks"></textarea>
+                                <label>מה Plan B כשנתקע? (חלופה, קיצור דרך, עזרה)</label>
+                                <textarea id="q-alternatives" placeholder="אבקש עזרה ב-Stack Overflow או אחזור ל-callbacks"></textarea>
                             </div>
 
                             <div class="q-card">
-                                <label>׳›׳׳” ׳–׳׳ ׳–׳” ׳׳׳•׳¨ ׳׳§׳—׳×? (׳׳™׳ ׳™׳׳•׳ 70% ׳׳©׳™׳׳”)</label>
-                                <input type="text" id="q-time" placeholder="45 ׳“׳§׳•׳×">
+                                <label>כמה זמן זה אמור לקחת? (מינימום 70% משימה)</label>
+                                <input type="text" id="q-time" placeholder="45 דקות">
                             </div>
                         </div>
 
                         <div class="step-buttons">
-                            <button id="back-to-capture-btn" class="btn btn-secondary" onclick="goToStep(1)">ג† ׳—׳–׳•׳¨</button>
-                            <button id="gap-analysis-btn" class="btn btn-primary" onclick="extractAndMoveToStep3()">׳‘׳“׳™׳§׳× ׳₪׳¢׳¨ ׳¦׳™׳₪׳™׳•׳× ג†’</button>
+                            <button id="back-to-capture-btn" class="btn btn-secondary" onclick="goToStep(1)">← חזור</button>
+                            <button id="gap-analysis-btn" class="btn btn-primary" onclick="extractAndMoveToStep3()">בדיקת פער ציפיות →</button>
                         </div>
                     </div>
 
@@ -1137,53 +953,53 @@
                     <div id="blueprint-step-3" class="blueprint-step hidden">
                         <div class="step-header">
                             <span class="step-number">3</span>
-                            <h3>׳₪׳¢׳¨ ׳¦׳™׳₪׳™׳•׳× vs ׳™׳›׳•׳׳×</h3>
+                            <h3>פער ציפיות vs יכולת</h3>
                         </div>
-                        <p class="step-desc">׳‘׳•׳׳ ׳ ׳‘׳—׳ ׳׳× ׳”׳₪׳¢׳¨ ׳‘׳™׳ ׳׳” ׳©׳׳¦׳₪׳™׳ ׳׳׳ ׳׳‘׳™׳ ׳׳” ׳׳×׳” ׳™׳›׳•׳ ׳׳¢׳©׳•׳× ׳›׳¨׳’׳¢.</p>
+                        <p class="step-desc">בואן נבחן את הפער בין מה שמצפים ממך לבין מה אתה יכול לעשות כרגע.</p>
 
                         <div class="blueprint-questions">
                             <div class="q-card">
-                                <label>׳׳™ ׳׳¦׳₪׳”? (׳׳×׳” / ׳׳™׳©׳”׳• ׳׳—׳¨ / ׳׳¢׳¨׳›׳×)</label>
+                                <label>מי מצפה? (אתה / מישהו אחר / מערכת)</label>
                                 <select id="q-who-expects">
-                                    <option value="">׳‘׳—׳¨...</option>
-                                    <option value="self">׳׳ ׳™ ׳‘׳¢׳¦׳׳™</option>
-                                    <option value="other">׳׳™׳©׳”׳• ׳׳—׳¨</option>
-                                    <option value="system">׳׳¢׳¨׳›׳×/׳—׳•׳§/׳“׳“׳׳™׳™׳</option>
+                                    <option value="">בחר...</option>
+                                    <option value="self">אני בעצמי</option>
+                                    <option value="other">מישהו אחר</option>
+                                    <option value="system">מערכת/חוק/דדליין</option>
                                 </select>
                             </div>
 
                             <div class="q-card">
-                                <label>׳׳” ׳‘׳“׳™׳•׳§ ׳”׳¦׳™׳₪׳™׳™׳”?</label>
-                                <textarea id="q-expectation" placeholder="׳׳ ׳™ ׳׳׳•׳¨ ׳׳”׳×׳₪׳§׳“ ׳›-JavaScript expert"></textarea>
+                                <label>מה בדיוק הציפייה?</label>
+                                <textarea id="q-expectation" placeholder="אני אמור להתפקד כ-JavaScript expert"></textarea>
                             </div>
 
                             <div class="q-card">
-                                <label>׳׳™׳–׳• ׳”׳ ׳—׳” ׳¡׳׳•׳™׳” ׳›׳׳? (׳¢׳ ׳׳” ׳”׳¦׳™׳₪׳™׳” ׳׳ ׳™׳—׳”?)</label>
-                                <textarea id="q-assumption" placeholder="'׳–׳” ׳•׳•׳“׳׳™ ׳§׳', '׳›׳•׳׳ ׳™׳•׳“׳¢׳™׳ ׳׳× ׳–׳”', '׳¦׳¨׳™׳ 5 ׳“׳§׳•׳×'"></textarea>
+                                <label>איזו הנחה סמויה כאן? (על מה הציפיה מניחה?)</label>
+                                <textarea id="q-assumption" placeholder="'זה וודאי קל', 'כולם יודעים את זה', 'צריך 5 דקות'"></textarea>
                             </div>
 
                             <div class="q-card">
-                                <label>׳™׳›׳•׳׳× ׳›׳¨׳’׳¢ (0-10, ׳›׳©-10 ׳–׳” ׳׳•׳©׳׳)</label>
+                                <label>יכולת כרגע (0-10, כש-10 זה מושלם)</label>
                                 <input type="range" id="q-ability" min="0" max="10" value="5">
                                 <span id="ability-display">5</span>
                             </div>
 
                             <div class="q-card">
-                                <label>׳׳” ׳—׳¡׳¨ ׳׳ ׳›׳“׳™ ׳׳¢׳׳•׳× ׳ ׳§׳•׳“׳” ׳׳—׳×?</label>
-                                <textarea id="q-gap" placeholder="15 ׳“׳§׳•׳× ׳“׳•׳§׳•׳׳ ׳˜׳¦׳™׳” / ׳›׳׳™ ׳ ׳™׳×׳•׳ ׳™׳ / ׳׳™׳©׳•׳¨ / ׳§׳•׳ ׳” ׳“׳¢׳×"></textarea>
+                                <label>מה חסר לך כדי לעלות נקודה אחת?</label>
+                                <textarea id="q-gap" placeholder="15 דקות דוקומנטציה / כלי ניתונים / אישור / קונה דעת"></textarea>
                             </div>
 
                             <div class="q-card gap-reframe">
-                                <label>נ¯ ׳ ׳™׳¡׳•׳— ׳׳—׳“׳© (׳׳-׳׳׳©׳™׳):</label>
+                                <label>🎯 ניסוח מחדש (לא-מאשים):</label>
                                 <div id="q-reframe" class="reframe-box">
-                                    (׳”-׳”׳•׳“׳¢׳” ׳×׳×׳¢׳“׳›׳ ׳׳•׳˜׳•׳׳˜׳™׳×)
+                                    (ה-הודעה תתעדכן אוטומטית)
                                 </div>
                             </div>
                         </div>
 
                         <div class="step-buttons">
-                            <button id="back-to-specify-btn" class="btn btn-secondary" onclick="goToStep(2)">ג† ׳—׳–׳•׳¨</button>
-                            <button id="next-step-btn" class="btn btn-primary" onclick="extractAndMoveToStep4()">׳¦׳¢׳“ ׳”׳‘׳ ׳•׳×׳•׳›׳ ׳™׳× ג†’</button>
+                            <button id="back-to-specify-btn" class="btn btn-secondary" onclick="goToStep(2)">← חזור</button>
+                            <button id="next-step-btn" class="btn btn-primary" onclick="extractAndMoveToStep4()">צעד הבא ותוכנית →</button>
                         </div>
                     </div>
 
@@ -1191,7 +1007,7 @@
                     <div id="blueprint-step-4" class="blueprint-step hidden">
                         <div class="step-header">
                             <span class="step-number">4</span>
-                            <h3>׳×׳•׳›׳ ׳™׳× ׳”׳‘׳™׳¦׳•׳¢ ׳¡׳•׳₪׳™׳× ג¨</h3>
+                            <h3>תוכנית הביצוע סופית ✨</h3>
                         </div>
 
                         <div id="final-blueprint" class="final-blueprint-display">
@@ -1199,19 +1015,19 @@
                         </div>
 
                         <div id="next-action-box" class="next-action">
-                            <h4>נ¯ ׳”׳¦׳¢׳“ ׳©׳׳ ׳”׳‘׳:</h4>
+                            <h4>🎯 הצעד שלך הבא:</h4>
                             <p id="next-physical-action"></p>
                         </div>
 
                         <div id="if-stuck-box" class="if-stuck">
-                            <h4>׳׳ ׳ ׳×׳§׳¢׳×:</h4>
+                            <h4>אם נתקעת:</h4>
                             <p id="if-stuck-content"></p>
                         </div>
 
                         <div class="action-buttons">
-                            <button id="export-json-btn" class="btn btn-secondary" onclick="exportBlueprint()">נ“¥ ׳™׳™׳¦׳ JSON</button>
-                            <button id="start-over-btn" class="btn btn-secondary" onclick="goToStep(1)">נ”„ Blueprint ׳—׳“׳©</button>
-                            <button id="do-it-now-btn" class="btn btn-primary" onclick="startTenMinuteTimer()">ג±ן¸ ׳‘׳•׳׳ ׳ ׳¢׳©׳” ׳׳× ׳–׳” ׳‘-10 ׳“׳§׳•׳×!</button>
+                            <button id="export-json-btn" class="btn btn-secondary" onclick="exportBlueprint()">📥 ייצא JSON</button>
+                            <button id="start-over-btn" class="btn btn-secondary" onclick="goToStep(1)">🔄 Blueprint חדש</button>
+                            <button id="do-it-now-btn" class="btn btn-primary" onclick="startTenMinuteTimer()">⏱️ בואן נעשה את זה ב-10 דקות!</button>
                         </div>
                     </div>
                 </div>
@@ -1221,37 +1037,33 @@
         <!-- ABOUT TAB -->
         <section id="about" class="tab-content">
             <div class="card">
-                <h2>׳¢׳ ׳”׳₪׳¨׳•׳™׳§׳˜ נ“–</h2>
-                <p><strong>Meta Model - ׳›׳׳™ ׳×׳¨׳’׳•׳ ׳׳˜׳” ׳׳•׳“׳</strong></p>
-                <p>׳₪׳¨׳•׳™׳§׳˜ ׳–׳” ׳׳¢׳•׳¦׳‘ ׳›׳“׳™ ׳׳¢׳–׳•׳¨ ׳׳׳•׳׳“׳™׳ ׳©׳ NLP (Neuro-Linguistic Programming) ׳׳™׳™׳©׳•׳ ׳˜׳›׳ ׳™׳§׳•׳× Meta Model ׳©׳ Richard Bandler ׳•-John Grinder.</p>
+                <h2>על הפרויקט 📖</h2>
+                <p><strong>Meta Model - כלי תרגול מטה מודל</strong></p>
+                <p>פרויקט זה מעוצב כדי לעזור ללומדים של NLP (Neuro-Linguistic Programming) ליישום טכניקות Meta Model של Richard Bandler ו-John Grinder.</p>
                 
-                <h3>׳”׳§׳˜׳’׳•׳¨׳™׳•׳× ׳”׳¢׳™׳§׳¨׳™׳•׳×:</h3>
+                <h3>הקטגוריות העיקריות:</h3>
                 <ul>
-                    <li><strong>DELETION (׳׳—׳™׳§׳”)</strong> - ׳׳—׳™׳§׳× ׳׳™׳“׳¢ ׳—׳©׳•׳‘</li>
-                    <li><strong>DISTORTION (׳¢׳™׳•׳•׳×)</strong> - ׳©׳™׳ ׳•׳™ ׳”׳׳¦׳™׳׳•׳×</li>
-                    <li><strong>GENERALIZATION (׳”׳›׳׳׳”)</strong> - ׳”׳¨׳—׳‘׳” ׳׳¢׳‘׳¨ ׳׳¦׳¨׳™׳</li>
+                    <li><strong>DELETION (מחיקה)</strong> - מחיקת מידע חשוב</li>
+                    <li><strong>DISTORTION (עיוות)</strong> - שינוי המציאות</li>
+                    <li><strong>GENERALIZATION (הכללה)</strong> - הרחבה מעבר לצריך</li>
                 </ul>
 
-                <h3>׳”׳׳§׳•׳¨׳•׳×:</h3>
+                <h3>המקורות:</h3>
                 <ul>
                     <li>Richard Bandler & John Grinder - Founders of NLP</li>
                     <li><a href="https://github.com/streamDragon/Meta_Model_app" target="_blank">GitHub Repository</a></li>
                 </ul>
 
-                <p class="footer-text">׳₪׳™׳×׳•׳— ׳¢׳ ׳™׳“׳™: streamDragon | 2026</p>
+                <p class="footer-text">פיתוח על ידי: streamDragon | 2026</p>
             </div>
         </section>
     </div>
 
     <script src="js/hebrew-sanitize.js?v=1.0.18"></script>
     <script src="js/wr2w-path-core.js?v=1.0.18"></script>
-    <script src="js/sentence-morpher-core.js?v=1.0.18"></script>
     <script src="js/triples-radar-core.js?v=1.0.18"></script>
     <script src="js/app.js?v=1.0.18"></script>
-    <script src="js/living-triples.js?v=1.0.18"></script>
-    <script src="js/sentence-morpher.js?v=1.0.18"></script>
     <script src="js/triples-radar.js?v=1.0.18"></script>
 </body>
 </html>
-
 
