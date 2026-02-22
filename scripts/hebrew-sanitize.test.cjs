@@ -5,11 +5,13 @@ const path = require('node:path');
 
 const sanitize = require('../js/hebrew-sanitize.js');
 
-const REQUIRED_SQHCEL_SENTENCE = 'כאשר המטפל מזהה פער בין עוצמת הרגש שהמשפט מעורר באדם לבין מה שהמשפט אומר ומכיל, או פער בין המשפט לבין המציאות כפי שהאדם מספר עליה או המטפל מכיר מחוויותיו – כאן נדלקת נורת ההתובנות הפנימית על העניין, ויש רמז שיש לנו כאן כמתי-צל בפעולה.';
+const REQUIRED_WIZARD_TITLE = 'כמתים נסתרים – ההכללות שמשתמעות אבל לא נאמרות';
+const REQUIRED_WIZARD_FORMULA = 'חוץ (מצלמה) + כמת נסתר → עוצמה בפנים';
 
 test('sanitizeHebrewText fixes known typo words', () => {
     assert.equal(sanitize.sanitizeHebrewText('מפששט'), 'משפט');
     assert.equal(sanitize.sanitizeHebrewText('נורת הההתובנות'), 'נורת ההתובנות');
+    assert.equal(sanitize.sanitizeHebrewText('הההתובנות'), 'ההתובנות');
 });
 
 test('collapseRepeatedHebrewLetters collapses triple Hebrew repeats', () => {
@@ -28,6 +30,12 @@ test('sanitizeHebrewText is idempotent', () => {
     const once = sanitize.sanitizeHebrewText(source);
     const twice = sanitize.sanitizeHebrewText(once);
     assert.equal(once, twice);
+});
+
+test('hasObviousHebrewTypos flags triple repeated Hebrew letters', () => {
+    const report = sanitize.hasObviousHebrewTypos('הההרגשה הזו חזקה');
+    assert.equal(report.ok, false);
+    assert.equal(report.issues.includes('repeated_hebrew_letter_3plus'), true);
 });
 
 test('sanitizeHebrewJsonStrings sanitizes nested AI-like payload fields', () => {
@@ -52,8 +60,9 @@ test('sanitizeHebrewJsonStrings sanitizes nested AI-like payload fields', () => 
     assert.equal(cleaned.evaluator.one_fix_suggestion, 'זה לא בהכרח שקר, רק חסר הקשר.');
 });
 
-test('SQHCEL intro sentence is present exactly in app strings', () => {
+test('Wizard title and formula strings are present in app UI', () => {
     const appPath = path.join(__dirname, '..', 'js', 'app.js');
     const appSource = fs.readFileSync(appPath, 'utf8');
-    assert.equal(appSource.includes(REQUIRED_SQHCEL_SENTENCE), true);
+    assert.equal(appSource.includes(REQUIRED_WIZARD_TITLE), true);
+    assert.equal(appSource.includes(REQUIRED_WIZARD_FORMULA), true);
 });

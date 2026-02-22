@@ -1,0 +1,111 @@
+{
+  "categories": [
+    { "id": "lost_performative", "label": "Lost Performative", "labelHe": "שיפוט חסר מקור" },
+    { "id": "assumptions", "label": "Assumptions", "labelHe": "הנחות סמויות" },
+    { "id": "mind_reading", "label": "Mind Reading", "labelHe": "קריאת מחשבות" },
+    { "id": "universal_quantifier", "label": "Universal Quantifier", "labelHe": "כמת כוללני" },
+    { "id": "modal_operator", "label": "Modal Operator", "labelHe": "מודל אופרטור" },
+    { "id": "cause_effect", "label": "Cause & Effect", "labelHe": "סיבה ותוצאה" },
+    { "id": "nominalisations", "label": "Nominalisations", "labelHe": "נומינליזציה" },
+    { "id": "identity_predicates", "label": "Identity Predicates", "labelHe": "זהות" },
+    { "id": "complex_equivalence", "label": "Complex Equivalence", "labelHe": "שקילות מורכבת" },
+    { "id": "comparative_deletion", "label": "Comparative Deletion", "labelHe": "השוואה חסרה" },
+    { "id": "time_space_predicates", "label": "Time & Space", "labelHe": "זמן ומרחב" },
+    { "id": "lack_referential_index", "label": "Lack Referential Index", "labelHe": "חוסר ייחוס" },
+    { "id": "non_referring_nouns", "label": "Non-referring Nouns", "labelHe": "שמות לא מפנים" },
+    { "id": "sensory_predicates", "label": "Sensory Predicates", "labelHe": "פרדיקטים חושיים" },
+    { "id": "unspecified_verbs", "label": "Unspecified Verbs", "labelHe": "פועל לא מפורט" }
+  ],
+  "scenarios": [
+    {
+      "id": "tr_001",
+      "clientText": "זה לא הוגן שהם לא חזרו אליי באותו יום.",
+      "focusHint": "לפי איזה סטנדרט זה לא הוגן?",
+      "correctCategory": "lost_performative"
+    },
+    {
+      "id": "tr_002",
+      "clientText": "אם באמת היה אכפת לו, הוא היה יוזם לבד.",
+      "focusHint": "מה אתה מניח שחייב להיות נכון כדי שהמשפט יעמוד?",
+      "correctCategory": "assumptions"
+    },
+    {
+      "id": "tr_003",
+      "clientText": "אני יודע שהיא חושבת שאני חלש.",
+      "focusHint": "איך בדיוק אתה יודע מה היא חושבת?",
+      "correctCategory": "mind_reading"
+    },
+    {
+      "id": "tr_004",
+      "clientText": "זה תמיד קורה לי מול לקוחות.",
+      "focusHint": "באמת תמיד? יש יוצא דופן כלשהו?",
+      "correctCategory": "universal_quantifier"
+    },
+    {
+      "id": "tr_005",
+      "clientText": "אני לא יכול לבקש העלאה עכשיו.",
+      "focusHint": "מה מונע ממך ומה יקרה אם כן תבקש?",
+      "correctCategory": "modal_operator"
+    },
+    {
+      "id": "tr_006",
+      "clientText": "כל פעם שהיא שותקת, זה הורס את הקשר.",
+      "focusHint": "איך בדיוק X גורם ל-Y? מה השרשרת?",
+      "correctCategory": "cause_effect"
+    },
+    {
+      "id": "tr_007",
+      "clientText": "יש אצלנו חוסר תקשורת רציני בבית.",
+      "focusHint": "מה קורה בפועל? מי עושה מה?",
+      "correctCategory": "nominalisations"
+    },
+    {
+      "id": "tr_008",
+      "clientText": "אני פשוט כישלון.",
+      "focusHint": "באיזה תחום? מתי זה לא נכון?",
+      "correctCategory": "identity_predicates"
+    },
+    {
+      "id": "tr_009",
+      "clientText": "אם היא איחרה, זה אומר שלא אכפת לה ממני.",
+      "focusHint": "איך X אומר Y? מה הקריטריון?",
+      "correctCategory": "complex_equivalence"
+    },
+    {
+      "id": "tr_010",
+      "clientText": "אני פחות טוב מהם בישיבות.",
+      "focusHint": "פחות טוב ביחס למה או למי?",
+      "correctCategory": "comparative_deletion"
+    },
+    {
+      "id": "tr_011",
+      "clientText": "ככה זה תמיד אצלי בבוקר.",
+      "focusHint": "מתי בדיוק? איפה בדיוק?",
+      "correctCategory": "time_space_predicates"
+    },
+    {
+      "id": "tr_012",
+      "clientText": "הם לא נותנים לי מקום.",
+      "focusHint": "מי בדיוק הם? ומה בדיוק לא נותנים?",
+      "correctCategory": "lack_referential_index"
+    },
+    {
+      "id": "tr_013",
+      "clientText": "יש שם משהו לא ברור בסיפור הזה.",
+      "focusHint": "מה זה בדיוק המשהו הזה?",
+      "correctCategory": "non_referring_nouns"
+    },
+    {
+      "id": "tr_014",
+      "clientText": "אני מרגיש רע כשזה קורה.",
+      "focusHint": "איך אתה יודע? מה אתה רואה/שומע/מרגיש בגוף?",
+      "correctCategory": "sensory_predicates"
+    },
+    {
+      "id": "tr_015",
+      "clientText": "ואז אני פשוט מתפרק לגמרי.",
+      "focusHint": "מה קורה צעד-צעד בפועל?",
+      "correctCategory": "unspecified_verbs"
+    }
+  ]
+}

@@ -12,6 +12,7 @@
     const SPACE_REGEX = /[ \t]+/g;
     const COMMON_TYPO_REPLACEMENTS = Object.freeze([
         Object.freeze({ wrong: 'נורת הההתובנות', right: 'נורת ההתובנות' }),
+        Object.freeze({ wrong: 'הההתובנות', right: 'ההתובנות' }),
         Object.freeze({ wrong: 'מפששט', right: 'משפט' }),
         Object.freeze({ wrong: 'מפששטים', right: 'משפטים' }),
         Object.freeze({ wrong: 'התתרגיל', right: 'התרגיל' }),

@@ -1,4 +1,4 @@
-// Global Variables
+﻿// Global Variables
 let metaModelData = {};
 let practiceCount = 0;
 let currentStatementIndex = 0;
@@ -108,9 +108,9 @@ const OPENING_TRACK_SRC = 'assets/audio/The_Inner_Task.mp3';
 const OPENING_TRACK_FIRST_ENTRY_KEY = 'meta_opening_track_first_entry_done';
 
 const TRAINER_CATEGORY_LABELS = {
-    DELETION: 'מחיקה (Deletion)',
-    DISTORTION: 'עיוות (Distortion)',
-    GENERALIZATION: 'הכללה (Generalization)'
+    DELETION: '׳׳—׳™׳§׳” (Deletion)',
+    DISTORTION: '׳¢׳™׳•׳•׳× (Distortion)',
+    GENERALIZATION: '׳”׳›׳׳׳” (Generalization)'
 };
 
 const TRAINER_STAR_REWARDS = Object.freeze({
@@ -120,15 +120,19 @@ const TRAINER_STAR_REWARDS = Object.freeze({
 });
 
 let trainerRewardEffectTimer = null;
-const PRACTICE_PAGE_KEYS = Object.freeze(['question', 'radar', 'wizard', 'verb-unzip']);
+const PRACTICE_PAGE_KEYS = Object.freeze(['question', 'radar', 'triples-radar', 'wizard', 'sentence-morpher', 'verb-unzip']);
 const PRACTICE_ACTIVE_TAB_STORAGE_KEY = 'practice_active_tab_v1';
 const PRACTICE_TAB_BY_PAGE_KEY = Object.freeze({
     question: 'practice-question',
     radar: 'practice-radar',
+    'triples-radar': 'practice-triples-radar',
     wizard: 'practice-wizard',
+    'sentence-morpher': 'practice-sentence-morpher',
     'verb-unzip': 'practice-verb-unzip'
 });
 const PRACTICE_TAB_IDS = Object.freeze(Object.values(PRACTICE_TAB_BY_PAGE_KEY));
+const WIZARD_REQUIRED_TITLE_STRING = 'כמתים נסתרים – ההכללות שמשתמעות אבל לא נאמרות';
+const WIZARD_REQUIRED_FORMULA_STRING = 'חוץ (מצלמה) + כמת נסתר → עוצמה בפנים';
 
 const SUBCATEGORY_TO_CATEGORY = {
     SIMPLE_DELETION: 'DELETION',
@@ -207,7 +211,7 @@ function updateMusicToggleButtonUI() {
     if (!btn) return;
 
     if (audioState.muted) {
-        btn.textContent = '🔇';
+        btn.textContent = 'נ”‡';
         btn.setAttribute('aria-label', 'Enable audio and play opening music');
         btn.setAttribute('title', 'Enable audio and play opening music');
         btn.classList.add('is-muted');
@@ -216,7 +220,7 @@ function updateMusicToggleButtonUI() {
     }
 
     if (isOpeningTrackPlaying()) {
-        btn.textContent = '⏹';
+        btn.textContent = 'ג¹';
         btn.setAttribute('aria-label', 'Stop opening music');
         btn.setAttribute('title', 'Stop opening music');
         btn.classList.add('is-playing');
@@ -224,7 +228,7 @@ function updateMusicToggleButtonUI() {
         return;
     }
 
-    btn.textContent = '🎵';
+    btn.textContent = 'נµ';
     btn.setAttribute('aria-label', 'Play opening music');
     btn.setAttribute('title', 'Play opening music');
     btn.classList.remove('is-playing', 'is-muted');
@@ -237,7 +241,7 @@ function setupMusicToggleButton() {
         btn.id = 'music-toggle-btn';
         btn.className = 'music-toggle-btn';
         btn.type = 'button';
-        btn.textContent = '🎵';
+        btn.textContent = 'נµ';
         document.body.appendChild(btn);
     }
 
@@ -264,7 +268,7 @@ function updateMuteButtonUI() {
         return;
     }
     btns.forEach(btn => {
-        btn.textContent = audioState.muted ? 'סאונד כבוי' : 'סאונד פעיל';
+        btn.textContent = audioState.muted ? '׳¡׳׳•׳ ׳“ ׳›׳‘׳•׳™' : '׳¡׳׳•׳ ׳“ ׳₪׳¢׳™׳';
         btn.classList.toggle('is-muted', audioState.muted);
     });
     updateMusicToggleButtonUI();
@@ -442,6 +446,23 @@ function hideSplashScreen() {
     }, 3600);
 }
 
+function applyViewModeOverride() {
+    const params = new URLSearchParams(window.location.search);
+    const viewMode = String(params.get('view') || params.get('layout') || '').trim().toLowerCase();
+    if (!viewMode) return;
+
+    const forceMobile = viewMode === 'mobile' || viewMode === 'm' || viewMode === 'phone';
+    const forceDesktop = viewMode === 'desktop' || viewMode === 'd' || viewMode === 'pc';
+
+    if (forceMobile) {
+        document.body.classList.add('force-mobile-view');
+        document.body.classList.remove('force-desktop-view');
+    } else if (forceDesktop) {
+        document.body.classList.add('force-desktop-view');
+        document.body.classList.remove('force-mobile-view');
+    }
+}
+
 function applyEmbeddedCompactMode() {
     let embedded = false;
     try {
@@ -457,12 +478,14 @@ function applyEmbeddedCompactMode() {
 
     const forceSimple = params.get('simple') === '1';
     const disableSimple = params.get('simple') === '0';
+    const forceMobileView = document.body.classList.contains('force-mobile-view');
+    const forceDesktopView = document.body.classList.contains('force-desktop-view');
 
     if (embedded) {
         document.body.classList.add('embed-mode');
     }
 
-    if (forceSimple || (embedded && !disableSimple)) {
+    if (forceSimple || ((embedded || forceMobileView) && !disableSimple && !forceDesktopView)) {
         document.body.classList.add('minimal-ui');
     }
 }
@@ -487,7 +510,9 @@ function normalizeRequestedTab(tabName = '') {
     if (!raw) return '';
     if (key === 'practice' || key === 'practice-question' || key === 'question') return 'practice-question';
     if (key === 'practice-radar' || key === 'radar' || key === 'meta-radar' || key === 'meta_radar') return 'practice-radar';
+    if (key === 'practice-triples-radar' || key === 'triples-radar' || key === 'triples_radar' || key === 'breen-radar' || key === 'michael-breen') return 'practice-triples-radar';
     if (key === 'practice-wizard' || key === 'wizard' || key === 'sqhcel') return 'practice-wizard';
+    if (key === 'practice-sentence-morpher' || key === 'sentence-morpher' || key === 'sentence_morpher' || key === 'live-sentence' || key === 'quantifier-morph') return 'practice-sentence-morpher';
     if (key === 'practice-verb-unzip' || key === 'verb-unzip' || key === 'unspecified-verb' || key === 'unzip') return 'practice-verb-unzip';
     return raw;
 }
@@ -527,108 +552,118 @@ function setupMobileViewportSizing() {
 }
 
 const DEFAULT_SCREEN_READ_GUIDE = Object.freeze({
-    logic: 'התרגול בנוי מלמטה למעלה: מזהים הנחה סמויה, מדייקים שפה, ואז פועלים צעד קטן.',
-    goal: 'להחליף אוטומט של האשמה/בלבול בחשיבה פרקטית שמובילה לביצוע.',
-    approach: 'עובדים לאט: קוראים את ההנחיה, עונים קצר, ובודקים האם התשובה מובילה לפעולה ברורה.',
-    expected: 'בסיום התרגול תדע/י לזהות במהירות איפה המשפט עמום, לשאול שאלה מדויקת, ולתרגם את זה לצעד מעשי.',
-    success: 'תוכל/י להסביר לעצמך מה זיהית, למה בחרת כך, ומה הצעד הבא שבאמת אפשר לבצע.'
+    logic: '׳”׳×׳¨׳’׳•׳ ׳‘׳ ׳•׳™ ׳׳׳׳˜׳” ׳׳׳¢׳׳”: ׳׳–׳”׳™׳ ׳”׳ ׳—׳” ׳¡׳׳•׳™׳”, ׳׳“׳™׳™׳§׳™׳ ׳©׳₪׳”, ׳•׳׳– ׳₪׳•׳¢׳׳™׳ ׳¦׳¢׳“ ׳§׳˜׳.',
+    goal: '׳׳”׳—׳׳™׳£ ׳׳•׳˜׳•׳׳˜ ׳©׳ ׳”׳׳©׳׳”/׳‘׳׳‘׳•׳ ׳‘׳—׳©׳™׳‘׳” ׳₪׳¨׳§׳˜׳™׳× ׳©׳׳•׳‘׳™׳׳” ׳׳‘׳™׳¦׳•׳¢.',
+    approach: '׳¢׳•׳‘׳“׳™׳ ׳׳׳˜: ׳§׳•׳¨׳׳™׳ ׳׳× ׳”׳”׳ ׳—׳™׳”, ׳¢׳•׳ ׳™׳ ׳§׳¦׳¨, ׳•׳‘׳•׳“׳§׳™׳ ׳”׳׳ ׳”׳×׳©׳•׳‘׳” ׳׳•׳‘׳™׳׳” ׳׳₪׳¢׳•׳׳” ׳‘׳¨׳•׳¨׳”.',
+    expected: '׳‘׳¡׳™׳•׳ ׳”׳×׳¨׳’׳•׳ ׳×׳“׳¢/׳™ ׳׳–׳”׳•׳× ׳‘׳׳”׳™׳¨׳•׳× ׳׳™׳₪׳” ׳”׳׳©׳₪׳˜ ׳¢׳׳•׳, ׳׳©׳׳•׳ ׳©׳׳׳” ׳׳“׳•׳™׳§׳×, ׳•׳׳×׳¨׳’׳ ׳׳× ׳–׳” ׳׳¦׳¢׳“ ׳׳¢׳©׳™.',
+    success: '׳×׳•׳›׳/׳™ ׳׳”׳¡׳‘׳™׳¨ ׳׳¢׳¦׳׳ ׳׳” ׳–׳™׳”׳™׳×, ׳׳׳” ׳‘׳—׳¨׳× ׳›׳, ׳•׳׳” ׳”׳¦׳¢׳“ ׳”׳‘׳ ׳©׳‘׳׳׳× ׳׳₪׳©׳¨ ׳׳‘׳¦׳¢.'
 });
 
 const SCREEN_READ_GUIDES = Object.freeze({
     home: Object.freeze({
-        logic: 'המסך מרכז את כל מסלולי התרגול במקום אחד כדי לבחור מה נכון לך עכשיו.',
-        goal: 'להתחיל עבודה ממוקדת בלי לקפוץ בין כלים.',
-        approach: 'בחר/י מסלול אחד, סיים/י אותו, ואז חזור/י לבית למסלול הבא.'
+        logic: '׳”׳׳¡׳ ׳׳¨׳›׳– ׳׳× ׳›׳ ׳׳¡׳׳•׳׳™ ׳”׳×׳¨׳’׳•׳ ׳‘׳׳§׳•׳ ׳׳—׳“ ׳›׳“׳™ ׳׳‘׳—׳•׳¨ ׳׳” ׳ ׳›׳•׳ ׳׳ ׳¢׳›׳©׳™׳•.',
+        goal: '׳׳”׳×׳—׳™׳ ׳¢׳‘׳•׳“׳” ׳׳׳•׳§׳“׳× ׳‘׳׳™ ׳׳§׳₪׳•׳¥ ׳‘׳™׳ ׳›׳׳™׳.',
+        approach: '׳‘׳—׳¨/׳™ ׳׳¡׳׳•׳ ׳׳—׳“, ׳¡׳™׳™׳/׳™ ׳׳•׳×׳•, ׳•׳׳– ׳—׳–׳•׳¨/׳™ ׳׳‘׳™׳× ׳׳׳¡׳׳•׳ ׳”׳‘׳.'
     }),
     'scenario-screen-home': Object.freeze({
-        logic: 'מתרגלים מעבר ממשפט עמום לתגובה שמקדמת פעולה.',
-        goal: 'להוריד אשמה ולהעלות בהירות בתוך אינטראקציה אמיתית.',
-        approach: 'התחל/י מסצנות, עבר/י למסך בחירה, ואז קבל/י משוב ובנה/י פירוק.'
+        logic: '׳׳×׳¨׳’׳׳™׳ ׳׳¢׳‘׳¨ ׳׳׳©׳₪׳˜ ׳¢׳׳•׳ ׳׳×׳’׳•׳‘׳” ׳©׳׳§׳“׳׳× ׳₪׳¢׳•׳׳”.',
+        goal: '׳׳”׳•׳¨׳™׳“ ׳׳©׳׳” ׳•׳׳”׳¢׳׳•׳× ׳‘׳”׳™׳¨׳•׳× ׳‘׳×׳•׳ ׳׳™׳ ׳˜׳¨׳׳§׳¦׳™׳” ׳׳׳™׳×׳™׳×.',
+        approach: '׳”׳×׳—׳/׳™ ׳׳¡׳¦׳ ׳•׳×, ׳¢׳‘׳¨/׳™ ׳׳׳¡׳ ׳‘׳—׳™׳¨׳”, ׳•׳׳– ׳§׳‘׳/׳™ ׳׳©׳•׳‘ ׳•׳‘׳ ׳”/׳™ ׳₪׳™׳¨׳•׳§.'
     }),
     'scenario-screen-domain': Object.freeze({
-        logic: 'סינון תחום ורמה מתאים את הסצנות לעומס הרגשי ולשלב הלמידה שלך.',
-        goal: 'לתרגל בדיוק ברמת קושי נכונה.',
-        approach: 'בחר/י תחום, רמה וכמות סצנות ואז התחל/י ריצה רציפה.'
+        logic: '׳¡׳™׳ ׳•׳ ׳×׳—׳•׳ ׳•׳¨׳׳” ׳׳×׳׳™׳ ׳׳× ׳”׳¡׳¦׳ ׳•׳× ׳׳¢׳•׳׳¡ ׳”׳¨׳’׳©׳™ ׳•׳׳©׳׳‘ ׳”׳׳׳™׳“׳” ׳©׳׳.',
+        goal: '׳׳×׳¨׳’׳ ׳‘׳“׳™׳•׳§ ׳‘׳¨׳׳× ׳§׳•׳©׳™ ׳ ׳›׳•׳ ׳”.',
+        approach: '׳‘׳—׳¨/׳™ ׳×׳—׳•׳, ׳¨׳׳” ׳•׳›׳׳•׳× ׳¡׳¦׳ ׳•׳× ׳•׳׳– ׳”׳×׳—׳/׳™ ׳¨׳™׳¦׳” ׳¨׳¦׳™׳₪׳”.'
     }),
     'scenario-screen-play': Object.freeze({
-        logic: 'כל סצנה מציגה משפט לא-מפורש ודורשת בחירה בין תגובה אדומה לירוקה.',
-        goal: 'לזהות מהר מה תוקע ומה מקדם.',
-        approach: 'קרא/י את הסיפור, סמן/י תגובה אחת, ושים/י לב להשפעה שלה.'
+        logic: '׳›׳ ׳¡׳¦׳ ׳” ׳׳¦׳™׳’׳” ׳׳©׳₪׳˜ ׳׳-׳׳₪׳•׳¨׳© ׳•׳“׳•׳¨׳©׳× ׳‘׳—׳™׳¨׳” ׳‘׳™׳ ׳×׳’׳•׳‘׳” ׳׳“׳•׳׳” ׳׳™׳¨׳•׳§׳”.',
+        goal: '׳׳–׳”׳•׳× ׳׳”׳¨ ׳׳” ׳×׳•׳§׳¢ ׳•׳׳” ׳׳§׳“׳.',
+        approach: '׳§׳¨׳/׳™ ׳׳× ׳”׳¡׳™׳₪׳•׳¨, ׳¡׳׳/׳™ ׳×׳’׳•׳‘׳” ׳׳—׳×, ׳•׳©׳™׳/׳™ ׳׳‘ ׳׳”׳©׳₪׳¢׳” ׳©׳׳”.'
     }),
     'scenario-screen-feedback': Object.freeze({
-        logic: 'המשוב מחבר בין בחירה לבין תוצאה מיידית ולא רק "נכון/לא נכון".',
-        goal: 'לבנות אינטואיציה של סיבה-תוצאה בשיחה.',
-        approach: 'קרא/י את ההסבר עד הסוף ורק אז התקדם/י לפירוק.'
+        logic: '׳”׳׳©׳•׳‘ ׳׳—׳‘׳¨ ׳‘׳™׳ ׳‘׳—׳™׳¨׳” ׳׳‘׳™׳ ׳×׳•׳¦׳׳” ׳׳™׳™׳“׳™׳× ׳•׳׳ ׳¨׳§ "׳ ׳›׳•׳/׳׳ ׳ ׳›׳•׳".',
+        goal: '׳׳‘׳ ׳•׳× ׳׳™׳ ׳˜׳•׳׳™׳¦׳™׳” ׳©׳ ׳¡׳™׳‘׳”-׳×׳•׳¦׳׳” ׳‘׳©׳™׳—׳”.',
+        approach: '׳§׳¨׳/׳™ ׳׳× ׳”׳”׳¡׳‘׳¨ ׳¢׳“ ׳”׳¡׳•׳£ ׳•׳¨׳§ ׳׳– ׳”׳×׳§׳“׳/׳™ ׳׳₪׳™׳¨׳•׳§.'
     }),
     'scenario-screen-blueprint': Object.freeze({
-        logic: 'אחרי בחירה טובה מפרקים אותה לתוכנית ביצוע קצרה וישימה.',
-        goal: 'לתרגם תובנה לפעולה שתוכל/י לבצע בעולם האמיתי.',
-        approach: 'התמקד/י בצעד ראשון, נקודת תקיעה ו-Plan B ברור.'
+        logic: '׳׳—׳¨׳™ ׳‘׳—׳™׳¨׳” ׳˜׳•׳‘׳” ׳׳₪׳¨׳§׳™׳ ׳׳•׳×׳” ׳׳×׳•׳›׳ ׳™׳× ׳‘׳™׳¦׳•׳¢ ׳§׳¦׳¨׳” ׳•׳™׳©׳™׳׳”.',
+        goal: '׳׳×׳¨׳’׳ ׳×׳•׳‘׳ ׳” ׳׳₪׳¢׳•׳׳” ׳©׳×׳•׳›׳/׳™ ׳׳‘׳¦׳¢ ׳‘׳¢׳•׳׳ ׳”׳׳׳™׳×׳™.',
+        approach: '׳”׳×׳׳§׳“/׳™ ׳‘׳¦׳¢׳“ ׳¨׳׳©׳•׳, ׳ ׳§׳•׳“׳× ׳×׳§׳™׳¢׳” ׳•-Plan B ׳‘׳¨׳•׳¨.'
     }),
     'scenario-screen-score': Object.freeze({
-        logic: 'סיכום הסצנה נועד לקבע דפוס חשיבה לפני מעבר לסצנה הבאה.',
-        goal: 'להפוך שיפור רגעי להרגל.',
-        approach: 'קרא/י את המשפט הירוק הבא והחליט/י אם ממשיכים או מסיימים סשן.'
+        logic: '׳¡׳™׳›׳•׳ ׳”׳¡׳¦׳ ׳” ׳ ׳•׳¢׳“ ׳׳§׳‘׳¢ ׳“׳₪׳•׳¡ ׳—׳©׳™׳‘׳” ׳׳₪׳ ׳™ ׳׳¢׳‘׳¨ ׳׳¡׳¦׳ ׳” ׳”׳‘׳׳”.',
+        goal: '׳׳”׳₪׳•׳ ׳©׳™׳₪׳•׳¨ ׳¨׳’׳¢׳™ ׳׳”׳¨׳’׳.',
+        approach: '׳§׳¨׳/׳™ ׳׳× ׳”׳׳©׳₪׳˜ ׳”׳™׳¨׳•׳§ ׳”׳‘׳ ׳•׳”׳—׳׳™׳˜/׳™ ׳׳ ׳׳׳©׳™׳›׳™׳ ׳׳• ׳׳¡׳™׳™׳׳™׳ ׳¡׳©׳.'
     }),
     'scenario-screen-history': Object.freeze({
-        logic: 'היסטוריה חושפת מגמות ולא רק הצלחה נקודתית.',
-        goal: 'לראות איפה יש שיפור עקבי ואיפה עדיין נתקעים.',
-        approach: 'סקור/י רשומות קצרות, ואז החלט/י על מוקד תרגול הבא.'
+        logic: '׳”׳™׳¡׳˜׳•׳¨׳™׳” ׳—׳•׳©׳₪׳× ׳׳’׳׳•׳× ׳•׳׳ ׳¨׳§ ׳”׳¦׳׳—׳” ׳ ׳§׳•׳“׳×׳™׳×.',
+        goal: '׳׳¨׳׳•׳× ׳׳™׳₪׳” ׳™׳© ׳©׳™׳₪׳•׳¨ ׳¢׳§׳‘׳™ ׳•׳׳™׳₪׳” ׳¢׳“׳™׳™׳ ׳ ׳×׳§׳¢׳™׳.',
+        approach: '׳¡׳§׳•׳¨/׳™ ׳¨׳©׳•׳׳•׳× ׳§׳¦׳¨׳•׳×, ׳•׳׳– ׳”׳—׳׳˜/׳™ ׳¢׳ ׳׳•׳§׳“ ׳×׳¨׳’׳•׳ ׳”׳‘׳.'
     }),
     'scenario-screen-settings': Object.freeze({
-        logic: 'הגדרות שומרות ברירת מחדל כדי לחסוך חיכוך בכל כניסה מחדש.',
-        goal: 'להתחיל תרגול מהר עם פחות קליקים.',
-        approach: 'קבע/י תחום, רמה והעדפות סאונד/פריזמה לפי איך שנוח לך.'
+        logic: '׳”׳’׳“׳¨׳•׳× ׳©׳•׳׳¨׳•׳× ׳‘׳¨׳™׳¨׳× ׳׳—׳“׳ ׳›׳“׳™ ׳׳—׳¡׳•׳ ׳—׳™׳›׳•׳ ׳‘׳›׳ ׳›׳ ׳™׳¡׳” ׳׳—׳“׳©.',
+        goal: '׳׳”׳×׳—׳™׳ ׳×׳¨׳’׳•׳ ׳׳”׳¨ ׳¢׳ ׳₪׳—׳•׳× ׳§׳׳™׳§׳™׳.',
+        approach: '׳§׳‘׳¢/׳™ ׳×׳—׳•׳, ׳¨׳׳” ׳•׳”׳¢׳“׳₪׳•׳× ׳¡׳׳•׳ ׳“/׳₪׳¨׳™׳–׳׳” ׳׳₪׳™ ׳׳™׳ ׳©׳ ׳•׳— ׳׳.'
     }),
     'comic-engine': Object.freeze({
-        logic: 'הזרימה מדמה דיאלוג אמיתי: בחירה, תגובת נגד, ניסוח מחדש ופירוק.',
-        goal: 'ללמוד תגובה מדויקת תחת לחץ שיח.',
-        approach: 'בחר/י תגובה, אשר/י ניסוח קצר, ואז פתח/י Power Card ו-Blueprint.'
+        logic: '׳”׳–׳¨׳™׳׳” ׳׳“׳׳” ׳“׳™׳׳׳•׳’ ׳׳׳™׳×׳™: ׳‘׳—׳™׳¨׳”, ׳×׳’׳•׳‘׳× ׳ ׳’׳“, ׳ ׳™׳¡׳•׳— ׳׳—׳“׳© ׳•׳₪׳™׳¨׳•׳§.',
+        goal: '׳׳׳׳•׳“ ׳×׳’׳•׳‘׳” ׳׳“׳•׳™׳§׳× ׳×׳—׳× ׳׳—׳¥ ׳©׳™׳—.',
+        approach: '׳‘׳—׳¨/׳™ ׳×׳’׳•׳‘׳”, ׳׳©׳¨/׳™ ׳ ׳™׳¡׳•׳— ׳§׳¦׳¨, ׳•׳׳– ׳₪׳×׳—/׳™ Power Card ׳•-Blueprint.'
     }),
     prismlab: Object.freeze({
-        logic: 'המיפוי בודק באיזו רמה לוגית יושבת הבעיה כדי לבחור Pivot נכון.',
-        goal: 'להפסיק לטפל בסימפטום ולפגוע בשורש.',
-        approach: 'מלא/י תשובות לכל רמה, אשר/י מיפוי וקרא/י את ההמלצה המעשית.'
+        logic: '׳”׳׳™׳₪׳•׳™ ׳‘׳•׳“׳§ ׳‘׳׳™׳–׳• ׳¨׳׳” ׳׳•׳’׳™׳× ׳™׳•׳©׳‘׳× ׳”׳‘׳¢׳™׳” ׳›׳“׳™ ׳׳‘׳—׳•׳¨ Pivot ׳ ׳›׳•׳.',
+        goal: '׳׳”׳₪׳¡׳™׳§ ׳׳˜׳₪׳ ׳‘׳¡׳™׳׳₪׳˜׳•׳ ׳•׳׳₪׳’׳•׳¢ ׳‘׳©׳•׳¨׳©.',
+        approach: '׳׳׳/׳™ ׳×׳©׳•׳‘׳•׳× ׳׳›׳ ׳¨׳׳”, ׳׳©׳¨/׳™ ׳׳™׳₪׳•׳™ ׳•׳§׳¨׳/׳™ ׳׳× ׳”׳”׳׳׳¦׳” ׳”׳׳¢׳©׳™׳×.'
     }),
     categories: Object.freeze({
-        logic: 'זהו מסך ידע: מחיקה, עיוות והכללה כמפת ניווט לתרגול.',
-        goal: 'לזהות מהר איזה סוג הפרה מופיע במשפט.',
-        approach: 'עבור/י על הדוגמאות ואז חזור/י למסך תרגול מעשי.'
+        logic: '׳–׳”׳• ׳׳¡׳ ׳™׳“׳¢: ׳׳—׳™׳§׳”, ׳¢׳™׳•׳•׳× ׳•׳”׳›׳׳׳” ׳›׳׳₪׳× ׳ ׳™׳•׳•׳˜ ׳׳×׳¨׳’׳•׳.',
+        goal: '׳׳–׳”׳•׳× ׳׳”׳¨ ׳׳™׳–׳” ׳¡׳•׳’ ׳”׳₪׳¨׳” ׳׳•׳₪׳™׳¢ ׳‘׳׳©׳₪׳˜.',
+        approach: '׳¢׳‘׳•׳¨/׳™ ׳¢׳ ׳”׳“׳•׳’׳׳׳•׳× ׳•׳׳– ׳—׳–׳•׳¨/׳™ ׳׳׳¡׳ ׳×׳¨׳’׳•׳ ׳׳¢׳©׳™.'
     }),
     practice: Object.freeze({
-        logic: 'מסך התרגול פוצל ל-4 דפים: שאלות, Meta Radar, SQHCEL, ופועל לא מפורט.',
-        goal: 'לעבוד בצורה ממוקדת - כל פעם מיומנות אחת.',
-        approach: 'בחר/י דף אחד, סיים/י סבב קצר, ורק אז עבר/י לדף הבא.'
+        logic: '׳׳¡׳ ׳”׳×׳¨׳’׳•׳ ׳₪׳•׳¦׳ ׳-5 ׳“׳₪׳™׳: ׳©׳׳׳•׳×, Meta Radar, ׳›׳׳×׳™׳ ׳ ׳¡׳×׳¨׳™׳, ׳׳©׳₪׳˜ ׳—׳™, ׳•׳₪׳•׳¢׳ ׳׳ ׳׳₪׳•׳¨׳˜.',
+        goal: '׳׳¢׳‘׳•׳“ ׳‘׳¦׳•׳¨׳” ׳׳׳•׳§׳“׳× - ׳›׳ ׳₪׳¢׳ ׳׳™׳•׳׳ ׳•׳× ׳׳—׳×.',
+        approach: '׳‘׳—׳¨/׳™ ׳“׳£ ׳׳—׳“, ׳¡׳™׳™׳/׳™ ׳¡׳‘׳‘ ׳§׳¦׳¨, ׳•׳¨׳§ ׳׳– ׳¢׳‘׳¨/׳™ ׳׳“׳£ ׳”׳‘׳.'
     }),
-    'practice-question': Object.freeze({
-        logic: 'הדף הזה מאמן ניסוח שאלות מדויקות במקום ניחוש.',
-        goal: 'להשתפר בזיהוי מהיר של מחיקה/עיוות/הכללה.',
-        approach: 'קרא/י את המשפט, נסח/י שאלה מדויקת, ובדוק/י עם המשוב.'
+        'practice-triples-radar': Object.freeze({
+        logic: 'זהו אימון זיהוי בתוך טבלת השלשות של מייקל ברין: 5 שורות, 15 קטגוריות.',
+        goal: 'לפגוע בקטגוריה המדויקת או לפחות לזהות נכון את השלשה.',
+        approach: 'קרא/י משפט מטופל, בחר/י קטגוריה אחת וקבל/י משוב מדורג.',
+        success: 'הצלחה = יותר דיוק בפחות ניסיונות ושיפור קבוע בזיהוי שורה וקטגוריה.'
+    }),    'practice-radar': Object.freeze({
+        logic: '׳”׳“׳£ ׳”׳–׳” ׳׳׳׳ ׳–׳™׳”׳•׳™ ׳×׳‘׳ ׳™׳•׳× ׳‘׳–׳׳ ׳׳׳× ׳¢׳ ׳׳—׳¥ ׳–׳׳.',
+        goal: '׳׳—׳–׳§ ׳¨׳₪׳׳§׳¡ ׳“׳™׳•׳§ ׳׳”׳™׳¨ ׳‘׳׳•׳ ׳•׳׳•׳’ ׳—׳™.',
+        approach: '׳¨׳׳”/׳™ ׳׳× ׳”׳”׳™׳™׳׳™׳™׳˜, ׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳‘׳׳”׳™׳¨׳•׳×, ׳•׳‘׳“׳•׳§/׳™ ׳׳” ׳׳×׳§׳ ׳‘׳¡׳™׳›׳•׳.'
     }),
-    'practice-radar': Object.freeze({
-        logic: 'הדף הזה מאמן זיהוי תבניות בזמן אמת עם לחץ זמן.',
-        goal: 'לחזק רפלקס דיוק מהיר במונולוג חי.',
-        approach: 'ראה/י את ההיילייט, בחר/י תבנית במהירות, ובדוק/י מה לתקן בסיכום.'
+    'practice-triples-radar': Object.freeze({
+        logic: '׳”׳“׳£ ׳”׳–׳” ׳׳׳׳ ׳–׳™׳”׳•׳™ ׳׳×׳•׳ ׳˜׳‘׳׳× ׳׳™׳™׳§׳ ׳‘׳¨׳™׳: 5 ׳©׳׳©׳•׳×, 15 ׳§׳˜׳’׳•׳¨׳™׳•׳×.',
+        goal: '׳׳₪׳’׳•׳¢ ׳‘׳§׳˜׳’׳•׳¨׳™׳” ׳”׳׳“׳•׳™׳§׳× ׳׳• ׳׳₪׳—׳•׳× ׳׳–׳”׳•׳× ׳׳× ׳”׳©׳׳©׳” ׳”׳ ׳›׳•׳ ׳”.',
+        approach: '׳§׳¨׳/׳™ ׳׳©׳₪׳˜, ׳‘׳—׳¨/׳™ ׳§׳˜׳’׳•׳¨׳™׳”, ׳•׳§׳‘׳/׳™ ׳׳©׳•׳‘ ׳׳“׳•׳¨׳’: ׳׳“׳•׳™׳§/׳§׳¨׳•׳‘/׳©׳’׳•׳™.'
     }),
     'practice-wizard': Object.freeze({
-        logic: 'הדף הזה מאמן גישור בין תחושה למשפט לפני אתגור.',
-        goal: 'לבנות מיומנות SQHCEL עקבית עם אישור לפני פריצה.',
-        approach: 'עבוד/י בסדר קבוע: S -> Q -> H -> C -> PATH -> E/L. הגוף מרגיש "אבסולוטי" לפני שהמילים אמרו "תמיד".'
+        logic: '׳”׳“׳£ ׳”׳–׳” ׳׳׳׳ ׳¢׳‘׳•׳“׳” ׳‘׳©׳›׳‘׳•׳× ׳§׳‘׳•׳¢׳•׳×: ׳—׳•׳¥, ׳₪׳ ׳™׳, ׳•׳›׳׳×׳™׳ ׳ ׳¡׳×׳¨׳™׳.',
+        goal: '׳׳‘׳ ׳•׳× ׳׳©׳₪׳˜ ׳׳’׳©׳¨ ׳׳“׳•׳™׳§ ׳׳₪׳ ׳™ ׳‘׳—׳™׳¨׳× PATH.',
+        approach: '׳¢׳‘׳•׳“/׳™ ׳‘׳¡׳“׳¨ ׳§׳‘׳•׳¢: S -> Q -> H -> C -> PATH -> E/L, ׳•׳‘׳›׳ ׳©׳׳‘ ׳‘׳“׳•׳§/׳™ ׳׳™׳–׳• ׳©׳›׳‘׳” ׳ ׳“׳׳§׳×.'
+    }),
+    'practice-sentence-morpher': Object.freeze({
+        logic: '׳”׳“׳£ ׳”׳–׳” ׳׳׳׳ ׳”׳–׳¨׳§׳× ׳›׳׳×׳™׳ ׳•׳×׳ ׳׳™׳ ׳׳׳©׳₪׳˜ ׳‘׳¡׳™׳¡׳™ ׳‘׳–׳׳ ׳׳׳×.',
+        goal: '׳׳—׳©׳•׳£ ׳›׳׳×׳™׳ ׳ ׳¡׳×׳¨׳™׳ ׳•׳׳¨׳׳•׳× ׳׳™׳“ ׳׳™׳ ׳”׳ ׳׳©׳ ׳™׳ ׳׳× ׳”׳׳©׳₪׳˜ ׳”׳’׳“׳•׳.',
+        approach: '׳‘׳—׳¨/׳™ ׳¦׳³׳™׳₪׳™׳ ׳׳₪׳™ ׳¦׳™׳¨׳™׳, ׳¢׳§׳•׳‘/׳™ ׳׳—׳¨׳™ ׳”׳׳©׳₪׳˜ ׳”׳—׳™, ׳•׳—׳“׳“/׳™ ׳׳× ׳”׳ ׳™׳¡׳•׳—.'
     }),
     'practice-verb-unzip': Object.freeze({
-        logic: 'הדף הזה מאמן פירוק פועל לא מפורט באמצעות 15 שאלות קבועות וגרירה לסכמה קשיחה.',
-        goal: 'לתרגם מילה דחוסה לתהליך מפורט, כולל טריגר, צעדים, ערך, קריטריון סיום וחריגים.',
-        approach: 'שאל/י שאלה, גרור/י את התשובה למקום הנכון, וקבל/י X אדום אם טעית. מסיימים רק כשהסכמה מלאה ואז קוראים סיכום.'
+        logic: '׳”׳“׳£ ׳”׳–׳” ׳׳׳׳ ׳₪׳™׳¨׳•׳§ ׳₪׳•׳¢׳ ׳׳ ׳׳₪׳•׳¨׳˜ ׳‘׳׳׳¦׳¢׳•׳× 15 ׳©׳׳׳•׳× ׳§׳‘׳•׳¢׳•׳× ׳•׳’׳¨׳™׳¨׳” ׳׳¡׳›׳׳” ׳§׳©׳™׳—׳”.',
+        goal: '׳׳×׳¨׳’׳ ׳׳™׳׳” ׳“׳—׳•׳¡׳” ׳׳×׳”׳׳™׳ ׳׳₪׳•׳¨׳˜, ׳›׳•׳׳ ׳˜׳¨׳™׳’׳¨, ׳¦׳¢׳“׳™׳, ׳¢׳¨׳, ׳§׳¨׳™׳˜׳¨׳™׳•׳ ׳¡׳™׳•׳ ׳•׳—׳¨׳™׳’׳™׳.',
+        approach: '׳©׳׳/׳™ ׳©׳׳׳”, ׳’׳¨׳•׳¨/׳™ ׳׳× ׳”׳×׳©׳•׳‘׳” ׳׳׳§׳•׳ ׳”׳ ׳›׳•׳, ׳•׳§׳‘׳/׳™ X ׳׳“׳•׳ ׳׳ ׳˜׳¢׳™׳×. ׳׳¡׳™׳™׳׳™׳ ׳¨׳§ ׳›׳©׳”׳¡׳›׳׳” ׳׳׳׳” ׳•׳׳– ׳§׳•׳¨׳׳™׳ ׳¡׳™׳›׳•׳.'
     }),
     blueprint: Object.freeze({
-        logic: 'המסך מפרק משימה עמומה ליעד, צעדים, פער ציפיות ותוכנית ביצוע.',
-        goal: 'לעבור מ"צריך לעשות" ל"מה עושים עכשיו".',
-        approach: 'התקדם/י צעד-צעד, מלא/י רק מה שצריך, וודא/י שיש צעד ראשון ברור.'
+        logic: '׳”׳׳¡׳ ׳׳₪׳¨׳§ ׳׳©׳™׳׳” ׳¢׳׳•׳׳” ׳׳™׳¢׳“, ׳¦׳¢׳“׳™׳, ׳₪׳¢׳¨ ׳¦׳™׳₪׳™׳•׳× ׳•׳×׳•׳›׳ ׳™׳× ׳‘׳™׳¦׳•׳¢.',
+        goal: '׳׳¢׳‘׳•׳¨ ׳"׳¦׳¨׳™׳ ׳׳¢׳©׳•׳×" ׳"׳׳” ׳¢׳•׳©׳™׳ ׳¢׳›׳©׳™׳•".',
+        approach: '׳”׳×׳§׳“׳/׳™ ׳¦׳¢׳“-׳¦׳¢׳“, ׳׳׳/׳™ ׳¨׳§ ׳׳” ׳©׳¦׳¨׳™׳, ׳•׳•׳“׳/׳™ ׳©׳™׳© ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳‘׳¨׳•׳¨.'
     }),
     about: Object.freeze({
-        logic: 'המסך מסביר את הרקע המתודולוגי ואת מקור הכלים בפרויקט.',
-        goal: 'לחבר בין התרגול לבין עקרונות ה-NLP שמאחוריו.',
-        approach: 'קרא/י בקצרה וחזור/י למסכי התרגול ליישום בפועל.'
+        logic: '׳”׳׳¡׳ ׳׳¡׳‘׳™׳¨ ׳׳× ׳”׳¨׳§׳¢ ׳”׳׳×׳•׳“׳•׳׳•׳’׳™ ׳•׳׳× ׳׳§׳•׳¨ ׳”׳›׳׳™׳ ׳‘׳₪׳¨׳•׳™׳§׳˜.',
+        goal: '׳׳—׳‘׳¨ ׳‘׳™׳ ׳”׳×׳¨׳’׳•׳ ׳׳‘׳™׳ ׳¢׳§׳¨׳•׳ ׳•׳× ׳”-NLP ׳©׳׳׳—׳•׳¨׳™׳•.',
+        approach: '׳§׳¨׳/׳™ ׳‘׳§׳¦׳¨׳” ׳•׳—׳–׳•׳¨/׳™ ׳׳׳¡׳›׳™ ׳”׳×׳¨׳’׳•׳ ׳׳™׳™׳©׳•׳ ׳‘׳₪׳•׳¢׳.'
     })
 });
 
@@ -647,14 +682,118 @@ const SCREEN_READ_GUIDE_TARGET_IDS = Object.freeze([
     'categories',
     'practice-question',
     'practice-radar',
+    'practice-triples-radar',
     'practice-wizard',
+    'practice-sentence-morpher',
     'practice-verb-unzip',
     'blueprint',
     'about'
 ]);
 
+const SCREEN_READ_GUIDE_OVERRIDES = Object.freeze({
+    'scenario-screen-play': Object.freeze({
+        logic: '׳׳×׳” ׳¨׳•׳׳” ׳¡׳¦׳ ׳” ׳׳׳™׳×׳™׳× ׳¢׳ ׳₪׳•׳¢׳ ׳¢׳׳•׳. ׳›׳׳ ׳‘׳•׳“׳§׳™׳ ׳׳™׳–׳• ׳×׳’׳•׳‘׳” ׳©׳ ׳׳˜׳₪׳ ׳׳§׳“׳׳× ׳×׳”׳׳™׳.',
+        goal: '׳׳‘׳—׳•׳¨ ׳×׳’׳•׳‘׳” ׳©׳׳™׳™׳¦׳¨׳× ׳‘׳”׳™׳¨׳•׳×, ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳•׳×׳—׳•׳©׳× ׳›׳™׳•׳•׳.',
+        approach: '׳§׳¨׳/׳™ ׳׳× ׳”׳¡׳™׳₪׳•׳¨, ׳‘׳—׳¨/׳™ ׳×׳’׳•׳‘׳” ׳׳—׳×, ׳•׳׳– ׳”׳׳©׳/׳™ ׳׳׳©׳•׳‘.',
+        success: '׳”׳¦׳׳—׳” = ׳‘׳—׳¨׳× ׳×׳’׳•׳‘׳” ׳™׳¨׳•׳§׳” ׳©׳׳₪׳¨׳§׳× ׳׳× ׳”׳‘׳¢׳™׳” ׳׳¦׳¢׳“ ׳‘׳™׳¦׳•׳¢.'
+    }),
+    'scenario-screen-feedback': Object.freeze({
+        logic: '׳”׳׳¡׳ ׳”׳–׳” ׳׳¡׳‘׳™׳¨ ׳׳” ׳§׳¨׳” ׳‘׳’׳׳ ׳”׳‘׳—׳™׳¨׳” ׳©׳׳, ׳•׳׳ ׳¨׳§ ׳ ׳›׳•׳/׳׳ ׳ ׳›׳•׳.',
+        goal: '׳׳”׳‘׳™׳ ׳׳׳” ׳×׳’׳•׳‘׳” ׳׳—׳× ׳¡׳•׳’׳¨׳× ׳©׳™׳—׳” ׳•׳×׳’׳•׳‘׳” ׳׳—׳¨׳× ׳₪׳•׳×׳—׳× ׳×׳”׳׳™׳.',
+        approach: '׳§׳¨׳/׳™ ׳׳× ׳”׳”׳©׳₪׳¢׳” ׳”׳׳™׳™׳“׳™׳× ׳•׳׳– ׳׳—׳¥/׳™ "׳”׳¨׳׳” ׳׳× ׳”׳₪׳™׳¨׳•׳§".',
+        success: '׳”׳¦׳׳—׳” = ׳׳₪׳©׳¨ ׳׳”׳¡׳‘׳™׳¨ ׳׳” ׳™׳§׳¨׳” ׳׳™׳“ ׳׳—׳¨׳™ ׳”׳×׳’׳•׳‘׳” ׳©׳‘׳—׳¨׳×.'
+    }),
+    'scenario-screen-blueprint': Object.freeze({
+        logic: '׳›׳׳ ׳”׳•׳₪׳›׳™׳ ׳׳©׳₪׳˜ ׳׳-׳׳₪׳•׳¨׳˜ ׳׳׳₪׳× ׳₪׳¢׳•׳׳” ׳‘׳¨׳•׳¨׳” ׳׳₪׳™ TOTE.',
+        goal: '׳׳¦׳׳× ׳׳×׳§׳™׳¢׳•׳× ׳¢׳ ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳׳“׳™׳“ ׳•-Plan B.',
+        approach: '׳¢׳‘׳¨/׳™ ׳¢׳ 9 ׳”׳¡׳׳•׳˜׳™׳, ׳§׳¨׳/׳™ ׳׳× ׳©׳׳׳•׳× ׳”׳”׳©׳׳׳”, ׳•׳¡׳™׳™׳/׳™ ׳‘׳¡׳™׳›׳•׳ ׳§׳¦׳¨.',
+        success: '׳”׳¦׳׳—׳” = ׳™׳© ׳˜׳¨׳™׳’׳¨ ׳‘׳¨׳•׳¨, ׳©׳׳‘׳™ ׳₪׳¢׳•׳׳”, ׳—׳¡׳, ׳•׳§׳¨׳™׳˜׳¨׳™׳•׳ ׳™׳¦׳™׳׳”.'
+    }),
+        'practice-triples-radar': Object.freeze({
+        logic: 'זהו אימון זיהוי בתוך טבלת השלשות של מייקל ברין: 5 שורות, 15 קטגוריות.',
+        goal: 'לפגוע בקטגוריה המדויקת או לפחות לזהות נכון את השלשה.',
+        approach: 'קרא/י משפט מטופל, בחר/י קטגוריה אחת וקבל/י משוב מדורג.',
+        success: 'הצלחה = יותר דיוק בפחות ניסיונות ושיפור קבוע בזיהוי שורה וקטגוריה.'
+    }),
+    'practice-wizard': Object.freeze({
+        logic: '׳‘׳׳¡׳ ׳”׳–׳” ׳¢׳•׳‘׳“׳™׳ ׳¢׳ 3 ׳©׳›׳‘׳•׳×: ׳₪׳ ׳™׳, ׳—׳•׳¥, ׳•׳”׳׳₪׳” ׳”׳׳“׳•׳‘׳¨׳×; ׳§׳•׳“׳ ׳”׳׳™׳׳”, ׳׳—׳¨ ׳›׳ ׳‘׳“׳™׳§׳× ׳׳¦׳™׳׳•׳×.',
+        goal: '׳׳”׳₪׳•׳ "׳׳ ׳׳©׳ ׳” ׳׳”" ׳׳׳₪׳” ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™׳× ׳©׳׳—׳–׳™׳§׳” ׳’׳ ׳—׳•׳¥ ׳•׳’׳ ׳₪׳ ׳™׳.',
+        approach: 'S ׳×׳—׳•׳©׳” ג†’ Q ׳×׳₪׳¨׳™׳˜ ׳˜׳•׳˜׳׳׳™׳•׳× ג†’ H ׳•׳׳™׳“׳¦׳™׳” ׳׳׳׳” ג†’ C Filter/Paradox + ׳׳™׳ ׳˜׳’׳¨׳¦׳™׳” ג†’ PATH.',
+        success: '׳”׳¦׳׳—׳” = ׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™ ׳‘׳׳™ "׳׳‘׳", ׳•׳׳– ׳‘׳—׳™׳¨׳× ׳›׳™׳•׳•׳ ׳¢׳‘׳•׳“׳” (׳—׳•׳¥/׳₪׳ ׳™׳/׳’׳©׳¨).'
+    }),
+    'practice-sentence-morpher': Object.freeze({
+        logic: '׳›׳׳ ׳׳ ׳₪׳•׳×׳¨׳™׳ ׳׳× ׳›׳ ׳”׳˜׳™׳₪׳•׳, ׳׳׳ ׳׳׳׳ ׳™׳ ׳¨׳›׳™׳‘ ׳׳—׳“: ׳׳”׳₪׳•׳ ׳׳©׳₪׳˜ ׳‘׳¡׳™׳¡׳™ ׳׳׳₪׳” ׳—׳™׳” ׳¢׳ ׳›׳׳×׳™׳ ׳•׳×׳ ׳׳™׳.',
+        goal: '׳׳–׳”׳•׳× ׳׳” ׳ ׳•׳¡׳£ ׳׳׳©׳₪׳˜ ׳›׳©׳‘׳•׳—׳¨׳™׳ ׳–׳׳/׳׳™׳׳™׳/׳₪׳¢׳•׳׳”/׳׳ ׳©׳™׳/׳”׳§׳©׳¨/׳¨׳’׳©.',
+        approach: '׳‘׳—׳¨/׳™ ׳¦׳³׳™׳₪, ׳‘׳“׳•׳§/׳™ ׳׳× ׳”׳׳©׳₪׳˜ ׳”׳’׳“׳•׳, ׳•׳׳ ׳¦׳¨׳™׳ ׳—׳–׳•׳¨/׳™ ׳¦׳¢׳“ ׳׳• ׳׳₪׳¡/׳™.',
+        success: '׳”׳¦׳׳—׳” = ׳”׳׳©׳₪׳˜ ׳”׳—׳™ ׳׳©׳§׳£ ׳‘׳¦׳•׳¨׳” ׳׳₪׳•׳¨׳©׳× ׳׳× ׳”׳›׳׳×׳™׳ ׳”׳¡׳׳•׳™׳™׳.'
+    }),
+    'practice-verb-unzip': Object.freeze({
+        logic: '׳‘׳׳¡׳ ׳”׳–׳” ׳”׳׳˜׳₪׳ ׳©׳•׳׳ ׳©׳׳׳”, ׳”׳׳˜׳•׳₪׳ ׳¢׳•׳ ׳”, ׳•׳׳– ׳׳©׳‘׳¦׳™׳ ׳׳× ׳”׳×׳©׳•׳‘׳” ׳‘׳¡׳›׳׳”.',
+        goal: '׳׳₪׳¨׳§ ׳₪׳•׳¢׳ ׳׳ ׳׳₪׳•׳¨׳˜ ׳׳×׳”׳׳™׳ ׳‘׳¨׳•׳¨: ׳”׳§׳©׳¨, ׳¦׳¢׳“׳™׳, ׳׳˜׳¨׳”, ׳¢׳¨׳ ׳•׳§׳¨׳™׳˜׳¨׳™׳•׳.',
+        approach: '׳‘׳—׳¨ ׳©׳׳׳× ׳׳˜׳₪׳, ׳§׳‘׳ ׳×׳©׳•׳‘׳× ׳׳˜׳•׳₪׳, ׳•׳©׳‘׳¥ ׳׳•׳×׳” ׳׳¡׳׳•׳˜ ׳”׳׳×׳׳™׳.',
+        success: '׳”׳¦׳׳—׳” = ׳›׳ ׳”׳¡׳׳•׳˜׳™׳ ׳©׳•׳™׳›׳• ׳ ׳›׳•׳ ׳•׳׳×׳” ׳™׳›׳•׳ ׳׳”׳¡׳‘׳™׳¨ ׳׳” ׳™׳“׳•׳¢ ׳•׳׳” ׳—׳¡׳¨.'
+    })
+});
+
+const SCREEN_QUICK_GUIDE_STEPS = Object.freeze({
+    'scenario-screen-play': Object.freeze([
+        'קרא את הסצנה ואת הפועל הלא-מפורט.',
+        'בחר תגובת מטפל אחת בלבד.',
+        'בדוק במשוב אם התגובה מקדמת פירוק תהליך.'
+    ]),
+    'scenario-screen-feedback': Object.freeze([
+        'קרא מה ההשפעה המיידית של הבחירה שלך.',
+        'שים לב מה מקדם ומה מעכב בסצנה.',
+        'לחץ "הראה את הפירוק" כדי לעבור למפה פרקטית.'
+    ]),
+    'scenario-screen-blueprint': Object.freeze([
+        'קרא את מפת TOTE: טריגר, צעדים, חסם ויציאה.',
+        'השתמש בשאלות ההשלמה כדי לדייק נקודות חסרות.',
+        'סיים עם צעד ראשון קצר שאפשר לבצע בפועל.'
+    ]),
+    'practice-question': Object.freeze([
+        'קרא את המשפט שמופיע בתיבה.',
+        'כתוב שאלה אחת שמבררת מילה או הנחה עמומה.',
+        'בחר קטגוריה ולחץ על "בדוק שאלה".'
+    ]),
+    'practice-triples-radar': Object.freeze([
+        'קרא/י את משפט המטופל.',
+        'בחר/י קטגוריה אחת מתוך 15 הקטגוריות.',
+        'השתמש/י במשוב: מדויק, קרוב (אותה שלשה), או שורה שגויה.'
+    ]),
+    'practice-wizard': Object.freeze([
+        'בחר תחושת גוף דומיננטית (S) וניסוח טוטאליות מדויק (Q).',
+        'נסח ולידציה מלאה לחוויה לפני בדיקת עובדות (H).',
+        'בנה משפט אינטגרטיבי בחוץ+פנים ורק אז בחר PATH.'
+    ]),
+    'practice-sentence-morpher': Object.freeze([
+        'קרא את המשפט הגדול בתחילת המסך.',
+        'בחר צ׳יפ אחד או יותר מהצירים שמתחת.',
+        'בדוק איך המשפט מתעדכן בזמן אמת עם קטעי הכמתים.'
+    ]),
+    'practice-verb-unzip': Object.freeze([
+        'בחר שאלת מטפל מהרשימה.',
+        'קבל את תשובת המטופל שנוצרה.',
+        'שבץ את תשובת המטופל בסלוט הנכון בלוח.'
+    ])
+});
+
+function resolveScreenReadGuideCopy(screenId) {
+    const base = SCREEN_READ_GUIDES[screenId] || DEFAULT_SCREEN_READ_GUIDE;
+    const override = SCREEN_READ_GUIDE_OVERRIDES[screenId];
+    return override ? { ...base, ...override } : base;
+}
+
+function getQuickGuideSteps(screenId) {
+    return SCREEN_QUICK_GUIDE_STEPS[screenId] || [
+        '׳§׳¨׳ ׳׳” ׳׳•׳¦׳’ ׳›׳¨׳’׳¢ ׳¢׳ ׳”׳׳¡׳.',
+        '׳‘׳¦׳¢ ׳¦׳¢׳“ ׳׳—׳“ ׳‘׳¨׳•׳¨.',
+        '׳‘׳“׳•׳§ ׳׳× ׳”׳׳©׳•׳‘ ׳•׳”׳׳©׳ ׳׳¦׳¢׳“ ׳”׳‘׳.'
+    ];
+}
+
 function buildScreenReadGuide(screenId) {
-    const copy = SCREEN_READ_GUIDES[screenId] || DEFAULT_SCREEN_READ_GUIDE;
+    const copy = resolveScreenReadGuideCopy(screenId);
     const wrapper = document.createElement('div');
     wrapper.className = 'screen-read-guide';
     wrapper.dataset.screenGuide = screenId;
@@ -662,13 +801,12 @@ function buildScreenReadGuide(screenId) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'btn btn-primary screen-read-guide-btn';
-    button.innerHTML = `
-        <span class="screen-read-guide-btn-main">קרא לפני שתתחיל!</span>
-        <span class="screen-read-guide-btn-sub">הסבר מלא: היגיון, דרך עבודה, ומה צפוי לדעת אחרי התרגול</span>
-    `;
+    button.innerHTML =
+        '<span class="screen-read-guide-btn-main">׳׳” ׳¢׳•׳©׳™׳ ׳›׳׳? (20 ׳©׳ ׳™׳•׳×)</span>' +
+        '<span class="screen-read-guide-btn-sub">3 ׳¦׳¢׳“׳™׳ ׳‘׳¨׳•׳¨׳™׳ ׳׳”׳×׳—׳׳”</span>';
 
     const modal = document.createElement('div');
-    const modalId = `screen-read-guide-modal-${screenId}`;
+    const modalId = 'screen-read-guide-modal-' + screenId;
     modal.className = 'screen-read-guide-modal hidden';
     modal.id = modalId;
     modal.setAttribute('role', 'dialog');
@@ -678,39 +816,29 @@ function buildScreenReadGuide(screenId) {
     button.setAttribute('aria-expanded', 'false');
 
     const title = getScreenReadGuideTitle(screenId);
-    const expected = copy.expected || `לאחר התרגול במסך הזה תדע/י: ${copy.goal}`;
     const success = copy.success || DEFAULT_SCREEN_READ_GUIDE.success;
+    const steps = getQuickGuideSteps(screenId)
+        .map((step) => '<li>' + escapeHtml(step) + '</li>')
+        .join('');
 
-    modal.innerHTML = `
-        <div class="screen-read-guide-dialog">
-            <button type="button" class="screen-read-guide-close" aria-label="סגירה">×</button>
-            <h3>קרא לפני שתתחיל: ${escapeHtml(title)}</h3>
-            <p class="screen-read-guide-lead">המטרה כאן היא לא רק לענות נכון, אלא להבין את ההיגיון של התרגול כדי ליישם אותו גם בשיחה אמיתית מחוץ לאפליקציה.</p>
-            <div class="screen-read-guide-content">
-                <h4>מה ההיגיון של התרגול?</h4>
-                <p>${escapeHtml(copy.logic)}</p>
-                <h4>מה בדיוק המטרה במסך הזה?</h4>
-                <p>${escapeHtml(copy.goal)}</p>
-                <h4>איך לגשת לתרגול שלב-שלב?</h4>
-                <p>${escapeHtml(copy.approach)}</p>
-                <h4>סדר עבודה מומלץ כדי להפיק תוצאה אמיתית</h4>
-                <ol class="screen-read-guide-steps">
-                    <li>לעבור פעם ראשונה על המשפט או המשימה כדי להבין הקשר כללי.</li>
-                    <li>לעבור פעם שנייה ולזהות מילה/הנחה שיוצרת עמימות, לחץ או הכללה.</li>
-                    <li>לבחור תגובה או שאלה שמפרקת את העמימות לצעד ברור.</li>
-                    <li>להסתכל על המשוב, לתקן אם צריך, ואז להמשיך לסבב הבא.</li>
-                </ol>
-                <h4>מה צפוי שתדע/י לעשות אחרי התרגול?</h4>
-                <p>${escapeHtml(expected)}</p>
-                <h4>איך תזהה/י שהתקדמת?</h4>
-                <p>${escapeHtml(success)}</p>
-                <p class="screen-read-guide-summary">ציפיית התוצר בסוף התרגול: לא רק "לענות נכון", אלא לדעת להסביר לעצמך את ההיגיון מאחורי הבחירה וליישם אותו בשיחה אמיתית.</p>
-            </div>
-            <div class="screen-read-guide-actions">
-                <button type="button" class="btn btn-primary screen-read-guide-confirm">הבנתי, אפשר להתחיל תרגול</button>
-            </div>
-        </div>
-    `;
+    modal.innerHTML =
+        '<div class="screen-read-guide-dialog">' +
+            '<button type="button" class="screen-read-guide-close" aria-label="׳¡׳’׳™׳¨׳”">ֳ—</button>' +
+            '<h3>׳”׳¡׳‘׳¨ ׳§׳¦׳¨: ' + escapeHtml(title) + '</h3>' +
+            '<p class="screen-read-guide-lead">' + escapeHtml(copy.goal) + '</p>' +
+            '<div class="screen-read-guide-content">' +
+                '<h4>׳׳” ׳”׳¨׳¢׳™׳•׳?</h4>' +
+                '<p>' + escapeHtml(copy.logic) + '</p>' +
+                '<h4>׳׳™׳ ׳׳×׳—׳™׳׳™׳ ׳¢׳›׳©׳™׳•?</h4>' +
+                '<ol class="screen-read-guide-steps">' + steps + '</ol>' +
+                '<h4>׳׳” ׳ ׳—׳©׳‘ ׳˜׳•׳‘?</h4>' +
+                '<p>' + escapeHtml(copy.approach) + '</p>' +
+                '<p class="screen-read-guide-summary">' + escapeHtml(success) + '</p>' +
+            '</div>' +
+            '<div class="screen-read-guide-actions">' +
+                '<button type="button" class="btn btn-primary screen-read-guide-confirm">׳”׳‘׳ ׳×׳™, ׳׳×׳—׳™׳׳™׳</button>' +
+            '</div>' +
+        '</div>';
 
     const closeBtn = modal.querySelector('.screen-read-guide-close');
     const confirmBtn = modal.querySelector('.screen-read-guide-confirm');
@@ -747,10 +875,10 @@ function buildScreenReadGuide(screenId) {
 
 function getScreenReadGuideTitle(screenId) {
     const screen = document.getElementById(screenId);
-    if (!screen) return 'מסך תרגול';
+    if (!screen) return '׳׳¡׳ ׳×׳¨׳’׳•׳';
     const heading = screen.querySelector('h2, h3');
     const title = heading?.textContent?.trim();
-    return title || 'מסך תרגול';
+    return title || '׳׳¡׳ ׳×׳¨׳’׳•׳';
 }
 
 function setupReadBeforeStartGuides() {
@@ -787,7 +915,7 @@ async function resolveAppVersion() {
 function applyAppVersion(version) {
     const chip = document.getElementById('app-version-chip');
     if (chip) {
-        chip.textContent = `גרסה: ${version}`;
+        chip.textContent = `׳’׳¨׳¡׳”: ${version}`;
         chip.setAttribute('title', `Build ${version}`);
     }
 
@@ -814,6 +942,7 @@ async function setupAppVersionChip() {
 document.addEventListener('DOMContentLoaded', () => {
     setupAppVersionChip();
     setupMobileViewportSizing();
+    applyViewModeOverride();
     applyEmbeddedCompactMode();
     applyHeaderDensityPreference();
     loadAudioSettings();
@@ -835,10 +964,19 @@ document.addEventListener('DOMContentLoaded', () => {
     setupQuestionDrill();
     setupRapidPatternArena();
     setupWrinkleGame();
+    if (typeof setupSentenceMorpherDemo === 'function') {
+        setupSentenceMorpherDemo();
+    }
+    if (typeof setupTriplesRadarModule === 'function') {
+        setupTriplesRadarModule();
+    }
     setupTrainerMode();
     setupBlueprintBuilder();
     setupPrismModule();
     setupScenarioTrainerModule();
+    if (typeof setupLivingTriplesModule === 'function') {
+        setupLivingTriplesModule();
+    }
     setupComicEngine2();
     setupCommunityFeedbackWall();
     initializeProgressHub();
@@ -867,7 +1005,7 @@ async function loadMetaModelData() {
     } catch (error) {
         console.error('Error loading data:', error);
         hideLoadingIndicator();
-        showErrorMessage('שגיאה בטעינת הנתונים');
+        showErrorMessage('׳©׳’׳™׳׳” ׳‘׳˜׳¢׳™׳ ׳× ׳”׳ ׳×׳•׳ ׳™׳');
     }
 }
 
@@ -965,7 +1103,9 @@ function populateCategorySelect() {
 function normalizePracticePageKey(pageKey = '') {
     const key = String(pageKey || '').trim().toLowerCase();
     if (key === 'meta-radar' || key === 'meta_radar') return 'radar';
+    if (key === 'triples_radar' || key === 'breen-radar') return 'triples-radar';
     if (key === 'sqhcel' || key === 'wizard') return 'wizard';
+    if (key === 'sentence_morpher' || key === 'live-sentence' || key === 'quantifier-morph') return 'sentence-morpher';
     if (key === 'question' || key === 'questions' || key === 'drill') return 'question';
     return PRACTICE_PAGE_KEYS.includes(key) ? key : 'question';
 }
@@ -999,36 +1139,42 @@ function setupPracticeMode() {
 const QUESTION_DRILL_PACK = [
     {
         id: 'question1',
-        statement: 'הבוס אמר שהלקוח לא מבין למה זה לא אפשרי כעת.',
+        statement: '׳”׳‘׳•׳¡ ׳׳׳¨ ׳©׳”׳׳§׳•׳— ׳׳ ׳׳‘׳™׳ ׳׳׳” ׳–׳” ׳׳ ׳׳₪׳©׳¨׳™ ׳›׳¢׳×.',
         focus: ['DISTORTION']
     },
     {
         id: 'question2',
-        statement: 'אני תמיד מאחר כי הרבה עומס.',
+        statement: '׳׳ ׳™ ׳×׳׳™׳“ ׳׳׳—׳¨ ׳›׳™ ׳”׳¨׳‘׳” ׳¢׳•׳׳¡.',
         focus: ['GENERALIZATION']
     },
     {
         id: 'question3',
-        statement: 'הם שואלים אותי מה בדיוק חסר.',
+        statement: '׳”׳ ׳©׳•׳׳׳™׳ ׳׳•׳×׳™ ׳׳” ׳‘׳“׳™׳•׳§ ׳—׳¡׳¨.',
         focus: ['DELETION']
     },
     {
         id: 'question4',
-        statement: 'כולם אומרים שזה לא עומד להשתנות.',
+        statement: '׳›׳•׳׳ ׳׳•׳׳¨׳™׳ ׳©׳–׳” ׳׳ ׳¢׳•׳׳“ ׳׳”׳©׳×׳ ׳•׳×.',
         focus: ['GENERALIZATION']
     },
     {
         id: 'question5',
-        statement: 'הם טוענים שכבר ניסו הכל על סמך הרגשה.',
+        statement: '׳”׳ ׳˜׳•׳¢׳ ׳™׳ ׳©׳›׳‘׳¨ ׳ ׳™׳¡׳• ׳”׳›׳ ׳¢׳ ׳¡׳׳ ׳”׳¨׳’׳©׳”.',
         focus: ['DISTORTION']
     }
 ];
 
 const QUESTION_DRILL_KEYWORDS = {
-    DELETION: ['מה', 'איך', 'איזה', 'מי', 'האם', 'למה', 'כמה'],
-    DISTORTION: ['האם זה אומר', 'לפי מה', 'איך אתה יודע', 'זה בטוח', 'ממה אתה מסיק', 'לפי ההרגשה'],
-    GENERALIZATION: ['תמיד', 'כל אחד', 'כולם', 'לעולם', 'אין', 'תמיד', 'כל', 'כל הזמן']
+    DELETION: ['׳׳”', '׳׳™׳', '׳׳™׳–׳”', '׳׳™', '׳”׳׳', '׳׳׳”', '׳›׳׳”'],
+    DISTORTION: ['׳”׳׳ ׳–׳” ׳׳•׳׳¨', '׳׳₪׳™ ׳׳”', '׳׳™׳ ׳׳×׳” ׳™׳•׳“׳¢', '׳–׳” ׳‘׳˜׳•׳—', '׳׳׳” ׳׳×׳” ׳׳¡׳™׳§', '׳׳₪׳™ ׳”׳”׳¨׳’׳©׳”'],
+    GENERALIZATION: ['׳×׳׳™׳“', '׳›׳ ׳׳—׳“', '׳›׳•׳׳', '׳׳¢׳•׳׳', '׳׳™׳', '׳×׳׳™׳“', '׳›׳', '׳›׳ ׳”׳–׳׳']
 };
+
+const QUESTION_DRILL_CATEGORY_LABELS_HE = Object.freeze({
+    DELETION: '׳׳—׳™׳§׳”',
+    DISTORTION: '׳¢׳™׳•׳•׳×',
+    GENERALIZATION: '׳”׳›׳׳׳”'
+});
 
 const questionDrillState = {
     current: null,
@@ -1085,11 +1231,12 @@ function evaluateQuestionDrill() {
 
     const text = input.value.trim();
     if (!text) {
-        feedbackEl.textContent = 'כתבו שאלה לפני שבודקים.';
+        feedbackEl.textContent = '׳›׳×׳‘׳• ׳©׳׳׳” ׳׳₪׳ ׳™ ׳©׳‘׳•׳“׳§׳™׳.';
         return;
     }
 
     const selected = questionDrillState.elements.category.value || 'DELETION';
+    const selectedLabel = QUESTION_DRILL_CATEGORY_LABELS_HE[selected] || selected;
     const matched = getMatchedCategories(text);
     const expected = questionDrillState.current.focus || [];
     const focusMatchesExpected = expected.length === 0 || expected.includes(selected);
@@ -1101,11 +1248,14 @@ function evaluateQuestionDrill() {
     updateQuestionDrillStats();
 
     if (success) {
-        feedbackEl.textContent = `מצוין! השאלה פגעה ב-${selected} וכוללת ביטוי שמבהיר את ההנחה.`;
+        feedbackEl.textContent = `׳׳¦׳•׳™׳. ׳–׳• ׳©׳׳׳× ${selectedLabel} ׳˜׳•׳‘׳” ׳©׳׳§׳“׳׳× ׳”׳‘׳”׳¨׳”.`;
     } else {
-        const missing = !keywordMatches ? 'הוסיפו מילות מפתח כמו ' + QUESTION_DRILL_KEYWORDS[selected].slice(0, 3).join(', ') : '';
-        const expectedMessage = expected.length ? ` הכי ראוי לכיוון ${expected.join(' / ')}` : '';
-        feedbackEl.textContent = `נסה/ניסי שוב. ${missing} ${expectedMessage}`.trim();
+        const missing = !keywordMatches ? '׳”׳•׳¡׳™׳₪׳• ׳׳™׳׳•׳× ׳׳₪׳×׳— ׳›׳׳• ' + QUESTION_DRILL_KEYWORDS[selected].slice(0, 3).join(', ') : '';
+        const expectedLabels = expected
+            .map((category) => QUESTION_DRILL_CATEGORY_LABELS_HE[category] || category)
+            .join(' / ');
+        const expectedMessage = expected.length ? ` ׳”׳›׳™׳•׳•׳ ׳”׳׳•׳׳׳¥ ׳›׳׳: ${expectedLabels}` : '';
+        feedbackEl.textContent = `׳ ׳¡׳”/׳ ׳™׳¡׳™ ׳©׳•׳‘. ${missing} ${expectedMessage}`.trim();
     }
 }
 
@@ -1116,21 +1266,21 @@ function updateQuestionDrillStats() {
 }
 
 const RAPID_PATTERN_BUTTONS = Object.freeze([
-    Object.freeze({ id: 'lost_performative', label: 'Lost Performative', hint: 'שלשה 1 | שמאל' }),
-    Object.freeze({ id: 'assumptions', label: 'Assumptions +1', hint: 'שלשה 1 | מרכז' }),
-    Object.freeze({ id: 'mind_reading', label: 'Mind Reading', hint: 'שלשה 1 | ימין' }),
-    Object.freeze({ id: 'universal_quantifier', label: 'Universal Quantifier', hint: 'שלשה 2 | שמאל' }),
-    Object.freeze({ id: 'modal_operator', label: 'Modal Operator', hint: 'שלשה 2 | מרכז' }),
-    Object.freeze({ id: 'cause_effect', label: 'Cause & Effect', hint: 'שלשה 2 | ימין' }),
-    Object.freeze({ id: 'nominalisations', label: 'Nominalisations', hint: 'שלשה 3 | שמאל' }),
-    Object.freeze({ id: 'identity_predicates', label: 'Identity Predicates', hint: 'שלשה 3 | מרכז' }),
-    Object.freeze({ id: 'complex_equivalence', label: 'Complex Equivalence', hint: 'שלשה 3 | ימין' }),
-    Object.freeze({ id: 'comparative_deletion', label: 'Comparative Deletion', hint: 'שלשה 4 | שמאל' }),
-    Object.freeze({ id: 'time_space_predicates', label: 'Time & Space Predicates', hint: 'שלשה 4 | מרכז' }),
-    Object.freeze({ id: 'lack_referential_index', label: 'Lack of Referential Index', hint: 'שלשה 4 | ימין' }),
-    Object.freeze({ id: 'non_referring_nouns', label: 'Non-referring nouns', hint: 'שלשה 5 | שמאל' }),
-    Object.freeze({ id: 'sensory_predicates', label: 'Sensory Predicates', hint: 'שלשה 5 | מרכז' }),
-    Object.freeze({ id: 'unspecified_verbs', label: 'Unspecified Verbs', hint: 'שלשה 5 | ימין' })
+    Object.freeze({ id: 'lost_performative', label: 'Lost Performative', hint: '׳©׳׳©׳” 1 | ׳©׳׳׳' }),
+    Object.freeze({ id: 'assumptions', label: 'Assumptions +1', hint: '׳©׳׳©׳” 1 | ׳׳¨׳›׳–' }),
+    Object.freeze({ id: 'mind_reading', label: 'Mind Reading', hint: '׳©׳׳©׳” 1 | ׳™׳׳™׳' }),
+    Object.freeze({ id: 'universal_quantifier', label: 'Universal Quantifier', hint: '׳©׳׳©׳” 2 | ׳©׳׳׳' }),
+    Object.freeze({ id: 'modal_operator', label: 'Modal Operator', hint: '׳©׳׳©׳” 2 | ׳׳¨׳›׳–' }),
+    Object.freeze({ id: 'cause_effect', label: 'Cause & Effect', hint: '׳©׳׳©׳” 2 | ׳™׳׳™׳' }),
+    Object.freeze({ id: 'nominalisations', label: 'Nominalisations', hint: '׳©׳׳©׳” 3 | ׳©׳׳׳' }),
+    Object.freeze({ id: 'identity_predicates', label: 'Identity Predicates', hint: '׳©׳׳©׳” 3 | ׳׳¨׳›׳–' }),
+    Object.freeze({ id: 'complex_equivalence', label: 'Complex Equivalence', hint: '׳©׳׳©׳” 3 | ׳™׳׳™׳' }),
+    Object.freeze({ id: 'comparative_deletion', label: 'Comparative Deletion', hint: '׳©׳׳©׳” 4 | ׳©׳׳׳' }),
+    Object.freeze({ id: 'time_space_predicates', label: 'Time & Space Predicates', hint: '׳©׳׳©׳” 4 | ׳׳¨׳›׳–' }),
+    Object.freeze({ id: 'lack_referential_index', label: 'Lack of Referential Index', hint: '׳©׳׳©׳” 4 | ׳™׳׳™׳' }),
+    Object.freeze({ id: 'non_referring_nouns', label: 'Non-referring nouns', hint: '׳©׳׳©׳” 5 | ׳©׳׳׳' }),
+    Object.freeze({ id: 'sensory_predicates', label: 'Sensory Predicates', hint: '׳©׳׳©׳” 5 | ׳׳¨׳›׳–' }),
+    Object.freeze({ id: 'unspecified_verbs', label: 'Unspecified Verbs', hint: '׳©׳׳©׳” 5 | ׳™׳׳™׳' })
 ]);
 
 const RAPID_PATTERN_ALIASES = Object.freeze({
@@ -1152,217 +1302,217 @@ function normalizeRapidPatternId(patternId) {
 const RAPID_PATTERN_CUES = Object.freeze([
     Object.freeze({
         id: 'rp_work_1',
-        type: 'עבודה',
-        monologue: 'אני פותח את היום עם עשר משימות, עוד לפני קפה כבר יש לחץ, והמנהל אמר לי שחייב לסיים הכל היום אחרת אין לי מה לבוא מחר.',
-        highlight: 'חייב לסיים הכל היום',
+        type: '׳¢׳‘׳•׳“׳”',
+        monologue: '׳׳ ׳™ ׳₪׳•׳×׳— ׳׳× ׳”׳™׳•׳ ׳¢׳ ׳¢׳©׳¨ ׳׳©׳™׳׳•׳×, ׳¢׳•׳“ ׳׳₪׳ ׳™ ׳§׳₪׳” ׳›׳‘׳¨ ׳™׳© ׳׳—׳¥, ׳•׳”׳׳ ׳”׳ ׳׳׳¨ ׳׳™ ׳©׳—׳™׳™׳‘ ׳׳¡׳™׳™׳ ׳”׳›׳ ׳”׳™׳•׳ ׳׳—׳¨׳× ׳׳™׳ ׳׳™ ׳׳” ׳׳‘׳•׳ ׳׳—׳¨.',
+        highlight: '׳—׳™׳™׳‘ ׳׳¡׳™׳™׳ ׳”׳›׳ ׳”׳™׳•׳',
         patternId: 'modal_necessity',
         acceptedPatterns: ['modal_necessity', 'modal_operator']
     }),
     Object.freeze({
         id: 'rp_work_2',
-        type: 'עבודה',
-        monologue: 'כששני אנשים מהצוות דיברו בצד ליד הלוח, ישר היה לי ברור שהם חושבים שאני חלש מקצועית וזה שיתק אותי.',
-        highlight: 'הם חושבים שאני חלש מקצועית',
+        type: '׳¢׳‘׳•׳“׳”',
+        monologue: '׳›׳©׳©׳ ׳™ ׳׳ ׳©׳™׳ ׳׳”׳¦׳•׳•׳× ׳“׳™׳‘׳¨׳• ׳‘׳¦׳“ ׳׳™׳“ ׳”׳׳•׳—, ׳™׳©׳¨ ׳”׳™׳” ׳׳™ ׳‘׳¨׳•׳¨ ׳©׳”׳ ׳—׳•׳©׳‘׳™׳ ׳©׳׳ ׳™ ׳—׳׳© ׳׳§׳¦׳•׳¢׳™׳× ׳•׳–׳” ׳©׳™׳×׳§ ׳׳•׳×׳™.',
+        highlight: '׳”׳ ׳—׳•׳©׳‘׳™׳ ׳©׳׳ ׳™ ׳—׳׳© ׳׳§׳¦׳•׳¢׳™׳×',
         patternId: 'mind_reading',
         acceptedPatterns: ['mind_reading']
     }),
     Object.freeze({
         id: 'rp_work_3',
-        type: 'עבודה',
-        monologue: 'אם הלקוח לא עונה לי תוך שעה, זה אומר שאין לו אמון בי, ואז אני כבר מאבד קצב ולא שולח כלום.',
-        highlight: 'זה אומר שאין לו אמון בי',
+        type: '׳¢׳‘׳•׳“׳”',
+        monologue: '׳׳ ׳”׳׳§׳•׳— ׳׳ ׳¢׳•׳ ׳” ׳׳™ ׳×׳•׳ ׳©׳¢׳”, ׳–׳” ׳׳•׳׳¨ ׳©׳׳™׳ ׳׳• ׳׳׳•׳ ׳‘׳™, ׳•׳׳– ׳׳ ׳™ ׳›׳‘׳¨ ׳׳׳‘׳“ ׳§׳¦׳‘ ׳•׳׳ ׳©׳•׳׳— ׳›׳׳•׳.',
+        highlight: '׳–׳” ׳׳•׳׳¨ ׳©׳׳™׳ ׳׳• ׳׳׳•׳ ׳‘׳™',
         patternId: 'complex_equivalence',
         acceptedPatterns: ['complex_equivalence']
     }),
     Object.freeze({
         id: 'rp_work_4',
-        type: 'עבודה',
-        monologue: 'במחלקה שלנו כולם תמיד יודעים מה לעשות, ורק אני איכשהו נתקע בכל פעם שהפרויקט מתהדק.',
-        highlight: 'כולם תמיד יודעים מה לעשות',
+        type: '׳¢׳‘׳•׳“׳”',
+        monologue: '׳‘׳׳—׳׳§׳” ׳©׳׳ ׳• ׳›׳•׳׳ ׳×׳׳™׳“ ׳™׳•׳“׳¢׳™׳ ׳׳” ׳׳¢׳©׳•׳×, ׳•׳¨׳§ ׳׳ ׳™ ׳׳™׳›׳©׳”׳• ׳ ׳×׳§׳¢ ׳‘׳›׳ ׳₪׳¢׳ ׳©׳”׳₪׳¨׳•׳™׳§׳˜ ׳׳×׳”׳“׳§.',
+        highlight: '׳›׳•׳׳ ׳×׳׳™׳“ ׳™׳•׳“׳¢׳™׳ ׳׳” ׳׳¢׳©׳•׳×',
         patternId: 'universal_quantifier',
         acceptedPatterns: ['universal_quantifier']
     }),
     Object.freeze({
         id: 'rp_work_5',
-        type: 'עבודה',
-        monologue: 'קיבלתי פידבק שזה לא מספיק טוב, ומאז אני לא בטוח מה לתקן קודם אז אני פשוט קופא.',
-        highlight: 'זה לא מספיק טוב',
+        type: '׳¢׳‘׳•׳“׳”',
+        monologue: '׳§׳™׳‘׳׳×׳™ ׳₪׳™׳“׳‘׳§ ׳©׳–׳” ׳׳ ׳׳¡׳₪׳™׳§ ׳˜׳•׳‘, ׳•׳׳׳– ׳׳ ׳™ ׳׳ ׳‘׳˜׳•׳— ׳׳” ׳׳×׳§׳ ׳§׳•׳“׳ ׳׳– ׳׳ ׳™ ׳₪׳©׳•׳˜ ׳§׳•׳₪׳.',
+        highlight: '׳–׳” ׳׳ ׳׳¡׳₪׳™׳§ ׳˜׳•׳‘',
         patternId: 'simple_deletion',
         acceptedPatterns: ['simple_deletion']
     }),
     Object.freeze({
         id: 'rp_work_6',
-        type: 'עבודה',
-        monologue: 'כל היום אני אומר לעצמי שצריך לטפל בזה כבר, אבל בפועל אני לא יודע מה הפעולה הראשונה שאני אמור לבצע.',
-        highlight: 'לטפל בזה כבר',
+        type: '׳¢׳‘׳•׳“׳”',
+        monologue: '׳›׳ ׳”׳™׳•׳ ׳׳ ׳™ ׳׳•׳׳¨ ׳׳¢׳¦׳׳™ ׳©׳¦׳¨׳™׳ ׳׳˜׳₪׳ ׳‘׳–׳” ׳›׳‘׳¨, ׳׳‘׳ ׳‘׳₪׳•׳¢׳ ׳׳ ׳™ ׳׳ ׳™׳•׳“׳¢ ׳׳” ׳”׳₪׳¢׳•׳׳” ׳”׳¨׳׳©׳•׳ ׳” ׳©׳׳ ׳™ ׳׳׳•׳¨ ׳׳‘׳¦׳¢.',
+        highlight: '׳׳˜׳₪׳ ׳‘׳–׳” ׳›׳‘׳¨',
         patternId: 'unspecified_verb',
         acceptedPatterns: ['unspecified_verb', 'simple_deletion']
     }),
     Object.freeze({
         id: 'rp_work_7',
-        type: 'עבודה',
-        monologue: 'הטון שלו הוריד לי את כל המוטיבציה, וברגע שזה קרה לא הצלחתי לכתוב אפילו עדכון אחד קטן.',
-        highlight: 'הוריד לי את כל המוטיבציה',
+        type: '׳¢׳‘׳•׳“׳”',
+        monologue: '׳”׳˜׳•׳ ׳©׳׳• ׳”׳•׳¨׳™׳“ ׳׳™ ׳׳× ׳›׳ ׳”׳׳•׳˜׳™׳‘׳¦׳™׳”, ׳•׳‘׳¨׳’׳¢ ׳©׳–׳” ׳§׳¨׳” ׳׳ ׳”׳¦׳׳—׳×׳™ ׳׳›׳×׳•׳‘ ׳׳₪׳™׳׳• ׳¢׳“׳›׳•׳ ׳׳—׳“ ׳§׳˜׳.',
+        highlight: '׳”׳•׳¨׳™׳“ ׳׳™ ׳׳× ׳›׳ ׳”׳׳•׳˜׳™׳‘׳¦׳™׳”',
         patternId: 'cause_effect',
         acceptedPatterns: ['cause_effect']
     }),
     Object.freeze({
         id: 'rp_relationship_1',
-        type: 'זוגיות',
-        monologue: 'אם אני מאחר לפגישה אחת, זה אומר שאני לא אוהב באמת, ואז כל השיחה נהיית מתגוננת ולא עניינית.',
-        highlight: 'זה אומר שאני לא אוהב באמת',
+        type: '׳–׳•׳’׳™׳•׳×',
+        monologue: '׳׳ ׳׳ ׳™ ׳׳׳—׳¨ ׳׳₪׳’׳™׳©׳” ׳׳—׳×, ׳–׳” ׳׳•׳׳¨ ׳©׳׳ ׳™ ׳׳ ׳׳•׳”׳‘ ׳‘׳׳׳×, ׳•׳׳– ׳›׳ ׳”׳©׳™׳—׳” ׳ ׳”׳™׳™׳× ׳׳×׳’׳•׳ ׳ ׳× ׳•׳׳ ׳¢׳ ׳™׳™׳ ׳™׳×.',
+        highlight: '׳–׳” ׳׳•׳׳¨ ׳©׳׳ ׳™ ׳׳ ׳׳•׳”׳‘ ׳‘׳׳׳×',
         patternId: 'complex_equivalence',
         acceptedPatterns: ['complex_equivalence']
     }),
     Object.freeze({
         id: 'rp_relationship_2',
-        type: 'זוגיות',
-        monologue: 'היא מסתכלת בטלפון לכמה דקות ואני ישר יודע שהיא כבר כועסת עליי, עוד לפני שאמרה מילה.',
-        highlight: 'אני ישר יודע שהיא כבר כועסת עליי',
+        type: '׳–׳•׳’׳™׳•׳×',
+        monologue: '׳”׳™׳ ׳׳¡׳×׳›׳׳× ׳‘׳˜׳׳₪׳•׳ ׳׳›׳׳” ׳“׳§׳•׳× ׳•׳׳ ׳™ ׳™׳©׳¨ ׳™׳•׳“׳¢ ׳©׳”׳™׳ ׳›׳‘׳¨ ׳›׳•׳¢׳¡׳× ׳¢׳׳™׳™, ׳¢׳•׳“ ׳׳₪׳ ׳™ ׳©׳׳׳¨׳” ׳׳™׳׳”.',
+        highlight: '׳׳ ׳™ ׳™׳©׳¨ ׳™׳•׳“׳¢ ׳©׳”׳™׳ ׳›׳‘׳¨ ׳›׳•׳¢׳¡׳× ׳¢׳׳™׳™',
         patternId: 'mind_reading',
         acceptedPatterns: ['mind_reading']
     }),
     Object.freeze({
         id: 'rp_relationship_3',
-        type: 'זוגיות',
-        monologue: 'בבית זה פשוט לא נכון לדבר ככה, נקודה, ואין בכלל על מה לדון או לבדוק.',
-        highlight: 'זה פשוט לא נכון לדבר ככה',
+        type: '׳–׳•׳’׳™׳•׳×',
+        monologue: '׳‘׳‘׳™׳× ׳–׳” ׳₪׳©׳•׳˜ ׳׳ ׳ ׳›׳•׳ ׳׳“׳‘׳¨ ׳›׳›׳”, ׳ ׳§׳•׳“׳”, ׳•׳׳™׳ ׳‘׳›׳׳ ׳¢׳ ׳׳” ׳׳“׳•׳ ׳׳• ׳׳‘׳“׳•׳§.',
+        highlight: '׳–׳” ׳₪׳©׳•׳˜ ׳׳ ׳ ׳›׳•׳ ׳׳“׳‘׳¨ ׳›׳›׳”',
         patternId: 'lost_performative',
         acceptedPatterns: ['lost_performative']
     }),
     Object.freeze({
         id: 'rp_relationship_4',
-        type: 'זוגיות',
-        monologue: 'מתי תפסיק שוב להרוס לעצמך את הקשר? זו שאלה שרצה לי בראש כל פעם שיש ויכוח קטן.',
-        highlight: 'מתי תפסיק שוב להרוס לעצמך את הקשר',
+        type: '׳–׳•׳’׳™׳•׳×',
+        monologue: '׳׳×׳™ ׳×׳₪׳¡׳™׳§ ׳©׳•׳‘ ׳׳”׳¨׳•׳¡ ׳׳¢׳¦׳׳ ׳׳× ׳”׳§׳©׳¨? ׳–׳• ׳©׳׳׳” ׳©׳¨׳¦׳” ׳׳™ ׳‘׳¨׳׳© ׳›׳ ׳₪׳¢׳ ׳©׳™׳© ׳•׳™׳›׳•׳— ׳§׳˜׳.',
+        highlight: '׳׳×׳™ ׳×׳₪׳¡׳™׳§ ׳©׳•׳‘ ׳׳”׳¨׳•׳¡ ׳׳¢׳¦׳׳ ׳׳× ׳”׳§׳©׳¨',
         patternId: 'presupposition',
         acceptedPatterns: ['presupposition']
     }),
     Object.freeze({
         id: 'rp_relationship_5',
-        type: 'זוגיות',
-        monologue: 'אי אפשר לדבר איתו על כסף בלי פיצוץ, אז אני כבר מראש מוותר ונכנס לשקט.',
-        highlight: 'אי אפשר לדבר איתו על כסף',
+        type: '׳–׳•׳’׳™׳•׳×',
+        monologue: '׳׳™ ׳׳₪׳©׳¨ ׳׳“׳‘׳¨ ׳׳™׳×׳• ׳¢׳ ׳›׳¡׳£ ׳‘׳׳™ ׳₪׳™׳¦׳•׳¥, ׳׳– ׳׳ ׳™ ׳›׳‘׳¨ ׳׳¨׳׳© ׳׳•׳•׳×׳¨ ׳•׳ ׳›׳ ׳¡ ׳׳©׳§׳˜.',
+        highlight: '׳׳™ ׳׳₪׳©׳¨ ׳׳“׳‘׳¨ ׳׳™׳×׳• ׳¢׳ ׳›׳¡׳£',
         patternId: 'modal_possibility',
         acceptedPatterns: ['modal_possibility', 'modal_operator']
     }),
     Object.freeze({
         id: 'rp_parent_1',
-        type: 'הורות',
-        monologue: 'אומרים לי שאני הורה לא עקבי, ואני נלחץ כי לא ברור מי בדיוק אומר את זה ועל מה הוא נשען.',
-        highlight: 'אומרים לי שאני הורה לא עקבי',
+        type: '׳”׳•׳¨׳•׳×',
+        monologue: '׳׳•׳׳¨׳™׳ ׳׳™ ׳©׳׳ ׳™ ׳”׳•׳¨׳” ׳׳ ׳¢׳§׳‘׳™, ׳•׳׳ ׳™ ׳ ׳׳—׳¥ ׳›׳™ ׳׳ ׳‘׳¨׳•׳¨ ׳׳™ ׳‘׳“׳™׳•׳§ ׳׳•׳׳¨ ׳׳× ׳–׳” ׳•׳¢׳ ׳׳” ׳”׳•׳ ׳ ׳©׳¢׳.',
+        highlight: '׳׳•׳׳¨׳™׳ ׳׳™ ׳©׳׳ ׳™ ׳”׳•׳¨׳” ׳׳ ׳¢׳§׳‘׳™',
         patternId: 'lack_referential_index',
         acceptedPatterns: ['lack_referential_index']
     }),
     Object.freeze({
         id: 'rp_parent_2',
-        type: 'הורות',
-        monologue: 'כולם בבית אומרים שהדרך הזאת יותר טובה לילד, אבל אף אחד לא מסביר יותר טובה ביחס למה.',
-        highlight: 'יותר טובה לילד',
+        type: '׳”׳•׳¨׳•׳×',
+        monologue: '׳›׳•׳׳ ׳‘׳‘׳™׳× ׳׳•׳׳¨׳™׳ ׳©׳”׳“׳¨׳ ׳”׳–׳׳× ׳™׳•׳×׳¨ ׳˜׳•׳‘׳” ׳׳™׳׳“, ׳׳‘׳ ׳׳£ ׳׳—׳“ ׳׳ ׳׳¡׳‘׳™׳¨ ׳™׳•׳×׳¨ ׳˜׳•׳‘׳” ׳‘׳™׳—׳¡ ׳׳׳”.',
+        highlight: '׳™׳•׳×׳¨ ׳˜׳•׳‘׳” ׳׳™׳׳“',
         patternId: 'comparative_deletion',
         acceptedPatterns: ['comparative_deletion']
     }),
     Object.freeze({
         id: 'rp_parent_3',
-        type: 'הורות',
-        monologue: 'יש בבית עניין שחוזר כל ערב סביב שיעורים, ואני מרגיש שאני מאבד שליטה עוד לפני שמתחילים.',
-        highlight: 'עניין שחוזר כל ערב',
+        type: '׳”׳•׳¨׳•׳×',
+        monologue: '׳™׳© ׳‘׳‘׳™׳× ׳¢׳ ׳™׳™׳ ׳©׳—׳•׳–׳¨ ׳›׳ ׳¢׳¨׳‘ ׳¡׳‘׳™׳‘ ׳©׳™׳¢׳•׳¨׳™׳, ׳•׳׳ ׳™ ׳׳¨׳’׳™׳© ׳©׳׳ ׳™ ׳׳׳‘׳“ ׳©׳׳™׳˜׳” ׳¢׳•׳“ ׳׳₪׳ ׳™ ׳©׳׳×׳—׳™׳׳™׳.',
+        highlight: '׳¢׳ ׳™׳™׳ ׳©׳—׳•׳–׳¨ ׳›׳ ׳¢׳¨׳‘',
         patternId: 'unspecified_noun',
         acceptedPatterns: ['unspecified_noun', 'simple_deletion']
     }),
     Object.freeze({
         id: 'rp_parent_4',
-        type: 'הורות',
-        monologue: 'אחרי כל ריב קטן אני מרגיש שהתקשורת בבית נשברה לגמרי, ואין כבר דרך לשקם את זה.',
-        highlight: 'התקשורת בבית נשברה',
+        type: '׳”׳•׳¨׳•׳×',
+        monologue: '׳׳—׳¨׳™ ׳›׳ ׳¨׳™׳‘ ׳§׳˜׳ ׳׳ ׳™ ׳׳¨׳’׳™׳© ׳©׳”׳×׳§׳©׳•׳¨׳× ׳‘׳‘׳™׳× ׳ ׳©׳‘׳¨׳” ׳׳’׳׳¨׳™, ׳•׳׳™׳ ׳›׳‘׳¨ ׳“׳¨׳ ׳׳©׳§׳ ׳׳× ׳–׳”.',
+        highlight: '׳”׳×׳§׳©׳•׳¨׳× ׳‘׳‘׳™׳× ׳ ׳©׳‘׳¨׳”',
         patternId: 'nominalization',
         acceptedPatterns: ['nominalization']
     }),
     Object.freeze({
         id: 'rp_self_1',
-        type: 'ביטחון עצמי',
-        monologue: 'כשאני צריך לדבר מול קבוצה, המשפט שעולה מיד הוא שאני לא יכול לעמוד מול אנשים וזה עוצר אותי לגמרי.',
-        highlight: 'אני לא יכול לעמוד מול אנשים',
+        type: '׳‘׳™׳˜׳—׳•׳ ׳¢׳¦׳׳™',
+        monologue: '׳›׳©׳׳ ׳™ ׳¦׳¨׳™׳ ׳׳“׳‘׳¨ ׳׳•׳ ׳§׳‘׳•׳¦׳”, ׳”׳׳©׳₪׳˜ ׳©׳¢׳•׳׳” ׳׳™׳“ ׳”׳•׳ ׳©׳׳ ׳™ ׳׳ ׳™׳›׳•׳ ׳׳¢׳׳•׳“ ׳׳•׳ ׳׳ ׳©׳™׳ ׳•׳–׳” ׳¢׳•׳¦׳¨ ׳׳•׳×׳™ ׳׳’׳׳¨׳™.',
+        highlight: '׳׳ ׳™ ׳׳ ׳™׳›׳•׳ ׳׳¢׳׳•׳“ ׳׳•׳ ׳׳ ׳©׳™׳',
         patternId: 'modal_possibility',
         acceptedPatterns: ['modal_possibility', 'modal_operator']
     }),
     Object.freeze({
         id: 'rp_self_2',
-        type: 'ביטחון עצמי',
-        monologue: 'מאז הטעות האחרונה הביטחון שלי נהרס, ומאותו רגע אני נמנע מיוזמות חדשות בעבודה.',
-        highlight: 'הביטחון שלי נהרס',
+        type: '׳‘׳™׳˜׳—׳•׳ ׳¢׳¦׳׳™',
+        monologue: '׳׳׳– ׳”׳˜׳¢׳•׳× ׳”׳׳—׳¨׳•׳ ׳” ׳”׳‘׳™׳˜׳—׳•׳ ׳©׳׳™ ׳ ׳”׳¨׳¡, ׳•׳׳׳•׳×׳• ׳¨׳’׳¢ ׳׳ ׳™ ׳ ׳׳ ׳¢ ׳׳™׳•׳–׳׳•׳× ׳—׳“׳©׳•׳× ׳‘׳¢׳‘׳•׳“׳”.',
+        highlight: '׳”׳‘׳™׳˜׳—׳•׳ ׳©׳׳™ ׳ ׳”׳¨׳¡',
         patternId: 'nominalization',
         acceptedPatterns: ['nominalization']
     }),
     Object.freeze({
         id: 'rp_self_3',
-        type: 'ביטחון עצמי',
-        monologue: 'אני פחות טוב מהם אז עדיף לא לנסות להוביל שום דבר כדי לא להיחשף שוב לכישלון.',
-        highlight: 'אני פחות טוב מהם',
+        type: '׳‘׳™׳˜׳—׳•׳ ׳¢׳¦׳׳™',
+        monologue: '׳׳ ׳™ ׳₪׳—׳•׳× ׳˜׳•׳‘ ׳׳”׳ ׳׳– ׳¢׳“׳™׳£ ׳׳ ׳׳ ׳¡׳•׳× ׳׳”׳•׳‘׳™׳ ׳©׳•׳ ׳“׳‘׳¨ ׳›׳“׳™ ׳׳ ׳׳”׳™׳—׳©׳£ ׳©׳•׳‘ ׳׳›׳™׳©׳׳•׳.',
+        highlight: '׳׳ ׳™ ׳₪׳—׳•׳× ׳˜׳•׳‘ ׳׳”׳',
         patternId: 'comparative_deletion',
         acceptedPatterns: ['comparative_deletion']
     }),
     Object.freeze({
         id: 'rp_money_1',
-        type: 'כסף',
-        monologue: 'כשאני מסתכל על חשבון הבנק, זה תמיד קורה לי דווקא בזמן הכי לא נוח ואני מתנתק מכל תכנון.',
-        highlight: 'זה תמיד קורה לי',
+        type: '׳›׳¡׳£',
+        monologue: '׳›׳©׳׳ ׳™ ׳׳¡׳×׳›׳ ׳¢׳ ׳—׳©׳‘׳•׳ ׳”׳‘׳ ׳§, ׳–׳” ׳×׳׳™׳“ ׳§׳•׳¨׳” ׳׳™ ׳“׳•׳•׳§׳ ׳‘׳–׳׳ ׳”׳›׳™ ׳׳ ׳ ׳•׳— ׳•׳׳ ׳™ ׳׳×׳ ׳×׳§ ׳׳›׳ ׳×׳›׳ ׳•׳.',
+        highlight: '׳–׳” ׳×׳׳™׳“ ׳§׳•׳¨׳” ׳׳™',
         patternId: 'universal_quantifier',
         acceptedPatterns: ['universal_quantifier']
     }),
     Object.freeze({
         id: 'rp_money_2',
-        type: 'כסף',
-        monologue: 'אני אומר לעצמי שזה חייב להיות ככה ואין שום אפשרות אחרת, אז אני לא בודק חלופות בכלל.',
-        highlight: 'זה חייב להיות ככה ואין שום אפשרות אחרת',
+        type: '׳›׳¡׳£',
+        monologue: '׳׳ ׳™ ׳׳•׳׳¨ ׳׳¢׳¦׳׳™ ׳©׳–׳” ׳—׳™׳™׳‘ ׳׳”׳™׳•׳× ׳›׳›׳” ׳•׳׳™׳ ׳©׳•׳ ׳׳₪׳©׳¨׳•׳× ׳׳—׳¨׳×, ׳׳– ׳׳ ׳™ ׳׳ ׳‘׳•׳“׳§ ׳—׳׳•׳₪׳•׳× ׳‘׳›׳׳.',
+        highlight: '׳–׳” ׳—׳™׳™׳‘ ׳׳”׳™׳•׳× ׳›׳›׳” ׳•׳׳™׳ ׳©׳•׳ ׳׳₪׳©׳¨׳•׳× ׳׳—׳¨׳×',
         patternId: 'modal_operator',
         acceptedPatterns: ['modal_operator', 'modal_necessity', 'modal_possibility']
     }),
     Object.freeze({
         id: 'rp_health_1',
-        type: 'בריאות',
-        monologue: 'אחרי ביקור קצר יצאתי עם משפט שזה בסדר יחסית, אבל לא הבנתי בסדר ביחס למה ומה בכלל המדד.',
-        highlight: 'זה בסדר יחסית',
+        type: '׳‘׳¨׳™׳׳•׳×',
+        monologue: '׳׳—׳¨׳™ ׳‘׳™׳§׳•׳¨ ׳§׳¦׳¨ ׳™׳¦׳׳×׳™ ׳¢׳ ׳׳©׳₪׳˜ ׳©׳–׳” ׳‘׳¡׳“׳¨ ׳™׳—׳¡׳™׳×, ׳׳‘׳ ׳׳ ׳”׳‘׳ ׳×׳™ ׳‘׳¡׳“׳¨ ׳‘׳™׳—׳¡ ׳׳׳” ׳•׳׳” ׳‘׳›׳׳ ׳”׳׳“׳“.',
+        highlight: '׳–׳” ׳‘׳¡׳“׳¨ ׳™׳—׳¡׳™׳×',
         patternId: 'comparative_deletion',
         acceptedPatterns: ['comparative_deletion', 'simple_deletion']
     }),
     Object.freeze({
         id: 'rp_health_2',
-        type: 'בריאות',
-        monologue: 'כולם אומרים שצריך לעשות שינוי עכשיו, ואני נכנס לפחד לפני שבכלל ביררתי מה רלוונטי אליי.',
-        highlight: 'כולם אומרים שצריך לעשות שינוי עכשיו',
+        type: '׳‘׳¨׳™׳׳•׳×',
+        monologue: '׳›׳•׳׳ ׳׳•׳׳¨׳™׳ ׳©׳¦׳¨׳™׳ ׳׳¢׳©׳•׳× ׳©׳™׳ ׳•׳™ ׳¢׳›׳©׳™׳•, ׳•׳׳ ׳™ ׳ ׳›׳ ׳¡ ׳׳₪׳—׳“ ׳׳₪׳ ׳™ ׳©׳‘׳›׳׳ ׳‘׳™׳¨׳¨׳×׳™ ׳׳” ׳¨׳׳•׳•׳ ׳˜׳™ ׳׳׳™׳™.',
+        highlight: '׳›׳•׳׳ ׳׳•׳׳¨׳™׳ ׳©׳¦׳¨׳™׳ ׳׳¢׳©׳•׳× ׳©׳™׳ ׳•׳™ ׳¢׳›׳©׳™׳•',
         patternId: 'lack_referential_index',
         acceptedPatterns: ['lack_referential_index', 'universal_quantifier']
     }),
     Object.freeze({
         id: 'rp_general_1',
-        type: 'כללי',
-        monologue: 'אם לא הצלחתי היום, זה אומר שאני לא בנוי לזה, ואז אני דוחה שוב את כל הניסיון הבא.',
-        highlight: 'אם לא הצלחתי היום, זה אומר שאני לא בנוי לזה',
+        type: '׳›׳׳׳™',
+        monologue: '׳׳ ׳׳ ׳”׳¦׳׳—׳×׳™ ׳”׳™׳•׳, ׳–׳” ׳׳•׳׳¨ ׳©׳׳ ׳™ ׳׳ ׳‘׳ ׳•׳™ ׳׳–׳”, ׳•׳׳– ׳׳ ׳™ ׳“׳•׳—׳” ׳©׳•׳‘ ׳׳× ׳›׳ ׳”׳ ׳™׳¡׳™׳•׳ ׳”׳‘׳.',
+        highlight: '׳׳ ׳׳ ׳”׳¦׳׳—׳×׳™ ׳”׳™׳•׳, ׳–׳” ׳׳•׳׳¨ ׳©׳׳ ׳™ ׳׳ ׳‘׳ ׳•׳™ ׳׳–׳”',
         patternId: 'complex_equivalence',
         acceptedPatterns: ['complex_equivalence']
     }),
     Object.freeze({
         id: 'rp_identity_1',
-        type: 'כללי',
-        monologue: 'ברגע שאני נתקע במשימה אחת, אני מיד אומר לעצמי שאני פשוט אדם לא מאורגן וזה הסיפור שלי.',
-        highlight: 'אני פשוט אדם לא מאורגן',
+        type: '׳›׳׳׳™',
+        monologue: '׳‘׳¨׳’׳¢ ׳©׳׳ ׳™ ׳ ׳×׳§׳¢ ׳‘׳׳©׳™׳׳” ׳׳—׳×, ׳׳ ׳™ ׳׳™׳“ ׳׳•׳׳¨ ׳׳¢׳¦׳׳™ ׳©׳׳ ׳™ ׳₪׳©׳•׳˜ ׳׳“׳ ׳׳ ׳׳׳•׳¨׳’׳ ׳•׳–׳” ׳”׳¡׳™׳₪׳•׳¨ ׳©׳׳™.',
+        highlight: '׳׳ ׳™ ׳₪׳©׳•׳˜ ׳׳“׳ ׳׳ ׳׳׳•׳¨׳’׳',
         patternId: 'identity_predicates',
         acceptedPatterns: ['identity_predicates']
     }),
     Object.freeze({
         id: 'rp_time_space_1',
-        type: 'עבודה',
-        monologue: 'בישיבות של יום ראשון בבוקר, בחדר הזה ספציפית, אני תמיד קופא ולא מצליח לדבר חופשי.',
-        highlight: 'בישיבות של יום ראשון בבוקר, בחדר הזה ספציפית',
+        type: '׳¢׳‘׳•׳“׳”',
+        monologue: '׳‘׳™׳©׳™׳‘׳•׳× ׳©׳ ׳™׳•׳ ׳¨׳׳©׳•׳ ׳‘׳‘׳•׳§׳¨, ׳‘׳—׳“׳¨ ׳”׳–׳” ׳¡׳₪׳¦׳™׳₪׳™׳×, ׳׳ ׳™ ׳×׳׳™׳“ ׳§׳•׳₪׳ ׳•׳׳ ׳׳¦׳׳™׳— ׳׳“׳‘׳¨ ׳—׳•׳₪׳©׳™.',
+        highlight: '׳‘׳™׳©׳™׳‘׳•׳× ׳©׳ ׳™׳•׳ ׳¨׳׳©׳•׳ ׳‘׳‘׳•׳§׳¨, ׳‘׳—׳“׳¨ ׳”׳–׳” ׳¡׳₪׳¦׳™׳₪׳™׳×',
         patternId: 'time_space_predicates',
         acceptedPatterns: ['time_space_predicates']
     }),
     Object.freeze({
         id: 'rp_sensory_1',
-        type: 'זוגיות',
-        monologue: 'אני מרגיש שזה לא נכון בינינו, אבל אין לי שום תמונה ברורה של מה בדיוק אני רואה או שומע שקורה שם.',
-        highlight: 'מרגיש שזה לא נכון בינינו',
+        type: '׳–׳•׳’׳™׳•׳×',
+        monologue: '׳׳ ׳™ ׳׳¨׳’׳™׳© ׳©׳–׳” ׳׳ ׳ ׳›׳•׳ ׳‘׳™׳ ׳™׳ ׳•, ׳׳‘׳ ׳׳™׳ ׳׳™ ׳©׳•׳ ׳×׳׳•׳ ׳” ׳‘׳¨׳•׳¨׳” ׳©׳ ׳׳” ׳‘׳“׳™׳•׳§ ׳׳ ׳™ ׳¨׳•׳׳” ׳׳• ׳©׳•׳׳¢ ׳©׳§׳•׳¨׳” ׳©׳.',
+        highlight: '׳׳¨׳’׳™׳© ׳©׳–׳” ׳׳ ׳ ׳›׳•׳ ׳‘׳™׳ ׳™׳ ׳•',
         patternId: 'sensory_predicates',
         acceptedPatterns: ['sensory_predicates']
     })
@@ -1439,7 +1589,7 @@ function setupRapidPatternArena() {
     renderRapidPatternButtons();
     setRapidPatternTrafficLight('green');
     updateRapidPatternScoreboard();
-    setRapidPatternFeedback('ממתין לתחילת סבב...', 'info');
+    setRapidPatternFeedback('׳׳׳×׳™׳ ׳׳×׳—׳™׳׳× ׳¡׳‘׳‘...', 'info');
     setRapidPatternButtonsDisabled(true);
     setRapidPatternPauseButtonState(false, false);
     setRapidPatternHelpButtonState(false);
@@ -1458,7 +1608,7 @@ function setupRapidPatternArena() {
     rapidPatternArenaState.elements.explainBtn?.addEventListener('click', showRapidPatternExplanation);
     rapidPatternArenaState.elements.focusExitBtn?.addEventListener('click', () => {
         setRapidPatternFocusMode(false);
-        setRapidPatternFeedback('חזרתם לתצוגה מלאה.', 'info');
+        setRapidPatternFeedback('׳—׳–׳¨׳×׳ ׳׳×׳¦׳•׳’׳” ׳׳׳׳”.', 'info');
     });
     rapidPatternArenaState.elements.explainCloseBtn?.addEventListener('click', () => {
         hideRapidPatternExplanation({ resumeIfNeeded: true });
@@ -1516,8 +1666,8 @@ function setRapidPatternMode(mode = 'learning', { persist = true, announce = tru
     }
     if (modeNote) {
         modeNote.textContent = isLearning
-            ? 'למידה: אפשר לעצור ולקבל HELP.'
-            : 'מבחן: אין עצירה ואין HELP.';
+            ? '׳׳׳™׳“׳”: ׳׳₪׳©׳¨ ׳׳¢׳¦׳•׳¨ ׳•׳׳§׳‘׳ HELP.'
+            : '׳׳‘׳—׳: ׳׳™׳ ׳¢׳¦׳™׳¨׳” ׳•׳׳™׳ HELP.';
     }
     if (root) {
         root.dataset.rapidMode = resolvedMode;
@@ -1531,7 +1681,7 @@ function setRapidPatternMode(mode = 'learning', { persist = true, announce = tru
         setRapidPatternHelpButtonState(true);
         updateRapidPatternExplainButtonState();
         if (announce) {
-            setRapidPatternFeedback('מצב למידה פעיל: HELP עוצר את הסבב ומציג הסבר.', 'info');
+            setRapidPatternFeedback('׳׳¦׳‘ ׳׳׳™׳“׳” ׳₪׳¢׳™׳: HELP ׳¢׳•׳¦׳¨ ׳׳× ׳”׳¡׳‘׳‘ ׳•׳׳¦׳™׳’ ׳”׳¡׳‘׳¨.', 'info');
         }
         return;
     }
@@ -1545,7 +1695,7 @@ function setRapidPatternMode(mode = 'learning', { persist = true, announce = tru
     setRapidPatternHelpButtonState(false);
     updateRapidPatternExplainButtonState();
     if (announce) {
-        setRapidPatternFeedback('מצב מבחן פעיל: אין עצירה ואין HELP.', 'info');
+        setRapidPatternFeedback('׳׳¦׳‘ ׳׳‘׳—׳ ׳₪׳¢׳™׳: ׳׳™׳ ׳¢׳¦׳™׳¨׳” ׳•׳׳™׳ HELP.', 'info');
     }
 }
 
@@ -1564,8 +1714,8 @@ function updateRapidPatternExplainButtonState() {
     const blockedInExam = rapidPatternArenaState.mode === 'exam' && rapidPatternArenaState.active;
     btn.disabled = blockedInExam;
     btn.setAttribute('title', blockedInExam
-        ? 'במצב מבחן ההסבר זמין בין סבבים בלבד.'
-        : 'הסבר קצר: מה עושים בתרגיל ולמה');
+        ? '׳‘׳׳¦׳‘ ׳׳‘׳—׳ ׳”׳”׳¡׳‘׳¨ ׳–׳׳™׳ ׳‘׳™׳ ׳¡׳‘׳‘׳™׳ ׳‘׳׳‘׳“.'
+        : '׳”׳¡׳‘׳¨ ׳§׳¦׳¨: ׳׳” ׳¢׳•׳©׳™׳ ׳‘׳×׳¨׳’׳™׳ ׳•׳׳׳”');
 }
 
 function showRapidPatternExplanation() {
@@ -1573,7 +1723,7 @@ function showRapidPatternExplanation() {
     if (!modal) return;
 
     if (rapidPatternArenaState.mode === 'exam' && rapidPatternArenaState.active) {
-        setRapidPatternFeedback('במצב מבחן ההסבר זמין בין סבבים בלבד.', 'warn');
+        setRapidPatternFeedback('׳‘׳׳¦׳‘ ׳׳‘׳—׳ ׳”׳”׳¡׳‘׳¨ ׳–׳׳™׳ ׳‘׳™׳ ׳¡׳‘׳‘׳™׳ ׳‘׳׳‘׳“.', 'warn');
         return;
     }
 
@@ -1633,7 +1783,7 @@ function handleRapidPatternGlobalKeydown(event) {
 
     if (rapidPatternArenaState.focusMode) {
         setRapidPatternFocusMode(false);
-        setRapidPatternFeedback('חזרתם לתצוגה מלאה.', 'info');
+        setRapidPatternFeedback('׳—׳–׳¨׳×׳ ׳׳×׳¦׳•׳’׳” ׳׳׳׳”.', 'info');
         event.preventDefault();
     }
 }
@@ -1648,14 +1798,14 @@ function buildRapidPatternHelpHtml(cue) {
     const patternId = normalizeRapidPatternId(cue?.patternId || '');
     const label = getRapidPatternLabel(patternId);
     const buttonMeta = RAPID_PATTERN_BUTTONS.find((item) => item.id === patternId);
-    const hint = buttonMeta?.hint || 'בדקו איזו הנחה לשונית נחשפת במילה המודגשת.';
-    const highlight = String(cue?.highlight || '').trim() || 'המילה המודגשת במשפט';
+    const hint = buttonMeta?.hint || '׳‘׳“׳§׳• ׳׳™׳–׳• ׳”׳ ׳—׳” ׳׳©׳•׳ ׳™׳× ׳ ׳—׳©׳₪׳× ׳‘׳׳™׳׳” ׳”׳׳•׳“׳’׳©׳×.';
+    const highlight = String(cue?.highlight || '').trim() || '׳”׳׳™׳׳” ׳”׳׳•׳“׳’׳©׳× ׳‘׳׳©׳₪׳˜';
 
     return `
-        <p><strong>איך לחשוב כאן:</strong> קודם מסתכלים על המילה המודגשת, ורק אחר כך בוחרים כפתור.</p>
-        <p><strong>רמז מהיר:</strong> "${escapeHtml(highlight)}" מצביע בדרך כלל על <strong>${escapeHtml(label)}</strong>.</p>
-        <p><strong>למה:</strong> ${escapeHtml(hint)}.</p>
-        <p><strong>תהליך 3 צעדים:</strong> טריגר מודגש -> זיהוי סוג ההפרה -> בחירת תבנית אחת מתוך 15.</p>
+        <p><strong>׳׳™׳ ׳׳—׳©׳•׳‘ ׳›׳׳:</strong> ׳§׳•׳“׳ ׳׳¡׳×׳›׳׳™׳ ׳¢׳ ׳”׳׳™׳׳” ׳”׳׳•׳“׳’׳©׳×, ׳•׳¨׳§ ׳׳—׳¨ ׳›׳ ׳‘׳•׳—׳¨׳™׳ ׳›׳₪׳×׳•׳¨.</p>
+        <p><strong>׳¨׳׳– ׳׳”׳™׳¨:</strong> "${escapeHtml(highlight)}" ׳׳¦׳‘׳™׳¢ ׳‘׳“׳¨׳ ׳›׳׳ ׳¢׳ <strong>${escapeHtml(label)}</strong>.</p>
+        <p><strong>׳׳׳”:</strong> ${escapeHtml(hint)}.</p>
+        <p><strong>׳×׳”׳׳™׳ 3 ׳¦׳¢׳“׳™׳:</strong> ׳˜׳¨׳™׳’׳¨ ׳׳•׳“׳’׳© -> ׳–׳™׳”׳•׳™ ׳¡׳•׳’ ׳”׳”׳₪׳¨׳” -> ׳‘׳—׳™׳¨׳× ׳×׳‘׳ ׳™׳× ׳׳—׳× ׳׳×׳•׳ 15.</p>
     `;
 }
 
@@ -1663,7 +1813,7 @@ function showRapidPatternHelp() {
     if (rapidPatternArenaState.mode === 'exam') return;
 
     if (!rapidPatternArenaState.currentCue) {
-        setRapidPatternFeedback('התחילו סבב ואז לחצו HELP להסבר בזמן אמת.', 'warn');
+        setRapidPatternFeedback('׳”׳×׳—׳™׳׳• ׳¡׳‘׳‘ ׳•׳׳– ׳׳—׳¦׳• HELP ׳׳”׳¡׳‘׳¨ ׳‘׳–׳׳ ׳׳׳×.', 'warn');
         return;
     }
 
@@ -1681,7 +1831,7 @@ function populateRapidPatternTypes() {
     if (!select) return;
     const selected = select.value || 'random';
     const uniqueTypes = Array.from(new Set(RAPID_PATTERN_CUES.map(item => item.type))).sort((a, b) => a.localeCompare(b, 'he'));
-    select.innerHTML = '<option value="random">רנדומלי</option>';
+    select.innerHTML = '<option value="random">׳¨׳ ׳“׳•׳׳׳™</option>';
     uniqueTypes.forEach((type) => {
         const option = document.createElement('option');
         option.value = type;
@@ -1727,7 +1877,7 @@ function startRapidPatternSession() {
     playUISound('start');
 
     if (rapidPatternArenaState.elements.startBtn) {
-        rapidPatternArenaState.elements.startBtn.textContent = 'איפוס והתחלה מחדש';
+        rapidPatternArenaState.elements.startBtn.textContent = '׳׳™׳₪׳•׳¡ ׳•׳”׳×׳—׳׳” ׳׳—׳“׳©';
     }
     setRapidPatternPauseButtonState(true, false);
     setRapidPatternHelpButtonState(true);
@@ -1766,12 +1916,12 @@ function pauseRapidPatternSession(reason = 'manual') {
     stopRapidPatternTimer();
     clearRapidPatternNextTimer();
     setRapidPatternButtonsDisabled(true);
-    setRapidPatternFeedback('הסבב בהשהיה. לחצו RESUME כדי להמשיך.', 'warn');
+    setRapidPatternFeedback('׳”׳¡׳‘׳‘ ׳‘׳”׳©׳”׳™׳”. ׳׳—׳¦׳• RESUME ׳›׳“׳™ ׳׳”׳׳©׳™׳.', 'warn');
     if (reason === 'help') {
-        setRapidPatternFeedback('HELP פתוח: הסבב בהשהיה. לחצו RESUME כדי להמשיך.', 'warn');
+        setRapidPatternFeedback('HELP ׳₪׳×׳•׳—: ׳”׳¡׳‘׳‘ ׳‘׳”׳©׳”׳™׳”. ׳׳—׳¦׳• RESUME ׳›׳“׳™ ׳׳”׳׳©׳™׳.', 'warn');
     }
     if (reason === 'explain') {
-        setRapidPatternFeedback('חלון ההסבר פתוח: הסבב בהשהיה. לחצו "הבנתי, ממשיכים" כדי לחזור.', 'warn');
+        setRapidPatternFeedback('׳—׳׳•׳ ׳”׳”׳¡׳‘׳¨ ׳₪׳×׳•׳—: ׳”׳¡׳‘׳‘ ׳‘׳”׳©׳”׳™׳”. ׳׳—׳¦׳• "׳”׳‘׳ ׳×׳™, ׳׳׳©׳™׳›׳™׳" ׳›׳“׳™ ׳׳—׳–׳•׳¨.', 'warn');
     }
     setRapidPatternPauseButtonState(true, true);
     updateRapidPatternExplainButtonState();
@@ -1797,7 +1947,7 @@ function resumeRapidPatternSession() {
     rapidPatternArenaState.pausedRemainingMs = 0;
     setRapidPatternButtonsDisabled(false);
     updateRapidPatternExplainButtonState();
-    setRapidPatternFeedback('המשך סבב: זהה את התבנית לפני שהזמן נגמר.', 'info');
+    setRapidPatternFeedback('׳”׳׳©׳ ׳¡׳‘׳‘: ׳–׳”׳” ׳׳× ׳”׳×׳‘׳ ׳™׳× ׳׳₪׳ ׳™ ׳©׳”׳–׳׳ ׳ ׳’׳׳¨.', 'info');
     startRapidPatternTimer(resumeMs);
 }
 
@@ -1837,7 +1987,7 @@ function handleRapidPatternCorrectAnswer(button, cue, resolvedPatternId = '') {
     rapidPatternArenaState.streak += 1;
     button.classList.add('is-correct');
     setRapidPatternTrafficLight('green');
-    setRapidPatternFeedback(`מעולה! זיהוי מדויק (+${gained} נק׳).`, 'success');
+    setRapidPatternFeedback(`׳׳¢׳•׳׳”! ׳–׳™׳”׳•׳™ ׳׳“׳•׳™׳§ (+${gained} ׳ ׳§׳³).`, 'success');
     playUISound('correct');
     addXP(Math.max(2, Math.min(8, Math.round(gained / 2))));
     if (rapidPatternArenaState.streak > 0 && rapidPatternArenaState.streak % 5 === 0) {
@@ -1868,7 +2018,7 @@ function handleRapidPatternWrongAnswer(button, cue, chosenPattern = '') {
         setRapidPatternButtonsDisabled(true);
         revealRapidPatternCorrectButton(normalizeRapidPatternId(cue.patternId));
         setRapidPatternTrafficLight('red');
-        setRapidPatternFeedback(`טעות שנייה. התשובה הייתה: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`, 'danger');
+        setRapidPatternFeedback(`׳˜׳¢׳•׳× ׳©׳ ׳™׳™׳”. ׳”׳×׳©׳•׳‘׳” ׳”׳™׳™׳×׳”: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`, 'danger');
         updateRapidPatternScoreboard();
         recordRapidPatternAttempt({
             cue,
@@ -1883,7 +2033,7 @@ function handleRapidPatternWrongAnswer(button, cue, chosenPattern = '') {
     }
 
     setRapidPatternTrafficLight('yellow');
-    setRapidPatternFeedback('טעות ראשונה. נסו שוב לפני שנגמר הזמן.', 'warn');
+    setRapidPatternFeedback('׳˜׳¢׳•׳× ׳¨׳׳©׳•׳ ׳”. ׳ ׳¡׳• ׳©׳•׳‘ ׳׳₪׳ ׳™ ׳©׳ ׳’׳׳¨ ׳”׳–׳׳.', 'warn');
     updateRapidPatternScoreboard();
 }
 
@@ -1897,7 +2047,7 @@ function handleRapidPatternTimeout() {
     setRapidPatternButtonsDisabled(true);
     revealRapidPatternCorrectButton(normalizeRapidPatternId(cue.patternId));
     setRapidPatternTrafficLight('red');
-    setRapidPatternFeedback(`נגמר הזמן! התשובה: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`, 'danger');
+    setRapidPatternFeedback(`׳ ׳’׳׳¨ ׳”׳–׳׳! ׳”׳×׳©׳•׳‘׳”: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`, 'danger');
     recordRapidPatternAttempt({
         cue,
         chosenPatternId: '',
@@ -1935,7 +2085,7 @@ function moveToNextRapidPatternCue() {
 
     const cue = pickRapidPatternCue();
     if (!cue) {
-        setRapidPatternFeedback('לא נמצאו מונולוגים זמינים למסנן שנבחר.', 'warn');
+        setRapidPatternFeedback('׳׳ ׳ ׳׳¦׳׳• ׳׳•׳ ׳•׳׳•׳’׳™׳ ׳–׳׳™׳ ׳™׳ ׳׳׳¡׳ ׳ ׳©׳ ׳‘׳—׳¨.', 'warn');
         setRapidPatternButtonsDisabled(true);
         setRapidPatternPauseButtonState(false);
         setRapidPatternHelpButtonState(false);
@@ -1952,7 +2102,7 @@ function moveToNextRapidPatternCue() {
     setRapidPatternHelpButtonState(true);
     updateRapidPatternExplainButtonState();
     renderRapidPatternMonologue(cue);
-    setRapidPatternFeedback('זהו/י את התבנית של הביטוי המודגש.', 'info');
+    setRapidPatternFeedback('׳–׳”׳•/׳™ ׳׳× ׳”׳×׳‘׳ ׳™׳× ׳©׳ ׳”׳‘׳™׳˜׳•׳™ ׳”׳׳•׳“׳’׳©.', 'info');
     startRapidPatternTimer(null);
 }
 
@@ -2077,9 +2227,9 @@ function finishRapidPatternRoundIfNeeded() {
     setRapidPatternHelpButtonState(false);
     updateRapidPatternExplainButtonState();
     setRapidPatternTrafficLight('green');
-    setRapidPatternFeedback(`סיכום AI אחרי ${RAPID_PATTERN_FEEDBACK_INTERVAL} שאלות.`, 'info');
+    setRapidPatternFeedback(`׳¡׳™׳›׳•׳ AI ׳׳—׳¨׳™ ${RAPID_PATTERN_FEEDBACK_INTERVAL} ׳©׳׳׳•׳×.`, 'info');
     if (rapidPatternArenaState.elements.startBtn) {
-        rapidPatternArenaState.elements.startBtn.textContent = `התחל ${RAPID_PATTERN_FEEDBACK_INTERVAL} שאלות חדשות`;
+        rapidPatternArenaState.elements.startBtn.textContent = `׳”׳×׳—׳ ${RAPID_PATTERN_FEEDBACK_INTERVAL} ׳©׳׳׳•׳× ׳—׳“׳©׳•׳×`;
     }
     renderRapidPatternAiFeedback();
     return true;
@@ -2140,29 +2290,29 @@ function buildRapidPatternAiFeedbackHtml(history) {
 
     const strengthsHtml = strongHits.length
         ? `<ul class="rapid-ai-list">${strongHits.map(item => `<li>${escapeHtml(item.highlight || item.statement)} -> ${escapeHtml(item.correctPatternLabel)}</li>`).join('')}</ul>`
-        : '<p class="rapid-ai-note">עדיין אין מספיק הצלחות מהירות. נסו קודם לזהות את מילת הטריגר ורק אז לבחור כפתור.</p>';
+        : '<p class="rapid-ai-note">׳¢׳“׳™׳™׳ ׳׳™׳ ׳׳¡׳₪׳™׳§ ׳”׳¦׳׳—׳•׳× ׳׳”׳™׳¨׳•׳×. ׳ ׳¡׳• ׳§׳•׳“׳ ׳׳–׳”׳•׳× ׳׳× ׳׳™׳׳× ׳”׳˜׳¨׳™׳’׳¨ ׳•׳¨׳§ ׳׳– ׳׳‘׳—׳•׳¨ ׳›׳₪׳×׳•׳¨.</p>';
 
     const missesHtml = topMisses.length
         ? `<ul class="rapid-ai-list">${topMisses.map(group => {
-            const examples = group.examples.map(example => `<li>${escapeHtml(example.highlight || example.statement)} -> תשובה נכונה: ${escapeHtml(group.label)}</li>`).join('');
+            const examples = group.examples.map(example => `<li>${escapeHtml(example.highlight || example.statement)} -> ׳×׳©׳•׳‘׳” ׳ ׳›׳•׳ ׳”: ${escapeHtml(group.label)}</li>`).join('');
             return `<li><strong>${escapeHtml(group.label)}</strong> (${group.count})<ul class="rapid-ai-sublist">${examples}</ul></li>`;
         }).join('')}</ul>`
-        : '<p class="rapid-ai-note">מעולה: אין טעויות בבלוק האחרון.</p>';
+        : '<p class="rapid-ai-note">׳׳¢׳•׳׳”: ׳׳™׳ ׳˜׳¢׳•׳™׳•׳× ׳‘׳‘׳׳•׳§ ׳”׳׳—׳¨׳•׳.</p>';
 
     const missingFocus = wrongCount >= 4
-        ? 'המלצה: עצרו לחצי שנייה על המילה המודגשת לפני בחירה, זה מוריד ניחושים.'
-        : 'המלצה: המשיכו באותו קצב, אפשר גם להוריד זמן כדי לחדד דיוק.';
+        ? '׳”׳׳׳¦׳”: ׳¢׳¦׳¨׳• ׳׳—׳¦׳™ ׳©׳ ׳™׳™׳” ׳¢׳ ׳”׳׳™׳׳” ׳”׳׳•׳“׳’׳©׳× ׳׳₪׳ ׳™ ׳‘׳—׳™׳¨׳”, ׳–׳” ׳׳•׳¨׳™׳“ ׳ ׳™׳—׳•׳©׳™׳.'
+        : '׳”׳׳׳¦׳”: ׳”׳׳©׳™׳›׳• ׳‘׳׳•׳×׳• ׳§׳¦׳‘, ׳׳₪׳©׳¨ ׳’׳ ׳׳”׳•׳¨׳™׳“ ׳–׳׳ ׳›׳“׳™ ׳׳—׳“׳“ ׳“׳™׳•׳§.';
 
     const avgSeconds = (avgRemainingMs / 1000).toFixed(1);
     return `
-        <h4>AI Coach: סיכום ${rounds} שאלות</h4>
-        <p>דיוק: <strong>${accuracy}%</strong> | נכונות: <strong>${correctCount}/${rounds}</strong> | זמן ממוצע שנותר בתשובות נכונות: <strong>${avgSeconds} שנ׳</strong></p>
-        <p class="rapid-ai-title">מה חזק אצלך עכשיו</p>
+        <h4>AI Coach: ׳¡׳™׳›׳•׳ ${rounds} ׳©׳׳׳•׳×</h4>
+        <p>׳“׳™׳•׳§: <strong>${accuracy}%</strong> | ׳ ׳›׳•׳ ׳•׳×: <strong>${correctCount}/${rounds}</strong> | ׳–׳׳ ׳׳׳•׳¦׳¢ ׳©׳ ׳•׳×׳¨ ׳‘׳×׳©׳•׳‘׳•׳× ׳ ׳›׳•׳ ׳•׳×: <strong>${avgSeconds} ׳©׳ ׳³</strong></p>
+        <p class="rapid-ai-title">׳׳” ׳—׳–׳§ ׳׳¦׳׳ ׳¢׳›׳©׳™׳•</p>
         ${strengthsHtml}
-        <p class="rapid-ai-title">מה חסר או בעייתי כרגע</p>
+        <p class="rapid-ai-title">׳׳” ׳—׳¡׳¨ ׳׳• ׳‘׳¢׳™׳™׳×׳™ ׳›׳¨׳’׳¢</p>
         ${missesHtml}
         <p class="rapid-ai-summary">${escapeHtml(missingFocus)}</p>
-        <p class="rapid-ai-summary">להמשך: לחצו "איפוס והתחלה מחדש" לעוד בלוק של ${RAPID_PATTERN_FEEDBACK_INTERVAL} שאלות.</p>
+        <p class="rapid-ai-summary">׳׳”׳׳©׳: ׳׳—׳¦׳• "׳׳™׳₪׳•׳¡ ׳•׳”׳×׳—׳׳” ׳׳—׳“׳©" ׳׳¢׳•׳“ ׳‘׳׳•׳§ ׳©׳ ${RAPID_PATTERN_FEEDBACK_INTERVAL} ׳©׳׳׳•׳×.</p>
     `;
 }
 
@@ -2227,7 +2377,7 @@ function setRapidPatternTrafficLight(state) {
     if (traffic) traffic.dataset.state = state;
     if (errorsLabel) {
         const errors = Math.max(0, Math.min(2, rapidPatternArenaState.errors));
-        errorsLabel.textContent = `טעויות בשאלה: ${errors}/2`;
+        errorsLabel.textContent = `׳˜׳¢׳•׳™׳•׳× ׳‘׳©׳׳׳”: ${errors}/2`;
     }
 }
 
@@ -2277,47 +2427,47 @@ const WRINKLE_GAME_INTERVAL_HOURS = [0, 24, 72, 168, 336, 720];
 const WRINKLE_FOLD_LIBRARY = Object.freeze([
     {
         key: 'ABSOLUTE_IMPOSSIBLE',
-        label: 'אי-יכולת מוחלטת',
-        emoji: '🚫',
-        hiddenAssumption: 'יש פה הנחה ש״אין יכולת בשום מצב״.',
-        challengeQuestion: 'באמת בשום מצב? מה כן אפשר לעשות כבר עכשיו ב-10 דקות?'
+        label: '׳׳™-׳™׳›׳•׳׳× ׳׳•׳—׳׳˜׳×',
+        emoji: 'נ«',
+        hiddenAssumption: '׳™׳© ׳₪׳” ׳”׳ ׳—׳” ׳©׳´׳׳™׳ ׳™׳›׳•׳׳× ׳‘׳©׳•׳ ׳׳¦׳‘׳´.',
+        challengeQuestion: '׳‘׳׳׳× ׳‘׳©׳•׳ ׳׳¦׳‘? ׳׳” ׳›׳ ׳׳₪׳©׳¨ ׳׳¢׳©׳•׳× ׳›׳‘׳¨ ׳¢׳›׳©׳™׳• ׳‘-10 ׳“׳§׳•׳×?'
     },
     {
         key: 'NO_CHOICE',
-        label: 'אין ברירה / חייב',
-        emoji: '🔒',
-        hiddenAssumption: 'יש פה הנחה שאין בחירה פנימית.',
-        challengeQuestion: 'מה יקרה אם לא? איזו בחירה קטנה כן קיימת פה?'
+        label: '׳׳™׳ ׳‘׳¨׳™׳¨׳” / ׳—׳™׳™׳‘',
+        emoji: 'נ”’',
+        hiddenAssumption: '׳™׳© ׳₪׳” ׳”׳ ׳—׳” ׳©׳׳™׳ ׳‘׳—׳™׳¨׳” ׳₪׳ ׳™׳׳™׳×.',
+        challengeQuestion: '׳׳” ׳™׳§׳¨׳” ׳׳ ׳׳? ׳׳™׳–׳• ׳‘׳—׳™׳¨׳” ׳§׳˜׳ ׳” ׳›׳ ׳§׳™׳™׳׳× ׳₪׳”?'
     },
     {
         key: 'IDENTITY_LOCK',
-        label: 'זהות מקובעת',
-        emoji: '🧱',
-        hiddenAssumption: 'התנהגות רגעית הוגדרה כ״מי שאני/מי שהוא״.',
-        challengeQuestion: 'מה הוא/אתה עושה בפועל שמוביל לזה, במקום מי הוא?'
+        label: '׳–׳”׳•׳× ׳׳§׳•׳‘׳¢׳×',
+        emoji: 'נ§±',
+        hiddenAssumption: '׳”׳×׳ ׳”׳’׳•׳× ׳¨׳’׳¢׳™׳× ׳”׳•׳’׳“׳¨׳” ׳›׳´׳׳™ ׳©׳׳ ׳™/׳׳™ ׳©׳”׳•׳׳´.',
+        challengeQuestion: '׳׳” ׳”׳•׳/׳׳×׳” ׳¢׳•׳©׳” ׳‘׳₪׳•׳¢׳ ׳©׳׳•׳‘׳™׳ ׳׳–׳”, ׳‘׳׳§׳•׳ ׳׳™ ׳”׳•׳?'
     },
     {
         key: 'GLOBAL_RULE',
-        label: 'הכללה גורפת',
-        emoji: '🌐',
-        hiddenAssumption: 'המשפט הופך אירוע מסוים לחוק גורף.',
-        challengeQuestion: 'תמיד? אף פעם? תן מקרה אחד שסותר את זה.'
+        label: '׳”׳›׳׳׳” ׳’׳•׳¨׳₪׳×',
+        emoji: 'נ',
+        hiddenAssumption: '׳”׳׳©׳₪׳˜ ׳”׳•׳₪׳ ׳׳™׳¨׳•׳¢ ׳׳¡׳•׳™׳ ׳׳—׳•׳§ ׳’׳•׳¨׳£.',
+        challengeQuestion: '׳×׳׳™׳“? ׳׳£ ׳₪׳¢׳? ׳×׳ ׳׳§׳¨׳” ׳׳—׳“ ׳©׳¡׳•׳×׳¨ ׳׳× ׳–׳”.'
     }
 ]);
 
 const WRINKLE_BASE_CARDS = Object.freeze([
-    { id: 'wr_001', statement: 'אני לא יכול להוביל פגישה צוות.', foldKey: 'ABSOLUTE_IMPOSSIBLE' },
-    { id: 'wr_002', statement: 'הוא בעייתי, אי אפשר לעבוד איתו.', foldKey: 'IDENTITY_LOCK' },
-    { id: 'wr_003', statement: 'אני חייב להסכים, אחרת הכול יתפרק.', foldKey: 'NO_CHOICE' },
-    { id: 'wr_004', statement: 'אני תמיד הורס שיחות חשובות.', foldKey: 'GLOBAL_RULE' },
-    { id: 'wr_005', statement: 'אין לי ברירה, אני חייב לענות לכל הודעה מייד.', foldKey: 'NO_CHOICE' },
-    { id: 'wr_006', statement: 'אני לא יכול להשתנות בכלל.', foldKey: 'ABSOLUTE_IMPOSSIBLE' },
-    { id: 'wr_007', statement: 'היא פשוט אגואיסטית, זה מה שהיא.', foldKey: 'IDENTITY_LOCK' },
-    { id: 'wr_008', statement: 'כולם מזלזלים בי כל הזמן.', foldKey: 'GLOBAL_RULE' },
-    { id: 'wr_009', statement: 'אי אפשר להירגע לפני שמסיימים הכול.', foldKey: 'ABSOLUTE_IMPOSSIBLE' },
-    { id: 'wr_010', statement: 'אני מוכרח להיות מושלם בכל משימה.', foldKey: 'NO_CHOICE' },
-    { id: 'wr_011', statement: 'אני כישלון כשאני מתבלבל מול אנשים.', foldKey: 'IDENTITY_LOCK' },
-    { id: 'wr_012', statement: 'אף פעם לא מצליח לי בזמן.', foldKey: 'GLOBAL_RULE' }
+    { id: 'wr_001', statement: '׳׳ ׳™ ׳׳ ׳™׳›׳•׳ ׳׳”׳•׳‘׳™׳ ׳₪׳’׳™׳©׳” ׳¦׳•׳•׳×.', foldKey: 'ABSOLUTE_IMPOSSIBLE' },
+    { id: 'wr_002', statement: '׳”׳•׳ ׳‘׳¢׳™׳™׳×׳™, ׳׳™ ׳׳₪׳©׳¨ ׳׳¢׳‘׳•׳“ ׳׳™׳×׳•.', foldKey: 'IDENTITY_LOCK' },
+    { id: 'wr_003', statement: '׳׳ ׳™ ׳—׳™׳™׳‘ ׳׳”׳¡׳›׳™׳, ׳׳—׳¨׳× ׳”׳›׳•׳ ׳™׳×׳₪׳¨׳§.', foldKey: 'NO_CHOICE' },
+    { id: 'wr_004', statement: '׳׳ ׳™ ׳×׳׳™׳“ ׳”׳•׳¨׳¡ ׳©׳™׳—׳•׳× ׳—׳©׳•׳‘׳•׳×.', foldKey: 'GLOBAL_RULE' },
+    { id: 'wr_005', statement: '׳׳™׳ ׳׳™ ׳‘׳¨׳™׳¨׳”, ׳׳ ׳™ ׳—׳™׳™׳‘ ׳׳¢׳ ׳•׳× ׳׳›׳ ׳”׳•׳“׳¢׳” ׳׳™׳™׳“.', foldKey: 'NO_CHOICE' },
+    { id: 'wr_006', statement: '׳׳ ׳™ ׳׳ ׳™׳›׳•׳ ׳׳”׳©׳×׳ ׳•׳× ׳‘׳›׳׳.', foldKey: 'ABSOLUTE_IMPOSSIBLE' },
+    { id: 'wr_007', statement: '׳”׳™׳ ׳₪׳©׳•׳˜ ׳׳’׳•׳׳™׳¡׳˜׳™׳×, ׳–׳” ׳׳” ׳©׳”׳™׳.', foldKey: 'IDENTITY_LOCK' },
+    { id: 'wr_008', statement: '׳›׳•׳׳ ׳׳–׳׳–׳׳™׳ ׳‘׳™ ׳›׳ ׳”׳–׳׳.', foldKey: 'GLOBAL_RULE' },
+    { id: 'wr_009', statement: '׳׳™ ׳׳₪׳©׳¨ ׳׳”׳™׳¨׳’׳¢ ׳׳₪׳ ׳™ ׳©׳׳¡׳™׳™׳׳™׳ ׳”׳›׳•׳.', foldKey: 'ABSOLUTE_IMPOSSIBLE' },
+    { id: 'wr_010', statement: '׳׳ ׳™ ׳׳•׳›׳¨׳— ׳׳”׳™׳•׳× ׳׳•׳©׳׳ ׳‘׳›׳ ׳׳©׳™׳׳”.', foldKey: 'NO_CHOICE' },
+    { id: 'wr_011', statement: '׳׳ ׳™ ׳›׳™׳©׳׳•׳ ׳›׳©׳׳ ׳™ ׳׳×׳‘׳׳‘׳ ׳׳•׳ ׳׳ ׳©׳™׳.', foldKey: 'IDENTITY_LOCK' },
+    { id: 'wr_012', statement: '׳׳£ ׳₪׳¢׳ ׳׳ ׳׳¦׳׳™׳— ׳׳™ ׳‘׳–׳׳.', foldKey: 'GLOBAL_RULE' }
 ]);
 
 const DEFAULT_WRINKLE_GAME_STATS = Object.freeze({
@@ -2517,7 +2667,7 @@ function buildWrinkleChallengeOptions(correctFoldKey) {
 function startWrinkleRound() {
     const picked = pickNextWrinkleCard();
     if (!picked || !picked.card) {
-        setWrinkleFeedback('אין כרגע כרטיסים זמינים לתרגול.', 'warn');
+        setWrinkleFeedback('׳׳™׳ ׳›׳¨׳’׳¢ ׳›׳¨׳˜׳™׳¡׳™׳ ׳–׳׳™׳ ׳™׳ ׳׳×׳¨׳’׳•׳.', 'warn');
         return;
     }
 
@@ -2534,9 +2684,9 @@ function startWrinkleRound() {
     }
 
     if (picked.isDueNow) {
-        setWrinkleFeedback('שלב 1: חשפו את ההנחה הסמויה, ורק אחר כך עברו לשאלת אתגור.', 'info');
+        setWrinkleFeedback('׳©׳׳‘ 1: ׳—׳©׳₪׳• ׳׳× ׳”׳”׳ ׳—׳” ׳”׳¡׳׳•׳™׳”, ׳•׳¨׳§ ׳׳—׳¨ ׳›׳ ׳¢׳‘׳¨׳• ׳׳©׳׳׳× ׳׳×׳’׳•׳¨.', 'info');
     } else {
-        setWrinkleFeedback('הכרטיסים הבאים מתוזמנים לעתיד. מבצעים חיזוק יזום.', 'warn');
+        setWrinkleFeedback('׳”׳›׳¨׳˜׳™׳¡׳™׳ ׳”׳‘׳׳™׳ ׳׳×׳•׳–׳׳ ׳™׳ ׳׳¢׳×׳™׳“. ׳׳‘׳¦׳¢׳™׳ ׳—׳™׳–׳•׳§ ׳™׳–׳•׳.', 'warn');
     }
 
     renderWrinkleRound();
@@ -2552,8 +2702,8 @@ function renderWrinkleRound() {
 
     if (wrinkleGameState.elements.stepLabel) {
         wrinkleGameState.elements.stepLabel.textContent = wrinkleGameState.phase === 'expose'
-            ? 'שלב 1/2: חשיפת הכמת'
-            : 'שלב 2/2: בחירת שאלת האתגור';
+            ? '׳©׳׳‘ 1/2: ׳—׳©׳™׳₪׳× ׳”׳›׳׳×'
+            : '׳©׳׳‘ 2/2: ׳‘׳—׳™׳¨׳× ׳©׳׳׳× ׳”׳׳×׳’׳•׳¨';
     }
 
     const options = wrinkleGameState.phase === 'expose'
@@ -2601,7 +2751,7 @@ function handleWrinkleExposeChoice(selectedKey, button) {
     if (selectedKey === card.foldKey) {
         button.classList.add('is-correct');
         const fold = getWrinkleFoldByKey(card.foldKey);
-        setWrinkleFeedback(`מעולה. נחשף הכמת: ${fold?.hiddenAssumption || ''} עכשיו בחר/י שאלת אתגור.`, 'success');
+        setWrinkleFeedback(`׳׳¢׳•׳׳”. ׳ ׳—׳©׳£ ׳”׳›׳׳×: ${fold?.hiddenAssumption || ''} ׳¢׳›׳©׳™׳• ׳‘׳—׳¨/׳™ ׳©׳׳׳× ׳׳×׳’׳•׳¨.`, 'success');
         playUISound('correct');
         wrinkleGameState.phase = 'challenge';
         renderWrinkleRound();
@@ -2612,7 +2762,7 @@ function handleWrinkleExposeChoice(selectedKey, button) {
     button.disabled = true;
     button.classList.add('is-wrong');
     const fold = getWrinkleFoldByKey(card.foldKey);
-    setWrinkleFeedback(`עדיין לא. רמז: ${fold?.hiddenAssumption || 'חפש/י את ההנחה שלא נאמרה במפורש.'}`, 'warn');
+    setWrinkleFeedback(`׳¢׳“׳™׳™׳ ׳׳. ׳¨׳׳–: ${fold?.hiddenAssumption || '׳—׳₪׳©/׳™ ׳׳× ׳”׳”׳ ׳—׳” ׳©׳׳ ׳ ׳׳׳¨׳” ׳‘׳׳₪׳•׳¨׳©.'}`, 'warn');
     playUISound('wrong');
 }
 
@@ -2630,7 +2780,7 @@ function handleWrinkleChallengeChoice(selectedKey, button) {
     button.disabled = true;
     button.classList.add('is-wrong');
     const fold = getWrinkleFoldByKey(card.foldKey);
-    setWrinkleFeedback(`כמעט. שאלת העוגן המדויקת כאן: "${fold?.challengeQuestion || ''}"`, 'warn');
+    setWrinkleFeedback(`׳›׳׳¢׳˜. ׳©׳׳׳× ׳”׳¢׳•׳’׳ ׳”׳׳“׳•׳™׳§׳× ׳›׳׳: "${fold?.challengeQuestion || ''}"`, 'warn');
     playUISound('wrong');
 }
 
@@ -2655,7 +2805,7 @@ function completeWrinkleRound() {
         addXP(4);
         playUISound('hint');
         setWrinkleFeedback(
-            `נחשף הכמת אחרי תיקון. השאלה הנכונה: "${fold?.challengeQuestion || ''}". נחזור לזה בעוד ${WRINKLE_GAME_RETRY_MINUTES} דקות.`,
+            `׳ ׳—׳©׳£ ׳”׳›׳׳× ׳׳—׳¨׳™ ׳×׳™׳§׳•׳. ׳”׳©׳׳׳” ׳”׳ ׳›׳•׳ ׳”: "${fold?.challengeQuestion || ''}". ׳ ׳—׳–׳•׳¨ ׳׳–׳” ׳‘׳¢׳•׳“ ${WRINKLE_GAME_RETRY_MINUTES} ׳“׳§׳•׳×.`,
             'success'
         );
     } else {
@@ -2676,11 +2826,11 @@ function completeWrinkleRound() {
         }
 
         const waitLabel = nextHours >= 24
-            ? `${Math.round(nextHours / 24)} ימים`
-            : `${nextHours} שעות`;
+            ? `${Math.round(nextHours / 24)} ׳™׳׳™׳`
+            : `${nextHours} ׳©׳¢׳•׳×`;
 
         setWrinkleFeedback(
-            `קרעת את הכמת! "${fold?.challengeQuestion || ''}" נשמר להרגל אוטומטי. חזרה הבאה בעוד ${waitLabel}.`,
+            `׳§׳¨׳¢׳× ׳׳× ׳”׳›׳׳×! "${fold?.challengeQuestion || ''}" ׳ ׳©׳׳¨ ׳׳”׳¨׳’׳ ׳׳•׳˜׳•׳׳˜׳™. ׳—׳–׳¨׳” ׳”׳‘׳׳” ׳‘׳¢׳•׳“ ${waitLabel}.`,
             'success'
         );
     }
@@ -2723,8 +2873,8 @@ function triggerWrinkleBreakFx() {
     if (!layer) return;
 
     layer.innerHTML = '';
-    const brickChars = ['🧱', '🧩'];
-    const confettiChars = ['✨', '🎉', '💥', '🟨', '🟦'];
+    const brickChars = ['נ§±', 'נ§©'];
+    const confettiChars = ['ג¨', 'נ‰', 'נ’¥', 'נ¨', 'נ¦'];
 
     for (let i = 0; i < 9; i += 1) {
         const brick = document.createElement('span');
@@ -2765,7 +2915,7 @@ function addSelfStatementToWrinkleGame() {
 
     const raw = input.value.trim();
     if (raw.length < 6) {
-        setWrinkleFeedback('כתבו משפט אישי קצר כדי להוסיף אותו למשחק.', 'warn');
+        setWrinkleFeedback('׳›׳×׳‘׳• ׳׳©׳₪׳˜ ׳׳™׳©׳™ ׳§׳¦׳¨ ׳›׳“׳™ ׳׳”׳•׳¡׳™׳£ ׳׳•׳×׳• ׳׳׳©׳—׳§.', 'warn');
         return;
     }
 
@@ -2773,7 +2923,7 @@ function addSelfStatementToWrinkleGame() {
     const alreadyExists = wrinkleGameState.cards.some(card => normalizeText(card.statement).replace(/\s+/g, ' ').trim() === normalizedInput);
 
     if (alreadyExists) {
-        setWrinkleFeedback('המשפט הזה כבר קיים בתרגול. נסו ניסוח אחר.', 'warn');
+        setWrinkleFeedback('׳”׳׳©׳₪׳˜ ׳”׳–׳” ׳›׳‘׳¨ ׳§׳™׳™׳ ׳‘׳×׳¨׳’׳•׳. ׳ ׳¡׳• ׳ ׳™׳¡׳•׳— ׳׳—׳¨.', 'warn');
         return;
     }
 
@@ -2796,7 +2946,7 @@ function addSelfStatementToWrinkleGame() {
 
     input.value = '';
     const fold = getWrinkleFoldByKey(foldKey);
-    setWrinkleFeedback(`נוסף משפט אישי עם כמת משוער: ${fold?.label || 'כללי'}.`, 'success');
+    setWrinkleFeedback(`׳ ׳•׳¡׳£ ׳׳©׳₪׳˜ ׳׳™׳©׳™ ׳¢׳ ׳›׳׳× ׳׳©׳•׳¢׳¨: ${fold?.label || '׳›׳׳׳™'}.`, 'success');
     playUISound('next');
 
     saveWrinkleGameState();
@@ -2807,19 +2957,19 @@ function addSelfStatementToWrinkleGame() {
 function detectWrinkleFoldFromText(text) {
     const normalized = normalizeText(text);
 
-    if (/(לא יכול|אי אפשר|אין מצב|בלתי אפשרי|בחיים לא)/.test(normalized)) {
+    if (/(׳׳ ׳™׳›׳•׳|׳׳™ ׳׳₪׳©׳¨|׳׳™׳ ׳׳¦׳‘|׳‘׳׳×׳™ ׳׳₪׳©׳¨׳™|׳‘׳—׳™׳™׳ ׳׳)/.test(normalized)) {
         return 'ABSOLUTE_IMPOSSIBLE';
     }
 
-    if (/(חייב|צריך|מוכרח|אין ברירה|אסור לי לא)/.test(normalized)) {
+    if (/(׳—׳™׳™׳‘|׳¦׳¨׳™׳|׳׳•׳›׳¨׳—|׳׳™׳ ׳‘׳¨׳™׳¨׳”|׳׳¡׳•׳¨ ׳׳™ ׳׳)/.test(normalized)) {
         return 'NO_CHOICE';
     }
 
-    if (/(תמיד|אף פעם|כולם|כל הזמן|אף אחד)/.test(normalized)) {
+    if (/(׳×׳׳™׳“|׳׳£ ׳₪׳¢׳|׳›׳•׳׳|׳›׳ ׳”׳–׳׳|׳׳£ ׳׳—׳“)/.test(normalized)) {
         return 'GLOBAL_RULE';
     }
 
-    if (/(אני .*כישלון|אני .*דפוק|הוא .*בעייתי|היא .*בעייתית|הוא .*עצלן|היא .*עצלנית|אני .*לא יוצלח)/.test(normalized)) {
+    if (/(׳׳ ׳™ .*׳›׳™׳©׳׳•׳|׳׳ ׳™ .*׳“׳₪׳•׳§|׳”׳•׳ .*׳‘׳¢׳™׳™׳×׳™|׳”׳™׳ .*׳‘׳¢׳™׳™׳×׳™׳×|׳”׳•׳ .*׳¢׳¦׳׳|׳”׳™׳ .*׳¢׳¦׳׳ ׳™׳×|׳׳ ׳™ .*׳׳ ׳™׳•׳¦׳׳—)/.test(normalized)) {
         return 'IDENTITY_LOCK';
     }
 
@@ -2839,7 +2989,7 @@ function renderWrinkleSelfList() {
     if (!selfCards.length) {
         const empty = document.createElement('li');
         empty.className = 'muted';
-        empty.textContent = 'עדיין לא הוזן משפט אישי.';
+        empty.textContent = '׳¢׳“׳™׳™׳ ׳׳ ׳”׳•׳–׳ ׳׳©׳₪׳˜ ׳׳™׳©׳™.';
         list.appendChild(empty);
         return;
     }
@@ -2847,7 +2997,7 @@ function renderWrinkleSelfList() {
     selfCards.forEach(card => {
         const fold = getWrinkleFoldByKey(card.foldKey);
         const row = document.createElement('li');
-        row.textContent = `“${card.statement}” → ${fold?.label || 'כמת כללי'}`;
+        row.textContent = `ג€${card.statement}ג€ ג†’ ${fold?.label || '׳›׳׳× ׳›׳׳׳™'}`;
         list.appendChild(row);
     });
 }
@@ -2864,7 +3014,7 @@ function getNextStatement() {
     }
     
     if (filteredStatements.length === 0) {
-        alert('אין משפטים זמינים בקטגוריה זו');
+        alert('׳׳™׳ ׳׳©׳₪׳˜׳™׳ ׳–׳׳™׳ ׳™׳ ׳‘׳§׳˜׳’׳•׳¨׳™׳” ׳–׳•');
         return;
     }
     
@@ -2913,8 +3063,8 @@ function showAnswer() {
     const answerText = document.getElementById('answer-text');
     const answerExplanation = document.getElementById('answer-explanation');
     
-    answerText.textContent = `🎯 ${statement.suggested_question}`;
-    answerExplanation.textContent = `💡 ${statement.explanation} | קטגוריה: ${statement.violation}`;
+    answerText.textContent = `נ¯ ${statement.suggested_question}`;
+    answerExplanation.textContent = `נ’¡ ${statement.explanation} | ׳§׳˜׳’׳•׳¨׳™׳”: ${statement.violation}`;
     
     answerBox.classList.remove('hidden');
 }
@@ -2935,18 +3085,18 @@ function showLegacyPracticeHint() {
     const statement = filteredStatements[currentStatementIndex];
     
     const hints = {
-        'DELETION': '🔍 מחפשים את המידע החסר - מי? מה? לפי מי?',
-        'DISTORTION': '🔄 מחפשים את השינוי או ההנחה - מה כאן לא בדיוק? מה מוכן?',
-        'GENERALIZATION': '📈 מחפשים את ההכללה - באמת תמיד? באמת אף פעם?'
+        'DELETION': 'נ” ׳׳—׳₪׳©׳™׳ ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ - ׳׳™? ׳׳”? ׳׳₪׳™ ׳׳™?',
+        'DISTORTION': 'נ”„ ׳׳—׳₪׳©׳™׳ ׳׳× ׳”׳©׳™׳ ׳•׳™ ׳׳• ׳”׳”׳ ׳—׳” - ׳׳” ׳›׳׳ ׳׳ ׳‘׳“׳™׳•׳§? ׳׳” ׳׳•׳›׳?',
+        'GENERALIZATION': 'נ“ˆ ׳׳—׳₪׳©׳™׳ ׳׳× ׳”׳”׳›׳׳׳” - ׳‘׳׳׳× ׳×׳׳™׳“? ׳‘׳׳׳× ׳׳£ ׳₪׳¢׳?'
     };
     
     const difficultyHint = {
-        'easy': 'הפרה זו לא כל כך מורכבת - חשוב על פרטים כופים',
-        'medium': 'זו הפרה מעט יותר מסובכת - חשוב לעומק יותר',
-        'hard': 'זו הפרה מסובכת - זקוק להרבה כדי לפרוק אותה'
+        'easy': '׳”׳₪׳¨׳” ׳–׳• ׳׳ ׳›׳ ׳›׳ ׳׳•׳¨׳›׳‘׳× - ׳—׳©׳•׳‘ ׳¢׳ ׳₪׳¨׳˜׳™׳ ׳›׳•׳₪׳™׳',
+        'medium': '׳–׳• ׳”׳₪׳¨׳” ׳׳¢׳˜ ׳™׳•׳×׳¨ ׳׳¡׳•׳‘׳›׳× - ׳—׳©׳•׳‘ ׳׳¢׳•׳׳§ ׳™׳•׳×׳¨',
+        'hard': '׳–׳• ׳”׳₪׳¨׳” ׳׳¡׳•׳‘׳›׳× - ׳–׳§׳•׳§ ׳׳”׳¨׳‘׳” ׳›׳“׳™ ׳׳₪׳¨׳•׳§ ׳׳•׳×׳”'
     };
     
-    alert(`טיפ:\n\n${hints[statement.category] || ''}\n\nרמת קשיות: ${difficultyHint[statement.difficulty]}`);
+    alert(`׳˜׳™׳₪:\n\n${hints[statement.category] || ''}\n\n׳¨׳׳× ׳§׳©׳™׳•׳×: ${difficultyHint[statement.difficulty]}`);
 }
 
 // Hide Answer
@@ -2976,7 +3126,7 @@ function setupTrainerMode() {
     startBtn.addEventListener('click', () => {
         const selectedCategory = categorySelect.value;
         if (!selectedCategory) {
-            showHintMessage('בחר קטגוריה תחילה!');
+            showHintMessage('׳‘׳—׳¨ ׳§׳˜׳’׳•׳¨׳™׳” ׳×׳—׳™׳׳”!');
             return;
         }
         startTrainer(selectedCategory);
@@ -2998,16 +3148,16 @@ function isDeletionCategorySelected(categoryId = '') {
 
 function buildDeletionGuideHtml() {
     return `
-        <p><strong>איך עובד תרגול מחיקה (6 אפשרויות)?</strong></p>
-        <p>בכל שאלה תקבל/י 6 אפשרויות: 3 שאלות שאינן מחיקה, ו-3 שאלות מחיקה בניסוחים שונים.</p>
-        <p><strong>המטרה שלך:</strong> לבחור את שאלת המחיקה שחושפת את המידע החסר הכי משמעותי להקשר.</p>
-        <p><strong>דירוג איכות בתוך שאלות המחיקה:</strong></p>
+        <p><strong>׳׳™׳ ׳¢׳•׳‘׳“ ׳×׳¨׳’׳•׳ ׳׳—׳™׳§׳” (6 ׳׳₪׳©׳¨׳•׳™׳•׳×)?</strong></p>
+        <p>׳‘׳›׳ ׳©׳׳׳” ׳×׳§׳‘׳/׳™ 6 ׳׳₪׳©׳¨׳•׳™׳•׳×: 3 ׳©׳׳׳•׳× ׳©׳׳™׳ ׳ ׳׳—׳™׳§׳”, ׳•-3 ׳©׳׳׳•׳× ׳׳—׳™׳§׳” ׳‘׳ ׳™׳¡׳•׳—׳™׳ ׳©׳•׳ ׳™׳.</p>
+        <p><strong>׳”׳׳˜׳¨׳” ׳©׳׳:</strong> ׳׳‘׳—׳•׳¨ ׳׳× ׳©׳׳׳× ׳”׳׳—׳™׳§׳” ׳©׳—׳•׳©׳₪׳× ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳›׳™ ׳׳©׳׳¢׳•׳×׳™ ׳׳”׳§׳©׳¨.</p>
+        <p><strong>׳“׳™׳¨׳•׳’ ׳׳™׳›׳•׳× ׳‘׳×׳•׳ ׳©׳׳׳•׳× ׳”׳׳—׳™׳§׳”:</strong></p>
         <ul>
-            <li>רמה גבוהה: חושפת מידע חסר קריטי שמאפשר פעולה מיידית.</li>
-            <li>רמה בינונית: מחיקה נכונה אבל פחות מרכזית להתקדמות.</li>
-            <li>רמה נמוכה: מחיקה כללית שלא תורמת מספיק לפתרון.</li>
+            <li>׳¨׳׳” ׳’׳‘׳•׳”׳”: ׳—׳•׳©׳₪׳× ׳׳™׳“׳¢ ׳—׳¡׳¨ ׳§׳¨׳™׳˜׳™ ׳©׳׳׳₪׳©׳¨ ׳₪׳¢׳•׳׳” ׳׳™׳™׳“׳™׳×.</li>
+            <li>׳¨׳׳” ׳‘׳™׳ ׳•׳ ׳™׳×: ׳׳—׳™׳§׳” ׳ ׳›׳•׳ ׳” ׳׳‘׳ ׳₪׳—׳•׳× ׳׳¨׳›׳–׳™׳× ׳׳”׳×׳§׳“׳׳•׳×.</li>
+            <li>׳¨׳׳” ׳ ׳׳•׳›׳”: ׳׳—׳™׳§׳” ׳›׳׳׳™׳× ׳©׳׳ ׳×׳•׳¨׳׳× ׳׳¡׳₪׳™׳§ ׳׳₪׳×׳¨׳•׳.</li>
         </ul>
-        <p><strong>טיפ עבודה:</strong> לפני בחירה שאל/י מה חסר כאן כדי להבין מה באמת נדרש, מי מעורב, ולפי איזה קריטריון.</p>
+        <p><strong>׳˜׳™׳₪ ׳¢׳‘׳•׳“׳”:</strong> ׳׳₪׳ ׳™ ׳‘׳—׳™׳¨׳” ׳©׳׳/׳™ ׳׳” ׳—׳¡׳¨ ׳›׳׳ ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳׳” ׳‘׳׳׳× ׳ ׳“׳¨׳©, ׳׳™ ׳׳¢׳•׳¨׳‘, ׳•׳׳₪׳™ ׳׳™׳–׳” ׳§׳¨׳™׳˜׳¨׳™׳•׳.</p>
     `;
 }
 
@@ -3057,7 +3207,7 @@ function startTrainer(categoryId) {
     }
     
     if (statements.length === 0) {
-        showHintMessage('אין משפטים לקטגוריה זו');
+        showHintMessage('׳׳™׳ ׳׳©׳₪׳˜׳™׳ ׳׳§׳˜׳’׳•׳¨׳™׳” ׳–׳•');
         return;
     }
     
@@ -3146,8 +3296,8 @@ function updateTrainerProgressNote() {
     if (!noteEl) return;
     const remaining = trainerState.questions.length - trainerState.currentQuestion - 1;
     const answeredCount = trainerState.currentQuestion - trainerState.phaseSkippedCount + (trainerState.answered ? 1 : 0);
-    const modeLabel = trainerState.reviewMode ? 'Review Loop' : 'ריצה ראשית';
-    noteEl.textContent = `${modeLabel} | נשארו ${Math.max(remaining, 0)} שאלות | נענו: ${Math.max(answeredCount, 0)} | דולגו: ${trainerState.phaseSkippedCount}`;
+    const modeLabel = trainerState.reviewMode ? 'Review Loop' : '׳¨׳™׳¦׳” ׳¨׳׳©׳™׳×';
+    noteEl.textContent = `${modeLabel} | ׳ ׳©׳׳¨׳• ${Math.max(remaining, 0)} ׳©׳׳׳•׳× | ׳ ׳¢׳ ׳•: ${Math.max(answeredCount, 0)} | ׳“׳•׳׳’׳•: ${trainerState.phaseSkippedCount}`;
 }
 
 function loadNextQuestion() {
@@ -3172,7 +3322,7 @@ function loadNextQuestion() {
     const questionTextEl = document.getElementById('question-text');
     if (questionTextEl) {
         if (trainerState.deletionCoachMode) {
-            questionTextEl.textContent = `מטרת השאלה: לזהות את המידע החסר הכי משמעותי במשפט.\n\n${question.statement}`;
+            questionTextEl.textContent = `׳׳˜׳¨׳× ׳”׳©׳׳׳”: ׳׳–׳”׳•׳× ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳›׳™ ׳׳©׳׳¢׳•׳×׳™ ׳‘׳׳©׳₪׳˜.\n\n${question.statement}`;
         } else {
             questionTextEl.textContent = question.statement;
         }
@@ -3207,7 +3357,7 @@ function generateMCQOptions(question) {
                         <span class="option-radio"></span>
                         <span class="option-text">
                             <span class="option-main">${escapeHtml(option.questionText)}</span>
-                            <small class="option-purpose"><strong>מטרה:</strong> ${escapeHtml(option.purpose)}</small>
+                            <small class="option-purpose"><strong>׳׳˜׳¨׳”:</strong> ${escapeHtml(option.purpose)}</small>
                         </span>
                     </label>
                 </div>
@@ -3249,29 +3399,29 @@ function buildDeletionCoachOptionSet(question) {
     const subtype = String(question?.subcategory || '').toLowerCase();
     const statement = String(question?.statement || '');
 
-    let highQuestion = question?.suggested_question || 'מה בדיוק חסר כאן כדי להבין את המשפט?';
-    let mediumQuestion = 'איזה פרט חסר כאן שיכול לעזור להבין טוב יותר?';
-    let lowQuestion = 'יש עוד משהו להוסיף?';
+    let highQuestion = question?.suggested_question || '׳׳” ׳‘׳“׳™׳•׳§ ׳—׳¡׳¨ ׳›׳׳ ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳׳× ׳”׳׳©׳₪׳˜?';
+    let mediumQuestion = '׳׳™׳–׳” ׳₪׳¨׳˜ ׳—׳¡׳¨ ׳›׳׳ ׳©׳™׳›׳•׳ ׳׳¢׳–׳•׳¨ ׳׳”׳‘׳™׳ ׳˜׳•׳‘ ׳™׳•׳×׳¨?';
+    let lowQuestion = '׳™׳© ׳¢׳•׳“ ׳׳©׳”׳• ׳׳”׳•׳¡׳™׳£?';
 
     if (subtype.includes('comparative')) {
-        highQuestion = 'לעומת מי/מה, ובאיזה מדד מדויק ההשוואה נעשית?';
-        mediumQuestion = 'באיזה הקשר ההשוואה הזו נכונה?';
-        lowQuestion = 'אפשר לתת עוד דוגמה להשוואה?';
+        highQuestion = '׳׳¢׳•׳׳× ׳׳™/׳׳”, ׳•׳‘׳׳™׳–׳” ׳׳“׳“ ׳׳“׳•׳™׳§ ׳”׳”׳©׳•׳•׳׳” ׳ ׳¢׳©׳™׳×?';
+        mediumQuestion = '׳‘׳׳™׳–׳” ׳”׳§׳©׳¨ ׳”׳”׳©׳•׳•׳׳” ׳”׳–׳• ׳ ׳›׳•׳ ׳”?';
+        lowQuestion = '׳׳₪׳©׳¨ ׳׳×׳× ׳¢׳•׳“ ׳“׳•׳’׳׳” ׳׳”׳©׳•׳•׳׳”?';
     } else if (subtype.includes('referential')) {
-        highQuestion = 'מי בדיוק אמר/קבע/חושב את זה, ואיזה מקור יש לכך?';
-        mediumQuestion = 'על אילו אנשים או גורמים מדובר כאן?';
-        lowQuestion = 'יש עוד מישהו שקשור לזה?';
+        highQuestion = '׳׳™ ׳‘׳“׳™׳•׳§ ׳׳׳¨/׳§׳‘׳¢/׳—׳•׳©׳‘ ׳׳× ׳–׳”, ׳•׳׳™׳–׳” ׳׳§׳•׳¨ ׳™׳© ׳׳›׳?';
+        mediumQuestion = '׳¢׳ ׳׳™׳׳• ׳׳ ׳©׳™׳ ׳׳• ׳’׳•׳¨׳׳™׳ ׳׳“׳•׳‘׳¨ ׳›׳׳?';
+        lowQuestion = '׳™׳© ׳¢׳•׳“ ׳׳™׳©׳”׳• ׳©׳§׳©׳•׳¨ ׳׳–׳”?';
     } else if (subtype.includes('simple')) {
-        highQuestion = 'מה בדיוק לא טוב, לפי מי, ובאיזה קריטריון זה נמדד?';
-        mediumQuestion = 'מתי זה קורה ובאיזה מצב זה בולט יותר?';
-        lowQuestion = 'אפשר לפרט קצת יותר?';
+        highQuestion = '׳׳” ׳‘׳“׳™׳•׳§ ׳׳ ׳˜׳•׳‘, ׳׳₪׳™ ׳׳™, ׳•׳‘׳׳™׳–׳” ׳§׳¨׳™׳˜׳¨׳™׳•׳ ׳–׳” ׳ ׳׳“׳“?';
+        mediumQuestion = '׳׳×׳™ ׳–׳” ׳§׳•׳¨׳” ׳•׳‘׳׳™׳–׳” ׳׳¦׳‘ ׳–׳” ׳‘׳•׳׳˜ ׳™׳•׳×׳¨?';
+        lowQuestion = '׳׳₪׳©׳¨ ׳׳₪׳¨׳˜ ׳§׳¦׳× ׳™׳•׳×׳¨?';
     }
 
-    if (statement.includes('יותר') || statement.includes('פחות')) {
-        highQuestion = 'יותר/פחות ביחס למה בדיוק, ובאיזו יחידת מדידה?';
+    if (statement.includes('׳™׳•׳×׳¨') || statement.includes('׳₪׳—׳•׳×')) {
+        highQuestion = '׳™׳•׳×׳¨/׳₪׳—׳•׳× ׳‘׳™׳—׳¡ ׳׳׳” ׳‘׳“׳™׳•׳§, ׳•׳‘׳׳™׳–׳• ׳™׳—׳™׳“׳× ׳׳“׳™׳“׳”?';
     }
-    if (statement.includes('כולם') || statement.includes('ידוע')) {
-        mediumQuestion = 'מי בדיוק \"כולם\", ומי מחוץ לקבוצה הזו?';
+    if (statement.includes('׳›׳•׳׳') || statement.includes('׳™׳“׳•׳¢')) {
+        mediumQuestion = '׳׳™ ׳‘׳“׳™׳•׳§ \"׳›׳•׳׳\", ׳•׳׳™ ׳׳—׳•׳¥ ׳׳§׳‘׳•׳¦׳” ׳”׳–׳•?';
     }
 
     const options = [
@@ -3279,49 +3429,49 @@ function buildDeletionCoachOptionSet(question) {
             id: 'D1',
             focus: 'DELETION',
             quality: 'high',
-            purpose: 'לחשוף את המידע החסר הקריטי שמאפשר להתקדם בפועל',
+            purpose: '׳׳—׳©׳•׳£ ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳§׳¨׳™׳˜׳™ ׳©׳׳׳₪׳©׳¨ ׳׳”׳×׳§׳“׳ ׳‘׳₪׳•׳¢׳',
             questionText: highQuestion,
-            why: 'מכוונת למידע שחסר באמת להקשר ולביצוע.'
+            why: '׳׳›׳•׳•׳ ׳× ׳׳׳™׳“׳¢ ׳©׳—׳¡׳¨ ׳‘׳׳׳× ׳׳”׳§׳©׳¨ ׳•׳׳‘׳™׳¦׳•׳¢.'
         },
         {
             id: 'D2',
             focus: 'DELETION',
             quality: 'medium',
-            purpose: 'לחשוף מחיקה אמיתית אבל פחות מרכזית',
+            purpose: '׳׳—׳©׳•׳£ ׳׳—׳™׳§׳” ׳׳׳™׳×׳™׳× ׳׳‘׳ ׳₪׳—׳•׳× ׳׳¨׳›׳–׳™׳×',
             questionText: mediumQuestion,
-            why: 'שאלה טובה, אך לא תמיד הפער הכי משמעותי במשפט.'
+            why: '׳©׳׳׳” ׳˜׳•׳‘׳”, ׳׳ ׳׳ ׳×׳׳™׳“ ׳”׳₪׳¢׳¨ ׳”׳›׳™ ׳׳©׳׳¢׳•׳×׳™ ׳‘׳׳©׳₪׳˜.'
         },
         {
             id: 'D3',
             focus: 'DELETION',
             quality: 'low',
-            purpose: 'לחשוף מחיקה כללית אך תרומה נמוכה לפתרון',
+            purpose: '׳׳—׳©׳•׳£ ׳׳—׳™׳§׳” ׳›׳׳׳™׳× ׳׳ ׳×׳¨׳•׳׳” ׳ ׳׳•׳›׳” ׳׳₪׳×׳¨׳•׳',
             questionText: lowQuestion,
-            why: 'שאלה כללית מדי, לא ממקדת את המידע החסר הקריטי.'
+            why: '׳©׳׳׳” ׳›׳׳׳™׳× ׳׳“׳™, ׳׳ ׳׳׳§׳“׳× ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳§׳¨׳™׳˜׳™.'
         },
         {
             id: 'N1',
             focus: 'DISTORTION',
             quality: 'offtrack',
-            purpose: 'בדיקת פרשנות/סיבתיות (לא מחיקה)',
-            questionText: 'איך אתה יודע שזה נכון ומה ההוכחה לכך?',
-            why: 'זו שאלה על עיוות ולא על מידע חסר.'
+            purpose: '׳‘׳“׳™׳§׳× ׳₪׳¨׳©׳ ׳•׳×/׳¡׳™׳‘׳×׳™׳•׳× (׳׳ ׳׳—׳™׳§׳”)',
+            questionText: '׳׳™׳ ׳׳×׳” ׳™׳•׳“׳¢ ׳©׳–׳” ׳ ׳›׳•׳ ׳•׳׳” ׳”׳”׳•׳›׳—׳” ׳׳›׳?',
+            why: '׳–׳• ׳©׳׳׳” ׳¢׳ ׳¢׳™׳•׳•׳× ׳•׳׳ ׳¢׳ ׳׳™׳“׳¢ ׳—׳¡׳¨.'
         },
         {
             id: 'N2',
             focus: 'GENERALIZATION',
             quality: 'offtrack',
-            purpose: 'בדיקת הכללה גורפת (לא מחיקה)',
-            questionText: 'זה תמיד קורה, או שיש מקרים שזה אחרת?',
-            why: 'זו שאלה על הכללה, לא על השמטת פרטים.'
+            purpose: '׳‘׳“׳™׳§׳× ׳”׳›׳׳׳” ׳’׳•׳¨׳₪׳× (׳׳ ׳׳—׳™׳§׳”)',
+            questionText: '׳–׳” ׳×׳׳™׳“ ׳§׳•׳¨׳”, ׳׳• ׳©׳™׳© ׳׳§׳¨׳™׳ ׳©׳–׳” ׳׳—׳¨׳×?',
+            why: '׳–׳• ׳©׳׳׳” ׳¢׳ ׳”׳›׳׳׳”, ׳׳ ׳¢׳ ׳”׳©׳׳˜׳× ׳₪׳¨׳˜׳™׳.'
         },
         {
             id: 'N3',
             focus: 'NON_DELETION',
             quality: 'offtrack',
-            purpose: 'קפיצה לפתרון בלי למפות מידע חסר',
-            questionText: 'מה כדאי לעשות עכשיו כדי לפתור את זה מהר?',
-            why: 'שאלת פתרון מוקדם בלי לחשוף קודם את המידע החסר.'
+            purpose: '׳§׳₪׳™׳¦׳” ׳׳₪׳×׳¨׳•׳ ׳‘׳׳™ ׳׳׳₪׳•׳× ׳׳™׳“׳¢ ׳—׳¡׳¨',
+            questionText: '׳׳” ׳›׳“׳׳™ ׳׳¢׳©׳•׳× ׳¢׳›׳©׳™׳• ׳›׳“׳™ ׳׳₪׳×׳•׳¨ ׳׳× ׳–׳” ׳׳”׳¨?',
+            why: '׳©׳׳׳× ׳₪׳×׳¨׳•׳ ׳׳•׳§׳“׳ ׳‘׳׳™ ׳׳—׳©׳•׳£ ׳§׳•׳“׳ ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨.'
         }
     ];
 
@@ -3342,8 +3492,8 @@ function evaluateDeletionCoachChoice(choice, question) {
             state: 'offtrack',
             xpGain: 0,
             countsAsCorrect: false,
-            title: 'לא מדויק',
-            message: 'נבחרה שאלה שלא מחפשת השמטה. כאן המטרה היא מחיקה בלבד.',
+            title: '׳׳ ׳׳“׳•׳™׳§',
+            message: '׳ ׳‘׳—׳¨׳” ׳©׳׳׳” ׳©׳׳ ׳׳—׳₪׳©׳× ׳”׳©׳׳˜׳”. ׳›׳׳ ׳”׳׳˜׳¨׳” ׳”׳™׳ ׳׳—׳™׳§׳” ׳‘׳׳‘׳“.',
             ranked
         };
     }
@@ -3353,8 +3503,8 @@ function evaluateDeletionCoachChoice(choice, question) {
             state: 'best',
             xpGain: baseXp,
             countsAsCorrect: true,
-            title: 'מצוין - זו המחיקה הכי משמעותית',
-            message: 'בחרת את השאלה שמחזירה את המידע החסר הקריטי ביותר להקשר.',
+            title: '׳׳¦׳•׳™׳ - ׳–׳• ׳”׳׳—׳™׳§׳” ׳”׳›׳™ ׳׳©׳׳¢׳•׳×׳™׳×',
+            message: '׳‘׳—׳¨׳× ׳׳× ׳”׳©׳׳׳” ׳©׳׳—׳–׳™׳¨׳” ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳§׳¨׳™׳˜׳™ ׳‘׳™׳•׳×׳¨ ׳׳”׳§׳©׳¨.',
             ranked
         };
     }
@@ -3364,8 +3514,8 @@ function evaluateDeletionCoachChoice(choice, question) {
             state: 'partial',
             xpGain: Math.max(2, Math.floor(baseXp * 0.5)),
             countsAsCorrect: false,
-            title: 'כיוון נכון חלקית',
-            message: 'זו שאלה שמאתרת מחיקה, אבל לא את ההשמטה הכי משמעותית במשפט.',
+            title: '׳›׳™׳•׳•׳ ׳ ׳›׳•׳ ׳—׳׳§׳™׳×',
+            message: '׳–׳• ׳©׳׳׳” ׳©׳׳׳×׳¨׳× ׳׳—׳™׳§׳”, ׳׳‘׳ ׳׳ ׳׳× ׳”׳”׳©׳׳˜׳” ׳”׳›׳™ ׳׳©׳׳¢׳•׳×׳™׳× ׳‘׳׳©׳₪׳˜.',
             ranked
         };
     }
@@ -3374,8 +3524,8 @@ function evaluateDeletionCoachChoice(choice, question) {
         state: 'weak',
         xpGain: 1,
         countsAsCorrect: false,
-        title: 'זו מחיקה, אבל לא מועילה מספיק',
-        message: 'השאלה כללית מדי ולכן לא מקדמת הבנה או פעולה בצורה טובה.',
+        title: '׳–׳• ׳׳—׳™׳§׳”, ׳׳‘׳ ׳׳ ׳׳•׳¢׳™׳׳” ׳׳¡׳₪׳™׳§',
+        message: '׳”׳©׳׳׳” ׳›׳׳׳™׳× ׳׳“׳™ ׳•׳׳›׳ ׳׳ ׳׳§׳“׳׳× ׳”׳‘׳ ׳” ׳׳• ׳₪׳¢׳•׳׳” ׳‘׳¦׳•׳¨׳” ׳˜׳•׳‘׳”.',
         ranked
     };
 }
@@ -3385,12 +3535,12 @@ function showTrainerRewardEffect(starGain, result = 'fail') {
     const display = document.getElementById('question-display');
     if (!fx || !display || starGain <= 0) return;
 
-    const mainText = `+${starGain} ⭐`;
+    const mainText = `+${starGain} ג­`;
     const subtitle = result === 'success'
-        ? 'בונוס הצלחה!'
+        ? '׳‘׳•׳ ׳•׳¡ ׳”׳¦׳׳—׳”!'
         : result === 'partial'
-            ? 'כיוון טוב, ממשיכים'
-            : 'לומדים גם מזה';
+            ? '׳›׳™׳•׳•׳ ׳˜׳•׳‘, ׳׳׳©׳™׳›׳™׳'
+            : '׳׳•׳׳“׳™׳ ׳’׳ ׳׳–׳”';
 
     fx.classList.remove('hidden', 'show', 'success', 'partial', 'fail');
     display.classList.remove('reward-success', 'reward-partial', 'reward-fail');
@@ -3499,25 +3649,25 @@ function showDeletionCoachFeedback(question, selectedChoice, evaluation, starGai
     const rankedHtml = (evaluation.ranked || []).map((item, index) => `
         <li>
             <strong>${index + 1}.</strong> ${escapeHtml(item.questionText)}<br>
-            <small><strong>למה:</strong> ${escapeHtml(item.why || '')}</small>
+            <small><strong>׳׳׳”:</strong> ${escapeHtml(item.why || '')}</small>
         </li>
     `).join('');
 
-    const selectedText = selectedChoice?.questionText || 'לא זוהתה בחירה';
+    const selectedText = selectedChoice?.questionText || '׳׳ ׳–׳•׳”׳×׳” ׳‘׳—׳™׳¨׳”';
     const boxClass = evaluation.state === 'best' ? 'correct' : 'incorrect';
 
     feedbackContent.innerHTML = `
         <div class="${boxClass}">
             <strong>${escapeHtml(evaluation.title || '')}</strong>
             <p class="explanation">
-                <strong>מטרת השאלה כאן:</strong> לאתר את המידע החסר המשמעותי ביותר בהשמטה.<br>
-                <strong>הבחירה שלך:</strong> ${escapeHtml(selectedText)}<br>
-                <strong>משוב:</strong> ${escapeHtml(evaluation.message || '')}
+                <strong>׳׳˜׳¨׳× ׳”׳©׳׳׳” ׳›׳׳:</strong> ׳׳׳×׳¨ ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳׳©׳׳¢׳•׳×׳™ ׳‘׳™׳•׳×׳¨ ׳‘׳”׳©׳׳˜׳”.<br>
+                <strong>׳”׳‘׳—׳™׳¨׳” ׳©׳׳:</strong> ${escapeHtml(selectedText)}<br>
+                <strong>׳׳©׳•׳‘:</strong> ${escapeHtml(evaluation.message || '')}
             </p>
-            <p class="explanation"><strong>דירוג 3 שאלות המחיקה בשאלה הזו:</strong></p>
+            <p class="explanation"><strong>׳“׳™׳¨׳•׳’ 3 ׳©׳׳׳•׳× ׳”׳׳—׳™׳§׳” ׳‘׳©׳׳׳” ׳”׳–׳•:</strong></p>
             <ol class="deletion-rank-list">${rankedHtml}</ol>
             <p style="margin-top: 12px; color: #2f855a; font-weight: bold;">+${evaluation.xpGain} XP</p>
-            <p style="margin-top: 6px; color: #805ad5; font-weight: bold;">+${starGain} ⭐</p>
+            <p style="margin-top: 6px; color: #805ad5; font-weight: bold;">+${starGain} ג­</p>
         </div>
     `;
 
@@ -3544,35 +3694,35 @@ function showFeedback(isCorrect, question, selectedViolation, xpGain = 10, starG
     const correctCategory = getQuestionCategoryKey(question);
     const selectedLabel = TRAINER_CATEGORY_LABELS[selectedViolation] || selectedViolation;
     const correctLabel = TRAINER_CATEGORY_LABELS[correctCategory] || correctCategory;
-    const violationName = question.violation || question.subcategory || 'לא צוין';
+    const violationName = question.violation || question.subcategory || '׳׳ ׳¦׳•׳™׳';
 
     let feedbackHTML = '';
     if (isCorrect) {
         feedbackHTML = `
             <div class="correct">
-                <strong>✅ נכון!</strong>
+                <strong>ג… ׳ ׳›׳•׳!</strong>
                 <p class="explanation">
-                    <strong>קטגוריה:</strong> ${correctLabel}<br>
-                    <strong>סוג הפרה:</strong> ${violationName}<br>
-                    <strong>שאלת עומק מוצעת:</strong> "${question.suggested_question}"<br>
-                    <strong>הסבר:</strong> ${question.explanation}
+                    <strong>׳§׳˜׳’׳•׳¨׳™׳”:</strong> ${correctLabel}<br>
+                    <strong>׳¡׳•׳’ ׳”׳₪׳¨׳”:</strong> ${violationName}<br>
+                    <strong>׳©׳׳׳× ׳¢׳•׳׳§ ׳׳•׳¦׳¢׳×:</strong> "${question.suggested_question}"<br>
+                    <strong>׳”׳¡׳‘׳¨:</strong> ${question.explanation}
                 </p>
                 <p style="margin-top: 15px; color: #28a745; font-weight: bold;">+${xpGain} XP</p>
-                <p style="margin-top: 6px; color: #805ad5; font-weight: bold;">+${starGain} ⭐</p>
+                <p style="margin-top: 6px; color: #805ad5; font-weight: bold;">+${starGain} ג­</p>
             </div>
         `;
     } else {
         feedbackHTML = `
             <div class="incorrect">
-                <strong>❌ לא נכון</strong>
+                <strong>ג ׳׳ ׳ ׳›׳•׳</strong>
                 <p class="explanation">
-                    <strong>בחרת:</strong> ${selectedLabel}<br>
-                    <strong>התשובה הנכונה:</strong> ${correctLabel}<br>
-                    <strong>סוג הפרה:</strong> ${violationName}<br>
-                    <strong>שאלת עומק מוצעת:</strong> "${question.suggested_question}"<br>
-                    <strong>הסבר:</strong> ${question.explanation}
+                    <strong>׳‘׳—׳¨׳×:</strong> ${selectedLabel}<br>
+                    <strong>׳”׳×׳©׳•׳‘׳” ׳”׳ ׳›׳•׳ ׳”:</strong> ${correctLabel}<br>
+                    <strong>׳¡׳•׳’ ׳”׳₪׳¨׳”:</strong> ${violationName}<br>
+                    <strong>׳©׳׳׳× ׳¢׳•׳׳§ ׳׳•׳¦׳¢׳×:</strong> "${question.suggested_question}"<br>
+                    <strong>׳”׳¡׳‘׳¨:</strong> ${question.explanation}
                 </p>
-                <p style="margin-top: 12px; color: #744210; font-weight: bold;">+${starGain} ⭐ על הלמידה</p>
+                <p style="margin-top: 12px; color: #744210; font-weight: bold;">+${starGain} ג­ ׳¢׳ ׳”׳׳׳™׳“׳”</p>
             </div>
         `;
     }
@@ -3615,11 +3765,11 @@ function showTrainerHint() {
         trainerState.hintLevel = Math.min(trainerState.hintLevel + 1, 3);
         let hintHtml = '';
         if (trainerState.hintLevel === 1) {
-            hintHtml = '<p><strong>רמז 1/3:</strong> חפש/י מה חסר כדי להבין את המשפט ברמת ביצוע, לא רק ברמת ניסוח.</p>';
+            hintHtml = '<p><strong>׳¨׳׳– 1/3:</strong> ׳—׳₪׳©/׳™ ׳׳” ׳—׳¡׳¨ ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳׳× ׳”׳׳©׳₪׳˜ ׳‘׳¨׳׳× ׳‘׳™׳¦׳•׳¢, ׳׳ ׳¨׳§ ׳‘׳¨׳׳× ׳ ׳™׳¡׳•׳—.</p>';
         } else if (trainerState.hintLevel === 2) {
-            hintHtml = '<p><strong>רמז 2/3:</strong> בין 3 שאלות המחיקה, בחר/י את זו שמחזירה קריטריון/גורם/מדד שמאפשרים פעולה.</p>';
+            hintHtml = '<p><strong>׳¨׳׳– 2/3:</strong> ׳‘׳™׳ 3 ׳©׳׳׳•׳× ׳”׳׳—׳™׳§׳”, ׳‘׳—׳¨/׳™ ׳׳× ׳–׳• ׳©׳׳—׳–׳™׳¨׳” ׳§׳¨׳™׳˜׳¨׳™׳•׳/׳’׳•׳¨׳/׳׳“׳“ ׳©׳׳׳₪׳©׳¨׳™׳ ׳₪׳¢׳•׳׳”.</p>';
         } else {
-            hintHtml = `<p><strong>רמז 3/3:</strong> שאלת מחיקה חזקה בדרך כלל כוללת: <em>מי בדיוק / מה בדיוק / לפי איזה קריטריון</em>.</p><p>דוגמה: "${escapeHtml(question.suggested_question || '')}"</p>`;
+            hintHtml = `<p><strong>׳¨׳׳– 3/3:</strong> ׳©׳׳׳× ׳׳—׳™׳§׳” ׳—׳–׳§׳” ׳‘׳“׳¨׳ ׳›׳׳ ׳›׳•׳׳׳×: <em>׳׳™ ׳‘׳“׳™׳•׳§ / ׳׳” ׳‘׳“׳™׳•׳§ / ׳׳₪׳™ ׳׳™׳–׳” ׳§׳¨׳™׳˜׳¨׳™׳•׳</em>.</p><p>׳“׳•׳’׳׳”: "${escapeHtml(question.suggested_question || '')}"</p>`;
         }
         setPanelContent('hint-display', hintHtml);
         playUISound('hint');
@@ -3629,24 +3779,24 @@ function showTrainerHint() {
     trainerState.hintLevel = Math.min(trainerState.hintLevel + 1, 3);
 
     const categoryHint = {
-        DELETION: 'בדוק מה חסר במשפט: מי? מה? מתי? לפי מה?',
-        DISTORTION: 'בדוק איפה יש הנחה או קשר סיבה-תוצאה שלא הוכח.',
-        GENERALIZATION: 'בדוק מילים מוחלטות כמו תמיד/אף פעם/כולם/אי אפשר.'
-    }[categoryKey] || 'בדוק איזו מילה במשפט סוגרת אפשרויות.';
+        DELETION: '׳‘׳“׳•׳§ ׳׳” ׳—׳¡׳¨ ׳‘׳׳©׳₪׳˜: ׳׳™? ׳׳”? ׳׳×׳™? ׳׳₪׳™ ׳׳”?',
+        DISTORTION: '׳‘׳“׳•׳§ ׳׳™׳₪׳” ׳™׳© ׳”׳ ׳—׳” ׳׳• ׳§׳©׳¨ ׳¡׳™׳‘׳”-׳×׳•׳¦׳׳” ׳©׳׳ ׳”׳•׳›׳—.',
+        GENERALIZATION: '׳‘׳“׳•׳§ ׳׳™׳׳™׳ ׳׳•׳—׳׳˜׳•׳× ׳›׳׳• ׳×׳׳™׳“/׳׳£ ׳₪׳¢׳/׳›׳•׳׳/׳׳™ ׳׳₪׳©׳¨.'
+    }[categoryKey] || '׳‘׳“׳•׳§ ׳׳™׳–׳• ׳׳™׳׳” ׳‘׳׳©׳₪׳˜ ׳¡׳•׳’׳¨׳× ׳׳₪׳©׳¨׳•׳™׳•׳×.';
 
-    const triggerWords = ['תמיד', 'אף פעם', 'כולם', 'חייב', 'לא יכול', 'גרם לי', 'יודע ש', 'ברור ש']
+    const triggerWords = ['׳×׳׳™׳“', '׳׳£ ׳₪׳¢׳', '׳›׳•׳׳', '׳—׳™׳™׳‘', '׳׳ ׳™׳›׳•׳', '׳’׳¨׳ ׳׳™', '׳™׳•׳“׳¢ ׳©', '׳‘׳¨׳•׳¨ ׳©']
         .filter(word => statementText.includes(word));
     const triggerLine = triggerWords.length
-        ? `מילות טריגר במשפט: ${triggerWords.join(', ')}`
-        : 'נסה לזהות מילה שמקבעת מסקנה בלי פירוט.';
+        ? `׳׳™׳׳•׳× ׳˜׳¨׳™׳’׳¨ ׳‘׳׳©׳₪׳˜: ${triggerWords.join(', ')}`
+        : '׳ ׳¡׳” ׳׳–׳”׳•׳× ׳׳™׳׳” ׳©׳׳§׳‘׳¢׳× ׳׳¡׳§׳ ׳” ׳‘׳׳™ ׳₪׳™׳¨׳•׳˜.';
 
     let hintHtml = '';
     if (trainerState.hintLevel === 1) {
-        hintHtml = `<p><strong>רמז 1/3:</strong> ${categoryHint}</p>`;
+        hintHtml = `<p><strong>׳¨׳׳– 1/3:</strong> ${categoryHint}</p>`;
     } else if (trainerState.hintLevel === 2) {
-        hintHtml = `<p><strong>רמז 2/3:</strong> ${triggerLine}</p><p>עכשיו נסח שאלה קצרה שתפרק את ההנחה.</p>`;
+        hintHtml = `<p><strong>׳¨׳׳– 2/3:</strong> ${triggerLine}</p><p>׳¢׳›׳©׳™׳• ׳ ׳¡׳— ׳©׳׳׳” ׳§׳¦׳¨׳” ׳©׳×׳₪׳¨׳§ ׳׳× ׳”׳”׳ ׳—׳”.</p>`;
     } else {
-        hintHtml = `<p><strong>רמז 3/3:</strong> הקטגוריה היא <strong>${TRAINER_CATEGORY_LABELS[categoryKey] || categoryKey}</strong>.</p><p>שאלה מוצעת: "${question.suggested_question}"</p>`;
+        hintHtml = `<p><strong>׳¨׳׳– 3/3:</strong> ׳”׳§׳˜׳’׳•׳¨׳™׳” ׳”׳™׳ <strong>${TRAINER_CATEGORY_LABELS[categoryKey] || categoryKey}</strong>.</p><p>׳©׳׳׳” ׳׳•׳¦׳¢׳×: "${question.suggested_question}"</p>`;
     }
 
     setPanelContent('hint-display', hintHtml);
@@ -3660,30 +3810,30 @@ function showTrainerImportance() {
 
     if (trainerState.deletionCoachMode) {
         setPanelContent('why-display', `
-            <p><strong>מטרת השאלה כאן:</strong></p>
-            <p>לא רק לזהות שיש מחיקה, אלא לבחור את שאלת המחיקה שחושפת את המידע החסר הכי משמעותי להבנה ולפעולה.</p>
-            <p><strong>איך מודדים איכות?</strong></p>
+            <p><strong>׳׳˜׳¨׳× ׳”׳©׳׳׳” ׳›׳׳:</strong></p>
+            <p>׳׳ ׳¨׳§ ׳׳–׳”׳•׳× ׳©׳™׳© ׳׳—׳™׳§׳”, ׳׳׳ ׳׳‘׳—׳•׳¨ ׳׳× ׳©׳׳׳× ׳”׳׳—׳™׳§׳” ׳©׳—׳•׳©׳₪׳× ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳›׳™ ׳׳©׳׳¢׳•׳×׳™ ׳׳”׳‘׳ ׳” ׳•׳׳₪׳¢׳•׳׳”.</p>
+            <p><strong>׳׳™׳ ׳׳•׳“׳“׳™׳ ׳׳™׳›׳•׳×?</strong></p>
             <ul>
-                <li>גבוה: מחזיר פרט קריטי שחסר להחלטה/ביצוע.</li>
-                <li>בינוני: שאלה נכונה על מחיקה, אבל פחות ממוקדת במה שיקדם תוצאה.</li>
-                <li>נמוך: שאלה כללית מדי, כמעט בלי תרומה פרקטית.</li>
+                <li>׳’׳‘׳•׳”: ׳׳—׳–׳™׳¨ ׳₪׳¨׳˜ ׳§׳¨׳™׳˜׳™ ׳©׳—׳¡׳¨ ׳׳”׳—׳׳˜׳”/׳‘׳™׳¦׳•׳¢.</li>
+                <li>׳‘׳™׳ ׳•׳ ׳™: ׳©׳׳׳” ׳ ׳›׳•׳ ׳” ׳¢׳ ׳׳—׳™׳§׳”, ׳׳‘׳ ׳₪׳—׳•׳× ׳׳׳•׳§׳“׳× ׳‘׳׳” ׳©׳™׳§׳“׳ ׳×׳•׳¦׳׳”.</li>
+                <li>׳ ׳׳•׳: ׳©׳׳׳” ׳›׳׳׳™׳× ׳׳“׳™, ׳›׳׳¢׳˜ ׳‘׳׳™ ׳×׳¨׳•׳׳” ׳₪׳¨׳§׳˜׳™׳×.</li>
             </ul>
-            <p><strong>בדיקה עצמית קצרה:</strong> האם השאלה שבחרת מוסיפה מידע שאפשר לעבוד איתו מיד?</p>
+            <p><strong>׳‘׳“׳™׳§׳” ׳¢׳¦׳׳™׳× ׳§׳¦׳¨׳”:</strong> ׳”׳׳ ׳”׳©׳׳׳” ׳©׳‘׳—׳¨׳× ׳׳•׳¡׳™׳₪׳” ׳׳™׳“׳¢ ׳©׳׳₪׳©׳¨ ׳׳¢׳‘׳•׳“ ׳׳™׳×׳• ׳׳™׳“?</p>
         `);
         playUISound('hint');
         return;
     }
 
     const importanceText = {
-        DELETION: 'כשמידע נמחק, המסקנה נבנית על חוסר נתונים. השאלה מחזירה פרטים הכרחיים.',
-        DISTORTION: 'כשיש עיוות, פירוש הופך לעובדה. השאלה מפרידה בין פרשנות למציאות.',
-        GENERALIZATION: 'כשיש הכללה, מקרה אחד הופך לחוק. השאלה פותחת יותר אפשרויות תגובה.'
-    }[categoryKey] || 'השאלה מחזירה דיוק ומאפשרת תגובה טובה יותר.';
+        DELETION: '׳›׳©׳׳™׳“׳¢ ׳ ׳׳—׳§, ׳”׳׳¡׳§׳ ׳” ׳ ׳‘׳ ׳™׳× ׳¢׳ ׳—׳•׳¡׳¨ ׳ ׳×׳•׳ ׳™׳. ׳”׳©׳׳׳” ׳׳—׳–׳™׳¨׳” ׳₪׳¨׳˜׳™׳ ׳”׳›׳¨׳—׳™׳™׳.',
+        DISTORTION: '׳›׳©׳™׳© ׳¢׳™׳•׳•׳×, ׳₪׳™׳¨׳•׳© ׳”׳•׳₪׳ ׳׳¢׳•׳‘׳“׳”. ׳”׳©׳׳׳” ׳׳₪׳¨׳™׳“׳” ׳‘׳™׳ ׳₪׳¨׳©׳ ׳•׳× ׳׳׳¦׳™׳׳•׳×.',
+        GENERALIZATION: '׳›׳©׳™׳© ׳”׳›׳׳׳”, ׳׳§׳¨׳” ׳׳—׳“ ׳”׳•׳₪׳ ׳׳—׳•׳§. ׳”׳©׳׳׳” ׳₪׳•׳×׳—׳× ׳™׳•׳×׳¨ ׳׳₪׳©׳¨׳•׳™׳•׳× ׳×׳’׳•׳‘׳”.'
+    }[categoryKey] || '׳”׳©׳׳׳” ׳׳—׳–׳™׳¨׳” ׳“׳™׳•׳§ ׳•׳׳׳₪׳©׳¨׳× ׳×׳’׳•׳‘׳” ׳˜׳•׳‘׳” ׳™׳•׳×׳¨.';
 
     setPanelContent('why-display', `
-        <p><strong>למה זה חשוב בשאלה הזו?</strong></p>
+        <p><strong>׳׳׳” ׳–׳” ׳—׳©׳•׳‘ ׳‘׳©׳׳׳” ׳”׳–׳•?</strong></p>
         <p>${importanceText}</p>
-        <p><strong>מה המטרה כאן?</strong> להפוך אמירה כללית למידע מדויק שאפשר לעבוד איתו.</p>
+        <p><strong>׳׳” ׳”׳׳˜׳¨׳” ׳›׳׳?</strong> ׳׳”׳₪׳•׳ ׳׳׳™׳¨׳” ׳›׳׳׳™׳× ׳׳׳™׳“׳¢ ׳׳“׳•׳™׳§ ׳©׳׳₪׳©׳¨ ׳׳¢׳‘׳•׳“ ׳׳™׳×׳•.</p>
     `);
     playUISound('hint');
 }
@@ -3694,30 +3844,30 @@ function showTrainerDepth() {
 
     if (trainerState.deletionCoachMode) {
         setPanelContent('depth-display', `
-            <p><strong>מסגרת פתרון למחיקה (6 אפשרויות):</strong></p>
+            <p><strong>׳׳¡׳’׳¨׳× ׳₪׳×׳¨׳•׳ ׳׳׳—׳™׳§׳” (6 ׳׳₪׳©׳¨׳•׳™׳•׳×):</strong></p>
             <ul>
-                <li>שלב 1: זהה מה חסר במשפט כדי להבין את ההקשר בפועל.</li>
-                <li>שלב 2: סנן 3 אפשרויות שאינן מחיקה.</li>
-                <li>שלב 3: בין 3 שאלות המחיקה, דרג לפי תרומה: גבוהה, בינונית, נמוכה.</li>
-                <li>שלב 4: בחר את השאלה שמחזירה מידע מדיד/בר-בדיקה/מכוון פעולה.</li>
+                <li>׳©׳׳‘ 1: ׳–׳”׳” ׳׳” ׳—׳¡׳¨ ׳‘׳׳©׳₪׳˜ ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳׳× ׳”׳”׳§׳©׳¨ ׳‘׳₪׳•׳¢׳.</li>
+                <li>׳©׳׳‘ 2: ׳¡׳ ׳ 3 ׳׳₪׳©׳¨׳•׳™׳•׳× ׳©׳׳™׳ ׳ ׳׳—׳™׳§׳”.</li>
+                <li>׳©׳׳‘ 3: ׳‘׳™׳ 3 ׳©׳׳׳•׳× ׳”׳׳—׳™׳§׳”, ׳“׳¨׳’ ׳׳₪׳™ ׳×׳¨׳•׳׳”: ׳’׳‘׳•׳”׳”, ׳‘׳™׳ ׳•׳ ׳™׳×, ׳ ׳׳•׳›׳”.</li>
+                <li>׳©׳׳‘ 4: ׳‘׳—׳¨ ׳׳× ׳”׳©׳׳׳” ׳©׳׳—׳–׳™׳¨׳” ׳׳™׳“׳¢ ׳׳“׳™׳“/׳‘׳¨-׳‘׳“׳™׳§׳”/׳׳›׳•׳•׳ ׳₪׳¢׳•׳׳”.</li>
             </ul>
-            <p><strong>מטרת השאלה:</strong> חשיפת המידע החסר המשמעותי ביותר, לא רק \"עוד פירוט\".</p>
-            <p><strong>דוגמת מחיקה חזקה:</strong> "${escapeHtml(question.suggested_question || '')}"</p>
+            <p><strong>׳׳˜׳¨׳× ׳”׳©׳׳׳”:</strong> ׳—׳©׳™׳₪׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳׳©׳׳¢׳•׳×׳™ ׳‘׳™׳•׳×׳¨, ׳׳ ׳¨׳§ \"׳¢׳•׳“ ׳₪׳™׳¨׳•׳˜\".</p>
+            <p><strong>׳“׳•׳’׳׳× ׳׳—׳™׳§׳” ׳—׳–׳§׳”:</strong> "${escapeHtml(question.suggested_question || '')}"</p>
         `);
         playUISound('hint');
         return;
     }
 
     const depthTrack = {
-        easy: ['שלב 1: זהה מילה בעייתית.', 'שלב 2: שאל מה חסר.', 'שלב 3: נסח שאלה אחת מדויקת.'],
-        medium: ['שלב 1: זהה הנחה סמויה.', 'שלב 2: בדוק ראיות.', 'שלב 3: נסח חלופה מדויקת.'],
-        hard: ['שלב 1: זהה דפוס שפה.', 'שלב 2: מפה E/B/C/V/I/S בקצרה.', 'שלב 3: בחר Small Win להתקדמות.']
-    }[question.difficulty] || ['שלב 1: זהה דפוס.', 'שלב 2: שאל מה חסר.', 'שלב 3: בנה שאלה מדויקת.'];
+        easy: ['׳©׳׳‘ 1: ׳–׳”׳” ׳׳™׳׳” ׳‘׳¢׳™׳™׳×׳™׳×.', '׳©׳׳‘ 2: ׳©׳׳ ׳׳” ׳—׳¡׳¨.', '׳©׳׳‘ 3: ׳ ׳¡׳— ׳©׳׳׳” ׳׳—׳× ׳׳“׳•׳™׳§׳×.'],
+        medium: ['׳©׳׳‘ 1: ׳–׳”׳” ׳”׳ ׳—׳” ׳¡׳׳•׳™׳”.', '׳©׳׳‘ 2: ׳‘׳“׳•׳§ ׳¨׳׳™׳•׳×.', '׳©׳׳‘ 3: ׳ ׳¡׳— ׳—׳׳•׳₪׳” ׳׳“׳•׳™׳§׳×.'],
+        hard: ['׳©׳׳‘ 1: ׳–׳”׳” ׳“׳₪׳•׳¡ ׳©׳₪׳”.', '׳©׳׳‘ 2: ׳׳₪׳” E/B/C/V/I/S ׳‘׳§׳¦׳¨׳”.', '׳©׳׳‘ 3: ׳‘׳—׳¨ Small Win ׳׳”׳×׳§׳“׳׳•׳×.']
+    }[question.difficulty] || ['׳©׳׳‘ 1: ׳–׳”׳” ׳“׳₪׳•׳¡.', '׳©׳׳‘ 2: ׳©׳׳ ׳׳” ׳—׳¡׳¨.', '׳©׳׳‘ 3: ׳‘׳ ׳” ׳©׳׳׳” ׳׳“׳•׳™׳§׳×.'];
 
     setPanelContent('depth-display', `
-        <p><strong>עומק מומלץ לשאלה:</strong></p>
+        <p><strong>׳¢׳•׳׳§ ׳׳•׳׳׳¥ ׳׳©׳׳׳”:</strong></p>
         <ul>${depthTrack.map(step => `<li>${step}</li>`).join('')}</ul>
-        <p><strong>דוגמת שאלה:</strong> "${question.suggested_question}"</p>
+        <p><strong>׳“׳•׳’׳׳× ׳©׳׳׳”:</strong> "${question.suggested_question}"</p>
     `);
     playUISound('hint');
 }
@@ -3727,7 +3877,7 @@ function skipCurrentQuestion() {
     const question = trainerState.questions[trainerState.currentQuestion];
     trainerState.phaseSkippedCount++;
     addQuestionToReviewPool(question);
-    showHintMessage('דילגת לשאלה הבאה');
+    showHintMessage('׳“׳™׳׳’׳× ׳׳©׳׳׳” ׳”׳‘׳׳”');
     playUISound('skip');
     trainerState.currentQuestion++;
     loadNextQuestion();
@@ -3744,25 +3894,25 @@ function legacyEndTrainerSession() {
 
     let message = '';
     if (successRate === 100) {
-        message = 'מושלם! כל התשובות נכונות';
+        message = '׳׳•׳©׳׳! ׳›׳ ׳”׳×׳©׳•׳‘׳•׳× ׳ ׳›׳•׳ ׳•׳×';
     } else if (successRate >= 80) {
-        message = 'מעולה! רמת דיוק גבוהה מאוד';
+        message = '׳׳¢׳•׳׳”! ׳¨׳׳× ׳“׳™׳•׳§ ׳’׳‘׳•׳”׳” ׳׳׳•׳“';
     } else if (successRate >= 60) {
-        message = 'טוב מאוד, עוד חידוד קטן ואתה שם';
+        message = '׳˜׳•׳‘ ׳׳׳•׳“, ׳¢׳•׳“ ׳—׳™׳“׳•׳“ ׳§׳˜׳ ׳•׳׳×׳” ׳©׳';
     } else {
-        message = 'התחלה טובה, ממשיכים לתרגול נוסף';
+        message = '׳”׳×׳—׳׳” ׳˜׳•׳‘׳”, ׳׳׳©׳™׳›׳™׳ ׳׳×׳¨׳’׳•׳ ׳ ׳•׳¡׳£';
     }
 
     feedbackContent.innerHTML = `
         <div class="correct" style="text-align: center;">
             <h2>${message}</h2>
             <p style="font-size: 1.05em;">
-                <strong>ציון סופי:</strong> ${trainerState.correctCount} / ${trainerState.questions.length}<br>
-                <strong>קצב הצלחה:</strong> ${successRate}%<br>
-                <strong>XP שהרווחת:</strong> +${trainerState.sessionXP}<br>
-                <strong>דילוגים:</strong> ${trainerState.skippedCount}
+                <strong>׳¦׳™׳•׳ ׳¡׳•׳₪׳™:</strong> ${trainerState.correctCount} / ${trainerState.questions.length}<br>
+                <strong>׳§׳¦׳‘ ׳”׳¦׳׳—׳”:</strong> ${successRate}%<br>
+                <strong>XP ׳©׳”׳¨׳•׳•׳—׳×:</strong> +${trainerState.sessionXP}<br>
+                <strong>׳“׳™׳׳•׳’׳™׳:</strong> ${trainerState.skippedCount}
             </p>
-            <button class="btn btn-primary" onclick="resetTrainer()" style="margin-top: 20px; width: 100%;">תרגול נוסף →</button>
+            <button class="btn btn-primary" onclick="resetTrainer()" style="margin-top: 20px; width: 100%;">׳×׳¨׳’׳•׳ ׳ ׳•׳¡׳£ ג†’</button>
         </div>
     `;
 
@@ -3867,15 +4017,15 @@ function endTrainerSession() {
 
         feedbackContent.innerHTML = `
             <div class="correct" style="text-align: center;">
-                <h2>סיימת את הסשן הראשי</h2>
+                <h2>׳¡׳™׳™׳׳× ׳׳× ׳”׳¡׳©׳ ׳”׳¨׳׳©׳™</h2>
                 <p style="font-size: 1.02em;">
-                    <strong>ציון ראשי:</strong> ${mainCorrect} / ${mainTotal} (${mainRate}%)<br>
-                    <strong>XP שנצבר:</strong> +${trainerState.sessionXP}<br>
-                    <strong>שאלות לחיזוק:</strong> ${weakCount}
+                    <strong>׳¦׳™׳•׳ ׳¨׳׳©׳™:</strong> ${mainCorrect} / ${mainTotal} (${mainRate}%)<br>
+                    <strong>XP ׳©׳ ׳¦׳‘׳¨:</strong> +${trainerState.sessionXP}<br>
+                    <strong>׳©׳׳׳•׳× ׳׳—׳™׳–׳•׳§:</strong> ${weakCount}
                 </p>
-                <p style="margin-top: 12px; color: #2c5282; font-weight: 700;">Review Loop מוכן עבורך עם השאלות שדורשות חיזוק.</p>
-                <button class="btn btn-primary" onclick="startReviewLoop()" style="margin-top: 12px; width: 100%;">התחל Review Loop</button>
-                <button class="btn btn-secondary" onclick="finishTrainerSession()" style="margin-top: 10px; width: 100%;">סיים בלי Review</button>
+                <p style="margin-top: 12px; color: #2c5282; font-weight: 700;">Review Loop ׳׳•׳›׳ ׳¢׳‘׳•׳¨׳ ׳¢׳ ׳”׳©׳׳׳•׳× ׳©׳“׳•׳¨׳©׳•׳× ׳—׳™׳–׳•׳§.</p>
+                <button class="btn btn-primary" onclick="startReviewLoop()" style="margin-top: 12px; width: 100%;">׳”׳×׳—׳ Review Loop</button>
+                <button class="btn btn-secondary" onclick="finishTrainerSession()" style="margin-top: 10px; width: 100%;">׳¡׳™׳™׳ ׳‘׳׳™ Review</button>
             </div>
         `;
 
@@ -3927,7 +4077,7 @@ function startReviewLoop() {
         feedbackSection.classList.remove('visible');
     }
 
-    showHintMessage(`Review Loop התחיל: ${reviewQuestions.length} שאלות לחיזוק`);
+    showHintMessage(`Review Loop ׳”׳×׳—׳™׳: ${reviewQuestions.length} ׳©׳׳׳•׳× ׳׳—׳™׳–׳•׳§`);
     playUISound('start');
     loadNextQuestion();
 }
@@ -3953,15 +4103,15 @@ function finishTrainerSession() {
 
     let message = '';
     if (reviewTotal > 0 && reviewRate >= 80) {
-        message = 'חזק מאוד. סגרת פינות קריטיות ב-Review Loop';
+        message = '׳—׳–׳§ ׳׳׳•׳“. ׳¡׳’׳¨׳× ׳₪׳™׳ ׳•׳× ׳§׳¨׳™׳˜׳™׳•׳× ׳‘-Review Loop';
     } else if (mainRate === 100) {
-        message = 'מושלם! כל התשובות נכונות';
+        message = '׳׳•׳©׳׳! ׳›׳ ׳”׳×׳©׳•׳‘׳•׳× ׳ ׳›׳•׳ ׳•׳×';
     } else if (mainRate >= 80) {
-        message = 'מעולה! רמת דיוק גבוהה מאוד';
+        message = '׳׳¢׳•׳׳”! ׳¨׳׳× ׳“׳™׳•׳§ ׳’׳‘׳•׳”׳” ׳׳׳•׳“';
     } else if (mainRate >= 60) {
-        message = 'טוב מאוד, עוד חידוד קטן ואתה שם';
+        message = '׳˜׳•׳‘ ׳׳׳•׳“, ׳¢׳•׳“ ׳—׳™׳“׳•׳“ ׳§׳˜׳ ׳•׳׳×׳” ׳©׳';
     } else {
-        message = 'התחלה טובה, ממשיכים לתרגול נוסף';
+        message = '׳”׳×׳—׳׳” ׳˜׳•׳‘׳”, ׳׳׳©׳™׳›׳™׳ ׳׳×׳¨׳’׳•׳ ׳ ׳•׳¡׳£';
     }
 
     const reviewLine = reviewTotal
@@ -3972,12 +4122,12 @@ function finishTrainerSession() {
         <div class="correct" style="text-align: center;">
             <h2>${message}</h2>
             <p style="font-size: 1.05em;">
-                <strong>ציון ריצה ראשית:</strong> ${mainCorrect} / ${mainTotal} (${mainRate}%)<br>
+                <strong>׳¦׳™׳•׳ ׳¨׳™׳¦׳” ׳¨׳׳©׳™׳×:</strong> ${mainCorrect} / ${mainTotal} (${mainRate}%)<br>
                 ${reviewLine}
-                <strong>XP שהרווחת:</strong> +${trainerState.sessionXP}<br>
-                <strong>דילוגים:</strong> ${trainerState.mainSkippedCount}
+                <strong>XP ׳©׳”׳¨׳•׳•׳—׳×:</strong> +${trainerState.sessionXP}<br>
+                <strong>׳“׳™׳׳•׳’׳™׳:</strong> ${trainerState.mainSkippedCount}
             </p>
-            <button class="btn btn-primary" onclick="resetTrainer()" style="margin-top: 20px; width: 100%;">תרגול נוסף →</button>
+            <button class="btn btn-primary" onclick="resetTrainer()" style="margin-top: 20px; width: 100%;">׳×׳¨׳’׳•׳ ׳ ׳•׳¡׳£ ג†’</button>
         </div>
     `;
 
@@ -4079,7 +4229,7 @@ async function loadScenarioTrainerData() {
         return true;
     } catch (error) {
         console.error('Scenario data load failed', error);
-        showHint('לא הצלחנו לטעון את סצנות ה-Scenario Trainer');
+        showHint('׳׳ ׳”׳¦׳׳—׳ ׳• ׳׳˜׳¢׳•׳ ׳׳× ׳¡׳¦׳ ׳•׳× ׳”-Scenario Trainer');
         return false;
     }
 }
@@ -4132,7 +4282,7 @@ function containsScenarioSafetyRisk(text) {
     const value = String(text).toLowerCase();
     const keywords = scenarioTrainerData.safetyKeywords.length
         ? scenarioTrainerData.safetyKeywords
-        : ['להתאבד', 'לפגוע בעצמי', 'למות', 'suicide', 'kill myself', 'self harm'];
+        : ['׳׳”׳×׳׳‘׳“', '׳׳₪׳’׳•׳¢ ׳‘׳¢׳¦׳׳™', '׳׳׳•׳×', 'suicide', 'kill myself', 'self harm'];
     return keywords.some(keyword => value.includes(String(keyword).toLowerCase()));
 }
 
@@ -4160,8 +4310,8 @@ function populateScenarioSelects() {
     const difficultySelect = document.getElementById('scenario-difficulty-select');
     const settingsDifficultySelect = document.getElementById('scenario-setting-difficulty');
 
-    const domainOptions = [{ id: 'all', label: 'כל התחומים' }, ...scenarioTrainerData.domains];
-    const difficultyOptions = [{ id: 'all', label: 'כל הרמות' }, ...scenarioTrainerData.difficulties];
+    const domainOptions = [{ id: 'all', label: '׳›׳ ׳”׳×׳—׳•׳׳™׳' }, ...scenarioTrainerData.domains];
+    const difficultyOptions = [{ id: 'all', label: '׳›׳ ׳”׳¨׳׳•׳×' }, ...scenarioTrainerData.difficulties];
 
     const renderOptions = (selectEl, items) => {
         if (!selectEl) return;
@@ -4209,10 +4359,10 @@ function renderScenarioHomeStats() {
     const stars = scenarioTrainer.progress.stars || 0;
 
     const stats = [
-        `סה"כ סצנות: ${completed}`,
-        `אחוז ירוק: ${successRate}%`,
-        `רצף שיא: ${bestStreak}`,
-        `כוכבים: ${stars}`
+        `׳¡׳”"׳› ׳¡׳¦׳ ׳•׳×: ${completed}`,
+        `׳׳—׳•׳– ׳™׳¨׳•׳§: ${successRate}%`,
+        `׳¨׳¦׳£ ׳©׳™׳: ${bestStreak}`,
+        `׳›׳•׳›׳‘׳™׳: ${stars}`
     ];
 
     el.innerHTML = '';
@@ -4237,7 +4387,7 @@ function openScenarioDomainPicker() {
         return;
     }
     if (!scenarioTrainerData.scenarios.length) {
-        showHint('אין סצנות זמינות כרגע');
+        showHint('׳׳™׳ ׳¡׳¦׳ ׳•׳× ׳–׳׳™׳ ׳•׳× ׳›׳¨׳’׳¢');
         return;
     }
     scenarioTransitionTo(SCENARIO_STATES.DOMAIN_PICK, true);
@@ -4288,19 +4438,19 @@ function getScenarioOptions(scenario) {
     }
 
     const defaultRed = (scenarioTrainerData.optionTemplates?.red || [
-        { id: 'A', emoji: '😡', text: 'מה הבעיה איתך? אתה עצלן.', type: 'red_identity_blame', score: 0, feedback: 'מאשים זהות במקום למפות חסר.' },
-        { id: 'B', emoji: '🙄', text: 'בגילך כבר הייתי יודע לעשות את זה.', type: 'red_comparison_shame', score: 0, feedback: 'השוואה מעלה בושה ומורידה פתרון.' },
-        { id: 'C', emoji: '🥴', text: 'עזוב, אני אעשה את זה במקום.', type: 'red_overtake', score: 0, feedback: 'לקיחת משימה במקומך מונעת למידה.' },
-        { id: 'D', emoji: '😬', text: 'כן כן, אחר כך נטפל בזה.', type: 'red_avoid_pretend', score: 0, feedback: 'דחייה בלי פירוק מגדילה תקיעות.' }
+        { id: 'A', emoji: 'נ˜¡', text: '׳׳” ׳”׳‘׳¢׳™׳” ׳׳™׳×׳? ׳׳×׳” ׳¢׳¦׳׳.', type: 'red_identity_blame', score: 0, feedback: '׳׳׳©׳™׳ ׳–׳”׳•׳× ׳‘׳׳§׳•׳ ׳׳׳₪׳•׳× ׳—׳¡׳¨.' },
+        { id: 'B', emoji: 'נ™„', text: '׳‘׳’׳™׳׳ ׳›׳‘׳¨ ׳”׳™׳™׳×׳™ ׳™׳•׳“׳¢ ׳׳¢׳©׳•׳× ׳׳× ׳–׳”.', type: 'red_comparison_shame', score: 0, feedback: '׳”׳©׳•׳•׳׳” ׳׳¢׳׳” ׳‘׳•׳©׳” ׳•׳׳•׳¨׳™׳“׳” ׳₪׳×׳¨׳•׳.' },
+        { id: 'C', emoji: 'נ¥´', text: '׳¢׳–׳•׳‘, ׳׳ ׳™ ׳׳¢׳©׳” ׳׳× ׳–׳” ׳‘׳׳§׳•׳.', type: 'red_overtake', score: 0, feedback: '׳׳§׳™׳—׳× ׳׳©׳™׳׳” ׳‘׳׳§׳•׳׳ ׳׳•׳ ׳¢׳× ׳׳׳™׳“׳”.' },
+        { id: 'D', emoji: 'נ˜¬', text: '׳›׳ ׳›׳, ׳׳—׳¨ ׳›׳ ׳ ׳˜׳₪׳ ׳‘׳–׳”.', type: 'red_avoid_pretend', score: 0, feedback: '׳“׳—׳™׳™׳” ׳‘׳׳™ ׳₪׳™׳¨׳•׳§ ׳׳’׳“׳™׳׳” ׳×׳§׳™׳¢׳•׳×.' }
     ]).slice(0, 4);
 
     const greenTemplate = scenarioTrainerData.optionTemplates?.green || {
         id: 'E',
-        emoji: '✅🙂',
-        text: 'בוא נפרק: מה ניסית? איפה נתקעת? מה הצעד הראשון?',
+        emoji: 'ג…נ™‚',
+        text: '׳‘׳•׳ ׳ ׳₪׳¨׳§: ׳׳” ׳ ׳™׳¡׳™׳×? ׳׳™׳₪׳” ׳ ׳×׳§׳¢׳×? ׳׳” ׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳?',
         type: 'green_meta_model',
         score: 1,
-        feedback: 'מפרק הוראה עמומה לצעדים ניתנים לביצוע.'
+        feedback: '׳׳₪׳¨׳§ ׳”׳•׳¨׳׳” ׳¢׳׳•׳׳” ׳׳¦׳¢׳“׳™׳ ׳ ׳™׳×׳ ׳™׳ ׳׳‘׳™׳¦׳•׳¢.'
     };
 
     const greenText = scenario?.greenSentence || greenTemplate.text;
@@ -4325,7 +4475,7 @@ function startScenarioRun() {
         return;
     }
     if (!scenarioTrainerData.scenarios.length) {
-        showHint('נתוני הסצנות עדיין לא נטענו');
+        showHint('׳ ׳×׳•׳ ׳™ ׳”׳¡׳¦׳ ׳•׳× ׳¢׳“׳™׳™׳ ׳׳ ׳ ׳˜׳¢׳ ׳•');
         return;
     }
 
@@ -4342,7 +4492,7 @@ function startScenarioRun() {
 
     const queue = buildScenarioQueue(domain, difficulty, runSize);
     if (!queue.length) {
-        showHint('לא נמצאו סצנות למסנן שבחרת');
+        showHint('׳׳ ׳ ׳׳¦׳׳• ׳¡׳¦׳ ׳•׳× ׳׳׳¡׳ ׳ ׳©׳‘׳—׳¨׳×');
         return;
     }
 
@@ -4379,7 +4529,7 @@ function renderScenarioPlayScreen() {
     const progress = Math.round(((currentIndex - 1) / total) * 100);
     const storyContainer = document.getElementById('scenario-story-lines');
     const optionsContainer = document.getElementById('scenario-options-container');
-    const roleLabel = scenario?.expectation?.speaker || scenario?.role || 'דובר';
+    const roleLabel = scenario?.expectation?.speaker || scenario?.role || '׳“׳•׳‘׳¨';
 
     const currentIndexEl = document.getElementById('scenario-current-index');
     const totalCountEl = document.getElementById('scenario-total-count');
@@ -4389,17 +4539,26 @@ function renderScenarioPlayScreen() {
     const roleEl = document.getElementById('scenario-role');
     const titleEl = document.getElementById('scenario-title');
     const unspecifiedEl = document.getElementById('scenario-unspecified-verb');
+    const contextPressureEl = document.getElementById('scenario-context-pressure');
+    const contextBeliefEl = document.getElementById('scenario-context-belief');
+    const contextStuckEl = document.getElementById('scenario-context-stuck');
+    const liveFocusEl = document.getElementById('scenario-live-focus');
 
     if (currentIndexEl) currentIndexEl.textContent = String(currentIndex);
     if (totalCountEl) totalCountEl.textContent = String(total);
     if (sessionScoreEl) sessionScoreEl.textContent = String(scenarioTrainer.session.score);
     if (sessionStreakEl) sessionStreakEl.textContent = String(scenarioTrainer.session.streak);
     if (progressFill) progressFill.style.width = `${progress}%`;
-    if (roleEl) roleEl.textContent = `תפקיד: ${roleLabel}`;
-    if (titleEl) titleEl.textContent = scenario.title || 'סצנה';
-    if (unspecifiedEl) unspecifiedEl.textContent = `נו, פשוט ${scenario.unspecifiedVerb || 'תעשה את זה'}`;
+    if (roleEl) roleEl.textContent = `׳׳™ ׳׳“׳‘׳¨ ׳›׳׳: ${roleLabel}`;
+    if (titleEl) titleEl.textContent = scenario.title || '׳¡׳¦׳ ׳”';
+    if (unspecifiedEl) unspecifiedEl.textContent = scenario.unspecifiedVerb || '׳׳¢׳©׳•׳× ׳׳× ׳–׳”';
 
     renderScenarioPredicateAnalysis(scenario);
+    const analysis = scenarioTrainer.currentPredicateAnalysis || buildScenarioPredicateAnalysis(scenario);
+    if (contextPressureEl) contextPressureEl.textContent = scenario?.expectation?.pressure || '׳׳ ׳¦׳•׳™׳';
+    if (contextBeliefEl) contextBeliefEl.textContent = scenario?.expectation?.belief || '׳׳ ׳¦׳•׳™׳';
+    if (contextStuckEl) contextStuckEl.textContent = scenario?.stuckPointHint || '׳׳ ׳¦׳•׳™׳';
+    if (liveFocusEl) liveFocusEl.textContent = analysis?.missingAction || '׳‘׳—׳¨/׳™ ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳§׳¦׳¨ ׳•׳׳“׳™׳“.';
 
     if (storyContainer) {
         storyContainer.innerHTML = '';
@@ -4413,10 +4572,20 @@ function renderScenarioPlayScreen() {
     if (optionsContainer) {
         optionsContainer.innerHTML = '';
         getScenarioOptions(scenario).forEach(option => {
+            const isGreen = Number(option.score) === 1 || String(option.type).includes('green');
+            const optionTitle = `${option.emoji || ''} ${option.text || ''}`.trim();
+            const optionHint = isGreen
+                ? '׳×׳’׳•׳‘׳” ׳׳§׳“׳׳×: ׳₪׳™׳¨׳•׳§, ׳‘׳™׳¨׳•׳¨, ׳•׳¦׳¢׳“ ׳¨׳׳©׳•׳.'
+                : '׳×׳’׳•׳‘׳” ׳׳¢׳›׳‘׳×: ׳”׳׳©׳׳”/׳”׳©׳•׳•׳׳”/׳“׳—׳™׳™׳” ׳‘׳׳™ ׳₪׳™׳¨׳•׳§.';
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = `scenario-option-btn ${String(option.type).includes('green') ? 'green' : 'red'}`;
-            btn.textContent = `${option.emoji || ''} ${option.text || ''}`.trim();
+            btn.className = `scenario-option-btn ${isGreen ? 'green' : 'red'}`;
+            btn.innerHTML = `
+                <span class="scenario-option-kind">${isGreen ? '׳›׳™׳•׳•׳ ׳™׳¨׳•׳§' : '׳›׳™׳•׳•׳ ׳׳“׳•׳'}</span>
+                <span class="scenario-option-main">${escapeHtml(optionTitle)}</span>
+                <span class="scenario-option-hint">${escapeHtml(optionHint)}</span>
+            `;
+            btn.setAttribute('aria-label', optionTitle);
             btn.setAttribute('data-option-id', option.id);
             btn.addEventListener('click', () => pickScenarioOption(option.id));
             optionsContainer.appendChild(btn);
@@ -4460,13 +4629,13 @@ function renderScenarioFeedback(option, isGreen) {
     const consequenceResult = document.getElementById('scenario-consequence-result');
 
     if (mark) {
-        mark.textContent = isGreen ? '✓' : 'X';
+        mark.textContent = isGreen ? 'ג“' : 'X';
         mark.className = `scenario-feedback-mark ${isGreen ? 'success' : 'fail'}`;
         // Restart animation each feedback screen.
         void mark.offsetWidth;
         mark.classList.add('animate');
     }
-    if (title) title.textContent = isGreen ? 'תגובה ירוקה: פירוק לתהליך' : 'תגובה אדומה: האשמה/התחמקות';
+    if (title) title.textContent = isGreen ? '׳×׳’׳•׳‘׳” ׳™׳¨׳•׳§׳”: ׳₪׳™׳¨׳•׳§ ׳׳×׳”׳׳™׳' : '׳×׳’׳•׳‘׳” ׳׳“׳•׳׳”: ׳”׳׳©׳׳”/׳”׳×׳—׳׳§׳•׳×';
     if (text) text.textContent = option.feedback || '';
     renderScenarioConsequence(option, isGreen, consequenceBox, consequenceTitle, consequenceAction, consequenceResult);
 
@@ -4486,18 +4655,18 @@ function resolveScenarioConsequence(option, isGreen) {
 
     if (isGreen) {
         return {
-            icon: '🛠️',
-            title: 'מה קורה אחרי בחירה ירוקה?',
-            action: 'שואלים שאלת פירוק במקום להאשים.',
-            result: 'המשימה הופכת לצעד ראשון שאפשר לבצע.'
+            icon: 'נ› ן¸',
+            title: '׳׳” ׳§׳•׳¨׳” ׳׳—׳¨׳™ ׳‘׳—׳™׳¨׳” ׳™׳¨׳•׳§׳”?',
+            action: '׳©׳•׳׳׳™׳ ׳©׳׳׳× ׳₪׳™׳¨׳•׳§ ׳‘׳׳§׳•׳ ׳׳”׳׳©׳™׳.',
+            result: '׳”׳׳©׳™׳׳” ׳”׳•׳₪׳›׳× ׳׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳©׳׳₪׳©׳¨ ׳׳‘׳¦׳¢.'
         };
     }
 
     return {
-        icon: '💥',
-        title: 'מה קורה אם ממשיכים בדרך הישנה?',
-        action: 'ממשיכים לנחש/להאשים בלי לבדוק מה נתקע.',
-        result: 'המשימה נתקעת, הלחץ עולה, ולעיתים נוצרת תקלה אמיתית.'
+        icon: 'נ’¥',
+        title: '׳׳” ׳§׳•׳¨׳” ׳׳ ׳׳׳©׳™׳›׳™׳ ׳‘׳“׳¨׳ ׳”׳™׳©׳ ׳”?',
+        action: '׳׳׳©׳™׳›׳™׳ ׳׳ ׳—׳©/׳׳”׳׳©׳™׳ ׳‘׳׳™ ׳׳‘׳“׳•׳§ ׳׳” ׳ ׳×׳§׳¢.',
+        result: '׳”׳׳©׳™׳׳” ׳ ׳×׳§׳¢׳×, ׳”׳׳—׳¥ ׳¢׳•׳׳”, ׳•׳׳¢׳™׳×׳™׳ ׳ ׳•׳¦׳¨׳× ׳×׳§׳׳” ׳׳׳™׳×׳™׳×.'
     };
 }
 
@@ -4508,8 +4677,8 @@ function renderScenarioConsequence(option, isGreen, box, titleEl, actionEl, resu
     box.classList.remove('hidden', 'red', 'green');
     box.classList.add(isGreen ? 'green' : 'red');
     titleEl.textContent = `${consequence.icon || ''} ${consequence.title || ''}`.trim();
-    actionEl.innerHTML = `<strong>מה קורה מיד אחרי זה:</strong> ${consequence.action || ''}`;
-    resultEl.innerHTML = `<strong>התוצאה בפועל:</strong> ${consequence.result || ''}`;
+    actionEl.innerHTML = `<strong>׳׳” ׳§׳•׳¨׳” ׳׳™׳“ ׳׳—׳¨׳™ ׳–׳”:</strong> ${consequence.action || ''}`;
+    resultEl.innerHTML = `<strong>׳”׳×׳•׳¦׳׳” ׳‘׳₪׳•׳¢׳:</strong> ${consequence.result || ''}`;
 }
 
 function getScenarioGreenOptionText(scenario) {
@@ -4519,45 +4688,45 @@ function getScenarioGreenOptionText(scenario) {
 }
 
 const SCENARIO_PREDICATE_TYPE_LABELS = Object.freeze({
-    action: 'פועל פעולה',
-    process: 'תהליך / קורה לי',
-    state: 'מצב / זהות מקוצרת'
+    action: '׳₪׳¢׳•׳׳”',
+    process: '׳×׳”׳׳™׳',
+    state: '׳׳¦׳‘/׳–׳”׳•׳×'
 });
 
 const SCENARIO_STATE_NORMALIZATION_RULES = Object.freeze([
-    { pattern: /תקוע|תקועה/, normalizedVerb: 'להיתקע בלופ ולא להתקדם', missingAction: 'להגדיר צעד ראשון מדיד ולבצע אותו מיד' },
-    { pattern: /כישלון|כשלון|אפס/, normalizedVerb: 'להדביק זהות שלילית במקום לתאר פעולה', missingAction: 'לתאר פעולה קטנה שניתן לבצע ב-10 דקות' },
-    { pattern: /לא מסוגל|לא מסוגלת|לא יכול|לא יכולה/, normalizedVerb: 'לחסום יכולת לפני בדיקת תנאים', missingAction: 'לבדוק מה אפשר לבצע גם אם רק ב-5% הצלחה' },
-    { pattern: /אין סיכוי|חסר סיכוי|אבוד|אבודה/, normalizedVerb: 'להפוך מצב לקביעה גורלית', missingAction: 'לאתר תנאים שבהם זה קצת פחות נכון' }
+    { pattern: /׳×׳§׳•׳¢|׳×׳§׳•׳¢׳”/, normalizedVerb: '׳׳”׳™׳×׳§׳¢ ׳‘׳׳•׳₪ ׳•׳׳ ׳׳”׳×׳§׳“׳', missingAction: '׳׳”׳’׳“׳™׳¨ ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳׳“׳™׳“ ׳•׳׳‘׳¦׳¢ ׳׳•׳×׳• ׳׳™׳“' },
+    { pattern: /׳›׳™׳©׳׳•׳|׳›׳©׳׳•׳|׳׳₪׳¡/, normalizedVerb: '׳׳”׳“׳‘׳™׳§ ׳–׳”׳•׳× ׳©׳׳™׳׳™׳× ׳‘׳׳§׳•׳ ׳׳×׳׳¨ ׳₪׳¢׳•׳׳”', missingAction: '׳׳×׳׳¨ ׳₪׳¢׳•׳׳” ׳§׳˜׳ ׳” ׳©׳ ׳™׳×׳ ׳׳‘׳¦׳¢ ׳‘-10 ׳“׳§׳•׳×' },
+    { pattern: /׳׳ ׳׳¡׳•׳’׳|׳׳ ׳׳¡׳•׳’׳׳×|׳׳ ׳™׳›׳•׳|׳׳ ׳™׳›׳•׳׳”/, normalizedVerb: '׳׳—׳¡׳•׳ ׳™׳›׳•׳׳× ׳׳₪׳ ׳™ ׳‘׳“׳™׳§׳× ׳×׳ ׳׳™׳', missingAction: '׳׳‘׳“׳•׳§ ׳׳” ׳׳₪׳©׳¨ ׳׳‘׳¦׳¢ ׳’׳ ׳׳ ׳¨׳§ ׳‘-5% ׳”׳¦׳׳—׳”' },
+    { pattern: /׳׳™׳ ׳¡׳™׳›׳•׳™|׳—׳¡׳¨ ׳¡׳™׳›׳•׳™|׳׳‘׳•׳“|׳׳‘׳•׳“׳”/, normalizedVerb: '׳׳”׳₪׳•׳ ׳׳¦׳‘ ׳׳§׳‘׳™׳¢׳” ׳’׳•׳¨׳׳™׳×', missingAction: '׳׳׳×׳¨ ׳×׳ ׳׳™׳ ׳©׳‘׳”׳ ׳–׳” ׳§׳¦׳× ׳₪׳—׳•׳× ׳ ׳›׳•׳' }
 ]);
 
 const SCENARIO_PROCESS_HINTS = Object.freeze([
-    { pattern: /מציף|מציפה/, normalizedVerb: 'להיות מוצף ולהפסיק לחשוב בצעדים', missingAction: 'לעצור, לנשום, ולפרק למשימת מיקרו אחת' },
-    { pattern: /נתקע|נתקעת|נתקעים/, normalizedVerb: 'להיכנס ללולאת עצירה', missingAction: 'לבחור צעד ראשון קצר עם מדד סיום ברור' },
-    { pattern: /משתלט|משתלטת/, normalizedVerb: 'לתת לתגובה אוטומטית לנהל את המהלך', missingAction: 'להחזיר שליטה דרך שאלה קונקרטית אחת' }
+    { pattern: /׳׳¦׳™׳£|׳׳¦׳™׳₪׳”/, normalizedVerb: '׳׳”׳™׳•׳× ׳׳•׳¦׳£ ׳•׳׳”׳₪׳¡׳™׳§ ׳׳—׳©׳•׳‘ ׳‘׳¦׳¢׳“׳™׳', missingAction: '׳׳¢׳¦׳•׳¨, ׳׳ ׳©׳•׳, ׳•׳׳₪׳¨׳§ ׳׳׳©׳™׳׳× ׳׳™׳§׳¨׳• ׳׳—׳×' },
+    { pattern: /׳ ׳×׳§׳¢|׳ ׳×׳§׳¢׳×|׳ ׳×׳§׳¢׳™׳/, normalizedVerb: '׳׳”׳™׳›׳ ׳¡ ׳׳׳•׳׳׳× ׳¢׳¦׳™׳¨׳”', missingAction: '׳׳‘׳—׳•׳¨ ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳§׳¦׳¨ ׳¢׳ ׳׳“׳“ ׳¡׳™׳•׳ ׳‘׳¨׳•׳¨' },
+    { pattern: /׳׳©׳×׳׳˜|׳׳©׳×׳׳˜׳×/, normalizedVerb: '׳׳×׳× ׳׳×׳’׳•׳‘׳” ׳׳•׳˜׳•׳׳˜׳™׳× ׳׳ ׳”׳ ׳׳× ׳”׳׳”׳׳', missingAction: '׳׳”׳—׳–׳™׳¨ ׳©׳׳™׳˜׳” ׳“׳¨׳ ׳©׳׳׳” ׳§׳•׳ ׳§׳¨׳˜׳™׳× ׳׳—׳×' }
 ]);
 
 const SCENARIO_DYNAMIC_QUESTIONS = Object.freeze({
     action: Object.freeze([
-        'מה הצעד הראשון של הפועל הזה אצלך?',
-        'מה קורה בין ההחלטה לבין רגע הוויתור?',
-        'איך נראה סימן "בוצע" ברור?'
+        '׳׳” ׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳ ׳©׳ ׳”׳₪׳•׳¢׳ ׳”׳–׳” ׳׳¦׳׳?',
+        '׳׳” ׳§׳•׳¨׳” ׳‘׳™׳ ׳”׳”׳—׳׳˜׳” ׳׳‘׳™׳ ׳¨׳’׳¢ ׳”׳•׳•׳™׳×׳•׳¨?',
+        '׳׳™׳ ׳ ׳¨׳׳” ׳¡׳™׳׳ "׳‘׳•׳¦׳¢" ׳‘׳¨׳•׳¨?'
     ]),
     process: Object.freeze([
-        'מה האות הראשון בגוף שזה מתחיל?',
-        'מה קורה אוטומטית בלי החלטה מודעת?',
-        'מה אתה עושה שמגדיל או מקטין את התהליך הזה?'
+        '׳׳” ׳”׳׳•׳× ׳”׳¨׳׳©׳•׳ ׳‘׳’׳•׳£ ׳©׳–׳” ׳׳×׳—׳™׳?',
+        '׳׳” ׳§׳•׳¨׳” ׳׳•׳˜׳•׳׳˜׳™׳× ׳‘׳׳™ ׳”׳—׳׳˜׳” ׳׳•׳“׳¢׳×?',
+        '׳׳” ׳׳×׳” ׳¢׳•׳©׳” ׳©׳׳’׳“׳™׳ ׳׳• ׳׳§׳˜׳™׳ ׳׳× ׳”׳×׳”׳׳™׳ ׳”׳–׳”?'
     ]),
     state: Object.freeze([
-        'אם היינו מצלמה, מה בדיוק רואים שאתה עושה כשזה קורה?',
-        'מה לא קורה שהיית מצפה שיקרה?',
-        'ביחס למה זה "תקוע" - יעד, החלטה או פעולה מסוימת?'
+        '׳׳ ׳”׳™׳™׳ ׳• ׳׳¦׳׳׳”, ׳׳” ׳‘׳“׳™׳•׳§ ׳¨׳•׳׳™׳ ׳©׳׳×׳” ׳¢׳•׳©׳” ׳›׳©׳–׳” ׳§׳•׳¨׳”?',
+        '׳׳” ׳׳ ׳§׳•׳¨׳” ׳©׳”׳™׳™׳× ׳׳¦׳₪׳” ׳©׳™׳§׳¨׳”?',
+        '׳‘׳™׳—׳¡ ׳׳׳” ׳–׳” "׳×׳§׳•׳¢" - ׳™׳¢׳“, ׳”׳—׳׳˜׳” ׳׳• ׳₪׳¢׳•׳׳” ׳׳¡׳•׳™׳׳×?'
     ])
 });
 
 function getScenarioPredicateBaseText(scenario) {
     const raw = String(scenario?.predicate || scenario?.unspecifiedVerb || '').trim();
-    return raw || 'לעשות את זה';
+    return raw || '׳׳¢׳©׳•׳× ׳׳× ׳–׳”';
 }
 
 function inferScenarioPredicateType(scenario) {
@@ -4568,13 +4737,13 @@ function inferScenarioPredicateType(scenario) {
     const haystack = `${predicate} ${story} ${stuck} ${belief}`;
 
     if (
-        /תקוע|תקועה|כישלון|כשלון|אפס|לא מסוגל|לא מסוגלת|אין סיכוי|אבוד|אבודה/.test(haystack) ||
-        /^להיות\b/.test(predicate)
+        /׳×׳§׳•׳¢|׳×׳§׳•׳¢׳”|׳›׳™׳©׳׳•׳|׳›׳©׳׳•׳|׳׳₪׳¡|׳׳ ׳׳¡׳•׳’׳|׳׳ ׳׳¡׳•׳’׳׳×|׳׳™׳ ׳¡׳™׳›׳•׳™|׳׳‘׳•׳“|׳׳‘׳•׳“׳”/.test(haystack) ||
+        /^׳׳”׳™׳•׳×\b/.test(predicate)
     ) {
         return 'state';
     }
 
-    if (/נתקע|נתקעת|מציף|מציפה|משתלט|קופא|ננעל|לחוץ/.test(haystack)) {
+    if (/׳ ׳×׳§׳¢|׳ ׳×׳§׳¢׳×|׳׳¦׳™׳£|׳׳¦׳™׳₪׳”|׳׳©׳×׳׳˜|׳§׳•׳₪׳|׳ ׳ ׳¢׳|׳׳—׳•׳¥/.test(haystack)) {
         return 'process';
     }
 
@@ -4584,7 +4753,7 @@ function inferScenarioPredicateType(scenario) {
 function resolveScenarioPredicateNormalization(predicate, type, scenario) {
     const normalizedPredicate = normalizeText(predicate);
     const bp = scenario?.greenBlueprint || {};
-    const fallbackMissing = bp.firstStep || (scenario?.hiddenSteps || [])[0] || 'להגדיר ולבצע צעד ראשון ברור';
+    const fallbackMissing = bp.firstStep || (scenario?.hiddenSteps || [])[0] || '׳׳”׳’׳“׳™׳¨ ׳•׳׳‘׳¦׳¢ ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳‘׳¨׳•׳¨';
 
     if (type === 'state') {
         const matched = SCENARIO_STATE_NORMALIZATION_RULES.find((rule) => rule.pattern.test(normalizedPredicate));
@@ -4595,7 +4764,7 @@ function resolveScenarioPredicateNormalization(predicate, type, scenario) {
             };
         }
         return {
-            normalizedVerb: 'להיתקע בלופ במקום פעולה מדידה',
+            normalizedVerb: '׳׳”׳™׳×׳§׳¢ ׳‘׳׳•׳₪ ׳‘׳׳§׳•׳ ׳₪׳¢׳•׳׳” ׳׳“׳™׳“׳”',
             missingAction: fallbackMissing
         };
     }
@@ -4609,7 +4778,7 @@ function resolveScenarioPredicateNormalization(predicate, type, scenario) {
             };
         }
         return {
-            normalizedVerb: `לנוע אוטומטית סביב "${predicate}" בלי פירוק לשלבים`,
+            normalizedVerb: `׳׳ ׳•׳¢ ׳׳•׳˜׳•׳׳˜׳™׳× ׳¡׳‘׳™׳‘ "${predicate}" ׳‘׳׳™ ׳₪׳™׳¨׳•׳§ ׳׳©׳׳‘׳™׳`,
             missingAction: fallbackMissing
         };
     }
@@ -4648,12 +4817,12 @@ function renderScenarioPredicateAnalysis(scenario) {
 
 function resolveScenarioAutoLoopText(type = 'action') {
     if (type === 'state') {
-        return 'הגדרה עצמית שלילית -> לחץ/קיפאון -> הימנעות -> יותר תקיעות.';
+        return '׳”׳’׳“׳¨׳” ׳¢׳¦׳׳™׳× ׳©׳׳™׳׳™׳× -> ׳׳—׳¥/׳§׳™׳₪׳׳•׳ -> ׳”׳™׳׳ ׳¢׳•׳× -> ׳™׳•׳×׳¨ ׳×׳§׳™׳¢׳•׳×.';
     }
     if (type === 'process') {
-        return 'טריגר פנימי -> תגובה אוטומטית -> עצירה של הביצוע.';
+        return '׳˜׳¨׳™׳’׳¨ ׳₪׳ ׳™׳׳™ -> ׳×׳’׳•׳‘׳” ׳׳•׳˜׳•׳׳˜׳™׳× -> ׳¢׳¦׳™׳¨׳” ׳©׳ ׳”׳‘׳™׳¦׳•׳¢.';
     }
-    return 'החלטה כללית -> קפיצה בין שלבים -> בלי סגירת צעד ראשון.';
+    return '׳”׳—׳׳˜׳” ׳›׳׳׳™׳× -> ׳§׳₪׳™׳¦׳” ׳‘׳™׳ ׳©׳׳‘׳™׳ -> ׳‘׳׳™ ׳¡׳’׳™׳¨׳× ׳¦׳¢׳“ ׳¨׳׳©׳•׳.';
 }
 
 function buildScenarioToteSlots(scenario, analysis) {
@@ -4661,18 +4830,18 @@ function buildScenarioToteSlots(scenario, analysis) {
     const hiddenSteps = Array.isArray(scenario?.hiddenSteps) ? scenario.hiddenSteps : [];
     const bpSteps = Array.isArray(bp.steps) ? bp.steps : [];
     const steps = [...hiddenSteps, ...bpSteps].filter(Boolean);
-    const fallbackStep = analysis?.missingAction || bp.firstStep || 'לבחור פעולה קטנה ומדידה';
+    const fallbackStep = analysis?.missingAction || bp.firstStep || '׳׳‘׳—׳•׳¨ ׳₪׳¢׳•׳׳” ׳§׳˜׳ ׳” ׳•׳׳“׳™׳“׳”';
 
     return {
-        trigger: (scenario?.story || [])[0] || scenario?.title || 'לא זוהה טריגר מפורש',
-        preEvent: (scenario?.story || [])[1] || scenario?.expectation?.pressure || 'לא זוהה אירוע מקדים',
-        evidence: scenario?.stuckPointHint || 'איך רואים שזה קורה בפועל? מה עדות מדידה?',
+        trigger: (scenario?.story || [])[0] || scenario?.title || '׳׳ ׳–׳•׳”׳” ׳˜׳¨׳™׳’׳¨ ׳׳₪׳•׳¨׳©',
+        preEvent: (scenario?.story || [])[1] || scenario?.expectation?.pressure || '׳׳ ׳–׳•׳”׳” ׳׳™׳¨׳•׳¢ ׳׳§׳“׳™׳',
+        evidence: scenario?.stuckPointHint || '׳׳™׳ ׳¨׳•׳׳™׳ ׳©׳–׳” ׳§׳•׳¨׳” ׳‘׳₪׳•׳¢׳? ׳׳” ׳¢׳“׳•׳× ׳׳“׳™׳“׳”?',
         op1: steps[0] || fallbackStep,
-        op2: steps[1] || bp.firstStep || 'להמשיך בצעד שני קצר וברור',
-        op3: steps[2] || 'לסגור בדיקה קצרה: מה הושלם ומה עוד חסר',
-        blocker: scenario?.expectation?.belief || bp.stuckPoint || scenario?.stuckPointHint || 'אמונה/כלל שעוצר את ה-Exit',
+        op2: steps[1] || bp.firstStep || '׳׳”׳׳©׳™׳ ׳‘׳¦׳¢׳“ ׳©׳ ׳™ ׳§׳¦׳¨ ׳•׳‘׳¨׳•׳¨',
+        op3: steps[2] || '׳׳¡׳’׳•׳¨ ׳‘׳“׳™׳§׳” ׳§׳¦׳¨׳”: ׳׳” ׳”׳•׳©׳׳ ׳•׳׳” ׳¢׳•׳“ ׳—׳¡׳¨',
+        blocker: scenario?.expectation?.belief || bp.stuckPoint || scenario?.stuckPointHint || '׳׳׳•׳ ׳”/׳›׳׳ ׳©׳¢׳•׳¦׳¨ ׳׳× ׳”-Exit',
         autoLoop: resolveScenarioAutoLoopText(analysis?.type),
-        exit: bp.doneDefinition || 'יש סימן ביצוע ברור שאפשר לראות ולמדוד'
+        exit: bp.doneDefinition || '׳™׳© ׳¡׳™׳׳ ׳‘׳™׳¦׳•׳¢ ׳‘׳¨׳•׳¨ ׳©׳׳₪׳©׳¨ ׳׳¨׳׳•׳× ׳•׳׳׳“׳•׳“'
     };
 }
 
@@ -4708,7 +4877,7 @@ function renderScenarioToteMap(scenario) {
     Object.entries(bindings).forEach(([key, id]) => {
         const el = document.getElementById(id);
         if (!el) return;
-        el.textContent = slots[key] || '—';
+        el.textContent = slots[key] || 'ג€”';
     });
 
     renderScenarioDynamicQuestions(analysis);
@@ -4721,21 +4890,21 @@ function getScenarioProbePrompt(kind = 'open') {
     const type = analysis.type || 'action';
     if (kind === 'knife') {
         if (type === 'state') {
-            return 'איזה חיבור לא הכרחי מופעל כאן? למשל: "אם לא מושלם אז אני כישלון". מה פירוש חלופי אפשרי?';
+            return '׳׳™׳–׳” ׳—׳™׳‘׳•׳¨ ׳׳ ׳”׳›׳¨׳—׳™ ׳׳•׳₪׳¢׳ ׳›׳׳? ׳׳׳©׳: "׳׳ ׳׳ ׳׳•׳©׳׳ ׳׳– ׳׳ ׳™ ׳›׳™׳©׳׳•׳". ׳׳” ׳₪׳™׳¨׳•׳© ׳—׳׳•׳₪׳™ ׳׳₪׳©׳¨׳™?';
         }
         if (type === 'process') {
-            return 'מה גורם להסיק ש"כשהטריגר מופיע אין שליטה"? איפה זה כן עבד אחרת (אפילו 5%)?';
+            return '׳׳” ׳’׳•׳¨׳ ׳׳”׳¡׳™׳§ ׳©"׳›׳©׳”׳˜׳¨׳™׳’׳¨ ׳׳•׳₪׳™׳¢ ׳׳™׳ ׳©׳׳™׳˜׳”"? ׳׳™׳₪׳” ׳–׳” ׳›׳ ׳¢׳‘׳“ ׳׳—׳¨׳× (׳׳₪׳™׳׳• 5%)?';
         }
-        return 'איזה קשר אוטומטי נוצר בין הצעד הזה לבין כישלון? מה תנאי הקשר שבו כן אפשר להתקדם?';
+        return '׳׳™׳–׳” ׳§׳©׳¨ ׳׳•׳˜׳•׳׳˜׳™ ׳ ׳•׳¦׳¨ ׳‘׳™׳ ׳”׳¦׳¢׳“ ׳”׳–׳” ׳׳‘׳™׳ ׳›׳™׳©׳׳•׳? ׳׳” ׳×׳ ׳׳™ ׳”׳§׳©׳¨ ׳©׳‘׳• ׳›׳ ׳׳₪׳©׳¨ ׳׳”׳×׳§׳“׳?';
     }
 
     if (type === 'state') {
-        return 'פתח עוד: איזה שלב פעולה חסר בין ההגדרה ("תקוע") לבין מה שקורה בפועל?';
+        return '׳₪׳×׳— ׳¢׳•׳“: ׳׳™׳–׳” ׳©׳׳‘ ׳₪׳¢׳•׳׳” ׳—׳¡׳¨ ׳‘׳™׳ ׳”׳”׳’׳“׳¨׳” ("׳×׳§׳•׳¢") ׳׳‘׳™׳ ׳׳” ׳©׳§׳•׳¨׳” ׳‘׳₪׳•׳¢׳?';
     }
     if (type === 'process') {
-        return 'פתח עוד: מה האות הראשון בגוף, ומה הפעולה המידית שמתחילה את הלופ?';
+        return '׳₪׳×׳— ׳¢׳•׳“: ׳׳” ׳”׳׳•׳× ׳”׳¨׳׳©׳•׳ ׳‘׳’׳•׳£, ׳•׳׳” ׳”׳₪׳¢׳•׳׳” ׳”׳׳™׳“׳™׳× ׳©׳׳×׳—׳™׳׳” ׳׳× ׳”׳׳•׳₪?';
     }
-    return 'פתח עוד: איזה מיקרו-שלב נשמט בין הכוונה לבין הביצוע?';
+    return '׳₪׳×׳— ׳¢׳•׳“: ׳׳™׳–׳” ׳׳™׳§׳¨׳•-׳©׳׳‘ ׳ ׳©׳׳˜ ׳‘׳™׳ ׳”׳›׳•׳•׳ ׳” ׳׳‘׳™׳ ׳”׳‘׳™׳¦׳•׳¢?';
 }
 
 function runScenarioProbe(kind = 'open') {
@@ -4811,9 +4980,9 @@ function renderScenarioPrismWheel() {
             detailEl.innerHTML = '';
 
             const q = document.createElement('p');
-            q.innerHTML = `<strong>שאלת Meta:</strong> ${item.question || ''}`;
+            q.innerHTML = `<strong>׳©׳׳׳× Meta:</strong> ${item.question || ''}`;
             const ex = document.createElement('p');
-            ex.innerHTML = `<strong>דוגמה:</strong> ${item.example || ''}`;
+            ex.innerHTML = `<strong>׳“׳•׳’׳׳”:</strong> ${item.example || ''}`;
             detailEl.appendChild(q);
             detailEl.appendChild(ex);
             playScenarioSound('next');
@@ -4836,10 +5005,10 @@ async function copyScenarioGreenSentence() {
             document.execCommand('copy');
             helper.remove();
         }
-        showHint('המשפט הירוק הועתק');
+        showHint('׳”׳׳©׳₪׳˜ ׳”׳™׳¨׳•׳§ ׳”׳•׳¢׳×׳§');
     } catch (error) {
         console.error('Copy failed', error);
-        showHint('לא הצלחנו להעתיק. אפשר להעתיק ידנית.');
+        showHint('׳׳ ׳”׳¦׳׳—׳ ׳• ׳׳”׳¢׳×׳™׳§. ׳׳₪׳©׳¨ ׳׳”׳¢׳×׳™׳§ ׳™׳“׳ ׳™׳×.');
     }
 }
 
@@ -4920,23 +5089,23 @@ function renderScenarioScore(entry) {
     const nextBtn = document.getElementById('scenario-next-scene-btn');
 
     const playedCount = scenarioTrainer.session.index + 1;
-    const starVisual = '⭐'.repeat(scenarioTrainer.session.stars) + '☆'.repeat(Math.max(playedCount - scenarioTrainer.session.stars, 0));
+    const starVisual = 'ג­'.repeat(scenarioTrainer.session.stars) + 'ג˜†'.repeat(Math.max(playedCount - scenarioTrainer.session.stars, 0));
 
-    if (starsRow) starsRow.textContent = starVisual || '☆☆☆☆☆';
+    if (starsRow) starsRow.textContent = starVisual || 'ג˜†ג˜†ג˜†ג˜†ג˜†';
     if (scoreLine) {
-        scoreLine.textContent = `סיימת סצנה ${playedCount}/${scenarioTrainer.session.queue.length}. נקודות סשן: ${scenarioTrainer.session.score}`;
+        scoreLine.textContent = `׳¡׳™׳™׳׳× ׳¡׳¦׳ ׳” ${playedCount}/${scenarioTrainer.session.queue.length}. ׳ ׳§׳•׳“׳•׳× ׳¡׳©׳: ${scenarioTrainer.session.score}`;
     }
-    if (greenLine) greenLine.textContent = `בפעם הבאה: "${entry.greenSentence}"`;
+    if (greenLine) greenLine.textContent = `׳‘׳₪׳¢׳ ׳”׳‘׳׳”: "${entry.greenSentence}"`;
     if (summaryBox) {
         const hasGoal = Boolean(entry.goalGeneral);
         const hasMetric = Boolean(entry.successMetric);
         summaryBox.classList.toggle('hidden', !hasGoal && !hasMetric);
-        if (goalEl) goalEl.textContent = entry.goalGeneral || 'לא הוגדר';
-        if (metricEl) metricEl.textContent = entry.successMetric || 'לא הוגדר';
+        if (goalEl) goalEl.textContent = entry.goalGeneral || '׳׳ ׳”׳•׳’׳“׳¨';
+        if (metricEl) metricEl.textContent = entry.successMetric || '׳׳ ׳”׳•׳’׳“׳¨';
     }
 
     const isLast = scenarioTrainer.session.index >= scenarioTrainer.session.queue.length - 1;
-    if (nextBtn) nextBtn.textContent = isLast ? 'סיום סשן וחזרה לבית' : 'המשך לסצנה הבאה';
+    if (nextBtn) nextBtn.textContent = isLast ? '׳¡׳™׳•׳ ׳¡׳©׳ ׳•׳—׳–׳¨׳” ׳׳‘׳™׳×' : '׳”׳׳©׳ ׳׳¡׳¦׳ ׳” ׳”׳‘׳׳”';
 
     showScenarioScreen('score');
 }
@@ -4955,7 +5124,7 @@ function moveToNextScenario() {
         }
         playScenarioSound('finish');
         openScenarioHome();
-        showHint('סשן הושלם. המשך מעולה!');
+        showHint('׳¡׳©׳ ׳”׳•׳©׳׳. ׳”׳׳©׳ ׳׳¢׳•׳׳”!');
         return;
     }
 
@@ -4975,7 +5144,7 @@ function renderScenarioHistoryList() {
     if (!history.length) {
         const empty = document.createElement('div');
         empty.className = 'scenario-history-empty';
-        empty.textContent = 'עדיין אין היסטוריה. שחק/י סצנה ראשונה כדי להתחיל.';
+        empty.textContent = '׳¢׳“׳™׳™׳ ׳׳™׳ ׳”׳™׳¡׳˜׳•׳¨׳™׳”. ׳©׳—׳§/׳™ ׳¡׳¦׳ ׳” ׳¨׳׳©׳•׳ ׳” ׳›׳“׳™ ׳׳”׳×׳—׳™׳.';
         list.appendChild(empty);
         return;
     }
@@ -4989,7 +5158,7 @@ function renderScenarioHistoryList() {
 
         const meta = document.createElement('p');
         meta.className = 'meta';
-        const scoreBadge = entry.score ? '✓ ירוק' : 'X אדום';
+        const scoreBadge = entry.score ? 'ג“ ׳™׳¨׳•׳§' : 'X ׳׳“׳•׳';
         const date = new Date(entry.timestamp).toLocaleString('he-IL');
         meta.textContent = `${scoreBadge} | ${entry.selectedOptionText} | ${date}`;
 
@@ -4999,7 +5168,7 @@ function renderScenarioHistoryList() {
         if (entry.note) {
             const note = document.createElement('p');
             note.className = 'meta';
-            note.textContent = `הערה: ${entry.note}`;
+            note.textContent = `׳”׳¢׳¨׳”: ${entry.note}`;
             card.appendChild(note);
         }
 
@@ -5023,7 +5192,7 @@ function exportScenarioHistory() {
 }
 
 function clearScenarioHistory() {
-    const ok = window.confirm('לנקות את כל היסטוריית הסצנות?');
+    const ok = window.confirm('׳׳ ׳§׳•׳× ׳׳× ׳›׳ ׳”׳™׳¡׳˜׳•׳¨׳™׳™׳× ׳”׳¡׳¦׳ ׳•׳×?');
     if (!ok) return;
     scenarioTrainer.progress = getDefaultScenarioProgress();
     saveScenarioTrainerProgress();
@@ -5046,7 +5215,7 @@ function saveScenarioSettingsFromForm() {
     };
     saveScenarioTrainerSettings();
     applyScenarioSettingsToControls();
-    showHint('הגדרות Scenario נשמרו');
+    showHint('׳”׳’׳“׳¨׳•׳× Scenario ׳ ׳©׳׳¨׳•');
     openScenarioHome();
 }
 
@@ -5095,45 +5264,45 @@ async function setupScenarioTrainerModule() {
 const COMIC_SCENE_LIBRARY = [
     {
         key: 'work_presentation',
-        title: 'Work: Presentation',
-        subtitle: 'Clarify message, structure, and delivery.',
-        path: 'assets/svg/comics/scenes/עבודה_מצגת.svg'
+        title: '׳¢׳‘׳•׳“׳”: ׳׳¦׳’׳×',
+        subtitle: '׳“׳™׳•׳§ ׳׳¡׳¨, ׳׳‘׳ ׳” ׳•׳“׳׳™׳‘׳¨׳™.',
+        path: 'assets/svg/comics/scenes/׳¢׳‘׳•׳“׳”_׳׳¦׳’׳×.svg'
     },
     {
         key: 'bureaucracy_form',
-        title: 'Bureaucracy: Form',
-        subtitle: 'Translate vague instructions into clear steps.',
-        path: 'assets/svg/comics/scenes/ביורוקרטיה_טופס.svg'
+        title: '׳‘׳™׳•׳¨׳•׳§׳¨׳˜׳™׳”: ׳˜׳•׳₪׳¡',
+        subtitle: '׳׳”׳₪׳•׳ ׳”׳•׳¨׳׳•׳× ׳¢׳׳•׳׳•׳× ׳׳¦׳¢׳“׳™׳ ׳‘׳¨׳•׳¨׳™׳.',
+        path: 'assets/svg/comics/scenes/׳‘׳™׳•׳¨׳•׳§׳¨׳˜׳™׳”_׳˜׳•׳₪׳¡.svg'
     },
     {
         key: 'bureaucracy_money',
-        title: 'Bureaucracy: Arnona',
-        subtitle: 'Resolve billing flow and required details.',
-        path: 'assets/svg/comics/scenes/כסף_ארנונה.svg'
+        title: '׳‘׳™׳•׳¨׳•׳§׳¨׳˜׳™׳”: ׳׳¨׳ ׳•׳ ׳”',
+        subtitle: '׳¡׳™׳“׳•׳¨ ׳–׳¨׳™׳׳× ׳×׳©׳׳•׳ ׳•׳₪׳¨׳˜׳™׳ ׳—׳¡׳¨׳™׳.',
+        path: 'assets/svg/comics/scenes/׳›׳¡׳£_׳׳¨׳ ׳•׳ ׳”.svg'
     },
     {
         key: 'parenting_homework',
-        title: 'Parenting: Homework',
-        subtitle: 'Break down what to do first and what is missing.',
-        path: 'assets/svg/comics/scenes/הורות_שיעורים.svg'
+        title: '׳”׳•׳¨׳•׳×: ׳©׳™׳¢׳•׳¨׳™ ׳‘׳™׳×',
+        subtitle: '׳׳” ׳¢׳•׳©׳™׳ ׳§׳•׳“׳ ׳•׳׳” ׳—׳¡׳¨ ׳›׳“׳™ ׳׳”׳×׳—׳™׳.',
+        path: 'assets/svg/comics/scenes/׳”׳•׳¨׳•׳×_׳©׳™׳¢׳•׳¨׳™׳.svg'
     },
     {
         key: 'relationships_apology',
-        title: 'Relationships: Apology',
-        subtitle: 'From blame to specific repair steps.',
-        path: 'assets/svg/comics/scenes/זוגיות_סליחה.svg'
+        title: '׳–׳•׳’׳™׳•׳×: ׳”׳×׳ ׳¦׳׳•׳×',
+        subtitle: '׳׳¢׳‘׳™׳¨׳™׳ ׳׳׳©׳׳” ׳׳¦׳¢׳“׳™ ׳×׳™׳§׳•׳ ׳¡׳₪׳¦׳™׳₪׳™׳™׳.',
+        path: 'assets/svg/comics/scenes/׳–׳•׳’׳™׳•׳×_׳¡׳׳™׳—׳”.svg'
     },
     {
         key: 'home_tech_cleanup',
-        title: 'Home Tech: Cleanup',
-        subtitle: 'Technical task with explicit execution steps.',
-        path: 'assets/svg/comics/scenes/טכני_ניקוי_קבצים.svg'
+        title: '׳‘׳™׳×/׳˜׳›׳ ׳™: ׳ ׳™׳§׳•׳™',
+        subtitle: '׳׳©׳™׳׳” ׳˜׳›׳ ׳™׳× ׳¢׳ ׳©׳׳‘׳™ ׳‘׳™׳¦׳•׳¢ ׳׳₪׳•׳¨׳©׳™׳.',
+        path: 'assets/svg/comics/scenes/׳˜׳›׳ ׳™_׳ ׳™׳§׳•׳™_׳§׳‘׳¦׳™׳.svg'
     },
     {
         key: 'cooking_lasagna',
-        title: 'Cooking: Lasagna',
-        subtitle: 'Process thinking for everyday routines.',
-        path: 'assets/svg/comics/scenes/בישול_לזניה.svg'
+        title: '׳‘׳™׳©׳•׳: ׳׳–׳ ׳™׳”',
+        subtitle: '׳—׳©׳™׳‘׳× ׳×׳”׳׳™׳ ׳׳₪׳¢׳•׳׳•׳× ׳™׳•׳׳™׳•׳׳™׳•׳×.',
+        path: 'assets/svg/comics/scenes/׳‘׳™׳©׳•׳_׳׳–׳ ׳™׳”.svg'
     }
 ];
 
@@ -5152,7 +5321,9 @@ const TAB_TO_COMIC_SCENE_KEYS = {
     categories: ['relationships_apology', 'home_tech_cleanup', 'work_presentation'],
     'practice-question': ['parenting_homework', 'home_tech_cleanup', 'bureaucracy_form'],
     'practice-radar': ['parenting_homework', 'home_tech_cleanup', 'bureaucracy_form'],
+    'practice-triples-radar': ['parenting_homework', 'home_tech_cleanup', 'bureaucracy_form'],
     'practice-wizard': ['parenting_homework', 'home_tech_cleanup', 'bureaucracy_form'],
+    'practice-sentence-morpher': ['relationships_apology', 'work_presentation', 'parenting_homework'],
     blueprint: ['work_presentation', 'cooking_lasagna', 'bureaucracy_form'],
     prismlab: ['home_tech_cleanup', 'relationships_apology', 'bureaucracy_form'],
     about: ['work_presentation', 'relationships_apology', 'cooking_lasagna']
@@ -5250,7 +5421,7 @@ function openComicPreviewModal(scene) {
 
     image.src = scene.path;
     image.alt = scene.title || 'Comic Scene';
-    title.textContent = scene.title || 'תצוגת קומיקס';
+    title.textContent = scene.title || '׳×׳¦׳•׳’׳× ׳§׳•׳׳™׳§׳¡';
     subtitle.textContent = scene.subtitle || '';
 
     modal.classList.remove('hidden');
@@ -5335,8 +5506,8 @@ function renderGlobalComicStrip(tabName = getActiveTabName(), scenario = null) {
     mainTitle.textContent = selected.title;
     mainSubtitle.textContent = selected.subtitle || 'Meta Model comic scene';
     selectedGlobalComicScene = selected;
-    previewBtn.setAttribute('aria-label', `תצוגה: ${selected.title}`);
-    practiceBtn.setAttribute('aria-label', `מעבר לתרגול: ${selected.title}`);
+    previewBtn.setAttribute('aria-label', `׳×׳¦׳•׳’׳”: ${selected.title}`);
+    practiceBtn.setAttribute('aria-label', `׳׳¢׳‘׳¨ ׳׳×׳¨׳’׳•׳: ${selected.title}`);
 
     thumbs.innerHTML = '';
     scenes.forEach(scene => {
@@ -5373,6 +5544,7 @@ function renderGlobalComicStrip(tabName = getActiveTabName(), scenario = null) {
 
 function renderScenarioComicStage(scenario) {
     const stage = document.getElementById('scenario-comic-stage');
+    const layout = document.querySelector('#scenario-screen-play .scenario-play-layout');
     const image = document.getElementById('scenario-comic-image');
     const title = document.getElementById('scenario-comic-title');
     const subtitle = document.getElementById('scenario-comic-subtitle');
@@ -5381,6 +5553,7 @@ function renderScenarioComicStage(scenario) {
     const scene = resolveComicSceneForScenario(scenario);
     if (!scene) {
         stage.hidden = true;
+        layout?.classList.add('no-comic');
         return;
     }
 
@@ -5388,12 +5561,18 @@ function renderScenarioComicStage(scenario) {
     image.alt = scene.title;
     title.textContent = scene.title;
 
+    const difficultyLabelMap = {
+        easy: '׳§׳',
+        medium: '׳‘׳™׳ ׳•׳ ׳™',
+        hard: '׳§׳©׳”'
+    };
     const details = [];
-    if (scenario?.domainLabel || scenario?.domain) details.push(`Domain: ${scenario.domainLabel || scenario.domain}`);
-    if (scenario?.difficulty) details.push(`Difficulty: ${scenario.difficulty}`);
-    subtitle.textContent = details.join(' | ') || scene.subtitle || '';
+    if (scenario?.domainLabel || scenario?.domain) details.push(`׳×׳—׳•׳: ${scenario.domainLabel || scenario.domain}`);
+    if (scenario?.difficulty) details.push(`׳¨׳׳”: ${difficultyLabelMap[scenario.difficulty] || scenario.difficulty}`);
+    subtitle.textContent = details.join(' | ') || scene.subtitle || '׳™׳™׳¦׳•׳’ ׳—׳–׳•׳×׳™ ׳§׳¦׳¨ ׳©׳ ׳”׳¡׳™׳˜׳•׳׳¦׳™׳”';
 
     stage.hidden = false;
+    layout?.classList.remove('no-comic');
 }
 
 // ==================== COMIC ENGINE 2.0 ====================
@@ -5420,13 +5599,13 @@ function getComicToneClass(tone) {
 
 function getComicOutcome(choiceId) {
     const map = {
-        angry: 'הטון עולה, השיחה נסגרת, ונוצרת יותר התנגדות.',
-        mock: 'נוצרת בושה והצד השני מפסיק לשתף מידע אמיתי.',
-        rescue: 'הבעיה נפתרת רגעית, אבל היכולת של הצד השני לא נבנית.',
-        avoid: 'התקיעות נדחית וחוזרת אחר כך עם יותר לחץ.',
-        meta: 'העמימות יורדת והופכת לתהליך שאפשר לבצע.'
+        angry: '׳”׳˜׳•׳ ׳¢׳•׳׳”, ׳”׳©׳™׳—׳” ׳ ׳¡׳’׳¨׳×, ׳•׳ ׳•׳¦׳¨׳× ׳™׳•׳×׳¨ ׳”׳×׳ ׳’׳“׳•׳×.',
+        mock: '׳ ׳•׳¦׳¨׳× ׳‘׳•׳©׳” ׳•׳”׳¦׳“ ׳”׳©׳ ׳™ ׳׳₪׳¡׳™׳§ ׳׳©׳×׳£ ׳׳™׳“׳¢ ׳׳׳™׳×׳™.',
+        rescue: '׳”׳‘׳¢׳™׳” ׳ ׳₪׳×׳¨׳× ׳¨׳’׳¢׳™׳×, ׳׳‘׳ ׳”׳™׳›׳•׳׳× ׳©׳ ׳”׳¦׳“ ׳”׳©׳ ׳™ ׳׳ ׳ ׳‘׳ ׳™׳×.',
+        avoid: '׳”׳×׳§׳™׳¢׳•׳× ׳ ׳“׳—׳™׳× ׳•׳—׳•׳–׳¨׳× ׳׳—׳¨ ׳›׳ ׳¢׳ ׳™׳•׳×׳¨ ׳׳—׳¥.',
+        meta: '׳”׳¢׳׳™׳׳•׳× ׳™׳•׳¨׳“׳× ׳•׳”׳•׳₪׳›׳× ׳׳×׳”׳׳™׳ ׳©׳׳₪׳©׳¨ ׳׳‘׳¦׳¢.'
     };
-    return map[choiceId] || 'בחירה זו משנה את הכיוון של הסצנה.';
+    return map[choiceId] || '׳‘׳—׳™׳¨׳” ׳–׳• ׳׳©׳ ׳” ׳׳× ׳”׳›׳™׳•׳•׳ ׳©׳ ׳”׳¡׳¦׳ ׳”.';
 }
 
 function buildComicBlueprintHtml(blueprint) {
@@ -5438,18 +5617,18 @@ function buildComicBlueprintHtml(blueprint) {
 
     return `
         <div class="blueprint">
-            <h3>Blueprint (פירוק פעולה)</h3>
-            <div><b>מטרה:</b> ${escapeHtml(blueprint.goal || '')}</div>
-            <div><b>צעד ראשון:</b> ${escapeHtml(blueprint.first_step || '')}</div>
-            <div><b>צעד אחרון:</b> ${escapeHtml(blueprint.last_step || '')}</div>
+            <h3>Blueprint (׳₪׳™׳¨׳•׳§ ׳₪׳¢׳•׳׳”)</h3>
+            <div><b>׳׳˜׳¨׳”:</b> ${escapeHtml(blueprint.goal || '')}</div>
+            <div><b>׳¦׳¢׳“ ׳¨׳׳©׳•׳:</b> ${escapeHtml(blueprint.first_step || '')}</div>
+            <div><b>׳¦׳¢׳“ ׳׳—׳¨׳•׳:</b> ${escapeHtml(blueprint.last_step || '')}</div>
 
-            <div style="margin-top:8px"><b>שלבי ביניים:</b></div>
+            <div style="margin-top:8px"><b>׳©׳׳‘׳™ ׳‘׳™׳ ׳™׳™׳:</b></div>
             <ul>${toList(blueprint.middle_steps)}</ul>
 
-            <div style="margin-top:8px"><b>תנאים מקדימים:</b></div>
+            <div style="margin-top:8px"><b>׳×׳ ׳׳™׳ ׳׳§׳“׳™׳׳™׳:</b></div>
             <ul>${toList(blueprint.preconditions)}</ul>
 
-            <div style="margin-top:8px"><b>אלטרנטיבות כשנתקעים:</b></div>
+            <div style="margin-top:8px"><b>׳׳׳˜׳¨׳ ׳˜׳™׳‘׳•׳× ׳›׳©׳ ׳×׳§׳¢׳™׳:</b></div>
             <ul>${toList(blueprint.alternatives)}</ul>
         </div>
     `;
@@ -5487,14 +5666,14 @@ async function setupComicEngine2Legacy() {
         payload = await response.json();
     } catch (error) {
         console.error('Cannot load data/comic-scenarios.json', error);
-        els.title.textContent = 'שגיאה בטעינת סצנות קומיקס';
+        els.title.textContent = '׳©׳’׳™׳׳” ׳‘׳˜׳¢׳™׳ ׳× ׳¡׳¦׳ ׳•׳× ׳§׳•׳׳™׳§׳¡';
         if (els.meta) els.meta.textContent = '';
         return;
     }
 
     const scenarios = Array.isArray(payload?.scenarios) ? payload.scenarios : [];
     if (!scenarios.length) {
-        els.title.textContent = 'אין סצנות קומיקס כרגע';
+        els.title.textContent = '׳׳™׳ ׳¡׳¦׳ ׳•׳× ׳§׳•׳׳™׳§׳¡ ׳›׳¨׳’׳¢';
         if (els.meta) els.meta.textContent = '';
         return;
     }
@@ -5576,7 +5755,7 @@ async function setupComicEngine2Legacy() {
     const updateCompactToggleState = () => {
         if (!els.compactToggle) return;
         els.compactToggle.setAttribute('aria-pressed', prefs.compact ? 'true' : 'false');
-        els.compactToggle.textContent = prefs.compact ? 'תצוגה מלאה' : 'מצב קומפקטי';
+        els.compactToggle.textContent = prefs.compact ? '׳×׳¦׳•׳’׳” ׳׳׳׳”' : '׳׳¦׳‘ ׳§׳•׳׳₪׳§׳˜׳™';
     };
 
     const renderQuickParams = (scenario) => {
@@ -5588,14 +5767,14 @@ async function setupComicEngine2Legacy() {
         const goal = metaChoice?.blueprint?.goal || '';
 
         const chips = [
-            `<span class="comic-param-chip"><b>תחום</b> ${escapeHtml(scenario.domain || 'לא צוין')}</span>`,
-            `<span class="comic-param-chip"><b>דיאלוג</b> ${dialogCount} שורות</span>`,
-            `<span class="comic-param-chip"><b>אפשרויות</b> ${choicesCount}</span>`,
-            `<span class="comic-param-chip"><b>תצוגה</b> ${prefs.compact ? 'קומפקטית' : 'רגילה'}</span>`
+            `<span class="comic-param-chip"><b>׳×׳—׳•׳</b> ${escapeHtml(scenario.domain || '׳׳ ׳¦׳•׳™׳')}</span>`,
+            `<span class="comic-param-chip"><b>׳“׳™׳׳׳•׳’</b> ${dialogCount} ׳©׳•׳¨׳•׳×</span>`,
+            `<span class="comic-param-chip"><b>׳׳₪׳©׳¨׳•׳™׳•׳×</b> ${choicesCount}</span>`,
+            `<span class="comic-param-chip"><b>׳×׳¦׳•׳’׳”</b> ${prefs.compact ? '׳§׳•׳׳₪׳§׳˜׳™׳×' : '׳¨׳’׳™׳׳”'}</span>`
         ];
 
         if (goal) {
-            chips.push(`<span class="comic-param-chip"><b>מטרה</b> ${escapeHtml(goal)}</span>`);
+            chips.push(`<span class="comic-param-chip"><b>׳׳˜׳¨׳”</b> ${escapeHtml(goal)}</span>`);
         }
 
         els.quickParams.innerHTML = chips.join('');
@@ -5640,8 +5819,8 @@ async function setupComicEngine2Legacy() {
             els.btnNext.onclick = null;
         }
 
-        els.title.textContent = scenario.title || 'סצנה';
-        if (els.meta) els.meta.textContent = `תחום: ${scenario.domain || 'לא צוין'}`;
+        els.title.textContent = scenario.title || '׳¡׳¦׳ ׳”';
+        if (els.meta) els.meta.textContent = `׳×׳—׳•׳: ${scenario.domain || '׳׳ ׳¦׳•׳™׳'}`;
         renderQuickParams(scenario);
 
         const left = scenario?.characters?.left || {};
@@ -5718,7 +5897,7 @@ async function setupComicEngine2Legacy() {
         const outcome = choice.outcome || getComicOutcome(choice.id);
         let rightHtml = `
             <div class="comic-feedback-summary">
-                <div style="color:#6B7280;font-weight:900;margin-bottom:6px">התגובה שלך</div>
+                <div style="color:#6B7280;font-weight:900;margin-bottom:6px">׳”׳×׳’׳•׳‘׳” ׳©׳׳</div>
                 <div style="font-weight:900">${escapeHtml(choice.say || '')}</div>
                 <div style="margin-top:10px; color:#1f2937;">${escapeHtml(outcome)}</div>
             </div>
@@ -5741,11 +5920,11 @@ async function setupComicEngine2Legacy() {
         }
 
         const altChars = [
-            'assets/svg/characters/דניאל.svg',
-            'assets/svg/characters/לירון.svg',
-            'assets/svg/characters/עדן.svg'
+            'assets/svg/characters/׳“׳ ׳™׳׳.svg',
+            'assets/svg/characters/׳׳™׳¨׳•׳.svg',
+            'assets/svg/characters/׳¢׳“׳.svg'
         ];
-        const calmChar = 'assets/svg/characters/שירי.svg';
+        const calmChar = 'assets/svg/characters/׳©׳™׳¨׳™.svg';
 
         const rightImg = els.charRight?.querySelector('img');
         if (!rightImg) return;
@@ -5789,8 +5968,8 @@ async function setupComicEngine2Legacy() {
 
         const outcome = choice.outcome || getComicOutcome(choice.id);
         const followupTitle = choice.id === 'meta'
-            ? 'דיאלוג המשך: זה מתחיל לעבוד'
-            : 'דיאלוג המשך: מתברר שזה לא עובד';
+            ? '׳“׳™׳׳׳•׳’ ׳”׳׳©׳: ׳–׳” ׳׳×׳—׳™׳ ׳׳¢׳‘׳•׳“'
+            : '׳“׳™׳׳׳•׳’ ׳”׳׳©׳: ׳׳×׳‘׳¨׳¨ ׳©׳–׳” ׳׳ ׳¢׳•׳‘׳“';
         const noteFieldId = `comic-note-${String(scenario?.id || 'scene').replace(/[^a-z0-9_-]/gi, '').toLowerCase() || 'scene'}`;
 
         if (els.charRight) {
@@ -5800,7 +5979,7 @@ async function setupComicEngine2Legacy() {
         if (els.dialog) {
             els.dialog.innerHTML = `
                 <div class="comic-line comic-line-user-turn">
-                    <div class="who">מה שנאמר בפועל</div>
+                    <div class="who">׳׳” ׳©׳ ׳׳׳¨ ׳‘׳₪׳•׳¢׳</div>
                     <div class="comic-line-text">${escapeHtml(choice.say || '')}</div>
                 </div>
                 <div class="comic-line comic-line-followup ${choice.id === 'meta' ? 'success' : 'fail'}">
@@ -5812,13 +5991,13 @@ async function setupComicEngine2Legacy() {
 
         let rightHtml = `
             <div class="comic-feedback-summary">
-                <div style="color:#6B7280;font-weight:900;margin-bottom:6px">התגובה שלך</div>
+                <div style="color:#6B7280;font-weight:900;margin-bottom:6px">׳”׳×׳’׳•׳‘׳” ׳©׳׳</div>
                 <div style="font-weight:900">${escapeHtml(choice.say || '')}</div>
                 <div style="margin-top:10px; color:#1f2937;">${escapeHtml(outcome)}</div>
             </div>
             <div class="comic-explain-box">
-                <label for="${noteFieldId}">למה זה עבד או לא עבד? כתבו הסבר קצר:</label>
-                <textarea id="${noteFieldId}" rows="3" placeholder="לדוגמה: מה היה חסר, מה תקע את הצד השני, ומה אפשר לשאול במקום..."></textarea>
+                <label for="${noteFieldId}">׳׳׳” ׳–׳” ׳¢׳‘׳“ ׳׳• ׳׳ ׳¢׳‘׳“? ׳›׳×׳‘׳• ׳”׳¡׳‘׳¨ ׳§׳¦׳¨:</label>
+                <textarea id="${noteFieldId}" rows="3" placeholder="׳׳“׳•׳’׳׳”: ׳׳” ׳”׳™׳” ׳—׳¡׳¨, ׳׳” ׳×׳§׳¢ ׳׳× ׳”׳¦׳“ ׳”׳©׳ ׳™, ׳•׳׳” ׳׳₪׳©׳¨ ׳׳©׳׳•׳ ׳‘׳׳§׳•׳..."></textarea>
             </div>
         `;
 
@@ -5902,65 +6081,65 @@ function evaluateCommunityMessage(text) {
     const tips = [];
     const strengths = [];
 
-    const hasQuestionMark = /[?؟]/.test(message);
+    const hasQuestionMark = /[?״]/.test(message);
     if (hasQuestionMark) {
         score += 15;
-        strengths.push('נוסח כשאלה ברורה');
+        strengths.push('׳ ׳•׳¡׳— ׳›׳©׳׳׳” ׳‘׳¨׳•׳¨׳”');
     } else {
-        tips.push('להוסיף סימן שאלה כדי למסגר בקשה ברורה.');
+        tips.push('׳׳”׳•׳¡׳™׳£ ׳¡׳™׳׳ ׳©׳׳׳” ׳›׳“׳™ ׳׳׳¡׳’׳¨ ׳‘׳§׳©׳” ׳‘׳¨׳•׳¨׳”.');
     }
 
-    const questionWords = ['מה', 'איך', 'למה', 'מתי', 'מי', 'איפה', 'איזה', 'כמה', 'באיזה', 'למי'];
+    const questionWords = ['׳׳”', '׳׳™׳', '׳׳׳”', '׳׳×׳™', '׳׳™', '׳׳™׳₪׳”', '׳׳™׳–׳”', '׳›׳׳”', '׳‘׳׳™׳–׳”', '׳׳׳™'];
     const hasQuestionWord = questionWords.some(word => message.includes(word));
     if (hasQuestionWord) {
         score += 15;
-        strengths.push('יש מילת שאלה ממקדת');
+        strengths.push('׳™׳© ׳׳™׳׳× ׳©׳׳׳” ׳׳׳§׳“׳×');
     } else {
-        tips.push('להוסיף מילת שאלה ממוקדת (מה/איך/מתי/מי/איזה).');
+        tips.push('׳׳”׳•׳¡׳™׳£ ׳׳™׳׳× ׳©׳׳׳” ׳׳׳•׳§׳“׳× (׳׳”/׳׳™׳/׳׳×׳™/׳׳™/׳׳™׳–׳”).');
     }
 
     if (words.length >= 10) {
         score += 20;
-        strengths.push('יש הקשר מספק');
+        strengths.push('׳™׳© ׳”׳§׳©׳¨ ׳׳¡׳₪׳§');
     } else if (words.length >= 6) {
         score += 10;
-        tips.push('אפשר להוסיף עוד פרטי הקשר כדי לחדד.');
+        tips.push('׳׳₪׳©׳¨ ׳׳”׳•׳¡׳™׳£ ׳¢׳•׳“ ׳₪׳¨׳˜׳™ ׳”׳§׳©׳¨ ׳›׳“׳™ ׳׳—׳“׳“.');
     } else {
-        tips.push('הניסוח קצר מדי, חסרים פרטים משמעותיים.');
+        tips.push('׳”׳ ׳™׳¡׳•׳— ׳§׳¦׳¨ ׳׳“׳™, ׳—׳¡׳¨׳™׳ ׳₪׳¨׳˜׳™׳ ׳׳©׳׳¢׳•׳×׳™׳™׳.');
     }
 
-    const contextSignals = ['בסיטואציה', 'במצב', 'כש', 'אחרי', 'לפני', 'מול', 'עם', 'בבית', 'בעבודה', 'בכיתה'];
+    const contextSignals = ['׳‘׳¡׳™׳˜׳•׳׳¦׳™׳”', '׳‘׳׳¦׳‘', '׳›׳©', '׳׳—׳¨׳™', '׳׳₪׳ ׳™', '׳׳•׳', '׳¢׳', '׳‘׳‘׳™׳×', '׳‘׳¢׳‘׳•׳“׳”', '׳‘׳›׳™׳×׳”'];
     const hasContext = contextSignals.some(word => message.includes(word));
     if (hasContext) {
         score += 15;
-        strengths.push('ההקשר הסיטואציוני ברור');
+        strengths.push('׳”׳”׳§׳©׳¨ ׳”׳¡׳™׳˜׳•׳׳¦׳™׳•׳ ׳™ ׳‘׳¨׳•׳¨');
     } else {
-        tips.push('להוסיף איפה/מול מי/מתי זה קורה בפועל.');
+        tips.push('׳׳”׳•׳¡׳™׳£ ׳׳™׳₪׳”/׳׳•׳ ׳׳™/׳׳×׳™ ׳–׳” ׳§׳•׳¨׳” ׳‘׳₪׳•׳¢׳.');
     }
 
-    const outcomeSignals = ['כדי', 'מטרה', 'רוצה', 'רוצים', 'להשיג', 'להצליח', 'תוצאה'];
+    const outcomeSignals = ['׳›׳“׳™', '׳׳˜׳¨׳”', '׳¨׳•׳¦׳”', '׳¨׳•׳¦׳™׳', '׳׳”׳©׳™׳’', '׳׳”׳¦׳׳™׳—', '׳×׳•׳¦׳׳”'];
     const hasOutcome = outcomeSignals.some(word => message.includes(word));
     if (hasOutcome) {
         score += 10;
-        strengths.push('יש תוצאה רצויה');
+        strengths.push('׳™׳© ׳×׳•׳¦׳׳” ׳¨׳¦׳•׳™׳”');
     } else {
-        tips.push('להגדיר מה התוצאה שאתם רוצים להשיג.');
+        tips.push('׳׳”׳’׳“׳™׳¨ ׳׳” ׳”׳×׳•׳¦׳׳” ׳©׳׳×׳ ׳¨׳•׳¦׳™׳ ׳׳”׳©׳™׳’.');
     }
 
     score = Math.max(15, Math.min(100, score));
 
     let level = 'level-low';
-    let levelLabel = 'דורש חידוד';
-    let summary = 'כדאי לחדד את השאלה: מה חסר, באיזה הקשר, ומה רוצים להשיג.';
+    let levelLabel = '׳“׳•׳¨׳© ׳—׳™׳“׳•׳“';
+    let summary = '׳›׳“׳׳™ ׳׳—׳“׳“ ׳׳× ׳”׳©׳׳׳”: ׳׳” ׳—׳¡׳¨, ׳‘׳׳™׳–׳” ׳”׳§׳©׳¨, ׳•׳׳” ׳¨׳•׳¦׳™׳ ׳׳”׳©׳™׳’.';
 
     if (score >= 75) {
         level = 'level-high';
-        levelLabel = 'מדויק מאוד';
-        summary = 'שאלה חזקה שמסייעת לחשוף מידע חסר משמעותי.';
+        levelLabel = '׳׳“׳•׳™׳§ ׳׳׳•׳“';
+        summary = '׳©׳׳׳” ׳—׳–׳§׳” ׳©׳׳¡׳™׳™׳¢׳× ׳׳—׳©׳•׳£ ׳׳™׳“׳¢ ׳—׳¡׳¨ ׳׳©׳׳¢׳•׳×׳™.';
     } else if (score >= 55) {
         level = 'level-mid';
-        levelLabel = 'כיוון טוב';
-        summary = 'ניסוח טוב. עוד תוספת הקשר קטנה תהפוך אותו למדויק יותר.';
+        levelLabel = '׳›׳™׳•׳•׳ ׳˜׳•׳‘';
+        summary = '׳ ׳™׳¡׳•׳— ׳˜׳•׳‘. ׳¢׳•׳“ ׳×׳•׳¡׳₪׳× ׳”׳§׳©׳¨ ׳§׳˜׳ ׳” ׳×׳”׳₪׳•׳ ׳׳•׳×׳• ׳׳׳“׳•׳™׳§ ׳™׳•׳×׳¨.';
     }
 
     return {
@@ -6015,7 +6194,7 @@ function setupCommunityFeedbackWall() {
 
     const renderFeed = () => {
         if (!entries.length) {
-            els.feed.innerHTML = '<div class="community-empty">עדיין אין הודעות. כתבו ראשונים וקבלו פידבק על הניסוח.</div>';
+            els.feed.innerHTML = '<div class="community-empty">׳¢׳“׳™׳™׳ ׳׳™׳ ׳”׳•׳“׳¢׳•׳×. ׳›׳×׳‘׳• ׳¨׳׳©׳•׳ ׳™׳ ׳•׳§׳‘׳׳• ׳₪׳™׳“׳‘׳§ ׳¢׳ ׳”׳ ׳™׳¡׳•׳—.</div>';
             return;
         }
 
@@ -6026,18 +6205,18 @@ function setupCommunityFeedbackWall() {
             const summary = escapeHtml(entry?.analysis?.summary || '');
             const tips = Array.isArray(entry?.analysis?.tips) ? entry.analysis.tips : [];
             const strengths = Array.isArray(entry?.analysis?.strengths) ? entry.analysis.strengths : [];
-            const author = escapeHtml(entry.author || 'משתמש/ת');
+            const author = escapeHtml(entry.author || '׳׳©׳×׳׳©/׳×');
             const message = escapeHtml(entry.message || '');
             const date = escapeHtml(formatDate(entry.createdAt));
 
             const tipsHtml = tips.map(tip => `<li>${escapeHtml(tip)}</li>`).join('');
-            const strengthsText = strengths.length ? `חוזקות: ${escapeHtml(strengths.join(' | '))}` : '';
+            const strengthsText = strengths.length ? `׳—׳•׳–׳§׳•׳×: ${escapeHtml(strengths.join(' | '))}` : '';
 
             return `
                 <article class="community-item ${itemClass}">
                     <header class="community-item-header">
-                        <div class="community-item-meta">${author} · ${date}</div>
-                        <div class="community-score">${score}/100 · ${levelLabel}</div>
+                        <div class="community-item-meta">${author} ֲ· ${date}</div>
+                        <div class="community-score">${score}/100 ֲ· ${levelLabel}</div>
                     </header>
                     <p class="community-message">${message}</p>
                     <p class="community-feedback">${summary}</p>
@@ -6061,14 +6240,14 @@ function setupCommunityFeedbackWall() {
         const author = String(els.name?.value || '').trim();
 
         if (message.length < 6) {
-            setStatus('כתבו לפחות 6 תווים כדי לקבל פידבק שימושי.', true);
+            setStatus('׳›׳×׳‘׳• ׳׳₪׳—׳•׳× 6 ׳×׳•׳•׳™׳ ׳›׳“׳™ ׳׳§׳‘׳ ׳₪׳™׳“׳‘׳§ ׳©׳™׳׳•׳©׳™.', true);
             return;
         }
 
         const analysis = evaluateCommunityMessage(message);
         const entry = {
             id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-            author: author || 'משתמש/ת',
+            author: author || '׳׳©׳×׳׳©/׳×',
             message,
             createdAt: new Date().toISOString(),
             analysis
@@ -6079,8 +6258,8 @@ function setupCommunityFeedbackWall() {
         saveEntries();
         renderFeed();
 
-        const scoreLabel = analysis.score >= 75 ? 'מצוין' : analysis.score >= 55 ? 'יפה מאוד' : 'יש כיוון';
-        setStatus(`נשמר. ציון ניסוח: ${analysis.score}/100 (${scoreLabel}).`);
+        const scoreLabel = analysis.score >= 75 ? '׳׳¦׳•׳™׳' : analysis.score >= 55 ? '׳™׳₪׳” ׳׳׳•׳“' : '׳™׳© ׳›׳™׳•׳•׳';
+        setStatus(`׳ ׳©׳׳¨. ׳¦׳™׳•׳ ׳ ׳™׳¡׳•׳—: ${analysis.score}/100 (${scoreLabel}).`);
 
         els.message.value = '';
     });
@@ -6090,7 +6269,7 @@ function setupCommunityFeedbackWall() {
             entries = [];
             saveEntries();
             renderFeed();
-            setStatus('הקיר נוקה.');
+            setStatus('׳”׳§׳™׳¨ ׳ ׳•׳§׳”.');
         });
     }
 
@@ -6162,7 +6341,7 @@ function extractAndMoveToStep2() {
     const actionInput = document.getElementById('action-input').value.trim();
 
     if (!actionInput) {
-        alert('בואן תקלד משהו - מה אתה אומר לעצמך לעשות?');
+        alert('׳‘׳•׳׳ ׳×׳§׳׳“ ׳׳©׳”׳• - ׳׳” ׳׳×׳” ׳׳•׳׳¨ ׳׳¢׳¦׳׳ ׳׳¢׳©׳•׳×?');
         return;
     }
 
@@ -6182,7 +6361,7 @@ function extractAndMoveToStep3() {
     blueprintData.time = document.getElementById('q-time').value.trim();
 
     if (!blueprintData.success || !blueprintData.firstStep) {
-        alert('בואן תמלא לפחות את התוצאה והצעד הראשון');
+        alert('׳‘׳•׳׳ ׳×׳׳׳ ׳׳₪׳—׳•׳× ׳׳× ׳”׳×׳•׳¦׳׳” ׳•׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳');
         return;
     }
 
@@ -6198,7 +6377,7 @@ function extractAndMoveToStep4() {
     blueprintData.gap = document.getElementById('q-gap').value.trim();
 
     if (!blueprintData.whoExpects || !blueprintData.ability) {
-        alert('בואן תמלא את מי מצפה והערכת יכולת');
+        alert('׳‘׳•׳׳ ׳×׳׳׳ ׳׳× ׳׳™ ׳׳¦׳₪׳” ׳•׳”׳¢׳¨׳›׳× ׳™׳›׳•׳׳×');
         return;
     }
 
@@ -6211,76 +6390,76 @@ function updateReframeBox() {
     const gap = document.getElementById('q-gap').value.trim();
 
     let gapHint = '';
-    if (ability <= 3) gapHint = 'יכולת נמוכה';
-    else if (ability <= 6) gapHint = 'חסר כלים';
-    else gapHint = 'חסר אישור / קונה דעת';
+    if (ability <= 3) gapHint = '׳™׳›׳•׳׳× ׳ ׳׳•׳›׳”';
+    else if (ability <= 6) gapHint = '׳—׳¡׳¨ ׳›׳׳™׳';
+    else gapHint = '׳—׳¡׳¨ ׳׳™׳©׳•׳¨ / ׳§׳•׳ ׳” ׳“׳¢׳×';
 
-    if (gap.includes('דקות')) gapHint = 'חסר ידע';
+    if (gap.includes('׳“׳§׳•׳×')) gapHint = '׳—׳¡׳¨ ׳™׳“׳¢';
 
     const templates = metaModelData.blueprint_builder?.reframe_templates || [];
     const template = templates.find(t => t.gap_hint === gapHint);
-    const reframeText = template ? template.reframe : 'זה לא בעיה של אופי - זו הגדרה לא שלמה של המשימה.';
+    const reframeText = template ? template.reframe : '׳–׳” ׳׳ ׳‘׳¢׳™׳” ׳©׳ ׳׳•׳₪׳™ - ׳–׳• ׳”׳’׳“׳¨׳” ׳׳ ׳©׳׳׳” ׳©׳ ׳”׳׳©׳™׳׳”.';
 
     document.getElementById('q-reframe').textContent = reframeText;
 }
 
 function generateFinalBlueprint() {
     const whoExpectsMap = {
-        'self': 'אני בעצמי',
-        'other': 'מישהו אחר',
-        'system': 'מערכת/חוק/דדליין'
+        'self': '׳׳ ׳™ ׳‘׳¢׳¦׳׳™',
+        'other': '׳׳™׳©׳”׳• ׳׳—׳¨',
+        'system': '׳׳¢׳¨׳›׳×/׳—׳•׳§/׳“׳“׳׳™׳™׳'
     };
 
     const blueprint = document.getElementById('final-blueprint');
     blueprint.innerHTML = `
         <div class="blueprint-section">
-            <h4>📌 הפעולה:</h4>
+            <h4>נ“ ׳”׳₪׳¢׳•׳׳”:</h4>
             <p>"${blueprintData.action}"</p>
         </div>
 
         <div class="blueprint-section">
-            <h4>🎯 התוצאה הרצויה:</h4>
+            <h4>נ¯ ׳”׳×׳•׳¦׳׳” ׳”׳¨׳¦׳•׳™׳”:</h4>
             <p>${blueprintData.success}</p>
         </div>
 
         <div class="blueprint-section">
-            <h4>📋 התוכנית:</h4>
+            <h4>נ“‹ ׳”׳×׳•׳›׳ ׳™׳×:</h4>
             <ul>
-                <li><strong>צעד ראשון:</strong> ${blueprintData.firstStep}</li>
-                <li><strong>שלבי ביניים:</strong> ${blueprintData.middleSteps || '(לא הוגדרו)'}</li>
-                <li><strong>צעד אחרון:</strong> ${blueprintData.lastStep}</li>
+                <li><strong>׳¦׳¢׳“ ׳¨׳׳©׳•׳:</strong> ${blueprintData.firstStep}</li>
+                <li><strong>׳©׳׳‘׳™ ׳‘׳™׳ ׳™׳™׳:</strong> ${blueprintData.middleSteps || '(׳׳ ׳”׳•׳’׳“׳¨׳•)'}</li>
+                <li><strong>׳¦׳¢׳“ ׳׳—׳¨׳•׳:</strong> ${blueprintData.lastStep}</li>
             </ul>
         </div>
 
         <div class="blueprint-section">
-            <h4>⚙️ תנאים מקדימים:</h4>
-            <p>${blueprintData.prerequisites || '(אין)'}</p>
+            <h4>ג™ן¸ ׳×׳ ׳׳™׳ ׳׳§׳“׳™׳׳™׳:</h4>
+            <p>${blueprintData.prerequisites || '(׳׳™׳)'}</p>
         </div>
 
         <div class="blueprint-section">
-            <h4>⚠️ נקודות תקיעה צפויות:</h4>
+            <h4>ג ן¸ ׳ ׳§׳•׳“׳•׳× ׳×׳§׳™׳¢׳” ׳¦׳₪׳•׳™׳•׳×:</h4>
             <p>${blueprintData.friction}</p>
             <strong>Plan B:</strong>
             <p>${blueprintData.alternatives}</p>
         </div>
 
         <div class="blueprint-section">
-            <h4>⏱️ טיימואט:</h4>
-            <p>${blueprintData.time || '30 דקות'}</p>
+            <h4>ג±ן¸ ׳˜׳™׳™׳׳•׳׳˜:</h4>
+            <p>${blueprintData.time || '30 ׳“׳§׳•׳×'}</p>
         </div>
 
         <div class="blueprint-section">
-            <h4>📊 ניתוח ציפיות:</h4>
+            <h4>נ“ ׳ ׳™׳×׳•׳— ׳¦׳™׳₪׳™׳•׳×:</h4>
             <ul>
-                <li><strong>מי מצפה:</strong> ${whoExpectsMap[blueprintData.whoExpects] || blueprintData.whoExpects}</li>
-                <li><strong>הציפייה:</strong> ${blueprintData.expectation}</li>
-                <li><strong>יכולת כרגע:</strong> ${blueprintData.ability}/10</li>
-                <li><strong>מה חסר:</strong> ${blueprintData.gap}</li>
+                <li><strong>׳׳™ ׳׳¦׳₪׳”:</strong> ${whoExpectsMap[blueprintData.whoExpects] || blueprintData.whoExpects}</li>
+                <li><strong>׳”׳¦׳™׳₪׳™׳™׳”:</strong> ${blueprintData.expectation}</li>
+                <li><strong>׳™׳›׳•׳׳× ׳›׳¨׳’׳¢:</strong> ${blueprintData.ability}/10</li>
+                <li><strong>׳׳” ׳—׳¡׳¨:</strong> ${blueprintData.gap}</li>
             </ul>
         </div>
 
         <div class="blueprint-section" style="background: #f0fff4; padding: 15px; border-radius: 8px;">
-            <h4>✨ ניסוח מחדש (לא-מאשים):</h4>
+            <h4>ג¨ ׳ ׳™׳¡׳•׳— ׳׳—׳“׳© (׳׳-׳׳׳©׳™׳):</h4>
             <p><em>${document.getElementById('q-reframe').textContent}</em></p>
         </div>
     `;
@@ -6296,14 +6475,14 @@ function generateNextAction() {
     const timebox = blueprintData.time ? blueprintData.time.split(' ')[0] : '45';
     const nextAction = `
         <strong>${blueprintData.firstStep}</strong>
-        <br/><small>(צפוי לקחת ${timebox} דקות משך)</small>
+        <br/><small>(׳¦׳₪׳•׳™ ׳׳§׳—׳× ${timebox} ׳“׳§׳•׳× ׳׳©׳)</small>
     `;
 
     const ifStuck = `
-        <strong>אם נתקעת בחלק הזה:</strong><br/>
+        <strong>׳׳ ׳ ׳×׳§׳¢׳× ׳‘׳—׳׳§ ׳”׳–׳”:</strong><br/>
         ${blueprintData.friction ? blueprintData.friction + '<br/>' : ''}
         <strong>Plan B:</strong><br/>
-        ${blueprintData.alternatives || 'בקש עזרה או נסה חלופה'}
+        ${blueprintData.alternatives || '׳‘׳§׳© ׳¢׳–׳¨׳” ׳׳• ׳ ׳¡׳” ׳—׳׳•׳₪׳”'}
     `;
 
     nextActionBox.innerHTML = nextAction;
@@ -6311,7 +6490,7 @@ function generateNextAction() {
 }
 
 function startTenMinuteTimer() {
-    alert(`🎯 התחלת! ${blueprintData.firstStep}\n\nיש לך 10 דקות. לך!`);
+    alert(`נ¯ ׳”׳×׳—׳׳×! ${blueprintData.firstStep}\n\n׳™׳© ׳׳ 10 ׳“׳§׳•׳×. ׳׳!`);
     // Could implement actual timer here
 }
 
@@ -6338,43 +6517,43 @@ function logMetaModelData() {
 const LOGICAL_LEVEL_INFO = {
     E: {
         name: 'Environment (E)',
-        hebrew: 'סביבה',
-        prompt: 'איפה, מתי, עם מי ובאיזה הקשר זה קורה?'
+        hebrew: '׳¡׳‘׳™׳‘׳”',
+        prompt: '׳׳™׳₪׳”, ׳׳×׳™, ׳¢׳ ׳׳™ ׳•׳‘׳׳™׳–׳” ׳”׳§׳©׳¨ ׳–׳” ׳§׳•׳¨׳”?'
     },
     B: {
         name: 'Behavior (B)',
-        hebrew: 'התנהגות',
-        prompt: 'מה האדם עושה בפועל? מה הפעולה הנצפית?'
+        hebrew: '׳”׳×׳ ׳”׳’׳•׳×',
+        prompt: '׳׳” ׳”׳׳“׳ ׳¢׳•׳©׳” ׳‘׳₪׳•׳¢׳? ׳׳” ׳”׳₪׳¢׳•׳׳” ׳”׳ ׳¦׳₪׳™׳×?'
     },
     C: {
         name: 'Capabilities (C)',
-        hebrew: 'יכולות',
-        prompt: 'איזו מיומנות או אסטרטגיה נדרשת כאן?'
+        hebrew: '׳™׳›׳•׳׳•׳×',
+        prompt: '׳׳™׳–׳• ׳׳™׳•׳׳ ׳•׳× ׳׳• ׳׳¡׳˜׳¨׳˜׳’׳™׳” ׳ ׳“׳¨׳©׳× ׳›׳׳?'
     },
     V: {
         name: 'Values/Beliefs (V)',
-        hebrew: 'ערכים/אמונות',
-        prompt: 'מה חשוב כאן? איזו אמונה מנהלת את ההתנהגות?'
+        hebrew: '׳¢׳¨׳›׳™׳/׳׳׳•׳ ׳•׳×',
+        prompt: '׳׳” ׳—׳©׳•׳‘ ׳›׳׳? ׳׳™׳–׳• ׳׳׳•׳ ׳” ׳׳ ׳”׳׳× ׳׳× ׳”׳”׳×׳ ׳”׳’׳•׳×?'
     },
     I: {
         name: 'Identity (I)',
-        hebrew: 'זהות',
-        prompt: 'מה זה אומר על הזהות: מי אני? איזה אדם אני?'
+        hebrew: '׳–׳”׳•׳×',
+        prompt: '׳׳” ׳–׳” ׳׳•׳׳¨ ׳¢׳ ׳”׳–׳”׳•׳×: ׳׳™ ׳׳ ׳™? ׳׳™׳–׳” ׳׳“׳ ׳׳ ׳™?'
     },
     S: {
         name: 'Belonging (S)',
-        hebrew: 'שייכות',
-        prompt: 'לאיזו קבוצה/קהילה/שייכות זה מתחבר?'
+        hebrew: '׳©׳™׳™׳›׳•׳×',
+        prompt: '׳׳׳™׳–׳• ׳§׳‘׳•׳¦׳”/׳§׳”׳™׳׳”/׳©׳™׳™׳›׳•׳× ׳–׳” ׳׳×׳—׳‘׳¨?'
     }
 };
 
 const LOGICAL_LEVEL_KEYWORDS = {
-    E: ['סביבה', 'מקום', 'זמן', 'הקשר', 'בחדר', 'בעבודה', 'בבית', 'מתי', 'איפה'],
-    B: ['עושה', 'עשיתי', 'ביצוע', 'פעולה', 'התנהגות', 'מגיב', 'אומר', 'שואל'],
-    C: ['יכולת', 'מיומנות', 'אסטרטגיה', 'כלי', 'ללמוד', 'להתאמן', 'לתרגל', 'מסוגל'],
-    V: ['חשוב', 'ערך', 'אמונה', 'מאמין', 'צריך', 'נכון', 'לא נכון', 'עיקרון'],
-    I: ['אני', 'עצמי', 'זהות', 'מי אני', 'טיפש', 'מצליחן', 'כישלון', 'בן אדם'],
-    S: ['אנחנו', 'קבוצה', 'קהילה', 'צוות', 'משפחה', 'שייכות', 'חברה', 'ארגון']
+    E: ['׳¡׳‘׳™׳‘׳”', '׳׳§׳•׳', '׳–׳׳', '׳”׳§׳©׳¨', '׳‘׳—׳“׳¨', '׳‘׳¢׳‘׳•׳“׳”', '׳‘׳‘׳™׳×', '׳׳×׳™', '׳׳™׳₪׳”'],
+    B: ['׳¢׳•׳©׳”', '׳¢׳©׳™׳×׳™', '׳‘׳™׳¦׳•׳¢', '׳₪׳¢׳•׳׳”', '׳”׳×׳ ׳”׳’׳•׳×', '׳׳’׳™׳‘', '׳׳•׳׳¨', '׳©׳•׳׳'],
+    C: ['׳™׳›׳•׳׳×', '׳׳™׳•׳׳ ׳•׳×', '׳׳¡׳˜׳¨׳˜׳’׳™׳”', '׳›׳׳™', '׳׳׳׳•׳“', '׳׳”׳×׳׳׳', '׳׳×׳¨׳’׳', '׳׳¡׳•׳’׳'],
+    V: ['׳—׳©׳•׳‘', '׳¢׳¨׳', '׳׳׳•׳ ׳”', '׳׳׳׳™׳', '׳¦׳¨׳™׳', '׳ ׳›׳•׳', '׳׳ ׳ ׳›׳•׳', '׳¢׳™׳§׳¨׳•׳'],
+    I: ['׳׳ ׳™', '׳¢׳¦׳׳™', '׳–׳”׳•׳×', '׳׳™ ׳׳ ׳™', '׳˜׳™׳₪׳©', '׳׳¦׳׳™׳—׳', '׳›׳™׳©׳׳•׳', '׳‘׳ ׳׳“׳'],
+    S: ['׳׳ ׳—׳ ׳•', '׳§׳‘׳•׳¦׳”', '׳§׳”׳™׳׳”', '׳¦׳•׳•׳×', '׳׳©׳₪׳—׳”', '׳©׳™׳™׳›׳•׳×', '׳—׳‘׳¨׳”', '׳׳¨׳’׳•׳']
 };
 
 function getPrismById(prismId) {
@@ -6402,7 +6581,7 @@ function parseLevelPrefixedText(rawText) {
 
 function inferLogicalLevel(text) {
     const source = (text || '').toLowerCase();
-    if (!source) return { level: '', confidence: 0, reason: 'אין טקסט לניתוח.' };
+    if (!source) return { level: '', confidence: 0, reason: '׳׳™׳ ׳˜׳§׳¡׳˜ ׳׳ ׳™׳×׳•׳—.' };
 
     let bestLevel = '';
     let bestScore = 0;
@@ -6415,20 +6594,20 @@ function inferLogicalLevel(text) {
     });
 
     if (!bestLevel || bestScore === 0) {
-        return { level: '', confidence: 0, reason: 'לא זוהו מילות מפתח חד-משמעיות.' };
+        return { level: '', confidence: 0, reason: '׳׳ ׳–׳•׳”׳• ׳׳™׳׳•׳× ׳׳₪׳×׳— ׳—׳“-׳׳©׳׳¢׳™׳•׳×.' };
     }
     if (bestScore === 1) {
-        return { level: bestLevel, confidence: 1, reason: `זוהתה מילה אחת שמתאימה לרמת ${getLevelDisplay(bestLevel)}.` };
+        return { level: bestLevel, confidence: 1, reason: `׳–׳•׳”׳×׳” ׳׳™׳׳” ׳׳—׳× ׳©׳׳×׳׳™׳׳” ׳׳¨׳׳× ${getLevelDisplay(bestLevel)}.` };
     }
-    return { level: bestLevel, confidence: 2, reason: `זוהו כמה רמזים שמתאימים לרמת ${getLevelDisplay(bestLevel)}.` };
+    return { level: bestLevel, confidence: 2, reason: `׳–׳•׳”׳• ׳›׳׳” ׳¨׳׳–׳™׳ ׳©׳׳×׳׳™׳׳™׳ ׳׳¨׳׳× ${getLevelDisplay(bestLevel)}.` };
 }
 
 function getLevelImprovementTip(level, prism) {
     if (prism && prism.level_hints && prism.level_hints[level]) {
-        return `מיקוד מומלץ לרמה זו: ${prism.level_hints[level]}`;
+        return `׳׳™׳§׳•׳“ ׳׳•׳׳׳¥ ׳׳¨׳׳” ׳–׳•: ${prism.level_hints[level]}`;
     }
     const info = LOGICAL_LEVEL_INFO[level];
-    return info ? info.prompt : 'מומלץ לדייק את הניסוח לרמה הלוגית המתאימה.';
+    return info ? info.prompt : '׳׳•׳׳׳¥ ׳׳“׳™׳™׳§ ׳׳× ׳”׳ ׳™׳¡׳•׳— ׳׳¨׳׳” ׳”׳׳•׳’׳™׳× ׳”׳׳×׳׳™׳׳”.';
 }
 
 function clearMappingInputStatus(inputEl) {
@@ -6459,7 +6638,7 @@ function validateMappingEntry(expectedLevel, rawText, suggestedLevel, prism) {
             detectedLevel: '',
             effectiveLevel: expectedLevel,
             status: 'empty',
-            reason: 'השדה ריק.',
+            reason: '׳”׳©׳“׳” ׳¨׳™׳§.',
             improvement
         };
     }
@@ -6471,7 +6650,7 @@ function validateMappingEntry(expectedLevel, rawText, suggestedLevel, prism) {
             detectedLevel: explicitLevel,
             effectiveLevel: explicitLevel,
             status: 'mismatch',
-            reason: `הטקסט מסומן כרמת ${getLevelDisplay(explicitLevel)} אבל הוזן בשדה ${getLevelDisplay(expectedLevel)}.`,
+            reason: `׳”׳˜׳§׳¡׳˜ ׳׳¡׳•׳׳ ׳›׳¨׳׳× ${getLevelDisplay(explicitLevel)} ׳׳‘׳ ׳”׳•׳–׳ ׳‘׳©׳“׳” ${getLevelDisplay(expectedLevel)}.`,
             improvement
         };
     }
@@ -6483,7 +6662,7 @@ function validateMappingEntry(expectedLevel, rawText, suggestedLevel, prism) {
             detectedLevel: explicitLevel,
             effectiveLevel: expectedLevel,
             status: 'ok',
-            reason: `הטקסט מתאים לשדה ${getLevelDisplay(expectedLevel)}.`,
+            reason: `׳”׳˜׳§׳¡׳˜ ׳׳×׳׳™׳ ׳׳©׳“׳” ${getLevelDisplay(expectedLevel)}.`,
             improvement
         };
     }
@@ -6496,7 +6675,7 @@ function validateMappingEntry(expectedLevel, rawText, suggestedLevel, prism) {
             detectedLevel: inferred.level,
             effectiveLevel: inferred.level,
             status: 'mismatch',
-            reason: `${inferred.reason} לכן יש סבירות גבוהה לשיבוץ שגוי בשדה ${getLevelDisplay(expectedLevel)}.`,
+            reason: `${inferred.reason} ׳׳›׳ ׳™׳© ׳¡׳‘׳™׳¨׳•׳× ׳’׳‘׳•׳”׳” ׳׳©׳™׳‘׳•׳¥ ׳©׳’׳•׳™ ׳‘׳©׳“׳” ${getLevelDisplay(expectedLevel)}.`,
             improvement
         };
     }
@@ -6519,7 +6698,7 @@ function validateMappingEntry(expectedLevel, rawText, suggestedLevel, prism) {
         detectedLevel: inferred.level || '',
         effectiveLevel: expectedLevel,
         status: 'uncertain',
-        reason: inferred.reason || 'לא ניתן להכריע אוטומטית אם השיבוץ מדויק.',
+        reason: inferred.reason || '׳׳ ׳ ׳™׳×׳ ׳׳”׳›׳¨׳™׳¢ ׳׳•׳˜׳•׳׳˜׳™׳× ׳׳ ׳”׳©׳™׳‘׳•׳¥ ׳׳“׳•׳™׳§.',
         improvement
     };
 }
@@ -6533,7 +6712,7 @@ function computePrismScore(answerChecks) {
             coverage: 0,
             alignment: 0,
             clarity: 0,
-            grade: 'אין מספיק מידע לציון'
+            grade: '׳׳™׳ ׳׳¡׳₪׳™׳§ ׳׳™׳“׳¢ ׳׳¦׳™׳•׳'
         };
     }
 
@@ -6546,10 +6725,10 @@ function computePrismScore(answerChecks) {
     const clarity = Math.round((sufficientlyDetailed / answeredCount) * 20);
     const total = Math.min(100, coverage + alignment + clarity);
 
-    let grade = 'טעון שיפור משמעותי';
-    if (total >= 85) grade = 'מצוין';
-    else if (total >= 70) grade = 'טוב מאוד';
-    else if (total >= 55) grade = 'בינוני';
+    let grade = '׳˜׳¢׳•׳ ׳©׳™׳₪׳•׳¨ ׳׳©׳׳¢׳•׳×׳™';
+    if (total >= 85) grade = '׳׳¦׳•׳™׳';
+    else if (total >= 70) grade = '׳˜׳•׳‘ ׳׳׳•׳“';
+    else if (total >= 55) grade = '׳‘׳™׳ ׳•׳ ׳™';
 
     return { total, coverage, alignment, clarity, grade };
 }
@@ -6564,7 +6743,7 @@ function renderPrismDeepGuide(prism) {
         .map(level => `<li><strong>${getLevelDisplay(level)}:</strong> ${LOGICAL_LEVEL_INFO[level].prompt}</li>`)
         .join('');
     const depthLadder = ['E', 'B', 'C', 'V', 'I', 'S']
-        .map(level => `<li><strong>${getLevelDisplay(level)}:</strong> עומק החשיבה הוא "${LOGICAL_LEVEL_INFO[level].prompt}"</li>`)
+        .map(level => `<li><strong>${getLevelDisplay(level)}:</strong> ׳¢׳•׳׳§ ׳”׳—׳©׳™׳‘׳” ׳”׳•׳ "${LOGICAL_LEVEL_INFO[level].prompt}"</li>`)
         .join('');
     const anchorTemplates = (prism.anchor_question_templates || [])
         .slice(0, 2)
@@ -6572,42 +6751,42 @@ function renderPrismDeepGuide(prism) {
         .join('');
 
     guideEl.innerHTML = `
-        <h4>הסבר עומק על הפריזמה: ${prism.name_he}</h4>
-        <p><strong>מה הפריזמה הזו בודקת?</strong> ${prism.philosophy_core}</p>
-        <p><strong>למה זה חשוב?</strong> ${prism.therapist_intent || 'מטרת הפריזמה היא להפוך ניסוח כללי למפה ברורה שאפשר לפעול לפיה.'}</p>
+        <h4>׳”׳¡׳‘׳¨ ׳¢׳•׳׳§ ׳¢׳ ׳”׳₪׳¨׳™׳–׳׳”: ${prism.name_he}</h4>
+        <p><strong>׳׳” ׳”׳₪׳¨׳™׳–׳׳” ׳”׳–׳• ׳‘׳•׳“׳§׳×?</strong> ${prism.philosophy_core}</p>
+        <p><strong>׳׳׳” ׳–׳” ׳—׳©׳•׳‘?</strong> ${prism.therapist_intent || '׳׳˜׳¨׳× ׳”׳₪׳¨׳™׳–׳׳” ׳”׳™׳ ׳׳”׳₪׳•׳ ׳ ׳™׳¡׳•׳— ׳›׳׳׳™ ׳׳׳₪׳” ׳‘׳¨׳•׳¨׳” ׳©׳׳₪׳©׳¨ ׳׳₪׳¢׳•׳ ׳׳₪׳™׳”.'}</p>
 
         <div class="prism-guide-grid">
             <div class="prism-guide-card">
-                <h5>איך עובדים נכון ב-4 שלבים</h5>
+                <h5>׳׳™׳ ׳¢׳•׳‘׳“׳™׳ ׳ ׳›׳•׳ ׳‘-4 ׳©׳׳‘׳™׳</h5>
                 <ol>
-                    <li>מנסחים את שאלת העוגן ומוודאים שהיא ברורה ומדידה.</li>
-                    <li>ממפים כל תשובה לרמה הלוגית המתאימה: E/B/C/V/I/S.</li>
-                    <li>מזהים פערים ושיבוצים שגויים כדי למנוע מסקנות לא מדויקות.</li>
-                    <li>בוחרים Pivot אחד קטן לביצוע מיידי, עם המשך עומק מדורג.</li>
+                    <li>׳׳ ׳¡׳—׳™׳ ׳׳× ׳©׳׳׳× ׳”׳¢׳•׳’׳ ׳•׳׳•׳•׳“׳׳™׳ ׳©׳”׳™׳ ׳‘׳¨׳•׳¨׳” ׳•׳׳“׳™׳“׳”.</li>
+                    <li>׳׳׳₪׳™׳ ׳›׳ ׳×׳©׳•׳‘׳” ׳׳¨׳׳” ׳”׳׳•׳’׳™׳× ׳”׳׳×׳׳™׳׳”: E/B/C/V/I/S.</li>
+                    <li>׳׳–׳”׳™׳ ׳₪׳¢׳¨׳™׳ ׳•׳©׳™׳‘׳•׳¦׳™׳ ׳©׳’׳•׳™׳™׳ ׳›׳“׳™ ׳׳׳ ׳•׳¢ ׳׳¡׳§׳ ׳•׳× ׳׳ ׳׳“׳•׳™׳§׳•׳×.</li>
+                    <li>׳‘׳•׳—׳¨׳™׳ Pivot ׳׳—׳“ ׳§׳˜׳ ׳׳‘׳™׳¦׳•׳¢ ׳׳™׳™׳“׳™, ׳¢׳ ׳”׳׳©׳ ׳¢׳•׳׳§ ׳׳“׳•׳¨׳’.</li>
                 </ol>
             </div>
             <div class="prism-guide-card">
-                <h5>איך להבחין בין הרמות</h5>
+                <h5>׳׳™׳ ׳׳”׳‘׳—׳™׳ ׳‘׳™׳ ׳”׳¨׳׳•׳×</h5>
                 <ul>${levelGuide}</ul>
             </div>
             <div class="prism-guide-card">
-                <h5>מה אומר "עומק" בפריזמה</h5>
-                <p>מתחילים ב-E/B כדי לעגן עובדות בשטח, ואז עולים ל-C/V/I/S כדי להבין מנגנון פנימי וזהותי.</p>
+                <h5>׳׳” ׳׳•׳׳¨ "׳¢׳•׳׳§" ׳‘׳₪׳¨׳™׳–׳׳”</h5>
+                <p>׳׳×׳—׳™׳׳™׳ ׳‘-E/B ׳›׳“׳™ ׳׳¢׳’׳ ׳¢׳•׳‘׳“׳•׳× ׳‘׳©׳˜׳—, ׳•׳׳– ׳¢׳•׳׳™׳ ׳-C/V/I/S ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳׳ ׳’׳ ׳•׳ ׳₪׳ ׳™׳׳™ ׳•׳–׳”׳•׳×׳™.</p>
                 <ul>${depthLadder}</ul>
             </div>
         </div>
 
         <div class="prism-guide-grid">
             <div class="prism-guide-card">
-                <h5>דוגמאות עוגן מומלצות</h5>
-                <ul>${anchorTemplates || '<li>אין דוגמאות נוספות בנתונים.</li>'}</ul>
-                <h5>דוגמאות מהחיים</h5>
-                <ul>${examples || '<li>אין דוגמאות נוספות בנתונים.</li>'}</ul>
+                <h5>׳“׳•׳’׳׳׳•׳× ׳¢׳•׳’׳ ׳׳•׳׳׳¦׳•׳×</h5>
+                <ul>${anchorTemplates || '<li>׳׳™׳ ׳“׳•׳’׳׳׳•׳× ׳ ׳•׳¡׳₪׳•׳× ׳‘׳ ׳×׳•׳ ׳™׳.</li>'}</ul>
+                <h5>׳“׳•׳’׳׳׳•׳× ׳׳”׳—׳™׳™׳</h5>
+                <ul>${examples || '<li>׳׳™׳ ׳“׳•׳’׳׳׳•׳× ׳ ׳•׳¡׳₪׳•׳× ׳‘׳ ׳×׳•׳ ׳™׳.</li>'}</ul>
             </div>
             <div class="prism-guide-card">
-                <h5>טעויות נפוצות שכדאי להימנע מהן</h5>
-                <ul>${antiPatterns || '<li>להישאר כללי ולא לבדוק ראיות.</li>'}</ul>
-                <p><strong>טיפ:</strong> אם יש ספק ברמה, קצר את המשפט לשורה אחת קונקרטית ובדוק שוב לאיזו שאלה הוא עונה.</p>
+                <h5>׳˜׳¢׳•׳™׳•׳× ׳ ׳₪׳•׳¦׳•׳× ׳©׳›׳“׳׳™ ׳׳”׳™׳׳ ׳¢ ׳׳”׳</h5>
+                <ul>${antiPatterns || '<li>׳׳”׳™׳©׳׳¨ ׳›׳׳׳™ ׳•׳׳ ׳׳‘׳“׳•׳§ ׳¨׳׳™׳•׳×.</li>'}</ul>
+                <p><strong>׳˜׳™׳₪:</strong> ׳׳ ׳™׳© ׳¡׳₪׳§ ׳‘׳¨׳׳”, ׳§׳¦׳¨ ׳׳× ׳”׳׳©׳₪׳˜ ׳׳©׳•׳¨׳” ׳׳—׳× ׳§׳•׳ ׳§׳¨׳˜׳™׳× ׳•׳‘׳“׳•׳§ ׳©׳•׳‘ ׳׳׳™׳–׳• ׳©׳׳׳” ׳”׳•׳ ׳¢׳•׳ ׳”.</p>
             </div>
         </div>
     `;
@@ -6616,23 +6795,23 @@ function renderPrismDeepGuide(prism) {
 function renderPrismScoreInterpretation(score, mismatchCount) {
     const notes = [];
     if (score.total >= 85) {
-        notes.push('המיפוי מדויק מאוד. אפשר לעבור לעבודה אסטרטגית על התערבות אחת עמוקה.');
+        notes.push('׳”׳׳™׳₪׳•׳™ ׳׳“׳•׳™׳§ ׳׳׳•׳“. ׳׳₪׳©׳¨ ׳׳¢׳‘׳•׳¨ ׳׳¢׳‘׳•׳“׳” ׳׳¡׳˜׳¨׳˜׳’׳™׳× ׳¢׳ ׳”׳×׳¢׳¨׳‘׳•׳× ׳׳—׳× ׳¢׳׳•׳§׳”.');
     } else if (score.total >= 70) {
-        notes.push('בסיס טוב מאוד. נדרש חידוד קל ברמות כדי להפוך את המיפוי לחד ומשכנע.');
+        notes.push('׳‘׳¡׳™׳¡ ׳˜׳•׳‘ ׳׳׳•׳“. ׳ ׳“׳¨׳© ׳—׳™׳“׳•׳“ ׳§׳ ׳‘׳¨׳׳•׳× ׳›׳“׳™ ׳׳”׳₪׳•׳ ׳׳× ׳”׳׳™׳₪׳•׳™ ׳׳—׳“ ׳•׳׳©׳›׳ ׳¢.');
     } else if (score.total >= 55) {
-        notes.push('המיפוי חלקי. לפני Pivot עמוק, מומלץ לסדר את השיבוצים ולדייק ניסוחים.');
+        notes.push('׳”׳׳™׳₪׳•׳™ ׳—׳׳§׳™. ׳׳₪׳ ׳™ Pivot ׳¢׳׳•׳§, ׳׳•׳׳׳¥ ׳׳¡׳“׳¨ ׳׳× ׳”׳©׳™׳‘׳•׳¦׳™׳ ׳•׳׳“׳™׳™׳§ ׳ ׳™׳¡׳•׳—׳™׳.');
     } else {
-        notes.push('המיפוי עדיין ראשוני. כדאי לחזור לשאלת העוגן ולמפות מחדש בצורה קונקרטית.');
+        notes.push('׳”׳׳™׳₪׳•׳™ ׳¢׳“׳™׳™׳ ׳¨׳׳©׳•׳ ׳™. ׳›׳“׳׳™ ׳׳—׳–׳•׳¨ ׳׳©׳׳׳× ׳”׳¢׳•׳’׳ ׳•׳׳׳₪׳•׳× ׳׳—׳“׳© ׳‘׳¦׳•׳¨׳” ׳§׳•׳ ׳§׳¨׳˜׳™׳×.');
     }
 
     if (mismatchCount > 0) {
-        notes.push(`זוהו ${mismatchCount} שיבוצים שגויים. זה לא כישלון אלא איתות שאפשר לשפר דיוק ולחסוך מאמץ בהמשך.`);
+        notes.push(`׳–׳•׳”׳• ${mismatchCount} ׳©׳™׳‘׳•׳¦׳™׳ ׳©׳’׳•׳™׳™׳. ׳–׳” ׳׳ ׳›׳™׳©׳׳•׳ ׳׳׳ ׳׳™׳×׳•׳× ׳©׳׳₪׳©׳¨ ׳׳©׳₪׳¨ ׳“׳™׳•׳§ ׳•׳׳—׳¡׳•׳ ׳׳׳׳¥ ׳‘׳”׳׳©׳.`);
     } else {
-        notes.push('לא זוהו שיבוצים שגויים מפורשים, וזה בסיס מצוין להתקדמות.');
+        notes.push('׳׳ ׳–׳•׳”׳• ׳©׳™׳‘׳•׳¦׳™׳ ׳©׳’׳•׳™׳™׳ ׳׳₪׳•׳¨׳©׳™׳, ׳•׳–׳” ׳‘׳¡׳™׳¡ ׳׳¦׳•׳™׳ ׳׳”׳×׳§׳“׳׳•׳×.');
     }
 
     if (score.clarity < 12) {
-        notes.push('רמת בהירות נמוכה יחסית: נסח משפטים קצרים עם פעולה, מקום או קריטריון במקום ניסוחים כלליים.');
+        notes.push('׳¨׳׳× ׳‘׳”׳™׳¨׳•׳× ׳ ׳׳•׳›׳” ׳™׳—׳¡׳™׳×: ׳ ׳¡׳— ׳׳©׳₪׳˜׳™׳ ׳§׳¦׳¨׳™׳ ׳¢׳ ׳₪׳¢׳•׳׳”, ׳׳§׳•׳ ׳׳• ׳§׳¨׳™׳˜׳¨׳™׳•׳ ׳‘׳׳§׳•׳ ׳ ׳™׳¡׳•׳—׳™׳ ׳›׳׳׳™׳™׳.');
     }
 
     return `<ul>${notes.map(note => `<li>${note}</li>`).join('')}</ul>`;
@@ -6643,27 +6822,27 @@ function renderPrismLevelsDeepAnalysis(prism, recommendation) {
     const items = order.map(level => {
         const count = recommendation.counts[level] || 0;
         const levelHint = prism?.level_hints?.[level] || LOGICAL_LEVEL_INFO[level].prompt;
-        const intervention = prism?.recommended_interventions_by_level?.[level] || 'המשך דיוק בשפה ובדיקה מול שאלת העוגן.';
+        const intervention = prism?.recommended_interventions_by_level?.[level] || '׳”׳׳©׳ ׳“׳™׳•׳§ ׳‘׳©׳₪׳” ׳•׳‘׳“׳™׳§׳” ׳׳•׳ ׳©׳׳׳× ׳”׳¢׳•׳’׳.';
 
-        let meaning = 'לא התקבלו תשובות ברמה הזו, לכן חשוב לבדוק אם נוצרה השמטה.';
+        let meaning = '׳׳ ׳”׳×׳§׳‘׳׳• ׳×׳©׳•׳‘׳•׳× ׳‘׳¨׳׳” ׳”׳–׳•, ׳׳›׳ ׳—׳©׳•׳‘ ׳׳‘׳“׳•׳§ ׳׳ ׳ ׳•׳¦׳¨׳” ׳”׳©׳׳˜׳”.';
         if (count >= 3) {
-            meaning = 'הרמה הזו דומיננטית מאוד ומספקת מנוף התערבות מרכזי.';
+            meaning = '׳”׳¨׳׳” ׳”׳–׳• ׳“׳•׳׳™׳ ׳ ׳˜׳™׳× ׳׳׳•׳“ ׳•׳׳¡׳₪׳§׳× ׳׳ ׳•׳£ ׳”׳×׳¢׳¨׳‘׳•׳× ׳׳¨׳›׳–׳™.';
         } else if (count === 2) {
-            meaning = 'הרמה הזו חוזרת כמה פעמים ולכן כדאי להתייחס אליה כציר עבודה משמעותי.';
+            meaning = '׳”׳¨׳׳” ׳”׳–׳• ׳—׳•׳–׳¨׳× ׳›׳׳” ׳₪׳¢׳׳™׳ ׳•׳׳›׳ ׳›׳“׳׳™ ׳׳”׳×׳™׳™׳—׳¡ ׳׳׳™׳” ׳›׳¦׳™׳¨ ׳¢׳‘׳•׳“׳” ׳׳©׳׳¢׳•׳×׳™.';
         } else if (count === 1) {
-            meaning = 'יש סימן ראשוני לרמה הזו, אך נדרש עוד ביסוס כדי להסיק מסקנות.';
+            meaning = '׳™׳© ׳¡׳™׳׳ ׳¨׳׳©׳•׳ ׳™ ׳׳¨׳׳” ׳”׳–׳•, ׳׳ ׳ ׳“׳¨׳© ׳¢׳•׳“ ׳‘׳™׳¡׳•׳¡ ׳›׳“׳™ ׳׳”׳¡׳™׳§ ׳׳¡׳§׳ ׳•׳×.';
         }
 
         const pivotTag = recommendation.pivot === level
-            ? '<p><strong>סטטוס:</strong> זו רמת ה-Pivot המומלצת כרגע.</p>'
+            ? '<p><strong>׳¡׳˜׳˜׳•׳¡:</strong> ׳–׳• ׳¨׳׳× ׳”-Pivot ׳”׳׳•׳׳׳¦׳× ׳›׳¨׳’׳¢.</p>'
             : '';
 
         return `
             <li class="prism-level-deep-item">
-                <p><strong>${getLevelDisplay(level)}</strong> | מופעים: ${count}</p>
-                <p><strong>משמעות:</strong> ${meaning}</p>
-                <p><strong>מה לבדוק ברמה הזו:</strong> ${levelHint}</p>
-                <p><strong>מהלך התערבות אפשרי:</strong> ${intervention}</p>
+                <p><strong>${getLevelDisplay(level)}</strong> | ׳׳•׳₪׳¢׳™׳: ${count}</p>
+                <p><strong>׳׳©׳׳¢׳•׳×:</strong> ${meaning}</p>
+                <p><strong>׳׳” ׳׳‘׳“׳•׳§ ׳‘׳¨׳׳” ׳”׳–׳•:</strong> ${levelHint}</p>
+                <p><strong>׳׳”׳׳ ׳”׳×׳¢׳¨׳‘׳•׳× ׳׳₪׳©׳¨׳™:</strong> ${intervention}</p>
                 ${pivotTag}
             </li>
         `;
@@ -6676,22 +6855,22 @@ function renderPrismActionPlan(session, recommendation, mismatchCount) {
     const highResistance = session.resistance >= 4;
     const highEmotion = session.emotion >= 4;
     const alignmentStep = mismatchCount > 0
-        ? 'יישור שיבוצים: עבור כל פריט אדום, נסח מחדש משפט ממוקד שמתאים רק לרמה אחת.'
-        : 'שימור דיוק: השאר את הניסוח חד וקצר, ובדוק שכל משפט עונה לשאלת העוגן.';
+        ? '׳™׳™׳©׳•׳¨ ׳©׳™׳‘׳•׳¦׳™׳: ׳¢׳‘׳•׳¨ ׳›׳ ׳₪׳¨׳™׳˜ ׳׳“׳•׳, ׳ ׳¡׳— ׳׳—׳“׳© ׳׳©׳₪׳˜ ׳׳׳•׳§׳“ ׳©׳׳×׳׳™׳ ׳¨׳§ ׳׳¨׳׳” ׳׳—׳×.'
+        : '׳©׳™׳׳•׳¨ ׳“׳™׳•׳§: ׳”׳©׳׳¨ ׳׳× ׳”׳ ׳™׳¡׳•׳— ׳—׳“ ׳•׳§׳¦׳¨, ׳•׳‘׳“׳•׳§ ׳©׳›׳ ׳׳©׳₪׳˜ ׳¢׳•׳ ׳” ׳׳©׳׳׳× ׳”׳¢׳•׳’׳.';
     const resistanceStep = highResistance
-        ? 'עבודה עם התנגדות גבוהה: התחל ב-Small Win חיצוני (E/B) לפני שינוי אמונות עמוק.'
-        : 'אפשר להתקדם לעומק: אחרי ביצוע צעד קטן, עבור לעבודה ברמות C/V/I.';
+        ? '׳¢׳‘׳•׳“׳” ׳¢׳ ׳”׳×׳ ׳’׳“׳•׳× ׳’׳‘׳•׳”׳”: ׳”׳×׳—׳ ׳‘-Small Win ׳—׳™׳¦׳•׳ ׳™ (E/B) ׳׳₪׳ ׳™ ׳©׳™׳ ׳•׳™ ׳׳׳•׳ ׳•׳× ׳¢׳׳•׳§.'
+        : '׳׳₪׳©׳¨ ׳׳”׳×׳§׳“׳ ׳׳¢׳•׳׳§: ׳׳—׳¨׳™ ׳‘׳™׳¦׳•׳¢ ׳¦׳¢׳“ ׳§׳˜׳, ׳¢׳‘׳•׳¨ ׳׳¢׳‘׳•׳“׳” ׳‘׳¨׳׳•׳× C/V/I.';
     const emotionStep = highEmotion
-        ? 'במצב רגשי גבוה: האט קצב, אמת עובדות, ורק אז בצע פרשנות או הכללה.'
-        : 'הרגש יציב יחסית: מתאים לבניית תוכנית פעולה מדורגת לשבוע הקרוב.';
+        ? '׳‘׳׳¦׳‘ ׳¨׳’׳©׳™ ׳’׳‘׳•׳”: ׳”׳׳˜ ׳§׳¦׳‘, ׳׳׳× ׳¢׳•׳‘׳“׳•׳×, ׳•׳¨׳§ ׳׳– ׳‘׳¦׳¢ ׳₪׳¨׳©׳ ׳•׳× ׳׳• ׳”׳›׳׳׳”.'
+        : '׳”׳¨׳’׳© ׳™׳¦׳™׳‘ ׳™׳—׳¡׳™׳×: ׳׳×׳׳™׳ ׳׳‘׳ ׳™׳™׳× ׳×׳•׳›׳ ׳™׳× ׳₪׳¢׳•׳׳” ׳׳“׳•׳¨׳’׳× ׳׳©׳‘׳•׳¢ ׳”׳§׳¨׳•׳‘.';
 
     return `
         <ol class="prism-action-plan">
-            <li><strong>צעד 1 (דיוק שפה):</strong> ${alignmentStep}</li>
-            <li><strong>צעד 2 (Pivot מעשי):</strong> בצע פעולה אחת לפי רמת ${recommendation.levelName}: ${recommendation.intervention}</li>
-            <li><strong>צעד 3 (וויסות והתמדה):</strong> ${resistanceStep}</li>
-            <li><strong>צעד 4 (עומק רגשי):</strong> ${emotionStep}</li>
-            <li><strong>שאלת המשך מחייבת:</strong> ${recommendation.followUpQuestion}</li>
+            <li><strong>׳¦׳¢׳“ 1 (׳“׳™׳•׳§ ׳©׳₪׳”):</strong> ${alignmentStep}</li>
+            <li><strong>׳¦׳¢׳“ 2 (Pivot ׳׳¢׳©׳™):</strong> ׳‘׳¦׳¢ ׳₪׳¢׳•׳׳” ׳׳—׳× ׳׳₪׳™ ׳¨׳׳× ${recommendation.levelName}: ${recommendation.intervention}</li>
+            <li><strong>׳¦׳¢׳“ 3 (׳•׳•׳™׳¡׳•׳× ׳•׳”׳×׳׳“׳”):</strong> ${resistanceStep}</li>
+            <li><strong>׳¦׳¢׳“ 4 (׳¢׳•׳׳§ ׳¨׳’׳©׳™):</strong> ${emotionStep}</li>
+            <li><strong>׳©׳׳׳× ׳”׳׳©׳ ׳׳—׳™׳™׳‘׳×:</strong> ${recommendation.followUpQuestion}</li>
         </ol>
     `;
 }
@@ -6743,8 +6922,8 @@ function renderPrismLibrary() {
         div.innerHTML = `
             <h4>${p.name_he}</h4>
             <p>${p.philosophy_core}</p>
-            <p><strong>שאלת עוגן:</strong> ${p.anchor_question_templates[0]}</p>
-            <div style="margin-top:10px"><button class="btn prism-open-btn" data-id="${p.id}">בחר פריזמה</button></div>
+            <p><strong>׳©׳׳׳× ׳¢׳•׳’׳:</strong> ${p.anchor_question_templates[0]}</p>
+            <div style="margin-top:10px"><button class="btn prism-open-btn" data-id="${p.id}">׳‘׳—׳¨ ׳₪׳¨׳™׳–׳׳”</button></div>
         `;
         // Direct binding fallback (helps in some embedded hosts).
         const openBtn = div.querySelector('.prism-open-btn');
@@ -6761,7 +6940,7 @@ function renderPrismLibrary() {
 
 function openPrism(id) {
     const prism = getPrismById(id);
-    if (!prism) return alert('פריזמה לא נמצאה');
+    if (!prism) return alert('׳₪׳¨׳™׳–׳׳” ׳׳ ׳ ׳׳¦׳׳”');
     document.getElementById('prism-library').classList.add('hidden');
     const detail = document.getElementById('prism-detail');
     detail.classList.remove('hidden');
@@ -6795,7 +6974,7 @@ function openPrism(id) {
 function handlePrismSubmit() {
     const id = document.getElementById('prism-detail').getAttribute('data-prism-id');
     const prism = getPrismById(id);
-    if (!prism) return alert('אין פריזמה פעילה');
+    if (!prism) return alert('׳׳™׳ ׳₪׳¨׳™׳–׳׳” ׳₪׳¢׳™׳׳”');
 
     const answerChecks = [];
     ['E','B','C','V','I','S'].forEach(level => {
@@ -6830,7 +7009,7 @@ function handlePrismSubmit() {
 
     if (answerChecks.length === 0) {
         playUISound('prism_error');
-        showHintMessage('יש להזין לפחות תשובה אחת כדי לקבל אבחון וציון.');
+        showHintMessage('׳™׳© ׳׳”׳–׳™׳ ׳׳₪׳—׳•׳× ׳×׳©׳•׳‘׳” ׳׳—׳× ׳›׳“׳™ ׳׳§׳‘׳ ׳׳‘׳—׳•׳ ׳•׳¦׳™׳•׳.');
         return;
     }
 
@@ -6886,29 +7065,29 @@ function computePivotRecommendation(session) {
 
     const prism = getPrismById(session.prism_id);
     const mismatches = session.answers.filter(a => a.status === 'mismatch').length;
-    const intervention = prism?.recommended_interventions_by_level?.[best] || 'מומלץ להתחיל בצעד קטן וברור שניתן לבצע השבוע.';
+    const intervention = prism?.recommended_interventions_by_level?.[best] || '׳׳•׳׳׳¥ ׳׳”׳×׳—׳™׳ ׳‘׳¦׳¢׳“ ׳§׳˜׳ ׳•׳‘׳¨׳•׳¨ ׳©׳ ׳™׳×׳ ׳׳‘׳¦׳¢ ׳”׳©׳‘׳•׳¢.';
     const levelSummary = getLevelDisplay(best);
     const reasonParts = [];
 
     if (bestCount > 0) {
-        reasonParts.push(`הריכוז הגבוה ביותר של תשובות נמצא ברמת ${levelSummary} (${bestCount} תשובות).`);
+        reasonParts.push(`׳”׳¨׳™׳›׳•׳– ׳”׳’׳‘׳•׳” ׳‘׳™׳•׳×׳¨ ׳©׳ ׳×׳©׳•׳‘׳•׳× ׳ ׳׳¦׳ ׳‘׳¨׳׳× ${levelSummary} (${bestCount} ׳×׳©׳•׳‘׳•׳×).`);
     } else {
-        reasonParts.push('אין מספיק תשובות ממוקדות, לכן נבחרה רמת התחלה מעשית.');
+        reasonParts.push('׳׳™׳ ׳׳¡׳₪׳™׳§ ׳×׳©׳•׳‘׳•׳× ׳׳׳•׳§׳“׳•׳×, ׳׳›׳ ׳ ׳‘׳—׳¨׳” ׳¨׳׳× ׳”׳×׳—׳׳” ׳׳¢׳©׳™׳×.');
     }
     if (mismatches > 0) {
-        reasonParts.push(`זוהו ${mismatches} שיבוצים לא מדויקים, ולכן חשוב להתחיל בסידור הרמות לפני התערבות עמוקה.`);
+        reasonParts.push(`׳–׳•׳”׳• ${mismatches} ׳©׳™׳‘׳•׳¦׳™׳ ׳׳ ׳׳“׳•׳™׳§׳™׳, ׳•׳׳›׳ ׳—׳©׳•׳‘ ׳׳”׳×׳—׳™׳ ׳‘׳¡׳™׳“׳•׳¨ ׳”׳¨׳׳•׳× ׳׳₪׳ ׳™ ׳”׳×׳¢׳¨׳‘׳•׳× ׳¢׳׳•׳§׳”.`);
     }
     if (session.resistance >= 4) {
-        reasonParts.push('רמת התנגדות גבוהה מצביעה על עדיפות להתחלה ברמה פרקטית ונמוכה יותר.');
+        reasonParts.push('׳¨׳׳× ׳”׳×׳ ׳’׳“׳•׳× ׳’׳‘׳•׳”׳” ׳׳¦׳‘׳™׳¢׳” ׳¢׳ ׳¢׳“׳™׳₪׳•׳× ׳׳”׳×׳—׳׳” ׳‘׳¨׳׳” ׳₪׳¨׳§׳˜׳™׳× ׳•׳ ׳׳•׳›׳” ׳™׳•׳×׳¨.');
     }
 
     const followUpQuestions = {
-        E: 'איזה שינוי קטן בסביבה יכול להפוך את ההתנהגות לקלה יותר כבר מחר?',
-        B: 'איזו פעולה אחת ספציפית תבצע בפועל במהלך 24 השעות הקרובות?',
-        C: 'איזו מיומנות אחת חסרה, ואיך תתרגל אותה 10 דקות ביום?',
-        V: 'איזו אמונה מרכזית מנהלת את המצב, ומה יקרה אם ננסח אותה מחדש?',
-        I: 'איזה סיפור זהות מופעל כאן, ואיזה ניסוח זהות חלופי יעזור להתקדם?',
-        S: 'מי במעגל שלך יכול לתמוך במהלך, ואיך תחבר אותו לתהליך?'
+        E: '׳׳™׳–׳” ׳©׳™׳ ׳•׳™ ׳§׳˜׳ ׳‘׳¡׳‘׳™׳‘׳” ׳™׳›׳•׳ ׳׳”׳₪׳•׳ ׳׳× ׳”׳”׳×׳ ׳”׳’׳•׳× ׳׳§׳׳” ׳™׳•׳×׳¨ ׳›׳‘׳¨ ׳׳—׳¨?',
+        B: '׳׳™׳–׳• ׳₪׳¢׳•׳׳” ׳׳—׳× ׳¡׳₪׳¦׳™׳₪׳™׳× ׳×׳‘׳¦׳¢ ׳‘׳₪׳•׳¢׳ ׳‘׳׳”׳׳ 24 ׳”׳©׳¢׳•׳× ׳”׳§׳¨׳•׳‘׳•׳×?',
+        C: '׳׳™׳–׳• ׳׳™׳•׳׳ ׳•׳× ׳׳—׳× ׳—׳¡׳¨׳”, ׳•׳׳™׳ ׳×׳×׳¨׳’׳ ׳׳•׳×׳” 10 ׳“׳§׳•׳× ׳‘׳™׳•׳?',
+        V: '׳׳™׳–׳• ׳׳׳•׳ ׳” ׳׳¨׳›׳–׳™׳× ׳׳ ׳”׳׳× ׳׳× ׳”׳׳¦׳‘, ׳•׳׳” ׳™׳§׳¨׳” ׳׳ ׳ ׳ ׳¡׳— ׳׳•׳×׳” ׳׳—׳“׳©?',
+        I: '׳׳™׳–׳” ׳¡׳™׳₪׳•׳¨ ׳–׳”׳•׳× ׳׳•׳₪׳¢׳ ׳›׳׳, ׳•׳׳™׳–׳” ׳ ׳™׳¡׳•׳— ׳–׳”׳•׳× ׳—׳׳•׳₪׳™ ׳™׳¢׳–׳•׳¨ ׳׳”׳×׳§׳“׳?',
+        S: '׳׳™ ׳‘׳׳¢׳’׳ ׳©׳׳ ׳™׳›׳•׳ ׳׳×׳׳•׳ ׳‘׳׳”׳׳, ׳•׳׳™׳ ׳×׳—׳‘׳¨ ׳׳•׳×׳• ׳׳×׳”׳׳™׳?'
     };
 
     return {
@@ -6928,9 +7107,9 @@ function renderPrismResult(session, recommendation) {
 
     const score = session.score || computePrismScore(session.answers || []);
     const statusMap = {
-        ok: { label: 'תואם', className: 'status-ok' },
-        mismatch: { label: 'שיבוץ שגוי', className: 'status-bad' },
-        uncertain: { label: 'דורש חידוד', className: 'status-warn' }
+        ok: { label: '׳×׳•׳׳', className: 'status-ok' },
+        mismatch: { label: '׳©׳™׳‘׳•׳¥ ׳©׳’׳•׳™', className: 'status-bad' },
+        uncertain: { label: '׳“׳•׳¨׳© ׳—׳™׳“׳•׳“', className: 'status-warn' }
     };
 
     const mismatchCount = (session.answers || []).filter(a => a.status === 'mismatch').length;
@@ -6945,74 +7124,74 @@ function renderPrismResult(session, recommendation) {
     const answersHtml = (session.answers || []).map(answer => {
         const status = statusMap[answer.status] || statusMap.uncertain;
         const movedLevelNote = answer.effectiveLevel && answer.effectiveLevel !== answer.level
-            ? `<p><strong>מיקום מומלץ:</strong> ${getLevelDisplay(answer.effectiveLevel)}</p>`
+            ? `<p><strong>׳׳™׳§׳•׳ ׳׳•׳׳׳¥:</strong> ${getLevelDisplay(answer.effectiveLevel)}</p>`
             : '';
 
         return `
             <li class="prism-check-item ${status.className}">
-                <p><strong>שדה שהוזן:</strong> ${getLevelDisplay(answer.level)}</p>
-                <p><strong>סטטוס:</strong> ${status.label}</p>
-                <p><strong>תוכן:</strong> ${answer.text}</p>
+                <p><strong>׳©׳“׳” ׳©׳”׳•׳–׳:</strong> ${getLevelDisplay(answer.level)}</p>
+                <p><strong>׳¡׳˜׳˜׳•׳¡:</strong> ${status.label}</p>
+                <p><strong>׳×׳•׳›׳:</strong> ${answer.text}</p>
                 ${movedLevelNote}
-                <p><strong>למה:</strong> ${answer.reason}</p>
-                <p><strong>איך לשפר:</strong> ${answer.improvement}</p>
+                <p><strong>׳׳׳”:</strong> ${answer.reason}</p>
+                <p><strong>׳׳™׳ ׳׳©׳₪׳¨:</strong> ${answer.improvement}</p>
             </li>
         `;
     }).join('');
 
     out.innerHTML = `
-        <h4>מפת תשובות מפורטת - ${session.prism_name}</h4>
-        <p><strong>שאלת עוגן:</strong> ${session.anchor}</p>
+        <h4>׳׳₪׳× ׳×׳©׳•׳‘׳•׳× ׳׳₪׳•׳¨׳˜׳× - ${session.prism_name}</h4>
+        <p><strong>׳©׳׳׳× ׳¢׳•׳’׳:</strong> ${session.anchor}</p>
 
         <div class="blueprint-section prism-score-box">
-            <h4>ציון ואבחון</h4>
-            <p><strong>ציון כללי:</strong> ${score.total}/100 (${score.grade})</p>
-            <p>פירוק הציון: כיסוי ${score.coverage}/40 | דיוק שיבוץ ${score.alignment}/40 | בהירות ניסוח ${score.clarity}/20</p>
-            <p><strong>שיבוצים שגויים שסומנו באדום:</strong> ${mismatchCount}</p>
-            <p><strong>פענוח הציון:</strong></p>
+            <h4>׳¦׳™׳•׳ ׳•׳׳‘׳—׳•׳</h4>
+            <p><strong>׳¦׳™׳•׳ ׳›׳׳׳™:</strong> ${score.total}/100 (${score.grade})</p>
+            <p>׳₪׳™׳¨׳•׳§ ׳”׳¦׳™׳•׳: ׳›׳™׳¡׳•׳™ ${score.coverage}/40 | ׳“׳™׳•׳§ ׳©׳™׳‘׳•׳¥ ${score.alignment}/40 | ׳‘׳”׳™׳¨׳•׳× ׳ ׳™׳¡׳•׳— ${score.clarity}/20</p>
+            <p><strong>׳©׳™׳‘׳•׳¦׳™׳ ׳©׳’׳•׳™׳™׳ ׳©׳¡׳•׳׳ ׳• ׳‘׳׳“׳•׳:</strong> ${mismatchCount}</p>
+            <p><strong>׳₪׳¢׳ ׳•׳— ׳”׳¦׳™׳•׳:</strong></p>
             ${scoreInsights}
         </div>
 
         <div class="blueprint-section">
-            <h4>בדיקת נכונות לכל תשובה</h4>
+            <h4>׳‘׳“׳™׳§׳× ׳ ׳›׳•׳ ׳•׳× ׳׳›׳ ׳×׳©׳•׳‘׳”</h4>
             <ul class="prism-check-list">
                 ${answersHtml}
             </ul>
         </div>
 
         <div class="blueprint-section prism-pivot-box">
-            <h4>המלצת Pivot - הסבר מעמיק</h4>
-            <p><strong>Pivot מומלץ:</strong> ${recommendation.levelName}</p>
-            <p><strong>למה זה נבחר:</strong> ${recommendation.reason}</p>
-            <p><strong>התערבות מוצעת:</strong> ${recommendation.intervention}</p>
-            <p><strong>שאלת המשך לעומק:</strong> ${recommendation.followUpQuestion}</p>
-            <p><strong>עוצמת רגש:</strong> ${session.emotion} | <strong>התנגדות:</strong> ${session.resistance}</p>
-            <p><strong>פיזור תשובות לפי רמות (לאחר נרמול):</strong></p>
+            <h4>׳”׳׳׳¦׳× Pivot - ׳”׳¡׳‘׳¨ ׳׳¢׳׳™׳§</h4>
+            <p><strong>Pivot ׳׳•׳׳׳¥:</strong> ${recommendation.levelName}</p>
+            <p><strong>׳׳׳” ׳–׳” ׳ ׳‘׳—׳¨:</strong> ${recommendation.reason}</p>
+            <p><strong>׳”׳×׳¢׳¨׳‘׳•׳× ׳׳•׳¦׳¢׳×:</strong> ${recommendation.intervention}</p>
+            <p><strong>׳©׳׳׳× ׳”׳׳©׳ ׳׳¢׳•׳׳§:</strong> ${recommendation.followUpQuestion}</p>
+            <p><strong>׳¢׳•׳¦׳׳× ׳¨׳’׳©:</strong> ${session.emotion} | <strong>׳”׳×׳ ׳’׳“׳•׳×:</strong> ${session.resistance}</p>
+            <p><strong>׳₪׳™׳–׳•׳¨ ׳×׳©׳•׳‘׳•׳× ׳׳₪׳™ ׳¨׳׳•׳× (׳׳׳—׳¨ ׳ ׳¨׳׳•׳):</strong></p>
             <ul>${countsHtml}</ul>
-            <p><strong>משמעות מעשית:</strong> ה-Pivot הוא נקודת המינוף הכי יעילה כרגע. מיקוד נכון ברמה הזו יוצר תזוזה מהירה ואז מאפשר עבודה עמוקה יותר.</p>
+            <p><strong>׳׳©׳׳¢׳•׳× ׳׳¢׳©׳™׳×:</strong> ׳”-Pivot ׳”׳•׳ ׳ ׳§׳•׳“׳× ׳”׳׳™׳ ׳•׳£ ׳”׳›׳™ ׳™׳¢׳™׳׳” ׳›׳¨׳’׳¢. ׳׳™׳§׳•׳“ ׳ ׳›׳•׳ ׳‘׳¨׳׳” ׳”׳–׳• ׳™׳•׳¦׳¨ ׳×׳–׳•׳–׳” ׳׳”׳™׳¨׳” ׳•׳׳– ׳׳׳₪׳©׳¨ ׳¢׳‘׳•׳“׳” ׳¢׳׳•׳§׳” ׳™׳•׳×׳¨.</p>
         </div>
 
         <div class="blueprint-section">
-            <h4>פענוח עומק לפי כל רמה</h4>
+            <h4>׳₪׳¢׳ ׳•׳— ׳¢׳•׳׳§ ׳׳₪׳™ ׳›׳ ׳¨׳׳”</h4>
             ${levelsDeepAnalysis}
         </div>
 
         <div class="blueprint-section">
-            <h4>תוכנית פעולה מדורגת (לא רק ציון)</h4>
+            <h4>׳×׳•׳›׳ ׳™׳× ׳₪׳¢׳•׳׳” ׳׳“׳•׳¨׳’׳× (׳׳ ׳¨׳§ ׳¦׳™׳•׳)</h4>
             ${actionPlan}
         </div>
 
         <div class="blueprint-section">
-            <h4>איך לשפר לציון גבוה יותר בתרגול הבא</h4>
+            <h4>׳׳™׳ ׳׳©׳₪׳¨ ׳׳¦׳™׳•׳ ׳’׳‘׳•׳” ׳™׳•׳×׳¨ ׳‘׳×׳¨׳’׳•׳ ׳”׳‘׳</h4>
             <ol>
-                <li>בכל שדה כתוב משפט אחד ברור שמתאים רק לרמה של אותו שדה.</li>
-                <li>אם אתה מעתיק פריט מוכן, ודא שהאות של הפריט תואמת לשדה.</li>
-                <li>הימנע ממשפטים כלליים מאוד; כתיבה קונקרטית משפרת את ציון הבהירות.</li>
+                <li>׳‘׳›׳ ׳©׳“׳” ׳›׳×׳•׳‘ ׳׳©׳₪׳˜ ׳׳—׳“ ׳‘׳¨׳•׳¨ ׳©׳׳×׳׳™׳ ׳¨׳§ ׳׳¨׳׳” ׳©׳ ׳׳•׳×׳• ׳©׳“׳”.</li>
+                <li>׳׳ ׳׳×׳” ׳׳¢׳×׳™׳§ ׳₪׳¨׳™׳˜ ׳׳•׳›׳, ׳•׳“׳ ׳©׳”׳׳•׳× ׳©׳ ׳”׳₪׳¨׳™׳˜ ׳×׳•׳׳׳× ׳׳©׳“׳”.</li>
+                <li>׳”׳™׳׳ ׳¢ ׳׳׳©׳₪׳˜׳™׳ ׳›׳׳׳™׳™׳ ׳׳׳•׳“; ׳›׳×׳™׳‘׳” ׳§׳•׳ ׳§׳¨׳˜׳™׳× ׳׳©׳₪׳¨׳× ׳׳× ׳¦׳™׳•׳ ׳”׳‘׳”׳™׳¨׳•׳×.</li>
             </ol>
         </div>
 
         <div class="action-buttons">
-            <button class="btn btn-secondary" onclick="exportPrismSession()">ייצא סשן JSON</button>
+            <button class="btn btn-secondary" onclick="exportPrismSession()">׳™׳™׳¦׳ ׳¡׳©׳ JSON</button>
         </div>
     `;
 }
@@ -7024,9 +7203,9 @@ function renderPrismResultCompact(session, recommendation) {
 
     const score = session.score || computePrismScore(session.answers || []);
     const statusMap = {
-        ok: { label: 'תואם', className: 'status-ok' },
-        mismatch: { label: 'שיבוץ שגוי', className: 'status-bad' },
-        uncertain: { label: 'דורש חידוד', className: 'status-warn' }
+        ok: { label: '׳×׳•׳׳', className: 'status-ok' },
+        mismatch: { label: '׳©׳™׳‘׳•׳¥ ׳©׳’׳•׳™', className: 'status-bad' },
+        uncertain: { label: '׳“׳•׳¨׳© ׳—׳™׳“׳•׳“', className: 'status-warn' }
     };
 
     const statusCounts = { ok: 0, mismatch: 0, uncertain: 0 };
@@ -7047,7 +7226,7 @@ function renderPrismResultCompact(session, recommendation) {
     const checksCompactHtml = (session.answers || []).map(answer => {
         const status = statusMap[answer.status] || statusMap.uncertain;
         const targetLevel = answer.effectiveLevel && answer.effectiveLevel !== answer.level
-            ? `<p><strong>העבר לרמה:</strong> ${getLevelDisplay(answer.effectiveLevel)}</p>`
+            ? `<p><strong>׳”׳¢׳‘׳¨ ׳׳¨׳׳”:</strong> ${getLevelDisplay(answer.effectiveLevel)}</p>`
             : '';
 
         return `
@@ -7071,72 +7250,72 @@ function renderPrismResultCompact(session, recommendation) {
         .join('');
 
     out.innerHTML = `
-        <h4>בדיקה מהירה - ${escapeHtml(session.prism_name || '')}</h4>
-        <p><strong>שאלת עוגן:</strong> ${escapeHtml(session.anchor || '')}</p>
+        <h4>׳‘׳“׳™׳§׳” ׳׳”׳™׳¨׳” - ${escapeHtml(session.prism_name || '')}</h4>
+        <p><strong>׳©׳׳׳× ׳¢׳•׳’׳:</strong> ${escapeHtml(session.anchor || '')}</p>
 
         <div class="prism-quick-grid">
             <article class="prism-quick-card">
-                <h5>ציון כולל</h5>
+                <h5>׳¦׳™׳•׳ ׳›׳•׳׳</h5>
                 <p class="prism-quick-number">${score.total}/100</p>
                 <p>${escapeHtml(score.grade || '')}</p>
             </article>
             <article class="prism-quick-card">
-                <h5>Pivot מומלץ</h5>
+                <h5>Pivot ׳׳•׳׳׳¥</h5>
                 <p class="prism-quick-number">${escapeHtml(recommendation.levelName || '')}</p>
                 <p>${escapeHtml(recommendation.intervention || '')}</p>
             </article>
             <article class="prism-quick-card">
-                <h5>סטטוס שיבוצים</h5>
-                <p>תואם: ${statusCounts.ok} | דורש חידוד: ${statusCounts.uncertain} | שגוי: ${statusCounts.mismatch}</p>
-                <p>רגש: ${session.emotion} | התנגדות: ${session.resistance}</p>
+                <h5>׳¡׳˜׳˜׳•׳¡ ׳©׳™׳‘׳•׳¦׳™׳</h5>
+                <p>׳×׳•׳׳: ${statusCounts.ok} | ׳“׳•׳¨׳© ׳—׳™׳“׳•׳“: ${statusCounts.uncertain} | ׳©׳’׳•׳™: ${statusCounts.mismatch}</p>
+                <p>׳¨׳’׳©: ${session.emotion} | ׳”׳×׳ ׳’׳“׳•׳×: ${session.resistance}</p>
             </article>
         </div>
 
         <div class="blueprint-section prism-focus-box">
-            <h4>מה עושים עכשיו (עד 3 צעדים)</h4>
+            <h4>׳׳” ׳¢׳•׳©׳™׳ ׳¢׳›׳©׳™׳• (׳¢׳“ 3 ׳¦׳¢׳“׳™׳)</h4>
             <ul class="prism-action-plan">
-                ${focusItems || '<li>נראה טוב. אפשר לעבור לביצוע ה-Pivot שנבחר.</li>'}
-                <li><strong>שאלת המשך:</strong> ${escapeHtml(recommendation.followUpQuestion || '')}</li>
+                ${focusItems || '<li>׳ ׳¨׳׳” ׳˜׳•׳‘. ׳׳₪׳©׳¨ ׳׳¢׳‘׳•׳¨ ׳׳‘׳™׳¦׳•׳¢ ׳”-Pivot ׳©׳ ׳‘׳—׳¨.</li>'}
+                <li><strong>׳©׳׳׳× ׳”׳׳©׳:</strong> ${escapeHtml(recommendation.followUpQuestion || '')}</li>
             </ul>
         </div>
 
         <details class="prism-more-details">
-            <summary>הצג פירוט מלא</summary>
+            <summary>׳”׳¦׳’ ׳₪׳™׳¨׳•׳˜ ׳׳׳</summary>
             <div class="blueprint-section prism-score-box">
-                <h4>ציון ואבחון מלא</h4>
-                <p><strong>ציון כולל:</strong> ${score.total}/100 (${escapeHtml(score.grade || '')})</p>
-                <p>פירוק הציון: כיסוי ${score.coverage}/40 | דיוק שיבוץ ${score.alignment}/40 | בהירות ניסוח ${score.clarity}/20</p>
-                <p><strong>שיבוצים שגויים:</strong> ${mismatchCount}</p>
+                <h4>׳¦׳™׳•׳ ׳•׳׳‘׳—׳•׳ ׳׳׳</h4>
+                <p><strong>׳¦׳™׳•׳ ׳›׳•׳׳:</strong> ${score.total}/100 (${escapeHtml(score.grade || '')})</p>
+                <p>׳₪׳™׳¨׳•׳§ ׳”׳¦׳™׳•׳: ׳›׳™׳¡׳•׳™ ${score.coverage}/40 | ׳“׳™׳•׳§ ׳©׳™׳‘׳•׳¥ ${score.alignment}/40 | ׳‘׳”׳™׳¨׳•׳× ׳ ׳™׳¡׳•׳— ${score.clarity}/20</p>
+                <p><strong>׳©׳™׳‘׳•׳¦׳™׳ ׳©׳’׳•׳™׳™׳:</strong> ${mismatchCount}</p>
                 ${scoreInsights}
             </div>
 
             <div class="blueprint-section">
-                <h4>בדיקה לכל תשובה</h4>
+                <h4>׳‘׳“׳™׳§׳” ׳׳›׳ ׳×׳©׳•׳‘׳”</h4>
                 <ul class="prism-check-list">
                     ${checksCompactHtml}
                 </ul>
             </div>
 
             <div class="blueprint-section prism-pivot-box">
-                <h4>למה זה ה-Pivot המומלץ</h4>
+                <h4>׳׳׳” ׳–׳” ׳”-Pivot ׳”׳׳•׳׳׳¥</h4>
                 <p>${escapeHtml(recommendation.reason || '')}</p>
-                <p><strong>פיזור תשובות לפי רמות:</strong></p>
+                <p><strong>׳₪׳™׳–׳•׳¨ ׳×׳©׳•׳‘׳•׳× ׳׳₪׳™ ׳¨׳׳•׳×:</strong></p>
                 <ul>${countsHtml}</ul>
             </div>
 
             <div class="blueprint-section">
-                <h4>תוכנית פעולה מדורגת</h4>
+                <h4>׳×׳•׳›׳ ׳™׳× ׳₪׳¢׳•׳׳” ׳׳“׳•׳¨׳’׳×</h4>
                 ${actionPlan}
             </div>
 
             <div class="blueprint-section">
-                <h4>פענוח עומק לפי רמות</h4>
+                <h4>׳₪׳¢׳ ׳•׳— ׳¢׳•׳׳§ ׳׳₪׳™ ׳¨׳׳•׳×</h4>
                 ${levelsDeepAnalysis}
             </div>
         </details>
 
         <div class="action-buttons">
-            <button class="btn btn-secondary" onclick="exportPrismSession()">ייצא סשן JSON</button>
+            <button class="btn btn-secondary" onclick="exportPrismSession()">׳™׳™׳¦׳ ׳¡׳©׳ JSON</button>
         </div>
     `;
 }
@@ -7235,7 +7414,7 @@ function attachMappingDropHandlers() {
 
             const expectedLevel = getExpectedLevelFromInput(inp);
             if (inp.dataset.suggestedLevel && inp.dataset.suggestedLevel !== expectedLevel) {
-                setMappingInputStatus(inp, 'mismatch', `התוכן נראה כמו ${getLevelDisplay(inp.dataset.suggestedLevel)} ולא ${getLevelDisplay(expectedLevel)}.`);
+                setMappingInputStatus(inp, 'mismatch', `׳”׳×׳•׳›׳ ׳ ׳¨׳׳” ׳›׳׳• ${getLevelDisplay(inp.dataset.suggestedLevel)} ׳•׳׳ ${getLevelDisplay(expectedLevel)}.`);
             } else {
                 clearMappingInputStatus(inp);
             }
@@ -7258,7 +7437,7 @@ function applyPreparedTextToInput(inputEl, text, suggestedLevel = '') {
 
     const expectedLevel = getExpectedLevelFromInput(inputEl);
     if (level && expectedLevel && level !== expectedLevel) {
-        setMappingInputStatus(inputEl, 'mismatch', `התוכן שויך ל-${getLevelDisplay(level)} אך הוזן בשדה ${getLevelDisplay(expectedLevel)}.`);
+        setMappingInputStatus(inputEl, 'mismatch', `׳”׳×׳•׳›׳ ׳©׳•׳™׳ ׳-${getLevelDisplay(level)} ׳׳ ׳”׳•׳–׳ ׳‘׳©׳“׳” ${getLevelDisplay(expectedLevel)}.`);
         playUISound('prism_warn');
     } else {
         clearMappingInputStatus(inputEl);
@@ -7282,7 +7461,7 @@ function showLoadingIndicator() {
     if (!loader) {
         loader = document.createElement('div');
         loader.id = 'app-loader';
-        loader.innerHTML = '<div class="loader-box"><p>📚 טעינת כלים...</p></div>';
+        loader.innerHTML = '<div class="loader-box"><p>נ“ ׳˜׳¢׳™׳ ׳× ׳›׳׳™׳...</p></div>';
         document.body.insertBefore(loader, document.body.firstChild);
     }
     loader.style.display = 'flex';
@@ -7294,13 +7473,13 @@ function hideLoadingIndicator() {
 }
 
 function showErrorMessage(msg) {
-    alert('❌ ' + msg);
+    alert('ג ' + msg);
 }
 
 function showHint(text) {
     const box = document.getElementById('hint-box');
     const hintText = document.getElementById('hint-text');
-    const message = String(text || '').trim() || 'המשך/י צעד קטן אחד קדימה.';
+    const message = String(text || '').trim() || '׳”׳׳©׳/׳™ ׳¦׳¢׳“ ׳§׳˜׳ ׳׳—׳“ ׳§׳“׳™׳׳”.';
     if (box && hintText) {
         hintText.textContent = message;
         box.style.display = 'flex';
@@ -7386,17 +7565,17 @@ function legacyUpdateStreak() {
 
 function legacyCheckAndAwardBadges() {
     const badgesList = [
-        { id: 'first_step', name: 'צעד ראשון', icon: '👣', condition: () => userProgress.xp >= 10 },
-        { id: 'fire_10', name: 'להט 🔥', icon: '🔥', condition: () => userProgress.streak >= 10 },
-        { id: 'xp_100', name: '100 XP', icon: '⭐', condition: () => userProgress.xp >= 100 },
-        { id: 'xp_500', name: '500 XP', icon: '✨', condition: () => userProgress.xp >= 500 },
-        { id: 'sessions_10', name: '10 סשנים', icon: '📊', condition: () => userProgress.sessions >= 10 },
+        { id: 'first_step', name: '׳¦׳¢׳“ ׳¨׳׳©׳•׳', icon: 'נ‘£', condition: () => userProgress.xp >= 10 },
+        { id: 'fire_10', name: '׳׳”׳˜ נ”¥', icon: 'נ”¥', condition: () => userProgress.streak >= 10 },
+        { id: 'xp_100', name: '100 XP', icon: 'ג­', condition: () => userProgress.xp >= 100 },
+        { id: 'xp_500', name: '500 XP', icon: 'ג¨', condition: () => userProgress.xp >= 500 },
+        { id: 'sessions_10', name: '10 ׳¡׳©׳ ׳™׳', icon: 'נ“', condition: () => userProgress.sessions >= 10 },
     ];
     
     badgesList.forEach(badge => {
         if (badge.condition() && !userProgress.badges.find(b => b.id === badge.id)) {
             userProgress.badges.push({ id: badge.id, name: badge.name, icon: badge.icon, earned: new Date().toISOString() });
-            showHint(`🏆 כבר רכשת את התג: ${badge.name}`);
+            showHint(`נ† ׳›׳‘׳¨ ׳¨׳›׳©׳× ׳׳× ׳”׳×׳’: ${badge.name}`);
         }
     });
 }
@@ -7421,7 +7600,7 @@ function legacyUpdateProgressHub() {
     const sessionEl = document.getElementById('session-count');
     const badgesDisplay = document.getElementById('badges-display');
     
-    if (streakEl) streakEl.textContent = `${userProgress.streak} ימים`;
+    if (streakEl) streakEl.textContent = `${userProgress.streak} ׳™׳׳™׳`;
     if (xpEl) xpEl.textContent = userProgress.xp;
     if (starsEl) starsEl.textContent = userProgress.stars;
     if (badgeCountEl) badgeCountEl.textContent = userProgress.badges.length;
@@ -7437,7 +7616,7 @@ function legacyUpdateProgressHub() {
     }
 }
 
-// اهوك XP acquisition على actions
+// ״§‡ˆƒ XP acquisition ״¹„‰ actions
 function onPracticeComplete() {
     addXP(5);
     recordSession();
@@ -7520,7 +7699,7 @@ function tryAwardStreakCharge() {
 
     userProgress.streakCharges += 1;
     userProgress.lastChargeAwardedDate = userProgress.todayDate;
-    showHint(`🛡️ קיבלת Streak Charge (${userProgress.streakCharges}/${MAX_STREAK_CHARGES})`);
+    showHint(`נ›¡ן¸ ׳§׳™׳‘׳׳× Streak Charge (${userProgress.streakCharges}/${MAX_STREAK_CHARGES})`);
 }
 
 function registerDailyAction(amount = 1) {
@@ -7583,7 +7762,7 @@ function updateStreak() {
             userProgress.streakCharges -= 1;
             userProgress.streak += 1;
             userProgress.lastChargeUsedDate = today;
-            showHint(`🛡️ השתמשת ב-Streak Charge. נשארו ${userProgress.streakCharges}/${MAX_STREAK_CHARGES}`);
+            showHint(`נ›¡ן¸ ׳”׳©׳×׳׳©׳× ׳‘-Streak Charge. ׳ ׳©׳׳¨׳• ${userProgress.streakCharges}/${MAX_STREAK_CHARGES}`);
         } else {
             userProgress.streak = 1;
         }
@@ -7594,19 +7773,19 @@ function updateStreak() {
 
 function checkAndAwardBadges() {
     const badgesList = [
-        { id: 'first_step', name: 'צעד ראשון', icon: '👣', condition: () => userProgress.xp >= 10 },
-        { id: 'fire_10', name: 'להט 🔥', icon: '🔥', condition: () => userProgress.streak >= 10 },
-        { id: 'xp_100', name: '100 XP', icon: '⭐', condition: () => userProgress.xp >= 100 },
-        { id: 'xp_500', name: '500 XP', icon: '✨', condition: () => userProgress.xp >= 500 },
-        { id: 'sessions_10', name: '10 סשנים', icon: '📊', condition: () => userProgress.sessions >= 10 },
-        { id: 'daily_goal', name: 'יעד יומי', icon: '🎯', condition: () => userProgress.lastChargeAwardedDate === userProgress.todayDate },
-        { id: 'charge_full', name: 'Charge Full', icon: '🛡️', condition: () => userProgress.streakCharges >= MAX_STREAK_CHARGES },
+        { id: 'first_step', name: '׳¦׳¢׳“ ׳¨׳׳©׳•׳', icon: 'נ‘£', condition: () => userProgress.xp >= 10 },
+        { id: 'fire_10', name: '׳׳”׳˜ נ”¥', icon: 'נ”¥', condition: () => userProgress.streak >= 10 },
+        { id: 'xp_100', name: '100 XP', icon: 'ג­', condition: () => userProgress.xp >= 100 },
+        { id: 'xp_500', name: '500 XP', icon: 'ג¨', condition: () => userProgress.xp >= 500 },
+        { id: 'sessions_10', name: '10 ׳¡׳©׳ ׳™׳', icon: 'נ“', condition: () => userProgress.sessions >= 10 },
+        { id: 'daily_goal', name: '׳™׳¢׳“ ׳™׳•׳׳™', icon: 'נ¯', condition: () => userProgress.lastChargeAwardedDate === userProgress.todayDate },
+        { id: 'charge_full', name: 'Charge Full', icon: 'נ›¡ן¸', condition: () => userProgress.streakCharges >= MAX_STREAK_CHARGES },
     ];
 
     badgesList.forEach(badge => {
         if (badge.condition() && !userProgress.badges.find(b => b.id === badge.id)) {
             userProgress.badges.push({ id: badge.id, name: badge.name, icon: badge.icon, earned: new Date().toISOString() });
-            showHint(`🏆 כבר רכשת את התג: ${badge.name}`);
+            showHint(`נ† ׳›׳‘׳¨ ׳¨׳›׳©׳× ׳׳× ׳”׳×׳’: ${badge.name}`);
         }
     });
 }
@@ -7628,18 +7807,18 @@ function updateProgressHub() {
 
     syncDailyProgressWindow();
 
-    if (streakEl) streakEl.textContent = `${userProgress.streak} ימים`;
+    if (streakEl) streakEl.textContent = `${userProgress.streak} ׳™׳׳™׳`;
     if (xpEl) xpEl.textContent = userProgress.xp;
     if (starsEl) starsEl.textContent = userProgress.stars;
     if (badgeCountEl) badgeCountEl.textContent = userProgress.badges.length;
     if (sessionEl) sessionEl.textContent = userProgress.sessions;
     if (streakDateEl) {
         if (!userProgress.lastSessionDate) {
-            streakDateEl.textContent = 'היום הראשון!';
+            streakDateEl.textContent = '׳”׳™׳•׳ ׳”׳¨׳׳©׳•׳!';
         } else if (userProgress.lastChargeUsedDate === userProgress.lastSessionDate) {
-            streakDateEl.textContent = 'הרצף נשמר עם Charge';
+            streakDateEl.textContent = '׳”׳¨׳¦׳£ ׳ ׳©׳׳¨ ׳¢׳ Charge';
         } else {
-            streakDateEl.textContent = `פעילות אחרונה: ${userProgress.lastSessionDate}`;
+            streakDateEl.textContent = `׳₪׳¢׳™׳׳•׳× ׳׳—׳¨׳•׳ ׳”: ${userProgress.lastSessionDate}`;
         }
     }
 
@@ -7649,14 +7828,14 @@ function updateProgressHub() {
     const completed = remaining === 0;
     if (dailyGoalValueEl) dailyGoalValueEl.textContent = `${Math.min(userProgress.todayActions, userProgress.dailyGoal)}/${userProgress.dailyGoal}`;
     if (dailyGoalFillEl) dailyGoalFillEl.style.width = `${goalPercent}%`;
-    if (dailyGoalNoteEl) dailyGoalNoteEl.textContent = completed ? 'היעד היומי הושלם' : `עוד ${remaining} פעולות להשלמה`;
+    if (dailyGoalNoteEl) dailyGoalNoteEl.textContent = completed ? '׳”׳™׳¢׳“ ׳”׳™׳•׳׳™ ׳”׳•׳©׳׳' : `׳¢׳•׳“ ${remaining} ׳₪׳¢׳•׳׳•׳× ׳׳”׳©׳׳׳”`;
     if (dailyGoalCard) dailyGoalCard.classList.toggle('is-goal-complete', completed);
 
     if (streakChargeValueEl) streakChargeValueEl.textContent = `${userProgress.streakCharges}/${MAX_STREAK_CHARGES}`;
     if (streakChargeNoteEl) {
         streakChargeNoteEl.textContent = userProgress.streakCharges > 0
-            ? 'שומר על הרצף ביום פספוס אחד'
-            : 'סיים יעד יומי כדי למלא Charge';
+            ? '׳©׳•׳׳¨ ׳¢׳ ׳”׳¨׳¦׳£ ׳‘׳™׳•׳ ׳₪׳¡׳₪׳•׳¡ ׳׳—׳“'
+            : '׳¡׳™׳™׳ ׳™׳¢׳“ ׳™׳•׳׳™ ׳›׳“׳™ ׳׳׳׳ Charge';
     }
 
     if (badgesDisplay) {
@@ -7687,41 +7866,41 @@ const CEFLOW_CHOICE_ORDER = Object.freeze(['angry', 'mock', 'rescue', 'avoid', '
 
 const CEFLOW_FALLBACKS = Object.freeze({
     angry: Object.freeze({
-        tone: 'danger', label: 'כעס', emoji: '😡',
-        counterReply: 'אני נסגר/ת כשמדברים אליי ככה.',
-        interpretation: 'תגובה אימפולסיבית הגבירה בושה וסגרה זרימת מידע.',
-        impact: Object.freeze({ stats: Object.freeze({ flow: 24, agency: 20, shame: 88 }), xrayTags: Object.freeze(['😳 בושה', '🚪 סגירה']), microOutcome: Object.freeze(['📉 זרימה', '🧱 תקיעה', '🔒 הימנעות']) })
+        tone: 'danger', label: '׳›׳¢׳¡', emoji: 'נ˜¡',
+        counterReply: '׳׳ ׳™ ׳ ׳¡׳’׳¨/׳× ׳›׳©׳׳“׳‘׳¨׳™׳ ׳׳׳™׳™ ׳›׳›׳”.',
+        interpretation: '׳×׳’׳•׳‘׳” ׳׳™׳׳₪׳•׳׳¡׳™׳‘׳™׳× ׳”׳’׳‘׳™׳¨׳” ׳‘׳•׳©׳” ׳•׳¡׳’׳¨׳” ׳–׳¨׳™׳׳× ׳׳™׳“׳¢.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 24, agency: 20, shame: 88 }), xrayTags: Object.freeze(['נ˜³ ׳‘׳•׳©׳”', 'נ× ׳¡׳’׳™׳¨׳”']), microOutcome: Object.freeze(['נ“‰ ׳–׳¨׳™׳׳”', 'נ§± ׳×׳§׳™׳¢׳”', 'נ”’ ׳”׳™׳׳ ׳¢׳•׳×']) })
     }),
     mock: Object.freeze({
-        tone: 'warn', label: 'לעג', emoji: '😏',
-        counterReply: 'טוב... אז אני כנראה סתם לא מספיק טוב/ה.',
-        interpretation: 'לעג מייצר השוואה ושיתוק, לא הבהרה.',
-        impact: Object.freeze({ stats: Object.freeze({ flow: 32, agency: 24, shame: 82 }), xrayTags: Object.freeze(['🙈 השוואה', '🧊 ניתוק']), microOutcome: Object.freeze(['📉 אמון', '📉 זרימה', '🧱 תקיעה']) })
+        tone: 'warn', label: '׳׳¢׳’', emoji: 'נ˜',
+        counterReply: '׳˜׳•׳‘... ׳׳– ׳׳ ׳™ ׳›׳ ׳¨׳׳” ׳¡׳×׳ ׳׳ ׳׳¡׳₪׳™׳§ ׳˜׳•׳‘/׳”.',
+        interpretation: '׳׳¢׳’ ׳׳™׳™׳¦׳¨ ׳”׳©׳•׳•׳׳” ׳•׳©׳™׳×׳•׳§, ׳׳ ׳”׳‘׳”׳¨׳”.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 32, agency: 24, shame: 82 }), xrayTags: Object.freeze(['נ™ˆ ׳”׳©׳•׳•׳׳”', 'נ§ ׳ ׳™׳×׳•׳§']), microOutcome: Object.freeze(['נ“‰ ׳׳׳•׳', 'נ“‰ ׳–׳¨׳™׳׳”', 'נ§± ׳×׳§׳™׳¢׳”']) })
     }),
     rescue: Object.freeze({
-        tone: 'purple', label: 'הצלה', emoji: '🛟',
-        counterReply: 'סבבה... אז תעשה/י במקומי.',
-        interpretation: 'הצלה פותרת רגעית אך משאירה תלות.',
-        impact: Object.freeze({ stats: Object.freeze({ flow: 46, agency: 20, shame: 50 }), xrayTags: Object.freeze(['🛟 תלות', '🧠 בלי למידה']), microOutcome: Object.freeze(['⏸️ הקלה', '🔁 תלות', '📉 אחריות']) })
+        tone: 'purple', label: '׳”׳¦׳׳”', emoji: 'נ›',
+        counterReply: '׳¡׳‘׳‘׳”... ׳׳– ׳×׳¢׳©׳”/׳™ ׳‘׳׳§׳•׳׳™.',
+        interpretation: '׳”׳¦׳׳” ׳₪׳•׳×׳¨׳× ׳¨׳’׳¢׳™׳× ׳׳ ׳׳©׳׳™׳¨׳” ׳×׳׳•׳×.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 46, agency: 20, shame: 50 }), xrayTags: Object.freeze(['נ› ׳×׳׳•׳×', 'נ§  ׳‘׳׳™ ׳׳׳™׳“׳”']), microOutcome: Object.freeze(['ג¸ן¸ ׳”׳§׳׳”', 'נ” ׳×׳׳•׳×', 'נ“‰ ׳׳—׳¨׳™׳•׳×']) })
     }),
     avoid: Object.freeze({
-        tone: 'muted', label: 'התחמקות', emoji: '🙈',
-        counterReply: 'אוקיי... אז נדחה גם את זה.',
-        interpretation: 'דחייה שומרת על נוחות רגעית ומעמיקה את התקיעות.',
-        impact: Object.freeze({ stats: Object.freeze({ flow: 30, agency: 22, shame: 62 }), xrayTags: Object.freeze(['🕳️ דחייה', '⏳ עומס']), microOutcome: Object.freeze(['📉 התקדמות', '🔁 חזרת בעיה', '🧱 תקיעה']) })
+        tone: 'muted', label: '׳”׳×׳—׳׳§׳•׳×', emoji: 'נ™ˆ',
+        counterReply: '׳׳•׳§׳™׳™... ׳׳– ׳ ׳“׳—׳” ׳’׳ ׳׳× ׳–׳”.',
+        interpretation: '׳“׳—׳™׳™׳” ׳©׳•׳׳¨׳× ׳¢׳ ׳ ׳•׳—׳•׳× ׳¨׳’׳¢׳™׳× ׳•׳׳¢׳׳™׳§׳” ׳׳× ׳”׳×׳§׳™׳¢׳•׳×.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 30, agency: 22, shame: 62 }), xrayTags: Object.freeze(['נ•³ן¸ ׳“׳—׳™׳™׳”', 'ג³ ׳¢׳•׳׳¡']), microOutcome: Object.freeze(['נ“‰ ׳”׳×׳§׳“׳׳•׳×', 'נ” ׳—׳–׳¨׳× ׳‘׳¢׳™׳”', 'נ§± ׳×׳§׳™׳¢׳”']) })
     }),
     meta: Object.freeze({
-        tone: 'good', label: 'מטה-מודל', emoji: '✅',
-        counterReply: 'אני נתקע/ת בצעד הראשון, לא ברור לי מאיפה להתחיל.',
-        interpretation: 'שאלה מדויקת חשפה את הכמת והחזירה סוכנות.',
-        impact: Object.freeze({ stats: Object.freeze({ flow: 86, agency: 84, shame: 24 }), xrayTags: Object.freeze(['🧩 חשיפה', '🌬️ פתיחה']), microOutcome: Object.freeze(['📈 זרימה', '🟢 סוכנות', '🔓 מידע חדש']) })
+        tone: 'good', label: '׳׳˜׳”-׳׳•׳“׳', emoji: 'ג…',
+        counterReply: '׳׳ ׳™ ׳ ׳×׳§׳¢/׳× ׳‘׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳, ׳׳ ׳‘׳¨׳•׳¨ ׳׳™ ׳׳׳™׳₪׳” ׳׳”׳×׳—׳™׳.',
+        interpretation: '׳©׳׳׳” ׳׳“׳•׳™׳§׳× ׳—׳©׳₪׳” ׳׳× ׳”׳›׳׳× ׳•׳”׳—׳–׳™׳¨׳” ׳¡׳•׳›׳ ׳•׳×.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 86, agency: 84, shame: 24 }), xrayTags: Object.freeze(['נ§© ׳—׳©׳™׳₪׳”', 'נ¬ן¸ ׳₪׳×׳™׳—׳”']), microOutcome: Object.freeze(['נ“ˆ ׳–׳¨׳™׳׳”', 'נ¢ ׳¡׳•׳›׳ ׳•׳×', 'נ”“ ׳׳™׳“׳¢ ׳—׳“׳©']) })
     })
 });
 
 const CEFLOW_HL_RULES = Object.freeze([
-    Object.freeze({ type: 'generalization', label: 'הכללה', css: 'hl-generalization', tokens: Object.freeze(['כולם', 'תמיד', 'אף אחד', 'כלום', 'בשום מצב']) }),
-    Object.freeze({ type: 'modal', label: 'מודליות', css: 'hl-modal', tokens: Object.freeze(['אי אפשר', 'חייב', 'צריך', 'אסור', 'לא יכול']) }),
-    Object.freeze({ type: 'vague', label: 'עמימות פעולה', css: 'hl-vague', tokens: Object.freeze(['לעשות', 'לסדר', 'לטפל', 'להתארגן', 'להגיע']) })
+    Object.freeze({ type: 'generalization', label: '׳”׳›׳׳׳”', css: 'hl-generalization', tokens: Object.freeze(['׳›׳•׳׳', '׳×׳׳™׳“', '׳׳£ ׳׳—׳“', '׳›׳׳•׳', '׳‘׳©׳•׳ ׳׳¦׳‘']) }),
+    Object.freeze({ type: 'modal', label: '׳׳•׳“׳׳™׳•׳×', css: 'hl-modal', tokens: Object.freeze(['׳׳™ ׳׳₪׳©׳¨', '׳—׳™׳™׳‘', '׳¦׳¨׳™׳', '׳׳¡׳•׳¨', '׳׳ ׳™׳›׳•׳']) }),
+    Object.freeze({ type: 'vague', label: '׳¢׳׳™׳׳•׳× ׳₪׳¢׳•׳׳”', css: 'hl-vague', tokens: Object.freeze(['׳׳¢׳©׳•׳×', '׳׳¡׳“׳¨', '׳׳˜׳₪׳', '׳׳”׳×׳׳¨׳’׳', '׳׳”׳’׳™׳¢']) })
 ]);
 
 function ceflowClamp(value, fallback) {
@@ -7762,16 +7941,16 @@ function ceflowNormChoice(raw, fallbackId) {
     const replyOptions = Array.isArray(raw?.replyOptions) ? raw.replyOptions.slice(0, 3) : [];
     return {
         id,
-        label: String(raw?.label || f.label || 'תגובה'),
+        label: String(raw?.label || f.label || '׳×׳’׳•׳‘׳”'),
         tone: String(raw?.tone || f.tone || 'muted'),
-        emoji: String(raw?.emoji || f.emoji || '💬'),
+        emoji: String(raw?.emoji || f.emoji || 'נ’¬'),
         say: String(raw?.say || ''),
         counterReply: String(raw?.counterReply || f.counterReply || ''),
-        replyPrompt: String(raw?.replyPrompt || 'איך את/ה עונה עכשיו?'),
+        replyPrompt: String(raw?.replyPrompt || '׳׳™׳ ׳׳×/׳” ׳¢׳•׳ ׳” ׳¢׳›׳©׳™׳•?'),
         replyOptions: replyOptions.length ? replyOptions : [
-            'בוא/י ננשום רגע ונגדיר צעד ראשון.',
-            'איפה בדיוק נתקעת?',
-            'מה כבר כן עובד, אפילו חלקית?'
+            '׳‘׳•׳/׳™ ׳ ׳ ׳©׳•׳ ׳¨׳’׳¢ ׳•׳ ׳’׳“׳™׳¨ ׳¦׳¢׳“ ׳¨׳׳©׳•׳.',
+            '׳׳™׳₪׳” ׳‘׳“׳™׳•׳§ ׳ ׳×׳§׳¢׳×?',
+            '׳׳” ׳›׳‘׳¨ ׳›׳ ׳¢׳•׳‘׳“, ׳׳₪׳™׳׳• ׳—׳׳§׳™׳×?'
         ],
         interpretation: String(raw?.interpretation || f.interpretation || ''),
         badge: String(raw?.badge || ''),
@@ -7797,20 +7976,20 @@ function ceflowNormScenario(raw, i) {
     const choices = CEFLOW_CHOICE_ORDER.map(id => map.get(id)).filter(Boolean);
     const meta = choices.find(choice => choice.id === 'meta');
     if (meta && !meta.powerQuestions.length) {
-        meta.powerQuestions = ['מה בדיוק לא ברור כרגע?', 'איזה צעד ראשון הכי קטן כן אפשרי?', 'איזה מידע חסר כדי להתקדם?'];
+        meta.powerQuestions = ['׳׳” ׳‘׳“׳™׳•׳§ ׳׳ ׳‘׳¨׳•׳¨ ׳›׳¨׳’׳¢?', '׳׳™׳–׳” ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳”׳›׳™ ׳§׳˜׳ ׳›׳ ׳׳₪׳©׳¨׳™?', '׳׳™׳–׳” ׳׳™׳“׳¢ ׳—׳¡׳¨ ׳›׳“׳™ ׳׳”׳×׳§׳“׳?'];
     }
     if (meta && !meta.newInfoBubble) {
-        meta.newInfoBubble = 'עכשיו זה ברור יותר: אפשר להתחיל מצעד קטן במקום להיתקע על הכול.';
+        meta.newInfoBubble = '׳¢׳›׳©׳™׳• ׳–׳” ׳‘׳¨׳•׳¨ ׳™׳•׳×׳¨: ׳׳₪׳©׳¨ ׳׳”׳×׳—׳™׳ ׳׳¦׳¢׳“ ׳§׳˜׳ ׳‘׳׳§׳•׳ ׳׳”׳™׳×׳§׳¢ ׳¢׳ ׳”׳›׳•׳.';
     }
     return {
         id: String(raw.id || `scene_${i + 1}`),
-        domain: String(raw.domain || 'כללי'),
-        title: String(raw.title || `סצנה ${i + 1}`),
-        level: String(raw.level || raw.levelTag || 'מודליות + הכללה'),
-        regulationNote: String(raw.regulationNote || 'לכולנו יש תגובה רגשית אימפולסיבית. התרגול כאן הוא לזהות אותה, לווסת סטייט, ולעבור לתגובה שכלית מבוססת שאלה.'),
+        domain: String(raw.domain || '׳›׳׳׳™'),
+        title: String(raw.title || `׳¡׳¦׳ ׳” ${i + 1}`),
+        level: String(raw.level || raw.levelTag || '׳׳•׳“׳׳™׳•׳× + ׳”׳›׳׳׳”'),
+        regulationNote: String(raw.regulationNote || '׳׳›׳•׳׳ ׳• ׳™׳© ׳×׳’׳•׳‘׳” ׳¨׳’׳©׳™׳× ׳׳™׳׳₪׳•׳׳¡׳™׳‘׳™׳×. ׳”׳×׳¨׳’׳•׳ ׳›׳׳ ׳”׳•׳ ׳׳–׳”׳•׳× ׳׳•׳×׳”, ׳׳•׳•׳¡׳× ׳¡׳˜׳™׳™׳˜, ׳•׳׳¢׳‘׳•׳¨ ׳׳×׳’׳•׳‘׳” ׳©׳›׳׳™׳× ׳׳‘׳•׳¡׳¡׳× ׳©׳׳׳”.'),
         characters: {
-            left: { name: String(raw?.characters?.left?.name || 'דמות שמאל'), sprite: String(raw?.characters?.left?.sprite || '') },
-            right: { name: String(raw?.characters?.right?.name || 'דמות ימין'), sprite: String(raw?.characters?.right?.sprite || '') }
+            left: { name: String(raw?.characters?.left?.name || '׳“׳׳•׳× ׳©׳׳׳'), sprite: String(raw?.characters?.left?.sprite || '') },
+            right: { name: String(raw?.characters?.right?.name || '׳“׳׳•׳× ׳™׳׳™׳'), sprite: String(raw?.characters?.right?.sprite || '') }
         },
         dialog: (raw.dialog || []).map(item => ({
             speaker: item?.speaker === 'right' ? 'right' : 'left',
@@ -7902,13 +8081,13 @@ async function setupComicEngine2() {
         payload = await response.json();
     } catch (error) {
         console.error('Cannot load data/comic-scenarios.json', error);
-        els.root.innerHTML = '<p>שגיאה בטעינת סצנות קומיקס.</p>';
+        els.root.innerHTML = '<p>׳©׳’׳™׳׳” ׳‘׳˜׳¢׳™׳ ׳× ׳¡׳¦׳ ׳•׳× ׳§׳•׳׳™׳§׳¡.</p>';
         return;
     }
 
     const scenarios = Array.isArray(payload?.scenarios) ? payload.scenarios.map(ceflowNormScenario).filter(Boolean) : [];
     if (!scenarios.length) {
-        els.root.innerHTML = '<p>לא נמצאו סצנות קומיקס להצגה.</p>';
+        els.root.innerHTML = '<p>׳׳ ׳ ׳׳¦׳׳• ׳¡׳¦׳ ׳•׳× ׳§׳•׳׳™׳§׳¡ ׳׳”׳¦׳’׳”.</p>';
         return;
     }
 
@@ -8006,7 +8185,7 @@ async function setupComicEngine2() {
         state.mode = mode === 'play' ? 'play' : 'learn';
         els.root.classList.toggle('is-play-mode', state.mode === 'play');
         if (els.toggleMode) {
-            els.toggleMode.textContent = state.mode === 'learn' ? '🎮 מצב משחק' : '📚 מצב לימוד';
+            els.toggleMode.textContent = state.mode === 'learn' ? 'נ® ׳׳¦׳‘ ׳׳©׳—׳§' : 'נ“ ׳׳¦׳‘ ׳׳™׳׳•׳“';
         }
         if (persist) persistMode();
     };
@@ -8026,8 +8205,8 @@ async function setupComicEngine2() {
         const scenario = currentScenario();
         const draw = (slot, ch) => {
             if (!slot) return;
-            const safeName = escapeHtml(ch?.name || 'דמות');
-            const art = ch?.sprite ? `<img src="${escapeHtml(ch.sprite)}" alt="${safeName}" loading="lazy">` : '<div class="ceflow-avatar-fallback">🙂</div>';
+            const safeName = escapeHtml(ch?.name || '׳“׳׳•׳×');
+            const art = ch?.sprite ? `<img src="${escapeHtml(ch.sprite)}" alt="${safeName}" loading="lazy">` : '<div class="ceflow-avatar-fallback">נ™‚</div>';
             slot.innerHTML = `<div class="ceflow-character-inner"><div class="ceflow-character-art">${art}</div><p class="ceflow-character-name">${safeName}</p></div>`;
         };
         draw(els.left, scenario?.characters?.left);
@@ -8046,7 +8225,7 @@ async function setupComicEngine2() {
 
         els.dialog.innerHTML = lines.map((line) => `
             <article class="ceflow-bubble is-${line.speaker === 'right' ? 'right' : 'left'} ${line.role ? `is-${escapeHtml(line.role)}` : ''}">
-                <p class="ceflow-bubble-speaker">${escapeHtml(speakerName(line) || 'דמות')}</p>
+                <p class="ceflow-bubble-speaker">${escapeHtml(speakerName(line) || '׳“׳׳•׳×')}</p>
                 <p class="ceflow-bubble-text">${ceflowHighlight(line.text, line.highlights, state.mode)}</p>
             </article>
         `).join('');
@@ -8109,12 +8288,12 @@ async function setupComicEngine2() {
             const interpretation = compactText(choice.interpretation, 210);
             const regulation = compactText(currentScenario().regulationNote, 220);
             els.feedbackRight.innerHTML = `
-                <p><strong>מה אמרת:</strong> ${escapeHtml(choice.say)}</p>
-                <p><strong>מה קרה:</strong></p>
+                <p><strong>׳׳” ׳׳׳¨׳×:</strong> ${escapeHtml(choice.say)}</p>
+                <p><strong>׳׳” ׳§׳¨׳”:</strong></p>
                 <div class="ceflow-outcomes">${(choice.impact?.microOutcome || []).map(item => `<span>${escapeHtml(item)}</span>`).join('')}</div>
                 <div class="ceflow-feedback-actions">
-                    <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(interpretation)}">🔍 פרשנות</button>
-                    <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(regulation)}">🧠 ויסות סטייט</button>
+                    <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(interpretation)}">נ” ׳₪׳¨׳©׳ ׳•׳×</button>
+                    <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(regulation)}">נ§  ׳•׳™׳¡׳•׳× ׳¡׳˜׳™׳™׳˜</button>
                 </div>
                 <div class="ceflow-feedback-note hidden" aria-live="polite"></div>
             `;
@@ -8132,7 +8311,7 @@ async function setupComicEngine2() {
             const hasInfo = !!state.generatedInfo;
             els.newInfo.classList.toggle('hidden', !hasInfo);
             els.newInfo.innerHTML = hasInfo
-                ? `<p><strong>שאלה:</strong> ${escapeHtml(state.selectedQuestion)}</p><p><strong>מידע חדש:</strong> ${escapeHtml(state.generatedInfo)}</p>`
+                ? `<p><strong>׳©׳׳׳”:</strong> ${escapeHtml(state.selectedQuestion)}</p><p><strong>׳׳™׳“׳¢ ׳—׳“׳©:</strong> ${escapeHtml(state.generatedInfo)}</p>`
                 : '';
         }
     };
@@ -8146,15 +8325,15 @@ async function setupComicEngine2() {
         const alternatives = bp.alternatives || [];
         const preconditions = bp.preconditions || [];
         els.blueprint.innerHTML = `
-            <h4>Blueprint קצר</h4>
+            <h4>Blueprint ׳§׳¦׳¨</h4>
             <div class="ceflow-blueprint-grid">
-                <article class="ceflow-blueprint-step"><h5>🎯 מטרה</h5><p>${escapeHtml(bp.goal || 'לא הוגדר')}</p></article>
-                <article class="ceflow-blueprint-step"><h5>🟢 צעד ראשון</h5><p>${escapeHtml(bp.first || 'לא הוגדר')}</p></article>
-                <article class="ceflow-blueprint-step"><h5>🔁 שלבי ביניים</h5><p>${escapeHtml(middle.join(' | ') || 'עד 3 שלבים ברורים')}</p></article>
-                <article class="ceflow-blueprint-step"><h5>✅ צעד אחרון</h5><p>${escapeHtml(bp.last || 'לא הוגדר')}</p></article>
-                <article class="ceflow-blueprint-step"><h5>🧰 חלופות</h5><p>${escapeHtml(alternatives.join(' | ') || 'אין חלופות')}</p></article>
+                <article class="ceflow-blueprint-step"><h5>נ¯ ׳׳˜׳¨׳”</h5><p>${escapeHtml(bp.goal || '׳׳ ׳”׳•׳’׳“׳¨')}</p></article>
+                <article class="ceflow-blueprint-step"><h5>נ¢ ׳¦׳¢׳“ ׳¨׳׳©׳•׳</h5><p>${escapeHtml(bp.first || '׳׳ ׳”׳•׳’׳“׳¨')}</p></article>
+                <article class="ceflow-blueprint-step"><h5>נ” ׳©׳׳‘׳™ ׳‘׳™׳ ׳™׳™׳</h5><p>${escapeHtml(middle.join(' | ') || '׳¢׳“ 3 ׳©׳׳‘׳™׳ ׳‘׳¨׳•׳¨׳™׳')}</p></article>
+                <article class="ceflow-blueprint-step"><h5>ג… ׳¦׳¢׳“ ׳׳—׳¨׳•׳</h5><p>${escapeHtml(bp.last || '׳׳ ׳”׳•׳’׳“׳¨')}</p></article>
+                <article class="ceflow-blueprint-step"><h5>נ§° ׳—׳׳•׳₪׳•׳×</h5><p>${escapeHtml(alternatives.join(' | ') || '׳׳™׳ ׳—׳׳•׳₪׳•׳×')}</p></article>
             </div>
-            <p class="ceflow-blueprint-footnote"><strong>Preconditions:</strong> ${escapeHtml(preconditions.join(' | ') || 'אין תנאים מיוחדים')}</p>
+            <p class="ceflow-blueprint-footnote"><strong>Preconditions:</strong> ${escapeHtml(preconditions.join(' | ') || '׳׳™׳ ׳×׳ ׳׳™׳ ׳׳™׳•׳—׳“׳™׳')}</p>
         `;
     };
 
@@ -8167,9 +8346,9 @@ async function setupComicEngine2() {
 
     const renderHeader = () => {
         const scenario = currentScenario();
-        if (els.domain) els.domain.textContent = `תחום: ${scenario.domain}`;
-        if (els.progress) els.progress.textContent = `סצנה ${state.index + 1}/${scenarios.length}`;
-        if (els.level) els.level.textContent = `רמה: ${scenario.level}`;
+        if (els.domain) els.domain.textContent = `׳×׳—׳•׳: ${scenario.domain}`;
+        if (els.progress) els.progress.textContent = `׳¡׳¦׳ ׳” ${state.index + 1}/${scenarios.length}`;
+        if (els.level) els.level.textContent = `׳¨׳׳”: ${scenario.level}`;
         if (els.title) els.title.textContent = scenario.title;
         renderGlobalComicStrip('comic-engine', scenario);
     };
@@ -8206,14 +8385,14 @@ async function setupComicEngine2() {
     const confirmReply = () => {
         const text = String(els.replyInput?.value || '').trim();
         if (!text) {
-            if (els.replyStatus) els.replyStatus.textContent = 'כתבו תגובה קצרה לפני פרשנות.';
+            if (els.replyStatus) els.replyStatus.textContent = '׳›׳×׳‘׳• ׳×׳’׳•׳‘׳” ׳§׳¦׳¨׳” ׳׳₪׳ ׳™ ׳₪׳¨׳©׳ ׳•׳×.';
             return;
         }
         state.userReply = text;
         state.replyDraft = text;
         if (state.selectedChoice?.id === 'meta') {
             state.selectedQuestion = state.selectedChoice.powerQuestions?.[0] || '';
-            state.generatedInfo = state.selectedChoice.newInfoBubble || 'השאלה פתחה מידע חדש, ואפשר להתקדם לצעד ראשון.';
+            state.generatedInfo = state.selectedChoice.newInfoBubble || '׳”׳©׳׳׳” ׳₪׳×׳—׳” ׳׳™׳“׳¢ ׳—׳“׳©, ׳•׳׳₪׳©׳¨ ׳׳”׳×׳§׳“׳ ׳׳¦׳¢׳“ ׳¨׳׳©׳•׳.';
             state.flowState = CEFLOW_STATES.POWER_CARD;
         }
         playUISound('finish');
@@ -8259,7 +8438,7 @@ async function setupComicEngine2() {
             hideFloatingNote();
             return;
         }
-        showFloatingNote(currentScenario()?.regulationNote || 'לכולנו יש תגובה אימפולסיבית ראשונה. כאן עוצרים רגע, מווסתים סטייט, ועוברים לשאלה מדויקת.');
+        showFloatingNote(currentScenario()?.regulationNote || '׳׳›׳•׳׳ ׳• ׳™׳© ׳×׳’׳•׳‘׳” ׳׳™׳׳₪׳•׳׳¡׳™׳‘׳™׳× ׳¨׳׳©׳•׳ ׳”. ׳›׳׳ ׳¢׳•׳¦׳¨׳™׳ ׳¨׳’׳¢, ׳׳•׳•׳¡׳×׳™׳ ׳¡׳˜׳™׳™׳˜, ׳•׳¢׳•׳‘׳¨׳™׳ ׳׳©׳׳׳” ׳׳“׳•׳™׳§׳×.');
     });
     els.replyQuick?.addEventListener('click', (event) => {
         const button = event.target.closest('button[data-reply-option]');
@@ -8277,7 +8456,7 @@ async function setupComicEngine2() {
         const button = event.target.closest('button[data-power-question]');
         if (!button || !state.selectedChoice) return;
         state.selectedQuestion = button.getAttribute('data-power-question') || '';
-        state.generatedInfo = state.selectedChoice.newInfoBubble || 'נפתח מידע חדש שאפשר לעבוד איתו.';
+        state.generatedInfo = state.selectedChoice.newInfoBubble || '׳ ׳₪׳×׳— ׳׳™׳“׳¢ ׳—׳“׳© ׳©׳׳₪׳©׳¨ ׳׳¢׳‘׳•׳“ ׳׳™׳×׳•.';
         state.flowState = CEFLOW_STATES.POWER_CARD;
         render();
     });
@@ -8307,35 +8486,35 @@ const WR2_STORAGE_KEY = 'wrinkle_reveal_v2';
 const WR2_SEED_SCENES = Object.freeze([
     Object.freeze({
         id: 'wr2_seed_1',
-        anchor: 'אני לא יכול',
-        visibleSentence: 'אני לא יכול להסביר לה מה אני רוצה',
-        template: 'אני לא יכול {Q} להסביר לה מה אני רוצה',
-        quantifiers: Object.freeze(['אף פעם', 'בשום מצב רגשי', 'בשום סיטואציה', 'בשום צורה']),
-        transformedSentence: 'לפעמים קשה לי להסביר לה מה אני רוצה.'
+        anchor: '׳׳ ׳™ ׳׳ ׳™׳›׳•׳',
+        visibleSentence: '׳׳ ׳™ ׳׳ ׳™׳›׳•׳ ׳׳”׳¡׳‘׳™׳¨ ׳׳” ׳׳” ׳׳ ׳™ ׳¨׳•׳¦׳”',
+        template: '׳׳ ׳™ ׳׳ ׳™׳›׳•׳ {Q} ׳׳”׳¡׳‘׳™׳¨ ׳׳” ׳׳” ׳׳ ׳™ ׳¨׳•׳¦׳”',
+        quantifiers: Object.freeze(['׳׳£ ׳₪׳¢׳', '׳‘׳©׳•׳ ׳׳¦׳‘ ׳¨׳’׳©׳™', '׳‘׳©׳•׳ ׳¡׳™׳˜׳•׳׳¦׳™׳”', '׳‘׳©׳•׳ ׳¦׳•׳¨׳”']),
+        transformedSentence: '׳׳₪׳¢׳׳™׳ ׳§׳©׳” ׳׳™ ׳׳”׳¡׳‘׳™׳¨ ׳׳” ׳׳” ׳׳ ׳™ ׳¨׳•׳¦׳”.'
     }),
     Object.freeze({
         id: 'wr2_seed_2',
-        anchor: 'אני חייב',
-        visibleSentence: 'אני חייב להספיק הכל היום',
-        template: 'אני חייב {Q} להספיק הכל היום',
-        quantifiers: Object.freeze(['בכל תנאי', 'בלי לנשום', 'גם כשאני מותש', 'לא משנה מה המחיר']),
-        transformedSentence: 'אני בוחר להתמקד במה שחשוב היום, צעד אחד בכל פעם.'
+        anchor: '׳׳ ׳™ ׳—׳™׳™׳‘',
+        visibleSentence: '׳׳ ׳™ ׳—׳™׳™׳‘ ׳׳”׳¡׳₪׳™׳§ ׳”׳›׳ ׳”׳™׳•׳',
+        template: '׳׳ ׳™ ׳—׳™׳™׳‘ {Q} ׳׳”׳¡׳₪׳™׳§ ׳”׳›׳ ׳”׳™׳•׳',
+        quantifiers: Object.freeze(['׳‘׳›׳ ׳×׳ ׳׳™', '׳‘׳׳™ ׳׳ ׳©׳•׳', '׳’׳ ׳›׳©׳׳ ׳™ ׳׳•׳×׳©', '׳׳ ׳׳©׳ ׳” ׳׳” ׳”׳׳—׳™׳¨']),
+        transformedSentence: '׳׳ ׳™ ׳‘׳•׳—׳¨ ׳׳”׳×׳׳§׳“ ׳‘׳׳” ׳©׳—׳©׳•׳‘ ׳”׳™׳•׳, ׳¦׳¢׳“ ׳׳—׳“ ׳‘׳›׳ ׳₪׳¢׳.'
     }),
     Object.freeze({
         id: 'wr2_seed_3',
-        anchor: 'אי אפשר',
-        visibleSentence: 'אי אפשר לדבר איתו',
-        template: 'אי אפשר {Q} לדבר איתו',
-        quantifiers: Object.freeze(['בשום מצב', 'עם אף אחד', 'בשום צורה', 'בכל סיטואציה']),
-        transformedSentence: 'כרגע קשה לדבר איתו, ואפשר לחפש דרך מדויקת לשיחה.'
+        anchor: '׳׳™ ׳׳₪׳©׳¨',
+        visibleSentence: '׳׳™ ׳׳₪׳©׳¨ ׳׳“׳‘׳¨ ׳׳™׳×׳•',
+        template: '׳׳™ ׳׳₪׳©׳¨ {Q} ׳׳“׳‘׳¨ ׳׳™׳×׳•',
+        quantifiers: Object.freeze(['׳‘׳©׳•׳ ׳׳¦׳‘', '׳¢׳ ׳׳£ ׳׳—׳“', '׳‘׳©׳•׳ ׳¦׳•׳¨׳”', '׳‘׳›׳ ׳¡׳™׳˜׳•׳׳¦׳™׳”']),
+        transformedSentence: '׳›׳¨׳’׳¢ ׳§׳©׳” ׳׳“׳‘׳¨ ׳׳™׳×׳•, ׳•׳׳₪׳©׳¨ ׳׳—׳₪׳© ׳“׳¨׳ ׳׳“׳•׳™׳§׳× ׳׳©׳™׳—׳”.'
     }),
     Object.freeze({
         id: 'wr2_seed_4',
-        anchor: 'תמיד',
-        visibleSentence: 'תמיד אני נתקע כשצריך לדבר מול אנשים',
-        template: 'תמיד {Q} אני נתקע כשצריך לדבר מול אנשים',
-        quantifiers: Object.freeze(['ללא יוצא דופן', 'בכל מקום', 'עם כולם', 'בכל רמת לחץ']),
-        transformedSentence: 'לפעמים אני נתקע מול אנשים, ואפשר להתאמן כדי להשתפר.'
+        anchor: '׳×׳׳™׳“',
+        visibleSentence: '׳×׳׳™׳“ ׳׳ ׳™ ׳ ׳×׳§׳¢ ׳›׳©׳¦׳¨׳™׳ ׳׳“׳‘׳¨ ׳׳•׳ ׳׳ ׳©׳™׳',
+        template: '׳×׳׳™׳“ {Q} ׳׳ ׳™ ׳ ׳×׳§׳¢ ׳›׳©׳¦׳¨׳™׳ ׳׳“׳‘׳¨ ׳׳•׳ ׳׳ ׳©׳™׳',
+        quantifiers: Object.freeze(['׳׳׳ ׳™׳•׳¦׳ ׳“׳•׳₪׳', '׳‘׳›׳ ׳׳§׳•׳', '׳¢׳ ׳›׳•׳׳', '׳‘׳›׳ ׳¨׳׳× ׳׳—׳¥']),
+        transformedSentence: '׳׳₪׳¢׳׳™׳ ׳׳ ׳™ ׳ ׳×׳§׳¢ ׳׳•׳ ׳׳ ׳©׳™׳, ׳•׳׳₪׳©׳¨ ׳׳”׳×׳׳׳ ׳›׳“׳™ ׳׳”׳©׳×׳₪׳¨.'
     })
 ]);
 
@@ -8347,19 +8526,19 @@ function wr2TrimText(value, maxLen = 180) {
 
 function wr2DetectAnchor(sentence) {
     const s = String(sentence || '');
-    const anchors = ['לא יכול', 'אי אפשר', 'חייב', 'צריך', 'מוכרח', 'תמיד', 'כולם', 'אף פעם', 'אין ברירה'];
+    const anchors = ['׳׳ ׳™׳›׳•׳', '׳׳™ ׳׳₪׳©׳¨', '׳—׳™׳™׳‘', '׳¦׳¨׳™׳', '׳׳•׳›׳¨׳—', '׳×׳׳™׳“', '׳›׳•׳׳', '׳׳£ ׳₪׳¢׳', '׳׳™׳ ׳‘׳¨׳™׳¨׳”'];
     for (let i = 0; i < anchors.length; i += 1) {
         const token = anchors[i];
         if (s.includes(token)) return token;
     }
-    return 'המשפט';
+    return '׳”׳׳©׳₪׳˜';
 }
 
 function wr2BuildTemplate(sentence) {
     const raw = String(sentence || '').trim();
     if (!raw) return '{Q}';
     const anchor = wr2DetectAnchor(raw);
-    if (!anchor || anchor === 'המשפט') return `${raw} {Q}`;
+    if (!anchor || anchor === '׳”׳׳©׳₪׳˜') return `${raw} {Q}`;
     const idx = raw.indexOf(anchor);
     if (idx < 0) return `${raw} {Q}`;
     const left = raw.slice(0, idx + anchor.length).trimEnd();
@@ -8369,28 +8548,28 @@ function wr2BuildTemplate(sentence) {
 
 function wr2InferQuantifiers(sentence) {
     const normalized = normalizeText(sentence || '');
-    if (/(לא יכול|אי אפשר|בלתי אפשרי|אין סיכוי)/.test(normalized)) {
-        return ['אף פעם', 'בשום מצב רגשי', 'בשום סיטואציה', 'בשום צורה'];
+    if (/(׳׳ ׳™׳›׳•׳|׳׳™ ׳׳₪׳©׳¨|׳‘׳׳×׳™ ׳׳₪׳©׳¨׳™|׳׳™׳ ׳¡׳™׳›׳•׳™)/.test(normalized)) {
+        return ['׳׳£ ׳₪׳¢׳', '׳‘׳©׳•׳ ׳׳¦׳‘ ׳¨׳’׳©׳™', '׳‘׳©׳•׳ ׳¡׳™׳˜׳•׳׳¦׳™׳”', '׳‘׳©׳•׳ ׳¦׳•׳¨׳”'];
     }
-    if (/(תמיד|כל הזמן|אף פעם|כולם|אף אחד)/.test(normalized)) {
-        return ['בכל מצב', 'ללא יוצא דופן', 'עם כולם', 'בכל זמן'];
+    if (/(׳×׳׳™׳“|׳›׳ ׳”׳–׳׳|׳׳£ ׳₪׳¢׳|׳›׳•׳׳|׳׳£ ׳׳—׳“)/.test(normalized)) {
+        return ['׳‘׳›׳ ׳׳¦׳‘', '׳׳׳ ׳™׳•׳¦׳ ׳“׳•׳₪׳', '׳¢׳ ׳›׳•׳׳', '׳‘׳›׳ ׳–׳׳'];
     }
-    if (/(חייב|צריך|אין ברירה|מוכרח)/.test(normalized)) {
-        return ['בכל תנאי', 'ללא בחירה', 'גם כשאני עייף', 'לא משנה מה'];
+    if (/(׳—׳™׳™׳‘|׳¦׳¨׳™׳|׳׳™׳ ׳‘׳¨׳™׳¨׳”|׳׳•׳›׳¨׳—)/.test(normalized)) {
+        return ['׳‘׳›׳ ׳×׳ ׳׳™', '׳׳׳ ׳‘׳—׳™׳¨׳”', '׳’׳ ׳›׳©׳׳ ׳™ ׳¢׳™׳™׳£', '׳׳ ׳׳©׳ ׳” ׳׳”'];
     }
-    return ['בשום מצב', 'בכל תנאי', 'בשום צורה'];
+    return ['׳‘׳©׳•׳ ׳׳¦׳‘', '׳‘׳›׳ ׳×׳ ׳׳™', '׳‘׳©׳•׳ ׳¦׳•׳¨׳”'];
 }
 
 function wr2SoftenSentence(sentence) {
     let text = String(sentence || '').trim();
     if (!text) return '';
-    text = text.replace(/אני לא יכול/g, 'לפעמים קשה לי');
-    text = text.replace(/אי אפשר/g, 'כרגע זה מאתגר');
-    text = text.replace(/תמיד/g, 'לפעמים');
-    text = text.replace(/אף פעם/g, 'לפעמים');
-    text = text.replace(/כולם/g, 'חלק מהאנשים');
-    text = text.replace(/אין ברירה/g, 'יש לי כמה אפשרויות');
-    text = text.replace(/חייב/g, 'מעדיף');
+    text = text.replace(/׳׳ ׳™ ׳׳ ׳™׳›׳•׳/g, '׳׳₪׳¢׳׳™׳ ׳§׳©׳” ׳׳™');
+    text = text.replace(/׳׳™ ׳׳₪׳©׳¨/g, '׳›׳¨׳’׳¢ ׳–׳” ׳׳׳×׳’׳¨');
+    text = text.replace(/׳×׳׳™׳“/g, '׳׳₪׳¢׳׳™׳');
+    text = text.replace(/׳׳£ ׳₪׳¢׳/g, '׳׳₪׳¢׳׳™׳');
+    text = text.replace(/׳›׳•׳׳/g, '׳—׳׳§ ׳׳”׳׳ ׳©׳™׳');
+    text = text.replace(/׳׳™׳ ׳‘׳¨׳™׳¨׳”/g, '׳™׳© ׳׳™ ׳›׳׳” ׳׳₪׳©׳¨׳•׳™׳•׳×');
+    text = text.replace(/׳—׳™׳™׳‘/g, '׳׳¢׳“׳™׳£');
     if (!/[.!?]$/.test(text)) text += '.';
     return text;
 }
@@ -8427,7 +8606,7 @@ function wr2OverlayHtml(template, activeQuantifier) {
 function wr2TriggerFx(layer, strong = false) {
     if (!layer) return;
     layer.innerHTML = '';
-    const glyphs = strong ? ['✨', '🎉', '💥', '✅'] : ['✨', '🔍', '🧩'];
+    const glyphs = strong ? ['ג¨', 'נ‰', 'נ’¥', 'ג…'] : ['ג¨', 'נ”', 'נ§©'];
     const count = strong ? 14 : 7;
     for (let i = 0; i < count; i += 1) {
         const star = document.createElement('span');
@@ -8452,49 +8631,49 @@ function setupWrinkleGame() {
         root.className = 'card wrinkle-reveal-card';
         root.innerHTML = `
             <div class="wr2-topbar">
-                <span class="wr2-top-icon">🕵️‍♂️</span>
-                <h3>חשוף את הכמת!</h3>
+                <span class="wr2-top-icon">נ•µן¸ג€ג™‚ן¸</span>
+                <h3>׳—׳©׳•׳£ ׳׳× ׳”׳›׳׳×!</h3>
                 <div class="wr2-score">
-                    <span>🔥 <strong id="wr2-streak">0</strong></span>
-                    <span>⭐ <strong id="wr2-points">0</strong></span>
+                    <span>נ”¥ <strong id="wr2-streak">0</strong></span>
+                    <span>ג­ <strong id="wr2-points">0</strong></span>
                 </div>
             </div>
             <div class="wr2-headline">
-                <h4>המשפט נשמע תמים...</h4>
-                <p>אבל הבעיה האמיתית מסתתרת כאן 👇</p>
+                <h4>׳”׳׳©׳₪׳˜ ׳ ׳©׳׳¢ ׳×׳׳™׳...</h4>
+                <p>׳׳‘׳ ׳”׳‘׳¢׳™׳” ׳”׳׳׳™׳×׳™׳× ׳׳¡׳×׳×׳¨׳× ׳›׳׳ נ‘‡</p>
             </div>
             <section class="wr2-plain-box">
                 <p id="wr2-visible-sentence" class="wr2-visible-sentence"></p>
-                <small>כך זה נשמע</small>
+                <small>׳›׳ ׳–׳” ׳ ׳©׳׳¢</small>
             </section>
             <section class="wr2-detect-zone">
-                <p class="wr2-zone-title">כמתים סמויים</p>
-                <div id="wr2-quantifiers" class="wr2-quantifiers" role="group" aria-label="כמתים סמויים"></div>
+                <p class="wr2-zone-title">׳›׳׳×׳™׳ ׳¡׳׳•׳™׳™׳</p>
+                <div id="wr2-quantifiers" class="wr2-quantifiers" role="group" aria-label="׳›׳׳×׳™׳ ׳¡׳׳•׳™׳™׳"></div>
                 <div class="wr2-overlay-box">
                     <p id="wr2-overlay-sentence" class="wr2-overlay-sentence"></p>
-                    <p id="wr2-explain-line" class="wr2-explain-line">לחץ/י על כמת אדום כדי לחשוף טוטאליות סמויה.</p>
+                    <p id="wr2-explain-line" class="wr2-explain-line">׳׳—׳¥/׳™ ׳¢׳ ׳›׳׳× ׳׳“׳•׳ ׳›׳“׳™ ׳׳—׳©׳•׳£ ׳˜׳•׳˜׳׳׳™׳•׳× ׳¡׳׳•׳™׳”.</p>
                 </div>
-                <p id="wr2-progress" class="wr2-progress">0 מתוך 0 כמתים חשופים</p>
+                <p id="wr2-progress" class="wr2-progress">0 ׳׳×׳•׳ 0 ׳›׳׳×׳™׳ ׳—׳©׳•׳₪׳™׳</p>
             </section>
             <section id="wr2-release" class="wr2-release hidden">
-                <p>הבעיה אינה במילים "אני לא יכול". הבעיה היא בהכללות נסתרות שיוצרות תחושת "אין מוצא".</p>
-                <button id="wr2-unlock-btn" class="btn btn-primary wr2-unlock-btn" type="button">חשפתי את כל הכמתים! 🎉</button>
+                <p>׳”׳‘׳¢׳™׳” ׳׳™׳ ׳” ׳‘׳׳™׳׳™׳ "׳׳ ׳™ ׳׳ ׳™׳›׳•׳". ׳”׳‘׳¢׳™׳” ׳”׳™׳ ׳‘׳”׳›׳׳׳•׳× ׳ ׳¡׳×׳¨׳•׳× ׳©׳™׳•׳¦׳¨׳•׳× ׳×׳—׳•׳©׳× "׳׳™׳ ׳׳•׳¦׳".</p>
+                <button id="wr2-unlock-btn" class="btn btn-primary wr2-unlock-btn" type="button">׳—׳©׳₪׳×׳™ ׳׳× ׳›׳ ׳”׳›׳׳×׳™׳! נ‰</button>
             </section>
             <section id="wr2-transform-zone" class="wr2-transform-zone hidden">
-                <button id="wr2-transform-btn" class="btn btn-primary wr2-transform-btn" type="button">הסר הכללה טוטאלית</button>
+                <button id="wr2-transform-btn" class="btn btn-primary wr2-transform-btn" type="button">׳”׳¡׳¨ ׳”׳›׳׳׳” ׳˜׳•׳˜׳׳׳™׳×</button>
                 <div id="wr2-transformed" class="wr2-transformed hidden" aria-live="polite">
-                    <p class="wr2-transformed-label">ניסוח משוחרר:</p>
+                    <p class="wr2-transformed-label">׳ ׳™׳¡׳•׳— ׳׳©׳•׳—׳¨׳¨:</p>
                     <p id="wr2-transformed-text" class="wr2-transformed-text"></p>
                 </div>
             </section>
             <div class="wr2-actions">
-                <button id="wr2-next-btn" class="btn btn-secondary" type="button">משפט הבא</button>
-                <button id="wr2-self-toggle" class="btn btn-secondary" type="button">+ משפט אישי</button>
+                <button id="wr2-next-btn" class="btn btn-secondary" type="button">׳׳©׳₪׳˜ ׳”׳‘׳</button>
+                <button id="wr2-self-toggle" class="btn btn-secondary" type="button">+ ׳׳©׳₪׳˜ ׳׳™׳©׳™</button>
             </div>
             <section id="wr2-self-panel" class="wr2-self-panel hidden">
-                <label for="wr2-self-input">Self-Reference (אופציונלי)</label>
-                <textarea id="wr2-self-input" rows="2" placeholder="לדוגמה: אני לא יכול להסביר לה מה אני רוצה."></textarea>
-                <button id="wr2-self-add" class="btn btn-secondary" type="button">הוסף לתרגול</button>
+                <label for="wr2-self-input">Self-Reference (׳׳•׳₪׳¦׳™׳•׳ ׳׳™)</label>
+                <textarea id="wr2-self-input" rows="2" placeholder="׳׳“׳•׳’׳׳”: ׳׳ ׳™ ׳׳ ׳™׳›׳•׳ ׳׳”׳¡׳‘׳™׳¨ ׳׳” ׳׳” ׳׳ ׳™ ׳¨׳•׳¦׳”."></textarea>
+                <button id="wr2-self-add" class="btn btn-secondary" type="button">׳”׳•׳¡׳£ ׳׳×׳¨׳’׳•׳</button>
                 <ul id="wr2-self-list" class="wr2-self-list"></ul>
             </section>
             <div id="wr2-fx-layer" class="wr2-fx-layer" aria-hidden="true"></div>
@@ -8585,14 +8764,14 @@ function setupWrinkleGame() {
         if (!rows.length) return;
         rows.forEach((scene) => {
             const item = document.createElement('li');
-            item.textContent = `“${scene.visibleSentence}”`;
+            item.textContent = `ג€${scene.visibleSentence}ג€`;
             els.selfList.appendChild(item);
         });
     };
     const render = () => {
         const scene = currentScene();
         if (!scene) {
-            root.innerHTML = '<p>אין כרגע משפטים לתרגול.</p>';
+            root.innerHTML = '<p>׳׳™׳ ׳›׳¨׳’׳¢ ׳׳©׳₪׳˜׳™׳ ׳׳×׳¨׳’׳•׳.</p>';
             return;
         }
 
@@ -8605,8 +8784,8 @@ function setupWrinkleGame() {
         }
         if (els.explainLine) {
             els.explainLine.textContent = state.activeQuantifier
-                ? `זה לא בהכרח "${scene.anchor}". זה "${state.activeQuantifier}".`
-                : 'לחץ/י על כמת אדום כדי לחשוף טוטאליות סמויה.';
+                ? `׳–׳” ׳׳ ׳‘׳”׳›׳¨׳— "${scene.anchor}". ׳–׳” "${state.activeQuantifier}".`
+                : '׳׳—׳¥/׳™ ׳¢׳ ׳›׳׳× ׳׳“׳•׳ ׳›׳“׳™ ׳׳—׳©׳•׳£ ׳˜׳•׳˜׳׳׳™׳•׳× ׳¡׳׳•׳™׳”.';
         }
 
         const qSet = new Set(state.revealed);
@@ -8614,12 +8793,12 @@ function setupWrinkleGame() {
             els.quantifiers.innerHTML = scene.quantifiers.map((q) => {
                 const active = state.activeQuantifier === q;
                 const seen = qSet.has(q);
-                return `<button type="button" class="wr2-quantifier${active ? ' is-active' : ''}${seen ? ' is-revealed' : ''}" data-q="${escapeHtml(q)}" aria-label="חשוף ${escapeHtml(q)}">[${escapeHtml(q)}]</button>`;
+                return `<button type="button" class="wr2-quantifier${active ? ' is-active' : ''}${seen ? ' is-revealed' : ''}" data-q="${escapeHtml(q)}" aria-label="׳—׳©׳•׳£ ${escapeHtml(q)}">[${escapeHtml(q)}]</button>`;
             }).join('');
         }
 
         if (els.progress) {
-            els.progress.textContent = `${state.revealed.length} מתוך ${scene.quantifiers.length} כמתים חשופים`;
+            els.progress.textContent = `${state.revealed.length} ׳׳×׳•׳ ${scene.quantifiers.length} ׳›׳׳×׳™׳ ׳—׳©׳•׳₪׳™׳`;
         }
 
         const revealedAll = allRevealed();
@@ -8627,8 +8806,8 @@ function setupWrinkleGame() {
         if (els.unlockBtn) {
             els.unlockBtn.disabled = !revealedAll || state.unlocked;
             els.unlockBtn.textContent = state.unlocked
-                ? 'מעולה, נעבור לטרנספורמציה ✅'
-                : 'חשפתי את כל הכמתים! 🎉';
+                ? '׳׳¢׳•׳׳”, ׳ ׳¢׳‘׳•׳¨ ׳׳˜׳¨׳ ׳¡׳₪׳•׳¨׳׳¦׳™׳” ג…'
+                : '׳—׳©׳₪׳×׳™ ׳׳× ׳›׳ ׳”׳›׳׳×׳™׳! נ‰';
         }
 
         const showTransform = state.unlocked || state.transformed;
@@ -8686,13 +8865,13 @@ function setupWrinkleGame() {
     const addSelfSentence = () => {
         const input = String(els.selfInput?.value || '').trim();
         if (input.length < 8) {
-            if (els.explainLine) els.explainLine.textContent = 'כתבו משפט אישי קצר (לפחות 8 תווים).';
+            if (els.explainLine) els.explainLine.textContent = '׳›׳×׳‘׳• ׳׳©׳₪׳˜ ׳׳™׳©׳™ ׳§׳¦׳¨ (׳׳₪׳—׳•׳× 8 ׳×׳•׳•׳™׳).';
             return;
         }
         const normalized = normalizeText(input).replace(/\s+/g, ' ').trim();
         const exists = state.customScenes.some(scene => normalizeText(scene.visibleSentence).replace(/\s+/g, ' ').trim() === normalized);
         if (exists) {
-            if (els.explainLine) els.explainLine.textContent = 'המשפט הזה כבר קיים בתרגול.';
+            if (els.explainLine) els.explainLine.textContent = '׳”׳׳©׳₪׳˜ ׳”׳–׳” ׳›׳‘׳¨ ׳§׳™׳™׳ ׳‘׳×׳¨׳’׳•׳.';
             return;
         }
         const scene = wr2NormalizeScene({
@@ -8741,37 +8920,71 @@ function setupWrinkleGame() {
 const WR2_SQHCEL_STORAGE_KEY = 'wr2_sqhcel_v1';
 
 const WR2W_FLOW_STEPS = Object.freeze([
-    Object.freeze({ id: 'S', label: 'S תחושה', criterion: 'signal' }),
-    Object.freeze({ id: 'Q', label: 'Q כמת-צל', criterion: 'quantifier' }),
-    Object.freeze({ id: 'H', label: 'H היפותזה', criterion: 'hypothesis' }),
-    Object.freeze({ id: 'C', label: 'C אישור', criterion: 'confirm' }),
-    Object.freeze({ id: 'P', label: 'PATH בחירה', criterion: 'path' }),
-    Object.freeze({ id: 'E', label: 'E/L חריג-למידה', criterion: 'exception' })
+    Object.freeze({ id: 'S', label: 'S ׳₪׳ ׳™׳', criterion: 'signal' }),
+    Object.freeze({ id: 'Q', label: 'Q ׳›׳׳×׳™׳', criterion: 'quantifier' }),
+    Object.freeze({ id: 'H', label: 'H ׳’׳™׳©׳•׳¨', criterion: 'hypothesis' }),
+    Object.freeze({ id: 'C', label: 'C ׳“׳™׳•׳§', criterion: 'confirm' }),
+    Object.freeze({ id: 'P', label: 'PATH ׳‘׳—׳™׳¨׳”', criterion: 'path' }),
+    Object.freeze({ id: 'E', label: 'E/L ׳—׳¨׳™׳’-׳׳׳™׳“׳”', criterion: 'exception' })
 ]);
 
 const WR2W_BREAKOUT_STEPS = Object.freeze([
-    Object.freeze({ id: 0, label: 'בדיקה ישירה', prompt: 'האם יש מקרה שבו זה לא נכון לגמרי?' }),
-    Object.freeze({ id: 1, label: 'מדרגה 1', prompt: 'היה פעם שזה היה 5% פחות נכון?' }),
-    Object.freeze({ id: 2, label: 'מדרגה 2', prompt: 'אם לא 5% - אז 1% פחות נכון?' }),
-    Object.freeze({ id: 3, label: 'מדרגה 3', prompt: 'באיזה תנאים זה נהיה הכי חזק? (מתי/איפה/עם מי)' })
+    Object.freeze({ id: 0, label: '׳‘׳“׳™׳§׳” ׳™׳©׳™׳¨׳”', prompt: '׳”׳׳ ׳™׳© ׳׳§׳¨׳” ׳©׳‘׳• ׳–׳” ׳׳ ׳ ׳›׳•׳ ׳׳’׳׳¨׳™?' }),
+    Object.freeze({ id: 1, label: '׳׳“׳¨׳’׳” 1', prompt: '׳”׳™׳” ׳₪׳¢׳ ׳©׳–׳” ׳”׳™׳” 5% ׳₪׳—׳•׳× ׳ ׳›׳•׳?' }),
+    Object.freeze({ id: 2, label: '׳׳“׳¨׳’׳” 2', prompt: '׳׳ ׳׳ 5% - ׳׳– 1% ׳₪׳—׳•׳× ׳ ׳›׳•׳?' }),
+    Object.freeze({ id: 3, label: '׳׳“׳¨׳’׳” 3', prompt: '׳‘׳׳™׳–׳” ׳×׳ ׳׳™׳ ׳–׳” ׳ ׳”׳™׳” ׳”׳›׳™ ׳—׳–׳§? (׳׳×׳™/׳׳™׳₪׳”/׳¢׳ ׳׳™)' })
 ]);
 
 const WR2W_FEELINGS = Object.freeze([
-    'לחץ',
-    'בושה',
-    'פחד',
-    'כעס',
-    'עצב',
-    'בלבול'
+    '׳›׳™׳•׳•׳¥',
+    '׳׳—׳¥',
+    '׳—׳•׳',
+    '׳›׳‘׳“׳•׳×',
+    '׳“׳—׳™׳₪׳•׳×',
+    '׳¨׳™׳§׳ ׳•׳×',
+    '׳׳—׳¨'
+]);
+
+const WR2W_TOTALITY_MENU = Object.freeze([
+    Object.freeze({
+        id: 'time',
+        axis: '׳¦׳™׳¨ ׳–׳׳',
+        text: '׳׳ ׳׳©׳ ׳” ׳׳×׳™ ׳ ׳“׳‘׳¨ ׳׳• ׳›׳׳” ׳–׳׳ ׳™׳¢׳‘׳•׳¨ ג€” ׳–׳” ׳׳ ׳™׳¦׳׳™׳—.'
+    }),
+    Object.freeze({
+        id: 'action',
+        axis: '׳¦׳™׳¨ ׳₪׳¢׳•׳׳”',
+        text: '׳׳ ׳׳©׳ ׳” ׳׳™׳–׳• ׳₪׳¢׳•׳׳” ׳׳¢׳©׳” ׳׳• ׳›׳׳” ׳׳×׳׳׳¥ ג€” ׳©׳•׳ ׳“׳‘׳¨ ׳׳ ׳™׳¢׳–׳•׳¨.'
+    }),
+    Object.freeze({
+        id: 'words',
+        axis: '׳¦׳™׳¨ ׳׳™׳׳™׳',
+        text: '׳׳ ׳׳©׳ ׳” ׳׳™׳׳• ׳׳™׳׳™׳ ׳׳‘׳—׳¨ ׳׳• ׳׳™׳ ׳׳ ׳¡׳— ג€” ׳–׳” ׳׳ ׳¢׳•׳‘׳¨.'
+    }),
+    Object.freeze({
+        id: 'people',
+        axis: '׳¦׳™׳¨ ׳׳ ׳©׳™׳',
+        text: '׳׳ ׳׳©׳ ׳” ׳׳™ ׳™׳¢׳–׳•׳¨ ׳׳• ׳׳™ ׳™׳×׳¢׳¨׳‘ ג€” ׳–׳” ׳׳ ׳™׳©׳ ׳”.'
+    }),
+    Object.freeze({
+        id: 'context',
+        axis: '׳¦׳™׳¨ ׳”׳§׳©׳¨',
+        text: '׳׳ ׳׳©׳ ׳” ׳‘׳׳™׳–׳” ׳׳§׳•׳ ׳׳• ׳‘׳׳™׳–׳• ׳¡׳™׳˜׳•׳׳¦׳™׳” ג€” ׳–׳” ׳ ׳×׳§׳¢.'
+    }),
+    Object.freeze({
+        id: 'custom',
+        axis: '׳ ׳™׳¡׳•׳— ׳׳™׳©׳™',
+        text: '׳׳—׳¨'
+    })
 ]);
 
 const WR2W_CRITERIA_LABELS = Object.freeze({
-    signal: 'זיהוי תחושה',
-    quantifier: 'בחירת כמת-צל',
-    hypothesis: 'היפותזה עם בעלות+בדיקה',
-    confirm: 'אישור לפני אתגור',
-    path: 'בחירת PATH (Agency)',
-    exception: 'פריצה + משפט למידה'
+    signal: 'S | ׳–׳™׳”׳•׳™ ׳₪׳ ׳™׳',
+    quantifier: 'Q | ׳›׳׳× ׳ ׳¡׳×׳¨',
+    hypothesis: 'H | ׳׳©׳₪׳˜ ׳׳’׳©׳¨',
+    confirm: 'C | ׳”׳׳™׳׳” + ׳׳™׳ ׳˜׳’׳¨׳¦׳™׳”',
+    path: 'PATH | ׳‘׳—׳™׳¨׳”',
+    exception: 'E/L | ׳—׳¨׳™׳’ ׳•׳׳׳™׳“׳”'
 });
 
 const wr2wPathCore = (() => {
@@ -8811,7 +9024,7 @@ const wr2wPathCore = (() => {
         canEnterException: (roundState) => Boolean(roundState?.confirmResolved && roundState?.pathChoice),
         evaluateLearningByPath: (pathChoice, payload) => {
             const normalized = normalizeText(payload?.singleText || payload?.outsideText || payload?.insideText || '');
-            const hasCondition = /(בעיקר כש|לפעמים|בתנאים|כאשר|כש)/.test(normalized);
+            const hasCondition = /(׳‘׳¢׳™׳§׳¨ ׳›׳©|׳׳₪׳¢׳׳™׳|׳‘׳×׳ ׳׳™׳|׳›׳׳©׳¨|׳›׳©)/.test(normalized);
             const avoidsAbsolutes = !WR2W_ABSOLUTE_REGEX.test(normalized);
             const ok = hasCondition && (pathChoice === 'inside' ? true : avoidsAbsolutes);
             return {
@@ -8861,84 +9074,95 @@ let wr2wDialoguePackPromise = null;
 
 const WR2W_SEED_DIALOGS = Object.freeze([
     Object.freeze({
+        id: 'sqhcel_model_words_axis',
+        monologue: '׳׳ ׳™ ׳₪׳©׳•׳˜ ׳׳ ׳™׳›׳•׳ ׳׳”׳¡׳‘׳™׳¨ ׳׳” ׳׳” ׳׳ ׳™ ׳¨׳•׳¦׳”. ׳׳ ׳™ ׳׳×׳׳׳¥ ׳׳”׳¡׳‘׳™׳¨ ׳•׳©׳•׳‘ ׳ ׳¡׳’׳¨.',
+        visibleSentence: '׳׳ ׳™ ׳₪׳©׳•׳˜ ׳׳ ׳™׳›׳•׳ ׳׳”׳¡׳‘׳™׳¨ ׳׳” ׳׳” ׳׳ ׳™ ׳¨׳•׳¦׳”.',
+        quantifiers: Object.freeze([
+            '׳׳ ׳׳©׳ ׳” ׳›׳׳” ׳׳×׳׳׳¥ ׳•׳׳ ׳׳©׳ ׳” ׳׳™׳׳• ׳׳™׳׳™׳ ׳׳‘׳—׳¨ ג€” ׳–׳” ׳׳ ׳¢׳•׳‘׳¨.',
+            '׳׳™׳ ׳׳™ ׳©׳•׳ ׳”׳©׳₪׳¢׳”; ׳”׳×׳•׳¦׳׳” ׳¡׳’׳•׳¨׳” ׳׳¨׳׳©.'
+        ]),
+        exceptionExample: '׳׳×׳•׳ 10 ׳©׳™׳—׳•׳×, ׳‘׳¢׳¨׳ ׳‘-2 ׳›׳ ׳”׳™׳” ׳¨׳’׳¢ ׳©׳ ׳”׳§׳©׳‘׳” ׳׳• ׳©׳׳׳” ׳׳¦׳™׳“׳”.',
+        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳׳ ׳™ ׳›׳‘׳¨ ׳׳’׳™׳¢ ׳׳™׳•׳׳© ׳•׳ ׳ ׳¢׳ ׳׳¨׳׳©.'
+    }),
+    Object.freeze({
         id: 'sqhcel_1_work_manager',
-        monologue: 'מחר יש לי שיחה עם המנהל. הוא ביקש "להבהיר דברים". אני כבר מדמיין את הטון שלו ואני ננעל.',
-        visibleSentence: 'אני כישלון מולו.',
-        quantifiers: Object.freeze(['תמיד', 'בכל שיחה', 'מול כל סמכות', 'בלי יוצא דופן']),
-        exceptionExample: 'בשיחה האחרונה כן הצלחתי להסביר נקודה אחת בצורה עניינית.',
-        conditionsLine: 'זה נהיה הכי חזק כשיש ביקורת פתאומית ומעט זמן לחשוב.'
+        monologue: '׳׳—׳¨ ׳™׳© ׳׳™ ׳©׳™׳—׳” ׳¢׳ ׳”׳׳ ׳”׳. ׳”׳•׳ ׳‘׳™׳§׳© "׳׳”׳‘׳”׳™׳¨ ׳“׳‘׳¨׳™׳". ׳׳ ׳™ ׳›׳‘׳¨ ׳׳“׳׳™׳™׳ ׳׳× ׳”׳˜׳•׳ ׳©׳׳• ׳•׳׳ ׳™ ׳ ׳ ׳¢׳.',
+        visibleSentence: '׳׳ ׳™ ׳›׳™׳©׳׳•׳ ׳׳•׳׳•.',
+        quantifiers: Object.freeze(['׳×׳׳™׳“', '׳‘׳›׳ ׳©׳™׳—׳”', '׳׳•׳ ׳›׳ ׳¡׳׳›׳•׳×', '׳‘׳׳™ ׳™׳•׳¦׳ ׳“׳•׳₪׳']),
+        exceptionExample: '׳‘׳©׳™׳—׳” ׳”׳׳—׳¨׳•׳ ׳” ׳›׳ ׳”׳¦׳׳—׳×׳™ ׳׳”׳¡׳‘׳™׳¨ ׳ ׳§׳•׳“׳” ׳׳—׳× ׳‘׳¦׳•׳¨׳” ׳¢׳ ׳™׳™׳ ׳™׳×.',
+        conditionsLine: '׳–׳” ׳ ׳”׳™׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳™׳© ׳‘׳™׳§׳•׳¨׳× ׳₪׳×׳׳•׳׳™׳× ׳•׳׳¢׳˜ ׳–׳׳ ׳׳—׳©׳•׳‘.'
     }),
     Object.freeze({
         id: 'sqhcel_2_work_meeting',
-        monologue: 'בישיבה כולם שתקו ואז הוא אמר "צריך יותר רצינות". הוא לא הסתכל עליי, אבל זה התיישב לי ישר בבטן.',
-        visibleSentence: 'אין לי איך לצאת מזה טוב.',
-        quantifiers: Object.freeze(['אין מצב', 'בשום דרך', 'תמיד', 'מול כולם']),
-        exceptionExample: 'כשהכנתי מראש שלוש נקודות - כן יצאתי מזה סביר.',
-        conditionsLine: 'זה הכי חזק כשהמסר עקיף ואני משלים את החסר לבד.'
+        monologue: '׳‘׳™׳©׳™׳‘׳” ׳›׳•׳׳ ׳©׳×׳§׳• ׳•׳׳– ׳”׳•׳ ׳׳׳¨ "׳¦׳¨׳™׳ ׳™׳•׳×׳¨ ׳¨׳¦׳™׳ ׳•׳×". ׳”׳•׳ ׳׳ ׳”׳¡׳×׳›׳ ׳¢׳׳™׳™, ׳׳‘׳ ׳–׳” ׳”׳×׳™׳™׳©׳‘ ׳׳™ ׳™׳©׳¨ ׳‘׳‘׳˜׳.',
+        visibleSentence: '׳׳™׳ ׳׳™ ׳׳™׳ ׳׳¦׳׳× ׳׳–׳” ׳˜׳•׳‘.',
+        quantifiers: Object.freeze(['׳׳™׳ ׳׳¦׳‘', '׳‘׳©׳•׳ ׳“׳¨׳', '׳×׳׳™׳“', '׳׳•׳ ׳›׳•׳׳']),
+        exceptionExample: '׳›׳©׳”׳›׳ ׳×׳™ ׳׳¨׳׳© ׳©׳׳•׳© ׳ ׳§׳•׳“׳•׳× - ׳›׳ ׳™׳¦׳׳×׳™ ׳׳–׳” ׳¡׳‘׳™׳¨.',
+        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳”׳׳¡׳¨ ׳¢׳§׳™׳£ ׳•׳׳ ׳™ ׳׳©׳׳™׳ ׳׳× ׳”׳—׳¡׳¨ ׳׳‘׳“.'
     }),
     Object.freeze({
         id: 'sqhcel_3_relationship_texts',
-        monologue: 'שלחתי לה הודעה בבוקר. היא ראתה ולא ענתה כל היום. הראש שלי לא הפסיק לרוץ.',
-        visibleSentence: 'אני לא מספיק בשבילה.',
-        quantifiers: Object.freeze(['תמיד', 'בשום מצב', 'מול כל בן/בת זוג', 'לגמרי']),
-        exceptionExample: 'בשבוע שעבר היא כן אמרה שהיא מעריכה אותי מאוד.',
-        conditionsLine: 'זה הכי חזק כשיש שתיקה ארוכה ואני כבר עייף.'
+        monologue: '׳©׳׳—׳×׳™ ׳׳” ׳”׳•׳“׳¢׳” ׳‘׳‘׳•׳§׳¨. ׳”׳™׳ ׳¨׳׳×׳” ׳•׳׳ ׳¢׳ ׳×׳” ׳›׳ ׳”׳™׳•׳. ׳”׳¨׳׳© ׳©׳׳™ ׳׳ ׳”׳₪׳¡׳™׳§ ׳׳¨׳•׳¥.',
+        visibleSentence: '׳׳ ׳™ ׳׳ ׳׳¡׳₪׳™׳§ ׳‘׳©׳‘׳™׳׳”.',
+        quantifiers: Object.freeze(['׳×׳׳™׳“', '׳‘׳©׳•׳ ׳׳¦׳‘', '׳׳•׳ ׳›׳ ׳‘׳/׳‘׳× ׳–׳•׳’', '׳׳’׳׳¨׳™']),
+        exceptionExample: '׳‘׳©׳‘׳•׳¢ ׳©׳¢׳‘׳¨ ׳”׳™׳ ׳›׳ ׳׳׳¨׳” ׳©׳”׳™׳ ׳׳¢׳¨׳™׳›׳” ׳׳•׳×׳™ ׳׳׳•׳“.',
+        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳™׳© ׳©׳×׳™׳§׳” ׳׳¨׳•׳›׳” ׳•׳׳ ׳™ ׳›׳‘׳¨ ׳¢׳™׳™׳£.'
     }),
     Object.freeze({
         id: 'sqhcel_4_relationship_home',
-        monologue: 'הוא נכנס הביתה, אמר שהוא עייף, ונעלם לטלפון. אני נשארתי לבד עם הסיפור בראש.',
-        visibleSentence: 'זה לא הולך לשום מקום.',
-        quantifiers: Object.freeze(['בשום מקום', 'תמיד', 'לנצח', 'בלי סיכוי']),
-        exceptionExample: 'אתמול כן דיברנו רבע שעה והרגשתי חיבור.',
-        conditionsLine: 'זה הכי חזק כשאנחנו חוזרים הביתה מותשים וללא זמן מעבר.'
+        monologue: '׳”׳•׳ ׳ ׳›׳ ׳¡ ׳”׳‘׳™׳×׳”, ׳׳׳¨ ׳©׳”׳•׳ ׳¢׳™׳™׳£, ׳•׳ ׳¢׳׳ ׳׳˜׳׳₪׳•׳. ׳׳ ׳™ ׳ ׳©׳׳¨׳×׳™ ׳׳‘׳“ ׳¢׳ ׳”׳¡׳™׳₪׳•׳¨ ׳‘׳¨׳׳©.',
+        visibleSentence: '׳–׳” ׳׳ ׳”׳•׳׳ ׳׳©׳•׳ ׳׳§׳•׳.',
+        quantifiers: Object.freeze(['׳‘׳©׳•׳ ׳׳§׳•׳', '׳×׳׳™׳“', '׳׳ ׳¦׳—', '׳‘׳׳™ ׳¡׳™׳›׳•׳™']),
+        exceptionExample: '׳׳×׳׳•׳ ׳›׳ ׳“׳™׳‘׳¨׳ ׳• ׳¨׳‘׳¢ ׳©׳¢׳” ׳•׳”׳¨׳’׳©׳×׳™ ׳—׳™׳‘׳•׳¨.',
+        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳׳ ׳—׳ ׳• ׳—׳•׳–׳¨׳™׳ ׳”׳‘׳™׳×׳” ׳׳•׳×׳©׳™׳ ׳•׳׳׳ ׳–׳׳ ׳׳¢׳‘׳¨.'
     }),
     Object.freeze({
         id: 'sqhcel_5_social',
-        monologue: 'מחר אירוע. אני כבר רואה מבטים ושומע את עצמי נתקע במשפט הראשון.',
-        visibleSentence: 'אני אעשה שם פדיחה.',
-        quantifiers: Object.freeze(['בטוח', 'תמיד', 'מול כולם', 'בלי יוצא דופן']),
-        exceptionExample: 'בשתי פגישות קטנות דווקא הצלחתי לפתוח שיחה סבירה.',
-        conditionsLine: 'זה הכי חזק כשאני מגיע בלי הכנה ועם הרבה רעש מסביב.'
+        monologue: '׳׳—׳¨ ׳׳™׳¨׳•׳¢. ׳׳ ׳™ ׳›׳‘׳¨ ׳¨׳•׳׳” ׳׳‘׳˜׳™׳ ׳•׳©׳•׳׳¢ ׳׳× ׳¢׳¦׳׳™ ׳ ׳×׳§׳¢ ׳‘׳׳©׳₪׳˜ ׳”׳¨׳׳©׳•׳.',
+        visibleSentence: '׳׳ ׳™ ׳׳¢׳©׳” ׳©׳ ׳₪׳“׳™׳—׳”.',
+        quantifiers: Object.freeze(['׳‘׳˜׳•׳—', '׳×׳׳™׳“', '׳׳•׳ ׳›׳•׳׳', '׳‘׳׳™ ׳™׳•׳¦׳ ׳“׳•׳₪׳']),
+        exceptionExample: '׳‘׳©׳×׳™ ׳₪׳’׳™׳©׳•׳× ׳§׳˜׳ ׳•׳× ׳“׳•׳•׳§׳ ׳”׳¦׳׳—׳×׳™ ׳׳₪׳×׳•׳— ׳©׳™׳—׳” ׳¡׳‘׳™׳¨׳”.',
+        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳׳ ׳™ ׳׳’׳™׳¢ ׳‘׳׳™ ׳”׳›׳ ׳” ׳•׳¢׳ ׳”׳¨׳‘׳” ׳¨׳¢׳© ׳׳¡׳‘׳™׳‘.'
     }),
     Object.freeze({
         id: 'sqhcel_6_self_image',
-        monologue: 'התחלתי משהו בהתלהבות ואז ויתרתי באמצע, שוב. אני מרגיש שזה חוזר על עצמו.',
-        visibleSentence: 'אני פשוט לא מסוגל להתמיד.',
-        quantifiers: Object.freeze(['לעולם לא', 'תמיד', 'בשום פרויקט', 'בלי סיכוי']),
-        exceptionExample: 'הצלחתי להתמיד שלושה שבועות בתרגול קצר בבוקר.',
-        conditionsLine: 'זה הכי חזק כשהיעד גדול מדי ואין צעד ראשון קטן.'
+        monologue: '׳”׳×׳—׳׳×׳™ ׳׳©׳”׳• ׳‘׳”׳×׳׳”׳‘׳•׳× ׳•׳׳– ׳•׳™׳×׳¨׳×׳™ ׳‘׳׳׳¦׳¢, ׳©׳•׳‘. ׳׳ ׳™ ׳׳¨׳’׳™׳© ׳©׳–׳” ׳—׳•׳–׳¨ ׳¢׳ ׳¢׳¦׳׳•.',
+        visibleSentence: '׳׳ ׳™ ׳₪׳©׳•׳˜ ׳׳ ׳׳¡׳•׳’׳ ׳׳”׳×׳׳™׳“.',
+        quantifiers: Object.freeze(['׳׳¢׳•׳׳ ׳׳', '׳×׳׳™׳“', '׳‘׳©׳•׳ ׳₪׳¨׳•׳™׳§׳˜', '׳‘׳׳™ ׳¡׳™׳›׳•׳™']),
+        exceptionExample: '׳”׳¦׳׳—׳×׳™ ׳׳”׳×׳׳™׳“ ׳©׳׳•׳©׳” ׳©׳‘׳•׳¢׳•׳× ׳‘׳×׳¨׳’׳•׳ ׳§׳¦׳¨ ׳‘׳‘׳•׳§׳¨.',
+        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳”׳™׳¢׳“ ׳’׳“׳•׳ ׳׳“׳™ ׳•׳׳™׳ ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳§׳˜׳.'
     }),
     Object.freeze({
         id: 'sqhcel_7_parenting',
-        monologue: 'הילד שוב חזר עם הערה. אמרתי לעצמי שאשמור על רוגע, אבל התפרצתי.',
-        visibleSentence: 'אני הורה גרוע.',
-        quantifiers: Object.freeze(['תמיד', 'בכל מצב', 'בלי יוצא דופן', 'מול כל קושי']),
-        exceptionExample: 'אתמול דווקא עצרתי בזמן ושיניתי טון.',
-        conditionsLine: 'זה הכי חזק כשאני מוצף ועובר ישר למצב תגובה.'
+        monologue: '׳”׳™׳׳“ ׳©׳•׳‘ ׳—׳–׳¨ ׳¢׳ ׳”׳¢׳¨׳”. ׳׳׳¨׳×׳™ ׳׳¢׳¦׳׳™ ׳©׳׳©׳׳•׳¨ ׳¢׳ ׳¨׳•׳’׳¢, ׳׳‘׳ ׳”׳×׳₪׳¨׳¦׳×׳™.',
+        visibleSentence: '׳׳ ׳™ ׳”׳•׳¨׳” ׳’׳¨׳•׳¢.',
+        quantifiers: Object.freeze(['׳×׳׳™׳“', '׳‘׳›׳ ׳׳¦׳‘', '׳‘׳׳™ ׳™׳•׳¦׳ ׳“׳•׳₪׳', '׳׳•׳ ׳›׳ ׳§׳•׳©׳™']),
+        exceptionExample: '׳׳×׳׳•׳ ׳“׳•׳•׳§׳ ׳¢׳¦׳¨׳×׳™ ׳‘׳–׳׳ ׳•׳©׳™׳ ׳™׳×׳™ ׳˜׳•׳.',
+        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳׳ ׳™ ׳׳•׳¦׳£ ׳•׳¢׳•׳‘׳¨ ׳™׳©׳¨ ׳׳׳¦׳‘ ׳×׳’׳•׳‘׳”.'
     }),
     Object.freeze({
         id: 'sqhcel_8_change',
-        monologue: 'ניסיתי להתחזק, היו יומיים טובים, ואז נפלתי. זה מיד הפך לסיפור כולל.',
-        visibleSentence: 'אין לי באמת יכולת להשתנות.',
-        quantifiers: Object.freeze(['אין יכולת', 'בשום שלב', 'לעולם לא', 'תמיד חוזר']),
-        exceptionExample: 'כשעבדתי עם מסגרת קצרה כן נוצר שינוי קטן.',
-        conditionsLine: 'זה הכי חזק כשיש מעידה ואני מתרגם אותה לזהות קבועה.'
+        monologue: '׳ ׳™׳¡׳™׳×׳™ ׳׳”׳×׳—׳–׳§, ׳”׳™׳• ׳™׳•׳׳™׳™׳ ׳˜׳•׳‘׳™׳, ׳•׳׳– ׳ ׳₪׳׳×׳™. ׳–׳” ׳׳™׳“ ׳”׳₪׳ ׳׳¡׳™׳₪׳•׳¨ ׳›׳•׳׳.',
+        visibleSentence: '׳׳™׳ ׳׳™ ׳‘׳׳׳× ׳™׳›׳•׳׳× ׳׳”׳©׳×׳ ׳•׳×.',
+        quantifiers: Object.freeze(['׳׳™׳ ׳™׳›׳•׳׳×', '׳‘׳©׳•׳ ׳©׳׳‘', '׳׳¢׳•׳׳ ׳׳', '׳×׳׳™׳“ ׳—׳•׳–׳¨']),
+        exceptionExample: '׳›׳©׳¢׳‘׳“׳×׳™ ׳¢׳ ׳׳¡׳’׳¨׳× ׳§׳¦׳¨׳” ׳›׳ ׳ ׳•׳¦׳¨ ׳©׳™׳ ׳•׳™ ׳§׳˜׳.',
+        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳™׳© ׳׳¢׳™׳“׳” ׳•׳׳ ׳™ ׳׳×׳¨׳’׳ ׳׳•׳×׳” ׳׳–׳”׳•׳× ׳§׳‘׳•׳¢׳”.'
     }),
     Object.freeze({
         id: 'sqhcel_9_health',
-        monologue: 'עשיתי שבוע מסודר ואז לילה אחד התפרקתי. הראש אמר שהכול נמחק.',
-        visibleSentence: 'זה חסר סיכוי.',
-        quantifiers: Object.freeze(['חסר סיכוי', 'בשום מצב', 'תמיד', 'לגמרי']),
-        exceptionExample: 'אחרי הלילה הזה חזרתי למסלול כבר למחרת בצהריים.',
-        conditionsLine: 'זה הכי חזק כשאני עייף ומסתכל על אירוע אחד כאילו הוא מגדיר הכול.'
+        monologue: '׳¢׳©׳™׳×׳™ ׳©׳‘׳•׳¢ ׳׳¡׳•׳“׳¨ ׳•׳׳– ׳׳™׳׳” ׳׳—׳“ ׳”׳×׳₪׳¨׳§׳×׳™. ׳”׳¨׳׳© ׳׳׳¨ ׳©׳”׳›׳•׳ ׳ ׳׳—׳§.',
+        visibleSentence: '׳–׳” ׳—׳¡׳¨ ׳¡׳™׳›׳•׳™.',
+        quantifiers: Object.freeze(['׳—׳¡׳¨ ׳¡׳™׳›׳•׳™', '׳‘׳©׳•׳ ׳׳¦׳‘', '׳×׳׳™׳“', '׳׳’׳׳¨׳™']),
+        exceptionExample: '׳׳—׳¨׳™ ׳”׳׳™׳׳” ׳”׳–׳” ׳—׳–׳¨׳×׳™ ׳׳׳¡׳׳•׳ ׳›׳‘׳¨ ׳׳׳—׳¨׳× ׳‘׳¦׳”׳¨׳™׳™׳.',
+        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳׳ ׳™ ׳¢׳™׳™׳£ ׳•׳׳¡׳×׳›׳ ׳¢׳ ׳׳™׳¨׳•׳¢ ׳׳—׳“ ׳›׳׳™׳׳• ׳”׳•׳ ׳׳’׳“׳™׳¨ ׳”׳›׳•׳.'
     }),
     Object.freeze({
         id: 'sqhcel_10_money',
-        monologue: 'אני מסדר משהו ואז מגיע עוד סידור. מרגיש שאני כל הזמן רק מכבה שריפות.',
-        visibleSentence: 'אין פה סוף.',
-        quantifiers: Object.freeze(['לעולם לא', 'תמיד', 'בכל חודש', 'בלי הפסקה']),
-        exceptionExample: 'בחודש שעבר היה שבוע רגוע יותר עם פחות כיבוי שריפות.',
-        conditionsLine: 'זה הכי חזק סביב מועדי תשלום ולחץ זמן מקביל.'
+        monologue: '׳׳ ׳™ ׳׳¡׳“׳¨ ׳׳©׳”׳• ׳•׳׳– ׳׳’׳™׳¢ ׳¢׳•׳“ ׳¡׳™׳“׳•׳¨. ׳׳¨׳’׳™׳© ׳©׳׳ ׳™ ׳›׳ ׳”׳–׳׳ ׳¨׳§ ׳׳›׳‘׳” ׳©׳¨׳™׳₪׳•׳×.',
+        visibleSentence: '׳׳™׳ ׳₪׳” ׳¡׳•׳£.',
+        quantifiers: Object.freeze(['׳׳¢׳•׳׳ ׳׳', '׳×׳׳™׳“', '׳‘׳›׳ ׳—׳•׳“׳©', '׳‘׳׳™ ׳”׳₪׳¡׳§׳”']),
+        exceptionExample: '׳‘׳—׳•׳“׳© ׳©׳¢׳‘׳¨ ׳”׳™׳” ׳©׳‘׳•׳¢ ׳¨׳’׳•׳¢ ׳™׳•׳×׳¨ ׳¢׳ ׳₪׳—׳•׳× ׳›׳™׳‘׳•׳™ ׳©׳¨׳™׳₪׳•׳×.',
+        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳¡׳‘׳™׳‘ ׳׳•׳¢׳“׳™ ׳×׳©׳׳•׳ ׳•׳׳—׳¥ ׳–׳׳ ׳׳§׳‘׳™׳.'
     })
 ]);
 
@@ -8962,9 +9186,9 @@ function wr2wResolveCaseSeedMeta(raw, visibleSentence, monologue) {
     let quantifierNature = 'mixed';
     if (['internal_climate', 'external_pattern', 'mixed'].includes(quantifierNatureRaw)) {
         quantifierNature = quantifierNatureRaw;
-    } else if (/(מרגיש|בפנים|חרדה|לחץ|בושה|כאב|דופק)/.test(normalizedText)) {
+    } else if (/(׳׳¨׳’׳™׳©|׳‘׳₪׳ ׳™׳|׳—׳¨׳“׳”|׳׳—׳¥|׳‘׳•׳©׳”|׳›׳׳‘|׳“׳•׳₪׳§)/.test(normalizedText)) {
         quantifierNature = 'internal_climate';
-    } else if (/(בעבודה|בבית|בפגישה|בשיחה|מול|ביחסים|כסף|פרויקט)/.test(normalizedText)) {
+    } else if (/(׳‘׳¢׳‘׳•׳“׳”|׳‘׳‘׳™׳×|׳‘׳₪׳’׳™׳©׳”|׳‘׳©׳™׳—׳”|׳׳•׳|׳‘׳™׳—׳¡׳™׳|׳›׳¡׳£|׳₪׳¨׳•׳™׳§׳˜)/.test(normalizedText)) {
         quantifierNature = 'external_pattern';
     }
 
@@ -9020,11 +9244,11 @@ function wr2wNormalizeScene(raw, idxPrefix = 'wr2w') {
         anchor: wr2TrimText(wr2wSanitizeText(source.anchor || wr2DetectAnchor(visibleSentence)), 36),
         quantifiers: [...new Set(inferredQuantifiers)].slice(0, 4),
         exceptionExample: wr2TrimText(
-            wr2wSanitizeText(source.exceptionExample || 'היה רגע קצר שזה היה קצת פחות נכון.'),
+            wr2wSanitizeText(source.exceptionExample || '׳”׳™׳” ׳¨׳’׳¢ ׳§׳¦׳¨ ׳©׳–׳” ׳”׳™׳” ׳§׳¦׳× ׳₪׳—׳•׳× ׳ ׳›׳•׳.'),
             180
         ),
         conditionsLine: wr2TrimText(
-            wr2wSanitizeText(source.conditionsLine || 'זה נהיה הכי חזק בתנאים של לחץ/עייפות/חוסר ודאות.'),
+            wr2wSanitizeText(source.conditionsLine || '׳–׳” ׳ ׳”׳™׳” ׳”׳›׳™ ׳—׳–׳§ ׳‘׳×׳ ׳׳™׳ ׳©׳ ׳׳—׳¥/׳¢׳™׳™׳₪׳•׳×/׳—׳•׳¡׳¨ ׳•׳“׳׳•׳×.'),
             180
         ),
         transformedSentence: wr2TrimText(
@@ -9057,7 +9281,7 @@ function wr2wMapDialoguePackEntry(entry, index = 0) {
     const quantifiers = [suggestedQuantifier, ...wr2InferQuantifiers(visibleSentence)]
         .filter(Boolean)
         .slice(0, 4);
-    const fallbackCondition = 'זה נהיה הכי חזק בעיקר בעומס, עייפות או חוסר ודאות.';
+    const fallbackCondition = '׳–׳” ׳ ׳”׳™׳” ׳”׳›׳™ ׳—׳–׳§ ׳‘׳¢׳™׳§׳¨ ׳‘׳¢׳•׳׳¡, ׳¢׳™׳™׳₪׳•׳× ׳׳• ׳—׳•׳¡׳¨ ׳•׳“׳׳•׳×.';
     const caseSeedMeta = wr2wResolveCaseSeedMeta(source, visibleSentence, monologue);
     wr2wLogHebrewIssues('dialogue_pack.visibleSentence', visibleSentence);
     wr2wLogHebrewIssues('dialogue_pack.monologue', monologue);
@@ -9070,7 +9294,7 @@ function wr2wMapDialoguePackEntry(entry, index = 0) {
         exceptionExample: wr2TrimText(
             wr2wSanitizeText(source.suggested_exception || source.suggestedException || source.exceptionExample),
             180
-        ) || 'כן, יש רגע שבו זה 5% פחות נכון.',
+        ) || '׳›׳, ׳™׳© ׳¨׳’׳¢ ׳©׳‘׳• ׳–׳” 5% ׳₪׳—׳•׳× ׳ ׳›׳•׳.',
         conditionsLine: wr2TrimText(wr2wSanitizeText(source.conditionsLine || fallbackCondition), 180),
         transformedSentence: wr2TrimText(wr2SoftenSentence(visibleSentence), 190),
         caseSeedMeta,
@@ -9099,9 +9323,39 @@ async function wr2wLoadSeedScenesFromPack() {
     return wr2wDialoguePackPromise;
 }
 
-function wr2wBuildHypothesisSkeleton(scene, quantifier) {
-    const q = quantifier || '___';
-    return `כשאת/ה אומר/ת "${scene.visibleSentence}", עולה לי כאילו יש כאן "${q}" לגבי ___. זה קרוב למה שאתה מתכוון, או שאני משלים?`;
+function wr2wBuildHypothesisSkeleton(scene, totalityText) {
+    const q = totalityText || '___';
+    return `׳׳ ׳™ ׳©׳•׳׳¢ ׳©׳›׳׳©׳¨ ׳׳×׳” ׳׳•׳׳¨ "${scene.visibleSentence}" ׳–׳” ׳ ׳—׳•׳•׳” ׳׳‘׳₪׳ ׳™׳ ׳›"${q}". ׳–׳” ׳׳¨׳’׳™׳© ׳›׳‘׳“ ׳•׳׳©׳×׳§. ׳–׳” ׳׳“׳•׳™׳§ ׳¢׳‘׳•׳¨׳ ׳¢׳›׳©׳™׳•?`;
+}
+
+function wr2wFrequencyToAttempts(meta = {}) {
+    const freq = String(meta?.external_frequency_estimate || '').toLowerCase();
+    if (freq === 'rare') return 1;
+    if (freq === 'sometimes') return 2;
+    if (freq === 'almost_always') return 7;
+    return 4;
+}
+
+function wr2wBuildRealitySnapshot(scene, roundState = {}) {
+    const meta = scene?.caseSeedMeta || {};
+    const attempts = wr2wFrequencyToAttempts(meta);
+    const signal = wr2TrimText(wr2wSanitizeText(scene?.exceptionExample || '׳”׳™׳” ׳¨׳’׳¢ ׳§׳˜׳ ׳©׳ ׳”׳×׳§׳¨׳‘׳•׳×, ׳’׳ ׳׳ ׳׳ ׳׳•׳©׳׳.'), 180);
+    const quantifier = wr2wSanitizeText(roundState?.selectedQuantifier || '׳׳ ׳׳©׳ ׳” ׳׳”');
+    return Object.freeze({
+        attempts,
+        outOf: 10,
+        signal,
+        filterLine: '׳›׳©׳™׳™׳׳•׳© ׳—׳–׳§, ׳׳•׳₪׳¢׳ ׳׳¡׳ ׳ ׳”׳©׳׳˜׳” ׳©׳׳•׳—׳§ ׳׳•׳×׳•׳× ׳§׳˜׳ ׳™׳ ׳‘׳—׳•׳¥ ׳›׳“׳™ ׳׳”׳’׳ ׳׳׳›׳–׳‘׳”.',
+        paradoxLine: '׳•׳‘׳•-׳–׳׳: ׳׳×׳” ׳¢׳“׳™׳™׳ ׳›׳׳. ׳–׳” ׳¡׳™׳׳ ׳©׳™׳© ׳’׳ ׳¦׳“ ׳©׳׳§׳•׳•׳” ׳©׳–׳” ׳›׳ ׳™׳›׳•׳ ׳׳¢׳‘׳•׳“.',
+        insideLine: `׳׳‘׳₪׳ ׳™׳ ׳”׳—׳•׳•׳™׳” ׳ ׳©׳׳¢׳× ׳›׳׳• "${quantifier}", ׳•׳׳›׳ ׳™׳© ׳ ׳˜׳™׳™׳” ׳׳”׳™׳¡׳’׳¨ ׳׳¨׳׳©.`
+    });
+}
+
+function wr2wBuildIntegrativeSkeleton(snapshot) {
+    const inside = snapshot?.insideLine || '׳‘׳₪׳ ׳™׳ ׳™׳© ׳™׳™׳׳•׳© ׳©׳׳™׳™׳¦׳¨ ׳¡׳’׳™׳¨׳” ׳׳¨׳׳©.';
+    const attempts = Number(snapshot?.attempts) || 0;
+    const outOf = Number(snapshot?.outOf) || 10;
+    return `׳‘׳—׳•׳¥ ׳™׳© ׳׳₪׳¢׳׳™׳ ׳ ׳™׳¡׳™׳•׳ (׳‘׳¢׳¨׳ ${attempts}/${outOf}), ׳•׳‘׳₪׳ ׳™׳ ׳™׳© ׳™׳™׳׳•׳© ׳—׳–׳§. ׳›׳©׳©׳ ׳™ ׳׳׳” ׳ ׳₪׳’׳©׳™׳ ׳ ׳•׳¦׳¨׳× ׳”׳×׳§׳™׳¢׳•׳× ׳”׳ ׳•׳›׳—׳™׳×.`;
 }
 
 function wr2wExtractConditionHint(scene, roundState = {}) {
@@ -9114,22 +9368,22 @@ function wr2wExtractConditionHint(scene, roundState = {}) {
     for (let i = 0; i < samples.length; i += 1) {
         const text = wr2wSanitizeText(samples[i] || '').replace(/\s+/g, ' ').trim();
         if (!text) continue;
-        const match = text.match(/(?:בעיקר\s+כש|כש|כאשר)\s*([^.,;!?]+)/);
+        const match = text.match(/(?:׳‘׳¢׳™׳§׳¨\s+׳›׳©|׳›׳©|׳›׳׳©׳¨)\s*([^.,;!?]+)/);
         if (match && match[1]) {
             const cleaned = match[1].replace(/["']/g, '').trim();
             if (cleaned) return cleaned;
         }
     }
-    return 'יש עומס, עייפות או חוסר ודאות';
+    return '׳™׳© ׳¢׳•׳׳¡, ׳¢׳™׳™׳₪׳•׳× ׳׳• ׳—׳•׳¡׳¨ ׳•׳“׳׳•׳×';
 }
 
 function wr2wComposeAutoLearning(pathChoice, scene, roundState = {}) {
     const choice = String(pathChoice || '').toLowerCase();
-    const quantifier = wr2wSanitizeText(roundState?.selectedQuantifier || 'תמיד');
+    const quantifier = wr2wSanitizeText(roundState?.selectedQuantifier || '׳×׳׳™׳“');
     const conditionCore = wr2wExtractConditionHint(scene, roundState);
-    const conditionClause = conditionCore.startsWith('כש') ? conditionCore : `כש${conditionCore}`;
-    const outsideText = wr2wSanitizeText(`זה לא בהכרח "${quantifier}", זה דפוס לא עקבי — בעיקר ${conditionClause}.`);
-    const insideText = wr2wSanitizeText(`זה מרגיש "${quantifier}" — בעיקר ${conditionClause}.`);
+    const conditionClause = conditionCore.startsWith('׳›׳©') ? conditionCore : `׳›׳©${conditionCore}`;
+    const outsideText = wr2wSanitizeText(`׳–׳” ׳׳ ׳‘׳”׳›׳¨׳— "${quantifier}", ׳–׳” ׳“׳₪׳•׳¡ ׳׳ ׳¢׳§׳‘׳™ ג€” ׳‘׳¢׳™׳§׳¨ ${conditionClause}.`);
+    const insideText = wr2wSanitizeText(`׳–׳” ׳׳¨׳’׳™׳© "${quantifier}" ג€” ׳‘׳¢׳™׳§׳¨ ${conditionClause}.`);
 
     if (choice === 'outside') {
         return Object.freeze({ singleText: outsideText, outsideText, insideText: '' });
@@ -9140,11 +9394,13 @@ function wr2wComposeAutoLearning(pathChoice, scene, roundState = {}) {
     return Object.freeze({ singleText: '', outsideText, insideText });
 }
 
-const WR2W_OWNERSHIP_REGEX = /(עולה לי|כשאני שומע|אני קולט כאילו|נדמה לי|מרגיש לי)/;
-const WR2W_CHECK_REGEX = /(זה קרוב|או שאני משלים|זה מדויק|זה מתאים|אני מפספס)/;
-const WR2W_ABSOLUTE_REGEX = /(תמיד|אף פעם|בשום|כולם|אין מצב|לגמרי|לעולם)/;
-const WR2W_OUTSIDE_REGEX = /(דפוס|לא עקבי|בפועל|באינטראקציה|ביחסים|גבול|בקשה|פתרון|התנהגות)/;
-const WR2W_INSIDE_REGEX = /(מרגיש|בפנים|בגוף|עוצמה|לחץ|פחד|בושה|דופק|כאב)/;
+const WR2W_OWNERSHIP_REGEX = /(׳¢׳•׳׳” ׳׳™|׳›׳©׳׳ ׳™ ׳©׳•׳׳¢|׳׳ ׳™ ׳§׳•׳׳˜ ׳›׳׳™׳׳•|׳ ׳“׳׳” ׳׳™|׳׳¨׳’׳™׳© ׳׳™)/;
+const WR2W_CHECK_REGEX = /(׳–׳” ׳§׳¨׳•׳‘|׳׳• ׳©׳׳ ׳™ ׳׳©׳׳™׳|׳–׳” ׳׳“׳•׳™׳§|׳–׳” ׳׳×׳׳™׳|׳׳ ׳™ ׳׳₪׳¡׳₪׳¡|׳–׳” ׳׳” ׳©׳”׳×׳›׳•׳•׳ ׳×)/;
+const WR2W_ABSOLUTE_REGEX = /(׳×׳׳™׳“|׳׳£ ׳₪׳¢׳|׳‘׳©׳•׳|׳›׳•׳׳|׳׳™׳ ׳׳¦׳‘|׳׳’׳׳¨׳™|׳׳¢׳•׳׳)/;
+const WR2W_OUTSIDE_REGEX = /(׳“׳₪׳•׳¡|׳׳ ׳¢׳§׳‘׳™|׳‘׳₪׳•׳¢׳|׳‘׳׳™׳ ׳˜׳¨׳׳§׳¦׳™׳”|׳‘׳™׳—׳¡׳™׳|׳’׳‘׳•׳|׳‘׳§׳©׳”|׳₪׳×׳¨׳•׳|׳”׳×׳ ׳”׳’׳•׳×)/;
+const WR2W_INSIDE_REGEX = /(׳׳¨׳’׳™׳©|׳‘׳₪׳ ׳™׳|׳‘׳’׳•׳£|׳¢׳•׳¦׳׳”|׳׳—׳¥|׳₪׳—׳“|׳‘׳•׳©׳”|׳“׳•׳₪׳§|׳›׳׳‘)/;
+const WR2W_VALIDATION_REGEX = /(׳›׳‘׳“|׳׳©׳×׳§|׳׳×׳¡׳›׳|׳§׳©׳”|׳׳™׳ ׳׳™ ׳”׳©׳₪׳¢׳”|׳×׳•׳¦׳׳” ׳¡׳’׳•׳¨׳” ׳׳¨׳׳©|׳—׳•׳•׳™׳” ׳׳•׳—׳׳˜׳×)/;
+const WR2W_PREMATURE_FACT_CHECK_REGEX = /(׳‘׳׳׳×|׳‘׳₪׳•׳¢׳|׳׳×׳•׳ 10|׳׳₪׳¡|׳™׳© ׳׳₪׳¢׳׳™׳|׳”׳™׳ ׳›׳|׳”׳•׳ ׳›׳|׳ ׳™׳¡׳™׳•׳ ׳׳¦׳™׳“׳”|׳ ׳™׳¡׳™׳•׳ ׳׳¦׳“׳•)/;
 
 const wr2wPatientAgent = Object.freeze({
     confirmHypothesis(scene, hypothesisText, selectedQuantifier) {
@@ -9154,7 +9410,7 @@ const wr2wPatientAgent = Object.freeze({
             : false;
         const meta = scene?.caseSeedMeta || {};
         if (!hasQuantifier) {
-            const rawText = 'לא ממש. אני לא שומע כאן את ההשלמה שאני מרגיש בפנים.';
+            const rawText = '׳׳ ׳׳׳©. ׳׳ ׳™ ׳׳ ׳©׳•׳׳¢ ׳›׳׳ ׳׳× ׳”׳”׳©׳׳׳” ׳©׳׳ ׳™ ׳׳¨׳’׳™׳© ׳‘׳₪׳ ׳™׳.';
             wr2wLogHebrewIssues('patient.confirm.no_quantifier', rawText);
             return Object.freeze({
                 status: 'no',
@@ -9164,7 +9420,7 @@ const wr2wPatientAgent = Object.freeze({
 
         const profile = wr2wHash(scene.id) % 3;
         if (profile === 0) {
-            const rawText = 'כן, זה קרוב למה שקורה לי. זה בדיוק הקול הפנימי.';
+            const rawText = '׳›׳, ׳–׳” ׳§׳¨׳•׳‘ ׳׳׳” ׳©׳§׳•׳¨׳” ׳׳™. ׳–׳” ׳‘׳“׳™׳•׳§ ׳”׳§׳•׳ ׳”׳₪׳ ׳™׳׳™.';
             wr2wLogHebrewIssues('patient.confirm.yes', rawText);
             return Object.freeze({
                 status: 'yes',
@@ -9173,8 +9429,8 @@ const wr2wPatientAgent = Object.freeze({
         }
         if (profile === 1) {
             const rawText = meta.quantifier_nature === 'external_pattern'
-                ? 'בערך. זה נראה יותר כמו דפוס חיצוני בתנאים מסוימים, לא תמיד.'
-                : 'בערך. זה נכון בעיקר במצבים מסוימים, לא תמיד.';
+                ? '׳‘׳¢׳¨׳. ׳–׳” ׳ ׳¨׳׳” ׳™׳•׳×׳¨ ׳›׳׳• ׳“׳₪׳•׳¡ ׳—׳™׳¦׳•׳ ׳™ ׳‘׳×׳ ׳׳™׳ ׳׳¡׳•׳™׳׳™׳, ׳׳ ׳×׳׳™׳“.'
+                : '׳‘׳¢׳¨׳. ׳–׳” ׳ ׳›׳•׳ ׳‘׳¢׳™׳§׳¨ ׳‘׳׳¦׳‘׳™׳ ׳׳¡׳•׳™׳׳™׳, ׳׳ ׳×׳׳™׳“.';
             wr2wLogHebrewIssues('patient.confirm.partial', rawText);
             return Object.freeze({
                 status: 'partial',
@@ -9182,8 +9438,8 @@ const wr2wPatientAgent = Object.freeze({
             });
         }
         const rawText = meta.quantifier_nature === 'internal_climate'
-            ? 'לא לגמרי. כרגע זה מרגיש יותר אקלים פנימי חזק מאשר כלל קבוע.'
-            : 'לא לגמרי. זה נשמע יותר עומס רגעי מאשר כלל קבוע.';
+            ? '׳׳ ׳׳’׳׳¨׳™. ׳›׳¨׳’׳¢ ׳–׳” ׳׳¨׳’׳™׳© ׳™׳•׳×׳¨ ׳׳§׳׳™׳ ׳₪׳ ׳™׳׳™ ׳—׳–׳§ ׳׳׳©׳¨ ׳›׳׳ ׳§׳‘׳•׳¢.'
+            : '׳׳ ׳׳’׳׳¨׳™. ׳–׳” ׳ ׳©׳׳¢ ׳™׳•׳×׳¨ ׳¢׳•׳׳¡ ׳¨׳’׳¢׳™ ׳׳׳©׳¨ ׳›׳׳ ׳§׳‘׳•׳¢.';
         wr2wLogHebrewIssues('patient.confirm.no', rawText);
         return Object.freeze({
             status: 'no',
@@ -9193,17 +9449,17 @@ const wr2wPatientAgent = Object.freeze({
     probeException(scene, level) {
         const profile = wr2wHash(`${scene.id}:${level}`) % 4;
         if (level === 0 && profile <= 2) {
-            const rawText = 'כרגע לא עולה לי חריג ברור.';
+            const rawText = '׳›׳¨׳’׳¢ ׳׳ ׳¢׳•׳׳” ׳׳™ ׳—׳¨׳™׳’ ׳‘׳¨׳•׳¨.';
             wr2wLogHebrewIssues('patient.probe.level0', rawText);
             return Object.freeze({ found: false, text: wr2wSanitizeText(rawText) });
         }
         if (level === 1 && profile <= 1) {
-            const rawText = 'גם 5% פחות נכון קשה לי לזהות.';
+            const rawText = '׳’׳ 5% ׳₪׳—׳•׳× ׳ ׳›׳•׳ ׳§׳©׳” ׳׳™ ׳׳–׳”׳•׳×.';
             wr2wLogHebrewIssues('patient.probe.level1', rawText);
             return Object.freeze({ found: false, text: wr2wSanitizeText(rawText) });
         }
         if (level === 2 && profile === 0) {
-            const rawText = 'אפילו 1% פחות נכון לא עולה לי כרגע.';
+            const rawText = '׳׳₪׳™׳׳• 1% ׳₪׳—׳•׳× ׳ ׳›׳•׳ ׳׳ ׳¢׳•׳׳” ׳׳™ ׳›׳¨׳’׳¢.';
             wr2wLogHebrewIssues('patient.probe.level2', rawText);
             return Object.freeze({ found: false, text: wr2wSanitizeText(rawText) });
         }
@@ -9226,11 +9482,15 @@ const wr2wEvaluatorAgent = Object.freeze({
             ? normalized.includes(normalizeText(selectedQuantifier))
             : false;
         const hasCheck = WR2W_CHECK_REGEX.test(normalized);
+        const hasValidation = WR2W_VALIDATION_REGEX.test(normalized);
+        const hasPrematureFactCheck = WR2W_PREMATURE_FACT_CHECK_REGEX.test(normalized);
         return Object.freeze({
-            ok: hasOwnership && hasQuantifier && hasCheck,
+            ok: hasOwnership && hasQuantifier && hasCheck && hasValidation && !hasPrematureFactCheck,
             hasOwnership,
             hasQuantifier,
-            hasCheck
+            hasCheck,
+            hasValidation,
+            hasPrematureFactCheck
         });
     },
     evaluateLearning(pathChoice, payload = {}) {
@@ -9240,10 +9500,10 @@ const wr2wEvaluatorAgent = Object.freeze({
                 ok: Boolean(result.ok),
                 mode: 'outside',
                 outside: result.outside || {
-                    hasCondition: /(בעיקר כש|לפעמים|בתנאים|כאשר|כש)/.test(normalizeText(payload.singleText || '')),
+                    hasCondition: /(׳‘׳¢׳™׳§׳¨ ׳›׳©|׳׳₪׳¢׳׳™׳|׳‘׳×׳ ׳׳™׳|׳›׳׳©׳¨|׳›׳©)/.test(normalizeText(payload.singleText || '')),
                     hasPattern: WR2W_OUTSIDE_REGEX.test(normalizeText(payload.singleText || '')),
                     avoidsRigidAbsolute: !WR2W_ABSOLUTE_REGEX.test(normalizeText(payload.singleText || ''))
-                        || /זה לא/.test(normalizeText(payload.singleText || ''))
+                        || /׳–׳” ׳׳/.test(normalizeText(payload.singleText || ''))
                 }
             });
         }
@@ -9252,7 +9512,7 @@ const wr2wEvaluatorAgent = Object.freeze({
                 ok: Boolean(result.ok),
                 mode: 'inside',
                 inside: result.inside || {
-                    hasCondition: /(בעיקר כש|לפעמים|בתנאים|כאשר|כש)/.test(normalizeText(payload.singleText || '')),
+                    hasCondition: /(׳‘׳¢׳™׳§׳¨ ׳›׳©|׳׳₪׳¢׳׳™׳|׳‘׳×׳ ׳׳™׳|׳›׳׳©׳¨|׳›׳©)/.test(normalizeText(payload.singleText || '')),
                     hasInnerFrame: WR2W_INSIDE_REGEX.test(normalizeText(payload.singleText || ''))
                 }
             });
@@ -9262,13 +9522,13 @@ const wr2wEvaluatorAgent = Object.freeze({
             mode: 'both',
             bothComplete: Boolean(result?.bothComplete),
             outside: result?.outside || {
-                hasCondition: /(בעיקר כש|לפעמים|בתנאים|כאשר|כש)/.test(normalizeText(payload.outsideText || '')),
+                hasCondition: /(׳‘׳¢׳™׳§׳¨ ׳›׳©|׳׳₪׳¢׳׳™׳|׳‘׳×׳ ׳׳™׳|׳›׳׳©׳¨|׳›׳©)/.test(normalizeText(payload.outsideText || '')),
                 hasPattern: WR2W_OUTSIDE_REGEX.test(normalizeText(payload.outsideText || '')),
                 avoidsRigidAbsolute: !WR2W_ABSOLUTE_REGEX.test(normalizeText(payload.outsideText || ''))
-                    || /זה לא/.test(normalizeText(payload.outsideText || ''))
+                    || /׳–׳” ׳׳/.test(normalizeText(payload.outsideText || ''))
             },
             inside: result?.inside || {
-                hasCondition: /(בעיקר כש|לפעמים|בתנאים|כאשר|כש)/.test(normalizeText(payload.insideText || '')),
+                hasCondition: /(׳‘׳¢׳™׳§׳¨ ׳›׳©|׳׳₪׳¢׳׳™׳|׳‘׳×׳ ׳׳™׳|׳›׳׳©׳¨|׳›׳©)/.test(normalizeText(payload.insideText || '')),
                 hasInnerFrame: WR2W_INSIDE_REGEX.test(normalizeText(payload.insideText || ''))
             }
         });
@@ -9288,29 +9548,43 @@ function setupWrinkleGame() {
     root.innerHTML = `
         <div class="wr2w-shell">
             <div class="wr2w-topbar">
-                <h3>SQHCEL Wizard</h3>
+                <div class="wr2w-title-wrap">
+                    <h3>׳›׳׳×׳™׳ ׳ ׳¡׳×׳¨׳™׳ ג€“ ׳”׳”׳›׳׳׳•׳× ׳©׳׳©׳×׳׳¢׳•׳× ׳׳‘׳ ׳׳ ׳ ׳׳׳¨׳•׳×</h3>
+                    <p class="wr2w-subtitle">׳›׳©׳”׳¨׳’׳© ׳—׳–׳§ ׳™׳•׳×׳¨ ׳׳”׳׳©׳₪׳˜ ג€“ ׳™׳© ׳›׳׳× ׳ ׳¡׳×׳¨ ׳©׳׳“׳‘׳™׳§ ׳׳× ׳”׳¡׳™׳₪׳•׳¨</p>
+                    <p class="wr2w-formula">
+                        ׳—׳•׳¥ (׳׳¦׳׳׳”) + ׳›׳׳× ׳ ׳¡׳×׳¨ ג†’ ׳¢׳•׳¦׳׳” ׳‘׳₪׳ ׳™׳
+                        <button type="button" class="wr2w-tip-btn" title="׳‘׳—׳•׳¥ ׳¡׳•׳₪׳¨׳™׳ ׳×׳“׳™׳¨׳•׳×. ׳‘׳₪׳ ׳™׳ ׳™׳© ׳׳©׳§׳. ׳׳₪׳¢׳׳™׳ ׳׳™׳¨׳•׳¢ ׳׳—׳“ ׳©׳•׳§׳ ׳›׳׳• ׳¢׳©׳¨." aria-label="׳”׳¡׳‘׳¨ ׳§׳¦׳¨ ׳¢׳ ׳¡׳˜׳˜׳™׳¡׳˜׳™׳§׳” ׳›׳₪׳•׳׳”">ג“˜</button>
+                    </p>
+                </div>
                 <div class="wr2w-score">
-                    <span>תהליך: <strong id="wr2w-process-score">0/6</strong></span>
-                    <span>🔥 רצף: <strong id="wr2w-streak">0</strong></span>
-                    <span>⭐ נקודות: <strong id="wr2w-points">0</strong></span>
-                    <span>PATH O/I/B: <strong id="wr2w-path-distribution">0/0/0</strong></span>
-                    <span>תקיעות H/C: <strong id="wr2w-stuck-distribution">0/0</strong></span>
+                    <span>׳×׳”׳׳™׳: <strong id="wr2w-process-score">0/6</strong></span>
+                    <span>נ”¥ ׳¨׳¦׳£: <strong id="wr2w-streak">0</strong></span>
+                    <span>ג­ ׳ ׳§׳•׳“׳•׳×: <strong id="wr2w-points">0</strong></span>
+                    <span class="wr2w-score-minor">PATH ׳—׳•׳¥/׳₪׳ ׳™׳/׳’׳©׳¨: <strong id="wr2w-path-distribution">0/0/0</strong></span>
+                    <span class="wr2w-score-minor">׳×׳§׳™׳¢׳•׳× H/C: <strong id="wr2w-stuck-distribution">0/0</strong></span>
                 </div>
             </div>
 
-            <section class="wr2w-principle">
-                <h4>איתות אי-הלימה</h4>
-                <p>כאשר המטפל מזהה פער בין עוצמת הרגש שהמשפט מעורר באדם לבין מה שהמשפט אומר ומכיל, או פער בין המשפט לבין המציאות כפי שהאדם מספר עליה או המטפל מכיר מחוויותיו – כאן נדלקת נורת ההתובנות הפנימית על העניין, ויש רמז שיש לנו כאן כמתי-צל בפעולה.</p>
-                <p>הגוף מרגיש "אבסולוטי" לפני שהמילים אמרו "תמיד".</p>
-                <p class="wr2w-flow">S → Q → H → C → PATH → E/L</p>
+            <section class="wr2w-sentence-card">
+                <p class="wr2w-kicker">׳”׳׳©׳₪׳˜ ׳©׳ ׳׳׳¨</p>
+                <p id="wr2w-visible-sentence" class="wr2w-visible-sentence"></p>
+                <p class="wr2w-sentence-help">׳׳©׳₪׳˜ ׳§׳¦׳¨ ׳™׳›׳•׳ ׳׳”׳¡׳×׳™׳¨ "׳×׳׳™׳“/׳׳£ ׳₪׳¢׳/׳׳™׳ ׳¡׳™׳›׳•׳™".</p>
+                <p id="wr2w-monologue" class="wr2w-monologue"></p>
             </section>
 
-            <section class="wr2w-scene-box">
-                <p class="wr2w-kicker">מונולוג (ההקשר הרחב)</p>
-                <p id="wr2w-monologue" class="wr2w-monologue"></p>
-                <p class="wr2w-kicker">משפט גלוי (שורת הסיכום מהמונולוג)</p>
-                <p id="wr2w-visible-sentence" class="wr2w-visible-sentence"></p>
-                <p class="wr2w-template-note">קשר ביניהם: המונולוג מציג את הסיפור והנסיבות, והמשפט הגלוי הוא הקיצור הלשוני שעליו עובדים ב-SQHCEL.</p>
+            <section class="wr2w-layers" aria-label="׳©׳›׳‘׳•׳× ׳§׳‘׳•׳¢׳•׳×">
+                <article id="wr2w-layer-outside" class="wr2w-layer-card is-blue">
+                    <h4>׳׳¦׳׳׳” (׳—׳•׳¥)</h4>
+                    <p>׳׳” ׳‘׳׳׳× ׳§׳¨׳” / ׳׳” ׳¨׳•׳׳™׳ ׳׳‘׳—׳•׳¥?</p>
+                </article>
+                <article id="wr2w-layer-inside" class="wr2w-layer-card is-green">
+                    <h4>׳’׳•׳£/׳¨׳’׳© (׳₪׳ ׳™׳)</h4>
+                    <p>׳׳” ׳§׳•׳¨׳” ׳‘׳™ ׳¢׳›׳©׳™׳•?</p>
+                </article>
+                <article id="wr2w-layer-quantifier" class="wr2w-layer-card is-purple">
+                    <h4>׳›׳׳×׳™׳ ׳ ׳¡׳×׳¨׳™׳</h4>
+                    <p>׳׳™׳–׳” "׳×׳׳™׳“/׳׳£ ׳₪׳¢׳" ׳׳©׳×׳׳¢ ׳₪׳”?</p>
+                </article>
             </section>
 
             <div id="wr2w-step-chips" class="wr2w-step-chips"></div>
@@ -9319,19 +9593,20 @@ function setupWrinkleGame() {
                 <h4 id="wr2w-step-title"></h4>
                 <p id="wr2w-step-instruction" class="wr2w-step-instruction"></p>
                 <div id="wr2w-step-body" class="wr2w-step-body"></div>
+                <div id="wr2w-hebrew-warning" class="wr2w-hebrew-warning hidden">ג ן¸ ׳×׳•׳§׳ ׳ ׳™׳¡׳•׳— ׳¢׳‘׳¨׳™ ׳‘׳×׳¦׳•׳’׳”.</div>
                 <p id="wr2w-feedback" class="wr2w-feedback" data-tone="info"></p>
             </section>
 
             <div class="wr2w-actions">
-                <button id="wr2w-next-scene" class="btn btn-secondary" type="button">משפט הבא</button>
-                <button id="wr2w-reset-round" class="btn btn-secondary" type="button">איפוס סבב</button>
-                <button id="wr2w-self-toggle" class="btn btn-secondary" type="button">+ משפט אישי</button>
+                <button id="wr2w-next-scene" class="btn btn-secondary" type="button">׳׳©׳₪׳˜ ׳”׳‘׳</button>
+                <button id="wr2w-reset-round" class="btn btn-secondary" type="button">׳׳™׳₪׳•׳¡ ׳¡׳‘׳‘</button>
+                <button id="wr2w-self-toggle" class="btn btn-secondary" type="button">+ ׳׳©׳₪׳˜ ׳׳™׳©׳™</button>
             </div>
 
             <section id="wr2w-self-panel" class="wr2w-self-panel hidden">
-                <label for="wr2w-self-input">Self-Reference (אופציונלי)</label>
-                <textarea id="wr2w-self-input" rows="2" placeholder="לדוגמה: אני לא יכול להסביר לה מה אני רוצה."></textarea>
-                <button id="wr2w-self-add" class="btn btn-secondary" type="button">הוסף לתרגול</button>
+                <label for="wr2w-self-input">Self-Reference (׳׳•׳₪׳¦׳™׳•׳ ׳׳™)</label>
+                <textarea id="wr2w-self-input" rows="2" placeholder="׳׳“׳•׳’׳׳”: ׳׳ ׳™ ׳׳ ׳™׳›׳•׳ ׳׳”׳¡׳‘׳™׳¨ ׳׳” ׳׳” ׳׳ ׳™ ׳¨׳•׳¦׳”."></textarea>
+                <button id="wr2w-self-add" class="btn btn-secondary" type="button">׳”׳•׳¡׳£ ׳׳×׳¨׳’׳•׳</button>
                 <ul id="wr2w-self-list" class="wr2w-self-list"></ul>
             </section>
         </div>
@@ -9345,10 +9620,14 @@ function setupWrinkleGame() {
         stuckDistribution: document.getElementById('wr2w-stuck-distribution'),
         monologue: document.getElementById('wr2w-monologue'),
         visibleSentence: document.getElementById('wr2w-visible-sentence'),
+        layerOutside: document.getElementById('wr2w-layer-outside'),
+        layerInside: document.getElementById('wr2w-layer-inside'),
+        layerQuantifier: document.getElementById('wr2w-layer-quantifier'),
         stepChips: document.getElementById('wr2w-step-chips'),
         stepTitle: document.getElementById('wr2w-step-title'),
         stepInstruction: document.getElementById('wr2w-step-instruction'),
         stepBody: document.getElementById('wr2w-step-body'),
+        hebrewWarning: document.getElementById('wr2w-hebrew-warning'),
         feedback: document.getElementById('wr2w-feedback'),
         nextScene: document.getElementById('wr2w-next-scene'),
         resetRound: document.getElementById('wr2w-reset-round'),
@@ -9364,11 +9643,17 @@ function setupWrinkleGame() {
         step: 'S',
         feeling: '',
         selectedQuantifier: '',
+        selectedQuantifierAxis: '',
         hypothesisDraft: '',
         hypothesisFinal: '',
         confirmation: null,
         confirmCorrections: 0,
+        lastConfirmSelection: '',
         confirmResolved: false,
+        realitySnapshot: null,
+        integrativeDraft: '',
+        integrativeFinal: '',
+        integrativeApproved: false,
         breakoutLevel: 0,
         lastProbe: null,
         breakoutFound: false,
@@ -9382,6 +9667,11 @@ function setupWrinkleGame() {
         bothLearningComplete: false,
         roundScore: 0,
         completedCount: 0,
+        penaltyPoints: 0,
+        penalties: {
+            prematureFactCheck: 0,
+            invalidation: 0
+        },
         criteria: {
             signal: false,
             quantifier: false,
@@ -9390,8 +9680,9 @@ function setupWrinkleGame() {
             path: false,
             exception: false
         },
-        feedback: 'בחר/י תחושה חזקה שמופיעה מעבר למילים.',
-        feedbackTone: 'info'
+        feedback: '׳₪׳×׳™׳—׳”: ׳™׳© 3 ׳©׳›׳‘׳•׳× (׳₪׳ ׳™׳/׳—׳•׳¥/׳“׳™׳‘׳•׳¨). ׳©׳׳‘ ׳¨׳׳©׳•׳: ׳‘׳—׳¨/׳™ ׳ ׳™׳¡׳•׳— ׳˜׳•׳˜׳׳׳™׳•׳× ׳©׳¢׳•׳©׳” "׳›׳" ׳׳‘׳₪׳ ׳™׳.',
+        feedbackTone: 'info',
+        uiHebrewIssues: []
     });
 
     let saved = {};
@@ -9414,6 +9705,7 @@ function setupWrinkleGame() {
         lastChosenPath: String(saved.lastChosenPath || saved.chosen_path || ''),
         round: createRoundState()
     };
+    const displayWarnings = [];
 
     const allScenes = () => [...state.seedScenes, ...state.customScenes];
 
@@ -9434,7 +9726,7 @@ function setupWrinkleGame() {
         state.seedScenes = normalizedPack;
         if (state.index >= allScenes().length) state.index = 0;
         resetRoundState();
-        setFeedback(`נטענו ${normalizedPack.length} דיאלוגים לחבילה המורחבת.`, 'info');
+        setFeedback(`׳ ׳˜׳¢׳ ׳• ${normalizedPack.length} ׳“׳™׳׳׳•׳’׳™׳ ׳׳—׳‘׳™׳׳” ׳”׳׳•׳¨׳—׳‘׳×.`, 'info');
         render();
     };
 
@@ -9451,9 +9743,40 @@ function setupWrinkleGame() {
     };
 
     const setFeedback = (message, tone = 'info') => {
-        wr2wLogHebrewIssues('ui.feedback', message);
+        const report = wr2wHebrewSanitize.hasObviousHebrewTypos(String(message || ''));
+        if (!report.ok) {
+            wr2wLogHebrewIssues('ui.feedback', message);
+        }
+        state.round.uiHebrewIssues = report.ok ? [] : report.issues;
         state.round.feedback = wr2wSanitizeText(message);
         state.round.feedbackTone = tone;
+    };
+
+    const resetDisplayWarnings = () => {
+        displayWarnings.length = 0;
+    };
+
+    const sanitizeForDisplay = (context, value) => {
+        const raw = String(value || '');
+        const report = wr2wHebrewSanitize.hasObviousHebrewTypos(raw);
+        if (!report.ok) {
+            displayWarnings.push({ context, issues: report.issues });
+        }
+        return wr2wSanitizeText(raw);
+    };
+
+    const renderHebrewWarningBadge = () => {
+        if (!els.hebrewWarning) return;
+        if (!displayWarnings.length) {
+            els.hebrewWarning.classList.add('hidden');
+            els.hebrewWarning.removeAttribute('title');
+            return;
+        }
+        const issueText = displayWarnings
+            .flatMap((item) => item.issues || [])
+            .join(', ');
+        els.hebrewWarning.classList.remove('hidden');
+        els.hebrewWarning.setAttribute('title', `׳–׳•׳”׳• ׳•׳×׳•׳§׳ ׳• ׳‘׳×׳¦׳•׳’׳”: ${issueText}`);
     };
 
     const markCriterion = (criterionKey) => {
@@ -9507,7 +9830,8 @@ function setupWrinkleGame() {
             bothLearningComplete: state.round.bothLearningComplete
         });
         const completed = scoreResult.completed;
-        const earned = scoreResult.total;
+        const penalty = Math.max(0, Number(state.round.penaltyPoints || 0));
+        const earned = Math.max(0, scoreResult.total - penalty);
         state.round.completedCount = completed;
         state.round.roundScore = earned;
         state.points += earned;
@@ -9530,9 +9854,10 @@ function setupWrinkleGame() {
         state.round.step = 'DONE';
         const bonusText = [
             scoreResult.pathPoint ? '+1 PATH' : '',
-            scoreResult.bothBonus ? '+1 BOTH' : ''
+            scoreResult.bothBonus ? '+1 BOTH' : '',
+            penalty ? `-${penalty} ׳§׳ ׳¡` : ''
         ].filter(Boolean).join(' | ');
-        setFeedback(`סיכום סבב: ${completed}/6 קריטריונים, +${earned} נקודות${bonusText ? ` (${bonusText})` : ''}.`, 'success');
+        setFeedback(`׳¡׳™׳›׳•׳ ׳¡׳‘׳‘: ${completed}/6 ׳§׳¨׳™׳˜׳¨׳™׳•׳ ׳™׳, +${earned} ׳ ׳§׳•׳“׳•׳×${bonusText ? ` (${bonusText})` : ''}.`, 'success');
         persist();
 
         if (!state.round.learningFinal && scene?.transformedSentence) {
@@ -9549,7 +9874,7 @@ function setupWrinkleGame() {
         if (!rows.length) return;
         rows.forEach((scene) => {
             const li = document.createElement('li');
-            li.textContent = `“${scene.visibleSentence}”`;
+            li.textContent = `ג€${scene.visibleSentence}ג€`;
             els.selfList.appendChild(li);
         });
     };
@@ -9564,96 +9889,211 @@ function setupWrinkleGame() {
         }).join('');
     };
 
+    const getTotalityMenuOptions = (scene) => {
+        const base = WR2W_TOTALITY_MENU
+            .map((item) => ({
+                id: item.id,
+                axis: item.axis,
+                text: wr2wSanitizeText(item.text)
+            }))
+            .filter((item) => item.text.length > 0);
+        const dynamicRaw = Array.isArray(scene?.quantifiers) ? scene.quantifiers : [];
+        const dynamic = dynamicRaw
+            .map((q, idx) => wr2wSanitizeText(String(q || '').trim()))
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((q, idx) => ({
+                id: `scene_${idx + 1}`,
+                axis: '׳׳•׳× ׳׳”׳¡׳¦׳ ׳”',
+                text: q
+            }));
+
+        const custom = base.find((item) => item.id === 'custom');
+        const withoutCustom = base.filter((item) => item.id !== 'custom');
+        return [...withoutCustom, ...dynamic, ...(custom ? [custom] : [])];
+    };
+
+    const updateLayerFocus = () => {
+        const step = state.round.step;
+        const map = {
+            S: ['inside'],
+            Q: ['quantifier'],
+            H: ['quantifier', 'inside'],
+            C: ['outside', 'quantifier', 'inside'],
+            P: ['outside', 'inside', 'quantifier'],
+            E: ['outside', 'inside', 'quantifier'],
+            DONE: []
+        };
+        const active = new Set(map[step] || []);
+        const layerMap = [
+            ['outside', els.layerOutside],
+            ['inside', els.layerInside],
+            ['quantifier', els.layerQuantifier]
+        ];
+        layerMap.forEach(([key, el]) => {
+            if (!el) return;
+            el.classList.toggle('is-active', active.has(key));
+        });
+    };
+
     const renderStepContent = (scene) => {
         if (!scene) return '';
         const step = state.round.step;
         if (step === 'S') {
+            const chosenFeeling = String(state.round.feeling || '').trim();
+            const useCustomFeeling = chosenFeeling && !WR2W_FEELINGS.includes(chosenFeeling);
             return `
+                <p class="wr2w-template-note">׳©׳׳•׳© ׳©׳›׳‘׳•׳× ׳‘׳×׳¨׳’׳™׳: ׳₪׳ ׳™׳ (׳—׳•׳•׳™׳”), ׳—׳•׳¥ (׳¢׳•׳‘׳“׳•׳×), ׳•׳“׳™׳‘׳•׳¨ (׳”׳׳₪׳” ׳”׳׳™׳׳•׳׳™׳×).</p>
                 <div class="wr2w-option-grid">
                     ${WR2W_FEELINGS.map((feeling) => `
                         <button type="button" class="wr2w-option-btn${state.round.feeling === feeling ? ' is-selected' : ''}" data-action="select-feeling" data-feeling="${escapeHtml(feeling)}">${escapeHtml(feeling)}</button>
                     `).join('')}
                 </div>
-                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-q" ${state.round.feeling ? '' : 'disabled'}>המשך לשלב Q</button>
+                ${state.round.feeling === '׳׳—׳¨' || useCustomFeeling ? `
+                    <input id="wr2w-feeling-custom" class="wr2w-inline-input" type="text" placeholder="׳׳” ׳¢׳•׳׳” ׳‘׳’׳•׳£ ׳¢׳›׳©׳™׳•?" value="${escapeHtml(useCustomFeeling ? chosenFeeling : '')}">
+                ` : ''}
+                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-q" ${chosenFeeling ? '' : 'disabled'}>׳”׳׳©׳ ׳׳©׳׳‘ Q</button>
             `;
         }
         if (step === 'Q') {
+            const quantifierOptions = getTotalityMenuOptions(scene);
+            const chosenQuantifier = String(state.round.selectedQuantifier || '').trim();
+            const useCustomQuantifier = chosenQuantifier
+                && !quantifierOptions.some((item) => item.text === chosenQuantifier);
             return `
+                <p class="wr2w-template-note">׳׳™׳–׳” ׳ ׳™׳¡׳•׳— ׳˜׳•׳˜׳׳׳™׳•׳× ׳¢׳•׳©׳” "׳›׳" ׳₪׳ ׳™׳׳™? ׳׳₪׳©׳¨ ׳׳‘׳—׳•׳¨ ׳×׳₪׳¨׳™׳˜ ׳׳• ׳׳ ׳¡׳— ׳׳©׳׳.</p>
                 <div class="wr2w-option-grid">
-                    ${scene.quantifiers.map((q) => `
-                        <button type="button" class="wr2w-option-btn${state.round.selectedQuantifier === q ? ' is-selected' : ''}" data-action="select-quantifier" data-quantifier="${escapeHtml(q)}">${escapeHtml(q)}</button>
+                    ${quantifierOptions.map((item) => `
+                        <button
+                            type="button"
+                            class="wr2w-option-btn${state.round.selectedQuantifier === item.text ? ' is-selected' : ''}"
+                            data-action="select-quantifier"
+                            data-quantifier="${escapeHtml(item.text)}"
+                            data-axis="${escapeHtml(item.axis)}"
+                        >
+                            <strong>${escapeHtml(item.axis)}</strong>
+                            <span>${escapeHtml(item.text)}</span>
+                        </button>
                     `).join('')}
                 </div>
-                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-h" ${state.round.selectedQuantifier ? '' : 'disabled'}>המשך לשלב H</button>
+                ${state.round.selectedQuantifier === '׳׳—׳¨' || useCustomQuantifier ? `
+                    <input id="wr2w-quantifier-custom" class="wr2w-inline-input" type="text" placeholder="׳ ׳™׳¡׳•׳— ׳˜׳•׳˜׳׳׳™׳•׳× ׳׳™׳©׳™ (׳¦׳™׳¨ ׳–׳׳/׳₪׳¢׳•׳׳”/׳׳™׳׳™׳/׳׳ ׳©׳™׳/׳”׳§׳©׳¨)" value="${escapeHtml(useCustomQuantifier ? chosenQuantifier : '')}">
+                ` : ''}
+                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-h" ${chosenQuantifier ? '' : 'disabled'}>׳”׳׳©׳ ׳׳©׳׳‘ H</button>
             `;
         }
         if (step === 'H') {
+            const templates = [
+                {
+                    id: 'climate',
+                    label: '׳˜׳׳₪׳׳˜ ׳׳§׳׳™׳',
+                    text: "׳¢׳•׳׳” ׳׳™ ׳©׳›׳©׳׳× ׳׳•׳׳¨׳× '___' ׳™׳© ׳›׳׳ ׳›׳׳× ׳ ׳¡׳×׳¨ ׳›׳׳• '___', ׳©׳׳×׳׳¨ ׳׳§׳׳™׳ ׳‘׳₪׳ ׳™׳. ׳–׳” ׳§׳¨׳•׳‘?"
+                },
+                {
+                    id: 'weight',
+                    label: '׳˜׳׳₪׳׳˜ ׳׳©׳§׳',
+                    text: "׳¢׳•׳׳” ׳׳™ ׳©'___' ׳׳ ׳׳×׳׳¨ ׳¨׳§ ׳×׳“׳™׳¨׳•׳× ׳‘׳—׳•׳¥, ׳׳׳ ׳׳©׳§׳ ׳‘׳₪׳ ׳™׳. ׳–׳” ׳§׳¨׳•׳‘?"
+                },
+                {
+                    id: 'bridge',
+                    label: '׳˜׳׳₪׳׳˜ ׳—׳•׳¥ג†”׳₪׳ ׳™׳',
+                    text: "׳¢׳•׳׳” ׳׳™ ׳©׳׳” ׳©׳§׳•׳¨׳” ׳‘׳—׳•׳¥ ׳׳×׳•׳¨׳’׳ ׳׳¦׳׳ ׳‘׳₪׳ ׳™׳ ׳›'___'. ׳–׳” ׳׳” ׳©׳”׳×׳›׳•׳•׳ ׳×?"
+                }
+            ];
             return `
-                <p class="wr2w-template-note">טמפלט קשיח: בעלות ("עולה לי...") + כמת + בדיקה ("זה קרוב... או שאני משלים?").</p>
-                <textarea id="wr2w-hypothesis-input" class="wr2w-textarea" rows="4">${escapeHtml(state.round.hypothesisDraft)}</textarea>
-                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="submit-hypothesis">בדיקת Evaluator</button>
+                <div class="wr2w-template-buttons">
+                    ${templates.map((tpl) => `
+                        <button type="button" class="btn btn-secondary wr2w-template-btn" data-action="insert-h-template" data-template="${tpl.id}">
+                            ${escapeHtml(tpl.label)}
+                        </button>
+                    `).join('')}
+                </div>
+                <textarea id="wr2w-hypothesis-input" class="wr2w-textarea" rows="4" placeholder="׳×׳ ׳׳™ ׳׳‘׳“׳•׳§ ׳׳ ׳׳ ׳™ ׳׳“׳™׳™׳§.">${escapeHtml(state.round.hypothesisDraft)}</textarea>
+                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="submit-hypothesis">׳‘׳“׳•׳§ ׳“׳™׳•׳§</button>
             `;
         }
         if (step === 'C') {
             const confirmation = state.round.confirmation;
-            const canEnterPath = wr2wPathCore.canEnterPath(state.round);
+            const confirmStatus = String(confirmation?.status || '');
+            const snapshot = state.round.realitySnapshot || wr2wBuildRealitySnapshot(scene, state.round);
+            const canEnterPath = wr2wPathCore.canEnterPath(state.round) && Boolean(state.round.integrativeApproved);
+            const canValidateIntegrative = Boolean(confirmation && state.round.confirmResolved);
             const correctionsLeft = Math.max(0, 2 - Number(state.round.confirmCorrections || 0));
+            const integrativeValue = String(state.round.integrativeDraft || state.round.integrativeFinal || wr2wBuildIntegrativeSkeleton(snapshot));
             return `
                 <div class="wr2w-quote-box">
-                    <strong>היפותזה שנשלחת:</strong>
+                    <strong>׳׳©׳₪׳˜ ׳׳’׳©׳¨:</strong>
                     <p>${escapeHtml(state.round.hypothesisFinal || state.round.hypothesisDraft)}</p>
                 </div>
-                ${confirmation ? `
-                    <div class="wr2w-patient-box" data-status="${escapeHtml(confirmation.status)}">
-                        <strong>מטופל:</strong>
-                        <p>${escapeHtml(confirmation.text)}</p>
-                    </div>
-                    ${canEnterPath ? `
-                        <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-path">המשך לשלב PATH</button>
-                    ` : `
-                        <p class="wr2w-template-note">נותרו עד ${correctionsLeft} תיקונים לפני מעבר PATH.</p>
-                        <button type="button" class="btn btn-secondary wr2w-main-btn" data-action="revise-hypothesis">חזור/י ל-H לתיקון</button>
-                    `}
+                <div class="wr2w-patient-box" data-status="${escapeHtml(confirmStatus || 'partial')}">
+                    <strong>׳”׳×׳’׳•׳‘׳”:</strong>
+                    <p>${escapeHtml(sanitizeForDisplay('patient.confirm', confirmation?.text || '׳¢׳“׳™׳™׳ ׳׳ ׳ ׳•׳¦׳¨׳” ׳×׳’׳•׳‘׳× ׳׳˜׳•׳₪׳.'))}</p>
+                </div>
+                <div class="wr2w-quote-box">
+                    <strong>Filter + Paradox (׳‘׳׳™ ׳׳©׳׳”):</strong>
+                    <p>${escapeHtml(snapshot.filterLine)}</p>
+                    <p>${escapeHtml(snapshot.paradoxLine)}</p>
+                </div>
+                <div class="wr2w-patient-box" data-status="partial">
+                    <strong>Reality Check (׳—׳•׳¥):</strong>
+                    <p>׳׳×׳•׳ ${snapshot.outOf}, ׳™׳© ׳‘׳¢׳¨׳ ${snapshot.attempts} ׳ ׳™׳¡׳™׳•׳ ׳•׳× (׳’׳ ׳§׳˜׳ ׳™׳).</p>
+                    <p>׳׳•׳× ׳׳—׳¨׳•׳ ׳׳”׳—׳•׳¥: ${escapeHtml(sanitizeForDisplay('patient.external.signal', snapshot.signal))}</p>
+                    <p>${escapeHtml(snapshot.insideLine)}</p>
+                </div>
+                <div class="wr2w-confirm-grid">
+                    <button type="button" class="wr2w-confirm-btn${confirmStatus === 'yes' ? ' is-selected' : ''}" data-action="confirm-response" data-status="yes" ${confirmation ? '' : 'disabled'}>ג… ׳›׳</button>
+                    <button type="button" class="wr2w-confirm-btn${confirmStatus === 'partial' ? ' is-selected' : ''}" data-action="confirm-response" data-status="partial" ${confirmation ? '' : 'disabled'}>נ¨ ׳‘׳¢׳¨׳</button>
+                    <button type="button" class="wr2w-confirm-btn${confirmStatus === 'no' ? ' is-selected' : ''}" data-action="confirm-response" data-status="no" ${confirmation ? '' : 'disabled'}>ג ׳׳</button>
+                </div>
+                ${!confirmation ? `
+                    <button type="button" class="btn btn-secondary wr2w-main-btn" data-action="send-hypothesis">׳¦׳•׳¨ ׳×׳’׳•׳‘׳× ׳׳˜׳•׳₪׳</button>
+                ` : ''}
+                <label class="wr2w-learning-label" for="wr2w-integrative-input">׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™: ׳—׳•׳¥ + ׳₪׳ ׳™׳ = ׳×׳§׳™׳¢׳•׳×</label>
+                <textarea id="wr2w-integrative-input" class="wr2w-textarea" rows="4" placeholder="׳‘׳—׳•׳¥..., ׳•׳‘׳₪׳ ׳™׳..., ׳•׳›׳©׳–׳” ׳ ׳₪׳’׳© ׳ ׳•׳¦׳¨׳× ׳”׳×׳§׳™׳¢׳•׳×...">${escapeHtml(integrativeValue)}</textarea>
+                <button type="button" class="btn btn-secondary wr2w-main-btn" data-action="validate-integrative" ${canValidateIntegrative ? '' : 'disabled'}>׳׳©׳¨ ׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™</button>
+                ${canEnterPath ? `
+                    <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-path">׳”׳׳©׳ ׳׳©׳׳‘ PATH</button>
                 ` : `
-                    <button type="button" class="btn btn-primary wr2w-main-btn" data-action="send-hypothesis">שלח היפותזה למטופל</button>
+                    <p class="wr2w-template-note">׳׳₪׳ ׳™ PATH ׳ ׳“׳¨׳©: 1) ׳×׳’׳•׳‘׳× ׳׳˜׳•׳₪׳, 2) ׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™ ׳׳׳•׳©׳¨. ׳ ׳•׳×׳¨׳• ${correctionsLeft} ׳×׳™׳§׳•׳ ׳™ C.</p>
+                    <button type="button" class="btn btn-secondary wr2w-main-btn" data-action="revise-hypothesis">׳—׳–׳¨׳” ׳-H</button>
                 `}
             `;
         }
         if (step === 'P') {
             const selected = state.round.pathChoice || '';
             return `
-                <p class="wr2w-path-explain">
-                    Sometimes "always" is an internal climate; sometimes it’s an external pattern (e.g., 97/100); sometimes both.
-                    Choose where to invest your power now.
+                <p class="wr2w-path-question">
+                    ׳¢׳›׳©׳™׳• ׳™׳© ׳׳ ׳• ׳”׳׳™׳׳”. ׳׳׳ ׳×׳¨׳¦׳” ׳©׳ ׳׳ ׳§׳•׳“׳?
                 </p>
                 <div class="wr2w-path-grid">
                     <button type="button" class="wr2w-path-btn${selected === 'outside' ? ' is-selected' : ''}" data-action="select-path" data-path="outside">
-                        <strong>Outside</strong>
-                        <small>גבול / בקשה / פתרון</small>
+                        <strong>׳׳׳¦׳™׳׳•׳× ׳”׳—׳™׳¦׳•׳ ׳™׳×</strong>
+                        <small>׳¢׳•׳‘׳“׳•׳×, ׳×׳₪׳§׳•׳“, ׳’׳‘׳•׳׳•׳×</small>
                     </button>
                     <button type="button" class="wr2w-path-btn${selected === 'inside' ? ' is-selected' : ''}" data-action="select-path" data-path="inside">
-                        <strong>Inside</strong>
-                        <small>וויסות / טריגר / גוף</small>
+                        <strong>׳׳׳¦׳™׳׳•׳× ׳”׳₪׳ ׳™׳׳™׳×</strong>
+                        <small>׳’׳•׳£, ׳¨׳’׳©, ׳•׳™׳¡׳•׳×</small>
                     </button>
                     <button type="button" class="wr2w-path-btn${selected === 'both' ? ' is-selected' : ''}" data-action="select-path" data-path="both">
-                        <strong>Both</strong>
-                        <small>צעד קטן בחוץ + צעד קטן בפנים</small>
+                        <strong>׳׳’׳©׳¨ ׳‘׳™׳ ׳©׳ ׳™׳”׳</strong>
+                        <small>׳¦׳¢׳“ ׳§׳˜׳ ׳‘׳›׳ ׳¦׳“</small>
                     </button>
                 </div>
-                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-e" ${selected ? '' : 'disabled'}>המשך לשלב E/L</button>
+                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="goto-e" ${selected ? '' : 'disabled'}>׳”׳׳©׳ ׳׳©׳׳‘ E/L</button>
             `;
         }
         if (step === 'E') {
             const pathChoice = state.round.pathChoice || '';
             const pathLabel = pathChoice === 'outside'
-                ? 'Outside'
+                ? '׳׳׳¦׳™׳׳•׳× ׳”׳—׳™׳¦׳•׳ ׳™׳×'
                 : pathChoice === 'inside'
-                    ? 'Inside'
+                    ? '׳׳׳¦׳™׳׳•׳× ׳”׳₪׳ ׳™׳׳™׳×'
                     : pathChoice === 'both'
-                        ? 'Both'
-                        : 'לא נבחר';
+                        ? '׳׳’׳©׳¨ ׳‘׳™׳ ׳©׳ ׳™׳”׳'
+                        : '׳׳ ׳ ׳‘׳—׳¨';
             return `
-                <p class="wr2w-template-note">PATH נבחר: <strong>${escapeHtml(pathLabel)}</strong></p>
+                <p class="wr2w-template-note">PATH ׳ ׳‘׳—׳¨: <strong>${escapeHtml(pathLabel)}</strong></p>
+                <p class="wr2w-template-note">E ג€” ׳׳™׳₪׳” ׳–׳” 1% ׳₪׳—׳•׳× ׳ ׳›׳•׳?</p>
                 <div class="wr2w-ladder">
                     ${WR2W_BREAKOUT_STEPS.map((item) => `
                         <button type="button" class="wr2w-ladder-btn${state.round.breakoutLevel === item.id ? ' is-selected' : ''}" data-action="set-breakout-level" data-level="${item.id}">
@@ -9662,51 +10102,49 @@ function setupWrinkleGame() {
                     `).join('')}
                 </div>
                 <p class="wr2w-ladder-prompt">${escapeHtml(WR2W_BREAKOUT_STEPS[state.round.breakoutLevel].prompt)}</p>
-                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="send-breakout">שאל/י את המטופל</button>
+                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="send-breakout">׳©׳׳/׳™ ׳׳× ׳”׳׳˜׳•׳₪׳</button>
 
                 ${state.round.lastProbe ? `
                     <div class="wr2w-patient-box" data-status="${state.round.lastProbe.found ? 'yes' : 'no'}">
-                        <strong>מטופל:</strong>
-                        <p>${escapeHtml(state.round.lastProbe.text)}</p>
+                        <strong>׳׳˜׳•׳₪׳:</strong>
+                        <p>${escapeHtml(sanitizeForDisplay('patient.probe', state.round.lastProbe.text))}</p>
                     </div>
                 ` : ''}
 
                 ${state.round.breakoutFound ? `
-                    <button type="button" class="btn btn-secondary wr2w-main-btn" data-action="autofill-learning">צור ניסוח אוטומטי מהתשאול</button>
-                    <p class="wr2w-template-note">המערכת מסכמת אוטומטית לפי מה שעלה בתשאול. אפשר לערוך ידנית אם רוצים דיוק נוסף.</p>
+                    <button type="button" class="btn btn-secondary wr2w-main-btn" data-action="autofill-learning">׳¦׳•׳¨ ׳ ׳™׳¡׳•׳— ׳׳•׳˜׳•׳׳˜׳™ ׳׳”׳×׳©׳׳•׳</button>
+                    <p class="wr2w-template-note">L ג€” ׳׳– ׳–׳” ׳׳ '___', ׳–׳” ׳‘׳¢׳™׳§׳¨ ׳›׳©___.</p>
                     ${pathChoice === 'outside' ? `
-                        <p class="wr2w-template-note">Outside: עברו מ"גורל" ל"דפוס פונקציונלי + תנאים". תבנית: "זה לא 'אף פעם', זה 'לא עקבי' — בעיקר כש___".</p>
-                        <textarea id="wr2w-learning-outside-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningOutsideDraft || state.round.learningDraft)}</textarea>
+                        <textarea id="wr2w-learning-outside-input" class="wr2w-textarea" rows="3" placeholder="׳׳– ׳–׳” ׳׳ '___', ׳–׳” ׳‘׳¢׳™׳§׳¨ ׳›׳©___">${escapeHtml(state.round.learningOutsideDraft || state.round.learningDraft)}</textarea>
                     ` : pathChoice === 'inside' ? `
-                        <p class="wr2w-template-note">Inside: שמרו את השפה החווייתית והפכו לאבסולוטי-מותנה. תבנית: "זה מרגיש 'תמיד' — בעיקר כש___".</p>
-                        <textarea id="wr2w-learning-inside-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningInsideDraft || state.round.learningDraft)}</textarea>
+                        <textarea id="wr2w-learning-inside-input" class="wr2w-textarea" rows="3" placeholder="׳׳– ׳–׳” ׳׳ '___', ׳–׳” ׳‘׳¢׳™׳§׳¨ ׳›׳©___">${escapeHtml(state.round.learningInsideDraft || state.round.learningDraft)}</textarea>
                     ` : `
-                        <p class="wr2w-template-note">Both: נדרשים שני משפטים קצרים - אחד Outside ואחד Inside.</p>
-                        <label class="wr2w-learning-label" for="wr2w-learning-outside-input">Outside (דפוס/תנאים)</label>
-                        <textarea id="wr2w-learning-outside-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningOutsideDraft)}</textarea>
-                        <label class="wr2w-learning-label" for="wr2w-learning-inside-input">Inside (חוויה/תנאים)</label>
-                        <textarea id="wr2w-learning-inside-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningInsideDraft)}</textarea>
+                        <label class="wr2w-learning-label" for="wr2w-learning-outside-input">׳׳׳¦׳™׳׳•׳× ׳”׳—׳™׳¦׳•׳ ׳™׳×</label>
+                        <textarea id="wr2w-learning-outside-input" class="wr2w-textarea" rows="3" placeholder="׳׳– ׳–׳” ׳׳ '___', ׳–׳” ׳‘׳¢׳™׳§׳¨ ׳›׳©___">${escapeHtml(state.round.learningOutsideDraft)}</textarea>
+                        <label class="wr2w-learning-label" for="wr2w-learning-inside-input">׳׳׳¦׳™׳׳•׳× ׳”׳₪׳ ׳™׳׳™׳×</label>
+                        <textarea id="wr2w-learning-inside-input" class="wr2w-textarea" rows="3" placeholder="׳׳– ׳–׳” ׳׳ '___', ׳–׳” ׳‘׳¢׳™׳§׳¨ ׳›׳©___">${escapeHtml(state.round.learningInsideDraft)}</textarea>
                     `}
-                    <button type="button" class="btn btn-primary wr2w-main-btn" data-action="finish-round">סיים סבב</button>
+                    <button type="button" class="btn btn-primary wr2w-main-btn" data-action="finish-round">׳¡׳™׳™׳ ׳¡׳‘׳‘</button>
                 ` : ''}
             `;
         }
 
         const items = Object.entries(state.round.criteria).map(([key, done]) => `
             <li class="${done ? 'is-done' : ''}">
-                ${done ? '✅' : '▫️'} ${escapeHtml(WR2W_CRITERIA_LABELS[key] || key)}
+                ${done ? 'ג…' : 'ג–«ן¸'} ${escapeHtml(WR2W_CRITERIA_LABELS[key] || key)}
             </li>
         `).join('');
         return `
             <div class="wr2w-done-box">
-                <p><strong>ניקוד סבב:</strong> +${state.round.roundScore} | <strong>תהליך:</strong> ${state.round.completedCount}/6</p>
-                <p><strong>משפט למידה:</strong> ${escapeHtml(state.round.learningFinal || scene.transformedSentence)}</p>
+                <p><strong>׳ ׳™׳§׳•׳“ ׳¡׳‘׳‘:</strong> +${state.round.roundScore} | <strong>׳×׳”׳׳™׳:</strong> ${state.round.completedCount}/6</p>
+                <p><strong>׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™:</strong> ${escapeHtml(sanitizeForDisplay('round.integrative', state.round.integrativeFinal || '׳׳ ׳”׳•׳©׳׳'))}</p>
+                <p><strong>׳׳©׳₪׳˜ ׳׳׳™׳“׳”:</strong> ${escapeHtml(sanitizeForDisplay('round.learning', state.round.learningFinal || scene.transformedSentence))}</p>
                 ${state.round.pathChoice === 'both' ? `
-                    <p><strong>Outside:</strong> ${escapeHtml(state.round.learningOutsideFinal || state.round.learningOutsideDraft || '---')}</p>
-                    <p><strong>Inside:</strong> ${escapeHtml(state.round.learningInsideFinal || state.round.learningInsideDraft || '---')}</p>
+                    <p><strong>׳׳׳¦׳™׳׳•׳× ׳”׳—׳™׳¦׳•׳ ׳™׳×:</strong> ${escapeHtml(sanitizeForDisplay('round.outside', state.round.learningOutsideFinal || state.round.learningOutsideDraft || '---'))}</p>
+                    <p><strong>׳׳׳¦׳™׳׳•׳× ׳”׳₪׳ ׳™׳׳™׳×:</strong> ${escapeHtml(sanitizeForDisplay('round.inside', state.round.learningInsideFinal || state.round.learningInsideDraft || '---'))}</p>
                 ` : ''}
                 <ul class="wr2w-criteria-list">${items}</ul>
-                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="next-scene-inline">מעבר למשפט הבא</button>
+                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="next-scene-inline">׳׳¢׳‘׳¨ ׳׳׳©׳₪׳˜ ׳”׳‘׳</button>
             </div>
         `;
     };
@@ -9714,8 +10152,12 @@ function setupWrinkleGame() {
     const render = () => {
         const scene = currentScene();
         if (!scene) {
-            root.innerHTML = '<p>אין כרגע משפטים זמינים לתרגול.</p>';
+            root.innerHTML = '<p>׳׳™׳ ׳›׳¨׳’׳¢ ׳׳©׳₪׳˜׳™׳ ׳–׳׳™׳ ׳™׳ ׳׳×׳¨׳’׳•׳.</p>';
             return;
+        }
+        resetDisplayWarnings();
+        if (Array.isArray(state.round.uiHebrewIssues) && state.round.uiHebrewIssues.length) {
+            displayWarnings.push({ context: 'ui.feedback', issues: state.round.uiHebrewIssues });
         }
 
         const processCount = wr2wProcessCount(state.round.criteria);
@@ -9730,49 +10172,51 @@ function setupWrinkleGame() {
             const stuck = state.analytics?.stuck || {};
             els.stuckDistribution.textContent = `${stuck.H || 0}/${stuck.C || 0}`;
         }
-        if (els.monologue) els.monologue.textContent = wr2wSanitizeText(scene.monologue);
-        if (els.visibleSentence) els.visibleSentence.textContent = wr2wSanitizeText(scene.visibleSentence);
+        if (els.monologue) els.monologue.textContent = sanitizeForDisplay('scene.monologue', scene.monologue);
+        if (els.visibleSentence) els.visibleSentence.textContent = sanitizeForDisplay('scene.visible', scene.visibleSentence);
 
         const stepMeta = {
             S: {
-                title: 'S | תחושה לפני ערעור',
-                instruction: 'כשיש רגש חזק מהמשפט, זה איתות למבנה סמוי. בחר/י את התחושה הדומיננטית.'
+                title: 'S ג€” ׳׳” ׳§׳•׳¨׳” ׳‘׳₪׳ ׳™׳?',
+                instruction: '׳©׳׳‘ 1: ׳׳™׳×׳•׳× ׳’׳•׳£/׳¨׳’׳©. ׳›׳׳ ׳׳ ׳׳×׳§׳ ׳™׳ ׳•׳׳ ׳׳×׳•׳•׳›׳—׳™׳.'
             },
             Q: {
-                title: 'Q | בחירת כמת-צל',
-                instruction: 'בחר/י את הכמת הסביר שמחבר בין המשפט לחוויה. לא ניחוש "נכון", אלא התאמה סבירה.'
+                title: 'Q ג€” ׳׳” ׳׳©׳×׳׳¢?',
+                instruction: '׳©׳׳‘ 2: ׳×׳₪׳¨׳™׳˜ ׳˜׳•׳˜׳׳׳™׳•׳× (׳–׳׳/׳₪׳¢׳•׳׳”/׳׳™׳׳™׳/׳׳ ׳©׳™׳/׳”׳§׳©׳¨). ׳׳” ׳¢׳•׳©׳” "׳›׳" ׳₪׳ ׳™׳׳™?'
             },
             H: {
-                title: 'H | Hypothesis Mirror',
-                instruction: 'נסח/י השערה עם בעלות + כמת + בדיקה. בלי בעלות או בלי בדיקה - אין התקדמות.'
+                title: 'H ג€” ׳׳©׳₪׳˜ ׳׳’׳©׳¨',
+                instruction: '׳©׳׳‘ 3: ׳•׳׳™׳“׳¦׳™׳” ׳׳׳׳” ׳׳—׳•׳•׳™׳” ׳”׳׳•׳—׳׳˜׳× + ׳‘׳“׳™׳§׳× ׳”׳׳™׳׳”. ׳¢׳“׳™׳™׳ ׳‘׳׳™ Fact-check ׳—׳™׳¦׳•׳ ׳™.'
             },
             C: {
-                title: 'C | Calibration Before Challenge',
-                instruction: 'לא מערערים עדיין. קודם שולחים את ההיפותזה ומבקשים אישור/תיקון מהמטופל.'
+                title: 'C ג€” ׳‘׳“׳™׳§׳× ׳“׳™׳•׳§',
+                instruction: '׳©׳׳‘׳™׳ 4-6: Filter + Paradox + Reality Check, ׳•׳׳– ׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™ (׳—׳•׳¥ + ׳₪׳ ׳™׳ = ׳×׳§׳™׳¢׳•׳×).'
             },
             P: {
-                title: 'PATH | Choice / Agency',
-                instruction: 'אחרי אישור C בוחרים איפה להשקיע כוח עכשיו: Outside / Inside / Both.'
+                title: 'PATH ג€” ׳׳׳ ׳”׳•׳׳›׳™׳ ׳§׳•׳“׳?',
+                instruction: '׳¦׳•׳׳× ׳‘׳—׳™׳¨׳”: ׳—׳•׳¥ / ׳₪׳ ׳™׳ / ׳’׳©׳¨, ׳׳—׳¨׳™ ׳©׳™׳© ׳׳₪׳” ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™׳×.'
             },
             E: {
-                title: 'E/L | חריג + למידה',
-                instruction: 'אם אין חריג, עולים בסולם: 5% → 1% → תנאים. אפשר לייצר ניסוח אוטומטי לפי PATH ואז רק לאשר/לדייק.'
+                title: 'E/L ג€” ׳—׳¨׳™׳’ ׳•׳׳׳™׳“׳”',
+                instruction: 'E: ׳׳™׳₪׳” ׳–׳” 1% ׳₪׳—׳•׳× ׳ ׳›׳•׳? L: ׳׳– ׳–׳” ׳׳ "___", ׳–׳” ׳‘׳¢׳™׳§׳¨ ׳›׳©___.'
             },
             DONE: {
-                title: 'סיכום סבב',
-                instruction: 'הציון נקבע לפי איכות התהליך, לא לפי ניחוש חד-פעמי.'
+                title: '׳¡׳™׳›׳•׳ ׳¡׳‘׳‘',
+                instruction: '׳׳” ׳¢׳‘׳“ ׳‘׳¡׳‘׳‘ ׳”׳–׳” ׳•׳׳” ׳׳₪׳©׳¨ ׳׳©׳₪׳¨ ׳‘׳¡׳‘׳‘ ׳”׳‘׳.'
             }
         };
 
         const currentStepKey = stepMeta[state.round.step] ? state.round.step : 'DONE';
-        if (els.stepTitle) els.stepTitle.textContent = stepMeta[currentStepKey].title;
-        if (els.stepInstruction) els.stepInstruction.textContent = stepMeta[currentStepKey].instruction;
+        if (els.stepTitle) els.stepTitle.textContent = sanitizeForDisplay('ui.step.title', stepMeta[currentStepKey].title);
+        if (els.stepInstruction) els.stepInstruction.textContent = sanitizeForDisplay('ui.step.instruction', stepMeta[currentStepKey].instruction);
         if (els.stepBody) els.stepBody.innerHTML = renderStepContent(scene);
         if (els.feedback) {
-            els.feedback.textContent = state.round.feedback || '';
+            els.feedback.textContent = sanitizeForDisplay('ui.feedback.render', state.round.feedback || '');
             els.feedback.setAttribute('data-tone', state.round.feedbackTone || 'info');
         }
 
+        updateLayerFocus();
+        renderHebrewWarningBadge();
         renderStepChips();
         renderSelfList();
         persist();
@@ -9783,21 +10227,21 @@ function setupWrinkleGame() {
         if (!scenes.length) return;
         state.index = (state.index + 1) % scenes.length;
         resetRoundState();
-        setFeedback('סבב חדש. מתחילים שוב בזיהוי תחושה (S).', 'info');
+        setFeedback('׳¡׳‘׳‘ ׳—׳“׳©. ׳׳×׳—׳™׳׳™׳ ׳©׳•׳‘ ׳‘׳–׳™׳”׳•׳™ ׳×׳—׳•׳©׳” (S).', 'info');
         render();
     };
 
     const addSelfSentence = () => {
         const raw = String(els.selfInput?.value || '').trim();
         if (raw.length < 8) {
-            setFeedback('כתוב/י משפט אישי קצר (לפחות 8 תווים).', 'warn');
+            setFeedback('׳›׳×׳•׳‘/׳™ ׳׳©׳₪׳˜ ׳׳™׳©׳™ ׳§׳¦׳¨ (׳׳₪׳—׳•׳× 8 ׳×׳•׳•׳™׳).', 'warn');
             render();
             return;
         }
         const normalized = normalizeText(raw).replace(/\s+/g, ' ').trim();
         const exists = state.customScenes.some((scene) => normalizeText(scene.visibleSentence).replace(/\s+/g, ' ').trim() === normalized);
         if (exists) {
-            setFeedback('המשפט הזה כבר קיים בתרגול.', 'warn');
+            setFeedback('׳”׳׳©׳₪׳˜ ׳”׳–׳” ׳›׳‘׳¨ ׳§׳™׳™׳ ׳‘׳×׳¨׳’׳•׳.', 'warn');
             render();
             return;
         }
@@ -9808,8 +10252,8 @@ function setupWrinkleGame() {
             monologue: raw,
             visibleSentence: raw,
             quantifiers: wr2InferQuantifiers(raw),
-            exceptionExample: 'כן, היה רגע קטן שזה היה פחות נכון.',
-            conditionsLine: 'זה הכי חזק כשיש לחץ/עייפות/אי-ודאות.',
+            exceptionExample: '׳›׳, ׳”׳™׳” ׳¨׳’׳¢ ׳§׳˜׳ ׳©׳–׳” ׳”׳™׳” ׳₪׳—׳•׳× ׳ ׳›׳•׳.',
+            conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳™׳© ׳׳—׳¥/׳¢׳™׳™׳₪׳•׳×/׳׳™-׳•׳“׳׳•׳×.',
             transformedSentence: wr2SoftenSentence(raw),
             createdAt: Date.now()
         }, 'wr2w_self');
@@ -9821,7 +10265,7 @@ function setupWrinkleGame() {
         if (state.index < 0) state.index = 0;
         if (els.selfInput) els.selfInput.value = '';
         resetRoundState();
-        setFeedback('המשפט האישי נוסף. מתחילים ב-S עם איתות אי-הלימה.', 'success');
+        setFeedback('׳”׳׳©׳₪׳˜ ׳”׳׳™׳©׳™ ׳ ׳•׳¡׳£. ׳׳×׳—׳™׳׳™׳ ׳‘-S ׳¢׳ ׳׳™׳×׳•׳× ׳׳™-׳”׳׳™׳׳”.', 'success');
         playUISound('start');
         render();
     };
@@ -9836,31 +10280,35 @@ function setupWrinkleGame() {
         if (action === 'select-feeling') {
             state.round.feeling = button.getAttribute('data-feeling') || '';
             markCriterion('signal');
-            setFeedback(`נרשמה תחושה: ${state.round.feeling}.`, 'success');
+            setFeedback(`׳ ׳¨׳©׳: ${state.round.feeling}.`, 'success');
             render();
             return;
         }
         if (action === 'goto-q') {
-            if (!state.round.feeling) {
-                setFeedback('בחר/י תחושה לפני המעבר ל-Q.', 'warn');
+            const feelingText = String(state.round.feeling || '').trim();
+            if (!feelingText || feelingText === '׳׳—׳¨') {
+                setFeedback('׳‘׳—׳¨/׳™ ׳×׳—׳•׳©׳” ׳׳• ׳›׳×׳•׳‘/׳™ ׳×׳—׳•׳©׳” ׳׳©׳׳ ׳‘"׳׳—׳¨" ׳׳₪׳ ׳™ ׳”׳׳¢׳‘׳¨ ׳-Q.', 'warn');
                 render();
                 return;
             }
             state.round.step = 'Q';
-            setFeedback('מעולה. עכשיו בוחרים כמת-צל סביר.', 'info');
+            setFeedback('׳׳¢׳•׳׳”. ׳¢׳›׳©׳™׳• ׳‘׳—׳¨/׳™ ׳ ׳™׳¡׳•׳— ׳˜׳•׳˜׳׳׳™׳•׳× ׳׳×׳•׳ ׳”׳×׳₪׳¨׳™׳˜ ׳׳₪׳™ ׳”׳¦׳™׳¨ ׳©׳”׳›׳™ "׳›׳" ׳‘׳’׳•׳£.', 'info');
             render();
             return;
         }
         if (action === 'select-quantifier') {
             state.round.selectedQuantifier = button.getAttribute('data-quantifier') || '';
+            state.round.selectedQuantifierAxis = button.getAttribute('data-axis') || '';
             markCriterion('quantifier');
-            setFeedback(`נבחר כמת-צל: ${state.round.selectedQuantifier}.`, 'success');
+            const axisLabel = state.round.selectedQuantifierAxis ? ` (${state.round.selectedQuantifierAxis})` : '';
+            setFeedback(`Focusing-click: ׳ ׳‘׳—׳¨ ׳ ׳™׳¡׳•׳— ׳˜׳•׳˜׳׳׳™׳•׳×${axisLabel}: ${state.round.selectedQuantifier}`, 'success');
             render();
             return;
         }
         if (action === 'goto-h') {
-            if (!state.round.selectedQuantifier) {
-                setFeedback('בחר/י כמת-צל לפני המעבר ל-H.', 'warn');
+            const quantifierText = String(state.round.selectedQuantifier || '').trim();
+            if (!quantifierText || quantifierText === '׳׳—׳¨') {
+                setFeedback('׳‘׳—׳¨/׳™ ׳›׳׳× ׳ ׳¡׳×׳¨ ׳׳• ׳›׳×׳•׳‘/׳™ ׳›׳׳× ׳׳©׳׳ ׳‘"׳׳—׳¨" ׳׳₪׳ ׳™ ׳”׳׳¢׳‘׳¨ ׳-H.', 'warn');
                 render();
                 return;
             }
@@ -9868,14 +10316,35 @@ function setupWrinkleGame() {
             if (!state.round.hypothesisDraft || state.round.hypothesisDraft.includes('___')) {
                 state.round.hypothesisDraft = wr2wBuildHypothesisSkeleton(scene, state.round.selectedQuantifier);
             }
-            setFeedback('נסח/י לפי הטמפלט וגש/י לבדיקת Evaluator.', 'info');
+            setFeedback('׳©׳׳‘ 3: ׳׳©׳¨/׳™ ׳׳× ׳”׳—׳•׳•׳™׳” ׳”׳׳•׳—׳׳˜׳× ׳‘׳׳™ ׳׳”׳×׳•׳•׳›׳— ׳¢׳ ׳”׳¢׳•׳‘׳“׳•׳× ׳¢׳“׳™׳™׳.', 'info');
+            render();
+            return;
+        }
+        if (action === 'insert-h-template') {
+            const templateId = String(button.getAttribute('data-template') || '');
+            const visibleSentence = String(scene.visibleSentence || '').trim();
+            const selectedQuantifier = String(state.round.selectedQuantifier || '').trim() || '___';
+            let template = '';
+
+            if (templateId === 'climate') {
+                template = `׳¢׳•׳׳” ׳׳™ ׳©׳›׳©׳׳× ׳׳•׳׳¨/׳× '${visibleSentence || '___'}' ׳™׳© ׳›׳׳ ׳›׳׳× ׳ ׳¡׳×׳¨ ׳›׳׳• '${selectedQuantifier}', ׳©׳׳×׳׳¨ ׳׳§׳׳™׳ ׳‘׳₪׳ ׳™׳. ׳–׳” ׳§׳¨׳•׳‘?`;
+            } else if (templateId === 'weight') {
+                template = `׳¢׳•׳׳” ׳׳™ ׳©'${selectedQuantifier}' ׳׳ ׳׳×׳׳¨ ׳¨׳§ ׳×׳“׳™׳¨׳•׳× ׳‘׳—׳•׳¥, ׳׳׳ ׳׳©׳§׳ ׳‘׳₪׳ ׳™׳. ׳–׳” ׳§׳¨׳•׳‘?`;
+            } else if (templateId === 'bridge') {
+                template = "׳¢׳•׳׳” ׳׳™ ׳©׳׳” ׳©׳§׳•׳¨׳” ׳‘׳—׳•׳¥ ׳׳×׳•׳¨׳’׳ ׳׳¦׳׳ ׳‘׳₪׳ ׳™׳ ׳›'___'. ׳–׳” ׳׳” ׳©׳”׳×׳›׳•׳•׳ ׳×?";
+            }
+
+            if (template) {
+                state.round.hypothesisDraft = template;
+                setFeedback('׳”׳˜׳׳₪׳׳˜ ׳”׳•׳–׳¨׳§ ׳׳©׳“׳”. ׳׳₪׳©׳¨ ׳׳“׳™׳™׳§ ׳•׳׳©׳׳•׳—.', 'info');
+            }
             render();
             return;
         }
         if (action === 'submit-hypothesis') {
             const draft = String(state.round.hypothesisDraft || '').trim();
             if (draft.length < 20) {
-                setFeedback('נדרש ניסוח מלא יותר של היפותזה.', 'warn');
+                setFeedback('׳ ׳“׳¨׳© ׳ ׳™׳¡׳•׳— ׳׳׳ ׳™׳•׳×׳¨ ׳©׳ ׳”׳™׳₪׳•׳×׳–׳”.', 'warn');
                 render();
                 return;
             }
@@ -9883,25 +10352,40 @@ function setupWrinkleGame() {
             if (!evalResult.ok) {
                 state.analytics = wr2wPathCore.markStuck(state.analytics, 'H');
                 const missing = [];
-                if (!evalResult.hasOwnership) missing.push('בעלות (למשל: "עולה לי...")');
-                if (!evalResult.hasQuantifier) missing.push('הכמת שנבחר');
-                if (!evalResult.hasCheck) missing.push('בדיקה (למשל: "זה קרוב... או שאני משלים?")');
-                setFeedback(`צריך להשלים: ${missing.join(' | ')}.`, 'warn');
+                if (!evalResult.hasOwnership) missing.push('׳‘׳¢׳׳•׳× (׳׳׳©׳: "׳¢׳•׳׳” ׳׳™...")');
+                if (!evalResult.hasQuantifier) missing.push('׳”׳›׳׳× ׳©׳ ׳‘׳—׳¨');
+                if (!evalResult.hasValidation) missing.push('׳׳™׳©׳•׳¨ ׳׳׳ ׳׳—׳•׳•׳™׳” ׳”׳›׳‘׳“׳” (׳›׳‘׳“/׳׳©׳×׳§/׳×׳•׳¦׳׳” ׳¡׳’׳•׳¨׳”)');
+                if (!evalResult.hasCheck) missing.push('׳‘׳“׳™׳§׳” (׳׳׳©׳: "׳–׳” ׳§׳¨׳•׳‘... ׳׳• ׳©׳׳ ׳™ ׳׳©׳׳™׳?")');
+                if (evalResult.hasPrematureFactCheck) {
+                    state.round.penalties.prematureFactCheck += 1;
+                    state.round.penaltyPoints += 2;
+                    missing.push('׳׳ ׳‘׳•׳“׳§׳™׳ ׳¢׳•׳‘׳“׳•׳× ׳—׳•׳¥ ׳‘׳©׳׳‘ ׳–׳” (Fact-check ׳׳•׳§׳“׳)');
+                }
+                setFeedback(`׳¦׳¨׳™׳ ׳׳”׳©׳׳™׳: ${missing.join(' | ')}.`, 'warn');
                 render();
                 return;
             }
             state.round.hypothesisFinal = draft;
-            state.round.confirmation = null;
+            state.round.confirmation = wr2wPatientAgent.confirmHypothesis(
+                scene,
+                state.round.hypothesisFinal,
+                state.round.selectedQuantifier
+            );
+            state.round.lastConfirmSelection = '';
             state.round.confirmResolved = false;
+            state.round.integrativeApproved = false;
+            state.round.integrativeDraft = '';
+            state.round.integrativeFinal = '';
+            state.round.realitySnapshot = wr2wBuildRealitySnapshot(scene, state.round);
             markCriterion('hypothesis');
             state.round.step = 'C';
-            setFeedback('מעולה. עכשיו שולחים למטופל לקבל אישור/תיקון.', 'success');
+            setFeedback('׳ ׳•׳¦׳¨׳” ׳×׳’׳•׳‘׳× ׳׳˜׳•׳₪׳. ׳׳©׳¨/׳™ ׳”׳׳™׳׳”, ׳•׳׳– ׳‘׳ ׳”/׳™ ׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™ (׳—׳•׳¥ + ׳₪׳ ׳™׳ = ׳×׳§׳™׳¢׳•׳×).', 'success');
             render();
             return;
         }
         if (action === 'send-hypothesis') {
             if (!state.round.hypothesisFinal) {
-                setFeedback('קודם בצע/י בדיקת Evaluator בשלב H.', 'warn');
+                setFeedback('׳§׳•׳“׳ ׳‘׳¦׳¢/׳™ ׳‘׳“׳™׳§׳× ׳“׳™׳•׳§ ׳‘׳©׳׳‘ H.', 'warn');
                 render();
                 return;
             }
@@ -9910,7 +10394,28 @@ function setupWrinkleGame() {
                 state.round.hypothesisFinal,
                 state.round.selectedQuantifier
             );
-            const status = state.round.confirmation.status;
+            state.round.realitySnapshot = wr2wBuildRealitySnapshot(scene, state.round);
+            state.round.lastConfirmSelection = '';
+            setFeedback('׳¢׳•׳“׳›׳ ׳” ׳×׳’׳•׳‘׳× ׳׳˜׳•׳₪׳. ׳‘׳—׳¨/׳™ ׳›׳ / ׳‘׳¢׳¨׳ / ׳׳.', 'info');
+            render();
+            return;
+        }
+        if (action === 'confirm-response') {
+            const status = String(button.getAttribute('data-status') || '').toLowerCase();
+            if (!['yes', 'partial', 'no'].includes(status) || !state.round.confirmation) {
+                render();
+                return;
+            }
+            if (state.round.lastConfirmSelection === status && !state.round.confirmResolved) {
+                setFeedback('׳”׳×׳’׳•׳‘׳” ׳›׳‘׳¨ ׳ ׳¨׳©׳׳”. ׳׳₪׳©׳¨ ׳׳—׳–׳•׳¨ ׳-H ׳׳• ׳׳”׳×׳§׳“׳.', 'info');
+                render();
+                return;
+            }
+            state.round.confirmation = {
+                ...state.round.confirmation,
+                status
+            };
+            state.round.lastConfirmSelection = status;
             const tone = status === 'yes'
                 ? 'success'
                 : status === 'partial'
@@ -9918,45 +10423,81 @@ function setupWrinkleGame() {
                     : 'warn';
             if (status === 'yes') {
                 state.round.confirmResolved = true;
-                markCriterion('confirm');
-                setFeedback('התקבל אישור. אפשר להתקדם ל-PATH.', tone);
+                setFeedback('׳”׳×׳§׳‘׳ ׳׳™׳©׳•׳¨. ׳¢׳›׳©׳™׳• ׳׳©׳׳‘׳™׳ ׳—׳•׳¥+׳₪׳ ׳™׳ ׳׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™.', tone);
             } else {
                 state.analytics = wr2wPathCore.markStuck(state.analytics, 'C');
                 if (state.round.confirmCorrections < 2) {
                     state.round.confirmCorrections += 1;
                     if (state.round.confirmCorrections >= 2) {
                         state.round.confirmResolved = true;
-                        markCriterion('confirm');
-                        setFeedback('הושלמו 2 תיקוני C. ממשיכים ל-PATH עם כיול זהיר.', 'info');
+                        setFeedback('׳”׳•׳©׳׳׳• 2 ׳×׳™׳§׳•׳ ׳™ C. ׳›׳¢׳× ׳‘׳ ׳”/׳™ ׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™ ׳׳₪׳ ׳™ PATH.', 'info');
                         render();
                         return;
                     }
                     state.round.confirmResolved = false;
                     const left = Math.max(0, 2 - state.round.confirmCorrections);
-                    setFeedback(`התקבל תיקון. חזור/י ל-H לשיפור (נותרו ${left} תיקונים לפני PATH).`, tone);
+                    setFeedback(`׳‘׳—׳¨׳× "${status === 'partial' ? '׳‘׳¢׳¨׳' : '׳׳'}". ׳—׳–׳¨׳” ׳-H ׳׳“׳™׳™׳§ (׳ ׳•׳×׳¨׳• ${left} ׳×׳™׳§׳•׳ ׳™׳).`, tone);
                 } else {
                     state.round.confirmResolved = true;
-                    markCriterion('confirm');
-                    setFeedback('לאחר 2 תיקונים ממשיכים עם כיול חלקי. אפשר להתקדם ל-PATH.', 'info');
+                    setFeedback('׳׳׳—׳¨ 2 ׳×׳™׳§׳•׳ ׳™׳ ׳׳׳©׳™׳›׳™׳ ׳¢׳ ׳›׳™׳•׳ ׳—׳׳§׳™. ׳¢׳“׳™׳™׳ ׳ ׳“׳¨׳© ׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™.', 'info');
                 }
             }
             render();
             return;
         }
+        if (action === 'validate-integrative') {
+            if (!state.round.confirmation || !state.round.confirmResolved) {
+                setFeedback('׳§׳•׳“׳ ׳׳©׳¨/׳™ ׳×׳’׳•׳‘׳× ׳׳˜׳•׳₪׳ (׳›׳/׳‘׳¢׳¨׳/׳׳), ׳•׳׳– ׳׳©׳¨/׳™ ׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™.', 'warn');
+                render();
+                return;
+            }
+            const text = String(state.round.integrativeDraft || '').trim();
+            if (text.length < 30) {
+                setFeedback('׳ ׳“׳¨׳© ׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™ ׳׳׳ (׳׳₪׳—׳•׳× 30 ׳×׳•׳•׳™׳).', 'warn');
+                render();
+                return;
+            }
+            const normalized = normalizeText(text);
+            if (/\b׳׳‘׳\b/.test(normalized)) {
+                state.round.penalties.invalidation += 1;
+                state.round.penaltyPoints += 1;
+                setFeedback('׳‘׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™ ׳׳ ׳׳©׳×׳׳©׳™׳ ׳‘"׳׳‘׳" ׳©׳׳‘׳˜׳ ׳¦׳“ ׳׳—׳“. ׳ ׳¡׳—/׳™ ׳¢׳ "׳•".', 'warn');
+                render();
+                return;
+            }
+            const hasOutside = /(׳‘׳—׳•׳¥|׳‘׳₪׳•׳¢׳|׳׳×׳•׳ 10|׳™׳© ׳׳₪׳¢׳׳™׳|׳ ׳™׳¡׳™׳•׳)/.test(normalized);
+            const hasInside = /(׳‘׳₪׳ ׳™׳|׳׳¨׳’׳™׳©|׳™׳™׳׳•׳©|׳₪׳—׳“|׳ ׳¡׳’׳¨|׳›׳‘׳“)/.test(normalized);
+            const hasStuckness = /(׳×׳§׳™׳¢׳•׳×|׳ ׳¡׳’׳¨|׳—׳¡׳•׳|׳ ׳ ׳¢׳|׳׳ ׳¢׳•׳‘׳¨)/.test(normalized);
+            if (!hasOutside || !hasInside || !hasStuckness) {
+                const missing = [];
+                if (!hasOutside) missing.push('׳¨׳›׳™׳‘ ׳—׳™׳¦׳•׳ ׳™ (׳¢׳•׳‘׳“׳•׳×/׳™׳—׳¡/׳ ׳™׳¡׳™׳•׳)');
+                if (!hasInside) missing.push('׳¨׳›׳™׳‘ ׳₪׳ ׳™׳׳™ (׳—׳•׳•׳™׳”/׳’׳•׳£/׳¨׳’׳©)');
+                if (!hasStuckness) missing.push('׳׳™׳ ׳ ׳•׳¦׳¨׳” ׳”׳×׳§׳™׳¢׳•׳× ׳‘׳₪׳•׳¢׳');
+                setFeedback(`׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™ ׳—׳¡׳¨: ${missing.join(' | ')}.`, 'warn');
+                render();
+                return;
+            }
+            state.round.integrativeFinal = text;
+            state.round.integrativeApproved = true;
+            markCriterion('confirm');
+            setFeedback('׳׳¢׳•׳׳”. ׳™׳© ׳׳™׳ ׳˜׳’׳¨׳¦׳™׳” ׳‘׳™׳ ׳—׳•׳¥ ׳•׳₪׳ ׳™׳ ׳‘׳׳™ ׳׳‘׳˜׳ ׳׳£ ׳¦׳“. ׳׳₪׳©׳¨ ׳׳”׳׳©׳™׳ ׳-PATH.', 'success');
+            render();
+            return;
+        }
         if (action === 'revise-hypothesis') {
             state.round.step = 'H';
-            setFeedback('חזרה ל-H לתיקון ההיפותזה לפני PATH.', 'info');
+            setFeedback('׳—׳–׳¨׳” ׳-H ׳׳×׳™׳§׳•׳ ׳”׳”׳™׳₪׳•׳×׳–׳” ׳׳₪׳ ׳™ PATH.', 'info');
             render();
             return;
         }
         if (action === 'goto-path') {
-            if (!wr2wPathCore.canEnterPath(state.round)) {
-                setFeedback('אי אפשר להיכנס ל-PATH לפני אישור C (עם עד 2 תיקונים).', 'warn');
+            if (!wr2wPathCore.canEnterPath(state.round) || !state.round.integrativeApproved) {
+                setFeedback('׳׳™ ׳׳₪׳©׳¨ ׳׳”׳™׳›׳ ׳¡ ׳-PATH ׳׳₪׳ ׳™ ׳׳™׳©׳•׳¨ C ׳•׳׳©׳₪׳˜ ׳׳™׳ ׳˜׳’׳¨׳˜׳™׳‘׳™ ׳׳׳•׳©׳¨.', 'warn');
                 render();
                 return;
             }
             state.round.step = 'P';
-            setFeedback('בחר/י PATH: Outside / Inside / Both.', 'info');
+            setFeedback('׳‘׳—׳¨/׳™ ׳›׳™׳•׳•׳: ׳—׳™׳¦׳•׳ ׳™ / ׳₪׳ ׳™׳׳™ / ׳’׳©׳¨.', 'info');
             render();
             return;
         }
@@ -9965,48 +10506,53 @@ function setupWrinkleGame() {
             if (!['outside', 'inside', 'both'].includes(pathChoice)) return;
             state.round.pathChoice = pathChoice;
             markCriterion('path');
-            setFeedback(`נבחר PATH: ${pathChoice}.`, 'success');
+            const pathLabel = pathChoice === 'outside'
+                ? '׳׳׳¦׳™׳׳•׳× ׳”׳—׳™׳¦׳•׳ ׳™׳×'
+                : pathChoice === 'inside'
+                    ? '׳׳׳¦׳™׳׳•׳× ׳”׳₪׳ ׳™׳׳™׳×'
+                    : '׳׳’׳©׳¨ ׳‘׳™׳ ׳©׳ ׳™׳”׳';
+            setFeedback(`׳ ׳‘׳—׳¨ PATH: ${pathLabel}.`, 'success');
             render();
             return;
         }
         if (action === 'goto-e') {
             if (!wr2wPathCore.canEnterPath(state.round)) {
-                setFeedback('אי אפשר להיכנס ל-E/L לפני אישור C.', 'warn');
+                setFeedback('׳׳™ ׳׳₪׳©׳¨ ׳׳”׳™׳›׳ ׳¡ ׳-E/L ׳׳₪׳ ׳™ ׳׳™׳©׳•׳¨ C.', 'warn');
                 render();
                 return;
             }
             if (!wr2wPathCore.canEnterException(state.round)) {
-                setFeedback('בחר/י קודם PATH לפני המעבר ל-E/L.', 'warn');
+                setFeedback('׳‘׳—׳¨/׳™ ׳§׳•׳“׳ PATH ׳׳₪׳ ׳™ ׳”׳׳¢׳‘׳¨ ׳-E/L.', 'warn');
                 render();
                 return;
             }
             if (!state.round.confirmation) {
-                setFeedback('שלח/י קודם היפותזה למטופל.', 'warn');
+                setFeedback('׳©׳׳—/׳™ ׳§׳•׳“׳ ׳”׳™׳₪׳•׳×׳–׳” ׳׳׳˜׳•׳₪׳.', 'warn');
                 render();
                 return;
             }
             state.round.step = 'E';
-            setFeedback('אם אין חריג - עוברים מדרגה בסולם הפריצה. נסח/י למידה לפי PATH שנבחר.', 'info');
+            setFeedback('׳׳¢׳•׳׳”. ׳¢׳›׳©׳™׳• ׳׳¢׳׳™׳§׳™׳: ׳—׳¨׳™׳’ ׳§׳˜׳ + ׳ ׳™׳¡׳•׳— ׳׳׳™׳“׳” ׳׳“׳•׳™׳§.', 'info');
             render();
             return;
         }
         if (action === 'set-breakout-level') {
             state.round.breakoutLevel = Math.max(0, Math.min(3, Number(button.getAttribute('data-level') || 0)));
-            setFeedback(`נבחרה ${WR2W_BREAKOUT_STEPS[state.round.breakoutLevel].label}.`, 'info');
+            setFeedback(`׳ ׳‘׳—׳¨׳” ${WR2W_BREAKOUT_STEPS[state.round.breakoutLevel].label}.`, 'info');
             render();
             return;
         }
         if (action === 'autofill-learning') {
             if (!state.round.breakoutFound) {
-                setFeedback('קודם מצאו חריג/תנאי ואז אפשר ליצור ניסוח אוטומטי.', 'warn');
+                setFeedback('׳§׳•׳“׳ ׳׳¦׳׳• ׳—׳¨׳™׳’/׳×׳ ׳׳™ ׳•׳׳– ׳׳₪׳©׳¨ ׳׳™׳¦׳•׳¨ ׳ ׳™׳¡׳•׳— ׳׳•׳˜׳•׳׳˜׳™.', 'warn');
                 render();
                 return;
             }
             const didGenerate = applyAutoLearningDrafts(scene, true);
             setFeedback(
                 didGenerate
-                    ? 'נוצר ניסוח למידה אוטומטי. אפשר לערוך או לסיים סבב.'
-                    : 'לא נוצר ניסוח חדש - בדקו שבחרתם PATH.',
+                    ? '׳ ׳•׳¦׳¨ ׳ ׳™׳¡׳•׳— ׳׳׳™׳“׳” ׳׳•׳˜׳•׳׳˜׳™. ׳׳₪׳©׳¨ ׳׳¢׳¨׳•׳ ׳׳• ׳׳¡׳™׳™׳ ׳¡׳‘׳‘.'
+                    : '׳׳ ׳ ׳•׳¦׳¨ ׳ ׳™׳¡׳•׳— ׳—׳“׳© - ׳‘׳“׳§׳• ׳©׳‘׳—׳¨׳×׳ PATH.',
                 'info'
             );
             render();
@@ -10019,19 +10565,19 @@ function setupWrinkleGame() {
                 const autoBuilt = applyAutoLearningDrafts(scene, false);
                 setFeedback(
                     autoBuilt
-                        ? 'נמצא חריג/תנאי ונבנה ניסוח למידה אוטומטי. אפשר לערוך או לסיים.'
-                        : 'נמצא חריג/תנאי. אפשר ליצור ניסוח אוטומטי או לערוך ידנית.',
+                        ? '׳ ׳׳¦׳ ׳—׳¨׳™׳’/׳×׳ ׳׳™ ׳•׳ ׳‘׳ ׳” ׳ ׳™׳¡׳•׳— ׳׳׳™׳“׳” ׳׳•׳˜׳•׳׳˜׳™. ׳׳₪׳©׳¨ ׳׳¢׳¨׳•׳ ׳׳• ׳׳¡׳™׳™׳.'
+                        : '׳ ׳׳¦׳ ׳—׳¨׳™׳’/׳×׳ ׳׳™. ׳׳₪׳©׳¨ ׳׳™׳¦׳•׳¨ ׳ ׳™׳¡׳•׳— ׳׳•׳˜׳•׳׳˜׳™ ׳׳• ׳׳¢׳¨׳•׳ ׳™׳“׳ ׳™׳×.',
                     'success'
                 );
             } else if (state.round.breakoutLevel < 3) {
-                setFeedback('עוד לא נמצא חריג. עבור/י למדרגה הבאה בסולם.', 'warn');
+                setFeedback('׳¢׳•׳“ ׳׳ ׳ ׳׳¦׳ ׳—׳¨׳™׳’. ׳¢׳‘׳•׳¨/׳™ ׳׳׳“׳¨׳’׳” ׳”׳‘׳׳” ׳‘׳¡׳•׳׳.', 'warn');
             } else {
                 state.round.breakoutFound = true;
                 const autoBuilt = applyAutoLearningDrafts(scene, false);
                 setFeedback(
                     autoBuilt
-                        ? 'לא נמצא חריג חד, אבל נבנה ניסוח אוטומטי מתנאי החוזק.'
-                        : 'לא נמצא חריג חד. אפשר ליצור ניסוח אוטומטי מתנאי החוזק.',
+                        ? '׳׳ ׳ ׳׳¦׳ ׳—׳¨׳™׳’ ׳—׳“, ׳׳‘׳ ׳ ׳‘׳ ׳” ׳ ׳™׳¡׳•׳— ׳׳•׳˜׳•׳׳˜׳™ ׳׳×׳ ׳׳™ ׳”׳—׳•׳–׳§.'
+                        : '׳׳ ׳ ׳׳¦׳ ׳—׳¨׳™׳’ ׳—׳“. ׳׳₪׳©׳¨ ׳׳™׳¦׳•׳¨ ׳ ׳™׳¡׳•׳— ׳׳•׳˜׳•׳׳˜׳™ ׳׳×׳ ׳׳™ ׳”׳—׳•׳–׳§.',
                     'warn'
                 );
             }
@@ -10047,12 +10593,12 @@ function setupWrinkleGame() {
             const insideText = String(state.round.learningInsideDraft || '').trim();
 
             if (pathChoice === 'both' && (!outsideText || !insideText)) {
-                setFeedback('בנתיב BOTH נדרשים שני משפטי למידה: Outside + Inside.', 'warn');
+                setFeedback('׳‘׳ ׳×׳™׳‘ ׳”׳’׳©׳¨ ׳ ׳“׳¨׳©׳™׳ ׳©׳ ׳™ ׳׳©׳₪׳˜׳™ ׳׳׳™׳“׳”: ׳—׳•׳¥ + ׳₪׳ ׳™׳.', 'warn');
                 render();
                 return;
             }
             if ((pathChoice === 'outside' || pathChoice === 'inside') && singleText.length < 12) {
-                setFeedback('נדרש משפט למידה מלא יותר.', 'warn');
+                setFeedback('׳ ׳“׳¨׳© ׳׳©׳₪׳˜ ׳׳׳™׳“׳” ׳׳׳ ׳™׳•׳×׳¨.', 'warn');
                 render();
                 return;
             }
@@ -10065,15 +10611,15 @@ function setupWrinkleGame() {
             if (!learningEval.ok) {
                 const reasons = [];
                 if (learningEval.mode === 'outside') {
-                    if (!learningEval.outside?.hasCondition) reasons.push('Outside: הוסף/י תנאי (בעיקר כש/לפעמים כש/בתנאים).');
-                    if (!learningEval.outside?.hasPattern) reasons.push('Outside: נסח/י דפוס פונקציונלי (למשל "לא עקבי").');
-                    if (!learningEval.outside?.avoidsRigidAbsolute) reasons.push('Outside: החלף/י ניסוח אבסולוטי בניסוח מותנה.');
+                    if (!learningEval.outside?.hasCondition) reasons.push('׳—׳•׳¥: ׳”׳•׳¡׳£/׳™ ׳×׳ ׳׳™ (׳‘׳¢׳™׳§׳¨ ׳›׳©/׳׳₪׳¢׳׳™׳ ׳›׳©/׳‘׳×׳ ׳׳™׳).');
+                    if (!learningEval.outside?.hasPattern) reasons.push('׳—׳•׳¥: ׳ ׳¡׳—/׳™ ׳“׳₪׳•׳¡ ׳₪׳•׳ ׳§׳¦׳™׳•׳ ׳׳™ (׳׳׳©׳ "׳׳ ׳¢׳§׳‘׳™").');
+                    if (!learningEval.outside?.avoidsRigidAbsolute) reasons.push('׳—׳•׳¥: ׳”׳—׳׳£/׳™ ׳ ׳™׳¡׳•׳— ׳׳‘׳¡׳•׳׳•׳˜׳™ ׳‘׳ ׳™׳¡׳•׳— ׳׳•׳×׳ ׳”.');
                 } else if (learningEval.mode === 'inside') {
-                    if (!learningEval.inside?.hasCondition) reasons.push('Inside: הוסף/י תנאי (בעיקר כש/לפעמים כש/בתנאים).');
-                    if (!learningEval.inside?.hasInnerFrame) reasons.push('Inside: שמור/י על מסגור חווייתי ("מרגיש/בפנים/בגוף").');
+                    if (!learningEval.inside?.hasCondition) reasons.push('׳₪׳ ׳™׳: ׳”׳•׳¡׳£/׳™ ׳×׳ ׳׳™ (׳‘׳¢׳™׳§׳¨ ׳›׳©/׳׳₪׳¢׳׳™׳ ׳›׳©/׳‘׳×׳ ׳׳™׳).');
+                    if (!learningEval.inside?.hasInnerFrame) reasons.push('׳₪׳ ׳™׳: ׳©׳׳•׳¨/׳™ ׳¢׳ ׳׳¡׳’׳•׳¨ ׳—׳•׳•׳™׳™׳×׳™ ("׳׳¨׳’׳™׳©/׳‘׳₪׳ ׳™׳/׳‘׳’׳•׳£").');
                 } else {
-                    if (!learningEval.outside?.ok) reasons.push('Outside אינו שלם עדיין (דפוס + תנאים).');
-                    if (!learningEval.inside?.ok) reasons.push('Inside אינו שלם עדיין (חוויה + תנאים).');
+                    if (!learningEval.outside?.ok) reasons.push('׳—׳•׳¥ ׳¢׳“׳™׳™׳ ׳׳ ׳©׳׳ (׳“׳₪׳•׳¡ + ׳×׳ ׳׳™׳).');
+                    if (!learningEval.inside?.ok) reasons.push('׳₪׳ ׳™׳ ׳¢׳“׳™׳™׳ ׳׳ ׳©׳׳ (׳—׳•׳•׳™׳” + ׳×׳ ׳׳™׳).');
                 }
                 setFeedback(reasons.join(' '), 'warn');
                 render();
@@ -10089,7 +10635,7 @@ function setupWrinkleGame() {
                 state.round.learningOutsideFinal = outsideText;
                 state.round.learningInsideFinal = insideText;
                 state.round.bothLearningComplete = true;
-                state.round.learningFinal = `Outside: ${outsideText} | Inside: ${insideText}`;
+                state.round.learningFinal = `׳—׳•׳¥: ${outsideText} | ׳₪׳ ׳™׳: ${insideText}`;
             }
             markCriterion('exception');
             finalizeRound(scene);
@@ -10104,8 +10650,15 @@ function setupWrinkleGame() {
     els.stepBody.addEventListener('click', handleAction);
     els.stepBody.addEventListener('input', (event) => {
         const target = event.target;
-        if (target.id === 'wr2w-hypothesis-input') {
+        if (target.id === 'wr2w-feeling-custom') {
+            state.round.feeling = String(target.value || '').trim();
+        } else if (target.id === 'wr2w-quantifier-custom') {
+            state.round.selectedQuantifier = String(target.value || '').trim();
+            state.round.selectedQuantifierAxis = '׳ ׳™׳¡׳•׳— ׳׳™׳©׳™';
+        } else if (target.id === 'wr2w-hypothesis-input') {
             state.round.hypothesisDraft = String(target.value || '');
+        } else if (target.id === 'wr2w-integrative-input') {
+            state.round.integrativeDraft = String(target.value || '');
         } else if (target.id === 'wr2w-learning-input') {
             state.round.learningDraft = String(target.value || '');
         } else if (target.id === 'wr2w-learning-outside-input') {
@@ -10121,7 +10674,7 @@ function setupWrinkleGame() {
 
     els.resetRound?.addEventListener('click', () => {
         resetRoundState();
-        setFeedback('הסבב אופס. מתחילים שוב ב-S.', 'info');
+        setFeedback('׳”׳¡׳‘׳‘ ׳׳•׳₪׳¡. ׳׳×׳—׳™׳׳™׳ ׳©׳•׳‘ ׳‘-S.', 'info');
         render();
     });
 
@@ -10137,4 +10690,7 @@ function setupWrinkleGame() {
     render();
     hydrateSeedScenesFromPack();
 }
+
+
+
 

@@ -11,6 +11,8 @@
     "build:web": "vite build",
     "build": "vite build && node scripts/prepare-dist.mjs",
     "test:hebrew": "node --test scripts/hebrew-sanitize.test.cjs",
+    "test:morpher": "node --test scripts/sentence-morpher-core.test.cjs",
+    "test:triples-radar": "node --test scripts/triples-radar-core.test.cjs",
     "test:wr2w": "node --test scripts/wr2w-path-core.test.cjs",
     "test:mobile": "node scripts/test-mobile-layout.mjs",
     "preview": "vite preview",

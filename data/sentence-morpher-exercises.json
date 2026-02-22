@@ -1,0 +1,182 @@
+{
+  "exercises": [
+    {
+      "id": "sentence_morpher_quantifiers_demo_001",
+      "title": "משפט חי - כמתים שמוסיפים עומק",
+      "baseSentence": "אני יכול להסביר לה מה אני רוצה",
+      "axes": [
+        {
+          "id": "time",
+          "label": "זמן",
+          "selectionMode": "single",
+          "chips": [
+            {
+              "id": "time_never",
+              "text": "אף פעם",
+              "insertStrategy": "afterToken",
+              "anchor": "אני",
+              "impliedTokens": [
+                {
+                  "text": "לא",
+                  "insertStrategy": "beforeToken",
+                  "anchor": "יכול",
+                  "showHint": true
+                }
+              ]
+            },
+            {
+              "id": "time_always",
+              "text": "תמיד",
+              "insertStrategy": "afterToken",
+              "anchor": "אני"
+            },
+            {
+              "id": "time_most",
+              "text": "ברוב הפעמים",
+              "insertStrategy": "afterToken",
+              "anchor": "אני"
+            },
+            {
+              "id": "time_almost_always",
+              "text": "כמעט תמיד",
+              "insertStrategy": "afterToken",
+              "anchor": "אני"
+            }
+          ]
+        },
+        {
+          "id": "words",
+          "label": "מילים/ניסוח",
+          "selectionMode": "single",
+          "chips": [
+            {
+              "id": "words_any_words",
+              "text": "לא משנה אילו מילים אומר",
+              "insertStrategy": "prepend"
+            },
+            {
+              "id": "words_any_style",
+              "text": "לא משנה איך אנסח",
+              "insertStrategy": "prepend"
+            },
+            {
+              "id": "words_any_tone",
+              "text": "לא משנה הטון",
+              "insertStrategy": "prepend"
+            }
+          ]
+        },
+        {
+          "id": "action",
+          "label": "פעולה/מאמץ",
+          "selectionMode": "single",
+          "chips": [
+            {
+              "id": "action_anything",
+              "text": "לא משנה מה אעשה",
+              "insertStrategy": "prepend"
+            },
+            {
+              "id": "action_effort",
+              "text": "לא משנה כמה אתאמץ",
+              "insertStrategy": "prepend"
+            },
+            {
+              "id": "action_no_action_helps",
+              "text": "אין פעולה שעוזרת",
+              "insertStrategy": "prepend"
+            }
+          ]
+        },
+        {
+          "id": "people",
+          "label": "אנשים/עזרה",
+          "selectionMode": "single",
+          "chips": [
+            {
+              "id": "people_anyone",
+              "text": "לא משנה מי יעזור לנו",
+              "insertStrategy": "append"
+            },
+            {
+              "id": "people_nobody",
+              "text": "אף אחד לא יכול לעזור",
+              "insertStrategy": "append"
+            },
+            {
+              "id": "people_therapist",
+              "text": "גם אם מטפל יתערב",
+              "insertStrategy": "append"
+            }
+          ]
+        },
+        {
+          "id": "context",
+          "label": "הקשר/מסגרת",
+          "selectionMode": "single",
+          "chips": [
+            {
+              "id": "context_place",
+              "text": "לא משנה איפה נהיה",
+              "insertStrategy": "append"
+            },
+            {
+              "id": "context_talk_time",
+              "text": "לא משנה מתי נדבר",
+              "insertStrategy": "append"
+            },
+            {
+              "id": "context_elapsed",
+              "text": "לא משנה כמה זמן יעבור",
+              "insertStrategy": "append"
+            }
+          ]
+        },
+        {
+          "id": "emotional_state_me",
+          "label": "מצב רגשי שלי",
+          "selectionMode": "single",
+          "chips": [
+            {
+              "id": "emotion_me_none",
+              "text": "בשום מצב רגשי שאני נמצא בו",
+              "insertStrategy": "prepend"
+            },
+            {
+              "id": "emotion_me_stressed",
+              "text": "כשאני לחוץ",
+              "insertStrategy": "prepend"
+            },
+            {
+              "id": "emotion_me_hurt",
+              "text": "כשאני פגוע",
+              "insertStrategy": "prepend"
+            }
+          ]
+        },
+        {
+          "id": "emotional_state_her",
+          "label": "מצב רגשי שלה",
+          "selectionMode": "single",
+          "chips": [
+            {
+              "id": "emotion_her_none",
+              "text": "בשום מצב רגשי שהיא נמצאת בו",
+              "insertStrategy": "append"
+            },
+            {
+              "id": "emotion_her_critical",
+              "text": "כשזה נשמע לה ביקורת",
+              "insertStrategy": "append"
+            },
+            {
+              "id": "emotion_her_tired",
+              "text": "כשעייפה",
+              "insertStrategy": "append"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

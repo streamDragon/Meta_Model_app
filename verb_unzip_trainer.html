@@ -1,169 +1,1789 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>פועל לא מפורט — משחק הפירוק</title>
   <style>
-    :root{--bg:#f3f7fb;--card:#fff;--line:#d6e2ef;--txt:#173049;--muted:#56738f;--blue:#1f6feb;--green:#1f9d57;--red:#c53232;--yellow:#ffef99}
-    *{box-sizing:border-box} body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#f9fbff,#edf4fb);color:var(--txt)}
-    .app{max-width:1880px;margin:0 auto;padding:14px} .top{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:linear-gradient(90deg,#0f6ecf,#1ca7d4);color:#fff;padding:12px 14px;border-radius:14px}
-    .top h1{margin:0;font-size:clamp(1.1rem,2vw,1.45rem)} .ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    select,button{font:inherit;border-radius:10px;padding:8px 10px;border:1px solid #9ec0df} button{cursor:pointer;font-weight:700}
-    .primary{background:var(--blue);color:#fff;border-color:transparent} .secondary{background:#fff;color:#234}
-    .layout{margin-top:12px;display:grid;grid-template-columns:1.08fr 1.85fr 1.08fr;gap:12px;align-items:start}
-    .col{display:grid;gap:12px} .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:0 8px 20px rgba(20,50,88,.08)}
-    .card h2{margin:0 0 10px;font-size:1rem}
-    .qwrap{display:grid;gap:7px;max-height:70vh;overflow:auto;padding-inline-end:4px}
-    .qbtn{width:100%;text-align:right;background:#f7fbff;border:1px solid #b8cee3;color:#16476f;font-weight:700;padding:9px}
-    .qbtn small{display:block;font-size:.73rem;color:#567} .qbtn.used{background:#e9f1fb;color:#345}
-    .log{list-style:none;margin:0;padding:0;display:grid;gap:8px;max-height:200px;overflow:auto}
-    .log li{border:1px dashed #c5d7e8;border-radius:10px;background:#fbfdff;padding:8px;font-size:.88rem}
-    .log li.coach{background:#edf9f2;border-color:#b8e2c9;color:#15603a;font-weight:700}
-    .lines{display:grid;gap:8px} .line{border:1px solid #d2dfeb;background:#f8fcff;border-radius:10px;padding:9px;line-height:1.45}
-    .line.focus{border:2px solid #ffbf47;background:#fffdf3} .verb{background:var(--yellow);padding:0 4px;border-radius:6px;font-weight:800}
-    .badge{display:inline-flex;gap:8px;align-items:center;margin-top:9px;padding:8px 10px;border:1px solid #f2c147;background:#fff9df;border-radius:10px;color:#6d5400;font-weight:800;cursor:help}
-    .legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;font-size:.77rem;color:#365a7d}
-    .legend span{border:1px solid #b8cee3;background:#f3f8ff;border-radius:999px;padding:2px 8px}
-    .board{position:relative;min-height:640px;border:2px dashed #c8d9ea;border-radius:20px;background:radial-gradient(circle at 50% 50%,#fff,#f4f9ff)}
-    .center{position:absolute;right:50%;top:50%;transform:translate(50%,-50%);width:165px;height:165px;border-radius:50%;border:4px solid #0f6ecf;background:#eef6ff;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:800;z-index:2;padding:12px}
-    .slot{position:absolute;width:180px;min-height:92px;transform:translate(50%,-50%);border:2px dashed #9fbad5;border-radius:12px;padding:7px;background:#fcfeff;transition:.15s;z-index:1}
-    .slot[data-group="context"]{background:#fff8ed}.slot[data-group="steps"]{background:#eefcf2}.slot[data-group="goal"]{background:#eef6ff}.slot[data-group="done"]{background:#f7f0ff}.slot[data-group="obstacles"]{background:#fff2f6}
-    .slot.dragover{border-color:var(--blue);background:#e8f1ff;transform:translate(50%,-50%) scale(1.02)} .slot.shake{animation:shake .35s linear;border-color:var(--red)}
-    .stitle{font-size:.75rem;font-weight:800}.shelp{font-size:.67rem;color:#567;margin:3px 0 6px}.placeholder{border:1px dashed #b8cee3;border-radius:8px;font-size:.74rem;text-align:center;padding:7px;color:#5a7a99}
-    .block{border:1px solid #8fb6da;border-radius:10px;padding:8px;background:#edf5ff;color:#153f66;font-size:.84rem;line-height:1.35;box-shadow:0 4px 10px rgba(39,88,137,.15)} .block[draggable="true"]{cursor:grab}
-    .block .meta{display:block;font-size:.69rem;color:#456b8e;font-weight:700;margin-bottom:4px} .block.locked{background:#e7f8ee;border-color:#79c89c;color:#12482b;box-shadow:none}
-    .staging{min-height:220px;border:2px dashed #b6cade;border-radius:12px;background:#f8fbff;padding:10px;display:grid;gap:8px;align-content:start;max-height:52vh;overflow:auto}
-    .empty{border:1px dashed #c5d6e6;border-radius:10px;background:#fdfeff;padding:12px;text-align:center;font-size:.84rem;color:#607d98}
-    .feedback{border:1px solid #c7d8e9;border-radius:12px;background:#f8fcff;min-height:72px;padding:10px;font-size:.92rem;display:grid;align-items:center}
-    .feedback.ok{border-color:#96d4b1;background:#e8f7ef;color:#155a35}.feedback.err{border-color:#f2a8ad;background:#fdecee;color:#7f1f27}
-    .mistakes{font-weight:800;color:#6a2a2a;margin-top:10px}
-    .expand{border:1px solid #c6d8ea;border-radius:12px;background:#f7fbff;padding:10px;max-height:290px;overflow:auto;display:grid;gap:6px}
-    .expand .base{border-inline-start:4px solid #8eb7dd;padding-inline-start:8px;background:#f3f8ff;border-radius:8px}.eitem{border-inline-start:3px solid #54a5ec;padding-inline-start:8px;background:#fff;border-radius:8px}
-    .x{position:absolute;top:-14px;inset-inline-start:-12px;width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;box-shadow:0 8px 16px rgba(204,47,47,.3)}
-    .backdrop{position:fixed;inset:0;background:rgba(8,24,41,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:40}.backdrop.open{display:flex}
-    .modal{width:min(860px,100%);max-height:92vh;overflow:auto;background:#fff;border:1px solid #c8d7e8;border-radius:16px;padding:16px;box-shadow:0 24px 40px rgba(9,35,66,.35)}
-    .sum{border:1px solid #d5e1ee;border-radius:10px;background:#f9fcff;padding:10px;margin:0 0 10px}.sum h4{margin:0 0 7px;font-size:.95rem}
-    .sum ul{margin:0;padding-inline-start:18px;display:grid;gap:5px}.actions{display:flex;gap:8px;flex-wrap:wrap}
-    @keyframes shake{0%{transform:translate(50%,-50%) translateX(0)}25%{transform:translate(50%,-50%) translateX(-3px)}50%{transform:translate(50%,-50%) translateX(3px)}75%{transform:translate(50%,-50%) translateX(-2px)}100%{transform:translate(50%,-50%) translateX(0)}}
-    @media (max-width:1450px){.layout{grid-template-columns:1fr}.board{min-height:740px}.slot{width:160px}}
-    @media (max-width:900px){.top{grid-template-columns:1fr}select{min-width:180px}.board{min-height:860px}.slot{width:144px;min-height:84px;padding:6px}.stitle{font-size:.7rem}.shelp{font-size:.63rem}.block{font-size:.78rem}}
+    :root {
+      --bg: #eef3f9;
+      --card: #ffffff;
+      --line: #d2deea;
+      --text: #18344f;
+      --muted: #5a7691;
+      --blue: #1c76d2;
+      --green: #1d9155;
+      --red: #c93535;
+      --yellow: #ffef99;
+      --unknown-bg: #f1f3f5;
+      --unknown-line: #b6bcc4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #f7faff 0%, var(--bg) 100%);
+    }
+
+    .app {
+      max-width: 1880px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    .topbar {
+      background: linear-gradient(90deg, #0f67c1 0%, #1e9bcf 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    select,
+    button {
+      font: inherit;
+      border-radius: 10px;
+      border: 1px solid #9ec0df;
+      padding: 7px 10px;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    button.primary {
+      background: var(--blue);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    button.secondary {
+      background: #fff;
+      color: #234;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .progress-chip {
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-weight: 700;
+      min-width: 72px;
+      text-align: center;
+    }
+
+    .step-line {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      font-size: 0.9rem;
+      color: #244967;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .step-line .flow {
+      color: var(--muted);
+    }
+
+    .step-line .now {
+      font-weight: 700;
+      color: #1f4f78;
+    }
+
+    .layout {
+      margin-top: 12px;
+      direction: ltr;
+      display: grid;
+      grid-template-columns: 1.1fr 1.7fr 1.1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .layout > * {
+      direction: rtl;
+    }
+
+    .panel {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 8px 18px rgba(26, 58, 95, 0.08);
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .question-list {
+      display: grid;
+      gap: 7px;
+      max-height: 72vh;
+      overflow: auto;
+      padding-inline-end: 4px;
+    }
+
+    .qbtn {
+      text-align: right;
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #b8cfe5;
+      background: #f8fbff;
+      padding: 8px;
+      color: #19466b;
+      display: grid;
+      gap: 4px;
+      font-weight: 700;
+    }
+
+    .qbtn.used {
+      background: #edf3fb;
+      color: #5a7087;
+    }
+
+    .q-action {
+      font-size: 0.7rem;
+      color: #5d7892;
+      font-weight: 600;
+    }
+
+    .q-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+
+    .group-pill {
+      border: 1px solid #c7d9eb;
+      background: #eff5fc;
+      color: #355d80;
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 0.72rem;
+      white-space: nowrap;
+    }
+
+    .group-pill.role-therapist {
+      background: #e9f8ef;
+      border-color: #b8e2ca;
+      color: #1f6b44;
+    }
+
+    .group-pill.role-patient {
+      background: #fff3f3;
+      border-color: #f1c4c4;
+      color: #8a2d2d;
+    }
+
+    .role-note {
+      margin: 0 0 8px;
+      font-size: 0.8rem;
+      color: #4d6b88;
+    }
+
+    .question-text {
+      font-size: 0.76rem;
+      color: #4f6f8d;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    .log-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 7px;
+      max-height: 220px;
+      overflow: auto;
+    }
+
+    .log-item {
+      border: 1px dashed #c5d6e7;
+      background: #fbfdff;
+      border-radius: 10px;
+      padding: 7px;
+      font-size: 0.84rem;
+      color: #254b6d;
+    }
+
+    .log-item.coach {
+      border-color: #9dd3b8;
+      background: #eaf8f1;
+      color: #145737;
+      font-weight: 700;
+    }
+
+    .log-item.patient {
+      border-color: #f0c8c8;
+      background: #fff6f6;
+      color: #7c3030;
+    }
+
+    .transcript-lines {
+      display: grid;
+      gap: 8px;
+    }
+
+    .line-card {
+      border: 1px solid #d3e0ec;
+      border-radius: 10px;
+      padding: 8px;
+      background: #f9fcff;
+      line-height: 1.45;
+    }
+
+    .line-card.focus {
+      border: 2px solid #f0b340;
+      background: #fffdf2;
+    }
+
+    .verb-highlight {
+      background: var(--yellow);
+      border-radius: 6px;
+      padding: 0 4px;
+      font-weight: 800;
+    }
+
+    .focus-row {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mini-badge {
+      border: 1px solid #e3bc57;
+      background: #fff7d7;
+      color: #6b5100;
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: help;
+      white-space: nowrap;
+    }
+
+    .board-legend {
+      margin: 0 0 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .board-legend span {
+      border: 1px solid #c2d5e7;
+      border-radius: 999px;
+      background: #f1f7ff;
+      color: #3c6286;
+      padding: 2px 8px;
+      font-size: 0.73rem;
+    }
+
+    .schema-board {
+      position: relative;
+      min-height: 720px;
+      border: 2px dashed #c5d7e9;
+      border-radius: 20px;
+      background: radial-gradient(circle at center, #ffffff 0%, #f2f8ff 100%);
+      overflow: hidden;
+    }
+
+    .verb-center {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 4px solid #1f74cf;
+      background: #edf6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 10px;
+      font-weight: 800;
+      z-index: 2;
+    }
+
+    .slot {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 165px;
+      min-height: 86px;
+      border: 2px dashed #9fbad5;
+      border-radius: 12px;
+      padding: 6px;
+      background: #fcfeff;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      z-index: 1;
+    }
+
+    .slot[data-group="context"] { background: #fff8ee; }
+    .slot[data-group="steps"] { background: #eefcf2; }
+    .slot[data-group="goal"] { background: #eef6ff; }
+    .slot[data-group="done"] { background: #f5f0ff; }
+    .slot[data-group="obstacles"] { background: #fff2f6; }
+
+    .slot.dragover {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(28, 118, 210, 0.12);
+      transform: translate(-50%, -50%) scale(1.02);
+    }
+
+    .slot.shake {
+      animation: shake 0.35s linear;
+      border-color: var(--red);
+    }
+
+    .slot.hint-group {
+      animation: pulseGroup 1.2s ease-in-out;
+      box-shadow: 0 0 0 4px rgba(30, 154, 107, 0.18);
+    }
+
+    .slot.hint-slot {
+      animation: pulseSlot 1.2s ease-in-out;
+      border-color: #18a35a;
+      box-shadow: 0 0 0 4px rgba(24, 163, 90, 0.2);
+    }
+
+    .slot-title {
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+
+    .slot-helper {
+      font-size: 0.66rem;
+      color: #5e7993;
+      margin: 2px 0 5px;
+    }
+
+    .slot-empty {
+      margin-top: 2px;
+      padding: 2px 0;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #5d7a95;
+    }
+
+    .answer-block {
+      border: 1px solid #8bb1d6;
+      border-radius: 10px;
+      padding: 7px;
+      background: #edf5ff;
+      color: #1a4266;
+      font-size: 0.82rem;
+      line-height: 1.35;
+      box-shadow: 0 5px 12px rgba(34, 78, 124, 0.15);
+    }
+
+    .answer-block[draggable="true"] {
+      cursor: grab;
+    }
+
+    .answer-block.selected {
+      outline: 3px solid rgba(28, 118, 210, 0.45);
+      border-color: #1c76d2;
+      box-shadow: 0 0 0 3px rgba(28, 118, 210, 0.14);
+    }
+
+    .answer-block.locked {
+      background: #e8f8ef;
+      border-color: #79c59a;
+      color: #144b2c;
+      box-shadow: none;
+    }
+
+    .answer-block.unknown {
+      background: var(--unknown-bg);
+      border-color: var(--unknown-line);
+      color: #4e5964;
+    }
+
+    .block-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.71rem;
+      color: #3e6487;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .block-question-ref {
+      font-size: 0.73rem;
+      color: #496c8e;
+      margin-bottom: 4px;
+    }
+
+    .block-answer-line {
+      font-size: 0.82rem;
+      color: #1a4266;
+      line-height: 1.35;
+    }
+
+    .block-answer-line strong {
+      color: #153c60;
+      font-size: 0.76rem;
+    }
+
+    .answer-block.unknown .block-head {
+      color: #5a6570;
+    }
+
+    .answer-block.unknown .block-answer-line strong {
+      color: #5a6570;
+    }
+
+    .unknown-mark {
+      font-weight: 800;
+      margin-inline-start: 4px;
+    }
+
+    .staging {
+      min-height: 240px;
+      max-height: 52vh;
+      overflow: auto;
+      border: 2px dashed #b8cde1;
+      border-radius: 12px;
+      background: #f8fbff;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .placeholder {
+      border: 1px dashed #c6d7e8;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      color: #607f9a;
+      font-size: 0.85rem;
+      background: #fdfefe;
+    }
+
+    .feedback-box {
+      border: 1px solid #c8d9ea;
+      border-radius: 12px;
+      background: #f8fbff;
+      padding: 10px;
+      min-height: 86px;
+      display: grid;
+      gap: 6px;
+      align-content: center;
+    }
+
+    .feedback-box.ok {
+      border-color: #96d2af;
+      background: #e7f8ef;
+      color: #145a35;
+    }
+
+    .feedback-box.err {
+      border-color: #eea9af;
+      background: #fdecef;
+      color: #7c1e28;
+    }
+
+    .feedback-main {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .feedback-hint {
+      font-size: 0.84rem;
+      color: #3e6283;
+    }
+
+    .feedback-box.err .feedback-hint {
+      color: #7c1e28;
+    }
+
+    .mistakes {
+      margin-top: 8px;
+      font-weight: 800;
+      color: #6f2a2a;
+      font-size: 0.9rem;
+    }
+
+    .expand-area {
+      border: 1px solid #c8d9ea;
+      border-radius: 12px;
+      background: #f7fbff;
+      padding: 10px;
+      max-height: 300px;
+      overflow: auto;
+      display: grid;
+      gap: 6px;
+    }
+
+    .base-text {
+      border-inline-start: 4px solid #8fb4d8;
+      padding-inline-start: 8px;
+      border-radius: 8px;
+      background: #f1f7ff;
+    }
+
+    .base-text p {
+      margin: 0 0 4px;
+    }
+
+    .base-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .expanding-item {
+      border-inline-start: 3px solid #56a6ec;
+      background: #fff;
+      border-radius: 8px;
+      padding: 6px 8px;
+      margin: 0;
+      font-size: 0.88rem;
+    }
+
+    .expanding-item.unknown {
+      border-inline-start-color: #8f98a1;
+      background: #f5f6f7;
+      color: #4f5861;
+    }
+
+    .expanding-item.incoming {
+      animation: slideIn 0.45s ease;
+    }
+
+    .x-overlay {
+      position: absolute;
+      top: -12px;
+      inset-inline-start: -10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--red);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      box-shadow: 0 8px 16px rgba(201, 53, 53, 0.35);
+      pointer-events: none;
+      animation: xFade 0.7s ease;
+    }
+
+    .actions {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 24, 40, 0.56);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 40;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(900px, 100%);
+      max-height: 92vh;
+      overflow: auto;
+      background: #fff;
+      border: 1px solid #c8d8e8;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 24px 40px rgba(7, 30, 56, 0.34);
+    }
+
+    .modal h3 {
+      margin: 0 0 10px;
+    }
+
+    .summary-block {
+      border: 1px solid #d5e2ee;
+      border-radius: 10px;
+      background: #f9fcff;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .summary-block h4 {
+      margin: 0 0 7px;
+      font-size: 0.95rem;
+    }
+
+    .summary-block ul {
+      margin: 0;
+      padding-inline-start: 18px;
+      display: grid;
+      gap: 5px;
+    }
+
+    .summary-unknown li {
+      color: #6e2b2b;
+      font-weight: 700;
+    }
+
+    @keyframes shake {
+      0% { transform: translate(-50%, -50%) translateX(0); }
+      25% { transform: translate(-50%, -50%) translateX(-4px); }
+      50% { transform: translate(-50%, -50%) translateX(4px); }
+      75% { transform: translate(-50%, -50%) translateX(-3px); }
+      100% { transform: translate(-50%, -50%) translateX(0); }
+    }
+
+    @keyframes shakeLinear {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-3px); }
+      100% { transform: translateX(0); }
+    }
+
+    @keyframes pulseGroup {
+      0% { box-shadow: 0 0 0 0 rgba(30, 154, 107, 0.1); }
+      50% { box-shadow: 0 0 0 5px rgba(30, 154, 107, 0.22); }
+      100% { box-shadow: 0 0 0 0 rgba(30, 154, 107, 0.1); }
+    }
+
+    @keyframes pulseSlot {
+      0% { box-shadow: 0 0 0 0 rgba(24, 163, 90, 0.08); }
+      50% { box-shadow: 0 0 0 6px rgba(24, 163, 90, 0.24); }
+      100% { box-shadow: 0 0 0 0 rgba(24, 163, 90, 0.08); }
+    }
+
+    @keyframes xFade {
+      0% { opacity: 0; transform: scale(0.5); }
+      20% { opacity: 1; transform: scale(1); }
+      80% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.8); }
+    }
+
+    @keyframes slideIn {
+      0% { opacity: 0; transform: translateY(10px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 1480px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .schema-board {
+        min-height: 820px;
+      }
+    }
+
+    body.mobile-board .layout {
+      grid-template-columns: 1fr;
+    }
+
+    body.mobile-board .layout > .panel:nth-child(2) {
+      order: 1;
+    }
+
+    body.mobile-board .layout > .panel:nth-child(1) {
+      order: 2;
+    }
+
+    body.mobile-board .layout > .panel:nth-child(3) {
+      order: 3;
+    }
+
+    body.mobile-board .question-list,
+    body.mobile-board .staging {
+      max-height: none;
+    }
+
+    body.mobile-board .schema-board {
+      min-height: auto;
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      align-content: start;
+    }
+
+    body.mobile-board .verb-center {
+      position: sticky;
+      top: 0;
+      left: auto;
+      transform: none;
+      width: min(100%, 240px);
+      height: auto;
+      min-height: 64px;
+      border-radius: 14px;
+      margin: 0 auto 4px;
+    }
+
+    body.mobile-board .slot {
+      position: static;
+      width: 100%;
+      min-height: 0;
+      transform: none;
+    }
+
+    body.mobile-board .slot.dragover,
+    body.mobile-board .slot.shake {
+      transform: none;
+    }
+
+    body.mobile-board .slot.shake {
+      animation: shakeLinear 0.35s linear;
+    }
+
+    @media (max-width: 920px) {
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .controls {
+        width: 100%;
+      }
+
+      body:not(.force-desktop-view) .layout {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="app">
-    <header class="top">
-      <h1>פועל לא מפורט — משחק הפירוק</h1>
-      <div class="ctrl">
-        <label for="caseSelect">בחר קייס:</label>
-        <select id="caseSelect" aria-label="בחירת קייס"></select>
+    <header class="topbar">
+      <h1 class="title">פועל לא מפורט — משחק הפירוק</h1>
+      <div class="controls">
+        <label for="caseSelect">בחר תרגיל:</label>
+        <select id="caseSelect" aria-label="בחירת תרגיל"></select>
         <button id="startBtn" class="primary" type="button">התחל תרגיל</button>
-        <button id="restartBtn" class="secondary" type="button">Restart case</button>
+        <button id="restartBtn" class="secondary" type="button">התחל מחדש</button>
+        <button id="nextCaseBtn" class="secondary" type="button">תרגיל הבא</button>
+        <span id="progressChip" class="progress-chip">0/15</span>
       </div>
     </header>
+
+    <div class="step-line">
+      <span class="flow">שלבים: 1) המטפל בוחר שאלה → 2) המטופל עונה → 3) המטפל משבץ תשובה בסלוט → 4) ננעל</span>
+      <span class="now" id="stepNow">שלב 1/4: בחר שאלה כדי להתחיל.</span>
+    </div>
+
     <main class="layout">
-      <section class="col">
-        <article class="card"><h2>שאלות המטפל (15)</h2><div id="questionsWrap" class="qwrap"></div></article>
-        <article class="card"><h2>לוג תשאול</h2><ul id="questionLog" class="log"></ul></article>
+      <section class="panel">
+        <article class="card">
+          <h2>שלב 1: שאלות המטפל (15)</h2>
+          <p class="role-note">כאן שואלים בלבד. כל לחיצה תיצור תשובת מטופל חדשה באזור הבלוקים.</p>
+          <div id="questionList" class="question-list"></div>
+        </article>
+
+        <article class="card">
+          <h2>לוג תשאול</h2>
+          <ul id="questionLog" class="log-list"></ul>
+        </article>
       </section>
-      <section class="col">
+
+      <section class="panel">
         <article class="card">
           <h2>חלון מטופל</h2>
-          <div id="transcriptLines" class="lines"></div>
-          <div class="badge" title="זו מילה שמכווצת תהליך שלם. אנחנו פורסים אותה לצעדים/מטרה/ערך/קריטריון סיום.">⚠️ זה פועל לא מפורט (Unspecified Verb)</div>
-        </article>
-        <article class="card">
-          <h2>Schema Board</h2>
-          <div class="legend">
-            <span>Group 1: Context/Before/Trigger</span><span>Group 2: Steps</span><span>Group 3: Goal/Value/Positive Intention</span><span>Group 4: Done-Test/Criteria</span><span>Group 5: Obstacles/Automatic/Alternatives/Exceptions</span>
+          <div id="transcriptLines" class="transcript-lines"></div>
+          <div class="focus-row">
+            <span
+              class="mini-badge"
+              title="זו מילה שמכווצת תהליך שלם. אנחנו פורסים אותה לצעדים/מטרה/ערך/קריטריון סיום."
+            >⚠️ זה פועל לא מפורט (Unspecified Verb)</span>
           </div>
-          <div id="schemaBoard" class="board"></div>
         </article>
-        <article class="card"><h2>הטקסט נפרס</h2><div id="expandingText" class="expand"></div></article>
-      </section>
-      <section class="col">
-        <article class="card"><h2>Staging</h2><div id="stagingArea" class="staging"></div></article>
+
         <article class="card">
-          <h2>Feedback</h2>
-          <div id="feedbackBox" class="feedback">בחר שאלה מהעמודה השמאלית כדי לייצר AnswerBlock.</div>
-          <div id="mistakesCounter" class="mistakes">טעויות: 0</div>
-          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+          <h2>שלב 3: לוח הסכמה</h2>
+          <div class="board-legend">
+            <span>קבוצה 1: הקשר/לפני/טריגר</span>
+            <span>קבוצה 2: צעדים</span>
+            <span>קבוצה 3: מטרה/ערך/כוונה</span>
+            <span>קבוצה 4: קריטריון סיום</span>
+            <span>קבוצה 5: חסם/חלופה/חריג</span>
+          </div>
+          <div id="schemaBoard" class="schema-board"></div>
+        </article>
+
+        <article class="card">
+          <h2>הטקסט נפרס</h2>
+          <div id="expandingText" class="expand-area"></div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <article class="card">
+          <h2>שלב 2: תשובות המטופל לשיבוץ</h2>
+          <p class="role-note">גוררים רק תשובות מטופל. את השאלות שואלים בעמודה השמאלית.</p>
+          <div id="stagingArea" class="staging"></div>
+        </article>
+
+        <article class="card">
+          <h2>משוב</h2>
+          <div id="feedbackBox" class="feedback-box">
+            <div id="feedbackMain" class="feedback-main">בחר שאלה כדי ליצור בלוק תשובה.</div>
+            <div id="feedbackHint" class="feedback-hint">רמז: כל בלוק שייך לסלוט אחד בלבד. במובייל אפשר בלוק → סלוט בלחיצה.</div>
+          </div>
+          <div id="mistakesText" class="mistakes">טעויות: 0</div>
+          <div class="actions">
             <button id="summaryBtn" class="primary" type="button" disabled>סיכום</button>
-            <button id="nextCaseBtn" class="secondary" type="button">Case Next</button>
           </div>
         </article>
       </section>
     </main>
   </div>
-  <div id="summaryBackdrop" class="backdrop" role="dialog" aria-modal="true" aria-labelledby="summaryTitle">
+
+  <div id="summaryBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="summaryTitle">
     <div class="modal">
-      <h3 id="summaryTitle">סיכום קייס</h3>
-      <section class="sum"><h4>מה שאני מבין עד כה</h4><p id="summaryReflection"></p></section>
-      <section class="sum"><h4>מה עדיין לא ידוע</h4><ul id="summaryUnknown"></ul></section>
-      <section class="sum"><h4>צעד הבא מומלץ</h4><ul id="summarySuggestions"></ul></section>
+      <h3 id="summaryTitle">סיכום תרגיל</h3>
+
+      <section class="summary-block">
+        <h4>מה שאני מבין עד כה</h4>
+        <p id="summaryReflection"></p>
+      </section>
+
+      <section class="summary-block">
+        <h4>מה ידוע כבר</h4>
+        <ul id="summaryKnown"></ul>
+      </section>
+
+      <section class="summary-block summary-unknown">
+        <h4>מה עדיין לא ידוע</h4>
+        <ul id="summaryUnknown"></ul>
+      </section>
+
+      <section class="summary-block">
+        <h4>הצעד הבא (מבוסס כללים)</h4>
+        <ul id="summarySuggestions"></ul>
+      </section>
+
       <div class="actions">
-        <button id="summaryCloseBtn" class="secondary" type="button">סגור</button>
-        <button id="summaryNextCaseBtn" class="primary" type="button">תרגיל חדש (Case הבא)</button>
+        <button id="closeSummaryBtn" class="secondary" type="button">סגור</button>
+        <button id="summaryNextBtn" class="primary" type="button">תרגיל הבא</button>
       </div>
     </div>
   </div>
+
   <script>
-    const SLOT_IDS = Object.freeze({ CONTEXT:1, PRE_BEFORE:2, TRIGGER:3, PREVIOUS_STEP:4, STEP_START:5, STEP_MIDDLE:6, STEP_END:7, GOAL:8, VALUE:9, POS_INTENTION:10, DONE_TEST:11, EMOTION_BODY:12, OBSTACLE_BELIEF:13, ALTERNATIVES:14, EXCEPTION:15 });
-    const SLOT_DEFS = Object.freeze([
-      { id:1,key:"CONTEXT",title:"1) הקשר",helper:"איפה/מתי זה קורה?",group:"context",qLabel:"הקשר",question:"איפה/מתי זה קורה? (Episode)",expand:"הקשר: {a}.",pos:{x:50,y:6}},
-      { id:2,key:"PRE_BEFORE",title:"2) רגע לפני",helper:"Precipitating",group:"context",qLabel:"רגע לפני",question:"מה היה רגע לפני? (Precipitating)",expand:"רגע לפני: {a}.",pos:{x:66,y:10}},
-      { id:3,key:"TRIGGER",title:"3) טריגר",helper:"מה מפעיל?",group:"context",qLabel:"טריגר",question:"מה הטריגר שמתחיל? (Cue)",expand:"הטריגר: {a}.",pos:{x:79,y:20}},
-      { id:4,key:"PREVIOUS_STEP",title:"4) לפני זה",helper:"Step previous",group:"steps",qLabel:"צעד קודם",question:"מה הצעד שקדם לזה? (Step - previous)",expand:"לפני זה קורה: {a}.",pos:{x:88,y:33}},
-      { id:5,key:"STEP_START",title:"5) התחלה",helper:"Step start",group:"steps",qLabel:"צעד ראשון",question:"מה הצעד הראשון? (Start)",expand:"הצעד הראשון: {a}.",pos:{x:92,y:48}},
-      { id:6,key:"STEP_MIDDLE",title:"6) אמצע",helper:"Step middle",group:"steps",qLabel:"צעד אמצע",question:"מה קורה באמצע? (Middle)",expand:"אחר כך/באמצע: {a}.",pos:{x:89,y:63}},
-      { id:7,key:"STEP_END",title:"7) סוף",helper:"Step end",group:"steps",qLabel:"צעד סופי",question:"מה הצעד הסופי? (End)",expand:"בסוף זה נראה ככה: {a}.",pos:{x:80,y:77}},
-      { id:8,key:"GOAL",title:"8) מטרה",helper:"Goal",group:"goal",qLabel:"מטרה",question:"מה המטרה של זה?",expand:"המטרה המיידית: {a}.",pos:{x:66,y:88}},
-      { id:9,key:"VALUE",title:"9) ערך",helper:"Value",group:"goal",qLabel:"ערך",question:"איזה ערך/צורך זה משרת?",expand:"הערך/הצורך: {a}.",pos:{x:50,y:93}},
-      { id:10,key:"POS_INTENTION",title:"10) כוונה חיובית",helper:"Positive intention",group:"goal",qLabel:"כוונה חיובית",question:"מה הכוונה החיובית? (גם אם לא מודעת)",expand:"הכוונה החיובית (במובן הצר): {a}.",pos:{x:34,y:88}},
-      { id:11,key:"DONE_TEST",title:"11) בדיקת סיום",helper:"Done-test",group:"done",qLabel:"קריטריון סיום",question:"איך תדע שסיימת? (Criteria)",expand:"אני אדע שסיימתי כש: {a}.",pos:{x:20,y:77}},
-      { id:12,key:"EMOTION_BODY",title:"12) גוף/רגש",helper:"Automatic response",group:"obstacles",qLabel:"גוף/רגש",question:"מה התחושה/הגוף אומר שם?",expand:"בגוף/רגש: {a}.",pos:{x:11,y:63}},
-      { id:13,key:"OBSTACLE_BELIEF",title:"13) חסם/אמונה",helper:"Obstacle/Belief",group:"obstacles",qLabel:"חסם/אמונה",question:"מה עוצר/מפחיד/האמונה שמפעילה?",expand:"מה עוצר/מפעיל: {a}.",pos:{x:8,y:48}},
-      { id:14,key:"ALTERNATIVES",title:"14) חלופות",helper:"Alternatives",group:"obstacles",qLabel:"חלופות",question:"מה אפשר לעשות אחרת שמשרת אותו ערך?",expand:"חלופה אפשרית: {a}.",pos:{x:12,y:33}},
-      { id:15,key:"EXCEPTION",title:"15) חריג",helper:"Context switch",group:"obstacles",qLabel:"יוצא מן הכלל",question:"מתי זה לא קורה? (Context switch)",expand:"יוצא מן הכלל/מתי זה לא קורה: {a}.",pos:{x:21,y:20}}
+    const SLOT_IDS = Object.freeze({
+      CONTEXT: 1,
+      PRE_BEFORE: 2,
+      TRIGGER: 3,
+      PREVIOUS_STEP: 4,
+      STEP_START: 5,
+      STEP_MIDDLE: 6,
+      STEP_END: 7,
+      GOAL: 8,
+      VALUE: 9,
+      POS_INTENTION: 10,
+      DONE_TEST: 11,
+      EMOTION_BODY: 12,
+      OBSTACLE_BELIEF: 13,
+      ALTERNATIVES: 14,
+      EXCEPTION: 15
+    });
+
+    const SLOT_CONFIG = Object.freeze([
+      { id: 1, key: "CONTEXT", title: "1. הקשר", helper: "איפה/מתי זה קורה?", group: "context", groupLabel: "הקשר", questionButtonLabel: "הקשר", questionText: "איפה/מתי זה קורה?", expandSentenceTemplate: "הקשר: {a}.", pos: { x: 50, y: 10 } },
+      { id: 2, key: "PRE_BEFORE", title: "2. רגע לפני", helper: "מה היה רגע לפני?", group: "context", groupLabel: "הקשר", questionButtonLabel: "רגע לפני", questionText: "מה היה רגע לפני?", expandSentenceTemplate: "רגע לפני: {a}.", pos: { x: 35, y: 10 } },
+      { id: 3, key: "TRIGGER", title: "3. טריגר", helper: "מה מפעיל את זה?", group: "context", groupLabel: "הקשר", questionButtonLabel: "טריגר", questionText: "מה הטריגר שמתחיל?", expandSentenceTemplate: "הטריגר: {a}.", pos: { x: 65, y: 10 } },
+      { id: 4, key: "PREVIOUS_STEP", title: "4. צעד קודם", helper: "לפני זה קורה מה בא?", group: "steps", groupLabel: "צעדים", questionButtonLabel: "צעד קודם", questionText: "מה הצעד שקדם לזה?", expandSentenceTemplate: "לפני זה קורה: {a}.", pos: { x: 22, y: 32 } },
+      { id: 5, key: "STEP_START", title: "5. צעד ראשון", helper: "מה ההתחלה?", group: "steps", groupLabel: "צעדים", questionButtonLabel: "צעד ראשון", questionText: "מה הצעד הראשון?", expandSentenceTemplate: "הצעד הראשון: {a}.", pos: { x: 22, y: 44 } },
+      { id: 6, key: "STEP_MIDDLE", title: "6. צעד אמצע", helper: "מה קורה באמצע?", group: "steps", groupLabel: "צעדים", questionButtonLabel: "צעד אמצע", questionText: "מה קורה באמצע?", expandSentenceTemplate: "אחר כך/באמצע: {a}.", pos: { x: 22, y: 56 } },
+      { id: 7, key: "STEP_END", title: "7. צעד סוף", helper: "מה הצעד הסופי?", group: "steps", groupLabel: "צעדים", questionButtonLabel: "צעד סוף", questionText: "מה הצעד הסופי?", expandSentenceTemplate: "בסוף זה נראה ככה: {a}.", pos: { x: 22, y: 68 } },
+      { id: 8, key: "GOAL", title: "8. מטרה", helper: "לשם מה זה קורה?", group: "goal", groupLabel: "מטרה/ערך", questionButtonLabel: "מטרה", questionText: "מה המטרה של זה?", expandSentenceTemplate: "המטרה המיידית: {a}.", pos: { x: 35, y: 86 } },
+      { id: 9, key: "VALUE", title: "9. ערך", helper: "איזה ערך זה משרת?", group: "goal", groupLabel: "מטרה/ערך", questionButtonLabel: "ערך", questionText: "איזה ערך/צורך זה משרת?", expandSentenceTemplate: "הערך/הצורך: {a}.", pos: { x: 50, y: 90 } },
+      { id: 10, key: "POS_INTENTION", title: "10. כוונה חיובית", helper: "מה הכוונה החיובית?", group: "goal", groupLabel: "מטרה/ערך", questionButtonLabel: "כוונה חיובית", questionText: "מה הכוונה החיובית? (גם אם לא מודעת)", expandSentenceTemplate: "הכוונה החיובית (במובן הצר): {a}.", pos: { x: 65, y: 86 } },
+      { id: 11, key: "DONE_TEST", title: "11. קריטריון סיום", helper: "איך תדע שסיימת?", group: "done", groupLabel: "קריטריון", questionButtonLabel: "קריטריון סיום", questionText: "איך תדע שסיימת?", expandSentenceTemplate: "אני אדע שסיימתי כש: {a}.", pos: { x: 50, y: 76 } },
+      { id: 12, key: "EMOTION_BODY", title: "12. גוף/רגש", helper: "מה הגוף אומר שם?", group: "obstacles", groupLabel: "חסם/חלופה", questionButtonLabel: "גוף/רגש", questionText: "מה התחושה/הגוף אומר שם?", expandSentenceTemplate: "בגוף/רגש: {a}.", pos: { x: 78, y: 32 } },
+      { id: 13, key: "OBSTACLE_BELIEF", title: "13. חסם/אמונה", helper: "מה מפעיל/עוצר?", group: "obstacles", groupLabel: "חסם/חלופה", questionButtonLabel: "חסם/אמונה", questionText: "מה עוצר/מפחיד/האמונה שמפעילה?", expandSentenceTemplate: "מה עוצר/מפעיל: {a}.", pos: { x: 78, y: 44 } },
+      { id: 14, key: "ALTERNATIVES", title: "14. חלופות", helper: "מה אפשר אחרת?", group: "obstacles", groupLabel: "חסם/חלופה", questionButtonLabel: "חלופות", questionText: "מה אפשר לעשות אחרת שמשרת אותו ערך?", expandSentenceTemplate: "חלופה אפשרית: {a}.", pos: { x: 78, y: 56 } },
+      { id: 15, key: "EXCEPTION", title: "15. חריג", helper: "מתי זה לא קורה?", group: "obstacles", groupLabel: "חסם/חלופה", questionButtonLabel: "יוצא מן הכלל", questionText: "מתי זה לא קורה?", expandSentenceTemplate: "יוצא מן הכלל/מתי זה לא קורה: {a}.", pos: { x: 78, y: 68 } }
     ]);
-    const SLOT_BY_ID = Object.freeze(Object.fromEntries(SLOT_DEFS.map((slot)=>[slot.id,slot])));
-    const buildCaseTemplates = (answers)=>SLOT_DEFS.map((slot)=>({slotId:slot.id,questionButtonLabel:slot.qLabel,questionText:slot.question,answerText:String(answers[slot.id]||"אני לא יודע"),expandSentenceTemplate:slot.expand}));
+
+    const SLOT_BY_ID = Object.freeze(Object.fromEntries(SLOT_CONFIG.map((slot) => [slot.id, slot])));
+
+    const GROUP_HINT = Object.freeze({
+      context: "רמז קבוצה: הקשר/לפני/טריגר.",
+      steps: "רמז קבוצה: צעדים (קודם/ראשון/אמצע/סוף).",
+      goal: "רמז קבוצה: מטרה/ערך/כוונה.",
+      done: "רמז קבוצה: קריטריון סיום.",
+      obstacles: "רמז קבוצה: חסמים/חלופות/חריגים."
+    });
+
+    function buildTemplates(answerBySlot) {
+      return SLOT_CONFIG.map((slot) => ({
+        slotId: slot.id,
+        questionButtonLabel: slot.questionButtonLabel,
+        questionText: slot.questionText,
+        answerText: String(answerBySlot[slot.id] ?? "אני לא יודע"),
+        expandSentenceTemplate: slot.expandSentenceTemplate
+      }));
+    }
+
     const CASES = Object.freeze([
-      { id:"case_1_quote", title:"תקוע עם הצעה ללקוח", patientContextLines:["מחר יש לי דדליין לשלוח הצעת מחיר ללקוח חדש.","אני יושב מול המחשב, אבל משהו לא זז.","אני מרגיש תקוע, ובסוף אני בורח לטלפון.","אחר כך אני מתבאס על עצמי.","ואז אני אומר שמחר אני אתחיל כמו שצריך."], focusLineIndex:3, verb:{text:"תקוע",start:10,end:14}, templates:buildCaseTemplates({1:"בערב, כשאני לבד בבית ומנסה להתחיל לעבוד.",2:"פתחתי את ה-Word וראיתי דף ריק.",3:"הרגע שאני רואה שאין לי התחלה טובה.",4:"אני חושב על זה כל היום ואז דוחה את הרגע של להתחיל.",5:"אני פותח מסמך חדש.",6:"אני קורא הצעות ישנות ומתחיל לערוך אותן.",7:"אני סוגר את המסמך ועובר לוואטסאפ.",8:"להימנע מלהרגיש שאני מוציא משהו לא טוב.",9:"כבוד/מצוינות.",10:"להגן עליי מבושה או ביקורת.",11:"כשיש טיוטה ראשונה של 10 שורות.",12:"לחץ בחזה ותחושת כיווץ.",13:"אם זה לא מושלם יחשבו שאני לא מקצועי.",14:"לכתוב 10 שורות גרועות בכוונה ואז לשפר.",15:"כשאני עובד עם חבר/מישהו ליד — זה זז יותר."}) },
-      { id:"case_2_manager", title:"נמנע משיחה עם המנהל", patientContextLines:["המנהל שלי ביקש לדבר איתי על התפקוד.","כל פעם שיש שיחה כזו אני מוצא תירוץ.","אני נמנע מלעלות את הנושא של העלאה בשכר.","אחרי זה אני כועס על עצמי.","ובכל זאת בפעם הבאה זה חוזר."], focusLineIndex:3, verb:{text:"נמנע",start:4,end:8}, templates:buildCaseTemplates({1:"כשאני מקבל הודעה ממנו לקבוע שיחה.",2:"אני רואה את ההודעה ומרגיש דופק.",3:"המחשבה \"הוא ישפוט אותי\".",4:"אני מתחיל להכין בראש תירוצים עוד לפני השיחה.",5:"אני פותח יומן לחפש זמן.",6:"אני דוחה את הבחירה של זמן ושולח \"אחזור אליך\".",7:"אני לא קובע ואז זה נמסמס.",8:"לא להיכנס לסיטואציה לא נעימה.",9:"אני לא יודע",10:"להגן עליי מדחייה.",11:"כשקבעתי זמן ושאלתי שאלה אחת.",12:"חום בפנים ודופק מהיר.",13:"אם אבקש העלאה יחשבו שאני חוצפן.",14:"לשלוח הודעה קצרה עם בקשה ל-10 דקות בלבד.",15:"כשאני בא אחרי הצלחה — זה קל יותר."}) }
+      {
+        id: "case_1_quote",
+        title: "תקוע עם הצעה ללקוח",
+        patientContextLines: [
+          "מחר יש לי דדליין לשלוח הצעת מחיר ללקוח חדש.",
+          "אני יושב מול המחשב, אבל משהו לא זז.",
+          "אני מרגיש תקוע, ובסוף אני בורח לטלפון.",
+          "אחר כך אני מתבאס על עצמי.",
+          "ואז אני אומר שמחר אני אתחיל כמו שצריך."
+        ],
+        focusLineIndex: 3,
+        verb: { text: "תקוע", start: 4, end: 8 },
+        templates: buildTemplates({
+          1: "בערב, כשאני לבד בבית ומנסה להתחיל לעבוד.",
+          2: "פתחתי את ה-Word וראיתי דף ריק.",
+          3: "הרגע שאני רואה שאין לי התחלה טובה.",
+          4: "אני חושב על זה כל היום ואז דוחה את הרגע של להתחיל.",
+          5: "אני פותח מסמך חדש.",
+          6: "אני קורא הצעות ישנות ומתחיל לערוך אותן.",
+          7: "אני סוגר את המסמך ועובר לוואטסאפ.",
+          8: "להימנע מלהרגיש שאני מוציא משהו לא טוב.",
+          9: "כבוד/מצוינות.",
+          10: "להגן עליי מבושה או ביקורת.",
+          11: "כשיש טיוטה ראשונה של 10 שורות.",
+          12: "לחץ בחזה ותחושת כיווץ.",
+          13: "אם זה לא מושלם יחשבו שאני לא מקצועי.",
+          14: "לכתוב 10 שורות גרועות בכוונה ואז לשפר.",
+          15: "כשאני עובד עם חבר/מישהו ליד — זה זז יותר."
+        })
+      },
+      {
+        id: "case_2_manager",
+        title: "נמנע משיחה עם המנהל",
+        patientContextLines: [
+          "המנהל שלי ביקש לדבר איתי על התפקוד.",
+          "כל פעם שיש שיחה כזו אני מוצא תירוץ.",
+          "אני נמנע מלעלות את הנושא של העלאה בשכר.",
+          "אחרי זה אני כועס על עצמי.",
+          "ובכל זאת בפעם הבאה זה חוזר."
+        ],
+        focusLineIndex: 3,
+        verb: { text: "נמנע", start: 4, end: 8 },
+        templates: buildTemplates({
+          1: "כשאני מקבל הודעה ממנו לקבוע שיחה.",
+          2: "אני רואה את ההודעה ומרגיש דופק.",
+          3: "המחשבה 'הוא ישפוט אותי'.",
+          4: "אני מתחיל להכין בראש תירוצים עוד לפני השיחה.",
+          5: "אני פותח יומן לחפש זמן.",
+          6: "אני דוחה את הבחירה של זמן ושולח 'אחזור אליך'.",
+          7: "אני לא קובע ואז זה נמסמס.",
+          8: "לא להיכנס לסיטואציה לא נעימה.",
+          9: "אני לא יודע",
+          10: "להגן עליי מדחייה.",
+          11: "כשקבעתי זמן ושאלתי שאלה אחת.",
+          12: "חום בפנים ודופק מהיר.",
+          13: "אם אבקש העלאה יחשבו שאני חוצפן.",
+          14: "לשלוח הודעה קצרה עם בקשה ל-10 דקות בלבד.",
+          15: "כשאני בא אחרי הצלחה — זה קל יותר."
+        })
+      }
     ]);
-    const state={caseIndex:0,currentCase:null,askedSlotIds:new Set(),blocksById:{},stagingBlockIds:[],placedBySlotId:{},expandingBySlotId:{},logs:[],mistakes:0,feedback:{type:"neutral",text:"בחר שאלה מהעמודה השמאלית כדי לייצר AnswerBlock."}};
-    const els={caseSelect:document.getElementById("caseSelect"),startBtn:document.getElementById("startBtn"),restartBtn:document.getElementById("restartBtn"),questionsWrap:document.getElementById("questionsWrap"),questionLog:document.getElementById("questionLog"),transcriptLines:document.getElementById("transcriptLines"),schemaBoard:document.getElementById("schemaBoard"),expandingText:document.getElementById("expandingText"),stagingArea:document.getElementById("stagingArea"),feedbackBox:document.getElementById("feedbackBox"),mistakesCounter:document.getElementById("mistakesCounter"),summaryBtn:document.getElementById("summaryBtn"),nextCaseBtn:document.getElementById("nextCaseBtn"),summaryBackdrop:document.getElementById("summaryBackdrop"),summaryReflection:document.getElementById("summaryReflection"),summaryUnknown:document.getElementById("summaryUnknown"),summarySuggestions:document.getElementById("summarySuggestions"),summaryCloseBtn:document.getElementById("summaryCloseBtn"),summaryNextCaseBtn:document.getElementById("summaryNextCaseBtn")};
-    const esc=(t)=>String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#39;");
-    function highlightVerb(line,verb){if(!line||!verb)return esc(line||"");const s=Math.max(0,Math.min(line.length,Number(verb.start)||0));const e=Math.max(s,Math.min(line.length,Number(verb.end)||s));return `${esc(line.slice(0,s))}<span class="verb">${esc(line.slice(s,e)||verb.text||"")}</span>${esc(line.slice(e))}`;}
-    const getTemplate=(slotId)=>state.currentCase.templates.find((tpl)=>tpl.slotId===slotId)||null;
-    const getAnswer=(slotId)=>{const blockId=state.placedBySlotId[slotId];if(!blockId)return "אני לא יודע";const b=state.blocksById[blockId];return b?b.answerText:"אני לא יודע";};
-    const setFeedback=(type,text)=>{state.feedback={type,text};};
-    const addLog=(type,text)=>{state.logs.unshift({id:`${Date.now()}_${Math.random().toString(16).slice(2,7)}`,type,text});if(state.logs.length>22)state.logs=state.logs.slice(0,22);};
-    const isCompleted=()=>SLOT_DEFS.every((slot)=>Boolean(state.placedBySlotId[slot.id]));
-    const spawnBlock=(slotId)=>{if(!state.currentCase||state.askedSlotIds.has(slotId))return;const tpl=getTemplate(slotId);if(!tpl)return;const id=`${state.currentCase.id}_slot_${slotId}`;state.blocksById[id]={id,correctSlotId:slotId,questionText:tpl.questionText,answerText:tpl.answerText,locked:false};state.stagingBlockIds.push(id);state.askedSlotIds.add(slotId);addLog("therapist",`מטפל שואל: ${tpl.questionText}`);setFeedback("neutral",`נוצר AnswerBlock עבור: ${tpl.questionButtonLabel}. גרור/י לסלוט המתאים.`);render();};
-    const wrongDrop=(slotEl)=>{if(!slotEl)return;slotEl.classList.remove("shake");void slotEl.offsetWidth;slotEl.classList.add("shake");const m=document.createElement("span");m.className="x";m.textContent="✖";slotEl.appendChild(m);window.setTimeout(()=>{slotEl.classList.remove("shake");m.remove();},700);};
-    function placeBlock(blockId,targetSlotId,slotEl){const b=state.blocksById[blockId];if(!b||b.locked)return;if(state.placedBySlotId[targetSlotId])return;if(b.correctSlotId!==targetSlotId){state.mistakes+=1;setFeedback("error","❌ לא לשם — נסה שוב");wrongDrop(slotEl);render();return;}b.locked=true;state.stagingBlockIds=state.stagingBlockIds.filter((id)=>id!==blockId);state.placedBySlotId[targetSlotId]=blockId;const tpl=getTemplate(targetSlotId);if(tpl&&!state.expandingBySlotId[targetSlotId])state.expandingBySlotId[targetSlotId]=tpl.expandSentenceTemplate.replace("{a}",b.answerText);addLog("coach","אוקיי… וזה עדיין לא כל הסיפור.");setFeedback("success","✅ נכון");render();if(isCompleted())openSummary();}
-    function buildReflection(){const a=(id)=>getAnswer(id);return `מה שאני מבין עד כה: כש${a(1)}, רגע לפני ${a(2)}, הטריגר הוא ${a(3)}. לפני זה ${a(4)}. ואז אתה מתחיל ב-${a(5)}, ממשיך ב-${a(6)}, ומסיים ב-${a(7)}. המטרה היא ${a(8)}, כדי לשרת את הערך ${a(9)}. הכוונה החיובית היא ${a(10)}. אתה תדע שסיימת כש-${a(11)}. בגוף/רגש עולה ${a(12)}, ומה שמפעיל/עוצר הוא ${a(13)}. חלופה היא ${a(14)}, ויוצא מן הכלל: ${a(15)}.`;}
-    const buildUnknown=()=>SLOT_DEFS.filter((slot)=>getAnswer(slot.id).trim()==="אני לא יודע").map((slot)=>`${slot.title} — ${slot.helper}`);
-    function buildSuggestions(unknownIds){const out=[];if(unknownIds.includes(10))out.push("להעמיק בכוונה החיובית דרך שאלות ערך/הגנה.");if(unknownIds.includes(5)||unknownIds.includes(6)||unknownIds.includes(7))out.push("להמשיך פירוק צעדים \"וידאו\".");if(unknownIds.includes(11))out.push("להגדיר קריטריון סיום מדיד.");if(unknownIds.includes(15))out.push("לחפש הקשרים שבהם זה לא קורה כדי למצוא משאבים.");if(unknownIds.includes(10)||unknownIds.includes(9))out.push("שאלה מומלצת: מה זה מנסה להגן עליך ממנו ברגע האמת?");if(unknownIds.includes(5)||unknownIds.includes(6)||unknownIds.includes(7))out.push("שאלה מומלצת: אם היינו מצלמה, מה היינו רואים בצעד הראשון/האמצעי/האחרון?");if(unknownIds.includes(11))out.push("שאלה מומלצת: מה סימן מדיד קטן שמראה שסיימת?");if(unknownIds.includes(15))out.push("שאלה מומלצת: באיזה מצב דומה זה דווקא עובד אחרת?");if(!out.length)return ["השלב הבא: לקחת את החלופה ולתרגל אותה בקייס דומה אחד.","שאלה מומלצת: מהו צעד ניסוי קטן שאפשר לבצע עוד היום?"];return out.slice(0,3);}
-    function openSummary(){const unknown=buildUnknown();const unknownIds=SLOT_DEFS.filter((slot)=>getAnswer(slot.id).trim()==="אני לא יודע").map((slot)=>slot.id);els.summaryReflection.textContent=buildReflection();els.summaryUnknown.innerHTML="";if(!unknown.length){const li=document.createElement("li");li.textContent='אין כרגע "אני לא יודע". התמונה יחסית מלאה לקייס הזה.';els.summaryUnknown.appendChild(li);}else unknown.forEach((item)=>{const li=document.createElement("li");li.textContent=item;els.summaryUnknown.appendChild(li);});els.summarySuggestions.innerHTML="";buildSuggestions(unknownIds).forEach((item)=>{const li=document.createElement("li");li.textContent=item;els.summarySuggestions.appendChild(li);});els.summaryBackdrop.classList.add("open");}
-    const closeSummary=()=>els.summaryBackdrop.classList.remove("open");
-    function gotoNextCase(){state.caseIndex=(state.caseIndex+1)%CASES.length;els.caseSelect.value=String(state.caseIndex);startCase(state.caseIndex);}
-    function resetForCase(c){state.currentCase=c;state.askedSlotIds=new Set();state.blocksById={};state.stagingBlockIds=[];state.placedBySlotId={};state.expandingBySlotId={};state.logs=[];state.mistakes=0;setFeedback("neutral","בחר שאלה מהעמודה השמאלית כדי לייצר AnswerBlock.");}
-    function startCase(i){const idx=Math.max(0,Math.min(CASES.length-1,Number(i)||0));state.caseIndex=idx;resetForCase(CASES[idx]);addLog("coach",`התחלנו קייס: ${CASES[idx].title}`);closeSummary();render();}
-    function renderSelector(){els.caseSelect.innerHTML="";CASES.forEach((c,i)=>{const o=document.createElement("option");o.value=String(i);o.textContent=`${i+1}. ${c.title}`;if(i===state.caseIndex)o.selected=true;els.caseSelect.appendChild(o);});}
-    function renderQuestions(){els.questionsWrap.innerHTML="";SLOT_DEFS.forEach((slot)=>{const tpl=getTemplate(slot.id);const b=document.createElement("button");b.type="button";b.className=`qbtn${state.askedSlotIds.has(slot.id)?" used":""}`;b.disabled=state.askedSlotIds.has(slot.id);b.innerHTML=`<span>${slot.id}. ${esc(tpl.questionButtonLabel)}</span><small>${esc(tpl.questionText)}</small>`;b.addEventListener("click",()=>spawnBlock(slot.id));els.questionsWrap.appendChild(b);});}
-    function renderLogs(){els.questionLog.innerHTML="";if(!state.logs.length){const li=document.createElement("li");li.textContent="עדיין לא נשאלו שאלות.";els.questionLog.appendChild(li);return;}state.logs.forEach((entry)=>{const li=document.createElement("li");li.className=entry.type==="coach"?"coach":"";li.textContent=entry.text;els.questionLog.appendChild(li);});}
-    function renderTranscript(){els.transcriptLines.innerHTML="";const lines=state.currentCase.patientContextLines;const focus=Math.max(0,(Number(state.currentCase.focusLineIndex)||1)-1);lines.forEach((line,i)=>{const d=document.createElement("div");d.className=`line${i===focus?" focus":""}`;d.innerHTML=i===focus?highlightVerb(line,state.currentCase.verb):esc(line);els.transcriptLines.appendChild(d);});}
-    function createBlockEl(block,inSlot=false){const d=document.createElement("div");d.className=`block${block.locked?" locked":""}`;d.dataset.blockId=block.id;d.draggable=!block.locked&&!inSlot;d.innerHTML=`<span class="meta">${esc(SLOT_BY_ID[block.correctSlotId].title)} | AnswerBlock</span>${esc(block.answerText)}`;if(d.draggable)d.addEventListener("dragstart",(e)=>{e.dataTransfer.setData("text/plain",block.id);e.dataTransfer.effectAllowed="move";});return d;}
-    function renderBoard(){els.schemaBoard.innerHTML="";const center=document.createElement("div");center.className="center";center.innerHTML=`<div>הפועל: ${esc(state.currentCase.verb.text)}<br><small>Unspecified Verb</small></div>`;els.schemaBoard.appendChild(center);SLOT_DEFS.forEach((slot)=>{const s=document.createElement("div");s.className="slot";s.dataset.slotId=String(slot.id);s.dataset.group=slot.group;s.style.right=`${slot.pos.x}%`;s.style.top=`${slot.pos.y}%`;s.innerHTML=`<div class="stitle">${slot.title}</div><div class="shelp">${slot.helper}</div>`;const blockId=state.placedBySlotId[slot.id];if(blockId&&state.blocksById[blockId])s.appendChild(createBlockEl(state.blocksById[blockId],true));else{const p=document.createElement("div");p.className="placeholder";p.textContent="גרור לכאן";s.appendChild(p);}s.addEventListener("dragover",(e)=>{e.preventDefault();s.classList.add("dragover");});s.addEventListener("dragleave",()=>s.classList.remove("dragover"));s.addEventListener("drop",(e)=>{e.preventDefault();s.classList.remove("dragover");const bid=e.dataTransfer.getData("text/plain");if(bid)placeBlock(bid,slot.id,s);});els.schemaBoard.appendChild(s);});}
-    function renderStaging(){els.stagingArea.innerHTML="";if(!state.stagingBlockIds.length){const e=document.createElement("div");e.className="empty";e.textContent="אין כרגע בלוקים. לחץ/י על שאלה כדי לקבל תשובה מהמטופל.";els.stagingArea.appendChild(e);return;}state.stagingBlockIds.forEach((id)=>{const b=state.blocksById[id];if(b)els.stagingArea.appendChild(createBlockEl(b));});}
-    function renderExpand(){const base=state.currentCase.patientContextLines.map((line)=>`<p>${esc(line)}</p>`).join("");const items=SLOT_DEFS.map((slot)=>state.expandingBySlotId[slot.id]).filter(Boolean).map((s)=>`<p class="eitem">${esc(s)}</p>`).join("");els.expandingText.innerHTML=`<div class="base">${base}</div>${items}`;}
-    function renderFeedback(){els.feedbackBox.className=`feedback ${state.feedback.type==="success"?"ok":state.feedback.type==="error"?"err":""}`.trim();els.feedbackBox.textContent=state.feedback.text;els.mistakesCounter.textContent=`טעויות: ${state.mistakes}`;els.summaryBtn.disabled=!isCompleted();}
-    function render(){if(!state.currentCase)return;renderQuestions();renderLogs();renderTranscript();renderBoard();renderStaging();renderExpand();renderFeedback();}
-    function bind(){els.startBtn.addEventListener("click",()=>startCase(els.caseSelect.value));els.caseSelect.addEventListener("change",(e)=>{state.caseIndex=Number(e.target.value)||0;});els.restartBtn.addEventListener("click",()=>startCase(state.caseIndex));els.summaryBtn.addEventListener("click",()=>{if(isCompleted())openSummary();});els.nextCaseBtn.addEventListener("click",gotoNextCase);els.summaryCloseBtn.addEventListener("click",closeSummary);els.summaryNextCaseBtn.addEventListener("click",()=>{closeSummary();gotoNextCase();});els.summaryBackdrop.addEventListener("click",(e)=>{if(e.target===els.summaryBackdrop)closeSummary();});document.addEventListener("keydown",(e)=>{if(e.key==="Escape")closeSummary();});}
-    function init(){renderSelector();bind();startCase(0);} init();
+
+    const els = {
+      caseSelect: document.getElementById("caseSelect"),
+      startBtn: document.getElementById("startBtn"),
+      restartBtn: document.getElementById("restartBtn"),
+      nextCaseBtn: document.getElementById("nextCaseBtn"),
+      progressChip: document.getElementById("progressChip"),
+      stepNow: document.getElementById("stepNow"),
+      questionList: document.getElementById("questionList"),
+      questionLog: document.getElementById("questionLog"),
+      transcriptLines: document.getElementById("transcriptLines"),
+      schemaBoard: document.getElementById("schemaBoard"),
+      stagingArea: document.getElementById("stagingArea"),
+      expandingText: document.getElementById("expandingText"),
+      feedbackBox: document.getElementById("feedbackBox"),
+      feedbackMain: document.getElementById("feedbackMain"),
+      feedbackHint: document.getElementById("feedbackHint"),
+      mistakesText: document.getElementById("mistakesText"),
+      summaryBtn: document.getElementById("summaryBtn"),
+      summaryBackdrop: document.getElementById("summaryBackdrop"),
+      summaryReflection: document.getElementById("summaryReflection"),
+      summaryKnown: document.getElementById("summaryKnown"),
+      summaryUnknown: document.getElementById("summaryUnknown"),
+      summarySuggestions: document.getElementById("summarySuggestions"),
+      closeSummaryBtn: document.getElementById("closeSummaryBtn"),
+      summaryNextBtn: document.getElementById("summaryNextBtn")
+    };
+
+    const state = {
+      caseIndex: 0,
+      currentCase: null,
+      askedSlotIds: new Set(),
+      blocksById: {},
+      stagingBlockIds: [],
+      selectedBlockId: "",
+      placedBySlotId: {},
+      expandingEntries: [],
+      questionLog: [],
+      mistakes: 0,
+      wrongAttemptsByBlock: {},
+      feedback: {
+        type: "neutral",
+        main: "בחר שאלה שהמטפל שואל כדי לקבל תשובת מטופל.",
+        hint: "לאחר שהתשובה מופיעה, משבצים את תשובת המטופל בסלוט המתאים."
+      },
+      lastAction: "",
+      injectedEntryId: ""
+    };
+
+    let actionTimer = null;
+    let injectTimer = null;
+
+    function esc(text) {
+      return String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function isUnknownAnswer(answer) {
+      return String(answer).trim() === "אני לא יודע";
+    }
+
+    function getCaseTemplate(slotId) {
+      return state.currentCase.templates.find((tpl) => tpl.slotId === slotId) || null;
+    }
+
+    function getPlacedAnswer(slotId) {
+      const blockId = state.placedBySlotId[slotId];
+      if (!blockId) {
+        return "אני לא יודע";
+      }
+      const block = state.blocksById[blockId];
+      return block ? block.answerText : "אני לא יודע";
+    }
+
+    function getCompletedCount() {
+      return Object.keys(state.placedBySlotId).length;
+    }
+
+    function isCompleted() {
+      return getCompletedCount() === SLOT_CONFIG.length;
+    }
+
+    function setFeedback(type, main, hint) {
+      state.feedback = { type, main, hint };
+      renderFeedback();
+    }
+
+    function setTransientAction(action) {
+      state.lastAction = action;
+      renderStepLine();
+      if (actionTimer) {
+        clearTimeout(actionTimer);
+      }
+      actionTimer = setTimeout(() => {
+        state.lastAction = "";
+        renderStepLine();
+      }, 1400);
+    }
+
+    function computeStepText() {
+      if (isCompleted()) {
+        return "הושלמו 15/15. אפשר לפתוח סיכום או לעבור לתרגיל הבא.";
+      }
+
+      if (state.selectedBlockId) {
+        return "שלב 3/4: בלוק נבחר. עכשיו לחץ על סלוט מתאים (או גרור אליו).";
+      }
+
+      if (state.lastAction === "spawn") {
+        return "שלב 2/4: בלוק נוצר. שלב 3/4: גרור אותו לסלוט הנכון.";
+      }
+
+      if (state.lastAction === "lock") {
+        return "שלב 4/4: הבלוק ננעל. חזור לשלב 1 ובחר שאלה נוספת.";
+      }
+
+      if (state.stagingBlockIds.length > 0) {
+        return "שלב 3/4: גרור בלוק מאזור הבלוקים לסלוט הנכון.";
+      }
+
+      return "שלב 1/4: בחר שאלה כדי להתחיל פירוק.";
+    }
+
+    function renderStepLine() {
+      els.stepNow.textContent = computeStepText();
+    }
+
+    function addLog(type, text) {
+      state.questionLog.unshift({ id: `${Date.now()}_${Math.random().toString(16).slice(2, 6)}`, type, text });
+      if (state.questionLog.length > 25) {
+        state.questionLog = state.questionLog.slice(0, 25);
+      }
+      renderLog();
+    }
+
+    function highlightVerb(line, verb) {
+      const start = Math.max(0, Math.min(line.length, Number(verb.start) || 0));
+      const end = Math.max(start, Math.min(line.length, Number(verb.end) || start));
+      const before = esc(line.slice(0, start));
+      const middle = esc(line.slice(start, end) || verb.text || "");
+      const after = esc(line.slice(end));
+      return `${before}<span class="verb-highlight">${middle}</span>${after}`;
+    }
+
+    function buildBlockId(slotId) {
+      return `${state.currentCase.id}_slot_${slotId}`;
+    }
+
+    function selectBlockForPlacement(blockId) {
+      const block = state.blocksById[blockId];
+      if (!block || block.locked) return;
+
+      state.selectedBlockId = state.selectedBlockId === blockId ? "" : blockId;
+      if (state.selectedBlockId) {
+        setFeedback("neutral", "נבחר בלוק תשובה.", "במובייל: לחץ על סלוט מתאים כדי למקם. בדסקטופ אפשר גם לגרור.");
+      } else {
+        setFeedback("neutral", "בוטלה בחירת הבלוק.", "בחר בלוק אחר או גרור ישירות.");
+      }
+      renderBoard();
+      renderStaging();
+      renderStepLine();
+    }
+
+    function spawnAnswerBlock(slotId) {
+      if (state.askedSlotIds.has(slotId)) {
+        return;
+      }
+
+      const tpl = getCaseTemplate(slotId);
+      if (!tpl) {
+        return;
+      }
+
+      const blockId = buildBlockId(slotId);
+      state.blocksById[blockId] = {
+        id: blockId,
+        correctSlotId: slotId,
+        answerText: tpl.answerText,
+        questionText: tpl.questionText,
+        questionLabel: tpl.questionButtonLabel,
+        group: SLOT_BY_ID[slotId].group,
+        locked: false
+      };
+
+      state.stagingBlockIds.push(blockId);
+      state.askedSlotIds.add(slotId);
+      state.selectedBlockId = blockId;
+
+      addLog("therapist", `מטפל שואל: ${tpl.questionText}`);
+      addLog("patient", `מטופל עונה: ${tpl.answerText}`);
+      setFeedback("neutral", "התקבלה תשובת מטופל חדשה.", "שלב הבא: שבץ את תשובת המטופל בסלוט המתאים.");
+      setTransientAction("spawn");
+      renderQuestions();
+      renderBoard();
+      renderStaging();
+      renderProgress();
+    }
+
+    function showWrongX(slotEl) {
+      slotEl.classList.remove("shake");
+      void slotEl.offsetWidth;
+      slotEl.classList.add("shake");
+
+      const x = document.createElement("div");
+      x.className = "x-overlay";
+      x.textContent = "✕";
+      slotEl.appendChild(x);
+
+      setTimeout(() => {
+        slotEl.classList.remove("shake");
+        x.remove();
+      }, 700);
+    }
+
+    function blinkGroup(group) {
+      const slots = Array.from(els.schemaBoard.querySelectorAll(`.slot[data-group="${group}"]`));
+      slots.forEach((slot) => slot.classList.add("hint-group"));
+      setTimeout(() => {
+        slots.forEach((slot) => slot.classList.remove("hint-group"));
+      }, 1250);
+    }
+
+    function blinkSlot(slotId) {
+      const slot = els.schemaBoard.querySelector(`.slot[data-slot-id="${slotId}"]`);
+      if (!slot) {
+        return;
+      }
+      slot.classList.add("hint-slot");
+      setTimeout(() => {
+        slot.classList.remove("hint-slot");
+      }, 1250);
+    }
+
+    function injectToExpanding(slotId, answerText) {
+      const tpl = getCaseTemplate(slotId);
+      if (!tpl) {
+        return;
+      }
+
+      const text = tpl.expandSentenceTemplate.replace("{a}", answerText);
+      const entryId = `${slotId}_${Date.now()}`;
+      state.expandingEntries.push({ id: entryId, slotId, text, unknown: isUnknownAnswer(answerText) });
+      state.injectedEntryId = entryId;
+      renderExpanding();
+
+      if (injectTimer) {
+        clearTimeout(injectTimer);
+      }
+      injectTimer = setTimeout(() => {
+        state.injectedEntryId = "";
+        renderExpanding();
+      }, 520);
+    }
+
+    function handleDrop(blockId, targetSlotId, slotEl) {
+      const block = state.blocksById[blockId];
+      if (!block || block.locked) {
+        return;
+      }
+
+      if (state.placedBySlotId[targetSlotId]) {
+        setFeedback("err", "❌ הסלוט הזה כבר נעול.", "בחר סלוט פנוי.");
+        showWrongX(slotEl);
+        return;
+      }
+
+      if (block.correctSlotId !== targetSlotId) {
+        state.mistakes += 1;
+        state.wrongAttemptsByBlock[blockId] = (state.wrongAttemptsByBlock[blockId] || 0) + 1;
+
+        const correctSlot = SLOT_BY_ID[block.correctSlotId];
+        const attempts = state.wrongAttemptsByBlock[blockId];
+
+        let hint = GROUP_HINT[correctSlot.group] || "רמז: בדוק את הקבוצה המתאימה.";
+
+        if (attempts >= 3) {
+          hint += " עכשיו הסלוט המדויק מהבהב.";
+          blinkSlot(block.correctSlotId);
+        } else if (attempts >= 2) {
+          hint += " עכשיו הקבוצה הנכונה מהבהבת.";
+          blinkGroup(correctSlot.group);
+        }
+
+        setFeedback("err", "❌ לא לשם — נסה שוב", hint);
+        renderProgress();
+        showWrongX(slotEl);
+        return;
+      }
+
+      block.locked = true;
+      state.placedBySlotId[targetSlotId] = blockId;
+      state.stagingBlockIds = state.stagingBlockIds.filter((id) => id !== blockId);
+      if (state.selectedBlockId === blockId) {
+        state.selectedBlockId = "";
+      }
+
+      injectToExpanding(targetSlotId, block.answerText);
+      addLog("coach", "אוקיי… וזה עדיין לא כל הסיפור.");
+
+      setFeedback("ok", "✅ נכון", "הבלוק ננעל בסלוט המתאים.");
+      setTransientAction("lock");
+
+      renderBoard();
+      renderStaging();
+      renderProgress();
+      renderFeedback();
+
+      if (isCompleted()) {
+        openSummary();
+      }
+    }
+
+    function createBlockElement(block, inSlot) {
+      const slot = SLOT_BY_ID[block.correctSlotId];
+      const el = document.createElement("div");
+      const unknown = isUnknownAnswer(block.answerText);
+      const selected = state.selectedBlockId === block.id && !block.locked;
+
+      el.className = `answer-block${block.locked ? " locked" : ""}${unknown ? " unknown" : ""}${selected ? " selected" : ""}`;
+      el.dataset.blockId = block.id;
+      el.draggable = !block.locked && !inSlot;
+
+      const mark = unknown ? "<span class=\"unknown-mark\">❔</span>" : "";
+      el.innerHTML = `
+        <div class="block-head">
+          <span class="group-pill role-patient">תשובת מטופל</span>
+          <span class="group-pill">${esc(slot.groupLabel)}${mark}</span>
+        </div>
+        <div class="block-question-ref">שאלת מטפל ${slot.id}: ${esc(block.questionText)}</div>
+        <div class="block-answer-line"><strong>תשובת מטופל:</strong> ${esc(block.answerText)}</div>
+      `;
+
+      if (el.draggable) {
+        el.addEventListener("dragstart", (event) => {
+          event.dataTransfer.setData("text/plain", block.id);
+          event.dataTransfer.effectAllowed = "move";
+        });
+        el.addEventListener("click", (event) => {
+          event.preventDefault();
+          selectBlockForPlacement(block.id);
+        });
+      }
+
+      return el;
+    }
+
+    function renderQuestions() {
+      els.questionList.innerHTML = "";
+
+      SLOT_CONFIG.forEach((slot) => {
+        const tpl = getCaseTemplate(slot.id);
+        const used = state.askedSlotIds.has(slot.id);
+        const btn = document.createElement("button");
+
+        btn.type = "button";
+        btn.className = `qbtn${used ? " used" : ""}`;
+        btn.disabled = used;
+
+        btn.innerHTML = `
+          <div class="q-meta">
+            <span class="group-pill role-therapist">מטפל שואל</span>
+            <span class="group-pill">${esc(slot.groupLabel)}</span>
+          </div>
+          <div class="question-text">שאלה ${slot.id}: ${esc(tpl.questionText)}</div>
+          <div class="q-action">${used ? "כבר נשאלה" : "לחץ כדי לקבל תשובת מטופל"}</div>
+        `;
+
+        btn.addEventListener("click", () => spawnAnswerBlock(slot.id));
+        els.questionList.appendChild(btn);
+      });
+    }
+
+    function renderLog() {
+      els.questionLog.innerHTML = "";
+      if (!state.questionLog.length) {
+        const li = document.createElement("li");
+        li.className = "log-item";
+        li.textContent = "עדיין לא נשאלו שאלות.";
+        els.questionLog.appendChild(li);
+        return;
+      }
+
+      state.questionLog.forEach((item) => {
+        const li = document.createElement("li");
+        li.className = `log-item${item.type === "coach" ? " coach" : item.type === "patient" ? " patient" : ""}`;
+        li.textContent = item.text;
+        els.questionLog.appendChild(li);
+      });
+    }
+
+    function renderTranscript() {
+      els.transcriptLines.innerHTML = "";
+      const lines = state.currentCase.patientContextLines;
+      const focusIdx = Math.max(0, Math.min(lines.length - 1, Number(state.currentCase.focusLineIndex) - 1));
+
+      lines.forEach((line, idx) => {
+        const div = document.createElement("div");
+        div.className = `line-card${idx === focusIdx ? " focus" : ""}`;
+        div.innerHTML = idx === focusIdx ? highlightVerb(line, state.currentCase.verb) : esc(line);
+        els.transcriptLines.appendChild(div);
+      });
+    }
+
+    function renderBoard() {
+      els.schemaBoard.innerHTML = "";
+
+      const center = document.createElement("div");
+      center.className = "verb-center";
+      center.innerHTML = `הפועל: ${esc(state.currentCase.verb.text)}`;
+      els.schemaBoard.appendChild(center);
+
+      SLOT_CONFIG.forEach((slot) => {
+        const slotEl = document.createElement("div");
+        slotEl.className = "slot";
+        slotEl.dataset.slotId = String(slot.id);
+        slotEl.dataset.group = slot.group;
+        slotEl.style.left = `${slot.pos.x}%`;
+        slotEl.style.top = `${slot.pos.y}%`;
+
+        slotEl.innerHTML = `
+          <div class="slot-title">${esc(slot.title)}</div>
+          <div class="slot-helper">${esc(slot.helper)}</div>
+        `;
+
+        const placedBlockId = state.placedBySlotId[slot.id];
+        if (placedBlockId) {
+          const block = state.blocksById[placedBlockId];
+          if (block) {
+            slotEl.appendChild(createBlockElement(block, true));
+          }
+        } else {
+          const empty = document.createElement("div");
+          empty.className = "slot-empty";
+          empty.textContent = "שבץ כאן תשובת מטופל";
+          slotEl.appendChild(empty);
+        }
+
+        slotEl.addEventListener("dragover", (event) => {
+          event.preventDefault();
+          slotEl.classList.add("dragover");
+        });
+
+        slotEl.addEventListener("dragleave", () => {
+          slotEl.classList.remove("dragover");
+        });
+
+        slotEl.addEventListener("drop", (event) => {
+          event.preventDefault();
+          slotEl.classList.remove("dragover");
+          const blockId = event.dataTransfer.getData("text/plain");
+          if (blockId) {
+            handleDrop(blockId, slot.id, slotEl);
+          }
+        });
+
+        slotEl.addEventListener("click", () => {
+          if (state.selectedBlockId) {
+            handleDrop(state.selectedBlockId, slot.id, slotEl);
+          }
+        });
+
+        els.schemaBoard.appendChild(slotEl);
+      });
+    }
+
+    function renderStaging() {
+      els.stagingArea.innerHTML = "";
+
+      if (!state.stagingBlockIds.length) {
+        const empty = document.createElement("div");
+        empty.className = "placeholder";
+        empty.textContent = "אין כרגע תשובות מטופל. לחץ על שאלה כדי לקבל תשובה.";
+        els.stagingArea.appendChild(empty);
+        return;
+      }
+
+      state.stagingBlockIds.forEach((blockId) => {
+        const block = state.blocksById[blockId];
+        if (block) {
+          els.stagingArea.appendChild(createBlockElement(block, false));
+        }
+      });
+    }
+
+    function renderExpanding() {
+      const baseHtml = state.currentCase.patientContextLines
+        .map((line) => `<p>${esc(line)}</p>`)
+        .join("");
+
+      const extraHtml = state.expandingEntries
+        .map((entry) => {
+          const cls = ["expanding-item", entry.unknown ? "unknown" : "", entry.id === state.injectedEntryId ? "incoming" : ""]
+            .filter(Boolean)
+            .join(" ");
+          return `<p class="${cls}">${esc(entry.text)}</p>`;
+        })
+        .join("");
+
+      els.expandingText.innerHTML = `<div class="base-text">${baseHtml}</div>${extraHtml}`;
+    }
+
+    function renderFeedback() {
+      els.feedbackBox.classList.remove("ok", "err");
+      if (state.feedback.type === "ok") {
+        els.feedbackBox.classList.add("ok");
+      }
+      if (state.feedback.type === "err") {
+        els.feedbackBox.classList.add("err");
+      }
+
+      els.feedbackMain.textContent = state.feedback.main;
+      els.feedbackHint.textContent = state.feedback.hint;
+      els.mistakesText.textContent = `טעויות: ${state.mistakes}`;
+      els.summaryBtn.disabled = !isCompleted();
+      renderStepLine();
+    }
+
+    function renderProgress() {
+      const count = getCompletedCount();
+      els.progressChip.textContent = `${count}/15`;
+      if (isCompleted()) {
+        els.progressChip.style.background = "rgba(22, 145, 85, 0.32)";
+      } else {
+        els.progressChip.style.background = "rgba(255, 255, 255, 0.18)";
+      }
+    }
+
+    function renderAll() {
+      renderQuestions();
+      renderLog();
+      renderTranscript();
+      renderBoard();
+      renderStaging();
+      renderExpanding();
+      renderProgress();
+      renderFeedback();
+    }
+
+    function makeReflectionParagraph() {
+      const a = (slotId) => getPlacedAnswer(slotId);
+      return `מה שאני מבין עד כה: כש${a(SLOT_IDS.CONTEXT)}, רגע לפני ${a(SLOT_IDS.PRE_BEFORE)}, הטריגר הוא ${a(SLOT_IDS.TRIGGER)}. לפני זה ${a(SLOT_IDS.PREVIOUS_STEP)}. ואז אתה מתחיל ב-${a(SLOT_IDS.STEP_START)}, ממשיך ב-${a(SLOT_IDS.STEP_MIDDLE)}, ומסיים ב-${a(SLOT_IDS.STEP_END)}. המטרה היא ${a(SLOT_IDS.GOAL)}, כדי לשרת את הערך ${a(SLOT_IDS.VALUE)}. הכוונה החיובית היא ${a(SLOT_IDS.POS_INTENTION)}. אתה תדע שסיימת כש-${a(SLOT_IDS.DONE_TEST)}. בגוף/רגש עולה ${a(SLOT_IDS.EMOTION_BODY)}, ומה שמפעיל/עוצר הוא ${a(SLOT_IDS.OBSTACLE_BELIEF)}. חלופה היא ${a(SLOT_IDS.ALTERNATIVES)}, ויוצא מן הכלל: ${a(SLOT_IDS.EXCEPTION)}.`;
+    }
+
+    function buildUnknownSlotIds() {
+      return SLOT_CONFIG.filter((slot) => isUnknownAnswer(getPlacedAnswer(slot.id))).map((slot) => slot.id);
+    }
+
+    function buildRuleSuggestions(unknownIds) {
+      const unknownSet = new Set(unknownIds);
+      const suggestions = [];
+
+      if (unknownSet.has(SLOT_IDS.POS_INTENTION)) {
+        suggestions.push("להעמיק בכוונה החיובית דרך שאלות ערך/הגנה.");
+      }
+
+      if (unknownSet.has(SLOT_IDS.STEP_START) || unknownSet.has(SLOT_IDS.STEP_MIDDLE) || unknownSet.has(SLOT_IDS.STEP_END)) {
+        suggestions.push("להמשיך פירוק צעדים 'וידאו'.");
+      }
+
+      if (unknownSet.has(SLOT_IDS.DONE_TEST)) {
+        suggestions.push("להגדיר קריטריון סיום מדיד.");
+      }
+
+      if (unknownSet.has(SLOT_IDS.EXCEPTION)) {
+        suggestions.push("לחפש הקשרים שבהם זה לא קורה כדי למצוא משאבים.");
+      }
+
+      const unknownQuestions = unknownIds
+        .map((slotId) => getCaseTemplate(slotId))
+        .filter(Boolean)
+        .map((tpl) => `שאלת המשך: ${tpl.questionText}`);
+
+      for (const q of unknownQuestions) {
+        if (suggestions.length >= 3) {
+          break;
+        }
+        suggestions.push(q);
+      }
+
+      if (!suggestions.length) {
+        suggestions.push("לבחור חלופה אחת ולבדוק אותה השבוע בהקשר דומה.");
+        suggestions.push("שאלת המשך: מה צעד קטן אחד שתוכל לבצע כבר היום?");
+      }
+
+      if (suggestions.length === 1) {
+        suggestions.push("שאלת המשך: מה יעזור לך לזהות מוקדם שהדפוס מתחיל?");
+      }
+
+      return suggestions.slice(0, 3);
+    }
+
+    function openSummary() {
+      els.summaryReflection.textContent = makeReflectionParagraph();
+
+      const unknownIds = buildUnknownSlotIds();
+      const unknownSet = new Set(unknownIds);
+
+      els.summaryKnown.innerHTML = "";
+      SLOT_CONFIG.forEach((slot) => {
+        if (unknownSet.has(slot.id)) {
+          return;
+        }
+        const li = document.createElement("li");
+        li.textContent = `${slot.title}: ${getPlacedAnswer(slot.id)}`;
+        els.summaryKnown.appendChild(li);
+      });
+
+      if (!els.summaryKnown.children.length) {
+        const li = document.createElement("li");
+        li.textContent = "עדיין אין מידע ודאי.";
+        els.summaryKnown.appendChild(li);
+      }
+
+      els.summaryUnknown.innerHTML = "";
+      if (!unknownIds.length) {
+        const li = document.createElement("li");
+        li.textContent = "אין כרגע פערי מידע.";
+        els.summaryUnknown.appendChild(li);
+      } else {
+        unknownIds.forEach((slotId) => {
+          const slot = SLOT_BY_ID[slotId];
+          const li = document.createElement("li");
+          li.textContent = `❔ ${slot.title}: אני לא יודע`;
+          els.summaryUnknown.appendChild(li);
+        });
+      }
+
+      const suggestions = buildRuleSuggestions(unknownIds);
+      els.summarySuggestions.innerHTML = "";
+      suggestions.forEach((text) => {
+        const li = document.createElement("li");
+        li.textContent = text;
+        els.summarySuggestions.appendChild(li);
+      });
+
+      els.summaryBackdrop.classList.add("open");
+    }
+
+    function closeSummary() {
+      els.summaryBackdrop.classList.remove("open");
+    }
+
+    function resetCaseState(targetCase) {
+      state.currentCase = targetCase;
+      state.askedSlotIds = new Set();
+      state.blocksById = {};
+      state.stagingBlockIds = [];
+      state.selectedBlockId = "";
+      state.placedBySlotId = {};
+      state.expandingEntries = [];
+      state.questionLog = [];
+      state.mistakes = 0;
+      state.wrongAttemptsByBlock = {};
+      state.lastAction = "";
+      state.injectedEntryId = "";
+      setFeedback("neutral", "בחר שאלה כדי ליצור בלוק תשובה.", "שלב הבא: גרור את הבלוק לסלוט הנכון או לחץ בלוק ואז סלוט במובייל.");
+      addLog("coach", `התחלנו תרגיל: ${targetCase.title}`);
+    }
+
+    function applyTrainerViewMode() {
+      const params = new URLSearchParams(window.location.search);
+      const viewMode = String(params.get("view") || "").trim().toLowerCase();
+      if (viewMode === "mobile" || viewMode === "m" || viewMode === "phone") {
+        document.body.classList.add("force-mobile-view");
+        document.body.classList.remove("force-desktop-view");
+      } else if (viewMode === "desktop" || viewMode === "d" || viewMode === "pc") {
+        document.body.classList.add("force-desktop-view");
+        document.body.classList.remove("force-mobile-view");
+      }
+    }
+
+    function updateTrainerBoardMode() {
+      const forceMobile = document.body.classList.contains("force-mobile-view");
+      const forceDesktop = document.body.classList.contains("force-desktop-view");
+      const useMobileBoard = forceMobile || (!forceDesktop && window.innerWidth <= 920);
+      document.body.classList.toggle("mobile-board", useMobileBoard);
+    }
+
+    function startCase(index) {
+      const idx = Math.max(0, Math.min(CASES.length - 1, Number(index) || 0));
+      state.caseIndex = idx;
+      els.caseSelect.value = String(idx);
+      resetCaseState(CASES[idx]);
+      closeSummary();
+      renderAll();
+    }
+
+    function goToNextCase() {
+      const next = (state.caseIndex + 1) % CASES.length;
+      startCase(next);
+    }
+
+    function renderCaseSelector() {
+      els.caseSelect.innerHTML = "";
+      CASES.forEach((caseItem, idx) => {
+        const option = document.createElement("option");
+        option.value = String(idx);
+        option.textContent = `${idx + 1}. ${caseItem.title}`;
+        if (idx === state.caseIndex) {
+          option.selected = true;
+        }
+        els.caseSelect.appendChild(option);
+      });
+    }
+
+    function bindEvents() {
+      els.startBtn.addEventListener("click", () => startCase(els.caseSelect.value));
+      els.restartBtn.addEventListener("click", () => startCase(state.caseIndex));
+      els.nextCaseBtn.addEventListener("click", goToNextCase);
+
+      els.summaryBtn.addEventListener("click", () => {
+        if (isCompleted()) {
+          openSummary();
+        }
+      });
+
+      els.closeSummaryBtn.addEventListener("click", closeSummary);
+      els.summaryNextBtn.addEventListener("click", () => {
+        closeSummary();
+        goToNextCase();
+      });
+
+      els.summaryBackdrop.addEventListener("click", (event) => {
+        if (event.target === els.summaryBackdrop) {
+          closeSummary();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeSummary();
+        }
+      });
+    }
+
+    function init() {
+      applyTrainerViewMode();
+      updateTrainerBoardMode();
+      window.addEventListener("resize", () => {
+        updateTrainerBoardMode();
+      }, { passive: true });
+      renderCaseSelector();
+      bindEvents();
+      startCase(0);
+    }
+
+    init();
   </script>
 </body>
 </html>
