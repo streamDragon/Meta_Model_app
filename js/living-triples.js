@@ -143,6 +143,39 @@ function ltToStringArray(value) {
     return single ? [single] : [];
 }
 
+function ltLooksGarbledText(value) {
+    const text = String(value || '').trim();
+    if (!text) return false;
+    const questionMarks = (text.match(/\?/g) || []).length;
+    if (questionMarks < 3) return false;
+    const hebrewChars = (text.match(/[\u0590-\u05FF]/g) || []).length;
+    const latinChars = (text.match(/[A-Za-z]/g) || []).length;
+    const digits = (text.match(/\d/g) || []).length;
+    const noisyChars = questionMarks + digits;
+    return hebrewChars === 0
+        && latinChars === 0
+        && questionMarks >= Math.floor(text.length * 0.25)
+        && noisyChars >= Math.floor(text.length * 0.5);
+}
+
+function ltSafeText(value, fallback = '') {
+    const text = String(value || '').trim();
+    if (!text || ltLooksGarbledText(text)) {
+        return String(fallback || '').trim();
+    }
+    return text;
+}
+
+function ltSafeStringArray(values, fallbackValues = []) {
+    const cleaned = (Array.isArray(values) ? values : [])
+        .map(item => ltSafeText(item))
+        .filter(Boolean);
+    if (cleaned.length) return cleaned;
+    return (Array.isArray(fallbackValues) ? fallbackValues : [])
+        .map(item => String(item || '').trim())
+        .filter(Boolean);
+}
+
 function ltNormalizeFlow(flow, slotKey = 'slot') {
     if (!flow || typeof flow !== 'object') return null;
     const slotRaw = flow[slotKey] ?? flow.slot ?? flow.slot_index;
@@ -151,9 +184,9 @@ function ltNormalizeFlow(flow, slotKey = 'slot') {
     return {
         slot,
         finalUnknown: Boolean(flow.finalUnknown ?? flow.final_unknown ?? false),
-        followUpAnswer: String(flow.followUpAnswer ?? flow.follow_up_answer ?? '').trim(),
-        answer: String(flow.answer ?? '').trim(),
-        joinLead: String(flow.joinLead ?? flow.join_lead ?? '').trim(),
+        followUpAnswer: ltSafeText(flow.followUpAnswer ?? flow.follow_up_answer ?? ''),
+        answer: ltSafeText(flow.answer ?? ''),
+        joinLead: ltSafeText(flow.joinLead ?? flow.join_lead ?? ''),
         targetRowId: String(flow.targetRowId ?? flow.target_row_id ?? '').trim(),
         targetCategory: String(flow.targetCategory ?? flow.target_category ?? '').trim()
     };
@@ -204,7 +237,7 @@ function ltNormalizeCategoryId(value) {
     return aliases[compact] || compact;
 }
 
-function normalizeLivingTriplesScenario(rawScenario, index) {
+function normalizeLivingTriplesScenario(rawScenario, index, rows = []) {
     if (!rawScenario || typeof rawScenario !== 'object') return null;
 
     const scenarioId = String(rawScenario.scenarioId || rawScenario.scenario_id || `lt_scene_${index + 1}`).trim();
@@ -212,22 +245,50 @@ function normalizeLivingTriplesScenario(rawScenario, index) {
     const correctCategory = ltNormalizeCategoryId(rawScenario.correctCategory || rawScenario.correct_category || '');
     if (!rowId || !correctCategory) return null;
 
-    const title = String(rawScenario.title || rawScenario.scenario_title || `Scenario ${index + 1}`).trim();
-    const text = ltToStringArray(rawScenario.text || rawScenario.client_text);
-    const highlights = ltToStringArray(rawScenario.highlights);
-    const revealAnswers = Array.isArray(rawScenario.revealAnswers || rawScenario.reveal_answers)
-        ? (rawScenario.revealAnswers || rawScenario.reveal_answers).map(item => {
-            if (Array.isArray(item)) return item.map(v => String(v || '').trim()).filter(Boolean);
-            return String(item || '').trim();
-        })
+    const rowRef = (Array.isArray(rows) ? rows : []).find(row => row.id === rowId) || null;
+    const rowLabel = String(rowRef?.label || rowId).trim();
+    const categoryLabel = String(rowRef?.categories?.find(item => item.id === correctCategory)?.label || correctCategory).trim();
+
+    const title = ltSafeText(rawScenario.title || rawScenario.scenario_title || '', `Living Triples • ${rowLabel}`);
+    const text = ltSafeStringArray(
+        ltToStringArray(rawScenario.text || rawScenario.client_text),
+        [
+            `תרגול ${rowLabel}: זהו/י קודם את הקטגוריה המדויקת (${categoryLabel}), ואז המשיכו ל-Reveal ולאתגור.`,
+            'אם נוסח הסצנה נשמר פגום בדאטה, המערכת משתמשת בנוסח fallback כדי לאפשר אימון רציף.'
+        ]
+    );
+    const highlights = ltSafeStringArray(ltToStringArray(rawScenario.highlights), [rowLabel, categoryLabel]);
+
+    const rawRevealAnswers = Array.isArray(rawScenario.revealAnswers || rawScenario.reveal_answers)
+        ? (rawScenario.revealAnswers || rawScenario.reveal_answers)
         : [];
-    const anchors = Array.isArray(rawScenario.anchors) ? rawScenario.anchors.map(v => String(v || '').trim()) : [];
-    const challengeOptions = Array.isArray(rawScenario.challengeOptions || rawScenario.challenge_options)
-        ? (rawScenario.challengeOptions || rawScenario.challenge_options).map(v => String(v || '').trim())
-        : [];
-    const challengeReplies = Array.isArray(rawScenario.challengeReplies || rawScenario.challenge_replies)
-        ? (rawScenario.challengeReplies || rawScenario.challenge_replies).map(v => String(v || '').trim())
-        : [];
+    const revealAnswers = [0, 1, 2].map((slotIndex) => {
+        const item = rawRevealAnswers[slotIndex];
+        if (Array.isArray(item)) {
+            const nested = item.map(v => ltSafeText(v)).filter(Boolean);
+            return nested.length ? nested : `תשובת Reveal קונקרטית לרכיב ${slotIndex + 1}.`;
+        }
+        return ltSafeText(item, `תשובת Reveal קונקרטית לרכיב ${slotIndex + 1}.`);
+    });
+
+    const anchors = ltSafeStringArray(
+        Array.isArray(rawScenario.anchors) ? rawScenario.anchors.map(v => String(v || '').trim()) : [],
+        Array.isArray(rowRef?.revealQuestions) ? rowRef.revealQuestions : []
+    );
+    const challengeOptions = ltSafeStringArray(
+        Array.isArray(rawScenario.challengeOptions || rawScenario.challenge_options)
+            ? (rawScenario.challengeOptions || rawScenario.challenge_options).map(v => String(v || '').trim())
+            : [],
+        Array.isArray(rowRef?.challenges) ? rowRef.challenges : []
+    );
+    const challengeReplies = ltSafeStringArray(
+        Array.isArray(rawScenario.challengeReplies || rawScenario.challenge_replies)
+            ? (rawScenario.challengeReplies || rawScenario.challenge_replies).map(v => String(v || '').trim())
+            : [],
+        (Array.isArray(rowRef?.categories) ? rowRef.categories : []).map(category =>
+            `תגובה סימולטיבית: המטופל/ת מגיב/ה סביב ${String(category?.label || 'הרכיב שנבחר').trim()}.`
+        )
+    );
 
     const unknownFlow = ltNormalizeFlow(rawScenario.unknownFlow || rawScenario.unknown_flow, 'slot');
     const deviationFlow = ltNormalizeFlow(rawScenario.deviationFlow || rawScenario.deviation_flow, 'slot');
@@ -244,14 +305,35 @@ function normalizeLivingTriplesScenario(rawScenario, index) {
         revealAnswers,
         challengeOptions,
         challengeReplies,
-        reflectionTemplate: String(rawScenario.reflectionTemplate || rawScenario.reflection_template || '').trim(),
+        reflectionTemplate: ltSafeText(
+            rawScenario.reflectionTemplate || rawScenario.reflection_template || '',
+            String(rowRef?.reflectionTemplate || '').trim()
+        ),
         fillRules: rawScenario.fillRules || rawScenario.fill_rules || null,
-        directionQuestion: String(rawScenario.directionQuestion || rawScenario.direction_question || '').trim(),
-        clientGoal: String(rawScenario.clientGoal || rawScenario.client_goal || '').trim(),
-        hypnoticIntervention: String(rawScenario.hypnoticIntervention || rawScenario.hypnotic_intervention || '').trim(),
-        rememberNote: String(rawScenario.rememberNote || rawScenario.remember_note || rawScenario.apply_note || '').trim(),
-        futurePacePrompt: String(rawScenario.futurePacePrompt || rawScenario.future_pace_prompt || '').trim(),
-        futurePaceExample: String(rawScenario.futurePaceExample || rawScenario.future_pace_example || '').trim(),
+        directionQuestion: ltSafeText(
+            rawScenario.directionQuestion || rawScenario.direction_question || '',
+            'מה הכיוון הטיפולי הבא שנשאר נאמן לפריזמה שנחשפה?'
+        ),
+        clientGoal: ltSafeText(
+            rawScenario.clientGoal || rawScenario.client_goal || '',
+            'מטרה זמנית: לדייק את המפה הלשונית לפני מעבר לאתגור רחב יותר.'
+        ),
+        hypnoticIntervention: ltSafeText(
+            rawScenario.hypnoticIntervention || rawScenario.hypnotic_intervention || '',
+            'שמרו על קצב איטי, שאלת עוגן אחת בכל פעם, ואתגור שנשאר בתוך אותה שורה.'
+        ),
+        rememberNote: ltSafeText(
+            rawScenario.rememberNote || rawScenario.remember_note || rawScenario.apply_note || '',
+            'זכרו: Reveal מלא לפני Challenge.'
+        ),
+        futurePacePrompt: ltSafeText(
+            rawScenario.futurePacePrompt || rawScenario.future_pace_prompt || '',
+            'בפעם הבאה שזה יופיע, מה הסימן המוקדם? מה צעד קטן אחד? ומה מדד הצלחה?'
+        ),
+        futurePaceExample: ltSafeText(
+            rawScenario.futurePaceExample || rawScenario.future_pace_example || '',
+            'דוגמה: אשאל שאלה אחת מתוך אותה פריזמה לפני שאנסה לפרש.'
+        ),
         unknownFlow,
         deviationFlow
     };
@@ -299,7 +381,7 @@ async function loadLivingTriplesData() {
             })).filter(row => row.id)
             : [];
         const scenarios = Array.isArray(payload?.scenarios)
-            ? payload.scenarios.map(normalizeLivingTriplesScenario).filter(Boolean)
+            ? payload.scenarios.map((scenario, index) => normalizeLivingTriplesScenario(scenario, index, rows)).filter(Boolean)
             : [];
         if (!rows.length || !scenarios.length) throw new Error('living triples payload missing rows/scenarios');
 

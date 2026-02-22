@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Living Triples - Meta Model Trainer</title>
+  <script>
+    (function () {
+      var v = String(Date.now());
+      function withV(path) {
+        try {
+          var u = new URL(path, location.href);
+          u.searchParams.set('v', v);
+          return u.toString();
+        } catch (e) {
+          return path + (path.indexOf('?') === -1 ? '?' : '&') + 'v=' + encodeURIComponent(v);
+        }
+      }
+      function addCss(path) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = withV(path);
+        document.head.appendChild(link);
+      }
+      function addScript(path, cb) {
+        var s = document.createElement('script');
+        s.src = withV(path);
+        s.onload = function () { if (cb) cb(); };
+        document.head.appendChild(s);
+      }
+      function boot() {
+        if (window.__livingTriplesBooted) return;
+        if (!document.getElementById('living-triples')) return;
+        if (typeof window.setupLivingTriplesModule !== 'function') return;
+        window.__livingTriplesBooted = true;
+        window.setupLivingTriplesModule();
+      }
+      document.addEventListener('DOMContentLoaded', boot);
+      addCss('css/style.css');
+      addScript('js/living-triples.js', boot);
+    })();
+  </script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Living Triples</h1>
+      <p>אימון "קטגוריה -> Reveal -> שיקוף -> אתגור" לפי שלשות מייקל ברין.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a class="btn btn-secondary" href="index.html?tab=practice-triples-radar">חזרה ל-Triples Radar באפליקציה</a>
+      </div>
+    </header>
+    <section id="living-triples" class="tab-content active practice-tab-content">
+      <div class="practice-container">
+        <div id="living-triples-root" class="card practice-intro-card living-triples-card">
+          <h2>Living Triples — Trainer (Beta)</h2>
+          <p class="subtitle">מודול עצמאי לתרגול Reveal ושמירה על אתגור בתוך אותה פריזמה.</p>
+
+          <div id="lt-screen-onboarding" class="lt-screen">
+            <div class="lt-onboarding-copy">
+              <p>בוחרים קטגוריה אחת, משלימים Reveal מלא לשורה, ואז עוברים לשיקוף ולאתגור תואם.</p>
+              <p>אם חלק מהדאטה נשמר עם קידוד פגום, המערכת מחליפה לשדות fallback כדי להמשיך אימון.</p>
+            </div>
+            <div class="lt-onboarding-actions">
+              <button id="lt-demo-btn" type="button" class="btn btn-secondary">Demo (20s)</button>
+              <button id="lt-start-btn" type="button" class="btn btn-primary">התחל אימון</button>
+            </div>
+            <p id="lt-demo-status" class="lt-demo-status" aria-live="polite"></p>
+          </div>
+
+          <div id="lt-screen-practice" class="lt-screen hidden">
+            <div class="lt-session-bar">
+              <p>סצנה <strong id="lt-scene-index">1</strong>/<strong id="lt-scene-total">25</strong></p>
+              <p>ניקוד סשן: <strong id="lt-session-score">0</strong></p>
+            </div>
+
+            <div class="lt-scenario-box">
+              <h3 id="lt-scenario-title">סצנה</h3>
+              <div id="lt-scenario-text" class="lt-scenario-text"></div>
+              <div id="lt-scenario-highlights" class="lt-scenario-highlights"></div>
+            </div>
+
+            <div class="lt-step-box">
+              <h4>1. בחירת קטגוריה</h4>
+              <p class="lt-step-sub">זהו/י את הקטגוריה המדויקת מתוך השלשה.</p>
+              <div id="lt-category-buttons" class="lt-category-buttons"></div>
+              <p id="lt-category-feedback" class="lt-inline-feedback" aria-live="polite"></p>
+            </div>
+
+            <div id="lt-row-box" class="lt-step-box hidden">
+              <h4 id="lt-row-title" class="lt-row-title"></h4>
+              <div id="lt-row-chips" class="lt-row-chips"></div>
+            </div>
+
+            <div id="lt-reveal-box" class="lt-step-box hidden">
+              <h4>2. Reveal</h4>
+              <p class="lt-step-sub">משלימים 3 רכיבים לפני מעבר לשיקוף.</p>
+              <div id="lt-reveal-cards" class="lt-reveal-cards"></div>
+              <p id="lt-reveal-status" class="lt-inline-feedback" aria-live="polite"></p>
+            </div>
+
+            <div id="lt-reflect-box" class="lt-step-box hidden">
+              <h4>3. שיקוף</h4>
+              <p id="lt-reflect-auto" class="lt-reflect-auto"></p>
+              <div class="lt-reflect-actions">
+                <button id="lt-use-auto-reflect-btn" type="button" class="btn btn-primary">השתמש/י בשיקוף האוטומטי</button>
+                <button id="lt-open-custom-reflect-btn" type="button" class="btn btn-secondary">כתוב/י שיקוף אישי</button>
+              </div>
+              <div id="lt-custom-reflect-wrap" class="lt-custom-reflect-wrap hidden">
+                <textarea id="lt-custom-reflect-input" rows="3" placeholder="שיקוף קצר שמחבר את שלושת הרכיבים שעלו."></textarea>
+                <button id="lt-save-custom-reflect-btn" type="button" class="btn btn-secondary">שמור שיקוף אישי</button>
+              </div>
+              <p id="lt-reflect-status" class="lt-inline-feedback" aria-live="polite"></p>
+            </div>
+
+            <div id="lt-challenge-box" class="lt-step-box hidden">
+              <h4>4. אתגור בתוך אותה פריזמה</h4>
+              <p class="lt-step-sub">בחרו רכיב יעד, ואז אתגור שתואם רק לו.</p>
+              <div id="lt-challenge-targets" class="lt-challenge-targets"></div>
+              <div id="lt-challenge-options" class="lt-challenge-options"></div>
+              <p id="lt-challenge-feedback" class="lt-inline-feedback" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <div id="lt-screen-wrap" class="lt-screen hidden">
+            <h3>סיכום סצנה</h3>
+            <p id="lt-wrap-score" class="lt-wrap-score"></p>
+            <ul id="lt-score-breakdown" class="lt-score-breakdown"></ul>
+            <p id="lt-wrap-learned" class="lt-wrap-learned"></p>
+
+            <div id="lt-direction-box" class="lt-direction-box hidden">
+              <h4>Direction / Next Direction</h4>
+              <p id="lt-direction-question" class="lt-direction-question"></p>
+              <p id="lt-client-goal" class="lt-client-goal"></p>
+              <p id="lt-hypnotic-intervention" class="lt-hypnotic-intervention"></p>
+              <p id="lt-remember-note" class="lt-remember-note"></p>
+            </div>
+
+            <div class="lt-future-pace">
+              <h4>Future Pace</h4>
+              <p id="lt-future-prompt" class="lt-future-prompt"></p>
+              <p id="lt-future-example" class="lt-future-example"></p>
+              <label for="lt-future-sign">סימן מוקדם</label>
+              <input id="lt-future-sign" type="text" placeholder="מה יאותת שזה מתחיל?">
+              <label for="lt-future-step">צעד קטן</label>
+              <input id="lt-future-step" type="text" placeholder="מה תשאל/י קודם?">
+              <label for="lt-future-metric">מדד הצלחה</label>
+              <input id="lt-future-metric" type="text" placeholder="איך תדע/י שזה עבד?">
+              <div class="lt-wrap-actions">
+                <button id="lt-save-future-btn" type="button" class="btn btn-secondary">שמור Future-Pace</button>
+                <button id="lt-next-scene-btn" type="button" class="btn btn-primary">לסצנה הבאה</button>
+                <button id="lt-back-onboarding-btn" type="button" class="btn btn-secondary">חזרה לפתיחה</button>
+              </div>
+              <p id="lt-future-summary" class="lt-future-summary" aria-live="polite"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

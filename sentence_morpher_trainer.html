@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Sentence Morpher - Meta Model Trainer</title>
+  <script>
+    (function () {
+      var v = String(Date.now());
+      function withV(path) {
+        try {
+          var u = new URL(path, location.href);
+          u.searchParams.set('v', v);
+          return u.toString();
+        } catch (e) {
+          return path + (path.indexOf('?') === -1 ? '?' : '&') + 'v=' + encodeURIComponent(v);
+        }
+      }
+      function addCss(path) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = withV(path);
+        document.head.appendChild(link);
+      }
+      function addScript(path, cb) {
+        var s = document.createElement('script');
+        s.src = withV(path);
+        s.onload = function () { if (cb) cb(); };
+        document.head.appendChild(s);
+      }
+      function boot() {
+        if (window.__sentenceMorpherBooted) return;
+        if (!document.getElementById('sentence-morpher-demo-root')) return;
+        if (typeof window.setupSentenceMorpherDemo !== 'function') return;
+        window.__sentenceMorpherBooted = true;
+        window.setupSentenceMorpherDemo();
+      }
+      document.addEventListener('DOMContentLoaded', boot);
+      addCss('css/style.css');
+      addScript('js/sentence-morpher-core.js', function () {
+        addScript('js/sentence-morpher.js', boot);
+      });
+    })();
+  </script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Sentence Morpher</h1>
+      <p>תרגול הזרקת כמתים וניסוחים למשפט בסיסי כדי להבין איך נוצרת הכללה והקשחה.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a class="btn btn-secondary" href="index.html?tab=practice-question">חזרה לאפליקציה הראשית</a>
+      </div>
+    </header>
+    <section class="tab-content active practice-tab-content">
+      <div class="practice-container">
+        <div class="card practice-intro-card">
+          <h2>Sentence Morpher — Quantifier Injection Lab</h2>
+          <p class="subtitle">בוחרים צ'יפים לאורך צירים שונים ורואים בזמן אמת איך המשפט משתנה.</p>
+          <section class="practice-section practice-section-sentence-morpher" aria-label="Sentence Morpher">
+            <div class="practice-section-header">
+              <h3>מעבדת שינוי ניסוח</h3>
+              <p>המטרה: לראות איך "תמיד/אף פעם/לא משנה" משנים את המפה הלשונית ואת החוויה.</p>
+            </div>
+            <div id="sentence-morpher-demo-root" class="sentence-morpher-root" aria-live="polite"></div>
+            <div class="sentence-morpher-cta-row">
+              <button id="sentence-morpher-cta-btn" type="button" class="btn sentence-morpher-cta-btn">שמור ניסוח נוכחי</button>
+              <p id="sentence-morpher-cta-feedback" class="sentence-morpher-cta-feedback hidden" data-tone="info"></p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
