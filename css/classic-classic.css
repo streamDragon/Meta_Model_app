@@ -410,6 +410,60 @@ body {
   line-height: 1.35;
 }
 
+.cc-task-compass {
+  border-radius: 14px;
+  border: 1px solid #dbe7f5;
+  background: #fff;
+  padding: 10px;
+  display: grid;
+  gap: 10px;
+}
+
+.cc-task-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.cc-task-head strong {
+  color: #163b6a;
+}
+
+.cc-task-head span {
+  color: #315a8b;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.cc-task-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cc-task-card {
+  border-radius: 12px;
+  border: 1px solid #dbe7f5;
+  background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+  padding: 10px;
+  display: grid;
+  gap: 5px;
+}
+
+.cc-task-label {
+  color: #365b87;
+  font-weight: 800;
+  font-size: 0.78rem;
+}
+
+.cc-task-text {
+  color: #334155;
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
 .cc-stage-head {
   display: grid;
   gap: 6px;
@@ -784,6 +838,10 @@ body {
 
   .cc-flow-steps {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .cc-task-grid {
+    grid-template-columns: 1fr;
   }
 }
 
