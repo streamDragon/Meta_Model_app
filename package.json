@@ -21,6 +21,7 @@
     "test:prism-research": "node --test scripts/prism-research-core.test.cjs",
     "test:ui-wiring": "node scripts/test-ui-wiring.mjs",
     "test:mobile": "node scripts/test-mobile-layout.mjs",
+    "check:live": "node scripts/check-live-version.mjs",
     "test:all": "npm run sync:entry && npm run test:ui-wiring && npm run test:hebrew && npm run test:morpher && npm run test:triples-radar && npm run test:classic-classic && npm run test:wr2w && npm run test:prism-research && npm run test:mobile && npm run build:web",
     "preview": "vite preview",
     "cap:sync": "npx cap sync",
