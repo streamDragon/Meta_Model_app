@@ -952,7 +952,12 @@ function initializeMetaModelApp() {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeMetaModelApp, { once: true });
 } else {
-    initializeMetaModelApp();
+    // Defer init until after the rest of this file finishes evaluating.
+    if (typeof queueMicrotask === 'function') {
+        queueMicrotask(initializeMetaModelApp);
+    } else {
+        setTimeout(initializeMetaModelApp, 0);
+    }
 }
 
 // Load Meta Model data from JSON
