@@ -75,6 +75,81 @@
         return '';
     }
 
+    function operationProfileForFamily(family) {
+        const key = String(family || '').toLowerCase();
+        if (key === 'deletion') {
+            return {
+                code: 'RECOVER',
+                title: 'שחזור מידע',
+                desc: 'מחזירים פרטים חסרים כדי להפוך את המפה לספציפית וברת-פעולה.'
+            };
+        }
+        if (key === 'distortion') {
+            return {
+                code: 'CHECK / CHALLENGE',
+                title: 'בדיקת קשר/משמעות',
+                desc: 'בודקים ראיות, קריטריון או מנגנון לפני שמקבלים משמעות/סיבתיות.'
+            };
+        }
+        if (key === 'generalization') {
+            return {
+                code: 'SCOPE / EXCEPTIONS',
+                title: 'תיחום וחיפוש חריגים',
+                desc: 'מוצאים תנאים, חריגים ומקור-כלל כדי להחזיר גמישות ובחירה.'
+            };
+        }
+        return {
+            code: 'META',
+            title: 'דיוק מטא-מודלי',
+            desc: 'שואלים כדי להחזיר מידע חסר ולבדוק הנחות.'
+        };
+    }
+
+    function dataTargetLabel(key) {
+        const value = String(key || '').trim();
+        const map = {
+            actors: 'שחקנים / מי מעורב',
+            'alternative-meaning': 'משמעות חלופית',
+            alternatives: 'חלופות אפשריות',
+            assumption: 'הנחה סמויה',
+            behavior: 'התנהגות נצפית',
+            choice: 'נקודות בחירה',
+            'compare-to': 'לעומת מה משווים',
+            conditions: 'תנאים',
+            consequence: 'תוצאה / מה יקרה אם',
+            counterexamples: 'דוגמאות נגד / חריגים',
+            criteria: 'קריטריונים',
+            criterion: 'קריטריון',
+            evidence: 'ראיות',
+            'evidence-base': 'בסיס ראיות',
+            exceptions: 'יוצאי דופן',
+            frame: 'מסגרת / הקשר',
+            frequency: 'תדירות',
+            group: 'קבוצה ספציפית',
+            judge: 'מי שופט / מקור הערכה',
+            meaning: 'משמעות',
+            'meaning-rule': 'כלל המשמעות (איך X=Y)',
+            mechanism: 'מנגנון',
+            mediation: 'מה קורה באמצע (תיווך)',
+            metric: 'מדד',
+            'observable-cues': 'רמזים נצפים',
+            premise: 'הנחת יסוד',
+            process: 'תהליך',
+            referent: 'רפרנט / למה בדיוק הכוונה',
+            resources: 'משאבים',
+            'rule-source': 'מקור הכלל',
+            scope: 'היקף / תיחום',
+            sequence: 'רצף / סדר',
+            'specific-person': 'אדם מסוים',
+            standard: 'סטנדרט',
+            steps: 'צעדים',
+            what: 'מה בדיוק',
+            when: 'מתי',
+            who: 'מי'
+        };
+        return map[value] || value;
+    }
+
     function formatTime(seconds) {
         const value = Math.max(0, Math.floor(Number(seconds) || 0));
         const mm = String(Math.floor(value / 60)).padStart(2, '0');
@@ -320,8 +395,8 @@
           <header class="cc-panel cc-header">
             <div class="cc-header-row">
               <div class="cc-brand">
-                <h1>Classic Classic · Meta Model Trainer</h1>
-                <p>מבוסס טבלת Breen (MVP עם DEL / DIS / GEN) · RTL Drill</p>
+                <h1>Classic Classic · מאמן מטא-מודל</h1>
+                <p>מבוסס טבלת Breen (MVP עם DEL / DIS / GEN) · תרגול RTL</p>
               </div>
               <div class="cc-mode-toggle" role="tablist" aria-label="בחירת מצב">
                 <button type="button" class="cc-mode-btn ${state.mode === 'learning' ? 'is-active' : ''}" data-cc-action="mode-learning">למידה</button>
@@ -365,7 +440,7 @@
         const copy = state.copy || {};
 
         return `
-          <aside class="cc-panel cc-side" aria-label="Breen Table Panel">
+          <aside class="cc-panel cc-side" aria-label="פאנל טבלת ברין">
             <div>
               <h2>טבלת Breen (MVP)</h2>
               <p class="cc-sub">הטבלה נשארת קבועה על המסך. כל סבב מדליק תא אחד.</p>
@@ -434,6 +509,7 @@
     function renderStageCard(round) {
         const stage = round.stage;
         const copy = getStageCopy(round);
+        const operation = operationProfileForFamily(round.pattern?.family);
         const canUseHint = state.mode === 'learning'
             && stage !== 'summary'
             && !state.session.ended
@@ -453,26 +529,31 @@
                 </div>
                 <div class="cc-summary-grid">
                   <div class="cc-summary-block">
-                    <h4>Pattern</h4>
+                    <h4>תבנית</h4>
                     <p><strong>${escapeHtml(round.pattern.name)}</strong></p>
                     <p>${escapeHtml(round.pattern.definition || '')}</p>
                   </div>
                   <div class="cc-summary-block">
-                    <h4>Two correct questions</h4>
+                    <h4>שתי שאלות מתאימות</h4>
                     <ul>
                       ${roundCorrectQuestionTexts.map((text) => `<li>${escapeHtml(text)}</li>`).join('')}
                     </ul>
                   </div>
                   <div class="cc-summary-block">
-                    <h4>Problem</h4>
+                    <h4>הבעיה במפה</h4>
                     <p>${escapeHtml(round.pattern.problem?.oneLiner || '')}</p>
                   </div>
                   <div class="cc-summary-block">
-                    <h4>Goal / Data target</h4>
+                    <h4>המטרה / יעד מידע</h4>
                     <p>${escapeHtml(round.pattern.goal?.oneLiner || '')}</p>
                     <ul>
-                      ${(round.pattern.goal?.dataTargets || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                      ${(round.pattern.goal?.dataTargets || []).map((item) => `<li>${escapeHtml(dataTargetLabel(item))}</li>`).join('')}
                     </ul>
+                  </div>
+                  <div class="cc-summary-block">
+                    <h4>פעולה קלאסית (Structure of Magic)</h4>
+                    <p><strong>${escapeHtml(operation.code)}</strong> · ${escapeHtml(operation.title)}</p>
+                    <p>${escapeHtml(operation.desc)}</p>
                   </div>
                 </div>
                 <div class="cc-inline-actions">
@@ -496,9 +577,10 @@
               <div class="cc-pattern-family">${escapeHtml(familyLabel(round.pattern.family))}</div>
               <div class="cc-pattern-name">${escapeHtml(round.pattern.name)}</div>
               <div class="cc-pattern-definition">${escapeHtml(round.pattern.definition || '')}</div>
+              <div class="cc-pattern-definition"><strong>פעולה:</strong> ${escapeHtml(operation.title)}</div>
             </div>
 
-            <div class="cc-examples" aria-label="examples">
+            <div class="cc-examples" aria-label="דוגמאות">
               ${examples.map((example) => `<div class="cc-example-chip">${escapeHtml(example)}</div>`).join('')}
             </div>
 
@@ -521,9 +603,9 @@
         const patternMap = getPatternMap();
         const copy = state.copy || {};
         return `
-          <section class="cc-stage-card cc-report" aria-label="End session report">
+          <section class="cc-stage-card cc-report" aria-label="דוח סיום סשן">
             <div class="cc-stage-head">
-              <span class="cc-stage-kicker">End Session Report</span>
+              <span class="cc-stage-kicker">דוח סיום</span>
               <h3>דו"ח סשן</h3>
               <p>${escapeHtml(state.mode === 'learning' ? (copy.learningMode || '') : (copy.examMode || ''))}</p>
             </div>
@@ -535,10 +617,10 @@
             </div>
 
             <div class="cc-summary-block">
-              <h4>Per-family accuracy</h4>
+              <h4>דיוק לפי משפחה</h4>
               <table class="cc-table">
                 <thead>
-                  <tr><th>Family</th><th>Accuracy</th><th>Correct</th><th>Wrong</th></tr>
+                  <tr><th>משפחה</th><th>דיוק</th><th>נכון</th><th>שגוי</th></tr>
                 </thead>
                 <tbody>
                   ${(report.perFamily || []).map((row) => `
@@ -554,7 +636,7 @@
             </div>
 
             <div class="cc-summary-block">
-              <h4>Weak patterns</h4>
+              <h4>תבניות חלשות</h4>
               ${(report.weakPatterns || []).length ? `
                 <ul class="cc-bullet-list">
                   ${(report.weakPatterns || []).map((row) => {
@@ -567,7 +649,7 @@
 
             ${state.mode === 'learning' ? `
               <div class="cc-summary-block">
-                <h4>Review tips</h4>
+                <h4>טיפים לחזרה</h4>
                 <ul class="cc-bullet-list">
                   <li>${escapeHtml(copy.problemDefinition || '')}</li>
                   <li>${escapeHtml(copy.goalDefinition || '')}</li>
@@ -594,11 +676,11 @@
         const stageCard = session.ended ? renderReport() : renderStageCard(round);
 
         return `
-          <main class="cc-panel cc-main" aria-label="Game panel">
+          <main class="cc-panel cc-main" aria-label="לוח משחק">
             ${!session.ended && round ? `
               <div class="cc-help-box">
-                <strong>Problem</strong> · ${escapeHtml(state.copy?.problemDefinition || '')}<br>
-                <strong>Goal</strong> · ${escapeHtml(state.copy?.goalDefinition || '')}
+                <strong>הבעיה</strong> · ${escapeHtml(state.copy?.problemDefinition || '')}<br>
+                <strong>המטרה</strong> · ${escapeHtml(state.copy?.goalDefinition || '')}
               </div>
             ` : ''}
             ${stageCard}
