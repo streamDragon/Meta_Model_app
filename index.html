@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.19" data-build-time="1771809219027">
+<html lang="he" dir="rtl" data-app-version="1.0.19" data-build-time="1771811490141">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,6 +21,90 @@
             var assetVersion = declaredVersion || 'dev';
             var buildTime = declaredBuildTime || 'dev';
             var appPathPrefix = window.location.pathname.replace(/[^/]*$/, '');
+
+            function normalizeToken(value) {
+                return String(value == null ? '' : value).trim();
+            }
+
+            function buildIframeRefreshUrl(versionValue, buildTimeValue) {
+                var nextUrl = new URL(window.location.href);
+                var normalizedVersion = normalizeToken(versionValue);
+                var normalizedBuildTime = normalizeToken(buildTimeValue);
+
+                if (normalizedVersion) {
+                    nextUrl.searchParams.set('v', normalizedVersion);
+                } else {
+                    nextUrl.searchParams.delete('v');
+                }
+
+                if (normalizedBuildTime) {
+                    nextUrl.searchParams.set('t', normalizedBuildTime);
+                } else {
+                    nextUrl.searchParams.delete('t');
+                }
+
+                return nextUrl;
+            }
+
+            function replaceLocationIfNeeded(versionValue, buildTimeValue) {
+                try {
+                    var targetUrl = buildIframeRefreshUrl(versionValue, buildTimeValue).toString();
+                    if (targetUrl === window.location.href) {
+                        return false;
+                    }
+                    window.location.replace(targetUrl);
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            }
+
+            function maybeRefreshEmbeddedFrameFromManifest() {
+                var isEmbedded = false;
+                try {
+                    isEmbedded = window.self !== window.top;
+                } catch (error) {
+                    isEmbedded = true;
+                }
+
+                if (!isEmbedded || !window.fetch) {
+                    return;
+                }
+
+                var currentUrl;
+                try {
+                    currentUrl = new URL(window.location.href);
+                } catch (error) {
+                    return;
+                }
+
+                var currentVersionParam = normalizeToken(currentUrl.searchParams.get('v'));
+                var currentBuildTimeParam = normalizeToken(currentUrl.searchParams.get('t'));
+                var probeNonce = String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+                var manifestProbeUrl = 'version.json?_gscb=' + encodeURIComponent(probeNonce);
+
+                window.fetch(manifestProbeUrl, { cache: 'no-store' }).then(function (response) {
+                    if (!response || !response.ok) {
+                        throw new Error('version manifest fetch failed');
+                    }
+                    return response.json();
+                }).then(function (manifest) {
+                    var latestVersion = normalizeToken(manifest && manifest.version);
+                    var latestBuildTime = normalizeToken(manifest && manifest.buildTime);
+                    if (!latestVersion && !latestBuildTime) {
+                        return;
+                    }
+
+                    if (currentVersionParam !== latestVersion || currentBuildTimeParam !== latestBuildTime) {
+                        replaceLocationIfNeeded(latestVersion || declaredVersion, latestBuildTime || declaredBuildTime);
+                    }
+                }).catch(function () {
+                    // Fallback: at least move from a bare URL to a signed URL once.
+                    if (!currentVersionParam && !currentBuildTimeParam) {
+                        replaceLocationIfNeeded(declaredVersion, declaredBuildTime);
+                    }
+                });
+            }
 
             function withAssetVersion(path) {
                 try {
@@ -45,6 +129,8 @@
             window.__APP_ASSET_VERSION__ = assetVersion;
             window.__BUILD_TIME__ = buildTime;
             window.__withAssetVersion = withAssetVersion;
+
+            maybeRefreshEmbeddedFrameFromManifest();
 
             window.addEventListener('DOMContentLoaded', function () {
                 var hrefNodes = document.querySelectorAll('[data-versioned-href]');

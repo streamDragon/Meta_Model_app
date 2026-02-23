@@ -6,6 +6,7 @@ const ROOT = process.cwd();
 const INDEX_HTML_PATH = path.join(ROOT, 'index.html');
 const INDEX2_HTML_PATH = path.join(ROOT, 'index2.html');
 const PACKAGE_JSON_PATH = path.join(ROOT, 'package.json');
+const VERSION_MANIFEST_PATH = path.join(ROOT, 'version.json');
 
 const INDEX2_REDIRECT_HTML = `<!DOCTYPE html>
 <html lang="he" dir="rtl">
@@ -29,9 +30,9 @@ const INDEX2_REDIRECT_HTML = `<!DOCTYPE html>
 </html>
 `;
 
-function syncHtmlVersion(html, version) {
+function syncHtmlVersion(html, version, buildTime) {
     const normalizedVersion = String(version || '').trim() || 'dev';
-    const timestamp = Date.now();
+    const timestamp = String(buildTime || Date.now());
     return html.replace(/<html\b([^>]*)>/i, (fullMatch, attrs) => {
         let nextAttrs = String(attrs || '');
         
@@ -53,19 +54,44 @@ function syncHtmlVersion(html, version) {
     });
 }
 
+function buildVersionManifest(version, buildTime) {
+    const normalizedVersion = String(version || '').trim() || 'dev';
+    const normalizedBuildTime = String(buildTime || Date.now());
+    return `${JSON.stringify({
+        version: normalizedVersion,
+        buildTime: normalizedBuildTime
+    }, null, 2)}\n`;
+}
+
 async function run() {
     const pkgRaw = await readFile(PACKAGE_JSON_PATH, 'utf8');
     const pkg = JSON.parse(pkgRaw);
     const version = String(pkg?.version || '').trim();
     if (!version) throw new Error('package.json version is missing');
+    const buildTime = Date.now();
 
     const indexHtml = await readFile(INDEX_HTML_PATH, 'utf8');
-    const nextIndexHtml = syncHtmlVersion(indexHtml, version);
+    const nextIndexHtml = syncHtmlVersion(indexHtml, version, buildTime);
     if (nextIndexHtml !== indexHtml) {
         await writeFile(INDEX_HTML_PATH, nextIndexHtml, 'utf8');
         console.log(`Synced index.html data-app-version to ${version}`);
     } else {
         console.log(`index.html data-app-version already ${version}`);
+    }
+
+    const nextVersionManifest = buildVersionManifest(version, buildTime);
+    let currentVersionManifest = '';
+    try {
+        currentVersionManifest = await readFile(VERSION_MANIFEST_PATH, 'utf8');
+    } catch (error) {
+        currentVersionManifest = '';
+    }
+
+    if (currentVersionManifest !== nextVersionManifest) {
+        await writeFile(VERSION_MANIFEST_PATH, nextVersionManifest, 'utf8');
+        console.log(`Wrote version.json manifest for ${version}`);
+    } else {
+        console.log(`version.json manifest already synced (${version})`);
     }
 
     let currentIndex2 = '';

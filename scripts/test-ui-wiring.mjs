@@ -21,10 +21,11 @@ function unique(values) {
 }
 
 try {
-    const [html, appJs, pkg] = await Promise.all([
+    const [html, appJs, pkg, versionManifest] = await Promise.all([
         readText('index.html'),
         readText('js/app.js'),
-        readJson('package.json')
+        readJson('package.json'),
+        readJson('version.json')
     ]);
 
     const tabIds = unique(collectMatches(
@@ -68,6 +69,8 @@ try {
     const htmlBuildTimeMatch = html.match(/\bdata-build-time="([^"]+)"/i);
     const htmlBuildTime = htmlBuildTimeMatch ? htmlBuildTimeMatch[1].trim() : '';
     const packageVersion = String(pkg?.version || '').trim();
+    const manifestVersion = String(versionManifest?.version || '').trim();
+    const manifestBuildTime = String(versionManifest?.buildTime || '').trim();
 
     const floatingVersionPlaceholder = (html.match(/<div\b[^>]*id="app-version-floating"[^>]*>([^<]*)<\/div>/i) || [null, ''])[1].trim();
     const chipVersionPlaceholder = (html.match(/<p\b[^>]*id="app-version-chip"[^>]*>([^<]*)<\/p>/i) || [null, ''])[1].trim();
@@ -90,8 +93,16 @@ try {
     if (!packageVersion) failures.push('package.json version is missing');
     if (!htmlVersion) failures.push('index.html data-app-version is missing');
     if (!htmlBuildTime) failures.push('index.html data-build-time is missing');
+    if (!manifestVersion) failures.push('version.json version is missing');
+    if (!manifestBuildTime) failures.push('version.json buildTime is missing');
     if (packageVersion && htmlVersion && packageVersion !== htmlVersion) {
         failures.push(`index.html data-app-version (${htmlVersion}) does not match package.json version (${packageVersion})`);
+    }
+    if (packageVersion && manifestVersion && packageVersion !== manifestVersion) {
+        failures.push(`version.json version (${manifestVersion}) does not match package.json version (${packageVersion})`);
+    }
+    if (htmlBuildTime && manifestBuildTime && htmlBuildTime !== manifestBuildTime) {
+        failures.push(`version.json buildTime (${manifestBuildTime}) does not match index.html data-build-time (${htmlBuildTime})`);
     }
     if (!floatingVersionPlaceholder.includes(hebrewVersionWord)) {
         failures.push('Floating version placeholder is missing a clear "גרסה" label');
