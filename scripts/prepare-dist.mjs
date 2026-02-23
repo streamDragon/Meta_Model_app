@@ -11,6 +11,7 @@ const STATIC_FILES = [
   'verb_unzip_trainer.html',
   'classic_classic_trainer.html',
   'classic2_trainer.html',
+  'iceberg_templates_trainer.html',
   'prism_research_trainer.html',
   'sentence_morpher_trainer.html',
   'living_triples_trainer.html'
