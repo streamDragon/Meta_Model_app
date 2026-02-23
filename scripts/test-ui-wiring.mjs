@@ -65,6 +65,8 @@ try {
 
     const htmlVersionMatch = html.match(/\bdata-app-version="([^"]+)"/i);
     const htmlVersion = htmlVersionMatch ? htmlVersionMatch[1].trim() : '';
+    const htmlBuildTimeMatch = html.match(/\bdata-build-time="([^"]+)"/i);
+    const htmlBuildTime = htmlBuildTimeMatch ? htmlBuildTimeMatch[1].trim() : '';
     const packageVersion = String(pkg?.version || '').trim();
 
     const floatingVersionPlaceholder = (html.match(/<div\b[^>]*id="app-version-floating"[^>]*>([^<]*)<\/div>/i) || [null, ''])[1].trim();
@@ -87,6 +89,7 @@ try {
     if (missingScripts.length) failures.push(`Missing expected scriptQueue entries: ${missingScripts.join(', ')}`);
     if (!packageVersion) failures.push('package.json version is missing');
     if (!htmlVersion) failures.push('index.html data-app-version is missing');
+    if (!htmlBuildTime) failures.push('index.html data-build-time is missing');
     if (packageVersion && htmlVersion && packageVersion !== htmlVersion) {
         failures.push(`index.html data-app-version (${htmlVersion}) does not match package.json version (${packageVersion})`);
     }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.19">
+<html lang="he" dir="rtl" data-app-version="1.0.19" data-build-time="1771808505399">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,22 +10,27 @@
     <script>
         (function () {
             var declaredVersion = '';
+            var declaredBuildTime = '';
             try {
                 declaredVersion = (document.documentElement.getAttribute('data-app-version') || '').trim();
+                declaredBuildTime = (document.documentElement.getAttribute('data-build-time') || '').trim();
             } catch (error) {
                 declaredVersion = '';
+                declaredBuildTime = '';
             }
             var assetVersion = declaredVersion || 'dev';
+            var buildTime = declaredBuildTime || 'dev';
             var appPathPrefix = window.location.pathname.replace(/[^/]*$/, '');
 
             function withAssetVersion(path) {
                 try {
                     var url = new URL(path, window.location.href);
                     url.searchParams.set('v', assetVersion);
+                    url.searchParams.set('t', buildTime);
                     return url.toString();
                 } catch (error) {
                     var separator = path.indexOf('?') === -1 ? '?' : '&';
-                    return path + separator + 'v=' + encodeURIComponent(assetVersion);
+                    return path + separator + 'v=' + encodeURIComponent(assetVersion) + '&t=' + encodeURIComponent(buildTime);
                 }
             }
 
@@ -38,6 +43,7 @@
             }
 
             window.__APP_ASSET_VERSION__ = assetVersion;
+            window.__BUILD_TIME__ = buildTime;
             window.__withAssetVersion = withAssetVersion;
 
             window.addEventListener('DOMContentLoaded', function () {
@@ -77,6 +83,7 @@
                         }
 
                         url.searchParams.set('v', assetVersion);
+                        url.searchParams.set('t', buildTime);
 
                         var nextInit;
                         if (!init) {

@@ -31,13 +31,24 @@ const INDEX2_REDIRECT_HTML = `<!DOCTYPE html>
 
 function syncHtmlVersion(html, version) {
     const normalizedVersion = String(version || '').trim() || 'dev';
+    const timestamp = Date.now();
     return html.replace(/<html\b([^>]*)>/i, (fullMatch, attrs) => {
         let nextAttrs = String(attrs || '');
+        
+        // Update or add data-app-version
         if (/data-app-version\s*=\s*"[^"]*"/i.test(nextAttrs)) {
             nextAttrs = nextAttrs.replace(/data-app-version\s*=\s*"[^"]*"/i, `data-app-version="${normalizedVersion}"`);
         } else {
             nextAttrs = `${nextAttrs} data-app-version="${normalizedVersion}"`;
         }
+        
+        // Update or add data-build-time (timestamp for cache busting)
+        if (/data-build-time\s*=\s*"[^"]*"/i.test(nextAttrs)) {
+            nextAttrs = nextAttrs.replace(/data-build-time\s*=\s*"[^"]*"/i, `data-build-time="${timestamp}"`);
+        } else {
+            nextAttrs = `${nextAttrs} data-build-time="${timestamp}"`;
+        }
+        
         return `<html${nextAttrs}>`;
     });
 }
