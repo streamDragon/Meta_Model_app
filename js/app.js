@@ -822,8 +822,7 @@ function getShortBuildCommit() {
 
 function formatAppVersionDisplay(version) {
     const resolvedVersion = String(version || '').trim() || 'unknown';
-    const shortCommit = getShortBuildCommit();
-    return shortCommit ? `${resolvedVersion} (${shortCommit})` : resolvedVersion;
+    return resolvedVersion;
 }
 
 function buildAppVersionTitle(version) {

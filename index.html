@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.21" data-build-time="1771846942431" data-build-iso="2026-02-23T11:42:22.431Z" data-git-commit="8505699">
+<html lang="he" dir="rtl" data-app-version="1.0.21" data-build-time="1771848096820" data-build-iso="2026-02-23T12:01:36.820Z" data-git-commit="bdf3eb7">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -253,6 +253,64 @@
             <label for="mobile-tab-select">מעבר למסך</label>
             <select id="mobile-tab-select" class="mobile-tab-select" aria-label="מעבר בין מסכים"></select>
         </div>
+
+        <details class="feature-map-toggle" id="feature-map-toggle">
+            <summary class="feature-map-summary">
+                <span>🧭 מפת פיצ'רים / מה אפשר לשחק עכשיו</span>
+                <small>Toggle</small>
+            </summary>
+            <div class="feature-map-body">
+                <p class="feature-map-intro">
+                    אם משהו "נעלם" בטאב הנוכחי, בדוק כאן: יש מודולים פנימיים (בתוך הטאבים) ויש מודולים נפרדים (Standalone).
+                </p>
+
+                <div class="feature-map-grid">
+                    <section class="feature-map-card">
+                        <h4>Classic / Structure of Magic</h4>
+                        <div class="feature-map-links">
+                            <a class="btn btn-secondary" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html" target="_blank" rel="noopener">Classic 1 · Classic Classic</a>
+                            <a class="btn btn-secondary" href="classic2_trainer.html" data-versioned-href="classic2_trainer.html" target="_blank" rel="noopener">Classic 2 · Structure of Magic</a>
+                            <a class="btn btn-secondary" href="iceberg_templates_trainer.html" data-versioned-href="iceberg_templates_trainer.html" target="_blank" rel="noopener">קצה קרחון / שלדי עומק</a>
+                        </div>
+                        <p class="feature-map-note">כולם עמודים נפרדים (Standalone) עם cache-busting.</p>
+                    </section>
+
+                    <section class="feature-map-card">
+                        <h4>Prisms (שתי פריזמות שונות)</h4>
+                        <div class="feature-map-links">
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('prismlab')">Prism Lab · רמות לוגיות</button>
+                            <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html" target="_blank" rel="noopener">Prism Research Mode · Text Research</a>
+                        </div>
+                        <p class="feature-map-note">Prism Lab = רמות לוגיות. Prism Research = מחקר טקסט + AFAQ.</p>
+                    </section>
+
+                    <section class="feature-map-card">
+                        <h4>עם טבלאות ברין</h4>
+                        <div class="feature-map-links">
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-triples-radar')">Triples Radar (Breen)</button>
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('categories')">קטגוריות (עם ברין)</button>
+                            <a class="btn btn-secondary" href="living_triples_trainer.html" data-versioned-href="living_triples_trainer.html" target="_blank" rel="noopener">Living Triples</a>
+                        </div>
+                        <p class="feature-map-note">אם לא רואים טבלת ברין, בדוק שאתה במסלול "עם ברין".</p>
+                    </section>
+
+                    <section class="feature-map-card">
+                        <h4>כלי תרגול נוספים</h4>
+                        <div class="feature-map-links">
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול שאלות</button>
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">Meta Radar</button>
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">SQHCEL Wizard</button>
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">Blueprint Builder</button>
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">Comic Engine</button>
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('scenario-trainer')">Scenario Trainer</button>
+                            <a class="btn btn-secondary" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html" target="_blank" rel="noopener">Unzip Trainer</a>
+                            <a class="btn btn-secondary" href="sentence_morpher_trainer.html" data-versioned-href="sentence_morpher_trainer.html" target="_blank" rel="noopener">Sentence Morpher</a>
+                        </div>
+                        <p class="feature-map-note">מופיע בכל המסכים, גם במובייל וגם בדסקטופ.</p>
+                    </section>
+                </div>
+            </div>
+        </details>
 
         <section id="global-comic-strip" class="global-comic-strip hidden" aria-label="Comic strip preview">
             <div class="global-comic-strip-inner">

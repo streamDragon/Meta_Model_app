@@ -52,7 +52,12 @@ try {
 
     mustContain('viewport sizing setup function', js, /function\s+setupMobileViewportSizing\s*\(/);
     mustContain('viewport css var update in js', js, /setProperty\('--app-dvh',\s*`\$\{height\}px`\)/);
-    mustContain('viewport sizing called on load', js, /DOMContentLoaded[\s\S]*setupMobileViewportSizing\(\)/);
+    mustContain('viewport sizing called inside app init', js, /initializeMetaModelApp[\s\S]*setupMobileViewportSizing\(\)/);
+    mustContain(
+        'app init wired for dynamic script load path',
+        js,
+        /document\.addEventListener\('DOMContentLoaded',\s*initializeMetaModelApp[\s\S]*queueMicrotask\(initializeMetaModelApp\)|document\.addEventListener\('DOMContentLoaded',\s*initializeMetaModelApp[\s\S]*setTimeout\(initializeMetaModelApp,\s*0\)/,
+    );
 
     console.log(`PASS: mobile fullscreen and viewport rules verified (${htmlPath}).`);
 } catch (error) {
