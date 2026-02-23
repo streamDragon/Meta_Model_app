@@ -22,6 +22,8 @@
         hintUsedByStage: { question: false, problem: false, goal: false },
         lastSelectedOptionId: '',
         lastSelectedWasCorrect: null,
+        familyFocus: 'all',
+        showPhilosopher: false,
         paused: false,
         timerHandle: null,
         renderNonce: 0
@@ -57,6 +59,28 @@
             map.set(pattern.id, pattern);
         });
         return map;
+    }
+
+    function normalizeFamilyFocus(family) {
+        const value = String(family || '').trim().toLowerCase();
+        if (value === 'deletion' || value === 'distortion' || value === 'generalization') return value;
+        return 'all';
+    }
+
+    function getPatternsForCurrentFocus() {
+        const allPatterns = Array.isArray(state.data?.patterns) ? state.data.patterns : [];
+        const focus = normalizeFamilyFocus(state.familyFocus);
+        if (focus === 'all') return allPatterns;
+        const filtered = allPatterns.filter((pattern) => String(pattern?.family || '').toLowerCase() === focus);
+        return filtered.length ? filtered : allPatterns;
+    }
+
+    function familyFocusLabel(family) {
+        const key = normalizeFamilyFocus(family);
+        if (key === 'deletion') return 'DEL / מחיקות';
+        if (key === 'distortion') return 'DIS / עיוותים';
+        if (key === 'generalization') return 'GEN / הכללות';
+        return 'כל המשפחות';
     }
 
     function familyLabel(family) {
@@ -172,8 +196,9 @@
 
     function createSession(seedSuffix) {
         const seed = `classic-classic:${state.mode}:${Date.now()}:${seedSuffix || 0}`;
+        const patterns = getPatternsForCurrentFocus();
         state.session = engine.createSessionState({
-            patterns: state.data.patterns,
+            patterns,
             mode: state.mode,
             seed,
             config: configApi.GAME_CONFIG
@@ -324,6 +349,31 @@
         render();
     }
 
+    function setFamilyFocus(family) {
+        const normalized = normalizeFamilyFocus(family);
+        const nextFocus = normalized === state.familyFocus ? 'all' : normalized;
+        state.familyFocus = nextFocus;
+        if (state.loaded && state.data) {
+            createSession(`focus:${nextFocus}`);
+            state.feedback = {
+                tone: 'info',
+                text: nextFocus === 'all'
+                    ? 'פוקוס משפחה בוטל. ממשיכים עם כל התבניות.'
+                    : `פוקוס תרגול: ${familyFocusLabel(nextFocus)}. נפתח סשן חדש לפי המשפחה שנבחרה.`
+            };
+        }
+        render();
+    }
+
+    function togglePhilosopher(forceValue) {
+        if (typeof forceValue === 'boolean') {
+            state.showPhilosopher = forceValue;
+        } else {
+            state.showPhilosopher = !state.showPhilosopher;
+        }
+        render();
+    }
+
     function handleAction(action) {
         if (!action) return;
         if (action === 'mode-learning') return setMode('learning');
@@ -333,6 +383,8 @@
         if (action === 'use-hint') return useHint();
         if (action === 'next-round') return startNewRound();
         if (action === 'end-session') return endSession('manual');
+        if (action === 'toggle-philosopher') return togglePhilosopher();
+        if (action === 'close-philosopher') return togglePhilosopher(false);
     }
 
     function getStageCopy(round) {
