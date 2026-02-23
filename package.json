@@ -1,6 +1,6 @@
 {
   "name": "meta_model_app",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "׳›׳׳™ ׳׳™׳ ׳˜׳¨׳ ׳˜ ׳׳™׳ ׳˜׳¨׳׳§׳˜׳™׳‘׳™ ׳׳×׳¨׳’׳•׳ ׳˜׳›׳ ׳™׳§׳•׳× **Meta Model** ׳©׳ NLP (Neuro-Linguistic Programming) ׳¢׳ ׳₪׳™ Richard Bandler ׳•-John Grinder.",
   "main": "index.js",
   "directories": {
@@ -8,10 +8,11 @@
   },
   "scripts": {
     "sync:entry": "node scripts/sync-entry.mjs",
+    "build:classic2": "node scripts/build-classic2.mjs",
     "dev": "vite",
-    "prebuild:web": "npm run sync:entry",
+    "prebuild:web": "npm run sync:entry && npm run build:classic2",
     "build:web": "vite build",
-    "prebuild": "npm run sync:entry",
+    "prebuild": "npm run sync:entry && npm run build:classic2",
     "build": "vite build && node scripts/prepare-dist.mjs",
     "test:hebrew": "node --test scripts/hebrew-sanitize.test.cjs",
     "test:morpher": "node --test scripts/sentence-morpher-core.test.cjs",

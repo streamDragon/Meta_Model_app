@@ -3,127 +3,185 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Classic 2 - Structure of Magic Trainer</title>
   <style>
+    html, body { margin: 0; padding: 0; }
     body {
-      margin: 0;
-      font-family: "Assistant", "Heebo", "Segoe UI", sans-serif;
+      font-family: "Assistant", "Heebo", "Noto Sans Hebrew", "Segoe UI", sans-serif;
       background: radial-gradient(circle at 10% 10%, #dbeafe, #f8fafc 45%, #ecfeff);
       color: #0f172a;
-      padding: 18px;
-      line-height: 1.45;
-    }
-    .shell {
-      max-width: 980px;
-      margin: 0 auto;
-      background: #ffffffee;
-      border: 1px solid #dbe7f5;
-      border-radius: 18px;
-      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
-      padding: 18px;
-    }
-    h1 { margin: 0; font-size: 1.35rem; }
-    .sub { margin: 8px 0 0; color: #475569; }
-    blockquote {
-      margin: 12px 0;
-      padding: 10px 12px;
-      border-inline-start: 4px solid #3b82f6;
-      background: #eff6ff;
-      border-radius: 10px;
-      color: #1e3a8a;
-      font-weight: 700;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
-    }
-    .card {
-      border: 1px solid #dbe7f5;
-      border-radius: 14px;
-      background: #fff;
+      min-height: 100vh;
       padding: 12px;
     }
-    .card h2 {
-      margin: 0 0 8px;
-      font-size: 1rem;
+    #classic2-root {
+      max-width: 1240px;
+      margin: 0 auto;
     }
-    code {
-      direction: ltr;
-      unicode-bidi: plaintext;
-      background: #f1f5f9;
-      border-radius: 8px;
-      padding: 2px 6px;
-      font-weight: 700;
+    .c2-loading-shell {
+      max-width: 920px;
+      margin: 16px auto;
+      border: 1px solid #dbe7f5;
+      background: rgba(255,255,255,0.9);
+      border-radius: 18px;
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.07);
+      padding: 18px;
     }
-    ul { margin: 0; padding-inline-start: 20px; }
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      text-decoration: none;
-      border-radius: 12px;
-      padding: 10px 12px;
+    .c2-loading-title {
+      font-size: 1.1rem;
       font-weight: 800;
-      border: 1px solid #bfdbfe;
+      margin: 0 0 8px;
+    }
+    .c2-loading-text {
+      margin: 0;
+      color: #475569;
+      line-height: 1.45;
+    }
+    .c2-loading-meta {
+      margin-top: 8px;
       color: #1d4ed8;
-      background: #eff6ff;
+      font-weight: 700;
+      font-size: 0.86rem;
     }
-    .btn.secondary {
-      border-color: #cbd5e1;
-      color: #334155;
-      background: #fff;
-    }
-    @media (max-width: 760px) {
-      body { padding: 10px; }
-      .shell { padding: 14px; }
-      .grid { grid-template-columns: 1fr; }
+    .c2-error {
+      border-color: #fecaca;
+      background: #fff1f2;
+      color: #991b1b;
     }
   </style>
+  <script>
+    (function () {
+      var root = window;
+      var pageBuildMeta = { version: '', buildTime: '', buildIso: '', gitCommit: '' };
+
+      function normalizeToken(v) {
+        return String(v == null ? '' : v).trim();
+      }
+
+      function updateLoading(message, extra, isError) {
+        var mount = document.getElementById('classic2-root');
+        if (!mount) return;
+        mount.innerHTML = [
+          '<div class="c2-loading-shell' + (isError ? ' c2-error' : '') + '">',
+          '<p class="c2-loading-title">' + (isError ? 'שגיאה בטעינת Classic 2' : 'טוען Classic 2...') + '</p>',
+          '<p class="c2-loading-text">' + (message || '') + '</p>',
+          extra ? '<div class="c2-loading-meta">' + extra + '</div>' : '',
+          '</div>'
+        ].join('');
+      }
+
+      function currentUrl() {
+        try { return new URL(window.location.href); } catch (e) { return null; }
+      }
+
+      function buildSignedUrl(versionValue, buildTimeValue) {
+        var url = currentUrl();
+        if (!url) return null;
+        var version = normalizeToken(versionValue);
+        var buildTime = normalizeToken(buildTimeValue);
+        if (version) url.searchParams.set('v', version);
+        if (buildTime) url.searchParams.set('t', buildTime);
+        return url;
+      }
+
+      function maybeRefreshEmbeddedFrameFromManifest(manifest) {
+        var isEmbedded = false;
+        try { isEmbedded = window.self !== window.top; } catch (e) { isEmbedded = true; }
+        if (!isEmbedded) return;
+        var url = currentUrl();
+        if (!url) return;
+
+        var currentV = normalizeToken(url.searchParams.get('v'));
+        var currentT = normalizeToken(url.searchParams.get('t'));
+        var latestV = normalizeToken(manifest && manifest.version);
+        var latestT = normalizeToken(manifest && manifest.buildTime);
+        if (!latestV && !latestT) return;
+        if (currentV === latestV && currentT === latestT) return;
+
+        var target = buildSignedUrl(latestV, latestT);
+        if (target && target.toString() !== window.location.href) {
+          window.location.replace(target.toString());
+        }
+      }
+
+      function withBuildQuery(path) {
+        var raw = String(path || '');
+        var version = normalizeToken(pageBuildMeta.version);
+        var buildTime = normalizeToken(pageBuildMeta.buildTime);
+        try {
+          var u = new URL(raw, window.location.href);
+          if (version) u.searchParams.set('v', version);
+          if (buildTime) u.searchParams.set('t', buildTime);
+          return u.toString();
+        } catch (e) {
+          var sep = raw.indexOf('?') === -1 ? '?' : '&';
+          var qs = [];
+          if (version) qs.push('v=' + encodeURIComponent(version));
+          if (buildTime) qs.push('t=' + encodeURIComponent(buildTime));
+          return raw + (qs.length ? sep + qs.join('&') : '');
+        }
+      }
+
+      function fetchManifest() {
+        var nonce = Date.now() + '-' + Math.random().toString(36).slice(2);
+        return fetch('version.json?_classic2=' + encodeURIComponent(nonce), { cache: 'no-store' })
+          .then(function (res) { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+          .then(function (manifest) {
+            pageBuildMeta = {
+              version: normalizeToken(manifest && manifest.version),
+              buildTime: normalizeToken(manifest && manifest.buildTime),
+              buildIso: normalizeToken(manifest && manifest.buildIso),
+              gitCommit: normalizeToken(manifest && manifest.gitCommit)
+            };
+            root.__CLASSIC2_BUILD_META__ = pageBuildMeta;
+            maybeRefreshEmbeddedFrameFromManifest(manifest);
+            return manifest;
+          })
+          .catch(function () {
+            return null;
+          });
+      }
+
+      function loadBundle() {
+        var extra = [];
+        if (pageBuildMeta.version) extra.push('v' + pageBuildMeta.version);
+        if (pageBuildMeta.gitCommit) extra.push(pageBuildMeta.gitCommit.slice(0, 7));
+        if (pageBuildMeta.buildIso) extra.push(pageBuildMeta.buildIso);
+        updateLoading(
+          'מכין את מסך האימון של Structure of Magic (Classic 2) עם בחירת קטגוריה, סיפור-tiles ולולאה רקורסיבית.',
+          extra.join(' · '),
+          false
+        );
+
+        var script = document.createElement('script');
+        script.src = withBuildQuery('js/classic2-trainer.bundle.js');
+        script.defer = true;
+        script.onerror = function () {
+          updateLoading('לא ניתן לטעון את classic2-trainer.bundle.js', 'בדוק build/push', true);
+          console.error('[Classic2] Failed to load bundle');
+        };
+        document.head.appendChild(script);
+      }
+
+      function start() {
+        fetchManifest().finally(loadBundle);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', start, { once: true });
+      } else {
+        start();
+      }
+    })();
+  </script>
 </head>
 <body>
-  <div class="shell">
-    <h1>Classic 2 · Structure of Magic (Overview)</h1>
-    <p class="sub">
-      זהו עמוד גשר לפיצ'ר החדש. מימוש React + TypeScript המלא מוכן כקומפוננטה לשילוב בפרויקט React.
-    </p>
-
-    <blockquote>
-      This is not full therapy. This is a next-step engine: identify one violation, ask a precision question, update the surface structure toward deep structure, and propose the next step.
-    </blockquote>
-
-    <div class="grid">
-      <div class="card">
-        <h2>מה כבר מוכן</h2>
-        <ul>
-          <li>מפרט מלא של Classic 2 (story tiles + state machine + loop)</li>
-          <li>קומפוננטת React/TypeScript: <code>src/components/Classic2Trainer.tsx</code></li>
-          <li>חלוקת פיצ'רים ב-Hub הראשי: עם/בלי טבלת ברין</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h2>מה הפיצ'ר עושה</h2>
-        <ul>
-          <li>בחירת קטגוריה מטבלת ברין</li>
-          <li>סימון קטע נכון מתוך סיפור (tiles)</li>
-          <li>בחירת שאלת Meta Model מדויקת</li>
-          <li>Recursive Loop + Next Step Action</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="actions">
-      <a class="btn" href="classic_classic_trainer.html">פתיחת Classic 1</a>
-      <a class="btn secondary" href="index.html">חזרה לאפליקציה הראשית</a>
+  <div id="classic2-root">
+    <div class="c2-loading-shell">
+      <p class="c2-loading-title">טוען Classic 2...</p>
+      <p class="c2-loading-text">מכין את מנוע האימון.</p>
     </div>
   </div>
 </body>
