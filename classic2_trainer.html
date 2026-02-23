@@ -20,6 +20,44 @@
       max-width: 1240px;
       margin: 0 auto;
     }
+    .c2-page-nav {
+      max-width: 1240px;
+      margin: 0 auto 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .c2-page-nav-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .c2-page-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid #bfdbfe;
+      background: #ffffff;
+      color: #1d4ed8;
+      border-radius: 12px;
+      padding: 9px 12px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
+    }
+    .c2-page-btn:hover {
+      background: #eff6ff;
+      border-color: #93c5fd;
+    }
+    .c2-page-meta {
+      color: #475569;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
     .c2-loading-shell {
       max-width: 920px;
       margin: 16px auto;
@@ -155,6 +193,18 @@
           false
         );
 
+        var homeLink = document.getElementById('c2-back-home');
+        if (homeLink) {
+          homeLink.setAttribute('href', withBuildQuery('index.html'));
+        }
+        var metaEl = document.getElementById('c2-page-meta');
+        if (metaEl) {
+          var bits = [];
+          if (pageBuildMeta.version) bits.push('גרסה ' + pageBuildMeta.version);
+          if (pageBuildMeta.gitCommit) bits.push('build ' + pageBuildMeta.gitCommit.slice(0, 7));
+          metaEl.textContent = bits.join(' · ');
+        }
+
         var script = document.createElement('script');
         script.src = withBuildQuery('js/classic2-trainer.bundle.js');
         script.defer = true;
@@ -178,6 +228,13 @@
   </script>
 </head>
 <body>
+  <div class="c2-page-nav" aria-label="ניווט עמוד Classic 2">
+    <div class="c2-page-nav-group">
+      <a id="c2-back-home" class="c2-page-btn" href="index.html">⬅ חזרה לדף הראשי</a>
+      <a class="c2-page-btn" href="classic_classic_trainer.html">🏛️ Classic 1</a>
+    </div>
+    <div id="c2-page-meta" class="c2-page-meta" aria-live="polite"></div>
+  </div>
   <div id="classic2-root">
     <div class="c2-loading-shell">
       <p class="c2-loading-title">טוען Classic 2...</p>
