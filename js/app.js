@@ -900,9 +900,17 @@ function setupFeatureLauncherTabs() {
     });
 }
 
-// Load data on page load
-document.addEventListener('DOMContentLoaded', () => {
-    setupAppVersionChip();
+let hasInitializedApp = false;
+
+function initializeMetaModelApp() {
+    if (hasInitializedApp) return;
+    hasInitializedApp = true;
+
+    Promise.resolve(setupAppVersionChip()).catch((error) => {
+        console.error('Failed to resolve or render app version:', error);
+        applyAppVersion('לא ידוע');
+    });
+
     setupFeatureLauncherTabs();
     setupMobileViewportSizing();
     applyEmbeddedCompactMode();
@@ -937,7 +945,15 @@ document.addEventListener('DOMContentLoaded', () => {
     setupCommunityFeedbackWall();
     initializeProgressHub();
     renderGlobalComicStrip(getActiveTabName());
-});
+}
+
+// Scripts are injected dynamically from index.html, so DOMContentLoaded may have
+// already fired by the time this file executes (especially on cached loads).
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeMetaModelApp, { once: true });
+} else {
+    initializeMetaModelApp();
+}
 
 // Load Meta Model data from JSON
 async function loadMetaModelData() {
