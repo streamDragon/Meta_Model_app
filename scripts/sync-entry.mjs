@@ -1,4 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -30,36 +31,58 @@ const INDEX2_REDIRECT_HTML = `<!DOCTYPE html>
 </html>
 `;
 
-function syncHtmlVersion(html, version, buildTime) {
+function setHtmlAttr(attrs, attrName, value) {
+    const escapedName = String(attrName || '').trim();
+    const nextValue = String(value == null ? '' : value);
+    const pattern = new RegExp(`${escapedName}\\s*=\\s*"[^"]*"`, 'i');
+    if (pattern.test(attrs)) {
+        return attrs.replace(pattern, `${escapedName}="${nextValue}"`);
+    }
+    return `${attrs} ${escapedName}="${nextValue}"`;
+}
+
+function getGitCommitShort() {
+    try {
+        const result = spawnSync('git', ['rev-parse', '--short', 'HEAD'], {
+            cwd: ROOT,
+            encoding: 'utf8',
+            shell: process.platform === 'win32'
+        });
+        if (result.status !== 0) return 'unknown';
+        const hash = String(result.stdout || '').trim();
+        return hash || 'unknown';
+    } catch (error) {
+        return 'unknown';
+    }
+}
+
+function syncHtmlVersion(html, version, buildTime, buildIso, gitCommit) {
     const normalizedVersion = String(version || '').trim() || 'dev';
     const timestamp = String(buildTime || Date.now());
+    const iso = String(buildIso || new Date(Number(buildTime) || Date.now()).toISOString());
+    const commit = String(gitCommit || '').trim() || 'unknown';
     return html.replace(/<html\b([^>]*)>/i, (fullMatch, attrs) => {
         let nextAttrs = String(attrs || '');
-        
-        // Update or add data-app-version
-        if (/data-app-version\s*=\s*"[^"]*"/i.test(nextAttrs)) {
-            nextAttrs = nextAttrs.replace(/data-app-version\s*=\s*"[^"]*"/i, `data-app-version="${normalizedVersion}"`);
-        } else {
-            nextAttrs = `${nextAttrs} data-app-version="${normalizedVersion}"`;
-        }
-        
-        // Update or add data-build-time (timestamp for cache busting)
-        if (/data-build-time\s*=\s*"[^"]*"/i.test(nextAttrs)) {
-            nextAttrs = nextAttrs.replace(/data-build-time\s*=\s*"[^"]*"/i, `data-build-time="${timestamp}"`);
-        } else {
-            nextAttrs = `${nextAttrs} data-build-time="${timestamp}"`;
-        }
-        
+
+        nextAttrs = setHtmlAttr(nextAttrs, 'data-app-version', normalizedVersion);
+        nextAttrs = setHtmlAttr(nextAttrs, 'data-build-time', timestamp);
+        nextAttrs = setHtmlAttr(nextAttrs, 'data-build-iso', iso);
+        nextAttrs = setHtmlAttr(nextAttrs, 'data-git-commit', commit);
+
         return `<html${nextAttrs}>`;
     });
 }
 
-function buildVersionManifest(version, buildTime) {
+function buildVersionManifest(version, buildTime, buildIso, gitCommit) {
     const normalizedVersion = String(version || '').trim() || 'dev';
     const normalizedBuildTime = String(buildTime || Date.now());
+    const normalizedBuildIso = String(buildIso || new Date(Number(buildTime) || Date.now()).toISOString());
+    const normalizedGitCommit = String(gitCommit || '').trim() || 'unknown';
     return `${JSON.stringify({
         version: normalizedVersion,
-        buildTime: normalizedBuildTime
+        buildTime: normalizedBuildTime,
+        buildIso: normalizedBuildIso,
+        gitCommit: normalizedGitCommit
     }, null, 2)}\n`;
 }
 
@@ -69,9 +92,11 @@ async function run() {
     const version = String(pkg?.version || '').trim();
     if (!version) throw new Error('package.json version is missing');
     const buildTime = Date.now();
+    const buildIso = new Date(buildTime).toISOString();
+    const gitCommit = getGitCommitShort();
 
     const indexHtml = await readFile(INDEX_HTML_PATH, 'utf8');
-    const nextIndexHtml = syncHtmlVersion(indexHtml, version, buildTime);
+    const nextIndexHtml = syncHtmlVersion(indexHtml, version, buildTime, buildIso, gitCommit);
     if (nextIndexHtml !== indexHtml) {
         await writeFile(INDEX_HTML_PATH, nextIndexHtml, 'utf8');
         console.log(`Synced index.html data-app-version to ${version}`);
@@ -79,7 +104,7 @@ async function run() {
         console.log(`index.html data-app-version already ${version}`);
     }
 
-    const nextVersionManifest = buildVersionManifest(version, buildTime);
+    const nextVersionManifest = buildVersionManifest(version, buildTime, buildIso, gitCommit);
     let currentVersionManifest = '';
     try {
         currentVersionManifest = await readFile(VERSION_MANIFEST_PATH, 'utf8');
@@ -89,7 +114,7 @@ async function run() {
 
     if (currentVersionManifest !== nextVersionManifest) {
         await writeFile(VERSION_MANIFEST_PATH, nextVersionManifest, 'utf8');
-        console.log(`Wrote version.json manifest for ${version}`);
+        console.log(`Wrote version.json manifest for ${version} (${gitCommit})`);
     } else {
         console.log(`version.json manifest already synced (${version})`);
     }

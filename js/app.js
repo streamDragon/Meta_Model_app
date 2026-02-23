@@ -801,6 +801,41 @@ function getVersionFromHtmlAttribute() {
     }
 }
 
+function getBuildMetaFromHtmlAttributes() {
+    try {
+        const rootEl = document.documentElement;
+        if (!rootEl) return {};
+        const buildTime = (rootEl.getAttribute('data-build-time') || '').trim();
+        const buildIso = (rootEl.getAttribute('data-build-iso') || '').trim();
+        const gitCommit = (rootEl.getAttribute('data-git-commit') || '').trim();
+        return { buildTime, buildIso, gitCommit };
+    } catch (error) {
+        return {};
+    }
+}
+
+function getShortBuildCommit() {
+    const gitCommit = String(getBuildMetaFromHtmlAttributes().gitCommit || '').trim();
+    if (!gitCommit || gitCommit === 'unknown') return '';
+    return gitCommit.slice(0, 7);
+}
+
+function formatAppVersionDisplay(version) {
+    const resolvedVersion = String(version || '').trim() || 'unknown';
+    const shortCommit = getShortBuildCommit();
+    return shortCommit ? `${resolvedVersion} (${shortCommit})` : resolvedVersion;
+}
+
+function buildAppVersionTitle(version) {
+    const resolvedVersion = String(version || '').trim() || 'unknown';
+    const meta = getBuildMetaFromHtmlAttributes();
+    const parts = [`v${resolvedVersion}`];
+    if (meta.gitCommit) parts.push(`commit ${meta.gitCommit}`);
+    if (meta.buildIso) parts.push(`build ${meta.buildIso}`);
+    else if (meta.buildTime) parts.push(`buildTime ${meta.buildTime}`);
+    return parts.join(' | ');
+}
+
 async function resolveAppVersion() {
     // 1. Try to get version from HTML data-app-version attribute (most reliable for static hosting)
     const htmlVersion = getVersionFromHtmlAttribute();
@@ -830,23 +865,43 @@ const APP_VERSION_FLOATING_LABEL = '\u05d2\u05e8\u05e1\u05d4 \u05e4\u05e2\u05d9\
 
 function applyAppVersion(version) {
     const resolvedVersion = String(version || '').trim() || 'unknown';
+    const visibleVersion = formatAppVersionDisplay(resolvedVersion);
+    const versionTitle = buildAppVersionTitle(resolvedVersion);
     const chip = document.getElementById('app-version-chip');
     if (chip) {
-        chip.textContent = `${APP_VERSION_CHIP_LABEL}: ${resolvedVersion}`;
+        chip.textContent = `${APP_VERSION_CHIP_LABEL}: ${visibleVersion}`;
         chip.dataset.version = resolvedVersion;
-        chip.setAttribute('title', `Build ${resolvedVersion}`);
+        chip.dataset.buildCommit = getShortBuildCommit();
+        chip.setAttribute('title', versionTitle);
     }
 
     const floating = document.getElementById('app-version-floating');
     if (floating) {
-        floating.textContent = `${APP_VERSION_FLOATING_LABEL}: ${resolvedVersion}`;
+        floating.textContent = `${APP_VERSION_FLOATING_LABEL}: ${visibleVersion}`;
         floating.dataset.version = resolvedVersion;
-        floating.setAttribute('title', `Build ${resolvedVersion}`);
+        floating.dataset.buildCommit = getShortBuildCommit();
+        floating.setAttribute('title', versionTitle);
     }
 
     if (typeof document.title === 'string' && document.title) {
         const baseTitle = document.title.replace(/\s+\[v[^\]]+\]$/i, '');
-        document.title = `${baseTitle} [v${resolvedVersion}]`;
+        document.title = `${baseTitle} [v${visibleVersion}]`;
+    }
+
+    if (!window.__APP_VERSION_LOGGED__) {
+        window.__APP_VERSION_LOGGED__ = true;
+        try {
+            const meta = getBuildMetaFromHtmlAttributes();
+            console.info('[Meta Model] Active build', {
+                version: resolvedVersion,
+                visibleVersion,
+                gitCommit: meta.gitCommit || '',
+                buildIso: meta.buildIso || '',
+                buildTime: meta.buildTime || ''
+            });
+        } catch (error) {
+            // ignore
+        }
     }
 }
 
