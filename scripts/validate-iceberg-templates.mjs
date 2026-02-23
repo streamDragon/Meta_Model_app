@@ -19,10 +19,16 @@ function isObject(value) {
   return !!value && typeof value === 'object' && !Array.isArray(value);
 }
 
+function assertNoPlaceholderQuestionMarks(value, ctx) {
+  if (typeof value !== 'string') return;
+  ensure(!/\?{3,}/.test(value), `${ctx}: suspicious placeholder question-marks (possible encoding/content corruption)`);
+}
+
 function validateScenario(scenario, index) {
   const sid = String(scenario?.scenario_id || `#${index + 1}`);
   ensure(isObject(scenario), `Scenario ${sid}: must be an object`);
   ensure(typeof scenario.client_text === 'string' && scenario.client_text.length > 0, `Scenario ${sid}: client_text missing`);
+  assertNoPlaceholderQuestionMarks(scenario.client_text, `Scenario ${sid}: client_text`);
   ensure(Array.isArray(scenario.draggables) && scenario.draggables.length > 0, `Scenario ${sid}: draggables missing`);
   ensure(isObject(scenario.template_payloads), `Scenario ${sid}: template_payloads missing`);
 
@@ -33,6 +39,7 @@ function validateScenario(scenario, index) {
     ensure(!seenIds.has(did), `Scenario ${sid}: duplicate draggable id ${did}`);
     seenIds.add(did);
     ensure(typeof d.text === 'string' && d.text.length > 0, `Scenario ${sid}/${did}: text missing`);
+    assertNoPlaceholderQuestionMarks(d.text, `Scenario ${sid}/${did}: token text`);
     ensure(Number.isInteger(d.start) && Number.isInteger(d.end), `Scenario ${sid}/${did}: start/end must be integers`);
     ensure(d.start >= 0 && d.end > d.start, `Scenario ${sid}/${did}: invalid range [${d.start}, ${d.end}]`);
     const actual = scenario.client_text.slice(d.start, d.end);
@@ -48,6 +55,8 @@ function validateScenario(scenario, index) {
       ensure(isObject(payload), `Scenario ${sid}/${did}: payload missing for template ${t}`);
       ensure(typeof payload.question === 'string' && payload.question.length > 0, `Scenario ${sid}/${did}/${t}: question missing`);
       ensure(typeof payload.reflection_template === 'string' && payload.reflection_template.length > 0, `Scenario ${sid}/${did}/${t}: reflection_template missing`);
+      assertNoPlaceholderQuestionMarks(payload.question, `Scenario ${sid}/${did}/${t}: question`);
+      assertNoPlaceholderQuestionMarks(payload.reflection_template, `Scenario ${sid}/${did}/${t}: reflection`);
       ensure(Array.isArray(payload.sets) && payload.sets.length >= 2, `Scenario ${sid}/${did}/${t}: sets must include at least 2 variants`);
 
       const expectedSlots = SLOT_COUNTS[t];
@@ -57,6 +66,7 @@ function validateScenario(scenario, index) {
         ensure(set.length === expectedSlots, `Scenario ${sid}/${did}/${t}: set #${setIndex} length=${set.length} expected=${expectedSlots}`);
         set.forEach((value, valueIndex) => {
           ensure(typeof value === 'string' && value.trim().length > 0, `Scenario ${sid}/${did}/${t}: empty slot value at set #${setIndex}, slot #${valueIndex}`);
+          assertNoPlaceholderQuestionMarks(value, `Scenario ${sid}/${did}/${t}: slot value at set #${setIndex}, slot #${valueIndex}`);
         });
       });
     }
@@ -76,4 +86,3 @@ main().catch((error) => {
   console.error('FAIL validate-iceberg-templates:', error.message);
   process.exit(1);
 });
-
