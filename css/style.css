@@ -629,6 +629,12 @@ body.embed-mode .progress-hub {
     padding: 8px 10px;
 }
 
+/* User request: remove the top navigation row (desktop tabs + mobile selector). */
+body.hide-top-tabbar .tabs,
+body.hide-top-tabbar .mobile-tab-nav {
+    display: none !important;
+}
+
 .global-comic-strip {
     padding: 14px 20px;
     border-bottom: 1px solid #dbe6f5;
@@ -6946,6 +6952,95 @@ body.minimal-ui .wrinkle-self-list {
     box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
 }
 
+.lt-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.9fr);
+    gap: 14px;
+    align-items: start;
+}
+
+.lt-main-pane {
+    min-width: 0;
+}
+
+.lt-philosophy-panel {
+    position: sticky;
+    top: 14px;
+    border: 1px solid #cfe0f2;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+    padding: 12px;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+    display: grid;
+    gap: 10px;
+}
+
+.lt-philosophy-head h3 {
+    margin: 0;
+    color: #11395f;
+    font-size: 1rem;
+}
+
+.lt-philosophy-head p {
+    margin: 4px 0 0;
+    color: #486581;
+    line-height: 1.45;
+    font-size: 0.88rem;
+}
+
+.lt-philosophy-section {
+    border: 1px solid #dbe8f6;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 10px;
+}
+
+.lt-philosophy-section h4 {
+    margin: 0 0 6px;
+    color: #173f63;
+    font-size: 0.88rem;
+}
+
+.lt-philosophy-section p {
+    margin: 0;
+    color: #2b4f72;
+    line-height: 1.5;
+    font-size: 0.84rem;
+}
+
+.lt-philosophy-list {
+    margin: 0;
+    padding-right: 18px;
+    color: #2f4f6d;
+    font-size: 0.83rem;
+    line-height: 1.55;
+}
+
+.lt-philosophy-list li + li {
+    margin-top: 4px;
+}
+
+.lt-philosophy-focus {
+    border: 1px dashed #9fc1e8;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 9px 10px;
+}
+
+.lt-philosophy-focus strong {
+    display: block;
+    color: #13406b;
+    font-size: 0.82rem;
+    margin-bottom: 4px;
+}
+
+.lt-philosophy-focus p {
+    margin: 0;
+    color: #355a7c;
+    font-size: 0.81rem;
+    line-height: 1.45;
+}
+
 .lt-screen.hidden {
     display: none;
 }
@@ -7213,6 +7308,49 @@ body.minimal-ui .wrinkle-self-list {
     color: #1d3e5f;
 }
 
+.lt-reflect-structured {
+    margin: 0 0 10px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #d8e5f4;
+    background: #fbfdff;
+    display: grid;
+    gap: 7px;
+}
+
+.lt-reflect-line {
+    margin: 0;
+    color: #214667;
+    font-size: 0.87rem;
+    line-height: 1.45;
+}
+
+.lt-reflect-line strong {
+    color: #123a60;
+}
+
+.lt-reflect-ai-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.lt-reflect-ai-pill {
+    border: 1px solid #bfd5ea;
+    border-radius: 999px;
+    background: #f2f8ff;
+    color: #1e4a72;
+    padding: 4px 8px;
+    font-size: 0.78rem;
+}
+
+.lt-custom-reflect-caption {
+    margin: 0 0 8px;
+    color: #4a6480;
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
 .lt-reflect-actions,
 .lt-wrap-actions,
 .lt-challenge-targets,
@@ -7375,6 +7513,15 @@ body.minimal-ui .wrinkle-self-list {
 
     .lt-reveal-cards {
         grid-template-columns: 1fr;
+    }
+
+    .lt-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .lt-philosophy-panel {
+        position: static;
+        order: -1;
     }
 }
 

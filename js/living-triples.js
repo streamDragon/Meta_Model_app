@@ -1,6 +1,34 @@
 const LIVING_TRIPLES_STORAGE_KEY = 'living_triples_progress_v1';
 const LIVING_TRIPLES_DEVIATION_TOOLTIP = 'זו תשובה מעניינת, אבל היא לא בתוך הפריזמה הנוכחית.';
 
+const LIVING_TRIPLES_ROW_INTENT = Object.freeze({
+    row1: Object.freeze({
+        common: 'השלשה בודקת איך נבנית ודאות פנימית בלי בסיס בדיקה: סטנדרט, הנחה, וידיעת-מחשבה.',
+        impact: 'נוטה לייצר מתח, קריאת-כוונות, ושיפוט מהיר במקום בירור.',
+        goal: 'להחזיר את האדם מביטחון מדומיין לבדיקת מציאות עדינה.'
+    }),
+    row2: Object.freeze({
+        common: 'השלשה בונה חוק קשיח: תמיד/אסור/חייב + סיבתיות סגורה.',
+        impact: 'מייצרת חוסר אונים, קיבעון, ותחושה שאין מרחב פעולה.',
+        goal: 'לפתוח יוצאי דופן, דרגות ביניים, וחוליות חסרות בשרשרת.'
+    }),
+    row3: Object.freeze({
+        common: 'השלשה מדביקה משמעות: שם עצם עמום + זהות + חיבור כפוי בין אירועים.',
+        impact: 'החוויה נהיית "מי שאני" במקום תהליך שניתן לבדוק ולשנות.',
+        goal: 'להחזיר תהליך, הקשר, וקריטריון במקום זהות סגורה.'
+    }),
+    row4: Object.freeze({
+        common: 'השלשה מסדרת את ההקשר: ביחס למה, מתי/איפה, ועל מי בדיוק מדברים.',
+        impact: 'בלי הקשר מדויק האדם מרגיש שהבעיה "בכל מקום וכל הזמן".',
+        goal: 'לצמצם את המפה להקשר מדויק שאפשר לעבוד איתו.'
+    }),
+    row5: Object.freeze({
+        common: 'השלשה מקרקעת שפה: מה זה, איך יודעים, ומה קורה בפועל.',
+        impact: 'כשזה עמום מדי קשה לפעול; יש תחושת הצפה בלי צעד ברור.',
+        goal: 'לתרגם מילה/תחושה כללית לחוויה חושית ופעולה קונקרטית.'
+    })
+});
+
 let livingTriplesDataState = {
     rows: [],
     scenarios: [],
@@ -363,6 +391,148 @@ function getLivingTriplesReflectionTemplate() {
     return String(livingTriplesState.activeRow?.reflectionTemplate || '').trim();
 }
 
+function getLivingTriplesRowCategoryLabels(row = livingTriplesState.activeRow) {
+    return (Array.isArray(row?.categories) ? row.categories : [])
+        .map(category => String(category?.label || '').trim())
+        .filter(Boolean);
+}
+
+function getLivingTriplesSelectedCategoryLabel() {
+    const selectedId = ltNormalizeCategoryId(livingTriplesState.selectedCategory);
+    if (!selectedId || !livingTriplesState.activeRow) return '';
+    const found = (livingTriplesState.activeRow.categories || []).find(category => category.id === selectedId);
+    return String(found?.label || '').trim();
+}
+
+function getLivingTriplesRowDisplayLabel(row = livingTriplesState.activeRow) {
+    if (!row) return '';
+    const rowNumber = getLivingTriplesRowNumber(row.id) || '?';
+    return `Row ${rowNumber} - ${String(row.label || row.id).trim()}`;
+}
+
+function setLivingTriplesPhilosophyFocus(focusText = '', rowText = '') {
+    if (livingTriplesState.elements?.philosophyFocusText && focusText) {
+        livingTriplesState.elements.philosophyFocusText.textContent = focusText;
+    }
+    if (livingTriplesState.elements?.philosophyRowText && rowText) {
+        livingTriplesState.elements.philosophyRowText.textContent = rowText;
+    }
+}
+
+function buildLivingTriplesStructuredReflectionModel() {
+    const row = livingTriplesState.activeRow;
+    if (!row) return null;
+
+    const rowLabels = getLivingTriplesRowCategoryLabels(row);
+    const selectedCategoryLabel = getLivingTriplesSelectedCategoryLabel() || rowLabels[0] || '';
+    const rowIntent = LIVING_TRIPLES_ROW_INTENT[row.id] || {
+        common: 'השלשה הזו מאמנת זיהוי מבנה משותף בין שלושה דפוסים מאותה שכבה.',
+        impact: 'כששלושת הרכיבים עובדים יחד נוצרת תחושה שהחוויה "סגורה" ומוחלטת.',
+        goal: 'לזהות, לשקף, ולאתגר בלי לעבור לפריזמה אחרת.'
+    };
+    const revealLines = (livingTriplesState.revealSlots || []).map((slot, idx) => {
+        const label = rowLabels[idx] || `רכיב ${idx + 1}`;
+        if (slot?.status === 'unknown_final') return `${label}: חסר (Unknown אחרי Follow-up)`;
+        return `${label}: ${String(slot?.answer || '—').trim()}`;
+    });
+    const unknownCount = (livingTriplesState.revealSlots || []).filter(slot => slot?.status === 'unknown_final').length;
+    const learned = unknownCount
+        ? 'גם כשיש רכיב חסר, עדיין אפשר לבנות שיקוף מדויק שמכבד את מה שחסר ולא ממציא.'
+        : 'הצלחתי להחזיק שלשה מלאה בלי לקפוץ מוקדם מדי לאתגור או להסבר רחב מדי.';
+
+    return {
+        rowDisplay: getLivingTriplesRowDisplayLabel(row),
+        tripleLabels: rowLabels,
+        selectedCategoryLabel,
+        common: rowIntent.common,
+        impact: rowIntent.impact,
+        goal: rowIntent.goal,
+        learned,
+        revealLines,
+        autoReflection: buildLivingTriplesAutoReflection(),
+        aiChallenges: getLivingTriplesChallengeOptions().slice(0, 3)
+    };
+}
+
+function renderLivingTriplesStructuredReflection() {
+    const container = livingTriplesState.elements?.reflectStructured;
+    if (!container) return;
+    const model = buildLivingTriplesStructuredReflectionModel();
+    if (!model) {
+        container.innerHTML = '';
+        return;
+    }
+
+    const tripleLine = model.tripleLabels.join(' + ');
+    const aiPills = (model.aiChallenges || []).map((item) => (
+        `<span class="lt-reflect-ai-pill">${ltEscape(item)}</span>`
+    )).join('');
+
+    container.innerHTML = `
+        <p class="lt-reflect-line"><strong>השורה שנבחרה:</strong> ${ltEscape(model.rowDisplay)}</p>
+        <p class="lt-reflect-line"><strong>השלשה:</strong> ${ltEscape(tripleLine)}</p>
+        <p class="lt-reflect-line"><strong>הקטגוריה הראשית שזוהתה:</strong> ${ltEscape(model.selectedCategoryLabel)}</p>
+        <p class="lt-reflect-line"><strong>מה המשותף לשלוש:</strong> ${ltEscape(model.common)}</p>
+        <p class="lt-reflect-line"><strong>איך זה משפיע על האדם:</strong> ${ltEscape(model.impact)}</p>
+        <p class="lt-reflect-line"><strong>מה למדתי:</strong> ${ltEscape(model.learned)}</p>
+        <div class="lt-reflect-ai-options">${aiPills}</div>
+    `;
+}
+
+function buildLivingTriplesPersonalReflectionDraft() {
+    const model = buildLivingTriplesStructuredReflectionModel();
+    if (!model) return '';
+
+    const revealSummary = (model.revealLines || []).map((line) => `- ${line}`).join('\n');
+    const challenges = (model.aiChallenges || []).slice(0, 3).map((item, index) => `${index + 1}. ${item}`).join('\n');
+
+    return [
+        'שיקוף השלשה המלא',
+        `השורה שנבחרה: ${model.rowDisplay}`,
+        `השלשה: ${model.tripleLabels.join(' + ')}`,
+        `הקטגוריה הראשית: ${model.selectedCategoryLabel}`,
+        '',
+        'מה המשותף לשלוש:',
+        model.common,
+        '',
+        'איך זה משפיע על האדם:',
+        model.impact,
+        '',
+        'מה למדתי מה-Reveal:',
+        model.learned,
+        revealSummary ? `\nמה עלה ב-Reveal:\n${revealSummary}` : '',
+        '',
+        'השיקוף שאני אומר/ת עכשיו:',
+        model.autoReflection || 'נשמע שיש כאן שלשה שעובדת יחד וצריך לדייק אותה לפני אתגור.',
+        '',
+        'מה אני רוצה להשיג עכשיו:',
+        model.goal,
+        '',
+        'אתגור מומלץ (בחר אחד):',
+        challenges || '1. בחר/י אתגר אחד שמתאים לרכיב שנבחר.'
+    ].filter((line) => line !== '').join('\n');
+}
+
+function seedLivingTriplesCustomReflectionDraft(force = false) {
+    const input = livingTriplesState.elements?.customReflectInput;
+    if (!input) return;
+    if (!force && String(input.value || '').trim()) return;
+    input.value = buildLivingTriplesPersonalReflectionDraft();
+}
+
+function toggleLivingTriplesCustomReflection() {
+    const wrap = livingTriplesState.elements?.customReflectWrap;
+    if (!wrap) return;
+    const willOpen = wrap.classList.contains('hidden');
+    wrap.classList.toggle('hidden');
+    if (willOpen) {
+        seedLivingTriplesCustomReflectionDraft(false);
+        if (livingTriplesState.elements?.reflectStatus) {
+            livingTriplesState.elements.reflectStatus.textContent = 'טיוטת שיקוף אישי מוכנה לעריכה.';
+        }
+    }
+}
+
 async function loadLivingTriplesData() {
     try {
         const response = await fetch('data/living-triples.json', { cache: 'no-store' });
@@ -422,6 +592,10 @@ function setLivingTriplesScreen(screenName = 'onboarding') {
 function renderLivingTriplesOnboarding(statusMessage = '') {
     if (!livingTriplesState.elements) return;
     setLivingTriplesScreen('onboarding');
+    setLivingTriplesPhilosophyFocus(
+        'מתחילים מזיהוי קטגוריה אחת כדי להדליק את כל השורה.',
+        'עדיין לא נבחרה שלשה.'
+    );
     const played = Number(livingTriplesState.progress?.played || 0);
     const totalScore = Number(livingTriplesState.progress?.totalScore || 0);
     const avg = played ? Math.round(totalScore / played) : 0;
@@ -793,6 +967,12 @@ function openLivingTriplesReflectStepIfReady() {
     if (livingTriplesState.elements.reflectAuto) {
         livingTriplesState.elements.reflectAuto.textContent = autoText;
     }
+    renderLivingTriplesStructuredReflection();
+    seedLivingTriplesCustomReflectionDraft(true);
+    setLivingTriplesPhilosophyFocus(
+        'עכשיו בונים שיקוף שמחבר בין שלושת רכיבי השלשה לפני אתגור.',
+        `${getLivingTriplesRowDisplayLabel()} | ${getLivingTriplesRowCategoryLabels().join(' + ')}`
+    );
     if (livingTriplesState.elements.reflectStatus) {
         livingTriplesState.elements.reflectStatus.textContent = 'בחר/י שיקוף אוטומטי או ניסוח אישי.';
     }
@@ -827,6 +1007,10 @@ function saveLivingTriplesCustomReflection() {
 function openLivingTriplesChallengeStep() {
     if (!livingTriplesState.reflectionDone || !livingTriplesState.elements?.challengeBox) return;
     livingTriplesState.elements.challengeBox.classList.remove('hidden');
+    setLivingTriplesPhilosophyFocus(
+        'אתגור מדויק: נשארים בתוך אותה פריזמה ובוחרים רכיב יעד אחד.',
+        `${getLivingTriplesRowDisplayLabel()} | ${getLivingTriplesRowCategoryLabels().join(' + ')}`
+    );
     renderLivingTriplesChallenge();
 }
 
@@ -910,6 +1094,10 @@ function renderLivingTriplesWrap() {
     const progress = livingTriplesState.progress || getDefaultLivingTriplesProgress();
     const scenario = livingTriplesState.activeScenario || {};
     const avg = progress.played ? Math.round(progress.totalScore / progress.played) : 0;
+    setLivingTriplesPhilosophyFocus(
+        'סיכום + Future Pace: לוקחים את התובנה מהשלשה לצעד הבא בעולם האמיתי.',
+        `${getLivingTriplesRowDisplayLabel()} | ${getLivingTriplesRowCategoryLabels().join(' + ')}`
+    );
     livingTriplesState.elements.wrapScore.textContent = `ציון סצנה: ${breakdown.total}/100 | ממוצע מצטבר: ${avg}/100`;
 
     if (livingTriplesState.elements.breakdown) {
@@ -1007,6 +1195,10 @@ function saveLivingTriplesFuturePace() {
 function renderLivingTriplesPracticeScene() {
     if (!livingTriplesState.elements || !livingTriplesState.activeScenario) return;
     setLivingTriplesScreen('practice');
+    setLivingTriplesPhilosophyFocus(
+        'שלב 1: לזהות קטגוריה אחת מדויקת. רק אז מדליקים את השלשה כולה.',
+        'עדיין לא נבחרה שלשה (מסתירים את התשובה עד הזיהוי).'
+    );
     if (livingTriplesState.elements.sceneIndex) livingTriplesState.elements.sceneIndex.textContent = String(livingTriplesState.index + 1);
     if (livingTriplesState.elements.sceneTotal) livingTriplesState.elements.sceneTotal.textContent = String(livingTriplesState.queue.length);
     if (livingTriplesState.elements.sessionScore) livingTriplesState.elements.sessionScore.textContent = String(livingTriplesState.sessionScore);
@@ -1037,6 +1229,7 @@ function renderLivingTriplesPracticeScene() {
     if (livingTriplesState.elements.reflectBox) livingTriplesState.elements.reflectBox.classList.add('hidden');
     if (livingTriplesState.elements.challengeBox) livingTriplesState.elements.challengeBox.classList.add('hidden');
     if (livingTriplesState.elements.customReflectWrap) livingTriplesState.elements.customReflectWrap.classList.add('hidden');
+    if (livingTriplesState.elements.reflectStructured) livingTriplesState.elements.reflectStructured.innerHTML = '';
     if (livingTriplesState.elements.challengeFeedback) livingTriplesState.elements.challengeFeedback.textContent = '';
 }
 
@@ -1087,6 +1280,10 @@ function handleLivingTriplesCategoryPick(categoryId) {
     renderLivingTriplesCategoryButtons();
     if (livingTriplesState.elements?.rowBox) livingTriplesState.elements.rowBox.classList.remove('hidden');
     if (livingTriplesState.elements?.revealBox) livingTriplesState.elements.revealBox.classList.remove('hidden');
+    setLivingTriplesPhilosophyFocus(
+        'השורה נדלקה. עכשיו משלימים Reveal מלא: 3 שאלות, 3 תשובות, בתוך אותה שלשה.',
+        `${getLivingTriplesRowDisplayLabel()} | ${getLivingTriplesRowCategoryLabels().join(' + ')}`
+    );
     renderLivingTriplesRowLit();
     renderLivingTriplesReveal();
     ltPlay('correct');
@@ -1168,6 +1365,7 @@ async function setupLivingTriplesModule() {
         revealStatus: document.getElementById('lt-reveal-status'),
         reflectBox: document.getElementById('lt-reflect-box'),
         reflectAuto: document.getElementById('lt-reflect-auto'),
+        reflectStructured: document.getElementById('lt-reflect-structured'),
         customReflectWrap: document.getElementById('lt-custom-reflect-wrap'),
         customReflectInput: document.getElementById('lt-custom-reflect-input'),
         reflectStatus: document.getElementById('lt-reflect-status'),
@@ -1189,7 +1387,9 @@ async function setupLivingTriplesModule() {
         futurePrompt: document.getElementById('lt-future-prompt'),
         futureExample: document.getElementById('lt-future-example'),
         futureSummary: document.getElementById('lt-future-summary'),
-        nextSceneBtn: document.getElementById('lt-next-scene-btn')
+        nextSceneBtn: document.getElementById('lt-next-scene-btn'),
+        philosophyFocusText: document.getElementById('lt-philosophy-focus-text'),
+        philosophyRowText: document.getElementById('lt-philosophy-row-text')
     };
 
     if (!livingTriplesState.elements.root) return;
@@ -1199,7 +1399,7 @@ async function setupLivingTriplesModule() {
     bindLivingTriplesClick('lt-demo-btn', runLivingTriplesDemo);
     bindLivingTriplesClick('lt-start-btn', startLivingTriplesTraining);
     bindLivingTriplesClick('lt-use-auto-reflect-btn', useLivingTriplesAutoReflection);
-    bindLivingTriplesClick('lt-open-custom-reflect-btn', () => livingTriplesState.elements?.customReflectWrap?.classList.toggle('hidden'));
+    bindLivingTriplesClick('lt-open-custom-reflect-btn', toggleLivingTriplesCustomReflection);
     bindLivingTriplesClick('lt-save-custom-reflect-btn', saveLivingTriplesCustomReflection);
     bindLivingTriplesClick('lt-save-future-btn', saveLivingTriplesFuturePace);
     bindLivingTriplesClick('lt-next-scene-btn', moveToNextLivingTriplesScene);

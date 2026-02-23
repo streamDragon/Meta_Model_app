@@ -59,6 +59,8 @@
           <h2>Living Triples — Trainer (Beta)</h2>
           <p class="subtitle">מודול עצמאי לתרגול Reveal ושמירה על אתגור בתוך אותה פריזמה.</p>
 
+          <div class="lt-layout">
+            <div class="lt-main-pane">
           <div id="lt-screen-onboarding" class="lt-screen">
             <div class="lt-onboarding-copy">
               <p>בוחרים קטגוריה אחת, משלימים Reveal מלא לשורה, ואז עוברים לשיקוף ולאתגור תואם.</p>
@@ -105,12 +107,14 @@
             <div id="lt-reflect-box" class="lt-step-box hidden">
               <h4>3. שיקוף</h4>
               <p id="lt-reflect-auto" class="lt-reflect-auto"></p>
+              <div id="lt-reflect-structured" class="lt-reflect-structured" aria-live="polite"></div>
               <div class="lt-reflect-actions">
                 <button id="lt-use-auto-reflect-btn" type="button" class="btn btn-primary">השתמש/י בשיקוף האוטומטי</button>
-                <button id="lt-open-custom-reflect-btn" type="button" class="btn btn-secondary">כתוב/י שיקוף אישי</button>
+                <button id="lt-open-custom-reflect-btn" type="button" class="btn btn-secondary">פתח/י טיוטת שיקוף אישי</button>
               </div>
               <div id="lt-custom-reflect-wrap" class="lt-custom-reflect-wrap hidden">
-                <textarea id="lt-custom-reflect-input" rows="3" placeholder="שיקוף קצר שמחבר את שלושת הרכיבים שעלו."></textarea>
+                <p class="lt-custom-reflect-caption">כתבתי לך טיוטת שיקוף אישית לפי השלשה שנבחרה. אפשר לערוך לפני שמירה.</p>
+                <textarea id="lt-custom-reflect-input" rows="8" placeholder="שיקוף אישי מובנה יופיע כאן אוטומטית."></textarea>
                 <button id="lt-save-custom-reflect-btn" type="button" class="btn btn-secondary">שמור שיקוף אישי</button>
               </div>
               <p id="lt-reflect-status" class="lt-inline-feedback" aria-live="polite"></p>
@@ -156,6 +160,45 @@
               </div>
               <p id="lt-future-summary" class="lt-future-summary" aria-live="polite"></p>
             </div>
+          </div>
+            </div>
+
+            <aside class="lt-philosophy-panel" aria-label="פילוסופיית השלשות">
+              <div class="lt-philosophy-head">
+                <h3>פילוסופיית השלשות</h3>
+                <p>השלשה לא נועדה רק לזהות קטגוריה, אלא לחשוף משפחת דפוסים שעובדת יחד באותה שכבת משמעות.</p>
+              </div>
+
+              <section class="lt-philosophy-section">
+                <h4>ההיגיון</h4>
+                <p>קטגוריה אחת היא "שער כניסה". אחרי שזיהינו אותה, עובדים על כל השורה כדי לראות איך השפה בונה חוויה, פרשנות והתנהגות.</p>
+              </section>
+
+              <section class="lt-philosophy-section">
+                <h4>מה רוצים להשיג</h4>
+                <ul class="lt-philosophy-list">
+                  <li>דיוק בזיהוי דפוס Meta Model.</li>
+                  <li>Reveal מלא בתוך אותה שלשה (3 שאלות).</li>
+                  <li>שיקוף מחבר ולא מפוזר.</li>
+                  <li>אתגור מדויק שנשאר בתוך אותה פריזמה.</li>
+                </ul>
+              </section>
+
+              <section class="lt-philosophy-section">
+                <h4>כלל עבודה</h4>
+                <p>קודם Reveal מלא, אחר כך שיקוף, ורק אז אתגור. ככה נשמרים קצב, אמון, והיגיון טיפולי.</p>
+              </section>
+
+              <div class="lt-philosophy-focus">
+                <strong>המיקוד כרגע</strong>
+                <p id="lt-philosophy-focus-text">מתחילים מזיהוי קטגוריה אחת כדי להדליק את כל השורה.</p>
+              </div>
+
+              <div class="lt-philosophy-focus">
+                <strong>שורת העבודה הנוכחית</strong>
+                <p id="lt-philosophy-row-text">עדיין לא נבחרה שלשה.</p>
+              </div>
+            </aside>
           </div>
         </div>
       </div>
