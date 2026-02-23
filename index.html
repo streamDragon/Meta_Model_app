@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.19" data-build-time="1771812947218">
+<html lang="he" dir="rtl" data-app-version="1.0.19" data-build-time="1771813528769">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -244,7 +244,7 @@
             <button class="tab-btn" data-tab="practice-radar">Meta Radar</button>
             <button class="tab-btn" data-tab="practice-triples-radar">Triples Radar</button>
             <button class="tab-btn" data-tab="practice-wizard">SQHCEL Wizard</button>
-            <button class="tab-btn" data-tab="practice-verb-unzip">???????</button>
+            <button class="tab-btn" data-tab="practice-verb-unzip">פועל לא מפורט</button>
             <button class="tab-btn" data-tab="blueprint">Blueprint Builder</button>
             <button class="tab-btn" data-tab="prismlab">מעבדת פריזמות</button>
             <button class="tab-btn" data-tab="about">על הפרויקט</button>
@@ -316,7 +316,7 @@
                         <button class="btn btn-primary cta-btn" onclick="navigateTo('comic-engine')">🧩 Comic Engine 2.0</button>
                         <button class="btn btn-secondary cta-btn" onclick="window.open('assets/svg/demo/index.html', '_blank')">🎨 Comic Kit Demo</button>
                         <button class="btn btn-primary cta-btn" onclick="navigateTo('categories')">📚 לומד קטגוריות</button>
-                        <button class="btn btn-primary cta-btn" onclick="navigateTo('blueprint')">??? בנה Blueprint</button>
+                        <button class="btn btn-primary cta-btn" onclick="navigateTo('blueprint')">בנה Blueprint</button>
                         <button class="btn btn-primary cta-btn" onclick="navigateTo('prismlab')">🔍 סרוק פריזמות</button>
                         <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('question')">🎯 תרגול שאלות</button>
                         <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('radar')">⚡ Meta Radar</button>
@@ -387,7 +387,7 @@
             <div class="scenario-trainer-container">
                 <div class="card scenario-trainer-card">
                     <h2>🎬 Scenario Trainer: פועל לא-מפורט → תהליך (TOTE)</h2>
-                    <p class="subtitle">????? ??? ????? ????? ???????: ????? Predicate, ????? ?????, ?????? ??????? ???? ????? ????.</p>
+                    <p class="subtitle">תרגול מונחה של פועל לא-מפורט: בחירת Predicate, בניית תרחיש, והמרה לשאלות המשך מדויקות.</p>
 
                     <div id="scenario-safety-notice" class="scenario-safety-notice hidden" role="alert">
                         נראה שהטקסט שכתבת מצביע על מצוקה חריפה. עצרנו את התרגול כרגע.
@@ -399,7 +399,7 @@
                         <div class="scenario-home-grid">
                             <button id="scenario-home-scenes" class="btn btn-primary scenario-home-btn">🎬 סצנות</button>
                             <button id="scenario-home-prisms" class="btn btn-secondary scenario-home-btn">🧩 פריזמות (Drag&Drop)</button>
-                            <button id="scenario-home-history" class="btn btn-secondary scenario-home-btn">?? היסטוריה</button>
+                            <button id="scenario-home-history" class="btn btn-secondary scenario-home-btn">היסטוריה</button>
                             <button id="scenario-home-settings" class="btn btn-secondary scenario-home-btn">⚙️ הגדרות</button>
                         </div>
                         <div class="scenario-home-stats" id="scenario-home-stats"></div>
@@ -1055,20 +1055,20 @@
         <section id="practice-verb-unzip" class="tab-content practice-tab-content">
             <div class="practice-container">
                 <div class="card practice-intro-card">
-                    <h2>??????? ?????? ? Feature Hub</h2>
-                    <p class="subtitle">????? ??????? ??? ????: ?? ???? ???? / ??? ???? ????. ???? ???? ?? Unzip Trainer ?????? ??????.</p>
+                    <h2>מרכז כלים / Feature Hub</h2>
+                    <p class="subtitle">גישה מהירה לכל המודולים: מעבר בין מסלולים בלי ברין / עם ברין. אפשר גם לפתוח את Unzip Trainer בחלון נפרד.</p>
                     <p style="margin:0 0 10px;color:#335a7d;">אם העמוד בתוך מסגרת צרה, אפשר לפתוח במסך מלא.</p>
                     
 <div class="feature-launcher" data-feature-launcher>
     <div class="feature-launcher-head">
         <div>
-            <strong>???? ???????</strong>
-            <p>???? ???? ???? ?????. ????? ??? ????? ????? ???? ??? ????? ????.</p>
+            <strong>מסלול עבודה</strong>
+            <p>בחרו קבוצת כלים לפי סוג התרגול. אפשר לעבור בין מסכים בלי לאבד הקשר.</p>
         </div>
     </div>
-    <div class="feature-launcher-tabs" role="tablist" aria-label="?????? ???'???">
-        <button type="button" class="feature-launcher-tab is-active" data-feature-group-btn="without-breen" aria-selected="true">??? ???? ????</button>
-        <button type="button" class="feature-launcher-tab" data-feature-group-btn="with-breen" aria-selected="false">?? ???? ????</button>
+    <div class="feature-launcher-tabs" role="tablist" aria-label="קבוצות תרגול">
+        <button type="button" class="feature-launcher-tab is-active" data-feature-group-btn="without-breen" aria-selected="true">בלי טבלאות ברין</button>
+        <button type="button" class="feature-launcher-tab" data-feature-group-btn="with-breen" aria-selected="false">עם טבלאות ברין</button>
     </div>
 
     <div class="feature-launcher-panel is-active" data-feature-group-panel="without-breen">
@@ -1076,7 +1076,7 @@
             <a class="btn btn-primary" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html" target="_blank" rel="noopener">Unzip Trainer (Standalone)</a>
             <a class="btn btn-secondary" href="sentence_morpher_trainer.html" data-versioned-href="sentence_morpher_trainer.html" target="_blank" rel="noopener">Sentence Morpher</a>
             <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html" target="_blank" rel="noopener">Prism Research</a>
-            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">????? ?????</button>
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול שאלות</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">Meta Radar</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">SQHCEL Wizard</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">Blueprint Builder</button>
@@ -1089,14 +1089,14 @@
     <div class="feature-launcher-panel" data-feature-group-panel="with-breen" hidden>
         <div class="feature-launcher-grid">
             <button type="button" class="btn btn-primary" onclick="navigateTo('practice-triples-radar')">Triples Radar (Breen)</button>
-            <button type="button" class="btn btn-secondary" onclick="navigateTo('categories')">???????? (???? ?????)</button>
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('categories')">קטגוריות (עם ברין)</button>
             <a class="btn btn-secondary" href="living_triples_trainer.html" data-versioned-href="living_triples_trainer.html" target="_blank" rel="noopener">Living Triples</a>
             <a class="btn btn-secondary" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html" target="_blank" rel="noopener">Classic 1 ? Classic Classic</a>
             <a class="btn btn-secondary" href="classic2_trainer.html" data-versioned-href="classic2_trainer.html" target="_blank" rel="noopener">Classic 2 ? Overview</a>
         </div>
         <div class="feature-launcher-note">
             <strong>Classic 2 (React + TS)</strong>
-            <span>???? ??????????: <code>src/components/Classic2Trainer.tsx</code></span>
+            <span>קובץ קומפוננטה: <code>src/components/Classic2Trainer.tsx</code></span>
         </div>
     </div>
 </div>
@@ -1116,7 +1116,7 @@
         <section id="blueprint" class="tab-content">
             <div class="blueprint-container">
                 <div class="card">
-                    <h2>??? Blueprint Builder - הפוך פעולה בעמומה לתוכנית ביצוע</h2>
+                    <h2>Blueprint Builder - הפוך פעולה בעמומה לתוכנית ביצוע</h2>
                     <p>הקלד פעולה שצריך לעשות, ואנחנו נהפוך אותה לתוכנית מפורטת עם צעדים, תנאים, וחלופות.</p>
 
                     <!-- STEP 1: CAPTURE -->
