@@ -165,6 +165,11 @@ const css = `
 .it-focus-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;font-weight:800;font-size:.78rem}
 .it-focus-sketch .it-sketch{margin-top:0;padding:14px}
 .it-focus-sketch .it-sketch svg{min-height:170px}
+.it-stage-switch{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.it-stage-btn{border:1px solid #d1d5db;background:#fff;color:#374151;border-radius:999px;padding:6px 10px;font-weight:800;font-size:.8rem;cursor:pointer}
+.it-stage-btn.is-active{border-color:#2563eb;background:#eff6ff;color:#1d4ed8}
+.it-stage-btn:disabled{opacity:.5;cursor:not-allowed}
+.it-stage-card{border:1px solid #e5e7eb;background:#fff;border-radius:12px;padding:10px;display:grid;gap:10px}
 .it-challenge-list{display:grid;gap:8px;margin-top:8px}
 .it-challenge-item{border:1px solid #fecaca;background:#fff;border-radius:10px;padding:8px;color:#7f1d1d;line-height:1.35;font-weight:700}
 .it-challenge-note{margin-top:8px;border:1px dashed #fca5a5;background:#fff7f7;color:#991b1b;border-radius:10px;padding:8px;font-weight:700;line-height:1.35}
@@ -424,6 +429,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
   const [draggingTokenId, setDraggingTokenId] = useState<string | null>(null);
   const [hoverTemplate, setHoverTemplate] = useState<TemplateType | null>(null);
   const [shakeTemplate, setShakeTemplate] = useState<TemplateType | null>(null);
+  const [focusStage, setFocusStage] = useState<'build' | 'reveal' | 'challenge'>('build');
   const [state, setState] = useState<TrainerState>(INITIAL_STATE);
 
   useEffect(() => {
@@ -491,6 +497,15 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     [state.active?.templateType, activeToken?.text]
   );
   const challengeReady = revealReady && activeFilledSlots >= Math.min(2, Math.max(1, activeSlotCount || 0));
+
+  useEffect(() => {
+    setFocusStage((prev) => {
+      if (!revealReady) return 'build';
+      if (!challengeReady && prev === 'challenge') return 'reveal';
+      if (prev === 'build') return 'reveal';
+      return prev;
+    });
+  }, [revealReady, challengeReady]);
 
   const activeVariantKey = useMemo(() => {
     if (!scenario || !state.active) return '';
@@ -832,53 +847,113 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
                   />
                 </div>
 
-                <details className="it-collapse" open>
-                  <summary>
-                    <span>Reveal / חשיפה</span>
-                    <span className="it-kicker">{activeFilledSlots}/{activeSlotCount} חריצים</span>
-                  </summary>
-                  <div className="it-collapse-body">
-                    <div className="it-question">{activePayload.question}</div>
-                    <div className={`it-slots cols-${TEMPLATE_META[state.active.templateType].slotCount}`}>
-                      {Array.from({ length: TEMPLATE_META[state.active.templateType].slotCount }).map((_, idx) => (
-                        <div key={idx} className="it-slot">{activeSet[idx] || '—'}</div>
-                      ))}
-                    </div>
-                    <div className="it-reflection">{activeReflection}</div>
-                    <div className="it-disclaimer">{DISCLAIMER_COPY}</div>
-                    <div className="it-actions">
-                      <button type="button" className="it-btn secondary" onClick={cycleVariant}>
-                        מטופל אחר / תשובה אחרת
-                      </button>
-                      <button type="button" className="it-btn ghost" onClick={clearActive}>
-                        אפס תבנית
-                      </button>
-                    </div>
-                  </div>
-                </details>
+                <div className="it-stage-switch" role="tablist" aria-label="שלבי העבודה">
+                  <button
+                    type="button"
+                    className={`it-stage-btn ${focusStage === 'build' ? 'is-active' : ''}`}
+                    onClick={() => setFocusStage('build')}
+                    aria-pressed={focusStage === 'build'}
+                  >
+                    Build
+                  </button>
+                  <button
+                    type="button"
+                    className={`it-stage-btn ${focusStage === 'reveal' ? 'is-active' : ''}`}
+                    onClick={() => setFocusStage('reveal')}
+                    aria-pressed={focusStage === 'reveal'}
+                    disabled={!revealReady}
+                  >
+                    Reveal ({activeFilledSlots}/{activeSlotCount})
+                  </button>
+                  <button
+                    type="button"
+                    className={`it-stage-btn ${focusStage === 'challenge' ? 'is-active' : ''}`}
+                    onClick={() => setFocusStage('challenge')}
+                    aria-pressed={focusStage === 'challenge'}
+                    disabled={!challengeReady}
+                  >
+                    Challenge
+                  </button>
+                </div>
 
-                <details className="it-collapse" open={challengeReady}>
-                  <summary>
-                    <span>Challenge / שאלות בדיקה</span>
-                    <span className="it-kicker">{challengeReady ? 'מוכן' : 'ייפתח אחרי Reveal'}</span>
-                  </summary>
-                  <div className="it-collapse-body">
-                    {challengeReady ? (
-                      <>
-                        <div className="it-challenge-list">
-                          {challengePrompts.map((prompt, idx) => (
-                            <div key={`${state.active?.templateType}-${idx}`} className="it-challenge-item">{idx + 1}. {prompt}</div>
-                          ))}
-                        </div>
-                        <div className="it-challenge-note">
-                          שלב האתגר מגיע אחרי החשיפה: קודם בונים מפה, ואז בודקים את מה שנחשף.
-                        </div>
-                      </>
-                    ) : (
-                      <div className="it-empty">מלא/י Reveal והשלם/י לפחות שני חריצים כדי לפתוח אתגר ממוקד.</div>
-                    )}
-                  </div>
-                </details>
+                <div className="it-stage-card">
+                  {focusStage === 'build' ? (
+                    <>
+                      <div className="it-help"><strong>Build:</strong> בחר/י בלוק רלוונטי וגרור/י לתבנית. הסכמה מגדירה את סוג החשיפה.</div>
+                      <div className="it-board-row">
+                        <div className="it-board-label">בלוק נבחר</div>
+                        <div className="it-board-value">{activeToken.text}</div>
+                      </div>
+                      <div className="it-board-row">
+                        <div className="it-board-label">תבנית פעילה</div>
+                        <div className="it-board-value emph">{formatTemplateLabel(state.active.templateType)}</div>
+                      </div>
+                      <div className="it-board-row">
+                        <div className="it-board-label">מה יקרה בשלב הבא</div>
+                        <div className="it-board-value">המערכת תציג שאלה + חריצים + שיקוף. אחר כך תוכל/י לעבור לאתגר.</div>
+                      </div>
+                      <div className="it-actions">
+                        <button type="button" className="it-btn primary" onClick={() => setFocusStage('reveal')}>
+                          עבור ל-Reveal
+                        </button>
+                        <button type="button" className="it-btn ghost" onClick={clearActive}>
+                          אפס תבנית
+                        </button>
+                      </div>
+                    </>
+                  ) : null}
+
+                  {focusStage === 'reveal' ? (
+                    <>
+                      <div className="it-question">{activePayload.question}</div>
+                      <div className={`it-slots cols-${TEMPLATE_META[state.active.templateType].slotCount}`}>
+                        {Array.from({ length: TEMPLATE_META[state.active.templateType].slotCount }).map((_, idx) => (
+                          <div key={idx} className="it-slot">{activeSet[idx] || '—'}</div>
+                        ))}
+                      </div>
+                      <div className="it-reflection">{activeReflection}</div>
+                      <div className="it-disclaimer">{DISCLAIMER_COPY}</div>
+                      <div className="it-actions">
+                        <button type="button" className="it-btn secondary" onClick={cycleVariant}>
+                          מטופל אחר / תשובה אחרת
+                        </button>
+                        <button type="button" className="it-btn ghost" onClick={clearActive}>
+                          אפס תבנית
+                        </button>
+                        <button
+                          type="button"
+                          className="it-btn primary"
+                          onClick={() => setFocusStage('challenge')}
+                          disabled={!challengeReady}
+                        >
+                          עבור לאתגר
+                        </button>
+                      </div>
+                    </>
+                  ) : null}
+
+                  {focusStage === 'challenge' ? (
+                    <>
+                      <div className="it-help"><strong>Challenge:</strong> עכשיו בודקים את מה שנחשף, במקום לערבב חשיפה ואתגר באותו רגע.</div>
+                      <div className="it-challenge-list">
+                        {challengePrompts.map((prompt, idx) => (
+                          <div key={`${state.active?.templateType}-${idx}`} className="it-challenge-item">{idx + 1}. {prompt}</div>
+                        ))}
+                      </div>
+                      <div className="it-challenge-note">
+                        שלב האתגר מגיע אחרי החשיפה: קודם בונים מפה, ואז בודקים את מה שנחשף.
+                      </div>
+                      <div className="it-actions">
+                        <button type="button" className="it-btn secondary" onClick={() => setFocusStage('reveal')}>
+                          חזרה ל-Reveal
+                        </button>
+                        <button type="button" className="it-btn primary" onClick={nextScenario}>
+                          סיים סבב / הבא
+                        </button>
+                      </div>
+                    </>
+                  ) : null}
+                </div>
               </div>
             )}
 

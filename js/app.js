@@ -969,6 +969,7 @@ function initializeMetaModelApp() {
     setupMobileViewportSizing();
     applyEmbeddedCompactMode();
     applyHeaderDensityPreference();
+    updateRuntimeDebugInfoCard();
     loadAudioSettings();
     setupAudioMuteButtons();
     setupMusicToggleButton();
@@ -999,6 +1000,60 @@ function initializeMetaModelApp() {
     setupCommunityFeedbackWall();
     initializeProgressHub();
     renderGlobalComicStrip(getActiveTabName());
+    window.addEventListener('resize', updateRuntimeDebugInfoCard);
+}
+
+function updateRuntimeDebugInfoCard() {
+    const statusRoot = document.getElementById('feature-runtime-status');
+    if (!statusRoot) return;
+
+    const viewEl = document.getElementById('runtime-view-mode');
+    const viewportEl = document.getElementById('runtime-viewport-size');
+    const tabEl = document.getElementById('runtime-saved-tab');
+    const densityEl = document.getElementById('runtime-header-density');
+
+    let isEmbedded = false;
+    try {
+        isEmbedded = window.self !== window.top;
+    } catch (error) {
+        isEmbedded = true;
+    }
+
+    const width = Math.max(0, Math.round(window.innerWidth || 0));
+    const height = Math.max(0, Math.round(window.innerHeight || 0));
+    const savedTab = normalizeRequestedTab(localStorage.getItem(PRACTICE_ACTIVE_TAB_STORAGE_KEY) || '') || 'home';
+    const density = (localStorage.getItem('header_density_v1') || 'compact').toLowerCase();
+
+    if (viewEl) viewEl.textContent = isEmbedded ? 'מוטמע (iframe / Google Sites)' : 'ישיר (עמוד מלא)';
+    if (viewportEl) viewportEl.textContent = `${width}×${height}`;
+    if (tabEl) tabEl.textContent = savedTab;
+    if (densityEl) densityEl.textContent = density === 'cozy' ? 'cozy' : 'compact';
+}
+
+function resetLocalUiState() {
+    const keysToClear = [
+        PRACTICE_ACTIVE_TAB_STORAGE_KEY,
+        'header_density_v1',
+        'meta_audio_muted',
+        OPENING_TRACK_FIRST_ENTRY_KEY
+    ];
+    let cleared = 0;
+    keysToClear.forEach((key) => {
+        try {
+            if (localStorage.getItem(key) !== null) {
+                localStorage.removeItem(key);
+                cleared += 1;
+            }
+        } catch (error) {
+            // ignore storage access issues
+        }
+    });
+    try {
+        alert(`אופס מצב UI מקומי (${cleared} מפתחות). הדף יטען מחדש.`);
+    } catch (error) {
+        // ignore alert failures
+    }
+    window.location.reload();
 }
 
 // Scripts are injected dynamically from index.html, so DOMContentLoaded may have

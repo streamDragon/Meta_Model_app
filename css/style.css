@@ -293,6 +293,21 @@ body.force-mobile-view .app-version-floating {
     line-height: 1.35;
 }
 
+.feature-runtime-status {
+    display: grid;
+    gap: 6px;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fbff;
+    color: #334155;
+    font-size: 0.82rem;
+}
+
+.feature-runtime-status strong {
+    color: #0f172a;
+}
+
 /* Embedded mode (e.g. Google Sites iframe): maximize usable space */
 body.embed-mode {
     background: linear-gradient(155deg, #ecfeff 0%, #eff6ff 55%, #fffbeb 100%);
