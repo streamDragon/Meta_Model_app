@@ -792,7 +792,25 @@ function getVersionFromAppScriptQuery() {
     return match ? decodeURIComponent(match[1]).trim() : '';
 }
 
+function getVersionFromHtmlAttribute() {
+    try {
+        const version = (document.documentElement?.getAttribute('data-app-version') || '').trim();
+        return version || '';
+    } catch (error) {
+        return '';
+    }
+}
+
 async function resolveAppVersion() {
+    // 1. Try to get version from HTML data-app-version attribute (most reliable for static hosting)
+    const htmlVersion = getVersionFromHtmlAttribute();
+    if (htmlVersion) return htmlVersion;
+
+    // 2. Try to get version from script query parameter
+    const scriptVersion = getVersionFromAppScriptQuery();
+    if (scriptVersion) return scriptVersion;
+
+    // 3. Try to get version from package.json (fallback, may fail on static hosting without CORS)
     try {
         const response = await fetch('package.json', { cache: 'no-store' });
         if (response.ok) {
@@ -804,7 +822,7 @@ async function resolveAppVersion() {
         console.warn('Could not read package.json version:', error);
     }
 
-    return getVersionFromAppScriptQuery() || 'unknown';
+    return 'unknown';
 }
 
 const APP_VERSION_CHIP_LABEL = '\u05d2\u05e8\u05e1\u05d4 \u05e0\u05d5\u05db\u05d7\u05d9\u05ea';
