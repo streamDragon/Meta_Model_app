@@ -95,6 +95,15 @@
     }
 
     function shouldUsePhoneFlow() {
+        try {
+            const url = new URL(window.location.href);
+            if (url.searchParams.get('triplesLegacy') === '1') return false;
+            if (url.searchParams.get('triplesAdvanced') === '0') return false;
+        } catch (error) {
+            // Ignore URL parsing issues and fall through.
+        }
+        // Default to the advanced flow on both desktop and mobile.
+        return true;
         if (typeof document === 'undefined' || !document.body) return false;
         if (document.body.classList.contains('force-mobile-view')) return true;
         if (document.body.classList.contains('view-mobile')) return true;
