@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 
 type TemplateType = 'CEQ' | 'CAUSE' | 'ASSUMPTIONS1';
 type CauseMode = 'CAUSES_OF_TOKEN' | 'EFFECTS_OF_TOKEN';
@@ -114,9 +114,9 @@ const INITIAL_STATE: TrainerState = {
 };
 
 const css = `
-.it-wrap{direction:rtl;font-family:"Assistant","Heebo","Noto Sans Hebrew","Segoe UI",sans-serif;background:radial-gradient(circle at 10% 0%,#fef3c7 0,#fffaf0 36%,#f8fafc 100%);color:#111827;max-width:1260px;margin:0 auto;border:1px solid #fde68a;border-radius:18px;padding:14px;box-shadow:0 16px 32px rgba(17,24,39,.06)}
+.it-wrap{direction:rtl;font-family:"Assistant","Heebo","Noto Sans Hebrew","Segoe UI",sans-serif;background:radial-gradient(circle at 10% 0%,#fef3c7 0,#fffaf0 36%,#f8fafc 100%);color:#111827;max-width:1420px;margin:0 auto;border:1px solid #fde68a;border-radius:18px;padding:14px;box-shadow:0 16px 32px rgba(17,24,39,.06)}
 .it-wrap *{box-sizing:border-box}.it-panel{background:#ffffffde;border:1px solid #fde68a;border-radius:14px;padding:12px;box-shadow:0 8px 24px rgba(17,24,39,.04)}
-.it-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:12px}.it-stack{display:grid;gap:12px}
+.it-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:14px}.it-stack{display:grid;gap:12px}
 .it-title{margin:0;font-weight:900;font-size:1.2rem}.it-sub{margin:6px 0 0;color:#6b7280;line-height:1.4}
 .it-intro{margin-top:10px;border:1px solid #fde68a;background:#fff7d6;color:#92400e;border-radius:10px;padding:10px;line-height:1.4}
 .it-topbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.it-chip{background:#fff;border:1px solid #fde68a;border-radius:999px;padding:6px 10px;font-weight:800;font-size:.82rem}
@@ -152,9 +152,25 @@ const css = `
 .it-active{display:grid;gap:10px}.it-empty{color:#6b7280;border:1px dashed #d1d5db;border-radius:10px;padding:12px;background:#fafafa}
 .it-recap{margin-top:8px;border:1px solid #bfdbfe;background:#f0f9ff;color:#0c4a6e;border-radius:10px;padding:8px;line-height:1.35}
 .it-progress{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.it-steps{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.it-step{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid #d1d5db;background:#fff;color:#4b5563;font-weight:800;font-size:.78rem}
+.it-step.is-on{border-color:#2563eb;background:#eff6ff;color:#1d4ed8}
+.it-step.is-done{border-color:#bbf7d0;background:#ecfdf5;color:#166534}
+.it-collapse{border:1px solid #e5e7eb;border-radius:12px;background:#fff}
+.it-collapse>summary{list-style:none;cursor:pointer;padding:10px 12px;font-weight:900;color:#1f2937;display:flex;justify-content:space-between;align-items:center}
+.it-collapse>summary::-webkit-details-marker{display:none}
+.it-collapse-body{padding:0 12px 12px}
+.it-focus-panel{border-color:#bfdbfe;background:linear-gradient(180deg,#fff 0%,#f8fbff 100%)}
+.it-focus-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.it-focus-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;font-weight:800;font-size:.78rem}
+.it-focus-sketch .it-sketch{margin-top:0;padding:14px}
+.it-focus-sketch .it-sketch svg{min-height:170px}
+.it-challenge-list{display:grid;gap:8px;margin-top:8px}
+.it-challenge-item{border:1px solid #fecaca;background:#fff;border-radius:10px;padding:8px;color:#7f1d1d;line-height:1.35;font-weight:700}
+.it-challenge-note{margin-top:8px;border:1px dashed #fca5a5;background:#fff7f7;color:#991b1b;border-radius:10px;padding:8px;font-weight:700;line-height:1.35}
 .it-scenario-list{margin:0;padding:0;list-style:none;display:grid;gap:6px}.it-scenario-list li{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border:1px solid #f3f4f6;border-radius:8px;background:#fff}
 @media (max-width:1080px){.it-board-grid{grid-template-columns:1fr}}
-@media (max-width:980px){.it-grid{grid-template-columns:1fr}.it-slots.cols-3,.it-slots.cols-2{grid-template-columns:1fr}.it-board-row{grid-template-columns:1fr}}
+@media (max-width:980px){.it-grid{grid-template-columns:1fr}.it-slots.cols-3,.it-slots.cols-2{grid-template-columns:1fr}.it-board-row{grid-template-columns:1fr}.it-focus-sketch .it-sketch svg{min-height:120px}}
 `;
 
 function assetUrl(path: string): string {
@@ -226,6 +242,28 @@ function boardGapText(templateType: TemplateType | null, tokenText: string | nul
 function boardFactPrompt(templateType: TemplateType | null, tokenText: string | null): string {
   if (!templateType || !tokenText) return 'מה קרה בפועל? מי אמר מה? באיזה הקשר?';
   return `${TEMPLATE_META[templateType].factPrompt} סביב "${tokenText}"`;
+}
+
+function buildChallengePrompts(templateType: TemplateType | null, tokenText: string | null): string[] {
+  if (!templateType || !tokenText) return [];
+  const prompts: Record<TemplateType, string[]> = {
+    CEQ: [
+      `איך בדיוק "${tokenText}" מוגדר אצלך — ומה העובדות שמראות שזה באמת כך?`,
+      `מה היה צריך לקרות כדי שזה לא ייחשב "${tokenText}"?`,
+      `איזה קריטריון כאן חשוב יותר: הכוונה, ההתנהגות, או התוצאה?`
+    ],
+    CAUSE: [
+      `מה הראיה שהקשר סביב "${tokenText}" הוא סיבתי הכרחי ולא רק אפשרי?`,
+      `מה עוד יכול להסביר את "${tokenText}" מלבד הסיבה הראשונה שעלתה?`,
+      `באילו תנאים "${tokenText}" לא מופיע למרות אותם גורמים?`
+    ],
+    ASSUMPTIONS1: [
+      `איזו הנחה מתוך השלוש הכי כדאי לבדוק קודם מול המציאות?`,
+      `מה העובדות שתומכות בהנחה — ומה העובדות שלא בטוח תומכות?`,
+      `אם ההנחה הזו לא נכונה, מה משתנה במשמעות של "${tokenText}"?`
+    ]
+  };
+  return prompts[templateType];
 }
 
 function textWithoutToken(text: string, token: DraggableCandidate | null): string {
@@ -444,6 +482,15 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     if (!activePayload) return '';
     return fillPlaceholders(activePayload.reflection_template, activeSet);
   }, [activePayload, activeSet]);
+
+  const activeSlotCount = state.active ? TEMPLATE_META[state.active.templateType].slotCount : 0;
+  const activeFilledSlots = useMemo(() => activeSet.filter((item) => String(item || '').trim()).length, [activeSet]);
+  const revealReady = !!(state.active && activeToken && activePayload);
+  const challengePrompts = useMemo(
+    () => buildChallengePrompts(state.active?.templateType ?? null, activeToken?.text ?? null),
+    [state.active?.templateType, activeToken?.text]
+  );
+  const challengeReady = revealReady && activeFilledSlots >= Math.min(2, Math.max(1, activeSlotCount || 0));
 
   const activeVariantKey = useMemo(() => {
     if (!scenario || !state.active) return '';
@@ -671,13 +718,21 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
             <div className="it-help"><strong>מועמדים לגרירה:</strong> {scenario.draggables.map((d) => d.text).join(' · ')}</div>
           </section>
 
-          <SentenceBoard
-            scenario={scenario}
-            selectedToken={selectedToken}
-            activeTemplateType={state.active?.templateType ?? null}
-            activeQuestion={activePayload?.question ?? ''}
-            activeReflection={activeReflection}
-          />
+          <details className="it-collapse" open={!!state.active}>
+            <summary>
+              <span>לוח משפטים / מפת בדיקה</span>
+              <span className="it-kicker">{state.active ? 'פתוח בזמן עבודה' : 'אופציונלי'}</span>
+            </summary>
+            <div className="it-collapse-body">
+              <SentenceBoard
+                scenario={scenario}
+                selectedToken={selectedToken}
+                activeTemplateType={state.active?.templateType ?? null}
+                activeQuestion={activePayload?.question ?? ''}
+                activeReflection={activeReflection}
+              />
+            </div>
+          </details>
 
           <section className="it-panel" aria-label="Template gallery">
             <h2 className="it-title" style={{ fontSize: '1.05rem' }}>גלריית צורות / Templates</h2>
@@ -689,7 +744,6 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
                 const isHover = hoverTemplate === type;
                 const payload = isActive && activePayload ? activePayload : null;
                 const slotCount = meta.slotCount;
-                const slots = isActive ? activeSet : [];
                 const causeMode = payload && 'mode' in payload ? payload.mode ?? null : null;
 
                 return (
@@ -729,22 +783,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
                     {isActive && payload ? (
                       <>
                         {renderCauseDirectionLabel(payload) ? <div className="it-help"><strong>{renderCauseDirectionLabel(payload)}</strong></div> : null}
-                        <div className="it-question">{payload.question}</div>
-                        <div className={`it-slots cols-${slotCount}`}>
-                          {Array.from({ length: slotCount }).map((_, idx) => (
-                            <div key={idx} className="it-slot">{slots[idx] || <span style={{ color: '#9ca3af' }}>—</span>}</div>
-                          ))}
-                        </div>
-                        <div className="it-reflection">{activeReflection}</div>
-                        <div className="it-disclaimer">{DISCLAIMER_COPY}</div>
-                        <div className="it-actions">
-                          <button type="button" className="it-btn secondary" onClick={(e) => { e.stopPropagation(); cycleVariant(); }}>
-                            מטופל אחר / תשובה אחרת
-                          </button>
-                          <button type="button" className="it-btn ghost" onClick={(e) => { e.stopPropagation(); clearActive(); }}>
-                            אפס תבנית
-                          </button>
-                        </div>
+                        <div className="it-help"><strong>סטטוס:</strong> התבנית פעילה. הפירוט המלא מוצג בפאנל המיקוד.</div>
                       </>
                     ) : null}
                   </div>
@@ -754,35 +793,92 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
           </section>
         </div>
         <div className="it-stack">
-          <section className="it-panel" aria-label="Active output">
-            <h2 className="it-title" style={{ fontSize: '1.05rem' }}>תצוגת תוצאה / Reveal</h2>
-            <p className="it-sub">כאן מרוכזים השאלה, מילוי החריצים, והשיקוף המסכם של התבנית הפעילה.</p>
+          <section className="it-panel it-focus-panel" aria-label="Focus output">
+            <div className="it-focus-top">
+              <div>
+                <h2 className="it-title" style={{ fontSize: '1.08rem' }}>פאנל מיקוד / Build → Reveal → Challenge</h2>
+                <p className="it-sub">בונים קודם את הסכמה, אחר כך חושפים שיקוף, ורק אז פותחים את שלב האתגר.</p>
+              </div>
+              {revealReady && activeToken && state.active ? (
+                <div className="it-focus-badge">
+                  {TEMPLATE_META[state.active.templateType].code} · {activeToken.text}
+                </div>
+              ) : null}
+            </div>
 
-            {state.active && activeToken && activePayload ? (
-              <div className="it-active">
+            <div className="it-steps" aria-label="Focus stages">
+              <span className={`it-step ${state.selectedTokenId ? 'is-done' : 'is-on'}`}>1. בחר/י בלוק</span>
+              <span className={`it-step ${state.active ? 'is-done' : state.selectedTokenId ? 'is-on' : ''}`}>2. גרירה לסכמה</span>
+              <span className={`it-step ${revealReady ? 'is-done' : state.active ? 'is-on' : ''}`}>3. Reveal</span>
+              <span className={`it-step ${challengeReady ? 'is-on' : ''}`}>4. Challenge</span>
+            </div>
+
+            {!revealReady ? (
+              <div className="it-empty" style={{ marginTop: 10 }}>
+                הסכמה היא מרכז העבודה: בחר/י מילה מודגשת וגרור/י אותה לתבנית כדי לפתוח Reveal.
+              </div>
+            ) : (
+              <div className="it-active" style={{ marginTop: 10 }}>
                 <div className="it-chip" style={{ width: 'fit-content' }}>
                   טוקן: <strong>{activeToken.text}</strong> · תבנית: <strong>{formatTemplateLabel(state.active.templateType)}</strong>
                 </div>
 
-                <TemplateSketch
-                  meta={TEMPLATE_META[state.active.templateType]}
-                  tokenText={activeToken.text}
-                  causeMode={'mode' in activePayload ? activePayload.mode ?? null : null}
-                  active
-                />
-
-                <div className="it-question">{activePayload.question}</div>
-                <div className={`it-slots cols-${TEMPLATE_META[state.active.templateType].slotCount}`}>
-                  {Array.from({ length: TEMPLATE_META[state.active.templateType].slotCount }).map((_, idx) => (
-                    <div key={idx} className="it-slot">{activeSet[idx] || '—'}</div>
-                  ))}
+                <div className="it-focus-sketch">
+                  <TemplateSketch
+                    meta={TEMPLATE_META[state.active.templateType]}
+                    tokenText={activeToken.text}
+                    causeMode={'mode' in activePayload ? activePayload.mode ?? null : null}
+                    active
+                  />
                 </div>
-                <div className="it-reflection">{activeReflection}</div>
-                <div className="it-disclaimer">{DISCLAIMER_COPY}</div>
-              </div>
-            ) : (
-              <div className="it-empty">
-                עוד לא בוצעה גרירה תקינה. בחר/י מילה מודגשת והנח/י אותה על אחת התבניות כדי לקבל Reveal.
+
+                <details className="it-collapse" open>
+                  <summary>
+                    <span>Reveal / חשיפה</span>
+                    <span className="it-kicker">{activeFilledSlots}/{activeSlotCount} חריצים</span>
+                  </summary>
+                  <div className="it-collapse-body">
+                    <div className="it-question">{activePayload.question}</div>
+                    <div className={`it-slots cols-${TEMPLATE_META[state.active.templateType].slotCount}`}>
+                      {Array.from({ length: TEMPLATE_META[state.active.templateType].slotCount }).map((_, idx) => (
+                        <div key={idx} className="it-slot">{activeSet[idx] || '—'}</div>
+                      ))}
+                    </div>
+                    <div className="it-reflection">{activeReflection}</div>
+                    <div className="it-disclaimer">{DISCLAIMER_COPY}</div>
+                    <div className="it-actions">
+                      <button type="button" className="it-btn secondary" onClick={cycleVariant}>
+                        מטופל אחר / תשובה אחרת
+                      </button>
+                      <button type="button" className="it-btn ghost" onClick={clearActive}>
+                        אפס תבנית
+                      </button>
+                    </div>
+                  </div>
+                </details>
+
+                <details className="it-collapse" open={challengeReady}>
+                  <summary>
+                    <span>Challenge / שאלות בדיקה</span>
+                    <span className="it-kicker">{challengeReady ? 'מוכן' : 'ייפתח אחרי Reveal'}</span>
+                  </summary>
+                  <div className="it-collapse-body">
+                    {challengeReady ? (
+                      <>
+                        <div className="it-challenge-list">
+                          {challengePrompts.map((prompt, idx) => (
+                            <div key={`${state.active?.templateType}-${idx}`} className="it-challenge-item">{idx + 1}. {prompt}</div>
+                          ))}
+                        </div>
+                        <div className="it-challenge-note">
+                          שלב האתגר מגיע אחרי החשיפה: קודם בונים מפה, ואז בודקים את מה שנחשף.
+                        </div>
+                      </>
+                    ) : (
+                      <div className="it-empty">מלא/י Reveal והשלם/י לפחות שני חריצים כדי לפתוח אתגר ממוקד.</div>
+                    )}
+                  </div>
+                </details>
               </div>
             )}
 
@@ -799,18 +895,24 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
             </div>
           </section>
 
-          <section className="it-panel" aria-label="Quick checklist">
-            <h2 className="it-title" style={{ fontSize: '1.05rem' }}>מה עשינו כאן?</h2>
-            <ul className="it-scenario-list">
-              <li><span>1. בחרנו מילה/ביטוי</span><span>{state.selectedTokenId ? '✔' : '—'}</span></li>
-              <li><span>2. גרירה/התאמה לתבנית</span><span>{state.completedAtLeastOneDrop ? '✔' : '—'}</span></li>
-              <li><span>3. נחשפה שאלה + חריצים</span><span>{state.active ? '✔' : '—'}</span></li>
-              <li><span>4. וריאציית "מטופל אחר"</span><span>{state.scoreVariants > 0 ? '✔' : '—'}</span></li>
-              <li><span>5. Reveal-only (לא אמת)</span><span>✔</span></li>
-            </ul>
-          </section>
+          <details className="it-collapse" open={false}>
+            <summary>
+              <span>מה עשינו כאן? / צ'קליסט</span>
+              <span className="it-kicker">סקירה מהירה</span>
+            </summary>
+            <div className="it-collapse-body">
+              <ul className="it-scenario-list">
+                <li><span>1. בחרנו מילה/ביטוי</span><span>{state.selectedTokenId ? '✔' : '—'}</span></li>
+                <li><span>2. גרירה/התאמה לתבנית</span><span>{state.completedAtLeastOneDrop ? '✔' : '—'}</span></li>
+                <li><span>3. נחשפה שאלה + חריצים</span><span>{state.active ? '✔' : '—'}</span></li>
+                <li><span>4. וריאציית "מטופל אחר"</span><span>{state.scoreVariants > 0 ? '✔' : '—'}</span></li>
+                <li><span>5. Reveal-only (לא אמת)</span><span>✔</span></li>
+              </ul>
+            </div>
+          </details>
         </div>
       </div>
     </div>
   );
 }
+
