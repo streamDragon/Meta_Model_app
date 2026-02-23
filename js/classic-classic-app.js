@@ -435,50 +435,47 @@
     }
 
     function renderHeader(session) {
+        const round = currentRound();
         const canPause = state.mode === 'learning';
         const timerTone = session && session.timeLeftSeconds <= 30 ? 'warn' : '';
         const livesChip = state.mode === 'exam'
-            ? `<span class="cc-stat-chip ${timerTone ? '' : ''}" data-tone="${session && session.livesLeft <= 1 ? 'warn' : ''}">
-                חיים <strong>${Number.isFinite(session?.livesLeft) ? session.livesLeft : '-'}</strong>
+            ? `<span class="cc-stat-chip" data-tone="${session && session.livesLeft <= 1 ? 'warn' : ''}">
+                ???? <strong>${Number.isFinite(session?.livesLeft) ? session.livesLeft : '-'}</strong>
               </span>`
             : '';
+        const focusLabel = familyFocusLabel(state.familyFocus);
+        const currentStage = session?.ended ? '??? ????' : (stageLabel(round?.stage || '') || '?????');
 
         return `
           <header class="cc-panel cc-header">
             <div class="cc-header-row">
               <div class="cc-brand">
-                <h1>Classic Classic · מאמן מטא-מודל</h1>
-                <p>מבוסס טבלת Breen (MVP עם DEL / DIS / GEN) · תרגול RTL</p>
+                <h1>Classic Classic ? ???? ???-????</h1>
+                <p>???? ????? + ??? ????? ????: ????? ? ???? ? ???? ? ???? ? ?????</p>
               </div>
-              <div class="cc-mode-toggle" role="tablist" aria-label="בחירת מצב">
-                <button type="button" class="cc-mode-btn ${state.mode === 'learning' ? 'is-active' : ''}" data-cc-action="mode-learning">למידה</button>
-                <button type="button" class="cc-mode-btn ${state.mode === 'exam' ? 'is-active' : ''}" data-cc-action="mode-exam">מבחן</button>
+              <div class="cc-mode-toggle" role="tablist" aria-label="????? ???">
+                <button type="button" class="cc-mode-btn ${state.mode === 'learning' ? 'is-active' : ''}" data-cc-action="mode-learning">?????</button>
+                <button type="button" class="cc-mode-btn ${state.mode === 'exam' ? 'is-active' : ''}" data-cc-action="mode-exam">????</button>
               </div>
             </div>
             <div class="cc-header-row">
               <div class="cc-stats">
-                <span class="cc-stat-chip" data-tone="${timerTone}">
-                  זמן <strong>${formatTime(session?.timeLeftSeconds || 0)}</strong>
-                </span>
-                <span class="cc-stat-chip">
-                  ניקוד <strong>${session?.score ?? 0}</strong>
-                </span>
-                <span class="cc-stat-chip">
-                  רצף <strong>${session?.streak ?? 0}</strong>
-                </span>
+                <span class="cc-stat-chip" data-tone="${timerTone}">??? <strong>${formatTime(session?.timeLeftSeconds || 0)}</strong></span>
+                <span class="cc-stat-chip">????? <strong>${session?.score ?? 0}</strong></span>
+                <span class="cc-stat-chip">??? <strong>${session?.streak ?? 0}</strong></span>
                 ${livesChip}
               </div>
               <div class="cc-actions">
-                <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="toggle-pause" ${!canPause || !session || session.ended ? 'disabled' : ''}>
-                  ${state.paused ? 'המשך' : 'השהה'}
-                </button>
-                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="restart-session">
-                  התחל מחדש
-                </button>
-                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="end-session" ${!session || session.ended ? 'disabled' : ''}>
-                  סיים סשן
-                </button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="toggle-philosopher" aria-pressed="${state.showPhilosopher ? 'true' : 'false'}">??????? / ????</button>
+                <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="toggle-pause" ${!canPause || !session || session.ended ? 'disabled' : ''}>${state.paused ? '????' : '????'}</button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="restart-session">???? ????</button>
+                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="end-session" ${!session || session.ended ? 'disabled' : ''}>???? ???</button>
               </div>
+            </div>
+            <div class="cc-inline-meta" aria-label="??? ????? ?????">
+              <span class="cc-focus-chip">?????: <strong>${escapeHtml(focusLabel)}</strong></span>
+              <span class="cc-focus-chip">?????: <strong>${escapeHtml(currentStage)}</strong></span>
+              ${round?.pattern ? `<span class="cc-focus-chip">?????: <strong>${escapeHtml(round.pattern.name)}</strong></span>` : ''}
             </div>
           </header>
         `;
@@ -489,40 +486,132 @@
         const currentPattern = round?.pattern || null;
         const activeCellId = currentPattern?.breenCellId || '';
         const helpTexts = getFamilyHelpTexts();
-        const copy = state.copy || {};
+        const currentFocus = normalizeFamilyFocus(state.familyFocus);
 
         return `
-          <aside class="cc-panel cc-side" aria-label="פאנל טבלת ברין">
+          <aside class="cc-panel cc-side" aria-label="???? Breen ?????? ?????">
             <div>
-              <h2>טבלת Breen (MVP)</h2>
-              <p class="cc-sub">הטבלה נשארת קבועה על המסך. כל סבב מדליק תא אחד.</p>
+              <h2>???? Michael Breen (????? ??????)</h2>
+              <p class="cc-sub">?? ???? ??????. ?????? ????? ???????? ??????. ????? ???? ?????? "???????".</p>
             </div>
+
+            <div class="cc-breen-toolbar">
+              <button type="button" class="cc-tag-btn ${currentFocus === 'all' ? 'is-active' : ''}" data-cc-family-focus="all">?? ???????</button>
+              <span class="cc-sub">????? ?? ????? = ??? ??? ?????? ??????.</span>
+            </div>
+
             <div class="cc-breen-grid">
               ${cells.map((cell) => {
+                  const familyKey = normalizeFamilyFocus(cell.family);
                   const isActive = String(cell.id) === String(activeCellId);
+                  const isFocus = currentFocus !== 'all' && familyKey === currentFocus;
                   return `
-                    <div class="cc-breen-cell ${isActive ? 'is-active' : ''}" data-cell-id="${escapeHtml(cell.id)}">
+                    <button type="button" class="cc-breen-cell ${isActive ? 'is-active' : ''} ${isFocus ? 'is-focus' : ''}" data-cell-id="${escapeHtml(cell.id)}" data-cc-family-focus="${escapeHtml(cell.family || '')}">
                       <span class="cc-cell-code">${escapeHtml(cell.label)}</span>
                       <span class="cc-cell-label">${escapeHtml(cell.labelHe || cell.family || cell.id)}</span>
                       <span class="cc-cell-help">${escapeHtml(helpTexts[cell.family] || '')}</span>
+                    </button>
+                  `;
+              }).join('')}
+            </div>
+
+            <div class="cc-current-pattern-card">
+              <small>???? ???????</small>
+              <strong>${escapeHtml(currentPattern?.name || '???? ????? ???????')}</strong>
+              <span class="cc-sub">${escapeHtml(currentPattern ? familyLabel(currentPattern.family) : familyFocusLabel(state.familyFocus))}</span>
+            </div>
+
+            <div class="cc-help-box">
+              <strong>??? ???</strong>
+              <div>1. ???? ????? ?????. 2. ??? ??? ????. 3. ???? ????? ?????. 4. ?????? ?????? ????.</div>
+            </div>
+          </aside>
+        `;
+    }
+
+    function renderFlowGuide(round) {
+        if (!round) return '';
+        const stage = round.stage;
+        const currentCopy = getStageCopy(round);
+        const steps = [
+            { id: 'question', label: '1. ????', goal: '????? ???? ??????' },
+            { id: 'problem', label: '2. ????', goal: '?? ?????? ????' },
+            { id: 'goal', label: '3. ????', goal: '???? ???? ??????' },
+            { id: 'summary', label: '4. ?????', goal: '????? ????? ?????' }
+        ];
+        const currentIndex = steps.findIndex((step) => step.id === stage);
+        const helperText = stage === 'summary'
+            ? '????? ?????? ?? ??????, ??? ?????? ??????, ????? ?????? ? ??? ???????.'
+            : `????? ????: ${currentCopy.title}. ${currentCopy.desc}`;
+
+        return `
+          <section class="cc-flow-guide" aria-label="??? ??????? ????">
+            <div class="cc-flow-head">
+              <strong>?? ????? ??????</strong>
+              <span>???? ??? ??? ??? ? ??? ??? ?????? ??????.</span>
+            </div>
+            <div class="cc-flow-steps">
+              ${steps.map((step, index) => {
+                  const classes = [
+                      'cc-flow-step',
+                      stage === step.id ? 'is-current' : '',
+                      currentIndex > index ? 'is-done' : ''
+                  ].filter(Boolean).join(' ');
+                  return `
+                    <div class="${classes}">
+                      <div class="cc-flow-step-title">${escapeHtml(step.label)}</div>
+                      <div class="cc-flow-step-goal">${escapeHtml(step.goal)}</div>
                     </div>
                   `;
               }).join('')}
             </div>
-            <div class="cc-current-pattern-card">
-              <small>תבנית נוכחית</small>
-              <strong>${escapeHtml(currentPattern?.name || '—')}</strong>
-              <span class="cc-sub">${escapeHtml(familyLabel(currentPattern?.family || ''))}</span>
+            <div class="cc-flow-target">${escapeHtml(helperText)}</div>
+          </section>
+        `;
+    }
+
+    function renderPhilosopherOverlay(round) {
+        if (!state.showPhilosopher) return '';
+        const copy = state.copy || {};
+        const operation = operationProfileForFamily(round?.pattern?.family);
+        const modeTitle = state.mode === 'exam' ? '??? ????' : '??? ?????';
+        const modeText = state.mode === 'exam' ? (copy.examMode || '') : (copy.learningMode || '');
+
+        return `
+          <div class="cc-philosopher-overlay" role="dialog" aria-modal="true" aria-label="??????? - ????">
+            <div class="cc-philosopher-dialog">
+              <div class="cc-philosopher-head">
+                <div>
+                  <h3>???????? ? ???? ?? ????</h3>
+                  <p>????? ????? ??????? ????, ??? ????? ????? ????? ????? ?????.</p>
+                </div>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-philosopher">????</button>
+              </div>
+              <div class="cc-philosopher-grid">
+                <div class="cc-summary-block">
+                  <h4>?? ?? Meta Model?</h4>
+                  <p>${escapeHtml(copy.metaModelPurpose || '')}</p>
+                </div>
+                <div class="cc-summary-block">
+                  <h4>??? C ? ??? ??????</h4>
+                  <p>${escapeHtml(copy.problemDefinition || '')}</p>
+                </div>
+                <div class="cc-summary-block">
+                  <h4>??? D ? ??? ??????</h4>
+                  <p>${escapeHtml(copy.goalDefinition || '')}</p>
+                </div>
+                <div class="cc-summary-block">
+                  <h4>${escapeHtml(modeTitle)}</h4>
+                  <p>${escapeHtml(modeText)}</p>
+                </div>
+                <div class="cc-summary-block">
+                  <h4>????? ?????? (Structure of Magic)</h4>
+                  <p><strong>${escapeHtml(operation.code)}</strong> ? ${escapeHtml(operation.title)}</p>
+                  <p>${escapeHtml(operation.desc)}</p>
+                </div>
+              </div>
             </div>
-            <div class="cc-help-box">
-              <strong>מה זה Meta Model?</strong>
-              <div>${escapeHtml(copy.metaModelPurpose || '')}</div>
-            </div>
-            <div class="cc-help-box">
-              <strong>${state.mode === 'exam' ? 'מצב מבחן' : 'מצב למידה'}</strong>
-              <div>${escapeHtml(state.mode === 'exam' ? (copy.examMode || '') : (copy.learningMode || ''))}</div>
-            </div>
-          </aside>
+          </div>
         `;
     }
 
@@ -722,20 +811,16 @@
     function renderMainPanel() {
         const session = state.session;
         if (!session) {
-            return `<main class="cc-panel cc-main"><div class="cc-loading">מכין סשן…</div></main>`;
+            return `<main class="cc-panel cc-main"><div class="cc-loading">???? ???...</div></main>`;
         }
         const round = currentRound();
         const stageCard = session.ended ? renderReport() : renderStageCard(round);
 
         return `
-          <main class="cc-panel cc-main" aria-label="לוח משחק">
-            ${!session.ended && round ? `
-              <div class="cc-help-box">
-                <strong>הבעיה</strong> · ${escapeHtml(state.copy?.problemDefinition || '')}<br>
-                <strong>המטרה</strong> · ${escapeHtml(state.copy?.goalDefinition || '')}
-              </div>
-            ` : ''}
+          <main class="cc-panel cc-main" aria-label="??? ????">
+            ${!session.ended && round ? renderFlowGuide(round) : ''}
             ${stageCard}
+            ${renderPhilosopherOverlay(round)}
           </main>
         `;
     }
@@ -769,6 +854,12 @@
                 return;
             }
 
+            const familyFocusEl = event.target.closest('[data-cc-family-focus]');
+            if (familyFocusEl) {
+                setFamilyFocus(familyFocusEl.getAttribute('data-cc-family-focus'));
+                return;
+            }
+
             const optionEl = event.target.closest('[data-cc-option-id]');
             if (optionEl) {
                 submitOption(optionEl.getAttribute('data-cc-option-id'));
@@ -776,6 +867,11 @@
         });
 
         document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && state.showPhilosopher) {
+                event.preventDefault();
+                togglePhilosopher(false);
+                return;
+            }
             if (!state.session || state.session.ended || state.paused) return;
             const round = currentRound();
             if (!round || round.stage === 'summary') return;
