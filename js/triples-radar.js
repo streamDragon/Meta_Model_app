@@ -237,6 +237,7 @@
         phone.qaFeed = [];
         phone.completedScenario = false;
         phone.reply = null;
+        phone.challenge = null;
         phone.transcriptOpen = false;
         phone.toast = '';
         phone.toastTone = 'info';
@@ -275,21 +276,21 @@
     function getShortCategoryChip(categoryId) {
         const label = getCategoryLabelEn(categoryId);
         const map = {
-            lost_performative: 'Source',
-            assumptions: 'Assume',
-            mind_reading: 'Mind',
-            universal_quantifier: 'Pattern',
-            modal_operator: 'Limit',
-            cause_effect: 'Link',
-            nominalisations: 'Noun',
-            identity_predicates: 'Identity',
-            complex_equivalence: 'Meaning',
-            comparative_deletion: 'Compare',
-            time_space_predicates: 'Time/Place',
-            lack_referential_index: 'Who',
-            non_referring_nouns: 'What',
-            sensory_predicates: 'Sense',
-            unspecified_verbs: 'Action'
+            lost_performative: 'LP',
+            assumptions: 'A1',
+            mind_reading: 'MR',
+            universal_quantifier: 'UQ',
+            modal_operator: 'MO',
+            cause_effect: 'CE',
+            nominalisations: 'NOM',
+            identity_predicates: 'ID',
+            complex_equivalence: 'CEq',
+            comparative_deletion: 'CD',
+            time_space_predicates: 'CTX',
+            lack_referential_index: 'RI',
+            non_referring_nouns: 'NRN',
+            sensory_predicates: 'VAK',
+            unspecified_verbs: 'UV'
         };
         const normalized = root.triplesRadarCore.normalizeCategoryId(categoryId);
         return map[normalized] || label.split(/\s+/)[0] || label;
@@ -311,40 +312,42 @@
         }
 
         const promptMap = {
-            lost_performative: 'By what standard is this judged?',
-            assumptions: 'What are you assuming must be true here?',
-            mind_reading: 'How do you know what the other person thinks?',
-            universal_quantifier: 'Always? Any exceptions at all?',
-            modal_operator: 'What stops you, exactly?',
-            cause_effect: 'How does X create Y, step by step?',
-            nominalisations: 'What happens in action, not as a noun?',
-            identity_predicates: 'In which area is this true, and where not?',
-            complex_equivalence: 'How does this event mean that conclusion?',
-            comparative_deletion: 'Compared to what, specifically?',
-            time_space_predicates: 'When/where exactly?',
-            lack_referential_index: 'Who exactly is “they” here?',
-            non_referring_nouns: 'What does that “thing” mean exactly?',
-            sensory_predicates: 'What do you see/hear/feel specifically?',
-            unspecified_verbs: 'What happens, step by step?'
+            lost_performative: 'לפי איזה סטנדרט זה נשפט כאן?',
+            assumptions: 'איזו הנחה כאן חייבת להיות נכונה כדי שזה יחזיק?',
+            mind_reading: 'איך אתה יודע/ת מה הצד השני חושב או מתכוון?',
+            universal_quantifier: 'תמיד? אין אפילו יוצא דופן אחד?',
+            modal_operator: 'מה עוצר אותך בפועל? מה בדיוק מונע?',
+            cause_effect: 'איך בדיוק X מוביל ל-Y, שלב אחרי שלב?',
+            nominalisations: 'מה קורה כאן בפועל (כפעולה) ולא כשם עצם?',
+            identity_predicates: 'באיזה תחום זה נכון, ובאיזה תחום לא בהכרח?',
+            complex_equivalence: 'איך האירוע הזה אומר את המסקנה הזאת?',
+            comparative_deletion: 'ביחס למה בדיוק? ומה המדד?',
+            time_space_predicates: 'מתי/איפה בדיוק זה קורה (ומתי לא)?',
+            lack_referential_index: 'מי בדיוק זה "הם/כולם" כאן?',
+            non_referring_nouns: 'למה בדיוק מתכוונים במילה הזאת?',
+            sensory_predicates: 'מה בדיוק רואים/שומעים/מרגישים בגוף?',
+            unspecified_verbs: 'מה קורה כאן צעד-צעד בפועל?'
         };
 
-        return promptMap[normalized] || `What would make "${getCategoryLabelEn(normalized)}" clearer here?`;
+        return promptMap[normalized] || `מה יעזור לדייק כאן דרך ${getShortCategoryChip(normalized)}?`;
     }
 
+    
     function buildPhoneAnswer(categoryId) {
         const current = getCurrentScenario();
         const anchor = getPhoneSelectedAnchor();
         const anchorText = clipText(anchor?.text || current?.clientText || '', 72);
-        const chip = getShortCategoryChip(categoryId).toLowerCase();
+        const chip = getShortCategoryChip(categoryId);
         const variants = [
-            `Usually when "${anchorText}" happens, I read it as the same ${chip} pattern again.`,
-            `In that moment, "${anchorText}" feels like proof, so I react before I check details.`,
-            `When I focus on "${anchorText}", I narrow everything to one meaning and lose context.`
+            `כש"${anchorText}" קורה, אני ישר קורא/ת את זה דרך ${chip} ומגיב/ה מהר.`,
+            `ברגע הזה "${anchorText}" מרגיש לי כמו הוכחה, לפני שבדקתי פרטים.`,
+            `כשאני נתפס/ת על "${anchorText}", הכול מצטמצם למשמעות אחת ואני מפספס/ת הקשר.`
         ];
         const index = ensurePhoneScenarioFlow().qaFeed.length % variants.length;
         return variants[index];
     }
 
+    
     function buildPhoneReplyDraft() {
         const current = getCurrentScenario();
         const phone = ensurePhoneScenarioFlow();
@@ -356,15 +359,50 @@
         });
 
         const anchorText = clipText(anchor?.text || current?.clientText || '', 80);
-        const mirror = `Mirror: "When '${anchorText}' hits, it can feel final and heavy."`;
-        const gap = 'Gap: "Let us slow it down and test one piece instead of the whole story."';
-        const next = 'Next: "Choose one message, one topic, one clear ask."';
+        const mirror = `שיקוף: "כש'${anchorText}' פוגש אותך, זה יכול להרגיש סופי וכבד."`;
+        const gap = 'תובנת מטפל: "כרגע יש קפיצה מהאירוע למשמעות. נבדוק חלק אחד במקום את כל הסיפור יחד."';
+        const next = 'שאלת העדפה: "מה הכי נכון לך לבדוק עכשיו — עובדה, משמעות, או תנאי?"';
         return {
             bullets,
             mirror,
             gap,
             next,
-            actions: ['A: Reality plan', 'B: Regulate']
+            actions: ['בדיקת עובדות', 'ויסות/האטה']
+        };
+    }
+
+    
+    function buildPhoneChallengeDraft() {
+        const phone = ensurePhoneScenarioFlow();
+        const qaFeed = Array.isArray(phone.qaFeed) ? phone.qaFeed : [];
+        const challengeByCategory = {
+            lost_performative: 'לפי מי בדיוק זה "לא בסדר" או "צריך" כאן?',
+            assumptions: 'איזו הנחה כאן הכי כדאי לבדוק קודם מול המציאות?',
+            mind_reading: 'איך נבדוק מה באמת נאמר/נעשה בלי לנחש כוונה?',
+            universal_quantifier: 'מה יוצא הדופן הראשון שמחליש את ה"תמיד/אף פעם"?',
+            modal_operator: 'מה מונע בפועל, ומה צעד קטן שכן אפשרי?',
+            cause_effect: 'מה השרשרת בפועל, ומה עוד יכול להסביר את אותה תוצאה?',
+            nominalisations: 'מה קורה בפועל צעד-צעד במקום שם עצם כללי?',
+            identity_predicates: 'באיזה תחום זה נכון, ובאיזה תחום זה לא בהכרח נכון?',
+            complex_equivalence: 'איך בדיוק X אומר Y? מה הקריטריון או הראיה?',
+            comparative_deletion: 'ביחס למה/למי? ומה המדד?',
+            time_space_predicates: 'מתי/איפה בדיוק זה קורה, ומתי לא?',
+            lack_referential_index: 'מי בדיוק זה "הם" / "כולם" במקרה הזה?',
+            non_referring_nouns: 'למה בדיוק מתכוונים במילה הזו?',
+            sensory_predicates: 'מה ראית/שמעת/הרגשת בגוף באופן קונקרטי?',
+            unspecified_verbs: 'מה קורה בפועל צעד-צעד בתוך הפועל הזה?'
+        };
+
+        const items = qaFeed.slice(0, 3).map((item) => ({
+            letter: item.letter,
+            categoryLabel: item.categoryLabel,
+            challenge: challengeByCategory[item.categoryId] || 'מה השאלה המדויקת הבאה שתבדוק את זה מול המציאות?'
+        }));
+
+        return {
+            intro: 'שלב אתגר: אחרי החשיפה, בודקים כל אחד משלושת הפריטים שנאספו.',
+            items,
+            therapistChoice: 'מה המטופל מעדיף לחקור עכשיו: ראיה? משמעות? תנאים?'
         };
     }
 
@@ -392,12 +430,13 @@
         const anchor = (phone.anchors || []).find((item) => item.id === anchorId);
         if (!anchor) return;
         if (!anchor.isTop) {
-            showPhoneToast('Not a top anchor. Try another.', 'warn');
+            showPhoneToast('כרגע בחר/י אחד מ־Top 3 כדי לבנות שלשה חזקה.', 'warn');
             return;
         }
         phone.selectedAnchorId = anchor.id;
         phone.phase = 'focus';
         phone.reply = null;
+        phone.challenge = null;
         phone.transcriptOpen = false;
         phone.toast = '';
         renderBoard();
@@ -427,7 +466,7 @@
         const entry = {
             letter,
             categoryId: normalized,
-            categoryLabel: getCategoryLabelEn(normalized),
+            categoryLabel: getCategoryLabelHe(normalized),
             question: buildPhoneQuestion(normalized),
             answer: buildPhoneAnswer(normalized)
         };
@@ -435,6 +474,7 @@
         phone.usedCategoryIds = [...(phone.usedCategoryIds || []), normalized];
         phone.qaFeed = [...(phone.qaFeed || []), entry];
         phone.transcriptOpen = false;
+        phone.challenge = null;
         phone.toast = '';
 
         state.score += 1;
@@ -453,6 +493,15 @@
         const phone = ensurePhoneScenarioFlow();
         if ((phone.qaFeed || []).length < 3) return;
         phone.reply = buildPhoneReplyDraft();
+        phone.challenge = null;
+        phone.phase = 'done';
+        renderBoard();
+    }
+
+    function phoneGenerateChallenge() {
+        const phone = ensurePhoneScenarioFlow();
+        if (!phone.reply || (phone.qaFeed || []).length < 3) return;
+        phone.challenge = buildPhoneChallengeDraft();
         phone.phase = 'done';
         renderBoard();
     }
@@ -478,16 +527,18 @@
         const canGenerate = qaFeed.length >= Math.min(3, rowCategories.length || 3);
 
         const stepSubtitleMap = {
-            anchors: 'Tap 1 highlight (Top 3 only)',
-            focus: 'Good pick. Continue.',
-            qa: `Tap 3 cards (each once) ${qaFeed.length}/3`,
-            done: phone.reply ? 'Reply draft ready' : '3/3 done'
+            anchors: 'בחר/י קטע מתוך לוח המילים (Top 3).',
+            focus: 'קטע נבחר. עכשיו ננעל על שלשת הקטגוריה/שכנים.',
+            qa: `אסוף/י 3 שאלות-תשובות (שכן/תבנית/שכן) · ${qaFeed.length}/3`,
+            done: phone.challenge
+                ? 'שלב אתגר פעיל: בודקים את 3 הפריטים שנחשפו'
+                : (phone.reply ? 'שלב חשיפה הושלם — יש שיקוף ותובנה' : '3/3 הושלם — הפק/י שיקוף')
         };
         const headerTitleMap = {
-            anchors: 'Triples Radar',
-            focus: 'Anchor selected',
-            qa: 'Meta on this anchor',
-            done: phone.reply ? 'Therapist reply' : '3/3 done'
+            anchors: 'Triples Radar · לוח מילים',
+            focus: 'נבחר קטע לחקירה',
+            qa: 'חשיפה: שואלים על תבנית ושכנים',
+            done: phone.challenge ? 'אתגור 3 הפריטים' : (phone.reply ? 'שיקוף + תובנת מטפל' : '3/3 הושלם')
         };
 
         const highlightButtons = (phone.anchors || []).map((anchor) => {
@@ -506,7 +557,7 @@
                     data-tr-phone-anchor-id="${escapeHtml(anchor.id)}"
                     ${disabled ? 'tabindex="-1" disabled' : ''}>
                     ${escapeHtml(anchor.text)}
-                    ${anchor.isTop ? '<span class="tr-phone-badge">Top</span>' : ''}
+                    ${anchor.isTop ? '<span class="tr-phone-badge">Top 3</span>' : ''}
                 </button>
             `;
         }).join('');
@@ -528,8 +579,8 @@
                     ${used ? 'disabled' : ''}>
                     <span class="tr-phone-card-letter">${escapeHtml(getPhoneCardLetter(idx))}</span>
                     <span class="tr-phone-card-chip">${escapeHtml(getShortCategoryChip(normalized))}</span>
-                    <small class="tr-phone-card-label">${escapeHtml(getCategoryLabelEn(normalized))}</small>
-                    ${used ? '<span class="tr-phone-card-used">Used ✓</span>' : ''}
+                    <small class="tr-phone-card-label">${escapeHtml(getCategoryLabelHe(normalized))}</small>
+                    ${used ? '<span class="tr-phone-card-used">נשאל ✓</span>' : ''}
                 </button>
             `;
         }).join('');
@@ -537,21 +588,91 @@
         const qaFeedHtml = qaFeed.length
             ? qaFeed.map((item) => `
                 <article class="tr-phone-qa-item">
-                    <div class="tr-phone-qa-kicker">Q/A ${escapeHtml(item.letter)} · ${escapeHtml(item.categoryLabel)}</div>
+                    <div class="tr-phone-qa-kicker">שאלה/תשובה ${escapeHtml(item.letter)} · ${escapeHtml(item.categoryLabel)}</div>
                     <p class="tr-phone-q-line"><strong>Q:</strong> ${escapeHtml(item.question)}</p>
                     <p class="tr-phone-a-line"><strong>A:</strong> ${escapeHtml(item.answer)}</p>
                 </article>
             `).join('')
-            : '<p class="tr-phone-muted">Tap one card to create a question + client answer.</p>';
+            : '<p class="tr-phone-muted">בחר/י כרטיס אחד מתוך השלשה כדי ליצור שאלה ותשובת מטופל.</p>';
 
         const collectedHtml = qaFeed.length
             ? qaFeed.map((item) => `<li><strong>${escapeHtml(item.letter)}</strong> · ${escapeHtml(getShortCategoryChip(item.categoryId))}: ${escapeHtml(clipText(item.answer, 56))}</li>`).join('')
             : '';
 
+        const wordBoardHtml = `
+            <section class="tr-phone-panel tr-phone-wordboard">
+                <div class="tr-phone-panel-title">לוח מילים / עוגנים מהמשפט</div>
+                <div class="tr-phone-wordboard-grid">
+                    ${(phone.anchors || []).map((anchor) => {
+                        const cls = [
+                            'tr-phone-word-chip',
+                            anchor.isTop ? 'is-top' : '',
+                            selectedAnchor && selectedAnchor.id === anchor.id ? 'is-selected' : ''
+                        ].filter(Boolean).join(' ');
+                        return `<span class="${cls}">${escapeHtml(anchor.text)}</span>`;
+                    }).join('')}
+                </div>
+                <p class="tr-phone-wordboard-note"><strong>Top 3:</strong> ${escapeHtml(topAnchors.map((item) => item.text).join(' | '))}</p>
+            </section>
+        `;
+
+        const breenTableHtml = `
+            <section class="tr-phone-panel tr-phone-breen-panel">
+                <div class="tr-phone-panel-title">טבלת מטא-מודל ברין (מלאה)</div>
+                <div class="tr-phone-breen-grid">
+                    ${root.triplesRadarCore.ROWS.map((r) => {
+                        const meta = ROW_META[r.id] || ROW_META.row1;
+                        const rowLocked = row && row.id === r.id;
+                        const cells = r.categories.map((categoryId) => {
+                            const normalized = root.triplesRadarCore.normalizeCategoryId(categoryId);
+                            const isUsed = (phone.usedCategoryIds || []).includes(normalized);
+                            const isCorrect = root.triplesRadarCore.normalizeCategoryId(current.correctCategory) === normalized;
+                            const classes = [
+                                'tr-phone-breen-cell',
+                                rowLocked ? 'is-row-locked' : '',
+                                isUsed ? 'is-used' : '',
+                                isCorrect ? 'is-correct' : ''
+                            ].filter(Boolean).join(' ');
+                            return `
+                                <div class="${classes}">
+                                    <span class="tr-phone-breen-chip">${escapeHtml(getShortCategoryChip(normalized))}</span>
+                                    <small>${escapeHtml(getCategoryLabelHe(normalized))}</small>
+                                </div>
+                            `;
+                        }).join('');
+                        return `
+                            <div class="tr-phone-breen-row ${escapeHtml(meta.colorClass || '')} ${rowLocked ? 'is-active' : ''}">
+                                <div class="tr-phone-breen-row-head">${escapeHtml(meta.heLabel || r.label || r.id)}</div>
+                                <div class="tr-phone-breen-row-cells">${cells}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </section>
+        `;
+
+        const challengeHtml = phone.challenge
+            ? `
+                <section class="tr-phone-panel tr-phone-challenge-panel">
+                    <div class="tr-phone-panel-title">אתגור 3 הדברים שנחשפו</div>
+                    <p class="tr-phone-challenge-intro">${escapeHtml(phone.challenge.intro || '')}</p>
+                    <div class="tr-phone-challenge-list">
+                        ${(phone.challenge.items || []).map((item) => `
+                            <article class="tr-phone-challenge-item">
+                                <div class="tr-phone-qa-kicker">אתגור ${escapeHtml(item.letter)} · ${escapeHtml(item.categoryLabel)}</div>
+                                <p>${escapeHtml(item.challenge)}</p>
+                            </article>
+                        `).join('')}
+                    </div>
+                    <div class="tr-phone-challenge-next">${escapeHtml(phone.challenge.therapistChoice || '')}</div>
+                </section>
+            `
+            : '';
+
         const replyHtml = phone.reply
             ? `
                 <section class="tr-phone-panel">
-                    <div class="tr-phone-panel-title">THERAPIST REPLY (draft)</div>
+                    <div class="tr-phone-panel-title">שיקוף + תובנה של המטפל (טיוטה)</div>
                     <p>${escapeHtml(phone.reply.mirror)}</p>
                     <p>${escapeHtml(phone.reply.gap)}</p>
                     <p>${escapeHtml(phone.reply.next)}</p>
@@ -565,19 +686,19 @@
         const transcriptHtml = phone.transcriptOpen
             ? `
                 <section class="tr-phone-panel tr-phone-transcript">
-                    <div class="tr-phone-panel-title">Transcript</div>
-                    <div class="tr-phone-transcript-block"><strong>Client</strong><p>${escapeHtml(current.clientText || '')}</p></div>
-                    <div class="tr-phone-transcript-block"><strong>Anchor</strong><p>${escapeHtml(selectedAnchor?.text || '')}</p></div>
+                    <div class="tr-phone-panel-title">תמליל הסבב</div>
+                    <div class="tr-phone-transcript-block"><strong>מטופל</strong><p>${escapeHtml(current.clientText || '')}</p></div>
+                    <div class="tr-phone-transcript-block"><strong>קטע שנבחר</strong><p>${escapeHtml(selectedAnchor?.text || '')}</p></div>
                     ${qaFeed.map((item) => `
                         <div class="tr-phone-transcript-block">
-                            <strong>Q/A ${escapeHtml(item.letter)}</strong>
+                            <strong>שאלה/תשובה ${escapeHtml(item.letter)}</strong>
                             <p><em>Q:</em> ${escapeHtml(item.question)}</p>
                             <p><em>A:</em> ${escapeHtml(item.answer)}</p>
                         </div>
                     `).join('')}
                     ${phone.reply ? `
                         <div class="tr-phone-transcript-block">
-                            <strong>Reply</strong>
+                            <strong>שיקוף/תובנה</strong>
                             <p>${escapeHtml(phone.reply.mirror)}</p>
                             <p>${escapeHtml(phone.reply.gap)}</p>
                             <p>${escapeHtml(phone.reply.next)}</p>
@@ -590,10 +711,10 @@
         const focusPanelHtml = selectedAnchor
             ? `
                 <section class="tr-phone-panel tr-phone-anchor-panel">
-                    <div class="tr-phone-panel-title">SELECTED ANCHOR</div>
+                    <div class="tr-phone-panel-title">קטע שנבחר</div>
                     <p class="tr-phone-anchor-text">${escapeHtml(selectedAnchor.text)}</p>
                     ${phone.phase === 'focus' ? `
-                        <button type="button" class="tr-phone-meta-btn" data-tr-phone-action="meta">Meta Model</button>
+                        <button type="button" class="tr-phone-meta-btn" data-tr-phone-action="meta">התחל חשיפה בשלשה</button>
                     ` : ''}
                 </section>
             `
@@ -602,10 +723,10 @@
         const qaPanelHtml = selectedAnchor && (phone.phase === 'qa' || phone.phase === 'done' || phone.reply)
             ? `
                 <section class="tr-phone-panel tr-phone-locked-panel">
-                    <div class="tr-phone-panel-title">TRIPLE (LOCKED)</div>
+                    <div class="tr-phone-panel-title">שלשה נעולה (תבנית + שכנים)</div>
                     <div class="tr-phone-row-note">${escapeHtml(rowMeta.heLabel || '')}</div>
                     <div class="tr-phone-cards">${tripleCards}</div>
-                    <div class="tr-phone-panel-title">Q/A FEED</div>
+                    <div class="tr-phone-panel-title">פיד חשיפה (3 שאלות/תשובות)</div>
                     <div class="tr-phone-qa-feed">${qaFeedHtml}</div>
                 </section>
             `
@@ -615,14 +736,20 @@
             ? `
                 <section class="tr-phone-panel tr-phone-done-panel">
                     <div class="tr-phone-header-row">
-                        <div class="tr-phone-panel-title">3/3 done</div>
-                        <div class="tr-phone-done-micro">Scene ${state.index + 1}/${state.scenarios.length}</div>
+                        <div class="tr-phone-panel-title">3/3 הושלם (שלב חשיפה)</div>
+                        <div class="tr-phone-done-micro">סצנה ${state.index + 1}/${state.scenarios.length}</div>
                     </div>
                     <div class="tr-phone-inline-actions">
-                        <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="generate" ${canGenerate ? '' : 'disabled'}>Generate Reply</button>
-                        <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="transcript">${phone.transcriptOpen ? 'Hide Transcript' : 'Transcript'}</button>
+                        <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="generate" ${canGenerate ? '' : 'disabled'}>הפק שיקוף + תובנה</button>
+                        <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="transcript">${phone.transcriptOpen ? 'הסתר תמליל' : 'תמליל'}</button>
                     </div>
-                    <div class="tr-phone-panel-title">COLLECTED</div>
+                    ${phone.reply ? `
+                        <div class="tr-phone-inline-actions">
+                            <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="challenge">אתגר 3 דברים</button>
+                            <button type="button" class="tr-phone-secondary-btn" disabled>קודם חושפים ואז מאתגרים</button>
+                        </div>
+                    ` : ''}
+                    <div class="tr-phone-panel-title">מה נאסף עד עכשיו</div>
                     <ul class="tr-phone-collected-list">${collectedHtml}</ul>
                 </section>
             `
@@ -632,17 +759,17 @@
             <div class="triples-radar-phone-shell">
                 <div class="triples-radar-phone-header">
                     <div>
-                        <h4>${escapeHtml(headerTitleMap[phone.phase] || 'Triples Radar')}</h4>
+                        <h4>${escapeHtml(headerTitleMap[phone.phase] || 'Triples Radar · חשיפה ואתגור')}</h4>
                         <p>${escapeHtml(stepSubtitleMap[phone.phase] || '')}</p>
                     </div>
                     <div class="triples-radar-phone-stats">
-                        <span>Scene ${state.index + 1}/${state.scenarios.length}</span>
-                        <span>Score ${state.score}</span>
+                        <span>סצנה ${state.index + 1}/${state.scenarios.length}</span>
+                        <span>ניקוד ${state.score}</span>
                     </div>
                 </div>
 
                 <section class="tr-phone-panel tr-phone-client-panel">
-                    <div class="tr-phone-panel-title">CLIENT BLOCK</div>
+                    <div class="tr-phone-panel-title">לוח משפטים (מבנה הקסם)</div>
                     <p class="tr-phone-client-text">${escapeHtml(current.clientText || '')}</p>
                     <div class="tr-phone-highlights">${highlightButtons}</div>
                     <div class="tr-phone-top3-line">
@@ -651,15 +778,18 @@
                     </div>
                 </section>
 
+                ${wordBoardHtml}
+                ${breenTableHtml}
                 ${focusPanelHtml}
                 ${qaPanelHtml}
                 ${donePanelHtml}
                 ${replyHtml}
+                ${challengeHtml}
                 ${transcriptHtml}
 
                 <div class="tr-phone-footer-actions">
-                    <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="restart">Restart run</button>
-                    <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="next">Next scene</button>
+                    <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="restart">איפוס סבב</button>
+                    <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="next">הסצנה הבאה</button>
                 </div>
 
                 ${phone.toast ? `<div class="tr-phone-toast" data-tone="${escapeHtml(phone.toastTone || 'info')}">${escapeHtml(phone.toast)}</div>` : ''}
@@ -878,6 +1008,7 @@
                 const action = phoneActionBtn.getAttribute('data-tr-phone-action') || '';
                 if (action === 'meta') phoneOpenMeta();
                 if (action === 'generate') phoneGenerateReply();
+                if (action === 'challenge') phoneGenerateChallenge();
                 if (action === 'transcript') phoneToggleTranscript();
                 if (action === 'next') nextScenario();
                 if (action === 'restart') restartRun();
