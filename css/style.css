@@ -7797,6 +7797,69 @@ body.force-desktop-view .mobile-tab-nav {
 /* =========================
    Triples Radar (Michael Breen)
    ========================= */
+.triples-radar-mode-bar {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 14px;
+    border: 1px solid #d3e3fb;
+    background: linear-gradient(180deg, #f7fbff 0%, #eef5ff 100%);
+    display: grid;
+    gap: 8px;
+}
+
+.triples-radar-mode-copy {
+    display: grid;
+    gap: 3px;
+}
+
+.triples-radar-mode-copy strong {
+    color: #123f7b;
+    font-size: 0.92rem;
+}
+
+.triples-radar-mode-copy p {
+    margin: 0;
+    color: #49698f;
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+.triples-radar-mode-switch {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.triples-radar-mode-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #bfd1ea;
+    background: #ffffff;
+    color: #294c76;
+    border-radius: 999px;
+    padding: 6px 11px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    line-height: 1.2;
+    transition: all 0.18s ease;
+}
+
+.triples-radar-mode-btn:hover {
+    border-color: #7fb0ea;
+    transform: translateY(-1px);
+}
+
+.triples-radar-mode-btn.is-active,
+.triples-radar-mode-btn[aria-pressed="true"] {
+    border-color: #0f766e;
+    color: #ffffff;
+    background: linear-gradient(135deg, #0f766e 0%, #1d4ed8 100%);
+    box-shadow: 0 6px 16px rgba(29, 78, 216, 0.22);
+}
+
 .triples-radar-card {
     border: 1px solid rgba(16, 24, 40, 0.1);
     border-radius: 16px;
@@ -8038,6 +8101,21 @@ body.force-desktop-view .mobile-tab-nav {
 }
 
 @media (max-width: 760px) {
+    .triples-radar-mode-bar {
+        padding: 9px;
+        border-radius: 12px;
+    }
+
+    .triples-radar-mode-switch {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .triples-radar-mode-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
     .triples-radar-card {
         padding: 12px;
         border-radius: 14px;

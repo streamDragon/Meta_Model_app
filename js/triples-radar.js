@@ -6,6 +6,15 @@
     root.setupTriplesRadarModule = api.setupTriplesRadarModule;
 })(function createTriplesRadarModule(root) {
     const STORAGE_KEY = 'triples_radar_progress_v1';
+    const UI_MODE_STORAGE_KEY = 'triples_radar_ui_mode_v1';
+    const UI_MODE_BY_TOGGLE_KEY = Object.freeze({
+        triple: 'phone',
+        single: 'desktop'
+    });
+    const TOGGLE_KEY_BY_UI_MODE = Object.freeze({
+        phone: 'triple',
+        desktop: 'single'
+    });
 
     const ROW_META = Object.freeze({
         row1: Object.freeze({ colorClass: 'row-sky', heLabel: 'שלשה 1 — שכבת מקור' }),
@@ -28,7 +37,8 @@
         selectedCategory: '',
         elements: null,
         uiMode: 'desktop',
-        phone: null
+        phone: null,
+        desktopRootMarkup: ''
     };
 
     function escapeHtml(value) {
@@ -108,6 +118,63 @@
         if (document.body.classList.contains('force-mobile-view')) return true;
         if (document.body.classList.contains('view-mobile')) return true;
         return false;
+    }
+
+    function getDefaultUiMode() {
+        return shouldUsePhoneFlow() ? 'phone' : 'desktop';
+    }
+
+    function normalizeUiMode(value) {
+        const raw = String(value || '').trim().toLowerCase();
+        if (!raw) return getDefaultUiMode();
+        if (raw === 'phone' || raw === 'triple' || raw === 'advanced' || raw === 'row') return 'phone';
+        if (raw === 'desktop' || raw === 'single' || raw === 'legacy' || raw === 'category') return 'desktop';
+        return getDefaultUiMode();
+    }
+
+    function loadUiModePreference() {
+        try {
+            return normalizeUiMode(localStorage.getItem(UI_MODE_STORAGE_KEY) || '');
+        } catch (error) {
+            return getDefaultUiMode();
+        }
+    }
+
+    function saveUiModePreference() {
+        try {
+            localStorage.setItem(UI_MODE_STORAGE_KEY, state.uiMode);
+        } catch (error) {
+            // Ignore storage errors.
+        }
+    }
+
+    function getToggleKeyByUiMode() {
+        return TOGGLE_KEY_BY_UI_MODE[state.uiMode] || 'triple';
+    }
+
+    function updateModeToggleUI() {
+        const modeSwitch = document.getElementById('triples-radar-mode-switch');
+        if (!modeSwitch) return;
+
+        const activeToggleKey = getToggleKeyByUiMode();
+        modeSwitch.querySelectorAll('[data-tr-ui-mode]').forEach((btn) => {
+            const isActive = (btn.getAttribute('data-tr-ui-mode') || '') === activeToggleKey;
+            btn.classList.toggle('is-active', isActive);
+            btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+
+        const titleEl = document.getElementById('triples-radar-mode-title');
+        const noteEl = document.getElementById('triples-radar-mode-note');
+        if (titleEl) {
+            titleEl.textContent = activeToggleKey === 'triple'
+                ? 'Triples Radar · כל השורה'
+                : 'Radar רגיל · קטגוריה אחת';
+        }
+        if (noteEl) {
+            noteEl.textContent = activeToggleKey === 'triple'
+                ? 'כמו Meta Radar, אבל כאן עובדים על כל השלשה: 3 שאלות/תשובות באותה שורה.'
+                : 'מצב רדאר רגיל: בוחרים קטגוריה אחת מהטבלה ומקבלים משוב מדויק / קרוב / שורה שגויה.';
+        }
     }
 
     function normalizeSpaces(text) {
@@ -1057,13 +1124,83 @@
         };
     }
 
-    async function setupTriplesRadarModule() {
-        state.uiMode = shouldUsePhoneFlow() ? 'phone' : 'desktop';
-        if (state.uiMode === 'phone') {
-            state.elements = { root: document.getElementById('triples-radar-root') };
-        } else {
-            setupElements();
+    function captureDesktopRootMarkup() {
+        const rootEl = document.getElementById('triples-radar-root');
+        if (!rootEl) return null;
+        if (!state.desktopRootMarkup && rootEl.innerHTML) {
+            state.desktopRootMarkup = rootEl.innerHTML;
         }
+        return rootEl;
+    }
+
+    function setupElementsForCurrentMode() {
+        const rootEl = captureDesktopRootMarkup();
+        if (!rootEl) {
+            state.elements = null;
+            return;
+        }
+
+        if (state.uiMode === 'phone') {
+            state.elements = { root: rootEl };
+            return;
+        }
+
+        const hasDesktopShell = !!rootEl.querySelector('#triples-radar-statement');
+        if (!hasDesktopShell && state.desktopRootMarkup) {
+            rootEl.innerHTML = state.desktopRootMarkup;
+        }
+        setupElements();
+    }
+
+    function bindModeToggleEvents() {
+        const modeSwitch = document.getElementById('triples-radar-mode-switch');
+        if (!modeSwitch || modeSwitch.dataset.boundTriplesMode === 'true') return;
+        modeSwitch.dataset.boundTriplesMode = 'true';
+
+        modeSwitch.addEventListener('click', (event) => {
+            const btn = event.target.closest('[data-tr-ui-mode]');
+            if (!btn) return;
+            const toggleKey = (btn.getAttribute('data-tr-ui-mode') || '').trim().toLowerCase();
+            const nextMode = UI_MODE_BY_TOGGLE_KEY[toggleKey];
+            if (!nextMode) return;
+            setUiMode(nextMode);
+        });
+    }
+
+    function setUiMode(nextMode, options = {}) {
+        const normalizedMode = normalizeUiMode(nextMode);
+        const force = options.force === true;
+        if (!force && normalizedMode === state.uiMode) {
+            updateModeToggleUI();
+            return;
+        }
+
+        state.uiMode = normalizedMode;
+        saveUiModePreference();
+        setupElementsForCurrentMode();
+        bindEvents();
+        updateModeToggleUI();
+
+        if (state.uiMode === 'phone' && state.scenarios.length) {
+            resetPhoneScenarioFlow();
+        }
+
+        if (!state.scenarios.length || !state.elements?.root) return;
+
+        if (state.uiMode === 'desktop') {
+            setFeedback('בחר/י קטגוריה אחת מתוך הטבלה.', 'info');
+            setStepStatus('שלב 1: קרא/י את המשפט. שלב 2: בחר/י קטגוריה.');
+            updateHintControls();
+        }
+
+        renderBoard();
+    }
+
+    async function setupTriplesRadarModule() {
+        bindModeToggleEvents();
+        state.uiMode = loadUiModePreference();
+        setupElementsForCurrentMode();
+        updateModeToggleUI();
         if (!state.elements?.root) return;
         if (!root.triplesRadarCore) {
             state.elements.root.innerHTML = '<p class="triples-radar-error">שגיאה: מנוע Triples Radar לא נטען.</p>';
@@ -1092,8 +1229,10 @@
         if (state.uiMode === 'phone') resetPhoneScenarioFlow();
 
         bindEvents();
-        setFeedback('בחר/י קטגוריה אחת מתוך הטבלה.', 'info');
-        setStepStatus('שלב 1: קרא/י את המשפט. שלב 2: בחר/י קטגוריה.');
+        if (state.uiMode === 'desktop') {
+            setFeedback('בחר/י קטגוריה אחת מתוך הטבלה.', 'info');
+            setStepStatus('שלב 1: קרא/י את המשפט. שלב 2: בחר/י קטגוריה.');
+        }
         updateHintControls();
         renderBoard();
     }

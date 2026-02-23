@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.26" data-build-time="1771870360948" data-build-iso="2026-02-23T18:12:40.948Z" data-git-commit="25ba934">
+<html lang="he" dir="rtl" data-app-version="1.0.26" data-build-time="1771888764219" data-build-iso="2026-02-23T23:19:24.219Z" data-git-commit="b4ce4f4">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1040,8 +1040,19 @@
 
                     <section class="practice-section practice-section-triples-radar" aria-label="Triples Radar Section">
                         <div class="practice-section-header">
-                            <h3>בחר/י קטגוריה מתוך השלשה</h3>
-                            <p>קרא/י משפט מטופל, בחר/י קטגוריה, וקבל/י משוב: מדויק / קרוב / שורה שגויה.</p>
+                            <h3>Triples Radar / Radar רגיל בטוגל אחד</h3>
+                            <p>בחר/י מצב: רדאר רגיל (שאלה על קטגוריה אחת) או Triples Radar (שאלות על כל השלשה באותה שורה).</p>
+                        </div>
+
+                        <div class="triples-radar-mode-bar" id="triples-radar-mode-bar">
+                            <div class="triples-radar-mode-copy">
+                                <strong id="triples-radar-mode-title">Triples Radar · כל השורה</strong>
+                                <p id="triples-radar-mode-note">כמו Meta Radar, אבל כאן עובדים על כל השלשה: 3 שאלות/תשובות באותה שורה.</p>
+                            </div>
+                            <div id="triples-radar-mode-switch" class="triples-radar-mode-switch" role="group" aria-label="בחירת מצב Triples Radar">
+                                <button type="button" class="triples-radar-mode-btn is-active" data-tr-ui-mode="triple" aria-pressed="true">טריפל · כל השורה</button>
+                                <button type="button" class="triples-radar-mode-btn" data-tr-ui-mode="single" aria-pressed="false">רגיל · קטגוריה אחת</button>
+                            </div>
                         </div>
 
                         <div id="triples-radar-root" class="triples-radar-card">
