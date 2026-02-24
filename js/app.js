@@ -787,7 +787,7 @@ function looksLikeMojibakeText(value) {
     const text = String(value || '');
     if (!text) return false;
     const marks = (text.match(/׳/g) || []).length;
-    return marks >= 4 || /ג€|נ|�|ֳ—/.test(text);
+    return marks >= 4 || /ג€|ג†|ג­|נ|�|ֳ—/.test(text);
 }
 
 let win1255ReverseByteMap = null;
@@ -852,6 +852,29 @@ function decodeWin1255MojibakeToUtf8(value) {
 function normalizeUiText(value) {
     if (value === null || value === undefined) return '';
     return decodeWin1255MojibakeToUtf8(String(value));
+}
+
+function deepNormalizeUiPayload(value, seen = new WeakMap()) {
+    if (typeof value === 'string') return normalizeUiText(value);
+    if (value === null || value === undefined) return value;
+    if (typeof value !== 'object') return value;
+    if (seen.has(value)) return seen.get(value);
+
+    if (Array.isArray(value)) {
+        const arr = [];
+        seen.set(value, arr);
+        value.forEach((item, index) => {
+            arr[index] = deepNormalizeUiPayload(item, seen);
+        });
+        return arr;
+    }
+
+    const out = {};
+    seen.set(value, out);
+    Object.keys(value).forEach((key) => {
+        out[key] = deepNormalizeUiPayload(value[key], seen);
+    });
+    return out;
 }
 
 function repairMojibakeElementAttributes(element) {
@@ -1127,6 +1150,121 @@ function setupFeatureMapOverlayControls() {
         if (!featureMap.open) return;
         if (featureMap.contains(event.target)) return;
         setFeatureMapToggleOpen(false);
+    });
+}
+
+function setupGlobalFeatureMenuDropdown() {
+    const featureMap = document.getElementById('feature-map-toggle');
+    const body = featureMap?.querySelector('.feature-map-body');
+    if (!featureMap || !body || featureMap.dataset.globalFeatureMenuBound === 'true') return;
+    featureMap.dataset.globalFeatureMenuBound = 'true';
+
+    const menuBox = document.createElement('div');
+    menuBox.className = 'feature-map-menu-box';
+    menuBox.innerHTML = `
+        <div class="feature-map-menu-head">
+            <strong>בחירת פיצ'ר</strong>
+            <small>MENU</small>
+        </div>
+        <div class="feature-map-menu-controls">
+            <select class="feature-map-menu-select" data-global-feature-menu-select aria-label="בחירת פיצ'ר"></select>
+            <button type="button" class="btn btn-primary feature-map-menu-open" data-global-feature-menu-open>פתח</button>
+        </div>
+    `;
+    body.prepend(menuBox);
+    featureMap.classList.add('is-menu-enhanced');
+    setFeatureMapToggleOpen(false);
+
+    const select = menuBox.querySelector('[data-global-feature-menu-select]');
+    const openBtn = menuBox.querySelector('[data-global-feature-menu-open]');
+    if (!select || !openBtn) return;
+
+    const entries = [];
+    const seenKeys = new Set();
+    const pushEntry = (entry) => {
+        if (!entry || !entry.key || seenKeys.has(entry.key)) return;
+        seenKeys.add(entry.key);
+        entries.push(entry);
+    };
+
+    Array.from(document.querySelectorAll('.tab-btn')).forEach((btn) => {
+        const tabId = String(btn.getAttribute('data-tab') || '').trim();
+        const label = normalizeUiText((btn.textContent || '').trim());
+        if (!tabId || !label) return;
+        pushEntry({
+            key: `tab:${tabId}`,
+            label,
+            group: 'מסכים באפליקציה',
+            actionType: 'navigate',
+            actionValue: tabId,
+            element: btn
+        });
+    });
+
+    Array.from(featureMap.querySelectorAll('.feature-map-grid a.btn')).forEach((anchor) => {
+        const hrefKey = String(anchor.getAttribute('data-versioned-href') || anchor.getAttribute('href') || '').split('?')[0].trim();
+        const label = normalizeUiText((anchor.textContent || '').replace(/\s+/g, ' ').trim());
+        if (!hrefKey || !label) return;
+        pushEntry({
+            key: `href:${hrefKey}`,
+            label,
+            group: 'כלים נפרדים (Standalone)',
+            actionType: 'anchor',
+            actionValue: hrefKey,
+            element: anchor
+        });
+    });
+
+    const groups = ['מסכים באפליקציה', 'כלים נפרדים (Standalone)'];
+    const html = ['<option value="">בחר/י פיצ\'ר…</option>'];
+    groups.forEach((groupName) => {
+        const groupEntries = entries.filter((entry) => entry.group === groupName);
+        if (!groupEntries.length) return;
+        html.push(`<optgroup label="${escapeHtml(groupName)}">`);
+        groupEntries.forEach((entry) => {
+            html.push(`<option value="${escapeHtml(entry.key)}">${escapeHtml(entry.label)}</option>`);
+        });
+        html.push('</optgroup>');
+    });
+    select.innerHTML = html.join('');
+
+    const entryMap = entries.reduce((acc, entry) => {
+        acc[entry.key] = entry;
+        return acc;
+    }, {});
+
+    const syncToActiveTab = () => {
+        const activeTab = document.querySelector('.tab-btn.active')?.getAttribute('data-tab') || 'home';
+        const key = `tab:${activeTab}`;
+        if (entryMap[key]) select.value = key;
+    };
+    syncToActiveTab();
+
+    const executeSelected = () => {
+        const selected = entryMap[select.value];
+        if (!selected) return;
+        try {
+            if (selected.actionType === 'navigate') {
+                navigateTo(selected.actionValue);
+            } else if (selected.element && typeof selected.element.click === 'function') {
+                selected.element.click();
+            }
+        } finally {
+            setFeatureMapToggleOpen(false);
+        }
+    };
+
+    openBtn.addEventListener('click', executeSelected);
+    select.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            executeSelected();
+        }
+    });
+
+    document.addEventListener('click', (event) => {
+        const btn = event.target?.closest?.('.tab-btn');
+        if (btn) syncToActiveTab();
     });
 }
 
@@ -1655,6 +1793,7 @@ function initializeMetaModelApp() {
     });
 
     setupFeatureLauncherTabs();
+    setupGlobalFeatureMenuDropdown();
     setupFeatureMapOverlayControls();
     setupMobileViewportSizing();
     applyEmbeddedCompactMode();
@@ -1764,7 +1903,7 @@ async function loadMetaModelData() {
     try {
         const response = await fetch('data/meta-model-violations.json');
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        metaModelData = await response.json();
+        metaModelData = deepNormalizeUiPayload(await response.json());
         
         // Populate categories
         populateCategories();
@@ -4981,7 +5120,7 @@ async function loadScenarioTrainerData() {
     try {
         const response = await fetch('data/scenario-trainer-scenarios.json');
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
+        const data = deepNormalizeUiPayload(await response.json());
         scenarioTrainerData = {
             domains: Array.isArray(data.domains) ? data.domains : [],
             difficulties: Array.isArray(data.difficulties) ? data.difficulties : [],
@@ -6399,7 +6538,7 @@ async function setupComicEngine2Legacy() {
     try {
         const response = await fetch('data/comic-scenarios.json', { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        payload = await response.json();
+        payload = deepNormalizeUiPayload(await response.json());
     } catch (error) {
         console.error('Cannot load data/comic-scenarios.json', error);
         els.title.textContent = '׳©׳’׳™׳׳” ׳‘׳˜׳¢׳™׳ ׳× ׳¡׳¦׳ ׳•׳× ׳§׳•׳׳™׳§׳¡';
@@ -9371,7 +9510,7 @@ async function setupComicEngine2() {
     try {
         const response = await fetch('data/comic-scenarios.json', { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        payload = await response.json();
+        payload = deepNormalizeUiPayload(await response.json());
     } catch (error) {
         console.error('Cannot load data/comic-scenarios.json', error);
         els.root.innerHTML = '<p>׳©׳’׳™׳׳” ׳‘׳˜׳¢׳™׳ ׳× ׳¡׳¦׳ ׳•׳× ׳§׳•׳׳™׳§׳¡.</p>';

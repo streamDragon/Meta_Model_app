@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.26" data-build-time="1771899008763" data-build-iso="2026-02-24T02:10:08.763Z" data-git-commit="b0117a9">
+<html lang="he" dir="rtl" data-app-version="1.0.27" data-build-time="1771899896951" data-build-iso="2026-02-24T02:24:56.951Z" data-git-commit="645c9a7">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -209,7 +209,7 @@
         })();
     </script>
 </head>
-<body>
+<body class="hide-top-tabbar">
     <!-- SPLASH SCREEN -->
     <div id="splash-screen" class="splash-screen">
         <div class="splash-content">
@@ -256,12 +256,11 @@
 
         <details class="feature-map-toggle" id="feature-map-toggle">
             <summary class="feature-map-summary">
-                <span class="feature-map-summary-title">פיצ'רים</span>
-                <small class="feature-map-summary-meta">תפריט ▾</small>
+                <span class="feature-map-summary-title">MENU</span>
             </summary>
             <div class="feature-map-body">
                 <p class="feature-map-intro">
-                    תפריט פיצ'רים מהיר בסגנון dropdown: בחר/י קבוצה ואז פתח/י את הכלי הרצוי בלי להעמיס את המסך.
+                    תפריט אחד לבחירת פיצ'ר מכל האפליקציה. בחר/י מסך או כלי ולחץ/י פתיחה.
                 </p>
 
                 <div class="feature-map-grid">
@@ -362,7 +361,7 @@
             <div class="card">
                 <h2>ברוכים הבאים! 👋</h2>
                 <p id="app-version-chip" class="app-version-chip">גרסה נוכחית: נטען...</p>
-                <p>Meta Model היא טכניקה ב-NLP המסייעת לזיהוי ותיקון הפרות שפה שמגבילות אותנו.</p>
+                <p class="home-stable-summary"><strong>מה עושים כאן?</strong> זו אפליקציית תרגול ל-Meta Model: בוחרים פיצ'ר אחד, מתרגלים דיוק שפה/שיקוף/שאלות, ומתקדמים צעד-צעד בלי עומס.</p>
                 
                 <div class="intro-grid">
                     <div class="intro-item">
@@ -371,11 +370,11 @@
                     </div>
                     <div class="intro-item">
                         <h3>📚 למה זה חשוב?</h3>
-                        <p>זוהי כלי חזקה לתרגול עומק, כדי להבין ולשנות דפוסים של חשיבה.</p>
+                        <p>זה כלי חזק לתרגול עומק, כדי להבין ולשנות דפוסי חשיבה ושפה.</p>
                     </div>
                     <div class="intro-item">
                         <h3>✨ כיצד להשתמש?</h3>
-                        <p>בחר קטגוריה ללמוד או עבור לתרגול כדי להתאמן בשאול שאלות.</p>
+                        <p>בחר/י פיצ'ר אחד מה-MENU, קרא/י הסבר קצר, ותרגל/י סבב אחד בכל פעם.</p>
                     </div>
                 </div>
 
@@ -478,7 +477,7 @@
                         <a class="btn btn-secondary cta-btn" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html" target="_blank" rel="noopener">Prism Research (Chain)</a>
                         <button class="btn btn-secondary cta-btn" onclick="navigateTo('practice-radar')">Meta Radar</button>
                         <button class="btn btn-secondary cta-btn" onclick="navigateTo('practice-wizard')">SQHCEL Wizard</button>
-                        <button id="home-open-feature-map" class="btn btn-secondary cta-btn" type="button">מפת פיצ'רים מלאה ⤴</button>
+                        <button id="home-open-feature-map" class="btn btn-secondary cta-btn" type="button">MENU ⤴</button>
                     </div>
                 </div>
 
