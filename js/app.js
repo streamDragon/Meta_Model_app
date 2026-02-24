@@ -8642,6 +8642,8 @@ function renderPivotSuggestionsList(items) {
     (items || []).forEach((item) => {
         const div = document.createElement('div');
         div.className = 'prepared-item prepared-pivot-item';
+        div.dataset.level = item.level || '';
+        div.dataset.kind = 'pivot';
         div.innerHTML = `<span class="prepared-item-level-tag">${escapeHtml(item.level || '')}</span><span class="prepared-item-text">${escapeHtml(item.text || '')}</span>`;
         div.addEventListener('click', () => showHint(item.text || ''));
         list.appendChild(div);
@@ -8716,6 +8718,7 @@ function applyVerticalStackStateToUI(prism, draft) {
     if (resD) resD.textContent = String(resistance);
 
     populatePreparedItems(prism);
+    applyPrismLabVisualHierarchyEnhancements();
 }
 
 function refreshPrismVerticalStackForCurrentPrism(options = {}) {
@@ -9904,6 +9907,39 @@ function ensurePrismLabWorkLayout() {
     }
 }
 
+function getPrismLevelFromTextareaId(id) {
+    const level = String(id || '').replace('ans-', '').toUpperCase();
+    return LOGICAL_LEVEL_INFO[level] ? level : '';
+}
+
+function syncPrismLevelItemVisualState(item) {
+    if (!item) return;
+    const textarea = item.querySelector('textarea[id^="ans-"]');
+    if (!textarea) return;
+    item.classList.toggle('has-content', !!String(textarea.value || '').trim());
+}
+
+function applyPrismLabVisualHierarchyEnhancements() {
+    const detail = document.getElementById('prism-detail');
+    if (!detail) return;
+    detail.classList.add('prism-focus-layout');
+
+    detail.querySelectorAll('.level-item').forEach((item) => {
+        const textarea = item.querySelector('textarea[id^="ans-"]');
+        if (!textarea) return;
+        const level = getPrismLevelFromTextareaId(textarea.id);
+        if (level) item.dataset.level = level;
+        syncPrismLevelItemVisualState(item);
+
+        if (textarea.dataset.boundPrismVisualState !== 'true') {
+            textarea.dataset.boundPrismVisualState = 'true';
+            textarea.addEventListener('input', () => syncPrismLevelItemVisualState(item));
+            textarea.addEventListener('focus', () => item.classList.add('is-focused'));
+            textarea.addEventListener('blur', () => item.classList.remove('is-focused'));
+        }
+    });
+}
+
 function renderPrismDeepGuide(prism) {
     const guideEl = document.getElementById('prism-deep-guide');
     if (!guideEl || !prism) return;
@@ -10035,6 +10071,7 @@ function openPrism(id) {
     renderPrismDeepGuide(prism);
     applyPrismLabCompactRuntimeCopy();
     ensurePrismLabWorkLayout();
+    applyPrismLabVisualHierarchyEnhancements();
     playUISound('prism_open');
 
     const resultBox = document.getElementById('prism-result');
@@ -10062,6 +10099,7 @@ function openPrism(id) {
     refreshPrismVerticalStackForCurrentPrism({ forceDefaultAnchor: true });
     applyPrismLabCompactRuntimeCopy();
     ensurePrismLabWorkLayout();
+    applyPrismLabVisualHierarchyEnhancements();
 }
 
 // Populate prepared items for drag-and-drop into the mapping inputs
@@ -10107,6 +10145,7 @@ function attachMappingDropHandlers() {
             if (!inp.value.trim()) {
                 delete inp.dataset.suggestedLevel;
                 clearMappingInputStatus(inp);
+                syncPrismLevelItemVisualState(inp.closest('.level-item'));
                 return;
             }
 
@@ -10116,6 +10155,7 @@ function attachMappingDropHandlers() {
             } else {
                 clearMappingInputStatus(inp);
             }
+            syncPrismLevelItemVisualState(inp.closest('.level-item'));
             savePrismVerticalStackDraftForCurrentPrism();
         });
     });
@@ -10142,6 +10182,7 @@ function applyPreparedTextToInput(inputEl, text, suggestedLevel = '') {
         clearMappingInputStatus(inputEl);
         playUISound('prism_pick');
     }
+    syncPrismLevelItemVisualState(inputEl.closest('.level-item'));
     savePrismVerticalStackDraftForCurrentPrism();
 }
 
