@@ -297,7 +297,8 @@ body.force-mobile-view .app-version-floating {
     border: 1px solid #1f2937;
     background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
-    min-width: 96px;
+    min-width: 132px;
+    max-width: 100%;
 }
 
 .feature-map-summary::-webkit-details-marker {
@@ -305,9 +306,10 @@ body.force-mobile-view .app-version-floating {
 }
 
 .feature-map-summary-title {
-    font-size: 0.88rem;
+    font-size: 0.84rem;
     font-weight: 800;
     letter-spacing: 0.02em;
+    white-space: nowrap;
 }
 
 .feature-map-summary small {
@@ -1502,6 +1504,71 @@ body.hide-top-tabbar .mobile-tab-nav {
     position: relative;
 }
 
+.screen-read-guide-philosopher-toggle {
+    margin: 0 0 8px;
+    border: 1px solid #d7e7f6;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+    overflow: hidden;
+}
+
+.screen-read-guide-philosopher-toggle > summary {
+    list-style: none;
+}
+
+.screen-read-guide-philosopher-toggle > summary::-webkit-details-marker {
+    display: none;
+}
+
+.screen-read-guide-philosopher-summary {
+    cursor: pointer;
+    padding: 9px 12px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.screen-read-guide-philosopher-summary:hover {
+    background: rgba(255, 255, 255, 0.45);
+}
+
+.screen-read-guide-philosopher-summary::after {
+    content: '⌄';
+    color: #38628a;
+    font-weight: 900;
+    font-size: 0.95rem;
+    transition: transform 160ms ease;
+}
+
+.screen-read-guide-philosopher-toggle[open] .screen-read-guide-philosopher-summary::after {
+    transform: rotate(180deg);
+}
+
+.screen-read-guide-philosopher-panel {
+    border-top: 1px solid #d7e7f6;
+    padding: 10px 12px 12px;
+    display: grid;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.46);
+}
+
+.screen-read-guide-philosopher-panel p {
+    margin: 0;
+    color: #294663;
+    font-size: 0.84rem;
+    line-height: 1.45;
+}
+
+.screen-read-guide-philosopher-panel strong {
+    color: #0f4f8a;
+}
+
+.screen-read-guide-philosopher-meta {
+    display: grid;
+    gap: 6px;
+}
+
 .screen-read-guide-illustration {
     margin: 0 0 8px;
     border: 1px solid #d7e7f6;
@@ -1800,6 +1867,11 @@ body.screen-guide-open {
 @media (max-width: 640px) {
     .screen-read-guide-toolbar {
         grid-template-columns: 1fr;
+    }
+
+    .screen-read-guide-philosopher-summary {
+        grid-template-columns: 48px minmax(0, 1fr) auto;
+        gap: 8px;
     }
 
     .screen-read-guide-illustration {
@@ -6737,6 +6809,16 @@ a:hover {
         width: 100%;
         justify-content: space-between;
     }
+}
+
+/* Final guard: in embed/minimal modes, never re-show the legacy top tab rows when hide-top-tabbar is enabled */
+body.hide-top-tabbar.embed-mode .tabs,
+body.hide-top-tabbar.minimal-ui .tabs,
+body.hide-top-tabbar.embed-mode .mobile-tab-nav,
+body.hide-top-tabbar.minimal-ui .mobile-tab-nav,
+body.hide-top-tabbar.embed-mode.minimal-ui .tabs,
+body.hide-top-tabbar.embed-mode.minimal-ui .mobile-tab-nav {
+    display: none !important;
 }
 
 /* Minimal UI mode: cleaner layout for embeds and focused practice */

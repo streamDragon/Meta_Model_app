@@ -489,6 +489,27 @@ function applyEmbeddedCompactMode() {
     }
 }
 
+function enforceTopMenuOnlyMode() {
+    const body = document.body;
+    if (!body) return;
+    body.classList.add('hide-top-tabbar');
+
+    ['.tabs', '.mobile-tab-nav'].forEach((selector) => {
+        document.querySelectorAll(selector).forEach((el) => {
+            el.setAttribute('aria-hidden', 'true');
+            try {
+                el.style.setProperty('display', 'none', 'important');
+                el.style.setProperty('visibility', 'hidden', 'important');
+                el.style.setProperty('height', '0', 'important');
+                el.style.setProperty('overflow', 'hidden', 'important');
+                el.style.setProperty('pointer-events', 'none', 'important');
+            } catch (_error) {
+                // ignore style application failures
+            }
+        });
+    });
+}
+
 function applyHeaderDensityPreference() {
     const params = new URLSearchParams(window.location.search);
     const forceFull = params.get('fullheader') === '1';
@@ -787,7 +808,7 @@ function looksLikeMojibakeText(value) {
     const text = String(value || '');
     if (!text) return false;
     const marks = (text.match(/׳/g) || []).length;
-    return marks >= 4 || /ג€|ג†|ג­|נ|�|ֳ—/.test(text);
+    return marks >= 4 || /ג€|ג†|ג­|נ|�|ֳ—|\bג(?:ש|ל)\b/.test(text);
 }
 
 let win1255ReverseByteMap = null;
@@ -1159,12 +1180,25 @@ function setupGlobalFeatureMenuDropdown() {
     if (!featureMap || !body || featureMap.dataset.globalFeatureMenuBound === 'true') return;
     featureMap.dataset.globalFeatureMenuBound = 'true';
 
+    const summary = featureMap.querySelector('.feature-map-summary');
+    const summaryTitle = featureMap.querySelector('.feature-map-summary-title');
+    const featureMapIntro = featureMap.querySelector('.feature-map-intro');
+    if (summaryTitle) summaryTitle.textContent = 'תפריט האימונים';
+    if (featureMapIntro) {
+        featureMapIntro.textContent = 'תפריט אחד לכל הכלים: בוחרים מסך או כלי לפי סוג האימון, ולוחצים פתיחה.';
+    }
+    if (summary && !summary.querySelector('small')) {
+        const badge = document.createElement('small');
+        badge.textContent = 'MENU';
+        summary.appendChild(badge);
+    }
+
     const menuBox = document.createElement('div');
     menuBox.className = 'feature-map-menu-box';
     menuBox.innerHTML = `
         <div class="feature-map-menu-head">
-            <strong>בחירת פיצ'ר</strong>
-            <small>MENU</small>
+            <strong>תפריט האימונים והתרגילים</strong>
+            <small>ממויין לפי סוג היכולת</small>
         </div>
         <div class="feature-map-menu-controls">
             <select class="feature-map-menu-select" data-global-feature-menu-select aria-label="בחירת פיצ'ר"></select>
@@ -1181,10 +1215,93 @@ function setupGlobalFeatureMenuDropdown() {
 
     const entries = [];
     const seenKeys = new Set();
+    const labelOverrides = Object.freeze({
+        'tab:home': 'בית · התחלה והכוונה',
+        'tab:scenario-trainer': 'סימולטור סצנות (Execution)',
+        'tab:comic-engine': 'Comic Engine · תגובות/מהלכים',
+        'tab:categories': 'קטגוריות (ברין)',
+        'tab:practice-question': 'תרגול שאלות',
+        'tab:practice-radar': 'Meta Radar',
+        'tab:practice-triples-radar': 'Triples Radar (Breen)',
+        'tab:practice-wizard': 'SQHCEL Wizard · כמתים נסתרים',
+        'tab:practice-verb-unzip': 'פועל לא מפורט (Unzip)',
+        'tab:blueprint': 'בונה מהלך (Blueprint)',
+        'tab:prismlab': 'Prism Lab · רמות לוגיות',
+        'tab:about': 'על הפרויקט',
+        'href:classic_classic_trainer.html': 'Classic 1 · Classic Classic',
+        'href:classic2_trainer.html': 'Classic 2 · Structure of Magic',
+        'href:iceberg_templates_trainer.html': 'קצה קרחון / שלדי עומק',
+        'href:prism_research_trainer.html': 'Prism Research · Text Research',
+        'href:living_triples_trainer.html': 'Living Triples',
+        'href:verb_unzip_trainer.html': 'Unzip Trainer (Standalone)',
+        'href:sentence_morpher_trainer.html': 'Sentence Morpher',
+        'href:prism_lab_trainer.html': 'Prism Lab (Standalone)'
+    });
+    const groupLabels = Object.freeze({
+        orientation: 'התחלה והכוונה',
+        core: 'אימון מטה-מודל בסיסי',
+        systemic: 'אימון מרחבי / טבלאות ברין',
+        process: 'בניית תהליך / סימולציה',
+        depth: 'כלי עומק וקלאסיקות (Standalone)',
+        language: 'דיוק ניסוח ושפה (Standalone)',
+        research: 'פריזמות / מחקר טקסט (Standalone)',
+        misc: 'כלים נוספים'
+    });
+    const groupOrder = Object.freeze([
+        groupLabels.orientation,
+        groupLabels.core,
+        groupLabels.systemic,
+        groupLabels.process,
+        groupLabels.depth,
+        groupLabels.language,
+        groupLabels.research,
+        groupLabels.misc
+    ]);
+    const classifyEntryGroup = (key) => {
+        if (!key) return groupLabels.misc;
+        if (['tab:home', 'tab:about'].includes(key)) return groupLabels.orientation;
+        if ([
+            'tab:practice-question',
+            'tab:practice-radar',
+            'tab:practice-wizard',
+            'tab:practice-verb-unzip'
+        ].includes(key)) return groupLabels.core;
+        if ([
+            'tab:practice-triples-radar',
+            'tab:categories',
+            'href:living_triples_trainer.html'
+        ].includes(key)) return groupLabels.systemic;
+        if ([
+            'tab:scenario-trainer',
+            'tab:comic-engine',
+            'tab:blueprint',
+            'tab:prismlab'
+        ].includes(key)) return groupLabels.process;
+        if ([
+            'href:classic_classic_trainer.html',
+            'href:classic2_trainer.html',
+            'href:iceberg_templates_trainer.html'
+        ].includes(key)) return groupLabels.depth;
+        if ([
+            'href:verb_unzip_trainer.html',
+            'href:sentence_morpher_trainer.html'
+        ].includes(key)) return groupLabels.language;
+        if ([
+            'href:prism_research_trainer.html',
+            'href:prism_lab_trainer.html'
+        ].includes(key)) return groupLabels.research;
+        return groupLabels.misc;
+    };
     const pushEntry = (entry) => {
         if (!entry || !entry.key || seenKeys.has(entry.key)) return;
+        const resolvedLabel = normalizeUiText(labelOverrides[entry.key] || entry.label || '').trim();
+        if (!resolvedLabel) return;
         seenKeys.add(entry.key);
-        entries.push(entry);
+        entries.push({
+            ...entry,
+            label: resolvedLabel,
+            group: classifyEntryGroup(entry.key)
+        });
     };
 
     Array.from(document.querySelectorAll('.tab-btn')).forEach((btn) => {
@@ -1194,7 +1311,6 @@ function setupGlobalFeatureMenuDropdown() {
         pushEntry({
             key: `tab:${tabId}`,
             label,
-            group: 'מסכים באפליקציה',
             actionType: 'navigate',
             actionValue: tabId,
             element: btn
@@ -1208,14 +1324,13 @@ function setupGlobalFeatureMenuDropdown() {
         pushEntry({
             key: `href:${hrefKey}`,
             label,
-            group: 'כלים נפרדים (Standalone)',
             actionType: 'anchor',
             actionValue: hrefKey,
             element: anchor
         });
     });
 
-    const groups = ['מסכים באפליקציה', 'כלים נפרדים (Standalone)'];
+    const groups = groupOrder.filter((groupName) => entries.some((entry) => entry.group === groupName));
     const html = ['<option value="">בחר/י פיצ\'ר…</option>'];
     groups.forEach((groupName) => {
         const groupEntries = entries.filter((entry) => entry.group === groupName);
@@ -1298,15 +1413,24 @@ function buildScreenReadGuide(screenId) {
     const success = copy.success || DEFAULT_SCREEN_READ_GUIDE.success;
     const demo = getTherapeuticDemoContent(screenId, title, copy);
 
-    const illustrationNote = document.createElement('div');
-    illustrationNote.className = 'screen-read-guide-illustration';
-    illustrationNote.innerHTML = `
-        <div class="screen-read-guide-illustration-media">
-            <img class="screen-read-guide-philosopher" src="assets/svg/props/philosopher-guide.svg" alt="פילוסוף מסביר" loading="lazy">
-        </div>
-        <div class="screen-read-guide-illustration-copy">
-            <strong>פילוסוף המסך · ההיגיון מאחורי התרגול</strong>
-            <span>${escapeHtml(demo.banner)}</span>
+    const philosopherToggle = document.createElement('details');
+    philosopherToggle.className = 'screen-read-guide-philosopher-toggle';
+    philosopherToggle.innerHTML = `
+        <summary class="screen-read-guide-philosopher-summary" aria-label="פילוסוף מסך - פתיחת ההיגיון מאחורי התרגול">
+            <div class="screen-read-guide-illustration-media">
+                <img class="screen-read-guide-philosopher" src="assets/svg/props/philosopher-guide.svg" alt="פילוסוף מסביר" loading="lazy">
+            </div>
+            <div class="screen-read-guide-illustration-copy">
+                <strong>פילוסוף מסך · ההיגיון מאחורי התרגול</strong>
+                <span>לחיצה פותחת הסבר קצר למה הכלי הזה עובד ומה בדיוק הוא בא לתרגל.</span>
+            </div>
+        </summary>
+        <div class="screen-read-guide-philosopher-panel">
+            <p>${escapeHtml(demo.banner)}</p>
+            <div class="screen-read-guide-philosopher-meta">
+                <p><strong>מה ההיגיון של התהליך כאן?</strong> ${escapeHtml(copy.logic)}</p>
+                <p><strong>מה בדיוק מתרגלים במסך הזה?</strong> ${escapeHtml(copy.goal)}</p>
+            </div>
         </div>
     `;
 
@@ -1446,7 +1570,7 @@ function buildScreenReadGuide(screenId) {
 
     toolbar.appendChild(button);
     toolbar.appendChild(demoBtn);
-    wrapper.appendChild(illustrationNote);
+    wrapper.appendChild(philosopherToggle);
     wrapper.appendChild(toolbar);
     wrapper.appendChild(modal);
     wrapper.appendChild(demoModal);
@@ -1785,6 +1909,7 @@ function initializeMetaModelApp() {
     if (hasInitializedApp) return;
     hasInitializedApp = true;
 
+    enforceTopMenuOnlyMode();
     setupMojibakeAutoRepair();
 
     Promise.resolve(setupAppVersionChip()).catch((error) => {
@@ -1797,6 +1922,7 @@ function initializeMetaModelApp() {
     setupFeatureMapOverlayControls();
     setupMobileViewportSizing();
     applyEmbeddedCompactMode();
+    enforceTopMenuOnlyMode();
     applyHeaderDensityPreference();
     updateRuntimeDebugInfoCard();
     loadAudioSettings();
@@ -10352,12 +10478,12 @@ function setupWrinkleGame() {
 const WR2_SQHCEL_STORAGE_KEY = 'wr2_sqhcel_v1';
 
 const WR2W_FLOW_STEPS = Object.freeze([
-    Object.freeze({ id: 'S', label: 'S ׳×׳—׳•׳©׳”', criterion: 'signal' }),
-    Object.freeze({ id: 'Q', label: 'Q ׳›׳׳×-׳¦׳', criterion: 'quantifier' }),
-    Object.freeze({ id: 'H', label: 'H ׳”׳™׳₪׳•׳×׳–׳”', criterion: 'hypothesis' }),
-    Object.freeze({ id: 'C', label: 'C ׳׳™׳©׳•׳¨', criterion: 'confirm' }),
-    Object.freeze({ id: 'P', label: 'PATH ׳‘׳—׳™׳¨׳”', criterion: 'path' }),
-    Object.freeze({ id: 'E', label: 'E/L ׳—׳¨׳™׳’-׳׳׳™׳“׳”', criterion: 'exception' })
+    Object.freeze({ id: 'S', label: 'S · תחושה', criterion: 'signal' }),
+    Object.freeze({ id: 'Q', label: 'Q · כמת-צל', criterion: 'quantifier' }),
+    Object.freeze({ id: 'H', label: 'H · היפותזה', criterion: 'hypothesis' }),
+    Object.freeze({ id: 'C', label: 'C · אישור', criterion: 'confirm' }),
+    Object.freeze({ id: 'P', label: 'PATH · בחירה', criterion: 'path' }),
+    Object.freeze({ id: 'E', label: 'E/L · חריג-למידה', criterion: 'exception' })
 ]);
 
 const WR2W_BREAKOUT_STEPS = Object.freeze([
@@ -10377,12 +10503,12 @@ const WR2W_FEELINGS = Object.freeze([
 ]);
 
 const WR2W_CRITERIA_LABELS = Object.freeze({
-    signal: '׳–׳™׳”׳•׳™ ׳×׳—׳•׳©׳”',
-    quantifier: '׳‘׳—׳™׳¨׳× ׳›׳׳×-׳¦׳',
-    hypothesis: '׳”׳™׳₪׳•׳×׳–׳” ׳¢׳ ׳‘׳¢׳׳•׳×+׳‘׳“׳™׳§׳”',
-    confirm: '׳׳™׳©׳•׳¨ ׳׳₪׳ ׳™ ׳׳×׳’׳•׳¨',
-    path: '׳‘׳—׳™׳¨׳× PATH (Agency)',
-    exception: '׳₪׳¨׳™׳¦׳” + ׳׳©׳₪׳˜ ׳׳׳™׳“׳”'
+    signal: 'זיהוי תחושה',
+    quantifier: 'בחירת כמת-צל',
+    hypothesis: 'היפותזה עם בדיקה',
+    confirm: 'אישור לפני אתגור',
+    path: 'בחירת PATH (Agency)',
+    exception: 'חריג + משפט למידה'
 });
 
 const wr2wPathCore = (() => {
@@ -10904,20 +11030,20 @@ function setupWrinkleGame() {
             <div class="wr2w-topbar">
                 <h3>${WR2W_WIZARD_TITLE}</h3>
                 <div class="wr2w-score">
-                    <span>׳×׳”׳׳™׳: <strong id="wr2w-process-score">0/6</strong></span>
-                    <span>נ”¥ ׳¨׳¦׳£: <strong id="wr2w-streak">0</strong></span>
-                    <span>ג­ ׳ ׳§׳•׳“׳•׳×: <strong id="wr2w-points">0</strong></span>
+                    <span>תהליך: <strong id="wr2w-process-score">0/6</strong></span>
+                    <span>רצף: <strong id="wr2w-streak">0</strong></span>
+                    <span>נקודות: <strong id="wr2w-points">0</strong></span>
                     <span>PATH O/I/B: <strong id="wr2w-path-distribution">0/0/0</strong></span>
-                    <span>׳×׳§׳™׳¢׳•׳× H/C: <strong id="wr2w-stuck-distribution">0/0</strong></span>
+                    <span>תקיעות H/C: <strong id="wr2w-stuck-distribution">0/0</strong></span>
                 </div>
             </div>
 
             <section class="wr2w-principle">
-                <h4>׳׳™׳×׳•׳× ׳׳™-׳”׳׳™׳׳”</h4>
-                <p>׳›׳׳©׳¨ ׳”׳׳˜׳₪׳ ׳׳–׳”׳” ׳₪׳¢׳¨ ׳‘׳™׳ ׳¢׳•׳¦׳׳× ׳”׳¨׳’׳© ׳©׳”׳׳©׳₪׳˜ ׳׳¢׳•׳¨׳¨ ׳‘׳׳“׳ ׳׳‘׳™׳ ׳׳” ׳©׳”׳׳©׳₪׳˜ ׳׳•׳׳¨ ׳•׳׳›׳™׳, ׳׳• ׳₪׳¢׳¨ ׳‘׳™׳ ׳”׳׳©׳₪׳˜ ׳׳‘׳™׳ ׳”׳׳¦׳™׳׳•׳× ׳›׳₪׳™ ׳©׳”׳׳“׳ ׳׳¡׳₪׳¨ ׳¢׳׳™׳” ׳׳• ׳”׳׳˜׳₪׳ ׳׳›׳™׳¨ ׳׳—׳•׳•׳™׳•׳×׳™׳• ג€“ ׳›׳׳ ׳ ׳“׳׳§׳× ׳ ׳•׳¨׳× ׳”׳”׳×׳•׳‘׳ ׳•׳× ׳”׳₪׳ ׳™׳׳™׳× ׳¢׳ ׳”׳¢׳ ׳™׳™׳, ׳•׳™׳© ׳¨׳׳– ׳©׳™׳© ׳׳ ׳• ׳›׳׳ ׳›׳׳×׳™-׳¦׳ ׳‘׳₪׳¢׳•׳׳”.</p>
-                <p>׳”׳’׳•׳£ ׳׳¨׳’׳™׳© "׳׳‘׳¡׳•׳׳•׳˜׳™" ׳׳₪׳ ׳™ ׳©׳”׳׳™׳׳™׳ ׳׳׳¨׳• "׳×׳׳™׳“".</p>
+                <h4>איתות אי-הלימה</h4>
+                <p>כשיש פער בין עוצמת החוויה לבין הניסוח הגלוי, או פער בין המשפט לבין המציאות/הקשר, זה רמז טוב שיש כאן הכללה סמויה או כמת נסתר שצריך לפרק.</p>
+                <p>הגוף מרגיש "מוחלט" לפני שהמילים אומרות "תמיד".</p>
                 <p class="wr2w-flow">${WR2W_WIZARD_FORMULA}</p>
-                <p class="wr2w-flow">S ג†’ Q ג†’ H ג†’ C ג†’ PATH ג†’ E/L</p>
+                <p class="wr2w-flow">S → Q → H → C → PATH → E/L</p>
             </section>
 
             <section class="wr2w-scene-box">
