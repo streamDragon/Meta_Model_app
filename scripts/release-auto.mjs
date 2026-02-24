@@ -67,7 +67,9 @@ async function run() {
 
     const version = await getVersion();
     const releaseVersion = version || 'unknown';
-    runCmd('git', ['commit', '-m', `release: v${releaseVersion}`]);
+    runCmd('git', ['commit', '-m', `release: v${releaseVersion}`], {
+        env: { ...process.env, SKIP_AUTO_VERSION_BUMP: '1' }
+    });
     runCmd('git', ['push']);
 
     const currentBranch = runCmdCapture('git', ['branch', '--show-current']).trim();

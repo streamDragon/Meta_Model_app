@@ -1,0 +1,22 @@
+#!/bin/sh
+# Repo-managed pre-commit hook (installed via core.hooksPath=.githooks)
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+if [ -n "$ROOT" ]; then
+  cd "$ROOT" || exit 1
+fi
+
+if [ -x "$(command -v node)" ]; then
+  node scripts/pre-commit-version.mjs
+  STATUS=$?
+else
+  node.exe scripts/pre-commit-version.mjs
+  STATUS=$?
+fi
+
+if [ $STATUS -ne 0 ]; then
+  echo "pre-commit version automation failed. Aborting commit."
+  exit $STATUS
+fi
+
+exit 0

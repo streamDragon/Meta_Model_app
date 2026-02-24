@@ -16,7 +16,8 @@ const DEFAULT_USER_PROGRESS = {
     todayDate: null,
     streakCharges: 0,
     lastChargeAwardedDate: null,
-    lastChargeUsedDate: null
+    lastChargeUsedDate: null,
+    activityHistory: {}
 };
 let userProgress = { ...DEFAULT_USER_PROGRESS };
 let trainerState = {
@@ -2412,39 +2413,492 @@ const QUESTION_DRILL_KEYWORDS = {
     GENERALIZATION: ['׳×׳׳™׳“', '׳›׳ ׳׳—׳“', '׳›׳•׳׳', '׳׳¢׳•׳׳', '׳׳™׳', '׳×׳׳™׳“', '׳›׳', '׳›׳ ׳”׳–׳׳']
 };
 
+const QUESTION_DRILL_PREFS_KEY = 'question_drill_prefs_v1';
+const QUESTION_DRILL_CATEGORIES = Object.freeze(['DELETION', 'DISTORTION', 'GENERALIZATION']);
+const QUESTION_DRILL_SUCCESS_PLANS = Object.freeze([
+    Object.freeze({
+        id: 'warmup5',
+        label: 'Warmup 5',
+        rounds: 5,
+        targetStars: 6,
+        xpPerSuccess: 4,
+        note: 'Short warm-up: build rhythm and accuracy.'
+    }),
+    Object.freeze({
+        id: 'focus8',
+        label: 'Focus 8',
+        rounds: 8,
+        targetStars: 10,
+        xpPerSuccess: 5,
+        note: 'Balanced session for skill building.'
+    }),
+    Object.freeze({
+        id: 'sprint12',
+        label: 'Sprint 12',
+        rounds: 12,
+        targetStars: 15,
+        xpPerSuccess: 6,
+        note: 'Longer run with streak bonus potential.'
+    })
+]);
+
 const questionDrillState = {
     current: null,
+    deck: [],
     attempts: 0,
     hits: 0,
+    mode: 'learning',
+    planId: QUESTION_DRILL_SUCCESS_PLANS[1].id,
+    sessionActive: false,
+    sessionCompleted: false,
+    sessionRecorded: false,
+    roundsDone: 0,
+    roundsCorrect: 0,
+    sessionXP: 0,
+    sessionStars: 0,
+    streak: 0,
+    bestStreak: 0,
+    roundChecks: 0,
+    roundCorrect: false,
+    roundFinalized: false,
+    currentRoundAward: null,
     elements: {}
 };
 
-function setupQuestionDrill() {
-    const drillRoot = document.getElementById('question-drill');
-    if (!drillRoot) return;
-
-    questionDrillState.elements = {
-        statement: document.getElementById('question-drill-statement'),
-        input: document.getElementById('question-drill-input'),
-        category: document.getElementById('question-drill-category'),
-        feedback: document.getElementById('question-drill-feedback'),
-        attempts: document.getElementById('question-drill-attempts'),
-        hits: document.getElementById('question-drill-hits')
-    };
-
-    document.getElementById('question-drill-check')?.addEventListener('click', evaluateQuestionDrill);
-    document.getElementById('question-drill-next')?.addEventListener('click', loadNextQuestionDrill);
-    loadNextQuestionDrill();
+function getQuestionDrillPlan(planId = '') {
+    return QUESTION_DRILL_SUCCESS_PLANS.find(plan => plan.id === planId) || QUESTION_DRILL_SUCCESS_PLANS[0];
 }
 
-function loadNextQuestionDrill() {
+function loadQuestionDrillPrefs() {
+    try {
+        const raw = localStorage.getItem(QUESTION_DRILL_PREFS_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+            questionDrillState.mode = String(parsed.mode || '').toLowerCase() === 'exam' ? 'exam' : 'learning';
+            questionDrillState.planId = getQuestionDrillPlan(parsed.planId).id;
+        }
+    } catch (error) {
+        console.warn('Question Drill prefs parse error', error);
+    }
+}
+
+function saveQuestionDrillPrefs() {
+    try {
+        localStorage.setItem(QUESTION_DRILL_PREFS_KEY, JSON.stringify({
+            mode: questionDrillState.mode,
+            planId: questionDrillState.planId
+        }));
+    } catch (error) {
+        console.warn('Question Drill prefs save error', error);
+    }
+}
+
+function getQuestionDrillModeLabel(mode = questionDrillState.mode) {
+    return mode === 'exam' ? 'מבחן' : 'למידה';
+}
+
+function setQuestionDrillFeedback(text, tone = 'info') {
+    const feedbackEl = questionDrillState.elements.feedback;
+    if (!feedbackEl) return;
+    feedbackEl.textContent = text || '';
+    feedbackEl.dataset.tone = tone;
+}
+
+function populateQuestionDrillPlanSelect() {
+    const select = questionDrillState.elements.planSelect;
+    if (!select) return;
+    select.innerHTML = QUESTION_DRILL_SUCCESS_PLANS.map(plan => (
+        `<option value="${plan.id}">${plan.label} · ${plan.rounds}Q · ⭐${plan.targetStars}</option>`
+    )).join('');
+    select.value = getQuestionDrillPlan(questionDrillState.planId).id;
+}
+
+function setQuestionDrillMode(mode = 'learning', { persist = true, refreshCurrent = false } = {}) {
+    const resolved = String(mode || '').toLowerCase() === 'exam' ? 'exam' : 'learning';
+    questionDrillState.mode = resolved;
+
+    const learningBtn = questionDrillState.elements.modeLearningBtn;
+    const examBtn = questionDrillState.elements.modeExamBtn;
+    const modeNote = questionDrillState.elements.modeNote;
+    const modeChip = questionDrillState.elements.modeChip;
+    const hintBtn = questionDrillState.elements.hintBtn;
+
+    if (learningBtn) {
+        const active = resolved === 'learning';
+        learningBtn.classList.toggle('is-active', active);
+        learningBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
+    if (examBtn) {
+        const active = resolved === 'exam';
+        examBtn.classList.toggle('is-active', active);
+        examBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
+    if (modeNote) {
+        modeNote.textContent = resolved === 'exam'
+            ? 'מבחן: ניסיון אחד לכל סבב, משוב קצר, בלי רמזים.'
+            : 'למידה: אפשר לקבל רמזים ולשפר ניסוח לפני המעבר.';
+    }
+    if (modeChip) modeChip.textContent = `Mode: ${getQuestionDrillModeLabel(resolved)}`;
+    if (hintBtn) {
+        hintBtn.disabled = resolved === 'exam' || questionDrillState.sessionCompleted || questionDrillState.roundFinalized;
+        hintBtn.classList.toggle('is-hidden', resolved === 'exam');
+    }
+
+    if (persist) saveQuestionDrillPrefs();
+    if (refreshCurrent && questionDrillState.current && !questionDrillState.roundFinalized) {
+        const currentFocus = questionDrillState.current.focus || [];
+        if (questionDrillState.elements.category) {
+            questionDrillState.elements.category.value = resolved === 'learning'
+                ? (currentFocus[0] || 'DELETION')
+                : shuffleArray(QUESTION_DRILL_CATEGORIES)[0];
+        }
+    }
+    updateQuestionDrillSessionUI();
+    updateQuestionDrillControlsState();
+}
+
+function setQuestionDrillPlan(planId = '', { persist = true } = {}) {
+    const plan = getQuestionDrillPlan(planId);
+    questionDrillState.planId = plan.id;
+    if (questionDrillState.elements.planSelect) {
+        questionDrillState.elements.planSelect.value = plan.id;
+    }
+    if (questionDrillState.elements.planChip) {
+        questionDrillState.elements.planChip.textContent = `Plan: ${plan.label}`;
+    }
+    if (persist) saveQuestionDrillPrefs();
+    updateQuestionDrillSessionUI();
+}
+
+function resetQuestionDrillSessionState({ preservePrefs = true } = {}) {
+    questionDrillState.deck = [];
+    questionDrillState.current = null;
+    questionDrillState.attempts = 0;
+    questionDrillState.hits = 0;
+    questionDrillState.sessionActive = false;
+    questionDrillState.sessionCompleted = false;
+    questionDrillState.sessionRecorded = false;
+    questionDrillState.roundsDone = 0;
+    questionDrillState.roundsCorrect = 0;
+    questionDrillState.sessionXP = 0;
+    questionDrillState.sessionStars = 0;
+    questionDrillState.streak = 0;
+    questionDrillState.bestStreak = 0;
+    questionDrillState.roundChecks = 0;
+    questionDrillState.roundCorrect = false;
+    questionDrillState.roundFinalized = false;
+    questionDrillState.currentRoundAward = null;
+
+    if (!preservePrefs) {
+        questionDrillState.mode = 'learning';
+        questionDrillState.planId = QUESTION_DRILL_SUCCESS_PLANS[1].id;
+    }
+}
+
+function beginQuestionDrillRound(question) {
+    const elements = questionDrillState.elements;
+    const focus = Array.isArray(question?.focus) ? question.focus : [];
+
+    questionDrillState.current = question || null;
+    questionDrillState.roundChecks = 0;
+    questionDrillState.roundCorrect = false;
+    questionDrillState.roundFinalized = false;
+    questionDrillState.currentRoundAward = null;
+
+    if (elements.statement) elements.statement.textContent = question?.statement || '';
+    if (elements.input) {
+        elements.input.value = '';
+        elements.input.disabled = false;
+    }
+    if (elements.category) {
+        elements.category.disabled = false;
+        elements.category.value = questionDrillState.mode === 'exam'
+            ? shuffleArray(QUESTION_DRILL_CATEGORIES)[0]
+            : (focus[0] || 'DELETION');
+    }
+
+    if (questionDrillState.mode === 'exam') {
+        setQuestionDrillFeedback('מצב מבחן: נסו לזהות כיוון ולנסח שאלה מדויקת בניסיון אחד.', 'info');
+    } else {
+        setQuestionDrillFeedback('מצב למידה: כתבו שאלה, בדקו, ושפרו לפי המשוב או רמז.', 'info');
+    }
+
+    if (elements.summary) {
+        elements.summary.classList.add('hidden');
+        elements.summary.innerHTML = '';
+    }
+    updateQuestionDrillControlsState();
+    updateQuestionDrillSessionUI();
+}
+
+function buildQuestionDrillDeck() {
+    questionDrillState.deck = shuffleArray(QUESTION_DRILL_PACK.slice());
+}
+
+function getNextQuestionDrillItem() {
+    if (!QUESTION_DRILL_PACK.length) return null;
+    if (!questionDrillState.deck.length) buildQuestionDrillDeck();
+    let next = questionDrillState.deck.pop() || null;
+    if (
+        next &&
+        questionDrillState.current &&
+        QUESTION_DRILL_PACK.length > 1 &&
+        next.id === questionDrillState.current.id
+    ) {
+        questionDrillState.deck.unshift(next);
+        next = questionDrillState.deck.pop() || next;
+    }
+    return next;
+}
+
+function updateQuestionDrillStats() {
+    if (questionDrillState.elements.attempts) {
+        questionDrillState.elements.attempts.textContent = String(questionDrillState.attempts);
+    }
+    if (questionDrillState.elements.hits) {
+        questionDrillState.elements.hits.textContent = String(questionDrillState.hits);
+    }
+}
+
+function updateQuestionDrillSessionUI() {
+    const plan = getQuestionDrillPlan(questionDrillState.planId);
+    const roundsTotal = Math.max(1, plan.rounds);
+    const roundsDone = Math.min(questionDrillState.roundsDone, roundsTotal);
+    const progressPct = Math.round((roundsDone / roundsTotal) * 100);
+    const nextRound = Math.min(roundsTotal, roundsDone + (questionDrillState.sessionCompleted ? 0 : 1));
+    const accuracy = questionDrillState.roundsDone
+        ? Math.round((questionDrillState.roundsCorrect / questionDrillState.roundsDone) * 100)
+        : 0;
+    const targetReached = questionDrillState.sessionStars >= plan.targetStars;
+
+    if (questionDrillState.elements.progressFill) {
+        questionDrillState.elements.progressFill.style.width = `${progressPct}%`;
+    }
+    if (questionDrillState.elements.roundChip) {
+        questionDrillState.elements.roundChip.textContent = `Round: ${roundsDone}/${roundsTotal}`;
+    }
+    if (questionDrillState.elements.starsChip) {
+        questionDrillState.elements.starsChip.textContent = `Stars: ${questionDrillState.sessionStars}`;
+        questionDrillState.elements.starsChip.classList.toggle('is-goal', targetReached && questionDrillState.sessionCompleted);
+    }
+    if (questionDrillState.elements.targetChip) {
+        questionDrillState.elements.targetChip.textContent = `Target: ⭐${plan.targetStars}`;
+    }
+    if (questionDrillState.elements.streakChip) {
+        questionDrillState.elements.streakChip.textContent = `Streak: ${questionDrillState.streak}`;
+    }
+    if (questionDrillState.elements.modeChip) {
+        questionDrillState.elements.modeChip.textContent = `Mode: ${getQuestionDrillModeLabel()}`;
+    }
+    if (questionDrillState.elements.planChip) {
+        questionDrillState.elements.planChip.textContent = `Plan: ${plan.label}`;
+    }
+    if (questionDrillState.elements.sessionNote) {
+        if (questionDrillState.sessionCompleted) {
+            questionDrillState.elements.sessionNote.textContent = targetReached
+                ? `Session complete. Success target reached (${questionDrillState.sessionStars}/${plan.targetStars} stars).`
+                : `Session complete. ${questionDrillState.sessionStars}/${plan.targetStars} stars, accuracy ${accuracy}%.`;
+        } else if (!questionDrillState.sessionActive) {
+            questionDrillState.elements.sessionNote.textContent = `${plan.note} Choose mode and press Start Session.`;
+        } else if (questionDrillState.roundFinalized) {
+            questionDrillState.elements.sessionNote.textContent = `Round ${nextRound > roundsTotal ? roundsTotal : nextRound} is ready. Accuracy ${accuracy}%.`;
+        } else {
+            questionDrillState.elements.sessionNote.textContent = questionDrillState.mode === 'exam'
+                ? 'Exam mode: one answer per round, then move to the next statement.'
+                : 'Learning mode: use feedback/hint to improve before moving on.';
+        }
+    }
+}
+
+function updateQuestionDrillControlsState() {
+    const elements = questionDrillState.elements;
+    const sessionLocked = questionDrillState.sessionCompleted;
+    const hasQuestion = !!questionDrillState.current;
+    const canCheck = hasQuestion && !sessionLocked && !questionDrillState.roundFinalized;
+
+    if (elements.checkBtn) {
+        elements.checkBtn.disabled = !canCheck;
+        elements.checkBtn.textContent = questionDrillState.mode === 'exam' ? 'בדיקה (ניסיון אחד)' : 'בדוק שאלה';
+    }
+    if (elements.nextBtn) {
+        elements.nextBtn.disabled = !hasQuestion || sessionLocked;
+        elements.nextBtn.textContent = questionDrillState.roundFinalized ? 'משפט הבא' : 'דלג / משפט הבא';
+    }
+    if (elements.startBtn) {
+        elements.startBtn.textContent = questionDrillState.sessionActive && !questionDrillState.sessionCompleted
+            ? 'התחל סשן חדש'
+            : 'התחל סשן';
+    }
+    if (elements.resetBtn) {
+        elements.resetBtn.disabled = !questionDrillState.sessionActive && !questionDrillState.sessionCompleted && questionDrillState.attempts === 0;
+    }
+    if (elements.input) {
+        elements.input.disabled = sessionLocked || questionDrillState.roundFinalized;
+    }
+    if (elements.category) {
+        elements.category.disabled = sessionLocked || questionDrillState.roundFinalized;
+    }
+    if (elements.hintBtn) {
+        const examMode = questionDrillState.mode === 'exam';
+        elements.hintBtn.disabled = examMode || sessionLocked || questionDrillState.roundFinalized || !hasQuestion;
+        elements.hintBtn.classList.toggle('is-hidden', examMode);
+    }
+}
+
+function startQuestionDrillSession({ announce = true } = {}) {
+    resetQuestionDrillSessionState({ preservePrefs: true });
+    questionDrillState.sessionActive = true;
+    questionDrillState.sessionCompleted = false;
+    questionDrillState.sessionRecorded = false;
+    updateQuestionDrillStats();
+    updateQuestionDrillSessionUI();
+    if (announce) {
+        playUISound('start');
+    }
+    loadNextQuestionDrill({ initial: true, playSound: false });
+}
+
+function completeQuestionDrillSession() {
+    const plan = getQuestionDrillPlan(questionDrillState.planId);
+    const accuracy = questionDrillState.roundsDone
+        ? Math.round((questionDrillState.roundsCorrect / questionDrillState.roundsDone) * 100)
+        : 0;
+    const hitTarget = questionDrillState.sessionStars >= plan.targetStars;
+    let bonusStars = 0;
+    let bonusXP = 0;
+
+    if (hitTarget) {
+        bonusStars += 1;
+    }
+    if (questionDrillState.mode === 'exam' && accuracy >= 90) {
+        bonusStars += 1;
+        bonusXP += 6;
+    }
+
+    if (bonusStars > 0) {
+        addStars(bonusStars);
+        questionDrillState.sessionStars += bonusStars;
+    }
+    if (bonusXP > 0) {
+        addXP(bonusXP);
+        questionDrillState.sessionXP += bonusXP;
+    }
+
+    questionDrillState.sessionCompleted = true;
+    questionDrillState.sessionActive = false;
+
+    if (!questionDrillState.sessionRecorded) {
+        recordSession();
+        questionDrillState.sessionRecorded = true;
+    }
+
+    const summaryEl = questionDrillState.elements.summary;
+    if (summaryEl) {
+        summaryEl.classList.remove('hidden');
+        summaryEl.dataset.tone = hitTarget ? 'success' : 'info';
+        summaryEl.innerHTML = `
+            <div class="question-drill-summary-head">
+                <strong>${hitTarget ? 'יעד הושג' : 'סשן הושלם'}</strong>
+                <span>${getQuestionDrillModeLabel()} · ${plan.label}</span>
+            </div>
+            <div class="question-drill-summary-grid">
+                <div><small>דיוק</small><strong>${accuracy}%</strong></div>
+                <div><small>סבבים נכונים</small><strong>${questionDrillState.roundsCorrect}/${plan.rounds}</strong></div>
+                <div><small>כוכבים</small><strong>${questionDrillState.sessionStars}</strong></div>
+                <div><small>XP</small><strong>${questionDrillState.sessionXP}</strong></div>
+                <div><small>Best Streak</small><strong>${questionDrillState.bestStreak}</strong></div>
+                <div><small>Goal</small><strong>${plan.targetStars}⭐</strong></div>
+            </div>
+            ${bonusStars || bonusXP ? `<p class="question-drill-summary-bonus">Bonus: +${bonusStars}⭐ / +${bonusXP} XP</p>` : ''}
+        `;
+    }
+
+    setQuestionDrillFeedback(
+        hitTarget
+            ? 'כל הכבוד. עמדת ביעד הכוכבים של התוכנית. אפשר להתחיל סשן חדש או להעלות רמה.'
+            : 'הסשן הושלם. מומלץ לנסות שוב במצב למידה או לבחור תוכנית קצרה יותר כדי להגיע ליעד.',
+        hitTarget ? 'success' : 'info'
+    );
+    playUISound(hitTarget ? 'stars_big' : 'finish');
+    updateQuestionDrillSessionUI();
+    updateQuestionDrillControlsState();
+}
+
+function finalizeQuestionDrillRound(reason = 'next') {
+    if (!questionDrillState.current || questionDrillState.roundFinalized) return;
+
+    const plan = getQuestionDrillPlan(questionDrillState.planId);
+    const firstTry = questionDrillState.roundChecks <= 1;
+    const wasCorrect = !!questionDrillState.roundCorrect;
+
+    questionDrillState.roundFinalized = true;
+    questionDrillState.roundsDone += 1;
+
+    if (wasCorrect) {
+        questionDrillState.roundsCorrect += 1;
+        questionDrillState.streak += 1;
+        questionDrillState.bestStreak = Math.max(questionDrillState.bestStreak, questionDrillState.streak);
+
+        const baseXP = firstTry ? plan.xpPerSuccess : Math.max(2, plan.xpPerSuccess - 2);
+        let starGain = firstTry ? 2 : 1;
+        if (questionDrillState.mode === 'exam' && firstTry) starGain += 1;
+        if (questionDrillState.streak > 0 && questionDrillState.streak % 3 === 0) {
+            starGain += 1;
+        }
+
+        addXP(baseXP);
+        addStars(starGain);
+        questionDrillState.sessionXP += baseXP;
+        questionDrillState.sessionStars += starGain;
+        questionDrillState.currentRoundAward = { xp: baseXP, stars: starGain };
+        playUISound(starGain >= 3 ? 'stars_big' : 'stars_soft');
+
+        const awardLine = ` (+${baseXP} XP, +${starGain}⭐)`;
+        const currentText = String(questionDrillState.elements.feedback?.textContent || '');
+        if (currentText && !currentText.includes('+')) {
+            setQuestionDrillFeedback(`${currentText}${awardLine}`, 'success');
+        }
+    } else {
+        questionDrillState.streak = 0;
+        questionDrillState.currentRoundAward = { xp: 0, stars: 0 };
+        if (reason === 'skip') {
+            setQuestionDrillFeedback('הסבב דולג. אין ניקוד על הסבב הזה, עוברים למשפט הבא.', 'warn');
+            playUISound('skip');
+        }
+    }
+
+    updateQuestionDrillSessionUI();
+    updateQuestionDrillControlsState();
+
+    const planRounds = getQuestionDrillPlan(questionDrillState.planId).rounds;
+    if (questionDrillState.roundsDone >= planRounds) {
+        completeQuestionDrillSession();
+    }
+}
+
+function loadNextQuestionDrill(options = {}) {
+    const { initial = false, playSound = true } = options || {};
     if (!QUESTION_DRILL_PACK.length) return;
-    const next = QUESTION_DRILL_PACK[Math.floor(Math.random() * QUESTION_DRILL_PACK.length)];
-    questionDrillState.current = next;
-    questionDrillState.elements.statement.textContent = next.statement;
-    questionDrillState.elements.input.value = '';
-    questionDrillState.elements.feedback.textContent = '';
-    questionDrillState.elements.category.value = next.focus[0] || 'DELETION';
+
+    if (!questionDrillState.sessionActive && !questionDrillState.sessionCompleted) {
+        questionDrillState.sessionActive = true;
+    }
+
+    if (!initial && questionDrillState.current && !questionDrillState.roundFinalized) {
+        finalizeQuestionDrillRound('skip');
+        if (questionDrillState.sessionCompleted) return;
+    }
+
+    if (questionDrillState.sessionCompleted) {
+        updateQuestionDrillControlsState();
+        return;
+    }
+
+    const next = getNextQuestionDrillItem();
+    if (!next) return;
+    beginQuestionDrillRound(next);
+    if (!initial && playSound) playUISound('next');
 }
 
 function normalizeText(value) {
@@ -2460,14 +2914,35 @@ function getMatchedCategories(value) {
     }, []);
 }
 
+function showQuestionDrillHint() {
+    if (questionDrillState.mode === 'exam') {
+        setQuestionDrillFeedback('במצב מבחן אין רמזים. עברו למצב למידה אם רוצים תמיכה.', 'warn');
+        return;
+    }
+    if (!questionDrillState.current || questionDrillState.roundFinalized) return;
+    const selected = questionDrillState.elements.category?.value || 'DELETION';
+    const starters = (QUESTION_DRILL_KEYWORDS[selected] || []).slice(0, 3).join(', ');
+    const expected = (questionDrillState.current.focus || []).join(' / ');
+    const line = expected
+        ? `רמז: התחילו עם מילים כמו ${starters}. כיוון מומלץ לסבב הזה: ${expected}.`
+        : `רמז: התחילו עם מילים כמו ${starters}.`;
+    setQuestionDrillFeedback(line, 'info');
+    playUISound('hint');
+}
+
 function evaluateQuestionDrill() {
     const input = questionDrillState.elements.input;
     const feedbackEl = questionDrillState.elements.feedback;
     if (!input || !feedbackEl || !questionDrillState.current) return;
+    if (questionDrillState.sessionCompleted) return;
+    if (questionDrillState.roundFinalized) {
+        setQuestionDrillFeedback('הסבב הזה כבר נסגר. עברו למשפט הבא.', 'info');
+        return;
+    }
 
     const text = input.value.trim();
     if (!text) {
-        feedbackEl.textContent = '׳›׳×׳‘׳• ׳©׳׳׳” ׳׳₪׳ ׳™ ׳©׳‘׳•׳“׳§׳™׳.';
+        setQuestionDrillFeedback('כתבו שאלה לפני שבודקים.', 'warn');
         return;
     }
 
@@ -2478,23 +2953,114 @@ function evaluateQuestionDrill() {
     const keywordMatches = matched.includes(selected);
     const success = focusMatchesExpected && keywordMatches;
 
+    questionDrillState.roundChecks += 1;
     questionDrillState.attempts += 1;
     if (success) questionDrillState.hits += 1;
     updateQuestionDrillStats();
 
     if (success) {
-        feedbackEl.textContent = `׳׳¦׳•׳™׳! ׳”׳©׳׳׳” ׳₪׳’׳¢׳” ׳‘-${selected} ׳•׳›׳•׳׳׳× ׳‘׳™׳˜׳•׳™ ׳©׳׳‘׳”׳™׳¨ ׳׳× ׳”׳”׳ ׳—׳”.`;
-    } else {
-        const missing = !keywordMatches ? '׳”׳•׳¡׳™׳₪׳• ׳׳™׳׳•׳× ׳׳₪׳×׳— ׳›׳׳• ' + QUESTION_DRILL_KEYWORDS[selected].slice(0, 3).join(', ') : '';
-        const expectedMessage = expected.length ? ` ׳”׳›׳™ ׳¨׳׳•׳™ ׳׳›׳™׳•׳•׳ ${expected.join(' / ')}` : '';
-        feedbackEl.textContent = `׳ ׳¡׳”/׳ ׳™׳¡׳™ ׳©׳•׳‘. ${missing} ${expectedMessage}`.trim();
+        questionDrillState.roundCorrect = true;
+        if (questionDrillState.mode === 'exam') {
+            setQuestionDrillFeedback(`נכון. זוהה כיוון ${selected}. לחצו "משפט הבא" להמשך.`, 'success');
+        } else {
+            const matchedLabel = matched.length ? matched.join(' / ') : selected;
+            setQuestionDrillFeedback(`מצוין. השאלה פוגעת בכיוון ${selected} (${matchedLabel}). לחצו "משפט הבא" להמשך.`, 'success');
+        }
+        playUISound('correct');
+        finalizeQuestionDrillRound('correct');
+        return;
     }
+
+    playUISound('wrong');
+    if (questionDrillState.mode === 'exam') {
+        questionDrillState.roundCorrect = false;
+        setQuestionDrillFeedback('לא מדויק. בסבב מבחן יש ניסיון אחד בלבד. לחצו "משפט הבא".', 'danger');
+        finalizeQuestionDrillRound('exam_fail');
+        return;
+    }
+
+    const missing = !keywordMatches
+        ? 'הוסיפו מילות מפתח כמו ' + (QUESTION_DRILL_KEYWORDS[selected] || []).slice(0, 3).join(', ')
+        : '';
+    const expectedMessage = expected.length ? ` הכי מתאים כאן: ${expected.join(' / ')}` : '';
+    const matchedMessage = matched.length ? ` זיהוי לפי הטקסט: ${matched.join(' / ')}.` : '';
+    setQuestionDrillFeedback(`נסו שוב. ${missing}${expectedMessage}.${matchedMessage}`.trim(), keywordMatches ? 'warn' : 'danger');
+    updateQuestionDrillControlsState();
 }
 
-function updateQuestionDrillStats() {
-    if (!questionDrillState.elements.attempts || !questionDrillState.elements.hits) return;
-    questionDrillState.elements.attempts.textContent = String(questionDrillState.attempts);
-    questionDrillState.elements.hits.textContent = String(questionDrillState.hits);
+function setupQuestionDrill() {
+    const drillRoot = document.getElementById('question-drill');
+    if (!drillRoot) return;
+
+    questionDrillState.elements = {
+        root: drillRoot,
+        statement: document.getElementById('question-drill-statement'),
+        input: document.getElementById('question-drill-input'),
+        category: document.getElementById('question-drill-category'),
+        feedback: document.getElementById('question-drill-feedback'),
+        attempts: document.getElementById('question-drill-attempts'),
+        hits: document.getElementById('question-drill-hits'),
+        checkBtn: document.getElementById('question-drill-check'),
+        nextBtn: document.getElementById('question-drill-next'),
+        hintBtn: document.getElementById('question-drill-hint'),
+        modeLearningBtn: document.getElementById('question-drill-mode-learning'),
+        modeExamBtn: document.getElementById('question-drill-mode-exam'),
+        modeNote: document.getElementById('question-drill-mode-note'),
+        planSelect: document.getElementById('question-drill-plan'),
+        startBtn: document.getElementById('question-drill-start-session'),
+        resetBtn: document.getElementById('question-drill-reset-session'),
+        summary: document.getElementById('question-drill-summary'),
+        progressFill: document.getElementById('question-drill-progress-fill'),
+        modeChip: document.getElementById('question-drill-chip-mode'),
+        planChip: document.getElementById('question-drill-chip-plan'),
+        roundChip: document.getElementById('question-drill-chip-round'),
+        starsChip: document.getElementById('question-drill-chip-stars'),
+        targetChip: document.getElementById('question-drill-chip-target'),
+        streakChip: document.getElementById('question-drill-chip-streak'),
+        sessionNote: document.getElementById('question-drill-session-note')
+    };
+
+    loadQuestionDrillPrefs();
+    populateQuestionDrillPlanSelect();
+    setQuestionDrillPlan(questionDrillState.planId, { persist: false });
+    setQuestionDrillMode(questionDrillState.mode, { persist: false });
+
+    questionDrillState.elements.checkBtn?.addEventListener('click', evaluateQuestionDrill);
+    questionDrillState.elements.nextBtn?.addEventListener('click', () => loadNextQuestionDrill());
+    questionDrillState.elements.hintBtn?.addEventListener('click', showQuestionDrillHint);
+    questionDrillState.elements.modeLearningBtn?.addEventListener('click', () => {
+        setQuestionDrillMode('learning', { refreshCurrent: true });
+        playUISound('select_soft');
+    });
+    questionDrillState.elements.modeExamBtn?.addEventListener('click', () => {
+        setQuestionDrillMode('exam', { refreshCurrent: true });
+        playUISound('select_soft');
+    });
+    questionDrillState.elements.planSelect?.addEventListener('change', (event) => {
+        setQuestionDrillPlan(event.target.value);
+        playUISound('select_soft');
+    });
+    questionDrillState.elements.startBtn?.addEventListener('click', () => startQuestionDrillSession({ announce: true }));
+    questionDrillState.elements.resetBtn?.addEventListener('click', () => {
+        resetQuestionDrillSessionState({ preservePrefs: true });
+        updateQuestionDrillStats();
+        updateQuestionDrillSessionUI();
+        updateQuestionDrillControlsState();
+        setQuestionDrillFeedback('הסטטיסטיקה אופסה. לחצו "התחל סשן".', 'info');
+        if (questionDrillState.elements.statement) questionDrillState.elements.statement.textContent = '';
+        if (questionDrillState.elements.input) questionDrillState.elements.input.value = '';
+        if (questionDrillState.elements.summary) {
+            questionDrillState.elements.summary.classList.add('hidden');
+            questionDrillState.elements.summary.innerHTML = '';
+        }
+        playUISound('skip');
+    });
+
+    setupAudioMuteButtons();
+    updateQuestionDrillStats();
+    updateQuestionDrillSessionUI();
+    setQuestionDrillFeedback('בחרו מצב ותוכנית, ואז התחילו סשן.', 'info');
+    startQuestionDrillSession({ announce: false });
 }
 
 const RAPID_PATTERN_BUTTONS = Object.freeze([
@@ -9636,6 +10202,7 @@ function closeHint() {
 }
 
 function navigateTo(tabName) {
+    persistHomeLastVisitedTab(tabName);
     const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
     if (tabBtn) {
         tabBtn.click();
@@ -9666,6 +10233,551 @@ function navigateTo(tabName) {
 }
 
 // ==================== PROGRESS TRACKING & GAMIFICATION ====================
+
+const HOME_LAST_TAB_KEY = 'meta_home_last_tab_v1';
+const HOME_TRAINING_PROGRAM_KEY = 'meta_home_training_program_v1';
+
+const HOME_TRAINING_PROGRAMS = Object.freeze([
+    Object.freeze({
+        id: 'core_flow',
+        title: 'Core Flow',
+        badge: 'דיוק → תגובה',
+        description: 'תרגול בסיסי שמתחיל בזיהוי, עובר למהירות, ומסתיים בתגובה פרקטית.',
+        steps: Object.freeze([
+            Object.freeze({ tab: 'practice-question', title: 'תרגול שאלות', note: 'ניסוח שאלה מדויקת למשפט אחד' }),
+            Object.freeze({ tab: 'practice-radar', title: 'Meta Radar', note: 'סבב זיהוי מהיר בזמן' }),
+            Object.freeze({ tab: 'scenario-trainer', title: 'Scenario Trainer', note: 'להפוך דפוס לצעד ביצועי' })
+        ])
+    }),
+    Object.freeze({
+        id: 'deep_probe',
+        title: 'Deep Probe',
+        badge: 'פירוק עומק',
+        description: 'מסלול למי שרוצה עומק: פועל לא־מפורט, שלשות, ואז Blueprint.',
+        steps: Object.freeze([
+            Object.freeze({ tab: 'practice-verb-unzip', title: 'פועל לא מפורט', note: 'לחשוף מה חסר בפועל עמום' }),
+            Object.freeze({ tab: 'practice-triples-radar', title: 'Triples Radar', note: 'לזהות קו/משפחה שלמה' }),
+            Object.freeze({ tab: 'blueprint', title: 'Blueprint Builder', note: 'לסגור עם תוכנית פעולה + Plan B' })
+        ])
+    }),
+    Object.freeze({
+        id: 'cognitive_design',
+        title: 'Cognitive Design',
+        badge: 'מפה לוגית',
+        description: 'מסלול בניית מסגרות: פריזמה, Wizard, ואז סימולציה/קומיקס.',
+        steps: Object.freeze([
+            Object.freeze({ tab: 'prismlab', title: 'Prism Lab', note: 'מגדל לוגי + Pivot' }),
+            Object.freeze({ tab: 'practice-wizard', title: 'SQHCEL Wizard', note: 'איסוף תהליך מובנה' }),
+            Object.freeze({ tab: 'comic-engine', title: 'Comic Engine', note: 'הדמיית תגובות ותוצאה' })
+        ])
+    })
+]);
+
+function getDefaultHomeTrainingProgramState() {
+    return {
+        activeProgramId: null,
+        stepIndex: 0,
+        completedRuns: {},
+        updatedAt: null
+    };
+}
+
+function normalizeHomeTrainingProgramState(raw) {
+    const defaults = getDefaultHomeTrainingProgramState();
+    const merged = { ...defaults, ...(raw || {}) };
+    merged.activeProgramId = typeof merged.activeProgramId === 'string' ? merged.activeProgramId : null;
+    merged.stepIndex = Math.max(0, Math.floor(Number(merged.stepIndex) || 0));
+    merged.completedRuns = (merged.completedRuns && typeof merged.completedRuns === 'object' && !Array.isArray(merged.completedRuns))
+        ? merged.completedRuns
+        : {};
+    merged.updatedAt = typeof merged.updatedAt === 'string' ? merged.updatedAt : null;
+    return merged;
+}
+
+function loadHomeTrainingProgramState() {
+    try {
+        const raw = localStorage.getItem(HOME_TRAINING_PROGRAM_KEY);
+        if (!raw) return getDefaultHomeTrainingProgramState();
+        return normalizeHomeTrainingProgramState(JSON.parse(raw));
+    } catch (error) {
+        console.warn('Failed to parse home training program state', error);
+        return getDefaultHomeTrainingProgramState();
+    }
+}
+
+function saveHomeTrainingProgramState(state) {
+    const normalized = normalizeHomeTrainingProgramState(state);
+    normalized.updatedAt = new Date().toISOString();
+    localStorage.setItem(HOME_TRAINING_PROGRAM_KEY, JSON.stringify(normalized));
+    return normalized;
+}
+
+function getHomeProgramById(programId = '') {
+    return HOME_TRAINING_PROGRAMS.find(program => program.id === programId) || null;
+}
+
+function getProgressBadgeDefinitions() {
+    return [
+        { id: 'first_step', name: 'צעד ראשון', icon: '🎯', condition: () => userProgress.xp >= 10 },
+        { id: 'fire_10', name: 'להט 🔥', icon: '🔥', condition: () => userProgress.streak >= 10 },
+        { id: 'xp_100', name: '100 XP', icon: '⭐', condition: () => userProgress.xp >= 100 },
+        { id: 'xp_500', name: '500 XP', icon: '🌠', condition: () => userProgress.xp >= 500 },
+        { id: 'sessions_10', name: '10 סשנים', icon: '📊', condition: () => userProgress.sessions >= 10 },
+        { id: 'daily_goal', name: 'יעד יומי', icon: '🎯', condition: () => userProgress.lastChargeAwardedDate === userProgress.todayDate },
+        { id: 'charge_full', name: 'Charge Full', icon: '🛡️', condition: () => userProgress.streakCharges >= MAX_STREAK_CHARGES },
+    ];
+}
+
+function getNextProgressBadgePreview() {
+    const currentBadges = new Set((userProgress.badges || []).map(b => b.id));
+    const defs = getProgressBadgeDefinitions();
+    for (const badge of defs) {
+        if (currentBadges.has(badge.id)) continue;
+        if (!badge.condition()) return badge;
+    }
+    return null;
+}
+
+function getXpLevelMeta(xpTotal = 0) {
+    const xp = Math.max(0, Math.floor(Number(xpTotal) || 0));
+    // Quadratic-ish ramp keeps early levels fast and later levels meaningful.
+    const level = Math.max(1, Math.floor(Math.sqrt(xp / 25)) + 1);
+    const levelStartXp = Math.max(0, 25 * Math.pow(level - 1, 2));
+    const nextLevelXp = 25 * Math.pow(level, 2);
+    const inLevelXp = xp - levelStartXp;
+    const levelSpanXp = Math.max(1, nextLevelXp - levelStartXp);
+    const progressPct = Math.max(0, Math.min(100, Math.round((inLevelXp / levelSpanXp) * 100)));
+    return {
+        level,
+        levelStartXp,
+        nextLevelXp,
+        remainingXp: Math.max(0, nextLevelXp - xp),
+        progressPct
+    };
+}
+
+function persistHomeLastVisitedTab(tabName = '') {
+    const safeTab = normalizeRequestedTab(String(tabName || '').trim());
+    if (!safeTab || safeTab === 'home') return;
+    try {
+        localStorage.setItem(HOME_LAST_TAB_KEY, JSON.stringify({
+            tab: safeTab,
+            at: new Date().toISOString()
+        }));
+    } catch (error) {
+        console.warn('Failed to persist last visited tab', error);
+    }
+}
+
+function loadHomeLastVisitedTab() {
+    try {
+        const raw = localStorage.getItem(HOME_LAST_TAB_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        const tab = normalizeRequestedTab(parsed?.tab || '');
+        if (!tab || tab === 'home') return null;
+        return {
+            tab,
+            at: typeof parsed?.at === 'string' ? parsed.at : null
+        };
+    } catch (error) {
+        console.warn('Failed to parse last visited tab', error);
+        return null;
+    }
+}
+
+function getTabTitleForHome(tabName = '') {
+    const btn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+    const text = String(btn?.textContent || '').trim();
+    return text || tabName || 'מסך';
+}
+
+function formatRelativeTimeShort(iso = '') {
+    if (!iso) return '';
+    const stamp = new Date(iso);
+    if (!Number.isFinite(stamp.getTime())) return '';
+    const diffMs = Date.now() - stamp.getTime();
+    const diffMin = Math.max(0, Math.round(diffMs / (1000 * 60)));
+    if (diffMin < 1) return 'עכשיו';
+    if (diffMin < 60) return `לפני ${diffMin} דק׳`;
+    const diffHours = Math.round(diffMin / 60);
+    if (diffHours < 24) return `לפני ${diffHours} שעות`;
+    const diffDays = Math.round(diffHours / 24);
+    return `לפני ${diffDays} ימים`;
+}
+
+function getProgressMomentumCoach() {
+    const remainingDaily = Math.max(userProgress.dailyGoal - userProgress.todayActions, 0);
+    const hasCharge = userProgress.streakCharges > 0;
+    if (remainingDaily === 0 && userProgress.streakCharges >= MAX_STREAK_CHARGES) {
+        return {
+            tone: 'success',
+            title: 'מומנטום מצוין',
+            pill: 'Ready',
+            copy: 'היעד היומי הושלם וה־Charge מלא. זמן טוב לסשן מבחן קצר או מסלול מתקדם.'
+        };
+    }
+    if (remainingDaily === 0) {
+        return {
+            tone: 'success',
+            title: 'יעד יומי הושלם',
+            pill: 'Done',
+            copy: hasCharge
+                ? `מעולה. היעד הושלם וה־Streak Charge שלך ${userProgress.streakCharges}/${MAX_STREAK_CHARGES}.`
+                : 'מעולה. היעד הושלם. עוד סשנים יחזקו XP וכוכבים, אבל היעד של היום כבר סגור.'
+        };
+    }
+    if (userProgress.streak >= 7 && !hasCharge) {
+        return {
+            tone: 'warn',
+            title: 'שימור רצף',
+            pill: 'Streak',
+            copy: `יש רצף יפה (${userProgress.streak} ימים). השלימו עוד ${remainingDaily} פעולות היום כדי למלא Charge ולשמור על הגמישות.`
+        };
+    }
+    if (userProgress.streak === 0 || !userProgress.lastSessionDate) {
+        return {
+            tone: 'info',
+            title: 'פתיחת מומנטום',
+            pill: 'Start',
+            copy: `התחילו בסשן קצר (Question Drill / Meta Radar). ${remainingDaily} פעולות ישלימו את היעד היומי.`
+        };
+    }
+    return {
+        tone: remainingDaily <= 1 ? 'warn' : 'info',
+        title: 'צעד הבא להיום',
+        pill: 'Coach',
+        copy: `נשארו ${remainingDaily} פעולות כדי לסגור יעד יומי. רצף נוכחי: ${userProgress.streak} ימים.`
+    };
+}
+
+function formatWeekdayShort(date) {
+    try {
+        return new Intl.DateTimeFormat('he-IL', { weekday: 'short' }).format(date);
+    } catch (error) {
+        const labels = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
+        return labels[date.getDay()] || '';
+    }
+}
+
+function formatDayNumberShort(date) {
+    return String(date.getDate()).padStart(2, '0');
+}
+
+function getRecentProgressWeekData(days = 7) {
+    const totalDays = Math.max(1, Math.min(14, Math.floor(Number(days) || 7)));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const items = [];
+    for (let offset = totalDays - 1; offset >= 0; offset--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - offset);
+        const dateKey = toLocalDateKey(date);
+        const entry = (userProgress.activityHistory && userProgress.activityHistory[dateKey]) || {};
+        const actions = Math.max(0, Math.floor(Number(entry.actions) || 0));
+        const sessions = Math.max(0, Math.floor(Number(entry.sessions) || 0));
+        const goalTarget = clampNumber(entry.goalTarget, 1, 10, userProgress.dailyGoal || DEFAULT_DAILY_GOAL);
+        const metGoal = actions >= goalTarget;
+        const usedCharge = entry.usedCharge === true;
+        const awardedCharge = entry.chargeAwarded === true;
+        const isToday = dateKey === userProgress.todayDate;
+
+        let state = 'empty';
+        if (usedCharge) state = 'charge';
+        if (actions > 0 || sessions > 0) state = 'active';
+        if (metGoal) state = 'goal';
+
+        items.push({
+            dateKey,
+            date,
+            actions,
+            sessions,
+            goalTarget,
+            metGoal,
+            usedCharge,
+            awardedCharge,
+            isToday,
+            state,
+            weekday: formatWeekdayShort(date),
+            dayNum: formatDayNumberShort(date)
+        });
+    }
+    return items;
+}
+
+function renderProgressWeekStrip() {
+    const stripEl = document.getElementById('progress-week-strip');
+    const captionEl = document.getElementById('progress-week-caption');
+    if (!stripEl) return;
+
+    const week = getRecentProgressWeekData(7);
+    stripEl.innerHTML = week.map(item => {
+        const classes = ['progress-week-day'];
+        if (item.state === 'goal') classes.push('is-goal');
+        else if (item.state === 'charge') classes.push('is-charge-used');
+        else if (item.state === 'active') classes.push('is-active');
+        else classes.push('is-empty');
+        if (item.isToday) classes.push('is-today');
+
+        let marker = '•';
+        if (item.metGoal) marker = '✓';
+        else if (item.usedCharge) marker = '🛡';
+        else if (item.actions > 0) marker = String(Math.min(item.actions, 9));
+
+        const titleBits = [
+            item.dateKey,
+            `פעולות: ${item.actions}`,
+            `סשנים: ${item.sessions}`,
+            `יעד: ${item.goalTarget}`
+        ];
+        if (item.metGoal) titleBits.push('יעד יומי הושלם');
+        if (item.awardedCharge) titleBits.push('Charge הוענק');
+        if (item.usedCharge) titleBits.push('Charge שימש לשמירת רצף');
+
+        return `
+            <div class="${classes.join(' ')}" title="${escapeHtml(titleBits.join(' | '))}">
+                <small>${escapeHtml(item.weekday)}</small>
+                <span class="progress-week-dot" aria-hidden="true"></span>
+                <span>${escapeHtml(marker)}</span>
+            </div>
+        `;
+    }).join('');
+
+    if (captionEl) {
+        const goalsDone = week.filter(item => item.metGoal).length;
+        const activeDays = week.filter(item => item.actions > 0 || item.sessions > 0).length;
+        captionEl.textContent = `7 ימים אחרונים · ${activeDays} ימי פעילות · ${goalsDone} ימי יעד מלא`;
+    }
+}
+
+function setDailyGoalTarget(nextGoal, { announce = true } = {}) {
+    const clamped = clampNumber(nextGoal, 1, 10, DEFAULT_DAILY_GOAL);
+    if (clamped === userProgress.dailyGoal) return;
+    userProgress.dailyGoal = clamped;
+    syncDailyProgressWindow();
+    const todayEntry = ensureActivityHistoryEntry(userProgress.todayDate || toLocalDateKey());
+    if (todayEntry) todayEntry.goalTarget = clamped;
+    tryAwardStreakCharge();
+    saveUserProgress();
+    updateProgressHub();
+    if (announce) {
+        showHint(`🎯 יעד יומי עודכן ל-${clamped} פעולות.`);
+        playUISound('select_soft');
+    }
+}
+
+function adjustDailyGoalTarget(delta = 0) {
+    const step = Math.floor(Number(delta) || 0);
+    if (!step) return;
+    setDailyGoalTarget((userProgress.dailyGoal || DEFAULT_DAILY_GOAL) + step);
+}
+
+function renderHomeTrainingProgramCards() {
+    const root = document.getElementById('home-program-cards');
+    if (!root) return;
+
+    const state = loadHomeTrainingProgramState();
+    if (!HOME_TRAINING_PROGRAMS.length) {
+        root.innerHTML = '<div class="home-program-empty">אין מסלולים זמינים כרגע.</div>';
+        return;
+    }
+
+    root.innerHTML = HOME_TRAINING_PROGRAMS.map(program => {
+        const isActive = state.activeProgramId === program.id;
+        const stepCount = program.steps.length || 0;
+        const safeIndex = isActive ? Math.min(state.stepIndex, Math.max(stepCount - 1, 0)) : 0;
+        const completedRuns = Math.max(0, Math.floor(Number(state.completedRuns?.[program.id]) || 0));
+        const completedSteps = isActive ? Math.min(state.stepIndex, stepCount) : 0;
+        const allDoneInCurrentRun = isActive && state.stepIndex >= stepCount && stepCount > 0;
+        const currentStep = program.steps[safeIndex] || program.steps[0];
+        const launchLabel = isActive
+            ? (allDoneInCurrentRun ? 'התחל סבב חדש' : `פתח שלב ${Math.min(safeIndex + 1, stepCount)}`)
+            : 'התחל מסלול';
+
+        const stepsHtml = program.steps.map((step, index) => {
+            const isDone = isActive && index < completedSteps;
+            const isCurrent = isActive && !allDoneInCurrentRun && index === safeIndex;
+            const classes = ['home-program-step'];
+            if (isDone) classes.push('is-done');
+            if (isCurrent) classes.push('is-current');
+            return `
+                <li class="${classes.join(' ')}">
+                    <span class="home-program-step-index">${isDone ? '✓' : index + 1}</span>
+                    <span class="home-program-step-copy">
+                        <strong>${escapeHtml(step.title)}</strong>
+                        <small>${escapeHtml(step.note)} · ${escapeHtml(getTabTitleForHome(step.tab))}</small>
+                    </span>
+                </li>
+            `;
+        }).join('');
+
+        const cardClasses = ['home-program-card'];
+        if (isActive) cardClasses.push('is-active');
+        if (allDoneInCurrentRun) cardClasses.push('is-complete');
+
+        return `
+            <article class="${cardClasses.join(' ')}" data-home-program-card="${program.id}">
+                <div class="home-program-head">
+                    <div>
+                        <h5 class="home-program-title">${escapeHtml(program.title)}</h5>
+                        <p>${escapeHtml(program.description)}</p>
+                    </div>
+                    <span class="home-program-tag">${escapeHtml(program.badge)}</span>
+                </div>
+                <ol class="home-program-steps">${stepsHtml}</ol>
+                <div class="home-program-footer">
+                    <div class="home-program-meta">
+                        <span>שלב ${isActive ? Math.min(safeIndex + 1, stepCount) : 1}/${stepCount}</span>
+                        <span>הושלמו: ${completedRuns}</span>
+                    </div>
+                    <div class="home-program-actions">
+                        <button type="button" class="btn btn-primary" data-home-program-action="launch" data-program-id="${program.id}">${escapeHtml(launchLabel)}</button>
+                        <button type="button" class="btn btn-secondary" data-home-program-action="done" data-program-id="${program.id}" ${stepCount ? '' : 'disabled'}>סיימתי שלב</button>
+                        <button type="button" class="btn btn-secondary" data-home-program-action="reset" data-program-id="${program.id}">איפוס</button>
+                    </div>
+                    ${currentStep ? `<p class="progress-overview-subnote">השלב הנוכחי: ${escapeHtml(currentStep.title)}</p>` : ''}
+                </div>
+            </article>
+        `;
+    }).join('');
+}
+
+function advanceHomeProgramStep(programId) {
+    const program = getHomeProgramById(programId);
+    if (!program) return;
+    const state = loadHomeTrainingProgramState();
+    if (state.activeProgramId !== program.id) {
+        state.activeProgramId = program.id;
+        state.stepIndex = 0;
+    }
+
+    state.stepIndex += 1;
+    if (state.stepIndex >= program.steps.length) {
+        state.completedRuns[program.id] = Math.max(0, Math.floor(Number(state.completedRuns[program.id]) || 0)) + 1;
+        state.stepIndex = 0;
+        state.activeProgramId = program.id;
+        showHint(`✅ המסלול "${program.title}" הושלם. אפשר להתחיל סבב חדש או לעבור למסלול אחר.`);
+        playUISound('finish');
+    } else {
+        const nextStep = program.steps[state.stepIndex];
+        showHint(`נשמר. השלב הבא במסלול "${program.title}": ${nextStep?.title || 'שלב הבא'}.`);
+        playUISound('next');
+    }
+
+    saveHomeTrainingProgramState(state);
+    updateProgressHub();
+}
+
+function launchHomeProgramStep(programId) {
+    const program = getHomeProgramById(programId);
+    if (!program) return;
+    let state = loadHomeTrainingProgramState();
+    if (state.activeProgramId !== program.id) {
+        state.activeProgramId = program.id;
+        state.stepIndex = 0;
+    }
+    if (state.stepIndex >= program.steps.length) {
+        state.stepIndex = 0;
+    }
+    state = saveHomeTrainingProgramState(state);
+    const step = program.steps[Math.min(state.stepIndex, program.steps.length - 1)] || program.steps[0];
+    renderHomeTrainingProgramCards();
+    if (step?.tab) {
+        showHint(`פותח/ת מסלול "${program.title}" · שלב ${Math.min(state.stepIndex + 1, program.steps.length)}: ${step.title}`);
+        playUISound('start');
+        navigateTo(step.tab);
+    }
+}
+
+function resetHomeProgram(programId) {
+    const program = getHomeProgramById(programId);
+    if (!program) return;
+    const state = loadHomeTrainingProgramState();
+    if (state.activeProgramId === program.id) {
+        state.stepIndex = 0;
+    }
+    state.completedRuns[program.id] = 0;
+    saveHomeTrainingProgramState(state);
+    renderHomeTrainingProgramCards();
+    showHint(`אופס מסלול: ${program.title}`);
+    playUISound('skip');
+}
+
+function resetAllHomePrograms() {
+    saveHomeTrainingProgramState(getDefaultHomeTrainingProgramState());
+    renderHomeTrainingProgramCards();
+    showHint('כל המסלולים אופסו.');
+    playUISound('skip');
+}
+
+function handleHomeProgramActionClick(event) {
+    const button = event.target.closest('[data-home-program-action]');
+    if (!button) return;
+    const action = button.getAttribute('data-home-program-action');
+    const programId = button.getAttribute('data-program-id') || '';
+    if (!programId) return;
+
+    if (action === 'launch') {
+        launchHomeProgramStep(programId);
+        return;
+    }
+    if (action === 'done') {
+        advanceHomeProgramStep(programId);
+        return;
+    }
+    if (action === 'reset') {
+        resetHomeProgram(programId);
+    }
+}
+
+function setupProgressHubEnhancements() {
+    const programsRoot = document.getElementById('home-program-cards');
+    if (programsRoot && programsRoot.dataset.boundHomePrograms !== 'true') {
+        programsRoot.dataset.boundHomePrograms = 'true';
+        programsRoot.addEventListener('click', handleHomeProgramActionClick);
+    }
+
+    const resetAllBtn = document.getElementById('home-programs-reset-all');
+    if (resetAllBtn && resetAllBtn.dataset.boundHomeProgramsReset !== 'true') {
+        resetAllBtn.dataset.boundHomeProgramsReset = 'true';
+        resetAllBtn.addEventListener('click', resetAllHomePrograms);
+    }
+
+    const resumeBtn = document.getElementById('progress-resume-btn');
+    if (resumeBtn && resumeBtn.dataset.boundResumeLast !== 'true') {
+        resumeBtn.dataset.boundResumeLast = 'true';
+        resumeBtn.addEventListener('click', () => {
+            const last = loadHomeLastVisitedTab();
+            if (!last?.tab) return;
+            playUISound('start');
+            navigateTo(last.tab);
+        });
+    }
+
+    const openMenuBtn = document.getElementById('progress-open-home-menu-btn');
+    if (openMenuBtn && openMenuBtn.dataset.boundOpenFeatureMap !== 'true') {
+        openMenuBtn.dataset.boundOpenFeatureMap = 'true';
+        openMenuBtn.addEventListener('click', () => {
+            playUISound('tap_soft');
+            openFeatureMapMenu();
+        });
+    }
+
+    const goalMinusBtn = document.getElementById('daily-goal-decrease-btn');
+    if (goalMinusBtn && goalMinusBtn.dataset.boundDailyGoalAdjust !== 'true') {
+        goalMinusBtn.dataset.boundDailyGoalAdjust = 'true';
+        goalMinusBtn.addEventListener('click', () => adjustDailyGoalTarget(-1));
+    }
+
+    const goalPlusBtn = document.getElementById('daily-goal-increase-btn');
+    if (goalPlusBtn && goalPlusBtn.dataset.boundDailyGoalAdjust !== 'true') {
+        goalPlusBtn.dataset.boundDailyGoalAdjust = 'true';
+        goalPlusBtn.addEventListener('click', () => adjustDailyGoalTarget(1));
+    }
+
+    renderHomeTrainingProgramCards();
+}
 
 function legacyLoadUserProgress() {
     const saved = localStorage.getItem('userProgress');
@@ -9726,12 +10838,18 @@ function legacyCheckAndAwardBadges() {
 function recordSession() {
     userProgress.sessions += 1;
     updateStreak();
+    const todayKey = toLocalDateKey();
+    const entry = ensureActivityHistoryEntry(todayKey);
+    if (entry) {
+        entry.sessions += 1;
+    }
     checkAndAwardBadges();
     saveUserProgress();
     updateProgressHub();
 }
 
 function initializeProgressHub() {
+    setupProgressHubEnhancements();
     updateProgressHub();
 }
 
@@ -9805,6 +10923,52 @@ function clampNumber(value, min, max, fallback = min) {
     return Math.min(max, Math.max(min, parsed));
 }
 
+function isDateKey(value) {
+    return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+function pruneActivityHistoryMap(historyMap, maxDays = 45) {
+    const entries = Object.entries(historyMap || {})
+        .filter(([dateKey]) => isDateKey(dateKey))
+        .sort((a, b) => a[0].localeCompare(b[0]));
+    const kept = entries.slice(-Math.max(1, maxDays));
+    return kept.reduce((acc, [dateKey, value]) => {
+        const item = value && typeof value === 'object' ? value : {};
+        acc[dateKey] = {
+            actions: Math.max(0, Math.floor(Number(item.actions) || 0)),
+            sessions: Math.max(0, Math.floor(Number(item.sessions) || 0)),
+            xp: Math.max(0, Math.floor(Number(item.xp) || 0)),
+            stars: Math.max(0, Math.floor(Number(item.stars) || 0)),
+            goalTarget: clampNumber(item.goalTarget, 1, 10, DEFAULT_DAILY_GOAL),
+            usedCharge: item.usedCharge === true,
+            chargeAwarded: item.chargeAwarded === true
+        };
+        return acc;
+    }, {});
+}
+
+function ensureActivityHistoryEntry(dateKey = toLocalDateKey()) {
+    if (!userProgress.activityHistory || typeof userProgress.activityHistory !== 'object') {
+        userProgress.activityHistory = {};
+    }
+    if (!isDateKey(dateKey)) return null;
+    if (!userProgress.activityHistory[dateKey] || typeof userProgress.activityHistory[dateKey] !== 'object') {
+        userProgress.activityHistory[dateKey] = {
+            actions: 0,
+            sessions: 0,
+            xp: 0,
+            stars: 0,
+            goalTarget: clampNumber(userProgress.dailyGoal, 1, 10, DEFAULT_DAILY_GOAL),
+            usedCharge: false,
+            chargeAwarded: false
+        };
+    }
+    if (!Number.isFinite(Number(userProgress.activityHistory[dateKey].goalTarget))) {
+        userProgress.activityHistory[dateKey].goalTarget = clampNumber(userProgress.dailyGoal, 1, 10, DEFAULT_DAILY_GOAL);
+    }
+    return userProgress.activityHistory[dateKey];
+}
+
 function normalizeUserProgress(raw) {
     const merged = { ...DEFAULT_USER_PROGRESS, ...(raw || {}) };
     merged.badges = Array.isArray(merged.badges) ? merged.badges : [];
@@ -9819,6 +10983,7 @@ function normalizeUserProgress(raw) {
     merged.todayDate = typeof merged.todayDate === 'string' ? merged.todayDate : null;
     merged.lastChargeAwardedDate = typeof merged.lastChargeAwardedDate === 'string' ? merged.lastChargeAwardedDate : null;
     merged.lastChargeUsedDate = typeof merged.lastChargeUsedDate === 'string' ? merged.lastChargeUsedDate : null;
+    merged.activityHistory = pruneActivityHistoryMap(merged.activityHistory || {}, 45);
     return merged;
 }
 
@@ -9828,6 +10993,7 @@ function syncDailyProgressWindow() {
         userProgress.todayDate = today;
         userProgress.todayActions = 0;
     }
+    ensureActivityHistoryEntry(today);
 }
 
 function tryAwardStreakCharge() {
@@ -9842,6 +11008,8 @@ function tryAwardStreakCharge() {
 
     userProgress.streakCharges += 1;
     userProgress.lastChargeAwardedDate = userProgress.todayDate;
+    const entry = ensureActivityHistoryEntry(userProgress.todayDate);
+    if (entry) entry.chargeAwarded = true;
     showHint(`נ›¡ן¸ ׳§׳™׳‘׳׳× Streak Charge (${userProgress.streakCharges}/${MAX_STREAK_CHARGES})`);
 }
 
@@ -9850,6 +11018,8 @@ function registerDailyAction(amount = 1) {
     const delta = Math.max(0, Math.floor(Number(amount) || 0));
     if (!delta) return;
     userProgress.todayActions += delta;
+    const entry = ensureActivityHistoryEntry(userProgress.todayDate);
+    if (entry) entry.actions += delta;
     tryAwardStreakCharge();
 }
 
@@ -9876,6 +11046,8 @@ function addXP(amount) {
     if (delta <= 0) return;
     userProgress.xp += delta;
     registerDailyAction(1);
+    const entry = ensureActivityHistoryEntry(userProgress.todayDate || toLocalDateKey());
+    if (entry) entry.xp += delta;
     updateStreak();
     checkAndAwardBadges();
     saveUserProgress();
@@ -9886,6 +11058,8 @@ function addStars(amount) {
     const delta = Math.floor(Number(amount) || 0);
     if (delta <= 0) return;
     userProgress.stars += delta;
+    const entry = ensureActivityHistoryEntry(userProgress.todayDate || toLocalDateKey());
+    if (entry) entry.stars += delta;
     checkAndAwardBadges();
     saveUserProgress();
     updateProgressHub();
@@ -9905,6 +11079,8 @@ function updateStreak() {
             userProgress.streakCharges -= 1;
             userProgress.streak += 1;
             userProgress.lastChargeUsedDate = today;
+            const entry = ensureActivityHistoryEntry(today);
+            if (entry) entry.usedCharge = true;
             showHint(`נ›¡ן¸ ׳”׳©׳×׳׳©׳× ׳‘-Streak Charge. ׳ ׳©׳׳¨׳• ${userProgress.streakCharges}/${MAX_STREAK_CHARGES}`);
         } else {
             userProgress.streak = 1;
@@ -9915,15 +11091,7 @@ function updateStreak() {
 }
 
 function checkAndAwardBadges() {
-    const badgesList = [
-        { id: 'first_step', name: '׳¦׳¢׳“ ׳¨׳׳©׳•׳', icon: 'נ‘£', condition: () => userProgress.xp >= 10 },
-        { id: 'fire_10', name: '׳׳”׳˜ נ”¥', icon: 'נ”¥', condition: () => userProgress.streak >= 10 },
-        { id: 'xp_100', name: '100 XP', icon: 'ג­', condition: () => userProgress.xp >= 100 },
-        { id: 'xp_500', name: '500 XP', icon: 'ג¨', condition: () => userProgress.xp >= 500 },
-        { id: 'sessions_10', name: '10 ׳¡׳©׳ ׳™׳', icon: 'נ“', condition: () => userProgress.sessions >= 10 },
-        { id: 'daily_goal', name: '׳™׳¢׳“ ׳™׳•׳׳™', icon: 'נ¯', condition: () => userProgress.lastChargeAwardedDate === userProgress.todayDate },
-        { id: 'charge_full', name: 'Charge Full', icon: 'נ›¡ן¸', condition: () => userProgress.streakCharges >= MAX_STREAK_CHARGES },
-    ];
+    const badgesList = getProgressBadgeDefinitions();
 
     badgesList.forEach(badge => {
         if (badge.condition() && !userProgress.badges.find(b => b.id === badge.id)) {
@@ -9942,11 +11110,27 @@ function updateProgressHub() {
     const sessionEl = document.getElementById('session-count');
     const dailyGoalCard = document.getElementById('daily-goal-card');
     const dailyGoalValueEl = document.getElementById('daily-goal-value');
+    const dailyGoalTargetPillEl = document.getElementById('daily-goal-target-pill');
+    const dailyGoalDecreaseBtn = document.getElementById('daily-goal-decrease-btn');
+    const dailyGoalIncreaseBtn = document.getElementById('daily-goal-increase-btn');
     const dailyGoalFillEl = document.getElementById('daily-goal-fill');
     const dailyGoalNoteEl = document.getElementById('daily-goal-note');
     const streakChargeValueEl = document.getElementById('streak-charge-value');
     const streakChargeNoteEl = document.getElementById('streak-charge-note');
     const badgesDisplay = document.getElementById('badges-display');
+    const levelTitleEl = document.getElementById('progress-level-title');
+    const levelBadgeEl = document.getElementById('progress-level-badge');
+    const levelFillEl = document.getElementById('progress-level-fill');
+    const levelNoteEl = document.getElementById('progress-level-note');
+    const momentumCardEl = document.getElementById('progress-momentum-card');
+    const momentumTitleEl = document.getElementById('progress-momentum-title');
+    const momentumPillEl = document.getElementById('progress-momentum-pill');
+    const momentumCopyEl = document.getElementById('progress-momentum-copy');
+    const weekStripEl = document.getElementById('progress-week-strip');
+    const nextBadgeEl = document.getElementById('progress-next-badge');
+    const resumeTitleEl = document.getElementById('progress-resume-title');
+    const resumeCopyEl = document.getElementById('progress-resume-copy');
+    const resumeBtn = document.getElementById('progress-resume-btn');
 
     syncDailyProgressWindow();
 
@@ -9970,6 +11154,9 @@ function updateProgressHub() {
     const remaining = Math.max(userProgress.dailyGoal - userProgress.todayActions, 0);
     const completed = remaining === 0;
     if (dailyGoalValueEl) dailyGoalValueEl.textContent = `${Math.min(userProgress.todayActions, userProgress.dailyGoal)}/${userProgress.dailyGoal}`;
+    if (dailyGoalTargetPillEl) dailyGoalTargetPillEl.textContent = `יעד: ${userProgress.dailyGoal}`;
+    if (dailyGoalDecreaseBtn) dailyGoalDecreaseBtn.disabled = userProgress.dailyGoal <= 1;
+    if (dailyGoalIncreaseBtn) dailyGoalIncreaseBtn.disabled = userProgress.dailyGoal >= 10;
     if (dailyGoalFillEl) dailyGoalFillEl.style.width = `${goalPercent}%`;
     if (dailyGoalNoteEl) dailyGoalNoteEl.textContent = completed ? '׳”׳™׳¢׳“ ׳”׳™׳•׳׳™ ׳”׳•׳©׳׳' : `׳¢׳•׳“ ${remaining} ׳₪׳¢׳•׳׳•׳× ׳׳”׳©׳׳׳”`;
     if (dailyGoalCard) dailyGoalCard.classList.toggle('is-goal-complete', completed);
@@ -9981,6 +11168,46 @@ function updateProgressHub() {
             : '׳¡׳™׳™׳ ׳™׳¢׳“ ׳™׳•׳׳™ ׳›׳“׳™ ׳׳׳׳ Charge';
     }
 
+    const levelMeta = getXpLevelMeta(userProgress.xp);
+    if (levelTitleEl) levelTitleEl.textContent = `Level ${levelMeta.level} · התקדמות`;
+    if (levelBadgeEl) levelBadgeEl.textContent = `${userProgress.xp} XP`;
+    if (levelFillEl) levelFillEl.style.width = `${levelMeta.progressPct}%`;
+    if (levelNoteEl) {
+        levelNoteEl.textContent = levelMeta.remainingXp > 0
+            ? `עוד ${levelMeta.remainingXp} XP לרמה ${levelMeta.level + 1}`
+            : 'רמה הבאה פתוחה';
+    }
+
+    const momentum = getProgressMomentumCoach();
+    if (momentumCardEl) momentumCardEl.dataset.tone = momentum.tone || 'info';
+    if (momentumTitleEl) momentumTitleEl.textContent = momentum.title || 'מומנטום יומי';
+    if (momentumPillEl) momentumPillEl.textContent = momentum.pill || 'Coach';
+    if (momentumCopyEl) momentumCopyEl.textContent = momentum.copy || '';
+    if (weekStripEl) renderProgressWeekStrip();
+
+    const nextBadge = getNextProgressBadgePreview();
+    if (nextBadgeEl) {
+        nextBadgeEl.textContent = nextBadge
+            ? `התג הבא: ${nextBadge.icon} ${nextBadge.name}`
+            : 'כל התגים הפעילים הושגו. אפשר להעלות יעדי קושי.';
+    }
+
+    const lastVisited = loadHomeLastVisitedTab();
+    if (resumeTitleEl) {
+        resumeTitleEl.textContent = lastVisited?.tab
+            ? `המשך: ${getTabTitleForHome(lastVisited.tab)}`
+            : 'המשך אחרון';
+    }
+    if (resumeCopyEl) {
+        resumeCopyEl.textContent = lastVisited?.tab
+            ? `${getTabTitleForHome(lastVisited.tab)} · ${formatRelativeTimeShort(lastVisited.at)}`
+            : 'אין מסך אחרון שמור עדיין. בחר/י כלי מהתפריט או מהמסלולים למטה.';
+    }
+    if (resumeBtn) {
+        resumeBtn.disabled = !lastVisited?.tab;
+        resumeBtn.textContent = lastVisited?.tab ? `פתח ${getTabTitleForHome(lastVisited.tab)}` : 'פתח המשך';
+    }
+
     if (badgesDisplay) {
         badgesDisplay.innerHTML = userProgress.badges.map(b => `
             <div class="badge" title="${b.name}">
@@ -9989,6 +11216,8 @@ function updateProgressHub() {
             </div>
         `).join('');
     }
+
+    renderHomeTrainingProgramCards();
 }
 
 // ==================== END OF APP ===================

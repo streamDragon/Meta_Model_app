@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.30" data-build-time="1771957673663" data-build-iso="2026-02-24T18:27:53.663Z" data-git-commit="4f51df1">
+<html lang="he" dir="rtl" data-app-version="1.0.31" data-build-time="1771969213827" data-build-iso="2026-02-24T21:40:13.827Z" data-git-commit="9d7664a">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -510,7 +510,7 @@
                             <small>פרסים שהצברת</small>
                         </div>
                         <div class="progress-card">
-                            <span class="progress-icon">??</span>
+                            <span class="progress-icon">🧪</span>
                             <p class="progress-label">Sessions</p>
                             <p class="progress-value" id="session-count">0</p>
                             <small>סשנים שהשלמת</small>
@@ -519,6 +519,11 @@
                             <span class="progress-icon">🎯</span>
                             <p class="progress-label">Daily Goal</p>
                             <p class="progress-value" id="daily-goal-value">0/3</p>
+                            <div class="daily-goal-controls" role="group" aria-label="שינוי יעד יומי">
+                                <button id="daily-goal-decrease-btn" class="daily-goal-step-btn" type="button" aria-label="הקטן יעד יומי">−</button>
+                                <span id="daily-goal-target-pill" class="daily-goal-target-pill">יעד: 3</span>
+                                <button id="daily-goal-increase-btn" class="daily-goal-step-btn" type="button" aria-label="הגדל יעד יומי">+</button>
+                            </div>
                             <div class="daily-goal-meter" aria-hidden="true">
                                 <div class="daily-goal-fill" id="daily-goal-fill"></div>
                             </div>
@@ -530,6 +535,51 @@
                             <p class="progress-value" id="streak-charge-value">0/3</p>
                             <small id="streak-charge-note">שומר על רצף ביום פספוס</small>
                         </div>
+                    </div>
+                    <div class="progress-overview-grid">
+                        <div class="progress-overview-card progress-level-card">
+                            <div class="progress-overview-head">
+                                <strong id="progress-level-title">Level 1 · התחלה</strong>
+                                <span id="progress-level-badge" class="progress-mini-pill">XP</span>
+                            </div>
+                            <div class="progress-level-meter" aria-hidden="true">
+                                <div id="progress-level-fill" class="progress-level-fill"></div>
+                            </div>
+                            <p id="progress-level-note" class="progress-overview-note">צברו XP כדי לעלות רמה.</p>
+                        </div>
+                        <div id="progress-momentum-card" class="progress-overview-card progress-momentum-card" data-tone="info">
+                            <div class="progress-overview-head">
+                                <strong id="progress-momentum-title">מומנטום יומי</strong>
+                                <span id="progress-momentum-pill" class="progress-mini-pill">Coach</span>
+                            </div>
+                            <p id="progress-momentum-copy" class="progress-overview-note">השלימו פעולת אימון אחת כדי לפתוח את היום.</p>
+                            <div id="progress-week-strip" class="progress-week-strip" aria-label="סיכום 7 ימים אחרונים"></div>
+                            <p id="progress-week-caption" class="progress-overview-subnote">7 ימים אחרונים</p>
+                            <p id="progress-next-badge" class="progress-overview-subnote">התג הבא: —</p>
+                        </div>
+                        <div class="progress-overview-card progress-resume-card">
+                            <div class="progress-overview-head">
+                                <strong id="progress-resume-title">המשך אחרון</strong>
+                                <span class="progress-mini-pill">Flow</span>
+                            </div>
+                            <p id="progress-resume-copy" class="progress-overview-note">עדיין לא נשמר מסך אחרון.</p>
+                            <div class="progress-overview-actions">
+                                <button id="progress-resume-btn" class="btn btn-primary" type="button" disabled>פתח המשך</button>
+                                <button id="progress-open-home-menu-btn" class="btn btn-secondary" type="button">בחר כלי</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-programs-panel">
+                        <div class="progress-programs-head">
+                            <div>
+                                <h4>תוכניות אימון קצרות</h4>
+                                <p>מסלולים מהירים עם שלבים ברורים: פתח/י שלב, חזור/י לכאן וסמן/י "בוצע".</p>
+                            </div>
+                            <div class="progress-programs-head-actions">
+                                <button id="home-programs-reset-all" class="btn btn-secondary" type="button">איפוס מסלולים</button>
+                            </div>
+                        </div>
+                        <div id="home-program-cards" class="home-program-cards"></div>
                     </div>
                     <div id="badges-display" class="badges-display">
                         <!-- Badges will render here -->
@@ -1021,6 +1071,41 @@
                                 <h3>תרגיל בניית שאלות</h3>
                                 <small>בחרו את המשפט, כתבו שאלה ותייגו את הכיוון (מחיקה/עיוות/הכללה).</small>
                             </div>
+                            <div class="question-drill-session-panel">
+                                <div class="question-drill-session-config">
+                                    <div class="question-drill-mode-box">
+                                        <span class="question-drill-mode-label">מצב</span>
+                                        <div class="question-drill-mode-switch" role="group" aria-label="בחירת מצב לתרגיל שאלות">
+                                            <button id="question-drill-mode-learning" type="button" class="question-drill-mode-btn is-active" aria-pressed="true">למידה</button>
+                                            <button id="question-drill-mode-exam" type="button" class="question-drill-mode-btn" aria-pressed="false">מבחן</button>
+                                        </div>
+                                        <small id="question-drill-mode-note" class="question-drill-mode-note">למידה: אפשר לקבל רמזים ולדייק לפני המעבר.</small>
+                                    </div>
+                                    <label class="question-drill-plan-box" for="question-drill-plan">
+                                        <span>תוכנית הצלחה</span>
+                                        <select id="question-drill-plan" class="question-drill-plan-select"></select>
+                                    </label>
+                                </div>
+                                <div class="question-drill-session-actions">
+                                    <button id="question-drill-start-session" class="btn btn-primary" type="button">התחל סשן</button>
+                                    <button id="question-drill-reset-session" class="btn btn-secondary" type="button">איפוס</button>
+                                    <button class="btn btn-secondary audio-mute-btn question-drill-audio-btn" type="button">סאונד פעיל</button>
+                                </div>
+                                <div class="question-drill-session-status" aria-live="polite">
+                                    <div class="question-drill-status-chips">
+                                        <span id="question-drill-chip-mode" class="question-drill-chip">Mode: למידה</span>
+                                        <span id="question-drill-chip-plan" class="question-drill-chip">Plan: Focus 8</span>
+                                        <span id="question-drill-chip-round" class="question-drill-chip">Round: 0/0</span>
+                                        <span id="question-drill-chip-stars" class="question-drill-chip">Stars: 0</span>
+                                        <span id="question-drill-chip-target" class="question-drill-chip">Target: ⭐0</span>
+                                        <span id="question-drill-chip-streak" class="question-drill-chip">Streak: 0</span>
+                                    </div>
+                                    <div class="question-drill-progress" aria-hidden="true">
+                                        <span id="question-drill-progress-fill" class="question-drill-progress-fill"></span>
+                                    </div>
+                                    <p id="question-drill-session-note" class="question-drill-session-note"></p>
+                                </div>
+                            </div>
                             <p id="question-drill-statement" class="question-drill-statement"></p>
                             <textarea id="question-drill-input" rows="3" placeholder="כתוב/י כאן את השאלה שמחפשת את ההנחה הנסתרת..."></textarea>
                             <div class="question-drill-controls">
@@ -1032,10 +1117,12 @@
                                         <option value="GENERALIZATION">Generalization</option>
                                     </select>
                                 </label>
+                                <button id="question-drill-hint" class="btn btn-secondary" type="button">רמז</button>
                                 <button id="question-drill-check" class="btn btn-primary">בדוק שאלה</button>
                                 <button id="question-drill-next" class="btn btn-secondary">משפט חדש</button>
                             </div>
                             <div id="question-drill-feedback" class="question-drill-feedback"></div>
+                            <div id="question-drill-summary" class="question-drill-summary hidden"></div>
                             <div class="question-drill-stats">
                                 <span>ניסיונות: <strong id="question-drill-attempts">0</strong></span>
                                 <span>פגיעות: <strong id="question-drill-hits">0</strong></span>
