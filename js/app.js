@@ -809,7 +809,6 @@ function getTherapeuticDemoContent(screenId, screenTitle, guideCopy) {
 }
 
 const SCREEN_READ_GUIDE_TARGET_IDS = Object.freeze([
-    'home',
     'scenario-trainer',
     'scenario-screen-home',
     'scenario-screen-domain',
@@ -830,6 +829,46 @@ const SCREEN_READ_GUIDE_TARGET_IDS = Object.freeze([
     'blueprint',
     'about'
 ]);
+
+function setFeatureMapToggleOpen(isOpen) {
+    const featureMap = document.getElementById('feature-map-toggle');
+    if (!featureMap) return;
+    if (isOpen) featureMap.setAttribute('open', '');
+    else featureMap.removeAttribute('open');
+}
+
+function openFeatureMapMenu() {
+    const featureMap = document.getElementById('feature-map-toggle');
+    if (!featureMap) return;
+    setFeatureMapToggleOpen(true);
+    try {
+        featureMap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (_error) {
+        featureMap.scrollIntoView();
+    }
+}
+
+function setupFeatureMapOverlayControls() {
+    const featureMap = document.getElementById('feature-map-toggle');
+    if (!featureMap || featureMap.dataset.boundOverlayFeatureMap === 'true') return;
+    featureMap.dataset.boundOverlayFeatureMap = 'true';
+
+    const openBtn = document.getElementById('home-open-feature-map');
+    if (openBtn && openBtn.dataset.boundFeatureMapOpen !== 'true') {
+        openBtn.dataset.boundFeatureMapOpen = 'true';
+        openBtn.addEventListener('click', () => openFeatureMapMenu());
+    }
+
+    featureMap.addEventListener('toggle', () => {
+        document.body.classList.toggle('feature-map-open', featureMap.open);
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!featureMap.open) return;
+        if (featureMap.contains(event.target)) return;
+        setFeatureMapToggleOpen(false);
+    });
+}
 
 function buildScreenReadGuide(screenId) {
     const copy = SCREEN_READ_GUIDES[screenId] || DEFAULT_SCREEN_READ_GUIDE;
@@ -1208,6 +1247,7 @@ function initializeMetaModelApp() {
     });
 
     setupFeatureLauncherTabs();
+    setupFeatureMapOverlayControls();
     setupMobileViewportSizing();
     applyEmbeddedCompactMode();
     applyHeaderDensityPreference();

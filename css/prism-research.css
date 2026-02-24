@@ -253,6 +253,115 @@ body {
   font-size: 12px;
 }
 
+.prm-philosophy-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.prm-philosophy-library {
+  border-radius: 16px;
+}
+
+.prm-philosophy-library-summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 14px;
+  display: grid;
+  gap: 4px;
+  background: linear-gradient(180deg, rgba(15, 118, 110, 0.08), rgba(15, 118, 110, 0.04));
+  border-bottom: 1px solid rgba(15, 118, 110, 0.14);
+}
+
+.prm-philosophy-library-summary::-webkit-details-marker {
+  display: none;
+}
+
+.prm-philosophy-library-summary span {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.prm-philosophy-library-summary small {
+  color: var(--prm-muted);
+  font-size: 12px;
+}
+
+.prm-philosophy-library-body {
+  padding: 12px 14px 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.prm-philosophy-intro {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(15, 118, 110, 0.15);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  line-height: 1.55;
+}
+
+.prm-philosophy-list {
+  display: grid;
+  gap: 8px;
+}
+
+.prm-philosophy-item {
+  border: 1px solid var(--prm-line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  overflow: hidden;
+}
+
+.prm-philosophy-item-summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 10px 12px;
+  display: grid;
+  gap: 2px;
+  background: linear-gradient(180deg, rgba(180, 83, 9, 0.07), rgba(180, 83, 9, 0.02));
+}
+
+.prm-philosophy-item-summary::-webkit-details-marker {
+  display: none;
+}
+
+.prm-philosophy-item-title {
+  font-weight: 800;
+  color: var(--prm-ink);
+  line-height: 1.25;
+}
+
+.prm-philosophy-item-school {
+  color: var(--prm-muted);
+  font-size: 12px;
+}
+
+.prm-philosophy-item-body {
+  padding: 10px 12px 12px;
+  display: grid;
+  gap: 7px;
+}
+
+.prm-philosophy-item-body p {
+  margin: 0;
+  line-height: 1.55;
+  font-size: 13px;
+}
+
+.prm-philosophy-q {
+  border: 1px dashed rgba(37, 99, 235, 0.25);
+  background: rgba(239, 246, 255, 0.85);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.prm-philosophy-tooltip {
+  border-top: 1px dashed var(--prm-line);
+  padding-top: 7px;
+  color: #1e3a8a;
+}
+
 .prm-qa-panel.is-empty,
 .prm-report-panel.is-empty {
   color: var(--prm-muted);
@@ -414,5 +523,11 @@ body {
 
   .prm-report-grid {
     grid-template-columns: 1fr;
+  }
+
+  .prm-philosophy-library-summary,
+  .prm-philosophy-item-summary,
+  .prm-philosophy-item-body {
+    padding-inline: 10px;
   }
 }

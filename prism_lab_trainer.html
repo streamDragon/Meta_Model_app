@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Prism Research Mode - Meta Model Trainer</title>
+  <title>Prism Lab - חפירה עמוקה עם עדשות</title>
   <script>
     (function () {
       var v = String(Date.now());
@@ -31,21 +31,17 @@
         s.onload = function () { if (cb) cb(); };
         document.head.appendChild(s);
       }
-      window.__PRISM_RESEARCH_ASSET_V__ = v;
-      addCss('css/prism-research.css');
-      addScript('js/prism-research-core.js', function () {
-        addScript('js/prism-research-philosophy.js', function () {
-          addScript('js/prism-research-app.js');
-        });
-      });
+      addCss('css/prism-lab.css');
+      addScript('js/prism-lab.js');
     })();
   </script>
 </head>
 <body>
-  <div id="prism-research-app" aria-live="polite">
-    <div style="max-width:960px;margin:32px auto;padding:16px;border:1px solid #ddd;border-radius:12px;background:#fff;">
-      Loading Prism Research Mode...
+  <div id="prism-lab-app" aria-live="polite">
+    <div style="max-width:980px;margin:36px auto;padding:16px;border:1px solid #dbeafe;border-radius:14px;background:#fff;">
+      טוען Prism Lab...
     </div>
   </div>
 </body>
 </html>
+

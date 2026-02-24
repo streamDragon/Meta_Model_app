@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.26" data-build-time="1771894246481" data-build-iso="2026-02-24T00:50:46.481Z" data-git-commit="1a5f55d">
+<html lang="he" dir="rtl" data-app-version="1.0.26" data-build-time="1771896057607" data-build-iso="2026-02-24T01:20:57.607Z" data-git-commit="6bf5081">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -379,23 +379,106 @@
                     </div>
                 </div>
 
-                <div class="cta-section">
-                    <h3>🚀 בואן נתחיל!</h3>
-                    <p>בחר מה ברצונך לעשות:</p>
-                    <div class="cta-buttons">
-                        <button class="btn btn-primary cta-btn" onclick="navigateTo('scenario-trainer')">🎬 סצנות Execution</button>
-                        <button class="btn btn-primary cta-btn" onclick="navigateTo('comic-engine')">🧩 Comic Engine 2.0</button>
-                        <button class="btn btn-secondary cta-btn" onclick="window.open('assets/svg/demo/index.html', '_blank')">🎨 Comic Kit Demo</button>
-                        <button class="btn btn-primary cta-btn" onclick="navigateTo('categories')">📚 לומד קטגוריות</button>
-                        <button class="btn btn-primary cta-btn" onclick="navigateTo('blueprint')">בנה Blueprint</button>
-                        <button class="btn btn-primary cta-btn" onclick="navigateTo('prismlab')">🔍 Prism Lab (רמות לוגיות)</button>
-                        <button class="btn btn-secondary cta-btn" onclick="window.open('classic_classic_trainer.html', '_blank')">🏛️ Classic Classic</button>
-                        <button class="btn btn-secondary cta-btn" onclick="window.open('classic2_trainer.html', '_blank')">🌀 Classic 2 (Structure of Magic)</button>
-                        <button class="btn btn-secondary cta-btn" onclick="window.open('iceberg_templates_trainer.html', '_blank')">🧊 קצה קרחון / שלדי עומק</button>
-                        <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('question')">🎯 תרגול שאלות</button>
-                        <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('radar')">⚡ Meta Radar</button>
-                        <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('triples-radar')">Triples Radar</button>
-                        <button class="btn btn-secondary cta-btn" onclick="navigateToPracticePage('wizard')">🧠 SQHCEL Wizard</button>
+                <div class="home-therapy-demo" id="home-therapy-demo">
+                    <div class="home-therapy-demo-head">
+                        <h3>🧭 הדגמה תהליכית מוסברת: איך הכלים מתחברים לתהליך טיפולי ארוך</h3>
+                        <p>זו אילוסטרציה מסודרת של תהליך עבודה מתמשך. המטרה כאן היא להסביר מה כל פיצ'ר בא למדל, באיזה שלב משתמשים בו, ואיך אפשר לתרגל את אותו רצף לבד באפליקציה.</p>
+                    </div>
+                    <div class="home-therapy-demo-flow">
+                        <article class="home-therapy-step">
+                            <div class="home-therapy-step-num">1</div>
+                            <div class="home-therapy-step-body">
+                                <p class="home-therapy-step-kicker">מיקוד ראשון · זיהוי טקסט</p>
+                                <h4>Prism Research (Chain)</h4>
+                                <p>מתחילים מהפסקה של המטופל ומסמנים ביטוי טעון. עובדים רקורסיבית: אותה עדשה נשאלת שוב על המשפט החדש שנולד.</p>
+                                <p class="home-therapy-step-q">שאלת דוגמה: "איך אתה יודע ש־X?" / "איך בדיוק X גורם ל־Y?"</p>
+                                <div class="home-therapy-step-actions">
+                                    <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html" target="_blank" rel="noopener">פתח Prism Research</a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="home-therapy-step">
+                            <div class="home-therapy-step-num">2</div>
+                            <div class="home-therapy-step-body">
+                                <p class="home-therapy-step-kicker">חתך עומק · עוגן אחד</p>
+                                <h4>Prism Lab (Vertical Stack)</h4>
+                                <p>עוצרים על עוגן אחד משמעותי ולא "רצים קדימה". ממפים אותו דרך E/B/C/V/I/S כדי לזהות קפיצות רמה, רמות חסרות, ופיבוט הבא.</p>
+                                <p class="home-therapy-step-q">שאלת דוגמה: אותה קטגוריה, אבל דרך E/B/C/V/I/S (מגדל לוגי).</p>
+                                <div class="home-therapy-step-actions">
+                                    <button type="button" class="btn btn-primary" onclick="navigateTo('prismlab')">פתח Prism Lab</button>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="home-therapy-step">
+                            <div class="home-therapy-step-num">3</div>
+                            <div class="home-therapy-step-body">
+                                <p class="home-therapy-step-kicker">ויסות לפני אתגור</p>
+                                <h4>SQHCEL Wizard</h4>
+                                <p>כשהגוף נסגר, לא עוברים ישר לאתגר. קודם עושים גישור תחושה→שפה (S→Q→H→C→PATH→E/L), ורק אחר כך מחדדים שאלה.</p>
+                                <p class="home-therapy-step-q">שאלת דוגמה: מה אתה מרגיש עכשיו, ומה הגוף אומר לפני המילים?</p>
+                                <div class="home-therapy-step-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">SQHCEL Wizard</button>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="home-therapy-step">
+                            <div class="home-therapy-step-num">4</div>
+                            <div class="home-therapy-step-body">
+                                <p class="home-therapy-step-kicker">דיוק לשוני מהיר</p>
+                                <h4>Question Drill + Meta Radar</h4>
+                                <p>מתרגלים ניסוח שאלה מדויקת ואז זיהוי מהיר בזמן אמת. זה הופך את הידע לרפלקס במקום להישאר בתיאוריה.</p>
+                                <p class="home-therapy-step-q">שאלת דוגמה: "מה בדיוק?", "לפי מי?", "ביחס למה?"</p>
+                                <div class="home-therapy-step-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול שאלות</button>
+                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">Meta Radar</button>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="home-therapy-step">
+                            <div class="home-therapy-step-num">5</div>
+                            <div class="home-therapy-step-body">
+                                <p class="home-therapy-step-kicker">מפה מערכתית</p>
+                                <h4>Triples / Living Triples</h4>
+                                <p>כשמופיעים כמה דפוסים יחד, עובדים עם שלשות: רואים את הקשרים, בונים שיקוף מובנה, ומתרגלים את הקו השלם במקום פרט בודד.</p>
+                                <p class="home-therapy-step-q">שאלת דוגמה: מה משותף לשלוש הקטגוריות ואיך זה משפיע על האדם?</p>
+                                <div class="home-therapy-step-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-triples-radar')">Triples Radar</button>
+                                    <a class="btn btn-secondary" href="living_triples_trainer.html" data-versioned-href="living_triples_trainer.html" target="_blank" rel="noopener">Living Triples</a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="home-therapy-step">
+                            <div class="home-therapy-step-num">6</div>
+                            <div class="home-therapy-step-body">
+                                <p class="home-therapy-step-kicker">הטמעה לעולם האמיתי</p>
+                                <h4>Scenario / Comic / Blueprint</h4>
+                                <p>אחרי שהמפה ברורה, מתרגלים ניסוח תגובה בתוך סצנה, מדמים שיחה, ואז הופכים את זה לתוכנית ביצוע (צעד ראשון, תקיעות, Plan B).</p>
+                                <p class="home-therapy-step-q">שאלת דוגמה: מה התגובה המדויקת הבאה ומה הצעד הראשון שאפשר לבצע היום?</p>
+                                <div class="home-therapy-step-actions">
+                                    <button type="button" class="btn btn-primary" onclick="navigateTo('scenario-trainer')">Scenario Trainer</button>
+                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">Comic Engine</button>
+                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">Blueprint</button>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+
+                <div class="cta-section cta-section-compact">
+                    <h3>🚀 התחלה מהירה (בלי כפילות של כל הפיצ'רים)</h3>
+                    <p class="cta-section-note">כל הפיצ'רים לתרגול נמצאים במפת הפיצ'רים למעלה. כאן יש רק מסלולי התחלה מומלצים.</p>
+                    <div class="cta-buttons cta-buttons-compact">
+                        <button class="btn btn-primary cta-btn" onclick="navigateTo('scenario-trainer')">סצנות Execution</button>
+                        <button class="btn btn-primary cta-btn" onclick="navigateTo('prismlab')">Prism Lab (מגדל לוגי)</button>
+                        <a class="btn btn-secondary cta-btn" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html" target="_blank" rel="noopener">Prism Research (Chain)</a>
+                        <button class="btn btn-secondary cta-btn" onclick="navigateTo('practice-radar')">Meta Radar</button>
+                        <button class="btn btn-secondary cta-btn" onclick="navigateTo('practice-wizard')">SQHCEL Wizard</button>
+                        <button id="home-open-feature-map" class="btn btn-secondary cta-btn" type="button">מפת פיצ'רים מלאה ⤴</button>
                     </div>
                 </div>
 

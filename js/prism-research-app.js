@@ -418,6 +418,77 @@
         }).join('');
     }
 
+    function getCategoryPhilosophy(category) {
+        const lib = root.prismResearchPhilosophyLibrary || {};
+        const id = String(category && category.categoryId || '').trim();
+        const entry = lib[id];
+        if (entry) return entry;
+        const fallbackQuestion = Array.isArray(category && category.primaryQuestions) && category.primaryQuestions.length
+            ? String(category.primaryQuestions[0])
+            : 'מה בדיוק קורה כאן?';
+        return {
+            ask3x: fallbackQuestion,
+            school: 'דיוק לשוני וחקירה פנומנולוגית',
+            why: 'הקטגוריה הזו עוזרת להפוך ניסוח עמום למבנה שניתן לבדוק שלב-שלב.',
+            creates: 'יותר פירוט, תנאים, ראיות או מנגנון - ופחות מסקנות אוטומטיות.',
+            therapistCalm: 'לא חייבים לדעת מראש את התשובה; מספיק להחזיק שאלה יציבה.',
+            patientGain: 'יותר בהירות ויותר אפשרויות פעולה.',
+            trap: 'לקפוץ מהר מדי לפתרון.',
+            fix: 'להישאר עוד חפירה אחת על אותה עדשה.',
+            tooltip: 'פריזמה אחת, שלוש חפירות, יותר שטח פנימי.'
+        };
+    }
+
+    function renderPhilosophyLibrary() {
+        if (!Array.isArray(state.categories) || !state.categories.length) return '';
+
+        const items = state.categories.map((category) => {
+            const ph = getCategoryPhilosophy(category);
+            const appQuestion = Array.isArray(category.primaryQuestions) && category.primaryQuestions.length
+                ? category.primaryQuestions[0]
+                : ph.ask3x;
+            return `
+                <details class="prm-philosophy-item">
+                    <summary class="prm-philosophy-item-summary">
+                        <span class="prm-philosophy-item-title">${escapeHtml(category.labelHe || category.categoryId)}</span>
+                        <small class="prm-philosophy-item-school">${escapeHtml(ph.school || '')}</small>
+                    </summary>
+                    <div class="prm-philosophy-item-body">
+                        <p class="prm-philosophy-q"><strong>השאלה החוזרת (3×):</strong> ${escapeHtml(ph.ask3x || '')}</p>
+                        <p><strong>שאלת בסיס מהאפליקציה:</strong> ${escapeHtml(appQuestion || '')}</p>
+                        <p><strong>הבסיס הפילוסופי:</strong> ${escapeHtml(ph.why || '')}</p>
+                        <p><strong>מה זה מייצר בפועל:</strong> ${escapeHtml(ph.creates || '')}</p>
+                        <p><strong>השקט של המטפל:</strong> ${escapeHtml(ph.therapistCalm || '')}</p>
+                        <p><strong>הרווח למטופל:</strong> ${escapeHtml(ph.patientGain || '')}</p>
+                        <p><strong>מלכודת נפוצה:</strong> ${escapeHtml(ph.trap || '')}</p>
+                        <p><strong>תיקון/כוונון:</strong> ${escapeHtml(ph.fix || '')}</p>
+                        <p class="prm-philosophy-tooltip"><strong>Tooltip:</strong> ${escapeHtml(ph.tooltip || '')}</p>
+                    </div>
+                </details>
+            `;
+        }).join('');
+
+        return `
+            <section class="prm-card prm-philosophy-panel">
+                <details class="prm-philosophy-library">
+                    <summary class="prm-philosophy-library-summary">
+                        <span>פילוסופיה מאחורי 15 הפריזמות (מורחב)</span>
+                        <small>למה מותר לשאול את אותה שאלה שוב ושוב · 3×</small>
+                    </summary>
+                    <div class="prm-philosophy-library-body">
+                        <p class="prm-philosophy-intro">
+                            <strong>Prism Research = Chain / חקירה אורכית:</strong> בוחרים עדשה אחת וממשיכים קדימה על המשפט החדש שנולד.
+                            <strong>Prism Lab = Vertical Stack:</strong> מודול משלים לעומק על עוגן אחד דרך E/B/C/V/I/S.
+                        </p>
+                        <div class="prm-philosophy-list">
+                            ${items}
+                        </div>
+                    </div>
+                </details>
+            </section>
+        `;
+    }
+
     function renderPendingQa() {
         if (!state.pendingQA) {
             return `
@@ -578,6 +649,8 @@
                                 ${renderCategoryButtons()}
                             </div>
                         </section>
+
+                        ${renderPhilosophyLibrary()}
 
                         ${renderPendingQa()}
                     </div>
