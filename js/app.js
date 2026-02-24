@@ -525,9 +525,7 @@ function persistPracticeTabPreference(tabName = '') {
 function applyInitialTabPreference() {
     const params = new URLSearchParams(window.location.search);
     const requestedTab = normalizeRequestedTab(params.get('tab') || '');
-    const savedPracticeTab = normalizeRequestedTab(localStorage.getItem(PRACTICE_ACTIVE_TAB_STORAGE_KEY) || '');
-    const defaultEmbedTab = document.body.classList.contains('embed-mode') ? (savedPracticeTab || 'practice-question') : '';
-    const targetTab = requestedTab || defaultEmbedTab;
+    const targetTab = requestedTab || 'home';
     if (!targetTab || !document.getElementById(targetTab)) return;
 
     persistPracticeTabPreference(targetTab);
@@ -789,12 +787,180 @@ function looksLikeMojibakeText(value) {
     const text = String(value || '');
     if (!text) return false;
     const marks = (text.match(/׳/g) || []).length;
-    return marks >= 4 || /ג€|נ|�/.test(text);
+    return marks >= 4 || /ג€|נ|�|ֳ—/.test(text);
+}
+
+let win1255ReverseByteMap = null;
+let mojibakeMutationObserver = null;
+let isApplyingMojibakeRepair = false;
+
+function getWin1255ReverseByteMap() {
+    if (win1255ReverseByteMap) return win1255ReverseByteMap;
+    if (typeof TextDecoder !== 'function') return null;
+
+    let decoder = null;
+    try {
+        decoder = new TextDecoder('windows-1255');
+    } catch (_error) {
+        return null;
+    }
+
+    const map = new Map();
+    for (let byte = 0; byte <= 255; byte += 1) {
+        const decoded = decoder.decode(new Uint8Array([byte]));
+        if (!decoded || decoded === '\uFFFD') continue;
+        if (!map.has(decoded)) map.set(decoded, byte);
+    }
+    win1255ReverseByteMap = map;
+    return win1255ReverseByteMap;
+}
+
+function decodeWin1255MojibakeToUtf8(value) {
+    const raw = String(value || '');
+    if (!raw || !looksLikeMojibakeText(raw)) return raw;
+    const reverseMap = getWin1255ReverseByteMap();
+    if (!reverseMap || typeof TextDecoder !== 'function') return raw;
+
+    const bytes = [];
+    for (const ch of raw) {
+        if (reverseMap.has(ch)) {
+            bytes.push(reverseMap.get(ch));
+            continue;
+        }
+        const code = ch.codePointAt(0);
+        if (Number.isFinite(code) && code <= 0x7f) {
+            bytes.push(code);
+            continue;
+        }
+        return raw;
+    }
+
+    let decoded = raw;
+    try {
+        decoded = new TextDecoder('utf-8').decode(new Uint8Array(bytes));
+    } catch (_error) {
+        return raw;
+    }
+
+    if (!decoded || decoded === raw) return raw;
+
+    const decodedLooksBetter = !looksLikeMojibakeText(decoded)
+        && (/[\u0590-\u05FF]/.test(decoded) || /[\u{1F300}-\u{1FAFF}]/u.test(decoded) || /[“”’‘–—…]/.test(decoded));
+    return decodedLooksBetter ? decoded : raw;
+}
+
+function normalizeUiText(value) {
+    if (value === null || value === undefined) return '';
+    return decodeWin1255MojibakeToUtf8(String(value));
+}
+
+function repairMojibakeElementAttributes(element) {
+    if (!element || !element.getAttributeNames) return;
+    ['title', 'aria-label', 'placeholder'].forEach((attr) => {
+        const current = element.getAttribute(attr);
+        if (!current || !looksLikeMojibakeText(current)) return;
+        const fixed = normalizeUiText(current);
+        if (fixed && fixed !== current) {
+            element.setAttribute(attr, fixed);
+        }
+    });
+}
+
+function repairMojibakeDomSubtree(root) {
+    if (!root || isApplyingMojibakeRepair) return;
+    isApplyingMojibakeRepair = true;
+    try {
+        const processTextNode = (node) => {
+            if (!node || node.nodeType !== Node.TEXT_NODE) return;
+            const original = node.nodeValue || '';
+            if (!looksLikeMojibakeText(original)) return;
+            const fixed = normalizeUiText(original);
+            if (fixed && fixed !== original) {
+                node.nodeValue = fixed;
+            }
+        };
+
+        if (root.nodeType === Node.TEXT_NODE) {
+            processTextNode(root);
+            return;
+        }
+
+        if (root.nodeType !== Node.ELEMENT_NODE && root.nodeType !== Node.DOCUMENT_FRAGMENT_NODE && root !== document.body) {
+            return;
+        }
+
+        const elementRoot = root.nodeType === Node.ELEMENT_NODE ? root : null;
+        if (elementRoot) {
+            if (['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(elementRoot.tagName)) return;
+            repairMojibakeElementAttributes(elementRoot);
+        }
+
+        const walker = document.createTreeWalker(
+            root,
+            NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+            {
+                acceptNode(node) {
+                    if (node.nodeType === Node.TEXT_NODE) return NodeFilter.FILTER_ACCEPT;
+                    if (node.nodeType !== Node.ELEMENT_NODE) return NodeFilter.FILTER_SKIP;
+                    const tag = node.tagName;
+                    if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            }
+        );
+
+        let current = walker.currentNode;
+        while (current) {
+            if (current.nodeType === Node.TEXT_NODE) {
+                processTextNode(current);
+            } else if (current.nodeType === Node.ELEMENT_NODE) {
+                repairMojibakeElementAttributes(current);
+            }
+            current = walker.nextNode();
+        }
+    } finally {
+        isApplyingMojibakeRepair = false;
+    }
+}
+
+function setupMojibakeAutoRepair() {
+    if (mojibakeMutationObserver || typeof MutationObserver !== 'function') {
+        repairMojibakeDomSubtree(document.body);
+        return;
+    }
+
+    repairMojibakeDomSubtree(document.body);
+
+    mojibakeMutationObserver = new MutationObserver((mutations) => {
+        if (isApplyingMojibakeRepair) return;
+        for (const mutation of mutations) {
+            if (mutation.type === 'characterData') {
+                repairMojibakeDomSubtree(mutation.target);
+                continue;
+            }
+            if (mutation.type === 'attributes') {
+                repairMojibakeDomSubtree(mutation.target);
+                continue;
+            }
+            mutation.addedNodes.forEach((node) => repairMojibakeDomSubtree(node));
+        }
+    });
+
+    mojibakeMutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+        attributes: true,
+        attributeFilter: ['title', 'aria-label', 'placeholder']
+    });
 }
 
 function pickReadableText(primary, fallback) {
     const p = String(primary || '').trim();
-    if (p && !looksLikeMojibakeText(p)) return p;
+    if (p) {
+        const repaired = normalizeUiText(p);
+        if (repaired && !looksLikeMojibakeText(repaired)) return repaired;
+    }
     return String(fallback || '').trim();
 }
 
@@ -997,8 +1163,13 @@ function buildScreenReadGuide(screenId) {
     const illustrationNote = document.createElement('div');
     illustrationNote.className = 'screen-read-guide-illustration';
     illustrationNote.innerHTML = `
-        <strong>אילוסטרציה תהליכית</strong>
-        <span>${escapeHtml(demo.banner)}</span>
+        <div class="screen-read-guide-illustration-media">
+            <img class="screen-read-guide-philosopher" src="assets/svg/props/philosopher-guide.svg" alt="פילוסוף מסביר" loading="lazy">
+        </div>
+        <div class="screen-read-guide-illustration-copy">
+            <strong>פילוסוף המסך · ההיגיון מאחורי התרגול</strong>
+            <span>${escapeHtml(demo.banner)}</span>
+        </div>
     `;
 
     const toolbar = document.createElement('div');
@@ -1148,7 +1319,7 @@ function getScreenReadGuideTitle(screenId) {
     const screen = document.getElementById(screenId);
     if (!screen) return 'מסך תרגול';
     const heading = screen.querySelector('h2, h3');
-    const title = heading?.textContent?.trim();
+    const title = normalizeUiText(heading?.textContent?.trim() || '');
     return looksLikeMojibakeText(title) ? 'מסך תרגול' : (title || 'מסך תרגול');
 }
 
@@ -1476,6 +1647,8 @@ function initializeMetaModelApp() {
     if (hasInitializedApp) return;
     hasInitializedApp = true;
 
+    setupMojibakeAutoRepair();
+
     Promise.resolve(setupAppVersionChip()).catch((error) => {
         console.error('Failed to resolve or render app version:', error);
         applyAppVersion('׳׳ ׳™׳“׳•׳¢');
@@ -1542,7 +1715,7 @@ function updateRuntimeDebugInfoCard() {
     const density = (localStorage.getItem('header_density_v1') || 'compact').toLowerCase();
 
     if (viewEl) viewEl.textContent = isEmbedded ? '׳׳•׳˜׳׳¢ (iframe / Google Sites)' : '׳™׳©׳™׳¨ (׳¢׳׳•׳“ ׳׳׳)';
-    if (viewportEl) viewportEl.textContent = `${width}ֳ—${height}`;
+    if (viewportEl) viewportEl.textContent = `${width}×${height}`;
     if (tabEl) tabEl.textContent = savedTab;
     if (densityEl) densityEl.textContent = density === 'cozy' ? 'cozy' : 'compact';
 }
@@ -6146,7 +6319,7 @@ const COMMUNITY_WALL_STORAGE_KEY = 'community_feedback_wall_v1';
 
 function escapeHtml(value) {
     if (value === null || value === undefined) return '';
-    return String(value)
+    return normalizeUiText(value)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
@@ -10578,8 +10751,8 @@ function wr2wProcessCount(criteria) {
     return Object.values(criteria || {}).filter(Boolean).length;
 }
 
-const WR2W_WIZARD_TITLE = '׳›׳׳×׳™׳ ׳ ׳¡׳×׳¨׳™׳ ג€“ ׳”׳”׳›׳׳׳•׳× ׳©׳׳©׳×׳׳¢׳•׳× ׳׳‘׳ ׳׳ ׳ ׳׳׳¨׳•׳×';
-const WR2W_WIZARD_FORMULA = '׳—׳•׳¥ (׳׳¦׳׳׳”) + ׳›׳׳× ׳ ׳¡׳×׳¨ ג†’ ׳¢׳•׳¦׳׳” ׳‘׳₪׳ ׳™׳';
+const WR2W_WIZARD_TITLE = 'כמתים נסתרים – ההכללות שמשתמעות אבל לא נאמרות';
+const WR2W_WIZARD_FORMULA = 'חוץ (מצלמה) + כמת נסתר → עוצמה בפנים';
 
 function setupWrinkleGame() {
     const root = document.getElementById('wrinkle-game');
