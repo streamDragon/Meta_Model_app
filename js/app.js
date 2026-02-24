@@ -808,7 +808,7 @@ function looksLikeMojibakeText(value) {
     const text = String(value || '');
     if (!text) return false;
     const marks = (text.match(/׳/g) || []).length;
-    return marks >= 4 || /ג€|ג†|ג­|נ|�|ֳ—|\bג(?:ש|ל)\b/.test(text);
+    return marks >= 4 || /ג€|ג†|ג­|נ|�|ֳ—|\bג(?:ש|ל)\b|×[A-Za-zÀ-ÿ]/.test(text);
 }
 
 let win1255ReverseByteMap = null;
@@ -7518,43 +7518,43 @@ function logMetaModelData() {
 const LOGICAL_LEVEL_INFO = {
     E: {
         name: 'Environment (E)',
-        hebrew: '׳¡׳‘׳™׳‘׳”',
-        prompt: '׳׳™׳₪׳”, ׳׳×׳™, ׳¢׳ ׳׳™ ׳•׳‘׳׳™׳–׳” ׳”׳§׳©׳¨ ׳–׳” ׳§׳•׳¨׳”?'
+        hebrew: 'סביבה',
+        prompt: 'איפה, מתי, עם מי ובאיזה הקשר זה קורה?'
     },
     B: {
         name: 'Behavior (B)',
-        hebrew: '׳”׳×׳ ׳”׳’׳•׳×',
-        prompt: '׳׳” ׳”׳׳“׳ ׳¢׳•׳©׳” ׳‘׳₪׳•׳¢׳? ׳׳” ׳”׳₪׳¢׳•׳׳” ׳”׳ ׳¦׳₪׳™׳×?'
+        hebrew: 'התנהגות',
+        prompt: 'מה האדם עושה בפועל? מה הפעולה הנצפית?'
     },
     C: {
         name: 'Capabilities (C)',
-        hebrew: '׳™׳›׳•׳׳•׳×',
-        prompt: '׳׳™׳–׳• ׳׳™׳•׳׳ ׳•׳× ׳׳• ׳׳¡׳˜׳¨׳˜׳’׳™׳” ׳ ׳“׳¨׳©׳× ׳›׳׳?'
+        hebrew: 'יכולות',
+        prompt: 'איזו מיומנות או אסטרטגיה נדרשת כאן?'
     },
     V: {
         name: 'Values/Beliefs (V)',
-        hebrew: '׳¢׳¨׳›׳™׳/׳׳׳•׳ ׳•׳×',
-        prompt: '׳׳” ׳—׳©׳•׳‘ ׳›׳׳? ׳׳™׳–׳• ׳׳׳•׳ ׳” ׳׳ ׳”׳׳× ׳׳× ׳”׳”׳×׳ ׳”׳’׳•׳×?'
+        hebrew: 'ערכים/אמונות',
+        prompt: 'מה חשוב כאן? איזו אמונה מנהלת את ההתנהגות?'
     },
     I: {
         name: 'Identity (I)',
-        hebrew: '׳–׳”׳•׳×',
-        prompt: '׳׳” ׳–׳” ׳׳•׳׳¨ ׳¢׳ ׳”׳–׳”׳•׳×: ׳׳™ ׳׳ ׳™? ׳׳™׳–׳” ׳׳“׳ ׳׳ ׳™?'
+        hebrew: 'זהות',
+        prompt: 'מה זה אומר על הזהות: מי אני? איזה אדם אני?'
     },
     S: {
         name: 'Belonging (S)',
-        hebrew: '׳©׳™׳™׳›׳•׳×',
-        prompt: '׳׳׳™׳–׳• ׳§׳‘׳•׳¦׳”/׳§׳”׳™׳׳”/׳©׳™׳™׳›׳•׳× ׳–׳” ׳׳×׳—׳‘׳¨?'
+        hebrew: 'שייכות',
+        prompt: 'לאיזו קבוצה/קהילה/שייכות זה מתחבר?'
     }
 };
 
 const LOGICAL_LEVEL_KEYWORDS = {
-    E: ['׳¡׳‘׳™׳‘׳”', '׳׳§׳•׳', '׳–׳׳', '׳”׳§׳©׳¨', '׳‘׳—׳“׳¨', '׳‘׳¢׳‘׳•׳“׳”', '׳‘׳‘׳™׳×', '׳׳×׳™', '׳׳™׳₪׳”'],
-    B: ['׳¢׳•׳©׳”', '׳¢׳©׳™׳×׳™', '׳‘׳™׳¦׳•׳¢', '׳₪׳¢׳•׳׳”', '׳”׳×׳ ׳”׳’׳•׳×', '׳׳’׳™׳‘', '׳׳•׳׳¨', '׳©׳•׳׳'],
-    C: ['׳™׳›׳•׳׳×', '׳׳™׳•׳׳ ׳•׳×', '׳׳¡׳˜׳¨׳˜׳’׳™׳”', '׳›׳׳™', '׳׳׳׳•׳“', '׳׳”׳×׳׳׳', '׳׳×׳¨׳’׳', '׳׳¡׳•׳’׳'],
-    V: ['׳—׳©׳•׳‘', '׳¢׳¨׳', '׳׳׳•׳ ׳”', '׳׳׳׳™׳', '׳¦׳¨׳™׳', '׳ ׳›׳•׳', '׳׳ ׳ ׳›׳•׳', '׳¢׳™׳§׳¨׳•׳'],
-    I: ['׳׳ ׳™', '׳¢׳¦׳׳™', '׳–׳”׳•׳×', '׳׳™ ׳׳ ׳™', '׳˜׳™׳₪׳©', '׳׳¦׳׳™׳—׳', '׳›׳™׳©׳׳•׳', '׳‘׳ ׳׳“׳'],
-    S: ['׳׳ ׳—׳ ׳•', '׳§׳‘׳•׳¦׳”', '׳§׳”׳™׳׳”', '׳¦׳•׳•׳×', '׳׳©׳₪׳—׳”', '׳©׳™׳™׳›׳•׳×', '׳—׳‘׳¨׳”', '׳׳¨׳’׳•׳']
+    E: ['סביבה', 'מקום', 'זמן', 'הקשר', 'בחדר', 'בעבודה', 'בבית', 'מתי', 'איפה'],
+    B: ['עושה', 'עשיתי', 'ביצוע', 'פעולה', 'התנהגות', 'מגיב', 'אומר', 'שואל'],
+    C: ['יכולת', 'מיומנות', 'אסטרטגיה', 'כלי', 'ללמוד', 'להתאמן', 'לתרגל', 'מסוגל'],
+    V: ['חשוב', 'ערך', 'אמונה', 'מאמין', 'צריך', 'נכון', 'לא נכון', 'עיקרון'],
+    I: ['אני', 'עצמי', 'זהות', 'מי אני', 'טיפש', 'מצליחן', 'כישלון', 'בן אדם'],
+    S: ['אנחנו', 'קבוצה', 'קהילה', 'צוות', 'משפחה', 'שייכות', 'חברה', 'ארגון']
 };
 
 const PRISM_STACK_LEVEL_ORDER = Object.freeze(['E', 'B', 'C', 'V', 'I', 'S']);
@@ -7863,7 +7863,12 @@ function getPrismById(prismId) {
 
 function getLevelDisplay(level) {
     const info = LOGICAL_LEVEL_INFO[level];
-    return info ? `${info.hebrew} (${level})` : level;
+    return info ? `${level} · ${info.hebrew}` : level;
+}
+
+function getLevelBilingualLabel(level) {
+    const info = LOGICAL_LEVEL_INFO[level];
+    return info ? `${info.name} · ${info.hebrew}` : level;
 }
 
 function getExpectedLevelFromInput(inputEl) {
@@ -8381,6 +8386,8 @@ function renderVerticalStackResult(stackState) {
     `;
 }
 function setupPrismModule() {
+    if (typeof applyPrismLabCompactRuntimeCopy === 'function') applyPrismLabCompactRuntimeCopy();
+    if (typeof ensurePrismLabWorkLayout === 'function') ensurePrismLabWorkLayout();
     renderPrismLibrary();
     setupAudioMuteButtons();
 
@@ -8389,6 +8396,7 @@ function setupPrismModule() {
     if (prismDetail) prismDetail.classList.add('hidden');
     const prismLibrary = document.getElementById('prism-library');
     if (prismLibrary) prismLibrary.classList.remove('hidden');
+    if (typeof applyPrismLabCompactRuntimeCopy === 'function') applyPrismLabCompactRuntimeCopy();
 
     // Listeners for dynamic elements
     document.addEventListener('click', (e) => {
@@ -8445,6 +8453,9 @@ function setupPrismModule() {
             savePrismVerticalStackDraftForCurrentPrism();
         });
     }
+
+    if (typeof applyPrismLabCompactRuntimeCopy === 'function') applyPrismLabCompactRuntimeCopy();
+    if (typeof ensurePrismLabWorkLayout === 'function') ensurePrismLabWorkLayout();
 }
 
 function renderPrismLibrary() {
@@ -8911,6 +8922,273 @@ function exportPrismSession() {
     const blob = new Blob([raw], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = `prism_sessions_${Date.now()}.json`; a.click(); URL.revokeObjectURL(url);
+}
+
+function buildPrismStackLegendRowsHtml() {
+    return ['E', 'B', 'C', 'V', 'I', 'S']
+        .map((level) => {
+            const info = LOGICAL_LEVEL_INFO[level] || { hebrew: level, prompt: '' };
+            return `
+                <div class="prism-mini-stack-row prism-mini-stack-row-${level}">
+                    <span class="prism-mini-stack-tag">${level}</span>
+                    <div class="prism-mini-stack-copy">
+                        <span class="prism-mini-stack-label">${escapeHtml(info.hebrew)}</span>
+                        <small>${escapeHtml(info.prompt)}</small>
+                    </div>
+                </div>
+            `;
+        })
+        .join('');
+}
+
+function applyPrismLabCompactRuntimeCopy() {
+    const root = document.getElementById('prismlab');
+    if (!root) return;
+
+    const rootCard = root.querySelector('.prism-container .card');
+    const rootTitle = rootCard?.querySelector(':scope > h2');
+    const rootIntro = rootCard?.querySelector(':scope > p');
+    if (rootTitle) rootTitle.textContent = 'מעבדת פריזמות (Prism Lab)';
+    if (rootIntro) rootIntro.textContent = 'בחר/י פריזמה + עוגן אחד, ובנה/י מגדל עומק (Vertical Stack) דרך E/B/C/V/I/S.';
+
+    const anchorStrong = root.querySelector('#prism-detail .anchor-box strong');
+    if (anchorStrong) anchorStrong.textContent = 'שאלת עוגן / Anchor Question:';
+
+    const stackHeadTitle = root.querySelector('#prism-detail .prism-stack-head h4');
+    const stackHeadMuted = root.querySelector('#prism-detail .prism-stack-head .muted');
+    if (stackHeadTitle) stackHeadTitle.textContent = 'מגדל לוגי / Vertical Stack';
+    if (stackHeadMuted) stackHeadMuted.textContent = 'אותו עוגן, אותה פריזמה: ממפים עומק דרך E/B/C/V/I/S כדי לזהות שכבות חסרות ו-Pivot.';
+
+    const anchorLabel = root.querySelector('#prism-detail .prism-anchor-input-card label');
+    if (anchorLabel) anchorLabel.textContent = 'עוגן (Anchor) — מילה/ביטוי מרכזי:';
+
+    const mappingMuted = root.querySelector('#prism-detail .prism-anchor-input-card + .muted');
+    if (mappingMuted) mappingMuted.textContent = 'ממלאים תשובה קצרה בכל רמה. אפשר להקליד, לגרור הצעות, או להתחיל רק מ-3 רמות.';
+
+    const preparedHead = root.querySelector('#prism-detail .prepared-items h4');
+    if (preparedHead) preparedHead.textContent = 'תשובות מוצעות / Suggested';
+
+    const preparedMuted = root.querySelector('#prism-detail .prepared-items > .muted');
+    if (preparedMuted) preparedMuted.textContent = 'גרור/י לשדה המתאים, או לחץ/י להעתקה לשדה הפעיל.';
+
+    const pivotToggleLabel = root.querySelector('#prism-detail .prism-toggle-line span');
+    if (pivotToggleLabel) pivotToggleLabel.textContent = 'הצג/י Pivot Ideas';
+
+    const pivotWrapTitle = root.querySelector('#prism-detail #prepared-pivot-list-wrap h5');
+    const pivotWrapMuted = root.querySelector('#prism-detail #prepared-pivot-list-wrap .muted');
+    if (pivotWrapTitle) pivotWrapTitle.textContent = 'Pivot Ideas (נפרד מהמגדל)';
+    if (pivotWrapMuted) pivotWrapMuted.textContent = 'רעיונות להמשך עבודה. הם לא מחליפים מילוי של רמות המגדל.';
+
+    const qLabels = root.querySelectorAll('#prism-detail .q-card > label');
+    if (qLabels[0]) qLabels[0].textContent = 'רגש / Emotion (1-5)';
+    if (qLabels[1]) qLabels[1].textContent = 'התנגדות / Resistance (1-5)';
+
+    const cancelBtn = root.querySelector('#prism-cancel');
+    const submitBtn = root.querySelector('#prism-submit');
+    if (cancelBtn) cancelBtn.textContent = 'חזרה לפריזמות';
+    if (submitBtn) submitBtn.textContent = 'צור/י מפה + Pivot';
+
+    const levelItems = root.querySelectorAll('#prism-detail .level-item');
+    levelItems.forEach((item) => {
+        const textarea = item.querySelector('textarea[id^="ans-"]');
+        const label = item.querySelector('label');
+        if (!textarea || !label) return;
+        const level = String(textarea.id || '').replace('ans-', '').toUpperCase();
+        if (!LOGICAL_LEVEL_INFO[level]) return;
+        label.textContent = getLevelBilingualLabel(level);
+    });
+}
+
+function ensurePrismLabWorkLayout() {
+    const detail = document.getElementById('prism-detail');
+    const mappingRow = detail?.querySelector('.mapping-row');
+    const levelGrid = mappingRow?.querySelector('.level-grid');
+    if (!detail || !mappingRow || !levelGrid) return;
+
+    let workCol = mappingRow.querySelector('.prism-work-col');
+    if (!workCol) {
+        workCol = document.createElement('div');
+        workCol.className = 'prism-work-col';
+        mappingRow.insertBefore(workCol, levelGrid);
+        workCol.appendChild(levelGrid);
+    }
+
+    let legend = workCol.querySelector('.prism-mini-stack-panel');
+    if (!legend) {
+        legend = document.createElement('aside');
+        legend.className = 'prism-mini-stack-panel';
+        legend.innerHTML = `
+            <div class="prism-mini-stack-panel-head">
+                <strong>מפת רמות / Stack Map</strong>
+                <small>E → B → C → V → I → S</small>
+            </div>
+            <div class="prism-mini-stack">${buildPrismStackLegendRowsHtml()}</div>
+        `;
+        workCol.appendChild(legend);
+    } else {
+        const stack = legend.querySelector('.prism-mini-stack');
+        if (stack) stack.innerHTML = buildPrismStackLegendRowsHtml();
+    }
+}
+
+function renderPrismDeepGuide(prism) {
+    const guideEl = document.getElementById('prism-deep-guide');
+    if (!guideEl || !prism) return;
+
+    const antiPatterns = (prism.anti_patterns || [])
+        .slice(0, 4)
+        .map((item) => `<li>${escapeHtml(normalizeUiText(item || ''))}</li>`)
+        .join('');
+    const examples = (prism.examples || [])
+        .slice(0, 3)
+        .map((item) => `<li>${escapeHtml(normalizeUiText(item || ''))}</li>`)
+        .join('');
+    const anchorTemplates = (prism.anchor_question_templates || [])
+        .slice(0, 2)
+        .map((item) => `<li>${escapeHtml(normalizeUiText(item || ''))}</li>`)
+        .join('');
+    const nameHe = escapeHtml(normalizeUiText(prism.name_he || 'פריזמה'));
+    const nameEn = escapeHtml(normalizeUiText(prism.name_en || 'Prism'));
+    const philosophy = escapeHtml(normalizeUiText(prism.philosophy_core || ''));
+    const intent = escapeHtml(normalizeUiText(prism.therapist_intent || 'המטרה: להפוך ניסוח כללי למפת עומק שאפשר לעבוד איתה.'));
+
+    guideEl.innerHTML = `
+        <details class="prism-guide-collapsible">
+            <summary>
+                <span>הסבר מוד + דוגמה</span>
+                <small>Mode Guide + Example</small>
+            </summary>
+            <div class="prism-guide-collapsible-body">
+                <div class="prism-guide-grid prism-guide-grid-mode-split">
+                    <div class="prism-guide-card">
+                        <h5>${nameHe} / ${nameEn}</h5>
+                        <p><strong>מה הכלי בודק?</strong> ${philosophy}</p>
+                        <p><strong>למה זה חשוב?</strong> ${intent}</p>
+                    </div>
+                    <div class="prism-guide-card">
+                        <h5>Prism Lab vs Prism Research</h5>
+                        <p><strong>Prism Lab (Vertical Stack):</strong> עוגן אחד + חתך עומק דרך E/B/C/V/I/S.</p>
+                        <p><strong>Prism Research (Chain):</strong> שרשרת שאלות רקורסיבית על כל תשובה חדשה.</p>
+                        <p><strong>בקיצור:</strong> Lab = עומק, Research = רצף.</p>
+                    </div>
+                </div>
+
+                <div class="prism-guide-grid">
+                    <div class="prism-guide-card">
+                        <h5>איך עובדים / 4 Steps</h5>
+                        <ol>
+                            <li>בחר/י עוגן קצר.</li>
+                            <li>מלא/י 3-6 רמות (E/B/C/V/I/S).</li>
+                            <li>בדוק/י קפיצות או שכבות חסרות.</li>
+                            <li>בחר/י Pivot קטן להמשך.</li>
+                        </ol>
+                    </div>
+                    <div class="prism-guide-card prism-guide-card-legend">
+                        <h5>רמות לוגיות / Logical Levels</h5>
+                        <div class="prism-mini-stack">${buildPrismStackLegendRowsHtml()}</div>
+                    </div>
+                </div>
+
+                <details class="prism-guide-collapsible prism-guide-collapsible-sub">
+                    <summary>
+                        <span>עוד תיאוריה / Advanced</span>
+                        <small>לפתוח רק כשצריך</small>
+                    </summary>
+                    <div class="prism-guide-collapsible-body">
+                        <div class="prism-guide-grid">
+                            <div class="prism-guide-card">
+                                <h5>שאלות עוגן מומלצות</h5>
+                                <ul>${anchorTemplates || '<li>אין דוגמאות זמינות כרגע.</li>'}</ul>
+                                <h5>דוגמאות</h5>
+                                <ul>${examples || '<li>אין דוגמאות זמינות כרגע.</li>'}</ul>
+                            </div>
+                            <div class="prism-guide-card">
+                                <h5>טעויות נפוצות</h5>
+                                <ul>${antiPatterns || '<li>לא לקפוץ לפרשנות לפני E/B.</li>'}</ul>
+                                <p><strong>טיפ:</strong> אם יש ספק ברמה, קצר/י את המשפט לשורה קונקרטית אחת.</p>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </details>
+    `;
+}
+
+function renderPrismLibrary() {
+    const lib = document.getElementById('prism-library');
+    if (!lib || !metaModelData.prisms) return;
+    lib.innerHTML = '';
+    metaModelData.prisms.forEach((p) => {
+        const div = document.createElement('div');
+        div.className = 'prism-card';
+        const nameHe = normalizeUiText(p.name_he || '');
+        const nameEn = normalizeUiText(p.name_en || '');
+        const core = normalizeUiText(p.philosophy_core || '');
+        const anchor = normalizeUiText(String(p.anchor_question_templates?.[0] || ''));
+        div.innerHTML = `
+            <h4>${escapeHtml(nameHe || nameEn || 'Prism')}</h4>
+            <p class="prism-card-subtitle">${escapeHtml(nameEn || '')}</p>
+            <p>${escapeHtml(core)}</p>
+            <p><strong>Anchor / שאלת עוגן:</strong> ${escapeHtml(anchor)}</p>
+            <div style="margin-top:10px"><button class="btn prism-open-btn" data-id="${escapeHtml(String(p.id || ''))}">פתח/י פריזמה</button></div>
+        `;
+        const openBtn = div.querySelector('.prism-open-btn');
+        if (openBtn) {
+            openBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openPrism(p.id);
+            });
+        }
+        lib.appendChild(div);
+    });
+}
+
+function openPrism(id) {
+    const prism = getPrismById(id);
+    if (!prism) return alert('הפריזמה לא נמצאה');
+    document.getElementById('prism-library')?.classList.add('hidden');
+    const detail = document.getElementById('prism-detail');
+    if (!detail) return;
+    detail.classList.remove('hidden');
+
+    const prismName = document.getElementById('prism-name');
+    const prismDesc = document.getElementById('prism-desc');
+    const prismAnchor = document.getElementById('prism-anchor');
+    if (prismName) prismName.textContent = `${normalizeUiText(prism.name_he || '')} · ${normalizeUiText(prism.name_en || '')}`.trim();
+    if (prismDesc) prismDesc.textContent = normalizeUiText(prism.philosophy_core || '');
+    if (prismAnchor) prismAnchor.textContent = normalizeUiText(String(prism.anchor_question_templates?.[0] || ''));
+
+    renderPrismDeepGuide(prism);
+    applyPrismLabCompactRuntimeCopy();
+    ensurePrismLabWorkLayout();
+    playUISound('prism_open');
+
+    const resultBox = document.getElementById('prism-result');
+    if (resultBox) {
+        resultBox.classList.add('hidden');
+        resultBox.innerHTML = '';
+    }
+
+    detail.setAttribute('data-prism-id', id);
+    const pivotToggle = document.getElementById('prepared-pivot-toggle');
+    if (pivotToggle) pivotToggle.checked = false;
+
+    const draft = loadPrismVerticalStackDraft(id);
+    applyVerticalStackStateToUI(prism, draft || {
+        categoryId: prism.id,
+        categoryLabelHe: normalizeUiText(prism.name_he || ''),
+        coreQuestion: getPrismCoreQuestion(prism),
+        anchorText: deriveDefaultPrismAnchor(prism),
+        answers: {},
+        emotion: 3,
+        resistance: 2
+    });
+
+    attachMappingDropHandlers();
+    refreshPrismVerticalStackForCurrentPrism({ forceDefaultAnchor: true });
+    applyPrismLabCompactRuntimeCopy();
+    ensurePrismLabWorkLayout();
 }
 
 // Populate prepared items for drag-and-drop into the mapping inputs

@@ -4270,6 +4270,12 @@ input[type="range"] {
 }
 
 .prism-card h4 { margin: 0 0 8px 0; }
+.prism-card-subtitle {
+    margin: -2px 0 8px;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
 
 .prism-detail .anchor-box { background: #fff8e6; padding: 10px; border-radius: 6px; margin: 12px 0; }
 .anchor-question { font-weight: 700; color: var(--dark); }
@@ -4326,6 +4332,85 @@ input[type="range"] {
 .prism-anchor-input-card { margin-bottom: 12px; }
 .prism-anchor-input-card small { display: block; margin-top: 6px; }
 .prism-anchor-input { font-weight: 700; }
+.prism-work-col {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 240px;
+    gap: 12px;
+    align-items: start;
+}
+
+.prism-mini-stack-panel {
+    border: 1px solid #dbe7f5;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #fbfdff 0%, #f4f9ff 100%);
+    padding: 10px;
+    position: sticky;
+    top: 10px;
+}
+
+.prism-mini-stack-panel-head {
+    display: grid;
+    gap: 2px;
+    margin-bottom: 8px;
+}
+
+.prism-mini-stack-panel-head strong {
+    color: #0f4f8a;
+    font-size: 0.83rem;
+}
+
+.prism-mini-stack-panel-head small {
+    color: #64748b;
+    font-size: 0.73rem;
+}
+
+.prism-mini-stack {
+    display: grid;
+    gap: 6px;
+}
+
+.prism-mini-stack-row {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 8px;
+    align-items: start;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 6px;
+}
+
+.prism-mini-stack-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
+    border-radius: 999px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-weight: 900;
+    font-size: 0.76rem;
+    line-height: 1;
+}
+
+.prism-mini-stack-copy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.prism-mini-stack-label {
+    color: #1f2937;
+    font-weight: 800;
+    font-size: 0.78rem;
+}
+
+.prism-mini-stack-copy small {
+    color: #64748b;
+    font-size: 0.7rem;
+    line-height: 1.25;
+}
 
 .prism-check-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
 .prism-check-item { padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; }
@@ -4338,25 +4423,55 @@ input[type="range"] {
 .prism-pivot-box { border-right: 5px solid #805ad5; background: #faf5ff; }
 
 .prism-deep-guide {
-    background: linear-gradient(135deg, #f0f9ff 0%, #f7fafc 100%);
-    border: 1px solid #bee3f8;
-    border-radius: 10px;
-    padding: 14px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
     margin-bottom: 14px;
 }
 
-.prism-deep-guide h4 {
-    margin: 0 0 10px 0;
-    color: #2b6cb0;
+.prism-guide-collapsible {
+    border: 1px solid #cfe0f5;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #f8fbff 0%, #f2f8ff 100%);
+    overflow: hidden;
 }
 
-.prism-deep-guide h5 {
-    margin: 0 0 8px 0;
-    color: #2c5282;
+.prism-guide-collapsible > summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    color: #134a78;
+    font-weight: 900;
 }
 
-.prism-deep-guide p {
-    margin: 0 0 8px 0;
+.prism-guide-collapsible > summary::-webkit-details-marker {
+    display: none;
+}
+
+.prism-guide-collapsible > summary small {
+    color: #64748b;
+    font-weight: 700;
+    font-size: 0.74rem;
+}
+
+.prism-guide-collapsible[open] > summary {
+    border-bottom: 1px solid #dbe7f5;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.prism-guide-collapsible-body {
+    padding: 10px;
+}
+
+.prism-guide-collapsible-sub {
+    margin-top: 8px;
+    background: #ffffff;
+    border-style: dashed;
 }
 
 .prism-guide-grid {
@@ -4376,6 +4491,19 @@ input[type="range"] {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 10px;
+}
+
+.prism-guide-card h5 {
+    margin: 0 0 8px 0;
+    color: #2c5282;
+}
+
+.prism-guide-card p {
+    margin: 0 0 8px 0;
+}
+
+.prism-guide-card-legend .prism-mini-stack {
+    margin-top: 6px;
 }
 
 .prism-guide-card ul,
@@ -4510,6 +4638,8 @@ input[type="range"] {
 @media (max-width: 900px) {
     .mapping-row { flex-direction: column; }
     .prepared-items { width: 100%; }
+    .prism-work-col { grid-template-columns: 1fr; }
+    .prism-mini-stack-panel { position: static; }
     .prism-stack-result-grid { grid-template-columns: 1fr; }
 }
 
