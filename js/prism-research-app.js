@@ -33,8 +33,117 @@
         pendingNodeId: null,
         pendingQA: null,
         lastReport: null,
-        uiMessage: ''
+        uiMessage: '',
+        baseStoryEditorOpen: false,
+        baseStoryDraft: ''
     };
+
+    const PRISM_BREEN_OUTSIDE_ORDER = Object.freeze([
+        'lost_performative',
+        'universal_quantifiers',
+        'nominalization',
+        'comparative_deletion',
+        'unspecified_noun',
+        'simple_deletion',
+        'presuppositions'
+    ]);
+
+    const PRISM_BREEN_INSIDE_ORDER = Object.freeze([
+        'mind_reading',
+        'modal_necessity',
+        'modal_possibility',
+        'cause_effect',
+        'complex_equivalence',
+        'lack_ref_index',
+        'unspecified_verb',
+        'rules_generalization'
+    ]);
+
+    const PRISM_BREEN_ORDER_INDEX = Object.freeze(
+        [...PRISM_BREEN_OUTSIDE_ORDER, ...PRISM_BREEN_INSIDE_ORDER]
+            .reduce((acc, id, index) => {
+                acc[id] = index;
+                return acc;
+            }, {})
+    );
+
+    const PRISM_CATEGORY_UI_OVERRIDES = Object.freeze({
+        lost_performative: Object.freeze({
+            side: 'outside',
+            titleHe: 'מחיקה שיפוטית (Lost Performative)',
+            shortLine: 'מי קבע? על סמך מה?'
+        }),
+        universal_quantifiers: Object.freeze({
+            side: 'outside',
+            titleHe: 'כמתים כוללניים (Universal Quantifier)',
+            shortLine: 'תמיד/אף פעם? היקף וחריגים'
+        }),
+        nominalization: Object.freeze({
+            side: 'outside',
+            titleHe: 'נומינליזציה (Nominalisation)',
+            shortLine: 'להחזיר תהליך במקום שם עצם קפוא'
+        }),
+        comparative_deletion: Object.freeze({
+            side: 'outside',
+            titleHe: 'השוואה חסרה (Comparative Deletion)',
+            shortLine: 'ביחס למה? לפי איזה קריטריון?'
+        }),
+        unspecified_noun: Object.freeze({
+            side: 'outside',
+            titleHe: 'שם עצם לא-מפנה / לא מפורט',
+            shortLine: 'מי/מה בדיוק זה?'
+        }),
+        simple_deletion: Object.freeze({
+            side: 'outside',
+            titleHe: 'מחיקה פשוטה (כולל זמן/מרחב חסר)',
+            shortLine: 'מה חסר כדי להבין את התמונה?'
+        }),
+        presuppositions: Object.freeze({
+            side: 'outside',
+            titleHe: 'הנחות סמויות (Presuppositions)',
+            shortLine: 'מה חייב להיות נכון כדי שהמשפט יחזיק?'
+        }),
+        mind_reading: Object.freeze({
+            side: 'inside',
+            titleHe: 'קריאת מחשבות / קפיצה למסקנות',
+            shortLine: 'כולל Mind-Reading עצמי: "איך אני יודע/ת?"'
+        }),
+        modal_necessity: Object.freeze({
+            side: 'inside',
+            titleHe: 'אופרטור מודלי - הכרח (Modal)',
+            shortLine: 'חייב/צריך - מה המחיר אם לא?'
+        }),
+        modal_possibility: Object.freeze({
+            side: 'inside',
+            titleHe: 'אופרטור מודלי - אפשרות (Modal)',
+            shortLine: 'לא יכול/ה - מה מונע ומה יאפשר?'
+        }),
+        cause_effect: Object.freeze({
+            side: 'inside',
+            titleHe: 'סיבה ותוצאה (Cause & Effect)',
+            shortLine: 'איך בדיוק X גורם ל-Y?'
+        }),
+        complex_equivalence: Object.freeze({
+            side: 'inside',
+            titleHe: 'שקילות מורכבת (Complex Equivalence)',
+            shortLine: 'איך X אומר ש-Y?'
+        }),
+        lack_ref_index: Object.freeze({
+            side: 'inside',
+            titleHe: 'חוסר אינדקס ייחוס (Referential Index)',
+            shortLine: 'למי/למה בדיוק זה מתייחס?'
+        }),
+        unspecified_verb: Object.freeze({
+            side: 'inside',
+            titleHe: 'פועל לא מפורט (Unspecified Verb)',
+            shortLine: 'מה בדיוק קורה בפועל?'
+        }),
+        rules_generalization: Object.freeze({
+            side: 'inside',
+            titleHe: 'כללים/חוקים פנימיים (Rules)',
+            shortLine: 'מה הכלל, ומתי הוא לא עובד?'
+        })
+    });
 
     function escapeHtml(value) {
         if (value === null || value === undefined) return '';
@@ -60,6 +169,28 @@
             throw new Error(`HTTP ${response.status} loading ${path}`);
         }
         return response.json();
+    }
+
+    function getCategoryUiOverride(categoryId) {
+        return PRISM_CATEGORY_UI_OVERRIDES[String(categoryId || '')] || null;
+    }
+
+    function getCategoryDisplayTitle(category) {
+        const override = getCategoryUiOverride(category && category.categoryId);
+        return String((override && override.titleHe) || (category && category.labelHe) || (category && category.categoryId) || 'קטגוריה');
+    }
+
+    function getCategoryDisplayHint(category) {
+        const override = getCategoryUiOverride(category && category.categoryId);
+        if (override && override.shortLine) return String(override.shortLine);
+        const question = Array.isArray(category && category.primaryQuestions) && category.primaryQuestions[0]
+            ? String(category.primaryQuestions[0])
+            : '';
+        return question || String(category && category.definition || '');
+    }
+
+    function getMindReadingExtraNote() {
+        return 'Mind Reading כולל גם קריאת מחשבות עצמית ("אני רעב/פגוע/לא מסוגל" - איך אני יודע/ת?) וגם קפיצה למסקנות.';
     }
 
     function tokenizeText(text) {
@@ -91,8 +222,9 @@
     }
 
     function createFreshSession(baseStoryText) {
+        const normalizedBaseStory = String(baseStoryText || '').trim();
         state.session = core.createSession({
-            baseStoryText: String(baseStoryText || '').trim(),
+            baseStoryText: normalizedBaseStory,
             language: 'he',
             baseStoryId: 'manual'
         });
@@ -103,6 +235,7 @@
         resetPendingQa();
         state.lastReport = null;
         state.uiMessage = 'נוצר סשן חדש. סמן/י קטע ובחר/י פריזמה.';
+        state.baseStoryDraft = normalizedBaseStory || DEMO_STORY;
         syncTokens();
         persistState();
     }
@@ -321,7 +454,9 @@
                 selectionAwaitingEnd: state.selectionAwaitingEnd,
                 pendingNodeId: state.pendingNodeId,
                 pendingQA: state.pendingQA,
-                lastReport: state.lastReport
+                lastReport: state.lastReport,
+                baseStoryEditorOpen: state.baseStoryEditorOpen,
+                baseStoryDraft: state.baseStoryDraft
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
         } catch (error) {
@@ -345,6 +480,8 @@
             state.pendingNodeId = parsed.pendingNodeId || null;
             state.pendingQA = parsed.pendingQA || null;
             state.lastReport = parsed.lastReport || null;
+            state.baseStoryEditorOpen = !!parsed.baseStoryEditorOpen;
+            state.baseStoryDraft = String(parsed.baseStoryDraft || parsed.session.baseStoryText || '');
             syncTokens();
             state.uiMessage = 'שוחזר סשן קודם.';
             return true;
@@ -359,20 +496,42 @@
         } catch (error) {
             // no-op
         }
+        state.baseStoryEditorOpen = false;
+        state.baseStoryDraft = DEMO_STORY;
         createFreshSession(DEMO_STORY);
+    }
+
+    function getBaseStoryEditorValue() {
+        const input = document.getElementById('prm-base-input');
+        if (input) return String(input.value || '');
+        return String(state.baseStoryDraft || (state.session && state.session.baseStoryText) || DEMO_STORY);
+    }
+
+    function syncBaseStoryDraftFromInput() {
+        state.baseStoryDraft = getBaseStoryEditorValue();
+        persistState();
+    }
+
+    function toggleBaseStoryEditor(forceOpen) {
+        const next = typeof forceOpen === 'boolean' ? forceOpen : !state.baseStoryEditorOpen;
+        if (!next) syncBaseStoryDraftFromInput();
+        state.baseStoryEditorOpen = next;
+        render();
     }
 
     function setBaseStoryFromTextarea() {
-        const input = document.getElementById('prm-base-input');
-        if (!input) return;
-        const value = String(input.value || '').trim();
+        const value = String(getBaseStoryEditorValue() || '').trim();
         createFreshSession(value || DEMO_STORY);
+        state.baseStoryEditorOpen = false;
+        state.uiMessage = 'הטקסט החדש הוטמע ועבר לחלון המרכזי.';
+        render();
     }
 
     function loadDemoStory() {
-        const input = document.getElementById('prm-base-input');
-        if (input) input.value = DEMO_STORY;
+        state.baseStoryDraft = DEMO_STORY;
         createFreshSession(DEMO_STORY);
+        state.baseStoryEditorOpen = true;
+        render();
     }
 
     function renderTokenizedContext() {
@@ -402,6 +561,8 @@
         return state.categories.map((category) => {
             const disabled = !state.selection || !!state.pendingNodeId;
             const count = state.session ? (core.computeStats(state.session).categoryCounts[category.categoryId] || 0) : 0;
+            const title = getCategoryDisplayTitle(category);
+            const hint = getCategoryDisplayHint(category);
             return `
                 <button
                     type="button"
@@ -411,11 +572,83 @@
                     ${disabled ? 'disabled' : ''}
                     title="${escapeHtml(category.definition || '')}"
                 >
-                    <span class="prm-cat-name">${escapeHtml(category.labelHe)}</span>
+                    <span class="prm-cat-name">${escapeHtml(title)}</span>
+                    <span class="prm-cat-line">${escapeHtml(hint)}</span>
                     <span class="prm-cat-meta">${escapeHtml((category.family || '').toUpperCase())} · ${count}</span>
                 </button>
             `;
         }).join('');
+    }
+
+    function getOrderedCategoriesByIds(ids) {
+        return (Array.isArray(ids) ? ids : [])
+            .map((id) => getCategory(id))
+            .filter(Boolean);
+    }
+
+    function renderBreenCategoryBoard() {
+        const stats = state.session ? core.computeStats(state.session) : { categoryCounts: {} };
+        const outside = getOrderedCategoriesByIds(PRISM_BREEN_OUTSIDE_ORDER);
+        const inside = getOrderedCategoriesByIds(PRISM_BREEN_INSIDE_ORDER);
+        const maxRows = Math.max(outside.length, inside.length);
+        const rows = [];
+
+        for (let i = 0; i < maxRows; i += 1) {
+            rows.push({
+                outside: outside[i] || null,
+                inside: inside[i] || null
+            });
+        }
+
+        const renderCell = (category, sideKey) => {
+            if (!category) return '<div class="prm-breen-cell is-empty" aria-hidden="true"></div>';
+            const disabled = !state.selection || !!state.pendingNodeId;
+            const count = stats.categoryCounts[category.categoryId] || 0;
+            const title = getCategoryDisplayTitle(category);
+            const hint = getCategoryDisplayHint(category);
+            const extraMindReading = category.categoryId === 'mind_reading'
+                ? `<div class="prm-breen-note">${escapeHtml(getMindReadingExtraNote())}</div>`
+                : '';
+            return `
+                <button
+                    type="button"
+                    class="prm-breen-cell ${sideKey}"
+                    data-action="pick-category"
+                    data-category-id="${escapeHtml(category.categoryId)}"
+                    ${disabled ? 'disabled' : ''}
+                    title="${escapeHtml(category.definition || '')}"
+                >
+                    <span class="prm-cat-name">${escapeHtml(title)}</span>
+                    <span class="prm-cat-line">${escapeHtml(hint)}</span>
+                    <span class="prm-cat-meta">${escapeHtml((category.family || '').toUpperCase())} · ${count}</span>
+                    ${extraMindReading}
+                </button>
+            `;
+        };
+
+        return `
+            <section class="prm-card prm-breen-board-wrap">
+                <div class="prm-breen-board-head">
+                    <div class="prm-breen-head-col outside">
+                        <strong>OUTSIDE THEIR MAP</strong>
+                        <small>מחוץ למפה שלהם</small>
+                    </div>
+                    <div class="prm-breen-head-col inside">
+                        <strong>INSIDE THEIR MAP</strong>
+                        <small>בתוך המפה שלהם</small>
+                    </div>
+                </div>
+                <div class="prm-breen-board">
+                    ${rows.map((row) => `
+                        <div class="prm-breen-row">
+                            ${renderCell(row.outside, 'outside')}
+                            ${renderCell(row.inside, 'inside')}
+                        </div>
+                    `).join('')}
+                </div>
+                <p class="prm-breen-footnote">Mind Reading בצד ימין (Inside) וכולל גם קריאת מחשבות עצמית + קפיצה למסקנות.</p>
+            </section>
+        `;
     }
 
     function getCategoryPhilosophy(category) {
@@ -489,6 +722,23 @@
         `;
     }
 
+    function renderTheoryBridgeCard() {
+        return `
+            <section class="prm-card prm-theory-bridge">
+                <h3>תיאוריה ופילוסופיה של הפריזמות</h3>
+                <p>
+                    ההסבר המעמיק על כל פריזמה (שאלות / מטרה / פילוסופיה / מלכודות) עבר לדף נפרד כדי לשמור כאן על מסך תרגול נקי.
+                </p>
+                <p class="prm-kicker">
+                    פתח/י את דף קטגוריות ברין מהאפליקציה הראשית כדי ללמוד שכבות תאוריה בלי להעמיס על החקירה עצמה.
+                </p>
+                <div class="prm-inline-actions">
+                    <a class="prm-small-btn prm-link-btn" href="index.html?tab=categories" target="_blank" rel="noopener">פתח/י קטגוריות ברין (תאוריה)</a>
+                </div>
+            </section>
+        `;
+    }
+
     function renderPendingQa() {
         if (!state.pendingQA) {
             return `
@@ -527,7 +777,7 @@
                     <span>${escapeHtml(node.categoryLabelHe)}</span>
                     <span class="prm-tagline">${escapeHtml((node.tags || []).join(', '))}</span>
                 </div>
-                <div class="prm-log-line"><strong>Selection:</strong> ${escapeHtml(node.selection && node.selection.text)}</div>
+                <div class="prm-log-line"><strong>קטע שנבדק:</strong> ${escapeHtml(node.selection && node.selection.text)}</div>
                 <div class="prm-log-line"><strong>A:</strong> ${escapeHtml(node.answerText)}</div>
             </li>
         `).join('');
