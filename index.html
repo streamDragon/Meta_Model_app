@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.26" data-build-time="1771891970282" data-build-iso="2026-02-24T00:12:50.282Z" data-git-commit="862fdc9">
+<html lang="he" dir="rtl" data-app-version="1.0.26" data-build-time="1771894246481" data-build-iso="2026-02-24T00:50:46.481Z" data-git-commit="1a5f55d">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -281,7 +281,7 @@
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('prismlab')">Prism Lab · רמות לוגיות</button>
                             <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html" target="_blank" rel="noopener">Prism Research Mode · Text Research</a>
                         </div>
-                        <p class="feature-map-note">Prism Lab = רמות לוגיות. Prism Research = מחקר טקסט + AFAQ.</p>
+                        <p class="feature-map-note">Prism Lab = Vertical Stack (עוגן אחד × 6 רמות). Prism Research = Chain / Recursive Prism (שאלה חוזרת על הטקסט החדש).</p>
                     </section>
 
                     <section class="feature-map-card">
@@ -807,7 +807,7 @@
             <div class="prism-container">
                 <div class="card">
                     <h2>🔍 מעבדת פריזמות (Prism Lab)</h2>
-                    <p>בחר פריזמה לסריקה, הוצב שאלת עוגן אחת, ומפה את התשובות על רמות לוגיות.</p>
+                    <p>בחר/י קטגוריה לשונית־לוגית, הגדיר/י עוגן אחד משמעותי, ובנה/י מגדל לוגי (Vertical Stack) בעומק E/B/C/V/I/S.</p>
 
                     <div class="prism-grid" id="prism-library">
                         <!-- Prism cards will be rendered here -->
@@ -826,21 +826,65 @@
                             <div class="prism-tools-row">
                                 <button class="btn btn-secondary audio-mute-btn">סאונד פעיל</button>
                             </div>
-                            <p class="muted">מלא תשובות למפה לפי רמות (E,B,C,V,I,S)</p>
+                            <div class="prism-stack-head">
+                                <h4>מגדל לוגי / Vertical Stack</h4>
+                                <p class="muted">אינטגרציה: קטגוריה לשונית־לוגית × רמות (E/B/C/V/I/S). נשארים על עוגן אחד ובונים חתך עומק.</p>
+                            </div>
+
+                            <div class="prism-anchor-input-card">
+                                <label for="prism-anchor-input">עוגן (מילה/ביטוי משמעותי):</label>
+                                <input id="prism-anchor-input" class="mapping-input prism-anchor-input" type="text" placeholder="לדוגמה: טוב יותר / נדבר / כישלון" />
+                            </div>
+
+                            <p class="muted">מלא/י תשובות באותה קטגוריה על פני 6 הרמות. אפשר להקליד ידנית או לגרור תשובות מוצעות.</p>
                             <div class="mapping-row">
                                 <div class="prepared-items">
-                                    <h4>רשומות מוכנות</h4>
-                                    <p class="muted">גרור אל התיבה או לחץ להעתקה</p>
+                                    <h4>תשובות מוצעות</h4>
+                                    <p class="muted">גרור/י אל התיבה המתאימה או לחץ/י להעתקה לשדה הפעיל</p>
                                     <div id="prepared-list" class="prepared-list"></div>
+
+                                    <label class="prism-toggle-line" for="prepared-pivot-toggle">
+                                        <input id="prepared-pivot-toggle" type="checkbox" />
+                                        <span>הצג/י הצעות Pivot</span>
+                                    </label>
+                                    <div id="prepared-pivot-list-wrap" class="prepared-pivot-list-wrap hidden">
+                                        <h5>הצעות Pivot (נפרד מהמגדל)</h5>
+                                        <p class="muted">אלו רמזי המשך/פיבוט. הם לא ממלאים את המגדל.</p>
+                                        <div id="prepared-pivot-list" class="prepared-list"></div>
+                                    </div>
                                 </div>
 
                                 <div class="level-grid">
-                                    <div class="level-item"><label>Environment (E)</label><input id="ans-E" class="mapping-input" /></div>
-                                    <div class="level-item"><label>Behavior (B)</label><input id="ans-B" class="mapping-input" /></div>
-                                    <div class="level-item"><label>Capabilities (C)</label><input id="ans-C" class="mapping-input" /></div>
-                                    <div class="level-item"><label>Values/Beliefs (V)</label><input id="ans-V" class="mapping-input" /></div>
-                                    <div class="level-item"><label>Identity (I)</label><input id="ans-I" class="mapping-input" /></div>
-                                    <div class="level-item"><label>Belonging (S)</label><input id="ans-S" class="mapping-input" /></div>
+                                    <div class="level-item">
+                                        <label>Environment (E)</label>
+                                        <small id="prompt-E" class="level-prompt"></small>
+                                        <textarea id="ans-E" class="mapping-input" rows="2"></textarea>
+                                    </div>
+                                    <div class="level-item">
+                                        <label>Behavior (B)</label>
+                                        <small id="prompt-B" class="level-prompt"></small>
+                                        <textarea id="ans-B" class="mapping-input" rows="2"></textarea>
+                                    </div>
+                                    <div class="level-item">
+                                        <label>Capabilities (C)</label>
+                                        <small id="prompt-C" class="level-prompt"></small>
+                                        <textarea id="ans-C" class="mapping-input" rows="2"></textarea>
+                                    </div>
+                                    <div class="level-item">
+                                        <label>Values/Beliefs (V)</label>
+                                        <small id="prompt-V" class="level-prompt"></small>
+                                        <textarea id="ans-V" class="mapping-input" rows="2"></textarea>
+                                    </div>
+                                    <div class="level-item">
+                                        <label>Identity (I)</label>
+                                        <small id="prompt-I" class="level-prompt"></small>
+                                        <textarea id="ans-I" class="mapping-input" rows="2"></textarea>
+                                    </div>
+                                    <div class="level-item">
+                                        <label>Belonging (S)</label>
+                                        <small id="prompt-S" class="level-prompt"></small>
+                                        <textarea id="ans-S" class="mapping-input" rows="2"></textarea>
+                                    </div>
                                 </div>
                             </div>
 
@@ -854,12 +898,12 @@
                             </div>
 
                             <div class="step-buttons">
-                                <button id="prism-cancel" class="btn btn-secondary">← חזור לספריה</button>
-                                <button id="prism-submit" class="btn btn-primary">מפה והמלץ Pivot →</button>
+                                <button id="prism-cancel" class="btn btn-secondary">חזור לפריזמה</button>
+                                <button id="prism-submit" class="btn btn-primary">צור מפה + המלץ Pivot</button>
                             </div>
                         </div>
 
-                        <div id="prism-result" class="final-blueprint-display hidden">
+                        <div id="prism-result" class="final-blueprint-display hidden"> 
                             <!-- Result: pivot recommendation and map -->
                         </div>
                     </div>
@@ -1444,5 +1488,4 @@
     </script>
 </body>
 </html>
-
 
