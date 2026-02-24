@@ -392,7 +392,7 @@
     function generateReport() {
         if (!state.session) return;
         state.lastReport = core.buildAfaqReport(state.session, { categoriesById: state.categoriesById });
-        state.uiMessage = 'AFAQ Report הופק מהסשן הנוכחי.';
+        state.uiMessage = 'סיכום החקירה הופק מהסשן הנוכחי.';
         render();
         persistState();
     }
@@ -743,23 +743,23 @@
         if (!state.pendingQA) {
             return `
                 <div class="prm-card prm-qa-panel is-empty">
-                    <h3>Question Console</h3>
-                    <p>בחר/י קטגוריה אחרי סימון כדי לייצר שאלה + תשובת המשך.</p>
+                    <h3>מהלך חקירה הבא</h3>
+                    <p>בחרו קטגוריה אחרי סימון כדי לקבל שאלה מדויקת ותשובת המשך.</p>
                 </div>
             `;
         }
         return `
             <div class="prm-card prm-qa-panel">
-                <h3>Question Console</h3>
-                <p class="prm-kicker">קטגוריה: ${escapeHtml(state.pendingQA.categoryLabelHe)}</p>
+                <h3>מהלך חקירה הבא</h3>
+                <p class="prm-kicker">פריזמה שנבחרה: ${escapeHtml(state.pendingQA.categoryLabelHe)}</p>
                 <div class="prm-qa-block">
-                    <div><strong>Q:</strong> ${escapeHtml(state.pendingQA.questionText)}</div>
-                    <div><strong>A:</strong> ${escapeHtml(state.pendingQA.answerText)}</div>
-                    <div><strong>New Sentence:</strong> ${escapeHtml(state.pendingQA.generatedSentence)}</div>
+                    <div><strong>שאלה:</strong> ${escapeHtml(state.pendingQA.questionText)}</div>
+                    <div><strong>תשובת המשך:</strong> ${escapeHtml(state.pendingQA.answerText)}</div>
+                    <div><strong>משפט חדש שנולד:</strong> ${escapeHtml(state.pendingQA.generatedSentence)}</div>
                 </div>
                 <div class="prm-nav-actions">
-                    <button type="button" class="prm-big-btn secondary" data-action="back-base">חזור לבסיס</button>
-                    <button type="button" class="prm-big-btn primary" data-action="continue-answer">המשך מהתשובה ➜</button>
+                    <button type="button" class="prm-big-btn secondary" data-action="back-base">חזרה לטקסט המרכזי</button>
+                    <button type="button" class="prm-big-btn primary" data-action="continue-answer">המשך מתוך תשובת ההמשך</button>
                 </div>
             </div>
         `;
@@ -768,7 +768,7 @@
     function renderPathLog() {
         const nodes = state.session && Array.isArray(state.session.nodes) ? state.session.nodes : [];
         if (!nodes.length) {
-            return '<p class="prm-empty">עדיין אין צמתים. התחילו סימון + פריזמה.</p>';
+            return '<p class="prm-empty">עוד לא התחילה שרשרת חקירה. סמנו קטע בטקסט ובחרו פריזמה ראשונה.</p>';
         }
         const items = nodes.slice().reverse().slice(0, 14).map((node, idx) => `
             <li class="prm-log-item">
@@ -778,7 +778,7 @@
                     <span class="prm-tagline">${escapeHtml((node.tags || []).join(', '))}</span>
                 </div>
                 <div class="prm-log-line"><strong>קטע שנבדק:</strong> ${escapeHtml(node.selection && node.selection.text)}</div>
-                <div class="prm-log-line"><strong>A:</strong> ${escapeHtml(node.answerText)}</div>
+                <div class="prm-log-line"><strong>תשובת המשך:</strong> ${escapeHtml(node.answerText)}</div>
             </li>
         `).join('');
         return `<ol class="prm-log-list">${items}</ol>`;
@@ -788,38 +788,38 @@
         if (!state.lastReport) {
             return `
                 <div class="prm-card prm-report-panel is-empty">
-                    <h3>AFAQ Report</h3>
-                    <p>הדוח יופק כאן אחרי לפחות ${core.MIN_REPORT_NODES} צמתים.</p>
+                    <h3>סיכום תובנות מהחקירה</h3>
+                    <p>הסיכום יופיע כאן אחרי לפחות ${core.MIN_REPORT_NODES} צעדי חקירה.</p>
                 </div>
             `;
         }
         const r = state.lastReport;
         const renderList = (items) => {
-            if (!Array.isArray(items) || !items.length) return '<li>(none yet)</li>';
+            if (!Array.isArray(items) || !items.length) return '<li>עדיין אין מספיק תוכן</li>';
             return items.map(item => `<li>${escapeHtml(item)}</li>`).join('');
         };
 
         return `
             <div class="prm-card prm-report-panel">
-                <h3>AFAQ Report</h3>
+                <h3>סיכום תובנות מהחקירה</h3>
                 <div class="prm-report-actions">
-                    <button type="button" class="prm-small-btn" data-action="copy-report-json">Copy JSON</button>
-                    <button type="button" class="prm-small-btn" data-action="copy-report-md">Copy Markdown</button>
+                    <button type="button" class="prm-small-btn" data-action="copy-report-json">העתק JSON</button>
+                    <button type="button" class="prm-small-btn" data-action="copy-report-md">העתק סיכום</button>
                 </div>
                 <div class="prm-report-grid">
-                    <section><h4>Causal Chains</h4><ul>${renderList(r.sections.causalChains)}</ul></section>
-                    <section><h4>Meaning Chains</h4><ul>${renderList(r.sections.meaningChains)}</ul></section>
-                    <section><h4>Evidence / Criteria</h4><ul>${renderList(r.sections.evidenceCriteria)}</ul></section>
-                    <section><h4>Conditions / Scope</h4><ul>${renderList(r.sections.conditionsScope)}</ul></section>
-                    <section><h4>Modal Constraints</h4><ul>${renderList(r.sections.modalConstraints)}</ul></section>
-                    <section><h4>Generalizations</h4><ul>${renderList(r.sections.generalizations)}</ul></section>
+                    <section><h4>שרשראות סיבה</h4><ul>${renderList(r.sections.causalChains)}</ul></section>
+                    <section><h4>שרשראות משמעות</h4><ul>${renderList(r.sections.meaningChains)}</ul></section>
+                    <section><h4>ראיות / קריטריונים</h4><ul>${renderList(r.sections.evidenceCriteria)}</ul></section>
+                    <section><h4>תנאים / היקף</h4><ul>${renderList(r.sections.conditionsScope)}</ul></section>
+                    <section><h4>אילוצים מודליים</h4><ul>${renderList(r.sections.modalConstraints)}</ul></section>
+                    <section><h4>הכללות</h4><ul>${renderList(r.sections.generalizations)}</ul></section>
                 </div>
                 <section>
-                    <h4>Insights</h4>
+                    <h4>תובנות</h4>
                     <ul>${renderList(r.insights)}</ul>
                 </section>
                 <section>
-                    <h4>Next Step</h4>
+                    <h4>צעד המשך</h4>
                     <p>${escapeHtml(r.nextStep)}</p>
                 </section>
             </div>
@@ -831,14 +831,61 @@
         const reportEnabled = stats.totalNodes >= core.MIN_REPORT_NODES;
         return `
             <div class="prm-stats">
-                <span class="prm-chip">Steps: <strong>${stats.totalNodes}</strong></span>
-                <span class="prm-chip">Depth: <strong>${stats.maxDepth}</strong></span>
-                <span class="prm-chip">Branches: <strong>${stats.branchCount}</strong></span>
-                <span class="prm-chip">Avg: <strong>${stats.avgDepth.toFixed(1)}</strong></span>
+                <span class="prm-chip">צמתים: <strong>${stats.totalNodes}</strong></span>
+                <span class="prm-chip">עומק: <strong>${stats.maxDepth}</strong></span>
+                <span class="prm-chip">ענפים: <strong>${stats.branchCount}</strong></span>
+                <span class="prm-chip">ממוצע עומק: <strong>${stats.avgDepth.toFixed(1)}</strong></span>
                 <button type="button" class="prm-small-btn ${reportEnabled ? '' : 'is-disabled'}" data-action="generate-report" ${reportEnabled ? '' : 'disabled'}>
-                    AFAQ Report
+                    הפק סיכום חקירה
                 </button>
             </div>
+        `;
+    }
+
+    function renderBaseStoryPanel(reportEnabled) {
+        const draftText = String(state.baseStoryDraft || (state.session && state.session.baseStoryText) || DEMO_STORY);
+        const activeBase = String((state.session && state.session.baseStoryText) || '');
+        const hasDraftChanges = draftText.trim() && draftText.trim() !== activeBase.trim();
+        const draftPreview = draftText.trim() || 'אין טקסט טיוטה עדיין.';
+
+        return `
+            <section class="prm-card prm-base-config ${state.baseStoryEditorOpen ? 'is-open' : 'is-collapsed'}">
+                <div class="prm-base-head">
+                    <div>
+                        <h2>סיפור בסיס (לטיוטה / מימוש)</h2>
+                        <p class="prm-kicker">
+                            בנו או ערכו טקסט בסיסי, ואז לחצו "מימוש לטקסט המרכזי". דף התרגול נשאר קומפקטי כשהעורך סגור.
+                        </p>
+                    </div>
+                    <div class="prm-hero-actions">
+                        <button type="button" class="prm-small-btn" data-action="toggle-base-editor">
+                            ${state.baseStoryEditorOpen ? 'סגור עורך סיפור' : 'פתח עורך סיפור'}
+                        </button>
+                        <button type="button" class="prm-small-btn" data-action="apply-base">מימוש לטקסט המרכזי</button>
+                        <button type="button" class="prm-small-btn" data-action="back-base">חזרה לבסיס</button>
+                        <button type="button" class="prm-small-btn" data-action="generate-report" ${reportEnabled ? '' : 'disabled'}>סיכום חקירה</button>
+                    </div>
+                </div>
+
+                <div class="prm-base-preview ${hasDraftChanges ? 'has-draft-changes' : ''}">
+                    <strong>טיוטה נוכחית:</strong>
+                    <span>${escapeHtml(draftPreview.length > 240 ? `${draftPreview.slice(0, 237)}...` : draftPreview)}</span>
+                    ${hasDraftChanges ? '<small class="prm-badge-draft">יש שינויים שטרם מומשו</small>' : ''}
+                </div>
+
+                ${state.baseStoryEditorOpen ? `
+                    <label for="prm-base-input" class="prm-base-editor-label"><strong>עורך סיפור בסיס</strong></label>
+                    <textarea id="prm-base-input" rows="4" spellcheck="false">${escapeHtml(draftText)}</textarea>
+                    <div class="prm-inline-actions">
+                        <button type="button" class="prm-small-btn" data-action="load-demo">טען דוגמה</button>
+                        <button type="button" class="prm-small-btn" data-action="reset-session">סשן חדש מהטיוטה</button>
+                        <button type="button" class="prm-small-btn" data-action="toggle-base-editor">סגור עורך</button>
+                    </div>
+                ` : ''}
+
+                ${renderStatsChips()}
+                <p class="prm-message" aria-live="polite">${escapeHtml(state.uiMessage || '')}</p>
+            </section>
         `;
     }
 
@@ -866,48 +913,36 @@
                         <button type="button" class="prm-small-btn" data-action="clear-session">נקה שמירה</button>
                     </div>
                 </header>
-
-                <section class="prm-card prm-base-config">
-                    <label for="prm-base-input"><strong>Base Story</strong> (אפשר לערוך ואז ללחוץ "סשן חדש")</label>
-                    <textarea id="prm-base-input" rows="4" spellcheck="false">${escapeHtml(state.session ? state.session.baseStoryText : DEMO_STORY)}</textarea>
-                    <div class="prm-inline-actions">
-                        <button type="button" class="prm-small-btn" data-action="apply-base">סשן חדש מהטקסט</button>
-                        <button type="button" class="prm-small-btn" data-action="back-base">חזור לבסיס</button>
-                        <button type="button" class="prm-small-btn" data-action="generate-report" ${reportEnabled ? '' : 'disabled'}>AFAQ Report</button>
-                    </div>
-                    ${renderStatsChips()}
-                    <p class="prm-message" aria-live="polite">${escapeHtml(state.uiMessage || '')}</p>
-                </section>
+                ${renderBaseStoryPanel(reportEnabled)}
 
                 <section class="prm-layout">
                     <div class="prm-column">
                         <section class="prm-card">
-                            <h2>Base / Current Text</h2>
-                            <p class="prm-kicker">Context: ${state.currentContextType === 'continued' ? 'Continue From Answer' : 'Base Story'}</p>
+                             <h2>טקסט בסיס / טקסט פעיל</h2>
+                            <p class="prm-kicker">הקשר נוכחי: ${state.currentContextType === 'continued' ? 'המשך מתשובת ההמשך' : 'טקסט בסיס'}</p>
                             <div class="prm-context-text">${renderTokenizedContext()}</div>
                             <div class="prm-selection-box ${state.selection ? 'has-selection' : ''}">
-                                <strong>Selection:</strong>
-                                <span>${escapeHtml(selectedText || 'No selection yet')}</span>
+                                <strong>קטע מסומן:</strong>
+                                <span>${escapeHtml(selectedText || 'עדיין לא סומן קטע')}</span>
                                 ${state.selection ? `<small> [${state.selection.start}-${state.selection.end}]</small>` : ''}
                             </div>
                         </section>
 
+                        
                         <section class="prm-card">
-                            <h2>Breen Categories (15)</h2>
-                            <p class="prm-kicker">מבוסס <code>data/metaModelPatterns.he.json</code></p>
-                            <div class="prm-categories-grid">
-                                ${renderCategoryButtons()}
-                            </div>
+                            <h2>טבלת ברין - 15 קטגוריות (סדר עבודה)</h2>
+                            <p class="prm-kicker">ממוין לפי Outside / Inside map. Mind Reading מופיע בצד ימין כחלק מהגעה למסקנות.</p>
+                            ${renderBreenCategoryBoard()}
                         </section>
 
-                        ${renderPhilosophyLibrary()}
+                        ${renderTheoryBridgeCard()}
 
                         ${renderPendingQa()}
                     </div>
 
                     <div class="prm-column">
                         <section class="prm-card">
-                            <h2>Research Path Log</h2>
+                            <h2>יומן מסלול החקירה</h2>
                             ${renderPathLog()}
                         </section>
                         ${renderReportPanel()}
@@ -940,20 +975,38 @@
         if (action === 'copy-report-json') return copyReportJson();
         if (action === 'copy-report-md') return copyReportMarkdown();
         if (action === 'load-demo') return loadDemoStory();
+        if (action === 'toggle-base-editor') return toggleBaseStoryEditor();
         if (action === 'apply-base') return setBaseStoryFromTextarea();
-        if (action === 'reset-session') return createFreshSession((document.getElementById('prm-base-input') || {}).value || state.session.baseStoryText || DEMO_STORY);
+        if (action === 'reset-session') return createFreshSession(getBaseStoryEditorValue() || state.session.baseStoryText || DEMO_STORY);
         if (action === 'clear-session') return clearSavedSession();
+    }
+
+    function onAppInput(event) {
+        const target = event.target;
+        if (!target) return;
+        if (target.id === 'prm-base-input') {
+            syncBaseStoryDraftFromInput();
+        }
     }
 
     async function boot() {
         appEl.addEventListener('click', onAppClick);
+        appEl.addEventListener('input', onAppInput);
         render();
         try {
             const data = await fetchJson('data/metaModelPatterns.he.json');
             const categories = (Array.isArray(data && data.patterns) ? data.patterns : [])
                 .map((pattern, idx) => core.normalizeCategoryFromPattern(pattern, idx))
                 .filter(Boolean)
-                .slice(0, 15);
+                .slice(0, 15)
+                .sort((a, b) => {
+                    const ai = PRISM_BREEN_ORDER_INDEX[a.categoryId];
+                    const bi = PRISM_BREEN_ORDER_INDEX[b.categoryId];
+                    const aRank = Number.isInteger(ai) ? ai : 999;
+                    const bRank = Number.isInteger(bi) ? bi : 999;
+                    if (aRank !== bRank) return aRank - bRank;
+                    return String(a.labelHe || a.categoryId).localeCompare(String(b.labelHe || b.categoryId), 'he');
+                });
             state.categories = categories;
             state.categoriesById = categories.reduce((acc, category) => {
                 acc[category.categoryId] = category;
@@ -964,6 +1017,9 @@
             if (!restoreState()) {
                 createFreshSession(DEMO_STORY);
             } else {
+                if (!state.baseStoryDraft) {
+                    state.baseStoryDraft = String((state.session && state.session.baseStoryText) || DEMO_STORY);
+                }
                 syncTokens();
             }
             render();
