@@ -655,8 +655,161 @@ const SCREEN_READ_GUIDES = Object.freeze({
     })
 });
 
+const DEFAULT_THERAPEUTIC_DEMO = Object.freeze({
+    banner: 'אילוסטרציה תהליכית: זה מודל הדגמה למה הכלי הזה בא למדל. זו דוגמה לימודית של תהליך, ומה שאתה מתרגל כאן הוא בדיוק מה שתרצה לקבל/לתת בשיחה אמיתית.',
+    frame: 'זו דוגמה תהליכית (אילוסטרציה) בלבד. המטרה כאן היא להראות את סוג התנועה שהפיצ׳ר מאמן: דיוק, חקירה, שיקוף, או בניית צעד הבא.',
+    turns: Object.freeze([
+        Object.freeze({ role: 'מטופל', text: 'אני מרגיש שהכול תקוע, ואני לא בטוח מאיפה להתחיל.' }),
+        Object.freeze({ role: 'מטפל', text: 'בוא נעבוד דרך הכלי הזה וניקח נקודה אחת בלבד, כדי להבין מה באמת קורה ולא רק איך זה מרגיש כרגע.' }),
+        Object.freeze({ role: 'מטופל', text: 'כשמפרקים את זה ככה, אני פתאום רואה פרטים שלא שמתי לב אליהם.' }),
+        Object.freeze({ role: 'מטפל', text: 'מעולה. עכשיו נבחר את השאלה/התגובה הכי מדויקת לשלב הבא, בלי לקפוץ למסקנה גדולה מדי.' }),
+        Object.freeze({ role: 'מטופל', text: 'זה כבר מרגיש יותר ברור, ופחות כמו בלגן אחד גדול.' })
+    ]),
+    outcomeTitle: 'מה הפיצ׳ר הזה בא למדל',
+    outcomes: Object.freeze([
+        'איך עוברים מעומס/עמימות לצעד ברור אחד.',
+        'איך נשארים נוכחים ומדויקים בלי להמציא שאלות “חכמות” כל הזמן.',
+        'איך מייצרים תהליך שאפשר לתרגל שוב ושוב עד שהוא נהיה טבעי.'
+    ])
+});
+
+const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
+    'practice-question': Object.freeze({
+        turns: Object.freeze([
+            Object.freeze({ role: 'מטופל', text: 'כולם נגדי בעבודה, אין לי כבר מה להגיד.' }),
+            Object.freeze({ role: 'מטפל', text: 'בוא ננסח שאלה אחת מדויקת במקום להגיב ישר: מי בדיוק “כולם”?' }),
+            Object.freeze({ role: 'מטופל', text: 'בעצם אלה שני אנשים בצוות, לא כולם.' }),
+            Object.freeze({ role: 'מטפל', text: 'מעולה. עכשיו כבר יש לנו שיחה עם שני אנשים, לא מלחמה עם העולם.' })
+        ]),
+        outcomes: Object.freeze([
+            'להחליף תגובה אינטואיטיבית בשאלה מדויקת.',
+            'לזהות מה חסר במשפט לפני שנכנסים לפתרון.',
+            'להקטין דרמה דרך דיוק לשוני.'
+        ])
+    }),
+    'practice-radar': Object.freeze({
+        turns: Object.freeze([
+            Object.freeze({ role: 'מטופל', text: 'אני תמיד הורס את זה בסוף.' }),
+            Object.freeze({ role: 'מטפל', text: 'אני קולט כאן טריגר לשוני בזמן אמת. בוא נעצור על המילה “תמיד”.' }),
+            Object.freeze({ role: 'מטופל', text: 'טוב… לא תמיד. בעיקר כשאני בלחץ מול סמכות.' }),
+            Object.freeze({ role: 'מטפל', text: 'מצוין. בדיוק לזה Meta Radar מאמן: לזהות מהר את הטריגר לפני שהסיפור נסגר.' })
+        ]),
+        outcomes: Object.freeze([
+            'זיהוי מהיר של טריגר לשוני בזמן אמת.',
+            'מעבר מרפלקס תגובה לרפלקס דיוק.',
+            'קיצור זמן בין זיהוי הדפוס לשאלה הנכונה.'
+        ])
+    }),
+    'practice-triples-radar': Object.freeze({
+        turns: Object.freeze([
+            Object.freeze({ role: 'מטופל', text: 'אני יודע שהוא חושב שאני לא מספיק טוב, אז אני חייב להוכיח את עצמי.' }),
+            Object.freeze({ role: 'מטפל', text: 'במקום לבחור רק קטגוריה אחת, אנחנו עובדים על כל השלשה: מה אתה יודע, מה אתה מניח, ולפי איזה כלל אתה שופט.' }),
+            Object.freeze({ role: 'מטופל', text: 'כששואלים את כל השלשה, אני רואה שזה אותו מנגנון שחוזר.' }),
+            Object.freeze({ role: 'מטפל', text: 'בדיוק. Triples Radar מדליק “משפחה” של דפוסים, לא רק כפתור אחד.' })
+        ]),
+        outcomes: Object.freeze([
+            'לזהות קטגוריה בתוך הקשר של שלשה שלמה.',
+            'לראות איך 3 רכיבים עובדים יחד באותה שכבה.',
+            'לייצר שיקוף ואתגור מדויקים יותר כי המפה רחבה יותר.'
+        ])
+    }),
+    'practice-wizard': Object.freeze({
+        turns: Object.freeze([
+            Object.freeze({ role: 'מטופל', text: 'אני רוצה להגיב אחרת, אבל הגוף שלי כבר נסגר.' }),
+            Object.freeze({ role: 'מטפל', text: 'לפני אתגור, נעבור דרך SQHCEL: מה אתה מרגיש, מה קורה בפנים, ואיך זה נהיה שפה.' }),
+            Object.freeze({ role: 'מטופל', text: 'כשאני עוצר על התחושה קודם, השאלה שאני שואל נהיית יותר רגועה.' }),
+            Object.freeze({ role: 'מטפל', text: 'זה בדיוק המודל: קודם ויסות וגשר, אחר כך דיוק לשוני.' })
+        ])
+    }),
+    'practice-verb-unzip': Object.freeze({
+        turns: Object.freeze([
+            Object.freeze({ role: 'מטופל', text: 'אני פשוט צריך להתקדם.' }),
+            Object.freeze({ role: 'מטפל', text: 'בוא נפרק את “להתקדם”: מה קורה צעד-צעד בפועל? מה קודם למה?' }),
+            Object.freeze({ role: 'מטופל', text: 'אוקיי… קודם אני צריך לפתוח מסמך, לסכם 3 נקודות, ואז לשלוח.' }),
+            Object.freeze({ role: 'מטפל', text: 'מעולה. Unzip הופך פועל עמום לפרוצדורה שאפשר לבצע.' })
+        ])
+    }),
+    prismlab: Object.freeze({
+        turns: Object.freeze([
+            Object.freeze({ role: 'מטופל', text: 'ניסיתי כבר הכול וזה לא עובד.' }),
+            Object.freeze({ role: 'מטפל', text: 'בוא נבדוק באיזו רמה לוגית הבעיה יושבת לפני שנמשיך “לעשות עוד מאותו דבר”.' }),
+            Object.freeze({ role: 'מטופל', text: 'נראה שאני מנסה לפתור זהות עם פעולות התנהגות.' }),
+            Object.freeze({ role: 'מטפל', text: 'יפה. Prism Lab מדלג פחות בין רמות ומכוון התערבות במקום הנכון.' })
+        ]),
+        outcomes: Object.freeze([
+            'לזהות באיזו רמה לוגית השיחה תקועה.',
+            'להימנע מטיפול בסימפטום במקום בשורש.',
+            'לבחור Pivot מדויק יותר.'
+        ])
+    }),
+    blueprint: Object.freeze({
+        turns: Object.freeze([
+            Object.freeze({ role: 'מטופל', text: 'אני צריך לסגור את הפרויקט הזה, אבל אין לי מושג מאיפה להתחיל.' }),
+            Object.freeze({ role: 'מטפל', text: 'בוא נהפוך את זה מ”צריך” לתוכנית: יעד, צעד ראשון, תקיעות, ו-Plan B.' }),
+            Object.freeze({ role: 'מטופל', text: 'עכשיו זה כבר לא “פרויקט ענק”, אלא צעד ראשון ברור.' }),
+            Object.freeze({ role: 'מטפל', text: 'זה מה שהכלי ממדל: מעבר ממטלה עמומה לביצוע מעשי.' })
+        ])
+    }),
+    'comic-engine': Object.freeze({
+        turns: Object.freeze([
+            Object.freeze({ role: 'מטופל', text: 'ברגע האמת אני מגיב מהר מדי ואז מצטער.' }),
+            Object.freeze({ role: 'מטפל', text: 'נריץ סימולציה קצרה: תגובה, תגובת נגד, ניסוח מחדש, ואז נבדוק מה היה מקדם.' }),
+            Object.freeze({ role: 'מטופל', text: 'הסימולציה נותנת לי מרווח לחשוב לפני שאומרים את זה באמת.' }),
+            Object.freeze({ role: 'מטפל', text: 'בדיוק. Comic Engine ממדל חזרה גנרלית לשיחה אמיתית.' })
+        ])
+    }),
+    'scenario-trainer': Object.freeze({
+        turns: Object.freeze([
+            Object.freeze({ role: 'מטופל', text: 'אני ישר מתגונן בסיטואציות כאלה.' }),
+            Object.freeze({ role: 'מטפל', text: 'בוא נתרגל סצנה: נבדוק איזו תגובה מסלימה ואיזו תגובה מקדמת.' }),
+            Object.freeze({ role: 'מטופל', text: 'אני רואה איך ניסוח קטן משנה לגמרי את הכיוון.' }),
+            Object.freeze({ role: 'מטפל', text: 'זה בדיוק הערך: אימון החלטה בתוך הקשר, לא רק תיאוריה.' })
+        ])
+    }),
+    categories: Object.freeze({
+        turns: Object.freeze([
+            Object.freeze({ role: 'מטופל', text: 'אני מתבלבל בין סוגי ההפרות.' }),
+            Object.freeze({ role: 'מטפל', text: 'בוא נמפה קודם את המשפחות: מחיקה, עיוות, הכללה. אחר כך יהיה קל יותר לזהות בזמן אמת.' }),
+            Object.freeze({ role: 'מטופל', text: 'כשאני רואה את זה כמשפחות, הראש נהיה מסודר.' }),
+            Object.freeze({ role: 'מטפל', text: 'מעולה. זה מסך ידע שממפה את השטח לפני תרגול מהיר.' })
+        ])
+    }),
+    home: Object.freeze({
+        turns: Object.freeze([
+            Object.freeze({ role: 'מטופל', text: 'יש פה מלא כלים ואני לא בטוח מאיפה להתחיל.' }),
+            Object.freeze({ role: 'מטפל', text: 'נתחיל לפי מטרה: זיהוי? שיקוף? סימולציה? ביצוע? כל מסלול מאמן מיומנות אחרת.' }),
+            Object.freeze({ role: 'מטופל', text: 'אוקיי, עכשיו אני מבין מה מתאים לי לתרגול של היום.' }),
+            Object.freeze({ role: 'מטפל', text: 'זה מה שמסך הבית ממדל: בחירת מסלול תרגול במקום קפיצה אקראית בין כלים.' })
+        ])
+    })
+});
+
+function getTherapeuticDemoContent(screenId, screenTitle, guideCopy) {
+    const featureSpecific = THERAPEUTIC_DEMO_BY_SCREEN[screenId] || {};
+    const goal = String(guideCopy?.goal || DEFAULT_SCREEN_READ_GUIDE.goal || '').trim();
+    const approach = String(guideCopy?.approach || DEFAULT_SCREEN_READ_GUIDE.approach || '').trim();
+    const logic = String(guideCopy?.logic || DEFAULT_SCREEN_READ_GUIDE.logic || '').trim();
+
+    return {
+        banner: featureSpecific.banner || DEFAULT_THERAPEUTIC_DEMO.banner,
+        frame: featureSpecific.frame || `${DEFAULT_THERAPEUTIC_DEMO.frame} בפיצ׳ר "${screenTitle}" המטרה היא: ${goal || 'לתרגל דיוק ותהליך.'}`,
+        turns: Array.isArray(featureSpecific.turns) && featureSpecific.turns.length
+            ? featureSpecific.turns
+            : DEFAULT_THERAPEUTIC_DEMO.turns,
+        outcomeTitle: featureSpecific.outcomeTitle || DEFAULT_THERAPEUTIC_DEMO.outcomeTitle,
+        outcomes: Array.isArray(featureSpecific.outcomes) && featureSpecific.outcomes.length
+            ? featureSpecific.outcomes
+            : [
+                logic || DEFAULT_THERAPEUTIC_DEMO.outcomes[0],
+                approach || DEFAULT_THERAPEUTIC_DEMO.outcomes[1],
+                goal || DEFAULT_THERAPEUTIC_DEMO.outcomes[2]
+            ].filter(Boolean).slice(0, 3)
+    };
+}
+
 const SCREEN_READ_GUIDE_TARGET_IDS = Object.freeze([
     'home',
+    'scenario-trainer',
     'scenario-screen-home',
     'scenario-screen-domain',
     'scenario-screen-play',
@@ -670,6 +823,7 @@ const SCREEN_READ_GUIDE_TARGET_IDS = Object.freeze([
     'categories',
     'practice-question',
     'practice-radar',
+    'practice-triples-radar',
     'practice-wizard',
     'practice-verb-unzip',
     'blueprint',
@@ -703,6 +857,35 @@ function buildScreenReadGuide(screenId) {
     const title = getScreenReadGuideTitle(screenId);
     const expected = copy.expected || `לאחר התרגול במסך הזה תדע/י: ${copy.goal}`;
     const success = copy.success || DEFAULT_SCREEN_READ_GUIDE.success;
+    const demo = getTherapeuticDemoContent(screenId, title, copy);
+
+    const illustrationNote = document.createElement('div');
+    illustrationNote.className = 'screen-read-guide-illustration';
+    illustrationNote.innerHTML = `
+        <strong>אילוסטרציה תהליכית</strong>
+        <span>${escapeHtml(demo.banner)}</span>
+    `;
+
+    const toolbar = document.createElement('div');
+    toolbar.className = 'screen-read-guide-toolbar';
+
+    const demoBtn = document.createElement('button');
+    demoBtn.type = 'button';
+    demoBtn.className = 'btn btn-secondary screen-read-guide-demo-btn';
+    demoBtn.innerHTML = `
+        <span class="screen-read-guide-btn-main">דיאלוג טיפולי לדוגמה</span>
+        <span class="screen-read-guide-btn-sub">אילוסטרציה של מה שהכלי הזה בא למדל</span>
+    `;
+
+    const demoModal = document.createElement('div');
+    const demoModalId = `screen-demo-dialogue-modal-${screenId}`;
+    demoModal.className = 'screen-read-guide-modal hidden';
+    demoModal.id = demoModalId;
+    demoModal.setAttribute('role', 'dialog');
+    demoModal.setAttribute('aria-modal', 'true');
+    demoBtn.setAttribute('aria-controls', demoModalId);
+    demoBtn.setAttribute('aria-haspopup', 'dialog');
+    demoBtn.setAttribute('aria-expanded', 'false');
 
     modal.innerHTML = `
         <div class="screen-read-guide-dialog">
@@ -735,6 +918,34 @@ function buildScreenReadGuide(screenId) {
         </div>
     `;
 
+    const demoTurnsHtml = (Array.isArray(demo.turns) ? demo.turns : []).map((turn) => `
+        <div class="screen-demo-dialogue-turn">
+            <span class="screen-demo-dialogue-role">${escapeHtml(turn.role || 'דובר')}</span>
+            <p class="screen-demo-dialogue-text">${escapeHtml(turn.text || '')}</p>
+        </div>
+    `).join('');
+    const demoOutcomesHtml = (Array.isArray(demo.outcomes) ? demo.outcomes : [])
+        .slice(0, 4)
+        .map((item) => `<li>${escapeHtml(item)}</li>`)
+        .join('');
+
+    demoModal.innerHTML = `
+        <div class="screen-read-guide-dialog screen-read-guide-dialog-demo">
+            <button type="button" class="screen-read-guide-close" aria-label="סגירה">×</button>
+            <h3>דיאלוג טיפולי לדוגמה: ${escapeHtml(title)}</h3>
+            <p class="screen-read-guide-lead">${escapeHtml(demo.frame)}</p>
+            <div class="screen-demo-dialogue-box">${demoTurnsHtml}</div>
+            <div class="screen-demo-dialogue-summary">
+                <h4>${escapeHtml(demo.outcomeTitle || 'מה הפיצ׳ר הזה בא למדל')}</h4>
+                <ul class="screen-demo-dialogue-list">${demoOutcomesHtml}</ul>
+                <p class="screen-demo-dialogue-footnote">זו אילוסטרציה של מה הכלי הזה בא למדל. זו דוגמה תהליכית למה שמנסים להראות פה, וזה הכיוון שתקבל/י אם תפנים/י ותתרגל/י את הפיצ׳ר הזה.</p>
+            </div>
+            <div class="screen-read-guide-actions">
+                <button type="button" class="btn btn-primary screen-read-guide-confirm">סגור דוגמה</button>
+            </div>
+        </div>
+    `;
+
     const closeBtn = modal.querySelector('.screen-read-guide-close');
     const confirmBtn = modal.querySelector('.screen-read-guide-confirm');
     const openModal = () => {
@@ -763,8 +974,38 @@ function buildScreenReadGuide(screenId) {
         }
     });
 
-    wrapper.appendChild(button);
+    const demoCloseButtons = demoModal.querySelectorAll('.screen-read-guide-close, .screen-read-guide-confirm');
+    const openDemoModal = () => {
+        demoModal.classList.remove('hidden');
+        demoBtn.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('screen-guide-open');
+        playUISound('hint');
+    };
+    const closeDemoModal = () => {
+        demoModal.classList.add('hidden');
+        demoBtn.setAttribute('aria-expanded', 'false');
+        if (!document.querySelector('.screen-read-guide-modal:not(.hidden)')) {
+            document.body.classList.remove('screen-guide-open');
+        }
+    };
+
+    demoBtn.addEventListener('click', openDemoModal);
+    demoCloseButtons.forEach((btn) => btn.addEventListener('click', closeDemoModal));
+    demoModal.addEventListener('click', (event) => {
+        if (event.target === demoModal) closeDemoModal();
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !demoModal.classList.contains('hidden')) {
+            closeDemoModal();
+        }
+    });
+
+    toolbar.appendChild(button);
+    toolbar.appendChild(demoBtn);
+    wrapper.appendChild(illustrationNote);
+    wrapper.appendChild(toolbar);
     wrapper.appendChild(modal);
+    wrapper.appendChild(demoModal);
     return wrapper;
 }
 

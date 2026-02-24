@@ -122,6 +122,45 @@ function bindLivingTriplesClick(id, handler) {
     el.addEventListener('click', handler);
 }
 
+function bindLivingTriplesDemoDialogueModal() {
+    const openBtn = livingTriplesState.elements?.demoDialogueBtn;
+    const modal = livingTriplesState.elements?.demoDialogueModal;
+    const closeBtn = livingTriplesState.elements?.demoDialogueCloseBtn;
+    const confirmBtn = livingTriplesState.elements?.demoDialogueConfirmBtn;
+    if (!openBtn || !modal || modal.dataset.ltBound === 'true') return;
+    modal.dataset.ltBound = 'true';
+
+    const openModal = () => {
+        modal.classList.remove('hidden');
+        document.body.classList.add('screen-guide-open');
+        openBtn.setAttribute('aria-expanded', 'true');
+        ltPlay('hint');
+    };
+
+    const closeModal = () => {
+        modal.classList.add('hidden');
+        openBtn.setAttribute('aria-expanded', 'false');
+        if (!document.querySelector('.screen-read-guide-modal:not(.hidden)')) {
+            document.body.classList.remove('screen-guide-open');
+        }
+    };
+
+    openBtn.setAttribute('aria-haspopup', 'dialog');
+    openBtn.setAttribute('aria-controls', modal.id || 'lt-demo-dialogue-modal');
+    openBtn.setAttribute('aria-expanded', 'false');
+    openBtn.addEventListener('click', openModal);
+    closeBtn?.addEventListener('click', closeModal);
+    confirmBtn?.addEventListener('click', closeModal);
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+            closeModal();
+        }
+    });
+}
+
 function getLivingTriplesRowById(rowId) {
     return (livingTriplesDataState.rows || []).find(row => row.id === rowId) || null;
 }
@@ -1389,7 +1428,11 @@ async function setupLivingTriplesModule() {
         futureSummary: document.getElementById('lt-future-summary'),
         nextSceneBtn: document.getElementById('lt-next-scene-btn'),
         philosophyFocusText: document.getElementById('lt-philosophy-focus-text'),
-        philosophyRowText: document.getElementById('lt-philosophy-row-text')
+        philosophyRowText: document.getElementById('lt-philosophy-row-text'),
+        demoDialogueBtn: document.getElementById('lt-demo-dialogue-btn'),
+        demoDialogueModal: document.getElementById('lt-demo-dialogue-modal'),
+        demoDialogueCloseBtn: document.getElementById('lt-demo-dialogue-close'),
+        demoDialogueConfirmBtn: document.getElementById('lt-demo-dialogue-confirm')
     };
 
     if (!livingTriplesState.elements.root) return;
@@ -1404,6 +1447,7 @@ async function setupLivingTriplesModule() {
     bindLivingTriplesClick('lt-save-future-btn', saveLivingTriplesFuturePace);
     bindLivingTriplesClick('lt-next-scene-btn', moveToNextLivingTriplesScene);
     bindLivingTriplesClick('lt-back-onboarding-btn', () => renderLivingTriplesOnboarding());
+    bindLivingTriplesDemoDialogueModal();
 
     if (livingTriplesState.elements.categoryButtons && livingTriplesState.elements.categoryButtons.dataset.ltBound !== 'true') {
         livingTriplesState.elements.categoryButtons.dataset.ltBound = 'true';
