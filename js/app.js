@@ -785,26 +785,120 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
     })
 });
 
+function looksLikeMojibakeText(value) {
+    const text = String(value || '');
+    if (!text) return false;
+    const marks = (text.match(/׳/g) || []).length;
+    return marks >= 4 || /ג€|נ|�/.test(text);
+}
+
+function pickReadableText(primary, fallback) {
+    const p = String(primary || '').trim();
+    if (p && !looksLikeMojibakeText(p)) return p;
+    return String(fallback || '').trim();
+}
+
+const RUNTIME_CLEAN_SCREEN_GUIDE_DEFAULT = Object.freeze({
+    logic: 'התרגול בנוי מלמטה למעלה: מזהים ניסוח עמום, מדייקים שפה, ואז בוחרים צעד קטן וישים.',
+    goal: 'להחליף בלבול/אוטומטיות בחשיבה מדויקת שמובילה לפעולה.',
+    approach: 'עובדים לאט: קוראים את ההסבר, עושים צעד אחד, בודקים משוב, וממשיכים.',
+    expected: 'בסיום התרגול תדע/י לזהות ניסוח עמום, לשאול שאלה מדויקת, ולתרגם את זה לצעד מעשי.',
+    success: 'התקדמות נראית כשאת/ה יכול/ה להסביר למה בחרת צעד מסוים ומה הוא פותח בהמשך.'
+});
+
+const RUNTIME_CLEAN_SCREEN_GUIDE_OVERRIDES = Object.freeze({
+    'practice-triples-radar': Object.freeze({
+        logic: 'Triples Radar בודק דפוס כשלשה (שלוש קטגוריות באותה שורה), ולא רק קטגוריה אחת מבודדת.',
+        goal: 'לראות איך כמה רכיבי Meta Model עובדים יחד באותה שכבת משמעות.',
+        approach: 'בחר/י מצב עבודה (רגיל/Triples), קרא/י את המשפט, ענה/י לפי ההנחיה, ואז בדוק/י את המשוב לפני השלב הבא.',
+        expected: 'בסיום תדע/י להבחין בין עבודה על קטגוריה אחת לבין עבודה על שלשה שלמה באותה שורה.',
+        success: 'התקדמות נראית כשאת/ה מצליח/ה להסביר מה כל רכיב בשלשה תורם למפה הכוללת.'
+    }),
+    'practice-verb-unzip': Object.freeze({
+        logic: 'המסך הזה מרכז מעבר מהיר בין פיצ\'רים וגם מאפשר תרגול Unzip (פירוק פועל עמום) בתוך אותו עמוד.',
+        goal: 'לבחור פיצ\'ר מתאים מהר, בלי עומס כפתורים גדול על המסך.',
+        approach: 'בחר/י פיצ\'ר אחד מהתפריט היורד, פתח/י אותו, וסיים/י סבב קצר לפני מעבר לכלי הבא.'
+    })
+});
+
+const RUNTIME_CLEAN_DEFAULT_THERAPEUTIC_DEMO = Object.freeze({
+    banner: 'אילוסטרציה תהליכית: זו הדגמה של סוג התהליך שהכלי הזה בא למדל, לא אמת קלינית.',
+    frame: 'זו דוגמה תהליכית (אילוסטרציה בלבד). המטרה היא להראות את סוג התנועה שהפיצ\'ר מאמן: דיוק, חקירה, שיקוף או בניית צעד הבא.',
+    outcomeTitle: 'מה הכלי הזה בא למדל',
+    turns: Object.freeze([
+        Object.freeze({ role: 'מטופל', text: 'אני מרגיש שהכול תקוע, ולא בטוח מאיפה להתחיל.' }),
+        Object.freeze({ role: 'מטפל', text: 'בוא ניקח נקודה אחת ונעבוד עליה דרך הכלי, כדי להבין מה בדיוק קורה.' }),
+        Object.freeze({ role: 'מטופל', text: 'כשמפרקים את זה, אני רואה פרטים שלא שמתי לב אליהם קודם.' }),
+        Object.freeze({ role: 'מטפל', text: 'מעולה. עכשיו נבחר את השאלה/התגובה הכי מדויקת לשלב הבא.' })
+    ]),
+    outcomes: Object.freeze([
+        'לעבור מעומס כללי לצעד ברור אחד.',
+        'להישאר מדויק/ת בלי להמציא שאלות אקראיות.',
+        'לתרגל תהליך שחוזר על עצמו עד שהוא נהיה טבעי.'
+    ])
+});
+
+const RUNTIME_CLEAN_THERAPEUTIC_DEMO_OVERRIDES = Object.freeze({
+    'practice-triples-radar': Object.freeze({
+        banner: 'אילוסטרציה תהליכית: כאן אנחנו מדגימים איך עובדים על שלשה שלמה (ולא רק קטגוריה אחת).',
+        frame: 'זו דוגמה תהליכית ל-Triples Radar: מזהים משפחה של דפוסים (שלשה), ורק אז שואלים/משקפים בצורה מדויקת.',
+        turns: Object.freeze([
+            Object.freeze({ role: 'מטופל', text: 'אני יודע שהוא חושב שאני לא מספיק טוב, אז אני חייב להוכיח את עצמי.' }),
+            Object.freeze({ role: 'מטפל', text: 'במקום לבחור רק קטגוריה אחת, נבדוק כאן שלשה: מה אתה יודע, מה אתה מניח, ולפי איזה כלל אתה שופט.' }),
+            Object.freeze({ role: 'מטופל', text: 'כששואלים את כל השלשה, אני רואה שזה אותו מנגנון שחוזר.' }),
+            Object.freeze({ role: 'מטפל', text: 'בדיוק. Triples Radar עוזר לראות משפחה של דפוסים, לא רק טריגר אחד.' })
+        ]),
+        outcomes: Object.freeze([
+            'לזהות קטגוריה בתוך הקשר של שלשה מלאה.',
+            'לראות איך 3 רכיבים עובדים יחד באותה שכבה.',
+            'לבנות שיקוף/אתגור מדויקים יותר כי המפה רחבה יותר.'
+        ])
+    })
+});
+
+function getCleanScreenGuideCopy(screenId, rawCopy) {
+    const override = RUNTIME_CLEAN_SCREEN_GUIDE_OVERRIDES[screenId] || {};
+    const defaultCopy = RUNTIME_CLEAN_SCREEN_GUIDE_DEFAULT;
+    const source = rawCopy || {};
+    return {
+        logic: pickReadableText(override.logic || source.logic, defaultCopy.logic),
+        goal: pickReadableText(override.goal || source.goal, defaultCopy.goal),
+        approach: pickReadableText(override.approach || source.approach, defaultCopy.approach),
+        expected: pickReadableText(override.expected || source.expected, defaultCopy.expected),
+        success: pickReadableText(override.success || source.success, defaultCopy.success)
+    };
+}
+
 function getTherapeuticDemoContent(screenId, screenTitle, guideCopy) {
-    const featureSpecific = THERAPEUTIC_DEMO_BY_SCREEN[screenId] || {};
-    const goal = String(guideCopy?.goal || DEFAULT_SCREEN_READ_GUIDE.goal || '').trim();
-    const approach = String(guideCopy?.approach || DEFAULT_SCREEN_READ_GUIDE.approach || '').trim();
-    const logic = String(guideCopy?.logic || DEFAULT_SCREEN_READ_GUIDE.logic || '').trim();
+    const featureSpecificRaw = THERAPEUTIC_DEMO_BY_SCREEN[screenId] || {};
+    const featureSpecificOverride = RUNTIME_CLEAN_THERAPEUTIC_DEMO_OVERRIDES[screenId] || {};
+    const safeGuideCopy = getCleanScreenGuideCopy(screenId, guideCopy);
+    const defaultDemo = RUNTIME_CLEAN_DEFAULT_THERAPEUTIC_DEMO;
+
+    const turns = Array.isArray(featureSpecificOverride.turns) && featureSpecificOverride.turns.length
+        ? featureSpecificOverride.turns
+        : (Array.isArray(featureSpecificRaw.turns) && featureSpecificRaw.turns.length && !featureSpecificRaw.turns.some((t) => looksLikeMojibakeText(t?.text || t?.role))
+            ? featureSpecificRaw.turns
+            : defaultDemo.turns);
+
+    const outcomes = Array.isArray(featureSpecificOverride.outcomes) && featureSpecificOverride.outcomes.length
+        ? featureSpecificOverride.outcomes
+        : (Array.isArray(featureSpecificRaw.outcomes) && featureSpecificRaw.outcomes.length && !featureSpecificRaw.outcomes.some((item) => looksLikeMojibakeText(item))
+            ? featureSpecificRaw.outcomes
+            : [
+                safeGuideCopy.logic || defaultDemo.outcomes[0],
+                safeGuideCopy.approach || defaultDemo.outcomes[1],
+                safeGuideCopy.goal || defaultDemo.outcomes[2]
+            ].filter(Boolean).slice(0, 3));
+
+    const fallbackFrame = `${defaultDemo.frame} בפיצ'ר "${screenTitle}" המטרה היא: ${safeGuideCopy.goal || 'לתרגל דיוק ותהליך.'}`;
 
     return {
-        banner: featureSpecific.banner || DEFAULT_THERAPEUTIC_DEMO.banner,
-        frame: featureSpecific.frame || `${DEFAULT_THERAPEUTIC_DEMO.frame} ׳‘׳₪׳™׳¦׳³׳¨ "${screenTitle}" ׳”׳׳˜׳¨׳” ׳”׳™׳: ${goal || '׳׳×׳¨׳’׳ ׳“׳™׳•׳§ ׳•׳×׳”׳׳™׳.'}`,
-        turns: Array.isArray(featureSpecific.turns) && featureSpecific.turns.length
-            ? featureSpecific.turns
-            : DEFAULT_THERAPEUTIC_DEMO.turns,
-        outcomeTitle: featureSpecific.outcomeTitle || DEFAULT_THERAPEUTIC_DEMO.outcomeTitle,
-        outcomes: Array.isArray(featureSpecific.outcomes) && featureSpecific.outcomes.length
-            ? featureSpecific.outcomes
-            : [
-                logic || DEFAULT_THERAPEUTIC_DEMO.outcomes[0],
-                approach || DEFAULT_THERAPEUTIC_DEMO.outcomes[1],
-                goal || DEFAULT_THERAPEUTIC_DEMO.outcomes[2]
-            ].filter(Boolean).slice(0, 3)
+        banner: pickReadableText(featureSpecificOverride.banner || featureSpecificRaw.banner, defaultDemo.banner),
+        frame: pickReadableText(featureSpecificOverride.frame || featureSpecificRaw.frame, fallbackFrame),
+        turns,
+        outcomeTitle: pickReadableText(featureSpecificOverride.outcomeTitle || featureSpecificRaw.outcomeTitle, defaultDemo.outcomeTitle),
+        outcomes
     };
 }
 
@@ -871,7 +965,8 @@ function setupFeatureMapOverlayControls() {
 }
 
 function buildScreenReadGuide(screenId) {
-    const copy = SCREEN_READ_GUIDES[screenId] || DEFAULT_SCREEN_READ_GUIDE;
+    const rawCopy = SCREEN_READ_GUIDES[screenId] || DEFAULT_SCREEN_READ_GUIDE;
+    const copy = getCleanScreenGuideCopy(screenId, rawCopy);
     const wrapper = document.createElement('div');
     wrapper.className = 'screen-read-guide';
     wrapper.dataset.screenGuide = screenId;
@@ -880,8 +975,8 @@ function buildScreenReadGuide(screenId) {
     button.type = 'button';
     button.className = 'btn btn-primary screen-read-guide-btn';
     button.innerHTML = `
-        <span class="screen-read-guide-btn-main">׳§׳¨׳ ׳׳₪׳ ׳™ ׳©׳×׳×׳—׳™׳!</span>
-        <span class="screen-read-guide-btn-sub">׳”׳¡׳‘׳¨ ׳׳׳: ׳”׳™׳’׳™׳•׳, ׳“׳¨׳ ׳¢׳‘׳•׳“׳”, ׳•׳׳” ׳¦׳₪׳•׳™ ׳׳“׳¢׳× ׳׳—׳¨׳™ ׳”׳×׳¨׳’׳•׳</span>
+        <span class="screen-read-guide-btn-main">קרא/י לפני שמתחילים</span>
+        <span class="screen-read-guide-btn-sub">הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול</span>
     `;
 
     const modal = document.createElement('div');
@@ -902,7 +997,7 @@ function buildScreenReadGuide(screenId) {
     const illustrationNote = document.createElement('div');
     illustrationNote.className = 'screen-read-guide-illustration';
     illustrationNote.innerHTML = `
-        <strong>׳׳™׳׳•׳¡׳˜׳¨׳¦׳™׳” ׳×׳”׳׳™׳›׳™׳×</strong>
+        <strong>אילוסטרציה תהליכית</strong>
         <span>${escapeHtml(demo.banner)}</span>
     `;
 
@@ -913,8 +1008,8 @@ function buildScreenReadGuide(screenId) {
     demoBtn.type = 'button';
     demoBtn.className = 'btn btn-secondary screen-read-guide-demo-btn';
     demoBtn.innerHTML = `
-        <span class="screen-read-guide-btn-main">׳“׳™׳׳׳•׳’ ׳˜׳™׳₪׳•׳׳™ ׳׳“׳•׳’׳׳”</span>
-        <span class="screen-read-guide-btn-sub">׳׳™׳׳•׳¡׳˜׳¨׳¦׳™׳” ׳©׳ ׳׳” ׳©׳”׳›׳׳™ ׳”׳–׳” ׳‘׳ ׳׳׳“׳</span>
+        <span class="screen-read-guide-btn-main">דיאלוג טיפולי לדוגמה</span>
+        <span class="screen-read-guide-btn-sub">אילוסטרציה של מה שהכלי הזה בא למדל</span>
     `;
 
     const demoModal = document.createElement('div');
@@ -929,38 +1024,38 @@ function buildScreenReadGuide(screenId) {
 
     modal.innerHTML = `
         <div class="screen-read-guide-dialog">
-            <button type="button" class="screen-read-guide-close" aria-label="׳¡׳’׳™׳¨׳”">ֳ—</button>
-            <h3>׳§׳¨׳ ׳׳₪׳ ׳™ ׳©׳×׳×׳—׳™׳: ${escapeHtml(title)}</h3>
-            <p class="screen-read-guide-lead">׳”׳׳˜׳¨׳” ׳›׳׳ ׳”׳™׳ ׳׳ ׳¨׳§ ׳׳¢׳ ׳•׳× ׳ ׳›׳•׳, ׳׳׳ ׳׳”׳‘׳™׳ ׳׳× ׳”׳”׳™׳’׳™׳•׳ ׳©׳ ׳”׳×׳¨׳’׳•׳ ׳›׳“׳™ ׳׳™׳™׳©׳ ׳׳•׳×׳• ׳’׳ ׳‘׳©׳™׳—׳” ׳׳׳™׳×׳™׳× ׳׳—׳•׳¥ ׳׳׳₪׳׳™׳§׳¦׳™׳”.</p>
+            <button type="button" class="screen-read-guide-close" aria-label="סגירה">×</button>
+            <h3>קרא/י לפני שמתחילים: ${escapeHtml(title)}</h3>
+            <p class="screen-read-guide-lead">המטרה כאן היא לא רק לענות נכון, אלא להבין את ההיגיון של התרגול כדי ליישם אותו גם בשיחה אמיתית מחוץ לאפליקציה.</p>
             <div class="screen-read-guide-content">
-                <h4>׳׳” ׳”׳”׳™׳’׳™׳•׳ ׳©׳ ׳”׳×׳¨׳’׳•׳?</h4>
+                <h4>מה ההיגיון של התרגול?</h4>
                 <p>${escapeHtml(copy.logic)}</p>
-                <h4>׳׳” ׳‘׳“׳™׳•׳§ ׳”׳׳˜׳¨׳” ׳‘׳׳¡׳ ׳”׳–׳”?</h4>
+                <h4>מה בדיוק המטרה במסך הזה?</h4>
                 <p>${escapeHtml(copy.goal)}</p>
-                <h4>׳׳™׳ ׳׳’׳©׳× ׳׳×׳¨׳’׳•׳ ׳©׳׳‘-׳©׳׳‘?</h4>
+                <h4>איך לגשת לתרגול שלב-שלב?</h4>
                 <p>${escapeHtml(copy.approach)}</p>
-                <h4>׳¡׳“׳¨ ׳¢׳‘׳•׳“׳” ׳׳•׳׳׳¥ ׳›׳“׳™ ׳׳”׳₪׳™׳§ ׳×׳•׳¦׳׳” ׳׳׳™׳×׳™׳×</h4>
+                <h4>סדר עבודה מומלץ כדי להפיק תוצאה אמיתית</h4>
                 <ol class="screen-read-guide-steps">
-                    <li>׳׳¢׳‘׳•׳¨ ׳₪׳¢׳ ׳¨׳׳©׳•׳ ׳” ׳¢׳ ׳”׳׳©׳₪׳˜ ׳׳• ׳”׳׳©׳™׳׳” ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳”׳§׳©׳¨ ׳›׳׳׳™.</li>
-                    <li>׳׳¢׳‘׳•׳¨ ׳₪׳¢׳ ׳©׳ ׳™׳™׳” ׳•׳׳–׳”׳•׳× ׳׳™׳׳”/׳”׳ ׳—׳” ׳©׳™׳•׳¦׳¨׳× ׳¢׳׳™׳׳•׳×, ׳׳—׳¥ ׳׳• ׳”׳›׳׳׳”.</li>
-                    <li>׳׳‘׳—׳•׳¨ ׳×׳’׳•׳‘׳” ׳׳• ׳©׳׳׳” ׳©׳׳₪׳¨׳§׳× ׳׳× ׳”׳¢׳׳™׳׳•׳× ׳׳¦׳¢׳“ ׳‘׳¨׳•׳¨.</li>
-                    <li>׳׳”׳¡׳×׳›׳ ׳¢׳ ׳”׳׳©׳•׳‘, ׳׳×׳§׳ ׳׳ ׳¦׳¨׳™׳, ׳•׳׳– ׳׳”׳׳©׳™׳ ׳׳¡׳‘׳‘ ׳”׳‘׳.</li>
+                    <li>לעבור פעם ראשונה על המשפט/המשימה כדי להבין הקשר כללי.</li>
+                    <li>לעבור שוב ולזהות מילה/הנחה שיוצרות עמימות, לחץ או הכללה.</li>
+                    <li>לבחור שאלה/תגובה שמפרקת את העמימות לצעד ברור.</li>
+                    <li>להסתכל על המשוב, לתקן אם צריך, ואז להמשיך לסבב הבא.</li>
                 </ol>
-                <h4>׳׳” ׳¦׳₪׳•׳™ ׳©׳×׳“׳¢/׳™ ׳׳¢׳©׳•׳× ׳׳—׳¨׳™ ׳”׳×׳¨׳’׳•׳?</h4>
+                <h4>מה צפוי שתדע/י לעשות אחרי התרגול?</h4>
                 <p>${escapeHtml(expected)}</p>
-                <h4>׳׳™׳ ׳×׳–׳”׳”/׳™ ׳©׳”׳×׳§׳“׳׳×?</h4>
+                <h4>איך תזהה/י שהתקדמת?</h4>
                 <p>${escapeHtml(success)}</p>
-                <p class="screen-read-guide-summary">׳¦׳™׳₪׳™׳™׳× ׳”׳×׳•׳¦׳¨ ׳‘׳¡׳•׳£ ׳”׳×׳¨׳’׳•׳: ׳׳ ׳¨׳§ "׳׳¢׳ ׳•׳× ׳ ׳›׳•׳", ׳׳׳ ׳׳“׳¢׳× ׳׳”׳¡׳‘׳™׳¨ ׳׳¢׳¦׳׳ ׳׳× ׳”׳”׳™׳’׳™׳•׳ ׳׳׳—׳•׳¨׳™ ׳”׳‘׳—׳™׳¨׳” ׳•׳׳™׳™׳©׳ ׳׳•׳×׳• ׳‘׳©׳™׳—׳” ׳׳׳™׳×׳™׳×.</p>
+                <p class="screen-read-guide-summary">התוצאה הרצויה בסוף התרגול: לא רק "לענות נכון", אלא לדעת להסביר את ההיגיון מאחורי הבחירה וליישם אותו בשיחה אמיתית.</p>
             </div>
             <div class="screen-read-guide-actions">
-                <button type="button" class="btn btn-primary screen-read-guide-confirm">׳”׳‘׳ ׳×׳™, ׳׳₪׳©׳¨ ׳׳”׳×׳—׳™׳ ׳×׳¨׳’׳•׳</button>
+                <button type="button" class="btn btn-primary screen-read-guide-confirm">הבנתי, אפשר להתחיל</button>
             </div>
         </div>
     `;
 
     const demoTurnsHtml = (Array.isArray(demo.turns) ? demo.turns : []).map((turn) => `
         <div class="screen-demo-dialogue-turn">
-            <span class="screen-demo-dialogue-role">${escapeHtml(turn.role || '׳“׳•׳‘׳¨')}</span>
+            <span class="screen-demo-dialogue-role">${escapeHtml(turn.role || 'דובר')}</span>
             <p class="screen-demo-dialogue-text">${escapeHtml(turn.text || '')}</p>
         </div>
     `).join('');
@@ -971,17 +1066,17 @@ function buildScreenReadGuide(screenId) {
 
     demoModal.innerHTML = `
         <div class="screen-read-guide-dialog screen-read-guide-dialog-demo">
-            <button type="button" class="screen-read-guide-close" aria-label="׳¡׳’׳™׳¨׳”">ֳ—</button>
-            <h3>׳“׳™׳׳׳•׳’ ׳˜׳™׳₪׳•׳׳™ ׳׳“׳•׳’׳׳”: ${escapeHtml(title)}</h3>
+            <button type="button" class="screen-read-guide-close" aria-label="סגירה">×</button>
+            <h3>דיאלוג טיפולי לדוגמה: ${escapeHtml(title)}</h3>
             <p class="screen-read-guide-lead">${escapeHtml(demo.frame)}</p>
             <div class="screen-demo-dialogue-box">${demoTurnsHtml}</div>
             <div class="screen-demo-dialogue-summary">
-                <h4>${escapeHtml(demo.outcomeTitle || '׳׳” ׳”׳₪׳™׳¦׳³׳¨ ׳”׳–׳” ׳‘׳ ׳׳׳“׳')}</h4>
+                <h4>${escapeHtml(demo.outcomeTitle || 'מה הכלי הזה בא למדל')}</h4>
                 <ul class="screen-demo-dialogue-list">${demoOutcomesHtml}</ul>
-                <p class="screen-demo-dialogue-footnote">׳–׳• ׳׳™׳׳•׳¡׳˜׳¨׳¦׳™׳” ׳©׳ ׳׳” ׳”׳›׳׳™ ׳”׳–׳” ׳‘׳ ׳׳׳“׳. ׳–׳• ׳“׳•׳’׳׳” ׳×׳”׳׳™׳›׳™׳× ׳׳׳” ׳©׳׳ ׳¡׳™׳ ׳׳”׳¨׳׳•׳× ׳₪׳”, ׳•׳–׳” ׳”׳›׳™׳•׳•׳ ׳©׳×׳§׳‘׳/׳™ ׳׳ ׳×׳₪׳ ׳™׳/׳™ ׳•׳×׳×׳¨׳’׳/׳™ ׳׳× ׳”׳₪׳™׳¦׳³׳¨ ׳”׳–׳”.</p>
+                <p class="screen-demo-dialogue-footnote">זו אילוסטרציה של מה שהכלי הזה בא למדל. זו דוגמה תהליכית למה שמנסים להראות כאן, וזה הכיוון שתקבל/י אם תפנים/י ותתרגל/י את הפיצ'ר הזה.</p>
             </div>
             <div class="screen-read-guide-actions">
-                <button type="button" class="btn btn-primary screen-read-guide-confirm">׳¡׳’׳•׳¨ ׳“׳•׳’׳׳”</button>
+                <button type="button" class="btn btn-primary screen-read-guide-confirm">סגור דוגמה</button>
             </div>
         </div>
     `;
@@ -1051,10 +1146,10 @@ function buildScreenReadGuide(screenId) {
 
 function getScreenReadGuideTitle(screenId) {
     const screen = document.getElementById(screenId);
-    if (!screen) return '׳׳¡׳ ׳×׳¨׳’׳•׳';
+    if (!screen) return 'מסך תרגול';
     const heading = screen.querySelector('h2, h3');
     const title = heading?.textContent?.trim();
-    return title || '׳׳¡׳ ׳×׳¨׳’׳•׳';
+    return looksLikeMojibakeText(title) ? 'מסך תרגול' : (title || 'מסך תרגול');
 }
 
 function setupReadBeforeStartGuides() {
@@ -1201,9 +1296,83 @@ function setupFeatureLauncherTabs() {
     const launchers = document.querySelectorAll('[data-feature-launcher]');
     if (!launchers.length) return;
 
+    const featureLabelOverrides = Object.freeze({
+        "nav:practice-question": "תרגול שאלות",
+        "nav:practice-radar": "Meta Radar",
+        "nav:practice-wizard": "SQHCEL Wizard",
+        "nav:practice-verb-unzip": "פועל לא מפורט",
+        "nav:blueprint": "Blueprint Builder",
+        "nav:prismlab": "Prism Lab · רמות לוגיות",
+        "nav:practice-triples-radar": "Triples Radar (Breen)",
+        "nav:categories": "קטגוריות (עם ברין)",
+        "nav:comic-engine": "Comic Engine",
+        "nav:scenario-trainer": "Scenario Trainer",
+        "href:verb_unzip_trainer.html": "Unzip Trainer (Standalone)",
+        "href:sentence_morpher_trainer.html": "Sentence Morpher",
+        "href:prism_research_trainer.html": "Prism Research (Chain)",
+        "href:iceberg_templates_trainer.html": "קצה קרחון / שלדי עומק",
+        "href:living_triples_trainer.html": "Living Triples",
+        "href:classic_classic_trainer.html": "Classic 1 · Classic Classic",
+        "href:classic2_trainer.html": "Classic 2 · Structure of Magic"
+    });
+
+    function parseLauncherEntry(element) {
+        if (!element) return null;
+        const panel = element.closest('[data-feature-group-panel]');
+        const group = panel ? String(panel.getAttribute('data-feature-group-panel') || '') : '';
+        let key = '';
+        let actionType = '';
+        let actionValue = '';
+        if (element.tagName === 'A') {
+            actionType = 'href';
+            actionValue = String(element.getAttribute('data-versioned-href') || element.getAttribute('href') || '').trim();
+            key = `href:${actionValue.split('?')[0]}`;
+        } else {
+            const onclick = String(element.getAttribute('onclick') || '');
+            const navMatch = onclick.match(/navigateTo\('([^']+)'\)/);
+            if (navMatch) {
+                actionType = 'navigate';
+                actionValue = navMatch[1];
+                key = `nav:${actionValue}`;
+            }
+        }
+        if (!actionType) return null;
+        const fallbackLabel = String(element.textContent || '').replace(/\s+/g, ' ').trim();
+        return {
+            key,
+            group,
+            label: featureLabelOverrides[key] || (looksLikeMojibakeText(fallbackLabel) ? (featureLabelOverrides[key] || actionValue || 'פיצ\'ר') : fallbackLabel),
+            actionType,
+            actionValue,
+            target: element.getAttribute('target') || '',
+            element
+        };
+    }
+
+    function executeLauncherEntry(entry) {
+        if (!entry) return;
+        if (entry.actionType === 'navigate') {
+            try {
+                navigateTo(entry.actionValue);
+                return;
+            } catch (_error) {
+                // fall back to click
+            }
+        }
+        if (entry.element && typeof entry.element.click === 'function') {
+            entry.element.click();
+        }
+    }
+
     launchers.forEach((launcher) => {
         if (launcher.dataset.featureLauncherBound === '1') return;
         launcher.dataset.featureLauncherBound = '1';
+        launcher.classList.add('feature-launcher--compact');
+
+        const headStrong = launcher.querySelector('.feature-launcher-head strong');
+        const headP = launcher.querySelector('.feature-launcher-head p');
+        if (headStrong) headStrong.textContent = 'בחירת פיצ׳ר מהירה';
+        if (headP) headP.textContent = 'בחר/י כלי אחד מהתפריט היורד. הכפתורים הארוכים הוסתרו כדי לשמור על מסך נקי.';
 
         const buttons = Array.from(launcher.querySelectorAll('[data-feature-group-btn]'));
         const panels = Array.from(launcher.querySelectorAll('[data-feature-group-panel]'));
@@ -1232,6 +1401,72 @@ function setupFeatureLauncherTabs() {
 
         const initialButton = buttons.find((button) => button.classList.contains('is-active')) || buttons[0];
         activate(initialButton.getAttribute('data-feature-group-btn'));
+
+        const existingPicker = launcher.querySelector('[data-feature-launcher-picker]');
+        const pickerWrap = existingPicker || document.createElement('div');
+        if (!existingPicker) {
+            pickerWrap.setAttribute('data-feature-launcher-picker', '1');
+            pickerWrap.className = 'feature-launcher-picker';
+            launcher.insertBefore(pickerWrap, launcher.querySelector('.feature-launcher-tabs') || launcher.firstChild);
+        }
+
+        const allEntryElements = Array.from(launcher.querySelectorAll('.feature-launcher-grid .btn'));
+        const entries = allEntryElements
+            .map((el) => parseLauncherEntry(el))
+            .filter(Boolean);
+
+        const groupLabelMap = {
+            'without-breen': 'ללא טבלאות ברין',
+            'with-breen': 'עם טבלאות ברין'
+        };
+
+        const groupedHtml = Object.keys(groupLabelMap).map((groupKey) => {
+            const groupEntries = entries.filter((entry) => entry.group === groupKey);
+            if (!groupEntries.length) return '';
+            const options = groupEntries.map((entry) => (
+                `<option value="${escapeHtml(entry.key)}">${escapeHtml(entry.label)}</option>`
+            )).join('');
+            return `<optgroup label="${escapeHtml(groupLabelMap[groupKey])}">${options}</optgroup>`;
+        }).join('');
+
+        const selectId = `feature-launcher-select-${Math.random().toString(36).slice(2, 7)}`;
+        pickerWrap.innerHTML = `
+            <div class="feature-launcher-picker-head">
+                <label for="${selectId}">בחר/י פיצ׳ר</label>
+                <small>תפריט יורד במקום שורת כפתורים עליונה</small>
+            </div>
+            <div class="feature-launcher-picker-controls">
+                <select id="${selectId}" class="feature-launcher-select" data-feature-picker-select>
+                    <option value="">בחר/י כלי...</option>
+                    ${groupedHtml}
+                </select>
+                <button type="button" class="btn btn-primary" data-feature-picker-open>פתח</button>
+            </div>
+        `;
+
+        const select = pickerWrap.querySelector('[data-feature-picker-select]');
+        const openBtn = pickerWrap.querySelector('[data-feature-picker-open]');
+        const entryByKey = entries.reduce((acc, entry) => {
+            acc[entry.key] = entry;
+            return acc;
+        }, {});
+
+        if (select && !select.dataset.boundFeaturePicker) {
+            select.dataset.boundFeaturePicker = '1';
+            select.addEventListener('change', () => {
+                const selected = entryByKey[select.value];
+                if (selected && selected.group) activate(selected.group);
+            });
+        }
+
+        if (openBtn && !openBtn.dataset.boundFeaturePicker) {
+            openBtn.dataset.boundFeaturePicker = '1';
+            openBtn.addEventListener('click', () => {
+                const selected = select ? entryByKey[select.value] : null;
+                if (!selected) return;
+                executeLauncherEntry(selected);
+            });
+        }
     });
 }
 

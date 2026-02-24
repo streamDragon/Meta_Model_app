@@ -130,6 +130,49 @@ body.force-mobile-view .app-version-floating {
     line-height: 1.35;
 }
 
+.feature-launcher-picker {
+    margin-top: 10px;
+    border: 1px solid #dbe7f5;
+    border-radius: 12px;
+    background: #f8fbff;
+    padding: 10px;
+    display: grid;
+    gap: 8px;
+}
+
+.feature-launcher-picker-head {
+    display: grid;
+    gap: 2px;
+}
+
+.feature-launcher-picker-head label {
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.feature-launcher-picker-head small {
+    color: #64748b;
+    font-size: 0.78rem;
+}
+
+.feature-launcher-picker-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.feature-launcher-select {
+    width: 100%;
+    min-height: 40px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #fff;
+    padding: 8px 10px;
+    font: inherit;
+    color: #0f172a;
+}
+
 .feature-launcher-tabs {
     margin-top: 10px;
     display: flex;
@@ -204,6 +247,21 @@ body.force-mobile-view .app-version-floating {
     color: #0f172a;
     font-size: 0.88rem;
     font-weight: 800;
+}
+
+.feature-launcher--compact .feature-launcher-tabs,
+.feature-launcher--compact .feature-launcher-panel,
+.feature-launcher--compact .feature-launcher-note {
+    display: none !important;
+}
+
+@media (max-width: 640px) {
+    .feature-launcher-picker-controls {
+        grid-template-columns: 1fr;
+    }
+    .feature-launcher-picker-controls .btn {
+        width: 100%;
+    }
 }
 
 .feature-map-toggle {

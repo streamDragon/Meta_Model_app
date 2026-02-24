@@ -2,6 +2,7 @@
 
 type TemplateType = 'CEQ' | 'CAUSE' | 'ASSUMPTIONS1';
 type CauseMode = 'CAUSES_OF_TOKEN' | 'EFFECTS_OF_TOKEN';
+type PrototypeSchemaId = 'DEBONO_FAN' | 'LOGICAL_LEVELS_STACK' | 'RUSSELL_GRINDER_TYPES';
 
 type DraggableCandidate = {
   id: string;
@@ -63,6 +64,15 @@ type TemplateMeta = {
   factPrompt: string;
 };
 
+type PrototypeSchemaMeta = {
+  id: PrototypeSchemaId;
+  code: string;
+  titleHe: string;
+  titleEn: string;
+  shortHelp: string;
+  note: string;
+};
+
 const TEMPLATE_META: Record<TemplateType, TemplateMeta> = {
   CEQ: {
     type: 'CEQ',
@@ -96,6 +106,33 @@ const TEMPLATE_META: Record<TemplateType, TemplateMeta> = {
   }
 };
 
+const PROTOTYPE_SCHEMAS: PrototypeSchemaMeta[] = [
+  {
+    id: 'DEBONO_FAN',
+    code: 'DB',
+    titleHe: 'דה בונו · מניפה/עץ רעיונות',
+    titleEn: 'De Bono Idea Fan',
+    shortHelp: 'צורה היררכית לריבוי כיווני פיתוח סביב עוגן אחד.',
+    note: 'Prototype shape (ויזואלי בלבד כרגע)'
+  },
+  {
+    id: 'LOGICAL_LEVELS_STACK',
+    code: 'LL',
+    titleHe: 'רמות לוגיות · מגדל/פירמידה',
+    titleEn: 'Logical Levels Stack',
+    shortHelp: 'סביבה → התנהגות → יכולת → אמונה/ערך → זהות → שייכות.',
+    note: 'Prototype shape (בהמשך יחובר ל-Vertical Stack מלא)'
+  },
+  {
+    id: 'RUSSELL_GRINDER_TYPES',
+    code: 'RG',
+    titleHe: 'Russell / Grinder · טיפוסים לוגיים',
+    titleEn: 'Logical Types / Meta-Levels',
+    shortHelp: 'צורת רמות/שכבות לחשיפת קפיצה מטיפוס אחד לטיפוס אחר.',
+    note: 'Prototype shape (מיפוי חזותי לקפיצות רמה)'
+  }
+];
+
 const INTRO_COPY =
   'לפעמים מילה היא רק קצה-קרחון. כאן גוררים מילה/ביטוי לצורה שמגלה מבנה עומק אפשרי. התשובות הן אילוסטרציה בלבד — לא אמת.';
 const DISCLAIMER_COPY = 'אילוסטרציה בלבד — לא אמת. לחץ/י "מטופל אחר" כדי לראות וריאציות.';
@@ -114,32 +151,37 @@ const INITIAL_STATE: TrainerState = {
 };
 
 const css = `
-.it-wrap{direction:rtl;font-family:"Assistant","Heebo","Noto Sans Hebrew","Segoe UI",sans-serif;background:radial-gradient(circle at 10% 0%,#fef3c7 0,#fffaf0 36%,#f8fafc 100%);color:#111827;max-width:1420px;margin:0 auto;border:1px solid #fde68a;border-radius:18px;padding:14px;box-shadow:0 16px 32px rgba(17,24,39,.06)}
-.it-wrap *{box-sizing:border-box}.it-panel{background:#ffffffde;border:1px solid #fde68a;border-radius:14px;padding:12px;box-shadow:0 8px 24px rgba(17,24,39,.04)}
-.it-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:14px}.it-stack{display:grid;gap:12px}
+.it-wrap{direction:rtl;font-family:"Assistant","Heebo","Noto Sans Hebrew","Segoe UI",sans-serif;background:radial-gradient(circle at 10% 0%,#fef3c7 0,#fffaf0 36%,#f8fafc 100%);color:#111827;max-width:1420px;margin:0 auto;border:1px solid #fde68a;border-radius:18px;padding:12px;box-shadow:0 16px 32px rgba(17,24,39,.06)}
+.it-wrap *{box-sizing:border-box}.it-panel{background:#ffffffde;border:1px solid #fde68a;border-radius:14px;padding:10px;box-shadow:0 8px 24px rgba(17,24,39,.04)}
+.it-grid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(320px,.88fr);gap:12px;align-items:start}.it-stack{display:grid;gap:10px}
+.it-workbench-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:10px;align-items:start}
 .it-title{margin:0;font-weight:900;font-size:1.2rem}.it-sub{margin:6px 0 0;color:#6b7280;line-height:1.4}
 .it-intro{margin-top:10px;border:1px solid #fde68a;background:#fff7d6;color:#92400e;border-radius:10px;padding:10px;line-height:1.4}
 .it-topbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.it-chip{background:#fff;border:1px solid #fde68a;border-radius:999px;padding:6px 10px;font-weight:800;font-size:.82rem}
 .it-home-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.it-home-link{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid #d1d5db;background:#fff;color:#111827;text-decoration:none;font-weight:800;font-size:.82rem}
 .it-home-link:hover{border-color:#2563eb;color:#1d4ed8}
-.it-textbox{margin-top:8px;border:1px solid #f3e8b3;background:#fff;border-radius:12px;padding:12px;line-height:2;min-height:120px}.it-seg{white-space:pre-wrap}
+.it-textbox{margin-top:8px;border:1px solid #f3e8b3;background:#fff;border-radius:12px;padding:10px;line-height:1.85;min-height:96px}.it-seg{white-space:pre-wrap}
 .it-token{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;border:1px dashed #f59e0b;background:#fffbeb;color:#92400e;font-weight:800;cursor:grab;user-select:none}
 .it-token:hover{background:#fef3c7}.it-token.sel{border-style:solid;border-color:#2563eb;background:#eff6ff;color:#1d4ed8}.it-token.active{border-style:solid;border-color:#059669;background:#ecfdf5;color:#065f46}.it-token.dragging{opacity:.65}
+.it-token-dock{margin-top:8px;border:1px dashed #bfdbfe;background:#f8fbff;border-radius:10px;padding:8px}
+.it-token-dock-row{display:flex;flex-wrap:wrap;gap:6px}
+.it-token-dock .it-token{font-size:.84rem;padding:3px 8px}
 .it-help{margin-top:8px;color:#6b7280;font-size:.84rem}.it-help strong{color:#111827}.it-kicker{font-size:.78rem;color:#6b7280}
 .it-board{display:grid;gap:10px}.it-board-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.it-board-card{border:1px solid #e5e7eb;border-radius:12px;padding:10px;background:#fff}
 .it-board-card h3{margin:0 0 6px;font-size:.95rem;font-weight:900}.it-board-card p{margin:0;color:#4b5563;line-height:1.35}
 .it-board-row{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:flex-start}.it-board-label{font-weight:900;font-size:.82rem;color:#374151}
 .it-board-value{border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;padding:8px;line-height:1.35;min-height:40px}.it-board-value.emph{border-color:#bfdbfe;background:#eff6ff;color:#1e3a8a;font-weight:700}.it-board-value.warn{border-color:#fde68a;background:#fffbeb;color:#92400e}
 .it-board-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.it-mini-tag{padding:4px 8px;border-radius:999px;border:1px solid #d1d5db;background:#fff;font-size:.78rem;font-weight:700}.it-mini-tag.code{background:#111827;color:#fff;border-color:#111827;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-.it-template-grid{display:grid;gap:10px}.it-template{border:1px solid #e5e7eb;background:#fff;border-radius:12px;padding:10px;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.it-template-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.it-template{border:1px solid #e5e7eb;background:#fff;border-radius:12px;padding:8px;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
 .it-template[data-over="1"]{border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.14);transform:translateY(-1px)}.it-template.is-active{border-color:#059669;box-shadow:0 0 0 2px rgba(5,150,105,.12)}
+.it-template.is-proto{opacity:.9;border-style:dashed;background:linear-gradient(180deg,#fff,#fafafa)}
 .it-template.shake{animation:itShake .28s linear 1}@keyframes itShake{0%{transform:translateX(0)}25%{transform:translateX(-3px)}50%{transform:translateX(3px)}75%{transform:translateX(-2px)}100%{transform:translateX(0)}}
 .it-template-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.it-template-title{font-weight:900;line-height:1.2}.it-template-mini{font-size:.75rem;color:#6b7280}
 .it-template-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.it-template-code{font-size:.72rem;font-weight:900;background:#1f2937;color:#fff;padding:3px 7px;border-radius:999px}
 .it-template-help{margin-top:6px;color:#4b5563;font-size:.82rem;line-height:1.3}
 .it-dropzone{margin-top:8px;border:1px dashed #d1d5db;border-radius:10px;padding:8px;background:#fafafa;min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center;color:#6b7280;font-weight:700}
 .it-dropzone.has-active{background:#f0fdf4;border-color:#86efac;color:#065f46}
-.it-sketch{margin-top:8px;border:1px solid #e5e7eb;border-radius:10px;background:linear-gradient(180deg,#fff,#f9fafb);padding:8px}
+.it-sketch{margin-top:6px;border:1px solid #e5e7eb;border-radius:10px;background:linear-gradient(180deg,#fff,#f9fafb);padding:6px}
 .it-sketch svg{display:block;width:100%;height:auto}.it-sketch text{font-family:"Assistant","Heebo","Segoe UI",sans-serif;font-size:10px;fill:#374151;font-weight:700}
 .it-sketch .s-line{stroke:#475569;stroke-width:1.4;fill:none}.it-sketch .s-box{stroke:#475569;stroke-width:1.3;fill:#fff}.it-sketch .s-soft{stroke:#94a3b8;stroke-width:1.2;fill:#f8fafc;stroke-dasharray:3 3}
 .it-slots{margin-top:8px;display:grid;gap:8px}.it-slots.cols-2{grid-template-columns:1fr 1fr}.it-slots.cols-3{grid-template-columns:repeat(3,1fr)}.it-slot{border:1px solid #e5e7eb;border-radius:10px;background:#f9fafb;padding:8px;min-height:58px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:700;line-height:1.3}
@@ -164,7 +206,8 @@ const css = `
 .it-focus-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
 .it-focus-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;font-weight:800;font-size:.78rem}
 .it-focus-sketch .it-sketch{margin-top:0;padding:14px}
-.it-focus-sketch .it-sketch svg{min-height:170px}
+.it-focus-sketch .it-sketch svg{min-height:140px}
+.it-proto-note{margin-top:6px;color:#6b7280;font-size:.76rem;line-height:1.35}
 .it-stage-switch{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .it-stage-btn{border:1px solid #d1d5db;background:#fff;color:#374151;border-radius:999px;padding:6px 10px;font-weight:800;font-size:.8rem;cursor:pointer}
 .it-stage-btn.is-active{border-color:#2563eb;background:#eff6ff;color:#1d4ed8}
@@ -174,7 +217,8 @@ const css = `
 .it-challenge-item{border:1px solid #fecaca;background:#fff;border-radius:10px;padding:8px;color:#7f1d1d;line-height:1.35;font-weight:700}
 .it-challenge-note{margin-top:8px;border:1px dashed #fca5a5;background:#fff7f7;color:#991b1b;border-radius:10px;padding:8px;font-weight:700;line-height:1.35}
 .it-scenario-list{margin:0;padding:0;list-style:none;display:grid;gap:6px}.it-scenario-list li{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border:1px solid #f3f4f6;border-radius:8px;background:#fff}
-@media (max-width:1080px){.it-board-grid{grid-template-columns:1fr}}
+@media (max-width:1180px){.it-workbench-grid{grid-template-columns:1fr}.it-template-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1080px){.it-board-grid{grid-template-columns:1fr}.it-template-grid{grid-template-columns:1fr}}
 @media (max-width:980px){.it-grid{grid-template-columns:1fr}.it-slots.cols-3,.it-slots.cols-2{grid-template-columns:1fr}.it-board-row{grid-template-columns:1fr}.it-focus-sketch .it-sketch svg{min-height:120px}}
 `;
 
@@ -356,6 +400,80 @@ function TemplateSketch(props: { meta: TemplateMeta; tokenText?: string; causeMo
         <text x="54" y="61" textAnchor="middle">הנחה</text>
         <text x="150" y="61" textAnchor="middle">הנחה</text>
         <text x="246" y="61" textAnchor="middle">הנחה</text>
+      </svg>
+    </div>
+  );
+}
+
+function PrototypeSketch(props: { schemaId: PrototypeSchemaId }) {
+  const { schemaId } = props;
+
+  if (schemaId === 'DEBONO_FAN') {
+    return (
+      <div className="it-sketch" aria-hidden="true">
+        <svg viewBox="0 0 300 128" preserveAspectRatio="none">
+          <circle className="s-box" cx="150" cy="18" r="12" />
+          <text x="150" y="21" textAnchor="middle">עוגן</text>
+          <line className="s-line" x1="150" y1="30" x2="150" y2="44" />
+          <line className="s-line" x1="150" y1="44" x2="78" y2="44" />
+          <line className="s-line" x1="150" y1="44" x2="222" y2="44" />
+          <rect className="s-soft" x="46" y="44" width="64" height="18" rx="8" />
+          <rect className="s-soft" x="190" y="44" width="64" height="18" rx="8" />
+          <text x="78" y="56" textAnchor="middle">כיוון A</text>
+          <text x="222" y="56" textAnchor="middle">כיוון B</text>
+          <line className="s-line" x1="78" y1="62" x2="78" y2="82" />
+          <line className="s-line" x1="222" y1="62" x2="222" y2="82" />
+          <line className="s-line" x1="78" y1="82" x2="28" y2="82" />
+          <line className="s-line" x1="78" y1="82" x2="128" y2="82" />
+          <line className="s-line" x1="222" y1="82" x2="172" y2="82" />
+          <line className="s-line" x1="222" y1="82" x2="272" y2="82" />
+          {[28, 128, 172, 272].map((x) => <circle key={x} className="s-soft" cx={x} cy="98" r="12" />)}
+          <text x="28" y="101" textAnchor="middle">1</text>
+          <text x="128" y="101" textAnchor="middle">2</text>
+          <text x="172" y="101" textAnchor="middle">3</text>
+          <text x="272" y="101" textAnchor="middle">4</text>
+        </svg>
+      </div>
+    );
+  }
+
+  if (schemaId === 'LOGICAL_LEVELS_STACK') {
+    const rows = ['שייכות', 'זהות', 'אמונה/ערך', 'יכולת', 'התנהגות', 'סביבה'];
+    return (
+      <div className="it-sketch" aria-hidden="true">
+        <svg viewBox="0 0 300 140" preserveAspectRatio="none">
+          {rows.map((label, idx) => {
+            const y = 8 + idx * 21;
+            const w = 120 + (rows.length - idx - 1) * 20;
+            const x = (300 - w) / 2;
+            return (
+              <g key={label}>
+                <rect className={idx < 2 ? 's-box' : 's-soft'} x={x} y={y} width={w} height="16" rx="8" />
+                <text x="150" y={y + 11} textAnchor="middle">{label}</text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+    );
+  }
+
+  return (
+    <div className="it-sketch" aria-hidden="true">
+      <svg viewBox="0 0 300 124" preserveAspectRatio="none">
+        <rect className="s-box" x="106" y="8" width="88" height="20" rx="8" />
+        <text x="150" y="22" textAnchor="middle">משפט</text>
+        <line className="s-line" x1="150" y1="28" x2="150" y2="42" />
+        <rect className="s-soft" x="24" y="42" width="110" height="18" rx="8" />
+        <rect className="s-soft" x="166" y="42" width="110" height="18" rx="8" />
+        <text x="79" y="54" textAnchor="middle">טיפוס/רמה A</text>
+        <text x="221" y="54" textAnchor="middle">טיפוס/רמה B</text>
+        <line className="s-line" x1="79" y1="60" x2="79" y2="82" />
+        <line className="s-line" x1="221" y1="60" x2="221" y2="82" />
+        <rect className="s-soft" x="24" y="82" width="110" height="18" rx="8" />
+        <rect className="s-soft" x="166" y="82" width="110" height="18" rx="8" />
+        <text x="79" y="94" textAnchor="middle">נתון/פעולה</text>
+        <text x="221" y="94" textAnchor="middle">מסקנה/זהות</text>
       </svg>
     </div>
   );
@@ -701,37 +819,152 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
 
       <div className="it-grid" style={{ marginTop: 12 }}>
         <div className="it-stack">
-          <section className="it-panel" aria-label="Scenario text">
-            <div className="it-kicker">Scenario ID: <code>{scenario.scenario_id}</code></div>
-            <h2 className="it-title" style={{ fontSize: '1.05rem', marginTop: 4 }}>משפט מטופל / חלון טקסט</h2>
-            <p className="it-sub">גרור/י רק מילים/ביטויים מודגשים. במובייל: הקש/י מילה ואז הקש/י על תבנית.</p>
+          <div className="it-workbench-grid">
+            <section className="it-panel" aria-label="Scenario text">
+              <div className="it-kicker">Scenario ID: <code>{scenario.scenario_id}</code></div>
+              <h2 className="it-title" style={{ fontSize: '1.05rem', marginTop: 4 }}>משפט מטופל / חלון טקסט</h2>
+              <p className="it-sub">גרור/י רק מילים/ביטויים מודגשים. אפשר גם לבחור בלוק בלחיצה ואז ללחוץ על תבנית (ללא drag מדויק).</p>
 
-            <div className="it-textbox" aria-live="polite">
-              {segments.map((seg) => {
-                if (seg.kind === 'plain') return <span key={seg.key} className="it-seg">{seg.text}</span>;
-                const candidate = seg.candidate;
-                const isSelected = state.selectedTokenId === candidate.id;
-                const isActive = state.active?.tokenId === candidate.id;
-                const isDragging = draggingTokenId === candidate.id;
-                return (
-                  <button
-                    key={seg.key}
-                    type="button"
-                    draggable
-                    className={['it-token', isSelected ? 'sel' : '', isActive ? 'active' : '', isDragging ? 'dragging' : ''].filter(Boolean).join(' ')}
-                    onDragStart={(e) => onDragStart(e, candidate.id)}
-                    onDragEnd={onDragEnd}
-                    onClick={() => onTokenTap(candidate.id)}
-                    aria-pressed={isSelected}
-                    title={`תבניות מותרות: ${candidate.allowed_templates.join(', ')}`}
-                  >
-                    {candidate.text}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="it-help"><strong>מועמדים לגרירה:</strong> {scenario.draggables.map((d) => d.text).join(' · ')}</div>
-          </section>
+              <div className="it-textbox" aria-live="polite">
+                {segments.map((seg) => {
+                  if (seg.kind === 'plain') return <span key={seg.key} className="it-seg">{seg.text}</span>;
+                  const candidate = seg.candidate;
+                  const isSelected = state.selectedTokenId === candidate.id;
+                  const isActive = state.active?.tokenId === candidate.id;
+                  const isDragging = draggingTokenId === candidate.id;
+                  return (
+                    <button
+                      key={seg.key}
+                      type="button"
+                      draggable
+                      className={['it-token', isSelected ? 'sel' : '', isActive ? 'active' : '', isDragging ? 'dragging' : ''].filter(Boolean).join(' ')}
+                      onDragStart={(e) => onDragStart(e, candidate.id)}
+                      onDragEnd={onDragEnd}
+                      onClick={() => onTokenTap(candidate.id)}
+                      aria-pressed={isSelected}
+                      title={`תבניות מותרות: ${candidate.allowed_templates.join(', ')}`}
+                    >
+                      {candidate.text}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="it-help"><strong>מועמדים לגרירה:</strong> {scenario.draggables.map((d) => d.text).join(' · ')}</div>
+            </section>
+
+            <section className="it-panel" aria-label="Template gallery">
+              <h2 className="it-title" style={{ fontSize: '1.05rem' }}>גלריית צורות / Templates</h2>
+              <p className="it-sub">כדי לקצר מרחקי גרירה: אפשר לגרור מהמשפט, או להשתמש במגש הטוקנים הקרוב שמתחת.</p>
+
+              <div className="it-token-dock" aria-label="מגש טוקנים קרוב">
+                <div className="it-help"><strong>מגש טוקנים קרוב (drag / tap):</strong> נועד לקצר מרחק בין המשפט לבין הצורות.</div>
+                <div className="it-token-dock-row">
+                  {scenario.draggables.map((candidate) => {
+                    const isSelected = state.selectedTokenId === candidate.id;
+                    const isActive = state.active?.tokenId === candidate.id;
+                    const isDragging = draggingTokenId === candidate.id;
+                    return (
+                      <button
+                        key={`dock-${candidate.id}`}
+                        type="button"
+                        draggable
+                        className={['it-token', isSelected ? 'sel' : '', isActive ? 'active' : '', isDragging ? 'dragging' : ''].filter(Boolean).join(' ')}
+                        onDragStart={(e) => onDragStart(e, candidate.id)}
+                        onDragEnd={onDragEnd}
+                        onClick={() => onTokenTap(candidate.id)}
+                        aria-pressed={isSelected}
+                        title={`תבניות מותרות: ${candidate.allowed_templates.join(', ')}`}
+                      >
+                        {candidate.text}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="it-template-grid" style={{ marginTop: 8 }}>
+                {(Object.keys(TEMPLATE_META) as TemplateType[]).map((type) => {
+                  const meta = TEMPLATE_META[type];
+                  const isActive = state.active?.templateType === type;
+                  const isHover = hoverTemplate === type;
+                  const payload = isActive && activePayload ? activePayload : null;
+                  const slotCount = meta.slotCount;
+                  const causeMode = payload && 'mode' in payload ? payload.mode ?? null : null;
+
+                  return (
+                    <div
+                      key={type}
+                      className={['it-template', isActive ? 'is-active' : '', shakeTemplate === type ? 'shake' : ''].filter(Boolean).join(' ')}
+                      data-over={isHover ? '1' : '0'}
+                      onDragOver={(e) => { e.preventDefault(); setHoverTemplate(type); }}
+                      onDragLeave={() => setHoverTemplate((prev) => (prev === type ? null : prev))}
+                      onDrop={(e) => handleTemplateDrop(e, type)}
+                      onClick={() => handleTemplateClick(type)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleTemplateClick(type);
+                        }
+                      }}
+                      aria-label={`תבנית ${meta.titleHe}`}
+                    >
+                      <div className="it-template-head">
+                        <div>
+                          <div className="it-template-title">{meta.titleHe}</div>
+                          <div className="it-template-mini">{meta.titleEn}</div>
+                        </div>
+                        <div className="it-template-meta">
+                          <span className="it-template-code">{meta.code}</span>
+                          <span className="it-template-mini">{slotCount} slots</span>
+                        </div>
+                      </div>
+                      <div className="it-template-help">{meta.shortHelp}</div>
+                      <TemplateSketch meta={meta} tokenText={isActive && activeToken ? activeToken.text : undefined} causeMode={causeMode} active={isActive} />
+                      <div className={`it-dropzone${isActive ? ' has-active' : ''}`}>
+                        {isActive && activeToken ? <>טוקן פעיל: <strong style={{ marginInlineStart: 6 }}>{activeToken.text}</strong></> : 'גרור/י לכאן טוקן מודגש'}
+                      </div>
+                      {isActive && payload ? (
+                        <>
+                          {renderCauseDirectionLabel(payload) ? <div className="it-help"><strong>{renderCauseDirectionLabel(payload)}</strong></div> : null}
+                          <div className="it-help"><strong>סטטוס:</strong> התבנית פעילה. הפירוט המלא מוצג בפאנל המיקוד.</div>
+                        </>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <details className="it-collapse" style={{ marginTop: 8 }}>
+                <summary>
+                  <span>צורות חסרות / Prototype Shapes</span>
+                  <span className="it-kicker">דה בונו · רמות לוגיות · Russell/Grinder</span>
+                </summary>
+                <div className="it-collapse-body">
+                  <div className="it-template-grid">
+                    {PROTOTYPE_SCHEMAS.map((schema) => (
+                      <div key={schema.id} className="it-template is-proto" aria-disabled="true">
+                        <div className="it-template-head">
+                          <div>
+                            <div className="it-template-title">{schema.titleHe}</div>
+                            <div className="it-template-mini">{schema.titleEn}</div>
+                          </div>
+                          <div className="it-template-meta">
+                            <span className="it-template-code">{schema.code}</span>
+                            <span className="it-template-mini">prototype</span>
+                          </div>
+                        </div>
+                        <div className="it-template-help">{schema.shortHelp}</div>
+                        <PrototypeSketch schemaId={schema.id} />
+                        <div className="it-proto-note">{schema.note}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </details>
+            </section>
+          </div>
 
           <details className="it-collapse" open={!!state.active}>
             <summary>
@@ -748,64 +981,6 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
               />
             </div>
           </details>
-
-          <section className="it-panel" aria-label="Template gallery">
-            <h2 className="it-title" style={{ fontSize: '1.05rem' }}>גלריית צורות / Templates</h2>
-            <p className="it-sub">כל צורה כוללת איור-שלד קטן. גרור/י טוקן — וקבל/י שאלה + מילוי חריצים.</p>
-            <div className="it-template-grid">
-              {(Object.keys(TEMPLATE_META) as TemplateType[]).map((type) => {
-                const meta = TEMPLATE_META[type];
-                const isActive = state.active?.templateType === type;
-                const isHover = hoverTemplate === type;
-                const payload = isActive && activePayload ? activePayload : null;
-                const slotCount = meta.slotCount;
-                const causeMode = payload && 'mode' in payload ? payload.mode ?? null : null;
-
-                return (
-                  <div
-                    key={type}
-                    className={['it-template', isActive ? 'is-active' : '', shakeTemplate === type ? 'shake' : ''].filter(Boolean).join(' ')}
-                    data-over={isHover ? '1' : '0'}
-                    onDragOver={(e) => { e.preventDefault(); setHoverTemplate(type); }}
-                    onDragLeave={() => setHoverTemplate((prev) => (prev === type ? null : prev))}
-                    onDrop={(e) => handleTemplateDrop(e, type)}
-                    onClick={() => handleTemplateClick(type)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleTemplateClick(type);
-                      }
-                    }}
-                    aria-label={`תבנית ${meta.titleHe}`}
-                  >
-                    <div className="it-template-head">
-                      <div>
-                        <div className="it-template-title">{meta.titleHe}</div>
-                        <div className="it-template-mini">{meta.titleEn}</div>
-                      </div>
-                      <div className="it-template-meta">
-                        <span className="it-template-code">{meta.code}</span>
-                        <span className="it-template-mini">{slotCount} slots</span>
-                      </div>
-                    </div>
-                    <div className="it-template-help">{meta.shortHelp}</div>
-                    <TemplateSketch meta={meta} tokenText={isActive && activeToken ? activeToken.text : undefined} causeMode={causeMode} active={isActive} />
-                    <div className={`it-dropzone${isActive ? ' has-active' : ''}`}>
-                      {isActive && activeToken ? <>טוקן פעיל: <strong style={{ marginInlineStart: 6 }}>{activeToken.text}</strong></> : 'גרור/י לכאן טוקן מודגש'}
-                    </div>
-                    {isActive && payload ? (
-                      <>
-                        {renderCauseDirectionLabel(payload) ? <div className="it-help"><strong>{renderCauseDirectionLabel(payload)}</strong></div> : null}
-                        <div className="it-help"><strong>סטטוס:</strong> התבנית פעילה. הפירוט המלא מוצג בפאנל המיקוד.</div>
-                      </>
-                    ) : null}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
         </div>
         <div className="it-stack">
           <section className="it-panel it-focus-panel" aria-label="Focus output">
