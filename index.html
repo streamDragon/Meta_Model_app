@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.30" data-build-time="1771949276675" data-build-iso="2026-02-24T16:07:56.675Z" data-git-commit="73c0cf3">
+<html lang="he" dir="rtl" data-app-version="1.0.30" data-build-time="1771950615391" data-build-iso="2026-02-24T16:30:15.391Z" data-git-commit="c0d2b4b">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1166,29 +1166,29 @@
 
                     <section class="practice-section practice-section-triples-radar" aria-label="Triples Radar Section">
                         <div class="practice-section-header">
-                            <h3>Triples Radar / Radar רגיל בטוגל אחד</h3>
-                            <p>בחר/י מצב: רדאר רגיל (שאלה על קטגוריה אחת) או Triples Radar (שאלות על כל השלשה באותה שורה).</p>
+                            <h3>שני אופני עבודה באותו מסך</h3>
+                            <p>בחר/י איך נוח לעבוד כרגע: מבט שלשה (עבודה על משפחת דפוסים באותה שורה) או מבט ממוקד (דיוק של תבנית אחת בכל פעם).</p>
                         </div>
 
                         <div class="triples-radar-mode-bar" id="triples-radar-mode-bar">
                             <div class="triples-radar-mode-copy">
-                                <strong id="triples-radar-mode-title">Triples Radar · כל השורה</strong>
-                                <p id="triples-radar-mode-note">כמו Meta Radar, אבל כאן עובדים על כל השלשה: 3 שאלות/תשובות באותה שורה.</p>
+                                <strong id="triples-radar-mode-title">מבט שלשה · עובדים על המשפחה כולה</strong>
+                                <p id="triples-radar-mode-note">מזהים שורה מתאימה ואז מתרגלים 3 שאלות משלימות באותו אזור של הטבלה.</p>
                             </div>
-                            <div id="triples-radar-mode-switch" class="triples-radar-mode-switch" role="group" aria-label="בחירת מצב Triples Radar">
-                                <button type="button" class="triples-radar-mode-btn is-active" data-tr-ui-mode="triple" aria-pressed="true">טריפל · כל השורה</button>
-                                <button type="button" class="triples-radar-mode-btn" data-tr-ui-mode="single" aria-pressed="false">רגיל · קטגוריה אחת</button>
+                            <div id="triples-radar-mode-switch" class="triples-radar-mode-switch" role="group" aria-label="בחירת אופן עבודה ב-Triples Radar">
+                                <button type="button" class="triples-radar-mode-btn is-active" data-tr-ui-mode="triple" aria-pressed="true">מבט שלשה</button>
+                                <button type="button" class="triples-radar-mode-btn" data-tr-ui-mode="single" aria-pressed="false">מבט ממוקד</button>
                             </div>
                         </div>
 
                         <div id="triples-radar-root" class="triples-radar-card">
                             <div class="triples-radar-topbar">
-                                <span>סצנה <strong id="triples-radar-counter">1/15</strong></span>
-                                <span>ניקוד <strong id="triples-radar-score">0</strong></span>
-                                <span>דיוקים <strong id="triples-radar-solved-count">0</strong></span>
+                                <span>מקרה <strong id="triples-radar-counter">1/15</strong></span>
+                                <span>נקודות <strong id="triples-radar-score">0</strong></span>
+                                <span>בחירות מדויקות <strong id="triples-radar-solved-count">0</strong></span>
                             </div>
 
-                            <p id="triples-radar-step" class="triples-radar-step">שלב 1: קרא/י את המשפט. שלב 2: בחר/י קטגוריה.</p>
+                            <p id="triples-radar-step" class="triples-radar-step">שלב 1: קרא/י את משפט המטופל. שלב 2: בחר/י את התבנית שהכי מתאימה לעבודה כרגע.</p>
 
                             <div class="triples-radar-statement-wrap">
                                 <p class="triples-radar-kicker">משפט מטופל</p>
@@ -1201,10 +1201,10 @@
                             <p id="triples-radar-feedback" class="triples-radar-feedback" data-tone="info"></p>
 
                             <div class="triples-radar-actions">
-                                <button class="btn btn-secondary" data-tr-action="hint-row">רמז לשורה</button>
-                                <button class="btn btn-secondary" data-tr-action="hint-category">רמז לקטגוריה</button>
-                                <button class="btn btn-secondary" data-tr-action="restart">איפוס ריצה</button>
-                                <button class="btn btn-primary" data-tr-action="next">הבא</button>
+                                <button class="btn btn-secondary" data-tr-action="hint-row">רמז למשפחה</button>
+                                <button class="btn btn-secondary" data-tr-action="hint-category">רמז מדויק</button>
+                                <button class="btn btn-secondary" data-tr-action="restart">התחלה מחדש</button>
+                                <button class="btn btn-primary" data-tr-action="next">המקרה הבא</button>
                             </div>
                         </div>
                     </section>

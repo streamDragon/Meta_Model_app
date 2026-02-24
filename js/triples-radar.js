@@ -167,13 +167,13 @@
         const noteEl = document.getElementById('triples-radar-mode-note');
         if (titleEl) {
             titleEl.textContent = activeToggleKey === 'triple'
-                ? 'Triples Radar · כל השורה'
-                : 'Radar רגיל · קטגוריה אחת';
+                ? 'מבט שלשה · עובדים על המשפחה כולה'
+                : 'מבט ממוקד · תבנית אחת בכל פעם';
         }
         if (noteEl) {
             noteEl.textContent = activeToggleKey === 'triple'
-                ? 'כמו Meta Radar, אבל כאן עובדים על כל השלשה: 3 שאלות/תשובות באותה שורה.'
-                : 'מצב רדאר רגיל: בוחרים קטגוריה אחת מהטבלה ומקבלים משוב מדויק / קרוב / שורה שגויה.';
+                ? 'בוחרים שורה מתאימה בטבלה, ואז מתרגלים שלוש שאלות משלימות מאותה משפחת דפוסים.'
+                : 'מתרגלים זיהוי מדויק של תבנית אחת בכל משפט, עם משוב שמכוון לצעד הבא.';
         }
     }
 
@@ -497,7 +497,7 @@
         const anchor = (phone.anchors || []).find((item) => item.id === anchorId);
         if (!anchor) return;
         if (!anchor.isTop) {
-            showPhoneToast('כרגע בחר/י אחד מ־Top 3 כדי לבנות שלשה חזקה.', 'warn');
+            showPhoneToast('כרגע בחר/י אחד משלושת העוגנים המובילים כדי לפתוח עבודה מדויקת.', 'warn');
             return;
         }
         phone.selectedAnchorId = anchor.id;
@@ -594,18 +594,18 @@
         const canGenerate = qaFeed.length >= Math.min(3, rowCategories.length || 3);
 
         const stepSubtitleMap = {
-            anchors: 'בחר/י קטע מתוך לוח המילים (Top 3).',
-            focus: 'קטע נבחר. עכשיו ננעל על שלשת הקטגוריה/שכנים.',
-            qa: `אסוף/י 3 שאלות-תשובות (שכן/תבנית/שכן) · ${qaFeed.length}/3`,
+            anchors: 'בחר/י קטע בולט מתוך שלושת העוגנים המרכזיים במשפט.',
+            focus: 'הקטע נבחר. עכשיו נפתח עבודה על שלוש התבניות השכנות באותה שורה.',
+            qa: `בונים 3 שאלות ותשובות משלימות (שכן/תבנית/שכן) · ${qaFeed.length}/3`,
             done: phone.challenge
-                ? 'שלב אתגר פעיל: בודקים את 3 הפריטים שנחשפו'
-                : (phone.reply ? 'שלב חשיפה הושלם — יש שיקוף ותובנה' : '3/3 הושלם — הפק/י שיקוף')
+                ? 'שלב בדיקת ההמשך פעיל: בודקים את שלוש הנקודות שעלו'
+                : (phone.reply ? 'שלב החשיפה הושלם · יש שיקוף והצעת המשך' : '3/3 הושלם · בנה/י שיקוף')
         };
         const headerTitleMap = {
-            anchors: 'Triples Radar · לוח מילים',
-            focus: 'נבחר קטע לחקירה',
-            qa: 'חשיפה: שואלים על תבנית ושכנים',
-            done: phone.challenge ? 'אתגור 3 הפריטים' : (phone.reply ? 'שיקוף + תובנת מטפל' : '3/3 הושלם')
+            anchors: 'מבט שלשה · עוגנים מהמשפט',
+            focus: 'בחרנו נקודת פתיחה לעבודה',
+            qa: 'שואלים ומדייקים בתוך אותה משפחה',
+            done: phone.challenge ? 'בדיקת המשך ל-3 הנקודות' : (phone.reply ? 'שיקוף + ניסוח המשך' : '3/3 הושלם')
         };
 
         const highlightButtons = (phone.anchors || []).map((anchor) => {
@@ -624,7 +624,7 @@
                     data-tr-phone-anchor-id="${escapeHtml(anchor.id)}"
                     ${disabled ? 'tabindex="-1" disabled' : ''}>
                     ${escapeHtml(anchor.text)}
-                    ${anchor.isTop ? '<span class="tr-phone-badge">Top 3</span>' : ''}
+                    ${anchor.isTop ? '<span class="tr-phone-badge">עוגן מוביל</span>' : ''}
                 </button>
             `;
         }).join('');
@@ -656,8 +656,8 @@
             ? qaFeed.map((item) => `
                 <article class="tr-phone-qa-item">
                     <div class="tr-phone-qa-kicker">שאלה/תשובה ${escapeHtml(item.letter)} · ${escapeHtml(item.categoryLabel)}</div>
-                    <p class="tr-phone-q-line"><strong>Q:</strong> ${escapeHtml(item.question)}</p>
-                    <p class="tr-phone-a-line"><strong>A:</strong> ${escapeHtml(item.answer)}</p>
+                    <p class="tr-phone-q-line"><strong>שאלה:</strong> ${escapeHtml(item.question)}</p>
+                    <p class="tr-phone-a-line"><strong>תגובה:</strong> ${escapeHtml(item.answer)}</p>
                 </article>
             `).join('')
             : '<p class="tr-phone-muted">בחר/י כרטיס אחד מתוך השלשה כדי ליצור שאלה ותשובת מטופל.</p>';
@@ -668,7 +668,7 @@
 
         const wordBoardHtml = `
             <section class="tr-phone-panel tr-phone-wordboard">
-                <div class="tr-phone-panel-title">לוח מילים / עוגנים מהמשפט</div>
+                <div class="tr-phone-panel-title">עוגנים בולטים מתוך משפט המטופל</div>
                 <div class="tr-phone-wordboard-grid">
                     ${(phone.anchors || []).map((anchor) => {
                         const cls = [
@@ -679,13 +679,13 @@
                         return `<span class="${cls}">${escapeHtml(anchor.text)}</span>`;
                     }).join('')}
                 </div>
-                <p class="tr-phone-wordboard-note"><strong>Top 3:</strong> ${escapeHtml(topAnchors.map((item) => item.text).join(' | '))}</p>
+                <p class="tr-phone-wordboard-note"><strong>3 עוגנים מובילים:</strong> ${escapeHtml(topAnchors.map((item) => item.text).join(' | '))}</p>
             </section>
         `;
 
         const breenTableHtml = `
             <section class="tr-phone-panel tr-phone-breen-panel">
-                <div class="tr-phone-panel-title">טבלת מטא-מודל ברין (מלאה)</div>
+                <div class="tr-phone-panel-title">טבלת ברין (מפת הדפוסים המלאה)</div>
                 <div class="tr-phone-breen-grid">
                     ${root.triplesRadarCore.ROWS.map((r) => {
                         const meta = ROW_META[r.id] || ROW_META.row1;
@@ -759,8 +759,8 @@
                     ${qaFeed.map((item) => `
                         <div class="tr-phone-transcript-block">
                             <strong>שאלה/תשובה ${escapeHtml(item.letter)}</strong>
-                            <p><em>Q:</em> ${escapeHtml(item.question)}</p>
-                            <p><em>A:</em> ${escapeHtml(item.answer)}</p>
+                            <p><em>שאלה:</em> ${escapeHtml(item.question)}</p>
+                            <p><em>תגובה:</em> ${escapeHtml(item.answer)}</p>
                         </div>
                     `).join('')}
                     ${phone.reply ? `
@@ -778,10 +778,10 @@
         const focusPanelHtml = selectedAnchor
             ? `
                 <section class="tr-phone-panel tr-phone-anchor-panel">
-                    <div class="tr-phone-panel-title">קטע שנבחר</div>
+                    <div class="tr-phone-panel-title">הקטע שבחרת לעבודה</div>
                     <p class="tr-phone-anchor-text">${escapeHtml(selectedAnchor.text)}</p>
                     ${phone.phase === 'focus' ? `
-                        <button type="button" class="tr-phone-meta-btn" data-tr-phone-action="meta">התחל חשיפה בשלשה</button>
+                        <button type="button" class="tr-phone-meta-btn" data-tr-phone-action="meta">פתח/י עבודה על השלשה</button>
                     ` : ''}
                 </section>
             `
@@ -790,10 +790,10 @@
         const qaPanelHtml = selectedAnchor && (phone.phase === 'qa' || phone.phase === 'done' || phone.reply)
             ? `
                 <section class="tr-phone-panel tr-phone-locked-panel">
-                    <div class="tr-phone-panel-title">שלשה נעולה (תבנית + שכנים)</div>
+                    <div class="tr-phone-panel-title">השלשה הפעילה (התבנית והשכנים שלה)</div>
                     <div class="tr-phone-row-note">${escapeHtml(rowMeta.heLabel || '')}</div>
                     <div class="tr-phone-cards">${tripleCards}</div>
-                    <div class="tr-phone-panel-title">פיד חשיפה (3 שאלות/תשובות)</div>
+                    <div class="tr-phone-panel-title">רצף העבודה (3 שאלות ותשובות)</div>
                     <div class="tr-phone-qa-feed">${qaFeedHtml}</div>
                 </section>
             `
@@ -807,13 +807,13 @@
                         <div class="tr-phone-done-micro">סצנה ${state.index + 1}/${state.scenarios.length}</div>
                     </div>
                     <div class="tr-phone-inline-actions">
-                        <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="generate" ${canGenerate ? '' : 'disabled'}>הפק שיקוף + תובנה</button>
+                        <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="generate" ${canGenerate ? '' : 'disabled'}>בנה/י שיקוף והצעת המשך</button>
                         <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="transcript">${phone.transcriptOpen ? 'הסתר תמליל' : 'תמליל'}</button>
                     </div>
                     ${phone.reply ? `
                         <div class="tr-phone-inline-actions">
-                            <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="challenge">אתגר 3 דברים</button>
-                            <button type="button" class="tr-phone-secondary-btn" disabled>קודם חושפים ואז מאתגרים</button>
+                            <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="challenge">בדיקת המשך ל-3 הנקודות</button>
+                            <button type="button" class="tr-phone-secondary-btn" disabled>קודם בונים שיקוף, ואז בודקים המשך</button>
                         </div>
                     ` : ''}
                     <div class="tr-phone-panel-title">מה נאסף עד עכשיו</div>
@@ -826,21 +826,21 @@
             <div class="triples-radar-phone-shell">
                 <div class="triples-radar-phone-header">
                     <div>
-                        <h4>${escapeHtml(headerTitleMap[phone.phase] || 'Triples Radar · חשיפה ואתגור')}</h4>
+                        <h4>${escapeHtml(headerTitleMap[phone.phase] || 'מבט שלשה · חשיפה ובדיקת המשך')}</h4>
                         <p>${escapeHtml(stepSubtitleMap[phone.phase] || '')}</p>
                     </div>
                     <div class="triples-radar-phone-stats">
-                        <span>סצנה ${state.index + 1}/${state.scenarios.length}</span>
-                        <span>ניקוד ${state.score}</span>
+                        <span>מקרה ${state.index + 1}/${state.scenarios.length}</span>
+                        <span>נקודות ${state.score}</span>
                     </div>
                 </div>
 
                 <section class="tr-phone-panel tr-phone-client-panel">
-                    <div class="tr-phone-panel-title">לוח משפטים (מבנה הקסם)</div>
+                    <div class="tr-phone-panel-title">משפט המטופל + עוגנים לעבודה</div>
                     <p class="tr-phone-client-text">${escapeHtml(current.clientText || '')}</p>
                     <div class="tr-phone-highlights">${highlightButtons}</div>
                     <div class="tr-phone-top3-line">
-                        <strong>TOP 3:</strong>
+                        <strong>3 עוגנים מובילים:</strong>
                         <span>${escapeHtml(topAnchors.map((item) => item.text).join(' | '))}</span>
                     </div>
                 </section>
@@ -855,8 +855,8 @@
                 ${transcriptHtml}
 
                 <div class="tr-phone-footer-actions">
-                    <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="restart">איפוס סבב</button>
-                    <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="next">הסצנה הבאה</button>
+                    <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="restart">להתחיל מחדש</button>
+                    <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="next">המקרה הבא</button>
                 </div>
 
                 ${phone.toast ? `<div class="tr-phone-toast" data-tone="${escapeHtml(phone.toastTone || 'info')}">${escapeHtml(phone.toast)}</div>` : ''}
@@ -961,11 +961,11 @@
         if (state.solved) return;
         if (state.attemptsInScenario >= 2 && !state.rowHintUsed) {
             state.rowHintUsed = true;
-            setFeedback('❌ עדיין לא מדויק. הדלקתי לך את השורה הנכונה כדי לחדד מיקוד.', 'warn');
+            setFeedback('עדיין לא מדויק. סימנתי את משפחת הדפוסים המתאימה כדי לעזור לך לדייק.', 'warn');
         }
         if (state.attemptsInScenario >= 3 && result.status !== 'exact' && !state.categoryHintUsed) {
             state.categoryHintUsed = true;
-            setFeedback('❌ ניסיון שלישי: הדלקתי גם את הקטגוריה המדויקת. עכשיו סמן אותה.', 'warn');
+            setFeedback('בניסיון הזה סימנתי גם את התבנית המדויקת. בחר/י אותה כדי לראות את ההיגיון.', 'warn');
         }
     }
 
@@ -983,22 +983,22 @@
             state.solvedCount += 1;
             state.score += Math.max(1, 4 - Math.max(1, state.attemptsInScenario));
             saveProgress();
-            setFeedback('✅ מדויק. פגעת בקטגוריה הנכונה בתוך השלשה.', 'success');
-            setStepStatus('סגור/י סצנה: לחץ/י "הבא" כדי לעבור למשפט הבא.');
+            setFeedback('מעולה. בחרת את התבנית המדויקת בתוך המשפחה הנכונה.', 'success');
+            setStepStatus('יפה. אפשר לעבור למקרה הבא או לעצור רגע ולחשוב למה זו התבנית המתאימה.');
             if (typeof root.playUISound === 'function') root.playUISound('success');
         } else if (result.status === 'same_row') {
-            setFeedback('🟨 קרוב מאוד. זו השלשה הנכונה, אבל לא האחות המדויקת.', 'warn');
-            setStepStatus('עדיין בתוך אותה סצנה: בחר/י קטגוריה אחרת באותה שלשה.');
+            setFeedback('כיוון טוב. את/ה באותה משפחת דפוסים, עכשיו צריך לדייק לתבנית הנכונה.', 'warn');
+            setStepStatus('הישאר/י באותה שורה ובחר/י תבנית אחרת מתוך אותה משפחה.');
             if (typeof root.playUISound === 'function') root.playUISound('warning');
             handleAutoHints(result);
         } else if (result.status === 'wrong_row') {
-            setFeedback('❌ לא בשורה הנכונה. נסה/י שלשה אחרת.', 'danger');
-            setStepStatus('נסה/י שוב: חפש/י קודם שורה נכונה, אחר כך קטגוריה.');
+            setFeedback('עדיין לא. כרגע זה נראה כמו משפחת דפוסים אחרת.', 'danger');
+            setStepStatus('חפש/י קודם את המשפחה המתאימה בטבלה, ואז דייק/י לתבנית שבתוכה.');
             if (typeof root.playUISound === 'function') root.playUISound('error');
             handleAutoHints(result);
         } else {
-            setFeedback('⚠️ לא הצלחתי לזהות את הבחירה. נסה/י שוב.', 'warn');
-            setStepStatus('בחר/י קטגוריה מתוך אחת מהשלשות.');
+            setFeedback('לא הצלחתי לזהות את הבחירה. בחר/י שוב תבנית מתוך הטבלה.', 'warn');
+            setStepStatus('בחר/י תבנית מתוך אחת ממשפחות הדפוסים בטבלה.');
         }
 
         updateHintControls();
@@ -1014,8 +1014,8 @@
         state.solved = false;
         state.selectedCategory = '';
         if (state.uiMode === 'phone') resetPhoneScenarioFlow();
-        setFeedback('בחר/י קטגוריה אחת מתוך הטבלה.', 'info');
-        setStepStatus('שלב 1: קרא/י את המשפט. שלב 2: בחר/י קטגוריה.');
+        setFeedback('מקרה חדש. קרא/י את משפט המטופל ובחר/י תבנית לפתיחה.', 'info');
+        setStepStatus('שלב 1: קרא/י את משפט המטופל. שלב 2: בחר/י תבנית לעבודה.');
         updateHintControls();
         renderBoard();
     }
@@ -1028,8 +1028,8 @@
         state.solved = false;
         state.selectedCategory = '';
         if (state.uiMode === 'phone') resetPhoneScenarioFlow();
-        setFeedback('איפוס ריצה: חזרנו לסצנה הראשונה.', 'info');
-        setStepStatus('שלב 1: קרא/י את המשפט. שלב 2: בחר/י קטגוריה.');
+        setFeedback('התחלנו מחדש מההתחלה, כדי לתרגל שוב ברצף נקי.', 'info');
+        setStepStatus('שלב 1: קרא/י את משפט המטופל. שלב 2: בחר/י תבנית לעבודה.');
         updateHintControls();
         renderBoard();
     }
@@ -1037,7 +1037,7 @@
     function revealRowHint() {
         if (state.solved || state.rowHintUsed) return;
         state.rowHintUsed = true;
-        setFeedback('רמז: סימנתי לך את השלשה הנכונה.', 'info');
+        setFeedback('רמז: סימנתי את משפחת הדפוסים המתאימה (השורה הנכונה).', 'info');
         updateHintControls();
         renderBoard();
     }
@@ -1045,7 +1045,7 @@
     function revealCategoryHint() {
         if (state.solved || state.categoryHintUsed) return;
         state.categoryHintUsed = true;
-        setFeedback('רמז מדויק: סימנתי את הקטגוריה הנכונה.', 'info');
+        setFeedback('רמז מדויק: סימנתי את התבנית הנכונה בתוך השורה.', 'info');
         updateHintControls();
         renderBoard();
     }
@@ -1188,8 +1188,8 @@
         if (!state.scenarios.length || !state.elements?.root) return;
 
         if (state.uiMode === 'desktop') {
-            setFeedback('בחר/י קטגוריה אחת מתוך הטבלה.', 'info');
-            setStepStatus('שלב 1: קרא/י את המשפט. שלב 2: בחר/י קטגוריה.');
+            setFeedback('קרא/י את משפט המטופל ובחר/י את התבנית שנכון להתחיל ממנה.', 'info');
+            setStepStatus('שלב 1: קרא/י את משפט המטופל. שלב 2: בחר/י תבנית לעבודה.');
             updateHintControls();
         }
 
@@ -1230,8 +1230,8 @@
 
         bindEvents();
         if (state.uiMode === 'desktop') {
-            setFeedback('בחר/י קטגוריה אחת מתוך הטבלה.', 'info');
-            setStepStatus('שלב 1: קרא/י את המשפט. שלב 2: בחר/י קטגוריה.');
+            setFeedback('קרא/י את משפט המטופל ובחר/י את התבנית שנכון להתחיל ממנה.', 'info');
+            setStepStatus('שלב 1: קרא/י את משפט המטופל. שלב 2: בחר/י תבנית לעבודה.');
         }
         updateHintControls();
         renderBoard();
