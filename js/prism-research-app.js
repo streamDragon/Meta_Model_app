@@ -627,7 +627,7 @@
         };
 
         return `
-            <section class="prm-card prm-breen-board-wrap">
+            <div class="prm-breen-board-wrap">
                 <div class="prm-breen-board-head">
                     <div class="prm-breen-head-col outside">
                         <strong>OUTSIDE THEIR MAP</strong>
@@ -647,7 +647,7 @@
                     `).join('')}
                 </div>
                 <p class="prm-breen-footnote">Mind Reading בצד ימין (Inside) וכולל גם קריאת מחשבות עצמית + קפיצה למסקנות.</p>
-            </section>
+            </div>
         `;
     }
 
@@ -863,7 +863,6 @@
                         </button>
                         <button type="button" class="prm-small-btn" data-action="apply-base">מימוש לטקסט המרכזי</button>
                         <button type="button" class="prm-small-btn" data-action="back-base">חזרה לבסיס</button>
-                        <button type="button" class="prm-small-btn" data-action="generate-report" ${reportEnabled ? '' : 'disabled'}>סיכום חקירה</button>
                     </div>
                 </div>
 
@@ -977,7 +976,7 @@
         if (action === 'load-demo') return loadDemoStory();
         if (action === 'toggle-base-editor') return toggleBaseStoryEditor();
         if (action === 'apply-base') return setBaseStoryFromTextarea();
-        if (action === 'reset-session') return createFreshSession(getBaseStoryEditorValue() || state.session.baseStoryText || DEMO_STORY);
+        if (action === 'reset-session') return createFreshSession(getBaseStoryEditorValue() || ((state.session && state.session.baseStoryText) || DEMO_STORY));
         if (action === 'clear-session') return clearSavedSession();
     }
 

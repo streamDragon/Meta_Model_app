@@ -2179,32 +2179,154 @@ function setupTabNavigation() {
 }
 
 // Populate Categories Section
+function getBreenPrismPhilosophyEntry(subcategoryId = '') {
+    const lib = window.prismResearchPhilosophyLibrary || {};
+    const id = String(subcategoryId || '').trim().toLowerCase();
+    const aliasMap = {
+        lack_referential_index: 'lack_ref_index',
+        presupposition: 'presuppositions',
+        universal_quantifier: 'universal_quantifiers'
+    };
+
+    if (id === 'modal_operator') {
+        return {
+            ask3x: 'מה יקרה אם לא...? מה מונע? מה צריך כדי שזה יתאפשר?',
+            school: 'אילוצים / אפשרויות (Modal Operators)',
+            why: 'אופרטורים מודליים יוצרים תחושת חוק: "חייב", "צריך", "אי אפשר". בפריזמה אנחנו בודקים גם את המחיר/האיום (necessity) וגם את תנאי האפשרות (possibility).',
+            creates: 'מיפוי של פחד/אילוץ מול תנאים שמאפשרים תנועה. במקום "אין ברירה" נוצרת סקאלה של אפשרויות.',
+            therapistCalm: 'לא מבטלים את הפחד או הדרישה; בודקים מה הם מנסים להגן עליו ואיפה יש חופש פעולה.',
+            patientGain: 'פחות קיפאון. יותר בחירה מודעת בין חובה, רצוי, אפשרי, וצעד קטן.',
+            trap: 'להתווכח עם "חייב" לפני שמבינים את העלות שהמוח מנסה למנוע.',
+            fix: 'קודם למפות מחיר/איום, ואז לשאול על תנאי אפשרות וצעד ניסויי.',
+            tooltip: 'מאחורי "חייב/אי אפשר" יושבים לרוב פחד, ערך או הרגל.'
+        };
+    }
+
+    return lib[aliasMap[id] || id] || null;
+}
+
+function getBreenPatternGoalText(category, subcategory) {
+    const subId = String(subcategory?.id || '').toLowerCase();
+    const goalMap = {
+        mind_reading: 'להפריד בין סימנים/תחושות לבין המסקנה, ולבדוק ראיות. כולל Mind Reading עצמי (למשל: "אני רעב" - איך אני יודע?) וקפיצה למסקנות.',
+        universal_quantifier: 'לבדוק היקף, חריגים ותנאים: להפוך "תמיד/אף פעם" למפה שניתנת לבדיקה.',
+        modal_operator: 'לפרק "חייב/צריך/אי אפשר" למחיר, פחד, אילוץ ותנאי אפשרות.',
+        cause_effect: 'לפרק קשר סיבתי אוטומטי לשלבים/מנגנון כדי למצוא נקודת התערבות.',
+        complex_equivalence: 'לחשוף את חוק התרגום ("X אומר Y") ולבדוק אם יש תרגומים חלופיים.'
+    };
+    if (goalMap[subId]) return goalMap[subId];
+
+    const family = String(subcategory?.category || category?.name || '').toUpperCase();
+    if (family.includes('DELETION')) return 'להחזיר מידע חסר למפה: מי/מה/מתי/לפי מה - כדי שאפשר יהיה לעבוד עם המציאות ולא עם ערפל.';
+    if (family.includes('DISTORTION')) return 'להפריד בין נתון, פירוש ומסקנה - כדי לבדוק מה באמת ידוע ומה רק הונח.';
+    if (family.includes('GENERALIZATION')) return 'להחזיר גבולות ותנאים להכללה - כדי לפתוח יותר אפשרויות תגובה.';
+    return 'להפוך ניסוח מעורפל למבנה ברור שניתן לבדוק, לשקף ולעבוד איתו.';
+}
+
+function renderBreenPatternPhilosophyLayer(category, subcategory) {
+    const ph = getBreenPrismPhilosophyEntry(subcategory?.id);
+    if (!ph) {
+        return `
+            <p>תיאוריה פילוסופית מפורטת תתווסף כאן בהמשך. כרגע השתמשו בשאלות ובמטרה של התבנית כדי לעבוד בצורה מדויקת.</p>
+        `;
+    }
+
+    const mindReadingExtra = String(subcategory?.id || '') === 'mind_reading'
+        ? `<p><strong>הרחבה חשובה:</strong> קריאת מחשבות כוללת גם <em>מיינד-רידינג עצמי</em> ("אני רעב / אני פגוע - איך אני יודע?") וגם <em>קפיצה למסקנות</em> מתוך סימן קטן.</p>`
+        : '';
+
+    return `
+        <p><strong>המסגרת הפילוסופית:</strong> ${escapeHtml(ph.school || 'פריזמה לשונית-לוגית')}</p>
+        <p><strong>למה זה חשוב:</strong> ${escapeHtml(ph.why || '')}</p>
+        <p><strong>מה זה מייצר בתרגול:</strong> ${escapeHtml(ph.creates || '')}</p>
+        <p><strong>שקט של המטפל:</strong> ${escapeHtml(ph.therapistCalm || '')}</p>
+        <p><strong>רווח למטופל:</strong> ${escapeHtml(ph.patientGain || '')}</p>
+        ${mindReadingExtra}
+    `;
+}
+
+function buildCategorySubPatternCard(category, subcategory) {
+    const questionText = String(subcategory?.question || '').trim();
+    const exampleText = String(subcategory?.example || '').trim();
+    const goalText = getBreenPatternGoalText(category, subcategory);
+    const isMindReading = String(subcategory?.id || '') === 'mind_reading';
+    const questionsExtra = isMindReading
+        ? '<li><strong>הרחבה:</strong> זה כולל גם מיינד-רידינג עצמי ("אני רעב" / "אני לא מסוגל") וגם קפיצה למסקנות.</li>'
+        : '';
+
+    return `
+        <details class="subcategory-item subcategory-layered" data-pattern-id="${escapeHtml(subcategory.id || '')}">
+            <summary class="subcategory-summary">
+                <span class="subcategory-title">${escapeHtml(subcategory.hebrew || subcategory.name || subcategory.id || 'תבנית')}</span>
+                <span class="subcategory-desc">${escapeHtml(subcategory.description || '')}</span>
+            </summary>
+
+            <div class="subcategory-layers">
+                <details class="subcategory-layer">
+                    <summary>שאלות עבודה</summary>
+                    <div class="subcategory-layer-body">
+                        <ul>
+                            ${questionText ? `<li><strong>שאלת בסיס:</strong> ${escapeHtml(questionText)}</li>` : ''}
+                            ${exampleText ? `<li><strong>דוגמה למשפט:</strong> ${escapeHtml(exampleText)}</li>` : ''}
+                            ${questionsExtra}
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="subcategory-layer">
+                    <summary>המטרה של התבנית</summary>
+                    <div class="subcategory-layer-body">
+                        <p>${escapeHtml(goalText)}</p>
+                    </div>
+                </details>
+
+                <details class="subcategory-layer">
+                    <summary>פילוסופיה של הפריזמה (קשור לתבנית)</summary>
+                    <div class="subcategory-layer-body subcategory-layer-philosophy">
+                        ${renderBreenPatternPhilosophyLayer(category, subcategory)}
+                    </div>
+                </details>
+            </div>
+        </details>
+    `;
+}
+
 function populateCategories() {
     const container = document.getElementById('categories-container');
+    if (!container) return;
     container.innerHTML = '';
-    
+
+    const theoryIntro = document.createElement('section');
+    theoryIntro.className = 'card categories-theory-intro';
+    theoryIntro.innerHTML = `
+        <h2>קטגוריות ברין + שכבות תאוריה (פריזמה)</h2>
+        <p>
+            דף זה הוא דף התאוריה והכוונה: לכל תבנית יש שכבות לחיצה של <strong>שאלות</strong>, <strong>מטרה</strong>, ו-<strong>פילוסופיה</strong>.
+            תאוריית הפריזמות הועברה לכאן כדי לשמור את דפי התרגול נקיים וממוקדי עבודה.
+        </p>
+        <p class="categories-theory-note">
+            העיקרון: לא רק "מה לשאול", אלא גם למה השאלה הזו פותחת מרחב ומחזירה דיוק למפה של האדם.
+        </p>
+    `;
+    container.appendChild(theoryIntro);
+
     metaModelData.categories.forEach(category => {
         const categoryCard = document.createElement('div');
         categoryCard.className = `category-card ${category.id}`;
-        
-        let subcategoriesHtml = '';
-        category.subcategories.forEach(sub => {
-            subcategoriesHtml += `
-                <div class="subcategory-item">
-                    <strong>${sub.hebrew}:</strong> ${sub.description}
-                </div>
-            `;
-        });
-        
+
+        const subcategoriesHtml = (category.subcategories || [])
+            .map(sub => buildCategorySubPatternCard(category, sub))
+            .join('');
+
         categoryCard.innerHTML = `
             <div class="category-icon">${category.icon}</div>
             <h3>${category.name}</h3>
             <p>${category.description}</p>
-            <div class="subcategories">
+            <div class="subcategories layered">
                 ${subcategoriesHtml}
             </div>
         `;
-        
+
         container.appendChild(categoryCard);
     });
 }

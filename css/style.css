@@ -1251,6 +1251,27 @@ body.hide-top-tabbar .mobile-tab-nav {
     gap: 20px;
 }
 
+.categories-theory-intro {
+    grid-column: 1 / -1;
+    border: 1px solid #dbeafe;
+    background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.categories-theory-intro h2 {
+    margin: 0 0 10px;
+    color: #0f172a;
+}
+
+.categories-theory-intro p {
+    margin: 0 0 8px;
+    color: #475569;
+    line-height: 1.55;
+}
+
+.categories-theory-note {
+    font-size: 0.92rem;
+}
+
 .category-card {
     background: white;
     border-radius: var(--border-radius);
@@ -1309,6 +1330,93 @@ body.hide-top-tabbar .mobile-tab-nav {
 
 .subcategory-item strong {
     color: var(--dark);
+}
+
+.subcategories.layered {
+    display: grid;
+    gap: 10px;
+}
+
+.subcategory-layered {
+    margin: 0;
+    background: #f8fafc;
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.subcategory-layered > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 12px 14px;
+    display: grid;
+    gap: 4px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.subcategory-layered > summary::-webkit-details-marker {
+    display: none;
+}
+
+.subcategory-summary .subcategory-title {
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.subcategory-summary .subcategory-desc {
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.35;
+}
+
+.subcategory-layers {
+    padding: 10px 12px 12px;
+    display: grid;
+    gap: 8px;
+}
+
+.subcategory-layer {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.subcategory-layer > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 10px 12px;
+    font-weight: 700;
+    color: #1e293b;
+    background: #f8fafc;
+}
+
+.subcategory-layer > summary::-webkit-details-marker {
+    display: none;
+}
+
+.subcategory-layer-body {
+    padding: 10px 12px 12px;
+    color: #475569;
+    line-height: 1.5;
+    font-size: 0.92rem;
+}
+
+.subcategory-layer-body p {
+    margin: 0 0 8px;
+}
+
+.subcategory-layer-body p:last-child {
+    margin-bottom: 0;
+}
+
+.subcategory-layer-body ul {
+    margin: 0;
+    padding-inline-start: 18px;
+}
+
+.subcategory-layer-philosophy {
+    border-top: 1px dashed #dbeafe;
 }
 
 /* Practice Container */
