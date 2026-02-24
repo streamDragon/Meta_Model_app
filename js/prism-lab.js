@@ -387,3 +387,155 @@
     `;
   }
 
+  function renderHistory() {
+    const p = prism();
+    const ex = state.ex;
+    const steps = ex?.steps || [blankStep(0), blankStep(1), blankStep(2)];
+    const items = steps.map((s, i) => {
+      const hasQ = !!norm(s.q);
+      const hasA = !!norm(s.a);
+      if (!hasQ) {
+        return `<div class="pl-history-item is-empty"><div class="pl-history-item-head"><strong>שלב ${i + 1}</strong><span>ממתין</span></div><p>השאלה תופיע אחרי בחירת פריזמה.</p></div>`;
+      }
+      return `<div class="pl-history-item${hasA ? '' : ' is-empty'}"><div class="pl-history-item-head"><strong>שלב ${i + 1}</strong><span>${hasA ? 'נכתב' : 'ממתין'}</span></div><p>${esc(s.q)}</p><p class="pl-history-answer">${hasA ? esc(s.a) : 'אין תשובה עדיין.'}</p></div>`;
+    }).join('');
+
+    const savedHtml = state.saved.length
+      ? state.saved.map((it) => `
+        <article class="pl-saved-item">
+          <h5>${esc(it.prismNameHe || it.prismId || 'פריזמה')}</h5>
+          <p>${esc(fmtDate(it.savedAt))} · עוגן: ${esc(shrink(it.ex?.seedX || '', 26) || '—')}</p>
+          <p>${esc(shrink(it.ex?.steps?.[2]?.a || it.ex?.steps?.[0]?.a || '', 66) || 'ללא תשובה')}</p>
+          <div class="pl-inline-actions">
+            <button type="button" class="pl-btn" data-action="load-saved" data-id="${esc(it.id)}">פתח</button>
+            <button type="button" class="pl-btn" data-action="delete-saved" data-id="${esc(it.id)}">מחק</button>
+          </div>
+        </article>`).join('')
+      : '<div class="pl-history-item is-empty"><p>עדיין אין שמירות. אפשר לשמור אחרי שממלאים תשובה אחת לפחות.</p></div>';
+
+    return `
+      <aside class="pl-side">
+        <section class="pl-card pl-side-card">
+          <h3>היסטוריה של 3 השלבים</h3>
+          <p class="pl-kicker">קריאה בלבד · רואים את כל הרצף בלי לגלול.</p>
+          <div class="pl-history-list">${items}</div>
+          <div class="pl-side-actions">
+            <button type="button" class="pl-btn primary" data-action="save-current" ${canSave() ? '' : 'disabled'}>שמור פריזמה זו</button>
+            <button type="button" class="pl-btn" data-action="choose-another" ${p ? '' : 'disabled'}>בחר פריזמה אחרת</button>
+          </div>
+          <p class="pl-message">${esc(state.uiMessage || '')}</p>
+        </section>
+        <section class="pl-card pl-side-card">
+          <h3>פריזמות שמורות</h3>
+          <p class="pl-kicker">טעינה מהירה של חפירות קודמות בדפדפן זה.</p>
+          <div class="pl-saved-list">${savedHtml}</div>
+        </section>
+      </aside>
+    `;
+  }
+
+  function render() {
+    root.innerHTML = `
+      <div class="pl-shell" dir="rtl">
+        <header class="pl-hero">
+          <p class="pl-eyebrow">Prism Lab</p>
+          <h1>Prism Lab – חפירה עמוקה עם עדשות</h1>
+          <p>בוחרים עדשה אחת (פריזמה) ומבצעים חפירה עמוקה של 3 שלבים עם אותה שאלה בדיוק. בכל שלב <code>X</code> מתעדכן אוטומטית מהתשובה הקודמת.</p>
+        </header>
+        <div class="pl-layout">
+          <main class="pl-main">
+            <section class="pl-card pl-base">
+              <h2>Base Story</h2>
+              <p class="pl-kicker">כתבו/ערכו את הפסקה כאן. שלב 1 יקבל עוגן אוטומטי, ואז ההמשך נבנה מתוך התשובות.</p>
+              <textarea id="pl-base-story" spellcheck="false">${esc(state.baseStory || '')}</textarea>
+              <div class="pl-inline-actions">
+                <button type="button" class="pl-btn" data-action="load-demo">טען דוגמת בסיס</button>
+                <button type="button" class="pl-btn" data-action="refresh-anchor" ${state.selectedPrismId ? '' : 'disabled'}>רענן עוגן אוטומטי</button>
+                <button type="button" class="pl-btn" data-action="clear-draft">נקה טיוטה</button>
+              </div>
+            </section>
+
+            <section class="pl-card">
+              <h2>15 פריזמות</h2>
+              <p class="pl-kicker">3 שורות × 5 כפתורים. בוחרים פריזמה אחת וחופרים איתה 3 פעמים ברצף.</p>
+              <div class="pl-prisms-grid">${renderPrismGrid()}</div>
+            </section>
+
+            ${renderExcavation()}
+          </main>
+
+          ${renderHistory()}
+        </div>
+
+        <footer class="pl-card">
+          <p class="pl-footnote">המסך הזה ייעודי ל-Chain Recursive Prism: החקירה מתקדמת קדימה על המשפט החדש שנולד בכל תשובה, בלי להחליף כלי בין השלבים.</p>
+        </footer>
+      </div>
+    `;
+  }
+
+  function refreshAnchor() {
+    if (!state.selectedPrismId) return;
+    if (answers().some((x) => x.a)) {
+      state.uiMessage = 'כבר התחילה חפירה. כדי לרענן עוגן - בחר/י פריזמה אחרת או נקה טיוטה.';
+      render();
+      return;
+    }
+    state.ex = makeExcavation(state.selectedPrismId);
+    state.uiMessage = 'העוגן ההתחלתי רוענן מתוך Base Story.';
+    persistDraft();
+    render();
+  }
+
+  function clearDraft() {
+    state.baseStory = DEMO_STORY;
+    state.selectedPrismId = null;
+    state.ex = null;
+    state.uiMessage = 'הטיוטה נוקתה. אפשר להתחיל מחדש.';
+    try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+    render();
+  }
+
+  function onInput(e) {
+    const t = e.target;
+    if (!t) return;
+    if (t.id === 'pl-base-story') {
+      state.baseStory = String(t.value || '');
+      if (state.selectedPrismId && state.ex && !answers().some((x) => x.a)) state.ex = makeExcavation(state.selectedPrismId);
+      persistDraft();
+      return;
+    }
+    if (t.getAttribute('data-action') === 'step-answer') {
+      const idx = Number(t.getAttribute('data-step'));
+      if (Number.isInteger(idx)) setStepAnswer(idx, t.value);
+    }
+  }
+
+  function onClick(e) {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.getAttribute('data-action');
+    if (action === 'select-prism') return selectPrism(btn.getAttribute('data-id'));
+    if (action === 'continue-step') return continueStep(Number(btn.getAttribute('data-step')));
+    if (action === 'make-summary') return buildSummary();
+    if (action === 'save-current') return saveCurrent();
+    if (action === 'choose-another') return chooseAnother();
+    if (action === 'load-saved') return loadSaved(btn.getAttribute('data-id'));
+    if (action === 'delete-saved') return removeSaved(btn.getAttribute('data-id'));
+    if (action === 'load-demo') {
+      state.baseStory = DEMO_STORY;
+      if (state.selectedPrismId && state.ex && !answers().some((x) => x.a)) state.ex = makeExcavation(state.selectedPrismId);
+      state.uiMessage = 'נטענה פסקת בסיס לדוגמה.';
+      persistDraft();
+      render();
+      return;
+    }
+    if (action === 'refresh-anchor') return refreshAnchor();
+    if (action === 'clear-draft') return clearDraft();
+  }
+
+  restoreAll();
+  root.addEventListener('input', onInput);
+  root.addEventListener('click', onClick);
+  render();
+})();
