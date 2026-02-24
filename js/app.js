@@ -11529,20 +11529,25 @@ function setupWrinkleGame() {
                         <h3>${WR2W_WIZARD_TITLE}</h3>
                         <p class="wr2w-subtitle">${WR2W_WIZARD_SLOGAN}</p>
                     </div>
-                    <div class="wr2w-score">
-                        <span>תהליך <strong id="wr2w-process-score">0/6</strong></span>
-                        <span>רצף <strong id="wr2w-streak">0</strong></span>
-                        <span>נק׳ <strong id="wr2w-points">0</strong></span>
-                        <span class="wr2w-score-minor">PATH <strong id="wr2w-path-distribution">0/0/0</strong></span>
-                        <span class="wr2w-score-minor">H/C <strong id="wr2w-stuck-distribution">0/0</strong></span>
+                    <button id="wr2w-next-scene" class="btn btn-primary wr2w-main-btn wr2w-main-btn--green wr2w-hero-cta" type="button">דיאלוג חדש</button>
+                </div>
+                <details class="wr2w-meta-drawer">
+                    <summary>מצב תרגול וכלים</summary>
+                    <div class="wr2w-meta-drawer-body">
+                        <div class="wr2w-score">
+                            <span>תהליך <strong id="wr2w-process-score">0/6</strong></span>
+                            <span>רצף <strong id="wr2w-streak">0</strong></span>
+                            <span>נק׳ <strong id="wr2w-points">0</strong></span>
+                            <span class="wr2w-score-minor">PATH <strong id="wr2w-path-distribution">0/0/0</strong></span>
+                            <span class="wr2w-score-minor">H/C <strong id="wr2w-stuck-distribution">0/0</strong></span>
+                        </div>
+                        <p class="wr2w-formula">${WR2W_WIZARD_FORMULA}</p>
+                        <div class="wr2w-actions wr2w-actions--hero">
+                            <button id="wr2w-reset-round" class="btn btn-secondary" type="button">התחל/י את הסבב מחדש</button>
+                            <button id="wr2w-self-toggle" class="btn btn-secondary" type="button">משפט אישי לתרגול</button>
+                        </div>
                     </div>
-                </div>
-                <p class="wr2w-formula">${WR2W_WIZARD_FORMULA}</p>
-                <div class="wr2w-actions wr2w-actions--hero">
-                    <button id="wr2w-next-scene" class="btn btn-primary wr2w-main-btn wr2w-main-btn--green" type="button">בחר דיאלוג חדש</button>
-                    <button id="wr2w-reset-round" class="btn btn-secondary" type="button">אפס סבב</button>
-                    <button id="wr2w-self-toggle" class="btn btn-secondary" type="button">צור משפט משלי</button>
-                </div>
+                </details>
             </section>
 
             <details class="wr2w-guide" id="wr2w-philosopher-panel">
@@ -11559,6 +11564,7 @@ function setupWrinkleGame() {
                     <p class="wr2w-kicker">משפט מרכזי · Core Sentence</p>
                     <p id="wr2w-sentence-help" class="wr2w-sentence-help">בחר/י תחושה ואז כמת נסתר. הכרטיס יתעדכן לאורך הסבב.</p>
                 </div>
+                <div id="wr2w-signal-inline" class="wr2w-signal-inline hidden"></div>
                 <p id="wr2w-visible-sentence" class="wr2w-visible-sentence"></p>
 
                 <div class="wr2w-layers">
@@ -11609,6 +11615,7 @@ function setupWrinkleGame() {
         monologue: document.getElementById('wr2w-monologue'),
         visibleSentence: document.getElementById('wr2w-visible-sentence'),
         sentenceHelp: document.getElementById('wr2w-sentence-help'),
+        signalInline: document.getElementById('wr2w-signal-inline'),
         layerOutside: document.getElementById('wr2w-layer-outside'),
         layerInside: document.getElementById('wr2w-layer-inside'),
         layerSpoken: document.getElementById('wr2w-layer-spoken'),
@@ -11661,7 +11668,7 @@ function setupWrinkleGame() {
             path: false,
             exception: false
         },
-        feedback: '׳‘׳—׳¨/׳™ ׳×׳—׳•׳©׳” ׳—׳–׳§׳” ׳©׳׳•׳₪׳™׳¢׳” ׳׳¢׳‘׳¨ ׳׳׳™׳׳™׳.',
+        feedback: 'נתחיל מהגוף: מה עולה כאן כששומעים את המשפט הזה?',
         feedbackTone: 'info'
     });
 
@@ -11705,7 +11712,7 @@ function setupWrinkleGame() {
         state.seedScenes = normalizedPack;
         if (state.index >= allScenes().length) state.index = 0;
         resetRoundState();
-        setFeedback(`׳ ׳˜׳¢׳ ׳• ${normalizedPack.length} ׳“׳™׳׳׳•׳’׳™׳ ׳׳—׳‘׳™׳׳” ׳”׳׳•׳¨׳—׳‘׳×.`, 'info');
+        setFeedback(`נטענו ${normalizedPack.length} דיאלוגים לחבילה המורחבת.`, 'info');
         render();
     };
 
@@ -11745,10 +11752,48 @@ function setupWrinkleGame() {
         if (pathChoice === 'both') return 'גשר / Both';
         return 'עדיין לא נבחר PATH';
     };
+    const wr2wPathTherapeuticLabel = (pathChoice) => {
+        if (pathChoice === 'outside') return 'כיוון חוץ (מה קורה בפועל / בקשה / גבולות)';
+        if (pathChoice === 'inside') return 'כיוון פנים (רגש / גוף / ויסות)';
+        if (pathChoice === 'both') return 'כיוון גשר (פנים + חוץ ביחד)';
+        return '';
+    };
+    const wr2wPathNextStepText = (pathChoice) => {
+        if (pathChoice === 'outside') return 'ננסח צעד חיצוני קטן וברור שאפשר לבדוק במציאות.';
+        if (pathChoice === 'inside') return 'ננסח משפט פנימי מדויק יותר שמכבד את החוויה ומרכך את המוחלטות.';
+        if (pathChoice === 'both') return 'נבנה גם צעד פנימי וגם צעד חיצוני, כדי לשמור על חיבור ופעולה יחד.';
+        return '';
+    };
+    const wr2wBuildTherapistPathSummary = (scene) => {
+        const pathChoice = String(state.round.pathChoice || '').toLowerCase();
+        if (!['outside', 'inside', 'both'].includes(pathChoice)) return '';
+        const visible = wr2wShort(scene?.visibleSentence || '', 90);
+        const feeling = wr2wSanitizeText(state.round.feeling || '');
+        const quantifier = wr2wSanitizeText(state.round.selectedQuantifier || '');
+        const pathLabel = wr2wPathTherapeuticLabel(pathChoice);
+        const nextStep = wr2wPathNextStepText(pathChoice);
+        const feelingText = feeling ? `מתחת למשפט עולה בעיקר תחושת ${feeling}` : 'יש כאן רגש משמעותי מאחורי המשפט';
+        const quantifierText = quantifier ? `, ונשמע שיש גם כמת סמוי כמו "${quantifier}"` : '';
+        return `אם אני מסכם/ת: כשאת/ה אומר/ת "${visible}", ${feelingText}${quantifierText}. כרגע נשמע שהכיוון שמתאים לך הוא ${pathLabel}. בשלב הבא ${nextStep}`;
+    };
+    const renderWr2wInlineSignalPicker = () => {
+        if (state.round.step !== 'S') return '';
+        return `
+            <div class="wr2w-signal-inline-card" aria-label="בחירת תחושה">
+                <p class="wr2w-signal-inline-title">מה עולה לך כשאת/ה שומע/ת את זה?</p>
+                <p class="wr2w-signal-inline-subtitle">אם היית שואל/ת את המטופל: איזה רגש או תחושת גוף יש כאן מאחורי המשפט הזה?</p>
+                <div class="wr2w-option-grid wr2w-signal-option-grid">
+                    ${WR2W_FEELINGS.map((feeling) => `
+                        <button type="button" class="wr2w-option-btn${state.round.feeling === feeling ? ' is-selected' : ''}" data-action="select-feeling" data-feeling="${escapeHtml(feeling)}">${escapeHtml(feeling)}</button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    };
     const wr2wStepCopy = Object.freeze({
         S: {
             title: 'שלב 1 · Signal / תחושה',
-            instruction: 'בחר/י תחושה דומיננטית אחת כדי להתחיל מהגוף, ואז נחשוף את הכמת הסמוי.'
+            instruction: 'נתחיל מהחוויה: מה עולה למטופל כשהוא אומר את המשפט הזה? בחר/י רגש/תחושת גוף, ואז נזהה את הכמת הסמוי.'
         },
         Q: {
             title: 'שלב 2 · Hidden Quantifier / כמת נסתר',
@@ -11764,7 +11809,7 @@ function setupWrinkleGame() {
         },
         P: {
             title: 'שלב 5 · PATH / בחירת כיוון',
-            instruction: 'לאן מכוונים עכשיו את העבודה: מציאות חיצונית, חוויה פנימית, או גשר בין שתיהן.'
+            instruction: 'אחרי שנוצרה הלימה, בוחרים יחד איפה הכי נכון להמשיך עכשיו: בחוץ, בפנים, או בגשר שמחבר ביניהם.'
         },
         E: {
             title: 'שלב 6 · Exception + Learning / חריג ולמידה',
@@ -11837,7 +11882,7 @@ function setupWrinkleGame() {
         }
         if (els.layerInsideText) {
             const insideParts = [
-                state.round.feeling ? `תחושה: ${state.round.feeling}` : 'בחר/י תחושה דומיננטית',
+                state.round.feeling ? `רגש/תחושת גוף: ${state.round.feeling}` : 'מה עולה למטופל כשהוא אומר את זה?',
                 state.round.selectedQuantifier ? `כמת משתמע: ${state.round.selectedQuantifier}` : '',
                 state.round.confirmation?.status === 'yes' ? 'נוצר אישור (כן)' : '',
                 state.round.confirmation?.status === 'partial' ? 'יש אישור חלקי (בערך)' : ''
@@ -11854,10 +11899,12 @@ function setupWrinkleGame() {
         if (els.sentenceHelp) {
             const stepHint = step === 'Q'
                 ? 'בחר/י כמת נסתר (תמיד/אף פעם/אין סיכוי...)'
+                : step === 'S'
+                    ? 'שאל/י: "מה עולה לך כשאת/ה שומע/ת את זה?" ואז בחר/י רגש/תחושת גוף.'
                 : step === 'H'
                     ? 'נסח/י גשר קצר ובדוק/י הלימה'
-                    : step === 'P'
-                        ? 'בחר/י כיוון עבודה: חוץ / פנים / גשר'
+                : step === 'P'
+                    ? 'בחר/י כיוון עבודה: חוץ / פנים / גשר'
                         : 'התקדמות לפי 6 שלבים. אפשר לפתוח את "פילוסוף מסך" רק כשצריך.';
             els.sentenceHelp.textContent = stepHint;
         }
@@ -11933,7 +11980,7 @@ function setupWrinkleGame() {
             scoreResult.pathPoint ? '+1 PATH' : '',
             scoreResult.bothBonus ? '+1 BOTH' : ''
         ].filter(Boolean).join(' | ');
-        setFeedback(`׳¡׳™׳›׳•׳ ׳¡׳‘׳‘: ${completed}/6 ׳§׳¨׳™׳˜׳¨׳™׳•׳ ׳™׳, +${earned} ׳ ׳§׳•׳“׳•׳×${bonusText ? ` (${bonusText})` : ''}.`, 'success');
+        setFeedback(`סיכום סבב: ${completed}/6 רכיבי תהליך הושלמו, +${earned} נקודות${bonusText ? ` (${bonusText})` : ''}.`, 'success');
         persist();
 
         if (!state.round.learningFinal && scene?.transformedSentence) {
@@ -11970,11 +12017,7 @@ function setupWrinkleGame() {
         const step = state.round.step;
         if (step === 'S') {
             return `
-                <div class="wr2w-option-grid">
-                    ${WR2W_FEELINGS.map((feeling) => `
-                        <button type="button" class="wr2w-option-btn${state.round.feeling === feeling ? ' is-selected' : ''}" data-action="select-feeling" data-feeling="${escapeHtml(feeling)}">${escapeHtml(feeling)}</button>
-                    `).join('')}
-                </div>
+                <p class="wr2w-inline-hint">בחר/י רגש אחד שמרגיש הכי קרוב למה שיש מתחת למשפט. אחר כך נעבור לבדוק איזה כמת סמוי מחזיק את זה.</p>
                 <button type="button" class="btn btn-primary wr2w-main-btn wr2w-main-btn--green" data-action="goto-q" ${state.round.feeling ? '' : 'disabled'}>המשך · כמת נסתר</button>
             `;
         }
@@ -12025,8 +12068,9 @@ function setupWrinkleGame() {
         }
         if (step === 'P') {
             const selected = state.round.pathChoice || '';
+            const therapistSummary = selected ? wr2wBuildTherapistPathSummary(scene) : '';
             return `
-                <p class="wr2w-path-question">עכשיו יש הלימה. לאן תרצה/י שנלך?</p>
+                <p class="wr2w-path-question">נשמע שנוצר כאן רגע של דיוק משותף. מה הכי יעזור לך עכשיו להמשיך ממנו?</p>
                 <div class="wr2w-path-grid">
                     <button type="button" class="wr2w-path-btn${selected === 'outside' ? ' is-selected' : ''}" data-action="select-path" data-path="outside">
                         <strong>🔵 חוץ · Reality</strong>
@@ -12041,6 +12085,12 @@ function setupWrinkleGame() {
                         <small>צעד קטן בחוץ + צעד קטן בפנים</small>
                     </button>
                 </div>
+                ${therapistSummary ? `
+                    <div class="wr2w-step-hero wr2w-path-summary">
+                        <strong>שיקוף-סיכום של המטפל/ת</strong>
+                        <p>${escapeHtml(therapistSummary)}</p>
+                    </div>
+                ` : ''}
                 <button type="button" class="btn btn-primary wr2w-main-btn wr2w-main-btn--green" data-action="goto-e" ${selected ? '' : 'disabled'}>המשך לחריג ולמידה</button>
             `;
         }
@@ -12074,15 +12124,15 @@ function setupWrinkleGame() {
                     <button type="button" class="btn btn-secondary wr2w-main-btn" data-action="autofill-learning">צור ניסוח למידה אוטומטי</button>
                     <p class="wr2w-template-note">אפשר לקבל ניסוח אוטומטי וללטש אותו עד שהוא מרגיש מדויק.</p>
                     ${pathChoice === 'outside' ? `
-                        <label class="wr2w-learning-label" for="wr2w-learning-outside-input">Outside / חוץ</label>
+                        <label class="wr2w-learning-label" for="wr2w-learning-outside-input">חוץ / מה ננסה או נבדוק בפועל</label>
                         <textarea id="wr2w-learning-outside-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningOutsideDraft || state.round.learningDraft)}</textarea>
                     ` : pathChoice === 'inside' ? `
-                        <label class="wr2w-learning-label" for="wr2w-learning-inside-input">Inside / פנים</label>
+                        <label class="wr2w-learning-label" for="wr2w-learning-inside-input">פנים / מה קורה בפנים ואיך נרצה לפגוש את זה</label>
                         <textarea id="wr2w-learning-inside-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningInsideDraft || state.round.learningDraft)}</textarea>
                     ` : `
-                        <label class="wr2w-learning-label" for="wr2w-learning-outside-input">Outside / חוץ</label>
+                        <label class="wr2w-learning-label" for="wr2w-learning-outside-input">חוץ / מה ננסה או נבדוק בפועל</label>
                         <textarea id="wr2w-learning-outside-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningOutsideDraft)}</textarea>
-                        <label class="wr2w-learning-label" for="wr2w-learning-inside-input">Inside / פנים</label>
+                        <label class="wr2w-learning-label" for="wr2w-learning-inside-input">פנים / מה קורה בפנים ואיך נרצה לפגוש את זה</label>
                         <textarea id="wr2w-learning-inside-input" class="wr2w-textarea" rows="3">${escapeHtml(state.round.learningInsideDraft)}</textarea>
                     `}
                     <button type="button" class="btn btn-primary wr2w-main-btn wr2w-main-btn--green" data-action="finish-round">סיים סבב</button>
@@ -12133,6 +12183,11 @@ function setupWrinkleGame() {
         if (els.visibleSentence) {
             els.visibleSentence.innerHTML = wr2wHighlightSentenceHtml(scene.visibleSentence, state.round.selectedQuantifier);
         }
+        if (els.signalInline) {
+            const showInlineSignal = state.round.step === 'S';
+            els.signalInline.classList.toggle('hidden', !showInlineSignal);
+            els.signalInline.innerHTML = showInlineSignal ? renderWr2wInlineSignalPicker() : '';
+        }
 
         const currentStepKey = wr2wStepCopy[state.round.step] ? state.round.step : 'DONE';
         if (els.stepTitle) els.stepTitle.textContent = wr2wStepCopy[currentStepKey].title;
@@ -12157,21 +12212,21 @@ function setupWrinkleGame() {
         state.index = (state.index + 1) % scenes.length;
         resetRoundState();
         playUISound('next');
-        setFeedback('׳¡׳‘׳‘ ׳—׳“׳©. ׳׳×׳—׳™׳׳™׳ ׳©׳•׳‘ ׳‘׳–׳™׳”׳•׳™ ׳×׳—׳•׳©׳” (S).', 'info');
+        setFeedback('דיאלוג חדש. מתחילים שוב מזיהוי התחושה שעולה (שלב S).', 'info');
         render();
     };
 
     const addSelfSentence = () => {
         const raw = String(els.selfInput?.value || '').trim();
         if (raw.length < 8) {
-            setFeedback('׳›׳×׳•׳‘/׳™ ׳׳©׳₪׳˜ ׳׳™׳©׳™ ׳§׳¦׳¨ (׳׳₪׳—׳•׳× 8 ׳×׳•׳•׳™׳).', 'warn');
+            setFeedback('כתוב/י משפט אישי קצר לתרגול (לפחות 8 תווים).', 'warn');
             render();
             return;
         }
         const normalized = normalizeText(raw).replace(/\s+/g, ' ').trim();
         const exists = state.customScenes.some((scene) => normalizeText(scene.visibleSentence).replace(/\s+/g, ' ').trim() === normalized);
         if (exists) {
-            setFeedback('׳”׳׳©׳₪׳˜ ׳”׳–׳” ׳›׳‘׳¨ ׳§׳™׳™׳ ׳‘׳×׳¨׳’׳•׳.', 'warn');
+            setFeedback('המשפט הזה כבר קיים ברשימת התרגול.', 'warn');
             render();
             return;
         }
@@ -12182,8 +12237,8 @@ function setupWrinkleGame() {
             monologue: raw,
             visibleSentence: raw,
             quantifiers: wr2InferQuantifiers(raw),
-            exceptionExample: '׳›׳, ׳”׳™׳” ׳¨׳’׳¢ ׳§׳˜׳ ׳©׳–׳” ׳”׳™׳” ׳₪׳—׳•׳× ׳ ׳›׳•׳.',
-            conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳™׳© ׳׳—׳¥/׳¢׳™׳™׳₪׳•׳×/׳׳™-׳•׳“׳׳•׳×.',
+            exceptionExample: 'כן, היה רגע קטן שבו זה היה פחות נכון.',
+            conditionsLine: 'זה בדרך כלל מתחזק כשיש לחץ, עייפות או חוסר ודאות.',
             transformedSentence: wr2SoftenSentence(raw),
             createdAt: Date.now()
         }, 'wr2w_self');
@@ -12195,7 +12250,7 @@ function setupWrinkleGame() {
         if (state.index < 0) state.index = 0;
         if (els.selfInput) els.selfInput.value = '';
         resetRoundState();
-        setFeedback('׳”׳׳©׳₪׳˜ ׳”׳׳™׳©׳™ ׳ ׳•׳¡׳£. ׳׳×׳—׳™׳׳™׳ ׳‘-S ׳¢׳ ׳׳™׳×׳•׳× ׳׳™-׳”׳׳™׳׳”.', 'success');
+        setFeedback('המשפט האישי נוסף. מתחילים משלב S כדי לזהות מה עולה מתחת למילים.', 'success');
         playUISound('start');
         render();
     };
@@ -12210,32 +12265,32 @@ function setupWrinkleGame() {
         if (action === 'select-feeling') {
             state.round.feeling = button.getAttribute('data-feeling') || '';
             markCriterion('signal', 'select_soft');
-            setFeedback(`׳ ׳¨׳©׳׳” ׳×׳—׳•׳©׳”: ${state.round.feeling}.`, 'success');
+            setFeedback(`נרשמה תחושה מרכזית: ${state.round.feeling}.`, 'success');
             render();
             return;
         }
         if (action === 'goto-q') {
             if (!state.round.feeling) {
-                setFeedback('׳‘׳—׳¨/׳™ ׳×׳—׳•׳©׳” ׳׳₪׳ ׳™ ׳”׳׳¢׳‘׳¨ ׳-Q.', 'warn');
+                setFeedback('בחר/י קודם רגש/תחושת גוף לפני המעבר לכמת הנסתר.', 'warn');
                 render();
                 return;
             }
             playUISound('next');
             state.round.step = 'Q';
-            setFeedback('׳׳¢׳•׳׳”. ׳¢׳›׳©׳™׳• ׳‘׳•׳—׳¨׳™׳ ׳›׳׳×-׳¦׳ ׳¡׳‘׳™׳¨.', 'info');
+            setFeedback('מעולה. עכשיו נזהה איזה כמת סמוי מחזיק את המשפט הזה.', 'info');
             render();
             return;
         }
         if (action === 'select-quantifier') {
             state.round.selectedQuantifier = button.getAttribute('data-quantifier') || '';
             markCriterion('quantifier', 'wr2w_quantifier');
-            setFeedback(`׳ ׳‘׳—׳¨ ׳›׳׳×-׳¦׳: ${state.round.selectedQuantifier}.`, 'success');
+            setFeedback(`נבחר כמת נסתר: ${state.round.selectedQuantifier}.`, 'success');
             render();
             return;
         }
         if (action === 'goto-h') {
             if (!state.round.selectedQuantifier) {
-                setFeedback('׳‘׳—׳¨/׳™ ׳›׳׳×-׳¦׳ ׳׳₪׳ ׳™ ׳”׳׳¢׳‘׳¨ ׳-H.', 'warn');
+                setFeedback('בחר/י קודם כמת נסתר לפני המעבר לשלב הגישור.', 'warn');
                 render();
                 return;
             }
@@ -12244,14 +12299,14 @@ function setupWrinkleGame() {
             if (!state.round.hypothesisDraft || state.round.hypothesisDraft.includes('___')) {
                 state.round.hypothesisDraft = wr2wBuildHypothesisSkeleton(scene, state.round.selectedQuantifier);
             }
-            setFeedback('׳ ׳¡׳—/׳™ ׳׳₪׳™ ׳”׳˜׳׳₪׳׳˜ ׳•׳’׳©/׳™ ׳׳‘׳“׳™׳§׳× Evaluator.', 'info');
+            setFeedback('נסח/י גישור לפי התבנית ושלח/י לבדיקה.', 'info');
             render();
             return;
         }
         if (action === 'submit-hypothesis') {
             const draft = String(state.round.hypothesisDraft || '').trim();
             if (draft.length < 20) {
-                setFeedback('׳ ׳“׳¨׳© ׳ ׳™׳¡׳•׳— ׳׳׳ ׳™׳•׳×׳¨ ׳©׳ ׳”׳™׳₪׳•׳×׳–׳”.', 'warn');
+                setFeedback('נדרש ניסוח מלא יותר של הגשר כדי לבדוק הלימה.', 'warn');
                 render();
                 return;
             }
@@ -12259,10 +12314,10 @@ function setupWrinkleGame() {
             if (!evalResult.ok) {
                 state.analytics = wr2wPathCore.markStuck(state.analytics, 'H');
                 const missing = [];
-                if (!evalResult.hasOwnership) missing.push('׳‘׳¢׳׳•׳× (׳׳׳©׳: "׳¢׳•׳׳” ׳׳™...")');
-                if (!evalResult.hasQuantifier) missing.push('׳”׳›׳׳× ׳©׳ ׳‘׳—׳¨');
-                if (!evalResult.hasCheck) missing.push('׳‘׳“׳™׳§׳” (׳׳׳©׳: "׳–׳” ׳§׳¨׳•׳‘... ׳׳• ׳©׳׳ ׳™ ׳׳©׳׳™׳?")');
-                setFeedback(`׳¦׳¨׳™׳ ׳׳”׳©׳׳™׳: ${missing.join(' | ')}.`, 'warn');
+                if (!evalResult.hasOwnership) missing.push('בעלות על ההשערה (למשל: "עולה לי...")');
+                if (!evalResult.hasQuantifier) missing.push('הכמת שבחרת');
+                if (!evalResult.hasCheck) missing.push('שאלת בדיקה (למשל: "זה קרוב למה שהתכוונת, או שאני משלים/ה?")');
+                setFeedback(`כדי שהגישור יהיה מדויק יותר, כדאי להשלים: ${missing.join(' | ')}.`, 'warn');
                 render();
                 return;
             }
@@ -12272,13 +12327,13 @@ function setupWrinkleGame() {
             markCriterion('hypothesis');
             playUISound('wr2w_submit');
             state.round.step = 'C';
-            setFeedback('׳׳¢׳•׳׳”. ׳¢׳›׳©׳™׳• ׳©׳•׳׳—׳™׳ ׳׳׳˜׳•׳₪׳ ׳׳§׳‘׳ ׳׳™׳©׳•׳¨/׳×׳™׳§׳•׳.', 'success');
+            setFeedback('מעולה. עכשיו נבדוק מול "המטופל" אם זה מרגיש לו מדויק או שצריך תיקון.', 'success');
             render();
             return;
         }
         if (action === 'send-hypothesis') {
             if (!state.round.hypothesisFinal) {
-                setFeedback('׳§׳•׳“׳ ׳‘׳¦׳¢/׳™ ׳‘׳“׳™׳§׳× Evaluator ׳‘׳©׳׳‘ H.', 'warn');
+                setFeedback('קודם בדוק/י את הגישור בשלב H ורק אחר כך שלח/י לאישור.', 'warn');
                 render();
                 return;
             }
@@ -12303,7 +12358,7 @@ function setupWrinkleGame() {
             if (status === 'yes') {
                 state.round.confirmResolved = true;
                 markCriterion('confirm');
-                setFeedback('׳”׳×׳§׳‘׳ ׳׳™׳©׳•׳¨. ׳׳₪׳©׳¨ ׳׳”׳×׳§׳“׳ ׳-PATH.', tone);
+                setFeedback('התקבל אישור. אפשר להמשיך לבחירת כיוון העבודה (PATH).', tone);
             } else {
                 state.analytics = wr2wPathCore.markStuck(state.analytics, 'C');
                 if (state.round.confirmCorrections < 2) {
@@ -12311,17 +12366,17 @@ function setupWrinkleGame() {
                     if (state.round.confirmCorrections >= 2) {
                         state.round.confirmResolved = true;
                         markCriterion('confirm');
-                        setFeedback('׳”׳•׳©׳׳׳• 2 ׳×׳™׳§׳•׳ ׳™ C. ׳׳׳©׳™׳›׳™׳ ׳-PATH ׳¢׳ ׳›׳™׳•׳ ׳–׳”׳™׳¨.', 'info');
+                        setFeedback('נעשו 2 תיקונים בשלב האישור. נמשיך ל-PATH עם כיוון זהיר ומדויק.', 'info');
                         render();
                         return;
                     }
                     state.round.confirmResolved = false;
                     const left = Math.max(0, 2 - state.round.confirmCorrections);
-                    setFeedback(`׳”׳×׳§׳‘׳ ׳×׳™׳§׳•׳. ׳—׳–׳•׳¨/׳™ ׳-H ׳׳©׳™׳₪׳•׳¨ (׳ ׳•׳×׳¨׳• ${left} ׳×׳™׳§׳•׳ ׳™׳ ׳׳₪׳ ׳™ PATH).`, tone);
+                    setFeedback(`עלה צורך בתיקון. חזור/י לשלב H לשיפור הגישור (נותרו ${left} תיקונים לפני PATH).`, tone);
                 } else {
                     state.round.confirmResolved = true;
                     markCriterion('confirm');
-                    setFeedback('׳׳׳—׳¨ 2 ׳×׳™׳§׳•׳ ׳™׳ ׳׳׳©׳™׳›׳™׳ ׳¢׳ ׳›׳™׳•׳ ׳—׳׳§׳™. ׳׳₪׳©׳¨ ׳׳”׳×׳§׳“׳ ׳-PATH.', 'info');
+                    setFeedback('אחרי שני תיקונים נמשיך עם הלימה חלקית ונבחר כיוון עבודה.', 'info');
                 }
             }
             render();
@@ -12330,19 +12385,19 @@ function setupWrinkleGame() {
         if (action === 'revise-hypothesis') {
             playUISound('tap_soft');
             state.round.step = 'H';
-            setFeedback('׳—׳–׳¨׳” ׳-H ׳׳×׳™׳§׳•׳ ׳”׳”׳™׳₪׳•׳×׳–׳” ׳׳₪׳ ׳™ PATH.', 'info');
+            setFeedback('חזרנו לשלב H כדי ללטש את הגישור לפני בחירת כיוון.', 'info');
             render();
             return;
         }
         if (action === 'goto-path') {
             if (!wr2wPathCore.canEnterPath(state.round)) {
-                setFeedback('׳׳™ ׳׳₪׳©׳¨ ׳׳”׳™׳›׳ ׳¡ ׳-PATH ׳׳₪׳ ׳™ ׳׳™׳©׳•׳¨ C (׳¢׳ ׳¢׳“ 2 ׳×׳™׳§׳•׳ ׳™׳).', 'warn');
+                setFeedback('אי אפשר להיכנס ל-PATH לפני שלב האישור (C), כולל עד שני תיקונים.', 'warn');
                 render();
                 return;
             }
             playUISound('next');
             state.round.step = 'P';
-            setFeedback('׳‘׳—׳¨/׳™ PATH: Outside / Inside / Both.', 'info');
+            setFeedback('בחר/י עכשיו כיוון עבודה שמתאים למה שנפתח כאן: חוץ, פנים או גשר.', 'info');
             render();
             return;
         }
@@ -12351,42 +12406,42 @@ function setupWrinkleGame() {
             if (!['outside', 'inside', 'both'].includes(pathChoice)) return;
             state.round.pathChoice = pathChoice;
             markCriterion('path', 'wr2w_path');
-            setFeedback(`׳ ׳‘׳—׳¨ PATH: ${pathChoice}.`, 'success');
+            setFeedback(`נבחר כיוון עבודה: ${wr2wPathTherapeuticLabel(pathChoice)}.`, 'success');
             render();
             return;
         }
         if (action === 'goto-e') {
             if (!wr2wPathCore.canEnterPath(state.round)) {
-                setFeedback('׳׳™ ׳׳₪׳©׳¨ ׳׳”׳™׳›׳ ׳¡ ׳-E/L ׳׳₪׳ ׳™ ׳׳™׳©׳•׳¨ C.', 'warn');
+                setFeedback('אי אפשר לעבור לשלב החריג/למידה לפני אישור בשלב C.', 'warn');
                 render();
                 return;
             }
             if (!wr2wPathCore.canEnterException(state.round)) {
-                setFeedback('׳‘׳—׳¨/׳™ ׳§׳•׳“׳ PATH ׳׳₪׳ ׳™ ׳”׳׳¢׳‘׳¨ ׳-E/L.', 'warn');
+                setFeedback('בחר/י קודם כיוון PATH לפני המעבר לחריג ולמידה.', 'warn');
                 render();
                 return;
             }
             if (!state.round.confirmation) {
-                setFeedback('׳©׳׳—/׳™ ׳§׳•׳“׳ ׳”׳™׳₪׳•׳×׳–׳” ׳׳׳˜׳•׳₪׳.', 'warn');
+                setFeedback('שלח/י קודם את הגישור לבדיקת הלימה מול "המטופל".', 'warn');
                 render();
                 return;
             }
             playUISound('next');
             state.round.step = 'E';
-            setFeedback('׳׳ ׳׳™׳ ׳—׳¨׳™׳’ - ׳¢׳•׳‘׳¨׳™׳ ׳׳“׳¨׳’׳” ׳‘׳¡׳•׳׳ ׳”׳₪׳¨׳™׳¦׳”. ׳ ׳¡׳—/׳™ ׳׳׳™׳“׳” ׳׳₪׳™ PATH ׳©׳ ׳‘׳—׳¨.', 'info');
+            setFeedback('אם אין חריג מיידי, נתקדם בסולם הפריצה בהדרגה וננסח למידה לפי כיוון ה-PATH שבחרת.', 'info');
             render();
             return;
         }
         if (action === 'set-breakout-level') {
             state.round.breakoutLevel = Math.max(0, Math.min(3, Number(button.getAttribute('data-level') || 0)));
             playUISound('select_soft');
-            setFeedback(`׳ ׳‘׳—׳¨׳” ${WR2W_BREAKOUT_STEPS[state.round.breakoutLevel].label}.`, 'info');
+                setFeedback(`נבחרה דרגת בדיקה: ${WR2W_BREAKOUT_STEPS[state.round.breakoutLevel].label}.`, 'info');
             render();
             return;
         }
         if (action === 'autofill-learning') {
             if (!state.round.breakoutFound) {
-                setFeedback('׳§׳•׳“׳ ׳׳¦׳׳• ׳—׳¨׳™׳’/׳×׳ ׳׳™ ׳•׳׳– ׳׳₪׳©׳¨ ׳׳™׳¦׳•׳¨ ׳ ׳™׳¡׳•׳— ׳׳•׳˜׳•׳׳˜׳™.', 'warn');
+                setFeedback('קודם מצאו חריג/תנאי, ואז אפשר ליצור ניסוח למידה אוטומטי.', 'warn');
                 render();
                 return;
             }
@@ -12394,8 +12449,8 @@ function setupWrinkleGame() {
             playUISound(didGenerate ? 'hint' : 'wr2w_confirm_no');
             setFeedback(
                 didGenerate
-                    ? '׳ ׳•׳¦׳¨ ׳ ׳™׳¡׳•׳— ׳׳׳™׳“׳” ׳׳•׳˜׳•׳׳˜׳™. ׳׳₪׳©׳¨ ׳׳¢׳¨׳•׳ ׳׳• ׳׳¡׳™׳™׳ ׳¡׳‘׳‘.'
-                    : '׳׳ ׳ ׳•׳¦׳¨ ׳ ׳™׳¡׳•׳— ׳—׳“׳© - ׳‘׳“׳§׳• ׳©׳‘׳—׳¨׳×׳ PATH.',
+                    ? 'נוצר ניסוח למידה אוטומטי. אפשר לערוך אותו או לסיים את הסבב.'
+                    : 'לא נוצר ניסוח חדש. בדקו שנבחר PATH מתאים.',
                 'info'
             );
             render();
@@ -12410,19 +12465,19 @@ function setupWrinkleGame() {
                 const autoBuilt = applyAutoLearningDrafts(scene, false);
                 setFeedback(
                     autoBuilt
-                        ? '׳ ׳׳¦׳ ׳—׳¨׳™׳’/׳×׳ ׳׳™ ׳•׳ ׳‘׳ ׳” ׳ ׳™׳¡׳•׳— ׳׳׳™׳“׳” ׳׳•׳˜׳•׳׳˜׳™. ׳׳₪׳©׳¨ ׳׳¢׳¨׳•׳ ׳׳• ׳׳¡׳™׳™׳.'
-                        : '׳ ׳׳¦׳ ׳—׳¨׳™׳’/׳×׳ ׳׳™. ׳׳₪׳©׳¨ ׳׳™׳¦׳•׳¨ ׳ ׳™׳¡׳•׳— ׳׳•׳˜׳•׳׳˜׳™ ׳׳• ׳׳¢׳¨׳•׳ ׳™׳“׳ ׳™׳×.',
+                        ? 'נמצא חריג/תנאי, ובנינו גם ניסוח למידה אוטומטי. אפשר לערוך או לסיים.'
+                        : 'נמצא חריג/תנאי. אפשר ליצור ניסוח אוטומטי או לנסח ידנית.',
                     'success'
                 );
             } else if (state.round.breakoutLevel < 3) {
-                setFeedback('׳¢׳•׳“ ׳׳ ׳ ׳׳¦׳ ׳—׳¨׳™׳’. ׳¢׳‘׳•׳¨/׳™ ׳׳׳“׳¨׳’׳” ׳”׳‘׳׳” ׳‘׳¡׳•׳׳.', 'warn');
+                setFeedback('עדיין לא נמצא חריג. עברו/י לדרגת הבדיקה הבאה בסולם.', 'warn');
             } else {
                 state.round.breakoutFound = true;
                 const autoBuilt = applyAutoLearningDrafts(scene, false);
                 setFeedback(
                     autoBuilt
-                        ? '׳׳ ׳ ׳׳¦׳ ׳—׳¨׳™׳’ ׳—׳“, ׳׳‘׳ ׳ ׳‘׳ ׳” ׳ ׳™׳¡׳•׳— ׳׳•׳˜׳•׳׳˜׳™ ׳׳×׳ ׳׳™ ׳”׳—׳•׳–׳§.'
-                        : '׳׳ ׳ ׳׳¦׳ ׳—׳¨׳™׳’ ׳—׳“. ׳׳₪׳©׳¨ ׳׳™׳¦׳•׳¨ ׳ ׳™׳¡׳•׳— ׳׳•׳˜׳•׳׳˜׳™ ׳׳×׳ ׳׳™ ׳”׳—׳•׳–׳§.',
+                        ? 'לא נמצא חריג חד, אבל נבנה ניסוח למידה מותנה מהחומר שכן עלה.'
+                        : 'לא נמצא חריג חד. אפשר ליצור ניסוח למידה מותנה מהחומר שכן עלה.',
                     'warn'
                 );
                 playUISound('wr2w_confirm_no');
@@ -12439,12 +12494,12 @@ function setupWrinkleGame() {
             const insideText = String(state.round.learningInsideDraft || '').trim();
 
             if (pathChoice === 'both' && (!outsideText || !insideText)) {
-                setFeedback('׳‘׳ ׳×׳™׳‘ BOTH ׳ ׳“׳¨׳©׳™׳ ׳©׳ ׳™ ׳׳©׳₪׳˜׳™ ׳׳׳™׳“׳”: Outside + Inside.', 'warn');
+                setFeedback('במסלול גשר (Both) צריך להשלים שני ניסוחי למידה: חוץ + פנים.', 'warn');
                 render();
                 return;
             }
             if ((pathChoice === 'outside' || pathChoice === 'inside') && singleText.length < 12) {
-                setFeedback('׳ ׳“׳¨׳© ׳׳©׳₪׳˜ ׳׳׳™׳“׳” ׳׳׳ ׳™׳•׳×׳¨.', 'warn');
+                setFeedback('נדרש משפט למידה מלא יותר לפני סיום הסבב.', 'warn');
                 render();
                 return;
             }
@@ -12457,15 +12512,15 @@ function setupWrinkleGame() {
             if (!learningEval.ok) {
                 const reasons = [];
                 if (learningEval.mode === 'outside') {
-                    if (!learningEval.outside?.hasCondition) reasons.push('Outside: ׳”׳•׳¡׳£/׳™ ׳×׳ ׳׳™ (׳‘׳¢׳™׳§׳¨ ׳›׳©/׳׳₪׳¢׳׳™׳ ׳›׳©/׳‘׳×׳ ׳׳™׳).');
-                    if (!learningEval.outside?.hasPattern) reasons.push('Outside: ׳ ׳¡׳—/׳™ ׳“׳₪׳•׳¡ ׳₪׳•׳ ׳§׳¦׳™׳•׳ ׳׳™ (׳׳׳©׳ "׳׳ ׳¢׳§׳‘׳™").');
-                    if (!learningEval.outside?.avoidsRigidAbsolute) reasons.push('Outside: ׳”׳—׳׳£/׳™ ׳ ׳™׳¡׳•׳— ׳׳‘׳¡׳•׳׳•׳˜׳™ ׳‘׳ ׳™׳¡׳•׳— ׳׳•׳×׳ ׳”.');
+                    if (!learningEval.outside?.hasCondition) reasons.push('חוץ: הוסף/י תנאי (למשל "כש...", "בתנאים מסוימים", "לפעמים").');
+                    if (!learningEval.outside?.hasPattern) reasons.push('חוץ: נסח/י דפוס תפקודי ברור (למשל מה קורה בפועל).');
+                    if (!learningEval.outside?.avoidsRigidAbsolute) reasons.push('חוץ: החלף/י ניסוח מוחלט בניסוח מותנה ומדויק יותר.');
                 } else if (learningEval.mode === 'inside') {
-                    if (!learningEval.inside?.hasCondition) reasons.push('Inside: ׳”׳•׳¡׳£/׳™ ׳×׳ ׳׳™ (׳‘׳¢׳™׳§׳¨ ׳›׳©/׳׳₪׳¢׳׳™׳ ׳›׳©/׳‘׳×׳ ׳׳™׳).');
-                    if (!learningEval.inside?.hasInnerFrame) reasons.push('Inside: ׳©׳׳•׳¨/׳™ ׳¢׳ ׳׳¡׳’׳•׳¨ ׳—׳•׳•׳™׳™׳×׳™ ("׳׳¨׳’׳™׳©/׳‘׳₪׳ ׳™׳/׳‘׳’׳•׳£").');
+                    if (!learningEval.inside?.hasCondition) reasons.push('פנים: הוסף/י תנאי (למשל "כש...", "לפעמים", "בתנאים מסוימים").');
+                    if (!learningEval.inside?.hasInnerFrame) reasons.push('פנים: שמור/י על ניסוח חווייתי (רגש/גוף/בפנים), לא רק עובדות.');
                 } else {
-                    if (!learningEval.outside?.ok) reasons.push('Outside ׳׳™׳ ׳• ׳©׳׳ ׳¢׳“׳™׳™׳ (׳“׳₪׳•׳¡ + ׳×׳ ׳׳™׳).');
-                    if (!learningEval.inside?.ok) reasons.push('Inside ׳׳™׳ ׳• ׳©׳׳ ׳¢׳“׳™׳™׳ (׳—׳•׳•׳™׳” + ׳×׳ ׳׳™׳).');
+                    if (!learningEval.outside?.ok) reasons.push('חוץ עדיין לא שלם (דפוס + תנאים).');
+                    if (!learningEval.inside?.ok) reasons.push('פנים עדיין לא שלם (חוויה + תנאים).');
                 }
                 setFeedback(reasons.join(' '), 'warn');
                 render();
@@ -12494,6 +12549,7 @@ function setupWrinkleGame() {
     };
 
     els.stepBody.addEventListener('click', handleAction);
+    els.signalInline?.addEventListener('click', handleAction);
     els.stepBody.addEventListener('input', (event) => {
         const target = event.target;
         if (target.id === 'wr2w-hypothesis-input') {
@@ -12514,7 +12570,7 @@ function setupWrinkleGame() {
     els.resetRound?.addEventListener('click', () => {
         resetRoundState();
         playUISound('skip');
-        setFeedback('׳”׳¡׳‘׳‘ ׳׳•׳₪׳¡. ׳׳×׳—׳™׳׳™׳ ׳©׳•׳‘ ׳‘-S.', 'info');
+        setFeedback('הסבב אופס. מתחילים שוב משלב S (מה עולה מתחת למשפט).', 'info');
         render();
     });
 
