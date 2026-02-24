@@ -193,6 +193,70 @@
         return 'Mind Reading כולל גם קריאת מחשבות עצמית ("אני רעב/פגוע/לא מסוגל" - איך אני יודע/ת?) וגם קפיצה למסקנות.';
     }
 
+    function normalizeQuestionVariantText(text) {
+        let value = String(text || '').trim().replace(/\s+/g, ' ');
+        if (!value) return '';
+        value = value.replace(/[.:]+$/, '').trim();
+        if (!/[?？]$/.test(value)) value = `${value}?`;
+        return value;
+    }
+
+    function uniqueQuestionList(list) {
+        const out = [];
+        const seen = new Set();
+        (Array.isArray(list) ? list : []).forEach((item) => {
+            const value = normalizeQuestionVariantText(item);
+            if (!value) return;
+            const key = value.toLowerCase();
+            if (seen.has(key)) return;
+            seen.add(key);
+            out.push(value);
+        });
+        return out;
+    }
+
+    function buildQuestionVariantPack({ category, selectionText, contextText, stepIndex }) {
+        const selection = String(selectionText || '').trim();
+        const context = String(contextText || '').trim();
+        const baseQuestions = uniqueQuestionList(category && category.primaryQuestions);
+        const fallbackCoreQuestion = String(core.generateQuestion({
+            category,
+            selectionText,
+            contextText,
+            stepIndex
+        }) || '').trim();
+
+        const firstBase = baseQuestions[0] || normalizeQuestionVariantText(fallbackCoreQuestion) || 'מה בדיוק קורה כאן?';
+        const shortSelection = selection.length > 44 ? `${selection.slice(0, 41)}...` : selection;
+        const shortContext = context.length > 64 ? `${context.slice(0, 61)}...` : context;
+
+        const wrappedVariants = [];
+        if (shortSelection) {
+            wrappedVariants.push(`כשאת/ה אומר/ת "${shortSelection}" — ${firstBase}`);
+            wrappedVariants.push(`בוא/י נדייק את "${shortSelection}": ${firstBase}`);
+            wrappedVariants.push(`כדי להבין את "${shortSelection}" טוב יותר: ${firstBase}`);
+        }
+        if (shortContext) {
+            wrappedVariants.push(`בתוך ההקשר הזה, ${firstBase}`);
+        }
+
+        const allVariants = uniqueQuestionList([
+            ...baseQuestions,
+            ...wrappedVariants,
+            fallbackCoreQuestion
+        ]).slice(0, 6);
+
+        const selectedIndex = allVariants.length
+            ? Math.abs(Number(stepIndex) || 0) % allVariants.length
+            : 0;
+
+        return {
+            selectedIndex,
+            selectedQuestion: allVariants[selectedIndex] || firstBase,
+            variants: allVariants
+        };
+    }
+
     function tokenizeText(text) {
         const source = String(text || '');
         const out = [];
@@ -317,12 +381,13 @@
 
         const stepIndex = state.session.nodes.length;
         const selectionText = getSelectedText();
-        const questionText = core.generateQuestion({
+        const questionPack = buildQuestionVariantPack({
             category,
             selectionText,
             contextText: state.currentContextText,
             stepIndex
         });
+        const questionText = questionPack.selectedQuestion;
         const answerGen = core.generateContinuityAnswer({
             category,
             selectionText,
@@ -351,6 +416,8 @@
             nodeId: node.nodeId,
             categoryLabelHe: node.categoryLabelHe,
             questionText,
+            questionVariants: questionPack.variants,
+            selectedQuestionIndex: questionPack.selectedIndex,
             answerText: node.answerText,
             generatedSentence: node.generatedSentence
         };
@@ -385,6 +452,28 @@
         resetSelection();
         resetPendingQa();
         state.uiMessage = 'המשכנו מהתשובה. עכשיו אפשר לסמן את המשפט החדש.';
+        render();
+        persistState();
+    }
+
+    function pickPendingQuestionVariant(variantIndex) {
+        if (!state.pendingQA || !Array.isArray(state.pendingQA.questionVariants)) return;
+        const idx = Number(variantIndex);
+        if (!Number.isInteger(idx)) return;
+        const nextQuestion = String(state.pendingQA.questionVariants[idx] || '').trim();
+        if (!nextQuestion) return;
+
+        state.pendingQA.selectedQuestionIndex = idx;
+        state.pendingQA.questionText = nextQuestion;
+
+        const node = state.session && Array.isArray(state.session.nodes)
+            ? state.session.nodes.find(item => item.nodeId === state.pendingQA.nodeId)
+            : null;
+        if (node) {
+            node.questionText = nextQuestion;
+        }
+
+        state.uiMessage = 'עודכן ניסוח השאלה לאותה קטגוריה (אותה כוונה טיפולית, ניסוח אחר).';
         render();
         persistState();
     }
@@ -748,15 +837,42 @@
                 </div>
             `;
         }
+        const variants = Array.isArray(state.pendingQA.questionVariants) ? state.pendingQA.questionVariants : [];
+        const selectedVariantIndex = Number.isInteger(state.pendingQA.selectedQuestionIndex)
+            ? state.pendingQA.selectedQuestionIndex
+            : variants.findIndex((item) => String(item || '').trim() === String(state.pendingQA.questionText || '').trim());
+        const variantsHtml = variants.length > 1 ? `
+            <div class="prm-question-variants">
+                <div class="prm-question-variants-head">
+                    <strong>ניסוחים חלופיים לאותה שאלה (אותה כוונה טיפולית)</strong>
+                    <small>אפשר לבחור ניסוח שמרגיש לך טבעי יותר מול המטופל/ת.</small>
+                </div>
+                <div class="prm-question-variants-list">
+                    ${variants.map((variant, index) => `
+                        <button
+                            type="button"
+                            class="prm-question-variant-btn ${index === selectedVariantIndex ? 'is-active' : ''}"
+                            data-action="pick-question-variant"
+                            data-variant-index="${index}"
+                            aria-pressed="${index === selectedVariantIndex ? 'true' : 'false'}"
+                        >
+                            <span class="prm-question-variant-index">${index + 1}</span>
+                            <span>${escapeHtml(variant)}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        ` : '';
         return `
             <div class="prm-card prm-qa-panel">
                 <h3>מהלך חקירה הבא</h3>
                 <p class="prm-kicker">פריזמה שנבחרה: ${escapeHtml(state.pendingQA.categoryLabelHe)}</p>
                 <div class="prm-qa-block">
-                    <div><strong>שאלה:</strong> ${escapeHtml(state.pendingQA.questionText)}</div>
+                    <div><strong>השאלה שנבחרה כרגע:</strong> ${escapeHtml(state.pendingQA.questionText)}</div>
                     <div><strong>תשובת המשך:</strong> ${escapeHtml(state.pendingQA.answerText)}</div>
                     <div><strong>משפט חדש שנולד:</strong> ${escapeHtml(state.pendingQA.generatedSentence)}</div>
                 </div>
+                ${variantsHtml}
                 <div class="prm-nav-actions">
                     <button type="button" class="prm-big-btn secondary" data-action="back-base">חזרה לטקסט המרכזי</button>
                     <button type="button" class="prm-big-btn primary" data-action="continue-answer">המשך מתוך תשובת ההמשך</button>
@@ -976,6 +1092,7 @@
         if (action === 'load-demo') return loadDemoStory();
         if (action === 'toggle-base-editor') return toggleBaseStoryEditor();
         if (action === 'apply-base') return setBaseStoryFromTextarea();
+        if (action === 'pick-question-variant') return pickPendingQuestionVariant(Number(button.dataset.variantIndex));
         if (action === 'reset-session') return createFreshSession(getBaseStoryEditorValue() || ((state.session && state.session.baseStoryText) || DEMO_STORY));
         if (action === 'clear-session') return clearSavedSession();
     }
