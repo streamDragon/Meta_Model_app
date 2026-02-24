@@ -7483,6 +7483,74 @@ function setupCommunityFeedbackWall() {
 
 let blueprintData = {};
 
+function blueprintSplitList(value) {
+    return String(value || '')
+        .split(/[|\n,]+/)
+        .map(item => item.trim())
+        .filter(Boolean);
+}
+
+function blueprintJoinListNatural(items) {
+    const clean = (items || []).map(item => String(item || '').trim()).filter(Boolean);
+    if (!clean.length) return '';
+    if (clean.length === 1) return clean[0];
+    if (clean.length === 2) return `${clean[0]} ו-${clean[1]}`;
+    return `${clean.slice(0, -1).join(', ')} ו-${clean[clean.length - 1]}`;
+}
+
+function buildBlueprintTherapistSummaryText() {
+    const blockers = blueprintSplitList(blueprintData.resourceBlockers || blueprintData.friction);
+    const enablers = blueprintSplitList(blueprintData.resourceEnablers || blueprintData.prerequisites);
+    const valuesIfYes = blueprintSplitList(blueprintData.valuesIfYes);
+    const valuesIfNo = blueprintSplitList(blueprintData.valuesIfNo);
+    const ability = Number(blueprintData.ability || 0);
+    const importance = String(blueprintData.resourceImportance || '').trim();
+
+    const parts = [];
+    parts.push(`אם אני מסכם/ת אותך: יש כאן רצון ברור להגיע ל"${blueprintData.success || 'תוצאה רצויה'}" דרך הפעולה "${blueprintData.action || ''}".`);
+    parts.push(`כרגע את/ה מעריך/ה את היכולת ב-${Number.isFinite(ability) ? ability : 0}/10, וזה לא אומר שאין יכולת — אלא שיש פער שצריך לגשר עליו בצורה מדויקת.`);
+
+    if (blockers.length) {
+        parts.push(`הקשיים המרכזיים כרגע הם ${blueprintJoinListNatural(blockers)}.`);
+    }
+    if (enablers.length) {
+        parts.push(`המשאבים שכבר זמינים לך הם ${blueprintJoinListNatural(enablers)} — וזה בסיס חשוב שאפשר לעבוד ממנו.`);
+    }
+    if (importance) {
+        parts.push(`זה חשוב לך עכשיו כי ${importance}.`);
+    }
+    if (valuesIfYes.length || valuesIfNo.length) {
+        const yesText = valuesIfYes.length ? `אם תתקדם/י, יתממשו ערכים כמו ${blueprintJoinListNatural(valuesIfYes)}` : '';
+        const noText = valuesIfNo.length ? `אם לא תתקדם/י, עלולים להיפגע ערכים כמו ${blueprintJoinListNatural(valuesIfNo)}` : '';
+        parts.push([yesText, noText].filter(Boolean).join('. ') + '.');
+    }
+    if (blueprintData.firstStep) {
+        parts.push(`לכן השלב הבא שנבחר הוא להתחיל ב-"${blueprintData.firstStep}" בתוך מסגרת זמן של ${blueprintData.time || '30 דקות'}, עם Plan B ברור אם יהיה קושי.`);
+    }
+    return parts.join(' ');
+}
+
+function buildBlueprintGuidedImageryText() {
+    const firstStep = String(blueprintData.firstStep || '').trim();
+    const success = String(blueprintData.success || '').trim();
+    const enablers = blueprintSplitList(blueprintData.resourceEnablers || blueprintData.prerequisites);
+    const valuesIfYes = blueprintSplitList(blueprintData.valuesIfYes);
+    const timeText = String(blueprintData.time || '30 דקות').trim();
+
+    const anchorResource = enablers[0] || 'המשאב שכבר עומד לרשותך';
+    const anchorValue = valuesIfYes[0] || 'תחושת מסוגלות';
+
+    return [
+        'קח/י נשימה איטית אחת, ושימי/ם לב לגוף בכיסא.',
+        `דמיין/י את עצמך מתחיל/ה בצעד הראשון: "${firstStep || 'הצעד הראשון שבחרת'}".`,
+        `שימי/ם לב איך ${anchorResource} עוזר לך להישאר בתנועה שקטה ומדויקת.`,
+        `דמיין/י ${timeText} של עבודה ממוקדת, צעד אחרי צעד, בלי לרוץ קדימה.`,
+        `ואז ראה/י את התוצאה מתחילה להתבהר: "${success || 'התוצאה הרצויה שלך'}".`,
+        `שימי/ם לב איזה ערך מתממש בפנים כשזה קורה — למשל ${anchorValue}.`,
+        'קח/י נשימה נוספת, וחזור/י עם משפט קצר: "אני מתחיל/ה בצעד אחד ברור, לא בכל הדרך בבת אחת".'
+    ].join(' ');
+}
+
 function setupBlueprintBuilder() {
     // Step 1: Extract Button
     const extractBtn = document.getElementById('extract-btn');
@@ -7578,6 +7646,11 @@ function extractAndMoveToStep4() {
     blueprintData.assumption = document.getElementById('q-assumption').value.trim();
     blueprintData.ability = document.getElementById('q-ability').value;
     blueprintData.gap = document.getElementById('q-gap').value.trim();
+    blueprintData.resourceBlockers = document.getElementById('q-resource-blockers')?.value.trim() || '';
+    blueprintData.resourceEnablers = document.getElementById('q-resource-enablers')?.value.trim() || '';
+    blueprintData.resourceImportance = document.getElementById('q-resource-importance')?.value.trim() || '';
+    blueprintData.valuesIfYes = document.getElementById('q-values-if-yes')?.value.trim() || '';
+    blueprintData.valuesIfNo = document.getElementById('q-values-if-no')?.value.trim() || '';
 
     if (!blueprintData.whoExpects || !blueprintData.ability) {
         alert('׳‘׳•׳׳ ׳×׳׳׳ ׳׳× ׳׳™ ׳׳¦׳₪׳” ׳•׳”׳¢׳¨׳›׳× ׳™׳›׳•׳׳×');
@@ -7608,84 +7681,116 @@ function updateReframeBox() {
 
 function generateFinalBlueprint() {
     const whoExpectsMap = {
-        'self': '׳׳ ׳™ ׳‘׳¢׳¦׳׳™',
-        'other': '׳׳™׳©׳”׳• ׳׳—׳¨',
-        'system': '׳׳¢׳¨׳›׳×/׳—׳•׳§/׳“׳“׳׳™׳™׳'
+        self: 'אני בעצמי',
+        other: 'מישהו אחר',
+        system: 'מערכת / חוק / דדליין'
     };
+    const middleStepsList = blueprintSplitList(blueprintData.middleSteps);
+    const prereqList = blueprintSplitList(blueprintData.prerequisites);
+    const blockerList = blueprintSplitList(blueprintData.resourceBlockers || blueprintData.friction);
+    const enablerList = blueprintSplitList(blueprintData.resourceEnablers);
+    const valuesYesList = blueprintSplitList(blueprintData.valuesIfYes);
+    const valuesNoList = blueprintSplitList(blueprintData.valuesIfNo);
+    const therapistSummary = buildBlueprintTherapistSummaryText();
+    const guidedImagery = buildBlueprintGuidedImageryText();
+    blueprintData.therapistSummary = therapistSummary;
+    blueprintData.guidedImagery = guidedImagery;
 
     const blueprint = document.getElementById('final-blueprint');
     blueprint.innerHTML = `
         <div class="blueprint-section">
-            <h4>נ“ ׳”׳₪׳¢׳•׳׳”:</h4>
-            <p>"${blueprintData.action}"</p>
+            <h4>הפעולה שעולה עכשיו</h4>
+            <p>"${escapeHtml(blueprintData.action || '')}"</p>
         </div>
 
         <div class="blueprint-section">
-            <h4>נ¯ ׳”׳×׳•׳¦׳׳” ׳”׳¨׳¦׳•׳™׳”:</h4>
-            <p>${blueprintData.success}</p>
+            <h4>התוצאה הרצויה (איך תדע/י שהצלחת)</h4>
+            <p>${escapeHtml(blueprintData.success || '')}</p>
         </div>
 
         <div class="blueprint-section">
-            <h4>נ“‹ ׳”׳×׳•׳›׳ ׳™׳×:</h4>
+            <h4>תוכנית ביצוע ברורה</h4>
             <ul>
-                <li><strong>׳¦׳¢׳“ ׳¨׳׳©׳•׳:</strong> ${blueprintData.firstStep}</li>
-                <li><strong>׳©׳׳‘׳™ ׳‘׳™׳ ׳™׳™׳:</strong> ${blueprintData.middleSteps || '(׳׳ ׳”׳•׳’׳“׳¨׳•)'}</li>
-                <li><strong>׳¦׳¢׳“ ׳׳—׳¨׳•׳:</strong> ${blueprintData.lastStep}</li>
+                <li><strong>צעד ראשון:</strong> ${escapeHtml(blueprintData.firstStep || '')}</li>
+                <li><strong>שלבי ביניים:</strong> ${escapeHtml(middleStepsList.join(' | ') || '(לא הוגדרו)')}</li>
+                <li><strong>צעד אחרון / סימן סיום:</strong> ${escapeHtml(blueprintData.lastStep || '')}</li>
             </ul>
         </div>
 
         <div class="blueprint-section">
-            <h4>ג™ן¸ ׳×׳ ׳׳™׳ ׳׳§׳“׳™׳׳™׳:</h4>
-            <p>${blueprintData.prerequisites || '(׳׳™׳)'}</p>
+            <h4>תנאים מקדימים</h4>
+            <p>${escapeHtml(prereqList.join(' | ') || '(אין)')}</p>
         </div>
 
         <div class="blueprint-section">
-            <h4>ג ן¸ ׳ ׳§׳•׳“׳•׳× ׳×׳§׳™׳¢׳” ׳¦׳₪׳•׳™׳•׳×:</h4>
-            <p>${blueprintData.friction}</p>
-            <strong>Plan B:</strong>
-            <p>${blueprintData.alternatives}</p>
+            <h4>קשיים צפויים + Plan B</h4>
+            <p><strong>איפה זה נוטה להיתקע:</strong> ${escapeHtml(blueprintData.friction || '(לא הוגדר)')}</p>
+            <p><strong>חלופה / עזרה אם נתקעים:</strong> ${escapeHtml(blueprintData.alternatives || '(לא הוגדר)')}</p>
         </div>
 
         <div class="blueprint-section">
-            <h4>ג±ן¸ ׳˜׳™׳™׳׳•׳׳˜:</h4>
-            <p>${blueprintData.time || '30 ׳“׳§׳•׳×'}</p>
+            <h4>מסגרת זמן</h4>
+            <p>${escapeHtml(blueprintData.time || '30 דקות')}</p>
         </div>
 
         <div class="blueprint-section">
-            <h4>נ“ ׳ ׳™׳×׳•׳— ׳¦׳™׳₪׳™׳•׳×:</h4>
+            <h4>פער ציפיות מול יכולת נוכחית</h4>
             <ul>
-                <li><strong>׳׳™ ׳׳¦׳₪׳”:</strong> ${whoExpectsMap[blueprintData.whoExpects] || blueprintData.whoExpects}</li>
-                <li><strong>׳”׳¦׳™׳₪׳™׳™׳”:</strong> ${blueprintData.expectation}</li>
-                <li><strong>׳™׳›׳•׳׳× ׳›׳¨׳’׳¢:</strong> ${blueprintData.ability}/10</li>
-                <li><strong>׳׳” ׳—׳¡׳¨:</strong> ${blueprintData.gap}</li>
+                <li><strong>מי מצפה:</strong> ${escapeHtml(whoExpectsMap[blueprintData.whoExpects] || blueprintData.whoExpects || '(לא הוגדר)')}</li>
+                <li><strong>מה הציפייה:</strong> ${escapeHtml(blueprintData.expectation || '(לא הוגדר)')}</li>
+                <li><strong>הנחה סמויה:</strong> ${escapeHtml(blueprintData.assumption || '(לא הוגדר)')}</li>
+                <li><strong>יכולת כרגע:</strong> ${escapeHtml(String(blueprintData.ability || '0'))}/10</li>
+                <li><strong>מה חסר כדי לעלות נקודה:</strong> ${escapeHtml(blueprintData.gap || '(לא הוגדר)')}</li>
             </ul>
         </div>
 
-        <div class="blueprint-section" style="background: #f0fff4; padding: 15px; border-radius: 8px;">
-            <h4>ג¨ ׳ ׳™׳¡׳•׳— ׳׳—׳“׳© (׳׳-׳׳׳©׳™׳):</h4>
-            <p><em>${document.getElementById('q-reframe').textContent}</em></p>
+        <div class="blueprint-section">
+            <h4>מיפוי מטפל/ת: קשיים, משאבים ומשמעות</h4>
+            <ul>
+                <li><strong>מה מונע כרגע:</strong> ${escapeHtml(blockerList.join(' | ') || '(לא הוגדר)')}</li>
+                <li><strong>מה כבר מאפשר:</strong> ${escapeHtml(enablerList.join(' | ') || '(לא הוגדר)')}</li>
+                <li><strong>למה זה חשוב עכשיו:</strong> ${escapeHtml(blueprintData.resourceImportance || '(לא הוגדר)')}</li>
+            </ul>
+        </div>
+
+        <div class="blueprint-section">
+            <h4>Meta Outcome – ערכים בתמונה הרחבה</h4>
+            <ul>
+                <li><strong>אם כן אעשה:</strong> ${escapeHtml(valuesYesList.join(' | ') || '(לא הוגדר)')}</li>
+                <li><strong>אם לא אעשה:</strong> ${escapeHtml(valuesNoList.join(' | ') || '(לא הוגדר)')}</li>
+            </ul>
+        </div>
+
+        <div class="blueprint-section blueprint-highlight-panel">
+            <h4>ניסוח מחדש (לא מאשים)</h4>
+            <p><em>${escapeHtml(document.getElementById('q-reframe')?.textContent || '')}</em></p>
         </div>
     `;
 
     // Generate Next Physical Action
     generateNextAction();
+
+    const therapistSummaryEl = document.getElementById('therapist-summary-content');
+    if (therapistSummaryEl) therapistSummaryEl.textContent = therapistSummary;
+    const guidedImageryEl = document.getElementById('guided-imagery-content');
+    if (guidedImageryEl) guidedImageryEl.textContent = guidedImagery;
 }
 
 function generateNextAction() {
     const nextActionBox = document.getElementById('next-physical-action');
     const ifStuckBox = document.getElementById('if-stuck-content');
 
-    const timebox = blueprintData.time ? blueprintData.time.split(' ')[0] : '45';
+    const timebox = blueprintData.time ? String(blueprintData.time).split(' ')[0] : '45';
     const nextAction = `
-        <strong>${blueprintData.firstStep}</strong>
-        <br/><small>(׳¦׳₪׳•׳™ ׳׳§׳—׳× ${timebox} ׳“׳§׳•׳× ׳׳©׳)</small>
+        <strong>${escapeHtml(blueprintData.firstStep || '')}</strong>
+        <br/><small>(מומלץ לתת לזה ${escapeHtml(timebox)} דקות של קשב רציף)</small>
     `;
 
     const ifStuck = `
-        <strong>׳׳ ׳ ׳×׳§׳¢׳× ׳‘׳—׳׳§ ׳”׳–׳”:</strong><br/>
-        ${blueprintData.friction ? blueprintData.friction + '<br/>' : ''}
+        <strong>אם נתקעים בשלב הזה:</strong><br/>
+        ${escapeHtml(blueprintData.friction || 'עצור/י, שים/י לב מה חסר כרגע, וחדד/י את הצעד.')}<br/>
         <strong>Plan B:</strong><br/>
-        ${blueprintData.alternatives || '׳‘׳§׳© ׳¢׳–׳¨׳” ׳׳• ׳ ׳¡׳” ׳—׳׳•׳₪׳”'}
+        ${escapeHtml(blueprintData.alternatives || 'בקש/י עזרה, קצר/י את המשימה, או בחר/י גרסה קטנה יותר')}
     `;
 
     nextActionBox.innerHTML = nextAction;
@@ -7693,7 +7798,7 @@ function generateNextAction() {
 }
 
 function startTenMinuteTimer() {
-    alert(`נ¯ ׳”׳×׳—׳׳×! ${blueprintData.firstStep}\n\n׳™׳© ׳׳ 10 ׳“׳§׳•׳×. ׳׳!`);
+    alert(`מתחילים עכשיו.\n\nהצעד הראשון שלך: ${blueprintData.firstStep || 'צעד ראשון'}\n\nיש לך 10 דקות. קדימה.`);
     // Could implement actual timer here
 }
 
