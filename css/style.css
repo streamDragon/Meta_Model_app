@@ -4142,25 +4142,34 @@ body.rapid-radar-focus #practice-radar #rapid-focus-exit-btn {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 8px;
+    gap: 6px 10px;
     align-items: center;
 }
 
 .wr2w-sentence-help {
     margin: 0;
     color: #5b6474;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     text-align: left;
+}
+
+.wr2w-sentence-card {
+    padding: 12px;
+    gap: 10px;
+}
+
+.wr2w-visible-sentence {
+    font-size: clamp(1.04rem, 2.8vw, 1.34rem);
 }
 
 .wr2w-visible-sentence {
     position: relative;
     border-radius: 18px;
-    padding: 16px 18px;
+    padding: 13px 15px;
     background: #fff;
     border: 1px solid #e8def5;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 14px 30px rgba(31, 17, 71, 0.07);
-    line-height: 1.5;
+    line-height: 1.55;
 }
 
 .wr2w-quantifier-glow {
@@ -4172,23 +4181,68 @@ body.rapid-radar-focus #practice-radar #rapid-focus-exit-btn {
     animation: wr2wGlowPulse 1.2s ease;
 }
 
+.wr2w-quantifier-insert {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-inline: 2px;
+    vertical-align: baseline;
+}
+
+.wr2w-quantifier-insert-label {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px dashed rgba(168, 85, 247, 0.35);
+    background: rgba(245, 243, 255, 0.95);
+    color: #6d28d9;
+    padding: 1px 6px;
+    font-size: 0.68rem;
+    font-weight: 900;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.wr2w-quantifier-glow--inserted {
+    border: 1px solid rgba(202, 138, 4, 0.45);
+    padding: 1px 6px;
+    white-space: nowrap;
+}
+
 @keyframes wr2wGlowPulse {
     0% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.45); }
     100% { box-shadow: 0 0 0 8px rgba(250, 204, 21, 0); }
 }
 
 .wr2w-layers {
-    gap: 10px;
+    gap: 8px;
 }
 
 .wr2w-layer-card {
     border-radius: 16px;
-    min-height: 110px;
-    padding: 12px;
+    min-height: 82px;
+    padding: 9px 10px;
+    display: grid;
+    gap: 4px;
+    align-content: start;
 }
 
 .wr2w-layer-card.is-active {
     transform: translateY(-2px);
+}
+
+.wr2w-layer-card h4 {
+    margin-bottom: 2px;
+    font-size: 0.83rem;
+}
+
+.wr2w-layer-card p {
+    font-size: 0.78rem;
+    line-height: 1.28;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .wr2w-layer-card.is-blue.is-active {
@@ -4212,9 +4266,10 @@ body.rapid-radar-focus #practice-radar #rapid-focus-exit-btn {
 
 .wr2w-context summary {
     cursor: pointer;
-    padding: 10px 12px;
+    padding: 8px 10px;
     font-weight: 800;
     color: #5b4a89;
+    font-size: 0.84rem;
 }
 
 .wr2w-context[open] summary {
@@ -4223,20 +4278,42 @@ body.rapid-radar-focus #practice-radar #rapid-focus-exit-btn {
 
 .wr2w-context .wr2w-monologue {
     margin: 0;
-    padding: 10px 12px 12px;
-    font-size: 0.85rem;
+    padding: 8px 10px 10px;
+    font-size: 0.8rem;
 }
 
 .wr2w-step-panel {
     border-radius: 18px;
     border-color: #e9def7;
     box-shadow: 0 16px 32px rgba(31, 17, 71, 0.06);
-    padding: 14px;
+    padding: 12px;
+}
+
+.wr2w-step-panel h4 {
+    font-size: 1rem;
+    line-height: 1.25;
+}
+
+.wr2w-step-instruction {
+    font-size: 0.82rem;
+    line-height: 1.35;
 }
 
 .wr2w-step-body {
     display: grid;
-    gap: 10px;
+    gap: 8px;
+}
+
+.wr2w-inline-hint {
+    margin: 0;
+    border: 1px dashed #ddd6fe;
+    background: rgba(248, 245, 255, 0.9);
+    color: #5b4a89;
+    border-radius: 12px;
+    padding: 7px 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.35;
 }
 
 .wr2w-step-hero {
@@ -4315,6 +4392,19 @@ body.rapid-radar-focus #practice-radar #rapid-focus-exit-btn {
     line-height: 1.35;
 }
 
+.wr2w-step-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: thin;
+}
+
+.wr2w-chip {
+    flex: 0 0 auto;
+    padding: 4px 9px;
+    font-size: 0.75rem;
+}
+
 @media (max-width: 760px) {
     .wr2w-actions--hero {
         grid-template-columns: 1fr;
@@ -4351,6 +4441,29 @@ body.rapid-radar-focus #practice-radar #rapid-focus-exit-btn {
 
     .wr2w-score-minor {
         display: none;
+    }
+
+    .wr2w-quantifier-insert-label {
+        display: none;
+    }
+}
+
+@media (max-width: 760px) and (min-width: 560px) {
+    .wr2w-layers {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .wr2w-layer-card {
+        min-height: 72px;
+        padding: 8px;
+    }
+
+    .wr2w-layer-card h4 {
+        font-size: 0.76rem;
+    }
+
+    .wr2w-layer-card p {
+        font-size: 0.74rem;
     }
 }
 /* Blueprint Builder */

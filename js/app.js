@@ -101,7 +101,10 @@ let audioState = {
     muted: false,
     openingPlayed: false,
     openingTrack: null,
-    firstEntryDone: false
+    firstEntryDone: false,
+    lastUiSoundAtMs: 0,
+    lastGlobalTapAtMs: 0,
+    globalInteractionBound: false
 };
 
 const OPENING_TRACK_SRC = 'assets/audio/The_Inner_Task.mp3';
@@ -319,6 +322,9 @@ function playTone(frequency, duration = 0.12, type = 'sine', volume = 0.05, dela
 
 function playUISound(kind) {
     if (audioState.muted) return;
+    audioState.lastUiSoundAtMs = (typeof performance !== 'undefined' && typeof performance.now === 'function')
+        ? performance.now()
+        : Date.now();
     if (kind === 'correct') {
         playTone(660, 0.12, 'triangle', 0.06, 0);
         playTone(880, 0.14, 'triangle', 0.06, 0.08);
@@ -367,7 +373,80 @@ function playUISound(kind) {
     } else if (kind === 'prism_error') {
         playTone(180, 0.12, 'sawtooth', 0.05, 0);
         playTone(150, 0.12, 'sawtooth', 0.05, 0.1);
+    } else if (kind === 'tap_soft') {
+        playTone(510, 0.045, 'sine', 0.022, 0);
+    } else if (kind === 'select_soft') {
+        playTone(480, 0.05, 'triangle', 0.026, 0);
+        playTone(620, 0.055, 'triangle', 0.026, 0.05);
+    } else if (kind === 'wr2w_quantifier') {
+        playTone(740, 0.05, 'triangle', 0.04, 0);
+        playTone(920, 0.07, 'triangle', 0.04, 0.05);
+    } else if (kind === 'wr2w_path') {
+        playTone(420, 0.06, 'sine', 0.03, 0);
+        playTone(560, 0.07, 'triangle', 0.03, 0.05);
+    } else if (kind === 'wr2w_submit') {
+        playTone(430, 0.06, 'sine', 0.03, 0);
+        playTone(520, 0.06, 'sine', 0.03, 0.05);
+        playTone(650, 0.08, 'triangle', 0.03, 0.11);
+    } else if (kind === 'wr2w_confirm_yes') {
+        playTone(620, 0.05, 'triangle', 0.032, 0);
+        playTone(780, 0.07, 'triangle', 0.032, 0.05);
+    } else if (kind === 'wr2w_confirm_partial') {
+        playTone(520, 0.055, 'triangle', 0.03, 0);
+        playTone(560, 0.06, 'triangle', 0.03, 0.05);
+    } else if (kind === 'wr2w_confirm_no') {
+        playTone(230, 0.07, 'sawtooth', 0.03, 0);
+        playTone(190, 0.08, 'sawtooth', 0.03, 0.06);
+    } else if (kind === 'wr2w_probe') {
+        playTone(470, 0.045, 'sine', 0.026, 0);
+        playTone(540, 0.045, 'sine', 0.026, 0.04);
+    } else if (kind === 'wr2w_probe_found') {
+        playTone(560, 0.05, 'triangle', 0.03, 0);
+        playTone(700, 0.06, 'triangle', 0.03, 0.05);
+        playTone(860, 0.08, 'triangle', 0.03, 0.11);
     }
+}
+
+function setupGlobalInteractionSounds() {
+    if (audioState.globalInteractionBound) return;
+    audioState.globalInteractionBound = true;
+
+    const nowMs = () => (
+        (typeof performance !== 'undefined' && typeof performance.now === 'function')
+            ? performance.now()
+            : Date.now()
+    );
+
+    const canPlayGlobalTap = () => {
+        const now = nowMs();
+        if ((now - Number(audioState.lastUiSoundAtMs || 0)) < 90) return false;
+        if ((now - Number(audioState.lastGlobalTapAtMs || 0)) < 120) return false;
+        audioState.lastGlobalTapAtMs = now;
+        return true;
+    };
+
+    document.addEventListener('click', (event) => {
+        const target = event.target && typeof event.target.closest === 'function'
+            ? event.target.closest('button, summary, .tab-btn, [role="button"]')
+            : null;
+        if (!target) return;
+        if (target.closest('.wr2w-card')) return; // WR2W gets custom sounds per action
+        if (target.matches('.audio-mute-btn, #music-toggle-btn')) return;
+        if (target.dataset && target.dataset.uiSound === 'off') return;
+        if (!canPlayGlobalTap()) return;
+        const isSummary = target.tagName === 'SUMMARY';
+        playUISound(isSummary ? 'select_soft' : 'tap_soft');
+    });
+
+    document.addEventListener('change', (event) => {
+        const target = event.target;
+        if (!target || typeof target.matches !== 'function') return;
+        if (!target.matches('select')) return;
+        if (target.closest('.wr2w-card')) return;
+        const now = nowMs();
+        if ((now - Number(audioState.lastUiSoundAtMs || 0)) < 90) return;
+        playUISound('select_soft');
+    });
 }
 
 function stopOpeningMusic(resetToStart = false) {
@@ -1954,6 +2033,7 @@ function initializeMetaModelApp() {
     setupComicEngine2();
     setupCommunityFeedbackWall();
     initializeProgressHub();
+    setupGlobalInteractionSounds();
     renderGlobalComicStrip(getActiveTabName());
     window.addEventListener('resize', updateRuntimeDebugInfoCard);
 }
@@ -11525,10 +11605,10 @@ function setupWrinkleGame() {
         state.round.feedbackTone = tone;
     };
 
-    const markCriterion = (criterionKey) => {
+    const markCriterion = (criterionKey, soundKind = 'next') => {
         if (state.round.criteria[criterionKey]) return;
         state.round.criteria[criterionKey] = true;
-        playUISound('next');
+        playUISound(soundKind);
     };
 
     const wr2wEscapeRegExp = (text) => String(text || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -11546,11 +11626,11 @@ function setupWrinkleGame() {
     const wr2wStepCopy = Object.freeze({
         S: {
             title: 'שלב 1 · Signal / תחושה',
-            instruction: 'בחר/י את התחושה הדומיננטית. זה "האיתות" לכך שיש פער בין המילים לבין עוצמת החוויה.'
+            instruction: 'בחר/י תחושה דומיננטית אחת כדי להתחיל מהגוף, ואז נחשוף את הכמת הסמוי.'
         },
         Q: {
             title: 'שלב 2 · Hidden Quantifier / כמת נסתר',
-            instruction: 'בחר/י את הכמת שמשתמע מהמשפט. לא "האמת" אלא הניסוח שמרגיש הכי קרוב כרגע.'
+            instruction: 'בחר/י את הכמת שמשתמע מהמשפט. הוא יודגש בתוך המשפט העליון בצהוב גם אם לא נאמר במפורש.'
         },
         H: {
             title: 'שלב 3 · Bridge Hypothesis / גישור',
@@ -11578,13 +11658,38 @@ function setupWrinkleGame() {
         if (step === 'H' || step === 'C') return 'spoken';
         return 'outside';
     };
+    const wr2wInlineQuantifierInsertHtml = (sentenceText, quantifierText) => {
+        const sentence = wr2wSanitizeText(sentenceText || '');
+        const quantifier = wr2wSanitizeText(quantifierText || '').trim();
+        if (!sentence) return '';
+        if (!quantifier) return escapeHtml(sentence);
+
+        const tokens = [...sentence.matchAll(/\S+/g)];
+        if (!tokens.length) return escapeHtml(sentence);
+
+        const cleanToken = (value) => String(value || '').replace(/^[\s"'״׳([{]+|[\s"'״׳)\].,!?;:]+$/g, '');
+        const pronounRegex = /^(אני|אתה|את|אתם|אתן|הוא|היא|הם|הן|אנחנו|זה|זאת|זו)$/;
+        let anchorIdx = tokens.findIndex((match) => pronounRegex.test(cleanToken(match[0])));
+        if (anchorIdx < 0) anchorIdx = 0;
+
+        const anchorMatch = tokens[anchorIdx];
+        const insertPos = Number(anchorMatch.index) + String(anchorMatch[0]).length;
+        const before = sentence.slice(0, insertPos);
+        const after = sentence.slice(insertPos);
+        const needsLeftSpace = before && !/\s$/.test(before);
+        const needsRightSpace = after && !/^\s/.test(after) && !/^[,.;:!?]/.test(after);
+
+        return `${escapeHtml(before)}${needsLeftSpace ? ' ' : ''}<span class="wr2w-quantifier-insert" aria-label="כמת נסתר: ${escapeHtml(quantifier)}"><span class="wr2w-quantifier-insert-label">כמת נסתר</span><mark class="wr2w-quantifier-glow wr2w-quantifier-glow--inserted">${escapeHtml(quantifier)}</mark></span>${needsRightSpace ? ' ' : ''}${escapeHtml(after)}`;
+    };
     const wr2wHighlightSentenceHtml = (sentenceText, quantifierText) => {
         const sentence = wr2wSanitizeText(sentenceText || '');
         const quantifier = wr2wSanitizeText(quantifierText || '').trim();
         if (!quantifier) return escapeHtml(sentence);
         try {
             const regex = new RegExp(wr2wEscapeRegExp(quantifier), 'g');
-            if (!regex.test(sentence)) return escapeHtml(sentence);
+            if (!regex.test(sentence)) {
+                return wr2wInlineQuantifierInsertHtml(sentence, quantifier);
+            }
             regex.lastIndex = 0;
             return escapeHtml(sentence).replace(
                 new RegExp(wr2wEscapeRegExp(escapeHtml(quantifier)), 'g'),
@@ -11606,12 +11711,12 @@ function setupWrinkleGame() {
             el.classList.toggle('is-active', key === active);
         });
         if (els.layerSpokenText) {
-            const q = state.round.selectedQuantifier ? ` | כמת: ${state.round.selectedQuantifier}` : '';
-            els.layerSpokenText.textContent = wr2wShort(`${scene?.visibleSentence || ''}${q}`, 120);
+            els.layerSpokenText.textContent = wr2wShort(scene?.visibleSentence || '', 120);
         }
         if (els.layerInsideText) {
             const insideParts = [
                 state.round.feeling ? `תחושה: ${state.round.feeling}` : 'בחר/י תחושה דומיננטית',
+                state.round.selectedQuantifier ? `כמת משתמע: ${state.round.selectedQuantifier}` : '',
                 state.round.confirmation?.status === 'yes' ? 'נוצר אישור (כן)' : '',
                 state.round.confirmation?.status === 'partial' ? 'יש אישור חלקי (בערך)' : ''
             ].filter(Boolean);
@@ -11743,10 +11848,6 @@ function setupWrinkleGame() {
         const step = state.round.step;
         if (step === 'S') {
             return `
-                <div class="wr2w-step-hero">
-                    <strong>שלב 1 · Signal / תחושה</strong>
-                    <p>מה הכי מורגש עכשיו? בוחרים תחושה אחת כדי להתחיל מהגוף ולא מהוויכוח עם המשפט.</p>
-                </div>
                 <div class="wr2w-option-grid">
                     ${WR2W_FEELINGS.map((feeling) => `
                         <button type="button" class="wr2w-option-btn${state.round.feeling === feeling ? ' is-selected' : ''}" data-action="select-feeling" data-feeling="${escapeHtml(feeling)}">${escapeHtml(feeling)}</button>
@@ -11757,10 +11858,6 @@ function setupWrinkleGame() {
         }
         if (step === 'Q') {
             return `
-                <div class="wr2w-step-hero">
-                    <strong>שלב 2 · Hidden Quantifier</strong>
-                    <p>בחר/י את הכמת שמשתמע מהמשפט (גם אם לא נאמר בפועל).</p>
-                </div>
                 <div class="wr2w-option-grid">
                     ${scene.quantifiers.map((q) => `
                         <button type="button" class="wr2w-option-btn${state.round.selectedQuantifier === q ? ' is-selected' : ''}" data-action="select-quantifier" data-quantifier="${escapeHtml(q)}">${escapeHtml(q)}</button>
@@ -11919,6 +12016,7 @@ function setupWrinkleGame() {
         if (els.stepTitle) els.stepTitle.textContent = wr2wStepCopy[currentStepKey].title;
         if (els.stepInstruction) els.stepInstruction.textContent = wr2wStepCopy[currentStepKey].instruction;
         if (els.stepBody) els.stepBody.innerHTML = renderStepContent(scene);
+        if (els.stepBody) els.stepBody.dataset.step = String(state.round.step || 'S');
         if (els.feedback) {
             els.feedback.textContent = wr2wSanitizeText(state.round.feedback || '');
             els.feedback.setAttribute('data-tone', state.round.feedbackTone || 'info');
@@ -11936,6 +12034,7 @@ function setupWrinkleGame() {
         if (!scenes.length) return;
         state.index = (state.index + 1) % scenes.length;
         resetRoundState();
+        playUISound('next');
         setFeedback('׳¡׳‘׳‘ ׳—׳“׳©. ׳׳×׳—׳™׳׳™׳ ׳©׳•׳‘ ׳‘׳–׳™׳”׳•׳™ ׳×׳—׳•׳©׳” (S).', 'info');
         render();
     };
@@ -11988,7 +12087,7 @@ function setupWrinkleGame() {
 
         if (action === 'select-feeling') {
             state.round.feeling = button.getAttribute('data-feeling') || '';
-            markCriterion('signal');
+            markCriterion('signal', 'select_soft');
             setFeedback(`׳ ׳¨׳©׳׳” ׳×׳—׳•׳©׳”: ${state.round.feeling}.`, 'success');
             render();
             return;
@@ -11999,6 +12098,7 @@ function setupWrinkleGame() {
                 render();
                 return;
             }
+            playUISound('next');
             state.round.step = 'Q';
             setFeedback('׳׳¢׳•׳׳”. ׳¢׳›׳©׳™׳• ׳‘׳•׳—׳¨׳™׳ ׳›׳׳×-׳¦׳ ׳¡׳‘׳™׳¨.', 'info');
             render();
@@ -12006,7 +12106,7 @@ function setupWrinkleGame() {
         }
         if (action === 'select-quantifier') {
             state.round.selectedQuantifier = button.getAttribute('data-quantifier') || '';
-            markCriterion('quantifier');
+            markCriterion('quantifier', 'wr2w_quantifier');
             setFeedback(`׳ ׳‘׳—׳¨ ׳›׳׳×-׳¦׳: ${state.round.selectedQuantifier}.`, 'success');
             render();
             return;
@@ -12017,6 +12117,7 @@ function setupWrinkleGame() {
                 render();
                 return;
             }
+            playUISound('next');
             state.round.step = 'H';
             if (!state.round.hypothesisDraft || state.round.hypothesisDraft.includes('___')) {
                 state.round.hypothesisDraft = wr2wBuildHypothesisSkeleton(scene, state.round.selectedQuantifier);
@@ -12047,6 +12148,7 @@ function setupWrinkleGame() {
             state.round.confirmation = null;
             state.round.confirmResolved = false;
             markCriterion('hypothesis');
+            playUISound('wr2w_submit');
             state.round.step = 'C';
             setFeedback('׳׳¢׳•׳׳”. ׳¢׳›׳©׳™׳• ׳©׳•׳׳—׳™׳ ׳׳׳˜׳•׳₪׳ ׳׳§׳‘׳ ׳׳™׳©׳•׳¨/׳×׳™׳§׳•׳.', 'success');
             render();
@@ -12069,6 +12171,13 @@ function setupWrinkleGame() {
                 : status === 'partial'
                     ? 'info'
                     : 'warn';
+            playUISound(
+                status === 'yes'
+                    ? 'wr2w_confirm_yes'
+                    : status === 'partial'
+                        ? 'wr2w_confirm_partial'
+                        : 'wr2w_confirm_no'
+            );
             if (status === 'yes') {
                 state.round.confirmResolved = true;
                 markCriterion('confirm');
@@ -12097,6 +12206,7 @@ function setupWrinkleGame() {
             return;
         }
         if (action === 'revise-hypothesis') {
+            playUISound('tap_soft');
             state.round.step = 'H';
             setFeedback('׳—׳–׳¨׳” ׳-H ׳׳×׳™׳§׳•׳ ׳”׳”׳™׳₪׳•׳×׳–׳” ׳׳₪׳ ׳™ PATH.', 'info');
             render();
@@ -12108,6 +12218,7 @@ function setupWrinkleGame() {
                 render();
                 return;
             }
+            playUISound('next');
             state.round.step = 'P';
             setFeedback('׳‘׳—׳¨/׳™ PATH: Outside / Inside / Both.', 'info');
             render();
@@ -12117,7 +12228,7 @@ function setupWrinkleGame() {
             const pathChoice = String(button.getAttribute('data-path') || '').toLowerCase();
             if (!['outside', 'inside', 'both'].includes(pathChoice)) return;
             state.round.pathChoice = pathChoice;
-            markCriterion('path');
+            markCriterion('path', 'wr2w_path');
             setFeedback(`׳ ׳‘׳—׳¨ PATH: ${pathChoice}.`, 'success');
             render();
             return;
@@ -12138,6 +12249,7 @@ function setupWrinkleGame() {
                 render();
                 return;
             }
+            playUISound('next');
             state.round.step = 'E';
             setFeedback('׳׳ ׳׳™׳ ׳—׳¨׳™׳’ - ׳¢׳•׳‘׳¨׳™׳ ׳׳“׳¨׳’׳” ׳‘׳¡׳•׳׳ ׳”׳₪׳¨׳™׳¦׳”. ׳ ׳¡׳—/׳™ ׳׳׳™׳“׳” ׳׳₪׳™ PATH ׳©׳ ׳‘׳—׳¨.', 'info');
             render();
@@ -12145,6 +12257,7 @@ function setupWrinkleGame() {
         }
         if (action === 'set-breakout-level') {
             state.round.breakoutLevel = Math.max(0, Math.min(3, Number(button.getAttribute('data-level') || 0)));
+            playUISound('select_soft');
             setFeedback(`׳ ׳‘׳—׳¨׳” ${WR2W_BREAKOUT_STEPS[state.round.breakoutLevel].label}.`, 'info');
             render();
             return;
@@ -12156,6 +12269,7 @@ function setupWrinkleGame() {
                 return;
             }
             const didGenerate = applyAutoLearningDrafts(scene, true);
+            playUISound(didGenerate ? 'hint' : 'wr2w_confirm_no');
             setFeedback(
                 didGenerate
                     ? '׳ ׳•׳¦׳¨ ׳ ׳™׳¡׳•׳— ׳׳׳™׳“׳” ׳׳•׳˜׳•׳׳˜׳™. ׳׳₪׳©׳¨ ׳׳¢׳¨׳•׳ ׳׳• ׳׳¡׳™׳™׳ ׳¡׳‘׳‘.'
@@ -12166,8 +12280,10 @@ function setupWrinkleGame() {
             return;
         }
         if (action === 'send-breakout') {
+            playUISound('wr2w_probe');
             state.round.lastProbe = wr2wPatientAgent.probeException(scene, state.round.breakoutLevel);
             if (state.round.lastProbe.found) {
+                playUISound('wr2w_probe_found');
                 state.round.breakoutFound = true;
                 const autoBuilt = applyAutoLearningDrafts(scene, false);
                 setFeedback(
@@ -12187,6 +12303,7 @@ function setupWrinkleGame() {
                         : '׳׳ ׳ ׳׳¦׳ ׳—׳¨׳™׳’ ׳—׳“. ׳׳₪׳©׳¨ ׳׳™׳¦׳•׳¨ ׳ ׳™׳¡׳•׳— ׳׳•׳˜׳•׳׳˜׳™ ׳׳×׳ ׳׳™ ׳”׳—׳•׳–׳§.',
                     'warn'
                 );
+                playUISound('wr2w_confirm_no');
             }
             render();
             return;
@@ -12274,12 +12391,14 @@ function setupWrinkleGame() {
 
     els.resetRound?.addEventListener('click', () => {
         resetRoundState();
+        playUISound('skip');
         setFeedback('׳”׳¡׳‘׳‘ ׳׳•׳₪׳¡. ׳׳×׳—׳™׳׳™׳ ׳©׳•׳‘ ׳‘-S.', 'info');
         render();
     });
 
     els.selfToggle?.addEventListener('click', () => {
         els.selfPanel?.classList.toggle('hidden');
+        playUISound('tap_soft');
     });
 
     els.selfAdd?.addEventListener('click', () => {
