@@ -5476,6 +5476,85 @@ input[type="range"] {
     padding: 8px 10px;
 }
 
+.prism-analysis-drawer {
+    margin: 10px 0 12px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+    overflow: hidden;
+}
+
+.prism-analysis-drawer > summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    font-weight: 900;
+    color: #0f4f8a;
+}
+
+.prism-analysis-drawer > summary::-webkit-details-marker { display: none; }
+
+.prism-analysis-drawer > summary small {
+    color: #64748b;
+    font-weight: 700;
+    font-size: 0.74rem;
+}
+
+.prism-analysis-drawer[open] > summary {
+    border-bottom: 1px dashed #dbe7f5;
+    background: #f8fbff;
+}
+
+.prism-analysis-drawer-body {
+    padding: 10px;
+    display: grid;
+    gap: 10px;
+}
+
+.prism-analysis-note {
+    margin: 0;
+    border: 1px solid #dbeafe;
+    background: #eff6ff;
+    color: #1e3a8a;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    font-weight: 700;
+}
+
+.prism-analysis-result-hint {
+    margin: -2px 0 0;
+    color: #64748b;
+    font-size: 0.76rem;
+    line-height: 1.25;
+}
+
+.prism-analysis-sliders {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.prism-analysis-sliders .q-card {
+    margin: 0;
+    border-left: 0;
+}
+
+.prism-analysis-actions {
+    border-top: 1px dashed #e2e8f0;
+    padding-top: 8px;
+    margin-top: 0;
+}
+
+.prism-analysis-actions .btn-primary {
+    font-weight: 800;
+}
+
 /* Logical level color system */
 .prism-detail.prism-focus-layout .level-item[data-level="E"] { background: linear-gradient(180deg, var(--prism-e-soft), #fff 65%); border-color: #bfdbfe; }
 .prism-detail.prism-focus-layout .level-item[data-level="E"]::before { background: var(--prism-e); }
@@ -5759,6 +5838,7 @@ input[type="range"] {
     .prism-stack-result-grid { grid-template-columns: 1fr; }
     .level-grid { grid-template-columns: 1fr; }
     .prism-mini-stack-copy small { display: block; }
+    .prism-analysis-sliders { grid-template-columns: 1fr; }
 }
 
 /* Onboarding & CTA */

@@ -9479,6 +9479,16 @@ function handlePrismSubmit() {
 
     renderVerticalStackResult(stackState);
     savePrismVerticalStackDraftForCurrentPrism();
+    const prismResultEl = document.getElementById('prism-result');
+    if (prismResultEl) {
+        window.requestAnimationFrame(() => {
+            try {
+                prismResultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (_error) {
+                prismResultEl.scrollIntoView();
+            }
+        });
+    }
 
     const session = {
         datetime: new Date().toISOString(),
@@ -9817,6 +9827,64 @@ function buildPrismStackLegendRowsHtml() {
         .join('');
 }
 
+function enhancePrismLabOptionalAnalysisSection(root = document) {
+    const detail = root.querySelector?.('#prism-detail') || document.getElementById('prism-detail');
+    const mappingForm = detail?.querySelector('.mapping-form');
+    if (!detail || !mappingForm) return;
+
+    const sliderCards = Array.from(mappingForm.querySelectorAll(':scope > .q-card'));
+    const actions = mappingForm.querySelector(':scope > .step-buttons');
+    if (!sliderCards.length || !actions) return;
+
+    let drawer = mappingForm.querySelector(':scope > .prism-analysis-drawer');
+    let drawerBody = drawer?.querySelector('.prism-analysis-drawer-body');
+    let slidersWrap = drawer?.querySelector('.prism-analysis-sliders');
+
+    if (!drawer) {
+        drawer = document.createElement('details');
+        drawer.className = 'prism-analysis-drawer';
+
+        const summary = document.createElement('summary');
+        summary.innerHTML = '<span>שלב אופציונלי: בדיקה + המלצת Pivot</span><small>לא חובה כדי לתרגל מילוי רמות</small>';
+        drawer.appendChild(summary);
+
+        drawerBody = document.createElement('div');
+        drawerBody.className = 'prism-analysis-drawer-body';
+        drawer.appendChild(drawerBody);
+
+        const note = document.createElement('p');
+        note.className = 'prism-analysis-note';
+        note.textContent = 'הכפתור מנתח את המפה שבנית, מסמן שיבוצים בעייתיים, ומחזיר המלצת Pivot + צעדים להמשך. אם את/ה רק מתרגל/ת מילוי רמות, אפשר לדלג.';
+        drawerBody.appendChild(note);
+
+        const resultHint = document.createElement('p');
+        resultHint.className = 'prism-analysis-result-hint';
+        resultHint.textContent = 'אחרי לחיצה, התוצאה תופיע מיד בהמשך המסך (ונגלול אליה אוטומטית).';
+        drawerBody.appendChild(resultHint);
+
+        slidersWrap = document.createElement('div');
+        slidersWrap.className = 'prism-analysis-sliders';
+        drawerBody.appendChild(slidersWrap);
+
+        const firstSlider = sliderCards[0];
+        mappingForm.insertBefore(drawer, firstSlider);
+    }
+
+    if (!drawerBody) return;
+    if (!slidersWrap) {
+        slidersWrap = document.createElement('div');
+        slidersWrap.className = 'prism-analysis-sliders';
+        drawerBody.appendChild(slidersWrap);
+    }
+
+    sliderCards.forEach((card) => {
+        if (card.parentElement !== slidersWrap) slidersWrap.appendChild(card);
+    });
+
+    actions.classList.add('prism-analysis-actions');
+    if (actions.parentElement !== drawerBody) drawerBody.appendChild(actions);
+}
+
 function applyPrismLabCompactRuntimeCopy() {
     const root = document.getElementById('prismlab');
     if (!root) return;
@@ -9856,13 +9924,16 @@ function applyPrismLabCompactRuntimeCopy() {
     if (pivotWrapMuted) pivotWrapMuted.textContent = 'רעיונות להמשך עבודה. הם לא מחליפים מילוי של רמות המגדל.';
 
     const qLabels = root.querySelectorAll('#prism-detail .q-card > label');
-    if (qLabels[0]) qLabels[0].textContent = 'רגש / Emotion (1-5)';
-    if (qLabels[1]) qLabels[1].textContent = 'התנגדות / Resistance (1-5)';
+    if (qLabels[0]) qLabels[0].textContent = 'רגש נוכחי / Emotion (1-5) · אופציונלי';
+    if (qLabels[1]) qLabels[1].textContent = 'התנגדות לשינוי / Resistance (1-5) · אופציונלי';
 
     const cancelBtn = root.querySelector('#prism-cancel');
     const submitBtn = root.querySelector('#prism-submit');
     if (cancelBtn) cancelBtn.textContent = 'חזרה לפריזמות';
-    if (submitBtn) submitBtn.textContent = 'צור/י מפה + Pivot';
+    if (submitBtn) {
+        submitBtn.textContent = 'בדוק/י מפה + קבל/י Pivot';
+        submitBtn.setAttribute('title', 'מנתח את המילוי, מציג תוצאות, ומציע Pivot להמשך');
+    }
 
     const levelItems = root.querySelectorAll('#prism-detail .level-item');
     levelItems.forEach((item) => {
@@ -9873,6 +9944,8 @@ function applyPrismLabCompactRuntimeCopy() {
         if (!LOGICAL_LEVEL_INFO[level]) return;
         label.textContent = getLevelBilingualLabel(level);
     });
+
+    enhancePrismLabOptionalAnalysisSection(root);
 }
 
 function ensurePrismLabWorkLayout() {
