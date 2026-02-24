@@ -3,6 +3,10 @@
 type TemplateType = 'CEQ' | 'CAUSE' | 'ASSUMPTIONS1';
 type CauseMode = 'CAUSES_OF_TOKEN' | 'EFFECTS_OF_TOKEN';
 type PrototypeSchemaId = 'DEBONO_FAN' | 'LOGICAL_LEVELS_STACK' | 'RUSSELL_GRINDER_TYPES';
+type RelationalVoiceRoleId = 'PARENT' | 'CHILD' | 'SIBLING' | 'MENTOR' | 'PARTNER' | 'PEER';
+type RelationalToneId = 'SUPPORTIVE' | 'CURIOUS' | 'FIRM' | 'PLAYFUL' | 'CALM' | 'CHALLENGING';
+type LogicalLevelKey = 'belonging' | 'identity' | 'beliefsValues' | 'capability' | 'behavior' | 'environment';
+type DebonoHatKey = 'white' | 'red' | 'black' | 'yellow' | 'green' | 'blue';
 
 type DraggableCandidate = {
   id: string;
@@ -73,6 +77,43 @@ type PrototypeSchemaMeta = {
   note: string;
 };
 
+type RelationalVoiceRolePreset = {
+  id: RelationalVoiceRoleId;
+  labelHe: string;
+  stanceHe: string;
+  careFocusHe: string;
+  closenessHe: string;
+  boundaryHe: string;
+};
+
+type RelationalTonePreset = {
+  id: RelationalToneId;
+  labelHe: string;
+  adverbHe: string;
+  openingMoveHe: string;
+  riskHe: string;
+  benefitHe: string;
+  challengeVerbHe: string;
+};
+
+type LogicalLevelsDraft = Record<LogicalLevelKey, string>;
+type DebonoHatDraft = Record<DebonoHatKey, string>;
+
+type RelationalVoiceDraft = {
+  anchor: string;
+  roleId: RelationalVoiceRoleId;
+  toneId: RelationalToneId;
+  voiceLine: string;
+  levels: LogicalLevelsDraft;
+  deBono: DebonoHatDraft;
+  rgChecks: {
+    detectedType: string;
+    lowerTypeQuestion: string;
+    upperTypeQuestion: string;
+    splitPrompt: string;
+  };
+};
+
 const TEMPLATE_META: Record<TemplateType, TemplateMeta> = {
   CEQ: {
     type: 'CEQ',
@@ -131,6 +172,132 @@ const PROTOTYPE_SCHEMAS: PrototypeSchemaMeta[] = [
     shortHelp: 'צורת רמות/שכבות לחשיפת קפיצה מטיפוס אחד לטיפוס אחר.',
     note: 'Prototype shape (מיפוי חזותי לקפיצות רמה)'
   }
+];
+
+const RELATIONAL_ROLE_PRESETS: Record<RelationalVoiceRoleId, RelationalVoiceRolePreset> = {
+  PARENT: {
+    id: 'PARENT',
+    labelHe: 'הורה',
+    stanceHe: 'מחזיק/ה ומכוון/ת',
+    careFocusHe: 'ביטחון + כיוון',
+    closenessHe: 'קשר מגן',
+    boundaryHe: 'גבול ברור עם חום'
+  },
+  CHILD: {
+    id: 'CHILD',
+    labelHe: 'ילד/ה',
+    stanceHe: 'סקרן/ית ומביע/ה צורך',
+    careFocusHe: 'נראות + רגש',
+    closenessHe: 'בקשת חיבור',
+    boundaryHe: 'שאלה במקום קביעה'
+  },
+  SIBLING: {
+    id: 'SIBLING',
+    labelHe: 'אח/אחות',
+    stanceHe: 'ישיר/ה ושוויוני/ת',
+    careFocusHe: 'נאמנות + אמת',
+    closenessHe: 'קרבה בגובה העיניים',
+    boundaryHe: 'דוגרי בלי לבטל'
+  },
+  MENTOR: {
+    id: 'MENTOR',
+    labelHe: 'מנטור/ית',
+    stanceHe: 'מחדד/ת כיוון',
+    careFocusHe: 'למידה + אחריות',
+    closenessHe: 'ליווי מקצועי',
+    boundaryHe: 'דיוק לצד תמיכה'
+  },
+  PARTNER: {
+    id: 'PARTNER',
+    labelHe: 'בן/בת זוג',
+    stanceHe: 'מחובר/ת ומשקף/ת',
+    careFocusHe: 'קרבה + תיאום',
+    closenessHe: 'שותפות רגשית',
+    boundaryHe: 'אותנטיות עם רכות'
+  },
+  PEER: {
+    id: 'PEER',
+    labelHe: 'חבר/ה / קולגה',
+    stanceHe: 'בגובה העיניים',
+    careFocusHe: 'שיתוף + פתרון',
+    closenessHe: 'שיתוף פעולה',
+    boundaryHe: 'כנות תכל׳ס'
+  }
+};
+
+const RELATIONAL_TONE_PRESETS: Record<RelationalToneId, RelationalTonePreset> = {
+  SUPPORTIVE: {
+    id: 'SUPPORTIVE',
+    labelHe: 'תומך',
+    adverbHe: 'ברכות',
+    openingMoveHe: 'לאשר קודם את החוויה',
+    riskHe: 'לעטוף יותר מדי ולהשאיר ערפול',
+    benefitHe: 'מוריד הגנה ומאפשר שיתוף',
+    challengeVerbHe: 'להציע'
+  },
+  CURIOUS: {
+    id: 'CURIOUS',
+    labelHe: 'סקרני',
+    adverbHe: 'בסקרנות',
+    openingMoveHe: 'לשאול לפני פירוש',
+    riskHe: 'להישמע מרוחק אם אין אמפתיה',
+    benefitHe: 'פותח מידע חדש ומפחית הנחות',
+    challengeVerbHe: 'לחקור'
+  },
+  FIRM: {
+    id: 'FIRM',
+    labelHe: 'אסרטיבי',
+    adverbHe: 'בבהירות',
+    openingMoveHe: 'להגדיר גבול ומשמעות',
+    riskHe: 'להישמע שיפוטי אם אין קשר',
+    benefitHe: 'מייצר כיוון ויציבות',
+    challengeVerbHe: 'לחדד'
+  },
+  PLAYFUL: {
+    id: 'PLAYFUL',
+    labelHe: 'משחקי',
+    adverbHe: 'בקלילות',
+    openingMoveHe: 'לפתוח דרך דימוי/הומור קטן',
+    riskHe: 'להוזיל נושא רגיש',
+    benefitHe: 'משחרר תקיעות ויצירתיות',
+    challengeVerbHe: 'לשחק'
+  },
+  CALM: {
+    id: 'CALM',
+    labelHe: 'רגוע',
+    adverbHe: 'באיטיות',
+    openingMoveHe: 'להאט קצב ולייצב נשימה',
+    riskHe: 'להיתפס כפסיבי מדי',
+    benefitHe: 'מוריד הצפה ומאפשר דיוק',
+    challengeVerbHe: 'לייצב'
+  },
+  CHALLENGING: {
+    id: 'CHALLENGING',
+    labelHe: 'מאתגר',
+    adverbHe: 'בישירות',
+    openingMoveHe: 'להצביע על הפער בלי להאשים',
+    riskHe: 'להקפיץ התנגדות',
+    benefitHe: 'מניע שינוי כשיש תקיעות',
+    challengeVerbHe: 'לאתגר'
+  }
+};
+
+const LOGICAL_LEVEL_FIELDS: Array<{ key: LogicalLevelKey; labelHe: string; hintHe: string }> = [
+  { key: 'belonging', labelHe: 'שייכות / שליחות', hintHe: 'אנחנו / קהילה / למה רחב יותר' },
+  { key: 'identity', labelHe: 'זהות', hintHe: 'מי אני/אתה בסיפור הזה' },
+  { key: 'beliefsValues', labelHe: 'אמונות / ערכים', hintHe: 'מה חשוב / מה נכון כאן' },
+  { key: 'capability', labelHe: 'יכולות / אסטרטגיה', hintHe: 'איך אני יודע/ת לעשות' },
+  { key: 'behavior', labelHe: 'התנהגות', hintHe: 'מה עושים בפועל' },
+  { key: 'environment', labelHe: 'סביבה / הקשר', hintHe: 'מתי/איפה/עם מי' }
+];
+
+const DEBONO_FIELDS: Array<{ key: DebonoHatKey; labelHe: string; chip: string }> = [
+  { key: 'white', labelHe: 'לבן (עובדות)', chip: 'White' },
+  { key: 'red', labelHe: 'אדום (רגש)', chip: 'Red' },
+  { key: 'black', labelHe: 'שחור (סיכון)', chip: 'Black' },
+  { key: 'yellow', labelHe: 'צהוב (רווח)', chip: 'Yellow' },
+  { key: 'green', labelHe: 'ירוק (חלופות)', chip: 'Green' },
+  { key: 'blue', labelHe: 'כחול (ניהול)', chip: 'Blue' }
 ];
 
 const INTRO_COPY =
@@ -205,9 +372,51 @@ const css = `
 .it-focus-panel{border-color:#bfdbfe;background:linear-gradient(180deg,#fff 0%,#f8fbff 100%)}
 .it-focus-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
 .it-focus-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e3a8a;font-weight:800;font-size:.78rem}
+.it-focus-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.it-focus-mini-btn{border:1px solid #d1d5db;background:#fff;color:#374151;border-radius:999px;padding:5px 9px;font-weight:800;font-size:.76rem;cursor:pointer}
+.it-focus-mini-btn:hover{border-color:#2563eb;color:#1d4ed8}
+.it-focus-guide{margin-top:8px;border:1px solid #dbeafe;background:#f8fbff;border-radius:10px;padding:8px}
+.it-focus-guide summary{cursor:pointer;font-weight:800;color:#1e3a8a;list-style:none}
+.it-focus-guide summary::-webkit-details-marker{display:none}
+.it-focus-guide-body{margin-top:8px;display:grid;gap:8px}
 .it-focus-sketch .it-sketch{margin-top:0;padding:14px}
 .it-focus-sketch .it-sketch svg{min-height:140px}
+.it-focus-sketch.is-compact .it-sketch{padding:8px}
+.it-focus-sketch.is-compact .it-sketch svg{min-height:96px}
 .it-proto-note{margin-top:6px;color:#6b7280;font-size:.76rem;line-height:1.35}
+.it-role-studio{margin-top:10px;border:1px solid #bfdbfe;background:linear-gradient(180deg,#fff 0,#f8fbff 100%);border-radius:12px;padding:10px;display:grid;gap:10px}
+.it-role-studio-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.it-role-studio-title{margin:0;font-weight:900;font-size:.95rem;color:#1e3a8a}
+.it-role-studio-sub{margin:4px 0 0;color:#475569;font-size:.82rem;line-height:1.35}
+.it-role-chip-row{display:flex;flex-wrap:wrap;gap:6px}
+.it-role-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:999px;border:1px solid #bfdbfe;background:#eff6ff;color:#1e3a8a;font-size:.75rem;font-weight:800}
+.it-role-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-items:end}
+.it-field{display:grid;gap:4px}
+.it-field label{font-size:.76rem;font-weight:800;color:#334155}
+.it-input,.it-select,.it-textarea{width:100%;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#111827;font:inherit}
+.it-input,.it-select{padding:7px 9px;min-height:38px}
+.it-textarea{padding:8px 9px;line-height:1.35;resize:vertical;min-height:66px}
+.it-field-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.it-btn.small{padding:7px 10px;border-radius:8px;font-size:.82rem}
+.it-voice-line{border:1px solid #dbeafe;background:#eff6ff;color:#1e3a8a;border-radius:10px;padding:8px;font-weight:700;line-height:1.35}
+.it-role-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:10px;align-items:start}
+.it-levels-grid{display:grid;gap:8px}
+.it-level-card{border:1px solid #e5e7eb;background:#fff;border-radius:10px;padding:8px;display:grid;gap:6px}
+.it-level-card-head{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.it-level-card-head strong{font-size:.84rem}
+.it-level-hint{color:#64748b;font-size:.74rem}
+.it-side-stack{display:grid;gap:10px}
+.it-hat-list{display:grid;gap:8px}
+.it-hat-card{border:1px solid #e5e7eb;background:#fff;border-radius:10px;padding:8px;display:grid;gap:6px}
+.it-hat-head{display:flex;justify-content:space-between;gap:6px;align-items:center}
+.it-rg-card{border:1px solid #e5e7eb;background:#fff;border-radius:10px;padding:8px;display:grid;gap:8px}
+.it-rg-card h4{margin:0;font-size:.86rem}
+.it-rg-line{border:1px solid #e5e7eb;border-radius:8px;background:#f8fafc;padding:7px 8px;font-size:.82rem;line-height:1.3}
+.it-rg-line strong{color:#111827}
+.it-reveal-extra{margin-top:8px;border:1px solid #d1d5db;background:#fff;border-radius:10px;padding:8px}
+.it-reveal-extra summary{cursor:pointer;font-weight:800;color:#374151;list-style:none}
+.it-reveal-extra summary::-webkit-details-marker{display:none}
+.it-reveal-extra-body{margin-top:8px;display:grid;gap:8px}
 .it-stage-switch{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .it-stage-btn{border:1px solid #d1d5db;background:#fff;color:#374151;border-radius:999px;padding:6px 10px;font-weight:800;font-size:.8rem;cursor:pointer}
 .it-stage-btn.is-active{border-color:#2563eb;background:#eff6ff;color:#1d4ed8}
@@ -217,9 +426,11 @@ const css = `
 .it-challenge-item{border:1px solid #fecaca;background:#fff;border-radius:10px;padding:8px;color:#7f1d1d;line-height:1.35;font-weight:700}
 .it-challenge-note{margin-top:8px;border:1px dashed #fca5a5;background:#fff7f7;color:#991b1b;border-radius:10px;padding:8px;font-weight:700;line-height:1.35}
 .it-scenario-list{margin:0;padding:0;list-style:none;display:grid;gap:6px}.it-scenario-list li{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border:1px solid #f3f4f6;border-radius:8px;background:#fff}
+@media (min-width:981px){.it-focus-panel{position:sticky;top:10px;align-self:start;max-height:calc(100vh - 20px);overflow:auto}}
 @media (max-width:1180px){.it-workbench-grid{grid-template-columns:1fr}.it-template-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:1080px){.it-board-grid{grid-template-columns:1fr}.it-template-grid{grid-template-columns:1fr}}
-@media (max-width:980px){.it-grid{grid-template-columns:1fr}.it-slots.cols-3,.it-slots.cols-2{grid-template-columns:1fr}.it-board-row{grid-template-columns:1fr}.it-focus-sketch .it-sketch svg{min-height:120px}}
+@media (max-width:980px){.it-grid{grid-template-columns:1fr}.it-slots.cols-3,.it-slots.cols-2{grid-template-columns:1fr}.it-board-row{grid-template-columns:1fr}.it-focus-sketch .it-sketch svg{min-height:120px}.it-role-form{grid-template-columns:1fr 1fr}.it-role-grid{grid-template-columns:1fr}}
+@media (max-width:680px){.it-role-form{grid-template-columns:1fr}}
 `;
 
 function assetUrl(path: string): string {
@@ -479,6 +690,202 @@ function PrototypeSketch(props: { schemaId: PrototypeSchemaId }) {
   );
 }
 
+function cleanSnippet(text: string, max = 120): string {
+  const trimmed = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!trimmed) return '';
+  return trimmed.length > max ? `${trimmed.slice(0, max - 1)}…` : trimmed;
+}
+
+function buildRelationalVoiceDraft(input: {
+  roleId: RelationalVoiceRoleId;
+  toneId: RelationalToneId;
+  anchorText: string;
+  contextText: string;
+}): RelationalVoiceDraft {
+  const role = RELATIONAL_ROLE_PRESETS[input.roleId];
+  const tone = RELATIONAL_TONE_PRESETS[input.toneId];
+  const anchor = String(input.anchorText || '').trim() || 'הנושא';
+  const context = cleanSnippet(input.contextText, 110) || 'אין עדיין משפט מקור פעיל';
+
+  const levels: LogicalLevelsDraft = {
+    belonging: `בתוך ${role.closenessHe}, המטרה הרחבה היא לשמור על קשר ולגדול סביב "${anchor}" בלי לאבד כבוד הדדי.`,
+    identity: `אני מדבר/ת כאן כמו ${role.labelHe}: ${role.stanceHe}, ומביא/ה טון ${tone.labelHe} כדי לעבוד עם "${anchor}".`,
+    beliefsValues: `ערך מוביל: ${role.careFocusHe}. לכן חשוב לי ${tone.openingMoveHe} ולשמור על ${role.boundaryHe} סביב "${anchor}".`,
+    capability: `יכולות נדרשות: הקשבה, ניסוח מחדש, ${tone.challengeVerbHe} בעדינות, ופירוק "${anchor}" לשאלה אחת או צעד קטן.`,
+    behavior: `בפועל אדבר ${tone.adverbHe}, אתן משפט קצר על "${anchor}", אשאל שאלה אחת, ואז אציע פעולה הבאה.`,
+    environment: `הקשר מומלץ: זמן קצר ושקט, פנים-אל-פנים או הודעה מדויקת, עם דוגמה מהמשפט: "${context}".`
+  };
+
+  const deBono: DebonoHatDraft = {
+    white: `מה העובדות שנאמרו בפועל על "${anchor}"? מה מתוך המשפט הוא תיאור ומה פירוש? (קצה משפט: "${context}")`,
+    red: `כשאני בתפקיד ${role.labelHe} ובטון ${tone.labelHe}, מה אני מרגיש/ה לגבי "${anchor}" לפני שאני מסביר/ה?`,
+    black: `מה הסיכון אם אשתמש בטון ${tone.labelHe} בלי התאמה? (${tone.riskHe}) איפה זה עלול להסלים את "${anchor}"?`,
+    yellow: `מה הרווח האפשרי אם אדבר כמו ${role.labelHe} בטון ${tone.labelHe}? (${tone.benefitHe}) מה זה יאפשר סביב "${anchor}"?`,
+    green: `איזו חלופה יצירתית יש לאותו מסר על "${anchor}"? דימוי, דוגמה, משחק תפקידים, או ניסוח עדין יותר.`,
+    blue: `ניהול שיחה: 1) עוגן "${anchor}" 2) עובדה 3) רגש/צורך 4) שאלה 5) צעד קטן. מה סדר הפעולות הנכון כאן?`
+  };
+
+  const rgChecks = {
+    detectedType: `בדיקת טיפוסים: האם "${anchor}" מוצג כאן כנתון/התנהגות, או שכבר קפץ לזהות/מהות?`,
+    lowerTypeQuestion: `הורדת רמה: מה רואים/שומעים בפועל סביב "${anchor}" בלי תוויות או פרשנות?`,
+    upperTypeQuestion: `העלאת רמה: איזה כלל/ערך/זהות מפעילים את האמירה על "${anchor}" מתוך תפקיד ${role.labelHe}?`,
+    splitPrompt: `פירוק מומלץ: נתון | פירוש | כוונה | זהות. כתוב/י משפט קצר לכל חלק לפני תגובה מלאה.`
+  };
+
+  return {
+    anchor,
+    roleId: input.roleId,
+    toneId: input.toneId,
+    voiceLine: `קול ${role.labelHe} בטון ${tone.labelHe}: ${tone.openingMoveHe}, ואז ${tone.challengeVerbHe} סביב "${anchor}" מתוך ${role.boundaryHe}.`,
+    levels,
+    deBono,
+    rgChecks
+  };
+}
+
+function LogicalLevelsRoleStudio(props: { anchorText: string; contextText: string }) {
+  const { anchorText, contextText } = props;
+  const [roleId, setRoleId] = useState<RelationalVoiceRoleId>('PARENT');
+  const [toneId, setToneId] = useState<RelationalToneId>('SUPPORTIVE');
+  const [anchor, setAnchor] = useState(String(anchorText || '').trim());
+  const [draft, setDraft] = useState<RelationalVoiceDraft>(() =>
+    buildRelationalVoiceDraft({ roleId: 'PARENT', toneId: 'SUPPORTIVE', anchorText: anchorText || '', contextText })
+  );
+
+  useEffect(() => {
+    setAnchor(String(anchorText || '').trim());
+  }, [anchorText]);
+
+  useEffect(() => {
+    setDraft(buildRelationalVoiceDraft({ roleId, toneId, anchorText: anchor, contextText }));
+  }, [roleId, toneId, anchor, contextText]);
+
+  const rolePreset = RELATIONAL_ROLE_PRESETS[roleId];
+  const tonePreset = RELATIONAL_TONE_PRESETS[toneId];
+
+  function regenerate() {
+    setDraft(buildRelationalVoiceDraft({ roleId, toneId, anchorText: anchor, contextText }));
+  }
+
+  return (
+    <section className="it-role-studio" aria-label="Relational logical levels studio">
+      <div className="it-role-studio-head">
+        <div>
+          <h3 className="it-role-studio-title">סטודיו רמות לוגיות + דה בונו + Russell/Grinder (בטא)</h3>
+          <p className="it-role-studio-sub">
+            בחר/י תפקיד (למשל הורה/ילד/אח) וטון דיבור, והמערכת ממלאת טיוטת רמות לוגיות + שאלות עזר. אפשר לערוך ידנית.
+          </p>
+        </div>
+        <div className="it-role-chip-row" aria-label="preset summary">
+          <span className="it-role-chip">{rolePreset.labelHe}</span>
+          <span className="it-role-chip">{tonePreset.labelHe}</span>
+          <span className="it-role-chip">{rolePreset.boundaryHe}</span>
+        </div>
+      </div>
+
+      <div className="it-role-form">
+        <div className="it-field">
+          <label htmlFor="it-role-role">תפקיד / פרספקטיבה</label>
+          <select id="it-role-role" className="it-select" value={roleId} onChange={(e) => setRoleId(e.target.value as RelationalVoiceRoleId)}>
+            {(Object.values(RELATIONAL_ROLE_PRESETS) as RelationalVoiceRolePreset[]).map((preset) => (
+              <option key={preset.id} value={preset.id}>{preset.labelHe}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="it-field">
+          <label htmlFor="it-role-tone">טון דיבור</label>
+          <select id="it-role-tone" className="it-select" value={toneId} onChange={(e) => setToneId(e.target.value as RelationalToneId)}>
+            {(Object.values(RELATIONAL_TONE_PRESETS) as RelationalTonePreset[]).map((preset) => (
+              <option key={preset.id} value={preset.id}>{preset.labelHe}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="it-field">
+          <label htmlFor="it-role-anchor">עוגן / טוקן</label>
+          <input
+            id="it-role-anchor"
+            className="it-input"
+            value={anchor}
+            onChange={(e) => setAnchor(e.target.value)}
+            placeholder="למשל: מנוחה, ביקורת, כסף"
+          />
+        </div>
+
+        <div className="it-field">
+          <label>פעולה</label>
+          <div className="it-field-actions">
+            <button type="button" className="it-btn secondary small" onClick={regenerate}>מלא מחדש</button>
+            <button type="button" className="it-btn ghost small" onClick={() => setAnchor(String(anchorText || '').trim())}>משוך מהטוקן</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="it-voice-line">{draft.voiceLine}</div>
+
+      <div className="it-role-grid">
+        <div className="it-levels-grid" aria-label="Logical levels">
+          {LOGICAL_LEVEL_FIELDS.map((field) => (
+            <div key={field.key} className="it-level-card">
+              <div className="it-level-card-head">
+                <strong>{field.labelHe}</strong>
+                <span className="it-level-hint">{field.hintHe}</span>
+              </div>
+              <textarea
+                className="it-textarea"
+                value={draft.levels[field.key]}
+                onChange={(e) =>
+                  setDraft((prev) => ({
+                    ...prev,
+                    levels: { ...prev.levels, [field.key]: e.target.value }
+                  }))
+                }
+                rows={3}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="it-side-stack">
+          <div className="it-rg-card" aria-label="Russell Grinder logical types prompts">
+            <h4>Russell / Grinder · בדיקת טיפוסים ורמות</h4>
+            <div className="it-rg-line"><strong>זיהוי:</strong> {draft.rgChecks.detectedType}</div>
+            <div className="it-rg-line"><strong>הורדת רמה:</strong> {draft.rgChecks.lowerTypeQuestion}</div>
+            <div className="it-rg-line"><strong>העלאת רמה:</strong> {draft.rgChecks.upperTypeQuestion}</div>
+            <div className="it-rg-line"><strong>פירוק:</strong> {draft.rgChecks.splitPrompt}</div>
+          </div>
+
+          <div className="it-rg-card" aria-label="De Bono hats prompts">
+            <h4>דה בונו · מניפת חשיבה סביב אותו עוגן</h4>
+            <div className="it-hat-list">
+              {DEBONO_FIELDS.map((field) => (
+                <div key={field.key} className="it-hat-card">
+                  <div className="it-hat-head">
+                    <strong>{field.labelHe}</strong>
+                    <span className="it-mini-tag">{field.chip}</span>
+                  </div>
+                  <textarea
+                    className="it-textarea"
+                    value={draft.deBono[field.key]}
+                    onChange={(e) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        deBono: { ...prev.deBono, [field.key]: e.target.value }
+                      }))
+                    }
+                    rows={2}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function SentenceBoard(props: {
   scenario: Scenario;
   selectedToken: DraggableCandidate | null;
@@ -548,6 +955,8 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
   const [hoverTemplate, setHoverTemplate] = useState<TemplateType | null>(null);
   const [shakeTemplate, setShakeTemplate] = useState<TemplateType | null>(null);
   const [focusStage, setFocusStage] = useState<'build' | 'reveal' | 'challenge'>('build');
+  const [showFocusGuide, setShowFocusGuide] = useState(false);
+  const [showFocusSketch, setShowFocusSketch] = useState(false);
   const [state, setState] = useState<TrainerState>(INITIAL_STATE);
 
   useEffect(() => {
@@ -961,6 +1370,10 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
                       </div>
                     ))}
                   </div>
+                  <LogicalLevelsRoleStudio
+                    anchorText={selectedToken?.text ?? activeToken?.text ?? ''}
+                    contextText={scenario.client_text}
+                  />
                 </div>
               </details>
             </section>
@@ -987,7 +1400,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
             <div className="it-focus-top">
               <div>
                 <h2 className="it-title" style={{ fontSize: '1.08rem' }}>פאנל מיקוד / Build → Reveal → Challenge</h2>
-                <p className="it-sub">בונים קודם את הסכמה, אחר כך חושפים שיקוף, ורק אז פותחים את שלב האתגר.</p>
+                <p className="it-sub">פאנל עבודה קצר. הסבר מפורט ומפת הסכמה נפתחים רק כשצריך.</p>
               </div>
               {revealReady && activeToken && state.active ? (
                 <div className="it-focus-badge">
@@ -996,12 +1409,35 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
               ) : null}
             </div>
 
-            <div className="it-steps" aria-label="Focus stages">
-              <span className={`it-step ${state.selectedTokenId ? 'is-done' : 'is-on'}`}>1. בחר/י בלוק</span>
-              <span className={`it-step ${state.active ? 'is-done' : state.selectedTokenId ? 'is-on' : ''}`}>2. גרירה לסכמה</span>
-              <span className={`it-step ${revealReady ? 'is-done' : state.active ? 'is-on' : ''}`}>3. Reveal</span>
-              <span className={`it-step ${challengeReady ? 'is-on' : ''}`}>4. Challenge</span>
+            <div className="it-focus-toolbar">
+              <button type="button" className="it-focus-mini-btn" onClick={() => setShowFocusGuide((prev) => !prev)} aria-pressed={showFocusGuide}>
+                {showFocusGuide ? 'הסתר הסבר' : 'הסבר מהיר'}
+              </button>
+              <button
+                type="button"
+                className="it-focus-mini-btn"
+                onClick={() => setShowFocusSketch((prev) => !prev)}
+                aria-pressed={showFocusSketch}
+                disabled={!revealReady}
+                title={revealReady ? 'הצג/הסתר מפת סכמה' : 'הסכמה תופיע אחרי בחירת טוקן ותבנית'}
+              >
+                {showFocusSketch ? 'הסתר מפה' : 'הצג מפה'}
+              </button>
             </div>
+
+            {showFocusGuide ? (
+              <div className="it-focus-guide" aria-label="הסבר מהיר">
+                <div className="it-focus-guide-body">
+                  <div className="it-help"><strong>איך עובדים כאן:</strong> בוחרים בלוק, גוררים לתבנית, רואים Reveal, ואז בודקים ב-Challenge.</div>
+                  <div className="it-steps" aria-label="Focus stages">
+                    <span className={`it-step ${state.selectedTokenId ? 'is-done' : 'is-on'}`}>1. בחר/י בלוק</span>
+                    <span className={`it-step ${state.active ? 'is-done' : state.selectedTokenId ? 'is-on' : ''}`}>2. גרירה לסכמה</span>
+                    <span className={`it-step ${revealReady ? 'is-done' : state.active ? 'is-on' : ''}`}>3. Reveal</span>
+                    <span className={`it-step ${challengeReady ? 'is-on' : ''}`}>4. Challenge</span>
+                  </div>
+                </div>
+              </div>
+            ) : null}
 
             {!revealReady ? (
               <div className="it-empty" style={{ marginTop: 10 }}>
@@ -1009,18 +1445,16 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
               </div>
             ) : (
               <div className="it-active" style={{ marginTop: 10 }}>
-                <div className="it-chip" style={{ width: 'fit-content' }}>
-                  טוקן: <strong>{activeToken.text}</strong> · תבנית: <strong>{formatTemplateLabel(state.active.templateType)}</strong>
-                </div>
-
-                <div className="it-focus-sketch">
-                  <TemplateSketch
-                    meta={TEMPLATE_META[state.active.templateType]}
-                    tokenText={activeToken.text}
-                    causeMode={'mode' in activePayload ? activePayload.mode ?? null : null}
-                    active
-                  />
-                </div>
+                {showFocusSketch || focusStage === 'build' ? (
+                  <div className={`it-focus-sketch ${focusStage !== 'build' ? 'is-compact' : ''}`}>
+                    <TemplateSketch
+                      meta={TEMPLATE_META[state.active.templateType]}
+                      tokenText={activeToken.text}
+                      causeMode={'mode' in activePayload ? activePayload.mode ?? null : null}
+                      active
+                    />
+                  </div>
+                ) : null}
 
                 <div className="it-stage-switch" role="tablist" aria-label="שלבי העבודה">
                   <button
@@ -1080,14 +1514,19 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
 
                   {focusStage === 'reveal' ? (
                     <>
-                      <div className="it-question">{activePayload.question}</div>
                       <div className={`it-slots cols-${TEMPLATE_META[state.active.templateType].slotCount}`}>
                         {Array.from({ length: TEMPLATE_META[state.active.templateType].slotCount }).map((_, idx) => (
                           <div key={idx} className="it-slot">{activeSet[idx] || '—'}</div>
                         ))}
                       </div>
-                      <div className="it-reflection">{activeReflection}</div>
-                      <div className="it-disclaimer">{DISCLAIMER_COPY}</div>
+                      <details className="it-reveal-extra">
+                        <summary>הסבר השאלה + שיקוף (Reveal)</summary>
+                        <div className="it-reveal-extra-body">
+                          <div className="it-question">{activePayload.question}</div>
+                          <div className="it-reflection">{activeReflection}</div>
+                          <div className="it-disclaimer">{DISCLAIMER_COPY}</div>
+                        </div>
+                      </details>
                       <div className="it-actions">
                         <button type="button" className="it-btn secondary" onClick={cycleVariant}>
                           מטופל אחר / תשובה אחרת
@@ -1109,15 +1548,24 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
 
                   {focusStage === 'challenge' ? (
                     <>
-                      <div className="it-help"><strong>Challenge:</strong> עכשיו בודקים את מה שנחשף, במקום לערבב חשיפה ואתגר באותו רגע.</div>
+                      <div className="it-board-row">
+                        <div className="it-board-label">מה עושים כאן</div>
+                        <div className="it-board-value emph">שאלות בדיקה (לא תשובות). בודקים את ה-Reveal במקום להתווכח איתו מיד.</div>
+                      </div>
                       <div className="it-challenge-list">
                         {challengePrompts.map((prompt, idx) => (
                           <div key={`${state.active?.templateType}-${idx}`} className="it-challenge-item">{idx + 1}. {prompt}</div>
                         ))}
                       </div>
-                      <div className="it-challenge-note">
-                        שלב האתגר מגיע אחרי החשיפה: קודם בונים מפה, ואז בודקים את מה שנחשף.
-                      </div>
+                      <details className="it-reveal-extra">
+                        <summary>למה השאלות האלה? (הסבר אתגר)</summary>
+                        <div className="it-reveal-extra-body">
+                          <div className="it-challenge-note">
+                            שלב האתגר מגיע אחרי החשיפה: קודם בונים מפה, ואז בודקים את מה שנחשף.
+                          </div>
+                          <div className="it-help"><strong>טיפ:</strong> קח/י שאלה אחת בלבד, ענה/י בקצרה, ואז חזור/י ל-Reveal אם צריך.</div>
+                        </div>
+                      </details>
                       <div className="it-actions">
                         <button type="button" className="it-btn secondary" onClick={() => setFocusStage('reveal')}>
                           חזרה ל-Reveal

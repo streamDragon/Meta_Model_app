@@ -1,9 +1,12 @@
 import { spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import process from 'node:process';
 
 const ROOT = process.cwd();
-const NPM_CMD = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+const NPM_CANDIDATES = process.platform === 'win32' ? ['npm.cmd', 'npm'] : ['npm'];
 const NODE_CMD = process.execPath;
+const NPM_CLI_PATH = path.join(path.dirname(NODE_CMD), 'node_modules', 'npm', 'bin', 'npm-cli.js');
 
 function runCmd(command, args, options = {}) {
     const result = spawnSync(command, args, {
@@ -12,9 +15,34 @@ function runCmd(command, args, options = {}) {
         ...options
     });
     if (result.status !== 0) {
-        throw new Error(`Command failed: ${command} ${args.join(' ')}`);
+        const cause = result.error ? ` (${result.error.message})` : '';
+        throw new Error(`Command failed: ${command} ${args.join(' ')}${cause}`);
     }
     return result;
+}
+
+function runCmdWithFallback(commands, args, options = {}) {
+    let lastError = null;
+    for (const command of commands) {
+        try {
+            return runCmd(command, args, options);
+        } catch (err) {
+            lastError = err;
+        }
+    }
+    throw lastError ?? new Error(`All command candidates failed: ${commands.join(', ')}`);
+}
+
+function runNpmVersionPatch() {
+    try {
+        return runCmdWithFallback(NPM_CANDIDATES, ['version', 'patch', '--no-git-tag-version', '--silent']);
+    } catch (err) {
+        if (existsSync(NPM_CLI_PATH)) {
+            console.log(`pre-commit: PATH npm not found, retrying via npm-cli at ${NPM_CLI_PATH}`);
+            return runCmd(NODE_CMD, [NPM_CLI_PATH, 'version', 'patch', '--no-git-tag-version', '--silent']);
+        }
+        throw err;
+    }
 }
 
 function hasStagedChanges() {
@@ -41,7 +69,7 @@ function run() {
         console.log('pre-commit: merge commit detected, skipping auto version bump.');
     } else if (String(process.env.SKIP_AUTO_VERSION_BUMP || '') !== '1') {
         console.log('pre-commit: auto-bumping patch version...');
-        runCmd(NPM_CMD, ['version', 'patch', '--no-git-tag-version', '--silent']);
+        runNpmVersionPatch();
     } else {
         console.log('pre-commit: skipping auto version bump (SKIP_AUTO_VERSION_BUMP=1).');
     }
