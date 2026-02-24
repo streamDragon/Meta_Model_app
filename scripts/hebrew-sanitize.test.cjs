@@ -5,8 +5,8 @@ const path = require('node:path');
 
 const sanitize = require('../js/hebrew-sanitize.js');
 
-const REQUIRED_WIZARD_TITLE = 'כמתים נסתרים – ההכללות שמשתמעות אבל לא נאמרות';
-const REQUIRED_WIZARD_FORMULA = 'חוץ (מצלמה) + כמת נסתר → עוצמה בפנים';
+const REQUIRED_WIZARD_TITLE = 'כמתים נסתרים – הגשר שנסגר';
+const REQUIRED_WIZARD_FORMULA = 'Signal → Hidden Quantifier → Bridge → Confirm → PATH → Learning';
 
 test('sanitizeHebrewText fixes known typo words', () => {
     assert.equal(sanitize.sanitizeHebrewText('מפששט'), 'משפט');
