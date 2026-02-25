@@ -12092,7 +12092,7 @@ function wr2NormalizeScene(raw, idxPrefix = 'wr2_custom') {
 
 function wr2OverlayHtml(template, activeQuantifier) {
     const parts = String(template || '').split('{Q}');
-    const q = activeQuantifier ? `[${activeQuantifier}]` : '[???]';
+    const q = activeQuantifier ? `[${activeQuantifier}]` : '[בחר/י כמת]';
     const qHtml = `<span class="wr2-q-inline">${escapeHtml(q)}</span>`;
     if (parts.length < 2) return `${escapeHtml(template || '')} ${qHtml}`.trim();
     return `${escapeHtml(parts[0])}${qHtml}${escapeHtml(parts.slice(1).join('{Q}'))}`;
@@ -12101,7 +12101,7 @@ function wr2OverlayHtml(template, activeQuantifier) {
 function wr2TriggerFx(layer, strong = false) {
     if (!layer) return;
     layer.innerHTML = '';
-    const glyphs = strong ? ['ג¨', 'נ‰', 'נ’¥', 'ג…'] : ['ג¨', 'נ”', 'נ§©'];
+    const glyphs = strong ? ['✨', '🎉', '💥', '🌟'] : ['✨', '🔍', '🧩'];
     const count = strong ? 14 : 7;
     for (let i = 0; i < count; i += 1) {
         const star = document.createElement('span');
