@@ -119,10 +119,35 @@
         document.head.appendChild(style);
     }
 
+    function ensureExternalCss(id, path) {
+        if (document.getElementById(id)) return;
+        var link = document.createElement('link');
+        link.id = id;
+        link.rel = 'stylesheet';
+        link.href = withBuildQuery(path);
+        document.head.appendChild(link);
+    }
+
+    function ensureExternalScript(id, path) {
+        if (document.getElementById(id)) return;
+        var script = document.createElement('script');
+        script.id = id;
+        script.src = withBuildQuery(path);
+        script.defer = true;
+        document.head.appendChild(script);
+    }
+
+    function ensureAlchemyLayer() {
+        if (!isStandaloneTrainerPage()) return;
+        ensureExternalCss('alchemy-global-style', 'css/alchemy-global.css');
+        ensureExternalScript('alchemy-global-script', 'js/alchemy-global.js');
+    }
+
     function buildNav() {
         if (!isStandaloneTrainerPage()) return;
         if (!document.body || document.querySelector('.trainer-shell-nav')) return;
 
+        ensureAlchemyLayer();
         injectStyles();
 
         var nav = document.createElement('div');

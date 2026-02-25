@@ -106,6 +106,15 @@ const STEP_LABELS_HE: Record<Step, string> = {
   nextStep: 'צעד הבא'
 };
 
+const BREEN_CELL_ORDER = ['DEL', 'DIS', 'GEN', 'CTX', 'VAK'] as const;
+const BREEN_CELL_LABELS: Record<(typeof BREEN_CELL_ORDER)[number], string> = {
+  DEL: 'מחיקות',
+  DIS: 'עיוותים',
+  GEN: 'הכללות',
+  CTX: 'הקשר',
+  VAK: 'חושי'
+};
+
 const CATEGORIES: CategoryMeta[] = [
   { id: 'cause_effect', label: 'CE / סיבה–תוצאה', family: 'Distortion', breenCell: 'DIS', tileHint: "חפש/י קשר סיבתי או 'כי/אז/ממילא'.", mapUpdateLine: 'המפה עודכנה: מעבר מגורל למנגנון.', nextLikely: ['complex_equivalence', 'universal_quantifier'] },
   { id: 'complex_equivalence', label: 'CEq / שקילות מורכבת', family: 'Distortion', breenCell: 'DIS', tileHint: "חפש/י 'X אומר Y'.", mapUpdateLine: 'המפה עודכנה: מעבר ממשמעות קשיחה לאלטרנטיבות.', nextLikely: ['mind_reading', 'cause_effect'] },
@@ -322,6 +331,27 @@ const css = `
 .c2-next{margin-top:12px;border:1px solid #c7d2fe;background:linear-gradient(180deg,#fff,#f8fbff);border-radius:12px;padding:12px}.c2-next p{margin-top:8px;line-height:1.35}.c2-next blockquote{margin:10px 0 0;padding:8px 10px;border-inline-start:4px solid #3b82f6;background:#eff6ff;border-radius:8px;color:#1e3a8a;font-size:.86rem}
 .c2-dirs{display:grid;gap:8px;margin-top:10px}.c2-dir{border:1px solid #dbe7f5;background:#fff;border-radius:12px;padding:10px;text-align:right;font-weight:800;cursor:pointer}.c2-dir.active{border-color:#2563eb;background:#eff6ff}.c2-note{margin-top:10px;border:1px solid #dbe7f5;background:#f8fafc;border-radius:10px;padding:10px;line-height:1.35;color:#334155}
 @media (max-width:960px){.c2-layout,.c2-grid{grid-template-columns:1fr}.c2-side{position:static}.c2-storybar-top{align-items:flex-start}}
+/* Classic2 UX reflow: one visual workspace + Breen table up top */
+.c2-layout{grid-template-columns:1fr}
+.c2-side{position:static;top:auto}
+.c2-side-grid{display:grid;gap:10px}
+.c2-breen-board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}
+.c2-breen-col{border:1px solid #dbe7f5;background:#ffffffd9;border-radius:12px;padding:8px;display:grid;gap:8px;align-content:start}
+.c2-breen-col-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:10px;background:#f8fbff;border:1px solid #e2ecfa}
+.c2-breen-code{font-weight:900;color:#1d4ed8;font-size:.86rem}
+.c2-breen-name{color:#475569;font-weight:800;font-size:.72rem}
+.c2-breen-col-grid{display:grid;gap:6px}
+.c2-breen-col-grid .c2-cat{padding:8px 9px}
+.c2-workspace{margin-top:12px;display:grid;grid-template-columns:1fr;gap:12px}
+.c2-focus-stack{display:grid;gap:12px}
+.c2-focus-head{display:grid;gap:8px}
+.c2-focus-selected{border:1px dashed #bfdbfe;background:#eff6ff;border-radius:10px;padding:9px 10px;color:#1e3a8a;font-weight:700;line-height:1.35}
+.c2-focus-selected code{font-family:inherit;font-weight:900;color:#1d4ed8;background:#dbeafe;padding:1px 6px;border-radius:999px}
+.c2-story-grid-tip{margin-top:8px;color:#64748b;font-size:.78rem;line-height:1.35}
+.c2-q-anchor{margin-top:8px;border:1px dashed #bfdbfe;background:#f8fbff;color:#1e3a8a;border-radius:10px;padding:8px 10px;font-weight:700;font-size:.82rem}
+@media (max-width:1280px){.c2-breen-board{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:860px){.c2-breen-board{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.c2-breen-board{grid-template-columns:1fr}.c2-breen-col-head{padding:8px}.c2-story-actions,.c2-filter-row,.c2-actions{display:grid;grid-template-columns:1fr}.c2-story-actions .c2-btn,.c2-filter-row .c2-btn,.c2-actions .c2-btn{width:100%}}
 `;
 
 const lineGroups = (scenario: Scenario) => {
@@ -382,6 +412,12 @@ export default function Classic2Trainer(): React.ReactElement {
   const currentCat = s.selectedCategory ? CAT[s.selectedCategory] : null;
   const lastTurn = s.dialogueTurns[s.dialogueTurns.length - 1] || null;
   const nextNeighbor = s.selectedCategory ? CAT[s.selectedCategory].nextLikely[0] : null;
+  const selectedTile = s.selectedTileId ? (scenario.storyTiles.find((t) => t.id === s.selectedTileId) || null) : null;
+  const breenColumns = BREEN_CELL_ORDER.map((cellCode) => ({
+    cellCode,
+    title: BREEN_CELL_LABELS[cellCode],
+    items: CATEGORIES.filter((c) => c.breenCell === cellCode)
+  }));
 
   useEffect(() => {
     if (storyFilter === 'all' || scenario.storyType === storyFilter) return;
@@ -548,36 +584,60 @@ export default function Classic2Trainer(): React.ReactElement {
     <div className="c2" dir="rtl" lang="he">
       <style>{css}</style>
       <div className="c2-layout">
-        <aside className="c2-panel c2-side" aria-label="טבלת קטגוריות">
-          <h2 style={{ fontSize: '1.18rem', fontWeight: 900 }}>Classic 2 · Structure of Magic</h2>
-          <p className="c2-sub">סיפור רחב → קטגוריה → קטע → שאלה → דיאלוג → צעד הבא</p>
-          <button type="button" className="c2-philo-btn" onClick={() => setShowPhilosopher((v) => !v)} aria-expanded={showPhilosopher}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span className="c2-philo-avatar" aria-hidden="true">🧙</span>
-              <span>הפילוסוף (הפילוסופיה של הכלי)</span>
-            </span>
-            <span>{showPhilosopher ? '▾' : '▸'}</span>
-          </button>
-          {showPhilosopher && (
-            <div className="c2-quote">
-              <strong>למה הכלי הזה קיים?</strong>
-              <div>{PHILOSOPHY_COPY}</div>
+        <aside className="c2-panel c2-side" aria-label="טבלת ברין">
+          <div className="c2-side-grid">
+            <div>
+              <h2 style={{ fontSize: '1.18rem', fontWeight: 900 }}>Classic 2 · Structure of Magic</h2>
+              <p className="c2-sub">טבלת ברין למעלה + חלון סיפור + פאנל פוקוס אחד (קטגוריה/שאלה/משוב) בלי זיגזג בין צדדים.</p>
             </div>
-          )}
-          <div className="c2-cats" role="list" aria-label="קטגוריות לשוניות-לוגיות">
-            {CATEGORIES.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                className={`c2-cat${s.selectedCategory === c.id ? ' active' : ''}${scenarioHasCategory(scenario, c.id) ? '' : ' off'}`}
-                onClick={() => chooseCategory(c.id)}
-                aria-pressed={s.selectedCategory === c.id}
-              >
-                <div className="c2-cat-top"><span className="c2-pill">{c.breenCell}</span><span className="c2-mini">{FAMILY_LABELS_HE[c.family]}</span></div>
-                <div style={{ marginTop: 6, fontWeight: 800 }}>{c.label}</div>
-                <div className="c2-mini">{scenarioHasCategory(scenario, c.id) ? 'יש דוגמה בסיפור' : 'אין דוגמה בסיפור הזה'}</div>
-              </button>
-            ))}
+
+            <button type="button" className="c2-philo-btn" onClick={() => setShowPhilosopher((v) => !v)} aria-expanded={showPhilosopher}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span className="c2-philo-avatar" aria-hidden="true">🧙</span>
+                <span>הפילוסוף (הפילוסופיה של הכלי)</span>
+              </span>
+              <span>{showPhilosopher ? '▾' : '▸'}</span>
+            </button>
+
+            {showPhilosopher && (
+              <div className="c2-quote">
+                <strong>למה הכלי הזה קיים?</strong>
+                <div>{PHILOSOPHY_COPY}</div>
+              </div>
+            )}
+
+            <div className="c2-info" style={{ marginTop: 0 }}>
+              טבלת ברין: בחר/י קודם קטגוריה מתוך התא (DEL / DIS / GEN / CTX / VAK), ואז סמנו קטע מתאים בתוך הסיפור.
+            </div>
+
+            <div className="c2-breen-board" role="list" aria-label="טבלת ברין עם כל ההפרות">
+              {breenColumns.map((col) => (
+                <section key={col.cellCode} className="c2-breen-col" role="listitem" aria-label={`תא ${col.cellCode}`}>
+                  <div className="c2-breen-col-head">
+                    <span className="c2-breen-code">{col.cellCode}</span>
+                    <span className="c2-breen-name">{col.title}</span>
+                  </div>
+                  <div className="c2-breen-col-grid">
+                    {col.items.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        className={`c2-cat${s.selectedCategory === c.id ? ' active' : ''}${scenarioHasCategory(scenario, c.id) ? '' : ' off'}`}
+                        onClick={() => chooseCategory(c.id)}
+                        aria-pressed={s.selectedCategory === c.id}
+                      >
+                        <div className="c2-cat-top">
+                          <span className="c2-pill">{c.breenCell}</span>
+                          <span className="c2-mini">{FAMILY_LABELS_HE[c.family]}</span>
+                        </div>
+                        <div style={{ marginTop: 6, fontWeight: 800 }}>{c.label}</div>
+                        <div className="c2-mini">{scenarioHasCategory(scenario, c.id) ? 'יש דוגמה בסיפור' : 'אין דוגמה בסיפור הזה'}</div>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
           </div>
         </aside>
 
@@ -624,9 +684,10 @@ export default function Classic2Trainer(): React.ReactElement {
             </div>
           </div>
 
-          <div className="c2-grid">
+          <div className="c2-workspace">
             <section className="c2-card" aria-label="חלון סיפור">
               <h3>חלון סיפור (הקשר רחב)</h3>
+              <div className="c2-story-grid-tip">זרימה מומלצת: 1) בחר/י קטגוריה בטבלת ברין למעלה 2) סמן/י קטע בסיפור 3) בחר/י שאלה בפאנל הפוקוס שמתחת.</div>
               {rows.map(([line, tiles]) => (
                 <div key={line} className="c2-line">
                   <div className="c2-line-label">שורה {line}</div>
@@ -647,66 +708,77 @@ export default function Classic2Trainer(): React.ReactElement {
               ))}
             </section>
 
-            <section className="c2-card" aria-label="סטטוס קטגוריה">
-              <h3>סטטוס קטגוריה / ברין</h3>
-              {currentCat ? (
-                <>
-                  <div style={{ fontWeight: 800 }}>{currentCat.label}</div>
-                  <div className="c2-mini">{FAMILY_LABELS_HE[currentCat.family]} · קוד {currentCat.breenCell}</div>
-                  <div className="c2-info" style={{ marginTop: 10 }}>{currentCat.tileHint}</div>
-                </>
-              ) : (
-                <div className="c2-mini">בחר/י קטגוריה כדי להתחיל.</div>
+            <aside className="c2-focus-stack" aria-label="פאנל פוקוס">
+              <section className="c2-card" aria-label="פוקוס נוכחי">
+                <div className="c2-focus-head">
+                  <h3>פוקוס נוכחי (קטגוריה + קטע + שאלה)</h3>
+                  {currentCat ? (
+                    <>
+                      <div style={{ fontWeight: 800 }}>{currentCat.label}</div>
+                      <div className="c2-mini">{FAMILY_LABELS_HE[currentCat.family]} · תא ברין {currentCat.breenCell}</div>
+                      <div className="c2-info" style={{ marginTop: 0 }}>{currentCat.tileHint}</div>
+                    </>
+                  ) : (
+                    <div className="c2-mini">בחר/י קטגוריה מטבלת ברין כדי להתחיל.</div>
+                  )}
+
+                  <div className="c2-focus-selected">
+                    קטע נבחר:
+                    {' '}
+                    {selectedTile ? <code>{selectedTile.text}</code> : 'עדיין לא נבחר קטע מהסיפור'}
+                  </div>
+
+                  {s.lastFeedback && <div className={`c2-fb ${s.lastFeedback.tone}`}>{s.lastFeedback.message}</div>}
+                </div>
+              </section>
+
+              {s.step === 'chooseQuestion' && s.selectedCategory && (
+                <section className="c2-card" aria-label="בחירת שאלה">
+                  <h3>שלב 2 · בחירת השאלה המטא-מודלית הבאה</h3>
+                  <div className="c2-mini">השאלה נפתחת כאן, ליד הפוקוס הנוכחי. יש 6 אפשרויות; בדיוק 3 טובות.</div>
+                  {selectedTile && <div className="c2-q-anchor">על הקטע: "{selectedTile.text}"</div>}
+                  <div className="c2-qs">
+                    {s.questionDeck.map((q) => (
+                      <button key={q.id} type="button" className={`c2-q${s.selectedQuestionId === q.id ? ' sel' : ''}`} onClick={() => chooseQuestion(q)}>
+                        {q.text}
+                      </button>
+                    ))}
+                  </div>
+                </section>
               )}
-            </section>
+
+              {s.step === 'dialogue' && lastTurn && (
+                <section className="c2-card" aria-label="דיאלוג שנוצר">
+                  <h3>תור דיאלוג חדש</h3>
+                  <div className="c2-turn"><div className="c2-turn-l">שאלה (מטפל/ת)</div><div className="c2-turn-t">{lastTurn.therapist}</div></div>
+                  <div className="c2-turn"><div className="c2-turn-l">תשובת מטופל/ת</div><div className="c2-turn-t">{lastTurn.client}</div><div className="c2-map">{lastTurn.mapUpdate}</div></div>
+                  <div className="c2-actions">
+                    <button type="button" className="c2-btn p" onClick={goNextStep}>פתח צעד הבא</button>
+                    <button type="button" className="c2-btn s" onClick={() => setS((p) => ({ ...p, step: 'chooseQuestion' }))}>בחר/י שאלה אחרת</button>
+                  </div>
+                </section>
+              )}
+
+              {s.step === 'nextStep' && (
+                <section className="c2-next" aria-label="צעד הבא">
+                  <h3 style={{ fontSize: '1rem' }}>צעד הבא</h3>
+                  <p>זה לא טיפול מלא; זה מנוע לצעד הבא: לזהות קטגוריה אחת, לשאול שאלה מדויקת, ולעדכן את המפה.</p>
+                  <p>{nextNeighbor ? `קטגוריה שכנה מומלצת: ${CAT[nextNeighbor].label}.` : 'בחר/י כיוון המשך כדי להמשיך את הלולאה.'}</p>
+                  <blockquote>{PHILOSOPHY_COPY}</blockquote>
+                  <div className="c2-dirs">
+                    <button type="button" className={`c2-dir${s.activeDirection === 'same' ? ' active' : ''}`} onClick={() => pickDirection('same')}>1) להמשיך לדייק את אותה קטגוריה</button>
+                    <button type="button" className={`c2-dir${s.activeDirection === 'neighbor' ? ' active' : ''}`} onClick={() => pickDirection('neighbor')}>2) לעבור לקטגוריה שכנה</button>
+                    <button type="button" className={`c2-dir${s.activeDirection === 'counter' ? ' active' : ''}`} onClick={() => pickDirection('counter')}>3) לחפש גבולות / יוצאי דופן</button>
+                  </div>
+                  {s.nextActionMessage && <div className="c2-note">{s.nextActionMessage}</div>}
+                  <div className="c2-actions">
+                    <button type="button" className="c2-btn g" onClick={() => setS((p) => ({ ...p, step: 'selectTile', selectedTileId: null, selectedQuestionId: null, lastFeedback: { tone: 'info', message: 'לולאה חדשה באותו סיפור: בחר/י קטע.' } }))}>לולאה נוספת (אותו סיפור)</button>
+                    <button type="button" className="c2-btn s" onClick={reset}>איפוס</button>
+                  </div>
+                </section>
+              )}
+            </aside>
           </div>
-
-          {s.lastFeedback && <div className={`c2-fb ${s.lastFeedback.tone}`}>{s.lastFeedback.message}</div>}
-
-          {s.step === 'chooseQuestion' && s.selectedCategory && (
-            <section className="c2-card" style={{ marginTop: 12 }} aria-label="בחירת שאלה">
-              <h3>שלב 2 · בחירת השאלה המטא-מודלית הבאה</h3>
-              <div className="c2-mini">יש 6 אפשרויות; בדיוק 3 טובות. ההתקדמות נעצרת עד בחירת שאלה טובה.</div>
-              <div className="c2-qs">
-                {s.questionDeck.map((q) => (
-                  <button key={q.id} type="button" className={`c2-q${s.selectedQuestionId === q.id ? ' sel' : ''}`} onClick={() => chooseQuestion(q)}>
-                    {q.text}
-                  </button>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {s.step === 'dialogue' && lastTurn && (
-            <section className="c2-card" style={{ marginTop: 12 }} aria-label="דיאלוג שנוצר">
-              <h3>תור דיאלוג חדש</h3>
-              <div className="c2-turn"><div className="c2-turn-l">שאלה (מטפל/ת)</div><div className="c2-turn-t">{lastTurn.therapist}</div></div>
-              <div className="c2-turn"><div className="c2-turn-l">תשובת מטופל/ת</div><div className="c2-turn-t">{lastTurn.client}</div><div className="c2-map">{lastTurn.mapUpdate}</div></div>
-              <div className="c2-actions">
-                <button type="button" className="c2-btn p" onClick={goNextStep}>פתח צעד הבא</button>
-                <button type="button" className="c2-btn s" onClick={() => setS((p) => ({ ...p, step: 'chooseQuestion' }))}>בחר/י שאלה אחרת</button>
-              </div>
-            </section>
-          )}
-
-          {s.step === 'nextStep' && (
-            <section className="c2-next" aria-label="צעד הבא">
-              <h3 style={{ fontSize: '1rem' }}>צעד הבא</h3>
-              <p>זה לא טיפול מלא; זה מנוע לצעד הבא: לזהות קטגוריה אחת, לשאול שאלה מדויקת, ולעדכן את המפה.</p>
-              <p>{nextNeighbor ? `קטגוריה שכנה מומלצת: ${CAT[nextNeighbor].label}.` : 'בחר/י כיוון המשך כדי להמשיך את הלולאה.'}</p>
-              <blockquote>{PHILOSOPHY_COPY}</blockquote>
-              <div className="c2-dirs">
-                <button type="button" className={`c2-dir${s.activeDirection === 'same' ? ' active' : ''}`} onClick={() => pickDirection('same')}>1) להמשיך לדייק את אותה קטגוריה</button>
-                <button type="button" className={`c2-dir${s.activeDirection === 'neighbor' ? ' active' : ''}`} onClick={() => pickDirection('neighbor')}>2) לעבור לקטגוריה שכנה</button>
-                <button type="button" className={`c2-dir${s.activeDirection === 'counter' ? ' active' : ''}`} onClick={() => pickDirection('counter')}>3) לחפש גבולות / יוצאי דופן</button>
-              </div>
-              {s.nextActionMessage && <div className="c2-note">{s.nextActionMessage}</div>}
-              <div className="c2-actions">
-                <button type="button" className="c2-btn g" onClick={() => setS((p) => ({ ...p, step: 'selectTile', selectedTileId: null, selectedQuestionId: null, lastFeedback: { tone: 'info', message: 'לולאה חדשה באותו סיפור: בחר/י קטע.' } }))}>לולאה נוספת (אותו סיפור)</button>
-                <button type="button" className="c2-btn s" onClick={reset}>איפוס</button>
-              </div>
-            </section>
-          )}
 
           {s.dialogueTurns.length > 0 && (
             <section className="c2-card" style={{ marginTop: 12 }} aria-label="היסטוריית דיאלוג">

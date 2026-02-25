@@ -114,6 +114,12 @@ type RelationalVoiceDraft = {
   };
 };
 
+type TreeChip = {
+  id: string;
+  label: string;
+  text: string;
+};
+
 const TEMPLATE_META: Record<TemplateType, TemplateMeta> = {
   CEQ: {
     type: 'CEQ',
@@ -431,6 +437,67 @@ const css = `
 @media (max-width:1080px){.it-board-grid{grid-template-columns:1fr}.it-template-grid{grid-template-columns:1fr}}
 @media (max-width:980px){.it-grid{grid-template-columns:1fr}.it-slots.cols-3,.it-slots.cols-2{grid-template-columns:1fr}.it-board-row{grid-template-columns:1fr}.it-focus-sketch .it-sketch svg{min-height:120px}.it-role-form{grid-template-columns:1fr 1fr}.it-role-grid{grid-template-columns:1fr}}
 @media (max-width:680px){.it-role-form{grid-template-columns:1fr}}
+/* UX refinements from user feedback */
+.it-grid{grid-template-columns:1fr}
+@media (min-width:981px){.it-focus-panel{position:static;top:auto;align-self:stretch;max-height:none;overflow:visible}}
+.it-focus-help{border:1px solid #dbeafe;background:#f8fbff;border-radius:10px;padding:8px}
+.it-focus-help summary{cursor:pointer;list-style:none;font-weight:900;color:#1e3a8a;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.it-focus-help summary::-webkit-details-marker{display:none}
+.it-focus-help-body{margin-top:8px;display:grid;gap:8px}
+.it-focus-core-layout{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:10px;align-items:start}
+.it-focus-result-column{display:grid;gap:10px}
+.it-focus-side-column{display:grid;gap:10px}
+.it-reveal-visual{border:1px solid #bfdbfe;background:linear-gradient(180deg,#fff 0,#f0f9ff 100%);border-radius:12px;padding:10px;display:grid;gap:8px}
+.it-reveal-visual-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.it-reveal-visual-head h4{margin:0;font-size:.92rem;color:#1e3a8a}
+.it-reveal-visual-head p{margin:0;color:#64748b;font-size:.78rem;line-height:1.3}
+.it-reveal-figure{border:1px solid #dbeafe;background:#fff;border-radius:12px;padding:10px}
+.it-reveal-anchor{display:flex;justify-content:center;margin-bottom:10px}
+.it-reveal-node{border:1px solid #d1d5db;background:#f9fafb;border-radius:10px;padding:8px;text-align:center;line-height:1.3;min-height:46px;display:grid;align-content:center;gap:3px}
+.it-reveal-node strong{font-size:.75rem;color:#374151}
+.it-reveal-node span{font-weight:800;color:#111827;font-size:.84rem;word-break:break-word}
+.it-reveal-node.anchor{border-color:#93c5fd;background:#eff6ff}
+.it-reveal-node.anchor span{color:#1e3a8a}
+.it-reveal-branches{display:grid;gap:8px}
+.it-reveal-branches.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.it-reveal-branches.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.it-reveal-connector{height:14px;position:relative}
+.it-reveal-connector::before{content:"";position:absolute;inset:6px 10% auto 10%;border-top:2px solid #bfdbfe}
+.it-reveal-connector::after{content:"";position:absolute;top:6px;left:50%;height:8px;border-left:2px solid #bfdbfe;transform:translateX(-50%)}
+.it-reveal-cause-layout{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:10px;align-items:center}
+.it-reveal-cause-side{display:grid;gap:8px}
+.it-reveal-cause-arrow{display:flex;justify-content:center;align-items:center;color:#2563eb;font-weight:900;font-size:1.2rem}
+.it-reveal-cause-arrow small{font-size:.72rem;color:#64748b;font-weight:800}
+.it-tree-lab{border:1px solid #e5e7eb;background:#fff;border-radius:12px;padding:10px;display:grid;gap:10px}
+.it-tree-lab-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.it-tree-lab-head h4{margin:0;font-size:.9rem}
+.it-tree-lab-head p{margin:0;color:#64748b;font-size:.78rem;line-height:1.3}
+.it-tree-chip-bank{display:flex;flex-wrap:wrap;gap:6px}
+.it-tree-chip{border:1px solid #d1d5db;background:#fff;border-radius:999px;padding:6px 10px;font-weight:800;font-size:.78rem;cursor:grab;display:inline-flex;align-items:center;gap:6px}
+.it-tree-chip:hover{border-color:#93c5fd;background:#f8fbff}
+.it-tree-chip.sel{border-color:#2563eb;background:#eff6ff;color:#1d4ed8}
+.it-tree-chip-label{font-size:.68rem;color:#64748b;font-weight:900}
+.it-tree-lab-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:start}
+.it-tree-board{border:1px solid #e5e7eb;background:#fafafa;border-radius:12px;padding:8px;display:grid;gap:8px}
+.it-tree-board h5{margin:0;font-size:.84rem;color:#334155}
+.it-tree-levels{display:grid;gap:7px}
+.it-tree-level-slot{border:1px dashed #cbd5e1;background:#fff;border-radius:10px;padding:8px;display:grid;gap:6px;min-height:58px}
+.it-tree-level-slot[data-over="1"]{border-style:solid;border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.12)}
+.it-tree-level-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.it-tree-level-head strong{font-size:.8rem}
+.it-tree-level-head span{font-size:.72rem;color:#64748b}
+.it-tree-slot-value{border:1px solid #e5e7eb;background:#f8fafc;border-radius:8px;padding:7px 8px;line-height:1.3;font-weight:700;color:#111827;word-break:break-word}
+.it-tree-slot-empty{color:#9ca3af;font-size:.76rem;font-weight:700}
+.it-tree-fan{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.it-tree-fan-slot{border:1px dashed #cbd5e1;background:#fff;border-radius:10px;padding:8px;display:grid;gap:6px;min-height:76px}
+.it-tree-fan-slot[data-over="1"]{border-style:solid;border-color:#0ea5a4;box-shadow:0 0 0 2px rgba(14,165,164,.1)}
+.it-tree-fan-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.it-tree-fan-head strong{font-size:.78rem}
+.it-tree-fan-head .it-mini-tag{padding:2px 6px;font-size:.68rem}
+.it-tree-lab-actions{display:flex;gap:8px;flex-wrap:wrap}
+.it-tree-tap-hint{color:#64748b;font-size:.76rem}
+@media (max-width:1180px){.it-focus-core-layout{grid-template-columns:1fr}.it-focus-side-column{order:2}.it-focus-result-column{order:1}}
+@media (max-width:860px){.it-reveal-branches.cols-3{grid-template-columns:1fr}.it-reveal-cause-layout{grid-template-columns:1fr}.it-tree-lab-grid{grid-template-columns:1fr}}
 `;
 
 function assetUrl(path: string): string {
@@ -947,6 +1014,275 @@ function SentenceBoard(props: {
   );
 }
 
+function RevealTemplateFigure(props: {
+  templateType: TemplateType;
+  tokenText: string;
+  slots: string[];
+  causeMode?: CauseMode | null;
+}) {
+  const { templateType, tokenText, slots, causeMode } = props;
+  const safeSlots = Array.from({ length: templateType === 'CAUSE' ? 2 : 3 }).map((_, idx) => slots[idx] || '');
+
+  const renderNode = (label: string, value: string, key: string) => (
+    <div key={key} className="it-reveal-node">
+      <strong>{label}</strong>
+      <span>{value || '—'}</span>
+    </div>
+  );
+
+  if (templateType === 'CAUSE') {
+    const labels = causeMode === 'EFFECTS_OF_TOKEN' ? ['אפקט 1', 'אפקט 2'] : ['תנאי 1', 'תנאי 2'];
+    return (
+      <div className="it-reveal-figure" aria-label="Reveal visual map">
+        <div className="it-reveal-cause-layout">
+          <div className="it-reveal-cause-side">
+            {labels.map((label, idx) => renderNode(label, safeSlots[idx], `cause-${idx}`))}
+          </div>
+          <div className="it-reveal-cause-arrow" aria-hidden="true">
+            <div>
+              <div>{causeMode === 'EFFECTS_OF_TOKEN' ? '⇠' : '⇢'}</div>
+              <small>{causeMode === 'EFFECTS_OF_TOKEN' ? 'נובע מ' : 'מוביל ל'}</small>
+            </div>
+          </div>
+          <div className="it-reveal-anchor">
+            <div className="it-reveal-node anchor">
+              <strong>עוגן</strong>
+              <span>{tokenText}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const labels = templateType === 'CEQ' ? ['סימן', 'קריטריון', 'דוגמה'] : ['הנחה 1', 'הנחה 2', 'הנחה 3'];
+  return (
+    <div className="it-reveal-figure" aria-label="Reveal visual map">
+      <div className="it-reveal-anchor">
+        <div className="it-reveal-node anchor">
+          <strong>עוגן</strong>
+          <span>{tokenText}</span>
+        </div>
+      </div>
+      <div className="it-reveal-connector" aria-hidden="true" />
+      <div className={`it-reveal-branches cols-${labels.length}`}>
+        {labels.map((label, idx) => renderNode(label, safeSlots[idx], `slot-${idx}`))}
+      </div>
+    </div>
+  );
+}
+
+function LogicalLevelsDebonoDragTree(props: {
+  seedKey: string;
+  anchorText: string;
+  sourceChips: TreeChip[];
+}) {
+  const { seedKey, anchorText, sourceChips } = props;
+  const [selectedChipId, setSelectedChipId] = useState<string | null>(null);
+  const [hoverSlotId, setHoverSlotId] = useState<string | null>(null);
+  const [levelSlots, setLevelSlots] = useState<Partial<Record<LogicalLevelKey, string>>>({});
+  const [hatSlots, setHatSlots] = useState<Partial<Record<DebonoHatKey, string>>>({});
+
+  useEffect(() => {
+    setSelectedChipId(null);
+    setHoverSlotId(null);
+    setLevelSlots({});
+    setHatSlots({});
+  }, [seedKey]);
+
+  const chipById = useMemo(() => {
+    const out: Record<string, TreeChip> = {};
+    sourceChips.forEach((chip) => {
+      out[chip.id] = chip;
+    });
+    return out;
+  }, [sourceChips]);
+
+  function readDraggedChipId(event: React.DragEvent): string {
+    try {
+      return event.dataTransfer.getData('text/plain') || '';
+    } catch {
+      return '';
+    }
+  }
+
+  function assignToLevel(levelKey: LogicalLevelKey, chipId: string) {
+    const chip = chipById[chipId];
+    if (!chip) return;
+    setLevelSlots((prev) => ({ ...prev, [levelKey]: chip.text }));
+    setSelectedChipId(null);
+  }
+
+  function assignToHat(hatKey: DebonoHatKey, chipId: string) {
+    const chip = chipById[chipId];
+    if (!chip) return;
+    setHatSlots((prev) => ({ ...prev, [hatKey]: chip.text }));
+    setSelectedChipId(null);
+  }
+
+  function onSlotClickLevel(levelKey: LogicalLevelKey) {
+    if (!selectedChipId) return;
+    assignToLevel(levelKey, selectedChipId);
+  }
+
+  function onSlotClickHat(hatKey: DebonoHatKey) {
+    if (!selectedChipId) return;
+    assignToHat(hatKey, selectedChipId);
+  }
+
+  const chips = sourceChips.filter((chip) => String(chip.text || '').trim());
+
+  return (
+    <section className="it-tree-lab" aria-label="מעבדת גרירה רמות לוגיות ודה בונו">
+      <div className="it-tree-lab-head">
+        <div>
+          <h4>עץ גרירה · רמות לוגיות + דה בונו (בטא)</h4>
+          <p>בחר/י צ׳יפ ואז הנח/י באחד המקומות בעץ/מניפה. זה מיועד לארגון חשיבה, לא לתשובה "נכונה".</p>
+        </div>
+        <span className="it-focus-badge">עוגן: {anchorText || '—'}</span>
+      </div>
+
+      <div className="it-tree-chip-bank" aria-label="צ׳יפים לגרירה">
+        {chips.map((chip) => (
+          <button
+            key={chip.id}
+            type="button"
+            draggable
+            className={`it-tree-chip${selectedChipId === chip.id ? ' sel' : ''}`}
+            onDragStart={(e) => {
+              try {
+                e.dataTransfer.setData('text/plain', chip.id);
+                e.dataTransfer.effectAllowed = 'copy';
+              } catch {
+                // ignore
+              }
+              setSelectedChipId(chip.id);
+            }}
+            onClick={() => setSelectedChipId((prev) => (prev === chip.id ? null : chip.id))}
+            aria-pressed={selectedChipId === chip.id}
+            title={chip.text}
+          >
+            <span className="it-tree-chip-label">{chip.label}</span>
+            <span>{chip.text}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="it-tree-tap-hint">במובייל: הקש/י על צ׳יפ ואז הקש/י על מקום בעץ.</div>
+
+      <div className="it-tree-lab-grid">
+        <div className="it-tree-board" aria-label="רמות לוגיות">
+          <h5>מגדל רמות לוגיות (דה־בונו סטייל גרירה)</h5>
+          <div className="it-tree-levels">
+            {LOGICAL_LEVEL_FIELDS.map((field) => {
+              const slotId = `ll:${field.key}`;
+              const value = levelSlots[field.key] || '';
+              return (
+                <div
+                  key={field.key}
+                  className="it-tree-level-slot"
+                  data-over={hoverSlotId === slotId ? '1' : '0'}
+                  onDragOver={(e) => { e.preventDefault(); setHoverSlotId(slotId); }}
+                  onDragLeave={() => setHoverSlotId((prev) => (prev === slotId ? null : prev))}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setHoverSlotId(null);
+                    const chipId = readDraggedChipId(e) || selectedChipId || '';
+                    if (chipId) assignToLevel(field.key, chipId);
+                  }}
+                  onClick={() => onSlotClickLevel(field.key)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && selectedChipId) {
+                      e.preventDefault();
+                      assignToLevel(field.key, selectedChipId);
+                    }
+                  }}
+                  aria-label={`שיבוץ לרמה ${field.labelHe}`}
+                >
+                  <div className="it-tree-level-head">
+                    <strong>{field.labelHe}</strong>
+                    <span>{field.hintHe}</span>
+                  </div>
+                  {value ? <div className="it-tree-slot-value">{value}</div> : <div className="it-tree-slot-empty">גרור/י לכאן</div>}
+                  {value ? (
+                    <button
+                      type="button"
+                      className="it-focus-mini-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLevelSlots((prev) => ({ ...prev, [field.key]: '' }));
+                      }}
+                    >
+                      נקה
+                    </button>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="it-tree-board" aria-label="דה בונו">
+          <h5>מניפת דה בונו (6 כובעים)</h5>
+          <div className="it-tree-fan">
+            {DEBONO_FIELDS.map((field) => {
+              const slotId = `db:${field.key}`;
+              const value = hatSlots[field.key] || '';
+              return (
+                <div
+                  key={field.key}
+                  className="it-tree-fan-slot"
+                  data-over={hoverSlotId === slotId ? '1' : '0'}
+                  onDragOver={(e) => { e.preventDefault(); setHoverSlotId(slotId); }}
+                  onDragLeave={() => setHoverSlotId((prev) => (prev === slotId ? null : prev))}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setHoverSlotId(null);
+                    const chipId = readDraggedChipId(e) || selectedChipId || '';
+                    if (chipId) assignToHat(field.key, chipId);
+                  }}
+                  onClick={() => onSlotClickHat(field.key)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && selectedChipId) {
+                      e.preventDefault();
+                      assignToHat(field.key, selectedChipId);
+                    }
+                  }}
+                  aria-label={`שיבוץ לכובע ${field.labelHe}`}
+                >
+                  <div className="it-tree-fan-head">
+                    <strong>{field.labelHe}</strong>
+                    <span className="it-mini-tag">{field.chip}</span>
+                  </div>
+                  {value ? <div className="it-tree-slot-value">{value}</div> : <div className="it-tree-slot-empty">גרור/י לכאן</div>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="it-tree-lab-actions">
+        <button
+          type="button"
+          className="it-btn ghost"
+          onClick={() => {
+            setLevelSlots({});
+            setHatSlots({});
+            setSelectedChipId(null);
+          }}
+        >
+          נקה עץ/מניפה
+        </button>
+      </div>
+    </section>
+  );
+}
+
 export default function IcebergTemplatesTrainer(): React.ReactElement {
   const [data, setData] = useState<ScenarioFile | null>(null);
   const [loadingError, setLoadingError] = useState('');
@@ -1202,6 +1538,22 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     activeToken ||
     null;
 
+  const dragTreeSeedKey = `${activeVariantKey}|${state.active?.setIndex ?? 0}|${focusStage}`;
+  const dragTreeChips = useMemo<TreeChip[]>(() => {
+    if (!revealReady || !state.active || !activeToken) return [];
+    const chips: TreeChip[] = [
+      { id: 'chip-anchor', label: 'עוגן', text: activeToken.text }
+    ];
+    activeSet.forEach((value, idx) => {
+      const text = String(value || '').trim();
+      if (!text) return;
+      chips.push({ id: `chip-slot-${idx}`, label: `Slot ${idx + 1}`, text });
+    });
+    if (activePayload?.question) chips.push({ id: 'chip-question', label: 'שאלה', text: cleanSnippet(activePayload.question, 80) });
+    if (activeReflection) chips.push({ id: 'chip-reveal', label: 'Reveal', text: cleanSnippet(activeReflection, 80) });
+    return chips;
+  }, [revealReady, state.active, activeToken, activeSet, activePayload?.question, activeReflection]);
+
   return (
     <div className="it-wrap" dir="rtl" lang="he">
       <style>{css}</style>
@@ -1399,8 +1751,8 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
           <section className="it-panel it-focus-panel" aria-label="Focus output">
             <div className="it-focus-top">
               <div>
-                <h2 className="it-title" style={{ fontSize: '1.08rem' }}>פאנל מיקוד / Build → Reveal → Challenge</h2>
-                <p className="it-sub">פאנל עבודה קצר. הסבר מפורט ומפת הסכמה נפתחים רק כשצריך.</p>
+                <h2 className="it-title" style={{ fontSize: '1.08rem' }}>אזור תוצאה ועבודה / Build → Reveal → Challenge</h2>
+                <p className="it-sub">זה חלק מהתרגיל (לא רק הסבר): כאן רואים ציור, Reveal, ותוצאות. ההוראות נפתחות/נסגרות בנפרד.</p>
               </div>
               {revealReady && activeToken && state.active ? (
                 <div className="it-focus-badge">
@@ -1411,7 +1763,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
 
             <div className="it-focus-toolbar">
               <button type="button" className="it-focus-mini-btn" onClick={() => setShowFocusGuide((prev) => !prev)} aria-pressed={showFocusGuide}>
-                {showFocusGuide ? 'הסתר הסבר' : 'הסבר מהיר'}
+                {showFocusGuide ? 'סגור הוראות' : 'מה עושים כאן?'}
               </button>
               <button
                 type="button"
@@ -1421,13 +1773,13 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
                 disabled={!revealReady}
                 title={revealReady ? 'הצג/הסתר מפת סכמה' : 'הסכמה תופיע אחרי בחירת טוקן ותבנית'}
               >
-                {showFocusSketch ? 'הסתר מפה' : 'הצג מפה'}
+                {showFocusSketch ? 'הסתר ציור' : 'הצג ציור'}
               </button>
             </div>
 
             {showFocusGuide ? (
-              <div className="it-focus-guide" aria-label="הסבר מהיר">
-                <div className="it-focus-guide-body">
+              <div className="it-focus-help" aria-label="הוראות עבודה">
+                <div className="it-focus-help-body">
                   <div className="it-help"><strong>איך עובדים כאן:</strong> בוחרים בלוק, גוררים לתבנית, רואים Reveal, ואז בודקים ב-Challenge.</div>
                   <div className="it-steps" aria-label="Focus stages">
                     <span className={`it-step ${state.selectedTokenId ? 'is-done' : 'is-on'}`}>1. בחר/י בלוק</span>
@@ -1514,34 +1866,65 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
 
                   {focusStage === 'reveal' ? (
                     <>
-                      <div className={`it-slots cols-${TEMPLATE_META[state.active.templateType].slotCount}`}>
-                        {Array.from({ length: TEMPLATE_META[state.active.templateType].slotCount }).map((_, idx) => (
-                          <div key={idx} className="it-slot">{activeSet[idx] || '—'}</div>
-                        ))}
-                      </div>
-                      <details className="it-reveal-extra">
-                        <summary>הסבר השאלה + שיקוף (Reveal)</summary>
-                        <div className="it-reveal-extra-body">
-                          <div className="it-question">{activePayload.question}</div>
-                          <div className="it-reflection">{activeReflection}</div>
-                          <div className="it-disclaimer">{DISCLAIMER_COPY}</div>
+                      <div className="it-focus-core-layout">
+                        <div className="it-focus-result-column">
+                          <section className="it-reveal-visual" aria-label="תוצאת reveal חזותית">
+                            <div className="it-reveal-visual-head">
+                              <div>
+                                <h4>תוצאת Reveal בתוך ציור (מורחב)</h4>
+                                <p>לא רק מילים: השיבוץ מוצג בתוך מבנה הסכמה כדי לראות את ההיגיון בצורה מרחבית.</p>
+                              </div>
+                              <span className="it-mini-tag code">{TEMPLATE_META[state.active.templateType].code}</span>
+                            </div>
+
+                            <RevealTemplateFigure
+                              templateType={state.active.templateType}
+                              tokenText={activeToken.text}
+                              slots={activeSet}
+                              causeMode={'mode' in activePayload ? activePayload.mode ?? null : null}
+                            />
+
+                            <div className={`it-slots cols-${TEMPLATE_META[state.active.templateType].slotCount}`}>
+                              {Array.from({ length: TEMPLATE_META[state.active.templateType].slotCount }).map((_, idx) => (
+                                <div key={idx} className="it-slot">{activeSet[idx] || '—'}</div>
+                              ))}
+                            </div>
+                          </section>
+
+                          <details className="it-reveal-extra" open>
+                            <summary>שאלה + שיקוף (Reveal)</summary>
+                            <div className="it-reveal-extra-body">
+                              <div className="it-question">{activePayload.question}</div>
+                              <div className="it-reflection">{activeReflection}</div>
+                              <div className="it-disclaimer">{DISCLAIMER_COPY}</div>
+                            </div>
+                          </details>
                         </div>
-                      </details>
-                      <div className="it-actions">
-                        <button type="button" className="it-btn secondary" onClick={cycleVariant}>
-                          מטופל אחר / תשובה אחרת
-                        </button>
-                        <button type="button" className="it-btn ghost" onClick={clearActive}>
-                          אפס תבנית
-                        </button>
-                        <button
-                          type="button"
-                          className="it-btn primary"
-                          onClick={() => setFocusStage('challenge')}
-                          disabled={!challengeReady}
-                        >
-                          עבור לאתגר
-                        </button>
+
+                        <div className="it-focus-side-column">
+                          <LogicalLevelsDebonoDragTree
+                            seedKey={dragTreeSeedKey}
+                            anchorText={activeToken.text}
+                            sourceChips={dragTreeChips}
+                          />
+
+                          <div className="it-actions">
+                            <button type="button" className="it-btn secondary" onClick={cycleVariant}>
+                              מטופל אחר / תשובה אחרת
+                            </button>
+                            <button type="button" className="it-btn ghost" onClick={clearActive}>
+                              אפס תבנית
+                            </button>
+                            <button
+                              type="button"
+                              className="it-btn primary"
+                              onClick={() => setFocusStage('challenge')}
+                              disabled={!challengeReady}
+                            >
+                              עבור לאתגר
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </>
                   ) : null}

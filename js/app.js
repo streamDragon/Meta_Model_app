@@ -2131,35 +2131,55 @@ async function loadMetaModelData() {
     }
 }
 
+function activateTabByName(tabName = '', { playSound = false, scrollToTop = true } = {}) {
+    const resolvedTab = normalizeRequestedTab(tabName);
+    if (!resolvedTab) return false;
+
+    const tabBtns = Array.from(document.querySelectorAll('.tab-btn'));
+    const tabContents = Array.from(document.querySelectorAll('.tab-content'));
+    const content = document.getElementById(resolvedTab);
+    if (!content) return false;
+
+    tabBtns.forEach((btn) => btn.classList.remove('active'));
+    tabContents.forEach((tab) => tab.classList.remove('active'));
+
+    const btn = tabBtns.find((node) => node.getAttribute('data-tab') === resolvedTab);
+    if (btn) btn.classList.add('active');
+    content.classList.add('active');
+
+    if (resolvedTab !== 'practice-radar') {
+        setRapidPatternFocusMode(false);
+        hideRapidPatternExplanation({ resumeIfNeeded: false });
+    }
+
+    persistPracticeTabPreference(resolvedTab);
+
+    const mobileTabSelect = document.getElementById('mobile-tab-select');
+    if (mobileTabSelect && mobileTabSelect.value !== resolvedTab) {
+        mobileTabSelect.value = resolvedTab;
+    }
+
+    const scenarioContext = resolvedTab === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
+    closeComicPreviewModal();
+    renderGlobalComicStrip(resolvedTab, scenarioContext);
+
+    if (scrollToTop) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    if (playSound) playUISound('next');
+    return true;
+}
+
 // Setup Tab Navigation
 function setupTabNavigation() {
     const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
     const mobileTabSelect = document.getElementById('mobile-tab-select');
     
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Remove active class from all
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(tc => tc.classList.remove('active'));
-            
-            // Add active class to clicked button
-            btn.classList.add('active');
-            
-            // Show corresponding content
             const tabName = btn.getAttribute('data-tab');
-            document.getElementById(tabName).classList.add('active');
-            if (tabName !== 'practice-radar') {
-                setRapidPatternFocusMode(false);
-                hideRapidPatternExplanation({ resumeIfNeeded: false });
-            }
-            persistPracticeTabPreference(tabName);
-            if (mobileTabSelect) mobileTabSelect.value = tabName;
-            const scenarioContext = tabName === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
-            closeComicPreviewModal();
-            renderGlobalComicStrip(tabName, scenarioContext);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            playUISound('next');
+            activateTabByName(tabName, { playSound: true, scrollToTop: true });
         });
     });
 
@@ -2173,8 +2193,7 @@ function setupTabNavigation() {
 
         mobileTabSelect.addEventListener('change', () => {
             const targetTab = mobileTabSelect.value;
-            const btn = document.querySelector(`.tab-btn[data-tab="${targetTab}"]`);
-            if (btn) btn.click();
+            activateTabByName(targetTab, { playSound: true, scrollToTop: true });
         });
     }
 }
@@ -10325,10 +10344,10 @@ function closeHint() {
 }
 
 function navigateTo(tabName) {
-    persistHomeLastVisitedTab(tabName);
-    const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
-    if (tabBtn) {
-        tabBtn.click();
+    const resolvedTab = normalizeRequestedTab(tabName);
+    persistHomeLastVisitedTab(resolvedTab || tabName);
+
+    if (activateTabByName(resolvedTab || tabName, { playSound: false, scrollToTop: true })) {
         return;
     }
 
@@ -10338,20 +10357,20 @@ function navigateTo(tabName) {
     tabs.forEach(t => t.classList.remove('active'));
     contents.forEach(c => c.classList.remove('active'));
     
-    const btn = document.querySelector(`[data-tab="${tabName}"]`);
+    const btn = document.querySelector(`[data-tab="${resolvedTab || tabName}"]`);
     if (btn) btn.classList.add('active');
     
-    const content = document.getElementById(tabName);
+    const content = document.getElementById(resolvedTab || tabName);
     if (content) content.classList.add('active');
-    if (tabName !== 'practice-radar') {
+    if ((resolvedTab || tabName) !== 'practice-radar') {
         setRapidPatternFocusMode(false);
         hideRapidPatternExplanation({ resumeIfNeeded: false });
     }
-    persistPracticeTabPreference(tabName);
+    persistPracticeTabPreference(resolvedTab || tabName);
 
-    const scenarioContext = tabName === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
+    const scenarioContext = (resolvedTab || tabName) === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
     closeComicPreviewModal();
-    renderGlobalComicStrip(tabName, scenarioContext);
+    renderGlobalComicStrip(resolvedTab || tabName, scenarioContext);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 

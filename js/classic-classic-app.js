@@ -24,6 +24,7 @@
         lastSelectedWasCorrect: null,
         familyFocus: 'all',
         showPhilosopher: false,
+        showRoundGuide: false,
         paused: false,
         timerHandle: null,
         renderNonce: 0
@@ -37,6 +38,19 @@
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
+    }
+
+    function emitAlchemyFx(type, detail) {
+        try {
+            if (root.alchemyFx && typeof root.alchemyFx.emit === 'function') {
+                root.alchemyFx.emit(type, detail || {});
+                return;
+            }
+            if (typeof CustomEvent === 'function') {
+                const payload = Object.assign({ type }, detail || {});
+                document.dispatchEvent(new CustomEvent('alchemy:fx', { detail: payload }));
+            }
+        } catch (e) {}
     }
 
     function assetUrl(path) {
@@ -244,6 +258,7 @@
             engine.nextRound(state.session);
             resetRoundUiState();
             state.feedback = null;
+            emitAlchemyFx('success', { text: 'Next round' });
         } catch (error) {
             state.feedback = { tone: 'warn', text: error.message || 'לא ניתן להתחיל סבב חדש עדיין.' };
         }
@@ -256,6 +271,7 @@
             engine.endSession(state.session, reason || 'manual');
         }
         state.paused = false;
+        emitAlchemyFx('mastery', { text: 'Session complete' });
         render();
     }
 
@@ -280,6 +296,7 @@
         if (state.hintUsedByStage[round.stage]) return;
         state.hintUsedByStage[round.stage] = true;
         state.hintMessage = buildHintForStage(round.stage, round);
+        emitAlchemyFx('whoosh', { text: 'Hint' });
         state.feedback = { tone: 'info', text: 'רמז מוצג (פעם אחת לשלב).' };
         render();
     }
@@ -374,6 +391,15 @@
         render();
     }
 
+    function toggleRoundGuide(forceValue) {
+        if (typeof forceValue === 'boolean') {
+            state.showRoundGuide = forceValue;
+        } else {
+            state.showRoundGuide = !state.showRoundGuide;
+        }
+        render();
+    }
+
     function handleAction(action) {
         if (!action) return;
         if (action === 'mode-learning') return setMode('learning');
@@ -383,6 +409,7 @@
         if (action === 'use-hint') return useHint();
         if (action === 'next-round') return startNewRound();
         if (action === 'end-session') return endSession('manual');
+        if (action === 'toggle-round-guide') return toggleRoundGuide();
         if (action === 'toggle-philosopher') return togglePhilosopher();
         if (action === 'close-philosopher') return togglePhilosopher(false);
     }
@@ -466,7 +493,7 @@
                 ${livesChip}
               </div>
               <div class="cc-actions">
-                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="toggle-philosopher" aria-pressed="${state.showPhilosopher ? 'true' : 'false'}">עקרונות / הסבר</button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="toggle-philosopher" aria-pressed="${state.showPhilosopher ? 'true' : 'false'}">הסבר מורחב</button>
                 <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="toggle-pause" ${!canPause || !session || session.ended ? 'disabled' : ''}>${state.paused ? 'המשך' : 'השהה'}</button>
                 <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="restart-session">סשן חדש</button>
                 <button type="button" class="cc-btn cc-btn-primary" data-cc-action="end-session" ${!session || session.ended ? 'disabled' : ''}>סיים סשן</button>
@@ -538,8 +565,8 @@
         return `
           <section class="cc-flow-guide" aria-label="רצף שלבי הסבב">
             <div class="cc-flow-head">
-              <strong>זרימת הסבב (Classic)</strong>
-              <span>קודם בוחרים שאלה, אחר כך מזהים בעיה/מטרה, ואז מסכמים לפני הסבב הבא.</span>
+              <strong>איך הסבב מתקדם</strong>
+              <span>רואים את סדר השלבים כדי להבין איפה אתם עכשיו ומה יגיע מיד אחר כך.</span>
             </div>
             <div class="cc-flow-steps">
               ${steps.map((step, index) => {
@@ -585,7 +612,7 @@
         return `
           <section class="cc-task-compass" aria-label="מצפן הצעד הנוכחי">
             <div class="cc-task-head">
-              <strong>מצפן הצעד הנוכחי</strong>
+              <strong>מה עושים עכשיו</strong>
               <span>${escapeHtml(copy.kicker || '')}</span>
             </div>
             <div class="cc-task-grid">
@@ -602,6 +629,78 @@
                 <div class="cc-task-text">${escapeHtml(task.check)}</div>
               </div>
             </div>
+          </section>
+        `;
+    }
+
+    function renderRoundGuidePanel(round) {
+        if (!round) return '';
+        const copy = getStageCopy(round);
+        const stage = round.stage;
+        const steps = [
+            { id: 'question', label: '1. שאלה' },
+            { id: 'problem', label: '2. בעיה' },
+            { id: 'goal', label: '3. מטרה' },
+            { id: 'summary', label: '4. סיכום' }
+        ];
+        const currentIndex = steps.findIndex((step) => step.id === stage);
+        const examples = Array.isArray(round.pattern?.examples) ? round.pattern.examples.slice(0, 2) : [];
+
+        return `
+          <section class="cc-round-guide ${state.showRoundGuide ? 'is-open' : ''}" aria-label="הסבר קצר לתרגיל">
+            <div class="cc-round-guide-shell">
+              <div class="cc-round-guide-copy">
+                <span class="cc-round-guide-kicker">${escapeHtml(copy.kicker || '')}</span>
+                <strong>${escapeHtml(copy.title || '')}</strong>
+              </div>
+              <button
+                type="button"
+                class="cc-round-guide-btn"
+                data-cc-action="toggle-round-guide"
+                aria-expanded="${state.showRoundGuide ? 'true' : 'false'}"
+                aria-controls="cc-round-guide-body">
+                <span class="cc-round-guide-btn-badge">${state.showRoundGuide ? 'פתוח' : 'עזרה'}</span>
+                <span class="cc-round-guide-btn-text">${state.showRoundGuide ? 'סגור הסבר ודוגמא' : 'מה עושים פה?'}</span>
+              </button>
+            </div>
+
+            <div class="cc-round-guide-progress" aria-label="התקדמות בשלבים">
+              ${steps.map((step, index) => {
+                  const classes = [
+                      'cc-round-guide-pill',
+                      step.id === stage ? 'is-current' : '',
+                      currentIndex > index ? 'is-done' : ''
+                  ].filter(Boolean).join(' ');
+                  return `<span class="${classes}">${escapeHtml(step.label)}</span>`;
+              }).join('')}
+            </div>
+
+            ${state.showRoundGuide ? `
+              <div id="cc-round-guide-body" class="cc-round-guide-body">
+                ${copy.desc ? `<div class="cc-round-guide-intro">${escapeHtml(copy.desc)}</div>` : ''}
+                <div class="cc-round-guide-grid">
+                  ${renderTaskCompass(round)}
+                  ${renderFlowGuide(round)}
+                </div>
+
+                <section class="cc-round-guide-example" aria-label="דוגמה והרחבה">
+                  <div class="cc-round-guide-example-head">
+                    <strong>דוגמה מהתבנית הנוכחית</strong>
+                    <span>${escapeHtml(round.pattern?.name || '')}</span>
+                  </div>
+                  ${examples.length ? `
+                    <div class="cc-round-guide-example-list">
+                      ${examples.map((example) => `<div class="cc-round-guide-example-item">${escapeHtml(example)}</div>`).join('')}
+                    </div>
+                  ` : `<div class="cc-round-guide-example-item">אין דוגמה זמינה לתבנית הזו כרגע.</div>`}
+                  <div class="cc-round-guide-actions">
+                    <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="toggle-philosopher">
+                      הסבר מורחב + עקרונות
+                    </button>
+                  </div>
+                </section>
+              </div>
+            ` : ''}
           </section>
         `;
     }
@@ -854,8 +953,7 @@
 
         return `
           <main class="cc-panel cc-main" aria-label="פאנל המשחק">
-            ${!session.ended && round ? renderFlowGuide(round) : ''}
-            ${!session.ended && round ? renderTaskCompass(round) : ''}
+            ${!session.ended && round ? renderRoundGuidePanel(round) : ''}
             ${stageCard}
             ${renderPhilosopherOverlay(round)}
           </main>
@@ -868,8 +966,8 @@
         appEl.innerHTML = `
           ${renderHeader(session)}
           <div class="cc-layout">
-            ${renderBreenPanel(round)}
             ${renderMainPanel()}
+            ${renderBreenPanel(round)}
           </div>
         `;
     }

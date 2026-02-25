@@ -181,6 +181,7 @@ body {
   gap: 6px;
   min-height: 108px;
   align-content: start;
+  min-width: 0;
 }
 
 .pl-prism-btn.is-active {
@@ -210,6 +211,7 @@ body {
   font-size: 0.85rem;
   font-weight: 800;
   line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .pl-prism-desc {
@@ -217,6 +219,7 @@ body {
   color: var(--pl-muted);
   font-size: 0.75rem;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .pl-excavation-empty {
@@ -490,6 +493,24 @@ body {
   }
 }
 
+@media (max-width: 1180px) {
+  #prism-lab-app {
+    padding: 12px;
+  }
+
+  .pl-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .pl-main {
+    order: 1;
+  }
+
+  .pl-side {
+    order: 2;
+  }
+}
+
 @media (max-width: 980px) {
   #prism-lab-app {
     padding: 12px;
@@ -533,4 +554,3 @@ body {
     max-width: 100%;
   }
 }
-
