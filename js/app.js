@@ -1985,6 +1985,111 @@ function setupFeatureLauncherTabs() {
 
 let hasInitializedApp = false;
 
+function setupGlobalTheoryLauncher() {
+    if (document.getElementById('global-theory-launcher')) return;
+    if (!document.body) return;
+
+    if (!document.getElementById('global-theory-launcher-style')) {
+        const style = document.createElement('style');
+        style.id = 'global-theory-launcher-style';
+        style.textContent = `
+            .global-theory-launcher {
+                position: fixed;
+                left: 12px;
+                bottom: 12px;
+                z-index: 1400;
+                border: 1px solid rgba(250, 204, 21, 0.38);
+                border-radius: 999px;
+                min-height: 44px;
+                padding: 10px 14px;
+                font: inherit;
+                font-weight: 800;
+                color: #fff;
+                cursor: pointer;
+                background:
+                    radial-gradient(circle at 18% 18%, rgba(255,255,255,0.20), transparent 38%),
+                    linear-gradient(135deg, rgba(76, 29, 149, 0.94), rgba(34, 211, 238, 0.22));
+                box-shadow: 0 14px 34px rgba(12, 18, 44, 0.22), 0 0 0 1px rgba(255,255,255,0.08) inset;
+                backdrop-filter: blur(8px);
+                transition: transform 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+            }
+            .global-theory-launcher:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 18px 38px rgba(12, 18, 44, 0.24), 0 0 0 3px rgba(250, 204, 21, 0.16);
+            }
+            .global-theory-launcher:focus-visible {
+                outline: 2px solid #facc15;
+                outline-offset: 2px;
+            }
+            @media (max-width: 720px) {
+                .global-theory-launcher {
+                    left: 8px;
+                    bottom: 8px;
+                    min-height: 40px;
+                    padding: 8px 12px;
+                    font-size: 0.86rem;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'global-theory-launcher';
+    btn.className = 'global-theory-launcher';
+    btn.textContent = 'תיאוריה / קטגוריות';
+    btn.setAttribute('aria-label', 'מעבר לדף התאוריה והקטגוריות');
+    btn.addEventListener('click', () => {
+        try {
+            navigateTo('categories');
+        } catch (error) {
+            console.warn('Failed to navigate to categories theory tab', error);
+        }
+        try {
+            const container = document.getElementById('categories-container');
+            if (container) container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (error) {
+            // ignore smooth scroll issues
+        }
+    });
+
+    document.body.appendChild(btn);
+}
+
+function setupGlobalCollapsedHelpDetails() {
+    if (window.__globalCollapsedHelpDetailsBound) return;
+    window.__globalCollapsedHelpDetailsBound = true;
+
+    const summaryRegex = /(help|guide|theory|philosophy|instruction|הסבר|עזרה|תיאוריה|פילוסופ|מה עושים)/i;
+
+    const closeHelpDetails = (root = document) => {
+        const detailsList = root.querySelectorAll ? root.querySelectorAll('details') : [];
+        detailsList.forEach((detailsEl) => {
+            if (!detailsEl || !detailsEl.open) return;
+            const cls = String(detailsEl.className || '');
+            const summaryText = String(detailsEl.querySelector('summary')?.textContent || '');
+            if (summaryRegex.test(cls) || summaryRegex.test(summaryText)) {
+                detailsEl.open = false;
+            }
+        });
+    };
+
+    closeHelpDetails(document);
+
+    if (window.MutationObserver && document.body) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node?.nodeType !== 1) return;
+                    closeHelpDetails(node);
+                });
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+}
+
 function initializeMetaModelApp() {
     if (hasInitializedApp) return;
     hasInitializedApp = true;
@@ -2017,6 +2122,8 @@ function initializeMetaModelApp() {
     showLoadingIndicator();
     loadMetaModelData();
     setupTabNavigation();
+    setupGlobalTheoryLauncher();
+    setupGlobalCollapsedHelpDetails();
     setupReadBeforeStartGuides();
     applyInitialTabPreference();
     setupGlobalComicStripActions();
