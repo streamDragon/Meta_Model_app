@@ -35,7 +35,8 @@
         lastReport: null,
         uiMessage: '',
         baseStoryEditorOpen: false,
-        baseStoryDraft: ''
+        baseStoryDraft: '',
+        showRecursiveGuide: false
     };
 
     const PRISM_BREEN_OUTSIDE_ORDER = Object.freeze([
@@ -828,6 +829,50 @@
         `;
     }
 
+    function renderRecursiveGuidePanel() {
+        return `
+            <section class="prm-card prm-recursive-guide" aria-label="הסבר רקורסיבי ו-Next Step Function">
+                <div class="prm-recursive-guide-head">
+                    <h2>מה זה "רקורסיבי" ולמה זה חשוב כאן?</h2>
+                    <p class="prm-kicker">ב-Prism Research לא "רצים" לעוד תיאוריה. שואלים, מקבלים תשובה חדשה, ואז בודקים אותה שוב עם אותה עדשה.</p>
+                </div>
+
+                <div class="prm-recursive-flow" aria-hidden="true">
+                    <span>משפט/קטע</span>
+                    <span class="prm-recursive-flow-arrow">←</span>
+                    <span>שאלה מדויקת</span>
+                    <span class="prm-recursive-flow-arrow">←</span>
+                    <span>תשובה חדשה</span>
+                    <span class="prm-recursive-flow-arrow">←</span>
+                    <span>בחירת צעד הבא</span>
+                </div>
+
+                <div class="prm-recursive-grid">
+                    <article class="prm-recursive-step">
+                        <div class="prm-recursive-step-index">1</div>
+                        <h3>תמונה כללית + מוקד נוכחי</h3>
+                        <p>מחזיקים תמונה כללית של הסיפור, אבל בכל רגע עובדים רק על קטע מסוים שנבחר. זה מונע הצפה וממקד את החקירה.</p>
+                    </article>
+                    <article class="prm-recursive-step">
+                        <div class="prm-recursive-step-index">2</div>
+                        <h3>Next Step Function (הצעד הבא)</h3>
+                        <p>בספרים הראשונים של NLP דיברו על <strong>Next Step Function</strong>: לא חייבים לדעת את כל המסלול מראש, אלא לבחור את הצעד הבא הכי טוב לפי מה שנמצא עכשיו.</p>
+                    </article>
+                    <article class="prm-recursive-step">
+                        <div class="prm-recursive-step-index">3</div>
+                        <h3>פידבק (קיברנטיקה) במקום ניחוש</h3>
+                        <p>מתחום הקיברנטיקה: כל פעולה מייצרת היזון חוזר. לכן לא מגיבים רק למה שחשבנו שיהיה, אלא למה שבאמת חזר מהשאלה - ומשם בוחרים את הצעד הבא.</p>
+                    </article>
+                </div>
+
+                <div class="prm-recursive-note">
+                    <strong>למה זה רלוונטי לעבודה טיפולית?</strong>
+                    <p>כי זה משלב גם כיוון (לאן אנחנו חוקרים) וגם גמישות (מה עושים עכשיו בפועל לפי התגובה שקיבלנו), במקום להיצמד לפרשנות מוקדמת.</p>
+                </div>
+            </section>
+        `;
+    }
+
     function renderPendingQa() {
         if (!state.pendingQA) {
             return `
@@ -1021,6 +1066,17 @@
                         <p class="prm-eyebrow">Prism Research Mode</p>
                         <h1>מודל הפריזמה: חקירת טקסט דרך קטגוריות לשוניות-לוגיות</h1>
                         <p class="prm-subtitle">לולאה קבועה: סימון → קטגוריה → שאלה → תשובה → חזור לבסיס / המשך מהתשובה.</p>
+                        <div class="prm-hero-help-row">
+                            <button
+                                type="button"
+                                class="prm-small-btn prm-small-btn-help"
+                                data-action="toggle-recursive-guide"
+                                aria-expanded="${state.showRecursiveGuide ? 'true' : 'false'}"
+                            >
+                                ${state.showRecursiveGuide ? 'סגור הסבר "רקורסיבי"' : 'מה זה "רקורסיבי"?'}
+                            </button>
+                            <small>הסבר קצר על Next Step Function + היזון חוזר (קיברנטיקה)</small>
+                        </div>
                     </div>
                     <div class="prm-hero-actions">
                         <button type="button" class="prm-small-btn" data-action="load-demo">טען דוגמה</button>
@@ -1028,6 +1084,7 @@
                         <button type="button" class="prm-small-btn" data-action="clear-session">נקה שמירה</button>
                     </div>
                 </header>
+                ${state.showRecursiveGuide ? renderRecursiveGuidePanel() : ''}
                 ${renderBaseStoryPanel(reportEnabled)}
 
                 <section class="prm-layout">
@@ -1081,6 +1138,12 @@
 
         if (action === 'pick-category') {
             runPrismStep(button.dataset.categoryId);
+            return;
+        }
+
+        if (action === 'toggle-recursive-guide') {
+            state.showRecursiveGuide = !state.showRecursiveGuide;
+            render();
             return;
         }
 
