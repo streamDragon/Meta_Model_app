@@ -2090,6 +2090,45 @@ function setupGlobalCollapsedHelpDetails() {
     }
 }
 
+function safeRunUiEnhancement(fn, label = 'ui-enhancement') {
+    if (typeof fn !== 'function') return;
+    try {
+        fn();
+    } catch (error) {
+        console.warn(`Skipped ${label} after runtime error`, error);
+    }
+}
+
+function ensurePracticeTabHydration(tabId = '') {
+    const resolved = normalizeRequestedTab(tabId);
+    if (!resolved) return;
+
+    if (resolved === 'practice-radar') {
+        try {
+            const root = document.getElementById('rapid-pattern-arena');
+            const buttons = document.getElementById('rapid-pattern-buttons');
+            const typeSelect = document.getElementById('rapid-case-type');
+            const looksEmpty = !buttons || buttons.children.length === 0;
+            const typeLooksUnhydrated = !!typeSelect && typeSelect.options.length <= 1;
+            if (root && (looksEmpty || typeLooksUnhydrated || root.dataset.rapidBound !== 'true')) {
+                setupRapidPatternArena();
+            }
+        } catch (error) {
+            console.warn('Failed to rehydrate Meta Radar', error);
+        }
+    }
+
+    if (resolved === 'practice-triples-radar') {
+        try {
+            if (typeof setupTriplesRadarModule === 'function') {
+                setupTriplesRadarModule();
+            }
+        } catch (error) {
+            console.warn('Failed to rehydrate Triples Radar', error);
+        }
+    }
+}
+
 function initializeMetaModelApp() {
     if (hasInitializedApp) return;
     hasInitializedApp = true;
@@ -2122,8 +2161,6 @@ function initializeMetaModelApp() {
     showLoadingIndicator();
     loadMetaModelData();
     setupTabNavigation();
-    setupGlobalTheoryLauncher();
-    setupGlobalCollapsedHelpDetails();
     setupReadBeforeStartGuides();
     applyInitialTabPreference();
     setupGlobalComicStripActions();
@@ -2141,6 +2178,8 @@ function initializeMetaModelApp() {
     setupComicEngine2();
     setupCommunityFeedbackWall();
     initializeProgressHub();
+    safeRunUiEnhancement(setupGlobalTheoryLauncher, 'global-theory-launcher');
+    safeRunUiEnhancement(setupGlobalCollapsedHelpDetails, 'global-collapsed-help-details');
     setupGlobalInteractionSounds();
     renderGlobalComicStrip(getActiveTabName());
     window.addEventListener('resize', updateRuntimeDebugInfoCard);
@@ -2253,6 +2292,7 @@ function activateTabByName(tabName = '', { playSound = false, scrollToTop = true
     const btn = tabBtns.find((node) => node.getAttribute('data-tab') === resolvedTab);
     if (btn) btn.classList.add('active');
     content.classList.add('active');
+    ensurePracticeTabHydration(resolvedTab);
 
     if (resolvedTab !== 'practice-radar') {
         setRapidPatternFocusMode(false);
@@ -13095,6 +13135,7 @@ function wr2wProcessCount(criteria) {
 
 const WR2W_WIZARD_TITLE = 'כמתים נסתרים – הגשר שנסגר';
 const WR2W_WIZARD_SLOGAN = 'כשהרגש גדול מהמילים — יש כמת נסתר. אנחנו לא מתקנים ולא מבטלים; אנחנו פותחים גשר בין הגוף, העולם והשפה.';
+const WR2W_WIZARD_FORMULA_CANONICAL = 'Signal → Hidden Quantifier → Bridge → Confirm → PATH → Learning';
 const WR2W_WIZARD_FORMULA = 'מה עולה בגוף → איזה "תמיד/אף פעם" מסתתר → משפט מגשר + בדיקה → אישור/הלימה → בחירת כיוון עבודה → למידה חדשה';
 
 function setupWrinkleGame() {
