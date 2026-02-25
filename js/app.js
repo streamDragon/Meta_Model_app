@@ -708,9 +708,9 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: '׳‘׳—׳¨/׳™ ׳×׳’׳•׳‘׳”, ׳׳©׳¨/׳™ ׳ ׳™׳¡׳•׳— ׳§׳¦׳¨, ׳•׳׳– ׳₪׳×׳—/׳™ Power Card ׳•-Blueprint.'
     }),
     prismlab: Object.freeze({
-        logic: `Prism Lab הוא פריזמה לעומק (מגדל רמות): בוחרים קטגוריה + עוגן אחד, וממפים אותו על רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי לחשוף גשרים חסרים וקפיצות רמה.`,
-        goal: 'להפסיק לערבב בין חקירה אורכית (Prism Research) לבין חקירת עומק, ולבחור צעד הבא מדויק על בסיס מפה.',
-        approach: 'בחר/י פריזמה, כתוב/כתבי עוגן, מלא/י שכבות במגדל, ואז צור/צרי מפה + צעד הבא אחד מומלץ. אם חסרות רמות - משלימים שכבה ולא \"רצים קדימה\".'
+        logic: `Prism Lab הוא כלי עומק: בוחרים קטגוריה + מילה/ביטוי מרכזי אחד ("עוגן"), ובודקים אותו דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי להבין איפה באמת נמצא הקושי.`,
+        goal: 'להבדיל בין חקירה בשרשרת (שאלה על כל תשובה חדשה) לבין חקירת עומק על אותו נושא, ולבחור צעד המשך מדויק על בסיס מפה.',
+        approach: 'בחר/י פריזמה, כתוב/כתבי מילה/ביטוי מרכזי אחד מהמשפט, מלא/י כמה רמות, ואז בדוק/י את המפה ובחר/י צעד המשך. אם חסרה רמה - משלימים שכבה לפני שעוברים הלאה.'
     }),
     categories: Object.freeze({
         logic: '׳–׳”׳• ׳׳¡׳ ׳™׳“׳¢: ׳׳—׳™׳§׳”, ׳¢׳™׳•׳•׳× ׳•׳”׳›׳׳׳” ׳›׳׳₪׳× ׳ ׳™׳•׳•׳˜ ׳׳×׳¨׳’׳•׳.',
@@ -829,16 +829,16 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
         ])
     }),
     prismlab: Object.freeze({
-        frame: `זו אילוסטרציה של Prism Lab כ-מגדל רמות: לא ממשיכים בשרשרת רקורסיבית, אלא עוצרים על עוגן אחד וממפים אותו דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי לייצר מפה + צעד הבא.`,
+        frame: `דוגמת שימוש ב-Prism Lab: במקום להמשיך לשאלה חדשה על כל תשובה (חקירה רקורסיבית), עוצרים על מילה/ביטוי מרכזי אחד ("עוגן") ובודקים אותו דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי לבנות מפת עומק.`,
         turns: Object.freeze([
             Object.freeze({ role: 'מטופל', text: 'אני רוצה להבין למה כל פעם \"נדבר\" נשמע לי כמו כישלון.' }),
-            Object.freeze({ role: 'מטפל', text: 'מעולה. ב-Prism Research היינו ממשיכים בשרשרת רקורסיבית על כל תשובה. כאן ב-Prism Lab נעשה משהו אחר: נשאר על העוגן \"נדבר\" ונבנה מגדל לוגי.' }),
-            Object.freeze({ role: 'מטופל', text: 'כלומר אותה קטגוריה, אותו עוגן - אבל שואלים אותו דרך רמות לוגיות (סביבה/התנהגות/יכולות/ערכים/זהות/שייכות)?' }),
+            Object.freeze({ role: 'מטפל', text: 'מעולה. ב-Prism Research היינו ממשיכים ושואלים שוב על כל תשובה חדשה (חקירה רקורסיבית). כאן ב-Prism Lab נעשה משהו אחר: נשאר על המילה \"נדבר\" ונבדוק אותה לעומק דרך רמות שונות.' }),
+            Object.freeze({ role: 'מטופל', text: 'כלומר לא מחליפים נושא - פשוט מסתכלים על אותה מילה דרך סביבה/התנהגות/יכולות/ערכים/זהות/שייכות?' }),
             Object.freeze({ role: 'מטפל', text: 'בדיוק. כך מקבלים מפה: איפה זה יושב, מה אתה עושה, איזו יכולת חסרה, איזה כלל מפעיל את זה, ומה צעד ההמשך הכי מדויק.' })
         ]),
         outcomes: Object.freeze([
-            'להבחין בין Prism Research (שרשרת/רקורסיה) לבין Prism Lab (מגדל עומק).',
-            'למפות עוגן אחד דרך 6 רמות במקום לקפוץ ישר לפרשנות או פתרון.',
+            'להבחין בין חקירה בשרשרת (שאלה על כל תשובה חדשה) לבין חקירת עומק על אותו נושא.',
+            'למפות מילה/ביטוי מרכזי אחד דרך רמות לוגיות במקום לקפוץ ישר לפרשנות או פתרון.',
             'להפיק צעד הבא אחד מדויק מתוך המפה (ולא מתוך אינטואיציה בלבד).'
         ])
     }),
@@ -1112,9 +1112,9 @@ const RUNTIME_CLEAN_SCREEN_GUIDE_OVERRIDES = Object.freeze({
 });
 
 const RUNTIME_CLEAN_DEFAULT_THERAPEUTIC_DEMO = Object.freeze({
-    banner: 'אילוסטרציה תהליכית: זו הדגמה של סוג התהליך שהכלי הזה בא למדל, לא אמת קלינית.',
-    frame: 'זו דוגמה תהליכית (אילוסטרציה בלבד). המטרה היא להראות את סוג התנועה שהפיצ\'ר מאמן: דיוק, חקירה, שיקוף או בניית צעד הבא.',
-    outcomeTitle: 'מה הכלי הזה בא למדל',
+    banner: 'דוגמת שימוש לימודית: זה לא "מהלך טיפולי נכון" אחד, אלא המחשה איך לעבוד עם הכלי.',
+    frame: 'זו דוגמת שימוש קצרה. המטרה היא להבין איזה סוג מיומנות הכלי מחזק (דיוק, חקירה, שיקוף, או בחירת צעד המשך).',
+    outcomeTitle: 'מה מקבלים מהכלי הזה',
     turns: Object.freeze([
         Object.freeze({ role: 'מטופל', text: 'אני מרגיש שהכול תקוע, ולא בטוח מאיפה להתחיל.' }),
         Object.freeze({ role: 'מטפל', text: 'בוא ניקח נקודה אחת ונעבוד עליה דרך הכלי, כדי להבין מה בדיוק קורה.' }),
@@ -1130,7 +1130,7 @@ const RUNTIME_CLEAN_DEFAULT_THERAPEUTIC_DEMO = Object.freeze({
 
 const RUNTIME_CLEAN_THERAPEUTIC_DEMO_OVERRIDES = Object.freeze({
     'practice-triples-radar': Object.freeze({
-        banner: 'אילוסטרציה תהליכית: כאן אנחנו מדגימים איך עובדים על שלשה שלמה (ולא רק קטגוריה אחת).',
+        banner: 'דוגמת שימוש: כאן רואים איך עובדים על שלשה שלמה (ולא רק על קטגוריה אחת).',
         frame: 'זו דוגמה תהליכית ל-Triples Radar: מזהים משפחה של דפוסים (שלשה), ורק אז שואלים/משקפים בצורה מדויקת.',
         turns: Object.freeze([
             Object.freeze({ role: 'מטופל', text: 'אני יודע שהוא חושב שאני לא מספיק טוב, אז אני חייב להוכיח את עצמי.' }),
@@ -1522,7 +1522,7 @@ function buildScreenReadGuide(screenId) {
     demoBtn.className = 'btn btn-secondary screen-read-guide-demo-btn';
     demoBtn.innerHTML = `
         <span class="screen-read-guide-btn-main">דיאלוג טיפולי לדוגמה</span>
-        <span class="screen-read-guide-btn-sub">אילוסטרציה של מה שהכלי הזה בא למדל</span>
+        <span class="screen-read-guide-btn-sub">דוגמת שימוש שממחישה איך הכלי עוזר בשיחה אמיתית</span>
     `;
 
     const demoModal = document.createElement('div');
@@ -1584,9 +1584,9 @@ function buildScreenReadGuide(screenId) {
             <p class="screen-read-guide-lead">${escapeHtml(demo.frame)}</p>
             <div class="screen-demo-dialogue-box">${demoTurnsHtml}</div>
             <div class="screen-demo-dialogue-summary">
-                <h4>${escapeHtml(demo.outcomeTitle || 'מה הכלי הזה בא למדל')}</h4>
+                <h4>${escapeHtml(demo.outcomeTitle || 'מה מקבלים מהכלי הזה')}</h4>
                 <ul class="screen-demo-dialogue-list">${demoOutcomesHtml}</ul>
-                <p class="screen-demo-dialogue-footnote">זו אילוסטרציה של מה שהכלי הזה בא למדל. זו דוגמה תהליכית למה שמנסים להראות כאן, וזה הכיוון שתקבל/י אם תפנים/י ותתרגל/י את הפיצ'ר הזה.</p>
+                <p class="screen-demo-dialogue-footnote">זו דוגמת שימוש לימודית. המטרה היא להבין איזה סוג כלי זה נותן לך, ואיך לשלב אותו עם שאר הכלים כדי לקבל שיח מדויק ויעיל יותר.</p>
             </div>
             <div class="screen-read-guide-actions">
                 <button type="button" class="btn btn-primary screen-read-guide-confirm">סגור דוגמה</button>
@@ -5659,7 +5659,7 @@ function showTrainerDepth() {
     const depthTrack = {
         easy: ['׳©׳׳‘ 1: ׳–׳”׳” ׳׳™׳׳” ׳‘׳¢׳™׳™׳×׳™׳×.', '׳©׳׳‘ 2: ׳©׳׳ ׳׳” ׳—׳¡׳¨.', '׳©׳׳‘ 3: ׳ ׳¡׳— ׳©׳׳׳” ׳׳—׳× ׳׳“׳•׳™׳§׳×.'],
         medium: ['׳©׳׳‘ 1: ׳–׳”׳” ׳”׳ ׳—׳” ׳¡׳׳•׳™׳”.', '׳©׳׳‘ 2: ׳‘׳“׳•׳§ ׳¨׳׳™׳•׳×.', '׳©׳׳‘ 3: ׳ ׳¡׳— ׳—׳׳•׳₪׳” ׳׳“׳•׳™׳§׳×.'],
-        hard: ['׳©׳׳‘ 1: ׳–׳”׳” ׳“׳₪׳•׳¡ ׳©׳₪׳”.', '׳©׳׳‘ 2: ׳׳₪׳” E/B/C/V/I/S ׳‘׳§׳¦׳¨׳”.', '׳©׳׳‘ 3: ׳‘׳—׳¨ Small Win ׳׳”׳×׳§׳“׳׳•׳×.']
+        hard: ['׳©׳׳‘ 1: ׳–׳”׳” ׳“׳₪׳•׳¡ ׳©׳₪׳”.', '׳©׳׳‘ 2: ׳׳₪׳” רמות לוגיות (סביבה/התנהגות/יכולות/ערכים/זהות/שייכות) ׳‘׳§׳¦׳¨׳”.', '׳©׳׳‘ 3: ׳‘׳—׳¨ Small Win ׳׳”׳×׳§׳“׳׳•׳×.']
     }[question.difficulty] || ['׳©׳׳‘ 1: ׳–׳”׳” ׳“׳₪׳•׳¡.', '׳©׳׳‘ 2: ׳©׳׳ ׳׳” ׳—׳¡׳¨.', '׳©׳׳‘ 3: ׳‘׳ ׳” ׳©׳׳׳” ׳׳“׳•׳™׳§׳×.'];
 
     setPanelContent('depth-display', `
@@ -8421,7 +8421,7 @@ const LOGICAL_LEVEL_INFO = {
     }
 };
 
-const LOGICAL_LEVELS_SEQUENCE_FRIENDLY = 'סביבה (E) → התנהגות (B) → יכולות (C) → ערכים/אמונות (V) → זהות (I) → שייכות (S)';
+const LOGICAL_LEVELS_SEQUENCE_FRIENDLY = 'סביבה → התנהגות → יכולות → ערכים/אמונות → זהות → שייכות';
 const LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT = 'סביבה, התנהגות, יכולות, ערכים/אמונות, זהות, שייכות';
 
 const LOGICAL_LEVEL_KEYWORDS = {
@@ -8742,14 +8742,13 @@ function getPrismById(prismId) {
 
 function getLevelDisplay(level) {
     const info = LOGICAL_LEVEL_INFO[level];
-    return info ? `${info.hebrew} (${level})` : level;
+    return info ? `${info.hebrew}` : level;
 }
 
 function getLevelBilingualLabel(level) {
     const info = LOGICAL_LEVEL_INFO[level];
     if (!info) return level;
-    const english = String(info.name || '').replace(` (${level})`, '');
-    return `${info.hebrew} (${level}) · ${english}`;
+    return `${info.hebrew}`;
 }
 
 function getExpectedLevelFromInput(inputEl) {
@@ -8945,9 +8944,14 @@ function renderPrismDeepGuide(prism) {
         <div class="prism-guide-grid prism-guide-grid-mode-split">
             <div class="prism-guide-card">
                 <h5>שתי פריזמות שונות (חשוב)</h5>
-                <p><strong>Prism Research (אורכי / Chain):</strong> אותה שאלה נשאלת שוב ושוב רקורסיבית על המשפט החדש שנולד מהתשובה. זו חקירה קדימה.</p>
-                <p><strong>Prism Lab (מגדל לוגי / מגדל רמות):</strong> נשארים על עוגן אחד + קטגוריה אחת, ובונים חתך עומק ברמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY}). זו חקירה לעומק.</p>
-                <p><strong>במשפט אחד:</strong> Prism = חקירה קדימה בזמן. Stack = חקירה לעומק במשמעות.</p>
+                <p><strong>Prism Research (חקירה בשרשרת):</strong> שואלים שוב על כל תשובה חדשה שנולדה. זו חקירה "רקורסיבית" - כלומר אותה צורת שאלה חוזרת על תוצאה חדשה כדי להתקדם שכבה אחרי שכבה.</p>
+                <p><strong>Prism Lab (מגדל רמות):</strong> נשארים על מילה/ביטוי מרכזי אחד ("עוגן") + קטגוריה אחת, ובונים חתך עומק דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY}). זו חקירה לעומק.</p>
+                <p><strong>במשפט אחד:</strong> Research = מתקדמים קדימה עם שאלות חדשות. Lab = נשארים על אותו מוקד ומעמיקים.</p>
+            </div>
+            <div class="prism-guide-card">
+                <h5>שני מושגים שחייבים להיות ברורים</h5>
+                <p><strong>מה זה "עוגן"?</strong> המילה או הביטוי המרכזיים מתוך המשפט שעליהם עובדים עכשיו. לא כל המשפט - רק נקודת מיקוד אחת שמעמיקים עליה.</p>
+                <p><strong>מה זה "רקורסיבי" ולמה זה חשוב בטיפול?</strong> רקורסיבי = חוזרים עם אותה שאלה/עדשה על התשובה החדשה. זה עוזר לא לקפוץ מהר לפרשנות, אלא לחשוף שכבות נוספות של משמעות, הכללה והנחות.</p>
             </div>
         </div>
 
@@ -8956,7 +8960,7 @@ function renderPrismDeepGuide(prism) {
                 <h5>׳׳™׳ ׳¢׳•׳‘׳“׳™׳ ׳ ׳›׳•׳ ׳‘-4 ׳©׳׳‘׳™׳</h5>
                 <ol>
                     <li>׳׳ ׳¡׳—׳™׳ ׳׳× ׳©׳׳׳× ׳”׳¢׳•׳’׳ ׳•׳׳•׳•׳“׳׳™׳ ׳©׳”׳™׳ ׳‘׳¨׳•׳¨׳” ׳•׳׳“׳™׳“׳”.</li>
-                    <li>ממפים כל תשובה לרמה הלוגית המתאימה: סביבה (E), התנהגות (B), יכולות (C), ערכים/אמונות (V), זהות (I), שייכות (S).</li>
+                    <li>ממפים כל תשובה לרמה הלוגית המתאימה: סביבה, התנהגות, יכולות, ערכים/אמונות, זהות, שייכות.</li>
                     <li>׳׳–׳”׳™׳ ׳₪׳¢׳¨׳™׳ ׳•׳©׳™׳‘׳•׳¦׳™׳ ׳©׳’׳•׳™׳™׳ ׳›׳“׳™ ׳׳׳ ׳•׳¢ ׳׳¡׳§׳ ׳•׳× ׳׳ ׳׳“׳•׳™׳§׳•׳×.</li>
                     <li>׳‘׳•׳—׳¨׳™׳ צעד הבא ׳׳—׳“ ׳§׳˜׳ ׳׳‘׳™׳¦׳•׳¢ ׳׳™׳™׳“׳™, ׳¢׳ ׳”׳׳©׳ ׳¢׳•׳׳§ ׳׳“׳•׳¨׳’.</li>
                 </ol>
@@ -8967,7 +8971,7 @@ function renderPrismDeepGuide(prism) {
             </div>
             <div class="prism-guide-card">
                 <h5>׳׳” ׳׳•׳׳¨ "׳¢׳•׳׳§" ׳‘׳₪׳¨׳™׳–׳׳”</h5>
-                <p>׳׳×׳—׳™׳׳™׳ ׳‘-E/B ׳›׳“׳™ ׳׳¢׳’׳ ׳¢׳•׳‘׳“׳•׳× ׳‘׳©׳˜׳—, ׳•׳׳– ׳¢׳•׳׳™׳ ׳-C/V/I/S ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳׳ ׳’׳ ׳•׳ ׳₪׳ ׳™׳׳™ ׳•׳–׳”׳•׳×׳™.</p>
+                <p>׳׳×׳—׳™׳׳™׳ ׳‘-סביבה/התנהגות ׳›׳“׳™ ׳׳¢׳’׳ ׳¢׳•׳‘׳“׳•׳× ׳‘׳©׳˜׳—, ׳•׳׳– ׳¢׳•׳׳™׳ ׳-יכולות/ערכים/זהות/שייכות ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳׳ ׳’׳ ׳•׳ ׳₪׳ ׳™׳׳™ ׳•׳–׳”׳•׳×׳™.</p>
                 <ul>${depthLadder}</ul>
             </div>
         </div>
@@ -9054,8 +9058,8 @@ function renderPrismActionPlan(session, recommendation, mismatchCount) {
         ? '׳™׳™׳©׳•׳¨ ׳©׳™׳‘׳•׳¦׳™׳: ׳¢׳‘׳•׳¨ ׳›׳ ׳₪׳¨׳™׳˜ ׳׳“׳•׳, ׳ ׳¡׳— ׳׳—׳“׳© ׳׳©׳₪׳˜ ׳׳׳•׳§׳“ ׳©׳׳×׳׳™׳ ׳¨׳§ ׳׳¨׳׳” ׳׳—׳×.'
         : '׳©׳™׳׳•׳¨ ׳“׳™׳•׳§: ׳”׳©׳׳¨ ׳׳× ׳”׳ ׳™׳¡׳•׳— ׳—׳“ ׳•׳§׳¦׳¨, ׳•׳‘׳“׳•׳§ ׳©׳›׳ ׳׳©׳₪׳˜ ׳¢׳•׳ ׳” ׳׳©׳׳׳× ׳”׳¢׳•׳’׳.';
     const resistanceStep = highResistance
-        ? '׳¢׳‘׳•׳“׳” ׳¢׳ ׳”׳×׳ ׳’׳“׳•׳× ׳’׳‘׳•׳”׳”: ׳”׳×׳—׳ ׳‘-Small Win ׳—׳™׳¦׳•׳ ׳™ (E/B) ׳׳₪׳ ׳™ ׳©׳™׳ ׳•׳™ ׳׳׳•׳ ׳•׳× ׳¢׳׳•׳§.'
-        : '׳׳₪׳©׳¨ ׳׳”׳×׳§׳“׳ ׳׳¢׳•׳׳§: ׳׳—׳¨׳™ ׳‘׳™׳¦׳•׳¢ ׳¦׳¢׳“ ׳§׳˜׳, ׳¢׳‘׳•׳¨ ׳׳¢׳‘׳•׳“׳” ׳‘׳¨׳׳•׳× C/V/I.';
+        ? '׳¢׳‘׳•׳“׳” ׳¢׳ ׳”׳×׳ ׳’׳“׳•׳× ׳’׳‘׳•׳”׳”: ׳”׳×׳—׳ ׳‘-Small Win ׳—׳™׳¦׳•׳ ׳™ (סביבה/התנהגות) ׳׳₪׳ ׳™ ׳©׳™׳ ׳•׳™ ׳׳׳•׳ ׳•׳× ׳¢׳׳•׳§.'
+        : '׳׳₪׳©׳¨ ׳׳”׳×׳§׳“׳ ׳׳¢׳•׳׳§: ׳׳—׳¨׳™ ׳‘׳™׳¦׳•׳¢ ׳¦׳¢׳“ ׳§׳˜׳, ׳¢׳‘׳•׳¨ ׳׳¢׳‘׳•׳“׳” ׳‘׳¨׳׳•׳× יכולות/ערכים/זהות.';
     const emotionStep = highEmotion
         ? '׳‘׳׳¦׳‘ ׳¨׳’׳©׳™ ׳’׳‘׳•׳”: ׳”׳׳˜ ׳§׳¦׳‘, ׳׳׳× ׳¢׳•׳‘׳“׳•׳×, ׳•׳¨׳§ ׳׳– ׳‘׳¦׳¢ ׳₪׳¨׳©׳ ׳•׳× ׳׳• ׳”׳›׳׳׳”.'
         : '׳”׳¨׳’׳© ׳™׳¦׳™׳‘ ׳™׳—׳¡׳™׳×: ׳׳×׳׳™׳ ׳׳‘׳ ׳™׳™׳× ׳×׳•׳›׳ ׳™׳× ׳₪׳¢׳•׳׳” ׳׳“׳•׳¨׳’׳× ׳׳©׳‘׳•׳¢ ׳”׳§׳¨׳•׳‘.';
@@ -9079,21 +9083,21 @@ function classifyStackJumpFromMap(filledSet) {
         jumps.push({
             code: 'EB_to_IS_without_V',
             severity: 'high',
-            text: 'קפיצה חדה: יש E/B וגם I/S, אבל חסרה שכבת V (ערכים/אמונות) כגשר.'
+            text: 'קפיצה חדה: יש סביבה/התנהגות וגם זהות/שייכות, אבל חסרה שכבת ערכים/אמונות כגשר.'
         });
     }
     if ((has('E') || has('B')) && has('I') && !has('C')) {
         jumps.push({
             code: 'EB_to_I_without_C',
             severity: 'medium',
-            text: 'קפיצה לזהות בלי שכבת C (יכולות/אסטרטגיה). ייתכן שחסרה מיומנות ולא רק משמעות.'
+            text: 'קפיצה לזהות בלי שכבת יכולות/אסטרטגיה. ייתכן שחסרה מיומנות ולא רק משמעות.'
         });
     }
     if (has('V') && !has('E') && !has('B')) {
         jumps.push({
             code: 'V_without_EB',
             severity: 'medium',
-            text: 'יש כלל/אמונה בלי עיגון של הקשר או התנהגות. החזר/י קודם E/B.'
+            text: 'יש כלל/אמונה בלי עיגון של הקשר או התנהגות. חזר/י קודם לסביבה/התנהגות.'
         });
     }
     if (has('S') && !has('E') && !has('B')) {
@@ -9148,12 +9152,12 @@ function computeVerticalStackPivotRecommendation(stackState) {
     } else if (bigJumpWithoutV) {
         suggestedLevelFocus = 'V';
         titleHe = 'לחשוף את הכלל שמחבר';
-        whyHe = 'נראית קפיצה מ-E/B ל-I/S בלי גשר. שכבת V יכולה לחשוף את הכלל שמדביק בין הרמות.';
+        whyHe = 'נראית קפיצה מסביבה/התנהגות לזהות/שייכות בלי גשר. שכבת ערכים/אמונות יכולה לחשוף את הכלל שמדביק בין הרמות.';
         nextQuestionHe = `איזה כלל/אמונה מחברים אצלך את "${stackState.anchorText}" למשמעות הזו?`;
     } else if (highResistance) {
         suggestedLevelFocus = has('E') ? (has('B') ? 'C' : 'B') : 'E';
         titleHe = 'צעד הבא בטוח (חיכוך נמוך)';
-        whyHe = 'רמת התנגדות גבוהה: עדיף צעד הבא בטוח ב-E/B/C לפני אתגור עמוק.';
+        whyHe = 'רמת התנגדות גבוהה: עדיף צעד הבא בטוח בסביבה/התנהגות/יכולות לפני אתגור עמוק.';
         const safeQuestions = {
             E: `באיזה הקשר/מתי "${stackState.anchorText}" קורה או לא קורה?`,
             B: `מה אתה עושה בפועל כש-"${stackState.anchorText}" מופיע?`,
@@ -9408,7 +9412,7 @@ function handlePrismSubmit() {
     const anchorText = getCurrentPrismAnchorText(prism);
     if (!String(anchorText || '').trim()) {
         playUISound('prism_error');
-        showHintMessage('יש להזין עוגן (מילה/ביטוי משמעותי) לפני יצירת המפה.');
+        showHintMessage('יש להזין מילה/ביטוי מרכזי לבדיקה ("עוגן") לפני יצירת המפה.');
         return;
     }
 
@@ -9817,11 +9821,11 @@ function exportPrismSession() {
 
 function buildPrismStackLegendRowsHtml() {
     return ['E', 'B', 'C', 'V', 'I', 'S']
-        .map((level) => {
+        .map((level, index) => {
             const info = LOGICAL_LEVEL_INFO[level] || { hebrew: level, prompt: '' };
             return `
                 <div class="prism-mini-stack-row prism-mini-stack-row-${level}">
-                    <span class="prism-mini-stack-tag">${level}</span>
+                    <span class="prism-mini-stack-tag">${index + 1}</span>
                     <div class="prism-mini-stack-copy">
                         <span class="prism-mini-stack-label">${escapeHtml(info.hebrew)}</span>
                         <small>${escapeHtml(info.prompt)}</small>
@@ -9898,18 +9902,18 @@ function applyPrismLabCompactRuntimeCopy() {
     const rootTitle = rootCard?.querySelector(':scope > h2');
     const rootIntro = rootCard?.querySelector(':scope > p');
     if (rootTitle) rootTitle.textContent = 'מעבדת פריזמות (Prism Lab)';
-    if (rootIntro) rootIntro.textContent = `בחר/י פריזמה + עוגן אחד, ובנה/י מגדל עומק (מגדל רמות) דרך רמות לוגיות: ${LOGICAL_LEVELS_SEQUENCE_FRIENDLY}.`;
+    if (rootIntro) rootIntro.textContent = `בחר/י פריזמה, בחר/י מילה/ביטוי מרכזי אחד מתוך המשפט ("עוגן"), ואז בדוק/י אותו דרך רמות לוגיות: ${LOGICAL_LEVELS_SEQUENCE_FRIENDLY}.`;
 
     const anchorStrong = root.querySelector('#prism-detail .anchor-box strong');
-    if (anchorStrong) anchorStrong.textContent = 'שאלת עוגן / Anchor Question:';
+    if (anchorStrong) anchorStrong.textContent = 'שאלת מיקוד (על המילה/ביטוי שבחרת):';
 
     const stackHeadTitle = root.querySelector('#prism-detail .prism-stack-head h4');
     const stackHeadMuted = root.querySelector('#prism-detail .prism-stack-head .muted');
-    if (stackHeadTitle) stackHeadTitle.textContent = 'מגדל לוגי / מגדל רמות';
-    if (stackHeadMuted) stackHeadMuted.textContent = `אותו עוגן, אותה פריזמה: ממפים עומק דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי לזהות שכבות חסרות והצעד הבא.`;
+    if (stackHeadTitle) stackHeadTitle.textContent = 'מגדל רמות (רמות לוגיות)';
+    if (stackHeadMuted) stackHeadMuted.textContent = `אותה מילה/ביטוי מרכזי, כמה שכבות הסתכלות: ${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}. המטרה: לזהות מה חסר ולבחור צעד המשך מדויק.`;
 
     const anchorLabel = root.querySelector('#prism-detail .prism-anchor-input-card label');
-    if (anchorLabel) anchorLabel.textContent = 'עוגן (Anchor) — מילה/ביטוי מרכזי:';
+    if (anchorLabel) anchorLabel.textContent = 'מילה/ביטוי מרכזי לבדיקה ("עוגן"):';
 
     const mappingMuted = root.querySelector('#prism-detail .prism-anchor-input-card + .muted');
     if (mappingMuted) mappingMuted.textContent = 'ממלאים תשובה קצרה בכל רמה לוגית. אפשר להקליד, לגרור הצעות, או להתחיל רק מ-3 רמות.';
@@ -9974,7 +9978,7 @@ function ensurePrismLabWorkLayout() {
         legend.innerHTML = `
             <div class="prism-mini-stack-panel-head">
                 <strong>מפת רמות / Stack Map</strong>
-                <small>E → B → C → V → I → S</small>
+                <small>סביבה → התנהגות → יכולות → ערכים/אמונות → זהות → שייכות</small>
             </div>
             <div class="prism-mini-stack">${buildPrismStackLegendRowsHtml()}</div>
         `;
@@ -10054,9 +10058,9 @@ function renderPrismDeepGuide(prism) {
                     </div>
                     <div class="prism-guide-card">
                         <h5>Prism Lab vs Prism Research</h5>
-                        <p><strong>Prism Lab (מגדל רמות):</strong> עוגן אחד + חתך עומק דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}).</p>
-                        <p><strong>Prism Research (Chain):</strong> שרשרת שאלות רקורסיבית על כל תשובה חדשה.</p>
-                        <p><strong>בקיצור:</strong> Lab = עומק, Research = רצף.</p>
+                        <p><strong>Prism Lab (מגדל רמות):</strong> מילה/ביטוי מרכזי אחד ("עוגן") + חתך עומק דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}).</p>
+                        <p><strong>Prism Research (חקירה בשרשרת):</strong> שואלים שוב על כל תשובה חדשה ("רקורסיבי" = אותה שאלה חוזרת על תוצאה חדשה).</p>
+                        <p><strong>בקיצור:</strong> Lab = עומק על מוקד אחד, Research = התקדמות בשרשרת.</p>
                     </div>
                 </div>
 
@@ -10064,8 +10068,8 @@ function renderPrismDeepGuide(prism) {
                     <div class="prism-guide-card">
                         <h5>איך עובדים / 4 Steps</h5>
                         <ol>
-                            <li>בחר/י עוגן קצר.</li>
-                            <li>מלא/י 3-6 רמות לוגיות (למשל: סביבה, התנהגות, יכולות, ערכים, זהות, שייכות).</li>
+                            <li>בחר/י מילה/ביטוי מרכזי אחד מהמשפט (זה ה"עוגן").</li>
+                            <li>מלא/י 3-6 רמות לוגיות (למשל: סביבה, התנהגות, יכולות, ערכים/אמונות, זהות, שייכות).</li>
                             <li>בדוק/י קפיצות או שכבות חסרות.</li>
                             <li>בחר/י צעד הבא קטן להמשך.</li>
                         </ol>
@@ -10091,7 +10095,7 @@ function renderPrismDeepGuide(prism) {
                             </div>
                             <div class="prism-guide-card">
                                 <h5>טעויות נפוצות</h5>
-                                <ul>${antiPatterns || '<li>לא לקפוץ לפרשנות לפני E/B.</li>'}</ul>
+                                <ul>${antiPatterns || '<li>לא לקפוץ לפרשנות לפני שיש עיגון של סביבה/התנהגות.</li>'}</ul>
                                 <p><strong>טיפ:</strong> אם יש ספק ברמה, קצר/י את המשפט לשורה קונקרטית אחת.</p>
                             </div>
                         </div>
@@ -10117,7 +10121,7 @@ function renderPrismLibrary() {
             <h4>${escapeHtml(nameHe || nameEn || 'Prism')}</h4>
             <p class="prism-card-subtitle">${escapeHtml(nameEn || '')}</p>
             <p>${escapeHtml(core)}</p>
-            <p><strong>Anchor / שאלת עוגן:</strong> ${escapeHtml(anchor)}</p>
+            <p><strong>שאלת מיקוד (על העוגן):</strong> ${escapeHtml(anchor)}</p>
             <div style="margin-top:10px"><button class="btn prism-open-btn" data-id="${escapeHtml(String(p.id || ''))}">פתח/י פריזמה</button></div>
         `;
         const openBtn = div.querySelector('.prism-open-btn');
@@ -13008,7 +13012,7 @@ function setupWrinkleGame() {
                 <div class="wr2w-guide-body">
                     <p>כאן עובדים כמו באימון: קודם מזהים איפה המתח גדול מהמילים, אחר כך חושפים את הכמת הסמוי, ורק אז בונים גשר מדויק ובודקים אותו.</p>
                     <p>המטרה היא לא "לתקן" את המשפט, אלא להגיע לרגע של הלימה (felt shift): "כן, זה בדיוק זה".</p>
-                    <p class="wr2w-guide-note">אילוסטרציה תהליכית: זו הדגמה של סוג התהליך שהכלי בא למדל, לא אמת קלינית.</p>
+                    <p class="wr2w-guide-note">דוגמת שימוש לימודית: זו המחשה לאופן עבודה אפשרי עם הכלי, לא "נוסחה טיפולית" אחת.</p>
                 </div>
             </details>
 
