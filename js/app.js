@@ -12413,7 +12413,7 @@ const WR2_SQHCEL_STORAGE_KEY = 'wr2_sqhcel_v1';
 const WR2W_FLOW_STEPS = Object.freeze([
     Object.freeze({ id: 'S', label: '❤️ תחושה שעולה (S)', criterion: 'signal' }),
     Object.freeze({ id: 'Q', label: '🫧 כמת נסתר (Q)', criterion: 'quantifier' }),
-    Object.freeze({ id: 'H', label: '🌉 גישור ובדיקת השערה (H)', criterion: 'hypothesis' }),
+    Object.freeze({ id: 'H', label: '🌉 משפט מגשר לבדיקה (H)', criterion: 'hypothesis' }),
     Object.freeze({ id: 'C', label: '✅ אישור/בדיקת הלימה (C)', criterion: 'confirm' }),
     Object.freeze({ id: 'P', label: '🧭 בחירת כיוון עבודה', criterion: 'path' }),
     Object.freeze({ id: 'E', label: '✨ חריג + למידה חדשה', criterion: 'exception' })
@@ -12438,7 +12438,7 @@ const WR2W_FEELINGS = Object.freeze([
 const WR2W_CRITERIA_LABELS = Object.freeze({
     signal: 'תחושה (S) · זיהוי תחושה',
     quantifier: 'כמת נסתר (Q)',
-    hypothesis: 'גישור (H) · ניסוח + בדיקה',
+    hypothesis: 'משפט מגשר (H) · ניסוח + בדיקה',
     confirm: 'אישור/הלימה (C) · לפני מעבר',
     path: 'בחירת כיוון עבודה',
     exception: 'למידה/חריג (E/L) · משפט למידה'
@@ -12965,7 +12965,7 @@ function wr2wProcessCount(criteria) {
 
 const WR2W_WIZARD_TITLE = 'כמתים נסתרים – הגשר שנסגר';
 const WR2W_WIZARD_SLOGAN = 'כשהרגש גדול מהמילים — יש כמת נסתר. אנחנו לא מתקנים ולא מבטלים; אנחנו פותחים גשר בין הגוף, העולם והשפה.';
-const WR2W_WIZARD_FORMULA = 'מה עולה בגוף → איזה "תמיד/אף פעם" מסתתר → גישור ובדיקה → אישור/הלימה → בחירת כיוון עבודה → למידה חדשה';
+const WR2W_WIZARD_FORMULA = 'מה עולה בגוף → איזה "תמיד/אף פעם" מסתתר → משפט מגשר + בדיקה → אישור/הלימה → בחירת כיוון עבודה → למידה חדשה';
 
 function setupWrinkleGame() {
     const root = document.getElementById('wrinkle-game');
@@ -13253,12 +13253,12 @@ function setupWrinkleGame() {
             instruction: 'בחר/י את הכמת שמשתמע מהמשפט. הוא יודגש בתוך המשפט העליון בצהוב גם אם לא נאמר במפורש.'
         },
         H: {
-            title: 'שלב 3 · ניסוח גישור לבדיקה',
-            instruction: 'נסח/י גשר עם בעלות + הכמת + בדיקה ("זה קרוב או שאני משלים/ה?").'
+            title: 'שלב 3 · ניסוח משפט מגשר לבדיקה',
+            instruction: 'מנסחים "משפט מגשר" קצר: ניסוח ביניים שמחבר בין התחושה, הכמת הסמוי והמשפט של המטופל, ואז בודקים אם זה קרוב למה שהתכוון.'
         },
         C: {
             title: 'שלב 4 · בדיקת הלימה מול המטופל',
-            instruction: 'קודם בודקים הלימה מול "המטופל" (AI) ורק אז ממשיכים. אפשר עד 2 תיקונים.'
+            instruction: 'אחרי בדיקת הניסוח בשלב H, שולחים את המשפט המגשר ל"אישור/תיקון" מול המטופל (AI). רק כשיש הלימה עוברים לכיוון עבודה.'
         },
         P: {
             title: 'שלב 5 · בחירת כיוון עבודה',
@@ -13481,17 +13481,26 @@ function setupWrinkleGame() {
                         <button type="button" class="wr2w-option-btn${state.round.selectedQuantifier === q ? ' is-selected' : ''}" data-action="select-quantifier" data-quantifier="${escapeHtml(q)}">${escapeHtml(q)}</button>
                     `).join('')}
                 </div>
-                <button type="button" class="btn btn-primary wr2w-main-btn wr2w-main-btn--green" data-action="goto-h" ${state.round.selectedQuantifier ? '' : 'disabled'}>בנה גישור (H)</button>
+                <button type="button" class="btn btn-primary wr2w-main-btn wr2w-main-btn--green" data-action="goto-h" ${state.round.selectedQuantifier ? '' : 'disabled'}>בנה משפט מגשר (H)</button>
             `;
         }
         if (step === 'H') {
             return `
+                <div class="wr2w-step-hero">
+                    <strong>מה זה "משפט מגשר"?</strong>
+                    <p>זה משפט ביניים זמני: הוא לא "פתרון", אלא בדיקה האם הבנו נכון את הקשר בין התחושה לבין ה"תמיד/אף פעם" הסמוי.</p>
+                </div>
                 <details class="wr2w-inline-theory">
-                    <summary>תבנית גישור קצרה</summary>
+                    <summary>מה עושה בודק הניסוח (Evaluator)?</summary>
+                    <p>זה בודק טכני קצר לשלב H: האם יש בעלות ("עולה לי..."), האם הכמת שבחרת מופיע, והאם יש שאלת בדיקה ("זה קרוב...?"). הוא לא מחליף שיקול טיפולי.</p>
+                </details>
+                <details class="wr2w-inline-theory">
+                    <summary>תבנית משפט מגשר קצרה</summary>
                     <p>בעלות ("עולה לי...") + כמת נסתר + בדיקה ("זה קרוב למה שהתכוונת?").</p>
                 </details>
                 <textarea id="wr2w-hypothesis-input" class="wr2w-textarea" rows="4">${escapeHtml(state.round.hypothesisDraft)}</textarea>
-                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="submit-hypothesis">בדוק אם הגישור מתאים</button>
+                <button type="button" class="btn btn-primary wr2w-main-btn" data-action="submit-hypothesis">בדוק/י עם בודק הניסוח</button>
+                <p class="wr2w-template-note">אחרי שהניסוח עובר כאן, עדיין שולחים אותו בשלב הבא לאישור/תיקון מול "המטופל" (AI).</p>
             `;
         }
         if (step === 'C') {
@@ -13499,23 +13508,24 @@ function setupWrinkleGame() {
             const canEnterPath = wr2wPathCore.canEnterPath(state.round);
             const correctionsLeft = Math.max(0, 2 - Number(state.round.confirmCorrections || 0));
             return `
+                <p class="wr2w-inline-hint">שלב האישור: כאן בודקים הלימה מול "המטופל" (AI) — לא אם הניסוח "יפה", אלא אם הוא באמת קרוב למה שהתכוון.</p>
                 <div class="wr2w-quote-box">
-                    <strong>הגשר שנבדק</strong>
+                    <strong>המשפט המגשר שנבדק</strong>
                     <p>${escapeHtml(state.round.hypothesisFinal || state.round.hypothesisDraft)}</p>
                 </div>
                 ${confirmation ? `
                     <div class="wr2w-patient-box" data-status="${escapeHtml(confirmation.status)}">
-                        <strong>תגובת AI (אישור/תיקון)</strong>
+                        <strong>תגובת "המטופל" (AI) · אישור/תיקון</strong>
                         <p>${escapeHtml(confirmation.text)}</p>
                     </div>
                     ${canEnterPath ? `
                         <button type="button" class="btn btn-primary wr2w-main-btn wr2w-main-btn--green" data-action="goto-path">המשך לבחירת כיוון עבודה</button>
                     ` : `
-                        <p class="wr2w-template-note">נשארו ${correctionsLeft} תיקוני גישור לפני מעבר לשלב בחירת כיוון עבודה.</p>
+                        <p class="wr2w-template-note">נשארו ${correctionsLeft} תיקונים למשפט המגשר לפני מעבר לשלב בחירת כיוון עבודה.</p>
                         <button type="button" class="btn btn-secondary wr2w-main-btn" data-action="revise-hypothesis">חזור/י ל-H לשיפור</button>
                     `}
                 ` : `
-                    <button type="button" class="btn btn-primary wr2w-main-btn" data-action="send-hypothesis">שלח/י לאישור</button>
+                    <button type="button" class="btn btn-primary wr2w-main-btn" data-action="send-hypothesis">שלח/י לאישור מול "המטופל"</button>
                 `}
             `;
         }
@@ -13743,7 +13753,7 @@ function setupWrinkleGame() {
         }
         if (action === 'goto-h') {
             if (!state.round.selectedQuantifier) {
-                setFeedback('בחר/י קודם כמת נסתר לפני המעבר לשלב הגישור.', 'warn');
+                setFeedback('בחר/י קודם כמת נסתר לפני המעבר לשלב ניסוח המשפט המגשר.', 'warn');
                 render();
                 return;
             }
@@ -13752,7 +13762,7 @@ function setupWrinkleGame() {
             if (!state.round.hypothesisDraft || state.round.hypothesisDraft.includes('___')) {
                 state.round.hypothesisDraft = wr2wBuildHypothesisSkeleton(scene, state.round.selectedQuantifier);
             }
-            setFeedback('נסח/י גישור לפי התבנית ושלח/י לבדיקה.', 'info');
+            setFeedback('נסח/י משפט מגשר לפי התבנית ושלח/י לבדיקה.', 'info');
             render();
             return;
         }
@@ -13770,7 +13780,7 @@ function setupWrinkleGame() {
                 if (!evalResult.hasOwnership) missing.push('בעלות על ההשערה (למשל: "עולה לי...")');
                 if (!evalResult.hasQuantifier) missing.push('הכמת שבחרת');
                 if (!evalResult.hasCheck) missing.push('שאלת בדיקה (למשל: "זה קרוב למה שהתכוונת, או שאני משלים/ה?")');
-                setFeedback(`כדי שהגישור יהיה מדויק יותר, כדאי להשלים: ${missing.join(' | ')}.`, 'warn');
+                setFeedback(`כדי שהמשפט המגשר יהיה מדויק יותר, כדאי להשלים: ${missing.join(' | ')}.`, 'warn');
                 render();
                 return;
             }
@@ -13786,7 +13796,7 @@ function setupWrinkleGame() {
         }
         if (action === 'send-hypothesis') {
             if (!state.round.hypothesisFinal) {
-                setFeedback('קודם בדוק/י את הגישור בשלב H ורק אחר כך שלח/י לאישור.', 'warn');
+                setFeedback('קודם בדוק/י את המשפט המגשר בשלב H ורק אחר כך שלח/י לאישור.', 'warn');
                 render();
                 return;
             }
@@ -13825,7 +13835,7 @@ function setupWrinkleGame() {
                     }
                     state.round.confirmResolved = false;
                     const left = Math.max(0, 2 - state.round.confirmCorrections);
-                    setFeedback(`עלה צורך בתיקון. חזור/י לשלב הגישור (H) לשיפור הניסוח (נותרו ${left} תיקונים לפני שלב בחירת כיוון עבודה).`, tone);
+                    setFeedback(`עלה צורך בתיקון. חזור/י לשלב המשפט המגשר (H) לשיפור הניסוח (נותרו ${left} תיקונים לפני שלב בחירת כיוון עבודה).`, tone);
                 } else {
                     state.round.confirmResolved = true;
                     markCriterion('confirm');
@@ -13838,7 +13848,7 @@ function setupWrinkleGame() {
         if (action === 'revise-hypothesis') {
             playUISound('tap_soft');
             state.round.step = 'H';
-            setFeedback('חזרנו לשלב H כדי ללטש את הגישור לפני בחירת כיוון.', 'info');
+            setFeedback('חזרנו לשלב H כדי ללטש את המשפט המגשר לפני בחירת כיוון.', 'info');
             render();
             return;
         }
@@ -13875,7 +13885,7 @@ function setupWrinkleGame() {
                 return;
             }
             if (!state.round.confirmation) {
-                setFeedback('שלח/י קודם את הגישור לבדיקת הלימה מול "המטופל".', 'warn');
+                setFeedback('שלח/י קודם את המשפט המגשר לבדיקת הלימה מול "המטופל".', 'warn');
                 render();
                 return;
             }
