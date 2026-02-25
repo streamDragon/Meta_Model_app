@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.35" data-build-time="1771975307507" data-build-iso="2026-02-24T23:21:47.507Z" data-git-commit="d049e97">
+<html lang="he" dir="rtl" data-app-version="1.0.36" data-build-time="1772009482459" data-build-iso="2026-02-25T08:51:22.459Z" data-git-commit="c8af49d">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -243,7 +243,7 @@
             <button class="tab-btn" data-tab="practice-question">תרגול שאלות</button>
             <button class="tab-btn" data-tab="practice-radar">Meta Radar</button>
             <button class="tab-btn" data-tab="practice-triples-radar">Triples Radar</button>
-            <button class="tab-btn" data-tab="practice-wizard">SQHCEL Wizard</button>
+            <button class="tab-btn" data-tab="practice-wizard">גשר תחושה-שפה (SQHCEL)</button>
             <button class="tab-btn" data-tab="practice-verb-unzip">פועל לא מפורט</button>
             <button class="tab-btn" data-tab="blueprint">Blueprint Builder</button>
             <button class="tab-btn" data-tab="prismlab">מעבדת פריזמות</button>
@@ -298,7 +298,7 @@
                         <div class="feature-map-links">
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול שאלות</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">Meta Radar</button>
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">SQHCEL Wizard</button>
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה (SQHCEL)</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">Blueprint Builder</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">Comic Engine</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('scenario-trainer')">Scenario Trainer</button>
@@ -402,8 +402,8 @@
                             <div class="home-therapy-step-body">
                                 <p class="home-therapy-step-kicker">חתך עומק · עוגן אחד</p>
                                 <h4>Prism Lab (Vertical Stack)</h4>
-                                <p>עוצרים על עוגן אחד משמעותי ולא "רצים קדימה". ממפים אותו דרך E/B/C/V/I/S כדי לזהות קפיצות רמה, רמות חסרות, ופיבוט הבא.</p>
-                                <p class="home-therapy-step-q">שאלת דוגמה: אותה קטגוריה, אבל דרך E/B/C/V/I/S (מגדל לוגי).</p>
+                                <p>עוצרים על עוגן אחד משמעותי ולא "רצים קדימה". ממפים אותו דרך רמות לוגיות: סביבה (E), התנהגות (B), יכולות (C), ערכים/אמונות (V), זהות (I), שייכות (S) - כדי לזהות קפיצות רמה, רמות חסרות, ופיבוט הבא.</p>
+                                <p class="home-therapy-step-q">שאלת דוגמה: אותה קטגוריה, אבל דרך רמות לוגיות (מגדל לוגי) - סביבה/התנהגות/יכולות/ערכים/זהות/שייכות.</p>
                                 <div class="home-therapy-step-actions">
                                     <button type="button" class="btn btn-primary" onclick="navigateTo('prismlab')">פתח Prism Lab</button>
                                 </div>
@@ -414,11 +414,11 @@
                             <div class="home-therapy-step-num">3</div>
                             <div class="home-therapy-step-body">
                                 <p class="home-therapy-step-kicker">ויסות לפני אתגור</p>
-                                <h4>SQHCEL Wizard</h4>
-                                <p>כשהגוף נסגר, לא עוברים ישר לאתגר. קודם עושים גישור תחושה→שפה (S→Q→H→C→PATH→E/L), ורק אחר כך מחדדים שאלה.</p>
+                                <h4>גשר תחושה-שפה (SQHCEL)</h4>
+                                <p>כשהגוף נסגר, לא עוברים ישר לאתגר. קודם עושים גישור תחושה→שפה: תחושה (S) → כמת נסתר (Q) → גישור (H) → אישור (C) → בחירת כיוון (PATH) → למידה/חריג (E/L), ורק אחר כך מחדדים שאלה.</p>
                                 <p class="home-therapy-step-q">שאלת דוגמה: מה אתה מרגיש עכשיו, ומה הגוף אומר לפני המילים?</p>
                                 <div class="home-therapy-step-actions">
-                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">SQHCEL Wizard</button>
+                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה (SQHCEL)</button>
                                 </div>
                             </div>
                         </article>
@@ -476,7 +476,7 @@
                         <button class="btn btn-primary cta-btn" onclick="navigateTo('prismlab')">Prism Lab (מגדל לוגי)</button>
                         <a class="btn btn-secondary cta-btn" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html" target="_blank" rel="noopener">Prism Research (שרשרת)</a>
                         <button class="btn btn-secondary cta-btn" onclick="navigateTo('practice-radar')">Meta Radar</button>
-                        <button class="btn btn-secondary cta-btn" onclick="navigateTo('practice-wizard')">SQHCEL Wizard</button>
+                        <button class="btn btn-secondary cta-btn" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה (SQHCEL)</button>
                         <button id="home-open-feature-map" class="btn btn-secondary cta-btn" type="button">MENU ⤴</button>
                     </div>
                 </div>
@@ -939,7 +939,7 @@
             <div class="prism-container">
                 <div class="card">
                     <h2>🔍 מעבדת פריזמות (Prism Lab)</h2>
-                    <p>בחר/י קטגוריה לשונית־לוגית, הגדיר/י עוגן אחד משמעותי, ובנה/י מגדל לוגי (Vertical Stack) בעומק E/B/C/V/I/S.</p>
+                    <p>בחר/י קטגוריה לשונית־לוגית, הגדיר/י עוגן אחד משמעותי, ובנה/י מגדל לוגי (Vertical Stack) דרך רמות לוגיות: סביבה, התנהגות, יכולות, ערכים/אמונות, זהות, שייכות.</p>
 
                     <div class="prism-grid" id="prism-library">
                         <!-- Prism cards will be rendered here -->
@@ -960,7 +960,7 @@
                             </div>
                             <div class="prism-stack-head">
                                 <h4>מגדל לוגי / Vertical Stack</h4>
-                                <p class="muted">אינטגרציה: קטגוריה לשונית־לוגית × רמות (E/B/C/V/I/S). נשארים על עוגן אחד ובונים חתך עומק.</p>
+                                <p class="muted">אינטגרציה: קטגוריה לשונית־לוגית × רמות לוגיות (סביבה/התנהגות/יכולות/ערכים/זהות/שייכות). נשארים על עוגן אחד ובונים חתך עומק.</p>
                             </div>
 
                             <div class="prism-anchor-input-card">
@@ -988,32 +988,32 @@
 
                                 <div class="level-grid">
                                     <div class="level-item">
-                                        <label>Environment (E)</label>
+                                        <label>סביבה (E) · Environment</label>
                                         <small id="prompt-E" class="level-prompt"></small>
                                         <textarea id="ans-E" class="mapping-input" rows="2"></textarea>
                                     </div>
                                     <div class="level-item">
-                                        <label>Behavior (B)</label>
+                                        <label>התנהגות (B) · Behavior</label>
                                         <small id="prompt-B" class="level-prompt"></small>
                                         <textarea id="ans-B" class="mapping-input" rows="2"></textarea>
                                     </div>
                                     <div class="level-item">
-                                        <label>Capabilities (C)</label>
+                                        <label>יכולות (C) · Capabilities</label>
                                         <small id="prompt-C" class="level-prompt"></small>
                                         <textarea id="ans-C" class="mapping-input" rows="2"></textarea>
                                     </div>
                                     <div class="level-item">
-                                        <label>Values/Beliefs (V)</label>
+                                        <label>ערכים/אמונות (V) · Values/Beliefs</label>
                                         <small id="prompt-V" class="level-prompt"></small>
                                         <textarea id="ans-V" class="mapping-input" rows="2"></textarea>
                                     </div>
                                     <div class="level-item">
-                                        <label>Identity (I)</label>
+                                        <label>זהות (I) · Identity</label>
                                         <small id="prompt-I" class="level-prompt"></small>
                                         <textarea id="ans-I" class="mapping-input" rows="2"></textarea>
                                     </div>
                                     <div class="level-item">
-                                        <label>Belonging (S)</label>
+                                        <label>שייכות (S) · Belonging</label>
                                         <small id="prompt-S" class="level-prompt"></small>
                                         <textarea id="ans-S" class="mapping-input" rows="2"></textarea>
                                     </div>
@@ -1303,13 +1303,13 @@
         <section id="practice-wizard" class="tab-content practice-tab-content">
             <div class="practice-container">
                 <div class="card practice-intro-card">
-                    <h2>SQHCEL Wizard 🧠</h2>
-                    <p class="subtitle">דף 3 מתוך 3: גישור תחושה-שפה לפי S→Q→H→C→PATH→E/L לפני אתגור.</p>
+                    <h2>גשר תחושה-שפה (SQHCEL) 🧠</h2>
+                    <p class="subtitle">דף 3 מתוך 3: גישור תחושה-שפה לפני אתגור: תחושה → כמת נסתר → גישור → אישור → בחירת כיוון → למידה/חריג.</p>
 
-                    <section class="practice-section practice-section-wizard" aria-label="SQHCEL Wizard Section">
+                    <section class="practice-section practice-section-wizard" aria-label="גשר תחושה-שפה (SQHCEL) Section">
                         <div class="practice-section-header">
-                            <h3>3. SQHCEL Wizard</h3>
-                            <p>גשר בין תחושה למשפט לפני אתגור: S→Q→H→C→PATH→E/L. הגוף מרגיש "אבסולוטי" לפני שהמילים אמרו "תמיד".</p>
+                            <h3>3. גשר תחושה-שפה (SQHCEL)</h3>
+                            <p>גשר בין תחושה למשפט לפני אתגור: תחושה (S) → כמת נסתר (Q) → גישור (H) → אישור (C) → בחירת כיוון (PATH) → למידה/חריג (E/L). הגוף מרגיש "אבסולוטי" לפני שהמילים אמרו "תמיד".</p>
                         </div>
                         <div id="wrinkle-game" class="card wrinkle-game-card">
                             <div class="wrinkle-game-header">
@@ -1377,7 +1377,7 @@
             <a class="btn btn-secondary" href="iceberg_templates_trainer.html" data-versioned-href="iceberg_templates_trainer.html" target="_blank" rel="noopener">קצה קרחון / שלדי עומק</a>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול שאלות</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">Meta Radar</button>
-            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">SQHCEL Wizard</button>
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה (SQHCEL)</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">Blueprint Builder</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('prismlab')">Prism Lab · רמות לוגיות</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">Comic Engine</button>

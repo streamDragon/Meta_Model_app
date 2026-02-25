@@ -708,7 +708,7 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: '׳‘׳—׳¨/׳™ ׳×׳’׳•׳‘׳”, ׳׳©׳¨/׳™ ׳ ׳™׳¡׳•׳— ׳§׳¦׳¨, ׳•׳׳– ׳₪׳×׳—/׳™ Power Card ׳•-Blueprint.'
     }),
     prismlab: Object.freeze({
-        logic: 'Prism Lab הוא פריזמה לעומק (Vertical Stack): בוחרים קטגוריה + עוגן אחד, וממפים אותו על E/B/C/V/I/S כדי לחשוף גשרים חסרים וקפיצות רמה.',
+        logic: `Prism Lab הוא פריזמה לעומק (Vertical Stack): בוחרים קטגוריה + עוגן אחד, וממפים אותו על רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי לחשוף גשרים חסרים וקפיצות רמה.`,
         goal: 'להפסיק לערבב בין חקירה אורכית (Prism Research) לבין חקירת עומק, ולבחור Pivot מדויק על בסיס מפה.',
         approach: 'בחר/י פריזמה, כתוב/כתבי עוגן, מלא/י שכבות במגדל, ואז צור/צרי מפה + Pivot אחד מומלץ. אם חסרות רמות - משלימים שכבה ולא \"רצים קדימה\".'
     }),
@@ -829,11 +829,11 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
         ])
     }),
     prismlab: Object.freeze({
-        frame: 'זו אילוסטרציה של Prism Lab כ-Vertical Stack: לא ממשיכים בשרשרת רקורסיבית, אלא עוצרים על עוגן אחד וממפים אותו דרך E/B/C/V/I/S כדי לייצר מפה + Pivot.',
+        frame: `זו אילוסטרציה של Prism Lab כ-Vertical Stack: לא ממשיכים בשרשרת רקורסיבית, אלא עוצרים על עוגן אחד וממפים אותו דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי לייצר מפה + Pivot.`,
         turns: Object.freeze([
             Object.freeze({ role: 'מטופל', text: 'אני רוצה להבין למה כל פעם \"נדבר\" נשמע לי כמו כישלון.' }),
             Object.freeze({ role: 'מטפל', text: 'מעולה. ב-Prism Research היינו ממשיכים בשרשרת רקורסיבית על כל תשובה. כאן ב-Prism Lab נעשה משהו אחר: נשאר על העוגן \"נדבר\" ונבנה מגדל לוגי.' }),
-            Object.freeze({ role: 'מטופל', text: 'כלומר אותה קטגוריה, אותו עוגן - אבל שואלים אותו דרך E/B/C/V/I/S?' }),
+            Object.freeze({ role: 'מטופל', text: 'כלומר אותה קטגוריה, אותו עוגן - אבל שואלים אותו דרך רמות לוגיות (סביבה/התנהגות/יכולות/ערכים/זהות/שייכות)?' }),
             Object.freeze({ role: 'מטפל', text: 'בדיוק. כך מקבלים מפה: איפה זה יושב, מה אתה עושה, איזו יכולת חסרה, איזה כלל מפעיל את זה, ומה ה-Pivot הבא הכי מדויק.' })
         ]),
         outcomes: Object.freeze([
@@ -8421,6 +8421,9 @@ const LOGICAL_LEVEL_INFO = {
     }
 };
 
+const LOGICAL_LEVELS_SEQUENCE_FRIENDLY = 'סביבה (E) → התנהגות (B) → יכולות (C) → ערכים/אמונות (V) → זהות (I) → שייכות (S)';
+const LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT = 'סביבה, התנהגות, יכולות, ערכים/אמונות, זהות, שייכות';
+
 const LOGICAL_LEVEL_KEYWORDS = {
     E: ['סביבה', 'מקום', 'זמן', 'הקשר', 'בחדר', 'בעבודה', 'בבית', 'מתי', 'איפה'],
     B: ['עושה', 'עשיתי', 'ביצוע', 'פעולה', 'התנהגות', 'מגיב', 'אומר', 'שואל'],
@@ -8579,10 +8582,10 @@ function buildVerticalStackSuggestedAnswers(prism, anchorText) {
 function buildVerticalStackPivotSuggestions(prism, anchorText) {
     const a = String(anchorText || '').trim() || deriveDefaultPrismAnchor(prism);
     return [
-        { id: `pivot-safe-E-${prism?.id || 'g'}`, level: 'E', text: `Safe Pivot (E): באיזה הקשר/מתי ${a} קורה או לא קורה?` },
-        { id: `pivot-down-B-${prism?.id || 'g'}`, level: 'B', text: `Downshift (B): מה אתה עושה בפועל כש-${a} מופיע?` },
-        { id: `pivot-bridge-V-${prism?.id || 'g'}`, level: 'V', text: `Bridge (V): איזה כלל מחבר אצלך את ${a} למשמעות/תוצאה?` },
-        { id: `pivot-cap-C-${prism?.id || 'g'}`, level: 'C', text: `Capability (C): איזו מיומנות תקטין את הקפיצה סביב ${a}?` }
+        { id: `pivot-safe-E-${prism?.id || 'g'}`, level: 'E', text: `Pivot סביבה (E): באיזה הקשר/מתי ${a} קורה או לא קורה?` },
+        { id: `pivot-down-B-${prism?.id || 'g'}`, level: 'B', text: `Pivot התנהגות (B): מה אתה עושה בפועל כש-${a} מופיע?` },
+        { id: `pivot-bridge-V-${prism?.id || 'g'}`, level: 'V', text: `Pivot ערכים/אמונות (V): איזה כלל מחבר אצלך את ${a} למשמעות/תוצאה?` },
+        { id: `pivot-cap-C-${prism?.id || 'g'}`, level: 'C', text: `Pivot יכולות (C): איזו מיומנות תקטין את הקפיצה סביב ${a}?` }
     ];
 }
 
@@ -8739,12 +8742,14 @@ function getPrismById(prismId) {
 
 function getLevelDisplay(level) {
     const info = LOGICAL_LEVEL_INFO[level];
-    return info ? `${level} · ${info.hebrew}` : level;
+    return info ? `${info.hebrew} (${level})` : level;
 }
 
 function getLevelBilingualLabel(level) {
     const info = LOGICAL_LEVEL_INFO[level];
-    return info ? `${info.name} · ${info.hebrew}` : level;
+    if (!info) return level;
+    const english = String(info.name || '').replace(` (${level})`, '');
+    return `${info.hebrew} (${level}) · ${english}`;
 }
 
 function getExpectedLevelFromInput(inputEl) {
@@ -8941,7 +8946,7 @@ function renderPrismDeepGuide(prism) {
             <div class="prism-guide-card">
                 <h5>שתי פריזמות שונות (חשוב)</h5>
                 <p><strong>Prism Research (אורכי / Chain):</strong> אותה שאלה נשאלת שוב ושוב רקורסיבית על המשפט החדש שנולד מהתשובה. זו חקירה קדימה.</p>
-                <p><strong>Prism Lab (מגדל לוגי / Vertical Stack):</strong> נשארים על עוגן אחד + קטגוריה אחת, ובונים חתך עומק ב-E/B/C/V/I/S. זו חקירה לעומק.</p>
+                <p><strong>Prism Lab (מגדל לוגי / Vertical Stack):</strong> נשארים על עוגן אחד + קטגוריה אחת, ובונים חתך עומק ברמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY}). זו חקירה לעומק.</p>
                 <p><strong>במשפט אחד:</strong> Prism = חקירה קדימה בזמן. Stack = חקירה לעומק במשמעות.</p>
             </div>
         </div>
@@ -8951,7 +8956,7 @@ function renderPrismDeepGuide(prism) {
                 <h5>׳׳™׳ ׳¢׳•׳‘׳“׳™׳ ׳ ׳›׳•׳ ׳‘-4 ׳©׳׳‘׳™׳</h5>
                 <ol>
                     <li>׳׳ ׳¡׳—׳™׳ ׳׳× ׳©׳׳׳× ׳”׳¢׳•׳’׳ ׳•׳׳•׳•׳“׳׳™׳ ׳©׳”׳™׳ ׳‘׳¨׳•׳¨׳” ׳•׳׳“׳™׳“׳”.</li>
-                    <li>׳׳׳₪׳™׳ ׳›׳ ׳×׳©׳•׳‘׳” ׳׳¨׳׳” ׳”׳׳•׳’׳™׳× ׳”׳׳×׳׳™׳׳”: E/B/C/V/I/S.</li>
+                    <li>ממפים כל תשובה לרמה הלוגית המתאימה: סביבה (E), התנהגות (B), יכולות (C), ערכים/אמונות (V), זהות (I), שייכות (S).</li>
                     <li>׳׳–׳”׳™׳ ׳₪׳¢׳¨׳™׳ ׳•׳©׳™׳‘׳•׳¦׳™׳ ׳©׳’׳•׳™׳™׳ ׳›׳“׳™ ׳׳׳ ׳•׳¢ ׳׳¡׳§׳ ׳•׳× ׳׳ ׳׳“׳•׳™׳§׳•׳×.</li>
                     <li>׳‘׳•׳—׳¨׳™׳ Pivot ׳׳—׳“ ׳§׳˜׳ ׳׳‘׳™׳¦׳•׳¢ ׳׳™׳™׳“׳™, ׳¢׳ ׳”׳׳©׳ ׳¢׳•׳׳§ ׳׳“׳•׳¨׳’.</li>
                 </ol>
@@ -9893,7 +9898,7 @@ function applyPrismLabCompactRuntimeCopy() {
     const rootTitle = rootCard?.querySelector(':scope > h2');
     const rootIntro = rootCard?.querySelector(':scope > p');
     if (rootTitle) rootTitle.textContent = 'מעבדת פריזמות (Prism Lab)';
-    if (rootIntro) rootIntro.textContent = 'בחר/י פריזמה + עוגן אחד, ובנה/י מגדל עומק (Vertical Stack) דרך E/B/C/V/I/S.';
+    if (rootIntro) rootIntro.textContent = `בחר/י פריזמה + עוגן אחד, ובנה/י מגדל עומק (Vertical Stack) דרך רמות לוגיות: ${LOGICAL_LEVELS_SEQUENCE_FRIENDLY}.`;
 
     const anchorStrong = root.querySelector('#prism-detail .anchor-box strong');
     if (anchorStrong) anchorStrong.textContent = 'שאלת עוגן / Anchor Question:';
@@ -9901,13 +9906,13 @@ function applyPrismLabCompactRuntimeCopy() {
     const stackHeadTitle = root.querySelector('#prism-detail .prism-stack-head h4');
     const stackHeadMuted = root.querySelector('#prism-detail .prism-stack-head .muted');
     if (stackHeadTitle) stackHeadTitle.textContent = 'מגדל לוגי / Vertical Stack';
-    if (stackHeadMuted) stackHeadMuted.textContent = 'אותו עוגן, אותה פריזמה: ממפים עומק דרך E/B/C/V/I/S כדי לזהות שכבות חסרות ו-Pivot.';
+    if (stackHeadMuted) stackHeadMuted.textContent = `אותו עוגן, אותה פריזמה: ממפים עומק דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי לזהות שכבות חסרות והצעד הבא.`;
 
     const anchorLabel = root.querySelector('#prism-detail .prism-anchor-input-card label');
     if (anchorLabel) anchorLabel.textContent = 'עוגן (Anchor) — מילה/ביטוי מרכזי:';
 
     const mappingMuted = root.querySelector('#prism-detail .prism-anchor-input-card + .muted');
-    if (mappingMuted) mappingMuted.textContent = 'ממלאים תשובה קצרה בכל רמה. אפשר להקליד, לגרור הצעות, או להתחיל רק מ-3 רמות.';
+    if (mappingMuted) mappingMuted.textContent = 'ממלאים תשובה קצרה בכל רמה לוגית. אפשר להקליד, לגרור הצעות, או להתחיל רק מ-3 רמות.';
 
     const preparedHead = root.querySelector('#prism-detail .prepared-items h4');
     if (preparedHead) preparedHead.textContent = 'תשובות מוצעות / Suggested';
@@ -10049,7 +10054,7 @@ function renderPrismDeepGuide(prism) {
                     </div>
                     <div class="prism-guide-card">
                         <h5>Prism Lab vs Prism Research</h5>
-                        <p><strong>Prism Lab (Vertical Stack):</strong> עוגן אחד + חתך עומק דרך E/B/C/V/I/S.</p>
+                        <p><strong>Prism Lab (Vertical Stack):</strong> עוגן אחד + חתך עומק דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}).</p>
                         <p><strong>Prism Research (Chain):</strong> שרשרת שאלות רקורסיבית על כל תשובה חדשה.</p>
                         <p><strong>בקיצור:</strong> Lab = עומק, Research = רצף.</p>
                     </div>
@@ -10060,7 +10065,7 @@ function renderPrismDeepGuide(prism) {
                         <h5>איך עובדים / 4 Steps</h5>
                         <ol>
                             <li>בחר/י עוגן קצר.</li>
-                            <li>מלא/י 3-6 רמות (E/B/C/V/I/S).</li>
+                            <li>מלא/י 3-6 רמות לוגיות (למשל: סביבה, התנהגות, יכולות, ערכים, זהות, שייכות).</li>
                             <li>בדוק/י קפיצות או שכבות חסרות.</li>
                             <li>בחר/י Pivot קטן להמשך.</li>
                         </ol>
@@ -10381,7 +10386,7 @@ const HOME_TRAINING_PROGRAMS = Object.freeze([
         description: 'מסלול בניית מסגרות: פריזמה, Wizard, ואז סימולציה/קומיקס.',
         steps: Object.freeze([
             Object.freeze({ tab: 'prismlab', title: 'Prism Lab', note: 'מגדל לוגי + Pivot' }),
-            Object.freeze({ tab: 'practice-wizard', title: 'SQHCEL Wizard', note: 'איסוף תהליך מובנה' }),
+            Object.freeze({ tab: 'practice-wizard', title: 'גשר תחושה-שפה (SQHCEL)', note: 'איסוף תהליך מובנה' }),
             Object.freeze({ tab: 'comic-engine', title: 'Comic Engine', note: 'הדמיית תגובות ותוצאה' })
         ])
     })
@@ -12406,12 +12411,12 @@ function setupWrinkleGame() {
 const WR2_SQHCEL_STORAGE_KEY = 'wr2_sqhcel_v1';
 
 const WR2W_FLOW_STEPS = Object.freeze([
-    Object.freeze({ id: 'S', label: '❤️ Signal / תחושה', criterion: 'signal' }),
-    Object.freeze({ id: 'Q', label: '🫧 Quantifier / כמת', criterion: 'quantifier' }),
-    Object.freeze({ id: 'H', label: '🌉 Bridge / גישור', criterion: 'hypothesis' }),
-    Object.freeze({ id: 'C', label: '✅ Confirm / אישור', criterion: 'confirm' }),
-    Object.freeze({ id: 'P', label: '🧭 PATH', criterion: 'path' }),
-    Object.freeze({ id: 'E', label: '✨ Learning / למידה', criterion: 'exception' })
+    Object.freeze({ id: 'S', label: '❤️ תחושה שעולה (S) · Signal', criterion: 'signal' }),
+    Object.freeze({ id: 'Q', label: '🫧 כמת נסתר (Q) · Quantifier', criterion: 'quantifier' }),
+    Object.freeze({ id: 'H', label: '🌉 גישור ובדיקת השערה (H)', criterion: 'hypothesis' }),
+    Object.freeze({ id: 'C', label: '✅ אישור/הלימה לפני מעבר (C)', criterion: 'confirm' }),
+    Object.freeze({ id: 'P', label: '🧭 בחירת כיוון (PATH)', criterion: 'path' }),
+    Object.freeze({ id: 'E', label: '✨ חריג + למידה (E/L)', criterion: 'exception' })
 ]);
 
 const WR2W_BREAKOUT_STEPS = Object.freeze([
@@ -12431,12 +12436,12 @@ const WR2W_FEELINGS = Object.freeze([
 ]);
 
 const WR2W_CRITERIA_LABELS = Object.freeze({
-    signal: 'Signal · זיהוי תחושה',
-    quantifier: 'Quantifier · כמת נסתר',
-    hypothesis: 'Bridge · גישור עם בדיקה',
-    confirm: 'Confirm · אישור לפני מעבר',
-    path: 'PATH · בחירת כיוון',
-    exception: 'Learning · חריג + משפט למידה'
+    signal: 'תחושה (S) · זיהוי תחושה',
+    quantifier: 'כמת נסתר (Q)',
+    hypothesis: 'גישור (H) · ניסוח + בדיקה',
+    confirm: 'אישור/הלימה (C) · לפני מעבר',
+    path: 'בחירת כיוון (PATH)',
+    exception: 'למידה/חריג (E/L) · משפט למידה'
 });
 
 const wr2wPathCore = (() => {
@@ -12960,7 +12965,7 @@ function wr2wProcessCount(criteria) {
 
 const WR2W_WIZARD_TITLE = 'כמתים נסתרים – הגשר שנסגר';
 const WR2W_WIZARD_SLOGAN = 'כשהרגש גדול מהמילים — יש כמת נסתר. אנחנו לא מתקנים ולא מבטלים; אנחנו פותחים גשר בין הגוף, העולם והשפה.';
-const WR2W_WIZARD_FORMULA = 'Signal → Hidden Quantifier → Bridge → Confirm → PATH → Learning';
+const WR2W_WIZARD_FORMULA = 'תחושה (S) → כמת נסתר (Q) → גישור (H) → אישור (C) → בחירת כיוון (PATH) → למידה/חריג (E/L)';
 
 function setupWrinkleGame() {
     const root = document.getElementById('wrinkle-game');
@@ -12973,7 +12978,7 @@ function setupWrinkleGame() {
             <section class="wr2w-hero">
                 <div class="wr2w-topbar">
                     <div class="wr2w-title-wrap">
-                        <p class="wr2w-kicker">SQHCEL / Hidden Quantifiers</p>
+                        <p class="wr2w-kicker">גשר תחושה-שפה (SQHCEL) · כמתים נסתרים</p>
                         <h3>${WR2W_WIZARD_TITLE}</h3>
                         <p class="wr2w-subtitle">${WR2W_WIZARD_SLOGAN}</p>
                     </div>
@@ -12986,7 +12991,7 @@ function setupWrinkleGame() {
                             <span>תהליך <strong id="wr2w-process-score">0/6</strong></span>
                             <span>רצף <strong id="wr2w-streak">0</strong></span>
                             <span>נק׳ <strong id="wr2w-points">0</strong></span>
-                            <span class="wr2w-score-minor">PATH <strong id="wr2w-path-distribution">0/0/0</strong></span>
+                            <span class="wr2w-score-minor">כיוונים (PATH) <strong id="wr2w-path-distribution">0/0/0</strong></span>
                             <span class="wr2w-score-minor">H/C <strong id="wr2w-stuck-distribution">0/0</strong></span>
                         </div>
                         <p class="wr2w-formula">${WR2W_WIZARD_FORMULA}</p>
@@ -13198,7 +13203,7 @@ function setupWrinkleGame() {
         if (pathChoice === 'outside') return 'חוץ / Outside';
         if (pathChoice === 'inside') return 'פנים / Inside';
         if (pathChoice === 'both') return 'גשר / Both';
-        return 'עדיין לא נבחר PATH';
+        return 'עדיין לא נבחר כיוון (PATH)';
     };
     const wr2wPathTherapeuticLabel = (pathChoice) => {
         if (pathChoice === 'outside') return 'כיוון חוץ (מה קורה בפועל / בקשה / גבולות)';
@@ -13256,7 +13261,7 @@ function setupWrinkleGame() {
             instruction: 'קודם בודקים הלימה מול "המטופל" (AI) ורק אז ממשיכים. אפשר עד 2 תיקונים.'
         },
         P: {
-            title: 'שלב 5 · PATH / בחירת כיוון',
+            title: 'שלב 5 · בחירת כיוון (PATH)',
             instruction: 'אחרי שנוצרה הלימה, בוחרים יחד איפה הכי נכון להמשיך עכשיו: בחוץ, בפנים, או בגשר שמחבר ביניהם.'
         },
         E: {
@@ -13339,7 +13344,7 @@ function setupWrinkleGame() {
         }
         if (els.layerOutsideText) {
             const outsideParts = [
-                state.round.pathChoice ? `PATH: ${wr2wPathLabel(state.round.pathChoice)}` : 'מה באמת קורה במציאות/בהקשר?',
+                state.round.pathChoice ? `כיוון (PATH): ${wr2wPathLabel(state.round.pathChoice)}` : 'מה באמת קורה במציאות/בהקשר?',
                 scene?.conditionsLine ? `תנאי נפוץ: ${scene.conditionsLine}` : ''
             ].filter(Boolean);
             els.layerOutsideText.textContent = wr2wShort(outsideParts.join(' · '), 120);
@@ -13425,7 +13430,7 @@ function setupWrinkleGame() {
         addXP(Math.max(4, completed * 2));
         state.round.step = 'DONE';
         const bonusText = [
-            scoreResult.pathPoint ? '+1 PATH' : '',
+            scoreResult.pathPoint ? '+1 בחירת כיוון (PATH)' : '',
             scoreResult.bothBonus ? '+1 BOTH' : ''
         ].filter(Boolean).join(' | ');
         setFeedback(`סיכום סבב: ${completed}/6 רכיבי תהליך הושלמו, +${earned} נקודות${bonusText ? ` (${bonusText})` : ''}.`, 'success');
@@ -13504,9 +13509,9 @@ function setupWrinkleGame() {
                         <p>${escapeHtml(confirmation.text)}</p>
                     </div>
                     ${canEnterPath ? `
-                        <button type="button" class="btn btn-primary wr2w-main-btn wr2w-main-btn--green" data-action="goto-path">המשך ל-PATH</button>
+                        <button type="button" class="btn btn-primary wr2w-main-btn wr2w-main-btn--green" data-action="goto-path">המשך לבחירת כיוון (PATH)</button>
                     ` : `
-                        <p class="wr2w-template-note">נשארו ${correctionsLeft} תיקוני גישור לפני מעבר ל-PATH.</p>
+                        <p class="wr2w-template-note">נשארו ${correctionsLeft} תיקוני גישור לפני מעבר לשלב בחירת כיוון (PATH).</p>
                         <button type="button" class="btn btn-secondary wr2w-main-btn" data-action="revise-hypothesis">חזור/י ל-H לשיפור</button>
                     `}
                 ` : `
@@ -13550,7 +13555,7 @@ function setupWrinkleGame() {
                     <summary>סולם פריצה (רק אם אין חריג מיידי)</summary>
                     <p>בודקים חריג בהדרגה: ישיר → 5% → 1% → תנאים. המטרה היא למצוא ריכוך אמיתי, לא "לשכנע".</p>
                 </details>
-                <p class="wr2w-template-note">PATH נבחר: <strong>${escapeHtml(pathLabel)}</strong></p>
+                <p class="wr2w-template-note">בחירת כיוון (PATH): <strong>${escapeHtml(pathLabel)}</strong></p>
                 <div class="wr2w-ladder">
                     ${WR2W_BREAKOUT_STEPS.map((item) => `
                         <button type="button" class="wr2w-ladder-btn${state.round.breakoutLevel === item.id ? ' is-selected' : ''}" data-action="set-breakout-level" data-level="${item.id}">
@@ -13660,7 +13665,7 @@ function setupWrinkleGame() {
         state.index = (state.index + 1) % scenes.length;
         resetRoundState();
         playUISound('next');
-        setFeedback('דיאלוג חדש. מתחילים שוב מזיהוי התחושה שעולה (שלב S).', 'info');
+        setFeedback('דיאלוג חדש. מתחילים שוב מזיהוי התחושה שעולה (שלב תחושה / S).', 'info');
         render();
     };
 
@@ -13698,7 +13703,7 @@ function setupWrinkleGame() {
         if (state.index < 0) state.index = 0;
         if (els.selfInput) els.selfInput.value = '';
         resetRoundState();
-        setFeedback('המשפט האישי נוסף. מתחילים משלב S כדי לזהות מה עולה מתחת למילים.', 'success');
+        setFeedback('המשפט האישי נוסף. מתחילים משלב התחושה (S) כדי לזהות מה עולה מתחת למילים.', 'success');
         playUISound('start');
         render();
     };
@@ -13806,7 +13811,7 @@ function setupWrinkleGame() {
             if (status === 'yes') {
                 state.round.confirmResolved = true;
                 markCriterion('confirm');
-                setFeedback('התקבל אישור. אפשר להמשיך לבחירת כיוון העבודה (PATH).', tone);
+                    setFeedback('התקבל אישור. אפשר להמשיך לשלב בחירת כיוון העבודה (PATH).', tone);
             } else {
                 state.analytics = wr2wPathCore.markStuck(state.analytics, 'C');
                 if (state.round.confirmCorrections < 2) {
@@ -13814,13 +13819,13 @@ function setupWrinkleGame() {
                     if (state.round.confirmCorrections >= 2) {
                         state.round.confirmResolved = true;
                         markCriterion('confirm');
-                        setFeedback('נעשו 2 תיקונים בשלב האישור. נמשיך ל-PATH עם כיוון זהיר ומדויק.', 'info');
+                        setFeedback('נעשו 2 תיקונים בשלב האישור (C). נמשיך לבחירת כיוון (PATH) עם כיוון זהיר ומדויק.', 'info');
                         render();
                         return;
                     }
                     state.round.confirmResolved = false;
                     const left = Math.max(0, 2 - state.round.confirmCorrections);
-                    setFeedback(`עלה צורך בתיקון. חזור/י לשלב H לשיפור הגישור (נותרו ${left} תיקונים לפני PATH).`, tone);
+                    setFeedback(`עלה צורך בתיקון. חזור/י לשלב הגישור (H) לשיפור הניסוח (נותרו ${left} תיקונים לפני שלב PATH).`, tone);
                 } else {
                     state.round.confirmResolved = true;
                     markCriterion('confirm');
@@ -13839,7 +13844,7 @@ function setupWrinkleGame() {
         }
         if (action === 'goto-path') {
             if (!wr2wPathCore.canEnterPath(state.round)) {
-                setFeedback('אי אפשר להיכנס ל-PATH לפני שלב האישור (C), כולל עד שני תיקונים.', 'warn');
+                setFeedback('אי אפשר להיכנס לשלב בחירת כיוון (PATH) לפני שלב האישור (C), כולל עד שני תיקונים.', 'warn');
                 render();
                 return;
             }
@@ -13860,12 +13865,12 @@ function setupWrinkleGame() {
         }
         if (action === 'goto-e') {
             if (!wr2wPathCore.canEnterPath(state.round)) {
-                setFeedback('אי אפשר לעבור לשלב החריג/למידה לפני אישור בשלב C.', 'warn');
+                setFeedback('אי אפשר לעבור לשלב חריג/למידה (E/L) לפני אישור בשלב האישור (C).', 'warn');
                 render();
                 return;
             }
             if (!wr2wPathCore.canEnterException(state.round)) {
-                setFeedback('בחר/י קודם כיוון PATH לפני המעבר לחריג ולמידה.', 'warn');
+                setFeedback('בחר/י קודם כיוון עבודה בשלב PATH לפני המעבר לחריג ולמידה.', 'warn');
                 render();
                 return;
             }
@@ -13876,7 +13881,7 @@ function setupWrinkleGame() {
             }
             playUISound('next');
             state.round.step = 'E';
-            setFeedback('אם אין חריג מיידי, נתקדם בסולם הפריצה בהדרגה וננסח למידה לפי כיוון ה-PATH שבחרת.', 'info');
+            setFeedback('אם אין חריג מיידי, נתקדם בסולם הפריצה בהדרגה וננסח למידה לפי בחירת הכיוון (PATH) שבחרת.', 'info');
             render();
             return;
         }
@@ -13898,7 +13903,7 @@ function setupWrinkleGame() {
             setFeedback(
                 didGenerate
                     ? 'נוצר ניסוח למידה אוטומטי. אפשר לערוך אותו או לסיים את הסבב.'
-                    : 'לא נוצר ניסוח חדש. בדקו שנבחר PATH מתאים.',
+                    : 'לא נוצר ניסוח חדש. בדקו שנבחר כיוון (PATH) מתאים.',
                 'info'
             );
             render();
@@ -14018,7 +14023,7 @@ function setupWrinkleGame() {
     els.resetRound?.addEventListener('click', () => {
         resetRoundState();
         playUISound('skip');
-        setFeedback('הסבב אופס. מתחילים שוב משלב S (מה עולה מתחת למשפט).', 'info');
+        setFeedback('הסבב אופס. מתחילים שוב משלב התחושה (S) - מה עולה מתחת למשפט.', 'info');
         render();
     });
 
