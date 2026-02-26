@@ -2563,6 +2563,172 @@ function renderBreenPatternPhilosophyLayer(category, subcategory) {
     `;
 }
 
+function getBreenReferenceRows() {
+    const coreRows = window.triplesRadarCore?.ROWS;
+    if (Array.isArray(coreRows) && coreRows.length) return coreRows;
+    return [
+        { id: 'row1', categories: ['lost_performative', 'assumptions', 'mind_reading'] },
+        { id: 'row2', categories: ['universal_quantifier', 'modal_operator', 'cause_effect'] },
+        { id: 'row3', categories: ['nominalisations', 'identity_predicates', 'complex_equivalence'] },
+        { id: 'row4', categories: ['comparative_deletion', 'time_space_predicates', 'lack_referential_index'] },
+        { id: 'row5', categories: ['non_referring_nouns', 'sensory_predicates', 'unspecified_verbs'] }
+    ];
+}
+
+function getBreenReferenceRowMeta(rowId = '') {
+    const meta = {
+        row1: { colorClass: 'row-sky', heLabel: 'שלשה 1 — שכבת מקור' },
+        row2: { colorClass: 'row-teal', heLabel: 'שלשה 2 — שכבת חוקים' },
+        row3: { colorClass: 'row-amber', heLabel: 'שלשה 3 — שכבת משמעות' },
+        row4: { colorClass: 'row-violet', heLabel: 'שלשה 4 — שכבת הקשר' },
+        row5: { colorClass: 'row-rose', heLabel: 'שלשה 5 — שכבת קרקע' }
+    };
+    return meta[rowId] || meta.row1;
+}
+
+function normalizeBreenReferenceCategoryId(categoryId = '') {
+    const raw = String(categoryId || '').trim().toLowerCase().replace(/\s+/g, '_');
+    if (!raw) return '';
+    const aliases = {
+        assumption: 'assumptions',
+        presupposition: 'assumptions',
+        presuppositions: 'assumptions',
+        modal_necessity: 'modal_operator',
+        modal_possibility: 'modal_operator',
+        nominalization: 'nominalisations',
+        nominalisation: 'nominalisations',
+        time_space: 'time_space_predicates',
+        lack_of_referential_index: 'lack_referential_index',
+        unspecified_verb: 'unspecified_verbs',
+        unspecified_noun: 'non_referring_nouns',
+        simple_deletion: 'non_referring_nouns'
+    };
+    return aliases[raw] || raw;
+}
+
+function getBreenReferenceCategoryLabelHe(categoryId = '') {
+    const id = normalizeBreenReferenceCategoryId(categoryId);
+    const labels = {
+        lost_performative: 'שיפוט חסר מקור',
+        assumptions: 'הנחות סמויות',
+        mind_reading: 'קריאת מחשבות',
+        universal_quantifier: 'כמת כוללני',
+        modal_operator: 'מודל אופרטור',
+        cause_effect: 'סיבה ותוצאה',
+        nominalisations: 'נומינליזציה',
+        identity_predicates: 'זהות',
+        complex_equivalence: 'שקילות מורכבת',
+        comparative_deletion: 'השוואה חסרה',
+        time_space_predicates: 'זמן ומרחב',
+        lack_referential_index: 'חוסר ייחוס',
+        non_referring_nouns: 'שמות לא מפנים',
+        sensory_predicates: 'פרדיקטים חושיים',
+        unspecified_verbs: 'פועל לא מפורט'
+    };
+    return labels[id] || id;
+}
+
+function getBreenReferenceCategoryChip(categoryId = '') {
+    const id = normalizeBreenReferenceCategoryId(categoryId);
+    const chips = {
+        lost_performative: 'LP',
+        assumptions: 'AS',
+        mind_reading: 'MR',
+        universal_quantifier: 'UQ',
+        modal_operator: 'MO',
+        cause_effect: 'CE',
+        nominalisations: 'NM',
+        identity_predicates: 'ID',
+        complex_equivalence: 'CEq',
+        comparative_deletion: 'CD',
+        time_space_predicates: 'TS',
+        lack_referential_index: 'RI',
+        non_referring_nouns: 'NN',
+        sensory_predicates: 'SP',
+        unspecified_verbs: 'UV'
+    };
+    return chips[id] || id.slice(0, 2).toUpperCase();
+}
+
+function getBreenReferenceRowIdByCategory(categoryId = '') {
+    const normalized = normalizeBreenReferenceCategoryId(categoryId);
+    const rows = getBreenReferenceRows();
+    const row = rows.find(item => (item.categories || []).some(cat => normalizeBreenReferenceCategoryId(cat) === normalized));
+    return row?.id || '';
+}
+
+function buildBreenReferenceBoardHtml({
+    title = 'טבלת ברין (מפת הדפוסים המלאה)',
+    note = '',
+    activeCategoryId = '',
+    mode = 'static',
+    availableCategoryIds = null
+} = {}) {
+    const normalizedActive = normalizeBreenReferenceCategoryId(activeCategoryId);
+    const activeRowId = getBreenReferenceRowIdByCategory(normalizedActive);
+    const rows = getBreenReferenceRows();
+    const availableSet = availableCategoryIds instanceof Set ? availableCategoryIds : null;
+    const categoryLinkAliases = {
+        assumptions: ['presupposition'],
+        nominalisations: ['nominalization', 'nominalisation'],
+        non_referring_nouns: ['simple_deletion'],
+        unspecified_verbs: ['simple_deletion']
+    };
+
+    const rowsHtml = rows.map((row) => {
+        const rowMeta = getBreenReferenceRowMeta(row.id);
+        const isActiveRow = !!activeRowId && activeRowId === row.id;
+        const cellsHtml = (row.categories || []).map((rawCategoryId) => {
+            const categoryId = normalizeBreenReferenceCategoryId(rawCategoryId);
+            const isActive = !!normalizedActive && categoryId === normalizedActive;
+            const commonClasses = ['tr-phone-breen-cell', 'breen-reference-cell'];
+            if (isActiveRow) commonClasses.push('is-row-locked');
+            if (isActive) commonClasses.push('is-correct');
+
+            if (mode === 'category-links') {
+                let targetCategoryId = categoryId;
+                if (availableSet && !availableSet.has(targetCategoryId)) {
+                    const aliasMatch = (categoryLinkAliases[targetCategoryId] || [])
+                        .map(alias => normalizeBreenReferenceCategoryId(alias))
+                        .find(alias => availableSet.has(alias));
+                    if (aliasMatch) targetCategoryId = aliasMatch;
+                }
+                const canLink = !availableSet || availableSet.has(targetCategoryId);
+                const tag = canLink ? 'a' : 'div';
+                const hrefAttr = canLink ? ` href="#pattern-${escapeHtml(targetCategoryId)}" data-breen-pattern-link="${escapeHtml(targetCategoryId)}"` : '';
+                return `
+                    <${tag} class="${commonClasses.join(' ')}${canLink ? '' : ' is-missing'}"${hrefAttr}>
+                        <span class="tr-phone-breen-chip">${escapeHtml(getBreenReferenceCategoryChip(categoryId))}</span>
+                        <small>${escapeHtml(getBreenReferenceCategoryLabelHe(categoryId))}</small>
+                    </${tag}>
+                `;
+            }
+
+            return `
+                <div class="${commonClasses.join(' ')}">
+                    <span class="tr-phone-breen-chip">${escapeHtml(getBreenReferenceCategoryChip(categoryId))}</span>
+                    <small>${escapeHtml(getBreenReferenceCategoryLabelHe(categoryId))}</small>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <div class="tr-phone-breen-row ${escapeHtml(rowMeta.colorClass || '')} ${isActiveRow ? 'is-active' : ''}">
+                <div class="tr-phone-breen-row-head">${escapeHtml(rowMeta.heLabel || row.id)}</div>
+                <div class="tr-phone-breen-row-cells">${cellsHtml}</div>
+            </div>
+        `;
+    }).join('');
+
+    return `
+        <section class="tr-phone-panel tr-phone-breen-panel breen-reference-panel">
+            <div class="tr-phone-panel-title">${escapeHtml(title)}</div>
+            ${note ? `<p class="breen-reference-panel-note">${escapeHtml(note)}</p>` : ''}
+            <div class="tr-phone-breen-grid">${rowsHtml}</div>
+        </section>
+    `;
+}
+
 function buildCategorySubPatternCard(category, subcategory) {
     const questionText = String(subcategory?.question || '').trim();
     const exampleText = String(subcategory?.example || '').trim();
@@ -2573,7 +2739,7 @@ function buildCategorySubPatternCard(category, subcategory) {
         : '';
 
     return `
-        <details class="subcategory-item subcategory-layered" data-pattern-id="${escapeHtml(subcategory.id || '')}">
+        <details id="pattern-${escapeHtml(subcategory.id || '')}" class="subcategory-item subcategory-layered" data-pattern-id="${escapeHtml(subcategory.id || '')}">
             <summary class="subcategory-summary">
                 <span class="subcategory-title">${escapeHtml(subcategory.hebrew || subcategory.name || subcategory.id || 'תבנית')}</span>
                 <span class="subcategory-desc">${escapeHtml(subcategory.description || '')}</span>
@@ -2613,6 +2779,23 @@ function populateCategories() {
     const container = document.getElementById('categories-container');
     if (!container) return;
     container.innerHTML = '';
+
+    const availablePatternIds = new Set(
+        (metaModelData.categories || [])
+            .flatMap(category => Array.isArray(category?.subcategories) ? category.subcategories : [])
+            .map(subcategory => normalizeBreenReferenceCategoryId(subcategory?.id || ''))
+            .filter(Boolean)
+    );
+
+    const breenBoard = document.createElement('section');
+    breenBoard.className = 'categories-breen-board';
+    breenBoard.innerHTML = buildBreenReferenceBoardHtml({
+        title: 'טבלת ברין — מפת 5×3',
+        note: 'לחיצה על תא תקפוץ לכרטיס התבנית בעמוד.',
+        mode: 'category-links',
+        availableCategoryIds: availablePatternIds
+    });
+    container.appendChild(breenBoard);
 
     const theoryIntro = document.createElement('section');
     theoryIntro.className = 'card categories-theory-intro';
@@ -3663,6 +3846,36 @@ let rapidPatternArenaState = {
     elements: {}
 };
 
+function ensureRapidPatternBreenReferenceSlot() {
+    const buttons = rapidPatternArenaState.elements?.buttons;
+    if (!buttons) return null;
+
+    let slot = rapidPatternArenaState.elements.breenReference;
+    if (slot && slot.isConnected) return slot;
+
+    slot = document.getElementById('rapid-breen-reference');
+    if (!slot) {
+        slot = document.createElement('div');
+        slot.id = 'rapid-breen-reference';
+        slot.className = 'rapid-breen-reference';
+        buttons.insertAdjacentElement('beforebegin', slot);
+    }
+    rapidPatternArenaState.elements.breenReference = slot;
+    return slot;
+}
+
+function renderRapidPatternBreenReference(activePatternId = '') {
+    const slot = ensureRapidPatternBreenReferenceSlot();
+    if (!slot) return;
+    const normalized = normalizeBreenReferenceCategoryId(activePatternId);
+    slot.innerHTML = buildBreenReferenceBoardHtml({
+        title: 'טבלת ברין (עוגן זיהוי מהיר)',
+        note: normalized ? 'התא הפעיל מסומן לפי הטריגר הנוכחי.' : 'המפה הקבועה של 15 התבניות לפי שלשות.',
+        activeCategoryId: normalized,
+        mode: 'static'
+    });
+}
+
 function setupRapidPatternArena() {
     const root = document.getElementById('rapid-pattern-arena');
     if (!root || root.dataset.rapidBound === 'true') return;
@@ -3690,6 +3903,7 @@ function setupRapidPatternArena() {
         timerFill: document.getElementById('rapid-timer-fill'),
         feedback: document.getElementById('rapid-feedback'),
         buttons: document.getElementById('rapid-pattern-buttons'),
+        breenReference: null,
         aiFeedback: document.getElementById('rapid-ai-feedback'),
         helpPanel: document.getElementById('rapid-help-panel'),
         helpContent: document.getElementById('rapid-help-content'),
@@ -3703,6 +3917,7 @@ function setupRapidPatternArena() {
     updateRapidPatternTimeLabel();
     populateRapidPatternTypes();
     renderRapidPatternButtons();
+    renderRapidPatternBreenReference('');
     setRapidPatternTrafficLight('green');
     updateRapidPatternScoreboard();
     setRapidPatternFeedback('׳׳׳×׳™׳ ׳׳×׳—׳™׳׳× ׳¡׳‘׳‘...', 'info');
@@ -4270,6 +4485,7 @@ function renderRapidPatternMonologue(cue) {
         if (!highlight || !escaped.includes(token)) return escaped;
         return escaped.replace(token, `<mark class="rapid-highlight">${escapeHtml(highlight)}</mark>`);
     }).join('<br>');
+    renderRapidPatternBreenReference(normalizeRapidPatternId(cue.patternId || ''));
 }
 
 function buildRapidMonologueLines(text, targetLines = 4, highlight = '') {

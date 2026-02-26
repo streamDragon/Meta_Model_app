@@ -13,6 +13,7 @@ const STATIC_FILES = [
   'classic2_trainer.html',
   'iceberg_templates_trainer.html',
   'prism_research_trainer.html',
+  'prism_lab_trainer.html',
   'sentence_morpher_trainer.html',
   'living_triples_trainer.html'
 ];
