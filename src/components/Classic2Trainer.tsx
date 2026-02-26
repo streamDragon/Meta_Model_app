@@ -1,808 +1,680 @@
 ﻿import React, { useEffect, useRef, useState } from 'react';
 
-export type CategoryId =
-  | 'cause_effect'
-  | 'complex_equivalence'
-  | 'mind_reading'
-  | 'lost_performative'
-  | 'universal_quantifier'
-  | 'modal_necessity'
-  | 'nominalization'
-  | 'unspecified_verb'
-  | 'time_space_context'
-  | 'sensory_vak';
+type CategoryCode = 'MR' | 'CEq' | 'CE' | 'PRE' | 'NOM' | 'LP' | 'UQ' | 'MN' | 'MP' | 'UV' | 'UN' | 'COMP' | 'DEL' | 'CTX' | 'VAK';
+type GroupCode = 'DIS' | 'GEN' | 'DEL';
+type FamilyCell = GroupCode | 'CTX' | 'VAK';
+type TextSource = 'built_in' | 'random' | 'manual';
+type FieldCtx = 'general' | 'work' | 'relationship' | 'family' | 'anxiety' | 'belief';
+type RoundsChoice = 5 | 10 | 'infinite';
+type CategoryDisplay = 'all' | 'group';
+type Tone = 'info' | 'success' | 'error';
 
-export type StoryTypeId = 'work' | 'relationship' | 'family' | 'study';
-export type StoryFilterId = StoryTypeId | 'all';
-
-export type Step = 'chooseCategory' | 'selectTile' | 'chooseQuestion' | 'dialogue' | 'nextStep';
-
-export interface StoryTile {
-  id: string;
-  text: string;
-  tags: CategoryId[];
-  line: number;
-}
-
-export interface QuestionOption {
-  id: string;
-  text: string;
-  isGood: boolean;
-  feedbackIfBad?: string;
-  generatesClientAnswer: string;
-}
-
-export interface Scenario {
-  id: string;
-  title: string;
-  storyType: StoryTypeId;
-  storyTypeLabel: string;
-  storyTiles: StoryTile[];
-  categoriesAvailable: CategoryId[];
-  questionsByCategory: Record<CategoryId, QuestionOption[]>;
-}
-
-type Feedback = { tone: 'info' | 'success' | 'error'; message: string };
-
-type DialogueTurn = {
-  id: string;
-  categoryId: CategoryId;
-  tileId: string;
-  therapist: string;
-  client: string;
-  mapUpdate: string;
-  loopIndex: number;
+type Feedback = { tone: Tone; message: string };
+type Sentence = { id: string; text: string; tags: CategoryCode[] };
+type Scenario = { id: string; title: string; context: FieldCtx; contextLabel: string; sentences: Sentence[] };
+type Round = { id: string; scenarioId: string; title: string; contextLabel: string; sentences: Sentence[] };
+type Settings = {
+  textSource: TextSource;
+  fieldContext: FieldCtx;
+  difficulty: number;
+  sentenceCount: number;
+  rounds: RoundsChoice;
+  categoryDisplay: CategoryDisplay;
+  categoryGroup: GroupCode;
+  includeCtxVak: boolean;
 };
 
-type Machine = {
-  step: Step;
-  selectedCategory: CategoryId | null;
-  selectedTileId: string | null;
-  selectedQuestionId: string | null;
-  tileAttempts: number;
-  questionAttempts: number;
-  lastFeedback: Feedback | null;
-  dialogueTurns: DialogueTurn[];
-  questionDeck: QuestionOption[];
-  loopIndex: number;
-  nextActionMessage: string;
-  activeDirection: 'same' | 'neighbor' | 'counter' | null;
-  usedGoodQuestionIds: string[];
+const BREEN_GRID_RTL: CategoryCode[][] = [
+  ['MR', 'CEq', 'CE'],
+  ['PRE', 'NOM', 'LP'],
+  ['UQ', 'MN', 'MP'],
+  ['UV', 'UN', 'COMP'],
+  ['DEL', 'CTX', 'VAK']
+];
+
+const CAT: Record<CategoryCode, { he: string; family: FamilyCell; familyHe: string; hint: string; note?: string }> = {
+  MR: { he: 'קריאת מחשבות', family: 'DIS', familyHe: 'עיוות', hint: 'הנחה על מה האחר חושב/מרגיש בלי ראיה מפורשת.' },
+  CEq: { he: 'שקילות מורכבת', family: 'DIS', familyHe: 'עיוות', hint: "חפש/י 'X אומר Y' / 'אם X אז זה אומר Y'." },
+  CE: { he: 'סיבה-תוצאה', family: 'DIS', familyHe: 'עיוות', hint: "חפש/י 'כי/אז/בגלל/גורם'." },
+  PRE: { he: 'פרסופוזיציה / הנחת מוקדמת', family: 'DIS', familyHe: 'עיוות', hint: 'שאלה/טענה שמניחה משהו מראש.' },
+  NOM: { he: 'נומינליזציה', family: 'DIS', familyHe: 'עיוות', hint: 'שם פעולה/תהליך קפוא (מבוכה, דחייה, כישלון...).'},
+  LP: { he: 'אמירה ערכית / Lost Performative', family: 'GEN', familyHe: 'הכללה', hint: "שיפוט בלי 'לפי מי/איזה קריטריון'." },
+  UQ: { he: 'כמת אוניברסלי', family: 'GEN', familyHe: 'הכללה', hint: "תמיד/אף פעם/כולם/שום דבר/ממילא." },
+  MN: { he: 'מודאל הכרח', family: 'GEN', familyHe: 'הכללה', hint: "חייב/צריך/מוכרח/אין ברירה." },
+  MP: { he: 'מודאל אפשרות / פעולה', family: 'GEN', familyHe: 'הכללה', hint: "יכול/אפשר/לא יכול. כרגע כולל גם רוצה/כוונה.", note: 'WANT מקופל כרגע תחת MP כדי לשמור על גריד 15 פריטים קבוע.' },
+  UV: { he: 'פועל לא מפורט', family: 'DEL', familyHe: 'מחיקה', hint: "פועל עמום בלי 'איך בדיוק'." },
+  UN: { he: 'שם עצם לא מפורט / ייחוס חסר', family: 'DEL', familyHe: 'מחיקה', hint: "הם/מישהו/כולם בלי זיהוי ברור." },
+  COMP: { he: 'השוואה חסרה', family: 'DEL', familyHe: 'מחיקה', hint: "יותר/פחות/טוב יותר בלי ביחס למה." },
+  DEL: { he: 'מחיקה / חסר מידע', family: 'DEL', familyHe: 'מחיקה', hint: 'טענה שחסר בה מידע בסיסי (מי/מה/איך/לפי מה).' },
+  CTX: { he: 'הקשר (זמן/מקום/מצב)', family: 'CTX', familyHe: 'הקשר', hint: "אתמול/בבית/לפני ישיבה/במסדרון..." },
+  VAK: { he: 'ערוצי חישה', family: 'VAK', familyHe: 'חושי', hint: 'ראייה/שמיעה/תחושה גופנית.' }
 };
 
-type CategoryMeta = {
-  id: CategoryId;
-  label: string;
-  family: 'Deletion' | 'Distortion' | 'Generalization' | 'Extension';
-  breenCell: string;
-  tileHint: string;
-  mapUpdateLine: string;
-  nextLikely: CategoryId[];
-};
+const ORDER = BREEN_GRID_RTL.flat();
 
-const PHILOSOPHY_COPY = 'זה לא טיפול מלא. זה מנוע לצעד הבא: מזהים קטגוריה אחת, שואלים שאלה מדויקת, מעדכנים את מבנה השטח לכיוון מבנה העומק, ובוחרים צעד המשך.';
-const BAD_QUESTION_DEFAULT = 'שאלה טובה, אבל לא מקדמת את המידע שחיפשנו.';
-
-const STORY_TYPE_LABELS: Record<StoryFilterId, string> = {
-  all: 'כל הסיפורים',
+const CTX_LABEL: Record<FieldCtx, string> = {
+  general: 'כללי',
   work: 'עבודה',
   relationship: 'זוגיות',
   family: 'משפחה',
-  study: 'לימודים'
+  anxiety: 'חרדה',
+  belief: 'אמונה/דת'
 };
 
-const FAMILY_LABELS_HE: Record<CategoryMeta['family'], string> = {
-  Deletion: 'מחיקה',
-  Distortion: 'עיוות',
-  Generalization: 'הכללה',
-  Extension: 'הרחבה'
+const DEFAULTS: Settings = {
+  textSource: 'built_in',
+  fieldContext: 'general',
+  difficulty: 2,
+  sentenceCount: 5,
+  rounds: 5,
+  categoryDisplay: 'all',
+  categoryGroup: 'DIS',
+  includeCtxVak: true
 };
 
-const STEP_LABELS_HE: Record<Step, string> = {
-  chooseCategory: 'בחירת קטגוריה',
-  selectTile: 'בחירת קטע',
-  chooseQuestion: 'בחירת שאלה',
-  dialogue: 'דיאלוג',
-  nextStep: 'צעד הבא'
-};
-
-const BREEN_CELL_ORDER = ['DEL', 'DIS', 'GEN', 'CTX', 'VAK'] as const;
-const BREEN_CELL_LABELS: Record<(typeof BREEN_CELL_ORDER)[number], string> = {
-  DEL: 'מחיקות',
-  DIS: 'עיוותים',
-  GEN: 'הכללות',
-  CTX: 'הקשר',
-  VAK: 'חושי'
-};
-
-const CATEGORIES: CategoryMeta[] = [
-  { id: 'cause_effect', label: 'CE / סיבה–תוצאה', family: 'Distortion', breenCell: 'DIS', tileHint: "חפש/י קשר סיבתי או 'כי/אז/ממילא'.", mapUpdateLine: 'המפה עודכנה: מעבר מגורל למנגנון.', nextLikely: ['complex_equivalence', 'universal_quantifier'] },
-  { id: 'complex_equivalence', label: 'CEq / שקילות מורכבת', family: 'Distortion', breenCell: 'DIS', tileHint: "חפש/י 'X אומר Y'.", mapUpdateLine: 'המפה עודכנה: מעבר ממשמעות קשיחה לאלטרנטיבות.', nextLikely: ['mind_reading', 'cause_effect'] },
-  { id: 'mind_reading', label: 'MR / קריאת מחשבות', family: 'Distortion', breenCell: 'DIS', tileHint: 'חפש/י הנחה על מה האחר חושב/מרגיש בלי ראיות.', mapUpdateLine: 'המפה עודכנה: מעבר מהנחת כוונה לראיות.', nextLikely: ['complex_equivalence', 'cause_effect'] },
-  { id: 'lost_performative', label: 'LP / אובדן מבצע הערכה', family: 'Generalization', breenCell: 'GEN', tileHint: "חפש/י 'לא מקצועי/לא בסדר' בלי 'לפי מי'.", mapUpdateLine: 'המפה עודכנה: מעבר משיפוט סמוי לקריטריונים.', nextLikely: ['modal_necessity', 'universal_quantifier'] },
-  { id: 'universal_quantifier', label: 'UQ / כמת אוניברסלי', family: 'Generalization', breenCell: 'GEN', tileHint: "חפש/י 'תמיד/אף פעם/ממילא/כולם'.", mapUpdateLine: 'המפה עודכנה: מעבר מהכללה לתנאים.', nextLikely: ['cause_effect', 'modal_necessity'] },
-  { id: 'modal_necessity', label: 'MN / חייב-צריך', family: 'Generalization', breenCell: 'GEN', tileHint: "חפש/י 'חייב/צריך/מוכרח'.", mapUpdateLine: 'המפה עודכנה: מעבר מכלל קשיח לבחירה.', nextLikely: ['lost_performative', 'universal_quantifier'] },
-  { id: 'nominalization', label: 'NOM / נומינליזציה', family: 'Distortion', breenCell: 'DIS', tileHint: 'חפש/י שם פעולה קפוא (למשל פאדיחות/כישלון).', mapUpdateLine: 'המפה עודכנה: מעבר מתווית קפואה לתהליך.', nextLikely: ['unspecified_verb', 'cause_effect'] },
-  { id: 'unspecified_verb', label: 'UV / פועל לא מפורט', family: 'Deletion', breenCell: 'DEL', tileHint: "חפש/י פועל בלי 'איך בדיוק'.", mapUpdateLine: 'המפה עודכנה: מעבר מפועל עמום לצעדים.', nextLikely: ['nominalization', 'modal_necessity'] },
-  { id: 'time_space_context', label: 'CTX / זמן-מרחב-הקשר', family: 'Extension', breenCell: 'CTX', tileHint: "חפש/י מתי/איפה/באיזה הקשר (למשל 'אתמול', 'בישיבה').", mapUpdateLine: 'המפה עודכנה: נוסף הקשר זמן-מקום.', nextLikely: ['cause_effect', 'sensory_vak'] },
-  { id: 'sensory_vak', label: 'VAK / פרדיקטים חושיים', family: 'Extension', breenCell: 'VAK', tileHint: 'חפש/י מילים של ראייה/שמיעה/תחושה/הרגשה.', mapUpdateLine: 'המפה עודכנה: נוספו נתונים חושיים.', nextLikely: ['time_space_context', 'unspecified_verb'] }
-];
-
-const CAT: Record<CategoryId, CategoryMeta> = CATEGORIES.reduce((acc, c) => {
-  acc[c.id] = c;
-  return acc;
-}, {} as Record<CategoryId, CategoryMeta>);
-
-const g = (id: string, text: string, a: string): QuestionOption => ({ id, text, isGood: true, generatesClientAnswer: a });
-const b = (id: string, text: string, why: string): QuestionOption => ({ id, text, isGood: false, feedbackIfBad: why, generatesClientAnswer: '' });
-
-const SCENARIO: Scenario = {
-  id: 'work-meeting-loop',
-  storyType: 'work',
-  storyTypeLabel: 'עבודה',
-  title: 'Classic 2 · סיפור הקשר רחב (עבודה/ישיבה)',
-  storyTiles: [
-    { id: 't1', text: 'אתמול', tags: ['time_space_context'], line: 1 },
-    { id: 't2', text: 'בעבודה', tags: ['time_space_context'], line: 1 },
-    { id: 't3', text: 'המנהל עבר לידי', tags: ['time_space_context', 'sensory_vak'], line: 1 },
-    { id: 't4', text: 'בלי להגיד שלום.', tags: ['mind_reading', 'sensory_vak'], line: 1 },
-    { id: 't5', text: 'באותו רגע', tags: ['time_space_context'], line: 2 },
-    { id: 't6', text: 'הרגשתי שאני שקוף.', tags: ['complex_equivalence', 'sensory_vak'], line: 2 },
-    { id: 't7', text: 'אם הוא לא אומר שלום', tags: ['complex_equivalence', 'mind_reading'], line: 3 },
-    { id: 't8', text: 'זה אומר', tags: ['complex_equivalence'], line: 3 },
-    { id: 't9', text: 'שהוא לא מעריך אותי.', tags: ['complex_equivalence', 'mind_reading'], line: 3 },
-    { id: 't10', text: 'ואז כל היום לא רציתי לדבר בישיבה,', tags: ['cause_effect', 'time_space_context'], line: 4 },
-    { id: 't11', text: 'כי ממילא זה לא יעזור.', tags: ['cause_effect', 'universal_quantifier'], line: 4 },
-    { id: 't12', text: 'אמרתי לעצמי שאני חייב לשתוק', tags: ['modal_necessity'], line: 5 },
-    { id: 't13', text: 'כדי לא לעשות פאדיחות,', tags: ['cause_effect', 'nominalization'], line: 5 },
-    { id: 't14', text: 'כי זה פשוט לא מקצועי מצידי.', tags: ['lost_performative'], line: 5 },
-    { id: 't15', text: 'בסוף אמרתי שאני לא מצליח להסביר מה אני צריך.', tags: ['unspecified_verb'], line: 6 }
-  ],
-  categoriesAvailable: CATEGORIES.map((c) => c.id),
-  questionsByCategory: {
-    cause_effect: [
-      g('ce1', 'איך בדיוק מה שקרה שם הוביל להחלטה לשתוק?', 'אני מסיק שאין טעם, ואז נסגר עוד לפני שאני מנסה.'),
-      g('ce2', 'מה קורה אצלך בין מה שהוא עשה לבין "לא לדבר"?', 'יש לי פירוש מהיר שהוא כבר לא פתוח אליי ואז אני מוותר.'),
-      g('ce3', 'היה מצב דומה ובכל זאת דיברת? מה היה שונה?', 'כן, כשהגעתי מוכן עם נקודה אחת קצרה כן דיברתי.'),
-      b('ce4', 'פשוט תדבר יותר באומץ.', 'קפיצה לפתרון לפני בירור המנגנון.'),
-      b('ce5', 'למה אתה רגיש לזה?', 'שאלת למה כללית לא מפרקת סיבתיות.'),
-      b('ce6', 'נשמע שאתה חסר ביטחון.', 'פרשנות במקום בירור מנגנון.')
-    ],
-    complex_equivalence: [
-      g('cx1', 'איך בדיוק "לא אמר שלום" אומר "לא מעריך אותי"?', 'אצלי שלום הוא סימן לכבוד, אז אני מחבר ביניהם.'),
-      g('cx2', 'מה עוד זה יכול לומר חוץ מ"לא מעריך אותי"?', 'שהוא ממהר או טרוד, ולא בהכרח שזה קשור אליי.'),
-      g('cx3', 'איזה סימן כן היה מספיק לך כדי לדעת שיש הערכה?', 'אם בישיבה הוא היה מבקש ממני דעה זה היה מרגיש אחרת.'),
-      b('cx4', 'אל תיקח את זה אישית.', 'עצה מרגיעה, לא בדיקת השקילות.'),
-      b('cx5', 'אז הוא כנראה אדם קר.', 'מגדיל פרשנות במקום לדייק.'),
-      b('cx6', 'מה אתה מרגיש בגוף?', 'שאלה רגשית טובה, אבל לא מטא-מודל מדויק כאן.')
-    ],
-    mind_reading: [
-      g('mr1', 'איך אתה יודע שהוא לא מעריך אותך? מה הראיה?', 'אין לי משפט שלו, אני נשען על ההתעלמות באותו רגע.'),
-      g('mr2', 'איזו התנהגות ספציפית שלו פירשת כחוסר הערכה?', 'הוא עבר קרוב בלי קשר עין ובלי שלום.'),
-      g('mr3', 'מה עוד יכול להסביר את ההתנהגות בלי להניח מה הוא חושב?', 'אולי הוא היה לחוץ או שקוע במשהו דחוף.'),
-      b('mr4', 'אולי באמת הוא לא מעריך אותך.', 'מאשר את ההנחה במקום לבדוק ראיות.'),
-      b('mr5', 'למה אתה צריך ממנו הערכה?', 'שאלה אחרת, לא דיוק על קריאת מחשבות.'),
-      b('mr6', 'תשאל אם הוא אוהב אותך.', 'קפיצה לפתרון/עצה לפני דיוק.')
-    ],
-    lost_performative: [
-      g('lp1', 'לפי מי זה "לא מקצועי"?', 'בעיקר לפי כלל פנימי שפיתחתי לעצמי.'),
-      g('lp2', 'מה הקריטריון שלך ל"מקצועי" כאן?', 'לא להראות היסוס ולא לדבר בלי משהו חד.'),
-      g('lp3', 'יש אדם מקצועי בעיניך שהיה פועל אחרת?', 'כן, יש מנהלת ששואלת שאלות גם בלי ודאות מלאה.'),
-      b('lp4', 'זה באמת לא מקצועי.', 'מחזק שיפוט במקום לברר מקור/קריטריון.'),
-      b('lp5', 'מי אשם בזה?', 'שאלת אשמה לא מחזירה קריטריון.'),
-      b('lp6', 'תהיה פחות ביקורתי.', BAD_QUESTION_DEFAULT)
-    ],
-    universal_quantifier: [
-      g('uq1', '"ממילא זה לא יעזור" — תמיד זה לא עוזר?', 'לא תמיד. לפעמים כשאני מוכן מראש זה כן עוזר.'),
-      g('uq2', 'באילו מצבים דווקא כן יש סיכוי שזה יעזור?', 'כששואלים אותי ישירות או כשיש לי ניסוח קצר.'),
-      g('uq3', 'כמה פעמים בפועל זה לא עזר לאחרונה?', 'אם אני סופר, היו גם ישיבות שבהן כן קידמתי משהו.'),
-      b('uq4', 'אל תגיד תמיד/אף פעם.', 'הטפה לשונית במקום שאלה מדויקת.'),
-      b('uq5', 'למה אתה פסימי?', 'פרשנות אישיותית במקום חיפוש יוצאי דופן.'),
-      b('uq6', 'זה פשוט שלילי לחשוב ככה.', 'מוסרנות/שיפוט.')
-    ],
-    modal_necessity: [
-      g('mn1', 'מה יקרה אם לא תשתוק בישיבה?', 'אני מפחד שיחשבו שאני לא מספיק חד.'),
-      g('mn2', 'מי אומר שאתה חייב לשתוק כדי להישאר מקצועי?', 'אף אחד לא אמר. זה כלל פנימי שלי.'),
-      g('mn3', 'יש מצב שמותר לך לדבר גם בלי ודאות מלאה?', 'אולי אם אנסח את זה כשאלה, זה כן אפשרי.'),
-      b('mn4', 'ברור שאתה חייב, אחרת ידרכו עליך.', 'מחזק את המודאל במקום לבדוק אותו.'),
-      b('mn5', 'פשוט תדבר, מה הבעיה?', 'קפיצה לפתרון זה צוין! אבל חסר בירור של הכלל.'),
-      b('mn6', 'איך זה מרגיש להיות חייב?', 'רגשי, לא בודק בחירה/כלל.')
-    ],
-    nominalization: [
-      g('no1', 'כשאתה אומר "פאדיחות" — מה בדיוק היה קורה?', 'הייתי מתבלבל, עוצר, ומפרש מבטים כביקורת.'),
-      g('no2', 'איך תזהה בזמן אמת שזו "פאדיחה"?', 'אם יקטעו אותי מהר או אם אאבד לגמרי את הנקודה.'),
-      g('no3', 'מי עושה מה בתוך ה"פאדיחות" שאתה מדמיין?', 'אני מדבר, הם שותקים, ואני מפרש את השקט לרעה.'),
-      b('no4', 'תחשוב חיובי במקום פאדיחות.', 'עצה, לא פירוק ההפשטה לתהליך.'),
-      b('no5', 'פאדיחות זה חלק מהחיים.', 'נורמליזציה כללית בלי דיוק.'),
-      b('no6', 'למה אתה מפחד ממבוכה?', 'שאלת למה כללית.')
-    ],
-    unspecified_verb: [
-      g('uv1', 'כשאתה אומר "לא מצליח להסביר" — איך אתה מנסה להסביר?', 'אני מתחיל מהר מדי ומאבד את הנקודה המרכזית.'),
-      g('uv2', 'מה הצעד הראשון שלך כשאתה מנסה להסביר מה אתה צריך?', 'אני מתנצל קודם, ואז כבר יוצא מבולבל.'),
-      g('uv3', 'אם היינו מצלמים וידאו של "להסביר" — מה היינו רואים?', 'מבט למטה, דיבור חלש, ושינוי ניסוח כמה פעמים.'),
-      b('uv4', 'פשוט תהיה יותר ברור.', 'עצה במקום פירוק הפועל לצעדים.'),
-      b('uv5', 'למה אתה לא מצליח להסביר?', '"למה" כללי לא מחזיר צעדים.'),
-      b('uv6', 'זה כי אתה חסר ביטחון.', 'פרשנות + נומינליזציה במקום פירוק פועל.')
-    ],
-    time_space_context: [
-      g('ctx1', 'כשאתה אומר "אתמול" — באיזה חלק של היום זה קרה בדיוק?', 'זה היה ממש לפני ישיבת הבוקר, כשכולם כבר היו בלחץ.'),
-      g('ctx2', 'איפה בדיוק זה קרה — במסדרון, ליד החדר, או בתוך הישיבה?', 'במסדרון ליד חדר הישיבות, תוך כדי שכולם נכנסו פנימה.'),
-      g('ctx3', 'באיזה הקשר זה קורה יותר — תחילת יום, מעבר בין פגישות, מול צוות?', 'בעיקר במעברים מהירים בתחילת יום, כשאין זמן לעצור.'),
-      b('ctx4', 'עזוב זמן ומקום, העיקר מה אתה מרגיש.', 'רגש חשוב, אבל כרגע ביקשנו הקשר זמן/מקום.'),
-      b('ctx5', 'אז מה הפתרון שלך לזה?', 'קפיצה לפתרון לפני בניית הקשר.'),
-      b('ctx6', 'הוא פשוט לא מנומס.', 'שיפוט בלי לבנות הקשר.')
-    ],
-    sensory_vak: [
-      g('vak1', 'מה אתה רואה/שומע/מרגיש בגוף ברגע שזה קורה?', 'אני רואה שהוא עובר מהר, לא שומע שלום, ומרגיש כיווץ בחזה.'),
-      g('vak2', 'מה הסימן החושי הראשון שמפעיל אותך שם?', 'היעדר קשר העין והתחושה שהגוף נסגר מיד.'),
-      g('vak3', 'אם נפריד ראייה/שמיעה/תחושה — מה יש בכל ערוץ?', 'ראייה: מעבר מהיר. שמיעה: שקט. תחושה: מתח וירידה באנרגיה.'),
-      b('vak4', 'אז אתה רגיש מדי.', 'שיפוט אישיותי במקום פירוט חושי.'),
-      b('vak5', 'למה אתה מרגיש ככה?', 'שאלת "למה" כללית, לא איסוף נתונים חושיים.'),
-      b('vak6', 'תנשום עמוק וזה יעבור.', 'קפיצה לפתרון לפני דיוק החוויה.')
-    ]
-  }
-};
+const QUICK: Settings = { ...DEFAULTS, categoryDisplay: 'group', categoryGroup: 'DIS', sentenceCount: 4 };
 
 const SCENARIOS: Scenario[] = [
-  SCENARIO,
   {
-    id: 'relationship-evening-loop',
-    storyType: 'relationship',
-    storyTypeLabel: 'זוגיות',
-    title: 'Classic 2 · סיפור הקשר רחב (זוגיות/ערב)',
-    storyTiles: [
-      { id: 'r1', text: 'אתמול בערב', tags: ['time_space_context'], line: 1 },
-      { id: 'r2', text: 'בבית', tags: ['time_space_context'], line: 1 },
-      { id: 'r3', text: 'היא נכנסה', tags: ['sensory_vak', 'time_space_context'], line: 1 },
-      { id: 'r4', text: 'ולא הסתכלה עליי.', tags: ['mind_reading', 'sensory_vak'], line: 1 },
-      { id: 'r5', text: 'זה הרגיש דחייה.', tags: ['complex_equivalence', 'sensory_vak'], line: 2 },
-      { id: 'r6', text: 'אם היא שקטה', tags: ['complex_equivalence'], line: 3 },
-      { id: 'r7', text: 'זה אומר שהיא כועסת עליי.', tags: ['complex_equivalence', 'mind_reading'], line: 3 },
-      { id: 'r8', text: 'ואז אני חייב להתרחק', tags: ['modal_necessity', 'cause_effect'], line: 4 },
-      { id: 'r9', text: 'כי אחרת תהיה דרמה.', tags: ['cause_effect', 'universal_quantifier'], line: 4 },
-      { id: 'r10', text: 'אני לא מצליח לדבר נורמלי ברגעים כאלה.', tags: ['unspecified_verb'], line: 5 },
-      { id: 'r11', text: 'זה פשוט לא מכבד.', tags: ['lost_performative', 'nominalization'], line: 5 }
-    ],
-    categoriesAvailable: CATEGORIES.map((c) => c.id),
-    questionsByCategory: SCENARIO.questionsByCategory
+    id: 'g-form',
+    title: 'טופס ובירוקרטיה',
+    context: 'general',
+    contextLabel: CTX_LABEL.general,
+    sentences: [
+      { id: 'g1', text: 'אתמול בעירייה לפני הסגירה החזירו לי את הטופס.', tags: ['CTX', 'UN', 'VAK'] },
+      { id: 'g2', text: 'אמרו שהוא לא טוב.', tags: ['DEL', 'UN', 'LP'] },
+      { id: 'g3', text: 'המסמך החדש צריך להיות יותר ברור.', tags: ['MN', 'COMP'] },
+      { id: 'g4', text: 'אם אני טועה בעוד שדה אחד זה אומר שידחו הכול.', tags: ['CEq', 'CE', 'UQ'] },
+      { id: 'g5', text: 'אני לא יכול להבין מה בדיוק הם רוצים ממני.', tags: ['MP', 'UN', 'DEL'] },
+      { id: 'g6', text: 'למה שוב מניחים שכבר העליתי את כל האישורים?', tags: ['PRE', 'UN'] },
+      { id: 'g7', text: 'בסוף לא הצלחתי להסביר מה חסר.', tags: ['UV', 'DEL'] }
+    ]
   },
   {
-    id: 'study-exam-loop',
-    storyType: 'study',
-    storyTypeLabel: 'לימודים',
-    title: 'Classic 2 · סיפור הקשר רחב (לימודים/מבחן)',
-    storyTiles: [
-      { id: 's1', text: 'בלילה לפני המבחן', tags: ['time_space_context'], line: 1 },
-      { id: 's2', text: 'אני יושב מול החומר', tags: ['time_space_context', 'sensory_vak'], line: 1 },
-      { id: 's3', text: 'ולא מצליח להתרכז.', tags: ['unspecified_verb', 'sensory_vak'], line: 1 },
-      { id: 's4', text: 'אם אני לא קולט מהר', tags: ['complex_equivalence'], line: 2 },
-      { id: 's5', text: 'זה אומר שאני לא בנוי לזה.', tags: ['complex_equivalence', 'mind_reading'], line: 2 },
-      { id: 's6', text: 'ואז אני חייב לפתור עוד ועוד שאלות', tags: ['modal_necessity', 'cause_effect'], line: 3 },
-      { id: 's7', text: 'כי אחרת בטוח אכשל.', tags: ['cause_effect', 'universal_quantifier'], line: 3 },
-      { id: 's8', text: 'כל העסק הזה מרגיש כישלון.', tags: ['nominalization', 'sensory_vak'], line: 4 },
-      { id: 's9', text: 'זה לא רציני לעצור לנוח.', tags: ['lost_performative'], line: 4 }
-    ],
-    categoriesAvailable: CATEGORIES.map((c) => c.id),
-    questionsByCategory: SCENARIO.questionsByCategory
+    id: 'w-meeting',
+    title: 'ישיבת צוות',
+    context: 'work',
+    contextLabel: CTX_LABEL.work,
+    sentences: [
+      { id: 'w1', text: 'אתמול במסדרון לפני הישיבה ראיתי את המנהל עובר בלי שלום.', tags: ['CTX', 'VAK'] },
+      { id: 'w2', text: 'אם הוא לא אומר שלום זה אומר שהוא לא מעריך אותי.', tags: ['CEq', 'MR'] },
+      { id: 'w3', text: 'ממילא אין טעם לדבר כי זה לא יעזור.', tags: ['UQ', 'CE'] },
+      { id: 'w4', text: 'אני חייב לשתוק כדי לא לעשות פאדיחות.', tags: ['MN', 'CE', 'NOM'] },
+      { id: 'w5', text: 'זה פשוט לא מקצועי.', tags: ['LP', 'DEL'] },
+      { id: 'w6', text: 'בסוף לא הצלחתי להסביר מה אני צריך.', tags: ['UV', 'UN'] },
+      { id: 'w7', text: 'התגובה שלו הייתה יותר קרה היום.', tags: ['COMP', 'MR'] },
+      { id: 'w8', text: 'מתי הוא יתחיל להתייחס אליי כמו לאחרים?', tags: ['PRE', 'COMP', 'MR'] }
+    ]
   },
   {
-    id: 'family-morning-loop',
-    storyType: 'family',
-    storyTypeLabel: 'משפחה',
-    title: 'Classic 2 · סיפור הקשר רחב (משפחה/בוקר)',
-    storyTiles: [
-      { id: 'f1', text: 'כל בוקר לפני בית ספר', tags: ['time_space_context', 'universal_quantifier'], line: 1 },
-      { id: 'f2', text: 'אני אומר לו להזדרז', tags: ['unspecified_verb'], line: 1 },
-      { id: 'f3', text: 'והוא עושה פרצוף.', tags: ['sensory_vak', 'mind_reading'], line: 1 },
-      { id: 'f4', text: 'זה אומר שהוא מזלזל בי.', tags: ['complex_equivalence', 'mind_reading'], line: 2 },
-      { id: 'f5', text: 'ואז אני חייב להרים קול', tags: ['modal_necessity', 'cause_effect'], line: 3 },
-      { id: 'f6', text: 'כי אחרת שום דבר לא זז.', tags: ['cause_effect', 'universal_quantifier'], line: 3 },
-      { id: 'f7', text: 'אחרי זה יש אווירה לא טובה בבית.', tags: ['nominalization', 'lost_performative'], line: 4 }
-    ],
-    categoriesAvailable: CATEGORIES.map((c) => c.id),
-    questionsByCategory: SCENARIO.questionsByCategory
+    id: 'r-evening',
+    title: 'שיחה בערב',
+    context: 'relationship',
+    contextLabel: CTX_LABEL.relationship,
+    sentences: [
+      { id: 'r1', text: 'אתמול בערב בבית היא נכנסה שקטה ולא הסתכלה עליי.', tags: ['CTX', 'VAK'] },
+      { id: 'r2', text: 'ידעתי שהיא כועסת עליי לפני שאמרה מילה.', tags: ['MR'] },
+      { id: 'r3', text: 'אם היא שקטה זה אומר שעשיתי משהו לא בסדר.', tags: ['CEq', 'MR', 'LP'] },
+      { id: 'r4', text: 'אז אני חייב להתרחק כדי שלא תתפתח דרמה.', tags: ['MN', 'CE', 'NOM'] },
+      { id: 'r5', text: 'ממילא שיחות כאלה תמיד נגמרות רע.', tags: ['UQ', 'CE'] },
+      { id: 'r6', text: 'אני לא מצליח לדבר נורמלי ברגעים האלה.', tags: ['UV', 'DEL'] },
+      { id: 'r7', text: 'אני רוצה לפתוח את זה, אבל כרגע אני לא יכול.', tags: ['MP'] },
+      { id: 'r8', text: 'מתי נצליח לדבר כמו זוג נורמלי?', tags: ['PRE', 'COMP', 'NOM'] }
+    ]
+  },
+  {
+    id: 'f-morning',
+    title: 'בוקר בבית',
+    context: 'family',
+    contextLabel: CTX_LABEL.family,
+    sentences: [
+      { id: 'f1', text: 'כל בוקר לפני בית ספר אני מבקש ממנו להזדרז.', tags: ['UQ', 'CTX'] },
+      { id: 'f2', text: 'הוא עושה פרצוף ואני ישר שומע את הטון הזה.', tags: ['VAK', 'MR'] },
+      { id: 'f3', text: 'זה אומר שהוא מזלזל בי.', tags: ['CEq', 'MR'] },
+      { id: 'f4', text: 'אני חייב להרים קול כי אחרת שום דבר לא זז.', tags: ['MN', 'CE', 'UQ'] },
+      { id: 'f5', text: 'הוא אומר שכולם בבית רק לוחצים עליו.', tags: ['UN', 'UQ'] },
+      { id: 'f6', text: 'אחר כך יש אווירה לא טובה.', tags: ['NOM', 'DEL', 'LP'] },
+      { id: 'f7', text: 'אני לא מצליח להסביר מה בדיוק אני מבקש.', tags: ['UV', 'DEL'] },
+      { id: 'f8', text: 'למה הוא כבר לא יכול להתארגן כמו אחיו?', tags: ['PRE', 'MP', 'COMP'] }
+    ]
+  },
+  {
+    id: 'a-crowd',
+    title: 'אירוע חברתי',
+    context: 'anxiety',
+    contextLabel: CTX_LABEL.anxiety,
+    sentences: [
+      { id: 'a1', text: 'כשהגעתי לאולם ושמעתי את הרעש הגוף שלי מיד נסגר.', tags: ['CTX', 'VAK', 'CE'] },
+      { id: 'a2', text: 'אם אני מרגיש סחרחורת זה אומר שאני עומד לאבד שליטה.', tags: ['CEq', 'CE', 'VAK'] },
+      { id: 'a3', text: 'אני חייב לצאת עכשיו.', tags: ['MN'] },
+      { id: 'a4', text: 'אני לא יכול להישאר פה, למרות שאני רוצה להיות עם החברים.', tags: ['MP'] },
+      { id: 'a5', text: 'כולם יראו שאני מוזר.', tags: ['UQ', 'MR', 'LP'] },
+      { id: 'a6', text: 'כל הסיפור הזה הוא התקף.', tags: ['NOM', 'DEL'] },
+      { id: 'a7', text: 'זה מסוכן.', tags: ['DEL', 'LP'] },
+      { id: 'a8', text: 'למה זה שוב מתחיל דווקא ליד הרבה אנשים?', tags: ['PRE', 'CTX'] }
+    ]
+  },
+  {
+    id: 'b-faith',
+    title: 'אמונה ותרגול',
+    context: 'belief',
+    contextLabel: CTX_LABEL.belief,
+    sentences: [
+      { id: 'b1', text: 'בשבת בבוקר בבית הכנסת התחלתי להרגיש ריחוק.', tags: ['CTX', 'VAK', 'NOM'] },
+      { id: 'b2', text: 'אם עולות לי שאלות זה אומר שהאמונה שלי חלשה.', tags: ['CEq', 'CE', 'LP'] },
+      { id: 'b3', text: 'אני צריך להתפלל נכון יותר.', tags: ['MN', 'COMP'] },
+      { id: 'b4', text: 'אני רוצה להתחבר אבל לא מצליח כרגע.', tags: ['MP', 'UV'] },
+      { id: 'b5', text: 'הם בקהילה בטח שמים לב שאני לא מרוכז.', tags: ['UN', 'MR'] },
+      { id: 'b6', text: 'ממילא תמיד אצא פחות רוחני מהם.', tags: ['UQ', 'COMP'] },
+      { id: 'b7', text: 'מתי אחזור להיות מאמין מספיק?', tags: ['PRE', 'COMP'] },
+      { id: 'b8', text: 'זה לא ראוי.', tags: ['LP', 'DEL'] }
+    ]
   }
 ];
 
-const INITIAL: Machine = {
-  step: 'chooseCategory', selectedCategory: null, selectedTileId: null, selectedQuestionId: null,
-  tileAttempts: 0, questionAttempts: 0, lastFeedback: null, dialogueTurns: [], questionDeck: [],
-  loopIndex: 0, nextActionMessage: '', activeDirection: null, usedGoodQuestionIds: []
-};
-
-const css = `
-.c2{direction:rtl;font-family:"Assistant","Heebo","Noto Sans Hebrew","Segoe UI",sans-serif;background:radial-gradient(circle at 10% 0%,#dbeafe 0,#f8fafc 45%,#ecfeff 100%);color:#0f172a;border:1px solid #dbe7f5;border-radius:18px;padding:14px;max-width:1160px;margin:0 auto}
-.c2 *{box-sizing:border-box}.c2-layout{display:grid;grid-template-columns:320px 1fr;gap:12px}.c2-panel{background:#ffffffd9;border:1px solid #dbe7f5;border-radius:14px;box-shadow:0 12px 28px rgba(15,23,42,.06)}
-.c2-side{padding:12px;position:sticky;top:8px;align-self:start}.c2-main{padding:12px}.c2 h1,.c2 h2,.c2 h3,.c2 p{margin:0}.c2-sub{margin-top:6px;color:#475569;font-size:.9rem;line-height:1.35}
-.c2-philo-btn{margin-top:10px;width:100%;border:1px solid #c7d2fe;background:#eef2ff;color:#3730a3;border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:900;cursor:pointer}
-.c2-philo-avatar{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:999px;background:#fff;border:1px solid #bfdbfe;font-size:1.05rem}
-.c2-quote{margin-top:10px;border:1px solid #bfdbfe;background:#eff6ff;border-radius:10px;padding:10px;font-size:.84rem;line-height:1.35;color:#1e3a8a}.c2-quote strong{display:block;margin-bottom:4px}
-.c2-cats{display:grid;gap:8px;margin-top:10px}.c2-cat{border:1px solid #dbe7f5;background:#fff;border-radius:12px;padding:10px;text-align:right;cursor:pointer}.c2-cat:hover{border-color:#93c5fd;background:#f8fbff}.c2-cat.active{border-color:#2563eb;background:#eff6ff;box-shadow:0 0 0 2px rgba(37,99,235,.12)}.c2-cat.off{opacity:.78}
-.c2-cat-top{display:flex;justify-content:space-between;gap:8px;direction:ltr}.c2-pill{border-radius:999px;background:#e2e8f0;padding:2px 8px;font-size:.72rem;font-weight:800}.c2-mini{color:#64748b;font-size:.74rem;margin-top:4px}
-.c2-info{margin-top:10px;border:1px solid #c7d2fe;background:#eef2ff;color:#3730a3;border-radius:10px;padding:9px 10px;font-weight:700;line-height:1.3}.c2-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.c2-chip{border:1px solid #dbe7f5;background:#fff;border-radius:999px;padding:6px 10px;font-weight:700;font-size:.8rem}
-.c2-storybar{margin-top:10px;border:1px solid #dbe7f5;background:#fff;border-radius:12px;padding:10px;display:grid;gap:8px}.c2-storybar-top{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}.c2-story-actions{display:flex;flex-wrap:wrap;gap:8px}.c2-filter-row{display:flex;flex-wrap:wrap;gap:6px}
-.c2-loop{margin-top:10px;border:1px dashed #93c5fd;background:#f8fbff;border-radius:12px;padding:10px}.c2-track{margin-top:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.c2-track span{border:1px solid #dbe7f5;background:#fff;border-radius:10px;padding:8px;text-align:center;font-weight:800;font-size:.76rem}.c2-track span.a{border-color:#2563eb;background:#dbeafe;color:#1d4ed8}
-.c2-grid{margin-top:12px;display:grid;grid-template-columns:1.2fr .9fr;gap:12px}.c2-card{border:1px solid #dbe7f5;border-radius:12px;background:#fff;padding:12px}.c2-card h3{font-size:1rem;margin-bottom:8px}
-.c2-line{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}.c2-line-label{width:52px;color:#64748b;font-size:.75rem;padding-top:6px}.c2-line-tiles{flex:1;display:flex;flex-wrap:wrap;gap:6px}.c2-tile{border:1px solid #dbe7f5;background:#f8fafc;border-radius:12px;padding:8px 10px;font-weight:700;cursor:pointer;line-height:1.25}.c2-tile:hover:not(:disabled){border-color:#93c5fd;background:#eff6ff}.c2-tile:disabled{opacity:.75;cursor:not-allowed}.c2-tile.sel{border-color:#2563eb;background:#dbeafe}.c2-tile.ok{border-color:#059669;background:#ecfdf5}.c2-tile.bad{border-color:#dc2626;background:#fef2f2}
-.c2-fb{margin-top:12px;border-radius:10px;padding:10px 12px;font-weight:700;line-height:1.35}.c2-fb.info{background:#eef2ff;border:1px solid #c7d2fe;color:#3730a3}.c2-fb.success{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}.c2-fb.error{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
-.c2-qs{display:grid;gap:8px;margin-top:10px}.c2-q{border:1px solid #dbe7f5;background:#fff;border-radius:12px;padding:10px 12px;text-align:right;font-weight:700;line-height:1.35;cursor:pointer}.c2-q:hover{border-color:#93c5fd;background:#f8fbff}.c2-q.sel{border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.12)}
-.c2-turn{border:1px solid #dbe7f5;border-radius:12px;padding:10px;background:#fff;margin-top:8px}.c2-turn-l{color:#64748b;font-size:.74rem;font-weight:800}.c2-turn-t{margin-top:4px;font-weight:700;line-height:1.35}.c2-map{margin-top:6px;color:#0f766e;font-weight:800;font-size:.82rem}
-.c2-actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}.c2-btn{border:0;border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer}.c2-btn:disabled{opacity:.55;cursor:not-allowed}.c2-btn.p{background:#2563eb;color:#fff}.c2-btn.s{background:#e2e8f0;color:#0f172a}.c2-btn.g{background:#fff;border:1px solid #bfdbfe;color:#1d4ed8}
-.c2-next{margin-top:12px;border:1px solid #c7d2fe;background:linear-gradient(180deg,#fff,#f8fbff);border-radius:12px;padding:12px}.c2-next p{margin-top:8px;line-height:1.35}.c2-next blockquote{margin:10px 0 0;padding:8px 10px;border-inline-start:4px solid #3b82f6;background:#eff6ff;border-radius:8px;color:#1e3a8a;font-size:.86rem}
-.c2-dirs{display:grid;gap:8px;margin-top:10px}.c2-dir{border:1px solid #dbe7f5;background:#fff;border-radius:12px;padding:10px;text-align:right;font-weight:800;cursor:pointer}.c2-dir.active{border-color:#2563eb;background:#eff6ff}.c2-note{margin-top:10px;border:1px solid #dbe7f5;background:#f8fafc;border-radius:10px;padding:10px;line-height:1.35;color:#334155}
-@media (max-width:960px){.c2-layout,.c2-grid{grid-template-columns:1fr}.c2-side{position:static}.c2-storybar-top{align-items:flex-start}}
-/* Classic2 UX reflow: one visual workspace + Breen table up top */
-.c2-layout{grid-template-columns:1fr}
-.c2-side{position:static;top:auto}
-.c2-side-grid{display:grid;gap:10px}
-.c2-breen-board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}
-.c2-breen-col{border:1px solid #dbe7f5;background:#ffffffd9;border-radius:12px;padding:8px;display:grid;gap:8px;align-content:start}
-.c2-breen-col-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:10px;background:#f8fbff;border:1px solid #e2ecfa}
-.c2-breen-code{font-weight:900;color:#1d4ed8;font-size:.86rem}
-.c2-breen-name{color:#475569;font-weight:800;font-size:.72rem}
-.c2-breen-col-grid{display:grid;gap:6px}
-.c2-breen-col-grid .c2-cat{padding:8px 9px}
-.c2-workspace{margin-top:12px;display:grid;grid-template-columns:1fr;gap:12px}
-.c2-focus-stack{display:grid;gap:12px}
-.c2-focus-head{display:grid;gap:8px}
-.c2-focus-selected{border:1px dashed #bfdbfe;background:#eff6ff;border-radius:10px;padding:9px 10px;color:#1e3a8a;font-weight:700;line-height:1.35}
-.c2-focus-selected code{font-family:inherit;font-weight:900;color:#1d4ed8;background:#dbeafe;padding:1px 6px;border-radius:999px}
-.c2-story-grid-tip{margin-top:8px;color:#64748b;font-size:.78rem;line-height:1.35}
-.c2-q-anchor{margin-top:8px;border:1px dashed #bfdbfe;background:#f8fbff;color:#1e3a8a;border-radius:10px;padding:8px 10px;font-weight:700;font-size:.82rem}
-@media (max-width:1280px){.c2-breen-board{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:860px){.c2-breen-board{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:640px){.c2-breen-board{grid-template-columns:1fr}.c2-breen-col-head{padding:8px}.c2-story-actions,.c2-filter-row,.c2-actions{display:grid;grid-template-columns:1fr}.c2-story-actions .c2-btn,.c2-filter-row .c2-btn,.c2-actions .c2-btn{width:100%}}
+const CSS = `
+.c2n{direction:rtl;font-family:"Assistant","Rubik","Segoe UI",sans-serif;color:#0f172a;max-width:1180px;margin:0 auto}
+.c2n *{box-sizing:border-box}.c2n-shell{background:radial-gradient(circle at 8% -5%,#cfe4ff,transparent 45%),radial-gradient(circle at 92% 0,#ccf6dd,transparent 45%),linear-gradient(180deg,#f7faff,#fbfffd);border:1px solid #dae4f3;border-radius:22px;padding:14px;box-shadow:0 18px 45px rgba(15,23,42,.07)}
+.c2n h1,.c2n h2,.c2n h3,.c2n h4,.c2n p{margin:0}.c2n-card{background:#ffffffe8;border:1px solid #dde6f3;border-radius:16px;padding:12px}
+.c2n-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}.c2n-title h1{font-size:1.1rem;font-weight:900}.c2n-title p{font-size:.82rem;color:#526173}
+.c2n-actions{display:flex;flex-wrap:wrap;gap:8px}.c2n-btn{border:1px solid transparent;border-radius:12px;padding:10px 12px;font-weight:900;cursor:pointer;font-family:inherit}.c2n-btn:disabled{opacity:.55;cursor:not-allowed}
+.c2n-btn.p{background:#0f4cd6;color:#fff}.c2n-btn.s{background:#e8edf6;color:#0f172a}.c2n-btn.g{background:#fff;border-color:#c8d5ea;color:#173a8a}.c2n-btn.w{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+.c2n-chip{display:inline-flex;align-items:center;border:1px solid #d7e0ee;background:#fff;border-radius:999px;padding:5px 10px;font-weight:800;font-size:.78rem}
+.c2n-intro{margin-top:12px;display:grid;gap:10px}.c2n-intro p{line-height:1.45;color:#243242}.c2n-help{border:1px dashed #c7d5ea;background:#f9fbff;border-radius:12px;padding:10px;line-height:1.4;color:#31465e}
+.c2n-layout{margin-top:12px;display:grid;grid-template-columns:340px 1fr;gap:12px}.c2n-sub{color:#546579;font-size:.82rem;line-height:1.35}.c2n-cta{margin-top:8px;border:1px solid #cbddff;background:#f3f7ff;border-radius:12px;padding:10px}.c2n-cta strong{display:block;color:#0d3fae}.c2n-cta span{display:block;margin-top:4px;color:#4a5d73;font-size:.82rem}
+.c2n-grid{display:grid;gap:8px;margin-top:10px}.c2n-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;direction:rtl}.c2n-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.c2n-cat{width:100%;text-align:right;border:1px solid #dbe5f2;background:#fff;border-radius:14px;padding:9px;display:grid;gap:6px;cursor:pointer;min-height:92px}.c2n-cat:hover:not(:disabled){border-color:#98b9ff;background:#f9fbff}.c2n-cat:disabled{opacity:.58;cursor:not-allowed}.c2n-cat.sel{border-color:#0f4cd6;background:#eaf1ff;box-shadow:0 0 0 2px rgba(15,76,214,.12)}
+.c2n-cat-top{display:flex;justify-content:space-between;gap:8px}.c2n-code{background:#eef3ff;color:#1d4ed8;border-radius:999px;padding:2px 8px;font-weight:900;font-size:.74rem}.c2n-fam{color:#64748b;font-size:.73rem;font-weight:700}.c2n-name{font-size:.82rem;font-weight:800;line-height:1.25}.c2n-badge{width:max-content;border-radius:999px;padding:2px 8px;font-weight:800;font-size:.68rem}.c2n-badge.ok{background:#ecfdf5;color:#0f766e}.c2n-badge.off{background:#f4f6fb;color:#64748b}
+.c2n-text-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}.c2n-meta{display:flex;flex-wrap:wrap;gap:6px}.c2n-target{margin-top:10px;border:1px dashed #c6d6ee;background:#f9fbff;border-radius:12px;padding:10px}.c2n-target p{margin-top:4px;color:#45596f;font-size:.84rem;line-height:1.35}
+.c2n-sents{margin-top:10px;display:grid;gap:8px}.c2n-sent{width:100%;text-align:right;border:1px solid #dce5f2;background:#fff;border-radius:14px;padding:10px 12px;display:grid;gap:6px;cursor:pointer}.c2n-sent:hover:not(:disabled){border-color:#9bbcff;background:#f9fbff}.c2n-sent:disabled{opacity:.75;cursor:not-allowed}
+.c2n-sent-top{display:flex;justify-content:space-between;gap:8px;font-size:.75rem;font-weight:900;color:#4e647c}.c2n-sent-text{font-weight:700;line-height:1.45}.c2n-sent.sel{border-color:#0f4cd6;background:#eaf1ff}.c2n-sent.good{border-color:#86efac;background:#f0fdf4}.c2n-sent.bad{border-color:#fca5a5;background:#fff5f5}
+.c2n-row-actions{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}.c2n-fb{margin-top:10px;border-radius:12px;padding:10px 12px;border:1px solid;font-weight:800;line-height:1.4}.c2n-fb.info{background:#eef4ff;border-color:#c8d8fb;color:#1e3a8a}.c2n-fb.success{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}.c2n-fb.error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+.c2n-hint{margin-top:10px;border:1px dashed #c9d8ef;background:#f9fbff;border-radius:12px;padding:10px;display:grid;gap:6px}.c2n-hint p{font-size:.84rem;line-height:1.4;color:#334155}
+.c2n-foot{margin-top:12px;border:1px dashed #cad8ec;background:#fbfdff;border-radius:14px;padding:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;align-items:center}.c2n-score{display:flex;flex-wrap:wrap;gap:8px}
+.c2n-empty{margin-top:12px;border:1px dashed #cad8ec;background:#fbfdff;border-radius:16px;padding:18px;display:grid;gap:10px;text-align:center}.c2n-empty p{color:#4d5e73}
+.c2n-overlay{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.45);backdrop-filter:blur(4px);display:flex;justify-content:center;align-items:flex-start;padding:16px;overflow:auto}.c2n-modal{width:min(880px,100%);background:#fff;border:1px solid #dde6f2;border-radius:20px;padding:14px;display:grid;gap:12px;box-shadow:0 28px 70px rgba(15,23,42,.22)}
+.c2n-modal-head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:flex-start}.c2n-modal-head h2{font-size:1.05rem;font-weight:900}.c2n-modal-head p{margin-top:4px;font-size:.84rem;color:#536579;line-height:1.35}
+.c2n-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.c2n-field{border:1px solid #dde6f2;background:#fbfdff;border-radius:14px;padding:10px;display:grid;gap:8px}.c2n-field h3{font-size:.9rem;font-weight:900}
+.c2n-radio{display:flex;gap:8px;align-items:flex-start;border:1px solid #e3eaf5;background:#fff;border-radius:10px;padding:8px}.c2n-radio input{margin-top:3px}.c2n-radio strong{display:block;font-size:.83rem}.c2n-radio span{display:block;color:#64748b;font-size:.75rem;line-height:1.3}.c2n-radio.dim{opacity:.55}
+.c2n-seg{display:flex;flex-wrap:wrap;gap:6px}.c2n-seg .c2n-btn{padding:8px 10px;border-radius:999px}.c2n-toggle{display:flex;gap:8px;align-items:center;font-weight:700;font-size:.84rem}.c2n-range{width:100%}.c2n-modal-actions{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}.c2n-main-acts{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:980px){.c2n-layout{grid-template-columns:1fr}.c2n-form{grid-template-columns:1fr}}
+@media (max-width:640px){.c2n-overlay{padding:10px}.c2n-row{grid-template-columns:1fr}.c2n-list{grid-template-columns:1fr}.c2n-actions,.c2n-row-actions,.c2n-main-acts,.c2n-modal-actions,.c2n-seg{display:grid;grid-template-columns:1fr}.c2n-btn{width:100%}}
 `;
 
-const lineGroups = (scenario: Scenario) => {
-  const m = new Map<number, StoryTile[]>();
-  scenario.storyTiles.forEach((t) => { if (!m.has(t.line)) m.set(t.line, []); m.get(t.line)!.push(t); });
-  return Array.from(m.entries()).sort((a, b) => a[0] - b[0]);
-};
+const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
+const rand = (n: number) => Math.floor(Math.random() * n);
 
-const shuffle = <T,>(arr: T[]) => {
-  const x = [...arr];
-  for (let i = x.length - 1; i > 0; i -= 1) { const j = Math.floor(Math.random() * (i + 1)); [x[i], x[j]] = [x[j], x[i]]; }
-  return x;
-};
+function visibleCategories(s: Settings): CategoryCode[] {
+  if (s.categoryDisplay === 'all') return [...ORDER];
+  const base = ORDER.filter((c) => CAT[c].family === s.categoryGroup);
+  const extra = s.includeCtxVak ? (['CTX', 'VAK'] as CategoryCode[]) : [];
+  return ORDER.filter((c) => [...base, ...extra].includes(c));
+}
 
-const deckFor = (id: CategoryId) => {
-  const list = SCENARIO.questionsByCategory[id];
-  if (list.filter((q) => q.isGood).length !== 3) throw new Error(`Category ${id} must have 3 good questions`);
-  return shuffle(list);
-};
+function scenarioPool(ctx: FieldCtx): Scenario[] {
+  const exact = SCENARIOS.filter((s) => s.context === ctx);
+  return exact.length ? exact : SCENARIOS.filter((s) => s.context === 'general');
+}
 
-const scenarioHasCategory = (scenario: Scenario, categoryId: CategoryId) =>
-  scenario.storyTiles.some((t) => t.tags.includes(categoryId));
-
-const nextScenarioId = (currentId: string, filterId: StoryFilterId, selectedCategory?: CategoryId | null) => {
-  const pool = SCENARIOS.filter((sc) => {
-    const filterOk = filterId === 'all' || sc.storyType === filterId;
-    const catOk = !selectedCategory || scenarioHasCategory(sc, selectedCategory);
-    return filterOk && catOk;
-  });
-  if (!pool.length) return null;
-  const idx = pool.findIndex((sc) => sc.id === currentId);
-  if (idx < 0) return pool[0].id;
-  return pool[(idx + 1) % pool.length].id;
-};
-
-const instructionFor = (step: Step, cat: CategoryId | null, scenario: Scenario) => {
-  if (!cat || step === 'chooseCategory') return 'שלב 1: בחר/י קטגוריה, ואז אתר/י קטע מתאים בסיפור.';
-  const label = CAT[cat].label;
-  if (step === 'selectTile') {
-    if (!scenarioHasCategory(scenario, cat)) return `בסיפור הזה אין דוגמה ברורה לקטגוריה ${label}. נסה/י להחליף סיפור.`;
-    return `בחר/י קטע שמתאים לקטגוריה ${label}.`;
+function makeRound(settings: Settings, roundNo: number, prevScenarioId: string | null): Round {
+  const pool = scenarioPool(settings.fieldContext);
+  let sc = settings.textSource === 'random' ? pool[rand(pool.length)] : pool[(roundNo - 1) % pool.length];
+  if (settings.textSource === 'random' && pool.length > 1 && prevScenarioId && sc.id === prevScenarioId) {
+    const alts = pool.filter((x) => x.id !== prevScenarioId);
+    sc = alts[rand(alts.length)];
   }
-  if (step === 'chooseQuestion') return `שלב 2: בחר/י שאלה מטא-מודלית מדויקת לקטגוריה ${label}.`;
-  if (step === 'dialogue') return 'שלב 3: בדוק/י את תור הדיאלוג החדש ומה עודכן במפה.';
-  return 'שלב 4: בחר/י כיוון לצעד הבא (אותה קטגוריה / שכנה / גבולות).';
-};
+  const want = clamp(settings.sentenceCount, 3, 8);
+  const count = Math.min(want, sc.sentences.length);
+  let part = sc.sentences;
+  if (sc.sentences.length > count) {
+    const maxStart = sc.sentences.length - count;
+    const start = settings.textSource === 'random' ? rand(maxStart + 1) : ((roundNo - 1) % (maxStart + 1));
+    part = sc.sentences.slice(start, start + count);
+  }
+  return { id: `${sc.id}-${roundNo}-${part[0]?.id ?? 'x'}`, scenarioId: sc.id, title: sc.title, contextLabel: sc.contextLabel, sentences: part };
+}
+
+const progressText = (n: number, rounds: RoundsChoice) => (rounds === 'infinite' ? `סבב ${n}/∞` : `סבב ${Math.min(n, rounds)}/${rounds}`);
+const roundsText = (r: RoundsChoice) => (r === 'infinite' ? 'אינסופי' : String(r));
+const rules = (s: Settings) => ({ showPresence: s.difficulty <= 2, exact: s.difficulty >= 4, autoHint: s.difficulty <= 2 });
 
 export default function Classic2Trainer(): React.ReactElement {
-  const [s, setS] = useState<Machine>(INITIAL);
-  const [sound, setSound] = useState<'success' | 'fail' | null>(null);
-  const [storyFilter, setStoryFilter] = useState<StoryFilterId>('all');
-  const [scenarioId, setScenarioId] = useState<string>(SCENARIO.id);
-  const [showPhilosopher, setShowPhilosopher] = useState<boolean>(false);
-  const audioRef = useRef<AudioContext | null>(null);
-
-  const scenario = SCENARIOS.find((sc) => sc.id === scenarioId) || SCENARIO;
-  const rows = lineGroups(scenario);
-  const currentCat = s.selectedCategory ? CAT[s.selectedCategory] : null;
-  const lastTurn = s.dialogueTurns[s.dialogueTurns.length - 1] || null;
-  const nextNeighbor = s.selectedCategory ? CAT[s.selectedCategory].nextLikely[0] : null;
-  const selectedTile = s.selectedTileId ? (scenario.storyTiles.find((t) => t.id === s.selectedTileId) || null) : null;
-  const breenColumns = BREEN_CELL_ORDER.map((cellCode) => ({
-    cellCode,
-    title: BREEN_CELL_LABELS[cellCode],
-    items: CATEGORIES.filter((c) => c.breenCell === cellCode)
-  }));
-
-  useEffect(() => {
-    if (storyFilter === 'all' || scenario.storyType === storyFilter) return;
-    const fallbackId = nextScenarioId(scenario.id, storyFilter, null);
-    if (!fallbackId) return;
-    setScenarioId(fallbackId);
-    setS({ ...INITIAL });
-  }, [storyFilter, scenario.id, scenario.storyType]);
-
-  function tone(freq: number, ms: number, kind: OscillatorType) {
-    const AC = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AC) return;
-    if (!audioRef.current) audioRef.current = new AC();
-    const ctx = audioRef.current;
-    const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = kind;
-    osc.frequency.setValueAtTime(freq, now);
-    gain.gain.setValueAtTime(0.001, now);
-    gain.gain.exponentialRampToValueAtTime(0.06, now + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + ms / 1000);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + ms / 1000);
-  }
-
-  function playSuccess() { setSound('success'); }
-  function playFail() { setSound('fail'); }
+  const [wizardOpen, setWizardOpen] = useState(true);
+  const [draft, setDraft] = useState<Settings>({ ...DEFAULTS });
+  const [settings, setSettings] = useState<Settings>({ ...DEFAULTS });
+  const [started, setStarted] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [roundNo, setRoundNo] = useState(1);
+  const [done, setDone] = useState(0);
+  const [correct, setCorrect] = useState(0);
+  const [round, setRound] = useState<Round | null>(null);
+  const [selectedCat, setSelectedCat] = useState<CategoryCode | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [showHint, setShowHint] = useState(false);
+  const [showSolution, setShowSolution] = useState(false);
+  const [result, setResult] = useState<'pending' | 'correct' | 'wrong'>('pending');
+  const scrollYRef = useRef(0);
 
   useEffect(() => {
-    if (!sound) return;
-    try {
-      if (sound === 'success') { tone(740, 110, 'triangle'); setTimeout(() => tone(980, 90, 'triangle'), 90); }
-      else tone(220, 130, 'sawtooth');
-    } catch { /* noop */ }
-    setSound(null);
-  }, [sound]);
-
-  const chooseCategory = (id: CategoryId) => {
-    const hasExampleInStory = scenarioHasCategory(scenario, id);
-    setS((p) => ({
-      ...p,
-      step: 'selectTile', selectedCategory: id, selectedTileId: null, selectedQuestionId: null,
-      questionDeck: deckFor(id), activeDirection: null, nextActionMessage: '', usedGoodQuestionIds: [],
-      lastFeedback: hasExampleInStory
-        ? { tone: 'info', message: `נבחרה קטגוריה: ${CAT[id].label}. עכשיו סמן/י קטע מתאים בסיפור.` }
-        : { tone: 'info', message: `נבחרה קטגוריה: ${CAT[id].label}. אין דוגמה ברורה בסיפור הזה — נסה/י \"סיפור מתאים לקטגוריה\".` }
-    }));
-  };
-
-  const chooseTile = (tile: StoryTile) => {
-    if (!s.selectedCategory || s.step !== 'selectTile') return;
-    const ok = tile.tags.includes(s.selectedCategory);
-    setS((p) => ({
-      ...p,
-      tileAttempts: p.tileAttempts + 1,
-      selectedTileId: tile.id,
-      step: ok ? 'chooseQuestion' : 'selectTile',
-      lastFeedback: ok
-        ? { tone: 'success', message: 'זיהוי טוב. עכשיו בחר/י שאלה מדויקת שתשיג מידע.' }
-        : { tone: 'error', message: `עדיין לא. ${CAT[s.selectedCategory!].tileHint}` }
-    }));
-    ok ? playSuccess() : playFail();
-  };
-
-  const chooseQuestion = (q: QuestionOption) => {
-    if (s.step !== 'chooseQuestion' || !s.selectedCategory || !s.selectedTileId) return;
-    if (!q.isGood) {
-      setS((p) => ({
-        ...p,
-        questionAttempts: p.questionAttempts + 1,
-        selectedQuestionId: q.id,
-        lastFeedback: { tone: 'error', message: q.feedbackIfBad || BAD_QUESTION_DEFAULT }
-      }));
-      playFail();
-      return;
-    }
-    const turn: DialogueTurn = {
-      id: `turn-${s.dialogueTurns.length + 1}`,
-      categoryId: s.selectedCategory,
-      tileId: s.selectedTileId,
-      therapist: q.text,
-      client: q.generatesClientAnswer,
-      mapUpdate: CAT[s.selectedCategory].mapUpdateLine,
-      loopIndex: s.loopIndex + 1
+    if (!wizardOpen) return;
+    const { body } = document;
+    const prev = { overflow: body.style.overflow, position: body.style.position, top: body.style.top, width: body.style.width };
+    scrollYRef.current = window.scrollY || 0;
+    body.style.overflow = 'hidden';
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollYRef.current}px`;
+    body.style.width = '100%';
+    return () => {
+      body.style.overflow = prev.overflow;
+      body.style.position = prev.position;
+      body.style.top = prev.top;
+      body.style.width = prev.width;
+      window.scrollTo(0, scrollYRef.current);
     };
-    setS((p) => ({
-      ...p,
-      step: 'dialogue',
-      questionAttempts: p.questionAttempts + 1,
-      selectedQuestionId: q.id,
-      dialogueTurns: [...p.dialogueTurns, turn],
-      loopIndex: p.loopIndex + 1,
-      usedGoodQuestionIds: [...p.usedGoodQuestionIds, q.id],
-      lastFeedback: { tone: 'success', message: 'שאלה טובה. נוסף מידע חדש, ונפתח צעד המשך בדיאלוג.' }
-    }));
-    playSuccess();
-  };
+  }, [wizardOpen]);
 
-  const goNextStep = () => {
-    if (s.step !== 'dialogue') return;
-    setS((p) => ({ ...p, step: 'nextStep', activeDirection: null, nextActionMessage: '', lastFeedback: { tone: 'info', message: 'בחר/י כיוון להמשך החקירה.' } }));
-  };
+  const rr = rules(settings);
+  const matches = round && selectedCat ? round.sentences.filter((s) => s.tags.includes(selectedCat)).map((s) => s.id) : [];
 
-  const pickDirection = (d: 'same' | 'neighbor' | 'counter') => {
-    if (s.step !== 'nextStep' || !s.selectedCategory) return;
-    if (d === 'same') {
-      const fresh = deckFor(s.selectedCategory).filter((q) => !(q.isGood && s.usedGoodQuestionIds.includes(q.id)));
-      setS((p) => ({
-        ...p,
-        step: 'chooseQuestion', activeDirection: 'same', selectedQuestionId: null,
-        questionDeck: fresh.length >= 6 ? fresh : deckFor(s.selectedCategory!),
-        nextActionMessage: 'ממשיכים באותה קטגוריה כדי לדייק עוד מנגנון/קריטריון/תנאי.',
-        lastFeedback: { tone: 'info', message: 'לולאה נוספת באותה קטגוריה: בחר/י שאלה נוספת.' }
-      }));
+  const resetInteraction = (nextRound?: Round, nextSettings?: Settings) => {
+    setSelectedIds([]);
+    setShowHint(false);
+    setShowSolution(false);
+    setResult('pending');
+    if (!nextRound) {
+      setFeedback(null);
       return;
     }
-    if (d === 'neighbor') {
-      const n = nextNeighbor;
-      if (!n) return;
-      setS((p) => ({
-        ...p,
-        step: 'selectTile', activeDirection: 'neighbor', selectedCategory: n,
-        selectedTileId: null, selectedQuestionId: null, questionDeck: deckFor(n),
-        nextActionMessage: `מעבר לקטגוריה שכנה: ${CAT[n].label}. עכשיו חפש/י קטע חדש.`,
-        lastFeedback: { tone: 'info', message: `עברנו ל-${CAT[n].label}. בחר/י קטע מתאים בסיפור.` }
-      }));
+    const baseSettings = nextSettings || settings;
+    const nextVisible = visibleCategories(baseSettings);
+    const auto = nextVisible.length === 1 ? nextVisible[0] : null;
+    setSelectedCat(auto);
+    setFeedback(auto
+      ? { tone: 'info', message: `נבחרה קטגוריה אוטומטית: ${auto} / ${CAT[auto].he}. סמן/י משפט או דווח/י שאין מופע.` }
+      : { tone: 'info', message: 'בחר/י קטגוריה לאימון ואז סמן/י משפט מתאים בטקסט.' });
+  };
+
+  const startPractice = (cfg: Settings) => {
+    const normalized: Settings = { ...cfg, difficulty: clamp(cfg.difficulty, 1, 5), sentenceCount: clamp(cfg.sentenceCount, 3, 8) };
+    const r1 = makeRound(normalized, 1, null);
+    setSettings(normalized);
+    setStarted(true);
+    setFinished(false);
+    setHelpOpen(false);
+    setRoundNo(1);
+    setDone(0);
+    setCorrect(0);
+    setRound(r1);
+    setWizardOpen(false);
+    resetInteraction(r1, normalized);
+  };
+
+  const openSettings = () => { setDraft({ ...settings }); setWizardOpen(true); };
+
+  const selectCat = (code: CategoryCode) => {
+    if (result !== 'pending') return;
+    if (!visibleCategories(settings).includes(code)) return;
+    setSelectedCat(code);
+    setSelectedIds([]);
+    setShowHint(false);
+    setShowSolution(false);
+    setFeedback({ tone: 'info', message: `קטגוריה נבחרה: ${CAT[code].he} (${code}). סמן/י משפט או דווח/י שאין מופע.` });
+  };
+
+  const toggleSentence = (id: string) => {
+    if (!round || !selectedCat || result !== 'pending') return;
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const evaluate = () => {
+    if (!round) return;
+    if (!selectedCat) { setFeedback({ tone: 'error', message: 'בחר/י קודם קטגוריה לאימון.' }); return; }
+    if (result !== 'pending') return;
+    if (!selectedIds.length) {
+      setFeedback({ tone: 'error', message: 'סמן/י לפחות משפט אחד או השתמש/י בכפתור "אין את הקטגוריה המבוקשת בתוך הטקסט".' });
       return;
     }
-    setS((p) => ({
-      ...p,
-      activeDirection: 'counter',
-      nextActionMessage: 'חיפוש גבולות/יוצאי דופן: שאל/י מתי זה לא קורה, מה התנאים, ומה היה שונה. אפשר לעצור כאן או לפתוח לולאה חדשה.',
-      lastFeedback: { tone: 'info', message: 'נבחר כיוון: גבולות / יוצאי דופן.' }
-    }));
-  };
-
-  const reset = () => setS({ ...INITIAL });
-
-  const switchStory = (mode: 'next' | 'matchCategory') => {
-    const nextId = nextScenarioId(scenario.id, storyFilter, mode === 'matchCategory' ? s.selectedCategory : null);
-    if (!nextId) {
-      setS((p) => ({ ...p, lastFeedback: { tone: 'info', message: 'אין כרגע סיפור מתאים לפי הסינון/הקטגוריה.' } }));
+    const sel = new Set(selectedIds);
+    const wrong = selectedIds.filter((id) => !matches.includes(id));
+    const missed = matches.filter((id) => !sel.has(id));
+    const ok = matches.length > 0 && wrong.length === 0 && (!rr.exact || missed.length === 0);
+    if (ok) {
+      setResult('correct');
+      setFeedback({ tone: 'success', message: 'זיהוי נכון. אפשר לעבור לסבב הבא.' });
       return;
     }
-    setScenarioId(nextId);
-    setS({ ...INITIAL });
+    setResult('wrong');
+    setFeedback({
+      tone: 'error',
+      message:
+        matches.length === 0
+          ? 'בקטגוריה הזו אין מופע בטקסט. נסה/י את כפתור "אין את הקטגוריה המבוקשת בתוך הטקסט".'
+          : rr.exact && missed.length > 0
+            ? 'יש סימון חלקי או שגוי. ברמה הזו צריך לסמן את כל המשפטים המתאימים.'
+            : 'הסימון לא תואם לקטגוריה. נסה/י שוב או לחץ/י "רמז".'
+    });
+    if (rr.autoHint) setShowHint(true);
   };
 
-  const changeStoryFilter = (filterId: StoryFilterId) => {
-    setStoryFilter(filterId);
-    const nextId = nextScenarioId(scenario.id, filterId, null);
-    if (nextId && nextId !== scenario.id) {
-      setScenarioId(nextId);
-      setS({ ...INITIAL });
+  const declareNoCategory = () => {
+    if (!round) return;
+    if (!selectedCat) { setFeedback({ tone: 'error', message: 'בחר/י קודם קטגוריה לאימון.' }); return; }
+    if (result !== 'pending') return;
+    if (!matches.length) {
+      setResult('correct');
+      setFeedback({ tone: 'success', message: 'נכון. אין מופע של הקטגוריה המבוקשת בתוך הטקסט. אפשר לעבור לסבב הבא.' });
+      return;
     }
+    setResult('wrong');
+    setFeedback({ tone: 'error', message: "יש לפחות מופע אחד בטקסט. נסה/י שוב או לחץ/י 'רמז'." });
+    if (rr.autoHint) setShowHint(true);
   };
 
-  const loopKey = s.step === 'chooseCategory' || s.step === 'selectTile' ? 'i1' : s.step === 'chooseQuestion' ? 'ask' : s.step === 'dialogue' ? 'data' : 'i2';
+  const nextRound = () => {
+    if (!round || result !== 'correct') return;
+    const nextDone = done + 1;
+    setDone(nextDone);
+    setCorrect((p) => p + 1);
+    if (settings.rounds !== 'infinite' && nextDone >= settings.rounds) {
+      setFinished(true);
+      setRound(null);
+      setSelectedCat(null);
+      setSelectedIds([]);
+      setFeedback({ tone: 'success', message: 'התרגול הסתיים. אפשר לפתוח Settings ולהתחיל סט חדש.' });
+      setShowHint(false);
+      setShowSolution(false);
+      setResult('pending');
+      return;
+    }
+    const nextNo = roundNo + 1;
+    const nr = makeRound(settings, nextNo, round.scenarioId);
+    setRoundNo(nextNo);
+    setRound(nr);
+    resetInteraction(nr, settings);
+  };
+
+  const hintIdx = round && selectedCat
+    ? round.sentences.map((s, i) => (s.tags.includes(selectedCat) ? i + 1 : null)).filter((n): n is number => n !== null)
+    : [];
+
+  const renderCatPicker = (cfg: Settings, interactive: boolean, compact = false) => {
+    const vis = visibleCategories(cfg);
+    const showPresence = rr.showPresence && !!round && cfg === settings;
+    if (cfg.categoryDisplay === 'group') {
+      return (
+        <div className="c2n-list">
+          {ORDER.filter((c) => vis.includes(c)).map((c) => {
+            const present = !!round && round.sentences.some((s) => s.tags.includes(c));
+            return (
+              <button
+                key={c}
+                type="button"
+                className={`c2n-cat${selectedCat === c && cfg === settings ? ' sel' : ''}`}
+                onClick={() => (cfg === settings ? selectCat(c) : undefined)}
+                disabled={compact ? true : !interactive}
+                aria-pressed={selectedCat === c && cfg === settings}
+              >
+                <div className="c2n-cat-top"><span className="c2n-code">{c}</span><span className="c2n-fam">{CAT[c].familyHe}</span></div>
+                <div className="c2n-name">{CAT[c].he}</div>
+                {!compact && showPresence && <span className={`c2n-badge ${present ? 'ok' : 'off'}`}>{present ? 'יש בטקסט' : 'לא בטקסט'}</span>}
+              </button>
+            );
+          })}
+        </div>
+      );
+    }
+    return (
+      <div className="c2n-grid">
+        {BREEN_GRID_RTL.map((row, i) => (
+          <div key={i} className="c2n-row">
+            {row.map((c) => {
+              const enabled = vis.includes(c);
+              const present = !!round && round.sentences.some((s) => s.tags.includes(c));
+              const sel = selectedCat === c && cfg === settings;
+              return (
+                <button key={c} type="button" className={`c2n-cat${sel ? ' sel' : ''}`} onClick={() => (cfg === settings ? selectCat(c) : undefined)} disabled={compact ? true : !interactive || !enabled} aria-pressed={sel}>
+                  <div className="c2n-cat-top"><span className="c2n-code">{c}</span><span className="c2n-fam">{CAT[c].familyHe}</span></div>
+                  <div className="c2n-name">{CAT[c].he}</div>
+                  {!compact && showPresence && enabled && <span className={`c2n-badge ${present ? 'ok' : 'off'}`}>{present ? 'יש בטקסט' : 'לא בטקסט'}</span>}
+                  {!compact && !enabled && <span className="c2n-badge off">מוסתר</span>}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
-    <div className="c2" dir="rtl" lang="he">
-      <style>{css}</style>
-      <div className="c2-layout">
-        <aside className="c2-panel c2-side" aria-label="טבלת ברין">
-          <div className="c2-side-grid">
-            <div>
-              <h2 style={{ fontSize: '1.18rem', fontWeight: 900 }}>Classic 2 · Structure of Magic</h2>
-              <p className="c2-sub">טבלת ברין למעלה + חלון סיפור + פאנל פוקוס אחד (קטגוריה/שאלה/משוב) בלי זיגזג בין צדדים.</p>
+    <div className="c2n" dir="rtl" lang="he">
+      <style>{CSS}</style>
+      <div className="c2n-shell">
+        <div className="c2n-top c2n-card">
+          <div className="c2n-title">
+            <h1>Meta-Model Content Trainer</h1>
+            <p>Classic 2 · Structure of Magic</p>
+          </div>
+          <div className="c2n-actions">
+            <button type="button" className="c2n-btn g" onClick={openSettings}>חזרה ל-Settings</button>
+            <span className="c2n-chip">{started ? progressText(roundNo, settings.rounds) : 'טרם התחיל תרגול'}</span>
+            <button type="button" className="c2n-btn s" onClick={() => setHelpOpen((v) => !v)} aria-expanded={helpOpen}>עזרה / איך זה עובד</button>
+          </div>
+        </div>
+
+        <div className="c2n-intro">
+          <section className="c2n-card">
+            <h2 style={{ fontSize: '1rem', fontWeight: 900 }}>מטרת התרגול</h2>
+            <p>בוחרים קטגוריה מהמטה-מודל ולומדים לזהות אותה בתוך טקסט אמיתי. בכל סבב תקבל/י טקסט קצר. תסמן/י איפה הקטגוריה מופיעה או תדווח/י שהיא לא מופיעה בטקסט.</p>
+            <p className="c2n-sub" style={{ marginTop: 8 }}>הסברי קטגוריות מפורטים (רמזים/פירושים) נשארים בדף הזה; בדפי תרגול אחרים טבלת ברין נשמרת נקייה ללחיצה מהירה.</p>
+          </section>
+          {helpOpen && <div className="c2n-help">1) בוחרים קטגוריה. 2) מסמנים משפט/ים (מצב משפטים/צ׳יפים). 3) בודקים תשובה או משתמשים בכפתור "אין את הקטגוריה...". 4) ממשיכים לסבב הבא.</div>}
+        </div>
+
+        {!started && (
+          <div className="c2n-empty">
+            <h2 style={{ fontSize: '1rem', fontWeight: 900 }}>התרגול עוד לא הופעל</h2>
+            <p>המודאל נפתח אוטומטית בכניסה. אחרי "הפעל תרגול" נכנסים לטריינר.</p>
+            <div className="c2n-row-actions" style={{ marginTop: 0, justifyContent: 'center' }}>
+              <button type="button" className="c2n-btn p" onClick={() => setWizardOpen(true)}>פתח/י Settings</button>
             </div>
+          </div>
+        )}
 
-            <button type="button" className="c2-philo-btn" onClick={() => setShowPhilosopher((v) => !v)} aria-expanded={showPhilosopher}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span className="c2-philo-avatar" aria-hidden="true">🧙</span>
-                <span>הפילוסוף (הפילוסופיה של הכלי)</span>
-              </span>
-              <span>{showPhilosopher ? '▾' : '▸'}</span>
-            </button>
-
-            {showPhilosopher && (
-              <div className="c2-quote">
-                <strong>למה הכלי הזה קיים?</strong>
-                <div>{PHILOSOPHY_COPY}</div>
+        {started && !finished && round && (
+          <div className="c2n-layout">
+            <aside className="c2n-card">
+              <h3 style={{ fontSize: '.98rem', fontWeight: 900 }}>שלב 1: לחץ/י – בחר קטגוריה לאימון</h3>
+              <div className="c2n-sub">
+                {settings.categoryDisplay === 'all'
+                  ? 'כל הקטגוריות מוצגות תמיד בגריד RTL קבוע (MR בפינה הימנית-עליונה).'
+                  : `קבוצה ממוקדת: ${settings.categoryGroup}${settings.includeCtxVak ? ' + CTX/VAK' : ''}`}
               </div>
-            )}
-
-            <div className="c2-info" style={{ marginTop: 0 }}>
-              טבלת ברין: בחר/י קודם קטגוריה מתוך התא (DEL / DIS / GEN / CTX / VAK), ואז סמנו קטע מתאים בתוך הסיפור.
-            </div>
-
-            <div className="c2-breen-board" role="list" aria-label="טבלת ברין עם כל ההפרות">
-              {breenColumns.map((col) => (
-                <section key={col.cellCode} className="c2-breen-col" role="listitem" aria-label={`תא ${col.cellCode}`}>
-                  <div className="c2-breen-col-head">
-                    <span className="c2-breen-code">{col.cellCode}</span>
-                    <span className="c2-breen-name">{col.title}</span>
-                  </div>
-                  <div className="c2-breen-col-grid">
-                    {col.items.map((c) => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        className={`c2-cat${s.selectedCategory === c.id ? ' active' : ''}${scenarioHasCategory(scenario, c.id) ? '' : ' off'}`}
-                        onClick={() => chooseCategory(c.id)}
-                        aria-pressed={s.selectedCategory === c.id}
-                      >
-                        <div className="c2-cat-top">
-                          <span className="c2-pill">{c.breenCell}</span>
-                          <span className="c2-mini">{FAMILY_LABELS_HE[c.family]}</span>
-                        </div>
-                        <div style={{ marginTop: 6, fontWeight: 800 }}>{c.label}</div>
-                        <div className="c2-mini">{scenarioHasCategory(scenario, c.id) ? 'יש דוגמה בסיפור' : 'אין דוגמה בסיפור הזה'}</div>
-                      </button>
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          </div>
-        </aside>
-
-        <main className="c2-panel c2-main" aria-label="זרימת אימון Classic 2">
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 900 }}>{scenario.title}</h1>
-          <p className="c2-sub">מצב תרגול עם בחירת קטעים (RTL, מותאם מגע).</p>
-
-          <div className="c2-storybar" aria-label="ניהול סיפורים">
-            <div className="c2-storybar-top">
-              <div>
-                <div style={{ fontWeight: 900 }}>סיפור פעיל: {scenario.storyTypeLabel}</div>
-                <div className="c2-mini">אפשר להחליף סיפור, לסנן לפי סוג סיפור, או למצוא סיפור מתאים לקטגוריה שבחרת.</div>
+              <div className="c2n-cta">
+                <strong>בחר/י קטגוריה, ואז סמן/י משפט בטקסט</strong>
+                <span>אם אין מופע בטקסט, השתמש/י בכפתור הייעודי.</span>
               </div>
-              <div className="c2-story-actions">
-                <button type="button" className="c2-btn s" onClick={() => switchStory('next')}>החלף סיפור</button>
-                <button type="button" className="c2-btn g" onClick={() => switchStory('matchCategory')} disabled={!s.selectedCategory}>סיפור מתאים לקטגוריה</button>
-              </div>
-            </div>
-            <div className="c2-filter-row">
-              {(Object.keys(STORY_TYPE_LABELS) as StoryFilterId[]).map((fid) => (
-                <button key={fid} type="button" className={`c2-btn ${storyFilter === fid ? 'p' : 's'}`} onClick={() => changeStoryFilter(fid)}>
-                  {STORY_TYPE_LABELS[fid]}
-                </button>
-              ))}
-            </div>
-          </div>
+              {renderCatPicker(settings, result === 'pending')}
+            </aside>
 
-          <div className="c2-info">{instructionFor(s.step, s.selectedCategory, scenario)}</div>
-
-          <div className="c2-row">
-            <span className="c2-chip">שלב: <strong>{STEP_LABELS_HE[s.step]}</strong></span>
-            <span className="c2-chip">ניסיונות קטע: <strong>{s.tileAttempts}</strong></span>
-            <span className="c2-chip">ניסיונות שאלה: <strong>{s.questionAttempts}</strong></span>
-            <span className="c2-chip">לולאות: <strong>{s.loopIndex}</strong></span>
-          </div>
-
-          <div className="c2-loop" aria-label="אינדיקטור לולאה">
-            <div style={{ fontWeight: 800, color: '#1e3a8a', fontSize: '.86rem' }}>לולאה רקורסיבית: זיהוי → שאלה → מידע חדש → זיהוי</div>
-            <div className="c2-track">
-              <span className={loopKey === 'i1' ? 'a' : ''}>זיהוי</span>
-              <span className={loopKey === 'ask' ? 'a' : ''}>שאלה</span>
-              <span className={loopKey === 'data' ? 'a' : ''}>מידע חדש</span>
-              <span className={loopKey === 'i2' ? 'a' : ''}>זיהוי</span>
-            </div>
-          </div>
-
-          <div className="c2-workspace">
-            <section className="c2-card" aria-label="חלון סיפור">
-              <h3>חלון סיפור (הקשר רחב)</h3>
-              <div className="c2-story-grid-tip">זרימה מומלצת: 1) בחר/י קטגוריה בטבלת ברין למעלה 2) סמן/י קטע בסיפור 3) בחר/י שאלה בפאנל הפוקוס שמתחת.</div>
-              {rows.map(([line, tiles]) => (
-                <div key={line} className="c2-line">
-                  <div className="c2-line-label">שורה {line}</div>
-                  <div className="c2-line-tiles">
-                    {tiles.map((t) => {
-                      const sel = s.selectedTileId === t.id;
-                      const good = sel && !!s.selectedCategory && t.tags.includes(s.selectedCategory) && s.step !== 'selectTile';
-                      const bad = sel && !!s.selectedCategory && !t.tags.includes(s.selectedCategory) && s.lastFeedback?.tone === 'error';
-                      const disabled = s.step !== 'selectTile';
-                      return (
-                        <button key={t.id} type="button" className={`c2-tile${sel ? ' sel' : ''}${good ? ' ok' : ''}${bad ? ' bad' : ''}`} onClick={() => chooseTile(t)} disabled={disabled}>
-                          {t.text}
-                        </button>
-                      );
-                    })}
-                  </div>
+            <section className="c2n-card">
+              <div className="c2n-text-top">
+                <div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 900 }}>{round.title}</h3>
+                  <div className="c2n-sub">סבב {roundNo} · {round.contextLabel} · {round.sentences.length} משפטים</div>
                 </div>
-              ))}
+                <div className="c2n-meta">
+                  <span className="c2n-chip">רמה {settings.difficulty}/5</span>
+                  <span className="c2n-chip">תצוגה: {settings.categoryDisplay === 'all' ? 'All Categories' : 'Group'}</span>
+                  {rr.exact && <span className="c2n-chip">בדיקה מלאה</span>}
+                </div>
+              </div>
+
+              <div className="c2n-target">
+                <strong>{selectedCat ? `הקטגוריה הפעילה: ${selectedCat} / ${CAT[selectedCat].he}` : 'בחר/י קטגוריה לאימון'}</strong>
+                <p>{selectedCat ? CAT[selectedCat].hint : 'התחל/י מהגריד משמאל. לאחר הבחירה ניתן לסמן משפטים.'}</p>
+                {selectedCat && CAT[selectedCat].note && <p style={{ fontWeight: 800, color: '#0d3fae' }}>{CAT[selectedCat].note}</p>}
+              </div>
+
+              <div className="c2n-sents">
+                {round.sentences.map((s, i) => {
+                  const sel = selectedIds.includes(s.id);
+                  const isMatch = !!selectedCat && s.tags.includes(selectedCat);
+                  const showGood = !!selectedCat && (showSolution || result === 'correct') && isMatch;
+                  const showBad = result === 'wrong' && sel && !isMatch;
+                  return (
+                    <button key={s.id} type="button" className={`c2n-sent${sel ? ' sel' : ''}${showGood ? ' good' : ''}${showBad ? ' bad' : ''}`} onClick={() => toggleSentence(s.id)} disabled={!selectedCat || result !== 'pending'} aria-pressed={sel}>
+                      <div className="c2n-sent-top">
+                        <span>משפט {i + 1}</span>
+                        <span>{showGood ? 'פתרון / נכון' : showBad ? 'לא מתאים' : sel ? 'מסומן' : 'לחיץ'}</span>
+                      </div>
+                      <span className="c2n-sent-text">{s.text}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="c2n-row-actions">
+                <button type="button" className="c2n-btn p" onClick={evaluate} disabled={!selectedCat || result !== 'pending'}>בדוק תשובה</button>
+                <button type="button" className="c2n-btn w" onClick={declareNoCategory} disabled={!selectedCat || result !== 'pending'}>אין את הקטגוריה המבוקשת בתוך הטקסט</button>
+                <button type="button" className="c2n-btn s" onClick={() => { setSelectedIds([]); setResult('pending'); setShowHint(false); setShowSolution(false); setFeedback(selectedCat ? { tone: 'info', message: 'נוקה סימון. נסה/י שוב.' } : { tone: 'info', message: 'בחר/י קטגוריה לאימון.' }); }}>נקה סימון</button>
+                <button type="button" className="c2n-btn g" onClick={() => setShowHint(true)} disabled={!selectedCat}>הצג רמז</button>
+                <button type="button" className="c2n-btn g" onClick={() => setShowSolution(true)} disabled={!selectedCat}>הצג פתרון</button>
+              </div>
+
+              {feedback && <div className={`c2n-fb ${feedback.tone}`}>{feedback.message}</div>}
+
+              {showHint && selectedCat && (
+                <div className="c2n-hint">
+                  <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>רמז</h4>
+                  <p>{CAT[selectedCat].hint}</p>
+                  {hintIdx.length ? <p>נסה/י לבדוק במיוחד את משפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p> : <p>ייתכן שאין מופע של הקטגוריה הזו בטקסט.</p>}
+                </div>
+              )}
+
+              {showSolution && selectedCat && (
+                <div className="c2n-hint">
+                  <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>פתרון</h4>
+                  {hintIdx.length
+                    ? <p>המופעים של {selectedCat} / {CAT[selectedCat].he} נמצאים במשפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p>
+                    : <p>אין מופע של {selectedCat} / {CAT[selectedCat].he} בטקסט הזה.</p>}
+                </div>
+              )}
+
+              <div className="c2n-foot">
+                <div className="c2n-score">
+                  <span className="c2n-chip">הושלמו: {done}</span>
+                  <span className="c2n-chip">נכונים: {correct + (result === 'correct' ? 1 : 0)}</span>
+                  <span className="c2n-chip">סבבים: {roundsText(settings.rounds)}</span>
+                </div>
+                <button type="button" className="c2n-btn p" onClick={nextRound} disabled={result !== 'correct'}>{settings.rounds === 'infinite' ? 'סבב הבא (∞)' : 'סבב הבא'}</button>
+              </div>
             </section>
+          </div>
+        )}
 
-            <aside className="c2-focus-stack" aria-label="פאנל פוקוס">
-              <section className="c2-card" aria-label="פוקוס נוכחי">
-                <div className="c2-focus-head">
-                  <h3>פוקוס נוכחי (קטגוריה + קטע + שאלה)</h3>
-                  {currentCat ? (
-                    <>
-                      <div style={{ fontWeight: 800 }}>{currentCat.label}</div>
-                      <div className="c2-mini">{FAMILY_LABELS_HE[currentCat.family]} · תא ברין {currentCat.breenCell}</div>
-                      <div className="c2-info" style={{ marginTop: 0 }}>{currentCat.tileHint}</div>
-                    </>
-                  ) : (
-                    <div className="c2-mini">בחר/י קטגוריה מטבלת ברין כדי להתחיל.</div>
-                  )}
+        {started && finished && (
+          <section className="c2n-card" style={{ marginTop: 12 }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 900 }}>סיכום תרגול</h3>
+            <div className="c2n-sub" style={{ marginTop: 4 }}>הושלמו {done} סבבים ({correct} נכונים) · הקשר: {CTX_LABEL[settings.fieldContext]} · רמה: {settings.difficulty}/5</div>
+            <div className="c2n-row-actions">
+              <button type="button" className="c2n-btn p" onClick={() => startPractice(settings)}>הפעל שוב עם אותן הגדרות</button>
+              <button type="button" className="c2n-btn g" onClick={openSettings}>חזרה ל-Settings</button>
+            </div>
+          </section>
+        )}
+      </div>
 
-                  <div className="c2-focus-selected">
-                    קטע נבחר:
-                    {' '}
-                    {selectedTile ? <code>{selectedTile.text}</code> : 'עדיין לא נבחר קטע מהסיפור'}
-                  </div>
+      {wizardOpen && (
+        <div className="c2n-overlay" role="dialog" aria-modal="true" aria-label="Settings Wizard">
+          <div className="c2n-modal">
+            <div className="c2n-modal-head">
+              <div>
+                <h2>Classic 2 · Structure of Magic — Settings</h2>
+                <p>המודאל נפתח מיד בכניסה. נעילת גלילת רקע מופעלת בזמן פתיחה.</p>
+              </div>
+              <button type="button" className="c2n-btn s" onClick={() => setWizardOpen(false)}>צא</button>
+            </div>
 
-                  {s.lastFeedback && <div className={`c2-fb ${s.lastFeedback.tone}`}>{s.lastFeedback.message}</div>}
+            <div className="c2n-form">
+              <section className="c2n-field">
+                <h3>A. מקור הטקסט</h3>
+                <label className="c2n-radio">
+                  <input type="radio" name="src" checked={draft.textSource === 'built_in'} onChange={() => setDraft((p) => ({ ...p, textSource: 'built_in' }))} />
+                  <div><strong>סט תרגול מובנה</strong><span>רצף תרחישים לפי ההקשר.</span></div>
+                </label>
+                <label className="c2n-radio">
+                  <input type="radio" name="src" checked={draft.textSource === 'random'} onChange={() => setDraft((p) => ({ ...p, textSource: 'random' }))} />
+                  <div><strong>טקסט רנדומלי</strong><span>בחירה אקראית של תרחיש/חלון משפטים.</span></div>
+                </label>
+                <label className="c2n-radio dim">
+                  <input type="radio" name="src" disabled />
+                  <div><strong>הדבק טקסט ידנית (אופציה עתידית)</strong><span>שמור לשלב הבא.</span></div>
+                </label>
+              </section>
+
+              <section className="c2n-field">
+                <h3>B. סגנון טקסט / תחום</h3>
+                <div className="c2n-seg">
+                  {(Object.keys(CTX_LABEL) as FieldCtx[]).map((c) => (
+                    <button key={c} type="button" className={`c2n-btn ${draft.fieldContext === c ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, fieldContext: c }))}>{CTX_LABEL[c]}</button>
+                  ))}
                 </div>
               </section>
 
-              {s.step === 'chooseQuestion' && s.selectedCategory && (
-                <section className="c2-card" aria-label="בחירת שאלה">
-                  <h3>שלב 2 · בחירת השאלה המטא-מודלית הבאה</h3>
-                  <div className="c2-mini">השאלה נפתחת כאן, ליד הפוקוס הנוכחי. יש 6 אפשרויות; בדיוק 3 טובות.</div>
-                  {selectedTile && <div className="c2-q-anchor">על הקטע: "{selectedTile.text}"</div>}
-                  <div className="c2-qs">
-                    {s.questionDeck.map((q) => (
-                      <button key={q.id} type="button" className={`c2-q${s.selectedQuestionId === q.id ? ' sel' : ''}`} onClick={() => chooseQuestion(q)}>
-                        {q.text}
-                      </button>
-                    ))}
-                  </div>
-                </section>
-              )}
+              <section className="c2n-field">
+                <h3>C. רמת קושי</h3>
+                <div className="c2n-chip">{draft.difficulty}/5</div>
+                <input className="c2n-range" type="range" min={1} max={5} step={1} value={draft.difficulty} onChange={(e) => setDraft((p) => ({ ...p, difficulty: Number(e.target.value) }))} />
+                <div className="c2n-sub">משפיע על רמזי נוכחות, קשיחות בדיקה, ורמז אוטומטי אחרי שגיאה.</div>
 
-              {s.step === 'dialogue' && lastTurn && (
-                <section className="c2-card" aria-label="דיאלוג שנוצר">
-                  <h3>תור דיאלוג חדש</h3>
-                  <div className="c2-turn"><div className="c2-turn-l">שאלה (מטפל/ת)</div><div className="c2-turn-t">{lastTurn.therapist}</div></div>
-                  <div className="c2-turn"><div className="c2-turn-l">תשובת מטופל/ת</div><div className="c2-turn-t">{lastTurn.client}</div><div className="c2-map">{lastTurn.mapUpdate}</div></div>
-                  <div className="c2-actions">
-                    <button type="button" className="c2-btn p" onClick={goNextStep}>פתח צעד הבא</button>
-                    <button type="button" className="c2-btn s" onClick={() => setS((p) => ({ ...p, step: 'chooseQuestion' }))}>בחר/י שאלה אחרת</button>
-                  </div>
-                </section>
-              )}
-
-              {s.step === 'nextStep' && (
-                <section className="c2-next" aria-label="צעד הבא">
-                  <h3 style={{ fontSize: '1rem' }}>צעד הבא</h3>
-                  <p>זה לא טיפול מלא; זה מנוע לצעד הבא: לזהות קטגוריה אחת, לשאול שאלה מדויקת, ולעדכן את המפה.</p>
-                  <p>{nextNeighbor ? `קטגוריה שכנה מומלצת: ${CAT[nextNeighbor].label}.` : 'בחר/י כיוון המשך כדי להמשיך את הלולאה.'}</p>
-                  <blockquote>{PHILOSOPHY_COPY}</blockquote>
-                  <div className="c2-dirs">
-                    <button type="button" className={`c2-dir${s.activeDirection === 'same' ? ' active' : ''}`} onClick={() => pickDirection('same')}>1) להמשיך לדייק את אותה קטגוריה</button>
-                    <button type="button" className={`c2-dir${s.activeDirection === 'neighbor' ? ' active' : ''}`} onClick={() => pickDirection('neighbor')}>2) לעבור לקטגוריה שכנה</button>
-                    <button type="button" className={`c2-dir${s.activeDirection === 'counter' ? ' active' : ''}`} onClick={() => pickDirection('counter')}>3) לחפש גבולות / יוצאי דופן</button>
-                  </div>
-                  {s.nextActionMessage && <div className="c2-note">{s.nextActionMessage}</div>}
-                  <div className="c2-actions">
-                    <button type="button" className="c2-btn g" onClick={() => setS((p) => ({ ...p, step: 'selectTile', selectedTileId: null, selectedQuestionId: null, lastFeedback: { tone: 'info', message: 'לולאה חדשה באותו סיפור: בחר/י קטע.' } }))}>לולאה נוספת (אותו סיפור)</button>
-                    <button type="button" className="c2-btn s" onClick={reset}>איפוס</button>
-                  </div>
-                </section>
-              )}
-            </aside>
-          </div>
-
-          {s.dialogueTurns.length > 0 && (
-            <section className="c2-card" style={{ marginTop: 12 }} aria-label="היסטוריית דיאלוג">
-              <h3>היסטוריית דיאלוג</h3>
-              {s.dialogueTurns.map((t) => (
-                <div key={t.id} className="c2-turn">
-                  <div className="c2-turn-l">לולאה #{t.loopIndex} · {CAT[t.categoryId].label}</div>
-                  <div className="c2-turn-t"><strong>שאלה:</strong> {t.therapist}</div>
-                  <div className="c2-turn-t" style={{ marginTop: 4 }}><strong>תשובה:</strong> {t.client}</div>
-                  <div className="c2-map">{t.mapUpdate}</div>
+                <h3 style={{ marginTop: 4 }}>D. אורך התרגול</h3>
+                <div className="c2n-sub">מספר משפטים בטקסט: {draft.sentenceCount}</div>
+                <input className="c2n-range" type="range" min={3} max={8} step={1} value={draft.sentenceCount} onChange={(e) => setDraft((p) => ({ ...p, sentenceCount: Number(e.target.value) }))} />
+                <div className="c2n-sub">מספר סבבים / טקסטים</div>
+                <div className="c2n-seg">
+                  {[5, 10, 'infinite'].map((r) => (
+                    <button key={String(r)} type="button" className={`c2n-btn ${draft.rounds === r ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, rounds: r as RoundsChoice }))}>{r === 'infinite' ? 'אינסופי' : r}</button>
+                  ))}
                 </div>
-              ))}
-            </section>
-          )}
-        </main>
-      </div>
+              </section>
+
+              <section className="c2n-field">
+                <h3>E. תצוגת קטגוריות</h3>
+                <label className="c2n-radio">
+                  <input type="radio" name="disp" checked={draft.categoryDisplay === 'all'} onChange={() => setDraft((p) => ({ ...p, categoryDisplay: 'all' }))} />
+                  <div><strong>כל הקטגוריות (טבלת מייקל ברין)</strong><span>סדר/מיקום קבועים ב-RTL.</span></div>
+                </label>
+                <label className="c2n-radio">
+                  <input type="radio" name="disp" checked={draft.categoryDisplay === 'group'} onChange={() => setDraft((p) => ({ ...p, categoryDisplay: 'group' }))} />
+                  <div><strong>רק קבוצה</strong><span>GEN / DIS / DEL.</span></div>
+                </label>
+                <div className="c2n-seg">
+                  {(['GEN', 'DIS', 'DEL'] as GroupCode[]).map((g) => (
+                    <button key={g} type="button" className={`c2n-btn ${draft.categoryGroup === g ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, categoryGroup: g }))}>{g}</button>
+                  ))}
+                </div>
+                <label className="c2n-toggle">
+                  <input type="checkbox" checked={draft.includeCtxVak} onChange={(e) => setDraft((p) => ({ ...p, includeCtxVak: e.target.checked }))} />
+                  כולל CTX + VAK
+                </label>
+                <div className="c2n-sub">Preview (אותו breen_grid_rtl הקבוע במצב All Categories)</div>
+                {renderCatPicker(draft, false, true)}
+              </section>
+            </div>
+
+            <div className="c2n-modal-actions">
+              <button type="button" className="c2n-btn s" onClick={() => setDraft({ ...QUICK })}>ברירת מחדל מהירה</button>
+              <div className="c2n-main-acts">
+                <button type="button" className="c2n-btn g" onClick={() => setDraft({ ...DEFAULTS })}>איפוס הגדרות</button>
+                <button type="button" className="c2n-btn p" onClick={() => startPractice(draft)}>הפעל תרגול</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-/*
-README snippet:
-- Add scenario: duplicate SCENARIO shape (storyTiles + questionsByCategory) and retag tiles.
-- Add category: extend CategoryId + CATEGORIES + questionsByCategory[category].
-- Keep exactly 3 good questions per category and 6-7 total options.
-- Preserve the explicit step machine: chooseCategory -> selectTile -> chooseQuestion -> dialogue -> nextStep.
-*/

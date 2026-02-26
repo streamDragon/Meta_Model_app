@@ -652,7 +652,6 @@
             const disabled = !state.selection || !!state.pendingNodeId;
             const count = state.session ? (core.computeStats(state.session).categoryCounts[category.categoryId] || 0) : 0;
             const title = getCategoryDisplayTitle(category);
-            const hint = getCategoryDisplayHint(category);
             return `
                 <button
                     type="button"
@@ -663,7 +662,6 @@
                     title="${escapeHtml(category.definition || '')}"
                 >
                     <span class="prm-cat-name">${escapeHtml(title)}</span>
-                    <span class="prm-cat-line">${escapeHtml(hint)}</span>
                     <span class="prm-cat-meta">${escapeHtml((category.family || '').toUpperCase())} · ${count}</span>
                 </button>
             `;
@@ -695,10 +693,6 @@
             const disabled = !state.selection || !!state.pendingNodeId;
             const count = stats.categoryCounts[category.categoryId] || 0;
             const title = getCategoryDisplayTitle(category);
-            const hint = getCategoryDisplayHint(category);
-            const extraMindReading = category.categoryId === 'mind_reading'
-                ? `<div class="prm-breen-note">${escapeHtml(getMindReadingExtraNote())}</div>`
-                : '';
             return `
                 <button
                     type="button"
@@ -709,9 +703,7 @@
                     title="${escapeHtml(category.definition || '')}"
                 >
                     <span class="prm-cat-name">${escapeHtml(title)}</span>
-                    <span class="prm-cat-line">${escapeHtml(hint)}</span>
                     <span class="prm-cat-meta">${escapeHtml((category.family || '').toUpperCase())} · ${count}</span>
-                    ${extraMindReading}
                 </button>
             `;
         };
@@ -736,7 +728,6 @@
                         </div>
                     `).join('')}
                 </div>
-                <p class="prm-breen-footnote">Mind Reading בצד ימין (Inside) וכולל גם קריאת מחשבות עצמית + קפיצה למסקנות.</p>
             </div>
         `;
     }
@@ -1103,7 +1094,6 @@
                         
                         <section class="prm-card">
                             <h2>טבלת ברין - 15 קטגוריות (סדר עבודה)</h2>
-                            <p class="prm-kicker">ממוין לפי Outside / Inside map. Mind Reading מופיע בצד ימין כחלק מהגעה למסקנות.</p>
                             ${renderBreenCategoryBoard()}
                         </section>
 

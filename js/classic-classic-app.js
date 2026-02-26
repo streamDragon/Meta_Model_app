@@ -770,19 +770,16 @@
         const cells = state.data?.breenTable?.cells || [];
         const currentPattern = round?.pattern || null;
         const activeCellId = currentPattern?.breenCellId || '';
-        const helpTexts = getFamilyHelpTexts();
         const currentFocus = normalizeFamilyFocus(state.familyFocus);
 
         return `
           <aside class="cc-panel cc-side" aria-label="מפת Breen למשפחות דפוסים">
             <div>
               <h2>מפת Michael Breen (משפחות דפוסים)</h2>
-              <p class="cc-sub">כל תא מייצג משפחת תבניות. אפשר לסנן תרגול לפי מחיקות / עיוותים / הכללות.</p>
             </div>
 
             <div class="cc-breen-toolbar">
               <button type="button" class="cc-tag-btn ${currentFocus === 'all' ? 'is-active' : ''}" data-cc-family-focus="all">כל המשפחות</button>
-              <span class="cc-sub">בחירה במשפחה פותחת סשן חדש ממוקד.</span>
             </div>
 
             <div class="cc-breen-grid">
@@ -794,7 +791,6 @@
                     <button type="button" class="cc-breen-cell ${isActive ? 'is-active' : ''} ${isFocus ? 'is-focus' : ''}" data-cell-id="${escapeHtml(cell.id)}" data-cc-family-focus="${escapeHtml(cell.family || '')}">
                       <span class="cc-cell-code">${escapeHtml(cell.label)}</span>
                       <span class="cc-cell-label">${escapeHtml(cell.labelHe || cell.family || cell.id)}</span>
-                      <span class="cc-cell-help">${escapeHtml(helpTexts[cell.family] || '')}</span>
                     </button>
                   `;
               }).join('')}
