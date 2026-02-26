@@ -304,6 +304,17 @@ function ltNormalizeCategoryId(value) {
     return aliases[compact] || compact;
 }
 
+function getLivingTriplesBreenRowMeta(rowId = '') {
+    const map = {
+        row1: { colorClass: 'row-sky', heLabel: 'שלשה 1 — שכבת מקור' },
+        row2: { colorClass: 'row-teal', heLabel: 'שלשה 2 — שכבת חוקים' },
+        row3: { colorClass: 'row-amber', heLabel: 'שלשה 3 — שכבת משמעות' },
+        row4: { colorClass: 'row-violet', heLabel: 'שלשה 4 — שכבת הקשר' },
+        row5: { colorClass: 'row-rose', heLabel: 'שלשה 5 — שכבת קרקע' }
+    };
+    return map[ltNormalizeRowId(rowId)] || map.row1;
+}
+
 function normalizeLivingTriplesScenario(rawScenario, index, rows = []) {
     if (!rawScenario || typeof rawScenario !== 'object') return null;
 
@@ -779,29 +790,57 @@ function resetLivingTriplesRoundState() {
 
 function renderLivingTriplesCategoryButtons() {
     if (!livingTriplesState.elements?.categoryButtons) return;
-    const categories = getLivingTriplesCategories();
     const container = livingTriplesState.elements.categoryButtons;
+    const rows = Array.isArray(livingTriplesDataState.rows) ? livingTriplesDataState.rows : [];
+    const selectedCategoryId = ltNormalizeCategoryId(livingTriplesState.selectedCategory);
+    const selectedRowId = livingTriplesState.categoryResolved
+        ? ltNormalizeRowId(livingTriplesState.activeRow?.id || '')
+        : ltNormalizeRowId(getLivingTriplesRowByCategory(selectedCategoryId)?.id || '');
+
+    container.classList.add('lt-breen-grid-layout');
     container.innerHTML = '';
 
-    categories.forEach(category => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'lt-category-btn';
-        button.dataset.ltCategory = category.id;
-        if (livingTriplesState.selectedCategory === category.id) button.classList.add('is-selected');
-        if (livingTriplesState.categoryResolved) button.disabled = true;
+    rows.forEach((row, rowIndex) => {
+        const rowMeta = getLivingTriplesBreenRowMeta(row.id || `row${rowIndex + 1}`);
+        const rowWrap = document.createElement('section');
+        rowWrap.className = `tr-phone-breen-row lt-category-row ${rowMeta.colorClass || ''}`;
+        if (selectedRowId && ltNormalizeRowId(row.id) === selectedRowId) {
+            rowWrap.classList.add('is-active');
+        }
 
-        const label = document.createElement('span');
-        label.className = 'lt-category-label';
-        label.textContent = category.label || category.id;
+        const rowHead = document.createElement('div');
+        rowHead.className = 'tr-phone-breen-row-head';
+        rowHead.textContent = rowMeta.heLabel || row.label || `Row ${rowIndex + 1}`;
+        rowWrap.appendChild(rowHead);
 
-        const hint = document.createElement('small');
-        hint.className = 'lt-category-hint';
-        hint.textContent = category.rowNumber ? `Row ${category.rowNumber}` : '';
+        const rowCells = document.createElement('div');
+        rowCells.className = 'tr-phone-breen-row-cells';
 
-        button.appendChild(label);
-        button.appendChild(hint);
-        container.appendChild(button);
+        (row.categories || []).forEach((category) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'lt-category-btn lt-category-btn-board';
+            button.dataset.ltCategory = category.id;
+            if (selectedCategoryId && ltNormalizeCategoryId(category.id) === selectedCategoryId) {
+                button.classList.add('is-selected');
+            }
+            if (livingTriplesState.categoryResolved) button.disabled = true;
+
+            const label = document.createElement('span');
+            label.className = 'lt-category-label';
+            label.textContent = category.label || category.id;
+
+            const hint = document.createElement('small');
+            hint.className = 'lt-category-hint';
+            hint.textContent = `Row ${rowIndex + 1}`;
+
+            button.appendChild(label);
+            button.appendChild(hint);
+            rowCells.appendChild(button);
+        });
+
+        rowWrap.appendChild(rowCells);
+        container.appendChild(rowWrap);
     });
 }
 

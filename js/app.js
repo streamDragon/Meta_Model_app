@@ -2667,7 +2667,8 @@ function buildBreenReferenceBoardHtml({
     const normalizedActive = normalizeBreenReferenceCategoryId(activeCategoryId);
     const activeRowId = getBreenReferenceRowIdByCategory(normalizedActive);
     const rows = getBreenReferenceRows();
-    const availableSet = availableCategoryIds instanceof Set ? availableCategoryIds : null;
+    const availableMap = availableCategoryIds instanceof Map ? availableCategoryIds : null;
+    const availableSet = availableMap ? new Set(availableMap.keys()) : (availableCategoryIds instanceof Set ? availableCategoryIds : null);
     const categoryLinkAliases = {
         assumptions: ['presupposition'],
         nominalisations: ['nominalization', 'nominalisation'],
@@ -2687,13 +2688,19 @@ function buildBreenReferenceBoardHtml({
 
             if (mode === 'category-links') {
                 let targetCategoryId = categoryId;
-                if (availableSet && !availableSet.has(targetCategoryId)) {
+                if (availableMap && availableMap.has(targetCategoryId)) {
+                    targetCategoryId = availableMap.get(targetCategoryId) || targetCategoryId;
+                } else if (availableSet && !availableSet.has(targetCategoryId)) {
                     const aliasMatch = (categoryLinkAliases[targetCategoryId] || [])
                         .map(alias => normalizeBreenReferenceCategoryId(alias))
                         .find(alias => availableSet.has(alias));
-                    if (aliasMatch) targetCategoryId = aliasMatch;
+                    if (aliasMatch && availableMap && availableMap.has(aliasMatch)) {
+                        targetCategoryId = availableMap.get(aliasMatch) || aliasMatch;
+                    } else if (aliasMatch) {
+                        targetCategoryId = aliasMatch;
+                    }
                 }
-                const canLink = !availableSet || availableSet.has(targetCategoryId);
+                const canLink = !availableSet || availableSet.has(normalizeBreenReferenceCategoryId(targetCategoryId)) || (availableMap ? Array.from(availableMap.values()).includes(targetCategoryId) : false);
                 const tag = canLink ? 'a' : 'div';
                 const hrefAttr = canLink ? ` href="#pattern-${escapeHtml(targetCategoryId)}" data-breen-pattern-link="${escapeHtml(targetCategoryId)}"` : '';
                 return `
@@ -2780,12 +2787,16 @@ function populateCategories() {
     if (!container) return;
     container.innerHTML = '';
 
-    const availablePatternIds = new Set(
-        (metaModelData.categories || [])
-            .flatMap(category => Array.isArray(category?.subcategories) ? category.subcategories : [])
-            .map(subcategory => normalizeBreenReferenceCategoryId(subcategory?.id || ''))
-            .filter(Boolean)
-    );
+    const availablePatternIds = new Map();
+    (metaModelData.categories || [])
+        .flatMap(category => Array.isArray(category?.subcategories) ? category.subcategories : [])
+        .forEach((subcategory) => {
+            const actualId = String(subcategory?.id || '').trim();
+            const normalizedId = normalizeBreenReferenceCategoryId(actualId);
+            if (normalizedId && actualId && !availablePatternIds.has(normalizedId)) {
+                availablePatternIds.set(normalizedId, actualId);
+            }
+        });
 
     const breenBoard = document.createElement('section');
     breenBoard.className = 'categories-breen-board';

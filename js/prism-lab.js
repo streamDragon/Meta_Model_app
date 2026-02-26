@@ -23,6 +23,53 @@
     { id: 'context_place', icon: '📍', nameHe: 'מקום/הקשר', desc: 'ממפים טריגרים סביבתיים והקשר.', q: 'איפה/באיזה הקשר X?', type: 'context' },
     { id: 'logical_levels', icon: '🗼', nameHe: 'רמות לוגיות', desc: 'מזהים רמה וקפיצות רמה.', q: 'באיזו רמה אתה מדבר עכשיו?', type: 'levels' }
   ];
+
+  const BREEN_ROWS = Object.freeze([
+    Object.freeze({ id: 'row1', categories: Object.freeze(['lost_performative', 'assumptions', 'mind_reading']) }),
+    Object.freeze({ id: 'row2', categories: Object.freeze(['universal_quantifier', 'modal_operator', 'cause_effect']) }),
+    Object.freeze({ id: 'row3', categories: Object.freeze(['nominalisations', 'identity_predicates', 'complex_equivalence']) }),
+    Object.freeze({ id: 'row4', categories: Object.freeze(['comparative_deletion', 'time_space_predicates', 'lack_referential_index']) }),
+    Object.freeze({ id: 'row5', categories: Object.freeze(['non_referring_nouns', 'sensory_predicates', 'unspecified_verbs']) })
+  ]);
+
+  const BREEN_ROW_META = Object.freeze({
+    row1: Object.freeze({ colorClass: 'row-sky', heLabel: 'שלשה 1 — שכבת מקור' }),
+    row2: Object.freeze({ colorClass: 'row-teal', heLabel: 'שלשה 2 — שכבת חוקים' }),
+    row3: Object.freeze({ colorClass: 'row-amber', heLabel: 'שלשה 3 — שכבת משמעות' }),
+    row4: Object.freeze({ colorClass: 'row-violet', heLabel: 'שלשה 4 — שכבת הקשר' }),
+    row5: Object.freeze({ colorClass: 'row-rose', heLabel: 'שלשה 5 — שכבת קרקע' })
+  });
+
+  const BREEN_LABELS_HE = Object.freeze({
+    lost_performative: 'שיפוט חסר מקור',
+    assumptions: 'הנחות סמויות',
+    mind_reading: 'קריאת מחשבות',
+    universal_quantifier: 'כמת כוללני',
+    modal_operator: 'מודל אופרטור',
+    cause_effect: 'סיבה ותוצאה',
+    nominalisations: 'נומינליזציה',
+    identity_predicates: 'זהות',
+    complex_equivalence: 'שקילות מורכבת',
+    comparative_deletion: 'השוואה חסרה',
+    time_space_predicates: 'זמן ומרחב',
+    lack_referential_index: 'חוסר ייחוס',
+    non_referring_nouns: 'שמות לא מפנים',
+    sensory_predicates: 'פרדיקטים חושיים',
+    unspecified_verbs: 'פועל לא מפורט'
+  });
+
+  const BREEN_PRISM_ALIASES = Object.freeze({
+    presupposition: 'assumptions',
+    nominalization: 'nominalisations',
+    necessity_modal: 'modal_operator',
+    possibility_modal: 'modal_operator',
+    comparison: 'comparative_deletion',
+    unspecified_noun: 'non_referring_nouns',
+    unspecified_verb: 'unspecified_verbs',
+    unspecified_time: 'time_space_predicates',
+    context_place: 'time_space_predicates'
+  });
+
   const PRISM_BY_ID = Object.fromEntries(PRISMS.map((p) => [p.id, p]));
 
   const state = {
@@ -44,6 +91,12 @@
 
   function norm(v) {
     return String(v || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function normalizeBreenPrismId(prismId) {
+    const raw = String(prismId || '').trim().toLowerCase().replace(/\s+/g, '_');
+    if (!raw) return '';
+    return BREEN_PRISM_ALIASES[raw] || raw;
   }
 
   function splitSentences(text) {
@@ -337,6 +390,52 @@
     `).join('');
   }
 
+  function renderBreenReferenceBoard() {
+    const activeId = normalizeBreenPrismId(state.selectedPrismId);
+    const activeRowId = BREEN_ROWS.find((row) => row.categories.includes(activeId))?.id || '';
+
+    const rowsHtml = BREEN_ROWS.map((row) => {
+      const meta = BREEN_ROW_META[row.id] || BREEN_ROW_META.row1;
+      const isActiveRow = !!activeRowId && activeRowId === row.id;
+      const cellsHtml = row.categories.map((categoryId) => {
+        const isActive = !!activeId && activeId === categoryId;
+        const classes = ['pl-breen-cell'];
+        if (isActiveRow) classes.push('is-row');
+        if (isActive) classes.push('is-active');
+        return `
+          <div class="${classes.join(' ')}">
+            <span class="pl-breen-chip">${esc((categoryId || '').slice(0, 2).toUpperCase())}</span>
+            <small>${esc(BREEN_LABELS_HE[categoryId] || categoryId)}</small>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="pl-breen-row ${esc(meta.colorClass || '')}${isActiveRow ? ' is-active' : ''}">
+          <div class="pl-breen-row-head">${esc(meta.heLabel || row.id)}</div>
+          <div class="pl-breen-row-cells">${cellsHtml}</div>
+        </div>
+      `;
+    }).join('');
+
+    const selectedPrismName = state.selectedPrismId && PRISM_BY_ID[state.selectedPrismId]
+      ? PRISM_BY_ID[state.selectedPrismId].nameHe
+      : '';
+    const note = selectedPrismName
+      ? (activeId
+          ? `הפריזמה הנבחרת (${selectedPrismName}) מסומנת בטבלת ברין כשיש התאמה ישירה/אליאס.`
+          : `הפריזמה הנבחרת (${selectedPrismName}) היא הרחבה שאינה תא ברין ישיר.`)
+      : 'טבלת ברין משמשת כמפת עוגן (5×3) בין העדשות השונות.';
+
+    return `
+      <section class="pl-card pl-breen-board">
+        <h2>טבלת ברין — מפת 5×3</h2>
+        <p class="pl-kicker">${esc(note)}</p>
+        <div class="pl-breen-grid">${rowsHtml}</div>
+      </section>
+    `;
+  }
+
   function renderStep(step, idx, p, ex) {
     const visible = ex.visible >= idx + 1;
     if (!visible) return '';
@@ -454,6 +553,8 @@
                 <button type="button" class="pl-btn" data-action="clear-draft">נקה טיוטה</button>
               </div>
             </section>
+
+            ${renderBreenReferenceBoard()}
 
             <section class="pl-card">
               <h2>15 פריזמות</h2>

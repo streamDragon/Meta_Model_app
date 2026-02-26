@@ -674,6 +674,37 @@
             .filter(Boolean);
     }
 
+    function renderClassicBreenReferenceBoard() {
+        const rows = [
+            { id: 'row1', title: 'שלשה 1 — שכבת מקור', cells: ['שיפוט חסר מקור', 'הנחות סמויות', 'קריאת מחשבות'] },
+            { id: 'row2', title: 'שלשה 2 — שכבת חוקים', cells: ['כמת כוללני', 'מודל אופרטור', 'סיבה ותוצאה'] },
+            { id: 'row3', title: 'שלשה 3 — שכבת משמעות', cells: ['נומינליזציה', 'זהות', 'שקילות מורכבת'] },
+            { id: 'row4', title: 'שלשה 4 — שכבת הקשר', cells: ['השוואה חסרה', 'זמן ומרחב', 'חוסר ייחוס'] },
+            { id: 'row5', title: 'שלשה 5 — שכבת קרקע', cells: ['שמות לא מפנים', 'פרדיקטים חושיים', 'פועל לא מפורט'] }
+        ];
+
+        return `
+            <div class="prm-breen-5x3-wrap" aria-label="טבלת ברין קלאסית 5x3">
+                <div class="prm-breen-5x3-title">טבלת ברין הקלאסית (5×3) — מפת עוגן</div>
+                <p class="prm-breen-5x3-note">זוהי מפת הייחוס הקבועה. מתחתיה נשאר הלוח האינטראקטיבי של Prism Research (Inside/Outside map).</p>
+                <div class="prm-breen-5x3-grid">
+                    ${rows.map((row) => `
+                        <div class="prm-breen-5x3-row ${escapeHtml(row.id)}">
+                            <div class="prm-breen-5x3-row-head">${escapeHtml(row.title)}</div>
+                            <div class="prm-breen-5x3-row-cells">
+                                ${row.cells.map((label) => `
+                                    <div class="prm-breen-5x3-cell">
+                                        <span>${escapeHtml(label)}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
     function renderBreenCategoryBoard() {
         const stats = state.session ? core.computeStats(state.session) : { categoryCounts: {} };
         const outside = getOrderedCategoriesByIds(PRISM_BREEN_OUTSIDE_ORDER);
@@ -710,6 +741,7 @@
 
         return `
             <div class="prm-breen-board-wrap">
+                ${renderClassicBreenReferenceBoard()}
                 <div class="prm-breen-board-head">
                     <div class="prm-breen-head-col outside">
                         <strong>OUTSIDE THEIR MAP</strong>

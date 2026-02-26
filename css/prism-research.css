@@ -393,6 +393,68 @@ body {
   line-height: 1.35;
 }
 
+.prm-breen-5x3-wrap {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(37, 99, 235, 0.14);
+  border-radius: 12px;
+  background: rgba(248, 251, 255, 0.92);
+}
+
+.prm-breen-5x3-title {
+  font-weight: 800;
+  color: #1e3a8a;
+  font-size: 13px;
+}
+
+.prm-breen-5x3-note {
+  margin: 0;
+  color: var(--prm-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.prm-breen-5x3-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.prm-breen-5x3-row {
+  border: 1px solid var(--prm-line);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.9);
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+.prm-breen-5x3-row-head {
+  font-size: 12px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.prm-breen-5x3-row-cells {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.prm-breen-5x3-cell {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 10px;
+  background: #fff;
+  min-height: 46px;
+  padding: 6px;
+  display: grid;
+  align-items: center;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.25;
+  color: #334155;
+}
+
 .prm-breen-board-wrap {
   margin-top: 8px;
   display: grid;
@@ -898,6 +960,10 @@ body {
 
   .prm-breen-cell {
     min-height: 82px;
+  }
+
+  .prm-breen-5x3-row-cells {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .prm-nav-actions {
