@@ -1,0 +1,4532 @@
+{
+  "generatedAt": "2026-02-26T17:55:57.430Z",
+  "baseUrl": "http://127.0.0.1:4173/index.html",
+  "bootstrap": {
+    "status": 200,
+    "finalUrl": "http://127.0.0.1:4173/index.html",
+    "issues": {
+      "consoleErrors": [],
+      "pageErrors": [],
+      "requestFailures": [],
+      "topLevelResponses": [
+        {
+          "url": "http://127.0.0.1:4173/index.html",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+          "status": 200,
+          "method": "GET"
+        }
+      ],
+      "action": {
+        "mode": "bootstrap",
+        "targetUrl": "http://127.0.0.1:4173/index.html"
+      }
+    }
+  },
+  "counts": {
+    "candidates": 104,
+    "ok": 33,
+    "broken": 0,
+    "skipped": 71,
+    "mainMenuBroken": 0
+  },
+  "items": [
+    {
+      "text": "Classic 1 · Classic Classic",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/classic_classic_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.56&t=1772127540624",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.56&t=1772127540624",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/classic-classic.css?v=1772128465088",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/classic-classic-config.js?v=1772128465088",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/classic-classic-rng.js?v=1772128465088",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/classic-classic-engine.js?v=1772128465088",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/classic-classic-app.js?v=1772128465088",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/metaModelPatterns.he.json?v=1772128465088",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/copy.he.json?v=1772128465088",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.56&t=1772127540624"
+        }
+      }
+    },
+    {
+      "text": "Classic 2 · Structure of Magic",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/classic2_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.56&t=1772127540624",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.56&t=1772127540624",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/version.json?_classic2=1772128466046-8sdvt1gupz",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/classic2-trainer.bundle.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.56&t=1772127540624"
+        }
+      }
+    },
+    {
+      "text": "קצה קרחון / שלדי עומק",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/iceberg_templates_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.56&t=1772127540624",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.56&t=1772127540624",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/version.json?_iceberg=1772128466979-pvxgksk4tk",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/iceberg-templates-trainer.bundle.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/iceberg-templates-scenarios.he.json?v=1.0.56-1772127540624",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.56&t=1772127540624"
+        }
+      }
+    },
+    {
+      "text": "Prism Research · חקירת טקסט",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/prism_research_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.56&t=1772127540624",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.56&t=1772127540624",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/prism-research.css?v=1772128467894",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-core.js?v=1772128467894",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1772128467894",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-app.js?v=1772128467894",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/metaModelPatterns.he.json?v=1772128467894",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.56&t=1772127540624"
+        }
+      }
+    },
+    {
+      "text": "Living Triples",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/living_triples_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.56&t=1772127540624",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.56&t=1772127540624",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1772128468802",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/living-triples.js?v=1772128468802",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/living-triples.json",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.56&t=1772127540624"
+        }
+      }
+    },
+    {
+      "text": "Unzip Trainer",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/verb_unzip_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.56&t=1772127540624",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.56&t=1772127540624",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.56&t=1772127540624"
+        }
+      }
+    },
+    {
+      "text": "Sentence Morpher",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/sentence_morpher_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.56&t=1772127540624",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.56&t=1772127540624",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1772128470717",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/sentence-morpher-core.js?v=1772128470717",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/sentence-morpher.js?v=1772128470717",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sentence-morpher-exercises.json",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.56&t=1772127540624"
+        }
+      }
+    },
+    {
+      "text": "LP שיפוט חסר מקור",
+      "selector": "a[href=\"\\#pattern-lost_performative\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/index.html#pattern-lost_performative",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-lost_performative",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-lost_performative"
+        }
+      }
+    },
+    {
+      "text": "AS הנחות סמויות",
+      "selector": "a[href=\"\\#pattern-presupposition\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/index.html#pattern-presupposition",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-presupposition",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-presupposition"
+        }
+      }
+    },
+    {
+      "text": "MR קריאת מחשבות",
+      "selector": "a[href=\"\\#pattern-mind_reading\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/index.html#pattern-mind_reading",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-mind_reading",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-mind_reading"
+        }
+      }
+    },
+    {
+      "text": "UQ כמת כוללני",
+      "selector": "a[href=\"\\#pattern-universal_quantifier\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/index.html#pattern-universal_quantifier",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-universal_quantifier",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-universal_quantifier"
+        }
+      }
+    },
+    {
+      "text": "MO מודל אופרטור",
+      "selector": "a[href=\"\\#pattern-modal_operator\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/index.html#pattern-modal_operator",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-modal_operator",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-modal_operator"
+        }
+      }
+    },
+    {
+      "text": "CE סיבה ותוצאה",
+      "selector": "a[href=\"\\#pattern-cause_effect\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/index.html#pattern-cause_effect",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-cause_effect",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-cause_effect"
+        }
+      }
+    },
+    {
+      "text": "NM נומינליזציה",
+      "selector": "a[href=\"\\#pattern-nominalization\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/index.html#pattern-nominalization",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-nominalization",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-nominalization"
+        }
+      }
+    },
+    {
+      "text": "CEq שקילות מורכבת",
+      "selector": "a[href=\"\\#pattern-complex_equivalence\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/index.html#pattern-complex_equivalence",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-complex_equivalence",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-complex_equivalence"
+        }
+      }
+    },
+    {
+      "text": "CD השוואה חסרה",
+      "selector": "a[href=\"\\#pattern-comparative_deletion\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/index.html#pattern-comparative_deletion",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-comparative_deletion",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-comparative_deletion"
+        }
+      }
+    },
+    {
+      "text": "RI חוסר ייחוס",
+      "selector": "a[href=\"\\#pattern-lack_referential_index\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/index.html#pattern-lack_referential_index",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-lack_referential_index",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-lack_referential_index"
+        }
+      }
+    },
+    {
+      "text": "NN שמות לא מפנים",
+      "selector": "a[href=\"\\#pattern-simple_deletion\"]",
+      "kind": "anchor",
+      "intended": "http://127.0.0.1:4173/index.html#pattern-simple_deletion",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-simple_deletion",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-simple_deletion"
+        }
+      }
+    },
+    {
+      "text": "GitHub Repository",
+      "selector": "a[href=\"https\\:\\/\\/github\\.com\\/streamDragon\\/Meta_Model_app\"]",
+      "kind": "anchor",
+      "intended": "https://github.com/streamDragon/Meta_Model_app",
+      "mode": "goto",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "https://github.com/streamDragon/Meta_Model_app",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [
+          {
+            "url": "https://github.com/streamDragon/Meta_Model_app/hovercards/citation/sidebar_partial?tree_name=main",
+            "method": "GET",
+            "errorText": "net::ERR_ABORTED",
+            "resourceType": "fetch"
+          }
+        ],
+        "topLevelResponses": [
+          {
+            "url": "https://github.com/streamDragon/Meta_Model_app",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/light-8f714f203754d3e3.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/light_high_contrast-852c22d357937740.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/dark-b5a0f9dbeed37e9c.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/github-8ecc5798f0584cac.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/93110.295addbaf970606b.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/dark_high_contrast-b1b5000c4cba6bc9.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/react-core.254a044618331903.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/repository-dd7b55261c401703.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/notifications-subscriptions-menu.c495fe07c1fdb46e.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/code-bedb41adf21fe337.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/global-95af332f763e4560.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/primer-bcf0a93b19072a86.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/primer-primitives-26e89bb5a0c37ae9.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/marketing-navigation.c8b0b6074a452510.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/46358.9c6d6fd14d9d1f8f.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/primer-react-css.472b5991857bf128.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/high-contrast-cookie-9c894bc29dbadce2.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/wp-runtime-332a402739f01442.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/28839-632d00a964e8dbd5.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/49863-8861e351482cb073.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/64220-deafac6136d536ed.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/runtime-helpers-3cd71e27e349021d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/environment-8e076be5f2ee950d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/2966-25cb8e34b31306a4.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/51210-185739338ae8119b.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/96232-fb82336d69225835.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/github-elements-837d26c249ef0f1d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/46740-84bdd4782a486b80.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/81751-d3fe9e061a21f8d3.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/81683-740d112caee5baa9.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/element-registry-77705dcf8f1c5392.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/7053-20b4a6914bbde21f.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/41013-ac21ea90ed8590af.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/react-core-4e607900bfb1765d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/24387-6b7f5e596897eded.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/react-lib-e74a1db7c21f7e74.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/61110-212553c409076913.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/62249-2895213a788d973c.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/2887-0e9a84f5dc250853.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/79039-9ce5da88e09eef89.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/2694-372ce035e93800e0.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/26533-6b8040883d16f6ae.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/30476-099261a2e3d4cf14.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/56093-3c4afcfd31bec219.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/22960-12a7c572a55f9c87.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/38302-277be92deeed3c63.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/76545-cf3621a1f2f36d8d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/51683-f6844a8acd415e3b.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/notifications-global-fc52e59df1c89647.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/26093-41ccbaed136aa43d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/32225-787d18790ca43912.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/92351-7bc542feb2bc5250.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/codespaces-d828f57ddbc7b41a.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/code-menu-439b5f9254c8b840.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/behaviors-150a92b9e2d67c9f.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/repositories-58788c17bc3a06ed.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/28360-f4444f13a0dc6af9.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/99291-ef227718ed886fe7.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/89756-e7c55d48f60b581d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/3064-ff9d0f819c141e10.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/65316-c849c86dc66fef72.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/70168.e22cbb4c48f049f8.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/78168-dda25026ab7e88b8.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/68751-4d3d1aac1f81a213.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/11864-2cac855ca554fc43.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/51597-90368bb51b82ae4f.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/notifications-subscriptions-menu-d4b3ac512d9e7fdd.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/55398-c408961da2ad0d9b.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/93308-bf887482583069d7.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/sessions-ef46f0030f2d06d6.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/octicons-react-39f7eb9c9327cc85.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/46752-4c55523fe83d3457.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/primer-react-9537ac79f0a3d832.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-21631-7b44e09c8aa8bae4.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-39433-05e4c28439011a7a.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-51121-6c45293ab72d80a4.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/35204-746d7d6e6799f847.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/62758-a82ebda28357a9b1.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-76725-d7e9aba06d379264.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/73494-006cc0da9ef70376.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/9751-4eacd5880f7fd2f3.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-15640-e7e5ab3105b2e17d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-19008-b161acd372b75775.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-38631-7a25773e89f0c5a2.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/58850-450dc451601609a9.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/22843-5258188d3a16318a.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/87640-1093f490768cb7ff.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-14451-be95ace004a5c675.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/91088-d78b1f1a89e88bc2.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/99602-4f0a0da8ab307329.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-30368-d1bfa5a135efeae3.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/7463-2a94d884e276b7f9.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/lazy-react-partial-keyboard-shortcuts-dialog-087eec09f8fd3a41.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/15272-ef674e7caa43f3d4.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/71236-7c82c9609b2bcb51.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/73945-3ca042c5784812d6.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/437-ed451d0ef5202580.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/41954-50d9d252ed7dfcc6.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/68557-ba609e11988efb67.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/97274-95fb76b77ffabc73.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/78563-887dd48b0f36941b.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/99849-ddbe5989b6cb6eb0.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/38593-b96dc75b3f58efb5.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/46358-c04dd332cfeef146.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/lazy-react-partial-repos-overview-2efcc5b7360f5c6d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/61093-d8a5a5e5e705b7b7.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/86071-1432f72559cfd118.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/93110-2e59e31b9a670a1f.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-3735-ad1b443bf082a03f.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.com/streamDragon/Meta_Model_app/hovercards/citation/sidebar_partial?tree_name=main",
+            "status": 204,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/appearance-settings.f3eb0e28f3a950df.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-85825-2b0ba509cdf93b03.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/71849.d0eafa15d4f4abca.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/7759-2b6cfa446ca53dd8.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/90040-9fe6b8de37a6e228.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/85507.d4fe93c6f4ff9a03.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-85507-9bceccd28f7e0116.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/43142-4374369079f91842.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.com/streamDragon/Meta_Model_app/refs?type=branch",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.com/streamDragon/Meta_Model_app/branch-and-tag-count",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.com/streamDragon/Meta_Model_app/tree-commit-info/main",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.com/streamDragon/Meta_Model_app/latest-commit/main",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/88235.93f7ec340fb2b13f.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-88235-fda227c5a1bf1fd6.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://api.github.com/_private/browser/stats",
+            "status": 200,
+            "method": "POST"
+          },
+          {
+            "url": "https://avatars.githubusercontent.com/u/64856880?v=4&size=40",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "goto",
+          "targetUrl": "https://github.com/streamDragon/Meta_Model_app"
+        }
+      }
+    },
+    {
+      "text": "✕",
+      "selector": "html > body.hide-top-tabbar.compact-header > div.container:nth-of-type(4) > header > div.onboarding-hint > button.close-hint",
+      "kind": "button",
+      "intended": "closeHint()",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "בית",
+      "selector": ".tab-btn[data-tab=\"home\"]",
+      "kind": "tab-button",
+      "intended": "home",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "סצנות Execution",
+      "selector": ".tab-btn[data-tab=\"scenario-trainer\"]",
+      "kind": "tab-button",
+      "intended": "scenario-trainer",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Comic Engine",
+      "selector": ".tab-btn[data-tab=\"comic-engine\"]",
+      "kind": "tab-button",
+      "intended": "comic-engine",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קטגוריות",
+      "selector": ".tab-btn[data-tab=\"categories\"]",
+      "kind": "tab-button",
+      "intended": "categories",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "תרגול שאלות",
+      "selector": ".tab-btn[data-tab=\"practice-question\"]",
+      "kind": "tab-button",
+      "intended": "practice-question",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Meta Radar",
+      "selector": ".tab-btn[data-tab=\"practice-radar\"]",
+      "kind": "tab-button",
+      "intended": "practice-radar",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Triples Radar",
+      "selector": ".tab-btn[data-tab=\"practice-triples-radar\"]",
+      "kind": "tab-button",
+      "intended": "practice-triples-radar",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "גשר תחושה-שפה",
+      "selector": ".tab-btn[data-tab=\"practice-wizard\"]",
+      "kind": "tab-button",
+      "intended": "practice-wizard",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "פועל לא מפורט",
+      "selector": ".tab-btn[data-tab=\"practice-verb-unzip\"]",
+      "kind": "tab-button",
+      "intended": "practice-verb-unzip",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Blueprint Builder",
+      "selector": ".tab-btn[data-tab=\"blueprint\"]",
+      "kind": "tab-button",
+      "intended": "blueprint",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "מעבדת פריזמות",
+      "selector": ".tab-btn[data-tab=\"prismlab\"]",
+      "kind": "tab-button",
+      "intended": "prismlab",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "על הפרויקט",
+      "selector": ".tab-btn[data-tab=\"about\"]",
+      "kind": "tab-button",
+      "intended": "about",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "פתח",
+      "selector": "div.container:nth-of-type(4) > details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-menu-box:nth-of-type(1) > div.feature-map-menu-controls:nth-of-type(2) > button.btn.btn-primary",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Prism Lab · רמות לוגיות",
+      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(2) > div.feature-map-links > button.btn.btn-secondary",
+      "kind": "button",
+      "intended": "prismlab",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Triples Radar (Breen)",
+      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(3) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "practice-triples-radar",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קטגוריות (עם ברין)",
+      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(3) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(2)",
+      "kind": "button",
+      "intended": "categories",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "תרגול שאלות",
+      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(4) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "practice-question",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Meta Radar",
+      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(4) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(2)",
+      "kind": "button",
+      "intended": "practice-radar",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "גשר תחושה-שפה",
+      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(4) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(3)",
+      "kind": "button",
+      "intended": "practice-wizard",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Blueprint Builder",
+      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(4) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(4)",
+      "kind": "button",
+      "intended": "blueprint",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Comic Engine",
+      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(4) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(5)",
+      "kind": "button",
+      "intended": "comic-engine",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Scenario Trainer",
+      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(4) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(6)",
+      "kind": "button",
+      "intended": "scenario-trainer",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "איפוס מצב מקומי (UI)",
+      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(5) > div.feature-map-links:nth-of-type(2) > button.btn.btn-secondary",
+      "kind": "button",
+      "intended": "resetLocalUiState()",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "לתרגול",
+      "selector": "#global-comic-main-practice",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "מעבר לתרגול בסצנה",
+      "selector": "#comicPreviewGoPractice",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "פתח Prism Lab",
+      "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(2) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-primary",
+      "kind": "button",
+      "intended": "prismlab",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(2) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-primary"
+        }
+      }
+    },
+    {
+      "text": "גשר תחושה-שפה",
+      "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(3) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-secondary",
+      "kind": "button",
+      "intended": "practice-wizard",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(3) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-secondary"
+        }
+      }
+    },
+    {
+      "text": "תרגול שאלות",
+      "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(4) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-secondary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "practice-question",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(4) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-secondary:nth-of-type(1)"
+        }
+      }
+    },
+    {
+      "text": "Meta Radar",
+      "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(4) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-secondary:nth-of-type(2)",
+      "kind": "button",
+      "intended": "practice-radar",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(4) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-secondary:nth-of-type(2)"
+        }
+      }
+    },
+    {
+      "text": "Triples Radar",
+      "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(5) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-secondary",
+      "kind": "button",
+      "intended": "practice-triples-radar",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/triples-radar-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(5) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-secondary"
+        }
+      }
+    },
+    {
+      "text": "Scenario Trainer",
+      "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(6) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "scenario-trainer",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(6) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-primary:nth-of-type(1)"
+        }
+      }
+    },
+    {
+      "text": "Comic Engine",
+      "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(6) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-secondary:nth-of-type(2)",
+      "kind": "button",
+      "intended": "comic-engine",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/characters/%D7%A0%D7%95%D7%A2%D7%9D.svg",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/characters/%D7%9E%D7%90%D7%99%D7%94.svg",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/stickers/badges/%D7%AA%D7%92%D7%95%D7%91%D7%94_%D7%A0%D7%90%D7%99%D7%91%D7%99%D7%AA.svg",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/stickers/badges/%D7%94%D7%A6%D7%9C%D7%94_%D7%91%D7%9E%D7%A7%D7%95%D7%9D.svg",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/stickers/badges/%D7%A1%D7%A7%D7%A8%D7%A0%D7%95%D7%AA_%D7%9E%D7%98%D7%94_%D7%9E%D7%95%D7%93%D7%9C.svg",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/stickers/badges/%D7%9C%D7%A2%D7%92_%D7%95%D7%94%D7%A9%D7%95%D7%95%D7%90%D7%94.svg",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(6) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-secondary:nth-of-type(2)"
+        }
+      }
+    },
+    {
+      "text": "Blueprint",
+      "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(6) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-secondary:nth-of-type(3)",
+      "kind": "button",
+      "intended": "blueprint",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "div.home-therapy-demo:nth-of-type(2) > div.home-therapy-demo-flow:nth-of-type(2) > article.home-therapy-step:nth-of-type(6) > div.home-therapy-step-body:nth-of-type(2) > div.home-therapy-step-actions > button.btn.btn-secondary:nth-of-type(3)"
+        }
+      }
+    },
+    {
+      "text": "סצנות Execution",
+      "selector": "div.container:nth-of-type(4) > section.tab-content.active:nth-of-type(2) > div.card > div.cta-section.cta-section-compact:nth-of-type(3) > div.cta-buttons.cta-buttons-compact > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "scenario-trainer",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "div.container:nth-of-type(4) > section.tab-content.active:nth-of-type(2) > div.card > div.cta-section.cta-section-compact:nth-of-type(3) > div.cta-buttons.cta-buttons-compact > button.btn.btn-primary:nth-of-type(1)"
+        }
+      }
+    },
+    {
+      "text": "Prism Lab (רמות לוגיות)",
+      "selector": "div.container:nth-of-type(4) > section.tab-content.active:nth-of-type(2) > div.card > div.cta-section.cta-section-compact:nth-of-type(3) > div.cta-buttons.cta-buttons-compact > button.btn.btn-primary:nth-of-type(2)",
+      "kind": "button",
+      "intended": "prismlab",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "div.container:nth-of-type(4) > section.tab-content.active:nth-of-type(2) > div.card > div.cta-section.cta-section-compact:nth-of-type(3) > div.cta-buttons.cta-buttons-compact > button.btn.btn-primary:nth-of-type(2)"
+        }
+      }
+    },
+    {
+      "text": "Meta Radar",
+      "selector": "div.container:nth-of-type(4) > section.tab-content.active:nth-of-type(2) > div.card > div.cta-section.cta-section-compact:nth-of-type(3) > div.cta-buttons.cta-buttons-compact > button.btn.btn-secondary:nth-of-type(3)",
+      "kind": "button",
+      "intended": "practice-radar",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "div.container:nth-of-type(4) > section.tab-content.active:nth-of-type(2) > div.card > div.cta-section.cta-section-compact:nth-of-type(3) > div.cta-buttons.cta-buttons-compact > button.btn.btn-secondary:nth-of-type(3)"
+        }
+      }
+    },
+    {
+      "text": "גשר תחושה-שפה",
+      "selector": "div.container:nth-of-type(4) > section.tab-content.active:nth-of-type(2) > div.card > div.cta-section.cta-section-compact:nth-of-type(3) > div.cta-buttons.cta-buttons-compact > button.btn.btn-secondary:nth-of-type(4)",
+      "kind": "button",
+      "intended": "practice-wizard",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "div.container:nth-of-type(4) > section.tab-content.active:nth-of-type(2) > div.card > div.cta-section.cta-section-compact:nth-of-type(3) > div.cta-buttons.cta-buttons-compact > button.btn.btn-secondary:nth-of-type(4)"
+        }
+      }
+    },
+    {
+      "text": "MENU ⤴",
+      "selector": "#home-open-feature-map",
+      "kind": "button",
+      "intended": "click",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "#home-open-feature-map"
+        }
+      }
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "body.hide-top-tabbar.compact-header > div.container:nth-of-type(4) > section.tab-content:nth-of-type(3) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "div.scenario-trainer-container:nth-of-type(2) > div.card.scenario-trainer-card > div.scenario-screen:nth-of-type(2) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "🎬 סצנות",
+      "selector": "#scenario-home-scenes",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "div.scenario-trainer-container:nth-of-type(2) > div.card.scenario-trainer-card > div.scenario-screen.hidden:nth-of-type(3) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "התחל סשן סצנות",
+      "selector": "#scenario-start-run-btn",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "div.scenario-trainer-container:nth-of-type(2) > div.card.scenario-trainer-card > div.scenario-screen.hidden:nth-of-type(4) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "div.scenario-trainer-container:nth-of-type(2) > div.card.scenario-trainer-card > div.scenario-screen.hidden:nth-of-type(5) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "div.scenario-trainer-container:nth-of-type(2) > div.card.scenario-trainer-card > div.scenario-screen.hidden:nth-of-type(6) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "div.scenario-trainer-container:nth-of-type(2) > div.card.scenario-trainer-card > div.scenario-screen.hidden:nth-of-type(7) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "חזרה לבית הסצנות",
+      "selector": "#scenario-back-home-btn",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "div.scenario-trainer-container:nth-of-type(2) > div.card.scenario-trainer-card > div.scenario-screen.hidden:nth-of-type(8) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "div.scenario-trainer-container:nth-of-type(2) > div.card.scenario-trainer-card > div.scenario-screen.hidden:nth-of-type(9) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "body.hide-top-tabbar.compact-header > div.container:nth-of-type(4) > section.tab-content:nth-of-type(4) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "ג… מטה-מודל בוא נפרק: מה ניסית? באיזה שלב נתקעת?",
+      "selector": "section.tab-content:nth-of-type(4) > div.card.comic-engine-shell:nth-of-type(2) > section.ceflow-engine > section:nth-of-type(1) > div.ceflow-choice-deck > button.ceflow-choice.ceflow-tone-good:nth-of-type(5)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "body.hide-top-tabbar.compact-header > div.container:nth-of-type(4) > section.tab-content:nth-of-type(5) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "body.hide-top-tabbar.compact-header > div.container:nth-of-type(4) > section.tab-content:nth-of-type(6) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "body.hide-top-tabbar.compact-header > div.container:nth-of-type(4) > section.tab-content.practice-tab-content:nth-of-type(7) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "body.hide-top-tabbar.compact-header > div.container:nth-of-type(4) > section.tab-content.practice-tab-content:nth-of-type(8) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "body.hide-top-tabbar.compact-header > div.container:nth-of-type(4) > section.tab-content.practice-tab-content:nth-of-type(9) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "body.hide-top-tabbar.compact-header > div.container:nth-of-type(4) > section.tab-content.practice-tab-content:nth-of-type(10) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "דיאלוג חדש",
+      "selector": "#wr2w-next-scene",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "משפט אישי לתרגול",
+      "selector": "#wr2w-self-toggle",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "הוסף לתרגול",
+      "selector": "#wr2w-self-add",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "body.hide-top-tabbar.compact-header > div.container:nth-of-type(4) > section.tab-content.practice-tab-content:nth-of-type(11) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "בלי טבלאות ברין",
+      "selector": "section.tab-content.practice-tab-content:nth-of-type(11) > div.practice-container:nth-of-type(2) > div.card.practice-intro-card > div.feature-launcher.feature-launcher--compact:nth-of-type(1) > div.feature-launcher-tabs:nth-of-type(3) > button.feature-launcher-tab.is-active:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "עם טבלאות ברין",
+      "selector": "section.tab-content.practice-tab-content:nth-of-type(11) > div.practice-container:nth-of-type(2) > div.card.practice-intro-card > div.feature-launcher.feature-launcher--compact:nth-of-type(1) > div.feature-launcher-tabs:nth-of-type(3) > button.feature-launcher-tab:nth-of-type(2)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "תרגול שאלות",
+      "selector": "div.practice-container:nth-of-type(2) > div.card.practice-intro-card > div.feature-launcher.feature-launcher--compact:nth-of-type(1) > div.feature-launcher-panel.is-active:nth-of-type(4) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "practice-question",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Meta Radar",
+      "selector": "div.practice-container:nth-of-type(2) > div.card.practice-intro-card > div.feature-launcher.feature-launcher--compact:nth-of-type(1) > div.feature-launcher-panel.is-active:nth-of-type(4) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(2)",
+      "kind": "button",
+      "intended": "practice-radar",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "גשר תחושה-שפה",
+      "selector": "div.practice-container:nth-of-type(2) > div.card.practice-intro-card > div.feature-launcher.feature-launcher--compact:nth-of-type(1) > div.feature-launcher-panel.is-active:nth-of-type(4) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(3)",
+      "kind": "button",
+      "intended": "practice-wizard",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Blueprint Builder",
+      "selector": "div.practice-container:nth-of-type(2) > div.card.practice-intro-card > div.feature-launcher.feature-launcher--compact:nth-of-type(1) > div.feature-launcher-panel.is-active:nth-of-type(4) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(4)",
+      "kind": "button",
+      "intended": "blueprint",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Prism Lab · רמות לוגיות",
+      "selector": "div.practice-container:nth-of-type(2) > div.card.practice-intro-card > div.feature-launcher.feature-launcher--compact:nth-of-type(1) > div.feature-launcher-panel.is-active:nth-of-type(4) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(5)",
+      "kind": "button",
+      "intended": "prismlab",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Comic Engine",
+      "selector": "div.practice-container:nth-of-type(2) > div.card.practice-intro-card > div.feature-launcher.feature-launcher--compact:nth-of-type(1) > div.feature-launcher-panel.is-active:nth-of-type(4) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(6)",
+      "kind": "button",
+      "intended": "comic-engine",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Scenario Trainer",
+      "selector": "div.practice-container:nth-of-type(2) > div.card.practice-intro-card > div.feature-launcher.feature-launcher--compact:nth-of-type(1) > div.feature-launcher-panel.is-active:nth-of-type(4) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(7)",
+      "kind": "button",
+      "intended": "scenario-trainer",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "Triples Radar (Breen)",
+      "selector": "div.practice-container:nth-of-type(2) > div.card.practice-intro-card > div.feature-launcher.feature-launcher--compact:nth-of-type(1) > div.feature-launcher-panel:nth-of-type(5) > div.feature-launcher-grid:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "practice-triples-radar",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קטגוריות (עם ברין)",
+      "selector": "div.practice-container:nth-of-type(2) > div.card.practice-intro-card > div.feature-launcher.feature-launcher--compact:nth-of-type(1) > div.feature-launcher-panel:nth-of-type(5) > div.feature-launcher-grid:nth-of-type(1) > button.btn.btn-secondary:nth-of-type(2)",
+      "kind": "button",
+      "intended": "categories",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "html > body.hide-top-tabbar.compact-header > section.tab-content:nth-of-type(1) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "חלץ ובנה Blueprint →",
+      "selector": "#extract-btn",
+      "kind": "button",
+      "intended": "extractAndMoveToStep2()",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "← חזור",
+      "selector": "#back-to-capture-btn",
+      "kind": "button",
+      "intended": "goToStep(1)",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "בדיקת פער ציפיות →",
+      "selector": "#gap-analysis-btn",
+      "kind": "button",
+      "intended": "extractAndMoveToStep3()",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "← חזור",
+      "selector": "#back-to-specify-btn",
+      "kind": "button",
+      "intended": "goToStep(2)",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "צעד הבא ותוכנית →",
+      "selector": "#next-step-btn",
+      "kind": "button",
+      "intended": "extractAndMoveToStep4()",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "📥 ייצא JSON",
+      "selector": "#export-json-btn",
+      "kind": "button",
+      "intended": "exportBlueprint()",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "🔄 Blueprint חדש",
+      "selector": "#start-over-btn",
+      "kind": "button",
+      "intended": "goToStep(1)",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "⏱️ בואן נעשה את זה ב-10 דקות!",
+      "selector": "#do-it-now-btn",
+      "kind": "button",
+      "intended": "startTenMinuteTimer()",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
+      "selector": "html > body.hide-top-tabbar.compact-header > section.tab-content:nth-of-type(2) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "תיאוריה / קטגוריות",
+      "selector": "#global-theory-launcher",
+      "kind": "button",
+      "intended": "click",
+      "mode": "click",
+      "ok": true,
+      "skipped": false,
+      "responseStatus": 200,
+      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "error": null,
+      "issues": {
+        "consoleErrors": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "topLevelResponses": [
+          {
+            "url": "http://127.0.0.1:4173/index.html",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "status": 200,
+            "method": "GET"
+          }
+        ],
+        "action": {
+          "mode": "click",
+          "selector": "#global-theory-launcher"
+        }
+      }
+    }
+  ]
+}

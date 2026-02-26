@@ -139,6 +139,63 @@ const PRACTICE_TAB_BY_PAGE_KEY = Object.freeze({
 });
 const PRACTICE_TAB_IDS = Object.freeze(Object.values(PRACTICE_TAB_BY_PAGE_KEY));
 
+const STANDALONE_NAV_KEYS = Object.freeze({
+    classicClassic: 'classicClassic',
+    classic2: 'classic2',
+    iceberg: 'iceberg',
+    prismResearch: 'prismResearch',
+    prismLabStandalone: 'prismLabStandalone',
+    livingTriples: 'livingTriples',
+    verbUnzipStandalone: 'verbUnzipStandalone',
+    sentenceMorpher: 'sentenceMorpher'
+});
+
+function getGlobalNavPathByKey(navKey, fallbackPath = '') {
+    try {
+        if (typeof window.getMetaModelNavPathByKey === 'function') {
+            const resolved = String(window.getMetaModelNavPathByKey(navKey) || '').trim();
+            if (resolved) return resolved;
+        }
+    } catch (_error) {
+        // ignore nav map lookup failures and use fallback
+    }
+    const fallback = String(fallbackPath || '').trim();
+    if (!fallback) return '';
+    if (/^https?:\/\//i.test(fallback)) return fallback;
+    return fallback.startsWith('/') ? fallback : `/${fallback.replace(/^\.?\//, '')}`;
+}
+
+function toHrefFeatureKeyFromPath(rawPath = '') {
+    const value = String(rawPath || '').trim();
+    if (!value) return '';
+    try {
+        const url = new URL(value, window.location.href);
+        return `href:${url.pathname.replace(/^\//, '')}`;
+    } catch (_error) {
+        const normalized = value.split('?')[0].split('#')[0].replace(/^\.?\//, '').replace(/^\//, '');
+        return normalized ? `href:${normalized}` : '';
+    }
+}
+
+function getNavHrefFeatureKey(navKey, fallbackPath = '') {
+    return toHrefFeatureKeyFromPath(getGlobalNavPathByKey(navKey, fallbackPath));
+}
+
+function getNavHrefFeatureKeyFromElement(element) {
+    if (!element) return '';
+    const href = String(element.getAttribute('data-versioned-href') || element.getAttribute('href') || '').trim();
+    if (!href) return '';
+    try {
+        if (typeof window.getMetaModelNavKeyByPath === 'function') {
+            const navKey = String(window.getMetaModelNavKeyByPath(href) || '').trim();
+            if (navKey) return getNavHrefFeatureKey(navKey, href);
+        }
+    } catch (_error) {
+        // ignore reverse lookup failures and fall back to raw href
+    }
+    return toHrefFeatureKeyFromPath(href);
+}
+
 const SUBCATEGORY_TO_CATEGORY = {
     SIMPLE_DELETION: 'DELETION',
     COMPARATIVE_DELETION: 'DELETION',
@@ -799,6 +856,8 @@ function setupMobileViewportSizing() {
     window.addEventListener('orientationchange', setViewportHeight, { passive: true });
 }
 
+const LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT = 'סביבה, התנהגות, יכולות, ערכים/אמונות, זהות, שייכות';
+
 const DEFAULT_SCREEN_READ_GUIDE = Object.freeze({
     logic: '׳”׳×׳¨׳’׳•׳ ׳‘׳ ׳•׳™ ׳׳׳׳˜׳” ׳׳׳¢׳׳”: ׳׳–׳”׳™׳ ׳”׳ ׳—׳” ׳¡׳׳•׳™׳”, ׳׳“׳™׳™׳§׳™׳ ׳©׳₪׳”, ׳•׳׳– ׳₪׳•׳¢׳׳™׳ ׳¦׳¢׳“ ׳§׳˜׳.',
     goal: '׳׳”׳—׳׳™׳£ ׳׳•׳˜׳•׳׳˜ ׳©׳ ׳”׳׳©׳׳”/׳‘׳׳‘׳•׳ ׳‘׳—׳©׳™׳‘׳” ׳₪׳¨׳§׳˜׳™׳× ׳©׳׳•׳‘׳™׳׳” ׳׳‘׳™׳¦׳•׳¢.',
@@ -1400,6 +1459,7 @@ function setupFeatureMapOverlayControls() {
 
     document.addEventListener('click', (event) => {
         if (!featureMap.open) return;
+        if (event.target?.closest?.('#home-open-feature-map')) return;
         if (featureMap.contains(event.target)) return;
         setFeatureMapToggleOpen(false);
     });
@@ -1459,14 +1519,14 @@ function setupGlobalFeatureMenuDropdown() {
         'tab:blueprint': 'בונה מהלך (Blueprint)',
         'tab:prismlab': 'Prism Lab · רמות לוגיות',
         'tab:about': 'על הפרויקט',
-        'href:classic_classic_trainer.html': 'Classic 1 · Classic Classic',
-        'href:classic2_trainer.html': 'Classic 2 · Structure of Magic',
-        'href:iceberg_templates_trainer.html': 'קצה קרחון / שלדי עומק',
-        'href:prism_research_trainer.html': 'Prism Research · Text Research',
-        'href:living_triples_trainer.html': 'Living Triples',
-        'href:verb_unzip_trainer.html': 'Unzip Trainer (Standalone)',
-        'href:sentence_morpher_trainer.html': 'Sentence Morpher',
-        'href:prism_lab_trainer.html': 'Prism Lab (Standalone)'
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classicClassic, 'classic_classic_trainer.html')]: 'Classic 1 · Classic Classic',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classic2, 'classic2_trainer.html')]: 'Classic 2 · Structure of Magic',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.iceberg, 'iceberg_templates_trainer.html')]: 'קצה קרחון / שלדי עומק',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html')]: 'Prism Research · Text Research',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html')]: 'Living Triples',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: 'Unzip Trainer (Standalone)',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: 'Sentence Morpher',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismLabStandalone, 'prism_lab_trainer.html')]: 'Prism Lab (Standalone)'
     });
     const groupLabels = Object.freeze({
         orientation: 'התחלה והכוונה',
@@ -1500,7 +1560,7 @@ function setupGlobalFeatureMenuDropdown() {
         if ([
             'tab:practice-triples-radar',
             'tab:categories',
-            'href:living_triples_trainer.html'
+            getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html')
         ].includes(key)) return groupLabels.systemic;
         if ([
             'tab:scenario-trainer',
@@ -1509,17 +1569,17 @@ function setupGlobalFeatureMenuDropdown() {
             'tab:prismlab'
         ].includes(key)) return groupLabels.process;
         if ([
-            'href:classic_classic_trainer.html',
-            'href:classic2_trainer.html',
-            'href:iceberg_templates_trainer.html'
+            getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classicClassic, 'classic_classic_trainer.html'),
+            getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classic2, 'classic2_trainer.html'),
+            getNavHrefFeatureKey(STANDALONE_NAV_KEYS.iceberg, 'iceberg_templates_trainer.html')
         ].includes(key)) return groupLabels.depth;
         if ([
-            'href:verb_unzip_trainer.html',
-            'href:sentence_morpher_trainer.html'
+            getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html'),
+            getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')
         ].includes(key)) return groupLabels.language;
         if ([
-            'href:prism_research_trainer.html',
-            'href:prism_lab_trainer.html'
+            getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html'),
+            getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismLabStandalone, 'prism_lab_trainer.html')
         ].includes(key)) return groupLabels.research;
         return groupLabels.misc;
     };
@@ -1549,14 +1609,14 @@ function setupGlobalFeatureMenuDropdown() {
     });
 
     Array.from(featureMap.querySelectorAll('.feature-map-grid a.btn')).forEach((anchor) => {
-        const hrefKey = String(anchor.getAttribute('data-versioned-href') || anchor.getAttribute('href') || '').split('?')[0].trim();
+        const hrefKey = getNavHrefFeatureKeyFromElement(anchor);
         const label = normalizeUiText((anchor.textContent || '').replace(/\s+/g, ' ').trim());
         if (!hrefKey || !label) return;
         pushEntry({
-            key: `href:${hrefKey}`,
+            key: hrefKey,
             label,
             actionType: 'anchor',
-            actionValue: hrefKey,
+            actionValue: String(anchor.getAttribute('data-versioned-href') || anchor.getAttribute('href') || '').trim(),
             element: anchor
         });
     });
@@ -1971,13 +2031,13 @@ function setupFeatureLauncherTabs() {
         "nav:categories": "קטגוריות (עם ברין)",
         "nav:comic-engine": "Comic Engine",
         "nav:scenario-trainer": "Scenario Trainer",
-        "href:verb_unzip_trainer.html": "Unzip Trainer (Standalone)",
-        "href:sentence_morpher_trainer.html": "Sentence Morpher",
-        "href:prism_research_trainer.html": "Prism Research (Chain)",
-        "href:iceberg_templates_trainer.html": "קצה קרחון / שלדי עומק",
-        "href:living_triples_trainer.html": "Living Triples",
-        "href:classic_classic_trainer.html": "Classic 1 · Classic Classic",
-        "href:classic2_trainer.html": "Classic 2 · Structure of Magic"
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: "Unzip Trainer (Standalone)",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: "Sentence Morpher",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html')]: "Prism Research (Chain)",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.iceberg, 'iceberg_templates_trainer.html')]: "קצה קרחון / שלדי עומק",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html')]: "Living Triples",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classicClassic, 'classic_classic_trainer.html')]: "Classic 1 · Classic Classic",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classic2, 'classic2_trainer.html')]: "Classic 2 · Structure of Magic"
     });
 
     function parseLauncherEntry(element) {
@@ -1990,7 +2050,7 @@ function setupFeatureLauncherTabs() {
         if (element.tagName === 'A') {
             actionType = 'href';
             actionValue = String(element.getAttribute('data-versioned-href') || element.getAttribute('href') || '').trim();
-            key = `href:${actionValue.split('?')[0]}`;
+            key = getNavHrefFeatureKeyFromElement(element) || toHrefFeatureKeyFromPath(actionValue);
         } else {
             const onclick = String(element.getAttribute('onclick') || '');
             const navMatch = onclick.match(/navigateTo\('([^']+)'\)/);
@@ -8983,7 +9043,6 @@ const LOGICAL_LEVEL_INFO = {
 };
 
 const LOGICAL_LEVELS_SEQUENCE_FRIENDLY = 'סביבה → התנהגות → יכולות → ערכים/אמונות → זהות → שייכות';
-const LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT = 'סביבה, התנהגות, יכולות, ערכים/אמונות, זהות, שייכות';
 
 const LOGICAL_LEVEL_KEYWORDS = {
     E: ['סביבה', 'מקום', 'זמן', 'הקשר', 'בחדר', 'בעבודה', 'בבית', 'מתי', 'איפה'],

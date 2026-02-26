@@ -57,6 +57,7 @@ try {
         'js/hebrew-sanitize.js',
         'js/wr2w-path-core.js',
         'js/triples-radar-core.js',
+        'js/nav-map.js',
         'js/app.js',
         'js/triples-radar.js'
     ];

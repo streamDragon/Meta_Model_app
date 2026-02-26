@@ -1539,11 +1539,9 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     null;
 
   const dragTreeSeedKey = `${activeVariantKey}|${state.active?.setIndex ?? 0}|${focusStage}`;
-  const dragTreeChips = useMemo<TreeChip[]>(() => {
+  const dragTreeChips: TreeChip[] = (() => {
     if (!revealReady || !state.active || !activeToken) return [];
-    const chips: TreeChip[] = [
-      { id: 'chip-anchor', label: 'עוגן', text: activeToken.text }
-    ];
+    const chips: TreeChip[] = [{ id: 'chip-anchor', label: 'עוגן', text: activeToken.text }];
     activeSet.forEach((value, idx) => {
       const text = String(value || '').trim();
       if (!text) return;
@@ -1552,7 +1550,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     if (activePayload?.question) chips.push({ id: 'chip-question', label: 'שאלה', text: cleanSnippet(activePayload.question, 80) });
     if (activeReflection) chips.push({ id: 'chip-reveal', label: 'Reveal', text: cleanSnippet(activeReflection, 80) });
     return chips;
-  }, [revealReady, state.active, activeToken, activeSet, activePayload?.question, activeReflection]);
+  })();
 
   return (
     <div className="it-wrap" dir="rtl" lang="he">

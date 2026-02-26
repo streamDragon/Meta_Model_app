@@ -148,6 +148,11 @@ async function collectCandidates(page) {
     return page.evaluate(() => {
         const isVisible = (el) => {
             if (!el || !(el instanceof Element)) return false;
+            const closedDetails = el.closest('details:not([open])');
+            if (closedDetails) {
+                const summary = el.closest('summary');
+                if (!summary || summary.parentElement !== closedDetails) return false;
+            }
             const style = window.getComputedStyle(el);
             if (style.display === 'none' || style.visibility === 'hidden' || style.pointerEvents === 'none') return false;
             const rect = el.getBoundingClientRect();
@@ -179,7 +184,8 @@ async function collectCandidates(page) {
                 const cls = Array.from(node.classList || []).slice(0, 2);
                 if (cls.length) {
                     part += `.${cls.map(cssEscapeSafe).join('.')}`;
-                } else if (node.parentElement) {
+                }
+                if (node.parentElement) {
                     const siblings = Array.from(node.parentElement.children).filter((c) => c.tagName === node.tagName);
                     if (siblings.length > 1) {
                         const idx = siblings.indexOf(node);
@@ -282,11 +288,25 @@ async function getPageSnapshot(page) {
                 return style.display !== 'none' && style.visibility !== 'hidden';
             })
             .map((el) => el.id);
+        const openDetails = Array.from(document.querySelectorAll('details[open]'))
+            .map((el) => el.id || el.className || el.tagName)
+            .sort();
+        const bodyClass = Array.from(document.body.classList).sort();
+        const visibleDialogs = Array.from(document.querySelectorAll('dialog, [role="dialog"]'))
+            .filter((el) => {
+                const style = window.getComputedStyle(el);
+                return style.display !== 'none' && style.visibility !== 'hidden' && !el.classList.contains('hidden');
+            })
+            .map((el) => el.id || el.className || el.tagName)
+            .sort();
         return {
             url: location.href,
             activeTabBtn,
             activeTabSections,
-            visibleTabSections
+            visibleTabSections,
+            openDetails,
+            visibleDialogs,
+            bodyClass
         };
     });
 }
@@ -410,6 +430,9 @@ async function auditSpaClick(browser, baseUrl, candidate, intended) {
             before.url !== after.url
             || before.activeTabBtn !== after.activeTabBtn
             || JSON.stringify(before.activeTabSections) !== JSON.stringify(after.activeTabSections)
+            || JSON.stringify(before.openDetails) !== JSON.stringify(after.openDetails)
+            || JSON.stringify(before.visibleDialogs) !== JSON.stringify(after.visibleDialogs)
+            || JSON.stringify(before.bodyClass) !== JSON.stringify(after.bodyClass)
         );
 
     const ok = !clickError && !!after && (

@@ -99,6 +99,7 @@ header p {
     font-variant-numeric: tabular-nums;
     box-shadow: 0 8px 20px rgba(15, 23, 42, 0.24);
     backdrop-filter: blur(4px);
+    pointer-events: none;
 }
 
 body.embed-mode .app-version-floating,
