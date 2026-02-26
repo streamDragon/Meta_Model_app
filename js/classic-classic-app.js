@@ -10,6 +10,11 @@
         return;
     }
 
+    const SETTINGS_STORAGE_KEY = 'classic-classic.practice-settings.v2';
+    const SESSION_STATE_INTRO = 'intro';
+    const SESSION_STATE_PRACTICE = 'practice';
+    const SESSION_STATE_SUMMARY = 'summary';
+
     const state = {
         loaded: false,
         loadError: '',
@@ -17,6 +22,11 @@
         copy: null,
         mode: 'learning',
         session: null,
+        appStage: SESSION_STATE_INTRO,
+        setupOpen: false,
+        settingsDrawerOpen: false,
+        hasSavedSettings: false,
+        settings: null,
         feedback: null,
         hintMessage: '',
         hintUsedByStage: { question: false, problem: false, goal: false },
@@ -84,9 +94,18 @@
     function getPatternsForCurrentFocus() {
         const allPatterns = Array.isArray(state.data?.patterns) ? state.data.patterns : [];
         const focus = normalizeFamilyFocus(state.familyFocus);
-        if (focus === 'all') return allPatterns;
-        const filtered = allPatterns.filter((pattern) => String(pattern?.family || '').toLowerCase() === focus);
-        return filtered.length ? filtered : allPatterns;
+        const byFamily = focus === 'all'
+            ? allPatterns
+            : allPatterns.filter((pattern) => String(pattern?.family || '').toLowerCase() === focus);
+        const maxDifficulty = normalizeDifficulty(state.settings?.difficulty);
+        const byDifficulty = byFamily.filter((pattern) => {
+            const level = Number(pattern?.difficulty);
+            if (!Number.isFinite(level)) return true;
+            return level <= maxDifficulty;
+        });
+        if (byDifficulty.length) return byDifficulty;
+        if (byFamily.length) return byFamily;
+        return allPatterns;
     }
 
     function familyFocusLabel(family) {
@@ -195,6 +214,171 @@
         return `${mm}:${ss}`;
     }
 
+    function clampInt(value, min, max, fallback) {
+        const n = Number(value);
+        if (!Number.isFinite(n)) return fallback;
+        return Math.max(min, Math.min(max, Math.round(n)));
+    }
+
+    function defaultPracticeSettings() {
+        return {
+            mode: 'learning',
+            difficulty: 3,
+            questionCount: 10,
+            timerEnabled: true,
+            familyFocus: 'all'
+        };
+    }
+
+    function normalizeModeSetting(mode) {
+        return mode === 'exam' ? 'exam' : 'learning';
+    }
+
+    function normalizeQuestionCount(count) {
+        const allowed = [5, 10, 15];
+        const n = clampInt(count, 5, 15, 10);
+        return allowed.includes(n) ? n : 10;
+    }
+
+    function normalizeDifficulty(value) {
+        return clampInt(value, 1, 5, 3);
+    }
+
+    function normalizeTimerEnabled(value) {
+        if (typeof value === 'boolean') return value;
+        if (typeof value === 'number') return value !== 0;
+        const normalized = String(value || '').trim().toLowerCase();
+        return !(normalized === 'false' || normalized === '0' || normalized === 'off' || normalized === 'no');
+    }
+
+    function normalizePracticeSettings(raw) {
+        const defaults = defaultPracticeSettings();
+        const input = raw && typeof raw === 'object' ? raw : {};
+        return {
+            mode: normalizeModeSetting(input.mode ?? defaults.mode),
+            difficulty: normalizeDifficulty(input.difficulty ?? defaults.difficulty),
+            questionCount: normalizeQuestionCount(input.questionCount ?? defaults.questionCount),
+            timerEnabled: normalizeTimerEnabled(input.timerEnabled ?? defaults.timerEnabled),
+            familyFocus: normalizeFamilyFocus(input.familyFocus ?? defaults.familyFocus)
+        };
+    }
+
+    function syncLegacyFieldsFromSettings() {
+        const settings = state.settings || defaultPracticeSettings();
+        state.mode = normalizeModeSetting(settings.mode);
+        state.familyFocus = normalizeFamilyFocus(settings.familyFocus);
+    }
+
+    function loadSavedPracticeSettings() {
+        try {
+            const raw = root.localStorage ? root.localStorage.getItem(SETTINGS_STORAGE_KEY) : '';
+            if (!raw) {
+                state.hasSavedSettings = false;
+                return normalizePracticeSettings(defaultPracticeSettings());
+            }
+            const parsed = JSON.parse(raw);
+            state.hasSavedSettings = true;
+            return normalizePracticeSettings(parsed);
+        } catch (error) {
+            state.hasSavedSettings = false;
+            return normalizePracticeSettings(defaultPracticeSettings());
+        }
+    }
+
+    function persistPracticeSettings() {
+        if (!state.settings) return;
+        try {
+            if (!root.localStorage) return;
+            root.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(state.settings));
+            state.hasSavedSettings = true;
+        } catch (error) {}
+    }
+
+    function applySettings(nextSettings, options) {
+        const cfg = options || {};
+        state.settings = normalizePracticeSettings(nextSettings);
+        syncLegacyFieldsFromSettings();
+        if (cfg.persist !== false) persistPracticeSettings();
+        if (cfg.render !== false) render();
+    }
+
+    function patchSettings(patch, options) {
+        const next = Object.assign({}, state.settings || defaultPracticeSettings(), patch || {});
+        applySettings(next, options);
+    }
+
+    function buildSessionConfigForSettings() {
+        const base = configApi.GAME_CONFIG || engine.DEFAULT_CONFIG;
+        const settings = normalizePracticeSettings(state.settings || defaultPracticeSettings());
+        const difficulty = normalizeDifficulty(settings.difficulty);
+        const questionCount = normalizeQuestionCount(settings.questionCount);
+        const timerEnabled = !!settings.timerEnabled;
+        const difficultyTimeFactor = ({ 1: 1.25, 2: 1.12, 3: 1, 4: 0.9, 5: 0.8 })[difficulty] || 1;
+        const perRoundSecondsLearning = 55;
+        const perRoundSecondsExam = 32;
+        const learningSeconds = Math.max(180, Math.round(questionCount * perRoundSecondsLearning * difficultyTimeFactor));
+        const examSeconds = Math.max(90, Math.round(questionCount * perRoundSecondsExam * difficultyTimeFactor));
+
+        return {
+            exam: Object.assign({}, base.exam, {
+                sessionSeconds: timerEnabled ? examSeconds : 36000,
+                lives: difficulty >= 4 ? 2 : base.exam.lives,
+                timePenaltyOnWrong: timerEnabled ? base.exam.timePenaltyOnWrong : 0
+            }),
+            learning: Object.assign({}, base.learning, {
+                sessionSeconds: timerEnabled ? learningSeconds : 36000,
+                timePenaltyOnWrong: timerEnabled ? Math.max(0, difficulty - 1) : 0
+            }),
+            optionCounts: Object.assign({}, base.optionCounts),
+            scoring: Object.assign({}, base.scoring),
+            session: Object.assign({}, base.session, {
+                examEndsRoundOnWrong: difficulty >= 5 ? true : base.session.examEndsRoundOnWrong
+            })
+        };
+    }
+
+    function getQuestionTarget() {
+        return normalizeQuestionCount(state.settings?.questionCount);
+    }
+
+    function hasReachedQuestionTarget() {
+        if (!state.session) return false;
+        return Number(state.session.completedRounds || 0) >= getQuestionTarget();
+    }
+
+    function currentQuestionPosition() {
+        if (!state.session) return { current: 0, total: getQuestionTarget() };
+        const total = getQuestionTarget();
+        const round = currentRound();
+        const completed = Number(state.session.completedRounds || 0);
+        const atRoundSummary = round?.stage === 'summary';
+        const current = state.session.ended
+            ? total
+            : Math.min(total, atRoundSummary ? Math.max(1, completed) : Math.max(1, completed + 1));
+        return { current, total };
+    }
+
+    function timerEnabledForSession() {
+        return !!state.settings?.timerEnabled;
+    }
+
+    function shouldShowSessionSummary() {
+        return !!(state.session && state.session.ended);
+    }
+
+    function randomizePracticeSettings() {
+        const families = ['all', 'deletion', 'distortion', 'generalization'];
+        const questionCounts = [5, 10, 15];
+        const picked = {
+            mode: Math.random() < 0.3 ? 'exam' : 'learning',
+            difficulty: 1 + Math.floor(Math.random() * 5),
+            questionCount: questionCounts[Math.floor(Math.random() * questionCounts.length)],
+            timerEnabled: Math.random() < 0.7,
+            familyFocus: families[Math.floor(Math.random() * families.length)]
+        };
+        applySettings(picked, { render: false });
+    }
+
     function currentRound() {
         if (!state.session) return null;
         return engine.currentRound(state.session);
@@ -209,14 +393,19 @@
     }
 
     function createSession(seedSuffix) {
+        syncLegacyFieldsFromSettings();
         const seed = `classic-classic:${state.mode}:${Date.now()}:${seedSuffix || 0}`;
         const patterns = getPatternsForCurrentFocus();
         state.session = engine.createSessionState({
             patterns,
             mode: state.mode,
             seed,
-            config: configApi.GAME_CONFIG
+            config: buildSessionConfigForSettings()
         });
+        state.appStage = SESSION_STATE_PRACTICE;
+        state.setupOpen = false;
+        state.settingsDrawerOpen = false;
+        state.showRoundGuide = false;
         state.paused = false;
         resetRoundUiState();
         state.feedback = {
@@ -226,6 +415,7 @@
                 : 'מצב למידה פעיל: אפשר לעצור, לקבל רמז ולנסות שוב.'
         };
         ensureTimer();
+        render();
     }
 
     function ensureTimer() {
@@ -233,8 +423,10 @@
         state.timerHandle = setInterval(() => {
             if (!state.session || state.session.ended) return;
             if (state.paused) return;
+            if (!timerEnabledForSession()) return;
             engine.tickSession(state.session, 1);
             if (state.session.ended) {
+                state.appStage = SESSION_STATE_SUMMARY;
                 state.feedback = {
                     tone: state.session.endReason === 'lives' ? 'danger' : 'warn',
                     text: state.session.endReason === 'lives'
@@ -254,6 +446,10 @@
 
     function startNewRound() {
         if (!state.session || state.session.ended) return;
+        if (hasReachedQuestionTarget()) {
+            endSession('target-rounds');
+            return;
+        }
         try {
             engine.nextRound(state.session);
             resetRoundUiState();
@@ -270,6 +466,8 @@
         if (!state.session.ended) {
             engine.endSession(state.session, reason || 'manual');
         }
+        state.appStage = SESSION_STATE_SUMMARY;
+        state.settingsDrawerOpen = false;
         state.paused = false;
         emitAlchemyFx('mastery', { text: 'Session complete' });
         render();
@@ -336,6 +534,9 @@
             };
         }
 
+        if (state.session.ended) {
+            state.appStage = SESSION_STATE_SUMMARY;
+        }
         if (state.session.ended && !state.feedback) {
             state.feedback = {
                 tone: 'danger',
@@ -358,7 +559,9 @@
 
     function setMode(mode) {
         const normalized = mode === 'exam' ? 'exam' : 'learning';
-        if (normalized === state.mode && state.session) return;
+        const currentMode = state.mode;
+        patchSettings({ mode: normalized }, { render: false });
+        if (normalized === currentMode && state.session) return;
         state.mode = normalized;
         if (state.loaded && state.data) {
             createSession('mode-switch');
@@ -369,6 +572,7 @@
     function setFamilyFocus(family) {
         const normalized = normalizeFamilyFocus(family);
         const nextFocus = normalized === state.familyFocus ? 'all' : normalized;
+        patchSettings({ familyFocus: nextFocus }, { render: false });
         state.familyFocus = nextFocus;
         if (state.loaded && state.data) {
             createSession(`focus:${nextFocus}`);
@@ -402,6 +606,60 @@
 
     function handleAction(action) {
         if (!action) return;
+        if (action === 'open-setup') {
+            state.setupOpen = true;
+            state.settingsDrawerOpen = false;
+            render();
+            return;
+        }
+        if (action === 'close-setup') {
+            state.setupOpen = false;
+            render();
+            return;
+        }
+        if (action === 'continue-last-settings') {
+            createSession('continue-last');
+            render();
+            return;
+        }
+        if (action === 'start-session') {
+            createSession('setup-start');
+            render();
+            return;
+        }
+        if (action === 'random-start') {
+            randomizePracticeSettings();
+            createSession('setup-random');
+            render();
+            return;
+        }
+        if (action === 'open-settings-drawer') {
+            state.settingsDrawerOpen = true;
+            render();
+            return;
+        }
+        if (action === 'close-settings-drawer') {
+            state.settingsDrawerOpen = false;
+            render();
+            return;
+        }
+        if (action === 'apply-settings-and-restart') {
+            createSession('settings-restart');
+            render();
+            return;
+        }
+        if (action === 'back-to-intro') {
+            state.session = null;
+            state.appStage = SESSION_STATE_INTRO;
+            state.setupOpen = false;
+            state.settingsDrawerOpen = false;
+            state.paused = false;
+            state.feedback = null;
+            resetRoundUiState();
+            render();
+            return;
+        }
+        if (action === 'show-before-start') return togglePhilosopher(true);
         if (action === 'mode-learning') return setMode('learning');
         if (action === 'mode-exam') return setMode('exam');
         if (action === 'restart-session') return createSession('restart');
@@ -981,6 +1239,530 @@
         renderLoaded();
     }
 
+    // New 3-state RTL UI (declared late so it overrides legacy render helpers)
+    function familyLabelSimple(family) {
+        const key = normalizeFamilyFocus(family);
+        if (key === 'deletion') return 'מחיקות';
+        if (key === 'distortion') return 'עיוותים';
+        if (key === 'generalization') return 'הכללות';
+        return 'הכול';
+    }
+
+    function stageStepLabel(stage) {
+        if (stage === 'question') return 'שאלה';
+        if (stage === 'problem') return 'בעיה';
+        if (stage === 'goal') return 'מטרה';
+        if (stage === 'summary') return 'סיכום';
+        return '';
+    }
+
+    function getPromptTextForRound(round) {
+        const examples = Array.isArray(round?.pattern?.examples) ? round.pattern.examples.filter(Boolean) : [];
+        if (examples.length) {
+            const idx = Math.max(0, (state.session?.completedRounds || 0) % examples.length);
+            return String(examples[idx] || examples[0] || '').trim();
+        }
+        return String(round?.pattern?.definition || '').trim();
+    }
+
+    function feedbackTitleForTone(tone) {
+        if (tone === 'success') return 'נכון';
+        if (tone === 'warn') return 'כמעט';
+        if (tone === 'danger') return 'נעצר';
+        return 'המשך';
+    }
+
+    function stageQuestionPrompt(round) {
+        const stage = round?.stage || '';
+        if (stage === 'question') return 'מה השאלה הכי מדויקת כדי להחזיר מידע חסר?';
+        if (stage === 'problem') return 'מה הבעיה הלשונית המרכזית כאן?';
+        if (stage === 'goal') return 'מה יעד המידע שכדאי לברר עכשיו?';
+        return 'מה התבנית המרכזית?';
+    }
+
+    function renderSettingsControls(scope) {
+        const settings = normalizePracticeSettings(state.settings || defaultPracticeSettings());
+        const modeName = `cc-mode-${scope}`;
+        const countName = `cc-count-${scope}`;
+        const selectId = `cc-family-${scope}`;
+
+        return `
+          <div class="cc-settings-stack">
+            <div class="cc-form-block">
+              <div class="cc-form-label">מצב</div>
+              <div class="cc-choice-row">
+                <label class="cc-choice-pill ${settings.mode === 'learning' ? 'is-active' : ''}">
+                  <input type="radio" name="${modeName}" value="learning" data-cc-setting="mode" ${settings.mode === 'learning' ? 'checked' : ''}>
+                  <span>לימוד</span>
+                </label>
+                <label class="cc-choice-pill ${settings.mode === 'exam' ? 'is-active' : ''}">
+                  <input type="radio" name="${modeName}" value="exam" data-cc-setting="mode" ${settings.mode === 'exam' ? 'checked' : ''}>
+                  <span>מבחן</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="cc-form-block">
+              <div class="cc-form-label-row">
+                <span>קושי</span>
+                <strong>${settings.difficulty}</strong>
+              </div>
+              <input class="cc-range" type="range" min="1" max="5" step="1" value="${settings.difficulty}" data-cc-setting="difficulty" aria-label="קושי">
+              <div class="cc-range-scale"><span>קל</span><span>בינוני</span><span>מאתגר</span></div>
+            </div>
+
+            <div class="cc-form-block">
+              <div class="cc-form-label">מספר שאלות</div>
+              <div class="cc-choice-row">
+                ${[5, 10, 15].map((count) => `
+                  <label class="cc-choice-pill ${settings.questionCount === count ? 'is-active' : ''}">
+                    <input type="radio" name="${countName}" value="${count}" data-cc-setting="questionCount" ${settings.questionCount === count ? 'checked' : ''}>
+                    <span>${count}</span>
+                  </label>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="cc-form-block cc-toggle-row">
+              <label class="cc-switch">
+                <input type="checkbox" data-cc-setting="timerEnabled" ${settings.timerEnabled ? 'checked' : ''}>
+                <span class="cc-switch-track" aria-hidden="true"></span>
+                <span class="cc-switch-copy">
+                  <strong>טיימר</strong>
+                  <small>${settings.timerEnabled ? 'פעיל' : 'כבוי'}</small>
+                </span>
+              </label>
+            </div>
+
+            <details class="cc-advanced-panel">
+              <summary>אפשרויות מתקדמות</summary>
+              <div class="cc-advanced-panel-body">
+                <label class="cc-field-vertical" for="${selectId}">
+                  <span>קטגוריות לתרגול</span>
+                  <select id="${selectId}" class="cc-select" data-cc-setting="familyFocus">
+                    <option value="all" ${settings.familyFocus === 'all' ? 'selected' : ''}>הכול</option>
+                    <option value="deletion" ${settings.familyFocus === 'deletion' ? 'selected' : ''}>מחיקות</option>
+                    <option value="distortion" ${settings.familyFocus === 'distortion' ? 'selected' : ''}>עיוותים</option>
+                    <option value="generalization" ${settings.familyFocus === 'generalization' ? 'selected' : ''}>הכללות</option>
+                  </select>
+                </label>
+                <div class="cc-advanced-note">ההגדרות נשמרות אוטומטית ויוצעו בפעם הבאה.</div>
+              </div>
+            </details>
+          </div>
+        `;
+    }
+
+    function renderSettingsSummaryLine() {
+        const s = normalizePracticeSettings(state.settings || defaultPracticeSettings());
+        return `
+          <div class="cc-settings-summary-line">
+            <span>${s.mode === 'exam' ? 'מבחן' : 'לימוד'}</span>
+            <span>קושי ${s.difficulty}</span>
+            <span>${s.questionCount} שאלות</span>
+            <span>${s.timerEnabled ? 'עם טיימר' : 'ללא טיימר'}</span>
+            <span>${familyLabelSimple(s.familyFocus)}</span>
+          </div>
+        `;
+    }
+
+    function renderSetupModal() {
+        if (!state.setupOpen) return '';
+        return `
+          <div class="cc-layer cc-layer-center" role="dialog" aria-modal="true" aria-label="הגדרות תרגול">
+            <div class="cc-modal-card">
+              <div class="cc-modal-head">
+                <div>
+                  <div class="cc-modal-kicker">Classic Meta Model</div>
+                  <h2>Classic Meta Model — זיהוי תבניות</h2>
+                  <p>אתם מקבלים קטע דיבור קצר. המשימה: לזהות את המבנה המרכזי, לקבל משוב, ולהמשיך בקצב נקי.</p>
+                </div>
+                <button type="button" class="cc-icon-btn" data-cc-action="close-setup" aria-label="סגור">×</button>
+              </div>
+              ${renderSettingsControls('setup')}
+              <div class="cc-modal-actions">
+                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="start-session">התחל</button>
+                <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="random-start">הגרל</button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-setup">סגור</button>
+              </div>
+              ${state.hasSavedSettings ? `<div class="cc-modal-foot"><button type="button" class="cc-link-btn" data-cc-action="continue-last-settings">המשך עם ההגדרות האחרונות</button></div>` : ''}
+            </div>
+          </div>
+        `;
+    }
+
+    function renderPhilosopherOverlay(round) {
+        if (!state.showPhilosopher) return '';
+        const copy = state.copy || {};
+        const operation = operationProfileForFamily(round?.pattern?.family);
+        const examples = Array.isArray(round?.pattern?.examples) ? round.pattern.examples.slice(0, 2) : [];
+        return `
+          <div class="cc-layer cc-layer-center" role="dialog" aria-modal="true" aria-label="לפני שמתחילים">
+            <div class="cc-modal-card cc-modal-card-wide">
+              <div class="cc-modal-head">
+                <div>
+                  <div class="cc-modal-kicker">לפני שמתחילים (30 שניות)</div>
+                  <h2>מה המטרה כאן?</h2>
+                  <p>המטרה היא לפתח עין למבנה השפה: לזהות הכללה, מחיקה או עיוות לפני שנכנסים לפרשנות.</p>
+                </div>
+                <button type="button" class="cc-icon-btn" data-cc-action="close-philosopher" aria-label="סגור">×</button>
+              </div>
+              <div class="cc-summary-grid">
+                <div class="cc-summary-block">
+                  <h4>מה עושים בפועל</h4>
+                  <p>${escapeHtml(copy.metaModelPurpose || 'מזהים מה חסר/מוכלל/מעוות בשפה ובוחרים תגובה מדויקת יותר.')}</p>
+                </div>
+                <div class="cc-summary-block">
+                  <h4>מה לחפש</h4>
+                  <p>${escapeHtml(copy.problemDefinition || 'מה המבנה הלשוני יוצר במפה של הדובר/ת?')}</p>
+                </div>
+                <div class="cc-summary-block">
+                  <h4>מה המטרה בשאלה</h4>
+                  <p>${escapeHtml(copy.goalDefinition || 'להחזיר מידע חסר, לבדוק הנחה, או לצמצם הכללה.')}</p>
+                </div>
+                <div class="cc-summary-block">
+                  <h4>כיוון קלאסי</h4>
+                  <p><strong>${escapeHtml(operation.code)}</strong> · ${escapeHtml(operation.title)}</p>
+                  <p>${escapeHtml(operation.desc)}</p>
+                </div>
+                ${examples.length ? `<div class="cc-summary-block"><h4>דוגמה מהתרגול</h4><ul>${examples.map((x) => `<li>${escapeHtml(x)}</li>`).join('')}</ul></div>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+    }
+
+    function renderOptions(round) {
+        const stage = round?.stage;
+        const options = getVisibleOptions(round);
+        const correctIds = getCorrectOptionIds(round, stage);
+        return `
+          <div class="cc-options cc-options-grid" role="list" aria-label="אפשרויות תשובה">
+            ${options.map((option, index) => {
+                const id = String(option.id);
+                const isSelected = state.lastSelectedOptionId === id;
+                let className = 'cc-option-btn';
+                if (isSelected) className += ' is-selected';
+                if (isSelected && state.lastSelectedWasCorrect === false) className += ' is-wrong';
+                if (isSelected && state.lastSelectedWasCorrect === true) className += ' is-correct';
+                if (stage === 'summary' && correctIds.has(id)) className += ' is-correct';
+                return `
+                  <button type="button" class="${className}" data-cc-option-id="${escapeHtml(id)}" ${state.session?.ended ? 'disabled' : ''} ${state.paused ? 'disabled' : ''}>
+                    <span class="cc-option-num">${index + 1}</span>
+                    <span>${escapeHtml(option.text)}</span>
+                  </button>
+                `;
+            }).join('')}
+          </div>
+        `;
+    }
+
+    function renderStageProgressPills(round) {
+        const stage = round?.stage || '';
+        const steps = ['question', 'problem', 'goal', 'summary'];
+        const currentIndex = steps.indexOf(stage);
+        return `
+          <div class="cc-mini-steps" aria-label="התקדמות בסבב">
+            ${steps.map((id, index) => {
+                const classes = ['cc-mini-step', id === stage ? 'is-current' : '', currentIndex > index ? 'is-done' : ''].filter(Boolean).join(' ');
+                return `<span class="${classes}">${escapeHtml(stageStepLabel(id))}</span>`;
+            }).join('')}
+          </div>
+        `;
+    }
+
+    function renderFeedbackBox(round) {
+        if (!state.feedback && !state.hintMessage) return '';
+        const tone = state.feedback?.tone || 'info';
+        const headline = feedbackTitleForTone(tone);
+        const message = state.feedback?.text || state.hintMessage || '';
+        const examples = Array.isArray(round?.pattern?.examples) ? round.pattern.examples.slice(0, 2) : [];
+        const goodQs = ((round?.options?.question) || []).filter((opt) => opt.isCorrect).map((opt) => opt.text).slice(0, 2);
+        return `
+          <section class="cc-feedback-panel" data-tone="${escapeHtml(tone)}" aria-live="polite">
+            <div class="cc-feedback-main"><strong>${escapeHtml(headline)}</strong><span>${escapeHtml(message)}</span></div>
+            <details class="cc-feedback-details">
+              <summary>הצג הסבר</summary>
+              <div class="cc-feedback-details-body">
+                ${state.hintMessage ? `<p>${escapeHtml(state.hintMessage)}</p>` : ''}
+                ${round?.pattern?.definition ? `<p><strong>תבנית:</strong> ${escapeHtml(round.pattern.definition)}</p>` : ''}
+                ${round?.pattern?.problem?.oneLiner ? `<p><strong>הבעיה:</strong> ${escapeHtml(round.pattern.problem.oneLiner)}</p>` : ''}
+                ${round?.pattern?.goal?.oneLiner ? `<p><strong>מטרת בירור:</strong> ${escapeHtml(round.pattern.goal.oneLiner)}</p>` : ''}
+                ${goodQs.length ? `<div class="cc-feedback-list"><div class="cc-feedback-list-title">שאלות טובות אפשריות</div>${goodQs.map((x) => `<div class="cc-feedback-list-item">${escapeHtml(x)}</div>`).join('')}</div>` : ''}
+                ${examples.length ? `<div class="cc-feedback-list"><div class="cc-feedback-list-title">דוגמאות</div>${examples.map((x) => `<div class="cc-feedback-list-item">${escapeHtml(x)}</div>`).join('')}</div>` : ''}
+              </div>
+            </details>
+          </section>
+        `;
+    }
+
+    function renderRoundSummaryCard(round) {
+        const reachedTarget = hasReachedQuestionTarget();
+        const primaryAction = reachedTarget ? 'end-session' : 'next-round';
+        const primaryLabel = reachedTarget ? 'לסיכום' : 'לשאלה הבאה';
+        const operation = operationProfileForFamily(round?.pattern?.family);
+        return `
+          <section class="cc-practice-card cc-round-summary-card">
+            <div class="cc-practice-card-head">
+              <div class="cc-card-kicker">סיום שאלה</div>
+              <h2>${escapeHtml(round?.pattern?.name || 'סיכום')}</h2>
+              <p>${escapeHtml(round?.pattern?.definition || '')}</p>
+            </div>
+            <div class="cc-summary-grid">
+              <div class="cc-summary-block"><h4>משפחה</h4><p>${escapeHtml(familyLabelSimple(round?.pattern?.family))}</p></div>
+              <div class="cc-summary-block"><h4>כיוון עבודה</h4><p>${escapeHtml(operation.title)}</p><p>${escapeHtml(operation.desc)}</p></div>
+              <div class="cc-summary-block"><h4>מה חידדנו</h4><p>${escapeHtml(round?.pattern?.problem?.oneLiner || '')}</p></div>
+            </div>
+            ${renderFeedbackBox(round)}
+            <div class="cc-primary-actions">
+              <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="${primaryAction}">${primaryLabel}</button>
+              <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="end-session">סיום עכשיו</button>
+            </div>
+          </section>
+        `;
+    }
+
+    function renderPracticeCard(round) {
+        if (!round) {
+            return `<section class="cc-practice-card"><div class="cc-loading">מכין שאלה...</div></section>`;
+        }
+        if (round.stage === 'summary') return renderRoundSummaryCard(round);
+
+        const stageCopy = getStageCopy(round);
+        const promptText = getPromptTextForRound(round);
+        const operation = operationProfileForFamily(round.pattern?.family);
+        const canUseHint = state.mode === 'learning' && !state.session?.ended && !state.hintUsedByStage[round.stage];
+
+        return `
+          <section class="cc-practice-card">
+            <div class="cc-practice-card-head">
+              <div class="cc-card-kicker">${escapeHtml(stageCopy.kicker || '')}</div>
+              <h2>${escapeHtml(stageQuestionPrompt(round))}</h2>
+              <p>${escapeHtml(stageCopy.desc || '')}</p>
+            </div>
+            <div class="cc-client-card" aria-label="קטע דיבור">
+              <div class="cc-client-card-head"><span>קטע דיבור</span><small>${escapeHtml(familyLabelSimple(round.pattern?.family))}</small></div>
+              <div class="cc-client-text">${escapeHtml(promptText || 'אין טקסט לדוגמה')}</div>
+            </div>
+            <div class="cc-question-line"><strong>${escapeHtml(stageQuestionPrompt(round))}</strong><span>${escapeHtml(operation.title)}</span></div>
+            ${renderOptions(round)}
+            ${renderFeedbackBox(round)}
+            <div class="cc-practice-actions">
+              <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="use-hint" ${canUseHint ? '' : 'disabled'}>רמז</button>
+              <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="toggle-pause" ${state.mode !== 'learning' || state.session?.ended ? 'disabled' : ''}>${state.paused ? 'המשך' : 'השהיה'}</button>
+              <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="restart-session">התחל מחדש</button>
+            </div>
+          </section>
+        `;
+    }
+
+    function renderPracticeTopBar(session, round) {
+        const progress = currentQuestionPosition();
+        const timerTone = timerEnabledForSession() && session?.timeLeftSeconds <= 30 ? 'warn' : '';
+        const timerText = timerEnabledForSession() ? formatTime(session?.timeLeftSeconds || 0) : 'ללא טיימר';
+        const livesChip = state.mode === 'exam'
+            ? `<div class="cc-top-chip" data-tone="${session?.livesLeft <= 1 ? 'warn' : ''}"><span>חיים</span><strong>${Number.isFinite(session?.livesLeft) ? session.livesLeft : '-'}</strong></div>`
+            : '';
+        return `
+          <header class="cc-practice-bar">
+            <div class="cc-practice-bar-main">
+              <div class="cc-top-chip"><span>שאלה</span><strong>${progress.current}/${progress.total}</strong></div>
+              <div class="cc-top-chip"><span>ניקוד</span><strong>${session?.score ?? 0}</strong></div>
+              <div class="cc-top-chip" data-tone="${timerTone}"><span>זמן</span><strong>${escapeHtml(timerText)}</strong></div>
+              ${livesChip}
+            </div>
+            <div class="cc-practice-bar-actions">
+              <button type="button" class="cc-icon-btn" data-cc-action="show-before-start" aria-label="לפני שמתחילים">?</button>
+              <button type="button" class="cc-icon-btn" data-cc-action="open-settings-drawer" aria-label="הגדרות">⚙</button>
+            </div>
+          </header>
+        `;
+    }
+
+    function renderSettingsDrawer() {
+        if (!state.settingsDrawerOpen) return '';
+        return `
+          <div class="cc-layer cc-layer-side" role="dialog" aria-modal="true" aria-label="הגדרות">
+            <div class="cc-drawer">
+              <div class="cc-drawer-head">
+                <div>
+                  <div class="cc-modal-kicker">הגדרות</div>
+                  <h2>שינוי הגדרות תרגול</h2>
+                  <p>הגדרות נשמרות אוטומטית. כדי להחיל על הסשן הנוכחי, הפעילו מחדש.</p>
+                </div>
+                <button type="button" class="cc-icon-btn" data-cc-action="close-settings-drawer" aria-label="סגור">×</button>
+              </div>
+              ${renderSettingsControls('drawer')}
+              <div class="cc-modal-actions">
+                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="apply-settings-and-restart">הפעל מחדש עם ההגדרות</button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-settings-drawer">סגור</button>
+              </div>
+            </div>
+          </div>
+        `;
+    }
+
+    function renderPracticeScreen() {
+        const session = state.session;
+        const round = currentRound();
+        return `
+          <div class="cc-practice-shell" aria-label="תרגול מטה מודל">
+            ${renderPracticeTopBar(session, round)}
+            <div class="cc-practice-meta-row">
+              <button type="button" class="cc-link-btn" data-cc-action="show-before-start">לפני שמתחילים (30 שניות)</button>
+              ${renderSettingsSummaryLine()}
+            </div>
+            ${round ? renderStageProgressPills(round) : ''}
+            ${renderPracticeCard(round)}
+            ${renderSettingsDrawer()}
+            ${renderPhilosopherOverlay(round)}
+          </div>
+        `;
+    }
+
+    function buildSummarySuggestions(report) {
+        const patternMap = getPatternMap();
+        const suggestions = [];
+        const weakestFamily = (report.perFamily || []).slice().sort((a, b) => a.accuracy - b.accuracy)[0];
+        const weakestPattern = (report.weakPatterns || [])[0];
+        if (weakestFamily) {
+            suggestions.push(`סשן הבא: להתמקד ב-${familyLabelSimple(weakestFamily.family)} כדי לחזק דיוק בסיסי.`);
+        }
+        if (weakestPattern) {
+            const patternName = patternMap.get(weakestPattern.patternId)?.name || weakestPattern.patternId;
+            suggestions.push(`חזרה ממוקדת על "${patternName}" לפני העלאת קושי.`);
+        }
+        if ((report.overall?.accuracy || 0) >= 80) {
+            suggestions.push('אפשר לעלות קושי או לעבור למצב מבחן לסשן הבא.');
+        } else {
+            suggestions.push('עדיף עוד סשן קצר במצב לימוד עם רמז אחד לכל שאלה.');
+        }
+        while (suggestions.length < 3) {
+            suggestions.push('שמרו על קצב קצר ועקבי: עדיף 5–10 שאלות ביום מאשר סשן ארוך ומתיש.');
+        }
+        return suggestions.slice(0, 3);
+    }
+
+    function renderSummaryScreen() {
+        if (!state.session) return '';
+        const report = engine.buildEndSessionReport(state.session);
+        const patternMap = getPatternMap();
+        const weakPatterns = (report.weakPatterns || []).slice(0, 3);
+        const strongestFamilies = (report.perFamily || []).slice().sort((a, b) => b.accuracy - a.accuracy).slice(0, 2);
+        const suggestions = buildSummarySuggestions(report);
+
+        return `
+          <div class="cc-summary-shell" aria-label="סיכום תרגול">
+            <section class="cc-summary-hero">
+              <div class="cc-modal-kicker">סיכום</div>
+              <h1>סיכום תרגול Meta Model</h1>
+              <p>סיימתם ${report.completedRounds} שאלות. הנה מה השתפר, איפה כדאי לדייק, ומה מומלץ לתרגל בהמשך.</p>
+            </section>
+
+            <div class="cc-report-grid cc-report-grid-modern">
+              <div class="cc-report-stat"><strong>${report.overall.accuracy}%</strong><span>דיוק כולל</span></div>
+              <div class="cc-report-stat"><strong>${report.score}</strong><span>ניקוד</span></div>
+              <div class="cc-report-stat"><strong>${report.completedRounds}</strong><span>שאלות שהושלמו</span></div>
+            </div>
+
+            <div class="cc-summary-grid">
+              <div class="cc-summary-block">
+                <h4>3 המלצות אימון</h4>
+                <ul>
+                  ${suggestions.map((text) => `<li>${escapeHtml(text)}</li>`).join('')}
+                </ul>
+              </div>
+
+              <div class="cc-summary-block">
+                <h4>מה הכי התבלבל</h4>
+                ${weakPatterns.length ? `
+                  <ul>
+                    ${weakPatterns.map((row) => {
+                        const p = patternMap.get(row.patternId);
+                        return `<li><strong>${escapeHtml(p?.name || row.patternId)}</strong> · ${row.accuracy}% דיוק · טעויות: ${row.wrongStages}</li>`;
+                    }).join('')}
+                  </ul>
+                ` : '<p>אין מספיק נתונים כדי לזהות דפוסים חלשים.</p>'}
+              </div>
+
+              <div class="cc-summary-block">
+                <h4>מה הלך טוב</h4>
+                ${strongestFamilies.length ? `
+                  <ul>
+                    ${strongestFamilies.map((row) => `<li>${escapeHtml(familyLabelSimple(row.family))} · ${row.accuracy}%</li>`).join('')}
+                  </ul>
+                ` : '<p>בסשן קצר מאוד עדיין אין מספיק נתונים להשוואה.</p>'}
+              </div>
+            </div>
+
+            <div class="cc-primary-actions">
+              <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="restart-session">תרגול נוסף באותה רמה</button>
+              <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="open-setup">שנה הגדרות</button>
+              <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="back-to-intro">חזרה לפתיחה</button>
+            </div>
+
+            ${renderSetupModal()}
+            ${renderPhilosopherOverlay(currentRound())}
+          </div>
+        `;
+    }
+
+    function renderIntroScreen() {
+        const settings = normalizePracticeSettings(state.settings || defaultPracticeSettings());
+        return `
+          <div class="cc-entry-shell" aria-label="פתיחת תרגול">
+            <section class="cc-entry-card">
+              <div class="cc-modal-kicker">Classic Meta Model</div>
+              <h1>Classic Meta Model — זיהוי תבניות</h1>
+              <p>אתם מקבלים קטע דיבור של “מטופל”. המשימה: לזהות את המבנה המרכזי, לקבל משוב מיידי, ולהמשיך לשאלה הבאה.</p>
+              <p class="cc-entry-sub">פתיח קצר פעם אחת, ואז מסך תרגול נקי בלי בלוקי הגדרות קבועים.</p>
+              ${renderSettingsSummaryLine()}
+              <div class="cc-primary-actions">
+                <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="open-setup">התחל תרגול</button>
+                ${state.hasSavedSettings ? `<button type="button" class="cc-btn cc-btn-secondary" data-cc-action="continue-last-settings">המשך עם ההגדרות האחרונות</button>` : ''}
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="show-before-start">לפני שמתחילים (30 שניות)</button>
+              </div>
+              <div class="cc-entry-mini">
+                <span>מצב: ${settings.mode === 'exam' ? 'מבחן' : 'לימוד'}</span>
+                <span>קושי: ${settings.difficulty}</span>
+                <span>קטגוריה: ${familyLabelSimple(settings.familyFocus)}</span>
+              </div>
+            </section>
+            ${renderSetupModal()}
+            ${renderPhilosopherOverlay(currentRound())}
+          </div>
+        `;
+    }
+
+    function renderLoaded() {
+        if (shouldShowSessionSummary()) {
+            state.appStage = SESSION_STATE_SUMMARY;
+        } else if (state.session) {
+            state.appStage = SESSION_STATE_PRACTICE;
+        } else {
+            state.appStage = SESSION_STATE_INTRO;
+        }
+
+        if (!state.session || state.appStage === SESSION_STATE_INTRO) {
+            appEl.innerHTML = renderIntroScreen();
+            return;
+        }
+        if (state.appStage === SESSION_STATE_SUMMARY) {
+            appEl.innerHTML = renderSummaryScreen();
+            return;
+        }
+        appEl.innerHTML = renderPracticeScreen();
+    }
+
+    function render() {
+        state.renderNonce += 1;
+        if (!state.loaded) {
+            appEl.innerHTML = `<div class="cc-loading">${escapeHtml(state.loadError || 'טוען נתונים...')}</div>`;
+            return;
+        }
+        renderLoaded();
+    }
+
     function bindEvents() {
         appEl.addEventListener('click', (event) => {
             const actionEl = event.target.closest('[data-cc-action]');
@@ -1001,13 +1783,54 @@
             }
         });
 
+        function applySettingFromInput(target) {
+            const settingKey = target?.getAttribute?.('data-cc-setting');
+            if (!settingKey) return;
+            let value;
+            if (target.type === 'checkbox') {
+                value = !!target.checked;
+            } else if (target.type === 'radio') {
+                if (!target.checked) return;
+                value = target.value;
+            } else {
+                value = target.value;
+            }
+            patchSettings({ [settingKey]: value });
+        }
+
+        appEl.addEventListener('change', (event) => {
+            applySettingFromInput(event.target);
+        });
+
+        appEl.addEventListener('input', (event) => {
+            const target = event.target;
+            if (target?.matches?.('input[type="range"][data-cc-setting]')) {
+                applySettingFromInput(target);
+            }
+        });
+
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && state.showPhilosopher) {
-                event.preventDefault();
-                togglePhilosopher(false);
-                return;
+            if (event.key === 'Escape') {
+                if (state.showPhilosopher) {
+                    event.preventDefault();
+                    togglePhilosopher(false);
+                    return;
+                }
+                if (state.settingsDrawerOpen) {
+                    event.preventDefault();
+                    state.settingsDrawerOpen = false;
+                    render();
+                    return;
+                }
+                if (state.setupOpen) {
+                    event.preventDefault();
+                    state.setupOpen = false;
+                    render();
+                    return;
+                }
             }
             if (!state.session || state.session.ended || state.paused) return;
+            if (state.setupOpen || state.settingsDrawerOpen || state.showPhilosopher) return;
             const round = currentRound();
             if (!round || round.stage === 'summary') return;
             const digit = Number(event.key);
@@ -1030,8 +1853,10 @@
             ]);
             state.data = data;
             state.copy = copy;
+            state.settings = loadSavedPracticeSettings();
+            syncLegacyFieldsFromSettings();
             state.loaded = true;
-            createSession('init');
+            state.appStage = SESSION_STATE_INTRO;
             render();
         } catch (error) {
             state.loadError = `שגיאה בטעינת Classic Classic: ${error.message || error}`;
