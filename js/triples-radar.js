@@ -869,6 +869,9 @@
         if (!state.elements?.feedback) return;
         state.elements.feedback.textContent = message || '';
         state.elements.feedback.dataset.tone = tone || 'info';
+        if (typeof root.triggerPlayfulFeedbackFx === 'function') {
+            root.triggerPlayfulFeedbackFx(state.elements.feedback, tone || 'info');
+        }
     }
 
     function setStepStatus(message) {

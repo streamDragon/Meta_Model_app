@@ -11552,3 +11552,142 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+/* Playful feedback boost: stronger visual response for correct/wrong + message updates */
+.rapid-pattern-btn.is-correct,
+.wrinkle-option-btn.is-correct,
+.triples-radar-cat-btn.is-correct {
+    box-shadow: 0 10px 22px rgba(22, 163, 74, 0.2);
+    animation: uiSuccessPop 480ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.rapid-pattern-btn.is-wrong,
+.wrinkle-option-btn.is-wrong,
+.triples-radar-cat-btn.is-wrong {
+    box-shadow: 0 8px 18px rgba(239, 68, 68, 0.16);
+    animation: uiWrongShake 420ms ease-out;
+}
+
+.question-drill-feedback.ui-feedback-fx,
+.rapid-feedback.ui-feedback-fx,
+.wrinkle-feedback.ui-feedback-fx,
+.triples-radar-feedback.ui-feedback-fx {
+    will-change: transform, box-shadow;
+    transform-origin: center;
+}
+
+.question-drill-feedback.ui-feedback-success,
+.rapid-feedback.ui-feedback-success,
+.wrinkle-feedback.ui-feedback-success,
+.triples-radar-feedback.ui-feedback-success {
+    box-shadow: 0 10px 24px rgba(16, 185, 129, 0.16);
+    animation: uiFeedbackCelebrate 620ms cubic-bezier(0.22, 0.9, 0.2, 1);
+}
+
+.question-drill-feedback.ui-feedback-warn,
+.rapid-feedback.ui-feedback-warn,
+.wrinkle-feedback.ui-feedback-warn,
+.triples-radar-feedback.ui-feedback-warn {
+    box-shadow: 0 8px 22px rgba(245, 158, 11, 0.15);
+    animation: uiFeedbackWarnNudge 520ms ease-out;
+}
+
+.question-drill-feedback.ui-feedback-danger,
+.rapid-feedback.ui-feedback-danger,
+.wrinkle-feedback.ui-feedback-danger,
+.triples-radar-feedback.ui-feedback-danger {
+    box-shadow: 0 8px 22px rgba(239, 68, 68, 0.14);
+    animation: uiFeedbackDangerShake 460ms ease-out;
+}
+
+.question-drill-feedback.ui-feedback-info,
+.rapid-feedback.ui-feedback-info,
+.wrinkle-feedback.ui-feedback-info,
+.triples-radar-feedback.ui-feedback-info {
+    animation: uiFeedbackInfoPulse 480ms ease-out;
+}
+
+@keyframes uiSuccessPop {
+    0% {
+        transform: scale(0.97);
+        filter: saturate(0.95);
+    }
+    35% {
+        transform: scale(1.045) translateY(-1px);
+        filter: saturate(1.12);
+    }
+    65% {
+        transform: scale(0.992);
+    }
+    100% {
+        transform: scale(1);
+        filter: saturate(1);
+    }
+}
+
+@keyframes uiWrongShake {
+    0% { transform: translateX(0); }
+    18% { transform: translateX(-4px) rotate(-0.4deg); }
+    34% { transform: translateX(4px) rotate(0.4deg); }
+    50% { transform: translateX(-3px); }
+    66% { transform: translateX(3px); }
+    82% { transform: translateX(-1px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes uiFeedbackCelebrate {
+    0% {
+        transform: scale(0.985) translateY(0);
+    }
+    25% {
+        transform: scale(1.02) translateY(-2px);
+    }
+    50% {
+        transform: scale(1.01) translateY(0);
+    }
+    72% {
+        transform: scale(1.015) translateY(-1px);
+    }
+    100% {
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes uiFeedbackWarnNudge {
+    0% { transform: translateX(0) scale(1); }
+    22% { transform: translateX(-3px) scale(1.005); }
+    45% { transform: translateX(3px) scale(1.01); }
+    70% { transform: translateX(-2px); }
+    100% { transform: translateX(0) scale(1); }
+}
+
+@keyframes uiFeedbackDangerShake {
+    0% { transform: translateX(0) scale(1); }
+    15% { transform: translateX(-5px) rotate(-0.5deg); }
+    30% { transform: translateX(5px) rotate(0.5deg); }
+    45% { transform: translateX(-4px); }
+    60% { transform: translateX(4px); }
+    75% { transform: translateX(-2px); }
+    100% { transform: translateX(0) scale(1); }
+}
+
+@keyframes uiFeedbackInfoPulse {
+    0% { transform: scale(0.992); }
+    50% { transform: scale(1.01); }
+    100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rapid-pattern-btn.is-correct,
+    .wrinkle-option-btn.is-correct,
+    .triples-radar-cat-btn.is-correct,
+    .rapid-pattern-btn.is-wrong,
+    .wrinkle-option-btn.is-wrong,
+    .triples-radar-cat-btn.is-wrong,
+    .question-drill-feedback.ui-feedback-fx,
+    .rapid-feedback.ui-feedback-fx,
+    .wrinkle-feedback.ui-feedback-fx,
+    .triples-radar-feedback.ui-feedback-fx {
+        animation: none !important;
+    }
+}

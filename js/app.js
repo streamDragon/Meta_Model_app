@@ -103,6 +103,8 @@ let audioState = {
     openingPlayed: false,
     openingTrack: null,
     firstEntryDone: false,
+    uiCompressor: null,
+    uiMasterGain: null,
     lastUiSoundAtMs: 0,
     lastGlobalTapAtMs: 0,
     globalInteractionBound: false
@@ -110,6 +112,8 @@ let audioState = {
 
 const OPENING_TRACK_SRC = 'assets/audio/The_Inner_Task.mp3';
 const OPENING_TRACK_FIRST_ENTRY_KEY = 'meta_opening_track_first_entry_done';
+const UI_SOUND_GAIN_BOOST = 1.45;
+const UI_SOUND_GAIN_LIMIT = 0.12;
 
 const TRAINER_CATEGORY_LABELS = {
     DELETION: '׳׳—׳™׳§׳” (Deletion)',
@@ -183,6 +187,31 @@ function ensureAudioContext() {
         return audioState.context;
     } catch (e) {
         return null;
+    }
+}
+
+function ensureUiSoundOutput(ctx) {
+    if (!ctx) return null;
+    if (audioState.uiMasterGain) return audioState.uiMasterGain;
+    try {
+        const compressor = ctx.createDynamicsCompressor();
+        compressor.threshold.value = -24;
+        compressor.knee.value = 18;
+        compressor.ratio.value = 2.5;
+        compressor.attack.value = 0.003;
+        compressor.release.value = 0.18;
+
+        const masterGain = ctx.createGain();
+        masterGain.gain.value = 0.92;
+
+        compressor.connect(masterGain);
+        masterGain.connect(ctx.destination);
+
+        audioState.uiCompressor = compressor;
+        audioState.uiMasterGain = masterGain;
+        return masterGain;
+    } catch (_error) {
+        return ctx.destination;
     }
 }
 
@@ -308,13 +337,16 @@ function playTone(frequency, duration = 0.12, type = 'sine', volume = 0.05, dela
     const now = ctx.currentTime + delay;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+    const output = ensureUiSoundOutput(ctx) || ctx.destination;
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(output);
 
     osc.frequency.value = frequency;
     osc.type = type;
+    osc.detune.value = (Math.random() - 0.5) * 6;
+    const boostedVolume = Math.min(UI_SOUND_GAIN_LIMIT, Math.max(0.0001, volume * UI_SOUND_GAIN_BOOST));
     gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(volume, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(boostedVolume, now + 0.008);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
     osc.start(now);
@@ -323,89 +355,155 @@ function playTone(frequency, duration = 0.12, type = 'sine', volume = 0.05, dela
 
 function playUISound(kind) {
     if (audioState.muted) return;
+    const soundKind = kind === 'success'
+        ? 'correct'
+        : kind === 'warning'
+            ? 'hint'
+            : kind === 'error'
+                ? 'wrong'
+                : kind;
     audioState.lastUiSoundAtMs = (typeof performance !== 'undefined' && typeof performance.now === 'function')
         ? performance.now()
         : Date.now();
-    if (kind === 'correct') {
+    if (soundKind === 'correct') {
         playTone(660, 0.12, 'triangle', 0.06, 0);
+        playTone(990, 0.1, 'sine', 0.028, 0.02);
         playTone(880, 0.14, 'triangle', 0.06, 0.08);
-    } else if (kind === 'wrong') {
+        playTone(1320, 0.08, 'sine', 0.02, 0.12);
+    } else if (soundKind === 'wrong') {
         playTone(220, 0.14, 'sawtooth', 0.05, 0);
+        playTone(196, 0.09, 'square', 0.025, 0.04);
         playTone(165, 0.16, 'sawtooth', 0.05, 0.08);
-    } else if (kind === 'hint') {
+        playTone(132, 0.11, 'sawtooth', 0.02, 0.14);
+    } else if (soundKind === 'hint') {
         playTone(540, 0.08, 'sine', 0.04, 0);
-        playTone(620, 0.08, 'sine', 0.04, 0.06);
-    } else if (kind === 'skip') {
+        playTone(620, 0.08, 'triangle', 0.04, 0.06);
+        playTone(780, 0.05, 'sine', 0.016, 0.1);
+    } else if (soundKind === 'skip') {
         playTone(380, 0.08, 'square', 0.04, 0);
-    } else if (kind === 'next') {
+        playTone(280, 0.045, 'sine', 0.014, 0.03);
+    } else if (soundKind === 'next') {
         playTone(520, 0.08, 'triangle', 0.04, 0);
-    } else if (kind === 'start') {
+        playTone(660, 0.05, 'sine', 0.016, 0.045);
+    } else if (soundKind === 'start') {
         playTone(523.25, 0.12, 'sine', 0.04, 0);
-        playTone(659.25, 0.12, 'sine', 0.04, 0.1);
-    } else if (kind === 'finish') {
+        playTone(659.25, 0.12, 'triangle', 0.04, 0.09);
+        playTone(783.99, 0.1, 'sine', 0.02, 0.16);
+    } else if (soundKind === 'finish') {
         playTone(523.25, 0.11, 'triangle', 0.05, 0);
         playTone(659.25, 0.11, 'triangle', 0.05, 0.08);
         playTone(783.99, 0.15, 'triangle', 0.05, 0.16);
-    } else if (kind === 'buzzer') {
+        playTone(1046.5, 0.1, 'sine', 0.02, 0.24);
+    } else if (soundKind === 'buzzer') {
         playTone(980, 0.06, 'square', 0.06, 0);
         playTone(740, 0.08, 'square', 0.06, 0.06);
         playTone(190, 0.22, 'sawtooth', 0.065, 0.14);
-    } else if (kind === 'stars_big') {
+        playTone(130.81, 0.13, 'triangle', 0.018, 0.16);
+    } else if (soundKind === 'stars_big') {
         playTone(659.25, 0.08, 'triangle', 0.06, 0);
         playTone(880, 0.1, 'triangle', 0.06, 0.07);
         playTone(1174.66, 0.12, 'triangle', 0.06, 0.15);
-    } else if (kind === 'stars_soft') {
+        playTone(1567.98, 0.09, 'sine', 0.025, 0.23);
+    } else if (soundKind === 'stars_soft') {
         playTone(520, 0.07, 'sine', 0.045, 0);
         playTone(620, 0.08, 'sine', 0.045, 0.06);
-    } else if (kind === 'prism_open') {
+        playTone(780, 0.05, 'sine', 0.015, 0.11);
+    } else if (soundKind === 'prism_open') {
         playTone(440, 0.1, 'sine', 0.05, 0);
         playTone(554, 0.1, 'sine', 0.05, 0.09);
-    } else if (kind === 'prism_pick') {
+    } else if (soundKind === 'prism_pick') {
         playTone(720, 0.06, 'triangle', 0.04, 0);
-    } else if (kind === 'prism_warn') {
+        playTone(980, 0.04, 'sine', 0.012, 0.04);
+    } else if (soundKind === 'prism_warn') {
         playTone(240, 0.1, 'square', 0.04, 0);
         playTone(210, 0.1, 'square', 0.04, 0.08);
-    } else if (kind === 'prism_submit') {
+    } else if (soundKind === 'prism_submit') {
         playTone(600, 0.08, 'triangle', 0.05, 0);
         playTone(760, 0.08, 'triangle', 0.05, 0.08);
         playTone(920, 0.12, 'triangle', 0.05, 0.16);
-    } else if (kind === 'prism_back') {
+        playTone(1140, 0.07, 'sine', 0.017, 0.24);
+    } else if (soundKind === 'prism_back') {
         playTone(460, 0.08, 'sine', 0.04, 0);
-    } else if (kind === 'prism_error') {
+    } else if (soundKind === 'prism_error') {
         playTone(180, 0.12, 'sawtooth', 0.05, 0);
         playTone(150, 0.12, 'sawtooth', 0.05, 0.1);
-    } else if (kind === 'tap_soft') {
+    } else if (soundKind === 'tap_soft') {
         playTone(510, 0.045, 'sine', 0.022, 0);
-    } else if (kind === 'select_soft') {
+        playTone(820, 0.03, 'sine', 0.009, 0.012);
+    } else if (soundKind === 'select_soft') {
         playTone(480, 0.05, 'triangle', 0.026, 0);
         playTone(620, 0.055, 'triangle', 0.026, 0.05);
-    } else if (kind === 'wr2w_quantifier') {
+    } else if (soundKind === 'wr2w_quantifier') {
         playTone(740, 0.05, 'triangle', 0.04, 0);
         playTone(920, 0.07, 'triangle', 0.04, 0.05);
-    } else if (kind === 'wr2w_path') {
+    } else if (soundKind === 'wr2w_path') {
         playTone(420, 0.06, 'sine', 0.03, 0);
         playTone(560, 0.07, 'triangle', 0.03, 0.05);
-    } else if (kind === 'wr2w_submit') {
+    } else if (soundKind === 'wr2w_submit') {
         playTone(430, 0.06, 'sine', 0.03, 0);
         playTone(520, 0.06, 'sine', 0.03, 0.05);
         playTone(650, 0.08, 'triangle', 0.03, 0.11);
-    } else if (kind === 'wr2w_confirm_yes') {
+        playTone(760, 0.06, 'sine', 0.014, 0.19);
+    } else if (soundKind === 'wr2w_confirm_yes') {
         playTone(620, 0.05, 'triangle', 0.032, 0);
         playTone(780, 0.07, 'triangle', 0.032, 0.05);
-    } else if (kind === 'wr2w_confirm_partial') {
+    } else if (soundKind === 'wr2w_confirm_partial') {
         playTone(520, 0.055, 'triangle', 0.03, 0);
         playTone(560, 0.06, 'triangle', 0.03, 0.05);
-    } else if (kind === 'wr2w_confirm_no') {
+    } else if (soundKind === 'wr2w_confirm_no') {
         playTone(230, 0.07, 'sawtooth', 0.03, 0);
         playTone(190, 0.08, 'sawtooth', 0.03, 0.06);
-    } else if (kind === 'wr2w_probe') {
+    } else if (soundKind === 'wr2w_probe') {
         playTone(470, 0.045, 'sine', 0.026, 0);
         playTone(540, 0.045, 'sine', 0.026, 0.04);
-    } else if (kind === 'wr2w_probe_found') {
+    } else if (soundKind === 'wr2w_probe_found') {
         playTone(560, 0.05, 'triangle', 0.03, 0);
         playTone(700, 0.06, 'triangle', 0.03, 0.05);
         playTone(860, 0.08, 'triangle', 0.03, 0.11);
     }
+}
+
+function prefersReducedMotion() {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+    try {
+        return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    } catch (_error) {
+        return false;
+    }
+}
+
+function triggerPlayfulFeedbackFx(element, tone = 'info') {
+    if (!element || !element.classList || prefersReducedMotion()) return;
+    const toneClass = tone === 'success'
+        ? 'ui-feedback-success'
+        : (tone === 'warn' || tone === 'warning')
+            ? 'ui-feedback-warn'
+            : (tone === 'danger' || tone === 'error' || tone === 'fail')
+                ? 'ui-feedback-danger'
+                : 'ui-feedback-info';
+
+    element.classList.remove(
+        'ui-feedback-fx',
+        'ui-feedback-success',
+        'ui-feedback-warn',
+        'ui-feedback-danger',
+        'ui-feedback-info'
+    );
+    void element.offsetWidth;
+    element.classList.add('ui-feedback-fx', toneClass);
+
+    if (element.__uiFeedbackFxTimer) {
+        clearTimeout(element.__uiFeedbackFxTimer);
+    }
+    element.__uiFeedbackFxTimer = setTimeout(() => {
+        if (!element || !element.classList) return;
+        element.classList.remove('ui-feedback-fx', toneClass);
+        element.__uiFeedbackFxTimer = null;
+    }, 700);
+}
+
+if (typeof window !== 'undefined') {
+    window.triggerPlayfulFeedbackFx = triggerPlayfulFeedbackFx;
 }
 
 function setupGlobalInteractionSounds() {
@@ -2669,6 +2767,7 @@ function setQuestionDrillFeedback(text, tone = 'info') {
     if (!feedbackEl) return;
     feedbackEl.textContent = text || '';
     feedbackEl.dataset.tone = tone;
+    triggerPlayfulFeedbackFx(feedbackEl, tone);
 }
 
 function populateQuestionDrillPlanSelect() {
@@ -4347,6 +4446,7 @@ function setRapidPatternFeedback(text, tone = 'info') {
     if (!el) return;
     el.textContent = text;
     el.dataset.tone = tone;
+    triggerPlayfulFeedbackFx(el, tone);
 }
 
 function setRapidPatternTrafficLight(state) {
@@ -4844,6 +4944,7 @@ function setWrinkleFeedback(message, tone = 'info') {
     if (!feedback) return;
     feedback.textContent = message;
     feedback.dataset.tone = tone;
+    triggerPlayfulFeedbackFx(feedback, tone);
 }
 
 function triggerWrinkleBreakFx() {
