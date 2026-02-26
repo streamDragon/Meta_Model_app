@@ -3591,9 +3591,15 @@ function setupRapidPatternArena() {
         rapidPatternArenaState.timeLimitSec = Number.isFinite(value) ? Math.max(6, Math.min(25, value)) : 12;
         updateRapidPatternTimeLabel();
     });
+    rapidPatternArenaState.elements.typeSelect?.addEventListener('change', () => {
+        if (!rapidPatternArenaState.active && !rapidPatternArenaState.paused) {
+            renderRapidPatternIdlePreview();
+        }
+    });
     rapidPatternArenaState.elements.modeLearningBtn?.addEventListener('click', () => setRapidPatternMode('learning'));
     rapidPatternArenaState.elements.modeExamBtn?.addEventListener('click', () => setRapidPatternMode('exam'));
     rapidPatternArenaState.elements.buttons?.addEventListener('click', handleRapidPatternButtonClick);
+    renderRapidPatternIdlePreview();
 }
 
 function updateRapidPatternTimeLabel() {
@@ -3814,6 +3820,14 @@ function renderRapidPatternButtons() {
             <span class="rapid-pattern-sub">${escapeHtml(item.hint)}</span>
         </button>
     `).join('');
+}
+
+function renderRapidPatternIdlePreview() {
+    if (rapidPatternArenaState.active || rapidPatternArenaState.paused || rapidPatternArenaState.currentCue) return;
+    const pool = getRapidPatternCuePool();
+    if (!Array.isArray(pool) || !pool.length) return;
+    const cue = pool[Math.floor(Math.random() * pool.length)];
+    renderRapidPatternMonologue(cue);
 }
 
 function startRapidPatternSession() {

@@ -109,14 +109,15 @@
             const url = new URL(window.location.href);
             if (url.searchParams.get('triplesLegacy') === '1') return false;
             if (url.searchParams.get('triplesAdvanced') === '0') return false;
+            if (url.searchParams.get('triplesAdvanced') === '1') return true;
         } catch (error) {
             // Ignore URL parsing issues and fall through.
         }
-        // Default to the advanced flow on both desktop and mobile.
-        return true;
+        // Restore classic 3x5 board as the default; use phone flow only on forced mobile.
         if (typeof document === 'undefined' || !document.body) return false;
         if (document.body.classList.contains('force-mobile-view')) return true;
         if (document.body.classList.contains('view-mobile')) return true;
+        if (typeof window !== 'undefined' && window.innerWidth && window.innerWidth <= 640) return true;
         return false;
     }
 
