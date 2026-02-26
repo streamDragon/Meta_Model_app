@@ -628,6 +628,12 @@ function setLivingTriplesScreen(screenName = 'onboarding') {
     });
 }
 
+function setLivingTriplesCurrentTask(text = '') {
+    const el = livingTriplesState.elements?.currentTask;
+    if (!el) return;
+    el.textContent = String(text || '').trim() || 'עכשיו: קרא/י את המשפט ובחר/י קטגוריה אחת מתוך הטבלה.';
+}
+
 function renderLivingTriplesOnboarding(statusMessage = '') {
     if (!livingTriplesState.elements) return;
     setLivingTriplesScreen('onboarding');
@@ -646,6 +652,7 @@ function renderLivingTriplesOnboarding(statusMessage = '') {
     if (livingTriplesState.elements.customReflectWrap) {
         livingTriplesState.elements.customReflectWrap.classList.add('hidden');
     }
+    setLivingTriplesCurrentTask('עכשיו: לחץ/י על "התחל אימון" כדי לקבל סצנה ולעבוד שלב-שלב.');
 }
 
 function runLivingTriplesDemo() {
@@ -887,6 +894,10 @@ function renderLivingTriplesReveal() {
         livingTriplesState.elements.revealStatus.textContent = `${completed}/${total} תשובות Reveal הושלמו${suffix}`;
     }
 
+    if (!isLivingTriplesRevealComplete()) {
+        setLivingTriplesCurrentTask(`שלב 2 (Reveal): השלם/י ${total - completed} כרטיסים נוספים ואז עוברים לשיקוף.`);
+    }
+
     if (isLivingTriplesRevealComplete()) {
         openLivingTriplesReflectStepIfReady();
     }
@@ -1015,6 +1026,7 @@ function openLivingTriplesReflectStepIfReady() {
     if (livingTriplesState.elements.reflectStatus) {
         livingTriplesState.elements.reflectStatus.textContent = 'בחר/י שיקוף אוטומטי או ניסוח אישי.';
     }
+    setLivingTriplesCurrentTask('שלב 3 (שיקוף): בחר/י שיקוף אוטומטי או כתוב/כתבי שיקוף אישי, ואז שמור/י.');
 }
 
 function useLivingTriplesAutoReflection() {
@@ -1024,6 +1036,7 @@ function useLivingTriplesAutoReflection() {
     if (livingTriplesState.elements?.reflectStatus) {
         livingTriplesState.elements.reflectStatus.textContent = 'השיקוף האוטומטי נשמר.';
     }
+    setLivingTriplesCurrentTask('השיקוף נשמר. עכשיו עוברים לשלב 4: בחר/י רכיב יעד לאתגור.');
     openLivingTriplesChallengeStep();
 }
 
@@ -1040,6 +1053,7 @@ function saveLivingTriplesCustomReflection() {
     if (livingTriplesState.elements?.reflectStatus) {
         livingTriplesState.elements.reflectStatus.textContent = 'השיקוף האישי נשמר.';
     }
+    setLivingTriplesCurrentTask('השיקוף נשמר. עכשיו עוברים לשלב 4: בחר/י רכיב יעד לאתגור.');
     openLivingTriplesChallengeStep();
 }
 
@@ -1050,6 +1064,10 @@ function openLivingTriplesChallengeStep() {
         'אתגור מדויק: נשארים בתוך אותה פריזמה ובוחרים רכיב יעד אחד.',
         `${getLivingTriplesRowDisplayLabel()} | ${getLivingTriplesRowCategoryLabels().join(' + ')}`
     );
+    if (livingTriplesState.elements?.challengeFeedback) {
+        livingTriplesState.elements.challengeFeedback.textContent = 'בחר/י קודם רכיב יעד (אחד משלושת הרכיבים), ואז בחר/י אתגר תואם.';
+    }
+    setLivingTriplesCurrentTask('שלב 4 (אתגור): קודם בחר/י רכיב יעד, ואז בחר/י אתגר לאותו רכיב.');
     renderLivingTriplesChallenge();
 }
 
@@ -1125,6 +1143,7 @@ function finishLivingTriplesScene() {
 
     renderLivingTriplesWrap();
     setLivingTriplesScreen('wrap');
+    setLivingTriplesCurrentTask('סיכום סצנה: בדוק/י ציון, מלא/י Future Pace, ואז המשך/י לסצנה הבאה.');
 }
 
 function renderLivingTriplesWrap() {
@@ -1234,6 +1253,7 @@ function saveLivingTriplesFuturePace() {
 function renderLivingTriplesPracticeScene() {
     if (!livingTriplesState.elements || !livingTriplesState.activeScenario) return;
     setLivingTriplesScreen('practice');
+    setLivingTriplesCurrentTask('עכשיו: קרא/י את המשפט, ואז בחר/י קטגוריה אחת מתוך הטבלה (לא את כל השלשה).');
     setLivingTriplesPhilosophyFocus(
         'שלב 1: לזהות קטגוריה אחת מדויקת. רק אז מדליקים את השלשה כולה.',
         'עדיין לא נבחרה שלשה (מסתירים את התשובה עד הזיהוי).'
@@ -1262,13 +1282,17 @@ function renderLivingTriplesPracticeScene() {
     }
 
     renderLivingTriplesCategoryButtons();
-    if (livingTriplesState.elements.categoryFeedback) livingTriplesState.elements.categoryFeedback.textContent = '';
+    if (livingTriplesState.elements.categoryFeedback) {
+        livingTriplesState.elements.categoryFeedback.textContent = 'בחר/י קטגוריה אחת שמתאימה למשפט. אם טעית, נסה/י שוב.';
+    }
     if (livingTriplesState.elements.rowBox) livingTriplesState.elements.rowBox.classList.add('hidden');
     if (livingTriplesState.elements.revealBox) livingTriplesState.elements.revealBox.classList.add('hidden');
     if (livingTriplesState.elements.reflectBox) livingTriplesState.elements.reflectBox.classList.add('hidden');
     if (livingTriplesState.elements.challengeBox) livingTriplesState.elements.challengeBox.classList.add('hidden');
     if (livingTriplesState.elements.customReflectWrap) livingTriplesState.elements.customReflectWrap.classList.add('hidden');
     if (livingTriplesState.elements.reflectStructured) livingTriplesState.elements.reflectStructured.innerHTML = '';
+    if (livingTriplesState.elements.revealStatus) livingTriplesState.elements.revealStatus.textContent = '';
+    if (livingTriplesState.elements.reflectStatus) livingTriplesState.elements.reflectStatus.textContent = '';
     if (livingTriplesState.elements.challengeFeedback) livingTriplesState.elements.challengeFeedback.textContent = '';
 }
 
@@ -1306,6 +1330,7 @@ function handleLivingTriplesCategoryPick(categoryId) {
         if (livingTriplesState.elements?.categoryFeedback) {
             livingTriplesState.elements.categoryFeedback.textContent = `סטייה: הקטגוריה לא תואמת למשפט (${attemptedRow ? `Row ${rowNumber}` : 'שורה אחרת'}). חזור/י לטריגר ובחר/י שוב.`;
         }
+        setLivingTriplesCurrentTask('עדיין שלב 1: חזור/י למשפט ולחץ/י על קטגוריה אחרת שמתאימה יותר.');
         ltPlay('fail');
         return;
     }
@@ -1316,6 +1341,7 @@ function handleLivingTriplesCategoryPick(categoryId) {
         const rowNumber = getLivingTriplesRowNumber(livingTriplesState.activeRow?.id || '');
         livingTriplesState.elements.categoryFeedback.textContent = `מדויק. Row ${rowNumber} נדלקה, עוברים ל-Reveal.`;
     }
+    setLivingTriplesCurrentTask('שלב 2 (Reveal): בכל כרטיס לחצו על שאלת העוגן עד שמגיעים ל-3/3 תשובות.');
     renderLivingTriplesCategoryButtons();
     if (livingTriplesState.elements?.rowBox) livingTriplesState.elements.rowBox.classList.remove('hidden');
     if (livingTriplesState.elements?.revealBox) livingTriplesState.elements.revealBox.classList.remove('hidden');
@@ -1331,6 +1357,8 @@ function handleLivingTriplesCategoryPick(categoryId) {
 function handleLivingTriplesChallengeTargetPick(targetIndex) {
     if (livingTriplesState.challengeDone) return;
     livingTriplesState.challengeTargetIndex = targetIndex;
+    const label = livingTriplesState.activeRow?.categories?.[targetIndex]?.label || `רכיב ${targetIndex + 1}`;
+    setLivingTriplesCurrentTask(`שלב 4 (אתגור): נבחר יעד (${label}). עכשיו בחר/י אתגר שמתאים לרכיב הזה.`);
     renderLivingTriplesChallenge();
 }
 
@@ -1388,6 +1416,7 @@ async function setupLivingTriplesModule() {
         demoBtn: document.getElementById('lt-demo-btn'),
         startBtn: document.getElementById('lt-start-btn'),
         demoStatus: document.getElementById('lt-demo-status'),
+        currentTask: document.getElementById('lt-current-task'),
         sceneIndex: document.getElementById('lt-scene-index'),
         sceneTotal: document.getElementById('lt-scene-total'),
         sessionScore: document.getElementById('lt-session-score'),

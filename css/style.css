@@ -9572,6 +9572,34 @@ body.minimal-ui .wrinkle-self-list {
     min-height: 20px;
 }
 
+.lt-quick-guide-box {
+    border-color: #c9dcf1;
+    background: linear-gradient(180deg, #f8fbff 0%, #f2f8ff 100%);
+}
+
+.lt-quick-guide-list {
+    margin: 0 0 10px;
+    padding-right: 18px;
+    color: #244766;
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
+.lt-quick-guide-list li + li {
+    margin-top: 3px;
+}
+
+.lt-current-task {
+    margin: 0;
+    padding: 8px 10px;
+    border: 1px solid #c6ddf5;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #0f3f69;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
 .lt-category-buttons {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));

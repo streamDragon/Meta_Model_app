@@ -79,6 +79,17 @@
               <p>ניקוד סשן: <strong id="lt-session-score">0</strong></p>
             </div>
 
+            <div class="lt-step-box lt-quick-guide-box">
+              <h4>מה עושים כאן? (בקצרה)</h4>
+              <ol class="lt-quick-guide-list">
+                <li>קרא/י את משפט המטופל.</li>
+                <li>בחר/י קטגוריה אחת מתוך הטבלה (רק נקודת כניסה).</li>
+                <li>השלם/י Reveal מלא לאותה שלשה (3/3).</li>
+                <li>בחר/י שיקוף, ואז אתגור תואם לאותו רכיב.</li>
+              </ol>
+              <p id="lt-current-task" class="lt-current-task" aria-live="polite">עכשיו: קרא/י את המשפט ובחר/י קטגוריה אחת מתוך הטבלה.</p>
+            </div>
+
             <div class="lt-scenario-box">
               <h3 id="lt-scenario-title">סצנה</h3>
               <div id="lt-scenario-text" class="lt-scenario-text"></div>
@@ -87,7 +98,7 @@
 
             <div class="lt-step-box">
               <h4>1. בחירת קטגוריה</h4>
-              <p class="lt-step-sub">זהו/י את הקטגוריה המדויקת מתוך השלשה.</p>
+              <p class="lt-step-sub">קרא/י את המשפט למעלה ולחץ/י על קטגוריה אחת שהכי מתאימה. לא צריך להשלים את כל השלשה בשלב הזה.</p>
               <div id="lt-category-buttons" class="lt-category-buttons"></div>
               <p id="lt-category-feedback" class="lt-inline-feedback" aria-live="polite"></p>
             </div>
@@ -99,7 +110,7 @@
 
             <div id="lt-reveal-box" class="lt-step-box hidden">
               <h4>2. Reveal</h4>
-              <p class="lt-step-sub">משלימים 3 רכיבים לפני מעבר לשיקוף.</p>
+              <p class="lt-step-sub">בכל כרטיס לחצו על שאלת העוגן (או Rephrase פעם אחת), וקבלו 3/3 תשובות לפני מעבר לשיקוף.</p>
               <div id="lt-reveal-cards" class="lt-reveal-cards"></div>
               <p id="lt-reveal-status" class="lt-inline-feedback" aria-live="polite"></p>
             </div>
@@ -122,7 +133,7 @@
 
             <div id="lt-challenge-box" class="lt-step-box hidden">
               <h4>4. אתגור בתוך אותה פריזמה</h4>
-              <p class="lt-step-sub">בחרו רכיב יעד, ואז אתגור שתואם רק לו.</p>
+              <p class="lt-step-sub">שלב א: בחר/י רכיב יעד. שלב ב: בחר/י אתגר שתואם לאותו רכיב (ולא לרכיב אחר).</p>
               <div id="lt-challenge-targets" class="lt-challenge-targets"></div>
               <div id="lt-challenge-options" class="lt-challenge-options"></div>
               <p id="lt-challenge-feedback" class="lt-inline-feedback" aria-live="polite"></p>
