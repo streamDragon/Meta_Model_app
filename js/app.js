@@ -175,9 +175,48 @@ function getQuestionCategoryKey(question) {
 }
 
 function loadAudioSettings() {
-    const saved = localStorage.getItem('meta_audio_muted');
-    audioState.muted = saved === 'true';
-    audioState.firstEntryDone = localStorage.getItem(OPENING_TRACK_FIRST_ENTRY_KEY) === 'true';
+    let saved = null;
+    try {
+        saved = localStorage.getItem('meta_audio_muted');
+    } catch (_error) {
+        saved = null;
+    }
+
+    // Embedded contexts (Google Sites / iframes) should always start quiet.
+    if (isEmbeddedRuntimeContext()) {
+        audioState.muted = true;
+    } else if (saved === 'true' || saved === 'false') {
+        audioState.muted = saved === 'true';
+    } else {
+        audioState.muted = false;
+    }
+
+    try {
+        audioState.firstEntryDone = localStorage.getItem(OPENING_TRACK_FIRST_ENTRY_KEY) === 'true';
+    } catch (_error) {
+        audioState.firstEntryDone = false;
+    }
+}
+
+function isEmbeddedRuntimeContext() {
+    if (document.body && document.body.classList.contains('embed-mode')) return true;
+    try {
+        return window.self !== window.top;
+    } catch (_error) {
+        return true;
+    }
+}
+
+function safeResumeAudioContext(ctx) {
+    if (!ctx || typeof ctx.resume !== 'function' || ctx.state !== 'suspended') return;
+    try {
+        const resumeResult = ctx.resume();
+        if (resumeResult && typeof resumeResult.catch === 'function') {
+            resumeResult.catch(() => {});
+        }
+    } catch (_error) {
+        // Ignore audio resume failures in restricted embeds/iframes.
+    }
 }
 
 function ensureAudioContext() {
@@ -306,7 +345,11 @@ function updateMuteButtonUI() {
 
 function setMutedAudio(isMuted) {
     audioState.muted = isMuted;
-    localStorage.setItem('meta_audio_muted', String(isMuted));
+    try {
+        localStorage.setItem('meta_audio_muted', String(isMuted));
+    } catch (_error) {
+        // Ignore storage failures (common in restricted iframe/privacy contexts).
+    }
     if (isMuted && audioState.openingTrack && !audioState.openingTrack.paused) {
         audioState.openingTrack.pause();
         audioState.openingTrack.currentTime = 0;
@@ -332,7 +375,7 @@ function playTone(frequency, duration = 0.12, type = 'sine', volume = 0.05, dela
     if (audioState.muted) return;
     const ctx = ensureAudioContext();
     if (!ctx) return;
-    if (ctx.state === 'suspended') ctx.resume();
+    safeResumeAudioContext(ctx);
 
     const now = ctx.currentTime + delay;
     const osc = ctx.createOscillator();
@@ -567,7 +610,11 @@ async function playOpeningMusic({ force = false, markFirstEntry = false } = {}) 
         audioState.openingPlayed = true;
         if (markFirstEntry) {
             audioState.firstEntryDone = true;
-            localStorage.setItem(OPENING_TRACK_FIRST_ENTRY_KEY, 'true');
+            try {
+                localStorage.setItem(OPENING_TRACK_FIRST_ENTRY_KEY, 'true');
+            } catch (_error) {
+                // Ignore storage failures in restricted embeds/iframes.
+            }
         }
         updateMusicToggleButtonUI();
         return true;
@@ -579,6 +626,12 @@ async function playOpeningMusic({ force = false, markFirstEntry = false } = {}) 
 }
 
 function setupOpeningMusicOnFirstEntry() {
+    if (isEmbeddedRuntimeContext()) {
+        // In embedded contexts, generic clicks should not start a long music track.
+        updateMusicToggleButtonUI();
+        return;
+    }
+
     if (audioState.firstEntryDone || audioState.muted) {
         updateMusicToggleButtonUI();
         return;
