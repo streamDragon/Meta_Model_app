@@ -110,6 +110,21 @@ let audioState = {
     globalInteractionBound: false
 };
 
+const OPENED_CONTENT_ATTR_NAMES = Object.freeze(['class', 'style', 'hidden', 'open', 'aria-hidden', 'aria-expanded']);
+const OPENED_CONTENT_HINT_RE = /(?:reveal|feedback|summary|result|answer|hint|guide|explain|analysis|response|drawer|accordion|details|blueprint|wizard|decomposition|metric|status|content|panel|card|note|רמז|משוב|תוצאה|סיכום|הסבר|פירוק|שלב|תגובה|פרטים)/i;
+const OPENED_CONTENT_ACTION_WINDOW_MS = 1800;
+const OPENED_CONTENT_TRANSIENT_MS = 9500;
+const OPENED_CONTENT_SCROLL_COOLDOWN_MS = 900;
+
+let revealFeedbackState = {
+    bound: false,
+    observer: null,
+    lastActionAt: 0,
+    lastActionButton: null,
+    scrollCooldownUntil: 0,
+    visibilityMap: new WeakMap()
+};
+
 const OPENING_TRACK_SRC = 'assets/audio/The_Inner_Task.mp3';
 const OPENING_TRACK_FIRST_ENTRY_KEY = 'meta_opening_track_first_entry_done';
 const UI_SOUND_GAIN_BOOST = 1.45;
@@ -646,6 +661,364 @@ function setupGlobalInteractionSounds() {
         if ((now - Number(audioState.lastUiSoundAtMs || 0)) < 90) return;
         playUISound('select_soft');
     });
+}
+
+function isRevealActionButtonCandidate(element) {
+    if (!element || typeof element.matches !== 'function') return false;
+    if (element.matches('.audio-mute-btn, #music-toggle-btn')) return false;
+    if (element.matches('input, textarea, select, option')) return false;
+    return element.matches(
+        'button, .btn, summary, [role="button"], [aria-controls], [data-global-feature-menu-open], [data-feature-picker-open], [data-tr-action], [data-ui-reveal], [data-open-reveal]'
+    );
+}
+
+function findRevealActionButton(startNode) {
+    if (!startNode || typeof startNode.closest !== 'function') return null;
+    const button = startNode.closest(
+        'button, .btn, summary, [role="button"], [aria-controls], [data-global-feature-menu-open], [data-feature-picker-open], [data-tr-action], [data-ui-reveal], [data-open-reveal]'
+    );
+    if (!button || !isRevealActionButtonCandidate(button)) return null;
+    return button;
+}
+
+function applyActionButtonVisualState(button, { sticky = false } = {}) {
+    if (!button || !button.classList) return;
+    button.classList.add('action-button-active');
+    if (sticky) {
+        button.setAttribute('data-action-button-sticky', '1');
+    }
+    if (button.__actionButtonTimer) {
+        clearTimeout(button.__actionButtonTimer);
+        button.__actionButtonTimer = null;
+    }
+    if (!sticky) {
+        button.__actionButtonTimer = setTimeout(() => {
+            button.__actionButtonTimer = null;
+            if (button.getAttribute('data-action-button-sticky') === '1') return;
+            button.classList.remove('action-button-active');
+        }, 230);
+    }
+}
+
+function clearActionButtonVisualState(button) {
+    if (!button || !button.classList) return;
+    if (button.__actionButtonTimer) {
+        clearTimeout(button.__actionButtonTimer);
+        button.__actionButtonTimer = null;
+    }
+    if (button.__actionButtonStickyTimer) {
+        clearTimeout(button.__actionButtonStickyTimer);
+        button.__actionButtonStickyTimer = null;
+    }
+    button.removeAttribute('data-action-button-sticky');
+    button.classList.remove('action-button-active');
+}
+
+function isElementActuallyVisible(element) {
+    if (!element || !(element instanceof Element)) return false;
+    if (!element.isConnected) return false;
+    if (element.hidden) return false;
+    if (element.getAttribute('aria-hidden') === 'true') return false;
+    const closedDetails = element.closest('details:not([open])');
+    if (closedDetails) {
+        const summary = element.closest('summary');
+        if (!summary || summary.parentElement !== closedDetails) return false;
+    }
+    const style = window.getComputedStyle(element);
+    if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity || 1) <= 0.01) return false;
+    const rect = element.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+}
+
+function elementLooksLikeOpenedContent(node, trigger) {
+    if (!node || !(node instanceof Element)) return false;
+    if (node === trigger) return false;
+    if (node.matches('button, summary, input, select, textarea, label, option')) return false;
+    if (!isElementActuallyVisible(node)) return false;
+
+    const style = window.getComputedStyle(node);
+    if (style.display === 'inline') return false;
+
+    const rect = node.getBoundingClientRect();
+    if (rect.width < 80 || rect.height < 20) return false;
+    if (rect.width > window.innerWidth * 0.98 && rect.height > window.innerHeight * 0.92) return false;
+
+    const signalText = `${node.id || ''} ${node.className || ''}`;
+    const normalizedText = String(node.textContent || '').replace(/\s+/g, ' ').trim();
+    if (OPENED_CONTENT_HINT_RE.test(signalText)) return true;
+    if (node.matches('details, section, article, aside')) return normalizedText.length >= 22;
+    if (node.classList.contains('card') || node.classList.contains('panel') || node.classList.contains('box')) return normalizedText.length >= 18;
+    return normalizedText.length >= 44;
+}
+
+function getOpenedContentScore(node, trigger) {
+    if (!node || !(node instanceof Element)) return -1;
+    if (!elementLooksLikeOpenedContent(node, trigger)) return -1;
+
+    const signalText = `${node.id || ''} ${node.className || ''}`;
+    const normalizedText = String(node.textContent || '').replace(/\s+/g, ' ').trim();
+    const rect = node.getBoundingClientRect();
+
+    let score = 0;
+    if (OPENED_CONTENT_HINT_RE.test(signalText)) score += 7;
+    if (node.matches('details, section, article')) score += 4;
+    if (node.classList.contains('card') || node.classList.contains('panel') || node.classList.contains('box')) score += 3;
+    if (normalizedText.length >= 120) score += 2;
+    if (rect.height <= 420) score += 2;
+    if (rect.width <= window.innerWidth * 0.9) score += 1;
+    if (/container|wrapper|root|layout|app/i.test(signalText)) score -= 4;
+
+    return score;
+}
+
+function resolveOpenedContentContainer(startElement, trigger) {
+    if (!startElement || !(startElement instanceof Element)) return null;
+    let node = startElement;
+    let bestNode = null;
+    let bestScore = -1;
+    let depth = 0;
+
+    while (node && node !== document.body && depth < 9) {
+        const score = getOpenedContentScore(node, trigger);
+        if (score > bestScore) {
+            bestScore = score;
+            bestNode = node;
+        }
+        node = node.parentElement;
+        depth += 1;
+    }
+
+    return bestScore >= 0 ? bestNode : null;
+}
+
+function clearOpenedContentFeedback(element) {
+    if (!element || !(element instanceof Element) || !element.classList) return;
+    if (element.__openedContentTimer) {
+        clearTimeout(element.__openedContentTimer);
+        element.__openedContentTimer = null;
+    }
+    if (element.__openedContentPulseTimer) {
+        clearTimeout(element.__openedContentPulseTimer);
+        element.__openedContentPulseTimer = null;
+    }
+    element.classList.remove('opened-content-pulse');
+    element.classList.remove('opened-content');
+}
+
+function maybeAssistScrollToOpenedContent(element) {
+    if (!element || !(element instanceof Element) || typeof element.scrollIntoView !== 'function') return;
+    const now = Date.now();
+    if (now < Number(revealFeedbackState.scrollCooldownUntil || 0)) return;
+    const rect = element.getBoundingClientRect();
+    const viewportHeight = Math.max(1, window.innerHeight || document.documentElement?.clientHeight || 1);
+    const isMobileViewport = window.matchMedia && window.matchMedia('(max-width: 900px)').matches;
+    const isOutsideFocusBand = rect.top < 88 || rect.bottom > (viewportHeight - 80);
+    if (!isMobileViewport && !isOutsideFocusBand) return;
+
+    revealFeedbackState.scrollCooldownUntil = now + OPENED_CONTENT_SCROLL_COOLDOWN_MS;
+    try {
+        element.scrollIntoView({
+            behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+            block: 'center',
+            inline: 'nearest'
+        });
+    } catch (_error) {
+        try {
+            element.scrollIntoView();
+        } catch (_ignored) {}
+    }
+}
+
+function applyOpenedContentFeedback(element, triggerButton) {
+    if (!element || !(element instanceof Element) || !element.classList) return;
+    if (!isElementActuallyVisible(element)) return;
+
+    element.classList.add('opened-content');
+    element.classList.remove('opened-content-pulse');
+    void element.offsetWidth;
+    element.classList.add('opened-content-pulse');
+
+    if (element.__openedContentPulseTimer) clearTimeout(element.__openedContentPulseTimer);
+    element.__openedContentPulseTimer = setTimeout(() => {
+        if (!element || !element.classList) return;
+        element.classList.remove('opened-content-pulse');
+        element.__openedContentPulseTimer = null;
+    }, 480);
+
+    if (element.__openedContentTimer) clearTimeout(element.__openedContentTimer);
+    element.__openedContentTimer = setTimeout(() => {
+        if (!element || !element.classList) return;
+        element.__openedContentTimer = null;
+        if (!isElementActuallyVisible(element)) {
+            clearOpenedContentFeedback(element);
+            return;
+        }
+        element.classList.remove('opened-content');
+    }, OPENED_CONTENT_TRANSIENT_MS);
+
+    maybeAssistScrollToOpenedContent(element);
+
+    if (triggerButton) {
+        applyActionButtonVisualState(triggerButton, { sticky: true });
+        if (triggerButton.__actionButtonStickyTimer) clearTimeout(triggerButton.__actionButtonStickyTimer);
+        triggerButton.__actionButtonStickyTimer = setTimeout(() => {
+            triggerButton.__actionButtonStickyTimer = null;
+            triggerButton.removeAttribute('data-action-button-sticky');
+            syncActionButtonOpenState(triggerButton);
+        }, 3600);
+    }
+}
+
+function isControlledPanelOpenByButton(button) {
+    if (!button || !(button instanceof Element)) return false;
+    if (button.tagName === 'SUMMARY') {
+        const details = button.closest('details');
+        return !!(details && details.open);
+    }
+    if (button.getAttribute('aria-expanded') === 'true') return true;
+
+    const controls = String(button.getAttribute('aria-controls') || '').trim();
+    if (!controls) return false;
+    const ids = controls.split(/\s+/).filter(Boolean);
+    return ids.some((id) => {
+        const controlled = document.getElementById(id);
+        return !!controlled && isElementActuallyVisible(controlled);
+    });
+}
+
+function syncActionButtonOpenState(button) {
+    if (!button || !(button instanceof Element) || !button.classList.contains('action-button')) return;
+    const isOpen = isControlledPanelOpenByButton(button);
+    if (isOpen) {
+        applyActionButtonVisualState(button, { sticky: true });
+    } else if (button.getAttribute('data-action-button-sticky') === '1') {
+        clearActionButtonVisualState(button);
+    }
+}
+
+function refreshActionButtonDecorators(root = document) {
+    if (!root) return;
+    const selector = 'button, .btn, summary, [role="button"], [aria-controls], [data-global-feature-menu-open], [data-feature-picker-open], [data-tr-action], [data-ui-reveal], [data-open-reveal]';
+    const nodes = [];
+    if (root instanceof Element && root.matches(selector)) nodes.push(root);
+    if (typeof root.querySelectorAll === 'function') {
+        nodes.push(...Array.from(root.querySelectorAll(selector)));
+    }
+    nodes.forEach((node) => {
+        if (!isRevealActionButtonCandidate(node)) return;
+        node.classList.add('action-button');
+    });
+}
+
+function handleRevealFeedbackMutations(records) {
+    const mutationList = Array.from(records || []);
+    if (!mutationList.length) return;
+    const now = Date.now();
+    const withinActionWindow = (now - Number(revealFeedbackState.lastActionAt || 0)) <= OPENED_CONTENT_ACTION_WINDOW_MS;
+    const candidateElements = new Set();
+
+    mutationList.forEach((record) => {
+        if (!record) return;
+        if (record.type === 'childList') {
+            if (withinActionWindow && record.target instanceof Element) candidateElements.add(record.target);
+            record.addedNodes.forEach((node) => {
+                if (!(node instanceof Element)) return;
+                refreshActionButtonDecorators(node);
+                if (withinActionWindow) candidateElements.add(node);
+            });
+            return;
+        }
+
+        if (record.type === 'attributes') {
+            const target = record.target;
+            if (target instanceof Element) {
+                if (
+                    record.attributeName === 'class'
+                    && target.classList
+                    && (
+                        target.classList.contains('opened-content')
+                        || target.classList.contains('opened-content-pulse')
+                        || target.classList.contains('action-button-active')
+                    )
+                ) {
+                    return;
+                }
+                if (record.attributeName === 'aria-expanded') {
+                    syncActionButtonOpenState(target);
+                } else if (record.attributeName === 'open' && target.tagName === 'DETAILS') {
+                    const summary = target.querySelector(':scope > summary');
+                    if (summary) syncActionButtonOpenState(summary);
+                }
+                if (withinActionWindow) {
+                    candidateElements.add(target);
+                } else if (target.classList.contains('opened-content')) {
+                    candidateElements.add(target);
+                }
+            }
+        }
+    });
+
+    candidateElements.forEach((element) => {
+        if (!(element instanceof Element)) return;
+
+        if (!isElementActuallyVisible(element)) {
+            clearOpenedContentFeedback(element);
+            if (typeof element.querySelectorAll === 'function') {
+                element.querySelectorAll('.opened-content').forEach((node) => clearOpenedContentFeedback(node));
+            }
+            return;
+        }
+
+        if (!withinActionWindow) return;
+        const container = resolveOpenedContentContainer(element, revealFeedbackState.lastActionButton);
+        if (!container) return;
+        if (!isElementActuallyVisible(container)) return;
+        applyOpenedContentFeedback(container, revealFeedbackState.lastActionButton);
+    });
+}
+
+function setupGlobalRevealFeedback() {
+    if (revealFeedbackState.bound) return;
+    revealFeedbackState.bound = true;
+    refreshActionButtonDecorators(document);
+
+    const registerAction = (event) => {
+        const trigger = findRevealActionButton(event.target);
+        if (!trigger) return;
+        revealFeedbackState.lastActionAt = Date.now();
+        revealFeedbackState.lastActionButton = trigger;
+        applyActionButtonVisualState(trigger, { sticky: false });
+        setTimeout(() => syncActionButtonOpenState(trigger), 260);
+    };
+
+    document.addEventListener('pointerdown', registerAction, true);
+    document.addEventListener('click', registerAction, true);
+    document.addEventListener('keydown', (event) => {
+        if (!event || (event.key !== 'Enter' && event.key !== ' ')) return;
+        registerAction(event);
+    }, true);
+    document.addEventListener('toggle', (event) => {
+        const details = event.target;
+        if (!(details instanceof Element) || details.tagName !== 'DETAILS') return;
+        const summary = details.querySelector(':scope > summary');
+        if (!summary) return;
+        revealFeedbackState.lastActionAt = Date.now();
+        revealFeedbackState.lastActionButton = summary;
+        syncActionButtonOpenState(summary);
+        if (details.open) applyOpenedContentFeedback(details, summary);
+        else clearOpenedContentFeedback(details);
+    }, true);
+
+    const observerTarget = document.body || document.documentElement;
+    if (window.MutationObserver && observerTarget) {
+        revealFeedbackState.observer = new MutationObserver(handleRevealFeedbackMutations);
+        revealFeedbackState.observer.observe(observerTarget, {
+            subtree: true,
+            childList: true,
+            attributes: true,
+            attributeFilter: OPENED_CONTENT_ATTR_NAMES
+        });
+    }
 }
 
 function stopOpeningMusic(resetToStart = false) {
@@ -2392,6 +2765,7 @@ function initializeMetaModelApp() {
     safeRunUiEnhancement(setupGlobalTheoryLauncher, 'global-theory-launcher');
     safeRunUiEnhancement(setupGlobalCollapsedHelpDetails, 'global-collapsed-help-details');
     setupGlobalInteractionSounds();
+    setupGlobalRevealFeedback();
     renderGlobalComicStrip(getActiveTabName());
     window.addEventListener('resize', updateRuntimeDebugInfoCard);
 }

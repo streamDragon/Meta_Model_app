@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-26T17:55:57.430Z",
+  "generatedAt": "2026-02-26T23:42:36.554Z",
   "baseUrl": "http://127.0.0.1:4173/index.html",
   "bootstrap": {
     "status": 200,
@@ -15,62 +15,62 @@
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+          "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+          "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+          "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+          "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+          "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+          "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+          "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+          "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+          "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+          "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+          "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+          "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
           "status": 200,
           "method": "GET"
         },
@@ -96,14 +96,14 @@
   "items": [
     {
       "text": "Classic 1 · Classic Classic",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/classic_classic_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/classic_classic_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.56&t=1772127540624",
+      "intended": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.57&t=1772128682560",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.56&t=1772127540624",
+      "finalUrl": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.57&t=1772128682560",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -111,7 +111,12 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.57&t=1772128682560",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/css/classic-classic.css?v=1772149237416",
             "status": 200,
             "method": "GET"
           },
@@ -121,67 +126,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/classic-classic.css?v=1772128465088",
+            "url": "http://127.0.0.1:4173/js/classic-classic-config.js?v=1772149237416",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/classic-classic-config.js?v=1772128465088",
+            "url": "http://127.0.0.1:4173/js/classic-classic-rng.js?v=1772149237416",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/classic-classic-rng.js?v=1772128465088",
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/classic-classic-engine.js?v=1772149237416",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/classic-classic-engine.js?v=1772128465088",
+            "url": "http://127.0.0.1:4173/js/classic-classic-app.js?v=1772149237416",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/classic-classic-app.js?v=1772128465088",
+            "url": "http://127.0.0.1:4173/data/metaModelPatterns.he.json?v=1772149237416",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/metaModelPatterns.he.json?v=1772128465088",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/copy.he.json?v=1772128465088",
+            "url": "http://127.0.0.1:4173/data/copy.he.json?v=1772149237416",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.56&t=1772127540624"
+          "targetUrl": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.57&t=1772128682560"
         }
       }
     },
     {
       "text": "Classic 2 · Structure of Magic",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/classic2_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/classic2_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.56&t=1772127540624",
+      "intended": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.57&t=1772128682560",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.56&t=1772127540624",
+      "finalUrl": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.57&t=1772128682560",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -189,7 +189,7 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -199,42 +199,42 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/version.json?_classic2=1772128466046-8sdvt1gupz",
+            "url": "http://127.0.0.1:4173/version.json?_classic2=1772149238402-lzagav5m98c",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/classic2-trainer.bundle.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/classic2-trainer.bundle.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.56&t=1772127540624"
+          "targetUrl": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.57&t=1772128682560"
         }
       }
     },
     {
       "text": "קצה קרחון / שלדי עומק",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/iceberg_templates_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/iceberg_templates_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.56&t=1772127540624",
+      "intended": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.57&t=1772128682560",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.56&t=1772127540624",
+      "finalUrl": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.57&t=1772128682560",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -242,7 +242,7 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -252,47 +252,47 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/version.json?_iceberg=1772128466979-pvxgksk4tk",
+            "url": "http://127.0.0.1:4173/version.json?_iceberg=1772149239329-osn33prlnz",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/iceberg-templates-trainer.bundle.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/iceberg-templates-trainer.bundle.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/iceberg-templates-scenarios.he.json?v=1.0.56-1772127540624",
+            "url": "http://127.0.0.1:4173/data/iceberg-templates-scenarios.he.json?v=1.0.57-1772128682560",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.56&t=1772127540624"
+          "targetUrl": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.57&t=1772128682560"
         }
       }
     },
     {
       "text": "Prism Research · חקירת טקסט",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/prism_research_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/prism_research_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.56&t=1772127540624",
+      "intended": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.57&t=1772128682560",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.56&t=1772127540624",
+      "finalUrl": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.57&t=1772128682560",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -300,12 +300,7 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.56&t=1772127540624",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/css/prism-research.css?v=1772128467894",
+            "url": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -315,52 +310,57 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-core.js?v=1772128467894",
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/prism-research.css?v=1772149240300",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1772128467894",
+            "url": "http://127.0.0.1:4173/js/prism-research-core.js?v=1772149240300",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-app.js?v=1772128467894",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1772149240300",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/metaModelPatterns.he.json?v=1772128467894",
+            "url": "http://127.0.0.1:4173/js/prism-research-app.js?v=1772149240300",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/data/metaModelPatterns.he.json?v=1772149240300",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.56&t=1772127540624"
+          "targetUrl": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.57&t=1772128682560"
         }
       }
     },
     {
       "text": "Living Triples",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/living_triples_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/living_triples_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.56&t=1772127540624",
+      "intended": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.57&t=1772128682560",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.56&t=1772127540624",
+      "finalUrl": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.57&t=1772128682560",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -368,7 +368,7 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -378,22 +378,22 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1772128468802",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1772149241306",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/living-triples.js?v=1772128468802",
+            "url": "http://127.0.0.1:4173/js/living-triples.js?v=1772149241306",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -405,20 +405,20 @@
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.56&t=1772127540624"
+          "targetUrl": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.57&t=1772128682560"
         }
       }
     },
     {
       "text": "Unzip Trainer",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/verb_unzip_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/verb_unzip_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.56&t=1772127540624",
+      "intended": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.57&t=1772128682560",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.56&t=1772127540624",
+      "finalUrl": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.57&t=1772128682560",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -426,7 +426,7 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -436,32 +436,32 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.56&t=1772127540624"
+          "targetUrl": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.57&t=1772128682560"
         }
       }
     },
     {
       "text": "Sentence Morpher",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/sentence_morpher_trainer\\.html\\?v\\=1\\.0\\.56\\&t\\=1772127540624\"]",
+      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/sentence_morpher_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.56&t=1772127540624",
+      "intended": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.57&t=1772128682560",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.56&t=1772127540624",
+      "finalUrl": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.57&t=1772128682560",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -469,12 +469,7 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.56&t=1772127540624",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1772128470717",
+            "url": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -484,22 +479,27 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/sentence-morpher-core.js?v=1772128470717",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1772149243289",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/sentence-morpher-core.js?v=1772149243289",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/sentence-morpher.js?v=1772128470717",
+            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "http://127.0.0.1:4173/js/sentence-morpher.js?v=1772149243289",
             "status": 200,
             "method": "GET"
           },
@@ -511,7 +511,7 @@
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.56&t=1772127540624"
+          "targetUrl": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.57&t=1772128682560"
         }
       }
     },
@@ -537,62 +537,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -630,62 +630,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -723,62 +723,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -816,62 +816,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -909,62 +909,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -1002,62 +1002,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -1095,62 +1095,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -1188,62 +1188,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -1281,62 +1281,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -1374,62 +1374,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -1467,62 +1467,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -1567,57 +1567,17 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/light-8f714f203754d3e3.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/light_high_contrast-852c22d357937740.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/dark-b5a0f9dbeed37e9c.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/github-8ecc5798f0584cac.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/93110.295addbaf970606b.module.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/dark_high_contrast-b1b5000c4cba6bc9.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/react-core.254a044618331903.module.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.githubassets.com/assets/repository-dd7b55261c401703.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/notifications-subscriptions-menu.c495fe07c1fdb46e.module.css",
+            "url": "https://github.githubassets.com/assets/93110.b26d028ff9f2a8f4.module.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/code-bedb41adf21fe337.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/global-95af332f763e4560.css",
+            "url": "https://github.githubassets.com/assets/marketing-navigation.14cc8c51c839d6ba.module.css",
             "status": 200,
             "method": "GET"
           },
@@ -1632,12 +1592,22 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/marketing-navigation.c8b0b6074a452510.module.css",
+            "url": "https://github.githubassets.com/assets/high-contrast-cookie-9c894bc29dbadce2.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/46358.9c6d6fd14d9d1f8f.module.css",
+            "url": "https://github.githubassets.com/assets/global-95af332f763e4560.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/dark-b5a0f9dbeed37e9c.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/dark_high_contrast-b1b5000c4cba6bc9.css",
             "status": 200,
             "method": "GET"
           },
@@ -1647,12 +1617,37 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/high-contrast-cookie-9c894bc29dbadce2.js",
+            "url": "https://github.githubassets.com/assets/light-8f714f203754d3e3.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/wp-runtime-332a402739f01442.js",
+            "url": "https://github.githubassets.com/assets/code-bedb41adf21fe337.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/react-core.f83897d176d1739d.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/notifications-subscriptions-menu.130413fce3dfbad5.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/98212.7b2f822be33480fb.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/light_high_contrast-852c22d357937740.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/github-8ecc5798f0584cac.css",
             "status": 200,
             "method": "GET"
           },
@@ -1662,22 +1657,32 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/wp-runtime-210ac8e341915784.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/environment-81f8ffaec057cc01.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/64220-73db141148c600ae.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/49863-8861e351482cb073.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/64220-deafac6136d536ed.js",
+            "url": "https://github.githubassets.com/assets/41013-ac21ea90ed8590af.js",
             "status": 200,
             "method": "GET"
           },
           {
             "url": "https://github.githubassets.com/assets/runtime-helpers-3cd71e27e349021d.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/environment-8e076be5f2ee950d.js",
             "status": 200,
             "method": "GET"
           },
@@ -1692,12 +1697,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/96232-fb82336d69225835.js",
+            "url": "https://github.githubassets.com/assets/24387-6b7f5e596897eded.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/github-elements-837d26c249ef0f1d.js",
+            "url": "https://github.githubassets.com/assets/96232-fb82336d69225835.js",
             "status": 200,
             "method": "GET"
           },
@@ -1707,42 +1712,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/81751-d3fe9e061a21f8d3.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.githubassets.com/assets/81683-740d112caee5baa9.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/element-registry-77705dcf8f1c5392.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/7053-20b4a6914bbde21f.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/41013-ac21ea90ed8590af.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/react-core-4e607900bfb1765d.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/24387-6b7f5e596897eded.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/react-lib-e74a1db7c21f7e74.js",
             "status": 200,
             "method": "GET"
           },
@@ -1752,12 +1722,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/62249-2895213a788d973c.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/2887-0e9a84f5dc250853.js",
+            "url": "https://github.githubassets.com/assets/81751-d3fe9e061a21f8d3.js",
             "status": 200,
             "method": "GET"
           },
@@ -1767,7 +1732,42 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/react-core-4d91a4784b23bcae.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/element-registry-99507fede2d90420.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/7053-20b4a6914bbde21f.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/github-elements-837d26c249ef0f1d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/react-lib-e74a1db7c21f7e74.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/2887-0e9a84f5dc250853.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/2694-372ce035e93800e0.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/62249-2895213a788d973c.js",
             "status": 200,
             "method": "GET"
           },
@@ -1777,22 +1777,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/30476-099261a2e3d4cf14.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/56093-3c4afcfd31bec219.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/22960-12a7c572a55f9c87.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/38302-277be92deeed3c63.js",
+            "url": "https://github.githubassets.com/assets/65316-113dcaf2d2180c9e.js",
             "status": 200,
             "method": "GET"
           },
@@ -1802,7 +1787,27 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/28360-f4444f13a0dc6af9.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/22960-12a7c572a55f9c87.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/51683-f6844a8acd415e3b.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/38302-277be92deeed3c63.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/56093-3c4afcfd31bec219.js",
             "status": 200,
             "method": "GET"
           },
@@ -1817,47 +1822,17 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/behaviors-e290126a06098a54.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/32225-787d18790ca43912.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/92351-7bc542feb2bc5250.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/codespaces-d828f57ddbc7b41a.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/code-menu-439b5f9254c8b840.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/behaviors-150a92b9e2d67c9f.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/repositories-58788c17bc3a06ed.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/28360-f4444f13a0dc6af9.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/99291-ef227718ed886fe7.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/89756-e7c55d48f60b581d.js",
+            "url": "https://github.githubassets.com/assets/30476-099261a2e3d4cf14.js",
             "status": 200,
             "method": "GET"
           },
@@ -1867,17 +1842,27 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/65316-c849c86dc66fef72.js",
+            "url": "https://github.githubassets.com/assets/89756-e7c55d48f60b581d.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/70168.e22cbb4c48f049f8.module.css",
+            "url": "https://github.githubassets.com/assets/codespaces-d828f57ddbc7b41a.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/78168-dda25026ab7e88b8.js",
+            "url": "https://github.githubassets.com/assets/code-menu-ac8ef1c9f2457929.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/99291-ef227718ed886fe7.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/92351-7bc542feb2bc5250.js",
             "status": 200,
             "method": "GET"
           },
@@ -1887,7 +1872,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/11864-2cac855ca554fc43.js",
+            "url": "https://github.githubassets.com/assets/repositories-ed3436d1d75fd60f.js",
             "status": 200,
             "method": "GET"
           },
@@ -1897,12 +1882,17 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/notifications-subscriptions-menu-d4b3ac512d9e7fdd.js",
+            "url": "https://github.githubassets.com/assets/16111-c5d291d1f8c47430.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/55398-c408961da2ad0d9b.js",
+            "url": "https://github.githubassets.com/assets/notifications-subscriptions-menu-cb6fee6c5f23d249.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/45446-16625b16b5ce1a33.js",
             "status": 200,
             "method": "GET"
           },
@@ -1912,17 +1902,12 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/78168-dda25026ab7e88b8.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/sessions-ef46f0030f2d06d6.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/octicons-react-39f7eb9c9327cc85.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/46752-4c55523fe83d3457.js",
             "status": 200,
             "method": "GET"
           },
@@ -1932,12 +1917,17 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-21631-7b44e09c8aa8bae4.js",
+            "url": "https://github.githubassets.com/assets/46752-4c55523fe83d3457.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-39433-05e4c28439011a7a.js",
+            "url": "https://github.githubassets.com/assets/octicons-react-39f7eb9c9327cc85.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/70168.e22cbb4c48f049f8.module.css",
             "status": 200,
             "method": "GET"
           },
@@ -1947,7 +1937,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/35204-746d7d6e6799f847.js",
+            "url": "https://github.githubassets.com/assets/chunk-39433-05e4c28439011a7a.js",
             "status": 200,
             "method": "GET"
           },
@@ -1957,17 +1947,12 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/chunk-21631-7b44e09c8aa8bae4.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/chunk-76725-d7e9aba06d379264.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/73494-006cc0da9ef70376.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/9751-4eacd5880f7fd2f3.js",
             "status": 200,
             "method": "GET"
           },
@@ -1977,12 +1962,32 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/chunk-14451-be95ace004a5c675.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/chunk-19008-b161acd372b75775.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-38631-7a25773e89f0c5a2.js",
+            "url": "https://github.githubassets.com/assets/35204-746d7d6e6799f847.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/9751-4eacd5880f7fd2f3.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-30368-d1bfa5a135efeae3.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-3735-ad1b443bf082a03f.js",
             "status": 200,
             "method": "GET"
           },
@@ -1997,27 +2002,22 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/87640-1093f490768cb7ff.js",
+            "url": "https://github.githubassets.com/assets/71236-7c82c9609b2bcb51.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-14451-be95ace004a5c675.js",
+            "url": "https://github.githubassets.com/assets/73494-006cc0da9ef70376.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/91088-d78b1f1a89e88bc2.js",
+            "url": "https://github.githubassets.com/assets/lazy-react-partial-keyboard-shortcuts-dialog-e672d5c77e416a0f.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/99602-4f0a0da8ab307329.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/chunk-30368-d1bfa5a135efeae3.js",
+            "url": "https://github.githubassets.com/assets/71954-a5d2b3aeda7b55b3.js",
             "status": 200,
             "method": "GET"
           },
@@ -2027,22 +2027,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/lazy-react-partial-keyboard-shortcuts-dialog-087eec09f8fd3a41.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.githubassets.com/assets/15272-ef674e7caa43f3d4.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/71236-7c82c9609b2bcb51.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/73945-3ca042c5784812d6.js",
+            "url": "https://github.githubassets.com/assets/91088-d78b1f1a89e88bc2.js",
             "status": 200,
             "method": "GET"
           },
@@ -2052,22 +2042,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/41954-50d9d252ed7dfcc6.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/68557-ba609e11988efb67.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/97274-95fb76b77ffabc73.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/78563-887dd48b0f36941b.js",
+            "url": "https://github.githubassets.com/assets/73945-3ca042c5784812d6.js",
             "status": 200,
             "method": "GET"
           },
@@ -2077,17 +2052,52 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/38593-b96dc75b3f58efb5.js",
+            "url": "https://github.githubassets.com/assets/41954-50d9d252ed7dfcc6.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/46358-c04dd332cfeef146.js",
+            "url": "https://github.githubassets.com/assets/86071-49c0bf9d4b4f1731.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/lazy-react-partial-repos-overview-2efcc5b7360f5c6d.js",
+            "url": "https://github.githubassets.com/assets/16073-85e63ca50f563465.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/78563-887dd48b0f36941b.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/98212-c974aa4640f78592.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/57956-9e7cc2ff89333d92.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/93110-1d724dcbe50c482b.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/lazy-react-partial-repos-overview-102d9f891f8a2e71.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-38631-7a25773e89f0c5a2.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/99602-8110a1eaf4307aae.js",
             "status": 200,
             "method": "GET"
           },
@@ -2097,27 +2107,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/86071-1432f72559cfd118.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/93110-2e59e31b9a670a1f.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/chunk-3735-ad1b443bf082a03f.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.com/streamDragon/Meta_Model_app/hovercards/citation/sidebar_partial?tree_name=main",
-            "status": 204,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/appearance-settings.f3eb0e28f3a950df.module.css",
+            "url": "https://github.githubassets.com/assets/appearance-settings.2fbde1012bed47de.module.css",
             "status": 200,
             "method": "GET"
           },
@@ -2127,22 +2117,32 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/71849.d0eafa15d4f4abca.module.css",
+            "url": "https://github.githubassets.com/assets/71849.887f5139f9d7b50f.module.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/7759-2b6cfa446ca53dd8.js",
+            "url": "https://github.githubassets.com/assets/chunk-lazy-react-partial-appearance-settings-e8376bd23e225bdc.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/90040-9fe6b8de37a6e228.js",
+            "url": "https://github.githubassets.com/assets/60433-bb9743c46ae50de8.js",
             "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.com/streamDragon/Meta_Model_app/hovercards/citation/sidebar_partial?tree_name=main",
+            "status": 204,
             "method": "GET"
           },
           {
             "url": "https://github.githubassets.com/assets/85507.d4fe93c6f4ff9a03.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/43142-e0ed058b12703a92.js",
             "status": 200,
             "method": "GET"
           },
@@ -2152,27 +2152,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/43142-4374369079f91842.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.com/streamDragon/Meta_Model_app/refs?type=branch",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.com/streamDragon/Meta_Model_app/branch-and-tag-count",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.com/streamDragon/Meta_Model_app/tree-commit-info/main",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.com/streamDragon/Meta_Model_app/latest-commit/main",
             "status": 200,
             "method": "GET"
           },
@@ -2182,17 +2162,17 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-88235-fda227c5a1bf1fd6.js",
+            "url": "https://github.com/streamDragon/Meta_Model_app/refs?type=branch",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://api.github.com/_private/browser/stats",
+            "url": "https://github.com/streamDragon/Meta_Model_app/latest-commit/main",
             "status": 200,
-            "method": "POST"
+            "method": "GET"
           },
           {
-            "url": "https://avatars.githubusercontent.com/u/64856880?v=4&size=40",
+            "url": "https://github.githubassets.com/assets/chunk-88235-fda227c5a1bf1fd6.js",
             "status": 200,
             "method": "GET"
           }
@@ -2205,7 +2185,7 @@
     },
     {
       "text": "✕",
-      "selector": "html > body.hide-top-tabbar.compact-header > div.container:nth-of-type(4) > header > div.onboarding-hint > button.close-hint",
+      "selector": "html > body.hide-top-tabbar.compact-header > div.container:nth-of-type(4) > header > div.onboarding-hint > button.close-hint.action-button",
       "kind": "button",
       "intended": "closeHint()",
       "mode": "skip",
@@ -2563,62 +2543,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -2661,62 +2641,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -2759,62 +2739,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -2857,62 +2837,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -2955,62 +2935,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -3020,7 +3000,7 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/triples-radar-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/triples-radar-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -3058,62 +3038,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -3156,62 +3136,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -3241,17 +3221,17 @@
             "method": "GET"
           },
           {
+            "url": "http://127.0.0.1:4173/assets/svg/stickers/badges/%D7%9C%D7%A2%D7%92_%D7%95%D7%94%D7%A9%D7%95%D7%95%D7%90%D7%94.svg",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "http://127.0.0.1:4173/assets/svg/stickers/badges/%D7%94%D7%A6%D7%9C%D7%94_%D7%91%D7%9E%D7%A7%D7%95%D7%9D.svg",
             "status": 200,
             "method": "GET"
           },
           {
             "url": "http://127.0.0.1:4173/assets/svg/stickers/badges/%D7%A1%D7%A7%D7%A8%D7%A0%D7%95%D7%AA_%D7%9E%D7%98%D7%94_%D7%9E%D7%95%D7%93%D7%9C.svg",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/svg/stickers/badges/%D7%9C%D7%A2%D7%92_%D7%95%D7%94%D7%A9%D7%95%D7%95%D7%90%D7%94.svg",
             "status": 200,
             "method": "GET"
           }
@@ -3284,62 +3264,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -3382,62 +3362,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -3480,62 +3460,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -3578,62 +3558,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -3676,62 +3656,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -3774,62 +3754,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
@@ -4172,7 +4152,7 @@
     },
     {
       "text": "עם טבלאות ברין",
-      "selector": "section.tab-content.practice-tab-content:nth-of-type(11) > div.practice-container:nth-of-type(2) > div.card.practice-intro-card > div.feature-launcher.feature-launcher--compact:nth-of-type(1) > div.feature-launcher-tabs:nth-of-type(3) > button.feature-launcher-tab:nth-of-type(2)",
+      "selector": "section.tab-content.practice-tab-content:nth-of-type(11) > div.practice-container:nth-of-type(2) > div.card.practice-intro-card > div.feature-launcher.feature-launcher--compact:nth-of-type(1) > div.feature-launcher-tabs:nth-of-type(3) > button.feature-launcher-tab.action-button:nth-of-type(2)",
       "kind": "button",
       "intended": "click",
       "mode": "skip",
@@ -4452,62 +4432,62 @@
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.56&t=1772127540624",
+            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
             "status": 200,
             "method": "GET"
           },
