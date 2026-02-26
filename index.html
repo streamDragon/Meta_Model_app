@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.46" data-build-time="1772060591371" data-build-iso="2026-02-25T23:03:11.371Z" data-git-commit="2cd9b0e">
+<html lang="he" dir="rtl" data-app-version="1.0.47" data-build-time="1772069847216" data-build-iso="2026-02-26T01:37:27.216Z" data-git-commit="9f80570">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -132,7 +132,31 @@
 
             maybeRefreshEmbeddedFrameFromManifest();
 
+            function seedVersionLabelsFromHtml() {
+                var versionText = normalizeToken(declaredVersion || assetVersion);
+                if (!versionText || versionText === 'dev') {
+                    return;
+                }
+
+                ['app-version-chip', 'app-version-floating'].forEach(function (id) {
+                    var node = document.getElementById(id);
+                    if (!node) {
+                        return;
+                    }
+
+                    var currentText = String(node.textContent || '');
+                    if (!currentText || currentText.indexOf(':') === -1) {
+                        return;
+                    }
+
+                    node.textContent = currentText.replace(/:\s*.*/, ': ' + versionText);
+                    node.setAttribute('data-version', versionText);
+                });
+            }
+
             window.addEventListener('DOMContentLoaded', function () {
+                seedVersionLabelsFromHtml();
+
                 var hrefNodes = document.querySelectorAll('[data-versioned-href]');
                 hrefNodes.forEach(function (node) {
                     var originalHref = node.getAttribute('data-versioned-href');
