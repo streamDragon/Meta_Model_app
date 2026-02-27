@@ -189,6 +189,15 @@
 - `css/style.css`
 - `DEV_NOTES.md`
 
+## Update: Full Living Triples Pack (50 scenarios)
+
+- Imported full JSON scenario pack provided by user into `data/living-triples.json`.
+- Verified schema and load:
+  - `version: 1.0.0`
+  - `language: he`
+  - `scenarios: 50`
+  - rows distribution: `1:10, 2:10, 3:10, 4:10, 5:10`.
+
 ## Run / verify
 
 - `npm run dev`
