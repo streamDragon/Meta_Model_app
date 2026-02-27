@@ -2392,14 +2392,77 @@ body.screen-guide-open {
     font-weight: 600;
 }
 
-.question-drill-card textarea {
-    width: 100%;
-    border-radius: 10px;
-    border: 1px solid #e2e8f0;
-    padding: 10px;
-    resize: vertical;
-    font-size: 0.95rem;
+.question-drill-options {
+    display: grid;
+    gap: 10px;
     margin-bottom: 12px;
+}
+
+.question-drill-option {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid #dbe7f5;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    padding: 10px 12px;
+    text-align: right;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: #0f172a;
+    cursor: pointer;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.question-drill-option:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 8px 18px rgba(30, 64, 175, 0.1);
+    transform: translateY(-1px);
+}
+
+.question-drill-option:focus-visible {
+    outline: 3px solid rgba(59, 130, 246, 0.28);
+    outline-offset: 1px;
+}
+
+.question-drill-option.is-selected {
+    border-color: #2563eb;
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.16);
+    background: linear-gradient(180deg, #eff6ff 0%, #e0ecff 100%);
+}
+
+.question-drill-option.is-correct {
+    border-color: rgba(22, 163, 74, 0.54);
+    background: linear-gradient(180deg, #ecfdf5 0%, #dcfce7 100%);
+}
+
+.question-drill-option.is-wrong {
+    border-color: rgba(220, 38, 38, 0.5);
+    background: linear-gradient(180deg, #fef2f2 0%, #fee2e2 100%);
+}
+
+.question-drill-option[disabled] {
+    opacity: 0.72;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.question-drill-option-label {
+    font-weight: 600;
+}
+
+.question-drill-option-category {
+    border-radius: 999px;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1e40af;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .question-drill-controls {
@@ -2544,6 +2607,15 @@ body.screen-guide-open {
     .question-drill-session-actions .question-drill-audio-btn {
         grid-column: 1 / -1;
         width: 100%;
+    }
+
+    .question-drill-option {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .question-drill-option-category {
+        align-self: flex-end;
     }
 
     .question-drill-summary-grid {

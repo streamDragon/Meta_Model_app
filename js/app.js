@@ -3537,6 +3537,36 @@ const QUESTION_DRILL_KEYWORDS = {
     GENERALIZATION: ['תמיד', 'כל אחד', '׳›׳•לם', '׳׳¢׳•לם', 'אין', 'תמיד', 'כל', '׳›׳ ׳”׳–מן']
 };
 
+const QUESTION_DRILL_CATEGORY_LABELS = Object.freeze({
+    DELETION: 'מחיקה (Deletion)',
+    DISTORTION: 'עיוות (Distortion)',
+    GENERALIZATION: 'הכללה (Generalization)'
+});
+
+const QUESTION_DRILL_OPTION_BANK = Object.freeze({
+    DELETION: Object.freeze([
+        'מה בדיוק חסר בתיאור הזה?',
+        'מי בדיוק אמר את זה, ובאיזה הקשר?',
+        'איך זה נראה בפועל בפרטים קטנים?',
+        'על מה בדיוק אתה מתבסס כאן?',
+        'מה עוד לא נאמר כאן שחשוב להבין?'
+    ]),
+    DISTORTION: Object.freeze([
+        'האם זה בהכרח אומר את מה שאתה מסיק?',
+        'לפי מה אתה יודע שזו הסיבה האמיתית?',
+        'יכול להיות שיש פירוש אחר למה שקרה?',
+        'איך בדקת שהמסקנה הזו באמת נכונה?',
+        'מה העובדות ומה הפרשנות שלך כאן?'
+    ]),
+    GENERALIZATION: Object.freeze([
+        'האם זה קורה תמיד, או שיש יוצאים מהכלל?',
+        'כולם באמת, או רק חלק מהמקרים?',
+        'מתי זה כן עובד אחרת?',
+        'באילו מצבים הטענה הזו לא נכונה?',
+        'תמיד זה כך, או שזה תלוי בזמן/אדם?'
+    ])
+});
+
 const QUESTION_DRILL_PREFS_KEY = 'question_drill_prefs_v1';
 const QUESTION_DRILL_CATEGORIES = Object.freeze(['DELETION', 'DISTORTION', 'GENERALIZATION']);
 const QUESTION_DRILL_SUCCESS_PLANS = Object.freeze([
@@ -3569,6 +3599,8 @@ const QUESTION_DRILL_SUCCESS_PLANS = Object.freeze([
 const questionDrillState = {
     current: null,
     deck: [],
+    options: [],
+    selectedOptionId: '',
     attempts: 0,
     hits: 0,
     mode: 'learning',
@@ -3647,13 +3679,8 @@ function populateQuestionDrillPlanSelect() {
 function localizeQuestionDrillCategoryOptions() {
     const select = questionDrillState.elements.category;
     if (!select) return;
-    const labelsByValue = {
-        DELETION: 'מחיקה (Deletion)',
-        DISTORTION: 'עיוות (Distortion)',
-        GENERALIZATION: 'הכללה (Generalization)'
-    };
     Array.from(select.options || []).forEach((option) => {
-        const nextLabel = labelsByValue[String(option.value || '').toUpperCase()];
+        const nextLabel = QUESTION_DRILL_CATEGORY_LABELS[String(option.value || '').toUpperCase()];
         if (nextLabel) option.textContent = nextLabel;
     });
 }
@@ -3681,7 +3708,7 @@ function setQuestionDrillMode(mode = 'learning', { persist = true, refreshCurren
     if (modeNote) {
         modeNote.textContent = resolved === 'exam'
             ? 'מבחן: ניסיון אחד לכל סבב, משוב קצר, בלי רמזים.'
-            : 'למידה: אפשר לקבל רמזים ולשפר ניסוח לפני המעבר.';
+            : 'למידה: אפשר לקבל רמזים ולשפר בחירה לפני המעבר.';
     }
     if (modeChip) modeChip.textContent = `מצב: ${getQuestionDrillModeLabel(resolved)}`;
     if (hintBtn) {
@@ -3718,6 +3745,8 @@ function setQuestionDrillPlan(planId = '', { persist = true } = {}) {
 function resetQuestionDrillSessionState({ preservePrefs = true } = {}) {
     questionDrillState.deck = [];
     questionDrillState.current = null;
+    questionDrillState.options = [];
+    questionDrillState.selectedOptionId = '';
     questionDrillState.attempts = 0;
     questionDrillState.hits = 0;
     questionDrillState.sessionActive = false;
@@ -3740,21 +3769,147 @@ function resetQuestionDrillSessionState({ preservePrefs = true } = {}) {
     }
 }
 
+function getQuestionDrillCategoryLabel(category = '') {
+    const key = String(category || '').toUpperCase();
+    return QUESTION_DRILL_CATEGORY_LABELS[key] || key;
+}
+
+function buildQuestionDrillOptions(question) {
+    const focus = Array.isArray(question?.focus) && question.focus.length
+        ? question.focus.filter(item => QUESTION_DRILL_CATEGORIES.includes(item))
+        : [];
+    const expectedCategory = focus[0] || 'DELETION';
+    const distractorCategories = QUESTION_DRILL_CATEGORIES.filter(category => category !== expectedCategory);
+    const correctPool = shuffleArray((QUESTION_DRILL_OPTION_BANK[expectedCategory] || []).slice());
+    const options = [];
+
+    options.push({
+        id: `${question?.id || 'question'}-${expectedCategory}-correct`,
+        text: correctPool[0] || 'מה בדיוק הכוונה כאן?',
+        category: expectedCategory,
+        isCorrect: true
+    });
+
+    distractorCategories.forEach((category) => {
+        const pool = shuffleArray((QUESTION_DRILL_OPTION_BANK[category] || []).slice());
+        options.push({
+            id: `${question?.id || 'question'}-${category}-distractor`,
+            text: pool[0] || 'אפשר לדייק את הניסוח?',
+            category,
+            isCorrect: false
+        });
+    });
+
+    return shuffleArray(options);
+}
+
+function updateQuestionDrillOptionButtonsState() {
+    const optionsRoot = questionDrillState.elements.options;
+    if (!optionsRoot) return;
+    const locked = questionDrillState.sessionCompleted || questionDrillState.roundFinalized || !questionDrillState.current;
+
+    Array.from(optionsRoot.querySelectorAll('.question-drill-option')).forEach((button) => {
+        const optionId = button.dataset.optionId || '';
+        const selected = optionId === questionDrillState.selectedOptionId;
+        button.classList.toggle('is-selected', selected);
+        button.setAttribute('aria-checked', selected ? 'true' : 'false');
+        button.disabled = locked;
+    });
+}
+
+function renderQuestionDrillOptions() {
+    const optionsRoot = questionDrillState.elements.options;
+    if (!optionsRoot) return;
+    optionsRoot.innerHTML = '';
+    if (!Array.isArray(questionDrillState.options) || !questionDrillState.options.length) {
+        optionsRoot.setAttribute('aria-disabled', 'true');
+        return;
+    }
+    optionsRoot.removeAttribute('aria-disabled');
+
+    const fragment = document.createDocumentFragment();
+    questionDrillState.options.forEach((option, index) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'question-drill-option';
+        btn.dataset.optionId = option.id;
+        btn.dataset.category = option.category;
+        btn.setAttribute('role', 'radio');
+        btn.setAttribute('aria-checked', 'false');
+        btn.setAttribute('aria-label', `אפשרות ${index + 1}: ${option.text}`);
+
+        const label = document.createElement('span');
+        label.className = 'question-drill-option-label';
+        label.textContent = option.text;
+
+        const categoryTag = document.createElement('span');
+        categoryTag.className = 'question-drill-option-category';
+        categoryTag.textContent = getQuestionDrillCategoryLabel(option.category);
+
+        btn.append(label, categoryTag);
+        fragment.appendChild(btn);
+    });
+
+    optionsRoot.appendChild(fragment);
+    updateQuestionDrillOptionButtonsState();
+}
+
+function setQuestionDrillSelectedOption(optionId = '', { playSound = true } = {}) {
+    if (!questionDrillState.current || questionDrillState.roundFinalized || questionDrillState.sessionCompleted) return;
+    const selected = questionDrillState.options.find(option => option.id === optionId);
+    if (!selected) return;
+
+    questionDrillState.selectedOptionId = selected.id;
+    if (questionDrillState.elements.options) {
+        Array.from(questionDrillState.elements.options.querySelectorAll('.question-drill-option')).forEach((button) => {
+            button.classList.remove('is-correct', 'is-wrong');
+        });
+    }
+    if (questionDrillState.elements.category) {
+        questionDrillState.elements.category.value = selected.category;
+    }
+    updateQuestionDrillOptionButtonsState();
+    updateQuestionDrillControlsState();
+    if (playSound) playUISound('select_soft');
+}
+
+function revealQuestionDrillOptionResult({ selectedOptionId = '', success = false, expectedCategories = [] } = {}) {
+    const optionsRoot = questionDrillState.elements.options;
+    if (!optionsRoot) return;
+
+    const expectedPrimary = expectedCategories.find(category => QUESTION_DRILL_CATEGORIES.includes(category)) || '';
+    const correctOption = questionDrillState.options.find(option => option.category === expectedPrimary) || null;
+    const buttons = Array.from(optionsRoot.querySelectorAll('.question-drill-option'));
+
+    buttons.forEach((button) => {
+        button.classList.remove('is-correct', 'is-wrong');
+    });
+
+    const selectedButton = buttons.find(button => String(button.dataset.optionId || '') === String(selectedOptionId || ''));
+    if (selectedButton) {
+        selectedButton.classList.add(success ? 'is-correct' : 'is-wrong');
+    }
+
+    if (!success && correctOption) {
+        const correctButton = buttons.find(button => String(button.dataset.optionId || '') === String(correctOption.id || ''));
+        if (correctButton) correctButton.classList.add('is-correct');
+    }
+}
+
 function beginQuestionDrillRound(question) {
     const elements = questionDrillState.elements;
     const focus = Array.isArray(question?.focus) ? question.focus : [];
 
     questionDrillState.current = question || null;
+    questionDrillState.options = buildQuestionDrillOptions(question);
+    questionDrillState.selectedOptionId = '';
     questionDrillState.roundChecks = 0;
     questionDrillState.roundCorrect = false;
     questionDrillState.roundFinalized = false;
     questionDrillState.currentRoundAward = null;
 
     if (elements.statement) elements.statement.textContent = question?.statement || '';
-    if (elements.input) {
-        elements.input.value = '';
-        elements.input.disabled = false;
-    }
+    renderQuestionDrillOptions();
     if (elements.category) {
         elements.category.disabled = false;
         elements.category.value = questionDrillState.mode === 'exam'
@@ -3763,9 +3918,9 @@ function beginQuestionDrillRound(question) {
     }
 
     if (questionDrillState.mode === 'exam') {
-        setQuestionDrillFeedback('מצב מבחן: נסו לזהות כיוון ולנסח שאלה מדויקת בניסיון אחד.', 'info');
+        setQuestionDrillFeedback('מצב מבחן: בחרו את השאלה המדויקת ביותר בניסיון אחד.', 'info');
     } else {
-        setQuestionDrillFeedback('מצב למידה: כתבו שאלה, בדקו, ושפרו לפי המשוב או רמז.', 'info');
+        setQuestionDrillFeedback('מצב למידה: בחרו שאלה מהרשימה, בדקו, ושפרו לפי המשוב או רמז.', 'info');
     }
 
     if (elements.summary) {
@@ -3860,7 +4015,8 @@ function updateQuestionDrillControlsState() {
     const elements = questionDrillState.elements;
     const sessionLocked = questionDrillState.sessionCompleted;
     const hasQuestion = !!questionDrillState.current;
-    const canCheck = hasQuestion && !sessionLocked && !questionDrillState.roundFinalized;
+    const hasSelection = !!questionDrillState.selectedOptionId;
+    const canCheck = hasQuestion && hasSelection && !sessionLocked && !questionDrillState.roundFinalized;
 
     if (elements.checkBtn) {
         elements.checkBtn.disabled = !canCheck;
@@ -3878,9 +4034,6 @@ function updateQuestionDrillControlsState() {
     if (elements.resetBtn) {
         elements.resetBtn.disabled = !questionDrillState.sessionActive && !questionDrillState.sessionCompleted && questionDrillState.attempts === 0;
     }
-    if (elements.input) {
-        elements.input.disabled = sessionLocked || questionDrillState.roundFinalized;
-    }
     if (elements.category) {
         elements.category.disabled = sessionLocked || questionDrillState.roundFinalized;
     }
@@ -3889,6 +4042,7 @@ function updateQuestionDrillControlsState() {
         elements.hintBtn.disabled = examMode || sessionLocked || questionDrillState.roundFinalized || !hasQuestion;
         elements.hintBtn.classList.toggle('is-hidden', examMode);
     }
+    updateQuestionDrillOptionButtonsState();
 }
 
 function startQuestionDrillSession({ announce = true } = {}) {
@@ -4047,19 +4201,6 @@ function loadNextQuestionDrill(options = {}) {
     if (!initial && playSound) playUISound('next');
 }
 
-function normalizeText(value) {
-    return (value || '').toLowerCase();
-}
-
-function getMatchedCategories(value) {
-    const normalized = normalizeText(value);
-    return Object.entries(QUESTION_DRILL_KEYWORDS).reduce((matches, [category, keywords]) => {
-        const found = keywords.some(keyword => normalized.includes(keyword));
-        if (found) matches.push(category);
-        return matches;
-    }, []);
-}
-
 function showQuestionDrillHint() {
     if (questionDrillState.mode === 'exam') {
         setQuestionDrillFeedback('במצב מבחן אין רמזים. עברו למצב למידה אם רוצים תמיכה.', 'warn');
@@ -4070,47 +4211,52 @@ function showQuestionDrillHint() {
     const starters = (QUESTION_DRILL_KEYWORDS[selected] || []).slice(0, 3).join(', ');
     const expected = (questionDrillState.current.focus || []).join(' / ');
     const line = expected
-        ? `רמז: התחילו עם מילים כמו ${starters}. כיוון מומלץ לסבב הזה: ${expected}.`
-        : `רמז: התחילו עם מילים כמו ${starters}.`;
+        ? `רמז: חפשו שאלה שבוחנת ${getQuestionDrillCategoryLabel(selected)}. מילות כיוון: ${starters}. כיוון מומלץ לסבב הזה: ${expected}.`
+        : `רמז: חפשו שאלה בכיוון ${getQuestionDrillCategoryLabel(selected)}.`;
     setQuestionDrillFeedback(line, 'info');
     playUISound('hint');
 }
 
 function evaluateQuestionDrill() {
-    const input = questionDrillState.elements.input;
     const feedbackEl = questionDrillState.elements.feedback;
-    if (!input || !feedbackEl || !questionDrillState.current) return;
+    if (!feedbackEl || !questionDrillState.current) return;
     if (questionDrillState.sessionCompleted) return;
     if (questionDrillState.roundFinalized) {
         setQuestionDrillFeedback('הסבב הזה כבר נסגר. עברו למשפט הבא.', 'info');
         return;
     }
 
-    const text = input.value.trim();
-    if (!text) {
-        setQuestionDrillFeedback('כתבו שאלה לפני שבודקים.', 'warn');
+    const selectedOption = questionDrillState.options.find(option => option.id === questionDrillState.selectedOptionId);
+    if (!selectedOption) {
+        setQuestionDrillFeedback('בחרו שאלה אמריקאית לפני שבודקים.', 'warn');
         return;
     }
 
-    const selected = questionDrillState.elements.category.value || 'DELETION';
-    const matched = getMatchedCategories(text);
     const expected = questionDrillState.current.focus || [];
-    const focusMatchesExpected = expected.length === 0 || expected.includes(selected);
-    const keywordMatches = matched.includes(selected);
-    const success = focusMatchesExpected && keywordMatches;
+    const selectedCategory = selectedOption.category || 'DELETION';
+    const success = expected.length === 0 || expected.includes(selectedCategory);
+
+    if (questionDrillState.elements.category) {
+        questionDrillState.elements.category.value = selectedCategory;
+    }
 
     questionDrillState.roundChecks += 1;
     questionDrillState.attempts += 1;
     if (success) questionDrillState.hits += 1;
     updateQuestionDrillStats();
+    revealQuestionDrillOptionResult({
+        selectedOptionId: selectedOption.id,
+        success,
+        expectedCategories: expected
+    });
 
     if (success) {
         questionDrillState.roundCorrect = true;
+        const selectedLabel = getQuestionDrillCategoryLabel(selectedCategory);
         if (questionDrillState.mode === 'exam') {
-            setQuestionDrillFeedback(`נכון. זוהה כיוון ${selected}. לחצו "משפט הבא" להמשך.`, 'success');
+            setQuestionDrillFeedback(`נכון. זוהה כיוון ${selectedLabel}. לחצו "משפט הבא" להמשך.`, 'success');
         } else {
-            const matchedLabel = matched.length ? matched.join(' / ') : selected;
-            setQuestionDrillFeedback(`מצוין. השאלה פוגעת בכיוון ${selected} (${matchedLabel}). לחצו "משפט הבא" להמשך.`, 'success');
+            setQuestionDrillFeedback(`מצוין. בחרת שאלה מדויקת בכיוון ${selectedLabel}. לחצו "משפט הבא" להמשך.`, 'success');
         }
         playUISound('correct');
         finalizeQuestionDrillRound('correct');
@@ -4125,12 +4271,8 @@ function evaluateQuestionDrill() {
         return;
     }
 
-    const missing = !keywordMatches
-        ? 'הוסיפו מילות מפתח כמו ' + (QUESTION_DRILL_KEYWORDS[selected] || []).slice(0, 3).join(', ')
-        : '';
-    const expectedMessage = expected.length ? ` הכי מתאים כאן: ${expected.join(' / ')}` : '';
-    const matchedMessage = matched.length ? ` זיהוי לפי הטקסט: ${matched.join(' / ')}.` : '';
-    setQuestionDrillFeedback(`נסו שוב. ${missing}${expectedMessage}.${matchedMessage}`.trim(), keywordMatches ? 'warn' : 'danger');
+    const expectedLabel = expected.length ? getQuestionDrillCategoryLabel(expected[0]) : 'כיוון אחר';
+    setQuestionDrillFeedback(`נסו שוב. הכיוון המתאים כאן הוא ${expectedLabel}.`, 'warn');
     updateQuestionDrillControlsState();
 }
 
@@ -4141,7 +4283,7 @@ function setupQuestionDrill() {
     questionDrillState.elements = {
         root: drillRoot,
         statement: document.getElementById('question-drill-statement'),
-        input: document.getElementById('question-drill-input'),
+        options: document.getElementById('question-drill-options'),
         category: document.getElementById('question-drill-category'),
         feedback: document.getElementById('question-drill-feedback'),
         attempts: document.getElementById('question-drill-attempts'),
@@ -4172,6 +4314,12 @@ function setupQuestionDrill() {
     setQuestionDrillPlan(questionDrillState.planId, { persist: false });
     setQuestionDrillMode(questionDrillState.mode, { persist: false });
 
+    questionDrillState.elements.options?.addEventListener('click', (event) => {
+        const button = event.target.closest('.question-drill-option');
+        if (!button) return;
+        setQuestionDrillSelectedOption(String(button.dataset.optionId || ''));
+    });
+
     questionDrillState.elements.checkBtn?.addEventListener('click', evaluateQuestionDrill);
     questionDrillState.elements.nextBtn?.addEventListener('click', () => loadNextQuestionDrill());
     questionDrillState.elements.hintBtn?.addEventListener('click', showQuestionDrillHint);
@@ -4195,7 +4343,7 @@ function setupQuestionDrill() {
         updateQuestionDrillControlsState();
         setQuestionDrillFeedback('הסטטיסטיקה אופסה. לחצו "התחל סשן".', 'info');
         if (questionDrillState.elements.statement) questionDrillState.elements.statement.textContent = '';
-        if (questionDrillState.elements.input) questionDrillState.elements.input.value = '';
+        renderQuestionDrillOptions();
         if (questionDrillState.elements.summary) {
             clearOpenedContentFeedback(questionDrillState.elements.summary);
             questionDrillState.elements.summary.classList.add('hidden');
@@ -15391,4 +15539,3 @@ function setupWrinkleGame() {
 
 
 
-"
