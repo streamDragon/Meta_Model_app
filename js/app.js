@@ -3533,31 +3533,159 @@ function setupPracticeMode() {
 }
 
 const QUESTION_DRILL_PACK = [
-    {
-        id: 'question1',
-        statement: 'הבוס אמר שהלקוח לא מבין למה זה לא אפשרי ׳›עת.',
-        focus: ['DISTORTION']
-    },
-    {
-        id: 'question2',
-        statement: 'אני תמיד מאחר כי הרבה עומס.',
-        focus: ['GENERALIZATION']
-    },
-    {
-        id: 'question3',
-        statement: 'הם שואלים אותי מה בדיוק ׳—סר.',
-        focus: ['DELETION']
-    },
-    {
-        id: 'question4',
-        statement: 'כולם אומרים שזה לא עומד להשתנות.',
-        focus: ['GENERALIZATION']
-    },
-    {
-        id: 'question5',
-        statement: 'הם טוענים שכבר ניסו הכל על סמך הרגשה.',
-        focus: ['DISTORTION']
-    }
+    Object.freeze({
+        id: 'mm_easy_001',
+        statement: 'כולם תמיד מתעלמים ממני.',
+        focus: ['GENERALIZATION'],
+        targetMacro: 'GENERALIZATION',
+        targetSubpattern: 'universal_quantifier',
+        difficulty: 'easy',
+        explanation: 'זו הכללה גורפת עם "כולם/תמיד".'
+    }),
+    Object.freeze({
+        id: 'mm_easy_002',
+        statement: 'אני חייב להסכים, אחרת הכול יתפרק.',
+        focus: ['GENERALIZATION'],
+        targetMacro: 'GENERALIZATION',
+        targetSubpattern: 'modal_necessity',
+        difficulty: 'easy',
+        explanation: 'מפעיל מודליות הכרח: "חייב".'
+    }),
+    Object.freeze({
+        id: 'mm_easy_003',
+        statement: 'אי אפשר לדבר איתו.',
+        focus: ['GENERALIZATION'],
+        targetMacro: 'GENERALIZATION',
+        targetSubpattern: 'modal_possibility',
+        difficulty: 'easy',
+        explanation: 'הכללה של אפשרות: "אי אפשר".'
+    }),
+    Object.freeze({
+        id: 'mm_easy_004',
+        statement: 'הוא לא מכבד אותי.',
+        focus: ['DISTORTION'],
+        targetMacro: 'DISTORTION',
+        targetSubpattern: 'complex_equivalence',
+        difficulty: 'easy',
+        explanation: 'שקילות מורכבת: פעולה אחת מתורגמת למשמעות רחבה.'
+    }),
+    Object.freeze({
+        id: 'mm_easy_005',
+        statement: 'אני יודעת שהם חושבים שאני חלשה.',
+        focus: ['DISTORTION'],
+        targetMacro: 'DISTORTION',
+        targetSubpattern: 'mind_reading',
+        difficulty: 'easy',
+        explanation: 'קריאת מחשבות ללא ראיה ישירה.'
+    }),
+    Object.freeze({
+        id: 'mm_easy_006',
+        statement: 'הוא איחר, אז ברור שלא אכפת לו ממני.',
+        focus: ['DISTORTION'],
+        targetMacro: 'DISTORTION',
+        targetSubpattern: 'cause_effect',
+        difficulty: 'easy',
+        explanation: 'סיבה-תוצאה מהירה בין איחור לבין כוונה רגשית.'
+    }),
+    Object.freeze({
+        id: 'mm_easy_007',
+        statement: 'זה לא עובד.',
+        focus: ['DELETION'],
+        targetMacro: 'DELETION',
+        targetSubpattern: 'unspecified_verb',
+        difficulty: 'easy',
+        explanation: 'מחיקה: לא ברור מה בדיוק לא עובד ובאיזה תנאים.'
+    }),
+    Object.freeze({
+        id: 'mm_easy_008',
+        statement: 'הם אמרו שזה בעייתי.',
+        focus: ['DELETION'],
+        targetMacro: 'DELETION',
+        targetSubpattern: 'unspecified_noun',
+        difficulty: 'easy',
+        explanation: 'מחיקה: מי בדיוק אמר ומה בדיוק בעייתי.'
+    }),
+    Object.freeze({
+        id: 'mm_easy_009',
+        statement: 'זה יותר טוב עכשיו.',
+        focus: ['DELETION'],
+        targetMacro: 'DELETION',
+        targetSubpattern: 'comparative_deletion',
+        difficulty: 'easy',
+        explanation: 'השוואה חסרה: יותר טוב ביחס למה.'
+    }),
+    Object.freeze({
+        id: 'mm_medium_001',
+        statement: 'כשאין תגובה ממנו, אני יודעת שכבר לא באמת חשוב לו.',
+        focus: ['DISTORTION'],
+        targetMacro: 'DISTORTION',
+        targetSubpattern: 'mind_reading',
+        difficulty: 'medium',
+        explanation: 'פרשנות של כוונה פנימית מתוך שתיקה.'
+    }),
+    Object.freeze({
+        id: 'mm_medium_002',
+        statement: 'בפגישות כאלה אני תמיד נתקעת.',
+        focus: ['GENERALIZATION'],
+        targetMacro: 'GENERALIZATION',
+        targetSubpattern: 'universal_quantifier',
+        difficulty: 'medium',
+        explanation: 'הכללה על כל הפגישות מסוג מסוים.'
+    }),
+    Object.freeze({
+        id: 'mm_medium_003',
+        statement: 'צריך להיות מושלם כדי להצליח בזה.',
+        focus: ['GENERALIZATION'],
+        targetMacro: 'GENERALIZATION',
+        targetSubpattern: 'modal_necessity',
+        difficulty: 'medium',
+        explanation: 'מודליות הכרח נוקשה: "צריך".'
+    }),
+    Object.freeze({
+        id: 'mm_medium_004',
+        statement: 'המשוב שלהם הוכיח שאני לא מתאימה לתפקיד.',
+        focus: ['DISTORTION'],
+        targetMacro: 'DISTORTION',
+        targetSubpattern: 'complex_equivalence',
+        difficulty: 'medium',
+        explanation: 'הופך משוב נקודתי לזהות כוללת.'
+    }),
+    Object.freeze({
+        id: 'mm_medium_005',
+        statement: 'הפרויקט הזה לא ברור.',
+        focus: ['DELETION'],
+        targetMacro: 'DELETION',
+        targetSubpattern: 'unspecified_noun',
+        difficulty: 'medium',
+        explanation: 'מחיקה: מה בדיוק לא ברור בפרויקט.'
+    }),
+    Object.freeze({
+        id: 'mm_medium_006',
+        statement: 'הטון שלה גרם לי להיכשל לגמרי.',
+        focus: ['DISTORTION'],
+        targetMacro: 'DISTORTION',
+        targetSubpattern: 'cause_effect',
+        difficulty: 'medium',
+        explanation: 'סיבה-תוצאה מוחלטת בין טון חיצוני לביצוע.'
+    }),
+    Object.freeze({
+        id: 'mm_medium_007',
+        statement: 'אם פעם אחת פישלתי, זה אומר שאני תמיד לא יציב.',
+        focus: ['GENERALIZATION'],
+        targetMacro: 'GENERALIZATION',
+        targetSubpattern: 'universal_quantifier',
+        difficulty: 'medium',
+        explanation: 'מקרה אחד הופך לכלל תמידי.'
+    }),
+    Object.freeze({
+        id: 'mm_medium_008',
+        statement: 'הם רוצים שינוי.',
+        focus: ['DELETION'],
+        targetMacro: 'DELETION',
+        targetSubpattern: 'unspecified_noun',
+        difficulty: 'medium',
+        explanation: 'מחיקה: מי בדיוק הם, ומה סוג השינוי.'
+    })
 ];
 
 const QUESTION_DRILL_KEYWORDS = {
@@ -3571,6 +3699,24 @@ const QUESTION_DRILL_CATEGORY_LABELS = Object.freeze({
     DISTORTION: 'עיוות (Distortion)',
     GENERALIZATION: 'הכללה (Generalization)'
 });
+
+const QUESTION_DRILL_CATEGORY_SHORT_LABELS = Object.freeze({
+    DELETION: 'מחיקה',
+    DISTORTION: 'עיוות',
+    GENERALIZATION: 'הכללה'
+});
+
+const QUESTION_DRILL_TEST_PROMPTS = Object.freeze({
+    DELETION: 'מצא את ההשמטה!!',
+    DISTORTION: 'מצא את העיוות!!',
+    GENERALIZATION: 'מצא את ההכללה!!'
+});
+
+const QUESTION_DRILL_DIFFICULTIES = Object.freeze([
+    Object.freeze({ id: 'easy', label: 'קל', note: '3 תשובות: מחיקה / עיוות / הכללה' }),
+    Object.freeze({ id: 'medium', label: 'בינוני', note: 'משפטים מעורבים ועדינים יותר' })
+]);
+const QUESTION_DRILL_TEST_AUTO_ADVANCE_MS = 900;
 
 const QUESTION_DRILL_OPTION_BANK = Object.freeze({
     DELETION: Object.freeze([
@@ -3596,7 +3742,9 @@ const QUESTION_DRILL_OPTION_BANK = Object.freeze({
     ])
 });
 
-const QUESTION_DRILL_PREFS_KEY = 'question_drill_prefs_v1';
+const QUESTION_DRILL_PREFS_KEY = 'question_drill_prefs_v2';
+const QUESTION_DRILL_PREFS_LEGACY_KEY = 'question_drill_prefs_v1';
+const QUESTION_DRILL_TEST_STATS_KEY = 'question_drill_test_stats_v1';
 const QUESTION_DRILL_CATEGORIES = Object.freeze(['DELETION', 'DISTORTION', 'GENERALIZATION']);
 const QUESTION_DRILL_SUCCESS_PLANS = Object.freeze([
     Object.freeze({
@@ -3633,6 +3781,20 @@ const questionDrillState = {
     attempts: 0,
     hits: 0,
     mode: 'learning',
+    testDifficulty: 'easy',
+    testScore: 0,
+    testTimerMs: 0,
+    testRoundStartedAt: 0,
+    testTimerHandle: null,
+    testAutoAdvanceHandle: null,
+    testLastResults: [],
+    testBestScoreByDifficulty: {
+        easy: 0,
+        medium: 0
+    },
+    testReactionTotalMs: 0,
+    testReactionCount: 0,
+    currentRoundReactionMs: 0,
     planId: QUESTION_DRILL_SUCCESS_PLANS[1].id,
     sessionActive: false,
     sessionCompleted: false,
@@ -3654,14 +3816,56 @@ function getQuestionDrillPlan(planId = '') {
     return QUESTION_DRILL_SUCCESS_PLANS.find(plan => plan.id === planId) || QUESTION_DRILL_SUCCESS_PLANS[0];
 }
 
+const questionDrillEngine = (typeof window !== 'undefined' && window.QuestionDrillEngine)
+    ? window.QuestionDrillEngine
+    : {
+        normalizeDifficulty(value) {
+            const key = String(value || '').trim().toLowerCase();
+            return key === 'medium' ? 'medium' : 'easy';
+        },
+        selectItemsByDifficulty(items, difficulty) {
+            if (!Array.isArray(items)) return [];
+            const level = this.normalizeDifficulty(difficulty);
+            const filtered = items.filter((item) => String(item?.difficulty || '').toLowerCase() === level);
+            return filtered.length ? filtered : items.slice();
+        },
+        clampReactionTimeMs(value) {
+            const raw = Number(value);
+            if (!Number.isFinite(raw) || raw < 0) return 0;
+            return Math.round(raw);
+        },
+        computeTestScoreDelta({ correct = false, rtMs = 0, streak = 0 } = {}) {
+            if (!correct) {
+                return { total: -50, base: 0, speedBonus: 0, streakBonus: 0 };
+            }
+            const reactionTime = this.clampReactionTimeMs(rtMs);
+            const normalizedStreak = Math.max(0, Math.floor(Number(streak) || 0));
+            const base = 100;
+            const speedBonus = Math.max(0, Math.round((2000 - reactionTime) / 20));
+            const streakBonus = normalizedStreak * 10;
+            return { total: base + speedBonus + streakBonus, base, speedBonus, streakBonus };
+        }
+    };
+
+function normalizeQuestionDrillMode(input = '') {
+    const key = String(input || '').trim().toLowerCase();
+    if (key === 'exam' || key === 'test') return 'test';
+    return 'learning';
+}
+
+function normalizeQuestionDrillDifficulty(input = '') {
+    return questionDrillEngine.normalizeDifficulty(input);
+}
+
 function loadQuestionDrillPrefs() {
     try {
-        const raw = localStorage.getItem(QUESTION_DRILL_PREFS_KEY);
+        const raw = localStorage.getItem(QUESTION_DRILL_PREFS_KEY) || localStorage.getItem(QUESTION_DRILL_PREFS_LEGACY_KEY);
         if (!raw) return;
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object') {
-            questionDrillState.mode = String(parsed.mode || '').toLowerCase() === 'exam' ? 'exam' : 'learning';
+            questionDrillState.mode = normalizeQuestionDrillMode(parsed.mode);
             questionDrillState.planId = getQuestionDrillPlan(parsed.planId).id;
+            questionDrillState.testDifficulty = normalizeQuestionDrillDifficulty(parsed.testDifficulty);
         }
     } catch (error) {
         console.warn('Question Drill prefs parse error', error);
@@ -3672,15 +3876,47 @@ function saveQuestionDrillPrefs() {
     try {
         localStorage.setItem(QUESTION_DRILL_PREFS_KEY, JSON.stringify({
             mode: questionDrillState.mode,
-            planId: questionDrillState.planId
+            planId: questionDrillState.planId,
+            testDifficulty: questionDrillState.testDifficulty
         }));
     } catch (error) {
         console.warn('Question Drill prefs save error', error);
     }
 }
 
+function loadQuestionDrillTestStats() {
+    try {
+        const raw = localStorage.getItem(QUESTION_DRILL_TEST_STATS_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') return;
+
+        questionDrillState.testDifficulty = normalizeQuestionDrillDifficulty(parsed.lastDifficulty || questionDrillState.testDifficulty);
+        const best = parsed.bestScores && typeof parsed.bestScores === 'object' ? parsed.bestScores : {};
+        questionDrillState.testBestScoreByDifficulty.easy = Math.max(0, Math.floor(Number(best.easy) || 0));
+        questionDrillState.testBestScoreByDifficulty.medium = Math.max(0, Math.floor(Number(best.medium) || 0));
+        questionDrillState.testLastResults = Array.isArray(parsed.last10)
+            ? parsed.last10.slice(0, 10)
+            : [];
+    } catch (error) {
+        console.warn('Question Drill test stats parse error', error);
+    }
+}
+
+function saveQuestionDrillTestStats() {
+    try {
+        localStorage.setItem(QUESTION_DRILL_TEST_STATS_KEY, JSON.stringify({
+            lastDifficulty: questionDrillState.testDifficulty,
+            bestScores: questionDrillState.testBestScoreByDifficulty,
+            last10: questionDrillState.testLastResults.slice(0, 10)
+        }));
+    } catch (error) {
+        console.warn('Question Drill test stats save error', error);
+    }
+}
+
 function getQuestionDrillModeLabel(mode = questionDrillState.mode) {
-    return mode === 'exam' ? 'מבחן' : 'למידה';
+    return normalizeQuestionDrillMode(mode) === 'test' ? 'מוד מבחן' : 'לימוד';
 }
 
 function setQuestionDrillFeedback(text, tone = 'info') {

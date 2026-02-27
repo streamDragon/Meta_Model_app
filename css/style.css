@@ -2550,7 +2550,7 @@ body.screen-guide-open {
 
 .question-drill-session-config {
     display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(220px, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
     align-items: start;
 }
@@ -2611,6 +2611,10 @@ body.screen-guide-open {
 
 .question-drill-plan-box > span {
     font-size: 0.85rem;
+}
+
+.question-drill-difficulty-box {
+    min-width: 170px;
 }
 
 .question-drill-plan-select {
@@ -2740,6 +2744,60 @@ body.screen-guide-open {
     font-weight: 600;
 }
 
+.question-drill-test-banner {
+    margin-bottom: 12px;
+    border: 1px solid #f59e0b;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 55%, #fde68a 100%);
+    padding: 10px 12px;
+    box-shadow: 0 8px 18px rgba(245, 158, 11, 0.2);
+    display: grid;
+    gap: 4px;
+}
+
+.question-drill-test-banner p {
+    margin: 0;
+    font-size: 1.22rem;
+    font-weight: 900;
+    color: #9a3412;
+}
+
+.question-drill-test-banner small {
+    color: #9a3412;
+    font-weight: 700;
+    font-size: 0.84rem;
+}
+
+.question-drill-test-banner[data-tone="DELETION"] {
+    border-color: #2563eb;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 52%, #bfdbfe 100%);
+}
+
+.question-drill-test-banner[data-tone="DELETION"] p,
+.question-drill-test-banner[data-tone="DELETION"] small {
+    color: #1e3a8a;
+}
+
+.question-drill-test-banner[data-tone="DISTORTION"] {
+    border-color: #e11d48;
+    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 52%, #fecdd3 100%);
+}
+
+.question-drill-test-banner[data-tone="DISTORTION"] p,
+.question-drill-test-banner[data-tone="DISTORTION"] small {
+    color: #9f1239;
+}
+
+.question-drill-test-banner[data-tone="GENERALIZATION"] {
+    border-color: #7c3aed;
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 52%, #ddd6fe 100%);
+}
+
+.question-drill-test-banner[data-tone="GENERALIZATION"] p,
+.question-drill-test-banner[data-tone="GENERALIZATION"] small {
+    color: #5b21b6;
+}
+
 .question-drill-options {
     display: grid;
     gap: 10px;
@@ -2811,6 +2869,38 @@ body.screen-guide-open {
     padding: 4px 8px;
     white-space: nowrap;
     flex-shrink: 0;
+}
+
+.question-drill-option.question-drill-option--test {
+    min-height: 58px;
+    justify-content: center;
+    text-align: center;
+    border-width: 2px;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.question-drill-option.question-drill-option--test .question-drill-option-label {
+    font-size: 1.04rem;
+    font-weight: 900;
+}
+
+.question-drill-option.question-drill-option--test .question-drill-option-category {
+    display: none;
+}
+
+.question-drill-option.question-drill-option--test[data-category="DELETION"] {
+    border-color: rgba(37, 99, 235, 0.42);
+    background: linear-gradient(180deg, #f8fbff 0%, #ecf4ff 100%);
+}
+
+.question-drill-option.question-drill-option--test[data-category="DISTORTION"] {
+    border-color: rgba(225, 29, 72, 0.38);
+    background: linear-gradient(180deg, #fff8fa 0%, #ffeef3 100%);
+}
+
+.question-drill-option.question-drill-option--test[data-category="GENERALIZATION"] {
+    border-color: rgba(124, 58, 237, 0.34);
+    background: linear-gradient(180deg, #faf8ff 0%, #f2edff 100%);
 }
 
 .question-drill-controls {
@@ -2932,6 +3022,26 @@ body.screen-guide-open {
 
 .question-drill-controls .is-hidden {
     display: none !important;
+}
+
+.question-drill-controls .question-drill-control-hidden {
+    display: none !important;
+}
+
+.question-drill-card.is-test-mode .question-drill-statement {
+    font-size: 1.05rem;
+    border-style: solid;
+    border-color: #cbd5e1;
+}
+
+.question-drill-card.is-test-mode .question-drill-controls {
+    justify-content: flex-start;
+}
+
+.question-drill-card.is-test-mode #question-drill-next {
+    background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+    color: #fff;
+    border-color: #1d4ed8;
 }
 
 .question-drill-stats {
