@@ -106,6 +106,7 @@ let audioState = {
     uiCompressor: null,
     uiMasterGain: null,
     lastUiSoundAtMs: 0,
+    lastUiSoundByKind: Object.create(null),
     lastGlobalTapAtMs: 0,
     globalInteractionBound: false
 };
@@ -129,6 +130,16 @@ const OPENING_TRACK_SRC = 'assets/audio/The_Inner_Task.mp3';
 const OPENING_TRACK_FIRST_ENTRY_KEY = 'meta_opening_track_first_entry_done';
 const UI_SOUND_GAIN_BOOST = 1.45;
 const UI_SOUND_GAIN_LIMIT = 0.12;
+const UI_SOUND_KIND_COOLDOWNS_MS = Object.freeze({
+    prism_pick: 120,
+    prism_warn: 170,
+    prism_submit: 260,
+    prism_open: 260,
+    prism_back: 140,
+    prism_error: 180,
+    tap_soft: 70,
+    select_soft: 80
+});
 
 const TRAINER_CATEGORY_LABELS = {
     DELETION: 'מחיקה (Deletion)',
@@ -477,9 +488,15 @@ function playUISound(kind) {
             : kind === 'error'
                 ? 'wrong'
                 : kind;
-    audioState.lastUiSoundAtMs = (typeof performance !== 'undefined' && typeof performance.now === 'function')
+    const nowMs = (typeof performance !== 'undefined' && typeof performance.now === 'function')
         ? performance.now()
         : Date.now();
+    const cooldownMs = Number(UI_SOUND_KIND_COOLDOWNS_MS[soundKind] || 0);
+    const lastByKind = Number(audioState.lastUiSoundByKind[soundKind] || 0);
+    if (cooldownMs > 0 && (nowMs - lastByKind) < cooldownMs) return;
+
+    audioState.lastUiSoundByKind[soundKind] = nowMs;
+    audioState.lastUiSoundAtMs = nowMs;
     if (soundKind === 'correct') {
         playTone(660, 0.12, 'triangle', 0.06, 0);
         playTone(990, 0.1, 'sine', 0.028, 0.02);
@@ -9796,7 +9813,11 @@ const LOGICAL_LEVEL_KEYWORDS = {
 
 const PRISM_STACK_LEVEL_ORDER = Object.freeze(['E', 'B', 'C', 'V', 'I', 'S']);
 const PRISM_VERTICAL_STACK_DRAFT_KEY = 'prism_vertical_stack_draft_v1';
+const PRISM_DRAFT_SAVE_DEBOUNCE_MS = 140;
+const PRISM_ANCHOR_REFRESH_DEBOUNCE_MS = 120;
 let prismVerticalStackState = null;
+let prismDraftSaveTimer = null;
+let prismAnchorRefreshTimer = null;
 
 const PRISM_STACK_DEFAULT_ANCHORS = Object.freeze({
     cause_effect: 'ביקורת',
@@ -10170,17 +10191,49 @@ function savePrismVerticalStackDraftForCurrentPrism() {
         categoryLabelHe: prism.name_he || '',
         coreQuestion: getPrismCoreQuestion(prism),
         anchorText,
-        prompts: buildVerticalStackPrompts(prism, anchorText),
         answers,
-        suggestions: buildVerticalStackSuggestedAnswers(prism, anchorText),
         emotion: parseInt(document.getElementById('prism-emotion')?.value || '3', 10),
         resistance: parseInt(document.getElementById('prism-resistance')?.value || '2', 10)
     };
 
-    const store = getPrismVerticalStackDraftStore();
-    store[prism.id] = draft;
-    localStorage.setItem(PRISM_VERTICAL_STACK_DRAFT_KEY, JSON.stringify(store));
+    try {
+        const store = getPrismVerticalStackDraftStore();
+        store[prism.id] = draft;
+        localStorage.setItem(PRISM_VERTICAL_STACK_DRAFT_KEY, JSON.stringify(store));
+    } catch (error) {
+        console.warn('Failed to persist Prism Lab draft', error);
+    }
     prismVerticalStackState = draft;
+}
+
+function schedulePrismVerticalStackDraftSave() {
+    if (prismDraftSaveTimer) {
+        clearTimeout(prismDraftSaveTimer);
+        prismDraftSaveTimer = null;
+    }
+    prismDraftSaveTimer = window.setTimeout(() => {
+        prismDraftSaveTimer = null;
+        savePrismVerticalStackDraftForCurrentPrism();
+    }, PRISM_DRAFT_SAVE_DEBOUNCE_MS);
+}
+
+function flushPrismVerticalStackDraftSave() {
+    if (prismDraftSaveTimer) {
+        clearTimeout(prismDraftSaveTimer);
+        prismDraftSaveTimer = null;
+    }
+    savePrismVerticalStackDraftForCurrentPrism();
+}
+
+function schedulePrismVerticalStackAnchorRefresh(options = {}) {
+    if (prismAnchorRefreshTimer) {
+        clearTimeout(prismAnchorRefreshTimer);
+        prismAnchorRefreshTimer = null;
+    }
+    prismAnchorRefreshTimer = window.setTimeout(() => {
+        prismAnchorRefreshTimer = null;
+        refreshPrismVerticalStackForCurrentPrism(options);
+    }, PRISM_ANCHOR_REFRESH_DEBOUNCE_MS);
 }
 
 function applyVerticalStackStateToUI(prism, draft) {
@@ -10228,7 +10281,7 @@ function refreshPrismVerticalStackForCurrentPrism(options = {}) {
     renderPrismActiveSentenceCard(prism, anchorText);
     renderVerticalStackPrompts(buildVerticalStackPrompts(prism, anchorText));
     populatePreparedItems(prism);
-    savePrismVerticalStackDraftForCurrentPrism();
+    schedulePrismVerticalStackDraftSave();
 }
 function getPrismById(prismId) {
     return (metaModelData.prisms || []).find(x => x.id === prismId);
@@ -10873,31 +10926,45 @@ function setupPrismModule() {
     const prismLibrary = document.getElementById('prism-library');
     if (prismLibrary) prismLibrary.classList.remove('hidden');
     if (typeof applyPrismLabCompactRuntimeCopy === 'function') applyPrismLabCompactRuntimeCopy();
-
-    // Listeners for dynamic elements
-    document.addEventListener('click', (e) => {
-        const targetEl = e.target && e.target.nodeType === 1 ? e.target : e.target.parentElement;
-        const openBtn = targetEl && targetEl.closest('.prism-open-btn');
-        if (!openBtn) return;
-        const id = openBtn.getAttribute('data-id');
-        openPrism(id);
-    });
+    if (setupPrismModule.__bound === true) return;
+    setupPrismModule.__bound = true;
 
     const cancelBtn = document.getElementById('prism-cancel');
-    if (cancelBtn) cancelBtn.addEventListener('click', () => {
-        document.getElementById('prism-detail').classList.add('hidden');
-        document.getElementById('prism-library').classList.remove('hidden');
-        playUISound('prism_back');
-    });
+    if (cancelBtn) {
+        cancelBtn.dataset.uiSound = 'off';
+        cancelBtn.addEventListener('click', () => {
+            flushPrismVerticalStackDraftSave();
+            if (prismAnchorRefreshTimer) {
+                clearTimeout(prismAnchorRefreshTimer);
+                prismAnchorRefreshTimer = null;
+            }
+            document.getElementById('prism-detail').classList.add('hidden');
+            document.getElementById('prism-library').classList.remove('hidden');
+            playUISound('prism_back');
+        });
+    }
 
     const prismSubmit = document.getElementById('prism-submit');
-    if (prismSubmit) prismSubmit.addEventListener('click', handlePrismSubmit);
+    if (prismSubmit) {
+        prismSubmit.dataset.uiSound = 'off';
+        prismSubmit.addEventListener('click', () => {
+            flushPrismVerticalStackDraftSave();
+            handlePrismSubmit();
+        });
+    }
 
     const anchorInput = document.getElementById('prism-anchor-input');
     if (anchorInput && anchorInput.dataset.boundPrismAnchor !== 'true') {
         anchorInput.dataset.boundPrismAnchor = 'true';
-        anchorInput.addEventListener('input', () => refreshPrismVerticalStackForCurrentPrism({ forceDefaultAnchor: false }));
-        anchorInput.addEventListener('blur', () => refreshPrismVerticalStackForCurrentPrism({ forceDefaultAnchor: true }));
+        anchorInput.addEventListener('input', () => schedulePrismVerticalStackAnchorRefresh({ forceDefaultAnchor: false }));
+        anchorInput.addEventListener('blur', () => {
+            if (prismAnchorRefreshTimer) {
+                clearTimeout(prismAnchorRefreshTimer);
+                prismAnchorRefreshTimer = null;
+            }
+            refreshPrismVerticalStackForCurrentPrism({ forceDefaultAnchor: true });
+            flushPrismVerticalStackDraftSave();
+        });
     }
 
     const pivotToggle = document.getElementById('prepared-pivot-toggle');
@@ -10907,7 +10974,7 @@ function setupPrismModule() {
             const prism = getCurrentPrismFromDetail();
             if (!prism) return;
             renderPivotSuggestionsList(buildVerticalStackPivotSuggestions(prism, getCurrentPrismAnchorText(prism)));
-            savePrismVerticalStackDraftForCurrentPrism();
+            schedulePrismVerticalStackDraftSave();
         });
     }
 
@@ -10917,7 +10984,7 @@ function setupPrismModule() {
         emo.dataset.boundPrismSlider = 'true';
         emo.addEventListener('input', (e) => {
             emoD.textContent = e.target.value;
-            savePrismVerticalStackDraftForCurrentPrism();
+            schedulePrismVerticalStackDraftSave();
         });
     }
     const res = document.getElementById('prism-resistance');
@@ -10926,7 +10993,7 @@ function setupPrismModule() {
         res.dataset.boundPrismSlider = 'true';
         res.addEventListener('input', (e) => {
             resD.textContent = e.target.value;
-            savePrismVerticalStackDraftForCurrentPrism();
+            schedulePrismVerticalStackDraftSave();
         });
     }
 
@@ -10945,7 +11012,7 @@ function renderPrismLibrary() {
             <h4>${p.name_he}</h4>
             <p>${p.philosophy_core}</p>
             <p><strong>׳©׳׳׳× ׳¢׳•׳’׳:</strong> ${p.anchor_question_templates[0]}</p>
-            <div style="margin-top:10px"><button class="btn prism-open-btn" data-id="${p.id}">׳‘׳—׳¨ ׳₪׳¨׳™׳–׳׳”</button></div>
+            <div style="margin-top:10px"><button class="btn prism-open-btn" data-ui-sound="off" data-id="${p.id}">׳‘׳—׳¨ ׳₪׳¨׳™׳–׳׳”</button></div>
         `;
         // Direct binding fallback (helps in some embedded hosts).
         const openBtn = div.querySelector('.prism-open-btn');
@@ -11713,7 +11780,7 @@ function renderPrismLibrary() {
             <p class="prism-card-subtitle">${escapeHtml(nameEn || '')}</p>
             <p>${escapeHtml(core)}</p>
             <p><strong>שאלת מיקוד (על העוגן):</strong> ${escapeHtml(anchor)}</p>
-            <div style="margin-top:10px"><button class="btn prism-open-btn" data-id="${escapeHtml(String(p.id || ''))}">פתח/י פריזמה</button></div>
+            <div style="margin-top:10px"><button class="btn prism-open-btn" data-ui-sound="off" data-id="${escapeHtml(String(p.id || ''))}">פתח/י פריזמה</button></div>
         `;
         const openBtn = div.querySelector('.prism-open-btn');
         if (openBtn) {
@@ -11729,6 +11796,11 @@ function renderPrismLibrary() {
 function openPrism(id) {
     const prism = getPrismById(id);
     if (!prism) return alert('הפריזמה לא נמצאה');
+    if (prismAnchorRefreshTimer) {
+        clearTimeout(prismAnchorRefreshTimer);
+        prismAnchorRefreshTimer = null;
+    }
+    flushPrismVerticalStackDraftSave();
     document.getElementById('prism-library')?.classList.add('hidden');
     const detail = document.getElementById('prism-detail');
     if (!detail) return;
@@ -11742,9 +11814,6 @@ function openPrism(id) {
     if (prismAnchor) prismAnchor.textContent = normalizeUiText(String(prism.anchor_question_templates?.[0] || ''));
 
     renderPrismDeepGuide(prism);
-    applyPrismLabCompactRuntimeCopy();
-    ensurePrismLabWorkLayout();
-    applyPrismLabVisualHierarchyEnhancements();
     playUISound('prism_open');
 
     const resultBox = document.getElementById('prism-result');
@@ -11829,7 +11898,7 @@ function attachMappingDropHandlers() {
                 clearMappingInputStatus(inp);
             }
             syncPrismLevelItemVisualState(inp.closest('.level-item'));
-            savePrismVerticalStackDraftForCurrentPrism();
+            schedulePrismVerticalStackDraftSave();
         });
     });
 }
@@ -11856,7 +11925,7 @@ function applyPreparedTextToInput(inputEl, text, suggestedLevel = '') {
         playUISound('prism_pick');
     }
     syncPrismLevelItemVisualState(inputEl.closest('.level-item'));
-    savePrismVerticalStackDraftForCurrentPrism();
+    schedulePrismVerticalStackDraftSave();
 }
 
 function copyPreparedToFocusedOrEmpty(text, suggestedLevel = '') {
