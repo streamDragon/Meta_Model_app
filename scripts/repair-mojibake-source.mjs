@@ -157,6 +157,7 @@ function decodeStringLiteralsInJs(input) {
             if (ch === '`') {
                 out += ch;
                 state = 'template';
+                buf = '';
                 i += 1;
                 continue;
             }
@@ -184,14 +185,26 @@ function decodeStringLiteralsInJs(input) {
         }
 
         if (state === 'template') {
-            out += ch;
-            i += 1;
-            if (ch === '\\' && i < src.length) {
-                out += src[i];
+            if (ch === '\\') {
+                buf += ch;
+                i += 1;
+                if (i < src.length) {
+                    buf += src[i];
+                    i += 1;
+                }
+                continue;
+            }
+            if (ch === '`') {
+                const decoded = decodeSuspiciousRuns(buf);
+                changed += decoded.changed;
+                out += decoded.output + '`';
+                buf = '';
+                state = 'normal';
                 i += 1;
                 continue;
             }
-            if (ch === '`') state = 'normal';
+            buf += ch;
+            i += 1;
             continue;
         }
 
@@ -219,6 +232,7 @@ function decodeStringLiteralsInJs(input) {
     }
 
     if (state === 'single' || state === 'double') out += buf;
+    if (state === 'template') out += buf;
 
     return { output: out, changed };
 }

@@ -4800,7 +4800,7 @@ function buildRapidPatternHelpHtml(cue) {
 
     return `
         <p><strong>׳׳™׳ ׳׳—׳©׳•׳‘ ׳›׳׳:</strong> ׳§׳•׳“׳ ׳׳¡׳×׳›׳׳™׳ ׳¢׳ ׳”׳׳™׳׳” ׳”׳׳•׳“׳’׳©׳×, ׳•׳¨׳§ ׳׳—׳¨ ׳›׳ ׳‘׳•׳—׳¨׳™׳ ׳›׳₪׳×׳•׳¨.</p>
-        <p><strong>׳¨׳׳– ׳׳”׳™׳¨:</strong> "${escapeHtml(highlight)}" ׳׳¦׳‘׳™׳¢ ׳‘׳“׳¨׳ ׳›׳׳ ׳¢׳ <strong>${escapeHtml(label)}</strong>.</p>
+        <p><strong>׳¨׳׳– ׳׳”׳™׳¨:</strong> "${escapeHtml(highlight)}" ׳׳¦׳‘׳™׳¢ ׳‘׳“׳¨׳ ׳›לל על <strong>${escapeHtml(label)}</strong>.</p>
         <p><strong>׳׳׳”:</strong> ${escapeHtml(hint)}.</p>
         <p><strong>׳×׳”׳׳™׳ 3 ׳¦׳¢׳“׳™׳:</strong> ׳˜׳¨׳™׳’׳¨ ׳׳•׳“׳’׳© -> ׳–׳™׳”׳•׳™ ׳¡׳•׳’ ׳”׳”׳₪׳¨׳” -> ׳‘׳—׳™׳¨׳× ׳×׳‘׳ ׳™׳× ׳׳—׳× ׳׳×׳•׳ 15.</p>
     `;
@@ -4992,7 +4992,7 @@ function handleRapidPatternCorrectAnswer(button, cue, resolvedPatternId = '') {
     rapidPatternArenaState.streak += 1;
     button.classList.add('is-correct');
     setRapidPatternTrafficLight('green');
-    setRapidPatternFeedback(`׳׳¢׳•׳׳”! ׳–׳™׳”׳•׳™ ׳׳“׳•׳™׳§ (+${gained} ׳ ׳§׳³).`, 'success');
+    setRapidPatternFeedback(`׳׳¢׳•׳׳”! ׳–׳™׳”׳•׳™ ׳׳“׳•׳™ק (+${gained} נק׳).`, 'success');
     playUISound('correct');
     addXP(Math.max(2, Math.min(8, Math.round(gained / 2))));
     if (rapidPatternArenaState.streak > 0 && rapidPatternArenaState.streak % 5 === 0) {
@@ -5314,7 +5314,7 @@ function buildRapidPatternAiFeedbackHtml(history) {
     const avgSeconds = (avgRemainingMs / 1000).toFixed(1);
     return `
         <h4>AI Coach: ׳¡׳™׳›׳•׳ ${rounds} ׳©׳׳׳•׳×</h4>
-        <p>׳“׳™׳•׳§: <strong>${accuracy}%</strong> | ׳ ׳›׳•׳ ׳•׳×: <strong>${correctCount}/${rounds}</strong> | ׳–׳׳ ׳׳׳•׳¦׳¢ ׳©׳ ׳•׳×׳¨ ׳‘׳×׳©׳•׳‘׳•׳× ׳ ׳›׳•׳ ׳•׳×: <strong>${avgSeconds} ׳©׳ ׳³</strong></p>
+        <p>׳“׳™׳•׳§: <strong>${accuracy}%</strong> | ׳ ׳›׳•׳ ׳•׳×: <strong>${correctCount}/${rounds}</strong> | ׳–׳׳ ׳׳׳•׳¦׳¢ ׳©׳ ׳•׳×׳¨ ׳‘׳×׳©׳•׳‘׳•׳× ׳ ׳›׳•׳ ׳•ת: <strong>${avgSeconds} שנ׳</strong></p>
         <p class="rapid-ai-title">׳׳” ׳—׳–׳§ ׳׳¦׳׳ ׳¢׳›׳©׳™׳•</p>
         ${strengthsHtml}
         <p class="rapid-ai-title">׳׳” ׳—׳¡׳¨ ׳׳• ׳‘׳¢׳™׳™׳×׳™ ׳›׳¨׳’׳¢</p>
@@ -5771,7 +5771,7 @@ function handleWrinkleExposeChoice(selectedKey, button) {
     button.disabled = true;
     button.classList.add('is-wrong');
     const fold = getWrinkleFoldByKey(card.foldKey);
-    setWrinkleFeedback(`׳¢׳“׳™׳™׳ ׳׳. ׳¨׳׳–: ${fold?.hiddenAssumption || '׳—׳₪׳©/׳™ ׳׳× ׳”׳”׳ ׳—׳” ׳©׳׳ ׳ ׳׳׳¨׳” ׳‘׳׳₪׳•׳¨׳©.'}`, 'warn');
+    setWrinkleFeedback(`׳¢׳“׳™׳™׳ ׳׳. ׳¨׳׳–: ${fold?.hiddenAssumption || '׳—׳₪׳©/׳™ ׳׳× ׳”׳”׳ ׳—׳” ׳©׳׳ ׳ ׳׳׳¨׳” ׳‘׳׳₪׳•רש.'}`, 'warn');
     playUISound('wrong');
 }
 
@@ -5789,7 +5789,7 @@ function handleWrinkleChallengeChoice(selectedKey, button) {
     button.disabled = true;
     button.classList.add('is-wrong');
     const fold = getWrinkleFoldByKey(card.foldKey);
-    setWrinkleFeedback(`׳›׳׳¢׳˜. ׳©׳׳׳× ׳”׳¢׳•׳’׳ ׳”׳׳“׳•׳™׳§׳× ׳›׳׳: "${fold?.challengeQuestion || ''}"`, 'warn');
+    setWrinkleFeedback(`׳›׳׳¢׳˜. ׳©׳׳׳× ׳”׳¢׳•׳’׳ ׳”׳׳“׳•׳™׳§׳× ׳›אן: "${fold?.challengeQuestion || ''}"`, 'warn');
     playUISound('wrong');
 }
 
@@ -5967,11 +5967,11 @@ function addSelfStatementToWrinkleGame() {
 function detectWrinkleFoldFromText(text) {
     const normalized = normalizeText(text);
 
-    if (/(׳׳ ׳™׳›׳•׳|׳׳™ ׳׳₪׳©׳¨|׳׳™׳ ׳׳¦׳‘|׳‘׳׳×׳™ ׳׳₪׳©׳¨׳™|׳‘׳—׳™׳™׳ ׳׳)/.test(normalized)) {
+    if (/(׳׳ ׳™׳›׳•׳|׳׳™ ׳׳₪׳©׳¨|׳׳™׳ ׳׳¦׳‘|׳‘׳׳×׳™ ׳׳₪׳©׳¨׳™|׳‘׳—׳™׳™ם לא)/.test(normalized)) {
         return 'ABSOLUTE_IMPOSSIBLE';
     }
 
-    if (/(׳—׳™׳™׳‘|׳¦׳¨׳™׳|׳׳•׳›׳¨׳—|׳׳™׳ ׳‘׳¨׳™׳¨׳”|׳׳¡׳•׳¨ ׳׳™ ׳׳)/.test(normalized)) {
+    if (/(׳—׳™׳™׳‘|׳¦׳¨׳™׳|׳׳•׳›׳¨׳—|׳׳™׳ ׳‘׳¨׳™׳¨׳”|׳׳¡׳•׳¨ ׳׳™ לא)/.test(normalized)) {
         return 'NO_CHOICE';
     }
 
@@ -6160,7 +6160,7 @@ function buildDeletionGuideHtml() {
     return `
         <p><strong>׳׳™׳ ׳¢׳•׳‘׳“ ׳×׳¨׳’׳•׳ ׳׳—׳™׳§׳” (6 ׳׳₪׳©׳¨׳•׳™׳•׳×)?</strong></p>
         <p>׳‘׳›׳ ׳©׳׳׳” ׳×׳§׳‘׳/׳™ 6 ׳׳₪׳©׳¨׳•׳™׳•׳×: 3 ׳©׳׳׳•׳× ׳©׳׳™׳ ׳ ׳׳—׳™׳§׳”, ׳•-3 ׳©׳׳׳•׳× ׳׳—׳™׳§׳” ׳‘׳ ׳™׳¡׳•׳—׳™׳ ׳©׳•׳ ׳™׳.</p>
-        <p><strong>׳”׳׳˜׳¨׳” ׳©׳׳:</strong> ׳׳‘׳—׳•׳¨ ׳׳× ׳©׳׳׳× ׳”׳׳—׳™׳§׳” ׳©׳—׳•׳©׳₪׳× ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳›׳™ ׳׳©׳׳¢׳•׳×׳™ ׳׳”׳§׳©׳¨.</p>
+        <p><strong>׳”׳׳˜׳¨׳” ׳©׳׳:</strong> ׳׳‘׳—׳•׳¨ ׳׳× ׳©׳׳׳× ׳”׳׳—׳™׳§׳” ׳©׳—׳•׳©׳₪׳× ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳›׳™ ׳׳©׳׳¢׳•׳×׳™ ׳׳”קשר.</p>
         <p><strong>׳“׳™׳¨׳•׳’ ׳׳™׳›׳•׳× ׳‘׳×׳•׳ ׳©׳׳׳•׳× ׳”׳׳—׳™׳§׳”:</strong></p>
         <ul>
             <li>׳¨׳׳” ׳’׳‘׳•׳”׳”: ׳—׳•׳©׳₪׳× ׳׳™׳“׳¢ ׳—׳¡׳¨ ׳§׳¨׳™׳˜׳™ ׳©׳׳׳₪׳©׳¨ ׳₪׳¢׳•׳׳” ׳׳™׳™׳“׳™׳×.</li>
@@ -6671,7 +6671,7 @@ function showDeletionCoachFeedback(question, selectedChoice, evaluation, starGai
             <strong>${escapeHtml(evaluation.title || '')}</strong>
             <p class="explanation">
                 <strong>׳׳˜׳¨׳× ׳”׳©׳׳׳” ׳›׳׳:</strong> ׳׳׳×׳¨ ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳׳©׳׳¢׳•׳×׳™ ׳‘׳™׳•׳×׳¨ ׳‘׳”׳©׳׳˜׳”.<br>
-                <strong>׳”׳‘׳—׳™׳¨׳” ׳©׳׳:</strong> ${escapeHtml(selectedText)}<br>
+                <strong>׳”׳‘׳—׳™׳¨׳” שלך:</strong> ${escapeHtml(selectedText)}<br>
                 <strong>׳׳©׳•׳‘:</strong> ${escapeHtml(evaluation.message || '')}
             </p>
             <p class="explanation"><strong>׳“׳™׳¨׳•׳’ 3 ׳©׳׳׳•׳× ׳”׳׳—׳™׳§׳” ׳‘׳©׳׳׳” ׳”׳–׳•:</strong></p>
@@ -6714,7 +6714,7 @@ function showFeedback(isCorrect, question, selectedViolation, xpGain = 10, starG
                 <p class="explanation">
                     <strong>׳§׳˜׳’׳•׳¨׳™׳”:</strong> ${correctLabel}<br>
                     <strong>׳¡׳•׳’ ׳”׳₪׳¨׳”:</strong> ${violationName}<br>
-                    <strong>׳©׳׳׳× ׳¢׳•׳׳§ ׳׳•׳¦׳¢׳×:</strong> "${question.suggested_question}"<br>
+                    <strong>׳©׳׳׳× ׳¢׳•׳׳§ ׳׳•צעת:</strong> "${question.suggested_question}"<br>
                     <strong>׳”׳¡׳‘׳¨:</strong> ${question.explanation}
                 </p>
                 <p style="margin-top: 15px; color: #28a745; font-weight: bold;">+${xpGain} XP</p>
@@ -6726,10 +6726,10 @@ function showFeedback(isCorrect, question, selectedViolation, xpGain = 10, starG
             <div class="incorrect">
                 <strong>ג ׳׳ ׳ ׳›׳•׳</strong>
                 <p class="explanation">
-                    <strong>׳‘׳—׳¨׳×:</strong> ${selectedLabel}<br>
+                    <strong>׳‘׳—רת:</strong> ${selectedLabel}<br>
                     <strong>׳”׳×׳©׳•׳‘׳” ׳”׳ ׳›׳•׳ ׳”:</strong> ${correctLabel}<br>
                     <strong>׳¡׳•׳’ ׳”׳₪׳¨׳”:</strong> ${violationName}<br>
-                    <strong>׳©׳׳׳× ׳¢׳•׳׳§ ׳׳•׳¦׳¢׳×:</strong> "${question.suggested_question}"<br>
+                    <strong>׳©׳׳׳× ׳¢׳•׳׳§ ׳׳•צעת:</strong> "${question.suggested_question}"<br>
                     <strong>׳”׳¡׳‘׳¨:</strong> ${question.explanation}
                 </p>
                 <p style="margin-top: 12px; color: #744210; font-weight: bold;">+${starGain} ג­ ׳¢׳ ׳”׳׳׳™׳“׳”</p>
@@ -6806,7 +6806,7 @@ function showTrainerHint() {
     } else if (trainerState.hintLevel === 2) {
         hintHtml = `<p><strong>׳¨׳׳– 2/3:</strong> ${triggerLine}</p><p>׳¢׳›׳©׳™׳• ׳ ׳¡׳— ׳©׳׳׳” ׳§׳¦׳¨׳” ׳©׳×׳₪׳¨׳§ ׳׳× ׳”׳”׳ ׳—׳”.</p>`;
     } else {
-        hintHtml = `<p><strong>׳¨׳׳– 3/3:</strong> ׳”׳§׳˜׳’׳•׳¨׳™׳” ׳”׳™׳ <strong>${TRAINER_CATEGORY_LABELS[categoryKey] || categoryKey}</strong>.</p><p>׳©׳׳׳” ׳׳•׳¦׳¢׳×: "${question.suggested_question}"</p>`;
+        hintHtml = `<p><strong>׳¨׳׳– 3/3:</strong> ׳”׳§׳˜׳’׳•׳¨׳™׳” ׳”׳™׳ <strong>${TRAINER_CATEGORY_LABELS[categoryKey] || categoryKey}</strong>.</p><p>׳©׳׳׳” ׳׳•צעת: "${question.suggested_question}"</p>`;
     }
 
     setPanelContent('hint-display', hintHtml);
@@ -6820,7 +6820,7 @@ function showTrainerImportance() {
 
     if (trainerState.deletionCoachMode) {
         setPanelContent('why-display', `
-            <p><strong>׳׳˜׳¨׳× ׳”׳©׳׳׳” ׳›׳׳:</strong></p>
+            <p><strong>׳׳˜׳¨׳× ׳”׳©׳׳׳” ׳›אן:</strong></p>
             <p>׳׳ ׳¨׳§ ׳׳–׳”׳•׳× ׳©׳™׳© ׳׳—׳™׳§׳”, ׳׳׳ ׳׳‘׳—׳•׳¨ ׳׳× ׳©׳׳׳× ׳”׳׳—׳™׳§׳” ׳©׳—׳•׳©׳₪׳× ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳›׳™ ׳׳©׳׳¢׳•׳×׳™ ׳׳”׳‘׳ ׳” ׳•׳׳₪׳¢׳•׳׳”.</p>
             <p><strong>׳׳™׳ ׳׳•׳“׳“׳™׳ ׳׳™׳›׳•׳×?</strong></p>
             <ul>
@@ -6856,7 +6856,7 @@ function showTrainerDepth() {
         setPanelContent('depth-display', `
             <p><strong>׳׳¡׳’׳¨׳× ׳₪׳×׳¨׳•׳ ׳׳׳—׳™׳§׳” (6 ׳׳₪׳©׳¨׳•׳™׳•׳×):</strong></p>
             <ul>
-                <li>׳©׳׳‘ 1: ׳–׳”׳” ׳׳” ׳—׳¡׳¨ ׳‘׳׳©׳₪׳˜ ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳׳× ׳”׳”׳§׳©׳¨ ׳‘׳₪׳•׳¢׳.</li>
+                <li>׳©׳׳‘ 1: ׳–׳”׳” ׳׳” ׳—׳¡׳¨ ׳‘׳׳©׳₪׳˜ ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳׳× ׳”׳”׳§׳©׳¨ ׳‘׳₪׳•על.</li>
                 <li>׳©׳׳‘ 2: ׳¡׳ ׳ 3 ׳׳₪׳©׳¨׳•׳™׳•׳× ׳©׳׳™׳ ׳ ׳׳—׳™׳§׳”.</li>
                 <li>׳©׳׳‘ 3: ׳‘׳™׳ 3 ׳©׳׳׳•׳× ׳”׳׳—׳™׳§׳”, ׳“׳¨׳’ ׳׳₪׳™ ׳×׳¨׳•׳׳”: ׳’׳‘׳•׳”׳”, ׳‘׳™׳ ׳•׳ ׳™׳×, ׳ ׳׳•׳›׳”.</li>
                 <li>׳©׳׳‘ 4: ׳‘׳—׳¨ ׳׳× ׳”׳©׳׳׳” ׳©׳׳—׳–׳™׳¨׳” ׳׳™׳“׳¢ ׳׳“׳™׳“/׳‘׳¨-׳‘׳“׳™׳§׳”/׳׳›׳•׳•׳ ׳₪׳¢׳•׳׳”.</li>
@@ -7669,7 +7669,7 @@ function renderScenarioConsequence(option, isGreen, box, titleEl, actionEl, resu
     box.classList.add(isGreen ? 'green' : 'red');
     titleEl.textContent = `${consequence.icon || ''} ${consequence.title || ''}`.trim();
     actionEl.innerHTML = `<strong>׳׳” ׳§׳•׳¨׳” ׳׳™׳“ ׳׳—׳¨׳™ ׳–׳”:</strong> ${consequence.action || ''}`;
-    resultEl.innerHTML = `<strong>׳”׳×׳•׳¦׳׳” ׳‘׳₪׳•׳¢׳:</strong> ${consequence.result || ''}`;
+    resultEl.innerHTML = `<strong>׳”׳×׳•׳¦׳׳” ׳‘׳₪׳•על:</strong> ${consequence.result || ''}`;
 }
 
 function getScenarioGreenOptionText(scenario) {
@@ -7971,7 +7971,7 @@ function renderScenarioPrismWheel() {
             detailEl.innerHTML = '';
 
             const q = document.createElement('p');
-            q.innerHTML = `<strong>׳©׳׳׳× Meta:</strong> ${item.question || ''}`;
+            q.innerHTML = `<strong>שאלת Meta:</strong> ${item.question || ''}`;
             const ex = document.createElement('p');
             ex.innerHTML = `<strong>׳“׳•׳’׳׳”:</strong> ${item.example || ''}`;
             detailEl.appendChild(q);
@@ -8084,7 +8084,7 @@ function renderScenarioScore(entry) {
 
     if (starsRow) starsRow.textContent = starVisual || 'ג˜†ג˜†ג˜†ג˜†ג˜†';
     if (scoreLine) {
-        scoreLine.textContent = `׳¡׳™׳™׳׳× ׳¡׳¦׳ ׳” ${playedCount}/${scenarioTrainer.session.queue.length}. ׳ ׳§׳•׳“׳•׳× ׳¡׳©׳: ${scenarioTrainer.session.score}`;
+        scoreLine.textContent = `׳¡׳™׳™׳׳× ׳¡׳¦׳ ׳” ${playedCount}/${scenarioTrainer.session.queue.length}. ׳ ׳§׳•׳“׳•ת סשן: ${scenarioTrainer.session.score}`;
     }
     if (greenLine) greenLine.textContent = `׳‘׳₪׳¢׳ ׳”׳‘׳׳”: "${entry.greenSentence}"`;
     if (summaryBox) {
@@ -13484,7 +13484,7 @@ function setupWrinkleGame() {
                 <p id="wr2-progress" class="wr2-progress">0 ׳׳×׳•׳ 0 ׳›׳׳×׳™׳ ׳—׳©׳•׳₪׳™׳</p>
             </section>
             <section id="wr2-release" class="wr2-release hidden">
-                <p>׳”׳‘׳¢׳™׳” ׳׳™׳ ׳” ׳‘׳׳™׳׳™׳ "׳׳ ׳™ ׳׳ ׳™׳›׳•׳". ׳”׳‘׳¢׳™׳” ׳”׳™׳ ׳‘׳”׳›׳׳׳•׳× ׳ ׳¡׳×׳¨׳•׳× ׳©׳™׳•׳¦׳¨׳•׳× ׳×׳—׳•שת "׳׳™׳ ׳׳•׳¦׳".</p>
+                <p>׳”׳‘׳¢׳™׳” ׳׳™׳ ׳” ׳‘׳׳™׳׳™׳ "׳׳ ׳™ ׳׳ ׳™׳›׳•׳". ׳”׳‘׳¢׳™׳” ׳”׳™׳ ׳‘׳”׳›׳׳׳•׳× ׳ ׳¡׳×׳¨׳•׳× ׳©׳™׳•׳¦׳¨׳•׳× ׳×׳—׳•שת "׳׳™׳ ׳׳•צא".</p>
                 <button id="wr2-unlock-btn" class="btn btn-primary wr2-unlock-btn" type="button">׳—׳©׳₪׳×׳™ ׳׳× ׳›׳ ׳”׳›׳׳×׳™׳! נ‰</button>
             </section>
             <section id="wr2-transform-zone" class="wr2-transform-zone hidden">
