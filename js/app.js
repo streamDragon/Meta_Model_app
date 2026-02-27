@@ -9799,10 +9799,40 @@ const PRISM_VERTICAL_STACK_DRAFT_KEY = 'prism_vertical_stack_draft_v1';
 let prismVerticalStackState = null;
 
 const PRISM_STACK_DEFAULT_ANCHORS = Object.freeze({
-    comparative_deletion: 'טוב יותר',
-    cause_effect: 'הוא אמר: נדבר',
-    complex_equivalence: 'זה אומר שנכשלתי'
+    cause_effect: 'ביקורת',
+    comparisons: 'בחירה',
+    comparative_deletion: 'בחירה',
+    nominalization: 'תקשורת',
+    nominalisations: 'תקשורת',
+    modal_operators: 'שליטה',
+    modal_operator: 'שליטה',
+    universal_quantifiers: 'אהבה',
+    universal_quantifier: 'אהבה',
+    mind_reading: 'שליטה',
+    complex_equivalence: 'משמעות'
 });
+
+const PRISM_STACK_GENERIC_ANCHORS = Object.freeze(['תקשורת', 'בחירה', 'שליטה', 'אהבה', 'ביטחון', 'יחסים']);
+const PRISM_STACK_TECHNICAL_ANCHOR_TERMS = Object.freeze([
+    'נומינליזציה',
+    'nominalization',
+    'nominalisation',
+    'nominalisations',
+    'קריאת מחשבות',
+    'mind reading',
+    'אופרטורים מודלים',
+    'modal operators',
+    'כמותים כלליים',
+    'universal quantifiers',
+    'השוואות',
+    'comparisons',
+    'סיבה תוצאה',
+    'cause effect',
+    'שקילות מורכבת',
+    'complex equivalence',
+    'זהות',
+    'identity predicates'
+]);
 const PRISM_ANCHOR_PLACEHOLDER_RE = /^(?:test|טסט)\s*\d*$/i;
 
 const PRISM_STACK_PROMPT_TEMPLATES = Object.freeze({
@@ -9844,21 +9874,59 @@ function getPrismCoreQuestion(prism) {
     return String(prism?.anchor_question_templates?.[0] || '').trim();
 }
 
+function normalizePrismAnchorKey(value) {
+    return normalizeUiText(String(value || ''))
+        .toLowerCase()
+        .replace(/["'״׳]/g, '')
+        .replace(/[\s\-_/().,:;[\]{}!?]+/g, '');
+}
+
+function pickGenericPrismAnchor(prism) {
+    const source = String(prism?.id || prism?.name_en || prism?.name_he || '');
+    const code = Array.from(source).reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+    return PRISM_STACK_GENERIC_ANCHORS[code % PRISM_STACK_GENERIC_ANCHORS.length] || 'תקשורת';
+}
+
+function isTechnicalPrismAnchor(prism, rawAnchor) {
+    const key = normalizePrismAnchorKey(rawAnchor);
+    if (!key) return false;
+
+    const prismKeys = [prism?.id, prism?.name_he, prism?.name_en]
+        .map(normalizePrismAnchorKey)
+        .filter(Boolean);
+    if (prismKeys.includes(key)) return true;
+
+    const technicalKeys = PRISM_STACK_TECHNICAL_ANCHOR_TERMS.map(normalizePrismAnchorKey);
+    if (technicalKeys.includes(key)) return true;
+
+    return key.includes('נומינליזציה') || key.includes('nominal');
+}
+
+function normalizeSuggestedAnchorText(anchor, prism) {
+    const cleaned = normalizeUiText(String(anchor || '').trim());
+    if (!cleaned) return '';
+    if (/^x$/i.test(cleaned)) return '';
+    if (isTechnicalPrismAnchor(prism, cleaned)) return '';
+    return cleaned;
+}
+
 function deriveDefaultPrismAnchor(prism) {
     if (!prism) return 'עוגן';
     if (PRISM_STACK_DEFAULT_ANCHORS[prism.id]) return PRISM_STACK_DEFAULT_ANCHORS[prism.id];
 
     const anchorQuestion = getPrismCoreQuestion(prism);
-    const quoted = anchorQuestion.match(/["״](.+?)["״]/);
-    if (quoted && quoted[1]) return quoted[1].trim();
+    const quoted = anchorQuestion.match(/["'״׳](.+?)["'״׳]/);
+    const suggestedAnchor = normalizeSuggestedAnchorText(quoted?.[1] || '', prism);
+    if (suggestedAnchor) return suggestedAnchor;
 
-    return (prism.name_he || prism.name_en || 'עוגן').trim();
+    return pickGenericPrismAnchor(prism);
 }
 
 function normalizePrismAnchorText(prism, rawAnchor) {
     const raw = normalizeUiText(String(rawAnchor || '').trim());
     if (!raw) return deriveDefaultPrismAnchor(prism);
     if (PRISM_ANCHOR_PLACEHOLDER_RE.test(raw)) return deriveDefaultPrismAnchor(prism);
+    if (isTechnicalPrismAnchor(prism, raw)) return deriveDefaultPrismAnchor(prism);
     return raw;
 }
 
@@ -9883,59 +9951,99 @@ function buildVerticalStackSuggestedAnswers(prism, anchorText) {
     const a = String(anchorText || '').trim() || deriveDefaultPrismAnchor(prism);
     const suggestionsByLevel = {
         E: [
-            `כש-${a} מופיע בשיחה רשמית מול סמכות`,
-            `בעיקר בתחילת שיחה או בהקשר פורמלי` 
+            `זה עולה בעיקר בשיחה על ${a} בעבודה או בבית`,
+            `זה מופיע כשיש לחץ זמן סביב ${a}`
         ],
         B: [
-            `כש-${a} מופיע אני משתתק/מוריד מבט/עוצר`,
-            `אני מסנן משפטים בראש במקום לענות ישירות`
+            `כש-${a} עולה אני עוצר/ת ומקצר/ת תשובה`,
+            `אני מחליף/ה נושא במקום להישאר בשיחה על ${a}`
         ],
         C: [
-            `חסרה לי אסטרטגיית הבהרה קצרה מול ${a}`,
-            `נדרשת מיומנות ויסות + ניסוח שאלה מדויקת`
+            `תעזור לי מיומנות של שאלה קצרה ומדויקת על ${a}`,
+            `נדרשת לי אסטרטגיה להרגעה קצרה לפני תגובה על ${a}`
         ],
         V: [
-            `הכלל שלי: אם ${a} מופיע - זה סימן למשהו שלילי`,
-            `הקריטריון שלי כרגע הוא לא לטעות מול סמכות`
+            `חשוב לי לשמור על כבוד הדדי כשמדברים על ${a}`,
+            `יש לי כלל שצריך לדבר על ${a} בלי האשמות`
         ],
         I: [
-            `${a} מפעיל סיפור זהות של "אני לא מספיק טוב"`,
-            `אני מפרש את ${a} כהוכחה לערך עצמי`
+            `אני רוצה לראות את עצמי כמי שמדבר/ת על ${a} ברוגע`,
+            `אני מזכיר/ה לעצמי ש-${a} לא מגדיר אותי כאדם`
         ],
         S: [
-            `${a} גורם לי להרגיש שאני מחוץ לקבוצה/במבחן`,
-            `זה נשמע לי כמו איום על המקום שלי במערכת`
+            `המטרה שלי היא להישאר חלק מהשיחה גם כשעולה ${a}`,
+            `אני רוצה להרגיש שייך/ת בקבוצה גם כשיש ויכוח על ${a}`
         ]
     };
 
-    if (prism?.id === 'comparative_deletion') {
+    if (prism?.id === 'comparative_deletion' || prism?.id === 'comparisons') {
         suggestionsByLevel.V = [
-            `הקריטריון שלי ל-"${a}" הוא תוצאה/מדד מסוים`,
-            `אני משווה לפי סטנדרט לא מוגדר במקום קריטריון ברור`
+            `אני מגדיר/ה מראש מדד ברור ל-"${a}"`,
+            `אני משווה את עצמי ליעד אישי ולא לכולם`
         ];
         suggestionsByLevel.S = [
-            `ההשוואה סביב "${a}" חשובה מול קבוצה מסוימת`,
-            `אני מודד את עצמי מול קבוצת ייחוס`
+            `ההשוואה סביב "${a}" מגיעה בעיקר מול אנשים מסוימים`,
+            `אני בוחר/ת עם מי נכון לי להשוות סביב "${a}"`
         ];
     }
     if (prism?.id === 'cause_effect') {
         suggestionsByLevel.B = [
-            `כש-${a} מופיע אני נכנס לדריכות/סינון/שתיקה`,
-            `התגובה שלי ל-${a} מייצרת את התקיעות בפועל`
+            `כש-${a} קורה אני נכנס/ת למגננה ומפסיק/ה להקשיב`,
+            `התגובה המהירה שלי ל-${a} מחריפה את המצב`
         ];
         suggestionsByLevel.V = [
-            `האמונה: אם ${a} קורה - כנראה יש ביקורת/סכנה`,
-            `יש כלל שמחבר בין ${a} לבין תוצאה שלילית`
+            `אני מניח/ה שאם ${a} קורה אז כנראה יש סכנה`,
+            `יש לי כלל אוטומטי שמחבר ${a} לתוצאה שלילית`
+        ];
+    }
+    if (prism?.id === 'nominalization' || prism?.id === 'nominalisations') {
+        suggestionsByLevel.B = [
+            `כשעולה "${a}" אני נשאר/ת במילים כלליות במקום דוגמה`,
+            `אני אומר/ת "${a}" אבל לא מפרק/ת מה קרה צעד-צעד`
+        ];
+        suggestionsByLevel.C = [
+            `תעזור לי מיומנות של תיאור פעולה במקום מילה כללית`,
+            `נדרש ממני לפרט פעולה אחת קטנה שקורית סביב "${a}"`
+        ];
+    }
+    if (prism?.id === 'modal_operators' || prism?.id === 'modal_operator') {
+        suggestionsByLevel.V = [
+            `יש לי כלל פנימי שעם ${a} חייבים להיות מושלמים`,
+            `אני שם/ה על עצמי "אסור לטעות" כשזה נוגע ל-${a}`
+        ];
+        suggestionsByLevel.C = [
+            `תעזור לי מיומנות להציע חלופה אחת במקום "חייב/אסור"`,
+            `אני צריך/ה לתרגל שפה של "אפשר גם..." סביב ${a}`
+        ];
+    }
+    if (prism?.id === 'universal_quantifiers' || prism?.id === 'universal_quantifier') {
+        suggestionsByLevel.E = [
+            `זה קורה לי בעיקר במצבים מסוימים סביב ${a}, לא תמיד`,
+            `יש גם רגעים שכן מצליח לי לדבר על ${a} אחרת`
+        ];
+        suggestionsByLevel.B = [
+            `במקום "תמיד/אף פעם" אני מתאר/ת מה קרה הפעם`,
+            `אני מחפש/ת דוגמה אחת יוצאת דופן סביב ${a}`
+        ];
+    }
+    if (prism?.id === 'mind_reading') {
+        suggestionsByLevel.C = [
+            `תעזור לי מיומנות של בדיקת עובדות לפני מסקנה על ${a}`,
+            `אני מתרגל/ת לשאול שאלה ישירה במקום לנחש כוונה`
+        ];
+        suggestionsByLevel.V = [
+            `אני רוצה להעדיף בדיקה ישירה על פרשנות אוטומטית`,
+            `חשוב לי להפריד בין עובדות לבין ניחוש כשעולה ${a}`
         ];
     }
     if (prism?.id === 'complex_equivalence') {
         suggestionsByLevel.V = [
-            `הכלל: "${a}" = משמעות של כישלון/דחייה`,
-            `אני נותן ל-${a} משמעות קבועה בלי לבדוק חלופות`
+            `אני מפרש/ת "${a}" כאילו הוא אומר משהו שלילי עליי`,
+            `אני נותן/ת ל-${a} משמעות אחת קבועה בלי לבדוק חלופות`
         ];
         suggestionsByLevel.C = [
-            `חסרה אסטרטגיית בדיקת ראיות לפני קביעת משמעות`,
-            `נדרשת יכולת להחזיק כמה פירושים ל-${a}`
+            `תעזור לי בדיקת ראיות לפני שאני קובע/ת משמעות`,
+            `נדרשת לי יכולת להחזיק שני פירושים אפשריים ל-${a}`
         ];
     }
 
@@ -11399,10 +11507,10 @@ function applyPrismLabCompactRuntimeCopy() {
     if (anchorLabel) anchorLabel.textContent = 'מילה/ביטוי מרכזי לבדיקה ("עוגן"):';
 
     const mappingMuted = root.querySelector('#prism-detail .prism-anchor-input-card + .muted');
-    if (mappingMuted) mappingMuted.textContent = 'ממלאים תשובה קצרה בכל רמה לוגית. אפשר להקליד, לגרור הצעות, או להתחיל רק מ-3 רמות.';
+    if (mappingMuted) mappingMuted.textContent = 'ממלאים תשובה קצרה בכל רמה לוגית. התחילו מ-3 רמות (סביבה, התנהגות, יכולות), ואז המשיכו אם צריך.';
 
     const preparedHead = root.querySelector('#prism-detail .prepared-items h4');
-    if (preparedHead) preparedHead.textContent = 'תשובות מוצעות / Suggested';
+    if (preparedHead) preparedHead.textContent = 'תשובות מוצעות';
 
     const preparedMuted = root.querySelector('#prism-detail .prepared-items > .muted');
     if (preparedMuted) preparedMuted.textContent = 'גרור/י לשדה המתאים, או לחץ/י להעתקה לשדה הפעיל.';
