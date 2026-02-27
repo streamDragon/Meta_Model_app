@@ -101,7 +101,7 @@ function decodeWin1255MojibakeToUtf8(value) {
 
 function decodeSuspiciousRuns(input) {
     let changed = 0;
-    const output = String(input || '').replace(/[\u0080-\u05FF][\u0009\u0020-\u05FF]*/g, (segment) => {
+    const output = String(input || '').replace(/[\u0080-\uFFFF][\u0009\u0020-\uFFFF]*/g, (segment) => {
         if (!looksLikeMojibakeText(segment)) return segment;
         const decoded = decodeWin1255MojibakeToUtf8(segment);
         if (decoded !== segment) changed += 1;
@@ -119,9 +119,9 @@ function decodeStringLiteralsInJs(input) {
     let changed = 0;
 
     const flushString = (quoteChar) => {
-        const decoded = decodeSuspiciousRuns(buf);
-        changed += decoded.changed;
-        out += decoded.output + quoteChar;
+        const decoded = decodeWin1255MojibakeToUtf8(buf);
+        if (decoded !== buf) changed += 1;
+        out += decoded + quoteChar;
         buf = '';
     };
 
