@@ -1,4 +1,4 @@
-﻿// Global Variables
+// Global Variables
 let metaModelData = {};
 let practiceCount = 0;
 let currentStatementIndex = 0;
@@ -363,7 +363,7 @@ function updateMusicToggleButtonUI() {
     if (!btn) return;
 
     if (audioState.muted) {
-        btn.textContent = 'נ”‡';
+        btn.textContent = '🔇';
         btn.setAttribute('aria-label', 'Enable audio and play opening music');
         btn.setAttribute('title', 'Enable audio and play opening music');
         btn.classList.add('is-muted');
@@ -372,7 +372,7 @@ function updateMusicToggleButtonUI() {
     }
 
     if (isOpeningTrackPlaying()) {
-        btn.textContent = 'ג¹';
+        btn.textContent = '⏹';
         btn.setAttribute('aria-label', 'Stop opening music');
         btn.setAttribute('title', 'Stop opening music');
         btn.classList.add('is-playing');
@@ -380,7 +380,7 @@ function updateMusicToggleButtonUI() {
         return;
     }
 
-    btn.textContent = 'נµ';
+    btn.textContent = '🎵';
     btn.setAttribute('aria-label', 'Play opening music');
     btn.setAttribute('title', 'Play opening music');
     btn.classList.remove('is-playing', 'is-muted');
@@ -393,7 +393,7 @@ function setupMusicToggleButton() {
         btn.id = 'music-toggle-btn';
         btn.className = 'music-toggle-btn';
         btn.type = 'button';
-        btn.textContent = 'נµ';
+        btn.textContent = '🎵';
         document.body.appendChild(btn);
     }
 
@@ -1249,11 +1249,11 @@ function setupMobileViewportSizing() {
 const LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT = 'סביבה, התנהגות, יכולות, ערכים/אמונות, זהות, שייכות';
 
 const DEFAULT_SCREEN_READ_GUIDE = Object.freeze({
-    logic: '׳”׳×׳¨׳’׳•׳ ׳‘׳ ׳•׳™ ׳׳׳׳˜׳” ׳׳׳¢׳׳”: ׳׳–׳”׳™׳ ׳”׳ ׳—׳” ׳¡׳׳•׳™׳”, ׳׳“׳™׳™׳§׳™׳ ׳©׳₪׳”, ׳•׳׳– ׳₪׳•׳¢׳׳™׳ ׳¦׳¢׳“ קטן.',
+    logic: 'התרגול בנוי מלמטה למעלה: מזהים הנחה סמויה, מדייקים שפה, ואז פועלים צעד קטן.',
     goal: 'להחליף אוטומט של האשמה/בלבול בחשיבה פרקטית שמובילה לביצוע.',
     approach: 'עובדים לאט: קוראים את ההנחיה, עונים קצר, ובודקים האם התשובה מובילה לפעולה ברורה.',
     expected: 'בסיום התרגול תדע/י לזהות במהירות איפה המשפט עמום, לשאול שאלה מדויקת, ולתרגם את זה לצעד מעשי.',
-    success: '׳×׳•׳›׳/׳™ ׳׳”׳¡׳‘׳™׳¨ ׳׳¢׳¦׳׳ ׳׳” ׳–׳™׳”׳™׳×, ׳׳׳” ׳‘׳—׳¨׳× ׳›׳, ׳•׳׳” ׳”׳¦׳¢׳“ ׳”׳‘׳ ׳©׳‘׳׳׳× ׳׳₪׳©׳¨ ׳׳‘צע.'
+    success: 'תוכל/י להסביר לעצמך מה זיהית, למה בחרת כך, ומה הצעד הבא שבאמת אפשר לבצע.'
 });
 
 const SCREEN_READ_GUIDES = Object.freeze({
@@ -1268,7 +1268,7 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: 'התחל/י מסצנות, עבר/י למסך בחירה, ואז קבל/י משוב ובנה/י פירוק.'
     }),
     'scenario-screen-domain': Object.freeze({
-        logic: '׳¡׳™׳ ׳•׳ ׳×׳—׳•׳ ׳•׳¨׳׳” ׳׳×׳׳™׳ ׳׳× ׳”׳¡׳¦׳ ׳•׳× ׳׳¢׳•׳׳¡ ׳”׳¨׳’׳©׳™ ׳•׳׳©׳׳‘ ׳”׳׳׳™׳“׳” שלך.',
+        logic: 'סינון תחום ורמה מתאים את הסצנות לעומס הרגשי ולשלב הלמידה שלך.',
         goal: 'לתרגל בדיוק ברמת קושי נכונה.',
         approach: 'בחר/י תחום, רמה וכמות סצנות ואז התחל/י ריצה רציפה.'
     }),
@@ -1290,7 +1290,7 @@ const SCREEN_READ_GUIDES = Object.freeze({
     'scenario-screen-score': Object.freeze({
         logic: 'סיכום הסצנה נועד לקבע דפוס חשיבה לפני מעבר לסצנה הבאה.',
         goal: 'להפוך שיפור רגעי להרגל.',
-        approach: '׳§׳¨׳/׳™ ׳׳× ׳”׳׳©׳₪׳˜ ׳”׳™׳¨׳•׳§ ׳”׳‘׳ ׳•׳”׳—׳׳™׳˜/׳™ ׳׳ ׳׳׳©׳™׳›׳™׳ ׳׳• ׳׳¡׳™׳™׳׳™ם סשן.'
+        approach: 'קרא/י את המשפט הירוק הבא והחליט/י אם ממשיכים או מסיימים סשן.'
     }),
     'scenario-screen-history': Object.freeze({
         logic: 'היסטוריה חושפת מגמות ולא רק הצלחה נקודתית.',
@@ -1300,7 +1300,7 @@ const SCREEN_READ_GUIDES = Object.freeze({
     'scenario-screen-settings': Object.freeze({
         logic: 'הגדרות שומרות ברירת מחדל כדי לחסוך חיכוך בכל כניסה מחדש.',
         goal: 'להתחיל תרגול מהר עם פחות קליקים.',
-        approach: '׳§׳‘׳¢/׳™ ׳×׳—׳•׳, ׳¨׳׳” ׳•׳”׳¢׳“׳₪׳•׳× ׳¡׳׳•׳ ׳“/׳₪׳¨׳™׳–׳׳” ׳׳₪׳™ ׳׳™׳ ׳©׳ ׳•׳— לך.'
+        approach: 'קבע/י תחום, רמה והעדפות סאונד/פריזמה לפי איך שנוח לך.'
     }),
     'comic-engine': Object.freeze({
         logic: 'הזרימה מדמה דיאלוג אמיתי: בחירה, תגובת נגד, ניסוח מחדש ופירוק.',
@@ -1318,7 +1318,7 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: 'עבור/י על הדוגמאות ואז חזור/י למסך תרגול מעשי.'
     }),
     practice: Object.freeze({
-        logic: '׳׳¡׳ ׳”׳×׳¨׳’׳•׳ ׳₪׳•׳¦׳ ׳-4 ׳“׳₪׳™׳: ׳©׳׳׳•׳×, Meta Radar, SQHCEL, ׳•׳₪׳•׳¢׳ ׳׳ ׳׳₪׳•רט.',
+        logic: 'מסך התרגול פוצל ל-4 דפים: שאלות, Meta Radar, SQHCEL, ופועל לא מפורט.',
         goal: 'לעבוד בצורה ממוקדת - כל פעם מיומנות אחת.',
         approach: 'בחר/י דף אחד, סיים/י סבב קצר, ורק אז עבר/י לדף הבא.'
     }),
@@ -1328,14 +1328,14 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: 'קרא/י את המשפט, נסח/י שאלה מדויקת, ובדוק/י עם המשוב.'
     }),
     'practice-radar': Object.freeze({
-        logic: '׳”׳“׳£ ׳”׳–׳” ׳׳׳׳ ׳–׳™׳”׳•׳™ ׳×׳‘׳ ׳™׳•׳× ׳‘׳–׳׳ ׳׳׳× ׳¢׳ ׳׳—׳¥ ׳–מן.',
+        logic: 'הדף הזה מאמן זיהוי תבניות בזמן אמת עם לחץ ׳–מן.',
         goal: 'לחזק רפלקס דיוק מהיר במונולוג חי.',
         approach: 'ראה/י את ההיילייט, בחר/י תבנית במהירות, ובדוק/י מה לתקן בסיכום.'
     }),
     'practice-wizard': Object.freeze({
         logic: 'הדף הזה מאמן גישור בין תחושה למשפט לפני אתגור.',
         goal: 'לבנות מיומנות SQHCEL עקבית עם אישור לפני פריצה.',
-        approach: '׳¢׳‘׳•׳“/׳™ ׳‘׳¡׳“׳¨ ׳§׳‘׳•׳¢: S -> Q -> H -> C -> כיוון עבודה -> E/L. ׳”׳’׳•׳£ ׳׳¨׳’׳™׳© "׳׳‘׳¡׳•׳׳•׳˜׳™" ׳׳₪׳ ׳™ ׳©׳”׳׳™׳׳™׳ ׳׳׳¨׳• "׳×׳׳™׳“".'
+        approach: 'עבוד/י בסדר קבוע: S -> Q -> H -> C -> כיוון עבודה -> E/L. הגוף מרגיש "אבסולוטי" לפני שהמילים אמרו "תמיד".'
     }),
     'practice-verb-unzip': Object.freeze({
         logic: 'הדף הזה מאמן פירוק פועל לא מפורט באמצעות 15 שאלות קבועות וגרירה לסכמה קשיחה.',
@@ -1348,9 +1348,9 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: 'התקדם/י צעד-צעד, מלא/י רק מה שצריך, וודא/י שיש צעד ראשון ברור.'
     }),
     about: Object.freeze({
-        logic: '׳”׳׳¡׳ ׳׳¡׳‘׳™׳¨ ׳׳× ׳”׳¨׳§׳¢ ׳”׳׳×׳•׳“׳•׳׳•׳’׳™ ׳•׳׳× ׳׳§׳•׳¨ ׳”׳›׳׳™׳ ׳‘׳₪׳¨׳•׳™קט.',
+        logic: 'המסך מסביר את הרקע המתודולוגי ואת מקור הכלים בפרויקט.',
         goal: 'לחבר בין התרגול לבין עקרונות ה-NLP שמאחוריו.',
-        approach: '׳§׳¨׳/׳™ ׳‘׳§׳¦׳¨׳” ׳•׳—׳–׳•׳¨/׳™ ׳׳׳¡׳›׳™ ׳”׳×׳¨׳’׳•׳ ׳׳™׳™׳©׳•׳ ׳‘׳₪׳•על.'
+        approach: 'קרא/י בקצרה וחזור/י למסכי התרגול ליישום בפועל.'
     })
 });
 
@@ -1367,7 +1367,7 @@ const DEFAULT_THERAPEUTIC_DEMO = Object.freeze({
     outcomeTitle: 'מה הפיצ׳ר הזה בא למדל',
     outcomes: Object.freeze([
         'איך עוברים מעומס/עמימות לצעד ברור אחד.',
-        '׳׳™׳ ׳ ׳©׳׳¨׳™׳ ׳ ׳•׳›׳—׳™׳ ׳•׳׳“׳•׳™׳§׳™׳ ׳‘׳׳™ ׳׳”׳׳¦׳™׳ ׳©׳׳׳•׳× ג€׳—׳›׳׳•׳×ג€ ׳›׳ ׳”׳–מן.',
+        'איך נשארים נוכחים ומדויקים בלי להמציא שאלות “חכמות” כל הזמן.',
         'איך מייצרים תהליך שאפשר לתרגל שוב ושוב עד שהוא נהיה טבעי.'
     ])
 });
@@ -1377,11 +1377,11 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
         turns: Object.freeze([
             Object.freeze({ role: 'מטופל', text: 'כולם נגדי בעבודה, אין לי כבר מה להגיד.' }),
             Object.freeze({ role: 'מטפל', text: 'בוא ננסח שאלה אחת מדויקת במקום להגיב ישר: מי בדיוק “כולם”?' }),
-            Object.freeze({ role: 'מטופל', text: '׳‘׳¢׳¦׳ ׳׳׳” ׳©׳ ׳™ ׳׳ ׳©׳™׳ ׳‘׳¦׳•׳•׳×, ׳׳ ׳›׳•לם.' }),
-            Object.freeze({ role: 'מטפל', text: '׳׳¢׳•׳׳”. ׳¢׳›׳©׳™׳• ׳›׳‘׳¨ ׳™׳© ׳׳ ׳• ׳©׳™׳—׳” ׳¢׳ ׳©׳ ׳™ ׳׳ ׳©׳™׳, ׳׳ ׳׳׳—׳׳” ׳¢׳ ׳”׳¢׳•לם.' })
+            Object.freeze({ role: 'מטופל', text: 'בעצם אלה שני אנשים בצוות, לא כולם.' }),
+            Object.freeze({ role: 'מטפל', text: 'מעולה. עכשיו כבר יש לנו שיחה עם שני אנשים, לא מלחמה עם העולם.' })
         ]),
         outcomes: Object.freeze([
-            '׳׳”׳—׳׳™׳£ ׳×׳’׳•׳‘׳” ׳׳™׳ ׳˜׳•׳׳™׳˜׳™׳‘׳™׳× ׳‘׳©׳׳׳” ׳׳“׳•׳™קת.',
+            'להחליף תגובה אינטואיטיבית בשאלה מדויקת.',
             'לזהות מה חסר במשפט לפני שנכנסים לפתרון.',
             'להקטין דרמה דרך דיוק לשוני.'
         ])
@@ -1394,7 +1394,7 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
             Object.freeze({ role: 'מטפל', text: 'מצוין. בדיוק לזה Meta Radar מאמן: לזהות מהר את הטריגר לפני שהסיפור נסגר.' })
         ]),
         outcomes: Object.freeze([
-            '׳–׳™׳”׳•׳™ ׳׳”׳™׳¨ ׳©׳ ׳˜׳¨׳™׳’׳¨ ׳׳©׳•׳ ׳™ ׳‘׳–מן אמת.',
+            'זיהוי מהיר של טריגר לשוני בזמן אמת.',
             'מעבר מרפלקס תגובה לרפלקס דיוק.',
             'קיצור זמן בין זיהוי הדפוס לשאלה הנכונה.'
         ])
@@ -1409,7 +1409,7 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
         outcomes: Object.freeze([
             'לזהות קטגוריה בתוך הקשר של שלשה שלמה.',
             'לראות איך 3 רכיבים עובדים יחד באותה שכבה.',
-            '׳׳™׳™׳¦׳¨ ׳©׳™׳§׳•׳£ ׳•׳׳×׳’׳•׳¨ ׳׳“׳•׳™׳§׳™׳ ׳™׳•׳×׳¨ ׳›׳™ ׳”׳׳₪׳” ׳¨׳—׳‘׳” ׳™׳•תר.'
+            'לייצר שיקוף ואתגור מדויקים יותר כי המפה רחבה יותר.'
         ])
     }),
     'practice-wizard': Object.freeze({
@@ -1425,7 +1425,7 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
             Object.freeze({ role: 'מטופל', text: 'אני פשוט צריך להתקדם.' }),
             Object.freeze({ role: 'מטפל', text: 'בוא נפרק את “להתקדם”: מה קורה צעד-צעד בפועל? מה קודם למה?' }),
             Object.freeze({ role: 'מטופל', text: 'אוקיי… קודם אני צריך לפתוח מסמך, לסכם 3 נקודות, ואז לשלוח.' }),
-            Object.freeze({ role: 'מטפל', text: '׳׳¢׳•׳׳”. Unzip ׳”׳•׳₪׳ ׳₪׳•׳¢׳ ׳¢׳׳•׳ ׳׳₪׳¨׳•׳¦׳“׳•׳¨׳” ׳©׳׳₪׳©׳¨ ׳׳‘צע.' })
+            Object.freeze({ role: 'מטפל', text: 'מעולה. Unzip הופך פועל עמום לפרוצדורה שאפשר לבצע.' })
         ])
     }),
     prismlab: Object.freeze({
@@ -1452,16 +1452,16 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
     }),
     'comic-engine': Object.freeze({
         turns: Object.freeze([
-            Object.freeze({ role: 'מטופל', text: '׳‘׳¨׳’׳¢ ׳”׳׳׳× ׳׳ ׳™ ׳׳’׳™׳‘ ׳׳”׳¨ ׳׳“׳™ ׳•׳׳– מצטער.' }),
+            Object.freeze({ role: 'מטופל', text: 'ברגע האמת אני מגיב מהר מדי ואז מצטער.' }),
             Object.freeze({ role: 'מטפל', text: 'נריץ סימולציה קצרה: תגובה, תגובת נגד, ניסוח מחדש, ואז נבדוק מה היה מקדם.' }),
-            Object.freeze({ role: 'מטופל', text: '׳”׳¡׳™׳׳•׳׳¦׳™׳” ׳ ׳•׳×׳ ׳× ׳׳™ ׳׳¨׳•׳•׳— ׳׳—׳©׳•׳‘ ׳׳₪׳ ׳™ ׳©׳׳•׳׳¨׳™׳ ׳׳× ׳–׳” ׳‘אמת.' }),
+            Object.freeze({ role: 'מטופל', text: 'הסימולציה נותנת לי מרווח לחשוב לפני שאומרים את זה באמת.' }),
             Object.freeze({ role: 'מטפל', text: 'בדיוק. Comic Engine ממדל חזרה גנרלית לשיחה אמיתית.' })
         ])
     }),
     'scenario-trainer': Object.freeze({
         turns: Object.freeze([
             Object.freeze({ role: 'מטופל', text: 'אני ישר מתגונן בסיטואציות כאלה.' }),
-            Object.freeze({ role: 'מטפל', text: '׳‘׳•׳ ׳ ׳×׳¨׳’׳ ׳¡׳¦׳ ׳”: ׳ ׳‘׳“׳•׳§ ׳׳™׳–׳• ׳×׳’׳•׳‘׳” ׳׳¡׳׳™׳׳” ׳•׳׳™׳–׳• ׳×׳’׳•׳‘׳” ׳׳§׳“מת.' }),
+            Object.freeze({ role: 'מטפל', text: 'בוא נתרגל סצנה: נבדוק איזו תגובה מסלימה ואיזו תגובה מקדמת.' }),
             Object.freeze({ role: 'מטופל', text: 'אני רואה איך ניסוח קטן משנה לגמרי את הכיוון.' }),
             Object.freeze({ role: 'מטפל', text: 'זה בדיוק הערך: אימון החלטה בתוך הקשר, לא רק תיאוריה.' })
         ])
@@ -1469,7 +1469,7 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
     categories: Object.freeze({
         turns: Object.freeze([
             Object.freeze({ role: 'מטופל', text: 'אני מתבלבל בין סוגי ההפרות.' }),
-            Object.freeze({ role: 'מטפל', text: '׳‘׳•׳ ׳ ׳׳₪׳” ׳§׳•׳“׳ ׳׳× ׳”׳׳©׳₪׳—׳•׳×: ׳׳—׳™׳§׳”, ׳¢׳™׳•׳•׳×, ׳”׳›׳׳׳”. ׳׳—׳¨ ׳›׳ ׳™׳”׳™׳” ׳§׳ ׳™׳•׳×׳¨ ׳׳–׳”׳•׳× ׳‘׳–מן אמת.' }),
+            Object.freeze({ role: 'מטפל', text: 'בוא נמפה קודם את המשפחות: מחיקה, עיוות, הכללה. אחר כך יהיה קל יותר לזהות בזמן אמת.' }),
             Object.freeze({ role: 'מטופל', text: 'כשאני רואה את זה כמשפחות, הראש נהיה מסודר.' }),
             Object.freeze({ role: 'מטפל', text: 'מעולה. זה מסך ידע שממפה את השטח לפני תרגול מהיר.' })
         ])
@@ -1477,7 +1477,7 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
     home: Object.freeze({
         turns: Object.freeze([
             Object.freeze({ role: 'מטופל', text: 'יש פה מלא כלים ואני לא בטוח מאיפה להתחיל.' }),
-            Object.freeze({ role: 'מטפל', text: '׳ ׳×׳—׳™׳ ׳׳₪׳™ ׳׳˜׳¨׳”: ׳–׳™׳”׳•׳™? ׳©׳™׳§׳•׳£? ׳¡׳™׳׳•׳׳¦׳™׳”? ׳‘׳™׳¦׳•׳¢? ׳›׳ ׳׳¡׳׳•׳ ׳׳׳׳ ׳׳™׳•׳׳ ׳•׳× ׳׳—רת.' }),
+            Object.freeze({ role: 'מטפל', text: 'נתחיל לפי מטרה: זיהוי? שיקוף? סימולציה? ביצוע? כל מסלול מאמן מיומנות אחרת.' }),
             Object.freeze({ role: 'מטופל', text: 'אוקיי, עכשיו אני מבין מה מתאים לי לתרגול של היום.' }),
             Object.freeze({ role: 'מטפל', text: 'זה מה שמסך הבית ממדל: בחירת מסלול תרגול במקום קפיצה אקראית בין כלים.' })
         ])
@@ -1490,7 +1490,11 @@ function looksLikeMojibakeText(value) {
     const marks = (text.match(/׳/g) || []).length;
     if (marks >= 3) return true;
     if (/(?:׳[^\u0590-\u05FF\s]){2,}/.test(text)) return true;
-    return /ג€|ג†|ג­|נ|�|ֳ—|\bג(?:ש|ל)\b|×[A-Za-zÀ-ÿ]|׳[A-Za-z0-9]/.test(text);
+    return /[\uFFFD]/u.test(text)
+        || /\u05F3[A-Za-z0-9]/u.test(text)
+        || /\u00D7[A-Za-z\u00C0-\u00FF]/u.test(text)
+        || /\u05F3[\u0080-\u00FF\u2018-\u201F]/u.test(text)
+        || /[\u05D2\u05E0\u05B3][\u20AC\u2020\u00AD\u009F\u2014]/u.test(text);
 }
 
 let win1255ReverseByteMap = null;
@@ -2992,7 +2996,7 @@ function updateRuntimeDebugInfoCard() {
     const savedTab = normalizeRequestedTab(localStorage.getItem(PRACTICE_ACTIVE_TAB_STORAGE_KEY) || '') || 'home';
     const density = (localStorage.getItem('header_density_v1') || 'compact').toLowerCase();
 
-    if (viewEl) viewEl.textContent = isEmbedded ? '׳׳•טמע (iframe / Google Sites)' : '׳™׳©׳™׳¨ (׳¢׳׳•׳“ מלא)';
+    if (viewEl) viewEl.textContent = isEmbedded ? 'מוטמע (iframe / Google Sites)' : 'ישיר (עמוד מלא)';
     if (viewportEl) viewportEl.textContent = `${width}×${height}`;
     if (tabEl) tabEl.textContent = savedTab;
     if (densityEl) densityEl.textContent = density === 'cozy' ? 'cozy' : 'compact';
@@ -3531,17 +3535,17 @@ function setupPracticeMode() {
 const QUESTION_DRILL_PACK = [
     {
         id: 'question1',
-        statement: '׳”׳‘׳•׳¡ ׳׳׳¨ ׳©׳”׳׳§׳•׳— ׳׳ ׳׳‘׳™׳ ׳׳׳” ׳–׳” ׳׳ ׳׳₪׳©׳¨׳™ ׳›עת.',
+        statement: 'הבוס אמר שהלקוח לא מבין למה זה לא אפשרי ׳›עת.',
         focus: ['DISTORTION']
     },
     {
         id: 'question2',
-        statement: '׳׳ ׳™ ׳×׳׳™׳“ ׳׳׳—׳¨ ׳›׳™ ׳”׳¨׳‘׳” ׳¢׳•מס.',
+        statement: 'אני תמיד מאחר כי הרבה עומס.',
         focus: ['GENERALIZATION']
     },
     {
         id: 'question3',
-        statement: '׳”׳ ׳©׳•׳׳׳™׳ ׳׳•׳×׳™ ׳׳” ׳‘׳“׳™׳•׳§ ׳—סר.',
+        statement: 'הם שואלים אותי מה בדיוק ׳—סר.',
         focus: ['DELETION']
     },
     {
@@ -3557,9 +3561,9 @@ const QUESTION_DRILL_PACK = [
 ];
 
 const QUESTION_DRILL_KEYWORDS = {
-    DELETION: ['מה', 'איך', 'איזה', 'מי', '׳”אם', 'למה', 'כמה'],
-    DISTORTION: ['׳”׳׳ ׳–׳” ׳׳•מר', 'לפי מה', 'איך אתה יודע', 'זה בטוח', 'ממה אתה מסיק', 'לפי ההרגשה'],
-    GENERALIZATION: ['תמיד', 'כל אחד', '׳›׳•לם', '׳׳¢׳•לם', 'אין', 'תמיד', 'כל', '׳›׳ ׳”׳–מן']
+    DELETION: ['מה', 'איך', 'איזה', 'מי', 'האם', 'למה', 'כמה'],
+    DISTORTION: ['האם זה אומר', 'לפי מה', 'איך אתה יודע', 'זה בטוח', 'ממה אתה מסיק', 'לפי ההרגשה'],
+    GENERALIZATION: ['תמיד', 'כל אחד', 'כולם', 'לעולם', 'אין', 'תמיד', 'כל', 'כל הזמן']
 };
 
 const QUESTION_DRILL_CATEGORY_LABELS = Object.freeze({
@@ -4387,19 +4391,19 @@ function setupQuestionDrill() {
 }
 
 const RAPID_PATTERN_BUTTONS = Object.freeze([
-    Object.freeze({ id: 'lost_performative', label: 'Lost Performative', hint: '׳©׳׳©׳” 1 | שמאל' }),
+    Object.freeze({ id: 'lost_performative', label: 'Lost Performative', hint: 'שלשה 1 | שמאל' }),
     Object.freeze({ id: 'assumptions', label: 'Assumptions +1', hint: 'שלשה 1 | מרכז' }),
     Object.freeze({ id: 'mind_reading', label: 'Mind Reading', hint: 'שלשה 1 | ימין' }),
-    Object.freeze({ id: 'universal_quantifier', label: 'Universal Quantifier', hint: '׳©׳׳©׳” 2 | שמאל' }),
+    Object.freeze({ id: 'universal_quantifier', label: 'Universal Quantifier', hint: 'שלשה 2 | שמאל' }),
     Object.freeze({ id: 'modal_operator', label: 'Modal Operator', hint: 'שלשה 2 | מרכז' }),
     Object.freeze({ id: 'cause_effect', label: 'Cause & Effect', hint: 'שלשה 2 | ימין' }),
-    Object.freeze({ id: 'nominalisations', label: 'Nominalisations', hint: '׳©׳׳©׳” 3 | שמאל' }),
+    Object.freeze({ id: 'nominalisations', label: 'Nominalisations', hint: 'שלשה 3 | שמאל' }),
     Object.freeze({ id: 'identity_predicates', label: 'Identity Predicates', hint: 'שלשה 3 | מרכז' }),
     Object.freeze({ id: 'complex_equivalence', label: 'Complex Equivalence', hint: 'שלשה 3 | ימין' }),
-    Object.freeze({ id: 'comparative_deletion', label: 'Comparative Deletion', hint: '׳©׳׳©׳” 4 | שמאל' }),
+    Object.freeze({ id: 'comparative_deletion', label: 'Comparative Deletion', hint: 'שלשה 4 | שמאל' }),
     Object.freeze({ id: 'time_space_predicates', label: 'Time & Space Predicates', hint: 'שלשה 4 | מרכז' }),
     Object.freeze({ id: 'lack_referential_index', label: 'Lack of Referential Index', hint: 'שלשה 4 | ימין' }),
-    Object.freeze({ id: 'non_referring_nouns', label: 'Non-referring nouns', hint: '׳©׳׳©׳” 5 | שמאל' }),
+    Object.freeze({ id: 'non_referring_nouns', label: 'Non-referring nouns', hint: 'שלשה 5 | שמאל' }),
     Object.freeze({ id: 'sensory_predicates', label: 'Sensory Predicates', hint: 'שלשה 5 | מרכז' }),
     Object.freeze({ id: 'unspecified_verbs', label: 'Unspecified Verbs', hint: 'שלשה 5 | ימין' })
 ]);
@@ -4464,7 +4468,7 @@ const RAPID_PATTERN_CUES = Object.freeze([
     Object.freeze({
         id: 'rp_work_6',
         type: 'עבודה',
-        monologue: '׳›׳ ׳”׳™׳•׳ ׳׳ ׳™ ׳׳•׳׳¨ ׳׳¢׳¦׳׳™ ׳©׳¦׳¨׳™׳ ׳׳˜׳₪׳ ׳‘׳–׳” ׳›׳‘׳¨, ׳׳‘׳ ׳‘׳₪׳•׳¢׳ ׳׳ ׳™ ׳׳ ׳™׳•׳“׳¢ ׳׳” ׳”׳₪׳¢׳•׳׳” ׳”׳¨׳׳©׳•׳ ׳” ׳©׳׳ ׳™ ׳׳׳•׳¨ ׳׳‘צע.',
+        monologue: 'כל היום אני אומר לעצמי שצריך לטפל בזה כבר, אבל בפועל אני לא יודע מה הפעולה הראשונה שאני אמור לבצע.',
         highlight: 'לטפל בזה כבר',
         patternId: 'unspecified_verb',
         acceptedPatterns: ['unspecified_verb', 'simple_deletion']
@@ -4472,7 +4476,7 @@ const RAPID_PATTERN_CUES = Object.freeze([
     Object.freeze({
         id: 'rp_work_7',
         type: 'עבודה',
-        monologue: '׳”׳˜׳•׳ ׳©׳׳• ׳”׳•׳¨׳™׳“ ׳׳™ ׳׳× ׳›׳ ׳”׳׳•׳˜׳™׳‘׳¦׳™׳”, ׳•׳‘׳¨׳’׳¢ ׳©׳–׳” ׳§׳¨׳” ׳׳ ׳”׳¦׳׳—׳×׳™ ׳׳›׳×׳•׳‘ ׳׳₪׳™׳׳• ׳¢׳“׳›׳•׳ ׳׳—׳“ קטן.',
+        monologue: 'הטון שלו הוריד לי את כל המוטיבציה, וברגע שזה קרה לא הצלחתי לכתוב אפילו עדכון אחד קטן.',
         highlight: 'הוריד לי את כל המוטיבציה',
         patternId: 'cause_effect',
         acceptedPatterns: ['cause_effect']
@@ -4481,7 +4485,7 @@ const RAPID_PATTERN_CUES = Object.freeze([
         id: 'rp_relationship_1',
         type: 'זוגיות',
         monologue: 'אם אני מאחר לפגישה אחת, זה אומר שאני לא אוהב באמת, ואז כל השיחה נהיית מתגוננת ולא עניינית.',
-        highlight: '׳–׳” ׳׳•׳׳¨ ׳©׳׳ ׳™ ׳׳ ׳׳•׳”׳‘ ׳‘אמת',
+        highlight: 'זה אומר שאני לא אוהב באמת',
         patternId: 'complex_equivalence',
         acceptedPatterns: ['complex_equivalence']
     }),
@@ -4504,23 +4508,23 @@ const RAPID_PATTERN_CUES = Object.freeze([
     Object.freeze({
         id: 'rp_relationship_4',
         type: 'זוגיות',
-        monologue: '׳׳×׳™ ׳×׳₪׳¡׳™׳§ ׳©׳•׳‘ ׳׳”׳¨׳•׳¡ ׳׳¢׳¦׳׳ ׳׳× ׳”׳§׳©׳¨? ׳–׳• ׳©׳׳׳” ׳©׳¨׳¦׳” ׳׳™ ׳‘׳¨׳׳© ׳›׳ ׳₪׳¢׳ ׳©׳™׳© ׳•׳™׳›׳•׳— קטן.',
-        highlight: '׳׳×׳™ ׳×׳₪׳¡׳™׳§ ׳©׳•׳‘ ׳׳”׳¨׳•׳¡ ׳׳¢׳¦׳׳ ׳׳× ׳”קשר',
+        monologue: 'מתי תפסיק שוב להרוס לעצמך את הקשר? זו שאלה שרצה לי בראש כל פעם שיש ויכוח קטן.',
+        highlight: 'מתי תפסיק שוב להרוס לעצמך את הקשר',
         patternId: 'presupposition',
         acceptedPatterns: ['presupposition']
     }),
     Object.freeze({
         id: 'rp_relationship_5',
         type: 'זוגיות',
-        monologue: '׳׳™ ׳׳₪׳©׳¨ ׳׳“׳‘׳¨ ׳׳™׳×׳• ׳¢׳ ׳›׳¡׳£ ׳‘׳׳™ ׳₪׳™׳¦׳•׳¥, ׳׳– ׳׳ ׳™ ׳›׳‘׳¨ ׳׳¨׳׳© ׳׳•׳•׳×׳¨ ׳•׳ ׳›נס לשקט.',
-        highlight: '׳׳™ ׳׳₪׳©׳¨ ׳׳“׳‘׳¨ ׳׳™׳×׳• ׳¢׳ ׳›סף',
+        monologue: 'אי אפשר לדבר איתו על כסף בלי פיצוץ, אז אני כבר מראש מוותר ונכנס לשקט.',
+        highlight: 'אי אפשר לדבר איתו על ׳›סף',
         patternId: 'modal_possibility',
         acceptedPatterns: ['modal_possibility', 'modal_operator']
     }),
     Object.freeze({
         id: 'rp_parent_1',
         type: 'הורות',
-        monologue: '׳׳•׳׳¨׳™׳ ׳׳™ ׳©׳׳ ׳™ ׳”׳•׳¨׳” ׳׳ ׳¢׳§׳‘׳™, ׳•׳׳ ׳™ ׳ ׳׳—׳¥ ׳›׳™ ׳׳ ׳‘׳¨׳•׳¨ ׳׳™ ׳‘׳“׳™׳•׳§ ׳׳•׳׳¨ ׳׳× ׳–׳” ׳•׳¢׳ ׳׳” ׳”׳•א נשען.',
+        monologue: 'אומרים לי שאני הורה לא עקבי, ואני נלחץ כי לא ברור מי בדיוק אומר את זה ועל מה הוא נשען.',
         highlight: 'אומרים לי שאני הורה לא עקבי',
         patternId: 'lack_referential_index',
         acceptedPatterns: ['lack_referential_index']
@@ -4561,7 +4565,7 @@ const RAPID_PATTERN_CUES = Object.freeze([
         id: 'rp_self_2',
         type: 'ביטחון עצמי',
         monologue: 'מאז הטעות האחרונה הביטחון שלי נהרס, ומאותו רגע אני נמנע מיוזמות חדשות בעבודה.',
-        highlight: '׳”׳‘׳™׳˜׳—׳•׳ ׳©׳׳™ ׳ ׳”רס',
+        highlight: 'הביטחון שלי נהרס',
         patternId: 'nominalization',
         acceptedPatterns: ['nominalization']
     }),
@@ -4584,8 +4588,8 @@ const RAPID_PATTERN_CUES = Object.freeze([
     Object.freeze({
         id: 'rp_money_2',
         type: '׳›סף',
-        monologue: '׳׳ ׳™ ׳׳•׳׳¨ ׳׳¢׳¦׳׳™ ׳©׳–׳” ׳—׳™׳™׳‘ ׳׳”׳™׳•׳× ׳›׳›׳” ׳•׳׳™׳ ׳©׳•׳ ׳׳₪׳©׳¨׳•׳× ׳׳—׳¨׳×, ׳׳– ׳׳ ׳™ ׳׳ ׳‘׳•׳“׳§ ׳—׳׳•׳₪׳•׳× ׳‘׳›לל.',
-        highlight: '׳–׳” ׳—׳™׳™׳‘ ׳׳”׳™׳•׳× ׳›׳›׳” ׳•׳׳™׳ ׳©׳•׳ ׳׳₪׳©׳¨׳•׳× ׳׳—רת',
+        monologue: 'אני אומר לעצמי שזה חייב להיות ככה ואין שום אפשרות אחרת, אז אני לא בודק חלופות בכלל.',
+        highlight: 'זה חייב להיות ככה ואין שום אפשרות אחרת',
         patternId: 'modal_operator',
         acceptedPatterns: ['modal_operator', 'modal_necessity', 'modal_possibility']
     }),
@@ -4632,7 +4636,7 @@ const RAPID_PATTERN_CUES = Object.freeze([
     Object.freeze({
         id: 'rp_sensory_1',
         type: 'זוגיות',
-        monologue: '׳׳ ׳™ ׳׳¨׳’׳™׳© ׳©׳–׳” ׳׳ ׳ ׳›׳•׳ ׳‘׳™׳ ׳™׳ ׳•, ׳׳‘׳ ׳׳™׳ ׳׳™ ׳©׳•׳ ׳×׳׳•׳ ׳” ׳‘׳¨׳•׳¨׳” ׳©׳ ׳׳” ׳‘׳“׳™׳•׳§ ׳׳ ׳™ ׳¨׳•׳׳” ׳׳• ׳©׳•׳׳¢ ׳©׳§׳•׳¨׳” שם.',
+        monologue: 'אני מרגיש שזה לא נכון בינינו, אבל אין לי שום תמונה ברורה של מה בדיוק אני רואה או שומע שקורה שם.',
         highlight: 'מרגיש שזה לא נכון בינינו',
         patternId: 'sensory_predicates',
         acceptedPatterns: ['sensory_predicates']
@@ -4970,12 +4974,12 @@ function buildRapidPatternHelpHtml(cue) {
     const patternId = normalizeRapidPatternId(cue?.patternId || '');
     const label = getRapidPatternLabel(patternId);
     const buttonMeta = RAPID_PATTERN_BUTTONS.find((item) => item.id === patternId);
-    const hint = buttonMeta?.hint || '׳‘׳“׳§׳• ׳׳™׳–׳• ׳”׳ ׳—׳” ׳׳©׳•׳ ׳™׳× ׳ ׳—׳©׳₪׳× ׳‘׳׳™׳׳” ׳”׳׳•׳“׳’שת.';
+    const hint = buttonMeta?.hint || 'בדקו איזו הנחה לשונית נחשפת במילה המודגשת.';
     const highlight = String(cue?.highlight || '').trim() || 'המילה המודגשת במשפט';
 
     return `
         <p><strong>איך לחשוב כאן:</strong> קודם מסתכלים על המילה המודגשת, ורק אחר כך בוחרים כפתור.</p>
-        <p><strong>׳¨׳׳– ׳׳”׳™׳¨:</strong> "${escapeHtml(highlight)}" ׳׳¦׳‘׳™׳¢ ׳‘׳“׳¨׳ ׳›לל על <strong>${escapeHtml(label)}</strong>.</p>
+        <p><strong>רמז מהיר:</strong> "${escapeHtml(highlight)}" מצביע בדרך ׳›לל על <strong>${escapeHtml(label)}</strong>.</p>
         <p><strong>למה:</strong> ${escapeHtml(hint)}.</p>
         <p><strong>תהליך 3 צעדים:</strong> טריגר מודגש -> זיהוי סוג ההפרה -> בחירת תבנית אחת מתוך 15.</p>
     `;
@@ -4985,7 +4989,7 @@ function showRapidPatternHelp() {
     if (rapidPatternArenaState.mode === 'exam') return;
 
     if (!rapidPatternArenaState.currentCue) {
-        setRapidPatternFeedback('׳”׳×׳—׳™׳׳• ׳¡׳‘׳‘ ׳•׳׳– ׳׳—׳¦׳• HELP ׳׳”׳¡׳‘׳¨ ׳‘׳–מן אמת.', 'warn');
+        setRapidPatternFeedback('התחילו סבב ואז לחצו HELP להסבר בזמן אמת.', 'warn');
         return;
     }
 
@@ -5127,7 +5131,7 @@ function resumeRapidPatternSession() {
     rapidPatternArenaState.pausedRemainingMs = 0;
     setRapidPatternButtonsDisabled(false);
     updateRapidPatternExplainButtonState();
-    setRapidPatternFeedback('׳”׳׳©׳ ׳¡׳‘׳‘: ׳–׳”׳” ׳׳× ׳”׳×׳‘׳ ׳™׳× ׳׳₪׳ ׳™ ׳©׳”׳–׳׳ ׳ ׳’מר.', 'info');
+    setRapidPatternFeedback('המשך סבב: זהה את התבנית לפני שהזמן נגמר.', 'info');
     startRapidPatternTimer(resumeMs);
 }
 
@@ -5167,7 +5171,7 @@ function handleRapidPatternCorrectAnswer(button, cue, resolvedPatternId = '') {
     rapidPatternArenaState.streak += 1;
     button.classList.add('is-correct');
     setRapidPatternTrafficLight('green');
-    setRapidPatternFeedback(`׳׳¢׳•׳׳”! ׳–׳™׳”׳•׳™ ׳׳“׳•׳™ק (+${gained} נק׳).`, 'success');
+    setRapidPatternFeedback(`מעולה! זיהוי מדויק (+${gained} נק׳).`, 'success');
     playUISound('correct');
     addXP(Math.max(2, Math.min(8, Math.round(gained / 2))));
     if (rapidPatternArenaState.streak > 0 && rapidPatternArenaState.streak % 5 === 0) {
@@ -5213,7 +5217,7 @@ function handleRapidPatternWrongAnswer(button, cue, chosenPattern = '') {
     }
 
     setRapidPatternTrafficLight('yellow');
-    setRapidPatternFeedback('׳˜׳¢׳•׳× ׳¨׳׳©׳•׳ ׳”. ׳ ׳¡׳• ׳©׳•׳‘ ׳׳₪׳ ׳™ ׳©׳ ׳’׳׳¨ ׳”׳–מן.', 'warn');
+    setRapidPatternFeedback('טעות ראשונה. נסו שוב לפני שנגמר הזמן.', 'warn');
     updateRapidPatternScoreboard();
 }
 
@@ -5477,7 +5481,7 @@ function buildRapidPatternAiFeedbackHtml(history) {
 
     const missesHtml = topMisses.length
         ? `<ul class="rapid-ai-list">${topMisses.map(group => {
-            const examples = group.examples.map(example => `<li>${escapeHtml(example.highlight || example.statement)} -> ׳×׳©׳•׳‘׳” ׳ ׳›׳•׳ ׳”: ${escapeHtml(group.label)}</li>`).join('');
+            const examples = group.examples.map(example => `<li>${escapeHtml(example.highlight || example.statement)} -> תשובה נכונה: ${escapeHtml(group.label)}</li>`).join('');
             return `<li><strong>${escapeHtml(group.label)}</strong> (${group.count})<ul class="rapid-ai-sublist">${examples}</ul></li>`;
         }).join('')}</ul>`
         : '<p class="rapid-ai-note">מעולה: אין טעויות בבלוק האחרון.</p>';
@@ -5489,7 +5493,7 @@ function buildRapidPatternAiFeedbackHtml(history) {
     const avgSeconds = (avgRemainingMs / 1000).toFixed(1);
     return `
         <h4>AI Coach: סיכום ${rounds} שאלות</h4>
-        <p>׳“׳™׳•׳§: <strong>${accuracy}%</strong> | ׳ ׳›׳•׳ ׳•׳×: <strong>${correctCount}/${rounds}</strong> | ׳–׳׳ ׳׳׳•׳¦׳¢ ׳©׳ ׳•׳×׳¨ ׳‘׳×׳©׳•׳‘׳•׳× ׳ ׳›׳•׳ ׳•ת: <strong>${avgSeconds} שנ׳</strong></p>
+        <p>דיוק: <strong>${accuracy}%</strong> | נכונות: <strong>${correctCount}/${rounds}</strong> | זמן ממוצע שנותר בתשובות נכונות: <strong>${avgSeconds} שנ׳</strong></p>
         <p class="rapid-ai-title">מה חזק אצלך עכשיו</p>
         ${strengthsHtml}
         <p class="rapid-ai-title">מה חסר או בעייתי כרגע</p>
@@ -5611,30 +5615,30 @@ const WRINKLE_GAME_INTERVAL_HOURS = [0, 24, 72, 168, 336, 720];
 const WRINKLE_FOLD_LIBRARY = Object.freeze([
     {
         key: 'ABSOLUTE_IMPOSSIBLE',
-        label: '׳׳™-׳™׳›׳•׳׳× ׳׳•׳—לטת',
-        emoji: 'נ«',
+        label: 'אי-יכולת מוחלטת',
+        emoji: '🚫',
         hiddenAssumption: 'יש פה הנחה ש״אין יכולת בשום מצב״.',
         challengeQuestion: 'באמת בשום מצב? מה כן אפשר לעשות כבר עכשיו ב-10 דקות?'
     },
     {
         key: 'NO_CHOICE',
         label: 'אין ברירה / חייב',
-        emoji: 'נ”’',
+        emoji: '🔒',
         hiddenAssumption: 'יש פה הנחה שאין בחירה פנימית.',
         challengeQuestion: 'מה יקרה אם לא? איזו בחירה קטנה כן קיימת פה?'
     },
     {
         key: 'IDENTITY_LOCK',
-        label: '׳–׳”׳•׳× ׳׳§׳•׳‘עת',
-        emoji: 'נ§±',
-        hiddenAssumption: '׳”׳×׳ ׳”׳’׳•׳× ׳¨׳’׳¢׳™׳× ׳”׳•׳’׳“׳¨׳” ׳›׳´׳׳™ ׳©׳׳ ׳™/׳׳™ ׳©׳”׳•א״.',
+        label: 'זהות מקובעת',
+        emoji: '🧱',
+        hiddenAssumption: 'התנהגות רגעית הוגדרה כ״מי שאני/מי שהוא״.',
         challengeQuestion: 'מה הוא/אתה עושה בפועל שמוביל לזה, במקום מי הוא?'
     },
     {
         key: 'GLOBAL_RULE',
         label: 'הכללה גורפת',
-        emoji: 'נ',
-        hiddenAssumption: '׳”׳׳©׳₪׳˜ ׳”׳•׳₪׳ ׳׳™׳¨׳•׳¢ ׳׳¡׳•׳™׳ ׳׳—׳•׳§ ׳’׳•רף.',
+        emoji: '🌐',
+        hiddenAssumption: 'המשפט הופך אירוע מסוים לחוק גורף.',
         challengeQuestion: 'תמיד? אף פעם? תן מקרה אחד שסותר את זה.'
     }
 ]);
@@ -5642,16 +5646,16 @@ const WRINKLE_FOLD_LIBRARY = Object.freeze([
 const WRINKLE_BASE_CARDS = Object.freeze([
     { id: 'wr_001', statement: 'אני לא יכול להוביל פגישה צוות.', foldKey: 'ABSOLUTE_IMPOSSIBLE' },
     { id: 'wr_002', statement: 'הוא בעייתי, אי אפשר לעבוד איתו.', foldKey: 'IDENTITY_LOCK' },
-    { id: 'wr_003', statement: '׳׳ ׳™ ׳—׳™׳™׳‘ ׳׳”׳¡׳›׳™׳, ׳׳—׳¨׳× ׳”׳›׳•׳ ׳™׳×׳₪רק.', foldKey: 'NO_CHOICE' },
+    { id: 'wr_003', statement: 'אני חייב להסכים, אחרת הכול יתפרק.', foldKey: 'NO_CHOICE' },
     { id: 'wr_004', statement: 'אני תמיד הורס שיחות חשובות.', foldKey: 'GLOBAL_RULE' },
     { id: 'wr_005', statement: 'אין לי ברירה, אני חייב לענות לכל הודעה מייד.', foldKey: 'NO_CHOICE' },
-    { id: 'wr_006', statement: '׳׳ ׳™ ׳׳ ׳™׳›׳•׳ ׳׳”׳©׳×׳ ׳•׳× ׳‘׳›לל.', foldKey: 'ABSOLUTE_IMPOSSIBLE' },
+    { id: 'wr_006', statement: 'אני לא יכול להשתנות בכלל.', foldKey: 'ABSOLUTE_IMPOSSIBLE' },
     { id: 'wr_007', statement: 'היא פשוט אגואיסטית, זה מה שהיא.', foldKey: 'IDENTITY_LOCK' },
-    { id: 'wr_008', statement: '׳›׳•׳׳ ׳׳–׳׳–׳׳™׳ ׳‘׳™ ׳›׳ ׳”׳–מן.', foldKey: 'GLOBAL_RULE' },
+    { id: 'wr_008', statement: 'כולם מזלזלים בי כל הזמן.', foldKey: 'GLOBAL_RULE' },
     { id: 'wr_009', statement: 'אי אפשר להירגע לפני שמסיימים הכול.', foldKey: 'ABSOLUTE_IMPOSSIBLE' },
     { id: 'wr_010', statement: 'אני מוכרח להיות מושלם בכל משימה.', foldKey: 'NO_CHOICE' },
     { id: 'wr_011', statement: 'אני כישלון כשאני מתבלבל מול אנשים.', foldKey: 'IDENTITY_LOCK' },
-    { id: 'wr_012', statement: '׳׳£ ׳₪׳¢׳ ׳׳ ׳׳¦׳׳™׳— ׳׳™ ׳‘׳–מן.', foldKey: 'GLOBAL_RULE' }
+    { id: 'wr_012', statement: 'אף פעם לא מצליח לי בזמן.', foldKey: 'GLOBAL_RULE' }
 ]);
 
 const DEFAULT_WRINKLE_GAME_STATS = Object.freeze({
@@ -5886,7 +5890,7 @@ function renderWrinkleRound() {
 
     if (wrinkleGameState.elements.stepLabel) {
         wrinkleGameState.elements.stepLabel.textContent = wrinkleGameState.phase === 'expose'
-            ? '׳©׳׳‘ 1/2: ׳—׳©׳™׳₪׳× ׳”׳›מת'
+            ? 'שלב 1/2: חשיפת הכמת'
             : 'שלב 2/2: בחירת שאלת האתגור';
     }
 
@@ -5946,7 +5950,7 @@ function handleWrinkleExposeChoice(selectedKey, button) {
     button.disabled = true;
     button.classList.add('is-wrong');
     const fold = getWrinkleFoldByKey(card.foldKey);
-    setWrinkleFeedback(`׳¢׳“׳™׳™׳ ׳׳. ׳¨׳׳–: ${fold?.hiddenAssumption || '׳—׳₪׳©/׳™ ׳׳× ׳”׳”׳ ׳—׳” ׳©׳׳ ׳ ׳׳׳¨׳” ׳‘׳׳₪׳•רש.'}`, 'warn');
+    setWrinkleFeedback(`עדיין לא. רמז: ${fold?.hiddenAssumption || 'חפש/י את ההנחה שלא נאמרה במפורש.'}`, 'warn');
     playUISound('wrong');
 }
 
@@ -5964,7 +5968,7 @@ function handleWrinkleChallengeChoice(selectedKey, button) {
     button.disabled = true;
     button.classList.add('is-wrong');
     const fold = getWrinkleFoldByKey(card.foldKey);
-    setWrinkleFeedback(`׳›׳׳¢׳˜. ׳©׳׳׳× ׳”׳¢׳•׳’׳ ׳”׳׳“׳•׳™׳§׳× ׳›אן: "${fold?.challengeQuestion || ''}"`, 'warn');
+    setWrinkleFeedback(`כמעט. שאלת העוגן המדויקת ׳›אן: "${fold?.challengeQuestion || ''}"`, 'warn');
     playUISound('wrong');
 }
 
@@ -6058,8 +6062,8 @@ function triggerWrinkleBreakFx() {
     if (!layer) return;
 
     layer.innerHTML = '';
-    const brickChars = ['נ§±', 'נ§©'];
-    const confettiChars = ['ג¨', 'נ‰', 'נ’¥', 'נ¨', 'נ¦'];
+    const brickChars = ['🧱', '🧩'];
+    const confettiChars = ['✨', '🎉', '💥', '🟨', '🟦'];
 
     for (let i = 0; i < 9; i += 1) {
         const brick = document.createElement('span');
@@ -6142,19 +6146,19 @@ function addSelfStatementToWrinkleGame() {
 function detectWrinkleFoldFromText(text) {
     const normalized = normalizeText(text);
 
-    if (/(׳׳ ׳™׳›׳•׳|׳׳™ ׳׳₪׳©׳¨|׳׳™׳ ׳׳¦׳‘|׳‘׳׳×׳™ ׳׳₪׳©׳¨׳™|׳‘׳—׳™׳™ם לא)/.test(normalized)) {
+    if (/(לא יכול|אי אפשר|אין מצב|בלתי אפשרי|בחיים לא)/.test(normalized)) {
         return 'ABSOLUTE_IMPOSSIBLE';
     }
 
-    if (/(׳—׳™׳™׳‘|׳¦׳¨׳™׳|׳׳•׳›׳¨׳—|׳׳™׳ ׳‘׳¨׳™׳¨׳”|׳׳¡׳•׳¨ ׳׳™ לא)/.test(normalized)) {
+    if (/(חייב|צריך|מוכרח|אין ברירה|אסור לי לא)/.test(normalized)) {
         return 'NO_CHOICE';
     }
 
-    if (/(׳×׳׳™׳“|׳׳£ ׳₪׳¢׳|׳›׳•׳׳|׳›׳ ׳”׳–׳׳|׳׳£ ׳׳—׳“)/.test(normalized)) {
+    if (/(תמיד|אף פעם|כולם|כל הזמן|אף אחד)/.test(normalized)) {
         return 'GLOBAL_RULE';
     }
 
-    if (/(׳׳ ׳™ .*׳›׳™׳©׳׳•׳|׳׳ ׳™ .*׳“׳₪׳•׳§|׳”׳•׳ .*׳‘׳¢׳™׳™׳×׳™|׳”׳™׳ .*׳‘׳¢׳™׳™׳×׳™׳×|׳”׳•׳ .*׳¢׳¦׳׳|׳”׳™׳ .*׳¢׳¦׳׳ ׳™׳×|׳׳ ׳™ .*׳׳ ׳™׳•׳¦׳׳—)/.test(normalized)) {
+    if (/(אני .*כישלון|אני .*דפוק|הוא .*בעייתי|היא .*בעייתית|הוא .*עצלן|היא .*עצלנית|אני .*לא יוצלח)/.test(normalized)) {
         return 'IDENTITY_LOCK';
     }
 
@@ -6248,7 +6252,7 @@ function showAnswer() {
     const answerText = document.getElementById('answer-text');
     const answerExplanation = document.getElementById('answer-explanation');
     
-    answerText.textContent = `נ¯ ${statement.suggested_question}`;
+    answerText.textContent = `🎯 ${statement.suggested_question}`;
     answerExplanation.textContent = `💡 ${statement.explanation} | קטגוריה: ${statement.violation}`;
     
     answerBox.classList.remove('hidden');
@@ -6272,12 +6276,12 @@ function showLegacyPracticeHint() {
     const hints = {
         'DELETION': '🔍 מחפשים את המידע החסר - מי? מה? לפי מי?',
         'DISTORTION': '🔄 מחפשים את השינוי או ההנחה - מה כאן לא בדיוק? מה מוכן?',
-        'GENERALIZATION': 'נ“ˆ ׳׳—׳₪׳©׳™׳ ׳׳× ׳”׳”׳›׳׳׳” - ׳‘׳׳׳× ׳×׳׳™׳“? ׳‘׳׳׳× ׳׳£ ׳₪עם?'
+        'GENERALIZATION': '📈 מחפשים את ההכללה - באמת תמיד? באמת אף ׳₪עם?'
     };
     
     const difficultyHint = {
         'easy': 'הפרה זו לא כל כך מורכבת - חשוב על פרטים כופים',
-        'medium': '׳–׳• ׳”׳₪׳¨׳” ׳׳¢׳˜ ׳™׳•׳×׳¨ ׳׳¡׳•׳‘׳›׳× - ׳—׳©׳•׳‘ ׳׳¢׳•׳׳§ ׳™׳•תר',
+        'medium': 'זו הפרה מעט יותר מסובכת - חשוב לעומק יותר',
         'hard': 'זו הפרה מסובכת - זקוק להרבה כדי לפרוק אותה'
     };
     
@@ -6335,7 +6339,7 @@ function buildDeletionGuideHtml() {
     return `
         <p><strong>איך עובד תרגול מחיקה (6 אפשרויות)?</strong></p>
         <p>בכל שאלה תקבל/י 6 אפשרויות: 3 שאלות שאינן מחיקה, ו-3 שאלות מחיקה בניסוחים שונים.</p>
-        <p><strong>׳”׳׳˜׳¨׳” ׳©׳׳:</strong> ׳׳‘׳—׳•׳¨ ׳׳× ׳©׳׳׳× ׳”׳׳—׳™׳§׳” ׳©׳—׳•׳©׳₪׳× ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳›׳™ ׳׳©׳׳¢׳•׳×׳™ ׳׳”קשר.</p>
+        <p><strong>המטרה שלך:</strong> לבחור את שאלת המחיקה שחושפת את המידע החסר הכי משמעותי להקשר.</p>
         <p><strong>דירוג איכות בתוך שאלות המחיקה:</strong></p>
         <ul>
             <li>רמה גבוהה: חושפת מידע חסר קריטי שמאפשר פעולה מיידית.</li>
@@ -6585,7 +6589,7 @@ function buildDeletionCoachOptionSet(question) {
     const statement = String(question?.statement || '');
 
     let highQuestion = question?.suggested_question || 'מה בדיוק חסר כאן כדי להבין את המשפט?';
-    let mediumQuestion = '׳׳™׳–׳” ׳₪׳¨׳˜ ׳—׳¡׳¨ ׳›׳׳ ׳©׳™׳›׳•׳ ׳׳¢׳–׳•׳¨ ׳׳”׳‘׳™׳ ׳˜׳•׳‘ ׳™׳•תר?';
+    let mediumQuestion = 'איזה פרט חסר כאן שיכול לעזור להבין טוב יותר?';
     let lowQuestion = 'יש עוד משהו להוסיף?';
 
     if (subtype.includes('comparative')) {
@@ -6594,18 +6598,18 @@ function buildDeletionCoachOptionSet(question) {
         lowQuestion = 'אפשר לתת עוד דוגמה להשוואה?';
     } else if (subtype.includes('referential')) {
         highQuestion = 'מי בדיוק אמר/קבע/חושב את זה, ואיזה מקור יש לכך?';
-        mediumQuestion = '׳¢׳ ׳׳™׳׳• ׳׳ ׳©׳™׳ ׳׳• ׳’׳•׳¨׳׳™׳ ׳׳“׳•׳‘׳¨ ׳›אן?';
+        mediumQuestion = 'על אילו אנשים או גורמים מדובר ׳›אן?';
         lowQuestion = 'יש עוד מישהו שקשור לזה?';
     } else if (subtype.includes('simple')) {
         highQuestion = 'מה בדיוק לא טוב, לפי מי, ובאיזה קריטריון זה נמדד?';
-        mediumQuestion = '׳׳×׳™ ׳–׳” ׳§׳•׳¨׳” ׳•׳‘׳׳™׳–׳” ׳׳¦׳‘ ׳–׳” ׳‘׳•׳׳˜ ׳™׳•תר?';
-        lowQuestion = '׳׳₪׳©׳¨ ׳׳₪׳¨׳˜ ׳§׳¦׳× ׳™׳•תר?';
+        mediumQuestion = 'מתי זה קורה ובאיזה מצב זה בולט יותר?';
+        lowQuestion = 'אפשר לפרט קצת יותר?';
     }
 
-    if (statement.includes('׳™׳•תר') || statement.includes('פחות')) {
+    if (statement.includes('יותר') || statement.includes('פחות')) {
         highQuestion = 'יותר/פחות ביחס למה בדיוק, ובאיזו יחידת מדידה?';
     }
-    if (statement.includes('׳›׳•לם') || statement.includes('ידוע')) {
+    if (statement.includes('כולם') || statement.includes('ידוע')) {
         mediumQuestion = 'מי בדיוק \"כולם\", ומי מחוץ לקבוצה הזו?';
     }
 
@@ -6614,7 +6618,7 @@ function buildDeletionCoachOptionSet(question) {
             id: 'D1',
             focus: 'DELETION',
             quality: 'high',
-            purpose: '׳׳—׳©׳•׳£ ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳§׳¨׳™׳˜׳™ ׳©׳׳׳₪׳©׳¨ ׳׳”׳×׳§׳“׳ ׳‘׳₪׳•על',
+            purpose: 'לחשוף את המידע החסר הקריטי שמאפשר להתקדם בפועל',
             questionText: highQuestion,
             why: 'מכוונת למידע שחסר באמת להקשר ולביצוע.'
         },
@@ -6640,23 +6644,23 @@ function buildDeletionCoachOptionSet(question) {
             quality: 'offtrack',
             purpose: 'בדיקת פרשנות/סיבתיות (לא מחיקה)',
             questionText: 'איך אתה יודע שזה נכון ומה ההוכחה לכך?',
-            why: '׳–׳• ׳©׳׳׳” ׳¢׳ ׳¢׳™׳•׳•׳× ׳•׳׳ ׳¢׳ ׳׳™׳“׳¢ ׳—סר.'
+            why: 'זו שאלה על עיוות ולא על מידע ׳—סר.'
         },
         {
             id: 'N2',
             focus: 'GENERALIZATION',
             quality: 'offtrack',
             purpose: 'בדיקת הכללה גורפת (לא מחיקה)',
-            questionText: '׳–׳” ׳×׳׳™׳“ ׳§׳•׳¨׳”, ׳׳• ׳©׳™׳© ׳׳§׳¨׳™׳ ׳©׳–׳” ׳׳—רת?',
+            questionText: 'זה תמיד קורה, או שיש מקרים שזה אחרת?',
             why: 'זו שאלה על הכללה, לא על השמטת פרטים.'
         },
         {
             id: 'N3',
             focus: 'NON_DELETION',
             quality: 'offtrack',
-            purpose: '׳§׳₪׳™׳¦׳” ׳׳₪׳×׳¨׳•׳ ׳‘׳׳™ ׳׳׳₪׳•׳× ׳׳™׳“׳¢ ׳—סר',
+            purpose: 'קפיצה לפתרון בלי למפות מידע ׳—סר',
             questionText: 'מה כדאי לעשות עכשיו כדי לפתור את זה מהר?',
-            why: '׳©׳׳׳× ׳₪׳×׳¨׳•׳ ׳׳•׳§׳“׳ ׳‘׳׳™ ׳׳—׳©׳•׳£ ׳§׳•׳“׳ ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—סר.'
+            why: 'שאלת פתרון מוקדם בלי לחשוף קודם את המידע החסר.'
         }
     ];
 
@@ -6689,7 +6693,7 @@ function evaluateDeletionCoachChoice(choice, question) {
             xpGain: baseXp,
             countsAsCorrect: true,
             title: 'מצוין - זו המחיקה הכי משמעותית',
-            message: '׳‘׳—׳¨׳× ׳׳× ׳”׳©׳׳׳” ׳©׳׳—׳–׳™׳¨׳” ׳׳× ׳”׳׳™׳“׳¢ ׳”׳—׳¡׳¨ ׳”׳§׳¨׳™׳˜׳™ ׳‘׳™׳•׳×׳¨ ׳׳”קשר.',
+            message: 'בחרת את השאלה שמחזירה את המידע החסר הקריטי ביותר להקשר.',
             ranked
         };
     }
@@ -6720,7 +6724,7 @@ function showTrainerRewardEffect(starGain, result = 'fail') {
     const display = document.getElementById('question-display');
     if (!fx || !display || starGain <= 0) return;
 
-    const mainText = `+${starGain} ג­`;
+    const mainText = `+${starGain} ⭐`;
     const subtitle = result === 'success'
         ? 'בונוס הצלחה!'
         : result === 'partial'
@@ -6846,13 +6850,13 @@ function showDeletionCoachFeedback(question, selectedChoice, evaluation, starGai
             <strong>${escapeHtml(evaluation.title || '')}</strong>
             <p class="explanation">
                 <strong>מטרת השאלה כאן:</strong> לאתר את המידע החסר המשמעותי ביותר בהשמטה.<br>
-                <strong>׳”׳‘׳—׳™׳¨׳” שלך:</strong> ${escapeHtml(selectedText)}<br>
+                <strong>הבחירה שלך:</strong> ${escapeHtml(selectedText)}<br>
                 <strong>משוב:</strong> ${escapeHtml(evaluation.message || '')}
             </p>
             <p class="explanation"><strong>דירוג 3 שאלות המחיקה בשאלה הזו:</strong></p>
             <ol class="deletion-rank-list">${rankedHtml}</ol>
             <p style="margin-top: 12px; color: #2f855a; font-weight: bold;">+${evaluation.xpGain} XP</p>
-            <p style="margin-top: 6px; color: #805ad5; font-weight: bold;">+${starGain} ג­</p>
+            <p style="margin-top: 6px; color: #805ad5; font-weight: bold;">+${starGain} ⭐</p>
         </div>
     `;
 
@@ -6889,11 +6893,11 @@ function showFeedback(isCorrect, question, selectedViolation, xpGain = 10, starG
                 <p class="explanation">
                     <strong>קטגוריה:</strong> ${correctLabel}<br>
                     <strong>סוג הפרה:</strong> ${violationName}<br>
-                    <strong>׳©׳׳׳× ׳¢׳•׳׳§ ׳׳•צעת:</strong> "${question.suggested_question}"<br>
+                    <strong>שאלת עומק מוצעת:</strong> "${question.suggested_question}"<br>
                     <strong>הסבר:</strong> ${question.explanation}
                 </p>
                 <p style="margin-top: 15px; color: #28a745; font-weight: bold;">+${xpGain} XP</p>
-                <p style="margin-top: 6px; color: #805ad5; font-weight: bold;">+${starGain} ג­</p>
+                <p style="margin-top: 6px; color: #805ad5; font-weight: bold;">+${starGain} ⭐</p>
             </div>
         `;
     } else {
@@ -6901,10 +6905,10 @@ function showFeedback(isCorrect, question, selectedViolation, xpGain = 10, starG
             <div class="incorrect">
                 <strong>❌ לא נכון</strong>
                 <p class="explanation">
-                    <strong>׳‘׳—רת:</strong> ${selectedLabel}<br>
+                    <strong>בחרת:</strong> ${selectedLabel}<br>
                     <strong>התשובה הנכונה:</strong> ${correctLabel}<br>
                     <strong>סוג הפרה:</strong> ${violationName}<br>
-                    <strong>׳©׳׳׳× ׳¢׳•׳׳§ ׳׳•צעת:</strong> "${question.suggested_question}"<br>
+                    <strong>שאלת עומק מוצעת:</strong> "${question.suggested_question}"<br>
                     <strong>הסבר:</strong> ${question.explanation}
                 </p>
                 <p style="margin-top: 12px; color: #744210; font-weight: bold;">+${starGain} ⭐ על הלמידה</p>
@@ -6966,10 +6970,10 @@ function showTrainerHint() {
     const categoryHint = {
         DELETION: 'בדוק מה חסר במשפט: מי? מה? מתי? לפי מה?',
         DISTORTION: 'בדוק איפה יש הנחה או קשר סיבה-תוצאה שלא הוכח.',
-        GENERALIZATION: '׳‘׳“׳•׳§ ׳׳™׳׳™׳ ׳׳•׳—׳׳˜׳•׳× ׳›׳׳• ׳×׳׳™׳“/׳׳£ ׳₪׳¢׳/׳›׳•׳׳/׳׳™ ׳׳₪שר.'
+        GENERALIZATION: 'בדוק מילים מוחלטות כמו תמיד/אף פעם/כולם/אי אפשר.'
     }[categoryKey] || 'בדוק איזו מילה במשפט סוגרת אפשרויות.';
 
-    const triggerWords = ['תמיד', '׳׳£ ׳₪עם', '׳›׳•לם', 'חייב', 'לא יכול', 'גרם לי', 'יודע ש', 'ברור ש']
+    const triggerWords = ['תמיד', 'אף ׳₪עם', 'כולם', 'חייב', 'לא יכול', 'גרם לי', 'יודע ש', 'ברור ש']
         .filter(word => statementText.includes(word));
     const triggerLine = triggerWords.length
         ? `מילות טריגר במשפט: ${triggerWords.join(', ')}`
@@ -6981,7 +6985,7 @@ function showTrainerHint() {
     } else if (trainerState.hintLevel === 2) {
         hintHtml = `<p><strong>רמז 2/3:</strong> ${triggerLine}</p><p>עכשיו נסח שאלה קצרה שתפרק את ההנחה.</p>`;
     } else {
-        hintHtml = `<p><strong>׳¨׳׳– 3/3:</strong> ׳”׳§׳˜׳’׳•׳¨׳™׳” ׳”׳™׳ <strong>${TRAINER_CATEGORY_LABELS[categoryKey] || categoryKey}</strong>.</p><p>׳©׳׳׳” ׳׳•צעת: "${question.suggested_question}"</p>`;
+        hintHtml = `<p><strong>רמז 3/3:</strong> הקטגוריה היא <strong>${TRAINER_CATEGORY_LABELS[categoryKey] || categoryKey}</strong>.</p><p>שאלה מוצעת: "${question.suggested_question}"</p>`;
     }
 
     setPanelContent('hint-display', hintHtml);
@@ -6995,7 +6999,7 @@ function showTrainerImportance() {
 
     if (trainerState.deletionCoachMode) {
         setPanelContent('why-display', `
-            <p><strong>׳׳˜׳¨׳× ׳”׳©׳׳׳” ׳›אן:</strong></p>
+            <p><strong>מטרת השאלה ׳›אן:</strong></p>
             <p>לא רק לזהות שיש מחיקה, אלא לבחור את שאלת המחיקה שחושפת את המידע החסר הכי משמעותי להבנה ולפעולה.</p>
             <p><strong>איך מודדים איכות?</strong></p>
             <ul>
@@ -7013,7 +7017,7 @@ function showTrainerImportance() {
         DELETION: 'כשמידע נמחק, המסקנה נבנית על חוסר נתונים. השאלה מחזירה פרטים הכרחיים.',
         DISTORTION: 'כשיש עיוות, פירוש הופך לעובדה. השאלה מפרידה בין פרשנות למציאות.',
         GENERALIZATION: 'כשיש הכללה, מקרה אחד הופך לחוק. השאלה פותחת יותר אפשרויות תגובה.'
-    }[categoryKey] || '׳”׳©׳׳׳” ׳׳—׳–׳™׳¨׳” ׳“׳™׳•׳§ ׳•׳׳׳₪׳©׳¨׳× ׳×׳’׳•׳‘׳” ׳˜׳•׳‘׳” ׳™׳•תר.';
+    }[categoryKey] || 'השאלה מחזירה דיוק ומאפשרת תגובה טובה יותר.';
 
     setPanelContent('why-display', `
         <p><strong>למה זה חשוב בשאלה הזו?</strong></p>
@@ -7031,7 +7035,7 @@ function showTrainerDepth() {
         setPanelContent('depth-display', `
             <p><strong>מסגרת פתרון למחיקה (6 אפשרויות):</strong></p>
             <ul>
-                <li>׳©׳׳‘ 1: ׳–׳”׳” ׳׳” ׳—׳¡׳¨ ׳‘׳׳©׳₪׳˜ ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳׳× ׳”׳”׳§׳©׳¨ ׳‘׳₪׳•על.</li>
+                <li>שלב 1: זהה מה חסר במשפט כדי להבין את ההקשר בפועל.</li>
                 <li>שלב 2: סנן 3 אפשרויות שאינן מחיקה.</li>
                 <li>שלב 3: בין 3 שאלות המחיקה, דרג לפי תרומה: גבוהה, בינונית, נמוכה.</li>
                 <li>שלב 4: בחר את השאלה שמחזירה מידע מדיד/בר-בדיקה/מכוון פעולה.</li>
@@ -7044,10 +7048,10 @@ function showTrainerDepth() {
     }
 
     const depthTrack = {
-        easy: ['שלב 1: זהה מילה בעייתית.', '׳©׳׳‘ 2: ׳©׳׳ ׳׳” ׳—סר.', '׳©׳׳‘ 3: ׳ ׳¡׳— ׳©׳׳׳” ׳׳—׳× ׳׳“׳•׳™קת.'],
-        medium: ['שלב 1: זהה הנחה סמויה.', 'שלב 2: בדוק ראיות.', '׳©׳׳‘ 3: ׳ ׳¡׳— ׳—׳׳•׳₪׳” ׳׳“׳•׳™קת.'],
-        hard: ['שלב 1: זהה דפוס שפה.', '׳©׳׳‘ 2: ׳׳₪׳” רמות לוגיות (סביבה/התנהגות/יכולות/ערכים/זהות/שייכות) ׳‘׳§׳¦׳¨׳”.', 'שלב 3: בחר Small Win להתקדמות.']
-    }[question.difficulty] || ['שלב 1: זהה דפוס.', '׳©׳׳‘ 2: ׳©׳׳ ׳׳” ׳—סר.', '׳©׳׳‘ 3: ׳‘׳ ׳” ׳©׳׳׳” ׳׳“׳•׳™קת.'];
+        easy: ['שלב 1: זהה מילה בעייתית.', 'שלב 2: שאל מה ׳—סר.', 'שלב 3: נסח שאלה אחת מדויקת.'],
+        medium: ['שלב 1: זהה הנחה סמויה.', 'שלב 2: בדוק ראיות.', 'שלב 3: נסח חלופה מדויקת.'],
+        hard: ['שלב 1: זהה דפוס שפה.', 'שלב 2: מפה רמות לוגיות (סביבה/התנהגות/יכולות/ערכים/זהות/שייכות) בקצרה.', 'שלב 3: בחר Small Win להתקדמות.']
+    }[question.difficulty] || ['שלב 1: זהה דפוס.', 'שלב 2: שאל מה ׳—סר.', 'שלב 3: בנה שאלה מדויקת.'];
 
     setPanelContent('depth-display', `
         <p><strong>עומק מומלץ לשאלה:</strong></p>
@@ -7083,9 +7087,9 @@ function legacyEndTrainerSession() {
     } else if (successRate >= 80) {
         message = 'מעולה! רמת דיוק גבוהה מאוד';
     } else if (successRate >= 60) {
-        message = '׳˜׳•׳‘ ׳׳׳•׳“, ׳¢׳•׳“ ׳—׳™׳“׳•׳“ ׳§׳˜׳ ׳•׳׳×׳” שם';
+        message = 'טוב מאוד, עוד חידוד קטן ואתה שם';
     } else {
-        message = '׳”׳×׳—׳׳” ׳˜׳•׳‘׳”, ׳׳׳©׳™׳›׳™׳ ׳׳×׳¨׳’׳•׳ ׳ ׳•סף';
+        message = 'התחלה טובה, ממשיכים לתרגול נוסף';
     }
 
     feedbackContent.innerHTML = `
@@ -7294,9 +7298,9 @@ function finishTrainerSession() {
     } else if (mainRate >= 80) {
         message = 'מעולה! רמת דיוק גבוהה מאוד';
     } else if (mainRate >= 60) {
-        message = '׳˜׳•׳‘ ׳׳׳•׳“, ׳¢׳•׳“ ׳—׳™׳“׳•׳“ ׳§׳˜׳ ׳•׳׳×׳” שם';
+        message = 'טוב מאוד, עוד חידוד קטן ואתה שם';
     } else {
-        message = '׳”׳×׳—׳׳” ׳˜׳•׳‘׳”, ׳׳׳©׳™׳›׳™׳ ׳׳×׳¨׳’׳•׳ ׳ ׳•סף';
+        message = 'התחלה טובה, ממשיכים לתרגול נוסף';
     }
 
     const reviewLine = reviewTotal
@@ -7642,15 +7646,15 @@ function getScenarioOptions(scenario) {
     }
 
     const defaultRed = (scenarioTrainerData.optionTemplates?.red || [
-        { id: 'A', emoji: 'נ˜¡', text: '׳׳” ׳”׳‘׳¢׳™׳” ׳׳™׳×׳? ׳׳×׳” עצלן.', type: 'red_identity_blame', score: 0, feedback: '׳׳׳©׳™׳ ׳–׳”׳•׳× ׳‘׳׳§׳•׳ ׳׳׳₪׳•׳× ׳—סר.' },
-        { id: 'B', emoji: 'נ™„', text: 'בגילך כבר הייתי יודע לעשות את זה.', type: 'red_comparison_shame', score: 0, feedback: 'השוואה מעלה בושה ומורידה פתרון.' },
-        { id: 'C', emoji: 'נ¥´', text: 'עזוב, אני אעשה את זה במקום.', type: 'red_overtake', score: 0, feedback: 'לקיחת משימה במקומך מונעת למידה.' },
-        { id: 'D', emoji: 'נ˜¬', text: 'כן כן, אחר כך נטפל בזה.', type: 'red_avoid_pretend', score: 0, feedback: 'דחייה בלי פירוק מגדילה תקיעות.' }
+        { id: 'A', emoji: '😡', text: 'מה הבעיה איתך? אתה עצלן.', type: 'red_identity_blame', score: 0, feedback: 'מאשים זהות במקום למפות ׳—סר.' },
+        { id: 'B', emoji: '🙄', text: 'בגילך כבר הייתי יודע לעשות את זה.', type: 'red_comparison_shame', score: 0, feedback: 'השוואה מעלה בושה ומורידה פתרון.' },
+        { id: 'C', emoji: '🥴', text: 'עזוב, אני אעשה את זה במקום.', type: 'red_overtake', score: 0, feedback: 'לקיחת משימה במקומך מונעת למידה.' },
+        { id: 'D', emoji: '😬', text: 'כן כן, אחר כך נטפל בזה.', type: 'red_avoid_pretend', score: 0, feedback: 'דחייה בלי פירוק מגדילה תקיעות.' }
     ]).slice(0, 4);
 
     const greenTemplate = scenarioTrainerData.optionTemplates?.green || {
         id: 'E',
-        emoji: 'ג…נ™‚',
+        emoji: '✅🙂',
         text: 'בוא נפרק: מה ניסית? איפה נתקעת? מה הצעד הראשון?',
         type: 'green_meta_model',
         score: 1,
@@ -7696,7 +7700,7 @@ function startScenarioRun() {
 
     const queue = buildScenarioQueue(domain, difficulty, runSize);
     if (!queue.length) {
-        showHint('׳׳ ׳ ׳׳¦׳׳• ׳¡׳¦׳ ׳•׳× ׳׳׳¡׳ ׳ ׳©׳‘׳—רת');
+        showHint('לא נמצאו סצנות למסנן שבחרת');
         return;
     }
 
@@ -7814,7 +7818,7 @@ function renderScenarioFeedback(option, isGreen) {
     const consequenceResult = document.getElementById('scenario-consequence-result');
 
     if (mark) {
-        mark.textContent = isGreen ? 'ג“' : 'X';
+        mark.textContent = isGreen ? '✓' : 'X';
         mark.className = `scenario-feedback-mark ${isGreen ? 'success' : 'fail'}`;
         // Restart animation each feedback screen.
         void mark.offsetWidth;
@@ -7840,17 +7844,17 @@ function resolveScenarioConsequence(option, isGreen) {
 
     if (isGreen) {
         return {
-            icon: 'נ› ן¸',
+            icon: '✅',
             title: 'מה קורה אחרי בחירה ירוקה?',
             action: 'שואלים שאלת פירוק במקום להאשים.',
-            result: '׳”׳׳©׳™׳׳” ׳”׳•׳₪׳›׳× ׳׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳©׳׳₪׳©׳¨ ׳׳‘צע.'
+            result: 'המשימה הופכת לצעד ראשון שאפשר לבצע.'
         };
     }
 
     return {
-        icon: 'נ’¥',
+        icon: '💥',
         title: 'מה קורה אם ממשיכים בדרך הישנה?',
-        action: '׳׳׳©׳™׳›׳™׳ ׳׳ ׳—׳©/׳׳”׳׳©׳™׳ ׳‘׳׳™ ׳׳‘׳“׳•׳§ ׳׳” נתקע.',
+        action: 'ממשיכים לנחש/להאשים בלי לבדוק מה נתקע.',
         result: 'המשימה נתקעת, הלחץ עולה, ולעיתים נוצרת תקלה אמיתית.'
     };
 }
@@ -7863,7 +7867,7 @@ function renderScenarioConsequence(option, isGreen, box, titleEl, actionEl, resu
     box.classList.add(isGreen ? 'green' : 'red');
     titleEl.textContent = `${consequence.icon || ''} ${consequence.title || ''}`.trim();
     actionEl.innerHTML = `<strong>מה קורה מיד אחרי זה:</strong> ${consequence.action || ''}`;
-    resultEl.innerHTML = `<strong>׳”׳×׳•׳¦׳׳” ׳‘׳₪׳•על:</strong> ${consequence.result || ''}`;
+    resultEl.innerHTML = `<strong>התוצאה בפועל:</strong> ${consequence.result || ''}`;
 }
 
 function getScenarioGreenOptionText(scenario) {
@@ -7875,37 +7879,37 @@ function getScenarioGreenOptionText(scenario) {
 const SCENARIO_PREDICATE_TYPE_LABELS = Object.freeze({
     action: 'פועל פעולה',
     process: 'תהליך / קורה לי',
-    state: '׳׳¦׳‘ / ׳–׳”׳•׳× ׳׳§׳•צרת'
+    state: 'מצב / זהות מקוצרת'
 });
 
 const SCENARIO_STATE_NORMALIZATION_RULES = Object.freeze([
-    { pattern: /׳×׳§׳•׳¢|׳×׳§׳•׳¢׳”/, normalizedVerb: 'להיתקע בלופ ולא להתקדם', missingAction: 'להגדיר צעד ראשון מדיד ולבצע אותו מיד' },
-    { pattern: /׳›׳™׳©׳׳•׳|׳›׳©׳׳•׳|׳׳₪׳¡/, normalizedVerb: 'להדביק זהות שלילית במקום לתאר פעולה', missingAction: 'לתאר פעולה קטנה שניתן לבצע ב-10 דקות' },
-    { pattern: /׳׳ ׳׳¡׳•׳’׳|׳׳ ׳׳¡׳•׳’׳׳×|׳׳ ׳™׳›׳•׳|׳׳ ׳™׳›׳•׳׳”/, normalizedVerb: 'לחסום יכולת לפני בדיקת תנאים', missingAction: 'לבדוק מה אפשר לבצע גם אם רק ב-5% הצלחה' },
-    { pattern: /׳׳™׳ ׳¡׳™׳›׳•׳™|׳—׳¡׳¨ ׳¡׳™׳›׳•׳™|׳׳‘׳•׳“|׳׳‘׳•׳“׳”/, normalizedVerb: 'להפוך מצב לקביעה גורלית', missingAction: 'לאתר תנאים שבהם זה קצת פחות נכון' }
+    { pattern: /תקוע|תקועה/, normalizedVerb: 'להיתקע בלופ ולא להתקדם', missingAction: 'להגדיר צעד ראשון מדיד ולבצע אותו מיד' },
+    { pattern: /כישלון|כשלון|אפס/, normalizedVerb: 'להדביק זהות שלילית במקום לתאר פעולה', missingAction: 'לתאר פעולה קטנה שניתן לבצע ב-10 דקות' },
+    { pattern: /לא מסוגל|לא מסוגלת|לא יכול|לא יכולה/, normalizedVerb: 'לחסום יכולת לפני בדיקת תנאים', missingAction: 'לבדוק מה אפשר לבצע גם אם רק ב-5% הצלחה' },
+    { pattern: /אין סיכוי|חסר סיכוי|אבוד|אבודה/, normalizedVerb: 'להפוך מצב לקביעה גורלית', missingAction: 'לאתר תנאים שבהם זה קצת פחות נכון' }
 ]);
 
 const SCENARIO_PROCESS_HINTS = Object.freeze([
-    { pattern: /׳׳¦׳™׳£|׳׳¦׳™׳₪׳”/, normalizedVerb: 'להיות מוצף ולהפסיק לחשוב בצעדים', missingAction: 'לעצור, לנשום, ולפרק למשימת מיקרו אחת' },
-    { pattern: /׳ ׳×׳§׳¢|׳ ׳×׳§׳¢׳×|׳ ׳×׳§׳¢׳™׳/, normalizedVerb: 'להיכנס ללולאת עצירה', missingAction: 'לבחור צעד ראשון קצר עם מדד סיום ברור' },
-    { pattern: /׳׳©׳×׳׳˜|׳׳©׳×׳׳˜׳×/, normalizedVerb: '׳׳×׳× ׳׳×׳’׳•׳‘׳” ׳׳•׳˜׳•׳׳˜׳™׳× ׳׳ ׳”׳ ׳׳× ׳”׳׳”לך', missingAction: 'להחזיר שליטה דרך שאלה קונקרטית אחת' }
+    { pattern: /מציף|מציפה/, normalizedVerb: 'להיות מוצף ולהפסיק לחשוב בצעדים', missingAction: 'לעצור, לנשום, ולפרק למשימת מיקרו אחת' },
+    { pattern: /נתקע|נתקעת|נתקעים/, normalizedVerb: 'להיכנס ללולאת עצירה', missingAction: 'לבחור צעד ראשון קצר עם מדד סיום ברור' },
+    { pattern: /משתלט|משתלטת/, normalizedVerb: 'לתת לתגובה אוטומטית לנהל את המהלך', missingAction: 'להחזיר שליטה דרך שאלה קונקרטית אחת' }
 ]);
 
 const SCENARIO_DYNAMIC_QUESTIONS = Object.freeze({
     action: Object.freeze([
-        '׳׳” ׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳ ׳©׳ ׳”׳₪׳•׳¢׳ ׳”׳–׳” אצלך?',
+        'מה הצעד הראשון של הפועל הזה אצלך?',
         'מה קורה בין ההחלטה לבין רגע הוויתור?',
         'איך נראה סימן "בוצע" ברור?'
     ]),
     process: Object.freeze([
         'מה האות הראשון בגוף שזה מתחיל?',
-        '׳׳” ׳§׳•׳¨׳” ׳׳•׳˜׳•׳׳˜׳™׳× ׳‘׳׳™ ׳”׳—׳׳˜׳” ׳׳•׳“עת?',
+        'מה קורה אוטומטית בלי החלטה מודעת?',
         'מה אתה עושה שמגדיל או מקטין את התהליך הזה?'
     ]),
     state: Object.freeze([
         'אם היינו מצלמה, מה בדיוק רואים שאתה עושה כשזה קורה?',
         'מה לא קורה שהיית מצפה שיקרה?',
-        '׳‘׳™׳—׳¡ ׳׳׳” ׳–׳” "׳×׳§׳•׳¢" - ׳™׳¢׳“, ׳”׳—׳׳˜׳” ׳׳• ׳₪׳¢׳•׳׳” ׳׳¡׳•׳™מת?'
+        'ביחס למה זה "תקוע" - יעד, החלטה או פעולה מסוימת?'
     ])
 });
 
@@ -7922,13 +7926,13 @@ function inferScenarioPredicateType(scenario) {
     const haystack = `${predicate} ${story} ${stuck} ${belief}`;
 
     if (
-        /׳×׳§׳•׳¢|׳×׳§׳•׳¢׳”|׳›׳™׳©׳׳•׳|׳›׳©׳׳•׳|׳׳₪׳¡|׳׳ ׳׳¡׳•׳’׳|׳׳ ׳׳¡׳•׳’׳׳×|׳׳™׳ ׳¡׳™׳›׳•׳™|׳׳‘׳•׳“|׳׳‘׳•׳“׳”/.test(haystack) ||
-        /^׳׳”׳™׳•׳×\b/.test(predicate)
+        /תקוע|תקועה|כישלון|כשלון|אפס|לא מסוגל|לא מסוגלת|אין סיכוי|אבוד|אבודה/.test(haystack) ||
+        /^להיות\b/.test(predicate)
     ) {
         return 'state';
     }
 
-    if (/׳ ׳×׳§׳¢|׳ ׳×׳§׳¢׳×|׳׳¦׳™׳£|׳׳¦׳™׳₪׳”|׳׳©׳×׳׳˜|׳§׳•׳₪׳|׳ ׳ ׳¢׳|׳׳—׳•׳¥/.test(haystack)) {
+    if (/נתקע|נתקעת|מציף|מציפה|משתלט|קופא|ננעל|לחוץ/.test(haystack)) {
         return 'process';
     }
 
@@ -8018,12 +8022,12 @@ function buildScenarioToteSlots(scenario, analysis) {
     const fallbackStep = analysis?.missingAction || bp.firstStep || 'לבחור פעולה קטנה ומדידה';
 
     return {
-        trigger: (scenario?.story || [])[0] || scenario?.title || '׳׳ ׳–׳•׳”׳” ׳˜׳¨׳™׳’׳¨ ׳׳₪׳•רש',
+        trigger: (scenario?.story || [])[0] || scenario?.title || 'לא זוהה טריגר מפורש',
         preEvent: (scenario?.story || [])[1] || scenario?.expectation?.pressure || 'לא זוהה אירוע מקדים',
         evidence: scenario?.stuckPointHint || 'איך רואים שזה קורה בפועל? מה עדות מדידה?',
         op1: steps[0] || fallbackStep,
         op2: steps[1] || bp.firstStep || 'להמשיך בצעד שני קצר וברור',
-        op3: steps[2] || '׳׳¡׳’׳•׳¨ ׳‘׳“׳™׳§׳” ׳§׳¦׳¨׳”: ׳׳” ׳”׳•׳©׳׳ ׳•׳׳” ׳¢׳•׳“ ׳—סר',
+        op3: steps[2] || 'לסגור בדיקה קצרה: מה הושלם ומה עוד ׳—סר',
         blocker: scenario?.expectation?.belief || bp.stuckPoint || scenario?.stuckPointHint || 'אמונה/כלל שעוצר את ה-Exit',
         autoLoop: resolveScenarioAutoLoopText(analysis?.type),
         exit: bp.doneDefinition || 'יש סימן ביצוע ברור שאפשר לראות ולמדוד'
@@ -8062,7 +8066,7 @@ function renderScenarioToteMap(scenario) {
     Object.entries(bindings).forEach(([key, id]) => {
         const el = document.getElementById(id);
         if (!el) return;
-        el.textContent = slots[key] || 'ג€”';
+        el.textContent = slots[key] || '—';
     });
 
     renderScenarioDynamicQuestions(analysis);
@@ -8084,7 +8088,7 @@ function getScenarioProbePrompt(kind = 'open') {
     }
 
     if (type === 'state') {
-        return '׳₪׳×׳— ׳¢׳•׳“: ׳׳™׳–׳” ׳©׳׳‘ ׳₪׳¢׳•׳׳” ׳—׳¡׳¨ ׳‘׳™׳ ׳”׳”׳’׳“׳¨׳” ("׳×׳§׳•׳¢") ׳׳‘׳™׳ ׳׳” ׳©׳§׳•׳¨׳” ׳‘׳₪׳•על?';
+        return 'פתח עוד: איזה שלב פעולה חסר בין ההגדרה ("תקוע") לבין מה שקורה בפועל?';
     }
     if (type === 'process') {
         return 'פתח עוד: מה האות הראשון בגוף, ומה הפעולה המידית שמתחילה את הלופ?';
@@ -8190,7 +8194,7 @@ async function copyScenarioGreenSentence() {
             document.execCommand('copy');
             helper.remove();
         }
-        showHint('׳”׳׳©׳₪׳˜ ׳”׳™׳¨׳•׳§ ׳”׳•עתק');
+        showHint('המשפט הירוק הועתק');
     } catch (error) {
         console.error('Copy failed', error);
         showHint('לא הצלחנו להעתיק. אפשר להעתיק ידנית.');
@@ -8274,11 +8278,11 @@ function renderScenarioScore(entry) {
     const nextBtn = document.getElementById('scenario-next-scene-btn');
 
     const playedCount = scenarioTrainer.session.index + 1;
-    const starVisual = 'ג­'.repeat(scenarioTrainer.session.stars) + 'ג˜†'.repeat(Math.max(playedCount - scenarioTrainer.session.stars, 0));
+    const starVisual = '⭐'.repeat(scenarioTrainer.session.stars) + '☆'.repeat(Math.max(playedCount - scenarioTrainer.session.stars, 0));
 
-    if (starsRow) starsRow.textContent = starVisual || 'ג˜†ג˜†ג˜†ג˜†ג˜†';
+    if (starsRow) starsRow.textContent = starVisual || '☆☆☆☆☆';
     if (scoreLine) {
-        scoreLine.textContent = `׳¡׳™׳™׳׳× ׳¡׳¦׳ ׳” ${playedCount}/${scenarioTrainer.session.queue.length}. ׳ ׳§׳•׳“׳•ת סשן: ${scenarioTrainer.session.score}`;
+        scoreLine.textContent = `סיימת סצנה ${playedCount}/${scenarioTrainer.session.queue.length}. נקודות סשן: ${scenarioTrainer.session.score}`;
     }
     if (greenLine) greenLine.textContent = `בפעם הבאה: "${entry.greenSentence}"`;
     if (summaryBox) {
@@ -8604,7 +8608,7 @@ function openComicPreviewModal(scene) {
 
     image.src = scene.path;
     image.alt = scene.title || 'Comic Scene';
-    title.textContent = scene.title || '׳×׳¦׳•׳’׳× ׳§׳•׳׳™קס';
+    title.textContent = scene.title || 'תצוגת קומיקס';
     subtitle.textContent = scene.subtitle || '';
 
     modal.classList.remove('hidden');
@@ -8774,13 +8778,13 @@ function getComicToneClass(tone) {
 
 function getComicOutcome(choiceId) {
     const map = {
-        angry: '׳”׳˜׳•׳ ׳¢׳•׳׳”, ׳”׳©׳™׳—׳” ׳ ׳¡׳’׳¨׳×, ׳•׳ ׳•׳¦׳¨׳× ׳™׳•׳×׳¨ ׳”׳×׳ ׳’׳“׳•׳×.',
-        mock: '׳ ׳•׳¦׳¨׳× ׳‘׳•׳©׳” ׳•׳”׳¦׳“ ׳”׳©׳ ׳™ ׳׳₪׳¡׳™׳§ ׳׳©׳×׳£ ׳׳™׳“׳¢ ׳׳׳™׳×׳™.',
-        rescue: '׳”׳‘׳¢׳™׳” ׳ ׳₪׳×׳¨׳× ׳¨׳’׳¢׳™׳×, ׳׳‘׳ ׳”׳™׳›׳•׳׳× ׳©׳ ׳”׳¦׳“ ׳”׳©׳ ׳™ ׳׳ ׳ ׳‘׳ ׳™׳×.',
-        avoid: '׳”׳×׳§׳™׳¢׳•׳× ׳ ׳“׳—׳™׳× ׳•׳—׳•׳–׳¨׳× ׳׳—׳¨ ׳›׳ ׳¢׳ ׳™׳•׳×׳¨ ׳׳—׳¥.',
-        meta: '׳”׳¢׳׳™׳׳•׳× ׳™׳•׳¨׳“׳× ׳•׳”׳•׳₪׳›׳× ׳׳×׳”׳׳™׳ ׳©׳׳₪׳©׳¨ ׳׳‘צע.'
+        angry: 'הטון עולה, השיחה נסגרת, ונוצרת יותר התנגדות.',
+        mock: 'נוצרת בושה והצד השני מפסיק לשתף מידע אמיתי.',
+        rescue: 'הבעיה נפתרת רגעית, אבל היכולת של הצד השני לא נבנית.',
+        avoid: 'התקיעות נדחית וחוזרת אחר כך עם יותר לחץ.',
+        meta: 'העמימות יורדת והופכת לתהליך שאפשר לבצע.'
     };
-    return map[choiceId] || '׳‘׳—׳™׳¨׳” ׳–׳• ׳׳©׳ ׳” ׳׳× ׳”׳›׳™׳•׳•׳ ׳©׳ ׳”׳¡׳¦׳ ׳”.';
+    return map[choiceId] || 'בחירה זו משנה את הכיוון של הסצנה.';
 }
 
 function buildComicBlueprintHtml(blueprint) {
@@ -8803,7 +8807,7 @@ function buildComicBlueprintHtml(blueprint) {
             <div style="margin-top:8px"><b>תנאים מקדימים:</b></div>
             <ul>${toList(blueprint.preconditions)}</ul>
 
-            <div style="margin-top:8px"><b>׳׳׳˜׳¨׳ ׳˜׳™׳‘׳•׳× ׳›׳©׳ ׳×׳§׳¢׳™׳:</b></div>
+            <div style="margin-top:8px"><b>אלטרנטיבות כשנתקעים:</b></div>
             <ul>${toList(blueprint.alternatives)}</ul>
         </div>
     `;
@@ -8841,14 +8845,14 @@ async function setupComicEngine2Legacy() {
         payload = deepNormalizeUiPayload(await response.json());
     } catch (error) {
         console.error('Cannot load data/comic-scenarios.json', error);
-        els.title.textContent = '׳©׳’׳™׳׳” ׳‘׳˜׳¢׳™׳ ׳× ׳¡׳¦׳ ׳•׳× ׳§׳•׳׳™קס';
+        els.title.textContent = 'שגיאה בטעינת סצנות קומיקס';
         if (els.meta) els.meta.textContent = '';
         return;
     }
 
     const scenarios = Array.isArray(payload?.scenarios) ? payload.scenarios : [];
     if (!scenarios.length) {
-        els.title.textContent = '׳׳™׳ ׳¡׳¦׳ ׳•׳× ׳§׳•׳׳™׳§׳¡ ׳›׳¨׳’׳¢';
+        els.title.textContent = 'אין סצנות קומיקס כרגע';
         if (els.meta) els.meta.textContent = '';
         return;
     }
@@ -9072,7 +9076,7 @@ async function setupComicEngine2Legacy() {
         const outcome = choice.outcome || getComicOutcome(choice.id);
         let rightHtml = `
             <div class="comic-feedback-summary">
-                <div style="color:#6B7280;font-weight:900;margin-bottom:6px">׳”׳×׳’׳•׳‘׳” שלך</div>
+                <div style="color:#6B7280;font-weight:900;margin-bottom:6px">התגובה שלך</div>
                 <div style="font-weight:900">${escapeHtml(choice.say || '')}</div>
                 <div style="margin-top:10px; color:#1f2937;">${escapeHtml(outcome)}</div>
             </div>
@@ -9095,11 +9099,11 @@ async function setupComicEngine2Legacy() {
         }
 
         const altChars = [
-            'assets/svg/characters/׳“׳ ׳™אל.svg',
-            'assets/svg/characters/׳׳™׳¨׳•׳.svg',
-            'assets/svg/characters/׳¢׳“׳.svg'
+            'assets/svg/characters/דניאל.svg',
+            'assets/svg/characters/לירון.svg',
+            'assets/svg/characters/עדן.svg'
         ];
-        const calmChar = 'assets/svg/characters/׳©׳™׳¨׳™.svg';
+        const calmChar = 'assets/svg/characters/שירי.svg';
 
         const rightImg = els.charRight?.querySelector('img');
         if (!rightImg) return;
@@ -9154,7 +9158,7 @@ async function setupComicEngine2Legacy() {
         if (els.dialog) {
             els.dialog.innerHTML = `
                 <div class="comic-line comic-line-user-turn">
-                    <div class="who">׳׳” ׳©׳ ׳׳׳¨ ׳‘׳₪׳•על</div>
+                    <div class="who">מה שנאמר בפועל</div>
                     <div class="comic-line-text">${escapeHtml(choice.say || '')}</div>
                 </div>
                 <div class="comic-line comic-line-followup ${choice.id === 'meta' ? 'success' : 'fail'}">
@@ -9166,13 +9170,13 @@ async function setupComicEngine2Legacy() {
 
         let rightHtml = `
             <div class="comic-feedback-summary">
-                <div style="color:#6B7280;font-weight:900;margin-bottom:6px">׳”׳×׳’׳•׳‘׳” שלך</div>
+                <div style="color:#6B7280;font-weight:900;margin-bottom:6px">התגובה שלך</div>
                 <div style="font-weight:900">${escapeHtml(choice.say || '')}</div>
                 <div style="margin-top:10px; color:#1f2937;">${escapeHtml(outcome)}</div>
             </div>
             <div class="comic-explain-box">
-                <label for="${noteFieldId}">׳׳׳” ׳–׳” ׳¢׳‘׳“ ׳׳• ׳׳ ׳¢׳‘׳“? ׳›׳×׳‘׳• ׳”׳¡׳‘ר קצר:</label>
-                <textarea id="${noteFieldId}" rows="3" placeholder="׳׳“׳•׳’׳׳”: ׳׳” ׳”׳™׳” ׳—׳¡׳¨, ׳׳” ׳×׳§׳¢ ׳׳× ׳”׳¦׳“ ׳”׳©׳ ׳™, ׳•׳׳” ׳׳₪׳©׳¨ ׳׳©׳׳•׳ ׳‘׳׳§׳•׳..."></textarea>
+                <label for="${noteFieldId}">למה זה עבד או לא עבד? כתבו הסבר קצר:</label>
+                <textarea id="${noteFieldId}" rows="3" placeholder="לדוגמה: מה היה חסר, מה תקע את הצד השני, ומה אפשר לשאול במקום..."></textarea>
             </div>
         `;
 
@@ -9259,62 +9263,62 @@ function evaluateCommunityMessage(text) {
     const hasQuestionMark = /[?״]/.test(message);
     if (hasQuestionMark) {
         score += 15;
-        strengths.push('׳ ׳•׳¡׳— ׳›׳©׳׳׳” ׳‘׳¨׳•׳¨׳”');
+        strengths.push('נוסח כשאלה ברורה');
     } else {
-        tips.push('׳׳”׳•׳¡׳™׳£ ׳¡׳™׳׳ ׳©׳׳׳” ׳›׳“׳™ ׳׳׳¡׳’׳¨ ׳‘׳§׳©׳” ׳‘׳¨׳•׳¨׳”.');
+        tips.push('להוסיף סימן שאלה כדי למסגר בקשה ברורה.');
     }
 
-    const questionWords = ['׳׳”', '׳׳™׳', '׳׳׳”', '׳׳×׳™', '׳׳™', '׳׳™׳₪׳”', '׳׳™׳–׳”', '׳›׳׳”', '׳‘׳׳™׳–׳”', '׳׳׳™'];
+    const questionWords = ['מה', 'איך', 'למה', 'מתי', 'מי', 'איפה', 'איזה', 'כמה', 'באיזה', 'למי'];
     const hasQuestionWord = questionWords.some(word => message.includes(word));
     if (hasQuestionWord) {
         score += 15;
-        strengths.push('׳™׳© ׳׳™׳׳× ׳©׳׳׳” ׳׳׳§׳“׳×');
+        strengths.push('יש מילת שאלה ממקדת');
     } else {
-        tips.push('׳׳”׳•׳¡׳™׳£ ׳׳™׳׳× ׳©׳׳׳” ׳׳׳•׳§׳“׳× (׳׳”/׳׳™׳/׳׳×׳™/׳׳™/׳׳™׳–׳”).');
+        tips.push('להוסיף מילת שאלה ממוקדת (מה/איך/מתי/מי/איזה).');
     }
 
     if (words.length >= 10) {
         score += 20;
-        strengths.push('׳™׳© ׳”׳§׳©׳¨ ׳׳¡׳₪׳§');
+        strengths.push('יש הקשר מספק');
     } else if (words.length >= 6) {
         score += 10;
-        tips.push('׳׳₪׳©׳¨ ׳׳”׳•׳¡׳™׳£ ׳¢׳•׳“ ׳₪׳¨׳˜׳™ ׳”׳§׳©׳¨ ׳›׳“׳™ ׳׳—׳“׳“.');
+        tips.push('אפשר להוסיף עוד פרטי הקשר כדי לחדד.');
     } else {
-        tips.push('׳”׳ ׳™׳¡׳•׳— ׳§׳¦׳¨ ׳׳“׳™, ׳—׳¡׳¨׳™׳ ׳₪׳¨׳˜׳™׳ ׳׳©׳׳¢׳•׳×׳™׳™׳.');
+        tips.push('הניסוח קצר מדי, חסרים פרטים משמעותיים.');
     }
 
-    const contextSignals = ['׳‘׳¡׳™׳˜׳•׳׳¦׳™׳”', '׳‘׳׳¦׳‘', '׳›׳©', '׳׳—׳¨׳™', '׳׳₪׳ ׳™', '׳׳•׳', '׳¢׳', '׳‘׳‘׳™׳×', '׳‘׳¢׳‘׳•׳“׳”', '׳‘׳›׳™׳×׳”'];
+    const contextSignals = ['בסיטואציה', 'במצב', 'כש', 'אחרי', 'לפני', 'מול', 'עם', 'בבית', 'בעבודה', 'בכיתה'];
     const hasContext = contextSignals.some(word => message.includes(word));
     if (hasContext) {
         score += 15;
-        strengths.push('׳”׳”׳§׳©׳¨ ׳”׳¡׳™׳˜׳•׳׳¦׳™׳•׳ ׳™ ׳‘׳¨׳•׳¨');
+        strengths.push('ההקשר הסיטואציוני ברור');
     } else {
-        tips.push('׳׳”׳•׳¡׳™׳£ ׳׳™׳₪׳”/׳׳•׳ ׳׳™/׳׳×׳™ ׳–׳” ׳§׳•׳¨׳” ׳‘׳₪׳•על.');
+        tips.push('להוסיף איפה/מול מי/מתי זה קורה בפועל.');
     }
 
-    const outcomeSignals = ['׳›׳“׳™', '׳׳˜׳¨׳”', '׳¨׳•׳¦׳”', '׳¨׳•׳¦׳™׳', '׳׳”׳©׳™׳’', '׳׳”׳¦׳׳™׳—', '׳×׳•׳¦׳׳”'];
+    const outcomeSignals = ['כדי', 'מטרה', 'רוצה', 'רוצים', 'להשיג', 'להצליח', 'תוצאה'];
     const hasOutcome = outcomeSignals.some(word => message.includes(word));
     if (hasOutcome) {
         score += 10;
-        strengths.push('׳™׳© ׳×׳•׳¦׳׳” ׳¨׳¦׳•׳™׳”');
+        strengths.push('יש תוצאה רצויה');
     } else {
-        tips.push('׳׳”׳’׳“׳™׳¨ ׳׳” ׳”׳×׳•׳¦׳׳” ׳©׳׳×׳ ׳¨׳•׳¦׳™׳ ׳׳”׳©׳™׳’.');
+        tips.push('להגדיר מה התוצאה שאתם רוצים להשיג.');
     }
 
     score = Math.max(15, Math.min(100, score));
 
     let level = 'level-low';
-    let levelLabel = '׳“׳•׳¨׳© ׳—׳™׳“׳•׳“';
-    let summary = '׳›׳“׳׳™ ׳׳—׳“׳“ ׳׳× ׳”׳©׳׳׳”: ׳׳” ׳—׳¡׳¨, ׳‘׳׳™׳–׳” ׳”׳§׳©׳¨, ׳•׳׳” ׳¨׳•׳¦׳™׳ ׳׳”׳©׳™׳’.';
+    let levelLabel = 'דורש חידוד';
+    let summary = 'כדאי לחדד את השאלה: מה חסר, באיזה הקשר, ומה רוצים להשיג.';
 
     if (score >= 75) {
         level = 'level-high';
-        levelLabel = '׳׳“׳•׳™׳§ ׳׳׳•׳“';
-        summary = '׳©׳׳׳” ׳—׳–׳§׳” ׳©׳׳¡׳™׳™׳¢׳× ׳׳—׳©׳•׳£ ׳׳™׳“׳¢ ׳—׳¡׳¨ ׳׳©׳׳¢׳•׳×׳™.';
+        levelLabel = 'מדויק מאוד';
+        summary = 'שאלה חזקה שמסייעת לחשוף מידע חסר משמעותי.';
     } else if (score >= 55) {
         level = 'level-mid';
-        levelLabel = '׳›׳™׳•׳•׳ ׳˜׳•׳‘';
-        summary = '׳ ׳™׳¡׳•׳— ׳˜׳•׳‘. ׳¢׳•׳“ ׳×׳•׳¡׳₪׳× ׳”׳§׳©׳¨ ׳§׳˜׳ ׳” ׳×׳”׳₪׳•׳ ׳׳•׳×׳• ׳׳׳“׳•׳™׳§ ׳™׳•תר.';
+        levelLabel = 'כיוון טוב';
+        summary = 'ניסוח טוב. עוד תוספת הקשר קטנה תהפוך אותו למדויק יותר.';
     }
 
     return {
@@ -9369,7 +9373,7 @@ function setupCommunityFeedbackWall() {
 
     const renderFeed = () => {
         if (!entries.length) {
-            els.feed.innerHTML = '<div class="community-empty">׳¢׳“׳™׳™׳ ׳׳™׳ ׳”׳•׳“׳¢׳•׳×. ׳›׳×׳‘׳• ׳¨׳׳©׳•׳ ׳™׳ ׳•׳§׳‘׳׳• ׳₪׳™׳“׳‘׳§ ׳¢׳ ׳”׳ ׳™׳¡׳•׳—.</div>';
+            els.feed.innerHTML = '<div class="community-empty">עדיין אין הודעות. כתבו ראשונים וקבלו פידבק על הניסוח.</div>';
             return;
         }
 
@@ -9385,7 +9389,7 @@ function setupCommunityFeedbackWall() {
             const date = escapeHtml(formatDate(entry.createdAt));
 
             const tipsHtml = tips.map(tip => `<li>${escapeHtml(tip)}</li>`).join('');
-            const strengthsText = strengths.length ? `׳—׳•׳–׳§׳•׳×: ${escapeHtml(strengths.join(' | '))}` : '';
+            const strengthsText = strengths.length ? `חוזקות: ${escapeHtml(strengths.join(' | '))}` : '';
 
             return `
                 <article class="community-item ${itemClass}">
@@ -9415,7 +9419,7 @@ function setupCommunityFeedbackWall() {
         const author = String(els.name?.value || '').trim();
 
         if (message.length < 6) {
-            setStatus('׳›׳×׳‘׳• ׳׳₪׳—׳•׳× 6 ׳×׳•׳•׳™׳ ׳›׳“׳™ ׳׳§׳‘׳ ׳₪׳™׳“׳‘׳§ ׳©׳™׳׳•׳©׳™.', true);
+            setStatus('כתבו לפחות 6 תווים כדי לקבל פידבק שימושי.', true);
             return;
         }
 
@@ -9433,8 +9437,8 @@ function setupCommunityFeedbackWall() {
         saveEntries();
         renderFeed();
 
-        const scoreLabel = analysis.score >= 75 ? '׳׳¦׳•׳™׳' : analysis.score >= 55 ? '׳™׳₪׳” ׳׳׳•׳“' : '׳™׳© ׳›׳™׳•׳•׳';
-        setStatus(`׳ ׳©׳׳¨. ׳¦׳™׳•׳ ׳ ׳™׳¡׳•׳—: ${analysis.score}/100 (${scoreLabel}).`);
+        const scoreLabel = analysis.score >= 75 ? 'מצוין' : analysis.score >= 55 ? 'יפה מאוד' : 'יש כיוון';
+        setStatus(`נשמר. ציון ניסוח: ${analysis.score}/100 (${scoreLabel}).`);
 
         els.message.value = '';
     });
@@ -9444,7 +9448,7 @@ function setupCommunityFeedbackWall() {
             entries = [];
             saveEntries();
             renderFeed();
-            setStatus('׳”׳§׳™׳¨ ׳ ׳•׳§׳”.');
+            setStatus('הקיר נוקה.');
         });
     }
 
@@ -9584,7 +9588,7 @@ function extractAndMoveToStep2() {
     const actionInput = document.getElementById('action-input').value.trim();
 
     if (!actionInput) {
-        alert('׳‘׳•׳׳ ׳×׳§׳׳“ ׳׳©׳”׳• - ׳׳” ׳׳×׳” ׳׳•׳׳¨ ׳׳¢׳¦׳׳ ׳׳¢׳©׳•׳×?');
+        alert('בואן תקלד משהו - מה אתה אומר לעצמך לעשות?');
         return;
     }
 
@@ -9604,7 +9608,7 @@ function extractAndMoveToStep3() {
     blueprintData.time = document.getElementById('q-time').value.trim();
 
     if (!blueprintData.success || !blueprintData.firstStep) {
-        alert('׳‘׳•׳׳ ׳×׳׳׳ ׳׳₪׳—׳•׳× ׳׳× ׳”׳×׳•׳¦׳׳” ׳•׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳');
+        alert('בואן תמלא לפחות את התוצאה והצעד הראשון');
         return;
     }
 
@@ -9625,7 +9629,7 @@ function extractAndMoveToStep4() {
     blueprintData.valuesIfNo = document.getElementById('q-values-if-no')?.value.trim() || '';
 
     if (!blueprintData.whoExpects || !blueprintData.ability) {
-        alert('׳‘׳•׳׳ ׳×׳׳׳ ׳׳× ׳׳™ ׳׳¦׳₪׳” ׳•׳”׳¢׳¨׳›׳× ׳™׳›׳•לת');
+        alert('בואן תמלא את מי מצפה והערכת יכולת');
         return;
     }
 
@@ -9638,15 +9642,15 @@ function updateReframeBox() {
     const gap = document.getElementById('q-gap').value.trim();
 
     let gapHint = '';
-    if (ability <= 3) gapHint = '׳™׳›׳•׳׳× ׳ ׳׳•׳›׳”';
-    else if (ability <= 6) gapHint = '׳—׳¡׳¨ ׳›׳׳™׳';
-    else gapHint = '׳—׳¡׳¨ ׳׳™׳©׳•׳¨ / ׳§׳•׳ ׳” ׳“עת';
+    if (ability <= 3) gapHint = 'יכולת נמוכה';
+    else if (ability <= 6) gapHint = 'חסר כלים';
+    else gapHint = 'חסר אישור / קונה דעת';
 
-    if (gap.includes('׳“׳§׳•׳×')) gapHint = '׳—׳¡׳¨ ׳™׳“׳¢';
+    if (gap.includes('דקות')) gapHint = 'חסר ידע';
 
     const templates = metaModelData.blueprint_builder?.reframe_templates || [];
     const template = templates.find(t => t.gap_hint === gapHint);
-    const reframeText = template ? template.reframe : '׳–׳” ׳׳ ׳‘׳¢׳™׳” ׳©׳ ׳׳•׳₪׳™ - ׳–׳• ׳”׳’׳“׳¨׳” ׳׳ ׳©׳׳׳” ׳©׳ ׳”׳׳©׳™׳׳”.';
+    const reframeText = template ? template.reframe : 'זה לא בעיה של אופי - זו הגדרה לא שלמה של המשימה.';
 
     document.getElementById('q-reframe').textContent = reframeText;
 }
@@ -10341,7 +10345,7 @@ function parseLevelPrefixedText(rawText) {
 
 function inferLogicalLevel(text) {
     const source = (text || '').toLowerCase();
-    if (!source) return { level: '', confidence: 0, reason: '׳׳™׳ ׳˜׳§׳¡׳˜ ׳׳ ׳™׳×׳•׳—.' };
+    if (!source) return { level: '', confidence: 0, reason: 'אין טקסט לניתוח.' };
 
     let bestLevel = '';
     let bestScore = 0;
@@ -10354,20 +10358,20 @@ function inferLogicalLevel(text) {
     });
 
     if (!bestLevel || bestScore === 0) {
-        return { level: '', confidence: 0, reason: '׳׳ ׳–׳•׳”׳• ׳׳™׳׳•׳× ׳׳₪׳×׳— ׳—׳“-׳׳©׳׳¢׳™׳•׳×.' };
+        return { level: '', confidence: 0, reason: 'לא זוהו מילות מפתח חד-משמעיות.' };
     }
     if (bestScore === 1) {
-        return { level: bestLevel, confidence: 1, reason: `׳–׳•׳”׳×׳” ׳׳™׳׳” ׳׳—׳× ׳©׳׳×׳׳™׳׳” לרמת ${getLevelDisplay(bestLevel)}.` };
+        return { level: bestLevel, confidence: 1, reason: `זוהתה מילה אחת שמתאימה לרמת ${getLevelDisplay(bestLevel)}.` };
     }
-    return { level: bestLevel, confidence: 2, reason: `׳–׳•׳”׳• ׳›׳׳” ׳¨׳׳–׳™׳ ׳©׳׳×׳׳™׳׳™ם לרמת ${getLevelDisplay(bestLevel)}.` };
+    return { level: bestLevel, confidence: 2, reason: `זוהו כמה רמזים שמתאימים לרמת ${getLevelDisplay(bestLevel)}.` };
 }
 
 function getLevelImprovementTip(level, prism) {
     if (prism && prism.level_hints && prism.level_hints[level]) {
-        return `׳׳™׳§׳•׳“ ׳׳•׳׳׳¥ ׳׳¨׳׳” ׳–׳•: ${prism.level_hints[level]}`;
+        return `מיקוד מומלץ לרמה זו: ${prism.level_hints[level]}`;
     }
     const info = LOGICAL_LEVEL_INFO[level];
-    return info ? info.prompt : '׳׳•׳׳׳¥ ׳׳“׳™׳™׳§ ׳׳× ׳”׳ ׳™׳¡׳•׳— ׳׳¨׳׳” ׳”׳׳•׳’׳™׳× ׳”׳׳×׳׳™׳׳”.';
+    return info ? info.prompt : 'מומלץ לדייק את הניסוח לרמה הלוגית המתאימה.';
 }
 
 function clearMappingInputStatus(inputEl) {
@@ -10398,7 +10402,7 @@ function validateMappingEntry(expectedLevel, rawText, suggestedLevel, prism) {
             detectedLevel: '',
             effectiveLevel: expectedLevel,
             status: 'empty',
-            reason: '׳”׳©׳“׳” ׳¨׳™׳§.',
+            reason: 'השדה ריק.',
             improvement
         };
     }
@@ -10410,7 +10414,7 @@ function validateMappingEntry(expectedLevel, rawText, suggestedLevel, prism) {
             detectedLevel: explicitLevel,
             effectiveLevel: explicitLevel,
             status: 'mismatch',
-            reason: `׳”׳˜׳§׳¡׳˜ ׳׳¡׳•׳׳ ׳›׳¨׳׳× ${getLevelDisplay(explicitLevel)} ׳׳‘׳ ׳”׳•׳–׳ ׳‘׳©׳“׳” ${getLevelDisplay(expectedLevel)}.`,
+            reason: `הטקסט מסומן כרמת ${getLevelDisplay(explicitLevel)} אבל הוזן בשדה ${getLevelDisplay(expectedLevel)}.`,
             improvement
         };
     }
@@ -10422,7 +10426,7 @@ function validateMappingEntry(expectedLevel, rawText, suggestedLevel, prism) {
             detectedLevel: explicitLevel,
             effectiveLevel: expectedLevel,
             status: 'ok',
-            reason: `׳”׳˜׳§׳¡׳˜ ׳׳×׳׳™׳ ׳׳©׳“׳” ${getLevelDisplay(expectedLevel)}.`,
+            reason: `הטקסט מתאים לשדה ${getLevelDisplay(expectedLevel)}.`,
             improvement
         };
     }
@@ -10435,7 +10439,7 @@ function validateMappingEntry(expectedLevel, rawText, suggestedLevel, prism) {
             detectedLevel: inferred.level,
             effectiveLevel: inferred.level,
             status: 'mismatch',
-            reason: `${inferred.reason} ׳׳›׳ ׳™׳© ׳¡׳‘׳™׳¨׳•׳× ׳’׳‘׳•׳”׳” ׳׳©׳™׳‘׳•׳¥ ׳©׳’׳•׳™ ׳‘׳©׳“׳” ${getLevelDisplay(expectedLevel)}.`,
+            reason: `${inferred.reason} לכן יש סבירות גבוהה לשיבוץ שגוי בשדה ${getLevelDisplay(expectedLevel)}.`,
             improvement
         };
     }
@@ -10458,7 +10462,7 @@ function validateMappingEntry(expectedLevel, rawText, suggestedLevel, prism) {
         detectedLevel: inferred.level || '',
         effectiveLevel: expectedLevel,
         status: 'uncertain',
-        reason: inferred.reason || '׳׳ ׳ ׳™׳×׳ ׳׳”׳›׳¨׳™׳¢ ׳׳•׳˜׳•׳׳˜׳™׳× ׳׳ ׳”׳©׳™׳‘׳•׳¥ ׳׳“׳•׳™׳§.',
+        reason: inferred.reason || 'לא ניתן להכריע אוטומטית אם השיבוץ מדויק.',
         improvement
     };
 }
@@ -10472,7 +10476,7 @@ function computePrismScore(answerChecks) {
             coverage: 0,
             alignment: 0,
             clarity: 0,
-            grade: '׳׳™׳ ׳׳¡׳₪׳™׳§ ׳׳™׳“׳¢ ׳׳¦׳™׳•׳'
+            grade: 'אין מספיק מידע לציון'
         };
     }
 
@@ -10485,10 +10489,10 @@ function computePrismScore(answerChecks) {
     const clarity = Math.round((sufficientlyDetailed / answeredCount) * 20);
     const total = Math.min(100, coverage + alignment + clarity);
 
-    let grade = '׳˜׳¢׳•׳ ׳©׳™׳₪׳•׳¨ ׳׳©׳׳¢׳•׳×׳™';
-    if (total >= 85) grade = '׳׳¦׳•׳™׳';
-    else if (total >= 70) grade = '׳˜׳•׳‘ ׳׳׳•׳“';
-    else if (total >= 55) grade = '׳‘׳™׳ ׳•׳ ׳™';
+    let grade = 'טעון שיפור משמעותי';
+    if (total >= 85) grade = 'מצוין';
+    else if (total >= 70) grade = 'טוב מאוד';
+    else if (total >= 55) grade = 'בינוני';
 
     return { total, coverage, alignment, clarity, grade };
 }
@@ -10666,23 +10670,23 @@ function renderPrismDeepGuide(prism) {
 function renderPrismScoreInterpretation(score, mismatchCount) {
     const notes = [];
     if (score.total >= 85) {
-        notes.push('׳”׳׳™׳₪׳•׳™ ׳׳“׳•׳™׳§ ׳׳׳•׳“. ׳׳₪׳©׳¨ ׳׳¢׳‘׳•׳¨ ׳׳¢׳‘׳•׳“׳” ׳׳¡׳˜׳¨׳˜׳’׳™׳× ׳¢׳ ׳”׳×׳¢׳¨׳‘׳•׳× ׳׳—׳× ׳¢׳׳•׳§׳”.');
+        notes.push('המיפוי מדויק מאוד. אפשר לעבור לעבודה אסטרטגית על התערבות אחת עמוקה.');
     } else if (score.total >= 70) {
-        notes.push('׳‘׳¡׳™׳¡ ׳˜׳•׳‘ ׳׳׳•׳“. ׳ ׳“׳¨׳© ׳—׳™׳“׳•׳“ ׳§׳ ׳‘׳¨׳׳•׳× ׳›׳“׳™ ׳׳”׳₪׳•׳ ׳׳× ׳”׳׳™׳₪׳•׳™ ׳׳—׳“ ׳•׳׳©׳›׳ ׳¢.');
+        notes.push('בסיס טוב מאוד. נדרש חידוד קל ברמות כדי להפוך את המיפוי לחד ומשכנע.');
     } else if (score.total >= 55) {
-        notes.push('׳”׳׳™׳₪׳•׳™ ׳—׳׳§׳™. ׳׳₪׳ ׳™ צעד הבא ׳¢׳׳•׳§, ׳׳•׳׳׳¥ ׳׳¡׳“׳¨ ׳׳× ׳”׳©׳™׳‘׳•׳¦׳™׳ ׳•׳׳“׳™׳™׳§ ׳ ׳™׳¡׳•׳—׳™׳.');
+        notes.push('המיפוי חלקי. לפני צעד הבא עמוק, מומלץ לסדר את השיבוצים ולדייק ניסוחים.');
     } else {
-        notes.push('׳”׳׳™׳₪׳•׳™ ׳¢׳“׳™׳™׳ ׳¨׳׳©׳•׳ ׳™. ׳›׳“׳׳™ ׳׳—׳–׳•׳¨ ׳׳©׳׳׳× ׳”׳¢׳•׳’׳ ׳•׳׳׳₪׳•׳× ׳׳—׳“׳© ׳‘׳¦׳•׳¨׳” ׳§׳•׳ ׳§׳¨׳˜׳™׳×.');
+        notes.push('המיפוי עדיין ראשוני. כדאי לחזור לשאלת העוגן ולמפות מחדש בצורה קונקרטית.');
     }
 
     if (mismatchCount > 0) {
-        notes.push(`׳–׳•׳”׳• ${mismatchCount} ׳©׳™׳‘׳•׳¦׳™׳ ׳©׳’׳•׳™׳™׳. ׳–׳” ׳׳ ׳›׳™׳©׳׳•׳ ׳׳׳ ׳׳™׳×׳•׳× ׳©׳׳₪׳©׳¨ ׳׳©׳₪׳¨ ׳“׳™׳•׳§ ׳•׳׳—׳¡׳•׳ ׳׳׳׳¥ ׳‘׳”משך.`);
+        notes.push(`זוהו ${mismatchCount} שיבוצים שגויים. זה לא כישלון אלא איתות שאפשר לשפר דיוק ולחסוך מאמץ בהמשך.`);
     } else {
-        notes.push('׳׳ ׳–׳•׳”׳• ׳©׳™׳‘׳•׳¦׳™׳ ׳©׳’׳•׳™׳™׳ ׳׳₪׳•׳¨׳©׳™׳, ׳•׳–׳” ׳‘׳¡׳™׳¡ ׳׳¦׳•׳™׳ ׳׳”׳×׳§׳“׳׳•׳×.');
+        notes.push('לא זוהו שיבוצים שגויים מפורשים, וזה בסיס מצוין להתקדמות.');
     }
 
     if (score.clarity < 12) {
-        notes.push('׳¨׳׳× ׳‘׳”׳™׳¨׳•׳× ׳ ׳׳•׳›׳” ׳™׳—׳¡׳™׳×: ׳ ׳¡׳— ׳׳©׳₪׳˜׳™׳ ׳§׳¦׳¨׳™׳ ׳¢׳ ׳₪׳¢׳•׳׳”, ׳׳§׳•׳ ׳׳• ׳§׳¨׳™׳˜׳¨׳™׳•׳ ׳‘׳׳§׳•׳ ׳ ׳™׳¡׳•׳—׳™׳ ׳›׳׳׳™׳™׳.');
+        notes.push('רמת בהירות נמוכה יחסית: נסח משפטים קצרים עם פעולה, מקום או קריטריון במקום ניסוחים כלליים.');
     }
 
     return `<ul>${notes.map(note => `<li>${note}</li>`).join('')}</ul>`;
@@ -10693,19 +10697,19 @@ function renderPrismLevelsDeepAnalysis(prism, recommendation) {
     const items = order.map(level => {
         const count = recommendation.counts[level] || 0;
         const levelHint = prism?.level_hints?.[level] || LOGICAL_LEVEL_INFO[level].prompt;
-        const intervention = prism?.recommended_interventions_by_level?.[level] || '׳”׳׳©׳ ׳“׳™׳•׳§ ׳‘׳©׳₪׳” ׳•׳‘׳“׳™׳§׳” ׳׳•׳ ׳©׳׳׳× ׳”׳¢׳•׳’׳.';
+        const intervention = prism?.recommended_interventions_by_level?.[level] || 'המשך דיוק בשפה ובדיקה מול שאלת העוגן.';
 
-        let meaning = '׳׳ ׳”׳×׳§׳‘׳׳• ׳×׳©׳•׳‘׳•׳× ׳‘׳¨׳׳” ׳”׳–׳•, ׳׳›׳ ׳—׳©׳•׳‘ ׳׳‘׳“׳•׳§ ׳׳ ׳ ׳•׳¦׳¨׳” ׳”׳©׳׳˜׳”.';
+        let meaning = 'לא התקבלו תשובות ברמה הזו, לכן חשוב לבדוק אם נוצרה השמטה.';
         if (count >= 3) {
-            meaning = '׳”׳¨׳׳” ׳”׳–׳• ׳“׳•׳׳™׳ ׳ ׳˜׳™׳× ׳׳׳•׳“ ׳•׳׳¡׳₪׳§׳× ׳׳ ׳•׳£ ׳”׳×׳¢׳¨׳‘׳•׳× ׳׳¨׳›׳–׳™.';
+            meaning = 'הרמה הזו דומיננטית מאוד ומספקת מנוף התערבות מרכזי.';
         } else if (count === 2) {
-            meaning = '׳”׳¨׳׳” ׳”׳–׳• ׳—׳•׳–׳¨׳× ׳›׳׳” ׳₪׳¢׳׳™׳ ׳•׳׳›׳ ׳›׳“׳׳™ ׳׳”׳×׳™׳™׳—׳¡ ׳׳׳™׳” ׳›׳¦׳™׳¨ ׳¢׳‘׳•׳“׳” ׳׳©׳׳¢׳•׳×׳™.';
+            meaning = 'הרמה הזו חוזרת כמה פעמים ולכן כדאי להתייחס אליה כציר עבודה משמעותי.';
         } else if (count === 1) {
-            meaning = '׳™׳© ׳¡׳™׳׳ ׳¨׳׳©׳•׳ ׳™ ׳׳¨׳׳” ׳”׳–׳•, ׳׳ ׳ ׳“׳¨׳© ׳¢׳•׳“ ׳‘׳™׳¡׳•׳¡ ׳›׳“׳™ ׳׳”׳¡׳™׳§ ׳׳¡׳§׳ ׳•׳×.';
+            meaning = 'יש סימן ראשוני לרמה הזו, אך נדרש עוד ביסוס כדי להסיק מסקנות.';
         }
 
         const pivotTag = recommendation.pivot === level
-            ? '<p><strong>׳¡׳˜׳˜׳•׳¡:</strong> ׳–׳• ׳¨׳׳× ׳”-צעד הבא ׳”׳׳•׳׳׳¦׳× ׳›׳¨׳’׳¢.</p>'
+            ? '<p><strong>סטטוס:</strong> זו רמת ה-צעד הבא המומלצת כרגע.</p>'
             : '';
 
         return `
@@ -10726,22 +10730,22 @@ function renderPrismActionPlan(session, recommendation, mismatchCount) {
     const highResistance = session.resistance >= 4;
     const highEmotion = session.emotion >= 4;
     const alignmentStep = mismatchCount > 0
-        ? '׳™׳™׳©׳•׳¨ ׳©׳™׳‘׳•׳¦׳™׳: ׳¢׳‘׳•׳¨ ׳›׳ ׳₪׳¨׳™׳˜ ׳׳“׳•׳, ׳ ׳¡׳— ׳׳—׳“׳© ׳׳©׳₪׳˜ ׳׳׳•׳§׳“ ׳©׳׳×׳׳™׳ ׳¨׳§ ׳׳¨׳׳” ׳׳—׳×.'
-        : '׳©׳™׳׳•׳¨ ׳“׳™׳•׳§: ׳”׳©׳׳¨ ׳׳× ׳”׳ ׳™׳¡׳•׳— ׳—׳“ ׳•׳§׳¦׳¨, ׳•׳‘׳“׳•׳§ ׳©׳›׳ ׳׳©׳₪׳˜ ׳¢׳•׳ ׳” ׳׳©׳׳׳× ׳”׳¢׳•׳’׳.';
+        ? 'יישור שיבוצים: עבור כל פריט אדום, נסח מחדש משפט ממוקד שמתאים רק לרמה אחת.'
+        : 'שימור דיוק: השאר את הניסוח חד וקצר, ובדוק שכל משפט עונה לשאלת העוגן.';
     const resistanceStep = highResistance
-        ? '׳¢׳‘׳•׳“׳” ׳¢׳ ׳”׳×׳ ׳’׳“׳•׳× ׳’׳‘׳•׳”׳”: ׳”׳×׳—׳ ׳‘-Small Win ׳—׳™׳¦׳•׳ ׳™ (סביבה/התנהגות) ׳׳₪׳ ׳™ ׳©׳™׳ ׳•׳™ ׳׳׳•׳ ׳•׳× ׳¢׳׳•׳§.'
-        : '׳׳₪׳©׳¨ ׳׳”׳×׳§׳“׳ ׳׳¢׳•׳׳§: ׳׳—׳¨׳™ ׳‘׳™׳¦׳•׳¢ ׳¦׳¢׳“ ׳§׳˜׳, ׳¢׳‘׳•׳¨ ׳׳¢׳‘׳•׳“׳” ׳‘׳¨׳׳•׳× יכולות/ערכים/זהות.';
+        ? 'עבודה עם התנגדות גבוהה: התחל ב-Small Win חיצוני (סביבה/התנהגות) לפני שינוי אמונות עמוק.'
+        : 'אפשר להתקדם לעומק: אחרי ביצוע צעד קטן, עבור לעבודה ברמות יכולות/ערכים/זהות.';
     const emotionStep = highEmotion
-        ? '׳‘׳׳¦׳‘ ׳¨׳’׳©׳™ ׳’׳‘׳•׳”: ׳”׳׳˜ ׳§׳¦׳‘, ׳׳׳× ׳¢׳•׳‘׳“׳•׳×, ׳•׳¨׳§ ׳׳– ׳‘׳¦׳¢ ׳₪׳¨׳©׳ ׳•׳× ׳׳• ׳”׳›׳׳׳”.'
-        : '׳”׳¨׳’׳© ׳™׳¦׳™׳‘ ׳™׳—׳¡׳™׳×: ׳׳×׳׳™׳ ׳׳‘׳ ׳™׳™׳× ׳×׳•׳›׳ ׳™׳× ׳₪׳¢׳•׳׳” ׳׳“׳•׳¨׳’׳× ׳׳©׳‘׳•׳¢ ׳”׳§׳¨׳•׳‘.';
+        ? 'במצב רגשי גבוה: האט קצב, אמת עובדות, ורק אז בצע פרשנות או הכללה.'
+        : 'הרגש יציב יחסית: מתאים לבניית תוכנית פעולה מדורגת לשבוע הקרוב.';
 
     return `
         <ol class="prism-action-plan">
-            <li><strong>׳¦׳¢׳“ 1 (׳“׳™׳•׳§ ׳©׳₪׳”):</strong> ${alignmentStep}</li>
-            <li><strong>׳¦׳¢׳“ 2 (צעד הבא ׳׳¢׳©׳™):</strong> ׳‘׳¦׳¢ ׳₪׳¢׳•׳׳” ׳׳—׳× ׳׳₪׳™ רמת ${recommendation.levelName}: ${recommendation.intervention}</li>
-            <li><strong>׳¦׳¢׳“ 3 (׳•׳•׳™׳¡׳•׳× ׳•׳”׳×׳׳“׳”):</strong> ${resistanceStep}</li>
-            <li><strong>׳¦׳¢׳“ 4 (׳¢׳•׳׳§ ׳¨׳’׳©׳™):</strong> ${emotionStep}</li>
-            <li><strong>׳©׳׳׳× ׳”׳׳©׳ ׳׳—׳™׳™׳‘׳×:</strong> ${recommendation.followUpQuestion}</li>
+            <li><strong>צעד 1 (דיוק שפה):</strong> ${alignmentStep}</li>
+            <li><strong>צעד 2 (צעד הבא מעשי):</strong> בצע פעולה אחת לפי רמת ${recommendation.levelName}: ${recommendation.intervention}</li>
+            <li><strong>צעד 3 (וויסות והתמדה):</strong> ${resistanceStep}</li>
+            <li><strong>צעד 4 (עומק רגשי):</strong> ${emotionStep}</li>
+            <li><strong>שאלת המשך מחייבת:</strong> ${recommendation.followUpQuestion}</li>
         </ol>
     `;
 }
@@ -11038,8 +11042,8 @@ function renderPrismLibrary() {
         div.innerHTML = `
             <h4>${p.name_he}</h4>
             <p>${p.philosophy_core}</p>
-            <p><strong>׳©׳׳׳× ׳¢׳•׳’׳:</strong> ${p.anchor_question_templates[0]}</p>
-            <div style="margin-top:10px"><button class="btn prism-open-btn" data-ui-sound="off" data-id="${p.id}">׳‘׳—׳¨ ׳₪׳¨׳™׳–׳׳”</button></div>
+            <p><strong>שאלת עוגן:</strong> ${p.anchor_question_templates[0]}</p>
+            <div style="margin-top:10px"><button class="btn prism-open-btn" data-ui-sound="off" data-id="${p.id}">בחר פריזמה</button></div>
         `;
         // Direct binding fallback (helps in some embedded hosts).
         const openBtn = div.querySelector('.prism-open-btn');
@@ -11056,7 +11060,7 @@ function renderPrismLibrary() {
 
 function openPrism(id) {
     const prism = getPrismById(id);
-    if (!prism) return alert('׳₪׳¨׳™׳–׳׳” ׳׳ ׳ ׳׳¦׳׳”');
+    if (!prism) return alert('פריזמה לא נמצאה');
     document.getElementById('prism-library').classList.add('hidden');
     const detail = document.getElementById('prism-detail');
     detail.classList.remove('hidden');
@@ -11093,7 +11097,7 @@ function openPrism(id) {
 function handlePrismSubmit() {
     const id = document.getElementById('prism-detail').getAttribute('data-prism-id');
     const prism = getPrismById(id);
-    if (!prism) return alert('׳׳™׳ ׳₪׳¨׳™׳–׳׳” ׳₪׳¢׳™׳׳”');
+    if (!prism) return alert('אין פריזמה פעילה');
     const anchorText = getCurrentPrismAnchorText(prism);
     if (!String(anchorText || '').trim()) {
         playUISound('prism_error');
@@ -11231,29 +11235,29 @@ function computePivotRecommendation(session) {
 
     const prism = getPrismById(session.prism_id);
     const mismatches = session.answers.filter(a => a.status === 'mismatch').length;
-    const intervention = prism?.recommended_interventions_by_level?.[best] || '׳׳•׳׳׳¥ ׳׳”׳×׳—׳™׳ ׳‘׳¦׳¢׳“ ׳§׳˜׳ ׳•׳‘׳¨׳•׳¨ ׳©׳ ׳™׳×׳ ׳׳‘׳¦׳¢ ׳”׳©׳‘׳•׳¢.';
+    const intervention = prism?.recommended_interventions_by_level?.[best] || 'מומלץ להתחיל בצעד קטן וברור שניתן לבצע השבוע.';
     const levelSummary = getLevelDisplay(best);
     const reasonParts = [];
 
     if (bestCount > 0) {
-        reasonParts.push(`׳”׳¨׳™׳›׳•׳– ׳”׳’׳‘׳•׳” ׳‘׳™׳•׳×׳¨ ׳©׳ ׳×׳©׳•׳‘׳•׳× ׳ ׳׳¦׳ ׳‘׳¨׳׳× ${levelSummary} (${bestCount} ׳×׳©׳•׳‘׳•׳×).`);
+        reasonParts.push(`הריכוז הגבוה ביותר של תשובות נמצא ברמת ${levelSummary} (${bestCount} תשובות).`);
     } else {
-        reasonParts.push('׳׳™׳ ׳׳¡׳₪׳™׳§ ׳×׳©׳•׳‘׳•׳× ׳׳׳•׳§׳“׳•׳×, ׳׳›׳ ׳ ׳‘׳—׳¨׳” ׳¨׳׳× ׳”׳×׳—׳׳” ׳׳¢׳©׳™׳×.');
+        reasonParts.push('אין מספיק תשובות ממוקדות, לכן נבחרה רמת התחלה מעשית.');
     }
     if (mismatches > 0) {
-        reasonParts.push(`׳–׳•׳”׳• ${mismatches} ׳©׳™׳‘׳•׳¦׳™׳ ׳׳ ׳׳“׳•׳™׳§׳™׳, ׳•׳׳›׳ ׳—׳©׳•׳‘ ׳׳”׳×׳—׳™׳ ׳‘׳¡׳™׳“׳•׳¨ ׳”׳¨׳׳•׳× ׳׳₪׳ ׳™ ׳”׳×׳¢׳¨׳‘׳•׳× ׳¢׳׳•׳§׳”.`);
+        reasonParts.push(`זוהו ${mismatches} שיבוצים לא מדויקים, ולכן חשוב להתחיל בסידור הרמות לפני התערבות עמוקה.`);
     }
     if (session.resistance >= 4) {
-        reasonParts.push('׳¨׳׳× ׳”׳×׳ ׳’׳“׳•׳× ׳’׳‘׳•׳”׳” ׳׳¦׳‘׳™׳¢׳” ׳¢׳ ׳¢׳“׳™׳₪׳•׳× ׳׳”׳×׳—׳׳” ׳‘׳¨׳׳” ׳₪׳¨׳§׳˜׳™׳× ׳•׳ ׳׳•׳›׳” ׳™׳•תר.');
+        reasonParts.push('רמת התנגדות גבוהה מצביעה על עדיפות להתחלה ברמה פרקטית ונמוכה יותר.');
     }
 
     const followUpQuestions = {
-        E: '׳׳™׳–׳” ׳©׳™׳ ׳•׳™ ׳§׳˜׳ ׳‘׳¡׳‘׳™׳‘׳” ׳™׳›׳•׳ ׳׳”׳₪׳•׳ ׳׳× ׳”׳”׳×׳ ׳”׳’׳•׳× ׳׳§׳׳” ׳™׳•׳×׳¨ ׳›׳‘׳¨ ׳׳—׳¨?',
-        B: '׳׳™׳–׳• ׳₪׳¢׳•׳׳” ׳׳—׳× ׳¡׳₪׳¦׳™׳₪׳™׳× ׳×׳‘׳¦׳¢ ׳‘׳₪׳•׳¢׳ ׳‘׳׳”׳׳ 24 ׳”׳©׳¢׳•׳× ׳”׳§׳¨׳•׳‘׳•׳×?',
-        C: '׳׳™׳–׳• ׳׳™׳•׳׳ ׳•׳× ׳׳—׳× ׳—׳¡׳¨׳”, ׳•׳׳™׳ ׳×׳×׳¨׳’׳ ׳׳•׳×׳” 10 ׳“׳§׳•׳× ׳‘׳™׳•׳?',
-        V: '׳׳™׳–׳• ׳׳׳•׳ ׳” ׳׳¨׳›׳–׳™׳× ׳׳ ׳”׳׳× ׳׳× ׳”׳׳¦׳‘, ׳•׳׳” ׳™׳§׳¨׳” ׳׳ ׳ ׳ ׳¡׳— ׳׳•׳×׳” ׳׳—׳“׳©?',
-        I: '׳׳™׳–׳” ׳¡׳™׳₪׳•׳¨ ׳–׳”׳•׳× ׳׳•׳₪׳¢׳ ׳›׳׳, ׳•׳׳™׳–׳” ׳ ׳™׳¡׳•׳— ׳–׳”׳•׳× ׳—׳׳•׳₪׳™ ׳™׳¢׳–׳•׳¨ ׳׳”׳×׳§׳“׳?',
-        S: '׳׳™ ׳‘׳׳¢׳’׳ ׳©׳׳ ׳™׳›׳•׳ ׳׳×׳׳•׳ ׳‘׳׳”׳׳, ׳•׳׳™׳ ׳×׳—׳‘׳¨ ׳׳•׳×׳• ׳׳×׳”׳׳™׳?'
+        E: 'איזה שינוי קטן בסביבה יכול להפוך את ההתנהגות לקלה יותר כבר מחר?',
+        B: 'איזו פעולה אחת ספציפית תבצע בפועל במהלך 24 השעות הקרובות?',
+        C: 'איזו מיומנות אחת חסרה, ואיך תתרגל אותה 10 דקות ביום?',
+        V: 'איזו אמונה מרכזית מנהלת את המצב, ומה יקרה אם ננסח אותה מחדש?',
+        I: 'איזה סיפור זהות מופעל כאן, ואיזה ניסוח זהות חלופי יעזור להתקדם?',
+        S: 'מי במעגל שלך יכול לתמוך במהלך, ואיך תחבר אותו לתהליך?'
     };
 
     return {
@@ -11273,9 +11277,9 @@ function renderPrismResult(session, recommendation) {
 
     const score = session.score || computePrismScore(session.answers || []);
     const statusMap = {
-        ok: { label: '׳×׳•אם', className: 'status-ok' },
-        mismatch: { label: '׳©׳™׳‘׳•׳¥ ׳©׳’׳•׳™', className: 'status-bad' },
-        uncertain: { label: '׳“׳•׳¨׳© ׳—׳™׳“׳•׳“', className: 'status-warn' }
+        ok: { label: 'תואם', className: 'status-ok' },
+        mismatch: { label: 'שיבוץ שגוי', className: 'status-bad' },
+        uncertain: { label: 'דורש חידוד', className: 'status-warn' }
     };
 
     const mismatchCount = (session.answers || []).filter(a => a.status === 'mismatch').length;
@@ -11290,24 +11294,24 @@ function renderPrismResult(session, recommendation) {
     const answersHtml = (session.answers || []).map(answer => {
         const status = statusMap[answer.status] || statusMap.uncertain;
         const movedLevelNote = answer.effectiveLevel && answer.effectiveLevel !== answer.level
-            ? `<p><strong>׳׳™׳§׳•׳ ׳׳•מלץ:</strong> ${getLevelDisplay(answer.effectiveLevel)}</p>`
+            ? `<p><strong>מיקום מומלץ:</strong> ${getLevelDisplay(answer.effectiveLevel)}</p>`
             : '';
 
         return `
             <li class="prism-check-item ${status.className}">
-                <p><strong>׳©׳“׳” ׳©׳”׳•׳–׳:</strong> ${getLevelDisplay(answer.level)}</p>
-                <p><strong>׳¡׳˜׳˜׳•׳¡:</strong> ${status.label}</p>
-                <p><strong>׳×׳•׳›׳:</strong> ${answer.text}</p>
+                <p><strong>שדה שהוזן:</strong> ${getLevelDisplay(answer.level)}</p>
+                <p><strong>סטטוס:</strong> ${status.label}</p>
+                <p><strong>תוכן:</strong> ${answer.text}</p>
                 ${movedLevelNote}
-                <p><strong>׳׳׳”:</strong> ${answer.reason}</p>
-                <p><strong>׳׳™׳ ׳׳©׳₪׳¨:</strong> ${answer.improvement}</p>
+                <p><strong>למה:</strong> ${answer.reason}</p>
+                <p><strong>איך לשפר:</strong> ${answer.improvement}</p>
             </li>
         `;
     }).join('');
 
     out.innerHTML = `
-        <h4>׳׳₪׳× ׳×׳©׳•׳‘׳•׳× ׳׳₪׳•רטת - ${session.prism_name}</h4>
-        <p><strong>׳©׳׳׳× ׳¢׳•׳’׳:</strong> ${session.anchor}</p>
+        <h4>מפת תשובות מפורטת - ${session.prism_name}</h4>
+        <p><strong>שאלת עוגן:</strong> ${session.anchor}</p>
 
         <div class="blueprint-section prism-score-box">
             <h4>ציון ואבחון</h4>
@@ -11326,15 +11330,15 @@ function renderPrismResult(session, recommendation) {
         </div>
 
         <div class="blueprint-section prism-pivot-box">
-            <h4>׳”׳׳׳¦׳× צעד הבא - ׳”׳¡׳‘׳¨ ׳׳¢׳׳™׳§</h4>
-            <p><strong>צעד הבא ׳׳•מלץ:</strong> ${recommendation.levelName}</p>
-            <p><strong>׳׳׳” ׳–׳” ׳ ׳‘׳—׳¨:</strong> ${recommendation.reason}</p>
-            <p><strong>׳”׳×׳¢׳¨׳‘׳•׳× ׳׳•צעת:</strong> ${recommendation.intervention}</p>
-            <p><strong>׳©׳׳׳× ׳”׳׳©׳ ׳׳¢׳•מק:</strong> ${recommendation.followUpQuestion}</p>
-            <p><strong>׳¢׳•׳¦׳׳× ׳¨׳’׳©:</strong> ${session.emotion} | <strong>׳”׳×׳ ׳’׳“׳•׳×:</strong> ${session.resistance}</p>
-            <p><strong>׳₪׳™׳–׳•׳¨ ׳×׳©׳•׳‘׳•׳× ׳׳₪׳™ ׳¨׳׳•׳× (׳׳׳—׳¨ ׳ ׳¨׳׳•׳):</strong></p>
+            <h4>המלצת צעד הבא - הסבר מעמיק</h4>
+            <p><strong>צעד הבא מומלץ:</strong> ${recommendation.levelName}</p>
+            <p><strong>למה זה נבחר:</strong> ${recommendation.reason}</p>
+            <p><strong>התערבות מוצעת:</strong> ${recommendation.intervention}</p>
+            <p><strong>שאלת המשך לעומק:</strong> ${recommendation.followUpQuestion}</p>
+            <p><strong>עוצמת רגש:</strong> ${session.emotion} | <strong>התנגדות:</strong> ${session.resistance}</p>
+            <p><strong>פיזור תשובות לפי רמות (לאחר נרמול):</strong></p>
             <ul>${countsHtml}</ul>
-            <p><strong>׳׳©׳׳¢׳•׳× ׳׳¢׳©׳™׳×:</strong> ׳”-צעד הבא ׳”׳•׳ ׳ ׳§׳•׳“׳× ׳”׳׳™׳ ׳•׳£ ׳”׳›׳™ ׳™׳¢׳™׳׳” ׳›׳¨׳’׳¢. ׳׳™׳§׳•׳“ ׳ ׳›׳•׳ ׳‘׳¨׳׳” ׳”׳–׳• ׳™׳•׳¦׳¨ ׳×׳–׳•׳–׳” ׳׳”׳™׳¨׳” ׳•׳׳– ׳׳׳₪׳©׳¨ ׳¢׳‘׳•׳“׳” ׳¢׳׳•׳§׳” ׳™׳•תר.</p>
+            <p><strong>משמעות מעשית:</strong> ה-צעד הבא הוא נקודת המינוף הכי יעילה כרגע. מיקוד נכון ברמה הזו יוצר תזוזה מהירה ואז מאפשר עבודה עמוקה יותר.</p>
         </div>
 
         <div class="blueprint-section">
@@ -11357,7 +11361,7 @@ function renderPrismResult(session, recommendation) {
         </div>
 
         <div class="action-buttons">
-            <button class="btn btn-secondary" onclick="exportPrismSession()">׳™׳™צא סשן JSON</button>
+            <button class="btn btn-secondary" onclick="exportPrismSession()">ייצא סשן JSON</button>
         </div>
     `;
 }
@@ -11369,9 +11373,9 @@ function renderPrismResultCompact(session, recommendation) {
 
     const score = session.score || computePrismScore(session.answers || []);
     const statusMap = {
-        ok: { label: '׳×׳•אם', className: 'status-ok' },
-        mismatch: { label: '׳©׳™׳‘׳•׳¥ ׳©׳’׳•׳™', className: 'status-bad' },
-        uncertain: { label: '׳“׳•׳¨׳© ׳—׳™׳“׳•׳“', className: 'status-warn' }
+        ok: { label: 'תואם', className: 'status-ok' },
+        mismatch: { label: 'שיבוץ שגוי', className: 'status-bad' },
+        uncertain: { label: 'דורש חידוד', className: 'status-warn' }
     };
 
     const statusCounts = { ok: 0, mismatch: 0, uncertain: 0 };
@@ -11392,7 +11396,7 @@ function renderPrismResultCompact(session, recommendation) {
     const checksCompactHtml = (session.answers || []).map(answer => {
         const status = statusMap[answer.status] || statusMap.uncertain;
         const targetLevel = answer.effectiveLevel && answer.effectiveLevel !== answer.level
-            ? `<p><strong>׳”׳¢׳‘׳¨ ׳׳¨׳׳”:</strong> ${getLevelDisplay(answer.effectiveLevel)}</p>`
+            ? `<p><strong>העבר לרמה:</strong> ${getLevelDisplay(answer.effectiveLevel)}</p>`
             : '';
 
         return `
@@ -11421,12 +11425,12 @@ function renderPrismResultCompact(session, recommendation) {
 
         <div class="prism-quick-grid">
             <article class="prism-quick-card">
-                <h5>׳¦׳™׳•׳ ׳›׳•לל</h5>
+                <h5>ציון כולל</h5>
                 <p class="prism-quick-number">${score.total}/100</p>
                 <p>${escapeHtml(score.grade || '')}</p>
             </article>
             <article class="prism-quick-card">
-                <h5>צעד הבא ׳׳•מלץ</h5>
+                <h5>צעד הבא מומלץ</h5>
                 <p class="prism-quick-number">${escapeHtml(recommendation.levelName || '')}</p>
                 <p>${escapeHtml(recommendation.intervention || '')}</p>
             </article>
@@ -11440,18 +11444,18 @@ function renderPrismResultCompact(session, recommendation) {
         <div class="blueprint-section prism-focus-box">
             <h4>מה עושים עכשיו (עד 3 צעדים)</h4>
             <ul class="prism-action-plan">
-                ${focusItems || '<li>׳ ׳¨׳׳” ׳˜׳•׳‘. ׳׳₪׳©׳¨ ׳׳¢׳‘׳•׳¨ ׳׳‘׳™׳¦׳•׳¢ ׳”-צעד הבא ׳©׳ ׳‘׳—׳¨.</li>'}
-                <li><strong>׳©׳׳׳× ׳”משך:</strong> ${escapeHtml(recommendation.followUpQuestion || '')}</li>
+                ${focusItems || '<li>נראה טוב. אפשר לעבור לביצוע ה-צעד הבא שנבחר.</li>'}
+                <li><strong>שאלת המשך:</strong> ${escapeHtml(recommendation.followUpQuestion || '')}</li>
             </ul>
         </div>
 
         <details class="prism-more-details">
-            <summary>׳”׳¦׳’ ׳₪׳™׳¨׳•ט מלא</summary>
+            <summary>הצג פירוט מלא</summary>
             <div class="blueprint-section prism-score-box">
-                <h4>׳¦׳™׳•׳ ׳•׳׳‘׳—׳•ן מלא</h4>
-                <p><strong>׳¦׳™׳•׳ ׳›׳•לל:</strong> ${score.total}/100 (${escapeHtml(score.grade || '')})</p>
-                <p>׳₪׳™׳¨׳•׳§ ׳”׳¦׳™׳•׳: ׳›׳™׳¡׳•׳™ ${score.coverage}/40 | ׳“׳™׳•׳§ ׳©׳™׳‘׳•׳¥ ${score.alignment}/40 | ׳‘׳”׳™׳¨׳•׳× ׳ ׳™׳¡׳•׳— ${score.clarity}/20</p>
-                <p><strong>׳©׳™׳‘׳•׳¦׳™׳ ׳©׳’׳•׳™׳™׳:</strong> ${mismatchCount}</p>
+                <h4>ציון ואבחון מלא</h4>
+                <p><strong>ציון כולל:</strong> ${score.total}/100 (${escapeHtml(score.grade || '')})</p>
+                <p>פירוק הציון: כיסוי ${score.coverage}/40 | דיוק שיבוץ ${score.alignment}/40 | בהירות ניסוח ${score.clarity}/20</p>
+                <p><strong>שיבוצים שגויים:</strong> ${mismatchCount}</p>
                 ${scoreInsights}
             </div>
 
@@ -11463,9 +11467,9 @@ function renderPrismResultCompact(session, recommendation) {
             </div>
 
             <div class="blueprint-section prism-pivot-box">
-                <h4>׳׳׳” ׳–׳” ׳”-צעד הבא ׳”׳׳•מלץ</h4>
+                <h4>למה זה ה-צעד הבא המומלץ</h4>
                 <p>${escapeHtml(recommendation.reason || '')}</p>
-                <p><strong>׳₪׳™׳–׳•׳¨ ׳×׳©׳•׳‘׳•׳× ׳׳₪׳™ ׳¨׳׳•׳×:</strong></p>
+                <p><strong>פיזור תשובות לפי רמות:</strong></p>
                 <ul>${countsHtml}</ul>
             </div>
 
@@ -11481,7 +11485,7 @@ function renderPrismResultCompact(session, recommendation) {
         </details>
 
         <div class="action-buttons">
-            <button class="btn btn-secondary" onclick="exportPrismSession()">׳™׳™צא סשן JSON</button>
+            <button class="btn btn-secondary" onclick="exportPrismSession()">ייצא סשן JSON</button>
         </div>
     `;
 }
@@ -11920,7 +11924,7 @@ function attachMappingDropHandlers() {
 
             const expectedLevel = getExpectedLevelFromInput(inp);
             if (inp.dataset.suggestedLevel && inp.dataset.suggestedLevel !== expectedLevel) {
-                setMappingInputStatus(inp, 'mismatch', `׳”׳×׳•׳›׳ ׳ ׳¨׳׳” ׳›׳׳• ${getLevelDisplay(inp.dataset.suggestedLevel)} ׳•לא ${getLevelDisplay(expectedLevel)}.`);
+                setMappingInputStatus(inp, 'mismatch', `התוכן נראה כמו ${getLevelDisplay(inp.dataset.suggestedLevel)} ׳•לא ${getLevelDisplay(expectedLevel)}.`);
             } else {
                 clearMappingInputStatus(inp);
             }
@@ -11945,7 +11949,7 @@ function applyPreparedTextToInput(inputEl, text, suggestedLevel = '') {
 
     const expectedLevel = getExpectedLevelFromInput(inputEl);
     if (level && expectedLevel && level !== expectedLevel) {
-        setMappingInputStatus(inputEl, 'mismatch', `׳”׳×׳•׳›׳ ׳©׳•׳™׳ ׳-${getLevelDisplay(level)} ׳׳ ׳”׳•׳–׳ ׳‘׳©׳“׳” ${getLevelDisplay(expectedLevel)}.`);
+        setMappingInputStatus(inputEl, 'mismatch', `התוכן שויך ל-${getLevelDisplay(level)} אך הוזן בשדה ${getLevelDisplay(expectedLevel)}.`);
         playUISound('prism_warn');
     } else {
         clearMappingInputStatus(inputEl);
@@ -12633,17 +12637,17 @@ function legacyUpdateStreak() {
 
 function legacyCheckAndAwardBadges() {
     const badgesList = [
-        { id: 'first_step', name: '׳¦׳¢׳“ ׳¨׳׳©׳•׳', icon: 'נ‘£', condition: () => userProgress.xp >= 10 },
-        { id: 'fire_10', name: '׳׳”׳˜ נ”¥', icon: 'נ”¥', condition: () => userProgress.streak >= 10 },
-        { id: 'xp_100', name: '100 XP', icon: 'ג­', condition: () => userProgress.xp >= 100 },
-        { id: 'xp_500', name: '500 XP', icon: 'ג¨', condition: () => userProgress.xp >= 500 },
-        { id: 'sessions_10', name: '10 ׳¡׳©׳ ׳™׳', icon: 'נ“', condition: () => userProgress.sessions >= 10 },
+        { id: 'first_step', name: 'צעד ראשון', icon: '👣', condition: () => userProgress.xp >= 10 },
+        { id: 'fire_10', name: 'להט 🔥', icon: '🔥', condition: () => userProgress.streak >= 10 },
+        { id: 'xp_100', name: '100 XP', icon: '⭐', condition: () => userProgress.xp >= 100 },
+        { id: 'xp_500', name: '500 XP', icon: '✨', condition: () => userProgress.xp >= 500 },
+        { id: 'sessions_10', name: '10 סשנים', icon: '📊', condition: () => userProgress.sessions >= 10 },
     ];
     
     badgesList.forEach(badge => {
         if (badge.condition() && !userProgress.badges.find(b => b.id === badge.id)) {
             userProgress.badges.push({ id: badge.id, name: badge.name, icon: badge.icon, earned: new Date().toISOString() });
-            showHint(`נ† ׳›׳‘׳¨ ׳¨׳›׳©׳× ׳׳× ׳”׳×׳’: ${badge.name}`);
+            showHint(`🏆 כבר רכשת את התג: ${badge.name}`);
         }
     });
 }
@@ -12674,7 +12678,7 @@ function legacyUpdateProgressHub() {
     const sessionEl = document.getElementById('session-count');
     const badgesDisplay = document.getElementById('badges-display');
     
-    if (streakEl) streakEl.textContent = `${userProgress.streak} ׳™׳׳™׳`;
+    if (streakEl) streakEl.textContent = `${userProgress.streak} ימים`;
     if (xpEl) xpEl.textContent = userProgress.xp;
     if (starsEl) starsEl.textContent = userProgress.stars;
     if (badgeCountEl) badgeCountEl.textContent = userProgress.badges.length;
@@ -12823,7 +12827,7 @@ function tryAwardStreakCharge() {
     userProgress.lastChargeAwardedDate = userProgress.todayDate;
     const entry = ensureActivityHistoryEntry(userProgress.todayDate);
     if (entry) entry.chargeAwarded = true;
-    showHint(`נ›¡ן¸ ׳§׳™׳‘לת Streak Charge (${userProgress.streakCharges}/${MAX_STREAK_CHARGES})`);
+    showHint(`🛡️ קיבלת Streak Charge (${userProgress.streakCharges}/${MAX_STREAK_CHARGES})`);
 }
 
 function registerDailyAction(amount = 1) {
@@ -12894,7 +12898,7 @@ function updateStreak() {
             userProgress.lastChargeUsedDate = today;
             const entry = ensureActivityHistoryEntry(today);
             if (entry) entry.usedCharge = true;
-            showHint(`נ›¡ן¸ ׳”׳©׳×׳׳©׳× ׳‘-Streak Charge. ׳ ׳©׳׳¨׳• ${userProgress.streakCharges}/${MAX_STREAK_CHARGES}`);
+            showHint(`🛡️ השתמשת ב-Streak Charge. נשארו ${userProgress.streakCharges}/${MAX_STREAK_CHARGES}`);
         } else {
             userProgress.streak = 1;
         }
@@ -12909,7 +12913,7 @@ function checkAndAwardBadges() {
     badgesList.forEach(badge => {
         if (badge.condition() && !userProgress.badges.find(b => b.id === badge.id)) {
             userProgress.badges.push({ id: badge.id, name: badge.name, icon: badge.icon, earned: new Date().toISOString() });
-            showHint(`נ† ׳›׳‘׳¨ ׳¨׳›׳©׳× ׳׳× ׳”׳×׳’: ${badge.name}`);
+            showHint(`🏆 כבר רכשת את התג: ${badge.name}`);
         }
     });
 }
@@ -12947,18 +12951,18 @@ function updateProgressHub() {
 
     syncDailyProgressWindow();
 
-    if (streakEl) streakEl.textContent = `${userProgress.streak} ׳™׳׳™׳`;
+    if (streakEl) streakEl.textContent = `${userProgress.streak} ימים`;
     if (xpEl) xpEl.textContent = userProgress.xp;
     if (starsEl) starsEl.textContent = userProgress.stars;
     if (badgeCountEl) badgeCountEl.textContent = userProgress.badges.length;
     if (sessionEl) sessionEl.textContent = userProgress.sessions;
     if (streakDateEl) {
         if (!userProgress.lastSessionDate) {
-            streakDateEl.textContent = '׳”׳™׳•׳ ׳”׳¨׳׳©׳•׳!';
+            streakDateEl.textContent = 'היום הראשון!';
         } else if (userProgress.lastChargeUsedDate === userProgress.lastSessionDate) {
-            streakDateEl.textContent = '׳”רצף נשמר עם Charge';
+            streakDateEl.textContent = 'הרצף נשמר עם Charge';
         } else {
-            streakDateEl.textContent = `׳₪׳¢׳™׳׳•׳× ׳׳—׳¨׳•׳ ׳”: ${userProgress.lastSessionDate}`;
+            streakDateEl.textContent = `פעילות אחרונה: ${userProgress.lastSessionDate}`;
         }
     }
 
@@ -12971,14 +12975,14 @@ function updateProgressHub() {
     if (dailyGoalDecreaseBtn) dailyGoalDecreaseBtn.disabled = userProgress.dailyGoal <= 1;
     if (dailyGoalIncreaseBtn) dailyGoalIncreaseBtn.disabled = userProgress.dailyGoal >= 10;
     if (dailyGoalFillEl) dailyGoalFillEl.style.width = `${goalPercent}%`;
-    if (dailyGoalNoteEl) dailyGoalNoteEl.textContent = completed ? '׳”׳™׳¢׳“ ׳”׳™׳•׳׳™ ׳”׳•׳©׳׳' : `׳¢׳•׳“ ${remaining} ׳₪׳¢׳•׳׳•׳× ׳׳”׳©׳׳׳”`;
+    if (dailyGoalNoteEl) dailyGoalNoteEl.textContent = completed ? 'היעד היומי הושלם' : `עוד ${remaining} פעולות להשלמה`;
     if (dailyGoalCard) dailyGoalCard.classList.toggle('is-goal-complete', completed);
 
     if (streakChargeValueEl) streakChargeValueEl.textContent = `${userProgress.streakCharges}/${MAX_STREAK_CHARGES}`;
     if (streakChargeNoteEl) {
         streakChargeNoteEl.textContent = userProgress.streakCharges > 0
-            ? '׳©׳•׳׳¨ ׳¢׳ ׳”׳¨׳¦׳£ ׳‘׳™׳•׳ ׳₪׳¡׳₪׳•׳¡ ׳׳—׳“'
-            : '׳¡׳™׳™׳ ׳™׳¢׳“ ׳™׳•׳׳™ ׳›׳“׳™ למלא Charge';
+            ? 'שומר על הרצף ביום פספוס אחד'
+            : 'סיים יעד יומי כדי למלא Charge';
     }
 
     const levelMeta = getXpLevelMeta(userProgress.xp);
@@ -13052,40 +13056,40 @@ const CEFLOW_CHOICE_ORDER = Object.freeze(['angry', 'mock', 'rescue', 'avoid', '
 const CEFLOW_FALLBACKS = Object.freeze({
     angry: Object.freeze({
         tone: 'danger', label: '׳›עס', emoji: '😡',
-        counterReply: '׳׳ ׳™ ׳ ׳¡׳’׳¨/׳× ׳›׳©׳׳“׳‘׳¨׳™׳ ׳׳׳™׳™ ׳›׳›׳”.',
-        interpretation: '׳×׳’׳•׳‘׳” ׳׳™׳׳₪׳•׳׳¡׳™׳‘׳™׳× ׳”׳’׳‘׳™׳¨׳” ׳‘׳•׳©׳” ׳•׳¡׳’׳¨׳” ׳–׳¨׳™׳׳× ׳׳™׳“׳¢.',
-        impact: Object.freeze({ stats: Object.freeze({ flow: 24, agency: 20, shame: 88 }), xrayTags: Object.freeze(['נ˜³ ׳‘׳•׳©׳”', 'נ× ׳¡׳’׳™׳¨׳”']), microOutcome: Object.freeze(['נ“‰ ׳–׳¨׳™׳׳”', 'נ§± ׳×׳§׳™׳¢׳”', 'נ”’ ׳”׳™׳׳ ׳¢׳•׳×']) })
+        counterReply: 'אני נסגר/ת כשמדברים אליי ככה.',
+        interpretation: 'תגובה אימפולסיבית הגבירה בושה וסגרה זרימת מידע.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 24, agency: 20, shame: 88 }), xrayTags: Object.freeze(['😳 בושה', '🚪 סגירה']), microOutcome: Object.freeze(['📉 זרימה', '🧱 תקיעה', '🔒 הימנעות']) })
     }),
     mock: Object.freeze({
-        tone: 'warn', label: '׳׳¢׳’', emoji: 'נ˜',
-        counterReply: '׳˜׳•׳‘... ׳׳– ׳׳ ׳™ ׳›׳ ׳¨׳׳” ׳¡׳×׳ ׳׳ ׳׳¡׳₪׳™׳§ ׳˜׳•׳‘/׳”.',
-        interpretation: '׳׳¢׳’ ׳׳™׳™׳¦׳¨ ׳”׳©׳•׳•׳׳” ׳•׳©׳™׳×׳•׳§, ׳׳ ׳”׳‘׳”׳¨׳”.',
-        impact: Object.freeze({ stats: Object.freeze({ flow: 32, agency: 24, shame: 82 }), xrayTags: Object.freeze(['נ™ˆ ׳”׳©׳•׳•׳׳”', 'נ§ ׳ ׳™׳×׳•׳§']), microOutcome: Object.freeze(['נ“‰ ׳׳׳•׳', 'נ“‰ ׳–׳¨׳™׳׳”', 'נ§± ׳×׳§׳™׳¢׳”']) })
+        tone: 'warn', label: 'לעג', emoji: '😏',
+        counterReply: 'טוב... אז אני כנראה סתם לא מספיק טוב/ה.',
+        interpretation: 'לעג מייצר השוואה ושיתוק, לא הבהרה.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 32, agency: 24, shame: 82 }), xrayTags: Object.freeze(['🙈 השוואה', '🧊 ניתוק']), microOutcome: Object.freeze(['📉 אמון', '📉 זרימה', '🧱 תקיעה']) })
     }),
     rescue: Object.freeze({
-        tone: 'purple', label: '׳”׳¦׳׳”', emoji: 'נ›',
-        counterReply: '׳¡׳‘׳‘׳”... ׳׳– ׳×׳¢׳©׳”/׳™ ׳‘׳׳§׳•׳׳™.',
-        interpretation: '׳”׳¦׳׳” ׳₪׳•׳×׳¨׳× ׳¨׳’׳¢׳™׳× ׳׳ ׳׳©׳׳™׳¨׳” ׳×׳׳•׳×.',
-        impact: Object.freeze({ stats: Object.freeze({ flow: 46, agency: 20, shame: 50 }), xrayTags: Object.freeze(['נ› ׳×׳׳•׳×', 'נ§  ׳‘׳׳™ ׳׳׳™׳“׳”']), microOutcome: Object.freeze(['ג¸ן¸ ׳”׳§׳׳”', 'נ” ׳×׳׳•׳×', 'נ“‰ ׳׳—׳¨׳™׳•׳×']) })
+        tone: 'purple', label: 'הצלה', emoji: '🛟',
+        counterReply: 'סבבה... אז תעשה/י במקומי.',
+        interpretation: 'הצלה פותרת רגעית אך משאירה תלות.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 46, agency: 20, shame: 50 }), xrayTags: Object.freeze(['🛟 תלות', '🧠 בלי למידה']), microOutcome: Object.freeze(['⏸️ הקלה', '🔁 תלות', '📉 אחריות']) })
     }),
     avoid: Object.freeze({
-        tone: 'muted', label: '׳”׳×׳—׳׳§׳•׳×', emoji: 'נ™ˆ',
-        counterReply: '׳׳•׳§׳™׳™... ׳׳– ׳ ׳“׳—׳” ׳’׳ ׳׳× ׳–׳”.',
-        interpretation: '׳“׳—׳™׳™׳” ׳©׳•׳׳¨׳× ׳¢׳ ׳ ׳•׳—׳•׳× ׳¨׳’׳¢׳™׳× ׳•׳׳¢׳׳™׳§׳” ׳׳× ׳”׳×׳§׳™׳¢׳•׳×.',
-        impact: Object.freeze({ stats: Object.freeze({ flow: 30, agency: 22, shame: 62 }), xrayTags: Object.freeze(['נ•³ן¸ ׳“׳—׳™׳™׳”', 'ג³ ׳¢׳•׳׳¡']), microOutcome: Object.freeze(['נ“‰ ׳”׳×׳§׳“׳׳•׳×', 'נ” ׳—׳–׳¨׳× ׳‘׳¢׳™׳”', 'נ§± ׳×׳§׳™׳¢׳”']) })
+        tone: 'muted', label: 'התחמקות', emoji: '🙈',
+        counterReply: 'אוקיי... אז נדחה גם את זה.',
+        interpretation: 'דחייה שומרת על נוחות רגעית ומעמיקה את התקיעות.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 30, agency: 22, shame: 62 }), xrayTags: Object.freeze(['🕳️ דחייה', '⏳ עומס']), microOutcome: Object.freeze(['📉 התקדמות', '🔁 חזרת בעיה', '🧱 תקיעה']) })
     }),
     meta: Object.freeze({
-        tone: 'good', label: '׳׳˜׳”-׳׳•׳“׳', emoji: 'ג…',
-        counterReply: '׳׳ ׳™ ׳ ׳×׳§׳¢/׳× ׳‘׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳, ׳׳ ׳‘׳¨׳•׳¨ ׳׳™ ׳׳׳™׳₪׳” ׳׳”׳×׳—׳™׳.',
-        interpretation: '׳©׳׳׳” ׳׳“׳•׳™׳§׳× ׳—׳©׳₪׳” ׳׳× ׳”׳›׳׳× ׳•׳”׳—׳–׳™׳¨׳” ׳¡׳•׳›׳ ׳•׳×.',
-        impact: Object.freeze({ stats: Object.freeze({ flow: 86, agency: 84, shame: 24 }), xrayTags: Object.freeze(['נ§© ׳—׳©׳™׳₪׳”', 'נ¬ן¸ ׳₪׳×׳™׳—׳”']), microOutcome: Object.freeze(['נ“ˆ ׳–׳¨׳™׳׳”', 'נ¢ ׳¡׳•׳›׳ ׳•׳×', 'נ”“ ׳׳™׳“׳¢ ׳—׳“׳©']) })
+        tone: 'good', label: 'מטה-מודל', emoji: '✅',
+        counterReply: 'אני נתקע/ת בצעד הראשון, לא ברור לי מאיפה להתחיל.',
+        interpretation: 'שאלה מדויקת חשפה את הכמת והחזירה סוכנות.',
+        impact: Object.freeze({ stats: Object.freeze({ flow: 86, agency: 84, shame: 24 }), xrayTags: Object.freeze(['🧩 חשיפה', '🌬️ פתיחה']), microOutcome: Object.freeze(['📈 זרימה', '🟢 סוכנות', '🔓 מידע חדש']) })
     })
 });
 
 const CEFLOW_HL_RULES = Object.freeze([
-    Object.freeze({ type: 'generalization', label: '׳”׳›׳׳׳”', css: 'hl-generalization', tokens: Object.freeze(['׳›׳•׳׳', '׳×׳׳™׳“', '׳׳£ ׳׳—׳“', '׳›׳׳•׳', '׳‘׳©׳•׳ ׳׳¦׳‘']) }),
-    Object.freeze({ type: 'modal', label: '׳׳•׳“׳׳™׳•׳×', css: 'hl-modal', tokens: Object.freeze(['׳׳™ ׳׳₪׳©׳¨', '׳—׳™׳™׳‘', '׳¦׳¨׳™׳', '׳׳¡׳•׳¨', '׳׳ ׳™׳›׳•׳']) }),
-    Object.freeze({ type: 'vague', label: '׳¢׳׳™׳׳•׳× ׳₪׳¢׳•׳׳”', css: 'hl-vague', tokens: Object.freeze(['׳׳¢׳©׳•׳×', '׳׳¡׳“׳¨', '׳׳˜׳₪׳', '׳׳”׳×׳׳¨׳’׳', '׳׳”׳’׳™׳¢']) })
+    Object.freeze({ type: 'generalization', label: 'הכללה', css: 'hl-generalization', tokens: Object.freeze(['כולם', 'תמיד', 'אף אחד', 'כלום', 'בשום מצב']) }),
+    Object.freeze({ type: 'modal', label: 'מודליות', css: 'hl-modal', tokens: Object.freeze(['אי אפשר', 'חייב', 'צריך', 'אסור', 'לא יכול']) }),
+    Object.freeze({ type: 'vague', label: 'עמימות פעולה', css: 'hl-vague', tokens: Object.freeze(['לעשות', 'לסדר', 'לטפל', 'להתארגן', 'להגיע']) })
 ]);
 
 function ceflowClamp(value, fallback) {
@@ -13126,16 +13130,16 @@ function ceflowNormChoice(raw, fallbackId) {
     const replyOptions = Array.isArray(raw?.replyOptions) ? raw.replyOptions.slice(0, 3) : [];
     return {
         id,
-        label: String(raw?.label || f.label || '׳×׳’׳•׳‘׳”'),
+        label: String(raw?.label || f.label || 'תגובה'),
         tone: String(raw?.tone || f.tone || 'muted'),
-        emoji: String(raw?.emoji || f.emoji || 'נ’¬'),
+        emoji: String(raw?.emoji || f.emoji || '💬'),
         say: String(raw?.say || ''),
         counterReply: String(raw?.counterReply || f.counterReply || ''),
-        replyPrompt: String(raw?.replyPrompt || '׳׳™׳ ׳׳×/׳” ׳¢׳•׳ ׳” ׳¢׳›׳©׳™׳•?'),
+        replyPrompt: String(raw?.replyPrompt || 'איך את/ה עונה עכשיו?'),
         replyOptions: replyOptions.length ? replyOptions : [
-            '׳‘׳•׳/׳™ ׳ ׳ ׳©׳•׳ ׳¨׳’׳¢ ׳•׳ ׳’׳“׳™׳¨ ׳¦׳¢׳“ ׳¨׳׳©׳•׳.',
-            '׳׳™׳₪׳” ׳‘׳“׳™׳•ק נתקעת?',
-            '׳׳” ׳›׳‘׳¨ ׳›׳ ׳¢׳•׳‘׳“, ׳׳₪׳™׳׳• ׳—׳׳§׳™׳×?'
+            'בוא/י ננשום רגע ונגדיר צעד ראשון.',
+            'איפה בדיוק נתקעת?',
+            'מה כבר כן עובד, אפילו חלקית?'
         ],
         interpretation: String(raw?.interpretation || f.interpretation || ''),
         badge: String(raw?.badge || ''),
@@ -13161,20 +13165,20 @@ function ceflowNormScenario(raw, i) {
     const choices = CEFLOW_CHOICE_ORDER.map(id => map.get(id)).filter(Boolean);
     const meta = choices.find(choice => choice.id === 'meta');
     if (meta && !meta.powerQuestions.length) {
-        meta.powerQuestions = ['׳׳” ׳‘׳“׳™׳•׳§ ׳׳ ׳‘׳¨׳•׳¨ ׳›׳¨׳’׳¢?', '׳׳™׳–׳” ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳”׳›׳™ ׳§׳˜׳ ׳›׳ ׳׳₪׳©׳¨׳™?', '׳׳™׳–׳” ׳׳™׳“׳¢ ׳—׳¡׳¨ ׳›׳“׳™ ׳׳”׳×׳§׳“׳?'];
+        meta.powerQuestions = ['מה בדיוק לא ברור כרגע?', 'איזה צעד ראשון הכי קטן כן אפשרי?', 'איזה מידע חסר כדי להתקדם?'];
     }
     if (meta && !meta.newInfoBubble) {
-        meta.newInfoBubble = '׳¢׳›׳©׳™׳• ׳–׳” ׳‘׳¨׳•׳¨ ׳™׳•׳×׳¨: ׳׳₪׳©׳¨ ׳׳”׳×׳—׳™׳ ׳׳¦׳¢׳“ ׳§׳˜׳ ׳‘׳׳§׳•׳ ׳׳”׳™׳×׳§׳¢ ׳¢׳ ׳”׳›׳•׳.';
+        meta.newInfoBubble = 'עכשיו זה ברור יותר: אפשר להתחיל מצעד קטן במקום להיתקע על הכול.';
     }
     return {
         id: String(raw.id || `scene_${i + 1}`),
-        domain: String(raw.domain || '׳›׳׳׳™'),
-        title: String(raw.title || `׳¡׳¦׳ ׳” ${i + 1}`),
-        level: String(raw.level || raw.levelTag || '׳׳•׳“׳׳™׳•׳× + ׳”׳›׳׳׳”'),
-        regulationNote: String(raw.regulationNote || '׳׳›׳•׳׳ ׳• ׳™׳© ׳×׳’׳•׳‘׳” ׳¨׳’׳©׳™׳× ׳׳™׳׳₪׳•׳׳¡׳™׳‘׳™׳×. ׳”׳×׳¨׳’׳•׳ ׳›׳׳ ׳”׳•׳ ׳׳–׳”׳•׳× ׳׳•׳×׳”, ׳׳•׳•׳¡׳× ׳¡׳˜׳™׳™׳˜, ׳•׳׳¢׳‘׳•׳¨ ׳׳×׳’׳•׳‘׳” ׳©׳›׳׳™׳× ׳׳‘׳•׳¡׳¡׳× ׳©׳׳׳”.'),
+        domain: String(raw.domain || 'כללי'),
+        title: String(raw.title || `סצנה ${i + 1}`),
+        level: String(raw.level || raw.levelTag || 'מודליות + הכללה'),
+        regulationNote: String(raw.regulationNote || 'לכולנו יש תגובה רגשית אימפולסיבית. התרגול כאן הוא לזהות אותה, לווסת סטייט, ולעבור לתגובה שכלית מבוססת שאלה.'),
         characters: {
-            left: { name: String(raw?.characters?.left?.name || '׳“׳׳•ת שמאל'), sprite: String(raw?.characters?.left?.sprite || '') },
-            right: { name: String(raw?.characters?.right?.name || '׳“׳׳•׳× ׳™׳׳™׳'), sprite: String(raw?.characters?.right?.sprite || '') }
+            left: { name: String(raw?.characters?.left?.name || 'דמות שמאל'), sprite: String(raw?.characters?.left?.sprite || '') },
+            right: { name: String(raw?.characters?.right?.name || 'דמות ימין'), sprite: String(raw?.characters?.right?.sprite || '') }
         },
         dialog: (raw.dialog || []).map(item => ({
             speaker: item?.speaker === 'right' ? 'right' : 'left',
@@ -13266,13 +13270,13 @@ async function setupComicEngine2() {
         payload = deepNormalizeUiPayload(await response.json());
     } catch (error) {
         console.error('Cannot load data/comic-scenarios.json', error);
-        els.root.innerHTML = '<p>׳©׳’׳™׳׳” ׳‘׳˜׳¢׳™׳ ׳× ׳¡׳¦׳ ׳•׳× ׳§׳•׳׳™קס.</p>';
+        els.root.innerHTML = '<p>שגיאה בטעינת סצנות קומיקס.</p>';
         return;
     }
 
     const scenarios = Array.isArray(payload?.scenarios) ? payload.scenarios.map(ceflowNormScenario).filter(Boolean) : [];
     if (!scenarios.length) {
-        els.root.innerHTML = '<p>׳׳ ׳ ׳׳¦׳׳• ׳¡׳¦׳ ׳•׳× ׳§׳•׳׳™׳§׳¡ ׳׳”׳¦׳’׳”.</p>';
+        els.root.innerHTML = '<p>לא נמצאו סצנות קומיקס להצגה.</p>';
         return;
     }
 
@@ -13370,7 +13374,7 @@ async function setupComicEngine2() {
         state.mode = mode === 'play' ? 'play' : 'learn';
         els.root.classList.toggle('is-play-mode', state.mode === 'play');
         if (els.toggleMode) {
-            els.toggleMode.textContent = state.mode === 'learn' ? 'נ® ׳׳¦׳‘ ׳׳©׳—׳§' : 'נ“ ׳׳¦׳‘ ׳׳™׳׳•׳“';
+            els.toggleMode.textContent = state.mode === 'learn' ? '🎮 מצב משחק' : '📚 מצב לימוד';
         }
         if (persist) persistMode();
     };
@@ -13390,8 +13394,8 @@ async function setupComicEngine2() {
         const scenario = currentScenario();
         const draw = (slot, ch) => {
             if (!slot) return;
-            const safeName = escapeHtml(ch?.name || '׳“׳׳•׳×');
-            const art = ch?.sprite ? `<img src="${escapeHtml(ch.sprite)}" alt="${safeName}" loading="lazy">` : '<div class="ceflow-avatar-fallback">נ™‚</div>';
+            const safeName = escapeHtml(ch?.name || 'דמות');
+            const art = ch?.sprite ? `<img src="${escapeHtml(ch.sprite)}" alt="${safeName}" loading="lazy">` : '<div class="ceflow-avatar-fallback">🙂</div>';
             slot.innerHTML = `<div class="ceflow-character-inner"><div class="ceflow-character-art">${art}</div><p class="ceflow-character-name">${safeName}</p></div>`;
         };
         draw(els.left, scenario?.characters?.left);
@@ -13473,8 +13477,8 @@ async function setupComicEngine2() {
             const interpretation = compactText(choice.interpretation, 210);
             const regulation = compactText(currentScenario().regulationNote, 220);
             els.feedbackRight.innerHTML = `
-                <p><strong>׳׳” אמרת:</strong> ${escapeHtml(choice.say)}</p>
-                <p><strong>׳׳” ׳§׳¨׳”:</strong></p>
+                <p><strong>מה אמרת:</strong> ${escapeHtml(choice.say)}</p>
+                <p><strong>מה קרה:</strong></p>
                 <div class="ceflow-outcomes">${(choice.impact?.microOutcome || []).map(item => `<span>${escapeHtml(item)}</span>`).join('')}</div>
                 <div class="ceflow-feedback-actions">
                     <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(interpretation)}">🔍 פרשנות</button>
@@ -13496,7 +13500,7 @@ async function setupComicEngine2() {
             const hasInfo = !!state.generatedInfo;
             els.newInfo.classList.toggle('hidden', !hasInfo);
             els.newInfo.innerHTML = hasInfo
-                ? `<p><strong>׳©׳׳׳”:</strong> ${escapeHtml(state.selectedQuestion)}</p><p><strong>׳׳™׳“׳¢ ׳—׳“׳©:</strong> ${escapeHtml(state.generatedInfo)}</p>`
+                ? `<p><strong>שאלה:</strong> ${escapeHtml(state.selectedQuestion)}</p><p><strong>מידע חדש:</strong> ${escapeHtml(state.generatedInfo)}</p>`
                 : '';
         }
     };
@@ -13518,7 +13522,7 @@ async function setupComicEngine2() {
                 <article class="ceflow-blueprint-step"><h5>✅ צעד אחרון</h5><p>${escapeHtml(bp.last || 'לא הוגדר')}</p></article>
                 <article class="ceflow-blueprint-step"><h5>🧰 חלופות</h5><p>${escapeHtml(alternatives.join(' | ') || 'אין חלופות')}</p></article>
             </div>
-            <p class="ceflow-blueprint-footnote"><strong>Preconditions:</strong> ${escapeHtml(preconditions.join(' | ') || '׳׳™׳ ׳×׳ ׳׳™׳ ׳׳™׳•׳—׳“׳™׳')}</p>
+            <p class="ceflow-blueprint-footnote"><strong>Preconditions:</strong> ${escapeHtml(preconditions.join(' | ') || 'אין תנאים מיוחדים')}</p>
         `;
     };
 
@@ -13531,9 +13535,9 @@ async function setupComicEngine2() {
 
     const renderHeader = () => {
         const scenario = currentScenario();
-        if (els.domain) els.domain.textContent = `׳×׳—׳•׳: ${scenario.domain}`;
-        if (els.progress) els.progress.textContent = `׳¡׳¦׳ ׳” ${state.index + 1}/${scenarios.length}`;
-        if (els.level) els.level.textContent = `׳¨׳׳”: ${scenario.level}`;
+        if (els.domain) els.domain.textContent = `תחום: ${scenario.domain}`;
+        if (els.progress) els.progress.textContent = `סצנה ${state.index + 1}/${scenarios.length}`;
+        if (els.level) els.level.textContent = `רמה: ${scenario.level}`;
         if (els.title) els.title.textContent = scenario.title;
         renderGlobalComicStrip('comic-engine', scenario);
     };
@@ -13570,14 +13574,14 @@ async function setupComicEngine2() {
     const confirmReply = () => {
         const text = String(els.replyInput?.value || '').trim();
         if (!text) {
-            if (els.replyStatus) els.replyStatus.textContent = '׳›׳×׳‘׳• ׳×׳’׳•׳‘׳” ׳§׳¦׳¨׳” ׳׳₪׳ ׳™ ׳₪׳¨׳©׳ ׳•׳×.';
+            if (els.replyStatus) els.replyStatus.textContent = 'כתבו תגובה קצרה לפני פרשנות.';
             return;
         }
         state.userReply = text;
         state.replyDraft = text;
         if (state.selectedChoice?.id === 'meta') {
             state.selectedQuestion = state.selectedChoice.powerQuestions?.[0] || '';
-            state.generatedInfo = state.selectedChoice.newInfoBubble || '׳”׳©׳׳׳” ׳₪׳×׳—׳” ׳׳™׳“׳¢ ׳—׳“׳©, ׳•׳׳₪׳©׳¨ ׳׳”׳×׳§׳“׳ ׳׳¦׳¢׳“ ׳¨׳׳©׳•׳.';
+            state.generatedInfo = state.selectedChoice.newInfoBubble || 'השאלה פתחה מידע חדש, ואפשר להתקדם לצעד ראשון.';
             state.flowState = CEFLOW_STATES.POWER_CARD;
         }
         playUISound('finish');
@@ -13623,7 +13627,7 @@ async function setupComicEngine2() {
             hideFloatingNote();
             return;
         }
-        showFloatingNote(currentScenario()?.regulationNote || '׳׳›׳•׳׳ ׳• ׳™׳© ׳×׳’׳•׳‘׳” ׳׳™׳׳₪׳•׳׳¡׳™׳‘׳™׳× ׳¨׳׳©׳•׳ ׳”. ׳›׳׳ ׳¢׳•׳¦׳¨׳™׳ ׳¨׳’׳¢, ׳׳•׳•׳¡׳×׳™׳ ׳¡׳˜׳™׳™׳˜, ׳•׳¢׳•׳‘׳¨׳™׳ ׳׳©׳׳׳” ׳׳“׳•׳™קת.');
+        showFloatingNote(currentScenario()?.regulationNote || 'לכולנו יש תגובה אימפולסיבית ראשונה. כאן עוצרים רגע, מווסתים סטייט, ועוברים לשאלה מדויקת.');
     });
     els.replyQuick?.addEventListener('click', (event) => {
         const button = event.target.closest('button[data-reply-option]');
@@ -13641,7 +13645,7 @@ async function setupComicEngine2() {
         const button = event.target.closest('button[data-power-question]');
         if (!button || !state.selectedChoice) return;
         state.selectedQuestion = button.getAttribute('data-power-question') || '';
-        state.generatedInfo = state.selectedChoice.newInfoBubble || '׳ ׳₪׳×׳— ׳׳™׳“׳¢ ׳—׳“׳© ׳©׳׳₪׳©׳¨ ׳׳¢׳‘׳•׳“ ׳׳™׳×׳•.';
+        state.generatedInfo = state.selectedChoice.newInfoBubble || 'נפתח מידע חדש שאפשר לעבוד איתו.';
         state.flowState = CEFLOW_STATES.POWER_CARD;
         render();
     });
@@ -13671,35 +13675,35 @@ const WR2_STORAGE_KEY = 'wrinkle_reveal_v2';
 const WR2_SEED_SCENES = Object.freeze([
     Object.freeze({
         id: 'wr2_seed_1',
-        anchor: '׳׳ ׳™ ׳׳ ׳™׳›׳•׳',
-        visibleSentence: '׳׳ ׳™ ׳׳ ׳™׳›׳•׳ ׳׳”׳¡׳‘׳™׳¨ ׳׳” ׳׳” ׳׳ ׳™ ׳¨׳•׳¦׳”',
-        template: '׳׳ ׳™ ׳׳ ׳™׳›׳•׳ {Q} ׳׳”׳¡׳‘׳™׳¨ ׳׳” ׳׳” ׳׳ ׳™ ׳¨׳•׳¦׳”',
-        quantifiers: Object.freeze(['׳׳£ ׳₪׳¢׳', '׳‘׳©׳•׳ ׳׳¦׳‘ ׳¨׳’׳©׳™', '׳‘׳©׳•׳ ׳¡׳™׳˜׳•׳׳¦׳™׳”', '׳‘׳©׳•׳ ׳¦׳•׳¨׳”']),
-        transformedSentence: '׳׳₪׳¢׳׳™׳ ׳§׳©׳” ׳׳™ ׳׳”׳¡׳‘׳™׳¨ ׳׳” ׳׳” ׳׳ ׳™ ׳¨׳•׳¦׳”.'
+        anchor: 'אני לא יכול',
+        visibleSentence: 'אני לא יכול להסביר לה מה אני רוצה',
+        template: 'אני לא יכול {Q} להסביר לה מה אני רוצה',
+        quantifiers: Object.freeze(['אף פעם', 'בשום מצב רגשי', 'בשום סיטואציה', 'בשום צורה']),
+        transformedSentence: 'לפעמים קשה לי להסביר לה מה אני רוצה.'
     }),
     Object.freeze({
         id: 'wr2_seed_2',
-        anchor: '׳׳ ׳™ ׳—׳™׳™׳‘',
-        visibleSentence: '׳׳ ׳™ ׳—׳™׳™׳‘ ׳׳”׳¡׳₪׳™׳§ ׳”׳›׳ ׳”׳™׳•׳',
-        template: '׳׳ ׳™ ׳—׳™׳™׳‘ {Q} ׳׳”׳¡׳₪׳™׳§ ׳”׳›׳ ׳”׳™׳•׳',
-        quantifiers: Object.freeze(['׳‘׳›׳ ׳×׳ ׳׳™', '׳‘׳׳™ ׳׳ ׳©׳•׳', '׳’׳ ׳›׳©׳׳ ׳™ ׳׳•׳×׳©', '׳׳ ׳׳©׳ ׳” ׳׳” ׳”׳׳—׳™׳¨']),
-        transformedSentence: '׳׳ ׳™ ׳‘׳•׳—׳¨ ׳׳”׳×׳׳§׳“ ׳‘׳׳” ׳©׳—׳©׳•׳‘ ׳”׳™׳•׳, ׳¦׳¢׳“ ׳׳—׳“ ׳‘׳›׳ ׳₪עם.'
+        anchor: 'אני חייב',
+        visibleSentence: 'אני חייב להספיק הכל היום',
+        template: 'אני חייב {Q} להספיק הכל היום',
+        quantifiers: Object.freeze(['בכל תנאי', 'בלי לנשום', 'גם כשאני מותש', 'לא משנה מה המחיר']),
+        transformedSentence: 'אני בוחר להתמקד במה שחשוב היום, צעד אחד בכל ׳₪עם.'
     }),
     Object.freeze({
         id: 'wr2_seed_3',
-        anchor: '׳׳™ ׳׳₪שר',
-        visibleSentence: '׳׳™ ׳׳₪׳©׳¨ ׳׳“׳‘׳¨ ׳׳™׳×׳•',
-        template: '׳׳™ ׳׳₪׳©׳¨ {Q} ׳׳“׳‘׳¨ ׳׳™׳×׳•',
-        quantifiers: Object.freeze(['׳‘׳©׳•׳ ׳׳¦׳‘', '׳¢׳ ׳׳£ ׳׳—׳“', '׳‘׳©׳•׳ ׳¦׳•׳¨׳”', '׳‘׳›׳ ׳¡׳™׳˜׳•׳׳¦׳™׳”']),
-        transformedSentence: '׳›׳¨׳’׳¢ ׳§׳©׳” ׳׳“׳‘׳¨ ׳׳™׳×׳•, ׳•׳׳₪׳©׳¨ ׳׳—׳₪׳© ׳“׳¨׳ ׳׳“׳•׳™׳§׳× ׳׳©׳™׳—׳”.'
+        anchor: 'אי אפשר',
+        visibleSentence: 'אי אפשר לדבר איתו',
+        template: 'אי אפשר {Q} לדבר איתו',
+        quantifiers: Object.freeze(['בשום מצב', 'עם אף אחד', 'בשום צורה', 'בכל סיטואציה']),
+        transformedSentence: 'כרגע קשה לדבר איתו, ואפשר לחפש דרך מדויקת לשיחה.'
     }),
     Object.freeze({
         id: 'wr2_seed_4',
-        anchor: '׳×׳׳™׳“',
-        visibleSentence: '׳×׳׳™׳“ ׳׳ ׳™ ׳ ׳×׳§׳¢ ׳›׳©׳¦׳¨׳™׳ ׳׳“׳‘׳¨ ׳׳•׳ ׳׳ ׳©׳™׳',
-        template: '׳×׳׳™׳“ {Q} ׳׳ ׳™ ׳ ׳×׳§׳¢ ׳›׳©׳¦׳¨׳™׳ ׳׳“׳‘׳¨ ׳׳•׳ ׳׳ ׳©׳™׳',
-        quantifiers: Object.freeze(['׳׳׳ ׳™׳•׳¦׳ ׳“׳•׳₪׳', '׳‘׳›׳ ׳׳§׳•׳', '׳¢׳ ׳›׳•׳׳', '׳‘׳›׳ ׳¨׳׳× ׳׳—׳¥']),
-        transformedSentence: '׳׳₪׳¢׳׳™׳ ׳׳ ׳™ ׳ ׳×׳§׳¢ ׳׳•׳ ׳׳ ׳©׳™׳, ׳•׳׳₪׳©׳¨ ׳׳”׳×׳׳׳ ׳›׳“׳™ ׳׳”׳©׳×׳₪׳¨.'
+        anchor: 'תמיד',
+        visibleSentence: 'תמיד אני נתקע כשצריך לדבר מול אנשים',
+        template: 'תמיד {Q} אני נתקע כשצריך לדבר מול אנשים',
+        quantifiers: Object.freeze(['ללא יוצא דופן', 'בכל מקום', 'עם כולם', 'בכל רמת לחץ']),
+        transformedSentence: 'לפעמים אני נתקע מול אנשים, ואפשר להתאמן כדי להשתפר.'
     })
 ]);
 
@@ -13711,19 +13715,19 @@ function wr2TrimText(value, maxLen = 180) {
 
 function wr2DetectAnchor(sentence) {
     const s = String(sentence || '');
-    const anchors = ['׳׳ ׳™׳›׳•׳', '׳׳™ ׳׳₪׳©׳¨', '׳—׳™׳™׳‘', '׳¦׳¨׳™׳', '׳׳•׳›׳¨׳—', '׳×׳׳™׳“', '׳›׳•׳׳', '׳׳£ ׳₪׳¢׳', '׳׳™׳ ׳‘׳¨׳™׳¨׳”'];
+    const anchors = ['לא יכול', 'אי אפשר', 'חייב', 'צריך', 'מוכרח', 'תמיד', 'כולם', 'אף פעם', 'אין ברירה'];
     for (let i = 0; i < anchors.length; i += 1) {
         const token = anchors[i];
         if (s.includes(token)) return token;
     }
-    return '׳”׳׳©׳₪׳˜';
+    return 'המשפט';
 }
 
 function wr2BuildTemplate(sentence) {
     const raw = String(sentence || '').trim();
     if (!raw) return '{Q}';
     const anchor = wr2DetectAnchor(raw);
-    if (!anchor || anchor === '׳”׳׳©׳₪׳˜') return `${raw} {Q}`;
+    if (!anchor || anchor === 'המשפט') return `${raw} {Q}`;
     const idx = raw.indexOf(anchor);
     if (idx < 0) return `${raw} {Q}`;
     const left = raw.slice(0, idx + anchor.length).trimEnd();
@@ -13733,28 +13737,28 @@ function wr2BuildTemplate(sentence) {
 
 function wr2InferQuantifiers(sentence) {
     const normalized = normalizeText(sentence || '');
-    if (/(׳׳ ׳™׳›׳•׳|׳׳™ ׳׳₪׳©׳¨|׳‘׳׳×׳™ ׳׳₪׳©׳¨׳™|׳׳™׳ ׳¡׳™׳›׳•׳™)/.test(normalized)) {
-        return ['׳׳£ ׳₪׳¢׳', '׳‘׳©׳•׳ ׳׳¦׳‘ ׳¨׳’׳©׳™', '׳‘׳©׳•׳ ׳¡׳™׳˜׳•׳׳¦׳™׳”', '׳‘׳©׳•׳ ׳¦׳•׳¨׳”'];
+    if (/(לא יכול|אי אפשר|בלתי אפשרי|אין סיכוי)/.test(normalized)) {
+        return ['אף פעם', 'בשום מצב רגשי', 'בשום סיטואציה', 'בשום צורה'];
     }
-    if (/(׳×׳׳™׳“|׳›׳ ׳”׳–׳׳|׳׳£ ׳₪׳¢׳|׳›׳•׳׳|׳׳£ ׳׳—׳“)/.test(normalized)) {
-        return ['׳‘׳›׳ ׳׳¦׳‘', '׳׳׳ ׳™׳•׳¦׳ ׳“׳•׳₪׳', '׳¢׳ ׳›׳•׳׳', '׳‘׳›׳ ׳–מן'];
+    if (/(תמיד|כל הזמן|אף פעם|כולם|אף אחד)/.test(normalized)) {
+        return ['בכל מצב', 'ללא יוצא דופן', 'עם כולם', 'בכל ׳–מן'];
     }
-    if (/(׳—׳™׳™׳‘|׳¦׳¨׳™׳|׳׳™׳ ׳‘׳¨׳™׳¨׳”|׳׳•׳›׳¨׳—)/.test(normalized)) {
-        return ['׳‘׳›׳ ׳×׳ ׳׳™', '׳׳׳ ׳‘׳—׳™׳¨׳”', '׳’׳ ׳›׳©׳׳ ׳™ ׳¢׳™׳™׳£', '׳׳ ׳׳©׳ ׳” ׳׳”'];
+    if (/(חייב|צריך|אין ברירה|מוכרח)/.test(normalized)) {
+        return ['בכל תנאי', 'ללא בחירה', 'גם כשאני עייף', 'לא משנה מה'];
     }
-    return ['׳‘׳©׳•׳ ׳׳¦׳‘', '׳‘׳›׳ ׳×׳ ׳׳™', '׳‘׳©׳•׳ ׳¦׳•׳¨׳”'];
+    return ['בשום מצב', 'בכל תנאי', 'בשום צורה'];
 }
 
 function wr2SoftenSentence(sentence) {
     let text = String(sentence || '').trim();
     if (!text) return '';
-    text = text.replace(/׳׳ ׳™ ׳׳ ׳™׳›׳•׳/g, '׳׳₪׳¢׳׳™׳ ׳§׳©׳” ׳׳™');
-    text = text.replace(/׳׳™ ׳׳₪׳©׳¨/g, '׳›׳¨׳’׳¢ ׳–׳” ׳׳׳×׳’׳¨');
-    text = text.replace(/׳×׳׳™׳“/g, '׳׳₪׳¢׳׳™׳');
-    text = text.replace(/׳׳£ ׳₪׳¢׳/g, '׳׳₪׳¢׳׳™׳');
-    text = text.replace(/׳›׳•׳׳/g, '׳—׳׳§ ׳׳”׳׳ ׳©׳™׳');
-    text = text.replace(/׳׳™׳ ׳‘׳¨׳™׳¨׳”/g, '׳™׳© ׳׳™ ׳›׳׳” ׳׳₪׳©׳¨׳•׳™׳•׳×');
-    text = text.replace(/׳—׳™׳™׳‘/g, '׳׳¢׳“׳™׳£');
+    text = text.replace(/אני לא יכול/g, 'לפעמים קשה לי');
+    text = text.replace(/אי אפשר/g, 'כרגע זה מאתגר');
+    text = text.replace(/תמיד/g, 'לפעמים');
+    text = text.replace(/אף פעם/g, 'לפעמים');
+    text = text.replace(/כולם/g, 'חלק מהאנשים');
+    text = text.replace(/אין ברירה/g, 'יש לי כמה אפשרויות');
+    text = text.replace(/חייב/g, 'מעדיף');
     if (!/[.!?]$/.test(text)) text += '.';
     return text;
 }
@@ -13816,11 +13820,11 @@ function setupWrinkleGame() {
         root.className = 'card wrinkle-reveal-card';
         root.innerHTML = `
             <div class="wr2-topbar">
-                <span class="wr2-top-icon">נ•µן¸ג€ג™‚ן¸</span>
-                <h3>׳—׳©׳•׳£ ׳׳× ׳”׳›מת!</h3>
+                <span class="wr2-top-icon">🕵️‍♂️</span>
+                <h3>חשוף את הכמת!</h3>
                 <div class="wr2-score">
-                    <span>נ”¥ <strong id="wr2-streak">0</strong></span>
-                    <span>ג­ <strong id="wr2-points">0</strong></span>
+                    <span>🔥 <strong id="wr2-streak">0</strong></span>
+                    <span>⭐ <strong id="wr2-points">0</strong></span>
                 </div>
             </div>
             <div class="wr2-headline">
@@ -13829,11 +13833,11 @@ function setupWrinkleGame() {
             </div>
             <section class="wr2-plain-box">
                 <p id="wr2-visible-sentence" class="wr2-visible-sentence"></p>
-                <small>׳›׳ ׳–׳” נשמע</small>
+                <small>כך זה נשמע</small>
             </section>
             <section class="wr2-detect-zone">
                 <p class="wr2-zone-title">כמתים סמויים</p>
-                <div id="wr2-quantifiers" class="wr2-quantifiers" role="group" aria-label="׳›׳׳×׳™׳ ׳¡׳׳•׳™׳™׳"></div>
+                <div id="wr2-quantifiers" class="wr2-quantifiers" role="group" aria-label="כמתים סמויים"></div>
                 <div class="wr2-overlay-box">
                     <p id="wr2-overlay-sentence" class="wr2-overlay-sentence"></p>
                     <p id="wr2-explain-line" class="wr2-explain-line">לחץ/י על כמת אדום כדי לחשוף טוטאליות סמויה.</p>
@@ -13841,13 +13845,13 @@ function setupWrinkleGame() {
                 <p id="wr2-progress" class="wr2-progress">0 מתוך 0 כמתים חשופים</p>
             </section>
             <section id="wr2-release" class="wr2-release hidden">
-                <p>הבעיה אינה במילים "׳׳ ׳™ ׳׳ ׳™׳›׳•׳". ׳”׳‘׳¢׳™׳” ׳”׳™׳ ׳‘׳”׳›׳׳׳•׳× ׳ ׳¡׳×׳¨׳•׳× ׳©׳™׳•׳¦׳¨׳•׳× ׳×׳—׳•שת "׳׳™׳ ׳׳•צא".</p>
+                <p>הבעיה אינה במילים "אני לא יכול". הבעיה היא בהכללות נסתרות שיוצרות תחושת "אין מוצא".</p>
                 <button id="wr2-unlock-btn" class="btn btn-primary wr2-unlock-btn" type="button">חשפתי את כל הכמתים! 🎉</button>
             </section>
             <section id="wr2-transform-zone" class="wr2-transform-zone hidden">
                 <button id="wr2-transform-btn" class="btn btn-primary wr2-transform-btn" type="button">הסר הכללה טוטאלית</button>
                 <div id="wr2-transformed" class="wr2-transformed hidden" aria-live="polite">
-                    <p class="wr2-transformed-label">׳ ׳™׳¡׳•׳— ׳׳©׳•׳—רר:</p>
+                    <p class="wr2-transformed-label">ניסוח משוחרר:</p>
                     <p id="wr2-transformed-text" class="wr2-transformed-text"></p>
                 </div>
             </section>
@@ -13857,7 +13861,7 @@ function setupWrinkleGame() {
             </div>
             <section id="wr2-self-panel" class="wr2-self-panel hidden">
                 <label for="wr2-self-input">Self-Reference (אופציונלי)</label>
-                <textarea id="wr2-self-input" rows="2" placeholder="׳׳“׳•׳’׳׳”: ׳׳ ׳™ ׳׳ ׳™׳›׳•׳ ׳׳”׳¡׳‘׳™׳¨ ׳׳” ׳׳” ׳׳ ׳™ ׳¨׳•׳¦׳”."></textarea>
+                <textarea id="wr2-self-input" rows="2" placeholder="לדוגמה: אני לא יכול להסביר לה מה אני רוצה."></textarea>
                 <button id="wr2-self-add" class="btn btn-secondary" type="button">הוסף לתרגול</button>
                 <ul id="wr2-self-list" class="wr2-self-list"></ul>
             </section>
@@ -13978,12 +13982,12 @@ function setupWrinkleGame() {
             els.quantifiers.innerHTML = scene.quantifiers.map((q) => {
                 const active = state.activeQuantifier === q;
                 const seen = qSet.has(q);
-                return `<button type="button" class="wr2-quantifier${active ? ' is-active' : ''}${seen ? ' is-revealed' : ''}" data-q="${escapeHtml(q)}" aria-label="׳—׳©׳•׳£ ${escapeHtml(q)}">[${escapeHtml(q)}]</button>`;
+                return `<button type="button" class="wr2-quantifier${active ? ' is-active' : ''}${seen ? ' is-revealed' : ''}" data-q="${escapeHtml(q)}" aria-label="חשוף ${escapeHtml(q)}">[${escapeHtml(q)}]</button>`;
             }).join('');
         }
 
         if (els.progress) {
-            els.progress.textContent = `${state.revealed.length} ׳׳×׳•׳ ${scene.quantifiers.length} ׳›׳׳×׳™׳ ׳—׳©׳•׳₪׳™׳`;
+            els.progress.textContent = `${state.revealed.length} מתוך ${scene.quantifiers.length} כמתים חשופים`;
         }
 
         const revealedAll = allRevealed();
@@ -13991,8 +13995,8 @@ function setupWrinkleGame() {
         if (els.unlockBtn) {
             els.unlockBtn.disabled = !revealedAll || state.unlocked;
             els.unlockBtn.textContent = state.unlocked
-                ? '׳׳¢׳•׳׳”, ׳ ׳¢׳‘׳•׳¨ ׳׳˜׳¨׳ ׳¡׳₪׳•׳¨׳׳¦׳™׳” ג…'
-                : '׳—׳©׳₪׳×׳™ ׳׳× ׳›׳ ׳”׳›׳׳×׳™׳! נ‰';
+                ? 'מעולה, נעבור לטרנספורמציה ✅'
+                : 'חשפתי את כל הכמתים! 🎉';
         }
 
         const showTransform = state.unlocked || state.transformed;
@@ -14050,13 +14054,13 @@ function setupWrinkleGame() {
     const addSelfSentence = () => {
         const input = String(els.selfInput?.value || '').trim();
         if (input.length < 8) {
-            if (els.explainLine) els.explainLine.textContent = '׳›׳×׳‘׳• ׳׳©׳₪׳˜ ׳׳™׳©׳™ ׳§׳¦׳¨ (׳׳₪׳—׳•׳× 8 ׳×׳•׳•׳™׳).';
+            if (els.explainLine) els.explainLine.textContent = 'כתבו משפט אישי קצר (לפחות 8 תווים).';
             return;
         }
         const normalized = normalizeText(input).replace(/\s+/g, ' ').trim();
         const exists = state.customScenes.some(scene => normalizeText(scene.visibleSentence).replace(/\s+/g, ' ').trim() === normalized);
         if (exists) {
-            if (els.explainLine) els.explainLine.textContent = '׳”׳׳©׳₪׳˜ ׳”׳–׳” ׳›׳‘׳¨ ׳§׳™׳™׳ ׳‘׳×׳¨׳’׳•׳.';
+            if (els.explainLine) els.explainLine.textContent = 'המשפט הזה כבר קיים בתרגול.';
             return;
         }
         const scene = wr2NormalizeScene({
@@ -14239,83 +14243,83 @@ let wr2wDialoguePackPromise = null;
 const WR2W_SEED_DIALOGS = Object.freeze([
     Object.freeze({
         id: 'sqhcel_1_work_manager',
-        monologue: '׳׳—׳¨ ׳™׳© ׳׳™ ׳©׳™׳—׳” ׳¢׳ ׳”׳׳ ׳”׳. ׳”׳•׳ ׳‘׳™קש "׳׳”׳‘׳”׳™׳¨ ׳“׳‘׳¨׳™׳". ׳׳ ׳™ ׳›׳‘׳¨ ׳׳“׳׳™׳™׳ ׳׳× ׳”׳˜׳•׳ ׳©׳׳• ׳•׳׳ ׳™ ננעל.',
-        visibleSentence: '׳׳ ׳™ ׳›׳™׳©׳׳•׳ ׳׳•׳׳•.',
-        quantifiers: Object.freeze(['׳×׳׳™׳“', '׳‘׳›׳ ׳©׳™׳—׳”', '׳׳•׳ ׳›׳ ׳¡׳׳›׳•׳×', '׳‘׳׳™ ׳™׳•׳¦׳ ׳“׳•׳₪׳']),
-        exceptionExample: '׳‘׳©׳™׳—׳” ׳”׳׳—׳¨׳•׳ ׳” ׳›׳ ׳”׳¦׳׳—׳×׳™ ׳׳”׳¡׳‘׳™׳¨ ׳ ׳§׳•׳“׳” ׳׳—׳× ׳‘׳¦׳•׳¨׳” ׳¢׳ ׳™׳™׳ ׳™׳×.',
-        conditionsLine: '׳–׳” ׳ ׳”׳™׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳™׳© ׳‘׳™׳§׳•׳¨׳× ׳₪׳×׳׳•׳׳™׳× ׳•׳׳¢׳˜ ׳–׳׳ ׳׳—׳©׳•׳‘.'
+        monologue: 'מחר יש לי שיחה עם המנהל. הוא ביקש "להבהיר דברים". אני כבר מדמיין את הטון שלו ואני ננעל.',
+        visibleSentence: 'אני כישלון מולו.',
+        quantifiers: Object.freeze(['תמיד', 'בכל שיחה', 'מול כל סמכות', 'בלי יוצא דופן']),
+        exceptionExample: 'בשיחה האחרונה כן הצלחתי להסביר נקודה אחת בצורה עניינית.',
+        conditionsLine: 'זה נהיה הכי חזק כשיש ביקורת פתאומית ומעט זמן לחשוב.'
     }),
     Object.freeze({
         id: 'sqhcel_2_work_meeting',
-        monologue: '׳‘׳™׳©׳™׳‘׳” ׳›׳•׳׳ ׳©׳×׳§׳• ׳•׳׳– ׳”׳•א אמר "׳¦׳¨׳™׳ ׳™׳•׳×׳¨ ׳¨׳¦׳™׳ ׳•׳×". ׳”׳•׳ ׳׳ ׳”׳¡׳×׳›׳ ׳¢׳׳™׳™, ׳׳‘׳ ׳–׳” ׳”׳×׳™׳™׳©׳‘ ׳׳™ ׳™׳©׳¨ ׳‘׳‘טן.',
-        visibleSentence: '׳׳™׳ ׳׳™ ׳׳™׳ ׳׳¦׳׳× ׳׳–׳” ׳˜׳•׳‘.',
-        quantifiers: Object.freeze(['׳׳™׳ ׳׳¦׳‘', '׳‘׳©׳•׳ ׳“׳¨׳', '׳×׳׳™׳“', '׳׳•׳ ׳›׳•לם']),
-        exceptionExample: '׳›׳©׳”׳›׳ ׳×׳™ ׳׳¨׳׳© ׳©׳׳•׳© ׳ ׳§׳•׳“׳•׳× - ׳›׳ ׳™׳¦׳׳×׳™ ׳׳–׳” ׳¡׳‘׳™׳¨.',
-        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳”׳׳¡׳¨ ׳¢׳§׳™׳£ ׳•׳׳ ׳™ ׳׳©׳׳™׳ ׳׳× ׳”׳—׳¡׳¨ ׳׳‘׳“.'
+        monologue: 'בישיבה כולם שתקו ואז הוא אמר "צריך יותר רצינות". הוא לא הסתכל עליי, אבל זה התיישב לי ישר בבטן.',
+        visibleSentence: 'אין לי איך לצאת מזה טוב.',
+        quantifiers: Object.freeze(['אין מצב', 'בשום דרך', 'תמיד', 'מול כולם']),
+        exceptionExample: 'כשהכנתי מראש שלוש נקודות - כן יצאתי מזה סביר.',
+        conditionsLine: 'זה הכי חזק כשהמסר עקיף ואני משלים את החסר לבד.'
     }),
     Object.freeze({
         id: 'sqhcel_3_relationship_texts',
-        monologue: '׳©׳׳—׳×׳™ ׳׳” ׳”׳•׳“׳¢׳” ׳‘׳‘׳•׳§׳¨. ׳”׳™׳ ׳¨׳׳×׳” ׳•׳׳ ׳¢׳ ׳×׳” ׳›׳ ׳”׳™׳•׳. ׳”׳¨׳׳© ׳©׳׳™ ׳׳ ׳”׳₪׳¡׳™׳§ ׳׳¨׳•׳¥.',
-        visibleSentence: '׳׳ ׳™ ׳׳ ׳׳¡׳₪׳™׳§ ׳‘׳©׳‘׳™׳׳”.',
-        quantifiers: Object.freeze(['׳×׳׳™׳“', '׳‘׳©׳•׳ ׳׳¦׳‘', '׳׳•׳ ׳›׳ ׳‘׳/׳‘׳× ׳–׳•׳’', '׳׳’׳׳¨׳™']),
-        exceptionExample: '׳‘׳©׳‘׳•׳¢ ׳©׳¢׳‘׳¨ ׳”׳™׳ ׳›׳ ׳׳׳¨׳” ׳©׳”׳™׳ ׳׳¢׳¨׳™׳›׳” ׳׳•׳×׳™ ׳׳׳•׳“.',
-        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳™׳© ׳©׳×׳™׳§׳” ׳׳¨׳•׳›׳” ׳•׳׳ ׳™ ׳›׳‘׳¨ ׳¢׳™׳™׳£.'
+        monologue: 'שלחתי לה הודעה בבוקר. היא ראתה ולא ענתה כל היום. הראש שלי לא הפסיק לרוץ.',
+        visibleSentence: 'אני לא מספיק בשבילה.',
+        quantifiers: Object.freeze(['תמיד', 'בשום מצב', 'מול כל בן/בת זוג', 'לגמרי']),
+        exceptionExample: 'בשבוע שעבר היא כן אמרה שהיא מעריכה אותי מאוד.',
+        conditionsLine: 'זה הכי חזק כשיש שתיקה ארוכה ואני כבר עייף.'
     }),
     Object.freeze({
         id: 'sqhcel_4_relationship_home',
-        monologue: '׳”׳•׳ ׳ ׳›׳ ׳¡ ׳”׳‘׳™׳×׳”, ׳׳׳¨ ׳©׳”׳•׳ ׳¢׳™׳™׳£, ׳•׳ ׳¢׳׳ ׳׳˜׳׳₪׳•׳. ׳׳ ׳™ ׳ ׳©׳׳¨׳×׳™ ׳׳‘׳“ ׳¢׳ ׳”׳¡׳™׳₪׳•׳¨ ׳‘ראש.',
-        visibleSentence: '׳–׳” ׳׳ ׳”׳•׳׳ ׳׳©׳•׳ ׳׳§׳•׳.',
-        quantifiers: Object.freeze(['׳‘׳©׳•׳ ׳׳§׳•׳', '׳×׳׳™׳“', '׳׳ ׳¦׳—', '׳‘׳׳™ ׳¡׳™׳›׳•׳™']),
-        exceptionExample: '׳׳×׳׳•׳ ׳›׳ ׳“׳™׳‘׳¨׳ ׳• ׳¨׳‘׳¢ ׳©׳¢׳” ׳•׳”׳¨׳’׳©׳×׳™ ׳—׳™׳‘׳•׳¨.',
-        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳׳ ׳—׳ ׳• ׳—׳•׳–׳¨׳™׳ ׳”׳‘׳™׳×׳” ׳׳•׳×׳©׳™׳ ׳•׳׳׳ ׳–׳׳ ׳׳¢׳‘׳¨.'
+        monologue: 'הוא נכנס הביתה, אמר שהוא עייף, ונעלם לטלפון. אני נשארתי לבד עם הסיפור בראש.',
+        visibleSentence: 'זה לא הולך לשום מקום.',
+        quantifiers: Object.freeze(['בשום מקום', 'תמיד', 'לנצח', 'בלי סיכוי']),
+        exceptionExample: 'אתמול כן דיברנו רבע שעה והרגשתי חיבור.',
+        conditionsLine: 'זה הכי חזק כשאנחנו חוזרים הביתה מותשים וללא זמן מעבר.'
     }),
     Object.freeze({
         id: 'sqhcel_5_social',
-        monologue: '׳׳—׳¨ ׳׳™׳¨׳•׳¢. ׳׳ ׳™ ׳›׳‘׳¨ ׳¨׳•׳׳” ׳׳‘׳˜׳™׳ ׳•׳©׳•׳׳¢ ׳׳× ׳¢׳¦׳׳™ ׳ ׳×׳§׳¢ ׳‘׳׳©׳₪׳˜ ׳”׳¨׳׳©׳•׳.',
-        visibleSentence: '׳׳ ׳™ ׳׳¢׳©׳” ׳©׳ ׳₪׳“׳™׳—׳”.',
-        quantifiers: Object.freeze(['׳‘׳˜׳•׳—', '׳×׳׳™׳“', '׳׳•׳ ׳›׳•׳׳', '׳‘׳׳™ ׳™׳•׳¦׳ ׳“׳•׳₪׳']),
-        exceptionExample: '׳‘׳©׳×׳™ ׳₪׳’׳™׳©׳•׳× ׳§׳˜׳ ׳•׳× ׳“׳•׳•׳§׳ ׳”׳¦׳׳—׳×׳™ ׳׳₪׳×׳•׳— ׳©׳™׳—׳” ׳¡׳‘׳™׳¨׳”.',
-        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳׳ ׳™ ׳׳’׳™׳¢ ׳‘׳׳™ ׳”׳›׳ ׳” ׳•׳¢׳ ׳”׳¨׳‘׳” ׳¨׳¢׳© ׳׳¡׳‘׳™׳‘.'
+        monologue: 'מחר אירוע. אני כבר רואה מבטים ושומע את עצמי נתקע במשפט הראשון.',
+        visibleSentence: 'אני אעשה שם פדיחה.',
+        quantifiers: Object.freeze(['בטוח', 'תמיד', 'מול כולם', 'בלי יוצא דופן']),
+        exceptionExample: 'בשתי פגישות קטנות דווקא הצלחתי לפתוח שיחה סבירה.',
+        conditionsLine: 'זה הכי חזק כשאני מגיע בלי הכנה ועם הרבה רעש מסביב.'
     }),
     Object.freeze({
         id: 'sqhcel_6_self_image',
-        monologue: '׳”׳×׳—׳׳×׳™ ׳׳©׳”׳• ׳‘׳”׳×׳׳”׳‘׳•׳× ׳•׳׳– ׳•׳™׳×׳¨׳×׳™ ׳‘׳׳׳¦׳¢, ׳©׳•׳‘. ׳׳ ׳™ ׳׳¨׳’׳™׳© ׳©׳–׳” ׳—׳•׳–׳¨ ׳¢׳ ׳¢׳¦׳׳•.',
-        visibleSentence: '׳׳ ׳™ ׳₪׳©׳•׳˜ ׳׳ ׳׳¡׳•׳’׳ ׳׳”׳×׳׳™׳“.',
-        quantifiers: Object.freeze(['׳׳¢׳•׳׳ ׳׳', '׳×׳׳™׳“', '׳‘׳©׳•׳ ׳₪׳¨׳•׳™׳§׳˜', '׳‘׳׳™ ׳¡׳™׳›׳•׳™']),
-        exceptionExample: '׳”׳¦׳׳—׳×׳™ ׳׳”׳×׳׳™׳“ ׳©׳׳•׳©׳” ׳©׳‘׳•׳¢׳•׳× ׳‘׳×׳¨׳’׳•׳ ׳§׳¦׳¨ ׳‘׳‘׳•קר.',
-        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳”׳™׳¢׳“ ׳’׳“׳•׳ ׳׳“׳™ ׳•׳׳™׳ ׳¦׳¢׳“ ׳¨׳׳©׳•ן קטן.'
+        monologue: 'התחלתי משהו בהתלהבות ואז ויתרתי באמצע, שוב. אני מרגיש שזה חוזר על עצמו.',
+        visibleSentence: 'אני פשוט לא מסוגל להתמיד.',
+        quantifiers: Object.freeze(['לעולם לא', 'תמיד', 'בשום פרויקט', 'בלי סיכוי']),
+        exceptionExample: 'הצלחתי להתמיד שלושה שבועות בתרגול קצר בבוקר.',
+        conditionsLine: 'זה הכי חזק כשהיעד גדול מדי ואין צעד ראשון קטן.'
     }),
     Object.freeze({
         id: 'sqhcel_7_parenting',
-        monologue: '׳”׳™׳׳“ ׳©׳•׳‘ ׳—׳–׳¨ ׳¢׳ ׳”׳¢׳¨׳”. ׳׳׳¨׳×׳™ ׳׳¢׳¦׳׳™ ׳©׳׳©׳׳•׳¨ ׳¢׳ ׳¨׳•׳’׳¢, ׳׳‘׳ ׳”׳×׳₪׳¨׳¦׳×׳™.',
-        visibleSentence: '׳׳ ׳™ ׳”׳•׳¨׳” ׳’׳¨׳•׳¢.',
-        quantifiers: Object.freeze(['׳×׳׳™׳“', '׳‘׳›׳ ׳׳¦׳‘', '׳‘׳׳™ ׳™׳•׳¦׳ ׳“׳•׳₪׳', '׳׳•׳ ׳›׳ ׳§׳•׳©׳™']),
-        exceptionExample: '׳׳×׳׳•׳ ׳“׳•׳•׳§׳ ׳¢׳¦׳¨׳×׳™ ׳‘׳–׳׳ ׳•׳©׳™׳ ׳™׳×׳™ ׳˜׳•׳.',
-        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳׳ ׳™ ׳׳•׳¦׳£ ׳•׳¢׳•׳‘׳¨ ׳™׳©׳¨ ׳׳׳¦׳‘ ׳×׳’׳•׳‘׳”.'
+        monologue: 'הילד שוב חזר עם הערה. אמרתי לעצמי שאשמור על רוגע, אבל התפרצתי.',
+        visibleSentence: 'אני הורה גרוע.',
+        quantifiers: Object.freeze(['תמיד', 'בכל מצב', 'בלי יוצא דופן', 'מול כל קושי']),
+        exceptionExample: 'אתמול דווקא עצרתי בזמן ושיניתי טון.',
+        conditionsLine: 'זה הכי חזק כשאני מוצף ועובר ישר למצב תגובה.'
     }),
     Object.freeze({
         id: 'sqhcel_8_change',
-        monologue: '׳ ׳™׳¡׳™׳×׳™ ׳׳”׳×׳—׳–׳§, ׳”׳™׳• ׳™׳•׳׳™׳™׳ ׳˜׳•׳‘׳™׳, ׳•׳׳– ׳ ׳₪׳׳×׳™. ׳–׳” ׳׳™׳“ ׳”׳₪׳ ׳׳¡׳™׳₪׳•׳¨ ׳›׳•לל.',
-        visibleSentence: '׳׳™׳ ׳׳™ ׳‘׳׳׳× ׳™׳›׳•׳׳× ׳׳”׳©׳×׳ ׳•׳×.',
-        quantifiers: Object.freeze(['׳׳™׳ ׳™׳›׳•׳׳×', '׳‘׳©׳•׳ ׳©׳׳‘', '׳׳¢׳•׳׳ ׳׳', '׳×׳׳™׳“ ׳—׳•׳–׳¨']),
-        exceptionExample: '׳›׳©׳¢׳‘׳“׳×׳™ ׳¢׳ ׳׳¡׳’׳¨׳× ׳§׳¦׳¨׳” ׳›׳ ׳ ׳•׳¦׳¨ ׳©׳™׳ ׳•׳™ קטן.',
-        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳™׳© ׳׳¢׳™׳“׳” ׳•׳׳ ׳™ ׳׳×׳¨׳’׳ ׳׳•׳×׳” ׳׳–׳”׳•׳× ׳§׳‘׳•׳¢׳”.'
+        monologue: 'ניסיתי להתחזק, היו יומיים טובים, ואז נפלתי. זה מיד הפך לסיפור כולל.',
+        visibleSentence: 'אין לי באמת יכולת להשתנות.',
+        quantifiers: Object.freeze(['אין יכולת', 'בשום שלב', 'לעולם לא', 'תמיד חוזר']),
+        exceptionExample: 'כשעבדתי עם מסגרת קצרה כן נוצר שינוי קטן.',
+        conditionsLine: 'זה הכי חזק כשיש מעידה ואני מתרגם אותה לזהות קבועה.'
     }),
     Object.freeze({
         id: 'sqhcel_9_health',
-        monologue: '׳¢׳©׳™׳×׳™ ׳©׳‘׳•׳¢ ׳׳¡׳•׳“׳¨ ׳•׳׳– ׳׳™׳׳” ׳׳—׳“ ׳”׳×׳₪׳¨׳§׳×׳™. ׳”׳¨׳׳© ׳׳׳¨ ׳©׳”׳›׳•׳ ׳ ׳׳—׳§.',
-        visibleSentence: '׳–׳” ׳—׳¡׳¨ ׳¡׳™׳›׳•׳™.',
-        quantifiers: Object.freeze(['׳—׳¡׳¨ ׳¡׳™׳›׳•׳™', '׳‘׳©׳•׳ ׳׳¦׳‘', '׳×׳׳™׳“', '׳׳’׳׳¨׳™']),
-        exceptionExample: '׳׳—׳¨׳™ ׳”׳׳™׳׳” ׳”׳–׳” ׳—׳–׳¨׳×׳™ ׳׳׳¡׳׳•׳ ׳›׳‘׳¨ ׳׳׳—׳¨׳× ׳‘׳¦׳”׳¨׳™׳™׳.',
-        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳›׳©׳׳ ׳™ ׳¢׳™׳™׳£ ׳•׳׳¡׳×׳›׳ ׳¢׳ ׳׳™׳¨׳•׳¢ ׳׳—׳“ ׳›׳׳™׳׳• ׳”׳•׳ ׳׳’׳“׳™׳¨ ׳”׳›׳•׳.'
+        monologue: 'עשיתי שבוע מסודר ואז לילה אחד התפרקתי. הראש אמר שהכול נמחק.',
+        visibleSentence: 'זה חסר סיכוי.',
+        quantifiers: Object.freeze(['חסר סיכוי', 'בשום מצב', 'תמיד', 'לגמרי']),
+        exceptionExample: 'אחרי הלילה הזה חזרתי למסלול כבר למחרת בצהריים.',
+        conditionsLine: 'זה הכי חזק כשאני עייף ומסתכל על אירוע אחד כאילו הוא מגדיר הכול.'
     }),
     Object.freeze({
         id: 'sqhcel_10_money',
-        monologue: '׳׳ ׳™ ׳׳¡׳“׳¨ ׳׳©׳”׳• ׳•׳׳– ׳׳’׳™׳¢ ׳¢׳•׳“ ׳¡׳™׳“׳•׳¨. ׳׳¨׳’׳™׳© ׳©׳׳ ׳™ ׳›׳ ׳”׳–׳׳ ׳¨׳§ ׳׳›׳‘׳” ׳©׳¨׳™׳₪׳•׳×.',
-        visibleSentence: '׳׳™׳ ׳₪׳” ׳¡׳•׳£.',
-        quantifiers: Object.freeze(['׳׳¢׳•׳׳ ׳׳', '׳×׳׳™׳“', '׳‘׳›׳ ׳—׳•׳“׳©', '׳‘׳׳™ ׳”׳₪׳¡׳§׳”']),
-        exceptionExample: '׳‘׳—׳•׳“׳© ׳©׳¢׳‘׳¨ ׳”׳™׳” ׳©׳‘׳•׳¢ ׳¨׳’׳•׳¢ ׳™׳•׳×׳¨ ׳¢׳ ׳₪׳—׳•׳× ׳›׳™׳‘׳•׳™ ׳©׳¨׳™׳₪׳•׳×.',
-        conditionsLine: '׳–׳” ׳”׳›׳™ ׳—׳–׳§ ׳¡׳‘׳™׳‘ ׳׳•׳¢׳“׳™ ׳×׳©׳׳•׳ ׳•׳׳—׳¥ ׳–׳׳ ׳׳§׳‘׳™׳.'
+        monologue: 'אני מסדר משהו ואז מגיע עוד סידור. מרגיש שאני כל הזמן רק מכבה שריפות.',
+        visibleSentence: 'אין פה סוף.',
+        quantifiers: Object.freeze(['לעולם לא', 'תמיד', 'בכל חודש', 'בלי הפסקה']),
+        exceptionExample: 'בחודש שעבר היה שבוע רגוע יותר עם פחות כיבוי שריפות.',
+        conditionsLine: 'זה הכי חזק סביב מועדי תשלום ולחץ זמן מקביל.'
     })
 ]);
 
@@ -14397,11 +14401,11 @@ function wr2wNormalizeScene(raw, idxPrefix = 'wr2w') {
         anchor: wr2TrimText(wr2wSanitizeText(source.anchor || wr2DetectAnchor(visibleSentence)), 36),
         quantifiers: [...new Set(inferredQuantifiers)].slice(0, 4),
         exceptionExample: wr2TrimText(
-            wr2wSanitizeText(source.exceptionExample || '׳”׳™׳” ׳¨׳’׳¢ ׳§׳¦׳¨ ׳©׳–׳” ׳”׳™׳” ׳§׳¦׳× ׳₪׳—׳•׳× ׳ ׳›׳•׳.'),
+            wr2wSanitizeText(source.exceptionExample || 'היה רגע קצר שזה היה קצת פחות נכון.'),
             180
         ),
         conditionsLine: wr2TrimText(
-            wr2wSanitizeText(source.conditionsLine || '׳–׳” ׳ ׳”׳™׳” ׳”׳›׳™ ׳—׳–׳§ ׳‘׳×׳ ׳׳™׳ ׳©׳ ׳׳—׳¥/׳¢׳™׳™׳₪׳•׳×/׳—׳•׳¡׳¨ ׳•׳“׳׳•׳×.'),
+            wr2wSanitizeText(source.conditionsLine || 'זה נהיה הכי חזק בתנאים של לחץ/עייפות/חוסר ודאות.'),
             180
         ),
         transformedSentence: wr2TrimText(
@@ -14532,7 +14536,7 @@ const wr2wPatientAgent = Object.freeze({
             : false;
         const meta = scene?.caseSeedMeta || {};
         if (!hasQuantifier) {
-            const rawText = '׳׳ ׳׳׳©. ׳׳ ׳™ ׳׳ ׳©׳•׳׳¢ ׳›׳׳ ׳׳× ׳”׳”׳©׳׳׳” ׳©׳׳ ׳™ ׳׳¨׳’׳™׳© ׳‘׳₪׳ ׳™׳.';
+            const rawText = 'לא ממש. אני לא שומע כאן את ההשלמה שאני מרגיש בפנים.';
             wr2wLogHebrewIssues('patient.confirm.no_quantifier', rawText);
             return Object.freeze({
                 status: 'no',
@@ -14542,7 +14546,7 @@ const wr2wPatientAgent = Object.freeze({
 
         const profile = wr2wHash(scene.id) % 3;
         if (profile === 0) {
-            const rawText = '׳›׳, ׳–׳” ׳§׳¨׳•׳‘ ׳׳׳” ׳©׳§׳•׳¨׳” ׳׳™. ׳–׳” ׳‘׳“׳™׳•׳§ ׳”׳§׳•׳ ׳”׳₪׳ ׳™׳׳™.';
+            const rawText = 'כן, זה קרוב למה שקורה לי. זה בדיוק הקול הפנימי.';
             wr2wLogHebrewIssues('patient.confirm.yes', rawText);
             return Object.freeze({
                 status: 'yes',
@@ -14551,8 +14555,8 @@ const wr2wPatientAgent = Object.freeze({
         }
         if (profile === 1) {
             const rawText = meta.quantifier_nature === 'external_pattern'
-                ? '׳‘׳¢׳¨׳. ׳–׳” ׳ ׳¨׳׳” ׳™׳•׳×׳¨ ׳›׳׳• ׳“׳₪׳•׳¡ ׳—׳™׳¦׳•׳ ׳™ ׳‘׳×׳ ׳׳™׳ ׳׳¡׳•׳™׳׳™׳, ׳׳ ׳×׳׳™׳“.'
-                : '׳‘׳¢׳¨׳. ׳–׳” ׳ ׳›׳•׳ ׳‘׳¢׳™׳§׳¨ ׳‘׳׳¦׳‘׳™׳ ׳׳¡׳•׳™׳׳™׳, ׳׳ ׳×׳׳™׳“.';
+                ? 'בערך. זה נראה יותר כמו דפוס חיצוני בתנאים מסוימים, לא תמיד.'
+                : 'בערך. זה נכון בעיקר במצבים מסוימים, לא תמיד.';
             wr2wLogHebrewIssues('patient.confirm.partial', rawText);
             return Object.freeze({
                 status: 'partial',
@@ -14560,8 +14564,8 @@ const wr2wPatientAgent = Object.freeze({
             });
         }
         const rawText = meta.quantifier_nature === 'internal_climate'
-            ? '׳׳ ׳׳’׳׳¨׳™. ׳›׳¨׳’׳¢ ׳–׳” ׳׳¨׳’׳™׳© ׳™׳•׳×׳¨ ׳׳§׳׳™׳ ׳₪׳ ׳™׳׳™ ׳—׳–׳§ ׳׳׳©׳¨ ׳›׳׳ ׳§׳‘׳•׳¢.'
-            : '׳׳ ׳׳’׳׳¨׳™. ׳–׳” ׳ ׳©׳׳¢ ׳™׳•׳×׳¨ ׳¢׳•׳׳¡ ׳¨׳’׳¢׳™ ׳׳׳©׳¨ ׳›׳׳ ׳§׳‘׳•׳¢.';
+            ? 'לא לגמרי. כרגע זה מרגיש יותר אקלים פנימי חזק מאשר כלל קבוע.'
+            : 'לא לגמרי. זה נשמע יותר עומס רגעי מאשר כלל קבוע.';
         wr2wLogHebrewIssues('patient.confirm.no', rawText);
         return Object.freeze({
             status: 'no',
@@ -14571,17 +14575,17 @@ const wr2wPatientAgent = Object.freeze({
     probeException(scene, level) {
         const profile = wr2wHash(`${scene.id}:${level}`) % 4;
         if (level === 0 && profile <= 2) {
-            const rawText = '׳›׳¨׳’׳¢ ׳׳ ׳¢׳•׳׳” ׳׳™ ׳—׳¨׳™׳’ ׳‘׳¨׳•׳¨.';
+            const rawText = 'כרגע לא עולה לי חריג ברור.';
             wr2wLogHebrewIssues('patient.probe.level0', rawText);
             return Object.freeze({ found: false, text: wr2wSanitizeText(rawText) });
         }
         if (level === 1 && profile <= 1) {
-            const rawText = '׳’׳ 5% ׳₪׳—׳•׳× ׳ ׳›׳•׳ ׳§׳©׳” ׳׳™ ׳׳–׳”׳•׳×.';
+            const rawText = 'גם 5% פחות נכון קשה לי לזהות.';
             wr2wLogHebrewIssues('patient.probe.level1', rawText);
             return Object.freeze({ found: false, text: wr2wSanitizeText(rawText) });
         }
         if (level === 2 && profile === 0) {
-            const rawText = '׳׳₪׳™׳׳• 1% ׳₪׳—׳•׳× ׳ ׳›׳•׳ ׳׳ ׳¢׳•׳׳” ׳׳™ ׳›׳¨׳’׳¢.';
+            const rawText = 'אפילו 1% פחות נכון לא עולה לי כרגע.';
             wr2wLogHebrewIssues('patient.probe.level2', rawText);
             return Object.freeze({ found: false, text: wr2wSanitizeText(rawText) });
         }
