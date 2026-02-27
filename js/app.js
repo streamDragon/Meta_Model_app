@@ -2674,6 +2674,146 @@ function setupGlobalCollapsedHelpDetails() {
     }
 }
 
+function setupGlobalGuideDetailsOverlay() {
+    if (window.__globalGuideDetailsOverlayBound) return;
+    window.__globalGuideDetailsOverlayBound = true;
+
+    const guideRegex = /(help|guide|theory|philosophy|instruction|intro|הסבר|עזרה|תיאוריה|פילוסופ|מה עושים|פתיחה)/i;
+    const escapeHtmlSafe = (value) => escapeHtml(normalizeUiText(String(value || '').trim()));
+
+    const ensureOverlayShell = () => {
+        let overlay = document.getElementById('global-guide-overlay');
+        if (overlay) return overlay;
+
+        overlay = document.createElement('div');
+        overlay.id = 'global-guide-overlay';
+        overlay.className = 'global-guide-overlay hidden';
+        overlay.setAttribute('aria-hidden', 'true');
+        overlay.innerHTML = `
+            <div class="global-guide-overlay-dialog" role="dialog" aria-modal="true" aria-labelledby="global-guide-overlay-title">
+                <button type="button" class="global-guide-overlay-close" data-guide-overlay-close aria-label="סגירה">×</button>
+                <h3 id="global-guide-overlay-title">הסבר</h3>
+                <div id="global-guide-overlay-body" class="global-guide-overlay-body"></div>
+                <div class="global-guide-overlay-actions">
+                    <button type="button" class="btn btn-primary" data-guide-overlay-close>הבנתי</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        overlay.querySelectorAll('[data-guide-overlay-close]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                overlay.classList.add('hidden');
+                overlay.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('global-guide-open');
+            });
+        });
+
+        overlay.addEventListener('click', (event) => {
+            if (event.target !== overlay) return;
+            overlay.classList.add('hidden');
+            overlay.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('global-guide-open');
+        });
+
+        return overlay;
+    };
+
+    const openOverlayWithDetails = (detailsEl) => {
+        if (!detailsEl) return;
+        const overlay = ensureOverlayShell();
+        const titleEl = overlay.querySelector('#global-guide-overlay-title');
+        const bodyEl = overlay.querySelector('#global-guide-overlay-body');
+        if (!titleEl || !bodyEl) return;
+
+        const summary = detailsEl.querySelector(':scope > summary');
+        const titleText = summary?.textContent || detailsEl.getAttribute('aria-label') || 'הסבר';
+        titleEl.textContent = normalizeUiText(titleText).replace(/\s+/g, ' ').trim() || 'הסבר';
+
+        const contentNodes = Array.from(detailsEl.children).filter((node) => node.tagName !== 'SUMMARY');
+        bodyEl.innerHTML = '';
+        if (!contentNodes.length) {
+            bodyEl.innerHTML = `<p>${escapeHtmlSafe(detailsEl.textContent || '')}</p>`;
+        } else {
+            contentNodes.forEach((node) => bodyEl.appendChild(node.cloneNode(true)));
+        }
+
+        overlay.classList.remove('hidden');
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('global-guide-open');
+
+        const confirmBtn = overlay.querySelector('.btn.btn-primary');
+        if (confirmBtn) {
+            try {
+                confirmBtn.focus({ preventScroll: true });
+            } catch (_error) {
+                confirmBtn.focus();
+            }
+        }
+    };
+
+    const shouldConvertDetails = (detailsEl) => {
+        if (!(detailsEl instanceof HTMLElement)) return false;
+        if (detailsEl.dataset.guideOverlayOptOut === 'true') return false;
+        if (detailsEl.closest('.global-guide-overlay, .prism-guide-overlay')) return false;
+
+        const cls = String(detailsEl.className || '');
+        const summaryText = String(detailsEl.querySelector(':scope > summary')?.textContent || '');
+        return guideRegex.test(cls) || guideRegex.test(summaryText);
+    };
+
+    const bindDetails = (root = document) => {
+        const allDetails = root.querySelectorAll ? root.querySelectorAll('details') : [];
+        allDetails.forEach((detailsEl) => {
+            if (!shouldConvertDetails(detailsEl)) return;
+            if (detailsEl.dataset.guideOverlayBound === 'true') return;
+            detailsEl.dataset.guideOverlayBound = 'true';
+
+            const summary = detailsEl.querySelector(':scope > summary');
+            if (!summary) return;
+
+            summary.addEventListener('click', (event) => {
+                event.preventDefault();
+                detailsEl.open = false;
+                openOverlayWithDetails(detailsEl);
+            });
+
+            summary.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                event.preventDefault();
+                detailsEl.open = false;
+                openOverlayWithDetails(detailsEl);
+            });
+        });
+    };
+
+    bindDetails(document);
+
+    if (window.MutationObserver && document.body) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node?.nodeType !== 1) return;
+                    bindDetails(node);
+                });
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    if (window.__globalGuideOverlayEscBound !== true) {
+        window.__globalGuideOverlayEscBound = true;
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape') return;
+            const overlay = document.getElementById('global-guide-overlay');
+            if (!overlay || overlay.classList.contains('hidden')) return;
+            overlay.classList.add('hidden');
+            overlay.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('global-guide-open');
+        });
+    }
+}
+
 function safeRunUiEnhancement(fn, label = 'ui-enhancement') {
     if (typeof fn !== 'function') return;
     try {
@@ -2764,6 +2904,7 @@ function initializeMetaModelApp() {
     initializeProgressHub();
     safeRunUiEnhancement(setupGlobalTheoryLauncher, 'global-theory-launcher');
     safeRunUiEnhancement(setupGlobalCollapsedHelpDetails, 'global-collapsed-help-details');
+    safeRunUiEnhancement(setupGlobalGuideDetailsOverlay, 'global-guide-details-overlay');
     setupGlobalInteractionSounds();
     setupGlobalRevealFeedback();
     renderGlobalComicStrip(getActiveTabName());
@@ -9459,6 +9600,7 @@ const PRISM_STACK_DEFAULT_ANCHORS = Object.freeze({
     cause_effect: 'הוא אמר: נדבר',
     complex_equivalence: 'זה אומר שנכשלתי'
 });
+const PRISM_ANCHOR_PLACEHOLDER_RE = /^(?:test|טסט)\s*\d*$/i;
 
 const PRISM_STACK_PROMPT_TEMPLATES = Object.freeze({
     comparative_deletion: Object.freeze({
@@ -9508,6 +9650,13 @@ function deriveDefaultPrismAnchor(prism) {
     if (quoted && quoted[1]) return quoted[1].trim();
 
     return (prism.name_he || prism.name_en || 'עוגן').trim();
+}
+
+function normalizePrismAnchorText(prism, rawAnchor) {
+    const raw = normalizeUiText(String(rawAnchor || '').trim());
+    if (!raw) return deriveDefaultPrismAnchor(prism);
+    if (PRISM_ANCHOR_PLACEHOLDER_RE.test(raw)) return deriveDefaultPrismAnchor(prism);
+    return raw;
 }
 
 function normalizePrismPromptTemplateText(text, anchor) {
@@ -9618,8 +9767,20 @@ function getCurrentPrismFromDetail() {
 
 function getCurrentPrismAnchorText(prism) {
     const input = getPrismAnchorInputEl();
-    const raw = String(input?.value || '').trim();
-    return raw || deriveDefaultPrismAnchor(prism);
+    return normalizePrismAnchorText(prism, input?.value || '');
+}
+
+function renderPrismActiveSentenceCard(prism, anchorText) {
+    const target = document.getElementById('prism-active-sentence');
+    if (!target || !prism) return;
+
+    const activeSentence = escapeHtml(normalizeUiText(anchorText || deriveDefaultPrismAnchor(prism)));
+    const focusQuestion = escapeHtml(normalizeUiText(getPrismCoreQuestion(prism) || ''));
+    target.innerHTML = `
+        <div class="prism-active-sentence-kicker">משפט עבודה פעיל</div>
+        <p class="prism-active-sentence-main">${activeSentence}</p>
+        <p class="prism-active-sentence-sub">${focusQuestion || 'בחר/י משפט עוגן קצר וברור לפני מילוי הרמות.'}</p>
+    `;
 }
 
 function renderVerticalStackPrompts(prompts) {
@@ -9713,8 +9874,9 @@ function savePrismVerticalStackDraftForCurrentPrism() {
 
 function applyVerticalStackStateToUI(prism, draft) {
     const anchorInput = getPrismAnchorInputEl();
-    const anchorText = String(draft?.anchorText || '').trim() || deriveDefaultPrismAnchor(prism);
+    const anchorText = normalizePrismAnchorText(prism, draft?.anchorText || '');
     if (anchorInput) anchorInput.value = anchorText;
+    renderPrismActiveSentenceCard(prism, anchorText);
 
     renderVerticalStackPrompts(buildVerticalStackPrompts(prism, anchorText));
 
@@ -9748,7 +9910,11 @@ function refreshPrismVerticalStackForCurrentPrism(options = {}) {
     if (anchorInput && !String(anchorInput.value || '').trim() && options.forceDefaultAnchor !== false) {
         anchorInput.value = deriveDefaultPrismAnchor(prism);
     }
+    if (anchorInput) {
+        anchorInput.value = normalizePrismAnchorText(prism, anchorInput.value || '');
+    }
     const anchorText = getCurrentPrismAnchorText(prism);
+    renderPrismActiveSentenceCard(prism, anchorText);
     renderVerticalStackPrompts(buildVerticalStackPrompts(prism, anchorText));
     populatePreparedItems(prism);
     savePrismVerticalStackDraftForCurrentPrism();
@@ -9936,77 +10102,174 @@ function computePrismScore(answerChecks) {
     return { total, coverage, alignment, clarity, grade };
 }
 
+function syncPrismGuideOverlayBodyLock() {
+    const hasOpen = !!document.querySelector('.prism-guide-overlay:not(.hidden)');
+    document.body.classList.toggle('prism-guide-open', hasOpen);
+}
+
+function closePrismGuideOverlay(modal) {
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+    syncPrismGuideOverlayBodyLock();
+}
+
+function openPrismGuideOverlay(modal) {
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+    syncPrismGuideOverlayBodyLock();
+    const focusTarget = modal.querySelector('.prism-guide-overlay-confirm, .prism-guide-overlay-close');
+    if (focusTarget) {
+        try {
+            focusTarget.focus({ preventScroll: true });
+        } catch (_error) {
+            focusTarget.focus();
+        }
+    }
+}
+
+function bindPrismGuideOverlayHandlers(rootEl) {
+    if (!rootEl) return;
+
+    rootEl.querySelectorAll('[data-prism-guide-target]').forEach((openBtn) => {
+        if (openBtn.dataset.boundPrismGuideOpen === 'true') return;
+        openBtn.dataset.boundPrismGuideOpen = 'true';
+        openBtn.addEventListener('click', () => {
+            const targetId = String(openBtn.getAttribute('data-prism-guide-target') || '').trim();
+            openPrismGuideOverlay(document.getElementById(targetId));
+        });
+    });
+
+    rootEl.querySelectorAll('.prism-guide-overlay').forEach((modal) => {
+        if (modal.dataset.boundPrismGuideModal === 'true') return;
+        modal.dataset.boundPrismGuideModal = 'true';
+
+        modal.querySelectorAll('[data-prism-guide-close]').forEach((closeBtn) => {
+            closeBtn.addEventListener('click', () => closePrismGuideOverlay(modal));
+        });
+
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) closePrismGuideOverlay(modal);
+        });
+    });
+
+    if (window.__prismGuideOverlayEscBound !== true) {
+        window.__prismGuideOverlayEscBound = true;
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape') return;
+            const openModals = Array.from(document.querySelectorAll('.prism-guide-overlay:not(.hidden)'));
+            if (!openModals.length) return;
+            closePrismGuideOverlay(openModals[openModals.length - 1]);
+        });
+    }
+}
+
 function renderPrismDeepGuide(prism) {
     const guideEl = document.getElementById('prism-deep-guide');
     if (!guideEl || !prism) return;
 
-    const antiPatterns = (prism.anti_patterns || []).map(item => `<li>${item}</li>`).join('');
-    const examples = (prism.examples || []).map(item => `<li>${item}</li>`).join('');
-    const levelGuide = ['E', 'B', 'C', 'V', 'I', 'S']
-        .map(level => `<li><strong>${getLevelDisplay(level)}:</strong> ${LOGICAL_LEVEL_INFO[level].prompt}</li>`)
+    const safePrismId = String(prism.id || 'prism').replace(/[^a-z0-9_-]/gi, '-');
+    const modeModalId = `prism-guide-mode-${safePrismId}`;
+    const advancedModalId = `prism-guide-advanced-${safePrismId}`;
+
+    const antiPatterns = (prism.anti_patterns || [])
+        .slice(0, 4)
+        .map((item) => `<li>${escapeHtml(normalizeUiText(item || ''))}</li>`)
         .join('');
-    const depthLadder = ['E', 'B', 'C', 'V', 'I', 'S']
-        .map(level => `<li><strong>${getLevelDisplay(level)}:</strong> ׳¢׳•׳׳§ ׳”׳—׳©׳™׳‘׳” ׳”׳•׳ "${LOGICAL_LEVEL_INFO[level].prompt}"</li>`)
+    const examples = (prism.examples || [])
+        .slice(0, 4)
+        .map((item) => `<li>${escapeHtml(normalizeUiText(item || ''))}</li>`)
+        .join('');
+    const levelGuide = ['E', 'B', 'C', 'V', 'I', 'S']
+        .map((level) => `<li><strong>${escapeHtml(getLevelDisplay(level))}:</strong> ${escapeHtml(normalizeUiText(LOGICAL_LEVEL_INFO[level].prompt || ''))}</li>`)
         .join('');
     const anchorTemplates = (prism.anchor_question_templates || [])
-        .slice(0, 2)
-        .map(item => `<li>${item}</li>`)
+        .slice(0, 3)
+        .map((item) => `<li>${escapeHtml(normalizeUiText(item || ''))}</li>`)
         .join('');
+    const nameHe = escapeHtml(normalizeUiText(prism.name_he || 'פריזמה'));
+    const nameEn = escapeHtml(normalizeUiText(prism.name_en || 'Prism'));
+    const philosophy = escapeHtml(normalizeUiText(prism.philosophy_core || ''));
+    const intent = escapeHtml(normalizeUiText(prism.therapist_intent || 'המטרה: להפוך ניסוח כללי למפת עומק שאפשר לעבוד איתה.'));
 
     guideEl.innerHTML = `
-        <h4>׳”׳¡׳‘׳¨ ׳¢׳•׳׳§ ׳¢׳ ׳”׳₪׳¨׳™׳–׳׳”: ${prism.name_he}</h4>
-        <p><strong>׳׳” ׳”׳₪׳¨׳™׳–׳׳” ׳”׳–׳• ׳‘׳•׳“׳§׳×?</strong> ${prism.philosophy_core}</p>
-        <p><strong>׳׳׳” ׳–׳” ׳—׳©׳•׳‘?</strong> ${prism.therapist_intent || '׳׳˜׳¨׳× ׳”׳₪׳¨׳™׳–׳׳” ׳”׳™׳ ׳׳”׳₪׳•׳ ׳ ׳™׳¡׳•׳— ׳›׳׳׳™ ׳׳׳₪׳” ׳‘׳¨׳•׳¨׳” ׳©׳׳₪׳©׳¨ ׳׳₪׳¢׳•׳ ׳׳₪׳™׳”.'}</p>
+        <div class="prism-guide-launchers" role="group" aria-label="הסברים זמניים">
+            <button type="button" class="btn btn-secondary prism-guide-launch-btn" data-prism-guide-target="${modeModalId}">
+                <span>Mode Guide + Example</span>
+                <small>הסבר קצר לפני תחילת המילוי</small>
+            </button>
+            <button type="button" class="btn btn-secondary prism-guide-launch-btn prism-guide-launch-btn-advanced" data-prism-guide-target="${advancedModalId}">
+                <span>Advanced Theory</span>
+                <small>לפתוח רק כשצריך</small>
+            </button>
+        </div>
 
-        <div class="prism-guide-grid prism-guide-grid-mode-split">
-            <div class="prism-guide-card">
-                <h5>שתי פריזמות שונות (חשוב)</h5>
-                <p><strong>Prism Research (חקירה בשרשרת):</strong> שואלים שוב על כל תשובה חדשה שנולדה. זו חקירה "רקורסיבית" - כלומר אותה צורת שאלה חוזרת על תוצאה חדשה כדי להתקדם שכבה אחרי שכבה.</p>
-                <p><strong>Prism Lab (מגדל רמות):</strong> נשארים על מילה/ביטוי מרכזי אחד ("עוגן") + קטגוריה אחת, ובונים חתך עומק דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY}). זו חקירה לעומק.</p>
-                <p><strong>במשפט אחד:</strong> Research = מתקדמים קדימה עם שאלות חדשות. Lab = נשארים על אותו מוקד ומעמיקים.</p>
-            </div>
-            <div class="prism-guide-card">
-                <h5>שני מושגים שחייבים להיות ברורים</h5>
-                <p><strong>מה זה "עוגן"?</strong> המילה או הביטוי המרכזיים מתוך המשפט שעליהם עובדים עכשיו. לא כל המשפט - רק נקודת מיקוד אחת שמעמיקים עליה.</p>
-                <p><strong>מה זה "רקורסיבי" ולמה זה חשוב בטיפול?</strong> רקורסיבי = חוזרים עם אותה שאלה/עדשה על התשובה החדשה. זה עוזר לא לקפוץ מהר לפרשנות, אלא לחשוף שכבות נוספות של משמעות, הכללה והנחות.</p>
+        <div id="${modeModalId}" class="prism-guide-overlay hidden" aria-hidden="true">
+            <div class="prism-guide-overlay-dialog" role="dialog" aria-modal="true" aria-labelledby="${modeModalId}-title">
+                <button type="button" class="prism-guide-overlay-close" data-prism-guide-close aria-label="סגירה">×</button>
+                <h4 id="${modeModalId}-title">Mode Guide + Example</h4>
+                <p class="prism-guide-overlay-lead">${nameHe} / ${nameEn}</p>
+                <div class="prism-guide-grid prism-guide-grid-mode-split prism-guide-overlay-content">
+                    <div class="prism-guide-card">
+                        <h5>מה הכלי בודק?</h5>
+                        <p>${philosophy}</p>
+                        <p><strong>למה זה חשוב?</strong> ${intent}</p>
+                    </div>
+                    <div class="prism-guide-card">
+                        <h5>Prism Lab vs Prism Research</h5>
+                        <p><strong>Prism Lab:</strong> מילה/ביטוי מרכזי אחד ("עוגן") + חתך עומק דרך רמות לוגיות.</p>
+                        <p><strong>Prism Research:</strong> שאלה רקורסיבית על כל תשובה חדשה בשרשרת חקירה.</p>
+                        <p><strong>בקיצור:</strong> Lab = עומק על מוקד אחד. Research = תנועה בשרשרת.</p>
+                    </div>
+                </div>
+                <div class="prism-guide-grid prism-guide-overlay-content">
+                    <div class="prism-guide-card">
+                        <h5>איך עובדים ב-4 צעדים</h5>
+                        <ol>
+                            <li>בחר/י מילה/ביטוי מרכזי אחד מהמשפט.</li>
+                            <li>מלא/י 3-6 רמות לוגיות.</li>
+                            <li>בדוק/י קפיצות או שכבות חסרות.</li>
+                            <li>בחר/י צעד הבא קטן ומדיד.</li>
+                        </ol>
+                    </div>
+                    <div class="prism-guide-card">
+                        <h5>רמות לוגיות / Stack Map</h5>
+                        <ul>${levelGuide}</ul>
+                    </div>
+                </div>
+                <div class="prism-guide-overlay-actions">
+                    <button type="button" class="btn btn-primary prism-guide-overlay-confirm" data-prism-guide-close>הבנתי</button>
+                </div>
             </div>
         </div>
 
-        <div class="prism-guide-grid">
-            <div class="prism-guide-card">
-                <h5>׳׳™׳ ׳¢׳•׳‘׳“׳™׳ ׳ ׳›׳•׳ ׳‘-4 ׳©׳׳‘׳™׳</h5>
-                <ol>
-                    <li>׳׳ ׳¡׳—׳™׳ ׳׳× ׳©׳׳׳× ׳”׳¢׳•׳’׳ ׳•׳׳•׳•׳“׳׳™׳ ׳©׳”׳™׳ ׳‘׳¨׳•׳¨׳” ׳•׳׳“׳™׳“׳”.</li>
-                    <li>ממפים כל תשובה לרמה הלוגית המתאימה: סביבה, התנהגות, יכולות, ערכים/אמונות, זהות, שייכות.</li>
-                    <li>׳׳–׳”׳™׳ ׳₪׳¢׳¨׳™׳ ׳•׳©׳™׳‘׳•׳¦׳™׳ ׳©׳’׳•׳™׳™׳ ׳›׳“׳™ ׳׳׳ ׳•׳¢ ׳׳¡׳§׳ ׳•׳× ׳׳ ׳׳“׳•׳™׳§׳•׳×.</li>
-                    <li>׳‘׳•׳—׳¨׳™׳ צעד הבא ׳׳—׳“ ׳§׳˜׳ ׳׳‘׳™׳¦׳•׳¢ ׳׳™׳™׳“׳™, ׳¢׳ ׳”׳׳©׳ ׳¢׳•׳׳§ ׳׳“׳•׳¨׳’.</li>
-                </ol>
-            </div>
-            <div class="prism-guide-card">
-                <h5>׳׳™׳ ׳׳”׳‘׳—׳™׳ ׳‘׳™׳ ׳”׳¨׳׳•׳×</h5>
-                <ul>${levelGuide}</ul>
-            </div>
-            <div class="prism-guide-card">
-                <h5>׳׳” ׳׳•׳׳¨ "׳¢׳•׳׳§" ׳‘׳₪׳¨׳™׳–׳׳”</h5>
-                <p>׳׳×׳—׳™׳׳™׳ ׳‘-סביבה/התנהגות ׳›׳“׳™ ׳׳¢׳’׳ ׳¢׳•׳‘׳“׳•׳× ׳‘׳©׳˜׳—, ׳•׳׳– ׳¢׳•׳׳™׳ ׳-יכולות/ערכים/זהות/שייכות ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳׳ ׳’׳ ׳•׳ ׳₪׳ ׳™׳׳™ ׳•׳–׳”׳•׳×׳™.</p>
-                <ul>${depthLadder}</ul>
-            </div>
-        </div>
-
-        <div class="prism-guide-grid">
-            <div class="prism-guide-card">
-                <h5>׳“׳•׳’׳׳׳•׳× ׳¢׳•׳’׳ ׳׳•׳׳׳¦׳•׳×</h5>
-                <ul>${anchorTemplates || '<li>׳׳™׳ ׳“׳•׳’׳׳׳•׳× ׳ ׳•׳¡׳₪׳•׳× ׳‘׳ ׳×׳•׳ ׳™׳.</li>'}</ul>
-                <h5>׳“׳•׳’׳׳׳•׳× ׳׳”׳—׳™׳™׳</h5>
-                <ul>${examples || '<li>׳׳™׳ ׳“׳•׳’׳׳׳•׳× ׳ ׳•׳¡׳₪׳•׳× ׳‘׳ ׳×׳•׳ ׳™׳.</li>'}</ul>
-            </div>
-            <div class="prism-guide-card">
-                <h5>׳˜׳¢׳•׳™׳•׳× ׳ ׳₪׳•׳¦׳•׳× ׳©׳›׳“׳׳™ ׳׳”׳™׳׳ ׳¢ ׳׳”׳</h5>
-                <ul>${antiPatterns || '<li>׳׳”׳™׳©׳׳¨ ׳›׳׳׳™ ׳•׳׳ ׳׳‘׳“׳•׳§ ׳¨׳׳™׳•׳×.</li>'}</ul>
-                <p><strong>׳˜׳™׳₪:</strong> ׳׳ ׳™׳© ׳¡׳₪׳§ ׳‘׳¨׳׳”, ׳§׳¦׳¨ ׳׳× ׳”׳׳©׳₪׳˜ ׳׳©׳•׳¨׳” ׳׳—׳× ׳§׳•׳ ׳§׳¨׳˜׳™׳× ׳•׳‘׳“׳•׳§ ׳©׳•׳‘ ׳׳׳™׳–׳• ׳©׳׳׳” ׳”׳•׳ ׳¢׳•׳ ׳”.</p>
+        <div id="${advancedModalId}" class="prism-guide-overlay hidden" aria-hidden="true">
+            <div class="prism-guide-overlay-dialog" role="dialog" aria-modal="true" aria-labelledby="${advancedModalId}-title">
+                <button type="button" class="prism-guide-overlay-close" data-prism-guide-close aria-label="סגירה">×</button>
+                <h4 id="${advancedModalId}-title">Advanced Theory</h4>
+                <p class="prism-guide-overlay-lead">לפתוח רק כשצריך. זה חומר הרחבה, לא חובה לפני התחלה.</p>
+                <div class="prism-guide-grid prism-guide-overlay-content">
+                    <div class="prism-guide-card">
+                        <h5>שאלות עוגן מומלצות</h5>
+                        <ul>${anchorTemplates || '<li>אין דוגמאות זמינות כרגע.</li>'}</ul>
+                        <h5>דוגמאות</h5>
+                        <ul>${examples || '<li>אין דוגמאות זמינות כרגע.</li>'}</ul>
+                    </div>
+                    <div class="prism-guide-card">
+                        <h5>טעויות נפוצות</h5>
+                        <ul>${antiPatterns || '<li>לא לקפוץ לפרשנות לפני שיש עיגון של סביבה/התנהגות.</li>'}</ul>
+                        <p><strong>טיפ:</strong> אם יש ספק ברמה, קצר/י את המשפט לשורה קונקרטית אחת.</p>
+                    </div>
+                </div>
+                <div class="prism-guide-overlay-actions">
+                    <button type="button" class="btn btn-primary prism-guide-overlay-confirm" data-prism-guide-close>הבנתי</button>
+                </div>
             </div>
         </div>
     `;
+
+    bindPrismGuideOverlayHandlers(guideEl);
 }
 
 function renderPrismScoreInterpretation(score, mismatchCount) {
@@ -11039,7 +11302,7 @@ function applyPrismLabVisualHierarchyEnhancements() {
     });
 }
 
-function renderPrismDeepGuide(prism) {
+function renderPrismDeepGuideLegacy(prism) {
     const guideEl = document.getElementById('prism-deep-guide');
     if (!guideEl || !prism) return;
 
