@@ -260,6 +260,294 @@ body.force-mobile-view .app-version-floating {
     display: none !important;
 }
 
+/* ==========================================================
+   APP SHELL + OVERLAY SYSTEM (feature-flagged runtime layer)
+   ========================================================== */
+.overlay-root {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px 16px;
+}
+
+.overlay-root.hidden {
+    display: none !important;
+}
+
+.overlay-panel {
+    width: min(900px, 92vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 26px 58px rgba(15, 23, 42, 0.34);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    transform-origin: center center;
+}
+
+.overlay-panel-size-sm {
+    width: min(520px, 92vw);
+}
+
+.overlay-panel-size-md {
+    width: min(760px, 92vw);
+}
+
+.overlay-panel-size-lg {
+    width: min(980px, 96vw);
+}
+
+.overlay-panel-size-xl {
+    width: min(1140px, 98vw);
+}
+
+.overlay-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.overlay-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.12rem;
+    font-weight: 800;
+}
+
+.overlay-close {
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.overlay-body {
+    color: #1e293b;
+}
+
+.app-shell {
+    border: 1px solid #d6e4f6;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #f8fbff 0%, #f2f7ff 100%);
+    padding: 12px;
+    margin-bottom: 14px;
+}
+
+.app-shell-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.app-shell-title-wrap {
+    display: grid;
+    gap: 4px;
+}
+
+.app-shell-kicker {
+    margin: 0;
+    font-size: 0.73rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
+.app-shell-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.2rem;
+    font-weight: 900;
+}
+
+.app-shell-subtitle {
+    margin: 0;
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+.app-shell-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.shell-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 7px 10px;
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.app-shell-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.metric-chip {
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    background: #ffffff;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 7px;
+    min-height: 42px;
+    padding: 7px 10px;
+    cursor: pointer;
+    color: #0f172a;
+    transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.metric-chip:hover {
+    transform: translateY(-1px);
+    border-color: #93c5fd;
+    box-shadow: 0 8px 14px rgba(59, 130, 246, 0.12);
+}
+
+.metric-chip-icon {
+    font-size: 0.98rem;
+}
+
+.metric-chip-label {
+    font-size: 0.81rem;
+    font-weight: 800;
+    color: #1e293b;
+    text-align: start;
+}
+
+.metric-chip-value {
+    font-size: 0.82rem;
+    font-weight: 900;
+    color: #1d4ed8;
+}
+
+.lab-container {
+    margin-top: 10px;
+    display: grid;
+    gap: 10px;
+}
+
+.lab-container-workspace {
+    background: #ffffff;
+    border: 1px solid #dbe7f5;
+    border-radius: 14px;
+    padding: 10px;
+}
+
+.lab-container-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.lab-container-bottom {
+    border: 1px solid #dbe7f5;
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 8px 10px;
+}
+
+.lab-container-bottom summary {
+    cursor: pointer;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.lab-container-bottom-body {
+    margin-top: 6px;
+    color: #475569;
+    font-size: 0.86rem;
+}
+
+.shell-screen-active .practice-intro-card.shell-workspace-card {
+    margin: 0;
+    padding: 8px;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+}
+
+.shell-inline-hidden {
+    display: none !important;
+}
+
+.shell-hidden-host {
+    display: none !important;
+}
+
+.shell-runtime-fallback {
+    margin-bottom: 10px;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+}
+
+.shell-overlay-content {
+    display: grid;
+    gap: 10px;
+}
+
+.shell-overlay-kicker {
+    margin: 0;
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: #1d4ed8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.shell-overlay-content h4 {
+    margin: 0;
+    color: #0f172a;
+}
+
+.shell-overlay-note {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.shell-help-list,
+.shell-stats-list {
+    margin: 0;
+    padding-inline-start: 20px;
+    color: #1e293b;
+}
+
+.shell-overlay-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.shell-launcher-wrap {
+    border: 1px solid #dbe7f5;
+    border-radius: 12px;
+    background: #f8fbff;
+    padding: 8px;
+}
+
 @media (max-width: 640px) {
     .feature-map-menu-controls {
         grid-template-columns: 1fr;
@@ -272,6 +560,47 @@ body.force-mobile-view .app-version-floating {
     }
     .feature-launcher-picker-controls .btn {
         width: 100%;
+    }
+}
+
+@media (max-width: 767px) {
+    .overlay-root {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .overlay-panel {
+        width: 100%;
+        max-height: 94vh;
+        border-radius: 18px 18px 0 0;
+        padding: 16px 14px calc(16px + var(--safe-bottom));
+        animation: overlaySheetIn 220ms ease-out;
+    }
+
+    .app-shell-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .app-shell-actions,
+    .lab-container-actions,
+    .shell-overlay-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .shell-action-btn {
+        width: 100%;
+    }
+}
+
+@keyframes overlaySheetIn {
+    0% {
+        opacity: 0;
+        transform: translateY(22px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 

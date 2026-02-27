@@ -2923,6 +2923,11 @@ function initializeMetaModelApp() {
     setupFeatureLauncherTabs();
     setupGlobalFeatureMenuDropdown();
     setupFeatureMapOverlayControls();
+    safeRunUiEnhancement(() => {
+        if (window.MetaAppShell && typeof window.MetaAppShell.bootstrap === 'function') {
+            window.MetaAppShell.bootstrap();
+        }
+    }, 'app-shell-bootstrap');
     setupMobileViewportSizing();
     applyEmbeddedCompactMode();
     enforceTopMenuOnlyMode();

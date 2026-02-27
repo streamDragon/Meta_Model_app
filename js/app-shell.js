@@ -178,6 +178,7 @@
     function openMetricOverlay(screenState, metric) {
         if (!screenState || !metric) return;
         recordPanelOpen(screenState, `metric:${metric.id}`);
+        renderHistoryFooter(screenState);
 
         const panel = document.createElement('article');
         panel.className = 'shell-overlay-content';
@@ -239,6 +240,7 @@
         const launcher = screenState.launcher;
 
         recordPanelOpen(screenState, entryMode ? 'wizard' : 'settings');
+        renderHistoryFooter(screenState);
 
         const wrapper = document.createElement('div');
         wrapper.className = 'shell-overlay-content shell-overlay-content-settings';
@@ -272,6 +274,7 @@
                 screenState.sessionStarted = true;
                 writeSessionFlag(VERB_SESSION_KEY, true);
                 renderMetrics(screenState);
+                renderHistoryFooter(screenState);
                 global.MetaOverlayProvider.closeOverlay('session-started');
             });
             actions.appendChild(startBtn);
@@ -294,6 +297,7 @@
             onClose: () => {
                 restoreLauncherHome(screenState);
                 renderMetrics(screenState);
+                renderHistoryFooter(screenState);
             }
         });
     }
@@ -302,6 +306,7 @@
         if (!screenState) return;
         ensureOverlayProvider();
         recordPanelOpen(screenState, 'help');
+        renderHistoryFooter(screenState);
 
         const panel = document.createElement('article');
         panel.className = 'shell-overlay-content';
@@ -313,7 +318,7 @@
             <ol class="shell-help-list">
                 <li>בחר/י כלי דרך כפתור ההגדרות.</li>
                 <li>השאר/י את סביבת העבודה פתוחה ונקייה.</li>
-                <li>סגור/י הסבר/הגדרות בלחיצה על "הבנתי" או `ESC`.</li>
+                <li>סגור/י הסבר/הגדרות בלחיצה על "הבנתי" או ESC.</li>
             </ol>
         `;
 
@@ -330,6 +335,7 @@
         if (!screenState) return;
         ensureOverlayProvider();
         recordPanelOpen(screenState, 'stats');
+        renderHistoryFooter(screenState);
 
         const panel = document.createElement('article');
         panel.className = 'shell-overlay-content';
