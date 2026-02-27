@@ -120,3 +120,24 @@
 - `node --check js/app.js`
 - `npm run -s test:ui-wiring`
 - `npm run -s test:mobile`
+
+## Update: Minimal Hebrew Case Pack (CB-01..CB-08)
+
+- Added case pack file:
+  - `src/data/connectedBubblesCases.he.json`
+- Synced runtime fetch file:
+  - `data/connected-bubbles-cases.json`
+- Loader now tries both URLs in order and falls back locally:
+  - `src/data/connectedBubblesCases.he.json`
+  - `data/connected-bubbles-cases.json`
+  - `cbcalFallbackCases()`
+- Parser supports both schemas:
+  - full (`suggested_chips`, `transcript_template`)
+  - minimal (`chips`, `transcript`, `target_balanced_sentence`)
+- Candidate validation now follows string match against `candidate_sentences[].text`.
+- Transcript highlight supports both styles:
+  - `[[inside:...]]` / `[[outside:...]]`
+  - `<inside>...</inside>` / `<outside>...</outside>`
+- Balanced unlock now supports deterministic target matching:
+  - exact or high similarity to `target_balanced_sentence`
+  - still keeps legacy score-based balance as fallback.

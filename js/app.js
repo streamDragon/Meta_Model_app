@@ -16737,6 +16737,7 @@ async function setupConnectedBubblesTrainer() {
         history: [],
         insideMatch: 0,
         outsideMatch: 0,
+        targetMatched: false,
         balanced: false,
         lastBalanced: false
     };
@@ -16778,10 +16779,11 @@ async function setupConnectedBubblesTrainer() {
 
         state.insideMatch = cbcalComputeInsideMatch(state.sentence, seed);
         state.outsideMatch = cbcalComputeOutsideMatch(state.sentence, seed);
-        state.balanced = state.insideMatch >= 70
+        state.targetMatched = cbcalIsTargetBalancedSentence(state.sentence, seed);
+        state.balanced = state.targetMatched || (state.insideMatch >= 70
             && state.outsideMatch >= 70
             && state.insideMatch <= 85
-            && state.outsideMatch <= 85;
+            && state.outsideMatch <= 85);
 
         if (els.insideScore) els.insideScore.textContent = `${state.insideMatch}%`;
         if (els.outsideScore) els.outsideScore.textContent = `${state.outsideMatch}%`;
@@ -16806,7 +16808,11 @@ async function setupConnectedBubblesTrainer() {
         if (els.svgOutside) els.svgOutside.style.transform = `translate(${-outsideShift}px, ${Math.round(outsideShift * 0.25)}px)`;
 
         if (state.balanced && !state.lastBalanced) {
-            setFeedback('איזון הושג. אפשר לפתוח תמלול חיים אמיתיים.', 'success');
+            if (state.targetMatched) {
+                setFeedback('דיוק גבוה מול משפט היעד. אפשר לפתוח תמלול חיים אמיתיים.', 'success');
+            } else {
+                setFeedback('איזון הושג. אפשר לפתוח תמלול חיים אמיתיים.', 'success');
+            }
         } else if (!state.balanced && state.lastBalanced) {
             setFeedback('האיזון ירד מעט. המשיכו לכייל עד שני הצדדים בטווח.', 'info');
         }
@@ -16876,6 +16882,7 @@ async function setupConnectedBubblesTrainer() {
         state.history = [];
         state.insideMatch = 0;
         state.outsideMatch = 0;
+        state.targetMatched = false;
         state.balanced = false;
         state.lastBalanced = false;
         if (els.sentenceInput) els.sentenceInput.value = state.sentence;
@@ -16974,41 +16981,70 @@ async function setupConnectedBubblesTrainer() {
     const normalizeCaseSeed = (raw, index) => {
         const source = raw && typeof raw === 'object' ? raw : {};
         const safeArray = (value) => (Array.isArray(value) ? value.filter(Boolean) : []);
+        const contextLines = safeArray(source.context_lines).map((line) => String(line));
+        const mapChipArray = (chips, bucket) => safeArray(chips).map((chip, chipIndex) => {
+            const normalized = {
+                id: String(chip?.id || `${bucket}_chip_${chipIndex + 1}`),
+                label: String(chip?.label || chip?.text || `${bucket} chip ${chipIndex + 1}`),
+                kind: String(chip?.kind || ''),
+                text: String(chip?.text || ''),
+                from: String(chip?.from || ''),
+                to: String(chip?.to || '')
+            };
+            if (!normalized.kind || (!normalized.text && !normalized.from && !normalized.to)) {
+                const inferred = cbcalInferMinimalChipTransform(normalized, bucket);
+                normalized.kind = inferred.kind;
+                normalized.text = inferred.text || '';
+                normalized.from = inferred.from || normalized.from;
+                normalized.to = inferred.to || normalized.to;
+            }
+            return normalized;
+        });
+
+        const rawCandidates = safeArray(source.candidate_sentences).map((item, candidateIndex) => {
+            const text = String(item?.text || '');
+            const normalizedText = cbcalNormalizeText(text);
+            const inferredLineIndex = contextLines.findIndex((line) => cbcalNormalizeText(line) === normalizedText);
+            return {
+                id: String(item?.id || `candidate_${candidateIndex + 1}`),
+                line_index: Number.isFinite(Number(item?.line_index))
+                    ? Number(item.line_index)
+                    : (inferredLineIndex >= 0 ? inferredLineIndex : candidateIndex),
+                text,
+                relevance: String(item?.relevance || 'medium')
+            };
+        });
+
+        const rawTranscript = safeArray(source.transcript_template).map((row) => ({
+            speaker: String(row?.speaker || 'מטפל'),
+            text: String(row?.text || '')
+        }));
+        const transcriptFromMinimal = safeArray(source.transcript).map((row) => ({
+            speaker: String(row?.role || row?.speaker || 'מטפל'),
+            text: String(row?.text || '')
+        }));
+
+        const insideMinimal = source?.chips?.inside;
+        const outsideMinimal = source?.chips?.outside;
+        const insideFull = source?.suggested_chips?.inside_chips;
+        const outsideFull = source?.suggested_chips?.outside_chips;
+
         return {
             id: String(source.id || `cb_case_${index + 1}`),
-            title: String(source.title || `מקרה ${index + 1}`),
-            context_lines: safeArray(source.context_lines).map((line) => String(line)),
-            candidate_sentences: safeArray(source.candidate_sentences).map((item, candidateIndex) => ({
-                id: String(item?.id || `candidate_${candidateIndex + 1}`),
-                line_index: Number.isFinite(Number(item?.line_index)) ? Number(item.line_index) : candidateIndex,
-                text: String(item?.text || ''),
-                relevance: String(item?.relevance || 'medium')
-            })),
+            title: String(source.title || source.topic || `מקרה ${index + 1}`),
+            topic: String(source.topic || ''),
+            difficulty: Number.isFinite(Number(source.difficulty)) ? Number(source.difficulty) : 1,
+            context_lines: contextLines,
+            candidate_sentences: rawCandidates,
             inside_bullets: safeArray(source.inside_bullets).map((line) => String(line)),
             outside_bullets: safeArray(source.outside_bullets).map((line) => String(line)),
             initial_sentence: String(source.initial_sentence || ''),
+            target_balanced_sentence: String(source.target_balanced_sentence || ''),
             suggested_chips: {
-                inside_chips: safeArray(source?.suggested_chips?.inside_chips).map((chip, chipIndex) => ({
-                    id: String(chip?.id || `in_chip_${chipIndex + 1}`),
-                    label: String(chip?.label || chip?.text || `צ׳יפ פנים ${chipIndex + 1}`),
-                    kind: String(chip?.kind || 'append_once'),
-                    text: String(chip?.text || ''),
-                    from: String(chip?.from || ''),
-                    to: String(chip?.to || '')
-                })),
-                outside_chips: safeArray(source?.suggested_chips?.outside_chips).map((chip, chipIndex) => ({
-                    id: String(chip?.id || `out_chip_${chipIndex + 1}`),
-                    label: String(chip?.label || chip?.text || `צ׳יפ חוץ ${chipIndex + 1}`),
-                    kind: String(chip?.kind || 'append_once'),
-                    text: String(chip?.text || ''),
-                    from: String(chip?.from || ''),
-                    to: String(chip?.to || '')
-                }))
+                inside_chips: mapChipArray(insideFull || insideMinimal, 'inside'),
+                outside_chips: mapChipArray(outsideFull || outsideMinimal, 'outside')
             },
-            transcript_template: safeArray(source.transcript_template).map((row) => ({
-                speaker: String(row?.speaker || 'מטפל'),
-                text: String(row?.text || '')
-            }))
+            transcript_template: transcriptFromMinimal.length ? transcriptFromMinimal : rawTranscript
         };
     };
 
@@ -17033,13 +17069,18 @@ async function setupConnectedBubblesTrainer() {
 
     const loadCases = async () => {
         let loaded = [];
-        try {
-            const response = await fetch(CONNECTED_BUBBLES_CASES_URL, { cache: 'no-store' });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const payload = await response.json();
-            if (Array.isArray(payload)) loaded = payload;
-        } catch (_error) {
-            loaded = [];
+        for (const url of CONNECTED_BUBBLES_CASES_URLS) {
+            try {
+                const response = await fetch(url, { cache: 'no-store' });
+                if (!response.ok) continue;
+                const payload = await response.json();
+                if (Array.isArray(payload) && payload.length) {
+                    loaded = payload;
+                    break;
+                }
+            } catch (_error) {
+                // try next source
+            }
         }
         if (!loaded.length) loaded = cbcalFallbackCases();
         state.cases = loaded.map((item, index) => normalizeCaseSeed(item, index));
@@ -17065,11 +17106,9 @@ async function setupConnectedBubblesTrainer() {
         const lineIndex = Number(button.dataset.lineIndex);
         const pickedLine = String(seed.context_lines?.[lineIndex] || '').trim();
         const candidates = Array.isArray(seed.candidate_sentences) ? seed.candidate_sentences : [];
-        const matchedCandidate = candidates.find((item) => {
-            const byIndex = Number(item?.line_index) === lineIndex;
-            const byText = cbcalNormalizeText(String(item?.text || '')) === cbcalNormalizeText(pickedLine);
-            return byIndex || byText;
-        });
+        const matchedCandidate = candidates.find(
+            (item) => cbcalNormalizeText(String(item?.text || '')) === cbcalNormalizeText(pickedLine)
+        );
 
         if (!matchedCandidate) {
             setFeedback('Try again', 'warn');
