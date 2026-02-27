@@ -4315,7 +4315,9 @@ function setupQuestionDrill() {
     setQuestionDrillMode(questionDrillState.mode, { persist: false });
 
     questionDrillState.elements.options?.addEventListener('click', (event) => {
-        const button = event.target.closest('.question-drill-option');
+        const target = event.target instanceof Element ? event.target : null;
+        if (!target) return;
+        const button = target.closest('.question-drill-option');
         if (!button) return;
         setQuestionDrillSelectedOption(String(button.dataset.optionId || ''));
     });
