@@ -1,88 +1,88 @@
 {
-  "generatedAt": "2026-02-26T23:42:36.554Z",
-  "baseUrl": "http://127.0.0.1:4173/index.html",
+  "generatedAt": "2026-02-27T00:37:31.699Z",
+  "baseUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
   "bootstrap": {
     "status": 200,
-    "finalUrl": "http://127.0.0.1:4173/index.html",
+    "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
     "issues": {
       "consoleErrors": [],
       "pageErrors": [],
       "requestFailures": [],
       "topLevelResponses": [
         {
-          "url": "http://127.0.0.1:4173/index.html",
+          "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+          "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+          "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+          "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+          "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+          "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+          "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+          "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+          "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+          "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+          "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+          "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+          "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
-          "status": 200,
+          "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+          "status": 206,
           "method": "GET"
         }
       ],
       "action": {
         "mode": "bootstrap",
-        "targetUrl": "http://127.0.0.1:4173/index.html"
+        "targetUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452"
       }
     }
   },
@@ -96,14 +96,14 @@
   "items": [
     {
       "text": "Classic 1 · Classic Classic",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/classic_classic_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
+      "selector": "a[href=\"https\\:\\/\\/meta-model-app\\.vercel\\.app\\/classic_classic_trainer\\.html\\?v\\=1\\.0\\.58\\&t\\=1772149468115\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.57&t=1772128682560",
+      "intended": "https://meta-model-app.vercel.app/classic_classic_trainer.html?v=1.0.58&t=1772149468115",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.57&t=1772128682560",
+      "finalUrl": "https://meta-model-app.vercel.app/classic_classic_trainer.html?v=1.0.58&t=1772149468115",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -111,77 +111,77 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/classic_classic_trainer.html?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/classic-classic.css?v=1772149237416",
+            "url": "https://meta-model-app.vercel.app/css/classic-classic.css?v=1772152521835",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "url": "https://meta-model-app.vercel.app/js/classic-classic-config.js?v=1772152521835",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/classic-classic-config.js?v=1772149237416",
+            "url": "https://meta-model-app.vercel.app/js/trainer-shell-nav.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/classic-classic-rng.js?v=1772149237416",
+            "url": "https://meta-model-app.vercel.app/css/alchemy-global.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/alchemy-global.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/classic-classic-rng.js?v=1772152521835",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/classic-classic-engine.js?v=1772149237416",
+            "url": "https://meta-model-app.vercel.app/js/classic-classic-engine.js?v=1772152521835",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/classic-classic-app.js?v=1772149237416",
+            "url": "https://meta-model-app.vercel.app/js/classic-classic-app.js?v=1772152521835",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/metaModelPatterns.he.json?v=1772149237416",
+            "url": "https://meta-model-app.vercel.app/data/copy.he.json?v=1772152521835",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/copy.he.json?v=1772149237416",
+            "url": "https://meta-model-app.vercel.app/data/metaModelPatterns.he.json?v=1772152521835",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/classic_classic_trainer.html?v=1.0.57&t=1772128682560"
+          "targetUrl": "https://meta-model-app.vercel.app/classic_classic_trainer.html?v=1.0.58&t=1772149468115"
         }
       }
     },
     {
       "text": "Classic 2 · Structure of Magic",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/classic2_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
+      "selector": "a[href=\"https\\:\\/\\/meta-model-app\\.vercel\\.app\\/classic2_trainer\\.html\\?v\\=1\\.0\\.58\\&t\\=1772149468115\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.57&t=1772128682560",
+      "intended": "https://meta-model-app.vercel.app/classic2_trainer.html?v=1.0.58&t=1772149468115",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.57&t=1772128682560",
+      "finalUrl": "https://meta-model-app.vercel.app/classic2_trainer.html?v=1.0.58&t=1772149468115",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -189,52 +189,52 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/classic2_trainer.html?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "url": "https://meta-model-app.vercel.app/js/trainer-shell-nav.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/version.json?_classic2=1772152523193-iizuhpkfdhj",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/version.json?_classic2=1772149238402-lzagav5m98c",
+            "url": "https://meta-model-app.vercel.app/js/alchemy-global.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/alchemy-global.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/classic2-trainer.bundle.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/classic2-trainer.bundle.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/classic2_trainer.html?v=1.0.57&t=1772128682560"
+          "targetUrl": "https://meta-model-app.vercel.app/classic2_trainer.html?v=1.0.58&t=1772149468115"
         }
       }
     },
     {
       "text": "קצה קרחון / שלדי עומק",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/iceberg_templates_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
+      "selector": "a[href=\"https\\:\\/\\/meta-model-app\\.vercel\\.app\\/iceberg_templates_trainer\\.html\\?v\\=1\\.0\\.58\\&t\\=1772149468115\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.57&t=1772128682560",
+      "intended": "https://meta-model-app.vercel.app/iceberg_templates_trainer.html?v=1.0.58&t=1772149468115",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.57&t=1772128682560",
+      "finalUrl": "https://meta-model-app.vercel.app/iceberg_templates_trainer.html?v=1.0.58&t=1772149468115",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -242,57 +242,57 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/iceberg_templates_trainer.html?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "url": "https://meta-model-app.vercel.app/js/trainer-shell-nav.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/version.json?_iceberg=1772152524520-z2jmsinwo1s",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/version.json?_iceberg=1772149239329-osn33prlnz",
+            "url": "https://meta-model-app.vercel.app/css/alchemy-global.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/alchemy-global.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/iceberg-templates-trainer.bundle.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/iceberg-templates-trainer.bundle.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/iceberg-templates-scenarios.he.json?v=1.0.57-1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/iceberg-templates-scenarios.he.json?v=1.0.58-1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/iceberg_templates_trainer.html?v=1.0.57&t=1772128682560"
+          "targetUrl": "https://meta-model-app.vercel.app/iceberg_templates_trainer.html?v=1.0.58&t=1772149468115"
         }
       }
     },
     {
       "text": "Prism Research · חקירת טקסט",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/prism_research_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
+      "selector": "a[href=\"https\\:\\/\\/meta-model-app\\.vercel\\.app\\/prism_research_trainer\\.html\\?v\\=1\\.0\\.58\\&t\\=1772149468115\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.57&t=1772128682560",
+      "intended": "https://meta-model-app.vercel.app/prism_research_trainer.html?v=1.0.58&t=1772149468115",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.57&t=1772128682560",
+      "finalUrl": "https://meta-model-app.vercel.app/prism_research_trainer.html?v=1.0.58&t=1772149468115",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -300,67 +300,67 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/prism_research_trainer.html?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "url": "https://meta-model-app.vercel.app/css/prism-research.css?v=1772152525684",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-core.js?v=1772152525684",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/prism-research.css?v=1772149240300",
+            "url": "https://meta-model-app.vercel.app/js/trainer-shell-nav.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-core.js?v=1772149240300",
+            "url": "https://meta-model-app.vercel.app/css/alchemy-global.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1772152525684",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1772149240300",
+            "url": "https://meta-model-app.vercel.app/js/alchemy-global.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-app.js?v=1772149240300",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-app.js?v=1772152525684",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/metaModelPatterns.he.json?v=1772149240300",
+            "url": "https://meta-model-app.vercel.app/data/metaModelPatterns.he.json?v=1772152525684",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/prism_research_trainer.html?v=1.0.57&t=1772128682560"
+          "targetUrl": "https://meta-model-app.vercel.app/prism_research_trainer.html?v=1.0.58&t=1772149468115"
         }
       }
     },
     {
       "text": "Living Triples",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/living_triples_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
+      "selector": "a[href=\"https\\:\\/\\/meta-model-app\\.vercel\\.app\\/living_triples_trainer\\.html\\?v\\=1\\.0\\.58\\&t\\=1772149468115\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.57&t=1772128682560",
+      "intended": "https://meta-model-app.vercel.app/living_triples_trainer.html?v=1.0.58&t=1772149468115",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.57&t=1772128682560",
+      "finalUrl": "https://meta-model-app.vercel.app/living_triples_trainer.html?v=1.0.58&t=1772149468115",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -368,57 +368,57 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/living_triples_trainer.html?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "url": "https://meta-model-app.vercel.app/js/trainer-shell-nav.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1772149241306",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1772152527016",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/living-triples.js?v=1772152527016",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/living-triples.js?v=1772149241306",
+            "url": "https://meta-model-app.vercel.app/css/alchemy-global.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/alchemy-global.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/living-triples.json",
+            "url": "https://meta-model-app.vercel.app/data/living-triples.json",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/living_triples_trainer.html?v=1.0.57&t=1772128682560"
+          "targetUrl": "https://meta-model-app.vercel.app/living_triples_trainer.html?v=1.0.58&t=1772149468115"
         }
       }
     },
     {
       "text": "Unzip Trainer",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/verb_unzip_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
+      "selector": "a[href=\"https\\:\\/\\/meta-model-app\\.vercel\\.app\\/verb_unzip_trainer\\.html\\?v\\=1\\.0\\.58\\&t\\=1772149468115\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.57&t=1772128682560",
+      "intended": "https://meta-model-app.vercel.app/verb_unzip_trainer.html?v=1.0.58&t=1772149468115",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.57&t=1772128682560",
+      "finalUrl": "https://meta-model-app.vercel.app/verb_unzip_trainer.html?v=1.0.58&t=1772149468115",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -426,42 +426,42 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/verb_unzip_trainer.html?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "url": "https://meta-model-app.vercel.app/js/trainer-shell-nav.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/alchemy-global.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/alchemy-global.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/verb_unzip_trainer.html?v=1.0.57&t=1772128682560"
+          "targetUrl": "https://meta-model-app.vercel.app/verb_unzip_trainer.html?v=1.0.58&t=1772149468115"
         }
       }
     },
     {
       "text": "Sentence Morpher",
-      "selector": "a[href=\"http\\:\\/\\/127\\.0\\.0\\.1\\:4173\\/sentence_morpher_trainer\\.html\\?v\\=1\\.0\\.57\\&t\\=1772128682560\"]",
+      "selector": "a[href=\"https\\:\\/\\/meta-model-app\\.vercel\\.app\\/sentence_morpher_trainer\\.html\\?v\\=1\\.0\\.58\\&t\\=1772149468115\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.57&t=1772128682560",
+      "intended": "https://meta-model-app.vercel.app/sentence_morpher_trainer.html?v=1.0.58&t=1772149468115",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.57&t=1772128682560",
+      "finalUrl": "https://meta-model-app.vercel.app/sentence_morpher_trainer.html?v=1.0.58&t=1772149468115",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -469,49 +469,49 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/sentence_morpher_trainer.html?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/trainer-shell-nav.js",
+            "url": "https://meta-model-app.vercel.app/js/trainer-shell-nav.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1772149243289",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1772152529584",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/sentence-morpher-core.js?v=1772149243289",
+            "url": "https://meta-model-app.vercel.app/js/sentence-morpher-core.js?v=1772152529584",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/alchemy-global.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/alchemy-global.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/alchemy-global.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/alchemy-global.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/sentence-morpher.js?v=1772149243289",
+            "url": "https://meta-model-app.vercel.app/js/sentence-morpher.js?v=1772152529584",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sentence-morpher-exercises.json",
+            "url": "https://meta-model-app.vercel.app/data/sentence-morpher-exercises.json",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/sentence_morpher_trainer.html?v=1.0.57&t=1772128682560"
+          "targetUrl": "https://meta-model-app.vercel.app/sentence_morpher_trainer.html?v=1.0.58&t=1772149468115"
         }
       }
     },
@@ -519,12 +519,12 @@
       "text": "LP שיפוט חסר מקור",
       "selector": "a[href=\"\\#pattern-lost_performative\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/index.html#pattern-lost_performative",
+      "intended": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-lost_performative",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-lost_performative",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-lost_performative",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -532,79 +532,49 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-lost_performative"
+          "targetUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-lost_performative"
         }
       }
     },
@@ -612,12 +582,12 @@
       "text": "AS הנחות סמויות",
       "selector": "a[href=\"\\#pattern-presupposition\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/index.html#pattern-presupposition",
+      "intended": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-presupposition",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-presupposition",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-presupposition",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -625,79 +595,49 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-presupposition"
+          "targetUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-presupposition"
         }
       }
     },
@@ -705,12 +645,12 @@
       "text": "MR קריאת מחשבות",
       "selector": "a[href=\"\\#pattern-mind_reading\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/index.html#pattern-mind_reading",
+      "intended": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-mind_reading",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-mind_reading",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-mind_reading",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -718,79 +658,49 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-mind_reading"
+          "targetUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-mind_reading"
         }
       }
     },
@@ -798,12 +708,12 @@
       "text": "UQ כמת כוללני",
       "selector": "a[href=\"\\#pattern-universal_quantifier\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/index.html#pattern-universal_quantifier",
+      "intended": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-universal_quantifier",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-universal_quantifier",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-universal_quantifier",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -811,79 +721,49 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-universal_quantifier"
+          "targetUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-universal_quantifier"
         }
       }
     },
@@ -891,12 +771,12 @@
       "text": "MO מודל אופרטור",
       "selector": "a[href=\"\\#pattern-modal_operator\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/index.html#pattern-modal_operator",
+      "intended": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-modal_operator",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-modal_operator",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-modal_operator",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -904,79 +784,49 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-modal_operator"
+          "targetUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-modal_operator"
         }
       }
     },
@@ -984,12 +834,12 @@
       "text": "CE סיבה ותוצאה",
       "selector": "a[href=\"\\#pattern-cause_effect\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/index.html#pattern-cause_effect",
+      "intended": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-cause_effect",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-cause_effect",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-cause_effect",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -997,79 +847,49 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-cause_effect"
+          "targetUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-cause_effect"
         }
       }
     },
@@ -1077,12 +897,12 @@
       "text": "NM נומינליזציה",
       "selector": "a[href=\"\\#pattern-nominalization\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/index.html#pattern-nominalization",
+      "intended": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-nominalization",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-nominalization",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-nominalization",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -1090,79 +910,59 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-nominalization"
+          "targetUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-nominalization"
         }
       }
     },
@@ -1170,12 +970,12 @@
       "text": "CEq שקילות מורכבת",
       "selector": "a[href=\"\\#pattern-complex_equivalence\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/index.html#pattern-complex_equivalence",
+      "intended": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-complex_equivalence",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-complex_equivalence",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-complex_equivalence",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -1183,79 +983,49 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-complex_equivalence"
+          "targetUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-complex_equivalence"
         }
       }
     },
@@ -1263,12 +1033,12 @@
       "text": "CD השוואה חסרה",
       "selector": "a[href=\"\\#pattern-comparative_deletion\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/index.html#pattern-comparative_deletion",
+      "intended": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-comparative_deletion",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-comparative_deletion",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-comparative_deletion",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -1276,79 +1046,49 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-comparative_deletion"
+          "targetUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-comparative_deletion"
         }
       }
     },
@@ -1356,12 +1096,12 @@
       "text": "RI חוסר ייחוס",
       "selector": "a[href=\"\\#pattern-lack_referential_index\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/index.html#pattern-lack_referential_index",
+      "intended": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-lack_referential_index",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-lack_referential_index",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-lack_referential_index",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -1369,79 +1109,49 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-lack_referential_index"
+          "targetUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-lack_referential_index"
         }
       }
     },
@@ -1449,12 +1159,12 @@
       "text": "NN שמות לא מפנים",
       "selector": "a[href=\"\\#pattern-simple_deletion\"]",
       "kind": "anchor",
-      "intended": "http://127.0.0.1:4173/index.html#pattern-simple_deletion",
+      "intended": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-simple_deletion",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html#pattern-simple_deletion",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-simple_deletion",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -1462,79 +1172,39 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://127.0.0.1:4173/index.html#pattern-simple_deletion"
+          "targetUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452#pattern-simple_deletion"
         }
       }
     },
@@ -1567,17 +1237,37 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/repository-dd7b55261c401703.css",
+            "url": "https://github.githubassets.com/assets/dark-b5a0f9dbeed37e9c.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/93110.b26d028ff9f2a8f4.module.css",
+            "url": "https://github.githubassets.com/assets/light-8f714f203754d3e3.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/marketing-navigation.14cc8c51c839d6ba.module.css",
+            "url": "https://github.githubassets.com/assets/global-95af332f763e4560.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/high-contrast-cookie-9c894bc29dbadce2.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/react-core.f83897d176d1739d.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/98212.7b2f822be33480fb.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/github-8ecc5798f0584cac.css",
             "status": 200,
             "method": "GET"
           },
@@ -1592,32 +1282,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/high-contrast-cookie-9c894bc29dbadce2.js",
+            "url": "https://github.githubassets.com/assets/light_high_contrast-852c22d357937740.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/global-95af332f763e4560.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/dark-b5a0f9dbeed37e9c.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/dark_high_contrast-b1b5000c4cba6bc9.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/primer-react-css.472b5991857bf128.module.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/light-8f714f203754d3e3.css",
+            "url": "https://github.githubassets.com/assets/repository-dd7b55261c401703.css",
             "status": 200,
             "method": "GET"
           },
@@ -1627,32 +1297,27 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/react-core.f83897d176d1739d.module.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.githubassets.com/assets/notifications-subscriptions-menu.130413fce3dfbad5.module.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/98212.7b2f822be33480fb.module.css",
+            "url": "https://github.githubassets.com/assets/dark_high_contrast-b1b5000c4cba6bc9.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/light_high_contrast-852c22d357937740.css",
+            "url": "https://github.githubassets.com/assets/93110.b26d028ff9f2a8f4.module.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/github-8ecc5798f0584cac.css",
+            "url": "https://github.githubassets.com/assets/primer-react-css.472b5991857bf128.module.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/28839-632d00a964e8dbd5.js",
+            "url": "https://github.githubassets.com/assets/marketing-navigation.14cc8c51c839d6ba.module.css",
             "status": 200,
             "method": "GET"
           },
@@ -1662,7 +1327,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/environment-81f8ffaec057cc01.js",
+            "url": "https://github.githubassets.com/assets/28839-632d00a964e8dbd5.js",
             "status": 200,
             "method": "GET"
           },
@@ -1677,7 +1342,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/41013-ac21ea90ed8590af.js",
+            "url": "https://github.githubassets.com/assets/environment-81f8ffaec057cc01.js",
             "status": 200,
             "method": "GET"
           },
@@ -1692,12 +1357,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/51210-185739338ae8119b.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/24387-6b7f5e596897eded.js",
+            "url": "https://github.githubassets.com/assets/41013-ac21ea90ed8590af.js",
             "status": 200,
             "method": "GET"
           },
@@ -1707,42 +1367,17 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/46740-84bdd4782a486b80.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.githubassets.com/assets/81683-740d112caee5baa9.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/61110-212553c409076913.js",
+            "url": "https://github.githubassets.com/assets/24387-6b7f5e596897eded.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/81751-d3fe9e061a21f8d3.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/79039-9ce5da88e09eef89.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/react-core-4d91a4784b23bcae.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/element-registry-99507fede2d90420.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/7053-20b4a6914bbde21f.js",
+            "url": "https://github.githubassets.com/assets/51210-185739338ae8119b.js",
             "status": 200,
             "method": "GET"
           },
@@ -1752,7 +1387,22 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/react-lib-e74a1db7c21f7e74.js",
+            "url": "https://github.githubassets.com/assets/46740-84bdd4782a486b80.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/element-registry-99507fede2d90420.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/81751-d3fe9e061a21f8d3.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/7053-20b4a6914bbde21f.js",
             "status": 200,
             "method": "GET"
           },
@@ -1762,7 +1412,22 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/2694-372ce035e93800e0.js",
+            "url": "https://github.githubassets.com/assets/61110-212553c409076913.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/79039-9ce5da88e09eef89.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/react-lib-e74a1db7c21f7e74.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/react-core-4d91a4784b23bcae.js",
             "status": 200,
             "method": "GET"
           },
@@ -1772,37 +1437,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/26533-6b8040883d16f6ae.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/65316-113dcaf2d2180c9e.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/76545-cf3621a1f2f36d8d.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.githubassets.com/assets/28360-f4444f13a0dc6af9.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/22960-12a7c572a55f9c87.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/51683-f6844a8acd415e3b.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/38302-277be92deeed3c63.js",
+            "url": "https://github.githubassets.com/assets/26533-6b8040883d16f6ae.js",
             "status": 200,
             "method": "GET"
           },
@@ -1812,7 +1452,32 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/notifications-global-fc52e59df1c89647.js",
+            "url": "https://github.githubassets.com/assets/22960-12a7c572a55f9c87.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/65316-113dcaf2d2180c9e.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/51683-f6844a8acd415e3b.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/2694-372ce035e93800e0.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/76545-cf3621a1f2f36d8d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/38302-277be92deeed3c63.js",
             "status": 200,
             "method": "GET"
           },
@@ -1822,17 +1487,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/behaviors-e290126a06098a54.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/32225-787d18790ca43912.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/30476-099261a2e3d4cf14.js",
+            "url": "https://github.githubassets.com/assets/codespaces-d828f57ddbc7b41a.js",
             "status": 200,
             "method": "GET"
           },
@@ -1842,42 +1497,22 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/behaviors-e290126a06098a54.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/notifications-global-fc52e59df1c89647.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/89756-e7c55d48f60b581d.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/codespaces-d828f57ddbc7b41a.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/code-menu-ac8ef1c9f2457929.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/99291-ef227718ed886fe7.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/92351-7bc542feb2bc5250.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/68751-4d3d1aac1f81a213.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/repositories-ed3436d1d75fd60f.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/51597-90368bb51b82ae4f.js",
+            "url": "https://github.githubassets.com/assets/32225-787d18790ca43912.js",
             "status": 200,
             "method": "GET"
           },
@@ -1887,17 +1522,17 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/notifications-subscriptions-menu-cb6fee6c5f23d249.js",
+            "url": "https://github.githubassets.com/assets/code-menu-ac8ef1c9f2457929.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/45446-16625b16b5ce1a33.js",
+            "url": "https://github.githubassets.com/assets/68751-4d3d1aac1f81a213.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/93308-bf887482583069d7.js",
+            "url": "https://github.githubassets.com/assets/92351-7bc542feb2bc5250.js",
             "status": 200,
             "method": "GET"
           },
@@ -1907,17 +1542,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/sessions-ef46f0030f2d06d6.js",
+            "url": "https://github.githubassets.com/assets/repositories-ed3436d1d75fd60f.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/primer-react-9537ac79f0a3d832.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/46752-4c55523fe83d3457.js",
+            "url": "https://github.githubassets.com/assets/30476-099261a2e3d4cf14.js",
             "status": 200,
             "method": "GET"
           },
@@ -1927,22 +1557,47 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/99291-ef227718ed886fe7.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/70168.e22cbb4c48f049f8.module.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-51121-6c45293ab72d80a4.js",
+            "url": "https://github.githubassets.com/assets/51597-90368bb51b82ae4f.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-39433-05e4c28439011a7a.js",
+            "url": "https://github.githubassets.com/assets/sessions-ef46f0030f2d06d6.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/62758-a82ebda28357a9b1.js",
+            "url": "https://github.githubassets.com/assets/93308-bf887482583069d7.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/notifications-subscriptions-menu-cb6fee6c5f23d249.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/46752-4c55523fe83d3457.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/45446-16625b16b5ce1a33.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/primer-react-9537ac79f0a3d832.js",
             "status": 200,
             "method": "GET"
           },
@@ -1952,22 +1607,22 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-76725-d7e9aba06d379264.js",
+            "url": "https://github.githubassets.com/assets/62758-a82ebda28357a9b1.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-15640-e7e5ab3105b2e17d.js",
+            "url": "https://github.githubassets.com/assets/chunk-39433-05e4c28439011a7a.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-14451-be95ace004a5c675.js",
+            "url": "https://github.githubassets.com/assets/chunk-51121-6c45293ab72d80a4.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-19008-b161acd372b75775.js",
+            "url": "https://github.githubassets.com/assets/73494-006cc0da9ef70376.js",
             "status": 200,
             "method": "GET"
           },
@@ -1977,7 +1632,22 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/9751-4eacd5880f7fd2f3.js",
+            "url": "https://github.githubassets.com/assets/chunk-76725-d7e9aba06d379264.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-19008-b161acd372b75775.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-14451-be95ace004a5c675.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-3735-ad1b443bf082a03f.js",
             "status": 200,
             "method": "GET"
           },
@@ -1987,7 +1657,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-3735-ad1b443bf082a03f.js",
+            "url": "https://github.githubassets.com/assets/chunk-38631-7a25773e89f0c5a2.js",
             "status": 200,
             "method": "GET"
           },
@@ -2002,17 +1672,17 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/7463-2a94d884e276b7f9.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-15640-e7e5ab3105b2e17d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/71236-7c82c9609b2bcb51.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/73494-006cc0da9ef70376.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/lazy-react-partial-keyboard-shortcuts-dialog-e672d5c77e416a0f.js",
             "status": 200,
             "method": "GET"
           },
@@ -2022,7 +1692,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/7463-2a94d884e276b7f9.js",
+            "url": "https://github.githubassets.com/assets/9751-4eacd5880f7fd2f3.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/lazy-react-partial-keyboard-shortcuts-dialog-e672d5c77e416a0f.js",
             "status": 200,
             "method": "GET"
           },
@@ -2042,12 +1717,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/73945-3ca042c5784812d6.js",
+            "url": "https://github.githubassets.com/assets/99602-8110a1eaf4307aae.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/99849-ddbe5989b6cb6eb0.js",
+            "url": "https://github.githubassets.com/assets/73945-3ca042c5784812d6.js",
             "status": 200,
             "method": "GET"
           },
@@ -2057,7 +1732,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/86071-49c0bf9d4b4f1731.js",
+            "url": "https://github.githubassets.com/assets/78563-887dd48b0f36941b.js",
             "status": 200,
             "method": "GET"
           },
@@ -2067,12 +1742,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/78563-887dd48b0f36941b.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/98212-c974aa4640f78592.js",
+            "url": "https://github.githubassets.com/assets/99849-ddbe5989b6cb6eb0.js",
             "status": 200,
             "method": "GET"
           },
@@ -2082,22 +1752,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/93110-1d724dcbe50c482b.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.githubassets.com/assets/lazy-react-partial-repos-overview-102d9f891f8a2e71.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/chunk-38631-7a25773e89f0c5a2.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/99602-8110a1eaf4307aae.js",
             "status": 200,
             "method": "GET"
           },
@@ -2107,12 +1762,22 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/appearance-settings.2fbde1012bed47de.module.css",
+            "url": "https://github.githubassets.com/assets/86071-49c0bf9d4b4f1731.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-85825-2b0ba509cdf93b03.js",
+            "url": "https://github.githubassets.com/assets/93110-1d724dcbe50c482b.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/98212-c974aa4640f78592.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/appearance-settings.2fbde1012bed47de.module.css",
             "status": 200,
             "method": "GET"
           },
@@ -2127,22 +1792,22 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/60433-bb9743c46ae50de8.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.com/streamDragon/Meta_Model_app/hovercards/citation/sidebar_partial?tree_name=main",
             "status": 204,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/85507.d4fe93c6f4ff9a03.module.css",
+            "url": "https://github.githubassets.com/assets/60433-bb9743c46ae50de8.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/43142-e0ed058b12703a92.js",
+            "url": "https://github.githubassets.com/assets/chunk-85825-2b0ba509cdf93b03.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/85507.d4fe93c6f4ff9a03.module.css",
             "status": 200,
             "method": "GET"
           },
@@ -2152,17 +1817,12 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/43142-e0ed058b12703a92.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.com/streamDragon/Meta_Model_app/branch-and-tag-count",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/88235.93f7ec340fb2b13f.module.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.com/streamDragon/Meta_Model_app/refs?type=branch",
             "status": 200,
             "method": "GET"
           },
@@ -2172,7 +1832,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-88235-fda227c5a1bf1fd6.js",
+            "url": "https://github.com/streamDragon/Meta_Model_app/refs?type=branch",
             "status": 200,
             "method": "GET"
           }
@@ -2530,7 +2190,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -2538,77 +2198,77 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/props/philosopher-guide.svg",
             "status": 200,
             "method": "GET"
           }
@@ -2628,7 +2288,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -2636,77 +2296,77 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/props/philosopher-guide.svg",
             "status": 200,
             "method": "GET"
           }
@@ -2726,7 +2386,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -2734,77 +2394,77 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/props/philosopher-guide.svg",
             "status": 200,
             "method": "GET"
           }
@@ -2824,7 +2484,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -2832,77 +2492,77 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/props/philosopher-guide.svg",
             "status": 200,
             "method": "GET"
           }
@@ -2922,7 +2582,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -2930,82 +2590,82 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
+            "method": "GET"
+          },
+          {
+            "url": "https://meta-model-app.vercel.app/data/triples-radar-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/triples-radar-scenarios.json?v=1.0.57&t=1772128682560",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/props/philosopher-guide.svg",
             "status": 200,
             "method": "GET"
           }
@@ -3025,7 +2685,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -3033,77 +2693,77 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/props/philosopher-guide.svg",
             "status": 200,
             "method": "GET"
           }
@@ -3123,7 +2783,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -3131,107 +2791,107 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
+            "method": "GET"
+          },
+          {
+            "url": "https://meta-model-app.vercel.app/assets/svg/characters/%D7%A0%D7%95%D7%A2%D7%9D.svg",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/props/philosopher-guide.svg",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/characters/%D7%A0%D7%95%D7%A2%D7%9D.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/stickers/badges/%D7%9C%D7%A2%D7%92_%D7%95%D7%94%D7%A9%D7%95%D7%95%D7%90%D7%94.svg",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/characters/%D7%9E%D7%90%D7%99%D7%94.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/stickers/badges/%D7%AA%D7%92%D7%95%D7%91%D7%94_%D7%A0%D7%90%D7%99%D7%91%D7%99%D7%AA.svg",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/stickers/badges/%D7%AA%D7%92%D7%95%D7%91%D7%94_%D7%A0%D7%90%D7%99%D7%91%D7%99%D7%AA.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/characters/%D7%9E%D7%90%D7%99%D7%94.svg",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/stickers/badges/%D7%9C%D7%A2%D7%92_%D7%95%D7%94%D7%A9%D7%95%D7%95%D7%90%D7%94.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/stickers/badges/%D7%A1%D7%A7%D7%A8%D7%A0%D7%95%D7%AA_%D7%9E%D7%98%D7%94_%D7%9E%D7%95%D7%93%D7%9C.svg",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/stickers/badges/%D7%94%D7%A6%D7%9C%D7%94_%D7%91%D7%9E%D7%A7%D7%95%D7%9D.svg",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/svg/stickers/badges/%D7%A1%D7%A7%D7%A8%D7%A0%D7%95%D7%AA_%D7%9E%D7%98%D7%94_%D7%9E%D7%95%D7%93%D7%9C.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/stickers/badges/%D7%94%D7%A6%D7%9C%D7%94_%D7%91%D7%9E%D7%A7%D7%95%D7%9D.svg",
             "status": 200,
             "method": "GET"
           }
@@ -3251,7 +2911,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -3259,77 +2919,77 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
+            "method": "GET"
+          },
+          {
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/props/philosopher-guide.svg",
             "status": 200,
             "method": "GET"
           }
@@ -3349,7 +3009,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -3357,77 +3017,77 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/props/philosopher-guide.svg",
             "status": 200,
             "method": "GET"
           }
@@ -3447,7 +3107,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -3455,77 +3115,77 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/props/philosopher-guide.svg",
             "status": 200,
             "method": "GET"
           }
@@ -3545,7 +3205,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -3553,77 +3213,77 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/props/philosopher-guide.svg",
             "status": 200,
             "method": "GET"
           }
@@ -3643,7 +3303,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -3651,77 +3311,77 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/props/philosopher-guide.svg",
             "status": 200,
             "method": "GET"
           }
@@ -3741,7 +3401,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -3749,73 +3409,73 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
             "method": "GET"
           }
         ],
@@ -4419,7 +4079,7 @@
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://127.0.0.1:4173/index.html",
+      "finalUrl": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -4427,77 +4087,77 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://127.0.0.1:4173/index.html",
+            "url": "https://meta-model-app.vercel.app/index.html?v=1.0.53&t=1772126490452",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/css/style.css?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/css/style.css?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/hebrew-sanitize.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/hebrew-sanitize.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/wr2w-path-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/wr2w-path-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar-core.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar-core.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/prism-research-philosophy.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/prism-research-philosophy.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/nav-map.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/nav-map.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/app.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/app.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/meta-model-violations.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/meta-model-violations.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/sqhcel-dialogues.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/sqhcel-dialogues.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/scenario-trainer-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/scenario-trainer-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/data/comic-scenarios.json?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/data/comic-scenarios.json?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/js/triples-radar.js?v=1.0.57&t=1772128682560",
+            "url": "https://meta-model-app.vercel.app/js/triples-radar.js?v=1.0.58&t=1772149468115",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
+            "url": "https://meta-model-app.vercel.app/assets/audio/The_Inner_Task.mp3",
+            "status": 206,
             "method": "GET"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/svg/props/philosopher-guide.svg",
+            "url": "https://meta-model-app.vercel.app/assets/svg/props/philosopher-guide.svg",
             "status": 200,
             "method": "GET"
           }

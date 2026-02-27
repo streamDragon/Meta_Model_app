@@ -3363,27 +3363,27 @@ const QUESTION_DRILL_CATEGORIES = Object.freeze(['DELETION', 'DISTORTION', 'GENE
 const QUESTION_DRILL_SUCCESS_PLANS = Object.freeze([
     Object.freeze({
         id: 'warmup5',
-        label: 'Warmup 5',
+        label: 'חימום 5',
         rounds: 5,
         targetStars: 6,
         xpPerSuccess: 4,
-        note: 'Short warm-up: build rhythm and accuracy.'
+        note: 'חימום קצר לבניית קצב ודיוק.'
     }),
     Object.freeze({
         id: 'focus8',
-        label: 'Focus 8',
+        label: 'פוקוס 8',
         rounds: 8,
         targetStars: 10,
         xpPerSuccess: 5,
-        note: 'Balanced session for skill building.'
+        note: 'סשן מאוזן לבניית מיומנות.'
     }),
     Object.freeze({
         id: 'sprint12',
-        label: 'Sprint 12',
+        label: 'ספרינט 12',
         rounds: 12,
         targetStars: 15,
         xpPerSuccess: 6,
-        note: 'Longer run with streak bonus potential.'
+        note: 'ריצה ארוכה עם פוטנציאל בונוס רצף.'
     })
 ]);
 
@@ -3449,15 +3449,34 @@ function setQuestionDrillFeedback(text, tone = 'info') {
     feedbackEl.textContent = text || '';
     feedbackEl.dataset.tone = tone;
     triggerPlayfulFeedbackFx(feedbackEl, tone);
+    if (text) {
+        applyOpenedContentFeedback(feedbackEl, revealFeedbackState.lastActionButton);
+    } else {
+        clearOpenedContentFeedback(feedbackEl);
+    }
 }
 
 function populateQuestionDrillPlanSelect() {
     const select = questionDrillState.elements.planSelect;
     if (!select) return;
     select.innerHTML = QUESTION_DRILL_SUCCESS_PLANS.map(plan => (
-        `<option value="${plan.id}">${plan.label} · ${plan.rounds}Q · ⭐${plan.targetStars}</option>`
+        `<option value="${plan.id}">${plan.label} · ${plan.rounds} שאלות · יעד ⭐${plan.targetStars}</option>`
     )).join('');
     select.value = getQuestionDrillPlan(questionDrillState.planId).id;
+}
+
+function localizeQuestionDrillCategoryOptions() {
+    const select = questionDrillState.elements.category;
+    if (!select) return;
+    const labelsByValue = {
+        DELETION: 'מחיקה (Deletion)',
+        DISTORTION: 'עיוות (Distortion)',
+        GENERALIZATION: 'הכללה (Generalization)'
+    };
+    Array.from(select.options || []).forEach((option) => {
+        const nextLabel = labelsByValue[String(option.value || '').toUpperCase()];
+        if (nextLabel) option.textContent = nextLabel;
+    });
 }
 
 function setQuestionDrillMode(mode = 'learning', { persist = true, refreshCurrent = false } = {}) {
@@ -3485,7 +3504,7 @@ function setQuestionDrillMode(mode = 'learning', { persist = true, refreshCurren
             ? 'מבחן: ניסיון אחד לכל סבב, משוב קצר, בלי רמזים.'
             : 'למידה: אפשר לקבל רמזים ולשפר ניסוח לפני המעבר.';
     }
-    if (modeChip) modeChip.textContent = `Mode: ${getQuestionDrillModeLabel(resolved)}`;
+    if (modeChip) modeChip.textContent = `מצב: ${getQuestionDrillModeLabel(resolved)}`;
     if (hintBtn) {
         hintBtn.disabled = resolved === 'exam' || questionDrillState.sessionCompleted || questionDrillState.roundFinalized;
         hintBtn.classList.toggle('is-hidden', resolved === 'exam');
@@ -3511,7 +3530,7 @@ function setQuestionDrillPlan(planId = '', { persist = true } = {}) {
         questionDrillState.elements.planSelect.value = plan.id;
     }
     if (questionDrillState.elements.planChip) {
-        questionDrillState.elements.planChip.textContent = `Plan: ${plan.label}`;
+        questionDrillState.elements.planChip.textContent = `תוכנית: ${plan.label}`;
     }
     if (persist) saveQuestionDrillPrefs();
     updateQuestionDrillSessionUI();
@@ -3571,6 +3590,7 @@ function beginQuestionDrillRound(question) {
     }
 
     if (elements.summary) {
+        clearOpenedContentFeedback(elements.summary);
         elements.summary.classList.add('hidden');
         elements.summary.innerHTML = '';
     }
@@ -3622,37 +3642,37 @@ function updateQuestionDrillSessionUI() {
         questionDrillState.elements.progressFill.style.width = `${progressPct}%`;
     }
     if (questionDrillState.elements.roundChip) {
-        questionDrillState.elements.roundChip.textContent = `Round: ${roundsDone}/${roundsTotal}`;
+        questionDrillState.elements.roundChip.textContent = `סבב: ${roundsDone}/${roundsTotal}`;
     }
     if (questionDrillState.elements.starsChip) {
-        questionDrillState.elements.starsChip.textContent = `Stars: ${questionDrillState.sessionStars}`;
+        questionDrillState.elements.starsChip.textContent = `כוכבים: ${questionDrillState.sessionStars}`;
         questionDrillState.elements.starsChip.classList.toggle('is-goal', targetReached && questionDrillState.sessionCompleted);
     }
     if (questionDrillState.elements.targetChip) {
-        questionDrillState.elements.targetChip.textContent = `Target: ⭐${plan.targetStars}`;
+        questionDrillState.elements.targetChip.textContent = `יעד: ⭐${plan.targetStars}`;
     }
     if (questionDrillState.elements.streakChip) {
-        questionDrillState.elements.streakChip.textContent = `Streak: ${questionDrillState.streak}`;
+        questionDrillState.elements.streakChip.textContent = `רצף: ${questionDrillState.streak}`;
     }
     if (questionDrillState.elements.modeChip) {
-        questionDrillState.elements.modeChip.textContent = `Mode: ${getQuestionDrillModeLabel()}`;
+        questionDrillState.elements.modeChip.textContent = `מצב: ${getQuestionDrillModeLabel()}`;
     }
     if (questionDrillState.elements.planChip) {
-        questionDrillState.elements.planChip.textContent = `Plan: ${plan.label}`;
+        questionDrillState.elements.planChip.textContent = `תוכנית: ${plan.label}`;
     }
     if (questionDrillState.elements.sessionNote) {
         if (questionDrillState.sessionCompleted) {
             questionDrillState.elements.sessionNote.textContent = targetReached
-                ? `Session complete. Success target reached (${questionDrillState.sessionStars}/${plan.targetStars} stars).`
-                : `Session complete. ${questionDrillState.sessionStars}/${plan.targetStars} stars, accuracy ${accuracy}%.`;
+                ? `הסשן הושלם. יעד הכוכבים הושג (${questionDrillState.sessionStars}/${plan.targetStars} כוכבים).`
+                : `הסשן הושלם. ${questionDrillState.sessionStars}/${plan.targetStars} כוכבים, דיוק ${accuracy}%.`;
         } else if (!questionDrillState.sessionActive) {
-            questionDrillState.elements.sessionNote.textContent = `${plan.note} Choose mode and press Start Session.`;
+            questionDrillState.elements.sessionNote.textContent = `${plan.note} בחרו מצב ולחצו "התחל סשן".`;
         } else if (questionDrillState.roundFinalized) {
-            questionDrillState.elements.sessionNote.textContent = `Round ${nextRound > roundsTotal ? roundsTotal : nextRound} is ready. Accuracy ${accuracy}%.`;
+            questionDrillState.elements.sessionNote.textContent = `סבב ${nextRound > roundsTotal ? roundsTotal : nextRound} מוכן. דיוק ${accuracy}%.`;
         } else {
             questionDrillState.elements.sessionNote.textContent = questionDrillState.mode === 'exam'
-                ? 'Exam mode: one answer per round, then move to the next statement.'
-                : 'Learning mode: use feedback/hint to improve before moving on.';
+                ? 'מצב מבחן: תשובה אחת בכל סבב, ואז ממשיכים למשפט הבא.'
+                : 'מצב למידה: השתמשו במשוב/רמז כדי להשתפר לפני המעבר.';
         }
     }
 }
@@ -3753,11 +3773,12 @@ function completeQuestionDrillSession() {
                 <div><small>סבבים נכונים</small><strong>${questionDrillState.roundsCorrect}/${plan.rounds}</strong></div>
                 <div><small>כוכבים</small><strong>${questionDrillState.sessionStars}</strong></div>
                 <div><small>XP</small><strong>${questionDrillState.sessionXP}</strong></div>
-                <div><small>Best Streak</small><strong>${questionDrillState.bestStreak}</strong></div>
-                <div><small>Goal</small><strong>${plan.targetStars}⭐</strong></div>
+                <div><small>רצף שיא</small><strong>${questionDrillState.bestStreak}</strong></div>
+                <div><small>יעד</small><strong>${plan.targetStars}⭐</strong></div>
             </div>
-            ${bonusStars || bonusXP ? `<p class="question-drill-summary-bonus">Bonus: +${bonusStars}⭐ / +${bonusXP} XP</p>` : ''}
+            ${bonusStars || bonusXP ? `<p class="question-drill-summary-bonus">בונוס: +${bonusStars}⭐ / +${bonusXP} XP</p>` : ''}
         `;
+        applyOpenedContentFeedback(summaryEl, revealFeedbackState.lastActionButton);
     }
 
     setQuestionDrillFeedback(
@@ -3967,6 +3988,7 @@ function setupQuestionDrill() {
     };
 
     loadQuestionDrillPrefs();
+    localizeQuestionDrillCategoryOptions();
     populateQuestionDrillPlanSelect();
     setQuestionDrillPlan(questionDrillState.planId, { persist: false });
     setQuestionDrillMode(questionDrillState.mode, { persist: false });
@@ -3996,6 +4018,7 @@ function setupQuestionDrill() {
         if (questionDrillState.elements.statement) questionDrillState.elements.statement.textContent = '';
         if (questionDrillState.elements.input) questionDrillState.elements.input.value = '';
         if (questionDrillState.elements.summary) {
+            clearOpenedContentFeedback(questionDrillState.elements.summary);
             questionDrillState.elements.summary.classList.add('hidden');
             questionDrillState.elements.summary.innerHTML = '';
         }
