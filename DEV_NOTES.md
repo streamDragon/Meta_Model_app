@@ -75,3 +75,48 @@
 - Ran a repository scan for mojibake/replacement-char patterns.
 - Confirmed no `�` replacement characters in `js/`, `css/`, `src/`, `index.html`.
 - Existing heuristics may still flag files with many Hebrew geresh characters (`׳`) as false positives; no actionable broken UTF-8 strings were found in the edited Question Drill flow.
+
+---
+
+# DEV Notes - Connected Bubbles (Sentence Calibration)
+
+## Discovery / placement
+
+- Module container:
+  - `index.html` -> inside `#practice-wizard` added card: `#connected-bubbles-trainer`.
+- Runtime integration:
+  - `js/app.js` bootstrap now calls `setupConnectedBubblesTrainer();` next to other trainers.
+- Styling stack:
+  - Custom CSS in `css/style.css` with `cbcal-*` classes (mobile-first).
+- Data source:
+  - Local JSON: `data/connected-bubbles-cases.json`.
+  - Runtime fallback: `cbcalFallbackCases()` in `js/app.js` if fetch fails.
+
+## What was integrated
+
+- New 3-stage flow:
+  - Intro (10s countdown + skip)
+  - Context (tap a key sentence; non-candidate -> `Try again`)
+  - Connected Bubbles main screen
+- Main screen features:
+  - SVG bubbles (Inside/Outside/Spoken) with motion by match score.
+  - Editable center sentence + chips in two rows (Inside / Outside).
+  - Deterministic dual scoring:
+    - `inside_match` + `outside_match` (0-100)
+    - `Balanced` only when both are 70-85.
+  - Undo stack for chip transforms.
+  - Transcript drawer stays locked until balanced.
+  - Bubble tap opens modal with full bullets.
+
+## Files touched for this module
+
+- `index.html`
+- `css/style.css`
+- `js/app.js`
+- `data/connected-bubbles-cases.json` (new)
+
+## Verification
+
+- `node --check js/app.js`
+- `npm run -s test:ui-wiring`
+- `npm run -s test:mobile`

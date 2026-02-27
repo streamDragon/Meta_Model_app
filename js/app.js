@@ -2959,6 +2959,7 @@ function initializeMetaModelApp() {
         setupTriplesRadarModule();
     }
     setupWrinkleGame();
+    setupConnectedBubblesTrainer();
     setupTrainerMode();
     setupBlueprintBuilder();
     setupPrismModule();
@@ -16300,6 +16301,870 @@ function setupWrinkleGame() {
     resetRoundState();
     render();
     hydrateSeedScenesFromPack();
+}
+
+const CONNECTED_BUBBLES_CASES_URLS = Object.freeze([
+    'src/data/connectedBubblesCases.he.json',
+    'data/connected-bubbles-cases.json'
+]);
+const CONNECTED_BUBBLES_INTRO_SECONDS = 10;
+const CONNECTED_BUBBLES_STOPWORDS = new Set([
+    'אני', 'אתה', 'את', 'הוא', 'היא', 'אנחנו', 'אתם', 'הם', 'הן',
+    'של', 'עם', 'על', 'אל', 'זה', 'זאת', 'הזה', 'הזו', 'יש', 'אין',
+    'כי', 'אם', 'אז', 'אבל', 'גם', 'רק', 'כל', 'לא', 'כן', 'כמו',
+    'לפני', 'אחרי', 'מה', 'מי', 'איך', 'עוד', 'פה', 'שם', 'היום',
+    'שהוא', 'שהיא', 'שאני', 'שזה', 'שיש', 'כאילו'
+]);
+
+function cbcalEscapeHtml(value = '') {
+    if (typeof escapeHtml === 'function') return escapeHtml(String(value || ''));
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function cbcalNormalizeText(value = '') {
+    return String(value || '')
+        .toLowerCase()
+        .replace(/[\u05BE\u05C0-\u05C7'"`~!@#$%^&*()_+\-=[\]{};:,.<>/?|\\]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function cbcalTokenize(text = '') {
+    return cbcalNormalizeText(text)
+        .split(' ')
+        .map((token) => token.trim())
+        .filter((token) => token.length > 1 && !CONNECTED_BUBBLES_STOPWORDS.has(token));
+}
+
+function cbcalCollectKeywords(lines = []) {
+    const set = new Set();
+    (Array.isArray(lines) ? lines : []).forEach((line) => {
+        cbcalTokenize(line).forEach((token) => set.add(token));
+    });
+    return set;
+}
+
+function cbcalAlignmentScore(sentence = '', bullets = [], maxScore = 60) {
+    const sentenceTokens = new Set(cbcalTokenize(sentence));
+    const keywords = cbcalCollectKeywords(bullets);
+    if (!keywords.size || !sentenceTokens.size) return 0;
+    let hits = 0;
+    keywords.forEach((token) => {
+        if (sentenceTokens.has(token)) hits += 1;
+    });
+    const denominator = Math.max(3, Math.min(8, keywords.size));
+    const ratio = Math.max(0, Math.min(1, hits / denominator));
+    return Math.round(ratio * maxScore);
+}
+
+function cbcalHasAny(text = '', regexes = []) {
+    return regexes.some((regex) => regex.test(text));
+}
+
+function cbcalComputeInsideMatch(sentence = '', caseSeed = {}) {
+    const text = cbcalNormalizeText(sentence);
+    const markerChecks = [
+        cbcalHasAny(text, [/אני/, /לי/, /אצלי/, /מרגיש/, /מרגישה/]),
+        cbcalHasAny(text, [/כרגע/, /עכשיו/, /כעת/, /ברגע\s+הזה/]),
+        cbcalHasAny(text, [/בגוף/, /בחזה/, /בבטן/, /נשימה/, /דופק/, /כיווץ/, /כתפיים/]),
+        cbcalHasAny(text, [/פחד/, /לחץ/, /מוצפ/, /עצב/, /כעס/, /בושה/, /אשמה/, /חרדה/]),
+        cbcalHasAny(text, [/בשבילי/, /משמעות/, /זה\s+אומר\s+לי/, /אני\s+מפרש/, /מרגיש\s+ש/])
+    ];
+    const markerScore = markerChecks.filter(Boolean).length * 8;
+    const alignment = cbcalAlignmentScore(sentence, caseSeed.inside_bullets, 60);
+    return Math.max(0, Math.min(100, markerScore + alignment));
+}
+
+function cbcalComputeOutsideMatch(sentence = '', caseSeed = {}) {
+    const text = cbcalNormalizeText(sentence);
+    const hasAbsolute = cbcalHasAny(text, [/תמיד/, /אף\s*פעם/, /כולם/, /אף\s*אחד/, /לגמרי/, /בטוח/]);
+    const markerChecks = [
+        cbcalHasAny(text, [/לפעמים/, /לעיתים/, /בדרך\s+כלל/, /רוב\s+הפעמים/, /חלק\s+מהפעמים/, /לא\s+תמיד/]),
+        cbcalHasAny(text, [/כש/, /כאשר/, /אם/, /בתנאים/, /במצבים/, /בשבוע/, /בבוקר/, /בערב/]),
+        cbcalHasAny(text, [/בפועל/, /מספר/, /תדירות/, /מדד/, /דקות/, /שעות/, /פגישה/, /תגובה/, /הודעה/]),
+        cbcalHasAny(text, [/אפשר\s+לבדוק/, /אפשר\s+למדוד/, /במציאות/, /נצפה/, /בנתונים/]),
+        !hasAbsolute
+    ];
+    const markerScore = markerChecks.filter(Boolean).length * 8;
+    const alignment = cbcalAlignmentScore(sentence, caseSeed.outside_bullets, 60);
+    return Math.max(0, Math.min(100, markerScore + alignment));
+}
+
+function cbcalSoftenAbsolutes(sentence = '') {
+    const replacements = [
+        [/\bתמיד\b/g, 'לעיתים קרובות'],
+        [/\bאף\s*פעם\b/g, 'לא תמיד'],
+        [/\bכולם\b/g, 'חלק מהאנשים'],
+        [/\bאף\s*אחד\b/g, 'לא כל אחד'],
+        [/\bבטוח\b/g, 'יכול להיות'],
+        [/\bהכל\b/g, 'הרבה מהדברים'],
+        [/\bלגמרי\b/g, 'מאוד'],
+        [/\bאין\s+לי\s+סיכוי\b/g, 'כרגע זה מרגיש קשה']
+    ];
+    let next = String(sentence || '');
+    replacements.forEach(([from, to]) => {
+        next = next.replace(from, to);
+    });
+    return next;
+}
+
+function cbcalApplyChipTransform(sentence = '', chip = {}) {
+    const base = String(sentence || '').trim();
+    if (!base) return base;
+    const kind = String(chip.kind || '').trim();
+    const text = String(chip.text || '').trim();
+
+    let next = base;
+    if (kind === 'prepend_once' && text) {
+        if (!cbcalNormalizeText(base).startsWith(cbcalNormalizeText(text))) {
+            next = `${text} ${base}`;
+        }
+    } else if (kind === 'append_once' && text) {
+        if (!cbcalNormalizeText(base).includes(cbcalNormalizeText(text))) {
+            next = `${base} ${text}`;
+        }
+    } else if (kind === 'replace_token') {
+        const from = String(chip.from || '').trim();
+        const to = String(chip.to || '').trim();
+        if (from && to) next = base.replace(new RegExp(from, 'g'), to);
+    } else if (kind === 'replace_phrase') {
+        const from = String(chip.from || '').trim();
+        const to = String(chip.to || '').trim();
+        if (from && to && base.includes(from)) next = base.replace(from, to);
+    } else if (kind === 'add_condition_prefix' && text) {
+        if (!/כש|כאשר|אם/.test(base)) next = `${text} ${base}`;
+    } else if (kind === 'soften_absolutes') {
+        next = cbcalSoftenAbsolutes(base);
+    }
+
+    return next
+        .replace(/\s+/g, ' ')
+        .replace(/\s+([.,!?])/g, '$1')
+        .trim();
+}
+
+function cbcalRenderTranscriptText(text = '') {
+    const canonical = String(text || '')
+        .replace(/<inside>([\s\S]*?)<\/inside>/gi, '[[inside:$1]]')
+        .replace(/<outside>([\s\S]*?)<\/outside>/gi, '[[outside:$1]]');
+    const escaped = cbcalEscapeHtml(canonical);
+    return escaped.replace(/\[\[(inside|outside):([^\]]+)\]\]/g, (_match, kind, value) => {
+        const cls = kind === 'inside' ? 'cbcal-hl cbcal-hl--inside' : 'cbcal-hl cbcal-hl--outside';
+        return `<span class="${cls}">${cbcalEscapeHtml(value)}</span>`;
+    });
+}
+
+function cbcalSentenceSimilarity(a = '', b = '') {
+    const aTokens = new Set(cbcalTokenize(a));
+    const bTokens = new Set(cbcalTokenize(b));
+    if (!aTokens.size || !bTokens.size) return 0;
+    let intersection = 0;
+    aTokens.forEach((token) => {
+        if (bTokens.has(token)) intersection += 1;
+    });
+    const union = new Set([...aTokens, ...bTokens]).size || 1;
+    return intersection / union;
+}
+
+function cbcalIsTargetBalancedSentence(sentence = '', caseSeed = {}) {
+    const target = String(caseSeed?.target_balanced_sentence || '').trim();
+    if (!target) return false;
+    const normalizedSentence = cbcalNormalizeText(sentence);
+    const normalizedTarget = cbcalNormalizeText(target);
+    if (normalizedSentence && normalizedSentence === normalizedTarget) return true;
+    return cbcalSentenceSimilarity(sentence, target) >= 0.72;
+}
+
+function cbcalInferMinimalChipTransform(chip = {}, bucket = 'inside') {
+    const rawLabel = String(chip?.label || '').trim();
+    const rawId = String(chip?.id || '').trim().toUpperCase();
+    const norm = cbcalNormalizeText(rawLabel);
+    const has = (pattern) => pattern.test(norm) || pattern.test(rawId);
+
+    if (bucket === 'inside') {
+        if (has(/OWN|מרגיש/)) return { kind: 'prepend_once', text: 'אני מרגיש/ה ש' };
+        if (has(/NOW|כרגע|בערבים|אחרי/)) return { kind: 'prepend_once', text: 'כרגע ' };
+        if (has(/BODY|בגוף/)) return { kind: 'append_once', text: 'בגוף זה מורגש.' };
+        if (has(/MEAN|אומר לי/)) return { kind: 'append_once', text: 'זה אומר לי ש...' };
+        if (has(/IMPASSE|חסר סיכוי/)) return { kind: 'append_once', text: 'זה מרגיש חסר סיכוי כרגע.' };
+        if (has(/EMO|בושה|פחד|חרדה|ייאוש|אשמה/)) return { kind: 'append_once', text: 'אני מרגיש/ה בושה ופחד.' };
+        if (has(/IMAG|מדמיין/)) return { kind: 'append_once', text: 'אני מדמיין/ת תרחיש קשה.' };
+        if (has(/VOICE|אין סיכוי/)) return { kind: 'append_once', text: 'בפנים עולה הקול: אין סיכוי.' };
+        return { kind: 'append_once', text: rawLabel };
+    }
+
+    if (has(/FREQ|רוב/)) return { kind: 'prepend_once', text: 'ברוב הפעמים ' };
+    if (has(/RATIO|מתוך/)) return { kind: 'append_once', text: 'בערך 3 מתוך 10 פעמים.' };
+    if (has(/COND|כש|בעיקר/)) return { kind: 'add_condition_prefix', text: 'בעיקר כש' };
+    if (has(/OPS|לא עקבי|לא נסגר/)) return { kind: 'append_once', text: 'בפועל זה לא נסגר בעקביות.' };
+    if (has(/TIME|חודשים/)) return { kind: 'append_once', text: 'בחודשים האחרונים.' };
+    if (has(/FACT|עובדה/)) return { kind: 'prepend_once', text: 'העובדה בפועל: ' };
+    if (has(/ALT|ניטרלית/)) return { kind: 'append_once', text: 'יש גם אפשרות ניטרלית.' };
+    if (has(/EVID|ראיה/)) return { kind: 'append_once', text: 'אין כרגע ראיה מפורשת.' };
+    if (has(/CHECK|מה עוד/)) return { kind: 'append_once', text: 'אפשר לבדוק מה עוד נאמר או נעשה.' };
+    if (has(/EXCEPTION|למרות/)) return { kind: 'prepend_once', text: 'למרות ש' };
+    if (has(/SUPPORT|תומך/)) return { kind: 'append_once', text: 'יש תנאי תומך אחד לפחות.' };
+    if (has(/UNKNOWN|לא ידוע/)) return { kind: 'append_once', text: 'העתיד עצמו לא ידוע.' };
+    if (has(/NOTABS|לא מוחלט/)) return { kind: 'soften_absolutes' };
+    if (has(/ANCHOR|עוגן/)) return { kind: 'append_once', text: 'יש עוגן מציאותי שאפשר להישען עליו.' };
+    if (has(/BEHAV|דחייה/)) return { kind: 'append_once', text: 'הדחייה הזו מגבירה את העומס.' };
+    if (has(/PATH|צעדים/)) return { kind: 'append_once', text: 'אפשר להתקדם בצעדים הדרגתיים.' };
+    if (has(/GAP|פער/)) return { kind: 'append_once', text: 'יש פער בין הופעה לחוויה.' };
+    if (has(/FUNC|מתפקד/)) return { kind: 'append_once', text: 'בחוץ אני כן מתפקד.' };
+    if (has(/FACTS|חוב|הכנסה/)) return { kind: 'append_once', text: 'אלה נתונים עובדתיים שאפשר למפות.' };
+    return { kind: 'append_once', text: rawLabel };
+}
+
+function cbcalFallbackCases() {
+    return [
+        {
+            id: 'cb_fallback_01',
+            title: 'כיול עומס קצר',
+            context_lines: [
+                'מטופל: אני תמיד נתקע כשיש עומס.',
+                'מטופל: בגוף זה מרגיש כמו לחץ בחזה.',
+                'מטופל: לפעמים זה קורה בעיקר בבוקר.',
+                'מטפל: נבחר משפט אחד לכיול.'
+            ],
+            candidate_sentences: [
+                { id: 'f1', line_index: 0, text: 'אני תמיד נתקע כשיש עומס.', relevance: 'high' },
+                { id: 'f2', line_index: 1, text: 'בגוף זה מרגיש כמו לחץ בחזה.', relevance: 'medium' },
+                { id: 'f3', line_index: 2, text: 'לפעמים זה קורה בעיקר בבוקר.', relevance: 'medium' }
+            ],
+            inside_bullets: ['כרגע יש לחץ בגוף.', 'יש פחד לאבד שליטה.', 'זה מרגיש אישי ומשמעותי.'],
+            outside_bullets: ['זה מופיע בעיקר כשיש עומס.', 'לא תמיד זה קורה.', 'אפשר לבדוק את תדירות המצבים.'],
+            initial_sentence: 'אני תמיד נתקע והכל קורס.',
+            suggested_chips: {
+                inside_chips: [
+                    { id: 'f_in_1', label: 'כרגע אני מרגיש/ה', kind: 'prepend_once', text: 'כרגע אני מרגיש/ה ש' },
+                    { id: 'f_in_2', label: 'בגוף', kind: 'append_once', text: 'בגוף זה מורגש בחזה ובנשימה.' }
+                ],
+                outside_chips: [
+                    { id: 'f_out_1', label: 'ריכוך מוחלטות', kind: 'soften_absolutes' },
+                    { id: 'f_out_2', label: 'תנאי כש...', kind: 'add_condition_prefix', text: 'כשיש עומס,' }
+                ]
+            },
+            transcript_template: [
+                { speaker: 'מטפל', text: '[[inside:כרגע יש לחץ בגוף]], ו[[outside:זה בעיקר כשיש עומס]].' },
+                { speaker: 'מטופל', text: 'כן... זה זה.' },
+                { speaker: 'מטפל', text: 'A) מציאות/גבולות  B) פנים/ויסות' }
+            ]
+        }
+    ];
+}
+
+async function setupConnectedBubblesTrainer() {
+    const root = document.getElementById('connected-bubbles-trainer');
+    if (!root || root.dataset.connectedBubblesBound === 'true') return;
+    root.dataset.connectedBubblesBound = 'true';
+
+    root.innerHTML = `
+        <div class="cbcal-shell" id="cbcal-shell">
+            <div class="cbcal-top">
+                <div>
+                    <h3>Connected Bubbles - כיול משפט</h3>
+                    <p>Inside + Outside + משפט מדובר: מכיילים עד שהמשפט יושב מדויק על שתי הבועות.</p>
+                </div>
+                <div class="cbcal-top-meta">
+                    <span id="cbcal-stage-chip" class="cbcal-stage-chip">Intro</span>
+                    <button id="cbcal-new-case" type="button" class="btn btn-secondary">מקרה חדש</button>
+                </div>
+            </div>
+
+            <section id="cbcal-screen-intro" class="cbcal-screen">
+                <div class="cbcal-intro-box">
+                    <h4>הסבר קצר</h4>
+                    <p>נציג Inside ו-Outside. התפקיד שלך: לכייל את המשפט כך שיתאים לשני הצדדים בלי הגזמה ובלי השמטה.</p>
+                    <p id="cbcal-intro-case" class="cbcal-feedback">טוען מקרה...</p>
+                    <div class="cbcal-intro-footer">
+                        <span id="cbcal-countdown" class="cbcal-countdown">10 שניות</span>
+                        <button id="cbcal-skip-intro" class="btn btn-secondary" type="button">דלג</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="cbcal-screen-context" class="cbcal-screen hidden">
+                <div class="cbcal-context-box">
+                    <h4>מסך הקשר</h4>
+                    <p>בחר/י משפט מפתח מתוך הדיאלוג. אם לא בחרת משפט מועמד תקבל/י: Try again.</p>
+                    <div id="cbcal-lines" class="cbcal-lines"></div>
+                </div>
+            </section>
+
+            <section id="cbcal-screen-main" class="cbcal-screen hidden">
+                <div class="cbcal-stage">
+                    <div class="cbcal-visual">
+                        <svg class="cbcal-svg" viewBox="0 0 1000 280" role="img" aria-label="Connected bubbles">
+                            <defs>
+                                <linearGradient id="cbcalInsideGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#fdf2f8"></stop><stop offset="100%" stop-color="#fce7f3"></stop></linearGradient>
+                                <linearGradient id="cbcalOutsideGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ecfeff"></stop><stop offset="100%" stop-color="#ccfbf1"></stop></linearGradient>
+                                <linearGradient id="cbcalCenterGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#eff6ff"></stop><stop offset="100%" stop-color="#dbeafe"></stop></linearGradient>
+                            </defs>
+                            <path d="M210 146 C320 118, 410 118, 500 138" stroke="#c7d2fe" stroke-width="4" fill="none"></path>
+                            <path d="M790 146 C680 118, 590 118, 500 138" stroke="#99f6e4" stroke-width="4" fill="none"></path>
+                            <g id="cbcal-svg-inside">
+                                <circle cx="170" cy="146" r="86" fill="url(#cbcalInsideGrad)" stroke="#f5c8dc" stroke-width="3"></circle>
+                                <text x="170" y="140" text-anchor="middle" fill="#9d174d" font-size="22" font-weight="800">INSIDE</text>
+                                <text x="170" y="165" text-anchor="middle" fill="#be185d" font-size="16" font-weight="700">פנים/גוף</text>
+                            </g>
+                            <g id="cbcal-svg-center">
+                                <circle cx="500" cy="146" r="66" fill="url(#cbcalCenterGrad)" stroke="#93c5fd" stroke-width="3"></circle>
+                                <text x="500" y="146" text-anchor="middle" fill="#1d4ed8" font-size="20" font-weight="800">SPOKEN</text>
+                            </g>
+                            <g id="cbcal-svg-outside">
+                                <circle cx="830" cy="146" r="86" fill="url(#cbcalOutsideGrad)" stroke="#7dd3c7" stroke-width="3"></circle>
+                                <text x="830" y="140" text-anchor="middle" fill="#0f766e" font-size="22" font-weight="800">OUTSIDE</text>
+                                <text x="830" y="165" text-anchor="middle" fill="#0f766e" font-size="16" font-weight="700">חוץ/מציאות</text>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <div class="cbcal-bubble-row">
+                        <button id="cbcal-inside-bubble" class="cbcal-bubble-btn cbcal-bubble-btn--inside" type="button">
+                            <h5>Inside - לב/גוף</h5>
+                            <ul id="cbcal-inside-preview"></ul>
+                        </button>
+                        <button id="cbcal-outside-bubble" class="cbcal-bubble-btn cbcal-bubble-btn--outside" type="button">
+                            <h5>Outside - חוץ/מציאות</h5>
+                            <ul id="cbcal-outside-preview"></ul>
+                        </button>
+                    </div>
+
+                    <div class="cbcal-center-card">
+                        <label for="cbcal-sentence-input">Spoken Sentence / משפט מדובר</label>
+                        <textarea id="cbcal-sentence-input" class="cbcal-sentence-input" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="cbcal-chip-rows">
+                    <div class="cbcal-chip-row">
+                        <div class="cbcal-chip-row-head">
+                            <strong>Row A - Add to Inside</strong>
+                            <button id="cbcal-undo-btn" class="btn btn-secondary" type="button">Undo</button>
+                        </div>
+                        <div id="cbcal-inside-chips" class="cbcal-chip-list"></div>
+                    </div>
+                    <div class="cbcal-chip-row">
+                        <div class="cbcal-chip-row-head"><strong>Row B - Calibrate Outside</strong></div>
+                        <div id="cbcal-outside-chips" class="cbcal-chip-list"></div>
+                    </div>
+                </div>
+
+                <div class="cbcal-meter">
+                    <div class="cbcal-meter-row">
+                        <div class="cbcal-meter-row-head"><span>InsideMatch</span><strong id="cbcal-inside-score">0%</strong></div>
+                        <div class="cbcal-meter-track"><span id="cbcal-inside-fill" class="cbcal-meter-fill cbcal-meter-fill--inside"></span></div>
+                    </div>
+                    <div class="cbcal-meter-row">
+                        <div class="cbcal-meter-row-head"><span>OutsideMatch</span><strong id="cbcal-outside-score">0%</strong></div>
+                        <div class="cbcal-meter-track"><span id="cbcal-outside-fill" class="cbcal-meter-fill cbcal-meter-fill--outside"></span></div>
+                    </div>
+                    <div id="cbcal-balanced-pill" class="cbcal-balanced-pill">Balanced: עדיין לא</div>
+                </div>
+
+                <div class="cbcal-transcript-wrap">
+                    <button id="cbcal-transcript-btn" class="btn btn-primary" type="button" disabled>Show Transcript (real-life)</button>
+                    <details id="cbcal-transcript" class="cbcal-transcript hidden">
+                        <summary>תמלול חיים אמיתיים</summary>
+                        <div id="cbcal-transcript-body" class="cbcal-transcript-body"></div>
+                    </details>
+                </div>
+            </section>
+
+            <p id="cbcal-feedback" class="cbcal-feedback" data-tone="info"></p>
+        </div>
+
+        <div id="cbcal-modal" class="cbcal-modal hidden" aria-modal="true" role="dialog">
+            <div class="cbcal-modal-card">
+                <div class="cbcal-chip-row-head">
+                    <h4 id="cbcal-modal-title">פירוט בועה</h4>
+                    <button id="cbcal-modal-close" type="button" class="btn btn-secondary">סגור</button>
+                </div>
+                <ul id="cbcal-modal-list"></ul>
+            </div>
+        </div>
+    `;
+
+    const els = {
+        shell: document.getElementById('cbcal-shell'),
+        stageChip: document.getElementById('cbcal-stage-chip'),
+        newCaseBtn: document.getElementById('cbcal-new-case'),
+        introScreen: document.getElementById('cbcal-screen-intro'),
+        introCase: document.getElementById('cbcal-intro-case'),
+        countdown: document.getElementById('cbcal-countdown'),
+        skipIntroBtn: document.getElementById('cbcal-skip-intro'),
+        contextScreen: document.getElementById('cbcal-screen-context'),
+        lines: document.getElementById('cbcal-lines'),
+        mainScreen: document.getElementById('cbcal-screen-main'),
+        insideBubble: document.getElementById('cbcal-inside-bubble'),
+        outsideBubble: document.getElementById('cbcal-outside-bubble'),
+        insidePreview: document.getElementById('cbcal-inside-preview'),
+        outsidePreview: document.getElementById('cbcal-outside-preview'),
+        sentenceInput: document.getElementById('cbcal-sentence-input'),
+        insideChips: document.getElementById('cbcal-inside-chips'),
+        outsideChips: document.getElementById('cbcal-outside-chips'),
+        undoBtn: document.getElementById('cbcal-undo-btn'),
+        insideScore: document.getElementById('cbcal-inside-score'),
+        outsideScore: document.getElementById('cbcal-outside-score'),
+        insideFill: document.getElementById('cbcal-inside-fill'),
+        outsideFill: document.getElementById('cbcal-outside-fill'),
+        balancedPill: document.getElementById('cbcal-balanced-pill'),
+        transcriptBtn: document.getElementById('cbcal-transcript-btn'),
+        transcript: document.getElementById('cbcal-transcript'),
+        transcriptBody: document.getElementById('cbcal-transcript-body'),
+        feedback: document.getElementById('cbcal-feedback'),
+        svgInside: document.getElementById('cbcal-svg-inside'),
+        svgOutside: document.getElementById('cbcal-svg-outside'),
+        modal: document.getElementById('cbcal-modal'),
+        modalTitle: document.getElementById('cbcal-modal-title'),
+        modalList: document.getElementById('cbcal-modal-list'),
+        modalClose: document.getElementById('cbcal-modal-close')
+    };
+    if (!els.shell || !els.mainScreen || !els.lines) return;
+
+    const state = {
+        cases: [],
+        index: 0,
+        stage: 'intro',
+        introLeft: CONNECTED_BUBBLES_INTRO_SECONDS,
+        introTimer: null,
+        sentence: '',
+        history: [],
+        insideMatch: 0,
+        outsideMatch: 0,
+        balanced: false,
+        lastBalanced: false
+    };
+
+    const currentCase = () => state.cases[state.index] || null;
+    const clearIntroTimer = () => {
+        if (state.introTimer) {
+            clearInterval(state.introTimer);
+            state.introTimer = null;
+        }
+    };
+
+    const setFeedback = (message, tone = 'info') => {
+        if (!els.feedback) return;
+        els.feedback.textContent = String(message || '');
+        els.feedback.dataset.tone = tone;
+        if (typeof applyOpenedContentFeedback === 'function') {
+            applyOpenedContentFeedback(els.feedback, revealFeedbackState?.lastActionButton || null);
+        }
+    };
+
+    const stageLabels = {
+        intro: 'Intro',
+        context: 'Context',
+        main: 'Connected Bubbles'
+    };
+
+    const setStage = (stage) => {
+        state.stage = stage;
+        if (els.stageChip) els.stageChip.textContent = stageLabels[stage] || stage;
+        els.introScreen?.classList.toggle('hidden', stage !== 'intro');
+        els.contextScreen?.classList.toggle('hidden', stage !== 'context');
+        els.mainScreen?.classList.toggle('hidden', stage !== 'main');
+    };
+
+    const updateBalance = () => {
+        const seed = currentCase();
+        if (!seed) return;
+
+        state.insideMatch = cbcalComputeInsideMatch(state.sentence, seed);
+        state.outsideMatch = cbcalComputeOutsideMatch(state.sentence, seed);
+        state.balanced = state.insideMatch >= 70
+            && state.outsideMatch >= 70
+            && state.insideMatch <= 85
+            && state.outsideMatch <= 85;
+
+        if (els.insideScore) els.insideScore.textContent = `${state.insideMatch}%`;
+        if (els.outsideScore) els.outsideScore.textContent = `${state.outsideMatch}%`;
+        if (els.insideFill) els.insideFill.style.width = `${Math.max(0, Math.min(100, state.insideMatch))}%`;
+        if (els.outsideFill) els.outsideFill.style.width = `${Math.max(0, Math.min(100, state.outsideMatch))}%`;
+        if (els.balancedPill) {
+            els.balancedPill.textContent = state.balanced
+                ? 'Balanced: It sits / נושם'
+                : 'Balanced: עדיין לא (יעד 70-85 לכל צד)';
+        }
+        if (els.transcriptBtn) els.transcriptBtn.disabled = !state.balanced;
+        if (els.transcript) {
+            els.transcript.classList.toggle('hidden', !state.balanced);
+            if (!state.balanced) els.transcript.open = false;
+        }
+        if (els.undoBtn) els.undoBtn.disabled = state.history.length === 0;
+        if (els.shell) els.shell.classList.toggle('is-balanced', state.balanced);
+
+        const insideShift = Math.round((state.insideMatch - 50) / 6);
+        const outsideShift = Math.round((state.outsideMatch - 50) / 6);
+        if (els.svgInside) els.svgInside.style.transform = `translate(${insideShift}px, ${Math.round(-insideShift * 0.25)}px)`;
+        if (els.svgOutside) els.svgOutside.style.transform = `translate(${-outsideShift}px, ${Math.round(outsideShift * 0.25)}px)`;
+
+        if (state.balanced && !state.lastBalanced) {
+            setFeedback('איזון הושג. אפשר לפתוח תמלול חיים אמיתיים.', 'success');
+        } else if (!state.balanced && state.lastBalanced) {
+            setFeedback('האיזון ירד מעט. המשיכו לכייל עד שני הצדדים בטווח.', 'info');
+        }
+        state.lastBalanced = state.balanced;
+    };
+
+    const renderPreview = (target, lines = []) => {
+        if (!target) return;
+        const list = (Array.isArray(lines) ? lines : []).slice(0, 2);
+        target.innerHTML = list.map((line) => `<li>${cbcalEscapeHtml(String(line || ''))}</li>`).join('');
+    };
+
+    const renderChips = () => {
+        const seed = currentCase();
+        if (!seed) return;
+
+        const renderRow = (target, chips, bucket) => {
+            if (!target) return;
+            target.innerHTML = '';
+            (Array.isArray(chips) ? chips : []).forEach((chip, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'cbcal-chip';
+                button.dataset.bucket = bucket;
+                button.dataset.chipIndex = String(index);
+                button.textContent = String(chip?.label || chip?.text || `Chip ${index + 1}`);
+                target.appendChild(button);
+            });
+        };
+
+        renderRow(els.insideChips, seed?.suggested_chips?.inside_chips, 'inside');
+        renderRow(els.outsideChips, seed?.suggested_chips?.outside_chips, 'outside');
+    };
+
+    const renderTranscript = () => {
+        const seed = currentCase();
+        if (!seed || !els.transcriptBody) return;
+        const lines = (Array.isArray(seed.transcript_template) ? seed.transcript_template : []).map((row) => {
+            const speaker = cbcalEscapeHtml(String(row?.speaker || ''));
+            const text = cbcalRenderTranscriptText(String(row?.text || ''));
+            return `<p class="cbcal-transcript-line"><strong>${speaker}:</strong> ${text}</p>`;
+        });
+        els.transcriptBody.innerHTML = lines.join('');
+    };
+
+    const openModal = (title, bullets = []) => {
+        if (!els.modal || !els.modalTitle || !els.modalList) return;
+        els.modalTitle.textContent = title;
+        els.modalList.innerHTML = '';
+        (Array.isArray(bullets) ? bullets : []).forEach((line) => {
+            const item = document.createElement('li');
+            item.textContent = String(line || '');
+            els.modalList.appendChild(item);
+        });
+        els.modal.classList.remove('hidden');
+        document.body.classList.add('no-scroll');
+    };
+
+    const closeModal = () => {
+        if (!els.modal) return;
+        els.modal.classList.add('hidden');
+        document.body.classList.remove('no-scroll');
+    };
+
+    const resetMainState = (sentenceText = '') => {
+        state.sentence = String(sentenceText || '').trim();
+        state.history = [];
+        state.insideMatch = 0;
+        state.outsideMatch = 0;
+        state.balanced = false;
+        state.lastBalanced = false;
+        if (els.sentenceInput) els.sentenceInput.value = state.sentence;
+        if (els.transcript) {
+            els.transcript.open = false;
+            els.transcript.classList.add('hidden');
+        }
+        if (els.transcriptBtn) els.transcriptBtn.disabled = true;
+    };
+
+    const setSentence = (nextSentence, options = {}) => {
+        const next = String(nextSentence || '').replace(/\s+/g, ' ').trim();
+        const pushHistory = options.pushHistory !== false;
+        if (!next || next === state.sentence) return false;
+        if (pushHistory && state.sentence) {
+            state.history.push(state.sentence);
+            if (state.history.length > 24) state.history.shift();
+        }
+        state.sentence = next;
+        if (els.sentenceInput) els.sentenceInput.value = next;
+        updateBalance();
+        return true;
+    };
+
+    const renderContext = () => {
+        const seed = currentCase();
+        if (!seed || !els.lines) return;
+
+        const candidateIndices = new Set(
+            (Array.isArray(seed.candidate_sentences) ? seed.candidate_sentences : [])
+                .map((item) => Number(item?.line_index))
+                .filter((value) => Number.isFinite(value))
+        );
+
+        els.lines.innerHTML = '';
+        (Array.isArray(seed.context_lines) ? seed.context_lines : []).forEach((line, index) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'cbcal-line-btn';
+            if (candidateIndices.has(index)) button.classList.add('is-candidate');
+            button.dataset.lineIndex = String(index);
+            button.textContent = String(line || '');
+            els.lines.appendChild(button);
+        });
+    };
+
+    const startContextStage = () => {
+        clearIntroTimer();
+        setStage('context');
+        renderContext();
+        setFeedback('בחר/י משפט מפתח. אם לא מתאים תקבל/י Try again.', 'info');
+    };
+
+    const moveToMain = (pickedLine = '') => {
+        const seed = currentCase();
+        if (!seed) return;
+        const seedSentence = String(seed.initial_sentence || pickedLine || '').trim();
+        resetMainState(seedSentence);
+        renderPreview(els.insidePreview, seed.inside_bullets);
+        renderPreview(els.outsidePreview, seed.outside_bullets);
+        renderChips();
+        renderTranscript();
+        setStage('main');
+        updateBalance();
+        setFeedback('בחרו צ׳יפים כדי לכייל את המשפט עד איזון דו-צדדי.', 'info');
+    };
+
+    const renderIntro = () => {
+        const seed = currentCase();
+        if (!seed) return;
+        if (els.introCase) {
+            els.introCase.textContent = seed.title ? `מקרה: ${seed.title}` : 'מקרה מוכן לתרגול.';
+        }
+        if (els.countdown) {
+            els.countdown.textContent = `${state.introLeft} שניות`;
+        }
+    };
+
+    const startIntroCountdown = () => {
+        clearIntroTimer();
+        state.introLeft = CONNECTED_BUBBLES_INTRO_SECONDS;
+        setStage('intro');
+        renderIntro();
+        state.introTimer = setInterval(() => {
+            state.introLeft -= 1;
+            if (state.introLeft <= 0) {
+                state.introLeft = 0;
+                renderIntro();
+                startContextStage();
+                return;
+            }
+            renderIntro();
+        }, 1000);
+    };
+
+    const normalizeCaseSeed = (raw, index) => {
+        const source = raw && typeof raw === 'object' ? raw : {};
+        const safeArray = (value) => (Array.isArray(value) ? value.filter(Boolean) : []);
+        return {
+            id: String(source.id || `cb_case_${index + 1}`),
+            title: String(source.title || `מקרה ${index + 1}`),
+            context_lines: safeArray(source.context_lines).map((line) => String(line)),
+            candidate_sentences: safeArray(source.candidate_sentences).map((item, candidateIndex) => ({
+                id: String(item?.id || `candidate_${candidateIndex + 1}`),
+                line_index: Number.isFinite(Number(item?.line_index)) ? Number(item.line_index) : candidateIndex,
+                text: String(item?.text || ''),
+                relevance: String(item?.relevance || 'medium')
+            })),
+            inside_bullets: safeArray(source.inside_bullets).map((line) => String(line)),
+            outside_bullets: safeArray(source.outside_bullets).map((line) => String(line)),
+            initial_sentence: String(source.initial_sentence || ''),
+            suggested_chips: {
+                inside_chips: safeArray(source?.suggested_chips?.inside_chips).map((chip, chipIndex) => ({
+                    id: String(chip?.id || `in_chip_${chipIndex + 1}`),
+                    label: String(chip?.label || chip?.text || `צ׳יפ פנים ${chipIndex + 1}`),
+                    kind: String(chip?.kind || 'append_once'),
+                    text: String(chip?.text || ''),
+                    from: String(chip?.from || ''),
+                    to: String(chip?.to || '')
+                })),
+                outside_chips: safeArray(source?.suggested_chips?.outside_chips).map((chip, chipIndex) => ({
+                    id: String(chip?.id || `out_chip_${chipIndex + 1}`),
+                    label: String(chip?.label || chip?.text || `צ׳יפ חוץ ${chipIndex + 1}`),
+                    kind: String(chip?.kind || 'append_once'),
+                    text: String(chip?.text || ''),
+                    from: String(chip?.from || ''),
+                    to: String(chip?.to || '')
+                }))
+            },
+            transcript_template: safeArray(source.transcript_template).map((row) => ({
+                speaker: String(row?.speaker || 'מטפל'),
+                text: String(row?.text || '')
+            }))
+        };
+    };
+
+    const chooseNextIndex = () => {
+        if (state.cases.length <= 1) return 0;
+        let next = state.index;
+        while (next === state.index) {
+            next = Math.floor(Math.random() * state.cases.length);
+        }
+        return next;
+    };
+
+    const startCase = (index = 0, source = 'initial') => {
+        if (!state.cases.length) return;
+        state.index = Math.max(0, Math.min(state.cases.length - 1, Number(index) || 0));
+        resetMainState('');
+        startIntroCountdown();
+        if (source === 'new') {
+            setFeedback('נטען מקרה חדש. מתחילים ב-Intro.', 'info');
+        }
+    };
+
+    const loadCases = async () => {
+        let loaded = [];
+        try {
+            const response = await fetch(CONNECTED_BUBBLES_CASES_URL, { cache: 'no-store' });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const payload = await response.json();
+            if (Array.isArray(payload)) loaded = payload;
+        } catch (_error) {
+            loaded = [];
+        }
+        if (!loaded.length) loaded = cbcalFallbackCases();
+        state.cases = loaded.map((item, index) => normalizeCaseSeed(item, index));
+        if (!state.cases.length) {
+            state.cases = cbcalFallbackCases().map((item, index) => normalizeCaseSeed(item, index));
+        }
+    };
+
+    els.skipIntroBtn?.addEventListener('click', () => {
+        startContextStage();
+    });
+
+    els.newCaseBtn?.addEventListener('click', () => {
+        startCase(chooseNextIndex(), 'new');
+    });
+
+    els.lines?.addEventListener('click', (event) => {
+        const button = event.target instanceof Element ? event.target.closest('.cbcal-line-btn') : null;
+        if (!button) return;
+        const seed = currentCase();
+        if (!seed) return;
+
+        const lineIndex = Number(button.dataset.lineIndex);
+        const pickedLine = String(seed.context_lines?.[lineIndex] || '').trim();
+        const candidates = Array.isArray(seed.candidate_sentences) ? seed.candidate_sentences : [];
+        const matchedCandidate = candidates.find((item) => {
+            const byIndex = Number(item?.line_index) === lineIndex;
+            const byText = cbcalNormalizeText(String(item?.text || '')) === cbcalNormalizeText(pickedLine);
+            return byIndex || byText;
+        });
+
+        if (!matchedCandidate) {
+            setFeedback('Try again', 'warn');
+            return;
+        }
+        moveToMain(pickedLine);
+    });
+
+    els.sentenceInput?.addEventListener('input', (event) => {
+        state.sentence = String(event?.target?.value || '');
+        updateBalance();
+    });
+
+    const handleChipClick = (event) => {
+        const chipButton = event.target instanceof Element ? event.target.closest('.cbcal-chip') : null;
+        if (!chipButton) return;
+        const seed = currentCase();
+        if (!seed) return;
+        const chipIndex = Number(chipButton.dataset.chipIndex);
+        const bucket = String(chipButton.dataset.bucket || '');
+        const chips = bucket === 'inside'
+            ? seed?.suggested_chips?.inside_chips
+            : seed?.suggested_chips?.outside_chips;
+        const chip = Array.isArray(chips) ? chips[chipIndex] : null;
+        if (!chip) return;
+
+        const nextSentence = cbcalApplyChipTransform(state.sentence, chip);
+        if (!nextSentence || nextSentence === state.sentence) {
+            setFeedback('הצ׳יפ הזה כבר מגולם במשפט.', 'info');
+            return;
+        }
+        setSentence(nextSentence, { pushHistory: true });
+    };
+
+    els.insideChips?.addEventListener('click', handleChipClick);
+    els.outsideChips?.addEventListener('click', handleChipClick);
+
+    els.undoBtn?.addEventListener('click', () => {
+        if (!state.history.length) return;
+        const previous = state.history.pop();
+        if (!previous) return;
+        state.sentence = previous;
+        if (els.sentenceInput) els.sentenceInput.value = previous;
+        updateBalance();
+    });
+
+    els.insideBubble?.addEventListener('click', () => {
+        const seed = currentCase();
+        if (!seed) return;
+        openModal('Inside - פנים/גוף', seed.inside_bullets);
+    });
+
+    els.outsideBubble?.addEventListener('click', () => {
+        const seed = currentCase();
+        if (!seed) return;
+        openModal('Outside - חוץ/מציאות', seed.outside_bullets);
+    });
+
+    els.modalClose?.addEventListener('click', () => {
+        closeModal();
+    });
+
+    els.modal?.addEventListener('click', (event) => {
+        if (event.target === els.modal) closeModal();
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        if (!els.modal?.classList.contains('hidden')) closeModal();
+    });
+
+    els.transcriptBtn?.addEventListener('click', () => {
+        if (!state.balanced) {
+            setFeedback('התמלול נפתח רק אחרי איזון שני הצדדים.', 'warn');
+            return;
+        }
+        if (!els.transcript) return;
+        els.transcript.classList.remove('hidden');
+        els.transcript.open = true;
+        const summary = els.transcript.querySelector('summary');
+        if (summary && typeof applyOpenedContentFeedback === 'function') {
+            applyOpenedContentFeedback(els.transcript, summary);
+        }
+        els.transcript.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    els.transcript?.addEventListener('toggle', () => {
+        if (!state.balanced && els.transcript) {
+            els.transcript.open = false;
+            els.transcript.classList.add('hidden');
+        }
+    });
+
+    await loadCases();
+    startCase(0, 'initial');
 }
 
 
