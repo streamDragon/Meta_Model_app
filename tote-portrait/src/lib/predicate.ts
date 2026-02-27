@@ -107,4 +107,3 @@ export const defaultNormalizedVerb = (predicateType: PredicateType, text: string
 
   return predicate || 'לעשות פעולה';
 };
-

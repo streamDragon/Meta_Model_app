@@ -1,7 +1,7 @@
 {
   "name": "meta_model_app",
-  "version": "1.0.63",
-  "description": "׳›׳׳™ ׳׳™׳ ׳˜׳¨׳ ׳˜ ׳׳™׳ ׳˜׳¨׳׳§׳˜׳™׳‘׳™ ׳׳×׳¨׳’׳•׳ ׳˜׳›׳ ׳™׳§׳•׳× **Meta Model** ׳©׳ NLP (Neuro-Linguistic Programming) ׳¢׳ ׳₪׳™ Richard Bandler ׳•-John Grinder.",
+  "version": "1.0.64",
+  "description": "כלי אינטרנט אינטראקטיבי לתרגול טכניקות **Meta Model** של NLP (Neuro-Linguistic Programming) על פי Richard Bandler ו-John Grinder.",
   "main": "index.js",
   "directories": {
     "doc": "docs"

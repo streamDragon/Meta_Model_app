@@ -1,20 +1,80 @@
 {
   "categories": [
-    { "id": "lost_performative", "label": "Lost Performative", "labelHe": "שיפוט חסר מקור" },
-    { "id": "assumptions", "label": "Assumptions", "labelHe": "הנחות סמויות" },
-    { "id": "mind_reading", "label": "Mind Reading", "labelHe": "קריאת מחשבות" },
-    { "id": "universal_quantifier", "label": "Universal Quantifier", "labelHe": "כמת כוללני" },
-    { "id": "modal_operator", "label": "Modal Operator", "labelHe": "מודל אופרטור" },
-    { "id": "cause_effect", "label": "Cause & Effect", "labelHe": "סיבה ותוצאה" },
-    { "id": "nominalisations", "label": "Nominalisations", "labelHe": "נומינליזציה" },
-    { "id": "identity_predicates", "label": "Identity Predicates", "labelHe": "זהות" },
-    { "id": "complex_equivalence", "label": "Complex Equivalence", "labelHe": "שקילות מורכבת" },
-    { "id": "comparative_deletion", "label": "Comparative Deletion", "labelHe": "השוואה חסרה" },
-    { "id": "time_space_predicates", "label": "Time & Space", "labelHe": "זמן ומרחב" },
-    { "id": "lack_referential_index", "label": "Lack Referential Index", "labelHe": "חוסר ייחוס" },
-    { "id": "non_referring_nouns", "label": "Non-referring Nouns", "labelHe": "שמות לא מפנים" },
-    { "id": "sensory_predicates", "label": "Sensory Predicates", "labelHe": "פרדיקטים חושיים" },
-    { "id": "unspecified_verbs", "label": "Unspecified Verbs", "labelHe": "פועל לא מפורט" }
+    {
+      "id": "lost_performative",
+      "label": "Lost Performative",
+      "labelHe": "שיפוט חסר מקור"
+    },
+    {
+      "id": "assumptions",
+      "label": "Assumptions",
+      "labelHe": "הנחות סמויות"
+    },
+    {
+      "id": "mind_reading",
+      "label": "Mind Reading",
+      "labelHe": "קריאת מחשבות"
+    },
+    {
+      "id": "universal_quantifier",
+      "label": "Universal Quantifier",
+      "labelHe": "כמת כוללני"
+    },
+    {
+      "id": "modal_operator",
+      "label": "Modal Operator",
+      "labelHe": "מודל אופרטור"
+    },
+    {
+      "id": "cause_effect",
+      "label": "Cause & Effect",
+      "labelHe": "סיבה ותוצאה"
+    },
+    {
+      "id": "nominalisations",
+      "label": "Nominalisations",
+      "labelHe": "נומינליזציה"
+    },
+    {
+      "id": "identity_predicates",
+      "label": "Identity Predicates",
+      "labelHe": "זהות"
+    },
+    {
+      "id": "complex_equivalence",
+      "label": "Complex Equivalence",
+      "labelHe": "שקילות מורכבת"
+    },
+    {
+      "id": "comparative_deletion",
+      "label": "Comparative Deletion",
+      "labelHe": "השוואה חסרה"
+    },
+    {
+      "id": "time_space_predicates",
+      "label": "Time & Space",
+      "labelHe": "זמן ומרחב"
+    },
+    {
+      "id": "lack_referential_index",
+      "label": "Lack Referential Index",
+      "labelHe": "חוסר ייחוס"
+    },
+    {
+      "id": "non_referring_nouns",
+      "label": "Non-referring Nouns",
+      "labelHe": "שמות לא מפנים"
+    },
+    {
+      "id": "sensory_predicates",
+      "label": "Sensory Predicates",
+      "labelHe": "פרדיקטים חושיים"
+    },
+    {
+      "id": "unspecified_verbs",
+      "label": "Unspecified Verbs",
+      "labelHe": "פועל לא מפורט"
+    }
   ],
   "scenarios": [
     {

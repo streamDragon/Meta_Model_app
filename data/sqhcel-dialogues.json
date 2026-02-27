@@ -5,7 +5,10 @@
     {
       "id": "W1",
       "topic": "work",
-      "tags": ["anxiety", "evaluation"],
+      "tags": [
+        "anxiety",
+        "evaluation"
+      ],
       "difficulty": 1,
       "lines": [
         "מחר יש לי שיחה עם המנהל.",
@@ -20,7 +23,10 @@
     {
       "id": "W2",
       "topic": "work",
-      "tags": ["shame", "criticism"],
+      "tags": [
+        "shame",
+        "criticism"
+      ],
       "difficulty": 2,
       "lines": [
         "בישיבה הוא אמר 'צריך יותר אחריות'.",
@@ -35,7 +41,10 @@
     {
       "id": "W3",
       "topic": "work",
-      "tags": ["overload", "helplessness"],
+      "tags": [
+        "overload",
+        "helplessness"
+      ],
       "difficulty": 2,
       "lines": [
         "אני מסדר משימה אחת.",
@@ -50,7 +59,10 @@
     {
       "id": "W4",
       "topic": "work",
-      "tags": ["mind_reading", "fear"],
+      "tags": [
+        "mind_reading",
+        "fear"
+      ],
       "difficulty": 3,
       "lines": [
         "הוא שלח לי מייל קצר: 'ראיתי'.",
@@ -65,7 +77,10 @@
     {
       "id": "W5",
       "topic": "work",
-      "tags": ["presentation", "performance"],
+      "tags": [
+        "presentation",
+        "performance"
+      ],
       "difficulty": 1,
       "lines": [
         "אני מכין מצגת.",
@@ -80,7 +95,10 @@
     {
       "id": "C1",
       "topic": "couples",
-      "tags": ["rejection", "anxiety"],
+      "tags": [
+        "rejection",
+        "anxiety"
+      ],
       "difficulty": 1,
       "lines": [
         "שלחתי לה הודעה בבוקר.",
@@ -95,7 +113,10 @@
     {
       "id": "C2",
       "topic": "couples",
-      "tags": ["distance", "home"],
+      "tags": [
+        "distance",
+        "home"
+      ],
       "difficulty": 1,
       "lines": [
         "הוא נכנס הביתה ואמר שהוא עייף.",
@@ -110,7 +131,10 @@
     {
       "id": "C3",
       "topic": "couples",
-      "tags": ["argument", "identity"],
+      "tags": [
+        "argument",
+        "identity"
+      ],
       "difficulty": 2,
       "lines": [
         "בכל ריב קטן אני מתפוצץ מהר.",
@@ -125,7 +149,10 @@
     {
       "id": "C4",
       "topic": "couples",
-      "tags": ["mind_reading", "silence"],
+      "tags": [
+        "mind_reading",
+        "silence"
+      ],
       "difficulty": 2,
       "lines": [
         "היא מסתכלת עליי כמה דקות בלי לדבר.",
@@ -140,7 +167,10 @@
     {
       "id": "C5",
       "topic": "couples",
-      "tags": ["money", "avoidance"],
+      "tags": [
+        "money",
+        "avoidance"
+      ],
       "difficulty": 3,
       "lines": [
         "כשעולה נושא כסף אנחנו מיד נתקעים.",
@@ -155,7 +185,10 @@
     {
       "id": "A1",
       "topic": "anxiety",
-      "tags": ["social", "exposure"],
+      "tags": [
+        "social",
+        "exposure"
+      ],
       "difficulty": 1,
       "lines": [
         "מחר יש אירוע עם הרבה אנשים.",
@@ -170,7 +203,10 @@
     {
       "id": "A2",
       "topic": "anxiety",
-      "tags": ["body", "panic"],
+      "tags": [
+        "body",
+        "panic"
+      ],
       "difficulty": 2,
       "lines": [
         "כשהלב דופק מהר אני ישר נלחץ.",
@@ -185,7 +221,10 @@
     {
       "id": "A3",
       "topic": "anxiety",
-      "tags": ["future", "catastrophe"],
+      "tags": [
+        "future",
+        "catastrophe"
+      ],
       "difficulty": 3,
       "lines": [
         "לפני כל שיחה חשובה אני מדמיין תסריט רע.",
@@ -200,7 +239,10 @@
     {
       "id": "P1",
       "topic": "parenting",
-      "tags": ["anger", "regret"],
+      "tags": [
+        "anger",
+        "regret"
+      ],
       "difficulty": 2,
       "lines": [
         "הילד חזר שוב עם הערה מהמורה.",
@@ -215,7 +257,10 @@
     {
       "id": "P2",
       "topic": "parenting",
-      "tags": ["homework", "control"],
+      "tags": [
+        "homework",
+        "control"
+      ],
       "difficulty": 1,
       "lines": [
         "כל ערב שיעורי הבית הופכים למאבק.",
@@ -230,7 +275,10 @@
     {
       "id": "P3",
       "topic": "parenting",
-      "tags": ["comparison", "pressure"],
+      "tags": [
+        "comparison",
+        "pressure"
+      ],
       "difficulty": 3,
       "lines": [
         "אני רואה הורים אחרים נראים בשליטה.",
@@ -245,7 +293,10 @@
     {
       "id": "F1",
       "topic": "faith",
-      "tags": ["guilt", "change"],
+      "tags": [
+        "guilt",
+        "change"
+      ],
       "difficulty": 2,
       "lines": [
         "ניסיתי להתחזק והיו לי יומיים טובים.",
@@ -260,7 +311,10 @@
     {
       "id": "F2",
       "topic": "faith",
-      "tags": ["identity", "shame"],
+      "tags": [
+        "identity",
+        "shame"
+      ],
       "difficulty": 3,
       "lines": [
         "ברגע שאני מפספס יום אחד אני נשבר.",
@@ -275,7 +329,10 @@
     {
       "id": "M1",
       "topic": "money",
-      "tags": ["stress", "planning"],
+      "tags": [
+        "stress",
+        "planning"
+      ],
       "difficulty": 1,
       "lines": [
         "אני מסדר תשלום אחד ואז מגיע עוד משהו.",
@@ -290,7 +347,10 @@
     {
       "id": "M2",
       "topic": "money",
-      "tags": ["helplessness", "future"],
+      "tags": [
+        "helplessness",
+        "future"
+      ],
       "difficulty": 2,
       "lines": [
         "אני מנסה לתכנן אבל הכול זז.",

@@ -6,12 +6,24 @@
       "domain": "הורות",
       "title": "אי אפשר לעשות שיעורים",
       "characters": {
-        "left": { "name": "ילד/ה", "sprite": "assets/svg/characters/נועם.svg" },
-        "right": { "name": "הורה", "sprite": "assets/svg/characters/מאיה.svg" }
+        "left": {
+          "name": "ילד/ה",
+          "sprite": "assets/svg/characters/נועם.svg"
+        },
+        "right": {
+          "name": "הורה",
+          "sprite": "assets/svg/characters/מאיה.svg"
+        }
       },
       "dialog": [
-        { "speaker": "left", "text": "אי אפשר... לא הבנתי כלום." },
-        { "speaker": "right", "text": "מה הבעיה? פשוט תעשה." }
+        {
+          "speaker": "left",
+          "text": "אי אפשר... לא הבנתי כלום."
+        },
+        {
+          "speaker": "right",
+          "text": "מה הבעיה? פשוט תעשה."
+        }
       ],
       "choices": [
         {
@@ -85,12 +97,24 @@
       "domain": "ביורוקרטיה",
       "title": "אין אפשרות למלא סעיף 222",
       "characters": {
-        "left": { "name": "את/ה", "sprite": "assets/svg/characters/יוסף.svg" },
-        "right": { "name": "פקיד/ה", "sprite": "assets/svg/characters/ספיר.svg" }
+        "left": {
+          "name": "את/ה",
+          "sprite": "assets/svg/characters/יוסף.svg"
+        },
+        "right": {
+          "name": "פקיד/ה",
+          "sprite": "assets/svg/characters/ספיר.svg"
+        }
       },
       "dialog": [
-        { "speaker": "right", "text": "תמלא סעיף 222 ותשלח היום." },
-        { "speaker": "left", "text": "אין אפשרות... אני לא מבין מה זה." }
+        {
+          "speaker": "right",
+          "text": "תמלא סעיף 222 ותשלח היום."
+        },
+        {
+          "speaker": "left",
+          "text": "אין אפשרות... אני לא מבין מה זה."
+        }
       ],
       "choices": [
         {
