@@ -3090,6 +3090,9 @@ function activateTabByName(tabName = '', { playSound = false, scrollToTop = true
     const scenarioContext = resolvedTab === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
     closeComicPreviewModal();
     renderGlobalComicStrip(resolvedTab, scenarioContext);
+    if (window.MetaAppShell && typeof window.MetaAppShell.notifyTabActivated === 'function') {
+        window.MetaAppShell.notifyTabActivated(resolvedTab);
+    }
 
     if (scrollToTop) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -12012,6 +12015,9 @@ function navigateTo(tabName) {
     const scenarioContext = (resolvedTab || tabName) === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
     closeComicPreviewModal();
     renderGlobalComicStrip(resolvedTab || tabName, scenarioContext);
+    if (window.MetaAppShell && typeof window.MetaAppShell.notifyTabActivated === 'function') {
+        window.MetaAppShell.notifyTabActivated(resolvedTab || tabName);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
