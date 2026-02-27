@@ -141,3 +141,56 @@
 - Balanced unlock now supports deterministic target matching:
   - exact or high similarity to `target_balanced_sentence`
   - still keeps legacy score-based balance as fallback.
+
+---
+
+# DEV Notes - Living Triples v2 (Stepper Refactor)
+
+## Discovery
+
+- Page: `living_triples_trainer.html` (standalone route).
+- Runtime logic: `js/living-triples.js`.
+- Data source: `data/living-triples.json`.
+- Routing model: static standalone page linked from `index.html` (`living_triples_trainer.html`).
+- UI stack: plain HTML/CSS/JS (custom, no React/Tailwind/MUI for this page).
+
+## What was implemented
+
+- Rebuilt module UX to strict 4-step flow:
+  1. בחירת קטגוריה
+  2. Reveal 0/3 -> 3/3
+  3. שיקוף
+  4. Insight + סיום
+- Large table removed from default gameplay view.
+- Added `מפת השלשות` modal/drawer, with sticky active row bar during play.
+- Reveal stage now shows exactly 3 cards for active row only.
+- Removed technical labels from user-facing UI (no `Unknown`, no `Follow-up`, no `Question Lock`).
+- Added gentle `אני לא יודע` popover with exactly 2 follow-up options.
+- Added wrong-row feedback during Reveal: short message + shake animation.
+- Added auto transition to Reflection after 3/3.
+- Added editable reflection (10-second window) and Insight card before `משפט הבא`.
+- Kept local progress persistence in `localStorage` (`living_triples_progress_v2`).
+
+## Data integration
+
+- Replaced `data/living-triples.json` with clean UTF-8 Hebrew/English content.
+- Schema used:
+  - `triplesMap.rows`
+  - `triplesMap.categoryToRow`
+  - `triplesMap.labelsHe`
+  - `scenarios[]` with `targetRow`, `sentence`, `answers`, `insight`
+- Added fallback scenarios in JS so module still runs if fetch fails.
+
+## Files changed
+
+- `living_triples_trainer.html`
+- `js/living-triples.js`
+- `data/living-triples.json`
+- `css/style.css`
+- `DEV_NOTES.md`
+
+## Run / verify
+
+- `npm run dev`
+- `node --check js/living-triples.js`
+- `node -e "JSON.parse(require('fs').readFileSync('data/living-triples.json','utf8')); console.log('living-triples.json OK')"`

@@ -1,1570 +1,849 @@
-const LIVING_TRIPLES_STORAGE_KEY = 'living_triples_progress_v1';
-const LIVING_TRIPLES_DEVIATION_TOOLTIP = 'זו תשובה מעניינת, אבל היא לא בתוך הפריזמה הנוכחית.';
 
-const LIVING_TRIPLES_ROW_INTENT = Object.freeze({
-    row1: Object.freeze({
-        common: 'השלשה בודקת איך נבנית ודאות פנימית בלי בסיס בדיקה: סטנדרט, הנחה, וידיעת-מחשבה.',
-        impact: 'נוטה לייצר מתח, קריאת-כוונות, ושיפוט מהיר במקום בירור.',
-        goal: 'להחזיר את האדם מביטחון מדומיין לבדיקת מציאות עדינה.'
-    }),
-    row2: Object.freeze({
-        common: 'השלשה בונה חוק קשיח: תמיד/אסור/חייב + סיבתיות סגורה.',
-        impact: 'מייצרת חוסר אונים, קיבעון, ותחושה שאין מרחב פעולה.',
-        goal: 'לפתוח יוצאי דופן, דרגות ביניים, וחוליות חסרות בשרשרת.'
-    }),
-    row3: Object.freeze({
-        common: 'השלשה מדביקה משמעות: שם עצם עמום + זהות + חיבור כפוי בין אירועים.',
-        impact: 'החוויה נהיית "מי שאני" במקום תהליך שניתן לבדוק ולשנות.',
-        goal: 'להחזיר תהליך, הקשר, וקריטריון במקום זהות סגורה.'
-    }),
-    row4: Object.freeze({
-        common: 'השלשה מסדרת את ההקשר: ביחס למה, מתי/איפה, ועל מי בדיוק מדברים.',
-        impact: 'בלי הקשר מדויק האדם מרגיש שהבעיה "בכל מקום וכל הזמן".',
-        goal: 'לצמצם את המפה להקשר מדויק שאפשר לעבוד איתו.'
-    }),
-    row5: Object.freeze({
-        common: 'השלשה מקרקעת שפה: מה זה, איך יודעים, ומה קורה בפועל.',
-        impact: 'כשזה עמום מדי קשה לפעול; יש תחושת הצפה בלי צעד ברור.',
-        goal: 'לתרגם מילה/תחושה כללית לחוויה חושית ופעולה קונקרטית.'
-    })
-});
+const LIVING_TRIPLES_STORAGE_KEY = 'living_triples_progress_v2';
+const LIVING_TRIPLES_DATA_URL = 'data/living-triples.json';
 
-let livingTriplesDataState = {
-    rows: [],
-    scenarios: [],
-    categories: [],
-    anchorTable: []
+const DEFAULT_TRIPLES_MAP = {
+  rows: {
+    '1': ['Lost Performative', 'Assumptions', 'Mind Reading'],
+    '2': ['Universal Quantifier', 'Modal Operator', 'Cause & Effect'],
+    '3': ['Nominalisations', 'Identity Predicates', 'Complex Equivalence'],
+    '4': ['Comparative Deletion', 'Time & Space Predicates', 'Lack of Referential Index'],
+    '5': ['Non-referring nouns', 'Sensory Predicates', 'Unspecified Verbs']
+  },
+  categoryToRow: {
+    'Lost Performative': 1,
+    'Assumptions': 1,
+    'Mind Reading': 1,
+    'Universal Quantifier': 2,
+    'Modal Operator': 2,
+    'Cause & Effect': 2,
+    'Nominalisations': 3,
+    'Identity Predicates': 3,
+    'Complex Equivalence': 3,
+    'Comparative Deletion': 4,
+    'Time & Space Predicates': 4,
+    'Lack of Referential Index': 4,
+    'Non-referring nouns': 5,
+    'Sensory Predicates': 5,
+    'Unspecified Verbs': 5
+  },
+  labelsHe: {
+    'Lost Performative': 'שיפוט חסר מקור',
+    'Assumptions': 'הנחות יסוד',
+    'Mind Reading': 'קריאת מחשבות',
+    'Universal Quantifier': 'כמת אוניברסלי',
+    'Modal Operator': 'אופרטור מודאלי',
+    'Cause & Effect': 'סיבה ותוצאה',
+    'Nominalisations': 'נומינליזציה',
+    'Identity Predicates': 'פרדיקטים של זהות',
+    'Complex Equivalence': 'הקבלה מורכבת',
+    'Comparative Deletion': 'השמטה השוואתית',
+    'Time & Space Predicates': 'פרדיקטים של זמן/מרחב',
+    'Lack of Referential Index': 'אבדן מצביע',
+    'Non-referring nouns': 'שמות לא-מייחסים',
+    'Sensory Predicates': 'פרדיקטים חושיים',
+    'Unspecified Verbs': 'פעלים לא-מפורטים'
+  }
 };
 
-const livingTriplesState = {
-    progress: null,
-    queue: [],
-    index: 0,
-    sessionScore: 0,
-    activeScenario: null,
-    activeRow: null,
-    selectedCategory: '',
-    categoryAttempts: 0,
-    categoryResolved: false,
-    revealSlots: [],
-    revealMessage: '',
-    reflectionDone: false,
-    reflectionText: '',
-    challengeDone: false,
-    challengeTargetIndex: -1,
-    challengeChoiceIndex: -1,
-    challengeAttempts: 0,
-    scoreBreakdown: null,
-    futurePace: null,
-    demoTimer: null,
-    elements: null
+const FALLBACK_SCENARIOS = [
+  {
+    id: 'fallback_row1',
+    targetRow: 1,
+    sentence: 'זה לא בסדר שהיא לא ענתה לי כל היום. ברור שהיא כבר לא רוצה אותי.',
+    answers: {
+      'Lost Performative': {
+        question: 'לפי מי זה "לא בסדר"?',
+        answer: 'לפי הסטנדרט שלי בזוגיות: מי שרוצה קשר עונה.',
+        summary: 'סטנדרט אישי: רצון = מענה.'
+      },
+      'Assumptions': {
+        question: 'מה אתה מניח שחייב להיות נכון כדי שהמסקנה תעמוד?',
+        answer: 'אני מניח שאם יש אהבה - יש תגובה יחסית מהר.',
+        summary: 'הנחה: אהבה נמדדת במהירות תגובה.'
+      },
+      'Mind Reading': {
+        question: 'איך אתה יודע שהיא כבר לא רוצה אותך?',
+        answer: 'אני לא יודע בוודאות, אני מפרש את השתיקה כריחוק.',
+        summary: 'פרשנות פנימית לשתיקה.'
+      }
+    },
+    insight: 'מעניין... הפכתי זמן תגובה למדד מוחלט של אהבה.'
+  },
+  {
+    id: 'fallback_row2',
+    targetRow: 2,
+    sentence: 'אני לא יכול להתחייב לחתונה. זה תמיד מסתבך, כי אני נחנק.',
+    answers: {
+      'Universal Quantifier': {
+        question: 'תמיד? מתי זה לא מסתבך אפילו קצת?',
+        answer: 'היו תקופות שזה היה קל יותר, בעיקר כשלא היה לחץ.',
+        summary: 'לא תמיד: תלוי בעומס ובלחץ.'
+      },
+      'Modal Operator': {
+        question: 'מה בדיוק מונע ממך להתחייב?',
+        answer: 'הפחד שאאבד חופש ושאעשה טעות.',
+        summary: 'המניעה: פחד מאובדן חופש וטעות.'
+      },
+      'Cause & Effect': {
+        question: 'איך בדיוק נחנק גורם למסתבך?',
+        answer: 'כשאני נחנק אני מתרחק, ואז הצד השני לוחץ ונוצר ריב.',
+        summary: 'נחנק -> התרחקות -> לחץ -> ריב.'
+      }
+    },
+    insight: 'הבנתי שהטריגר המרכזי הוא תחושת החנק, לא עצם המחויבות.'
+  }
+];
+
+const state = {
+  data: null,
+  queue: [],
+  index: 0,
+  current: null,
+  step: 1,
+  activeRow: 0,
+  selectedCategory: '',
+  reveal: {},
+  reflectionText: '',
+  score: 0,
+  progress: null,
+  editTimer: null,
+  autoTimer: null,
+  toastTimer: null,
+  el: null
 };
 
-function ltEscape(value) {
-    if (typeof escapeHtml === 'function') return escapeHtml(value);
-    if (value === null || value === undefined) return '';
-    return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+function esc(v) {
+  if (v === null || v === undefined) return '';
+  return String(v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
-function ltPlay(kind) {
-    if (typeof playUISound === 'function') playUISound(kind);
+function normKey(v) {
+  return String(v || '').toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9\u0590-\u05FF]+/g, '_').replace(/^_+|_+$/g, '');
 }
 
-function ltShuffle(items) {
-    if (typeof shuffleArray === 'function') return shuffleArray(items);
-    const arr = [...items];
-    for (let i = arr.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
+function parseRow(v) {
+  if (typeof v === 'number') return v >= 1 && v <= 5 ? v : 0;
+  const t = String(v || '').trim();
+  if (/^[1-5]$/.test(t)) return Number(t);
+  if (/^row[1-5]$/i.test(t)) return Number(t.replace(/[^\d]/g, ''));
+  return 0;
 }
 
-function getDefaultLivingTriplesProgress() {
-    return {
-        played: 0,
-        totalScore: 0,
-        bestScore: 0,
-        lastPlayedAt: null
-    };
+function safeText(v, fallback = '') {
+  const t = String(v || '').trim();
+  if (!t) return String(fallback || '').trim();
+  const qm = (t.match(/\?/g) || []).length;
+  const he = (t.match(/[\u0590-\u05FF]/g) || []).length;
+  const en = (t.match(/[A-Za-z]/g) || []).length;
+  if (qm >= 3 && he === 0 && en === 0) return String(fallback || '').trim();
+  return t;
 }
 
-function loadLivingTriplesProgress() {
-    const defaults = getDefaultLivingTriplesProgress();
-    try {
-        const raw = localStorage.getItem(LIVING_TRIPLES_STORAGE_KEY);
-        if (!raw) return defaults;
-        const parsed = JSON.parse(raw);
-        return {
-            ...defaults,
-            ...(parsed || {})
-        };
-    } catch (error) {
-        console.warn('Cannot parse living triples progress:', error);
-        return defaults;
-    }
+function shuffle(items) {
+  const a = [...items];
+  for (let i = a.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
-function saveLivingTriplesProgress() {
-    if (!livingTriplesState.progress) return;
-    localStorage.setItem(LIVING_TRIPLES_STORAGE_KEY, JSON.stringify(livingTriplesState.progress));
+function defaultQuestion(cat) {
+  const q = {
+    'Lost Performative': 'לפי מי זה נכון/לא נכון?',
+    'Assumptions': 'איזו הנחה סמויה חייבת להיות נכונה כאן?',
+    'Mind Reading': 'איך אתה יודע מה האדם השני חושב/מרגיש?',
+    'Universal Quantifier': 'תמיד/אף פעם? מתי זה לא נכון?',
+    'Modal Operator': 'מה מונע ממך? מה יקרה אם כן?',
+    'Cause & Effect': 'איך בדיוק X גורם ל-Y?',
+    'Nominalisations': 'כשאתה אומר את המילה הזו - מה קורה בפועל?',
+    'Identity Predicates': 'מי אתה נהיה כשאתה אומר "אני X"?',
+    'Complex Equivalence': 'איך X אומר בהכרח Y?',
+    'Comparative Deletion': 'יותר/פחות ביחס למה?',
+    'Time & Space Predicates': 'מתי ואיפה בדיוק זה קורה?',
+    'Lack of Referential Index': 'מי בדיוק? על מי זה נאמר?',
+    'Non-referring nouns': 'מה זה בדיוק? תן דוגמה מוחשית.',
+    'Sensory Predicates': 'איך אתה יודע - מה ראית/שמעת/הרגשת?',
+    'Unspecified Verbs': 'מה האדם עושה בפועל? צעד-צעד.'
+  };
+  return q[cat] || 'מה השאלה המדויקת שכדאי לשאול כאן?';
 }
 
-function bindLivingTriplesClick(id, handler) {
-    const el = document.getElementById(id);
-    if (!el || el.dataset.ltBound === 'true') return;
-    el.dataset.ltBound = 'true';
-    el.addEventListener('click', handler);
-}
+function normalizeMap(payload) {
+  const from = payload?.triplesMap || {};
+  const rows = {};
 
-function bindLivingTriplesDemoDialogueModal() {
-    const openBtn = livingTriplesState.elements?.demoDialogueBtn;
-    const modal = livingTriplesState.elements?.demoDialogueModal;
-    const closeBtn = livingTriplesState.elements?.demoDialogueCloseBtn;
-    const confirmBtn = livingTriplesState.elements?.demoDialogueConfirmBtn;
-    if (!openBtn || !modal || modal.dataset.ltBound === 'true') return;
-    modal.dataset.ltBound = 'true';
-
-    const openModal = () => {
-        modal.classList.remove('hidden');
-        document.body.classList.add('screen-guide-open');
-        openBtn.setAttribute('aria-expanded', 'true');
-        ltPlay('hint');
-    };
-
-    const closeModal = () => {
-        modal.classList.add('hidden');
-        openBtn.setAttribute('aria-expanded', 'false');
-        if (!document.querySelector('.screen-read-guide-modal:not(.hidden)')) {
-            document.body.classList.remove('screen-guide-open');
-        }
-    };
-
-    openBtn.setAttribute('aria-haspopup', 'dialog');
-    openBtn.setAttribute('aria-controls', modal.id || 'lt-demo-dialogue-modal');
-    openBtn.setAttribute('aria-expanded', 'false');
-    openBtn.addEventListener('click', openModal);
-    closeBtn?.addEventListener('click', closeModal);
-    confirmBtn?.addEventListener('click', closeModal);
-    modal.addEventListener('click', (event) => {
-        if (event.target === modal) closeModal();
+  if (from.rows && typeof from.rows === 'object' && !Array.isArray(from.rows)) {
+    Object.entries(from.rows).forEach(([k, v]) => {
+      const row = parseRow(k);
+      if (!row || !Array.isArray(v)) return;
+      rows[String(row)] = v.map((x) => safeText(x)).filter(Boolean);
     });
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
-            closeModal();
-        }
-    });
-}
+  }
 
-function getLivingTriplesRowById(rowId) {
-    return (livingTriplesDataState.rows || []).find(row => row.id === rowId) || null;
-}
-
-function getLivingTriplesRowByCategory(categoryId) {
-    const normalized = ltNormalizeCategoryId(categoryId);
-    if (!normalized) return null;
-    return (livingTriplesDataState.rows || []).find(row =>
-        Array.isArray(row.categories) && row.categories.some(category => category.id === normalized)
-    ) || null;
-}
-
-function getLivingTriplesRowNumber(rowId) {
-    const idx = (livingTriplesDataState.rows || []).findIndex(row => row.id === rowId);
-    return idx >= 0 ? idx + 1 : null;
-}
-
-function getLivingTriplesCategories() {
-    if (Array.isArray(livingTriplesDataState.categories) && livingTriplesDataState.categories.length) {
-        return livingTriplesDataState.categories.map(category => {
-            const rowId = category.rowId || getLivingTriplesRowByCategory(category.id)?.id || '';
-            return {
-                id: category.id,
-                label: category.label,
-                rowId,
-                rowNumber: getLivingTriplesRowNumber(rowId)
-            };
-        });
-    }
-
-    return (livingTriplesDataState.rows || []).flatMap(row => {
-        const rowNumber = getLivingTriplesRowNumber(row.id);
-        return (row.categories || []).map(category => ({
-            id: category.id,
-            label: category.label,
-            rowId: row.id,
-            rowNumber
-        }));
-    });
-}
-
-function ltToStringArray(value) {
-    if (Array.isArray(value)) {
-        return value.map(item => String(item || '').trim()).filter(Boolean);
-    }
-    const single = String(value || '').trim();
-    return single ? [single] : [];
-}
-
-function ltLooksGarbledText(value) {
-    const text = String(value || '').trim();
-    if (!text) return false;
-    const questionMarks = (text.match(/\?/g) || []).length;
-    if (questionMarks < 3) return false;
-    const hebrewChars = (text.match(/[\u0590-\u05FF]/g) || []).length;
-    const latinChars = (text.match(/[A-Za-z]/g) || []).length;
-    const digits = (text.match(/\d/g) || []).length;
-    const noisyChars = questionMarks + digits;
-    return hebrewChars === 0
-        && latinChars === 0
-        && questionMarks >= Math.floor(text.length * 0.25)
-        && noisyChars >= Math.floor(text.length * 0.5);
-}
-
-function ltSafeText(value, fallback = '') {
-    const text = String(value || '').trim();
-    if (!text || ltLooksGarbledText(text)) {
-        return String(fallback || '').trim();
-    }
-    return text;
-}
-
-function ltSafeStringArray(values, fallbackValues = []) {
-    const cleaned = (Array.isArray(values) ? values : [])
-        .map(item => ltSafeText(item))
+  if (!Object.keys(rows).length && Array.isArray(payload?.rows)) {
+    payload.rows.forEach((rowItem, idx) => {
+      const row = parseRow(rowItem?.id || rowItem?.rowId || idx + 1);
+      if (!row) return;
+      const cats = (Array.isArray(rowItem?.categories) ? rowItem.categories : [])
+        .map((c) => typeof c === 'string' ? safeText(c) : safeText(c?.label || c?.id))
         .filter(Boolean);
-    if (cleaned.length) return cleaned;
-    return (Array.isArray(fallbackValues) ? fallbackValues : [])
-        .map(item => String(item || '').trim())
-        .filter(Boolean);
-}
-
-function ltNormalizeFlow(flow, slotKey = 'slot') {
-    if (!flow || typeof flow !== 'object') return null;
-    const slotRaw = flow[slotKey] ?? flow.slot ?? flow.slot_index;
-    const slot = Number(slotRaw);
-    if (!Number.isInteger(slot) || slot < 0 || slot > 2) return null;
-    return {
-        slot,
-        finalUnknown: Boolean(flow.finalUnknown ?? flow.final_unknown ?? false),
-        followUpAnswer: ltSafeText(flow.followUpAnswer ?? flow.follow_up_answer ?? ''),
-        answer: ltSafeText(flow.answer ?? ''),
-        joinLead: ltSafeText(flow.joinLead ?? flow.join_lead ?? ''),
-        targetRowId: String(flow.targetRowId ?? flow.target_row_id ?? '').trim(),
-        targetCategory: String(flow.targetCategory ?? flow.target_category ?? '').trim()
-    };
-}
-
-function ltNormalizeRowId(value) {
-    const raw = String(value || '').trim().toLowerCase();
-    if (!raw) return '';
-    if (/^row[1-5]$/.test(raw)) return raw;
-    if (/^[1-5]$/.test(raw)) return `row${raw}`;
-    return raw;
-}
-
-function ltNormalizeCategoryId(value) {
-    const raw = String(value || '').trim().toLowerCase();
-    if (!raw) return '';
-    const compact = raw
-        .replace(/&/g, ' and ')
-        .replace(/[^a-z0-9]+/g, '_')
-        .replace(/^_+|_+$/g, '')
-        .replace(/_+/g, '_');
-
-    const aliases = {
-        lost_performative: 'lost_performative',
-        assumptions: 'assumptions',
-        assumption: 'assumptions',
-        mind_reading: 'mind_reading',
-        universal_quantifier: 'universal_quantifier',
-        universal_quantifiers: 'universal_quantifier',
-        modal_operator: 'modal_operator',
-        cause_effect: 'cause_effect',
-        cause_and_effect: 'cause_effect',
-        nominalisations: 'nominalisations',
-        nominalization: 'nominalisations',
-        nominalisationss: 'nominalisations',
-        identity_predicates: 'identity_predicates',
-        complex_equivalence: 'complex_equivalence',
-        comparative_deletion: 'comparative_deletion',
-        time_space_predicates: 'time_space_predicates',
-        lack_referential_index: 'lack_referential_index',
-        lack_of_referential_index: 'lack_referential_index',
-        non_referring_nouns: 'non_referring_nouns',
-        sensory_predicates: 'sensory_predicates',
-        unspecified_verbs: 'unspecified_verbs',
-        unspecified_verb: 'unspecified_verbs'
-    };
-
-    return aliases[compact] || compact;
-}
-
-function getLivingTriplesBreenRowMeta(rowId = '') {
-    const map = {
-        row1: { colorClass: 'row-sky', heLabel: 'שלשה 1 — שכבת מקור' },
-        row2: { colorClass: 'row-teal', heLabel: 'שלשה 2 — שכבת חוקים' },
-        row3: { colorClass: 'row-amber', heLabel: 'שלשה 3 — שכבת משמעות' },
-        row4: { colorClass: 'row-violet', heLabel: 'שלשה 4 — שכבת הקשר' },
-        row5: { colorClass: 'row-rose', heLabel: 'שלשה 5 — שכבת קרקע' }
-    };
-    return map[ltNormalizeRowId(rowId)] || map.row1;
-}
-
-function normalizeLivingTriplesScenario(rawScenario, index, rows = []) {
-    if (!rawScenario || typeof rawScenario !== 'object') return null;
-
-    const scenarioId = String(rawScenario.scenarioId || rawScenario.scenario_id || `lt_scene_${index + 1}`).trim();
-    const rowId = ltNormalizeRowId(rawScenario.rowId || rawScenario.row_id || '');
-    const correctCategory = ltNormalizeCategoryId(rawScenario.correctCategory || rawScenario.correct_category || '');
-    if (!rowId || !correctCategory) return null;
-
-    const rowRef = (Array.isArray(rows) ? rows : []).find(row => row.id === rowId) || null;
-    const rowLabel = String(rowRef?.label || rowId).trim();
-    const categoryLabel = String(rowRef?.categories?.find(item => item.id === correctCategory)?.label || correctCategory).trim();
-
-    const title = ltSafeText(rawScenario.title || rawScenario.scenario_title || '', `Living Triples • ${rowLabel}`);
-    const text = ltSafeStringArray(
-        ltToStringArray(rawScenario.text || rawScenario.client_text),
-        [
-            `תרגול ${rowLabel}: זהו/י קודם את הקטגוריה המדויקת (${categoryLabel}), ואז המשיכו ל-Reveal ולאתגור.`,
-            'אם נוסח הסצנה נשמר פגום בדאטה, המערכת משתמשת בנוסח fallback כדי לאפשר אימון רציף.'
-        ]
-    );
-    const highlights = ltSafeStringArray(ltToStringArray(rawScenario.highlights), [rowLabel, categoryLabel]);
-
-    const rawRevealAnswers = Array.isArray(rawScenario.revealAnswers || rawScenario.reveal_answers)
-        ? (rawScenario.revealAnswers || rawScenario.reveal_answers)
-        : [];
-    const revealAnswers = [0, 1, 2].map((slotIndex) => {
-        const item = rawRevealAnswers[slotIndex];
-        if (Array.isArray(item)) {
-            const nested = item.map(v => ltSafeText(v)).filter(Boolean);
-            return nested.length ? nested : `תשובת Reveal קונקרטית לרכיב ${slotIndex + 1}.`;
-        }
-        return ltSafeText(item, `תשובת Reveal קונקרטית לרכיב ${slotIndex + 1}.`);
+      if (cats.length) rows[String(row)] = cats;
     });
+  }
 
-    const anchors = ltSafeStringArray(
-        Array.isArray(rawScenario.anchors) ? rawScenario.anchors.map(v => String(v || '').trim()) : [],
-        Array.isArray(rowRef?.revealQuestions) ? rowRef.revealQuestions : []
-    );
-    const challengeOptions = ltSafeStringArray(
-        Array.isArray(rawScenario.challengeOptions || rawScenario.challenge_options)
-            ? (rawScenario.challengeOptions || rawScenario.challenge_options).map(v => String(v || '').trim())
-            : [],
-        Array.isArray(rowRef?.challenges) ? rowRef.challenges : []
-    );
-    const challengeReplies = ltSafeStringArray(
-        Array.isArray(rawScenario.challengeReplies || rawScenario.challenge_replies)
-            ? (rawScenario.challengeReplies || rawScenario.challenge_replies).map(v => String(v || '').trim())
-            : [],
-        (Array.isArray(rowRef?.categories) ? rowRef.categories : []).map(category =>
-            `תגובה סימולטיבית: המטופל/ת מגיב/ה סביב ${String(category?.label || 'הרכיב שנבחר').trim()}.`
-        )
-    );
+  if (!Object.keys(rows).length) return JSON.parse(JSON.stringify(DEFAULT_TRIPLES_MAP));
 
-    const unknownFlow = ltNormalizeFlow(rawScenario.unknownFlow || rawScenario.unknown_flow, 'slot');
-    const deviationFlow = ltNormalizeFlow(rawScenario.deviationFlow || rawScenario.deviation_flow, 'slot');
+  const allCats = Object.values(rows).flat();
+  const pickCat = (raw) => allCats.find((c) => normKey(c) === normKey(raw)) || safeText(raw);
 
+  const categoryToRow = {};
+  Object.entries(from.categoryToRow || {}).forEach(([cat, row]) => {
+    const p = pickCat(cat);
+    const r = parseRow(row);
+    if (p && r) categoryToRow[p] = r;
+  });
+  Object.entries(rows).forEach(([row, cats]) => cats.forEach((cat) => { if (!categoryToRow[cat]) categoryToRow[cat] = Number(row); }));
+
+  const labelsHe = {};
+  Object.entries(from.labelsHe || {}).forEach(([cat, he]) => {
+    const p = pickCat(cat);
+    const t = safeText(he);
+    if (p && t) labelsHe[p] = t;
+  });
+  Object.keys(categoryToRow).forEach((cat) => { if (!labelsHe[cat]) labelsHe[cat] = DEFAULT_TRIPLES_MAP.labelsHe[cat] || cat; });
+
+  return { rows, categoryToRow, labelsHe };
+}
+
+function pickScenarioText(raw) {
+  const keys = ['sentence', 'clientSentence', 'client_sentence', 'title', 'scenario_title', 'text', 'client_text'];
+  for (const k of keys) {
+    const v = raw?.[k];
+    if (Array.isArray(v)) {
+      const joined = v.map((x) => safeText(x)).filter(Boolean).join(' ').trim();
+      if (joined) return joined;
+    }
+    const t = safeText(v);
+    if (t) return t;
+  }
+  return 'משפט לתרגול';
+}
+function getAnswerByCat(answerObj, cat) {
+  if (!answerObj || typeof answerObj !== 'object') return null;
+  if (answerObj[cat]) return answerObj[cat];
+  const wanted = normKey(cat);
+  for (const key of Object.keys(answerObj)) {
+    if (normKey(key) === wanted) return answerObj[key];
+  }
+  return null;
+}
+
+function normalizeScenario(raw, index, triplesMap) {
+  if (!raw || typeof raw !== 'object') return null;
+
+  let targetRow = parseRow(raw.targetRow || raw.target_row || raw.rowId || raw.row_id || raw.targetRowId || raw.target_row_id);
+  const directCategory = safeText(raw.correctCategory || raw.correct_category);
+  if (!targetRow && directCategory) {
+    const entry = Object.entries(triplesMap.categoryToRow).find(([cat]) => normKey(cat) === normKey(directCategory));
+    if (entry) targetRow = Number(entry[1]) || 0;
+  }
+  if (!targetRow || !triplesMap.rows[String(targetRow)]?.length) return null;
+
+  const rowCats = triplesMap.rows[String(targetRow)] || [];
+  const answers = {};
+  const anchors = Array.isArray(raw.anchors) ? raw.anchors.map((x) => safeText(x)) : [];
+  const revealArr = Array.isArray(raw.revealAnswers || raw.reveal_answers) ? (raw.revealAnswers || raw.reveal_answers) : [];
+
+  rowCats.forEach((cat, idx) => {
+    const answerBlock = getAnswerByCat(raw.answers, cat);
+    const revealRaw = revealArr[idx];
+    const revealText = Array.isArray(revealRaw)
+      ? safeText(revealRaw.find((x) => safeText(x)))
+      : safeText(revealRaw);
+
+    const question = safeText(answerBlock?.question || anchors[idx], defaultQuestion(cat));
+    const answer = safeText(answerBlock?.answer || revealText, 'אין תשובה מוכנה. נסו לשאול מחדש בקצרה.');
+    const summary = safeText(answerBlock?.summary, answer.length > 100 ? `${answer.slice(0, 97).trim()}...` : answer);
+
+    answers[cat] = { question, answer, summary };
+  });
+
+  return {
+    id: safeText(raw.id || raw.scenarioId || raw.scenario_id, `lt_scn_${index + 1}`),
+    targetRow,
+    sentence: pickScenarioText(raw),
+    answers,
+    insight: safeText(raw.insight, 'מעניין... כשמחזיקים את כל השלשה יחד, התמונה נעשית מדויקת יותר.')
+  };
+}
+
+function normalizeData(payload) {
+  const triplesMap = normalizeMap(payload || {});
+  const scenarios = (Array.isArray(payload?.scenarios) ? payload.scenarios : [])
+    .map((item, i) => normalizeScenario(item, i, triplesMap))
+    .filter(Boolean);
+
+  if (!scenarios.length) {
     return {
-        ...rawScenario,
-        scenarioId,
-        rowId,
-        title,
-        text,
-        highlights,
-        correctCategory,
-        anchors,
-        revealAnswers,
-        challengeOptions,
-        challengeReplies,
-        reflectionTemplate: ltSafeText(
-            rawScenario.reflectionTemplate || rawScenario.reflection_template || '',
-            String(rowRef?.reflectionTemplate || '').trim()
-        ),
-        fillRules: rawScenario.fillRules || rawScenario.fill_rules || null,
-        directionQuestion: ltSafeText(
-            rawScenario.directionQuestion || rawScenario.direction_question || '',
-            'מה הכיוון הטיפולי הבא שנשאר נאמן לפריזמה שנחשפה?'
-        ),
-        clientGoal: ltSafeText(
-            rawScenario.clientGoal || rawScenario.client_goal || '',
-            'מטרה זמנית: לדייק את המפה הלשונית לפני מעבר לאתגור רחב יותר.'
-        ),
-        hypnoticIntervention: ltSafeText(
-            rawScenario.hypnoticIntervention || rawScenario.hypnotic_intervention || '',
-            'שמרו על קצב איטי, שאלת עוגן אחת בכל פעם, ואתגור שנשאר בתוך אותה שורה.'
-        ),
-        rememberNote: ltSafeText(
-            rawScenario.rememberNote || rawScenario.remember_note || rawScenario.apply_note || '',
-            'זכרו: Reveal מלא לפני Challenge.'
-        ),
-        futurePacePrompt: ltSafeText(
-            rawScenario.futurePacePrompt || rawScenario.future_pace_prompt || '',
-            'בפעם הבאה שזה יופיע, מה הסימן המוקדם? מה צעד קטן אחד? ומה מדד הצלחה?'
-        ),
-        futurePaceExample: ltSafeText(
-            rawScenario.futurePaceExample || rawScenario.future_pace_example || '',
-            'דוגמה: אשאל שאלה אחת מתוך אותה פריזמה לפני שאנסה לפרש.'
-        ),
-        unknownFlow,
-        deviationFlow
+      version: '1.1.0',
+      language: 'he',
+      triplesMap: JSON.parse(JSON.stringify(DEFAULT_TRIPLES_MAP)),
+      scenarios: JSON.parse(JSON.stringify(FALLBACK_SCENARIOS))
     };
+  }
+
+  return {
+    version: safeText(payload?.version, '1.1.0'),
+    language: safeText(payload?.language, 'he'),
+    triplesMap,
+    scenarios
+  };
 }
 
-function getLivingTriplesAnchorQuestion(slotIndex) {
-    const scenarioAnchors = Array.isArray(livingTriplesState.activeScenario?.anchors)
-        ? livingTriplesState.activeScenario.anchors
-        : [];
-    const scenarioQuestion = String(scenarioAnchors[slotIndex] || '').trim();
-    if (scenarioQuestion) return scenarioQuestion;
-    return String(livingTriplesState.activeRow?.revealQuestions?.[slotIndex] || '').trim();
+async function loadData() {
+  try {
+    const res = await fetch(LIVING_TRIPLES_DATA_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    return normalizeData(json);
+  } catch (e) {
+    console.warn('Cannot load living triples data, fallback in use.', e);
+    return normalizeData({ triplesMap: DEFAULT_TRIPLES_MAP, scenarios: FALLBACK_SCENARIOS });
+  }
 }
 
-function getLivingTriplesChallengeOptions() {
-    const scenarioOptions = Array.isArray(livingTriplesState.activeScenario?.challengeOptions)
-        ? livingTriplesState.activeScenario.challengeOptions
-        : [];
-    const cleaned = scenarioOptions.map(item => String(item || '').trim()).filter(Boolean);
-    if (cleaned.length === 3) return cleaned;
-    return (livingTriplesState.activeRow?.challenges || []).map(item => String(item || '').trim());
+function getElements() {
+  return {
+    root: document.getElementById('ltv2-root'),
+    onboarding: document.getElementById('ltv2-onboarding'),
+    practice: document.getElementById('ltv2-practice'),
+    startBtn: document.getElementById('ltv2-start-btn'),
+    openMapTopBtn: document.getElementById('ltv2-open-map-top'),
+    openMapBtn: document.getElementById('ltv2-open-map-btn'),
+    closeMapBtn: document.getElementById('ltv2-close-map-btn'),
+    mapModal: document.getElementById('ltv2-map-modal'),
+    mapContent: document.getElementById('ltv2-map-content'),
+    resetSceneBtn: document.getElementById('ltv2-reset-scene-btn'),
+    sceneIndex: document.getElementById('ltv2-scene-index'),
+    sceneTotal: document.getElementById('ltv2-scene-total'),
+    score: document.getElementById('ltv2-score'),
+    sentenceText: document.getElementById('ltv2-sentence-text'),
+    categoryChips: document.getElementById('ltv2-category-chips'),
+    step1Feedback: document.getElementById('ltv2-step1-feedback'),
+    rowSticky: document.getElementById('ltv2-row-sticky'),
+    rowTitle: document.getElementById('ltv2-row-title'),
+    rowMembers: document.getElementById('ltv2-row-members'),
+    changeRowBtn: document.getElementById('ltv2-change-row-btn'),
+    step1: document.getElementById('ltv2-step-1'),
+    step2: document.getElementById('ltv2-step-2'),
+    revealCategories: document.getElementById('ltv2-reveal-categories'),
+    revealProgress: document.getElementById('ltv2-reveal-progress'),
+    revealCards: document.getElementById('ltv2-reveal-cards'),
+    step2Feedback: document.getElementById('ltv2-step2-feedback'),
+    step3: document.getElementById('ltv2-step-3'),
+    reflectionCard: document.getElementById('ltv2-reflection-card'),
+    editReflectBtn: document.getElementById('ltv2-edit-reflect-btn'),
+    editTimer: document.getElementById('ltv2-edit-timer'),
+    editWrap: document.getElementById('ltv2-edit-wrap'),
+    reflectInput: document.getElementById('ltv2-reflect-input'),
+    saveReflectBtn: document.getElementById('ltv2-save-reflect-btn'),
+    toInsightBtn: document.getElementById('ltv2-to-insight-btn'),
+    step4: document.getElementById('ltv2-step-4'),
+    insightCard: document.getElementById('ltv2-insight-card'),
+    nextBtn: document.getElementById('ltv2-next-btn'),
+    stepperItems: Array.from(document.querySelectorAll('.ltv2-stepper [data-step]')),
+    toast: document.getElementById('ltv2-toast')
+  };
 }
 
-function getLivingTriplesReflectionTemplate() {
-    const scenarioTemplate = String(livingTriplesState.activeScenario?.reflectionTemplate || '').trim();
-    if (scenarioTemplate) return scenarioTemplate;
-    return String(livingTriplesState.activeRow?.reflectionTemplate || '').trim();
+function saveProgress() {
+  if (!state.progress) return;
+  localStorage.setItem(LIVING_TRIPLES_STORAGE_KEY, JSON.stringify(state.progress));
 }
 
-function getLivingTriplesRowCategoryLabels(row = livingTriplesState.activeRow) {
-    return (Array.isArray(row?.categories) ? row.categories : [])
-        .map(category => String(category?.label || '').trim())
-        .filter(Boolean);
+function loadProgress() {
+  const base = { played: 0, totalScore: 0, bestScore: 0, lastPlayedAt: null };
+  try {
+    const raw = localStorage.getItem(LIVING_TRIPLES_STORAGE_KEY);
+    if (!raw) return base;
+    return { ...base, ...(JSON.parse(raw) || {}) };
+  } catch {
+    return base;
+  }
 }
 
-function getLivingTriplesSelectedCategoryLabel() {
-    const selectedId = ltNormalizeCategoryId(livingTriplesState.selectedCategory);
-    if (!selectedId || !livingTriplesState.activeRow) return '';
-    const found = (livingTriplesState.activeRow.categories || []).find(category => category.id === selectedId);
-    return String(found?.label || '').trim();
+function showToast(text, cls = 'info') {
+  const t = state.el.toast;
+  if (!t) return;
+  t.className = `ltv2-toast ${cls}`;
+  t.textContent = text;
+  t.classList.remove('hidden');
+  clearTimeout(state.toastTimer);
+  state.toastTimer = setTimeout(() => t.classList.add('hidden'), 2200);
 }
 
-function getLivingTriplesRowDisplayLabel(row = livingTriplesState.activeRow) {
-    if (!row) return '';
-    const rowNumber = getLivingTriplesRowNumber(row.id) || '?';
-    return `Row ${rowNumber} - ${String(row.label || row.id).trim()}`;
-}
-
-function setLivingTriplesPhilosophyFocus(focusText = '', rowText = '') {
-    if (livingTriplesState.elements?.philosophyFocusText && focusText) {
-        livingTriplesState.elements.philosophyFocusText.textContent = focusText;
-    }
-    if (livingTriplesState.elements?.philosophyRowText && rowText) {
-        livingTriplesState.elements.philosophyRowText.textContent = rowText;
-    }
-}
-
-function buildLivingTriplesStructuredReflectionModel() {
-    const row = livingTriplesState.activeRow;
-    if (!row) return null;
-
-    const rowLabels = getLivingTriplesRowCategoryLabels(row);
-    const selectedCategoryLabel = getLivingTriplesSelectedCategoryLabel() || rowLabels[0] || '';
-    const rowIntent = LIVING_TRIPLES_ROW_INTENT[row.id] || {
-        common: 'השלשה הזו מאמנת זיהוי מבנה משותף בין שלושה דפוסים מאותה שכבה.',
-        impact: 'כששלושת הרכיבים עובדים יחד נוצרת תחושה שהחוויה "סגורה" ומוחלטת.',
-        goal: 'לזהות, לשקף, ולאתגר בלי לעבור לפריזמה אחרת.'
-    };
-    const revealLines = (livingTriplesState.revealSlots || []).map((slot, idx) => {
-        const label = rowLabels[idx] || `רכיב ${idx + 1}`;
-        if (slot?.status === 'unknown_final') return `${label}: חסר (Unknown אחרי Follow-up)`;
-        return `${label}: ${String(slot?.answer || '—').trim()}`;
+function categories() {
+  const out = [];
+  const map = state.data.triplesMap;
+  Object.keys(map.rows).map(Number).sort((a, b) => a - b).forEach((row) => {
+    (map.rows[String(row)] || []).forEach((cat) => {
+      out.push({ key: cat, row, he: map.labelsHe[cat] || cat, en: cat });
     });
-    const unknownCount = (livingTriplesState.revealSlots || []).filter(slot => slot?.status === 'unknown_final').length;
-    const learned = unknownCount
-        ? 'גם כשיש רכיב חסר, עדיין אפשר לבנות שיקוף מדויק שמכבד את מה שחסר ולא ממציא.'
-        : 'הצלחתי להחזיק שלשה מלאה בלי לקפוץ מוקדם מדי לאתגור או להסבר רחב מדי.';
-
-    return {
-        rowDisplay: getLivingTriplesRowDisplayLabel(row),
-        tripleLabels: rowLabels,
-        selectedCategoryLabel,
-        common: rowIntent.common,
-        impact: rowIntent.impact,
-        goal: rowIntent.goal,
-        learned,
-        revealLines,
-        autoReflection: buildLivingTriplesAutoReflection(),
-        aiChallenges: getLivingTriplesChallengeOptions().slice(0, 3)
-    };
+  });
+  return out;
 }
 
-function renderLivingTriplesStructuredReflection() {
-    const container = livingTriplesState.elements?.reflectStructured;
-    if (!container) return;
-    const model = buildLivingTriplesStructuredReflectionModel();
-    if (!model) {
-        container.innerHTML = '';
-        return;
-    }
+function catByKey(key) {
+  return categories().find((c) => c.key === key) || null;
+}
 
-    const tripleLine = model.tripleLabels.join(' + ');
-    const aiPills = (model.aiChallenges || []).map((item) => (
-        `<span class="lt-reflect-ai-pill">${ltEscape(item)}</span>`
-    )).join('');
+function setStep(step) {
+  state.step = step;
+  state.el.stepperItems.forEach((item) => {
+    const s = Number(item.getAttribute('data-step'));
+    item.classList.toggle('is-active', s === step);
+    item.classList.toggle('is-done', s < step);
+  });
+  state.el.step1.classList.toggle('hidden', step !== 1);
+  state.el.step2.classList.toggle('hidden', step !== 2);
+  state.el.step3.classList.toggle('hidden', step !== 3);
+  state.el.step4.classList.toggle('hidden', step !== 4);
+}
 
-    container.innerHTML = `
-        <p class="lt-reflect-line"><strong>השורה שנבחרה:</strong> ${ltEscape(model.rowDisplay)}</p>
-        <p class="lt-reflect-line"><strong>השלשה:</strong> ${ltEscape(tripleLine)}</p>
-        <p class="lt-reflect-line"><strong>הקטגוריה הראשית שזוהתה:</strong> ${ltEscape(model.selectedCategoryLabel)}</p>
-        <p class="lt-reflect-line"><strong>מה המשותף לשלוש:</strong> ${ltEscape(model.common)}</p>
-        <p class="lt-reflect-line"><strong>איך זה משפיע על האדם:</strong> ${ltEscape(model.impact)}</p>
-        <p class="lt-reflect-line"><strong>מה למדתי:</strong> ${ltEscape(model.learned)}</p>
-        <div class="lt-reflect-ai-options">${aiPills}</div>
+function updateTop() {
+  state.el.sceneIndex.textContent = String(state.index + 1);
+  state.el.sceneTotal.textContent = String(state.queue.length || 1);
+  state.el.score.textContent = String(state.score);
+}
+
+function renderSentence() {
+  state.el.sentenceText.textContent = safeText(state.current?.sentence, 'משפט לתרגול');
+}
+
+function renderMap() {
+  const rows = state.data.triplesMap.rows;
+  const labels = state.data.triplesMap.labelsHe;
+  state.el.mapContent.innerHTML = Object.keys(rows).map(Number).sort((a, b) => a - b).map((row) => {
+    const chips = (rows[String(row)] || []).map((cat) => `
+      <div class="ltv2-map-chip"><strong>${esc(labels[cat] || cat)}</strong><small>${esc(cat)}</small></div>
+    `).join('');
+    return `<section class="ltv2-map-row"><h4>Row ${row}</h4><div class="ltv2-map-row-cells">${chips}</div></section>`;
+  }).join('');
+}
+function resetRound() {
+  clearInterval(state.editTimer);
+  clearTimeout(state.autoTimer);
+  state.editTimer = null;
+  state.autoTimer = null;
+  state.step = 1;
+  state.activeRow = 0;
+  state.selectedCategory = '';
+  state.reveal = {};
+  state.reflectionText = '';
+
+  state.el.step1Feedback.textContent = '';
+  state.el.step2Feedback.textContent = '';
+  state.el.revealCards.innerHTML = '';
+  if (state.el.revealCategories) state.el.revealCategories.innerHTML = '';
+  state.el.revealProgress.textContent = '0/3';
+  state.el.rowSticky.classList.add('hidden');
+  state.el.rowMembers.innerHTML = '';
+  state.el.editWrap.classList.add('hidden');
+  state.el.editTimer.textContent = '';
+  state.el.reflectInput.value = '';
+  state.el.reflectionCard.innerHTML = '';
+  state.el.insightCard.innerHTML = '';
+}
+
+function initReveal(row) {
+  const slots = {};
+  (state.data.triplesMap.rows[String(row)] || []).forEach((cat) => {
+    slots[cat] = { asked: false, showHelp: false, helpHint: '', answer: '', summary: '' };
+  });
+  state.reveal = slots;
+}
+
+function renderCategoryChips() {
+  state.el.categoryChips.innerHTML = categories().map((c) => {
+    const selected = c.key === state.selectedCategory;
+    return `
+      <button type="button" class="ltv2-category-chip ${selected ? 'is-selected' : ''}" data-ltv2-category="${encodeURIComponent(c.key)}" aria-pressed="${selected ? 'true' : 'false'}">
+        <strong>${esc(c.he)}</strong>
+        <small>${esc(c.en)} · Row ${c.row}</small>
+      </button>
     `;
+  }).join('');
 }
 
-function buildLivingTriplesPersonalReflectionDraft() {
-    const model = buildLivingTriplesStructuredReflectionModel();
-    if (!model) return '';
+function renderRowSticky() {
+  if (!state.activeRow) {
+    state.el.rowSticky.classList.add('hidden');
+    state.el.rowMembers.innerHTML = '';
+    return;
+  }
 
-    const revealSummary = (model.revealLines || []).map((line) => `- ${line}`).join('\n');
-    const challenges = (model.aiChallenges || []).slice(0, 3).map((item, index) => `${index + 1}. ${item}`).join('\n');
-
-    return [
-        'שיקוף השלשה המלא',
-        `השורה שנבחרה: ${model.rowDisplay}`,
-        `השלשה: ${model.tripleLabels.join(' + ')}`,
-        `הקטגוריה הראשית: ${model.selectedCategoryLabel}`,
-        '',
-        'מה המשותף לשלוש:',
-        model.common,
-        '',
-        'איך זה משפיע על האדם:',
-        model.impact,
-        '',
-        'מה למדתי מה-Reveal:',
-        model.learned,
-        revealSummary ? `\nמה עלה ב-Reveal:\n${revealSummary}` : '',
-        '',
-        'השיקוף שאני אומר/ת עכשיו:',
-        model.autoReflection || 'נשמע שיש כאן שלשה שעובדת יחד וצריך לדייק אותה לפני אתגור.',
-        '',
-        'מה אני רוצה להשיג עכשיו:',
-        model.goal,
-        '',
-        'אתגור מומלץ (בחר אחד):',
-        challenges || '1. בחר/י אתגר אחד שמתאים לרכיב שנבחר.'
-    ].filter((line) => line !== '').join('\n');
+  const labels = state.data.triplesMap.labelsHe;
+  const rowCats = state.data.triplesMap.rows[String(state.activeRow)] || [];
+  state.el.rowTitle.textContent = `Row ${state.activeRow}: שלשה פעילה`;
+  state.el.rowMembers.innerHTML = rowCats.map((cat) => {
+    const selected = cat === state.selectedCategory;
+    return `<span class="ltv2-row-member ${selected ? 'is-selected' : ''}">${esc(labels[cat] || cat)}</span>`;
+  }).join('');
+  state.el.rowSticky.classList.remove('hidden');
 }
 
-function seedLivingTriplesCustomReflectionDraft(force = false) {
-    const input = livingTriplesState.elements?.customReflectInput;
-    if (!input) return;
-    if (!force && String(input.value || '').trim()) return;
-    input.value = buildLivingTriplesPersonalReflectionDraft();
+function revealCount() {
+  const keys = Object.keys(state.reveal);
+  const asked = keys.filter((k) => state.reveal[k]?.asked).length;
+  return { asked, total: keys.length };
 }
 
-function toggleLivingTriplesCustomReflection() {
-    const wrap = livingTriplesState.elements?.customReflectWrap;
-    if (!wrap) return;
-    const willOpen = wrap.classList.contains('hidden');
-    wrap.classList.toggle('hidden');
-    if (willOpen) {
-        seedLivingTriplesCustomReflectionDraft(false);
-        if (livingTriplesState.elements?.reflectStatus) {
-            livingTriplesState.elements.reflectStatus.textContent = 'טיוטת שיקוף אישי מוכנה לעריכה.';
-        }
-    }
+function helpHint(cat, option) {
+  const slot = state.reveal[cat] || {};
+  const labels = state.data.triplesMap.labelsHe;
+  if (Number(option) === 1) {
+    return `דוגמה קטנה: במקום משפט כללי, נסח/י מקרה אחד ממשי. (${labels[cat] || cat})`;
+  }
+  const short = (slot.answer || '').length > 90 ? `${slot.answer.slice(0, 88).trim()}...` : (slot.answer || '');
+  return `שאלה עדינה: מתי כן / מי כן היה יודע? רמז: ${short}`;
 }
 
-async function loadLivingTriplesData() {
-    try {
-        const response = await fetch('data/living-triples.json', { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const payload = await response.json();
-        const rows = Array.isArray(payload?.rows)
-            ? payload.rows.map(row => ({
-                ...row,
-                id: ltNormalizeRowId(row?.id || ''),
-                categories: Array.isArray(row?.categories)
-                    ? row.categories.map(category => ({
-                        ...category,
-                        id: ltNormalizeCategoryId(category?.id || category?.label || '')
-                    }))
-                    : []
-            })).filter(row => row.id)
-            : [];
-        const scenarios = Array.isArray(payload?.scenarios)
-            ? payload.scenarios.map((scenario, index) => normalizeLivingTriplesScenario(scenario, index, rows)).filter(Boolean)
-            : [];
-        if (!rows.length || !scenarios.length) throw new Error('living triples payload missing rows/scenarios');
+function renderReveal() {
+  const labels = state.data.triplesMap.labelsHe;
+  const rowCats = state.data.triplesMap.rows[String(state.activeRow)] || [];
 
-        livingTriplesDataState = {
-            ...payload,
-            rows,
-            scenarios,
-            categories: Array.isArray(payload?.categories) ? payload.categories : [],
-            anchorTable: Array.isArray(payload?.anchorTable) ? payload.anchorTable : []
-        };
-        return true;
-    } catch (error) {
-        console.error('Cannot load data/living-triples.json', error);
-        return false;
-    }
+  state.el.revealCards.innerHTML = rowCats.map((cat) => {
+    const slot = state.reveal[cat] || {};
+    const ans = state.current?.answers?.[cat] || {};
+    const answered = Boolean(slot.asked);
+
+    return `
+      <article class="ltv2-reveal-card ${answered ? 'is-answered opened-content' : ''}" data-ltv2-card="${encodeURIComponent(cat)}">
+        <header><h5>${esc(labels[cat] || cat)}</h5><small>${esc(cat)}</small></header>
+        <p class="ltv2-reveal-question">${esc(ans.question || defaultQuestion(cat))}</p>
+        <div class="ltv2-reveal-actions">
+          <button type="button" class="btn btn-primary" data-ltv2-act="ask" data-ltv2-cat="${encodeURIComponent(cat)}" ${answered ? 'disabled' : ''}>${answered ? 'נשאל ✓' : 'שאל'}</button>
+          <button type="button" class="btn btn-secondary" data-ltv2-act="help" data-ltv2-cat="${encodeURIComponent(cat)}" ${answered ? 'disabled' : ''}>אני לא יודע</button>
+        </div>
+        ${slot.showHelp && !answered ? `
+          <div class="ltv2-help-popover opened-content">
+            <button type="button" class="btn btn-secondary" data-ltv2-act="help-option" data-ltv2-option="1" data-ltv2-cat="${encodeURIComponent(cat)}">ננסה דוגמה אחת קטנה?</button>
+            <button type="button" class="btn btn-secondary" data-ltv2-act="help-option" data-ltv2-option="2" data-ltv2-cat="${encodeURIComponent(cat)}">מתי כן / מי כן היה יודע?</button>
+          </div>
+        ` : ''}
+        ${slot.helpHint ? `<p class="ltv2-help-hint">${esc(slot.helpHint)}</p>` : ''}
+        ${answered ? `<p class="ltv2-answer-text">✅ ${esc(slot.answer)}</p>` : ''}
+      </article>
+    `;
+  }).join('');
+
+  const c = revealCount();
+  state.el.revealProgress.textContent = `${c.asked}/${c.total}`;
 }
 
-function clearLivingTriplesDemoTimer() {
-    if (livingTriplesState.demoTimer) {
-        clearInterval(livingTriplesState.demoTimer);
-        livingTriplesState.demoTimer = null;
-    }
+function renderRevealCategories() {
+  if (!state.el.revealCategories) return;
+  const activeRow = state.activeRow;
+  state.el.revealCategories.innerHTML = categories().map((c) => {
+    const isRow = c.row === activeRow;
+    return `
+      <button type="button" class="ltv2-reveal-cat ${isRow ? 'is-row' : ''}" data-ltv2-category="${encodeURIComponent(c.key)}">
+        ${esc(c.he)}
+      </button>
+    `;
+  }).join('');
 }
 
-function setLivingTriplesScreen(screenName = 'onboarding') {
-    if (!livingTriplesState.elements) return;
-    const screens = {
-        onboarding: livingTriplesState.elements.screenOnboarding,
-        practice: livingTriplesState.elements.screenPractice,
-        wrap: livingTriplesState.elements.screenWrap
-    };
-    Object.entries(screens).forEach(([key, el]) => {
-        if (!el) return;
-        el.classList.toggle('hidden', key !== screenName);
-    });
+function buildReflection() {
+  const labels = state.data.triplesMap.labelsHe;
+  const rowCats = state.data.triplesMap.rows[String(state.activeRow)] || [];
+  const lines = rowCats.map((cat, i) => {
+    const slot = state.reveal[cat] || {};
+    const summary = safeText(slot.summary || slot.answer, '---');
+    return `(${i + 1}) ${labels[cat] || cat}: ${summary}`;
+  });
+  return `אז אם אני מבין נכון:\n${lines.join('\n')}`;
 }
 
-function setLivingTriplesCurrentTask(text = '') {
-    const el = livingTriplesState.elements?.currentTask;
-    if (!el) return;
-    el.textContent = String(text || '').trim() || 'עכשיו: קרא/י את המשפט ובחר/י קטגוריה אחת מתוך הטבלה.';
+function renderReflection() {
+  state.el.reflectionCard.innerHTML = `<p>${esc(state.reflectionText).replace(/\n/g, '<br>')}</p>`;
 }
 
-function renderLivingTriplesOnboarding(statusMessage = '') {
-    if (!livingTriplesState.elements) return;
-    setLivingTriplesScreen('onboarding');
-    setLivingTriplesPhilosophyFocus(
-        'מתחילים מזיהוי קטגוריה אחת כדי להדליק את כל השורה.',
-        'עדיין לא נבחרה שלשה.'
-    );
-    const played = Number(livingTriplesState.progress?.played || 0);
-    const totalScore = Number(livingTriplesState.progress?.totalScore || 0);
-    const avg = played ? Math.round(totalScore / played) : 0;
-    if (livingTriplesState.elements.demoStatus) {
-        livingTriplesState.elements.demoStatus.textContent = statusMessage || (played
-            ? `תרגלת ${played} סצנות עד עכשיו | ממוצע ${avg}/100`
-            : 'מוכן/ה לסשן ראשון של 25 סצנות.');
-    }
-    if (livingTriplesState.elements.customReflectWrap) {
-        livingTriplesState.elements.customReflectWrap.classList.add('hidden');
-    }
-    setLivingTriplesCurrentTask('עכשיו: לחץ/י על "התחל אימון" כדי לקבל סצנה ולעבוד שלב-שלב.');
+function renderInsight() {
+  const text = safeText(state.current?.insight, 'מעניין... לא חשבתי על זה ככה.');
+  state.el.insightCard.innerHTML = `<p class="ltv2-insight-quote">"${esc(text)}"</p><p class="ltv2-insight-sub">יפה. השלשה הושלמה ונוצרה תמונה טיפולית ברורה יותר.</p>`;
 }
 
-function runLivingTriplesDemo() {
-    if (!livingTriplesState.elements) return;
-    clearLivingTriplesDemoTimer();
-    const steps = [
-        'דמו 20 שניות: מזהים קטגוריה אחת בתוך משפט.',
-        'השורה כולה נדלקת: 3 רכיבים, פריזמה אחת.',
-        'נשאלות 3 שאלות עוגן קצרות (Reveal).',
-        'נבנה שיקוף שקוף שמחבר את כל הרכיבים.',
-        'נבחר אתגור אחד תואם לרכיב ונקבל תגובה.',
-        'זהו. עכשיו עוברים לאימון מלא.'
-    ];
+function render() {
+  setStep(state.step);
+  updateTop();
+  renderSentence();
+  renderCategoryChips();
+  renderRowSticky();
+  if (state.step >= 2) {
+    renderRevealCategories();
+    renderReveal();
+  }
+  if (state.step >= 3) renderReflection();
+  if (state.step >= 4) renderInsight();
+}
 
-    let index = 0;
-    if (livingTriplesState.elements.demoBtn) {
-        livingTriplesState.elements.demoBtn.disabled = true;
-    }
-    if (livingTriplesState.elements.demoStatus) {
-        livingTriplesState.elements.demoStatus.textContent = steps[index];
+function wrongShake(node) {
+  if (!node) return;
+  node.classList.add('ltv2-shake');
+  setTimeout(() => node.classList.remove('ltv2-shake'), 320);
+}
+
+function handleCategoryPick(catKey, button) {
+  const cat = catByKey(catKey);
+  if (!cat || !state.current) return;
+
+  if (state.step === 1) {
+    if (cat.row !== state.current.targetRow) {
+      state.score = Math.max(0, state.score - 15);
+      state.el.step1Feedback.textContent = 'נסה/י שוב: חפש/י קטגוריה ששייכת לשורה הפעילה במשפט הזה.';
+      wrongShake(button);
+      updateTop();
+      return;
     }
 
-    livingTriplesState.demoTimer = setInterval(() => {
-        index += 1;
-        if (index >= steps.length) {
-            clearLivingTriplesDemoTimer();
-            if (livingTriplesState.elements.demoBtn) {
-                livingTriplesState.elements.demoBtn.disabled = false;
-            }
-            if (livingTriplesState.elements.demoStatus) {
-                livingTriplesState.elements.demoStatus.textContent = 'הדמו הסתיים. לחץ/י \"התחל אימון\" כדי להיכנס ללופ המלא.';
-            }
-            return;
-        }
-        if (livingTriplesState.elements.demoStatus) {
-            livingTriplesState.elements.demoStatus.textContent = steps[index];
-        }
-    }, 4000);
-}
+    state.selectedCategory = cat.key;
+    state.activeRow = cat.row;
+    initReveal(cat.row);
+    state.score += 80;
+    state.el.step1Feedback.textContent = `נבחר: ${cat.he}. עכשיו משלימים Reveal מלא לאותה שלשה.`;
+    setStep(2);
+    render();
+    state.el.step2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
 
-function getLivingTriplesScenarioRevealAnswer(slotIndex) {
-    const answers = livingTriplesState.activeScenario?.revealAnswers;
-    if (!Array.isArray(answers)) return '';
-    const value = answers[slotIndex];
-    if (Array.isArray(value)) {
-        const options = value.map(item => String(item || '').trim()).filter(Boolean);
-        if (!options.length) return '';
-        return options[Math.floor(Math.random() * options.length)] || '';
+  if (state.step === 2) {
+    if (cat.row !== state.activeRow) {
+      const selected = catByKey(state.selectedCategory);
+      state.el.step2Feedback.textContent = `❌ לא באותה שלשה. חפש/י את שתי האחיות של ${selected?.he || 'הקטגוריה הנוכחית'} בתוך Row ${state.activeRow}.`;
+      wrongShake(button);
+      showToast('לא באותה שלשה', 'danger');
+      return;
     }
-    return String(value || '').trim();
-}
-
-function getLivingTriplesUnknownFlow(slotIndex) {
-    const flow = livingTriplesState.activeScenario?.unknownFlow;
-    if (!flow || typeof flow !== 'object') return null;
-    return Number(flow.slot) === Number(slotIndex) ? flow : null;
-}
-
-function getLivingTriplesDeviationFlow(slotIndex) {
-    const flow = livingTriplesState.activeScenario?.deviationFlow;
-    if (!flow || typeof flow !== 'object') return null;
-    return Number(flow.slot) === Number(slotIndex) ? flow : null;
-}
-
-function isLivingTriplesRevealResolved(slot) {
-    return slot?.status === 'answered' || slot?.status === 'unknown_final';
-}
-
-function isLivingTriplesRevealComplete() {
-    return Array.isArray(livingTriplesState.revealSlots) && livingTriplesState.revealSlots.length === 3
-        && livingTriplesState.revealSlots.every(isLivingTriplesRevealResolved);
-}
-
-function buildLivingTriplesAutoReflection() {
-    const row = livingTriplesState.activeRow;
-    if (!row) return '';
-
-    const fillValues = livingTriplesState.revealSlots.map(slot => {
-        if (slot.status === 'unknown_final') return '[חסר]';
-        return slot.answer || '[חסר]';
-    });
-    let fillIndex = 0;
-    const template = getLivingTriplesReflectionTemplate();
-    const base = String(template || '').replace(/\[[^\]]+\]/g, () => fillValues[fillIndex++] || '[חסר]');
-
-    const unknownLabels = livingTriplesState.revealSlots
-        .map((slot, idx) => (slot.status === 'unknown_final' ? row.categories?.[idx]?.label || `Slot ${idx + 1}` : null))
-        .filter(Boolean);
-
-    if (!unknownLabels.length) return base;
-    return `${base} (חסר רכיב: ${unknownLabels.join(', ')})`;
-}
-
-function resetLivingTriplesRoundState() {
-    const row = livingTriplesState.activeRow;
-    if (!row) return;
-
-    livingTriplesState.selectedCategory = '';
-    livingTriplesState.categoryAttempts = 0;
-    livingTriplesState.categoryResolved = false;
-    livingTriplesState.revealMessage = '';
-    livingTriplesState.reflectionDone = false;
-    livingTriplesState.reflectionText = '';
-    livingTriplesState.challengeDone = false;
-    livingTriplesState.challengeTargetIndex = -1;
-    livingTriplesState.challengeChoiceIndex = -1;
-    livingTriplesState.challengeAttempts = 0;
-    livingTriplesState.scoreBreakdown = null;
-    livingTriplesState.futurePace = null;
-
-    livingTriplesState.revealSlots = (row.categories || []).map((category, index) => ({
-        slotIndex: index,
-        categoryId: category.id,
-        asked: false,
-        status: 'pending',
-        answer: '',
-        followUpUsed: false,
-        rephraseUsed: false,
-        rephraseOpen: false,
-        rephraseText: '',
-        deviationHandled: false
-    }));
-}
-
-function renderLivingTriplesCategoryButtons() {
-    if (!livingTriplesState.elements?.categoryButtons) return;
-    const container = livingTriplesState.elements.categoryButtons;
-    const rows = Array.isArray(livingTriplesDataState.rows) ? livingTriplesDataState.rows : [];
-    const selectedCategoryId = ltNormalizeCategoryId(livingTriplesState.selectedCategory);
-    const selectedRowId = livingTriplesState.categoryResolved
-        ? ltNormalizeRowId(livingTriplesState.activeRow?.id || '')
-        : ltNormalizeRowId(getLivingTriplesRowByCategory(selectedCategoryId)?.id || '');
-
-    container.classList.add('lt-breen-grid-layout');
-    container.innerHTML = '';
-
-    rows.forEach((row, rowIndex) => {
-        const rowMeta = getLivingTriplesBreenRowMeta(row.id || `row${rowIndex + 1}`);
-        const rowWrap = document.createElement('section');
-        rowWrap.className = `tr-phone-breen-row lt-category-row ${rowMeta.colorClass || ''}`;
-        if (selectedRowId && ltNormalizeRowId(row.id) === selectedRowId) {
-            rowWrap.classList.add('is-active');
-        }
-
-        const rowHead = document.createElement('div');
-        rowHead.className = 'tr-phone-breen-row-head';
-        rowHead.textContent = rowMeta.heLabel || row.label || `Row ${rowIndex + 1}`;
-        rowWrap.appendChild(rowHead);
-
-        const rowCells = document.createElement('div');
-        rowCells.className = 'tr-phone-breen-row-cells';
-
-        (row.categories || []).forEach((category) => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'lt-category-btn lt-category-btn-board';
-            button.dataset.ltCategory = category.id;
-            if (selectedCategoryId && ltNormalizeCategoryId(category.id) === selectedCategoryId) {
-                button.classList.add('is-selected');
-            }
-            if (livingTriplesState.categoryResolved) button.disabled = true;
-
-            const label = document.createElement('span');
-            label.className = 'lt-category-label';
-            label.textContent = category.label || category.id;
-
-            const hint = document.createElement('small');
-            hint.className = 'lt-category-hint';
-            hint.textContent = `Row ${rowIndex + 1}`;
-
-            button.appendChild(label);
-            button.appendChild(hint);
-            rowCells.appendChild(button);
-        });
-
-        rowWrap.appendChild(rowCells);
-        container.appendChild(rowWrap);
-    });
-}
-
-function renderLivingTriplesRowLit() {
-    if (!livingTriplesState.elements || !livingTriplesState.activeRow) return;
-    const row = livingTriplesState.activeRow;
-    const rowNumber = getLivingTriplesRowNumber(row.id) || '?';
-    if (livingTriplesState.elements.rowTitle) {
-        livingTriplesState.elements.rowTitle.textContent = `Row ${rowNumber} — ${row.label}`;
+    const card = state.el.revealCards.querySelector(`[data-ltv2-card="${encodeURIComponent(cat.key)}"]`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.add('opened-content');
+      setTimeout(() => card.classList.remove('opened-content'), 900);
     }
-
-    if (!livingTriplesState.elements.rowChips) return;
-    livingTriplesState.elements.rowChips.innerHTML = '';
-    (row.categories || []).forEach(category => {
-        const chip = document.createElement('span');
-        chip.className = 'lt-row-chip';
-        if (category.id === livingTriplesState.selectedCategory) chip.classList.add('is-selected');
-        chip.textContent = category.label;
-        livingTriplesState.elements.rowChips.appendChild(chip);
-    });
+  }
 }
 
-function getLivingTriplesRevealStatusLabel(slot) {
-    switch (slot.status) {
-        case 'answered': return 'נחשף';
-        case 'unknown_wait': return 'Unknown: נדרש Follow-up';
-        case 'unknown_final': return 'Unknown slot';
-        case 'deviation_wait': return 'סטייה מהפריזמה';
-        default: return 'ממתין';
-    }
+function maybeToReflection() {
+  const c = revealCount();
+  if (c.total && c.asked === c.total) {
+    state.el.step2Feedback.textContent = 'מעולה. השלשה הושלמה (3/3). עוברים לשיקוף...';
+    state.autoTimer = setTimeout(() => {
+      state.reflectionText = buildReflection();
+      setStep(3);
+      render();
+      state.el.step3.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 420);
+  }
 }
 
-function renderLivingTriplesReveal() {
-    if (!livingTriplesState.elements?.revealCards || !livingTriplesState.activeRow) return;
-    const row = livingTriplesState.activeRow;
-    const container = livingTriplesState.elements.revealCards;
-    container.innerHTML = '';
+function handleRevealAction(catKey, action, option) {
+  const slot = state.reveal[catKey];
+  if (!slot) return;
 
-    livingTriplesState.revealSlots.forEach((slot, idx) => {
-        const category = row.categories?.[idx] || {};
-        const question = slot.rephraseText || getLivingTriplesAnchorQuestion(idx) || '';
-        const statusClass = `status-${slot.status || 'pending'}`;
-        const answerClass = slot.status === 'unknown_wait' || slot.status === 'unknown_final'
-            ? 'is-unknown'
-            : slot.status === 'deviation_wait'
-                ? 'is-deviation'
-                : 'is-ok';
-        const deviationFlow = getLivingTriplesDeviationFlow(idx);
-        const joinLead = deviationFlow?.joinLead || `חשוב מה שעלה, ובוא נחזור לשאלה: ${question}`;
-
-        const card = document.createElement('article');
-        card.className = `lt-reveal-card ${statusClass}`;
-        card.innerHTML = `
-            <div class="lt-reveal-head">
-                <strong>${ltEscape(category.label || `Slot ${idx + 1}`)}</strong>
-                <span>${ltEscape(getLivingTriplesRevealStatusLabel(slot))}</span>
-            </div>
-            <p class="lt-anchor-question">${ltEscape(question)}</p>
-            ${slot.asked ? `<div class="lt-answer-block ${answerClass}">${ltEscape(slot.answer || '')}</div>` : ''}
-            ${slot.status === 'deviation_wait' ? `
-                <p class="lt-deviation-tooltip">${ltEscape(LIVING_TRIPLES_DEVIATION_TOOLTIP)}</p>
-                <p class="lt-joinlead-text">${ltEscape(joinLead)}</p>
-                <button class="btn btn-secondary" data-lt-reveal-action="joinlead" data-slot="${idx}" type="button">חזור לשאלה</button>
-            ` : ''}
-            ${slot.status === 'unknown_wait' ? `
-                <p class="lt-followup-text">${ltEscape(livingTriplesState.activeScenario?.followUp || row.followUp || '')}</p>
-                <button class="btn btn-secondary" data-lt-reveal-action="followup" data-slot="${idx}" type="button">Follow-up</button>
-            ` : ''}
-            ${!slot.asked ? `
-                <div class="lt-reveal-actions">
-                    <button class="btn btn-primary" data-lt-reveal-action="ask" data-slot="${idx}" type="button">שאל שאלת עוגן</button>
-                    ${!slot.rephraseUsed ? `<button class="btn btn-secondary" data-lt-reveal-action="rephrase-open" data-slot="${idx}" type="button">Rephrase once</button>` : ''}
-                </div>
-            ` : ''}
-            ${slot.rephraseOpen && !slot.asked ? `
-                <div class="lt-rephrase-wrap">
-                    <textarea id="lt-rephrase-input-${idx}" rows="2" placeholder="ניסוח חלופי קצר...">${ltEscape(slot.rephraseText || question)}</textarea>
-                    <button class="btn btn-secondary" data-lt-reveal-action="rephrase-save" data-slot="${idx}" type="button">שמור ושאל</button>
-                </div>
-            ` : ''}
-            ${slot.asked ? '<p class="lt-question-lock-note">Question Lock: השאלה נעולה.</p>' : ''}
-        `;
-        container.appendChild(card);
-    });
-
-    const completed = livingTriplesState.revealSlots.filter(isLivingTriplesRevealResolved).length;
-    const total = livingTriplesState.revealSlots.length;
-    if (livingTriplesState.elements.revealStatus) {
-        const suffix = livingTriplesState.revealMessage ? ` · ${livingTriplesState.revealMessage}` : '';
-        livingTriplesState.elements.revealStatus.textContent = `${completed}/${total} תשובות Reveal הושלמו${suffix}`;
-    }
-
-    if (!isLivingTriplesRevealComplete()) {
-        setLivingTriplesCurrentTask(`שלב 2 (Reveal): השלם/י ${total - completed} כרטיסים נוספים ואז עוברים לשיקוף.`);
-    }
-
-    if (isLivingTriplesRevealComplete()) {
-        openLivingTriplesReflectStepIfReady();
-    }
-}
-
-function askLivingTriplesRevealSlot(slotIndex) {
-    const slot = livingTriplesState.revealSlots?.[slotIndex];
-    if (!slot || slot.asked) return;
+  if (action === 'ask') {
+    if (slot.asked) return;
+    const ans = state.current?.answers?.[catKey] || {};
     slot.asked = true;
-    slot.rephraseOpen = false;
+    slot.showHelp = false;
+    slot.answer = safeText(ans.answer, 'אין תשובה מוכנה. נסו לשאול מחדש בקצרה.');
+    slot.summary = safeText(ans.summary, slot.answer);
+    slot.helpHint = '';
+    state.score += 55;
+    renderReveal();
+    updateTop();
+    maybeToReflection();
+    return;
+  }
 
-    const deviation = getLivingTriplesDeviationFlow(slotIndex);
-    if (deviation && !slot.deviationHandled) {
-        slot.status = 'deviation_wait';
-        slot.answer = String(deviation.answer || '').trim() || LIVING_TRIPLES_DEVIATION_TOOLTIP;
-        livingTriplesState.revealMessage = LIVING_TRIPLES_DEVIATION_TOOLTIP;
-        ltPlay('next');
-        renderLivingTriplesReveal();
-        return;
-    }
+  if (action === 'help') {
+    Object.keys(state.reveal).forEach((k) => { if (k !== catKey) state.reveal[k].showHelp = false; });
+    slot.showHelp = !slot.showHelp;
+    renderReveal();
+    return;
+  }
 
-    const unknown = getLivingTriplesUnknownFlow(slotIndex);
-    if (unknown && !slot.followUpUsed) {
-        slot.status = 'unknown_wait';
-        slot.answer = 'אני לא יודע';
-        livingTriplesState.revealMessage = 'נדרש Follow-up בתוך אותה שורה.';
-        ltPlay('next');
-        renderLivingTriplesReveal();
-        return;
-    }
-
-    slot.status = 'answered';
-    slot.answer = getLivingTriplesScenarioRevealAnswer(slotIndex) || '—';
-    livingTriplesState.revealMessage = 'תשובת Reveal נשמרה.';
-    ltPlay('correct');
-    renderLivingTriplesReveal();
+  if (action === 'help-option') {
+    slot.showHelp = false;
+    slot.helpHint = helpHint(catKey, option);
+    renderReveal();
+  }
+}
+function startEditReflection() {
+  state.el.editWrap.classList.remove('hidden');
+  state.el.reflectInput.value = state.reflectionText;
+  const started = Date.now();
+  const limit = 10000;
+  clearInterval(state.editTimer);
+  state.editTimer = setInterval(() => {
+    const left = Math.max(0, limit - (Date.now() - started));
+    state.el.editTimer.textContent = `נותרו ${(left / 1000).toFixed(1)} שניות`;
+    if (left <= 0) saveEditReflection();
+  }, 120);
 }
 
-function followUpLivingTriplesRevealSlot(slotIndex) {
-    const slot = livingTriplesState.revealSlots?.[slotIndex];
-    if (!slot || slot.status !== 'unknown_wait') return;
-    slot.followUpUsed = true;
-
-    const unknown = getLivingTriplesUnknownFlow(slotIndex);
-    if (unknown?.finalUnknown) {
-        slot.status = 'unknown_final';
-        slot.answer = 'אני לא יודע (גם אחרי Follow-up)';
-        livingTriplesState.revealMessage = 'Unknown slot נסגר כחסר.';
-    } else {
-        slot.status = 'answered';
-        slot.answer = String(unknown?.followUpAnswer || getLivingTriplesScenarioRevealAnswer(slotIndex) || '—').trim();
-        livingTriplesState.revealMessage = 'Follow-up החזיר תשובה בתוך אותה שורה.';
-    }
-    ltPlay('next');
-    renderLivingTriplesReveal();
+function saveEditReflection() {
+  clearInterval(state.editTimer);
+  state.editTimer = null;
+  state.reflectionText = safeText(state.el.reflectInput.value, state.reflectionText);
+  state.el.editWrap.classList.add('hidden');
+  state.el.editTimer.textContent = 'השיקוף נשמר.';
+  renderReflection();
 }
 
-function joinLeadLivingTriplesRevealSlot(slotIndex) {
-    const slot = livingTriplesState.revealSlots?.[slotIndex];
-    if (!slot || slot.status !== 'deviation_wait') return;
-    const deviation = getLivingTriplesDeviationFlow(slotIndex);
-    slot.deviationHandled = true;
-    slot.status = 'answered';
-    slot.answer = getLivingTriplesScenarioRevealAnswer(slotIndex) || '—';
-    livingTriplesState.revealMessage = String(deviation?.joinLead || 'חזרנו לפריזמה ולשאלה המקורית.').trim();
-    ltPlay('correct');
-    renderLivingTriplesReveal();
+function toInsight() {
+  setStep(4);
+  render();
+  state.el.step4.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-function handleLivingTriplesRevealAction(action, slotIndex) {
-    const slot = livingTriplesState.revealSlots?.[slotIndex];
-    if (!slot) return;
-
-    if (action === 'ask') {
-        askLivingTriplesRevealSlot(slotIndex);
-        return;
-    }
-
-    if (action === 'rephrase-open') {
-        if (slot.asked || slot.rephraseUsed) return;
-        slot.rephraseOpen = true;
-        renderLivingTriplesReveal();
-        return;
-    }
-
-    if (action === 'rephrase-save') {
-        if (slot.asked || slot.rephraseUsed) return;
-        const input = document.getElementById(`lt-rephrase-input-${slotIndex}`);
-        const value = String(input?.value || '').trim();
-        if (!value) {
-            livingTriplesState.revealMessage = 'יש להזין ניסוח חלופי לפני שמירה.';
-            renderLivingTriplesReveal();
-            return;
-        }
-        slot.rephraseUsed = true;
-        slot.rephraseText = value;
-        slot.rephraseOpen = false;
-        askLivingTriplesRevealSlot(slotIndex);
-        return;
-    }
-
-    if (action === 'followup') {
-        followUpLivingTriplesRevealSlot(slotIndex);
-        return;
-    }
-
-    if (action === 'joinlead') {
-        joinLeadLivingTriplesRevealSlot(slotIndex);
-    }
+function loadCurrentScenario() {
+  if (!state.queue.length) {
+    state.queue = shuffle([...state.data.scenarios]);
+    state.index = 0;
+  }
+  state.current = state.queue[state.index] || state.data.scenarios[0];
+  resetRound();
+  setStep(1);
+  render();
 }
 
-function openLivingTriplesReflectStepIfReady() {
-    if (!isLivingTriplesRevealComplete()) return;
-    if (!livingTriplesState.elements?.reflectBox) return;
-    livingTriplesState.elements.reflectBox.classList.remove('hidden');
-    const autoText = buildLivingTriplesAutoReflection();
-    if (livingTriplesState.elements.reflectAuto) {
-        livingTriplesState.elements.reflectAuto.textContent = autoText;
-    }
-    renderLivingTriplesStructuredReflection();
-    seedLivingTriplesCustomReflectionDraft(true);
-    setLivingTriplesPhilosophyFocus(
-        'עכשיו בונים שיקוף שמחבר בין שלושת רכיבי השלשה לפני אתגור.',
-        `${getLivingTriplesRowDisplayLabel()} | ${getLivingTriplesRowCategoryLabels().join(' + ')}`
-    );
-    if (livingTriplesState.elements.reflectStatus) {
-        livingTriplesState.elements.reflectStatus.textContent = 'בחר/י שיקוף אוטומטי או ניסוח אישי.';
-    }
-    setLivingTriplesCurrentTask('שלב 3 (שיקוף): בחר/י שיקוף אוטומטי או כתוב/כתבי שיקוף אישי, ואז שמור/י.');
+function nextScenario() {
+  state.progress.played += 1;
+  state.progress.totalScore += state.score;
+  state.progress.bestScore = Math.max(Number(state.progress.bestScore || 0), Number(state.score || 0));
+  state.progress.lastPlayedAt = new Date().toISOString();
+  saveProgress();
+
+  state.index += 1;
+  if (state.index >= state.queue.length) {
+    state.queue = shuffle([...state.data.scenarios]);
+    state.index = 0;
+  }
+  loadCurrentScenario();
 }
 
-function useLivingTriplesAutoReflection() {
-    if (!isLivingTriplesRevealComplete()) return;
-    livingTriplesState.reflectionDone = true;
-    livingTriplesState.reflectionText = buildLivingTriplesAutoReflection();
-    if (livingTriplesState.elements?.reflectStatus) {
-        livingTriplesState.elements.reflectStatus.textContent = 'השיקוף האוטומטי נשמר.';
-    }
-    setLivingTriplesCurrentTask('השיקוף נשמר. עכשיו עוברים לשלב 4: בחר/י רכיב יעד לאתגור.');
-    openLivingTriplesChallengeStep();
+function restartPickStep() {
+  state.activeRow = 0;
+  state.selectedCategory = '';
+  state.reveal = {};
+  state.el.step1Feedback.textContent = 'בחר/י קטגוריה חדשה כדי להתחיל שוב את השלשה.';
+  state.el.step2Feedback.textContent = '';
+  setStep(1);
+  render();
 }
 
-function saveLivingTriplesCustomReflection() {
-    const value = String(livingTriplesState.elements?.customReflectInput?.value || '').trim();
-    if (value.length < 8) {
-        if (livingTriplesState.elements?.reflectStatus) {
-            livingTriplesState.elements.reflectStatus.textContent = 'צריך לפחות 8 תווים כדי לשמור שיקוף אישי.';
-        }
-        return;
-    }
-    livingTriplesState.reflectionDone = true;
-    livingTriplesState.reflectionText = value;
-    if (livingTriplesState.elements?.reflectStatus) {
-        livingTriplesState.elements.reflectStatus.textContent = 'השיקוף האישי נשמר.';
-    }
-    setLivingTriplesCurrentTask('השיקוף נשמר. עכשיו עוברים לשלב 4: בחר/י רכיב יעד לאתגור.');
-    openLivingTriplesChallengeStep();
+function openMap() {
+  state.el.mapModal.classList.remove('hidden');
+  document.body.classList.add('screen-guide-open');
 }
 
-function openLivingTriplesChallengeStep() {
-    if (!livingTriplesState.reflectionDone || !livingTriplesState.elements?.challengeBox) return;
-    livingTriplesState.elements.challengeBox.classList.remove('hidden');
-    setLivingTriplesPhilosophyFocus(
-        'אתגור מדויק: נשארים בתוך אותה פריזמה ובוחרים רכיב יעד אחד.',
-        `${getLivingTriplesRowDisplayLabel()} | ${getLivingTriplesRowCategoryLabels().join(' + ')}`
-    );
-    if (livingTriplesState.elements?.challengeFeedback) {
-        livingTriplesState.elements.challengeFeedback.textContent = 'בחר/י קודם רכיב יעד (אחד משלושת הרכיבים), ואז בחר/י אתגר תואם.';
-    }
-    setLivingTriplesCurrentTask('שלב 4 (אתגור): קודם בחר/י רכיב יעד, ואז בחר/י אתגר לאותו רכיב.');
-    renderLivingTriplesChallenge();
+function closeMap() {
+  state.el.mapModal.classList.add('hidden');
+  if (!document.querySelector('.screen-read-guide-modal:not(.hidden)')) {
+    document.body.classList.remove('screen-guide-open');
+  }
 }
 
-function renderLivingTriplesChallenge() {
-    if (!livingTriplesState.elements || !livingTriplesState.activeRow) return;
-    const row = livingTriplesState.activeRow;
-    const challengeOptions = getLivingTriplesChallengeOptions();
-
-    if (livingTriplesState.elements.challengeTargets) {
-        livingTriplesState.elements.challengeTargets.innerHTML = '';
-        (row.categories || []).forEach((category, idx) => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'lt-target-btn';
-            if (idx === livingTriplesState.challengeTargetIndex) button.classList.add('is-selected');
-            if (livingTriplesState.challengeDone) button.disabled = true;
-            button.dataset.ltChallengeTarget = String(idx);
-            button.textContent = category.label;
-            livingTriplesState.elements.challengeTargets.appendChild(button);
-        });
-    }
-
-    if (livingTriplesState.elements.challengeOptions) {
-        livingTriplesState.elements.challengeOptions.innerHTML = '';
-        challengeOptions.forEach((challengeText, idx) => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'lt-challenge-btn';
-            if (idx === livingTriplesState.challengeChoiceIndex) button.classList.add('is-selected');
-            if (livingTriplesState.challengeDone) button.disabled = true;
-            button.dataset.ltChallengeOption = String(idx);
-            button.innerHTML = `<strong>${ltEscape(row.categories?.[idx]?.label || `רכיב ${idx + 1}`)}</strong><span>${ltEscape(challengeText)}</span>`;
-            livingTriplesState.elements.challengeOptions.appendChild(button);
-        });
-    }
+function startPractice() {
+  state.el.onboarding.classList.add('hidden');
+  state.el.practice.classList.remove('hidden');
+  state.queue = shuffle([...state.data.scenarios]);
+  state.index = 0;
+  state.score = 0;
+  loadCurrentScenario();
 }
 
-function computeLivingTriplesScore() {
-    const unknownCount = livingTriplesState.revealSlots.filter(slot => slot.status === 'unknown_final').length;
-    const categoryScore = livingTriplesState.categoryResolved
-        ? (livingTriplesState.categoryAttempts === 1 ? 40 : 20)
-        : 0;
-    const revealScore = isLivingTriplesRevealComplete()
-        ? (unknownCount ? 24 : 30)
-        : 0;
-    const reflectionScore = livingTriplesState.reflectionDone ? 15 : 0;
-    const challengeScore = livingTriplesState.challengeDone
-        ? (livingTriplesState.challengeAttempts === 1 ? 15 : 10)
-        : 0;
-    return {
-        categoryScore,
-        revealScore,
-        reflectionScore,
-        challengeScore,
-        total: categoryScore + revealScore + reflectionScore + challengeScore,
-        unknownCount
-    };
+function bindEvents() {
+  state.el.startBtn.addEventListener('click', startPractice);
+  state.el.openMapTopBtn.addEventListener('click', openMap);
+  state.el.openMapBtn.addEventListener('click', openMap);
+  state.el.closeMapBtn.addEventListener('click', closeMap);
+
+  state.el.mapModal.addEventListener('click', (e) => {
+    if (e.target === state.el.mapModal) closeMap();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !state.el.mapModal.classList.contains('hidden')) closeMap();
+  });
+
+  state.el.resetSceneBtn.addEventListener('click', () => {
+    state.queue = shuffle([...state.data.scenarios]);
+    state.index = 0;
+    loadCurrentScenario();
+    showToast('נטען תרחיש חדש', 'info');
+  });
+
+  state.el.changeRowBtn.addEventListener('click', restartPickStep);
+
+  state.el.categoryChips.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-ltv2-category]');
+    if (!btn) return;
+    const catKey = decodeURIComponent(btn.getAttribute('data-ltv2-category') || '');
+    handleCategoryPick(catKey, btn);
+  });
+
+  state.el.revealCards.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-ltv2-act]');
+    if (!btn) return;
+    const action = btn.getAttribute('data-ltv2-act') || '';
+    const catKey = decodeURIComponent(btn.getAttribute('data-ltv2-cat') || '');
+    const option = btn.getAttribute('data-ltv2-option') || '';
+    if (!catKey) return;
+    handleRevealAction(catKey, action, option);
+  });
+
+  state.el.revealCategories?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-ltv2-category]');
+    if (!btn) return;
+    const catKey = decodeURIComponent(btn.getAttribute('data-ltv2-category') || '');
+    handleCategoryPick(catKey, btn);
+  });
+
+  state.el.editReflectBtn.addEventListener('click', startEditReflection);
+  state.el.saveReflectBtn.addEventListener('click', saveEditReflection);
+  state.el.toInsightBtn.addEventListener('click', toInsight);
+  state.el.nextBtn.addEventListener('click', nextScenario);
 }
 
-function finishLivingTriplesScene() {
-    livingTriplesState.scoreBreakdown = computeLivingTriplesScore();
-    livingTriplesState.sessionScore += livingTriplesState.scoreBreakdown.total;
-
-    if (!livingTriplesState.progress) livingTriplesState.progress = getDefaultLivingTriplesProgress();
-    livingTriplesState.progress.played += 1;
-    livingTriplesState.progress.totalScore += livingTriplesState.scoreBreakdown.total;
-    livingTriplesState.progress.bestScore = Math.max(
-        Number(livingTriplesState.progress.bestScore || 0),
-        livingTriplesState.scoreBreakdown.total
-    );
-    livingTriplesState.progress.lastPlayedAt = new Date().toISOString();
-    saveLivingTriplesProgress();
-
-    renderLivingTriplesWrap();
-    setLivingTriplesScreen('wrap');
-    setLivingTriplesCurrentTask('סיכום סצנה: בדוק/י ציון, מלא/י Future Pace, ואז המשך/י לסצנה הבאה.');
-}
-
-function renderLivingTriplesWrap() {
-    if (!livingTriplesState.elements?.wrapScore || !livingTriplesState.scoreBreakdown) return;
-    const breakdown = livingTriplesState.scoreBreakdown;
-    const progress = livingTriplesState.progress || getDefaultLivingTriplesProgress();
-    const scenario = livingTriplesState.activeScenario || {};
-    const avg = progress.played ? Math.round(progress.totalScore / progress.played) : 0;
-    setLivingTriplesPhilosophyFocus(
-        'סיכום + Future Pace: לוקחים את התובנה מהשלשה לצעד הבא בעולם האמיתי.',
-        `${getLivingTriplesRowDisplayLabel()} | ${getLivingTriplesRowCategoryLabels().join(' + ')}`
-    );
-    livingTriplesState.elements.wrapScore.textContent = `ציון סצנה: ${breakdown.total}/100 | ממוצע מצטבר: ${avg}/100`;
-
-    if (livingTriplesState.elements.breakdown) {
-        livingTriplesState.elements.breakdown.innerHTML = '';
-        const lines = [
-            `בחירת קטגוריה: ${breakdown.categoryScore}/40`,
-            `Reveal: ${breakdown.revealScore}/30`,
-            `שיקוף: ${breakdown.reflectionScore}/15`,
-            `אתגור: ${breakdown.challengeScore}/15`
-        ];
-        lines.forEach(line => {
-            const item = document.createElement('li');
-            item.textContent = line;
-            livingTriplesState.elements.breakdown.appendChild(item);
-        });
-    }
-
-    const row = livingTriplesState.activeRow;
-    const unknownLabels = livingTriplesState.revealSlots
-        .map((slot, idx) => (slot.status === 'unknown_final' ? row?.categories?.[idx]?.label || `Slot ${idx + 1}` : null))
-        .filter(Boolean);
-    const learnedParts = [];
-    if (livingTriplesState.categoryAttempts > 1) {
-        learnedParts.push('בחירת הקטגוריה דרשה תיקון, שים/י לב לטריגר הראשי במשפט.');
-    } else {
-        learnedParts.push('זיהוי הקטגוריה היה מדויק מהניסיון הראשון.');
-    }
-    if (unknownLabels.length) {
-        learnedParts.push(`הסצנה נסגרה עם Unknown slot ב-${unknownLabels.join(', ')}; זה חייב להופיע גם בשיקוף.`);
-    } else {
-        learnedParts.push('נסגרה שורה מלאה עם שלוש תשובות Reveal.');
-    }
-    learnedParts.push('האתגור נשאר בתוך אותה פריזמה.');
-    if (livingTriplesState.elements.wrapLearned) {
-        livingTriplesState.elements.wrapLearned.textContent = `מה למדנו: ${learnedParts.join(' ')}`;
-    }
-
-    const directionQuestion = String(scenario.directionQuestion || '').trim();
-    const clientGoal = String(scenario.clientGoal || '').trim();
-    const hypnoticIntervention = String(scenario.hypnoticIntervention || '').trim();
-    const rememberNote = String(scenario.rememberNote || '').trim();
-    const hasDirectionBlock = Boolean(directionQuestion || clientGoal || hypnoticIntervention || rememberNote);
-    if (livingTriplesState.elements.directionBox) {
-        livingTriplesState.elements.directionBox.classList.toggle('hidden', !hasDirectionBlock);
-    }
-    if (livingTriplesState.elements.directionQuestion) {
-        livingTriplesState.elements.directionQuestion.textContent = directionQuestion;
-    }
-    if (livingTriplesState.elements.clientGoal) {
-        livingTriplesState.elements.clientGoal.textContent = clientGoal ? `מטרת המטופל: ${clientGoal}` : '';
-    }
-    if (livingTriplesState.elements.hypnoticIntervention) {
-        livingTriplesState.elements.hypnoticIntervention.textContent = hypnoticIntervention;
-    }
-    if (livingTriplesState.elements.rememberNote) {
-        livingTriplesState.elements.rememberNote.textContent = rememberNote;
-    }
-
-    if (livingTriplesState.elements.futureSign) livingTriplesState.elements.futureSign.value = '';
-    if (livingTriplesState.elements.futureStep) livingTriplesState.elements.futureStep.value = '';
-    if (livingTriplesState.elements.futureMetric) livingTriplesState.elements.futureMetric.value = '';
-    if (livingTriplesState.elements.futureSummary) livingTriplesState.elements.futureSummary.textContent = '';
-    if (livingTriplesState.elements.futurePrompt) {
-        const prompt = String(livingTriplesState.activeScenario?.futurePacePrompt || '').trim()
-            || 'בפעם הבאה שזה יופיע, מה יהיה הסימן המוקדם? מה צעד קטן? מה מדד הצלחה?';
-        livingTriplesState.elements.futurePrompt.textContent = prompt;
-    }
-    if (livingTriplesState.elements.futureExample) {
-        const sample = String(livingTriplesState.activeScenario?.futurePaceExample || '').trim();
-        livingTriplesState.elements.futureExample.textContent = sample ? `דוגמה: ${sample}` : '';
-    }
-
-    const isLast = livingTriplesState.index >= livingTriplesState.queue.length - 1;
-    if (livingTriplesState.elements.nextSceneBtn) {
-        livingTriplesState.elements.nextSceneBtn.textContent = isLast ? 'סיום אימון' : 'לסצנה הבאה';
-    }
-}
-
-function saveLivingTriplesFuturePace() {
-    const sign = String(livingTriplesState.elements?.futureSign?.value || '').trim();
-    const step = String(livingTriplesState.elements?.futureStep?.value || '').trim();
-    const metric = String(livingTriplesState.elements?.futureMetric?.value || '').trim();
-    if (!sign && !step && !metric) {
-        if (livingTriplesState.elements?.futureSummary) {
-            livingTriplesState.elements.futureSummary.textContent = 'מלא/י לפחות שדה אחד כדי לשמור Future-Pace.';
-        }
-        return;
-    }
-    livingTriplesState.futurePace = { sign, step, metric };
-    if (livingTriplesState.elements?.futureSummary) {
-        livingTriplesState.elements.futureSummary.textContent = `בפעם הבאה ש-${sign || 'יופיע הטריגר'}, הצעד הקטן יהיה ${step || 'לשאול עוגן אחד'}, ומדד ההצלחה: ${metric || 'Reveal מלא לפני אתגור'}.`;
-    }
-}
-
-function renderLivingTriplesPracticeScene() {
-    if (!livingTriplesState.elements || !livingTriplesState.activeScenario) return;
-    setLivingTriplesScreen('practice');
-    setLivingTriplesCurrentTask('עכשיו: קרא/י את המשפט, ואז בחר/י קטגוריה אחת מתוך הטבלה (לא את כל השלשה).');
-    setLivingTriplesPhilosophyFocus(
-        'שלב 1: לזהות קטגוריה אחת מדויקת. רק אז מדליקים את השלשה כולה.',
-        'עדיין לא נבחרה שלשה (מסתירים את התשובה עד הזיהוי).'
-    );
-    if (livingTriplesState.elements.sceneIndex) livingTriplesState.elements.sceneIndex.textContent = String(livingTriplesState.index + 1);
-    if (livingTriplesState.elements.sceneTotal) livingTriplesState.elements.sceneTotal.textContent = String(livingTriplesState.queue.length);
-    if (livingTriplesState.elements.sessionScore) livingTriplesState.elements.sessionScore.textContent = String(livingTriplesState.sessionScore);
-    if (livingTriplesState.elements.scenarioTitle) {
-        livingTriplesState.elements.scenarioTitle.textContent = livingTriplesState.activeScenario.title || 'משפט מטופל';
-    }
-    if (livingTriplesState.elements.scenarioText) {
-        livingTriplesState.elements.scenarioText.innerHTML = '';
-        (livingTriplesState.activeScenario.text || []).forEach(line => {
-            const paragraph = document.createElement('p');
-            paragraph.textContent = line;
-            livingTriplesState.elements.scenarioText.appendChild(paragraph);
-        });
-    }
-    if (livingTriplesState.elements.scenarioHighlights) {
-        livingTriplesState.elements.scenarioHighlights.innerHTML = '';
-        (livingTriplesState.activeScenario.highlights || []).forEach(highlight => {
-            const chip = document.createElement('span');
-            chip.textContent = highlight;
-            livingTriplesState.elements.scenarioHighlights.appendChild(chip);
-        });
-    }
-
-    renderLivingTriplesCategoryButtons();
-    if (livingTriplesState.elements.categoryFeedback) {
-        livingTriplesState.elements.categoryFeedback.textContent = 'בחר/י קטגוריה אחת שמתאימה למשפט. אם טעית, נסה/י שוב.';
-    }
-    if (livingTriplesState.elements.rowBox) livingTriplesState.elements.rowBox.classList.add('hidden');
-    if (livingTriplesState.elements.revealBox) livingTriplesState.elements.revealBox.classList.add('hidden');
-    if (livingTriplesState.elements.reflectBox) livingTriplesState.elements.reflectBox.classList.add('hidden');
-    if (livingTriplesState.elements.challengeBox) livingTriplesState.elements.challengeBox.classList.add('hidden');
-    if (livingTriplesState.elements.customReflectWrap) livingTriplesState.elements.customReflectWrap.classList.add('hidden');
-    if (livingTriplesState.elements.reflectStructured) livingTriplesState.elements.reflectStructured.innerHTML = '';
-    if (livingTriplesState.elements.revealStatus) livingTriplesState.elements.revealStatus.textContent = '';
-    if (livingTriplesState.elements.reflectStatus) livingTriplesState.elements.reflectStatus.textContent = '';
-    if (livingTriplesState.elements.challengeFeedback) livingTriplesState.elements.challengeFeedback.textContent = '';
-}
-
-function loadLivingTriplesSceneAtCurrentIndex() {
-    livingTriplesState.activeScenario = livingTriplesState.queue[livingTriplesState.index] || null;
-    if (!livingTriplesState.activeScenario) return;
-    livingTriplesState.activeRow = getLivingTriplesRowById(livingTriplesState.activeScenario.rowId);
-    if (!livingTriplesState.activeRow) return;
-    resetLivingTriplesRoundState();
-    renderLivingTriplesPracticeScene();
-}
-
-function startLivingTriplesTraining() {
-    clearLivingTriplesDemoTimer();
-    if (!Array.isArray(livingTriplesDataState.scenarios) || !livingTriplesDataState.scenarios.length) {
-        renderLivingTriplesOnboarding('לא נמצאו סצנות Living Triples.');
-        return;
-    }
-    livingTriplesState.queue = ltShuffle(livingTriplesDataState.scenarios).slice(0, Math.min(25, livingTriplesDataState.scenarios.length));
-    livingTriplesState.index = 0;
-    livingTriplesState.sessionScore = 0;
-    loadLivingTriplesSceneAtCurrentIndex();
-}
-
-function handleLivingTriplesCategoryPick(categoryId) {
-    if (!livingTriplesState.activeScenario || livingTriplesState.categoryResolved) return;
-    const selected = ltNormalizeCategoryId(categoryId);
-    if (!selected) return;
-    livingTriplesState.categoryAttempts += 1;
-    const isCorrect = selected === livingTriplesState.activeScenario.correctCategory;
-
-    if (!isCorrect) {
-        const attemptedRow = getLivingTriplesRowByCategory(selected);
-        const rowNumber = getLivingTriplesRowNumber(attemptedRow?.id || '');
-        if (livingTriplesState.elements?.categoryFeedback) {
-            livingTriplesState.elements.categoryFeedback.textContent = `סטייה: הקטגוריה לא תואמת למשפט (${attemptedRow ? `Row ${rowNumber}` : 'שורה אחרת'}). חזור/י לטריגר ובחר/י שוב.`;
-        }
-        setLivingTriplesCurrentTask('עדיין שלב 1: חזור/י למשפט ולחץ/י על קטגוריה אחרת שמתאימה יותר.');
-        ltPlay('fail');
-        return;
-    }
-
-    livingTriplesState.selectedCategory = selected;
-    livingTriplesState.categoryResolved = true;
-    if (livingTriplesState.elements?.categoryFeedback) {
-        const rowNumber = getLivingTriplesRowNumber(livingTriplesState.activeRow?.id || '');
-        livingTriplesState.elements.categoryFeedback.textContent = `מדויק. Row ${rowNumber} נדלקה, עוברים ל-Reveal.`;
-    }
-    setLivingTriplesCurrentTask('שלב 2 (Reveal): בכל כרטיס לחצו על שאלת העוגן עד שמגיעים ל-3/3 תשובות.');
-    renderLivingTriplesCategoryButtons();
-    if (livingTriplesState.elements?.rowBox) livingTriplesState.elements.rowBox.classList.remove('hidden');
-    if (livingTriplesState.elements?.revealBox) livingTriplesState.elements.revealBox.classList.remove('hidden');
-    setLivingTriplesPhilosophyFocus(
-        'השורה נדלקה. עכשיו משלימים Reveal מלא: 3 שאלות, 3 תשובות, בתוך אותה שלשה.',
-        `${getLivingTriplesRowDisplayLabel()} | ${getLivingTriplesRowCategoryLabels().join(' + ')}`
-    );
-    renderLivingTriplesRowLit();
-    renderLivingTriplesReveal();
-    ltPlay('correct');
-}
-
-function handleLivingTriplesChallengeTargetPick(targetIndex) {
-    if (livingTriplesState.challengeDone) return;
-    livingTriplesState.challengeTargetIndex = targetIndex;
-    const label = livingTriplesState.activeRow?.categories?.[targetIndex]?.label || `רכיב ${targetIndex + 1}`;
-    setLivingTriplesCurrentTask(`שלב 4 (אתגור): נבחר יעד (${label}). עכשיו בחר/י אתגר שמתאים לרכיב הזה.`);
-    renderLivingTriplesChallenge();
-}
-
-function handleLivingTriplesChallengeOptionPick(optionIndex) {
-    if (!livingTriplesState.reflectionDone || livingTriplesState.challengeDone) return;
-    livingTriplesState.challengeAttempts += 1;
-
-    if (livingTriplesState.challengeTargetIndex < 0) {
-        if (livingTriplesState.elements?.challengeFeedback) {
-            livingTriplesState.elements.challengeFeedback.textContent = 'בחר/י קודם רכיב ספציפי לשלב האתגור.';
-        }
-        ltPlay('next');
-        return;
-    }
-
-    if (optionIndex !== livingTriplesState.challengeTargetIndex) {
-        const row = livingTriplesState.activeRow;
-        const expected = row?.categories?.[livingTriplesState.challengeTargetIndex]?.label || 'הרכיב שנבחר';
-        const picked = row?.categories?.[optionIndex]?.label || 'רכיב אחר';
-        if (livingTriplesState.elements?.challengeFeedback) {
-            livingTriplesState.elements.challengeFeedback.textContent = `סטייה: נבחר אתגור של ${picked}. כדי לחזור לפריזמה בחר/י אתגור של ${expected}.`;
-        }
-        ltPlay('fail');
-        return;
-    }
-
-    livingTriplesState.challengeDone = true;
-    livingTriplesState.challengeChoiceIndex = optionIndex;
-    const reply = String(livingTriplesState.activeScenario?.challengeReplies?.[optionIndex] || 'התגובה נפתחת: אפשר להמשיך בעדינות.').trim();
-    if (livingTriplesState.elements?.challengeFeedback) {
-        livingTriplesState.elements.challengeFeedback.textContent = `אתגור תואם ✔ תגובת מטופל סימולטיבית: ${reply}`;
-    }
-    renderLivingTriplesChallenge();
-    ltPlay('correct');
-    setTimeout(() => finishLivingTriplesScene(), 250);
-}
-
-function moveToNextLivingTriplesScene() {
-    const isLast = livingTriplesState.index >= livingTriplesState.queue.length - 1;
-    if (isLast) {
-        renderLivingTriplesOnboarding(`סיימת סשן Living Triples. ניקוד סשן: ${livingTriplesState.sessionScore}. אפשר להתחיל סשן חדש.`);
-        return;
-    }
-    livingTriplesState.index += 1;
-    loadLivingTriplesSceneAtCurrentIndex();
+function renderInit() {
+  state.el.onboarding.classList.remove('hidden');
+  state.el.practice.classList.add('hidden');
+  renderMap();
 }
 
 async function setupLivingTriplesModule() {
-    if (!document.getElementById('living-triples')) return;
-    livingTriplesState.elements = {
-        root: document.getElementById('living-triples-root'),
-        screenOnboarding: document.getElementById('lt-screen-onboarding'),
-        screenPractice: document.getElementById('lt-screen-practice'),
-        screenWrap: document.getElementById('lt-screen-wrap'),
-        demoBtn: document.getElementById('lt-demo-btn'),
-        startBtn: document.getElementById('lt-start-btn'),
-        demoStatus: document.getElementById('lt-demo-status'),
-        currentTask: document.getElementById('lt-current-task'),
-        sceneIndex: document.getElementById('lt-scene-index'),
-        sceneTotal: document.getElementById('lt-scene-total'),
-        sessionScore: document.getElementById('lt-session-score'),
-        scenarioTitle: document.getElementById('lt-scenario-title'),
-        scenarioText: document.getElementById('lt-scenario-text'),
-        scenarioHighlights: document.getElementById('lt-scenario-highlights'),
-        categoryButtons: document.getElementById('lt-category-buttons'),
-        categoryFeedback: document.getElementById('lt-category-feedback'),
-        rowBox: document.getElementById('lt-row-box'),
-        rowTitle: document.getElementById('lt-row-title'),
-        rowChips: document.getElementById('lt-row-chips'),
-        revealBox: document.getElementById('lt-reveal-box'),
-        revealCards: document.getElementById('lt-reveal-cards'),
-        revealStatus: document.getElementById('lt-reveal-status'),
-        reflectBox: document.getElementById('lt-reflect-box'),
-        reflectAuto: document.getElementById('lt-reflect-auto'),
-        reflectStructured: document.getElementById('lt-reflect-structured'),
-        customReflectWrap: document.getElementById('lt-custom-reflect-wrap'),
-        customReflectInput: document.getElementById('lt-custom-reflect-input'),
-        reflectStatus: document.getElementById('lt-reflect-status'),
-        challengeBox: document.getElementById('lt-challenge-box'),
-        challengeTargets: document.getElementById('lt-challenge-targets'),
-        challengeOptions: document.getElementById('lt-challenge-options'),
-        challengeFeedback: document.getElementById('lt-challenge-feedback'),
-        wrapScore: document.getElementById('lt-wrap-score'),
-        breakdown: document.getElementById('lt-score-breakdown'),
-        wrapLearned: document.getElementById('lt-wrap-learned'),
-        directionBox: document.getElementById('lt-direction-box'),
-        directionQuestion: document.getElementById('lt-direction-question'),
-        clientGoal: document.getElementById('lt-client-goal'),
-        hypnoticIntervention: document.getElementById('lt-hypnotic-intervention'),
-        rememberNote: document.getElementById('lt-remember-note'),
-        futureSign: document.getElementById('lt-future-sign'),
-        futureStep: document.getElementById('lt-future-step'),
-        futureMetric: document.getElementById('lt-future-metric'),
-        futurePrompt: document.getElementById('lt-future-prompt'),
-        futureExample: document.getElementById('lt-future-example'),
-        futureSummary: document.getElementById('lt-future-summary'),
-        nextSceneBtn: document.getElementById('lt-next-scene-btn'),
-        philosophyFocusText: document.getElementById('lt-philosophy-focus-text'),
-        philosophyRowText: document.getElementById('lt-philosophy-row-text'),
-        demoDialogueBtn: document.getElementById('lt-demo-dialogue-btn'),
-        demoDialogueModal: document.getElementById('lt-demo-dialogue-modal'),
-        demoDialogueCloseBtn: document.getElementById('lt-demo-dialogue-close'),
-        demoDialogueConfirmBtn: document.getElementById('lt-demo-dialogue-confirm')
-    };
+  state.el = getElements();
+  if (!state.el.root) return;
 
-    if (!livingTriplesState.elements.root) return;
-    if (livingTriplesState.elements.root.dataset.ltBound === 'true') return;
-    livingTriplesState.elements.root.dataset.ltBound = 'true';
+  state.progress = loadProgress();
+  state.data = await loadData();
 
-    bindLivingTriplesClick('lt-demo-btn', runLivingTriplesDemo);
-    bindLivingTriplesClick('lt-start-btn', startLivingTriplesTraining);
-    bindLivingTriplesClick('lt-use-auto-reflect-btn', useLivingTriplesAutoReflection);
-    bindLivingTriplesClick('lt-open-custom-reflect-btn', toggleLivingTriplesCustomReflection);
-    bindLivingTriplesClick('lt-save-custom-reflect-btn', saveLivingTriplesCustomReflection);
-    bindLivingTriplesClick('lt-save-future-btn', saveLivingTriplesFuturePace);
-    bindLivingTriplesClick('lt-next-scene-btn', moveToNextLivingTriplesScene);
-    bindLivingTriplesClick('lt-back-onboarding-btn', () => renderLivingTriplesOnboarding());
-    bindLivingTriplesDemoDialogueModal();
+  if (!Array.isArray(state.data.scenarios) || !state.data.scenarios.length) {
+    state.data = normalizeData({ triplesMap: DEFAULT_TRIPLES_MAP, scenarios: FALLBACK_SCENARIOS });
+  }
 
-    if (livingTriplesState.elements.categoryButtons && livingTriplesState.elements.categoryButtons.dataset.ltBound !== 'true') {
-        livingTriplesState.elements.categoryButtons.dataset.ltBound = 'true';
-        livingTriplesState.elements.categoryButtons.addEventListener('click', (event) => {
-            const button = event.target.closest('[data-lt-category]');
-            if (!button) return;
-            handleLivingTriplesCategoryPick(button.getAttribute('data-lt-category') || '');
-        });
-    }
-
-    if (livingTriplesState.elements.revealCards && livingTriplesState.elements.revealCards.dataset.ltBound !== 'true') {
-        livingTriplesState.elements.revealCards.dataset.ltBound = 'true';
-        livingTriplesState.elements.revealCards.addEventListener('click', (event) => {
-            const button = event.target.closest('[data-lt-reveal-action]');
-            if (!button) return;
-            const action = button.getAttribute('data-lt-reveal-action') || '';
-            const slotIndex = Number(button.getAttribute('data-slot'));
-            if (!Number.isInteger(slotIndex)) return;
-            handleLivingTriplesRevealAction(action, slotIndex);
-        });
-    }
-
-    if (livingTriplesState.elements.challengeTargets && livingTriplesState.elements.challengeTargets.dataset.ltBound !== 'true') {
-        livingTriplesState.elements.challengeTargets.dataset.ltBound = 'true';
-        livingTriplesState.elements.challengeTargets.addEventListener('click', (event) => {
-            const button = event.target.closest('[data-lt-challenge-target]');
-            if (!button) return;
-            const index = Number(button.getAttribute('data-lt-challenge-target'));
-            if (!Number.isInteger(index)) return;
-            handleLivingTriplesChallengeTargetPick(index);
-        });
-    }
-
-    if (livingTriplesState.elements.challengeOptions && livingTriplesState.elements.challengeOptions.dataset.ltBound !== 'true') {
-        livingTriplesState.elements.challengeOptions.dataset.ltBound = 'true';
-        livingTriplesState.elements.challengeOptions.addEventListener('click', (event) => {
-            const button = event.target.closest('[data-lt-challenge-option]');
-            if (!button) return;
-            const index = Number(button.getAttribute('data-lt-challenge-option'));
-            if (!Number.isInteger(index)) return;
-            handleLivingTriplesChallengeOptionPick(index);
-        });
-    }
-
-    livingTriplesState.progress = loadLivingTriplesProgress();
-    const loaded = await loadLivingTriplesData();
-    if (!loaded) {
-        renderLivingTriplesOnboarding('שגיאה בטעינת מודול Living Triples.');
-        return;
-    }
-    renderLivingTriplesOnboarding();
+  bindEvents();
+  renderInit();
 }
+
+window.setupLivingTriplesModule = setupLivingTriplesModule;

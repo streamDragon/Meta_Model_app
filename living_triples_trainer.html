@@ -45,223 +45,109 @@
   </script>
 </head>
 <body>
-  <div class="container">
-    <header>
+  <div class="container ltv2-page">
+    <header class="ltv2-header">
       <h1>Living Triples</h1>
-      <p>אימון "קטגוריה -> Reveal -> שיקוף -> אתגור" לפי שלשות מייקל ברין.</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <p>קטגוריה אחת ברורה -> Reveal מלא 3/3 -> שיקוף -> Insight</p>
+      <div class="ltv2-header-actions">
         <a class="btn btn-secondary" href="index.html?tab=practice-triples-radar">חזרה ל-Triples Radar באפליקציה</a>
+        <button id="ltv2-open-map-top" type="button" class="btn btn-secondary">מפת השלשות</button>
       </div>
     </header>
+
     <section id="living-triples" class="tab-content active practice-tab-content">
       <div class="practice-container">
-        <div id="living-triples-root" class="card practice-intro-card living-triples-card">
-          <h2>Living Triples — Trainer (Beta)</h2>
-          <p class="subtitle">מודול עצמאי לתרגול Reveal ושמירה על אתגור בתוך אותה פריזמה.</p>
-
-          <div class="lt-layout">
-            <div class="lt-main-pane">
-          <div id="lt-screen-onboarding" class="lt-screen">
-            <div class="lt-onboarding-copy">
-              <p>בוחרים קטגוריה אחת, משלימים Reveal מלא לשורה, ואז עוברים לשיקוף ולאתגור תואם.</p>
-              <p>אם חלק מהדאטה נשמר עם קידוד פגום, המערכת מחליפה לשדות fallback כדי להמשיך אימון.</p>
-            </div>
-            <div class="lt-onboarding-actions">
-              <button id="lt-demo-btn" type="button" class="btn btn-secondary">Demo (20s)</button>
-              <button id="lt-start-btn" type="button" class="btn btn-primary">התחל אימון</button>
-            </div>
-            <p id="lt-demo-status" class="lt-demo-status" aria-live="polite"></p>
+        <div id="ltv2-root" class="card practice-intro-card living-triples-card ltv2-root">
+          <div id="ltv2-onboarding" class="ltv2-onboarding" role="region" aria-label="הדרכת פתיחה">
+            <h2>איך עובדים כאן?</h2>
+            <ol>
+              <li>המטרה: לא לזהות דפוס אחד, אלא להשלים שלשה.</li>
+              <li>קליק אחד -> השורה נצבעת -> שואלים 3 שאלות.</li>
+              <li>בסוף מתקבל שיקוף + אינסייט, ואז ממשיכים למשפט הבא.</li>
+            </ol>
+            <button id="ltv2-start-btn" type="button" class="btn btn-primary">התחל תרגול</button>
           </div>
 
-          <div id="lt-screen-practice" class="lt-screen hidden">
-            <div class="lt-session-bar">
-              <p>סצנה <strong id="lt-scene-index">1</strong>/<strong id="lt-scene-total">25</strong></p>
-              <p>ניקוד סשן: <strong id="lt-session-score">0</strong></p>
+          <div id="ltv2-practice" class="ltv2-practice hidden" role="region" aria-label="תרגול שלשות">
+            <div class="ltv2-topbar">
+              <p class="ltv2-chip">סצנה <strong id="ltv2-scene-index">1</strong>/<strong id="ltv2-scene-total">1</strong></p>
+              <p class="ltv2-chip">ניקוד <strong id="ltv2-score">0</strong></p>
+              <button id="ltv2-open-map-btn" type="button" class="btn btn-secondary">מפת השלשות</button>
+              <button id="ltv2-reset-scene-btn" type="button" class="btn btn-secondary">תרחיש חדש</button>
             </div>
 
-            <div class="lt-step-box lt-quick-guide-box">
-              <h4>מה עושים כאן? (בקצרה)</h4>
-              <ol class="lt-quick-guide-list">
-                <li>קרא/י את משפט המטופל.</li>
-                <li>בחר/י קטגוריה אחת מתוך הטבלה (רק נקודת כניסה).</li>
-                <li>השלם/י Reveal מלא לאותה שלשה (3/3).</li>
-                <li>בחר/י שיקוף, ואז אתגור תואם לאותו רכיב.</li>
-              </ol>
-              <p id="lt-current-task" class="lt-current-task" aria-live="polite">עכשיו: קרא/י את המשפט ובחר/י קטגוריה אחת מתוך הטבלה.</p>
-            </div>
+            <ol class="ltv2-stepper" aria-label="שלבי עבודה">
+              <li data-step="1" class="is-active">1. בחר/י קטגוריה מהמשפט</li>
+              <li data-step="2">2. Reveal 0/3 -> 3/3</li>
+              <li data-step="3">3. שיקוף</li>
+              <li data-step="4">4. Insight + סיום</li>
+            </ol>
 
-            <div class="lt-scenario-box">
-              <h3 id="lt-scenario-title">סצנה</h3>
-              <div id="lt-scenario-text" class="lt-scenario-text"></div>
-              <div id="lt-scenario-highlights" class="lt-scenario-highlights"></div>
-            </div>
+            <section class="ltv2-sentence-card opened-content" aria-live="polite">
+              <h3>משפט לתרגול</h3>
+              <p id="ltv2-sentence-text"></p>
+            </section>
 
-            <div class="lt-step-box">
-              <h4>1. בחירת קטגוריה</h4>
-              <p class="lt-step-sub">קרא/י את המשפט למעלה ולחץ/י על קטגוריה אחת שהכי מתאימה. לא צריך להשלים את כל השלשה בשלב הזה.</p>
-              <div id="lt-category-buttons" class="lt-category-buttons"></div>
-              <p id="lt-category-feedback" class="lt-inline-feedback" aria-live="polite"></p>
-            </div>
+            <section id="ltv2-step-1" class="ltv2-stage" aria-label="שלב בחירת קטגוריה">
+              <h4>בחר/י קטגוריה אחת ברורה</h4>
+              <p class="ltv2-sub">לחיצה אחת מספיקה. אחר כך משלימים את שתי האחיות באותה שורה.</p>
+              <div id="ltv2-category-chips" class="ltv2-category-chips"></div>
+              <p id="ltv2-step1-feedback" class="ltv2-feedback" aria-live="polite"></p>
+            </section>
 
-            <div id="lt-row-box" class="lt-step-box hidden">
-              <h4 id="lt-row-title" class="lt-row-title"></h4>
-              <div id="lt-row-chips" class="lt-row-chips"></div>
-            </div>
-
-            <div id="lt-reveal-box" class="lt-step-box hidden">
-              <h4>2. Reveal</h4>
-              <p class="lt-step-sub">בכל כרטיס לחצו על שאלת העוגן (או Rephrase פעם אחת), וקבלו 3/3 תשובות לפני מעבר לשיקוף.</p>
-              <div id="lt-reveal-cards" class="lt-reveal-cards"></div>
-              <p id="lt-reveal-status" class="lt-inline-feedback" aria-live="polite"></p>
-            </div>
-
-            <div id="lt-reflect-box" class="lt-step-box hidden">
-              <h4>3. שיקוף</h4>
-              <p id="lt-reflect-auto" class="lt-reflect-auto"></p>
-              <div id="lt-reflect-structured" class="lt-reflect-structured" aria-live="polite"></div>
-              <div class="lt-reflect-actions">
-                <button id="lt-use-auto-reflect-btn" type="button" class="btn btn-primary">השתמש/י בשיקוף האוטומטי</button>
-                <button id="lt-open-custom-reflect-btn" type="button" class="btn btn-secondary">פתח/י טיוטת שיקוף אישי</button>
+            <section id="ltv2-row-sticky" class="ltv2-row-sticky hidden" aria-label="שורה פעילה">
+              <div class="ltv2-row-head">
+                <strong id="ltv2-row-title">Row 1</strong>
+                <button id="ltv2-change-row-btn" type="button" class="btn btn-secondary">החלף שורה</button>
               </div>
-              <div id="lt-custom-reflect-wrap" class="lt-custom-reflect-wrap hidden">
-                <p class="lt-custom-reflect-caption">כתבתי לך טיוטת שיקוף אישית לפי השלשה שנבחרה. אפשר לערוך לפני שמירה.</p>
-                <textarea id="lt-custom-reflect-input" rows="8" placeholder="שיקוף אישי מובנה יופיע כאן אוטומטית."></textarea>
-                <button id="lt-save-custom-reflect-btn" type="button" class="btn btn-secondary">שמור שיקוף אישי</button>
+              <div id="ltv2-row-members" class="ltv2-row-members"></div>
+            </section>
+
+            <section id="ltv2-step-2" class="ltv2-stage hidden" aria-label="שלב Reveal">
+              <h4>Reveal: השלם/י 3 מתוך 3</h4>
+              <p id="ltv2-reveal-progress" class="ltv2-sub">0/3</p>
+              <div id="ltv2-reveal-categories" class="ltv2-reveal-categories"></div>
+              <div id="ltv2-reveal-cards" class="ltv2-reveal-cards"></div>
+              <p id="ltv2-step2-feedback" class="ltv2-feedback" aria-live="polite"></p>
+            </section>
+
+            <section id="ltv2-step-3" class="ltv2-stage hidden" aria-label="שלב שיקוף">
+              <h4>שיקוף</h4>
+              <div id="ltv2-reflection-card" class="ltv2-reflection-card opened-content"></div>
+              <div class="ltv2-reflection-actions">
+                <button id="ltv2-edit-reflect-btn" type="button" class="btn btn-secondary">ערוך 10 שניות</button>
+                <span id="ltv2-edit-timer" class="ltv2-edit-timer" aria-live="polite"></span>
               </div>
-              <p id="lt-reflect-status" class="lt-inline-feedback" aria-live="polite"></p>
-            </div>
-
-            <div id="lt-challenge-box" class="lt-step-box hidden">
-              <h4>4. אתגור בתוך אותה פריזמה</h4>
-              <p class="lt-step-sub">שלב א: בחר/י רכיב יעד. שלב ב: בחר/י אתגר שתואם לאותו רכיב (ולא לרכיב אחר).</p>
-              <div id="lt-challenge-targets" class="lt-challenge-targets"></div>
-              <div id="lt-challenge-options" class="lt-challenge-options"></div>
-              <p id="lt-challenge-feedback" class="lt-inline-feedback" aria-live="polite"></p>
-            </div>
-          </div>
-
-          <div id="lt-screen-wrap" class="lt-screen hidden">
-            <h3>סיכום סצנה</h3>
-            <p id="lt-wrap-score" class="lt-wrap-score"></p>
-            <ul id="lt-score-breakdown" class="lt-score-breakdown"></ul>
-            <p id="lt-wrap-learned" class="lt-wrap-learned"></p>
-
-            <div id="lt-direction-box" class="lt-direction-box hidden">
-              <h4>Direction / Next Direction</h4>
-              <p id="lt-direction-question" class="lt-direction-question"></p>
-              <p id="lt-client-goal" class="lt-client-goal"></p>
-              <p id="lt-hypnotic-intervention" class="lt-hypnotic-intervention"></p>
-              <p id="lt-remember-note" class="lt-remember-note"></p>
-            </div>
-
-            <div class="lt-future-pace">
-              <h4>Future Pace</h4>
-              <p id="lt-future-prompt" class="lt-future-prompt"></p>
-              <p id="lt-future-example" class="lt-future-example"></p>
-              <label for="lt-future-sign">סימן מוקדם</label>
-              <input id="lt-future-sign" type="text" placeholder="מה יאותת שזה מתחיל?">
-              <label for="lt-future-step">צעד קטן</label>
-              <input id="lt-future-step" type="text" placeholder="מה תשאל/י קודם?">
-              <label for="lt-future-metric">מדד הצלחה</label>
-              <input id="lt-future-metric" type="text" placeholder="איך תדע/י שזה עבד?">
-              <div class="lt-wrap-actions">
-                <button id="lt-save-future-btn" type="button" class="btn btn-secondary">שמור Future-Pace</button>
-                <button id="lt-next-scene-btn" type="button" class="btn btn-primary">לסצנה הבאה</button>
-                <button id="lt-back-onboarding-btn" type="button" class="btn btn-secondary">חזרה לפתיחה</button>
+              <div id="ltv2-edit-wrap" class="hidden">
+                <textarea id="ltv2-reflect-input" rows="6" placeholder="ערוך את השיקוף בקצרה..."></textarea>
+                <button id="ltv2-save-reflect-btn" type="button" class="btn btn-secondary">שמור שיקוף</button>
               </div>
-              <p id="lt-future-summary" class="lt-future-summary" aria-live="polite"></p>
-            </div>
-          </div>
-            </div>
-
-            <aside class="lt-philosophy-panel" aria-label="פילוסופיית השלשות">
-              <div class="lt-philosophy-head">
-                <h3>פילוסופיית השלשות</h3>
-                <p>השלשה לא נועדה רק לזהות קטגוריה, אלא לחשוף משפחת דפוסים שעובדת יחד באותה שכבת משמעות.</p>
+              <div class="ltv2-reflection-actions">
+                <button id="ltv2-to-insight-btn" type="button" class="btn btn-primary">המשך ל-Insight</button>
               </div>
+            </section>
 
-              <p class="lt-philosophy-illustration-note">
-                אילוסטרציה תהליכית: זו דוגמה למה הכלי הזה בא למדל. זו לא שיחה "מושלמת", אלא המחשה של התנועה שתפתח/י דרך תרגול הפיצ׳ר.
-              </p>
-              <div class="lt-philosophy-actions">
-                <button id="lt-demo-dialogue-btn" type="button" class="btn btn-secondary">דיאלוג טיפולי לדוגמה</button>
-              </div>
-
-              <section class="lt-philosophy-section">
-                <h4>ההיגיון</h4>
-                <p>קטגוריה אחת היא "שער כניסה". אחרי שזיהינו אותה, עובדים על כל השורה כדי לראות איך השפה בונה חוויה, פרשנות והתנהגות.</p>
-              </section>
-
-              <section class="lt-philosophy-section">
-                <h4>מה רוצים להשיג</h4>
-                <ul class="lt-philosophy-list">
-                  <li>דיוק בזיהוי דפוס Meta Model.</li>
-                  <li>Reveal מלא בתוך אותה שלשה (3 שאלות).</li>
-                  <li>שיקוף מחבר ולא מפוזר.</li>
-                  <li>אתגור מדויק שנשאר בתוך אותה פריזמה.</li>
-                </ul>
-              </section>
-
-              <section class="lt-philosophy-section">
-                <h4>כלל עבודה</h4>
-                <p>קודם Reveal מלא, אחר כך שיקוף, ורק אז אתגור. ככה נשמרים קצב, אמון, והיגיון טיפולי.</p>
-              </section>
-
-              <div class="lt-philosophy-focus">
-                <strong>המיקוד כרגע</strong>
-                <p id="lt-philosophy-focus-text">מתחילים מזיהוי קטגוריה אחת כדי להדליק את כל השורה.</p>
-              </div>
-
-              <div class="lt-philosophy-focus">
-                <strong>שורת העבודה הנוכחית</strong>
-                <p id="lt-philosophy-row-text">עדיין לא נבחרה שלשה.</p>
-              </div>
-            </aside>
-
-            <div id="lt-demo-dialogue-modal" class="screen-read-guide-modal hidden" role="dialog" aria-modal="true" aria-labelledby="lt-demo-dialogue-title">
-              <div class="screen-read-guide-dialog screen-read-guide-dialog-demo">
-                <button type="button" class="screen-read-guide-close" id="lt-demo-dialogue-close" aria-label="סגירה">×</button>
-                <h3 id="lt-demo-dialogue-title">דיאלוג טיפולי לדוגמה: Living Triples</h3>
-                <p class="screen-read-guide-lead">
-                  אילוסטרציה של מה הכלי הזה בא למדל: זיהוי קטגוריה אחת, פתיחת כל השלשה, Reveal מלא, שיקוף, ואז אתגור מדויק בתוך אותה פריזמה.
-                </p>
-                <div class="screen-demo-dialogue-box">
-                  <div class="screen-demo-dialogue-turn">
-                    <span class="screen-demo-dialogue-role">מטופל</span>
-                    <p class="screen-demo-dialogue-text">אני יודע שהוא כבר החליט שאני חלש, אז אני ננעל בשיחה.</p>
-                  </div>
-                  <div class="screen-demo-dialogue-turn">
-                    <span class="screen-demo-dialogue-role">מטפל</span>
-                    <p class="screen-demo-dialogue-text">נזהה קודם קטגוריה אחת מדויקת. אחר כך נפתח את כל השלשה ולא נקפוץ ישר לאתגר.</p>
-                  </div>
-                  <div class="screen-demo-dialogue-turn">
-                    <span class="screen-demo-dialogue-role">מטופל</span>
-                    <p class="screen-demo-dialogue-text">כששאלת על שלושת הרכיבים, הבנתי שזה לא רק “מה הוא חושב”, אלא גם מה אני מניח ולפי איזה כלל אני שופט את עצמי.</p>
-                  </div>
-                  <div class="screen-demo-dialogue-turn">
-                    <span class="screen-demo-dialogue-role">מטפל</span>
-                    <p class="screen-demo-dialogue-text">מעולה. עכשיו אפשר לשקף את השלשה הזאת, ורק אז לבחור אתגור אחד שמתאים לרכיב הנכון.</p>
-                  </div>
-                </div>
-                <div class="screen-demo-dialogue-summary">
-                  <h4>מה זה ממדל</h4>
-                  <ul class="screen-demo-dialogue-list">
-                    <li>עבודה עם משפחת דפוסים (שלשה), לא רק קטגוריה בודדת.</li>
-                    <li>Reveal מלא לפני אתגור.</li>
-                    <li>שיקוף שמחזיק היגיון תהליכי ולא רק "תשובה נכונה".</li>
-                  </ul>
-                  <p class="screen-demo-dialogue-footnote">זה הכיוון שתראה/י יותר ויותר ככל שמתרגלים את Living Triples באופן עקבי.</p>
-                </div>
-                <div class="screen-read-guide-actions">
-                  <button id="lt-demo-dialogue-confirm" type="button" class="btn btn-primary screen-read-guide-confirm">סגור דוגמה</button>
-                </div>
-              </div>
-            </div>
+            <section id="ltv2-step-4" class="ltv2-stage hidden" aria-label="שלב Insight">
+              <h4>Insight</h4>
+              <div id="ltv2-insight-card" class="ltv2-insight-card opened-content"></div>
+              <p class="ltv2-end-note">מכאן הטיפול ימשיך בדרכו…</p>
+              <button id="ltv2-next-btn" type="button" class="btn btn-primary">משפט הבא</button>
+            </section>
           </div>
         </div>
       </div>
     </section>
   </div>
-  <script src="js/trainer-shell-nav.js"></script>
+
+  <div id="ltv2-map-modal" class="ltv2-modal hidden" role="dialog" aria-modal="true" aria-labelledby="ltv2-map-title">
+    <div class="ltv2-modal-card">
+      <button id="ltv2-close-map-btn" type="button" class="ltv2-modal-close" aria-label="סגירה">×</button>
+      <h3 id="ltv2-map-title">מפת השלשות</h3>
+      <p class="ltv2-sub">בזמן תרגול הטבלה מתקפלת. כאן אפשר להיזכר במבנה המלא.</p>
+      <div id="ltv2-map-content" class="ltv2-map-content"></div>
+    </div>
+  </div>
+
+  <div id="ltv2-toast" class="ltv2-toast hidden" aria-live="assertive"></div>
 </body>
 </html>
