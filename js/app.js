@@ -1471,12 +1471,15 @@ function looksLikeMojibakeText(value) {
     const text = String(value || '');
     if (!text) return false;
     const marks = (text.match(/׳/g) || []).length;
-    return marks >= 4 || /ג€|ג†|ג­|נ|�|ֳ—|\bג(?:ש|ל)\b|×[A-Za-zÀ-ÿ]/.test(text);
+    if (marks >= 3) return true;
+    if (/(?:׳[^\u0590-\u05FF\s]){2,}/.test(text)) return true;
+    return /ג€|ג†|ג­|נ|�|ֳ—|\bג(?:ש|ל)\b|×[A-Za-zÀ-ÿ]|׳[A-Za-z0-9]/.test(text);
 }
 
 let win1255ReverseByteMap = null;
 let mojibakeMutationObserver = null;
 let isApplyingMojibakeRepair = false;
+let mojibakeSafetyTimer = null;
 
 function getWin1255ReverseByteMap() {
     if (win1255ReverseByteMap) return win1255ReverseByteMap;
@@ -1499,7 +1502,7 @@ function getWin1255ReverseByteMap() {
     return win1255ReverseByteMap;
 }
 
-function decodeWin1255MojibakeToUtf8(value) {
+function decodeWin1255MojibakeToUtf8SinglePass(value) {
     const raw = String(value || '');
     if (!raw || !looksLikeMojibakeText(raw)) return raw;
     const reverseMap = getWin1255ReverseByteMap();
@@ -1533,6 +1536,18 @@ function decodeWin1255MojibakeToUtf8(value) {
     return decodedLooksBetter ? decoded : raw;
 }
 
+function decodeWin1255MojibakeToUtf8(value) {
+    let current = String(value || '');
+    if (!current) return current;
+    for (let i = 0; i < 3; i += 1) {
+        const decoded = decodeWin1255MojibakeToUtf8SinglePass(current);
+        if (!decoded || decoded === current) break;
+        current = decoded;
+        if (!looksLikeMojibakeText(current)) break;
+    }
+    return current;
+}
+
 function normalizeUiText(value) {
     if (value === null || value === undefined) return '';
     return decodeWin1255MojibakeToUtf8(String(value));
@@ -1563,7 +1578,7 @@ function deepNormalizeUiPayload(value, seen = new WeakMap()) {
 
 function repairMojibakeElementAttributes(element) {
     if (!element || !element.getAttributeNames) return;
-    ['title', 'aria-label', 'placeholder'].forEach((attr) => {
+    ['title', 'aria-label', 'placeholder', 'value', 'alt'].forEach((attr) => {
         const current = element.getAttribute(attr);
         if (!current || !looksLikeMojibakeText(current)) return;
         const fixed = normalizeUiText(current);
@@ -1571,6 +1586,15 @@ function repairMojibakeElementAttributes(element) {
             element.setAttribute(attr, fixed);
         }
     });
+}
+
+function repairMojibakeDocumentTitle() {
+    const title = String(document.title || '');
+    if (!title || !looksLikeMojibakeText(title)) return;
+    const fixed = normalizeUiText(title);
+    if (fixed && fixed !== title) {
+        document.title = fixed;
+    }
 }
 
 function repairMojibakeDomSubtree(root) {
@@ -1592,7 +1616,12 @@ function repairMojibakeDomSubtree(root) {
             return;
         }
 
-        if (root.nodeType !== Node.ELEMENT_NODE && root.nodeType !== Node.DOCUMENT_FRAGMENT_NODE && root !== document.body) {
+        if (
+            root.nodeType !== Node.ELEMENT_NODE &&
+            root.nodeType !== Node.DOCUMENT_FRAGMENT_NODE &&
+            root !== document.body &&
+            root !== document.documentElement
+        ) {
             return;
         }
 
@@ -1625,18 +1654,21 @@ function repairMojibakeDomSubtree(root) {
             }
             current = walker.nextNode();
         }
+        repairMojibakeDocumentTitle();
     } finally {
         isApplyingMojibakeRepair = false;
     }
 }
 
 function setupMojibakeAutoRepair() {
+    const repairRoot = document.documentElement || document.body;
+
     if (mojibakeMutationObserver || typeof MutationObserver !== 'function') {
-        repairMojibakeDomSubtree(document.body);
+        repairMojibakeDomSubtree(repairRoot);
         return;
     }
 
-    repairMojibakeDomSubtree(document.body);
+    repairMojibakeDomSubtree(repairRoot);
 
     mojibakeMutationObserver = new MutationObserver((mutations) => {
         if (isApplyingMojibakeRepair) return;
@@ -1658,8 +1690,14 @@ function setupMojibakeAutoRepair() {
         subtree: true,
         characterData: true,
         attributes: true,
-        attributeFilter: ['title', 'aria-label', 'placeholder']
+        attributeFilter: ['title', 'aria-label', 'placeholder', 'value', 'alt']
     });
+
+    if (!mojibakeSafetyTimer && typeof window !== 'undefined') {
+        mojibakeSafetyTimer = window.setInterval(() => {
+            repairMojibakeDomSubtree(document.documentElement || document.body);
+        }, 2400);
+    }
 }
 
 function pickReadableText(primary, fallback) {
@@ -4431,6 +4469,7 @@ const RAPID_PATTERN_WARNING_RATIO = 0.34;
 const RAPID_PATTERN_CONTEXT_LINES = 4;
 const RAPID_PATTERN_FEEDBACK_INTERVAL = 10;
 const RAPID_PATTERN_MODE_STORAGE_KEY = 'rapid_pattern_mode_v1';
+const RAPID_PATTERN_SHOW_BREEN_REFERENCE = false;
 
 let rapidPatternArenaState = {
     active: false,
@@ -4471,6 +4510,14 @@ function ensureRapidPatternBreenReferenceSlot() {
     }
     rapidPatternArenaState.elements.breenReference = slot;
     return slot;
+}
+
+function removeRapidPatternBreenReferenceSlot() {
+    const existing = rapidPatternArenaState.elements?.breenReference || document.getElementById('rapid-breen-reference');
+    if (existing?.parentElement) existing.parentElement.removeChild(existing);
+    if (rapidPatternArenaState.elements) {
+        rapidPatternArenaState.elements.breenReference = null;
+    }
 }
 
 function renderRapidPatternBreenReference(activePatternId = '') {
@@ -4526,7 +4573,11 @@ function setupRapidPatternArena() {
     updateRapidPatternTimeLabel();
     populateRapidPatternTypes();
     renderRapidPatternButtons();
-    renderRapidPatternBreenReference('');
+    if (RAPID_PATTERN_SHOW_BREEN_REFERENCE) {
+        renderRapidPatternBreenReference('');
+    } else {
+        removeRapidPatternBreenReferenceSlot();
+    }
     setRapidPatternTrafficLight('green');
     updateRapidPatternScoreboard();
     setRapidPatternFeedback('׳׳׳×׳™׳ ׳׳×׳—׳™׳׳× ׳¡׳‘׳‘...', 'info');
@@ -5094,7 +5145,9 @@ function renderRapidPatternMonologue(cue) {
         if (!highlight || !escaped.includes(token)) return escaped;
         return escaped.replace(token, `<mark class="rapid-highlight">${escapeHtml(highlight)}</mark>`);
     }).join('<br>');
-    renderRapidPatternBreenReference(normalizeRapidPatternId(cue.patternId || ''));
+    if (RAPID_PATTERN_SHOW_BREEN_REFERENCE) {
+        renderRapidPatternBreenReference(normalizeRapidPatternId(cue.patternId || ''));
+    }
 }
 
 function buildRapidMonologueLines(text, targetLines = 4, highlight = '') {
