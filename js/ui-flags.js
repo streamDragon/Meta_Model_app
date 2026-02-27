@@ -6,26 +6,107 @@
 
     const VALID_UI_MODES = Object.freeze(['legacy', 'shell']);
     const DEV_OVERRIDE_KEY = 'meta_ui_mode_override_v1';
+    const OVERLAY_PANELS_DEFAULT = Object.freeze(['settings', 'help', 'history', 'stats']);
 
     const SCREEN_UI_REGISTRY = Object.freeze({
-        home: Object.freeze({ id: 'home', path: '?tab=home', title: 'Home', defaultUiMode: 'legacy' }),
-        'practice-question': Object.freeze({ id: 'practice-question', path: '?tab=practice-question', title: 'Question Drill', defaultUiMode: 'legacy' }),
-        'practice-radar': Object.freeze({ id: 'practice-radar', path: '?tab=practice-radar', title: 'Meta Radar', defaultUiMode: 'legacy' }),
-        'practice-triples-radar': Object.freeze({ id: 'practice-triples-radar', path: '?tab=practice-triples-radar', title: 'Triples Radar', defaultUiMode: 'legacy' }),
-        'practice-wizard': Object.freeze({ id: 'practice-wizard', path: '?tab=practice-wizard', title: 'SQHCEL Wizard', defaultUiMode: 'legacy' }),
+        home: Object.freeze({
+            id: 'home',
+            path: '?tab=home',
+            title: 'Home Hub',
+            defaultUiMode: 'legacy',
+            aliases: Object.freeze(['hub', 'menu']),
+            overlayPanels: Object.freeze(['help', 'about'])
+        }),
+        'practice-question': Object.freeze({
+            id: 'practice-question',
+            path: '?tab=practice-question',
+            title: 'Questions',
+            defaultUiMode: 'legacy',
+            overlayPanels: OVERLAY_PANELS_DEFAULT
+        }),
+        'practice-radar': Object.freeze({
+            id: 'practice-radar',
+            path: '?tab=practice-radar',
+            title: 'Meta Radar',
+            defaultUiMode: 'legacy',
+            overlayPanels: OVERLAY_PANELS_DEFAULT
+        }),
+        'practice-triples-radar': Object.freeze({
+            id: 'practice-triples-radar',
+            path: '?tab=practice-triples-radar',
+            title: 'Triples Radar',
+            defaultUiMode: 'legacy',
+            overlayPanels: OVERLAY_PANELS_DEFAULT
+        }),
+        'practice-wizard': Object.freeze({
+            id: 'practice-wizard',
+            path: '?tab=practice-wizard',
+            title: 'Bridge / SQHCEL',
+            defaultUiMode: 'legacy',
+            aliases: Object.freeze(['bridge']),
+            overlayPanels: OVERLAY_PANELS_DEFAULT
+        }),
         'practice-verb-unzip': Object.freeze({
             id: 'practice-verb-unzip',
             path: '?tab=practice-verb-unzip',
             title: 'Unspecified Verb / פועל לא מפורט',
             defaultUiMode: 'shell',
+            aliases: Object.freeze(['unspecified-verb', 'unzip']),
+            overlayPanels: Object.freeze(['settings', 'help', 'history', 'stats', 'import-export']),
             notes: 'Initial shell migration target'
         }),
-        blueprint: Object.freeze({ id: 'blueprint', path: '?tab=blueprint', title: 'Blueprint', defaultUiMode: 'legacy' }),
-        prismlab: Object.freeze({ id: 'prismlab', path: '?tab=prismlab', title: 'Prism Lab', defaultUiMode: 'legacy' }),
-        categories: Object.freeze({ id: 'categories', path: '?tab=categories', title: 'Categories', defaultUiMode: 'legacy' }),
-        'comic-engine': Object.freeze({ id: 'comic-engine', path: '?tab=comic-engine', title: 'Comic Engine', defaultUiMode: 'legacy' }),
-        'scenario-trainer': Object.freeze({ id: 'scenario-trainer', path: '?tab=scenario-trainer', title: 'Scenario Trainer', defaultUiMode: 'legacy' }),
-        about: Object.freeze({ id: 'about', path: '?tab=about', title: 'About', defaultUiMode: 'legacy' })
+        'scenario-trainer': Object.freeze({
+            id: 'scenario-trainer',
+            path: '?tab=scenario-trainer',
+            title: 'Scenes / Execution',
+            defaultUiMode: 'shell',
+            aliases: Object.freeze(['scenes', 'execution']),
+            overlayPanels: Object.freeze([
+                'setup',
+                'settings',
+                'history',
+                'decomposition',
+                'action-map',
+                'blueprint',
+                'diagnostics'
+            ])
+        }),
+        'comic-engine': Object.freeze({
+            id: 'comic-engine',
+            path: '?tab=comic-engine',
+            title: 'Comic Engine',
+            defaultUiMode: 'legacy',
+            overlayPanels: OVERLAY_PANELS_DEFAULT
+        }),
+        categories: Object.freeze({
+            id: 'categories',
+            path: '?tab=categories',
+            title: 'Categories',
+            defaultUiMode: 'legacy',
+            overlayPanels: OVERLAY_PANELS_DEFAULT
+        }),
+        blueprint: Object.freeze({
+            id: 'blueprint',
+            path: '?tab=blueprint',
+            title: 'Blueprint Builder',
+            defaultUiMode: 'legacy',
+            overlayPanels: Object.freeze(['help', 'history', 'schema', 'import-export'])
+        }),
+        prismlab: Object.freeze({
+            id: 'prismlab',
+            path: '?tab=prismlab',
+            title: 'Prism Lab',
+            defaultUiMode: 'legacy',
+            aliases: Object.freeze(['prism-research']),
+            overlayPanels: OVERLAY_PANELS_DEFAULT
+        }),
+        about: Object.freeze({
+            id: 'about',
+            path: '?tab=about',
+            title: 'About / Guide',
+            defaultUiMode: 'legacy',
+            overlayPanels: Object.freeze(['about'])
+        })
     });
 
     function normalizeUiMode(input) {

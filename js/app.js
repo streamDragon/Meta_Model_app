@@ -7432,6 +7432,15 @@ function scenarioTransitionTo(nextState, force = false) {
 }
 
 function showScenarioScreen(screenName) {
+    try {
+        if (window.MetaAppShell && typeof window.MetaAppShell.handleScenarioScreenChange === 'function') {
+            const handledByShell = window.MetaAppShell.handleScenarioScreenChange(screenName);
+            if (handledByShell) return;
+        }
+    } catch (error) {
+        console.warn('Scenario shell screen interception failed', error);
+    }
+
     const screens = document.querySelectorAll('#scenario-trainer .scenario-screen');
     screens.forEach(screen => screen.classList.add('hidden'));
     const target = document.getElementById(`scenario-screen-${screenName}`);
@@ -7456,6 +7465,16 @@ function playScenarioSound(kind) {
 function setScenarioSafetyNoticeVisible(visible) {
     const notice = document.getElementById('scenario-safety-notice');
     if (!notice) return;
+
+    try {
+        if (window.MetaAppShell && typeof window.MetaAppShell.handleScenarioSafetyNotice === 'function') {
+            const handledByShell = window.MetaAppShell.handleScenarioSafetyNotice(!!visible, notice);
+            if (handledByShell) return;
+        }
+    } catch (error) {
+        console.warn('Scenario shell safety interception failed', error);
+    }
+
     notice.classList.toggle('hidden', !visible);
 
     const scenesBtn = document.getElementById('scenario-home-scenes');

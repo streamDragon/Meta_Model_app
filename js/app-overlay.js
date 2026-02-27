@@ -13,24 +13,42 @@
         body: null,
         active: null,
         lock: null,
-        escBound: false
+        escBound: false,
+        historyBound: false,
+        historyArmed: false,
+        pendingCloseReason: '',
+        isClosingFromHistory: false
     };
 
     function lockBodyScroll() {
         if (state.lock) return;
         const body = document.body;
         if (!body) return;
-        const currentOverflow = body.style.overflow || '';
-        const currentPaddingRight = body.style.paddingRight || '';
+        const scrollY = Math.max(0, window.scrollY || window.pageYOffset || 0);
+        const scrollX = Math.max(0, window.scrollX || window.pageXOffset || 0);
+        const previousStyle = {
+            position: body.style.position || '',
+            top: body.style.top || '',
+            left: body.style.left || '',
+            right: body.style.right || '',
+            width: body.style.width || '',
+            overflow: body.style.overflow || '',
+            paddingRight: body.style.paddingRight || ''
+        };
         const scrollbarWidth = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+
+        body.style.position = 'fixed';
+        body.style.top = `-${scrollY}px`;
+        body.style.left = '0';
+        body.style.right = '0';
+        body.style.width = '100%';
         body.style.overflow = 'hidden';
-        if (scrollbarWidth > 0) {
-            body.style.paddingRight = `${scrollbarWidth}px`;
-        }
+        if (scrollbarWidth > 0) body.style.paddingRight = `${scrollbarWidth}px`;
         body.classList.add('app-overlay-open');
         state.lock = {
-            overflow: currentOverflow,
-            paddingRight: currentPaddingRight
+            previousStyle,
+            scrollY,
+            scrollX
         };
     }
 
@@ -41,10 +59,174 @@
             state.lock = null;
             return;
         }
-        body.style.overflow = state.lock.overflow;
-        body.style.paddingRight = state.lock.paddingRight;
+        const previousStyle = state.lock.previousStyle || {};
+        body.style.position = previousStyle.position || '';
+        body.style.top = previousStyle.top || '';
+        body.style.left = previousStyle.left || '';
+        body.style.right = previousStyle.right || '';
+        body.style.width = previousStyle.width || '';
+        body.style.overflow = previousStyle.overflow || '';
+        body.style.paddingRight = previousStyle.paddingRight || '';
         body.classList.remove('app-overlay-open');
+
+        const restoreY = Number(state.lock.scrollY || 0);
+        const restoreX = Number(state.lock.scrollX || 0);
         state.lock = null;
+        window.scrollTo(restoreX, restoreY);
+    }
+
+    function getFocusableElements(container) {
+        if (!container || !(container instanceof Element)) return [];
+        const selector = [
+            'a[href]',
+            'button:not([disabled])',
+            'textarea:not([disabled])',
+            'input:not([disabled]):not([type="hidden"])',
+            'select:not([disabled])',
+            '[tabindex]:not([tabindex="-1"])'
+        ].join(',');
+
+        return Array.from(container.querySelectorAll(selector)).filter((el) => {
+            if (!(el instanceof HTMLElement)) return false;
+            if (el.getAttribute('aria-hidden') === 'true') return false;
+            const style = window.getComputedStyle(el);
+            if (style.visibility === 'hidden' || style.display === 'none') return false;
+            return true;
+        });
+    }
+
+    function trapFocus(event) {
+        if (event.key !== 'Tab' || !state.active || !state.panel) return;
+        const focusables = getFocusableElements(state.panel);
+        if (!focusables.length) {
+            event.preventDefault();
+            state.panel.focus();
+            return;
+        }
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const activeElement = document.activeElement;
+        if (!event.shiftKey && activeElement === last) {
+            event.preventDefault();
+            first.focus();
+            return;
+        }
+        if (event.shiftKey && (activeElement === first || activeElement === state.panel)) {
+            event.preventDefault();
+            last.focus();
+        }
+    }
+
+    function onDocumentKeydown(event) {
+        if (!state.active) return;
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            closeOverlay('esc');
+            return;
+        }
+        trapFocus(event);
+    }
+
+    function buildOverlayHash(typeValue) {
+        const type = String(typeValue || 'panel').trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '-');
+        return `overlay=${type || 'panel'}`;
+    }
+
+    function armOverlayHistory(typeValue) {
+        if (state.historyArmed) return;
+        try {
+            const nextUrl = new URL(global.location.href);
+            nextUrl.hash = buildOverlayHash(typeValue);
+            global.history.pushState({
+                ...(global.history.state && typeof global.history.state === 'object' ? global.history.state : {}),
+                __metaOverlay: true,
+                __metaOverlayAt: Date.now()
+            }, '', nextUrl.toString());
+            state.historyArmed = true;
+        } catch (_error) {
+            state.historyArmed = false;
+        }
+    }
+
+    function disarmOverlayHistory() {
+        state.historyArmed = false;
+        state.pendingCloseReason = '';
+        state.isClosingFromHistory = false;
+    }
+
+    function closeOverlayViaHistory(reason) {
+        if (!state.active) return false;
+        if (!state.historyArmed || state.isClosingFromHistory) return false;
+        state.pendingCloseReason = reason || 'close';
+        state.isClosingFromHistory = true;
+        try {
+            global.history.back();
+            return true;
+        } catch (_error) {
+            state.pendingCloseReason = '';
+            state.isClosingFromHistory = false;
+            return false;
+        }
+    }
+
+    function bindHistoryClose() {
+        if (state.historyBound) return;
+        state.historyBound = true;
+        global.addEventListener('popstate', () => {
+            if (!state.active) return;
+            const reason = state.pendingCloseReason || 'history';
+            finalizeOverlayClose(reason, true);
+        });
+    }
+
+    function finalizeOverlayClose(reason, fromHistoryPop = false) {
+        if (!state.active) return;
+        const active = state.active;
+        state.active = null;
+        disarmOverlayHistory();
+        if (!fromHistoryPop && global.location && /^#overlay=/.test(global.location.hash || '')) {
+            try {
+                const nextUrl = new URL(global.location.href);
+                nextUrl.hash = '';
+                global.history.replaceState(global.history.state, '', nextUrl.toString());
+            } catch (_error) {
+                // noop
+            }
+        }
+
+        if (state.root) {
+            state.root.classList.add('hidden');
+            state.root.setAttribute('aria-hidden', 'true');
+            state.root.setAttribute('data-overlay-type', '');
+        }
+
+        clearBody();
+        unlockBodyScroll();
+
+        if (state.panel) {
+            state.panel.className = 'overlay-panel overlay-panel-size-md opened-content';
+            window.setTimeout(() => {
+                if (state.panel) state.panel.classList.remove('opened-content');
+            }, 320);
+        }
+
+        try {
+            if (typeof active.onClose === 'function') {
+                active.onClose(reason || 'close');
+            }
+        } catch (error) {
+            console.warn('Overlay onClose callback failed', error);
+        }
+
+        const restoreTarget = active.restoreFocusEl;
+        if (restoreTarget && typeof restoreTarget.focus === 'function') {
+            try {
+                restoreTarget.focus({ preventScroll: true });
+            } catch (_error) {
+                restoreTarget.focus();
+            }
+        }
     }
 
     function ensureRoot() {
@@ -57,7 +239,7 @@
             root.className = 'overlay-root hidden';
             root.setAttribute('aria-hidden', 'true');
             root.innerHTML = `
-                <section class="overlay-panel overlay-panel-size-md" role="dialog" aria-modal="true" aria-labelledby="${TITLE_ID}">
+                <section class="overlay-panel overlay-panel-size-md" role="dialog" aria-modal="true" aria-labelledby="${TITLE_ID}" tabindex="-1">
                     <header class="overlay-head">
                         <h3 id="${TITLE_ID}" class="overlay-title">חלון</h3>
                         <button type="button" class="overlay-close" data-overlay-close aria-label="Close overlay">×</button>
@@ -89,13 +271,10 @@
 
         if (!state.escBound) {
             state.escBound = true;
-            document.addEventListener('keydown', (event) => {
-                if (event.key !== 'Escape') return;
-                if (!state.active) return;
-                closeOverlay('esc');
-            });
+            document.addEventListener('keydown', onDocumentKeydown);
         }
 
+        bindHistoryClose();
         return root;
     }
 
@@ -183,42 +362,9 @@
 
     function closeOverlay(reason) {
         if (!state.active) return;
-        const active = state.active;
-
-        state.active = null;
-
-        if (state.root) {
-            state.root.classList.add('hidden');
-            state.root.setAttribute('aria-hidden', 'true');
-            state.root.setAttribute('data-overlay-type', '');
-        }
-
-        clearBody();
-        unlockBodyScroll();
-
-        if (state.panel) {
-            state.panel.className = 'overlay-panel overlay-panel-size-md opened-content';
-            window.setTimeout(() => {
-                if (state.panel) state.panel.classList.remove('opened-content');
-            }, 320);
-        }
-
-        try {
-            if (typeof active.onClose === 'function') {
-                active.onClose(reason || 'close');
-            }
-        } catch (error) {
-            console.warn('Overlay onClose callback failed', error);
-        }
-
-        const restoreTarget = active.restoreFocusEl;
-        if (restoreTarget && typeof restoreTarget.focus === 'function') {
-            try {
-                restoreTarget.focus({ preventScroll: true });
-            } catch (_error) {
-                restoreTarget.focus();
-            }
-        }
+        const closedByHistory = closeOverlayViaHistory(reason);
+        if (closedByHistory) return;
+        finalizeOverlayClose(reason, false);
     }
 
     function openOverlay(options) {
@@ -227,7 +373,7 @@
         if (!root || !state.panel || !state.body) return null;
 
         if (state.active) {
-            closeOverlay('replace');
+            finalizeOverlayClose('replace', false);
         }
 
         const titleText = String(opts.title || 'חלון').trim() || 'חלון';
@@ -258,6 +404,7 @@
 
         lockBodyScroll();
         bindSwipeClose(state.panel);
+        armOverlayHistory(opts.type);
 
         if (typeof opts.onOpen === 'function') {
             try {
@@ -272,11 +419,13 @@
         });
 
         const closeBtn = root.querySelector('[data-overlay-close]');
-        if (closeBtn && typeof closeBtn.focus === 'function') {
+        const focusables = getFocusableElements(state.panel);
+        const targetFocus = focusables[0] || closeBtn || state.panel;
+        if (targetFocus && typeof targetFocus.focus === 'function') {
             try {
-                closeBtn.focus({ preventScroll: true });
+                targetFocus.focus({ preventScroll: true });
             } catch (_error) {
-                closeBtn.focus();
+                targetFocus.focus();
             }
         }
 

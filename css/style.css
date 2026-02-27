@@ -548,6 +548,25 @@ body.force-mobile-view .app-version-floating {
     padding: 8px;
 }
 
+.scenario-shell-overlay-host {
+    display: none !important;
+}
+
+.scenario-shell-inline-host {
+    display: grid;
+    gap: 10px;
+}
+
+.scenario-shell-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.scenario-shell-toolbar .shell-action-btn {
+    min-height: 36px;
+}
+
 @media (max-width: 640px) {
     .feature-map-menu-controls {
         grid-template-columns: 1fr;
