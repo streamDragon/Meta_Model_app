@@ -2991,6 +2991,41 @@ function getBuildMetaFromHtmlAttributes() {
     }
 }
 
+function normalizeVersionManifest(payload) {
+    if (!payload || typeof payload !== 'object') return null;
+    const appVersion = String(payload.appVersion || payload.version || '').trim();
+    const commitSha = String(payload.commitSha || payload.gitCommit || '').trim();
+    const builtAt = String(payload.builtAt || payload.buildIso || '').trim();
+    const buildTime = String(payload.buildTime || '').trim();
+    if (!appVersion && !commitSha && !builtAt && !buildTime) return null;
+    return { appVersion, commitSha, builtAt, buildTime };
+}
+
+function applyRuntimeBuildMetaFromManifest(meta) {
+    if (!meta || !document.documentElement) return;
+    if (meta.appVersion) document.documentElement.setAttribute('data-app-version', meta.appVersion);
+    if (meta.commitSha) document.documentElement.setAttribute('data-git-commit', meta.commitSha);
+    if (meta.builtAt) document.documentElement.setAttribute('data-build-iso', meta.builtAt);
+    if (meta.buildTime) document.documentElement.setAttribute('data-build-time', meta.buildTime);
+}
+
+async function fetchVersionManifest() {
+    try {
+        const response = await fetch(`version.json?t=${encodeURIComponent(Date.now())}`, {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache' }
+        });
+        if (!response.ok) return null;
+        const json = await response.json();
+        const meta = normalizeVersionManifest(json);
+        if (!meta) return null;
+        applyRuntimeBuildMetaFromManifest(meta);
+        return meta;
+    } catch (_error) {
+        return null;
+    }
+}
+
 function getShortBuildCommit() {
     const gitCommit = String(getBuildMetaFromHtmlAttributes().gitCommit || '').trim();
     if (!gitCommit || gitCommit === 'unknown') return '';
@@ -3000,6 +3035,13 @@ function getShortBuildCommit() {
 function formatAppVersionDisplay(version) {
     const resolvedVersion = String(version || '').trim() || 'unknown';
     return resolvedVersion;
+}
+
+function formatVersionWithCommit(version) {
+    const visibleVersion = formatAppVersionDisplay(version);
+    const shortCommit = getShortBuildCommit();
+    if (!shortCommit) return visibleVersion;
+    return `${visibleVersion} (${shortCommit})`;
 }
 
 function buildAppVersionTitle(version) {
@@ -3013,15 +3055,19 @@ function buildAppVersionTitle(version) {
 }
 
 async function resolveAppVersion() {
-    // 1. Try to get version from HTML data-app-version attribute (most reliable for static hosting)
+    // 1. Source of truth: fetch the live version manifest with no-store.
+    const manifestMeta = await fetchVersionManifest();
+    if (manifestMeta?.appVersion) return manifestMeta.appVersion;
+
+    // 2. Fallback: HTML data-app-version attribute.
     const htmlVersion = getVersionFromHtmlAttribute();
     if (htmlVersion) return htmlVersion;
 
-    // 2. Try to get version from script query parameter
+    // 3. Fallback: script query parameter.
     const scriptVersion = getVersionFromAppScriptQuery();
     if (scriptVersion) return scriptVersion;
 
-    // 3. Try to get version from package.json (fallback, may fail on static hosting without CORS)
+    // 4. Fallback: package.json (may fail on static hosting without CORS).
     try {
         const response = await fetch('package.json', { cache: 'no-store' });
         if (response.ok) {
@@ -3041,7 +3087,7 @@ const APP_VERSION_FLOATING_LABEL = '\u05d2\u05e8\u05e1\u05d4 \u05e4\u05e2\u05d9\
 
 function applyAppVersion(version) {
     const resolvedVersion = String(version || '').trim() || 'unknown';
-    const visibleVersion = formatAppVersionDisplay(resolvedVersion);
+    const visibleVersion = formatVersionWithCommit(resolvedVersion);
     const versionTitle = buildAppVersionTitle(resolvedVersion);
     const chip = document.getElementById('app-version-chip');
     if (chip) {
@@ -3086,7 +3132,7 @@ async function setupAppVersionChip() {
     const hasFloating = Boolean(document.getElementById('app-version-floating'));
     if (!hasChip && !hasFloating) return;
 
-    const immediateVersion = getVersionFromAppScriptQuery();
+    const immediateVersion = getVersionFromHtmlAttribute() || getVersionFromAppScriptQuery();
     if (immediateVersion) applyAppVersion(immediateVersion);
 
     const version = await resolveAppVersion();

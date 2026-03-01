@@ -42,6 +42,8 @@ function setHtmlAttr(attrs, attrName, value) {
 }
 
 function getGitCommitShort() {
+    const fromEnv = String(process.env.VERCEL_GIT_COMMIT_SHA || process.env.GIT_COMMIT || '').trim();
+    if (fromEnv) return fromEnv.slice(0, 7);
     try {
         const result = spawnSync('git', ['rev-parse', '--short', 'HEAD'], {
             cwd: ROOT,
@@ -79,6 +81,9 @@ function buildVersionManifest(version, buildTime, buildIso, gitCommit) {
     const normalizedBuildIso = String(buildIso || new Date(Number(buildTime) || Date.now()).toISOString());
     const normalizedGitCommit = String(gitCommit || '').trim() || 'unknown';
     return `${JSON.stringify({
+        appVersion: normalizedVersion,
+        commitSha: normalizedGitCommit,
+        builtAt: normalizedBuildIso,
         version: normalizedVersion,
         buildTime: normalizedBuildTime,
         buildIso: normalizedBuildIso,
