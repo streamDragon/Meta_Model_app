@@ -668,12 +668,6 @@
         }).join('');
     }
 
-    function getOrderedCategoriesByIds(ids) {
-        return (Array.isArray(ids) ? ids : [])
-            .map((id) => getCategory(id))
-            .filter(Boolean);
-    }
-
     function renderClassicBreenReferenceBoard() {
         const rows = [
             { id: 'row1', title: 'שלשה 1 — שכבת מקור', cells: ['שיפוט חסר מקור', 'הנחות סמויות', 'קריאת מחשבות'] },
@@ -686,7 +680,7 @@
         return `
             <div class="prm-breen-5x3-wrap" aria-label="טבלת ברין קלאסית 5x3">
                 <div class="prm-breen-5x3-title">טבלת ברין הקלאסית (5×3) — מפת עוגן</div>
-                <p class="prm-breen-5x3-note">זוהי מפת הייחוס הקבועה. מתחתיה נשאר הלוח האינטראקטיבי של Prism Research (Inside/Outside map).</p>
+                <p class="prm-breen-5x3-note">זוהי מפת הייחוס הקבועה של קטגוריות המטה-מודל לתרגול ולניווט.</p>
                 <div class="prm-breen-5x3-grid">
                     ${rows.map((row) => `
                         <div class="prm-breen-5x3-row ${escapeHtml(row.id)}">
@@ -706,62 +700,7 @@
     }
 
     function renderBreenCategoryBoard() {
-        const stats = state.session ? core.computeStats(state.session) : { categoryCounts: {} };
-        const outside = getOrderedCategoriesByIds(PRISM_BREEN_OUTSIDE_ORDER);
-        const inside = getOrderedCategoriesByIds(PRISM_BREEN_INSIDE_ORDER);
-        const maxRows = Math.max(outside.length, inside.length);
-        const rows = [];
-
-        for (let i = 0; i < maxRows; i += 1) {
-            rows.push({
-                outside: outside[i] || null,
-                inside: inside[i] || null
-            });
-        }
-
-        const renderCell = (category, sideKey) => {
-            if (!category) return '<div class="prm-breen-cell is-empty" aria-hidden="true"></div>';
-            const disabled = !state.selection || !!state.pendingNodeId;
-            const count = stats.categoryCounts[category.categoryId] || 0;
-            const title = getCategoryDisplayTitle(category);
-            return `
-                <button
-                    type="button"
-                    class="prm-breen-cell ${sideKey}"
-                    data-action="pick-category"
-                    data-category-id="${escapeHtml(category.categoryId)}"
-                    ${disabled ? 'disabled' : ''}
-                    title="${escapeHtml(category.definition || '')}"
-                >
-                    <span class="prm-cat-name">${escapeHtml(title)}</span>
-                    <span class="prm-cat-meta">${escapeHtml((category.family || '').toUpperCase())} · ${count}</span>
-                </button>
-            `;
-        };
-
-        return `
-            <div class="prm-breen-board-wrap">
-                ${renderClassicBreenReferenceBoard()}
-                <div class="prm-breen-board-head">
-                    <div class="prm-breen-head-col outside">
-                        <strong>OUTSIDE THEIR MAP</strong>
-                        <small>מחוץ למפה שלהם</small>
-                    </div>
-                    <div class="prm-breen-head-col inside">
-                        <strong>INSIDE THEIR MAP</strong>
-                        <small>בתוך המפה שלהם</small>
-                    </div>
-                </div>
-                <div class="prm-breen-board">
-                    ${rows.map((row) => `
-                        <div class="prm-breen-row">
-                            ${renderCell(row.outside, 'outside')}
-                            ${renderCell(row.inside, 'inside')}
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
+        return renderClassicBreenReferenceBoard();
     }
 
     function getCategoryPhilosophy(category) {
