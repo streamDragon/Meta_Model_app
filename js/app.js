@@ -3575,7 +3575,7 @@ function setupPracticeMode() {
 const QUESTION_DRILL_PACK = [
     Object.freeze({
         id: 'mm_easy_001',
-        statement: 'כולם תמיד מתעלמים ממני.',
+        statement: 'בישיבות צוות אני מנסה לדבר כמה פעמים, ואף אחד כמעט לא מגיב, אז אני מרגיש שכולם תמיד מתעלמים ממני.',
         focus: ['GENERALIZATION'],
         targetMacro: 'GENERALIZATION',
         targetSubpattern: 'universal_quantifier',
@@ -3584,7 +3584,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_easy_002',
-        statement: 'אני חייב להסכים, אחרת הכול יתפרק.',
+        statement: 'כשיש מתח בבית אני מיד מוותר על מה שאני רוצה, כי אני חייב להסכים אחרת הכול יתפרק.',
         focus: ['GENERALIZATION'],
         targetMacro: 'GENERALIZATION',
         targetSubpattern: 'modal_necessity',
@@ -3593,7 +3593,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_easy_003',
-        statement: 'אי אפשר לדבר איתו.',
+        statement: 'כל ניסיון לשיחה איתו נגמר בזה שהוא נסגר או מחליף נושא, אז מרגיש לי שאי אפשר לדבר איתו.',
         focus: ['GENERALIZATION'],
         targetMacro: 'GENERALIZATION',
         targetSubpattern: 'modal_possibility',
@@ -3602,7 +3602,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_easy_004',
-        statement: 'הוא לא מכבד אותי.',
+        statement: 'כשהוא קוטע אותי מול אנשים ולא נותן לי לסיים משפט, זה ברור לי שהוא לא מכבד אותי.',
         focus: ['DISTORTION'],
         targetMacro: 'DISTORTION',
         targetSubpattern: 'complex_equivalence',
@@ -3611,7 +3611,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_easy_005',
-        statement: 'אני יודעת שהם חושבים שאני חלשה.',
+        statement: 'בפגישה היום ראיתי את המבטים שלהם ואת השתיקה אחרי שדיברתי, ואני יודעת שהם חושבים שאני חלשה.',
         focus: ['DISTORTION'],
         targetMacro: 'DISTORTION',
         targetSubpattern: 'mind_reading',
@@ -3620,7 +3620,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_easy_006',
-        statement: 'הוא איחר, אז ברור שלא אכפת לו ממני.',
+        statement: 'קבענו להיפגש והוא איחר שוב בלי לעדכן, אז ברור לי שלא באמת אכפת לו ממני.',
         focus: ['DISTORTION'],
         targetMacro: 'DISTORTION',
         targetSubpattern: 'cause_effect',
@@ -3629,7 +3629,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_easy_007',
-        statement: 'זה לא עובד.',
+        statement: 'ניסיתי את הדרך הזאת כבר כמה פעמים בשבוע האחרון, וזה עדיין לא עובד לי כמו שצריך.',
         focus: ['DELETION'],
         targetMacro: 'DELETION',
         targetSubpattern: 'unspecified_verb',
@@ -3638,7 +3638,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_easy_008',
-        statement: 'הם אמרו שזה בעייתי.',
+        statement: 'בישיבה האחרונה הם אמרו שזה בעייתי, אבל לא היה ברור מי בדיוק אמר ומה הבעיה.',
         focus: ['DELETION'],
         targetMacro: 'DELETION',
         targetSubpattern: 'unspecified_noun',
@@ -3647,7 +3647,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_easy_009',
-        statement: 'זה יותר טוב עכשיו.',
+        statement: 'אחרי השינוי שעשינו במערכת זה יותר טוב עכשיו, אבל קשה לי להסביר ביחס למה בדיוק.',
         focus: ['DELETION'],
         targetMacro: 'DELETION',
         targetSubpattern: 'comparative_deletion',
@@ -3656,7 +3656,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_medium_001',
-        statement: 'כשאין תגובה ממנו, אני יודעת שכבר לא באמת חשוב לו.',
+        statement: 'כשאני שולחת הודעה והוא לא מגיב שעות, אני מיד יודעת שכבר לא באמת חשוב לו מה עובר עליי.',
         focus: ['DISTORTION'],
         targetMacro: 'DISTORTION',
         targetSubpattern: 'mind_reading',
@@ -3665,7 +3665,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_medium_002',
-        statement: 'בפגישות כאלה אני תמיד נתקעת.',
+        statement: 'בפגישות מהסוג הזה, במיוחד כשיש מנהלים בחדר, אני תמיד נתקעת ולא מצליחה לדבר חופשי.',
         focus: ['GENERALIZATION'],
         targetMacro: 'GENERALIZATION',
         targetSubpattern: 'universal_quantifier',
@@ -3674,7 +3674,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_medium_003',
-        statement: 'צריך להיות מושלם כדי להצליח בזה.',
+        statement: 'בשביל להצליח בתפקיד הזה צריך להיות מושלם בכל פרט קטן, אחרת אין סיכוי באמת להתקדם.',
         focus: ['GENERALIZATION'],
         targetMacro: 'GENERALIZATION',
         targetSubpattern: 'modal_necessity',
@@ -3683,7 +3683,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_medium_004',
-        statement: 'המשוב שלהם הוכיח שאני לא מתאימה לתפקיד.',
+        statement: 'אחרי שקיבלתי מהם משוב די ביקורתי על המצגת, הרגשתי שזה הוכיח שאני לא מתאימה לתפקיד הזה.',
         focus: ['DISTORTION'],
         targetMacro: 'DISTORTION',
         targetSubpattern: 'complex_equivalence',
@@ -3692,7 +3692,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_medium_005',
-        statement: 'הפרויקט הזה לא ברור.',
+        statement: 'כבר שבוע שאנחנו עובדים על הפרויקט הזה, ועדיין הוא לא ברור לי בכלל מבחינת סדרי עדיפויות.',
         focus: ['DELETION'],
         targetMacro: 'DELETION',
         targetSubpattern: 'unspecified_noun',
@@ -3701,7 +3701,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_medium_006',
-        statement: 'הטון שלה גרם לי להיכשל לגמרי.',
+        statement: 'בשיחה האחרונה הטון שלה היה כל כך חד, שזה פשוט גרם לי להיכשל לגמרי בהצגה מול הצוות.',
         focus: ['DISTORTION'],
         targetMacro: 'DISTORTION',
         targetSubpattern: 'cause_effect',
@@ -3710,7 +3710,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_medium_007',
-        statement: 'אם פעם אחת פישלתי, זה אומר שאני תמיד לא יציב.',
+        statement: 'אם פעם אחת פישלתי מול הלקוח, זה אומר שאני תמיד לא יציב במצבים כאלה.',
         focus: ['GENERALIZATION'],
         targetMacro: 'GENERALIZATION',
         targetSubpattern: 'universal_quantifier',
@@ -3719,7 +3719,7 @@ const QUESTION_DRILL_PACK = [
     }),
     Object.freeze({
         id: 'mm_medium_008',
-        statement: 'הם רוצים שינוי.',
+        statement: 'בהנהלה אמרו שהם רוצים שינוי כבר ברבעון הקרוב, אבל עדיין לא ברור מי בדיוק ומה צריך להשתנות.',
         focus: ['DELETION'],
         targetMacro: 'DELETION',
         targetSubpattern: 'unspecified_noun',

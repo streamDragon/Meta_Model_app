@@ -130,7 +130,7 @@
   "practice_statements": [
     {
       "id": 1,
-      "statement": "כל הגברים הם אותו דבר",
+      "statement": "בכל פעם שאני יוצאת לדייט עם מישהו חדש, בסוף הוא מתנהג כמו כל הקודמים, אז אני מרגישה שכל הגברים הם אותו דבר.",
       "category": "GENERALIZATION",
       "subcategory": "universal_quantifier",
       "violation": "Universal Quantifier",
@@ -140,7 +140,7 @@
     },
     {
       "id": 2,
-      "statement": "הוא גרם לי להיות עצוב",
+      "statement": "כשאתמול הוא דיבר אליי בטון הזה מול כולם, זה מיד הפיל אותי וגרם לי להיות עצובה כל הערב.",
       "category": "DISTORTION",
       "subcategory": "cause_effect",
       "violation": "Cause-Effect",
@@ -150,7 +150,7 @@
     },
     {
       "id": 3,
-      "statement": "זה חייב להיות ככה",
+      "statement": "אחרי כל מה שקרה בפרויקט הזה, זה חייב להיות ככה ואין באמת דרך אחרת לעבוד.",
       "category": "GENERALIZATION",
       "subcategory": "modal_operator",
       "violation": "Modal Operator",
@@ -160,7 +160,7 @@
     },
     {
       "id": 4,
-      "statement": "הוא קרא בדעותיי",
+      "statement": "הוא אפילו לא סיים את המשפט וכבר ידעתי שהוא קרא במחשבות שלי ומבין בדיוק מה אני חושבת.",
       "category": "DISTORTION",
       "subcategory": "mind_reading",
       "violation": "Mind Reading",
@@ -170,7 +170,7 @@
     },
     {
       "id": 5,
-      "statement": "כשהם לא השיבו, הבנתי שהם לא אוהבים אותי",
+      "statement": "שלחתי להם הודעה חשובה והם לא ענו עד סוף היום, ומאותו רגע הבנתי שהם כבר לא אוהבים אותי.",
       "category": "DISTORTION",
       "subcategory": "complex_equivalence",
       "violation": "Complex Equivalence",
@@ -180,7 +180,7 @@
     },
     {
       "id": 6,
-      "statement": "לא טוב לי",
+      "statement": "מאז הפגישה הזאת בעבודה לא טוב לי בכלל, ואני לא מצליחה להצביע אפילו על דבר אחד שמרגיש נכון.",
       "category": "DELETION",
       "subcategory": "simple_deletion",
       "violation": "Simple Deletion",
@@ -190,7 +190,7 @@
     },
     {
       "id": 7,
-      "statement": "היא יותר חכמה ממני",
+      "statement": "כשאני רואה אותה מציגה מול כולם בביטחון כזה, ברור לי שהיא יותר חכמה ממני.",
       "category": "DELETION",
       "subcategory": "comparative_deletion",
       "violation": "Comparative Deletion",
@@ -200,7 +200,7 @@
     },
     {
       "id": 8,
-      "statement": "הנוקדות שלי הוא בעיה",
+      "statement": "בכל משוב שאני מקבל אומרים לי שהנקודות שלי הן הבעיה המרכזית, כאילו זו עובדה קבועה שאי אפשר לשנות.",
       "category": "DISTORTION",
       "subcategory": "nominalization",
       "violation": "Nominalization",
@@ -210,7 +210,7 @@
     },
     {
       "id": 9,
-      "statement": "ידוע שההגבלות הן טבעיות",
+      "statement": "בצוות כבר ידוע שההגבלות האלה טבעיות ושאין מה לנסות לשנות, למרות שאף אחד לא מסביר מי קבע את זה.",
       "category": "DELETION",
       "subcategory": "lack_referential_index",
       "violation": "Lack of Referential Index",
@@ -220,7 +220,7 @@
     },
     {
       "id": 10,
-      "statement": "זה בלתי אפשרי",
+      "statement": "כשאני מסתכל על כמות המשימות שנשארה לי עד סוף השבוע, זה נראה לי פשוט בלתי אפשרי.",
       "category": "GENERALIZATION",
       "subcategory": "modal_operator",
       "violation": "Modal Operator",
