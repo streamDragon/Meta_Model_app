@@ -14224,6 +14224,13 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
     line-height: 1.55;
 }
 
+.home-lobby-humor-line {
+    margin: -2px 0 0;
+    color: #0f766e;
+    font-size: 0.94rem;
+    font-weight: 700;
+}
+
 .home-lobby-cta-row {
     display: flex;
     flex-wrap: wrap;
@@ -14431,6 +14438,16 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
     margin: 0 0 12px;
     color: #334155;
     line-height: 1.55;
+}
+
+.home-lobby-flow-explain p {
+    margin: 0 0 10px;
+    color: #334155;
+    line-height: 1.58;
+}
+
+.home-lobby-flow-explain p:last-child {
+    margin-bottom: 0;
 }
 
 .home-lobby-final-cta {

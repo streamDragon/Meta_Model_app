@@ -2434,7 +2434,7 @@ function setupHomeLobbyMicroDemo() {
 
             button.classList.add('is-wrong');
             if (feedback) {
-                feedback.textContent = 'חפש את המילה שעושה "הכל או כלום"...';
+                feedback.textContent = 'חפש את המילה שעושה "הכל או כלום"…';
                 feedback.classList.add('is-wrong');
             }
             demo.classList.remove('is-shake');
