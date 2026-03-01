@@ -355,7 +355,7 @@
             complex_equivalence: 'COMPLEX EQUIVALENCE',
             comparative_deletion: 'COMPARATIVE DELETION',
             time_space_predicates: 'TIME SPACE PREDICATES',
-            lack_referential_index: 'LACK REF INDEX',
+            lack_referential_index: 'LACK REFERENTIAL INDEX',
             non_referring_nouns: 'NON REFERRING NOUNS',
             sensory_predicates: 'SENSORY PREDICATES',
             unspecified_verbs: 'UNSPECIFIED VERBS'

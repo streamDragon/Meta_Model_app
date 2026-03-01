@@ -2671,6 +2671,480 @@ function setupFeatureLauncherTabs() {
     });
 }
 
+function resolveVersionedAssetPath(rawPath = '') {
+    const source = String(rawPath || '').trim();
+    if (!source) return '';
+    try {
+        if (typeof window.withAssetVersion === 'function') {
+            return String(window.withAssetVersion(source) || source);
+        }
+    } catch (_error) {
+        // fall back to raw path
+    }
+    return source;
+}
+
+function clearUnzipEmbedLoadTimer() {
+    if (unzipEmbedRuntime.timerId) {
+        clearTimeout(unzipEmbedRuntime.timerId);
+        unzipEmbedRuntime.timerId = null;
+    }
+}
+
+function setUnzipEmbedStatus(message = '', tone = 'info') {
+    const statusBox = document.getElementById('unzip-embed-status');
+    const statusText = document.getElementById('unzip-embed-status-text');
+    if (!statusBox || !statusText) return;
+    statusBox.setAttribute('data-tone', tone);
+    statusText.textContent = String(message || '').trim();
+}
+
+function syncUnzipEmbedButtons() {
+    const loadBtn = document.getElementById('unzip-embed-load-btn');
+    const reloadBtn = document.getElementById('unzip-embed-reload-btn');
+    if (loadBtn) {
+        loadBtn.disabled = !!unzipEmbedRuntime.loading;
+        loadBtn.hidden = !!unzipEmbedRuntime.loaded && !unzipEmbedRuntime.failed;
+    }
+    if (reloadBtn) {
+        reloadBtn.disabled = !!unzipEmbedRuntime.loading;
+        reloadBtn.hidden = !unzipEmbedRuntime.loaded && !unzipEmbedRuntime.failed;
+    }
+}
+
+function loadUnzipEmbedFrame({ forceReload = false } = {}) {
+    const frame = document.getElementById('unzip-embed-frame');
+    if (!frame) return;
+
+    const source = String(frame.getAttribute('data-versioned-src') || '').trim();
+    if (!source) {
+        unzipEmbedRuntime.failed = true;
+        setUnzipEmbedStatus('לא נמצא מקור תקין ל־Unzip Embed.', 'danger');
+        syncUnzipEmbedButtons();
+        return;
+    }
+
+    if (unzipEmbedRuntime.loading) return;
+    if (unzipEmbedRuntime.loaded && !forceReload) return;
+
+    const resolvedSrc = resolveVersionedAssetPath(source);
+    unzipEmbedRuntime.loading = true;
+    unzipEmbedRuntime.failed = false;
+    syncUnzipEmbedButtons();
+    setUnzipEmbedStatus('טוען את Unzip Embed…', 'info');
+
+    const handleLoaded = () => {
+        clearUnzipEmbedLoadTimer();
+        unzipEmbedRuntime.loading = false;
+        unzipEmbedRuntime.loaded = true;
+        unzipEmbedRuntime.failed = false;
+        syncUnzipEmbedButtons();
+        setUnzipEmbedStatus('ה־Embed נטען בהצלחה.', 'success');
+    };
+
+    const handleFailed = () => {
+        clearUnzipEmbedLoadTimer();
+        unzipEmbedRuntime.loading = false;
+        unzipEmbedRuntime.loaded = true;
+        unzipEmbedRuntime.failed = true;
+        syncUnzipEmbedButtons();
+        setUnzipEmbedStatus('טעינת ה־Embed נכשלה או התעכבה. אפשר לנסות טעינה מחדש.', 'danger');
+    };
+
+    frame.addEventListener('load', handleLoaded, { once: true });
+    frame.addEventListener('error', handleFailed, { once: true });
+
+    if (forceReload) {
+        frame.setAttribute('src', 'about:blank');
+    }
+
+    requestAnimationFrame(() => {
+        frame.setAttribute('src', resolvedSrc);
+    });
+
+    clearUnzipEmbedLoadTimer();
+    unzipEmbedRuntime.timerId = setTimeout(handleFailed, UNZIP_EMBED_LOAD_TIMEOUT_MS);
+}
+
+function setupUnzipEmbedLazyLoad() {
+    const frame = document.getElementById('unzip-embed-frame');
+    if (!frame || frame.dataset.unzipLazyBound === '1') return;
+    frame.dataset.unzipLazyBound = '1';
+
+    const loadBtn = document.getElementById('unzip-embed-load-btn');
+    const reloadBtn = document.getElementById('unzip-embed-reload-btn');
+
+    if (loadBtn && loadBtn.dataset.unzipLoadBound !== '1') {
+        loadBtn.dataset.unzipLoadBound = '1';
+        loadBtn.addEventListener('click', () => {
+            loadUnzipEmbedFrame();
+        });
+    }
+
+    if (reloadBtn && reloadBtn.dataset.unzipReloadBound !== '1') {
+        reloadBtn.dataset.unzipReloadBound = '1';
+        reloadBtn.addEventListener('click', () => {
+            loadUnzipEmbedFrame({ forceReload: true });
+        });
+    }
+
+    setUnzipEmbedStatus('כדי למנוע תקיעות, ה־Embed נטען רק בעת כניסה למסך או בלחיצה ידנית.', 'info');
+    syncUnzipEmbedButtons();
+}
+
+function escapeRegExpForPattern(value = '') {
+    return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function normalizeTrapPhrase(value = '') {
+    return String(value || '')
+        .toLowerCase()
+        .replace(/[^\u0590-\u05FFa-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function getCodexUnresolvedCount() {
+    return codexTrapLabState.activeTraps.filter((trap) => {
+        return !codexTrapLabState.resolvedByWord[trap.normalizedWord];
+    }).length;
+}
+
+function setCodexFeedback(text = '', tone = 'info') {
+    const feedback = codexTrapLabState.elements?.feedback;
+    if (!feedback) return;
+    feedback.textContent = String(text || '').trim();
+    feedback.setAttribute('data-tone', tone);
+}
+
+function setCodexBiteMessage(text = '', tone = 'warn') {
+    const bite = codexTrapLabState.elements?.bite;
+    if (!bite) return;
+    const message = String(text || '').trim();
+    if (!message) {
+        bite.textContent = '';
+        bite.classList.add('hidden');
+        bite.removeAttribute('data-tone');
+        return;
+    }
+    bite.classList.remove('hidden');
+    bite.textContent = message;
+    bite.setAttribute('data-tone', tone);
+}
+
+function syncCodexSaveState() {
+    const saveBtn = codexTrapLabState.elements?.saveBtn;
+    const counter = codexTrapLabState.elements?.counter;
+    if (!saveBtn || !counter) return;
+
+    const unresolved = getCodexUnresolvedCount();
+    counter.textContent = `${unresolved} קופסאות סגורות`;
+    counter.setAttribute('data-tone', unresolved > 0 ? 'warn' : 'success');
+    saveBtn.disabled = unresolved > 0;
+}
+
+function pruneCodexResolvedWords() {
+    const activeSet = new Set(codexTrapLabState.activeTraps.map((trap) => trap.normalizedWord));
+    Object.keys(codexTrapLabState.resolvedByWord).forEach((key) => {
+        if (!activeSet.has(key)) {
+            delete codexTrapLabState.resolvedByWord[key];
+        }
+    });
+}
+
+function detectCodexTraps(text = '') {
+    const normalizedText = ` ${normalizeTrapPhrase(text)} `;
+    if (!normalizedText.trim()) return [];
+
+    const active = [];
+    codexTrapLabState.trapWords.forEach((trap) => {
+        if (!trap?.normalizedWord) return;
+        const pattern = new RegExp(`(?:^|\\s)${escapeRegExpForPattern(trap.normalizedWord)}(?=\\s|$)`, 'g');
+        const matches = normalizedText.match(pattern);
+        if (!matches || !matches.length) return;
+        active.push({
+            ...trap,
+            count: matches.length
+        });
+    });
+    return active;
+}
+
+function renderCodexTrapList() {
+    const list = codexTrapLabState.elements?.list;
+    if (!list) return;
+    list.innerHTML = '';
+
+    if (!codexTrapLabState.activeTraps.length) {
+        const empty = document.createElement('p');
+        empty.className = 'codex-trap-empty';
+        empty.textContent = 'אין כרגע מילים עמומות פתוחות. אפשר לשמור.';
+        list.appendChild(empty);
+        return;
+    }
+
+    codexTrapLabState.activeTraps.forEach((trap) => {
+        const isResolved = !!codexTrapLabState.resolvedByWord[trap.normalizedWord];
+        const token = document.createElement('button');
+        token.type = 'button';
+        token.className = `codex-trap-token ${isResolved ? 'is-resolved' : 'is-open'}`;
+        token.dataset.trapWord = trap.normalizedWord;
+
+        const word = document.createElement('span');
+        word.className = 'codex-trap-token-word';
+        word.textContent = `"${trap.word}"`;
+
+        const meta = document.createElement('span');
+        meta.className = 'codex-trap-token-meta';
+        meta.textContent = isResolved
+            ? `נפתח ✓ → ${codexTrapLabState.resolvedByWord[trap.normalizedWord]}`
+            : `x${trap.count} · ${trap.hint}`;
+
+        token.appendChild(word);
+        token.appendChild(meta);
+        token.addEventListener('click', () => {
+            openCodexTrapModal(trap.normalizedWord);
+        });
+
+        list.appendChild(token);
+    });
+}
+
+function refreshCodexTrapAnalysis() {
+    const input = codexTrapLabState.elements?.input;
+    if (!input) return;
+    codexTrapLabState.activeTraps = detectCodexTraps(input.value || '');
+    pruneCodexResolvedWords();
+    renderCodexTrapList();
+    syncCodexSaveState();
+    if (!codexTrapLabState.activeTraps.length) {
+        setCodexBiteMessage('');
+    }
+}
+
+function closeCodexTrapModal() {
+    const modal = codexTrapLabState.elements?.modal;
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+    codexTrapLabState.selectedTrapWord = '';
+}
+
+function openCodexTrapModal(normalizedWord = '') {
+    const trap = codexTrapLabState.trapByWord.get(normalizedWord);
+    const els = codexTrapLabState.elements;
+    if (!trap || !els) return;
+
+    codexTrapLabState.selectedTrapWord = trap.normalizedWord;
+
+    if (els.modalTitle) {
+        els.modalTitle.textContent = `מי זה "${trap.word}" בעצם?`;
+    }
+    if (els.modalHint) {
+        els.modalHint.textContent = trap.hint || 'כתבו ניסוח מדויק יותר.';
+    }
+    if (els.modalInput) {
+        els.modalInput.value = codexTrapLabState.resolvedByWord[trap.normalizedWord] || '';
+    }
+
+    if (els.suggestions) {
+        els.suggestions.innerHTML = '';
+        const suggestions = Array.isArray(trap.suggestions) && trap.suggestions.length
+            ? trap.suggestions
+            : ['ההורים שלי', 'הבוס שלי', 'בן/בת הזוג'];
+        suggestions.forEach((suggestion) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'codex-trap-suggestion-chip';
+            btn.textContent = suggestion;
+            btn.addEventListener('click', () => {
+                if (!els.modalInput) return;
+                els.modalInput.value = suggestion;
+                els.modalInput.focus();
+            });
+            els.suggestions.appendChild(btn);
+        });
+    }
+
+    els.modal.classList.remove('hidden');
+    els.modal.setAttribute('aria-hidden', 'false');
+    if (els.modalInput) {
+        els.modalInput.focus();
+        els.modalInput.select();
+    }
+}
+
+function saveCodexTrapResolution() {
+    const selected = codexTrapLabState.selectedTrapWord;
+    const input = codexTrapLabState.elements?.modalInput;
+    if (!selected || !input) return;
+
+    const value = String(input.value || '').trim();
+    if (!value) {
+        setCodexFeedback('כדי לפתוח קופסה צריך ניסוח מדויק יותר.', 'warn');
+        input.focus();
+        return;
+    }
+
+    codexTrapLabState.resolvedByWord[selected] = value;
+    closeCodexTrapModal();
+    setCodexFeedback('הקופסה נפתחה בהצלחה.', 'success');
+    setCodexBiteMessage('');
+    refreshCodexTrapAnalysis();
+}
+
+async function loadCodexTrapWords() {
+    if (codexTrapLabState.trapWords.length) return codexTrapLabState.trapWords;
+
+    let sourceWords = CODEX_TRAP_FALLBACK_WORDS;
+    try {
+        const response = await fetch(resolveVersionedAssetPath('data/trap-words.json'), { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const payload = await response.json();
+        if (Array.isArray(payload?.trapWords) && payload.trapWords.length) {
+            sourceWords = payload.trapWords;
+        }
+    } catch (error) {
+        console.warn('Codex trap words: fallback list in use', error);
+    }
+
+    const normalizedWords = sourceWords.map((entry) => {
+        const word = String(entry?.word || '').trim();
+        const normalizedWord = normalizeTrapPhrase(word);
+        if (!word || !normalizedWord) return null;
+        return {
+            word,
+            normalizedWord,
+            category: String(entry?.category || '').trim() || 'general',
+            severity: String(entry?.severity || '').trim() || 'medium',
+            hint: String(entry?.hint || '').trim() || 'מי בדיוק?',
+            suggestions: Array.isArray(entry?.suggestions)
+                ? entry.suggestions.map((item) => String(item || '').trim()).filter(Boolean)
+                : []
+        };
+    }).filter(Boolean);
+
+    codexTrapLabState.trapWords = normalizedWords;
+    codexTrapLabState.trapByWord = new Map(normalizedWords.map((entry) => [entry.normalizedWord, entry]));
+    return normalizedWords;
+}
+
+async function setupCodexTrapWordLab() {
+    const root = document.getElementById('codex-trap-lab');
+    if (!root || root.dataset.codexBound === '1') return;
+    root.dataset.codexBound = '1';
+
+    codexTrapLabState.elements = {
+        input: document.getElementById('codex-trap-input'),
+        list: document.getElementById('codex-trap-list'),
+        counter: document.getElementById('codex-trap-counter'),
+        challengeBtn: document.getElementById('codex-trap-challenge-btn'),
+        clearBtn: document.getElementById('codex-trap-clear-btn'),
+        saveBtn: document.getElementById('codex-trap-save-btn'),
+        feedback: document.getElementById('codex-trap-feedback'),
+        bite: document.getElementById('codex-trap-bite'),
+        modal: document.getElementById('codex-trap-modal'),
+        modalTitle: document.getElementById('codex-trap-modal-title'),
+        modalHint: document.getElementById('codex-trap-modal-hint'),
+        modalInput: document.getElementById('codex-trap-modal-input'),
+        modalClose: document.getElementById('codex-trap-modal-close'),
+        modalSave: document.getElementById('codex-trap-modal-save'),
+        suggestions: document.getElementById('codex-trap-suggestions')
+    };
+
+    await loadCodexTrapWords();
+    refreshCodexTrapAnalysis();
+    setCodexFeedback('הפיצ׳ר פעיל. אפשר להתחיל להקליד.', 'info');
+
+    const els = codexTrapLabState.elements;
+
+    if (els.input && els.input.dataset.codexBound !== '1') {
+        els.input.dataset.codexBound = '1';
+        els.input.addEventListener('input', () => {
+            setCodexFeedback('', 'info');
+            refreshCodexTrapAnalysis();
+        });
+    }
+
+    if (els.clearBtn && els.clearBtn.dataset.codexBound !== '1') {
+        els.clearBtn.dataset.codexBound = '1';
+        els.clearBtn.addEventListener('click', () => {
+            if (els.input) els.input.value = '';
+            codexTrapLabState.activeTraps = [];
+            codexTrapLabState.resolvedByWord = {};
+            renderCodexTrapList();
+            syncCodexSaveState();
+            setCodexBiteMessage('');
+            setCodexFeedback('הטקסט נוקה.', 'info');
+        });
+    }
+
+    if (els.challengeBtn && els.challengeBtn.dataset.codexBound !== '1') {
+        els.challengeBtn.dataset.codexBound = '1';
+        els.challengeBtn.addEventListener('click', () => {
+            const firstOpen = codexTrapLabState.activeTraps.find((trap) => !codexTrapLabState.resolvedByWord[trap.normalizedWord]);
+            if (!firstOpen) {
+                setCodexFeedback('אין קופסאות פתוחות כרגע. אפשר לשמור.', 'success');
+                return;
+            }
+            openCodexTrapModal(firstOpen.normalizedWord);
+        });
+    }
+
+    if (els.saveBtn && els.saveBtn.dataset.codexBound !== '1') {
+        els.saveBtn.dataset.codexBound = '1';
+        els.saveBtn.addEventListener('click', () => {
+            const unresolved = getCodexUnresolvedCount();
+            if (unresolved > 0) {
+                setCodexBiteMessage(`🦷 גראווררר! נשארו ${unresolved} קופסאות פתוחות.`, 'warn');
+                setCodexFeedback('צריך לפתוח את כל הקופסאות לפני שמירה.', 'warn');
+                const firstOpen = codexTrapLabState.activeTraps.find((trap) => !codexTrapLabState.resolvedByWord[trap.normalizedWord]);
+                if (firstOpen) openCodexTrapModal(firstOpen.normalizedWord);
+                return;
+            }
+            setCodexBiteMessage('');
+            setCodexFeedback('הערה נשמרה בהצלחה.', 'success');
+        });
+    }
+
+    if (els.modalClose && els.modalClose.dataset.codexBound !== '1') {
+        els.modalClose.dataset.codexBound = '1';
+        els.modalClose.addEventListener('click', closeCodexTrapModal);
+    }
+
+    if (els.modalSave && els.modalSave.dataset.codexBound !== '1') {
+        els.modalSave.dataset.codexBound = '1';
+        els.modalSave.addEventListener('click', saveCodexTrapResolution);
+    }
+
+    if (els.modalInput && els.modalInput.dataset.codexBound !== '1') {
+        els.modalInput.dataset.codexBound = '1';
+        els.modalInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                saveCodexTrapResolution();
+            }
+        });
+    }
+
+    if (els.modal && els.modal.dataset.codexBound !== '1') {
+        els.modal.dataset.codexBound = '1';
+        els.modal.addEventListener('click', (event) => {
+            if (event.target === els.modal) closeCodexTrapModal();
+        });
+    }
+
+    if (window.__codexTrapEscBound !== true) {
+        window.__codexTrapEscBound = true;
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape') return;
+            const modal = codexTrapLabState.elements?.modal;
+            if (!modal || modal.classList.contains('hidden')) return;
+            closeCodexTrapModal();
+        });
+    }
+}
+
 let hasInitializedApp = false;
 
 function setupGlobalTheoryLauncher() {
@@ -2970,6 +3444,10 @@ function initializeMetaModelApp() {
     });
 
     setupFeatureLauncherTabs();
+    setupUnzipEmbedLazyLoad();
+    Promise.resolve(setupCodexTrapWordLab()).catch((error) => {
+        console.warn('Failed to initialize Codex Trap lab', error);
+    });
     setupGlobalFeatureMenuDropdown();
     setupFeatureMapOverlayControls();
     safeRunUiEnhancement(() => {
@@ -3130,6 +3608,9 @@ function activateTabByName(tabName = '', { playSound = false, scrollToTop = true
     if (btn) btn.classList.add('active');
     content.classList.add('active');
     ensurePracticeTabHydration(resolvedTab);
+    if (resolvedTab === 'practice-verb-unzip') {
+        loadUnzipEmbedFrame();
+    }
 
     if (resolvedTab !== 'practice-radar') {
         setRapidPatternFocusMode(false);
@@ -3355,7 +3836,7 @@ function getBreenReferenceCategoryChip(categoryId = '') {
         complex_equivalence: 'COMPLEX EQUIVALENCE',
         comparative_deletion: 'COMPARATIVE DELETION',
         time_space_predicates: 'TIME SPACE PREDICATES',
-        lack_referential_index: 'LACK REF INDEX',
+        lack_referential_index: 'LACK REFERENTIAL INDEX',
         non_referring_nouns: 'NON REFERRING NOUNS',
         sensory_predicates: 'SENSORY PREDICATES',
         unspecified_verbs: 'UNSPECIFIED VERBS'

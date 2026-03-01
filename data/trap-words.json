@@ -1,0 +1,144 @@
+{
+  "trapWords": [
+    {
+      "word": "הם",
+      "category": "referential",
+      "severity": "high",
+      "hint": "מי בדיוק הם?",
+      "suggestions": ["ההורים שלי", "הצוות שלי", "המנהלים שלי"]
+    },
+    {
+      "word": "אנחנו",
+      "category": "referential",
+      "severity": "high",
+      "hint": "מי בדיוק כלול ב\"אנחנו\"?",
+      "suggestions": ["אני ובן/בת הזוג", "אני והצוות", "כל המשפחה"]
+    },
+    {
+      "word": "זה",
+      "category": "vague",
+      "severity": "medium",
+      "hint": "מה בדיוק \"זה\"?",
+      "suggestions": ["השיחה הזאת", "התגובה שלו", "המצב בעבודה"]
+    },
+    {
+      "word": "ככה",
+      "category": "vague",
+      "severity": "medium",
+      "hint": "מה בדיוק קורה \"ככה\"?",
+      "suggestions": ["היא שותקת", "הוא עונה קצר", "אני מתכווץ וננעל"]
+    },
+    {
+      "word": "שם",
+      "category": "vague",
+      "severity": "low",
+      "hint": "איפה בדיוק \"שם\"?",
+      "suggestions": ["בחדר ישיבות", "בבית", "בשיחה בוואטסאפ"]
+    },
+    {
+      "word": "משהו",
+      "category": "deletion",
+      "severity": "medium",
+      "hint": "מה בדיוק אותו \"משהו\"?",
+      "suggestions": ["משפט אחד שנאמר", "תגובה ספציפית", "אירוע מסוים"]
+    },
+    {
+      "word": "כולם",
+      "category": "generalization",
+      "severity": "high",
+      "hint": "מי בדיוק \"כולם\"?",
+      "suggestions": ["שני אנשים בצוות", "כמה חברים", "חלק מבני המשפחה"]
+    },
+    {
+      "word": "אף אחד",
+      "category": "generalization",
+      "severity": "high",
+      "hint": "באמת אף אחד?",
+      "suggestions": ["אדם אחד כן עזר", "מעט אנשים עזרו", "רק אחד הקשיב לי"]
+    },
+    {
+      "word": "תמיד",
+      "category": "generalization",
+      "severity": "medium",
+      "hint": "תמיד? יש יוצאים מן הכלל?",
+      "suggestions": ["לפעמים", "ברוב הפעמים", "השבוע זה קרה כמה פעמים"]
+    },
+    {
+      "word": "אף פעם",
+      "category": "generalization",
+      "severity": "medium",
+      "hint": "אף פעם? אפס פעמים?",
+      "suggestions": ["מעט פעמים", "לעיתים רחוקות", "בדרך כלל לא"]
+    },
+    {
+      "word": "הכל",
+      "category": "generalization",
+      "severity": "medium",
+      "hint": "מה בדיוק \"הכל\"?",
+      "suggestions": ["בעבודה", "בבית", "בשיחה עם אדם מסוים"]
+    },
+    {
+      "word": "חייב",
+      "category": "modal",
+      "severity": "medium",
+      "hint": "מה הופך את זה לחובה?",
+      "suggestions": ["חשוב לי", "אני מעדיף", "אני בוחר כרגע"]
+    },
+    {
+      "word": "צריך",
+      "category": "modal",
+      "severity": "medium",
+      "hint": "לפי מי או לפי מה \"צריך\"?",
+      "suggestions": ["אני רוצה", "נכון לי", "בחרתי לעשות כך"]
+    },
+    {
+      "word": "אי אפשר",
+      "category": "modal",
+      "severity": "medium",
+      "hint": "מה בדיוק מונע?",
+      "suggestions": ["כרגע קשה", "יש מגבלה זמנית", "אפשר חלקית"]
+    },
+    {
+      "word": "לא יכול",
+      "category": "modal",
+      "severity": "medium",
+      "hint": "מה עוצר אותך בפועל?",
+      "suggestions": ["כרגע קשה לי", "אני לא יודע איך עדיין", "צריך צעד קטן ראשון"]
+    },
+    {
+      "word": "ברור",
+      "category": "assumption",
+      "severity": "low",
+      "hint": "ברור למי?",
+      "suggestions": ["נראה לי", "אני מניח ש", "יש לי תחושה ש"]
+    },
+    {
+      "word": "בטח",
+      "category": "mind-reading",
+      "severity": "medium",
+      "hint": "מה הראיה לזה?",
+      "suggestions": ["אני מנחש ש", "יכול להיות ש", "אין לי עדיין ראיה מלאה"]
+    },
+    {
+      "word": "בסוף",
+      "category": "generalization",
+      "severity": "low",
+      "hint": "מה קרה בפועל \"בסוף\"?",
+      "suggestions": ["בפעם האחרונה", "בשיחה האחרונה", "במקרה אחד שהיה לי"]
+    },
+    {
+      "word": "זה לא בסדר",
+      "category": "lost-performative",
+      "severity": "medium",
+      "hint": "לפי איזה סטנדרט זה לא בסדר?",
+      "suggestions": ["לפי הערך שלי", "לפי ההסכם בינינו", "לפי הכללים שהוגדרו"]
+    },
+    {
+      "word": "הם לא",
+      "category": "referential",
+      "severity": "high",
+      "hint": "מי בדיוק לא?",
+      "suggestions": ["שני אנשים בצוות", "ההורים שלי", "הקולגות שלי"]
+    }
+  ]
+}
