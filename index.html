@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.104" data-build-time="1772388637650" data-build-iso="2026-03-01T18:10:37.650Z" data-git-commit="88e96dd">
+<html lang="he" dir="rtl" data-app-version="1.0.105" data-build-time="1772388748648" data-build-iso="2026-03-01T18:12:28.648Z" data-git-commit="ccbe740">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,15 +59,8 @@
                 }
             }
 
-            function maybeRefreshEmbeddedFrameFromManifest() {
-                var isEmbedded = false;
-                try {
-                    isEmbedded = window.self !== window.top;
-                } catch (error) {
-                    isEmbedded = true;
-                }
-
-                if (!isEmbedded || !window.fetch) {
+            function maybeRefreshFromManifest() {
+                if (!window.fetch) {
                     return;
                 }
 
@@ -89,7 +82,7 @@
                     }
                     return response.json();
                 }).then(function (manifest) {
-                    var latestVersion = normalizeToken(manifest && manifest.version);
+                    var latestVersion = normalizeToken((manifest && (manifest.appVersion || manifest.version)) || '');
                     var latestBuildTime = normalizeToken(manifest && manifest.buildTime);
                     if (!latestVersion && !latestBuildTime) {
                         return;
@@ -123,14 +116,14 @@
                     return false;
                 }
                 var path = url.pathname || '';
-                return /(^|\/)(data|js|css)\//.test(path) || /\/package\.json$/.test(path);
+                return /(^|\/)(data|js|css)\//.test(path) || /\/package\.json$/.test(path) || /\/version\.json$/.test(path);
             }
 
             window.__APP_ASSET_VERSION__ = assetVersion;
             window.__BUILD_TIME__ = buildTime;
             window.__withAssetVersion = withAssetVersion;
 
-            maybeRefreshEmbeddedFrameFromManifest();
+            maybeRefreshFromManifest();
 
             function seedVersionLabelsFromHtml() {
                 var versionText = normalizeToken(declaredVersion || assetVersion);
