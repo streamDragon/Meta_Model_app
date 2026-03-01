@@ -21,6 +21,10 @@
         particles: [],
         particleRaf: 0,
         resizeTimer: 0,
+        feedbackObserver: null,
+        feedbackScanTimer: 0,
+        teardownDone: false,
+        eventCleanups: [],
         lastHoverAt: 0,
         lastFeedbackSignature: '',
         lastFeedbackAt: 0,
@@ -31,9 +35,27 @@
             masterGain: null,
             ambientGain: null,
             ambientStarted: false,
-            ambientNodes: []
+            ambientNodes: [],
+            ambientStopTimer: 0,
+            transientNodes: new Set(),
+            cleanupTimers: new Set(),
+            lastFxAtByType: {},
+            fxLockUntil: 0
         }
     };
+
+    var FX_COOLDOWN_MS = {
+        hover: 240,
+        click: 130,
+        success: 260,
+        mastery: 360,
+        almost: 220,
+        whoosh: 200
+    };
+    var FX_GLOBAL_LOCK_MS = 32;
+    var FEEDBACK_SCAN_DEBOUNCE_MS = 140;
+    var MAX_TRANSIENT_AUDIO_NODES = 36;
+    var AMBIENT_AUTO_STOP_MS = 22000;
 
     function safeStorageGet(key) {
         try {
@@ -93,6 +115,59 @@
         return Math.floor(randomRange(min, max + 1));
     }
 
+    function rememberCleanupTimer(timerId) {
+        if (!timerId) return;
+        state.audio.cleanupTimers.add(timerId);
+    }
+
+    function clearCleanupTimer(timerId) {
+        if (!timerId) return;
+        clearTimeout(timerId);
+        state.audio.cleanupTimers.delete(timerId);
+    }
+
+    function clearAllCleanupTimers() {
+        state.audio.cleanupTimers.forEach(function (timerId) {
+            clearTimeout(timerId);
+        });
+        state.audio.cleanupTimers.clear();
+    }
+
+    function registerTransientNode(node) {
+        if (!node) return;
+        state.audio.transientNodes.add(node);
+    }
+
+    function unregisterTransientNode(node) {
+        if (!node) return;
+        state.audio.transientNodes.delete(node);
+    }
+
+    function stopTransientAudio() {
+        clearAllCleanupTimers();
+        state.audio.transientNodes.forEach(function (node) {
+            if (!node) return;
+            if (typeof node.stop === 'function') {
+                try { node.stop(); } catch (e) {}
+            }
+            if (typeof node.disconnect === 'function') {
+                try { node.disconnect(); } catch (e2) {}
+            }
+        });
+        state.audio.transientNodes.clear();
+    }
+
+    function shouldPlayFx(type) {
+        var now = Date.now();
+        if (now < Number(state.audio.fxLockUntil || 0)) return false;
+        var lastByType = Number(state.audio.lastFxAtByType[type] || 0);
+        var cooldown = Number(FX_COOLDOWN_MS[type] || 120);
+        if (now - lastByType < cooldown) return false;
+        state.audio.lastFxAtByType[type] = now;
+        state.audio.fxLockUntil = now + FX_GLOBAL_LOCK_MS;
+        return true;
+    }
+
     function boot() {
         if (!document.body) return;
         document.body.classList.add('alchemy-active');
@@ -101,7 +176,6 @@
         setupParticles();
         if (state.audio.consent === 'yes') {
             updateMuteButton();
-            maybeStartAmbient();
         } else {
             updateMuteButton();
             if (!state.audio.consent) showConsent(true);
@@ -174,38 +248,45 @@
     }
 
     function bindEvents() {
-        window.addEventListener('resize', onResize, { passive: true });
+        function bind(target, eventName, handler, options) {
+            if (!target || !handler) return;
+            target.addEventListener(eventName, handler, options);
+            state.eventCleanups.push(function () {
+                try { target.removeEventListener(eventName, handler, options); } catch (e) {}
+            });
+        }
 
-        document.addEventListener('pointerover', function (event) {
+        bind(window, 'resize', onResize, { passive: true });
+
+        bind(document, 'pointerover', function (event) {
             var el = isInteractiveTarget(event.target);
             if (!el) return;
             var now = Date.now();
+            if (now - state.lastHoverAt < 180) return;
+            state.lastHoverAt = now;
             var center = getRectCenter(el);
-            if (!prefersReducedMotion) spawnSparks(center.x, center.y, 6, 18);
-            if (now - state.lastHoverAt > 140) {
-                state.lastHoverAt = now;
-                playFx('hover');
-            }
+            if (!prefersReducedMotion) spawnSparks(center.x, center.y, 4, 14);
+            playFx('hover');
         }, true);
 
-        document.addEventListener('click', function (event) {
+        bind(document, 'click', function (event) {
             if (event.target && event.target.closest && event.target.closest('.alchemy-consent, .alchemy-mute, .alchemy-companion')) {
                 return;
             }
             var x = Number.isFinite(event.clientX) ? event.clientX : (window.innerWidth / 2);
             var y = Number.isFinite(event.clientY) ? event.clientY : (window.innerHeight / 2);
             rippleAt(x, y);
-            if (!prefersReducedMotion) spawnSparks(x, y, 10, 28);
+            if (!prefersReducedMotion) spawnSparks(x, y, 8, 24);
             playFx('click');
         }, true);
 
-        document.addEventListener('alchemy:fx', function (event) {
+        bind(document, 'alchemy:fx', function (event) {
             var detail = (event && event.detail) || {};
             handleAlchemyEvent(detail.type || 'success', detail);
         });
 
         if (state.companion) {
-            state.companion.addEventListener('click', function () {
+            bind(state.companion, 'click', function () {
                 if (state.audio.consent !== 'yes') {
                     showConsent(true);
                     setCompanionMood('wow', 1200);
@@ -215,17 +296,18 @@
                 if (state.audio.muted) {
                     toggleMute(false);
                     announceCompanion('Sound on');
-                } else {
-                    playFx('success');
-                    celebrateAt(window.innerWidth - 72, window.innerHeight - 96, 'success');
-                    setCompanionMood('dance', 1800);
-                    announceCompanion('Woo!');
+                    return;
                 }
+                maybeStartAmbient({ durationMs: 14000 });
+                playFx('success');
+                celebrateAt(window.innerWidth - 72, window.innerHeight - 96, 'success');
+                setCompanionMood('dance', 1800);
+                announceCompanion('Woo!');
             });
         }
 
         if (state.muteBtn) {
-            state.muteBtn.addEventListener('click', function () {
+            bind(state.muteBtn, 'click', function () {
                 if (state.audio.consent !== 'yes') {
                     showConsent(true);
                     return;
@@ -236,7 +318,7 @@
         }
 
         if (state.consentEl) {
-            state.consentEl.addEventListener('click', function (event) {
+            bind(state.consentEl, 'click', function (event) {
                 var btn = event.target && event.target.closest ? event.target.closest('[data-alchemy-consent]') : null;
                 if (!btn) return;
                 var answer = btn.getAttribute('data-alchemy-consent') === 'yes' ? 'yes' : 'no';
@@ -246,13 +328,14 @@
                     state.audio.muted = false;
                     safeStorageSet(STORAGE_MUTED, '0');
                     ensureAudioReady(true);
-                    maybeStartAmbient();
                     playFx('success');
                     announceCompanion('Sound enabled');
                     setCompanionMood('happy', 1400);
                 } else {
                     state.audio.muted = true;
                     safeStorageSet(STORAGE_MUTED, '1');
+                    stopAmbient(true);
+                    stopTransientAudio();
                     announceCompanion('Silent magic mode');
                     setCompanionMood('idle', 800);
                 }
@@ -260,6 +343,24 @@
                 showConsent(false);
             });
         }
+
+        bind(document, 'visibilitychange', function () {
+            if (document.hidden) {
+                stopTransientAudio();
+                stopAmbient(false);
+                return;
+            }
+            if (!state.audio.muted && state.audio.consent === 'yes' && state.audio.ambientStarted) {
+                fadeAmbient(0.08, 0.35);
+            }
+        });
+
+        bind(window, 'blur', function () {
+            stopTransientAudio();
+        });
+
+        bind(window, 'pagehide', teardown);
+        bind(window, 'beforeunload', teardown);
     }
 
     function onResize() {
@@ -301,7 +402,13 @@
             state.audio.masterGain.gain.setValueAtTime(state.audio.masterGain.gain.value || 0.00001, now);
             state.audio.masterGain.gain.exponentialRampToValueAtTime(target, now + 0.08);
         }
-        if (!state.audio.muted) maybeStartAmbient();
+        if (state.audio.muted) {
+            stopAmbient(true);
+            stopTransientAudio();
+        } else if (state.audio.ambientStarted) {
+            fadeAmbient(0.08, 0.22);
+            scheduleAmbientStop(AMBIENT_AUTO_STOP_MS);
+        }
         updateMuteButton();
         announceCompanion(state.audio.muted ? 'Muted' : 'Sound on');
         setCompanionMood(state.audio.muted ? 'idle' : 'happy', 900);
@@ -330,13 +437,64 @@
         return true;
     }
 
-    function maybeStartAmbient() {
+    function clearAmbientStopTimer() {
+        if (!state.audio.ambientStopTimer) return;
+        clearTimeout(state.audio.ambientStopTimer);
+        state.audio.ambientStopTimer = 0;
+    }
+
+    function scheduleAmbientStop(durationMs) {
+        clearAmbientStopTimer();
+        var delay = Math.max(2500, Number(durationMs) || AMBIENT_AUTO_STOP_MS);
+        state.audio.ambientStopTimer = setTimeout(function () {
+            state.audio.ambientStopTimer = 0;
+            stopAmbient(false);
+        }, delay);
+    }
+
+    function shutdownAmbientNodes() {
+        if (!state.audio.ambientNodes || !state.audio.ambientNodes.length) {
+            state.audio.ambientStarted = false;
+            state.audio.ambientNodes = [];
+            return;
+        }
+        state.audio.ambientNodes.forEach(function (node) {
+            if (!node) return;
+            if (typeof node.stop === 'function') {
+                try { node.stop(); } catch (e) {}
+            }
+            if (typeof node.disconnect === 'function') {
+                try { node.disconnect(); } catch (e2) {}
+            }
+        });
+        state.audio.ambientNodes = [];
+        state.audio.ambientStarted = false;
+    }
+
+    function stopAmbient(hardStop) {
+        clearAmbientStopTimer();
+        if (!state.audio.ambientStarted) return;
+        if (hardStop) {
+            shutdownAmbientNodes();
+            return;
+        }
+        fadeAmbient(0.00001, 0.16);
+        var stopTimer = setTimeout(function () {
+            state.audio.cleanupTimers.delete(stopTimer);
+            shutdownAmbientNodes();
+        }, 240);
+        rememberCleanupTimer(stopTimer);
+    }
+
+    function maybeStartAmbient(options) {
+        var opts = options || {};
         if (prefersReducedMotion) return;
         if (state.audio.consent !== 'yes') return;
         if (state.audio.muted) return;
         if (!ensureAudioReady(true)) return;
         if (state.audio.ambientStarted) {
-            fadeAmbient(0.12, 0.3);
+            fadeAmbient(0.08, 0.24);
+            scheduleAmbientStop(opts.durationMs);
             return;
         }
         var ctx = state.audio.ctx;
@@ -386,10 +544,11 @@
         shimmer.start(now);
         lfo.start(now);
         lfo2.start(now);
-        fadeAmbient(0.1, 1.2);
+        fadeAmbient(0.08, 0.55);
 
         state.audio.ambientStarted = true;
         state.audio.ambientNodes = [pad1, g1, pad2, g2, shimmer, g3, lfo, lfoGain, lfo2, lfo2Gain];
+        scheduleAmbientStop(opts.durationMs);
     }
 
     function fadeAmbient(target, seconds) {
@@ -404,11 +563,15 @@
     function playFx(type) {
         if (state.audio.consent !== 'yes') return;
         if (state.audio.muted) return;
+        if (!shouldPlayFx(type)) return;
         if (!ensureAudioReady(true)) return;
         var ctx = state.audio.ctx;
         if (!ctx || !state.audio.masterGain) return;
         if (ctx.state === 'suspended') {
             try { ctx.resume(); } catch (e) {}
+        }
+        if (state.audio.transientNodes.size > MAX_TRANSIENT_AUDIO_NODES) {
+            stopTransientAudio();
         }
         if (type === 'hover') return playHoverChime(ctx);
         if (type === 'click') return playClickChime(ctx);
@@ -444,15 +607,36 @@
         gain.gain.setValueAtTime(0.00001, start);
         gain.gain.exponentialRampToValueAtTime(Math.max(0.00002, peak), start + Math.min(0.03, dur * 0.25));
         gain.gain.exponentialRampToValueAtTime(0.00001, start + dur);
-        osc.start(start);
-        osc.stop(start + dur + 0.02);
-        osc.onended = function () {
+        registerTransientNode(osc);
+        registerTransientNode(gain);
+        if (biquad) registerTransientNode(biquad);
+
+        var cleaned = false;
+        var cleanupTimer = 0;
+        var cleanup = function () {
+            if (cleaned) return;
+            cleaned = true;
+            clearCleanupTimer(cleanupTimer);
             try { osc.disconnect(); } catch (e) {}
             try { gain.disconnect(); } catch (e) {}
             if (biquad) {
                 try { biquad.disconnect(); } catch (e2) {}
             }
+            unregisterTransientNode(osc);
+            unregisterTransientNode(gain);
+            if (biquad) unregisterTransientNode(biquad);
         };
+
+        cleanupTimer = setTimeout(cleanup, Math.max(220, Math.round(((opts.delay || 0) + dur + 0.32) * 1000)));
+        rememberCleanupTimer(cleanupTimer);
+        osc.onended = cleanup;
+
+        try {
+            osc.start(start);
+            osc.stop(start + dur + 0.02);
+        } catch (e3) {
+            cleanup();
+        }
     }
 
     function noise(ctx, opts) {
@@ -474,13 +658,33 @@
         gain.gain.exponentialRampToValueAtTime(0.00001, now + duration);
         src.buffer = buffer;
         src.connect(filter).connect(gain).connect(state.audio.masterGain);
-        src.start(now);
-        src.stop(now + duration + 0.01);
-        src.onended = function () {
+        registerTransientNode(src);
+        registerTransientNode(filter);
+        registerTransientNode(gain);
+
+        var cleaned = false;
+        var cleanupTimer = 0;
+        var cleanup = function () {
+            if (cleaned) return;
+            cleaned = true;
+            clearCleanupTimer(cleanupTimer);
             try { src.disconnect(); } catch (e) {}
             try { filter.disconnect(); } catch (e2) {}
             try { gain.disconnect(); } catch (e3) {}
+            unregisterTransientNode(src);
+            unregisterTransientNode(filter);
+            unregisterTransientNode(gain);
         };
+        cleanupTimer = setTimeout(cleanup, Math.max(240, Math.round(((opts.delay || 0) + duration + 0.34) * 1000)));
+        rememberCleanupTimer(cleanupTimer);
+        src.onended = cleanup;
+
+        try {
+            src.start(now);
+            src.stop(now + duration + 0.01);
+        } catch (e4) {
+            cleanup();
+        }
     }
 
     function playHoverChime(ctx) {
@@ -737,20 +941,33 @@
         }
     }
 
+    function scheduleFeedbackScan() {
+        if (state.feedbackScanTimer || state.teardownDone) return;
+        state.feedbackScanTimer = setTimeout(function () {
+            state.feedbackScanTimer = 0;
+            detectFeedbackSignals();
+        }, FEEDBACK_SCAN_DEBOUNCE_MS);
+    }
+
     function observeFeedback() {
         if (!window.MutationObserver || !document.body) return;
-        var observer = new MutationObserver(function () {
-            detectFeedbackSignals();
+        if (state.feedbackObserver) {
+            try { state.feedbackObserver.disconnect(); } catch (e) {}
+        }
+        state.feedbackObserver = new MutationObserver(function () {
+            scheduleFeedbackScan();
         });
-        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-        detectFeedbackSignals();
+        state.feedbackObserver.observe(document.body, { childList: true, subtree: true });
+        scheduleFeedbackScan();
     }
 
     function detectFeedbackSignals() {
+        if (state.teardownDone || document.hidden) return;
         var now = Date.now();
-        var candidates = document.querySelectorAll('.cc-feedback, .cc-report, [data-tone], [class*="feedback"]');
+        var candidates = document.querySelectorAll('.cc-feedback, .cc-report, [data-tone], .cc-top-chip[data-tone], .cc-stat-chip[data-tone]');
+        var limit = Math.min(60, candidates.length);
         var i;
-        for (i = 0; i < candidates.length; i++) {
+        for (i = 0; i < limit; i++) {
             var el = candidates[i];
             if (!el || !el.textContent) continue;
             var text = String(el.textContent || '').trim();
@@ -782,6 +999,46 @@
 
     function emitFx(type, detail) {
         handleAlchemyEvent(type, detail || {});
+    }
+
+    function teardown() {
+        if (state.teardownDone) return;
+        state.teardownDone = true;
+
+        if (state.particleRaf) {
+            cancelAnimationFrame(state.particleRaf);
+            state.particleRaf = 0;
+        }
+        if (state.resizeTimer) {
+            clearTimeout(state.resizeTimer);
+            state.resizeTimer = 0;
+        }
+        if (state.feedbackScanTimer) {
+            clearTimeout(state.feedbackScanTimer);
+            state.feedbackScanTimer = 0;
+        }
+        if (state._companionMoodTimer) {
+            clearTimeout(state._companionMoodTimer);
+            state._companionMoodTimer = 0;
+        }
+
+        clearAmbientStopTimer();
+        stopTransientAudio();
+        stopAmbient(true);
+
+        if (state.feedbackObserver) {
+            try { state.feedbackObserver.disconnect(); } catch (e) {}
+            state.feedbackObserver = null;
+        }
+
+        while (state.eventCleanups.length) {
+            var off = state.eventCleanups.pop();
+            try { off(); } catch (e2) {}
+        }
+
+        if (state.audio.ctx && typeof state.audio.ctx.suspend === 'function') {
+            try { state.audio.ctx.suspend(); } catch (e3) {}
+        }
     }
 
     function exposeApi() {

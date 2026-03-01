@@ -37,6 +37,8 @@
         showRoundGuide: false,
         paused: false,
         timerHandle: null,
+        submitInFlight: false,
+        lastSubmitAt: 0,
         renderNonce: 0
     };
 
@@ -504,46 +506,62 @@
         const round = currentRound();
         if (!round || round.stage === 'summary') return;
 
-        state.lastSelectedOptionId = String(optionId || '');
-        const result = engine.submitStageAnswer(state.session, optionId);
-        state.lastSelectedWasCorrect = !!result.ok;
+        const now = Date.now();
+        if (state.submitInFlight) return;
+        if ((now - Number(state.lastSubmitAt || 0)) < 90) return;
 
-        if (result.ok) {
-            state.hintMessage = '';
-            if (result.completedRound) {
+        state.submitInFlight = true;
+        state.lastSubmitAt = now;
+        try {
+            state.lastSelectedOptionId = String(optionId || '');
+            const result = engine.submitStageAnswer(state.session, optionId);
+            state.lastSelectedWasCorrect = !!result.ok;
+
+            if (result.ok) {
+                state.hintMessage = '';
+                if (result.completedRound) {
+                    state.feedback = {
+                        tone: 'success',
+                        text: 'סבב הושלם. עברו על הסיכום ואז המשיכו לתבנית הבאה.'
+                    };
+                } else {
+                    state.feedback = {
+                        tone: 'success',
+                        text: `נכון. מעבר לשלב הבא: ${stageLabel(result.nextStage)}`
+                    };
+                }
+            } else if (state.mode === 'learning') {
                 state.feedback = {
-                    tone: 'success',
-                    text: 'סבב הושלם. עברו על הסיכום ואז המשיכו לתבנית הבאה.'
+                    tone: 'warn',
+                    text: result.explanation || 'לא מדויק. נסו שוב.'
                 };
             } else {
+                const livesText = Number.isFinite(result.livesLeft) ? ` | חיים: ${result.livesLeft}` : '';
                 state.feedback = {
-                    tone: 'success',
-                    text: `נכון. מעבר לשלב הבא: ${stageLabel(result.nextStage)}`
+                    tone: result.livesLeft <= 0 ? 'danger' : 'warn',
+                    text: `לא נכון.${livesText}`
                 };
             }
-        } else if (state.mode === 'learning') {
-            state.feedback = {
-                tone: 'warn',
-                text: result.explanation || 'לא מדויק. נסו שוב.'
-            };
-        } else {
-            const livesText = Number.isFinite(result.livesLeft) ? ` | חיים: ${result.livesLeft}` : '';
-            state.feedback = {
-                tone: result.livesLeft <= 0 ? 'danger' : 'warn',
-                text: `לא נכון.${livesText}`
-            };
-        }
 
-        if (state.session.ended) {
-            state.appStage = SESSION_STATE_SUMMARY;
-        }
-        if (state.session.ended && !state.feedback) {
+            if (state.session.ended) {
+                state.appStage = SESSION_STATE_SUMMARY;
+            }
+            if (state.session.ended && !state.feedback) {
+                state.feedback = {
+                    tone: 'danger',
+                    text: 'הסשן הסתיים.'
+                };
+            }
+        } catch (error) {
             state.feedback = {
                 tone: 'danger',
-                text: 'הסשן הסתיים.'
+                text: '����� ���� ����� ������ ������. ��� ���.'
             };
+            emitAlchemyFx('almost', { text: 'Retry' });
+        } finally {
+            state.submitInFlight = false;
+            render();
         }
-        render();
     }
 
     function togglePause() {
