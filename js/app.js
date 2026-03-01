@@ -175,7 +175,8 @@ const STANDALONE_NAV_KEYS = Object.freeze({
     prismLabStandalone: 'prismLabStandalone',
     livingTriples: 'livingTriples',
     verbUnzipStandalone: 'verbUnzipStandalone',
-    sentenceMorpher: 'sentenceMorpher'
+    sentenceMorpher: 'sentenceMorpher',
+    verbUnzipWorksheet: 'verbUnzipWorksheet'
 });
 
 const UNZIP_EMBED_LOAD_TIMEOUT_MS = 15000;
@@ -2033,6 +2034,7 @@ function setupGlobalFeatureMenuDropdown() {
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html')]: 'Prism Research · Text Research',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html')]: 'Living Triples',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: 'Unzip Trainer (Standalone)',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/')]: 'דף עבודה מעוגל · Verb Unzip',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: 'Sentence Morpher',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismLabStandalone, 'prism_lab_trainer.html')]: 'Prism Lab (Standalone)'
     });
@@ -2083,6 +2085,7 @@ function setupGlobalFeatureMenuDropdown() {
         ].includes(key)) return groupLabels.depth;
         if ([
             getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html'),
+            getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/'),
             getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')
         ].includes(key)) return groupLabels.language;
         if ([
@@ -2582,6 +2585,7 @@ function setupFeatureLauncherTabs() {
         "nav:comic-engine": "Comic Engine",
         "nav:scenario-trainer": "Scenario Trainer",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: "Unzip Trainer (Standalone)",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/')]: "דף עבודה מעוגל · Verb Unzip",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: "Sentence Morpher",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html')]: "Prism Research (Chain)",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.iceberg, 'iceberg_templates_trainer.html')]: "קצה קרחון / שלדי עומק",
