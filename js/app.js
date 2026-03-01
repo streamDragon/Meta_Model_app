@@ -103,6 +103,8 @@ let audioState = {
     openingPlayed: false,
     openingTrack: null,
     firstEntryDone: false,
+    audioArmed: false,
+    audioArmBound: false,
     uiCompressor: null,
     uiMasterGain: null,
     lastUiSoundAtMs: 0,
@@ -333,6 +335,26 @@ function safeResumeAudioContext(ctx) {
     }
 }
 
+function armAudioFromUserInteraction() {
+    if (audioState.audioArmed) return;
+    audioState.audioArmed = true;
+    const ctx = ensureAudioContext();
+    safeResumeAudioContext(ctx);
+}
+
+function setupAudioInteractionArm() {
+    if (audioState.audioArmBound) return;
+    audioState.audioArmBound = true;
+
+    const armHandler = () => {
+        armAudioFromUserInteraction();
+    };
+
+    document.addEventListener('pointerdown', armHandler, { once: true, capture: true });
+    document.addEventListener('keydown', armHandler, { once: true, capture: true });
+    document.addEventListener('touchstart', armHandler, { once: true, capture: true, passive: true });
+}
+
 function ensureAudioContext() {
     if (audioState.context) return audioState.context;
     try {
@@ -431,6 +453,7 @@ function setupMusicToggleButton() {
     if (btn.dataset.audioBound !== 'true') {
         btn.dataset.audioBound = 'true';
         btn.addEventListener('click', async () => {
+            armAudioFromUserInteraction();
             ensureAudioContext();
             if (audioState.muted) setMutedAudio(false);
             if (isOpeningTrackPlaying()) {
@@ -486,7 +509,7 @@ function setupAudioMuteButtons() {
 }
 
 function playTone(frequency, duration = 0.12, type = 'sine', volume = 0.05, delay = 0) {
-    if (audioState.muted) return;
+    if (audioState.muted || !audioState.audioArmed) return;
     const ctx = ensureAudioContext();
     if (!ctx) return;
     safeResumeAudioContext(ctx);
@@ -511,7 +534,7 @@ function playTone(frequency, duration = 0.12, type = 'sine', volume = 0.05, dela
 }
 
 function playUISound(kind) {
-    if (audioState.muted) return;
+    if (audioState.muted || !audioState.audioArmed) return;
     const soundKind = kind === 'success'
         ? 'correct'
         : kind === 'warning'
@@ -1080,6 +1103,10 @@ function stopOpeningMusic(resetToStart = false) {
 // Play opening track once on first entry, or manually via the music button.
 async function playOpeningMusic({ force = false, markFirstEntry = false } = {}) {
     if ((audioState.muted && !force) || (audioState.openingPlayed && !force)) return false;
+    if (!audioState.audioArmed) {
+        if (!force) return false;
+        armAudioFromUserInteraction();
+    }
     try {
         const track = ensureOpeningTrack();
         if (!track) return false;
@@ -1116,18 +1143,17 @@ function setupOpeningMusicOnFirstEntry() {
     }
 
     const onFirstInteraction = () => {
-        ensureAudioContext();
+        document.removeEventListener('pointerdown', onFirstInteraction, true);
+        document.removeEventListener('keydown', onFirstInteraction, true);
+        document.removeEventListener('touchstart', onFirstInteraction, true);
+        armAudioFromUserInteraction();
         playOpeningMusic({ markFirstEntry: true });
     };
 
-    // Browsers may block autoplay until the first user interaction.
-    document.addEventListener('pointerdown', onFirstInteraction, { once: true });
-
-    playOpeningMusic({ markFirstEntry: true }).then((started) => {
-        if (started) {
-            document.removeEventListener('pointerdown', onFirstInteraction);
-        }
-    });
+    // Browsers block autoplay before interaction; arm and play only after a user gesture.
+    document.addEventListener('pointerdown', onFirstInteraction, { once: true, capture: true });
+    document.addEventListener('keydown', onFirstInteraction, { once: true, capture: true });
+    document.addEventListener('touchstart', onFirstInteraction, { once: true, capture: true, passive: true });
 }
 
 // Hide Splash Screen
@@ -1939,7 +1965,7 @@ function setupGlobalFeatureMenuDropdown() {
     const featureMapIntro = featureMap.querySelector('.feature-map-intro');
     if (summaryTitle) summaryTitle.textContent = 'תפריט האימונים';
     if (featureMapIntro) {
-        featureMapIntro.textContent = 'תפריט אחד לכל הכלים: בוחרים מסך או כלי לפי סוג האימון, ולוחצים פתיחה.';
+        featureMapIntro.textContent = 'תפריט אחד לשני סוגי כלים: בוחרים מהתפריט המתאים והניווט נפתח מיד.';
     }
     if (summary && !summary.querySelector('small')) {
         const badge = document.createElement('small');
@@ -1952,20 +1978,27 @@ function setupGlobalFeatureMenuDropdown() {
     menuBox.innerHTML = `
         <div class="feature-map-menu-head">
             <strong>תפריט האימונים והתרגילים</strong>
-            <small>ממויין לפי סוג היכולת</small>
+            <small>בחירה אחת וכניסה מיידית</small>
         </div>
-        <div class="feature-map-menu-controls">
-            <select class="feature-map-menu-select" data-global-feature-menu-select aria-label="בחירת פיצ'ר"></select>
-            <button type="button" class="btn btn-primary feature-map-menu-open" data-global-feature-menu-open>פתח</button>
+        <div class="feature-map-menu-sections">
+            <section class="feature-map-menu-section">
+                <label class="feature-map-menu-label" for="global-feature-menu-in-app">מסכים בתוך האפליקציה</label>
+                <select id="global-feature-menu-in-app" class="feature-map-menu-select" data-global-feature-menu-select="in-app" aria-label="בחירת מסך בתוך האפליקציה"></select>
+            </section>
+            <section class="feature-map-menu-section">
+                <label class="feature-map-menu-label" for="global-feature-menu-standalone">כלים נפרדים (Standalone)</label>
+                <select id="global-feature-menu-standalone" class="feature-map-menu-select" data-global-feature-menu-select="standalone" aria-label="בחירת כלי חיצוני"></select>
+            </section>
         </div>
+        <p class="feature-map-menu-tip">אין כפתור נוסף: כל בחירה בתפריט פותחת את המסך מיד.</p>
     `;
     body.prepend(menuBox);
     featureMap.classList.add('is-menu-enhanced');
     setFeatureMapToggleOpen(false);
 
-    const select = menuBox.querySelector('[data-global-feature-menu-select]');
-    const openBtn = menuBox.querySelector('[data-global-feature-menu-open]');
-    if (!select || !openBtn) return;
+    const inAppSelect = menuBox.querySelector('[data-global-feature-menu-select="in-app"]');
+    const standaloneSelect = menuBox.querySelector('[data-global-feature-menu-select="standalone"]');
+    if (!inAppSelect || !standaloneSelect) return;
 
     const resolveTabFeatureTitle = (tabId = '', fallbackLabel = '') => {
         const safeTabId = String(tabId || '').trim();
@@ -2098,18 +2131,30 @@ function setupGlobalFeatureMenuDropdown() {
         });
     });
 
-    const groups = groupOrder.filter((groupName) => entries.some((entry) => entry.group === groupName));
-    const html = ['<option value="">בחר/י פיצ\'ר…</option>'];
-    groups.forEach((groupName) => {
-        const groupEntries = entries.filter((entry) => entry.group === groupName);
-        if (!groupEntries.length) return;
-        html.push(`<optgroup label="${escapeHtml(groupName)}">`);
-        groupEntries.forEach((entry) => {
-            html.push(`<option value="${escapeHtml(entry.key)}">${escapeHtml(entry.label)}</option>`);
+    const resolveEntryScope = (entry) => {
+        const key = String(entry?.key || '');
+        return key.startsWith('tab:') ? 'in-app' : 'standalone';
+    };
+    const inAppEntries = entries.filter((entry) => resolveEntryScope(entry) === 'in-app');
+    const standaloneEntries = entries.filter((entry) => resolveEntryScope(entry) === 'standalone');
+
+    const renderSelect = (selectNode, sourceEntries, placeholderText) => {
+        const groups = groupOrder.filter((groupName) => sourceEntries.some((entry) => entry.group === groupName));
+        const html = [`<option value="">${escapeHtml(placeholderText)}</option>`];
+        groups.forEach((groupName) => {
+            const groupEntries = sourceEntries.filter((entry) => entry.group === groupName);
+            if (!groupEntries.length) return;
+            html.push(`<optgroup label="${escapeHtml(groupName)}">`);
+            groupEntries.forEach((entry) => {
+                html.push(`<option value="${escapeHtml(entry.key)}">${escapeHtml(entry.label)}</option>`);
+            });
+            html.push('</optgroup>');
         });
-        html.push('</optgroup>');
-    });
-    select.innerHTML = html.join('');
+        selectNode.innerHTML = html.join('');
+    };
+
+    renderSelect(inAppSelect, inAppEntries, 'בחר/י מסך…');
+    renderSelect(standaloneSelect, standaloneEntries, 'בחר/י כלי…');
 
     const entryMap = entries.reduce((acc, entry) => {
         acc[entry.key] = entry;
@@ -2119,12 +2164,12 @@ function setupGlobalFeatureMenuDropdown() {
     const syncToActiveTab = () => {
         const activeTab = document.querySelector('.tab-btn.active')?.getAttribute('data-tab') || 'home';
         const key = `tab:${activeTab}`;
-        if (entryMap[key]) select.value = key;
+        inAppSelect.value = entryMap[key] ? key : '';
     };
     syncToActiveTab();
 
-    const executeSelected = () => {
-        const selected = entryMap[select.value];
+    const executeSelectedKey = (selectedKey = '') => {
+        const selected = entryMap[selectedKey];
         if (!selected) return;
         try {
             if (selected.actionType === 'navigate') {
@@ -2137,17 +2182,45 @@ function setupGlobalFeatureMenuDropdown() {
         }
     };
 
-    openBtn.addEventListener('click', executeSelected);
-    select.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
+    const bindImmediateSelect = (selectNode) => {
+        selectNode.addEventListener('change', () => {
+            const selectedKey = String(selectNode.value || '');
+            if (!selectedKey) return;
+            executeSelectedKey(selectedKey);
+            if (selectNode === standaloneSelect) {
+                selectNode.value = '';
+            } else {
+                standaloneSelect.value = '';
+                syncToActiveTab();
+            }
+        });
+
+        selectNode.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter') return;
+            const selectedKey = String(selectNode.value || '');
+            if (!selectedKey) return;
             event.preventDefault();
-            executeSelected();
-        }
-    });
+            executeSelectedKey(selectedKey);
+            if (selectNode === standaloneSelect) {
+                selectNode.value = '';
+            } else {
+                standaloneSelect.value = '';
+                syncToActiveTab();
+            }
+        });
+    };
+
+    bindImmediateSelect(inAppSelect);
+    bindImmediateSelect(standaloneSelect);
 
     document.addEventListener('click', (event) => {
         const btn = event.target?.closest?.('.tab-btn');
         if (btn) syncToActiveTab();
+    });
+
+    featureMap.addEventListener('toggle', () => {
+        if (!featureMap.open) return;
+        syncToActiveTab();
     });
 }
 
@@ -3461,6 +3534,7 @@ function initializeMetaModelApp() {
     applyHeaderDensityPreference();
     updateRuntimeDebugInfoCard();
     loadAudioSettings();
+    setupAudioInteractionArm();
     setupAudioMuteButtons();
     setupMusicToggleButton();
     setupOpeningMusicOnFirstEntry();

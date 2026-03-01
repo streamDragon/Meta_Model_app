@@ -568,11 +568,8 @@ body.force-mobile-view .app-version-floating {
 }
 
 @media (max-width: 640px) {
-    .feature-map-menu-controls {
+    .feature-map-menu-sections {
         grid-template-columns: 1fr;
-    }
-    .feature-map-menu-open.btn {
-        width: 100%;
     }
     .feature-launcher-picker-controls {
         grid-template-columns: 1fr;
@@ -767,7 +764,7 @@ body.force-mobile-view .app-version-floating {
 
 .feature-map-menu-box {
     display: grid;
-    gap: 8px;
+    gap: 10px;
 }
 
 .feature-map-menu-head {
@@ -788,11 +785,26 @@ body.force-mobile-view .app-version-floating {
     font-size: 0.75rem;
 }
 
-.feature-map-menu-controls {
+.feature-map-menu-sections {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
+    align-items: start;
+}
+
+.feature-map-menu-section {
+    display: grid;
+    gap: 6px;
+}
+
+.feature-map-menu-label {
+    display: inline-flex;
     align-items: center;
+    gap: 4px;
+    color: #1f3f66;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding-inline: 2px;
 }
 
 .feature-map-menu-select {
@@ -807,12 +819,12 @@ body.force-mobile-view .app-version-floating {
     font-weight: 600;
 }
 
-.feature-map-menu-open.btn {
-    min-height: 40px;
-    padding: 8px 12px;
-    border-radius: 10px;
-    width: auto;
-    white-space: nowrap;
+.feature-map-menu-tip {
+    margin: 0;
+    color: #475569;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    padding-inline: 2px;
 }
 
 body.embed-mode .feature-map-toggle {

@@ -756,8 +756,7 @@
     }
 
     body.mobile-board .verb-center {
-      position: sticky;
-      top: 0;
+      position: static;
       left: auto;
       transform: none;
       width: min(100%, 240px);
@@ -1085,6 +1084,17 @@
     let actionTimer = null;
     let injectTimer = null;
 
+    function cleanupCaseTimers() {
+      if (actionTimer) {
+        clearTimeout(actionTimer);
+        actionTimer = null;
+      }
+      if (injectTimer) {
+        clearTimeout(injectTimer);
+        injectTimer = null;
+      }
+    }
+
     function esc(text) {
       return String(text ?? "")
         .replace(/&/g, "&amp;")
@@ -1131,6 +1141,7 @@
         clearTimeout(actionTimer);
       }
       actionTimer = setTimeout(() => {
+        actionTimer = null;
         state.lastAction = "";
         renderStepLine();
       }, 1400);
@@ -1286,6 +1297,7 @@
         clearTimeout(injectTimer);
       }
       injectTimer = setTimeout(() => {
+        injectTimer = null;
         state.injectedEntryId = "";
         renderExpanding();
       }, 520);
@@ -1716,6 +1728,7 @@
     }
 
     function startCase(index) {
+      cleanupCaseTimers();
       const idx = Math.max(0, Math.min(CASES.length - 1, Number(index) || 0));
       state.caseIndex = idx;
       els.caseSelect.value = String(idx);
@@ -1778,6 +1791,7 @@
       window.addEventListener("resize", () => {
         updateTrainerBoardMode();
       }, { passive: true });
+      window.addEventListener("beforeunload", cleanupCaseTimers, { once: true });
       renderCaseSelector();
       bindEvents();
       startCase(0);
