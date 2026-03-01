@@ -299,61 +299,697 @@
       .map-anchor { width: min(250px, calc(100vw - 20px)); }
       .controls select { min-width: 170px; }
     }
-+  </style>
-+</head>
-+<body>
-+  <main class="page">
-+    <header class="card topbar">
-+      <div class="topbar-head">
-+        <div>
-+          <h1>פועל לא מפורט (Unzip) - זירה אינליין</h1>
-+          <p>הטקסט הוא הזירה, הקלפים הם הפעולה, ולוח ההסכמה הוא מפה עגולה שנבנית בזמן אמת.</p>
-+        </div>
-+        <span id="progressChip" class="progress-chip">0/3</span>
-+      </div>
-+
-+      <div class="controls">
-+        <label for="caseSelect">תרגיל:</label>
-+        <select id="caseSelect" aria-label="בחירת תרגיל"></select>
-+        <button id="startBtn" class="primary" type="button">התחל</button>
-+        <button id="resetBtn" type="button">איפוס</button>
-+        <button id="nextBtn" type="button">הבא</button>
-+        <button id="showMapBtn" type="button">הצג מפה</button>
-+        <a class="btn-link" href="worksheets/verb-unzip/">דף עבודה מעוגל</a>
-+        <a class="btn-link" href="index.html">חזרה למסך הראשי</a>
-+      </div>
-+    </header>
-+
-+    <section class="card patient-stage">
-+      <h2 id="exerciseTitle">משפט מטופל</h2>
-+      <p id="patientParagraph" class="patient-paragraph"></p>
-+      <p id="microcopy" class="microcopy"></p>
-+
-+      <section id="inlinePocket" class="inline-pocket hidden" aria-live="polite">
-+        <div class="pocket-status" id="pocketStatus"></div>
-+        <div id="cardGrid" class="card-grid"></div>
-+
-+        <div class="pocket-editor">
-+          <label id="pocketPromptLabel" for="answerInput">בחר קלף כדי לענות</label>
-+          <textarea id="answerInput" placeholder="כתוב תשובה קצרה ומדויקת"></textarea>
-+        </div>
-+
-+        <div class="pocket-actions">
-+          <button id="drawCardBtn" type="button">שלוף קלף אקראי</button>
-+          <button id="cancelPocketBtn" type="button">סגור</button>
-+          <button id="saveAnswerBtn" class="primary" type="button">שמור תשובה</button>
-+        </div>
-+
-+        <div id="pocketError" class="pocket-error"></div>
-+      </section>
-+    </section>
-+
-+    <section class="card output-stage">
-+      <h3>גרסה מפורטת בזמן אמת</h3>
-+      <p class="sentence-box"><strong>מקור:</strong> <span id="originalSentence"></span></p>
-+      <p id="detailedSentence" class="sentence-box sentence-box--detailed"><strong>מפורט:</strong> עדיין לא נבנתה גרסה מפורטת.</p>
-+      <div class="sentence-actions">
-+        <button id="copyDetailedBtn" type="button">Copy detailed version</button>
-+      </div>
-+    </section>
-+  </main>
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="card topbar">
+      <div class="topbar-head">
+        <div>
+          <h1>פועל לא מפורט (Unzip) - זירה אינליין</h1>
+          <p>הטקסט הוא הזירה, הקלפים הם הפעולה, ולוח ההסכמה הוא מפה עגולה שנבנית בזמן אמת.</p>
+        </div>
+        <span id="progressChip" class="progress-chip">0/3</span>
+      </div>
+
+      <div class="controls">
+        <label for="caseSelect">תרגיל:</label>
+        <select id="caseSelect" aria-label="בחירת תרגיל"></select>
+        <button id="startBtn" class="primary" type="button">התחל</button>
+        <button id="resetBtn" type="button">איפוס</button>
+        <button id="nextBtn" type="button">הבא</button>
+        <button id="showMapBtn" type="button">הצג מפה</button>
+        <a class="btn-link" href="worksheets/verb-unzip/">דף עבודה מעוגל</a>
+        <a class="btn-link" href="index.html">חזרה למסך הראשי</a>
+      </div>
+    </header>
+
+    <section class="card patient-stage">
+      <h2 id="exerciseTitle">משפט מטופל</h2>
+      <p id="patientParagraph" class="patient-paragraph"></p>
+      <p id="microcopy" class="microcopy"></p>
+
+      <section id="inlinePocket" class="inline-pocket hidden" aria-live="polite">
+        <div class="pocket-status" id="pocketStatus"></div>
+        <div id="cardGrid" class="card-grid"></div>
+
+        <div class="pocket-editor">
+          <label id="pocketPromptLabel" for="answerInput">בחר קלף כדי לענות</label>
+          <textarea id="answerInput" placeholder="כתוב תשובה קצרה ומדויקת"></textarea>
+        </div>
+
+        <div class="pocket-actions">
+          <button id="drawCardBtn" type="button">שלוף קלף אקראי</button>
+          <button id="cancelPocketBtn" type="button">סגור</button>
+          <button id="saveAnswerBtn" class="primary" type="button">שמור תשובה</button>
+        </div>
+
+        <div id="pocketError" class="pocket-error"></div>
+      </section>
+    </section>
+
+    <section class="card output-stage">
+      <h3>גרסה מפורטת בזמן אמת</h3>
+      <p class="sentence-box"><strong>מקור:</strong> <span id="originalSentence"></span></p>
+      <p id="detailedSentence" class="sentence-box sentence-box--detailed"><strong>מפורט:</strong> עדיין לא נבנתה גרסה מפורטת.</p>
+      <div class="sentence-actions">
+        <button id="copyDetailedBtn" type="button">Copy detailed version</button>
+      </div>
+    </section>
+  </main>
+
+  <aside class="map-anchor" aria-label="לוח הסכמה מוקטן">
+    <div class="map-anchor-head">
+      <strong>לוח הסכמה · Mini Radar</strong>
+      <button id="mapAnchorBtn" type="button">הצג מפה</button>
+    </div>
+    <div id="compactRadar"></div>
+  </aside>
+
+  <div id="reviewModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="reviewTitle">
+    <section class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h3 id="reviewTitle">Agreement Board · Review</h3>
+          <p>מפה עגולה של הפרוגרסיה: ZIP Verb → פירוק פעולה → ניסוח מפורט.</p>
+        </div>
+        <div class="modal-actions">
+          <button id="closeReviewBtn" type="button">סגור</button>
+          <button id="copyFromReviewBtn" class="primary" type="button">Copy detailed version</button>
+          <button id="nextFromReviewBtn" type="button">תרגיל הבא</button>
+        </div>
+      </div>
+
+      <div class="modal-grid">
+        <div id="expandedRadar"></div>
+
+        <div>
+          <div class="sentence-compare">
+            <article>
+              <h4>משפט מקור</h4>
+              <p id="reviewOriginal"></p>
+            </article>
+            <article>
+              <h4>משפט מפורט</h4>
+              <p id="reviewDetailed"></p>
+            </article>
+          </div>
+
+          <h4>תשובות לפי סגמנט</h4>
+          <ul id="reviewAnswers" class="answer-list"></ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/agreement-radar.js"></script>
+  <script src="js/audio-manager.js"></script>
+  <script>
+    const EXERCISES = Object.freeze([
+      {
+        id: 'client_quote',
+        title: 'תקוע עם הצעת מחיר ללקוח',
+        patientText: 'כשאני צריך לשלוח הצעת מחיר ללקוח חדש, אני נתקע מול המחשב ואז פשוט דוחה את זה למחר.',
+        targets: [{ targetText: 'נתקע', type: 'unconscious', hint: 'זה רצף אוטומטי שמופעל בלחץ.' }]
+      },
+      {
+        id: 'team_meeting',
+        title: 'שיחת צוות בעבודה',
+        patientText: 'בישיבות צוות אני נסגר ונשאר בשקט, גם כשיש לי רעיון טוב לתרום.',
+        targets: [{ targetText: 'נסגר', type: 'unconscious', hint: 'נבדוק טריגר, הגנה ומנגנון.' }]
+      },
+      {
+        id: 'family_evening',
+        title: 'ערב משפחתי בבית',
+        patientText: 'בערב אני מסדר את הבית מהר לפני שהילדים מגיעים ואז אני מרגיש שלפחות משהו בשליטה.',
+        targets: [{ targetText: 'מסדר', type: 'conscious', hint: 'זו פעולה שניתן לצלם בפועל.' }]
+      },
+      {
+        id: 'couple_text',
+        title: 'הודעה בוואטסאפ בזוגיות',
+        patientText: 'כשהיא לא עונה לי שעה, אני מתכווץ ומתרחק, ואז ממציא תירוץ לא לדבר.',
+        targets: [{ targetText: 'מתכווץ', type: 'unconscious', hint: 'כאן כדאי לפרק את המנגנון האוטומטי.' }]
+      },
+      {
+        id: 'study_focus',
+        title: 'למידה למבחן',
+        patientText: 'כשאני ניגש ללמוד, אני פותח את החומר, קורא כמה שורות, ואז שוב מתפזר לטלפון.',
+        targets: [{ targetText: 'מתפזר', type: 'conscious', hint: 'נפרט צעדים הניתנים לצפייה.' }]
+      },
+      {
+        id: 'parenting_homework',
+        title: 'שיעורי בית עם הילד',
+        patientText: 'כשאני יושב עם הילד על שיעורי בית, אני לוחץ עליו מהר מדי ואז כל הבית נהיה מתוח.',
+        targets: [{ targetText: 'לוחץ', type: 'conscious', hint: 'מה בדיוק רואים במצלמה בזמן הפעולה?' }]
+      }
+    ]);
+
+    const CARD_SETS = Object.freeze({
+      conscious: Object.freeze([
+        { id: 'camera', prompt: 'מה בדיוק עשית פיזית?', helper: 'רק מה שמצלמה רואה, בלי פרשנות.' },
+        { id: 'sequence', prompt: 'מה היו השלבים?', helper: 'ציין סדר: ראשון, אחר כך, בסוף.' },
+        { id: 'detailed', prompt: 'איך זה נראה מהצד?', helper: 'תיאור מדויק שמישהו מבחוץ יכול לזהות.' }
+      ]),
+      unconscious: Object.freeze([
+        { id: 'trigger', prompt: 'מה היה הטריגר? מה קרה רגע לפני?', helper: 'אירוע קצר שמדליק את הרצף.' },
+        { id: 'protection', prompt: 'ממה זה מנסה להגן עליך עכשיו?', helper: 'מה המנגנון מנסה למנוע או לשמור.' },
+        { id: 'mechanism', prompt: 'איך אתה עושה את זה בגוף/מחשבה?', helper: 'מה הפעולה הראשונה שנכנסת אוטומטית.' }
+      ])
+    });
+
+    const SEGMENT_LABELS = Object.freeze({
+      camera: 'Camera / Physical',
+      sequence: 'Steps / Sequence',
+      trigger: 'Trigger',
+      protection: 'Protection',
+      mechanism: 'Mechanism',
+      detailed: 'Detailed Action'
+    });
+
+    const TYPE_COPY = Object.freeze({
+      conscious: 'זה תיאור כללי של פעולה. בוא נצלם את זה ונפרק לצעדים נראים.',
+      unconscious: 'זה נשמע כמו תהליך אוטומטי שמנסה להגן עליך. נפרק טריגר, הגנה ומנגנון.'
+    });
+
+    const dom = {
+      caseSelect: document.getElementById('caseSelect'),
+      startBtn: document.getElementById('startBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      nextBtn: document.getElementById('nextBtn'),
+      showMapBtn: document.getElementById('showMapBtn'),
+      mapAnchorBtn: document.getElementById('mapAnchorBtn'),
+      progressChip: document.getElementById('progressChip'),
+      exerciseTitle: document.getElementById('exerciseTitle'),
+      patientParagraph: document.getElementById('patientParagraph'),
+      microcopy: document.getElementById('microcopy'),
+      inlinePocket: document.getElementById('inlinePocket'),
+      cardGrid: document.getElementById('cardGrid'),
+      pocketStatus: document.getElementById('pocketStatus'),
+      pocketPromptLabel: document.getElementById('pocketPromptLabel'),
+      answerInput: document.getElementById('answerInput'),
+      saveAnswerBtn: document.getElementById('saveAnswerBtn'),
+      cancelPocketBtn: document.getElementById('cancelPocketBtn'),
+      drawCardBtn: document.getElementById('drawCardBtn'),
+      pocketError: document.getElementById('pocketError'),
+      originalSentence: document.getElementById('originalSentence'),
+      detailedSentence: document.getElementById('detailedSentence'),
+      copyDetailedBtn: document.getElementById('copyDetailedBtn'),
+      compactRadar: document.getElementById('compactRadar'),
+      reviewModal: document.getElementById('reviewModal'),
+      closeReviewBtn: document.getElementById('closeReviewBtn'),
+      copyFromReviewBtn: document.getElementById('copyFromReviewBtn'),
+      nextFromReviewBtn: document.getElementById('nextFromReviewBtn'),
+      expandedRadar: document.getElementById('expandedRadar'),
+      reviewOriginal: document.getElementById('reviewOriginal'),
+      reviewDetailed: document.getElementById('reviewDetailed'),
+      reviewAnswers: document.getElementById('reviewAnswers')
+    };
+
+    const state = {
+      exerciseIndex: 0,
+      exercise: null,
+      target: null,
+      selectedCardId: '',
+      pocketOpen: false,
+      answers: {
+        camera: '',
+        sequence: '',
+        trigger: '',
+        protection: '',
+        mechanism: '',
+        detailed: ''
+      },
+      detailedText: '',
+      detailedSentence: '',
+      autoReviewShown: false,
+      highlightTimer: null,
+      compactRadar: null,
+      expandedRadar: null
+    };
+
+    const audio = window.UnzipAudioManager;
+    if (audio && typeof audio.bindArmListeners === 'function') {
+      audio.bindArmListeners();
+    }
+
+    function esc(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function normalize(value) {
+      return String(value || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function shortChip(text) {
+      const clean = normalize(text);
+      if (!clean) return '—';
+      const words = clean.split(' ').filter(Boolean).slice(0, 2);
+      const compact = words.join(' ');
+      return compact.length > 22 ? compact.slice(0, 22) + '…' : compact;
+    }
+
+    function getCards() {
+      const type = state.target?.type === 'unconscious' ? 'unconscious' : 'conscious';
+      return CARD_SETS[type];
+    }
+
+    function requiredCardIds() {
+      return getCards().map((card) => card.id);
+    }
+
+    function clearTimers() {
+      if (state.highlightTimer) {
+        clearTimeout(state.highlightTimer);
+        state.highlightTimer = null;
+      }
+    }
+
+    function cleanup(options = {}) {
+      clearTimers();
+      if (audio && typeof audio.cleanup === 'function') {
+        audio.cleanup();
+      }
+      if (options.resetFlow) {
+        state.selectedCardId = '';
+        state.pocketOpen = false;
+        dom.inlinePocket.classList.add('hidden');
+        dom.pocketError.textContent = '';
+      }
+    }
+
+    function resolveTarget(exercise) {
+      const target = exercise.targets[0];
+      const text = String(exercise.patientText || '');
+      const term = String(target.targetText || '').trim();
+      const start = text.indexOf(term);
+      const end = start >= 0 ? start + term.length : -1;
+      return {
+        targetText: term,
+        type: target.type === 'unconscious' ? 'unconscious' : 'conscious',
+        hint: target.hint || '',
+        start,
+        end
+      };
+    }
+
+    function buildDetailedText() {
+      const type = state.target?.type === 'unconscious' ? 'unconscious' : 'conscious';
+
+      if (type === 'conscious') {
+        const parts = [];
+        if (state.answers.camera) parts.push('בפועל: ' + normalize(state.answers.camera));
+        if (state.answers.sequence) parts.push('צעדים: ' + normalize(state.answers.sequence));
+        if (state.answers.detailed) parts.push('מבחוץ: ' + normalize(state.answers.detailed));
+        return parts.join('; ');
+      }
+
+      const trigger = normalize(state.answers.trigger);
+      const protection = normalize(state.answers.protection);
+      const mechanism = normalize(state.answers.mechanism);
+      if (!trigger && !protection && !mechanism) return '';
+
+      const chunks = [];
+      if (trigger) chunks.push('כשהטריגר הוא "' + trigger + '"');
+      if (mechanism) chunks.push('אני מפעיל מנגנון: ' + mechanism);
+      if (protection) chunks.push('כדי להגן על עצמי דרך ' + protection);
+      return chunks.join(', ');
+    }
+
+    function buildDetailedSentence() {
+      const original = String(state.exercise?.patientText || '');
+      const targetText = String(state.target?.targetText || '').trim();
+      const detail = normalize(state.detailedText);
+      if (!original || !targetText || !detail) return original;
+
+      const replacement = targetText + ' (' + detail + ')';
+      return original.replace(targetText, replacement);
+    }
+
+    function buildRadarSegments() {
+      const type = state.target?.type === 'unconscious' ? 'unconscious' : 'conscious';
+      return [
+        { id: 'camera', label: SEGMENT_LABELS.camera, active: !!normalize(state.answers.camera), visible: true, chip: shortChip(state.answers.camera) },
+        { id: 'sequence', label: SEGMENT_LABELS.sequence, active: !!normalize(state.answers.sequence), visible: true, chip: shortChip(state.answers.sequence) },
+        { id: 'trigger', label: SEGMENT_LABELS.trigger, active: !!normalize(state.answers.trigger), visible: type === 'unconscious', chip: shortChip(state.answers.trigger) },
+        { id: 'protection', label: SEGMENT_LABELS.protection, active: !!normalize(state.answers.protection), visible: type === 'unconscious', chip: shortChip(state.answers.protection) },
+        { id: 'mechanism', label: SEGMENT_LABELS.mechanism, active: !!normalize(state.answers.mechanism), visible: type === 'unconscious', chip: shortChip(state.answers.mechanism) },
+        { id: 'detailed', label: SEGMENT_LABELS.detailed, active: !!normalize(state.detailedText), visible: true, chip: shortChip(state.detailedText) }
+      ];
+    }
+
+    function isCompleted() {
+      return requiredCardIds().every((id) => !!normalize(state.answers[id]));
+    }
+
+    function openPocket() {
+      state.pocketOpen = true;
+      if (!state.selectedCardId) {
+        const firstOpen = getCards().find((card) => !normalize(state.answers[card.id]));
+        state.selectedCardId = firstOpen ? firstOpen.id : getCards()[0].id;
+      }
+      dom.inlinePocket.classList.remove('hidden');
+      renderPocket();
+      if (audio) audio.play('open');
+    }
+
+    function closePocket() {
+      cleanup({ resetFlow: true });
+      if (audio) audio.play('close');
+    }
+
+    function selectCard(cardId) {
+      state.selectedCardId = cardId;
+      dom.pocketError.textContent = '';
+      renderPocket();
+      if (audio) audio.play('tap');
+    }
+
+    function drawRandomCard() {
+      const cards = getCards();
+      const pending = cards.filter((card) => !normalize(state.answers[card.id]));
+      const source = pending.length ? pending : cards;
+      const pick = source[Math.floor(Math.random() * source.length)];
+      if (!pick) return;
+      selectCard(pick.id);
+    }
+
+    function renderParagraph() {
+      const text = String(state.exercise.patientText || '');
+      const target = state.target;
+      if (!target || target.start < 0 || target.end < 0) {
+        dom.patientParagraph.textContent = text;
+        return;
+      }
+
+      const before = esc(text.slice(0, target.start));
+      const mid = esc(text.slice(target.start, target.end));
+      const after = esc(text.slice(target.end));
+      dom.patientParagraph.innerHTML = before + '<button type="button" class="zip-target" data-open-pocket="true">' + mid + '</button>' + after;
+    }
+
+    function renderMicrocopy() {
+      const type = state.target?.type === 'unconscious' ? 'unconscious' : 'conscious';
+      dom.microcopy.textContent = TYPE_COPY[type] + (state.target.hint ? ' ' + state.target.hint : '');
+    }
+
+    function renderProgress() {
+      const required = requiredCardIds();
+      const done = required.filter((id) => !!normalize(state.answers[id])).length;
+      dom.progressChip.textContent = done + '/' + required.length;
+      dom.pocketStatus.textContent = 'כרטיסים שהושלמו: ' + done + '/' + required.length;
+    }
+
+    function renderPocket() {
+      const cards = getCards();
+      dom.cardGrid.innerHTML = '';
+
+      cards.forEach((card) => {
+        const done = !!normalize(state.answers[card.id]);
+        const active = state.selectedCardId === card.id;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'director-card' + (done ? ' done' : '') + (active ? ' active' : '');
+        btn.setAttribute('data-card-id', card.id);
+        btn.innerHTML = '<strong>' + esc(card.prompt) + '</strong><span>' + esc(card.helper) + '</span>';
+        btn.addEventListener('click', () => selectCard(card.id));
+        dom.cardGrid.appendChild(btn);
+      });
+
+      const selected = cards.find((card) => card.id === state.selectedCardId) || null;
+      if (selected) {
+        dom.pocketPromptLabel.textContent = selected.prompt;
+        dom.answerInput.placeholder = selected.helper;
+        dom.answerInput.value = state.answers[selected.id] || '';
+      } else {
+        dom.pocketPromptLabel.textContent = 'בחר קלף כדי לענות';
+        dom.answerInput.placeholder = 'כתוב תשובה קצרה ומדויקת';
+        dom.answerInput.value = '';
+      }
+
+      renderProgress();
+    }
+
+    function renderSentences(highlightInsert) {
+      dom.originalSentence.textContent = state.exercise.patientText;
+
+      if (!normalize(state.detailedSentence) || state.detailedSentence === state.exercise.patientText) {
+        dom.detailedSentence.innerHTML = '<strong>מפורט:</strong> עדיין לא נבנתה גרסה מפורטת.';
+        return;
+      }
+
+      if (highlightInsert) {
+        const target = state.target.targetText;
+        const escapedTarget = target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const pattern = new RegExp(escapedTarget + ' \\((.*?)\\)');
+        const marked = state.detailedSentence.replace(pattern, (match) => {
+          return '<span class="inserted">' + esc(match) + '</span>';
+        });
+        dom.detailedSentence.innerHTML = '<strong>מפורט:</strong> ' + marked;
+        clearTimers();
+        state.highlightTimer = setTimeout(() => {
+          dom.detailedSentence.innerHTML = '<strong>מפורט:</strong> ' + esc(state.detailedSentence);
+          state.highlightTimer = null;
+        }, 1000);
+        return;
+      }
+
+      dom.detailedSentence.innerHTML = '<strong>מפורט:</strong> ' + esc(state.detailedSentence);
+    }
+
+    function ensureCompactRadar() {
+      const options = {
+        mode: 'compact',
+        targetType: state.target.type,
+        centerLabel: 'ZIP: ' + state.target.targetText,
+        segments: buildRadarSegments(),
+        ariaLabel: 'Mini Agreement Radar'
+      };
+
+      if (!state.compactRadar) {
+        state.compactRadar = window.AgreementRadar.createRadar(dom.compactRadar, options);
+      } else {
+        state.compactRadar.update(options);
+      }
+    }
+
+    function ensureExpandedRadar() {
+      const options = {
+        mode: 'expanded',
+        targetType: state.target.type,
+        centerLabel: 'ZIP: ' + state.target.targetText,
+        segments: buildRadarSegments(),
+        ariaLabel: 'Agreement Radar Expanded'
+      };
+
+      if (!state.expandedRadar) {
+        state.expandedRadar = window.AgreementRadar.createRadar(dom.expandedRadar, options);
+      } else {
+        state.expandedRadar.update(options);
+      }
+    }
+
+    function renderReview() {
+      ensureExpandedRadar();
+      dom.reviewOriginal.textContent = state.exercise.patientText;
+      dom.reviewDetailed.textContent = normalize(state.detailedSentence) && state.detailedSentence !== state.exercise.patientText
+        ? state.detailedSentence
+        : 'עדיין אין ניסוח מפורט מלא.';
+
+      const segments = buildRadarSegments().filter((segment) => segment.visible);
+      dom.reviewAnswers.innerHTML = '';
+      segments.forEach((segment) => {
+        const li = document.createElement('li');
+        const raw = segment.id === 'detailed' ? state.detailedText : state.answers[segment.id];
+        li.innerHTML = '<strong>' + esc(segment.label) + ':</strong> ' + esc(normalize(raw) || '—');
+        dom.reviewAnswers.appendChild(li);
+      });
+    }
+
+    function openReview(force) {
+      if (!force && !isCompleted()) return;
+      renderReview();
+      dom.reviewModal.classList.add('open');
+      if (audio) audio.play('open');
+    }
+
+    function closeReview() {
+      dom.reviewModal.classList.remove('open');
+      if (audio) audio.play('close');
+    }
+
+    async function copyDetailed() {
+      const text = normalize(state.detailedSentence) && state.detailedSentence !== state.exercise.patientText
+        ? state.detailedSentence
+        : state.exercise.patientText;
+
+      try {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const helper = document.createElement('textarea');
+          helper.value = text;
+          document.body.appendChild(helper);
+          helper.select();
+          document.execCommand('copy');
+          helper.remove();
+        }
+        if (audio) audio.play('success');
+      } catch (_error) {
+        if (audio) audio.play('error');
+      }
+    }
+
+    function saveAnswer() {
+      if (!state.selectedCardId) {
+        dom.pocketError.textContent = 'בחר קלף לפני שמירה.';
+        if (audio) audio.play('error');
+        return;
+      }
+
+      const value = normalize(dom.answerInput.value);
+      if (!value) {
+        dom.pocketError.textContent = 'נדרשת תשובה קצרה לפני שמירה.';
+        if (audio) audio.play('error');
+        return;
+      }
+
+      dom.pocketError.textContent = '';
+      state.answers[state.selectedCardId] = value;
+      state.detailedText = buildDetailedText();
+      state.detailedSentence = buildDetailedSentence();
+      const completedNow = isCompleted();
+
+      renderProgress();
+      renderSentences(true);
+      ensureCompactRadar();
+      if (audio) audio.play('success');
+      closePocket();
+
+      if (completedNow && !state.autoReviewShown) {
+        state.autoReviewShown = true;
+        openReview(true);
+      }
+    }
+
+    function renderAll() {
+      dom.exerciseTitle.textContent = 'משפט מטופל: ' + state.exercise.title;
+      renderParagraph();
+      renderMicrocopy();
+      renderProgress();
+      renderSentences(false);
+      ensureCompactRadar();
+      if (state.pocketOpen) renderPocket();
+    }
+
+    function resetStateForExercise() {
+      state.selectedCardId = '';
+      state.pocketOpen = false;
+      state.answers = {
+        camera: '',
+        sequence: '',
+        trigger: '',
+        protection: '',
+        mechanism: '',
+        detailed: ''
+      };
+      state.detailedText = '';
+      state.detailedSentence = state.exercise.patientText;
+      state.autoReviewShown = false;
+      dom.inlinePocket.classList.add('hidden');
+      dom.pocketError.textContent = '';
+      dom.answerInput.value = '';
+      closeReview();
+    }
+
+    function startExercise(index) {
+      cleanup({ resetFlow: true });
+      const nextIndex = Math.max(0, Math.min(EXERCISES.length - 1, Number(index) || 0));
+      state.exerciseIndex = nextIndex;
+      state.exercise = EXERCISES[nextIndex];
+      state.target = resolveTarget(state.exercise);
+      dom.caseSelect.value = String(nextIndex);
+      resetStateForExercise();
+      renderAll();
+    }
+
+    function nextExercise() {
+      const nextIndex = (state.exerciseIndex + 1) % EXERCISES.length;
+      startExercise(nextIndex);
+    }
+
+    function bindEvents() {
+      dom.startBtn.addEventListener('click', () => startExercise(dom.caseSelect.value));
+      dom.resetBtn.addEventListener('click', () => startExercise(state.exerciseIndex));
+      dom.nextBtn.addEventListener('click', nextExercise);
+      dom.showMapBtn.addEventListener('click', () => openReview(true));
+      dom.mapAnchorBtn.addEventListener('click', () => openReview(true));
+      dom.saveAnswerBtn.addEventListener('click', saveAnswer);
+      dom.cancelPocketBtn.addEventListener('click', closePocket);
+      dom.drawCardBtn.addEventListener('click', drawRandomCard);
+      dom.copyDetailedBtn.addEventListener('click', copyDetailed);
+      dom.copyFromReviewBtn.addEventListener('click', copyDetailed);
+      dom.closeReviewBtn.addEventListener('click', closeReview);
+      dom.nextFromReviewBtn.addEventListener('click', () => {
+        closeReview();
+        nextExercise();
+      });
+
+      dom.caseSelect.addEventListener('change', () => {
+        startExercise(dom.caseSelect.value);
+      });
+
+      dom.patientParagraph.addEventListener('click', (event) => {
+        const trigger = event.target.closest('[data-open-pocket="true"]');
+        if (!trigger) return;
+        openPocket();
+      });
+
+      dom.reviewModal.addEventListener('click', (event) => {
+        if (event.target === dom.reviewModal) {
+          closeReview();
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        if (dom.reviewModal.classList.contains('open')) {
+          closeReview();
+          return;
+        }
+        if (state.pocketOpen) {
+          closePocket();
+        }
+      });
+
+      window.addEventListener('beforeunload', () => cleanup({ resetFlow: true }));
+    }
+
+    function renderCaseSelect() {
+      dom.caseSelect.innerHTML = '';
+      EXERCISES.forEach((exercise, index) => {
+        const option = document.createElement('option');
+        option.value = String(index);
+        option.textContent = (index + 1) + '. ' + exercise.title;
+        dom.caseSelect.appendChild(option);
+      });
+    }
+
+    function init() {
+      if (!window.AgreementRadar) {
+        throw new Error('AgreementRadar script is required');
+      }
+      renderCaseSelect();
+      bindEvents();
+      startExercise(0);
+    }
+
+    init();
+  </script>
+  <script src="js/trainer-shell-nav.js"></script>
+</body>
+</html>
