@@ -73,7 +73,7 @@
         {
           "id": "lost_performative",
           "name": "Lost Performative",
-          "hebrew": "פעולה אבודה",
+          "hebrew": "פועל לא מפורט",
           "description": "הצהרה ללא ציון מי אומר או על פי מה",
           "example": "זה לא נכון",
           "question": "על פי מי זה לא נכון? מי קובע?",

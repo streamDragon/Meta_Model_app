@@ -344,24 +344,24 @@
     function getShortCategoryChip(categoryId) {
         const label = getCategoryLabelEn(categoryId);
         const map = {
-            lost_performative: 'LP',
-            assumptions: 'A1',
-            mind_reading: 'MR',
-            universal_quantifier: 'UQ',
-            modal_operator: 'MO',
-            cause_effect: 'CE',
-            nominalisations: 'NOM',
-            identity_predicates: 'ID',
-            complex_equivalence: 'CEq',
-            comparative_deletion: 'CD',
-            time_space_predicates: 'CTX',
-            lack_referential_index: 'RI',
-            non_referring_nouns: 'NRN',
-            sensory_predicates: 'VAK',
-            unspecified_verbs: 'UV'
+            lost_performative: 'LOST PERFORMATIVE',
+            assumptions: 'ASSUMPTIONS',
+            mind_reading: 'MIND READING',
+            universal_quantifier: 'UNIVERSAL QUANTIFIER',
+            modal_operator: 'MODAL OPERATOR',
+            cause_effect: 'CAUSE EFFECT',
+            nominalisations: 'NOMINALISATIONS',
+            identity_predicates: 'IDENTITY PREDICATES',
+            complex_equivalence: 'COMPLEX EQUIVALENCE',
+            comparative_deletion: 'COMPARATIVE DELETION',
+            time_space_predicates: 'TIME SPACE PREDICATES',
+            lack_referential_index: 'LACK REF INDEX',
+            non_referring_nouns: 'NON REFERRING NOUNS',
+            sensory_predicates: 'SENSORY PREDICATES',
+            unspecified_verbs: 'UNSPECIFIED VERBS'
         };
         const normalized = root.triplesRadarCore.normalizeCategoryId(categoryId);
-        return map[normalized] || label.split(/\s+/)[0] || label;
+        return map[normalized] || label.toUpperCase();
     }
 
     function clipText(text, maxLen) {

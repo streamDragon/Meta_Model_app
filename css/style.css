@@ -1402,13 +1402,26 @@ body.hide-top-tabbar .mobile-tab-nav {
 }
 
 .feature-home-back-bar {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
+    padding: 10px;
+    border-radius: 14px;
+    border: 1px solid #a7e5dd;
+    background: linear-gradient(135deg, #e8fffb 0%, #eff8ff 100%);
+    box-shadow: 0 10px 22px rgba(15, 118, 110, 0.14);
 }
 
 .feature-home-back-btn {
-    white-space: nowrap;
+    width: 100%;
+    white-space: normal;
+    font-weight: 800;
+    border: none;
+    background: linear-gradient(135deg, #0f766e 0%, #0284c7 100%);
+    box-shadow: 0 8px 16px rgba(2, 132, 199, 0.24);
+}
+
+.feature-home-back-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 18px rgba(2, 132, 199, 0.28);
 }
 
 @keyframes fadeIn {
@@ -12383,9 +12396,11 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
 
 .tr-phone-card-chip {
     color: #0f172a;
-    font-size: 0.85rem;
+    font-size: 0.73rem;
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.15;
+    white-space: normal;
+    text-wrap: balance;
 }
 
 .tr-phone-card-label {
@@ -12598,15 +12613,19 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: fit-content;
-    min-width: 32px;
-    height: 22px;
+    width: 100%;
+    min-height: 22px;
+    height: auto;
     border-radius: 999px;
     background: #e7efff;
     color: #1f56bc;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     font-weight: 800;
-    padding: 0 8px;
+    line-height: 1.15;
+    text-align: center;
+    white-space: normal;
+    text-wrap: balance;
+    padding: 4px 8px;
 }
 
 .tr-phone-challenge-panel {

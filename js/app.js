@@ -176,6 +176,37 @@ const STANDALONE_NAV_KEYS = Object.freeze({
     sentenceMorpher: 'sentenceMorpher'
 });
 
+const UNZIP_EMBED_LOAD_TIMEOUT_MS = 15000;
+
+let unzipEmbedRuntime = {
+    loaded: false,
+    loading: false,
+    failed: false,
+    timerId: null
+};
+
+const CODEX_TRAP_FALLBACK_WORDS = Object.freeze([
+    Object.freeze({ word: 'הם', category: 'referential', severity: 'high', hint: 'מי בדיוק הם?', suggestions: Object.freeze(['ההורים שלי', 'הבוס שלי', 'הצוות שלי']) }),
+    Object.freeze({ word: 'אנחנו', category: 'referential', severity: 'high', hint: 'מי בדיוק כלול ב"אנחנו"?', suggestions: Object.freeze(['אני ובן/בת הזוג', 'אני והצוות', 'כל המשפחה']) }),
+    Object.freeze({ word: 'זה', category: 'vague', severity: 'medium', hint: 'מה בדיוק זה?', suggestions: Object.freeze(['השיחה הזאת', 'המצב בעבודה', 'התגובה שלו']) }),
+    Object.freeze({ word: 'ככה', category: 'vague', severity: 'medium', hint: 'מה בדיוק קורה "ככה"?', suggestions: Object.freeze(['הוא עונה בקצרה', 'היא שותקת', 'אני מתכווץ']) }),
+    Object.freeze({ word: 'כולם', category: 'generalization', severity: 'high', hint: 'מי בדיוק "כולם"?', suggestions: Object.freeze(['שני אנשים בצוות', 'חלק מהחברים', 'כמה בני משפחה']) }),
+    Object.freeze({ word: 'אף אחד', category: 'generalization', severity: 'high', hint: 'באמת אף אחד?', suggestions: Object.freeze(['אחד כן עזר', 'רק אדם אחד הקשיב', 'מעט אנשים עזרו']) }),
+    Object.freeze({ word: 'תמיד', category: 'generalization', severity: 'medium', hint: 'תמיד? יש יוצאים מן הכלל?', suggestions: Object.freeze(['לפעמים', 'בשבוע האחרון', 'ברוב הפעמים']) }),
+    Object.freeze({ word: 'אף פעם', category: 'generalization', severity: 'medium', hint: 'אף פעם? אפס פעמים?', suggestions: Object.freeze(['מעט פעמים', 'כמעט לא', 'לעיתים רחוקות']) }),
+    Object.freeze({ word: 'חייב', category: 'modal', severity: 'medium', hint: 'מה הופך את זה לחובה?', suggestions: Object.freeze(['אני מעדיף', 'חשוב לי', 'אני בוחר']) }),
+    Object.freeze({ word: 'אי אפשר', category: 'modal', severity: 'medium', hint: 'מה בדיוק מונע?', suggestions: Object.freeze(['כרגע קשה', 'יש מגבלה זמנית', 'אפשר חלקית']) })
+]);
+
+let codexTrapLabState = {
+    trapWords: [],
+    trapByWord: new Map(),
+    activeTraps: [],
+    resolvedByWord: {},
+    selectedTrapWord: '',
+    elements: null
+};
+
 function getGlobalNavPathByKey(navKey, fallbackPath = '') {
     try {
         if (typeof window.getMetaModelNavPathByKey === 'function') {
@@ -3141,7 +3172,7 @@ function setupFeatureHomeBackButtons() {
 
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = 'btn btn-secondary feature-home-back-btn';
+        button.className = 'btn btn-primary feature-home-back-btn';
         button.textContent = 'חזרה למסך הראשי';
         button.dataset.featureBackHomeBtn = 'true';
         button.addEventListener('click', () => navigateTo('home'));
@@ -3313,23 +3344,23 @@ function getBreenReferenceCategoryLabelHe(categoryId = '') {
 function getBreenReferenceCategoryChip(categoryId = '') {
     const id = normalizeBreenReferenceCategoryId(categoryId);
     const chips = {
-        lost_performative: 'LP',
-        assumptions: 'AS',
-        mind_reading: 'MR',
-        universal_quantifier: 'UQ',
-        modal_operator: 'MO',
-        cause_effect: 'CE',
-        nominalisations: 'NM',
-        identity_predicates: 'ID',
-        complex_equivalence: 'CEq',
-        comparative_deletion: 'CD',
-        time_space_predicates: 'TS',
-        lack_referential_index: 'RI',
-        non_referring_nouns: 'NN',
-        sensory_predicates: 'SP',
-        unspecified_verbs: 'UV'
+        lost_performative: 'LOST PERFORMATIVE',
+        assumptions: 'ASSUMPTIONS',
+        mind_reading: 'MIND READING',
+        universal_quantifier: 'UNIVERSAL QUANTIFIER',
+        modal_operator: 'MODAL OPERATOR',
+        cause_effect: 'CAUSE EFFECT',
+        nominalisations: 'NOMINALISATIONS',
+        identity_predicates: 'IDENTITY PREDICATES',
+        complex_equivalence: 'COMPLEX EQUIVALENCE',
+        comparative_deletion: 'COMPARATIVE DELETION',
+        time_space_predicates: 'TIME SPACE PREDICATES',
+        lack_referential_index: 'LACK REF INDEX',
+        non_referring_nouns: 'NON REFERRING NOUNS',
+        sensory_predicates: 'SENSORY PREDICATES',
+        unspecified_verbs: 'UNSPECIFIED VERBS'
     };
-    return chips[id] || id.slice(0, 2).toUpperCase();
+    return chips[id] || id.replace(/_/g, ' ').toUpperCase();
 }
 
 function getBreenReferenceRowIdByCategory(categoryId = '') {
