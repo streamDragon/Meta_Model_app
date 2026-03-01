@@ -1,5 +1,6 @@
 ﻿// Global Variables
 let metaModelData = {};
+let metaModelGlossaryData = { items: [] };
 let practiceCount = 0;
 let currentStatementIndex = 0;
 const MAX_STREAK_CHARGES = 3;
@@ -3647,9 +3648,17 @@ if (document.readyState === 'loading') {
 // Load Meta Model data from JSON
 async function loadMetaModelData() {
     try {
-        const response = await fetch('data/meta-model-violations.json');
+        const [response, glossaryResponse] = await Promise.all([
+            fetch(resolveVersionedAssetPath('data/meta-model-violations.json'), { cache: 'no-store' }),
+            fetch(resolveVersionedAssetPath('data/meta_model_glossary_breakthroughs.he.json'), { cache: 'no-store' }).catch(() => null)
+        ]);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         metaModelData = deepNormalizeUiPayload(await response.json());
+        if (glossaryResponse && glossaryResponse.ok) {
+            metaModelGlossaryData = deepNormalizeUiPayload(await glossaryResponse.json());
+        } else {
+            metaModelGlossaryData = { items: [] };
+        }
         
         // Populate categories
         populateCategories();
@@ -4054,10 +4063,98 @@ function buildCategorySubPatternCard(category, subcategory) {
     `;
 }
 
+function getGlossaryGroupClass(group = '') {
+    const normalized = String(group || '').trim().toUpperCase();
+    if (normalized === 'DELETION') return 'deletion';
+    if (normalized === 'DISTORTION') return 'distortion';
+    if (normalized === 'GENERALIZATION') return 'generalization';
+    return 'neutral';
+}
+
+function buildGlossaryConceptCard(item = {}) {
+    const title = String(item.he_title || item.hebrew || item.he_title || item.en_title || item.id || 'מושג').trim();
+    const groupHe = String(item.he_group || '').trim();
+    const groupEn = String(item.group || '').trim();
+    const definition = String(item.he_definition_short || item.definition || '').trim();
+    const storyClient = String(item.story?.client_line || '').trim();
+    const storyIntervention = String(item.story?.therapist_intervention || '').trim();
+    const transformation = String(item.transformation_moment || '').trim();
+    const positiveEnd = String(item.positive_end || '').trim();
+    const nextStep = String(item.next_step_direction || '').trim();
+
+    const markers = Array.isArray(item.markers)
+        ? item.markers.map((entry) => String(entry || '').trim()).filter(Boolean).slice(0, 8)
+        : [];
+    const questions = Array.isArray(item.meta_model_questions)
+        ? item.meta_model_questions.map((entry) => String(entry || '').trim()).filter(Boolean).slice(0, 8)
+        : [];
+
+    const markersHtml = markers.length
+        ? `<ul class="glossary-inline-list">${markers.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
+        : '<p>לא הוגדרו סימני זיהוי.</p>';
+    const questionsHtml = questions.length
+        ? `<ul class="glossary-inline-list">${questions.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
+        : '<p>לא הוגדרו שאלות מדויקות.</p>';
+
+    return `
+        <article class="category-card glossary-card ${escapeHtml(getGlossaryGroupClass(groupEn))}" data-glossary-id="${escapeHtml(String(item.id || ''))}">
+            <div class="glossary-card-head">
+                <h3>${escapeHtml(title)}</h3>
+                <div class="glossary-pills">
+                    ${groupHe ? `<span class="glossary-pill glossary-pill-he">${escapeHtml(groupHe)}</span>` : ''}
+                    ${groupEn ? `<span class="glossary-pill glossary-pill-en">${escapeHtml(groupEn)}</span>` : ''}
+                </div>
+            </div>
+            ${definition ? `<p class="glossary-definition">${escapeHtml(definition)}</p>` : ''}
+
+            <details class="glossary-layer" open>
+                <summary>הסיפור הקליני + רגע השינוי</summary>
+                <div class="glossary-layer-body">
+                    ${storyClient ? `<p><strong>משפט מטופל:</strong> ${escapeHtml(storyClient)}</p>` : ''}
+                    ${storyIntervention ? `<p><strong>התערבות מטפל:</strong> ${escapeHtml(storyIntervention)}</p>` : ''}
+                    ${transformation ? `<p><strong>רגע טרנספורמציה:</strong> ${escapeHtml(transformation)}</p>` : ''}
+                    ${positiveEnd ? `<p><strong>סיום חיובי:</strong> ${escapeHtml(positiveEnd)}</p>` : ''}
+                    ${nextStep ? `<p><strong>המשך:</strong> ${escapeHtml(nextStep)}</p>` : ''}
+                </div>
+            </details>
+
+            <details class="glossary-layer">
+                <summary>סימני זיהוי</summary>
+                <div class="glossary-layer-body">${markersHtml}</div>
+            </details>
+
+            <details class="glossary-layer">
+                <summary>שאלות Meta-Model</summary>
+                <div class="glossary-layer-body">${questionsHtml}</div>
+            </details>
+        </article>
+    `;
+}
+
 function populateCategories() {
     const container = document.getElementById('categories-container');
     if (!container) return;
     container.innerHTML = '';
+
+    const glossaryItems = Array.isArray(metaModelGlossaryData?.items)
+        ? metaModelGlossaryData.items.filter((item) => item && (item.he_title || item.en_title || item.id))
+        : [];
+    if (glossaryItems.length) {
+        const theoryIntro = document.createElement('section');
+        theoryIntro.className = 'card categories-theory-intro categories-glossary-intro';
+        theoryIntro.innerHTML = `
+            <h2>מילון מושגים — פריצות דרך קליניות</h2>
+            <p><strong>למה:</strong> המסך הזה הוא מילון מושגים, ולכן כל מושג מופיע פעם אחת בלבד, אבל עם יותר עומק בתוך הכרטיס.</p>
+            <p class="categories-theory-note">הדגש כאן הוא על סיפור קליני, רגע הטרנספורמציה, והמשך עבודה פרקטי.</p>
+        `;
+        container.appendChild(theoryIntro);
+
+        const glossaryGrid = document.createElement('section');
+        glossaryGrid.className = 'categories-glossary-grid';
+        glossaryGrid.innerHTML = glossaryItems.map((item) => buildGlossaryConceptCard(item)).join('');
+        container.appendChild(glossaryGrid);
+        return;
+    }
 
     const availablePatternIds = new Map();
     (metaModelData.categories || [])
