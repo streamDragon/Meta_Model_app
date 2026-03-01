@@ -1636,7 +1636,7 @@ body.hide-top-tabbar .mobile-tab-nav {
 #categories-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    gap: 12px;
 }
 
 .categories-breen-board {
@@ -1743,7 +1743,52 @@ a.breen-reference-cell:hover {
 }
 
 .categories-glossary-intro {
-    margin-bottom: 2px;
+    margin-bottom: 0;
+}
+
+.categories-glossary-columns {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    align-items: start;
+}
+
+.glossary-column {
+    display: grid;
+    gap: 10px;
+}
+
+.glossary-column-head {
+    border: 1px solid #cfe8ff;
+    background: linear-gradient(180deg, #f5faff 0%, #eef7ff 100%);
+    border-radius: 14px;
+    padding: 10px 12px;
+}
+
+.glossary-column-title {
+    margin: 0;
+    font-size: 1.04rem;
+    letter-spacing: 0.02em;
+    color: #0f172a;
+}
+
+.glossary-column-subtitle {
+    margin: 2px 0 0;
+    color: #475569;
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.glossary-column-list {
+    display: grid;
+    gap: 10px;
+}
+
+.glossary-column-empty {
+    border: 1px dashed #cbd5e1;
+    color: #64748b;
+    font-size: 0.9rem;
 }
 
 .glossary-card {
@@ -1836,6 +1881,18 @@ a.breen-reference-cell:hover {
     padding-inline-start: 18px;
     display: grid;
     gap: 4px;
+}
+
+@media (max-width: 1100px) {
+    .categories-glossary-columns {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .categories-glossary-columns {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 /* Subcategories */

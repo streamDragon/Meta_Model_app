@@ -106,6 +106,7 @@ let audioState = {
     musicTracks: new Map(),
     musicSnippetTimer: null,
     musicLastSource: '',
+    musicShuffleQueue: [],
     musicAutoplayPending: false,
     firstEntryDone: false,
     audioArmed: false,
@@ -140,7 +141,8 @@ let revealFeedbackState = {
 const MUSIC_TRACK_SOURCES = Object.freeze([
     'assets/audio/the-flawed-map.mp3',
     'assets/audio/alchemy-of-thought.mp3',
-    'assets/audio/mind-alchemy.mp3'
+    'assets/audio/mind-alchemy.mp3',
+    'assets/audio/The_Inner_Task.mp3'
 ]);
 const MUSIC_SNIPPET_DURATION_MS = 30000;
 const OPENING_TRACK_FIRST_ENTRY_KEY = 'meta_opening_track_first_entry_done';
@@ -407,11 +409,36 @@ function ensureUiSoundOutput(ctx) {
 }
 
 function pickRandomMusicSource(excludingSource = '') {
-    const candidates = MUSIC_TRACK_SOURCES.filter((src) => src !== excludingSource);
-    const pool = candidates.length ? candidates : MUSIC_TRACK_SOURCES;
-    if (!pool.length) return '';
-    const index = Math.floor(Math.random() * pool.length);
-    return pool[index] || '';
+    const base = MUSIC_TRACK_SOURCES.filter((src) => String(src || '').trim());
+    if (!base.length) return '';
+
+    if (!Array.isArray(audioState.musicShuffleQueue) || !audioState.musicShuffleQueue.length) {
+        const queue = [...base];
+        for (let i = queue.length - 1; i > 0; i -= 1) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [queue[i], queue[j]] = [queue[j], queue[i]];
+        }
+        if (queue.length > 1 && excludingSource && queue[0] === excludingSource) {
+            [queue[0], queue[1]] = [queue[1], queue[0]];
+        }
+        audioState.musicShuffleQueue = queue;
+    }
+
+    let next = String(audioState.musicShuffleQueue.shift() || '').trim();
+    if (!next) {
+        audioState.musicShuffleQueue = [];
+        return pickRandomMusicSource(excludingSource);
+    }
+
+    if (base.length > 1 && next === excludingSource) {
+        const replacement = String(audioState.musicShuffleQueue.shift() || '').trim();
+        if (replacement) {
+            audioState.musicShuffleQueue.push(next);
+            next = replacement;
+        }
+    }
+
+    return next;
 }
 
 function ensureOpeningTrack(requestedSource = '') {
@@ -2369,7 +2396,7 @@ function setupGlobalFeatureMenuDropdown() {
         'tab:home': 'בית · התחלה והכוונה',
         'tab:scenario-trainer': 'סימולטור סצנות (Execution)',
         'tab:comic-engine': 'Comic Engine · תגובות/מהלכים',
-        'tab:categories': 'קטגוריות (ברין)',
+        'tab:categories': 'מילון קטגוריות המטה-מודל',
         'tab:practice-question': 'תרגול זיהוי Meta-Model',
         'tab:practice-radar': 'Meta Radar',
         'tab:practice-triples-radar': 'Triples Radar (Breen)',
@@ -2931,7 +2958,7 @@ function setupFeatureLauncherTabs() {
         "nav:blueprint": "Blueprint Builder",
         "nav:prismlab": "Prism Lab · רמות לוגיות",
         "nav:practice-triples-radar": "Triples Radar (Breen)",
-        "nav:categories": "קטגוריות (עם ברין)",
+        "nav:categories": "מילון קטגוריות המטה-מודל",
         "nav:comic-engine": "Comic Engine",
         "nav:scenario-trainer": "Scenario Trainer",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: "Unzip Trainer (Standalone)",
@@ -4422,6 +4449,201 @@ function getGlossaryGroupClass(group = '') {
     return 'neutral';
 }
 
+const GLOSSARY_COLUMN_ORDER = Object.freeze(['GENERALIZATION', 'DISTORTION', 'DELETION']);
+const GLOSSARY_COLUMN_HEBREW = Object.freeze({
+    GENERALIZATION: 'הכללה',
+    DISTORTION: 'עיוות',
+    DELETION: 'מחיקה'
+});
+const GLOSSARY_FALLBACK_GROUP_BY_ID = Object.freeze({
+    simple_deletion: 'DELETION',
+    comparative_deletion: 'DELETION',
+    lack_referential_index: 'DELETION',
+    lack_of_referential_index: 'DELETION',
+    unspecified_verbs: 'DELETION',
+    unspecified_verb: 'DELETION',
+    non_referring_nouns: 'DELETION',
+    nominalisation: 'DELETION',
+    nominalisations: 'DELETION',
+    nominalization: 'DELETION',
+    universal_quantifier: 'GENERALIZATION',
+    modal_operator: 'GENERALIZATION',
+    mind_reading: 'DISTORTION',
+    cause_effect: 'DISTORTION',
+    complex_equivalence: 'DISTORTION',
+    lost_performative: 'DISTORTION',
+    assumptions: 'DISTORTION',
+    presupposition: 'DISTORTION',
+    identity_predicates: 'DISTORTION',
+    time_space_predicates: 'DISTORTION',
+    sensory_predicates: 'DISTORTION'
+});
+
+function normalizeGlossaryConceptId(raw = '') {
+    const value = String(raw || '').trim();
+    if (!value) return '';
+    const normalized = value.toLowerCase().replace(/[\s-]+/g, '_');
+    const aliases = {
+        presupposition: 'assumptions',
+        presuppositions: 'assumptions',
+        assumption: 'assumptions',
+        nominalisation: 'nominalization',
+        nominalisations: 'nominalization',
+        lack_of_referential_index: 'lack_referential_index',
+        unspecified_verbs: 'unspecified_verb',
+        unspecified_noun: 'non_referring_nouns'
+    };
+    return aliases[normalized] || normalized;
+}
+
+function normalizeGlossaryMacroGroup(group = '', conceptId = '') {
+    const normalizedGroup = String(group || '').trim().toUpperCase();
+    if (GLOSSARY_COLUMN_ORDER.includes(normalizedGroup)) return normalizedGroup;
+
+    const normalizedId = normalizeGlossaryConceptId(conceptId);
+    if (normalizedId && GLOSSARY_FALLBACK_GROUP_BY_ID[normalizedId]) {
+        return GLOSSARY_FALLBACK_GROUP_BY_ID[normalizedId];
+    }
+
+    const asSubcategory = SUBCATEGORY_TO_CATEGORY[String(conceptId || '').trim().toUpperCase().replace(/[\s-]+/g, '_')];
+    if (asSubcategory && GLOSSARY_COLUMN_ORDER.includes(asSubcategory)) {
+        return asSubcategory;
+    }
+
+    return 'DISTORTION';
+}
+
+function uniqueTrimmedList(items = [], limit = 10) {
+    const output = [];
+    const seen = new Set();
+    (items || []).forEach((entry) => {
+        const value = String(entry || '').trim();
+        if (!value) return;
+        const key = value.toLowerCase();
+        if (seen.has(key)) return;
+        seen.add(key);
+        output.push(value);
+    });
+    return output.slice(0, limit);
+}
+
+function normalizeGlossaryConcept(rawItem = {}) {
+    const conceptId = normalizeGlossaryConceptId(
+        rawItem.id
+        || rawItem.pattern_id
+        || rawItem.en_title
+        || rawItem.he_title
+        || rawItem.name
+        || rawItem.hebrew
+    );
+    if (!conceptId) return null;
+
+    const story = rawItem.story && typeof rawItem.story === 'object' ? rawItem.story : {};
+    const group = normalizeGlossaryMacroGroup(rawItem.group || rawItem.category || rawItem.family, conceptId);
+
+    return {
+        id: conceptId,
+        group,
+        he_group: String(rawItem.he_group || GLOSSARY_COLUMN_HEBREW[group] || '').trim(),
+        he_title: String(rawItem.he_title || rawItem.hebrew || rawItem.name || conceptId).trim(),
+        en_title: String(rawItem.en_title || rawItem.name || conceptId).trim(),
+        he_definition_short: String(rawItem.he_definition_short || rawItem.description || '').trim(),
+        markers: uniqueTrimmedList(Array.isArray(rawItem.markers) ? rawItem.markers : []),
+        meta_model_questions: uniqueTrimmedList(Array.isArray(rawItem.meta_model_questions) ? rawItem.meta_model_questions : []),
+        story: {
+            client_line: String(story.client_line || '').trim(),
+            therapist_intervention: String(story.therapist_intervention || '').trim()
+        },
+        transformation_moment: String(rawItem.transformation_moment || '').trim(),
+        positive_end: String(rawItem.positive_end || '').trim(),
+        next_step_direction: String(rawItem.next_step_direction || '').trim()
+    };
+}
+
+function buildGlossaryFallbackConcept(category = {}, subcategory = {}) {
+    const rawId = String(subcategory?.id || subcategory?.name || '').trim();
+    if (!rawId) return null;
+    const group = normalizeGlossaryMacroGroup(subcategory?.category || category?.id, rawId);
+    return normalizeGlossaryConcept({
+        id: rawId,
+        group,
+        he_group: GLOSSARY_COLUMN_HEBREW[group] || '',
+        he_title: subcategory?.hebrew || subcategory?.name || rawId,
+        en_title: subcategory?.name || rawId,
+        he_definition_short: subcategory?.description || '',
+        markers: [subcategory?.example || ''],
+        meta_model_questions: [subcategory?.question || '']
+    });
+}
+
+function mergeGlossaryConcept(primary, secondary) {
+    if (!primary) return secondary;
+    if (!secondary) return primary;
+
+    const merged = { ...primary };
+    merged.group = normalizeGlossaryMacroGroup(primary.group || secondary.group, primary.id || secondary.id);
+    merged.he_group = String(primary.he_group || secondary.he_group || GLOSSARY_COLUMN_HEBREW[merged.group] || '').trim();
+    merged.he_title = String(primary.he_title || secondary.he_title || primary.id || '').trim();
+    merged.en_title = String(primary.en_title || secondary.en_title || primary.id || '').trim();
+    merged.he_definition_short = String(primary.he_definition_short || secondary.he_definition_short || '').trim();
+    merged.markers = uniqueTrimmedList([...(primary.markers || []), ...(secondary.markers || [])]);
+    merged.meta_model_questions = uniqueTrimmedList([...(primary.meta_model_questions || []), ...(secondary.meta_model_questions || [])]);
+    merged.story = {
+        client_line: String(primary.story?.client_line || secondary.story?.client_line || '').trim(),
+        therapist_intervention: String(primary.story?.therapist_intervention || secondary.story?.therapist_intervention || '').trim()
+    };
+    merged.transformation_moment = String(primary.transformation_moment || secondary.transformation_moment || '').trim();
+    merged.positive_end = String(primary.positive_end || secondary.positive_end || '').trim();
+    merged.next_step_direction = String(primary.next_step_direction || secondary.next_step_direction || '').trim();
+    return merged;
+}
+
+function collectGlossaryConcepts() {
+    const byId = new Map();
+
+    const upsert = (rawConcept, { preferred = false } = {}) => {
+        const normalized = normalizeGlossaryConcept(rawConcept);
+        if (!normalized) return;
+        const key = normalized.id;
+        if (!byId.has(key)) {
+            byId.set(key, normalized);
+            return;
+        }
+        const existing = byId.get(key);
+        byId.set(key, preferred ? mergeGlossaryConcept(normalized, existing) : mergeGlossaryConcept(existing, normalized));
+    };
+
+    (metaModelData.categories || []).forEach((category) => {
+        (category?.subcategories || []).forEach((subcategory) => {
+            const fallback = buildGlossaryFallbackConcept(category, subcategory);
+            upsert(fallback, { preferred: false });
+        });
+    });
+
+    (metaModelGlossaryData?.items || []).forEach((item) => {
+        upsert(item, { preferred: true });
+    });
+
+    getBreenReferenceRows().forEach((row) => {
+        (row?.categories || []).forEach((categoryId) => {
+            const normalizedId = normalizeGlossaryConceptId(categoryId);
+            if (!normalizedId || byId.has(normalizedId)) return;
+            upsert({
+                id: normalizedId,
+                group: normalizeGlossaryMacroGroup('', normalizedId),
+                he_group: GLOSSARY_COLUMN_HEBREW[normalizeGlossaryMacroGroup('', normalizedId)] || '',
+                he_title: getBreenReferenceCategoryLabelHe(categoryId) || normalizedId,
+                en_title: getBreenReferenceCategoryChip(categoryId) || normalizedId.replace(/_/g, ' '),
+                he_definition_short: 'הרחבה תיאורטית תתווסף בהמשך. בינתיים מומלץ לתרגל זיהוי ושאלת דיוק אחת לפחות עבור תבנית זו.',
+                markers: [],
+                meta_model_questions: []
+            }, { preferred: false });
+        });
+    });
+
+    return Array.from(byId.values());
+}
+
 function buildGlossaryConceptCard(item = {}) {
     const title = String(item.he_title || item.hebrew || item.he_title || item.en_title || item.id || 'מושג').trim();
     const groupHe = String(item.he_group || '').trim();
@@ -4482,85 +4704,56 @@ function buildGlossaryConceptCard(item = {}) {
     `;
 }
 
+function renderGlossaryColumn(columnKey = '', concepts = []) {
+    const group = String(columnKey || '').trim().toUpperCase();
+    const groupHe = GLOSSARY_COLUMN_HEBREW[group] || '';
+    const items = concepts
+        .filter((item) => normalizeGlossaryMacroGroup(item.group, item.id) === group)
+        .sort((a, b) => String(a.he_title || '').localeCompare(String(b.he_title || ''), 'he'));
+
+    const cardsHtml = items.length
+        ? items.map((item) => buildGlossaryConceptCard(item)).join('')
+        : '<div class="card glossary-column-empty">אין קטגוריות להצגה בעמודה זו.</div>';
+
+    return `
+        <section class="glossary-column glossary-column-${escapeHtml(getGlossaryGroupClass(group))}" data-glossary-column="${escapeHtml(group)}">
+            <header class="glossary-column-head">
+                <h3 class="glossary-column-title">${escapeHtml(group)}</h3>
+                <p class="glossary-column-subtitle">${escapeHtml(groupHe)}</p>
+            </header>
+            <div class="glossary-column-list">${cardsHtml}</div>
+        </section>
+    `;
+}
+
 function populateCategories() {
     const container = document.getElementById('categories-container');
     if (!container) return;
     container.innerHTML = '';
 
-    const glossaryItems = Array.isArray(metaModelGlossaryData?.items)
-        ? metaModelGlossaryData.items.filter((item) => item && (item.he_title || item.en_title || item.id))
-        : [];
-    if (glossaryItems.length) {
-        const theoryIntro = document.createElement('section');
-        theoryIntro.className = 'card categories-theory-intro categories-glossary-intro';
-        theoryIntro.innerHTML = `
-            <h2>מילון מושגים — פריצות דרך קליניות</h2>
-            <p><strong>למה:</strong> המסך הזה הוא מילון מושגים, ולכן כל מושג מופיע פעם אחת בלבד, אבל עם יותר עומק בתוך הכרטיס.</p>
-            <p class="categories-theory-note">הדגש כאן הוא על סיפור קליני, רגע הטרנספורמציה, והמשך עבודה פרקטי.</p>
-        `;
-        container.appendChild(theoryIntro);
-
-        const glossaryGrid = document.createElement('section');
-        glossaryGrid.className = 'categories-glossary-grid';
-        glossaryGrid.innerHTML = glossaryItems.map((item) => buildGlossaryConceptCard(item)).join('');
-        container.appendChild(glossaryGrid);
+    const glossaryItems = collectGlossaryConcepts();
+    if (!glossaryItems.length) {
+        container.innerHTML = '<section class="card categories-theory-intro"><h2>מילון קטגוריות המטה-מודל</h2><p>לא נמצאו נתוני קטגוריות להצגה.</p></section>';
         return;
     }
 
-    const availablePatternIds = new Map();
-    (metaModelData.categories || [])
-        .flatMap(category => Array.isArray(category?.subcategories) ? category.subcategories : [])
-        .forEach((subcategory) => {
-            const actualId = String(subcategory?.id || '').trim();
-            const normalizedId = normalizeBreenReferenceCategoryId(actualId);
-            if (normalizedId && actualId && !availablePatternIds.has(normalizedId)) {
-                availablePatternIds.set(normalizedId, actualId);
-            }
-        });
-
-    const breenBoard = document.createElement('section');
-    breenBoard.className = 'categories-breen-board';
-    breenBoard.innerHTML = buildBreenReferenceBoardHtml({
-        title: 'טבלת ברין — מפת 5×3',
-        note: 'לחיצה על תא תקפוץ לכרטיס התבנית בעמוד.',
-        mode: 'category-links',
-        availableCategoryIds: availablePatternIds
-    });
-    container.appendChild(breenBoard);
-
     const theoryIntro = document.createElement('section');
-    theoryIntro.className = 'card categories-theory-intro';
+    theoryIntro.className = 'card categories-theory-intro categories-glossary-intro';
     theoryIntro.innerHTML = `
-        <h2>קטגוריות ברין + שכבות תאוריה (פריזמה)</h2>
+        <h2>מילון קטגוריות המטה-מודל</h2>
         <p>
-            דף זה הוא דף התאוריה והכוונה: לכל תבנית יש שכבות לחיצה של <strong>שאלות</strong>, <strong>מטרה</strong>, ו-<strong>פילוסופיה</strong>.
-            תאוריית הפריזמות הועברה לכאן כדי לשמור את דפי התרגול נקיים וממוקדי עבודה.
+            דף זה מרכז את כל קטגוריות המטה-מודל וההסבר התאורטי לכל אחת מהן.
+            כאן ניתן להבין מהי כל תבנית שפה, כיצד לזהות אותה,
+            ואיך היא פותחת מידע ומחזירה דיוק לחוויה של האדם.
         </p>
-        <p class="categories-theory-note">
-            העיקרון: לא רק "מה לשאול", אלא גם למה השאלה הזו פותחת מרחב ומחזירה דיוק למפה של האדם.
-        </p>
+        <p class="categories-theory-note"><strong>למה:</strong> המסך הזה הוא מילון מושגים, ולכן כל מושג מופיע פעם אחת בלבד, אבל עם יותר עומק בתוך הכרטיס.</p>
     `;
     container.appendChild(theoryIntro);
 
-    metaModelData.categories.forEach(category => {
-        const categoryCard = document.createElement('div');
-        categoryCard.className = `category-card ${category.id}`;
-
-        const subcategoriesHtml = (category.subcategories || [])
-            .map(sub => buildCategorySubPatternCard(category, sub))
-            .join('');
-
-        categoryCard.innerHTML = `
-            <div class="category-icon">${category.icon}</div>
-            <h3>${category.name}</h3>
-            <p>${category.description}</p>
-            <div class="subcategories layered">
-                ${subcategoriesHtml}
-            </div>
-        `;
-
-        container.appendChild(categoryCard);
-    });
+    const columns = document.createElement('section');
+    columns.className = 'categories-glossary-columns';
+    columns.innerHTML = GLOSSARY_COLUMN_ORDER.map((columnKey) => renderGlossaryColumn(columnKey, glossaryItems)).join('');
+    container.appendChild(columns);
 }
 
 // Populate Category Select in Practice Mode
