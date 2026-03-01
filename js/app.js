@@ -147,6 +147,7 @@ const MUSIC_TRACK_SOURCES = Object.freeze([
 const MUSIC_SNIPPET_DURATION_MS = 30000;
 const OPENING_TRACK_FIRST_ENTRY_KEY = 'meta_opening_track_first_entry_done';
 const AUDIO_FLOATING_CONTROLS_POSITION_KEY = 'meta_audio_controls_positions_v1';
+const HOME_LOBBY_REDUCED_MOTION_KEY = 'meta_home_lobby_reduce_motion_v1';
 const UI_SOUND_GAIN_BOOST = 1.45;
 const UI_SOUND_GAIN_LIMIT = 0.12;
 const UI_SOUND_KIND_COOLDOWNS_MS = Object.freeze({
@@ -766,6 +767,7 @@ function updateMuteButtonUI() {
     });
     updateFloatingMuteButtonUI();
     updateMusicToggleButtonUI();
+    updateHomeLobbyMuteToggleLabel();
 }
 
 function setMutedAudio(isMuted) {
@@ -2330,6 +2332,151 @@ function setupFeatureMapOverlayControls() {
         if (featureMap.contains(event.target)) return;
         setFeatureMapToggleOpen(false);
     });
+}
+
+function readHomeLobbyReducedMotionSetting() {
+    try {
+        return String(localStorage.getItem(HOME_LOBBY_REDUCED_MOTION_KEY) || '').trim().toLowerCase();
+    } catch (_error) {
+        return '';
+    }
+}
+
+function resolveHomeLobbyReducedMotionEnabled() {
+    const stored = readHomeLobbyReducedMotionSetting();
+    if (stored === 'true') return true;
+    if (stored === 'false') return false;
+    try {
+        return Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (_error) {
+        return false;
+    }
+}
+
+function applyHomeLobbyMotionPreference() {
+    const homeRoot = document.getElementById('home');
+    const toggle = document.getElementById('home-lobby-reduce-motion-toggle');
+    const reduced = resolveHomeLobbyReducedMotionEnabled();
+
+    if (homeRoot) {
+        homeRoot.classList.toggle('is-reduced-motion', reduced);
+    }
+
+    if (toggle) {
+        toggle.setAttribute('aria-pressed', reduced ? 'true' : 'false');
+        toggle.textContent = reduced ? 'הפחת אנימציות: פעיל' : 'הפחת אנימציות: כבוי';
+    }
+}
+
+function updateHomeLobbyMuteToggleLabel() {
+    const toggle = document.getElementById('home-lobby-mute-toggle');
+    if (!toggle) return;
+    const muted = Boolean(audioState.muted);
+    toggle.setAttribute('aria-pressed', muted ? 'true' : 'false');
+    toggle.textContent = muted ? 'צלילים: כבוי' : 'צלילים: פעיל';
+}
+
+function triggerHomeLobbyDemoConfetti(confettiRoot) {
+    if (!confettiRoot) return;
+    const palette = ['#2dd4bf', '#22d3ee', '#38bdf8', '#34d399', '#14b8a6', '#0ea5e9'];
+    const dots = Array.from({ length: 8 }).map((_, index) => {
+        const right = 10 + Math.round(Math.random() * 78);
+        const top = 52 + Math.round(Math.random() * 30);
+        const color = palette[index % palette.length];
+        const delay = (Math.random() * 120).toFixed(0);
+        return `<span class="home-lobby-confetti-dot" style="right:${right}%;top:${top}%;background:${color};animation-delay:${delay}ms;"></span>`;
+    }).join('');
+    confettiRoot.innerHTML = dots;
+    confettiRoot.classList.remove('is-burst');
+    // Reflow to restart animation cleanly.
+    void confettiRoot.offsetWidth;
+    confettiRoot.classList.add('is-burst');
+    setTimeout(() => {
+        confettiRoot.classList.remove('is-burst');
+    }, 760);
+}
+
+function setupHomeLobbyMicroDemo() {
+    const demo = document.getElementById('home-lobby-micro-demo');
+    if (!demo || demo.dataset.boundMicroDemo === 'true') return;
+    demo.dataset.boundMicroDemo = 'true';
+
+    const feedback = document.getElementById('home-lobby-demo-feedback');
+    const confetti = document.getElementById('home-lobby-confetti');
+    const choiceButtons = Array.from(demo.querySelectorAll('[data-home-demo-choice]'));
+
+    const clearChoiceState = () => {
+        choiceButtons.forEach((btn) => {
+            btn.classList.remove('is-correct', 'is-wrong');
+        });
+        if (feedback) {
+            feedback.classList.remove('is-correct', 'is-wrong');
+            feedback.textContent = '';
+        }
+    };
+
+    choiceButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            clearChoiceState();
+            const choice = String(button.getAttribute('data-home-demo-choice') || '').trim();
+            const isCorrect = choice === '2';
+
+            if (isCorrect) {
+                button.classList.add('is-correct');
+                if (feedback) {
+                    feedback.textContent = 'בום 🎯 פתאום יש חריגים → ויש עם מה לעבוד.';
+                    feedback.classList.add('is-correct');
+                }
+                triggerHomeLobbyDemoConfetti(confetti);
+                playUISound('success');
+                return;
+            }
+
+            button.classList.add('is-wrong');
+            if (feedback) {
+                feedback.textContent = 'חפש את המילה שעושה "הכל או כלום"...';
+                feedback.classList.add('is-wrong');
+            }
+            demo.classList.remove('is-shake');
+            void demo.offsetWidth;
+            demo.classList.add('is-shake');
+            setTimeout(() => demo.classList.remove('is-shake'), 320);
+            playUISound('tap_soft');
+        });
+    });
+}
+
+function setupHomeLobbyExperience() {
+    const homeRoot = document.getElementById('home');
+    if (!homeRoot) return;
+
+    applyHomeLobbyMotionPreference();
+    updateHomeLobbyMuteToggleLabel();
+    setupHomeLobbyMicroDemo();
+
+    const reduceMotionToggle = document.getElementById('home-lobby-reduce-motion-toggle');
+    if (reduceMotionToggle && reduceMotionToggle.dataset.boundReducedMotion !== 'true') {
+        reduceMotionToggle.dataset.boundReducedMotion = 'true';
+        reduceMotionToggle.addEventListener('click', () => {
+            const nextState = !resolveHomeLobbyReducedMotionEnabled();
+            try {
+                localStorage.setItem(HOME_LOBBY_REDUCED_MOTION_KEY, String(nextState));
+            } catch (_error) {
+                // ignore storage write issues
+            }
+            applyHomeLobbyMotionPreference();
+            playUISound('tap_soft');
+        });
+    }
+
+    const muteToggle = document.getElementById('home-lobby-mute-toggle');
+    if (muteToggle && muteToggle.dataset.boundHomeMute !== 'true') {
+        muteToggle.dataset.boundHomeMute = 'true';
+        muteToggle.addEventListener('click', () => {
+            toggleAudioMute();
+            updateHomeLobbyMuteToggleLabel();
+        });
+    }
 }
 
 function setupGlobalFeatureMenuDropdown() {
@@ -3918,6 +4065,7 @@ function initializeMetaModelApp() {
     setupAudioInteractionArm();
     setupAudioMuteButtons();
     setupMusicToggleButton();
+    setupHomeLobbyExperience();
     setupGlobalAudioSafety();
     setupOpeningMusicOnFirstEntry();
     

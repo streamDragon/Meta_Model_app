@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.100" data-build-time="1772382032277" data-build-iso="2026-03-01T16:20:32.277Z" data-git-commit="d91e380">
+<html lang="he" dir="rtl" data-app-version="1.0.101" data-build-time="1772385302708" data-build-iso="2026-03-01T17:15:02.708Z" data-git-commit="c0e7d77">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -382,242 +382,141 @@
         </div>
 
         <!-- HOME TAB -->
-        <section id="home" class="tab-content active">
-            <div class="card">
-                <h2>ברוכים הבאים! 👋</h2>
-                <p id="app-version-chip" class="app-version-chip">גרסה נוכחית: נטען...</p>
-                <p class="home-stable-summary"><strong>מה עושים כאן?</strong> זו אפליקציית תרגול ל-Meta Model: בוחרים פיצ'ר אחד, מתרגלים דיוק שפה/שיקוף/שאלות, ומתקדמים צעד-צעד בלי עומס.</p>
-                
-                <div class="intro-grid">
-                    <div class="intro-item">
-                        <h3>🎯 מה זה Meta Model?</h3>
-                        <p>דרך עבודה שמלמדת לשמוע איפה השפה נהיית כללית, עמומה או מוחלטת מדי - ואז לשאול שאלה שמחזירה דיוק.</p>
-                    </div>
-                    <div class="intro-item">
-                        <h3>📚 למה זה חשוב?</h3>
-                        <p>כי דיוק בשפה משפר הבנה, מפחית בלבול/הסלמה, ויוצר שיח טיפולי או אישי יותר מדויק.</p>
-                    </div>
-                    <div class="intro-item">
-                        <h3>✨ כיצד להשתמש?</h3>
-                        <p>בחר/י פיצ'ר אחד מה-MENU, קרא/י הסבר קצר, ותרגל/י סבב אחד בכל פעם.</p>
-                    </div>
-                </div>
-
-                <div class="home-feature-guide">
-                    <h3>מפת הפיצ'רים + מה זה “פילוסוף מסך”</h3>
-                    <p>כאן יש הסבר גלוי על מה שיש באתר: תרגול זיהוי Meta-Model, Meta Radar, Triples, Prism Lab, סצנות, Blueprint ושאר הכלים. בוחרים כלי אחד, מסיימים סבב, ואז ממשיכים לכלי הבא.</p>
-                    <p><strong>“פילוסוף מסך”</strong> הוא שכבת הסבר שמפרקת את ההיגיון של כל מסך: מה המטרה, למה זה עובד, ואיך לגשת לתרגול צעד-צעד.</p>
-                    <p>במסכי התרגול עצמם שמרנו על ממשק נקי יותר, וההסבר המלא מרוכז כאן במסך הבית.</p>
-                </div>
-
-                <div class="home-therapy-demo" id="home-therapy-demo">
-                    <div class="home-therapy-demo-head">
-                        <h3>🧭 הדגמה תהליכית מוסברת: איך הכלים מתחברים לתהליך טיפולי ארוך</h3>
-                        <p>תחשבו על זה כמו תזמורת של כלים: כל כלי נותן משהו אחר (זיהוי, עומק, שיקוף, ניסוח, תרגול תגובה), וביחד הם משדרגים מאוד את יכולת השיח, ההבנה והטיפול.</p>
-                    </div>
-                    <div class="home-therapy-demo-flow">
-                        <article class="home-therapy-step">
-                            <div class="home-therapy-step-num">1</div>
-                            <div class="home-therapy-step-body">
-                                <p class="home-therapy-step-kicker">מיקוד ראשון · זיהוי טקסט</p>
-                                <h4>Prism Research (שרשרת)</h4>
-                                <p>מתחילים מהפסקה של המטופל ומסמנים ביטוי טעון. עובדים "רקורסיבית" = חוזרים עם אותה שאלה על התשובה החדשה שנולדה, כדי לפרק שכבה-שכבה.</p>
-                                <p class="home-therapy-step-q">שאלת דוגמה: "איך אתה יודע ש־X?" / "איך בדיוק X גורם ל־Y?"</p>
-                                <div class="home-therapy-step-actions">
-                                    <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html">פתח Prism Research</a>
-                                </div>
-                            </div>
-                        </article>
-
-                        <article class="home-therapy-step">
-                            <div class="home-therapy-step-num">2</div>
-                            <div class="home-therapy-step-body">
-                                <p class="home-therapy-step-kicker">חתך עומק · מילה/ביטוי מרכזי אחד</p>
-                                <h4>Prism Lab (מגדל רמות)</h4>
-                                <p>עוצרים על מילה/ביטוי מרכזי אחד (זה ה"עוגן") ולא "רצים קדימה". בודקים אותו דרך רמות לוגיות: סביבה, התנהגות, יכולות, ערכים/אמונות, זהות, שייכות - כדי לזהות שכבות חסרות ולבחור צעד המשך מדויק.</p>
-                                <p class="home-therapy-step-q">שאלת דוגמה: אם העוגן הוא "נדבר" - מה קורה בסביבה? מה ההתנהגות? איזו יכולת חסרה? איזה ערך/אמונה מופעלים?</p>
-                                <div class="home-therapy-step-actions">
-                                    <button type="button" class="btn btn-primary" onclick="navigateTo('prismlab')">פתח Prism Lab</button>
-                                </div>
-                            </div>
-                        </article>
-
-                        <article class="home-therapy-step">
-                            <div class="home-therapy-step-num">3</div>
-                            <div class="home-therapy-step-body">
-                                <p class="home-therapy-step-kicker">ויסות לפני אתגור</p>
-                                <h4>גשר תחושה-שפה</h4>
-                                <p>כשהגוף נסגר, לא עוברים ישר לאתגר. קודם עושים גישור תחושה→שפה: תחושה (S) → כמת נסתר (Q) → גישור (H) → אישור (C) → בחירת כיוון עבודה → למידה/חריג (E/L), ורק אחר כך מחדדים שאלה.</p>
-                                <p class="home-therapy-step-q">שאלת דוגמה: מה אתה מרגיש עכשיו, ומה הגוף אומר לפני המילים?</p>
-                                <div class="home-therapy-step-actions">
-                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה</button>
-                                </div>
-                            </div>
-                        </article>
-
-                        <article class="home-therapy-step">
-                            <div class="home-therapy-step-num">4</div>
-                            <div class="home-therapy-step-body">
-                                <p class="home-therapy-step-kicker">דיוק לשוני מהיר</p>
-                                <h4>Question Drill + Meta Radar</h4>
-                                <p>מתרגלים ניסוח שאלה מדויקת ואז זיהוי מהיר בזמן אמת. זה הופך את הידע לרפלקס במקום להישאר בתיאוריה.</p>
-                                <p class="home-therapy-step-q">שאלת דוגמה: "מה בדיוק?", "לפי מי?", "ביחס למה?"</p>
-                                <div class="home-therapy-step-actions">
-                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול זיהוי Meta-Model</button>
-                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">Meta Radar</button>
-                                </div>
-                            </div>
-                        </article>
-
-                        <article class="home-therapy-step">
-                            <div class="home-therapy-step-num">5</div>
-                            <div class="home-therapy-step-body">
-                                <p class="home-therapy-step-kicker">מפה מערכתית</p>
-                                <h4>Triples / Living Triples</h4>
-                                <p>כשמופיעים כמה דפוסים יחד, עובדים עם שלשות: רואים את הקשרים, בונים שיקוף מובנה, ומתרגלים את הקו השלם במקום פרט בודד.</p>
-                                <p class="home-therapy-step-q">שאלת דוגמה: מה משותף לשלוש הקטגוריות ואיך זה משפיע על האדם?</p>
-                                <div class="home-therapy-step-actions">
-                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-triples-radar')">Triples Radar</button>
-                                    <a class="btn btn-secondary" href="living_triples_trainer.html" data-versioned-href="living_triples_trainer.html">Living Triples</a>
-                                </div>
-                            </div>
-                        </article>
-
-                        <article class="home-therapy-step">
-                            <div class="home-therapy-step-num">6</div>
-                            <div class="home-therapy-step-body">
-                                <p class="home-therapy-step-kicker">הטמעה לעולם האמיתי</p>
-                                <h4>Scenario / Comic / Blueprint</h4>
-                                <p>אחרי שהמפה ברורה, מתרגלים ניסוח תגובה בתוך סצנה, מדמים שיחה, ואז הופכים את זה לתוכנית ביצוע (צעד ראשון, תקיעות, Plan B).</p>
-                                <p class="home-therapy-step-q">שאלת דוגמה: מה התגובה המדויקת הבאה ומה הצעד הראשון שאפשר לבצע היום?</p>
-                                <div class="home-therapy-step-actions">
-                                    <button type="button" class="btn btn-primary" onclick="navigateTo('scenario-trainer')">Scenario Trainer</button>
-                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">Comic Engine</button>
-                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">Blueprint</button>
-                                </div>
-                            </div>
-                        </article>
-                    </div>
-                </div>
-
-                <div class="cta-section cta-section-compact">
-                    <h3>🚀 התחלה מהירה (בלי כפילות של כל הפיצ'רים)</h3>
-                    <p class="cta-section-note">כל הפיצ'רים לתרגול נמצאים במפת הפיצ'רים למעלה. כאן יש רק מסלולי התחלה מומלצים.</p>
-                    <div class="cta-buttons cta-buttons-compact">
-                        <button class="btn btn-primary cta-btn" onclick="navigateTo('scenario-trainer')">סצנות Execution</button>
-                        <button class="btn btn-primary cta-btn" onclick="navigateTo('prismlab')">Prism Lab (רמות לוגיות)</button>
-                        <a class="btn btn-secondary cta-btn" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html">Prism Research (שרשרת)</a>
-                        <button class="btn btn-secondary cta-btn" onclick="navigateTo('practice-radar')">Meta Radar</button>
-                        <button class="btn btn-secondary cta-btn" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה</button>
-                        <button id="home-open-feature-map" class="btn btn-secondary cta-btn" type="button">MENU ⤴</button>
-                    </div>
-                </div>
-
-                <!-- PROGRESS HUB -->
-                <div class="progress-hub">
-                    <h3>📊 ההתקדמות שלך</h3>
-                    <div class="progress-grid">
-                        <div class="progress-card">
-                            <span class="progress-icon">🔥</span>
-                            <p class="progress-label">Streak</p>
-                            <p class="progress-value" id="streak-count">0 ימים</p>
-                            <small id="streak-date">היום הראשון!</small>
-                        </div>
-                        <div class="progress-card">
-                            <span class="progress-icon">⭐</span>
-                            <p class="progress-label">XP Total</p>
-                            <p class="progress-value" id="xp-count">0</p>
-                            <small>כל משימה = נקודות</small>
-                        </div>
-                        <div class="progress-card">
-                            <span class="progress-icon">🌟</span>
-                            <p class="progress-label">Stars</p>
-                            <p class="progress-value" id="stars-count">0</p>
-                            <small>בונוס מכל תשובה</small>
-                        </div>
-                        <div class="progress-card">
-                            <span class="progress-icon">🏆</span>
-                            <p class="progress-label">Badges</p>
-                            <p class="progress-value" id="badge-count">0</p>
-                            <small>פרסים שהצברת</small>
-                        </div>
-                        <div class="progress-card">
-                            <span class="progress-icon">🧪</span>
-                            <p class="progress-label">Sessions</p>
-                            <p class="progress-value" id="session-count">0</p>
-                            <small>סשנים שהשלמת</small>
-                        </div>
-                        <div class="progress-card" id="daily-goal-card">
-                            <span class="progress-icon">🎯</span>
-                            <p class="progress-label">Daily Goal</p>
-                            <p class="progress-value" id="daily-goal-value">0/3</p>
-                            <div class="daily-goal-controls" role="group" aria-label="שינוי יעד יומי">
-                                <button id="daily-goal-decrease-btn" class="daily-goal-step-btn" type="button" aria-label="הקטן יעד יומי">−</button>
-                                <span id="daily-goal-target-pill" class="daily-goal-target-pill">יעד: 3</span>
-                                <button id="daily-goal-increase-btn" class="daily-goal-step-btn" type="button" aria-label="הגדל יעד יומי">+</button>
-                            </div>
-                            <div class="daily-goal-meter" aria-hidden="true">
-                                <div class="daily-goal-fill" id="daily-goal-fill"></div>
-                            </div>
-                            <small id="daily-goal-note">השלם 3 פעולות היום</small>
-                        </div>
-                        <div class="progress-card">
-                            <span class="progress-icon">🛡️</span>
-                            <p class="progress-label">Streak Charge</p>
-                            <p class="progress-value" id="streak-charge-value">0/3</p>
-                            <small id="streak-charge-note">שומר על רצף ביום פספוס</small>
-                        </div>
-                    </div>
-                    <div class="progress-overview-grid">
-                        <div class="progress-overview-card progress-level-card">
-                            <div class="progress-overview-head">
-                                <strong id="progress-level-title">Level 1 · התחלה</strong>
-                                <span id="progress-level-badge" class="progress-mini-pill">XP</span>
-                            </div>
-                            <div class="progress-level-meter" aria-hidden="true">
-                                <div id="progress-level-fill" class="progress-level-fill"></div>
-                            </div>
-                            <p id="progress-level-note" class="progress-overview-note">צברו XP כדי לעלות רמה.</p>
-                        </div>
-                        <div id="progress-momentum-card" class="progress-overview-card progress-momentum-card" data-tone="info">
-                            <div class="progress-overview-head">
-                                <strong id="progress-momentum-title">מומנטום יומי</strong>
-                                <span id="progress-momentum-pill" class="progress-mini-pill">Coach</span>
-                            </div>
-                            <p id="progress-momentum-copy" class="progress-overview-note">השלימו פעולת אימון אחת כדי לפתוח את היום.</p>
-                            <div id="progress-week-strip" class="progress-week-strip" aria-label="סיכום 7 ימים אחרונים"></div>
-                            <p id="progress-week-caption" class="progress-overview-subnote">7 ימים אחרונים</p>
-                            <p id="progress-next-badge" class="progress-overview-subnote">התג הבא: —</p>
-                        </div>
-                        <div class="progress-overview-card progress-resume-card">
-                            <div class="progress-overview-head">
-                                <strong id="progress-resume-title">המשך אחרון</strong>
-                                <span class="progress-mini-pill">Flow</span>
-                            </div>
-                            <p id="progress-resume-copy" class="progress-overview-note">עדיין לא נשמר מסך אחרון.</p>
-                            <div class="progress-overview-actions">
-                                <button id="progress-resume-btn" class="btn btn-primary" type="button" disabled>פתח המשך</button>
-                                <button id="progress-open-home-menu-btn" class="btn btn-secondary" type="button">בחר כלי</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="progress-programs-panel">
-                        <div class="progress-programs-head">
-                            <div>
-                                <h4>תוכניות אימון קצרות</h4>
-                                <p>מסלולים מהירים עם שלבים ברורים: פתח/י שלב, חזור/י לכאן וסמן/י "בוצע".</p>
-                            </div>
-                            <div class="progress-programs-head-actions">
-                                <button id="home-programs-reset-all" class="btn btn-secondary" type="button">איפוס מסלולים</button>
-                            </div>
-                        </div>
-                        <div id="home-program-cards" class="home-program-cards"></div>
-                    </div>
-                    <div id="badges-display" class="badges-display">
-                        <!-- Badges will render here -->
-                    </div>
-                </div>
+        <section id="home" class="tab-content active home-lobby-root">
+            <div class="home-lobby-bg" aria-hidden="true">
+                <span class="home-lobby-particle p1"></span>
+                <span class="home-lobby-particle p2"></span>
+                <span class="home-lobby-particle p3"></span>
+                <span class="home-lobby-particle p4"></span>
+                <span class="home-lobby-particle p5"></span>
+                <span class="home-lobby-particle p6"></span>
+                <span class="home-lobby-particle p7"></span>
+                <span class="home-lobby-particle p8"></span>
             </div>
+
+            <article class="home-lobby-hero-card">
+                <div class="home-lobby-whats-new" aria-label="מה חדש ב-2026">
+                    <strong>כמה חדש ב־2026?</strong>
+                    <ul>
+                        <li>כרטיסיות קליניות: מה זה משנה בטיפול</li>
+                        <li>תרגול מהיר עם פידבק ברור</li>
+                        <li>עברית נקייה + פחות עומס בעיניים</li>
+                    </ul>
+                </div>
+
+                <p id="app-version-chip" class="app-version-chip home-lobby-version">גרסה נוכחית: נטען...</p>
+
+                <h2 class="home-lobby-title">
+                    Meta-Model — חדר כושר לדיוק בשפה
+                    <span class="home-lobby-title-icon" aria-hidden="true">🧠💪</span>
+                </h2>
+                <p class="home-lobby-subtitle">
+                    מה שנולד בשנות ה־70 (1973) כמערכת שאלות למטפלים — קיבל כאן שדרוג מודרני:
+                    <br>
+                    פחות תיאוריה יבשה, יותר תרגול שמייצר שינוי בשיחה אמיתית.
+                </p>
+
+                <div class="home-lobby-cta-row">
+                    <a class="btn btn-primary home-lobby-cta-primary" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html">התחל תרגול עכשיו</a>
+                    <a class="btn btn-secondary home-lobby-cta-secondary" href="index.html?tab=categories">מרכז הידע: מילון הקטגוריות</a>
+                </div>
+            </article>
+
+            <section class="home-lobby-section">
+                <h3 class="home-lobby-section-title">מה תמצא פה</h3>
+                <div class="home-lobby-feature-grid">
+                    <article class="home-lobby-feature-card">
+                        <div class="home-lobby-feature-icon" aria-hidden="true">🧩</div>
+                        <h4>תרגול כיפי</h4>
+                        <p>דקה ביום — ופתאום אתה שומע "תמיד" ממרחק 3 ק״מ 😄</p>
+                        <a class="btn btn-primary" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html">פתח תרגול</a>
+                    </article>
+
+                    <article class="home-lobby-feature-card">
+                        <div class="home-lobby-feature-icon" aria-hidden="true">📖</div>
+                        <h4>מרכז הידע</h4>
+                        <p>כל הקטגוריות, דוגמאות, ושאלות שעובדות באמת (בלי יובש).</p>
+                        <a class="btn btn-secondary" href="index.html?tab=categories">פתח מילון</a>
+                    </article>
+
+                    <article class="home-lobby-feature-card">
+                        <div class="home-lobby-feature-icon" aria-hidden="true">🧪</div>
+                        <h4>מעבדות וחידושים</h4>
+                        <p>כשבא לך לחקור עמוק: מחקר, פריזמות, ניסויי שיחה.</p>
+                        <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html">פתח מעבדות</a>
+                    </article>
+                </div>
+            </section>
+
+            <section class="home-lobby-section">
+                <h3 class="home-lobby-section-title">מיני-מילון למוח האנושי (בלי לחץ)</h3>
+                <div class="home-lobby-accordion">
+                    <details class="home-lobby-accordion-item" open>
+                        <summary>
+                            <span>מה זה Meta-Model?</span>
+                            <span class="home-lobby-accordion-icon" aria-hidden="true">⌄</span>
+                        </summary>
+                        <p>סט שאלות שמחזירות מידע שנמחק/התעוות — כדי שהסיפור יהפוך לבדיקה, לא לגזירת גורל.</p>
+                    </details>
+
+                    <details class="home-lobby-accordion-item">
+                        <summary>
+                            <span>השמטה / עיוות / הכללה</span>
+                            <span class="home-lobby-accordion-icon" aria-hidden="true">⌄</span>
+                        </summary>
+                        <p>שלושת הפילטרים של המוח. לפעמים הם עוזרים — ולפעמים הם יוצרים תקיעות.</p>
+                    </details>
+
+                    <details class="home-lobby-accordion-item">
+                        <summary>
+                            <span>שאלות חילוץ</span>
+                            <span class="home-lobby-accordion-icon" aria-hidden="true">⌄</span>
+                        </summary>
+                        <p>׳מי בדיוק? מתי? איפה? איך בדיוק?׳ — לא חוכמה, דיוק.</p>
+                    </details>
+
+                    <details class="home-lobby-accordion-item">
+                        <summary>
+                            <span>למה זה כלי טיפולי?</span>
+                            <span class="home-lobby-accordion-icon" aria-hidden="true">⌄</span>
+                        </summary>
+                        <p>כי כשהשפה נהיית מדויקת — האדם חוזר לבחור. פחות 'ככה זה', יותר 'מה אפשר עכשיו'.</p>
+                    </details>
+
+                    <details class="home-lobby-accordion-item">
+                        <summary>
+                            <span>מה מודרני פה?</span>
+                            <span class="home-lobby-accordion-icon" aria-hidden="true">⌄</span>
+                        </summary>
+                        <p>לקחנו את המודל מהספרים והפכנו אותו לתרגול חי: דוגמאות, משוב, והתקדמות יומית.</p>
+                    </details>
+                </div>
+            </section>
+
+            <section class="home-lobby-section home-lobby-demo" id="home-lobby-micro-demo">
+                <h3 class="home-lobby-section-title">תנסה עכשיו — 10 שניות</h3>
+                <blockquote class="home-lobby-quote">"אני תמיד נכשל."</blockquote>
+                <div class="home-lobby-demo-choices" role="group" aria-label="בחירת שאלת דיוק">
+                    <button type="button" class="btn btn-secondary home-lobby-demo-choice" data-home-demo-choice="1">מי אמר?</button>
+                    <button type="button" class="btn btn-secondary home-lobby-demo-choice" data-home-demo-choice="2">תמיד? אפילו פעם אחת לא הצלחת?</button>
+                    <button type="button" class="btn btn-secondary home-lobby-demo-choice" data-home-demo-choice="3">למה אתה כזה?</button>
+                </div>
+                <p id="home-lobby-demo-feedback" class="home-lobby-demo-feedback" aria-live="polite"></p>
+                <div id="home-lobby-confetti" class="home-lobby-confetti" aria-hidden="true"></div>
+            </section>
+
+            <section class="home-lobby-section home-lobby-close">
+                <p>
+                    בין אם אתה מטפל, מאמן, או פשוט אדם שאוהב לדבר ברור יותר —
+                    <br>
+                    כאן מתאמנים על שאלות שמייצרות שינוי. בלי לחץ, עם חיוך.
+                </p>
+                <a class="btn btn-primary home-lobby-final-cta" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html">יאללה, מתחילים</a>
+                <div class="home-lobby-preferences">
+                    <button id="home-lobby-reduce-motion-toggle" class="btn btn-secondary" type="button" aria-pressed="false">הפחת אנימציות: כבוי</button>
+                    <button id="home-lobby-mute-toggle" class="btn btn-secondary" type="button" aria-pressed="false">צלילים: פעיל</button>
+                </div>
+            </section>
         </section>
 
         <!-- SCENARIO TRAINER TAB -->
