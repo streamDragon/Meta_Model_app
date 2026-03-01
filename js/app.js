@@ -15051,9 +15051,71 @@ function ceflowToneClass(tone) {
         : 'ceflow-tone-muted';
 }
 
-async function setupComicEngine2() {
+function renderComicEngineLoadError(els, message = 'אירעה תקלה בטעינת Comic Engine Flow. נסו שוב.') {
+    const safeMessage = String(message || 'אירעה תקלה בטעינה.').trim();
+    if (els.dialog) {
+        els.dialog.innerHTML = `
+            <article class="ceflow-bubble is-left is-counter">
+                <p class="ceflow-bubble-speaker">מערכת</p>
+                <p class="ceflow-bubble-text">${escapeHtml(safeMessage)}</p>
+            </article>
+        `;
+    }
+    if (els.deck) {
+        els.deck.innerHTML = `
+            <button type="button" class="ceflow-choice ceflow-tone-good" data-ceflow-reload="1" aria-label="טען מחדש את Comic Engine Flow">
+                <span class="ceflow-choice-top"><strong>🔄 טען מחדש</strong></span>
+                <span class="ceflow-choice-line">לחצו כדי לנסות שוב לטעון את הסצנה.</span>
+            </button>
+        `;
+        const reloadBtn = els.deck.querySelector('[data-ceflow-reload="1"]');
+        if (reloadBtn && reloadBtn.dataset.bound !== 'true') {
+            reloadBtn.dataset.bound = 'true';
+            reloadBtn.addEventListener('click', () => ensureComicEngineFlowReady({ force: true }));
+        }
+    }
+    els.replyBox?.classList.add('hidden');
+    els.feedback?.classList.add('hidden');
+    els.power?.classList.add('hidden');
+    els.blueprint?.classList.add('hidden');
+    if (els.retry) els.retry.disabled = false;
+    if (els.next) els.next.disabled = true;
+}
+
+function ensureComicEngineFlowReady({ force = false } = {}) {
+    const root = document.getElementById('comicEngine');
+    if (!root) return;
+    const bootState = String(root.dataset.ceflowBootState || '').trim();
+    if (!force && (bootState === 'loading' || bootState === 'ready')) return;
+
+    Promise.resolve(setupComicEngine2({ force }))
+        .catch((error) => {
+            console.error('Comic Engine Flow bootstrap failed:', error);
+            root.dataset.ceflowBootState = 'error';
+            const els = {
+                root,
+                dialog: document.getElementById('ceflow-dialog'),
+                deck: document.getElementById('ceflow-choice-deck'),
+                replyBox: document.getElementById('ceflow-reply-box'),
+                feedback: document.getElementById('ceflow-feedback'),
+                power: document.getElementById('ceflow-power-card'),
+                blueprint: document.getElementById('ceflow-blueprint'),
+                retry: document.getElementById('ceflow-retry'),
+                next: document.getElementById('ceflow-next-scene')
+            };
+            renderComicEngineLoadError(els, 'Comic Engine Flow נכשל באתחול. לחצו "טען מחדש".');
+        });
+}
+
+async function setupComicEngine2({ force = false } = {}) {
+    const root = document.getElementById('comicEngine');
+    if (!root) return;
+    const bootState = String(root.dataset.ceflowBootState || '').trim();
+    if (!force && (bootState === 'loading' || bootState === 'ready')) return;
+    root.dataset.ceflowBootState = 'loading';
+
     const els = {
-        root: document.getElementById('comicEngine'),
+        root,
         infoBtn: document.getElementById('ceflow-info-btn'),
         floatingNote: document.getElementById('ceflow-floating-note'),
         domain: document.getElementById('ceflow-domain'),
@@ -15087,7 +15149,10 @@ async function setupComicEngine2() {
         openBlueprintInner: document.getElementById('ceflow-open-blueprint-inner'),
         next: document.getElementById('ceflow-next-scene')
     };
-    if (!els.root || !els.deck || !els.dialog) return;
+    if (!els.root || !els.deck || !els.dialog) {
+        root.dataset.ceflowBootState = 'error';
+        return;
+    }
 
     let payload = null;
     try {
@@ -15096,13 +15161,15 @@ async function setupComicEngine2() {
         payload = deepNormalizeUiPayload(await response.json());
     } catch (error) {
         console.error('Cannot load data/comic-scenarios.json', error);
-        els.root.innerHTML = '<p>שגיאה בטעינת סצנות קומיקס.</p>';
+        root.dataset.ceflowBootState = 'error';
+        renderComicEngineLoadError(els, 'שגיאה בטעינת סצנות קומיקס. בדקו חיבור רשת ונסו שוב.');
         return;
     }
 
     const scenarios = Array.isArray(payload?.scenarios) ? payload.scenarios.map(ceflowNormScenario).filter(Boolean) : [];
     if (!scenarios.length) {
-        els.root.innerHTML = '<p>לא נמצאו סצנות קומיקס להצגה.</p>';
+        root.dataset.ceflowBootState = 'error';
+        renderComicEngineLoadError(els, 'לא נמצאו סצנות קומיקס להצגה.');
         return;
     }
 
@@ -15221,8 +15288,28 @@ async function setupComicEngine2() {
         const draw = (slot, ch) => {
             if (!slot) return;
             const safeName = escapeHtml(ch?.name || 'דמות');
-            const art = ch?.sprite ? `<img src="${escapeHtml(ch.sprite)}" alt="${safeName}" loading="lazy">` : '<div class="ceflow-avatar-fallback">🙂</div>';
-            slot.innerHTML = `<div class="ceflow-character-inner"><div class="ceflow-character-art">${art}</div><p class="ceflow-character-name">${safeName}</p></div>`;
+            const safeSprite = String(ch?.sprite || '').trim();
+            if (safeSprite) {
+                slot.innerHTML = `
+                    <div class="ceflow-character-inner">
+                        <div class="ceflow-character-art">
+                            <img data-ceflow-avatar-img="1" src="${escapeHtml(safeSprite)}" alt="${safeName}" loading="lazy">
+                            <div class="ceflow-avatar-fallback hidden">🙂</div>
+                        </div>
+                        <p class="ceflow-character-name">${safeName}</p>
+                    </div>
+                `;
+                const image = slot.querySelector('img[data-ceflow-avatar-img="1"]');
+                const fallback = slot.querySelector('.ceflow-avatar-fallback');
+                if (image && fallback) {
+                    image.addEventListener('error', () => {
+                        image.remove();
+                        fallback.classList.remove('hidden');
+                    }, { once: true });
+                }
+                return;
+            }
+            slot.innerHTML = `<div class="ceflow-character-inner"><div class="ceflow-character-art"><div class="ceflow-avatar-fallback">🙂</div></div><p class="ceflow-character-name">${safeName}</p></div>`;
         };
         draw(els.left, scenario?.characters?.left);
         draw(els.right, scenario?.characters?.right);
@@ -15237,6 +15324,13 @@ async function setupComicEngine2() {
         }
         if (state.userReply) lines.push({ speaker: 'right', text: state.userReply, role: 'reply' });
         if (state.generatedInfo) lines.push({ speaker: 'left', text: state.generatedInfo, role: 'new-info' });
+        if (!lines.length) {
+            lines.push({
+                speaker: 'left',
+                text: 'לא נטענו שורות דיאלוג לסצנה זו. אפשר ללחוץ "נסה שוב" או "טען מחדש".',
+                role: 'counter'
+            });
+        }
 
         els.dialog.innerHTML = lines.map((line) => `
             <article class="ceflow-bubble is-${line.speaker === 'right' ? 'right' : 'left'} ${line.role ? `is-${escapeHtml(line.role)}` : ''}">
@@ -15264,8 +15358,18 @@ async function setupComicEngine2() {
 
     const renderDeck = () => {
         const scenario = currentScenario();
+        const choices = Array.isArray(scenario?.choices) ? scenario.choices : [];
+        if (!choices.length) {
+            els.deck.innerHTML = `
+                <button type="button" class="ceflow-choice ceflow-tone-good" data-ceflow-reload="1" aria-label="טען מחדש את הסצנה">
+                    <span class="ceflow-choice-top"><strong>🔄 טען מחדש</strong></span>
+                    <span class="ceflow-choice-line">לא נמצאו אפשרויות תגובה כרגע.</span>
+                </button>
+            `;
+            return;
+        }
         const locked = state.flowState !== CEFLOW_STATES.SCENE_READY;
-        els.deck.innerHTML = (scenario?.choices || []).map(choice => {
+        els.deck.innerHTML = choices.map(choice => {
             const selected = state.selectedChoice?.id === choice.id;
             const icon = choice.badge ? `<img src="${escapeHtml(choice.badge)}" alt="${escapeHtml(choice.label)}" loading="lazy">` : '';
             return `
@@ -15365,7 +15469,11 @@ async function setupComicEngine2() {
         if (els.progress) els.progress.textContent = `סצנה ${state.index + 1}/${scenarios.length}`;
         if (els.level) els.level.textContent = `רמה: ${scenario.level}`;
         if (els.title) els.title.textContent = scenario.title;
-        renderGlobalComicStrip('comic-engine', scenario);
+        try {
+            renderGlobalComicStrip('comic-engine', scenario);
+        } catch (error) {
+            console.warn('Comic strip render failed in Comic Engine Flow:', error);
+        }
     };
 
     const render = () => {
@@ -15443,6 +15551,11 @@ async function setupComicEngine2() {
     };
 
     els.deck?.addEventListener('click', (event) => {
+        const reloadBtn = event.target.closest('button[data-ceflow-reload]');
+        if (reloadBtn) {
+            ensureComicEngineFlowReady({ force: true });
+            return;
+        }
         const button = event.target.closest('button[data-choice-id]');
         if (!button) return;
         choose(button.getAttribute('data-choice-id'));
@@ -15490,8 +15603,15 @@ async function setupComicEngine2() {
         render();
     });
 
-    setMode(state.mode, false);
-    render();
+    try {
+        setMode(state.mode, false);
+        render();
+        root.dataset.ceflowBootState = 'ready';
+    } catch (error) {
+        root.dataset.ceflowBootState = 'error';
+        console.error('Comic Engine Flow render failure:', error);
+        renderComicEngineLoadError(els, 'Comic Engine Flow נתקע בזמן ציור המסך. לחצו "טען מחדש".');
+    }
 }
 
 // ==================== WRINKLE REVEAL FLOW (OVERRIDE) ===================
