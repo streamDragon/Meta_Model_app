@@ -103,15 +103,23 @@ let audioState = {
     muted: false,
     openingPlayed: false,
     openingTrack: null,
+    musicTracks: new Map(),
+    musicSnippetTimer: null,
+    musicLastSource: '',
+    musicAutoplayPending: false,
     firstEntryDone: false,
     audioArmed: false,
     audioArmBound: false,
     uiCompressor: null,
     uiMasterGain: null,
+    activeUiNodes: new Set(),
+    uiSafetyStopTimer: null,
     lastUiSoundAtMs: 0,
     lastUiSoundByKind: Object.create(null),
     lastGlobalTapAtMs: 0,
-    globalInteractionBound: false
+    globalInteractionBound: false,
+    floatingControlsBound: false,
+    audioSafetyBound: false
 };
 
 const OPENED_CONTENT_ATTR_NAMES = Object.freeze(['class', 'style', 'hidden', 'open', 'aria-hidden', 'aria-expanded']);
@@ -129,8 +137,14 @@ let revealFeedbackState = {
     visibilityMap: new WeakMap()
 };
 
-const OPENING_TRACK_SRC = 'assets/audio/The_Inner_Task.mp3';
+const MUSIC_TRACK_SOURCES = Object.freeze([
+    'assets/audio/the-flawed-map.mp3',
+    'assets/audio/alchemy-of-thought.mp3',
+    'assets/audio/mind-alchemy.mp3'
+]);
+const MUSIC_SNIPPET_DURATION_MS = 30000;
 const OPENING_TRACK_FIRST_ENTRY_KEY = 'meta_opening_track_first_entry_done';
+const AUDIO_FLOATING_CONTROLS_POSITION_KEY = 'meta_audio_controls_positions_v1';
 const UI_SOUND_GAIN_BOOST = 1.45;
 const UI_SOUND_GAIN_LIMIT = 0.12;
 const UI_SOUND_KIND_COOLDOWNS_MS = Object.freeze({
@@ -392,20 +406,64 @@ function ensureUiSoundOutput(ctx) {
     }
 }
 
-function ensureOpeningTrack() {
-    if (audioState.openingTrack) return audioState.openingTrack;
+function pickRandomMusicSource(excludingSource = '') {
+    const candidates = MUSIC_TRACK_SOURCES.filter((src) => src !== excludingSource);
+    const pool = candidates.length ? candidates : MUSIC_TRACK_SOURCES;
+    if (!pool.length) return '';
+    const index = Math.floor(Math.random() * pool.length);
+    return pool[index] || '';
+}
+
+function ensureOpeningTrack(requestedSource = '') {
+    const source = String(requestedSource || '').trim() || pickRandomMusicSource(audioState.musicLastSource);
+    if (!source) return null;
+
+    const cachedTrack = audioState.musicTracks.get(source);
+    if (cachedTrack) {
+        audioState.openingTrack = cachedTrack;
+        return cachedTrack;
+    }
+
     try {
-        const track = new Audio(OPENING_TRACK_SRC);
+        const track = new Audio(source);
         track.preload = 'auto';
         track.loop = false;
+        track.dataset.musicSource = source;
         track.addEventListener('play', updateMusicToggleButtonUI);
         track.addEventListener('pause', updateMusicToggleButtonUI);
-        track.addEventListener('ended', updateMusicToggleButtonUI);
+        track.addEventListener('ended', () => {
+            clearMusicSnippetTimer();
+            if (audioState.openingTrack === track) {
+                audioState.openingTrack = null;
+            }
+            updateMusicToggleButtonUI();
+        });
+        audioState.musicTracks.set(source, track);
         audioState.openingTrack = track;
         return track;
-    } catch (e) {
+    } catch (_error) {
         return null;
     }
+}
+
+function clearMusicSnippetTimer() {
+    if (!audioState.musicSnippetTimer) return;
+    clearTimeout(audioState.musicSnippetTimer);
+    audioState.musicSnippetTimer = null;
+}
+
+function scheduleMusicSnippetStop(track) {
+    clearMusicSnippetTimer();
+    if (!track) return;
+    audioState.musicSnippetTimer = setTimeout(() => {
+        if (track.paused) return;
+        track.pause();
+        track.currentTime = 0;
+        if (audioState.openingTrack === track) {
+            audioState.openingTrack = null;
+        }
+        updateMusicToggleButtonUI();
+    }, MUSIC_SNIPPET_DURATION_MS);
 }
 
 function isOpeningTrackPlaying() {
@@ -418,27 +476,213 @@ function updateMusicToggleButtonUI() {
     if (!btn) return;
 
     if (audioState.muted) {
-        btn.textContent = '🔇';
-        btn.setAttribute('aria-label', 'Enable audio and play opening music');
-        btn.setAttribute('title', 'Enable audio and play opening music');
+        btn.innerHTML = '<span class="audio-fab-icon">🔇</span><span class="audio-fab-label">מיוט</span>';
+        btn.setAttribute('aria-label', 'בטל מיוט ונגן שיר אקראי ל-30 שניות');
+        btn.setAttribute('title', 'בטל מיוט ונגן שיר אקראי ל-30 שניות');
         btn.classList.add('is-muted');
         btn.classList.remove('is-playing');
         return;
     }
 
     if (isOpeningTrackPlaying()) {
-        btn.textContent = '⏹';
-        btn.setAttribute('aria-label', 'Stop opening music');
-        btn.setAttribute('title', 'Stop opening music');
+        btn.innerHTML = '<span class="audio-fab-icon">⏹</span><span class="audio-fab-label">עצור</span>';
+        btn.setAttribute('aria-label', 'עצור שיר');
+        btn.setAttribute('title', 'עצור שיר');
         btn.classList.add('is-playing');
         btn.classList.remove('is-muted');
         return;
     }
 
-    btn.textContent = '🎵';
-    btn.setAttribute('aria-label', 'Play opening music');
-    btn.setAttribute('title', 'Play opening music');
+    btn.innerHTML = '<span class="audio-fab-icon">🎵</span><span class="audio-fab-label">רנדום</span>';
+    btn.setAttribute('aria-label', 'נגן שיר אקראי ל-30 שניות');
+    btn.setAttribute('title', 'נגן שיר אקראי ל-30 שניות');
     btn.classList.remove('is-playing', 'is-muted');
+}
+
+function updateFloatingMuteButtonUI() {
+    const btn = document.getElementById('audio-master-mute-btn');
+    if (!btn) return;
+    if (audioState.muted) {
+        btn.innerHTML = '<span class="audio-fab-icon">🔇</span><span class="audio-fab-label">MUTE</span>';
+        btn.setAttribute('aria-label', 'הפעל סאונד');
+        btn.setAttribute('title', 'הפעל סאונד');
+        btn.classList.add('is-muted');
+        btn.classList.remove('is-active');
+        return;
+    }
+
+    btn.innerHTML = '<span class="audio-fab-icon">🔊</span><span class="audio-fab-label">SOUND</span>';
+    btn.setAttribute('aria-label', 'השתק סאונד');
+    btn.setAttribute('title', 'השתק סאונד');
+    btn.classList.add('is-active');
+    btn.classList.remove('is-muted');
+}
+
+function readAudioControlPositions() {
+    try {
+        const raw = localStorage.getItem(AUDIO_FLOATING_CONTROLS_POSITION_KEY);
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch (_error) {
+        return {};
+    }
+}
+
+function writeAudioControlPositions(positions) {
+    try {
+        localStorage.setItem(AUDIO_FLOATING_CONTROLS_POSITION_KEY, JSON.stringify(positions || {}));
+    } catch (_error) {
+        // Ignore storage failures in restricted contexts.
+    }
+}
+
+function clampAudioControlPosition(button, left, top) {
+    if (!button) return { left: 8, top: 8 };
+    const rect = button.getBoundingClientRect();
+    const width = Math.max(42, Math.round(rect.width || button.offsetWidth || 58));
+    const height = Math.max(42, Math.round(rect.height || button.offsetHeight || 58));
+    const maxLeft = Math.max(8, window.innerWidth - width - 8);
+    const maxTop = Math.max(8, window.innerHeight - height - 8);
+    return {
+        left: Math.min(maxLeft, Math.max(8, Math.round(Number(left) || 8))),
+        top: Math.min(maxTop, Math.max(8, Math.round(Number(top) || 8)))
+    };
+}
+
+function applyStoredAudioControlPosition(button, key) {
+    if (!button || !key) return;
+    const positions = readAudioControlPositions();
+    const saved = positions[key];
+    if (!saved || !Number.isFinite(Number(saved.left)) || !Number.isFinite(Number(saved.top))) return;
+    const clamped = clampAudioControlPosition(button, saved.left, saved.top);
+    button.style.left = `${clamped.left}px`;
+    button.style.top = `${clamped.top}px`;
+    button.style.right = 'auto';
+    button.style.bottom = 'auto';
+}
+
+function persistAudioControlPosition(key, left, top) {
+    if (!key) return;
+    const positions = readAudioControlPositions();
+    positions[key] = { left: Math.round(left), top: Math.round(top) };
+    writeAudioControlPositions(positions);
+}
+
+function bindAudioControlDrag(button, key) {
+    if (!button || !key || button.dataset.dragBound === 'true') return;
+    button.dataset.dragBound = 'true';
+
+    applyStoredAudioControlPosition(button, key);
+
+    const drag = {
+        active: false,
+        pointerId: null,
+        startX: 0,
+        startY: 0,
+        startLeft: 0,
+        startTop: 0,
+        moved: false
+    };
+
+    const suppressClickAfterDrag = () => {
+        button.dataset.dragSuppressClick = 'true';
+        setTimeout(() => {
+            if (button.dataset.dragSuppressClick === 'true') {
+                button.dataset.dragSuppressClick = 'false';
+            }
+        }, 180);
+    };
+
+    const finishDrag = () => {
+        if (!drag.active) return;
+        drag.active = false;
+        button.classList.remove('is-dragging');
+        if (drag.pointerId !== null && typeof button.releasePointerCapture === 'function') {
+            try {
+                button.releasePointerCapture(drag.pointerId);
+            } catch (_error) {}
+        }
+        if (drag.moved) {
+            const rect = button.getBoundingClientRect();
+            const clamped = clampAudioControlPosition(button, rect.left, rect.top);
+            button.style.left = `${clamped.left}px`;
+            button.style.top = `${clamped.top}px`;
+            button.style.right = 'auto';
+            button.style.bottom = 'auto';
+            persistAudioControlPosition(key, clamped.left, clamped.top);
+            suppressClickAfterDrag();
+        }
+        drag.pointerId = null;
+        drag.moved = false;
+    };
+
+    button.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0) return;
+        drag.active = true;
+        drag.pointerId = event.pointerId;
+        drag.startX = event.clientX;
+        drag.startY = event.clientY;
+        const rect = button.getBoundingClientRect();
+        drag.startLeft = rect.left;
+        drag.startTop = rect.top;
+        drag.moved = false;
+        button.classList.add('is-dragging');
+        if (typeof button.setPointerCapture === 'function') {
+            try {
+                button.setPointerCapture(event.pointerId);
+            } catch (_error) {}
+        }
+    });
+
+    button.addEventListener('pointermove', (event) => {
+        if (!drag.active || event.pointerId !== drag.pointerId) return;
+        const dx = event.clientX - drag.startX;
+        const dy = event.clientY - drag.startY;
+        if (!drag.moved && ((Math.abs(dx) > 4) || (Math.abs(dy) > 4))) {
+            drag.moved = true;
+        }
+        if (!drag.moved) return;
+        const clamped = clampAudioControlPosition(button, drag.startLeft + dx, drag.startTop + dy);
+        button.style.left = `${clamped.left}px`;
+        button.style.top = `${clamped.top}px`;
+        button.style.right = 'auto';
+        button.style.bottom = 'auto';
+    });
+
+    button.addEventListener('pointerup', finishDrag);
+    button.addEventListener('pointercancel', finishDrag);
+    button.addEventListener('lostpointercapture', finishDrag);
+
+    button.addEventListener('click', (event) => {
+        if (button.dataset.dragSuppressClick === 'true') {
+            button.dataset.dragSuppressClick = 'false';
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }, true);
+}
+
+function setupFloatingAudioControls() {
+    if (audioState.floatingControlsBound) return;
+    audioState.floatingControlsBound = true;
+
+    const remapOnResize = () => {
+        ['music-toggle-btn', 'audio-master-mute-btn'].forEach((id) => {
+            const button = document.getElementById(id);
+            if (!button) return;
+            const rect = button.getBoundingClientRect();
+            if (!Number.isFinite(rect.left) || !Number.isFinite(rect.top)) return;
+            if (button.style.left === '' || button.style.top === '') return;
+            const clamped = clampAudioControlPosition(button, rect.left, rect.top);
+            button.style.left = `${clamped.left}px`;
+            button.style.top = `${clamped.top}px`;
+            const storageKey = id === 'music-toggle-btn' ? 'music' : 'mute';
+            persistAudioControlPosition(storageKey, clamped.left, clamped.top);
+        });
+    };
+
+    window.addEventListener('resize', remapOnResize, { passive: true });
 }
 
 function setupMusicToggleButton() {
@@ -446,9 +690,9 @@ function setupMusicToggleButton() {
     if (!btn) {
         btn = document.createElement('button');
         btn.id = 'music-toggle-btn';
-        btn.className = 'music-toggle-btn';
+        btn.className = 'music-toggle-btn audio-fab audio-floating-control';
         btn.type = 'button';
-        btn.textContent = '🎵';
+        btn.setAttribute('data-ui-sound', 'off');
         document.body.appendChild(btn);
     }
 
@@ -456,7 +700,6 @@ function setupMusicToggleButton() {
         btn.dataset.audioBound = 'true';
         btn.addEventListener('click', async () => {
             armAudioFromUserInteraction();
-            ensureAudioContext();
             if (audioState.muted) setMutedAudio(false);
             if (isOpeningTrackPlaying()) {
                 stopOpeningMusic(true);
@@ -466,19 +709,35 @@ function setupMusicToggleButton() {
         });
     }
 
+    bindAudioControlDrag(btn, 'music');
+    setupFloatingAudioControls();
     updateMusicToggleButtonUI();
 }
 
-function updateMuteButtonUI() {
-    const btns = document.querySelectorAll('.audio-mute-btn');
-    if (!btns.length) {
-        updateMusicToggleButtonUI();
-        return;
+function ensureFloatingMuteButton() {
+    let btn = document.getElementById('audio-master-mute-btn');
+    if (!btn) {
+        btn = document.createElement('button');
+        btn.id = 'audio-master-mute-btn';
+        btn.className = 'audio-mute-btn audio-master-mute-btn audio-fab audio-floating-control';
+        btn.type = 'button';
+        btn.setAttribute('data-ui-sound', 'off');
+        document.body.appendChild(btn);
     }
-    btns.forEach(btn => {
+    bindAudioControlDrag(btn, 'mute');
+    setupFloatingAudioControls();
+    return btn;
+}
+
+function updateMuteButtonUI() {
+    ensureFloatingMuteButton();
+    const btns = document.querySelectorAll('.audio-mute-btn');
+    btns.forEach((btn) => {
+        if (btn.id === 'audio-master-mute-btn') return;
         btn.textContent = audioState.muted ? 'סאונד כבוי' : 'סאונד פעיל';
         btn.classList.toggle('is-muted', audioState.muted);
     });
+    updateFloatingMuteButtonUI();
     updateMusicToggleButtonUI();
 }
 
@@ -489,9 +748,9 @@ function setMutedAudio(isMuted) {
     } catch (_error) {
         // Ignore storage failures (common in restricted iframe/privacy contexts).
     }
-    if (isMuted && audioState.openingTrack && !audioState.openingTrack.paused) {
-        audioState.openingTrack.pause();
-        audioState.openingTrack.currentTime = 0;
+    if (isMuted) {
+        stopOpeningMusic(true);
+        stopAllUiSounds();
     }
     updateMuteButtonUI();
 }
@@ -501,13 +760,47 @@ function toggleAudioMute() {
 }
 
 function setupAudioMuteButtons() {
+    ensureFloatingMuteButton();
     const btns = document.querySelectorAll('.audio-mute-btn');
-    btns.forEach(btn => {
+    btns.forEach((btn) => {
         if (btn.dataset.audioBound === 'true') return;
         btn.dataset.audioBound = 'true';
         btn.addEventListener('click', toggleAudioMute);
     });
     updateMuteButtonUI();
+}
+
+function clearUiSoundSafetyTimer() {
+    if (!audioState.uiSafetyStopTimer) return;
+    clearTimeout(audioState.uiSafetyStopTimer);
+    audioState.uiSafetyStopTimer = null;
+}
+
+function stopAllUiSounds() {
+    clearUiSoundSafetyTimer();
+    audioState.activeUiNodes.forEach((node) => {
+        if (!node) return;
+        if (typeof node.stop === 'function') {
+            try {
+                node.stop();
+            } catch (_error) {
+                // Node may already be stopped.
+            }
+        }
+        if (typeof node.disconnect === 'function') {
+            try {
+                node.disconnect();
+            } catch (_error) {}
+        }
+    });
+    audioState.activeUiNodes.clear();
+}
+
+function scheduleUiSoundSafetyStop() {
+    clearUiSoundSafetyTimer();
+    audioState.uiSafetyStopTimer = setTimeout(() => {
+        stopAllUiSounds();
+    }, 1500);
 }
 
 function playTone(frequency, duration = 0.12, type = 'sine', volume = 0.05, delay = 0) {
@@ -522,6 +815,19 @@ function playTone(frequency, duration = 0.12, type = 'sine', volume = 0.05, dela
     const output = ensureUiSoundOutput(ctx) || ctx.destination;
     osc.connect(gain);
     gain.connect(output);
+    audioState.activeUiNodes.add(osc);
+    audioState.activeUiNodes.add(gain);
+
+    const cleanup = () => {
+        audioState.activeUiNodes.delete(osc);
+        audioState.activeUiNodes.delete(gain);
+        try {
+            osc.disconnect();
+        } catch (_error) {}
+        try {
+            gain.disconnect();
+        } catch (_error) {}
+    };
 
     osc.frequency.value = frequency;
     osc.type = type;
@@ -531,8 +837,14 @@ function playTone(frequency, duration = 0.12, type = 'sine', volume = 0.05, dela
     gain.gain.exponentialRampToValueAtTime(boostedVolume, now + 0.008);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
-    osc.start(now);
-    osc.stop(now + duration + 0.01);
+    osc.addEventListener('ended', cleanup, { once: true });
+
+    try {
+        osc.start(now);
+        osc.stop(now + duration + 0.01);
+    } catch (_error) {
+        cleanup();
+    }
 }
 
 function playUISound(kind) {
@@ -649,6 +961,7 @@ function playUISound(kind) {
         playTone(700, 0.06, 'triangle', 0.03, 0.05);
         playTone(860, 0.08, 'triangle', 0.03, 0.11);
     }
+    scheduleUiSoundSafetyStop();
 }
 
 function prefersReducedMotion() {
@@ -1095,26 +1408,34 @@ function setupGlobalRevealFeedback() {
 }
 
 function stopOpeningMusic(resetToStart = false) {
-    const track = audioState.openingTrack;
-    if (!track) return;
-    if (!track.paused) track.pause();
-    if (resetToStart) track.currentTime = 0;
+    clearMusicSnippetTimer();
+    audioState.musicTracks.forEach((track) => {
+        if (!track) return;
+        if (!track.paused) track.pause();
+        if (resetToStart) track.currentTime = 0;
+    });
+    if (resetToStart) {
+        audioState.openingTrack = null;
+    }
     updateMusicToggleButtonUI();
 }
 
-// Play opening track once on first entry, or manually via the music button.
-async function playOpeningMusic({ force = false, markFirstEntry = false } = {}) {
-    if ((audioState.muted && !force) || (audioState.openingPlayed && !force)) return false;
-    if (!audioState.audioArmed) {
-        if (!force) return false;
-        armAudioFromUserInteraction();
-    }
+async function playOpeningMusic({ force = false, markFirstEntry = false, source = '' } = {}) {
+    if (audioState.muted && !force) return false;
+    const selectedSource = String(source || '').trim() || pickRandomMusicSource(audioState.musicLastSource);
+    if (!selectedSource) return false;
+
     try {
-        const track = ensureOpeningTrack();
+        const track = ensureOpeningTrack(selectedSource);
         if (!track) return false;
+        stopOpeningMusic(true);
+        audioState.openingTrack = track;
         track.currentTime = 0;
         await track.play();
         audioState.openingPlayed = true;
+        audioState.musicLastSource = selectedSource;
+        audioState.musicAutoplayPending = false;
+        scheduleMusicSnippetStop(track);
         if (markFirstEntry) {
             audioState.firstEntryDone = true;
             try {
@@ -1126,36 +1447,64 @@ async function playOpeningMusic({ force = false, markFirstEntry = false } = {}) 
         updateMusicToggleButtonUI();
         return true;
     } catch (e) {
-        // Autoplay may fail until the first user interaction.
+        if (!audioState.muted) {
+            audioState.musicAutoplayPending = true;
+        }
         updateMusicToggleButtonUI();
         return false;
     }
 }
 
 function setupOpeningMusicOnFirstEntry() {
-    if (isEmbeddedRuntimeContext()) {
-        // In embedded contexts, generic clicks should not start a long music track.
+    if (audioState.muted) {
         updateMusicToggleButtonUI();
         return;
     }
 
-    if (audioState.firstEntryDone || audioState.muted) {
-        updateMusicToggleButtonUI();
-        return;
-    }
+    // Try autoplay on startup; when the browser blocks autoplay we retry on first interaction.
+    playOpeningMusic({ force: true, markFirstEntry: true });
 
     const onFirstInteraction = () => {
         document.removeEventListener('pointerdown', onFirstInteraction, true);
         document.removeEventListener('keydown', onFirstInteraction, true);
         document.removeEventListener('touchstart', onFirstInteraction, true);
+        if (audioState.muted) return;
+        if (!audioState.musicAutoplayPending && isOpeningTrackPlaying()) return;
         armAudioFromUserInteraction();
-        playOpeningMusic({ markFirstEntry: true });
+        playOpeningMusic({ force: true, markFirstEntry: true });
     };
 
-    // Browsers block autoplay before interaction; arm and play only after a user gesture.
     document.addEventListener('pointerdown', onFirstInteraction, { once: true, capture: true });
     document.addEventListener('keydown', onFirstInteraction, { once: true, capture: true });
     document.addEventListener('touchstart', onFirstInteraction, { once: true, capture: true, passive: true });
+}
+
+function setupGlobalAudioSafety() {
+    if (audioState.audioSafetyBound) return;
+    audioState.audioSafetyBound = true;
+
+    const stopTransientAudio = (resetTrack = false) => {
+        stopAllUiSounds();
+        stopOpeningMusic(resetTrack);
+    };
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopTransientAudio(false);
+        }
+    });
+
+    window.addEventListener('blur', () => {
+        stopTransientAudio(false);
+    });
+
+    window.addEventListener('pagehide', () => {
+        stopTransientAudio(true);
+    });
+
+    window.addEventListener('beforeunload', () => {
+        stopTransientAudio(true);
+    });
 }
 
 // Hide Splash Screen
@@ -3542,6 +3891,7 @@ function initializeMetaModelApp() {
     setupAudioInteractionArm();
     setupAudioMuteButtons();
     setupMusicToggleButton();
+    setupGlobalAudioSafety();
     setupOpeningMusicOnFirstEntry();
     
     // Hide splash after animation
@@ -3611,7 +3961,8 @@ function resetLocalUiState() {
         PRACTICE_ACTIVE_TAB_STORAGE_KEY,
         'header_density_v1',
         'meta_audio_muted',
-        OPENING_TRACK_FIRST_ENTRY_KEY
+        OPENING_TRACK_FIRST_ENTRY_KEY,
+        AUDIO_FLOATING_CONTROLS_POSITION_KEY
     ];
     let cleared = 0;
     keysToClear.forEach((key) => {
