@@ -1,4 +1,4 @@
-// Global Variables
+﻿// Global Variables
 let metaModelData = {};
 let practiceCount = 0;
 let currentStatementIndex = 0;
@@ -1936,6 +1936,18 @@ function setupGlobalFeatureMenuDropdown() {
     const openBtn = menuBox.querySelector('[data-global-feature-menu-open]');
     if (!select || !openBtn) return;
 
+    const resolveTabFeatureTitle = (tabId = '', fallbackLabel = '') => {
+        const safeTabId = String(tabId || '').trim();
+        const fallback = String(fallbackLabel || '').trim();
+        if (!safeTabId || safeTabId === 'home') return fallback;
+        const section = document.getElementById(safeTabId);
+        if (!section) return fallback;
+        const heading = section.querySelector('[data-feature-title], h2, h3');
+        const headingText = normalizeUiText(String(heading?.textContent || '').replace(/\s+/g, ' ').trim());
+        if (!headingText || looksLikeMojibakeText(headingText)) return fallback;
+        return headingText;
+    };
+
     const entries = [];
     const seenKeys = new Set();
     const labelOverrides = Object.freeze({
@@ -1943,7 +1955,7 @@ function setupGlobalFeatureMenuDropdown() {
         'tab:scenario-trainer': 'סימולטור סצנות (Execution)',
         'tab:comic-engine': 'Comic Engine · תגובות/מהלכים',
         'tab:categories': 'קטגוריות (ברין)',
-        'tab:practice-question': 'תרגול שאלות',
+        'tab:practice-question': 'תרגול זיהוי Meta-Model',
         'tab:practice-radar': 'Meta Radar',
         'tab:practice-triples-radar': 'Triples Radar (Breen)',
         'tab:practice-wizard': 'כמתים נסתרים · הגשר שנסגר',
@@ -2017,7 +2029,8 @@ function setupGlobalFeatureMenuDropdown() {
     };
     const pushEntry = (entry) => {
         if (!entry || !entry.key || seenKeys.has(entry.key)) return;
-        const resolvedLabel = normalizeUiText(labelOverrides[entry.key] || entry.label || '').trim();
+        const isTabEntry = String(entry.key || '').startsWith('tab:');
+        const resolvedLabel = normalizeUiText((isTabEntry ? entry.label : labelOverrides[entry.key]) || entry.label || '').trim();
         if (!resolvedLabel) return;
         seenKeys.add(entry.key);
         entries.push({
@@ -2029,7 +2042,8 @@ function setupGlobalFeatureMenuDropdown() {
 
     Array.from(document.querySelectorAll('.tab-btn')).forEach((btn) => {
         const tabId = String(btn.getAttribute('data-tab') || '').trim();
-        const label = normalizeUiText((btn.textContent || '').trim());
+        const rawLabel = normalizeUiText((btn.textContent || '').trim());
+        const label = resolveTabFeatureTitle(tabId, rawLabel);
         if (!tabId || !label) return;
         pushEntry({
             key: `tab:${tabId}`,
@@ -2453,7 +2467,7 @@ function setupFeatureLauncherTabs() {
     if (!launchers.length) return;
 
     const featureLabelOverrides = Object.freeze({
-        "nav:practice-question": "תרגול שאלות",
+        "nav:practice-question": "תרגול זיהוי Meta-Model",
         "nav:practice-radar": "Meta Radar",
         "nav:practice-wizard": "כמתים נסתרים · גשר השפה",
         "nav:practice-verb-unzip": "פועל לא מפורט",
@@ -2949,6 +2963,7 @@ function initializeMetaModelApp() {
     showLoadingIndicator();
     loadMetaModelData();
     setupTabNavigation();
+    setupFeatureHomeBackButtons();
     setupReadBeforeStartGuides();
     applyInitialTabPreference();
     setupGlobalComicStripActions();
@@ -3110,6 +3125,30 @@ function activateTabByName(tabName = '', { playSound = false, scrollToTop = true
 
     if (playSound) playUISound('next');
     return true;
+}
+
+function setupFeatureHomeBackButtons() {
+    const sections = Array.from(document.querySelectorAll('.tab-content[id]'));
+    if (!sections.length) return;
+
+    sections.forEach((section) => {
+        const tabId = String(section.id || '').trim();
+        if (!tabId || tabId === 'home') return;
+        if (section.querySelector('[data-feature-back-home-btn]')) return;
+
+        const bar = document.createElement('div');
+        bar.className = 'feature-home-back-bar';
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn btn-secondary feature-home-back-btn';
+        button.textContent = 'חזרה למסך הראשי';
+        button.dataset.featureBackHomeBtn = 'true';
+        button.addEventListener('click', () => navigateTo('home'));
+
+        bar.appendChild(button);
+        section.prepend(bar);
+    });
 }
 
 // Setup Tab Navigation
@@ -12614,7 +12653,7 @@ const HOME_TRAINING_PROGRAMS = Object.freeze([
         badge: 'דיוק → תגובה',
         description: 'תרגול בסיסי שמתחיל בזיהוי, עובר למהירות, ומסתיים בתגובה פרקטית.',
         steps: Object.freeze([
-            Object.freeze({ tab: 'practice-question', title: 'תרגול שאלות', note: 'ניסוח שאלה מדויקת למשפט אחד' }),
+            Object.freeze({ tab: 'practice-question', title: 'תרגול זיהוי Meta-Model', note: 'זיהוי סוג ההפרה במשפט אחד' }),
             Object.freeze({ tab: 'practice-radar', title: 'Meta Radar', note: 'סבב זיהוי מהיר בזמן' }),
             Object.freeze({ tab: 'scenario-trainer', title: 'Scenario Trainer', note: 'להפוך דפוס לצעד ביצועי' })
         ])

@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.85" data-build-time="1772219762703" data-build-iso="2026-02-27T19:16:02.703Z" data-git-commit="b19d817">
+﻿<!DOCTYPE html>
+<html lang="he" dir="rtl" data-app-version="1.0.86" data-build-time="1772363564772" data-build-iso="2026-03-01T11:12:44.772Z" data-git-commit="1902d8a">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -264,7 +264,7 @@
             <button class="tab-btn" data-tab="scenario-trainer">סצנות Execution</button>
             <button class="tab-btn" data-tab="comic-engine">Comic Engine</button>
             <button class="tab-btn" data-tab="categories">קטגוריות</button>
-            <button class="tab-btn" data-tab="practice-question">תרגול שאלות</button>
+            <button class="tab-btn" data-tab="practice-question">תרגול זיהוי Meta-Model</button>
             <button class="tab-btn" data-tab="practice-radar">Meta Radar</button>
             <button class="tab-btn" data-tab="practice-triples-radar">Triples Radar</button>
             <button class="tab-btn" data-tab="practice-wizard">גשר תחושה-שפה</button>
@@ -320,7 +320,7 @@
                     <section class="feature-map-card">
                         <h4>כלי תרגול נוספים</h4>
                         <div class="feature-map-links">
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול שאלות</button>
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול זיהוי Meta-Model</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">Meta Radar</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">Blueprint Builder</button>
@@ -404,7 +404,7 @@
 
                 <div class="home-feature-guide">
                     <h3>מפת הפיצ'רים + מה זה “פילוסוף מסך”</h3>
-                    <p>כאן יש הסבר גלוי על מה שיש באתר: תרגול שאלות, Meta Radar, Triples, Prism Lab, סצנות, Blueprint ושאר הכלים. בוחרים כלי אחד, מסיימים סבב, ואז ממשיכים לכלי הבא.</p>
+                    <p>כאן יש הסבר גלוי על מה שיש באתר: תרגול זיהוי Meta-Model, Meta Radar, Triples, Prism Lab, סצנות, Blueprint ושאר הכלים. בוחרים כלי אחד, מסיימים סבב, ואז ממשיכים לכלי הבא.</p>
                     <p><strong>“פילוסוף מסך”</strong> הוא שכבת הסבר שמפרקת את ההיגיון של כל מסך: מה המטרה, למה זה עובד, ואיך לגשת לתרגול צעד-צעד.</p>
                     <p>במסכי התרגול עצמם שמרנו על ממשק נקי יותר, וההסבר המלא מרוכז כאן במסך הבית.</p>
                 </div>
@@ -462,7 +462,7 @@
                                 <p>מתרגלים ניסוח שאלה מדויקת ואז זיהוי מהיר בזמן אמת. זה הופך את הידע לרפלקס במקום להישאר בתיאוריה.</p>
                                 <p class="home-therapy-step-q">שאלת דוגמה: "מה בדיוק?", "לפי מי?", "ביחס למה?"</p>
                                 <div class="home-therapy-step-actions">
-                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול שאלות</button>
+                                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול זיהוי Meta-Model</button>
                                     <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">Meta Radar</button>
                                 </div>
                             </div>
@@ -1083,8 +1083,8 @@
         <section id="practice-question" class="tab-content practice-tab-content">
             <div class="practice-container">
                 <div class="card practice-intro-card">
-                    <h2>תרגול דינאמי 🎮</h2>
-                    <p class="subtitle">דף 1 מתוך 3: בניית שאלות מדויקות על משפטי Meta Model.</p>
+                    <h2>תרגול זיהוי Meta-Model 🎮</h2>
+                    <p class="subtitle">דף 1 מתוך 3: זיהוי הפרות Meta-Model מתוך משפטים טבעיים ומפורטים.</p>
 
                     <div class="practice-filters">
                         <label>בחר קטגוריה:</label>
@@ -1093,7 +1093,7 @@
                         </select>
                     </div>
 
-                    <section class="practice-section practice-section-question" aria-label="Question Drill Section">
+                    <section class="practice-section practice-section-question" aria-label="Meta-Model Recognition Section">
                         <div id="question-drill" class="card question-drill-card">
                             <div class="question-drill-header">
                                 <h3 id="question-drill-main-title">תרגול זיהוי Meta-Model</h3>
@@ -1103,7 +1103,7 @@
                                 <div class="question-drill-session-config">
                                     <div class="question-drill-mode-box">
                                         <span class="question-drill-mode-label">מצב</span>
-                                        <div class="question-drill-mode-switch" role="group" aria-label="בחירת מצב לתרגיל שאלות">
+                                        <div class="question-drill-mode-switch" role="group" aria-label="בחירת מצב לתרגול זיהוי Meta-Model">
                                             <button id="question-drill-mode-learning" type="button" class="question-drill-mode-btn is-active" aria-pressed="true">לימוד</button>
                                             <button id="question-drill-mode-exam" type="button" class="question-drill-mode-btn" aria-pressed="false">מוד מבחן</button>
                                         </div>
@@ -1416,7 +1416,7 @@
             <a class="btn btn-secondary" href="sentence_morpher_trainer.html" data-versioned-href="sentence_morpher_trainer.html">Sentence Morpher</a>
             <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html">Prism Research · חקירת טקסט</a>
             <a class="btn btn-secondary" href="iceberg_templates_trainer.html" data-versioned-href="iceberg_templates_trainer.html">קצה קרחון / שלדי עומק</a>
-            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול שאלות</button>
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול זיהוי Meta-Model</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">Meta Radar</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">Blueprint Builder</button>

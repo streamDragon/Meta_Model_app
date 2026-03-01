@@ -1401,6 +1401,16 @@ body.hide-top-tabbar .mobile-tab-nav {
     display: block;
 }
 
+.feature-home-back-bar {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 12px;
+}
+
+.feature-home-back-btn {
+    white-space: nowrap;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -9684,6 +9694,14 @@ a:hover {
 
     .tab-content {
         padding: 16px calc(12px + var(--safe-right)) calc(20px + var(--safe-bottom)) calc(12px + var(--safe-left));
+    }
+
+    .feature-home-back-bar {
+        margin-bottom: 10px;
+    }
+
+    .feature-home-back-btn {
+        width: 100%;
     }
 
     body.embed-mode .tab-content,
