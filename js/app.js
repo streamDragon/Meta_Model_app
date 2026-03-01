@@ -3944,7 +3944,7 @@ function initializeMetaModelApp() {
     setupBlueprintBuilder();
     setupPrismModule();
     setupScenarioTrainerModule();
-    setupComicEngine2();
+    ensureComicEngineFlowReady({ force: true });
     setupCommunityFeedbackWall();
     initializeProgressHub();
     safeRunUiEnhancement(setupGlobalTheoryLauncher, 'global-theory-launcher');
@@ -4075,6 +4075,9 @@ function activateTabByName(tabName = '', { playSound = false, scrollToTop = true
     ensurePracticeTabHydration(resolvedTab);
     if (resolvedTab === 'practice-verb-unzip') {
         loadUnzipEmbedFrame();
+    }
+    if (resolvedTab === 'comic-engine') {
+        ensureComicEngineFlowReady();
     }
 
     if (resolvedTab !== 'practice-radar') {
