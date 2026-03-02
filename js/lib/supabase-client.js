@@ -9,71 +9,17 @@ function getRuntimeEnv() {
     return window.__META_MODEL_ENV__ || {};
 }
 
-function decodeBase64Url(value) {
-    const normalized = String(value || '').replace(/-/g, '+').replace(/_/g, '/');
-    if (!normalized) return '';
-    const padded = normalized + '='.repeat((4 - (normalized.length % 4 || 4)) % 4);
+function normalizeSupabaseUrl(rawUrl) {
+    const value = String(rawUrl || '').trim();
+    if (!value) return '';
     try {
-        if (typeof atob === 'function') {
-            return decodeURIComponent(Array.prototype.map.call(atob(padded), (char) => (
-                `%${`00${char.charCodeAt(0).toString(16)}`.slice(-2)}`
-            )).join(''));
-        }
-    } catch (_error) {}
-    return '';
-}
-
-function deriveSupabaseOriginFromAnonKey(anonKey) {
-    const token = String(anonKey || '').trim();
-    if (!token) return '';
-    const parts = token.split('.');
-    if (parts.length < 2) return '';
-
-    try {
-        const payloadRaw = decodeBase64Url(parts[1]);
-        if (!payloadRaw) return '';
-        const payload = JSON.parse(payloadRaw);
-        const issuer = String(payload.iss || '').trim();
-        if (!issuer) return '';
-        const issuerUrl = new URL(issuer);
-        const host = String(issuerUrl.hostname || '').trim().toLowerCase();
-        if (!host || !host.includes('supabase.co')) return '';
-        return `${issuerUrl.protocol}//${host}`;
+        const parsed = new URL(value);
+        const protocol = String(parsed.protocol || '').toLowerCase();
+        if (protocol !== 'https:' && protocol !== 'http:') return '';
+        return parsed.origin;
     } catch (_error) {
         return '';
     }
-}
-
-function normalizeProjectHost(host) {
-    const rawHost = String(host || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-    if (!rawHost) return '';
-    if (rawHost.endsWith('.supabase.co')) return rawHost;
-    if (rawHost.endsWith('.pc')) return `${rawHost.slice(0, -3)}.supabase.co`;
-    if (/^[a-z0-9]{20}$/.test(rawHost)) return `${rawHost}.supabase.co`;
-    return rawHost;
-}
-
-function normalizeSupabaseUrl(rawUrl, anonKey) {
-    const directValue = String(rawUrl || '').trim();
-    const fromValue = (() => {
-        if (!directValue) return '';
-        const hasScheme = /^[a-z][a-z0-9+\-.]*:\/\//i.test(directValue);
-        const candidate = hasScheme ? directValue : `https://${directValue.replace(/^\/+/, '')}`;
-        try {
-            const parsed = new URL(candidate);
-            const host = normalizeProjectHost(parsed.hostname);
-            if (!host) return '';
-            return `https://${host}`;
-        } catch (_error) {
-            if (/^[a-z0-9]{20}$/i.test(directValue)) {
-                return `https://${directValue.toLowerCase()}.supabase.co`;
-            }
-            return '';
-        }
-    })();
-
-    if (fromValue) return fromValue;
-    return deriveSupabaseOriginFromAnonKey(anonKey);
 }
 
 function isDebugMode() {
@@ -100,7 +46,7 @@ export function getSupabasePublicConfig() {
     const env = getRuntimeEnv();
     const rawUrl = String(env.VITE_SUPABASE_URL || '').trim();
     const anonKey = String(env.VITE_SUPABASE_ANON_KEY || '').trim();
-    const normalizedUrl = normalizeSupabaseUrl(rawUrl, anonKey);
+    const normalizedUrl = normalizeSupabaseUrl(rawUrl);
     return {
         rawUrl,
         url: normalizedUrl,
