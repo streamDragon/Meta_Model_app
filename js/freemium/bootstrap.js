@@ -2,7 +2,7 @@
     ensureSession,
     onAuthSessionChange,
     getAccessToken,
-    upgradeAnonymousWithEmailPassword,
+    signInWithEmailOtp,
     linkGoogleIdentity,
     switchToGoogleSignIn
 } from './auth-session.js';
@@ -16,10 +16,14 @@ import { createPaywallUi } from './paywall-ui.js';
 import { AdsProvider } from './ads-provider.js';
 
 const STATUS_BAR_ID = 'freemium-status-bar';
+const ERROR_BANNER_ID = 'freemium-error-banner';
 
 const freemiumState = {
     initialized: false,
-    isBusy: false
+    isBusy: false,
+    refreshPromise: null,
+    retryHandler: null,
+    lastAuthUserId: ''
 };
 
 function escapeHtml(value) {
@@ -47,6 +51,30 @@ function meterText(entitlements) {
     return `נותרו ${entitlements.guest_daily_remaining} מתוך ${entitlements.guest_daily_limit} היום`;
 }
 
+function debugLog(...parts) {
+    console.info('[freemium]', ...parts);
+}
+
+function userIdPrefix(session) {
+    const userId = String(session?.user?.id || '').trim();
+    return userId ? userId.slice(0, 8) : '';
+}
+
+function logSessionState(session) {
+    debugLog('session ready=', Boolean(session), 'userPrefix=', userIdPrefix(session));
+}
+
+function logEntitlementsState(entitlements) {
+    if (!entitlements) {
+        debugLog('entitlements missing');
+        return;
+    }
+    const remaining = entitlements.role === 'free'
+        ? entitlements.free_total_remaining
+        : entitlements.guest_daily_remaining;
+    debugLog('entitlements role=', entitlements.role, 'remaining=', remaining);
+}
+
 function ensureStatusBar() {
     let bar = document.getElementById(STATUS_BAR_ID);
     if (bar) return bar;
@@ -69,6 +97,53 @@ function ensureStatusBar() {
 
     document.body.appendChild(bar);
     return bar;
+}
+
+function ensureErrorBanner() {
+    let banner = document.getElementById(ERROR_BANNER_ID);
+    if (banner) return banner;
+
+    banner = document.createElement('div');
+    banner.id = ERROR_BANNER_ID;
+    banner.className = 'freemium-error-banner hidden';
+    banner.innerHTML = `
+        <span class="freemium-error-banner__text" data-freemium-error-text></span>
+        <button type="button" class="freemium-link-btn freemium-error-banner__retry" data-freemium-error-retry>retry</button>
+    `;
+    banner.addEventListener('click', async (event) => {
+        const retryBtn = event.target?.closest?.('[data-freemium-error-retry]');
+        if (!retryBtn || !freemiumState.retryHandler) return;
+        retryBtn.setAttribute('disabled', 'disabled');
+        try {
+            await freemiumState.retryHandler();
+        } finally {
+            retryBtn.removeAttribute('disabled');
+        }
+    });
+    document.body.appendChild(banner);
+    return banner;
+}
+
+function hideEntitlementsError() {
+    const banner = document.getElementById(ERROR_BANNER_ID);
+    if (!banner) return;
+    banner.classList.add('hidden');
+    freemiumState.retryHandler = null;
+}
+
+function showEntitlementsError(error, retryHandler = null) {
+    const banner = ensureErrorBanner();
+    const text = banner.querySelector('[data-freemium-error-text]');
+    const message = String(error?.message || 'Unknown error');
+    if (text) text.textContent = `Entitlements error: ${message}`;
+    banner.classList.remove('hidden');
+    freemiumState.retryHandler = async () => {
+        if (typeof retryHandler === 'function') {
+            await retryHandler();
+            return;
+        }
+        await refreshAll(true);
+    };
 }
 
 function updateStatusBar(entitlements) {
@@ -142,9 +217,8 @@ async function openPortal() {
 }
 
 const paywallUi = createPaywallUi({
-    onEmailUpgrade: async (email, password) => {
-        await upgradeAnonymousWithEmailPassword(email, password);
-        await refreshEntitlements({ force: true });
+    onEmailUpgrade: async (email) => {
+        await signInWithEmailOtp(email);
     },
     onGoogleLink: async () => {
         await linkGoogleIdentity();
@@ -158,11 +232,29 @@ const paywallUi = createPaywallUi({
 });
 
 async function refreshAll(force = false) {
-    await ensureSession();
-    const entitlements = await refreshEntitlements({ force });
-    updateStatusBar(entitlements);
-    AdsProvider.init(entitlements);
-    return entitlements;
+    if (freemiumState.refreshPromise) return freemiumState.refreshPromise;
+
+    freemiumState.refreshPromise = (async () => {
+        const session = await ensureSession();
+        logSessionState(session);
+        const entitlements = await refreshEntitlements({ force });
+        hideEntitlementsError();
+        logEntitlementsState(entitlements);
+        updateStatusBar(entitlements);
+        AdsProvider.init(entitlements);
+        return entitlements;
+    })();
+
+    try {
+        return await freemiumState.refreshPromise;
+    } catch (error) {
+        showEntitlementsError(error, async () => {
+            await refreshAll(true);
+        });
+        throw error;
+    } finally {
+        freemiumState.refreshPromise = null;
+    }
 }
 
 function handleStripeReturn() {
@@ -268,9 +360,17 @@ async function initializeFreemium() {
         bindStatusBarActions();
         bindModalAdsSync();
         exposeApi();
+        ensureStatusBar();
+        ensureErrorBanner();
 
-        onAuthSessionChange(() => {
-            refreshAll(true).catch(() => {});
+        onAuthSessionChange((snapshot) => {
+            if (!snapshot?.ready) return;
+            const nextUserId = String(snapshot?.user?.id || '');
+            if (nextUserId === freemiumState.lastAuthUserId) return;
+            freemiumState.lastAuthUserId = nextUserId;
+            refreshAll(true).catch((error) => {
+                showEntitlementsError(error);
+            });
         });
 
         onEntitlementsChange((entitlements) => {
@@ -283,6 +383,9 @@ async function initializeFreemium() {
         await refreshAll(true);
     } catch (error) {
         console.warn('[freemium] init failed', error);
+        showEntitlementsError(error, async () => {
+            await refreshAll(true);
+        });
         const bar = ensureStatusBar();
         const meter = bar.querySelector('[data-freemium-meter]');
         if (meter) {

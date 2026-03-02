@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.112" data-build-time="1772451548772" data-build-iso="2026-03-02T11:39:08.772Z" data-git-commit="c74c0a8">
+<html lang="he" dir="rtl" data-app-version="1.0.113" data-build-time="1772474860148" data-build-iso="2026-03-02T18:07:40.148Z" data-git-commit="da7939f">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1651,22 +1651,31 @@
                 document.body.appendChild(script);
             }
 
-            function loadFreemiumModule() {
+            function loadFreemiumModule(onReady) {
                 var moduleScript = document.createElement('script');
                 moduleScript.type = 'module';
-                moduleScript.src = withAssetVersion('js/freemium/bootstrap.js');
+                moduleScript.src = withAssetVersion('js/freemium/bootstrap-entry.js');
+                moduleScript.onload = function () {
+                    if (typeof onReady === 'function') onReady();
+                };
+                moduleScript.onerror = function () {
+                    console.error('Failed to load script:', 'js/freemium/bootstrap-entry.js');
+                    if (typeof onReady === 'function') onReady();
+                };
                 document.body.appendChild(moduleScript);
             }
 
             var runtimeEnvScript = document.createElement('script');
             runtimeEnvScript.src = withAssetVersion('js/runtime-env.js');
             runtimeEnvScript.onload = function () {
-                loadFreemiumModule();
-                loadScript(0);
+                loadFreemiumModule(function () {
+                    loadScript(0);
+                });
             };
             runtimeEnvScript.onerror = function () {
-                loadFreemiumModule();
-                loadScript(0);
+                loadFreemiumModule(function () {
+                    loadScript(0);
+                });
             };
             document.body.appendChild(runtimeEnvScript);
         })();

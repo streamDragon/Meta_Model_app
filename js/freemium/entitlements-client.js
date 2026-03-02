@@ -91,7 +91,10 @@ export async function refreshEntitlements(options = {}) {
     await ensureSession();
     const supabase = await getSupabaseClient();
 
-    await supabase.rpc('ensure_profile');
+    const { error: ensureError } = await supabase.rpc('ensure_profile');
+    if (ensureError) {
+        throw new Error(ensureError.message || 'ENSURE_PROFILE_FAILED');
+    }
     const { data, error } = await supabase.rpc('get_entitlements');
     if (error) {
         throw new Error(error.message || 'ENTITLEMENTS_FETCH_FAILED');
@@ -133,4 +136,3 @@ export async function consumeSentence(count = 1) {
         consumed_count: Number(row?.consumed_count || pCount)
     };
 }
-

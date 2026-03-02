@@ -241,7 +241,7 @@
 
         var runtimeScript = document.getElementById('meta-runtime-env-script');
         var ensureBootstrap = function () {
-            ensureExternalScript('meta-freemium-bootstrap', 'js/freemium/bootstrap.js', {
+            ensureExternalScript('meta-freemium-bootstrap', 'js/freemium/bootstrap-entry.js', {
                 type: 'module',
                 defer: true
             });

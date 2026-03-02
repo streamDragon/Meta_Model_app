@@ -91,40 +91,22 @@ export function createPaywallUi(actions = {}) {
     async function runEmailUpgrade(modal) {
         if (modalBusy) return;
         const emailInput = modal.querySelector('[data-freemium-email]');
-        const passwordInput = modal.querySelector('[data-freemium-password]');
         const status = modal.querySelector('[data-freemium-auth-status]');
         const email = String(emailInput?.value || '').trim();
-        const password = String(passwordInput?.value || '');
 
-        if (!email || !password) {
-            if (status) status.textContent = 'יש למלא אימייל וסיסמה.';
+        if (!email) {
+            if (status) status.textContent = 'יש למלא אימייל.';
             return;
         }
 
-        if (status) status.textContent = 'מבצע חיבור...';
+        if (status) status.textContent = 'שולח קישור אימות...';
         setModalBusy(modal, true);
         try {
-            await actions.onEmailUpgrade?.(email, password);
+            await actions.onEmailUpgrade?.(email);
             closeModal();
-            showToast('החשבון שודרג לחינם וההתקדמות נשמרה ✅', 'success');
+            showToast('נשלח קישור התחברות למייל ✅', 'success');
         } catch (error) {
-            const code = String(error?.code || '');
-            if (code === 'IDENTITY_ALREADY_EXISTS') {
-                if (status) {
-                    status.innerHTML = 'החשבון הזה כבר קיים. <button type="button" class="freemium-link-btn" data-freemium-switch-existing>להתחבר אליו במקום?</button>';
-                }
-                const switchBtn = modal.querySelector('[data-freemium-switch-existing]');
-                switchBtn?.addEventListener('click', async () => {
-                    try {
-                        await actions.onSwitchToExisting?.();
-                    } catch (_switchError) {
-                        if (status) status.textContent = 'לא הצלחנו לעבור לחשבון הקיים כרגע.';
-                    }
-                });
-                setModalBusy(modal, false);
-                return;
-            }
-            if (status) status.textContent = 'לא הצלחנו להשלים את החיבור כרגע.';
+            if (status) status.textContent = String(error?.message || 'לא הצלחנו לשלוח קישור אימות כרגע.');
             setModalBusy(modal, false);
         }
     }
@@ -138,12 +120,8 @@ export function createPaywallUi(actions = {}) {
                 אימייל
                 <input type="email" data-freemium-email placeholder="name@example.com" dir="ltr" />
             </label>
-            <label class="freemium-field">
-                סיסמה
-                <input type="password" data-freemium-password placeholder="••••••••" dir="ltr" />
-            </label>
             <div class="freemium-modal-actions">
-                <button type="button" class="freemium-btn freemium-btn-primary" data-freemium-email-upgrade>התחבר בחינם</button>
+                <button type="button" class="freemium-btn freemium-btn-primary" data-freemium-email-upgrade>שלח קישור במייל</button>
                 <button type="button" class="freemium-btn freemium-btn-secondary" data-freemium-google-link>התחבר עם Google</button>
             </div>
             <p class="freemium-auth-status" data-freemium-auth-status></p>

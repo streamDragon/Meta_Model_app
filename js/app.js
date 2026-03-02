@@ -259,6 +259,10 @@ function getNavHrefFeatureKey(navKey, fallbackPath = '') {
     return toHrefFeatureKeyFromPath(getGlobalNavPathByKey(navKey, fallbackPath));
 }
 
+function normalizeText(value) {
+    return String(value == null ? '' : value).trim();
+}
+
 async function gateSentenceConsumption(options = {}) {
     const api = window.MetaFreemium;
     if (!api || typeof api.consumeSentenceOrPrompt !== 'function') return true;

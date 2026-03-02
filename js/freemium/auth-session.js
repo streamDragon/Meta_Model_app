@@ -2,7 +2,10 @@ import { getSupabaseClient, isAnonymousUser, isSupabaseConfigured } from '../lib
 
 const authRuntime = {
     listenerBound: false,
-    syncing: false,
+    ensurePromise: null,
+    autoAnonAttempted: false,
+    oauthInFlight: false,
+    otpInFlight: false,
     state: {
         ready: false,
         session: null,
@@ -173,54 +176,65 @@ export async function ensureSession() {
         return null;
     }
 
-    if (authRuntime.syncing) return authRuntime.state.session;
-    authRuntime.syncing = true;
-    try {
-        await bindAuthListener();
-        const supabase = await getSupabaseClient();
-        const { data, error } = await supabase.auth.getSession();
-        if (error) throw error;
+    if (authRuntime.ensurePromise) return authRuntime.ensurePromise;
 
-        if (data?.session) {
-            applySessionSnapshot(data.session, '');
-            return data.session;
-        }
+    authRuntime.ensurePromise = (async () => {
+        try {
+            await bindAuthListener();
+            const supabase = await getSupabaseClient();
+            const { data, error } = await supabase.auth.getSession();
+            if (error) throw error;
 
-        if (hasAuthCallbackParams()) {
-            const callbackSession = await waitForCallbackSession(supabase);
-            if (callbackSession) {
-                applySessionSnapshot(callbackSession, '');
-                return callbackSession;
+            if (data?.session) {
+                applySessionSnapshot(data.session, '');
+                return data.session;
             }
 
-            const callbackError = readAuthCallbackError();
-            if (callbackError) {
-                setAuthState({
-                    ready: true,
-                    session: null,
-                    user: null,
-                    roleHint: 'guest',
-                    isGuest: true,
-                    error: callbackError.message
-                });
+            if (hasAuthCallbackParams()) {
+                const callbackSession = await waitForCallbackSession(supabase);
+                if (callbackSession) {
+                    applySessionSnapshot(callbackSession, '');
+                    return callbackSession;
+                }
+
+                const callbackError = readAuthCallbackError();
+                if (callbackError) {
+                    setAuthState({
+                        ready: true,
+                        session: null,
+                        user: null,
+                        roleHint: 'guest',
+                        isGuest: true,
+                        error: callbackError.message
+                    });
+                    return null;
+                }
+            }
+
+            // Auto anon sign-in should run once per page load to avoid signup spam loops.
+            if (authRuntime.autoAnonAttempted) {
+                applySessionSnapshot(null, '');
                 return null;
             }
+            authRuntime.autoAnonAttempted = true;
+            const anonRes = await supabase.auth.signInAnonymously();
+            if (anonRes.error) throw anonRes.error;
+            const nextSession = anonRes.data?.session || null;
+            applySessionSnapshot(nextSession, '');
+            return nextSession;
+        } catch (error) {
+            const normalized = toCodeError(error, 'AUTH_SESSION_INIT_FAILED');
+            setAuthState({
+                ready: true,
+                error: normalized.message
+            });
+            throw normalized;
+        } finally {
+            authRuntime.ensurePromise = null;
         }
+    })();
 
-        const anonRes = await supabase.auth.signInAnonymously();
-        if (anonRes.error) throw anonRes.error;
-        applySessionSnapshot(anonRes.data?.session || null, '');
-        return anonRes.data?.session || null;
-    } catch (error) {
-        const normalized = toCodeError(error, 'AUTH_SESSION_INIT_FAILED');
-        setAuthState({
-            ready: true,
-            error: normalized.message
-        });
-        throw normalized;
-    } finally {
-        authRuntime.syncing = false;
-    }
+    return authRuntime.ensurePromise;
 }
 
 export async function getAccessToken() {
@@ -298,17 +312,23 @@ export async function switchToGoogleSignIn() {
     if (!isSupabaseConfigured()) {
         throw toCodeError({ message: 'SUPABASE_CONFIG_MISSING' }, 'SUPABASE_CONFIG_MISSING');
     }
+    if (authRuntime.oauthInFlight) return;
+    authRuntime.oauthInFlight = true;
     const supabase = await getSupabaseClient();
-    await supabase.auth.signOut({ scope: 'local' });
-    const redirectTo = buildStableRedirectUrl({ auth_switch: 'google' });
-    const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-            redirectTo,
-            queryParams: { prompt: 'select_account' }
-        }
-    });
-    if (error) throw toCodeError(error, 'GOOGLE_SIGNIN_FAILED');
+    try {
+        await supabase.auth.signOut({ scope: 'local' });
+        const redirectTo = buildStableRedirectUrl({ auth_switch: 'google' });
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo,
+                queryParams: { prompt: 'select_account' }
+            }
+        });
+        if (error) throw toCodeError(error, 'GOOGLE_SIGNIN_FAILED');
+    } finally {
+        authRuntime.oauthInFlight = false;
+    }
 }
 
 export async function signOutNonGuest() {
@@ -319,5 +339,32 @@ export async function signOutNonGuest() {
     const supabase = await getSupabaseClient();
     const { error } = await supabase.auth.signOut({ scope: 'local' });
     if (error) throw toCodeError(error, 'SIGNOUT_FAILED');
+    authRuntime.autoAnonAttempted = false;
     applySessionSnapshot(null, '');
+}
+
+export async function signInWithEmailOtp(email) {
+    const cleanEmail = String(email || '').trim().toLowerCase();
+    if (!cleanEmail) {
+        throw toCodeError({ message: 'EMAIL_MISSING' }, 'EMAIL_MISSING');
+    }
+    if (!isSupabaseConfigured()) {
+        throw toCodeError({ message: 'SUPABASE_CONFIG_MISSING' }, 'SUPABASE_CONFIG_MISSING');
+    }
+    if (authRuntime.otpInFlight) return { sent: false };
+    authRuntime.otpInFlight = true;
+    try {
+        const supabase = await getSupabaseClient();
+        const redirectTo = buildStableRedirectUrl({ auth_switch: 'email' });
+        const { error } = await supabase.auth.signInWithOtp({
+            email: cleanEmail,
+            options: {
+                emailRedirectTo: redirectTo
+            }
+        });
+        if (error) throw toCodeError(error, 'EMAIL_OTP_FAILED');
+        return { sent: true };
+    } finally {
+        authRuntime.otpInFlight = false;
+    }
 }
