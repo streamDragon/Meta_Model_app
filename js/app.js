@@ -260,7 +260,11 @@ function getNavHrefFeatureKey(navKey, fallbackPath = '') {
 }
 
 function normalizeText(value) {
-    return String(value == null ? '' : value).trim();
+    return (value ?? '').toString().trim();
+}
+
+if (typeof window !== 'undefined' && typeof window.normalizeText !== 'function') {
+    window.normalizeText = normalizeText;
 }
 
 async function gateSentenceConsumption(options = {}) {
