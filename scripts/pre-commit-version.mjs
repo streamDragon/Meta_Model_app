@@ -77,7 +77,7 @@ function run() {
     console.log('pre-commit: syncing version metadata into app entry files...');
     runCmd(NODE_CMD, ['scripts/sync-entry.mjs']);
 
-    runCmd('git', ['add', '-f', 'package.json', 'package-lock.json', 'index.html', 'index2.html', 'version.json']);
+    runCmd('git', ['add', '-f', 'package.json', 'package-lock.json', 'index.html', 'index2.html', 'version.json', 'js/runtime-env.js']);
 }
 
 run();
