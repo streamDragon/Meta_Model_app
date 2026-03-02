@@ -17922,7 +17922,10 @@ function setupWrinkleGame() {
 }
 
 const CONNECTED_BUBBLES_CASES_URLS = Object.freeze([
-    '/data/connectedBubblesCases_he.json'
+    '/data/connectedBubblesCases_he.json',
+    '/data/connectedBubblesCases.he.json',
+    '/data/connected-bubbles-cases.json',
+    '/src/data/connectedBubblesCases.he.json'
 ]);
 const CONNECTED_BUBBLES_INTRO_SECONDS = 10;
 const CONNECTED_BUBBLES_STOPWORDS = new Set([
@@ -18688,7 +18691,8 @@ async function setupConnectedBubblesTrainer() {
         let loaded = [];
         for (const url of CONNECTED_BUBBLES_CASES_URLS) {
             try {
-                const response = await fetch(url, { cache: 'no-store' });
+                const requestUrl = resolveVersionedAssetPath(url);
+                const response = await fetch(requestUrl, { cache: 'no-store' });
                 if (!response.ok) continue;
                 const payload = await response.json();
                 if (Array.isArray(payload) && payload.length) {

@@ -1,4 +1,4 @@
-import { cp, copyFile } from 'node:fs/promises';
+import { cp, copyFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 
 const ROOT = process.cwd();
@@ -7,6 +7,7 @@ const STATIC_DIRS = ['assets', 'data', 'js', 'css', 'auth'];
 const STATIC_FILES = [
   'package.json',
   'version.json',
+  'src/data/connectedBubblesCases.he.json',
   'index2.html',
   'verb_unzip_trainer.html',
   'classic_classic_trainer.html',
@@ -27,6 +28,7 @@ async function copyStaticDir(dirName) {
 async function copyStaticFile(fileName) {
   const from = path.join(ROOT, fileName);
   const to = path.join(DIST_DIR, fileName);
+  await mkdir(path.dirname(to), { recursive: true });
   await copyFile(from, to);
 }
 
