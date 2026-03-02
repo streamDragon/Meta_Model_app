@@ -2,7 +2,6 @@ const SUPABASE_JS_CDN = 'https://esm.sh/@supabase/supabase-js@2';
 
 let cachedClient = null;
 let cachedCreateClient = null;
-let configLogDone = false;
 
 function getRuntimeEnv() {
     if (typeof window === 'undefined') return {};
@@ -20,26 +19,6 @@ function normalizeSupabaseUrl(rawUrl) {
     } catch (_error) {
         return '';
     }
-}
-
-function isDebugMode() {
-    if (typeof window === 'undefined') return false;
-    const host = String(window.location?.hostname || '').toLowerCase();
-    if (host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local')) return true;
-    try {
-        const search = new URLSearchParams(window.location?.search || '');
-        if (search.get('debug_supabase') === '1') return true;
-    } catch (_error) {}
-    const env = getRuntimeEnv();
-    return String(env.APP_VERSION || '').trim().toLowerCase() === 'dev';
-}
-
-function logConfig(cfg) {
-    if (configLogDone || !isDebugMode()) return;
-    configLogDone = true;
-    const key = String(cfg?.anonKey || '');
-    const keyPrefix = key ? key.slice(0, 16) : '';
-    console.info('[Supabase] url=', cfg?.url || '', 'keyPrefix=', keyPrefix);
 }
 
 export function getSupabasePublicConfig() {
@@ -76,7 +55,6 @@ async function loadCreateClient() {
 export async function getSupabaseClient() {
     if (cachedClient) return cachedClient;
     const cfg = getSupabasePublicConfig();
-    logConfig(cfg);
     if (!cfg.url || !cfg.anonKey) {
         throw new Error('SUPABASE_CONFIG_MISSING');
     }
