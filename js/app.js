@@ -17922,8 +17922,7 @@ function setupWrinkleGame() {
 }
 
 const CONNECTED_BUBBLES_CASES_URLS = Object.freeze([
-    'src/data/connectedBubblesCases.he.json',
-    'data/connected-bubbles-cases.json'
+    '/data/connectedBubblesCases_he.json'
 ]);
 const CONNECTED_BUBBLES_INTRO_SECONDS = 10;
 const CONNECTED_BUBBLES_STOPWORDS = new Set([

@@ -209,6 +209,13 @@
   font-size: 0.86rem;
 }
 
+.freemium-auth-note {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
 .freemium-toast-root {
   position: fixed;
   bottom: 16px;
@@ -230,6 +237,33 @@
 .freemium-toast--success { background: #059669; }
 .freemium-toast--warn { background: #b45309; }
 .freemium-toast--info { background: #2563eb; }
+
+.freemium-toast--action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.freemium-toast__text {
+  flex: 1;
+}
+
+.freemium-toast__retry {
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: transparent;
+  color: #ffffff;
+  border-radius: 8px;
+  min-height: 30px;
+  padding: 0 10px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.freemium-toast__retry[disabled] {
+  opacity: 0.65;
+  cursor: default;
+}
 
 .freemium-toast.is-hiding {
   opacity: 0;

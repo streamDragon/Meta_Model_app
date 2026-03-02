@@ -21,6 +21,20 @@ function normalizeSupabaseUrl(rawUrl) {
     }
 }
 
+function normalizePublicSiteUrl(rawUrl) {
+    const value = String(rawUrl || '').trim();
+    if (!value) return '';
+    if (!/^https:\/\//i.test(value)) return '';
+    try {
+        const parsed = new URL(value);
+        if (String(parsed.protocol || '').toLowerCase() !== 'https:') return '';
+        const normalizedPath = String(parsed.pathname || '').replace(/\/+$/, '');
+        return `${parsed.origin}${normalizedPath}`;
+    } catch (_error) {
+        return '';
+    }
+}
+
 export function getSupabasePublicConfig() {
     const env = getRuntimeEnv();
     const rawUrl = String(env.VITE_SUPABASE_URL || '').trim();
@@ -31,6 +45,11 @@ export function getSupabasePublicConfig() {
         url: normalizedUrl,
         anonKey
     };
+}
+
+export function getPublicSiteUrl() {
+    const env = getRuntimeEnv();
+    return normalizePublicSiteUrl(env.VITE_PUBLIC_SITE_URL);
 }
 
 export function isSupabaseConfigured() {

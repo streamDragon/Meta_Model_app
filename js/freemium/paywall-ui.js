@@ -77,15 +77,53 @@ export function createPaywallUi(actions = {}) {
         }
     }
 
+    function dismissToastLater(toast, durationMs = 3200) {
+        setTimeout(() => {
+            toast.classList.add('is-hiding');
+            setTimeout(() => toast.remove(), 280);
+        }, Math.max(900, Number(durationMs) || 3200));
+    }
+
     function showToast(text, tone = 'info', durationMs = 3200) {
         const root = ensureToastRoot();
         const toast = createElement('div', `freemium-toast freemium-toast--${tone}`);
         toast.textContent = text;
         root.appendChild(toast);
-        setTimeout(() => {
-            toast.classList.add('is-hiding');
-            setTimeout(() => toast.remove(), 280);
-        }, Math.max(900, Number(durationMs) || 3200));
+        dismissToastLater(toast, durationMs);
+    }
+
+    function showRetryToast(text, onRetry, tone = 'warn', durationMs = 5200) {
+        const root = ensureToastRoot();
+        const toast = createElement('div', `freemium-toast freemium-toast--${tone} freemium-toast--action`);
+        const message = createElement('span', 'freemium-toast__text');
+        const retryBtn = createElement('button', 'freemium-toast__retry');
+
+        message.textContent = text;
+        retryBtn.type = 'button';
+        retryBtn.textContent = 'Retry';
+        retryBtn.addEventListener('click', async () => {
+            retryBtn.disabled = true;
+            try {
+                await onRetry?.();
+                toast.remove();
+            } catch (_error) {
+                retryBtn.disabled = false;
+            }
+        });
+
+        toast.appendChild(message);
+        toast.appendChild(retryBtn);
+        root.appendChild(toast);
+        dismissToastLater(toast, durationMs);
+    }
+
+    function mapGoogleSignInError(error) {
+        const code = String(error?.code || '').trim().toUpperCase();
+        if (code === 'GOOGLE_PROVIDER_DISABLED') return 'Google לא פעיל כרגע במערכת. נסו התחברות באימייל.';
+        if (code === 'INVALID_REDIRECT_URL' || code === 'PUBLIC_SITE_URL_INVALID') {
+            return 'כתובת החזרה של Google לא תקינה כרגע. נסו שוב עוד רגע.';
+        }
+        return 'התחברות עם Google נכשלה כרגע.';
     }
 
     async function runEmailUpgrade(modal) {
@@ -124,61 +162,29 @@ export function createPaywallUi(actions = {}) {
                 <button type="button" class="freemium-btn freemium-btn-primary" data-freemium-email-upgrade>שלח קישור במייל</button>
                 <button type="button" class="freemium-btn freemium-btn-secondary" data-freemium-google-link>התחבר עם Google</button>
             </div>
+            <p class="freemium-auth-note">Google לא פועל כרגע אם אתה מחובר כאורח? אנחנו משדרגים אותך אוטומטית לחשבון Google.</p>
             <p class="freemium-auth-status" data-freemium-auth-status></p>
         `, (modal) => {
-            modal.querySelector('[data-freemium-close]')?.addEventListener('click', closeModal);
-            modal.querySelector('[data-freemium-email-upgrade]')?.addEventListener('click', () => runEmailUpgrade(modal));
-            modal.querySelector('[data-freemium-google-link]')?.addEventListener('click', async () => {
+            const runGoogleSignIn = async () => {
                 if (modalBusy) return;
                 const status = modal.querySelector('[data-freemium-auth-status]');
                 if (status) status.textContent = 'מעביר ל-Google...';
                 setModalBusy(modal, true);
                 try {
-                    await actions.onGoogleLink?.();
+                    await actions.onGoogleSignIn?.();
                 } catch (error) {
-                    const code = String(error?.code || '');
-                    if (code === 'IDENTITY_ALREADY_EXISTS') {
-                        if (status) {
-                            status.innerHTML = 'החשבון הזה כבר קיים. <button type="button" class="freemium-link-btn" data-freemium-switch-existing>להתחבר אליו במקום?</button>';
-                        }
-                        const switchBtn = modal.querySelector('[data-freemium-switch-existing]');
-                        switchBtn?.addEventListener('click', async () => {
-                            try {
-                                await actions.onSwitchToExisting?.();
-                            } catch (_switchError) {
-                                if (status) status.textContent = 'לא הצלחנו לעבור לחשבון הקיים כרגע.';
-                            }
-                        });
-                        setModalBusy(modal, false);
-                    } else if (code === 'MANUAL_LINKING_DISABLED') {
-                        if (status) {
-                            status.textContent = 'קישור Google לא זמין כרגע. נעביר להתחברות Google רגילה.';
-                        }
-                        try {
-                            await actions.onSwitchToExisting?.();
-                            return;
-                        } catch (_switchError) {
-                            if (status) status.textContent = 'לא הצלחנו לעבור להתחברות Google רגילה.';
-                        }
-                        setModalBusy(modal, false);
-                    } else if (code === 'GOOGLE_PROVIDER_DISABLED') {
-                        if (status) status.textContent = 'Google לא פעיל כרגע במערכת. נסו התחברות באימייל.';
-                        setModalBusy(modal, false);
-                    } else if (code === 'INVALID_REDIRECT_URL') {
-                        if (status) status.textContent = 'כתובת החזרה של Google לא תקינה כרגע. נסו שוב עוד רגע.';
-                        setModalBusy(modal, false);
-                    } else {
-                        if (status) status.textContent = 'קישור Google נכשל. עוברים להתחברות Google רגילה...';
-                        try {
-                            await actions.onSwitchToExisting?.();
-                            return;
-                        } catch (_switchError) {
-                            if (status) status.textContent = 'לא הצלחנו להתחבר ל-Google כרגע.';
-                        }
-                        setModalBusy(modal, false);
-                    }
+                    const message = mapGoogleSignInError(error);
+                    if (status) status.textContent = message;
+                    setModalBusy(modal, false);
+                    showRetryToast(`${message} לחצו Retry כדי לנסות שוב.`, async () => {
+                        await runGoogleSignIn();
+                    }, 'warn');
                 }
-            });
+            };
+
+            modal.querySelector('[data-freemium-close]')?.addEventListener('click', closeModal);
+            modal.querySelector('[data-freemium-email-upgrade]')?.addEventListener('click', () => runEmailUpgrade(modal));
+            modal.querySelector('[data-freemium-google-link]')?.addEventListener('click', runGoogleSignIn);
         });
     }
 

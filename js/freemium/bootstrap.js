@@ -3,7 +3,6 @@
     onAuthSessionChange,
     getAccessToken,
     signInWithEmailOtp,
-    linkGoogleIdentity,
     switchToGoogleSignIn
 } from './auth-session.js';
 import {
@@ -55,30 +54,6 @@ function meterText(entitlements) {
         return `נותרו ${entitlements.free_total_remaining} מתוך ${entitlements.free_total_limit}`;
     }
     return `נותרו ${entitlements.guest_daily_remaining} מתוך ${entitlements.guest_daily_limit} היום`;
-}
-
-function debugLog(...parts) {
-    console.info('[freemium]', ...parts);
-}
-
-function userIdPrefix(session) {
-    const userId = String(session?.user?.id || '').trim();
-    return userId ? userId.slice(0, 8) : '';
-}
-
-function logSessionState(session) {
-    debugLog('session ready=', Boolean(session), 'userPrefix=', userIdPrefix(session));
-}
-
-function logEntitlementsState(entitlements) {
-    if (!entitlements) {
-        debugLog('entitlements missing');
-        return;
-    }
-    const remaining = entitlements.role === 'free'
-        ? entitlements.free_total_remaining
-        : entitlements.guest_daily_remaining;
-    debugLog('entitlements role=', entitlements.role, 'remaining=', remaining);
 }
 
 function ensureStatusBar() {
@@ -253,10 +228,7 @@ const paywallUi = createPaywallUi({
     onEmailUpgrade: async (email) => {
         await signInWithEmailOtp(email);
     },
-    onGoogleLink: async () => {
-        await linkGoogleIdentity();
-    },
-    onSwitchToExisting: async () => {
+    onGoogleSignIn: async () => {
         await switchToGoogleSignIn();
     },
     onCheckoutPlan: async (plan) => {
@@ -269,10 +241,8 @@ async function refreshAll(force = false) {
 
     freemiumState.refreshPromise = (async () => {
         const session = await ensureSession();
-        logSessionState(session);
         const entitlements = await refreshEntitlements({ force });
         hideEntitlementsError();
-        logEntitlementsState(entitlements);
         updateStatusBar(entitlements);
         AdsProvider.init(entitlements);
         if (session?.user) {

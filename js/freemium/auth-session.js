@@ -1,4 +1,4 @@
-import { getSupabaseClient, isAnonymousUser, isSupabaseConfigured } from '../lib/supabase-client.js';
+import { getPublicSiteUrl, getSupabaseClient, isAnonymousUser, isSupabaseConfigured } from '../lib/supabase-client.js';
 
 const authRuntime = {
     listenerBound: false,
@@ -72,6 +72,8 @@ function toCodeError(error, fallbackCode) {
         derivedCode = 'GOOGLE_PROVIDER_DISABLED';
     } else if (normalizedMessage.includes('redirect') && normalizedMessage.includes('not allowed')) {
         derivedCode = 'INVALID_REDIRECT_URL';
+    } else if (normalizedMessage.includes('public_site_url') || normalizedMessage.includes('public site url')) {
+        derivedCode = 'PUBLIC_SITE_URL_INVALID';
     }
 
     return {
@@ -79,6 +81,14 @@ function toCodeError(error, fallbackCode) {
         message,
         raw: err
     };
+}
+
+function buildGoogleCallbackRedirectUrl() {
+    const publicSiteUrl = getPublicSiteUrl();
+    if (!publicSiteUrl) {
+        throw toCodeError({ message: 'PUBLIC_SITE_URL_INVALID' }, 'PUBLIC_SITE_URL_INVALID');
+    }
+    return `${publicSiteUrl}/auth/callback`;
 }
 
 function getAuthUrlParams() {
@@ -261,7 +271,7 @@ export async function linkGoogleIdentity() {
     if (!user) throw toCodeError({ message: 'NO_ACTIVE_USER' }, 'NO_ACTIVE_USER');
 
     const supabase = await getSupabaseClient();
-    const redirectTo = buildStableRedirectUrl({ auth_link: 'google' });
+    const redirectTo = buildGoogleCallbackRedirectUrl();
 
     if (typeof supabase.auth?.linkIdentity !== 'function') {
         throw toCodeError({ message: 'LINK_IDENTITY_UNSUPPORTED' }, 'LINK_IDENTITY_UNSUPPORTED');
@@ -293,10 +303,19 @@ export async function switchToGoogleSignIn() {
     }
     if (authRuntime.oauthInFlight) return;
     authRuntime.oauthInFlight = true;
-    const supabase = await getSupabaseClient();
     try {
-        await supabase.auth.signOut({ scope: 'local' });
-        const redirectTo = buildStableRedirectUrl({ auth_switch: 'google' });
+        const session = await ensureSession();
+        const user = session?.user || null;
+        const supabase = await getSupabaseClient();
+
+        if (normalizeGuestFlag(user)) {
+            const { error: signOutError } = await supabase.auth.signOut();
+            if (signOutError) throw toCodeError(signOutError, 'SIGNOUT_FAILED');
+            console.info('[auth] signed out guest');
+        }
+
+        const redirectTo = buildGoogleCallbackRedirectUrl();
+        console.info('[auth] starting google oauth');
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {

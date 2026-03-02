@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 const DIST_DIR = path.join(ROOT, 'dist');
-const STATIC_DIRS = ['assets', 'data', 'js', 'css'];
+const STATIC_DIRS = ['assets', 'data', 'js', 'css', 'auth'];
 const STATIC_FILES = [
   'package.json',
   'version.json',
