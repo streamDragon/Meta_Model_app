@@ -66,6 +66,10 @@
   display: none !important;
 }
 
+body.freemium-modal-open {
+  overflow: hidden !important;
+}
+
 .freemium-overlay {
   position: fixed;
   inset: 0;
@@ -87,6 +91,10 @@
   gap: 12px;
   position: relative;
   direction: rtl;
+}
+
+.freemium-modal.is-busy {
+  opacity: 0.96;
 }
 
 .freemium-modal h3 {

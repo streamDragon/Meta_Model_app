@@ -54,11 +54,73 @@ function applySessionSnapshot(session, errorText = '') {
 function toCodeError(error, fallbackCode) {
     const err = error || {};
     const message = String(err.message || err.error_description || fallbackCode || 'AUTH_ERROR');
+    const normalizedMessage = message.toLowerCase();
+    let derivedCode = String(err.code || fallbackCode || 'AUTH_ERROR');
+
+    if (normalizedMessage.includes('manual') && normalizedMessage.includes('link')) {
+        derivedCode = 'MANUAL_LINKING_DISABLED';
+    } else if (normalizedMessage.includes('already') || normalizedMessage.includes('linked')) {
+        derivedCode = 'IDENTITY_ALREADY_EXISTS';
+    } else if (
+        normalizedMessage.includes('provider is not enabled') ||
+        normalizedMessage.includes('unsupported provider') ||
+        normalizedMessage.includes('provider disabled')
+    ) {
+        derivedCode = 'GOOGLE_PROVIDER_DISABLED';
+    } else if (normalizedMessage.includes('redirect') && normalizedMessage.includes('not allowed')) {
+        derivedCode = 'INVALID_REDIRECT_URL';
+    }
+
     return {
-        code: String(err.code || fallbackCode || 'AUTH_ERROR'),
+        code: derivedCode,
         message,
         raw: err
     };
+}
+
+function getAuthUrlParams() {
+    if (typeof window === 'undefined') return new URLSearchParams();
+    const merged = new URLSearchParams(window.location.search || '');
+    const hash = String(window.location.hash || '');
+    if (hash.startsWith('#')) {
+        const hashParams = new URLSearchParams(hash.slice(1));
+        hashParams.forEach((value, key) => {
+            if (!merged.has(key)) merged.set(key, value);
+        });
+    }
+    return merged;
+}
+
+function hasAuthCallbackParams() {
+    const params = getAuthUrlParams();
+    return (
+        params.has('code') ||
+        params.has('access_token') ||
+        params.has('refresh_token') ||
+        params.has('error') ||
+        params.has('error_code')
+    );
+}
+
+function readAuthCallbackError() {
+    const params = getAuthUrlParams();
+    const message = String(params.get('error_description') || params.get('error') || '').trim();
+    const code = String(params.get('error_code') || '').trim();
+    if (!message && !code) return null;
+    return {
+        code: code || 'AUTH_CALLBACK_FAILED',
+        message: message || code || 'AUTH_CALLBACK_FAILED'
+    };
+}
+
+async function waitForCallbackSession(supabase, retries = 14, waitMs = 220) {
+    for (let i = 0; i < retries; i += 1) {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        if (data?.session) return data.session;
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+    }
+    return null;
 }
 
 async function bindAuthListener() {
@@ -105,6 +167,27 @@ export async function ensureSession() {
         if (data?.session) {
             applySessionSnapshot(data.session, '');
             return data.session;
+        }
+
+        if (hasAuthCallbackParams()) {
+            const callbackSession = await waitForCallbackSession(supabase);
+            if (callbackSession) {
+                applySessionSnapshot(callbackSession, '');
+                return callbackSession;
+            }
+
+            const callbackError = readAuthCallbackError();
+            if (callbackError) {
+                setAuthState({
+                    ready: true,
+                    session: null,
+                    user: null,
+                    roleHint: 'guest',
+                    isGuest: true,
+                    error: callbackError.message
+                });
+                return null;
+            }
         }
 
         const anonRes = await supabase.auth.signInAnonymously();
@@ -170,20 +253,30 @@ export async function linkGoogleIdentity() {
     const supabase = await getSupabaseClient();
     const redirectTo = new URL(window.location.href);
     redirectTo.searchParams.set('auth_link', 'google');
+    redirectTo.searchParams.delete('stripe');
+    redirectTo.searchParams.delete('session_id');
+
+    if (typeof supabase.auth?.linkIdentity !== 'function') {
+        throw toCodeError({ message: 'LINK_IDENTITY_UNSUPPORTED' }, 'LINK_IDENTITY_UNSUPPORTED');
+    }
 
     const { data, error } = await supabase.auth.linkIdentity({
         provider: 'google',
         options: {
-            redirectTo: redirectTo.toString()
+            redirectTo: redirectTo.toString(),
+            queryParams: { prompt: 'select_account' },
+            skipBrowserRedirect: true
         }
     });
     if (error) {
-        const message = String(error.message || '').toLowerCase();
-        if (message.includes('already') || message.includes('linked')) {
-            throw toCodeError(error, 'IDENTITY_ALREADY_EXISTS');
-        }
         throw toCodeError(error, 'GOOGLE_LINK_FAILED');
     }
+
+    const targetUrl = String(data?.url || '').trim();
+    if (!targetUrl) {
+        throw toCodeError({ message: 'GOOGLE_REDIRECT_URL_MISSING' }, 'GOOGLE_REDIRECT_URL_MISSING');
+    }
+    window.location.assign(targetUrl);
     return data || {};
 }
 
@@ -212,4 +305,3 @@ export async function signOutNonGuest() {
     if (error) throw toCodeError(error, 'SIGNOUT_FAILED');
     applySessionSnapshot(null, '');
 }
-

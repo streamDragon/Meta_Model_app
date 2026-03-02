@@ -16,6 +16,17 @@ function escapeHtml(value) {
 export function createPaywallUi(actions = {}) {
     let overlay = null;
     let toastRoot = null;
+    let modalBusy = false;
+
+    function setModalBusy(modal, busy) {
+        modalBusy = Boolean(busy);
+        if (!modal) return;
+        modal.classList.toggle('is-busy', modalBusy);
+        modal.querySelectorAll('.freemium-btn, .freemium-link-btn, input').forEach((el) => {
+            if (el.hasAttribute('data-freemium-close')) return;
+            el.disabled = modalBusy;
+        });
+    }
 
     function emitModalState(isOpen) {
         try {
@@ -48,6 +59,7 @@ export function createPaywallUi(actions = {}) {
         overlay.classList.add('hidden');
         const modal = overlay.querySelector('.freemium-modal');
         if (modal) modal.innerHTML = '';
+        modalBusy = false;
         document.body.classList.remove('freemium-modal-open');
         emitModalState(false);
     }
@@ -77,6 +89,7 @@ export function createPaywallUi(actions = {}) {
     }
 
     async function runEmailUpgrade(modal) {
+        if (modalBusy) return;
         const emailInput = modal.querySelector('[data-freemium-email]');
         const passwordInput = modal.querySelector('[data-freemium-password]');
         const status = modal.querySelector('[data-freemium-auth-status]');
@@ -89,6 +102,7 @@ export function createPaywallUi(actions = {}) {
         }
 
         if (status) status.textContent = 'מבצע חיבור...';
+        setModalBusy(modal, true);
         try {
             await actions.onEmailUpgrade?.(email, password);
             closeModal();
@@ -107,9 +121,11 @@ export function createPaywallUi(actions = {}) {
                         if (status) status.textContent = 'לא הצלחנו לעבור לחשבון הקיים כרגע.';
                     }
                 });
+                setModalBusy(modal, false);
                 return;
             }
             if (status) status.textContent = 'לא הצלחנו להשלים את החיבור כרגע.';
+            setModalBusy(modal, false);
         }
     }
 
@@ -135,8 +151,10 @@ export function createPaywallUi(actions = {}) {
             modal.querySelector('[data-freemium-close]')?.addEventListener('click', closeModal);
             modal.querySelector('[data-freemium-email-upgrade]')?.addEventListener('click', () => runEmailUpgrade(modal));
             modal.querySelector('[data-freemium-google-link]')?.addEventListener('click', async () => {
+                if (modalBusy) return;
                 const status = modal.querySelector('[data-freemium-auth-status]');
                 if (status) status.textContent = 'מעביר ל-Google...';
+                setModalBusy(modal, true);
                 try {
                     await actions.onGoogleLink?.();
                 } catch (error) {
@@ -153,8 +171,27 @@ export function createPaywallUi(actions = {}) {
                                 if (status) status.textContent = 'לא הצלחנו לעבור לחשבון הקיים כרגע.';
                             }
                         });
+                        setModalBusy(modal, false);
+                    } else if (code === 'MANUAL_LINKING_DISABLED') {
+                        if (status) {
+                            status.textContent = 'קישור Google לא זמין כרגע. נעביר להתחברות Google רגילה.';
+                        }
+                        try {
+                            await actions.onSwitchToExisting?.();
+                            return;
+                        } catch (_switchError) {
+                            if (status) status.textContent = 'לא הצלחנו לעבור להתחברות Google רגילה.';
+                        }
+                        setModalBusy(modal, false);
+                    } else if (code === 'GOOGLE_PROVIDER_DISABLED') {
+                        if (status) status.textContent = 'Google לא פעיל כרגע במערכת. נסו התחברות באימייל.';
+                        setModalBusy(modal, false);
+                    } else if (code === 'INVALID_REDIRECT_URL') {
+                        if (status) status.textContent = 'כתובת החזרה של Google לא תקינה כרגע. נסו שוב עוד רגע.';
+                        setModalBusy(modal, false);
                     } else if (status) {
                         status.textContent = 'לא הצלחנו להתחבר ל-Google כרגע.';
+                        setModalBusy(modal, false);
                     }
                 }
             });
@@ -179,12 +216,15 @@ export function createPaywallUi(actions = {}) {
 
     function bindCheckoutAction(modal, selector, plan) {
         modal.querySelector(selector)?.addEventListener('click', async () => {
+            if (modalBusy) return;
             const status = modal.querySelector('[data-freemium-auth-status]');
             if (status) status.textContent = 'פותח תשלום...';
+            setModalBusy(modal, true);
             try {
                 await actions.onCheckoutPlan?.(plan);
             } catch (_error) {
                 if (status) status.textContent = 'לא הצלחנו לפתוח את תהליך התשלום כרגע.';
+                setModalBusy(modal, false);
             }
         });
     }
