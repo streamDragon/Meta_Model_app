@@ -189,33 +189,12 @@ export async function ensureSession() {
                 applySessionSnapshot(data.session, '');
                 return data.session;
             }
-
-            if (hasAuthCallbackParams()) {
-                const callbackSession = await waitForCallbackSession(supabase);
-                if (callbackSession) {
-                    applySessionSnapshot(callbackSession, '');
-                    return callbackSession;
-                }
-
-                const callbackError = readAuthCallbackError();
-                if (callbackError) {
-                    setAuthState({
-                        ready: true,
-                        session: null,
-                        user: null,
-                        roleHint: 'guest',
-                        isGuest: true,
-                        error: callbackError.message
-                    });
-                    return null;
-                }
-            }
-
-            // Auto anon sign-in should run once per page load to avoid signup spam loops.
             if (authRuntime.autoAnonAttempted) {
                 applySessionSnapshot(null, '');
                 return null;
             }
+
+            // Sign in anonymously at most once per page load.
             authRuntime.autoAnonAttempted = true;
             const anonRes = await supabase.auth.signInAnonymously();
             if (anonRes.error) throw anonRes.error;
