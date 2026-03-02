@@ -189,8 +189,14 @@ export function createPaywallUi(actions = {}) {
                     } else if (code === 'INVALID_REDIRECT_URL') {
                         if (status) status.textContent = 'כתובת החזרה של Google לא תקינה כרגע. נסו שוב עוד רגע.';
                         setModalBusy(modal, false);
-                    } else if (status) {
-                        status.textContent = 'לא הצלחנו להתחבר ל-Google כרגע.';
+                    } else {
+                        if (status) status.textContent = 'קישור Google נכשל. עוברים להתחברות Google רגילה...';
+                        try {
+                            await actions.onSwitchToExisting?.();
+                            return;
+                        } catch (_switchError) {
+                            if (status) status.textContent = 'לא הצלחנו להתחבר ל-Google כרגע.';
+                        }
                         setModalBusy(modal, false);
                     }
                 }

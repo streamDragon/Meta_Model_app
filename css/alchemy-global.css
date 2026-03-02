@@ -23,7 +23,13 @@ body.alchemy-active::before {
     radial-gradient(circle at 72% 78%, rgba(251, 191, 36, 0.09) 0%, transparent 30%);
 }
 
-body.alchemy-active > *:not(.alchemy-root) {
+body.alchemy-active > .container,
+body.alchemy-active > #classic-classic-app,
+body.alchemy-active > .cc-app-shell,
+body.alchemy-active > .prism-research-page,
+body.alchemy-active > .prism-lab-shell,
+body.alchemy-active > .trainer-shell,
+body.alchemy-active > .trainer-page {
   position: relative;
   z-index: 1;
 }
@@ -51,12 +57,12 @@ body.alchemy-active > *:not(.alchemy-root) {
 
 .alchemy-companion {
   position: fixed;
-  right: 16px;
-  bottom: 16px;
+  right: max(24px, calc(env(safe-area-inset-right, 0px) + 16px));
+  bottom: max(88px, calc(env(safe-area-inset-bottom, 0px) + 16px));
   width: 110px;
   height: 110px;
   pointer-events: auto;
-  z-index: 1400;
+  z-index: 2400;
   border-radius: 50%;
   background:
     radial-gradient(circle at 35% 30%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.18) 28%, transparent 48%),
@@ -206,9 +212,9 @@ body.alchemy-active > *:not(.alchemy-root) {
 
 .alchemy-mute {
   position: fixed;
-  top: 14px;
-  right: 14px;
-  z-index: 1500;
+  top: max(14px, calc(env(safe-area-inset-top, 0px) + 8px));
+  right: max(14px, calc(env(safe-area-inset-right, 0px) + 8px));
+  z-index: 2400;
   pointer-events: auto;
   border: 1px solid rgba(255,255,255,0.24);
   border-radius: 999px;
@@ -454,8 +460,8 @@ body.alchemy-active .trainer-shell-nav__meta {
   .alchemy-companion {
     width: 88px;
     height: 88px;
-    right: 10px;
-    bottom: 12px;
+    right: max(12px, calc(env(safe-area-inset-right, 0px) + 6px));
+    bottom: max(74px, calc(env(safe-area-inset-bottom, 0px) + 10px));
   }
 
   .alchemy-companion__face {

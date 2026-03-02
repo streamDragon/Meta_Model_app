@@ -91,6 +91,23 @@ function getAuthUrlParams() {
     return merged;
 }
 
+function buildStableRedirectUrl(extraParams = {}) {
+    if (typeof window === 'undefined') return '';
+    const current = new URL(window.location.href);
+    const redirect = new URL(`${current.origin}${current.pathname}`);
+    const keepParams = ['tab'];
+    keepParams.forEach((key) => {
+        if (current.searchParams.has(key)) {
+            redirect.searchParams.set(key, current.searchParams.get(key));
+        }
+    });
+    Object.entries(extraParams || {}).forEach(([key, value]) => {
+        if (value == null || value === '') return;
+        redirect.searchParams.set(String(key), String(value));
+    });
+    return redirect.toString();
+}
+
 function hasAuthCallbackParams() {
     const params = getAuthUrlParams();
     return (
@@ -251,10 +268,7 @@ export async function linkGoogleIdentity() {
     if (!user) throw toCodeError({ message: 'NO_ACTIVE_USER' }, 'NO_ACTIVE_USER');
 
     const supabase = await getSupabaseClient();
-    const redirectTo = new URL(window.location.href);
-    redirectTo.searchParams.set('auth_link', 'google');
-    redirectTo.searchParams.delete('stripe');
-    redirectTo.searchParams.delete('session_id');
+    const redirectTo = buildStableRedirectUrl({ auth_link: 'google' });
 
     if (typeof supabase.auth?.linkIdentity !== 'function') {
         throw toCodeError({ message: 'LINK_IDENTITY_UNSUPPORTED' }, 'LINK_IDENTITY_UNSUPPORTED');
@@ -263,7 +277,7 @@ export async function linkGoogleIdentity() {
     const { data, error } = await supabase.auth.linkIdentity({
         provider: 'google',
         options: {
-            redirectTo: redirectTo.toString(),
+            redirectTo,
             queryParams: { prompt: 'select_account' },
             skipBrowserRedirect: true
         }
@@ -286,11 +300,13 @@ export async function switchToGoogleSignIn() {
     }
     const supabase = await getSupabaseClient();
     await supabase.auth.signOut({ scope: 'local' });
-    const redirectTo = new URL(window.location.href);
-    redirectTo.searchParams.set('auth_switch', 'google');
+    const redirectTo = buildStableRedirectUrl({ auth_switch: 'google' });
     const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: redirectTo.toString() }
+        options: {
+            redirectTo,
+            queryParams: { prompt: 'select_account' }
+        }
     });
     if (error) throw toCodeError(error, 'GOOGLE_SIGNIN_FAILED');
 }
