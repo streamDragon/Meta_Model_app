@@ -17,6 +17,12 @@ import { AdsProvider } from './ads-provider.js';
 
 const STATUS_BAR_ID = 'freemium-status-bar';
 const ERROR_BANNER_ID = 'freemium-error-banner';
+const AUTH_REQUIRED_SELECTORS = [
+    '[data-auth-required-overlay]',
+    '[data-auth-required]',
+    '.auth-required-overlay',
+    '#auth-required-overlay'
+];
 
 const freemiumState = {
     initialized: false,
@@ -108,7 +114,7 @@ function ensureErrorBanner() {
     banner.className = 'freemium-error-banner hidden';
     banner.innerHTML = `
         <span class="freemium-error-banner__text" data-freemium-error-text></span>
-        <button type="button" class="freemium-link-btn freemium-error-banner__retry" data-freemium-error-retry>retry</button>
+        <button type="button" class="freemium-link-btn freemium-error-banner__retry" data-freemium-error-retry>Retry</button>
     `;
     banner.addEventListener('click', async (event) => {
         const retryBtn = event.target?.closest?.('[data-freemium-error-retry]');
@@ -137,6 +143,9 @@ function showEntitlementsError(error, retryHandler = null) {
     const message = String(error?.message || 'Unknown error');
     if (text) text.textContent = `Entitlements error: ${message}`;
     banner.classList.remove('hidden');
+    if (paywallUi && typeof paywallUi.showToast === 'function') {
+        paywallUi.showToast('Entitlements unavailable. Retry', 'warn');
+    }
     freemiumState.retryHandler = async () => {
         if (typeof retryHandler === 'function') {
             await retryHandler();
@@ -144,6 +153,30 @@ function showEntitlementsError(error, retryHandler = null) {
         }
         await refreshAll(true);
     };
+}
+
+function setGuestReadyState(isReady) {
+    const ready = Boolean(isReady);
+    document.documentElement.setAttribute('data-freemium-ready', ready ? '1' : '0');
+    document.body.classList.toggle('freemium-ready', ready);
+    document.body.classList.toggle('freemium-not-ready', !ready);
+}
+
+function unlockAuthRequiredUi() {
+    AUTH_REQUIRED_SELECTORS.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((node) => {
+            node.classList.add('hidden');
+            node.setAttribute('aria-hidden', 'true');
+        });
+    });
+    document.querySelectorAll('[data-auth-required-disabled]').forEach((node) => {
+        if (node instanceof HTMLButtonElement || node instanceof HTMLInputElement || node instanceof HTMLSelectElement || node instanceof HTMLTextAreaElement) {
+            node.disabled = false;
+            return;
+        }
+        node.removeAttribute('disabled');
+    });
+    window.dispatchEvent(new CustomEvent('freemium:guest-ready', { detail: { ready: true } }));
 }
 
 function updateStatusBar(entitlements) {
@@ -242,6 +275,12 @@ async function refreshAll(force = false) {
         logEntitlementsState(entitlements);
         updateStatusBar(entitlements);
         AdsProvider.init(entitlements);
+        if (session?.user) {
+            setGuestReadyState(true);
+            unlockAuthRequiredUi();
+        } else {
+            setGuestReadyState(false);
+        }
         return entitlements;
     })();
 
@@ -251,7 +290,7 @@ async function refreshAll(force = false) {
         showEntitlementsError(error, async () => {
             await refreshAll(true);
         });
-        throw error;
+        return getEntitlementsSnapshot();
     } finally {
         freemiumState.refreshPromise = null;
     }
@@ -357,6 +396,7 @@ async function initializeFreemium() {
     freemiumState.initialized = true;
 
     try {
+        setGuestReadyState(false);
         bindStatusBarActions();
         bindModalAdsSync();
         exposeApi();

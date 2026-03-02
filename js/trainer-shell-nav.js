@@ -222,7 +222,9 @@
         script.src = withBuildQuery(path);
         if (opts.type) script.type = opts.type;
         if (typeof opts.defer === 'boolean') script.defer = opts.defer;
-        else script.defer = true;
+        else script.defer = false;
+        if (typeof opts.async === 'boolean') script.async = opts.async;
+        else script.async = false;
         if (opts.onload && typeof opts.onload === 'function') {
             script.addEventListener('load', opts.onload, { once: true });
         }
@@ -249,7 +251,8 @@
 
         if (!runtimeScript) {
             ensureExternalScript('meta-runtime-env-script', 'js/runtime-env.js', {
-                defer: true,
+                defer: false,
+                async: false,
                 onload: function () {
                     var loadedScript = document.getElementById('meta-runtime-env-script');
                     if (loadedScript) loadedScript.dataset.loaded = '1';
@@ -558,5 +561,9 @@
         document.addEventListener('DOMContentLoaded', buildNav, { once: true });
     } else {
         buildNav();
+    }
+
+    if (isStandaloneTrainerPage()) {
+        ensureFreemiumLayer();
     }
 })();

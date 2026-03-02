@@ -7,7 +7,9 @@ const ENTITLEMENTS_CACHE_TTL_MS = 45 * 1000;
 const entitlementsRuntime = {
     entitlements: null,
     updatedAt: 0,
-    listeners: new Set()
+    listeners: new Set(),
+    refreshPromise: null,
+    consumePromise: null
 };
 
 function emitEntitlements() {
@@ -87,20 +89,30 @@ export async function refreshEntitlements(options = {}) {
         return getEntitlementsSnapshot();
     }
 
-    if (!isSupabaseConfigured()) return null;
-    await ensureSession();
-    const supabase = await getSupabaseClient();
+    if (entitlementsRuntime.refreshPromise) return entitlementsRuntime.refreshPromise;
 
-    const { error: ensureError } = await supabase.rpc('ensure_profile');
-    if (ensureError) {
-        throw new Error(ensureError.message || 'ENSURE_PROFILE_FAILED');
+    entitlementsRuntime.refreshPromise = (async () => {
+        if (!isSupabaseConfigured()) return null;
+        await ensureSession();
+        const supabase = await getSupabaseClient();
+
+        const { error: ensureError } = await supabase.rpc('ensure_profile');
+        if (ensureError) {
+            throw new Error(ensureError.message || 'ENSURE_PROFILE_FAILED');
+        }
+        const { data, error } = await supabase.rpc('get_entitlements');
+        if (error) {
+            throw new Error(error.message || 'ENTITLEMENTS_FETCH_FAILED');
+        }
+        const row = Array.isArray(data) ? data[0] : data;
+        return applyEntitlements(row || {});
+    })();
+
+    try {
+        return await entitlementsRuntime.refreshPromise;
+    } finally {
+        entitlementsRuntime.refreshPromise = null;
     }
-    const { data, error } = await supabase.rpc('get_entitlements');
-    if (error) {
-        throw new Error(error.message || 'ENTITLEMENTS_FETCH_FAILED');
-    }
-    const row = Array.isArray(data) ? data[0] : data;
-    return applyEntitlements(row || {});
 }
 
 function parseQuotaError(error) {
@@ -110,7 +122,7 @@ function parseQuotaError(error) {
     return '';
 }
 
-export async function consumeSentence(count = 1) {
+async function runConsumeSentence(count = 1) {
     if (!isSupabaseConfigured()) {
         return { ok: true, entitlements: null };
     }
@@ -135,4 +147,15 @@ export async function consumeSentence(count = 1) {
         entitlements,
         consumed_count: Number(row?.consumed_count || pCount)
     };
+}
+
+export async function consumeSentence(count = 1) {
+    if (entitlementsRuntime.consumePromise) return entitlementsRuntime.consumePromise;
+
+    entitlementsRuntime.consumePromise = runConsumeSentence(count);
+    try {
+        return await entitlementsRuntime.consumePromise;
+    } finally {
+        entitlementsRuntime.consumePromise = null;
+    }
 }
