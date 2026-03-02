@@ -1,6 +1,6 @@
 {
   "name": "meta_model_app",
-  "version": "1.0.109",
+  "version": "1.0.111",
   "description": "כלי אינטרנט אינטראקטיבי לתרגול טכניקות **Meta Model** של NLP (Neuro-Linguistic Programming) על פי Richard Bandler ו-John Grinder.",
   "main": "index.js",
   "directories": {
@@ -58,9 +58,11 @@
   "dependencies": {
     "@capacitor/android": "^8.1.0",
     "@capacitor/core": "^8.1.0",
+    "@supabase/supabase-js": "^2.98.0",
     "esbuild": "^0.27.3",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "stripe": "^20.4.0"
   },
   "private": true
 }

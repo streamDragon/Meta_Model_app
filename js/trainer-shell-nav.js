@@ -214,12 +214,18 @@
         document.head.appendChild(link);
     }
 
-    function ensureExternalScript(id, path) {
+    function ensureExternalScript(id, path, options) {
         if (document.getElementById(id)) return;
+        var opts = options || {};
         var script = document.createElement('script');
         script.id = id;
         script.src = withBuildQuery(path);
-        script.defer = true;
+        if (opts.type) script.type = opts.type;
+        if (typeof opts.defer === 'boolean') script.defer = opts.defer;
+        else script.defer = true;
+        if (opts.onload && typeof opts.onload === 'function') {
+            script.addEventListener('load', opts.onload, { once: true });
+        }
         document.head.appendChild(script);
     }
 
@@ -227,6 +233,41 @@
         if (!isStandaloneTrainerPage()) return;
         ensureExternalCss('alchemy-global-style', 'css/alchemy-global.css');
         ensureExternalScript('alchemy-global-script', 'js/alchemy-global.js');
+    }
+
+    function ensureFreemiumLayer() {
+        if (!isStandaloneTrainerPage()) return;
+        ensureExternalCss('freemium-style', 'css/freemium.css');
+
+        var runtimeScript = document.getElementById('meta-runtime-env-script');
+        var ensureBootstrap = function () {
+            ensureExternalScript('meta-freemium-bootstrap', 'js/freemium/bootstrap.js', {
+                type: 'module',
+                defer: true
+            });
+        };
+
+        if (!runtimeScript) {
+            ensureExternalScript('meta-runtime-env-script', 'js/runtime-env.js', {
+                defer: true,
+                onload: function () {
+                    var loadedScript = document.getElementById('meta-runtime-env-script');
+                    if (loadedScript) loadedScript.dataset.loaded = '1';
+                    ensureBootstrap();
+                }
+            });
+            return;
+        }
+
+        if (runtimeScript.dataset.loaded === '1') {
+            ensureBootstrap();
+            return;
+        }
+
+        runtimeScript.addEventListener('load', function () {
+            runtimeScript.dataset.loaded = '1';
+            ensureBootstrap();
+        }, { once: true });
     }
 
     function escapeHtml(value) {
@@ -453,6 +494,7 @@
         if (!document.body || document.querySelector('.trainer-shell-nav')) return;
 
         ensureAlchemyLayer();
+        ensureFreemiumLayer();
         injectStyles();
 
         var nav = document.createElement('div');

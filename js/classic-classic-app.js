@@ -79,6 +79,17 @@
         return response.json();
     }
 
+    async function gateClassicSentenceConsumption(source = 'classic-classic') {
+        const api = root.MetaFreemium;
+        if (!api || typeof api.consumeSentenceOrPrompt !== 'function') return true;
+        try {
+            const allowed = await api.consumeSentenceOrPrompt({ source, count: 1 });
+            return allowed !== false;
+        } catch (_error) {
+            return true;
+        }
+    }
+
     function getPatternMap() {
         const map = new Map();
         (state.data?.patterns || []).forEach((pattern) => {
@@ -622,8 +633,19 @@
         render();
     }
 
-    function handleAction(action) {
+    async function handleAction(action) {
         if (!action) return;
+        if (
+            action === 'continue-last-settings' ||
+            action === 'start-session' ||
+            action === 'random-start' ||
+            action === 'apply-settings-and-restart' ||
+            action === 'restart-session' ||
+            action === 'next-round'
+        ) {
+            const canProceed = await gateClassicSentenceConsumption(`classic-classic:${action}`);
+            if (!canProceed) return;
+        }
         if (action === 'open-setup') {
             state.setupOpen = true;
             state.settingsDrawerOpen = false;
@@ -1781,7 +1803,7 @@
         appEl.addEventListener('click', (event) => {
             const actionEl = event.target.closest('[data-cc-action]');
             if (actionEl) {
-                handleAction(actionEl.getAttribute('data-cc-action'));
+                void handleAction(actionEl.getAttribute('data-cc-action'));
                 return;
             }
 
@@ -1885,3 +1907,4 @@
         stopTimer();
     });
 })();
+

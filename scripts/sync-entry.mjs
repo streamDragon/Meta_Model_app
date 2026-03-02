@@ -8,6 +8,7 @@ const INDEX_HTML_PATH = path.join(ROOT, 'index.html');
 const INDEX2_HTML_PATH = path.join(ROOT, 'index2.html');
 const PACKAGE_JSON_PATH = path.join(ROOT, 'package.json');
 const VERSION_MANIFEST_PATH = path.join(ROOT, 'version.json');
+const RUNTIME_ENV_JS_PATH = path.join(ROOT, 'js', 'runtime-env.js');
 
 const INDEX2_REDIRECT_HTML = `<!DOCTYPE html>
 <html lang="he" dir="rtl">
@@ -91,6 +92,24 @@ function buildVersionManifest(version, buildTime, buildIso, gitCommit) {
     }, null, 2)}\n`;
 }
 
+function buildRuntimeEnvPayload(version, buildIso, gitCommit) {
+    const fromEnv = (name, fallback = '') => String(process.env[name] || fallback || '').trim();
+    return {
+        VITE_SUPABASE_URL: fromEnv('VITE_SUPABASE_URL', fromEnv('SUPABASE_URL')),
+        VITE_SUPABASE_ANON_KEY: fromEnv('VITE_SUPABASE_ANON_KEY', fromEnv('SUPABASE_ANON_KEY')),
+        VITE_PUBLIC_SITE_URL: fromEnv('VITE_PUBLIC_SITE_URL', fromEnv('PUBLIC_SITE_URL')),
+        VITE_ADSENSE_CLIENT_ID: fromEnv('VITE_ADSENSE_CLIENT_ID'),
+        APP_VERSION: String(version || '').trim(),
+        BUILD_ISO: String(buildIso || '').trim(),
+        GIT_COMMIT: String(gitCommit || '').trim()
+    };
+}
+
+function buildRuntimeEnvScript(payload) {
+    const body = JSON.stringify(payload || {}, null, 2);
+    return `;(function attachRuntimeEnv(){\n  window.__META_MODEL_ENV__ = Object.assign({}, window.__META_MODEL_ENV__ || {}, ${body});\n})();\n`;
+}
+
 async function run() {
     const pkgRaw = await readFile(PACKAGE_JSON_PATH, 'utf8');
     const pkg = JSON.parse(pkgRaw);
@@ -122,6 +141,22 @@ async function run() {
         console.log(`Wrote version.json manifest for ${version} (${gitCommit})`);
     } else {
         console.log(`version.json manifest already synced (${version})`);
+    }
+
+    const runtimeEnvPayload = buildRuntimeEnvPayload(version, buildIso, gitCommit);
+    const runtimeEnvScript = buildRuntimeEnvScript(runtimeEnvPayload);
+    let currentRuntimeEnv = '';
+    try {
+        currentRuntimeEnv = await readFile(RUNTIME_ENV_JS_PATH, 'utf8');
+    } catch (error) {
+        currentRuntimeEnv = '';
+    }
+
+    if (currentRuntimeEnv !== runtimeEnvScript) {
+        await writeFile(RUNTIME_ENV_JS_PATH, runtimeEnvScript, 'utf8');
+        console.log('Synced js/runtime-env.js from build-time public env variables');
+    } else {
+        console.log('js/runtime-env.js already up to date');
     }
 
     let currentIndex2 = '';

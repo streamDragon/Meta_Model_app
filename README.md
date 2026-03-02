@@ -74,3 +74,41 @@ How to bump `appVersion`:
 1. Update `package.json` `version` (or use your release workflow).
 2. Run `npm run generate:version`.
 3. Commit `package.json`, `version.json`, and `index.html` metadata changes.
+
+## Freemium Stack (Supabase + Stripe)
+
+This repo now includes a freemium implementation:
+
+- `Guest` (anonymous): 10 sentences/day, ads enabled
+- `Free` (registered): 80 total sentences, ads enabled
+- `Pro` (subscription): unlimited, ads disabled
+
+### Supabase setup
+
+1. Enable `Anonymous Sign-Ins`.
+2. Enable `Manual Linking` (required for anonymous -> permanent account linking).
+3. Run SQL files in this order:
+   1. `docs/sql/001_schema.sql`
+   2. `docs/sql/002_rls.sql`
+   3. `docs/sql/003_rpc.sql`
+   4. `docs/sql/004_stripe_billing.sql`
+
+### Environment variables
+
+Client/build (`VITE_*`):
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_PUBLIC_SITE_URL`
+- `VITE_ADSENSE_CLIENT_ID` (optional)
+
+Server (Vercel):
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_ANON_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_PRICE_MONTHLY`
+- `STRIPE_PRICE_YEARLY`
+- `PUBLIC_SITE_URL`

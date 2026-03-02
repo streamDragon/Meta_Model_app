@@ -1,0 +1,243 @@
+.freemium-status-bar {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 2200;
+  min-width: 220px;
+  max-width: min(420px, calc(100vw - 24px));
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 26px rgba(2, 6, 23, 0.16);
+  backdrop-filter: blur(8px);
+  padding: 10px 12px;
+  display: grid;
+  gap: 8px;
+  direction: rtl;
+}
+
+.freemium-status-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.freemium-role-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid #0f766e;
+  background: #ecfeff;
+  color: #0f766e;
+  padding: 3px 10px;
+  font-weight: 800;
+  font-size: 0.84rem;
+}
+
+.freemium-meter {
+  color: #0f172a;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.freemium-status-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.freemium-link-btn {
+  border: 0;
+  background: transparent;
+  color: #1d4ed8;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.freemium-guest-banner {
+  color: #334155;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.freemium-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2600;
+  background: rgba(2, 6, 23, 0.56);
+  display: grid;
+  place-items: center;
+  padding: 12px;
+}
+
+.freemium-modal {
+  width: min(520px, 100%);
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #dbe7f5;
+  box-shadow: 0 18px 44px rgba(2, 6, 23, 0.34);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  position: relative;
+  direction: rtl;
+}
+
+.freemium-modal h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.2rem;
+}
+
+.freemium-modal-sub {
+  margin: 0;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.freemium-modal-close {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  border: 0;
+  border-radius: 999px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-weight: 800;
+  color: #334155;
+  background: #e2e8f0;
+}
+
+.freemium-modal-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.freemium-btn {
+  border-radius: 10px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.freemium-btn-primary {
+  color: #ffffff;
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+}
+
+.freemium-btn-secondary {
+  color: #0f172a;
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.freemium-bullets {
+  margin: 0;
+  padding-inline-start: 18px;
+  display: grid;
+  gap: 4px;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.freemium-field {
+  display: grid;
+  gap: 4px;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.freemium-field input {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  min-height: 40px;
+  padding: 6px 10px;
+  font: inherit;
+}
+
+.freemium-auth-status {
+  margin: 0;
+  color: #475569;
+  min-height: 18px;
+  font-size: 0.86rem;
+}
+
+.freemium-toast-root {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 2700;
+  display: grid;
+  gap: 8px;
+}
+
+.freemium-toast {
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.2);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.freemium-toast--success { background: #059669; }
+.freemium-toast--warn { background: #b45309; }
+.freemium-toast--info { background: #2563eb; }
+
+.freemium-toast.is-hiding {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.freemium-ad-banner {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 2100;
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid #dbe7f5;
+  box-shadow: 0 -8px 24px rgba(2, 6, 23, 0.12);
+  padding: 8px;
+}
+
+.freemium-locked-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.8;
+  filter: blur(0.2px);
+}
+
+.freemium-lock {
+  font-size: 1rem;
+}
+
+@media (max-width: 720px) {
+  .freemium-status-bar {
+    left: 8px;
+    right: 8px;
+    top: 8px;
+    max-width: none;
+  }
+
+  .freemium-modal-actions {
+    flex-direction: column;
+  }
+
+  .freemium-btn {
+    width: 100%;
+  }
+}

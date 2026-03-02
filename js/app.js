@@ -259,6 +259,20 @@ function getNavHrefFeatureKey(navKey, fallbackPath = '') {
     return toHrefFeatureKeyFromPath(getGlobalNavPathByKey(navKey, fallbackPath));
 }
 
+async function gateSentenceConsumption(options = {}) {
+    const api = window.MetaFreemium;
+    if (!api || typeof api.consumeSentenceOrPrompt !== 'function') return true;
+    try {
+        const allowed = await api.consumeSentenceOrPrompt({
+            source: String(options.source || 'app'),
+            count: Math.max(1, Number(options.count) || 1)
+        });
+        return allowed !== false;
+    } catch (error) {
+        return true;
+    }
+}
+
 function getNavHrefFeatureKeyFromElement(element) {
     if (!element) return '';
     const href = String(element.getAttribute('data-versioned-href') || element.getAttribute('href') || '').trim();
@@ -6166,7 +6180,7 @@ function finalizeQuestionDrillRound(reason = 'next') {
     }
 }
 
-function loadNextQuestionDrill(options = {}) {
+async function loadNextQuestionDrill(options = {}) {
     const { initial = false, playSound = true } = options || {};
     if (!QUESTION_DRILL_PACK.length) return;
 
@@ -6181,6 +6195,12 @@ function loadNextQuestionDrill(options = {}) {
     }
 
     if (questionDrillState.sessionCompleted) {
+        updateQuestionDrillControlsState();
+        return;
+    }
+
+    const canProceed = await gateSentenceConsumption({ source: 'question-drill', count: 1 });
+    if (!canProceed) {
         updateQuestionDrillControlsState();
         return;
     }
@@ -8212,7 +8232,10 @@ function renderWrinkleSelfList() {
 }
 
 // Get Next Practice Statement
-function getNextStatement() {
+async function getNextStatement() {
+    const canProceed = await gateSentenceConsumption({ source: 'legacy-practice', count: 1 });
+    if (!canProceed) return;
+
     const categorySelect = document.getElementById('category-select');
     const selectedCategory = categorySelect.value;
     

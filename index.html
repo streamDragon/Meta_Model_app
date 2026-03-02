@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.109" data-build-time="1772407279510" data-build-iso="2026-03-01T23:21:19.510Z" data-git-commit="0a07695">
+<html lang="he" dir="rtl" data-app-version="1.0.111" data-build-time="1772417284762" data-build-iso="2026-03-02T02:08:04.762Z" data-git-commit="0bd1aa5">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -223,6 +223,11 @@
             stylesheet.rel = 'stylesheet';
             stylesheet.href = withAssetVersion('css/style.css');
             document.head.appendChild(stylesheet);
+
+            var freemiumStylesheet = document.createElement('link');
+            freemiumStylesheet.rel = 'stylesheet';
+            freemiumStylesheet.href = withAssetVersion('css/freemium.css');
+            document.head.appendChild(freemiumStylesheet);
         })();
     </script>
 </head>
@@ -1646,7 +1651,24 @@
                 document.body.appendChild(script);
             }
 
-            loadScript(0);
+            function loadFreemiumModule() {
+                var moduleScript = document.createElement('script');
+                moduleScript.type = 'module';
+                moduleScript.src = withAssetVersion('js/freemium/bootstrap.js');
+                document.body.appendChild(moduleScript);
+            }
+
+            var runtimeEnvScript = document.createElement('script');
+            runtimeEnvScript.src = withAssetVersion('js/runtime-env.js');
+            runtimeEnvScript.onload = function () {
+                loadFreemiumModule();
+                loadScript(0);
+            };
+            runtimeEnvScript.onerror = function () {
+                loadFreemiumModule();
+                loadScript(0);
+            };
+            document.body.appendChild(runtimeEnvScript);
         })();
     </script>
 </body>
