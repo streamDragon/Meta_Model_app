@@ -1649,6 +1649,49 @@ body {
   background: #fff;
 }
 
+.cc-options-grid.is-stage-transition {
+  border-radius: 14px;
+  border: 1px solid #93c5fd;
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+  padding: 8px;
+  animation: cc-stage-burst 650ms ease-out;
+}
+
+.cc-stage-transition-banner {
+  border-radius: 12px;
+  border: 1px solid #93c5fd;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(191, 219, 254, 0.65), transparent 44%),
+    linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+  padding: 10px 12px;
+  display: grid;
+  gap: 4px;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+  animation: cc-stage-burst 650ms ease-out;
+}
+
+.cc-stage-transition-banner strong {
+  color: #1e3a8a;
+  font-size: 0.93rem;
+}
+
+.cc-stage-transition-banner span {
+  color: #334155;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+@keyframes cc-stage-burst {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .cc-feedback-panel {
   border-radius: 14px;
   border: 1px solid #dbe7f5;

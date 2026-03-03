@@ -39,7 +39,10 @@
         timerHandle: null,
         submitInFlight: false,
         lastSubmitAt: 0,
-        renderNonce: 0
+        renderNonce: 0,
+        detailsOpenState: Object.create(null),
+        stageTransition: null,
+        stageTransitionHandle: null
     };
 
     function escapeHtml(value) {
@@ -52,6 +55,65 @@
             .replace(/'/g, '&#39;');
     }
 
+    function detailStateKey(rawKey) {
+        return String(rawKey || '').trim();
+    }
+
+    function isDetailOpen(rawKey, fallback = false) {
+        const key = detailStateKey(rawKey);
+        if (!key) return Boolean(fallback);
+        if (!Object.prototype.hasOwnProperty.call(state.detailsOpenState, key)) return Boolean(fallback);
+        return Boolean(state.detailsOpenState[key]);
+    }
+
+    function setDetailOpen(rawKey, isOpen) {
+        const key = detailStateKey(rawKey);
+        if (!key) return;
+        state.detailsOpenState[key] = Boolean(isOpen);
+    }
+
+    function clearStageTransition(renderAfter = false) {
+        if (state.stageTransitionHandle) {
+            clearTimeout(state.stageTransitionHandle);
+            state.stageTransitionHandle = null;
+        }
+        if (!state.stageTransition) return;
+        state.stageTransition = null;
+        if (renderAfter) render();
+    }
+
+    function stageTransitionActionHint(stage) {
+        if (stage === 'question') return '\u05d4\u05de\u05e9\u05da: \u05d1\u05d7\u05e8\u05d5 \u05e9\u05d0\u05dc\u05d4 \u05de\u05d3\u05d5\u05d9\u05e7\u05ea \u05dc\u05d4\u05d7\u05d6\u05e8\u05ea \u05de\u05d9\u05d3\u05e2 \u05d7\u05e1\u05e8.';
+        if (stage === 'problem') return '\u05d4\u05de\u05e9\u05da: \u05d1\u05d7\u05e8\u05d5 \u05d0\u05ea \u05d4\u05d1\u05e2\u05d9\u05d4 \u05d4\u05dc\u05e9\u05d5\u05e0\u05d9\u05ea \u05d4\u05de\u05e8\u05db\u05d6\u05d9\u05ea.';
+        if (stage === 'goal') return '\u05d4\u05de\u05e9\u05da: \u05d1\u05d7\u05e8\u05d5 \u05d0\u05ea \u05de\u05d8\u05e8\u05ea \u05d4\u05d1\u05d9\u05e8\u05d5\u05e8 \u05d4\u05de\u05d3\u05d5\u05d9\u05e7\u05ea.';
+        return '\u05d4\u05de\u05e9\u05d9\u05db\u05d5 \u05dc\u05e9\u05dc\u05d1 \u05d4\u05d1\u05d0.';
+    }
+
+    function getStageTransitionForRound(round) {
+        const transition = state.stageTransition;
+        if (!transition || !round) return null;
+        if (transition.stage !== round.stage) return null;
+        if (transition.patternId && transition.patternId !== String(round?.pattern?.id || '')) return null;
+        if (Date.now() > Number(transition.expiresAt || 0)) return null;
+        return transition;
+    }
+
+    function activateStageTransition(round, nextStage) {
+        const stage = String(nextStage || '').trim();
+        if (!stage || !round) return;
+        const optionCount = Math.max(0, Number((round.options?.[stage] || []).length));
+        clearStageTransition(false);
+        state.stageTransition = {
+            stage,
+            patternId: String(round?.pattern?.id || ''),
+            optionCount,
+            expiresAt: Date.now() + 2800
+        };
+        state.stageTransitionHandle = setTimeout(() => {
+            clearStageTransition(true);
+        }, 2850);
+        emitAlchemyFx('whoosh', { text: '\u05de\u05e2\u05d1\u05e8 \u05e9\u05dc\u05d1: ' + stageStepLabel(stage) });
+    }
     function emitAlchemyFx(type, detail) {
         try {
             if (root.alchemyFx && typeof root.alchemyFx.emit === 'function') {
@@ -403,6 +465,7 @@
         state.hintUsedByStage = { question: false, problem: false, goal: false };
         state.lastSelectedOptionId = '';
         state.lastSelectedWasCorrect = null;
+        clearStageTransition(false);
     }
 
     function createSession(seedSuffix) {
@@ -452,9 +515,11 @@
     }
 
     function stopTimer() {
-        if (!state.timerHandle) return;
-        clearInterval(state.timerHandle);
-        state.timerHandle = null;
+        if (state.timerHandle) {
+            clearInterval(state.timerHandle);
+            state.timerHandle = null;
+        }
+        clearStageTransition(false);
     }
 
     function startNewRound() {
@@ -516,6 +581,7 @@
         if (!state.session || state.session.ended) return;
         const round = currentRound();
         if (!round || round.stage === 'summary') return;
+        const stageBeforeSubmit = String(round.stage || '');
 
         const now = Date.now();
         if (state.submitInFlight) return;
@@ -536,10 +602,15 @@
                         text: 'סבב הושלם. עברו על הסיכום ואז המשיכו לתבנית הבאה.'
                     };
                 } else {
+                    const nextRound = currentRound();
+                    const optionCount = Math.max(0, Number((nextRound?.options?.[result.nextStage] || []).length));
                     state.feedback = {
                         tone: 'success',
-                        text: `נכון. מעבר לשלב הבא: ${stageLabel(result.nextStage)}`
+                        text: '\u05e0\u05db\u05d5\u05df. ' + stageLabel(result.nextStage) + '. \u05d4\u05d5\u05d8\u05e2\u05e0\u05d5 ' + optionCount + ' \u05d0\u05e4\u05e9\u05e8\u05d5\u05d9\u05d5\u05ea \u05d7\u05d3\u05e9\u05d5\u05ea \u05dc\u05e9\u05dc\u05d1 \u05d6\u05d4.'
                     };
+                    if (stageBeforeSubmit !== String(result.nextStage || '')) {
+                        activateStageTransition(nextRound, result.nextStage);
+                    }
                 }
             } else if (state.mode === 'learning') {
                 state.feedback = {
@@ -1370,7 +1441,7 @@
               </label>
             </div>
 
-            <details class="cc-advanced-panel">
+            <details class="cc-advanced-panel" data-cc-details-key="advanced:${escapeHtml(scope)}" ${isDetailOpen(`advanced:${scope}`) ? 'open' : ''}>
               <summary>אפשרויות מתקדמות</summary>
               <div class="cc-advanced-panel-body">
                 <label class="cc-field-vertical" for="${selectId}">
@@ -1472,8 +1543,10 @@
         const stage = round?.stage;
         const options = getVisibleOptions(round);
         const correctIds = getCorrectOptionIds(round, stage);
+        const transition = getStageTransitionForRound(round);
+        const optionsClasses = ['cc-options', 'cc-options-grid', transition ? 'is-stage-transition' : ''].filter(Boolean).join(' ');
         return `
-          <div class="cc-options cc-options-grid" role="list" aria-label="אפשרויות תשובה">
+          <div class="${optionsClasses}" role="list" aria-label="אפשרויות תשובה">
             ${options.map((option, index) => {
                 const id = String(option.id);
                 const isSelected = state.lastSelectedOptionId === id;
@@ -1514,10 +1587,11 @@
         const message = state.feedback?.text || state.hintMessage || '';
         const examples = Array.isArray(round?.pattern?.examples) ? round.pattern.examples.slice(0, 2) : [];
         const goodQs = ((round?.options?.question) || []).filter((opt) => opt.isCorrect).map((opt) => opt.text).slice(0, 2);
+        const detailsKey = 'feedback:' + Number(state.session?.completedRounds || 0) + ':' + String(round?.pattern?.id || '') + ':' + String(round?.stage || '');
         return `
           <section class="cc-feedback-panel" data-tone="${escapeHtml(tone)}" aria-live="polite">
             <div class="cc-feedback-main"><strong>${escapeHtml(headline)}</strong><span>${escapeHtml(message)}</span></div>
-            <details class="cc-feedback-details">
+            <details class="cc-feedback-details" data-cc-details-key="${escapeHtml(detailsKey)}" ${isDetailOpen(detailsKey) ? 'open' : ''}>
               <summary>הצג הסבר</summary>
               <div class="cc-feedback-details-body">
                 ${state.hintMessage ? `<p>${escapeHtml(state.hintMessage)}</p>` : ''}
@@ -1558,6 +1632,19 @@
         `;
     }
 
+    function renderStageTransitionBanner(round) {
+        const transition = getStageTransitionForRound(round);
+        if (!transition) return '';
+        const stageText = stageLabel(transition.stage);
+        const optionCount = Math.max(0, Number(transition.optionCount || 0));
+        return `
+          <div class="cc-stage-transition-banner" role="status" aria-live="polite">
+            <strong>\u05de\u05e2\u05d1\u05e8 \u05d1\u05e8\u05d5\u05e8: ${escapeHtml(stageText)}</strong>
+            <span>\u05d4\u05d5\u05d8\u05e2\u05e0\u05d5 ${optionCount} \u05d0\u05e4\u05e9\u05e8\u05d5\u05d9\u05d5\u05ea \u05d7\u05d3\u05e9\u05d5\u05ea. ${escapeHtml(stageTransitionActionHint(transition.stage))}</span>
+          </div>
+        `;
+    }
+
     function renderPracticeCard(round) {
         if (!round) {
             return `<section class="cc-practice-card"><div class="cc-loading">מכין שאלה...</div></section>`;
@@ -1581,6 +1668,7 @@
               <div class="cc-client-text">${escapeHtml(promptText || 'אין טקסט לדוגמה')}</div>
             </div>
             <div class="cc-question-line"><strong>${escapeHtml(stageQuestionPrompt(round))}</strong><span>${escapeHtml(operation.title)}</span></div>
+            ${renderStageTransitionBanner(round)}
             ${renderOptions(round)}
             ${renderFeedbackBox(round)}
             <div class="cc-practice-actions">
@@ -1817,6 +1905,13 @@
             if (optionEl) {
                 submitOption(optionEl.getAttribute('data-cc-option-id'));
             }
+        });
+
+        appEl.addEventListener('toggle', (event) => {
+            const detailsEl = event?.target?.closest?.('details[data-cc-details-key]');
+            if (!detailsEl) return;
+            const key = detailsEl.getAttribute('data-cc-details-key');
+            setDetailOpen(key, !!detailsEl.open);
         });
 
         function applySettingFromInput(target) {
