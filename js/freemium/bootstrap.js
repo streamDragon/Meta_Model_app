@@ -1,4 +1,4 @@
-﻿import {
+import {
     ensureSession,
     onAuthSessionChange,
     getAccessToken,
@@ -16,17 +16,31 @@ import { AdsProvider } from './ads-provider.js';
 
 const STATUS_BAR_ID = 'freemium-status-bar';
 const ERROR_BANNER_ID = 'freemium-error-banner';
+const DEFAULT_GUEST_LIMIT = 80;
 const AUTH_REQUIRED_SELECTORS = [
     '[data-auth-required-overlay]',
     '[data-auth-required]',
     '.auth-required-overlay',
     '#auth-required-overlay'
 ];
+const AUTH_HASH_KEYS = [
+    'access_token',
+    'refresh_token',
+    'expires_at',
+    'expires_in',
+    'token_type',
+    'id_token',
+    'provider_token',
+    'provider_refresh_token',
+    'type'
+];
 
 const freemiumState = {
     initialized: false,
+    bootstrapPromise: null,
     isBusy: false,
     refreshPromise: null,
+    pendingRefreshOptions: null,
     retryHandler: null,
     lastAuthUserId: '',
     lastAuthRefreshKey: '',
@@ -48,6 +62,23 @@ function escapeHtml(value) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+}
+
+function createGuestUiEntitlements() {
+    return {
+        role: 'guest',
+        plan: 'guest',
+        ads_enabled: true,
+        guest_daily_limit: DEFAULT_GUEST_LIMIT,
+        guest_daily_used_today: 0,
+        guest_daily_remaining: DEFAULT_GUEST_LIMIT,
+        free_total_limit: DEFAULT_GUEST_LIMIT,
+        free_total_used: 0,
+        free_total_remaining: DEFAULT_GUEST_LIMIT,
+        remaining: DEFAULT_GUEST_LIMIT,
+        daily_limit: DEFAULT_GUEST_LIMIT,
+        unlimited: false
+    };
 }
 
 function mapRoleToHebrew(role) {
@@ -90,13 +121,45 @@ function normalizeRefreshOptions(forceOrOptions = false) {
     if (typeof forceOrOptions === 'object' && forceOrOptions !== null) {
         return {
             force: Boolean(forceOrOptions.force),
-            closeModalIfEligible: Boolean(forceOrOptions.closeModalIfEligible)
+            closeModalIfEligible: Boolean(forceOrOptions.closeModalIfEligible),
+            reason: String(forceOrOptions.reason || '').trim() || 'manual'
         };
     }
     return {
         force: Boolean(forceOrOptions),
-        closeModalIfEligible: false
+        closeModalIfEligible: false,
+        reason: 'manual'
     };
+}
+
+function mergeRefreshOptions(current, next) {
+    if (!current) return Object.assign({}, next);
+    return {
+        force: Boolean(current.force || next.force),
+        closeModalIfEligible: Boolean(current.closeModalIfEligible || next.closeModalIfEligible),
+        reason: String(next.reason || current.reason || 'manual')
+    };
+}
+
+function stripAuthHashTokens() {
+    const hash = String(window.location.hash || '');
+    if (!hash || hash === '#') return false;
+
+    const params = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash);
+    const hasAuthArtifacts = AUTH_HASH_KEYS.some((key) => params.has(key));
+    if (!hasAuthArtifacts) return false;
+
+    const cleanUrl = `${window.location.pathname}${window.location.search}`;
+    window.history.replaceState({}, document.title, cleanUrl);
+    return true;
+}
+
+function createQuotaRequestId(source = 'ui') {
+    const prefix = String(source || 'ui').replace(/[^a-z0-9_-]/gi, '').toLowerCase() || 'ui';
+    if (typeof globalThis.crypto?.randomUUID === 'function') {
+        return `${prefix}:${globalThis.crypto.randomUUID()}`;
+    }
+    return `${prefix}:${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 function ensureStatusBar() {
@@ -172,7 +235,7 @@ function showEntitlementsError(error, retryHandler = null) {
             await retryHandler();
             return;
         }
-        await refreshAll({ force: true });
+        await refreshAll({ force: true, reason: 'retry' });
     };
 }
 
@@ -208,13 +271,14 @@ function updateStatusBar(entitlements, authState = null) {
     const actionBtn = bar.querySelector('[data-freemium-action-primary]');
     const guestBanner = bar.querySelector('[data-freemium-guest-banner]');
 
-    const role = String(entitlements?.role || 'guest');
-    const remaining = resolveRemaining(entitlements);
+    const row = entitlements || createGuestUiEntitlements();
+    const role = String(row?.role || 'guest');
+    const remaining = resolveRemaining(row);
     freemiumState.currentRole = role;
     freemiumState.remaining = remaining;
 
     if (roleEl) roleEl.textContent = mapRoleToHebrew(role);
-    if (meterEl) meterEl.textContent = meterText(entitlements);
+    if (meterEl) meterEl.textContent = meterText(row);
     if (authLabelEl) authLabelEl.textContent = resolveAuthLabel(authState);
     if (guestBanner) guestBanner.classList.toggle('hidden', role !== 'guest');
 
@@ -288,36 +352,55 @@ const paywallUi = createPaywallUi({
     }
 });
 
+async function runRefresh(options = {}) {
+    const session = await ensureSession();
+    const entitlements = await refreshEntitlements({
+        force: Boolean(options.force),
+        reason: String(options.reason || 'manual')
+    });
+
+    hideEntitlementsError();
+    updateStatusBar(entitlements, freemiumState.authState);
+    if (options.closeModalIfEligible && shouldClosePaywallForAuth(entitlements)) {
+        paywallUi.closeModal();
+    }
+
+    AdsProvider.init(entitlements);
+    if (session?.user) {
+        setGuestReadyState(true);
+        unlockAuthRequiredUi();
+    } else {
+        setGuestReadyState(false);
+    }
+
+    return entitlements;
+}
+
 async function refreshAll(forceOrOptions = false) {
     const options = normalizeRefreshOptions(forceOrOptions);
-    const force = options.force;
-    if (freemiumState.refreshPromise) return freemiumState.refreshPromise;
+    freemiumState.pendingRefreshOptions = mergeRefreshOptions(freemiumState.pendingRefreshOptions, options);
+
+    if (freemiumState.refreshPromise) {
+        return freemiumState.refreshPromise;
+    }
 
     freemiumState.refreshPromise = (async () => {
-        const session = await ensureSession();
-        const entitlements = await refreshEntitlements({ force });
-        hideEntitlementsError();
-        updateStatusBar(entitlements, freemiumState.authState);
-        if (options.closeModalIfEligible && shouldClosePaywallForAuth(entitlements)) {
-            paywallUi.closeModal();
+        let lastEntitlements = getEntitlementsSnapshot() || createGuestUiEntitlements();
+        while (freemiumState.pendingRefreshOptions) {
+            const nextRefresh = freemiumState.pendingRefreshOptions;
+            freemiumState.pendingRefreshOptions = null;
+            lastEntitlements = await runRefresh(nextRefresh);
         }
-        AdsProvider.init(entitlements);
-        if (session?.user) {
-            setGuestReadyState(true);
-            unlockAuthRequiredUi();
-        } else {
-            setGuestReadyState(false);
-        }
-        return entitlements;
+        return lastEntitlements;
     })();
 
     try {
         return await freemiumState.refreshPromise;
     } catch (error) {
         showEntitlementsError(error, async () => {
-            await refreshAll({ force: true });
+            await refreshAll({ force: true, reason: 'retry_after_error' });
         });
-        return getEntitlementsSnapshot();
+        return getEntitlementsSnapshot() || createGuestUiEntitlements();
     } finally {
         freemiumState.refreshPromise = null;
     }
@@ -366,21 +449,46 @@ function bindStatusBarActions() {
 
 async function consumeSentenceOrPrompt(options = {}) {
     if (freemiumState.isBusy) return false;
+
+    const count = Math.max(1, Number(options.count) || 1);
+    const source = String(options.source || 'app').trim() || 'app';
+    const requestId = String(options.requestId || '').trim() || createQuotaRequestId(source);
+
     freemiumState.isBusy = true;
     try {
-        const result = await consumeSentence(Number(options.count) || 1);
+        let result = null;
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+            try {
+                result = await consumeSentence({ count, source, requestId });
+                break;
+            } catch (error) {
+                if (attempt === 0) {
+                    continue;
+                }
+                throw error;
+            }
+        }
+
+        if (!result) return false;
+
         if (result.ok) {
             updateStatusBar(result.entitlements, freemiumState.authState);
             AdsProvider.init(result.entitlements);
             return true;
         }
 
-        if (result.reason === 'guest_quota') {
+        const reason = String(result.reason || '').toLowerCase();
+        if (reason === 'not_authenticated') {
+            paywallUi.openGuestAuthModal();
+            return false;
+        }
+
+        if (reason === 'guest_quota') {
             paywallUi.openGuestQuotaEndedModal();
             return false;
         }
 
-        if (result.reason === 'free_quota') {
+        if (reason === 'free_quota') {
             paywallUi.openFreeQuotaEndedModal();
             return false;
         }
@@ -396,7 +504,8 @@ async function consumeSentenceOrPrompt(options = {}) {
 
 function exposeApi() {
     window.MetaFreemium = {
-        refreshEntitlements: async (force = true) => refreshAll(Boolean(force)),
+        refreshEntitlements: async (force = true) => refreshAll({ force: Boolean(force), reason: 'api_refresh' }),
+        bootstrapAuth: async (reason = 'api_bootstrap') => bootstrapAuth(reason),
         getEntitlements: () => getEntitlementsSnapshot(),
         consumeSentenceOrPrompt,
         openGuestLoginModal: () => paywallUi.openGuestAuthModal(),
@@ -440,6 +549,7 @@ async function initializeFreemium() {
                 isGuest: Boolean(snapshot.isGuest),
                 email: String(snapshot.email || '').trim()
             };
+
             updateStatusBar(getEntitlementsSnapshot(), freemiumState.authState);
 
             const nextUserId = String(snapshot?.user?.id || '');
@@ -450,15 +560,29 @@ async function initializeFreemium() {
 
             const userChanged = nextUserId !== freemiumState.lastAuthUserId;
             freemiumState.lastAuthUserId = nextUserId;
-            const shouldForceRefresh = userChanged || authEvent === 'SIGNED_IN' || authEvent === 'TOKEN_REFRESHED' || authEvent === 'SIGNED_OUT';
-            if (!shouldForceRefresh) return;
 
-            const closeModalIfEligible = authEvent === 'SIGNED_IN' || authEvent === 'TOKEN_REFRESHED' || userChanged;
-            if (closeModalIfEligible) {
-                paywallUi.closeModal();
+            const isSignInLike = authEvent === 'SIGNED_IN' || authEvent === 'TOKEN_REFRESHED';
+            const isSignedOut = authEvent === 'SIGNED_OUT';
+
+            if (isSignInLike) {
+                stripAuthHashTokens();
             }
 
-            refreshAll({ force: true, closeModalIfEligible }).catch((error) => {
+            if (isSignedOut) {
+                paywallUi.closeModal();
+                updateStatusBar(createGuestUiEntitlements(), freemiumState.authState);
+                setGuestReadyState(false);
+            }
+
+            const shouldRefresh = userChanged || isSignInLike || isSignedOut;
+            if (!shouldRefresh) return;
+
+            const closeModalIfEligible = isSignInLike || userChanged;
+            refreshAll({
+                force: true,
+                closeModalIfEligible,
+                reason: authEvent || 'auth_state_change'
+            }).catch((error) => {
                 showEntitlementsError(error);
             });
         });
@@ -470,11 +594,10 @@ async function initializeFreemium() {
         });
 
         handleStripeReturn();
-        await refreshAll({ force: true });
     } catch (error) {
         console.warn('[freemium] init failed', error);
         showEntitlementsError(error, async () => {
-            await refreshAll({ force: true });
+            await refreshAll({ force: true, reason: 'init_retry' });
         });
         const bar = ensureStatusBar();
         const meter = bar.querySelector('[data-freemium-meter]');
@@ -484,10 +607,31 @@ async function initializeFreemium() {
     }
 }
 
+export async function bootstrapAuth(reason = 'bootstrap') {
+    if (freemiumState.bootstrapPromise) return freemiumState.bootstrapPromise;
+
+    freemiumState.bootstrapPromise = (async () => {
+        await initializeFreemium();
+        await refreshAll({ force: true, reason: String(reason || 'bootstrap') });
+        return getEntitlementsSnapshot() || createGuestUiEntitlements();
+    })();
+
+    try {
+        return await freemiumState.bootstrapPromise;
+    } catch (error) {
+        freemiumState.bootstrapPromise = null;
+        throw error;
+    }
+}
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        initializeFreemium();
+        bootstrapAuth('dom_ready').catch((error) => {
+            console.warn('[freemium] bootstrap failed', error);
+        });
     }, { once: true });
 } else {
-    initializeFreemium();
+    bootstrapAuth('immediate').catch((error) => {
+        console.warn('[freemium] bootstrap failed', error);
+    });
 }

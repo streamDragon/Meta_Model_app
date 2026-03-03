@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.160" data-build-time="1772506491860" data-build-iso="2026-03-03T02:54:51.860Z" data-git-commit="a056ecc">
+<html lang="he" dir="rtl" data-app-version="1.0.161" data-build-time="1772536996950" data-build-iso="2026-03-03T11:23:16.950Z" data-git-commit="96aef33">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1657,7 +1657,18 @@
                 moduleScript.type = 'module';
                 moduleScript.src = withAssetVersion('js/freemium/bootstrap-entry.js');
                 moduleScript.onload = function () {
-                    if (typeof onReady === 'function') onReady();
+                    var finish = function () {
+                        if (typeof onReady === 'function') onReady();
+                    };
+                    var bootstrapReady = window.MetaFreemiumReady;
+                    if (bootstrapReady && typeof bootstrapReady.then === 'function') {
+                        bootstrapReady.then(finish).catch(function (error) {
+                            console.error('Freemium bootstrap failed:', error);
+                            finish();
+                        });
+                        return;
+                    }
+                    finish();
                 };
                 moduleScript.onerror = function () {
                     console.error('Failed to load script:', 'js/freemium/bootstrap-entry.js');

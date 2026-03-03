@@ -3,7 +3,6 @@ import { getPublicSiteUrl, getSupabaseClient, isAnonymousUser, isSupabaseConfigu
 const authRuntime = {
     listenerBound: false,
     ensurePromise: null,
-    autoAnonAttempted: false,
     oauthInFlight: false,
     otpInFlight: false,
     lastSnapshotKey: '',
@@ -202,9 +201,6 @@ async function bindAuthListener() {
     const supabase = await getSupabaseClient();
     supabase.auth.onAuthStateChange((event, session) => {
         const eventName = String(event || 'AUTH_STATE_CHANGE');
-        if (eventName === 'SIGNED_OUT') {
-            authRuntime.autoAnonAttempted = false;
-        }
         applySessionSnapshot(session, '', eventName);
     });
     authRuntime.listenerBound = true;
@@ -255,18 +251,8 @@ export async function ensureSession() {
                 applySessionSnapshot(null, '', 'OAUTH_IN_FLIGHT');
                 return null;
             }
-            if (authRuntime.autoAnonAttempted) {
-                applySessionSnapshot(null, '', 'NO_SESSION');
-                return null;
-            }
-
-            // Sign in anonymously at most once per page load.
-            authRuntime.autoAnonAttempted = true;
-            const anonRes = await supabase.auth.signInAnonymously();
-            if (anonRes.error) throw anonRes.error;
-            const nextSession = anonRes.data?.session || null;
-            applySessionSnapshot(nextSession, '', 'ANON_SIGNED_IN');
-            return nextSession;
+            applySessionSnapshot(null, '', 'NO_SESSION');
+            return null;
         } catch (error) {
             const normalized = toCodeError(error, 'AUTH_SESSION_INIT_FAILED');
             setAuthState({
@@ -396,7 +382,6 @@ export async function signOutNonGuest() {
     const supabase = await getSupabaseClient();
     const { error } = await supabase.auth.signOut({ scope: 'local' });
     if (error) throw toCodeError(error, 'SIGNOUT_FAILED');
-    authRuntime.autoAnonAttempted = false;
     applySessionSnapshot(null, '', 'SIGNED_OUT');
 }
 
