@@ -83,12 +83,18 @@
     }
 
     function stageTransitionActionHint(stage) {
-        if (stage === 'question') return '\u05d4\u05de\u05e9\u05da: \u05d1\u05d7\u05e8\u05d5 \u05e9\u05d0\u05dc\u05d4 \u05de\u05d3\u05d5\u05d9\u05e7\u05ea \u05dc\u05d4\u05d7\u05d6\u05e8\u05ea \u05de\u05d9\u05d3\u05e2 \u05d7\u05e1\u05e8.';
-        if (stage === 'problem') return '\u05d4\u05de\u05e9\u05da: \u05d1\u05d7\u05e8\u05d5 \u05d0\u05ea \u05d4\u05d1\u05e2\u05d9\u05d4 \u05d4\u05dc\u05e9\u05d5\u05e0\u05d9\u05ea \u05d4\u05de\u05e8\u05db\u05d6\u05d9\u05ea.';
-        if (stage === 'goal') return '\u05d4\u05de\u05e9\u05da: \u05d1\u05d7\u05e8\u05d5 \u05d0\u05ea \u05de\u05d8\u05e8\u05ea \u05d4\u05d1\u05d9\u05e8\u05d5\u05e8 \u05d4\u05de\u05d3\u05d5\u05d9\u05e7\u05ea.';
+        if (stage === 'question') return '\u05de\u05d4 \u05e8\u05d5\u05e6\u05d9\u05dd \u05db\u05e2\u05ea: \u05dc\u05d1\u05d7\u05d5\u05e8 \u05e9\u05d0\u05dc\u05d4 \u05d0\u05d7\u05ea \u05e9\u05de\u05d7\u05d6\u05d9\u05e8\u05d4 \u05de\u05d9\u05d3\u05e2 \u05d7\u05e1\u05e8, \u05dc\u05dc\u05d0 \u05e4\u05ea\u05e8\u05d5\u05df \u05de\u05d9\u05d9\u05d3\u05d9.';
+        if (stage === 'problem') return '\u05de\u05d4 \u05e8\u05d5\u05e6\u05d9\u05dd \u05db\u05e2\u05ea: \u05dc\u05d1\u05d7\u05d5\u05e8 \u05d0\u05ea \u05d4\u05d1\u05e2\u05d9\u05d4 \u05d4\u05dc\u05e9\u05d5\u05e0\u05d9\u05ea \u05d4\u05de\u05e8\u05db\u05d6\u05d9\u05ea, \u05dc\u05d0 \u05e4\u05ea\u05e8\u05d5\u05df \u05d5\u05dc\u05d0 \u05e9\u05d9\u05e4\u05d5\u05d8.';
+        if (stage === 'goal') return '\u05de\u05d4 \u05e8\u05d5\u05e6\u05d9\u05dd \u05db\u05e2\u05ea: \u05dc\u05d1\u05d7\u05d5\u05e8 \u05de\u05d4 \u05de\u05d9\u05d3\u05e2 \u05d7\u05e1\u05e8 \u05db\u05d3\u05d0\u05d9 \u05dc\u05d1\u05e8\u05e8 \u05e2\u05db\u05e9\u05d9\u05d5.';
         return '\u05d4\u05de\u05e9\u05d9\u05db\u05d5 \u05dc\u05e9\u05dc\u05d1 \u05d4\u05d1\u05d0.';
     }
 
+    function stageTransitionTitle(stage) {
+        if (stage === 'question') return '\u05e9\u05dc\u05d1 B - \u05d1\u05d7\u05d9\u05e8\u05ea \u05e9\u05d0\u05dc\u05ea \u05d1\u05d9\u05e8\u05d5\u05e8';
+        if (stage === 'problem') return '\u05e9\u05dc\u05d1 C - \u05d6\u05d9\u05d4\u05d5\u05d9 \u05d4\u05d1\u05e2\u05d9\u05d4 \u05d4\u05dc\u05e9\u05d5\u05e0\u05d9\u05ea';
+        if (stage === 'goal') return '\u05e9\u05dc\u05d1 D - \u05d1\u05d7\u05d9\u05e8\u05ea \u05d9\u05e2\u05d3 \u05d4\u05d1\u05d9\u05e8\u05d5\u05e8';
+        return stageLabel(stage);
+    }
     function getStageTransitionForRound(round) {
         const transition = state.stageTransition;
         if (!transition || !round) return null;
@@ -114,6 +120,21 @@
         }, 2850);
         emitAlchemyFx('whoosh', { text: '\u05de\u05e2\u05d1\u05e8 \u05e9\u05dc\u05d1: ' + stageStepLabel(stage) });
     }
+    function focusStageTop() {
+        if (typeof window === 'undefined') return;
+        window.requestAnimationFrame(() => {
+            const anchor = appEl.querySelector('.cc-stage-transition-banner')
+                || appEl.querySelector('.cc-question-line')
+                || appEl.querySelector('.cc-practice-card-head');
+            if (!anchor || typeof anchor.scrollIntoView !== 'function') return;
+            try {
+                anchor.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+            } catch (_error) {
+                anchor.scrollIntoView();
+            }
+        });
+    }
+
     function emitAlchemyFx(type, detail) {
         try {
             if (root.alchemyFx && typeof root.alchemyFx.emit === 'function') {
@@ -603,13 +624,15 @@
                     };
                 } else {
                     const nextRound = currentRound();
-                    const optionCount = Math.max(0, Number((nextRound?.options?.[result.nextStage] || []).length));
+                    const nextStage = String(result.nextStage || '');
+                    const optionCount = Math.max(0, Number((nextRound?.options?.[nextStage] || []).length));
                     state.feedback = {
                         tone: 'success',
-                        text: '\u05e0\u05db\u05d5\u05df. ' + stageLabel(result.nextStage) + '. \u05d4\u05d5\u05d8\u05e2\u05e0\u05d5 ' + optionCount + ' \u05d0\u05e4\u05e9\u05e8\u05d5\u05d9\u05d5\u05ea \u05d7\u05d3\u05e9\u05d5\u05ea \u05dc\u05e9\u05dc\u05d1 \u05d6\u05d4.'
+                        text: '\u05e0\u05db\u05d5\u05df! \u05de\u05d4 \u05e7\u05e8\u05d4 \u05e2\u05db\u05e9\u05d9\u05d5: \u05e2\u05d1\u05e8\u05ea \u05dc' + stageTransitionTitle(nextStage) + '. \u05de\u05d4 \u05e2\u05d5\u05e9\u05d9\u05dd \u05e2\u05db\u05e9\u05d9\u05d5: ' + stageTransitionActionHint(nextStage) + ' \u05d4\u05d5\u05e6\u05d2\u05d5 ' + optionCount + ' \u05d0\u05e4\u05e9\u05e8\u05d5\u05d9\u05d5\u05ea \u05d7\u05d3\u05e9\u05d5\u05ea.'
                     };
-                    if (stageBeforeSubmit !== String(result.nextStage || '')) {
-                        activateStageTransition(nextRound, result.nextStage);
+                    if (stageBeforeSubmit !== nextStage) {
+                        activateStageTransition(nextRound, nextStage);
+                        focusStageTop();
                     }
                 }
             } else if (state.mode === 'learning') {
@@ -1546,7 +1569,7 @@
         const transition = getStageTransitionForRound(round);
         const optionsClasses = ['cc-options', 'cc-options-grid', transition ? 'is-stage-transition' : ''].filter(Boolean).join(' ');
         return `
-          <div class="${optionsClasses}" role="list" aria-label="אפשרויות תשובה">
+          <div class="${optionsClasses}" data-cc-stage="${escapeHtml(stage || '')}" role="list" aria-label="\u05d0\u05e4\u05e9\u05e8\u05d5\u05d9\u05d5\u05ea \u05ea\u05e9\u05d5\u05d1\u05d4">
             ${options.map((option, index) => {
                 const id = String(option.id);
                 const isSelected = state.lastSelectedOptionId === id;
@@ -1635,10 +1658,10 @@
     function renderStageTransitionBanner(round) {
         const transition = getStageTransitionForRound(round);
         if (!transition) return '';
-        const stageText = stageLabel(transition.stage);
+        const stageText = stageTransitionTitle(transition.stage);
         const optionCount = Math.max(0, Number(transition.optionCount || 0));
         return `
-          <div class="cc-stage-transition-banner" role="status" aria-live="polite">
+          <div class="cc-stage-transition-banner" data-cc-stage="${escapeHtml(transition.stage)}" role="status" aria-live="polite">
             <strong>\u05de\u05e2\u05d1\u05e8 \u05d1\u05e8\u05d5\u05e8: ${escapeHtml(stageText)}</strong>
             <span>\u05d4\u05d5\u05d8\u05e2\u05e0\u05d5 ${optionCount} \u05d0\u05e4\u05e9\u05e8\u05d5\u05d9\u05d5\u05ea \u05d7\u05d3\u05e9\u05d5\u05ea. ${escapeHtml(stageTransitionActionHint(transition.stage))}</span>
           </div>
@@ -1647,7 +1670,7 @@
 
     function renderPracticeCard(round) {
         if (!round) {
-            return `<section class="cc-practice-card"><div class="cc-loading">מכין שאלה...</div></section>`;
+            return `<section class="cc-practice-card"><div class="cc-loading">\u05d8\u05d5\u05e2\u05df \u05ea\u05e8\u05d2\u05d5\u05dc...</div></section>`;
         }
         if (round.stage === 'summary') return renderRoundSummaryCard(round);
 
@@ -1657,20 +1680,20 @@
         const canUseHint = state.mode === 'learning' && !state.session?.ended && !state.hintUsedByStage[round.stage];
 
         return `
-          <section class="cc-practice-card">
+          <section class="cc-practice-card" data-cc-stage="${escapeHtml(round.stage || '')}">
             <div class="cc-practice-card-head">
               <div class="cc-card-kicker">${escapeHtml(stageCopy.kicker || '')}</div>
               <h2>${escapeHtml(stageQuestionPrompt(round))}</h2>
               <p>${escapeHtml(stageCopy.desc || '')}</p>
             </div>
-            <div class="cc-client-card" aria-label="קטע דיבור">
+            <div class="cc-client-card" data-cc-stage="${escapeHtml(round.stage || '')}" aria-label="\u05e7\u05d8\u05e2 \u05d3\u05d9\u05d1\u05d5\u05e8">
               <div class="cc-client-card-head"><span>קטע דיבור</span><small>${escapeHtml(familyLabelSimple(round.pattern?.family))}</small></div>
               <div class="cc-client-text">${escapeHtml(promptText || 'אין טקסט לדוגמה')}</div>
             </div>
-            <div class="cc-question-line"><strong>${escapeHtml(stageQuestionPrompt(round))}</strong><span>${escapeHtml(operation.title)}</span></div>
+            <div class="cc-question-line" data-cc-stage="${escapeHtml(round.stage || '')}"><strong>${escapeHtml(stageQuestionPrompt(round))}</strong><span>${escapeHtml(operation.title)}</span></div>
             ${renderStageTransitionBanner(round)}
-            ${renderOptions(round)}
             ${renderFeedbackBox(round)}
+            ${renderOptions(round)}
             <div class="cc-practice-actions">
               <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="use-hint" ${canUseHint ? '' : 'disabled'}>רמז</button>
               <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="toggle-pause" ${state.mode !== 'learning' || state.session?.ended ? 'disabled' : ''}>${state.paused ? 'המשך' : 'השהיה'}</button>
