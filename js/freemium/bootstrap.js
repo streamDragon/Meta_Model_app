@@ -28,7 +28,17 @@ const freemiumState = {
     isBusy: false,
     refreshPromise: null,
     retryHandler: null,
-    lastAuthUserId: ''
+    lastAuthUserId: '',
+    lastAuthRefreshKey: '',
+    authState: {
+        status: 'loading',
+        session: null,
+        user: null,
+        isGuest: true,
+        email: ''
+    },
+    currentRole: 'guest',
+    remaining: 0
 };
 
 function escapeHtml(value) {
@@ -56,6 +66,39 @@ function meterText(entitlements) {
     return `נותרו ${entitlements.guest_daily_remaining} מתוך ${entitlements.guest_daily_limit} היום`;
 }
 
+function resolveRemaining(entitlements) {
+    if (!entitlements) return 0;
+    if (entitlements.unlimited || entitlements.role === 'pro') return Number.POSITIVE_INFINITY;
+    if (entitlements.role === 'free') return Math.max(0, Number(entitlements.free_total_remaining || 0));
+    return Math.max(0, Number(entitlements.guest_daily_remaining || 0));
+}
+
+function resolveAuthLabel(authState = null) {
+    const snapshot = authState || freemiumState.authState;
+    if (String(snapshot?.status || '') !== 'authenticated') return 'אורח';
+    const email = String(snapshot?.email || '').trim();
+    return email || 'מחובר';
+}
+
+function shouldClosePaywallForAuth(entitlements) {
+    const role = String(entitlements?.role || 'guest');
+    const remaining = resolveRemaining(entitlements);
+    return role !== 'guest' || remaining > 0;
+}
+
+function normalizeRefreshOptions(forceOrOptions = false) {
+    if (typeof forceOrOptions === 'object' && forceOrOptions !== null) {
+        return {
+            force: Boolean(forceOrOptions.force),
+            closeModalIfEligible: Boolean(forceOrOptions.closeModalIfEligible)
+        };
+    }
+    return {
+        force: Boolean(forceOrOptions),
+        closeModalIfEligible: false
+    };
+}
+
 function ensureStatusBar() {
     let bar = document.getElementById(STATUS_BAR_ID);
     if (bar) return bar;
@@ -67,6 +110,9 @@ function ensureStatusBar() {
         <div class="freemium-status-main">
             <span class="freemium-role-badge" data-freemium-role>אורח</span>
             <span class="freemium-meter" data-freemium-meter>...</span>
+        </div>
+        <div class="freemium-status-meta">
+            <span class="freemium-auth-label" data-freemium-auth-label>אורח</span>
         </div>
         <div class="freemium-status-actions">
             <button type="button" class="freemium-link-btn" data-freemium-action-primary>התחבר</button>
@@ -126,7 +172,7 @@ function showEntitlementsError(error, retryHandler = null) {
             await retryHandler();
             return;
         }
-        await refreshAll(true);
+        await refreshAll({ force: true });
     };
 }
 
@@ -154,16 +200,22 @@ function unlockAuthRequiredUi() {
     window.dispatchEvent(new CustomEvent('freemium:guest-ready', { detail: { ready: true } }));
 }
 
-function updateStatusBar(entitlements) {
+function updateStatusBar(entitlements, authState = null) {
     const bar = ensureStatusBar();
     const roleEl = bar.querySelector('[data-freemium-role]');
     const meterEl = bar.querySelector('[data-freemium-meter]');
+    const authLabelEl = bar.querySelector('[data-freemium-auth-label]');
     const actionBtn = bar.querySelector('[data-freemium-action-primary]');
     const guestBanner = bar.querySelector('[data-freemium-guest-banner]');
 
     const role = String(entitlements?.role || 'guest');
+    const remaining = resolveRemaining(entitlements);
+    freemiumState.currentRole = role;
+    freemiumState.remaining = remaining;
+
     if (roleEl) roleEl.textContent = mapRoleToHebrew(role);
     if (meterEl) meterEl.textContent = meterText(entitlements);
+    if (authLabelEl) authLabelEl.textContent = resolveAuthLabel(authState);
     if (guestBanner) guestBanner.classList.toggle('hidden', role !== 'guest');
 
     if (actionBtn) {
@@ -236,14 +288,19 @@ const paywallUi = createPaywallUi({
     }
 });
 
-async function refreshAll(force = false) {
+async function refreshAll(forceOrOptions = false) {
+    const options = normalizeRefreshOptions(forceOrOptions);
+    const force = options.force;
     if (freemiumState.refreshPromise) return freemiumState.refreshPromise;
 
     freemiumState.refreshPromise = (async () => {
         const session = await ensureSession();
         const entitlements = await refreshEntitlements({ force });
         hideEntitlementsError();
-        updateStatusBar(entitlements);
+        updateStatusBar(entitlements, freemiumState.authState);
+        if (options.closeModalIfEligible && shouldClosePaywallForAuth(entitlements)) {
+            paywallUi.closeModal();
+        }
         AdsProvider.init(entitlements);
         if (session?.user) {
             setGuestReadyState(true);
@@ -258,7 +315,7 @@ async function refreshAll(force = false) {
         return await freemiumState.refreshPromise;
     } catch (error) {
         showEntitlementsError(error, async () => {
-            await refreshAll(true);
+            await refreshAll({ force: true });
         });
         return getEntitlementsSnapshot();
     } finally {
@@ -313,7 +370,7 @@ async function consumeSentenceOrPrompt(options = {}) {
     try {
         const result = await consumeSentence(Number(options.count) || 1);
         if (result.ok) {
-            updateStatusBar(result.entitlements);
+            updateStatusBar(result.entitlements, freemiumState.authState);
             AdsProvider.init(result.entitlements);
             return true;
         }
@@ -375,26 +432,49 @@ async function initializeFreemium() {
 
         onAuthSessionChange((snapshot) => {
             if (!snapshot?.ready) return;
+
+            freemiumState.authState = {
+                status: String(snapshot.status || ''),
+                session: snapshot.session || null,
+                user: snapshot.user || null,
+                isGuest: Boolean(snapshot.isGuest),
+                email: String(snapshot.email || '').trim()
+            };
+            updateStatusBar(getEntitlementsSnapshot(), freemiumState.authState);
+
             const nextUserId = String(snapshot?.user?.id || '');
-            if (nextUserId === freemiumState.lastAuthUserId) return;
+            const authEvent = String(snapshot?.lastEvent || '');
+            const refreshKey = `${authEvent}|${nextUserId}|${Number(snapshot?.lastEventAt || 0)}`;
+            if (refreshKey === freemiumState.lastAuthRefreshKey) return;
+            freemiumState.lastAuthRefreshKey = refreshKey;
+
+            const userChanged = nextUserId !== freemiumState.lastAuthUserId;
             freemiumState.lastAuthUserId = nextUserId;
-            refreshAll(true).catch((error) => {
+            const shouldForceRefresh = userChanged || authEvent === 'SIGNED_IN' || authEvent === 'TOKEN_REFRESHED' || authEvent === 'SIGNED_OUT';
+            if (!shouldForceRefresh) return;
+
+            const closeModalIfEligible = authEvent === 'SIGNED_IN' || authEvent === 'TOKEN_REFRESHED' || userChanged;
+            if (closeModalIfEligible) {
+                paywallUi.closeModal();
+            }
+
+            refreshAll({ force: true, closeModalIfEligible }).catch((error) => {
                 showEntitlementsError(error);
             });
         });
 
         onEntitlementsChange((entitlements) => {
             if (!entitlements) return;
-            updateStatusBar(entitlements);
+            updateStatusBar(entitlements, freemiumState.authState);
             AdsProvider.init(entitlements);
         });
 
         handleStripeReturn();
-        await refreshAll(true);
+        await refreshAll({ force: true });
     } catch (error) {
         console.warn('[freemium] init failed', error);
         showEntitlementsError(error, async () => {
-            await refreshAll(true);
+            await refreshAll({ force: true });
         });
         const bar = ensureStatusBar();
         const meter = bar.querySelector('[data-freemium-meter]');

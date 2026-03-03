@@ -49,6 +49,21 @@
   gap: 8px;
 }
 
+.freemium-status-meta {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.freemium-auth-label {
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .freemium-role-badge {
   display: inline-flex;
   align-items: center;

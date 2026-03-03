@@ -6,12 +6,18 @@ const authRuntime = {
     autoAnonAttempted: false,
     oauthInFlight: false,
     otpInFlight: false,
+    lastSnapshotKey: '',
+    lastAuthLogKey: '',
     state: {
+        status: 'loading',
         ready: false,
         session: null,
         user: null,
         roleHint: 'guest',
         isGuest: true,
+        email: '',
+        lastEvent: '',
+        lastEventAt: 0,
         error: ''
     },
     listeners: new Set()
@@ -41,17 +47,55 @@ function normalizeRoleHint(user) {
     return normalizeGuestFlag(user) ? 'guest' : 'free';
 }
 
-function applySessionSnapshot(session, errorText = '') {
+function normalizeAuthStatus(user, isGuest) {
+    if (!user) return 'signed_out';
+    if (isGuest) return 'guest';
+    return 'authenticated';
+}
+
+function buildSessionSnapshotKey(session, eventName, errorText = '') {
+    const user = session?.user || null;
+    return [
+        String(eventName || ''),
+        String(errorText || ''),
+        String(user?.id || ''),
+        String(user?.email || ''),
+        String(session?.access_token || ''),
+        String(session?.expires_at || '')
+    ].join('|');
+}
+
+function logAuthSnapshot(user, isGuest) {
+    const userId = String(user?.id || '').trim();
+    const email = String(user?.email || '').trim().toLowerCase();
+    const identity = email || userId || 'none';
+    const logKey = `${identity}|${isGuest ? '1' : '0'}`;
+    if (logKey === authRuntime.lastAuthLogKey) return;
+    authRuntime.lastAuthLogKey = logKey;
+    console.info(`[auth] session user=${identity} isGuest=${isGuest}`);
+}
+
+function applySessionSnapshot(session, errorText = '', eventName = 'SESSION_SYNC') {
+    const snapshotKey = buildSessionSnapshotKey(session, eventName, errorText);
+    if (snapshotKey === authRuntime.lastSnapshotKey) return;
+    authRuntime.lastSnapshotKey = snapshotKey;
+
     const user = session?.user || null;
     const isGuest = normalizeGuestFlag(user);
+    const email = String(user?.email || '').trim().toLowerCase();
     setAuthState({
+        status: normalizeAuthStatus(user, isGuest),
         ready: true,
         session,
         user,
         roleHint: normalizeRoleHint(user),
         isGuest,
+        email,
+        lastEvent: String(eventName || ''),
+        lastEventAt: Date.now(),
         error: errorText || ''
     });
+    logAuthSnapshot(user, isGuest);
 }
 
 function toCodeError(error, fallbackCode) {
@@ -156,8 +200,12 @@ async function waitForCallbackSession(supabase, retries = 14, waitMs = 220) {
 async function bindAuthListener() {
     if (authRuntime.listenerBound || !isSupabaseConfigured()) return;
     const supabase = await getSupabaseClient();
-    supabase.auth.onAuthStateChange((_event, session) => {
-        applySessionSnapshot(session, '');
+    supabase.auth.onAuthStateChange((event, session) => {
+        const eventName = String(event || 'AUTH_STATE_CHANGE');
+        if (eventName === 'SIGNED_OUT') {
+            authRuntime.autoAnonAttempted = false;
+        }
+        applySessionSnapshot(session, '', eventName);
     });
     authRuntime.listenerBound = true;
 }
@@ -176,11 +224,15 @@ export function onAuthSessionChange(listener) {
 export async function ensureSession() {
     if (!isSupabaseConfigured()) {
         setAuthState({
+            status: 'disabled',
             ready: true,
             session: null,
             user: null,
             roleHint: 'guest',
             isGuest: true,
+            email: '',
+            lastEvent: 'CONFIG_MISSING',
+            lastEventAt: Date.now(),
             error: 'SUPABASE_CONFIG_MISSING'
         });
         return null;
@@ -196,11 +248,15 @@ export async function ensureSession() {
             if (error) throw error;
 
             if (data?.session) {
-                applySessionSnapshot(data.session, '');
+                applySessionSnapshot(data.session, '', 'INITIAL_SESSION');
                 return data.session;
             }
+            if (authRuntime.oauthInFlight) {
+                applySessionSnapshot(null, '', 'OAUTH_IN_FLIGHT');
+                return null;
+            }
             if (authRuntime.autoAnonAttempted) {
-                applySessionSnapshot(null, '');
+                applySessionSnapshot(null, '', 'NO_SESSION');
                 return null;
             }
 
@@ -209,12 +265,15 @@ export async function ensureSession() {
             const anonRes = await supabase.auth.signInAnonymously();
             if (anonRes.error) throw anonRes.error;
             const nextSession = anonRes.data?.session || null;
-            applySessionSnapshot(nextSession, '');
+            applySessionSnapshot(nextSession, '', 'ANON_SIGNED_IN');
             return nextSession;
         } catch (error) {
             const normalized = toCodeError(error, 'AUTH_SESSION_INIT_FAILED');
             setAuthState({
+                status: authRuntime.state.status || 'loading',
                 ready: true,
+                lastEvent: 'ERROR',
+                lastEventAt: Date.now(),
                 error: normalized.message
             });
             throw normalized;
@@ -261,7 +320,7 @@ export async function upgradeAnonymousWithEmailPassword(email, password) {
     }
 
     const nextSession = data?.session || (await supabase.auth.getSession()).data?.session || null;
-    applySessionSnapshot(nextSession, '');
+    applySessionSnapshot(nextSession, '', 'USER_UPGRADED');
     return getAuthSnapshot();
 }
 
@@ -338,7 +397,7 @@ export async function signOutNonGuest() {
     const { error } = await supabase.auth.signOut({ scope: 'local' });
     if (error) throw toCodeError(error, 'SIGNOUT_FAILED');
     authRuntime.autoAnonAttempted = false;
-    applySessionSnapshot(null, '');
+    applySessionSnapshot(null, '', 'SIGNED_OUT');
 }
 
 export async function signInWithEmailOtp(email) {

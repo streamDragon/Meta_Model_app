@@ -1,15 +1,18 @@
 import { getSupabaseClient, isSupabaseConfigured } from '../lib/supabase-client.js';
-import { ensureSession } from './auth-session.js';
+import { ensureSession, getAuthSnapshot } from './auth-session.js';
 
 const ENTITLEMENTS_CACHE_KEY = 'meta_freemium_entitlements_v1';
 const ENTITLEMENTS_CACHE_TTL_MS = 45 * 1000;
+const SIGNED_OUT_USER_KEY = '__signed_out__';
 
 const entitlementsRuntime = {
     entitlements: null,
+    userKey: '',
     updatedAt: 0,
     listeners: new Set(),
     refreshPromise: null,
-    consumePromise: null
+    consumePromise: null,
+    lastLogKey: ''
 };
 
 function emitEntitlements() {
@@ -39,10 +42,52 @@ function normalizeEntitlementsRow(row) {
     };
 }
 
-function persistEntitlementsCache(entitlements) {
+function resolveRemaining(entitlements) {
+    if (!entitlements) return 0;
+    if (entitlements.unlimited || entitlements.role === 'pro') return -1;
+    if (entitlements.role === 'free') return Number(entitlements.free_total_remaining || 0);
+    return Number(entitlements.guest_daily_remaining || 0);
+}
+
+function resolveSessionUserKey(session) {
+    return String(session?.user?.id || '').trim();
+}
+
+function resolveAuthUserKey() {
+    const authSnapshot = getAuthSnapshot();
+    if (!authSnapshot?.ready) return '';
+    const userKey = String(authSnapshot?.user?.id || '').trim();
+    return userKey || SIGNED_OUT_USER_KEY;
+}
+
+function createGuestFallbackEntitlements() {
+    return normalizeEntitlementsRow({
+        role: 'guest',
+        ads_enabled: true,
+        guest_daily_limit: 10,
+        guest_daily_used_today: 0,
+        guest_daily_remaining: 10,
+        free_total_limit: 80,
+        free_total_used: 0,
+        free_total_remaining: 80,
+        unlimited: false
+    });
+}
+
+function logEntitlements(entitlements, userKey = '') {
+    const role = String(entitlements?.role || 'guest');
+    const remaining = resolveRemaining(entitlements);
+    const logKey = `${String(userKey || '')}|${role}|${remaining}`;
+    if (logKey === entitlementsRuntime.lastLogKey) return;
+    entitlementsRuntime.lastLogKey = logKey;
+    console.info(`[entitlements] role=${role} remaining=${remaining}`);
+}
+
+function persistEntitlementsCache(entitlements, userKey = '') {
     try {
         localStorage.setItem(ENTITLEMENTS_CACHE_KEY, JSON.stringify({
             entitlements,
+            userKey: String(userKey || ''),
             updatedAt: Date.now()
         }));
     } catch (error) {}
@@ -55,24 +100,41 @@ function readEntitlementsCache() {
         const parsed = JSON.parse(raw);
         if (!parsed || typeof parsed !== 'object') return null;
         if ((Date.now() - Number(parsed.updatedAt || 0)) > ENTITLEMENTS_CACHE_TTL_MS) return null;
-        return normalizeEntitlementsRow(parsed.entitlements || {});
+        return {
+            entitlements: normalizeEntitlementsRow(parsed.entitlements || {}),
+            userKey: String(parsed.userKey || '').trim()
+        };
     } catch (error) {
         return null;
     }
 }
 
-function applyEntitlements(entitlements) {
+function isCacheForCurrentUser(userKey) {
+    const currentAuthUserKey = resolveAuthUserKey();
+    if (!currentAuthUserKey) return true;
+    return String(userKey || '') === currentAuthUserKey;
+}
+
+function applyEntitlements(entitlements, options = {}) {
+    const userKey = String(options.userKey || '').trim();
     entitlementsRuntime.entitlements = normalizeEntitlementsRow(entitlements || {});
+    entitlementsRuntime.userKey = userKey;
     entitlementsRuntime.updatedAt = Date.now();
-    persistEntitlementsCache(entitlementsRuntime.entitlements);
+    persistEntitlementsCache(entitlementsRuntime.entitlements, userKey);
+    logEntitlements(entitlementsRuntime.entitlements, userKey);
     emitEntitlements();
     return entitlementsRuntime.entitlements;
 }
 
 export function getEntitlementsSnapshot() {
-    const cached = entitlementsRuntime.entitlements || readEntitlementsCache();
-    if (!cached) return null;
-    return Object.assign({}, cached);
+    if (entitlementsRuntime.entitlements && isCacheForCurrentUser(entitlementsRuntime.userKey)) {
+        return Object.assign({}, entitlementsRuntime.entitlements);
+    }
+
+    const cachedEntry = readEntitlementsCache();
+    if (!cachedEntry) return null;
+    if (!isCacheForCurrentUser(cachedEntry.userKey)) return null;
+    return Object.assign({}, cachedEntry.entitlements);
 }
 
 export function onEntitlementsChange(listener) {
@@ -84,7 +146,17 @@ export function onEntitlementsChange(listener) {
 
 export async function refreshEntitlements(options = {}) {
     const force = Boolean(options.force);
-    const hasFreshMemory = entitlementsRuntime.entitlements && (Date.now() - entitlementsRuntime.updatedAt) <= ENTITLEMENTS_CACHE_TTL_MS;
+    const authUserKey = resolveAuthUserKey();
+
+    if (authUserKey && entitlementsRuntime.userKey && authUserKey !== entitlementsRuntime.userKey) {
+        entitlementsRuntime.entitlements = null;
+        entitlementsRuntime.userKey = '';
+        entitlementsRuntime.updatedAt = 0;
+    }
+
+    const hasFreshMemory = entitlementsRuntime.entitlements &&
+        isCacheForCurrentUser(entitlementsRuntime.userKey) &&
+        (Date.now() - entitlementsRuntime.updatedAt) <= ENTITLEMENTS_CACHE_TTL_MS;
     if (!force && hasFreshMemory) {
         return getEntitlementsSnapshot();
     }
@@ -92,8 +164,15 @@ export async function refreshEntitlements(options = {}) {
     if (entitlementsRuntime.refreshPromise) return entitlementsRuntime.refreshPromise;
 
     entitlementsRuntime.refreshPromise = (async () => {
-        if (!isSupabaseConfigured()) return null;
-        await ensureSession();
+        if (!isSupabaseConfigured()) {
+            return applyEntitlements(createGuestFallbackEntitlements(), { userKey: resolveAuthUserKey() || SIGNED_OUT_USER_KEY });
+        }
+        const session = await ensureSession();
+        const sessionUserKey = resolveSessionUserKey(session);
+        if (!session?.user) {
+            return applyEntitlements(createGuestFallbackEntitlements(), { userKey: resolveAuthUserKey() || SIGNED_OUT_USER_KEY });
+        }
+
         const supabase = await getSupabaseClient();
 
         const { error: ensureError } = await supabase.rpc('ensure_profile');
@@ -105,7 +184,7 @@ export async function refreshEntitlements(options = {}) {
             throw new Error(error.message || 'ENTITLEMENTS_FETCH_FAILED');
         }
         const row = Array.isArray(data) ? data[0] : data;
-        return applyEntitlements(row || {});
+        return applyEntitlements(row || {}, { userKey: sessionUserKey });
     })();
 
     try {
@@ -126,7 +205,7 @@ async function runConsumeSentence(count = 1) {
     if (!isSupabaseConfigured()) {
         return { ok: true, entitlements: null };
     }
-    await ensureSession();
+    const session = await ensureSession();
     const supabase = await getSupabaseClient();
     const pCount = Math.max(1, Number(count) || 1);
 
@@ -141,7 +220,8 @@ async function runConsumeSentence(count = 1) {
     }
 
     const row = Array.isArray(data) ? data[0] : data;
-    const entitlements = applyEntitlements(row || {});
+    const sessionUserKey = resolveSessionUserKey(session) || resolveAuthUserKey();
+    const entitlements = applyEntitlements(row || {}, { userKey: sessionUserKey });
     return {
         ok: true,
         entitlements,
