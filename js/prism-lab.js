@@ -33,11 +33,31 @@
   ]);
 
   const BREEN_ROW_META = Object.freeze({
-    row1: Object.freeze({ colorClass: 'row-sky', heLabel: 'שלשה 1 — שכבת מקור' }),
-    row2: Object.freeze({ colorClass: 'row-teal', heLabel: 'שלשה 2 — שכבת חוקים' }),
-    row3: Object.freeze({ colorClass: 'row-amber', heLabel: 'שלשה 3 — שכבת משמעות' }),
-    row4: Object.freeze({ colorClass: 'row-violet', heLabel: 'שלשה 4 — שכבת הקשר' }),
-    row5: Object.freeze({ colorClass: 'row-rose', heLabel: 'שלשה 5 — שכבת קרקע' })
+    row1: Object.freeze({
+      colorClass: 'row-sky',
+      heLabel: 'שלשה 1 | מקור, הנחה וכוונה',
+      heInsight: 'מי קובע אמת, מה מניחים מראש, ואיזו כוונה מיוחסת לאחר.'
+    }),
+    row2: Object.freeze({
+      colorClass: 'row-teal',
+      heLabel: 'שלשה 2 | חוקי משחק וגבולות',
+      heInsight: 'חייב/יכול/תמיד ותיחום גבולות, כולל שרשראות סיבה-תוצאה.'
+    }),
+    row3: Object.freeze({
+      colorClass: 'row-amber',
+      heLabel: 'שלשה 3 | משמעות, זהות והסקה',
+      heInsight: 'איך שפה מופשטת וזהויות הופכות למסקנות כוללניות.'
+    }),
+    row4: Object.freeze({
+      colorClass: 'row-violet',
+      heLabel: 'שלשה 4 | הקשר, זמן וייחוס',
+      heInsight: 'מול מי, ביחס למה, ובאיזה זמן/מקום הטענה באמת נאמרת.'
+    }),
+    row5: Object.freeze({
+      colorClass: 'row-rose',
+      heLabel: 'שלשה 5 | קרקע חושית ופעולה',
+      heInsight: 'מעבירים לשפה מדידה: מי/מה, חושית, ומה הפעולה בפועל.'
+    })
   });
 
   const BREEN_LABELS_HE = Object.freeze({
@@ -445,7 +465,10 @@
 
       return `
         <div class="pl-breen-row ${esc(meta.colorClass || '')}${isActiveRow ? ' is-active' : ''}">
-          <div class="pl-breen-row-head">${esc(meta.heLabel || row.id)}</div>
+          <div class="pl-breen-row-head">
+            <strong>${esc(meta.heLabel || row.id)}</strong>
+            <small>${esc(meta.heInsight || '')}</small>
+          </div>
           <div class="pl-breen-row-cells">${cellsHtml}</div>
         </div>
       `;

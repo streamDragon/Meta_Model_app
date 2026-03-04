@@ -236,9 +236,21 @@ body {
 }
 
 .pl-breen-row-head {
+  display: grid;
+  gap: 2px;
+}
+
+.pl-breen-row-head strong {
   font-size: 0.76rem;
   font-weight: 800;
   color: #365b86;
+  line-height: 1.2;
+}
+
+.pl-breen-row-head small {
+  color: #5a7390;
+  font-size: 0.69rem;
+  line-height: 1.25;
 }
 
 .pl-breen-row-cells {

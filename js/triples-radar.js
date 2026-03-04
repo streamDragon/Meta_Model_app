@@ -1,4 +1,4 @@
-(function attachTriplesRadarModule(rootFactory) {
+﻿(function attachTriplesRadarModule(rootFactory) {
     const root = typeof globalThis !== 'undefined'
         ? globalThis
         : (typeof window !== 'undefined' ? window : this);
@@ -17,11 +17,31 @@
     });
 
     const ROW_META = Object.freeze({
-        row1: Object.freeze({ colorClass: 'row-sky', heLabel: 'שלשה 1 — שכבת מקור' }),
-        row2: Object.freeze({ colorClass: 'row-teal', heLabel: 'שלשה 2 — שכבת חוקים' }),
-        row3: Object.freeze({ colorClass: 'row-amber', heLabel: 'שלשה 3 — שכבת משמעות' }),
-        row4: Object.freeze({ colorClass: 'row-violet', heLabel: 'שלשה 4 — שכבת הקשר' }),
-        row5: Object.freeze({ colorClass: 'row-rose', heLabel: 'שלשה 5 — שכבת קרקע' })
+        row1: Object.freeze({
+            colorClass: 'row-sky',
+            heLabel: 'שלשה 1 | מקור, הנחה וכוונה',
+            heInsight: 'מי קובע אמת, מה מניחים מראש, ואיזו כוונה מיוחסת לאחר.'
+        }),
+        row2: Object.freeze({
+            colorClass: 'row-teal',
+            heLabel: 'שלשה 2 | חוקי משחק וגבולות',
+            heInsight: 'חייב/יכול/תמיד ותיחום גבולות, כולל שרשראות סיבה-תוצאה.'
+        }),
+        row3: Object.freeze({
+            colorClass: 'row-amber',
+            heLabel: 'שלשה 3 | משמעות, זהות והסקה',
+            heInsight: 'איך שפה מופשטת וזהויות הופכות למסקנות כוללניות.'
+        }),
+        row4: Object.freeze({
+            colorClass: 'row-violet',
+            heLabel: 'שלשה 4 | הקשר, זמן וייחוס',
+            heInsight: 'מול מי, ביחס למה, ובאיזה זמן/מקום הטענה באמת נאמרת.'
+        }),
+        row5: Object.freeze({
+            colorClass: 'row-rose',
+            heLabel: 'שלשה 5 | קרקע חושית ופעולה',
+            heInsight: 'מעבירים לשפה מדידה: מי/מה, חושית, ומה הפעולה בפועל.'
+        })
     });
 
     const state = {
@@ -168,13 +188,13 @@
         const noteEl = document.getElementById('triples-radar-mode-note');
         if (titleEl) {
             titleEl.textContent = activeToggleKey === 'triple'
-                ? 'מבט שלשה · עובדים על המשפחה כולה'
-                : 'מבט ממוקד · תבנית אחת בכל פעם';
+                ? '׳׳‘׳˜ ׳©׳׳©׳” ֲ· ׳¢׳•׳‘׳“׳™׳ ׳¢׳ ׳”׳׳©׳₪׳—׳” ׳›׳•׳׳”'
+                : '׳׳‘׳˜ ׳׳׳•׳§׳“ ֲ· ׳×׳‘׳ ׳™׳× ׳׳—׳× ׳‘׳›׳ ׳₪׳¢׳';
         }
         if (noteEl) {
             noteEl.textContent = activeToggleKey === 'triple'
-                ? 'בוחרים שורה מתאימה בטבלה, ואז מתרגלים שלוש שאלות משלימות מאותה משפחת דפוסים.'
-                : 'מתרגלים זיהוי מדויק של תבנית אחת בכל משפט, עם משוב שמכוון לצעד הבא.';
+                ? '׳‘׳•׳—׳¨׳™׳ ׳©׳•׳¨׳” ׳׳×׳׳™׳׳” ׳‘׳˜׳‘׳׳”, ׳•׳׳– ׳׳×׳¨׳’׳׳™׳ ׳©׳׳•׳© ׳©׳׳׳•׳× ׳׳©׳׳™׳׳•׳× ׳׳׳•׳×׳” ׳׳©׳₪׳—׳× ׳“׳₪׳•׳¡׳™׳.'
+                : '׳׳×׳¨׳’׳׳™׳ ׳–׳™׳”׳•׳™ ׳׳“׳•׳™׳§ ׳©׳ ׳×׳‘׳ ׳™׳× ׳׳—׳× ׳‘׳›׳ ׳׳©׳₪׳˜, ׳¢׳ ׳׳©׳•׳‘ ׳©׳׳›׳•׳•׳ ׳׳¦׳¢׳“ ׳”׳‘׳.';
         }
     }
 
@@ -368,7 +388,7 @@
         const value = normalizeSpaces(text);
         if (!value) return '';
         if (value.length <= maxLen) return value;
-        return `${value.slice(0, Math.max(0, maxLen - 1)).trim()}…`;
+        return `${value.slice(0, Math.max(0, maxLen - 1)).trim()}ג€¦`;
     }
 
     function buildPhoneQuestion(categoryId) {
@@ -380,24 +400,24 @@
         }
 
         const promptMap = {
-            lost_performative: 'לפי איזה סטנדרט זה נשפט כאן?',
-            assumptions: 'איזו הנחה כאן חייבת להיות נכונה כדי שזה יחזיק?',
-            mind_reading: 'איך אתה יודע/ת מה הצד השני חושב או מתכוון?',
-            universal_quantifier: 'תמיד? אין אפילו יוצא דופן אחד?',
-            modal_operator: 'מה עוצר אותך בפועל? מה בדיוק מונע?',
-            cause_effect: 'איך בדיוק X מוביל ל-Y, שלב אחרי שלב?',
-            nominalisations: 'מה קורה כאן בפועל (כפעולה) ולא כשם עצם?',
-            identity_predicates: 'באיזה תחום זה נכון, ובאיזה תחום לא בהכרח?',
-            complex_equivalence: 'איך האירוע הזה אומר את המסקנה הזאת?',
-            comparative_deletion: 'ביחס למה בדיוק? ומה המדד?',
-            time_space_predicates: 'מתי/איפה בדיוק זה קורה (ומתי לא)?',
-            lack_referential_index: 'מי בדיוק זה "הם/כולם" כאן?',
-            non_referring_nouns: 'למה בדיוק מתכוונים במילה הזאת?',
-            sensory_predicates: 'מה בדיוק רואים/שומעים/מרגישים בגוף?',
-            unspecified_verbs: 'מה קורה כאן צעד-צעד בפועל?'
+            lost_performative: '׳׳₪׳™ ׳׳™׳–׳” ׳¡׳˜׳ ׳“׳¨׳˜ ׳–׳” ׳ ׳©׳₪׳˜ ׳›׳׳?',
+            assumptions: '׳׳™׳–׳• ׳”׳ ׳—׳” ׳›׳׳ ׳—׳™׳™׳‘׳× ׳׳”׳™׳•׳× ׳ ׳›׳•׳ ׳” ׳›׳“׳™ ׳©׳–׳” ׳™׳—׳–׳™׳§?',
+            mind_reading: '׳׳™׳ ׳׳×׳” ׳™׳•׳“׳¢/׳× ׳׳” ׳”׳¦׳“ ׳”׳©׳ ׳™ ׳—׳•׳©׳‘ ׳׳• ׳׳×׳›׳•׳•׳?',
+            universal_quantifier: '׳×׳׳™׳“? ׳׳™׳ ׳׳₪׳™׳׳• ׳™׳•׳¦׳ ׳“׳•׳₪׳ ׳׳—׳“?',
+            modal_operator: '׳׳” ׳¢׳•׳¦׳¨ ׳׳•׳×׳ ׳‘׳₪׳•׳¢׳? ׳׳” ׳‘׳“׳™׳•׳§ ׳׳•׳ ׳¢?',
+            cause_effect: '׳׳™׳ ׳‘׳“׳™׳•׳§ X ׳׳•׳‘׳™׳ ׳-Y, ׳©׳׳‘ ׳׳—׳¨׳™ ׳©׳׳‘?',
+            nominalisations: '׳׳” ׳§׳•׳¨׳” ׳›׳׳ ׳‘׳₪׳•׳¢׳ (׳›׳₪׳¢׳•׳׳”) ׳•׳׳ ׳›׳©׳ ׳¢׳¦׳?',
+            identity_predicates: '׳‘׳׳™׳–׳” ׳×׳—׳•׳ ׳–׳” ׳ ׳›׳•׳, ׳•׳‘׳׳™׳–׳” ׳×׳—׳•׳ ׳׳ ׳‘׳”׳›׳¨׳—?',
+            complex_equivalence: '׳׳™׳ ׳”׳׳™׳¨׳•׳¢ ׳”׳–׳” ׳׳•׳׳¨ ׳׳× ׳”׳׳¡׳§׳ ׳” ׳”׳–׳׳×?',
+            comparative_deletion: '׳‘׳™׳—׳¡ ׳׳׳” ׳‘׳“׳™׳•׳§? ׳•׳׳” ׳”׳׳“׳“?',
+            time_space_predicates: '׳׳×׳™/׳׳™׳₪׳” ׳‘׳“׳™׳•׳§ ׳–׳” ׳§׳•׳¨׳” (׳•׳׳×׳™ ׳׳)?',
+            lack_referential_index: '׳׳™ ׳‘׳“׳™׳•׳§ ׳–׳” "׳”׳/׳›׳•׳׳" ׳›׳׳?',
+            non_referring_nouns: '׳׳׳” ׳‘׳“׳™׳•׳§ ׳׳×׳›׳•׳•׳ ׳™׳ ׳‘׳׳™׳׳” ׳”׳–׳׳×?',
+            sensory_predicates: '׳׳” ׳‘׳“׳™׳•׳§ ׳¨׳•׳׳™׳/׳©׳•׳׳¢׳™׳/׳׳¨׳’׳™׳©׳™׳ ׳‘׳’׳•׳£?',
+            unspecified_verbs: '׳׳” ׳§׳•׳¨׳” ׳›׳׳ ׳¦׳¢׳“-׳¦׳¢׳“ ׳‘׳₪׳•׳¢׳?'
         };
 
-        return promptMap[normalized] || `מה יעזור לדייק כאן דרך ${getShortCategoryChip(normalized)}?`;
+        return promptMap[normalized] || `׳׳” ׳™׳¢׳–׳•׳¨ ׳׳“׳™׳™׳§ ׳›׳׳ ׳“׳¨׳ ${getShortCategoryChip(normalized)}?`;
     }
 
     
@@ -407,9 +427,9 @@
         const anchorText = clipText(anchor?.text || current?.clientText || '', 72);
         const chip = getShortCategoryChip(categoryId);
         const variants = [
-            `כש"${anchorText}" קורה, אני ישר קורא/ת את זה דרך ${chip} ומגיב/ה מהר.`,
-            `ברגע הזה "${anchorText}" מרגיש לי כמו הוכחה, לפני שבדקתי פרטים.`,
-            `כשאני נתפס/ת על "${anchorText}", הכול מצטמצם למשמעות אחת ואני מפספס/ת הקשר.`
+            `׳›׳©"${anchorText}" ׳§׳•׳¨׳”, ׳׳ ׳™ ׳™׳©׳¨ ׳§׳•׳¨׳/׳× ׳׳× ׳–׳” ׳“׳¨׳ ${chip} ׳•׳׳’׳™׳‘/׳” ׳׳”׳¨.`,
+            `׳‘׳¨׳’׳¢ ׳”׳–׳” "${anchorText}" ׳׳¨׳’׳™׳© ׳׳™ ׳›׳׳• ׳”׳•׳›׳—׳”, ׳׳₪׳ ׳™ ׳©׳‘׳“׳§׳×׳™ ׳₪׳¨׳˜׳™׳.`,
+            `׳›׳©׳׳ ׳™ ׳ ׳×׳₪׳¡/׳× ׳¢׳ "${anchorText}", ׳”׳›׳•׳ ׳׳¦׳˜׳׳¦׳ ׳׳׳©׳׳¢׳•׳× ׳׳—׳× ׳•׳׳ ׳™ ׳׳₪׳¡׳₪׳¡/׳× ׳”׳§׳©׳¨.`
         ];
         const index = ensurePhoneScenarioFlow().qaFeed.length % variants.length;
         return variants[index];
@@ -427,15 +447,15 @@
         });
 
         const anchorText = clipText(anchor?.text || current?.clientText || '', 80);
-        const mirror = `שיקוף: "כש'${anchorText}' פוגש אותך, זה יכול להרגיש סופי וכבד."`;
-        const gap = 'תובנת מטפל: "כרגע יש קפיצה מהאירוע למשמעות. נבדוק חלק אחד במקום את כל הסיפור יחד."';
-        const next = 'שאלת העדפה: "מה הכי נכון לך לבדוק עכשיו — עובדה, משמעות, או תנאי?"';
+        const mirror = `׳©׳™׳§׳•׳£: "׳›׳©'${anchorText}' ׳₪׳•׳’׳© ׳׳•׳×׳, ׳–׳” ׳™׳›׳•׳ ׳׳”׳¨׳’׳™׳© ׳¡׳•׳₪׳™ ׳•׳›׳‘׳“."`;
+        const gap = '׳×׳•׳‘׳ ׳× ׳׳˜׳₪׳: "׳›׳¨׳’׳¢ ׳™׳© ׳§׳₪׳™׳¦׳” ׳׳”׳׳™׳¨׳•׳¢ ׳׳׳©׳׳¢׳•׳×. ׳ ׳‘׳“׳•׳§ ׳—׳׳§ ׳׳—׳“ ׳‘׳׳§׳•׳ ׳׳× ׳›׳ ׳”׳¡׳™׳₪׳•׳¨ ׳™׳—׳“."';
+        const next = '׳©׳׳׳× ׳”׳¢׳“׳₪׳”: "׳׳” ׳”׳›׳™ ׳ ׳›׳•׳ ׳׳ ׳׳‘׳“׳•׳§ ׳¢׳›׳©׳™׳• ג€” ׳¢׳•׳‘׳“׳”, ׳׳©׳׳¢׳•׳×, ׳׳• ׳×׳ ׳׳™?"';
         return {
             bullets,
             mirror,
             gap,
             next,
-            actions: ['בדיקת עובדות', 'ויסות/האטה']
+            actions: ['׳‘׳“׳™׳§׳× ׳¢׳•׳‘׳“׳•׳×', '׳•׳™׳¡׳•׳×/׳”׳׳˜׳”']
         };
     }
 
@@ -444,33 +464,33 @@
         const phone = ensurePhoneScenarioFlow();
         const qaFeed = Array.isArray(phone.qaFeed) ? phone.qaFeed : [];
         const challengeByCategory = {
-            lost_performative: 'לפי מי בדיוק זה "לא בסדר" או "צריך" כאן?',
-            assumptions: 'איזו הנחה כאן הכי כדאי לבדוק קודם מול המציאות?',
-            mind_reading: 'איך נבדוק מה באמת נאמר/נעשה בלי לנחש כוונה?',
-            universal_quantifier: 'מה יוצא הדופן הראשון שמחליש את ה"תמיד/אף פעם"?',
-            modal_operator: 'מה מונע בפועל, ומה צעד קטן שכן אפשרי?',
-            cause_effect: 'מה השרשרת בפועל, ומה עוד יכול להסביר את אותה תוצאה?',
-            nominalisations: 'מה קורה בפועל צעד-צעד במקום שם עצם כללי?',
-            identity_predicates: 'באיזה תחום זה נכון, ובאיזה תחום זה לא בהכרח נכון?',
-            complex_equivalence: 'איך בדיוק X אומר Y? מה הקריטריון או הראיה?',
-            comparative_deletion: 'ביחס למה/למי? ומה המדד?',
-            time_space_predicates: 'מתי/איפה בדיוק זה קורה, ומתי לא?',
-            lack_referential_index: 'מי בדיוק זה "הם" / "כולם" במקרה הזה?',
-            non_referring_nouns: 'למה בדיוק מתכוונים במילה הזו?',
-            sensory_predicates: 'מה ראית/שמעת/הרגשת בגוף באופן קונקרטי?',
-            unspecified_verbs: 'מה קורה בפועל צעד-צעד בתוך הפועל הזה?'
+            lost_performative: '׳׳₪׳™ ׳׳™ ׳‘׳“׳™׳•׳§ ׳–׳” "׳׳ ׳‘׳¡׳“׳¨" ׳׳• "׳¦׳¨׳™׳" ׳›׳׳?',
+            assumptions: '׳׳™׳–׳• ׳”׳ ׳—׳” ׳›׳׳ ׳”׳›׳™ ׳›׳“׳׳™ ׳׳‘׳“׳•׳§ ׳§׳•׳“׳ ׳׳•׳ ׳”׳׳¦׳™׳׳•׳×?',
+            mind_reading: '׳׳™׳ ׳ ׳‘׳“׳•׳§ ׳׳” ׳‘׳׳׳× ׳ ׳׳׳¨/׳ ׳¢׳©׳” ׳‘׳׳™ ׳׳ ׳—׳© ׳›׳•׳•׳ ׳”?',
+            universal_quantifier: '׳׳” ׳™׳•׳¦׳ ׳”׳“׳•׳₪׳ ׳”׳¨׳׳©׳•׳ ׳©׳׳—׳׳™׳© ׳׳× ׳”"׳×׳׳™׳“/׳׳£ ׳₪׳¢׳"?',
+            modal_operator: '׳׳” ׳׳•׳ ׳¢ ׳‘׳₪׳•׳¢׳, ׳•׳׳” ׳¦׳¢׳“ ׳§׳˜׳ ׳©׳›׳ ׳׳₪׳©׳¨׳™?',
+            cause_effect: '׳׳” ׳”׳©׳¨׳©׳¨׳× ׳‘׳₪׳•׳¢׳, ׳•׳׳” ׳¢׳•׳“ ׳™׳›׳•׳ ׳׳”׳¡׳‘׳™׳¨ ׳׳× ׳׳•׳×׳” ׳×׳•׳¦׳׳”?',
+            nominalisations: '׳׳” ׳§׳•׳¨׳” ׳‘׳₪׳•׳¢׳ ׳¦׳¢׳“-׳¦׳¢׳“ ׳‘׳׳§׳•׳ ׳©׳ ׳¢׳¦׳ ׳›׳׳׳™?',
+            identity_predicates: '׳‘׳׳™׳–׳” ׳×׳—׳•׳ ׳–׳” ׳ ׳›׳•׳, ׳•׳‘׳׳™׳–׳” ׳×׳—׳•׳ ׳–׳” ׳׳ ׳‘׳”׳›׳¨׳— ׳ ׳›׳•׳?',
+            complex_equivalence: '׳׳™׳ ׳‘׳“׳™׳•׳§ X ׳׳•׳׳¨ Y? ׳׳” ׳”׳§׳¨׳™׳˜׳¨׳™׳•׳ ׳׳• ׳”׳¨׳׳™׳”?',
+            comparative_deletion: '׳‘׳™׳—׳¡ ׳׳׳”/׳׳׳™? ׳•׳׳” ׳”׳׳“׳“?',
+            time_space_predicates: '׳׳×׳™/׳׳™׳₪׳” ׳‘׳“׳™׳•׳§ ׳–׳” ׳§׳•׳¨׳”, ׳•׳׳×׳™ ׳׳?',
+            lack_referential_index: '׳׳™ ׳‘׳“׳™׳•׳§ ׳–׳” "׳”׳" / "׳›׳•׳׳" ׳‘׳׳§׳¨׳” ׳”׳–׳”?',
+            non_referring_nouns: '׳׳׳” ׳‘׳“׳™׳•׳§ ׳׳×׳›׳•׳•׳ ׳™׳ ׳‘׳׳™׳׳” ׳”׳–׳•?',
+            sensory_predicates: '׳׳” ׳¨׳׳™׳×/׳©׳׳¢׳×/׳”׳¨׳’׳©׳× ׳‘׳’׳•׳£ ׳‘׳׳•׳₪׳ ׳§׳•׳ ׳§׳¨׳˜׳™?',
+            unspecified_verbs: '׳׳” ׳§׳•׳¨׳” ׳‘׳₪׳•׳¢׳ ׳¦׳¢׳“-׳¦׳¢׳“ ׳‘׳×׳•׳ ׳”׳₪׳•׳¢׳ ׳”׳–׳”?'
         };
 
         const items = qaFeed.slice(0, 3).map((item) => ({
             letter: item.letter,
             categoryLabel: item.categoryLabel,
-            challenge: challengeByCategory[item.categoryId] || 'מה השאלה המדויקת הבאה שתבדוק את זה מול המציאות?'
+            challenge: challengeByCategory[item.categoryId] || '׳׳” ׳”׳©׳׳׳” ׳”׳׳“׳•׳™׳§׳× ׳”׳‘׳׳” ׳©׳×׳‘׳“׳•׳§ ׳׳× ׳–׳” ׳׳•׳ ׳”׳׳¦׳™׳׳•׳×?'
         }));
 
         return {
-            intro: 'שלב אתגר: אחרי החשיפה, בודקים כל אחד משלושת הפריטים שנאספו.',
+            intro: '׳©׳׳‘ ׳׳×׳’׳¨: ׳׳—׳¨׳™ ׳”׳—׳©׳™׳₪׳”, ׳‘׳•׳“׳§׳™׳ ׳›׳ ׳׳—׳“ ׳׳©׳׳•׳©׳× ׳”׳₪׳¨׳™׳˜׳™׳ ׳©׳ ׳׳¡׳₪׳•.',
             items,
-            therapistChoice: 'מה המטופל מעדיף לחקור עכשיו: ראיה? משמעות? תנאים?'
+            therapistChoice: '׳׳” ׳”׳׳˜׳•׳₪׳ ׳׳¢׳“׳™׳£ ׳׳—׳§׳•׳¨ ׳¢׳›׳©׳™׳•: ׳¨׳׳™׳”? ׳׳©׳׳¢׳•׳×? ׳×׳ ׳׳™׳?'
         };
     }
 
@@ -498,7 +518,7 @@
         const anchor = (phone.anchors || []).find((item) => item.id === anchorId);
         if (!anchor) return;
         if (!anchor.isTop) {
-            showPhoneToast('כרגע בחר/י אחד משלושת העוגנים המובילים כדי לפתוח עבודה מדויקת.', 'warn');
+            showPhoneToast('׳›׳¨׳’׳¢ ׳‘׳—׳¨/׳™ ׳׳—׳“ ׳׳©׳׳•׳©׳× ׳”׳¢׳•׳’׳ ׳™׳ ׳”׳׳•׳‘׳™׳׳™׳ ׳›׳“׳™ ׳׳₪׳×׳•׳— ׳¢׳‘׳•׳“׳” ׳׳“׳•׳™׳§׳×.', 'warn');
             return;
         }
         phone.selectedAnchorId = anchor.id;
@@ -595,18 +615,18 @@
         const canGenerate = qaFeed.length >= Math.min(3, rowCategories.length || 3);
 
         const stepSubtitleMap = {
-            anchors: 'בחר/י קטע בולט מתוך שלושת העוגנים המרכזיים במשפט.',
-            focus: 'הקטע נבחר. עכשיו נפתח עבודה על שלוש התבניות השכנות באותה שורה.',
-            qa: `בונים 3 שאלות ותשובות משלימות (שכן/תבנית/שכן) · ${qaFeed.length}/3`,
+            anchors: '׳‘׳—׳¨/׳™ ׳§׳˜׳¢ ׳‘׳•׳׳˜ ׳׳×׳•׳ ׳©׳׳•׳©׳× ׳”׳¢׳•׳’׳ ׳™׳ ׳”׳׳¨׳›׳–׳™׳™׳ ׳‘׳׳©׳₪׳˜.',
+            focus: '׳”׳§׳˜׳¢ ׳ ׳‘׳—׳¨. ׳¢׳›׳©׳™׳• ׳ ׳₪׳×׳— ׳¢׳‘׳•׳“׳” ׳¢׳ ׳©׳׳•׳© ׳”׳×׳‘׳ ׳™׳•׳× ׳”׳©׳›׳ ׳•׳× ׳‘׳׳•׳×׳” ׳©׳•׳¨׳”.',
+            qa: `׳‘׳•׳ ׳™׳ 3 ׳©׳׳׳•׳× ׳•׳×׳©׳•׳‘׳•׳× ׳׳©׳׳™׳׳•׳× (׳©׳›׳/׳×׳‘׳ ׳™׳×/׳©׳›׳) ֲ· ${qaFeed.length}/3`,
             done: phone.challenge
-                ? 'שלב בדיקת ההמשך פעיל: בודקים את שלוש הנקודות שעלו'
-                : (phone.reply ? 'שלב החשיפה הושלם · יש שיקוף והצעת המשך' : '3/3 הושלם · בנה/י שיקוף')
+                ? '׳©׳׳‘ ׳‘׳“׳™׳§׳× ׳”׳”׳׳©׳ ׳₪׳¢׳™׳: ׳‘׳•׳“׳§׳™׳ ׳׳× ׳©׳׳•׳© ׳”׳ ׳§׳•׳“׳•׳× ׳©׳¢׳׳•'
+                : (phone.reply ? '׳©׳׳‘ ׳”׳—׳©׳™׳₪׳” ׳”׳•׳©׳׳ ֲ· ׳™׳© ׳©׳™׳§׳•׳£ ׳•׳”׳¦׳¢׳× ׳”׳׳©׳' : '3/3 ׳”׳•׳©׳׳ ֲ· ׳‘׳ ׳”/׳™ ׳©׳™׳§׳•׳£')
         };
         const headerTitleMap = {
-            anchors: 'מבט שלשה · עוגנים מהמשפט',
-            focus: 'בחרנו נקודת פתיחה לעבודה',
-            qa: 'שואלים ומדייקים בתוך אותה משפחה',
-            done: phone.challenge ? 'בדיקת המשך ל-3 הנקודות' : (phone.reply ? 'שיקוף + ניסוח המשך' : '3/3 הושלם')
+            anchors: '׳׳‘׳˜ ׳©׳׳©׳” ֲ· ׳¢׳•׳’׳ ׳™׳ ׳׳”׳׳©׳₪׳˜',
+            focus: '׳‘׳—׳¨׳ ׳• ׳ ׳§׳•׳“׳× ׳₪׳×׳™׳—׳” ׳׳¢׳‘׳•׳“׳”',
+            qa: '׳©׳•׳׳׳™׳ ׳•׳׳“׳™׳™׳§׳™׳ ׳‘׳×׳•׳ ׳׳•׳×׳” ׳׳©׳₪׳—׳”',
+            done: phone.challenge ? '׳‘׳“׳™׳§׳× ׳”׳׳©׳ ׳-3 ׳”׳ ׳§׳•׳“׳•׳×' : (phone.reply ? '׳©׳™׳§׳•׳£ + ׳ ׳™׳¡׳•׳— ׳”׳׳©׳' : '3/3 ׳”׳•׳©׳׳')
         };
 
         const highlightButtons = (phone.anchors || []).map((anchor) => {
@@ -625,7 +645,7 @@
                     data-tr-phone-anchor-id="${escapeHtml(anchor.id)}"
                     ${disabled ? 'tabindex="-1" disabled' : ''}>
                     ${escapeHtml(anchor.text)}
-                    ${anchor.isTop ? '<span class="tr-phone-badge">עוגן מוביל</span>' : ''}
+                    ${anchor.isTop ? '<span class="tr-phone-badge">׳¢׳•׳’׳ ׳׳•׳‘׳™׳</span>' : ''}
                 </button>
             `;
         }).join('');
@@ -648,7 +668,7 @@
                     <span class="tr-phone-card-letter">${escapeHtml(getPhoneCardLetter(idx))}</span>
                     <span class="tr-phone-card-chip">${escapeHtml(getShortCategoryChip(normalized))}</span>
                     <small class="tr-phone-card-label">${escapeHtml(getCategoryLabelHe(normalized))}</small>
-                    ${used ? '<span class="tr-phone-card-used">נשאל ✓</span>' : ''}
+                    ${used ? '<span class="tr-phone-card-used">׳ ׳©׳׳ ג“</span>' : ''}
                 </button>
             `;
         }).join('');
@@ -656,20 +676,20 @@
         const qaFeedHtml = qaFeed.length
             ? qaFeed.map((item) => `
                 <article class="tr-phone-qa-item">
-                    <div class="tr-phone-qa-kicker">שאלה/תשובה ${escapeHtml(item.letter)} · ${escapeHtml(item.categoryLabel)}</div>
-                    <p class="tr-phone-q-line"><strong>שאלה:</strong> ${escapeHtml(item.question)}</p>
-                    <p class="tr-phone-a-line"><strong>תגובה:</strong> ${escapeHtml(item.answer)}</p>
+                    <div class="tr-phone-qa-kicker">׳©׳׳׳”/׳×׳©׳•׳‘׳” ${escapeHtml(item.letter)} ֲ· ${escapeHtml(item.categoryLabel)}</div>
+                    <p class="tr-phone-q-line"><strong>׳©׳׳׳”:</strong> ${escapeHtml(item.question)}</p>
+                    <p class="tr-phone-a-line"><strong>׳×׳’׳•׳‘׳”:</strong> ${escapeHtml(item.answer)}</p>
                 </article>
             `).join('')
-            : '<p class="tr-phone-muted">בחר/י כרטיס אחד מתוך השלשה כדי ליצור שאלה ותשובת מטופל.</p>';
+            : '<p class="tr-phone-muted">׳‘׳—׳¨/׳™ ׳›׳¨׳˜׳™׳¡ ׳׳—׳“ ׳׳×׳•׳ ׳”׳©׳׳©׳” ׳›׳“׳™ ׳׳™׳¦׳•׳¨ ׳©׳׳׳” ׳•׳×׳©׳•׳‘׳× ׳׳˜׳•׳₪׳.</p>';
 
         const collectedHtml = qaFeed.length
-            ? qaFeed.map((item) => `<li><strong>${escapeHtml(item.letter)}</strong> · ${escapeHtml(getShortCategoryChip(item.categoryId))}: ${escapeHtml(clipText(item.answer, 56))}</li>`).join('')
+            ? qaFeed.map((item) => `<li><strong>${escapeHtml(item.letter)}</strong> ֲ· ${escapeHtml(getShortCategoryChip(item.categoryId))}: ${escapeHtml(clipText(item.answer, 56))}</li>`).join('')
             : '';
 
         const wordBoardHtml = `
             <section class="tr-phone-panel tr-phone-wordboard">
-                <div class="tr-phone-panel-title">עוגנים בולטים מתוך משפט המטופל</div>
+                <div class="tr-phone-panel-title">׳¢׳•׳’׳ ׳™׳ ׳‘׳•׳׳˜׳™׳ ׳׳×׳•׳ ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳</div>
                 <div class="tr-phone-wordboard-grid">
                     ${(phone.anchors || []).map((anchor) => {
                         const cls = [
@@ -680,13 +700,13 @@
                         return `<span class="${cls}">${escapeHtml(anchor.text)}</span>`;
                     }).join('')}
                 </div>
-                <p class="tr-phone-wordboard-note"><strong>3 עוגנים מובילים:</strong> ${escapeHtml(topAnchors.map((item) => item.text).join(' | '))}</p>
+                <p class="tr-phone-wordboard-note"><strong>3 ׳¢׳•׳’׳ ׳™׳ ׳׳•׳‘׳™׳׳™׳:</strong> ${escapeHtml(topAnchors.map((item) => item.text).join(' | '))}</p>
             </section>
         `;
 
         const breenTableHtml = `
             <section class="tr-phone-panel tr-phone-breen-panel">
-                <div class="tr-phone-panel-title">טבלת ברין (מפת הדפוסים המלאה)</div>
+                <div class="tr-phone-panel-title">׳˜׳‘׳׳× ׳‘׳¨׳™׳ (׳׳₪׳× ׳”׳“׳₪׳•׳¡׳™׳ ׳”׳׳׳׳”)</div>
                 <div class="tr-phone-breen-grid">
                     ${root.triplesRadarCore.ROWS.map((r) => {
                         const meta = ROW_META[r.id] || ROW_META.row1;
@@ -710,7 +730,10 @@
                         }).join('');
                         return `
                             <div class="tr-phone-breen-row ${escapeHtml(meta.colorClass || '')} ${rowLocked ? 'is-active' : ''}">
-                                <div class="tr-phone-breen-row-head">${escapeHtml(meta.heLabel || r.label || r.id)}</div>
+                                <div class="tr-phone-breen-row-head">
+                                    <strong>${escapeHtml(meta.heLabel || r.label || r.id)}</strong>
+                                    <small>${escapeHtml(meta.heInsight || '')}</small>
+                                </div>
                                 <div class="tr-phone-breen-row-cells">${cells}</div>
                             </div>
                         `;
@@ -722,12 +745,12 @@
         const challengeHtml = phone.challenge
             ? `
                 <section class="tr-phone-panel tr-phone-challenge-panel">
-                    <div class="tr-phone-panel-title">אתגור 3 הדברים שנחשפו</div>
+                    <div class="tr-phone-panel-title">׳׳×׳’׳•׳¨ 3 ׳”׳“׳‘׳¨׳™׳ ׳©׳ ׳—׳©׳₪׳•</div>
                     <p class="tr-phone-challenge-intro">${escapeHtml(phone.challenge.intro || '')}</p>
                     <div class="tr-phone-challenge-list">
                         ${(phone.challenge.items || []).map((item) => `
                             <article class="tr-phone-challenge-item">
-                                <div class="tr-phone-qa-kicker">אתגור ${escapeHtml(item.letter)} · ${escapeHtml(item.categoryLabel)}</div>
+                                <div class="tr-phone-qa-kicker">׳׳×׳’׳•׳¨ ${escapeHtml(item.letter)} ֲ· ${escapeHtml(item.categoryLabel)}</div>
                                 <p>${escapeHtml(item.challenge)}</p>
                             </article>
                         `).join('')}
@@ -740,7 +763,7 @@
         const replyHtml = phone.reply
             ? `
                 <section class="tr-phone-panel">
-                    <div class="tr-phone-panel-title">שיקוף + תובנה של המטפל (טיוטה)</div>
+                    <div class="tr-phone-panel-title">׳©׳™׳§׳•׳£ + ׳×׳•׳‘׳ ׳” ׳©׳ ׳”׳׳˜׳₪׳ (׳˜׳™׳•׳˜׳”)</div>
                     <p>${escapeHtml(phone.reply.mirror)}</p>
                     <p>${escapeHtml(phone.reply.gap)}</p>
                     <p>${escapeHtml(phone.reply.next)}</p>
@@ -754,19 +777,19 @@
         const transcriptHtml = phone.transcriptOpen
             ? `
                 <section class="tr-phone-panel tr-phone-transcript">
-                    <div class="tr-phone-panel-title">תמליל הסבב</div>
-                    <div class="tr-phone-transcript-block"><strong>מטופל</strong><p>${escapeHtml(current.clientText || '')}</p></div>
-                    <div class="tr-phone-transcript-block"><strong>קטע שנבחר</strong><p>${escapeHtml(selectedAnchor?.text || '')}</p></div>
+                    <div class="tr-phone-panel-title">׳×׳׳׳™׳ ׳”׳¡׳‘׳‘</div>
+                    <div class="tr-phone-transcript-block"><strong>׳׳˜׳•׳₪׳</strong><p>${escapeHtml(current.clientText || '')}</p></div>
+                    <div class="tr-phone-transcript-block"><strong>׳§׳˜׳¢ ׳©׳ ׳‘׳—׳¨</strong><p>${escapeHtml(selectedAnchor?.text || '')}</p></div>
                     ${qaFeed.map((item) => `
                         <div class="tr-phone-transcript-block">
-                            <strong>שאלה/תשובה ${escapeHtml(item.letter)}</strong>
-                            <p><em>שאלה:</em> ${escapeHtml(item.question)}</p>
-                            <p><em>תגובה:</em> ${escapeHtml(item.answer)}</p>
+                            <strong>׳©׳׳׳”/׳×׳©׳•׳‘׳” ${escapeHtml(item.letter)}</strong>
+                            <p><em>׳©׳׳׳”:</em> ${escapeHtml(item.question)}</p>
+                            <p><em>׳×׳’׳•׳‘׳”:</em> ${escapeHtml(item.answer)}</p>
                         </div>
                     `).join('')}
                     ${phone.reply ? `
                         <div class="tr-phone-transcript-block">
-                            <strong>שיקוף/תובנה</strong>
+                            <strong>׳©׳™׳§׳•׳£/׳×׳•׳‘׳ ׳”</strong>
                             <p>${escapeHtml(phone.reply.mirror)}</p>
                             <p>${escapeHtml(phone.reply.gap)}</p>
                             <p>${escapeHtml(phone.reply.next)}</p>
@@ -779,10 +802,10 @@
         const focusPanelHtml = selectedAnchor
             ? `
                 <section class="tr-phone-panel tr-phone-anchor-panel">
-                    <div class="tr-phone-panel-title">הקטע שבחרת לעבודה</div>
+                    <div class="tr-phone-panel-title">׳”׳§׳˜׳¢ ׳©׳‘׳—׳¨׳× ׳׳¢׳‘׳•׳“׳”</div>
                     <p class="tr-phone-anchor-text">${escapeHtml(selectedAnchor.text)}</p>
                     ${phone.phase === 'focus' ? `
-                        <button type="button" class="tr-phone-meta-btn" data-tr-phone-action="meta">פתח/י עבודה על השלשה</button>
+                        <button type="button" class="tr-phone-meta-btn" data-tr-phone-action="meta">׳₪׳×׳—/׳™ ׳¢׳‘׳•׳“׳” ׳¢׳ ׳”׳©׳׳©׳”</button>
                     ` : ''}
                 </section>
             `
@@ -791,10 +814,13 @@
         const qaPanelHtml = selectedAnchor && (phone.phase === 'qa' || phone.phase === 'done' || phone.reply)
             ? `
                 <section class="tr-phone-panel tr-phone-locked-panel">
-                    <div class="tr-phone-panel-title">השלשה הפעילה (התבנית והשכנים שלה)</div>
-                    <div class="tr-phone-row-note">${escapeHtml(rowMeta.heLabel || '')}</div>
+                    <div class="tr-phone-panel-title">׳”׳©׳׳©׳” ׳”׳₪׳¢׳™׳׳” (׳”׳×׳‘׳ ׳™׳× ׳•׳”׳©׳›׳ ׳™׳ ׳©׳׳”)</div>
+                    <div class="tr-phone-row-note">
+                        <strong>${escapeHtml(rowMeta.heLabel || '')}</strong>
+                        <small>${escapeHtml(rowMeta.heInsight || '')}</small>
+                    </div>
                     <div class="tr-phone-cards">${tripleCards}</div>
-                    <div class="tr-phone-panel-title">רצף העבודה (3 שאלות ותשובות)</div>
+                    <div class="tr-phone-panel-title">׳¨׳¦׳£ ׳”׳¢׳‘׳•׳“׳” (3 ׳©׳׳׳•׳× ׳•׳×׳©׳•׳‘׳•׳×)</div>
                     <div class="tr-phone-qa-feed">${qaFeedHtml}</div>
                 </section>
             `
@@ -804,20 +830,20 @@
             ? `
                 <section class="tr-phone-panel tr-phone-done-panel">
                     <div class="tr-phone-header-row">
-                        <div class="tr-phone-panel-title">3/3 הושלם (שלב חשיפה)</div>
-                        <div class="tr-phone-done-micro">סצנה ${state.index + 1}/${state.scenarios.length}</div>
+                        <div class="tr-phone-panel-title">3/3 ׳”׳•׳©׳׳ (׳©׳׳‘ ׳—׳©׳™׳₪׳”)</div>
+                        <div class="tr-phone-done-micro">׳¡׳¦׳ ׳” ${state.index + 1}/${state.scenarios.length}</div>
                     </div>
                     <div class="tr-phone-inline-actions">
-                        <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="generate" ${canGenerate ? '' : 'disabled'}>בנה/י שיקוף והצעת המשך</button>
-                        <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="transcript">${phone.transcriptOpen ? 'הסתר תמליל' : 'תמליל'}</button>
+                        <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="generate" ${canGenerate ? '' : 'disabled'}>׳‘׳ ׳”/׳™ ׳©׳™׳§׳•׳£ ׳•׳”׳¦׳¢׳× ׳”׳׳©׳</button>
+                        <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="transcript">${phone.transcriptOpen ? '׳”׳¡׳×׳¨ ׳×׳׳׳™׳' : '׳×׳׳׳™׳'}</button>
                     </div>
                     ${phone.reply ? `
                         <div class="tr-phone-inline-actions">
-                            <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="challenge">בדיקת המשך ל-3 הנקודות</button>
-                            <button type="button" class="tr-phone-secondary-btn" disabled>קודם בונים שיקוף, ואז בודקים המשך</button>
+                            <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="challenge">׳‘׳“׳™׳§׳× ׳”׳׳©׳ ׳-3 ׳”׳ ׳§׳•׳“׳•׳×</button>
+                            <button type="button" class="tr-phone-secondary-btn" disabled>׳§׳•׳“׳ ׳‘׳•׳ ׳™׳ ׳©׳™׳§׳•׳£, ׳•׳׳– ׳‘׳•׳“׳§׳™׳ ׳”׳׳©׳</button>
                         </div>
                     ` : ''}
-                    <div class="tr-phone-panel-title">מה נאסף עד עכשיו</div>
+                    <div class="tr-phone-panel-title">׳׳” ׳ ׳׳¡׳£ ׳¢׳“ ׳¢׳›׳©׳™׳•</div>
                     <ul class="tr-phone-collected-list">${collectedHtml}</ul>
                 </section>
             `
@@ -827,21 +853,21 @@
             <div class="triples-radar-phone-shell">
                 <div class="triples-radar-phone-header">
                     <div>
-                        <h4>${escapeHtml(headerTitleMap[phone.phase] || 'מבט שלשה · חשיפה ובדיקת המשך')}</h4>
+                        <h4>${escapeHtml(headerTitleMap[phone.phase] || '׳׳‘׳˜ ׳©׳׳©׳” ֲ· ׳—׳©׳™׳₪׳” ׳•׳‘׳“׳™׳§׳× ׳”׳׳©׳')}</h4>
                         <p>${escapeHtml(stepSubtitleMap[phone.phase] || '')}</p>
                     </div>
                     <div class="triples-radar-phone-stats">
-                        <span>מקרה ${state.index + 1}/${state.scenarios.length}</span>
-                        <span>נקודות ${state.score}</span>
+                        <span>׳׳§׳¨׳” ${state.index + 1}/${state.scenarios.length}</span>
+                        <span>׳ ׳§׳•׳“׳•׳× ${state.score}</span>
                     </div>
                 </div>
 
                 <section class="tr-phone-panel tr-phone-client-panel">
-                    <div class="tr-phone-panel-title">משפט המטופל + עוגנים לעבודה</div>
+                    <div class="tr-phone-panel-title">׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳ + ׳¢׳•׳’׳ ׳™׳ ׳׳¢׳‘׳•׳“׳”</div>
                     <p class="tr-phone-client-text">${escapeHtml(current.clientText || '')}</p>
                     <div class="tr-phone-highlights">${highlightButtons}</div>
                     <div class="tr-phone-top3-line">
-                        <strong>3 עוגנים מובילים:</strong>
+                        <strong>3 ׳¢׳•׳’׳ ׳™׳ ׳׳•׳‘׳™׳׳™׳:</strong>
                         <span>${escapeHtml(topAnchors.map((item) => item.text).join(' | '))}</span>
                     </div>
                 </section>
@@ -856,8 +882,8 @@
                 ${transcriptHtml}
 
                 <div class="tr-phone-footer-actions">
-                    <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="restart">להתחיל מחדש</button>
-                    <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="next">המקרה הבא</button>
+                    <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="restart">׳׳”׳×׳—׳™׳ ׳׳—׳“׳©</button>
+                    <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="next">׳”׳׳§׳¨׳” ׳”׳‘׳</button>
                 </div>
 
                 ${phone.toast ? `<div class="tr-phone-toast" data-tone="${escapeHtml(phone.toastTone || 'info')}">${escapeHtml(phone.toast)}</div>` : ''}
@@ -895,7 +921,7 @@
         const correctRowId = root.triplesRadarCore.getRowIdByCategory(current.correctCategory);
 
         state.elements.statement.textContent = current.clientText || '';
-        state.elements.focusHint.textContent = current.focusHint ? `רמז מיקוד: ${current.focusHint}` : '';
+        state.elements.focusHint.textContent = current.focusHint ? `׳¨׳׳– ׳׳™׳§׳•׳“: ${current.focusHint}` : '';
         state.elements.counter.textContent = `${state.index + 1}/${state.scenarios.length}`;
         state.elements.score.textContent = `${state.score}`;
         state.elements.solvedCount.textContent = `${state.solvedCount}`;
@@ -912,7 +938,7 @@
                 isSolvedRow ? 'is-solved' : ''
             ].filter(Boolean).join(' ');
 
-            // Display order is reversed for RTL training scan (e.g., Mind Reading on the right in Row 1).
+            // Display order is reversed for RTL training scan (e.g., Mind Reading on the right in Triple 1).
             const displayCategories = [...row.categories].reverse();
             const cards = displayCategories.map((categoryId) => {
                 const normalizedCategory = root.triplesRadarCore.normalizeCategoryId(categoryId);
@@ -944,6 +970,7 @@
                 <article class="${rowClass}" data-row-id="${row.id}">
                     <div class="triples-radar-row-head">
                         <strong>${escapeHtml(rowMeta.heLabel)}</strong>
+                        <small>${escapeHtml(rowMeta.heInsight || '')}</small>
                     </div>
                     <div class="triples-radar-row-cats">
                         ${cards}
@@ -965,11 +992,11 @@
         if (state.solved) return;
         if (state.attemptsInScenario >= 2 && !state.rowHintUsed) {
             state.rowHintUsed = true;
-            setFeedback('עדיין לא מדויק. סימנתי את משפחת הדפוסים המתאימה כדי לעזור לך לדייק.', 'warn');
+            setFeedback('׳¢׳“׳™׳™׳ ׳׳ ׳׳“׳•׳™׳§. ׳¡׳™׳׳ ׳×׳™ ׳׳× ׳׳©׳₪׳—׳× ׳”׳“׳₪׳•׳¡׳™׳ ׳”׳׳×׳׳™׳׳” ׳›׳“׳™ ׳׳¢׳–׳•׳¨ ׳׳ ׳׳“׳™׳™׳§.', 'warn');
         }
         if (state.attemptsInScenario >= 3 && result.status !== 'exact' && !state.categoryHintUsed) {
             state.categoryHintUsed = true;
-            setFeedback('בניסיון הזה סימנתי גם את התבנית המדויקת. בחר/י אותה כדי לראות את ההיגיון.', 'warn');
+            setFeedback('׳‘׳ ׳™׳¡׳™׳•׳ ׳”׳–׳” ׳¡׳™׳׳ ׳×׳™ ׳’׳ ׳׳× ׳”׳×׳‘׳ ׳™׳× ׳”׳׳“׳•׳™׳§׳×. ׳‘׳—׳¨/׳™ ׳׳•׳×׳” ׳›׳“׳™ ׳׳¨׳׳•׳× ׳׳× ׳”׳”׳™׳’׳™׳•׳.', 'warn');
         }
     }
 
@@ -987,22 +1014,22 @@
             state.solvedCount += 1;
             state.score += Math.max(1, 4 - Math.max(1, state.attemptsInScenario));
             saveProgress();
-            setFeedback('מעולה. בחרת את התבנית המדויקת בתוך המשפחה הנכונה.', 'success');
-            setStepStatus('יפה. אפשר לעבור למקרה הבא או לעצור רגע ולחשוב למה זו התבנית המתאימה.');
+            setFeedback('׳׳¢׳•׳׳”. ׳‘׳—׳¨׳× ׳׳× ׳”׳×׳‘׳ ׳™׳× ׳”׳׳“׳•׳™׳§׳× ׳‘׳×׳•׳ ׳”׳׳©׳₪׳—׳” ׳”׳ ׳›׳•׳ ׳”.', 'success');
+            setStepStatus('׳™׳₪׳”. ׳׳₪׳©׳¨ ׳׳¢׳‘׳•׳¨ ׳׳׳§׳¨׳” ׳”׳‘׳ ׳׳• ׳׳¢׳¦׳•׳¨ ׳¨׳’׳¢ ׳•׳׳—׳©׳•׳‘ ׳׳׳” ׳–׳• ׳”׳×׳‘׳ ׳™׳× ׳”׳׳×׳׳™׳׳”.');
             if (typeof root.playUISound === 'function') root.playUISound('success');
         } else if (result.status === 'same_row') {
-            setFeedback('כיוון טוב. את/ה באותה משפחת דפוסים, עכשיו צריך לדייק לתבנית הנכונה.', 'warn');
-            setStepStatus('הישאר/י באותה שורה ובחר/י תבנית אחרת מתוך אותה משפחה.');
+            setFeedback('׳›׳™׳•׳•׳ ׳˜׳•׳‘. ׳׳×/׳” ׳‘׳׳•׳×׳” ׳׳©׳₪׳—׳× ׳“׳₪׳•׳¡׳™׳, ׳¢׳›׳©׳™׳• ׳¦׳¨׳™׳ ׳׳“׳™׳™׳§ ׳׳×׳‘׳ ׳™׳× ׳”׳ ׳›׳•׳ ׳”.', 'warn');
+            setStepStatus('׳”׳™׳©׳׳¨/׳™ ׳‘׳׳•׳×׳” ׳©׳•׳¨׳” ׳•׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳—׳¨׳× ׳׳×׳•׳ ׳׳•׳×׳” ׳׳©׳₪׳—׳”.');
             if (typeof root.playUISound === 'function') root.playUISound('warning');
             handleAutoHints(result);
         } else if (result.status === 'wrong_row') {
-            setFeedback('עדיין לא. כרגע זה נראה כמו משפחת דפוסים אחרת.', 'danger');
-            setStepStatus('חפש/י קודם את המשפחה המתאימה בטבלה, ואז דייק/י לתבנית שבתוכה.');
+            setFeedback('׳¢׳“׳™׳™׳ ׳׳. ׳›׳¨׳’׳¢ ׳–׳” ׳ ׳¨׳׳” ׳›׳׳• ׳׳©׳₪׳—׳× ׳“׳₪׳•׳¡׳™׳ ׳׳—׳¨׳×.', 'danger');
+            setStepStatus('׳—׳₪׳©/׳™ ׳§׳•׳“׳ ׳׳× ׳”׳׳©׳₪׳—׳” ׳”׳׳×׳׳™׳׳” ׳‘׳˜׳‘׳׳”, ׳•׳׳– ׳“׳™׳™׳§/׳™ ׳׳×׳‘׳ ׳™׳× ׳©׳‘׳×׳•׳›׳”.');
             if (typeof root.playUISound === 'function') root.playUISound('error');
             handleAutoHints(result);
         } else {
-            setFeedback('לא הצלחתי לזהות את הבחירה. בחר/י שוב תבנית מתוך הטבלה.', 'warn');
-            setStepStatus('בחר/י תבנית מתוך אחת ממשפחות הדפוסים בטבלה.');
+            setFeedback('׳׳ ׳”׳¦׳׳—׳×׳™ ׳׳–׳”׳•׳× ׳׳× ׳”׳‘׳—׳™׳¨׳”. ׳‘׳—׳¨/׳™ ׳©׳•׳‘ ׳×׳‘׳ ׳™׳× ׳׳×׳•׳ ׳”׳˜׳‘׳׳”.', 'warn');
+            setStepStatus('׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳×׳•׳ ׳׳—׳× ׳׳׳©׳₪׳—׳•׳× ׳”׳“׳₪׳•׳¡׳™׳ ׳‘׳˜׳‘׳׳”.');
         }
 
         updateHintControls();
@@ -1018,8 +1045,8 @@
         state.solved = false;
         state.selectedCategory = '';
         if (state.uiMode === 'phone') resetPhoneScenarioFlow();
-        setFeedback('מקרה חדש. קרא/י את משפט המטופל ובחר/י תבנית לפתיחה.', 'info');
-        setStepStatus('שלב 1: קרא/י את משפט המטופל. שלב 2: בחר/י תבנית לעבודה.');
+        setFeedback('׳׳§׳¨׳” ׳—׳“׳©. ׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳ ׳•׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳₪׳×׳™׳—׳”.', 'info');
+        setStepStatus('׳©׳׳‘ 1: ׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳. ׳©׳׳‘ 2: ׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳¢׳‘׳•׳“׳”.');
         updateHintControls();
         renderBoard();
     }
@@ -1032,8 +1059,8 @@
         state.solved = false;
         state.selectedCategory = '';
         if (state.uiMode === 'phone') resetPhoneScenarioFlow();
-        setFeedback('התחלנו מחדש מההתחלה, כדי לתרגל שוב ברצף נקי.', 'info');
-        setStepStatus('שלב 1: קרא/י את משפט המטופל. שלב 2: בחר/י תבנית לעבודה.');
+        setFeedback('׳”׳×׳—׳׳ ׳• ׳׳—׳“׳© ׳׳”׳”׳×׳—׳׳”, ׳›׳“׳™ ׳׳×׳¨׳’׳ ׳©׳•׳‘ ׳‘׳¨׳¦׳£ ׳ ׳§׳™.', 'info');
+        setStepStatus('׳©׳׳‘ 1: ׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳. ׳©׳׳‘ 2: ׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳¢׳‘׳•׳“׳”.');
         updateHintControls();
         renderBoard();
     }
@@ -1041,7 +1068,7 @@
     function revealRowHint() {
         if (state.solved || state.rowHintUsed) return;
         state.rowHintUsed = true;
-        setFeedback('רמז: סימנתי את משפחת הדפוסים המתאימה (השורה הנכונה).', 'info');
+        setFeedback('׳¨׳׳–: ׳¡׳™׳׳ ׳×׳™ ׳׳× ׳׳©׳₪׳—׳× ׳”׳“׳₪׳•׳¡׳™׳ ׳”׳׳×׳׳™׳׳” (׳”׳©׳•׳¨׳” ׳”׳ ׳›׳•׳ ׳”).', 'info');
         updateHintControls();
         renderBoard();
     }
@@ -1049,7 +1076,7 @@
     function revealCategoryHint() {
         if (state.solved || state.categoryHintUsed) return;
         state.categoryHintUsed = true;
-        setFeedback('רמז מדויק: סימנתי את התבנית הנכונה בתוך השורה.', 'info');
+        setFeedback('׳¨׳׳– ׳׳“׳•׳™׳§: ׳¡׳™׳׳ ׳×׳™ ׳׳× ׳”׳×׳‘׳ ׳™׳× ׳”׳ ׳›׳•׳ ׳” ׳‘׳×׳•׳ ׳”׳©׳•׳¨׳”.', 'info');
         updateHintControls();
         renderBoard();
     }
@@ -1192,8 +1219,8 @@
         if (!state.scenarios.length || !state.elements?.root) return;
 
         if (state.uiMode === 'desktop') {
-            setFeedback('קרא/י את משפט המטופל ובחר/י את התבנית שנכון להתחיל ממנה.', 'info');
-            setStepStatus('שלב 1: קרא/י את משפט המטופל. שלב 2: בחר/י תבנית לעבודה.');
+            setFeedback('׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳ ׳•׳‘׳—׳¨/׳™ ׳׳× ׳”׳×׳‘׳ ׳™׳× ׳©׳ ׳›׳•׳ ׳׳”׳×׳—׳™׳ ׳׳׳ ׳”.', 'info');
+            setStepStatus('׳©׳׳‘ 1: ׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳. ׳©׳׳‘ 2: ׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳¢׳‘׳•׳“׳”.');
             updateHintControls();
         }
 
@@ -1207,7 +1234,7 @@
         updateModeToggleUI();
         if (!state.elements?.root) return;
         if (!root.triplesRadarCore) {
-            state.elements.root.innerHTML = '<p class="triples-radar-error">שגיאה: מנוע Triples Radar לא נטען.</p>';
+            state.elements.root.innerHTML = '<p class="triples-radar-error">׳©׳’׳™׳׳”: ׳׳ ׳•׳¢ Triples Radar ׳׳ ׳ ׳˜׳¢׳.</p>';
             return;
         }
 
@@ -1216,7 +1243,7 @@
                 state.data = await loadData();
                 state.scenarios = [...state.data.scenarios];
             } catch (error) {
-                state.elements.root.innerHTML = `<p class="triples-radar-error">שגיאה בטעינת הסצנות: ${escapeHtml(error.message || 'לא ידוע')}</p>`;
+                state.elements.root.innerHTML = `<p class="triples-radar-error">׳©׳’׳™׳׳” ׳‘׳˜׳¢׳™׳ ׳× ׳”׳¡׳¦׳ ׳•׳×: ${escapeHtml(error.message || '׳׳ ׳™׳“׳•׳¢')}</p>`;
                 return;
             }
         }
@@ -1234,8 +1261,8 @@
 
         bindEvents();
         if (state.uiMode === 'desktop') {
-            setFeedback('קרא/י את משפט המטופל ובחר/י את התבנית שנכון להתחיל ממנה.', 'info');
-            setStepStatus('שלב 1: קרא/י את משפט המטופל. שלב 2: בחר/י תבנית לעבודה.');
+            setFeedback('׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳ ׳•׳‘׳—׳¨/׳™ ׳׳× ׳”׳×׳‘׳ ׳™׳× ׳©׳ ׳›׳•׳ ׳׳”׳×׳—׳™׳ ׳׳׳ ׳”.', 'info');
+            setStepStatus('׳©׳׳‘ 1: ׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳. ׳©׳׳‘ 2: ׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳¢׳‘׳•׳“׳”.');
         }
         updateHintControls();
         renderBoard();
@@ -1245,3 +1272,4 @@
         setupTriplesRadarModule
     });
 });
+

@@ -1,4 +1,4 @@
-
+﻿
 const LIVING_TRIPLES_STORAGE_KEY = 'living_triples_progress_v2';
 const LIVING_TRIPLES_DATA_URL = 'data/living-triples.json';
 
@@ -38,11 +38,25 @@ const DEFAULT_TRIPLES_MAP = {
     'Identity Predicates': 'פרדיקטים של זהות',
     'Complex Equivalence': 'הקבלה מורכבת',
     'Comparative Deletion': 'השמטה השוואתית',
-    'Time & Space Predicates': 'פרדיקטים של זמן/מרחב',
+    'Time & Space Predicates': 'פרדיקטים של זמן ומרחב',
     'Lack of Referential Index': 'אבדן מצביע',
     'Non-referring nouns': 'שמות לא-מייחסים',
     'Sensory Predicates': 'פרדיקטים חושיים',
     'Unspecified Verbs': 'פעלים לא-מפורטים'
+  },
+  rowTitlesHe: {
+    '1': 'שלשה 1 | מקור, הנחה וכוונה',
+    '2': 'שלשה 2 | חוקי משחק וגבולות',
+    '3': 'שלשה 3 | משמעות, זהות והסקה',
+    '4': 'שלשה 4 | הקשר, זמן וייחוס',
+    '5': 'שלשה 5 | קרקע חושית ופעולה'
+  },
+  rowInsightsHe: {
+    '1': 'מזהים מי קובע מה נכון, מה מונח מראש, ואיזו כוונה מיוחסת לאחר.',
+    '2': 'בודקים גבולות של חייב/יכול/תמיד ואיך חוק אחד מייצר שרשרת סיבה-תוצאה.',
+    '3': 'ממפים איך מילים מופשטות וזהויות הופכות למסקנות על האדם.',
+    '4': 'מחדדים ביחס למה, באיזה זמן ומקום, ועל מי בדיוק הטענה נאמרת.',
+    '5': 'מורידים לקרקע: מי/מה בדיוק, מה נראה בחושים, ומה הפעולה המדויקת.'
   }
 };
 
@@ -50,48 +64,48 @@ const FALLBACK_SCENARIOS = [
   {
     id: 'fallback_row1',
     targetRow: 1,
-    sentence: 'זה לא בסדר שהיא לא ענתה לי כל היום. ברור שהיא כבר לא רוצה אותי.',
+    sentence: '׳–׳” ׳׳ ׳‘׳¡׳“׳¨ ׳©׳”׳™׳ ׳׳ ׳¢׳ ׳×׳” ׳׳™ ׳›׳ ׳”׳™׳•׳. ׳‘׳¨׳•׳¨ ׳©׳”׳™׳ ׳›׳‘׳¨ ׳׳ ׳¨׳•׳¦׳” ׳׳•׳×׳™.',
     answers: {
       'Lost Performative': {
-        question: 'לפי מי זה "לא בסדר"?',
-        answer: 'לפי הסטנדרט שלי בזוגיות: מי שרוצה קשר עונה.',
-        summary: 'סטנדרט אישי: רצון = מענה.'
+        question: '׳׳₪׳™ ׳׳™ ׳–׳” "׳׳ ׳‘׳¡׳“׳¨"?',
+        answer: '׳׳₪׳™ ׳”׳¡׳˜׳ ׳“׳¨׳˜ ׳©׳׳™ ׳‘׳–׳•׳’׳™׳•׳×: ׳׳™ ׳©׳¨׳•׳¦׳” ׳§׳©׳¨ ׳¢׳•׳ ׳”.',
+        summary: '׳¡׳˜׳ ׳“׳¨׳˜ ׳׳™׳©׳™: ׳¨׳¦׳•׳ = ׳׳¢׳ ׳”.'
       },
       'Assumptions': {
-        question: 'מה אתה מניח שחייב להיות נכון כדי שהמסקנה תעמוד?',
-        answer: 'אני מניח שאם יש אהבה - יש תגובה יחסית מהר.',
-        summary: 'הנחה: אהבה נמדדת במהירות תגובה.'
+        question: '׳׳” ׳׳×׳” ׳׳ ׳™׳— ׳©׳—׳™׳™׳‘ ׳׳”׳™׳•׳× ׳ ׳›׳•׳ ׳›׳“׳™ ׳©׳”׳׳¡׳§׳ ׳” ׳×׳¢׳׳•׳“?',
+        answer: '׳׳ ׳™ ׳׳ ׳™׳— ׳©׳׳ ׳™׳© ׳׳”׳‘׳” - ׳™׳© ׳×׳’׳•׳‘׳” ׳™׳—׳¡׳™׳× ׳׳”׳¨.',
+        summary: '׳”׳ ׳—׳”: ׳׳”׳‘׳” ׳ ׳׳“׳“׳× ׳‘׳׳”׳™׳¨׳•׳× ׳×׳’׳•׳‘׳”.'
       },
       'Mind Reading': {
-        question: 'איך אתה יודע שהיא כבר לא רוצה אותך?',
-        answer: 'אני לא יודע בוודאות, אני מפרש את השתיקה כריחוק.',
-        summary: 'פרשנות פנימית לשתיקה.'
+        question: '׳׳™׳ ׳׳×׳” ׳™׳•׳“׳¢ ׳©׳”׳™׳ ׳›׳‘׳¨ ׳׳ ׳¨׳•׳¦׳” ׳׳•׳×׳?',
+        answer: '׳׳ ׳™ ׳׳ ׳™׳•׳“׳¢ ׳‘׳•׳•׳“׳׳•׳×, ׳׳ ׳™ ׳׳₪׳¨׳© ׳׳× ׳”׳©׳×׳™׳§׳” ׳›׳¨׳™׳—׳•׳§.',
+        summary: '׳₪׳¨׳©׳ ׳•׳× ׳₪׳ ׳™׳׳™׳× ׳׳©׳×׳™׳§׳”.'
       }
     },
-    insight: 'מעניין... הפכתי זמן תגובה למדד מוחלט של אהבה.'
+    insight: '׳׳¢׳ ׳™׳™׳... ׳”׳₪׳›׳×׳™ ׳–׳׳ ׳×׳’׳•׳‘׳” ׳׳׳“׳“ ׳׳•׳—׳׳˜ ׳©׳ ׳׳”׳‘׳”.'
   },
   {
     id: 'fallback_row2',
     targetRow: 2,
-    sentence: 'אני לא יכול להתחייב לחתונה. זה תמיד מסתבך, כי אני נחנק.',
+    sentence: '׳׳ ׳™ ׳׳ ׳™׳›׳•׳ ׳׳”׳×׳—׳™׳™׳‘ ׳׳—׳×׳•׳ ׳”. ׳–׳” ׳×׳׳™׳“ ׳׳¡׳×׳‘׳, ׳›׳™ ׳׳ ׳™ ׳ ׳—׳ ׳§.',
     answers: {
       'Universal Quantifier': {
-        question: 'תמיד? מתי זה לא מסתבך אפילו קצת?',
-        answer: 'היו תקופות שזה היה קל יותר, בעיקר כשלא היה לחץ.',
-        summary: 'לא תמיד: תלוי בעומס ובלחץ.'
+        question: '׳×׳׳™׳“? ׳׳×׳™ ׳–׳” ׳׳ ׳׳¡׳×׳‘׳ ׳׳₪׳™׳׳• ׳§׳¦׳×?',
+        answer: '׳”׳™׳• ׳×׳§׳•׳₪׳•׳× ׳©׳–׳” ׳”׳™׳” ׳§׳ ׳™׳•׳×׳¨, ׳‘׳¢׳™׳§׳¨ ׳›׳©׳׳ ׳”׳™׳” ׳׳—׳¥.',
+        summary: '׳׳ ׳×׳׳™׳“: ׳×׳׳•׳™ ׳‘׳¢׳•׳׳¡ ׳•׳‘׳׳—׳¥.'
       },
       'Modal Operator': {
-        question: 'מה בדיוק מונע ממך להתחייב?',
-        answer: 'הפחד שאאבד חופש ושאעשה טעות.',
-        summary: 'המניעה: פחד מאובדן חופש וטעות.'
+        question: '׳׳” ׳‘׳“׳™׳•׳§ ׳׳•׳ ׳¢ ׳׳׳ ׳׳”׳×׳—׳™׳™׳‘?',
+        answer: '׳”׳₪׳—׳“ ׳©׳׳׳‘׳“ ׳—׳•׳₪׳© ׳•׳©׳׳¢׳©׳” ׳˜׳¢׳•׳×.',
+        summary: '׳”׳׳ ׳™׳¢׳”: ׳₪׳—׳“ ׳׳׳•׳‘׳“׳ ׳—׳•׳₪׳© ׳•׳˜׳¢׳•׳×.'
       },
       'Cause & Effect': {
-        question: 'איך בדיוק נחנק גורם למסתבך?',
-        answer: 'כשאני נחנק אני מתרחק, ואז הצד השני לוחץ ונוצר ריב.',
-        summary: 'נחנק -> התרחקות -> לחץ -> ריב.'
+        question: '׳׳™׳ ׳‘׳“׳™׳•׳§ ׳ ׳—׳ ׳§ ׳’׳•׳¨׳ ׳׳׳¡׳×׳‘׳?',
+        answer: '׳›׳©׳׳ ׳™ ׳ ׳—׳ ׳§ ׳׳ ׳™ ׳׳×׳¨׳—׳§, ׳•׳׳– ׳”׳¦׳“ ׳”׳©׳ ׳™ ׳׳•׳—׳¥ ׳•׳ ׳•׳¦׳¨ ׳¨׳™׳‘.',
+        summary: '׳ ׳—׳ ׳§ -> ׳”׳×׳¨׳—׳§׳•׳× -> ׳׳—׳¥ -> ׳¨׳™׳‘.'
       }
     },
-    insight: 'הבנתי שהטריגר המרכזי הוא תחושת החנק, לא עצם המחויבות.'
+    insight: '׳”׳‘׳ ׳×׳™ ׳©׳”׳˜׳¨׳™׳’׳¨ ׳”׳׳¨׳›׳–׳™ ׳”׳•׳ ׳×׳—׳•׳©׳× ׳”׳—׳ ׳§, ׳׳ ׳¢׳¦׳ ׳”׳׳—׳•׳™׳‘׳•׳×.'
   }
 ];
 
@@ -156,23 +170,23 @@ function shuffle(items) {
 
 function defaultQuestion(cat) {
   const q = {
-    'Lost Performative': 'לפי מי זה נכון/לא נכון?',
-    'Assumptions': 'איזו הנחה סמויה חייבת להיות נכונה כאן?',
-    'Mind Reading': 'איך אתה יודע מה האדם השני חושב/מרגיש?',
-    'Universal Quantifier': 'תמיד/אף פעם? מתי זה לא נכון?',
-    'Modal Operator': 'מה מונע ממך? מה יקרה אם כן?',
-    'Cause & Effect': 'איך בדיוק X גורם ל-Y?',
-    'Nominalisations': 'כשאתה אומר את המילה הזו - מה קורה בפועל?',
-    'Identity Predicates': 'מי אתה נהיה כשאתה אומר "אני X"?',
-    'Complex Equivalence': 'איך X אומר בהכרח Y?',
-    'Comparative Deletion': 'יותר/פחות ביחס למה?',
-    'Time & Space Predicates': 'מתי ואיפה בדיוק זה קורה?',
-    'Lack of Referential Index': 'מי בדיוק? על מי זה נאמר?',
-    'Non-referring nouns': 'מה זה בדיוק? תן דוגמה מוחשית.',
-    'Sensory Predicates': 'איך אתה יודע - מה ראית/שמעת/הרגשת?',
-    'Unspecified Verbs': 'מה האדם עושה בפועל? צעד-צעד.'
+    'Lost Performative': '׳׳₪׳™ ׳׳™ ׳–׳” ׳ ׳›׳•׳/׳׳ ׳ ׳›׳•׳?',
+    'Assumptions': '׳׳™׳–׳• ׳”׳ ׳—׳” ׳¡׳׳•׳™׳” ׳—׳™׳™׳‘׳× ׳׳”׳™׳•׳× ׳ ׳›׳•׳ ׳” ׳›׳׳?',
+    'Mind Reading': '׳׳™׳ ׳׳×׳” ׳™׳•׳“׳¢ ׳׳” ׳”׳׳“׳ ׳”׳©׳ ׳™ ׳—׳•׳©׳‘/׳׳¨׳’׳™׳©?',
+    'Universal Quantifier': '׳×׳׳™׳“/׳׳£ ׳₪׳¢׳? ׳׳×׳™ ׳–׳” ׳׳ ׳ ׳›׳•׳?',
+    'Modal Operator': '׳׳” ׳׳•׳ ׳¢ ׳׳׳? ׳׳” ׳™׳§׳¨׳” ׳׳ ׳›׳?',
+    'Cause & Effect': '׳׳™׳ ׳‘׳“׳™׳•׳§ X ׳’׳•׳¨׳ ׳-Y?',
+    'Nominalisations': '׳›׳©׳׳×׳” ׳׳•׳׳¨ ׳׳× ׳”׳׳™׳׳” ׳”׳–׳• - ׳׳” ׳§׳•׳¨׳” ׳‘׳₪׳•׳¢׳?',
+    'Identity Predicates': '׳׳™ ׳׳×׳” ׳ ׳”׳™׳” ׳›׳©׳׳×׳” ׳׳•׳׳¨ "׳׳ ׳™ X"?',
+    'Complex Equivalence': '׳׳™׳ X ׳׳•׳׳¨ ׳‘׳”׳›׳¨׳— Y?',
+    'Comparative Deletion': '׳™׳•׳×׳¨/׳₪׳—׳•׳× ׳‘׳™׳—׳¡ ׳׳׳”?',
+    'Time & Space Predicates': '׳׳×׳™ ׳•׳׳™׳₪׳” ׳‘׳“׳™׳•׳§ ׳–׳” ׳§׳•׳¨׳”?',
+    'Lack of Referential Index': '׳׳™ ׳‘׳“׳™׳•׳§? ׳¢׳ ׳׳™ ׳–׳” ׳ ׳׳׳¨?',
+    'Non-referring nouns': '׳׳” ׳–׳” ׳‘׳“׳™׳•׳§? ׳×׳ ׳“׳•׳’׳׳” ׳׳•׳—׳©׳™׳×.',
+    'Sensory Predicates': '׳׳™׳ ׳׳×׳” ׳™׳•׳“׳¢ - ׳׳” ׳¨׳׳™׳×/׳©׳׳¢׳×/׳”׳¨׳’׳©׳×?',
+    'Unspecified Verbs': '׳׳” ׳”׳׳“׳ ׳¢׳•׳©׳” ׳‘׳₪׳•׳¢׳? ׳¦׳¢׳“-׳¦׳¢׳“.'
   };
-  return q[cat] || 'מה השאלה המדויקת שכדאי לשאול כאן?';
+  return q[cat] || '׳׳” ׳”׳©׳׳׳” ׳”׳׳“׳•׳™׳§׳× ׳©׳›׳“׳׳™ ׳׳©׳׳•׳ ׳›׳׳?';
 }
 
 function normalizeMap(payload) {
@@ -219,7 +233,28 @@ function normalizeMap(payload) {
   });
   Object.keys(categoryToRow).forEach((cat) => { if (!labelsHe[cat]) labelsHe[cat] = DEFAULT_TRIPLES_MAP.labelsHe[cat] || cat; });
 
-  return { rows, categoryToRow, labelsHe };
+  const rowTitlesHe = {};
+  const rowInsightsHe = {};
+  Object.keys(rows).forEach((rowKey) => {
+    const fallbackTitle = DEFAULT_TRIPLES_MAP.rowTitlesHe?.[rowKey] || `שלשה ${rowKey}`;
+    const fallbackInsight = DEFAULT_TRIPLES_MAP.rowInsightsHe?.[rowKey] || '';
+    rowTitlesHe[rowKey] = fallbackTitle;
+    rowInsightsHe[rowKey] = fallbackInsight;
+  });
+  Object.entries(from.rowTitlesHe || {}).forEach(([rowKey, title]) => {
+    const parsed = parseRow(rowKey);
+    if (!parsed) return;
+    const text = safeText(title);
+    if (text) rowTitlesHe[String(parsed)] = text;
+  });
+  Object.entries(from.rowInsightsHe || {}).forEach(([rowKey, insight]) => {
+    const parsed = parseRow(rowKey);
+    if (!parsed) return;
+    const text = safeText(insight);
+    if (text) rowInsightsHe[String(parsed)] = text;
+  });
+
+  return { rows, categoryToRow, labelsHe, rowTitlesHe, rowInsightsHe };
 }
 
 function pickScenarioText(raw) {
@@ -233,7 +268,7 @@ function pickScenarioText(raw) {
     const t = safeText(v);
     if (t) return t;
   }
-  return 'משפט לתרגול';
+  return '׳׳©׳₪׳˜ ׳׳×׳¨׳’׳•׳';
 }
 function getAnswerByCat(answerObj, cat) {
   if (!answerObj || typeof answerObj !== 'object') return null;
@@ -269,7 +304,7 @@ function normalizeScenario(raw, index, triplesMap) {
       : safeText(revealRaw);
 
     const question = safeText(answerBlock?.question || anchors[idx], defaultQuestion(cat));
-    const answer = safeText(answerBlock?.answer || revealText, 'אין תשובה מוכנה. נסו לשאול מחדש בקצרה.');
+    const answer = safeText(answerBlock?.answer || revealText, '׳׳™׳ ׳×׳©׳•׳‘׳” ׳׳•׳›׳ ׳”. ׳ ׳¡׳• ׳׳©׳׳•׳ ׳׳—׳“׳© ׳‘׳§׳¦׳¨׳”.');
     const summary = safeText(answerBlock?.summary, answer.length > 100 ? `${answer.slice(0, 97).trim()}...` : answer);
 
     answers[cat] = { question, answer, summary };
@@ -280,7 +315,7 @@ function normalizeScenario(raw, index, triplesMap) {
     targetRow,
     sentence: pickScenarioText(raw),
     answers,
-    insight: safeText(raw.insight, 'מעניין... כשמחזיקים את כל השלשה יחד, התמונה נעשית מדויקת יותר.')
+    insight: safeText(raw.insight, '׳׳¢׳ ׳™׳™׳... ׳›׳©׳׳—׳–׳™׳§׳™׳ ׳׳× ׳›׳ ׳”׳©׳׳©׳” ׳™׳—׳“, ׳”׳×׳׳•׳ ׳” ׳ ׳¢׳©׳™׳× ׳׳“׳•׳™׳§׳× ׳™׳•׳×׳¨.')
   };
 }
 
@@ -339,6 +374,7 @@ function getElements() {
     step1Feedback: document.getElementById('ltv2-step1-feedback'),
     rowSticky: document.getElementById('ltv2-row-sticky'),
     rowTitle: document.getElementById('ltv2-row-title'),
+    rowInsight: document.getElementById('ltv2-row-insight'),
     rowMembers: document.getElementById('ltv2-row-members'),
     changeRowBtn: document.getElementById('ltv2-change-row-btn'),
     step1: document.getElementById('ltv2-step-1'),
@@ -404,6 +440,16 @@ function catByKey(key) {
   return categories().find((c) => c.key === key) || null;
 }
 
+function getRowMeta(row) {
+  const parsed = parseRow(row);
+  const rowKey = parsed ? String(parsed) : '';
+  const map = state.data?.triplesMap || DEFAULT_TRIPLES_MAP;
+  return {
+    title: safeText(map?.rowTitlesHe?.[rowKey], DEFAULT_TRIPLES_MAP.rowTitlesHe?.[rowKey] || `שלשה ${rowKey || '?'}`),
+    insight: safeText(map?.rowInsightsHe?.[rowKey], DEFAULT_TRIPLES_MAP.rowInsightsHe?.[rowKey] || '')
+  };
+}
+
 function setStep(step) {
   state.step = step;
   state.el.stepperItems.forEach((item) => {
@@ -424,17 +470,26 @@ function updateTop() {
 }
 
 function renderSentence() {
-  state.el.sentenceText.textContent = safeText(state.current?.sentence, 'משפט לתרגול');
+  state.el.sentenceText.textContent = safeText(state.current?.sentence, '׳׳©׳₪׳˜ ׳׳×׳¨׳’׳•׳');
 }
 
 function renderMap() {
   const rows = state.data.triplesMap.rows;
   const labels = state.data.triplesMap.labelsHe;
   state.el.mapContent.innerHTML = Object.keys(rows).map(Number).sort((a, b) => a - b).map((row) => {
+    const rowMeta = getRowMeta(row);
     const chips = (rows[String(row)] || []).map((cat) => `
       <div class="ltv2-map-chip"><strong>${esc(labels[cat] || cat)}</strong><small>${esc(cat)}</small></div>
     `).join('');
-    return `<section class="ltv2-map-row"><h4>Row ${row}</h4><div class="ltv2-map-row-cells">${chips}</div></section>`;
+    return `
+      <section class="ltv2-map-row">
+        <div class="ltv2-map-row-head">
+          <h4>${esc(rowMeta.title)}</h4>
+          <p class="ltv2-map-row-insight">${esc(rowMeta.insight)}</p>
+        </div>
+        <div class="ltv2-map-row-cells">${chips}</div>
+      </section>
+    `;
   }).join('');
 }
 function resetRound() {
@@ -454,6 +509,7 @@ function resetRound() {
   if (state.el.revealCategories) state.el.revealCategories.innerHTML = '';
   state.el.revealProgress.textContent = '0/3';
   state.el.rowSticky.classList.add('hidden');
+  if (state.el.rowInsight) state.el.rowInsight.textContent = '';
   state.el.rowMembers.innerHTML = '';
   state.el.editWrap.classList.add('hidden');
   state.el.editTimer.textContent = '';
@@ -473,10 +529,11 @@ function initReveal(row) {
 function renderCategoryChips() {
   state.el.categoryChips.innerHTML = categories().map((c) => {
     const selected = c.key === state.selectedCategory;
+    const rowMeta = getRowMeta(c.row);
     return `
       <button type="button" class="ltv2-category-chip ${selected ? 'is-selected' : ''}" data-ltv2-category="${encodeURIComponent(c.key)}" aria-pressed="${selected ? 'true' : 'false'}">
         <strong>${esc(c.he)}</strong>
-        <small>${esc(c.en)} · Row ${c.row}</small>
+        <small>${esc(c.en)} ֲ· ${esc(rowMeta.title)}</small>
       </button>
     `;
   }).join('');
@@ -485,13 +542,16 @@ function renderCategoryChips() {
 function renderRowSticky() {
   if (!state.activeRow) {
     state.el.rowSticky.classList.add('hidden');
+    if (state.el.rowInsight) state.el.rowInsight.textContent = '';
     state.el.rowMembers.innerHTML = '';
     return;
   }
 
   const labels = state.data.triplesMap.labelsHe;
   const rowCats = state.data.triplesMap.rows[String(state.activeRow)] || [];
-  state.el.rowTitle.textContent = `Row ${state.activeRow}: שלשה פעילה`;
+  const rowMeta = getRowMeta(state.activeRow);
+  state.el.rowTitle.textContent = rowMeta.title;
+  if (state.el.rowInsight) state.el.rowInsight.textContent = rowMeta.insight;
   state.el.rowMembers.innerHTML = rowCats.map((cat) => {
     const selected = cat === state.selectedCategory;
     return `<span class="ltv2-row-member ${selected ? 'is-selected' : ''}">${esc(labels[cat] || cat)}</span>`;
@@ -509,10 +569,10 @@ function helpHint(cat, option) {
   const slot = state.reveal[cat] || {};
   const labels = state.data.triplesMap.labelsHe;
   if (Number(option) === 1) {
-    return `דוגמה קטנה: במקום משפט כללי, נסח/י מקרה אחד ממשי. (${labels[cat] || cat})`;
+    return `׳“׳•׳’׳׳” ׳§׳˜׳ ׳”: ׳‘׳׳§׳•׳ ׳׳©׳₪׳˜ ׳›׳׳׳™, ׳ ׳¡׳—/׳™ ׳׳§׳¨׳” ׳׳—׳“ ׳׳׳©׳™. (${labels[cat] || cat})`;
   }
   const short = (slot.answer || '').length > 90 ? `${slot.answer.slice(0, 88).trim()}...` : (slot.answer || '');
-  return `שאלה עדינה: מתי כן / מי כן היה יודע? רמז: ${short}`;
+  return `׳©׳׳׳” ׳¢׳“׳™׳ ׳”: ׳׳×׳™ ׳›׳ / ׳׳™ ׳›׳ ׳”׳™׳” ׳™׳•׳“׳¢? ׳¨׳׳–: ${short}`;
 }
 
 function renderReveal() {
@@ -529,17 +589,17 @@ function renderReveal() {
         <header><h5>${esc(labels[cat] || cat)}</h5><small>${esc(cat)}</small></header>
         <p class="ltv2-reveal-question">${esc(ans.question || defaultQuestion(cat))}</p>
         <div class="ltv2-reveal-actions">
-          <button type="button" class="btn btn-primary" data-ltv2-act="ask" data-ltv2-cat="${encodeURIComponent(cat)}" ${answered ? 'disabled' : ''}>${answered ? 'נשאל ✓' : 'שאל'}</button>
-          <button type="button" class="btn btn-secondary" data-ltv2-act="help" data-ltv2-cat="${encodeURIComponent(cat)}" ${answered ? 'disabled' : ''}>אני לא יודע</button>
+          <button type="button" class="btn btn-primary" data-ltv2-act="ask" data-ltv2-cat="${encodeURIComponent(cat)}" ${answered ? 'disabled' : ''}>${answered ? '׳ ׳©׳׳ ג“' : '׳©׳׳'}</button>
+          <button type="button" class="btn btn-secondary" data-ltv2-act="help" data-ltv2-cat="${encodeURIComponent(cat)}" ${answered ? 'disabled' : ''}>׳׳ ׳™ ׳׳ ׳™׳•׳“׳¢</button>
         </div>
         ${slot.showHelp && !answered ? `
           <div class="ltv2-help-popover opened-content">
-            <button type="button" class="btn btn-secondary" data-ltv2-act="help-option" data-ltv2-option="1" data-ltv2-cat="${encodeURIComponent(cat)}">ננסה דוגמה אחת קטנה?</button>
-            <button type="button" class="btn btn-secondary" data-ltv2-act="help-option" data-ltv2-option="2" data-ltv2-cat="${encodeURIComponent(cat)}">מתי כן / מי כן היה יודע?</button>
+            <button type="button" class="btn btn-secondary" data-ltv2-act="help-option" data-ltv2-option="1" data-ltv2-cat="${encodeURIComponent(cat)}">׳ ׳ ׳¡׳” ׳“׳•׳’׳׳” ׳׳—׳× ׳§׳˜׳ ׳”?</button>
+            <button type="button" class="btn btn-secondary" data-ltv2-act="help-option" data-ltv2-option="2" data-ltv2-cat="${encodeURIComponent(cat)}">׳׳×׳™ ׳›׳ / ׳׳™ ׳›׳ ׳”׳™׳” ׳™׳•׳“׳¢?</button>
           </div>
         ` : ''}
         ${slot.helpHint ? `<p class="ltv2-help-hint">${esc(slot.helpHint)}</p>` : ''}
-        ${answered ? `<p class="ltv2-answer-text">✅ ${esc(slot.answer)}</p>` : ''}
+        ${answered ? `<p class="ltv2-answer-text">ג… ${esc(slot.answer)}</p>` : ''}
       </article>
     `;
   }).join('');
@@ -569,7 +629,7 @@ function buildReflection() {
     const summary = safeText(slot.summary || slot.answer, '---');
     return `(${i + 1}) ${labels[cat] || cat}: ${summary}`;
   });
-  return `אז אם אני מבין נכון:\n${lines.join('\n')}`;
+  return `׳׳– ׳׳ ׳׳ ׳™ ׳׳‘׳™׳ ׳ ׳›׳•׳:\n${lines.join('\n')}`;
 }
 
 function renderReflection() {
@@ -577,8 +637,8 @@ function renderReflection() {
 }
 
 function renderInsight() {
-  const text = safeText(state.current?.insight, 'מעניין... לא חשבתי על זה ככה.');
-  state.el.insightCard.innerHTML = `<p class="ltv2-insight-quote">"${esc(text)}"</p><p class="ltv2-insight-sub">יפה. השלשה הושלמה ונוצרה תמונה טיפולית ברורה יותר.</p>`;
+  const text = safeText(state.current?.insight, '׳׳¢׳ ׳™׳™׳... ׳׳ ׳—׳©׳‘׳×׳™ ׳¢׳ ׳–׳” ׳›׳›׳”.');
+  state.el.insightCard.innerHTML = `<p class="ltv2-insight-quote">"${esc(text)}"</p><p class="ltv2-insight-sub">׳™׳₪׳”. ׳”׳©׳׳©׳” ׳”׳•׳©׳׳׳” ׳•׳ ׳•׳¦׳¨׳” ׳×׳׳•׳ ׳” ׳˜׳™׳₪׳•׳׳™׳× ׳‘׳¨׳•׳¨׳” ׳™׳•׳×׳¨.</p>`;
 }
 
 function render() {
@@ -608,7 +668,7 @@ function handleCategoryPick(catKey, button) {
   if (state.step === 1) {
     if (cat.row !== state.current.targetRow) {
       state.score = Math.max(0, state.score - 15);
-      state.el.step1Feedback.textContent = 'נסה/י שוב: חפש/י קטגוריה ששייכת לשורה הפעילה במשפט הזה.';
+      state.el.step1Feedback.textContent = '׳ ׳¡׳”/׳™ ׳©׳•׳‘: ׳—׳₪׳©/׳™ ׳§׳˜׳’׳•׳¨׳™׳” ׳©׳©׳™׳™׳›׳× ׳׳©׳•׳¨׳” ׳”׳₪׳¢׳™׳׳” ׳‘׳׳©׳₪׳˜ ׳”׳–׳”.';
       wrongShake(button);
       updateTop();
       return;
@@ -618,7 +678,7 @@ function handleCategoryPick(catKey, button) {
     state.activeRow = cat.row;
     initReveal(cat.row);
     state.score += 80;
-    state.el.step1Feedback.textContent = `נבחר: ${cat.he}. עכשיו משלימים Reveal מלא לאותה שלשה.`;
+    state.el.step1Feedback.textContent = `נבחר: ${cat.he}. השלשה הפעילה: ${getRowMeta(cat.row).title}. עכשיו משלימים Reveal מלא.`;
     setStep(2);
     render();
     state.el.step2.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -628,9 +688,9 @@ function handleCategoryPick(catKey, button) {
   if (state.step === 2) {
     if (cat.row !== state.activeRow) {
       const selected = catByKey(state.selectedCategory);
-      state.el.step2Feedback.textContent = `❌ לא באותה שלשה. חפש/י את שתי האחיות של ${selected?.he || 'הקטגוריה הנוכחית'} בתוך Row ${state.activeRow}.`;
+      state.el.step2Feedback.textContent = `❌ לא באותה שלשה. חפש/י את שתי האחיות של ${selected?.he || 'הקטגוריה הנוכחית'} בתוך "${getRowMeta(state.activeRow).title}".`;
       wrongShake(button);
-      showToast('לא באותה שלשה', 'danger');
+      showToast('׳׳ ׳‘׳׳•׳×׳” ׳©׳׳©׳”', 'danger');
       return;
     }
     const card = state.el.revealCards.querySelector(`[data-ltv2-card="${encodeURIComponent(cat.key)}"]`);
@@ -645,7 +705,7 @@ function handleCategoryPick(catKey, button) {
 function maybeToReflection() {
   const c = revealCount();
   if (c.total && c.asked === c.total) {
-    state.el.step2Feedback.textContent = 'מעולה. השלשה הושלמה (3/3). עוברים לשיקוף...';
+    state.el.step2Feedback.textContent = '׳׳¢׳•׳׳”. ׳”׳©׳׳©׳” ׳”׳•׳©׳׳׳” (3/3). ׳¢׳•׳‘׳¨׳™׳ ׳׳©׳™׳§׳•׳£...';
     state.autoTimer = setTimeout(() => {
       state.reflectionText = buildReflection();
       setStep(3);
@@ -664,7 +724,7 @@ function handleRevealAction(catKey, action, option) {
     const ans = state.current?.answers?.[catKey] || {};
     slot.asked = true;
     slot.showHelp = false;
-    slot.answer = safeText(ans.answer, 'אין תשובה מוכנה. נסו לשאול מחדש בקצרה.');
+    slot.answer = safeText(ans.answer, '׳׳™׳ ׳×׳©׳•׳‘׳” ׳׳•׳›׳ ׳”. ׳ ׳¡׳• ׳׳©׳׳•׳ ׳׳—׳“׳© ׳‘׳§׳¦׳¨׳”.');
     slot.summary = safeText(ans.summary, slot.answer);
     slot.helpHint = '';
     state.score += 55;
@@ -695,7 +755,7 @@ function startEditReflection() {
   clearInterval(state.editTimer);
   state.editTimer = setInterval(() => {
     const left = Math.max(0, limit - (Date.now() - started));
-    state.el.editTimer.textContent = `נותרו ${(left / 1000).toFixed(1)} שניות`;
+    state.el.editTimer.textContent = `׳ ׳•׳×׳¨׳• ${(left / 1000).toFixed(1)} ׳©׳ ׳™׳•׳×`;
     if (left <= 0) saveEditReflection();
   }, 120);
 }
@@ -705,7 +765,7 @@ function saveEditReflection() {
   state.editTimer = null;
   state.reflectionText = safeText(state.el.reflectInput.value, state.reflectionText);
   state.el.editWrap.classList.add('hidden');
-  state.el.editTimer.textContent = 'השיקוף נשמר.';
+  state.el.editTimer.textContent = '׳”׳©׳™׳§׳•׳£ ׳ ׳©׳׳¨.';
   renderReflection();
 }
 
@@ -745,7 +805,7 @@ function restartPickStep() {
   state.activeRow = 0;
   state.selectedCategory = '';
   state.reveal = {};
-  state.el.step1Feedback.textContent = 'בחר/י קטגוריה חדשה כדי להתחיל שוב את השלשה.';
+  state.el.step1Feedback.textContent = '׳‘׳—׳¨/׳™ ׳§׳˜׳’׳•׳¨׳™׳” ׳—׳“׳©׳” ׳›׳“׳™ ׳׳”׳×׳—׳™׳ ׳©׳•׳‘ ׳׳× ׳”׳©׳׳©׳”.';
   state.el.step2Feedback.textContent = '';
   setStep(1);
   render();
@@ -790,7 +850,7 @@ function bindEvents() {
     state.queue = shuffle([...state.data.scenarios]);
     state.index = 0;
     loadCurrentScenario();
-    showToast('נטען תרחיש חדש', 'info');
+    showToast('׳ ׳˜׳¢׳ ׳×׳¨׳—׳™׳© ׳—׳“׳©', 'info');
   });
 
   state.el.changeRowBtn.addEventListener('click', restartPickStep);
@@ -847,3 +907,4 @@ async function setupLivingTriplesModule() {
 }
 
 window.setupLivingTriplesModule = setupLivingTriplesModule;
+

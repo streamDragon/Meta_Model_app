@@ -11,27 +11,27 @@
     const ROWS = Object.freeze([
         Object.freeze({
             id: 'row1',
-            label: 'Row 1',
+            label: 'שלשה 1 | מקור, הנחה וכוונה',
             categories: Object.freeze(['lost_performative', 'assumptions', 'mind_reading'])
         }),
         Object.freeze({
             id: 'row2',
-            label: 'Row 2',
+            label: 'שלשה 2 | חוקי משחק וגבולות',
             categories: Object.freeze(['universal_quantifier', 'modal_operator', 'cause_effect'])
         }),
         Object.freeze({
             id: 'row3',
-            label: 'Row 3',
+            label: 'שלשה 3 | משמעות, זהות והסקה',
             categories: Object.freeze(['nominalisations', 'identity_predicates', 'complex_equivalence'])
         }),
         Object.freeze({
             id: 'row4',
-            label: 'Row 4',
+            label: 'שלשה 4 | הקשר, זמן וייחוס',
             categories: Object.freeze(['comparative_deletion', 'time_space_predicates', 'lack_referential_index'])
         }),
         Object.freeze({
             id: 'row5',
-            label: 'Row 5',
+            label: 'שלשה 5 | קרקע חושית ופעולה',
             categories: Object.freeze(['non_referring_nouns', 'sensory_predicates', 'unspecified_verbs'])
         })
     ]);

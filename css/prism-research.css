@@ -434,9 +434,21 @@ body {
 }
 
 .prm-breen-5x3-row-head {
+  display: grid;
+  gap: 2px;
+}
+
+.prm-breen-5x3-row-head strong {
   font-size: 12px;
   font-weight: 800;
   color: #334155;
+  line-height: 1.2;
+}
+
+.prm-breen-5x3-row-head small {
+  color: #64748b;
+  font-size: 10px;
+  line-height: 1.25;
 }
 
 .prm-breen-5x3-row-cells {

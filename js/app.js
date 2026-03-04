@@ -5218,11 +5218,31 @@ function getBreenReferenceRows() {
 
 function getBreenReferenceRowMeta(rowId = '') {
     const meta = {
-        row1: { colorClass: 'row-sky', heLabel: 'שלשה 1 — שכבת מקור' },
-        row2: { colorClass: 'row-teal', heLabel: 'שלשה 2 — שכבת חוקים' },
-        row3: { colorClass: 'row-amber', heLabel: 'שלשה 3 — שכבת משמעות' },
-        row4: { colorClass: 'row-violet', heLabel: 'שלשה 4 — שכבת הקשר' },
-        row5: { colorClass: 'row-rose', heLabel: 'שלשה 5 — שכבת קרקע' }
+        row1: {
+            colorClass: 'row-sky',
+            heLabel: 'שלשה 1 | מקור, הנחה וכוונה',
+            heInsight: 'מי קובע אמת, מה מניחים מראש, ואיזו כוונה מיוחסת לאחר.'
+        },
+        row2: {
+            colorClass: 'row-teal',
+            heLabel: 'שלשה 2 | חוקי משחק וגבולות',
+            heInsight: 'חייב/יכול/תמיד ותיחום גבולות, כולל שרשראות סיבה-תוצאה.'
+        },
+        row3: {
+            colorClass: 'row-amber',
+            heLabel: 'שלשה 3 | משמעות, זהות והסקה',
+            heInsight: 'איך שפה מופשטת וזהויות הופכות למסקנות כוללניות.'
+        },
+        row4: {
+            colorClass: 'row-violet',
+            heLabel: 'שלשה 4 | הקשר, זמן וייחוס',
+            heInsight: 'מול מי, ביחס למה, ובאיזה זמן/מקום הטענה באמת נאמרת.'
+        },
+        row5: {
+            colorClass: 'row-rose',
+            heLabel: 'שלשה 5 | קרקע חושית ופעולה',
+            heInsight: 'מעבירים לשפה מדידה: מי/מה, חושית, ומה הפעולה בפועל.'
+        }
     };
     return meta[rowId] || meta.row1;
 }
@@ -5362,7 +5382,10 @@ function buildBreenReferenceBoardHtml({
 
         return `
             <div class="tr-phone-breen-row ${escapeHtml(rowMeta.colorClass || '')} ${isActiveRow ? 'is-active' : ''}">
-                <div class="tr-phone-breen-row-head">${escapeHtml(rowMeta.heLabel || row.id)}</div>
+                <div class="tr-phone-breen-row-head">
+                    <strong>${escapeHtml(rowMeta.heLabel || row.id)}</strong>
+                    <small>${escapeHtml(rowMeta.heInsight || '')}</small>
+                </div>
                 <div class="tr-phone-breen-row-cells">${cellsHtml}</div>
             </div>
         `;
