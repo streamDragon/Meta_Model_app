@@ -125,6 +125,7 @@ let audioState = {
 
 const OPENED_CONTENT_ATTR_NAMES = Object.freeze(['class', 'style', 'hidden', 'open', 'aria-hidden', 'aria-expanded']);
 const OPENED_CONTENT_HINT_RE = /(?:reveal|feedback|summary|result|answer|hint|guide|explain|analysis|response|drawer|accordion|details|blueprint|wizard|decomposition|metric|status|content|panel|card|note|רמז|משוב|תוצאה|סיכום|הסבר|פירוק|שלב|תגובה|פרטים)/i;
+const OPENED_CONTENT_EXCLUDED_HINT_RE = /(?:home-route|mobile-feed|feature-card|feature-grid|feature-list|feature-map|ticker|chip|lobby|launcher|sticky|nav)/i;
 const OPENED_CONTENT_ACTION_WINDOW_MS = 1800;
 const OPENED_CONTENT_TRANSIENT_MS = 9500;
 const OPENED_CONTENT_SCROLL_COOLDOWN_MS = 900;
@@ -136,7 +137,8 @@ let revealFeedbackState = {
     lastActionButton: null,
     scrollCooldownUntil: 0,
     activeContentElement: null,
-    visibilityMap: new WeakMap()
+    visibilityMap: new WeakMap(),
+    lightweightMode: false
 };
 
 const MUSIC_TRACK_SOURCES = Object.freeze([
@@ -235,7 +237,9 @@ let mobileExperienceRuntime = {
     tickerTimerId: null,
     stickyBound: false,
     stickyPollTimerId: null,
-    stickyPrimaryTarget: null
+    stickyPrimaryTarget: null,
+    accordionsBuilt: false,
+    accordionBuildScheduled: false
 };
 
 const CODEX_TRAP_FALLBACK_WORDS = Object.freeze([
@@ -1203,6 +1207,7 @@ function elementLooksLikeOpenedContent(node, trigger) {
     if (!node || !(node instanceof Element)) return false;
     if (node === trigger) return false;
     if (node.matches('button, summary, input, select, textarea, label, option')) return false;
+    if (node.matches('.home-route-feature-card, .home-route-features, .mobile-feed-card, .mobile-feed-list, .feature-map-grid, .feature-map-menu-box, .feature-map-menu-sections')) return false;
     if (!isElementActuallyVisible(node)) return false;
 
     const style = window.getComputedStyle(node);
@@ -1214,6 +1219,7 @@ function elementLooksLikeOpenedContent(node, trigger) {
 
     const signalText = `${node.id || ''} ${node.className || ''}`;
     const normalizedText = String(node.textContent || '').replace(/\s+/g, ' ').trim();
+    if (OPENED_CONTENT_EXCLUDED_HINT_RE.test(signalText)) return false;
     if (OPENED_CONTENT_HINT_RE.test(signalText)) return true;
     if (node.matches('details, section, article, aside')) return normalizedText.length >= 22;
     if (node.classList.contains('card') || node.classList.contains('panel') || node.classList.contains('box')) return normalizedText.length >= 18;
@@ -1473,6 +1479,7 @@ function setupGlobalRevealFeedback() {
     if (revealFeedbackState.bound) return;
     revealFeedbackState.bound = true;
     const isLightweightMode = hasCoarsePointerInput();
+    revealFeedbackState.lightweightMode = isLightweightMode;
     refreshActionButtonDecorators(document);
 
     const registerAction = (event) => {
@@ -1498,6 +1505,10 @@ function setupGlobalRevealFeedback() {
         revealFeedbackState.lastActionAt = Date.now();
         revealFeedbackState.lastActionButton = summary;
         syncActionButtonOpenState(summary);
+        if (isLightweightMode) {
+            clearOpenedContentFeedback(details);
+            return;
+        }
         if (details.open) applyOpenedContentFeedback(details, summary);
         else clearOpenedContentFeedback(details);
     }, true);
@@ -2086,6 +2097,7 @@ function setupMobileViewportWatcher() {
         viewportSyncRafId = null;
         const activeTab = getCurrentActiveTabName();
         syncHomeMobileFeedMode(activeTab);
+        scheduleMobileAccordionBuild();
         updateMobileStickyCta(activeTab);
     };
     const onViewportChange = () => {
@@ -3129,6 +3141,8 @@ function injectMobileAccordionFromSource(source) {
 }
 
 function setupMobileAccordions() {
+    if (mobileExperienceRuntime.accordionsBuilt) return;
+    if (!isMobileViewportMode()) return;
     const sections = Array.from(document.querySelectorAll('.tab-content[id]'));
     if (!sections.length) return;
     sections.forEach((section) => {
@@ -3140,6 +3154,24 @@ function setupMobileAccordions() {
         section.querySelectorAll('.muted-note').forEach((node) => candidates.push(node));
         candidates.forEach((candidate) => injectMobileAccordionFromSource(candidate));
     });
+    mobileExperienceRuntime.accordionsBuilt = true;
+}
+
+function scheduleMobileAccordionBuild() {
+    if (mobileExperienceRuntime.accordionsBuilt || mobileExperienceRuntime.accordionBuildScheduled) return;
+    if (!isMobileViewportMode()) return;
+    mobileExperienceRuntime.accordionBuildScheduled = true;
+
+    const run = () => {
+        mobileExperienceRuntime.accordionBuildScheduled = false;
+        setupMobileAccordions();
+    };
+
+    if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(() => run(), { timeout: 480 });
+        return;
+    }
+    setTimeout(run, 0);
 }
 
 function ensureMobileStickyCta() {
@@ -3259,7 +3291,7 @@ function setupMobileStickyCta() {
 
 function setupMobileExperienceLayer() {
     setupMobileViewportWatcher();
-    setupMobileAccordions();
+    scheduleMobileAccordionBuild();
     setupMobileStickyCta();
     const activeTab = getCurrentActiveTabName();
     syncHomeMobileFeedMode(activeTab);
@@ -5221,27 +5253,27 @@ function getBreenReferenceRowMeta(rowId = '') {
         row1: {
             colorClass: 'row-sky',
             heLabel: 'שלשה 1 | מקור, הנחה וכוונה',
-            heInsight: 'מי קובע אמת, מה מניחים מראש, ואיזו כוונה מיוחסת לאחר.'
+            heInsight: 'בודקים מי מקור הסמכות, איזו הנחה עובדת מתחת לפני השטח, ואיזו כוונה מיוחסת בלי ראיה ישירה.'
         },
         row2: {
             colorClass: 'row-teal',
             heLabel: 'שלשה 2 | חוקי משחק וגבולות',
-            heInsight: 'חייב/יכול/תמיד ותיחום גבולות, כולל שרשראות סיבה-תוצאה.'
+            heInsight: 'כאן חוקרים את חוקי המשחק: חייב/צריך/יכול, גבולות הנכונות, והנגזרת התפקודית של החוקים האלה על האדם.'
         },
         row3: {
             colorClass: 'row-amber',
             heLabel: 'שלשה 3 | משמעות, זהות והסקה',
-            heInsight: 'איך שפה מופשטת וזהויות הופכות למסקנות כוללניות.'
+            heInsight: 'מפרידים בין פעולה לזהות ובין סימן למסקנה, כדי לא להפוך תיאור רגעי להגדרה קבועה של האדם.'
         },
         row4: {
             colorClass: 'row-violet',
             heLabel: 'שלשה 4 | הקשר, זמן וייחוס',
-            heInsight: 'מול מי, ביחס למה, ובאיזה זמן/מקום הטענה באמת נאמרת.'
+            heInsight: 'מחדדים זמן, מקום והקשר: מול מי, ביחס למה, ומתי בדיוק המשפט נכון או לא נכון.'
         },
         row5: {
             colorClass: 'row-rose',
             heLabel: 'שלשה 5 | קרקע חושית ופעולה',
-            heInsight: 'מעבירים לשפה מדידה: מי/מה, חושית, ומה הפעולה בפועל.'
+            heInsight: 'מורידים לקרקע מדידה: מי/מה בדיוק, מה רואים ושומעים בפועל, ומה הצעד ההתנהגותי הבא.'
         }
     };
     return meta[rowId] || meta.row1;
