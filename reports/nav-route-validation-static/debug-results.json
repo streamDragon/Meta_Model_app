@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-03-03T13:11:48.568Z",
+  "results": [
+    {
+      "test": "debug guard redirect",
+      "pass": true,
+      "details": "http://127.0.0.1:4175/?v=1.0.161&t=1772536996950"
+    },
+    {
+      "test": "debug route enabled",
+      "pass": true,
+      "details": "http://127.0.0.1:4175/debug?debug=1&v=1.0.161&t=1772536996950"
+    },
+    {
+      "test": "debug log updated",
+      "pass": true,
+      "details": "[2026-03-03T13:11:45.442Z] debug panel initialized | [2026-03-03T13:11:46.028Z] consume count=1 request_id=debug-script:bc31a558-3f05-460f-8039-0cb9f0c318a5 rpc=none ok=true reason=supabase_disabled remaining=10 | [2026-03-03T13:11:46.040Z] consume count=1 request_id=debug-script:bc31a558-3f05-460f-8039-0cb9f0c318a5 rpc=none ok=true reason=supabase_disabled remaining=10"
+    }
+  ]
+}

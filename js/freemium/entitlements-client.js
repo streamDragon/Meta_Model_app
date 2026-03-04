@@ -3,8 +3,10 @@ import { ensureSession, getAuthSnapshot } from './auth-session.js';
 
 const ENTITLEMENTS_CACHE_KEY = 'meta_freemium_entitlements_v1';
 const ENTITLEMENTS_CACHE_TTL_MS = 45 * 1000;
+const GUEST_FINGERPRINT_KEY = 'meta_guest_fingerprint_v1';
 const SIGNED_OUT_USER_KEY = '__signed_out__';
-const DEFAULT_GUEST_LIMIT = 80;
+const GUEST_FREE_LIMIT = 10;
+const FREE_PACK_TOTAL = 60;
 
 const entitlementsRuntime = {
     entitlements: null,
@@ -13,6 +15,7 @@ const entitlementsRuntime = {
     listeners: new Set(),
     refreshPromise: null,
     consumeInFlightByRequestId: new Map(),
+    guestFingerprintPromise: null,
     lastLogKey: ''
 };
 
@@ -34,6 +37,12 @@ function normalizePlan(value) {
     return 'guest';
 }
 
+function defaultQuotaForPlan(plan) {
+    if (plan === 'guest') return GUEST_FREE_LIMIT;
+    if (plan === 'free') return FREE_PACK_TOTAL;
+    return FREE_PACK_TOTAL;
+}
+
 function normalizeCount(value, fallback = 0) {
     const parsed = Number(value);
     if (!Number.isFinite(parsed)) return Math.max(0, Number(fallback) || 0);
@@ -45,31 +54,32 @@ function normalizeEntitlementsRow(row) {
     const role = normalizePlan(data.role || data.plan);
     const unlimited = Boolean(data.unlimited || role === 'pro');
 
-    const limitCandidate = data.daily_limit ?? data.free_total_limit ?? data.guest_daily_limit;
-    const baseLimit = normalizeCount(limitCandidate, DEFAULT_GUEST_LIMIT) || DEFAULT_GUEST_LIMIT;
+    const quotaCandidate = data.total_quota ?? data.daily_limit ?? data.free_total_limit ?? data.guest_daily_limit;
+    const totalQuota = normalizeCount(quotaCandidate, defaultQuotaForPlan(role)) || defaultQuotaForPlan(role);
 
     let remainingCandidate = data.remaining;
     if (remainingCandidate == null) {
         remainingCandidate = role === 'free' ? data.free_total_remaining : data.guest_daily_remaining;
     }
-    const boundedRemaining = Math.min(baseLimit, normalizeCount(remainingCandidate, baseLimit));
+    const remaining = Math.min(totalQuota, normalizeCount(remainingCandidate, totalQuota));
 
-    const guestDailyRemaining = role === 'guest' ? boundedRemaining : baseLimit;
-    const freeTotalRemaining = role === 'free' ? boundedRemaining : baseLimit;
+    const guestRemaining = role === 'guest' ? remaining : totalQuota;
+    const freeRemaining = role === 'free' ? remaining : totalQuota;
 
     return {
         role,
         plan: role,
         ads_enabled: Boolean(data.ads_enabled ?? (role !== 'pro')),
-        guest_daily_limit: baseLimit,
-        guest_daily_used_today: role === 'guest' ? Math.max(0, baseLimit - guestDailyRemaining) : 0,
-        guest_daily_remaining: guestDailyRemaining,
-        free_total_limit: baseLimit,
-        free_total_used: role === 'free' ? Math.max(0, baseLimit - freeTotalRemaining) : 0,
-        free_total_remaining: freeTotalRemaining,
-        remaining: boundedRemaining,
-        daily_limit: baseLimit,
-        reset_at: data.reset_at ? String(data.reset_at) : '',
+        total_quota: totalQuota,
+        remaining,
+        guest_daily_limit: totalQuota,
+        guest_daily_used_today: role === 'guest' ? Math.max(0, totalQuota - guestRemaining) : 0,
+        guest_daily_remaining: guestRemaining,
+        free_total_limit: totalQuota,
+        free_total_used: role === 'free' ? Math.max(0, totalQuota - freeRemaining) : 0,
+        free_total_remaining: freeRemaining,
+        daily_limit: totalQuota,
+        reset_at: '',
         unlimited
     };
 }
@@ -77,8 +87,7 @@ function normalizeEntitlementsRow(row) {
 function resolveRemaining(entitlements) {
     if (!entitlements) return 0;
     if (entitlements.unlimited || entitlements.role === 'pro') return -1;
-    if (entitlements.role === 'free') return Number(entitlements.free_total_remaining || 0);
-    return Number(entitlements.guest_daily_remaining || 0);
+    return Number(entitlements.remaining || 0);
 }
 
 function resolveSessionUserKey(session) {
@@ -97,9 +106,8 @@ function createGuestFallbackEntitlements() {
         role: 'guest',
         plan: 'guest',
         ads_enabled: true,
-        daily_limit: DEFAULT_GUEST_LIMIT,
-        remaining: DEFAULT_GUEST_LIMIT,
-        reset_at: '',
+        total_quota: GUEST_FREE_LIMIT,
+        remaining: GUEST_FREE_LIMIT,
         unlimited: false
     });
 }
@@ -142,7 +150,13 @@ function readEntitlementsCache() {
 function isCacheForCurrentUser(userKey) {
     const currentAuthUserKey = resolveAuthUserKey();
     if (!currentAuthUserKey) return true;
-    return String(userKey || '') === currentAuthUserKey;
+
+    const normalizedUserKey = String(userKey || '');
+    if (currentAuthUserKey === SIGNED_OUT_USER_KEY) {
+        return normalizedUserKey === SIGNED_OUT_USER_KEY || normalizedUserKey.startsWith('guest:');
+    }
+
+    return normalizedUserKey === currentAuthUserKey;
 }
 
 function applyEntitlements(entitlements, options = {}) {
@@ -219,22 +233,10 @@ function isMissingRpc(error, functionName) {
     );
 }
 
-function toEntitlementsFromQuotaRpc(row = {}) {
-    return normalizeEntitlementsRow({
-        role: row.role || row.plan,
-        plan: row.plan || row.role,
-        ads_enabled: row.ads_enabled,
-        remaining: row.remaining,
-        daily_limit: row.daily_limit,
-        reset_at: row.reset_at,
-        unlimited: normalizePlan(row.plan || row.role) === 'pro'
-    });
-}
-
 function normalizeConsumeReason(reason, role = 'guest') {
     const normalizedReason = String(reason || '').trim().toLowerCase();
     if (!normalizedReason) return '';
-    if (normalizedReason === 'quota_exceeded') {
+    if (normalizedReason === 'quota_exhausted' || normalizedReason === 'quota_exceeded') {
         return normalizePlan(role) === 'guest' ? 'guest_quota' : 'free_quota';
     }
     if (normalizedReason === 'not_authenticated') return 'not_authenticated';
@@ -249,6 +251,113 @@ function parseLegacyQuotaError(error) {
     return '';
 }
 
+function getGuestFingerprintCache() {
+    try {
+        const cached = String(localStorage.getItem(GUEST_FINGERPRINT_KEY) || '').trim();
+        return cached;
+    } catch (_error) {
+        return '';
+    }
+}
+
+function setGuestFingerprintCache(value) {
+    const normalized = String(value || '').trim();
+    if (!normalized) return;
+    try {
+        localStorage.setItem(GUEST_FINGERPRINT_KEY, normalized);
+    } catch (_error) {}
+}
+
+function fallbackHash(value) {
+    const input = String(value || '');
+    let hash = 2166136261;
+    for (let i = 0; i < input.length; i += 1) {
+        hash ^= input.charCodeAt(i);
+        hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    }
+    return Math.abs(hash >>> 0).toString(16).padStart(8, '0');
+}
+
+async function sha256Hex(value) {
+    const input = String(value || '');
+    if (!globalThis.crypto?.subtle || typeof TextEncoder === 'undefined') {
+        return fallbackHash(input);
+    }
+    const bytes = new TextEncoder().encode(input);
+    const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+    return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+async function buildGuestFingerprint() {
+    const nav = typeof navigator === 'undefined' ? {} : navigator;
+    const scr = typeof screen === 'undefined' ? {} : screen;
+    const tz = (() => {
+        try {
+            return Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+        } catch (_error) {
+            return '';
+        }
+    })();
+
+    const parts = [
+        String(nav.userAgent || ''),
+        String(nav.language || ''),
+        Array.isArray(nav.languages) ? nav.languages.join(',') : '',
+        String(nav.platform || ''),
+        String(nav.hardwareConcurrency || ''),
+        String(nav.deviceMemory || ''),
+        `${Number(scr.width) || 0}x${Number(scr.height) || 0}x${Number(scr.colorDepth) || 0}`,
+        String(tz || ''),
+        String((new Date()).getTimezoneOffset())
+    ];
+
+    const raw = parts.join('|');
+    return sha256Hex(raw);
+}
+
+async function getGuestFingerprint() {
+    const cached = getGuestFingerprintCache();
+    if (cached) return cached;
+
+    if (entitlementsRuntime.guestFingerprintPromise) {
+        return entitlementsRuntime.guestFingerprintPromise;
+    }
+
+    entitlementsRuntime.guestFingerprintPromise = (async () => {
+        const next = await buildGuestFingerprint();
+        setGuestFingerprintCache(next);
+        return next;
+    })();
+
+    try {
+        return await entitlementsRuntime.guestFingerprintPromise;
+    } finally {
+        entitlementsRuntime.guestFingerprintPromise = null;
+    }
+}
+
+function toEntitlementsFromAuthRpc(row = {}) {
+    return normalizeEntitlementsRow({
+        role: row.role || row.plan,
+        plan: row.plan || row.role,
+        ads_enabled: row.ads_enabled,
+        total_quota: row.total_quota ?? row.daily_limit,
+        remaining: row.remaining,
+        unlimited: Boolean(row.unlimited || normalizePlan(row.plan || row.role) === 'pro')
+    });
+}
+
+function toEntitlementsFromGuestRpc(row = {}) {
+    return normalizeEntitlementsRow({
+        role: 'guest',
+        plan: 'guest',
+        ads_enabled: true,
+        total_quota: row.total_quota,
+        remaining: row.remaining,
+        unlimited: false
+    });
+}
+
 async function fetchLegacyEntitlements(supabase) {
     const { error: ensureError } = await supabase.rpc('ensure_profile');
     if (ensureError) {
@@ -261,7 +370,7 @@ async function fetchLegacyEntitlements(supabase) {
     return toRpcRow(data);
 }
 
-async function fetchEntitlementsFromServer(supabase) {
+async function fetchAuthenticatedEntitlements(supabase) {
     const { data, error } = await supabase.rpc('get_entitlements_state');
     if (!error) {
         return toRpcRow(data);
@@ -272,6 +381,18 @@ async function fetchEntitlementsFromServer(supabase) {
     }
 
     throw new Error(error.message || 'ENTITLEMENTS_FETCH_FAILED');
+}
+
+async function fetchGuestEntitlements(supabase, guestFingerprint) {
+    const { data, error } = await supabase.rpc('get_guest_entitlements_state', {
+        p_guest_fingerprint: guestFingerprint
+    });
+
+    if (error) {
+        throw new Error(error.message || 'GUEST_ENTITLEMENTS_FETCH_FAILED');
+    }
+
+    return toRpcRow(data);
 }
 
 async function runLegacyConsumeSentence(supabase, session, count = 1, requestId = '') {
@@ -286,7 +407,8 @@ async function runLegacyConsumeSentence(supabase, session, count = 1, requestId 
                 ok: false,
                 reason,
                 entitlements,
-                requestId
+                requestId,
+                rpc: 'consume_sentence'
             };
         }
         throw new Error(error.message || 'CONSUME_SENTENCE_FAILED');
@@ -300,38 +422,50 @@ async function runLegacyConsumeSentence(supabase, session, count = 1, requestId 
         reason: 'consumed',
         entitlements,
         consumed_count: Number(row?.consumed_count || pCount),
-        requestId
+        requestId,
+        rpc: 'consume_sentence'
     };
 }
 
-async function runConsumeSentence(options = {}) {
-    const parsed = normalizeConsumeOptions(options);
-    const requestId = parsed.requestId || createConsumeRequestId(parsed.source);
+async function runGuestConsume(supabase, parsed, requestId) {
+    const guestFingerprint = await getGuestFingerprint();
 
-    if (!isSupabaseConfigured()) {
-        return {
-            ok: true,
-            reason: 'supabase_disabled',
-            entitlements: createGuestFallbackEntitlements(),
-            requestId
-        };
+    const { data, error } = await supabase.rpc('consume_guest_quota', {
+        p_guest_fingerprint: guestFingerprint,
+        p_request_id: requestId,
+        p_cost: parsed.count
+    });
+
+    if (error) {
+        throw new Error(error.message || 'CONSUME_GUEST_QUOTA_FAILED');
     }
 
-    const session = await ensureSession();
-    if (!session?.user) {
-        const entitlements = applyEntitlements(createGuestFallbackEntitlements(), {
-            userKey: resolveAuthUserKey() || SIGNED_OUT_USER_KEY
-        });
+    const row = toRpcRow(data);
+    const entitlements = applyEntitlements(toEntitlementsFromGuestRpc(row), { userKey: `guest:${guestFingerprint}` });
+    const reason = normalizeConsumeReason(row.reason, 'guest');
+    const allowed = row.allowed === true || reason === 'idempotent_replay';
+
+    if (!allowed) {
         return {
             ok: false,
-            reason: 'not_authenticated',
+            reason: reason || 'guest_quota',
             entitlements,
-            requestId
+            requestId,
+            rpc: 'consume_guest_quota'
         };
     }
 
-    const supabase = await getSupabaseClient();
+    return {
+        ok: true,
+        reason: reason || 'consumed',
+        entitlements,
+        requestId,
+        remaining: normalizeCount(row.remaining, entitlements.remaining),
+        rpc: 'consume_guest_quota'
+    };
+}
 
+async function runAuthenticatedConsume(supabase, session, parsed, requestId) {
     const { data, error } = await supabase.rpc('consume_quota', {
         p_request_id: requestId,
         p_cost: parsed.count
@@ -346,28 +480,54 @@ async function runConsumeSentence(options = {}) {
     }
 
     const row = toRpcRow(data);
-    const role = normalizePlan(row.role || row.plan);
+    const role = normalizePlan(row.role || row.plan || 'free');
     const sessionUserKey = resolveSessionUserKey(session) || resolveAuthUserKey();
-    const entitlements = applyEntitlements(toEntitlementsFromQuotaRpc(row), { userKey: sessionUserKey });
-    const normalizedReason = normalizeConsumeReason(row.reason, role);
-    const allowed = row.allowed === true || normalizedReason === 'idempotent_replay';
+    const entitlements = applyEntitlements(toEntitlementsFromAuthRpc(row), { userKey: sessionUserKey });
+    const reason = normalizeConsumeReason(row.reason, role);
+    const allowed = row.allowed === true || reason === 'idempotent_replay';
 
     if (!allowed) {
         return {
             ok: false,
-            reason: normalizedReason || 'quota_exceeded',
+            reason: reason || 'free_quota',
             entitlements,
-            requestId
+            requestId,
+            rpc: 'consume_quota'
         };
     }
 
     return {
         ok: true,
-        reason: normalizedReason || 'consumed',
+        reason: reason || 'consumed',
         entitlements,
         requestId,
-        remaining: normalizeCount(row.remaining, entitlements.remaining)
+        remaining: normalizeCount(row.remaining, entitlements.remaining),
+        rpc: 'consume_quota'
     };
+}
+
+async function runConsumeSentence(options = {}) {
+    const parsed = normalizeConsumeOptions(options);
+    const requestId = parsed.requestId || createConsumeRequestId(parsed.source);
+
+    if (!isSupabaseConfigured()) {
+        return {
+            ok: true,
+            reason: 'supabase_disabled',
+            entitlements: createGuestFallbackEntitlements(),
+            requestId,
+            rpc: 'none'
+        };
+    }
+
+    const session = await ensureSession();
+    const supabase = await getSupabaseClient();
+
+    if (!session?.user) {
+        return runGuestConsume(supabase, parsed, requestId);
+    }
+
+    return runAuthenticatedConsume(supabase, session, parsed, requestId);
 }
 
 export function getEntitlementsSnapshot() {
@@ -416,16 +576,19 @@ export async function refreshEntitlements(optionsOrReason = {}) {
         }
 
         const session = await ensureSession();
-        const sessionUserKey = resolveSessionUserKey(session);
+        const supabase = await getSupabaseClient();
+
         if (!session?.user) {
-            return applyEntitlements(createGuestFallbackEntitlements(), {
-                userKey: resolveAuthUserKey() || SIGNED_OUT_USER_KEY
+            const guestFingerprint = await getGuestFingerprint();
+            const guestRow = await fetchGuestEntitlements(supabase, guestFingerprint);
+            return applyEntitlements(toEntitlementsFromGuestRpc(guestRow), {
+                userKey: `guest:${guestFingerprint}`
             });
         }
 
-        const supabase = await getSupabaseClient();
-        const entitlementsRow = await fetchEntitlementsFromServer(supabase);
-        return applyEntitlements(entitlementsRow || {}, { userKey: sessionUserKey });
+        const sessionUserKey = resolveSessionUserKey(session);
+        const entitlementsRow = await fetchAuthenticatedEntitlements(supabase);
+        return applyEntitlements(toEntitlementsFromAuthRpc(entitlementsRow), { userKey: sessionUserKey });
     })();
 
     try {

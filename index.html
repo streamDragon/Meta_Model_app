@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.161" data-build-time="1772536996950" data-build-iso="2026-03-03T11:23:16.950Z" data-git-commit="96aef33">
+<html lang="he" dir="rtl" data-app-version="1.0.162" data-build-time="1772584697428" data-build-iso="2026-03-04T00:38:17.428Z" data-git-commit="4e568d4">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +21,31 @@
             }
             var assetVersion = declaredVersion || 'dev';
             var buildTime = declaredBuildTime || 'dev';
-            var appPathPrefix = window.location.pathname.replace(/[^/]*$/, '');
+            function normalizePath(pathname) {
+                var value = String(pathname || '').trim();
+                if (!value) return '/';
+                var withSlash = value.charAt(0) === '/' ? value : '/' + value;
+                var collapsed = withSlash.replace(/\/{2,}/g, '/');
+                if (collapsed.length > 1 && /\/$/.test(collapsed)) {
+                    return collapsed.slice(0, -1);
+                }
+                return collapsed || '/';
+            }
+
+            function detectAppRootPath(pathname) {
+                var normalized = normalizePath(pathname);
+                var featureIndex = normalized.indexOf('/feature/');
+                if (featureIndex > 0) {
+                    return normalizePath(normalized.slice(0, featureIndex));
+                }
+                if (/\/index\.html$/i.test(normalized)) {
+                    return normalizePath(normalized.replace(/\/index\.html$/i, '') || '/');
+                }
+                return '/';
+            }
+
+            var appRootPath = detectAppRootPath(window.location.pathname);
+            var appPathPrefix = appRootPath === '/' ? '/' : appRootPath + '/';
 
             function normalizeToken(value) {
                 return String(value == null ? '' : value).trim();
@@ -100,15 +124,28 @@
                 });
             }
 
+            function resolveAppAssetPath(path) {
+                var raw = String(path == null ? '' : path).trim();
+                if (!raw) return raw;
+                if (/^[a-z][a-z0-9+.-]*:/i.test(raw) || raw.indexOf('//') === 0) {
+                    return raw;
+                }
+                if (raw.charAt(0) === '/') {
+                    return raw;
+                }
+                return (appPathPrefix + raw.replace(/^\.?\//, '')).replace(/\/{2,}/g, '/');
+            }
+
             function withAssetVersion(path) {
+                var assetPath = resolveAppAssetPath(path);
                 try {
-                    var url = new URL(path, window.location.href);
+                    var url = new URL(assetPath, window.location.origin);
                     url.searchParams.set('v', assetVersion);
                     url.searchParams.set('t', buildTime);
                     return url.toString();
                 } catch (error) {
-                    var separator = path.indexOf('?') === -1 ? '?' : '&';
-                    return path + separator + 'v=' + encodeURIComponent(assetVersion) + '&t=' + encodeURIComponent(buildTime);
+                    var separator = assetPath.indexOf('?') === -1 ? '?' : '&';
+                    return assetPath + separator + 'v=' + encodeURIComponent(assetVersion) + '&t=' + encodeURIComponent(buildTime);
                 }
             }
 
@@ -381,152 +418,75 @@
         </div>
 
         <!-- HOME TAB -->
-        <section id="home" class="tab-content active home-lobby-root">
-            <div class="home-lobby-bg" aria-hidden="true">
-                <span class="home-lobby-particle p1"></span>
-                <span class="home-lobby-particle p2"></span>
-                <span class="home-lobby-particle p3"></span>
-                <span class="home-lobby-particle p4"></span>
-                <span class="home-lobby-particle p5"></span>
-                <span class="home-lobby-particle p6"></span>
-                <span class="home-lobby-particle p7"></span>
-                <span class="home-lobby-particle p8"></span>
-            </div>
-
-            <article class="home-lobby-hero-card">
-                <div class="home-lobby-whats-new" aria-label="מה חדש ב-2026">
-                    <strong>כמה חדש ב־2026?</strong>
-                    <ul>
-                        <li>כרטיסיות קליניות: מה זה משנה בטיפול</li>
-                        <li>תרגול מהיר עם פידבק ברור</li>
-                        <li>עברית נקייה + פחות עומס בעיניים</li>
-                    </ul>
+        <section id="home" class="tab-content active home-route">
+            <section id="mobile-feed-home" class="mobile-feed-home" hidden aria-label="ניווט מהיר במובייל">
+                <div class="mobile-feed-ticker" role="status" aria-live="polite">
+                    <span class="mobile-feed-ticker-label">מה חדש</span>
+                    <span id="mobile-feed-ticker-text">נטען...</span>
                 </div>
+                <label class="mobile-feed-search-wrap" for="mobile-feed-search">
+                    <span>חיפוש מהיר</span>
+                    <input id="mobile-feed-search" type="search" placeholder="חפש/י תרגול, מעבדה או ידע" autocomplete="off">
+                </label>
+                <div id="mobile-feed-chips" class="mobile-feed-chips" role="tablist" aria-label="קטגוריות ניווט"></div>
+                <div id="mobile-feed-list" class="mobile-feed-list" aria-live="polite"></div>
+            </section>
 
-                <p id="app-version-chip" class="app-version-chip home-lobby-version">גרסה נוכחית: נטען...</p>
-
-                <h2 class="home-lobby-title">
-                    Meta-Model — חדר כושר לדיוק בשפה
-                    <span class="home-lobby-title-icon" aria-hidden="true">🧠💪</span>
-                </h2>
-                <p class="home-lobby-subtitle">
-                    מה שנולד ב־1973 כמערכת שאלות למטפלים — קיבל כאן שדרוג מודרני:
-                    <br>
-                    פחות תיאוריה יבשה, יותר תרגול שמייצר שינוי בשיחה אמיתית.
-                </p>
-                <p class="home-lobby-humor-line">אל דאגה — אין פה ניתוחים. רק פירוק משפטים 😄</p>
-
-                <div class="home-lobby-cta-row">
-                    <a class="btn btn-primary home-lobby-cta-primary" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html">התחל תרגול עכשיו</a>
-                    <a class="btn btn-secondary home-lobby-cta-secondary" href="index.html?tab=categories">מרכז הידע: מילון הקטגוריות</a>
+            <article class="home-route-hero home-route-desktop-only">
+                <div class="home-route-hero-media">
+                    <img
+                        class="home-route-hero-image"
+                        src=""
+                        data-versioned-src="assets/meta-model-gym-hero.png"
+                        alt="איור Meta Model Gym לאימון חשיבה, רגש והבנה"
+                        loading="lazy"
+                    >
+                </div>
+                <div class="home-route-hero-copy">
+                    <p id="app-version-chip" class="app-version-chip home-route-version">גרסה נוכחית: נטען...</p>
+                    <h2 class="home-route-title">Meta Model Gym</h2>
+                    <p class="home-route-subtitle">
+                        דף בית נקי להתחלה מהירה: בוחרים כלי, נכנסים לתרגול, ומקבלים פידבק ברור.
+                        כל פיצ'ר נפתח בעמוד נפרד במסלול הניווט.
+                    </p>
+                    <div class="home-route-cta-row">
+                        <button type="button" class="btn btn-primary" onclick="navigateTo('practice-question')">התחל תרגול</button>
+                        <button type="button" class="btn btn-secondary" onclick="navigateTo('categories')">מרכז ידע</button>
+                    </div>
                 </div>
             </article>
 
-            <section class="home-lobby-section">
-                <h3 class="home-lobby-section-title">מה תמצא פה</h3>
-                <div class="home-lobby-feature-grid">
-                    <article class="home-lobby-feature-card">
-                        <div class="home-lobby-feature-icon" aria-hidden="true">🧩</div>
-                        <h4>תרגול כיפי</h4>
-                        <p>דקה ביום — ופתאום אתה שומע "תמיד" ממרחק 3 ק״מ 😄</p>
-                        <a class="btn btn-primary" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html">פתח תרגול</a>
-                    </article>
+            <section class="home-route-features home-route-desktop-only" aria-label="מסלולי תרגול">
+                <article class="home-route-feature-card">
+                    <h3>Exercises</h3>
+                    <p>תרגול זיהוי + Meta Radar לעבודה מהירה על משפטים בזמן אמת.</p>
+                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">פתח Exercises</button>
+                </article>
+                <article class="home-route-feature-card">
+                    <h3>Lab</h3>
+                    <p>Prism Lab ו־Triples Radar לחקירה עמוקה ותכנון צעד המשך.</p>
+                    <button type="button" class="btn btn-secondary" onclick="navigateTo('prismlab')">פתח Lab</button>
+                </article>
+                <article class="home-route-feature-card">
+                    <h3>Knowledge</h3>
+                    <p>מילון קטגוריות מאוחד עם דוגמאות ושאלות מדויקות לשימוש מיידי.</p>
+                    <button type="button" class="btn btn-secondary" onclick="navigateTo('categories')">פתח Knowledge</button>
+                </article>
+                <article class="home-route-feature-card">
+                    <h3>Execution</h3>
+                    <p>Scenario Trainer ו־Blueprint כדי להפוך תובנה לשיחה ולפעולה.</p>
+                    <button type="button" class="btn btn-secondary" onclick="navigateTo('scenario-trainer')">פתח Execution</button>
+                </article>
+            </section>
 
-                    <article class="home-lobby-feature-card">
-                        <div class="home-lobby-feature-icon" aria-hidden="true">📖</div>
-                        <h4>מרכז הידע</h4>
-                        <p>כל הקטגוריות, דוגמאות, ושאלות שעובדות באמת (בלי יובש).</p>
-                        <a class="btn btn-secondary" href="index.html?tab=categories">פתח מילון</a>
-                    </article>
-
-                    <article class="home-lobby-feature-card">
-                        <div class="home-lobby-feature-icon" aria-hidden="true">🧪</div>
-                        <h4>מעבדות וחידושים</h4>
-                        <p>כאן חוקרים עמוק: Prism Lab, סצנות, Blueprint ועוד.</p>
-                        <a class="btn btn-secondary" href="prism_lab_trainer.html" data-versioned-href="prism_lab_trainer.html">פתח מעבדות</a>
-                    </article>
+            <section class="home-route-primary-cta home-route-desktop-only">
+                <h3>כניסה מהירה לפיצ'רים</h3>
+                <p>ה־MENU זמין בכל עמוד ונותן מעבר ישיר בין Home, Exercises, Lab, Knowledge ו־Settings.</p>
+                <div class="home-route-cta-row home-route-cta-row-center">
+                    <button type="button" class="btn btn-primary" onclick="navigateTo('scenario-trainer')">פתח סצנות</button>
+                    <button id="home-open-feature-map" type="button" class="btn btn-secondary">פתח MENU מלא</button>
                 </div>
-            </section>
-
-            <section class="home-lobby-section home-lobby-flow-explain">
-                <h3 class="home-lobby-section-title">איך עובדים באתר?</h3>
-                <p>
-                    יש כאן כמה כלים משלימים: תרגול זיהוי Meta-Model, Meta Radar, Triples, Prism Lab, סצנות, Blueprint ועוד.
-                    <br>
-                    בוחרים כלי אחד, עושים סבב קצר, מקבלים משוב — ומתקדמים לכלי הבא.
-                </p>
-                <p>
-                    בכל מסך יש גם כפתור ״פילוסוף מסך״: שכבת הסבר קצרה שמבהירה מה מטרת התרגול, למה זה עובד, ואיך לבצע אותו צעד-צעד.
-                    <br>
-                    במסכי התרגול עצמם שמרנו על ממשק נקי ומהיר — ואת ההסבר הרחב ריכזנו כאן במסך הבית.
-                </p>
-            </section>
-
-            <section class="home-lobby-section">
-                <h3 class="home-lobby-section-title">מיני-מילון למוח האנושי (בלי לחץ)</h3>
-                <div class="home-lobby-accordion">
-                    <details class="home-lobby-accordion-item" open>
-                        <summary>
-                            <span>מה זה Meta-Model?</span>
-                            <span class="home-lobby-accordion-icon" aria-hidden="true">⌄</span>
-                        </summary>
-                        <p>סט שאלות שמחזירות מידע שנמחק/התעוות — כדי שהסיפור יהפוך לבדיקה, לא לגזירת גורל.</p>
-                    </details>
-
-                    <details class="home-lobby-accordion-item">
-                        <summary>
-                            <span>השמטה / עיוות / הכללה</span>
-                            <span class="home-lobby-accordion-icon" aria-hidden="true">⌄</span>
-                        </summary>
-                        <p>שלושת הפילטרים של המוח. לפעמים הם עוזרים — ולפעמים הם יוצרים תקיעות.</p>
-                    </details>
-
-                    <details class="home-lobby-accordion-item">
-                        <summary>
-                            <span>שאלות חילוץ</span>
-                            <span class="home-lobby-accordion-icon" aria-hidden="true">⌄</span>
-                        </summary>
-                        <p>׳מי בדיוק? מתי? איפה? איך בדיוק?׳ — לא חוכמה, דיוק.</p>
-                    </details>
-
-                    <details class="home-lobby-accordion-item">
-                        <summary>
-                            <span>למה זה כלי טיפולי?</span>
-                            <span class="home-lobby-accordion-icon" aria-hidden="true">⌄</span>
-                        </summary>
-                        <p>כי כשהשפה נהיית מדויקת — האדם חוזר לבחור. פחות 'ככה זה', יותר 'מה אפשר עכשיו'.</p>
-                    </details>
-
-                    <details class="home-lobby-accordion-item">
-                        <summary>
-                            <span>מה מודרני פה?</span>
-                            <span class="home-lobby-accordion-icon" aria-hidden="true">⌄</span>
-                        </summary>
-                        <p>לקחנו את המודל מהספרים והפכנו אותו לתרגול חי: דוגמאות, משוב, והתקדמות יומית.</p>
-                    </details>
-                </div>
-            </section>
-
-            <section class="home-lobby-section home-lobby-demo" id="home-lobby-micro-demo">
-                <h3 class="home-lobby-section-title">תנסה עכשיו — 10 שניות</h3>
-                <blockquote class="home-lobby-quote">"אני תמיד נכשל."</blockquote>
-                <div class="home-lobby-demo-choices" role="group" aria-label="בחירת שאלת דיוק">
-                    <button type="button" class="btn btn-secondary home-lobby-demo-choice" data-home-demo-choice="1">מי אמר?</button>
-                    <button type="button" class="btn btn-secondary home-lobby-demo-choice" data-home-demo-choice="2">תמיד? אפילו פעם אחת לא הצלחת?</button>
-                    <button type="button" class="btn btn-secondary home-lobby-demo-choice" data-home-demo-choice="3">למה אתה כזה?</button>
-                </div>
-                <p id="home-lobby-demo-feedback" class="home-lobby-demo-feedback" aria-live="polite"></p>
-                <div id="home-lobby-confetti" class="home-lobby-confetti" aria-hidden="true"></div>
-            </section>
-
-            <section class="home-lobby-section home-lobby-close">
-                <p>
-                    בין אם אתה מטפל, מאמן, או פשוט אדם שאוהב לדבר ברור יותר —
-                    <br>
-                    כאן מתאמנים על שאלות שמייצרות שינוי. בלי לחץ, עם חיוך.
-                </p>
-                <a class="btn btn-primary home-lobby-final-cta" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html">יאללה, מתחילים</a>
-                <div class="home-lobby-preferences">
+                <div class="home-route-preferences">
                     <button id="home-lobby-reduce-motion-toggle" class="btn btn-secondary" type="button" aria-pressed="false">הפחת אנימציות: כבוי</button>
                     <button id="home-lobby-mute-toggle" class="btn btn-secondary" type="button" aria-pressed="false">צלילים: פעיל</button>
                 </div>
@@ -1571,6 +1531,43 @@
             </div>
         </section>
 
+        <section id="debug" class="tab-content">
+            <div class="card freemium-debug-card">
+                <h2>Debug Freemium</h2>
+                <p class="subtitle">זמין רק עם <code>?debug=1</code>. מיועד לבדיקת Session, Quota ו־Idempotency.</p>
+
+                <div class="freemium-debug-grid">
+                    <article class="freemium-debug-panel">
+                        <h3>Session</h3>
+                        <dl class="freemium-debug-list">
+                            <div><dt>Signed In</dt><dd id="freemium-debug-signed-in">-</dd></div>
+                            <div><dt>Email</dt><dd id="freemium-debug-email">-</dd></div>
+                            <div><dt>User ID</dt><dd id="freemium-debug-user-id">-</dd></div>
+                        </dl>
+                    </article>
+                    <article class="freemium-debug-panel">
+                        <h3>Quota</h3>
+                        <dl class="freemium-debug-list">
+                            <div><dt>Plan</dt><dd id="freemium-debug-plan">-</dd></div>
+                            <div><dt>Remaining</dt><dd id="freemium-debug-remaining">-</dd></div>
+                            <div><dt>Total</dt><dd id="freemium-debug-total">-</dd></div>
+                            <div><dt>Guest Used (localStorage)</dt><dd id="freemium-debug-guest-used">-</dd></div>
+                        </dl>
+                    </article>
+                </div>
+
+                <div class="freemium-debug-actions">
+                    <button type="button" class="btn btn-primary" data-freemium-debug-action="consume-one">Consume 1</button>
+                    <button type="button" class="btn btn-secondary" data-freemium-debug-action="replay-last">Replay Last Request ID</button>
+                    <button type="button" class="btn btn-secondary" data-freemium-debug-action="consume-five-parallel">Consume 5 Parallel</button>
+                    <button type="button" class="btn btn-secondary" data-freemium-debug-action="sign-out">Sign Out</button>
+                    <button type="button" class="btn btn-secondary" data-freemium-debug-action="reset-guest-used">Reset local guest_used</button>
+                </div>
+
+                <pre id="freemium-debug-log" class="freemium-debug-log" aria-live="polite"></pre>
+            </div>
+        </section>
+
         <!-- ABOUT TAB -->
         <section id="about" class="tab-content">
             <div class="card">
@@ -1626,6 +1623,7 @@
                 'js/wr2w-path-core.js',
                 'js/triples-radar-core.js',
                 'js/prism-research-philosophy.js',
+                'js/data/feature-feed.js',
                 'js/nav-map.js',
                 'js/ui-flags.js',
                 'js/app-overlay.js',

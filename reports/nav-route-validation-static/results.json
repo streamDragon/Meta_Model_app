@@ -1,0 +1,34 @@
+{
+  "generatedAt": "2026-03-03T12:56:59.456Z",
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "results": [
+    {
+      "test": "Hero image present on Home",
+      "pass": true
+    },
+    {
+      "test": "Home -> feature route",
+      "pass": true,
+      "details": "/feature/practice-radar"
+    },
+    {
+      "test": "Refresh keeps feature route",
+      "pass": true,
+      "details": "/feature/practice-radar"
+    },
+    {
+      "test": "Browser back returns Home",
+      "pass": true,
+      "details": "/"
+    },
+    {
+      "test": "MENU navigates and closes",
+      "pass": true,
+      "details": "/feature/categories"
+    }
+  ]
+}

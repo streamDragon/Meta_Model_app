@@ -3,7 +3,9 @@ import {
     onAuthSessionChange,
     getAccessToken,
     signInWithEmailOtp,
-    switchToGoogleSignIn
+    switchToGoogleSignIn,
+    signOutNonGuest,
+    getAuthSnapshot
 } from './auth-session.js';
 import {
     refreshEntitlements,
@@ -16,7 +18,8 @@ import { AdsProvider } from './ads-provider.js';
 
 const STATUS_BAR_ID = 'freemium-status-bar';
 const ERROR_BANNER_ID = 'freemium-error-banner';
-const DEFAULT_GUEST_LIMIT = 80;
+const GUEST_FREE_LIMIT = 10;
+const FREE_PACK_TOTAL = 60;
 const AUTH_REQUIRED_SELECTORS = [
     '[data-auth-required-overlay]',
     '[data-auth-required]',
@@ -34,6 +37,9 @@ const AUTH_HASH_KEYS = [
     'provider_refresh_token',
     'type'
 ];
+const DEBUG_ROUTE_ID = 'debug';
+const DEBUG_LOG_ID = 'freemium-debug-log';
+const DEBUG_GUEST_USED_KEY = 'guest_used';
 
 const freemiumState = {
     initialized: false,
@@ -52,7 +58,9 @@ const freemiumState = {
         email: ''
     },
     currentRole: 'guest',
-    remaining: 0
+    remaining: 0,
+    lastDebugRequestId: '',
+    debugBound: false
 };
 
 function escapeHtml(value) {
@@ -69,14 +77,15 @@ function createGuestUiEntitlements() {
         role: 'guest',
         plan: 'guest',
         ads_enabled: true,
-        guest_daily_limit: DEFAULT_GUEST_LIMIT,
+        total_quota: GUEST_FREE_LIMIT,
+        guest_daily_limit: GUEST_FREE_LIMIT,
         guest_daily_used_today: 0,
-        guest_daily_remaining: DEFAULT_GUEST_LIMIT,
-        free_total_limit: DEFAULT_GUEST_LIMIT,
+        guest_daily_remaining: GUEST_FREE_LIMIT,
+        free_total_limit: FREE_PACK_TOTAL,
         free_total_used: 0,
-        free_total_remaining: DEFAULT_GUEST_LIMIT,
-        remaining: DEFAULT_GUEST_LIMIT,
-        daily_limit: DEFAULT_GUEST_LIMIT,
+        free_total_remaining: FREE_PACK_TOTAL,
+        remaining: GUEST_FREE_LIMIT,
+        daily_limit: GUEST_FREE_LIMIT,
         unlimited: false
     };
 }
@@ -91,10 +100,10 @@ function mapRoleToHebrew(role) {
 function meterText(entitlements) {
     if (!entitlements) return '...';
     if (entitlements.role === 'pro' || entitlements.unlimited) return 'ללא הגבלה';
-    if (entitlements.role === 'free') {
-        return `נותרו ${entitlements.free_total_remaining} מתוך ${entitlements.free_total_limit}`;
-    }
-    return `נותרו ${entitlements.guest_daily_remaining} מתוך ${entitlements.guest_daily_limit} היום`;
+    const total = Math.max(0, Number(entitlements.total_quota ?? entitlements.daily_limit ?? (entitlements.role === 'guest' ? GUEST_FREE_LIMIT : FREE_PACK_TOTAL)) || 0);
+    const remainingValue = (entitlements.remaining ?? (entitlements.role === 'guest' ? entitlements.guest_daily_remaining : entitlements.free_total_remaining)) || 0;
+    const remaining = Math.max(0, Number(remainingValue));
+    return `נותרו ${remaining} מתוך ${total}`;
 }
 
 function resolveRemaining(entitlements) {
@@ -162,6 +171,143 @@ function createQuotaRequestId(source = 'ui') {
     return `${prefix}:${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function isDebugModeEnabled() {
+    const params = new URLSearchParams(window.location.search || '');
+    return params.get('debug') === '1';
+}
+
+function getDebugRoot() {
+    return document.getElementById(DEBUG_ROUTE_ID);
+}
+
+function readGuestUsedCounter() {
+    const raw = String(localStorage.getItem(DEBUG_GUEST_USED_KEY) || '').trim();
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed) || parsed < 0) return 0;
+    return Math.floor(parsed);
+}
+
+function updateDebugSnapshot() {
+    const root = getDebugRoot();
+    if (!root) return;
+
+    const auth = getAuthSnapshot();
+    const ent = getEntitlementsSnapshot();
+    const signedIn = String(auth?.status || '') === 'authenticated' ? 'yes' : 'no';
+    const email = String(auth?.email || '').trim() || '-';
+    const userId = String(auth?.user?.id || '').trim() || '-';
+
+    const plan = String(ent?.plan || ent?.role || 'guest');
+    const remaining = Number.isFinite(Number(ent?.remaining)) ? Number(ent?.remaining) : 0;
+    const total = Number.isFinite(Number(ent?.total_quota)) ? Number(ent?.total_quota) : 0;
+
+    const setText = (id, value) => {
+        const node = document.getElementById(id);
+        if (node) node.textContent = String(value);
+    };
+
+    setText('freemium-debug-signed-in', signedIn);
+    setText('freemium-debug-email', email);
+    setText('freemium-debug-user-id', userId);
+    setText('freemium-debug-plan', plan);
+    setText('freemium-debug-remaining', remaining);
+    setText('freemium-debug-total', total);
+    setText('freemium-debug-guest-used', readGuestUsedCounter());
+}
+
+function appendDebugLog(message) {
+    const logNode = document.getElementById(DEBUG_LOG_ID);
+    if (!logNode) return;
+    const stamp = new Date().toISOString();
+    const line = `[${stamp}] ${String(message || '').trim()}`;
+    const current = String(logNode.textContent || '').trim();
+    logNode.textContent = current ? `${current}\n${line}` : line;
+    logNode.scrollTop = logNode.scrollHeight;
+}
+
+async function runDebugConsume(count = 1, requestId = '', source = 'debug') {
+    const normalizedCount = Math.max(1, Number(count) || 1);
+    const normalizedRequestId = String(requestId || '').trim() || createQuotaRequestId(source);
+    const result = await consumeSentence({
+        count: normalizedCount,
+        requestId: normalizedRequestId,
+        source
+    });
+    freemiumState.lastDebugRequestId = normalizedRequestId;
+    const rpcName = String(result?.rpc || '').trim() || (String(result?.entitlements?.role || '') === 'guest' ? 'consume_guest_quota' : 'consume_quota');
+    appendDebugLog(`consume count=${normalizedCount} request_id=${normalizedRequestId} rpc=${rpcName} ok=${Boolean(result?.ok)} reason=${String(result?.reason || '-')} remaining=${String(result?.entitlements?.remaining ?? '-')}`);
+    await refreshAll({ force: true, reason: `debug_${source}` });
+    updateDebugSnapshot();
+    return result;
+}
+
+function setupDebugPanel() {
+    if (freemiumState.debugBound) return;
+    const root = getDebugRoot();
+    if (!root || !isDebugModeEnabled()) return;
+    freemiumState.debugBound = true;
+
+    root.addEventListener('click', async (event) => {
+        const actionNode = event.target?.closest?.('[data-freemium-debug-action]');
+        if (!actionNode) return;
+        const action = String(actionNode.getAttribute('data-freemium-debug-action') || '').trim();
+
+        try {
+            if (action === 'consume-one') {
+                await runDebugConsume(1, '', 'debug-single');
+                return;
+            }
+
+            if (action === 'replay-last') {
+                const requestId = String(freemiumState.lastDebugRequestId || '').trim();
+                if (!requestId) {
+                    appendDebugLog('replay skipped: no last request_id');
+                    return;
+                }
+                await runDebugConsume(1, requestId, 'debug-replay');
+                return;
+            }
+
+            if (action === 'consume-five-parallel') {
+                const requestIds = Array.from({ length: 5 }, () => createQuotaRequestId('debug-parallel'));
+                freemiumState.lastDebugRequestId = requestIds[requestIds.length - 1];
+                const results = await Promise.all(requestIds.map((requestId) => consumeSentence({
+                    count: 1,
+                    requestId,
+                    source: 'debug-parallel'
+                })));
+                const allowedCount = results.filter((item) => item?.ok).length;
+                const reasons = results.map((item) => String(item?.reason || '-')).join(', ');
+                const rpcNames = Array.from(new Set(results.map((item) => String(item?.rpc || '').trim()).filter(Boolean))).join('|') || 'consume_quota';
+                appendDebugLog(`consume parallel count=5 rpc=${rpcNames} allowed=${allowedCount}/5 reasons=[${reasons}] request_ids=${requestIds.join(',')}`);
+                await refreshAll({ force: true, reason: 'debug_parallel' });
+                updateDebugSnapshot();
+                return;
+            }
+
+            if (action === 'sign-out') {
+                await signOutNonGuest();
+                appendDebugLog('sign_out ok');
+                await refreshAll({ force: true, reason: 'debug_sign_out' });
+                updateDebugSnapshot();
+                return;
+            }
+
+            if (action === 'reset-guest-used') {
+                localStorage.setItem(DEBUG_GUEST_USED_KEY, '0');
+                appendDebugLog('localStorage guest_used reset to 0');
+                updateDebugSnapshot();
+            }
+        } catch (error) {
+            appendDebugLog(`action=${action} error=${String(error?.message || error || 'unknown_error')}`);
+            updateDebugSnapshot();
+        }
+    });
+
+    updateDebugSnapshot();
+    appendDebugLog('debug panel initialized');
+}
+
 function ensureStatusBar() {
     let bar = document.getElementById(STATUS_BAR_ID);
     if (bar) return bar;
@@ -181,7 +327,7 @@ function ensureStatusBar() {
             <button type="button" class="freemium-link-btn" data-freemium-action-primary>התחבר</button>
         </div>
         <div class="freemium-guest-banner hidden" data-freemium-guest-banner>
-            אהבת? התחבר בחינם וקבל עוד משפטים היום + שמירת התקדמות
+            התחבר עם Google כדי לשמור התקדמות ולקבל חבילת תרגול חינמית של 60 משפטים
         </div>
     `;
 
@@ -353,7 +499,7 @@ const paywallUi = createPaywallUi({
 });
 
 async function runRefresh(options = {}) {
-    const session = await ensureSession();
+    await ensureSession();
     const entitlements = await refreshEntitlements({
         force: Boolean(options.force),
         reason: String(options.reason || 'manual')
@@ -366,12 +512,8 @@ async function runRefresh(options = {}) {
     }
 
     AdsProvider.init(entitlements);
-    if (session?.user) {
-        setGuestReadyState(true);
-        unlockAuthRequiredUi();
-    } else {
-        setGuestReadyState(false);
-    }
+    setGuestReadyState(true);
+    unlockAuthRequiredUi();
 
     return entitlements;
 }
@@ -496,7 +638,8 @@ async function consumeSentenceOrPrompt(options = {}) {
         return false;
     } catch (error) {
         console.warn('[freemium] consumeSentence failed', error);
-        return true;
+        paywallUi.showToast('שגיאה זמנית בצריכת מכסה. נסו שוב.', 'warn');
+        return false;
     } finally {
         freemiumState.isBusy = false;
     }
@@ -507,12 +650,21 @@ function exposeApi() {
         refreshEntitlements: async (force = true) => refreshAll({ force: Boolean(force), reason: 'api_refresh' }),
         bootstrapAuth: async (reason = 'api_bootstrap') => bootstrapAuth(reason),
         getEntitlements: () => getEntitlementsSnapshot(),
+        getAuthSnapshot: () => getAuthSnapshot(),
         consumeSentenceOrPrompt,
+        debugConsume: async (options = {}) => {
+            const count = Math.max(1, Number(options?.count || 1) || 1);
+            const requestId = String(options?.requestId || '').trim();
+            const source = String(options?.source || 'debug-api').trim() || 'debug-api';
+            return runDebugConsume(count, requestId, source);
+        },
+        getLastDebugRequestId: () => String(freemiumState.lastDebugRequestId || ''),
         openGuestLoginModal: () => paywallUi.openGuestAuthModal(),
         openUpgradeModal: () => paywallUi.openFreeQuotaEndedModal(),
         showLockedPreview: (items = []) => paywallUi.openLockedPreviewModal(items),
         showToast: (text, tone = 'info') => paywallUi.showToast(String(text || ''), tone),
-        openPortal
+        openPortal,
+        signOut: async () => signOutNonGuest()
     };
 }
 
@@ -538,6 +690,7 @@ async function initializeFreemium() {
         exposeApi();
         ensureStatusBar();
         ensureErrorBanner();
+        setupDebugPanel();
 
         onAuthSessionChange((snapshot) => {
             if (!snapshot?.ready) return;
@@ -551,6 +704,7 @@ async function initializeFreemium() {
             };
 
             updateStatusBar(getEntitlementsSnapshot(), freemiumState.authState);
+            updateDebugSnapshot();
 
             const nextUserId = String(snapshot?.user?.id || '');
             const authEvent = String(snapshot?.lastEvent || '');
@@ -591,6 +745,7 @@ async function initializeFreemium() {
             if (!entitlements) return;
             updateStatusBar(entitlements, freemiumState.authState);
             AdsProvider.init(entitlements);
+            updateDebugSnapshot();
         });
 
         handleStripeReturn();

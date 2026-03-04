@@ -153,16 +153,12 @@ export function createPaywallUi(actions = {}) {
         renderModal(`
             <button class="freemium-modal-close" type="button" data-freemium-close>✕</button>
             <h3>התחברות בחינם</h3>
-            <p class="freemium-modal-sub">אהבת? התחבר בחינם וקבל עוד משפטים היום + שמירת התקדמות</p>
-            <label class="freemium-field">
-                אימייל
-                <input type="email" data-freemium-email placeholder="name@example.com" dir="ltr" />
-            </label>
+            <p class="freemium-modal-sub">התחבר עם Google כדי לשמור התקדמות ולקבל חבילה חינמית של 60 משפטים.</p>
             <div class="freemium-modal-actions">
-                <button type="button" class="freemium-btn freemium-btn-primary" data-freemium-email-upgrade>שלח קישור במייל</button>
-                <button type="button" class="freemium-btn freemium-btn-secondary" data-freemium-google-link>התחבר עם Google</button>
+                <button type="button" class="freemium-btn freemium-btn-primary" data-freemium-google-link>התחבר עם Google</button>
+                <button type="button" class="freemium-btn freemium-btn-secondary" data-freemium-close-later>לא עכשיו</button>
             </div>
-            <p class="freemium-auth-note">Google לא פועל כרגע אם אתה מחובר כאורח? אנחנו משדרגים אותך אוטומטית לחשבון Google.</p>
+            <p class="freemium-auth-note">התחברות עם Google מפעילה שמירת התקדמות ומעבר לחבילת משתמש רשום.</p>
             <p class="freemium-auth-status" data-freemium-auth-status></p>
         `, (modal) => {
             const runGoogleSignIn = async () => {
@@ -183,7 +179,7 @@ export function createPaywallUi(actions = {}) {
             };
 
             modal.querySelector('[data-freemium-close]')?.addEventListener('click', closeModal);
-            modal.querySelector('[data-freemium-email-upgrade]')?.addEventListener('click', () => runEmailUpgrade(modal));
+            modal.querySelector('[data-freemium-close-later]')?.addEventListener('click', closeModal);
             modal.querySelector('[data-freemium-google-link]')?.addEventListener('click', runGoogleSignIn);
         });
     }
@@ -191,16 +187,34 @@ export function createPaywallUi(actions = {}) {
     function openGuestQuotaEndedModal() {
         renderModal(`
             <button class="freemium-modal-close" type="button" data-freemium-close>✕</button>
-            <h3>כל הכבוד — סיימת את הסט היומי 🎯</h3>
-            <p class="freemium-modal-sub">התחברות חינם מוסיפה לך עוד משפטים היום ושומרת התקדמות.</p>
+            <h3>הגעת ל־10 משפטים חינם</h3>
+            <p class="freemium-modal-sub">כדי להמשיך צריך התחברות עם Google — כדי לשמור התקדמות ולהמשיך לתרגל.</p>
             <div class="freemium-modal-actions">
-                <button type="button" class="freemium-btn freemium-btn-primary" data-freemium-open-auth>התחבר בחינם</button>
-                <button type="button" class="freemium-btn freemium-btn-secondary" data-freemium-close-later>אמשיך מחר</button>
+                <button type="button" class="freemium-btn freemium-btn-primary" data-freemium-open-google>התחבר עם Google</button>
+                <button type="button" class="freemium-btn freemium-btn-secondary" data-freemium-close-later>לא עכשיו</button>
             </div>
+            <p class="freemium-auth-status" data-freemium-auth-status></p>
         `, (modal) => {
+            const runGoogleSignIn = async () => {
+                if (modalBusy) return;
+                const status = modal.querySelector('[data-freemium-auth-status]');
+                if (status) status.textContent = 'מעביר ל-Google...';
+                setModalBusy(modal, true);
+                try {
+                    await actions.onGoogleSignIn?.();
+                } catch (error) {
+                    const message = mapGoogleSignInError(error);
+                    if (status) status.textContent = message;
+                    setModalBusy(modal, false);
+                    showRetryToast(`${message} לחצו Retry כדי לנסות שוב.`, async () => {
+                        await runGoogleSignIn();
+                    }, 'warn');
+                }
+            };
+
             modal.querySelector('[data-freemium-close]')?.addEventListener('click', closeModal);
             modal.querySelector('[data-freemium-close-later]')?.addEventListener('click', closeModal);
-            modal.querySelector('[data-freemium-open-auth]')?.addEventListener('click', openGuestAuthModal);
+            modal.querySelector('[data-freemium-open-google]')?.addEventListener('click', runGoogleSignIn);
         });
     }
 
@@ -222,21 +236,21 @@ export function createPaywallUi(actions = {}) {
     function openFreeQuotaEndedModal() {
         renderModal(`
             <button class="freemium-modal-close" type="button" data-freemium-close>✕</button>
-            <h3>פתחת 80 משפטים. רוצה את כל הספרייה?</h3>
-            <ul class="freemium-bullets">
-                <li>כל המשפטים</li>
-                <li>כל המודולים החדשים</li>
-                <li>ללא פרסומות</li>
-            </ul>
+            <h3>נגמרה החבילה החינמית (60 משפטים)</h3>
+            <p class="freemium-modal-sub">כדי להמשיך לתרגל — צריך לשדרג.</p>
             <div class="freemium-modal-actions">
-                <button type="button" class="freemium-btn freemium-btn-primary" data-freemium-plan-monthly>מנוי חודשי</button>
-                <button type="button" class="freemium-btn freemium-btn-secondary" data-freemium-plan-yearly>מנוי שנתי (חסכון)</button>
+                <button type="button" class="freemium-btn freemium-btn-primary" data-freemium-upgrade-soon>שדרוג (בקרוב/לתשלום)</button>
+                <button type="button" class="freemium-btn freemium-btn-secondary" data-freemium-close-later>חזרה</button>
             </div>
             <p class="freemium-auth-status" data-freemium-auth-status></p>
         `, (modal) => {
+            modal.querySelector('[data-freemium-upgrade-soon]')?.addEventListener('click', () => {
+                const status = modal.querySelector('[data-freemium-auth-status]');
+                if (status) status.textContent = 'אפשרות שדרוג בתשלום תיפתח בקרוב.';
+                showToast('אפשרות שדרוג בתשלום תיפתח בקרוב.', 'info');
+            });
             modal.querySelector('[data-freemium-close]')?.addEventListener('click', closeModal);
-            bindCheckoutAction(modal, '[data-freemium-plan-monthly]', 'monthly');
-            bindCheckoutAction(modal, '[data-freemium-plan-yearly]', 'yearly');
+            modal.querySelector('[data-freemium-close-later]')?.addEventListener('click', closeModal);
         });
     }
 

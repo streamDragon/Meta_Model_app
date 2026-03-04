@@ -198,12 +198,38 @@ const STANDALONE_NAV_KEYS = Object.freeze({
 });
 
 const UNZIP_EMBED_LOAD_TIMEOUT_MS = 15000;
+const FEATURE_ROUTE_SEGMENT = '/feature/';
+const DEBUG_ROUTE_SEGMENT = '/debug';
+const ROUTER_BIND_FLAG = '__meta_model_router_bound_v1';
+const ROUTER_STATE_KEY = '__meta_model_route_tab_v1';
+const MOBILE_VIEWPORT_QUERY = '(max-width: 900px)';
+const MOBILE_FEED_HOME_ID = 'mobile-feed-home';
+const MOBILE_FEED_LIST_ID = 'mobile-feed-list';
+const MOBILE_FEED_CHIPS_ID = 'mobile-feed-chips';
+const MOBILE_FEED_SEARCH_ID = 'mobile-feed-search';
+const MOBILE_FEED_TICKER_ID = 'mobile-feed-ticker-text';
+const MOBILE_FEED_TICKER_INTERVAL_MS = 3600;
+const MOBILE_STICKY_CTA_ID = 'mobile-sticky-cta';
+const MOBILE_STICKY_CTA_POLL_INTERVAL_MS = 1200;
 
 let unzipEmbedRuntime = {
     loaded: false,
     loading: false,
     failed: false,
     timerId: null
+};
+
+let mobileExperienceRuntime = {
+    mediaQueryList: null,
+    mediaBound: false,
+    activeCategory: 'all',
+    searchText: '',
+    feedBound: false,
+    tickerIndex: 0,
+    tickerTimerId: null,
+    stickyBound: false,
+    stickyPollTimerId: null,
+    stickyPrimaryTarget: null
 };
 
 const CODEX_TRAP_FALLBACK_WORDS = Object.freeze([
@@ -277,7 +303,7 @@ async function gateSentenceConsumption(options = {}) {
         });
         return allowed !== false;
     } catch (error) {
-        return true;
+        return false;
     }
 }
 
@@ -1248,9 +1274,10 @@ function maybeAssistScrollToOpenedContent(element) {
     if (now < Number(revealFeedbackState.scrollCooldownUntil || 0)) return;
     const rect = element.getBoundingClientRect();
     const viewportHeight = Math.max(1, window.innerHeight || document.documentElement?.clientHeight || 1);
-    const isMobileViewport = window.matchMedia && window.matchMedia('(max-width: 900px)').matches;
+    const isMobileViewport = isMobileViewportMode();
     const isOutsideFocusBand = rect.top < 88 || rect.bottom > (viewportHeight - 80);
-    if (!isMobileViewport && !isOutsideFocusBand) return;
+    if (isMobileViewport) return;
+    if (!isOutsideFocusBand) return;
 
     revealFeedbackState.scrollCooldownUntil = now + OPENED_CONTENT_SCROLL_COOLDOWN_MS;
     try {
@@ -1673,6 +1700,474 @@ function normalizeRequestedTab(tabName = '') {
     return raw;
 }
 
+function getCurrentActiveTabName() {
+    return String(document.querySelector('.tab-btn.active')?.getAttribute('data-tab') || 'home').trim() || 'home';
+}
+
+function isMobileViewportMode() {
+    const body = document.body;
+    if (body?.classList.contains('force-desktop-view')) return false;
+    if (body?.classList.contains('force-mobile-view')) return true;
+    if (!window.matchMedia) return (window.innerWidth || 1024) <= 900;
+    return window.matchMedia(MOBILE_VIEWPORT_QUERY).matches;
+}
+
+function sanitizeHexColor(value, fallback = '#0ea5e9') {
+    const color = String(value || '').trim();
+    if (/^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(color)) return color;
+    return fallback;
+}
+
+function buildMobileFeedSvgThumb(item = {}, index = 0) {
+    const glyph = String(item.icon || item.id || 'MM').slice(0, 2).toUpperCase();
+    const from = sanitizeHexColor(item.accentFrom, '#0ea5e9');
+    const to = sanitizeHexColor(item.accentTo, '#1d4ed8');
+    const idxText = String(index + 1).padStart(2, '0');
+    const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="${escapeHtml(item.titleHe || '')}">
+            <defs>
+                <linearGradient id="mmFeedGrad${idxText}" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="${from}"/>
+                    <stop offset="100%" stop-color="${to}"/>
+                </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="320" height="180" rx="20" ry="20" fill="url(#mmFeedGrad${idxText})"/>
+            <circle cx="252" cy="46" r="28" fill="rgba(255,255,255,0.16)"/>
+            <circle cx="280" cy="28" r="12" fill="rgba(255,255,255,0.12)"/>
+            <text x="36" y="106" font-size="58" font-family="Arial, sans-serif" font-weight="900" fill="rgba(255,255,255,0.92)">${escapeHtml(glyph)}</text>
+            <text x="36" y="142" font-size="18" font-family="Arial, sans-serif" font-weight="700" fill="rgba(255,255,255,0.84)">Meta Model Gym</text>
+        </svg>
+    `.trim();
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function resolveMobileFeedThumbSrc(item = {}, index = 0) {
+    const rawSrc = String(item.thumbSrc || '').trim();
+    if (rawSrc) {
+        const versioner = typeof window.__withAssetVersion === 'function'
+            ? window.__withAssetVersion
+            : (typeof window.withAssetVersion === 'function' ? window.withAssetVersion : null);
+        if (versioner && !/^data:/i.test(rawSrc)) {
+            return versioner(rawSrc);
+        }
+        return rawSrc;
+    }
+    return buildMobileFeedSvgThumb(item, index);
+}
+
+function getMobileFeedCategories() {
+    const globalCategories = Array.isArray(window.MetaModelFeedCategories)
+        ? window.MetaModelFeedCategories
+        : [];
+    if (globalCategories.length) return globalCategories;
+    return [
+        { key: 'all', label: 'All' },
+        { key: 'exercises', label: 'Exercises' },
+        { key: 'lab', label: 'Lab' },
+        { key: 'knowledge', label: 'Knowledge' },
+        { key: 'settings', label: 'Settings' }
+    ];
+}
+
+function getMobileFeedItems() {
+    const globalItems = Array.isArray(window.MetaModelFeatureFeedItems)
+        ? window.MetaModelFeatureFeedItems
+        : [];
+    if (!globalItems.length) return [];
+    return globalItems
+        .map((entry) => ({
+            id: String(entry?.id || '').trim(),
+            titleHe: String(entry?.titleHe || '').trim(),
+            descHe: String(entry?.descHe || '').trim(),
+            route: String(entry?.route || '').trim(),
+            tab: normalizeRequestedTab(entry?.tab || ''),
+            tagHe: String(entry?.tagHe || '').trim(),
+            category: String(entry?.category || '').trim().toLowerCase() || 'exercises',
+            thumbType: String(entry?.thumbType || 'svg').trim().toLowerCase(),
+            thumbSrc: String(entry?.thumbSrc || '').trim(),
+            icon: String(entry?.icon || '').trim(),
+            accentFrom: String(entry?.accentFrom || '').trim(),
+            accentTo: String(entry?.accentTo || '').trim()
+        }))
+        .filter((entry) => {
+            if (!entry.titleHe) return false;
+            if (entry.tab && document.getElementById(entry.tab)) return true;
+            if (entry.route.startsWith('/feature/')) return true;
+            return false;
+        });
+}
+
+function getMobileFeedTickerMessages() {
+    const globalMessages = Array.isArray(window.MetaModelFeatureFeedTickerMessages)
+        ? window.MetaModelFeatureFeedTickerMessages
+        : [];
+    if (globalMessages.length) return globalMessages.map((item) => String(item || '').trim()).filter(Boolean);
+    return ['ניווט מהיר: בחרו כרטיס והמשיכו ישירות לתרגול.'];
+}
+
+function filterMobileFeedItems(items = []) {
+    const category = String(mobileExperienceRuntime.activeCategory || 'all').trim().toLowerCase();
+    const search = String(mobileExperienceRuntime.searchText || '').trim().toLowerCase();
+    return items.filter((item) => {
+        if (category && category !== 'all' && String(item.category || '').toLowerCase() !== category) return false;
+        if (!search) return true;
+        const haystack = `${item.titleHe} ${item.descHe} ${item.tagHe} ${item.category}`.toLowerCase();
+        return haystack.includes(search);
+    });
+}
+
+function renderMobileFeedChips() {
+    const chipsRoot = document.getElementById(MOBILE_FEED_CHIPS_ID);
+    if (!chipsRoot) return;
+    const categories = getMobileFeedCategories();
+    chipsRoot.innerHTML = '';
+    categories.forEach((category) => {
+        const key = String(category?.key || '').trim().toLowerCase();
+        if (!key) return;
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'mobile-feed-chip';
+        chip.dataset.mobileFeedChip = key;
+        chip.textContent = String(category?.label || key);
+        chip.setAttribute('role', 'tab');
+        chip.setAttribute('aria-selected', String(mobileExperienceRuntime.activeCategory === key));
+        if (mobileExperienceRuntime.activeCategory === key) chip.classList.add('is-active');
+        chipsRoot.appendChild(chip);
+    });
+}
+
+function renderMobileFeedList() {
+    const listRoot = document.getElementById(MOBILE_FEED_LIST_ID);
+    if (!listRoot) return;
+
+    const allItems = getMobileFeedItems();
+    const filtered = filterMobileFeedItems(allItems);
+    listRoot.innerHTML = '';
+
+    if (!filtered.length) {
+        const empty = document.createElement('div');
+        empty.className = 'mobile-feed-empty';
+        empty.textContent = 'לא נמצאו תוצאות לחיפוש הזה. נסו מילה אחרת.';
+        listRoot.appendChild(empty);
+        return;
+    }
+
+    filtered.forEach((item, index) => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'mobile-feed-card';
+        card.dataset.mobileFeedTab = item.tab;
+        card.dataset.mobileFeedRoute = item.route;
+
+        const thumb = document.createElement('div');
+        thumb.className = 'mobile-feed-thumb';
+        const image = document.createElement('img');
+        image.loading = 'lazy';
+        image.alt = item.titleHe;
+        image.src = resolveMobileFeedThumbSrc(item, index);
+        thumb.appendChild(image);
+
+        const copy = document.createElement('div');
+        copy.className = 'mobile-feed-copy';
+
+        const tag = document.createElement('span');
+        tag.className = 'mobile-feed-tag';
+        tag.textContent = item.tagHe || item.category;
+
+        const title = document.createElement('h3');
+        title.className = 'mobile-feed-title';
+        title.textContent = item.titleHe;
+
+        const desc = document.createElement('p');
+        desc.className = 'mobile-feed-desc';
+        desc.textContent = item.descHe;
+
+        const arrow = document.createElement('span');
+        arrow.className = 'mobile-feed-arrow';
+        arrow.textContent = '›';
+        arrow.setAttribute('aria-hidden', 'true');
+
+        copy.appendChild(tag);
+        copy.appendChild(title);
+        copy.appendChild(desc);
+        copy.appendChild(arrow);
+
+        card.appendChild(thumb);
+        card.appendChild(copy);
+        listRoot.appendChild(card);
+    });
+}
+
+function updateMobileFeedTicker() {
+    const tickerText = document.getElementById(MOBILE_FEED_TICKER_ID);
+    if (!tickerText) return;
+    const messages = getMobileFeedTickerMessages();
+    if (!messages.length) {
+        tickerText.textContent = '';
+        return;
+    }
+    const index = Math.abs(Number(mobileExperienceRuntime.tickerIndex || 0)) % messages.length;
+    tickerText.textContent = messages[index];
+}
+
+function stopMobileFeedTicker() {
+    if (!mobileExperienceRuntime.tickerTimerId) return;
+    clearInterval(mobileExperienceRuntime.tickerTimerId);
+    mobileExperienceRuntime.tickerTimerId = null;
+}
+
+function startMobileFeedTicker() {
+    updateMobileFeedTicker();
+    if (mobileExperienceRuntime.tickerTimerId) return;
+    mobileExperienceRuntime.tickerTimerId = setInterval(() => {
+        mobileExperienceRuntime.tickerIndex += 1;
+        updateMobileFeedTicker();
+    }, MOBILE_FEED_TICKER_INTERVAL_MS);
+}
+
+function setupMobileFeedBindings() {
+    if (mobileExperienceRuntime.feedBound) return;
+    const feedRoot = document.getElementById(MOBILE_FEED_HOME_ID);
+    if (!feedRoot) return;
+    mobileExperienceRuntime.feedBound = true;
+
+    const searchInput = document.getElementById(MOBILE_FEED_SEARCH_ID);
+    if (searchInput) {
+        searchInput.addEventListener('input', (event) => {
+            mobileExperienceRuntime.searchText = String(event?.target?.value || '').trim();
+            renderMobileFeedList();
+        });
+    }
+
+    const chipsRoot = document.getElementById(MOBILE_FEED_CHIPS_ID);
+    if (chipsRoot) {
+        chipsRoot.addEventListener('click', (event) => {
+            const chip = event.target?.closest?.('[data-mobile-feed-chip]');
+            if (!chip) return;
+            const nextCategory = String(chip.getAttribute('data-mobile-feed-chip') || '').trim().toLowerCase() || 'all';
+            if (nextCategory === mobileExperienceRuntime.activeCategory) return;
+            mobileExperienceRuntime.activeCategory = nextCategory;
+            renderMobileFeedChips();
+            renderMobileFeedList();
+        });
+    }
+
+    const listRoot = document.getElementById(MOBILE_FEED_LIST_ID);
+    if (listRoot) {
+        listRoot.addEventListener('click', (event) => {
+            const card = event.target?.closest?.('[data-mobile-feed-tab], [data-mobile-feed-route]');
+            if (!card) return;
+            const tab = normalizeRequestedTab(card.getAttribute('data-mobile-feed-tab') || '');
+            if (tab && document.getElementById(tab)) {
+                navigateTo(tab, { playSound: true, scrollToTop: true });
+                return;
+            }
+            const route = String(card.getAttribute('data-mobile-feed-route') || '').trim();
+            if (route.startsWith('/feature/')) {
+                const routeTab = normalizeRequestedTab(route.slice('/feature/'.length));
+                if (routeTab && document.getElementById(routeTab)) {
+                    navigateTo(routeTab, { playSound: true, scrollToTop: true });
+                }
+            }
+        });
+    }
+}
+
+function syncHomeMobileFeedMode(tabName = '') {
+    const homeSection = document.getElementById('home');
+    const feedRoot = document.getElementById(MOBILE_FEED_HOME_ID);
+    if (!homeSection || !feedRoot) return;
+
+    const activeTab = normalizeRequestedTab(tabName) || getCurrentActiveTabName();
+    const enableMobileFeed = activeTab === 'home' && isMobileViewportMode();
+
+    homeSection.classList.toggle('is-mobile-feed', enableMobileFeed);
+    feedRoot.hidden = !enableMobileFeed;
+
+    if (!enableMobileFeed) {
+        stopMobileFeedTicker();
+        return;
+    }
+
+    setupMobileFeedBindings();
+    renderMobileFeedChips();
+    renderMobileFeedList();
+    startMobileFeedTicker();
+}
+
+function setupMobileViewportWatcher() {
+    if (mobileExperienceRuntime.mediaBound) return;
+    mobileExperienceRuntime.mediaBound = true;
+
+    const onViewportChange = () => {
+        const activeTab = getCurrentActiveTabName();
+        syncHomeMobileFeedMode(activeTab);
+        updateMobileStickyCta(activeTab);
+    };
+
+    if (window.matchMedia) {
+        const mql = window.matchMedia(MOBILE_VIEWPORT_QUERY);
+        mobileExperienceRuntime.mediaQueryList = mql;
+        if (typeof mql.addEventListener === 'function') {
+            mql.addEventListener('change', onViewportChange);
+        } else if (typeof mql.addListener === 'function') {
+            mql.addListener(onViewportChange);
+        }
+    }
+
+    window.addEventListener('orientationchange', onViewportChange);
+    window.addEventListener('resize', onViewportChange);
+}
+
+function normalizeRouterPath(rawPath = '') {
+    const value = String(rawPath || '').trim();
+    if (!value) return '/';
+    const path = value.startsWith('/') ? value : `/${value}`;
+    const collapsed = path.replace(/\/{2,}/g, '/');
+    if (collapsed.length > 1 && collapsed.endsWith('/')) {
+        return collapsed.slice(0, -1);
+    }
+    return collapsed || '/';
+}
+
+function detectRouterBasePath() {
+    const currentPath = normalizeRouterPath(window.location.pathname || '/');
+    const featureIndex = currentPath.indexOf(FEATURE_ROUTE_SEGMENT);
+    if (featureIndex > 0) {
+        return normalizeRouterPath(currentPath.slice(0, featureIndex));
+    }
+    if (/\/index\.html$/i.test(currentPath)) {
+        const basePath = currentPath.replace(/\/index\.html$/i, '') || '/';
+        return normalizeRouterPath(basePath);
+    }
+    return '/';
+}
+
+function getRouterBasePath() {
+    if (window.__metaModelRouterBasePath) return window.__metaModelRouterBasePath;
+    const detected = detectRouterBasePath();
+    window.__metaModelRouterBasePath = detected;
+    return detected;
+}
+
+function buildAppPath(pathname = '/') {
+    const normalized = normalizeRouterPath(pathname);
+    const basePath = getRouterBasePath();
+    if (basePath === '/') return normalized;
+    if (normalized === '/') return basePath;
+    return normalizeRouterPath(`${basePath}${normalized}`);
+}
+
+function getPathnameWithoutRouterBase(rawPathname = '') {
+    const normalized = normalizeRouterPath(rawPathname || '/');
+    const basePath = getRouterBasePath();
+    if (basePath === '/') return normalized;
+    const basePrefix = basePath.endsWith('/') ? basePath : `${basePath}/`;
+    if (normalized === basePath) return '/';
+    if (normalized.startsWith(basePrefix)) {
+        const next = normalized.slice(basePath.length);
+        return normalizeRouterPath(next);
+    }
+    return normalized;
+}
+
+function getCurrentRouteTabFromPathname(rawPathname = '') {
+    const pathNoBase = getPathnameWithoutRouterBase(rawPathname || window.location.pathname || '/');
+    if (pathNoBase === '/' || pathNoBase === '/index.html') return 'home';
+    if (pathNoBase === DEBUG_ROUTE_SEGMENT) return 'debug';
+    const featureMatch = pathNoBase.match(/^\/feature\/([^/]+)$/i);
+    if (!featureMatch) return '';
+    let decoded = '';
+    try {
+        decoded = decodeURIComponent(featureMatch[1] || '');
+    } catch (_error) {
+        decoded = featureMatch[1] || '';
+    }
+    return normalizeRequestedTab(decoded);
+}
+
+function isDebugRouteEnabled() {
+    const params = new URLSearchParams(window.location.search || '');
+    return params.get('debug') === '1';
+}
+
+function getRouteSearchWithoutLegacyTab() {
+    const params = new URLSearchParams(window.location.search);
+    params.delete('tab');
+    const serialized = params.toString();
+    return serialized ? `?${serialized}` : '';
+}
+
+function buildRoutePathForTab(tabName = '') {
+    const resolvedTab = normalizeRequestedTab(tabName) || 'home';
+    if (resolvedTab === 'home') return buildAppPath('/');
+    if (resolvedTab === 'debug') return buildAppPath(DEBUG_ROUTE_SEGMENT);
+    return buildAppPath(`${FEATURE_ROUTE_SEGMENT}${encodeURIComponent(resolvedTab)}`);
+}
+
+function scrollPageToTop() {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+function syncHistoryRouteForTab(tabName = '', { replace = false } = {}) {
+    const resolvedTab = normalizeRequestedTab(tabName) || 'home';
+    const targetPath = `${buildRoutePathForTab(resolvedTab)}${getRouteSearchWithoutLegacyTab()}`;
+    const currentPath = `${window.location.pathname}${window.location.search}`;
+    if (targetPath === currentPath) return;
+
+    const currentState = (window.history.state && typeof window.history.state === 'object') ? window.history.state : {};
+    const nextState = {
+        ...currentState,
+        [ROUTER_STATE_KEY]: resolvedTab
+    };
+
+    if (replace) {
+        window.history.replaceState(nextState, '', targetPath);
+    } else {
+        window.history.pushState(nextState, '', targetPath);
+    }
+}
+
+function resolveInitialRouteTab() {
+    const routeTab = getCurrentRouteTabFromPathname(window.location.pathname || '/');
+    if (routeTab === 'debug' && !isDebugRouteEnabled()) {
+        return 'home';
+    }
+    if (routeTab && document.getElementById(routeTab)) return routeTab;
+    const params = new URLSearchParams(window.location.search);
+    const legacyTab = normalizeRequestedTab(params.get('tab') || '');
+    if (legacyTab && document.getElementById(legacyTab)) return legacyTab;
+    return 'home';
+}
+
+function applyRouteFromLocation({ replaceRoute = false, scrollToTop = true } = {}) {
+    const routeTab = getCurrentRouteTabFromPathname(window.location.pathname || '/');
+    const blockedDebugRoute = routeTab === 'debug' && !isDebugRouteEnabled();
+    const targetTab = blockedDebugRoute ? 'home' : resolveInitialRouteTab();
+    persistPracticeTabPreference(targetTab);
+    navigateTo(targetTab, {
+        playSound: false,
+        updateHistory: false,
+        scrollToTop
+    });
+
+    const mobileTabSelect = document.getElementById('mobile-tab-select');
+    if (mobileTabSelect) mobileTabSelect.value = targetTab;
+
+    if (replaceRoute || blockedDebugRoute) {
+        syncHistoryRouteForTab(targetTab, { replace: true });
+    }
+}
+
+function setupHistoryRouter() {
+    if (window[ROUTER_BIND_FLAG]) return;
+    window[ROUTER_BIND_FLAG] = true;
+
+    window.addEventListener('popstate', () => {
+        applyRouteFromLocation({ replaceRoute: false, scrollToTop: true });
+    });
+}
+
 function persistPracticeTabPreference(tabName = '') {
     const normalized = normalizeRequestedTab(tabName);
     if (PRACTICE_TAB_IDS.includes(normalized)) {
@@ -1681,15 +2176,8 @@ function persistPracticeTabPreference(tabName = '') {
 }
 
 function applyInitialTabPreference() {
-    const params = new URLSearchParams(window.location.search);
-    const requestedTab = normalizeRequestedTab(params.get('tab') || '');
-    const targetTab = requestedTab || 'home';
-    if (!targetTab || !document.getElementById(targetTab)) return;
-
-    persistPracticeTabPreference(targetTab);
-    navigateTo(targetTab);
-    const mobileTabSelect = document.getElementById('mobile-tab-select');
-    if (mobileTabSelect) mobileTabSelect.value = targetTab;
+    setupHistoryRouter();
+    applyRouteFromLocation({ replaceRoute: true, scrollToTop: false });
 }
 
 function setupMobileViewportSizing() {
@@ -2326,11 +2814,6 @@ function openFeatureMapMenu() {
     const featureMap = document.getElementById('feature-map-toggle');
     if (!featureMap) return;
     setFeatureMapToggleOpen(true);
-    try {
-        featureMap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (_error) {
-        featureMap.scrollIntoView();
-    }
 }
 
 function setupFeatureMapOverlayControls() {
@@ -2352,6 +2835,12 @@ function setupFeatureMapOverlayControls() {
         if (!featureMap.open) return;
         if (event.target?.closest?.('#home-open-feature-map')) return;
         if (featureMap.contains(event.target)) return;
+        setFeatureMapToggleOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        if (!featureMap.open) return;
         setFeatureMapToggleOpen(false);
     });
 }
@@ -2501,6 +2990,193 @@ function setupHomeLobbyExperience() {
     }
 }
 
+function stripIdsFromCloneTree(root) {
+    if (!root || !(root instanceof Element)) return;
+    if (root.hasAttribute('id')) root.removeAttribute('id');
+    root.querySelectorAll('[id]').forEach((node) => node.removeAttribute('id'));
+}
+
+function resolveMobileAccordionTitle(source) {
+    const explicit = String(source?.getAttribute?.('data-mobile-collapsible-title') || '').trim();
+    if (explicit) return explicit;
+    const key = `${String(source?.id || '')} ${String(source?.className || '')}`.toLowerCase();
+    if (/setting|advanced|מתקד|אפשרויות/.test(key)) return 'אפשרויות מתקדמות';
+    if (/stat|score|history|תוצאה|נתונ|סטטיסט/.test(key)) return 'סטטיסטיקות';
+    if (/example|demo|דוגמ/.test(key)) return 'דוגמאות';
+    return 'הסבר';
+}
+
+function isEligibleMobileAccordionSource(source) {
+    if (!source || !(source instanceof Element)) return false;
+    if (source.closest('.mobile-accordion') || source.classList.contains('mobile-accordion-source')) return false;
+    if (source.matches('.hidden, [hidden], [aria-hidden="true"]')) return false;
+    if (source.querySelector('input, select, textarea, button, iframe, canvas, video')) return false;
+    const text = normalizeUiText(source.textContent || '');
+    return text.length >= 55;
+}
+
+function injectMobileAccordionFromSource(source) {
+    if (!isEligibleMobileAccordionSource(source)) return;
+    source.classList.add('mobile-accordion-source');
+    source.setAttribute('data-mobile-collapsed', '1');
+
+    const accordion = document.createElement('details');
+    accordion.className = 'mobile-accordion';
+    accordion.setAttribute('data-mobile-accordion', 'true');
+
+    const summary = document.createElement('summary');
+    summary.className = 'mobile-accordion-summary';
+    summary.textContent = resolveMobileAccordionTitle(source);
+
+    const body = document.createElement('div');
+    body.className = 'mobile-accordion-body';
+
+    const clone = source.cloneNode(true);
+    stripIdsFromCloneTree(clone);
+    body.appendChild(clone);
+
+    accordion.appendChild(summary);
+    accordion.appendChild(body);
+    source.insertAdjacentElement('afterend', accordion);
+}
+
+function setupMobileAccordions() {
+    const sections = Array.from(document.querySelectorAll('.tab-content[id]'));
+    if (!sections.length) return;
+    sections.forEach((section) => {
+        const tabId = String(section.id || '').trim();
+        if (!tabId || tabId === 'home' || tabId === 'debug') return;
+        const candidates = [];
+        section.querySelectorAll('.subtitle').forEach((node) => candidates.push(node));
+        section.querySelectorAll('[data-mobile-collapsible]').forEach((node) => candidates.push(node));
+        section.querySelectorAll('.muted-note').forEach((node) => candidates.push(node));
+        candidates.forEach((candidate) => injectMobileAccordionFromSource(candidate));
+    });
+}
+
+function ensureMobileStickyCta() {
+    let root = document.getElementById(MOBILE_STICKY_CTA_ID);
+    if (root) return root;
+
+    root = document.createElement('div');
+    root.id = MOBILE_STICKY_CTA_ID;
+    root.className = 'mobile-sticky-cta hidden';
+    root.innerHTML = `
+        <button type="button" class="btn btn-primary" data-mobile-sticky-primary>פעולה ראשית</button>
+        <button type="button" class="btn btn-secondary" data-mobile-sticky-menu>MENU</button>
+    `;
+
+    root.addEventListener('click', (event) => {
+        const primaryBtn = event.target?.closest?.('[data-mobile-sticky-primary]');
+        if (primaryBtn) {
+            const target = mobileExperienceRuntime.stickyPrimaryTarget;
+            if (target && typeof target.click === 'function' && !target.disabled) {
+                target.click();
+                return;
+            }
+        }
+
+        const menuBtn = event.target?.closest?.('[data-mobile-sticky-menu]');
+        if (menuBtn) {
+            openFeatureMapMenu();
+        }
+    });
+
+    document.body.appendChild(root);
+    return root;
+}
+
+function isEligibleStickyActionButton(button) {
+    if (!button || !(button instanceof HTMLButtonElement)) return false;
+    if (button.disabled) return false;
+    if (!isElementActuallyVisible(button)) return false;
+    if (button.closest(`#${MOBILE_STICKY_CTA_ID}`)) return false;
+    if (button.closest('.feature-home-back-bar')) return false;
+    const text = normalizeUiText(button.textContent || '');
+    if (!text) return false;
+    if (/חזרה|back/i.test(text)) return false;
+    return true;
+}
+
+function resolveStickyPrimaryButton(section) {
+    if (!section) return null;
+    const selectorPriority = [
+        '[data-mobile-primary-action]',
+        'button.btn.btn-primary',
+        'button.btn-primary',
+        'button[data-tr-action="next"]',
+        'button[id*="start"]',
+        'button[id*="next"]'
+    ];
+    for (const selector of selectorPriority) {
+        const nodes = Array.from(section.querySelectorAll(selector));
+        const match = nodes.find((node) => isEligibleStickyActionButton(node));
+        if (match) return match;
+    }
+    return null;
+}
+
+function setMobileStickyCtaVisibility(isVisible) {
+    const root = ensureMobileStickyCta();
+    root.classList.toggle('hidden', !isVisible);
+    document.body.classList.toggle('mobile-sticky-cta-visible', Boolean(isVisible));
+}
+
+function updateMobileStickyCta(tabName = '') {
+    const activeTab = normalizeRequestedTab(tabName) || getCurrentActiveTabName();
+    if (!isMobileViewportMode() || !activeTab || activeTab === 'home' || activeTab === 'debug') {
+        mobileExperienceRuntime.stickyPrimaryTarget = null;
+        setMobileStickyCtaVisibility(false);
+        return;
+    }
+
+    const activeSection = document.getElementById(activeTab);
+    if (!activeSection || !activeSection.classList.contains('active')) {
+        mobileExperienceRuntime.stickyPrimaryTarget = null;
+        setMobileStickyCtaVisibility(false);
+        return;
+    }
+
+    const primaryTarget = resolveStickyPrimaryButton(activeSection);
+    if (!primaryTarget) {
+        mobileExperienceRuntime.stickyPrimaryTarget = null;
+        setMobileStickyCtaVisibility(false);
+        return;
+    }
+
+    mobileExperienceRuntime.stickyPrimaryTarget = primaryTarget;
+    const root = ensureMobileStickyCta();
+    const primaryBtn = root.querySelector('[data-mobile-sticky-primary]');
+    if (primaryBtn) {
+        const label = normalizeUiText(primaryTarget.textContent || '') || 'המשך';
+        primaryBtn.textContent = label.length > 28 ? `${label.slice(0, 28)}…` : label;
+    }
+
+    setMobileStickyCtaVisibility(true);
+}
+
+function setupMobileStickyCta() {
+    if (mobileExperienceRuntime.stickyBound) return;
+    mobileExperienceRuntime.stickyBound = true;
+    ensureMobileStickyCta();
+
+    if (!mobileExperienceRuntime.stickyPollTimerId) {
+        mobileExperienceRuntime.stickyPollTimerId = setInterval(() => {
+            const activeTab = getCurrentActiveTabName();
+            updateMobileStickyCta(activeTab);
+        }, MOBILE_STICKY_CTA_POLL_INTERVAL_MS);
+    }
+}
+
+function setupMobileExperienceLayer() {
+    setupMobileViewportWatcher();
+    setupMobileAccordions();
+    setupMobileStickyCta();
+    const activeTab = getCurrentActiveTabName();
+    syncHomeMobileFeedMode(activeTab);
+    updateMobileStickyCta(activeTab);
+}
+
 function setupGlobalFeatureMenuDropdown() {
     const featureMap = document.getElementById('feature-map-toggle');
     const body = featureMap?.querySelector('.feature-map-body');
@@ -2585,60 +3261,49 @@ function setupGlobalFeatureMenuDropdown() {
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismLabStandalone, 'prism_lab_trainer.html')]: 'Prism Lab (Standalone)'
     });
     const groupLabels = Object.freeze({
-        orientation: 'התחלה והכוונה',
-        core: 'אימון מטה-מודל בסיסי',
-        systemic: 'אימון מרחבי / טבלאות ברין',
-        process: 'בניית תהליך / סימולציה',
-        depth: 'כלי עומק וקלאסיקות (Standalone)',
-        language: 'דיוק ניסוח ושפה (Standalone)',
-        research: 'פריזמות / מחקר טקסט (Standalone)',
-        misc: 'כלים נוספים'
+        home: 'Home',
+        exercises: 'Exercises',
+        lab: 'Lab',
+        knowledge: 'Knowledge',
+        settings: 'Settings'
     });
     const groupOrder = Object.freeze([
-        groupLabels.orientation,
-        groupLabels.core,
-        groupLabels.systemic,
-        groupLabels.process,
-        groupLabels.depth,
-        groupLabels.language,
-        groupLabels.research,
-        groupLabels.misc
+        groupLabels.home,
+        groupLabels.exercises,
+        groupLabels.lab,
+        groupLabels.knowledge,
+        groupLabels.settings
     ]);
     const classifyEntryGroup = (key) => {
-        if (!key) return groupLabels.misc;
-        if (['tab:home', 'tab:about'].includes(key)) return groupLabels.orientation;
+        if (!key) return groupLabels.exercises;
+        if (key === 'tab:home') return groupLabels.home;
+        if (key === 'tab:about') return groupLabels.settings;
         if ([
             'tab:practice-question',
             'tab:practice-radar',
-            'tab:practice-wizard',
-            'tab:practice-verb-unzip'
-        ].includes(key)) return groupLabels.core;
-        if ([
             'tab:practice-triples-radar',
-            'tab:categories',
-            getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html')
-        ].includes(key)) return groupLabels.systemic;
-        if ([
+            'tab:practice-wizard',
+            'tab:practice-verb-unzip',
             'tab:scenario-trainer',
             'tab:comic-engine',
-            'tab:blueprint',
-            'tab:prismlab'
-        ].includes(key)) return groupLabels.process;
+            'tab:blueprint'
+        ].includes(key)) return groupLabels.exercises;
+        if (key === 'tab:prismlab') return groupLabels.lab;
         if ([
+            'tab:categories',
             getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classicClassic, 'classic_classic_trainer.html'),
             getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classic2, 'classic2_trainer.html'),
-            getNavHrefFeatureKey(STANDALONE_NAV_KEYS.iceberg, 'iceberg_templates_trainer.html')
-        ].includes(key)) return groupLabels.depth;
-        if ([
+            getNavHrefFeatureKey(STANDALONE_NAV_KEYS.iceberg, 'iceberg_templates_trainer.html'),
+            getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html'),
             getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html'),
             getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/'),
             getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')
-        ].includes(key)) return groupLabels.language;
+        ].includes(key)) return groupLabels.knowledge;
         if ([
             getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html'),
             getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismLabStandalone, 'prism_lab_trainer.html')
-        ].includes(key)) return groupLabels.research;
-        return groupLabels.misc;
+        ].includes(key)) return groupLabels.lab;
+        return groupLabels.exercises;
     };
     const pushEntry = (entry) => {
         if (!entry || !entry.key || seenKeys.has(entry.key)) return;
@@ -3344,8 +4009,11 @@ function resolveVersionedAssetPath(rawPath = '') {
     const source = String(rawPath || '').trim();
     if (!source) return '';
     try {
-        if (typeof window.withAssetVersion === 'function') {
-            return String(window.withAssetVersion(source) || source);
+        const versioner = (typeof window.__withAssetVersion === 'function')
+            ? window.__withAssetVersion
+            : (typeof window.withAssetVersion === 'function' ? window.withAssetVersion : null);
+        if (typeof versioner === 'function') {
+            return String(versioner(source) || source);
         }
     } catch (_error) {
         // fall back to raw path
@@ -3879,7 +4547,9 @@ function setupGlobalTheoryLauncher() {
         }
         try {
             const container = document.getElementById('categories-container');
-            if (container) container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (container && !isMobileViewportMode()) {
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         } catch (error) {
             // ignore smooth scroll issues
         }
@@ -4134,6 +4804,7 @@ function initializeMetaModelApp() {
     setupAudioMuteButtons();
     setupMusicToggleButton();
     setupHomeLobbyExperience();
+    setupMobileExperienceLayer();
     setupGlobalAudioSafety();
     setupOpeningMusicOnFirstEntry();
     
@@ -4315,8 +4986,11 @@ function activateTabByName(tabName = '', { playSound = false, scrollToTop = true
         window.MetaAppShell.notifyTabActivated(resolvedTab);
     }
 
+    syncHomeMobileFeedMode(resolvedTab);
+    updateMobileStickyCta(resolvedTab);
+
     if (scrollToTop) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        scrollPageToTop();
     }
 
     if (playSound) playUISound('next');
@@ -4355,7 +5029,7 @@ function setupTabNavigation() {
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const tabName = btn.getAttribute('data-tab');
-            activateTabByName(tabName, { playSound: true, scrollToTop: true });
+            navigateTo(tabName, { playSound: true, scrollToTop: true });
         });
     });
 
@@ -4369,7 +5043,7 @@ function setupTabNavigation() {
 
         mobileTabSelect.addEventListener('change', () => {
             const targetTab = mobileTabSelect.value;
-            activateTabByName(targetTab, { playSound: true, scrollToTop: true });
+            navigateTo(targetTab, { playSound: true, scrollToTop: true });
         });
     }
 }
@@ -5004,8 +5678,7 @@ function getPracticeTabIdFromPageKey(pageKey = 'question') {
 function navigateToPracticePage(pageKey = 'question') {
     const targetTab = getPracticeTabIdFromPageKey(pageKey);
     persistPracticeTabPreference(targetTab);
-    navigateTo(targetTab);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigateTo(targetTab, { playSound: false, scrollToTop: true });
 }
 
 // Setup Practice Mode
@@ -9454,7 +10127,7 @@ function saveScenarioTrainerProgress() {
 
 async function loadScenarioTrainerData() {
     try {
-        const response = await fetch('data/scenario-trainer-scenarios.json');
+        const response = await fetch(resolveVersionedAssetPath('data/scenario-trainer-scenarios.json'));
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = deepNormalizeUiPayload(await response.json());
         scenarioTrainerData = {
@@ -9505,7 +10178,7 @@ function showScenarioScreen(screenName) {
         const scenarioContext = needsScenarioContext.has(screenName) ? scenarioTrainer.activeScenario : null;
         renderGlobalComicStrip('scenario-trainer', scenarioContext);
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
 function playScenarioSound(kind) {
@@ -10891,7 +11564,7 @@ async function setupComicEngine2Legacy() {
 
     let payload = null;
     try {
-        const response = await fetch('data/comic-scenarios.json', { cache: 'no-store' });
+        const response = await fetch(resolveVersionedAssetPath('data/comic-scenarios.json'), { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         payload = deepNormalizeUiPayload(await response.json());
     } catch (error) {
@@ -11145,7 +11818,9 @@ async function setupComicEngine2Legacy() {
                 idx = (idx + 1) % scenarios.length;
                 rememberComicProgress();
                 renderScenario(scenarios[idx]);
-                els.root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (!isMobileViewportMode()) {
+                    els.root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             };
         }
 
@@ -11243,7 +11918,9 @@ async function setupComicEngine2Legacy() {
                 idx = (idx + 1) % scenarios.length;
                 rememberComicProgress();
                 renderScenario(scenarios[idx]);
-                els.root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (!isMobileViewportMode()) {
+                    els.root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             };
         }
 
@@ -11632,7 +12309,7 @@ function goToStep(stepNum) {
         targetStep.classList.remove('hidden');
         targetStep.classList.add('active');
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
 function extractAndMoveToStep2() {
@@ -13229,7 +13906,7 @@ function handlePrismSubmit() {
     renderVerticalStackResult(stackState);
     savePrismVerticalStackDraftForCurrentPrism();
     const prismResultEl = document.getElementById('prism-result');
-    if (prismResultEl) {
+    if (prismResultEl && !isMobileViewportMode()) {
         window.requestAnimationFrame(() => {
             try {
                 prismResultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -14066,11 +14743,21 @@ function closeHint() {
     if (box) box.style.display = 'none';
 }
 
-function navigateTo(tabName) {
-    const resolvedTab = normalizeRequestedTab(tabName);
-    persistHomeLastVisitedTab(resolvedTab || tabName);
+function navigateTo(tabName, options = {}) {
+    const resolvedTab = normalizeRequestedTab(tabName) || 'home';
+    const opts = (options && typeof options === 'object') ? options : {};
+    const playSound = Boolean(opts.playSound);
+    const scrollToTop = opts.scrollToTop !== false;
+    const updateHistory = opts.updateHistory !== false;
+    const replaceHistory = Boolean(opts.replaceHistory);
 
-    if (activateTabByName(resolvedTab || tabName, { playSound: false, scrollToTop: true })) {
+    persistHomeLastVisitedTab(resolvedTab);
+
+    if (activateTabByName(resolvedTab, { playSound, scrollToTop: false })) {
+        if (updateHistory) {
+            syncHistoryRouteForTab(resolvedTab, { replace: replaceHistory });
+        }
+        if (scrollToTop) scrollPageToTop();
         return;
     }
 
@@ -14080,24 +14767,29 @@ function navigateTo(tabName) {
     tabs.forEach(t => t.classList.remove('active'));
     contents.forEach(c => c.classList.remove('active'));
     
-    const btn = document.querySelector(`[data-tab="${resolvedTab || tabName}"]`);
+    const btn = document.querySelector(`[data-tab="${resolvedTab}"]`);
     if (btn) btn.classList.add('active');
     
-    const content = document.getElementById(resolvedTab || tabName);
+    const content = document.getElementById(resolvedTab);
     if (content) content.classList.add('active');
-    if ((resolvedTab || tabName) !== 'practice-radar') {
+    if (resolvedTab !== 'practice-radar') {
         setRapidPatternFocusMode(false);
         hideRapidPatternExplanation({ resumeIfNeeded: false });
     }
-    persistPracticeTabPreference(resolvedTab || tabName);
+    persistPracticeTabPreference(resolvedTab);
 
-    const scenarioContext = (resolvedTab || tabName) === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
+    const scenarioContext = resolvedTab === 'scenario-trainer' ? scenarioTrainer.activeScenario : null;
     closeComicPreviewModal();
-    renderGlobalComicStrip(resolvedTab || tabName, scenarioContext);
+    renderGlobalComicStrip(resolvedTab, scenarioContext);
     if (window.MetaAppShell && typeof window.MetaAppShell.notifyTabActivated === 'function') {
-        window.MetaAppShell.notifyTabActivated(resolvedTab || tabName);
+        window.MetaAppShell.notifyTabActivated(resolvedTab);
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    syncHomeMobileFeedMode(resolvedTab);
+    updateMobileStickyCta(resolvedTab);
+    if (updateHistory) {
+        syncHistoryRouteForTab(resolvedTab, { replace: replaceHistory });
+    }
+    if (scrollToTop) scrollPageToTop();
 }
 
 // ==================== PROGRESS TRACKING & GAMIFICATION ====================
@@ -15381,7 +16073,7 @@ async function setupComicEngine2({ force = false } = {}) {
 
     let payload = null;
     try {
-        const response = await fetch('data/comic-scenarios.json', { cache: 'no-store' });
+        const response = await fetch(resolveVersionedAssetPath('data/comic-scenarios.json'), { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         payload = deepNormalizeUiPayload(await response.json());
     } catch (error) {
@@ -18813,7 +19505,9 @@ async function setupConnectedBubblesTrainer() {
         if (summary && typeof applyOpenedContentFeedback === 'function') {
             applyOpenedContentFeedback(els.transcript, summary);
         }
-        els.transcript.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (!isMobileViewportMode()) {
+            els.transcript.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
     });
 
     els.transcript?.addEventListener('toggle', () => {
@@ -18826,6 +19520,8 @@ async function setupConnectedBubblesTrainer() {
     await loadCases();
     startCase(0, 'initial');
 }
+
+
 
 
 
