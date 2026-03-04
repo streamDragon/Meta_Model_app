@@ -14128,9 +14128,13 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
 }
 
 .home-route {
-    display: grid;
+    display: none;
     gap: 14px;
     padding-block: 10px;
+}
+
+.tab-content.active.home-route {
+    display: grid;
 }
 
 .home-route-hero {
