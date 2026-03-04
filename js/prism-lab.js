@@ -71,13 +71,29 @@
   });
 
   const PRISM_BY_ID = Object.fromEntries(PRISMS.map((p) => [p.id, p]));
+  const MOBILE_BREAKPOINT = 900;
+  const STEP_GUIDE = Object.freeze([
+    Object.freeze({
+      title: 'בחירת פריזמה',
+      subtitle: 'בחר עדשה/פריזמה להתחלה. היא תקבע איזה סוג חקירה תתרגל.'
+    }),
+    Object.freeze({
+      title: 'איסוף חומר גלם',
+      subtitle: 'כתוב משפט קצר מהחיים (או טען דוגמה). המטרה: שיהיה משפט שאפשר לשאול עליו שאלות.'
+    }),
+    Object.freeze({
+      title: 'חפירה עמוקה (3 שכבות)',
+      subtitle: 'ענה על שאלות שמדייקות: מה בדיוק? איך יודעים? לפי מי? ואז תקבל שאלות עומק נוספות.'
+    })
+  ]);
 
   const state = {
     baseStory: DEMO_STORY,
     selectedPrismId: null,
     ex: null,
     saved: [],
-    uiMessage: 'בחר/י פריזמה אחת והתחילו חפירה של 3 שלבים.'
+    uiMessage: 'בחר/י פריזמה אחת והתחילו חפירה של 3 שלבים.',
+    mobileActionsOpen: false
   };
 
   function esc(v) {
@@ -381,6 +397,23 @@
     }
   }
 
+  function isMobileView() {
+    if (typeof window.matchMedia !== 'function') return window.innerWidth <= MOBILE_BREAKPOINT;
+    return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
+  }
+
+  function stepGuide(idx) {
+    return STEP_GUIDE[idx] || {
+      title: `שלב ${idx + 1}`,
+      subtitle: 'המשך חקירה ממוקד על אותו עוגן.'
+    };
+  }
+
+  function pendingMicrocopy() {
+    if (!state.selectedPrismId) return 'בחר פריזמה כדי להתחיל';
+    return 'כתוב משפט כדי להמשיך';
+  }
+
   function renderPrismGrid() {
     return PRISMS.map((p) => `
       <button type="button" class="pl-btn pl-prism-btn${p.id === state.selectedPrismId ? ' is-active' : ''}" data-action="select-prism" data-id="${esc(p.id)}" title="${esc(p.q)}">
@@ -436,18 +469,57 @@
     `;
   }
 
+  function renderBaseActions(isMobile) {
+    if (!isMobile) {
+      return `
+        <div class="pl-inline-actions">
+          <button type="button" class="pl-btn" data-action="load-demo">טען דוגמת בסיס</button>
+          <button type="button" class="pl-btn" data-action="refresh-anchor" ${state.selectedPrismId ? '' : 'disabled'}>רענן עוגן אוטומטי</button>
+          <button type="button" class="pl-btn" data-action="clear-draft">נקה טיוטה</button>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="pl-mobile-actions-wrap${state.mobileActionsOpen ? ' is-open' : ''}" data-mobile-actions-root>
+        <button
+          type="button"
+          class="pl-btn pl-mobile-actions-toggle"
+          data-action="toggle-mobile-actions"
+          aria-expanded="${state.mobileActionsOpen ? 'true' : 'false'}"
+          aria-controls="pl-mobile-actions-menu"
+        >
+          פעולות
+        </button>
+        <div
+          id="pl-mobile-actions-menu"
+          class="pl-mobile-actions-menu${state.mobileActionsOpen ? ' is-open' : ''}"
+          role="menu"
+          aria-hidden="${state.mobileActionsOpen ? 'false' : 'true'}"
+        >
+          <button type="button" class="pl-btn pl-mobile-actions-item" data-action="load-demo" role="menuitem">טען דוגמת בסיס</button>
+          <button type="button" class="pl-btn pl-mobile-actions-item" data-action="refresh-anchor" role="menuitem" ${state.selectedPrismId ? '' : 'disabled'}>רענן עוגן אוטומטי</button>
+          <button type="button" class="pl-btn pl-mobile-actions-item" data-action="clear-draft" role="menuitem">נקה טיוטה</button>
+        </div>
+      </div>
+    `;
+  }
+
   function renderStep(step, idx, p, ex) {
     const visible = ex.visible >= idx + 1;
     if (!visible) return '';
+    const guide = stepGuide(idx);
     const hasA = !!norm(step.a);
+    const statusText = hasA ? 'נכתב' : pendingMicrocopy();
     const q = step.q || renderQuestion(p, step.anchorX || ex.seedX, step.anchorY || ex.seedY);
     const nextVisible = ex.visible >= idx + 2;
     return `
       <article class="pl-step-card${hasA ? ' is-locked' : ''}">
         <div class="pl-step-head">
-          <div class="pl-step-label">שלב ${idx + 1}</div>
-          <div class="pl-step-status${hasA ? ' done' : ''}">${hasA ? 'נכתב' : 'ממתין'}</div>
+          <div class="pl-step-label">שלב ${idx + 1} · ${esc(guide.title)}</div>
+          <div class="pl-step-status${hasA ? ' done' : ''}">${esc(statusText)}</div>
         </div>
+        <p class="pl-step-guidance">${esc(guide.subtitle)}</p>
         <p class="pl-step-question"><strong>השאלה:</strong> ${esc(q)}</p>
         <p class="pl-step-context">עוגן ${idx + 1}: <code>${esc(step.anchorX || ex.seedX || '—')}</code>${p.q.includes('Y') ? ` · Y: <code>${esc(step.anchorY || ex.seedY || 'תוצאה')}</code>` : ''}</p>
         <textarea data-action="step-answer" data-step="${idx}" spellcheck="false" placeholder="כתבו כאן את תשובת שלב ${idx + 1}...">${esc(step.a || '')}</textarea>
@@ -491,12 +563,14 @@
     const ex = state.ex;
     const steps = ex?.steps || [blankStep(0), blankStep(1), blankStep(2)];
     const items = steps.map((s, i) => {
+      const guide = stepGuide(i);
+      const title = `שלב ${i + 1} · ${guide.title}`;
       const hasQ = !!norm(s.q);
       const hasA = !!norm(s.a);
       if (!hasQ) {
-        return `<div class="pl-history-item is-empty"><div class="pl-history-item-head"><strong>שלב ${i + 1}</strong><span>ממתין</span></div><p>השאלה תופיע אחרי בחירת פריזמה.</p></div>`;
+        return `<div class="pl-history-item is-empty"><div class="pl-history-item-head"><strong>${esc(title)}</strong><span>${esc(pendingMicrocopy())}</span></div><p>${esc(guide.subtitle)}</p><p>${state.selectedPrismId ? 'השאלה תופיע אחרי שממלאים את השלב הקודם.' : 'השאלה תופיע אחרי בחירת פריזמה.'}</p></div>`;
       }
-      return `<div class="pl-history-item${hasA ? '' : ' is-empty'}"><div class="pl-history-item-head"><strong>שלב ${i + 1}</strong><span>${hasA ? 'נכתב' : 'ממתין'}</span></div><p>${esc(s.q)}</p><p class="pl-history-answer">${hasA ? esc(s.a) : 'אין תשובה עדיין.'}</p></div>`;
+      return `<div class="pl-history-item${hasA ? '' : ' is-empty'}"><div class="pl-history-item-head"><strong>${esc(title)}</strong><span>${hasA ? 'נכתב' : esc(pendingMicrocopy())}</span></div><p>${esc(guide.subtitle)}</p><p>${esc(s.q)}</p><p class="pl-history-answer">${hasA ? esc(s.a) : 'כתוב משפט כדי להמשיך.'}</p></div>`;
     }).join('');
 
     const savedHtml = state.saved.length
@@ -534,6 +608,7 @@
   }
 
   function render() {
+    const mobileView = isMobileView();
     root.innerHTML = `
       <div class="pl-shell" dir="rtl">
         <header class="pl-hero">
@@ -547,18 +622,14 @@
               <h2>Base Story</h2>
               <p class="pl-kicker">כתבו/ערכו את הפסקה כאן. שלב 1 יקבל עוגן אוטומטי, ואז ההמשך נבנה מתוך התשובות.</p>
               <textarea id="pl-base-story" spellcheck="false">${esc(state.baseStory || '')}</textarea>
-              <div class="pl-inline-actions">
-                <button type="button" class="pl-btn" data-action="load-demo">טען דוגמת בסיס</button>
-                <button type="button" class="pl-btn" data-action="refresh-anchor" ${state.selectedPrismId ? '' : 'disabled'}>רענן עוגן אוטומטי</button>
-                <button type="button" class="pl-btn" data-action="clear-draft">נקה טיוטה</button>
-              </div>
+              ${renderBaseActions(mobileView)}
             </section>
 
-            ${renderBreenReferenceBoard()}
+            ${mobileView ? '' : renderBreenReferenceBoard()}
 
             <section class="pl-card">
               <h2>15 פריזמות</h2>
-              <p class="pl-kicker">3 שורות × 5 כפתורים. בוחרים פריזמה אחת וחופרים איתה 3 פעמים ברצף.</p>
+              <p class="pl-kicker">בוחרים פריזמה אחת וחופרים איתה 3 פעמים ברצף.</p>
               <div class="pl-prisms-grid">${renderPrismGrid()}</div>
             </section>
 
@@ -616,6 +687,14 @@
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     const action = btn.getAttribute('data-action');
+    if (action === 'toggle-mobile-actions') {
+      state.mobileActionsOpen = !state.mobileActionsOpen;
+      render();
+      return;
+    }
+    if (state.mobileActionsOpen && (action === 'load-demo' || action === 'refresh-anchor' || action === 'clear-draft')) {
+      state.mobileActionsOpen = false;
+    }
     if (action === 'select-prism') return selectPrism(btn.getAttribute('data-id'));
     if (action === 'continue-step') return continueStep(Number(btn.getAttribute('data-step')));
     if (action === 'make-summary') return buildSummary();
@@ -635,8 +714,47 @@
     if (action === 'clear-draft') return clearDraft();
   }
 
+  function onDocumentClick(event) {
+    if (!state.mobileActionsOpen) return;
+    const wrap = root.querySelector('[data-mobile-actions-root]');
+    if (!wrap) {
+      state.mobileActionsOpen = false;
+      return;
+    }
+    const target = event.target;
+    if (target instanceof Node && wrap.contains(target)) return;
+    state.mobileActionsOpen = false;
+    render();
+  }
+
+  function onDocumentKeydown(event) {
+    if (!state.mobileActionsOpen) return;
+    if (event.key !== 'Escape') return;
+    state.mobileActionsOpen = false;
+    render();
+  }
+
+  function bindViewportListener() {
+    if (typeof window.matchMedia !== 'function') return;
+    const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
+    const onChange = () => {
+      state.mobileActionsOpen = false;
+      render();
+    };
+    if (typeof mq.addEventListener === 'function') {
+      mq.addEventListener('change', onChange);
+      return;
+    }
+    if (typeof mq.addListener === 'function') {
+      mq.addListener(onChange);
+    }
+  }
+
   restoreAll();
   root.addEventListener('input', onInput);
   root.addEventListener('click', onClick);
+  document.addEventListener('click', onDocumentClick, true);
+  document.addEventListener('keydown', onDocumentKeydown);
+  bindViewportListener();
   render();
 })();

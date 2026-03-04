@@ -1,0 +1,55 @@
+{
+  "checkedAt": "2026-03-04T01:42:03.034Z",
+  "url": "http://127.0.0.1:5173/prism_lab_trainer.html",
+  "mobile390": {
+    "initial": {
+      "breenExists": false,
+      "breenVisible": false,
+      "gridCols": 3,
+      "toggleExists": true,
+      "toggleVisible": true,
+      "menuVisible": false,
+      "actionButtonsVisible": {
+        "loadDemo": false,
+        "refresh": false,
+        "clear": false
+      },
+      "hasWaitingWord": false,
+      "hasStep1TitleText": false,
+      "hasStep2TitleText": false,
+      "hasStep3TitleText": false,
+      "noHorizontalScroll": true
+    },
+    "menuOpen": {
+      "visible": true,
+      "labels": [
+        "טען דוגמת בסיס",
+        "רענן עוגן אוטומטי",
+        "נקה טיוטה"
+      ]
+    },
+    "postActions": {
+      "gridCols": 3,
+      "stepLabels": [
+        "שלב 1 · בחירת פריזמה"
+      ],
+      "stepGuidance": [
+        "בחר עדשה/פריזמה להתחלה. היא תקבע איזה סוג חקירה תתרגל."
+      ],
+      "hasWaitingWord": false,
+      "hasChooseMicrocopy": false,
+      "hasWriteMicrocopy": false,
+      "menuClosedAfterAction": true,
+      "noHorizontalScroll": true
+    }
+  },
+  "mobile360": {
+    "gridCols": 2
+  },
+  "desktop1366": {
+    "breenVisible": true,
+    "mobileToggleVisible": false,
+    "inlineActionButtonsVisible": 3,
+    "gridCols": 5
+  }
+}
