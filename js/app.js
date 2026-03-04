@@ -135,6 +135,7 @@ let revealFeedbackState = {
     lastActionAt: 0,
     lastActionButton: null,
     scrollCooldownUntil: 0,
+    activeContentElement: null,
     visibilityMap: new WeakMap()
 };
 
@@ -209,8 +210,9 @@ const MOBILE_FEED_CHIPS_ID = 'mobile-feed-chips';
 const MOBILE_FEED_SEARCH_ID = 'mobile-feed-search';
 const MOBILE_FEED_TICKER_ID = 'mobile-feed-ticker-text';
 const MOBILE_FEED_TICKER_INTERVAL_MS = 3600;
+const MOBILE_FEED_SEARCH_DEBOUNCE_MS = 90;
 const MOBILE_STICKY_CTA_ID = 'mobile-sticky-cta';
-const MOBILE_STICKY_CTA_POLL_INTERVAL_MS = 1200;
+const MOBILE_STICKY_CTA_POLL_INTERVAL_MS = 2200;
 
 let unzipEmbedRuntime = {
     loaded: false,
@@ -224,7 +226,11 @@ let mobileExperienceRuntime = {
     mediaBound: false,
     activeCategory: 'all',
     searchText: '',
+    searchDebounceTimerId: null,
     feedBound: false,
+    feedItemsCache: [],
+    feedItemsCacheKey: '',
+    thumbSrcCache: new Map(),
     tickerIndex: 0,
     tickerTimerId: null,
     stickyBound: false,
@@ -1266,6 +1272,19 @@ function clearOpenedContentFeedback(element) {
     }
     element.classList.remove('opened-content-pulse');
     element.classList.remove('opened-content');
+    if (revealFeedbackState.activeContentElement === element) {
+        revealFeedbackState.activeContentElement = null;
+    }
+}
+
+function clearOtherOpenedContentFeedback(activeElement) {
+    if (!document || typeof document.querySelectorAll !== 'function') return;
+    const opened = document.querySelectorAll('.opened-content');
+    opened.forEach((node) => {
+        if (!(node instanceof Element)) return;
+        if (node === activeElement) return;
+        clearOpenedContentFeedback(node);
+    });
 }
 
 function maybeAssistScrollToOpenedContent(element) {
@@ -1297,6 +1316,12 @@ function applyOpenedContentFeedback(element, triggerButton) {
     if (!element || !(element instanceof Element) || !element.classList) return;
     if (!isElementActuallyVisible(element)) return;
 
+    if (revealFeedbackState.activeContentElement && revealFeedbackState.activeContentElement !== element) {
+        clearOpenedContentFeedback(revealFeedbackState.activeContentElement);
+    }
+    clearOtherOpenedContentFeedback(element);
+    revealFeedbackState.activeContentElement = element;
+
     element.classList.add('opened-content');
     element.classList.remove('opened-content-pulse');
     void element.offsetWidth;
@@ -1318,6 +1343,9 @@ function applyOpenedContentFeedback(element, triggerButton) {
             return;
         }
         element.classList.remove('opened-content');
+        if (revealFeedbackState.activeContentElement === element) {
+            revealFeedbackState.activeContentElement = null;
+        }
     }, OPENED_CONTENT_TRANSIENT_MS);
 
     maybeAssistScrollToOpenedContent(element);
@@ -1444,6 +1472,7 @@ function handleRevealFeedbackMutations(records) {
 function setupGlobalRevealFeedback() {
     if (revealFeedbackState.bound) return;
     revealFeedbackState.bound = true;
+    const isLightweightMode = hasCoarsePointerInput();
     refreshActionButtonDecorators(document);
 
     const registerAction = (event) => {
@@ -1474,7 +1503,7 @@ function setupGlobalRevealFeedback() {
     }, true);
 
     const observerTarget = document.body || document.documentElement;
-    if (window.MutationObserver && observerTarget) {
+    if (!isLightweightMode && window.MutationObserver && observerTarget) {
         revealFeedbackState.observer = new MutationObserver(handleRevealFeedbackMutations);
         revealFeedbackState.observer.observe(observerTarget, {
             subtree: true,
@@ -1712,6 +1741,15 @@ function isMobileViewportMode() {
     return window.matchMedia(MOBILE_VIEWPORT_QUERY).matches;
 }
 
+function hasCoarsePointerInput() {
+    if (!window.matchMedia) return isMobileViewportMode();
+    try {
+        return window.matchMedia('(pointer: coarse)').matches || window.matchMedia('(hover: none)').matches;
+    } catch (_error) {
+        return isMobileViewportMode();
+    }
+}
+
 function sanitizeHexColor(value, fallback = '#0ea5e9') {
     const color = String(value || '').trim();
     if (/^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(color)) return color;
@@ -1742,17 +1780,34 @@ function buildMobileFeedSvgThumb(item = {}, index = 0) {
 }
 
 function resolveMobileFeedThumbSrc(item = {}, index = 0) {
+    const cacheKey = [
+        String(item.id || '').trim(),
+        String(item.thumbSrc || '').trim(),
+        String(item.accentFrom || '').trim(),
+        String(item.accentTo || '').trim(),
+        String(item.icon || '').trim(),
+        String(index)
+    ].join('|');
+    const cached = mobileExperienceRuntime.thumbSrcCache.get(cacheKey);
+    if (cached) return cached;
+
+    let resolved = '';
     const rawSrc = String(item.thumbSrc || '').trim();
     if (rawSrc) {
         const versioner = typeof window.__withAssetVersion === 'function'
             ? window.__withAssetVersion
             : (typeof window.withAssetVersion === 'function' ? window.withAssetVersion : null);
         if (versioner && !/^data:/i.test(rawSrc)) {
-            return versioner(rawSrc);
+            resolved = String(versioner(rawSrc) || rawSrc);
+        } else {
+            resolved = rawSrc;
         }
-        return rawSrc;
+    } else {
+        resolved = buildMobileFeedSvgThumb(item, index);
     }
-    return buildMobileFeedSvgThumb(item, index);
+
+    mobileExperienceRuntime.thumbSrcCache.set(cacheKey, resolved);
+    return resolved;
 }
 
 function getMobileFeedCategories() {
@@ -1773,8 +1828,18 @@ function getMobileFeedItems() {
     const globalItems = Array.isArray(window.MetaModelFeatureFeedItems)
         ? window.MetaModelFeatureFeedItems
         : [];
-    if (!globalItems.length) return [];
-    return globalItems
+    if (!globalItems.length) {
+        mobileExperienceRuntime.feedItemsCache = [];
+        mobileExperienceRuntime.feedItemsCacheKey = 'empty';
+        return [];
+    }
+
+    const cacheKey = `${globalItems.length}:${String(globalItems[0]?.id || '')}:${String(globalItems[globalItems.length - 1]?.id || '')}`;
+    if (mobileExperienceRuntime.feedItemsCacheKey === cacheKey && mobileExperienceRuntime.feedItemsCache.length) {
+        return mobileExperienceRuntime.feedItemsCache;
+    }
+
+    const normalized = globalItems
         .map((entry) => ({
             id: String(entry?.id || '').trim(),
             titleHe: String(entry?.titleHe || '').trim(),
@@ -1795,6 +1860,10 @@ function getMobileFeedItems() {
             if (entry.route.startsWith('/feature/')) return true;
             return false;
         });
+
+    mobileExperienceRuntime.feedItemsCache = normalized;
+    mobileExperienceRuntime.feedItemsCacheKey = cacheKey;
+    return normalized;
 }
 
 function getMobileFeedTickerMessages() {
@@ -1852,6 +1921,7 @@ function renderMobileFeedList() {
         return;
     }
 
+    const fragment = document.createDocumentFragment();
     filtered.forEach((item, index) => {
         const card = document.createElement('button');
         card.type = 'button';
@@ -1894,8 +1964,9 @@ function renderMobileFeedList() {
 
         card.appendChild(thumb);
         card.appendChild(copy);
-        listRoot.appendChild(card);
+        fragment.appendChild(card);
     });
+    listRoot.appendChild(fragment);
 }
 
 function updateMobileFeedTicker() {
@@ -1934,8 +2005,15 @@ function setupMobileFeedBindings() {
     const searchInput = document.getElementById(MOBILE_FEED_SEARCH_ID);
     if (searchInput) {
         searchInput.addEventListener('input', (event) => {
-            mobileExperienceRuntime.searchText = String(event?.target?.value || '').trim();
-            renderMobileFeedList();
+            const nextSearch = String(event?.target?.value || '').trim();
+            mobileExperienceRuntime.searchText = nextSearch;
+            if (mobileExperienceRuntime.searchDebounceTimerId) {
+                clearTimeout(mobileExperienceRuntime.searchDebounceTimerId);
+            }
+            mobileExperienceRuntime.searchDebounceTimerId = setTimeout(() => {
+                mobileExperienceRuntime.searchDebounceTimerId = null;
+                renderMobileFeedList();
+            }, MOBILE_FEED_SEARCH_DEBOUNCE_MS);
         });
     }
 
@@ -1986,6 +2064,10 @@ function syncHomeMobileFeedMode(tabName = '') {
 
     if (!enableMobileFeed) {
         stopMobileFeedTicker();
+        if (mobileExperienceRuntime.searchDebounceTimerId) {
+            clearTimeout(mobileExperienceRuntime.searchDebounceTimerId);
+            mobileExperienceRuntime.searchDebounceTimerId = null;
+        }
         return;
     }
 
@@ -1998,11 +2080,17 @@ function syncHomeMobileFeedMode(tabName = '') {
 function setupMobileViewportWatcher() {
     if (mobileExperienceRuntime.mediaBound) return;
     mobileExperienceRuntime.mediaBound = true;
+    let viewportSyncRafId = null;
 
-    const onViewportChange = () => {
+    const syncViewport = () => {
+        viewportSyncRafId = null;
         const activeTab = getCurrentActiveTabName();
         syncHomeMobileFeedMode(activeTab);
         updateMobileStickyCta(activeTab);
+    };
+    const onViewportChange = () => {
+        if (viewportSyncRafId !== null) return;
+        viewportSyncRafId = window.requestAnimationFrame(syncViewport);
     };
 
     if (window.matchMedia) {
@@ -3162,6 +3250,7 @@ function setupMobileStickyCta() {
 
     if (!mobileExperienceRuntime.stickyPollTimerId) {
         mobileExperienceRuntime.stickyPollTimerId = setInterval(() => {
+            if (!isMobileViewportMode() || document.hidden) return;
             const activeTab = getCurrentActiveTabName();
             updateMobileStickyCta(activeTab);
         }, MOBILE_STICKY_CTA_POLL_INTERVAL_MS);
