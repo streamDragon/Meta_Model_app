@@ -114,6 +114,12 @@ body.force-mobile-view .app-version-floating {
     font-size: 0.74rem;
 }
 
+@media (max-width: 720px) {
+    .app-version-floating {
+        display: none;
+    }
+}
+
 .feature-launcher {
     margin: 0 0 12px;
     border: 1px solid #dbe7f5;
@@ -10387,9 +10393,9 @@ body.minimal-ui .wrinkle-self-list {
 
 .ceflow-engine {
     --ceflow-stage-height: 236px;
-    --ceflow-stage-height-mobile: 164px;
+    --ceflow-stage-height-mobile: 142px;
     --ceflow-stage-height-expanded: 340px;
-    --ceflow-stage-height-mobile-expanded: 248px;
+    --ceflow-stage-height-mobile-expanded: 214px;
     margin-top: 14px;
     padding: 10px;
     border: 1px solid #e2e8f0;
@@ -10605,7 +10611,14 @@ body.minimal-ui .wrinkle-self-list {
     grid-template-columns: 96px minmax(0, 1fr) 96px;
     gap: 8px;
     align-items: stretch;
-    margin-bottom: 2px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.ceflow-stage-wrap + section {
+    position: relative;
+    z-index: 2;
 }
 
 .ceflow-character-card {
@@ -11112,6 +11125,8 @@ body.minimal-ui .wrinkle-self-list {
     flex-wrap: wrap;
     gap: 8px;
     justify-content: flex-end;
+    position: relative;
+    z-index: 2;
 }
 
 .ceflow-engine.is-stage-expanded .ceflow-stage {
@@ -11776,19 +11791,44 @@ body.minimal-ui .wrinkle-self-list {
 
 @media (max-width: 980px) {
     .ceflow-stage-wrap {
-        grid-template-columns: 1fr;
+        grid-template-columns: 62px minmax(0, 1fr) 62px;
         gap: 6px;
+        margin-bottom: 14px;
     }
 
     .ceflow-character-card {
-        display: none;
+        display: flex;
+        min-height: var(--ceflow-stage-height-mobile);
+        padding: 4px;
+        border-radius: 10px;
+    }
+
+    .ceflow-character-art {
+        min-height: 42px;
+    }
+
+    .ceflow-character-art img {
+        width: 42px;
+    }
+
+    .ceflow-avatar-fallback {
+        width: 44px;
+        height: 44px;
+        font-size: 1.35rem;
+    }
+
+    .ceflow-character-name {
+        margin-top: 4px;
+        font-size: 0.66rem;
+        line-height: 1.2;
     }
 
     .ceflow-stage {
         min-height: var(--ceflow-stage-height-mobile);
         height: var(--ceflow-stage-height-mobile);
         max-height: var(--ceflow-stage-height-mobile);
-        aspect-ratio: 16 / 8;
+        aspect-ratio: auto;
+        padding: 8px;
     }
 
     .ceflow-engine.is-stage-expanded .ceflow-stage {
@@ -11839,6 +11879,26 @@ body.minimal-ui .wrinkle-self-list {
 @media (max-width: 640px) {
     .ceflow-engine {
         padding: 8px;
+    }
+
+    .ceflow-stage-wrap {
+        grid-template-columns: 54px minmax(0, 1fr) 54px;
+        gap: 5px;
+        margin-bottom: 12px;
+    }
+
+    .ceflow-character-art img {
+        width: 36px;
+    }
+
+    .ceflow-avatar-fallback {
+        width: 38px;
+        height: 38px;
+        font-size: 1.12rem;
+    }
+
+    .ceflow-character-name {
+        font-size: 0.61rem;
     }
 
     .ceflow-top-actions {

@@ -311,18 +311,20 @@
 
 @media (max-width: 720px) {
   .freemium-status-bar {
-    left: auto;
+    left: 8px;
     right: 8px;
     top: calc(env(safe-area-inset-top, 0px) + 8px);
     bottom: auto;
     min-width: 0;
     width: auto;
-    max-width: min(86vw, 320px);
-    border-radius: 999px;
+    max-width: none;
+    border-radius: 14px;
     padding: 6px 8px;
     gap: 6px;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    justify-content: flex-end;
     background: rgba(255, 255, 255, 0.78);
     box-shadow: 0 8px 20px rgba(2, 6, 23, 0.14);
     backdrop-filter: blur(12px);
@@ -338,8 +340,13 @@
   }
 
   .freemium-status-main {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
     justify-content: flex-start;
     min-width: 0;
+    flex: 1 1 190px;
   }
 
   .freemium-meter {
@@ -347,7 +354,9 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 40vw;
+    min-width: 0;
+    max-width: 100%;
+    flex: 1 1 120px;
   }
 
   .freemium-role-badge {
@@ -361,9 +370,10 @@
   }
 
   .freemium-status-actions {
-    margin-inline-start: auto;
+    margin-inline-start: 0;
     display: flex;
     justify-content: flex-end;
+    flex: 0 0 auto;
   }
 
   .freemium-link-btn {
