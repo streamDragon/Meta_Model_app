@@ -12707,6 +12707,63 @@ body.force-desktop-view .mobile-tab-nav {
 /* =========================
    Triples Radar (Michael Breen)
    ========================= */
+.triples-radar-concept {
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid #d3e3fb;
+    background: linear-gradient(180deg, #fcfdff 0%, #f2f7ff 100%);
+    display: grid;
+    gap: 8px;
+}
+
+.triples-radar-concept p {
+    margin: 0;
+    color: #294d78;
+    font-size: 0.9rem;
+    line-height: 1.65;
+}
+
+.triples-radar-concept strong {
+    color: #123f7b;
+}
+
+.triples-radar-breen-figure {
+    margin: 0 0 8px 0;
+    border-radius: 14px;
+    border: 1px solid #d3e3fb;
+    background: #ffffff;
+    padding: 10px;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+}
+
+.triples-radar-breen-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid #d7e4f8;
+    background: #f8fbff;
+}
+
+.triples-radar-breen-figure figcaption {
+    margin-top: 8px;
+    font-size: 0.82rem;
+    color: #35587f;
+    font-weight: 700;
+    text-align: center;
+}
+
+.triples-radar-reference-actions {
+    margin: 0 0 10px 0;
+}
+
+.triples-radar-reference-actions .btn {
+    min-height: 34px;
+    padding-inline: 12px;
+    font-size: 0.82rem;
+}
+
 .triples-radar-mode-bar {
     margin-bottom: 10px;
     padding: 10px;
@@ -13020,6 +13077,24 @@ body.force-desktop-view .mobile-tab-nav {
 }
 
 @media (max-width: 760px) {
+    .triples-radar-concept {
+        padding: 10px;
+    }
+
+    .triples-radar-concept p {
+        font-size: 0.85rem;
+        line-height: 1.55;
+    }
+
+    .triples-radar-breen-figure {
+        padding: 8px;
+    }
+
+    .triples-radar-reference-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
     .triples-radar-mode-bar {
         padding: 9px;
         border-radius: 12px;
