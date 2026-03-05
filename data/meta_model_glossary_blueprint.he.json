@@ -1,0 +1,54 @@
+{
+  "schema_version": "2.0",
+  "app": "meta-model-glossary-blueprint",
+  "notes": "תבנית למילוי ידני של פרמטרים מורחבים לכל קטגוריה/תת-קטגוריה. ניתן להוסיף פריטים חדשים ל-items עם אותו id כמו בקטגוריות הקיימות כדי לעדכן תוכן.",
+  "item_template": {
+    "id": "mind_reading",
+    "he_title": "",
+    "en_title": "",
+    "icon": "",
+    "group": "DISTORTION",
+    "main_category": "DISTORTION",
+    "he_group": "",
+    "he_definition_short": "",
+    "meta_intervention": "",
+    "violation": "",
+    "problem": "",
+    "emotional_meaning": "",
+    "context_signals": [],
+    "philosophical_background": "",
+    "jewish_quote": "",
+    "linguistic_triggers": [],
+    "markers": [],
+    "question_goal": "",
+    "target_information": "",
+    "question_sets": {
+      "canonical": [],
+      "daily": [],
+      "identity": []
+    },
+    "meta_model_questions": [],
+    "clinical_story": {
+      "client_line": "",
+      "therapist_intervention": "",
+      "turning_point": ""
+    },
+    "story": {
+      "client_line": "",
+      "therapist_intervention": ""
+    },
+    "transformation_moment": "",
+    "positive_end": "",
+    "next_step_direction": "",
+    "anti_patterns": [],
+    "dilts_levels": [
+      {
+        "level": "E",
+        "label": "Environment",
+        "focus": "",
+        "interventions": []
+      }
+    ]
+  },
+  "items": []
+}

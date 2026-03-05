@@ -3,6 +3,7 @@ let metaModelData = {};
 let metaModelGlossaryData = { items: [] };
 let metaModelPatternLibraryData = { patterns: [] };
 let metaModelGlossaryConfigData = null;
+let metaModelGlossaryBlueprintData = { items: [] };
 let practiceCount = 0;
 let currentStatementIndex = 0;
 const MAX_STREAK_CHARGES = 3;
@@ -5056,11 +5057,12 @@ if (document.readyState === 'loading') {
 // Load Meta Model data from JSON
 async function loadMetaModelData() {
     try {
-        const [response, glossaryResponse, patternsResponse, glossaryConfigResponse] = await Promise.all([
+        const [response, glossaryResponse, patternsResponse, glossaryConfigResponse, glossaryBlueprintResponse] = await Promise.all([
             fetch(resolveVersionedAssetPath('data/meta-model-violations.json'), { cache: 'no-store' }),
             fetch(resolveVersionedAssetPath('data/meta_model_glossary_breakthroughs.he.json'), { cache: 'no-store' }).catch(() => null),
             fetch(resolveVersionedAssetPath('data/metaModelPatterns.he.json'), { cache: 'no-store' }).catch(() => null),
-            fetch(resolveVersionedAssetPath('data/meta_model_glossary_config.he.json'), { cache: 'no-store' }).catch(() => null)
+            fetch(resolveVersionedAssetPath('data/meta_model_glossary_config.he.json'), { cache: 'no-store' }).catch(() => null),
+            fetch(resolveVersionedAssetPath('data/meta_model_glossary_blueprint.he.json'), { cache: 'no-store' }).catch(() => null)
         ]);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         metaModelData = deepNormalizeUiPayload(await response.json());
@@ -5083,6 +5085,15 @@ async function loadMetaModelData() {
             }
         } else {
             metaModelGlossaryConfigData = normalizeGlossaryConfig({});
+        }
+        if (glossaryBlueprintResponse && glossaryBlueprintResponse.ok) {
+            const payload = deepNormalizeUiPayload(await glossaryBlueprintResponse.json());
+            metaModelGlossaryBlueprintData = {
+                item_template: payload?.item_template && typeof payload.item_template === 'object' ? payload.item_template : {},
+                items: Array.isArray(payload?.items) ? payload.items : []
+            };
+        } else {
+            metaModelGlossaryBlueprintData = { items: [] };
         }
         
         // Populate categories
@@ -5712,6 +5723,62 @@ function uniqueTrimmedList(items = [], limit = 10) {
     return output.slice(0, limit);
 }
 
+function asPlainObject(value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+    return value;
+}
+
+function normalizeGlossaryQuestionSets(rawSets = {}, fallbackQuestions = []) {
+    const sets = asPlainObject(rawSets);
+    const canonical = uniqueTrimmedList(
+        Array.isArray(sets.canonical) ? sets.canonical : (Array.isArray(sets.core) ? sets.core : []),
+        18
+    );
+    const daily = uniqueTrimmedList(
+        Array.isArray(sets.daily) ? sets.daily : (Array.isArray(sets.everyday) ? sets.everyday : []),
+        18
+    );
+    const identity = uniqueTrimmedList(
+        Array.isArray(sets.identity) ? sets.identity : (Array.isArray(sets.identity_predicates) ? sets.identity_predicates : []),
+        18
+    );
+
+    const mergedFlat = uniqueTrimmedList([
+        ...(Array.isArray(fallbackQuestions) ? fallbackQuestions : []),
+        ...canonical,
+        ...daily,
+        ...identity
+    ], 24);
+
+    return {
+        canonical,
+        daily,
+        identity,
+        mergedFlat
+    };
+}
+
+function normalizeGlossaryDiltsLevels(rawLevels = []) {
+    const source = Array.isArray(rawLevels) ? rawLevels : [];
+    const normalized = [];
+    const seen = new Set();
+
+    source.forEach((entry) => {
+        const row = asPlainObject(entry);
+        const level = normalizeUiText(String(row.level || row.id || '').trim().toUpperCase());
+        const label = normalizeUiText(String(row.label || '').trim());
+        const focus = normalizeUiText(String(row.focus || row.problem_focus || '').trim());
+        const interventions = uniqueTrimmedList(Array.isArray(row.interventions) ? row.interventions : [], 8);
+        const key = `${level}|${label}|${focus}|${interventions.join('|')}`.toLowerCase();
+        if (seen.has(key)) return;
+        seen.add(key);
+        if (!level && !label && !focus && !interventions.length) return;
+        normalized.push({ level, label, focus, interventions });
+    });
+
+    return normalized.slice(0, 8);
+}
+
 function normalizeGlossaryConcept(rawItem = {}) {
     const conceptId = normalizeGlossaryConceptId(
         rawItem.id
@@ -5723,11 +5790,21 @@ function normalizeGlossaryConcept(rawItem = {}) {
     );
     if (!conceptId) return null;
 
-    const story = rawItem.story && typeof rawItem.story === 'object' ? rawItem.story : {};
+    const story = asPlainObject(rawItem.story);
+    const clinicalStory = asPlainObject(rawItem.clinical_story);
     const standardMeta = getGlossaryConfigStandardMeta()[conceptId] || null;
     const group = normalizeGlossaryMacroGroup(rawItem.group || rawItem.category || rawItem.family, conceptId);
     const resolvedGroup = standardMeta?.group || group;
     const columnHebrew = getGlossaryConfigColumnHebrew();
+    const baseMarkers = uniqueTrimmedList([
+        ...(Array.isArray(rawItem.markers) ? rawItem.markers : []),
+        ...(Array.isArray(rawItem.examples) ? rawItem.examples : [])
+    ], 16);
+    const directQuestions = uniqueTrimmedList([
+        ...(Array.isArray(rawItem.meta_model_questions) ? rawItem.meta_model_questions : []),
+        ...(Array.isArray(rawItem.questions) ? rawItem.questions : [])
+    ], 18);
+    const questionSets = normalizeGlossaryQuestionSets(rawItem.question_sets, directQuestions);
 
     return {
         id: conceptId,
@@ -5735,16 +5812,38 @@ function normalizeGlossaryConcept(rawItem = {}) {
         he_group: normalizeUiText(String(rawItem.he_group || columnHebrew[resolvedGroup] || '').trim()),
         he_title: normalizeUiText(String(standardMeta?.he || rawItem.he_title || rawItem.hebrew || rawItem.name || conceptId).trim()),
         en_title: normalizeUiText(String(standardMeta?.en || rawItem.en_title || rawItem.name || conceptId).trim()),
+        icon: normalizeUiText(String(rawItem.icon || rawItem.emoji || '').trim()),
+        main_category: normalizeUiText(String(rawItem.main_category || rawItem.category_root || resolvedGroup).trim().toUpperCase()),
+        meta_intervention: normalizeUiText(String(rawItem.meta_intervention || rawItem.intervention || '').trim()),
         he_definition_short: normalizeUiText(String(rawItem.he_definition_short || rawItem.description || '').trim()),
-        markers: uniqueTrimmedList(Array.isArray(rawItem.markers) ? rawItem.markers : []),
-        meta_model_questions: uniqueTrimmedList(Array.isArray(rawItem.meta_model_questions) ? rawItem.meta_model_questions : []),
-        story: {
-            client_line: normalizeUiText(String(story.client_line || '').trim()),
-            therapist_intervention: normalizeUiText(String(story.therapist_intervention || '').trim())
+        violation: normalizeUiText(String(rawItem.violation || '').trim()),
+        problem: normalizeUiText(String(rawItem.problem || '').trim()),
+        emotional_meaning: normalizeUiText(String(rawItem.emotional_meaning || rawItem.emotional_impact || '').trim()),
+        context_signals: uniqueTrimmedList(Array.isArray(rawItem.context_signals) ? rawItem.context_signals : [], 16),
+        philosophical_background: normalizeUiText(String(rawItem.philosophical_background || rawItem.philosophy || '').trim()),
+        jewish_quote: normalizeUiText(String(rawItem.jewish_quote || '').trim()),
+        linguistic_triggers: uniqueTrimmedList([
+            ...(Array.isArray(rawItem.linguistic_triggers) ? rawItem.linguistic_triggers : []),
+            ...(Array.isArray(rawItem.triggers) ? rawItem.triggers : [])
+        ], 18),
+        markers: baseMarkers,
+        question_goal: normalizeUiText(String(rawItem.question_goal || rawItem.questions_goal || '').trim()),
+        target_information: normalizeUiText(String(rawItem.target_information || rawItem.information_target || '').trim()),
+        question_sets: {
+            canonical: questionSets.canonical,
+            daily: questionSets.daily,
+            identity: questionSets.identity
         },
-        transformation_moment: normalizeUiText(String(rawItem.transformation_moment || '').trim()),
+        meta_model_questions: questionSets.mergedFlat,
+        story: {
+            client_line: normalizeUiText(String(story.client_line || clinicalStory.client_line || '').trim()),
+            therapist_intervention: normalizeUiText(String(story.therapist_intervention || clinicalStory.therapist_intervention || '').trim())
+        },
+        transformation_moment: normalizeUiText(String(rawItem.transformation_moment || clinicalStory.turning_point || '').trim()),
         positive_end: normalizeUiText(String(rawItem.positive_end || '').trim()),
-        next_step_direction: normalizeUiText(String(rawItem.next_step_direction || '').trim())
+        next_step_direction: normalizeUiText(String(rawItem.next_step_direction || '').trim()),
+        anti_patterns: uniqueTrimmedList(Array.isArray(rawItem.anti_patterns) ? rawItem.anti_patterns : [], 14),
+        dilts_levels: normalizeGlossaryDiltsLevels(rawItem.dilts_levels)
     };
 }
 
@@ -5774,9 +5873,35 @@ function mergeGlossaryConcept(primary, secondary) {
     merged.he_group = String(primary.he_group || secondary.he_group || getGlossaryConfigColumnHebrew()[merged.group] || '').trim();
     merged.he_title = String(primary.he_title || secondary.he_title || primary.id || '').trim();
     merged.en_title = String(primary.en_title || secondary.en_title || primary.id || '').trim();
+    merged.icon = String(primary.icon || secondary.icon || '').trim();
+    merged.main_category = String(primary.main_category || secondary.main_category || merged.group || '').trim().toUpperCase();
+    merged.meta_intervention = String(primary.meta_intervention || secondary.meta_intervention || '').trim();
     merged.he_definition_short = String(primary.he_definition_short || secondary.he_definition_short || '').trim();
+    merged.violation = String(primary.violation || secondary.violation || '').trim();
+    merged.problem = String(primary.problem || secondary.problem || '').trim();
+    merged.emotional_meaning = String(primary.emotional_meaning || secondary.emotional_meaning || '').trim();
+    merged.philosophical_background = String(primary.philosophical_background || secondary.philosophical_background || '').trim();
+    merged.jewish_quote = String(primary.jewish_quote || secondary.jewish_quote || '').trim();
+    merged.question_goal = String(primary.question_goal || secondary.question_goal || '').trim();
+    merged.target_information = String(primary.target_information || secondary.target_information || '').trim();
     merged.markers = uniqueTrimmedList([...(primary.markers || []), ...(secondary.markers || [])]);
+    merged.context_signals = uniqueTrimmedList([...(primary.context_signals || []), ...(secondary.context_signals || [])], 16);
+    merged.linguistic_triggers = uniqueTrimmedList([...(primary.linguistic_triggers || []), ...(secondary.linguistic_triggers || [])], 18);
+    const primaryQuestionSets = asPlainObject(primary.question_sets);
+    const secondaryQuestionSets = asPlainObject(secondary.question_sets);
+    const mergedQuestionSets = {
+        canonical: uniqueTrimmedList([...(primaryQuestionSets.canonical || []), ...(secondaryQuestionSets.canonical || [])], 18),
+        daily: uniqueTrimmedList([...(primaryQuestionSets.daily || []), ...(secondaryQuestionSets.daily || [])], 18),
+        identity: uniqueTrimmedList([...(primaryQuestionSets.identity || []), ...(secondaryQuestionSets.identity || [])], 18)
+    };
+    merged.question_sets = mergedQuestionSets;
     merged.meta_model_questions = uniqueTrimmedList([...(primary.meta_model_questions || []), ...(secondary.meta_model_questions || [])]);
+    merged.meta_model_questions = uniqueTrimmedList([
+        ...merged.meta_model_questions,
+        ...mergedQuestionSets.canonical,
+        ...mergedQuestionSets.daily,
+        ...mergedQuestionSets.identity
+    ], 24);
     merged.story = {
         client_line: String(primary.story?.client_line || secondary.story?.client_line || '').trim(),
         therapist_intervention: String(primary.story?.therapist_intervention || secondary.story?.therapist_intervention || '').trim()
@@ -5784,6 +5909,8 @@ function mergeGlossaryConcept(primary, secondary) {
     merged.transformation_moment = String(primary.transformation_moment || secondary.transformation_moment || '').trim();
     merged.positive_end = String(primary.positive_end || secondary.positive_end || '').trim();
     merged.next_step_direction = String(primary.next_step_direction || secondary.next_step_direction || '').trim();
+    merged.anti_patterns = uniqueTrimmedList([...(primary.anti_patterns || []), ...(secondary.anti_patterns || [])], 14);
+    merged.dilts_levels = normalizeGlossaryDiltsLevels([...(primary.dilts_levels || []), ...(secondary.dilts_levels || [])]);
     return merged;
 }
 
@@ -5816,6 +5943,9 @@ function enrichGlossaryConceptDepth(item = {}) {
     const group = normalizeGlossaryMacroGroup(item.group, id);
     const fallbackMarkersById = getGlossaryConfigFallbackMarkersById();
     const fallbackQuestionsById = getGlossaryConfigFallbackQuestionsById();
+    const mergedMarkers = uniqueTrimmedList([...(item.markers || []), ...((fallbackMarkersById[id]) || [])], 16);
+    const mergedQuestions = uniqueTrimmedList([...(item.meta_model_questions || []), ...((fallbackQuestionsById[id]) || [])], 18);
+    const normalizedQuestionSets = normalizeGlossaryQuestionSets(item.question_sets, mergedQuestions);
     return {
         ...item,
         id,
@@ -5823,8 +5953,17 @@ function enrichGlossaryConceptDepth(item = {}) {
         he_group: normalizeUiText(String(item.he_group || getGlossaryConfigColumnHebrew()[group] || '').trim()),
         he_title: normalizeUiText(String(standard?.he || item.he_title || id).trim()),
         en_title: normalizeUiText(String(standard?.en || item.en_title || id).trim()),
-        markers: uniqueTrimmedList([...(item.markers || []), ...((fallbackMarkersById[id]) || [])], 16),
-        meta_model_questions: uniqueTrimmedList([...(item.meta_model_questions || []), ...((fallbackQuestionsById[id]) || [])], 18)
+        markers: mergedMarkers,
+        meta_model_questions: normalizedQuestionSets.mergedFlat,
+        question_sets: {
+            canonical: normalizedQuestionSets.canonical,
+            daily: normalizedQuestionSets.daily,
+            identity: normalizedQuestionSets.identity
+        },
+        context_signals: uniqueTrimmedList(item.context_signals || [], 16),
+        linguistic_triggers: uniqueTrimmedList(item.linguistic_triggers || [], 18),
+        anti_patterns: uniqueTrimmedList(item.anti_patterns || [], 14),
+        dilts_levels: normalizeGlossaryDiltsLevels(item.dilts_levels || [])
     };
 }
 
@@ -5865,6 +6004,10 @@ function collectGlossaryConcepts() {
     });
 
     (metaModelGlossaryData?.items || []).forEach((item) => {
+        upsert(item, { preferred: true });
+    });
+
+    (metaModelGlossaryBlueprintData?.items || []).forEach((item) => {
         upsert(item, { preferred: true });
     });
 
@@ -5913,43 +6056,112 @@ function buildGlossaryConceptCard(item = {}) {
     const heTitle = normalizeUiText(String(item.he_title || item.hebrew || item.en_title || item.id || 'מושג').trim());
     const enTitle = normalizeUiText(String(item.en_title || '').trim());
     const title = heTitle && enTitle ? `${heTitle} — ${enTitle}` : (heTitle || enTitle || 'מושג');
+    const icon = normalizeUiText(String(item.icon || '').trim());
+    const mainCategory = normalizeUiText(String(item.main_category || '').trim());
     const groupHe = normalizeUiText(String(item.he_group || '').trim());
     const groupEn = normalizeUiText(String(item.group || '').trim());
     const definition = normalizeUiText(String(item.he_definition_short || item.definition || '').trim());
+    const metaIntervention = normalizeUiText(String(item.meta_intervention || '').trim());
+    const violation = normalizeUiText(String(item.violation || '').trim());
+    const problem = normalizeUiText(String(item.problem || '').trim());
+    const emotionalMeaning = normalizeUiText(String(item.emotional_meaning || '').trim());
+    const philosophicalBackground = normalizeUiText(String(item.philosophical_background || '').trim());
+    const jewishQuote = normalizeUiText(String(item.jewish_quote || '').trim());
+    const questionGoal = normalizeUiText(String(item.question_goal || '').trim());
+    const targetInformation = normalizeUiText(String(item.target_information || '').trim());
     const storyClient = normalizeUiText(String(item.story?.client_line || '').trim());
     const storyIntervention = normalizeUiText(String(item.story?.therapist_intervention || '').trim());
     const transformation = normalizeUiText(String(item.transformation_moment || '').trim());
     const positiveEnd = normalizeUiText(String(item.positive_end || '').trim());
     const nextStep = normalizeUiText(String(item.next_step_direction || '').trim());
+    const contextSignals = uniqueTrimmedList(item.context_signals || [], 16);
+    const triggers = uniqueTrimmedList(item.linguistic_triggers || [], 18);
+    const antiPatterns = uniqueTrimmedList(item.anti_patterns || [], 14);
+    const diltsLevels = normalizeGlossaryDiltsLevels(item.dilts_levels || []);
 
     const markers = Array.isArray(item.markers)
         ? item.markers.map((entry) => normalizeUiText(String(entry || '').trim())).filter(Boolean).slice(0, 12)
         : [];
-    const questions = Array.isArray(item.meta_model_questions)
+    const questionsAll = Array.isArray(item.meta_model_questions)
         ? item.meta_model_questions.map((entry) => normalizeUiText(String(entry || '').trim())).filter(Boolean).slice(0, 14)
         : [];
+    const questionSets = asPlainObject(item.question_sets);
+    const questionsCanonical = uniqueTrimmedList(questionSets.canonical || [], 14);
+    const questionsDaily = uniqueTrimmedList(questionSets.daily || [], 14);
+    const questionsIdentity = uniqueTrimmedList(questionSets.identity || [], 14);
 
     const markersHtml = markers.length
         ? `<ul class="glossary-inline-list">${markers.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
         : '<p>דוגמאות יתווספו בהמשך.</p>';
-    const questionsHtml = questions.length
-        ? `<ul class="glossary-inline-list">${questions.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
+    const triggerHtml = triggers.length
+        ? `<ul class="glossary-inline-list">${triggers.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
+        : '<p>טריגרים לשוניים יתווספו בהמשך.</p>';
+    const contextSignalsHtml = contextSignals.length
+        ? `<ul class="glossary-inline-list">${contextSignals.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
+        : '<p>סממנים לשוניים/קונטקסטואליים יתווספו בהמשך.</p>';
+    const questionsHtml = questionsAll.length
+        ? `<ul class="glossary-inline-list">${questionsAll.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
         : '<p>שאלות מטא־מודל יתווספו בהמשך.</p>';
+    const questionsCanonicalHtml = questionsCanonical.length
+        ? `<ul class="glossary-inline-list">${questionsCanonical.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
+        : '<p>שאלות קאנוניות יתווספו בהמשך.</p>';
+    const questionsDailyHtml = questionsDaily.length
+        ? `<ul class="glossary-inline-list">${questionsDaily.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
+        : '<p>שאלות יומיומיות יתווספו בהמשך.</p>';
+    const questionsIdentityHtml = questionsIdentity.length
+        ? `<ul class="glossary-inline-list">${questionsIdentity.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
+        : '<p>שאלות זהות יתווספו בהמשך.</p>';
+    const antiPatternsHtml = antiPatterns.length
+        ? `<ul class="glossary-inline-list">${antiPatterns.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
+        : '<p>אנטי-פאטרנים יתווספו בהמשך.</p>';
+    const diltsHtml = diltsLevels.length
+        ? `<ul class="glossary-inline-list">${diltsLevels.map((entry) => {
+            const levelHead = [entry.level, entry.label].filter(Boolean).join(' ');
+            const interventions = entry.interventions.length ? ` | התערבויות: ${entry.interventions.join(' · ')}` : '';
+            const focus = entry.focus ? ` — ${entry.focus}` : '';
+            return `<li><strong>${escapeHtml(levelHead || 'רמה')}</strong>${escapeHtml(focus + interventions)}</li>`;
+        }).join('')}</ul>`
+        : '<p>רמות נוירולוגיות + התערבויות יתווספו בהמשך.</p>';
     const storyEmpty = !storyClient && !storyIntervention && !transformation && !positiveEnd && !nextStep;
+    const mapSectionEmpty = !violation && !problem && !emotionalMeaning && !philosophicalBackground && !jewishQuote;
 
     return `
         <details class="category-card glossary-card glossary-category ${escapeHtml(getGlossaryGroupClass(groupEn))}" data-glossary-id="${escapeHtml(String(item.id || ''))}">
             <summary class="glossary-category-summary">
                 <div class="glossary-card-head">
-                    <h3>${escapeHtml(title)}</h3>
+                    <h3>${icon ? `${escapeHtml(icon)} ` : ''}${escapeHtml(title)}</h3>
                     <div class="glossary-pills">
                         ${groupHe ? `<span class="glossary-pill glossary-pill-he">${escapeHtml(groupHe)}</span>` : ''}
                         ${groupEn ? `<span class="glossary-pill glossary-pill-en">${escapeHtml(groupEn)}</span>` : ''}
+                        ${mainCategory ? `<span class="glossary-pill glossary-pill-en">${escapeHtml(mainCategory)}</span>` : ''}
                     </div>
                 </div>
             </summary>
             <div class="glossary-category-body">
                 ${definition ? `<p class="glossary-definition">${escapeHtml(definition)}</p>` : ''}
+                ${metaIntervention ? `<p><strong>התערבות מטא-מודל:</strong> ${escapeHtml(metaIntervention)}</p>` : ''}
+
+                <details class="glossary-layer">
+                    <summary>מפת פרמטרים מלאה</summary>
+                    <div class="glossary-layer-body">
+                        ${violation ? `<p><strong>הפרה:</strong> ${escapeHtml(violation)}</p>` : ''}
+                        ${problem ? `<p><strong>הבעיה:</strong> ${escapeHtml(problem)}</p>` : ''}
+                        ${emotionalMeaning ? `<p><strong>משמעות רגשית:</strong> ${escapeHtml(emotionalMeaning)}</p>` : ''}
+                        ${philosophicalBackground ? `<p><strong>רקע פילוסופי:</strong> ${escapeHtml(philosophicalBackground)}</p>` : ''}
+                        ${jewishQuote ? `<p><strong>ציטוט יהודי:</strong> ${escapeHtml(jewishQuote)}</p>` : ''}
+                        ${mapSectionEmpty ? '<p>שדות ההפרה/בעיה/משמעות/פילוסופיה יוזנו בהמשך.</p>' : ''}
+                    </div>
+                </details>
+
+                <details class="glossary-layer">
+                    <summary>סממנים לשוניים וקונטקסטואליים</summary>
+                    <div class="glossary-layer-body">
+                        <p><strong>סממנים:</strong></p>
+                        ${contextSignalsHtml}
+                        <p><strong>טריגרים לשוניים:</strong></p>
+                        ${triggerHtml}
+                    </div>
+                </details>
 
                 <details class="glossary-layer">
                     <summary>הסיפור הקליני + נקודת השינוי</summary>
@@ -5969,8 +6181,29 @@ function buildGlossaryConceptCard(item = {}) {
                 </details>
 
                 <details class="glossary-layer">
-                    <summary>שאלות מטא־מודל</summary>
-                    <div class="glossary-layer-body">${questionsHtml}</div>
+                    <summary>מטרת שאלות + אוסף שאלות</summary>
+                    <div class="glossary-layer-body">
+                        ${questionGoal ? `<p><strong>מטרת השאלות:</strong> ${escapeHtml(questionGoal)}</p>` : ''}
+                        ${targetInformation ? `<p><strong>מידע שאנחנו רוצים להשיג:</strong> ${escapeHtml(targetInformation)}</p>` : ''}
+                        <p><strong>שאלות קאנוניות:</strong></p>
+                        ${questionsCanonicalHtml}
+                        <p><strong>שאלות יומיומיות:</strong></p>
+                        ${questionsDailyHtml}
+                        <p><strong>שאלות זהות / Identity:</strong></p>
+                        ${questionsIdentityHtml}
+                        <p><strong>מאגר שאלות כללי:</strong></p>
+                        ${questionsHtml}
+                    </div>
+                </details>
+
+                <details class="glossary-layer">
+                    <summary>אנטי-פאטרנים + רמות נוירולוגיות</summary>
+                    <div class="glossary-layer-body">
+                        <p><strong>אנטי-פאטרנים:</strong></p>
+                        ${antiPatternsHtml}
+                        <p><strong>רמות נוירולוגיות (דילטס) + התערבויות:</strong></p>
+                        ${diltsHtml}
+                    </div>
                 </details>
             </div>
         </details>
