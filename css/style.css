@@ -11120,6 +11120,10 @@ body.minimal-ui .wrinkle-self-list {
     max-height: var(--ceflow-stage-height-expanded);
 }
 
+.ceflow-engine.is-stage-expanded .ceflow-character-card {
+    min-height: var(--ceflow-stage-height-expanded);
+}
+
 .ceflow-engine.ceflow-pressure-pulse {
     animation: ceflowPenaltyPulse 240ms ease-in-out;
 }

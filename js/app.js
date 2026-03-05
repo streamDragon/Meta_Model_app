@@ -16254,6 +16254,14 @@ const CEFLOW_NATURAL_CHOICE_COPY = Object.freeze({
     })
 });
 
+const CEFLOW_DEFAULT_LABELS = Object.freeze({
+    angry: 'Snap חם',
+    mock: 'עקיצה',
+    rescue: 'הצלה',
+    avoid: 'דחייה',
+    meta: 'מטה-מודל'
+});
+
 const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
     Object.freeze({
         id: 'dad_tools_danger_01',
@@ -16555,27 +16563,72 @@ function ceflowNormImpact(raw, id) {
 function ceflowNormChoice(raw, fallbackId) {
     const id = String(raw?.id || fallbackId || '').toLowerCase();
     const f = CEFLOW_FALLBACKS[id] || CEFLOW_FALLBACKS[fallbackId] || CEFLOW_FALLBACKS.meta;
-    const replyOptions = Array.isArray(raw?.replyOptions) ? raw.replyOptions.slice(0, 3) : [];
+    const natural = CEFLOW_NATURAL_CHOICE_COPY[id] || {};
+    const replyOptions = Array.isArray(raw?.replyOptions)
+        ? raw.replyOptions.map(v => ceflowNormalizeCopy(v, '')).filter(Boolean).slice(0, 4)
+        : [];
+    const fallbackReplyOptions = Array.isArray(natural.replyOptions)
+        ? natural.replyOptions.map(v => ceflowNormalizeCopy(v, '')).filter(Boolean).slice(0, 4)
+        : [];
+    const repairOptions = Array.isArray(raw?.repairOptions)
+        ? raw.repairOptions.map(v => ceflowNormalizeCopy(v, '')).filter(Boolean).slice(0, 4)
+        : [];
+    const fallbackRepairOptions = Array.isArray(natural.repairOptions)
+        ? natural.repairOptions.map(v => ceflowNormalizeCopy(v, '')).filter(Boolean).slice(0, 4)
+        : [];
     return {
         id,
-        label: String(raw?.label || f.label || 'תגובה'),
-        tone: String(raw?.tone || f.tone || 'muted'),
-        emoji: String(raw?.emoji || f.emoji || '💬'),
-        say: String(raw?.say || ''),
-        counterReply: String(raw?.counterReply || f.counterReply || ''),
-        replyPrompt: String(raw?.replyPrompt || 'איך את/ה עונה עכשיו?'),
-        replyOptions: replyOptions.length ? replyOptions : [
+        label: ceflowNormalizeCopy(raw?.label, natural.label || CEFLOW_DEFAULT_LABELS[id] || f.label || 'תגובה'),
+        tone: ceflowNormalizeCopy(raw?.tone, f.tone || 'muted'),
+        emoji: ceflowNormalizeCopy(raw?.emoji, f.emoji || '💬'),
+        say: ceflowNormalizeCopy(raw?.say, natural.say || ''),
+        counterReply: ceflowNormalizeCopy(raw?.counterReply, natural.counterReply || f.counterReply || ''),
+        replyPrompt: ceflowNormalizeCopy(raw?.replyPrompt, 'איך את/ה עונה עכשיו?'),
+        replyOptions: replyOptions.length ? replyOptions : (fallbackReplyOptions.length ? fallbackReplyOptions : [
             'בוא/י ננשום רגע ונגדיר צעד ראשון.',
             'איפה בדיוק נתקעת?',
             'מה כבר כן עובד, אפילו חלקית?'
-        ],
-        interpretation: String(raw?.interpretation || f.interpretation || ''),
-        badge: String(raw?.badge || ''),
-        sfx: String(raw?.sfx || ''),
+        ]),
+        repairOptions: id === 'meta'
+            ? []
+            : (repairOptions.length ? repairOptions : (fallbackRepairOptions.length ? fallbackRepairOptions : [...CEFLOW_DEFAULT_REPAIR_OPTIONS])),
+        interpretation: ceflowNormalizeCopy(raw?.interpretation, natural.interpretation || f.interpretation || ''),
+        badge: ceflowNormalizeCopy(raw?.badge, ''),
+        sfx: ceflowNormalizeCopy(raw?.sfx, ''),
         impact: ceflowNormImpact(raw?.impact, id),
-        powerQuestions: Array.isArray(raw?.powerQuestions) ? raw.powerQuestions.slice(0, 3).map(v => String(v || '').trim()).filter(Boolean) : [],
-        newInfoBubble: String(raw?.newInfoBubble || ''),
+        powerQuestions: Array.isArray(raw?.powerQuestions)
+            ? raw.powerQuestions.slice(0, 6).map(v => ceflowNormalizeCopy(v, '')).filter(Boolean)
+            : [],
+        newInfoBubble: ceflowNormalizeCopy(raw?.newInfoBubble, ''),
         blueprint: ceflowNormBlueprint(raw?.blueprint)
+    };
+}
+
+function ceflowNormContext(raw) {
+    const source = raw?.context && typeof raw.context === 'object' ? raw.context : (raw || {});
+    const distractors = Array.isArray(source?.distractors)
+        ? source.distractors.map(v => ceflowNormalizeCopy(v, '')).filter(Boolean).slice(0, 4)
+        : [];
+    const defaultSnap = CEFLOW_NATURAL_CHOICE_COPY.angry.say || 'די... אני לא יכול עכשיו עם זה.';
+    return {
+        role: ceflowNormalizeCopy(source?.role, 'אדם תחת לחץ'),
+        stakes: ceflowNormalizeCopy(source?.stakes, 'יש מחיר מיידי לדרך שבה תגיב/י עכשיו.'),
+        trigger: ceflowNormalizeCopy(source?.trigger, 'משהו קטן מפעיל תגובת Snap אוטומטית.'),
+        dominantEmotion: ceflowNormalizeCopy(source?.dominantEmotion, 'לחץ'),
+        snapLine: ceflowNormalizeCopy(source?.snapLine, defaultSnap),
+        distractors: distractors.length
+            ? distractors
+            : [
+                'הטלפון מצפצף: הודעה דחופה.',
+                'מישהו קורא לך מהחדר השני.',
+                'עוד משימה קופצת בדיוק באמצע השיחה.'
+            ],
+        shotClockSeconds: ceflowClampInt(
+            source?.shotClockSeconds || source?.shot_clock || source?.timerSeconds,
+            CEFLOW_DEFAULT_SHOT_CLOCK_SECONDS,
+            CEFLOW_MIN_SHOT_CLOCK_SECONDS,
+            CEFLOW_MAX_SHOT_CLOCK_SECONDS
+        )
     };
 }
 
@@ -16593,28 +16646,69 @@ function ceflowNormScenario(raw, i) {
     const choices = CEFLOW_CHOICE_ORDER.map(id => map.get(id)).filter(Boolean);
     const meta = choices.find(choice => choice.id === 'meta');
     if (meta && !meta.powerQuestions.length) {
-        meta.powerQuestions = ['מה בדיוק לא ברור כרגע?', 'איזה צעד ראשון הכי קטן כן אפשרי?', 'איזה מידע חסר כדי להתקדם?'];
+        meta.powerQuestions = [
+            'מה בדיוק לא ברור כרגע?',
+            'איזה צעד ראשון הכי קטן כן אפשרי?',
+            'איזה מידע חסר כדי להתקדם?',
+            'מה אפשר להוריד מהעומס עכשיו?',
+            'מה מגדיר הצלחה בדקה הקרובה?'
+        ];
     }
     if (meta && !meta.newInfoBubble) {
         meta.newInfoBubble = 'עכשיו זה ברור יותר: אפשר להתחיל מצעד קטן במקום להיתקע על הכול.';
     }
+    const context = ceflowNormContext(raw);
     return {
-        id: String(raw.id || `scene_${i + 1}`),
-        domain: String(raw.domain || 'כללי'),
-        title: String(raw.title || `סצנה ${i + 1}`),
-        level: String(raw.level || raw.levelTag || 'מודליות + הכללה'),
-        regulationNote: String(raw.regulationNote || 'לכולנו יש תגובה רגשית אימפולסיבית. התרגול כאן הוא לזהות אותה, לווסת סטייט, ולעבור לתגובה שכלית מבוססת שאלה.'),
+        id: ceflowNormalizeCopy(raw.id, `scene_${i + 1}`),
+        domain: ceflowNormalizeCopy(raw.domain, 'כללי'),
+        title: ceflowNormalizeCopy(raw.title, `סצנה ${i + 1}`),
+        level: ceflowNormalizeCopy(raw.level || raw.levelTag, 'מודליות + הכללה'),
+        regulationNote: ceflowNormalizeCopy(
+            raw.regulationNote,
+            'לכולנו יש תגובה רגשית אימפולסיבית. התרגול כאן הוא לזהות אותה, לווסת סטייט, ולעבור לתגובה שכלית מבוססת שאלה.'
+        ),
+        context,
+        shotClockSeconds: context.shotClockSeconds,
         characters: {
-            left: { name: String(raw?.characters?.left?.name || 'דמות שמאל'), sprite: String(raw?.characters?.left?.sprite || '') },
-            right: { name: String(raw?.characters?.right?.name || 'דמות ימין'), sprite: String(raw?.characters?.right?.sprite || '') }
+            left: {
+                name: ceflowNormalizeCopy(raw?.characters?.left?.name, 'דמות שמאל'),
+                sprite: ceflowNormalizeCopy(raw?.characters?.left?.sprite, '')
+            },
+            right: {
+                name: ceflowNormalizeCopy(raw?.characters?.right?.name, 'דמות ימין'),
+                sprite: ceflowNormalizeCopy(raw?.characters?.right?.sprite, '')
+            }
         },
         dialog: (raw.dialog || []).map(item => ({
             speaker: item?.speaker === 'right' ? 'right' : 'left',
-            text: String(item?.text || ''),
+            text: ceflowNormalizeCopy(item?.text, ''),
             highlights: Array.isArray(item?.highlights) ? item.highlights : []
         })).filter(line => line.text),
         choices
     };
+}
+
+function ceflowBuildScenarioPool(rawScenarios) {
+    const external = (Array.isArray(rawScenarios) ? rawScenarios : [])
+        .map((scenario, i) => ceflowNormScenario(scenario, i))
+        .filter(Boolean);
+    const injected = CEFLOW_PRESSURE_SCENARIOS
+        .map((scenario, i) => ceflowNormScenario(scenario, i))
+        .filter(Boolean);
+
+    const byId = new Map();
+    injected.forEach(scene => {
+        if (!scene?.id) return;
+        byId.set(scene.id, scene);
+    });
+    external.forEach(scene => {
+        if (!scene?.id) return;
+        if (!byId.has(scene.id)) byId.set(scene.id, scene);
+    });
+
+    const merged = [...byId.values()];
+    if (merged.length >= 6) return merged;
+    return injected.slice(0, 6);
 }
 
 function ceflowEscRe(value) {
@@ -16679,6 +16773,7 @@ function renderComicEngineLoadError(els, message = 'אירעה תקלה בטעי
     els.replyBox?.classList.add('hidden');
     els.feedback?.classList.add('hidden');
     els.power?.classList.add('hidden');
+    els.timeout?.classList.add('hidden');
     els.blueprint?.classList.add('hidden');
     if (els.retry) els.retry.disabled = false;
     if (els.next) els.next.disabled = true;
@@ -16701,6 +16796,7 @@ function ensureComicEngineFlowReady({ force = false } = {}) {
                 replyBox: document.getElementById('ceflow-reply-box'),
                 feedback: document.getElementById('ceflow-feedback'),
                 power: document.getElementById('ceflow-power-card'),
+                timeout: document.getElementById('ceflow-timeout'),
                 blueprint: document.getElementById('ceflow-blueprint'),
                 retry: document.getElementById('ceflow-retry'),
                 next: document.getElementById('ceflow-next-scene')
@@ -16719,11 +16815,20 @@ async function setupComicEngine2({ force = false } = {}) {
     const els = {
         root,
         infoBtn: document.getElementById('ceflow-info-btn'),
+        expandStage: document.getElementById('ceflow-expand-stage'),
         floatingNote: document.getElementById('ceflow-floating-note'),
+        distractor: document.getElementById('ceflow-distractor'),
         domain: document.getElementById('ceflow-domain'),
         progress: document.getElementById('ceflow-progress'),
         level: document.getElementById('ceflow-level'),
         title: document.getElementById('ceflow-title'),
+        contextMain: document.getElementById('ceflow-context-main'),
+        contextTrigger: document.getElementById('ceflow-context-trigger'),
+        contextSnap: document.getElementById('ceflow-context-snap'),
+        shotClock: document.getElementById('ceflow-shotclock'),
+        shotClockRing: document.getElementById('ceflow-shotclock-ring'),
+        shotClockSeconds: document.getElementById('ceflow-shotclock-seconds'),
+        shotClockLabel: document.getElementById('ceflow-shotclock-label'),
         left: document.getElementById('ceflow-left-character'),
         right: document.getElementById('ceflow-right-character'),
         dialog: document.getElementById('ceflow-dialog'),
@@ -16744,6 +16849,7 @@ async function setupComicEngine2({ force = false } = {}) {
         power: document.getElementById('ceflow-power-card'),
         powerQuestions: document.getElementById('ceflow-power-questions'),
         newInfo: document.getElementById('ceflow-new-info'),
+        timeout: document.getElementById('ceflow-timeout'),
         blueprint: document.getElementById('ceflow-blueprint'),
         retry: document.getElementById('ceflow-retry'),
         toggleMode: document.getElementById('ceflow-toggle-mode'),
@@ -16768,7 +16874,7 @@ async function setupComicEngine2({ force = false } = {}) {
         return;
     }
 
-    const scenarios = Array.isArray(payload?.scenarios) ? payload.scenarios.map(ceflowNormScenario).filter(Boolean) : [];
+    const scenarios = ceflowBuildScenarioPool(payload?.scenarios || []);
     if (!scenarios.length) {
         root.dataset.ceflowBootState = 'error';
         renderComicEngineLoadError(els, 'לא נמצאו סצנות קומיקס להצגה.');
@@ -16797,12 +16903,21 @@ async function setupComicEngine2({ force = false } = {}) {
         mode: savedMode,
         index: savedIndex,
         selectedChoice: null,
+        selectedRepair: '',
         replyDraft: '',
         userReply: '',
         selectedQuestion: '',
         generatedInfo: '',
+        stageExpanded: false,
         floatingTimer: null,
-        feedbackTimer: null
+        feedbackTimer: null,
+        distractorTimer: null,
+        activeDistractor: '',
+        shotClockTimer: 0,
+        shotClockTotalMs: 0,
+        shotClockDeadlineMs: 0,
+        shotClockNextTickMs: 0,
+        shotClockDistractorFired: false
     };
 
     const currentScenario = () => scenarios[state.index];
@@ -16813,6 +16928,88 @@ async function setupComicEngine2({ force = false } = {}) {
         if (!raw) return '';
         return raw.length > max ? `${raw.slice(0, max - 1)}...` : raw;
     };
+    const isEngineVisible = () => {
+        const tab = document.getElementById('comic-engine');
+        if (!tab) return true;
+        return tab.classList.contains('active');
+    };
+    const pressureAudio = (() => {
+        let ctx = null;
+        let lastTickAt = 0;
+        let lastBuzzerAt = 0;
+        let armed = false;
+
+        const ensureCtx = (forceResume) => {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return null;
+            if (!ctx) {
+                try {
+                    ctx = new AudioCtx();
+                } catch (_error) {
+                    return null;
+                }
+            }
+            if (forceResume && ctx.state === 'suspended') {
+                try {
+                    const resumePromise = ctx.resume();
+                    if (resumePromise && typeof resumePromise.catch === 'function') resumePromise.catch(() => {});
+                } catch (_error2) {}
+            }
+            return ctx;
+        };
+
+        const playTone = (options) => {
+            const audioCtx = ensureCtx(true);
+            if (!audioCtx || audioCtx.state !== 'running') return;
+            const now = audioCtx.currentTime + Number(options?.delay || 0);
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = options?.type || 'sine';
+            osc.frequency.setValueAtTime(Math.max(60, Number(options?.from || 440)), now);
+            if (Number.isFinite(options?.to) && Number(options.to) > 0 && Number(options.to) !== Number(options.from)) {
+                osc.frequency.exponentialRampToValueAtTime(Math.max(50, Number(options.to)), now + Math.max(0.02, Number(options?.dur || 0.1)));
+            }
+            const peak = Math.max(0.0002, Number(options?.amp || 0.02));
+            const dur = Math.max(0.04, Number(options?.dur || 0.08));
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(peak, now + 0.015);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            try {
+                osc.start(now);
+                osc.stop(now + dur + 0.02);
+            } catch (_error3) {}
+        };
+
+        return {
+            arm() {
+                armed = true;
+                ensureCtx(true);
+            },
+            tick(urgent) {
+                if (!armed) return;
+                const now = Date.now();
+                const cooldown = urgent ? 210 : 460;
+                if (now - lastTickAt < cooldown) return;
+                lastTickAt = now;
+                playTone({ type: urgent ? 'square' : 'triangle', from: urgent ? 1040 : 780, to: urgent ? 980 : 720, dur: urgent ? 0.045 : 0.06, amp: urgent ? 0.028 : 0.02 });
+            },
+            distractor() {
+                if (!armed) return;
+                playTone({ type: 'sawtooth', from: 440, to: 320, dur: 0.08, amp: 0.024 });
+                playTone({ type: 'triangle', from: 520, to: 620, dur: 0.06, delay: 0.05, amp: 0.018 });
+            },
+            buzzer() {
+                if (!armed) return;
+                const now = Date.now();
+                if (now - lastBuzzerAt < 1200) return;
+                lastBuzzerAt = now;
+                playTone({ type: 'sawtooth', from: 220, to: 170, dur: 0.2, amp: 0.036 });
+                playTone({ type: 'square', from: 180, to: 140, dur: 0.2, delay: 0.08, amp: 0.03 });
+            }
+        };
+    })();
     const hideFloatingNote = () => {
         if (state.floatingTimer) {
             clearTimeout(state.floatingTimer);
@@ -16833,6 +17030,34 @@ async function setupComicEngine2({ force = false } = {}) {
         els.floatingNote.classList.remove('hidden');
         els.floatingNote.classList.add('is-visible');
         state.floatingTimer = window.setTimeout(() => hideFloatingNote(), 6200);
+    };
+    const hideDistractor = () => {
+        if (state.distractorTimer) {
+            clearTimeout(state.distractorTimer);
+            state.distractorTimer = null;
+        }
+        if (els.distractor) {
+            els.distractor.classList.add('hidden');
+            els.distractor.textContent = '';
+        }
+        state.activeDistractor = '';
+    };
+    const showDistractor = (text) => {
+        if (!els.distractor) return;
+        const msg = compactText(text, 130);
+        if (!msg) return;
+        hideDistractor();
+        state.activeDistractor = msg;
+        els.distractor.textContent = `⚠️ אירוע נוסף: ${msg}`;
+        els.distractor.classList.remove('hidden');
+        els.root.classList.add('ceflow-pressure-pulse');
+        setTimeout(() => els.root.classList.remove('ceflow-pressure-pulse'), 260);
+        if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+            try { navigator.vibrate(30); } catch (_error) {}
+        }
+        state.distractorTimer = window.setTimeout(() => {
+            if (els.distractor) els.distractor.classList.add('hidden');
+        }, 3200);
     };
     const hideFeedbackNote = () => {
         if (state.feedbackTimer) {
@@ -16863,6 +17088,125 @@ async function setupComicEngine2({ force = false } = {}) {
         localStorage.setItem(COMIC_ENGINE_STORAGE_KEY, JSON.stringify({ index: state.index, updatedAt: new Date().toISOString() }));
     };
 
+    const roundDurationSeconds = () => ceflowClampInt(
+        currentScenario()?.shotClockSeconds || currentScenario()?.context?.shotClockSeconds,
+        CEFLOW_DEFAULT_SHOT_CLOCK_SECONDS,
+        CEFLOW_MIN_SHOT_CLOCK_SECONDS,
+        CEFLOW_MAX_SHOT_CLOCK_SECONDS
+    );
+
+    const renderShotClock = () => {
+        const baseMs = Math.max(1000, roundDurationSeconds() * 1000);
+        const totalMs = state.shotClockTotalMs > 0 ? state.shotClockTotalMs : baseMs;
+        let remainingMs = state.shotClockDeadlineMs > 0
+            ? Math.max(0, state.shotClockDeadlineMs - Date.now())
+            : totalMs;
+        if (state.flowState === CEFLOW_STATES.TIMEOUT) {
+            remainingMs = 0;
+        } else if (state.flowState !== CEFLOW_STATES.SCENE_READY) {
+            remainingMs = 0;
+        }
+        const secondsLeft = Math.max(0, Math.ceil(remainingMs / 1000));
+        const pct = totalMs > 0 ? Math.max(0, Math.min(1, remainingMs / totalMs)) : 0;
+        if (els.shotClockRing) els.shotClockRing.style.setProperty('--clock-pct', String(pct.toFixed(4)));
+        if (els.shotClockSeconds) els.shotClockSeconds.textContent = String(secondsLeft);
+        if (els.shotClockLabel) {
+            if (state.flowState === CEFLOW_STATES.TIMEOUT) els.shotClockLabel.textContent = 'נגמר הזמן';
+            else if (state.flowState !== CEFLOW_STATES.SCENE_READY) els.shotClockLabel.textContent = 'בחירה ננעלה';
+            else els.shotClockLabel.textContent = 'זמן לבחירה';
+        }
+        if (els.shotClock) {
+            const closing = state.flowState === CEFLOW_STATES.SCENE_READY && remainingMs <= 5000 && remainingMs > 0;
+            els.shotClock.classList.toggle('is-closing', closing);
+        }
+    };
+
+    const stopShotClock = () => {
+        if (state.shotClockTimer) {
+            clearInterval(state.shotClockTimer);
+            state.shotClockTimer = 0;
+        }
+        state.shotClockTotalMs = 0;
+        state.shotClockDeadlineMs = 0;
+        state.shotClockNextTickMs = 0;
+        state.shotClockDistractorFired = false;
+    };
+
+    const timeoutRound = () => {
+        stopShotClock();
+        hideDistractor();
+        state.flowState = CEFLOW_STATES.TIMEOUT;
+        state.selectedChoice = null;
+        state.selectedQuestion = '';
+        state.generatedInfo = '';
+        state.userReply = '';
+        state.replyDraft = '';
+        state.selectedRepair = '';
+        pressureAudio.buzzer();
+        playUISound('error');
+        render();
+    };
+
+    const tickShotClockLoop = () => {
+        if (!isEngineVisible() || state.flowState !== CEFLOW_STATES.SCENE_READY) {
+            stopShotClock();
+            renderShotClock();
+            return;
+        }
+        const now = Date.now();
+        const remainingMs = Math.max(0, state.shotClockDeadlineMs - now);
+        if (remainingMs <= 0) {
+            renderShotClock();
+            timeoutRound();
+            return;
+        }
+
+        const remainingSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
+        const tickInterval = remainingMs <= 5000 ? 500 : 1000;
+        if (now >= state.shotClockNextTickMs) {
+            pressureAudio.tick(remainingMs <= 5000);
+            state.shotClockNextTickMs = now + tickInterval;
+        }
+
+        const elapsedRatio = 1 - (remainingMs / Math.max(1, state.shotClockTotalMs));
+        if (!state.shotClockDistractorFired && elapsedRatio >= 0.4) {
+            state.shotClockDistractorFired = true;
+            const distractors = currentScenario()?.context?.distractors || [];
+            const randomText = distractors.length
+                ? distractors[Math.floor(Math.random() * distractors.length)]
+                : 'עוד גירוי נכנס ברקע ומעלה עומס.';
+            showDistractor(randomText);
+            pressureAudio.distractor();
+            renderDialog();
+        }
+
+        if (remainingSeconds <= 5) {
+            els.root.classList.add('ceflow-pressure-pulse');
+            setTimeout(() => els.root.classList.remove('ceflow-pressure-pulse'), 220);
+        }
+
+        renderShotClock();
+    };
+
+    const startShotClock = () => {
+        if (!isEngineVisible()) return;
+        if (state.flowState !== CEFLOW_STATES.SCENE_READY) return;
+        if (state.shotClockTimer) return;
+        const seconds = roundDurationSeconds();
+        state.shotClockTotalMs = Math.max(1000, seconds * 1000);
+        state.shotClockDeadlineMs = Date.now() + state.shotClockTotalMs;
+        state.shotClockNextTickMs = Date.now() + 220;
+        state.shotClockDistractorFired = false;
+        state.shotClockTimer = window.setInterval(tickShotClockLoop, 120);
+        renderShotClock();
+    };
+
+    const syncShotClockLifecycle = () => {
+        if (state.flowState === CEFLOW_STATES.SCENE_READY) startShotClock();
+        else stopShotClock();
+        renderShotClock();
+    };
+
     const speakerName = (line) => line.speaker === 'right' ? currentScenario()?.characters?.right?.name : currentScenario()?.characters?.left?.name;
 
     const setMode = (mode, persist) => {
@@ -16875,14 +17219,17 @@ async function setupComicEngine2({ force = false } = {}) {
     };
 
     const resetRound = () => {
+        stopShotClock();
         state.flowState = CEFLOW_STATES.SCENE_READY;
         state.selectedChoice = null;
+        state.selectedRepair = '';
         state.replyDraft = '';
         state.userReply = '';
         state.selectedQuestion = '';
         state.generatedInfo = '';
         hideFeedbackNote();
         hideFloatingNote();
+        hideDistractor();
     };
 
     const renderCharacters = () => {
@@ -16924,8 +17271,14 @@ async function setupComicEngine2({ force = false } = {}) {
             lines.push({ speaker: 'right', text: state.selectedChoice.say, role: 'selected' });
             lines.push({ speaker: 'left', text: state.selectedChoice.counterReply || CEFLOW_FALLBACKS[state.selectedChoice.id]?.counterReply || '', role: 'counter' });
         }
+        if (state.activeDistractor && state.flowState === CEFLOW_STATES.SCENE_READY) {
+            lines.push({ speaker: 'left', text: `אירוע נוסף: ${state.activeDistractor}`, role: 'new-info' });
+        }
         if (state.userReply) lines.push({ speaker: 'right', text: state.userReply, role: 'reply' });
         if (state.generatedInfo) lines.push({ speaker: 'left', text: state.generatedInfo, role: 'new-info' });
+        if (state.flowState === CEFLOW_STATES.TIMEOUT) {
+            lines.push({ speaker: 'left', text: '⏱️ הזמן נגמר. הסבב ננעל עד "נסה שוב" או מעבר לסצנה הבאה.', role: 'counter' });
+        }
         if (!lines.length) {
             lines.push({
                 speaker: 'left',
@@ -16956,6 +17309,32 @@ async function setupComicEngine2({ force = false } = {}) {
         if (els.agency) els.agency.style.width = `${ceflowClamp(stats.agency, 50)}%`;
         if (els.shame) els.shame.style.width = `${ceflowClamp(stats.shame, 50)}%`;
         els.overlay.classList.remove('hidden');
+    };
+
+    const renderContext = () => {
+        const context = currentScenario()?.context || {};
+        if (els.contextMain) {
+            els.contextMain.textContent = `תפקיד: ${context.role || 'אדם תחת לחץ'} | סטייקס: ${context.stakes || ''}`;
+        }
+        if (els.contextTrigger) {
+            els.contextTrigger.textContent = `טריגר: ${context.trigger || ''} | רגש דומיננטי: ${context.dominantEmotion || 'לחץ'}`;
+        }
+        if (els.contextSnap) {
+            els.contextSnap.textContent = `משפט אוטומטי שעלול להיפלט: "${context.snapLine || CEFLOW_NATURAL_CHOICE_COPY.angry.say}"`;
+        }
+    };
+
+    const renderTimeout = () => {
+        const open = state.flowState === CEFLOW_STATES.TIMEOUT;
+        els.timeout?.classList.toggle('hidden', !open);
+        if (!open || !els.timeout) return;
+        const context = currentScenario()?.context || {};
+        const snap = context.snapLine || CEFLOW_NATURAL_CHOICE_COPY.angry.say;
+        els.timeout.innerHTML = `
+            <strong>⏱️ נגמר הזמן לסבב הזה.</strong>
+            <div>המערכת נעלה בחירה כדי לדמות לחץ אמת. נסו שוב או המשיכו לסצנה הבאה.</div>
+            <div><strong>המשפט האוטומטי שכנראה היה יוצא:</strong> ${escapeHtml(snap)}</div>
+        `;
     };
 
     const renderDeck = () => {
@@ -17008,6 +17387,21 @@ async function setupComicEngine2({ force = false } = {}) {
         if (els.feedbackRight) {
             const interpretation = compactText(choice.interpretation, 210);
             const regulation = compactText(currentScenario().regulationNote, 220);
+            const repairOptions = Array.isArray(choice.repairOptions) ? choice.repairOptions.slice(0, 4) : [];
+            const repairBlock = (choice.id !== 'meta' && repairOptions.length)
+                ? `
+                    <div class="ceflow-repair-box">
+                        <p>Repair אחרי Snap:</p>
+                        <div class="ceflow-repair-options">
+                            ${repairOptions.map(item => `
+                                <button type="button" class="ceflow-repair-option${state.selectedRepair === item ? ' is-selected' : ''}" data-repair-option="${escapeHtml(item)}">
+                                    ${escapeHtml(item)}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `
+                : '';
             els.feedbackRight.innerHTML = `
                 <p><strong>מה אמרת:</strong> ${escapeHtml(choice.say)}</p>
                 <p><strong>מה קרה:</strong></p>
@@ -17016,6 +17410,7 @@ async function setupComicEngine2({ force = false } = {}) {
                     <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(interpretation)}">🔍 פרשנות</button>
                     <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(regulation)}">🧠 ויסות סטייט</button>
                 </div>
+                ${repairBlock}
                 <div class="ceflow-feedback-note hidden" aria-live="polite"></div>
             `;
         }
@@ -17059,8 +17454,9 @@ async function setupComicEngine2({ force = false } = {}) {
     };
 
     const renderControls = () => {
-        if (els.retry) els.retry.disabled = !state.selectedChoice;
-        if (els.next) els.next.disabled = !state.userReply;
+        const hasRoundOutcome = !!state.selectedChoice || !!state.userReply || state.flowState === CEFLOW_STATES.TIMEOUT;
+        if (els.retry) els.retry.disabled = !hasRoundOutcome;
+        if (els.next) els.next.disabled = !(state.userReply || state.flowState === CEFLOW_STATES.TIMEOUT);
         const showBlueprint = !!activeBlueprint() && !!state.userReply;
         els.openBlueprint?.classList.toggle('hidden', !showBlueprint);
     };
@@ -17071,6 +17467,11 @@ async function setupComicEngine2({ force = false } = {}) {
         if (els.progress) els.progress.textContent = `סצנה ${state.index + 1}/${scenarios.length}`;
         if (els.level) els.level.textContent = `רמה: ${scenario.level}`;
         if (els.title) els.title.textContent = scenario.title;
+        if (els.expandStage) {
+            els.expandStage.textContent = state.stageExpanded ? '🗕 כווץ קומיקס' : '🖼️ הגדל רגע';
+            els.expandStage.setAttribute('aria-pressed', state.stageExpanded ? 'true' : 'false');
+        }
+        renderContext();
         try {
             renderGlobalComicStrip('comic-engine', scenario);
         } catch (error) {
@@ -17079,24 +17480,30 @@ async function setupComicEngine2({ force = false } = {}) {
     };
 
     const render = () => {
+        els.root.classList.toggle('is-stage-expanded', !!state.stageExpanded);
         renderHeader();
         renderCharacters();
         renderDialog();
         renderOverlay();
         renderDeck();
+        renderTimeout();
         renderReply();
         renderFeedback();
         renderPower();
         renderBlueprint();
         renderControls();
         setMode(state.mode, false);
+        syncShotClockLifecycle();
     };
 
     const choose = (choiceId) => {
         if (state.flowState !== CEFLOW_STATES.SCENE_READY) return;
         const choice = (currentScenario()?.choices || []).find(item => item.id === choiceId);
         if (!choice) return;
+        stopShotClock();
+        hideDistractor();
         state.selectedChoice = choice;
+        state.selectedRepair = '';
         state.replyDraft = choice.replyOptions?.[0] || '';
         state.flowState = CEFLOW_STATES.CHOICE_REVEALED;
         state.userReply = '';
@@ -17115,6 +17522,7 @@ async function setupComicEngine2({ force = false } = {}) {
         }
         state.userReply = text;
         state.replyDraft = text;
+        state.selectedRepair = '';
         if (state.selectedChoice?.id === 'meta') {
             state.selectedQuestion = state.selectedChoice.powerQuestions?.[0] || '';
             state.generatedInfo = state.selectedChoice.newInfoBubble || 'השאלה פתחה מידע חדש, ואפשר להתקדם לצעד ראשון.';
@@ -17136,9 +17544,11 @@ async function setupComicEngine2({ force = false } = {}) {
     };
 
     const nextScene = () => {
-        if (!state.userReply) return;
+        if (!state.userReply && state.flowState !== CEFLOW_STATES.TIMEOUT) return;
         hideFloatingNote();
         hideFeedbackNote();
+        hideDistractor();
+        stopShotClock();
         state.flowState = CEFLOW_STATES.NEXT_SCENE;
         els.root.classList.add('ceflow-scene-leave');
         setTimeout(() => {
@@ -17151,6 +17561,10 @@ async function setupComicEngine2({ force = false } = {}) {
             setTimeout(() => els.root.classList.remove('ceflow-scene-enter'), 190);
         }, 130);
     };
+
+    document.addEventListener('pointerdown', () => pressureAudio.arm(), { once: true, capture: true });
+    document.addEventListener('keydown', () => pressureAudio.arm(), { once: true, capture: true });
+    document.addEventListener('touchstart', () => pressureAudio.arm(), { once: true, capture: true, passive: true });
 
     els.deck?.addEventListener('click', (event) => {
         const reloadBtn = event.target.closest('button[data-ceflow-reload]');
@@ -17169,6 +17583,11 @@ async function setupComicEngine2({ force = false } = {}) {
             return;
         }
         showFloatingNote(currentScenario()?.regulationNote || 'לכולנו יש תגובה אימפולסיבית ראשונה. כאן עוצרים רגע, מווסתים סטייט, ועוברים לשאלה מדויקת.');
+    });
+    els.expandStage?.addEventListener('click', () => {
+        state.stageExpanded = !state.stageExpanded;
+        els.root.classList.toggle('is-stage-expanded', state.stageExpanded);
+        render();
     });
     els.replyQuick?.addEventListener('click', (event) => {
         const button = event.target.closest('button[data-reply-option]');
@@ -17191,6 +17610,14 @@ async function setupComicEngine2({ force = false } = {}) {
         render();
     });
     els.feedbackRight?.addEventListener('click', (event) => {
+        const repairBtn = event.target.closest('button[data-repair-option]');
+        if (repairBtn) {
+            const nextRepair = repairBtn.getAttribute('data-repair-option') || '';
+            state.selectedRepair = nextRepair;
+            renderFeedback();
+            showFeedbackNote(nextRepair);
+            return;
+        }
         const button = event.target.closest('button[data-feedback-note]');
         if (!button) return;
         showFeedbackNote(button.getAttribute('data-feedback-note') || '');
@@ -17203,6 +17630,14 @@ async function setupComicEngine2({ force = false } = {}) {
         state.mode = state.mode === 'learn' ? 'play' : 'learn';
         setMode(state.mode, true);
         render();
+    });
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopShotClock();
+            renderShotClock();
+            return;
+        }
+        syncShotClockLifecycle();
     });
 
     try {
