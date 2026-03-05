@@ -1,0 +1,242 @@
+{
+  "column_order": [
+    "GENERALIZATION",
+    "DISTORTION",
+    "DELETION"
+  ],
+  "column_hebrew": {
+    "GENERALIZATION": "הכללה",
+    "DISTORTION": "עיוות",
+    "DELETION": "מחיקה"
+  },
+  "required_order": [
+    "mind_reading",
+    "assumptions",
+    "lost_performative",
+    "cause_effect",
+    "modal_operator",
+    "universal_quantifier",
+    "complex_equivalence",
+    "identity_predicates",
+    "nominalization",
+    "lack_referential_index",
+    "time_space_predicates",
+    "simple_deletion",
+    "comparative_deletion",
+    "unspecified_verb",
+    "sensory_predicates",
+    "non_referring_nouns",
+    "logical_types_confusion",
+    "false_dilemma"
+  ],
+  "standard_meta": {
+    "mind_reading": {
+      "he": "קריאת מחשבות",
+      "en": "Mind Reading",
+      "group": "DISTORTION"
+    },
+    "assumptions": {
+      "he": "הנחות מוקדמות",
+      "en": "Presuppositions",
+      "group": "DISTORTION"
+    },
+    "lost_performative": {
+      "he": "חסרון הדובר",
+      "en": "Lost Performative",
+      "group": "DISTORTION"
+    },
+    "cause_effect": {
+      "he": "סיבה ותוצאה",
+      "en": "Cause-Effect",
+      "group": "DISTORTION"
+    },
+    "modal_operator": {
+      "he": "מודל פעולה",
+      "en": "Modal Operators",
+      "group": "GENERALIZATION"
+    },
+    "universal_quantifier": {
+      "he": "הכללה",
+      "en": "Generalization",
+      "group": "GENERALIZATION"
+    },
+    "complex_equivalence": {
+      "he": "הקבלה מורכבת",
+      "en": "Complex Equivalence",
+      "group": "DISTORTION"
+    },
+    "identity_predicates": {
+      "he": "פרדיקטים של זהות",
+      "en": "Identity Predicates",
+      "group": "DISTORTION"
+    },
+    "nominalization": {
+      "he": "נומינליזציה",
+      "en": "Nominalization",
+      "group": "DELETION"
+    },
+    "lack_referential_index": {
+      "he": "אובדן המצביע",
+      "en": "Unspecified Referential Index",
+      "group": "DELETION"
+    },
+    "time_space_predicates": {
+      "he": "פרדיקטים של זמן ומקום",
+      "en": "Time and Place Predicates",
+      "group": "DISTORTION"
+    },
+    "simple_deletion": {
+      "he": "השמטה",
+      "en": "Deletion",
+      "group": "DELETION"
+    },
+    "comparative_deletion": {
+      "he": "השמטה השוואתית",
+      "en": "Comparative Deletion",
+      "group": "DELETION"
+    },
+    "unspecified_verb": {
+      "he": "פועל לא מפורט",
+      "en": "Unspecified Verb",
+      "group": "DELETION"
+    },
+    "sensory_predicates": {
+      "he": "פרדיקטים חושיים",
+      "en": "Sensory Predicates",
+      "group": "DISTORTION"
+    },
+    "non_referring_nouns": {
+      "he": "שם עצם לא מפורט",
+      "en": "Unspecified Noun",
+      "group": "DELETION"
+    },
+    "logical_types_confusion": {
+      "he": "בלבול ברמות לוגיות",
+      "en": "Logical Level Confusion",
+      "group": "DISTORTION"
+    },
+    "false_dilemma": {
+      "he": "חשיבה דיכוטומית (או־או)",
+      "en": "Dichotomous Thinking",
+      "group": "DISTORTION"
+    }
+  },
+  "concept_id_aliases": {
+    "assumptions": "assumptions",
+    "assumption": "assumptions",
+    "presupposition": "assumptions",
+    "presuppositions": "assumptions",
+    "cause_and_effect": "cause_effect",
+    "cause_effect": "cause_effect",
+    "modal_operator": "modal_operator",
+    "modal_operators": "modal_operator",
+    "modal_necessity": "modal_operator",
+    "modal_possibility": "modal_operator",
+    "universal_quantifier": "universal_quantifier",
+    "universal_quantifiers": "universal_quantifier",
+    "rules_generalization": "universal_quantifier",
+    "nominalisation": "nominalization",
+    "nominalisations": "nominalization",
+    "nominalization": "nominalization",
+    "lack_ref_index": "lack_referential_index",
+    "lack_of_referential_index": "lack_referential_index",
+    "unspecified_verb": "unspecified_verb",
+    "unspecified_verbs": "unspecified_verb",
+    "unspecified_noun": "non_referring_nouns",
+    "non_referring_noun": "non_referring_nouns",
+    "non_referring_nouns": "non_referring_nouns",
+    "simple_deletion": "simple_deletion"
+  },
+  "fallback_group_by_id": {
+    "simple_deletion": "DELETION",
+    "comparative_deletion": "DELETION",
+    "lack_referential_index": "DELETION",
+    "lack_of_referential_index": "DELETION",
+    "unspecified_verbs": "DELETION",
+    "unspecified_verb": "DELETION",
+    "non_referring_nouns": "DELETION",
+    "nominalisation": "DELETION",
+    "nominalisations": "DELETION",
+    "nominalization": "DELETION",
+    "universal_quantifier": "GENERALIZATION",
+    "modal_operator": "GENERALIZATION",
+    "mind_reading": "DISTORTION",
+    "cause_effect": "DISTORTION",
+    "complex_equivalence": "DISTORTION",
+    "lost_performative": "DISTORTION",
+    "assumptions": "DISTORTION",
+    "presupposition": "DISTORTION",
+    "identity_predicates": "DISTORTION",
+    "time_space_predicates": "DISTORTION",
+    "sensory_predicates": "DISTORTION"
+  },
+  "fallback_markers_by_id": {
+    "assumptions": [
+      "מתי תפסיק כבר...?",
+      "איך תתמודד עם זה שוב?",
+      "למה אתה עדיין...?"
+    ],
+    "lost_performative": [
+      "זה לא נכון.",
+      "ככה לא מתנהגים.",
+      "אסור לעשות את זה."
+    ],
+    "simple_deletion": [
+      "זה לא עובד.",
+      "היה קשה.",
+      "זה פשוט בעייתי."
+    ],
+    "lack_referential_index": [
+      "הם לא מעריכים אותי.",
+      "כולם אומרים שאני טועה.",
+      "במערכת חושבים אחרת."
+    ],
+    "sensory_predicates": [
+      "זה מרגיש כבד.",
+      "זה נשמע חד מדי.",
+      "התמונה הזאת צורמת לי."
+    ],
+    "non_referring_nouns": [
+      "משהו פה לא תקין.",
+      "הדבר הזה חוסם אותי.",
+      "זה נהיה בלתי נסבל."
+    ]
+  },
+  "fallback_questions_by_id": {
+    "assumptions": [
+      "איזו הנחה כבר הוכנסה כאן בלי בדיקה?",
+      "מה חייב להיות נכון כדי שהמשפט הזה יחזיק?",
+      "איך אפשר לבדוק את ההנחה הזו מול המציאות?"
+    ],
+    "lost_performative": [
+      "לפי מי זה נכון או לא נכון?",
+      "מה הקריטריון שמאחורֵי השיפוט הזה?",
+      "מי קבע את הכלל הזה ומתי?"
+    ],
+    "simple_deletion": [
+      "מה בדיוק לא עובד כאן?",
+      "איפה, מתי ועם מי זה קורה?",
+      "מה המדד שלפיו זה “לא טוב”?"
+    ],
+    "comparative_deletion": [
+      "יותר טוב ביחס למה בדיוק?",
+      "לפי איזה קריטריון נעשתה ההשוואה?",
+      "מה היה נחשב שיפור מדיד כאן?"
+    ],
+    "lack_referential_index": [
+      "מי בדיוק אמר או עשה את זה?",
+      "אפשר לתת שם אחד או דוגמה קונקרטית?",
+      "מתי זה קרה בפעם האחרונה?"
+    ],
+    "sensory_predicates": [
+      "מה אתה רואה/שומע/מרגיש בפועל?",
+      "איזה סימן חושי הכי חזק כרגע?",
+      "איך זה נראה במדידה חיצונית ולא רק בתחושה?"
+    ],
+    "non_referring_nouns": [
+      "מהו “זה” במשפט הזה, בדיוק?",
+      "איזה שם עצם ספציפי חסר כאן?",
+      "אם נחליף את המילה הכללית בשם מדויק, מה יופיע?"
+    ]
+  }
+}
