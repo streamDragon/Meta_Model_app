@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.174" data-build-time="1772675998503" data-build-iso="2026-03-05T01:59:58.503Z" data-git-commit="6ca7130">
+<html lang="he" dir="rtl" data-app-version="1.0.175" data-build-time="1772676385613" data-build-iso="2026-03-05T02:06:25.613Z" data-git-commit="3cd4b98">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -787,42 +787,45 @@
                     <section id="ceflow-context-card" class="ceflow-context-card" aria-live="polite">
                         <h4>Context לפני Snap</h4>
                         <p id="ceflow-context-main"></p>
+                        <p id="ceflow-context-stakes"></p>
                         <p id="ceflow-context-trigger"></p>
                         <p id="ceflow-context-snap" class="ceflow-context-snap"></p>
                     </section>
 
-                    <div class="ceflow-stage-wrap">
-                        <article id="ceflow-left-character" class="ceflow-character-card"></article>
+                    <div class="ceflow-dual-pane">
+                        <div class="ceflow-stage-wrap">
+                            <article id="ceflow-left-character" class="ceflow-character-card"></article>
 
-                        <section class="ceflow-stage" aria-live="polite">
-                            <div id="ceflow-dialog" class="ceflow-dialog"></div>
+                            <section class="ceflow-stage" aria-live="polite">
+                                <div id="ceflow-dialog" class="ceflow-dialog"></div>
 
-                            <div id="ceflow-overlay" class="ceflow-overlay hidden">
-                                <div id="ceflow-xray-tags" class="ceflow-xray-tags"></div>
-                                <div class="ceflow-stats">
-                                    <div class="ceflow-stat">
-                                        <span>Flow</span>
-                                        <div class="ceflow-bar"><span id="ceflow-stat-flow"></span></div>
-                                    </div>
-                                    <div class="ceflow-stat">
-                                        <span>Agency</span>
-                                        <div class="ceflow-bar"><span id="ceflow-stat-agency"></span></div>
-                                    </div>
-                                    <div class="ceflow-stat">
-                                        <span>Shame</span>
-                                        <div class="ceflow-bar"><span id="ceflow-stat-shame"></span></div>
+                                <div id="ceflow-overlay" class="ceflow-overlay hidden">
+                                    <div id="ceflow-xray-tags" class="ceflow-xray-tags"></div>
+                                    <div class="ceflow-stats">
+                                        <div class="ceflow-stat">
+                                            <span>Flow</span>
+                                            <div class="ceflow-bar"><span id="ceflow-stat-flow"></span></div>
+                                        </div>
+                                        <div class="ceflow-stat">
+                                            <span>Agency</span>
+                                            <div class="ceflow-bar"><span id="ceflow-stat-agency"></span></div>
+                                        </div>
+                                        <div class="ceflow-stat">
+                                            <span>Shame</span>
+                                            <div class="ceflow-bar"><span id="ceflow-stat-shame"></span></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </section>
+
+                            <article id="ceflow-right-character" class="ceflow-character-card"></article>
+                        </div>
+
+                        <section class="ceflow-choice-panel">
+                            <h4 class="ceflow-block-title">בחר/י תגובה</h4>
+                            <div id="ceflow-choice-deck" class="ceflow-choice-deck" role="group" aria-label="אפשרויות תגובה"></div>
                         </section>
-
-                        <article id="ceflow-right-character" class="ceflow-character-card"></article>
                     </div>
-
-                    <section>
-                        <h4 class="ceflow-block-title">בחר/י תגובה</h4>
-                        <div id="ceflow-choice-deck" class="ceflow-choice-deck" role="group" aria-label="אפשרויות תגובה"></div>
-                    </section>
 
                     <section id="ceflow-timeout" class="ceflow-timeout hidden" aria-live="polite"></section>
 

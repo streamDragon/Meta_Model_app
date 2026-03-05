@@ -16288,8 +16288,8 @@ const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
             Object.freeze({ speaker: 'right', text: 'עצור רגע, זה כלי מסוכן ליד הידיים שלך.' })
         ]),
         choices: Object.freeze([
-            Object.freeze({ id: 'angry', say: 'חלאס! כמה פעמים אמרתי לא לגעת בזה?!' }),
-            Object.freeze({ id: 'mock', say: 'מה, זה משחק בעיניך עכשיו?' }),
+            Object.freeze({ id: 'angry', say: 'חלאס, תפסיק רגע, זה מסוכן.' }),
+            Object.freeze({ id: 'mock', say: 'מה, זה נראה לך משחק עכשיו?' }),
             Object.freeze({ id: 'rescue', say: 'עזוב, אני כבר עושה הכול לבד.' }),
             Object.freeze({ id: 'avoid', say: 'שניה... לא עכשיו.' }),
             Object.freeze({
@@ -16330,8 +16330,8 @@ const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
             Object.freeze({ speaker: 'right', text: 'יש לנו פחות משעה לשחרור.' })
         ]),
         choices: Object.freeze([
-            Object.freeze({ id: 'angry', say: 'איך זה עדיין פתוח עכשיו?!' }),
-            Object.freeze({ id: 'mock', say: 'מדהים. בדיוק בזמן הכי גרוע הצלחת.' }),
+            Object.freeze({ id: 'angry', say: 'די... אני לא יכול עכשיו עם זה, איך זה עוד פתוח?' }),
+            Object.freeze({ id: 'mock', say: 'מעולה, בדיוק עכשיו זה מה שהיה חסר לי.' }),
             Object.freeze({ id: 'rescue', say: 'עזוב, אני אקח את זה עליי עכשיו.' }),
             Object.freeze({ id: 'avoid', say: 'טוב... נראה מה יהיה בעוד עשר דקות.' }),
             Object.freeze({
@@ -16372,8 +16372,8 @@ const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
             Object.freeze({ speaker: 'right', text: 'זה כבר ערב שלישי ברצף שזה קורה.' })
         ]),
         choices: Object.freeze([
-            Object.freeze({ id: 'angry', say: 'די, נמאס לי ממך כבר!' }),
-            Object.freeze({ id: 'mock', say: 'וואו, איזו הפתעה... שוב את/ה מאחר/ת.' }),
+            Object.freeze({ id: 'angry', say: 'די... אני לא יכול עכשיו עם זה.' }),
+            Object.freeze({ id: 'mock', say: 'איזו הפתעה, שוב איחור.' }),
             Object.freeze({ id: 'rescue', say: 'בסדר, אני אעשה הכול לבד כמו תמיד.' }),
             Object.freeze({ id: 'avoid', say: 'עזוב, לא משנה עכשיו.' }),
             Object.freeze({
@@ -16413,8 +16413,8 @@ const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
             Object.freeze({ speaker: 'right', text: 'יש לנו מבחן בעוד עשר דקות.' })
         ]),
         choices: Object.freeze([
-            Object.freeze({ id: 'angry', say: 'תסתמו כבר! די לדבר!' }),
-            Object.freeze({ id: 'mock', say: 'ברור, כי משמעת זה ממש לא הצד החזק שלכם.' }),
+            Object.freeze({ id: 'angry', say: 'די... לא ככה. אני צריך שקט עכשיו.' }),
+            Object.freeze({ id: 'mock', say: 'ברור, משמעת זו לא בדיוק החוזקה פה.' }),
             Object.freeze({ id: 'rescue', say: 'טוב, אני מבטל את המבחן להיום.' }),
             Object.freeze({ id: 'avoid', say: 'תמשיכו, אולי תירגעו לבד.' }),
             Object.freeze({
@@ -16454,8 +16454,8 @@ const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
             Object.freeze({ speaker: 'right', text: 'אני מבין את התסכול שלך ורוצה לפתור.' })
         ]),
         choices: Object.freeze([
-            Object.freeze({ id: 'angry', say: 'תירגע, זה לא עובד ככה פה.' }),
-            Object.freeze({ id: 'mock', say: 'כן, בטח, איום בפוסט תמיד עובד...' }),
+            Object.freeze({ id: 'angry', say: 'שניה. פשוט... לא עכשיו, אני בודק.' }),
+            Object.freeze({ id: 'mock', say: 'כן, בטח, איום בפוסט תמיד מקדם שיחה.' }),
             Object.freeze({ id: 'rescue', say: 'טוב, קח החזר מלא ונגמור עם זה.' }),
             Object.freeze({ id: 'avoid', say: 'אבדוק את זה אחר כך ואחזור אליך.' }),
             Object.freeze({
@@ -16495,8 +16495,8 @@ const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
             Object.freeze({ speaker: 'right', text: 'זה חשוב מאוד ליציבות שלך היום.' })
         ]),
         choices: Object.freeze([
-            Object.freeze({ id: 'angry', say: 'איך שוב שכחת? דיברנו על זה מיליון פעם.' }),
-            Object.freeze({ id: 'mock', say: 'מצוין... בדיוק כמו תמיד.' }),
+            Object.freeze({ id: 'angry', say: 'די... אני מתפרק פה, איך שוב שכחנו?' }),
+            Object.freeze({ id: 'mock', say: 'מצוין... שוב אנחנו באותו מקום.' }),
             Object.freeze({ id: 'rescue', say: 'עזוב, אני פשוט אנהל הכול במקומך.' }),
             Object.freeze({ id: 'avoid', say: 'טוב, נסתדר איכשהו בהמשך.' }),
             Object.freeze({
@@ -16823,6 +16823,7 @@ async function setupComicEngine2({ force = false } = {}) {
         level: document.getElementById('ceflow-level'),
         title: document.getElementById('ceflow-title'),
         contextMain: document.getElementById('ceflow-context-main'),
+        contextStakes: document.getElementById('ceflow-context-stakes'),
         contextTrigger: document.getElementById('ceflow-context-trigger'),
         contextSnap: document.getElementById('ceflow-context-snap'),
         shotClock: document.getElementById('ceflow-shotclock'),
@@ -16917,7 +16918,8 @@ async function setupComicEngine2({ force = false } = {}) {
         shotClockTotalMs: 0,
         shotClockDeadlineMs: 0,
         shotClockNextTickMs: 0,
-        shotClockDistractorFired: false
+        shotClockDistractorFired: false,
+        shotClockPenaltyNextMs: 0
     };
 
     const currentScenario = () => scenarios[state.index];
@@ -17130,6 +17132,7 @@ async function setupComicEngine2({ force = false } = {}) {
         state.shotClockDeadlineMs = 0;
         state.shotClockNextTickMs = 0;
         state.shotClockDistractorFired = false;
+        state.shotClockPenaltyNextMs = 0;
     };
 
     const timeoutRound = () => {
@@ -17180,6 +17183,16 @@ async function setupComicEngine2({ force = false } = {}) {
             renderDialog();
         }
 
+        if (now >= state.shotClockPenaltyNextMs) {
+            state.shotClockPenaltyNextMs = now + 3000;
+            pressureAudio.tick(true);
+            els.root.classList.add('ceflow-pressure-pulse');
+            setTimeout(() => els.root.classList.remove('ceflow-pressure-pulse'), 210);
+            if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+                try { navigator.vibrate(20); } catch (_error) {}
+            }
+        }
+
         if (remainingSeconds <= 5) {
             els.root.classList.add('ceflow-pressure-pulse');
             setTimeout(() => els.root.classList.remove('ceflow-pressure-pulse'), 220);
@@ -17197,6 +17210,7 @@ async function setupComicEngine2({ force = false } = {}) {
         state.shotClockDeadlineMs = Date.now() + state.shotClockTotalMs;
         state.shotClockNextTickMs = Date.now() + 220;
         state.shotClockDistractorFired = false;
+        state.shotClockPenaltyNextMs = Date.now() + 3000;
         state.shotClockTimer = window.setInterval(tickShotClockLoop, 120);
         renderShotClock();
     };
@@ -17314,10 +17328,13 @@ async function setupComicEngine2({ force = false } = {}) {
     const renderContext = () => {
         const context = currentScenario()?.context || {};
         if (els.contextMain) {
-            els.contextMain.textContent = `תפקיד: ${context.role || 'אדם תחת לחץ'} | סטייקס: ${context.stakes || ''}`;
+            els.contextMain.textContent = `תפקיד: ${context.role || 'אדם תחת לחץ'}`;
+        }
+        if (els.contextStakes) {
+            els.contextStakes.textContent = `למה זה חשוב עכשיו: ${context.stakes || ''}`;
         }
         if (els.contextTrigger) {
-            els.contextTrigger.textContent = `טריגר: ${context.trigger || ''} | רגש דומיננטי: ${context.dominantEmotion || 'לחץ'}`;
+            els.contextTrigger.textContent = `טריגר: ${context.trigger || ''} | רגש מוביל: ${context.dominantEmotion || 'לחץ'}`;
         }
         if (els.contextSnap) {
             els.contextSnap.textContent = `משפט אוטומטי שעלול להיפלט: "${context.snapLine || CEFLOW_NATURAL_CHOICE_COPY.angry.say}"`;

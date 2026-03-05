@@ -10392,10 +10392,10 @@ body.minimal-ui .wrinkle-self-list {
 }
 
 .ceflow-engine {
-    --ceflow-stage-height: 236px;
-    --ceflow-stage-height-mobile: 142px;
-    --ceflow-stage-height-expanded: 340px;
-    --ceflow-stage-height-mobile-expanded: 214px;
+    --ceflow-stage-height: 220px;
+    --ceflow-stage-height-mobile: 158px;
+    --ceflow-stage-height-expanded: 304px;
+    --ceflow-stage-height-mobile-expanded: 228px;
     margin-top: 14px;
     padding: 10px;
     border: 1px solid #e2e8f0;
@@ -10606,19 +10606,35 @@ body.minimal-ui .wrinkle-self-list {
     font-weight: 800;
 }
 
+.ceflow-dual-pane {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.82fr);
+    gap: 10px;
+    align-items: start;
+    margin-bottom: 4px;
+}
+
 .ceflow-stage-wrap {
     display: grid;
     grid-template-columns: 96px minmax(0, 1fr) 96px;
     gap: 8px;
     align-items: stretch;
-    margin-bottom: 12px;
+    margin-bottom: 0;
     position: relative;
     z-index: 1;
 }
 
-.ceflow-stage-wrap + section {
+.ceflow-choice-panel {
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    background: #f8fbff;
+    padding: 8px;
     position: relative;
     z-index: 2;
+}
+
+.ceflow-choice-panel .ceflow-block-title {
+    margin-top: 0;
 }
 
 .ceflow-character-card {
@@ -10675,7 +10691,7 @@ body.minimal-ui .wrinkle-self-list {
     min-height: var(--ceflow-stage-height);
     height: var(--ceflow-stage-height);
     max-height: var(--ceflow-stage-height);
-    aspect-ratio: 16 / 7;
+    aspect-ratio: 16 / 8;
     overflow: auto;
 }
 
@@ -11790,6 +11806,11 @@ body.minimal-ui .wrinkle-self-list {
 }
 
 @media (max-width: 980px) {
+    .ceflow-dual-pane {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
     .ceflow-stage-wrap {
         grid-template-columns: 62px minmax(0, 1fr) 62px;
         gap: 6px;
@@ -11827,7 +11848,7 @@ body.minimal-ui .wrinkle-self-list {
         min-height: var(--ceflow-stage-height-mobile);
         height: var(--ceflow-stage-height-mobile);
         max-height: var(--ceflow-stage-height-mobile);
-        aspect-ratio: auto;
+        aspect-ratio: 16 / 8;
         padding: 8px;
     }
 
@@ -11956,6 +11977,10 @@ body.minimal-ui .wrinkle-self-list {
 
     .ceflow-context-card p {
         font-size: 0.8rem;
+    }
+
+    .ceflow-choice-panel {
+        padding: 7px;
     }
 
     .ceflow-choice-deck {
