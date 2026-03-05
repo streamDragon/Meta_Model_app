@@ -20,6 +20,7 @@
         iceberg: Object.freeze({ type: 'page', path: '/iceberg_templates_trainer.html' }),
         prismResearch: Object.freeze({ type: 'page', path: '/prism_research_trainer.html' }),
         prismLabStandalone: Object.freeze({ type: 'page', path: '/prism_lab_trainer.html' }),
+        contextRadar: Object.freeze({ type: 'page', path: '/lab/context-radar/' }),
         livingTriples: Object.freeze({ type: 'page', path: '/living_triples_trainer.html' }),
         verbUnzipStandalone: Object.freeze({ type: 'page', path: '/verb_unzip_trainer.html' }),
         sentenceMorpher: Object.freeze({ type: 'page', path: '/sentence_morpher_trainer.html' })
