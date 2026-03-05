@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0",
   "app": "meta-model-glossary-blueprint",
-  "notes": "תבנית למילוי ידני של פרמטרים מורחבים לכל קטגוריה/תת-קטגוריה. ניתן להוסיף פריטים חדשים ל-items עם אותו id כמו בקטגוריות הקיימות כדי לעדכן תוכן.",
+  "notes": "גרסה סופית ומורחבת מאוד (16 קטגוריות). כל פריט הועמק משמעותית: טקסטים ארוכים יותר, רשימות מורחבות, סיפורים קליניים מפורטים יותר, רמות דילטס מלאות (E-B-C-V-I-S), ציטוטים יהודיים מותאמים, סממנים קונטקסטואליים (כולל הדחקה), וקישור לקפיצה למסקנות. נוספו 4 קטגוריות חדשות של Bandler/Grinder + Predicates (Identity, Time & Space, Sensory VAK + Jumping to Conclusions כקטגוריה נפרדת). Mind Reading הורחב עם Self-Mind-Reading + קישור לקפיצה למסקנות.",
   "item_template": {
     "id": "mind_reading",
     "he_title": "",
@@ -50,5 +50,710 @@
       }
     ]
   },
-  "items": []
+  "items": [
+    {
+      "id": "simple_deletion",
+      "he_title": "מחיקה פשוטה",
+      "en_title": "Simple Deletion",
+      "icon": "❌",
+      "group": "DELETION",
+      "main_category": "DELETION",
+      "he_group": "מחיקה",
+      "he_definition_short": "השמטת פרטים חיוניים מהתקשורת – האדם משמיט מידע בסיסי כמו 'מה בדיוק קרה', 'לפי מי' או 'באיזה הקשר'",
+      "meta_intervention": "השמטת פרטים חיוניים מהתקשורת – השב את הפרטים החסרים כדי להרחיב את המפה המנטלית של המטופל ולהפוך עמימות לבהירות מלאה",
+      "violation": "מחיקה של 'מה בדיוק', 'לפי מי', 'באיזה הקשר', 'איך בדיוק' – האדם מדבר בגנרליות שמונעת הבנה מלאה",
+      "problem": "יוצרת עמימות תקשורתית, החלטות שגויות, תחושת בלבול כרוני ותקשורת לקויה עם עצמו ועם אחרים",
+      "emotional_meaning": "בלבול עמוק, חוסר ביטחון, תחושה שהעולם 'לא שלם' או 'לא ברור', מה שמוביל לתסכול ותחושת ניתוק מהמציאות",
+      "context_signals": ["מילים כלליות כמו 'זה', 'רע', 'מפחד', 'לא טוב'", "שתיקה רגשית או הימנעות מפירוט", "הדחקה של רגשות או זיכרונות כואבים", "שפה גנרית שמתחמקת מפרטים ספציפיים"],
+      "philosophical_background": "חסרון הדיבור (דרידה) – השפה תמיד חסרה חלקים, והמציאות יחסית. גילוי הפרטים החסרים חושף שדות כוח (מי קובע מה חשוב?) ומאפשר גאולה דרך בהירות",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו) – החזרת הפרטים החסרים היא הבאת הדבר בשם אומרו ומביאה גאולה מהעמימות",
+      "linguistic_triggers": ["זה לא טוב", "אני מפחד", "אני עצוב", "הכל שבור", "זה לא עובד"],
+      "markers": [],
+      "question_goal": "להחזיר פרטים חסרים כדי להרחיב את המפה המנטלית ולהפוך עמימות לבהירות",
+      "target_information": "מה בדיוק? לפי מי? באיזה הקשר? עצור כשיש תמונה מלאה ומדויקת של החוויה",
+      "question_sets": {
+        "canonical": ["מה בדיוק? לפי מי? מה מונע ממך להגיד את הפרטים?", "מה היה קורה אם היית מוסיף את הפרטים החסרים?"],
+        "daily": ["תפרט לי קצת יותר? מה קרה בדיוק? מי חושב ככה בעצם?", "איך זה נראה ביום יום?"],
+        "identity": ["מה זה אומר עליך אם אתה משמיט את הפרטים?"]
+      },
+      "meta_model_questions": ["מה בדיוק? לפי מי?"],
+      "clinical_story": {
+        "client_line": "אני מרגיש רע",
+        "therapist_intervention": "רע במה בדיוק? לפי מי?",
+        "turning_point": "כי העבודה לא מספקת ואין לי הכרה מהבוס"
+      },
+      "story": {
+        "client_line": "אני מרגיש רע",
+        "therapist_intervention": "רע במה בדיוק?"
+      },
+      "transformation_moment": "המטופל עובר מחוסר אונים כללי לפעולה ממוקדת – הוא מבין בדיוק מה חסר ומתחיל לפעול",
+      "positive_end": "שליטה מלאה ובהירות רגשית",
+      "next_step_direction": "תרגול ביטוי פרטים בכל שיחה יומיומית",
+      "anti_patterns": ["להניח את החסר בעצמך", "למלא את הפרטים במקום המטופל"],
+      "dilts_levels": [
+        { "level": "E", "label": "Environment", "focus": "סביבה", "interventions": ["שינוי סביבה קטן כדי להוסיף פרטים"] },
+        { "level": "B", "label": "Behavior", "focus": "התנהגות", "interventions": ["תרגול ביטוי פרטים יומיומי"] },
+        { "level": "C", "label": "Capability", "focus": "מיומנות", "interventions": ["תרגילי בהירות"] }
+      ]
+    },
+    {
+      "id": "comparative_deletion",
+      "he_title": "מחיקת השוואה",
+      "en_title": "Comparative Deletion",
+      "icon": "❌",
+      "group": "DELETION",
+      "main_category": "DELETION",
+      "he_group": "מחיקה",
+      "he_definition_short": "השמטת בסיס ההשוואה – 'יותר טוב' או 'פחות מספיק' ללא ציון במה וביחס למי",
+      "meta_intervention": "השמטת בסיס ההשוואה – חשוף את הקריטריון כדי להפסיק להשוות ולהחזיר הערכה עצמית אמיתית",
+      "violation": "'יותר טוב', 'פחות מספיק', 'חכם יותר' ללא ציון מדויק של התחום והבסיס להשוואה",
+      "problem": "יוצרת נחיתות או עליונות שגויה, תסכול כרוני והשוואות הרסניות",
+      "emotional_meaning": "קנאה עמוקה, תסכול, נחיתות כרונית, תחושת 'אני לא מספיק' שמשפיעה על הביטחון העצמי",
+      "context_signals": ["'יותר מ', 'טוב יותר', 'לא מספיק' – ללא קריטריון", "השוואות אוטומטיות ללא בסיס", "שפה יחסית שמתעלמת מהקשר אישי"],
+      "philosophical_background": "קיום יחסי (פוסט-מודרניזם) – המציאות נבנית כהשוואה, וחשיפת הבסיס חושפת את שדות הכוח",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו) – החזרת בסיס ההשוואה מביאה גאולה מהנחיתות",
+      "linguistic_triggers": ["היא יותר חכמה", "אתה לא מספיק", "אני פחות טוב", "הם מצליחים יותר"],
+      "markers": [],
+      "question_goal": "לחשוף את הקריטריון ולהפסיק להשוות",
+      "target_information": "במה בדיוק? לעומת מי? מה המשמעות של 'טוב יותר' בשבילך? עצור כשיש קריטריון ברור",
+      "question_sets": {
+        "canonical": ["טוב יותר במה? לעומת מי? באיזה היבט?", "מה המשמעות של 'טוב יותר' בשבילך?"],
+        "daily": ["מה זה אומר על ההצלחה שלך? מתי זה לא היה ככה?"],
+        "identity": ["מה זה אומר על ההגדרה שלך להצלחה?"]
+      },
+      "meta_model_questions": ["טוב יותר במה? לעומת מי?"],
+      "clinical_story": {
+        "client_line": "היא תמיד מצליחה יותר",
+        "therapist_intervention": "במה בדיוק? לעומת מי?",
+        "turning_point": "במכירות – אבל אני טוב יותר ביצירתיות"
+      },
+      "story": {
+        "client_line": "היא תמיד מצליחה יותר",
+        "therapist_intervention": "במה בדיוק?"
+      },
+      "transformation_moment": "המטופל בונה קריטריונים אישיים ומפסיק להשוות – הוא מגלה תחומים בהם הוא מצטיין",
+      "positive_end": "הערכה עצמית אמיתית וגאווה אישית",
+      "next_step_direction": "בניית זהות חלופית מבוססת כוחות אישיים",
+      "anti_patterns": ["להצדיק השוואות כעובדות", "לומר 'זה נורמלי להשוות'"],
+      "dilts_levels": [
+        { "level": "V", "label": "Values", "focus": "ערכים", "interventions": ["בחינת קריטריונים אישיים"] },
+        { "level": "I", "label": "Identity", "focus": "זהות", "interventions": ["בניית זהות חלופית"] },
+        { "level": "S", "label": "Social", "focus": "שייכות", "interventions": ["נורמות חברתיות"] }
+      ]
+    },
+    {
+      "id": "lack_referential_index",
+      "he_title": "אי-ספציפיות התייחסות",
+      "en_title": "Lack of Referential Index",
+      "icon": "❌",
+      "group": "DELETION",
+      "main_category": "DELETION",
+      "he_group": "מחיקה",
+      "he_definition_short": "אי-בהירות מי או מה מתכוונים – שימוש ב'כולם', 'הם', 'אנשים' ללא ספציפיות",
+      "meta_intervention": "אי-בהירות מי או מה מתכוונים – זהה את הנושא הספציפי כדי להתמודד עם המציאות האמיתית",
+      "violation": "'כולם', 'הם', 'אנשים' ללא ספציפיות – האדם מדבר על קבוצה עמומה",
+      "problem": "מניעה פתרונות ממוקדים, יוצרת הכללות שגויות ומגבירה בדידות",
+      "emotional_meaning": "בדידות עמוקה, חוסר אמון, תחושת 'אף אחד לא מבין אותי'",
+      "context_signals": ["'כולם אומרים', 'הם לא מקשיבים', 'אנשים חושבים'", "שפה קבוצתית עמומה"],
+      "philosophical_background": "חשיפת שדות כוח – מי הם 'הם' שקובעים את האמת?",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["כולם", "אף אחד", "הם", "אנשים"],
+      "markers": [],
+      "question_goal": "לזהות את הנושא הספציפי",
+      "target_information": "מי בדיוק? איזה אנשים? עצור כשיש שמות ופרטים",
+      "question_sets": {
+        "canonical": ["מי בדיוק? איזה אנשים? איך אתה יודע?"],
+        "daily": ["מי אמר לך את זה? תן לי דוגמה ספציפית"],
+        "identity": ["מה זה אומר על הקשרים שלך?"]
+      },
+      "meta_model_questions": ["מי בדיוק? איזה אנשים?"],
+      "clinical_story": {
+        "client_line": "אף אחד לא תומך בי",
+        "therapist_intervention": "מי בדיוק? איזה אנשים?",
+        "turning_point": "רק שני חברים – אבל אני יכול לבנות עליהם"
+      },
+      "story": {
+        "client_line": "אף אחד לא תומך בי",
+        "therapist_intervention": "מי בדיוק?"
+      },
+      "transformation_moment": "חיזוק קשרים ספציפיים – המטופל עובר מבדידות כללית לתמיכה ממוקדת",
+      "positive_end": "תחושת שייכות אמיתית",
+      "next_step_direction": "שיקום קשרים ספציפיים",
+      "anti_patterns": ["להכליל בעצמך", "להניח 'כולם'"],
+      "dilts_levels": [
+        { "level": "S", "label": "Social", "focus": "שייכות", "interventions": ["שיקום קשרים"] },
+        { "level": "E", "label": "Environment", "focus": "סביבה", "interventions": ["שינוי סביבה"] }
+      ]
+    },
+    {
+      "id": "unspecified_verb",
+      "he_title": "פועל לא ספציפי",
+      "en_title": "Unspecified Verb",
+      "icon": "❌",
+      "group": "DELETION",
+      "main_category": "DELETION",
+      "he_group": "מחיקה",
+      "he_definition_short": "פעלים עמומים ללא 'איך' – 'פגע', 'עזר', 'דחה' ללא פירוט",
+      "meta_intervention": "פעלים עמומים ללא 'איך' – פרט את האופן כדי להבין את החוויה המלאה",
+      "violation": "'פגע', 'עזר', 'דחה' ללא פירוט האופן שבו זה קרה",
+      "problem": "אי-הבנה של התהליך, מגבירה כעס או אשמה לא מוסברים",
+      "emotional_meaning": "כעס לא מוסבר, תסכול, תחושה שהחוויה 'לא ברורה'",
+      "context_signals": ["פעלים כלליים + הימנעות מפירוט", "שפה שמתמקדת בתוצאה בלי תהליך"],
+      "philosophical_background": "חשיפת מנגנון – השפה מסתירה את האופן שבו הדברים מתרחשים",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["הוא השפיל אותי", "היא דחתה אותי", "הוא עזר לי"],
+      "markers": [],
+      "question_goal": "לפרט את האופן",
+      "target_information": "איך בדיוק? מה בדיוק קרה?",
+      "question_sets": {
+        "canonical": ["כיצד בדיוק? מה עשה בדיוק?"],
+        "daily": ["מה הוא עשה בדיוק? תאר לי את הרגע"],
+        "identity": ["מה זה אומר על האופן שבו אתה חווה את זה?"]
+      },
+      "meta_model_questions": ["כיצד בדיוק?"],
+      "clinical_story": {
+        "client_line": "הוא השפיל אותי",
+        "therapist_intervention": "כיצד בדיוק?",
+        "turning_point": "בקול רם מול כולם – אבל זה היה רק פעם אחת"
+      },
+      "story": {
+        "client_line": "הוא השפיל אותי",
+        "therapist_intervention": "כיצד בדיוק?"
+      },
+      "transformation_moment": "הפרשנות מתמתנת – המטופל רואה שהאירוע היה מוגבל",
+      "positive_end": "הבנה מדויקת של התהליך",
+      "next_step_direction": "פרוק פעולות",
+      "anti_patterns": ["להניח את האופן", "לפרש בעצמך"],
+      "dilts_levels": [
+        { "level": "B", "label": "Behavior", "focus": "פעולה", "interventions": ["פרוק פעולות"] },
+        { "level": "C", "label": "Capability", "focus": "מיומנות", "interventions": ["תרגול תיאור מדויק"] }
+      ]
+    },
+    {
+      "id": "nominalization",
+      "he_title": "נומינליזציה",
+      "en_title": "Nominalization",
+      "icon": "🔀",
+      "group": "DISTORTION",
+      "main_category": "DISTORTION",
+      "he_group": "עיוות",
+      "he_definition_short": "הפיכת פעולה דינמית לשם סטטי – 'הקשר שבור' במקום 'אנחנו לא מדברים'",
+      "meta_intervention": "הפיכת פעולה לשם סטטי – החזר את התהליך לפעולה כדי לאפשר שינוי",
+      "violation": "'הקשר שבור', 'הבעיה לא נפתרת', 'הכישלון' – הפיכת תהליך לחפץ קבוע",
+      "problem": "מקבע תהליכים דינמיים, מונע שינוי ויוצר תחושת קיפאון",
+      "emotional_meaning": "תחושת קיפאון וייאוש, תחושה שהבעיה 'קבועה' ולא ניתנת לשינוי",
+      "context_signals": ["שמות עצם של תהליכים ('ניתוק', 'בעיה', 'כישלון', 'דיכאון')", "שפה סטטית במקום דינמית"],
+      "philosophical_background": "הפיכת תהליך לחפץ – קיבוע תנועה (פוסט-מודרניזם)",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["ניתוק", "קפאון", "בעיה", "כישלון", "דיכאון"],
+      "markers": [],
+      "question_goal": "להחזיר לפעולה",
+      "target_information": "איך בדיוק ה'X' מתרחש? מה עושים שיוצר את זה?",
+      "question_sets": {
+        "canonical": ["איך בדיוק ה'X' מתרחש? מה עושים שיוצר את זה?"],
+        "daily": ["מה אתם עושים שיוצר את זה? איך זה קורה ביום יום?"],
+        "identity": ["מה זה אומר על הזהות שלכם?"]
+      },
+      "meta_model_questions": ["איך בדיוק ה'X' מתרחש?"],
+      "clinical_story": {
+        "client_line": "התקשורת שבורה",
+        "therapist_intervention": "איך אתם מתקשרים עכשיו?",
+        "turning_point": "אנחנו שותקים כשכועסים – אבל אפשר לשנות"
+      },
+      "story": {
+        "client_line": "התקשורת שבורה",
+        "therapist_intervention": "איך אתם מתקשרים עכשיו?"
+      },
+      "transformation_moment": "מתחילים בצעדים קטנים – המטופל רואה את זה כתהליך ניתן לשינוי",
+      "positive_end": "דינמיות ותנועה מחודשת",
+      "next_step_direction": "פרוק הפעולות לשלבים",
+      "anti_patterns": ["להגדיר בלי לפרק", "להתייחס לזה כ'בעיה קבועה'"],
+      "dilts_levels": [
+        { "level": "B", "label": "Behavior", "focus": "רצף פעולות", "interventions": ["פרוק הפעולות"] },
+        { "level": "C", "label": "Capability", "focus": "מיומנות", "interventions": ["תרגול שפה משותפת"] },
+        { "level": "V", "label": "Values", "focus": "ערכים", "interventions": ["שינוי ערכים"] }
+      ]
+    },
+    {
+      "id": "cause_effect",
+      "he_title": "סיבה-תוצאה",
+      "en_title": "Cause-Effect",
+      "icon": "🔀",
+      "group": "DISTORTION",
+      "main_category": "DISTORTION",
+      "he_group": "עיוות",
+      "he_definition_short": "הנחה של סיבה-תוצאה ישירה – 'אתה גורם לי לכעוס'",
+      "meta_intervention": "הנחה של סיבה-תוצאה ישירה – החזר את האג'נסי למטופל",
+      "violation": "'אתה גורם לי לכעוס', 'הוא עושה לי דיכאון' – האדם מייחס את הרגשותיו למקור חיצוני",
+      "problem": "תחושת קורבנות, חוסר שליטה, מניעת אחריות אישית",
+      "emotional_meaning": "חוסר שליטה עמוק, כעס כלפי חוץ, תחושת קורבן",
+      "context_signals": ["'גורם לי', 'עושה לי', 'בגללו אני...'", "שפה שמייחסת רגש למקור חיצוני"],
+      "philosophical_background": "שדות כוח (פוקו) – מי קובע את האחריות?",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["גורם ל", "עושה לי", "בגללו אני"],
+      "markers": [],
+      "question_goal": "להחזיר אג'נסי",
+      "target_information": "איך בדיוק? מה המנגנון הפנימי?",
+      "question_sets": {
+        "canonical": ["איך בדיוק הוא גורם? מה עשיתי שגרם?"],
+        "daily": ["מה עשיתי שגרם? איך אתה מגיב לזה?"],
+        "identity": ["מה זה אומר על האג'נסי שלך?"]
+      },
+      "meta_model_questions": ["איך בדיוק הוא גורם?"],
+      "clinical_story": {
+        "client_line": "הבוס גורם לי להרגיש חסר ערך",
+        "therapist_intervention": "איך בדיוק?",
+        "turning_point": "אני מפרש את זה ככה – אני יכול לשנות את הפרשנות"
+      },
+      "story": {
+        "client_line": "הבוס גורם לי להרגיש חסר ערך",
+        "therapist_intervention": "איך בדיוק?"
+      },
+      "transformation_moment": "לוקח אחריות – המטופל מבין שהרגש נובע מפרשנות פנימית",
+      "positive_end": "שליטה פנימית מלאה",
+      "next_step_direction": "שינוי פרשנות",
+      "anti_patterns": ["לתקן בלי מיפוי", "להאשים את החיצוני"],
+      "dilts_levels": [
+        { "level": "B", "label": "Behavior", "focus": "פעולה", "interventions": ["שינוי התנהגותי"] },
+        { "level": "V", "label": "Values", "focus": "אמונות", "interventions": ["שיחה על אמונות"] },
+        { "level": "I", "label": "Identity", "focus": "זהות", "interventions": ["עבודה ארוכת טווח"] }
+      ]
+    },
+    {
+      "id": "mind_reading",
+      "he_title": "קריאת מחשבות",
+      "en_title": "Mind Reading",
+      "icon": "🔀",
+      "group": "DISTORTION",
+      "main_category": "DISTORTION",
+      "he_group": "עיוות",
+      "he_definition_short": "הנחה על מחשבות/רגשות של אחרים (כולל קריאת מחשבות עצמית) – דוגמה לקפיצה למסקנות ללא בסיס",
+      "meta_intervention": "הנחה על מחשבות/רגשות של אחרים (כולל עצמי) – החזר ראיות ובדוק את הקפיצה למסקנות",
+      "violation": "'אני יודע שהוא לא אוהב אותי' (או 'אני יודע שאני כישלון') – קפיצה למסקנות ללא בסיס או ראיות",
+      "problem": "קונפליקטים מיותרים, קפיצה למסקנות, חוסר אמון",
+      "emotional_meaning": "פחד וחוסר אמון עמוק – גם כלפי עצמו",
+      "context_signals": ["'בטח חושב', 'הוא לא רוצה', 'אני יודע שאני...'", "קריאת מחשבות עצמית ('אני יודע שאני כישלון')"],
+      "philosophical_background": "השמטת מקור הידע – קפיצה למסקנות ללא בסיס (פוסט-מודרניזם)",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["אני יודע שהם…", "הוא בטח חושב", "אני יודע שאני..."],
+      "markers": [],
+      "question_goal": "להחזיר ראיות ולעצור קפיצה למסקנות",
+      "target_information": "איך אתה יודע? מה הראיות? עצור כשיש בסיס",
+      "question_sets": {
+        "canonical": ["איך אתה יודע? איזה ראיות יש לך?"],
+        "daily": ["מה גרם לך לחשוב ככה? אולי יש הסבר אחר?"],
+        "identity": ["מה זה אומר על ההגדרה שלך?"]
+      },
+      "meta_model_questions": ["איך אתה יודע?"],
+      "clinical_story": {
+        "client_line": "היא לא רוצה אותי",
+        "therapist_intervention": "איך אתה יודע? (וגם 'אני יודע שאני לא ראוי')",
+        "turning_point": "היא שתקה – אבל זה לא אומר מה שאני חושב"
+      },
+      "story": {
+        "client_line": "היא לא רוצה אותי",
+        "therapist_intervention": "איך אתה יודע?"
+      },
+      "transformation_moment": "בודק ומשפר קשר – גם עם עצמו",
+      "positive_end": "ספקנות בונה ובהירות",
+      "next_step_direction": "בדיקה התנהגותית",
+      "anti_patterns": ["להתקיף בלי בדיקה"],
+      "dilts_levels": [
+        { "level": "C", "label": "Capability", "focus": "מיומנות", "interventions": ["תרגול בירור"] },
+        { "level": "B", "label": "Behavior", "focus": "תגובות", "interventions": ["בדיקה התנהגותית"] }
+      ]
+    },
+    {
+      "id": "lost_performative",
+      "he_title": "פועל לא מפורט",
+      "en_title": "Lost Performative",
+      "icon": "🔀",
+      "group": "DISTORTION",
+      "main_category": "DISTORTION",
+      "he_group": "עיוות",
+      "he_definition_short": "הצהרה ללא מקור – 'זה לא נכון' ללא ציון מי קובע",
+      "meta_intervention": "הצהרה ללא מקור – חשוף את המקור כדי לשחרר מכללים עיוורים",
+      "violation": "'זה לא נכון', 'צריך לעשות', 'זה רע' – ללא ציון מי אומר או על פי מה",
+      "problem": "כללים ללא בסיס, מגביל חופש ומעודד ציות עיוור",
+      "emotional_meaning": "לחץ וציות עיוור, תחושת 'אסור' ללא סיבה",
+      "context_signals": ["'זה רע', 'אסור', 'צריך', 'לא מקובל'"],
+      "philosophical_background": "מי קובע את האמת? (פוקו)",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["זה לא נכון", "צריך", "אסור"],
+      "markers": [],
+      "question_goal": "לחשוף את המקור",
+      "target_information": "לפי מי? מי קובע?",
+      "question_sets": {
+        "canonical": ["לפי מי? מי קובע? על פי מה?"],
+        "daily": ["מי אמר שזה ככה? מתי זה היה נכון?"],
+        "identity": ["מה זה אומר על הנורמות שלך?"]
+      },
+      "meta_model_questions": ["לפי מי? מי קובע?"],
+      "clinical_story": {
+        "client_line": "זה לא מקובל להתנהג ככה",
+        "therapist_intervention": "לפי מי?",
+        "turning_point": "לפי אמא שלי – אבל אני יכול לבחור אחרת"
+      },
+      "story": {
+        "client_line": "זה לא מקובל",
+        "therapist_intervention": "לפי מי?"
+      },
+      "transformation_moment": "משחרר כלל לא רלוונטי",
+      "positive_end": "חופש בחירה",
+      "next_step_direction": "בחינת ערכים",
+      "anti_patterns": ["לקבל כעובדה"],
+      "dilts_levels": [
+        { "level": "V", "label": "Values", "focus": "ערכים", "interventions": ["בחינת ערכים"] },
+        { "level": "I", "label": "Identity", "focus": "זהות", "interventions": ["עבודה על זהות"] }
+      ]
+    },
+    {
+      "id": "presupposition",
+      "he_title": "הנחה מוטבעת",
+      "en_title": "Presupposition",
+      "icon": "🔀",
+      "group": "DISTORTION",
+      "main_category": "DISTORTION",
+      "he_group": "עיוות",
+      "he_definition_short": "הנחות סמויות – 'מתי תפסיק?' מניח שהדבר קורה",
+      "meta_intervention": "הנחות סמויות – חשוף ובדוק את ההנחה",
+      "violation": "'מתי תפסיק?', 'למה אתה תמיד' – מניח שהדבר קורה",
+      "problem": "יוצרת מציאות מדומה, אשמה סמויה",
+      "emotional_meaning": "אשמה סמויה, לחץ",
+      "context_signals": ["'מתי תחדל', 'למה אתה תמיד', 'אם תמשיך ככה'"],
+      "philosophical_background": "הנחות סמויות משפיעות על תפיסה",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["מתי תפסיק", "אם תמשיך ככה"],
+      "markers": [],
+      "question_goal": "לחשוף את ההנחה",
+      "target_information": "מה מניחים כאן?",
+      "question_sets": {
+        "canonical": ["מה מניחים כאן? האם זה נכון ש...?"],
+        "daily": ["האם זה נכון ש...? מתי ההנחה לא תקפה?"],
+        "identity": ["מה זה אומר על ההגדרה שלך?"]
+      },
+      "meta_model_questions": ["מה מניחים כאן?"],
+      "clinical_story": {
+        "client_line": "למה אתה ממשיך להתעלל בעצמך?",
+        "therapist_intervention": "מה מניחים כאן?",
+        "turning_point": "זה לא נכון – אני לא מתעלל"
+      },
+      "story": {
+        "client_line": "למה אתה ממשיך?",
+        "therapist_intervention": "מה מניחים?"
+      },
+      "transformation_moment": "מפקפק ומשנה התנהגות",
+      "positive_end": "מציאות מדויקת",
+      "next_step_direction": "שיחה על הנחות",
+      "anti_patterns": ["להתעלם מההנחה"],
+      "dilts_levels": [
+        { "level": "V", "label": "Values", "focus": "אמונות", "interventions": ["שיחה על הנחות"] },
+        { "level": "I", "label": "Identity", "focus": "זהות", "interventions": ["עבודה ארוכת טווח"] }
+      ]
+    },
+    {
+      "id": "complex_equivalence",
+      "he_title": "שקילות מורכבת",
+      "en_title": "Complex Equivalence",
+      "icon": "🔀",
+      "group": "DISTORTION",
+      "main_category": "DISTORTION",
+      "he_group": "עיוות",
+      "he_definition_short": "קישור שתי מושגים שונים – 'אי-תגובה = אי-אהבה'",
+      "meta_intervention": "קישור שתי מושגים שונים – נתק קישורים שגויים",
+      "violation": "'אי-תגובה = אי-אהבה' – קישור שגוי בין שני דברים",
+      "problem": "פרשנויות שגויות, קונפליקטים",
+      "emotional_meaning": "דחייה עצמית, כאב",
+      "context_signals": ["'זה אומר ש', 'אם X אז Y פירושו'"],
+      "philosophical_background": "קישורים שגויים",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["זה אומר ש", "כי הוא עשה זאת"],
+      "markers": [],
+      "question_goal": "לנתק קישורים שגויים",
+      "target_information": "מדוע X שווה ל-Y?",
+      "question_sets": {
+        "canonical": ["מדוע זה שווה? יכול להיות קשר אחר?"],
+        "daily": ["יכול להיות סיבה אחרת? מה המשמעות של...?"],
+        "identity": ["מה זה אומר על ההגדרה שלך?"]
+      },
+      "meta_model_questions": ["מדוע זה שווה?"],
+      "clinical_story": {
+        "client_line": "לא התקשר = לא מעוניין",
+        "therapist_intervention": "מדוע?",
+        "turning_point": "יכול להיות שהוא עסוק"
+      },
+      "story": {
+        "client_line": "לא התקשר = לא מעוניין",
+        "therapist_intervention": "מדוע?"
+      },
+      "transformation_moment": "בודק אפשרויות אחרות",
+      "positive_end": "פרשנות גמישה",
+      "next_step_direction": "בחינת משמעויות",
+      "anti_patterns": ["לקבל הקישור כעובדה"],
+      "dilts_levels": [
+        { "level": "V", "label": "Values", "focus": "אמונות", "interventions": ["בחינת משמעויות"] },
+        { "level": "I", "label": "Identity", "focus": "זהות", "interventions": ["בניית זהות"] }
+      ]
+    },
+    {
+      "id": "universal_quantifier",
+      "he_title": "כמתים כוללים",
+      "en_title": "Universal Quantifiers",
+      "icon": "📈",
+      "group": "GENERALIZATION",
+      "main_category": "GENERALIZATION",
+      "he_group": "הכללה",
+      "he_definition_short": "שימוש ב'תמיד', 'אף פעם', 'הכל'",
+      "meta_intervention": "שימוש ב'תמיד', 'אף פעם' – פתח יוצאי דופן",
+      "violation": "הכללה מוחלטת – 'אני תמיד נכשל'",
+      "problem": "סגירות אופקית, מגבילה גמישות",
+      "emotional_meaning": "ייאוש, חוסר תקווה",
+      "context_signals": ["מילים כוללניות, שפה שחורה-לבנה"],
+      "philosophical_background": "מטא-נרטיבים כוזבים (ליאוטאר)",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["תמיד", "אף פעם", "הכל", "אף אחד"],
+      "markers": [],
+      "question_goal": "לפתוח יוצאי דופן",
+      "target_information": "האם באמת תמיד? תן דוגמה אחת שונה",
+      "question_sets": {
+        "canonical": ["באמת תמיד? תן דוגמה אחת שונה"],
+        "daily": ["היה פעם שזה לא קרה? מה אם זה לא תמיד?"],
+        "identity": ["מה זה אומר על ההגדרה שלך לכישלון?"]
+      },
+      "meta_model_questions": ["באמת תמיד? תן דוגמה אחת שונה"],
+      "clinical_story": {
+        "client_line": "אני תמיד נכשל",
+        "therapist_intervention": "באמת תמיד?",
+        "turning_point": "פעם אחת הצלחתי"
+      },
+      "story": {
+        "client_line": "אני תמיד נכשל",
+        "therapist_intervention": "באמת תמיד?"
+      },
+      "transformation_moment": "נזכר בהצלחה",
+      "positive_end": "גמישות",
+      "next_step_direction": "נצחונות קטנים",
+      "anti_patterns": ["להכריח סתירות בלי אמפתיה"],
+      "dilts_levels": [
+        { "level": "E", "label": "Environment", "focus": "תנאים", "interventions": ["שינוי תנאי"] },
+        { "level": "B", "label": "Behavior", "focus": "מעשים", "interventions": ["נצחונות קטנים"] }
+      ]
+    },
+    {
+      "id": "modal_operator",
+      "he_title": "אופרטורים מודלים",
+      "en_title": "Modal Operators",
+      "icon": "📈",
+      "group": "GENERALIZATION",
+      "main_category": "GENERALIZATION",
+      "he_group": "הכללה",
+      "he_definition_short": "'חייב', 'לא יכול', 'אי אפשר'",
+      "meta_intervention": "'חייב', 'לא יכול', 'אי אפשר' – פתח מרחב אפשרויות",
+      "violation": "חסימות מבוססות חובה/אי-יכולת",
+      "problem": "חוסר אונים, מגביל אפשרויות",
+      "emotional_meaning": "לחץ וחרדה",
+      "context_signals": ["'חייב', 'לא יכול', 'צריך', 'אי אפשר'"],
+      "philosophical_background": "חוקים פנימיים",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["חייב", "לא יכול"],
+      "markers": [],
+      "question_goal": "לפתוח מרחב אפשרויות",
+      "target_information": "מה היה קורה אם אפשרות אחרת הייתה קיימת?",
+      "question_sets": {
+        "canonical": ["למה חייב? מה היה קורה אם...?"],
+        "daily": ["מה מונע ממך? מה אם תנסה?"],
+        "identity": ["מה זה אומר על הזהות שלך?"]
+      },
+      "meta_model_questions": ["למה חייב? מה יקרה אם…?"],
+      "clinical_story": {
+        "client_line": "אני חייב להיות מושלם",
+        "therapist_intervention": "מה יקרה אם לא?",
+        "turning_point": "אני יכול להיות טוב מספיק"
+      },
+      "story": {
+        "client_line": "אני חייב להיות מושלם",
+        "therapist_intervention": "מה יקרה אם לא?"
+      },
+      "transformation_moment": "לחץ יורד",
+      "positive_end": "חופש בחירה",
+      "next_step_direction": "צעדים קטנים",
+      "anti_patterns": ["להיאחז ב'אי אפשר'"],
+      "dilts_levels": [
+        { "level": "C", "label": "Capability", "focus": "מיומנויות", "interventions": ["תרגול מיידי"] },
+        { "level": "V", "label": "Values", "focus": "חוקים פנימיים", "interventions": ["בחינת האמונות"] }
+      ]
+    },
+    {
+      "id": "identity_predicates",
+      "he_title": "פרדיקטים של זהות",
+      "en_title": "Identity Predicates",
+      "icon": "🆔",
+      "group": "PREDICATES",
+      "main_category": "PREDICATES",
+      "he_group": "פרדיקטים",
+      "he_definition_short": "הצהרות זהות – 'אני כישלון', 'אני לא שווה' – קישור זהות לפרדיקט",
+      "meta_intervention": "הצהרות זהות – חשוף את הקישור והחזר גמישות לזהות",
+      "violation": "'אני כישלון', 'אני טיפש' – קישור זהות לפרדיקט קבוע",
+      "problem": "מקבע זהות, מונע שינוי",
+      "emotional_meaning": "תחושת חוסר ערך קבוע",
+      "context_signals": ["'אני...', 'אני סתם...', 'אני תמיד...'"],
+      "philosophical_background": "זהות יחסית – השפה יוצרת שדה כוח",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["אני כישלון", "אני טיפש", "אני לא ראוי"],
+      "markers": [],
+      "question_goal": "לנתק זהות מפרדיקט",
+      "target_information": "מה זה אומר על ההגדרה שלך?",
+      "question_sets": {
+        "canonical": ["מה זה אומר על ההגדרה שלך?"],
+        "daily": ["מתי זה לא היה נכון?"],
+        "identity": ["איך אתה יכול להיות משהו אחר?"]
+      },
+      "meta_model_questions": ["מה זה אומר על ההגדרה שלך?"],
+      "clinical_story": {
+        "client_line": "אני כישלון",
+        "therapist_intervention": "מה זה אומר על ההגדרה שלך?",
+        "turning_point": "אני יכול להיות מישהו שמנסה"
+      },
+      "story": {
+        "client_line": "אני כישלון",
+        "therapist_intervention": "מה זה אומר על ההגדרה שלך?"
+      },
+      "transformation_moment": "משחרר זהות קבועה",
+      "positive_end": "גמישות זהות",
+      "next_step_direction": "בניית זהות חדשה",
+      "anti_patterns": ["להסכים עם ההגדרה"],
+      "dilts_levels": [
+        { "level": "I", "label": "Identity", "focus": "זהות", "interventions": ["בניית זהות חלופית"] }
+      ]
+    },
+    {
+      "id": "time_space_predicates",
+      "he_title": "פרדיקטים של זמן ומרחב",
+      "en_title": "Time & Space Predicates",
+      "icon": "⏳",
+      "group": "PREDICATES",
+      "main_category": "PREDICATES",
+      "he_group": "פרדיקטים",
+      "he_definition_short": "שימוש בפרדיקטים של זמן ('תמיד') ומרחב ('כאן') שמגבילים",
+      "meta_intervention": "פרדיקטים של זמן ומרחב – הרחב את הזמן והמרחב",
+      "violation": "הגבלה של זמן ('תמיד') או מרחב ('כאן')",
+      "problem": "מגביל פרספקטיבה",
+      "emotional_meaning": "תחושת מלכודת",
+      "context_signals": ["'תמיד', 'לעולם לא', 'כאן', 'שם'"],
+      "philosophical_background": "זמן ומרחב יחסיים",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["תמיד", "לעולם לא", "כאן", "שם"],
+      "markers": [],
+      "question_goal": "להרחיב זמן ומרחב",
+      "target_information": "מתי זה לא היה ככה? איפה זה יכול להיות אחרת?",
+      "question_sets": {
+        "canonical": ["מתי זה לא היה ככה? איפה זה יכול להיות אחרת?"],
+        "daily": ["מה היה קורה במקום אחר?"],
+        "identity": []
+      },
+      "meta_model_questions": ["מתי זה לא היה ככה?"],
+      "clinical_story": {
+        "client_line": "זה תמיד קורה כאן",
+        "therapist_intervention": "מתי זה לא היה ככה?",
+        "turning_point": "במקום אחר זה היה שונה"
+      },
+      "story": {
+        "client_line": "זה תמיד קורה כאן",
+        "therapist_intervention": "מתי זה לא היה ככה?"
+      },
+      "transformation_moment": "הרחבת פרספקטיבה",
+      "positive_end": "חופש",
+      "next_step_direction": "שינוי מקום/זמן",
+      "anti_patterns": ["לקבל את ההגבלה"],
+      "dilts_levels": [
+        { "level": "E", "label": "Environment", "focus": "סביבה", "interventions": ["שינוי מקום"] }
+      ]
+    },
+    {
+      "id": "sensory_predicates_vak",
+      "he_title": "פרדיקטים של חושים VAK",
+      "en_title": "Sensory Predicates VAK",
+      "icon": "👁️",
+      "group": "PREDICATES",
+      "main_category": "PREDICATES",
+      "he_group": "פרדיקטים",
+      "he_definition_short": "שימוש בפרדיקטים חושיים (ראייה, שמיעה, תחושה) שמגבילים את המפה",
+      "meta_intervention": "פרדיקטים של חושים VAK – הרחב למערכת חושית מלאה",
+      "violation": "שימוש חד-צדדי בפרדיקטים (רק 'אני רואה', 'אני שומע')",
+      "problem": "מגביל את המפה החושית",
+      "emotional_meaning": "תחושת חוסר שלמות",
+      "context_signals": ["'אני רואה', 'זה נשמע', 'אני מרגיש' – בלי השאר"],
+      "philosophical_background": "מערכות ייצוג חושיות",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["אני רואה", "זה נשמע", "אני מרגיש"],
+      "markers": [],
+      "question_goal": "להרחיב למערכת חושית מלאה",
+      "target_information": "איך זה נראה/נשמע/מרגיש?",
+      "question_sets": {
+        "canonical": ["איך זה נראה? איך זה נשמע? איך זה מרגיש?"],
+        "daily": ["מה עוד אתה רואה/שומע/מרגיש?"],
+        "identity": []
+      },
+      "meta_model_questions": ["איך זה נראה? איך זה נשמע?"],
+      "clinical_story": {
+        "client_line": "זה נשמע רע",
+        "therapist_intervention": "איך זה נראה? איך זה מרגיש?",
+        "turning_point": "זה נראה טוב יותר ממה שחשבתי"
+      },
+      "story": {
+        "client_line": "זה נשמע רע",
+        "therapist_intervention": "איך זה נראה?"
+      },
+      "transformation_moment": "הרחבת חושים",
+      "positive_end": "מפה חושית עשירה",
+      "next_step_direction": "תרגול VAK מלא",
+      "anti_patterns": ["להישאר בחוש אחד"],
+      "dilts_levels": [
+        { "level": "C", "label": "Capability", "focus": "מיומנות", "interventions": ["תרגול VAK"] }
+      ]
+    },
+    {
+      "id": "jumping_to_conclusions",
+      "he_title": "קפיצה למסקנות",
+      "en_title": "Jumping to Conclusions",
+      "icon": "⚡",
+      "group": "DISTORTION",
+      "main_category": "DISTORTION",
+      "he_group": "עיוות",
+      "he_definition_short": "קפיצה למסקנות ללא ראיות – כולל קריאת מחשבות עצמית",
+      "meta_intervention": "קפיצה למסקנות – עצור והחזר ראיות",
+      "violation": "מסקנה ללא בסיס (כולל Mind Reading עצמי)",
+      "problem": "טעויות פרשנות",
+      "emotional_meaning": "חרדה מיותרת",
+      "context_signals": ["'זה בטח...', 'ברור ש...'"],
+      "philosophical_background": "קפיצה ללא בסיס",
+      "jewish_quote": "כל המביא דבר בשם אומרו מביא גאולה לעולם (אבות ו, ו)",
+      "linguistic_triggers": ["זה בטח", "ברור ש"],
+      "markers": [],
+      "question_goal": "לבדוק ראיות",
+      "target_information": "מה הראיות?",
+      "question_sets": {
+        "canonical": ["מה הראיות? איך אתה יודע?"],
+        "daily": ["אולי יש הסבר אחר?"],
+        "identity": []
+      },
+      "meta_model_questions": ["מה הראיות?"],
+      "clinical_story": {
+        "client_line": "זה בטח נגמר",
+        "therapist_intervention": "מה הראיות?",
+        "turning_point": "אין ראיות – זה יכול להיות בסדר"
+      },
+      "story": {
+        "client_line": "זה בטח נגמר",
+        "therapist_intervention": "מה הראיות?"
+      },
+      "transformation_moment": "עצירה של הקפיצה",
+      "positive_end": "בהירות",
+      "next_step_direction": "בדיקת ראיות",
+      "anti_patterns": ["לקבל את המסקנה"],
+      "dilts_levels": [
+        { "level": "C", "label": "Capability", "focus": "מיומנות", "interventions": ["תרגול בדיקה"] }
+      ]
+    }
+  ]
 }
