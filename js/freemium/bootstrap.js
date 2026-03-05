@@ -164,11 +164,11 @@ function stripAuthHashTokens() {
 }
 
 function createQuotaRequestId(source = 'ui') {
-    const prefix = String(source || 'ui').replace(/[^a-z0-9_-]/gi, '').toLowerCase() || 'ui';
     if (typeof globalThis.crypto?.randomUUID === 'function') {
-        return `${prefix}:${globalThis.crypto.randomUUID()}`;
+        return globalThis.crypto.randomUUID();
     }
-    return `${prefix}:${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    const segment = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).slice(1);
+    return `${segment()}${segment()}-${segment()}-4${segment().slice(1)}-a${segment().slice(1)}-${segment()}${segment()}${segment()}`;
 }
 
 function isDebugModeEnabled() {
@@ -226,7 +226,7 @@ function appendDebugLog(message) {
 }
 
 async function runDebugConsume(count = 1, requestId = '', source = 'debug') {
-    const normalizedCount = Math.max(1, Number(count) || 1);
+    const normalizedCount = Math.max(1, Math.min(100, Math.floor(Number(count) || 1)));
     const normalizedRequestId = String(requestId || '').trim() || createQuotaRequestId(source);
     const result = await consumeSentence({
         count: normalizedCount,
@@ -592,7 +592,7 @@ function bindStatusBarActions() {
 async function consumeSentenceOrPrompt(options = {}) {
     if (freemiumState.isBusy) return false;
 
-    const count = Math.max(1, Number(options.count) || 1);
+    const count = Math.max(1, Math.min(100, Math.floor(Number(options.count) || 1)));
     const source = String(options.source || 'app').trim() || 'app';
     const requestId = String(options.requestId || '').trim() || createQuotaRequestId(source);
 
@@ -653,7 +653,7 @@ function exposeApi() {
         getAuthSnapshot: () => getAuthSnapshot(),
         consumeSentenceOrPrompt,
         debugConsume: async (options = {}) => {
-            const count = Math.max(1, Number(options?.count || 1) || 1);
+            const count = Math.max(1, Math.min(100, Math.floor(Number(options?.count || 1) || 1)));
             const requestId = String(options?.requestId || '').trim();
             const source = String(options?.source || 'debug-api').trim() || 'debug-api';
             return runDebugConsume(count, requestId, source);

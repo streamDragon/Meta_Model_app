@@ -7,6 +7,7 @@ const GUEST_FINGERPRINT_KEY = 'meta_guest_fingerprint_v1';
 const SIGNED_OUT_USER_KEY = '__signed_out__';
 const GUEST_FREE_LIMIT = 10;
 const FREE_PACK_TOTAL = 60;
+const UUID_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i;
 
 const entitlementsRuntime = {
     entitlements: null,
@@ -195,27 +196,45 @@ function normalizeRefreshOptions(optionsOrReason = {}) {
     };
 }
 
+function normalizePositiveCost(value, fallback = 1) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return Math.max(1, Number(fallback) || 1);
+    return Math.max(1, Math.min(100, Math.floor(parsed)));
+}
+
 function normalizeConsumeOptions(countOrOptions = 1) {
     if (typeof countOrOptions === 'object' && countOrOptions !== null) {
         return {
-            count: Math.max(1, Number(countOrOptions.count ?? countOrOptions.cost ?? 1) || 1),
+            count: normalizePositiveCost(countOrOptions.count ?? countOrOptions.cost ?? 1, 1),
             requestId: String(countOrOptions.requestId || '').trim(),
             source: String(countOrOptions.source || 'sentence').trim() || 'sentence'
         };
     }
     return {
-        count: Math.max(1, Number(countOrOptions) || 1),
+        count: normalizePositiveCost(countOrOptions, 1),
         requestId: '',
         source: 'sentence'
     };
 }
 
 function createConsumeRequestId(source = 'sentence') {
-    const prefix = String(source || 'sentence').replace(/[^a-z0-9_-]/gi, '').toLowerCase() || 'sentence';
     if (typeof globalThis.crypto?.randomUUID === 'function') {
-        return `${prefix}:${globalThis.crypto.randomUUID()}`;
+        return globalThis.crypto.randomUUID();
     }
-    return `${prefix}:${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+    const segment = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).slice(1);
+    return `${segment()}${segment()}-${segment()}-4${segment().slice(1)}-a${segment().slice(1)}-${segment()}${segment()}${segment()}`;
+}
+
+function normalizeConsumeRequestId(requestId, source = 'sentence') {
+    const raw = String(requestId || '').trim();
+    if (!raw) return createConsumeRequestId(source);
+
+    const uuidMatch = raw.match(UUID_PATTERN);
+    if (uuidMatch && uuidMatch[0]) {
+        return uuidMatch[0].toLowerCase();
+    }
+
+    return raw.replace(/\s+/g, '_').slice(0, 120) || createConsumeRequestId(source);
 }
 
 function toRpcRow(data) {
@@ -396,7 +415,7 @@ async function fetchGuestEntitlements(supabase, guestFingerprint) {
 }
 
 async function runLegacyConsumeSentence(supabase, session, count = 1, requestId = '') {
-    const pCount = Math.max(1, Number(count) || 1);
+    const pCount = normalizePositiveCost(count, 1);
     const { data, error } = await supabase.rpc('consume_sentence', { p_count: pCount });
     if (error) {
         const reason = parseLegacyQuotaError(error);
@@ -508,7 +527,7 @@ async function runAuthenticatedConsume(supabase, session, parsed, requestId) {
 
 async function runConsumeSentence(options = {}) {
     const parsed = normalizeConsumeOptions(options);
-    const requestId = parsed.requestId || createConsumeRequestId(parsed.source);
+    const requestId = normalizeConsumeRequestId(parsed.requestId, parsed.source);
 
     if (!isSupabaseConfigured()) {
         return {
@@ -600,7 +619,7 @@ export async function refreshEntitlements(optionsOrReason = {}) {
 
 export async function consumeSentence(countOrOptions = 1) {
     const options = normalizeConsumeOptions(countOrOptions);
-    const requestId = options.requestId || createConsumeRequestId(options.source);
+    const requestId = normalizeConsumeRequestId(options.requestId, options.source);
 
     if (entitlementsRuntime.consumeInFlightByRequestId.has(requestId)) {
         return entitlementsRuntime.consumeInFlightByRequestId.get(requestId);
