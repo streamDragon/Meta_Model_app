@@ -106,6 +106,11 @@ header p {
     pointer-events: none;
 }
 
+body.mobile-sticky-cta-visible .app-version-floating,
+body.alchemy-mobile-ui .app-version-floating {
+    display: none !important;
+}
+
 body.embed-mode .app-version-floating,
 body.force-mobile-view .app-version-floating {
     left: 8px;
@@ -114,7 +119,7 @@ body.force-mobile-view .app-version-floating {
     font-size: 0.74rem;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 900px) {
     .app-version-floating {
         display: none;
     }
@@ -1814,6 +1819,45 @@ a.breen-reference-cell:hover {
 .glossary-card:hover {
     transform: none;
     box-shadow: 0 8px 14px rgba(15, 23, 42, 0.1);
+}
+
+.glossary-category {
+    padding: 0;
+    overflow: hidden;
+}
+
+.glossary-category-summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 12px 14px 10px;
+    display: grid;
+    gap: 6px;
+    position: relative;
+}
+
+.glossary-category-summary::-webkit-details-marker {
+    display: none;
+}
+
+.glossary-category-summary::after {
+    content: '\25BE';
+    position: absolute;
+    left: 12px;
+    top: 14px;
+    color: #2563eb;
+    font-size: 0.86rem;
+    font-weight: 900;
+    transition: transform 160ms ease;
+}
+
+.glossary-category[open] .glossary-category-summary::after {
+    transform: rotate(180deg);
+}
+
+.glossary-category-body {
+    padding: 0 14px 14px;
+    display: grid;
+    gap: 8px;
 }
 
 .glossary-card-head {

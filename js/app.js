@@ -216,6 +216,7 @@ const MOBILE_FEED_TICKER_INTERVAL_MS = 3600;
 const MOBILE_FEED_SEARCH_DEBOUNCE_MS = 90;
 const MOBILE_STICKY_CTA_ID = 'mobile-sticky-cta';
 const MOBILE_STICKY_CTA_POLL_INTERVAL_MS = 2200;
+const MOBILE_STICKY_DISABLED_TABS = Object.freeze(new Set(['home', 'debug', 'categories']));
 
 let unzipEmbedRuntime = {
     loaded: false,
@@ -3213,9 +3214,12 @@ function isEligibleStickyActionButton(button) {
     if (!isElementActuallyVisible(button)) return false;
     if (button.closest(`#${MOBILE_STICKY_CTA_ID}`)) return false;
     if (button.closest('.feature-home-back-bar')) return false;
+    if (button.closest('.screen-read-guide')) return false;
+    if (button.closest('.global-theory-launcher')) return false;
     const text = normalizeUiText(button.textContent || '');
     if (!text) return false;
     if (/חזרה|back/i.test(text)) return false;
+    if (/קרא\/?י לפני|דיאלוג טיפולי|תיאוריה|קטגוריות/i.test(text)) return false;
     return true;
 }
 
@@ -3245,7 +3249,8 @@ function setMobileStickyCtaVisibility(isVisible) {
 
 function updateMobileStickyCta(tabName = '') {
     const activeTab = normalizeRequestedTab(tabName) || getCurrentActiveTabName();
-    if (!isMobileViewportMode() || !activeTab || activeTab === 'home' || activeTab === 'debug') {
+    syncGlobalTheoryLauncherVisibility(activeTab);
+    if (!isMobileViewportMode() || !activeTab || MOBILE_STICKY_DISABLED_TABS.has(activeTab)) {
         mobileExperienceRuntime.stickyPrimaryTarget = null;
         setMobileStickyCtaVisibility(false);
         return;
@@ -4610,6 +4615,15 @@ async function setupCodexTrapWordLab() {
 
 let hasInitializedApp = false;
 
+function syncGlobalTheoryLauncherVisibility(tabName = '') {
+    const launcher = document.getElementById('global-theory-launcher');
+    if (!launcher) return;
+    const resolvedTab = normalizeRequestedTab(tabName) || getCurrentActiveTabName();
+    const shouldHide = isMobileViewportMode() || resolvedTab === 'categories';
+    launcher.classList.toggle('is-hidden-context', shouldHide);
+    launcher.setAttribute('aria-hidden', shouldHide ? 'true' : 'false');
+}
+
 function setupGlobalTheoryLauncher() {
     if (document.getElementById('global-theory-launcher')) return;
     if (!document.body) return;
@@ -4646,13 +4660,14 @@ function setupGlobalTheoryLauncher() {
                 outline: 2px solid #facc15;
                 outline-offset: 2px;
             }
-            @media (max-width: 720px) {
+            .global-theory-launcher.is-hidden-context {
+                opacity: 0;
+                pointer-events: none;
+                transform: translateY(8px) scale(0.96);
+            }
+            @media (max-width: 900px) {
                 .global-theory-launcher {
-                    left: 8px;
-                    bottom: 8px;
-                    min-height: 40px;
-                    padding: 8px 12px;
-                    font-size: 0.86rem;
+                    display: none !important;
                 }
             }
         `;
@@ -4682,6 +4697,7 @@ function setupGlobalTheoryLauncher() {
     });
 
     document.body.appendChild(btn);
+    syncGlobalTheoryLauncherVisibility(getCurrentActiveTabName());
 }
 
 function setupGlobalCollapsedHelpDetails() {
@@ -5098,6 +5114,9 @@ function activateTabByName(tabName = '', { playSound = false, scrollToTop = true
     if (resolvedTab === 'comic-engine') {
         ensureComicEngineFlowReady();
     }
+    if (resolvedTab === 'categories') {
+        collapseAllGlossaryCategories(document.getElementById('categories-container'));
+    }
 
     if (resolvedTab !== 'practice-radar') {
         setRapidPatternFocusMode(false);
@@ -5120,6 +5139,7 @@ function activateTabByName(tabName = '', { playSound = false, scrollToTop = true
 
     syncHomeMobileFeedMode(resolvedTab);
     updateMobileStickyCta(resolvedTab);
+    syncGlobalTheoryLauncherVisibility(resolvedTab);
 
     if (scrollToTop) {
         scrollPageToTop();
@@ -5926,39 +5946,67 @@ function buildGlossaryConceptCard(item = {}) {
     const storyEmpty = !storyClient && !storyIntervention && !transformation && !positiveEnd && !nextStep;
 
     return `
-        <article class="category-card glossary-card ${escapeHtml(getGlossaryGroupClass(groupEn))}" data-glossary-id="${escapeHtml(String(item.id || ''))}">
-            <div class="glossary-card-head">
-                <h3>${escapeHtml(title)}</h3>
-                <div class="glossary-pills">
-                    ${groupHe ? `<span class="glossary-pill glossary-pill-he">${escapeHtml(groupHe)}</span>` : ''}
-                    ${groupEn ? `<span class="glossary-pill glossary-pill-en">${escapeHtml(groupEn)}</span>` : ''}
+        <details class="category-card glossary-card glossary-category ${escapeHtml(getGlossaryGroupClass(groupEn))}" data-glossary-id="${escapeHtml(String(item.id || ''))}">
+            <summary class="glossary-category-summary">
+                <div class="glossary-card-head">
+                    <h3>${escapeHtml(title)}</h3>
+                    <div class="glossary-pills">
+                        ${groupHe ? `<span class="glossary-pill glossary-pill-he">${escapeHtml(groupHe)}</span>` : ''}
+                        ${groupEn ? `<span class="glossary-pill glossary-pill-en">${escapeHtml(groupEn)}</span>` : ''}
+                    </div>
                 </div>
+            </summary>
+            <div class="glossary-category-body">
+                ${definition ? `<p class="glossary-definition">${escapeHtml(definition)}</p>` : ''}
+
+                <details class="glossary-layer">
+                    <summary>הסיפור הקליני + נקודת השינוי</summary>
+                    <div class="glossary-layer-body">
+                        ${storyClient ? `<p><strong>משפט מטופל:</strong> ${escapeHtml(storyClient)}</p>` : ''}
+                        ${storyIntervention ? `<p><strong>התערבות מטפל:</strong> ${escapeHtml(storyIntervention)}</p>` : ''}
+                        ${transformation ? `<p><strong>רגע טרנספורמציה:</strong> ${escapeHtml(transformation)}</p>` : ''}
+                        ${positiveEnd ? `<p><strong>סיום חיובי:</strong> ${escapeHtml(positiveEnd)}</p>` : ''}
+                        ${nextStep ? `<p><strong>המשך:</strong> ${escapeHtml(nextStep)}</p>` : ''}
+                        ${storyEmpty ? '<p>הרחבה קלינית מלאה תתווסף בהמשך. בינתיים התקדמו דרך הדוגמאות והשאלות של התבנית.</p>' : ''}
+                    </div>
+                </details>
+
+                <details class="glossary-layer">
+                    <summary>דוגמאות</summary>
+                    <div class="glossary-layer-body">${markersHtml}</div>
+                </details>
+
+                <details class="glossary-layer">
+                    <summary>שאלות מטא־מודל</summary>
+                    <div class="glossary-layer-body">${questionsHtml}</div>
+                </details>
             </div>
-            ${definition ? `<p class="glossary-definition">${escapeHtml(definition)}</p>` : ''}
-
-            <details class="glossary-layer" open>
-                <summary>הסיפור הקליני + נקודת השינוי</summary>
-                <div class="glossary-layer-body">
-                    ${storyClient ? `<p><strong>משפט מטופל:</strong> ${escapeHtml(storyClient)}</p>` : ''}
-                    ${storyIntervention ? `<p><strong>התערבות מטפל:</strong> ${escapeHtml(storyIntervention)}</p>` : ''}
-                    ${transformation ? `<p><strong>רגע טרנספורמציה:</strong> ${escapeHtml(transformation)}</p>` : ''}
-                    ${positiveEnd ? `<p><strong>סיום חיובי:</strong> ${escapeHtml(positiveEnd)}</p>` : ''}
-                    ${nextStep ? `<p><strong>המשך:</strong> ${escapeHtml(nextStep)}</p>` : ''}
-                    ${storyEmpty ? '<p>הרחבה קלינית מלאה תתווסף בהמשך. בינתיים התקדמו דרך הדוגמאות והשאלות של התבנית.</p>' : ''}
-                </div>
-            </details>
-
-            <details class="glossary-layer">
-                <summary>דוגמאות</summary>
-                <div class="glossary-layer-body">${markersHtml}</div>
-            </details>
-
-            <details class="glossary-layer">
-                <summary>שאלות מטא־מודל</summary>
-                <div class="glossary-layer-body">${questionsHtml}</div>
-            </details>
-        </article>
+        </details>
     `;
+}
+
+function collapseAllGlossaryCategories(root = null) {
+    const host = root || document;
+    if (!host || !host.querySelectorAll) return;
+    host.querySelectorAll('details.glossary-category[open]').forEach((detailsEl) => {
+        detailsEl.open = false;
+    });
+}
+
+function setupGlossarySingleCategoryBehavior(root = null) {
+    const host = root && root instanceof HTMLElement ? root : null;
+    if (!host || host.dataset.glossarySingleBound === 'true') return;
+    host.dataset.glossarySingleBound = 'true';
+
+    host.addEventListener('toggle', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLDetailsElement)) return;
+        if (!target.classList.contains('glossary-category')) return;
+        if (!target.open) return;
+        host.querySelectorAll('details.glossary-category[open]').forEach((detailsEl) => {
+            if (detailsEl !== target) detailsEl.open = false;
+        });
+    });
 }
 
 function renderGlossaryColumn(columnKey = '', concepts = []) {
@@ -6013,6 +6061,8 @@ function populateCategories() {
         .map((item) => buildGlossaryConceptCard(item))
         .join('');
     container.appendChild(orderedList);
+    setupGlossarySingleCategoryBehavior(orderedList);
+    collapseAllGlossaryCategories(orderedList);
 }
 
 // Populate Category Select in Practice Mode
@@ -16269,6 +16319,7 @@ const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
         title: 'המברגה ביד של הילד',
         level: 'Snap -> Choice',
         role: 'אבא',
+        contextIntro: 'אתה חוזר עייף, עוד רגע צריך לצאת, ובבית בלגן של כלים פתוחים. הילד נוגע בדיוק במה שהכי מסוכן עכשיו.',
         stakes: 'אתה עייף, מאחר לעבודה, וכלי העבודה חדים ומסוכנים.',
         trigger: 'הילד שולף שוב את המברגה מתוך הארגז.',
         dominantEmotion: 'פחד + עצבנות + עייפות',
@@ -16311,6 +16362,7 @@ const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
         title: 'באג לפני השקה',
         level: 'Snap -> Choice',
         role: 'מנהל צוות',
+        contextIntro: 'ההשקה באופק, הראש עמוס, וכל דקה מרגישה כמו הפסד אמיתי. בדיוק אז מגיע עדכון שהבאג הקריטי עוד חי.',
         stakes: 'ההשקה בעוד שעה והלקוח מחכה לעדכון.',
         trigger: 'מפתח מודיע שהבאג הקריטי עדיין פתוח.',
         dominantEmotion: 'לחץ + פחד מכישלון',
@@ -16353,6 +16405,7 @@ const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
         title: 'איחור לאיסוף מהגן',
         level: 'Snap -> Choice',
         role: 'בן/בת זוג',
+        contextIntro: 'היום כבר היה צפוף, ועכשיו הילד מחכה בגן. המסר שמגיע מרגיש כמו עוד לבנה על הגב.',
         stakes: 'הילד מחכה בגן ואתם כבר על הקצה.',
         trigger: 'מגיע מסרון: "אני שוב מאחר/ת, תסתדר/י".',
         dominantEmotion: 'עלבון + עומס',
@@ -16394,6 +16447,7 @@ const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
         title: 'כיתה רועשת לפני מבחן',
         level: 'Snap -> Choice',
         role: 'מורה',
+        contextIntro: 'יש מבחן עוד רגע, אתה מנסה לאסוף את הכיתה, והרעש רק עולה. כל שנייה מרגישה כמו איבוד שליטה.',
         stakes: 'עוד 10 דקות מתחיל מבחן והכיתה לא מתכנסת.',
         trigger: 'שני תלמידים ממשיכים לדבר למרות שביקשת שקט.',
         dominantEmotion: 'כעס + חוסר אונים',
@@ -16435,6 +16489,7 @@ const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
         title: 'לקוח דורש החזר מיידי',
         level: 'Snap -> Choice',
         role: 'נציג/ת שירות',
+        contextIntro: 'עמדה עמוסה, תור מאחור, והלקוח שמולך רותח. אתה צריך לפתור מהר בלי להתפוצץ חזרה.',
         stakes: 'לקוח כועס בפומבי והמותג בסיכון.',
         trigger: 'הלקוח אומר "תזכה אותי עכשיו או שאני מעלה פוסט".',
         dominantEmotion: 'לחץ + הגנתיות',
@@ -16476,6 +16531,7 @@ const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
         title: 'תרופה שנשכחה',
         level: 'Snap -> Choice',
         role: 'בן/בת משפחה מטפל/ת',
+        contextIntro: 'אתה מחזיק הכול יחד כבר תקופה ארוכה, בלי הרבה אוויר. שוב אותה הודעה שהתרופה נשכחה, והלב קופץ.',
         stakes: 'הבריאות של ההורה תלויה בתזכורת עקבית.',
         trigger: 'שומעים שוב: "שכחתי לקחת את התרופה".',
         dominantEmotion: 'דאגה + תשישות',
@@ -16609,8 +16665,10 @@ function ceflowNormContext(raw) {
     const distractors = Array.isArray(source?.distractors)
         ? source.distractors.map(v => ceflowNormalizeCopy(v, '')).filter(Boolean).slice(0, 4)
         : [];
+    const contextIntro = ceflowNormalizeCopy(source?.contextIntro || source?.context_intro || source?.intro || '', '');
     const defaultSnap = CEFLOW_NATURAL_CHOICE_COPY.angry.say || 'די... אני לא יכול עכשיו עם זה.';
     return {
+        contextIntro,
         role: ceflowNormalizeCopy(source?.role, 'אדם תחת לחץ'),
         stakes: ceflowNormalizeCopy(source?.stakes, 'יש מחיר מיידי לדרך שבה תגיב/י עכשיו.'),
         trigger: ceflowNormalizeCopy(source?.trigger, 'משהו קטן מפעיל תגובת Snap אוטומטית.'),
@@ -17327,17 +17385,23 @@ async function setupComicEngine2({ force = false } = {}) {
 
     const renderContext = () => {
         const context = currentScenario()?.context || {};
+        const role = context.role || 'אדם תחת לחץ';
+        const stakes = context.stakes || 'יש מחיר מיידי לדרך שבה תגיב/י עכשיו.';
+        const trigger = context.trigger || 'משהו קטן מפעיל תגובת Snap אוטומטית.';
+        const emotion = context.dominantEmotion || 'לחץ';
+        const snap = context.snapLine || CEFLOW_NATURAL_CHOICE_COPY.angry.say;
+        const intro = context.contextIntro || `את/ה בתפקיד ${role}, ובדקה הזו הכול צפוף ומהיר.`;
         if (els.contextMain) {
-            els.contextMain.textContent = `תפקיד: ${context.role || 'אדם תחת לחץ'}`;
+            els.contextMain.textContent = intro;
         }
         if (els.contextStakes) {
-            els.contextStakes.textContent = `למה זה חשוב עכשיו: ${context.stakes || ''}`;
+            els.contextStakes.textContent = `מה מונח על השולחן עכשיו: ${stakes}`;
         }
         if (els.contextTrigger) {
-            els.contextTrigger.textContent = `טריגר: ${context.trigger || ''} | רגש מוביל: ${context.dominantEmotion || 'לחץ'}`;
+            els.contextTrigger.textContent = `מה הדליק את הרגע: ${trigger} כרגע זה מרגיש כמו ${emotion}.`;
         }
         if (els.contextSnap) {
-            els.contextSnap.textContent = `משפט אוטומטי שעלול להיפלט: "${context.snapLine || CEFLOW_NATURAL_CHOICE_COPY.angry.say}"`;
+            els.contextSnap.textContent = `המשפט שעלול לברוח אוטומטית: "${snap}"`;
         }
     };
 
