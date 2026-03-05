@@ -4,6 +4,7 @@ let metaModelGlossaryData = { items: [] };
 let metaModelPatternLibraryData = { patterns: [] };
 let metaModelGlossaryConfigData = null;
 let metaModelGlossaryBlueprintData = { items: [] };
+let glossaryConceptIndex = new Map();
 let practiceCount = 0;
 let currentStatementIndex = 0;
 const MAX_STREAK_CHARGES = 3;
@@ -123,6 +124,8 @@ let audioState = {
     lastGlobalTapAtMs: 0,
     globalInteractionBound: false,
     floatingControlsBound: false,
+    floatingScrollFadeTimer: null,
+    floatingAutoDockTimer: null,
     audioSafetyBound: false
 };
 
@@ -632,16 +635,77 @@ function clampAudioControlPosition(button, left, top) {
     const rect = button.getBoundingClientRect();
     const width = Math.max(42, Math.round(rect.width || button.offsetWidth || 58));
     const height = Math.max(42, Math.round(rect.height || button.offsetHeight || 58));
+    const bottomOffset = isMobileViewportMode() ? getFloatingAudioBottomOffsetPx() : 0;
     const maxLeft = Math.max(8, window.innerWidth - width - 8);
-    const maxTop = Math.max(8, window.innerHeight - height - 8);
+    const maxTop = Math.max(8, window.innerHeight - height - 8 - bottomOffset);
     return {
         left: Math.min(maxLeft, Math.max(8, Math.round(Number(left) || 8))),
         top: Math.min(maxTop, Math.max(8, Math.round(Number(top) || 8)))
     };
 }
 
+function getFloatingAudioBottomOffsetPx() {
+    if (!isMobileViewportMode()) return 0;
+    let offset = 0;
+
+    if (document.body?.classList.contains('mobile-sticky-cta-visible')) {
+        const stickyCta = document.getElementById(MOBILE_STICKY_CTA_ID);
+        if (stickyCta && !stickyCta.classList.contains('hidden')) {
+            const rect = stickyCta.getBoundingClientRect();
+            const visibleHeight = Math.max(0, Math.min(window.innerHeight, rect.bottom) - Math.max(0, rect.top));
+            offset += Math.max(0, Math.round(visibleHeight + 10));
+        } else {
+            offset += 88;
+        }
+    }
+
+    const vv = window.visualViewport;
+    if (vv && Number.isFinite(vv.height) && vv.height > 0) {
+        const keyboardInset = Math.max(0, Math.round((window.innerHeight || 0) - vv.height - 4));
+        if (keyboardInset > 36) {
+            offset += keyboardInset;
+        }
+    }
+
+    return Math.max(0, offset);
+}
+
+function syncFloatingAudioSafeZone() {
+    const offset = getFloatingAudioBottomOffsetPx();
+    document.documentElement.style.setProperty('--audio-floating-bottom-offset', `${offset}px`);
+}
+
+function fadeFloatingAudioControlsDuringScroll() {
+    if (!isMobileViewportMode()) return;
+    const controls = document.querySelectorAll('.audio-floating-control');
+    if (!controls.length) return;
+    controls.forEach((node) => node.classList.add('is-scroll-faded'));
+    if (audioState.floatingScrollFadeTimer) {
+        clearTimeout(audioState.floatingScrollFadeTimer);
+        audioState.floatingScrollFadeTimer = null;
+    }
+    audioState.floatingScrollFadeTimer = setTimeout(() => {
+        controls.forEach((node) => node.classList.remove('is-scroll-faded'));
+        audioState.floatingScrollFadeTimer = null;
+    }, 190);
+}
+
+function releaseMobileAudioDockIfNotPinned() {
+    if (!isMobileViewportMode()) return;
+    ['music-toggle-btn', 'audio-master-mute-btn'].forEach((id) => {
+        const button = document.getElementById(id);
+        if (!button) return;
+        if (button.dataset.dragPinned === 'true') return;
+        button.style.left = '';
+        button.style.top = '';
+        button.style.right = '';
+        button.style.bottom = '';
+    });
+}
+
 function applyStoredAudioControlPosition(button, key) {
     if (!button || !key) return;
+    if (isMobileViewportMode()) return;
     const positions = readAudioControlPositions();
     const saved = positions[key];
     if (!saved || !Number.isFinite(Number(saved.left)) || !Number.isFinite(Number(saved.top))) return;
@@ -700,6 +764,7 @@ function bindAudioControlDrag(button, key) {
             button.style.top = `${clamped.top}px`;
             button.style.right = 'auto';
             button.style.bottom = 'auto';
+            button.dataset.dragPinned = 'true';
             persistAudioControlPosition(key, clamped.left, clamped.top);
             suppressClickAfterDrag();
         }
@@ -757,6 +822,19 @@ function setupFloatingAudioControls() {
     if (audioState.floatingControlsBound) return;
     audioState.floatingControlsBound = true;
 
+    const scheduleSafeZoneSync = (delay = 0) => {
+        if (audioState.floatingAutoDockTimer) {
+            clearTimeout(audioState.floatingAutoDockTimer);
+            audioState.floatingAutoDockTimer = null;
+        }
+        audioState.floatingAutoDockTimer = setTimeout(() => {
+            syncFloatingAudioSafeZone();
+            releaseMobileAudioDockIfNotPinned();
+            remapOnResize();
+            audioState.floatingAutoDockTimer = null;
+        }, Math.max(0, Number(delay) || 0));
+    };
+
     const remapOnResize = () => {
         ['music-toggle-btn', 'audio-master-mute-btn'].forEach((id) => {
             const button = document.getElementById(id);
@@ -772,7 +850,24 @@ function setupFloatingAudioControls() {
         });
     };
 
-    window.addEventListener('resize', remapOnResize, { passive: true });
+    window.addEventListener('resize', () => scheduleSafeZoneSync(0), { passive: true });
+    window.addEventListener('scroll', () => {
+        fadeFloatingAudioControlsDuringScroll();
+        scheduleSafeZoneSync(120);
+    }, { passive: true });
+
+    const visualViewport = window.visualViewport;
+    if (visualViewport) {
+        visualViewport.addEventListener('resize', () => scheduleSafeZoneSync(0), { passive: true });
+        visualViewport.addEventListener('scroll', () => scheduleSafeZoneSync(0), { passive: true });
+    }
+
+    if (window.MutationObserver && document.body) {
+        const observer = new MutationObserver(() => scheduleSafeZoneSync(0));
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    scheduleSafeZoneSync(0);
 }
 
 function setupMusicToggleButton() {
@@ -1489,6 +1584,7 @@ function setupGlobalRevealFeedback() {
     const registerAction = (event) => {
         const trigger = findRevealActionButton(event.target);
         if (!trigger) return;
+        if (trigger.closest('.categories-glossary-ordered-list')) return;
         revealFeedbackState.lastActionAt = Date.now();
         revealFeedbackState.lastActionButton = trigger;
         applyActionButtonVisualState(trigger, { sticky: false });
@@ -1504,6 +1600,10 @@ function setupGlobalRevealFeedback() {
     document.addEventListener('toggle', (event) => {
         const details = event.target;
         if (!(details instanceof Element) || details.tagName !== 'DETAILS') return;
+        if (details.closest('.categories-glossary-ordered-list')) {
+            clearOpenedContentFeedback(details);
+            return;
+        }
         const summary = details.querySelector(':scope > summary');
         if (!summary) return;
         revealFeedbackState.lastActionAt = Date.now();
@@ -6052,14 +6152,7 @@ function collectGlossaryConcepts() {
     return sortGlossaryConceptsByRequiredOrder(Array.from(byId.values()).map((item) => enrichGlossaryConceptDepth(item)));
 }
 
-function buildGlossaryConceptCard(item = {}) {
-    const heTitle = normalizeUiText(String(item.he_title || item.hebrew || item.en_title || item.id || 'מושג').trim());
-    const enTitle = normalizeUiText(String(item.en_title || '').trim());
-    const title = heTitle && enTitle ? `${heTitle} — ${enTitle}` : (heTitle || enTitle || 'מושג');
-    const icon = normalizeUiText(String(item.icon || '').trim());
-    const mainCategory = normalizeUiText(String(item.main_category || '').trim());
-    const groupHe = normalizeUiText(String(item.he_group || '').trim());
-    const groupEn = normalizeUiText(String(item.group || '').trim());
+function buildGlossaryConceptBody(item = {}) {
     const definition = normalizeUiText(String(item.he_definition_short || item.definition || '').trim());
     const metaIntervention = normalizeUiText(String(item.meta_intervention || '').trim());
     const violation = normalizeUiText(String(item.violation || '').trim());
@@ -6126,7 +6219,90 @@ function buildGlossaryConceptCard(item = {}) {
     const mapSectionEmpty = !violation && !problem && !emotionalMeaning && !philosophicalBackground && !jewishQuote;
 
     return `
-        <details class="category-card glossary-card glossary-category ${escapeHtml(getGlossaryGroupClass(groupEn))}" data-glossary-id="${escapeHtml(String(item.id || ''))}">
+        ${definition ? `<p class="glossary-definition">${escapeHtml(definition)}</p>` : ''}
+        ${metaIntervention ? `<p><strong>התערבות מטא-מודל:</strong> ${escapeHtml(metaIntervention)}</p>` : ''}
+
+        <details class="glossary-layer">
+            <summary>מפת פרמטרים מלאה</summary>
+            <div class="glossary-layer-body">
+                ${violation ? `<p><strong>הפרה:</strong> ${escapeHtml(violation)}</p>` : ''}
+                ${problem ? `<p><strong>הבעיה:</strong> ${escapeHtml(problem)}</p>` : ''}
+                ${emotionalMeaning ? `<p><strong>משמעות רגשית:</strong> ${escapeHtml(emotionalMeaning)}</p>` : ''}
+                ${philosophicalBackground ? `<p><strong>רקע פילוסופי:</strong> ${escapeHtml(philosophicalBackground)}</p>` : ''}
+                ${jewishQuote ? `<p><strong>ציטוט יהודי:</strong> ${escapeHtml(jewishQuote)}</p>` : ''}
+                ${mapSectionEmpty ? '<p>שדות ההפרה/בעיה/משמעות/פילוסופיה יוזנו בהמשך.</p>' : ''}
+            </div>
+        </details>
+
+        <details class="glossary-layer">
+            <summary>סממנים לשוניים וקונטקסטואליים</summary>
+            <div class="glossary-layer-body">
+                <p><strong>סממנים:</strong></p>
+                ${contextSignalsHtml}
+                <p><strong>טריגרים לשוניים:</strong></p>
+                ${triggerHtml}
+            </div>
+        </details>
+
+        <details class="glossary-layer">
+            <summary>הסיפור הקליני + נקודת השינוי</summary>
+            <div class="glossary-layer-body">
+                ${storyClient ? `<p><strong>משפט מטופל:</strong> ${escapeHtml(storyClient)}</p>` : ''}
+                ${storyIntervention ? `<p><strong>התערבות מטפל:</strong> ${escapeHtml(storyIntervention)}</p>` : ''}
+                ${transformation ? `<p><strong>רגע טרנספורמציה:</strong> ${escapeHtml(transformation)}</p>` : ''}
+                ${positiveEnd ? `<p><strong>סיום חיובי:</strong> ${escapeHtml(positiveEnd)}</p>` : ''}
+                ${nextStep ? `<p><strong>המשך:</strong> ${escapeHtml(nextStep)}</p>` : ''}
+                ${storyEmpty ? '<p>הרחבה קלינית מלאה תתווסף בהמשך. בינתיים התקדמו דרך הדוגמאות והשאלות של התבנית.</p>' : ''}
+            </div>
+        </details>
+
+        <details class="glossary-layer">
+            <summary>דוגמאות</summary>
+            <div class="glossary-layer-body">${markersHtml}</div>
+        </details>
+
+        <details class="glossary-layer">
+            <summary>מטרת שאלות + אוסף שאלות</summary>
+            <div class="glossary-layer-body">
+                ${questionGoal ? `<p><strong>מטרת השאלות:</strong> ${escapeHtml(questionGoal)}</p>` : ''}
+                ${targetInformation ? `<p><strong>מידע שאנחנו רוצים להשיג:</strong> ${escapeHtml(targetInformation)}</p>` : ''}
+                <p><strong>שאלות קאנוניות:</strong></p>
+                ${questionsCanonicalHtml}
+                <p><strong>שאלות יומיומיות:</strong></p>
+                ${questionsDailyHtml}
+                <p><strong>שאלות זהות / Identity:</strong></p>
+                ${questionsIdentityHtml}
+                <p><strong>מאגר שאלות כללי:</strong></p>
+                ${questionsHtml}
+            </div>
+        </details>
+
+        <details class="glossary-layer">
+            <summary>אנטי-פאטרנים + רמות נוירולוגיות</summary>
+            <div class="glossary-layer-body">
+                <p><strong>אנטי-פאטרנים:</strong></p>
+                ${antiPatternsHtml}
+                <p><strong>רמות נוירולוגיות (דילטס) + התערבויות:</strong></p>
+                ${diltsHtml}
+            </div>
+        </details>
+    `;
+}
+
+function buildGlossaryConceptCard(item = {}, { lazyBody = false } = {}) {
+    const heTitle = normalizeUiText(String(item.he_title || item.hebrew || item.en_title || item.id || 'מושג').trim());
+    const enTitle = normalizeUiText(String(item.en_title || '').trim());
+    const title = heTitle && enTitle ? `${heTitle} — ${enTitle}` : (heTitle || enTitle || 'מושג');
+    const icon = normalizeUiText(String(item.icon || '').trim());
+    const mainCategory = normalizeUiText(String(item.main_category || '').trim());
+    const groupHe = normalizeUiText(String(item.he_group || '').trim());
+    const groupEn = normalizeUiText(String(item.group || '').trim());
+    const normalizedId = normalizeGlossaryConceptId(item.id || '') || normalizeUiText(String(item.id || '').trim());
+    const bodyMarkup = lazyBody ? '' : buildGlossaryConceptBody(item);
+    const lazyAttr = lazyBody ? ' data-glossary-lazy="true"' : '';
+
+    return `
+        <details class="category-card glossary-card glossary-category ${escapeHtml(getGlossaryGroupClass(groupEn))}" data-glossary-id="${escapeHtml(normalizedId)}">
             <summary class="glossary-category-summary">
                 <div class="glossary-card-head">
                     <h3>${icon ? `${escapeHtml(icon)} ` : ''}${escapeHtml(title)}</h3>
@@ -6137,83 +6313,40 @@ function buildGlossaryConceptCard(item = {}) {
                     </div>
                 </div>
             </summary>
-            <div class="glossary-category-body">
-                ${definition ? `<p class="glossary-definition">${escapeHtml(definition)}</p>` : ''}
-                ${metaIntervention ? `<p><strong>התערבות מטא-מודל:</strong> ${escapeHtml(metaIntervention)}</p>` : ''}
-
-                <details class="glossary-layer">
-                    <summary>מפת פרמטרים מלאה</summary>
-                    <div class="glossary-layer-body">
-                        ${violation ? `<p><strong>הפרה:</strong> ${escapeHtml(violation)}</p>` : ''}
-                        ${problem ? `<p><strong>הבעיה:</strong> ${escapeHtml(problem)}</p>` : ''}
-                        ${emotionalMeaning ? `<p><strong>משמעות רגשית:</strong> ${escapeHtml(emotionalMeaning)}</p>` : ''}
-                        ${philosophicalBackground ? `<p><strong>רקע פילוסופי:</strong> ${escapeHtml(philosophicalBackground)}</p>` : ''}
-                        ${jewishQuote ? `<p><strong>ציטוט יהודי:</strong> ${escapeHtml(jewishQuote)}</p>` : ''}
-                        ${mapSectionEmpty ? '<p>שדות ההפרה/בעיה/משמעות/פילוסופיה יוזנו בהמשך.</p>' : ''}
-                    </div>
-                </details>
-
-                <details class="glossary-layer">
-                    <summary>סממנים לשוניים וקונטקסטואליים</summary>
-                    <div class="glossary-layer-body">
-                        <p><strong>סממנים:</strong></p>
-                        ${contextSignalsHtml}
-                        <p><strong>טריגרים לשוניים:</strong></p>
-                        ${triggerHtml}
-                    </div>
-                </details>
-
-                <details class="glossary-layer">
-                    <summary>הסיפור הקליני + נקודת השינוי</summary>
-                    <div class="glossary-layer-body">
-                        ${storyClient ? `<p><strong>משפט מטופל:</strong> ${escapeHtml(storyClient)}</p>` : ''}
-                        ${storyIntervention ? `<p><strong>התערבות מטפל:</strong> ${escapeHtml(storyIntervention)}</p>` : ''}
-                        ${transformation ? `<p><strong>רגע טרנספורמציה:</strong> ${escapeHtml(transformation)}</p>` : ''}
-                        ${positiveEnd ? `<p><strong>סיום חיובי:</strong> ${escapeHtml(positiveEnd)}</p>` : ''}
-                        ${nextStep ? `<p><strong>המשך:</strong> ${escapeHtml(nextStep)}</p>` : ''}
-                        ${storyEmpty ? '<p>הרחבה קלינית מלאה תתווסף בהמשך. בינתיים התקדמו דרך הדוגמאות והשאלות של התבנית.</p>' : ''}
-                    </div>
-                </details>
-
-                <details class="glossary-layer">
-                    <summary>דוגמאות</summary>
-                    <div class="glossary-layer-body">${markersHtml}</div>
-                </details>
-
-                <details class="glossary-layer">
-                    <summary>מטרת שאלות + אוסף שאלות</summary>
-                    <div class="glossary-layer-body">
-                        ${questionGoal ? `<p><strong>מטרת השאלות:</strong> ${escapeHtml(questionGoal)}</p>` : ''}
-                        ${targetInformation ? `<p><strong>מידע שאנחנו רוצים להשיג:</strong> ${escapeHtml(targetInformation)}</p>` : ''}
-                        <p><strong>שאלות קאנוניות:</strong></p>
-                        ${questionsCanonicalHtml}
-                        <p><strong>שאלות יומיומיות:</strong></p>
-                        ${questionsDailyHtml}
-                        <p><strong>שאלות זהות / Identity:</strong></p>
-                        ${questionsIdentityHtml}
-                        <p><strong>מאגר שאלות כללי:</strong></p>
-                        ${questionsHtml}
-                    </div>
-                </details>
-
-                <details class="glossary-layer">
-                    <summary>אנטי-פאטרנים + רמות נוירולוגיות</summary>
-                    <div class="glossary-layer-body">
-                        <p><strong>אנטי-פאטרנים:</strong></p>
-                        ${antiPatternsHtml}
-                        <p><strong>רמות נוירולוגיות (דילטס) + התערבויות:</strong></p>
-                        ${diltsHtml}
-                    </div>
-                </details>
-            </div>
+            <div class="glossary-category-body"${lazyAttr}>${bodyMarkup}</div>
         </details>
     `;
+}
+
+function hydrateGlossaryCategoryCard(detailsEl) {
+    if (!(detailsEl instanceof HTMLElement)) return;
+    if (detailsEl.dataset.glossaryHydrated === 'true') return;
+    const body = detailsEl.querySelector(':scope > .glossary-category-body');
+    if (!body) return;
+    const rawId = normalizeUiText(String(detailsEl.dataset.glossaryId || '').trim());
+    const conceptId = normalizeGlossaryConceptId(rawId);
+    const concept = (conceptId && glossaryConceptIndex.get(conceptId))
+        || (rawId && glossaryConceptIndex.get(rawId))
+        || null;
+    if (!concept) return;
+    body.innerHTML = buildGlossaryConceptBody(concept);
+    detailsEl.dataset.glossaryHydrated = 'true';
+    body.removeAttribute('data-glossary-lazy');
+}
+
+function collapseGlossarySubLayers(categoryDetails = null) {
+    if (!(categoryDetails instanceof HTMLElement)) return;
+    categoryDetails.querySelectorAll('details[open]').forEach((detailsEl) => {
+        if (detailsEl === categoryDetails) return;
+        detailsEl.open = false;
+    });
 }
 
 function collapseAllGlossaryCategories(root = null) {
     const host = root || document;
     if (!host || !host.querySelectorAll) return;
-    host.querySelectorAll('details.glossary-category[open]').forEach((detailsEl) => {
+    host.querySelectorAll('details.glossary-category').forEach((detailsEl) => {
+        collapseGlossarySubLayers(detailsEl);
         detailsEl.open = false;
     });
 }
@@ -6227,9 +6360,15 @@ function setupGlossarySingleCategoryBehavior(root = null) {
         const target = event.target;
         if (!(target instanceof HTMLDetailsElement)) return;
         if (!target.classList.contains('glossary-category')) return;
-        if (!target.open) return;
-        host.querySelectorAll('details.glossary-category[open]').forEach((detailsEl) => {
-            if (detailsEl !== target) detailsEl.open = false;
+        if (!target.open) {
+            collapseGlossarySubLayers(target);
+            return;
+        }
+        hydrateGlossaryCategoryCard(target);
+        host.querySelectorAll('details.glossary-category').forEach((detailsEl) => {
+            if (detailsEl === target) return;
+            collapseGlossarySubLayers(detailsEl);
+            detailsEl.open = false;
         });
     });
 }
@@ -6242,7 +6381,7 @@ function renderGlossaryColumn(columnKey = '', concepts = []) {
         .sort((a, b) => String(a.he_title || '').localeCompare(String(b.he_title || ''), 'he'));
 
     const cardsHtml = items.length
-        ? items.map((item) => buildGlossaryConceptCard(item)).join('')
+        ? items.map((item) => buildGlossaryConceptCard(item, { lazyBody: true })).join('')
         : '<div class="card glossary-column-empty">אין קטגוריות להצגה בעמודה זו.</div>';
 
     return `
@@ -6282,8 +6421,16 @@ function populateCategories() {
 
     const orderedList = document.createElement('section');
     orderedList.className = 'categories-glossary-ordered-list';
-    orderedList.innerHTML = sortGlossaryConceptsByRequiredOrder(glossaryItems)
-        .map((item) => buildGlossaryConceptCard(item))
+    const orderedConcepts = sortGlossaryConceptsByRequiredOrder(glossaryItems);
+    glossaryConceptIndex = new Map();
+    orderedConcepts.forEach((item) => {
+        const normalizedId = normalizeGlossaryConceptId(item?.id || '');
+        const rawId = normalizeUiText(String(item?.id || '').trim());
+        if (normalizedId) glossaryConceptIndex.set(normalizedId, item);
+        if (rawId && !glossaryConceptIndex.has(rawId)) glossaryConceptIndex.set(rawId, item);
+    });
+    orderedList.innerHTML = orderedConcepts
+        .map((item) => buildGlossaryConceptCard(item, { lazyBody: true }))
         .join('');
     container.appendChild(orderedList);
     setupGlossarySingleCategoryBehavior(orderedList);

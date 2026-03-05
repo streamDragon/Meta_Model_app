@@ -1824,6 +1824,8 @@ a.breen-reference-cell:hover {
 .glossary-category {
     padding: 0;
     overflow: hidden;
+    content-visibility: auto;
+    contain-intrinsic-size: 110px;
 }
 
 .glossary-category-summary {
@@ -1858,6 +1860,10 @@ a.breen-reference-cell:hover {
     padding: 0 14px 14px;
     display: grid;
     gap: 8px;
+}
+
+.glossary-category-body[data-glossary-lazy="true"] {
+    min-height: 0;
 }
 
 .glossary-card-head {
@@ -8485,6 +8491,7 @@ a:hover {
     user-select: none;
     cursor: grab;
     z-index: 1400;
+    will-change: transform, opacity;
     transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
@@ -8504,9 +8511,14 @@ a:hover {
     transform: scale(1.04);
 }
 
+.audio-fab.is-scroll-faded {
+    opacity: 0.28;
+    transform: translateY(10px) scale(0.95);
+}
+
 .music-toggle-btn {
-    inset-inline-end: calc(16px + var(--safe-right));
-    bottom: calc(16px + var(--safe-bottom));
+    right: calc(16px + var(--safe-right));
+    bottom: calc(16px + var(--safe-bottom) + var(--audio-floating-bottom-offset, 0px));
     background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
     color: #fff;
     box-shadow: 0 11px 26px rgba(14, 116, 144, 0.34);
@@ -8528,8 +8540,8 @@ a:hover {
 }
 
 .audio-master-mute-btn {
-    inset-inline-end: calc(116px + var(--safe-right));
-    bottom: calc(16px + var(--safe-bottom));
+    right: calc(116px + var(--safe-right));
+    bottom: calc(16px + var(--safe-bottom) + var(--audio-floating-bottom-offset, 0px));
     background: linear-gradient(135deg, #0f766e, #14b8a6);
     color: #ffffff;
     box-shadow: 0 11px 26px rgba(13, 148, 136, 0.34);
@@ -8551,27 +8563,28 @@ a:hover {
 
 @media (max-width: 768px) {
     .audio-fab {
-        width: 82px;
-        height: 52px;
-        padding: 0 8px;
+        width: 56px;
+        height: 50px;
+        padding: 0 6px;
+        border-radius: 16px;
     }
 
     .audio-fab-icon {
-        font-size: 1.04rem;
+        font-size: 1rem;
     }
 
     .audio-fab-label {
-        font-size: 0.64rem;
+        display: none;
     }
 
     .music-toggle-btn {
-        inset-inline-end: calc(12px + var(--safe-right));
-        bottom: calc(12px + var(--safe-bottom));
+        right: calc(12px + var(--safe-right));
+        bottom: calc(12px + var(--safe-bottom) + var(--audio-floating-bottom-offset, 0px));
     }
 
     .audio-master-mute-btn {
-        inset-inline-end: calc(100px + var(--safe-right));
-        bottom: calc(12px + var(--safe-bottom));
+        right: calc(74px + var(--safe-right));
+        bottom: calc(12px + var(--safe-bottom) + var(--audio-floating-bottom-offset, 0px));
     }
 }
 
