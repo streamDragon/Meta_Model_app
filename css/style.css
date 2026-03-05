@@ -10386,6 +10386,10 @@ body.minimal-ui .wrinkle-self-list {
 }
 
 .ceflow-engine {
+    --ceflow-stage-height: 236px;
+    --ceflow-stage-height-mobile: 164px;
+    --ceflow-stage-height-expanded: 340px;
+    --ceflow-stage-height-mobile-expanded: 248px;
     margin-top: 14px;
     padding: 10px;
     border: 1px solid #e2e8f0;
@@ -10396,9 +10400,17 @@ body.minimal-ui .wrinkle-self-list {
 
 .ceflow-top-actions {
     display: flex;
-    justify-content: flex-start;
-    align-items: center;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
     margin-bottom: 8px;
+}
+
+.ceflow-action-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .ceflow-small-btn {
@@ -10407,6 +10419,75 @@ body.minimal-ui .wrinkle-self-list {
     border-radius: 999px;
     font-size: 0.83rem;
     font-weight: 800;
+}
+
+.ceflow-shotclock-shell {
+    margin-inline-start: auto;
+}
+
+.ceflow-shotclock {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    background: #f8fafc;
+    padding: 6px 10px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    transition: transform 120ms ease, box-shadow 140ms ease;
+}
+
+.ceflow-shotclock-ring {
+    --clock-pct: 1;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: conic-gradient(#ef4444 calc(var(--clock-pct) * 1turn), #e2e8f0 0turn);
+    display: grid;
+    place-items: center;
+    position: relative;
+}
+
+.ceflow-shotclock-ring::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    background: #ffffff;
+}
+
+.ceflow-shotclock-ring > span {
+    position: relative;
+    z-index: 1;
+    font-weight: 900;
+    color: #0f172a;
+    font-size: 1.06rem;
+}
+
+.ceflow-shotclock-copy {
+    display: grid;
+    line-height: 1.2;
+}
+
+.ceflow-shotclock-copy strong {
+    color: #0f172a;
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.ceflow-shotclock-copy small {
+    color: #334155;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.ceflow-shotclock.is-closing {
+    box-shadow: 0 10px 24px rgba(239, 68, 68, 0.22);
+}
+
+.ceflow-shotclock.is-closing .ceflow-shotclock-ring {
+    animation: ceflowClockPulse 520ms ease-in-out infinite;
 }
 
 .ceflow-floating-note {
@@ -10423,6 +10504,19 @@ body.minimal-ui .wrinkle-self-list {
 
 .ceflow-floating-note.is-visible {
     box-shadow: 0 10px 22px rgba(59, 130, 246, 0.2);
+}
+
+.ceflow-distractor {
+    margin-bottom: 8px;
+    border: 1px solid #fdba74;
+    border-radius: 12px;
+    background: #fff7ed;
+    color: #9a3412;
+    padding: 8px 10px;
+    font-size: 0.86rem;
+    font-weight: 800;
+    line-height: 1.35;
+    animation: ceflowOverlayIn 180ms ease-out;
 }
 
 .ceflow-principle {
@@ -10475,21 +10569,54 @@ body.minimal-ui .wrinkle-self-list {
     font-size: 1.3rem;
 }
 
+.ceflow-context-card {
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #f8fbff, #eff6ff);
+    padding: 9px 10px;
+    margin-bottom: 8px;
+    display: grid;
+    gap: 4px;
+}
+
+.ceflow-context-card h4 {
+    margin: 0;
+    color: #1e40af;
+    font-size: 0.9rem;
+}
+
+.ceflow-context-card p {
+    margin: 0;
+    color: #1f2937;
+    line-height: 1.4;
+    font-size: 0.84rem;
+}
+
+.ceflow-context-snap {
+    border-top: 1px dashed #bfdbfe;
+    margin-top: 2px;
+    padding-top: 4px;
+    color: #991b1b !important;
+    font-weight: 800;
+}
+
 .ceflow-stage-wrap {
     display: grid;
-    grid-template-columns: minmax(130px, 180px) 1fr minmax(130px, 180px);
-    gap: 10px;
+    grid-template-columns: 96px minmax(0, 1fr) 96px;
+    gap: 8px;
     align-items: stretch;
+    margin-bottom: 2px;
 }
 
 .ceflow-character-card {
     border: 1px solid #e2e8f0;
     border-radius: 12px;
     background: #ffffff;
-    padding: 8px;
+    padding: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: var(--ceflow-stage-height);
 }
 
 .ceflow-character-inner {
@@ -10498,13 +10625,13 @@ body.minimal-ui .wrinkle-self-list {
 }
 
 .ceflow-character-art {
-    min-height: 110px;
+    min-height: 68px;
     display: grid;
     place-items: center;
 }
 
 .ceflow-character-art img {
-    width: 108px;
+    width: 64px;
     max-width: 100%;
     height: auto;
 }
@@ -10521,7 +10648,7 @@ body.minimal-ui .wrinkle-self-list {
 
 .ceflow-character-name {
     margin: 6px 0 0;
-    font-size: 0.84rem;
+    font-size: 0.74rem;
     font-weight: 700;
     color: #475569;
 }
@@ -10532,13 +10659,19 @@ body.minimal-ui .wrinkle-self-list {
     border-radius: 12px;
     background: #f8fafc;
     padding: 10px;
-    min-height: 230px;
-    overflow: hidden;
+    min-height: var(--ceflow-stage-height);
+    height: var(--ceflow-stage-height);
+    max-height: var(--ceflow-stage-height);
+    aspect-ratio: 16 / 7;
+    overflow: auto;
 }
 
 .ceflow-dialog {
     display: grid;
     gap: 8px;
+    max-height: 100%;
+    overflow: auto;
+    padding-inline-end: 2px;
 }
 
 .ceflow-bubble {
@@ -10870,6 +11003,41 @@ body.minimal-ui .wrinkle-self-list {
     animation: ceflowOverlayIn 180ms ease-out;
 }
 
+.ceflow-repair-box {
+    margin-top: 8px;
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 8px;
+}
+
+.ceflow-repair-box > p {
+    margin: 0 0 6px;
+    color: #1f2937;
+    font-weight: 800;
+    font-size: 0.84rem;
+}
+
+.ceflow-repair-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.ceflow-repair-option {
+    border: 1px solid #93c5fd;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.ceflow-repair-option.is-selected {
+    border-color: #2563eb;
+    background: #dbeafe;
+}
+
 .ceflow-outcomes {
     display: flex;
     flex-wrap: wrap;
@@ -10946,6 +11114,16 @@ body.minimal-ui .wrinkle-self-list {
     justify-content: flex-end;
 }
 
+.ceflow-engine.is-stage-expanded .ceflow-stage {
+    min-height: var(--ceflow-stage-height-expanded);
+    height: var(--ceflow-stage-height-expanded);
+    max-height: var(--ceflow-stage-height-expanded);
+}
+
+.ceflow-engine.ceflow-pressure-pulse {
+    animation: ceflowPenaltyPulse 240ms ease-in-out;
+}
+
 .ceflow-engine.is-play-mode .ceflow-principle,
 .ceflow-engine.is-play-mode .ceflow-regulation-note {
     display: none;
@@ -10974,6 +11152,17 @@ body.minimal-ui .wrinkle-self-list {
 @keyframes ceflowSceneEnter {
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ceflowClockPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+}
+
+@keyframes ceflowPenaltyPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.006); }
+    100% { transform: scale(1); }
 }
 
 .living-triples-card {
@@ -11584,10 +11773,24 @@ body.minimal-ui .wrinkle-self-list {
 @media (max-width: 980px) {
     .ceflow-stage-wrap {
         grid-template-columns: 1fr;
+        gap: 6px;
     }
 
     .ceflow-character-card {
-        min-height: 120px;
+        display: none;
+    }
+
+    .ceflow-stage {
+        min-height: var(--ceflow-stage-height-mobile);
+        height: var(--ceflow-stage-height-mobile);
+        max-height: var(--ceflow-stage-height-mobile);
+        aspect-ratio: 16 / 8;
+    }
+
+    .ceflow-engine.is-stage-expanded .ceflow-stage {
+        min-height: var(--ceflow-stage-height-mobile-expanded);
+        height: var(--ceflow-stage-height-mobile-expanded);
+        max-height: var(--ceflow-stage-height-mobile-expanded);
     }
 
     .ceflow-choice-deck {
@@ -11635,12 +11838,60 @@ body.minimal-ui .wrinkle-self-list {
     }
 
     .ceflow-top-actions {
-        justify-content: stretch;
+        position: sticky;
+        top: 8px;
+        z-index: 6;
+        padding: 6px;
+        border: 1px solid #dbeafe;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(6px);
+    }
+
+    .ceflow-action-group {
+        flex: 1 1 auto;
+    }
+
+    .ceflow-shotclock-shell {
+        margin-inline-start: 0;
+    }
+
+    .ceflow-shotclock {
+        padding: 4px 7px;
+        gap: 7px;
+    }
+
+    .ceflow-shotclock-ring {
+        width: 42px;
+        height: 42px;
+    }
+
+    .ceflow-shotclock-copy strong {
+        font-size: 0.7rem;
+    }
+
+    .ceflow-shotclock-copy small {
+        font-size: 0.68rem;
     }
 
     .ceflow-small-btn {
-        width: 100%;
+        flex: 1 1 calc(50% - 4px);
+        min-height: 32px;
         text-align: center;
+        font-size: 0.77rem;
+        padding: 5px 8px;
+    }
+
+    .ceflow-context-card {
+        gap: 3px;
+    }
+
+    .ceflow-context-card h4 {
+        font-size: 0.82rem;
+    }
+
+    .ceflow-context-card p {
+        font-size: 0.8rem;
     }
 
     .ceflow-choice-deck {
@@ -14788,6 +15039,17 @@ body.mobile-sticky-cta-visible {
     display: grid;
     gap: 18px;
     overflow: hidden;
+}
+
+.ceflow-timeout {
+    margin-top: 10px;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    background: #fff1f2;
+    color: #9f1239;
+    padding: 9px 10px;
+    font-size: 0.86rem;
+    line-height: 1.4;
 }
 
 .home-lobby-bg {

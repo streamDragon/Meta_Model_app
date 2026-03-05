@@ -16157,7 +16157,8 @@ const CEFLOW_STATES = Object.freeze({
     CHOICE_REVEALED: 'CHOICE_REVEALED',
     POWER_CARD: 'POWER_CARD',
     BLUEPRINT_OPEN: 'BLUEPRINT_OPEN',
-    NEXT_SCENE: 'NEXT_SCENE'
+    NEXT_SCENE: 'NEXT_SCENE',
+    TIMEOUT: 'TIMEOUT'
 });
 
 const CEFLOW_CHOICE_ORDER = Object.freeze(['angry', 'mock', 'rescue', 'avoid', 'meta']);
@@ -16200,6 +16201,324 @@ const CEFLOW_HL_RULES = Object.freeze([
     Object.freeze({ type: 'modal', label: 'מודליות', css: 'hl-modal', tokens: Object.freeze(['אי אפשר', 'חייב', 'צריך', 'אסור', 'לא יכול']) }),
     Object.freeze({ type: 'vague', label: 'עמימות פעולה', css: 'hl-vague', tokens: Object.freeze(['לעשות', 'לסדר', 'לטפל', 'להתארגן', 'להגיע']) })
 ]);
+
+const CEFLOW_DEFAULT_SHOT_CLOCK_SECONDS = 20;
+const CEFLOW_MIN_SHOT_CLOCK_SECONDS = 12;
+const CEFLOW_MAX_SHOT_CLOCK_SECONDS = 35;
+
+const CEFLOW_DEFAULT_REPAIR_OPTIONS = Object.freeze([
+    'סליחה שהרמתי קול. זה הלחיץ אותי. בוא נעשה את זה יחד.',
+    'אני עייף וזה קפץ לי. אתה לא אשם.',
+    'ננסה שוב, לאט ובלי צעקות.'
+]);
+
+const CEFLOW_NATURAL_CHOICE_COPY = Object.freeze({
+    angry: Object.freeze({
+        say: 'די... אני לא יכול עכשיו עם זה.',
+        counterReply: 'אוקיי... אני רק רציתי להראות לך משהו.',
+        interpretation: 'הטון נסגר מהר, והמידע החיוני לא מגיע.',
+        replyOptions: Object.freeze([
+            'חכה רגע. אני רוצה לנסח את זה מחדש.',
+            'זה יצא לי חזק מדי, בוא נתחיל מהתחלה.',
+            'אני צריך 3 שניות ואז מדברים.'
+        ]),
+        repairOptions: CEFLOW_DEFAULT_REPAIR_OPTIONS
+    }),
+    mock: Object.freeze({
+        say: 'מה, זה באמת כזה מסובך עכשיו?',
+        counterReply: 'כשצוחקים עליי אני פשוט נסגר/ת.',
+        interpretation: 'לעג יוצר ריחוק ולא מייצר שיתוף פעולה.',
+        repairOptions: CEFLOW_DEFAULT_REPAIR_OPTIONS
+    }),
+    rescue: Object.freeze({
+        say: 'עזוב, אני כבר אטפל בזה לבד.',
+        counterReply: 'אז לא צריך אותי בכלל...',
+        interpretation: 'הצלה מרגיעה רגעית אבל מחלישה אחריות משותפת.',
+        repairOptions: CEFLOW_DEFAULT_REPAIR_OPTIONS
+    }),
+    avoid: Object.freeze({
+        say: 'שניה... לא עכשיו.',
+        counterReply: 'טוב, אז שוב נדחה את זה.',
+        interpretation: 'התחמקות חוסכת חיכוך רגעית אבל מגדילה לחץ בהמשך.',
+        repairOptions: CEFLOW_DEFAULT_REPAIR_OPTIONS
+    }),
+    meta: Object.freeze({
+        say: 'עצור רגע. מה בדיוק קרה עכשיו ומה הצעד הבא הכי קטן?',
+        counterReply: 'אם ככה, אני יכול/ה להגיד איפה נתקעתי.',
+        interpretation: 'שאלה מדויקת מרגיעה לחץ ומחזירה בחירה.',
+        replyOptions: Object.freeze([
+            'מה הכי דחוף בדקה הקרובה?',
+            'מה הצעד הכי קטן שכן אפשר לבצע עכשיו?',
+            'איזה מידע חסר לנו כדי להתקדם?'
+        ])
+    })
+});
+
+const CEFLOW_PRESSURE_SCENARIOS = Object.freeze([
+    Object.freeze({
+        id: 'dad_tools_danger_01',
+        domain: 'הורות',
+        title: 'המברגה ביד של הילד',
+        level: 'Snap -> Choice',
+        role: 'אבא',
+        stakes: 'אתה עייף, מאחר לעבודה, וכלי העבודה חדים ומסוכנים.',
+        trigger: 'הילד שולף שוב את המברגה מתוך הארגז.',
+        dominantEmotion: 'פחד + עצבנות + עייפות',
+        snapLine: 'די... אני לא יכול עכשיו עם זה.',
+        shotClockSeconds: 18,
+        distractors: Object.freeze([
+            'קלאק מתכתי חזק מהארגז ליד הרגל שלו.',
+            'מישהו צועק מהחדר השני: "אפשר רגע עכשיו?"',
+            'הטלפון מצפצף: הודעה דחופה מהעבודה.'
+        ]),
+        characters: {
+            left: { name: 'הילד', sprite: '' },
+            right: { name: 'אבא', sprite: '' }
+        },
+        dialog: Object.freeze([
+            Object.freeze({ speaker: 'left', text: 'אבא תראה, אני גם יודע להשתמש בזה.' }),
+            Object.freeze({ speaker: 'right', text: 'עצור רגע, זה כלי מסוכן ליד הידיים שלך.' })
+        ]),
+        choices: Object.freeze([
+            Object.freeze({ id: 'angry', say: 'חלאס! כמה פעמים אמרתי לא לגעת בזה?!' }),
+            Object.freeze({ id: 'mock', say: 'מה, זה משחק בעיניך עכשיו?' }),
+            Object.freeze({ id: 'rescue', say: 'עזוב, אני כבר עושה הכול לבד.' }),
+            Object.freeze({ id: 'avoid', say: 'שניה... לא עכשיו.' }),
+            Object.freeze({
+                id: 'meta',
+                say: 'עצור. זה מסוכן. בוא נעביר יחד את הכלים לקופסה ואז נסביר לאט.',
+                powerQuestions: Object.freeze([
+                    'מה הכי מסוכן כרגע בסביבה?',
+                    'איזה כלל בטיחות אחד הכי חשוב עכשיו?',
+                    'מה הצעד הבא של שנינו יחד?',
+                    'איך נבטיח שזה לא יחזור בדקה הקרובה?'
+                ]),
+                newInfoBubble: 'כשהגבול ברור אבל הטון יציב, הילד משתף פעולה במקום להתנגד.'
+            })
+        ])
+    }),
+    Object.freeze({
+        id: 'manager_release_01',
+        domain: 'עבודה',
+        title: 'באג לפני השקה',
+        level: 'Snap -> Choice',
+        role: 'מנהל צוות',
+        stakes: 'ההשקה בעוד שעה והלקוח מחכה לעדכון.',
+        trigger: 'מפתח מודיע שהבאג הקריטי עדיין פתוח.',
+        dominantEmotion: 'לחץ + פחד מכישלון',
+        snapLine: 'אני מתחרפן פה. תן לי רגע לסדר את זה.',
+        shotClockSeconds: 20,
+        distractors: Object.freeze([
+            'התראת Slack: "CEO asks for immediate status".',
+            'שיחת טלפון נכנסת מהלקוח.',
+            'הצוות בצד שואל במקביל "לעצור הכול?"'
+        ]),
+        characters: {
+            left: { name: 'מפתח', sprite: '' },
+            right: { name: 'מנהל', sprite: '' }
+        },
+        dialog: Object.freeze([
+            Object.freeze({ speaker: 'left', text: 'אני עדיין על הבאג הקריטי, לא הספקתי לסגור.' }),
+            Object.freeze({ speaker: 'right', text: 'יש לנו פחות משעה לשחרור.' })
+        ]),
+        choices: Object.freeze([
+            Object.freeze({ id: 'angry', say: 'איך זה עדיין פתוח עכשיו?!' }),
+            Object.freeze({ id: 'mock', say: 'מדהים. בדיוק בזמן הכי גרוע הצלחת.' }),
+            Object.freeze({ id: 'rescue', say: 'עזוב, אני אקח את זה עליי עכשיו.' }),
+            Object.freeze({ id: 'avoid', say: 'טוב... נראה מה יהיה בעוד עשר דקות.' }),
+            Object.freeze({
+                id: 'meta',
+                say: 'מה תקוע בדיוק? חסר מידע, החלטה או ידיים נוספות?',
+                powerQuestions: Object.freeze([
+                    'מה הקריטריון המדויק ל"דון"?',
+                    'מה אפשר לשחרר עכשיו בלי לסכן לקוח?',
+                    'איזה חסם אפשר להסיר בדקה אחת?',
+                    'מי לוקח משימה אחת ברורה מעכשיו?'
+                ]),
+                newInfoBubble: 'דיוק החסם מייצר פעולה קצרה במקום בהלה מפוזרת.'
+            })
+        ])
+    }),
+    Object.freeze({
+        id: 'couple_pickup_01',
+        domain: 'זוגיות',
+        title: 'איחור לאיסוף מהגן',
+        level: 'Snap -> Choice',
+        role: 'בן/בת זוג',
+        stakes: 'הילד מחכה בגן ואתם כבר על הקצה.',
+        trigger: 'מגיע מסרון: "אני שוב מאחר/ת, תסתדר/י".',
+        dominantEmotion: 'עלבון + עומס',
+        snapLine: 'ביקשתי ממך לא לעשות את זה שוב.',
+        shotClockSeconds: 19,
+        distractors: Object.freeze([
+            'הגננת מתקשרת בפעם השנייה.',
+            'הילד בוכה ברקע בשיחת וידאו.',
+            'התראה: "הפגישה שלך מתחילה בעוד 3 דקות".'
+        ]),
+        characters: {
+            left: { name: 'בן/בת זוג', sprite: '' },
+            right: { name: 'את/ה', sprite: '' }
+        },
+        dialog: Object.freeze([
+            Object.freeze({ speaker: 'left', text: 'אני שוב תקוע/ה בפקק, תאסוף/י אתה.' }),
+            Object.freeze({ speaker: 'right', text: 'זה כבר ערב שלישי ברצף שזה קורה.' })
+        ]),
+        choices: Object.freeze([
+            Object.freeze({ id: 'angry', say: 'די, נמאס לי ממך כבר!' }),
+            Object.freeze({ id: 'mock', say: 'וואו, איזו הפתעה... שוב את/ה מאחר/ת.' }),
+            Object.freeze({ id: 'rescue', say: 'בסדר, אני אעשה הכול לבד כמו תמיד.' }),
+            Object.freeze({ id: 'avoid', say: 'עזוב, לא משנה עכשיו.' }),
+            Object.freeze({
+                id: 'meta',
+                say: 'מה צריך לקרות עכשיו כדי שהילד ייאסף בזמן בלי מלחמה בינינו?',
+                powerQuestions: Object.freeze([
+                    'מה הדחיפות של הדקה הקרובה?',
+                    'מי עושה מה בפועל עד 18:00?',
+                    'איזה כלל חדש ימנע את זה מחר?',
+                    'מה הבקשה המדויקת שלך ממני עכשיו?'
+                ])
+            })
+        ])
+    }),
+    Object.freeze({
+        id: 'teacher_class_noise_01',
+        domain: 'חינוך',
+        title: 'כיתה רועשת לפני מבחן',
+        level: 'Snap -> Choice',
+        role: 'מורה',
+        stakes: 'עוד 10 דקות מתחיל מבחן והכיתה לא מתכנסת.',
+        trigger: 'שני תלמידים ממשיכים לדבר למרות שביקשת שקט.',
+        dominantEmotion: 'כעס + חוסר אונים',
+        snapLine: 'שקט עכשיו. אני לא יכול יותר.',
+        shotClockSeconds: 17,
+        distractors: Object.freeze([
+            'התראה מההנהלה: "נא להתחיל בזמן".',
+            'דפיקות בדלת עם בקשה דחופה ממורה אחרת.',
+            'תלמיד מאחור צועק "זה לא הוגן!".'
+        ]),
+        characters: {
+            left: { name: 'תלמיד/ה', sprite: '' },
+            right: { name: 'מורה', sprite: '' }
+        },
+        dialog: Object.freeze([
+            Object.freeze({ speaker: 'left', text: 'רגע, אנחנו רק שואלים משהו קטן.' }),
+            Object.freeze({ speaker: 'right', text: 'יש לנו מבחן בעוד עשר דקות.' })
+        ]),
+        choices: Object.freeze([
+            Object.freeze({ id: 'angry', say: 'תסתמו כבר! די לדבר!' }),
+            Object.freeze({ id: 'mock', say: 'ברור, כי משמעת זה ממש לא הצד החזק שלכם.' }),
+            Object.freeze({ id: 'rescue', say: 'טוב, אני מבטל את המבחן להיום.' }),
+            Object.freeze({ id: 'avoid', say: 'תמשיכו, אולי תירגעו לבד.' }),
+            Object.freeze({
+                id: 'meta',
+                say: 'עוצרים: מי צריך עוד 30 שניות שאלה, ומי כבר מוכן להתחלה שקטה?',
+                powerQuestions: Object.freeze([
+                    'מה יאפשר שקט מיידי בלי השפלה?',
+                    'איזה גבול אחד חייב להיות ברור?',
+                    'מה ההסבר הקצר שהכיתה צריכה לשמוע עכשיו?',
+                    'מי צריך תמיכה נקודתית כדי להתייצב?'
+                ])
+            })
+        ])
+    }),
+    Object.freeze({
+        id: 'service_refund_01',
+        domain: 'שירות לקוחות',
+        title: 'לקוח דורש החזר מיידי',
+        level: 'Snap -> Choice',
+        role: 'נציג/ת שירות',
+        stakes: 'לקוח כועס בפומבי והמותג בסיכון.',
+        trigger: 'הלקוח אומר "תזכה אותי עכשיו או שאני מעלה פוסט".',
+        dominantEmotion: 'לחץ + הגנתיות',
+        snapLine: 'שניה. פשוט... לא עכשיו.',
+        shotClockSeconds: 18,
+        distractors: Object.freeze([
+            'עוד לקוח מתערב מהתור ומצלם בטלפון.',
+            'המנהל שולח הודעה: "שמור על SLA".',
+            'מערכת התשלומים איטית ועולה שגיאה.'
+        ]),
+        characters: {
+            left: { name: 'לקוח', sprite: '' },
+            right: { name: 'נציג/ה', sprite: '' }
+        },
+        dialog: Object.freeze([
+            Object.freeze({ speaker: 'left', text: 'אני רוצה החזר עכשיו. זה לא מקובל.' }),
+            Object.freeze({ speaker: 'right', text: 'אני מבין את התסכול שלך ורוצה לפתור.' })
+        ]),
+        choices: Object.freeze([
+            Object.freeze({ id: 'angry', say: 'תירגע, זה לא עובד ככה פה.' }),
+            Object.freeze({ id: 'mock', say: 'כן, בטח, איום בפוסט תמיד עובד...' }),
+            Object.freeze({ id: 'rescue', say: 'טוב, קח החזר מלא ונגמור עם זה.' }),
+            Object.freeze({ id: 'avoid', say: 'אבדוק את זה אחר כך ואחזור אליך.' }),
+            Object.freeze({
+                id: 'meta',
+                say: 'מה חסר לך עכשיו כדי להרגיש שהטיפול מתקדם כבר בדקה הזו?',
+                powerQuestions: Object.freeze([
+                    'מה התוצאה המינימלית שאתה צריך עכשיו?',
+                    'איזה שלב אני יכול לבצע מולך מיידית?',
+                    'מה הטווח הזמני המדויק שאתה מצפה לו?',
+                    'מה ייחשב מבחינתך פתרון הוגן?'
+                ])
+            })
+        ])
+    }),
+    Object.freeze({
+        id: 'caregiver_medicine_01',
+        domain: 'משפחה',
+        title: 'תרופה שנשכחה',
+        level: 'Snap -> Choice',
+        role: 'בן/בת משפחה מטפל/ת',
+        stakes: 'הבריאות של ההורה תלויה בתזכורת עקבית.',
+        trigger: 'שומעים שוב: "שכחתי לקחת את התרופה".',
+        dominantEmotion: 'דאגה + תשישות',
+        snapLine: 'אני לא עומד בזה כבר.',
+        shotClockSeconds: 21,
+        distractors: Object.freeze([
+            'השעון מראה שכבר עבר זמן נטילה.',
+            'קרוב משפחה מתקשר ושואל מה קורה.',
+            'התראה נוספת קופצת על בדיקה רפואית קרובה.'
+        ]),
+        characters: {
+            left: { name: 'הורה', sprite: '' },
+            right: { name: 'מטפל/ת', sprite: '' }
+        },
+        dialog: Object.freeze([
+            Object.freeze({ speaker: 'left', text: 'שוב שכחתי את הכדור של הבוקר.' }),
+            Object.freeze({ speaker: 'right', text: 'זה חשוב מאוד ליציבות שלך היום.' })
+        ]),
+        choices: Object.freeze([
+            Object.freeze({ id: 'angry', say: 'איך שוב שכחת? דיברנו על זה מיליון פעם.' }),
+            Object.freeze({ id: 'mock', say: 'מצוין... בדיוק כמו תמיד.' }),
+            Object.freeze({ id: 'rescue', say: 'עזוב, אני פשוט אנהל הכול במקומך.' }),
+            Object.freeze({ id: 'avoid', say: 'טוב, נסתדר איכשהו בהמשך.' }),
+            Object.freeze({
+                id: 'meta',
+                say: 'מה יעזור לך לזכור היום בזמן? תזכורת, קופסה ליד מים, או יחד איתי עכשיו?',
+                powerQuestions: Object.freeze([
+                    'איזו תזכורת אחת באמת תעבוד היום?',
+                    'מה המקום הכי נגיש לשים בו את התרופה?',
+                    'מי בודק יחד איתך בפעם הבאה?',
+                    'מה הצעד הבא שנעשה כבר עכשיו?'
+                ])
+            })
+        ])
+    })
+]);
+
+function ceflowNormalizeCopy(value, fallback = '') {
+    const text = String(value || '').trim();
+    if (!text || looksLikeMojibakeText(text)) return String(fallback || '').trim();
+    return text;
+}
+
+function ceflowClampInt(value, fallback, min, max) {
+    const n = Number(value);
+    const base = Number.isFinite(n) ? n : Number(fallback);
+    const low = Number.isFinite(min) ? min : 0;
+    const high = Number.isFinite(max) ? max : 100;
+    if (!Number.isFinite(base)) return low;
+    return Math.max(low, Math.min(high, Math.round(base)));
+}
 
 function ceflowClamp(value, fallback) {
     const n = Number(value);
