@@ -75,6 +75,8 @@ body.alchemy-active > .trainer-page {
   place-items: center;
   transform-origin: 60% 80%;
   animation: alchemyCompanionFloat 4.8s ease-in-out infinite;
+  transition: transform 220ms ease, opacity 220ms ease, box-shadow 180ms ease;
+  will-change: transform, opacity;
 }
 
 .alchemy-companion::before {
@@ -169,6 +171,32 @@ body.alchemy-active > .trainer-page {
   transition: opacity 160ms ease, transform 160ms ease;
 }
 
+.alchemy-companion__dismiss {
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.42);
+  background: rgba(15, 23, 42, 0.82);
+  color: #f8fafc;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 8px 16px rgba(2, 6, 23, 0.34);
+  backdrop-filter: blur(6px);
+  pointer-events: auto;
+}
+
+.alchemy-companion__dismiss:hover {
+  background: rgba(30, 41, 59, 0.88);
+  transform: scale(1.04);
+}
+
 .alchemy-companion:hover .alchemy-companion__label {
   opacity: 1;
   transform: translateX(-50%) translateY(-2px);
@@ -227,7 +255,7 @@ body.alchemy-active > .trainer-page {
   cursor: pointer;
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 22px rgba(2, 6, 23, 0.22);
-  transition: transform 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+  transition: transform 180ms ease, box-shadow 160ms ease, background-color 140ms ease, opacity 180ms ease;
 }
 
 .alchemy-mute:hover {
@@ -238,6 +266,41 @@ body.alchemy-active > .trainer-page {
 .alchemy-mute[data-muted="true"] {
   background: rgba(127, 29, 29, 0.68);
   border-color: rgba(248, 113, 113, 0.28);
+}
+
+.alchemy-companion-toggle {
+  position: fixed;
+  right: max(12px, calc(env(safe-area-inset-right, 0px) + 6px));
+  bottom: max(12px, calc(env(safe-area-inset-bottom, 0px) + 6px));
+  width: 54px;
+  height: 54px;
+  z-index: 2400;
+  display: none;
+  place-items: center;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.34);
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255,255,255,0.68), rgba(255,255,255,0.12) 42%, transparent 66%),
+    linear-gradient(160deg, rgba(67, 56, 202, 0.92), rgba(6, 182, 212, 0.82));
+  color: #fff;
+  font: inherit;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.34), 0 0 24px rgba(79, 70, 229, 0.32);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px) scale(0.9);
+  transition: transform 180ms ease, opacity 180ms ease, box-shadow 160ms ease;
+}
+
+.alchemy-companion-toggle:hover {
+  transform: translateY(10px) scale(0.94);
+}
+
+.alchemy-companion-toggle[hidden] {
+  display: none !important;
 }
 
 .alchemy-consent {
@@ -457,6 +520,26 @@ body.alchemy-active .trainer-shell-nav__meta {
 }
 
 @media (max-width: 780px) {
+  body.alchemy-active.alchemy-mobile-ui .alchemy-companion {
+    width: 74px;
+    height: 74px;
+    right: max(12px, calc(env(safe-area-inset-right, 0px) + 6px));
+    bottom: max(12px, calc(env(safe-area-inset-bottom, 0px) + 6px));
+    box-shadow: 0 10px 24px rgba(9, 12, 30, 0.26), 0 0 18px rgba(34, 211, 238, 0.2);
+  }
+
+  body.alchemy-active.alchemy-mobile-ui .alchemy-companion::before {
+    inset: -6px;
+  }
+
+  body.alchemy-active.alchemy-mobile-ui .alchemy-companion__dismiss {
+    display: flex;
+  }
+
+  body.alchemy-active.alchemy-mobile-ui .alchemy-companion__label {
+    display: none;
+  }
+
   .alchemy-companion {
     width: 88px;
     height: 88px;
@@ -488,11 +571,40 @@ body.alchemy-active .trainer-shell-nav__meta {
   }
 
   .alchemy-mute {
-    top: 10px;
-    right: 10px;
-    padding: 7px 10px;
-    min-height: 34px;
-    font-size: 0.82rem;
+    top: auto;
+    right: max(88px, calc(env(safe-area-inset-right, 0px) + 80px));
+    bottom: max(16px, calc(env(safe-area-inset-bottom, 0px) + 6px));
+    padding: 0;
+    min-width: 40px;
+    min-height: 40px;
+    width: 40px;
+    border-radius: 12px;
+    font-size: 1.03rem;
+    display: grid;
+    place-items: center;
+  }
+
+  body.alchemy-active.alchemy-mobile-ui .alchemy-companion-toggle {
+    display: grid;
+  }
+
+  body.alchemy-active.alchemy-mobile-ui.alchemy-companion-minimized .alchemy-companion,
+  body.alchemy-active.alchemy-mobile-ui.alchemy-companion-minimized .alchemy-mute {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(120%) scale(0.86);
+  }
+
+  body.alchemy-active.alchemy-mobile-ui.alchemy-companion-minimized .alchemy-companion-toggle {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+
+  body.alchemy-active.alchemy-mobile-ui:not(.alchemy-companion-minimized) .alchemy-companion-toggle {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(12px) scale(0.9);
   }
 }
 

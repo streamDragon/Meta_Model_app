@@ -4,6 +4,8 @@
 
     var STORAGE_CONSENT = 'alchemy_audio_consent_v1';
     var STORAGE_MUTED = 'alchemy_audio_muted_v1';
+    var STORAGE_COMPANION_MINIMIZED = 'alchemy_companion_minimized_v1';
+    var MOBILE_BREAKPOINT = 780;
     var prefersReducedMotion = false;
     try {
         prefersReducedMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -16,6 +18,8 @@
         burstLayer: null,
         companion: null,
         companionLabel: null,
+        companionDismiss: null,
+        companionToggle: null,
         muteBtn: null,
         consentEl: null,
         particles: [],
@@ -41,6 +45,10 @@
             cleanupTimers: new Set(),
             lastFxAtByType: {},
             fxLockUntil: 0
+        },
+        ui: {
+            isMobileViewport: false,
+            companionMinimized: readStoredCompanionMinimized()
         }
     };
 
@@ -83,6 +91,11 @@
         return raw === '1';
     }
 
+    function readStoredCompanionMinimized() {
+        var raw = safeStorageGet(STORAGE_COMPANION_MINIMIZED);
+        return raw === '1';
+    }
+
     function createEl(tag, className) {
         var el = document.createElement(tag);
         if (className) el.className = className;
@@ -94,6 +107,8 @@
         var el = target.closest('button, [role="button"], a, .cc-breen-cell, .cc-option-btn, .cc-panel, .cc-stage-card, .cc-summary-block');
         if (!el) return false;
         if (el.classList && el.classList.contains('alchemy-mute')) return false;
+        if (el.classList && el.classList.contains('alchemy-companion-toggle')) return false;
+        if (el.classList && el.classList.contains('alchemy-companion__dismiss')) return false;
         if (el.classList && el.classList.contains('alchemy-consent__btn')) return false;
         return el;
     }
@@ -173,6 +188,7 @@
         document.body.classList.add('alchemy-active');
         buildUi();
         bindEvents();
+        syncCompanionLayout();
         setupParticles();
         if (state.audio.consent === 'yes') {
             updateMuteButton();
@@ -200,6 +216,7 @@
         companion.type = 'button';
         companion.setAttribute('aria-label', 'Alchemy companion');
         companion.innerHTML = [
+            '<span class="alchemy-companion__dismiss" title="Hide companion">\u00d7</span>',
             '<div class="alchemy-companion__label">Alchemy companion</div>',
             '<div class="alchemy-companion__face">',
             '  <div class="alchemy-companion__eyes"><span></span><span></span></div>',
@@ -213,6 +230,13 @@
         muteBtn.type = 'button';
         muteBtn.setAttribute('aria-label', 'Toggle alchemy sounds');
         muteBtn.style.pointerEvents = 'auto';
+
+        var companionToggle = createEl('button', 'alchemy-companion-toggle');
+        companionToggle.type = 'button';
+        companionToggle.setAttribute('aria-label', 'Show Alchemy companion');
+        companionToggle.innerHTML = '<span aria-hidden="true">\u2728</span>';
+        companionToggle.hidden = true;
+        companionToggle.style.pointerEvents = 'auto';
 
         var consent = createEl('div', 'alchemy-consent');
         consent.hidden = true;
@@ -233,6 +257,7 @@
         document.body.appendChild(root);
         document.body.appendChild(muteBtn);
         document.body.appendChild(companion);
+        document.body.appendChild(companionToggle);
 
         state.root = root;
         state.canvas = canvas;
@@ -240,6 +265,8 @@
         state.burstLayer = burst;
         state.companion = companion;
         state.companionLabel = companion.querySelector('.alchemy-companion__label');
+        state.companionDismiss = companion.querySelector('.alchemy-companion__dismiss');
+        state.companionToggle = companionToggle;
         state.muteBtn = muteBtn;
         state.consentEl = consent;
 
@@ -270,7 +297,7 @@
         }, true);
 
         bind(document, 'click', function (event) {
-            if (event.target && event.target.closest && event.target.closest('.alchemy-consent, .alchemy-mute, .alchemy-companion')) {
+            if (event.target && event.target.closest && event.target.closest('.alchemy-consent, .alchemy-mute, .alchemy-companion, .alchemy-companion-toggle')) {
                 return;
             }
             var x = Number.isFinite(event.clientX) ? event.clientX : (window.innerWidth / 2);
@@ -303,6 +330,27 @@
                 celebrateAt(window.innerWidth - 72, window.innerHeight - 96, 'success');
                 setCompanionMood('dance', 1800);
                 announceCompanion('Woo!');
+            });
+        }
+
+        if (state.companionDismiss) {
+            bind(state.companionDismiss, 'click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (!state.ui.isMobileViewport) return;
+                setCompanionMinimized(true, true);
+                announceCompanion('Companion hidden');
+            });
+        }
+
+        if (state.companionToggle) {
+            bind(state.companionToggle, 'click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                setCompanionMinimized(false, true);
+                setCompanionMood('happy', 1000);
+                announceCompanion('Back in view');
+                playFx('whoosh');
             });
         }
 
@@ -364,6 +412,7 @@
     }
 
     function onResize() {
+        syncCompanionLayout();
         if (state.resizeTimer) clearTimeout(state.resizeTimer);
         state.resizeTimer = setTimeout(function () {
             if (!state.canvas) return;
@@ -371,6 +420,52 @@
             state.canvas.height = Math.max(1, window.innerHeight || 1);
             seedParticles(true);
         }, 100);
+    }
+
+    function isMobileViewport() {
+        var width = Math.max(
+            Number(window.innerWidth || 0),
+            Number((document.documentElement && document.documentElement.clientWidth) || 0)
+        );
+        return width > 0 && width <= MOBILE_BREAKPOINT;
+    }
+
+    function syncCompanionLayout() {
+        if (!document.body) return;
+        state.ui.isMobileViewport = isMobileViewport();
+        document.body.classList.toggle('alchemy-mobile-ui', state.ui.isMobileViewport);
+        setCompanionMinimized(state.ui.companionMinimized, false);
+        updateMuteButton();
+    }
+
+    function setCompanionMinimized(nextMinimized, persist) {
+        state.ui.companionMinimized = !!nextMinimized;
+        if (persist) {
+            safeStorageSet(STORAGE_COMPANION_MINIMIZED, state.ui.companionMinimized ? '1' : '0');
+        }
+        var activeMinimized = !!state.ui.companionMinimized && !!state.ui.isMobileViewport;
+        if (document.body) {
+            document.body.classList.toggle('alchemy-companion-minimized', activeMinimized);
+        }
+        if (state.companionToggle) {
+            state.companionToggle.hidden = !activeMinimized;
+            state.companionToggle.setAttribute('aria-hidden', activeMinimized ? 'false' : 'true');
+        }
+        if (state.companion) {
+            if (activeMinimized) {
+                state.companion.setAttribute('aria-hidden', 'true');
+                try { state.companion.blur(); } catch (e) {}
+            } else {
+                state.companion.removeAttribute('aria-hidden');
+            }
+        }
+        if (state.muteBtn) {
+            if (activeMinimized) {
+                state.muteBtn.setAttribute('aria-hidden', 'true');
+            } else {
+                state.muteBtn.removeAttribute('aria-hidden');
+            }
+        }
     }
 
     function showConsent(show) {
@@ -382,13 +477,15 @@
     function updateMuteButton() {
         if (!state.muteBtn) return;
         var muted = !!state.audio.muted || state.audio.consent !== 'yes';
+        var compactMobileLabel = !!state.ui.isMobileViewport;
         state.muteBtn.setAttribute('data-muted', muted ? 'true' : 'false');
         if (state.audio.consent !== 'yes') {
-            state.muteBtn.textContent = 'Sound: ask';
+            state.muteBtn.textContent = compactMobileLabel ? '\ud83d\udd09?' : 'Sound: ask';
         } else {
-            state.muteBtn.textContent = muted ? 'Sound: off' : 'Sound: on';
+            state.muteBtn.textContent = compactMobileLabel ? (muted ? '\ud83d\udd07' : '\ud83d\udd0a') : (muted ? 'Sound: off' : 'Sound: on');
         }
         state.muteBtn.setAttribute('aria-pressed', muted ? 'true' : 'false');
+        state.muteBtn.setAttribute('aria-label', muted ? 'Sound off' : 'Sound on');
     }
 
     function toggleMute(nextMuted) {
@@ -1052,7 +1149,9 @@
             whoosh: function (detail) { emitFx('whoosh', detail || {}); },
             click: function (detail) { emitFx('click', detail || {}); },
             hover: function (detail) { emitFx('hover', detail || {}); },
-            showConsent: function () { showConsent(true); }
+            showConsent: function () { showConsent(true); },
+            minimizeCompanion: function () { setCompanionMinimized(true, true); },
+            restoreCompanion: function () { setCompanionMinimized(false, true); }
         };
     }
 

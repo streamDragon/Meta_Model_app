@@ -3,12 +3,12 @@
     {
       "id": "lost_performative",
       "label": "Lost Performative",
-      "labelHe": "שיפוט חסר מקור"
+      "labelHe": "חסרון הדובר"
     },
     {
       "id": "assumptions",
       "label": "Assumptions",
-      "labelHe": "הנחות סמויות"
+      "labelHe": "הנחות מוקדמות"
     },
     {
       "id": "mind_reading",
@@ -18,12 +18,12 @@
     {
       "id": "universal_quantifier",
       "label": "Universal Quantifier",
-      "labelHe": "כמת כוללני"
+      "labelHe": "הכללה"
     },
     {
       "id": "modal_operator",
       "label": "Modal Operator",
-      "labelHe": "מודל אופרטור"
+      "labelHe": "מודל פעולה"
     },
     {
       "id": "cause_effect",
@@ -43,12 +43,12 @@
     {
       "id": "complex_equivalence",
       "label": "Complex Equivalence",
-      "labelHe": "שקילות מורכבת"
+      "labelHe": "הקבלה מורכבת"
     },
     {
       "id": "comparative_deletion",
       "label": "Comparative Deletion",
-      "labelHe": "השוואה חסרה"
+      "labelHe": "השמטה השוואתית"
     },
     {
       "id": "time_space_predicates",
@@ -58,12 +58,12 @@
     {
       "id": "lack_referential_index",
       "label": "Lack Referential Index",
-      "labelHe": "חוסר ייחוס"
+      "labelHe": "אובדן המצביע"
     },
     {
       "id": "non_referring_nouns",
       "label": "Non-referring Nouns",
-      "labelHe": "שמות לא מפנים"
+      "labelHe": "שם עצם לא מפורט"
     },
     {
       "id": "sensory_predicates",

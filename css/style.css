@@ -1757,6 +1757,12 @@ a.breen-reference-cell:hover {
     align-items: start;
 }
 
+.categories-glossary-ordered-list {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 10px;
+}
+
 .glossary-column {
     display: grid;
     gap: 10px;
@@ -2297,13 +2303,12 @@ input[type="reset"] {
 }
 
 .screen-read-guide-philosopher-summary::after {
-    content: '׳’ֲג€';
+    content: '\25BE';
     color: #38628a;
     font-weight: 900;
     font-size: 0.95rem;
     transition: transform 160ms ease;
 }
-
 .screen-read-guide-philosopher-toggle[open] .screen-read-guide-philosopher-summary::after {
     transform: rotate(180deg);
 }
@@ -5325,11 +5330,11 @@ body.rapid-radar-focus #practice-radar #rapid-focus-exit-btn {
 }
 
 .wr2w-meta-drawer summary::before {
-    content: '׳’ג€“ֲ¸ ';
+    content: '׳³ֲ³ײ²ֲ³׳²ֲ²ײ²ֲ³׳³ֲ³׳’ג‚¬ג„¢׳³ג€™׳’ג‚¬ֲײ²ֲ¬׳³ג€™׳’ג‚¬ֲײ²ֲ¢׳³ֲ³ײ²ֲ³׳³ג€™׳’ג€ֲ¬׳’ג€ֲ¢׳³ֲ³׳’ג‚¬ג„¢׳³ג€™׳’ג€ֲ¬ײ²ֲ׳²ֲ²ײ²ֲ¬׳³ֲ³׳’ג‚¬ג„¢׳³ג€™׳’ג‚¬ֲײ²ֲ¬׳²ֲ²ײ²ֲ׳³ֲ³ײ²ֲ²׳²ֲ²ײ²ֲ²׳³ֲ²ײ²ֲ²׳²ֲ²ײ²ֲ¸ ';
 }
 
 .wr2w-meta-drawer[open] summary::before {
-    content: '׳’ג€“ֲ¾ ';
+    content: '׳³ֲ³ײ²ֲ³׳²ֲ²ײ²ֲ³׳³ֲ³׳’ג‚¬ג„¢׳³ג€™׳’ג‚¬ֲײ²ֲ¬׳³ג€™׳’ג‚¬ֲײ²ֲ¢׳³ֲ³ײ²ֲ³׳³ג€™׳’ג€ֲ¬׳’ג€ֲ¢׳³ֲ³׳’ג‚¬ג„¢׳³ג€™׳’ג€ֲ¬ײ²ֲ׳²ֲ²ײ²ֲ¬׳³ֲ³׳’ג‚¬ג„¢׳³ג€™׳’ג‚¬ֲײ²ֲ¬׳²ֲ²ײ²ֲ׳³ֲ³ײ²ֲ²׳²ֲ²ײ²ֲ²׳³ֲ²ײ²ֲ²׳²ֲ²ײ²ֲ¾ ';
 }
 
 .wr2w-meta-drawer[open] summary {
@@ -8264,7 +8269,7 @@ a:hover {
 }
 
 .option-input:checked ~ .option-label .option-radio::after {
-    content: '׳’ֲג€';
+    content: '׳³ֲ³ײ²ֲ³׳²ֲ²ײ²ֲ³׳³ֲ³׳’ג‚¬ג„¢׳³ג€™׳’ג‚¬ֲײ²ֲ¬׳³ג€™׳’ג‚¬ֲײ²ֲ¢׳³ֲ³ײ²ֲ²׳²ֲ²ײ²ֲ²׳³ֲ²ײ²ֲ²׳²ֲ²ײ²ֲ׳³ֲ³ײ²ֲ³׳³ג€™׳’ג€ֲ¬׳’ג€ֲ¢׳³ֲ³׳’ג‚¬ג„¢׳³ג€™׳’ג€ֲ¬ײ²ֲ׳²ֲ²ײ²ֲ¬׳³ֲ²ײ²ֲ²׳²ֲ²ײ²ֲ';
     color: white;
     font-weight: bold;
     font-size: 14px;
@@ -9287,7 +9292,7 @@ a:hover {
 }
 
 .comic-params-panel summary::before {
-    content: "׳’ג€“ֲ¾ ";
+    content: "׳³ֲ³ײ²ֲ³׳²ֲ²ײ²ֲ³׳³ֲ³׳’ג‚¬ג„¢׳³ג€™׳’ג‚¬ֲײ²ֲ¬׳³ג€™׳’ג‚¬ֲײ²ֲ¢׳³ֲ³ײ²ֲ³׳³ג€™׳’ג€ֲ¬׳’ג€ֲ¢׳³ֲ³׳’ג‚¬ג„¢׳³ג€™׳’ג€ֲ¬ײ²ֲ׳²ֲ²ײ²ֲ¬׳³ֲ³׳’ג‚¬ג„¢׳³ג€™׳’ג‚¬ֲײ²ֲ¬׳²ֲ²ײ²ֲ׳³ֲ³ײ²ֲ²׳²ֲ²ײ²ֲ²׳³ֲ²ײ²ֲ²׳²ֲ²ײ²ֲ¾ ";
     color: #64748b;
 }
 
@@ -15290,3 +15295,4 @@ body.mobile-sticky-cta-visible {
         transform: translateY(-34px) scale(1);
     }
 }
+

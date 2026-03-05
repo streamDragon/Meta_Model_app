@@ -1,6 +1,7 @@
 ﻿// Global Variables
 let metaModelData = {};
 let metaModelGlossaryData = { items: [] };
+let metaModelPatternLibraryData = { patterns: [] };
 let practiceCount = 0;
 let currentStatementIndex = 0;
 const MAX_STREAK_CHARGES = 3;
@@ -2360,9 +2361,9 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: 'בחר/י פריזמה, כתוב/כתבי מילה/ביטוי מרכזי אחד מהמשפט, מלא/י כמה רמות, ואז בדוק/י את המפה ובחר/י צעד המשך. אם חסרה רמה - משלימים שכבה לפני שעוברים הלאה.'
     }),
     categories: Object.freeze({
-        logic: 'זהו מסך ידע: מחיקה, עיוות והכללה כמפת ניווט לתרגול.',
-        goal: 'לזהות מהר איזה סוג הפרה מופיע במשפט.',
-        approach: 'עבור/י על הדוגמאות ואז חזור/י למסך תרגול מעשי.'
+        logic: 'זהו שער למודל: כל קטגוריה חושפת שכבת מידע אחרת שנמחקה, עוותה או הוכללה בשפה.',
+        goal: 'לזהות במהירות את התבנית הפעילה ולבחור שאלה שמחזירה עומק ודיוק.',
+        approach: 'לעבור לפי סדר ברין, לעבוד קטגוריה-קטגוריה, ואז לחזור לתרגול עם שאלה אחת מדויקת לכל דפוס.'
     }),
     practice: Object.freeze({
         logic: 'מסך התרגול פוצל ל-4 דפים: שאלות, Meta Radar, SQHCEL, ופועל לא מפורט.',
@@ -3588,17 +3589,21 @@ function buildScreenReadGuide(screenId) {
     const expected = copy.expected || `לאחר התרגול במסך הזה תדע/י: ${copy.goal}`;
     const success = copy.success || DEFAULT_SCREEN_READ_GUIDE.success;
     const demo = getTherapeuticDemoContent(screenId, title, copy);
+    const philosopherIconSrc = resolveVersionedAssetPath('assets/svg/props/philosopher-guide.svg');
+    const philosopherTeaser = screenId === 'categories'
+        ? 'כאן נפתחת מפת ברין המלאה: לא רק שמות תבניות, אלא איך כל תבנית חושפת מידע שהיה חסר.'
+        : 'לחיצה פותחת את מנגנון העומק: מאיפה נולד הדפוס, מה המחיר שלו, ומה השאלה שמחזירה תנועה.';
 
     const philosopherToggle = document.createElement('details');
     philosopherToggle.className = 'screen-read-guide-philosopher-toggle';
     philosopherToggle.innerHTML = `
         <summary class="screen-read-guide-philosopher-summary" aria-label="פילוסוף מסך - פתיחת ההיגיון מאחורי התרגול">
             <div class="screen-read-guide-illustration-media">
-                <img class="screen-read-guide-philosopher" src="assets/svg/props/philosopher-guide.svg" alt="פילוסוף מסביר" loading="lazy">
+                <img class="screen-read-guide-philosopher" src="${escapeHtml(philosopherIconSrc || 'assets/svg/props/philosopher-guide.svg')}" alt="פילוסוף מסביר" loading="lazy">
             </div>
             <div class="screen-read-guide-illustration-copy">
-                <strong>פילוסוף מסך · ההיגיון מאחורי התרגול</strong>
-                <span>לחיצה פותחת הסבר קצר למה הכלי הזה עובד ומה בדיוק הוא בא לתרגל.</span>
+                <strong>פילוסוף מסך · מה נפתח כאן באמת</strong>
+                <span>${escapeHtml(philosopherTeaser)}</span>
             </div>
         </summary>
         <div class="screen-read-guide-philosopher-panel">
@@ -5034,9 +5039,10 @@ if (document.readyState === 'loading') {
 // Load Meta Model data from JSON
 async function loadMetaModelData() {
     try {
-        const [response, glossaryResponse] = await Promise.all([
+        const [response, glossaryResponse, patternsResponse] = await Promise.all([
             fetch(resolveVersionedAssetPath('data/meta-model-violations.json'), { cache: 'no-store' }),
-            fetch(resolveVersionedAssetPath('data/meta_model_glossary_breakthroughs.he.json'), { cache: 'no-store' }).catch(() => null)
+            fetch(resolveVersionedAssetPath('data/meta_model_glossary_breakthroughs.he.json'), { cache: 'no-store' }).catch(() => null),
+            fetch(resolveVersionedAssetPath('data/metaModelPatterns.he.json'), { cache: 'no-store' }).catch(() => null)
         ]);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         metaModelData = deepNormalizeUiPayload(await response.json());
@@ -5044,6 +5050,11 @@ async function loadMetaModelData() {
             metaModelGlossaryData = deepNormalizeUiPayload(await glossaryResponse.json());
         } else {
             metaModelGlossaryData = { items: [] };
+        }
+        if (patternsResponse && patternsResponse.ok) {
+            metaModelPatternLibraryData = deepNormalizeUiPayload(await patternsResponse.json());
+        } else {
+            metaModelPatternLibraryData = { patterns: [] };
         }
         
         // Populate categories
@@ -5294,7 +5305,7 @@ function normalizeBreenReferenceCategoryId(categoryId = '') {
         lack_of_referential_index: 'lack_referential_index',
         unspecified_verb: 'unspecified_verbs',
         unspecified_noun: 'non_referring_nouns',
-        simple_deletion: 'non_referring_nouns'
+        simple_deletion: 'simple_deletion'
     };
     return aliases[raw] || raw;
 }
@@ -5302,19 +5313,19 @@ function normalizeBreenReferenceCategoryId(categoryId = '') {
 function getBreenReferenceCategoryLabelHe(categoryId = '') {
     const id = normalizeBreenReferenceCategoryId(categoryId);
     const labels = {
-        lost_performative: 'שיפוט חסר מקור',
-        assumptions: 'הנחות סמויות',
+        lost_performative: 'חסרון הדובר',
+        assumptions: 'הנחות מוקדמות',
         mind_reading: 'קריאת מחשבות',
-        universal_quantifier: 'כמת כוללני',
-        modal_operator: 'מודל אופרטור',
+        universal_quantifier: 'הכללה',
+        modal_operator: 'מודל פעולה',
         cause_effect: 'סיבה ותוצאה',
         nominalisations: 'נומינליזציה',
-        identity_predicates: 'זהות',
-        complex_equivalence: 'שקילות מורכבת',
-        comparative_deletion: 'השוואה חסרה',
-        time_space_predicates: 'זמן ומרחב',
-        lack_referential_index: 'חוסר ייחוס',
-        non_referring_nouns: 'שמות לא מפנים',
+        identity_predicates: 'פרדיקטים של זהות',
+        complex_equivalence: 'הקבלה מורכבת',
+        comparative_deletion: 'השמטה השוואתית',
+        time_space_predicates: 'פרדיקטים של זמן ומקום',
+        lack_referential_index: 'אובדן המצביע',
+        non_referring_nouns: 'שם עצם לא מפורט',
         sensory_predicates: 'פרדיקטים חושיים',
         unspecified_verbs: 'פועל לא מפורט'
     };
@@ -5492,6 +5503,72 @@ const GLOSSARY_COLUMN_HEBREW = Object.freeze({
     DISTORTION: 'עיוות',
     DELETION: 'מחיקה'
 });
+const GLOSSARY_REQUIRED_ORDER = Object.freeze([
+    'mind_reading',
+    'assumptions',
+    'lost_performative',
+    'cause_effect',
+    'modal_operator',
+    'universal_quantifier',
+    'complex_equivalence',
+    'identity_predicates',
+    'nominalization',
+    'lack_referential_index',
+    'time_space_predicates',
+    'simple_deletion',
+    'comparative_deletion',
+    'unspecified_verb',
+    'sensory_predicates',
+    'non_referring_nouns',
+    'logical_types_confusion',
+    'false_dilemma'
+]);
+const GLOSSARY_STANDARD_META = Object.freeze({
+    mind_reading: Object.freeze({ he: 'קריאת מחשבות', en: 'Mind Reading', group: 'DISTORTION' }),
+    assumptions: Object.freeze({ he: 'הנחות מוקדמות', en: 'Presuppositions', group: 'DISTORTION' }),
+    lost_performative: Object.freeze({ he: 'חסרון הדובר', en: 'Lost Performative', group: 'DISTORTION' }),
+    cause_effect: Object.freeze({ he: 'סיבה ותוצאה', en: 'Cause-Effect', group: 'DISTORTION' }),
+    modal_operator: Object.freeze({ he: 'מודל פעולה', en: 'Modal Operators', group: 'GENERALIZATION' }),
+    universal_quantifier: Object.freeze({ he: 'הכללה', en: 'Generalization', group: 'GENERALIZATION' }),
+    complex_equivalence: Object.freeze({ he: 'הקבלה מורכבת', en: 'Complex Equivalence', group: 'DISTORTION' }),
+    identity_predicates: Object.freeze({ he: 'פרדיקטים של זהות', en: 'Identity Predicates', group: 'DISTORTION' }),
+    nominalization: Object.freeze({ he: 'נומינליזציה', en: 'Nominalization', group: 'DELETION' }),
+    lack_referential_index: Object.freeze({ he: 'אובדן המצביע', en: 'Unspecified Referential Index', group: 'DELETION' }),
+    time_space_predicates: Object.freeze({ he: 'פרדיקטים של זמן ומקום', en: 'Time and Place Predicates', group: 'DISTORTION' }),
+    simple_deletion: Object.freeze({ he: 'השמטה', en: 'Deletion', group: 'DELETION' }),
+    comparative_deletion: Object.freeze({ he: 'השמטה השוואתית', en: 'Comparative Deletion', group: 'DELETION' }),
+    unspecified_verb: Object.freeze({ he: 'פועל לא מפורט', en: 'Unspecified Verb', group: 'DELETION' }),
+    sensory_predicates: Object.freeze({ he: 'פרדיקטים חושיים', en: 'Sensory Predicates', group: 'DISTORTION' }),
+    non_referring_nouns: Object.freeze({ he: 'שם עצם לא מפורט', en: 'Unspecified Noun', group: 'DELETION' }),
+    logical_types_confusion: Object.freeze({ he: 'בלבול ברמות לוגיות', en: 'Logical Level Confusion', group: 'DISTORTION' }),
+    false_dilemma: Object.freeze({ he: 'חשיבה דיכוטומית (או־או)', en: 'Dichotomous Thinking', group: 'DISTORTION' })
+});
+const GLOSSARY_CONCEPT_ID_ALIASES = Object.freeze({
+    assumptions: 'assumptions',
+    assumption: 'assumptions',
+    presupposition: 'assumptions',
+    presuppositions: 'assumptions',
+    cause_and_effect: 'cause_effect',
+    cause_effect: 'cause_effect',
+    modal_operator: 'modal_operator',
+    modal_operators: 'modal_operator',
+    modal_necessity: 'modal_operator',
+    modal_possibility: 'modal_operator',
+    universal_quantifier: 'universal_quantifier',
+    universal_quantifiers: 'universal_quantifier',
+    rules_generalization: 'universal_quantifier',
+    nominalisation: 'nominalization',
+    nominalisations: 'nominalization',
+    nominalization: 'nominalization',
+    lack_ref_index: 'lack_referential_index',
+    lack_of_referential_index: 'lack_referential_index',
+    unspecified_verb: 'unspecified_verb',
+    unspecified_verbs: 'unspecified_verb',
+    unspecified_noun: 'non_referring_nouns',
+    non_referring_noun: 'non_referring_nouns',
+    non_referring_nouns: 'non_referring_nouns',
+    simple_deletion: 'simple_deletion'
+});
 const GLOSSARY_FALLBACK_GROUP_BY_ID = Object.freeze({
     simple_deletion: 'DELETION',
     comparative_deletion: 'DELETION',
@@ -5515,22 +5592,81 @@ const GLOSSARY_FALLBACK_GROUP_BY_ID = Object.freeze({
     time_space_predicates: 'DISTORTION',
     sensory_predicates: 'DISTORTION'
 });
+const GLOSSARY_FALLBACK_MARKERS_BY_ID = Object.freeze({
+    assumptions: Object.freeze([
+        'מתי תפסיק כבר...?',
+        'איך תתמודד עם זה שוב?',
+        'למה אתה עדיין...?'
+    ]),
+    lost_performative: Object.freeze([
+        'זה לא נכון.',
+        'ככה לא מתנהגים.',
+        'אסור לעשות את זה.'
+    ]),
+    simple_deletion: Object.freeze([
+        'זה לא עובד.',
+        'היה קשה.',
+        'זה פשוט בעייתי.'
+    ]),
+    lack_referential_index: Object.freeze([
+        'הם לא מעריכים אותי.',
+        'כולם אומרים שאני טועה.',
+        'במערכת חושבים אחרת.'
+    ]),
+    sensory_predicates: Object.freeze([
+        'זה מרגיש כבד.',
+        'זה נשמע חד מדי.',
+        'התמונה הזאת צורמת לי.'
+    ]),
+    non_referring_nouns: Object.freeze([
+        'משהו פה לא תקין.',
+        'הדבר הזה חוסם אותי.',
+        'זה נהיה בלתי נסבל.'
+    ])
+});
+const GLOSSARY_FALLBACK_QUESTIONS_BY_ID = Object.freeze({
+    assumptions: Object.freeze([
+        'איזו הנחה כבר הוכנסה כאן בלי בדיקה?',
+        'מה חייב להיות נכון כדי שהמשפט הזה יחזיק?',
+        'איך אפשר לבדוק את ההנחה הזו מול המציאות?'
+    ]),
+    lost_performative: Object.freeze([
+        'לפי מי זה נכון או לא נכון?',
+        'מה הקריטריון שמאחורֵי השיפוט הזה?',
+        'מי קבע את הכלל הזה ומתי?'
+    ]),
+    simple_deletion: Object.freeze([
+        'מה בדיוק לא עובד כאן?',
+        'איפה, מתי ועם מי זה קורה?',
+        'מה המדד שלפיו זה “לא טוב”?'
+    ]),
+    comparative_deletion: Object.freeze([
+        'יותר טוב ביחס למה בדיוק?',
+        'לפי איזה קריטריון נעשתה ההשוואה?',
+        'מה היה נחשב שיפור מדיד כאן?'
+    ]),
+    lack_referential_index: Object.freeze([
+        'מי בדיוק אמר או עשה את זה?',
+        'אפשר לתת שם אחד או דוגמה קונקרטית?',
+        'מתי זה קרה בפעם האחרונה?'
+    ]),
+    sensory_predicates: Object.freeze([
+        'מה אתה רואה/שומע/מרגיש בפועל?',
+        'איזה סימן חושי הכי חזק כרגע?',
+        'איך זה נראה במדידה חיצונית ולא רק בתחושה?'
+    ]),
+    non_referring_nouns: Object.freeze([
+        'מהו “זה” במשפט הזה, בדיוק?',
+        'איזה שם עצם ספציפי חסר כאן?',
+        'אם נחליף את המילה הכללית בשם מדויק, מה יופיע?'
+    ])
+});
 
 function normalizeGlossaryConceptId(raw = '') {
     const value = String(raw || '').trim();
     if (!value) return '';
     const normalized = value.toLowerCase().replace(/[\s-]+/g, '_');
-    const aliases = {
-        presupposition: 'assumptions',
-        presuppositions: 'assumptions',
-        assumption: 'assumptions',
-        nominalisation: 'nominalization',
-        nominalisations: 'nominalization',
-        lack_of_referential_index: 'lack_referential_index',
-        unspecified_verbs: 'unspecified_verb',
-        unspecified_noun: 'non_referring_nouns'
-    };
-    return aliases[normalized] || normalized;
+    return GLOSSARY_CONCEPT_ID_ALIASES[normalized] || normalized;
 }
 
 function normalizeGlossaryMacroGroup(group = '', conceptId = '') {
@@ -5538,6 +5674,10 @@ function normalizeGlossaryMacroGroup(group = '', conceptId = '') {
     if (GLOSSARY_COLUMN_ORDER.includes(normalizedGroup)) return normalizedGroup;
 
     const normalizedId = normalizeGlossaryConceptId(conceptId);
+    const standard = GLOSSARY_STANDARD_META[normalizedId];
+    if (standard?.group && GLOSSARY_COLUMN_ORDER.includes(standard.group)) {
+        return standard.group;
+    }
     if (normalizedId && GLOSSARY_FALLBACK_GROUP_BY_ID[normalizedId]) {
         return GLOSSARY_FALLBACK_GROUP_BY_ID[normalizedId];
     }
@@ -5554,7 +5694,7 @@ function uniqueTrimmedList(items = [], limit = 10) {
     const output = [];
     const seen = new Set();
     (items || []).forEach((entry) => {
-        const value = String(entry || '').trim();
+        const value = normalizeUiText(String(entry || '').trim());
         if (!value) return;
         const key = value.toLowerCase();
         if (seen.has(key)) return;
@@ -5576,24 +5716,26 @@ function normalizeGlossaryConcept(rawItem = {}) {
     if (!conceptId) return null;
 
     const story = rawItem.story && typeof rawItem.story === 'object' ? rawItem.story : {};
+    const standardMeta = GLOSSARY_STANDARD_META[conceptId] || null;
     const group = normalizeGlossaryMacroGroup(rawItem.group || rawItem.category || rawItem.family, conceptId);
+    const resolvedGroup = standardMeta?.group || group;
 
     return {
         id: conceptId,
-        group,
-        he_group: String(rawItem.he_group || GLOSSARY_COLUMN_HEBREW[group] || '').trim(),
-        he_title: String(rawItem.he_title || rawItem.hebrew || rawItem.name || conceptId).trim(),
-        en_title: String(rawItem.en_title || rawItem.name || conceptId).trim(),
-        he_definition_short: String(rawItem.he_definition_short || rawItem.description || '').trim(),
+        group: resolvedGroup,
+        he_group: normalizeUiText(String(rawItem.he_group || GLOSSARY_COLUMN_HEBREW[resolvedGroup] || '').trim()),
+        he_title: normalizeUiText(String(standardMeta?.he || rawItem.he_title || rawItem.hebrew || rawItem.name || conceptId).trim()),
+        en_title: normalizeUiText(String(standardMeta?.en || rawItem.en_title || rawItem.name || conceptId).trim()),
+        he_definition_short: normalizeUiText(String(rawItem.he_definition_short || rawItem.description || '').trim()),
         markers: uniqueTrimmedList(Array.isArray(rawItem.markers) ? rawItem.markers : []),
         meta_model_questions: uniqueTrimmedList(Array.isArray(rawItem.meta_model_questions) ? rawItem.meta_model_questions : []),
         story: {
-            client_line: String(story.client_line || '').trim(),
-            therapist_intervention: String(story.therapist_intervention || '').trim()
+            client_line: normalizeUiText(String(story.client_line || '').trim()),
+            therapist_intervention: normalizeUiText(String(story.therapist_intervention || '').trim())
         },
-        transformation_moment: String(rawItem.transformation_moment || '').trim(),
-        positive_end: String(rawItem.positive_end || '').trim(),
-        next_step_direction: String(rawItem.next_step_direction || '').trim()
+        transformation_moment: normalizeUiText(String(rawItem.transformation_moment || '').trim()),
+        positive_end: normalizeUiText(String(rawItem.positive_end || '').trim()),
+        next_step_direction: normalizeUiText(String(rawItem.next_step_direction || '').trim())
     };
 }
 
@@ -5635,6 +5777,59 @@ function mergeGlossaryConcept(primary, secondary) {
     return merged;
 }
 
+function extractPatternLibraryTextList(items = [], limit = 12) {
+    const source = Array.isArray(items) ? items : [];
+    const normalized = source
+        .map((entry) => (typeof entry === 'string' ? entry : entry?.text))
+        .map((entry) => normalizeUiText(String(entry || '').trim()))
+        .filter(Boolean);
+    return uniqueTrimmedList(normalized, limit);
+}
+
+function buildPatternLibraryConcept(pattern = {}) {
+    const patternId = normalizeGlossaryConceptId(pattern?.id || pattern?.name || '');
+    if (!patternId) return null;
+    return normalizeGlossaryConcept({
+        id: patternId,
+        group: normalizeGlossaryMacroGroup(pattern?.family || '', patternId),
+        he_group: GLOSSARY_COLUMN_HEBREW[normalizeGlossaryMacroGroup(pattern?.family || '', patternId)] || '',
+        he_title: pattern?.name || '',
+        he_definition_short: pattern?.definition || pattern?.problem?.oneLiner || '',
+        markers: extractPatternLibraryTextList(pattern?.examples || [], 14),
+        meta_model_questions: extractPatternLibraryTextList(pattern?.goodQuestions || [], 18)
+    });
+}
+
+function enrichGlossaryConceptDepth(item = {}) {
+    const id = normalizeGlossaryConceptId(item.id);
+    const standard = GLOSSARY_STANDARD_META[id] || null;
+    const group = normalizeGlossaryMacroGroup(item.group, id);
+    return {
+        ...item,
+        id,
+        group,
+        he_group: normalizeUiText(String(item.he_group || GLOSSARY_COLUMN_HEBREW[group] || '').trim()),
+        he_title: normalizeUiText(String(standard?.he || item.he_title || id).trim()),
+        en_title: normalizeUiText(String(standard?.en || item.en_title || id).trim()),
+        markers: uniqueTrimmedList([...(item.markers || []), ...((GLOSSARY_FALLBACK_MARKERS_BY_ID[id]) || [])], 16),
+        meta_model_questions: uniqueTrimmedList([...(item.meta_model_questions || []), ...((GLOSSARY_FALLBACK_QUESTIONS_BY_ID[id]) || [])], 18)
+    };
+}
+
+function getGlossaryRequiredOrderRank(item = {}) {
+    const id = normalizeGlossaryConceptId(item?.id || '');
+    const idx = GLOSSARY_REQUIRED_ORDER.indexOf(id);
+    return idx === -1 ? Number.MAX_SAFE_INTEGER : idx;
+}
+
+function sortGlossaryConceptsByRequiredOrder(concepts = []) {
+    return [...(Array.isArray(concepts) ? concepts : [])].sort((a, b) => {
+        const rankDiff = getGlossaryRequiredOrderRank(a) - getGlossaryRequiredOrderRank(b);
+        if (rankDiff !== 0) return rankDiff;
+        return String(a?.he_title || '').localeCompare(String(b?.he_title || ''), 'he');
+    });
+}
+
 function collectGlossaryConcepts() {
     const byId = new Map();
 
@@ -5661,6 +5856,11 @@ function collectGlossaryConcepts() {
         upsert(item, { preferred: true });
     });
 
+    (metaModelPatternLibraryData?.patterns || []).forEach((pattern) => {
+        const concept = buildPatternLibraryConcept(pattern);
+        upsert(concept, { preferred: false });
+    });
+
     getBreenReferenceRows().forEach((row) => {
         (row?.categories || []).forEach((categoryId) => {
             const normalizedId = normalizeGlossaryConceptId(categoryId);
@@ -5678,33 +5878,52 @@ function collectGlossaryConcepts() {
         });
     });
 
-    return Array.from(byId.values());
+    GLOSSARY_REQUIRED_ORDER.forEach((requiredId) => {
+        if (byId.has(requiredId)) return;
+        const standard = GLOSSARY_STANDARD_META[requiredId];
+        if (!standard) return;
+        upsert({
+            id: requiredId,
+            group: standard.group,
+            he_group: GLOSSARY_COLUMN_HEBREW[standard.group] || '',
+            he_title: standard.he,
+            en_title: standard.en,
+            he_definition_short: 'הגדרה מלאה תתווסף בהמשך. כרגע אפשר להתחיל עם הדוגמאות ושאלות הדיוק שבכרטיס.',
+            markers: [],
+            meta_model_questions: []
+        }, { preferred: false });
+    });
+
+    return sortGlossaryConceptsByRequiredOrder(Array.from(byId.values()).map((item) => enrichGlossaryConceptDepth(item)));
 }
 
 function buildGlossaryConceptCard(item = {}) {
-    const title = String(item.he_title || item.hebrew || item.he_title || item.en_title || item.id || 'מושג').trim();
-    const groupHe = String(item.he_group || '').trim();
-    const groupEn = String(item.group || '').trim();
-    const definition = String(item.he_definition_short || item.definition || '').trim();
-    const storyClient = String(item.story?.client_line || '').trim();
-    const storyIntervention = String(item.story?.therapist_intervention || '').trim();
-    const transformation = String(item.transformation_moment || '').trim();
-    const positiveEnd = String(item.positive_end || '').trim();
-    const nextStep = String(item.next_step_direction || '').trim();
+    const heTitle = normalizeUiText(String(item.he_title || item.hebrew || item.en_title || item.id || 'מושג').trim());
+    const enTitle = normalizeUiText(String(item.en_title || '').trim());
+    const title = heTitle && enTitle ? `${heTitle} — ${enTitle}` : (heTitle || enTitle || 'מושג');
+    const groupHe = normalizeUiText(String(item.he_group || '').trim());
+    const groupEn = normalizeUiText(String(item.group || '').trim());
+    const definition = normalizeUiText(String(item.he_definition_short || item.definition || '').trim());
+    const storyClient = normalizeUiText(String(item.story?.client_line || '').trim());
+    const storyIntervention = normalizeUiText(String(item.story?.therapist_intervention || '').trim());
+    const transformation = normalizeUiText(String(item.transformation_moment || '').trim());
+    const positiveEnd = normalizeUiText(String(item.positive_end || '').trim());
+    const nextStep = normalizeUiText(String(item.next_step_direction || '').trim());
 
     const markers = Array.isArray(item.markers)
-        ? item.markers.map((entry) => String(entry || '').trim()).filter(Boolean).slice(0, 8)
+        ? item.markers.map((entry) => normalizeUiText(String(entry || '').trim())).filter(Boolean).slice(0, 12)
         : [];
     const questions = Array.isArray(item.meta_model_questions)
-        ? item.meta_model_questions.map((entry) => String(entry || '').trim()).filter(Boolean).slice(0, 8)
+        ? item.meta_model_questions.map((entry) => normalizeUiText(String(entry || '').trim())).filter(Boolean).slice(0, 14)
         : [];
 
     const markersHtml = markers.length
         ? `<ul class="glossary-inline-list">${markers.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
-        : '<p>לא הוגדרו סימני זיהוי.</p>';
+        : '<p>דוגמאות יתווספו בהמשך.</p>';
     const questionsHtml = questions.length
         ? `<ul class="glossary-inline-list">${questions.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
-        : '<p>לא הוגדרו שאלות מדויקות.</p>';
+        : '<p>שאלות מטא־מודל יתווספו בהמשך.</p>';
+    const storyEmpty = !storyClient && !storyIntervention && !transformation && !positiveEnd && !nextStep;
 
     return `
         <article class="category-card glossary-card ${escapeHtml(getGlossaryGroupClass(groupEn))}" data-glossary-id="${escapeHtml(String(item.id || ''))}">
@@ -5718,23 +5937,24 @@ function buildGlossaryConceptCard(item = {}) {
             ${definition ? `<p class="glossary-definition">${escapeHtml(definition)}</p>` : ''}
 
             <details class="glossary-layer" open>
-                <summary>הסיפור הקליני + רגע השינוי</summary>
+                <summary>הסיפור הקליני + נקודת השינוי</summary>
                 <div class="glossary-layer-body">
                     ${storyClient ? `<p><strong>משפט מטופל:</strong> ${escapeHtml(storyClient)}</p>` : ''}
                     ${storyIntervention ? `<p><strong>התערבות מטפל:</strong> ${escapeHtml(storyIntervention)}</p>` : ''}
                     ${transformation ? `<p><strong>רגע טרנספורמציה:</strong> ${escapeHtml(transformation)}</p>` : ''}
                     ${positiveEnd ? `<p><strong>סיום חיובי:</strong> ${escapeHtml(positiveEnd)}</p>` : ''}
                     ${nextStep ? `<p><strong>המשך:</strong> ${escapeHtml(nextStep)}</p>` : ''}
+                    ${storyEmpty ? '<p>הרחבה קלינית מלאה תתווסף בהמשך. בינתיים התקדמו דרך הדוגמאות והשאלות של התבנית.</p>' : ''}
                 </div>
             </details>
 
             <details class="glossary-layer">
-                <summary>סימני זיהוי</summary>
+                <summary>דוגמאות</summary>
                 <div class="glossary-layer-body">${markersHtml}</div>
             </details>
 
             <details class="glossary-layer">
-                <summary>שאלות Meta-Model</summary>
+                <summary>שאלות מטא־מודל</summary>
                 <div class="glossary-layer-body">${questionsHtml}</div>
             </details>
         </article>
@@ -5779,18 +5999,20 @@ function populateCategories() {
     theoryIntro.innerHTML = `
         <h2>מילון קטגוריות המטה-מודל</h2>
         <p>
-            דף זה מרכז את כל קטגוריות המטה-מודל וההסבר התאורטי לכל אחת מהן.
-            כאן ניתן להבין מהי כל תבנית שפה, כיצד לזהות אותה,
-            ואיך היא פותחת מידע ומחזירה דיוק לחוויה של האדם.
+            דף זה מציג את כל הקטגוריות בסדר המלא של Michael Breen,
+            ובסיומן הקטגוריות המורחבות של חגי.
+            לכל קטגוריה תמצאו שם סטנדרטי (עברית + אנגלית), דוגמאות ושאלות מטא־מודל.
         </p>
-        <p class="categories-theory-note"><strong>למה:</strong> המסך הזה הוא מילון מושגים, ולכן כל מושג מופיע פעם אחת בלבד, אבל עם יותר עומק בתוך הכרטיס.</p>
+        <p class="categories-theory-note"><strong>למה:</strong> מעבר עקבי על הסדר הזה בונה שפה אחידה ומונע כפילויות/בלבול בין קטגוריות.</p>
     `;
     container.appendChild(theoryIntro);
 
-    const columns = document.createElement('section');
-    columns.className = 'categories-glossary-columns';
-    columns.innerHTML = GLOSSARY_COLUMN_ORDER.map((columnKey) => renderGlossaryColumn(columnKey, glossaryItems)).join('');
-    container.appendChild(columns);
+    const orderedList = document.createElement('section');
+    orderedList.className = 'categories-glossary-ordered-list';
+    orderedList.innerHTML = sortGlossaryConceptsByRequiredOrder(glossaryItems)
+        .map((item) => buildGlossaryConceptCard(item))
+        .join('');
+    container.appendChild(orderedList);
 }
 
 // Populate Category Select in Practice Mode
@@ -5874,7 +6096,7 @@ const QUESTION_DRILL_PACK = [
         targetMacro: 'DISTORTION',
         targetSubpattern: 'complex_equivalence',
         difficulty: 'easy',
-        explanation: 'שקילות מורכבת: פעולה אחת מתורגמת למשמעות רחבה.'
+        explanation: 'הקבלה מורכבת: פעולה אחת מתורגמת למשמעות רחבה.'
     }),
     Object.freeze({
         id: 'mm_easy_005',
@@ -5919,7 +6141,7 @@ const QUESTION_DRILL_PACK = [
         targetMacro: 'DELETION',
         targetSubpattern: 'comparative_deletion',
         difficulty: 'easy',
-        explanation: 'השוואה חסרה: יותר טוב ביחס למה.'
+        explanation: 'השמטה השוואתית: יותר טוב ביחס למה.'
     }),
     Object.freeze({
         id: 'mm_medium_001',
@@ -12744,7 +12966,7 @@ const PRISM_STACK_TECHNICAL_ANCHOR_TERMS = Object.freeze([
     'nominalisations',
     'קריאת מחשבות',
     'mind reading',
-    'אופרטורים מודלים',
+    'מודל פעולה',
     'modal operators',
     'כמותים כלליים',
     'universal quantifiers',
@@ -12752,7 +12974,7 @@ const PRISM_STACK_TECHNICAL_ANCHOR_TERMS = Object.freeze([
     'comparisons',
     'סיבה תוצאה',
     'cause effect',
-    'שקילות מורכבת',
+    'הקבלה מורכבת',
     'complex equivalence',
     'זהות',
     'identity predicates'

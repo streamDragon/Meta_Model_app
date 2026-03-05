@@ -16,7 +16,7 @@
     { id: 'cause_effect', icon: '🔗', nameHe: 'סיבת-תוצאה', desc: 'בונים מנגנון X⇢Y במקום קסם.', q: 'איך בדיוק X גורם ל־Y?', type: 'mechanism' },
     { id: 'complex_equivalence', icon: '🪢', nameHe: 'הקבלה מורכבת', desc: 'מפרקים את הדבק של “זה אומר ש…”.', q: 'איך X אומר ש־Y?', type: 'meaning' },
     { id: 'mind_reading', icon: '🧠', nameHe: 'קריאת מחשבות', desc: 'מבדילים בין נתון לפרשנות.', q: 'איך אתה יודע ש־X?', type: 'evidence' },
-    { id: 'comparison', icon: '📏', nameHe: 'השוואה חסרה', desc: 'מוצאים ביחס למה/מי מודדים.', q: 'יותר/פחות ביחס ל־מה/מי?', type: 'criterion' },
+    { id: 'comparison', icon: '📏', nameHe: 'השמטה השוואתית', desc: 'מוצאים ביחס למה/מי מודדים.', q: 'יותר/פחות ביחס ל־מה/מי?', type: 'criterion' },
     { id: 'lost_performative', icon: '🏛️', nameHe: 'Lost Performative', desc: 'מגלים מי אמר ולפי איזה כלל.', q: 'לפי מי/איזה כלל X?', type: 'authority' },
     { id: 'presupposition', icon: '🧱', nameHe: 'הנחות יסוד', desc: 'חושפים מה חייב להיות נכון ברקע.', q: 'מה חייב להיות נכון כדי שהמשפט הזה יהיה נכון?', type: 'assumption' },
     { id: 'unspecified_time', icon: '⏱️', nameHe: 'זמן לא מוגדר', desc: 'מוצאים חלון זמן מדויק.', q: 'מתי בדיוק X?', type: 'time' },
@@ -61,19 +61,19 @@
   });
 
   const BREEN_LABELS_HE = Object.freeze({
-    lost_performative: 'שיפוט חסר מקור',
-    assumptions: 'הנחות סמויות',
+    lost_performative: 'חסרון הדובר',
+    assumptions: 'הנחות מוקדמות',
     mind_reading: 'קריאת מחשבות',
-    universal_quantifier: 'כמת כוללני',
-    modal_operator: 'מודל אופרטור',
+    universal_quantifier: 'הכללה',
+    modal_operator: 'מודל פעולה',
     cause_effect: 'סיבה ותוצאה',
     nominalisations: 'נומינליזציה',
     identity_predicates: 'זהות',
-    complex_equivalence: 'שקילות מורכבת',
-    comparative_deletion: 'השוואה חסרה',
+    complex_equivalence: 'הקבלה מורכבת',
+    comparative_deletion: 'השמטה השוואתית',
     time_space_predicates: 'זמן ומרחב',
-    lack_referential_index: 'חוסר ייחוס',
-    non_referring_nouns: 'שמות לא מפנים',
+    lack_referential_index: 'אובדן המצביע',
+    non_referring_nouns: 'שם עצם לא מפורט',
     sensory_predicates: 'פרדיקטים חושיים',
     unspecified_verbs: 'פועל לא מפורט'
   });
