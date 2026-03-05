@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.169" data-build-time="1772673920596" data-build-iso="2026-03-05T01:25:20.596Z" data-git-commit="97c1351">
+<html lang="he" dir="rtl" data-app-version="1.0.170" data-build-time="1772674146984" data-build-iso="2026-03-05T01:29:06.984Z" data-git-commit="19a02e4">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -755,9 +755,24 @@
 
                 <section id="comicEngine" class="ceflow-engine" dir="rtl">
                     <div class="ceflow-top-actions">
-                        <button id="ceflow-info-btn" class="btn btn-secondary ceflow-small-btn" type="button">💡 למה זה עובד?</button>
+                        <div class="ceflow-action-group">
+                            <button id="ceflow-info-btn" class="btn btn-secondary ceflow-small-btn" type="button">💡 למה זה עובד?</button>
+                            <button id="ceflow-expand-stage" class="btn btn-secondary ceflow-small-btn" type="button" aria-pressed="false">🖼️ הגדל רגע</button>
+                        </div>
+                        <aside id="ceflow-shotclock-shell" class="ceflow-shotclock-shell" aria-live="polite">
+                            <div id="ceflow-shotclock" class="ceflow-shotclock" role="timer" aria-label="שעון החלטה">
+                                <div id="ceflow-shotclock-ring" class="ceflow-shotclock-ring">
+                                    <span id="ceflow-shotclock-seconds">20</span>
+                                </div>
+                                <div class="ceflow-shotclock-copy">
+                                    <strong>Shot Clock</strong>
+                                    <small id="ceflow-shotclock-label">זמן לבחירה</small>
+                                </div>
+                            </div>
+                        </aside>
                     </div>
                     <div id="ceflow-floating-note" class="ceflow-floating-note hidden" aria-live="polite"></div>
+                    <div id="ceflow-distractor" class="ceflow-distractor hidden" aria-live="assertive"></div>
 
                     <header class="ceflow-header">
                         <div class="ceflow-chip-row">
@@ -767,6 +782,13 @@
                         </div>
                         <h3 id="ceflow-title" class="ceflow-title">כותרת סצנה</h3>
                     </header>
+
+                    <section id="ceflow-context-card" class="ceflow-context-card" aria-live="polite">
+                        <h4>Context לפני Snap</h4>
+                        <p id="ceflow-context-main"></p>
+                        <p id="ceflow-context-trigger"></p>
+                        <p id="ceflow-context-snap" class="ceflow-context-snap"></p>
+                    </section>
 
                     <div class="ceflow-stage-wrap">
                         <article id="ceflow-left-character" class="ceflow-character-card"></article>
@@ -800,6 +822,8 @@
                         <h4 class="ceflow-block-title">בחר/י תגובה</h4>
                         <div id="ceflow-choice-deck" class="ceflow-choice-deck" role="group" aria-label="אפשרויות תגובה"></div>
                     </section>
+
+                    <section id="ceflow-timeout" class="ceflow-timeout hidden" aria-live="polite"></section>
 
                     <section id="ceflow-reply-box" class="ceflow-reply-box hidden">
                         <h4 class="ceflow-block-title">הצד השני הגיב. איך את/ה עונה עכשיו?</h4>
