@@ -1847,14 +1847,14 @@ function normalizeRequestedTab(tabName = '') {
 const APP_STICKY_TAB_TITLE_OVERRIDES = Object.freeze({
     home: 'בית · התחלה והכוונה',
     'scenario-trainer': 'סצנות Execution',
-    'comic-engine': 'Comic Engine',
+    'comic-engine': 'במת קומיקס רגשי',
     categories: 'מילון קטגוריות המטה-מודל',
     'practice-question': 'תרגול זיהוי Meta-Model',
     'practice-radar': 'Meta Radar',
     'practice-triples-radar': 'Triples Radar (Breen)',
     'practice-wizard': 'גשר תחושה-שפה',
     'practice-verb-unzip': 'פועל לא מפורט (Unzip)',
-    blueprint: 'Blueprint Builder',
+    blueprint: 'בונה מהלך',
     prismlab: 'Prism Lab · רמות לוגיות',
     about: 'על הפרויקט'
 });
@@ -3617,14 +3617,14 @@ function setupGlobalFeatureMenuDropdown() {
     const labelOverrides = Object.freeze({
         'tab:home': 'בית · התחלה והכוונה',
         'tab:scenario-trainer': 'סימולטור סצנות (Execution)',
-        'tab:comic-engine': 'Comic Engine · תגובות/מהלכים',
+        'tab:comic-engine': 'במת קומיקס רגשי · תגובות ומהלכים',
         'tab:categories': 'מילון קטגוריות המטה-מודל',
         'tab:practice-question': 'תרגול זיהוי Meta-Model',
         'tab:practice-radar': 'Meta Radar',
         'tab:practice-triples-radar': 'Triples Radar (Breen)',
         'tab:practice-wizard': 'כמתים נסתרים · הגשר שנסגר',
         'tab:practice-verb-unzip': 'פועל לא מפורט (Unzip)',
-        'tab:blueprint': 'בונה מהלך (Blueprint)',
+        'tab:blueprint': 'בונה מהלך',
         'tab:prismlab': 'Prism Lab · רמות לוגיות',
         'tab:about': 'על הפרויקט',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classicClassic, 'classic_classic_trainer.html')]: 'Classic 1 · Classic Classic',
@@ -4226,12 +4226,12 @@ function setupFeatureLauncherTabs() {
         "nav:practice-radar": "Meta Radar",
         "nav:practice-wizard": "כמתים נסתרים · גשר השפה",
         "nav:practice-verb-unzip": "פועל לא מפורט",
-        "nav:blueprint": "Blueprint Builder",
+        "nav:blueprint": "בונה מהלך",
         "nav:prismlab": "Prism Lab · רמות לוגיות",
         "nav:practice-triples-radar": "Triples Radar (Breen)",
         "nav:categories": "מילון קטגוריות המטה-מודל",
-        "nav:comic-engine": "Comic Engine",
-        "nav:scenario-trainer": "Scenario Trainer",
+        "nav:comic-engine": "במת קומיקס רגשי",
+        "nav:scenario-trainer": "סימולטור סצנות",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: "Unzip Trainer (Standalone)",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/')]: "דף עבודה מעוגל · Verb Unzip",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: "Sentence Morpher",
@@ -15908,7 +15908,7 @@ const HOME_TRAINING_PROGRAMS = Object.freeze([
         steps: Object.freeze([
             Object.freeze({ tab: 'prismlab', title: 'Prism Lab', note: 'מגדל לוגי + צעד הבא' }),
             Object.freeze({ tab: 'practice-wizard', title: 'גשר תחושה-שפה', note: 'איסוף תהליך מובנה' }),
-            Object.freeze({ tab: 'comic-engine', title: 'Comic Engine', note: 'הדמיית תגובות ותוצאה' })
+            Object.freeze({ tab: 'comic-engine', title: 'במת קומיקס רגשי', note: 'הדמיית תגובות ותוצאה' })
         ])
     })
 ]);
@@ -16905,6 +16905,27 @@ const CEFLOW_MOTION = Object.freeze({
     })
 });
 
+const CEFLOW_UI = Object.freeze({
+    featureName: 'במת קומיקס רגשי',
+    shellHeading: 'סימולטור דיאלוג רגשי חי',
+    shellSubtitle: 'בחר/י תגובה תחת לחץ זמן, ראה/י איך השיחה נפתחת או מתקשה, והרגש/י את המחיר של כל מהלך בזמן אמת.',
+    shotClockTitle: 'שעון תגובה',
+    hudKicker: 'מדד רגשי חי',
+    powerCardTitle: 'קלף כוח: השאלה המדויקת שפותחת את הסצנה',
+    blueprintTitle: 'מהלך פעולה קצר',
+    blueprintPreconditions: 'תנאי פתיחה',
+    levelMap: Object.freeze({
+        'Snap -> Choice': 'לחץ מיידי -> בחירה',
+        'מודליות + הכללה': 'מודליות + הכללה'
+    }),
+    metrics: Object.freeze({
+        flow: Object.freeze({ label: 'זרימה', short: 'זרימה' }),
+        agency: Object.freeze({ label: 'סוכנות', short: 'סוכנות' }),
+        shame: Object.freeze({ label: 'בושה', short: 'בושה' }),
+        reactivity: Object.freeze({ label: 'תגובתיות', short: 'תגובתיות' })
+    })
+});
+
 const CEFLOW_EXPRESSION_ALIASES = Object.freeze({
     neutral: 'neutral',
     steady: 'neutral',
@@ -17115,7 +17136,7 @@ const CEFLOW_NATURAL_CHOICE_COPY = Object.freeze({
 });
 
 const CEFLOW_DEFAULT_LABELS = Object.freeze({
-    angry: 'Snap חם',
+    angry: 'התפרצות חמה',
     mock: 'עקיצה',
     rescue: 'הצלה',
     avoid: 'דחייה',
@@ -17482,7 +17503,7 @@ function ceflowNormContext(raw) {
         contextIntro,
         role: ceflowNormalizeCopy(source?.role, 'אדם תחת לחץ'),
         stakes: ceflowNormalizeCopy(source?.stakes, 'יש מחיר מיידי לדרך שבה תגיב/י עכשיו.'),
-        trigger: ceflowNormalizeCopy(source?.trigger, 'משהו קטן מפעיל תגובת Snap אוטומטית.'),
+        trigger: ceflowNormalizeCopy(source?.trigger, 'משהו קטן מפעיל תגובה אוטומטית.'),
         dominantEmotion: ceflowNormalizeCopy(source?.dominantEmotion, 'לחץ'),
         snapLine: ceflowNormalizeCopy(source?.snapLine, defaultSnap),
         distractors: distractors.length
@@ -17580,6 +17601,20 @@ function ceflowBuildScenarioPool(rawScenarios) {
     return injected.slice(0, 6);
 }
 
+function ceflowMetricMeta(metric) {
+    return CEFLOW_UI.metrics[metric] || Object.freeze({ label: metric, short: metric });
+}
+
+function ceflowFormatLevelLabel(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return 'רגע חי -> בחירה';
+    return CEFLOW_UI.levelMap[raw] || raw
+        .replace(/\bSnap\b/g, 'לחץ מיידי')
+        .replace(/\bChoice\b/g, 'בחירה')
+        .replace(/\bBlueprint\b/g, 'מהלך פעולה')
+        .replace(/\bMeta Model\b/gi, 'מטה-מודל');
+}
+
 function ceflowEscRe(value) {
     return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -17616,7 +17651,7 @@ function ceflowToneClass(tone) {
         : 'ceflow-tone-muted';
 }
 
-function renderComicEngineLoadError(els, message = 'אירעה תקלה בטעינת Comic Engine Flow. נסו שוב.') {
+function renderComicEngineLoadError(els, message = 'אירעה תקלה בטעינת במת הקומיקס הרגשי. נסו שוב.') {
     const safeMessage = String(message || 'אירעה תקלה בטעינה.').trim();
     if (els.dialog) {
         els.dialog.innerHTML = `
@@ -17628,7 +17663,7 @@ function renderComicEngineLoadError(els, message = 'אירעה תקלה בטעי
     }
     if (els.deck) {
         els.deck.innerHTML = `
-            <button type="button" class="ceflow-choice ceflow-tone-good" data-ceflow-reload="1" aria-label="טען מחדש את Comic Engine Flow">
+            <button type="button" class="ceflow-choice ceflow-tone-good" data-ceflow-reload="1" aria-label="טען מחדש את במת הקומיקס הרגשי">
                 <span class="ceflow-choice-top"><strong>🔄 טען מחדש</strong></span>
                 <span class="ceflow-choice-line">לחצו כדי לנסות שוב לטעון את הסצנה.</span>
             </button>
@@ -17670,7 +17705,7 @@ function ensureComicEngineFlowReady({ force = false } = {}) {
                 retry: document.getElementById('ceflow-retry'),
                 next: document.getElementById('ceflow-next-scene')
             };
-            renderComicEngineLoadError(els, 'Comic Engine Flow נכשל באתחול. לחצו "טען מחדש".');
+            renderComicEngineLoadError(els, 'במת הקומיקס הרגשי נכשלה באתחול. לחצו "טען מחדש".');
         });
 }
 
@@ -17809,6 +17844,8 @@ async function setupComicEngine2({ force = false } = {}) {
     const currentScenario = () => scenarios[state.index];
     const metaChoice = () => (currentScenario()?.choices || []).find(choice => choice.id === 'meta') || null;
     const activeBlueprint = () => state.selectedChoice?.blueprint || metaChoice()?.blueprint || null;
+    const prefersReducedMotion = () => Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const ceflowSoundEnabled = () => !(audioState?.muted);
     const compactText = (text, max = 155) => {
         const raw = String(text || '').trim().replace(/\s+/g, ' ');
         if (!raw) return '';
@@ -17816,22 +17853,28 @@ async function setupComicEngine2({ force = false } = {}) {
     };
     const applyMotionTokens = () => {
         if (!els.root) return;
+        const reduced = prefersReducedMotion();
         const style = els.root.style;
-        style.setProperty('--ceflow-motion-fast', `${CEFLOW_MOTION.duration.fast}ms`);
-        style.setProperty('--ceflow-motion-medium', `${CEFLOW_MOTION.duration.medium}ms`);
-        style.setProperty('--ceflow-motion-slow', `${CEFLOW_MOTION.duration.slow}ms`);
-        style.setProperty('--ceflow-motion-atmosphere', `${CEFLOW_MOTION.duration.atmosphere}ms`);
-        style.setProperty('--ceflow-motion-urgent', `${CEFLOW_MOTION.duration.urgent}ms`);
+        style.setProperty('--ceflow-motion-fast', `${reduced ? 1 : CEFLOW_MOTION.duration.fast}ms`);
+        style.setProperty('--ceflow-motion-medium', `${reduced ? 1 : CEFLOW_MOTION.duration.medium}ms`);
+        style.setProperty('--ceflow-motion-slow', `${reduced ? 1 : CEFLOW_MOTION.duration.slow}ms`);
+        style.setProperty('--ceflow-motion-atmosphere', `${reduced ? 1 : CEFLOW_MOTION.duration.atmosphere}ms`);
+        style.setProperty('--ceflow-motion-urgent', `${reduced ? 1 : CEFLOW_MOTION.duration.urgent}ms`);
         style.setProperty('--ceflow-ease-soft', CEFLOW_MOTION.ease.soft);
         style.setProperty('--ceflow-ease-standard', CEFLOW_MOTION.ease.standard);
         style.setProperty('--ceflow-ease-tension', CEFLOW_MOTION.ease.tension);
-        style.setProperty('--ceflow-scale-hover', String(CEFLOW_MOTION.scale.hover));
-        style.setProperty('--ceflow-scale-press', String(CEFLOW_MOTION.scale.press));
-        style.setProperty('--ceflow-scale-spotlight', String(CEFLOW_MOTION.scale.spotlight));
-        style.setProperty('--ceflow-shake-small', `${CEFLOW_MOTION.shake.small}px`);
-        style.setProperty('--ceflow-shake-medium', `${CEFLOW_MOTION.shake.medium}px`);
-        style.setProperty('--ceflow-glow-soft', CEFLOW_MOTION.glow.soft);
-        style.setProperty('--ceflow-glow-urgent', CEFLOW_MOTION.glow.urgent);
+        style.setProperty('--ceflow-scale-hover', String(reduced ? 1 : CEFLOW_MOTION.scale.hover));
+        style.setProperty('--ceflow-scale-press', String(reduced ? 1 : CEFLOW_MOTION.scale.press));
+        style.setProperty('--ceflow-scale-spotlight', String(reduced ? 1 : CEFLOW_MOTION.scale.spotlight));
+        style.setProperty('--ceflow-shake-small', `${reduced ? 0 : CEFLOW_MOTION.shake.small}px`);
+        style.setProperty('--ceflow-shake-medium', `${reduced ? 0 : CEFLOW_MOTION.shake.medium}px`);
+        style.setProperty('--ceflow-glow-soft', reduced ? '0 0 0 0 rgba(0,0,0,0)' : CEFLOW_MOTION.glow.soft);
+        style.setProperty('--ceflow-glow-urgent', reduced ? '0 0 0 0 rgba(0,0,0,0)' : CEFLOW_MOTION.glow.urgent);
+    };
+    const syncMotionPreference = () => {
+        if (!els.root) return;
+        els.root.classList.toggle('is-reduced-motion', prefersReducedMotion());
+        applyMotionTokens();
     };
     const resolveAvatarExpressionKey = (expression) => {
         const normalized = String(expression || '').trim().toLowerCase();
@@ -17869,7 +17912,7 @@ async function setupComicEngine2({ force = false } = {}) {
             </svg>
         `;
     };
-    applyMotionTokens();
+    syncMotionPreference();
     const isEngineVisible = () => {
         const tab = document.getElementById('comic-engine');
         if (!tab) return true;
@@ -17927,10 +17970,11 @@ async function setupComicEngine2({ force = false } = {}) {
         return {
             arm() {
                 armed = true;
+                if (!ceflowSoundEnabled()) return;
                 ensureCtx(true);
             },
             tick(urgent) {
-                if (!armed) return;
+                if (!armed || !ceflowSoundEnabled()) return;
                 const now = Date.now();
                 const cooldown = urgent ? 210 : 460;
                 if (now - lastTickAt < cooldown) return;
@@ -17938,12 +17982,12 @@ async function setupComicEngine2({ force = false } = {}) {
                 playTone({ type: urgent ? 'square' : 'triangle', from: urgent ? 1040 : 780, to: urgent ? 980 : 720, dur: urgent ? 0.045 : 0.06, amp: urgent ? 0.028 : 0.02 });
             },
             distractor() {
-                if (!armed) return;
+                if (!armed || !ceflowSoundEnabled()) return;
                 playTone({ type: 'sawtooth', from: 440, to: 320, dur: 0.08, amp: 0.024 });
                 playTone({ type: 'triangle', from: 520, to: 620, dur: 0.06, delay: 0.05, amp: 0.018 });
             },
             buzzer() {
-                if (!armed) return;
+                if (!armed || !ceflowSoundEnabled()) return;
                 const now = Date.now();
                 if (now - lastBuzzerAt < 1200) return;
                 lastBuzzerAt = now;
@@ -18127,7 +18171,7 @@ async function setupComicEngine2({ force = false } = {}) {
         const id = String(choice?.id || '').toLowerCase();
         if (id === 'angry') {
             return {
-                toneLabel: 'Snap חם',
+                toneLabel: 'התפרצות חמה',
                 preview: 'הלחץ קופץ, והצד השני נכנס להגנה.',
                 icon: '🔥'
             };
@@ -18155,7 +18199,7 @@ async function setupComicEngine2({ force = false } = {}) {
         }
         return {
             toneLabel: 'מהלך מטה-מודל',
-            preview: 'נפתח מידע חדש וה־agency חוזר לשיחה.',
+            preview: 'נפתח מידע חדש והסוכנות חוזרת לשיחה.',
             icon: '🧭'
         };
     };
@@ -18403,13 +18447,13 @@ async function setupComicEngine2({ force = false } = {}) {
                 atmosphere: 'timeout',
                 subtitle: 'השעון נסגר והמערכת הקפיאה את הסבב כדי לדמות לחץ אמת.',
                 choiceTitle: 'הסבב ננעל',
-                choiceCopy: 'נסה/י שוב או עבור/י לסצנה הבאה. כשהזמן נגמר, ה־snap בוחר במקומך.',
+                choiceCopy: 'נסה/י שוב או עבור/י לסצנה הבאה. כשהזמן נגמר, התגובה האימפולסיבית בוחרת במקומך.',
                 consequenceClass: 'is-negative',
                 consequenceKicker: 'החלון נסגר',
                 consequenceTitle: visual.escalationLevel === 'high' ? 'עוד פספוס דוחף את הסצנה לסגירה מהירה.' : 'הזמן בחר במקומך.',
                 consequenceCopy: 'כשאין תגובה, הלחץ עולה והמשפט האוטומטי מתחזק.',
                 replyTitle: 'הסצנה נעצרה. צריך לפתוח אותה מחדש.',
-                hudHeadline: 'Reactivity תפסה פיקוד',
+                hudHeadline: 'התגובתיות תפסה פיקוד',
                 hudCaption: 'המערכת בעומס, והיכולת לשמור על דיוק נשחקת.'
             };
         }
@@ -18426,7 +18470,7 @@ async function setupComicEngine2({ force = false } = {}) {
                     ? `גם "${state.activeDistractor}" נכנס לרקע ומוסיף עומס.`
                     : 'בחר/י תגובה אחת כדי לראות איך הצד השני שומע אותה באמת.',
                 replyTitle: 'כך זה נחת בצד השני. מה את/ה אומר/ת עכשיו?',
-                hudHeadline: 'Emotion HUD במצב חי',
+                hudHeadline: 'מדד רגשי חי',
                 hudCaption: 'המדדים כבר נעים לפי הלחץ, עוד לפני שבחרת תגובה.'
             };
         }
@@ -18445,7 +18489,7 @@ async function setupComicEngine2({ force = false } = {}) {
                     : 'נוצר ניסיון תיקון, עדיין בלי ריסט מלא.',
                 consequenceCopy: outcomes.join(' · ') || 'המתח יורד קצת, והדיאלוג מקבל עוד הזדמנות אחת מדויקת.',
                 replyTitle: 'התחלת לתקן. מה עוד יכול לייצב את המגע?',
-                hudHeadline: 'Repair, לא reset',
+                hudHeadline: 'תיקון, לא איפוס',
                 hudCaption: 'יש ירידה מסוימת בתגובתיות, אבל האמון עדיין נבנה מחדש.'
             };
         }
@@ -18454,14 +18498,14 @@ async function setupComicEngine2({ force = false } = {}) {
                 atmosphere: 'repair',
                 subtitle: 'יש יותר אוויר בשיחה. עכשיו אפשר לעבור מדיוק רגשי לצעד ראשון.',
                 choiceTitle: 'המהלך נפתח',
-                choiceCopy: 'בחרת שאלה מדויקת. עכשיו רואים ירידת לחץ ועלייה ב־agency.',
+                choiceCopy: 'בחרת שאלה מדויקת. עכשיו רואים ירידת לחץ ועלייה בסוכנות.',
                 consequenceClass: 'is-positive',
                 consequenceKicker: 'נפתח חלון חדש',
                 consequenceTitle: 'הטון נרגע והצד השני נשאר בשיחה.',
                 consequenceCopy: outcomes.join(' · ') || 'המידע מתחיל לזרום במקום להיתקע בהתגוננות.',
                 replyTitle: choice.replyPrompt || 'הדיוק עבד. מה המשפט הבא שלך כדי להמשיך את הפתיחה?',
                 hudHeadline: 'המערכת מתייצבת',
-                hudCaption: 'Flow ו־Agency עולים, ו־Reactivity יורד.'
+                hudCaption: 'הזרימה והסוכנות עולות, והתגובתיות יורדת.'
             };
         }
         if (choice.id === 'meta') {
@@ -18533,7 +18577,7 @@ async function setupComicEngine2({ force = false } = {}) {
         if (els.shotClockLabel) {
             if (state.flowState === CEFLOW_STATES.TIMEOUT) els.shotClockLabel.textContent = 'נגמר הזמן';
             else if (state.flowState !== CEFLOW_STATES.SCENE_READY) els.shotClockLabel.textContent = 'הבחירה ננעלה';
-            else if (clock.pressureState === 'critical') els.shotClockLabel.textContent = 'החלון נסגר';
+            else if (clock.pressureState === 'critical') els.shotClockLabel.textContent = 'שניות אחרונות';
             else if (clock.pressureState === 'alert') els.shotClockLabel.textContent = 'הלחץ עולה';
             else els.shotClockLabel.textContent = 'עוד יש מרחב בחירה';
         }
@@ -18643,12 +18687,12 @@ async function setupComicEngine2({ force = false } = {}) {
             pressureAudio.tick(true);
             els.root.classList.add('ceflow-pressure-pulse');
             setTimeout(() => els.root.classList.remove('ceflow-pressure-pulse'), 210);
-            if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+            if (!prefersReducedMotion() && typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
                 try { navigator.vibrate(20); } catch (_error) {}
             }
         }
 
-        if (remainingSeconds <= 5) {
+        if (remainingSeconds <= 5 && !prefersReducedMotion()) {
             els.root.classList.add('ceflow-pressure-pulse');
             setTimeout(() => els.root.classList.remove('ceflow-pressure-pulse'), 220);
         }
@@ -18943,17 +18987,17 @@ async function setupComicEngine2({ force = false } = {}) {
         els.overlay.innerHTML = `
             <div class="ceflow-hud-head">
                 <div class="ceflow-hud-copy">
-                    <p class="ceflow-hud-kicker">Emotion HUD</p>
+                    <p class="ceflow-hud-kicker">${escapeHtml(CEFLOW_UI.hudKicker)}</p>
                     <strong>${escapeHtml(narrative.hudHeadline)}</strong>
                 </div>
                 <p class="ceflow-hud-caption">${escapeHtml(narrative.hudCaption)}</p>
             </div>
             <div class="ceflow-xray-tags">${hud.xrayTags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('')}</div>
             <div class="ceflow-stats">
-                ${renderStat('Flow', hud.flow, 'is-flow', describeMetric('flow', hud.flow))}
-                ${renderStat('Agency', hud.agency, 'is-agency', describeMetric('agency', hud.agency))}
-                ${renderStat('Shame', hud.shame, 'is-shame', describeMetric('shame', hud.shame))}
-                ${renderStat('Reactivity', hud.reactivity, 'is-reactivity', describeMetric('reactivity', hud.reactivity))}
+                ${renderStat(ceflowMetricMeta('flow').label, hud.flow, 'is-flow', describeMetric('flow', hud.flow))}
+                ${renderStat(ceflowMetricMeta('agency').label, hud.agency, 'is-agency', describeMetric('agency', hud.agency))}
+                ${renderStat(ceflowMetricMeta('shame').label, hud.shame, 'is-shame', describeMetric('shame', hud.shame))}
+                ${renderStat(ceflowMetricMeta('reactivity').label, hud.reactivity, 'is-reactivity', describeMetric('reactivity', hud.reactivity))}
             </div>
         `;
         els.overlay.classList.remove('hidden');
@@ -18963,7 +19007,7 @@ async function setupComicEngine2({ force = false } = {}) {
         const context = currentScenario()?.context || {};
         const role = context.role || 'אדם תחת לחץ';
         const stakes = context.stakes || 'יש מחיר מיידי לדרך שבה תגיב/י עכשיו.';
-        const trigger = context.trigger || 'משהו קטן מפעיל תגובת Snap אוטומטית.';
+        const trigger = context.trigger || 'משהו קטן מפעיל תגובה אוטומטית.';
         const emotion = context.dominantEmotion || 'לחץ';
         const snap = context.snapLine || CEFLOW_NATURAL_CHOICE_COPY.angry.say;
         const intro = context.contextIntro || `את/ה בתפקיד ${role}, ובדקה הזו הכול צפוף ומהיר.`;
@@ -19003,7 +19047,7 @@ async function setupComicEngine2({ force = false } = {}) {
         els.timeout.innerHTML = `
             <strong>⏱️ החלון נסגר על הסצנה הזו.</strong>
             <div><strong>מה שנשמע בצד השני:</strong> ${escapeHtml(timeoutReply)}</div>
-            <div>לא נבחרה תגובה בזמן, ולכן המערכת הקפיאה את הרגע כדי להמחיש איך לחץ זמן דוחף ל־snap.</div>
+            <div>לא נבחרה תגובה בזמן, ולכן המערכת הקפיאה את הרגע כדי להמחיש איך לחץ זמן דוחף לתגובה אימפולסיבית.</div>
             <div><strong>זה המשפט האוטומטי שכנראה היה בורח:</strong> ${escapeHtml(snap)}</div>
         `;
     };
@@ -19043,9 +19087,9 @@ async function setupComicEngine2({ force = false } = {}) {
                         <strong>${escapeHtml(ui.preview)}</strong>
                     </span>
                     <span class="ceflow-choice-stats">
-                        <span>Flow ${escapeHtml(String(ceflowClamp(stats.flow, 50)))}</span>
-                        <span>Agency ${escapeHtml(String(ceflowClamp(stats.agency, 50)))}</span>
-                        <span>Shame ${escapeHtml(String(ceflowClamp(stats.shame, 50)))}</span>
+                        <span>${escapeHtml(ceflowMetricMeta('flow').short)} ${escapeHtml(String(ceflowClamp(stats.flow, 50)))}</span>
+                        <span>${escapeHtml(ceflowMetricMeta('agency').short)} ${escapeHtml(String(ceflowClamp(stats.agency, 50)))}</span>
+                        <span>${escapeHtml(ceflowMetricMeta('shame').short)} ${escapeHtml(String(ceflowClamp(stats.shame, 50)))}</span>
                     </span>
                 </button>
             `;
@@ -19203,7 +19247,7 @@ async function setupComicEngine2({ force = false } = {}) {
         const alternatives = bp.alternatives || [];
         const preconditions = bp.preconditions || [];
         els.blueprint.innerHTML = `
-            <h4>Blueprint קצר</h4>
+            <h4>${escapeHtml(CEFLOW_UI.blueprintTitle)}</h4>
             <div class="ceflow-blueprint-grid">
                 <article class="ceflow-blueprint-step"><h5>🎯 מטרה</h5><p>${escapeHtml(bp.goal || 'לא הוגדר')}</p></article>
                 <article class="ceflow-blueprint-step"><h5>🟢 צעד ראשון</h5><p>${escapeHtml(bp.first || 'לא הוגדר')}</p></article>
@@ -19211,7 +19255,7 @@ async function setupComicEngine2({ force = false } = {}) {
                 <article class="ceflow-blueprint-step"><h5>✅ צעד אחרון</h5><p>${escapeHtml(bp.last || 'לא הוגדר')}</p></article>
                 <article class="ceflow-blueprint-step"><h5>🧰 חלופות</h5><p>${escapeHtml(alternatives.join(' | ') || 'אין חלופות')}</p></article>
             </div>
-            <p class="ceflow-blueprint-footnote"><strong>Preconditions:</strong> ${escapeHtml(preconditions.join(' | ') || 'אין תנאים מיוחדים')}</p>
+            <p class="ceflow-blueprint-footnote"><strong>${escapeHtml(CEFLOW_UI.blueprintPreconditions)}:</strong> ${escapeHtml(preconditions.join(' | ') || 'אין תנאים מיוחדים')}</p>
         `;
     };
 
@@ -19228,7 +19272,7 @@ async function setupComicEngine2({ force = false } = {}) {
         const narrative = deriveSceneNarrative();
         if (els.domain) els.domain.textContent = `תחום: ${scenario.domain}`;
         if (els.progress) els.progress.textContent = `סצנה ${state.index + 1}/${scenarios.length}`;
-        if (els.level) els.level.textContent = `רמה: ${scenario.level}`;
+        if (els.level) els.level.textContent = `רמה: ${ceflowFormatLevelLabel(scenario.level)}`;
         if (els.title) els.title.textContent = scenario.title;
         if (els.sceneSubtitle) els.sceneSubtitle.textContent = narrative.subtitle;
         if (els.choiceTitle) els.choiceTitle.textContent = narrative.choiceTitle;
@@ -19333,8 +19377,8 @@ async function setupComicEngine2({ force = false } = {}) {
             render();
             els.root.classList.remove('ceflow-scene-leave');
             els.root.classList.add('ceflow-scene-enter');
-            setTimeout(() => els.root.classList.remove('ceflow-scene-enter'), 190);
-        }, 130);
+            setTimeout(() => els.root.classList.remove('ceflow-scene-enter'), prefersReducedMotion() ? 1 : 190);
+        }, prefersReducedMotion() ? 1 : 130);
     };
 
     document.addEventListener('pointerdown', () => pressureAudio.arm(), { once: true, capture: true });
@@ -19374,6 +19418,13 @@ async function setupComicEngine2({ force = false } = {}) {
     });
     els.replyInput?.addEventListener('input', () => {
         state.replyDraft = String(els.replyInput.value || '');
+    });
+    els.replyInput?.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter') return;
+        if (event.shiftKey) return;
+        if (!event.ctrlKey && !event.metaKey) return;
+        event.preventDefault();
+        confirmReply();
     });
     els.replyConfirm?.addEventListener('click', confirmReply);
     els.powerQuestions?.addEventListener('click', (event) => {
@@ -19416,7 +19467,18 @@ async function setupComicEngine2({ force = false } = {}) {
         syncShotClockLifecycle();
     });
 
+    const motionMql = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    if (motionMql) {
+        const onMotionChange = () => {
+            syncMotionPreference();
+            renderShotClock();
+        };
+        if (typeof motionMql.addEventListener === 'function') motionMql.addEventListener('change', onMotionChange);
+        else if (typeof motionMql.addListener === 'function') motionMql.addListener(onMotionChange);
+    }
+
     try {
+        syncMotionPreference();
         resetRound();
         setMode(state.mode, false);
         render();
@@ -19424,7 +19486,7 @@ async function setupComicEngine2({ force = false } = {}) {
     } catch (error) {
         root.dataset.ceflowBootState = 'error';
         console.error('Comic Engine Flow render failure:', error);
-        renderComicEngineLoadError(els, 'Comic Engine Flow נתקע בזמן ציור המסך. לחצו "טען מחדש".');
+        renderComicEngineLoadError(els, 'במת הקומיקס הרגשי נתקעה בזמן ציור המסך. לחצו "טען מחדש".');
     }
 }
 
