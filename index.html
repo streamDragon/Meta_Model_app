@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.185" data-build-time="1772805592862" data-build-iso="2026-03-06T13:59:52.862Z" data-git-commit="d8c7213">
+<html lang="he" dir="rtl" data-app-version="1.0.186" data-build-time="1772812690635" data-build-iso="2026-03-06T15:58:10.635Z" data-git-commit="a120bf8">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -765,10 +765,15 @@
         <!-- COMIC ENGINE TAB -->
         <section id="comic-engine" class="tab-content">
             <div class="card comic-engine-shell">
-                <h2>🎭 Comic Engine Flow</h2>
-                <p class="subtitle">דיאלוג חי בעמוד אחד: בחירה → תגובת צד שני → תגובה שלך → פרשנות → חלופה שכלית + ויסות סטייט.</p>
+                <div class="ceflow-shell-copy">
+                    <p class="ceflow-shell-kicker">Comic Engine</p>
+                    <h2>Live Emotional Dialogue</h2>
+                    <p class="subtitle">בחר/י תגובה תחת לחץ זמן, ראה/י איך השיחה מתקשה או נפתחת, והרגש/י את המחיר של כל מהלך בזמן אמת.</p>
+                </div>
 
                 <section id="comicEngine" class="ceflow-engine" dir="rtl">
+                    <div class="ceflow-cinematic-bg" aria-hidden="true"></div>
+
                     <div class="ceflow-top-actions">
                         <div class="ceflow-action-group">
                             <button id="ceflow-info-btn" class="btn btn-secondary ceflow-small-btn" type="button">💡 למה זה עובד?</button>
@@ -795,61 +800,88 @@
                             <span id="ceflow-progress" class="ceflow-chip">1/1</span>
                             <span id="ceflow-level" class="ceflow-chip">רמה</span>
                         </div>
-                        <h3 id="ceflow-title" class="ceflow-title">כותרת סצנה</h3>
+                        <div class="ceflow-heading-stack">
+                            <h3 id="ceflow-title" class="ceflow-title">כותרת סצנה</h3>
+                            <p id="ceflow-scene-subtitle" class="ceflow-scene-subtitle">הבמה חיה. בחר/י תגובה אחת וראה/י איך הכול זז.</p>
+                        </div>
                     </header>
 
-                    <section id="ceflow-context-card" class="ceflow-context-card" aria-live="polite">
-                        <h4>לפני התגובה האוטומטית</h4>
-                        <p id="ceflow-context-main"></p>
-                        <p id="ceflow-context-stakes"></p>
-                        <p id="ceflow-context-trigger"></p>
-                        <p id="ceflow-context-snap" class="ceflow-context-snap"></p>
-                    </section>
-
-                    <div class="ceflow-dual-pane">
-                        <div class="ceflow-stage-wrap">
-                            <article id="ceflow-left-character" class="ceflow-character-card"></article>
-
-                            <section class="ceflow-stage" aria-live="polite">
-                                <div id="ceflow-dialog" class="ceflow-dialog"></div>
-
-                                <div id="ceflow-overlay" class="ceflow-overlay hidden">
-                                    <div id="ceflow-xray-tags" class="ceflow-xray-tags"></div>
-                                    <div class="ceflow-stats">
-                                        <div class="ceflow-stat">
-                                            <span>Flow</span>
-                                            <div class="ceflow-bar"><span id="ceflow-stat-flow"></span></div>
-                                        </div>
-                                        <div class="ceflow-stat">
-                                            <span>Agency</span>
-                                            <div class="ceflow-bar"><span id="ceflow-stat-agency"></span></div>
-                                        </div>
-                                        <div class="ceflow-stat">
-                                            <span>Shame</span>
-                                            <div class="ceflow-bar"><span id="ceflow-stat-shame"></span></div>
-                                        </div>
-                                    </div>
+                    <div class="ceflow-scene-grid">
+                        <div class="ceflow-stage-column">
+                            <section id="ceflow-context-card" class="ceflow-context-card" aria-live="polite">
+                                <div class="ceflow-context-intro">
+                                    <span class="ceflow-context-kicker">לפני שהטון בורח</span>
+                                    <h4>מה קורה כאן באמת</h4>
                                 </div>
+                                <p id="ceflow-context-main"></p>
+                                <p id="ceflow-context-stakes"></p>
+                                <p id="ceflow-context-trigger"></p>
+                                <p id="ceflow-context-snap" class="ceflow-context-snap"></p>
                             </section>
 
-                            <article id="ceflow-right-character" class="ceflow-character-card"></article>
+                            <section id="ceflow-consequence-banner" class="ceflow-consequence-banner" aria-live="polite">
+                                <p class="ceflow-consequence-kicker">השיחה מחכה לבחירה שלך</p>
+                                <strong>עוד לא בחרת תגובה.</strong>
+                                <p>בחר/י תגובה אחת כדי לראות לאן הלחץ הולך.</p>
+                            </section>
+
+                            <div class="ceflow-stage-wrap">
+                                <article id="ceflow-left-character" class="ceflow-character-card"></article>
+
+                                <section class="ceflow-stage" aria-live="polite">
+                                    <div class="ceflow-stage-ambience" aria-hidden="true">
+                                        <span class="ceflow-stage-orb ceflow-stage-orb-a"></span>
+                                        <span class="ceflow-stage-orb ceflow-stage-orb-b"></span>
+                                        <span class="ceflow-stage-orb ceflow-stage-orb-c"></span>
+                                    </div>
+                                    <div id="ceflow-dialog" class="ceflow-dialog"></div>
+
+                                    <div id="ceflow-overlay" class="ceflow-overlay hidden">
+                                        <div id="ceflow-xray-tags" class="ceflow-xray-tags"></div>
+                                        <div class="ceflow-stats">
+                                            <div class="ceflow-stat">
+                                                <span>Flow</span>
+                                                <div class="ceflow-bar"><span id="ceflow-stat-flow"></span></div>
+                                            </div>
+                                            <div class="ceflow-stat">
+                                                <span>Agency</span>
+                                                <div class="ceflow-bar"><span id="ceflow-stat-agency"></span></div>
+                                            </div>
+                                            <div class="ceflow-stat">
+                                                <span>Shame</span>
+                                                <div class="ceflow-bar"><span id="ceflow-stat-shame"></span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <article id="ceflow-right-character" class="ceflow-character-card"></article>
+                            </div>
+
+                            <section id="ceflow-timeout" class="ceflow-timeout hidden" aria-live="polite"></section>
                         </div>
 
-                        <section class="ceflow-choice-panel">
-                            <h4 class="ceflow-block-title">בחר/י תגובה</h4>
-                            <div id="ceflow-choice-deck" class="ceflow-choice-deck" role="group" aria-label="אפשרויות תגובה"></div>
-                        </section>
+                        <aside class="ceflow-side-column">
+                            <section class="ceflow-choice-panel">
+                                <div class="ceflow-choice-panel-head">
+                                    <h4 id="ceflow-choice-title" class="ceflow-block-title">בחר/י תגובה עם משקל רגשי</h4>
+                                    <p id="ceflow-choice-copy" class="ceflow-choice-copy">כל כרטיס הוא טון אחר. הבחירה שלך מיד משנה את ההבעה, הזרימה והלחץ.</p>
+                                </div>
+                                <div id="ceflow-choice-deck" class="ceflow-choice-deck" role="group" aria-label="אפשרויות תגובה"></div>
+                            </section>
+                        </aside>
                     </div>
 
-                    <section id="ceflow-timeout" class="ceflow-timeout hidden" aria-live="polite"></section>
-
                     <section id="ceflow-reply-box" class="ceflow-reply-box hidden">
-                        <h4 class="ceflow-block-title">הצד השני הגיב. איך את/ה עונה עכשיו?</h4>
+                        <div class="ceflow-section-head">
+                            <p class="ceflow-section-kicker">הסצנה נמשכת</p>
+                            <h4 id="ceflow-reply-title" class="ceflow-block-title">כך זה נחת בצד השני. מה את/ה אומר/ת עכשיו?</h4>
+                        </div>
                         <div id="ceflow-reply-quick" class="ceflow-reply-quick"></div>
-                        <label for="ceflow-reply-input" class="ceflow-input-label">תגובה שלך:</label>
-                        <textarea id="ceflow-reply-input" rows="2" placeholder="כתבו תגובה אחת מדויקת וקצרה..."></textarea>
+                        <label for="ceflow-reply-input" class="ceflow-input-label">המשפט הבא שלך</label>
+                        <textarea id="ceflow-reply-input" rows="2" placeholder="כתבו תגובה קצרה, מדויקת, חיה..."></textarea>
                         <div class="ceflow-inline-actions">
-                            <button id="ceflow-reply-confirm" class="btn btn-primary" type="button">אשר תגובה</button>
+                            <button id="ceflow-reply-confirm" class="btn btn-primary" type="button">נעל/י את המשפט</button>
                             <small id="ceflow-reply-status" aria-live="polite"></small>
                         </div>
                     </section>
@@ -860,8 +892,11 @@
                     </section>
 
                     <section id="ceflow-power-card" class="ceflow-power-card hidden">
-                        <h4>Power Card: במקום תגובה אימפולסיבית</h4>
-                        <p>בחר/י שאלה מטה-מודל אחת. אחרי שאלה מדויקת, הדיאלוג נפתח מחדש.</p>
+                        <div class="ceflow-section-head">
+                            <p class="ceflow-section-kicker">פתיחת מידע חדש</p>
+                            <h4 class="ceflow-block-title">Power Card: השאלה המדויקת שפותחת את הסצנה</h4>
+                        </div>
+                        <p>בחר/י שאלה אחת שמזיזה את השיחה מהתגוננות לחקירה מדויקת.</p>
                         <div id="ceflow-power-questions" class="ceflow-power-questions"></div>
                         <div id="ceflow-new-info" class="ceflow-new-info hidden"></div>
                         <div class="ceflow-inline-actions">

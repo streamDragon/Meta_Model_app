@@ -6511,10 +6511,140 @@ function collapseAllGlossaryCategories(root = null) {
     });
 }
 
+function findGlossaryLinkedTarget(host, rawTargetId = '') {
+    if (!(host instanceof HTMLElement) || !host.querySelectorAll) return null;
+    const normalizedTarget = normalizeGlossaryConceptId(rawTargetId);
+    if (!normalizedTarget) return null;
+
+    const directCategory = Array.from(host.querySelectorAll('details.glossary-category')).find((detailsEl) => {
+        const glossaryId = normalizeGlossaryConceptId(String(detailsEl.dataset.glossaryId || '').trim());
+        return glossaryId === normalizedTarget;
+    });
+    if (directCategory) return directCategory;
+
+    return Array.from(host.querySelectorAll('details[data-pattern-id]')).find((detailsEl) => {
+        const patternId = normalizeGlossaryConceptId(
+            String(detailsEl.dataset.patternId || detailsEl.id || '').replace(/^pattern-/, '').trim()
+        );
+        return patternId === normalizedTarget;
+    }) || null;
+}
+
+function openGlossaryDetailsBranch(host, targetEl) {
+    if (!(host instanceof HTMLElement) || !(targetEl instanceof HTMLElement)) return false;
+
+    const detailsChain = [];
+    let node = targetEl;
+    while (node && node !== host) {
+        if (node instanceof HTMLDetailsElement) detailsChain.push(node);
+        node = node.parentElement;
+    }
+    if (!detailsChain.length) return false;
+
+    let activeCategory = null;
+    detailsChain.reverse().forEach((detailsEl) => {
+        if (detailsEl.classList.contains('glossary-category')) {
+            hydrateGlossaryCategoryCard(detailsEl);
+            activeCategory = detailsEl;
+        }
+        detailsEl.open = true;
+    });
+
+    if (activeCategory) {
+        host.querySelectorAll('details.glossary-category').forEach((detailsEl) => {
+            if (detailsEl === activeCategory) return;
+            collapseGlossarySubLayers(detailsEl);
+            detailsEl.open = false;
+        });
+    }
+
+    try {
+        targetEl.scrollIntoView({
+            behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+            block: 'start',
+            inline: 'nearest'
+        });
+    } catch (_error) {
+        try {
+            targetEl.scrollIntoView();
+        } catch (_ignored) {}
+    }
+
+    return true;
+}
+
+function syncGlossaryHashTarget(host = null) {
+    const root = host instanceof HTMLElement ? host : null;
+    if (!root) return false;
+    const hash = String(window.location.hash || '').trim().replace(/^#/, '');
+    if (!hash) return false;
+    const rawTargetId = hash.replace(/^pattern-/, '');
+    const target = findGlossaryLinkedTarget(root, rawTargetId);
+    if (!target) return false;
+    return openGlossaryDetailsBranch(root, target);
+}
+
 function setupGlossarySingleCategoryBehavior(root = null) {
     const host = root && root instanceof HTMLElement ? root : null;
     if (!host || host.dataset.glossarySingleBound === 'true') return;
     host.dataset.glossarySingleBound = 'true';
+
+    const handleSummaryActivation = (event) => {
+        const summary = event.target?.closest?.('summary');
+        if (!summary || !host.contains(summary)) return false;
+        const details = summary.parentElement;
+        if (!(details instanceof HTMLDetailsElement)) return false;
+
+        const isSupportedDetails = details.classList.contains('glossary-category')
+            || details.classList.contains('glossary-layer')
+            || details.classList.contains('subcategory-layered')
+            || details.classList.contains('subcategory-layer');
+        if (!isSupportedDetails) return false;
+
+        event.preventDefault();
+        if (!details.open && details.classList.contains('glossary-category')) {
+            hydrateGlossaryCategoryCard(details);
+        }
+        details.open = !details.open;
+        if (!details.open) collapseGlossarySubLayers(details);
+        return true;
+    };
+
+    const handlePatternLinkActivation = (event) => {
+        const link = event.target?.closest?.('[data-breen-pattern-link]');
+        if (!link || !host.contains(link)) return false;
+        event.preventDefault();
+
+        const rawTargetId = String(link.getAttribute('data-breen-pattern-link') || '').trim()
+            || String(link.getAttribute('href') || '').trim().replace(/^#pattern-/, '');
+        const target = findGlossaryLinkedTarget(host, rawTargetId);
+        if (!target) return false;
+
+        const normalizedTarget = normalizeGlossaryConceptId(rawTargetId);
+        if (normalizedTarget) {
+            const nextHash = `#pattern-${normalizedTarget}`;
+            if (window.location.hash !== nextHash) {
+                try {
+                    window.history.replaceState(null, '', nextHash);
+                } catch (_error) {
+                    window.location.hash = nextHash;
+                }
+            }
+        }
+
+        return openGlossaryDetailsBranch(host, target);
+    };
+
+    host.addEventListener('click', (event) => {
+        if (handlePatternLinkActivation(event)) return;
+        handleSummaryActivation(event);
+    });
+
+    host.addEventListener('keydown', (event) => {
+        if (!event || (event.key !== 'Enter' && event.key !== ' ')) return;
+        if (handlePatternLinkActivation(event)) return;
+        handleSummaryActivation(event);
+    });
 
     host.addEventListener('toggle', (event) => {
         const target = event.target;
@@ -6595,6 +6725,7 @@ function populateCategories() {
     container.appendChild(orderedList);
     setupGlossarySingleCategoryBehavior(orderedList);
     collapseAllGlossaryCategories(orderedList);
+    syncGlossaryHashTarget(orderedList);
 }
 
 // Populate Category Select in Practice Mode
@@ -17184,6 +17315,7 @@ function ceflowNormChoice(raw, fallbackId) {
         interpretation: ceflowNormalizeCopy(raw?.interpretation, natural.interpretation || f.interpretation || ''),
         badge: ceflowNormalizeCopy(raw?.badge, ''),
         sfx: ceflowNormalizeCopy(raw?.sfx, ''),
+        rightSpriteOverride: ceflowNormalizeCopy(raw?.rightSpriteOverride, ''),
         impact: ceflowNormImpact(raw?.impact, id),
         powerQuestions: Array.isArray(raw?.powerQuestions)
             ? raw.powerQuestions.slice(0, 6).map(v => ceflowNormalizeCopy(v, '')).filter(Boolean)
@@ -17413,10 +17545,12 @@ async function setupComicEngine2({ force = false } = {}) {
         progress: document.getElementById('ceflow-progress'),
         level: document.getElementById('ceflow-level'),
         title: document.getElementById('ceflow-title'),
+        sceneSubtitle: document.getElementById('ceflow-scene-subtitle'),
         contextMain: document.getElementById('ceflow-context-main'),
         contextStakes: document.getElementById('ceflow-context-stakes'),
         contextTrigger: document.getElementById('ceflow-context-trigger'),
         contextSnap: document.getElementById('ceflow-context-snap'),
+        consequence: document.getElementById('ceflow-consequence-banner'),
         shotClock: document.getElementById('ceflow-shotclock'),
         shotClockRing: document.getElementById('ceflow-shotclock-ring'),
         shotClockSeconds: document.getElementById('ceflow-shotclock-seconds'),
@@ -17429,8 +17563,11 @@ async function setupComicEngine2({ force = false } = {}) {
         flow: document.getElementById('ceflow-stat-flow'),
         agency: document.getElementById('ceflow-stat-agency'),
         shame: document.getElementById('ceflow-stat-shame'),
+        choiceTitle: document.getElementById('ceflow-choice-title'),
+        choiceCopy: document.getElementById('ceflow-choice-copy'),
         deck: document.getElementById('ceflow-choice-deck'),
         replyBox: document.getElementById('ceflow-reply-box'),
+        replyTitle: document.getElementById('ceflow-reply-title'),
         replyQuick: document.getElementById('ceflow-reply-quick'),
         replyInput: document.getElementById('ceflow-reply-input'),
         replyConfirm: document.getElementById('ceflow-reply-confirm'),
@@ -17688,7 +17825,7 @@ async function setupComicEngine2({ force = false } = {}) {
         CEFLOW_MAX_SHOT_CLOCK_SECONDS
     );
 
-    const renderShotClock = () => {
+    const currentShotClockState = () => {
         const baseMs = Math.max(1000, roundDurationSeconds() * 1000);
         const totalMs = state.shotClockTotalMs > 0 ? state.shotClockTotalMs : baseMs;
         let remainingMs = state.shotClockDeadlineMs > 0
@@ -17699,19 +17836,268 @@ async function setupComicEngine2({ force = false } = {}) {
         } else if (state.flowState !== CEFLOW_STATES.SCENE_READY) {
             remainingMs = 0;
         }
-        const secondsLeft = Math.max(0, Math.ceil(remainingMs / 1000));
         const pct = totalMs > 0 ? Math.max(0, Math.min(1, remainingMs / totalMs)) : 0;
+        const secondsLeft = Math.max(0, Math.ceil(remainingMs / 1000));
+        const pressureState = state.flowState === CEFLOW_STATES.TIMEOUT
+            ? 'timeout'
+            : state.flowState !== CEFLOW_STATES.SCENE_READY
+                ? 'locked'
+                : remainingMs <= 3500
+                    ? 'critical'
+                    : remainingMs <= 9000
+                        ? 'alert'
+                        : 'steady';
+        const pressureScore = state.flowState === CEFLOW_STATES.TIMEOUT
+            ? 100
+            : state.flowState !== CEFLOW_STATES.SCENE_READY
+                ? 34
+                : Math.round((1 - pct) * 100);
+        return {
+            baseMs,
+            totalMs,
+            remainingMs,
+            pct,
+            secondsLeft,
+            pressureState,
+            pressureScore
+        };
+    };
+
+    const choiceUiMeta = (choice) => {
+        const id = String(choice?.id || '').toLowerCase();
+        if (id === 'angry') {
+            return {
+                toneLabel: 'Snap חם',
+                preview: 'הלחץ קופץ, והצד השני נכנס להגנה.',
+                icon: '🔥'
+            };
+        }
+        if (id === 'mock') {
+            return {
+                toneLabel: 'עקיצה ביקורתית',
+                preview: 'הבושה עולה, והאמון נחתך מהר.',
+                icon: '🗡️'
+            };
+        }
+        if (id === 'rescue') {
+            return {
+                toneLabel: 'הרגעה שטחית',
+                preview: 'יש הקלה רגעית, אבל האחריות נחלשת.',
+                icon: '🛟'
+            };
+        }
+        if (id === 'avoid') {
+            return {
+                toneLabel: 'דחייה נסוגה',
+                preview: 'קונים שקט קטן ומאבדים בהירות.',
+                icon: '🌫️'
+            };
+        }
+        return {
+            toneLabel: 'מהלך מטה-מודל',
+            preview: 'נפתח מידע חדש וה־agency חוזר לשיחה.',
+            icon: '🧭'
+        };
+    };
+
+    const describeMetric = (metric, value) => {
+        if (metric === 'flow') {
+            if (value >= 75) return 'הדיאלוג זורם ונשאר פתוח.';
+            if (value >= 50) return 'יש תנועה, אבל עדיין יש חיכוך.';
+            return 'הזרימה נקטעת והשיחה נאספת בכוח.';
+        }
+        if (metric === 'agency') {
+            if (value >= 75) return 'יש גבול ברור בלי לאבד קשר.';
+            if (value >= 50) return 'יש קצת יציבות, אבל עדיין לא מסגרת מלאה.';
+            return 'הסוכנות נשמטת והתגובה נהיית ריאקטיבית.';
+        }
+        if (metric === 'shame') {
+            if (value >= 75) return 'הבושה מורגשת ומצמצמת שיתוף.';
+            if (value >= 50) return 'יש התכווצות זהירה ברקע.';
+            return 'יש פחות אשמה ויותר מקום לדבר.';
+        }
+        if (value >= 75) return 'המערכת דרוכה ומגיבה מהר מדי.';
+        if (value >= 50) return 'המתח מורגש אבל עדיין נשלט.';
+        return 'הטון רגוע יותר והמערכת פחות קופצת.';
+    };
+
+    const deriveEmotionalState = () => {
+        const scenario = currentScenario();
+        const context = scenario?.context || {};
+        const clock = currentShotClockState();
+        const dominantEmotion = String(context.dominantEmotion || '');
+        const emotionText = `${dominantEmotion} ${context.trigger || ''}`;
+        let flow = 54;
+        let agency = 48;
+        let shame = 42;
+        if (emotionText.includes('כעס')) flow -= 10;
+        if (emotionText.includes('לחץ')) {
+            flow -= 8;
+            agency -= 6;
+        }
+        if (emotionText.includes('עלבון')) shame += 10;
+        if (emotionText.includes('דאגה')) shame += 6;
+        if (emotionText.includes('תשישות')) agency -= 8;
+        if (state.activeDistractor) {
+            flow -= 10;
+            agency -= 8;
+            shame += 6;
+        }
+        if (state.selectedChoice?.impact?.stats) {
+            flow = ceflowClamp(state.selectedChoice.impact.stats.flow, flow);
+            agency = ceflowClamp(state.selectedChoice.impact.stats.agency, agency);
+            shame = ceflowClamp(state.selectedChoice.impact.stats.shame, shame);
+            if (state.userReply && state.selectedChoice.id === 'meta') {
+                flow = ceflowClamp(flow + 4, flow);
+                agency = ceflowClamp(agency + 6, agency);
+                shame = ceflowClamp(shame - 6, shame);
+            } else if (state.userReply && state.selectedRepair) {
+                flow = ceflowClamp(flow + 8, flow);
+                agency = ceflowClamp(agency + 8, agency);
+                shame = ceflowClamp(shame - 10, shame);
+            }
+        }
+        if (state.flowState === CEFLOW_STATES.TIMEOUT) {
+            flow = 12;
+            agency = 18;
+            shame = 78;
+        }
+        const reactivity = Math.max(0, Math.min(100, Math.round((100 - flow + shame + clock.pressureScore) / 3)));
+        const baseTags = Array.isArray(state.selectedChoice?.impact?.xrayTags) && state.selectedChoice.impact.xrayTags.length
+            ? state.selectedChoice.impact.xrayTags.slice(0, 3)
+            : [
+                `🎭 ${dominantEmotion || 'מתח'}`,
+                state.activeDistractor ? '⚠️ גירוי נוסף' : '🎯 רגע חי',
+                clock.pressureState === 'critical' ? '⏱️ חלון נסגר' : '🫁 עוד יש מרחב בחירה'
+            ];
+        let atmosphere = 'neutral';
+        if (state.flowState === CEFLOW_STATES.TIMEOUT) atmosphere = 'timeout';
+        else if (state.selectedChoice?.id === 'meta' && state.userReply) atmosphere = 'repair';
+        else if (state.selectedChoice?.id === 'meta') atmosphere = 'opening';
+        else if (state.selectedChoice?.id === 'rescue') atmosphere = 'fragile';
+        else if (state.selectedChoice) atmosphere = state.userReply ? 'aftershock' : 'fracture';
+        else if (clock.pressureState === 'critical' || state.activeDistractor) atmosphere = 'pressure';
+
+        return {
+            flow,
+            agency,
+            shame,
+            reactivity,
+            pressureState: clock.pressureState,
+            pressureScore: clock.pressureScore,
+            atmosphere,
+            xrayTags: baseTags
+        };
+    };
+
+    const deriveSceneNarrative = () => {
+        const scenario = currentScenario();
+        const context = scenario?.context || {};
+        const choice = state.selectedChoice;
+        const toneMeta = choiceUiMeta(choice);
+        const emotion = context.dominantEmotion || 'לחץ';
+        const hud = deriveEmotionalState();
+        const outcomes = Array.isArray(choice?.impact?.microOutcome) ? choice.impact.microOutcome.slice(0, 3) : [];
+        if (state.flowState === CEFLOW_STATES.TIMEOUT) {
+            return {
+                atmosphere: 'timeout',
+                subtitle: 'השעון נסגר והמערכת הקפיאה את הסבב כדי לדמות לחץ אמת.',
+                choiceTitle: 'הסבב ננעל',
+                choiceCopy: 'נסה/י שוב או עבור/י לסצנה הבאה. כשהזמן נגמר, ה־snap בוחר במקומך.',
+                consequenceClass: 'is-negative',
+                consequenceKicker: 'החלון נסגר',
+                consequenceTitle: 'הזמן בחר במקומך.',
+                consequenceCopy: 'כשאין תגובה, הלחץ עולה והמשפט האוטומטי מתחזק.',
+                replyTitle: 'הסצנה נעצרה. צריך לפתוח אותה מחדש.',
+                hudHeadline: 'Reactivity תפסה פיקוד',
+                hudCaption: 'המערכת בעומס, והיכולת לשמור על דיוק נשחקת.'
+            };
+        }
+        if (!choice) {
+            return {
+                atmosphere: hud.atmosphere,
+                subtitle: `ה${emotion} כבר באוויר, אבל עדיין יש לך חלון קטן לבחור טון אחר.`,
+                choiceTitle: 'בחר/י תגובה עם משקל רגשי',
+                choiceCopy: 'כל כרטיס הוא טון אחר. הבחירה שלך מיד משנה הבעה, זרימה ולחץ.',
+                consequenceClass: 'is-neutral',
+                consequenceKicker: hud.pressureState === 'critical' ? 'הזמן סוגר עליך' : 'השיחה מחכה לבחירה שלך',
+                consequenceTitle: hud.pressureState === 'critical' ? 'עוד רגע והחלון נסגר.' : 'הבמה פתוחה, אבל לא רגועה.',
+                consequenceCopy: state.activeDistractor
+                    ? `גם "${state.activeDistractor}" נכנס לרקע ומוסיף עומס.`
+                    : 'בחר/י תגובה אחת כדי לראות איך הצד השני שומע אותה באמת.',
+                replyTitle: 'כך זה נחת בצד השני. מה את/ה אומר/ת עכשיו?',
+                hudHeadline: 'Emotion HUD במצב חי',
+                hudCaption: 'המדדים כבר נעים לפי הלחץ, עוד לפני שבחרת תגובה.'
+            };
+        }
+        if (choice.id === 'meta' && state.userReply) {
+            return {
+                atmosphere: 'repair',
+                subtitle: 'יש יותר אוויר בשיחה. עכשיו אפשר לעבור מדיוק רגשי לצעד ראשון.',
+                choiceTitle: 'המהלך נפתח',
+                choiceCopy: 'בחרת שאלה מדויקת. עכשיו רואים ירידת לחץ ועלייה ב־agency.',
+                consequenceClass: 'is-positive',
+                consequenceKicker: 'נפתח חלון חדש',
+                consequenceTitle: 'הטון נרגע והצד השני נשאר בשיחה.',
+                consequenceCopy: outcomes.join(' · ') || 'המידע מתחיל לזרום במקום להיתקע בהתגוננות.',
+                replyTitle: choice.replyPrompt || 'הדיוק עבד. מה המשפט הבא שלך כדי להמשיך את הפתיחה?',
+                hudHeadline: 'המערכת מתייצבת',
+                hudCaption: 'Flow ו־Agency עולים, ו־Reactivity יורד.'
+            };
+        }
+        if (choice.id === 'meta') {
+            return {
+                atmosphere: 'opening',
+                subtitle: 'השאלה זזה מהאשמה לחקירה. זה עדיין עדין, אבל השיחה נפתחת.',
+                choiceTitle: 'הבחירה ננעלה',
+                choiceCopy: 'זה מהלך מדויק. עכשיו השאלה היא איך להמשיך בלי לאבד את הפתיחה.',
+                consequenceClass: 'is-positive',
+                consequenceKicker: 'כך זה נוחת',
+                consequenceTitle: 'הצד השני מרגיש שיש פה ניסיון להבין, לא רק להגיב.',
+                consequenceCopy: outcomes.join(' · ') || toneMeta.preview,
+                replyTitle: choice.replyPrompt || 'עכשיו כשהצד השני נפתח קצת, מה את/ה אומר/ת?',
+                hudHeadline: 'הטון זז לכיוון בירור',
+                hudCaption: 'המדדים מראים יותר מרחב נשימה ופחות תגובתיות.'
+            };
+        }
+        return {
+            atmosphere: choice.id === 'rescue' ? 'fragile' : (state.userReply ? 'aftershock' : 'fracture'),
+            subtitle: `הבחירה שלך כבר צבעה את הסצנה. עכשיו רואים את המחיר של ${toneMeta.toneLabel}.`,
+            choiceTitle: 'הבחירה ננעלה',
+            choiceCopy: 'התגובה כבר יצאה. עכשיו צריך להתמודד עם מה שהיא יצרה בשיחה.',
+            consequenceClass: 'is-negative',
+            consequenceKicker: 'כך זה פגע בשיחה',
+            consequenceTitle: toneMeta.preview,
+            consequenceCopy: outcomes.join(' · ') || 'המתח עולה, והצד השני מתכווץ או מתרחק.',
+            replyTitle: choice.replyPrompt || 'כך זה נחת בצד השני. מה את/ה אומר/ת עכשיו?',
+            hudHeadline: 'הטון התקשה',
+            hudCaption: 'המדדים מראים סגירה, עליית בושה או ירידת סוכנות.'
+        };
+    };
+
+    const renderShotClock = () => {
+        const clock = currentShotClockState();
+        const remainingMs = clock.remainingMs;
+        const secondsLeft = clock.secondsLeft;
+        const pct = clock.pct;
         if (els.shotClockRing) els.shotClockRing.style.setProperty('--clock-pct', String(pct.toFixed(4)));
         if (els.shotClockSeconds) els.shotClockSeconds.textContent = String(secondsLeft);
         if (els.shotClockLabel) {
             if (state.flowState === CEFLOW_STATES.TIMEOUT) els.shotClockLabel.textContent = 'נגמר הזמן';
-            else if (state.flowState !== CEFLOW_STATES.SCENE_READY) els.shotClockLabel.textContent = 'בחירה ננעלה';
-            else els.shotClockLabel.textContent = 'זמן לבחירה';
+            else if (state.flowState !== CEFLOW_STATES.SCENE_READY) els.shotClockLabel.textContent = 'הבחירה ננעלה';
+            else if (clock.pressureState === 'critical') els.shotClockLabel.textContent = 'החלון נסגר';
+            else if (clock.pressureState === 'alert') els.shotClockLabel.textContent = 'הלחץ עולה';
+            else els.shotClockLabel.textContent = 'עוד יש מרחב בחירה';
         }
         if (els.shotClock) {
             const closing = state.flowState === CEFLOW_STATES.SCENE_READY && remainingMs <= 5000 && remainingMs > 0;
+            const warning = state.flowState === CEFLOW_STATES.SCENE_READY && remainingMs <= 9000 && remainingMs > 5000;
             els.shotClock.classList.toggle('is-closing', closing);
+            els.shotClock.classList.toggle('is-warning', warning);
+            els.shotClock.classList.toggle('is-locked', state.flowState !== CEFLOW_STATES.SCENE_READY && state.flowState !== CEFLOW_STATES.TIMEOUT);
+            els.shotClock.classList.toggle('is-timeout', state.flowState === CEFLOW_STATES.TIMEOUT);
         }
+        if (els.root) els.root.dataset.ceflowPressure = clock.pressureState;
     };
 
     const stopShotClock = () => {
@@ -17837,36 +18223,131 @@ async function setupComicEngine2({ force = false } = {}) {
         hideDistractor();
     };
 
+    const deriveCharacterView = (side) => {
+        const scenario = currentScenario();
+        const context = scenario?.context || {};
+        const dominantEmotion = context.dominantEmotion || 'לחץ';
+        const choice = state.selectedChoice;
+        const isLeft = side === 'left';
+        const roleLabel = isLeft ? 'הצד השני' : 'התגובה שלך';
+        const spotlight = state.flowState === CEFLOW_STATES.TIMEOUT
+            ? isLeft
+            : !choice
+                ? !isLeft
+                : !state.userReply
+                    ? isLeft
+                    : !isLeft;
+        if (state.flowState === CEFLOW_STATES.TIMEOUT) {
+            return {
+                roleLabel,
+                spotlight,
+                expression: isLeft ? 'closed' : 'tense',
+                stateLabel: isLeft ? 'החלון נסגר והצד השני מתכווץ.' : 'הגוף קפא והתגובה לא יצאה.'
+            };
+        }
+        if (!choice) {
+            return {
+                roleLabel,
+                spotlight,
+                expression: isLeft ? (state.activeDistractor ? 'tense' : 'neutral') : 'steady',
+                stateLabel: isLeft ? `נכנס/ת עם ${dominantEmotion}.` : 'עוד אפשר לבחור טון אחר.'
+            };
+        }
+        if (choice.id === 'meta') {
+            if (state.userReply) {
+                return {
+                    roleLabel,
+                    spotlight,
+                    expression: isLeft ? 'open' : 'steady',
+                    stateLabel: isLeft ? 'נשאר/ת בשיחה ומוכן/ה לפרט יותר.' : 'מחזיק/ה מסגרת רגועה ומדויקת.'
+                };
+            }
+            return {
+                roleLabel,
+                spotlight,
+                expression: isLeft ? 'relieved' : 'steady',
+                stateLabel: isLeft ? 'מרגיש/ה שמישהו מנסה להבין.' : 'שומר/ת על סקרנות במקום snap.'
+            };
+        }
+        if (choice.id === 'angry') {
+            return {
+                roleLabel,
+                spotlight,
+                expression: isLeft ? 'defensive' : 'angry',
+                stateLabel: isLeft ? 'נסגר/ת מול מתקפה ישירה.' : 'הטון שלך מתחמם ומאבד דיוק.'
+            };
+        }
+        if (choice.id === 'mock') {
+            return {
+                roleLabel,
+                spotlight,
+                expression: isLeft ? 'hurt' : 'defensive',
+                stateLabel: isLeft ? 'נפגע/ת ומתרחק/ת מהשיחה.' : 'התגובה נעשית חדה ועוקצנית.'
+            };
+        }
+        if (choice.id === 'rescue') {
+            return {
+                roleLabel,
+                spotlight,
+                expression: isLeft ? 'withdrawn' : 'tense',
+                stateLabel: isLeft ? 'משחרר/ת אחריות ומתרגל/ת תלות.' : 'לוקח/ת הכול עליך כדי להרגיע מהר.'
+            };
+        }
+        return {
+            roleLabel,
+            spotlight,
+            expression: isLeft ? 'closed' : 'withdrawn',
+            stateLabel: isLeft ? 'לא מרגיש/ה שמבינים אותי באמת.' : 'נסוג/ה וקונה שקט קטן במחיר עתידי.'
+        };
+    };
+
     const renderCharacters = () => {
         const scenario = currentScenario();
-        const draw = (slot, ch) => {
+        const fallbackEmoji = Object.freeze({
+            neutral: '🙂',
+            steady: '🙂',
+            open: '😊',
+            relieved: '😌',
+            tense: '😬',
+            defensive: '😣',
+            hurt: '🥺',
+            angry: '😠',
+            withdrawn: '😶',
+            closed: '🫥'
+        });
+        const draw = (slot, ch, side) => {
             if (!slot) return;
             const safeName = escapeHtml(ch?.name || 'דמות');
-            const safeSprite = String(ch?.sprite || '').trim();
-            if (safeSprite) {
-                slot.innerHTML = `
-                    <div class="ceflow-character-inner">
-                        <div class="ceflow-character-art">
-                            <img data-ceflow-avatar-img="1" src="${escapeHtml(safeSprite)}" alt="${safeName}" loading="lazy">
-                            <div class="ceflow-avatar-fallback hidden">🙂</div>
-                        </div>
-                        <p class="ceflow-character-name">${safeName}</p>
+            const view = deriveCharacterView(side);
+            const spriteOverride = !side || side !== 'right' ? '' : String(state.selectedChoice?.rightSpriteOverride || '').trim();
+            const safeSprite = escapeHtml(spriteOverride || String(ch?.sprite || '').trim());
+            const fallbackFace = fallbackEmoji[view.expression] || '🙂';
+            slot.classList.toggle('is-spotlight', !!view.spotlight);
+            slot.dataset.expression = view.expression;
+            slot.innerHTML = `
+                <div class="ceflow-character-inner">
+                    <div class="ceflow-character-art">
+                        ${safeSprite ? `<img data-ceflow-avatar-img="1" src="${safeSprite}" alt="${safeName}" loading="lazy">` : ''}
+                        <div class="ceflow-avatar-fallback${safeSprite ? ' hidden' : ''}">${fallbackFace}</div>
                     </div>
-                `;
-                const image = slot.querySelector('img[data-ceflow-avatar-img="1"]');
-                const fallback = slot.querySelector('.ceflow-avatar-fallback');
-                if (image && fallback) {
-                    image.addEventListener('error', () => {
-                        image.remove();
-                        fallback.classList.remove('hidden');
-                    }, { once: true });
-                }
-                return;
+                    <div class="ceflow-character-copy">
+                        <p class="ceflow-character-role">${escapeHtml(view.roleLabel)}</p>
+                        <p class="ceflow-character-name">${safeName}</p>
+                        <p class="ceflow-character-state">${escapeHtml(view.stateLabel)}</p>
+                    </div>
+                </div>
+            `;
+            const image = slot.querySelector('img[data-ceflow-avatar-img="1"]');
+            const fallback = slot.querySelector('.ceflow-avatar-fallback');
+            if (image && fallback) {
+                image.addEventListener('error', () => {
+                    image.remove();
+                    fallback.classList.remove('hidden');
+                }, { once: true });
             }
-            slot.innerHTML = `<div class="ceflow-character-inner"><div class="ceflow-character-art"><div class="ceflow-avatar-fallback">🙂</div></div><p class="ceflow-character-name">${safeName}</p></div>`;
         };
-        draw(els.left, scenario?.characters?.left);
-        draw(els.right, scenario?.characters?.right);
+        draw(els.left, scenario?.characters?.left, 'left');
+        draw(els.right, scenario?.characters?.right, 'right');
     };
 
     const renderDialog = () => {
@@ -17891,28 +18372,49 @@ async function setupComicEngine2({ force = false } = {}) {
                 role: 'counter'
             });
         }
-
-        els.dialog.innerHTML = lines.map((line) => `
+        const narrative = deriveSceneNarrative();
+        const intro = `
+            <div class="ceflow-dialog-intro">
+                <p class="ceflow-dialog-kicker">כך זה נשמע מתוך הרגע</p>
+                <strong>${escapeHtml(narrative.consequenceTitle)}</strong>
+            </div>
+        `;
+        els.dialog.innerHTML = `${intro}${lines.map((line) => `
             <article class="ceflow-bubble is-${line.speaker === 'right' ? 'right' : 'left'} ${line.role ? `is-${escapeHtml(line.role)}` : ''}">
                 <p class="ceflow-bubble-speaker">${escapeHtml(speakerName(line) || 'דמות')}</p>
                 <p class="ceflow-bubble-text">${ceflowHighlight(line.text, line.highlights, state.mode)}</p>
             </article>
-        `).join('');
+        `).join('')}`;
+        els.dialog.scrollTop = els.dialog.scrollHeight;
     };
 
     const renderOverlay = () => {
-        if (!state.selectedChoice || !els.overlay) {
-            els.overlay?.classList.add('hidden');
-            return;
-        }
-        const impact = state.selectedChoice.impact || {};
-        const stats = impact.stats || {};
-        if (els.tags) {
-            els.tags.innerHTML = (impact.xrayTags || []).map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
-        }
-        if (els.flow) els.flow.style.width = `${ceflowClamp(stats.flow, 50)}%`;
-        if (els.agency) els.agency.style.width = `${ceflowClamp(stats.agency, 50)}%`;
-        if (els.shame) els.shame.style.width = `${ceflowClamp(stats.shame, 50)}%`;
+        if (!els.overlay) return;
+        const hud = deriveEmotionalState();
+        const narrative = deriveSceneNarrative();
+        const renderStat = (label, value, cssName, note) => `
+            <article class="ceflow-stat ${cssName}">
+                <span>${escapeHtml(label)}</span>
+                <div class="ceflow-bar"><span style="width:${ceflowClamp(value, 50)}%"></span></div>
+                <small>${escapeHtml(note)}</small>
+            </article>
+        `;
+        els.overlay.innerHTML = `
+            <div class="ceflow-hud-head">
+                <div class="ceflow-hud-copy">
+                    <p class="ceflow-hud-kicker">Emotion HUD</p>
+                    <strong>${escapeHtml(narrative.hudHeadline)}</strong>
+                </div>
+                <p class="ceflow-hud-caption">${escapeHtml(narrative.hudCaption)}</p>
+            </div>
+            <div class="ceflow-xray-tags">${hud.xrayTags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('')}</div>
+            <div class="ceflow-stats">
+                ${renderStat('Flow', hud.flow, 'is-flow', describeMetric('flow', hud.flow))}
+                ${renderStat('Agency', hud.agency, 'is-agency', describeMetric('agency', hud.agency))}
+                ${renderStat('Shame', hud.shame, 'is-shame', describeMetric('shame', hud.shame))}
+                ${renderStat('Reactivity', hud.reactivity, 'is-reactivity', describeMetric('reactivity', hud.reactivity))}
+            </div>
+        `;
         els.overlay.classList.remove('hidden');
     };
 
@@ -17938,6 +18440,18 @@ async function setupComicEngine2({ force = false } = {}) {
         }
     };
 
+    const renderConsequenceBanner = () => {
+        if (!els.consequence) return;
+        const narrative = deriveSceneNarrative();
+        els.root.dataset.ceflowAtmosphere = narrative.atmosphere;
+        els.consequence.className = `ceflow-consequence-banner ${narrative.consequenceClass}`.trim();
+        els.consequence.innerHTML = `
+            <p class="ceflow-consequence-kicker">${escapeHtml(narrative.consequenceKicker)}</p>
+            <strong>${escapeHtml(narrative.consequenceTitle)}</strong>
+            <p>${escapeHtml(narrative.consequenceCopy)}</p>
+        `;
+    };
+
     const renderTimeout = () => {
         const open = state.flowState === CEFLOW_STATES.TIMEOUT;
         els.timeout?.classList.toggle('hidden', !open);
@@ -17945,9 +18459,9 @@ async function setupComicEngine2({ force = false } = {}) {
         const context = currentScenario()?.context || {};
         const snap = context.snapLine || CEFLOW_NATURAL_CHOICE_COPY.angry.say;
         els.timeout.innerHTML = `
-            <strong>⏱️ נגמר הזמן לסבב הזה.</strong>
-            <div>המערכת נעלה בחירה כדי לדמות לחץ אמת. נסו שוב או המשיכו לסצנה הבאה.</div>
-            <div><strong>המשפט האוטומטי שכנראה היה יוצא:</strong> ${escapeHtml(snap)}</div>
+            <strong>⏱️ החלון נסגר על הסצנה הזו.</strong>
+            <div>לא נבחרה תגובה בזמן, ולכן המערכת הקפיאה את הרגע כדי להמחיש איך לחץ זמן דוחף ל־snap.</div>
+            <div><strong>זה המשפט האוטומטי שכנראה היה בורח:</strong> ${escapeHtml(snap)}</div>
         `;
     };
 
@@ -17967,10 +18481,22 @@ async function setupComicEngine2({ force = false } = {}) {
         els.deck.innerHTML = choices.map(choice => {
             const selected = state.selectedChoice?.id === choice.id;
             const icon = choice.badge ? `<img src="${escapeHtml(choice.badge)}" alt="${escapeHtml(choice.label)}" loading="lazy">` : '';
+            const ui = choiceUiMeta(choice);
+            const stats = choice.impact?.stats || {};
             return `
                 <button type="button" class="ceflow-choice ${ceflowToneClass(choice.tone)}${selected ? ' is-selected' : ''}" data-choice-id="${escapeHtml(choice.id)}" ${locked ? 'disabled' : ''} aria-label="${escapeHtml(choice.label)}">
+                    <span class="ceflow-choice-tone">${escapeHtml(ui.icon)} ${escapeHtml(ui.toneLabel)}</span>
                     <span class="ceflow-choice-top"><strong>${escapeHtml(choice.emoji)} ${escapeHtml(choice.label)}</strong>${icon}</span>
                     <span class="ceflow-choice-line">${escapeHtml(choice.say)}</span>
+                    <span class="ceflow-choice-preview">
+                        <span class="ceflow-choice-preview-label">כך זה כנראה יזוז</span>
+                        <strong>${escapeHtml(ui.preview)}</strong>
+                    </span>
+                    <span class="ceflow-choice-stats">
+                        <span>Flow ${escapeHtml(String(ceflowClamp(stats.flow, 50)))}</span>
+                        <span>Agency ${escapeHtml(String(ceflowClamp(stats.agency, 50)))}</span>
+                        <span>Shame ${escapeHtml(String(ceflowClamp(stats.shame, 50)))}</span>
+                    </span>
                 </button>
             `;
         }).join('');
@@ -17980,10 +18506,18 @@ async function setupComicEngine2({ force = false } = {}) {
         const open = !!state.selectedChoice && !state.userReply;
         els.replyBox?.classList.toggle('hidden', !open);
         if (!open) return;
+        if (els.replyTitle) {
+            els.replyTitle.textContent = state.selectedChoice?.replyPrompt || 'כך זה נחת בצד השני. מה את/ה אומר/ת עכשיו?';
+        }
         if (els.replyQuick) {
             els.replyQuick.innerHTML = (state.selectedChoice.replyOptions || []).map(opt => `<button type="button" class="ceflow-reply-option" data-reply-option="${escapeHtml(opt)}">${escapeHtml(opt)}</button>`).join('');
         }
         if (els.replyInput) els.replyInput.value = state.replyDraft || '';
+        if (els.replyInput) {
+            els.replyInput.placeholder = state.selectedChoice?.id === 'meta'
+                ? 'כתבו משפט שממשיך את הדיוק ופותח עוד צעד קטן...'
+                : 'כתבו משפט שמנסה לייצב את השיחה מחדש...';
+        }
         if (els.replyStatus) els.replyStatus.textContent = '';
     };
 
@@ -18001,11 +18535,13 @@ async function setupComicEngine2({ force = false } = {}) {
         if (els.feedbackRight) {
             const interpretation = compactText(choice.interpretation, 210);
             const regulation = compactText(currentScenario().regulationNote, 220);
+            const narrative = deriveSceneNarrative();
+            const counterReply = compactText(choice.counterReply || CEFLOW_FALLBACKS[choice.id]?.counterReply || '', 180);
             const repairOptions = Array.isArray(choice.repairOptions) ? choice.repairOptions.slice(0, 4) : [];
             const repairBlock = (choice.id !== 'meta' && repairOptions.length)
                 ? `
                     <div class="ceflow-repair-box">
-                        <p>Repair אחרי Snap:</p>
+                        <p>מה יכול להתחיל לתקן את הרגע הזה?</p>
                         <div class="ceflow-repair-options">
                             ${repairOptions.map(item => `
                                 <button type="button" class="ceflow-repair-option${state.selectedRepair === item ? ' is-selected' : ''}" data-repair-option="${escapeHtml(item)}">
@@ -18017,9 +18553,24 @@ async function setupComicEngine2({ force = false } = {}) {
                 `
                 : '';
             els.feedbackRight.innerHTML = `
-                <p><strong>מה אמרת:</strong> ${escapeHtml(choice.say)}</p>
-                <p><strong>מה קרה:</strong></p>
+                <div class="ceflow-section-head">
+                    <p class="ceflow-section-kicker">${escapeHtml(narrative.consequenceKicker)}</p>
+                    <h4 class="ceflow-block-title">${escapeHtml(narrative.consequenceTitle)}</h4>
+                </div>
+                <div class="ceflow-feedback-quote">
+                    <strong>המשפט שיצא ממך</strong>
+                    <p>${escapeHtml(choice.say)}</p>
+                </div>
+                <div class="ceflow-feedback-quote">
+                    <strong>כך זה נשמע בצד השני</strong>
+                    <p>${escapeHtml(counterReply || 'הטון התקשה, והצד השני לא נשאר פתוח לגמרי.')}</p>
+                </div>
+                <div class="ceflow-feedback-quote">
+                    <strong>המשפט שבחרת עכשיו</strong>
+                    <p>${escapeHtml(state.userReply)}</p>
+                </div>
                 <div class="ceflow-outcomes">${(choice.impact?.microOutcome || []).map(item => `<span>${escapeHtml(item)}</span>`).join('')}</div>
+                <p class="ceflow-interpretation">${escapeHtml(interpretation)}</p>
                 <div class="ceflow-feedback-actions">
                     <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(interpretation)}">🔍 פרשנות</button>
                     <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(regulation)}">🧠 ויסות סטייט</button>
@@ -18077,10 +18628,14 @@ async function setupComicEngine2({ force = false } = {}) {
 
     const renderHeader = () => {
         const scenario = currentScenario();
+        const narrative = deriveSceneNarrative();
         if (els.domain) els.domain.textContent = `תחום: ${scenario.domain}`;
         if (els.progress) els.progress.textContent = `סצנה ${state.index + 1}/${scenarios.length}`;
         if (els.level) els.level.textContent = `רמה: ${scenario.level}`;
         if (els.title) els.title.textContent = scenario.title;
+        if (els.sceneSubtitle) els.sceneSubtitle.textContent = narrative.subtitle;
+        if (els.choiceTitle) els.choiceTitle.textContent = narrative.choiceTitle;
+        if (els.choiceCopy) els.choiceCopy.textContent = narrative.choiceCopy;
         if (els.expandStage) {
             els.expandStage.textContent = state.stageExpanded ? '🗕 כווץ קומיקס' : '🖼️ הגדל רגע';
             els.expandStage.setAttribute('aria-pressed', state.stageExpanded ? 'true' : 'false');
@@ -18096,6 +18651,7 @@ async function setupComicEngine2({ force = false } = {}) {
     const render = () => {
         els.root.classList.toggle('is-stage-expanded', !!state.stageExpanded);
         renderHeader();
+        renderConsequenceBanner();
         renderCharacters();
         renderDialog();
         renderOverlay();
