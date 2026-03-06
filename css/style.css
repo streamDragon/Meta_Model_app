@@ -15454,7 +15454,23 @@ body.mobile-sticky-cta-visible {
     --ceflow-scene-glow: rgba(245, 158, 11, 0.16);
     --ceflow-scene-shadow: rgba(15, 23, 42, 0.16);
     --ceflow-clock-color: #22c55e;
+    --ceflow-motion-fast: 120ms;
+    --ceflow-motion-medium: 220ms;
+    --ceflow-motion-slow: 420ms;
+    --ceflow-motion-atmosphere: 600ms;
+    --ceflow-motion-urgent: 400ms;
+    --ceflow-ease-soft: ease-out;
+    --ceflow-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --ceflow-ease-tension: cubic-bezier(0.3, 0, 0.2, 1);
+    --ceflow-scale-hover: 1.02;
+    --ceflow-scale-press: 0.98;
+    --ceflow-scale-spotlight: 1.03;
+    --ceflow-shake-small: 2px;
+    --ceflow-shake-medium: 4px;
+    --ceflow-glow-soft: 0 0 0 6px rgba(56, 189, 248, 0.18);
+    --ceflow-glow-urgent: 0 0 0 10px rgba(239, 68, 68, 0.2);
     margin-top: 18px;
+    position: relative;
     padding: 18px;
     border: 1px solid rgba(148, 163, 184, 0.28);
     border-radius: 30px;
@@ -15464,6 +15480,10 @@ body.mobile-sticky-cta-visible {
         linear-gradient(155deg, #fffdf8 0%, #f7fbff 46%, #eef2ff 100%);
     box-shadow: 0 24px 60px rgba(15, 23, 42, 0.1);
     overflow: hidden;
+    transition:
+        background var(--ceflow-motion-atmosphere) var(--ceflow-ease-soft),
+        box-shadow var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        border-color var(--ceflow-motion-medium) var(--ceflow-ease-soft);
 }
 
 .ceflow-cinematic-bg {
@@ -15514,6 +15534,29 @@ body.mobile-sticky-cta-visible {
     --ceflow-scene-glow: rgba(127, 29, 29, 0.22);
 }
 
+.ceflow-engine[data-ceflow-scene-state="incoming"] .ceflow-stage-backdrop {
+    opacity: 0.92;
+    transform: scale(1.03);
+}
+
+.ceflow-engine[data-ceflow-scene-state="pressure"] .ceflow-stage-backdrop {
+    opacity: 1;
+    transform: scale(1.04);
+    filter: saturate(1.08);
+}
+
+.ceflow-engine[data-ceflow-impact="good"] .ceflow-stage {
+    animation: ceflowStageGlow var(--ceflow-motion-medium) var(--ceflow-ease-soft);
+}
+
+.ceflow-engine[data-ceflow-impact="bad"] .ceflow-stage {
+    animation: ceflowStageShake var(--ceflow-motion-medium) var(--ceflow-ease-tension);
+}
+
+.ceflow-engine[data-ceflow-impact="timeout"] .ceflow-stage {
+    animation: ceflowStageShake var(--ceflow-motion-medium) var(--ceflow-ease-tension);
+}
+
 .ceflow-top-actions {
     align-items: center;
     gap: 14px;
@@ -15538,7 +15581,13 @@ body.mobile-sticky-cta-visible {
     padding: 10px 12px;
     box-shadow: 0 18px 34px rgba(15, 23, 42, 0.12);
     backdrop-filter: blur(12px);
-    transition: transform 140ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    position: relative;
+    overflow: hidden;
+    transition:
+        transform var(--ceflow-motion-fast) var(--ceflow-ease-soft),
+        box-shadow var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        border-color var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        background var(--ceflow-motion-medium) var(--ceflow-ease-soft);
 }
 
 .ceflow-shotclock-ring {
@@ -15579,6 +15628,26 @@ body.mobile-sticky-cta-visible {
     --ceflow-clock-color: #ef4444;
     box-shadow: 0 18px 36px rgba(239, 68, 68, 0.26);
     border-color: rgba(239, 68, 68, 0.4);
+}
+
+.ceflow-shotclock.is-warning .ceflow-shotclock-ring {
+    animation: ceflowClockPulse 1500ms var(--ceflow-ease-soft) infinite;
+}
+
+.ceflow-shotclock.is-closing .ceflow-shotclock-ring {
+    animation: ceflowClockPulse 800ms var(--ceflow-ease-soft) infinite;
+}
+
+.ceflow-shotclock.is-urgent {
+    box-shadow: 0 18px 42px rgba(239, 68, 68, 0.28), var(--ceflow-glow-urgent);
+}
+
+.ceflow-shotclock.is-urgent .ceflow-shotclock-ring {
+    animation: ceflowClockPulse var(--ceflow-motion-urgent) var(--ceflow-ease-tension) infinite;
+}
+
+.ceflow-shotclock.is-final-hit {
+    transform: translateX(calc(var(--ceflow-shake-small) * -1));
 }
 
 .ceflow-shotclock.is-locked {
@@ -15802,12 +15871,20 @@ body.mobile-sticky-cta-visible {
     border: 1px solid rgba(148, 163, 184, 0.24);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.86));
     box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
-    transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease, background 180ms ease;
+    transition:
+        transform var(--ceflow-motion-medium) var(--ceflow-ease-standard),
+        box-shadow var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        filter var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        background var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        border-color var(--ceflow-motion-medium) var(--ceflow-ease-soft);
 }
 
 .ceflow-character-art {
     min-height: 148px;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .ceflow-character-art img {
@@ -15818,10 +15895,73 @@ body.mobile-sticky-cta-visible {
 }
 
 .ceflow-avatar-fallback {
-    width: 88px;
-    height: 88px;
-    background: radial-gradient(circle at 30% 30%, #ffffff, #e2e8f0 72%);
+    width: 92px;
+    height: 112px;
+    border-radius: 26px;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.94), rgba(226, 232, 240, 0.9) 72%);
     box-shadow: 0 14px 24px rgba(15, 23, 42, 0.12);
+    overflow: hidden;
+}
+
+.ceflow-avatar-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+    filter: drop-shadow(0 14px 20px rgba(15, 23, 42, 0.18));
+}
+
+.ceflow-avatar-head {
+    fill: #fff5eb;
+    stroke: rgba(148, 163, 184, 0.34);
+    stroke-width: 1.35;
+}
+
+.ceflow-avatar-neck {
+    fill: #fed7aa;
+    opacity: 0.78;
+}
+
+.ceflow-avatar-eye {
+    fill: rgba(255, 255, 255, 0.96);
+    stroke: rgba(30, 41, 59, 0.18);
+    stroke-width: 1.1;
+}
+
+.ceflow-avatar-pupil {
+    fill: #0f172a;
+}
+
+.ceflow-avatar-brow,
+.ceflow-avatar-mouth,
+.ceflow-avatar-nose {
+    fill: none;
+    stroke: #1e293b;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.ceflow-avatar-cheek {
+    fill: rgba(251, 113, 133, 0.52);
+}
+
+.ceflow-character-card[data-avatar-expression="open"] .ceflow-avatar-brow,
+.ceflow-character-card[data-avatar-expression="relieved"] .ceflow-avatar-brow,
+.ceflow-character-card[data-avatar-expression="open"] .ceflow-avatar-mouth,
+.ceflow-character-card[data-avatar-expression="relieved"] .ceflow-avatar-mouth {
+    stroke: #0f766e;
+}
+
+.ceflow-character-card[data-avatar-expression="hurt"] .ceflow-avatar-brow,
+.ceflow-character-card[data-avatar-expression="hurt"] .ceflow-avatar-mouth {
+    stroke: #b45309;
+}
+
+.ceflow-character-card[data-avatar-expression="defensive"] .ceflow-avatar-brow,
+.ceflow-character-card[data-avatar-expression="defensive"] .ceflow-avatar-mouth,
+.ceflow-character-card[data-avatar-expression="angry"] .ceflow-avatar-brow,
+.ceflow-character-card[data-avatar-expression="angry"] .ceflow-avatar-mouth {
+    stroke: #7f1d1d;
 }
 
 .ceflow-character-copy {
@@ -15853,8 +15993,8 @@ body.mobile-sticky-cta-visible {
 }
 
 .ceflow-character-card.is-spotlight .ceflow-character-inner {
-    transform: translateY(-4px);
-    box-shadow: 0 24px 40px rgba(15, 23, 42, 0.14);
+    transform: translateY(-4px) scale(var(--ceflow-scale-spotlight));
+    box-shadow: 0 24px 40px rgba(15, 23, 42, 0.14), var(--ceflow-glow-soft);
 }
 
 .ceflow-character-card[data-expression="open"] .ceflow-character-inner,
@@ -15889,12 +16029,39 @@ body.mobile-sticky-cta-visible {
         radial-gradient(circle at 30% 18%, var(--ceflow-scene-tint), transparent 24%),
         radial-gradient(circle at 82% 72%, var(--ceflow-scene-glow), transparent 30%),
         linear-gradient(180deg, rgba(12, 19, 35, 0.96), rgba(22, 31, 52, 0.92));
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 14px;
     padding: 20px 20px calc(var(--ceflow-stage-footer-space) + 20px);
     min-height: var(--ceflow-stage-height);
     height: auto;
     max-height: none;
     overflow: hidden;
     box-shadow: 0 26px 50px var(--ceflow-scene-shadow);
+    transition:
+        transform var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        box-shadow var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        border-color var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        background var(--ceflow-motion-atmosphere) var(--ceflow-ease-soft);
+}
+
+.ceflow-stage-backdrop {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.12), transparent 28%),
+        radial-gradient(circle at 78% 12%, rgba(251, 191, 36, 0.08), transparent 24%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(15, 23, 42, 0));
+    opacity: 0.76;
+    transform: scale(1);
+    transition:
+        opacity var(--ceflow-motion-atmosphere) var(--ceflow-ease-soft),
+        transform var(--ceflow-motion-atmosphere) var(--ceflow-ease-standard),
+        filter var(--ceflow-motion-atmosphere) var(--ceflow-ease-soft);
 }
 
 .ceflow-stage-ambience {
@@ -15902,6 +16069,7 @@ body.mobile-sticky-cta-visible {
     inset: 0;
     pointer-events: none;
     overflow: hidden;
+    z-index: 0;
 }
 
 .ceflow-stage-orb {
@@ -15939,11 +16107,105 @@ body.mobile-sticky-cta-visible {
     animation-delay: -5s;
 }
 
+.ceflow-stage-status,
+.ceflow-dialog,
+.ceflow-overlay {
+    position: relative;
+    z-index: 2;
+}
+
+.ceflow-stage-status {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(8, 15, 35, 0.46);
+    backdrop-filter: blur(10px);
+}
+
+.ceflow-stage-status-copy {
+    display: grid;
+    gap: 4px;
+}
+
+.ceflow-stage-status strong {
+    color: #f8fafc;
+    font-size: 1rem;
+    line-height: 1.25;
+}
+
+.ceflow-stage-status p:last-child {
+    margin: 0;
+    color: rgba(226, 232, 240, 0.82);
+    font-size: 0.86rem;
+    line-height: 1.45;
+}
+
+.ceflow-scene-speaker {
+    white-space: nowrap;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 7px 10px;
+}
+
+.ceflow-turn-transition-layer {
+    position: absolute;
+    top: 18px;
+    inset-inline-end: 18px;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.ceflow-turn-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(248, 250, 252, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #f8fafc;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    animation: ceflowBubblePop var(--ceflow-motion-medium) var(--ceflow-ease-standard);
+}
+
+.ceflow-engine[data-ceflow-scene-state="pressure"] .ceflow-turn-pill {
+    background: rgba(249, 115, 22, 0.16);
+    border-color: rgba(251, 146, 60, 0.24);
+}
+
+.ceflow-engine[data-ceflow-impact="good"] .ceflow-turn-pill {
+    background: rgba(34, 197, 94, 0.16);
+    border-color: rgba(74, 222, 128, 0.24);
+}
+
+.ceflow-engine[data-ceflow-impact="bad"] .ceflow-turn-pill,
+.ceflow-engine[data-ceflow-impact="timeout"] .ceflow-turn-pill {
+    background: rgba(239, 68, 68, 0.16);
+    border-color: rgba(248, 113, 113, 0.24);
+}
+
 .ceflow-dialog {
     position: relative;
-    z-index: 1;
+    z-index: 2;
+    display: grid;
+    align-content: start;
     gap: 12px;
     padding-inline-end: 4px;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 .ceflow-bubble {
@@ -15953,6 +16215,15 @@ body.mobile-sticky-cta-visible {
     padding: 14px 16px;
     max-width: min(84%, 500px);
     box-shadow: 0 18px 28px rgba(15, 23, 42, 0.16);
+    transform-origin: center;
+    transition:
+        transform var(--ceflow-motion-medium) var(--ceflow-ease-standard),
+        opacity var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        box-shadow var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        border-color var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        background var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        filter var(--ceflow-motion-medium) var(--ceflow-ease-soft);
+    animation: ceflowBubblePop var(--ceflow-motion-medium) var(--ceflow-ease-standard);
 }
 
 .ceflow-bubble::after {
@@ -15998,6 +16269,54 @@ body.mobile-sticky-cta-visible {
 .ceflow-bubble.is-new-info {
     background: linear-gradient(180deg, rgba(254, 249, 195, 0.98), rgba(255, 251, 235, 0.96));
     border-color: rgba(245, 158, 11, 0.4);
+}
+
+.ceflow-bubble.is-history {
+    opacity: 0.68;
+    transform: translateY(2px) scale(0.985);
+    filter: saturate(0.84);
+}
+
+.ceflow-bubble.is-active {
+    opacity: 1;
+    transform: translateY(0) scale(1.01);
+    box-shadow: 0 22px 34px rgba(15, 23, 42, 0.24);
+}
+
+.ceflow-bubble.is-tone-soft {
+    background: linear-gradient(180deg, rgba(255, 250, 245, 0.98), rgba(255, 255, 255, 0.96));
+    border-color: rgba(226, 232, 240, 0.7);
+}
+
+.ceflow-bubble.is-tone-open,
+.ceflow-bubble.is-tone-repair {
+    background: linear-gradient(180deg, rgba(220, 252, 231, 0.98), rgba(240, 253, 244, 0.96));
+    border-color: rgba(74, 222, 128, 0.52);
+}
+
+.ceflow-bubble.is-tone-hurt {
+    background: linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 237, 213, 0.96));
+    border-color: rgba(251, 146, 60, 0.46);
+}
+
+.ceflow-bubble.is-tone-defensive {
+    background: linear-gradient(180deg, rgba(255, 241, 242, 0.98), rgba(255, 247, 237, 0.96));
+    border-color: rgba(249, 115, 22, 0.42);
+}
+
+.ceflow-bubble.is-tone-sharp {
+    background: linear-gradient(180deg, rgba(254, 226, 226, 0.98), rgba(255, 241, 242, 0.96));
+    border-color: rgba(239, 68, 68, 0.48);
+}
+
+.ceflow-bubble.is-tone-escalated {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.94));
+    border-color: rgba(248, 113, 113, 0.4);
+}
+
+.ceflow-bubble.is-tone-escalated .ceflow-bubble-speaker,
+.ceflow-bubble.is-tone-escalated .ceflow-bubble-text {
+    color: #f8fafc;
 }
 
 .ceflow-bubble-speaker {
@@ -16160,9 +16479,15 @@ body.mobile-sticky-cta-visible {
     padding: 14px;
     gap: 10px;
     min-height: 148px;
-    transition: transform 0.16s ease, box-shadow 0.18s ease, opacity 0.14s ease, border-color 0.18s ease;
+    transition:
+        transform var(--ceflow-motion-fast) var(--ceflow-ease-standard),
+        box-shadow var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        opacity var(--ceflow-motion-fast) var(--ceflow-ease-soft),
+        border-color var(--ceflow-motion-medium) var(--ceflow-ease-soft),
+        filter var(--ceflow-motion-medium) var(--ceflow-ease-soft);
     background: linear-gradient(180deg, var(--ceflow-choice-top), var(--ceflow-choice-bottom));
     overflow: hidden;
+    animation: ceflowChoiceBreath 1800ms ease-in-out infinite;
 }
 
 .ceflow-choice::after {
@@ -16181,19 +16506,41 @@ body.mobile-sticky-cta-visible {
 }
 
 .ceflow-choice:hover {
-    transform: translateY(-4px);
+    transform: translateY(-4px) scale(var(--ceflow-scale-hover));
     box-shadow: 0 20px 36px rgba(2, 6, 23, 0.28);
     border-color: rgba(255, 255, 255, 0.2);
+    animation: none;
 }
 
 .ceflow-choice:disabled {
     opacity: 0.68;
     filter: saturate(0.72);
+    animation: none;
+}
+
+.ceflow-choice:active {
+    transform: scale(var(--ceflow-scale-press));
 }
 
 .ceflow-choice.is-selected {
     border-color: rgba(255, 255, 255, 0.72);
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.24), 0 22px 38px rgba(2, 6, 23, 0.32);
+    animation: none;
+}
+
+.ceflow-choice.is-dimmed {
+    opacity: 0.52;
+    filter: saturate(0.58);
+}
+
+.ceflow-choice.is-impact-good {
+    border-color: rgba(134, 239, 172, 0.8);
+    box-shadow: 0 0 0 2px rgba(134, 239, 172, 0.2), 0 22px 38px rgba(6, 95, 70, 0.28);
+}
+
+.ceflow-choice.is-impact-bad {
+    border-color: rgba(254, 202, 202, 0.82);
+    box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.2), 0 22px 38px rgba(127, 29, 29, 0.3);
 }
 
 .ceflow-choice-tone {
@@ -16573,9 +16920,9 @@ body.mobile-sticky-cta-visible {
     }
 
     .ceflow-avatar-fallback {
-        width: 52px;
-        height: 52px;
-        font-size: 1.4rem;
+        width: 56px;
+        height: 72px;
+        border-radius: 18px;
     }
 
     .ceflow-character-role,
@@ -16593,6 +16940,34 @@ body.mobile-sticky-cta-visible {
         padding: 14px 14px calc(var(--ceflow-stage-footer-space-mobile) + 14px);
     }
 
+    .ceflow-stage-status {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 10px 12px;
+    }
+
+    .ceflow-stage-status strong {
+        font-size: 0.92rem;
+    }
+
+    .ceflow-stage-status p:last-child {
+        font-size: 0.8rem;
+    }
+
+    .ceflow-turn-transition-layer {
+        top: auto;
+        bottom: calc(var(--ceflow-stage-footer-space-mobile) + 18px);
+        inset-inline-end: 12px;
+    }
+
+    .ceflow-turn-pill {
+        min-height: 30px;
+        padding: 5px 10px;
+        font-size: 0.64rem;
+        letter-spacing: 0.12em;
+    }
+
     .ceflow-engine.is-stage-expanded .ceflow-stage {
         min-height: var(--ceflow-stage-height-mobile-expanded);
     }
@@ -16604,6 +16979,10 @@ body.mobile-sticky-cta-visible {
 
     .ceflow-bubble-text {
         font-size: 0.9rem;
+    }
+
+    .ceflow-choice {
+        min-height: 138px;
     }
 
     .ceflow-overlay {
@@ -16644,6 +17023,24 @@ body.mobile-sticky-cta-visible {
 @keyframes ceflowClockPulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.06); }
+}
+
+@keyframes ceflowStageShake {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    25% { transform: translate3d(calc(var(--ceflow-shake-medium) * -1), 0, 0); }
+    50% { transform: translate3d(var(--ceflow-shake-medium), 0, 0); }
+    75% { transform: translate3d(calc(var(--ceflow-shake-small) * -1), 0, 0); }
+}
+
+@keyframes ceflowStageGlow {
+    0% { box-shadow: 0 26px 50px var(--ceflow-scene-shadow); }
+    50% { box-shadow: 0 28px 60px rgba(34, 197, 94, 0.22), var(--ceflow-glow-soft); }
+    100% { box-shadow: 0 26px 50px var(--ceflow-scene-shadow); }
+}
+
+@keyframes ceflowChoiceBreath {
+    0%, 100% { box-shadow: 0 0 0 rgba(255, 255, 255, 0); }
+    50% { box-shadow: 0 14px 26px rgba(2, 6, 23, 0.16); }
 }
 
 .home-lobby-bg {

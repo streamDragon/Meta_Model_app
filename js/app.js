@@ -16877,6 +16877,152 @@ const CEFLOW_STATES = Object.freeze({
 
 const CEFLOW_CHOICE_ORDER = Object.freeze(['angry', 'mock', 'rescue', 'avoid', 'meta']);
 
+const CEFLOW_MOTION = Object.freeze({
+    duration: Object.freeze({
+        fast: 120,
+        medium: 220,
+        slow: 420,
+        atmosphere: 600,
+        urgent: 400
+    }),
+    ease: Object.freeze({
+        soft: 'ease-out',
+        standard: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+        tension: 'cubic-bezier(0.3, 0, 0.2, 1)'
+    }),
+    scale: Object.freeze({
+        hover: 1.02,
+        press: 0.98,
+        spotlight: 1.03
+    }),
+    shake: Object.freeze({
+        small: 2,
+        medium: 4
+    }),
+    glow: Object.freeze({
+        soft: '0 0 0 6px rgba(56, 189, 248, 0.18)',
+        urgent: '0 0 0 10px rgba(239, 68, 68, 0.2)'
+    })
+});
+
+const CEFLOW_EXPRESSION_ALIASES = Object.freeze({
+    neutral: 'neutral',
+    steady: 'neutral',
+    open: 'open',
+    hurt: 'hurt',
+    defensive: 'defensive',
+    angry: 'angry',
+    relieved: 'relieved',
+    tense: 'defensive',
+    withdrawn: 'hurt',
+    closed: 'defensive'
+});
+
+const CEFLOW_EXPRESSION_MAP = Object.freeze({
+    neutral: Object.freeze({
+        headTilt: 0,
+        eyeRy: 4.8,
+        pupilShiftX: 0,
+        pupilShiftY: 0,
+        pupilRadius: 2.7,
+        browWidth: 3.3,
+        mouthWidth: 3,
+        brows: Object.freeze({
+            left: 'M35 45 Q43 41 50 44',
+            right: 'M62 44 Q69 41 77 45'
+        }),
+        mouth: 'M44 82 Q56 86 68 82',
+        cheekOpacity: 0.08,
+        halo: 'rgba(148, 163, 184, 0.18)',
+        shoulders: 'rgba(59, 130, 246, 0.26)'
+    }),
+    open: Object.freeze({
+        headTilt: -2,
+        eyeRy: 5.8,
+        pupilShiftX: 0.4,
+        pupilShiftY: 0,
+        pupilRadius: 2.9,
+        browWidth: 3,
+        mouthWidth: 3.1,
+        brows: Object.freeze({
+            left: 'M35 43 Q43 37 50 41',
+            right: 'M62 41 Q69 37 77 43'
+        }),
+        mouth: 'M44 80 Q56 91 68 80',
+        cheekOpacity: 0.12,
+        halo: 'rgba(56, 189, 248, 0.2)',
+        shoulders: 'rgba(14, 165, 233, 0.28)'
+    }),
+    hurt: Object.freeze({
+        headTilt: 2,
+        eyeRy: 4.2,
+        pupilShiftX: 0,
+        pupilShiftY: 1.1,
+        pupilRadius: 2.5,
+        browWidth: 3.4,
+        mouthWidth: 3,
+        brows: Object.freeze({
+            left: 'M35 47 Q43 39 50 45',
+            right: 'M62 45 Q69 39 77 47'
+        }),
+        mouth: 'M44 85 Q56 77 68 85',
+        cheekOpacity: 0.15,
+        halo: 'rgba(251, 146, 60, 0.2)',
+        shoulders: 'rgba(251, 146, 60, 0.28)'
+    }),
+    defensive: Object.freeze({
+        headTilt: 5,
+        eyeRy: 3.8,
+        pupilShiftX: -0.5,
+        pupilShiftY: 0.4,
+        pupilRadius: 2.5,
+        browWidth: 3.6,
+        mouthWidth: 3.2,
+        brows: Object.freeze({
+            left: 'M35 47 Q43 42 50 44',
+            right: 'M62 44 Q69 42 77 47'
+        }),
+        mouth: 'M44 82 Q56 81 68 82',
+        cheekOpacity: 0.08,
+        halo: 'rgba(249, 115, 22, 0.22)',
+        shoulders: 'rgba(234, 88, 12, 0.3)'
+    }),
+    angry: Object.freeze({
+        headTilt: -5,
+        eyeRy: 3.4,
+        pupilShiftX: 0.1,
+        pupilShiftY: 0.2,
+        pupilRadius: 2.6,
+        browWidth: 3.8,
+        mouthWidth: 3.3,
+        brows: Object.freeze({
+            left: 'M35 44 Q43 47 50 42',
+            right: 'M62 42 Q69 47 77 44'
+        }),
+        mouth: 'M44 84 Q56 79 68 84',
+        cheekOpacity: 0.14,
+        halo: 'rgba(239, 68, 68, 0.24)',
+        shoulders: 'rgba(220, 38, 38, 0.34)'
+    }),
+    relieved: Object.freeze({
+        headTilt: -1,
+        eyeRy: 5.2,
+        pupilShiftX: 0.2,
+        pupilShiftY: 0,
+        pupilRadius: 2.7,
+        browWidth: 3,
+        mouthWidth: 3,
+        brows: Object.freeze({
+            left: 'M35 44 Q43 40 50 42',
+            right: 'M62 42 Q69 40 77 44'
+        }),
+        mouth: 'M44 79 Q56 88 68 79',
+        cheekOpacity: 0.12,
+        halo: 'rgba(34, 197, 94, 0.2)',
+        shoulders: 'rgba(22, 163, 74, 0.28)'
+    })
+});
+
 const CEFLOW_FALLBACKS = Object.freeze({
     angry: Object.freeze({
         tone: 'danger', label: '׳›עס', emoji: '😡',
@@ -17557,6 +17703,9 @@ async function setupComicEngine2({ force = false } = {}) {
         shotClockLabel: document.getElementById('ceflow-shotclock-label'),
         left: document.getElementById('ceflow-left-character'),
         right: document.getElementById('ceflow-right-character'),
+        stage: root.querySelector('.ceflow-stage'),
+        stageStatus: document.getElementById('ceflow-stage-status'),
+        turnLayer: document.getElementById('ceflow-turn-transition-layer'),
         dialog: document.getElementById('ceflow-dialog'),
         overlay: document.getElementById('ceflow-overlay'),
         tags: document.getElementById('ceflow-xray-tags'),
@@ -17647,7 +17796,9 @@ async function setupComicEngine2({ force = false } = {}) {
         shotClockDeadlineMs: 0,
         shotClockNextTickMs: 0,
         shotClockDistractorFired: false,
-        shotClockPenaltyNextMs: 0
+        shotClockPenaltyNextMs: 0,
+        roundStartedAt: Date.now(),
+        lastPressureState: ''
     };
 
     const currentScenario = () => scenarios[state.index];
@@ -17658,6 +17809,62 @@ async function setupComicEngine2({ force = false } = {}) {
         if (!raw) return '';
         return raw.length > max ? `${raw.slice(0, max - 1)}...` : raw;
     };
+    const applyMotionTokens = () => {
+        if (!els.root) return;
+        const style = els.root.style;
+        style.setProperty('--ceflow-motion-fast', `${CEFLOW_MOTION.duration.fast}ms`);
+        style.setProperty('--ceflow-motion-medium', `${CEFLOW_MOTION.duration.medium}ms`);
+        style.setProperty('--ceflow-motion-slow', `${CEFLOW_MOTION.duration.slow}ms`);
+        style.setProperty('--ceflow-motion-atmosphere', `${CEFLOW_MOTION.duration.atmosphere}ms`);
+        style.setProperty('--ceflow-motion-urgent', `${CEFLOW_MOTION.duration.urgent}ms`);
+        style.setProperty('--ceflow-ease-soft', CEFLOW_MOTION.ease.soft);
+        style.setProperty('--ceflow-ease-standard', CEFLOW_MOTION.ease.standard);
+        style.setProperty('--ceflow-ease-tension', CEFLOW_MOTION.ease.tension);
+        style.setProperty('--ceflow-scale-hover', String(CEFLOW_MOTION.scale.hover));
+        style.setProperty('--ceflow-scale-press', String(CEFLOW_MOTION.scale.press));
+        style.setProperty('--ceflow-scale-spotlight', String(CEFLOW_MOTION.scale.spotlight));
+        style.setProperty('--ceflow-shake-small', `${CEFLOW_MOTION.shake.small}px`);
+        style.setProperty('--ceflow-shake-medium', `${CEFLOW_MOTION.shake.medium}px`);
+        style.setProperty('--ceflow-glow-soft', CEFLOW_MOTION.glow.soft);
+        style.setProperty('--ceflow-glow-urgent', CEFLOW_MOTION.glow.urgent);
+    };
+    const resolveAvatarExpressionKey = (expression) => {
+        const normalized = String(expression || '').trim().toLowerCase();
+        return CEFLOW_EXPRESSION_ALIASES[normalized] || 'neutral';
+    };
+    const renderAvatarFaceSvg = (expression, side, label = 'avatar') => {
+        const key = resolveAvatarExpressionKey(expression);
+        const spec = CEFLOW_EXPRESSION_MAP[key] || CEFLOW_EXPRESSION_MAP.neutral;
+        const leftPupilX = 44 + spec.pupilShiftX;
+        const rightPupilX = 68 + spec.pupilShiftX;
+        const pupilY = 60 + spec.pupilShiftY;
+        const cheekMarkup = spec.cheekOpacity > 0
+            ? `
+                <ellipse class="ceflow-avatar-cheek" cx="40" cy="73" rx="8" ry="4.6" style="opacity:${spec.cheekOpacity};"></ellipse>
+                <ellipse class="ceflow-avatar-cheek" cx="72" cy="73" rx="8" ry="4.6" style="opacity:${spec.cheekOpacity};"></ellipse>
+            `
+            : '';
+        return `
+            <svg class="ceflow-avatar-svg ceflow-avatar-svg--${escapeHtml(key)} ceflow-avatar-svg--${escapeHtml(side || 'left')}" viewBox="0 0 112 136" role="img" aria-label="${escapeHtml(label)}">
+                <ellipse class="ceflow-avatar-halo" cx="56" cy="62" rx="39" ry="42" style="fill:${spec.halo};"></ellipse>
+                <path class="ceflow-avatar-shoulders" d="M16 132 Q56 97 96 132 L96 136 L16 136 Z" style="fill:${spec.shoulders};"></path>
+                <g transform="rotate(${spec.headTilt} 56 60)">
+                    <ellipse class="ceflow-avatar-neck" cx="56" cy="88" rx="10" ry="11"></ellipse>
+                    <circle class="ceflow-avatar-head" cx="56" cy="58" r="34"></circle>
+                    ${cheekMarkup}
+                    <path class="ceflow-avatar-brow" d="${spec.brows.left}" style="stroke-width:${spec.browWidth};"></path>
+                    <path class="ceflow-avatar-brow" d="${spec.brows.right}" style="stroke-width:${spec.browWidth};"></path>
+                    <ellipse class="ceflow-avatar-eye" cx="44" cy="60" rx="8" ry="${spec.eyeRy}"></ellipse>
+                    <ellipse class="ceflow-avatar-eye" cx="68" cy="60" rx="8" ry="${spec.eyeRy}"></ellipse>
+                    <circle class="ceflow-avatar-pupil" cx="${leftPupilX}" cy="${pupilY}" r="${spec.pupilRadius}"></circle>
+                    <circle class="ceflow-avatar-pupil" cx="${rightPupilX}" cy="${pupilY}" r="${spec.pupilRadius}"></circle>
+                    <path class="ceflow-avatar-nose" d="M56 62 Q54 70 57 76"></path>
+                    <path class="ceflow-avatar-mouth" d="${spec.mouth}" style="stroke-width:${spec.mouthWidth};"></path>
+                </g>
+            </svg>
+        `;
+    };
+    applyMotionTokens();
     const isEngineVisible = () => {
         const tab = document.getElementById('comic-engine');
         if (!tab) return true;
@@ -17990,6 +18197,93 @@ async function setupComicEngine2({ force = false } = {}) {
         };
     };
 
+    const deriveSceneVisualState = () => {
+        const clock = currentShotClockState();
+        const choice = state.selectedChoice;
+        const impact = state.flowState === CEFLOW_STATES.TIMEOUT
+            ? 'timeout'
+            : !choice
+                ? 'none'
+                : choice.id === 'meta'
+                    ? 'good'
+                    : 'bad';
+        let sceneState = 'idle';
+        if (impact !== 'none') sceneState = 'impact';
+        else if (clock.pressureState === 'alert' || clock.pressureState === 'critical' || !!state.activeDistractor) sceneState = 'pressure';
+        else if ((Date.now() - state.roundStartedAt) < 2200) sceneState = 'incoming';
+        const activeSpeaker = state.flowState === CEFLOW_STATES.TIMEOUT
+            ? 'left'
+            : state.userReply
+                ? 'right'
+                : 'left';
+        if (impact === 'timeout') {
+            return {
+                sceneState,
+                impact,
+                activeSpeaker,
+                kicker: 'החלון נסגר',
+                headline: 'הרגע ננעל לפני שיצאה תגובה.',
+                copy: 'אין כאן פספוס טכני בלבד. חוסר תגובה עצמו כבר מורגש על הבמה.',
+                turnChip: 'פספוס חלון תגובה'
+            };
+        }
+        if (impact === 'good') {
+            return {
+                sceneState,
+                impact,
+                activeSpeaker,
+                kicker: 'הטון נפתח',
+                headline: 'הבחירה שלך יצרה יותר מרחב נשימה.',
+                copy: 'ההבעה נרגעת, הבועה מתרככת, ויש יותר סיכוי לדיוק במקום הסלמה.',
+                turnChip: 'Repair in motion'
+            };
+        }
+        if (impact === 'bad') {
+            return {
+                sceneState,
+                impact,
+                activeSpeaker,
+                kicker: 'כך זה פגע',
+                headline: 'הבחירה שלך הקשיחה את הסצנה.',
+                copy: 'הצד השני מצטמצם, והאווירה נהיית חדה יותר כמעט מיד.',
+                turnChip: 'התגוננות עולה'
+            };
+        }
+        if (sceneState === 'pressure') {
+            return {
+                sceneState,
+                impact,
+                activeSpeaker,
+                kicker: 'המתח עולה',
+                headline: clock.pressureState === 'critical' ? 'עוד רגע והחלון נסגר.' : 'השעון כבר מורגש בגוף.',
+                copy: state.activeDistractor
+                    ? `גם "${compactText(state.activeDistractor, 72)}" נכנס לרקע ומעלה עומס.`
+                    : 'הזמן דוחף לתגובה מהירה, אבל עדיין אפשר לבחור דיוק במקום snap.',
+                turnChip: 'Pressure rising'
+            };
+        }
+        if (sceneState === 'incoming') {
+            return {
+                sceneState,
+                impact,
+                activeSpeaker,
+                kicker: 'הקו נכנס',
+                headline: 'כך זה נשמע עכשיו מהצד השני.',
+                copy: 'המשפט החי כבר על הבמה. קודם מקשיבים לטון, אחר כך בוחרים תגובה.',
+                turnChip: 'Incoming dialogue'
+            };
+        }
+        return {
+            sceneState,
+            impact,
+            activeSpeaker,
+            kicker: 'סצנה חיה',
+            headline: 'הבמה פתוחה ומחכה לבחירה שלך.',
+            copy: 'עוד יש מרחב. אפשר לראות את הרגע, לווסת, ורק אז להגיב.',
+            turnChip: 'Ready state'
+        };
+    };
+
     const deriveSceneNarrative = () => {
         const scenario = currentScenario();
         const context = scenario?.context || {};
@@ -18075,11 +18369,34 @@ async function setupComicEngine2({ force = false } = {}) {
         };
     };
 
+    const renderSceneState = () => {
+        const visual = deriveSceneVisualState();
+        if (els.root) {
+            els.root.dataset.ceflowSceneState = visual.sceneState;
+            els.root.dataset.ceflowImpact = visual.impact;
+            els.root.dataset.ceflowSpeaker = visual.activeSpeaker;
+        }
+        if (els.stageStatus) {
+            els.stageStatus.innerHTML = `
+                <div class="ceflow-stage-status-copy">
+                    <p class="ceflow-dialog-kicker">${escapeHtml(visual.kicker)}</p>
+                    <strong>${escapeHtml(visual.headline)}</strong>
+                    <p>${escapeHtml(visual.copy)}</p>
+                </div>
+                <span class="ceflow-scene-speaker">${visual.activeSpeaker === 'left' ? 'הצד השני בפוקוס' : 'עכשיו התור שלך'}</span>
+            `;
+        }
+        if (els.turnLayer) {
+            els.turnLayer.innerHTML = `<span class="ceflow-turn-pill">${escapeHtml(visual.turnChip)}</span>`;
+        }
+    };
+
     const renderShotClock = () => {
         const clock = currentShotClockState();
         const remainingMs = clock.remainingMs;
         const secondsLeft = clock.secondsLeft;
         const pct = clock.pct;
+        const previousPressureState = state.lastPressureState;
         if (els.shotClockRing) els.shotClockRing.style.setProperty('--clock-pct', String(pct.toFixed(4)));
         if (els.shotClockSeconds) els.shotClockSeconds.textContent = String(secondsLeft);
         if (els.shotClockLabel) {
@@ -18092,12 +18409,26 @@ async function setupComicEngine2({ force = false } = {}) {
         if (els.shotClock) {
             const closing = state.flowState === CEFLOW_STATES.SCENE_READY && remainingMs <= 5000 && remainingMs > 0;
             const warning = state.flowState === CEFLOW_STATES.SCENE_READY && remainingMs <= 9000 && remainingMs > 5000;
+            const urgent = state.flowState === CEFLOW_STATES.SCENE_READY && remainingMs <= 3000 && remainingMs > 0;
+            const finalHit = state.flowState === CEFLOW_STATES.SCENE_READY && remainingMs <= 1000 && remainingMs > 0;
             els.shotClock.classList.toggle('is-closing', closing);
             els.shotClock.classList.toggle('is-warning', warning);
+            els.shotClock.classList.toggle('is-urgent', urgent);
+            els.shotClock.classList.toggle('is-final-hit', finalHit);
             els.shotClock.classList.toggle('is-locked', state.flowState !== CEFLOW_STATES.SCENE_READY && state.flowState !== CEFLOW_STATES.TIMEOUT);
             els.shotClock.classList.toggle('is-timeout', state.flowState === CEFLOW_STATES.TIMEOUT);
+            els.shotClock.dataset.pressure = clock.pressureState;
         }
         if (els.root) els.root.dataset.ceflowPressure = clock.pressureState;
+        state.lastPressureState = clock.pressureState;
+        renderSceneState();
+        if (previousPressureState && previousPressureState !== clock.pressureState && state.flowState === CEFLOW_STATES.SCENE_READY && !state.selectedChoice) {
+            renderHeader();
+            renderConsequenceBanner();
+            renderCharacters();
+            renderDialog();
+            renderOverlay();
+        }
     };
 
     const stopShotClock = () => {
@@ -18157,7 +18488,12 @@ async function setupComicEngine2({ force = false } = {}) {
                 : 'עוד גירוי נכנס ברקע ומעלה עומס.';
             showDistractor(randomText);
             pressureAudio.distractor();
+            renderHeader();
+            renderConsequenceBanner();
+            renderSceneState();
+            renderCharacters();
             renderDialog();
+            renderOverlay();
         }
 
         if (now >= state.shotClockPenaltyNextMs) {
@@ -18221,22 +18557,26 @@ async function setupComicEngine2({ force = false } = {}) {
         hideFeedbackNote();
         hideFloatingNote();
         hideDistractor();
+        state.roundStartedAt = Date.now();
+        state.lastPressureState = '';
     };
 
     const deriveCharacterView = (side) => {
         const scenario = currentScenario();
         const context = scenario?.context || {};
         const dominantEmotion = context.dominantEmotion || 'לחץ';
+        const emotionText = `${dominantEmotion} ${context.trigger || ''}`;
         const choice = state.selectedChoice;
         const isLeft = side === 'left';
         const roleLabel = isLeft ? 'הצד השני' : 'התגובה שלך';
-        const spotlight = state.flowState === CEFLOW_STATES.TIMEOUT
-            ? isLeft
-            : !choice
-                ? !isLeft
-                : !state.userReply
-                    ? isLeft
-                    : !isLeft;
+        const clock = currentShotClockState();
+        const visual = deriveSceneVisualState();
+        const spotlight = visual.activeSpeaker === side;
+        const incomingExpression = /עלבון|כאב|בושה/.test(emotionText)
+            ? 'hurt'
+            : /פחד|לחץ|כעס/.test(emotionText)
+                ? 'tense'
+                : 'open';
         if (state.flowState === CEFLOW_STATES.TIMEOUT) {
             return {
                 roleLabel,
@@ -18246,11 +18586,31 @@ async function setupComicEngine2({ force = false } = {}) {
             };
         }
         if (!choice) {
+            if (visual.sceneState === 'incoming') {
+                return {
+                    roleLabel,
+                    spotlight,
+                    expression: isLeft ? incomingExpression : 'neutral',
+                    stateLabel: isLeft ? 'זה המשפט שנוחת עכשיו בתוך הסצנה.' : 'עוד רגע צריך לבחור טון, לא רק טקסט.'
+                };
+            }
+            if (visual.sceneState === 'pressure') {
+                return {
+                    roleLabel,
+                    spotlight,
+                    expression: isLeft ? (state.activeDistractor ? 'hurt' : 'tense') : 'tense',
+                    stateLabel: isLeft
+                        ? 'ההמתנה מתוחה יותר, והטון עלול להיסגר.'
+                        : clock.pressureState === 'critical'
+                            ? 'הזמן סוגר. צריך תגובה ברורה עכשיו.'
+                            : 'הלחץ כבר עולה, אבל עדיין אפשר לבחור דיוק.'
+                };
+            }
             return {
                 roleLabel,
                 spotlight,
-                expression: isLeft ? (state.activeDistractor ? 'tense' : 'neutral') : 'steady',
-                stateLabel: isLeft ? `נכנס/ת עם ${dominantEmotion}.` : 'עוד אפשר לבחור טון אחר.'
+                expression: isLeft ? 'neutral' : 'steady',
+                stateLabel: isLeft ? `נכנס/ת עם ${dominantEmotion}, אבל עדיין לא נסגר/ת.` : 'יש מרחב לווסת ולבחור קו תגובה.'
             };
         }
         if (choice.id === 'meta') {
@@ -18258,15 +18618,15 @@ async function setupComicEngine2({ force = false } = {}) {
                 return {
                     roleLabel,
                     spotlight,
-                    expression: isLeft ? 'open' : 'steady',
-                    stateLabel: isLeft ? 'נשאר/ת בשיחה ומוכן/ה לפרט יותר.' : 'מחזיק/ה מסגרת רגועה ומדויקת.'
+                    expression: isLeft ? 'open' : 'relieved',
+                    stateLabel: isLeft ? 'נשאר/ת בשיחה ומוכן/ה לפרט יותר.' : 'התגובה נשמעת מווסתת, ברורה ומדויקת.'
                 };
             }
             return {
                 roleLabel,
                 spotlight,
-                expression: isLeft ? 'relieved' : 'steady',
-                stateLabel: isLeft ? 'מרגיש/ה שמישהו מנסה להבין.' : 'שומר/ת על סקרנות במקום snap.'
+                expression: isLeft ? 'relieved' : 'open',
+                stateLabel: isLeft ? 'מרגיש/ה שמישהו מנסה להבין, לא רק לעצור.' : 'שומר/ת על סקרנות במקום snap.'
             };
         }
         if (choice.id === 'angry') {
@@ -18303,32 +18663,21 @@ async function setupComicEngine2({ force = false } = {}) {
 
     const renderCharacters = () => {
         const scenario = currentScenario();
-        const fallbackEmoji = Object.freeze({
-            neutral: '🙂',
-            steady: '🙂',
-            open: '😊',
-            relieved: '😌',
-            tense: '😬',
-            defensive: '😣',
-            hurt: '🥺',
-            angry: '😠',
-            withdrawn: '😶',
-            closed: '🫥'
-        });
         const draw = (slot, ch, side) => {
             if (!slot) return;
             const safeName = escapeHtml(ch?.name || 'דמות');
             const view = deriveCharacterView(side);
             const spriteOverride = !side || side !== 'right' ? '' : String(state.selectedChoice?.rightSpriteOverride || '').trim();
             const safeSprite = escapeHtml(spriteOverride || String(ch?.sprite || '').trim());
-            const fallbackFace = fallbackEmoji[view.expression] || '🙂';
+            const fallbackFace = renderAvatarFaceSvg(view.expression, side, ch?.name || 'דמות');
             slot.classList.toggle('is-spotlight', !!view.spotlight);
             slot.dataset.expression = view.expression;
+            slot.dataset.avatarExpression = resolveAvatarExpressionKey(view.expression);
             slot.innerHTML = `
                 <div class="ceflow-character-inner">
                     <div class="ceflow-character-art">
                         ${safeSprite ? `<img data-ceflow-avatar-img="1" src="${safeSprite}" alt="${safeName}" loading="lazy">` : ''}
-                        <div class="ceflow-avatar-fallback${safeSprite ? ' hidden' : ''}">${fallbackFace}</div>
+                        <div class="ceflow-avatar-fallback${safeSprite ? ' hidden' : ''}" data-avatar-expression="${escapeHtml(resolveAvatarExpressionKey(view.expression))}">${fallbackFace}</div>
                     </div>
                     <div class="ceflow-character-copy">
                         <p class="ceflow-character-role">${escapeHtml(view.roleLabel)}</p>
@@ -18348,6 +18697,27 @@ async function setupComicEngine2({ force = false } = {}) {
         };
         draw(els.left, scenario?.characters?.left, 'left');
         draw(els.right, scenario?.characters?.right, 'right');
+    };
+
+    const bubbleToneForLine = (line) => {
+        const role = String(line?.role || '').trim();
+        if (role === 'reply') return state.selectedChoice?.id === 'meta' ? 'open' : 'repair';
+        if (role === 'counter') {
+            if (state.flowState === CEFLOW_STATES.TIMEOUT) return 'escalated';
+            if (state.selectedChoice?.id === 'meta') return state.userReply ? 'open' : 'soft';
+            if (state.selectedChoice?.id === 'mock') return 'hurt';
+            if (state.selectedChoice?.id === 'angry') return 'sharp';
+            return 'defensive';
+        }
+        if (role === 'selected') return state.selectedChoice?.id === 'meta' ? 'open' : 'sharp';
+        if (role === 'new-info') return state.activeDistractor ? 'escalated' : 'soft';
+        const emotionText = `${currentScenario()?.context?.dominantEmotion || ''} ${currentScenario()?.context?.trigger || ''}`;
+        if (line?.speaker === 'left') {
+            if (/עלבון|כאב|בושה/.test(emotionText)) return 'hurt';
+            if (/כעס|לחץ|פחד/.test(emotionText)) return 'defensive';
+            return 'soft';
+        }
+        return 'open';
     };
 
     const renderDialog = () => {
@@ -18372,19 +18742,25 @@ async function setupComicEngine2({ force = false } = {}) {
                 role: 'counter'
             });
         }
-        const narrative = deriveSceneNarrative();
-        const intro = `
-            <div class="ceflow-dialog-intro">
-                <p class="ceflow-dialog-kicker">כך זה נשמע מתוך הרגע</p>
-                <strong>${escapeHtml(narrative.consequenceTitle)}</strong>
-            </div>
-        `;
-        els.dialog.innerHTML = `${intro}${lines.map((line) => `
-            <article class="ceflow-bubble is-${line.speaker === 'right' ? 'right' : 'left'} ${line.role ? `is-${escapeHtml(line.role)}` : ''}">
+        const visual = deriveSceneVisualState();
+        let activeIndex = lines.length - 1;
+        for (let i = lines.length - 1; i >= 0; i -= 1) {
+            if ((lines[i]?.speaker === 'right' ? 'right' : 'left') === visual.activeSpeaker) {
+                activeIndex = i;
+                break;
+            }
+        }
+        els.dialog.innerHTML = lines.map((line, index) => {
+            const side = line.speaker === 'right' ? 'right' : 'left';
+            const tone = bubbleToneForLine(line);
+            const active = index === activeIndex;
+            return `
+            <article class="ceflow-bubble is-${side} ${line.role ? `is-${escapeHtml(line.role)}` : ''} is-tone-${tone}${active ? ' is-active' : ' is-history'}">
                 <p class="ceflow-bubble-speaker">${escapeHtml(speakerName(line) || 'דמות')}</p>
                 <p class="ceflow-bubble-text">${ceflowHighlight(line.text, line.highlights, state.mode)}</p>
             </article>
-        `).join('')}`;
+        `;
+        }).join('');
         els.dialog.scrollTop = els.dialog.scrollHeight;
     };
 
@@ -18483,8 +18859,10 @@ async function setupComicEngine2({ force = false } = {}) {
             const icon = choice.badge ? `<img src="${escapeHtml(choice.badge)}" alt="${escapeHtml(choice.label)}" loading="lazy">` : '';
             const ui = choiceUiMeta(choice);
             const stats = choice.impact?.stats || {};
+            const impactClass = selected ? ` is-impact-${choice.id === 'meta' ? 'good' : 'bad'}` : '';
+            const dimmedClass = locked && state.selectedChoice && !selected ? ' is-dimmed' : '';
             return `
-                <button type="button" class="ceflow-choice ${ceflowToneClass(choice.tone)}${selected ? ' is-selected' : ''}" data-choice-id="${escapeHtml(choice.id)}" ${locked ? 'disabled' : ''} aria-label="${escapeHtml(choice.label)}">
+                <button type="button" class="ceflow-choice ${ceflowToneClass(choice.tone)}${selected ? ' is-selected' : ''}${impactClass}${dimmedClass}" data-choice-id="${escapeHtml(choice.id)}" data-choice-impact="${escapeHtml(choice.id === 'meta' ? 'good' : 'bad')}" ${locked ? 'disabled' : ''} aria-label="${escapeHtml(choice.label)}" aria-pressed="${selected ? 'true' : 'false'}">
                     <span class="ceflow-choice-tone">${escapeHtml(ui.icon)} ${escapeHtml(ui.toneLabel)}</span>
                     <span class="ceflow-choice-top"><strong>${escapeHtml(choice.emoji)} ${escapeHtml(choice.label)}</strong>${icon}</span>
                     <span class="ceflow-choice-line">${escapeHtml(choice.say)}</span>
@@ -18651,6 +19029,7 @@ async function setupComicEngine2({ force = false } = {}) {
     const render = () => {
         els.root.classList.toggle('is-stage-expanded', !!state.stageExpanded);
         renderHeader();
+        renderSceneState();
         renderConsequenceBanner();
         renderCharacters();
         renderDialog();
