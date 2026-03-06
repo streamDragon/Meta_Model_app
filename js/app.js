@@ -1844,8 +1844,156 @@ function normalizeRequestedTab(tabName = '') {
     return raw;
 }
 
+const APP_STICKY_TAB_TITLE_OVERRIDES = Object.freeze({
+    home: 'בית · התחלה והכוונה',
+    'scenario-trainer': 'סצנות Execution',
+    'comic-engine': 'Comic Engine',
+    categories: 'מילון קטגוריות המטה-מודל',
+    'practice-question': 'תרגול זיהוי Meta-Model',
+    'practice-radar': 'Meta Radar',
+    'practice-triples-radar': 'Triples Radar (Breen)',
+    'practice-wizard': 'גשר תחושה-שפה',
+    'practice-verb-unzip': 'פועל לא מפורט (Unzip)',
+    blueprint: 'Blueprint Builder',
+    prismlab: 'Prism Lab · רמות לוגיות',
+    about: 'על הפרויקט'
+});
+
+const APP_STICKY_TAB_CONTEXT_OVERRIDES = Object.freeze({
+    home: 'שם האפליקציה והמסך הפעיל נשארים גלויים גם בזמן גלילה.',
+    'scenario-trainer': 'המסך הנוכחי נשאר מזוהה גם כשגוללים עמוק בתוך הסצנה.',
+    'comic-engine': 'הכותרת נשארת קבועה גם בתוך עריכה ארוכה של הקומיקס.',
+    categories: 'נוח להישאר ממוקדים גם כשגוללים הרבה בתוך המילון.',
+    'practice-question': 'המסך הפעיל נשאר גלוי גם בזמן תרגול רציף.',
+    'practice-radar': 'שומרים על זיהוי ברור של המסך גם בתוך רצפי תרגול מהירים.',
+    'practice-triples-radar': 'הכותרת נשארת קבועה גם בסריקה ארוכה של שלשות.',
+    'practice-wizard': 'הבאנר שומר את שם המסך גלוי לאורך כל השלבים.',
+    'practice-verb-unzip': 'הכותרת נשארת מול העיניים גם כשיורדים עמוק בתוך הפירוק.',
+    blueprint: 'נשאר ברור באיזה שלב של הבנייה אתם נמצאים.',
+    prismlab: 'הכותרת קבועה גם כשעובדים עמוק בתוך רמות ופאנלים.',
+    about: 'גם במסך המידע והקהילה שם האפליקציה נשאר גלוי.'
+});
+
 function getCurrentActiveTabName() {
     return String(document.querySelector('.tab-btn.active')?.getAttribute('data-tab') || 'home').trim() || 'home';
+}
+
+function resolveTabFeatureTitle(tabId = '', fallbackLabel = '') {
+    const safeTabId = String(tabId || '').trim();
+    const fallback = String(fallbackLabel || '').trim();
+    if (!safeTabId) return fallback;
+
+    const section = document.getElementById(safeTabId);
+    if (!section) return fallback;
+
+    const heading = section.querySelector('[data-feature-title], h2, h3');
+    const headingText = normalizeUiText(String(heading?.textContent || '').replace(/\s+/g, ' ').trim());
+    if (!headingText || looksLikeMojibakeText(headingText)) return fallback;
+    return headingText;
+}
+
+function getStickyBannerTitleForTab(tabName = '') {
+    const resolvedTab = normalizeRequestedTab(tabName) || 'home';
+    const btnLabel = normalizeUiText(String(document.querySelector(`.tab-btn[data-tab="${resolvedTab}"]`)?.textContent || '').trim());
+    const fallback = APP_STICKY_TAB_TITLE_OVERRIDES[resolvedTab] || btnLabel || resolvedTab || 'מסך';
+    const resolvedTitle = resolveTabFeatureTitle(resolvedTab, fallback);
+    return APP_STICKY_TAB_TITLE_OVERRIDES[resolvedTab] || resolvedTitle || fallback;
+}
+
+function getStickyBannerContextForTab(tabName = '') {
+    const resolvedTab = normalizeRequestedTab(tabName) || 'home';
+    const explicit = APP_STICKY_TAB_CONTEXT_OVERRIDES[resolvedTab];
+    if (explicit) return explicit;
+
+    const section = document.getElementById(resolvedTab);
+    if (section) {
+        const subtitleNode = section.querySelector('[data-feature-subtitle], p.subtitle, .subtitle, h2 + p, h3 + p');
+        const subtitleText = normalizeUiText(String(subtitleNode?.textContent || '').replace(/\s+/g, ' ').trim());
+        if (subtitleText && !looksLikeMojibakeText(subtitleText)) {
+            return subtitleText;
+        }
+    }
+
+    return 'שם האפליקציה והמסך הפעיל נשארים גלויים גם בזמן גלילה.';
+}
+
+function syncAppStickyBannerOffset() {
+    const banner = document.getElementById('app-sticky-banner');
+    const root = document.documentElement;
+    if (!root) return;
+    if (!banner) {
+        root.style.setProperty('--app-sticky-banner-offset', '0px');
+        return;
+    }
+
+    const nextHeight = Math.max(0, Math.ceil(banner.getBoundingClientRect().height || banner.offsetHeight || 0));
+    root.style.setProperty('--app-sticky-banner-offset', `${nextHeight}px`);
+}
+
+function updateAppStickyBanner(tabName = '') {
+    const banner = document.getElementById('app-sticky-banner');
+    if (!banner) return;
+
+    const resolvedTab = normalizeRequestedTab(tabName) || getCurrentActiveTabName() || 'home';
+    const title = getStickyBannerTitleForTab(resolvedTab);
+    const context = getStickyBannerContextForTab(resolvedTab);
+    const titleEl = document.getElementById('app-sticky-current-title');
+    const contextEl = document.getElementById('app-sticky-current-context');
+    const homeBtn = document.getElementById('app-sticky-home-btn');
+
+    if (titleEl) titleEl.textContent = title;
+    if (contextEl) contextEl.textContent = context;
+    if (homeBtn) {
+        homeBtn.disabled = resolvedTab === 'home';
+        homeBtn.setAttribute('aria-current', resolvedTab === 'home' ? 'page' : 'false');
+    }
+
+    banner.dataset.activeTab = resolvedTab;
+    banner.dataset.activeTitle = title;
+    document.body.classList.toggle('app-sticky-home-active', resolvedTab === 'home');
+
+    if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(syncAppStickyBannerOffset);
+    } else {
+        syncAppStickyBannerOffset();
+    }
+}
+
+function setupAppStickyBanner() {
+    const banner = document.getElementById('app-sticky-banner');
+    if (!banner) return;
+
+    if (banner.dataset.boundStickyBanner !== 'true') {
+        banner.dataset.boundStickyBanner = 'true';
+
+        const homeBtn = document.getElementById('app-sticky-home-btn');
+        if (homeBtn) {
+            homeBtn.addEventListener('click', () => {
+                if (homeBtn.disabled) return;
+                navigateTo('home', { playSound: true, scrollToTop: true });
+            });
+        }
+
+        const menuBtn = document.getElementById('app-sticky-menu-btn');
+        if (menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                if (typeof openFeatureMapMenu === 'function') {
+                    openFeatureMapMenu();
+                }
+            });
+        }
+
+        window.addEventListener('resize', syncAppStickyBannerOffset);
+        window.addEventListener('orientationchange', syncAppStickyBannerOffset);
+
+        if (typeof ResizeObserver === 'function') {
+            const observer = new ResizeObserver(() => syncAppStickyBannerOffset());
+            observer.observe(banner);
+            banner.__stickyBannerObserver = observer;
+        }
+    }
+
+    updateAppStickyBanner(getCurrentActiveTabName());
 }
 
 function isMobileViewportMode() {
@@ -4025,6 +4173,14 @@ function applyAppVersion(version) {
         floating.setAttribute('title', versionTitle);
     }
 
+    const stickyVersion = document.getElementById('app-sticky-version-chip');
+    if (stickyVersion) {
+        stickyVersion.textContent = `גרסה: ${visibleVersion}`;
+        stickyVersion.dataset.version = resolvedVersion;
+        stickyVersion.dataset.buildCommit = getShortBuildCommit();
+        stickyVersion.setAttribute('title', versionTitle);
+    }
+
     if (typeof document.title === 'string' && document.title) {
         const baseTitle = document.title.replace(/\s+\[v[^\]]+\]$/i, '');
         document.title = `${baseTitle} [v${visibleVersion}]`;
@@ -4045,6 +4201,8 @@ function applyAppVersion(version) {
             // ignore
         }
     }
+
+    syncAppStickyBannerOffset();
 }
 
 async function setupAppVersionChip() {
@@ -5033,6 +5191,7 @@ function initializeMetaModelApp() {
     });
     setupGlobalFeatureMenuDropdown();
     setupFeatureMapOverlayControls();
+    setupAppStickyBanner();
     safeRunUiEnhancement(() => {
         if (window.MetaAppShell && typeof window.MetaAppShell.bootstrap === 'function') {
             window.MetaAppShell.bootstrap();
@@ -5263,6 +5422,7 @@ function activateTabByName(tabName = '', { playSound = false, scrollToTop = true
     syncHomeMobileFeedMode(resolvedTab);
     updateMobileStickyCta(resolvedTab);
     syncGlobalTheoryLauncherVisibility(resolvedTab);
+    updateAppStickyBanner(resolvedTab);
 
     if (scrollToTop) {
         scrollPageToTop();
@@ -15574,6 +15734,7 @@ function navigateTo(tabName, options = {}) {
     }
     syncHomeMobileFeedMode(resolvedTab);
     updateMobileStickyCta(resolvedTab);
+    updateAppStickyBanner(resolvedTab);
     if (updateHistory) {
         syncHistoryRouteForTab(resolvedTab, { replace: replaceHistory });
     }

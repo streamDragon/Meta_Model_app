@@ -10,10 +10,29 @@
         }
     }
 
+    function isStandaloneShellPage() {
+        try {
+            var pathname = String(location.pathname || '').toLowerCase();
+            if (/_trainer\.html$/i.test(pathname.split('/').pop() || '')) {
+                return true;
+            }
+            return /\/worksheets\/verb-unzip\/?$/.test(pathname) || /\/lab\/context-radar\/?$/.test(pathname);
+        } catch (e) {
+            return false;
+        }
+    }
+
     function withBuildQuery(path) {
         try {
+            var rawPath = String(path || '');
+            var pathname = String(location.pathname || '').toLowerCase();
+            if (rawPath && !/^(?:[a-z][a-z0-9+.-]*:|\/\/|\.{1,2}\/|\/)/i.test(rawPath)) {
+                if (/\/worksheets\/verb-unzip(?:\/index\.html)?$/i.test(pathname) || /\/lab\/context-radar(?:\/index\.html)?$/i.test(pathname)) {
+                    rawPath = '../../' + rawPath;
+                }
+            }
             var current = new URL(window.location.href);
-            var target = new URL(path, window.location.href);
+            var target = new URL(rawPath, window.location.href);
             ['v', 't'].forEach(function (key) {
                 var val = current.searchParams.get(key);
                 if (val) target.searchParams.set(key, val);
@@ -21,6 +40,16 @@
             return target.toString();
         } catch (e) {
             return path;
+        }
+    }
+
+    function getStandaloneShellMetaLabel() {
+        try {
+            var url = new URL(window.location.href);
+            var version = String(url.searchParams.get('v') || '').trim();
+            return version ? 'Standalone · v' + version : 'Standalone';
+        } catch (e) {
+            return 'Standalone';
         }
     }
 
@@ -43,27 +72,41 @@
         style.textContent = [
             '.trainer-shell-nav {',
             '  position: sticky;',
-            '  top: 8px;',
+            '  top: calc(8px + env(safe-area-inset-top, 0px));',
             '  z-index: 1000;',
-            '  display: flex;',
-            '  align-items: center;',
-            '  justify-content: space-between;',
+            '  display: grid;',
             '  gap: 10px;',
             '  width: min(1180px, calc(100% - 16px));',
             '  margin: 8px auto 10px;',
-            '  padding: 8px 10px;',
-            '  border-radius: 14px;',
-            '  border: 1px solid rgba(250, 204, 21, 0.35);',
-            '  background: linear-gradient(135deg, rgba(76, 29, 149, 0.92), rgba(34, 211, 238, 0.18));',
+            '  padding: 10px 12px;',
+            '  border-radius: 16px;',
+            '  border: 1px solid rgba(125, 211, 252, 0.28);',
+            '  background: linear-gradient(135deg, rgba(15, 118, 110, 0.96), rgba(3, 105, 161, 0.94));',
             '  box-shadow: 0 14px 34px rgba(12, 18, 44, 0.18), inset 0 1px 0 rgba(255,255,255,0.12);',
             '  backdrop-filter: blur(8px);',
-            '  animation: trainerShellNavFloat 7s ease-in-out infinite;',
             '}',
             '.trainer-shell-nav__group {',
             '  display: flex;',
             '  align-items: center;',
             '  gap: 8px;',
             '  flex-wrap: wrap;',
+            '}',
+            '.trainer-shell-nav__group--title {',
+            '  justify-content: space-between;',
+            '  min-width: 0;',
+            '}',
+            '.trainer-shell-nav__title-block {',
+            '  display: grid;',
+            '  gap: 2px;',
+            '  min-width: 0;',
+            '  text-align: end;',
+            '}',
+            '.trainer-shell-nav__brand {',
+            '  color: rgba(224, 242, 254, 0.9);',
+            '  font-size: 0.74rem;',
+            '  font-weight: 800;',
+            '  letter-spacing: 0.08em;',
+            '  text-transform: uppercase;',
             '}',
             '.trainer-shell-nav__btn {',
             '  border: 1px solid rgba(255,255,255,0.28);',
@@ -92,12 +135,18 @@
             '  box-shadow: 0 0 0 1px rgba(251,191,36,0.12) inset;',
             '}',
             '.trainer-shell-nav__meta {',
-            '  color: rgba(255,255,255,0.88);',
-            '  font-size: 0.82rem;',
+            '  color: #ffffff;',
+            '  font-size: 0.98rem;',
+            '  font-weight: 900;',
+            '  line-height: 1.3;',
+            '  white-space: normal;',
+            '  overflow: visible;',
+            '  text-overflow: clip;',
+            '}',
+            '.trainer-shell-nav__meta-sub {',
+            '  color: rgba(239, 246, 255, 0.82);',
+            '  font-size: 0.76rem;',
             '  font-weight: 700;',
-            '  white-space: nowrap;',
-            '  overflow: hidden;',
-            '  text-overflow: ellipsis;',
             '}',
             '.trainer-shell-nav__spark {',
             '  width: 7px;',
@@ -194,7 +243,9 @@
             '.trainer-shell-help-overlay__card summary { cursor: default; }',
             '@media (max-width: 720px) {',
             '  .trainer-shell-nav { width: calc(100% - 10px); margin: 6px auto 8px; padding: 8px; }',
-            '  .trainer-shell-nav__meta { font-size: 0.75rem; max-width: 44vw; }',
+            '  .trainer-shell-nav__group--title { align-items: flex-start; }',
+            '  .trainer-shell-nav__meta { font-size: 0.88rem; }',
+            '  .trainer-shell-nav__meta-sub { font-size: 0.72rem; }',
             '  .trainer-shell-nav__btn { padding: 8px 10px; }',
             '  .trainer-shell-help-overlay { padding: 10px; }',
             '  .trainer-shell-help-overlay__dialog { max-height: 94vh; padding: 10px; }',
@@ -493,7 +544,7 @@
     }
 
     function buildNav() {
-        if (!isStandaloneTrainerPage()) return;
+        if (!isStandaloneShellPage()) return;
         if (!document.body || document.querySelector('.trainer-shell-nav')) return;
 
         ensureAlchemyLayer();
@@ -505,23 +556,34 @@
         nav.setAttribute('role', 'navigation');
         nav.setAttribute('aria-label', '\u05E0\u05D9\u05D5\u05D5\u05D8 \u05E2\u05DE\u05D5\u05D3 standalone');
 
-        var titleText = (document.title || 'Trainer').replace(/\s*-\s*Meta Model Trainer\s*$/i, '').trim();
+        var titleText = (document.title || 'Trainer')
+            .replace(/\s*-\s*Meta Model Trainer\s*$/i, '')
+            .replace(/\s*-\s*Meta Model Lab\s*$/i, '')
+            .trim();
+        var metaLabel = getStandaloneShellMetaLabel();
         var homeUrl = withBuildQuery('index.html');
         var theoryUrl = withBuildQuery('index.html?tab=categories');
 
         nav.innerHTML = [
+            '<div class="trainer-shell-nav__group trainer-shell-nav__group--title">',
+            '  <div class="trainer-shell-nav__title-block">',
+            '    <div class="trainer-shell-nav__brand">Meta Model</div>',
+            '    <div class="trainer-shell-nav__meta">' + String(titleText)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;') + '</div>',
+            '    <div class="trainer-shell-nav__meta-sub">' + String(metaLabel)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;') + '</div>',
+            '  </div>',
+            '  <span class="trainer-shell-nav__spark" aria-hidden="true"></span>',
+            '</div>',
             '<div class="trainer-shell-nav__group">',
             '  <button type="button" class="trainer-shell-nav__btn" data-nav-action="back" title="\u05D7\u05D6\u05E8\u05D4 \u05DC\u05E2\u05DE\u05D5\u05D3 \u05D4\u05E7\u05D5\u05D3\u05DD">\u2190 \u05D7\u05D6\u05E8\u05D4</button>',
             '  <button type="button" class="trainer-shell-nav__btn" data-nav-action="home" title="\u05D7\u05D6\u05E8\u05D4 \u05DC\u05D3\u05E3 \u05D4\u05E8\u05D0\u05E9\u05D9">\u05D3\u05E3 \u05E8\u05D0\u05E9\u05D9</button>',
             '  <button type="button" class="trainer-shell-nav__btn trainer-shell-nav__btn--theory" data-nav-action="theory" title="\u05D3\u05E3 \u05D4\u05EA\u05D0\u05D5\u05E8\u05D9\u05D4 \u05D4\u05DE\u05E8\u05DB\u05D6\u05D9">\u05EA\u05D9\u05D0\u05D5\u05E8\u05D9\u05D4</button>',
             '  <button type="button" class="trainer-shell-nav__btn" data-nav-action="help-overlay" title="\u05E2\u05D6\u05E8\u05D4 \u05DC\u05DE\u05E1\u05DA \u05D4\u05E0\u05D5\u05DB\u05D7\u05D9 (\u05DE\u05E1\u05DA \u05DE\u05DC\u05D0)">\u05E2\u05D6\u05E8\u05D4 \u05DC\u05DE\u05E1\u05DA</button>',
-            '</div>',
-            '<div class="trainer-shell-nav__group">',
-            '  <span class="trainer-shell-nav__spark" aria-hidden="true"></span>',
-            '  <div class="trainer-shell-nav__meta">' + String(titleText)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;') + '</div>',
             '</div>'
         ].join('');
 
