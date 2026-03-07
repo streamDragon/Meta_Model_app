@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.196" data-build-time="1772921194322" data-build-iso="2026-03-07T22:06:34.322Z" data-git-commit="02ce9e8">
+<html lang="he" dir="rtl" data-app-version="1.0.197" data-build-time="1772925791717" data-build-iso="2026-03-07T23:23:11.717Z" data-git-commit="8cad01a">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1050,79 +1050,105 @@
                     </div>
 
                     <section class="practice-section practice-section-question" aria-label="תרגול זיהוי מטה-מודל">
-                        <div id="question-drill" class="card question-drill-card">
-                            <div class="question-drill-header">
-                                <h3 id="question-drill-main-title">תרגול זיהוי מטה-מודל</h3>
-                                <small id="question-drill-subtitle">בחרו מצב לימוד או מוד מבחן, ואז עבדו על משפט אחד בכל סבב.</small>
-                            </div>
-                            <div class="question-drill-session-panel">
-                                <div class="question-drill-session-config">
-                                    <div class="question-drill-mode-box">
-                                        <span class="question-drill-mode-label">מצב</span>
-                                        <div class="question-drill-mode-switch" role="group" aria-label="בחירת מצב לתרגול זיהוי מטה-מודל">
-                                            <button id="question-drill-mode-learning" type="button" class="question-drill-mode-btn is-active" aria-pressed="true">לימוד</button>
-                                            <button id="question-drill-mode-exam" type="button" class="question-drill-mode-btn" aria-pressed="false">מוד מבחן</button>
+                        <div id="question-drill" class="card question-drill-card" data-stage="setup">
+                            <div id="question-drill-prestart" class="question-drill-prestart">
+                                <div class="question-drill-header">
+                                    <h3 id="question-drill-main-title">זיהוי מטה-מודל</h3>
+                                    <small id="question-drill-subtitle">קוראים משפט ובוחרים את סוג ההפרה.</small>
+                                </div>
+                                <div class="question-drill-session-panel">
+                                    <div class="question-drill-session-config">
+                                        <div class="question-drill-mode-box">
+                                            <span class="question-drill-mode-label">מצב</span>
+                                            <div class="question-drill-mode-switch" role="group" aria-label="בחירת מצב לתרגול זיהוי מטה-מודל">
+                                                <button id="question-drill-mode-learning" type="button" class="question-drill-mode-btn is-active" aria-pressed="true">לימוד</button>
+                                                <button id="question-drill-mode-exam" type="button" class="question-drill-mode-btn" aria-pressed="false">מבחן</button>
+                                            </div>
+                                            <small id="question-drill-mode-note" class="question-drill-mode-note">לימוד: עם רמזים ומשוב קצר.</small>
                                         </div>
-                                        <small id="question-drill-mode-note" class="question-drill-mode-note">לימוד: אפשר לקבל רמזים ולדייק לפני המעבר.</small>
+                                        <label class="question-drill-plan-box" for="question-drill-plan">
+                                            <span>חבילה</span>
+                                            <select id="question-drill-plan" class="question-drill-plan-select"></select>
+                                        </label>
+                                        <label class="question-drill-plan-box question-drill-difficulty-box" for="question-drill-difficulty">
+                                            <span>קושי</span>
+                                            <select id="question-drill-difficulty" class="question-drill-plan-select">
+                                                <option value="easy">קל</option>
+                                                <option value="medium">בינוני</option>
+                                            </select>
+                                        </label>
                                     </div>
-                                    <label class="question-drill-plan-box" for="question-drill-plan">
-                                        <span>תוכנית הצלחה</span>
-                                        <select id="question-drill-plan" class="question-drill-plan-select"></select>
-                                    </label>
-                                    <label class="question-drill-plan-box question-drill-difficulty-box" for="question-drill-difficulty">
-                                        <span>דרגת קושי</span>
-                                        <select id="question-drill-difficulty" class="question-drill-plan-select">
-                                            <option value="easy">קל</option>
-                                            <option value="medium">בינוני</option>
+                                    <div class="question-drill-session-actions">
+                                        <button id="question-drill-start-session" class="btn btn-primary" type="button">התחל</button>
+                                    </div>
+                                    <div class="question-drill-secondary-actions">
+                                        <button id="question-drill-open-help" class="btn btn-secondary" type="button">עזרה</button>
+                                        <button id="question-drill-open-stats" class="btn btn-secondary" type="button">נתונים</button>
+                                    </div>
+                                    <div class="question-drill-session-status question-drill-session-status--meta" aria-live="polite">
+                                        <div class="question-drill-status-chips">
+                                            <span id="question-drill-chip-mode" class="question-drill-chip">מצב: לימוד</span>
+                                            <span id="question-drill-chip-plan" class="question-drill-chip">חבילה: רגילה</span>
+                                            <span id="question-drill-chip-round" class="question-drill-chip">שאלה: 0/0</span>
+                                            <span id="question-drill-chip-stars" class="question-drill-chip">נכון: 0</span>
+                                            <span id="question-drill-chip-target" class="question-drill-chip">יעד: 0</span>
+                                            <span id="question-drill-chip-streak" class="question-drill-chip">רצף: 0</span>
+                                            <span id="question-drill-chip-timer" class="question-drill-chip hidden">זמן: 0.00ש׳</span>
+                                        </div>
+                                        <div class="question-drill-progress" aria-hidden="true">
+                                            <span id="question-drill-progress-fill" class="question-drill-progress-fill"></span>
+                                        </div>
+                                        <p id="question-drill-session-note" class="question-drill-session-note"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="question-drill-live-shell" class="question-drill-live-shell hidden">
+                                <div class="question-drill-compact-bar">
+                                    <div class="question-drill-compact-stats" aria-live="polite">
+                                        <span id="question-drill-compact-round" class="question-drill-compact-pill">שאלה 0/0</span>
+                                        <span id="question-drill-compact-score" class="question-drill-compact-pill">נכון 0</span>
+                                        <span id="question-drill-compact-streak" class="question-drill-compact-pill">רצף 0</span>
+                                    </div>
+                                    <button id="question-drill-open-menu" class="question-drill-mini-btn" type="button">עוד</button>
+                                </div>
+
+                                <p id="question-drill-statement" class="question-drill-statement"></p>
+                                <div id="question-drill-test-banner" class="question-drill-test-banner hidden" aria-live="polite">
+                                    <p id="question-drill-test-banner-title">מצא את העיוות!!</p>
+                                    <small id="question-drill-test-banner-subtitle">לחץ מהר על התשובה הנכונה</small>
+                                </div>
+                                <div id="question-drill-options" class="question-drill-options" role="radiogroup" aria-label="בחירת תשובה לתרגיל"></div>
+                                <div class="question-drill-controls">
+                                    <label id="question-drill-category-wrap">
+                                        <span>קטגוריה</span>
+                                        <select id="question-drill-category">
+                                            <option value="DELETION">מחיקה</option>
+                                            <option value="DISTORTION">עיוות</option>
+                                            <option value="GENERALIZATION">הכללה</option>
                                         </select>
                                     </label>
+                                    <button id="question-drill-check" class="btn btn-primary">בדוק</button>
+                                    <button id="question-drill-next" class="btn btn-secondary">דלג</button>
                                 </div>
-                                <div class="question-drill-session-actions">
-                                    <button id="question-drill-start-session" class="btn btn-primary" type="button">התחל סשן</button>
-                                    <button id="question-drill-reset-session" class="btn btn-secondary" type="button">איפוס</button>
-                                    <button class="btn btn-secondary audio-mute-btn question-drill-audio-btn" type="button">סאונד פעיל</button>
-                                </div>
-                                <div class="question-drill-session-status" aria-live="polite">
-                                    <div class="question-drill-status-chips">
-                                        <span id="question-drill-chip-mode" class="question-drill-chip">מצב: לימוד</span>
-                                        <span id="question-drill-chip-plan" class="question-drill-chip">תוכנית: פוקוס 8</span>
-                                        <span id="question-drill-chip-round" class="question-drill-chip">סבב: 0/0</span>
-                                        <span id="question-drill-chip-stars" class="question-drill-chip">כוכבים: 0</span>
-                                        <span id="question-drill-chip-target" class="question-drill-chip">יעד: ⭐0</span>
-                                        <span id="question-drill-chip-streak" class="question-drill-chip">רצף: 0</span>
-                                        <span id="question-drill-chip-timer" class="question-drill-chip hidden">זמן: 0.00ש׳</span>
+
+                                <div id="question-drill-feedback-shell" class="question-drill-feedback-shell hidden">
+                                    <div id="question-drill-feedback" class="question-drill-feedback">
+                                        <strong id="question-drill-feedback-title" class="question-drill-feedback-title">מה עושים עכשיו</strong>
+                                        <p id="question-drill-feedback-body" class="question-drill-feedback-body"></p>
                                     </div>
-                                    <div class="question-drill-progress" aria-hidden="true">
-                                        <span id="question-drill-progress-fill" class="question-drill-progress-fill"></span>
+                                    <div class="question-drill-feedback-actions">
+                                        <button id="question-drill-open-explanation" class="btn btn-secondary hidden" type="button">הסבר</button>
                                     </div>
-                                    <p id="question-drill-session-note" class="question-drill-session-note"></p>
                                 </div>
                             </div>
-                            <p id="question-drill-statement" class="question-drill-statement"></p>
-                            <div id="question-drill-test-banner" class="question-drill-test-banner hidden" aria-live="polite">
-                                <p id="question-drill-test-banner-title">מצא את העיוות!!</p>
-                                <small id="question-drill-test-banner-subtitle">לחץ מהר על התשובה הנכונה</small>
-                            </div>
-                            <div id="question-drill-options" class="question-drill-options" role="radiogroup" aria-label="בחירת תשובה לתרגיל"></div>
-                            <div class="question-drill-controls">
-                                <label id="question-drill-category-wrap">
-                                    <span>ממוקד ב-</span>
-                                    <select id="question-drill-category">
-                                        <option value="DELETION">מחיקה</option>
-                                        <option value="DISTORTION">עיוות</option>
-                                        <option value="GENERALIZATION">הכללה</option>
-                                    </select>
-                                </label>
-                                <button id="question-drill-hint" class="btn btn-secondary" type="button">רמז</button>
-                                <button id="question-drill-check" class="btn btn-primary">בדוק שאלה</button>
-                                <button id="question-drill-next" class="btn btn-secondary">הבא</button>
-                            </div>
-                            <div id="question-drill-feedback" class="question-drill-feedback"></div>
+
                             <div id="question-drill-summary" class="question-drill-summary hidden"></div>
-                            <div class="question-drill-stats">
+                            <div class="question-drill-stats question-drill-stats--meta">
                                 <span>ניסיונות: <strong id="question-drill-attempts">0</strong></span>
                                 <span>פגיעות: <strong id="question-drill-hits">0</strong></span>
                             </div>
+                            <button id="question-drill-reset-session" class="btn btn-secondary question-drill-hidden-button" type="button">איפוס</button>
                         </div>
                     </section>
                 </div>

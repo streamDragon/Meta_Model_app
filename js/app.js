@@ -221,7 +221,7 @@ const MOBILE_FEED_TICKER_INTERVAL_MS = 3600;
 const MOBILE_FEED_SEARCH_DEBOUNCE_MS = 90;
 const MOBILE_STICKY_CTA_ID = 'mobile-sticky-cta';
 const MOBILE_STICKY_CTA_POLL_INTERVAL_MS = 2200;
-const MOBILE_STICKY_DISABLED_TABS = Object.freeze(new Set(['home', 'debug', 'categories']));
+const MOBILE_STICKY_DISABLED_TABS = Object.freeze(new Set(['home', 'debug', 'categories', 'practice-question']));
 
 let unzipEmbedRuntime = {
     loaded: false,
@@ -5415,6 +5415,9 @@ function activateTabByName(tabName = '', { playSound = false, scrollToTop = true
     const btn = tabBtns.find((node) => node.getAttribute('data-tab') === resolvedTab);
     if (btn) btn.classList.add('active');
     content.classList.add('active');
+    if (document.body) {
+        document.body.dataset.activeTab = resolvedTab;
+    }
     ensurePracticeTabHydration(resolvedTab);
     if (resolvedTab === 'practice-verb-unzip') {
         loadUnzipEmbedFrame();
@@ -6963,9 +6966,9 @@ const QUESTION_DRILL_KEYWORDS = {
 };
 
 const QUESTION_DRILL_CATEGORY_LABELS = Object.freeze({
-    DELETION: 'מחיקה (Deletion)',
-    DISTORTION: 'עיוות (Distortion)',
-    GENERALIZATION: 'הכללה (Generalization)'
+    DELETION: 'מחיקה',
+    DISTORTION: 'עיוות',
+    GENERALIZATION: 'הכללה'
 });
 
 const QUESTION_DRILL_CATEGORY_SHORT_LABELS = Object.freeze({
@@ -7017,27 +7020,27 @@ const QUESTION_DRILL_CATEGORIES = Object.freeze(['DELETION', 'DISTORTION', 'GENE
 const QUESTION_DRILL_SUCCESS_PLANS = Object.freeze([
     Object.freeze({
         id: 'warmup5',
-        label: 'חימום 5',
+        label: 'קצרה',
         rounds: 5,
         targetStars: 6,
         xpPerSuccess: 4,
-        note: 'חימום קצר לבניית קצב ודיוק.'
+        note: '5 שאלות קצרות לחזרה מהירה.'
     }),
     Object.freeze({
         id: 'focus8',
-        label: 'פוקוס 8',
+        label: 'רגילה',
         rounds: 8,
         targetStars: 10,
         xpPerSuccess: 5,
-        note: 'סשן מאוזן לבניית מיומנות.'
+        note: '8 שאלות לבניית דיוק יציב.'
     }),
     Object.freeze({
         id: 'sprint12',
-        label: 'ספרינט 12',
+        label: 'ארוכה',
         rounds: 12,
         targetStars: 15,
         xpPerSuccess: 6,
-        note: 'ריצה ארוכה עם פוטנציאל בונוס רצף.'
+        note: '12 שאלות לאימון ממושך יותר.'
     })
 ]);
 
@@ -7077,6 +7080,8 @@ const questionDrillState = {
     roundCorrect: false,
     roundFinalized: false,
     currentRoundAward: null,
+    feedbackText: '',
+    feedbackTone: 'info',
     elements: {}
 };
 
@@ -7184,27 +7189,47 @@ function saveQuestionDrillTestStats() {
 }
 
 function getQuestionDrillModeLabel(mode = questionDrillState.mode) {
-    return normalizeQuestionDrillMode(mode) === 'test' ? 'מוד מבחן' : 'לימוד';
+    return normalizeQuestionDrillMode(mode) === 'test' ? 'מבחן' : 'לימוד';
+}
+
+function getQuestionDrillFeedbackHeading(tone = 'info') {
+    if (questionDrillState.sessionCompleted) return 'הסשן הושלם';
+    if (tone === 'success') return 'נכון';
+    if (tone === 'danger') return 'לא נכון';
+    if (tone === 'warn') return 'לא מדויק';
+    return 'מה עושים עכשיו';
 }
 
 function setQuestionDrillFeedback(text, tone = 'info') {
     const feedbackEl = questionDrillState.elements.feedback;
     if (!feedbackEl) return;
-    feedbackEl.textContent = text || '';
+    questionDrillState.feedbackText = text || '';
+    questionDrillState.feedbackTone = tone;
+    if (questionDrillState.elements.feedbackTitle) {
+        questionDrillState.elements.feedbackTitle.textContent = questionDrillState.feedbackText
+            ? getQuestionDrillFeedbackHeading(tone)
+            : '';
+    }
+    if (questionDrillState.elements.feedbackBody) {
+        questionDrillState.elements.feedbackBody.textContent = questionDrillState.feedbackText;
+    } else {
+        feedbackEl.textContent = questionDrillState.feedbackText;
+    }
     feedbackEl.dataset.tone = tone;
     triggerPlayfulFeedbackFx(feedbackEl, tone);
-    if (text) {
+    if (questionDrillState.feedbackText) {
         applyOpenedContentFeedback(feedbackEl, revealFeedbackState.lastActionButton);
     } else {
         clearOpenedContentFeedback(feedbackEl);
     }
+    updateQuestionDrillLayoutState();
 }
 
 function populateQuestionDrillPlanSelect() {
     const select = questionDrillState.elements.planSelect;
     if (!select) return;
     select.innerHTML = QUESTION_DRILL_SUCCESS_PLANS.map(plan => (
-        `<option value="${plan.id}">${plan.label} · ${plan.rounds} שאלות · יעד ⭐${plan.targetStars}</option>`
+        `<option value="${plan.id}">${plan.label} · ${plan.rounds} שאלות</option>`
     )).join('');
     select.value = getQuestionDrillPlan(questionDrillState.planId).id;
 }
@@ -7232,6 +7257,254 @@ function getQuestionDrillTargetCategory(question = null) {
     return QUESTION_DRILL_CATEGORIES.includes(raw) ? raw : 'DELETION';
 }
 
+function getQuestionDrillUiStage() {
+    if (!questionDrillState.sessionActive && !questionDrillState.sessionCompleted && !questionDrillState.current) {
+        return 'setup';
+    }
+    if (questionDrillState.roundChecks > 0 || questionDrillState.roundFinalized || questionDrillState.sessionCompleted) {
+        return 'feedback';
+    }
+    return 'live';
+}
+
+function focusQuestionDrillLiveSurface() {
+    const target = questionDrillState.elements.liveShell
+        || questionDrillState.elements.statement
+        || questionDrillState.elements.root;
+    if (!target) return;
+
+    const stickyOffset = Math.round(document.getElementById('app-sticky-banner')?.getBoundingClientRect().height || 0);
+    const nextTop = Math.max(0, Math.round((window.scrollY || window.pageYOffset || 0) + target.getBoundingClientRect().top - stickyOffset - 12));
+    window.scrollTo({ top: nextTop, behavior: 'auto' });
+}
+
+function updateQuestionDrillLayoutState({ focusLiveSurface = false } = {}) {
+    const elements = questionDrillState.elements;
+    const stage = getQuestionDrillUiStage();
+    const showFeedback = stage !== 'setup' && Boolean(questionDrillState.feedbackText);
+    const showExplanation = Boolean(questionDrillState.current) && (questionDrillState.roundChecks > 0 || questionDrillState.sessionCompleted);
+
+    if (elements.root) {
+        elements.root.dataset.stage = stage;
+    }
+    if (elements.prestart) {
+        elements.prestart.classList.toggle('hidden', stage !== 'setup');
+    }
+    if (elements.liveShell) {
+        elements.liveShell.classList.toggle('hidden', stage === 'setup');
+    }
+    if (elements.feedbackShell) {
+        elements.feedbackShell.classList.toggle('hidden', !showFeedback);
+    }
+    if (elements.openExplanationBtn) {
+        elements.openExplanationBtn.classList.toggle('hidden', !showExplanation);
+    }
+
+    if (focusLiveSurface && stage !== 'setup') {
+        window.requestAnimationFrame(() => focusQuestionDrillLiveSurface());
+    }
+}
+
+function openQuestionDrillOverlay({ type = 'question-drill', title = 'חלון', size = 'md', content = null } = {}) {
+    if (!window.MetaOverlayProvider || typeof window.MetaOverlayProvider.openOverlay !== 'function') return false;
+    window.MetaOverlayProvider.openOverlay({
+        type,
+        title,
+        size,
+        closeOnBackdrop: true,
+        content
+    });
+    return true;
+}
+
+function buildQuestionDrillHelpOverlayContent() {
+    const wrapper = document.createElement('article');
+    wrapper.className = 'shell-overlay-content question-drill-overlay-content';
+    wrapper.innerHTML = `
+        <p class="shell-overlay-kicker">עזרה</p>
+        <h4>איך עובדים כאן</h4>
+        <ol class="shell-help-list">
+            <li>קראו את המשפט.</li>
+            <li>בחרו את הסוג: מחיקה, עיוות או הכללה.</li>
+            <li>לחצו "בדוק" וקבלו משוב קצר.</li>
+        </ol>
+        <p class="shell-overlay-note">במצב לימוד אפשר לפתוח רמז. במבחן עובדים מהר ועוברים מיד לשאלה הבאה.</p>
+    `;
+    return wrapper;
+}
+
+function buildQuestionDrillStatsOverlayContent() {
+    const wrapper = document.createElement('article');
+    wrapper.className = 'shell-overlay-content question-drill-overlay-content';
+
+    const plan = getQuestionDrillPlan(questionDrillState.planId);
+    const accuracy = questionDrillState.roundsDone
+        ? Math.round((questionDrillState.roundsCorrect / questionDrillState.roundsDone) * 100)
+        : 0;
+    const isTestMode = questionDrillState.mode === 'test';
+    const list = document.createElement('ul');
+    list.className = 'shell-stats-list question-drill-overlay-list';
+
+    [
+        `מצב: ${getQuestionDrillModeLabel()}`,
+        `חבילה: ${plan.label} · ${plan.rounds} שאלות`,
+        isTestMode
+            ? `קושי: ${(QUESTION_DRILL_DIFFICULTIES.find((item) => item.id === questionDrillState.testDifficulty)?.label) || 'קל'}`
+            : `יעד: ${plan.targetStars} כוכבים`,
+        `שאלות שנענו: ${questionDrillState.roundsDone}/${plan.rounds}`,
+        `נכון: ${questionDrillState.roundsCorrect}`,
+        `ניסיונות: ${questionDrillState.attempts}`,
+        `דיוק: ${accuracy}%`,
+        isTestMode ? `ניקוד: ${questionDrillState.testScore}` : `כוכבים: ${questionDrillState.sessionStars}`,
+        `רצף שיא: ${questionDrillState.bestStreak}`
+    ].forEach((line) => {
+        const item = document.createElement('li');
+        item.textContent = line;
+        list.appendChild(item);
+    });
+
+    const note = document.createElement('p');
+    note.className = 'shell-overlay-note';
+    note.textContent = questionDrillState.sessionActive
+        ? 'הנתונים המלאים נשארים מחוץ למסך הראשי כדי לשמור על תרגול נקי.'
+        : 'לפני התחלה אין נתונים חובה על המסך הראשי. כאן אפשר לבדוק הכול אם צריך.';
+
+    wrapper.innerHTML = `
+        <p class="shell-overlay-kicker">נתונים</p>
+        <h4>${questionDrillState.sessionCompleted ? 'סיכום קצר' : 'מצב נוכחי'}</h4>
+    `;
+    wrapper.appendChild(list);
+
+    if (questionDrillState.sessionCompleted && questionDrillState.elements.summary?.innerHTML) {
+        const summaryClone = questionDrillState.elements.summary.cloneNode(true);
+        summaryClone.classList.remove('hidden', 'shell-inline-hidden');
+        wrapper.appendChild(summaryClone);
+    }
+
+    wrapper.appendChild(note);
+    return wrapper;
+}
+
+function buildQuestionDrillExplanationOverlayContent() {
+    const wrapper = document.createElement('article');
+    wrapper.className = 'shell-overlay-content question-drill-overlay-content';
+    const current = questionDrillState.current;
+
+    if (!current) {
+        wrapper.innerHTML = `
+            <p class="shell-overlay-kicker">הסבר</p>
+            <h4>עדיין אין שאלה פעילה</h4>
+            <p class="shell-overlay-note">התחילו תרגול כדי לקבל הסבר ממוקד על המשפט הנוכחי.</p>
+        `;
+        return wrapper;
+    }
+
+    const targetCategory = getQuestionDrillTargetCategory(current);
+    const probe = (QUESTION_DRILL_OPTION_BANK[targetCategory] || [])[0] || 'מה בדיוק חסר כאן?';
+
+    const statement = document.createElement('blockquote');
+    statement.className = 'question-drill-overlay-quote';
+    statement.textContent = current.statement || '';
+
+    wrapper.innerHTML = `
+        <p class="shell-overlay-kicker">הסבר</p>
+        <h4>${getQuestionDrillCategoryLabel(targetCategory)}</h4>
+        <p>${current.explanation || 'זה הכיוון המתאים במשפט הזה.'}</p>
+        <p class="shell-overlay-note">שאלה שיכולה לפתוח את המשפט: ${probe}</p>
+    `;
+    wrapper.appendChild(statement);
+    return wrapper;
+}
+
+function openQuestionDrillHelpOverlay() {
+    openQuestionDrillOverlay({
+        type: 'question-drill-help',
+        title: 'איך עובדים כאן',
+        size: 'md',
+        content: buildQuestionDrillHelpOverlayContent()
+    });
+}
+
+function openQuestionDrillStatsOverlay() {
+    openQuestionDrillOverlay({
+        type: 'question-drill-stats',
+        title: 'נתונים',
+        size: 'md',
+        content: buildQuestionDrillStatsOverlayContent()
+    });
+}
+
+function openQuestionDrillExplanationOverlay() {
+    openQuestionDrillOverlay({
+        type: 'question-drill-explanation',
+        title: 'למה זו התשובה',
+        size: 'md',
+        content: buildQuestionDrillExplanationOverlayContent()
+    });
+}
+
+function openQuestionDrillMenuOverlay() {
+    const wrapper = document.createElement('article');
+    wrapper.className = 'shell-overlay-content question-drill-overlay-content';
+    wrapper.innerHTML = `
+        <p class="shell-overlay-kicker">עוד</p>
+        <h4>כלים משניים</h4>
+        <p class="shell-overlay-note">שומרים את המסך הראשי פנוי ורק פותחים מה שצריך עכשיו.</p>
+    `;
+
+    const actions = document.createElement('div');
+    actions.className = 'shell-overlay-actions question-drill-overlay-actions';
+
+    const addAction = (label, className, handler) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = className;
+        button.textContent = label;
+        button.addEventListener('click', () => {
+            handler();
+        });
+        actions.appendChild(button);
+    };
+
+    addAction('עזרה', 'btn btn-secondary', () => {
+        window.MetaOverlayProvider?.closeOverlay('question-drill-menu-help');
+        openQuestionDrillHelpOverlay();
+    });
+    addAction('נתונים', 'btn btn-secondary', () => {
+        window.MetaOverlayProvider?.closeOverlay('question-drill-menu-stats');
+        openQuestionDrillStatsOverlay();
+    });
+
+    if (questionDrillState.mode !== 'test' && questionDrillState.current && !questionDrillState.roundFinalized) {
+        addAction('רמז', 'btn btn-secondary', () => {
+            window.MetaOverlayProvider?.closeOverlay('question-drill-menu-hint');
+            showQuestionDrillHint();
+        });
+    }
+
+    addAction(audioState.muted ? 'הפעל צליל' : 'השתק צליל', 'btn btn-secondary', () => {
+        toggleAudioMute();
+        window.MetaOverlayProvider?.closeOverlay('question-drill-menu-audio');
+    });
+
+    addAction(
+        questionDrillState.sessionCompleted ? 'תרגול חדש' : 'התחל מחדש',
+        'btn btn-primary',
+        () => {
+            window.MetaOverlayProvider?.closeOverlay('question-drill-menu-reset');
+            resetQuestionDrillToSetup({ preservePrefs: true });
+        }
+    );
+
+    wrapper.appendChild(actions);
+    openQuestionDrillOverlay({
+        type: 'question-drill-menu',
+        title: 'עוד',
+        size: 'sm',
+        content: wrapper
+    });
+}
+
 function clearQuestionDrillTestAutoAdvance() {
     if (questionDrillState.testAutoAdvanceHandle) {
         clearTimeout(questionDrillState.testAutoAdvanceHandle);
@@ -7241,10 +7514,14 @@ function clearQuestionDrillTestAutoAdvance() {
 
 function updateQuestionDrillTimerDisplay() {
     const timerChip = questionDrillState.elements.timerChip;
-    if (!timerChip) return;
     const isTestMode = questionDrillState.mode === 'test';
-    timerChip.classList.toggle('hidden', !isTestMode);
-    timerChip.textContent = `זמן: ${formatQuestionDrillTimerMs(questionDrillState.testTimerMs)}ש׳`;
+    if (timerChip) {
+        timerChip.classList.toggle('hidden', !isTestMode);
+        timerChip.textContent = `זמן: ${formatQuestionDrillTimerMs(questionDrillState.testTimerMs)}ש׳`;
+    }
+    if (questionDrillState.elements.compactStreak && isTestMode && !questionDrillState.sessionCompleted) {
+        questionDrillState.elements.compactStreak.textContent = `זמן ${formatQuestionDrillTimerMs(questionDrillState.testTimerMs)}ש׳`;
+    }
 }
 
 function stopQuestionDrillTimer({ freeze = true } = {}) {
@@ -7334,8 +7611,8 @@ function setQuestionDrillMode(mode = 'learning', { persist = true, refreshCurren
     }
     if (elements.modeNote) {
         elements.modeNote.textContent = isTestMode
-            ? 'מבחן: מזהים מהר את הקטגוריה הנכונה ולוחצים מיד.'
-            : 'למידה: בוחרים שאלה מדויקת, מקבלים משוב ורמזים.';
+            ? 'מבחן: מהיר וללא רמזים.'
+            : 'לימוד: עם רמזים ומשוב קצר.';
     }
     if (elements.modeChip) {
         elements.modeChip.textContent = `מצב: ${getQuestionDrillModeLabel(resolved)}`;
@@ -7386,7 +7663,7 @@ function setQuestionDrillPlan(planId = '', { persist = true } = {}) {
         questionDrillState.elements.planSelect.value = plan.id;
     }
     if (questionDrillState.elements.planChip) {
-        questionDrillState.elements.planChip.textContent = `תוכנית: ${plan.label}`;
+        questionDrillState.elements.planChip.textContent = `חבילה: ${plan.label}`;
     }
     if (persist) saveQuestionDrillPrefs();
     updateQuestionDrillSessionUI();
@@ -7415,6 +7692,8 @@ function resetQuestionDrillSessionState({ preservePrefs = true } = {}) {
     questionDrillState.roundCorrect = false;
     questionDrillState.roundFinalized = false;
     questionDrillState.currentRoundAward = null;
+    questionDrillState.feedbackText = '';
+    questionDrillState.feedbackTone = 'info';
     questionDrillState.testScore = 0;
     questionDrillState.testTimerMs = 0;
     questionDrillState.currentRoundReactionMs = 0;
@@ -7614,10 +7893,10 @@ function beginQuestionDrillRound(question) {
 
     updateQuestionDrillTestBanner();
     if (isTestMode) {
-        setQuestionDrillFeedback('זהו תרגול מהיר: לחצו מיד על הקטגוריה המתאימה.', 'info');
+        setQuestionDrillFeedback('קראו את המשפט ולחצו מיד על הקטגוריה הנכונה.', 'info');
         startQuestionDrillTimer();
     } else {
-        setQuestionDrillFeedback('מצב למידה: בחרו שאלה מהרשימה, בדקו ושפרו לפי המשוב.', 'info');
+        setQuestionDrillFeedback('קראו את המשפט ובחרו את הכיוון הכי מדויק.', 'info');
     }
 
     if (elements.summary) {
@@ -7627,6 +7906,7 @@ function beginQuestionDrillRound(question) {
     }
     updateQuestionDrillControlsState();
     updateQuestionDrillSessionUI();
+    updateQuestionDrillLayoutState({ focusLiveSurface: true });
 }
 
 function buildQuestionDrillDeck() {
@@ -7672,6 +7952,9 @@ function updateQuestionDrillSessionUI() {
     const roundsDone = Math.min(questionDrillState.roundsDone, roundsTotal);
     const progressPct = Math.round((roundsDone / roundsTotal) * 100);
     const nextRound = Math.min(roundsTotal, roundsDone + (questionDrillState.sessionCompleted ? 0 : 1));
+    const visibleRound = questionDrillState.sessionCompleted
+        ? roundsDone
+        : Math.min(roundsTotal, roundsDone + (questionDrillState.current ? 1 : 0));
     const accuracy = questionDrillState.roundsDone
         ? Math.round((questionDrillState.roundsCorrect / questionDrillState.roundsDone) * 100)
         : 0;
@@ -7683,18 +7966,18 @@ function updateQuestionDrillSessionUI() {
         questionDrillState.elements.progressFill.style.width = `${progressPct}%`;
     }
     if (questionDrillState.elements.roundChip) {
-        questionDrillState.elements.roundChip.textContent = `סבב: ${roundsDone}/${roundsTotal}`;
+        questionDrillState.elements.roundChip.textContent = `שאלה: ${visibleRound}/${roundsTotal}`;
     }
     if (questionDrillState.elements.starsChip) {
         questionDrillState.elements.starsChip.textContent = isTestMode
             ? `ניקוד: ${questionDrillState.testScore}`
-            : `כוכבים: ${questionDrillState.sessionStars}`;
+            : `נכון: ${questionDrillState.roundsCorrect}`;
         questionDrillState.elements.starsChip.classList.toggle('is-goal', !isTestMode && targetReached && questionDrillState.sessionCompleted);
     }
     if (questionDrillState.elements.targetChip) {
         questionDrillState.elements.targetChip.textContent = isTestMode
             ? `שיא: ${bestByDifficulty}`
-            : `יעד: ⭐${plan.targetStars}`;
+            : `יעד: ${plan.targetStars}`;
     }
     if (questionDrillState.elements.streakChip) {
         questionDrillState.elements.streakChip.textContent = `רצף: ${questionDrillState.streak}`;
@@ -7705,30 +7988,44 @@ function updateQuestionDrillSessionUI() {
     if (questionDrillState.elements.planChip) {
         questionDrillState.elements.planChip.textContent = isTestMode
             ? `קושי: ${(QUESTION_DRILL_DIFFICULTIES.find((item) => item.id === questionDrillState.testDifficulty)?.label) || 'קל'}`
-            : `תוכנית: ${plan.label}`;
+            : `חבילה: ${plan.label}`;
+    }
+    if (questionDrillState.elements.compactRound) {
+        questionDrillState.elements.compactRound.textContent = `שאלה ${visibleRound}/${roundsTotal}`;
+    }
+    if (questionDrillState.elements.compactScore) {
+        questionDrillState.elements.compactScore.textContent = isTestMode
+            ? `ניקוד ${questionDrillState.testScore}`
+            : `נכון ${questionDrillState.roundsCorrect}`;
+    }
+    if (questionDrillState.elements.compactStreak) {
+        questionDrillState.elements.compactStreak.textContent = isTestMode
+            ? `זמן ${formatQuestionDrillTimerMs(questionDrillState.testTimerMs)}ש׳`
+            : `רצף ${questionDrillState.streak}`;
     }
     updateQuestionDrillTimerDisplay();
     if (questionDrillState.elements.sessionNote) {
         if (questionDrillState.sessionCompleted) {
             questionDrillState.elements.sessionNote.textContent = isTestMode
-                ? `סשן מבחן הושלם. ניקוד ${questionDrillState.testScore}, דיוק ${accuracy}%, רצף שיא ${questionDrillState.bestStreak}.`
+                ? `המבחן הסתיים. ניקוד ${questionDrillState.testScore}, דיוק ${accuracy}%.`
                 : (targetReached
-                    ? `הסשן הושלם. יעד הכוכבים הושג (${questionDrillState.sessionStars}/${plan.targetStars} כוכבים).`
-                    : `הסשן הושלם. ${questionDrillState.sessionStars}/${plan.targetStars} כוכבים, דיוק ${accuracy}%.`);
+                    ? `התרגול הושלם. הגעת ליעד.`
+                    : `התרגול הושלם. דיוק ${accuracy}%.`);
         } else if (!questionDrillState.sessionActive) {
             questionDrillState.elements.sessionNote.textContent = isTestMode
-                ? 'בחרו דרגת קושי ולחצו "התחל מבחן".'
-                : `${plan.note} בחרו מצב ולחצו "התחל סשן".`;
+                ? 'בחרו קושי ולחצו "התחל".'
+                : `${plan.note} בחרו מצב ולחצו "התחל".`;
         } else if (questionDrillState.roundFinalized) {
             questionDrillState.elements.sessionNote.textContent = isTestMode
-                ? `סבב ${nextRound > roundsTotal ? roundsTotal : nextRound} מוכן. עוברים למשפט הבא מיד.`
-                : `סבב ${nextRound > roundsTotal ? roundsTotal : nextRound} מוכן. דיוק ${accuracy}%.`;
+                ? `המשך מוכן לשאלה ${nextRound > roundsTotal ? roundsTotal : nextRound}.`
+                : `מוכנים לשאלה ${nextRound > roundsTotal ? roundsTotal : nextRound}.`;
         } else {
             questionDrillState.elements.sessionNote.textContent = isTestMode
-                ? 'מוד מבחן מהיר: משפט, בחירה אחת, משוב מיידי והמשך.'
-                : 'מצב למידה: השתמשו במשוב/רמז כדי להשתפר לפני המעבר.';
+                ? 'מבחן מהיר: משפט אחד, בחירה אחת, ממשיכים.'
+                : 'בחרו את הסוג הכי מדויק והמשיכו.';
         }
     }
+    updateQuestionDrillLayoutState();
 }
 
 function updateQuestionDrillControlsState() {
@@ -7741,27 +8038,20 @@ function updateQuestionDrillControlsState() {
 
     if (elements.checkBtn) {
         elements.checkBtn.disabled = !canCheck;
-        elements.checkBtn.textContent = 'בדוק שאלה';
+        elements.checkBtn.textContent = questionDrillState.roundChecks > 0 && !questionDrillState.roundCorrect ? 'בדוק שוב' : 'בדוק';
         elements.checkBtn.classList.toggle('question-drill-control-hidden', isTestMode);
     }
     if (elements.nextBtn) {
-        elements.nextBtn.disabled = !hasQuestion || sessionLocked;
-        elements.nextBtn.textContent = isTestMode
-            ? (questionDrillState.roundFinalized ? 'הבא' : 'דלג')
-            : (questionDrillState.roundFinalized ? 'משפט הבא' : 'דלג / משפט הבא');
-        elements.nextBtn.classList.toggle('btn-primary', isTestMode);
-        elements.nextBtn.classList.toggle('btn-secondary', !isTestMode);
+        elements.nextBtn.disabled = questionDrillState.sessionCompleted ? false : !hasQuestion;
+        elements.nextBtn.textContent = questionDrillState.sessionCompleted
+            ? 'תרגול חדש'
+            : (questionDrillState.roundFinalized ? 'הבא' : 'דלג');
+        const nextIsPrimary = questionDrillState.sessionCompleted || questionDrillState.roundFinalized || isTestMode;
+        elements.nextBtn.classList.toggle('btn-primary', nextIsPrimary);
+        elements.nextBtn.classList.toggle('btn-secondary', !nextIsPrimary);
     }
     if (elements.startBtn) {
-        if (isTestMode) {
-            elements.startBtn.textContent = questionDrillState.sessionActive && !questionDrillState.sessionCompleted
-                ? 'סשן מבחן חדש'
-                : 'התחל מבחן';
-        } else {
-            elements.startBtn.textContent = questionDrillState.sessionActive && !questionDrillState.sessionCompleted
-                ? 'התחל סשן חדש'
-                : 'התחל סשן';
-        }
+        elements.startBtn.textContent = isTestMode ? 'התחל מבחן' : 'התחל';
     }
     if (elements.resetBtn) {
         elements.resetBtn.disabled = !questionDrillState.sessionActive && !questionDrillState.sessionCompleted && questionDrillState.attempts === 0;
@@ -7780,6 +8070,22 @@ function updateQuestionDrillControlsState() {
         elements.difficultySelect.disabled = !isTestMode;
     }
     updateQuestionDrillOptionButtonsState();
+}
+
+function resetQuestionDrillToSetup({ preservePrefs = true } = {}) {
+    resetQuestionDrillSessionState({ preservePrefs });
+    updateQuestionDrillStats();
+    if (questionDrillState.elements.statement) questionDrillState.elements.statement.textContent = '';
+    renderQuestionDrillOptions();
+    updateQuestionDrillTestBanner();
+    if (questionDrillState.elements.summary) {
+        clearOpenedContentFeedback(questionDrillState.elements.summary);
+        questionDrillState.elements.summary.classList.add('hidden');
+        questionDrillState.elements.summary.innerHTML = '';
+    }
+    setQuestionDrillFeedback('בחרו מצב, חבילה וקושי ואז לחצו "התחל".', 'info');
+    updateQuestionDrillSessionUI();
+    updateQuestionDrillControlsState();
 }
 
 function startQuestionDrillSession({ announce = true } = {}) {
@@ -7837,7 +8143,7 @@ function completeQuestionDrillSession() {
 
     const summaryEl = questionDrillState.elements.summary;
     if (summaryEl) {
-        summaryEl.classList.remove('hidden');
+        summaryEl.classList.add('hidden');
         summaryEl.dataset.tone = isTestMode ? 'info' : (hitTarget ? 'success' : 'info');
         if (isTestMode) {
             const avgMs = questionDrillState.testReactionCount
@@ -7861,7 +8167,7 @@ function completeQuestionDrillSession() {
             summaryEl.innerHTML = `
                 <div class="question-drill-summary-head">
                     <strong>${hitTarget ? 'יעד הושג' : 'סשן הושלם'}</strong>
-                    <span>${getQuestionDrillModeLabel()} · ${plan.label}</span>
+                    <span>${getQuestionDrillModeLabel()} · חבילה ${plan.label}</span>
                 </div>
                 <div class="question-drill-summary-grid">
                     <div><small>דיוק</small><strong>${accuracy}%</strong></div>
@@ -7878,14 +8184,14 @@ function completeQuestionDrillSession() {
     }
 
     if (isTestMode) {
-        setQuestionDrillFeedback('הסשן הושלם. אפשר להתחיל מבחן חדש או לעבור למצב לימוד.', 'success');
+        setQuestionDrillFeedback('המבחן נגמר. אפשר לפתוח תרגול חדש או לבדוק את הנתונים.', 'success');
         playUISound('finish');
         saveQuestionDrillTestStats();
     } else {
         setQuestionDrillFeedback(
             hitTarget
-                ? 'כל הכבוד. עמדת ביעד הכוכבים של התוכנית. אפשר להתחיל סשן חדש או להעלות רמה.'
-                : 'הסשן הושלם. מומלץ לנסות שוב במצב למידה או לבחור תוכנית קצרה יותר כדי להגיע ליעד.',
+                ? 'התרגול הושלם והגעת ליעד.'
+                : 'התרגול הושלם. אפשר להתחיל שוב או לפתוח את הנתונים.',
             hitTarget ? 'success' : 'info'
         );
         playUISound(hitTarget ? 'stars_big' : 'finish');
@@ -7947,14 +8253,14 @@ function finalizeQuestionDrillRound(reason = 'next') {
         playUISound(starGain >= 3 ? 'stars_big' : 'stars_soft');
 
         const awardLine = ` (+${baseXP} XP, +${starGain}⭐)`;
-        const currentText = String(questionDrillState.elements.feedback?.textContent || '');
+        const currentText = String(questionDrillState.feedbackText || '');
         if (currentText && !currentText.includes('+')) {
             setQuestionDrillFeedback(`${currentText}${awardLine}`, 'success');
         }
     } else {
         questionDrillState.currentRoundAward = { xp: 0, stars: 0 };
         if (reason === 'skip') {
-            setQuestionDrillFeedback('הסבב דולג. אין ניקוד על הסבב הזה, עוברים למשפט הבא.', 'warn');
+            setQuestionDrillFeedback('דילגתם על השאלה הזאת. ממשיכים.', 'warn');
             playUISound('skip');
         }
     }
@@ -7999,7 +8305,7 @@ async function loadNextQuestionDrill(options = {}) {
 
 function showQuestionDrillHint() {
     if (questionDrillState.mode === 'test') {
-        setQuestionDrillFeedback('במוד מבחן אין רמזים. עברו למצב לימוד אם רוצים תמיכה.', 'warn');
+        setQuestionDrillFeedback('במבחן אין רמזים. עברו ללימוד אם צריך.', 'warn');
         return;
     }
     if (!questionDrillState.current || questionDrillState.roundFinalized) return;
@@ -8016,7 +8322,7 @@ function evaluateQuestionDrill() {
     if (!feedbackEl || !questionDrillState.current) return;
     if (questionDrillState.sessionCompleted) return;
     if (questionDrillState.roundFinalized) {
-        setQuestionDrillFeedback('הסבב הזה כבר נסגר. עברו למשפט הבא.', 'info');
+        setQuestionDrillFeedback('השאלה הזאת כבר נסגרה. עברו לבאה.', 'info');
         return;
     }
 
@@ -8025,7 +8331,7 @@ function evaluateQuestionDrill() {
         setQuestionDrillFeedback(
             questionDrillState.mode === 'test'
                 ? 'בחרו קטגוריה לפני שממשיכים.'
-                : 'בחרו שאלה אמריקאית לפני שבודקים.',
+                : 'בחרו תשובה לפני שבודקים.',
             'warn'
         );
         return;
@@ -8078,16 +8384,15 @@ function evaluateQuestionDrill() {
         saveQuestionDrillTestStats();
 
         if (success) {
-            const explanation = questionDrillState.current?.explanation ? ` ${questionDrillState.current.explanation}` : '';
             setQuestionDrillFeedback(
-                `נכון! ${QUESTION_DRILL_CATEGORY_SHORT_LABELS[expectedCategory]} (${formatQuestionDrillTimerMs(rtMs)}ש׳, +${scoreDelta.total}).${explanation}`,
+                `נכון. ${QUESTION_DRILL_CATEGORY_SHORT_LABELS[expectedCategory]} · ${formatQuestionDrillTimerMs(rtMs)}ש׳ · +${scoreDelta.total}`,
                 'success'
             );
             playUISound('correct');
             finalizeQuestionDrillRound('correct');
         } else {
             setQuestionDrillFeedback(
-                `לא מדויק. התשובה הנכונה: ${QUESTION_DRILL_CATEGORY_SHORT_LABELS[expectedCategory]} (${formatQuestionDrillTimerMs(rtMs)}ש׳, ${scoreDelta.total}).`,
+                `לא מדויק. כאן התשובה היא ${QUESTION_DRILL_CATEGORY_SHORT_LABELS[expectedCategory]}.`,
                 'danger'
             );
             playUISound('wrong');
@@ -8102,7 +8407,7 @@ function evaluateQuestionDrill() {
 
     if (success) {
         const selectedLabel = getQuestionDrillCategoryLabel(selectedCategory);
-        setQuestionDrillFeedback(`מצוין. בחרת שאלה מדויקת בכיוון ${selectedLabel}. לחצו "משפט הבא" להמשך.`, 'success');
+        setQuestionDrillFeedback(`נכון. כאן זה ${selectedLabel}.`, 'success');
         playUISound('correct');
         finalizeQuestionDrillRound('correct');
         return;
@@ -8110,7 +8415,7 @@ function evaluateQuestionDrill() {
 
     playUISound('wrong');
     const expectedLabel = getQuestionDrillCategoryLabel(expectedCategory);
-    setQuestionDrillFeedback(`נסו שוב. הכיוון המתאים כאן הוא ${expectedLabel}.`, 'warn');
+    setQuestionDrillFeedback(`לא מדויק. הכיוון כאן הוא ${expectedLabel}.`, 'warn');
     updateQuestionDrillControlsState();
 }
 
@@ -8120,12 +8425,17 @@ function setupQuestionDrill() {
 
     questionDrillState.elements = {
         root: drillRoot,
+        prestart: document.getElementById('question-drill-prestart'),
+        liveShell: document.getElementById('question-drill-live-shell'),
         statement: document.getElementById('question-drill-statement'),
         options: document.getElementById('question-drill-options'),
         category: document.getElementById('question-drill-category'),
         categoryWrap: document.getElementById('question-drill-category-wrap'),
         difficultySelect: document.getElementById('question-drill-difficulty'),
         feedback: document.getElementById('question-drill-feedback'),
+        feedbackShell: document.getElementById('question-drill-feedback-shell'),
+        feedbackTitle: document.getElementById('question-drill-feedback-title'),
+        feedbackBody: document.getElementById('question-drill-feedback-body'),
         attempts: document.getElementById('question-drill-attempts'),
         hits: document.getElementById('question-drill-hits'),
         checkBtn: document.getElementById('question-drill-check'),
@@ -8149,7 +8459,14 @@ function setupQuestionDrill() {
         targetChip: document.getElementById('question-drill-chip-target'),
         streakChip: document.getElementById('question-drill-chip-streak'),
         timerChip: document.getElementById('question-drill-chip-timer'),
-        sessionNote: document.getElementById('question-drill-session-note')
+        sessionNote: document.getElementById('question-drill-session-note'),
+        compactRound: document.getElementById('question-drill-compact-round'),
+        compactScore: document.getElementById('question-drill-compact-score'),
+        compactStreak: document.getElementById('question-drill-compact-streak'),
+        openHelpBtn: document.getElementById('question-drill-open-help'),
+        openStatsBtn: document.getElementById('question-drill-open-stats'),
+        openMenuBtn: document.getElementById('question-drill-open-menu'),
+        openExplanationBtn: document.getElementById('question-drill-open-explanation')
     };
 
     loadQuestionDrillPrefs();
@@ -8169,7 +8486,13 @@ function setupQuestionDrill() {
     });
 
     questionDrillState.elements.checkBtn?.addEventListener('click', evaluateQuestionDrill);
-    questionDrillState.elements.nextBtn?.addEventListener('click', () => loadNextQuestionDrill());
+    questionDrillState.elements.nextBtn?.addEventListener('click', () => {
+        if (questionDrillState.sessionCompleted) {
+            startQuestionDrillSession({ announce: true });
+            return;
+        }
+        loadNextQuestionDrill();
+    });
     questionDrillState.elements.hintBtn?.addEventListener('click', showQuestionDrillHint);
     questionDrillState.elements.modeLearningBtn?.addEventListener('click', () => {
         setQuestionDrillMode('learning', { refreshCurrent: true });
@@ -8192,28 +8515,19 @@ function setupQuestionDrill() {
     });
     questionDrillState.elements.startBtn?.addEventListener('click', () => startQuestionDrillSession({ announce: true }));
     questionDrillState.elements.resetBtn?.addEventListener('click', () => {
-        resetQuestionDrillSessionState({ preservePrefs: true });
-        updateQuestionDrillStats();
-        updateQuestionDrillSessionUI();
-        updateQuestionDrillControlsState();
-        updateQuestionDrillTestBanner();
-        setQuestionDrillFeedback('הסטטיסטיקה אופסה. לחצו "התחל סשן".', 'info');
-        if (questionDrillState.elements.statement) questionDrillState.elements.statement.textContent = '';
-        renderQuestionDrillOptions();
-        if (questionDrillState.elements.summary) {
-            clearOpenedContentFeedback(questionDrillState.elements.summary);
-            questionDrillState.elements.summary.classList.add('hidden');
-            questionDrillState.elements.summary.innerHTML = '';
-        }
+        resetQuestionDrillToSetup({ preservePrefs: true });
         playUISound('skip');
     });
+    questionDrillState.elements.openHelpBtn?.addEventListener('click', openQuestionDrillHelpOverlay);
+    questionDrillState.elements.openStatsBtn?.addEventListener('click', openQuestionDrillStatsOverlay);
+    questionDrillState.elements.openMenuBtn?.addEventListener('click', openQuestionDrillMenuOverlay);
+    questionDrillState.elements.openExplanationBtn?.addEventListener('click', openQuestionDrillExplanationOverlay);
 
     setupAudioMuteButtons();
     updateQuestionDrillStats();
     updateQuestionDrillSessionUI();
     updateQuestionDrillTestBanner();
-    setQuestionDrillFeedback('בחרו מצב ותוכנית, ואז התחילו סשן.', 'info');
-    startQuestionDrillSession({ announce: false });
+    resetQuestionDrillToSetup({ preservePrefs: true });
 }
 
 const RAPID_PATTERN_BUTTONS = Object.freeze([
@@ -15877,6 +16191,9 @@ function navigateTo(tabName, options = {}) {
     
     const content = document.getElementById(resolvedTab);
     if (content) content.classList.add('active');
+    if (document.body) {
+        document.body.dataset.activeTab = resolvedTab;
+    }
     if (resolvedTab !== 'practice-radar') {
         setRapidPatternFocusMode(false);
         hideRapidPatternExplanation({ resumeIfNeeded: false });
