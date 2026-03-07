@@ -569,6 +569,12 @@ body.app-sticky-home-active #app-sticky-home-btn {
     gap: 8px;
 }
 
+.shell-inline-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 .lab-container-bottom {
     border: 1px solid #dbe7f5;
     border-radius: 12px;
@@ -615,6 +621,13 @@ body.app-sticky-home-active #app-sticky-home-btn {
     gap: 10px;
 }
 
+.shell-overlay-content .card,
+.shell-overlay-content .q-card,
+.shell-overlay-content .rapid-panel,
+.shell-overlay-content .feature-map-card {
+    margin: 0;
+}
+
 .shell-overlay-kicker {
     margin: 0;
     font-size: 0.74rem;
@@ -646,6 +659,13 @@ body.app-sticky-home-active #app-sticky-home-btn {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+}
+
+.shell-action-btn:focus-visible,
+.metric-chip:focus-visible,
+.home-shell-menu-clone .btn:focus-visible {
+    outline: 3px solid rgba(13, 148, 136, 0.45);
+    outline-offset: 2px;
 }
 
 .shell-launcher-wrap {
@@ -694,6 +714,14 @@ body.app-sticky-home-active #app-sticky-home-btn {
     min-height: 36px;
 }
 
+.shell-screen-active .comic-engine-shell,
+.shell-screen-active #categories-container,
+.shell-screen-active .blueprint-container > .card,
+.shell-screen-active .prism-container > .card,
+.shell-screen-active #about > .card {
+    margin: 0;
+}
+
 @media (max-width: 640px) {
     .feature-map-menu-sections {
         grid-template-columns: 1fr;
@@ -733,6 +761,17 @@ body.app-sticky-home-active #app-sticky-home-btn {
 
     .shell-action-btn {
         width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .overlay-panel,
+    .metric-chip,
+    .shell-action-btn,
+    .feature-map-body {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
     }
 }
 

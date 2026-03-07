@@ -1846,17 +1846,17 @@ function normalizeRequestedTab(tabName = '') {
 
 const APP_STICKY_TAB_TITLE_OVERRIDES = Object.freeze({
     home: 'בית · התחלה והכוונה',
-    'scenario-trainer': 'סצנות Execution',
+    'scenario-trainer': 'סימולטור סצנות',
     'comic-engine': 'במת קומיקס רגשי',
     categories: 'מילון קטגוריות המטה-מודל',
-    'practice-question': 'תרגול זיהוי Meta-Model',
-    'practice-radar': 'Meta Radar',
-    'practice-triples-radar': 'Triples Radar (Breen)',
+    'practice-question': 'תרגול זיהוי מטה-מודל',
+    'practice-radar': 'מכ"ם מטה-מודל',
+    'practice-triples-radar': 'מכ"ם שלשות (ברין)',
     'practice-wizard': 'גשר תחושה-שפה',
-    'practice-verb-unzip': 'פועל לא מפורט (Unzip)',
+    'practice-verb-unzip': 'מרכז כלים',
     blueprint: 'בונה מהלך',
-    prismlab: 'Prism Lab · רמות לוגיות',
-    about: 'על הפרויקט'
+    prismlab: 'מעבדת פריזמות · רמות לוגיות',
+    about: 'על המוצר'
 });
 
 const APP_STICKY_TAB_CONTEXT_OVERRIDES = Object.freeze({
@@ -2079,11 +2079,11 @@ function getMobileFeedCategories() {
         : [];
     if (globalCategories.length) return globalCategories;
     return [
-        { key: 'all', label: 'All' },
-        { key: 'exercises', label: 'Exercises' },
-        { key: 'lab', label: 'Lab' },
-        { key: 'knowledge', label: 'Knowledge' },
-        { key: 'settings', label: 'Settings' }
+        { key: 'all', label: 'הכול' },
+        { key: 'exercises', label: 'תרגול' },
+        { key: 'lab', label: 'מעבדה' },
+        { key: 'knowledge', label: 'ידע' },
+        { key: 'settings', label: 'הגדרות' }
     ];
 }
 
@@ -2584,7 +2584,7 @@ const SCREEN_READ_GUIDES = Object.freeze({
     'scenario-screen-blueprint': Object.freeze({
         logic: 'אחרי בחירה טובה מפרקים אותה לתוכנית ביצוע קצרה וישימה.',
         goal: 'לתרגם תובנה לפעולה שתוכל/י לבצע בעולם האמיתי.',
-        approach: 'התמקד/י בצעד ראשון, נקודת תקיעה ו-Plan B ברור.'
+        approach: 'התמקד/י בצעד ראשון, נקודת תקיעה וחלופה ברורה.'
     }),
     'scenario-screen-score': Object.freeze({
         logic: 'סיכום הסצנה נועד לקבע דפוס חשיבה לפני מעבר לסצנה הבאה.',
@@ -2604,10 +2604,10 @@ const SCREEN_READ_GUIDES = Object.freeze({
     'comic-engine': Object.freeze({
         logic: 'הזרימה מדמה דיאלוג אמיתי: בחירה, תגובת נגד, ניסוח מחדש ופירוק.',
         goal: 'ללמוד תגובה מדויקת תחת לחץ שיח.',
-        approach: 'בחר/י תגובה, אשר/י ניסוח קצר, ואז פתח/י Power Card ו-Blueprint.'
+        approach: 'בחר/י תגובה, אשר/י ניסוח קצר, ואז פתח/י את קלף הכוח ואת בונה המהלך.'
     }),
     prismlab: Object.freeze({
-        logic: `Prism Lab הוא כלי עומק: בוחרים קטגוריה + מילה/ביטוי מרכזי אחד ("עוגן"), ובודקים אותו דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי להבין איפה באמת נמצא הקושי.`,
+        logic: `מעבדת פריזמות היא כלי עומק: בוחרים קטגוריה + מילה/ביטוי מרכזי אחד ("עוגן"), ובודקים אותו דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי להבין איפה באמת נמצא הקושי.`,
         goal: 'להבדיל בין חקירה בשרשרת (שאלה על כל תשובה חדשה) לבין חקירת עומק על אותו נושא, ולבחור צעד המשך מדויק על בסיס מפה.',
         approach: 'בחר/י פריזמה, כתוב/כתבי מילה/ביטוי מרכזי אחד מהמשפט, מלא/י כמה רמות, ואז בדוק/י את המפה ובחר/י צעד המשך. אם חסרה רמה - משלימים שכבה לפני שעוברים הלאה.'
     }),
@@ -2617,7 +2617,7 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: 'לעבור לפי סדר ברין, לעבוד קטגוריה-קטגוריה, ואז לחזור לתרגול עם שאלה אחת מדויקת לכל דפוס.'
     }),
     practice: Object.freeze({
-        logic: 'מסך התרגול פוצל ל-4 דפים: שאלות, Meta Radar, SQHCEL, ופועל לא מפורט.',
+        logic: 'מסך התרגול פוצל ל-4 דפים: שאלות, מכ"ם מטה-מודל, SQHCEL, ופועל לא מפורט.',
         goal: 'לעבוד בצורה ממוקדת - כל פעם מיומנות אחת.',
         approach: 'בחר/י דף אחד, סיים/י סבב קצר, ורק אז עבר/י לדף הבא.'
     }),
@@ -2690,7 +2690,7 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
             Object.freeze({ role: 'מטופל', text: 'אני תמיד הורס את זה בסוף.' }),
             Object.freeze({ role: 'מטפל', text: 'אני קולט כאן טריגר לשוני בזמן אמת. בוא נעצור על המילה “תמיד”.' }),
             Object.freeze({ role: 'מטופל', text: 'טוב… לא תמיד. בעיקר כשאני בלחץ מול סמכות.' }),
-            Object.freeze({ role: 'מטפל', text: 'מצוין. בדיוק לזה Meta Radar מאמן: לזהות מהר את הטריגר לפני שהסיפור נסגר.' })
+            Object.freeze({ role: 'מטפל', text: 'מצוין. בדיוק לזה מכ"ם מטה-מודל מאמן: לזהות מהר את הטריגר לפני שהסיפור נסגר.' })
         ]),
         outcomes: Object.freeze([
             'זיהוי מהיר של טריגר לשוני בזמן אמת.',
@@ -2703,7 +2703,7 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
             Object.freeze({ role: 'מטופל', text: 'אני יודע שהוא חושב שאני לא מספיק טוב, אז אני חייב להוכיח את עצמי.' }),
             Object.freeze({ role: 'מטפל', text: 'במקום לבחור רק קטגוריה אחת, אנחנו עובדים על כל השלשה: מה אתה יודע, מה אתה מניח, ולפי איזה כלל אתה שופט.' }),
             Object.freeze({ role: 'מטופל', text: 'כששואלים את כל השלשה, אני רואה שזה אותו מנגנון שחוזר.' }),
-            Object.freeze({ role: 'מטפל', text: 'בדיוק. Triples Radar מדליק “משפחה” של דפוסים, לא רק כפתור אחד.' })
+            Object.freeze({ role: 'מטפל', text: 'בדיוק. מכ"ם שלשות מדליק “משפחה” של דפוסים, לא רק כפתור אחד.' })
         ]),
         outcomes: Object.freeze([
             'לזהות קטגוריה בתוך הקשר של שלשה שלמה.',
@@ -2728,10 +2728,10 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
         ])
     }),
     prismlab: Object.freeze({
-        frame: `דוגמת שימוש ב-Prism Lab: במקום להמשיך לשאלה חדשה על כל תשובה (חקירה רקורסיבית), עוצרים על מילה/ביטוי מרכזי אחד ("עוגן") ובודקים אותו דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי לבנות מפת עומק.`,
+        frame: `דוגמת שימוש במעבדת פריזמות: במקום להמשיך לשאלה חדשה על כל תשובה (חקירה רקורסיבית), עוצרים על מילה/ביטוי מרכזי אחד ("עוגן") ובודקים אותו דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי לבנות מפת עומק.`,
         turns: Object.freeze([
             Object.freeze({ role: 'מטופל', text: 'אני רוצה להבין למה כל פעם \"נדבר\" נשמע לי כמו כישלון.' }),
-            Object.freeze({ role: 'מטפל', text: 'מעולה. ב-Prism Research היינו ממשיכים ושואלים שוב על כל תשובה חדשה (חקירה רקורסיבית). כאן ב-Prism Lab נעשה משהו אחר: נשאר על המילה \"נדבר\" ונבדוק אותה לעומק דרך רמות שונות.' }),
+            Object.freeze({ role: 'מטפל', text: 'מעולה. ב-Prism Research היינו ממשיכים ושואלים שוב על כל תשובה חדשה (חקירה רקורסיבית). כאן במעבדת פריזמות נעשה משהו אחר: נשאר על המילה \"נדבר\" ונבדוק אותה לעומק דרך רמות שונות.' }),
             Object.freeze({ role: 'מטופל', text: 'כלומר לא מחליפים נושא - פשוט מסתכלים על אותה מילה דרך סביבה/התנהגות/יכולות/ערכים/זהות/שייכות?' }),
             Object.freeze({ role: 'מטפל', text: 'בדיוק. כך מקבלים מפה: איפה זה יושב, מה אתה עושה, איזו יכולת חסרה, איזה כלל מפעיל את זה, ומה צעד ההמשך הכי מדויק.' })
         ]),
@@ -2744,7 +2744,7 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
     blueprint: Object.freeze({
         turns: Object.freeze([
             Object.freeze({ role: 'מטופל', text: 'אני צריך לסגור את הפרויקט הזה, אבל אין לי מושג מאיפה להתחיל.' }),
-            Object.freeze({ role: 'מטפל', text: 'בוא נהפוך את זה מ”צריך” לתוכנית: יעד, צעד ראשון, תקיעות, ו-Plan B.' }),
+            Object.freeze({ role: 'מטפל', text: 'בוא נהפוך את זה מ”צריך” לתוכנית: יעד, צעד ראשון, תקיעות וחלופה אם צריך.' }),
             Object.freeze({ role: 'מטופל', text: 'עכשיו זה כבר לא “פרויקט ענק”, אלא צעד ראשון ברור.' }),
             Object.freeze({ role: 'מטפל', text: 'זה מה שהכלי ממדל: מעבר ממטלה עמומה לביצוע מעשי.' })
         ])
@@ -2754,7 +2754,7 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
             Object.freeze({ role: 'מטופל', text: 'ברגע האמת אני מגיב מהר מדי ואז מצטער.' }),
             Object.freeze({ role: 'מטפל', text: 'נריץ סימולציה קצרה: תגובה, תגובת נגד, ניסוח מחדש, ואז נבדוק מה היה מקדם.' }),
             Object.freeze({ role: 'מטופל', text: 'הסימולציה נותנת לי מרווח לחשוב לפני שאומרים את זה באמת.' }),
-            Object.freeze({ role: 'מטפל', text: 'בדיוק. Comic Engine ממדל חזרה גנרלית לשיחה אמיתית.' })
+            Object.freeze({ role: 'מטפל', text: 'בדיוק. במת הקומיקס ממדלת חזרה גנרלית לשיחה אמיתית.' })
         ])
     }),
     'scenario-trainer': Object.freeze({
@@ -3039,9 +3039,9 @@ const RUNTIME_CLEAN_SCREEN_GUIDE_DEFAULT = Object.freeze({
 
 const RUNTIME_CLEAN_SCREEN_GUIDE_OVERRIDES = Object.freeze({
     'practice-triples-radar': Object.freeze({
-        logic: 'Triples Radar בודק דפוס כשלשה (שלוש קטגוריות באותה שורה), ולא רק קטגוריה אחת מבודדת.',
-        goal: 'לראות איך כמה רכיבי Meta Model עובדים יחד באותה שכבת משמעות.',
-        approach: 'בחר/י מצב עבודה (רגיל/Triples), קרא/י את המשפט, ענה/י לפי ההנחיה, ואז בדוק/י את המשוב לפני השלב הבא.',
+        logic: 'מכ"ם שלשות בודק דפוס כשלשה (שלוש קטגוריות באותה שורה), ולא רק קטגוריה אחת מבודדת.',
+        goal: 'לראות איך כמה רכיבי מטה-מודל עובדים יחד באותה שכבת משמעות.',
+        approach: 'בחר/י מצב עבודה (רגיל/שלשה), קרא/י את המשפט, ענה/י לפי ההנחיה, ואז בדוק/י את המשוב לפני השלב הבא.',
         expected: 'בסיום תדע/י להבחין בין עבודה על קטגוריה אחת לבין עבודה על שלשה שלמה באותה שורה.',
         success: 'התקדמות נראית כשאת/ה מצליח/ה להסביר מה כל רכיב בשלשה תורם למפה הכוללת.'
     }),
@@ -3072,12 +3072,12 @@ const RUNTIME_CLEAN_DEFAULT_THERAPEUTIC_DEMO = Object.freeze({
 const RUNTIME_CLEAN_THERAPEUTIC_DEMO_OVERRIDES = Object.freeze({
     'practice-triples-radar': Object.freeze({
         banner: 'דוגמת שימוש: כאן רואים איך עובדים על שלשה שלמה (ולא רק על קטגוריה אחת).',
-        frame: 'זו דוגמה תהליכית ל-Triples Radar: מזהים משפחה של דפוסים (שלשה), ורק אז שואלים/משקפים בצורה מדויקת.',
+        frame: 'זו דוגמה תהליכית למכ"ם שלשות: מזהים משפחה של דפוסים (שלשה), ורק אז שואלים/משקפים בצורה מדויקת.',
         turns: Object.freeze([
             Object.freeze({ role: 'מטופל', text: 'אני יודע שהוא חושב שאני לא מספיק טוב, אז אני חייב להוכיח את עצמי.' }),
             Object.freeze({ role: 'מטפל', text: 'במקום לבחור רק קטגוריה אחת, נבדוק כאן שלשה: מה אתה יודע, מה אתה מניח, ולפי איזה כלל אתה שופט.' }),
             Object.freeze({ role: 'מטופל', text: 'כששואלים את כל השלשה, אני רואה שזה אותו מנגנון שחוזר.' }),
-            Object.freeze({ role: 'מטפל', text: 'בדיוק. Triples Radar עוזר לראות משפחה של דפוסים, לא רק טריגר אחד.' })
+            Object.freeze({ role: 'מטפל', text: 'בדיוק. מכ"ם שלשות עוזר לראות משפחה של דפוסים, לא רק טריגר אחד.' })
         ]),
         outcomes: Object.freeze([
             'לזהות קטגוריה בתוך הקשר של שלשה מלאה.',
@@ -3457,7 +3457,7 @@ function ensureMobileStickyCta() {
     root.className = 'mobile-sticky-cta hidden';
     root.innerHTML = `
         <button type="button" class="btn btn-primary" data-mobile-sticky-primary>פעולה ראשית</button>
-        <button type="button" class="btn btn-secondary" data-mobile-sticky-menu>MENU</button>
+        <button type="button" class="btn btn-secondary" data-mobile-sticky-menu>תפריט</button>
     `;
 
     root.addEventListener('click', (event) => {
@@ -3591,7 +3591,7 @@ function setupGlobalFeatureMenuDropdown() {
     }
     if (summary && !summary.querySelector('small')) {
         const badge = document.createElement('small');
-        badge.textContent = 'MENU';
+        badge.textContent = 'פתוח';
         summary.appendChild(badge);
     }
 
@@ -3608,7 +3608,7 @@ function setupGlobalFeatureMenuDropdown() {
                 <select id="global-feature-menu-in-app" class="feature-map-menu-select" data-global-feature-menu-select="in-app" aria-label="בחירת מסך בתוך האפליקציה"></select>
             </section>
             <section class="feature-map-menu-section">
-                <label class="feature-map-menu-label" for="global-feature-menu-standalone">כלים נפרדים (Standalone)</label>
+                <label class="feature-map-menu-label" for="global-feature-menu-standalone">כלים נפרדים</label>
                 <select id="global-feature-menu-standalone" class="feature-map-menu-select" data-global-feature-menu-select="standalone" aria-label="בחירת כלי חיצוני"></select>
             </section>
         </div>
@@ -3638,33 +3638,33 @@ function setupGlobalFeatureMenuDropdown() {
     const seenKeys = new Set();
     const labelOverrides = Object.freeze({
         'tab:home': 'בית · התחלה והכוונה',
-        'tab:scenario-trainer': 'סימולטור סצנות (Execution)',
+        'tab:scenario-trainer': 'סימולטור סצנות',
         'tab:comic-engine': 'במת קומיקס רגשי · תגובות ומהלכים',
         'tab:categories': 'מילון קטגוריות המטה-מודל',
-        'tab:practice-question': 'תרגול זיהוי Meta-Model',
-        'tab:practice-radar': 'Meta Radar',
-        'tab:practice-triples-radar': 'Triples Radar (Breen)',
+        'tab:practice-question': 'תרגול זיהוי מטה-מודל',
+        'tab:practice-radar': 'מכ"ם מטה-מודל',
+        'tab:practice-triples-radar': 'מכ"ם שלשות (ברין)',
         'tab:practice-wizard': 'כמתים נסתרים · הגשר שנסגר',
-        'tab:practice-verb-unzip': 'פועל לא מפורט (Unzip)',
+        'tab:practice-verb-unzip': 'מרכז כלים',
         'tab:blueprint': 'בונה מהלך',
-        'tab:prismlab': 'Prism Lab · רמות לוגיות',
-        'tab:about': 'על הפרויקט',
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classicClassic, 'classic_classic_trainer.html')]: 'Classic 1 · Classic Classic',
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classic2, 'classic2_trainer.html')]: 'Classic 2 · Structure of Magic',
+        'tab:prismlab': 'מעבדת פריזמות · רמות לוגיות',
+        'tab:about': 'על המוצר',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classicClassic, 'classic_classic_trainer.html')]: 'קלאסיק 1 · המבנה הקלאסי',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classic2, 'classic2_trainer.html')]: 'קלאסיק 2 · מבנה הקסם',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.iceberg, 'iceberg_templates_trainer.html')]: 'קצה קרחון / שלדי עומק',
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html')]: 'Prism Research · Text Research',
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html')]: 'Living Triples',
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: 'Unzip Trainer (Standalone)',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html')]: 'Prism Research · חקירה בשרשרת',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html')]: 'Living Triples · שלשות חיות',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: 'Unzip Trainer · חלון נפרד',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/')]: 'דף עבודה מעוגל · Verb Unzip',
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: 'Sentence Morpher',
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismLabStandalone, 'prism_lab_trainer.html')]: 'Prism Lab (Standalone)'
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: 'Sentence Morpher · ניסוח מחדש',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismLabStandalone, 'prism_lab_trainer.html')]: 'מעבדת פריזמות · חלון נפרד'
     });
     const groupLabels = Object.freeze({
-        home: 'Home',
-        exercises: 'Exercises',
-        lab: 'Lab',
-        knowledge: 'Knowledge',
-        settings: 'Settings'
+        home: 'בית',
+        exercises: 'תרגול',
+        lab: 'מעבדה',
+        knowledge: 'ידע',
+        settings: 'הגדרות'
     });
     const groupOrder = Object.freeze([
         groupLabels.home,
@@ -4244,24 +4244,24 @@ function setupFeatureLauncherTabs() {
     if (!launchers.length) return;
 
     const featureLabelOverrides = Object.freeze({
-        "nav:practice-question": "תרגול זיהוי Meta-Model",
-        "nav:practice-radar": "Meta Radar",
+        "nav:practice-question": "תרגול זיהוי מטה-מודל",
+        "nav:practice-radar": "מכ״ם מטה-מודל",
         "nav:practice-wizard": "כמתים נסתרים · גשר השפה",
-        "nav:practice-verb-unzip": "פועל לא מפורט",
+        "nav:practice-verb-unzip": "מרכז כלים",
         "nav:blueprint": "בונה מהלך",
-        "nav:prismlab": "Prism Lab · רמות לוגיות",
-        "nav:practice-triples-radar": "Triples Radar (Breen)",
+        "nav:prismlab": "מעבדת פריזמות · רמות לוגיות",
+        "nav:practice-triples-radar": "מכ״ם שלשות (ברין)",
         "nav:categories": "מילון קטגוריות המטה-מודל",
         "nav:comic-engine": "במת קומיקס רגשי",
         "nav:scenario-trainer": "סימולטור סצנות",
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: "Unzip Trainer (Standalone)",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: "Unzip Trainer · חלון נפרד",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/')]: "דף עבודה מעוגל · Verb Unzip",
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: "Sentence Morpher",
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html')]: "Prism Research (Chain)",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: "Sentence Morpher · ניסוח מחדש",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html')]: "Prism Research · חקירה בשרשרת",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.iceberg, 'iceberg_templates_trainer.html')]: "קצה קרחון / שלדי עומק",
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html')]: "Living Triples",
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classicClassic, 'classic_classic_trainer.html')]: "Classic 1 · Classic Classic",
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classic2, 'classic2_trainer.html')]: "Classic 2 · Structure of Magic"
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html')]: "Living Triples · שלשות חיות",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classicClassic, 'classic_classic_trainer.html')]: "קלאסיק 1 · המבנה הקלאסי",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classic2, 'classic2_trainer.html')]: "קלאסיק 2 · מבנה הקסם"
     });
 
     function parseLauncherEntry(element) {
@@ -4901,7 +4901,11 @@ function syncGlobalTheoryLauncherVisibility(tabName = '') {
     const launcher = document.getElementById('global-theory-launcher');
     if (!launcher) return;
     const resolvedTab = normalizeRequestedTab(tabName) || getCurrentActiveTabName();
-    const shouldHide = isMobileViewportMode() || resolvedTab === 'categories';
+    const shouldHide = isMobileViewportMode()
+        || resolvedTab === 'categories'
+        || (window.MetaAppShell
+            && typeof window.MetaAppShell.isShellModeScreen === 'function'
+            && window.MetaAppShell.isShellModeScreen(resolvedTab));
     launcher.classList.toggle('is-hidden-context', shouldHide);
     launcher.setAttribute('aria-hidden', shouldHide ? 'true' : 'false');
 }
@@ -9314,7 +9318,7 @@ function buildRapidPatternAiFeedbackHtml(history) {
 
     const avgSeconds = (avgRemainingMs / 1000).toFixed(1);
     return `
-        <h4>AI Coach: סיכום ${rounds} שאלות</h4>
+        <h4>מאמן הדיוק: סיכום ${rounds} שאלות</h4>
         <p>דיוק: <strong>${accuracy}%</strong> | נכונות: <strong>${correctCount}/${rounds}</strong> | זמן ממוצע שנותר בתשובות נכונות: <strong>${avgSeconds} שנ׳</strong></p>
         <p class="rapid-ai-title">מה חזק אצלך עכשיו</p>
         ${strengthsHtml}
@@ -11243,7 +11247,7 @@ async function loadScenarioTrainerData() {
         return true;
     } catch (error) {
         console.error('Scenario data load failed', error);
-        showHint('לא הצלחנו לטעון את סצנות ה-Scenario Trainer');
+        showHint('לא הצלחנו לטעון את סימולטור הסצנות');
         return false;
     }
 }
@@ -13330,7 +13334,7 @@ function buildBlueprintTherapistSummaryText() {
         parts.push([yesText, noText].filter(Boolean).join('. ') + '.');
     }
     if (blueprintData.firstStep) {
-        parts.push(`לכן השלב הבא שנבחר הוא להתחיל ב-"${blueprintData.firstStep}" בתוך מסגרת זמן של ${blueprintData.time || '30 דקות'}, עם Plan B ברור אם יהיה קושי.`);
+        parts.push(`לכן השלב הבא שנבחר הוא להתחיל ב-"${blueprintData.firstStep}" בתוך מסגרת זמן של ${blueprintData.time || '30 דקות'}, עם חלופה ברורה אם יהיה קושי.`);
     }
     return parts.join(' ');
 }
@@ -13528,7 +13532,7 @@ function generateFinalBlueprint() {
         </div>
 
         <div class="blueprint-section">
-            <h4>קשיים צפויים + Plan B</h4>
+            <h4>קשיים צפויים + חלופה</h4>
             <p><strong>איפה זה נוטה להיתקע:</strong> ${escapeHtml(blueprintData.friction || '(לא הוגדר)')}</p>
             <p><strong>חלופה / עזרה אם נתקעים:</strong> ${escapeHtml(blueprintData.alternatives || '(לא הוגדר)')}</p>
         </div>
@@ -13594,7 +13598,7 @@ function generateNextAction() {
     const ifStuck = `
         <strong>אם נתקעים בשלב הזה:</strong><br/>
         ${escapeHtml(blueprintData.friction || 'עצור/י, שים/י לב מה חסר כרגע, וחדד/י את הצעד.')}<br/>
-        <strong>Plan B:</strong><br/>
+        <strong>חלופה:</strong><br/>
         ${escapeHtml(blueprintData.alternatives || 'בקש/י עזרה, קצר/י את המשימה, או בחר/י גרסה קטנה יותר')}
     `;
 
@@ -14420,11 +14424,11 @@ function renderPrismDeepGuide(prism) {
     guideEl.innerHTML = `
         <div class="prism-guide-launchers" role="group" aria-label="הסברים זמניים">
             <button type="button" class="btn btn-secondary prism-guide-launch-btn" data-prism-guide-target="${modeModalId}">
-                <span>Mode Guide + Example</span>
+                <span>מדריך פתיחה ודוגמה</span>
                 <small>הסבר קצר לפני תחילת המילוי</small>
             </button>
             <button type="button" class="btn btn-secondary prism-guide-launch-btn prism-guide-launch-btn-advanced" data-prism-guide-target="${advancedModalId}">
-                <span>Advanced Theory</span>
+                <span>שכבת עומק</span>
                 <small>לפתוח רק כשצריך</small>
             </button>
         </div>
@@ -14432,7 +14436,7 @@ function renderPrismDeepGuide(prism) {
         <div id="${modeModalId}" class="prism-guide-overlay hidden" aria-hidden="true">
             <div class="prism-guide-overlay-dialog" role="dialog" aria-modal="true" aria-labelledby="${modeModalId}-title">
                 <button type="button" class="prism-guide-overlay-close" data-prism-guide-close aria-label="סגירה">×</button>
-                <h4 id="${modeModalId}-title">Mode Guide + Example</h4>
+                <h4 id="${modeModalId}-title">מדריך פתיחה ודוגמה</h4>
                 <p class="prism-guide-overlay-lead">${nameHe} / ${nameEn}</p>
                 <div class="prism-guide-grid prism-guide-grid-mode-split prism-guide-overlay-content">
                     <div class="prism-guide-card">
@@ -14441,10 +14445,10 @@ function renderPrismDeepGuide(prism) {
                         <p><strong>למה זה חשוב?</strong> ${intent}</p>
                     </div>
                     <div class="prism-guide-card">
-                        <h5>Prism Lab vs Prism Research</h5>
-                        <p><strong>Prism Lab:</strong> מילה/ביטוי מרכזי אחד ("עוגן") + חתך עומק דרך רמות לוגיות.</p>
+                        <h5>מעבדת פריזמות מול Prism Research</h5>
+                        <p><strong>מעבדת פריזמות:</strong> מילה/ביטוי מרכזי אחד ("עוגן") + חתך עומק דרך רמות לוגיות.</p>
                         <p><strong>Prism Research:</strong> שאלה רקורסיבית על כל תשובה חדשה בשרשרת חקירה.</p>
-                        <p><strong>בקיצור:</strong> Lab = עומק על מוקד אחד. Research = תנועה בשרשרת.</p>
+                        <p><strong>בקיצור:</strong> מעבדה = עומק על מוקד אחד. Research = תנועה בשרשרת.</p>
                     </div>
                 </div>
                 <div class="prism-guide-grid prism-guide-overlay-content">
@@ -14458,7 +14462,7 @@ function renderPrismDeepGuide(prism) {
                         </ol>
                     </div>
                     <div class="prism-guide-card">
-                        <h5>רמות לוגיות / Stack Map</h5>
+                        <h5>רמות לוגיות / מפת שכבות</h5>
                         <ul>${levelGuide}</ul>
                     </div>
                 </div>
@@ -14471,7 +14475,7 @@ function renderPrismDeepGuide(prism) {
         <div id="${advancedModalId}" class="prism-guide-overlay hidden" aria-hidden="true">
             <div class="prism-guide-overlay-dialog" role="dialog" aria-modal="true" aria-labelledby="${advancedModalId}-title">
                 <button type="button" class="prism-guide-overlay-close" data-prism-guide-close aria-label="סגירה">×</button>
-                <h4 id="${advancedModalId}-title">Advanced Theory</h4>
+                <h4 id="${advancedModalId}-title">חומר העמקה</h4>
                 <p class="prism-guide-overlay-lead">לפתוח רק כשצריך. זה חומר הרחבה, לא חובה לפני התחלה.</p>
                 <div class="prism-guide-grid prism-guide-overlay-content">
                     <div class="prism-guide-card">
@@ -15419,7 +15423,7 @@ function applyPrismLabCompactRuntimeCopy() {
     const rootCard = root.querySelector('.prism-container .card');
     const rootTitle = rootCard?.querySelector(':scope > h2');
     const rootIntro = rootCard?.querySelector(':scope > p');
-    if (rootTitle) rootTitle.textContent = 'מעבדת פריזמות (Prism Lab)';
+    if (rootTitle) rootTitle.textContent = 'מעבדת פריזמות';
     if (rootIntro) rootIntro.textContent = `בחר/י פריזמה, בחר/י מילה/ביטוי מרכזי אחד מתוך המשפט ("עוגן"), ואז בדוק/י אותו דרך רמות לוגיות: ${LOGICAL_LEVELS_SEQUENCE_FRIENDLY}.`;
 
     const anchorStrong = root.querySelector('#prism-detail .anchor-box strong');
@@ -15451,8 +15455,8 @@ function applyPrismLabCompactRuntimeCopy() {
     if (pivotWrapMuted) pivotWrapMuted.textContent = 'רעיונות להמשך עבודה. הם לא מחליפים מילוי של רמות המגדל.';
 
     const qLabels = root.querySelectorAll('#prism-detail .q-card > label');
-    if (qLabels[0]) qLabels[0].textContent = 'רגש נוכחי / Emotion (1-5) · אופציונלי';
-    if (qLabels[1]) qLabels[1].textContent = 'התנגדות לשינוי / Resistance (1-5) · אופציונלי';
+    if (qLabels[0]) qLabels[0].textContent = 'עוצמת רגש (1-5) · אופציונלי';
+    if (qLabels[1]) qLabels[1].textContent = 'התנגדות לשינוי (1-5) · אופציונלי';
 
     const cancelBtn = root.querySelector('#prism-cancel');
     const submitBtn = root.querySelector('#prism-submit');
@@ -15495,7 +15499,7 @@ function ensurePrismLabWorkLayout() {
         legend.className = 'prism-mini-stack-panel';
         legend.innerHTML = `
             <div class="prism-mini-stack-panel-head">
-                <strong>מפת רמות / Stack Map</strong>
+                <strong>מפת שכבות / מגדל רמות</strong>
                 <small>סביבה → התנהגות → יכולות → ערכים/אמונות → זהות → שייכות</small>
             </div>
             <div class="prism-mini-stack">${buildPrismStackLegendRowsHtml()}</div>
@@ -15565,7 +15569,7 @@ function renderPrismDeepGuideLegacy(prism) {
         <details class="prism-guide-collapsible">
             <summary>
                 <span>הסבר מוד + דוגמה</span>
-                <small>Mode Guide + Example</small>
+                <small>מדריך פתיחה ודוגמה</small>
             </summary>
             <div class="prism-guide-collapsible-body">
                 <div class="prism-guide-grid prism-guide-grid-mode-split">
@@ -15575,10 +15579,10 @@ function renderPrismDeepGuideLegacy(prism) {
                         <p><strong>למה זה חשוב?</strong> ${intent}</p>
                     </div>
                     <div class="prism-guide-card">
-                        <h5>Prism Lab vs Prism Research</h5>
-                        <p><strong>Prism Lab (מגדל רמות):</strong> מילה/ביטוי מרכזי אחד ("עוגן") + חתך עומק דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}).</p>
+                        <h5>מעבדת פריזמות מול Prism Research</h5>
+                        <p><strong>מעבדת פריזמות (מגדל רמות):</strong> מילה/ביטוי מרכזי אחד ("עוגן") + חתך עומק דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}).</p>
                         <p><strong>Prism Research (חקירה בשרשרת):</strong> שואלים שוב על כל תשובה חדשה ("רקורסיבי" = אותה שאלה חוזרת על תוצאה חדשה).</p>
-                        <p><strong>בקיצור:</strong> Lab = עומק על מוקד אחד, Research = התקדמות בשרשרת.</p>
+                        <p><strong>בקיצור:</strong> מעבדה = עומק על מוקד אחד, Research = התקדמות בשרשרת.</p>
                     </div>
                 </div>
 
@@ -15897,38 +15901,39 @@ function navigateTo(tabName, options = {}) {
 // ==================== PROGRESS TRACKING & GAMIFICATION ====================
 
 const HOME_LAST_TAB_KEY = 'meta_home_last_tab_v1';
+const SHELL_CONTINUE_KEY = 'meta_shell_continue_v1';
 const HOME_TRAINING_PROGRAM_KEY = 'meta_home_training_program_v1';
 
 const HOME_TRAINING_PROGRAMS = Object.freeze([
     Object.freeze({
         id: 'core_flow',
-        title: 'Core Flow',
+        title: 'זרימה בסיסית',
         badge: 'דיוק → תגובה',
         description: 'תרגול בסיסי שמתחיל בזיהוי, עובר למהירות, ומסתיים בתגובה פרקטית.',
         steps: Object.freeze([
-            Object.freeze({ tab: 'practice-question', title: 'תרגול זיהוי Meta-Model', note: 'זיהוי סוג ההפרה במשפט אחד' }),
-            Object.freeze({ tab: 'practice-radar', title: 'Meta Radar', note: 'סבב זיהוי מהיר בזמן' }),
-            Object.freeze({ tab: 'scenario-trainer', title: 'Scenario Trainer', note: 'להפוך דפוס לצעד ביצועי' })
+            Object.freeze({ tab: 'practice-question', title: 'תרגול זיהוי מטה-מודל', note: 'זיהוי סוג ההפרה במשפט אחד' }),
+            Object.freeze({ tab: 'practice-radar', title: 'מכ"ם מטה-מודל', note: 'סבב זיהוי מהיר בזמן' }),
+            Object.freeze({ tab: 'scenario-trainer', title: 'סימולטור סצנות', note: 'להפוך דפוס לצעד ביצועי' })
         ])
     }),
     Object.freeze({
         id: 'deep_probe',
-        title: 'Deep Probe',
+        title: 'פירוק עומק',
         badge: 'פירוק עומק',
-        description: 'מסלול למי שרוצה עומק: פועל לא־מפורט, שלשות, ואז Blueprint.',
+        description: 'מסלול למי שרוצה עומק: פועל לא־מפורט, שלשות, ואז בונה מהלך.',
         steps: Object.freeze([
             Object.freeze({ tab: 'practice-verb-unzip', title: 'פועל לא מפורט', note: 'לחשוף מה חסר בפועל עמום' }),
-            Object.freeze({ tab: 'practice-triples-radar', title: 'Triples Radar', note: 'לזהות קו/משפחה שלמה' }),
-            Object.freeze({ tab: 'blueprint', title: 'Blueprint Builder', note: 'לסגור עם תוכנית פעולה + Plan B' })
+            Object.freeze({ tab: 'practice-triples-radar', title: 'מכ"ם שלשות', note: 'לזהות קו/משפחה שלמה' }),
+            Object.freeze({ tab: 'blueprint', title: 'בונה מהלך', note: 'לסגור עם תוכנית פעולה + חלופה' })
         ])
     }),
     Object.freeze({
         id: 'cognitive_design',
-        title: 'Cognitive Design',
+        title: 'בניית מסגרת',
         badge: 'מפה לוגית',
-        description: 'מסלול בניית מסגרות: פריזמה, Wizard, ואז סימולציה/קומיקס.',
+        description: 'מסלול בניית מסגרות: פריזמה, גשר תחושה-שפה, ואז סימולציה/קומיקס.',
         steps: Object.freeze([
-            Object.freeze({ tab: 'prismlab', title: 'Prism Lab', note: 'מגדל לוגי + צעד הבא' }),
+            Object.freeze({ tab: 'prismlab', title: 'מעבדת פריזמות', note: 'מגדל לוגי + צעד הבא' }),
             Object.freeze({ tab: 'practice-wizard', title: 'גשר תחושה-שפה', note: 'איסוף תהליך מובנה' }),
             Object.freeze({ tab: 'comic-engine', title: 'במת קומיקס רגשי', note: 'הדמיית תגובות ותוצאה' })
         ])
@@ -15986,7 +15991,7 @@ function getProgressBadgeDefinitions() {
         { id: 'xp_500', name: '500 XP', icon: '🌠', condition: () => userProgress.xp >= 500 },
         { id: 'sessions_10', name: '10 סשנים', icon: '📊', condition: () => userProgress.sessions >= 10 },
         { id: 'daily_goal', name: 'יעד יומי', icon: '🎯', condition: () => userProgress.lastChargeAwardedDate === userProgress.todayDate },
-        { id: 'charge_full', name: 'Charge Full', icon: '🛡️', condition: () => userProgress.streakCharges >= MAX_STREAK_CHARGES },
+        { id: 'charge_full', name: 'מטען רצף מלא', icon: '🛡️', condition: () => userProgress.streakCharges >= MAX_STREAK_CHARGES },
     ];
 }
 
@@ -16033,6 +16038,18 @@ function persistHomeLastVisitedTab(tabName = '') {
 
 function loadHomeLastVisitedTab() {
     try {
+        const shellRaw = localStorage.getItem(SHELL_CONTINUE_KEY);
+        if (shellRaw) {
+            const shellState = JSON.parse(shellRaw);
+            const shellTab = normalizeRequestedTab(shellState?.screenId || '');
+            if (shellTab && shellTab !== 'home') {
+                return {
+                    tab: shellTab,
+                    at: typeof shellState?.at === 'string' ? shellState.at : null,
+                    panelTitle: typeof shellState?.panelTitle === 'string' ? shellState.panelTitle : ''
+                };
+            }
+        }
         const raw = localStorage.getItem(HOME_LAST_TAB_KEY);
         if (!raw) return null;
         const parsed = JSON.parse(raw);
@@ -16040,7 +16057,8 @@ function loadHomeLastVisitedTab() {
         if (!tab || tab === 'home') return null;
         return {
             tab,
-            at: typeof parsed?.at === 'string' ? parsed.at : null
+            at: typeof parsed?.at === 'string' ? parsed.at : null,
+            panelTitle: ''
         };
     } catch (error) {
         console.warn('Failed to parse last visited tab', error);
@@ -16075,17 +16093,17 @@ function getProgressMomentumCoach() {
         return {
             tone: 'success',
             title: 'מומנטום מצוין',
-            pill: 'Ready',
-            copy: 'היעד היומי הושלם וה־Charge מלא. זמן טוב לסשן מבחן קצר או מסלול מתקדם.'
+            pill: 'מוכן',
+            copy: 'היעד היומי הושלם ומטען הרצף מלא. זמן טוב לסשן מבחן קצר או למסלול מתקדם.'
         };
     }
     if (remainingDaily === 0) {
         return {
             tone: 'success',
             title: 'יעד יומי הושלם',
-            pill: 'Done',
+            pill: 'בוצע',
             copy: hasCharge
-                ? `מעולה. היעד הושלם וה־Streak Charge שלך ${userProgress.streakCharges}/${MAX_STREAK_CHARGES}.`
+                ? `מעולה. היעד הושלם ומטען הרצף שלך הוא ${userProgress.streakCharges}/${MAX_STREAK_CHARGES}.`
                 : 'מעולה. היעד הושלם. עוד סשנים יחזקו XP וכוכבים, אבל היעד של היום כבר סגור.'
         };
     }
@@ -16093,22 +16111,22 @@ function getProgressMomentumCoach() {
         return {
             tone: 'warn',
             title: 'שימור רצף',
-            pill: 'Streak',
-            copy: `יש רצף יפה (${userProgress.streak} ימים). השלימו עוד ${remainingDaily} פעולות היום כדי למלא Charge ולשמור על הגמישות.`
+            pill: 'רצף',
+            copy: `יש רצף יפה (${userProgress.streak} ימים). השלימו עוד ${remainingDaily} פעולות היום כדי למלא מטען רצף ולשמור על הגמישות.`
         };
     }
     if (userProgress.streak === 0 || !userProgress.lastSessionDate) {
         return {
             tone: 'info',
             title: 'פתיחת מומנטום',
-            pill: 'Start',
-            copy: `התחילו בסשן קצר (Question Drill / Meta Radar). ${remainingDaily} פעולות ישלימו את היעד היומי.`
+            pill: 'התחל',
+            copy: `התחילו בסשן קצר (תרגול זיהוי / מכ"ם מטה-מודל). ${remainingDaily} פעולות ישלימו את היעד היומי.`
         };
     }
     return {
         tone: remainingDaily <= 1 ? 'warn' : 'info',
         title: 'צעד הבא להיום',
-        pill: 'Coach',
+        pill: 'מיקוד',
         copy: `נשארו ${remainingDaily} פעולות כדי לסגור יעד יומי. רצף נוכחי: ${userProgress.streak} ימים.`
     };
 }
@@ -16194,8 +16212,8 @@ function renderProgressWeekStrip() {
             `יעד: ${item.goalTarget}`
         ];
         if (item.metGoal) titleBits.push('יעד יומי הושלם');
-        if (item.awardedCharge) titleBits.push('Charge הוענק');
-        if (item.usedCharge) titleBits.push('Charge שימש לשמירת רצף');
+        if (item.awardedCharge) titleBits.push('מטען רצף הוענק');
+        if (item.usedCharge) titleBits.push('מטען רצף שימש לשמירת רצף');
 
         return `
             <div class="${classes.join(' ')}" title="${escapeHtml(titleBits.join(' | '))}">
@@ -16413,6 +16431,9 @@ function setupProgressHubEnhancements() {
             const last = loadHomeLastVisitedTab();
             if (!last?.tab) return;
             playUISound('start');
+            if (window.MetaAppShell && typeof window.MetaAppShell.resumeContinueState === 'function' && window.MetaAppShell.resumeContinueState()) {
+                return;
+            }
             navigateTo(last.tab);
         });
     }
@@ -16672,7 +16693,7 @@ function tryAwardStreakCharge() {
     userProgress.lastChargeAwardedDate = userProgress.todayDate;
     const entry = ensureActivityHistoryEntry(userProgress.todayDate);
     if (entry) entry.chargeAwarded = true;
-    showHint(`🛡️ קיבלת Streak Charge (${userProgress.streakCharges}/${MAX_STREAK_CHARGES})`);
+    showHint(`🛡️ קיבלת מטען רצף (${userProgress.streakCharges}/${MAX_STREAK_CHARGES})`);
 }
 
 function registerDailyAction(amount = 1) {
@@ -16743,7 +16764,7 @@ function updateStreak() {
             userProgress.lastChargeUsedDate = today;
             const entry = ensureActivityHistoryEntry(today);
             if (entry) entry.usedCharge = true;
-            showHint(`🛡️ השתמשת ב-Streak Charge. נשארו ${userProgress.streakCharges}/${MAX_STREAK_CHARGES}`);
+            showHint(`🛡️ השתמשת במטען רצף. נשארו ${userProgress.streakCharges}/${MAX_STREAK_CHARGES}`);
         } else {
             userProgress.streak = 1;
         }
@@ -16805,7 +16826,7 @@ function updateProgressHub() {
         if (!userProgress.lastSessionDate) {
             streakDateEl.textContent = 'היום הראשון!';
         } else if (userProgress.lastChargeUsedDate === userProgress.lastSessionDate) {
-            streakDateEl.textContent = 'הרצף נשמר עם Charge';
+            streakDateEl.textContent = 'הרצף נשמר עם מטען רצף';
         } else {
             streakDateEl.textContent = `פעילות אחרונה: ${userProgress.lastSessionDate}`;
         }
@@ -16827,11 +16848,11 @@ function updateProgressHub() {
     if (streakChargeNoteEl) {
         streakChargeNoteEl.textContent = userProgress.streakCharges > 0
             ? 'שומר על הרצף ביום פספוס אחד'
-            : 'סיים יעד יומי כדי למלא Charge';
+            : 'סיים יעד יומי כדי למלא מטען רצף';
     }
 
     const levelMeta = getXpLevelMeta(userProgress.xp);
-    if (levelTitleEl) levelTitleEl.textContent = `Level ${levelMeta.level} · התקדמות`;
+    if (levelTitleEl) levelTitleEl.textContent = `רמה ${levelMeta.level} · התקדמות`;
     if (levelBadgeEl) levelBadgeEl.textContent = `${userProgress.xp} XP`;
     if (levelFillEl) levelFillEl.style.width = `${levelMeta.progressPct}%`;
     if (levelNoteEl) {
@@ -16843,7 +16864,7 @@ function updateProgressHub() {
     const momentum = getProgressMomentumCoach();
     if (momentumCardEl) momentumCardEl.dataset.tone = momentum.tone || 'info';
     if (momentumTitleEl) momentumTitleEl.textContent = momentum.title || 'מומנטום יומי';
-    if (momentumPillEl) momentumPillEl.textContent = momentum.pill || 'Coach';
+    if (momentumPillEl) momentumPillEl.textContent = momentum.pill || 'מיקוד';
     if (momentumCopyEl) momentumCopyEl.textContent = momentum.copy || '';
     if (weekStripEl) renderProgressWeekStrip();
 
@@ -16862,7 +16883,7 @@ function updateProgressHub() {
     }
     if (resumeCopyEl) {
         resumeCopyEl.textContent = lastVisited?.tab
-            ? `${getTabTitleForHome(lastVisited.tab)} · ${formatRelativeTimeShort(lastVisited.at)}`
+            ? `${getTabTitleForHome(lastVisited.tab)}${lastVisited.panelTitle ? ` · ${lastVisited.panelTitle}` : ''} · ${formatRelativeTimeShort(lastVisited.at)}`
             : 'אין מסך אחרון שמור עדיין. בחר/י כלי מהתפריט או מהמסלולים למטה.';
     }
     if (resumeBtn) {
@@ -20557,7 +20578,7 @@ function setupWrinkleGame() {
 
             <section class="wr2w-sentence-card wr2w-scene-box">
                 <div class="wr2w-sentence-top">
-                    <p class="wr2w-kicker">משפט מרכזי · Core Sentence</p>
+                    <p class="wr2w-kicker">משפט מרכזי</p>
                     <p id="wr2w-sentence-help" class="wr2w-sentence-help">בחר/י תחושה ואז כמת נסתר. הכרטיס יתעדכן לאורך הסבב.</p>
                 </div>
                 <div id="wr2w-signal-inline" class="wr2w-signal-inline hidden"></div>
@@ -20565,21 +20586,21 @@ function setupWrinkleGame() {
 
                 <div class="wr2w-layers">
                     <article id="wr2w-layer-outside" class="wr2w-layer-card is-blue">
-                        <h4>👁️ חוץ · Outside</h4>
+                        <h4>👁️ חוץ</h4>
                         <p id="wr2w-layer-outside-text">מה באמת קרה בחוץ?</p>
                     </article>
                     <article id="wr2w-layer-inside" class="wr2w-layer-card is-green">
-                        <h4>❤️ פנים/גוף · Inside</h4>
+                        <h4>❤️ פנים/גוף</h4>
                         <p id="wr2w-layer-inside-text">מה הגוף/הרגש אומר כרגע?</p>
                     </article>
                     <article id="wr2w-layer-spoken" class="wr2w-layer-card is-purple">
-                        <h4>💬 משפט גלוי · Spoken</h4>
+                        <h4>💬 משפט גלוי</h4>
                         <p id="wr2w-layer-spoken-text">מה באמת נאמר?</p>
                     </article>
                 </div>
 
                 <details class="wr2w-context">
-                    <summary>הקשר רחב / Monologue</summary>
+                    <summary>הקשר רחב</summary>
                     <p id="wr2w-monologue" class="wr2w-monologue"></p>
                 </details>
             </section>
@@ -21542,7 +21563,7 @@ function setupWrinkleGame() {
                 state.round.learningOutsideFinal = outsideText;
                 state.round.learningInsideFinal = insideText;
                 state.round.bothLearningComplete = true;
-                state.round.learningFinal = `Outside: ${outsideText} | Inside: ${insideText}`;
+                state.round.learningFinal = `חוץ: ${outsideText} | פנים: ${insideText}`;
             }
             markCriterion('exception');
             finalizeRound(scene);
@@ -21860,11 +21881,11 @@ async function setupConnectedBubblesTrainer() {
         <div class="cbcal-shell" id="cbcal-shell">
             <div class="cbcal-top">
                 <div>
-                    <h3>Connected Bubbles - כיול משפט</h3>
-                    <p>Inside + Outside + משפט מדובר: מכיילים עד שהמשפט יושב מדויק על שתי הבועות.</p>
+                    <h3>בועות מקושרות · כיול משפט</h3>
+                    <p>פנים + חוץ + משפט מדובר: מכיילים עד שהמשפט יושב מדויק על שתי הבועות.</p>
                 </div>
                 <div class="cbcal-top-meta">
-                    <span id="cbcal-stage-chip" class="cbcal-stage-chip">Intro</span>
+                    <span id="cbcal-stage-chip" class="cbcal-stage-chip">פתיחה</span>
                     <button id="cbcal-new-case" type="button" class="btn btn-secondary">מקרה חדש</button>
                 </div>
             </div>
@@ -21872,7 +21893,7 @@ async function setupConnectedBubblesTrainer() {
             <section id="cbcal-screen-intro" class="cbcal-screen">
                 <div class="cbcal-intro-box">
                     <h4>הסבר קצר</h4>
-                    <p>נציג Inside ו-Outside. התפקיד שלך: לכייל את המשפט כך שיתאים לשני הצדדים בלי הגזמה ובלי השמטה.</p>
+                    <p>נציג פנים וחוץ. התפקיד שלך: לכייל את המשפט כך שיתאים לשני הצדדים בלי הגזמה ובלי השמטה.</p>
                     <p id="cbcal-intro-case" class="cbcal-feedback">טוען מקרה...</p>
                     <div class="cbcal-intro-footer">
                         <span id="cbcal-countdown" class="cbcal-countdown">10 שניות</span>
@@ -21884,7 +21905,7 @@ async function setupConnectedBubblesTrainer() {
             <section id="cbcal-screen-context" class="cbcal-screen hidden">
                 <div class="cbcal-context-box">
                     <h4>מסך הקשר</h4>
-                    <p>בחר/י משפט מפתח מתוך הדיאלוג. אם לא בחרת משפט מועמד תקבל/י: Try again.</p>
+                    <p>בחר/י משפט מפתח מתוך הדיאלוג. אם לא בחרת משפט מועמד תקבל/י הודעת "נסו שוב".</p>
                     <div id="cbcal-lines" class="cbcal-lines"></div>
                 </div>
             </section>
@@ -21892,7 +21913,7 @@ async function setupConnectedBubblesTrainer() {
             <section id="cbcal-screen-main" class="cbcal-screen hidden">
                 <div class="cbcal-stage">
                     <div class="cbcal-visual">
-                        <svg class="cbcal-svg" viewBox="0 0 1000 280" role="img" aria-label="Connected bubbles">
+                        <svg class="cbcal-svg" viewBox="0 0 1000 280" role="img" aria-label="בועות מקושרות">
                             <defs>
                                 <linearGradient id="cbcalInsideGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#fdf2f8"></stop><stop offset="100%" stop-color="#fce7f3"></stop></linearGradient>
                                 <linearGradient id="cbcalOutsideGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ecfeff"></stop><stop offset="100%" stop-color="#ccfbf1"></stop></linearGradient>
@@ -21902,16 +21923,16 @@ async function setupConnectedBubblesTrainer() {
                             <path d="M790 146 C680 118, 590 118, 500 138" stroke="#99f6e4" stroke-width="4" fill="none"></path>
                             <g id="cbcal-svg-inside">
                                 <circle cx="170" cy="146" r="86" fill="url(#cbcalInsideGrad)" stroke="#f5c8dc" stroke-width="3"></circle>
-                                <text x="170" y="140" text-anchor="middle" fill="#9d174d" font-size="22" font-weight="800">INSIDE</text>
+                                <text x="170" y="140" text-anchor="middle" fill="#9d174d" font-size="22" font-weight="800">פנים</text>
                                 <text x="170" y="165" text-anchor="middle" fill="#be185d" font-size="16" font-weight="700">פנים/גוף</text>
                             </g>
                             <g id="cbcal-svg-center">
                                 <circle cx="500" cy="146" r="66" fill="url(#cbcalCenterGrad)" stroke="#93c5fd" stroke-width="3"></circle>
-                                <text x="500" y="146" text-anchor="middle" fill="#1d4ed8" font-size="20" font-weight="800">SPOKEN</text>
+                                <text x="500" y="146" text-anchor="middle" fill="#1d4ed8" font-size="20" font-weight="800">נאמר</text>
                             </g>
                             <g id="cbcal-svg-outside">
                                 <circle cx="830" cy="146" r="86" fill="url(#cbcalOutsideGrad)" stroke="#7dd3c7" stroke-width="3"></circle>
-                                <text x="830" y="140" text-anchor="middle" fill="#0f766e" font-size="22" font-weight="800">OUTSIDE</text>
+                                <text x="830" y="140" text-anchor="middle" fill="#0f766e" font-size="22" font-weight="800">חוץ</text>
                                 <text x="830" y="165" text-anchor="middle" fill="#0f766e" font-size="16" font-weight="700">חוץ/מציאות</text>
                             </g>
                         </svg>
@@ -21919,17 +21940,17 @@ async function setupConnectedBubblesTrainer() {
 
                     <div class="cbcal-bubble-row">
                         <button id="cbcal-inside-bubble" class="cbcal-bubble-btn cbcal-bubble-btn--inside" type="button">
-                            <h5>Inside - לב/גוף</h5>
+                            <h5>פנים · לב/גוף</h5>
                             <ul id="cbcal-inside-preview"></ul>
                         </button>
                         <button id="cbcal-outside-bubble" class="cbcal-bubble-btn cbcal-bubble-btn--outside" type="button">
-                            <h5>Outside - חוץ/מציאות</h5>
+                            <h5>חוץ · מציאות</h5>
                             <ul id="cbcal-outside-preview"></ul>
                         </button>
                     </div>
 
                     <div class="cbcal-center-card">
-                        <label for="cbcal-sentence-input">Spoken Sentence / משפט מדובר</label>
+                        <label for="cbcal-sentence-input">משפט מדובר</label>
                         <textarea id="cbcal-sentence-input" class="cbcal-sentence-input" rows="3"></textarea>
                     </div>
                 </div>
@@ -21937,31 +21958,31 @@ async function setupConnectedBubblesTrainer() {
                 <div class="cbcal-chip-rows">
                     <div class="cbcal-chip-row">
                         <div class="cbcal-chip-row-head">
-                            <strong>Row A - Add to Inside</strong>
-                            <button id="cbcal-undo-btn" class="btn btn-secondary" type="button">Undo</button>
+                            <strong>שורה א׳ · מוסיפים לפנים</strong>
+                            <button id="cbcal-undo-btn" class="btn btn-secondary" type="button">בטל</button>
                         </div>
                         <div id="cbcal-inside-chips" class="cbcal-chip-list"></div>
                     </div>
                     <div class="cbcal-chip-row">
-                        <div class="cbcal-chip-row-head"><strong>Row B - Calibrate Outside</strong></div>
+                        <div class="cbcal-chip-row-head"><strong>שורה ב׳ · מכיילים חוץ</strong></div>
                         <div id="cbcal-outside-chips" class="cbcal-chip-list"></div>
                     </div>
                 </div>
 
                 <div class="cbcal-meter">
                     <div class="cbcal-meter-row">
-                        <div class="cbcal-meter-row-head"><span>InsideMatch</span><strong id="cbcal-inside-score">0%</strong></div>
+                        <div class="cbcal-meter-row-head"><span>התאמת פנים</span><strong id="cbcal-inside-score">0%</strong></div>
                         <div class="cbcal-meter-track"><span id="cbcal-inside-fill" class="cbcal-meter-fill cbcal-meter-fill--inside"></span></div>
                     </div>
                     <div class="cbcal-meter-row">
-                        <div class="cbcal-meter-row-head"><span>OutsideMatch</span><strong id="cbcal-outside-score">0%</strong></div>
+                        <div class="cbcal-meter-row-head"><span>התאמת חוץ</span><strong id="cbcal-outside-score">0%</strong></div>
                         <div class="cbcal-meter-track"><span id="cbcal-outside-fill" class="cbcal-meter-fill cbcal-meter-fill--outside"></span></div>
                     </div>
-                    <div id="cbcal-balanced-pill" class="cbcal-balanced-pill">Balanced: עדיין לא</div>
+                    <div id="cbcal-balanced-pill" class="cbcal-balanced-pill">איזון: עדיין לא</div>
                 </div>
 
                 <div class="cbcal-transcript-wrap">
-                    <button id="cbcal-transcript-btn" class="btn btn-primary" type="button" disabled>Show Transcript (real-life)</button>
+                    <button id="cbcal-transcript-btn" class="btn btn-primary" type="button" disabled>פתח תמלול חיים אמיתיים</button>
                     <details id="cbcal-transcript" class="cbcal-transcript hidden">
                         <summary>תמלול חיים אמיתיים</summary>
                         <div id="cbcal-transcript-body" class="cbcal-transcript-body"></div>
@@ -22053,9 +22074,9 @@ async function setupConnectedBubblesTrainer() {
     };
 
     const stageLabels = {
-        intro: 'Intro',
-        context: 'Context',
-        main: 'Connected Bubbles'
+        intro: 'פתיחה',
+        context: 'הקשר',
+        main: 'בועות מקושרות'
     };
 
     const setStage = (stage) => {
@@ -22084,8 +22105,8 @@ async function setupConnectedBubblesTrainer() {
         if (els.outsideFill) els.outsideFill.style.width = `${Math.max(0, Math.min(100, state.outsideMatch))}%`;
         if (els.balancedPill) {
             els.balancedPill.textContent = state.balanced
-                ? 'Balanced: It sits / נושם'
-                : 'Balanced: עדיין לא (יעד 70-85 לכל צד)';
+                ? 'איזון: זה יושב ונושם'
+                : 'איזון: עדיין לא (יעד 70-85 לכל צד)';
         }
         if (els.transcriptBtn) els.transcriptBtn.disabled = !state.balanced;
         if (els.transcript) {
@@ -22226,7 +22247,7 @@ async function setupConnectedBubblesTrainer() {
         clearIntroTimer();
         setStage('context');
         renderContext();
-        setFeedback('בחר/י משפט מפתח. אם לא מתאים תקבל/י Try again.', 'info');
+        setFeedback('בחר/י משפט מפתח. אם לא מתאים תקבל/י "נסו שוב".', 'info');
     };
 
     const moveToMain = (pickedLine = '') => {
@@ -22356,7 +22377,7 @@ async function setupConnectedBubblesTrainer() {
         resetMainState('');
         startIntroCountdown();
         if (source === 'new') {
-            setFeedback('נטען מקרה חדש. מתחילים ב-Intro.', 'info');
+            setFeedback('נטען מקרה חדש. מתחילים בפתיחה.', 'info');
         }
     };
 
@@ -22405,7 +22426,7 @@ async function setupConnectedBubblesTrainer() {
         );
 
         if (!matchedCandidate) {
-            setFeedback('Try again', 'warn');
+            setFeedback('נסו שוב', 'warn');
             return;
         }
         moveToMain(pickedLine);
@@ -22452,13 +22473,13 @@ async function setupConnectedBubblesTrainer() {
     els.insideBubble?.addEventListener('click', () => {
         const seed = currentCase();
         if (!seed) return;
-        openModal('Inside - פנים/גוף', seed.inside_bullets);
+        openModal('פנים · לב/גוף', seed.inside_bullets);
     });
 
     els.outsideBubble?.addEventListener('click', () => {
         const seed = currentCase();
         if (!seed) return;
-        openModal('Outside - חוץ/מציאות', seed.outside_bullets);
+        openModal('חוץ · מציאות', seed.outside_bullets);
     });
 
     els.modalClose?.addEventListener('click', () => {

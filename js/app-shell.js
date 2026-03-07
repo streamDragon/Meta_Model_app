@@ -6,6 +6,7 @@
 
     const HOME_SCREEN_ID = 'home';
     const HOME_LAST_TAB_KEY = 'meta_home_last_tab_v1';
+    const SHELL_CONTINUE_KEY = 'meta_shell_continue_v1';
     const VERB_SCREEN_ID = 'practice-verb-unzip';
     const VERB_SESSION_KEY = 'verb_unzip_shell_session_started_v1';
     const VERB_WIZARD_KEY = 'verb_unzip_shell_wizard_seen_v1';
@@ -13,6 +14,99 @@
     const SCENARIO_WIZARD_KEY = 'scenario_shell_setup_seen_v1';
 
     const stateByScreen = Object.create(null);
+
+    function getShellCopy() {
+        return global.MetaShellCopy || {};
+    }
+
+    function getShellActionLabel(key, fallback = '') {
+        return String(getShellCopy()?.ACTIONS?.[key] || fallback || key || '').trim();
+    }
+
+    function getShellScreenCopy(screenId) {
+        return getShellCopy()?.SCREENS?.[screenId] || {};
+    }
+
+    function getShellRegistryEntry(screenId) {
+        try {
+            if (global.MetaShellRegistry && typeof global.MetaShellRegistry.getScreen === 'function') {
+                return global.MetaShellRegistry.getScreen(screenId);
+            }
+        } catch (_error) {
+            // fallback below
+        }
+        return null;
+    }
+
+    function normalizeContinueState(raw) {
+        const safe = raw && typeof raw === 'object' ? raw : {};
+        return {
+            screenId: typeof safe.screenId === 'string' ? safe.screenId : '',
+            screenTitle: typeof safe.screenTitle === 'string' ? safe.screenTitle : '',
+            panelId: typeof safe.panelId === 'string' ? safe.panelId : '',
+            panelTitle: typeof safe.panelTitle === 'string' ? safe.panelTitle : '',
+            at: typeof safe.at === 'string' ? safe.at : ''
+        };
+    }
+
+    function readContinueState() {
+        try {
+            return normalizeContinueState(JSON.parse(localStorage.getItem(SHELL_CONTINUE_KEY) || '{}'));
+        } catch (_error) {
+            return normalizeContinueState({});
+        }
+    }
+
+    function saveContinueState(nextState) {
+        const normalized = normalizeContinueState(nextState);
+        try {
+            localStorage.setItem(SHELL_CONTINUE_KEY, JSON.stringify(normalized));
+        } catch (_error) {
+            // noop
+        }
+        return normalized;
+    }
+
+    function rememberContinueState(screenId, partial) {
+        const safeScreenId = String(screenId || '').trim();
+        if (!safeScreenId || safeScreenId === HOME_SCREEN_ID) return readContinueState();
+        const previous = readContinueState();
+        const next = {
+            ...previous,
+            ...normalizeContinueState(partial || {}),
+            screenId: safeScreenId,
+            screenTitle: String(partial?.screenTitle || getShellScreenCopy(safeScreenId)?.title || getTabTitle(safeScreenId)).trim(),
+            at: new Date().toISOString()
+        };
+        return saveContinueState(next);
+    }
+
+    function readHomeLastVisitedTab() {
+        const continueState = readContinueState();
+        if (continueState.screenId && continueState.screenId !== HOME_SCREEN_ID) {
+            return {
+                tab: continueState.screenId,
+                at: continueState.at,
+                panelId: continueState.panelId,
+                panelTitle: continueState.panelTitle
+            };
+        }
+        try {
+            const raw = localStorage.getItem(HOME_LAST_TAB_KEY);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            const tab = String(parsed?.tab || '').trim();
+            if (!tab || tab === HOME_SCREEN_ID) return null;
+            return {
+                tab,
+                at: typeof parsed?.at === 'string' ? parsed.at : '',
+                panelId: '',
+                panelTitle: ''
+            };
+        } catch (_error) {
+            return null;
+        }
+    }
 
     function escapeHtml(value) {
         return String(value || '').replace(/[&<>'"]/g, (char) => {
@@ -35,22 +129,6 @@
         if (!safeId) return 'מסך';
         const btn = document.querySelector(`.tab-btn[data-tab="${safeId}"]`);
         return String(btn?.textContent || safeId).replace(/\s+/g, ' ').trim() || safeId;
-    }
-
-    function readHomeLastVisitedTab() {
-        try {
-            const raw = localStorage.getItem(HOME_LAST_TAB_KEY);
-            if (!raw) return null;
-            const parsed = JSON.parse(raw);
-            const tab = String(parsed?.tab || '').trim();
-            if (!tab || tab === HOME_SCREEN_ID) return null;
-            return {
-                tab,
-                at: typeof parsed?.at === 'string' ? parsed.at : ''
-            };
-        } catch (_error) {
-            return null;
-        }
     }
 
     function closeInlineFeatureMapIfNeeded() {
@@ -87,15 +165,17 @@
         }
     }
 
-    function recordPanelOpen(screenState, panelId) {
+    function recordPanelOpen(screenState, panelId, panelTitle = '') {
         if (!screenState) return;
         screenState.panelOpens[panelId] = (screenState.panelOpens[panelId] || 0) + 1;
         screenState.lastOpenedPanel = panelId;
+        screenState.lastOpenedPanelTitle = String(panelTitle || panelId || '').trim();
         screenState.lastPanelOpenAt = new Date().toISOString();
     }
 
     function createAppShellFrame(config) {
         const cfg = config && typeof config === 'object' ? config : {};
+        const shellCopy = getShellCopy();
         const root = document.createElement('section');
         root.className = 'app-shell';
         root.setAttribute('data-app-shell-screen', String(cfg.screenId || 'screen'));
@@ -103,18 +183,18 @@
         root.innerHTML = `
             <header class="app-shell-header">
                 <div class="app-shell-title-wrap">
-                    <p class="app-shell-kicker">LAB SHELL</p>
-                    <h2 class="app-shell-title">${escapeHtml(cfg.title || 'Lab')}</h2>
+                    <p class="app-shell-kicker">${escapeHtml(shellCopy?.SHELL?.kicker || 'מעטפת עבודה')}</p>
+                    <h2 class="app-shell-title">${escapeHtml(cfg.title || 'מסך')}</h2>
                     <p class="app-shell-subtitle">${escapeHtml(cfg.subtitle || '')}</p>
                 </div>
                 <div class="app-shell-actions" data-shell-header-actions></div>
             </header>
-            <section class="app-shell-metrics" data-shell-metrics aria-label="Metrics strip"></section>
+            <section class="app-shell-metrics" data-shell-metrics aria-label="שורת מדדים"></section>
             <div class="lab-container" data-lab-container>
                 <div class="lab-container-workspace" data-lab-workspace></div>
                 <div class="lab-container-actions" data-lab-actions></div>
                 <details class="lab-container-bottom" data-lab-bottom>
-                    <summary>Session history</summary>
+                    <summary>${escapeHtml(shellCopy?.SHELL?.bottomSummary || 'המשך ומצב')}</summary>
                     <div class="lab-container-bottom-body" data-lab-bottom-body></div>
                 </details>
             </div>
@@ -135,7 +215,7 @@
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = `btn btn-secondary shell-action-btn ${className}`.trim();
-        btn.innerHTML = `${icon ? `<span aria-hidden="true">${escapeHtml(icon)}</span>` : ''}<span>${escapeHtml(label || 'Action')}</span>`;
+        btn.innerHTML = `${icon ? `<span aria-hidden="true">${escapeHtml(icon)}</span>` : ''}<span>${escapeHtml(label || 'פעולה')}</span>`;
         if (typeof onClick === 'function') {
             btn.addEventListener('click', onClick);
         }
@@ -144,14 +224,15 @@
 
     function renderShellFallback(sectionEl, screenId, error) {
         if (!sectionEl || sectionEl.querySelector('[data-shell-error-fallback]')) return;
+        const shellCopy = getShellCopy();
 
         const fallback = document.createElement('div');
         fallback.className = 'shell-runtime-fallback card';
         fallback.setAttribute('data-shell-error-fallback', '1');
         fallback.innerHTML = `
-            <h3>Shell mode failed</h3>
-            <p>נסיון ממשק ה־Shell נכשל במסך הזה. אפשר להמשיך מיד ב־Legacy בלי לאבד פונקציונליות.</p>
-            <button type="button" class="btn btn-primary" data-shell-switch-legacy>Open Legacy Mode</button>
+            <h3>${escapeHtml(shellCopy?.SHELL?.fallbackTitle || 'המעבר למעטפת נכשל')}</h3>
+            <p>${escapeHtml(shellCopy?.SHELL?.fallbackBody || 'אפשר לעבור זמנית למצב הישן בלי לאבד את התרגול.')}</p>
+            <button type="button" class="btn btn-primary" data-shell-switch-legacy>${escapeHtml(shellCopy?.SHELL?.openLegacy || 'פתח מצב ישן')}</button>
         `;
 
         const button = fallback.querySelector('[data-shell-switch-legacy]');
@@ -212,20 +293,25 @@
                 icon: '⚡',
                 label: 'עומס',
                 percent: screenState.sessionStarted ? 28 : 54,
-                details: 'ב־Shell mode הסברים/הגדרות נפתחים מעל המסך, בלי להאריך את הדף.'
+                details: 'במצב מעטפת הסברים והגדרות נפתחים מעל המסך, בלי להאריך את הדף.'
             }
         ];
     }
 
     function openMetricOverlay(screenState, metric) {
         if (!screenState || !metric) return;
-        recordPanelOpen(screenState, `metric:${metric.id}`);
+        recordPanelOpen(screenState, `metric:${metric.id}`, metric.label);
+        rememberContinueState(screenState.id, {
+            panelId: `metric:${metric.id}`,
+            panelTitle: metric.label,
+            screenTitle: getShellScreenCopy(screenState.id)?.title || getTabTitle(screenState.id)
+        });
         renderHistoryFooter(screenState);
 
         const panel = document.createElement('article');
         panel.className = 'shell-overlay-content';
         panel.innerHTML = `
-            <p class="shell-overlay-kicker">Metric</p>
+            <p class="shell-overlay-kicker">מדד</p>
             <h4>${escapeHtml(metric.icon)} ${escapeHtml(metric.label)} · ${Number(metric.percent || 0)}%</h4>
             <p>${escapeHtml(metric.details || '')}</p>
             <p class="shell-overlay-note">הסבר זה מוצג ב־overlay כדי לשמור את סביבת העבודה יציבה.</p>
@@ -265,6 +351,303 @@
         metricsRoot.appendChild(fragment);
     }
 
+    function queryScoped(root, selector) {
+        if (!root || !selector) return [];
+        const safeSelector = String(selector || '').trim();
+        if (!safeSelector) return [];
+        try {
+            if (safeSelector.startsWith('>')) {
+                return Array.from(root.querySelectorAll(`:scope ${safeSelector}`));
+            }
+            return Array.from(root.querySelectorAll(safeSelector));
+        } catch (_error) {
+            return [];
+        }
+    }
+
+    function sanitizeCloneTree(root) {
+        if (!root || !(root instanceof Element)) return root;
+        stripIdsFromCloneTree(root);
+        const allNodes = [root, ...Array.from(root.querySelectorAll('*'))];
+        allNodes.forEach((node) => {
+            if (!(node instanceof HTMLElement)) return;
+            node.hidden = false;
+            node.removeAttribute('hidden');
+            node.removeAttribute('aria-hidden');
+            node.removeAttribute('aria-expanded');
+            node.classList.remove('hidden', 'shell-inline-hidden', 'opened-content', 'screen-read-guide-modal', 'rapid-explain-modal');
+            if (node.matches('details')) {
+                node.setAttribute('open', '');
+            }
+        });
+        root.querySelectorAll('.screen-read-guide-close, .rapid-explain-close, [data-guide-overlay-close], .overlay-close').forEach((node) => node.remove());
+        return root;
+    }
+
+    function buildGuidePanelContent(screenState, panel) {
+        const sourceId = String(panel?.guideId || screenState.id || '').trim();
+        const guideRoot = screenState.section?.querySelector(`.screen-read-guide[data-screen-guide="${sourceId}"]`)
+            || screenState.section?.querySelector('.screen-read-guide');
+        if (!guideRoot) {
+            const empty = document.createElement('article');
+            empty.className = 'shell-overlay-content';
+            empty.innerHTML = '<p>לא נמצא מדריך מסך זמין.</p>';
+            return empty;
+        }
+
+        const wrapper = document.createElement('article');
+        wrapper.className = 'shell-overlay-content';
+
+        const philosopher = guideRoot.querySelector('.screen-read-guide-philosopher-toggle');
+        const content = guideRoot.querySelector('.screen-read-guide-content');
+        const summary = guideRoot.querySelector('.screen-demo-dialogue-summary');
+        const dialogue = guideRoot.querySelector('.screen-demo-dialogue-box');
+
+        [philosopher, content, summary, dialogue].forEach((node) => {
+            if (!node) return;
+            wrapper.appendChild(sanitizeCloneTree(node.cloneNode(true)));
+        });
+
+        if (!wrapper.children.length) {
+            wrapper.innerHTML = '<p>לא נמצא תוכן מדריך זמין.</p>';
+        }
+        return wrapper;
+    }
+
+    function resolvePanelSourceRoot(screenState, panel) {
+        const sourceRoot = String(panel?.sourceRoot || 'workspace').trim();
+        if (sourceRoot === 'section') return screenState.section;
+        if (sourceRoot === 'document') return document;
+        return screenState.workspaceNode || screenState.section;
+    }
+
+    function buildSelectorsPanelContent(screenState, panel) {
+        const wrapper = document.createElement('article');
+        wrapper.className = 'shell-overlay-content';
+        const root = resolvePanelSourceRoot(screenState, panel);
+        const selectors = Array.isArray(panel?.selectors) ? panel.selectors : [];
+        let matched = 0;
+
+        selectors.forEach((selector) => {
+            queryScoped(root, selector).forEach((node) => {
+                if (!node) return;
+                wrapper.appendChild(sanitizeCloneTree(node.cloneNode(true)));
+                matched += 1;
+            });
+        });
+
+        if (!matched) {
+            const empty = document.createElement('p');
+            empty.textContent = 'אין כרגע תוכן זמין בחלון הזה.';
+            wrapper.appendChild(empty);
+        }
+        return wrapper;
+    }
+
+    function buildButtonsPanelContent(panel) {
+        const wrapper = document.createElement('article');
+        wrapper.className = 'shell-overlay-content';
+        if (panel?.description) {
+            const description = document.createElement('p');
+            description.textContent = panel.description;
+            wrapper.appendChild(description);
+        }
+
+        const actions = document.createElement('div');
+        actions.className = 'shell-overlay-actions';
+        (Array.isArray(panel?.buttons) ? panel.buttons : []).forEach((buttonCfg) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `btn ${buttonCfg?.style === 'primary' ? 'btn-primary' : 'btn-secondary'}`;
+            btn.textContent = String(buttonCfg?.label || 'פעולה').trim();
+            btn.addEventListener('click', () => {
+                const handlerName = String(buttonCfg?.handler || '').trim();
+                if (handlerName && typeof global[handlerName] === 'function') {
+                    global[handlerName]();
+                }
+            });
+            actions.appendChild(btn);
+        });
+        wrapper.appendChild(actions);
+        return wrapper;
+    }
+
+    function getGenericPanelById(screenState, panelId) {
+        const panels = Array.isArray(screenState?.config?.panels) ? screenState.config.panels : [];
+        return panels.find((panel) => String(panel?.id || '').trim() === String(panelId || '').trim()) || null;
+    }
+
+    function getPanelIcon(panelId) {
+        const id = String(panelId || '').trim();
+        if (id.includes('guide') || id.includes('help')) return '❔';
+        if (id.includes('history')) return '🕘';
+        if (id.includes('settings') || id.includes('setup')) return '⚙️';
+        if (id.includes('export')) return '📤';
+        if (id.includes('schema') || id.includes('blueprint')) return '🧩';
+        if (id.includes('menu')) return '☰';
+        if (id.includes('about') || id.includes('intro')) return 'ℹ';
+        if (id.includes('stats') || id.includes('performance')) return '📊';
+        return '•';
+    }
+
+    function renderGenericFooter(screenState) {
+        const body = screenState?.shell?.bottomBody;
+        if (!body) return;
+        const continueState = readContinueState();
+        const lastOpen = screenState.lastPanelOpenAt
+            ? new Date(screenState.lastPanelOpenAt).toLocaleString('he-IL')
+            : getShellCopy()?.SHELL?.lastOpenedAtNone || 'עדיין לא נרשמה פתיחה של חלון משנה.';
+
+        const panelText = screenState.lastOpenedPanelTitle
+            ? escapeHtml(screenState.lastOpenedPanelTitle)
+            : escapeHtml(getShellCopy()?.SHELL?.lastPanelNone || 'עדיין לא נפתח חלון משנה.');
+        const continueText = continueState.screenId
+            ? `${escapeHtml(continueState.screenTitle || getTabTitle(continueState.screenId))}${continueState.panelTitle ? ` · ${escapeHtml(continueState.panelTitle)}` : ''}`
+            : escapeHtml(getShellCopy()?.SHELL?.continueNone || 'אין נקודת המשך שמורה עדיין.');
+
+        body.innerHTML = `
+            <p><strong>המשך שמור:</strong> ${continueText}</p>
+            <p><strong>חלון אחרון במסך הזה:</strong> ${panelText}</p>
+            <p><strong>נפתח ב:</strong> ${escapeHtml(lastOpen)}</p>
+        `;
+    }
+
+    function renderGenericActionRail(screenState) {
+        const actionsRoot = screenState?.shell?.actions;
+        if (!actionsRoot) return;
+        actionsRoot.innerHTML = '';
+
+        const continueState = readContinueState();
+        if (!continueState.screenId || continueState.screenId === screenState.id) {
+            actionsRoot.hidden = true;
+            return;
+        }
+
+        actionsRoot.hidden = false;
+        const actionRow = document.createElement('div');
+        actionRow.className = 'shell-inline-actions home-shell-actions';
+        actionRow.appendChild(createActionButton({
+            label: `${getShellActionLabel('resume', 'המשך')}: ${continueState.screenTitle || getTabTitle(continueState.screenId)}`,
+            icon: '▶',
+            onClick: () => resumeContinueState()
+        }));
+        actionsRoot.appendChild(actionRow);
+    }
+
+    function applyScreenHideSelectors(screenState) {
+        if (!screenState) return;
+        const workspace = screenState.workspaceNode || screenState.section;
+        const section = screenState.section;
+        const workspaceSelectors = Array.isArray(screenState.config?.hideSelectors) ? screenState.config.hideSelectors : [];
+        const sectionSelectors = Array.isArray(screenState.config?.sectionHideSelectors) ? screenState.config.sectionHideSelectors : [];
+
+        workspaceSelectors.forEach((selector) => {
+            queryScoped(workspace, selector).forEach((node) => node.classList.add('shell-inline-hidden'));
+        });
+        sectionSelectors.forEach((selector) => {
+            queryScoped(section, selector).forEach((node) => node.classList.add('shell-inline-hidden'));
+        });
+    }
+
+    function openGenericPanelOverlay(screenState, panelId) {
+        const panel = getGenericPanelById(screenState, panelId);
+        if (!screenState || !panel) return false;
+        ensureOverlayProvider();
+        recordPanelOpen(screenState, panelId, panel.title);
+        rememberContinueState(screenState.id, {
+            panelId,
+            panelTitle: panel.title,
+            screenTitle: screenState.title
+        });
+        renderGenericFooter(screenState);
+
+        let content;
+        if (panel.type === 'guide') content = buildGuidePanelContent(screenState, panel);
+        else if (panel.type === 'buttons') content = buildButtonsPanelContent(panel);
+        else content = buildSelectorsPanelContent(screenState, panel);
+
+        global.MetaOverlayProvider.openOverlay({
+            type: `${screenState.id}-${panel.id}`,
+            title: panel.title || screenState.title,
+            size: panel.size || 'md',
+            closeOnBackdrop: true,
+            content
+        });
+        return true;
+    }
+
+    function mountGenericShell(screenId) {
+        const config = getShellRegistryEntry(screenId);
+        if (!config || config.adapter !== 'generic') return null;
+        const mode = getUiMode(screenId);
+        if (mode !== 'shell') return null;
+
+        const section = document.getElementById(screenId);
+        if (!section) return null;
+        if (stateByScreen[screenId]?.mounted) return stateByScreen[screenId];
+
+        try {
+            const container = section.querySelector(config.containerSelector) || section;
+            const workspaceNode = section.querySelector(config.workspaceSelector);
+            if (!workspaceNode) return null;
+
+            const shellCopy = getShellScreenCopy(screenId);
+            const shell = createAppShellFrame({
+                screenId,
+                title: shellCopy.title || getTabTitle(screenId),
+                subtitle: shellCopy.subtitle || ''
+            });
+            shell.metrics.hidden = true;
+
+            const screenState = {
+                id: screenId,
+                title: shellCopy.title || getTabTitle(screenId),
+                mode,
+                mounted: true,
+                config,
+                section,
+                container,
+                shell,
+                workspaceNode,
+                panelOpens: Object.create(null),
+                lastOpenedPanel: '',
+                lastOpenedPanelTitle: '',
+                lastPanelOpenAt: ''
+            };
+
+            const headerActions = Array.isArray(config.panels) ? config.panels : [];
+            headerActions.forEach((panel) => {
+                shell.headerActions.appendChild(createActionButton({
+                    label: panel.action || panel.title || 'פרטים',
+                    icon: getPanelIcon(panel.id),
+                    onClick: () => openGenericPanelOverlay(screenState, panel.id)
+                }));
+            });
+            shell.headerActions.appendChild(createActionButton({
+                label: getShellActionLabel('legacy', 'מצב ישן'),
+                icon: '↩',
+                className: 'shell-action-legacy',
+                onClick: () => global.location.assign(buildUiModeUrl(screenId, 'legacy'))
+            }));
+
+            shell.workspace.appendChild(workspaceNode);
+            container.prepend(shell.root);
+
+            section.classList.add('shell-screen-active');
+            section.setAttribute('data-ui-mode', 'shell');
+
+            applyScreenHideSelectors(screenState);
+            renderGenericActionRail(screenState);
+            renderGenericFooter(screenState);
+
+            stateByScreen[screenId] = screenState;
+            return screenState;
+        } catch (error) {
+            renderShellFallback(section, screenId, error);
+            return null;
+        }
+    }
+
     function restoreLauncherHome(screenState) {
         if (!screenState || !screenState.launcher || !screenState.launcherHost) return;
         if (!screenState.launcherHost.contains(screenState.launcher)) {
@@ -281,7 +664,12 @@
         const entryMode = opts.entry === true;
         const launcher = screenState.launcher;
 
-        recordPanelOpen(screenState, entryMode ? 'wizard' : 'settings');
+        recordPanelOpen(screenState, entryMode ? 'wizard' : 'settings', entryMode ? 'הגדרות פתיחה' : 'הגדרות');
+        rememberContinueState(screenState.id, {
+            panelId: entryMode ? 'wizard' : 'settings',
+            panelTitle: entryMode ? 'הגדרות פתיחה' : 'הגדרות',
+            screenTitle: getShellScreenCopy(screenState.id)?.title || getTabTitle(screenState.id)
+        });
         renderHistoryFooter(screenState);
 
         const wrapper = document.createElement('div');
@@ -289,7 +677,7 @@
 
         const title = document.createElement('p');
         title.className = 'shell-overlay-kicker';
-        title.textContent = entryMode ? 'Settings Wizard' : 'Settings';
+        title.textContent = entryMode ? 'הגדרות פתיחה' : 'הגדרות';
         wrapper.appendChild(title);
 
         const lead = document.createElement('p');
@@ -347,13 +735,18 @@
     function openVerbHelpOverlay(screenState) {
         if (!screenState) return;
         ensureOverlayProvider();
-        recordPanelOpen(screenState, 'help');
+        recordPanelOpen(screenState, 'help', 'עזרה');
+        rememberContinueState(screenState.id, {
+            panelId: 'help',
+            panelTitle: 'עזרה',
+            screenTitle: getShellScreenCopy(screenState.id)?.title || getTabTitle(screenState.id)
+        });
         renderHistoryFooter(screenState);
 
         const panel = document.createElement('article');
         panel.className = 'shell-overlay-content';
         panel.innerHTML = `
-            <p class="shell-overlay-kicker">Help</p>
+            <p class="shell-overlay-kicker">עזרה</p>
             <h4>${escapeHtml(screenState.helpCopy.title)}</h4>
             <p>${escapeHtml(screenState.helpCopy.subtitle)}</p>
             <p>${escapeHtml(screenState.helpCopy.note)}</p>
@@ -376,7 +769,12 @@
     function openVerbStatsOverlay(screenState) {
         if (!screenState) return;
         ensureOverlayProvider();
-        recordPanelOpen(screenState, 'stats');
+        recordPanelOpen(screenState, 'stats', 'נתונים');
+        rememberContinueState(screenState.id, {
+            panelId: 'stats',
+            panelTitle: 'נתונים',
+            screenTitle: getShellScreenCopy(screenState.id)?.title || getTabTitle(screenState.id)
+        });
         renderHistoryFooter(screenState);
 
         const panel = document.createElement('article');
@@ -385,13 +783,13 @@
             ? new Date(screenState.lastPanelOpenAt).toLocaleString('he-IL')
             : '—';
         panel.innerHTML = `
-            <p class="shell-overlay-kicker">Session Stats</p>
+            <p class="shell-overlay-kicker">נתונים</p>
             <ul class="shell-stats-list">
-                <li><strong>UI mode:</strong> ${escapeHtml(screenState.mode)}</li>
-                <li><strong>Session started:</strong> ${screenState.sessionStarted ? 'כן' : 'לא'}</li>
-                <li><strong>Last panel:</strong> ${escapeHtml(screenState.lastOpenedPanel || '—')}</li>
-                <li><strong>Last opened:</strong> ${escapeHtml(lastOpen)}</li>
-                <li><strong>Opens:</strong> settings ${screenState.panelOpens.settings || 0} | help ${screenState.panelOpens.help || 0} | stats ${screenState.panelOpens.stats || 0}</li>
+                <li><strong>מצב תצוגה:</strong> ${escapeHtml(screenState.mode)}</li>
+                <li><strong>הסשן התחיל:</strong> ${screenState.sessionStarted ? 'כן' : 'לא'}</li>
+                <li><strong>חלון אחרון:</strong> ${escapeHtml(screenState.lastOpenedPanelTitle || screenState.lastOpenedPanel || '—')}</li>
+                <li><strong>נפתח ב:</strong> ${escapeHtml(lastOpen)}</li>
+                <li><strong>פתיחות:</strong> הגדרות ${screenState.panelOpens.settings || 0} | עזרה ${screenState.panelOpens.help || 0} | נתונים ${screenState.panelOpens.stats || 0}</li>
             </ul>
         `;
 
@@ -412,9 +810,9 @@
             : 'עדיין לא נפתחו חלונות משנה';
 
         body.innerHTML = `
-            <p><strong>Last panel:</strong> ${escapeHtml(screenState.lastOpenedPanel || '—')}</p>
-            <p><strong>Opened at:</strong> ${escapeHtml(lastOpen)}</p>
-            <p><strong>Wizard shown:</strong> ${screenState.wizardShown ? 'כן' : 'לא'}</p>
+            <p><strong>חלון אחרון:</strong> ${escapeHtml(screenState.lastOpenedPanelTitle || screenState.lastOpenedPanel || '—')}</p>
+            <p><strong>נפתח ב:</strong> ${escapeHtml(lastOpen)}</p>
+            <p><strong>מסך פתיחה הוצג:</strong> ${screenState.wizardShown ? 'כן' : 'לא'}</p>
         `;
     }
 
@@ -426,12 +824,12 @@
             : 'עדיין לא נפתחו חלונות עזר';
         const lastVisited = readHomeLastVisitedTab();
         const lastVisitedText = lastVisited
-            ? `${escapeHtml(getTabTitle(lastVisited.tab))}${lastVisited.at ? ` · ${escapeHtml(new Date(lastVisited.at).toLocaleString('he-IL'))}` : ''}`
+            ? `${escapeHtml(getTabTitle(lastVisited.tab))}${lastVisited.panelTitle ? ` · ${escapeHtml(lastVisited.panelTitle)}` : ''}${lastVisited.at ? ` · ${escapeHtml(new Date(lastVisited.at).toLocaleString('he-IL'))}` : ''}`
             : 'אין מסך המשך שמור';
 
         body.innerHTML = `
             <p><strong>המשך אחרון:</strong> ${lastVisitedText}</p>
-            <p><strong>חלון אחרון:</strong> ${escapeHtml(screenState.lastOpenedPanel || '—')}</p>
+            <p><strong>חלון אחרון:</strong> ${escapeHtml(screenState.lastOpenedPanelTitle || screenState.lastOpenedPanel || '—')}</p>
             <p><strong>נפתח ב:</strong> ${escapeHtml(lastOverlay)}</p>
         `;
     }
@@ -439,18 +837,23 @@
     function openHomeHelpOverlay(screenState) {
         if (!screenState) return;
         ensureOverlayProvider();
-        recordPanelOpen(screenState, 'help');
+        recordPanelOpen(screenState, 'help', 'עזרה');
+        rememberContinueState(screenState.id, {
+            panelId: 'help',
+            panelTitle: 'עזרה',
+            screenTitle: getShellScreenCopy(screenState.id)?.title || getTabTitle(screenState.id)
+        });
         renderHomeFooter(screenState);
 
         const panel = document.createElement('article');
         panel.className = 'shell-overlay-content';
         panel.innerHTML = `
-            <p class="shell-overlay-kicker">Help</p>
+            <p class="shell-overlay-kicker">עזרה</p>
             <h4>איך לעבוד מדף הבית</h4>
             <p>דף הבית נשאר קצר: בוחרים מסלול אחד, נכנסים לתרגול, וחוזרים לכאן רק כדי לבחור את הצעד הבא.</p>
             <ol class="shell-help-list">
-                <li>התחל/י דרך אחת ה־CTA במסך הראשי או דרך ה־MENU המלא.</li>
-                <li>אם צריך הקשר, פתח/י About או Help ב־overlay בלי להאריך את הדף.</li>
+                <li>התחל/י דרך אחת ה־CTA במסך הראשי או דרך התפריט המלא.</li>
+                <li>אם צריך הקשר, פתח/י רקע או עזרה בשכבה בלי להאריך את הדף.</li>
                 <li>השתמש/י ב״המשך אחרון״ כדי לחזור ישר למסך שבו עצרת.</li>
             </ol>
         `;
@@ -467,19 +870,24 @@
     function openHomeAboutOverlay(screenState) {
         if (!screenState) return;
         ensureOverlayProvider();
-        recordPanelOpen(screenState, 'about');
+        recordPanelOpen(screenState, 'about', 'על המוצר');
+        rememberContinueState(screenState.id, {
+            panelId: 'about',
+            panelTitle: 'על המוצר',
+            screenTitle: getShellScreenCopy(screenState.id)?.title || getTabTitle(screenState.id)
+        });
         renderHomeFooter(screenState);
 
         const panel = document.createElement('article');
         panel.className = 'shell-overlay-content';
         panel.innerHTML = `
-            <p class="shell-overlay-kicker">About</p>
-            <h4>Meta Model Gym</h4>
-            <p>האפליקציה מרכזת תרגול של Meta Model: זיהוי מחיקות, עיוותים והכללות, ואז תרגום התובנה לשאלה או צעד מעשי.</p>
+            <p class="shell-overlay-kicker">רקע</p>
+            <h4>סביבת התרגול</h4>
+            <p>האפליקציה מרכזת תרגול מטה-מודל: זיהוי מחיקות, עיוותים והכללות, ואז תרגום התובנה לשאלה או צעד מעשי.</p>
             <ul class="shell-help-list">
-                <li><strong>Exercises:</strong> זיהוי מהיר ותרגול תגובה.</li>
-                <li><strong>Lab:</strong> עומק, פירוק ומיפוי לוגי.</li>
-                <li><strong>Execution:</strong> סימולציות ותרגום לפעולה.</li>
+                <li><strong>תרגול:</strong> זיהוי מהיר ותרגול תגובה.</li>
+                <li><strong>מעבדה:</strong> עומק, פירוק ומיפוי לוגי.</li>
+                <li><strong>ביצוע:</strong> סימולציות ותרגום לפעולה.</li>
             </ul>
         `;
 
@@ -489,7 +897,7 @@
         const openRouteBtn = document.createElement('button');
         openRouteBtn.type = 'button';
         openRouteBtn.className = 'btn btn-primary';
-        openRouteBtn.textContent = 'פתח מסך על הפרויקט';
+        openRouteBtn.textContent = 'פתח את מסך המוצר';
         openRouteBtn.addEventListener('click', () => {
             global.MetaOverlayProvider.closeOverlay('home-about-route');
             window.setTimeout(() => {
@@ -512,7 +920,7 @@
 
         global.MetaOverlayProvider.openOverlay({
             type: 'home-about',
-            title: 'על הפרויקט',
+            title: 'על המוצר',
             size: 'md',
             closeOnBackdrop: true,
             content: panel
@@ -522,7 +930,12 @@
     function openHomeMenuOverlay(screenState) {
         if (!screenState) return false;
         ensureOverlayProvider();
-        recordPanelOpen(screenState, 'menu');
+        recordPanelOpen(screenState, 'menu', 'תפריט');
+        rememberContinueState(screenState.id, {
+            panelId: 'menu',
+            panelTitle: 'תפריט',
+            screenTitle: getShellScreenCopy(screenState.id)?.title || getTabTitle(screenState.id)
+        });
         renderHomeFooter(screenState);
         closeInlineFeatureMapIfNeeded();
 
@@ -531,8 +944,8 @@
         const panel = document.createElement('article');
         panel.className = 'shell-overlay-content';
         panel.innerHTML = `
-            <p class="shell-overlay-kicker">Menu</p>
-            <h4>MENU מלא</h4>
+            <p class="shell-overlay-kicker">תפריט</p>
+            <h4>תפריט מלא</h4>
             <p>כל מסלולי האימון מרוכזים כאן, בלי להאריך את דף הבית.</p>
         `;
 
@@ -552,13 +965,13 @@
             panel.appendChild(clone);
         } else {
             const fallback = document.createElement('p');
-            fallback.textContent = 'תוכן ה־MENU לא זמין כרגע.';
+            fallback.textContent = 'תוכן התפריט לא זמין כרגע.';
             panel.appendChild(fallback);
         }
 
         global.MetaOverlayProvider.openOverlay({
             type: 'home-menu',
-            title: 'MENU מלא',
+            title: 'תפריט מלא',
             size: 'xl',
             closeOnBackdrop: true,
             content: panel
@@ -585,11 +998,7 @@
             label: `המשך: ${getTabTitle(lastVisited.tab)}`,
             icon: '▶',
             className: 'home-shell-resume-btn',
-            onClick: () => {
-                if (typeof global.navigateTo === 'function') {
-                    global.navigateTo(lastVisited.tab, { playSound: true, scrollToTop: true });
-                }
-            }
+            onClick: () => resumeContinueState()
         });
         actionRow.appendChild(resumeBtn);
         actionsRoot.appendChild(actionRow);
@@ -614,8 +1023,8 @@
 
             const shell = createAppShellFrame({
                 screenId: HOME_SCREEN_ID,
-                title: 'Home Hub',
-                subtitle: 'דף בית קומפקטי. MENU, Help ו-About נפתחים ב-overlay כדי לשמור את הניווט קצר.'
+                title: getShellScreenCopy(HOME_SCREEN_ID)?.title || 'מסך הבית',
+                subtitle: getShellScreenCopy(HOME_SCREEN_ID)?.subtitle || 'דף בית קומפקטי. תפריט, עזרה ורקע נפתחים בשכבה.'
             });
             shell.metrics.hidden = true;
             const bottomSummary = shell.bottom.querySelector('summary');
@@ -637,15 +1046,16 @@
                 workspace,
                 panelOpens: Object.create(null),
                 lastOpenedPanel: '',
+                lastOpenedPanelTitle: '',
                 lastPanelOpenAt: ''
             };
 
             const headerActions = [
-                createActionButton({ label: 'MENU', icon: '☰', onClick: () => openHomeMenuOverlay(screenState) }),
-                createActionButton({ label: 'About', icon: 'ℹ', onClick: () => openHomeAboutOverlay(screenState) }),
-                createActionButton({ label: 'Help', icon: '?', onClick: () => openHomeHelpOverlay(screenState) }),
+                createActionButton({ label: 'תפריט', icon: '☰', onClick: () => openHomeMenuOverlay(screenState) }),
+                createActionButton({ label: 'רקע', icon: 'ℹ', onClick: () => openHomeAboutOverlay(screenState) }),
+                createActionButton({ label: 'עזרה', icon: '?', onClick: () => openHomeHelpOverlay(screenState) }),
                 createActionButton({
-                    label: 'Legacy',
+                    label: getShellActionLabel('legacy', 'מצב ישן'),
                     icon: '↩',
                     className: 'shell-action-legacy',
                     onClick: () => global.location.assign(buildUiModeUrl(HOME_SCREEN_ID, 'legacy'))
@@ -676,6 +1086,95 @@
         const screenState = stateByScreen[HOME_SCREEN_ID] || mountHomeShell();
         if (!screenState || screenState.mode !== 'shell') return false;
         return openHomeMenuOverlay(screenState);
+    }
+
+    function restoreContinuePanel(screenState, panelId) {
+        if (!screenState || !panelId) return false;
+        const safePanelId = String(panelId || '').trim();
+        if (!safePanelId) return false;
+
+        if (screenState.id === VERB_SCREEN_ID) {
+            if (safePanelId === 'wizard') {
+                openVerbSettingsOverlay(screenState, { entry: true });
+                return true;
+            }
+            if (safePanelId === 'settings') {
+                openVerbSettingsOverlay(screenState, { entry: false });
+                return true;
+            }
+            if (safePanelId === 'help') {
+                openVerbHelpOverlay(screenState);
+                return true;
+            }
+            if (safePanelId === 'stats') {
+                openVerbStatsOverlay(screenState);
+                return true;
+            }
+            if (safePanelId.startsWith('metric:')) {
+                const metricId = safePanelId.slice('metric:'.length);
+                const metric = createMetricDefinitions(screenState).find((item) => item.id === metricId);
+                if (metric) {
+                    openMetricOverlay(screenState, metric);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        if (screenState.id === SCENARIO_SCREEN_ID) {
+            const mappedPanelId = safePanelId === 'wizard' ? 'domain' : safePanelId;
+            openScenarioPanelById(screenState, mappedPanelId);
+            return true;
+        }
+
+        if (screenState.id === HOME_SCREEN_ID) {
+            if (safePanelId === 'menu') return openHomeMenuOverlay(screenState);
+            if (safePanelId === 'about') {
+                openHomeAboutOverlay(screenState);
+                return true;
+            }
+            if (safePanelId === 'help') {
+                openHomeHelpOverlay(screenState);
+                return true;
+            }
+            return false;
+        }
+
+        return openGenericPanelOverlay(screenState, safePanelId);
+    }
+
+    function resumeContinueState() {
+        const continueState = readContinueState();
+        if (!continueState.screenId) return false;
+        if (typeof global.navigateTo !== 'function') {
+            global.location.assign(buildUiModeUrl(continueState.screenId, 'shell'));
+            return true;
+        }
+
+        global.navigateTo(continueState.screenId, { playSound: true, scrollToTop: true });
+        if (!continueState.panelId) return true;
+
+        global.setTimeout(() => {
+            const screenState = stateByScreen[continueState.screenId] || mountScreenShell(continueState.screenId);
+            if (!screenState) return;
+            restoreContinuePanel(screenState, continueState.panelId);
+        }, 90);
+        return true;
+    }
+
+    function mountScreenShell(screenId) {
+        const safeId = String(screenId || '').trim();
+        if (!safeId) return null;
+        if (safeId === HOME_SCREEN_ID) return mountHomeShell();
+        if (safeId === VERB_SCREEN_ID) return mountVerbUnzipShell();
+        if (safeId === SCENARIO_SCREEN_ID) return mountScenarioTrainerShell();
+        return mountGenericShell(safeId);
+    }
+
+    function isShellModeScreen(screenId) {
+        const safeId = String(screenId || '').trim();
+        if (!safeId) return false;
+        return getUiMode(safeId) === 'shell' && Boolean(getShellRegistryEntry(safeId) || safeId === VERB_SCREEN_ID || safeId === SCENARIO_SCREEN_ID || safeId === HOME_SCREEN_ID);
     }
 
     function mountVerbUnzipShell() {
@@ -711,8 +1210,8 @@
 
             const shell = createAppShellFrame({
                 screenId: VERB_SCREEN_ID,
-                title: 'פועל לא מפורט (Unzip)',
-                subtitle: 'Primary workspace stays visible. Settings/help/stats open in overlay.'
+                title: getShellScreenCopy(VERB_SCREEN_ID)?.title || 'מרכז כלים',
+                subtitle: getShellScreenCopy(VERB_SCREEN_ID)?.subtitle || 'סביבת העבודה נשארת יציבה. הגדרות, עזרה ונתונים נפתחים בשכבה.'
             });
 
             const launcherHost = document.createElement('div');
@@ -757,11 +1256,11 @@
             shell.actions.appendChild(actionPrimary);
 
             const headerActions = [
-                createActionButton({ label: 'Settings', icon: '⚙️', onClick: () => openVerbSettingsOverlay(screenState, { entry: false }) }),
-                createActionButton({ label: 'Help', icon: '?', onClick: () => openVerbHelpOverlay(screenState) }),
-                createActionButton({ label: 'Stats', icon: '📈', onClick: () => openVerbStatsOverlay(screenState) }),
+                createActionButton({ label: 'הגדרות', icon: '⚙️', onClick: () => openVerbSettingsOverlay(screenState, { entry: false }) }),
+                createActionButton({ label: 'עזרה', icon: '?', onClick: () => openVerbHelpOverlay(screenState) }),
+                createActionButton({ label: 'נתונים', icon: '📈', onClick: () => openVerbStatsOverlay(screenState) }),
                 createActionButton({
-                    label: 'Legacy',
+                    label: getShellActionLabel('legacy', 'מצב ישן'),
                     icon: '↩',
                     className: 'shell-action-legacy',
                     onClick: () => global.location.assign(buildUiModeUrl(VERB_SCREEN_ID, 'legacy'))
@@ -790,6 +1289,7 @@
                 wizardShown: readSessionFlag(VERB_WIZARD_KEY),
                 panelOpens: Object.create(null),
                 lastOpenedPanel: '',
+                lastOpenedPanelTitle: '',
                 lastPanelOpenAt: ''
             };
 
@@ -826,7 +1326,12 @@
         ensureOverlayProvider();
 
         const opts = options && typeof options === 'object' ? options : {};
-        recordPanelOpen(screenState, panelId);
+        recordPanelOpen(screenState, panelId, opts.title || panelId);
+        rememberContinueState(screenState.id, {
+            panelId,
+            panelTitle: opts.title || panelId,
+            screenTitle: getShellScreenCopy(screenState.id)?.title || getTabTitle(screenState.id)
+        });
         renderHistoryFooter(screenState);
 
         if (!screenState.overlayHost.contains(panel)) {
@@ -848,7 +1353,7 @@
 
         global.MetaOverlayProvider.openOverlay({
             type: `scenario-${panelId}`,
-            title: opts.title || 'Scenario panel',
+            title: opts.title || 'חלון משנה',
             size: opts.size || 'lg',
             closeOnBackdrop: true,
             content: wrapper,
@@ -884,9 +1389,9 @@
             domain: { title: 'הגדרות פתיחה', size: 'lg' },
             settings: { title: 'הגדרות', size: 'lg' },
             history: { title: 'היסטוריית סצנות', size: 'lg' },
-            blueprint: { title: 'Action Map + Blueprint', size: 'xl' }
+            blueprint: { title: 'מפת פעולה + בונה מהלך', size: 'xl' }
         };
-        const baseMeta = panelMeta[panelId] || { title: 'Scenario panel', size: 'lg' };
+        const baseMeta = panelMeta[panelId] || { title: 'חלון משנה', size: 'lg' };
         const merged = { ...baseMeta, ...(options && typeof options === 'object' ? options : {}) };
         openScenarioPanelOverlay(screenState, panelId, merged);
     }
@@ -917,8 +1422,8 @@
 
             const shell = createAppShellFrame({
                 screenId: SCENARIO_SCREEN_ID,
-                title: 'Scenario Trainer / פועל לא-מפורט',
-                subtitle: 'Primary = current scene action. Secondary panels open in overlay.'
+                title: getShellScreenCopy(SCENARIO_SCREEN_ID)?.title || 'סימולטור סצנות',
+                subtitle: getShellScreenCopy(SCENARIO_SCREEN_ID)?.subtitle || 'הסצנה הפעילה נשארת במרכז. מסכי העזר נפתחים בשכבה.'
             });
 
             const inlineHost = document.createElement('div');
@@ -968,6 +1473,7 @@
                 wizardShown: readSessionFlag(SCENARIO_WIZARD_KEY),
                 panelOpens: Object.create(null),
                 lastOpenedPanel: '',
+                lastOpenedPanelTitle: '',
                 lastPanelOpenAt: ''
             };
 
@@ -986,18 +1492,18 @@
                     })
                 }),
                 createActionButton({
-                    label: 'Action Map',
+                    label: 'מפת פעולה',
                     icon: '🧭',
                     onClick: () => openScenarioPanelById(screenState, 'blueprint', {
-                        title: 'Action Map: TOTE + Loop',
+                        title: 'מפת פעולה: TOTE + Loop',
                         scrollToSelector: '.scenario-tote-map'
                     })
                 }),
                 createActionButton({
-                    label: 'Blueprint',
+                    label: 'מהלך',
                     icon: '🧱',
                     onClick: () => openScenarioPanelById(screenState, 'blueprint', {
-                        title: 'Blueprint קומפקטי',
+                        title: 'בונה מהלך קומפקטי',
                         scrollToSelector: '.scenario-blueprint-display'
                     })
                 })
@@ -1005,10 +1511,10 @@
             shell.actions.appendChild(toolbar);
 
             const headerActions = [
-                createActionButton({ label: 'Setup', icon: '⚙️', onClick: () => openScenarioPanelById(screenState, 'domain') }),
-                createActionButton({ label: 'History', icon: '🕘', onClick: () => openScenarioPanelById(screenState, 'history') }),
+                createActionButton({ label: 'פתיחה', icon: '⚙️', onClick: () => openScenarioPanelById(screenState, 'domain') }),
+                createActionButton({ label: 'היסטוריה', icon: '🕘', onClick: () => openScenarioPanelById(screenState, 'history') }),
                 createActionButton({
-                    label: 'Legacy',
+                    label: getShellActionLabel('legacy', 'מצב ישן'),
                     icon: '↩',
                     className: 'shell-action-legacy',
                     onClick: () => global.location.assign(buildUiModeUrl(SCENARIO_SCREEN_ID, 'legacy'))
@@ -1084,7 +1590,7 @@
         const panel = document.createElement('article');
         panel.className = 'shell-overlay-content';
         panel.innerHTML = `
-            <p class="shell-overlay-kicker">Safety</p>
+            <p class="shell-overlay-kicker">בטיחות</p>
             <h4>נדרש עצירה לפני המשך התרגול</h4>
             <p>זיהינו נוסח שיכול להצביע על מצוקה חריפה. עצרו רגע ובדקו תמיכה מיידית.</p>
             <p>${isHebrew ? 'בישראל: אם יש סכנה מיידית התקשרו 100. לקו ער"ן: 1201 (24/7).' : 'If there is immediate danger call 911. You can also call/text 988 (24/7).'}</p>
@@ -1142,6 +1648,9 @@
             const screenState = stateByScreen[VERB_SCREEN_ID] || mountVerbUnzipShell();
             if (!screenState || screenState.mode !== 'shell') return;
 
+            rememberContinueState(id, {
+                screenTitle: getShellScreenCopy(id)?.title || getTabTitle(id)
+            });
             renderHistoryFooter(screenState);
             renderMetrics(screenState);
 
@@ -1159,6 +1668,9 @@
             const screenState = stateByScreen[SCENARIO_SCREEN_ID] || mountScenarioTrainerShell();
             if (!screenState || screenState.mode !== 'shell') return;
 
+            rememberContinueState(id, {
+                screenTitle: getShellScreenCopy(id)?.title || getTabTitle(id)
+            });
             renderHistoryFooter(screenState);
             if (!screenState.currentInlineScreen) {
                 showScenarioInlineScreen(screenState, 'play');
@@ -1176,7 +1688,44 @@
                     }
                 }
             }
+            return;
         }
+
+        const registryEntry = getShellRegistryEntry(id);
+        if (!registryEntry || registryEntry.adapter !== 'generic' || getUiMode(id) !== 'shell') {
+            return;
+        }
+
+        const screenState = stateByScreen[id] || mountGenericShell(id);
+        if (!screenState || screenState.mode !== 'shell') return;
+
+        rememberContinueState(id, {
+            screenTitle: getShellScreenCopy(id)?.title || getTabTitle(id)
+        });
+        applyScreenHideSelectors(screenState);
+        renderGenericActionRail(screenState);
+        renderGenericFooter(screenState);
+    }
+
+    function bootstrapShellScreens() {
+        mountHomeShell();
+        mountVerbUnzipShell();
+        mountScenarioTrainerShell();
+    }
+
+    function hasMountedShellScreens() {
+        return Object.values(stateByScreen).some((screenState) => screenState?.mounted);
+    }
+
+    function listShellScreenIds() {
+        try {
+            if (global.MetaShellRegistry && typeof global.MetaShellRegistry.getAll === 'function') {
+                return Object.keys(global.MetaShellRegistry.getAll() || {});
+            }
+        } catch (_error) {
+            // noop
+        }
+        return [HOME_SCREEN_ID, VERB_SCREEN_ID, SCENARIO_SCREEN_ID];
     }
 
     function bootstrap() {
@@ -1186,10 +1735,8 @@
             console.warn('Overlay provider not ready yet', error);
         }
 
-        const homeState = mountHomeShell();
-        const verbState = mountVerbUnzipShell();
-        const scenarioState = mountScenarioTrainerShell();
-        if (!homeState && !verbState && !scenarioState) return;
+        bootstrapShellScreens();
+        if (!hasMountedShellScreens() && !listShellScreenIds().some((screenId) => getUiMode(screenId) === 'shell')) return;
 
         const activeTab = document.querySelector('.tab-btn.active')?.getAttribute('data-tab') || 'home';
         notifyTabActivated(activeTab);
@@ -1198,11 +1745,14 @@
     global.MetaAppShell = Object.freeze({
         bootstrap,
         notifyTabActivated,
+        resumeContinueState,
         openHomeMenu,
         isHomeShellActive,
+        isShellModeScreen,
         mountHomeShell,
         mountVerbUnzipShell,
         mountScenarioTrainerShell,
+        mountScreenShell,
         handleScenarioScreenChange,
         handleScenarioSafetyNotice,
         createAppShellFrame,

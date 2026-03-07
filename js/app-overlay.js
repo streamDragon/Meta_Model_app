@@ -242,7 +242,7 @@
                 <section class="overlay-panel overlay-panel-size-md" role="dialog" aria-modal="true" aria-labelledby="${TITLE_ID}" tabindex="-1">
                     <header class="overlay-head">
                         <h3 id="${TITLE_ID}" class="overlay-title">חלון</h3>
-                        <button type="button" class="overlay-close" data-overlay-close aria-label="Close overlay">×</button>
+                        <button type="button" class="overlay-close" data-overlay-close aria-label="סגירה">×</button>
                     </header>
                     <div class="overlay-body" data-overlay-body></div>
                 </section>
