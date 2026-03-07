@@ -53,19 +53,19 @@ body {
     position: relative;
 }
 
-header {
+.container > header {
     background: linear-gradient(135deg, #0f766e 0%, #0369a1 60%, #0284c7 100%);
     color: white;
     padding: 18px 14px;
     text-align: center;
 }
 
-header h1 {
+.container > header h1 {
     font-size: clamp(1.45rem, 2.7vw, 1.85rem);
     margin-bottom: 0;
 }
 
-header p {
+.container > header > p {
     display: none;
     font-size: 0.92rem;
     opacity: 0.9;
@@ -1039,7 +1039,7 @@ body.embed-mode .container {
     box-shadow: 0 20px 42px rgba(15, 23, 42, 0.16);
 }
 
-body.embed-mode header {
+body.embed-mode .container > header {
     display: none;
 }
 
@@ -2668,7 +2668,7 @@ input[type="reset"] {
     padding-top: 10px;
 }
 
-body.compact-header header {
+body.compact-header .container > header {
     display: none;
 }
 
@@ -10179,11 +10179,11 @@ a:hover {
         max-height: min(58vh, 520px);
     }
 
-    header h1 {
+    .container > header h1 {
         font-size: 1.8em;
     }
 
-    header {
+    .container > header {
         padding-top: calc(28px + var(--safe-top));
     }
 

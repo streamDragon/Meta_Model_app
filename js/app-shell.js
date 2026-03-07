@@ -14,6 +14,7 @@
     const SCENARIO_WIZARD_KEY = 'scenario_shell_setup_seen_v1';
 
     const stateByScreen = Object.create(null);
+    const pendingEntryOverlayTimers = Object.create(null);
 
     function getShellCopy() {
         return global.MetaShellCopy || {};
@@ -71,13 +72,24 @@
         const safeScreenId = String(screenId || '').trim();
         if (!safeScreenId || safeScreenId === HOME_SCREEN_ID) return readContinueState();
         const previous = readContinueState();
+        const safePartial = partial && typeof partial === 'object' ? partial : {};
+        const preservePanel = previous.screenId === safeScreenId;
         const next = {
-            ...previous,
-            ...normalizeContinueState(partial || {}),
             screenId: safeScreenId,
-            screenTitle: String(partial?.screenTitle || getShellScreenCopy(safeScreenId)?.title || getTabTitle(safeScreenId)).trim(),
+            screenTitle: String(safePartial.screenTitle || getShellScreenCopy(safeScreenId)?.title || getTabTitle(safeScreenId)).trim(),
+            panelId: preservePanel ? previous.panelId : '',
+            panelTitle: preservePanel ? previous.panelTitle : '',
             at: new Date().toISOString()
         };
+        if (Object.prototype.hasOwnProperty.call(safePartial, 'panelId')) {
+            next.panelId = typeof safePartial.panelId === 'string' ? safePartial.panelId : '';
+            if (!next.panelId && !Object.prototype.hasOwnProperty.call(safePartial, 'panelTitle')) {
+                next.panelTitle = '';
+            }
+        }
+        if (Object.prototype.hasOwnProperty.call(safePartial, 'panelTitle')) {
+            next.panelTitle = typeof safePartial.panelTitle === 'string' ? safePartial.panelTitle : '';
+        }
         return saveContinueState(next);
     }
 
@@ -129,6 +141,23 @@
         if (!safeId) return 'מסך';
         const btn = document.querySelector(`.tab-btn[data-tab="${safeId}"]`);
         return String(btn?.textContent || safeId).replace(/\s+/g, ' ').trim() || safeId;
+    }
+
+    function getActiveTabId() {
+        return String(document.querySelector('.tab-content.active')?.id || '').trim();
+    }
+
+    function scheduleEntryOverlay(screenId, openFn) {
+        const safeScreenId = String(screenId || '').trim();
+        if (!safeScreenId || typeof openFn !== 'function') return;
+        if (pendingEntryOverlayTimers[safeScreenId]) {
+            global.clearTimeout(pendingEntryOverlayTimers[safeScreenId]);
+        }
+        pendingEntryOverlayTimers[safeScreenId] = global.setTimeout(() => {
+            pendingEntryOverlayTimers[safeScreenId] = 0;
+            if (getActiveTabId() !== safeScreenId) return;
+            openFn();
+        }, 0);
     }
 
     function closeInlineFeatureMapIfNeeded() {
@@ -1657,9 +1686,11 @@
             if (!screenState.wizardShown) {
                 screenState.wizardShown = true;
                 writeSessionFlag(VERB_WIZARD_KEY, true);
-                if (!global.MetaOverlayProvider || !global.MetaOverlayProvider.isOpen || !global.MetaOverlayProvider.isOpen()) {
-                    openVerbSettingsOverlay(screenState, { entry: true });
-                }
+                scheduleEntryOverlay(VERB_SCREEN_ID, () => {
+                    if (!global.MetaOverlayProvider || !global.MetaOverlayProvider.isOpen || !global.MetaOverlayProvider.isOpen()) {
+                        openVerbSettingsOverlay(screenState, { entry: true });
+                    }
+                });
             }
             return;
         }
@@ -1679,14 +1710,16 @@
             if (!screenState.wizardShown) {
                 screenState.wizardShown = true;
                 writeSessionFlag(SCENARIO_WIZARD_KEY, true);
-                if (!global.MetaOverlayProvider || !global.MetaOverlayProvider.isOpen || !global.MetaOverlayProvider.isOpen()) {
-                    const setupButton = document.getElementById('scenario-home-scenes');
-                    if (setupButton) {
-                        setupButton.click();
-                    } else {
-                        openScenarioPanelById(screenState, 'domain');
+                scheduleEntryOverlay(SCENARIO_SCREEN_ID, () => {
+                    if (!global.MetaOverlayProvider || !global.MetaOverlayProvider.isOpen || !global.MetaOverlayProvider.isOpen()) {
+                        const setupButton = document.getElementById('scenario-home-scenes');
+                        if (setupButton) {
+                            setupButton.click();
+                        } else {
+                            openScenarioPanelById(screenState, 'domain');
+                        }
                     }
-                }
+                });
             }
             return;
         }
