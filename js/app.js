@@ -3163,6 +3163,14 @@ function setFeatureMapToggleOpen(isOpen) {
 }
 
 function openFeatureMapMenu() {
+    if (window.MetaAppShell
+        && typeof window.MetaAppShell.isHomeShellActive === 'function'
+        && window.MetaAppShell.isHomeShellActive()
+        && typeof window.MetaAppShell.openHomeMenu === 'function') {
+        const handled = window.MetaAppShell.openHomeMenu();
+        if (handled) return;
+    }
+
     const featureMap = document.getElementById('feature-map-toggle');
     if (!featureMap) return;
     setFeatureMapToggleOpen(true);
@@ -3172,11 +3180,25 @@ function setupFeatureMapOverlayControls() {
     const featureMap = document.getElementById('feature-map-toggle');
     if (!featureMap || featureMap.dataset.boundOverlayFeatureMap === 'true') return;
     featureMap.dataset.boundOverlayFeatureMap = 'true';
+    const summary = featureMap.querySelector('summary');
 
     const openBtn = document.getElementById('home-open-feature-map');
     if (openBtn && openBtn.dataset.boundFeatureMapOpen !== 'true') {
         openBtn.dataset.boundFeatureMapOpen = 'true';
         openBtn.addEventListener('click', () => openFeatureMapMenu());
+    }
+
+    if (summary && summary.dataset.boundFeatureMapSummaryShell !== 'true') {
+        summary.dataset.boundFeatureMapSummaryShell = 'true';
+        summary.addEventListener('click', (event) => {
+            if (!window.MetaAppShell
+                || typeof window.MetaAppShell.isHomeShellActive !== 'function'
+                || !window.MetaAppShell.isHomeShellActive()) {
+                return;
+            }
+            event.preventDefault();
+            openFeatureMapMenu();
+        });
     }
 
     featureMap.addEventListener('toggle', () => {

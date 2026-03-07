@@ -4,6 +4,8 @@
     if (!global) return;
     if (global.MetaAppShell && typeof global.MetaAppShell.bootstrap === 'function') return;
 
+    const HOME_SCREEN_ID = 'home';
+    const HOME_LAST_TAB_KEY = 'meta_home_last_tab_v1';
     const VERB_SCREEN_ID = 'practice-verb-unzip';
     const VERB_SESSION_KEY = 'verb_unzip_shell_session_started_v1';
     const VERB_WIZARD_KEY = 'verb_unzip_shell_wizard_seen_v1';
@@ -20,6 +22,44 @@
             if (char === '"') return '&quot;';
             return '&#39;';
         });
+    }
+
+    function stripIdsFromCloneTree(root) {
+        if (!root || !(root instanceof Element)) return;
+        if (root.hasAttribute('id')) root.removeAttribute('id');
+        root.querySelectorAll('[id]').forEach((node) => node.removeAttribute('id'));
+    }
+
+    function getTabTitle(tabId) {
+        const safeId = String(tabId || '').trim();
+        if (!safeId) return 'מסך';
+        const btn = document.querySelector(`.tab-btn[data-tab="${safeId}"]`);
+        return String(btn?.textContent || safeId).replace(/\s+/g, ' ').trim() || safeId;
+    }
+
+    function readHomeLastVisitedTab() {
+        try {
+            const raw = localStorage.getItem(HOME_LAST_TAB_KEY);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            const tab = String(parsed?.tab || '').trim();
+            if (!tab || tab === HOME_SCREEN_ID) return null;
+            return {
+                tab,
+                at: typeof parsed?.at === 'string' ? parsed.at : ''
+            };
+        } catch (_error) {
+            return null;
+        }
+    }
+
+    function closeInlineFeatureMapIfNeeded() {
+        const featureMap = document.getElementById('feature-map-toggle');
+        if (!featureMap) return;
+        if (featureMap.open) {
+            featureMap.removeAttribute('open');
+        }
+        document.body.classList.remove('feature-map-open');
     }
 
     function getUiMode(screenId) {
@@ -376,6 +416,266 @@
             <p><strong>Opened at:</strong> ${escapeHtml(lastOpen)}</p>
             <p><strong>Wizard shown:</strong> ${screenState.wizardShown ? 'כן' : 'לא'}</p>
         `;
+    }
+
+    function renderHomeFooter(screenState) {
+        const body = screenState?.shell?.bottomBody;
+        if (!body) return;
+        const lastOverlay = screenState.lastPanelOpenAt
+            ? new Date(screenState.lastPanelOpenAt).toLocaleString('he-IL')
+            : 'עדיין לא נפתחו חלונות עזר';
+        const lastVisited = readHomeLastVisitedTab();
+        const lastVisitedText = lastVisited
+            ? `${escapeHtml(getTabTitle(lastVisited.tab))}${lastVisited.at ? ` · ${escapeHtml(new Date(lastVisited.at).toLocaleString('he-IL'))}` : ''}`
+            : 'אין מסך המשך שמור';
+
+        body.innerHTML = `
+            <p><strong>המשך אחרון:</strong> ${lastVisitedText}</p>
+            <p><strong>חלון אחרון:</strong> ${escapeHtml(screenState.lastOpenedPanel || '—')}</p>
+            <p><strong>נפתח ב:</strong> ${escapeHtml(lastOverlay)}</p>
+        `;
+    }
+
+    function openHomeHelpOverlay(screenState) {
+        if (!screenState) return;
+        ensureOverlayProvider();
+        recordPanelOpen(screenState, 'help');
+        renderHomeFooter(screenState);
+
+        const panel = document.createElement('article');
+        panel.className = 'shell-overlay-content';
+        panel.innerHTML = `
+            <p class="shell-overlay-kicker">Help</p>
+            <h4>איך לעבוד מדף הבית</h4>
+            <p>דף הבית נשאר קצר: בוחרים מסלול אחד, נכנסים לתרגול, וחוזרים לכאן רק כדי לבחור את הצעד הבא.</p>
+            <ol class="shell-help-list">
+                <li>התחל/י דרך אחת ה־CTA במסך הראשי או דרך ה־MENU המלא.</li>
+                <li>אם צריך הקשר, פתח/י About או Help ב־overlay בלי להאריך את הדף.</li>
+                <li>השתמש/י ב״המשך אחרון״ כדי לחזור ישר למסך שבו עצרת.</li>
+            </ol>
+        `;
+
+        global.MetaOverlayProvider.openOverlay({
+            type: 'home-help',
+            title: 'עזרה למסך הבית',
+            size: 'md',
+            closeOnBackdrop: true,
+            content: panel
+        });
+    }
+
+    function openHomeAboutOverlay(screenState) {
+        if (!screenState) return;
+        ensureOverlayProvider();
+        recordPanelOpen(screenState, 'about');
+        renderHomeFooter(screenState);
+
+        const panel = document.createElement('article');
+        panel.className = 'shell-overlay-content';
+        panel.innerHTML = `
+            <p class="shell-overlay-kicker">About</p>
+            <h4>Meta Model Gym</h4>
+            <p>האפליקציה מרכזת תרגול של Meta Model: זיהוי מחיקות, עיוותים והכללות, ואז תרגום התובנה לשאלה או צעד מעשי.</p>
+            <ul class="shell-help-list">
+                <li><strong>Exercises:</strong> זיהוי מהיר ותרגול תגובה.</li>
+                <li><strong>Lab:</strong> עומק, פירוק ומיפוי לוגי.</li>
+                <li><strong>Execution:</strong> סימולציות ותרגום לפעולה.</li>
+            </ul>
+        `;
+
+        const actions = document.createElement('div');
+        actions.className = 'shell-overlay-actions';
+
+        const openRouteBtn = document.createElement('button');
+        openRouteBtn.type = 'button';
+        openRouteBtn.className = 'btn btn-primary';
+        openRouteBtn.textContent = 'פתח מסך על הפרויקט';
+        openRouteBtn.addEventListener('click', () => {
+            global.MetaOverlayProvider.closeOverlay('home-about-route');
+            window.setTimeout(() => {
+                if (typeof global.navigateTo === 'function') {
+                    global.navigateTo('about', { playSound: true, scrollToTop: true });
+                } else {
+                    global.location.assign(buildUiModeUrl('about', 'legacy'));
+                }
+            }, 20);
+        });
+        actions.appendChild(openRouteBtn);
+
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'btn btn-secondary';
+        closeBtn.textContent = 'סגירה';
+        closeBtn.addEventListener('click', () => global.MetaOverlayProvider.closeOverlay('home-about-close'));
+        actions.appendChild(closeBtn);
+        panel.appendChild(actions);
+
+        global.MetaOverlayProvider.openOverlay({
+            type: 'home-about',
+            title: 'על הפרויקט',
+            size: 'md',
+            closeOnBackdrop: true,
+            content: panel
+        });
+    }
+
+    function openHomeMenuOverlay(screenState) {
+        if (!screenState) return false;
+        ensureOverlayProvider();
+        recordPanelOpen(screenState, 'menu');
+        renderHomeFooter(screenState);
+        closeInlineFeatureMapIfNeeded();
+
+        const featureMap = document.getElementById('feature-map-toggle');
+        const featureMapBody = featureMap?.querySelector('.feature-map-body');
+        const panel = document.createElement('article');
+        panel.className = 'shell-overlay-content';
+        panel.innerHTML = `
+            <p class="shell-overlay-kicker">Menu</p>
+            <h4>MENU מלא</h4>
+            <p>כל מסלולי האימון מרוכזים כאן, בלי להאריך את דף הבית.</p>
+        `;
+
+        if (featureMapBody) {
+            const clone = featureMapBody.cloneNode(true);
+            stripIdsFromCloneTree(clone);
+            clone.classList.add('home-shell-menu-clone');
+            clone.addEventListener('click', (event) => {
+                const trigger = event.target?.closest?.('a, button');
+                if (!trigger) return;
+                window.setTimeout(() => {
+                    if (global.MetaOverlayProvider && typeof global.MetaOverlayProvider.isOpen === 'function' && global.MetaOverlayProvider.isOpen()) {
+                        global.MetaOverlayProvider.closeOverlay('home-menu-action');
+                    }
+                }, 40);
+            });
+            panel.appendChild(clone);
+        } else {
+            const fallback = document.createElement('p');
+            fallback.textContent = 'תוכן ה־MENU לא זמין כרגע.';
+            panel.appendChild(fallback);
+        }
+
+        global.MetaOverlayProvider.openOverlay({
+            type: 'home-menu',
+            title: 'MENU מלא',
+            size: 'xl',
+            closeOnBackdrop: true,
+            content: panel
+        });
+        return true;
+    }
+
+    function renderHomeActionRail(screenState) {
+        const actionsRoot = screenState?.shell?.actions;
+        if (!actionsRoot) return;
+        actionsRoot.innerHTML = '';
+
+        const lastVisited = readHomeLastVisitedTab();
+        if (!lastVisited) {
+            actionsRoot.hidden = true;
+            return;
+        }
+
+        actionsRoot.hidden = false;
+        const actionRow = document.createElement('div');
+        actionRow.className = 'shell-inline-actions home-shell-actions';
+
+        const resumeBtn = createActionButton({
+            label: `המשך: ${getTabTitle(lastVisited.tab)}`,
+            icon: '▶',
+            className: 'home-shell-resume-btn',
+            onClick: () => {
+                if (typeof global.navigateTo === 'function') {
+                    global.navigateTo(lastVisited.tab, { playSound: true, scrollToTop: true });
+                }
+            }
+        });
+        actionRow.appendChild(resumeBtn);
+        actionsRoot.appendChild(actionRow);
+    }
+
+    function mountHomeShell() {
+        const mode = getUiMode(HOME_SCREEN_ID);
+        if (mode !== 'shell') return null;
+
+        const section = document.getElementById(HOME_SCREEN_ID);
+        if (!section) return null;
+        if (stateByScreen[HOME_SCREEN_ID] && stateByScreen[HOME_SCREEN_ID].mounted) {
+            return stateByScreen[HOME_SCREEN_ID];
+        }
+
+        try {
+            const mobileFeed = section.querySelector('#mobile-feed-home');
+            const hero = section.querySelector('.home-route-hero');
+            const features = section.querySelector('.home-route-features');
+            const primaryCta = section.querySelector('.home-route-primary-cta');
+            if (!hero || !features || !primaryCta) return null;
+
+            const shell = createAppShellFrame({
+                screenId: HOME_SCREEN_ID,
+                title: 'Home Hub',
+                subtitle: 'דף בית קומפקטי. MENU, Help ו-About נפתחים ב-overlay כדי לשמור את הניווט קצר.'
+            });
+            shell.metrics.hidden = true;
+            const bottomSummary = shell.bottom.querySelector('summary');
+            if (bottomSummary) bottomSummary.textContent = 'ניווט אחרון';
+
+            const workspace = document.createElement('div');
+            workspace.className = 'home-shell-workspace';
+            [mobileFeed, hero, features, primaryCta].forEach((node) => {
+                if (node) workspace.appendChild(node);
+            });
+            shell.workspace.appendChild(workspace);
+
+            const screenState = {
+                id: HOME_SCREEN_ID,
+                mode,
+                mounted: true,
+                section,
+                shell,
+                workspace,
+                panelOpens: Object.create(null),
+                lastOpenedPanel: '',
+                lastPanelOpenAt: ''
+            };
+
+            const headerActions = [
+                createActionButton({ label: 'MENU', icon: '☰', onClick: () => openHomeMenuOverlay(screenState) }),
+                createActionButton({ label: 'About', icon: 'ℹ', onClick: () => openHomeAboutOverlay(screenState) }),
+                createActionButton({ label: 'Help', icon: '?', onClick: () => openHomeHelpOverlay(screenState) }),
+                createActionButton({
+                    label: 'Legacy',
+                    icon: '↩',
+                    className: 'shell-action-legacy',
+                    onClick: () => global.location.assign(buildUiModeUrl(HOME_SCREEN_ID, 'legacy'))
+                })
+            ];
+            headerActions.forEach((btn) => shell.headerActions.appendChild(btn));
+
+            section.prepend(shell.root);
+            section.classList.add('shell-screen-active');
+            section.setAttribute('data-ui-mode', 'shell');
+
+            renderHomeActionRail(screenState);
+            renderHomeFooter(screenState);
+            stateByScreen[HOME_SCREEN_ID] = screenState;
+            return screenState;
+        } catch (error) {
+            renderShellFallback(section, HOME_SCREEN_ID, error);
+            return null;
+        }
+    }
+
+    function isHomeShellActive() {
+        const screenState = stateByScreen[HOME_SCREEN_ID] || mountHomeShell();
+        return Boolean(screenState && screenState.mode === 'shell' && screenState.section?.classList.contains('active'));
+    }
+
+    function openHomeMenu() {
+        const screenState = stateByScreen[HOME_SCREEN_ID] || mountHomeShell();
+        if (!screenState || screenState.mode !== 'shell') return false;
+        return openHomeMenuOverlay(screenState);
     }
 
     function mountVerbUnzipShell() {
@@ -829,6 +1129,15 @@
 
     function notifyTabActivated(tabId) {
         const id = String(tabId || '').trim();
+        if (id === HOME_SCREEN_ID) {
+            const screenState = stateByScreen[HOME_SCREEN_ID] || mountHomeShell();
+            if (!screenState || screenState.mode !== 'shell') return;
+            closeInlineFeatureMapIfNeeded();
+            renderHomeActionRail(screenState);
+            renderHomeFooter(screenState);
+            return;
+        }
+
         if (id === VERB_SCREEN_ID) {
             const screenState = stateByScreen[VERB_SCREEN_ID] || mountVerbUnzipShell();
             if (!screenState || screenState.mode !== 'shell') return;
@@ -877,9 +1186,10 @@
             console.warn('Overlay provider not ready yet', error);
         }
 
+        const homeState = mountHomeShell();
         const verbState = mountVerbUnzipShell();
         const scenarioState = mountScenarioTrainerShell();
-        if (!verbState && !scenarioState) return;
+        if (!homeState && !verbState && !scenarioState) return;
 
         const activeTab = document.querySelector('.tab-btn.active')?.getAttribute('data-tab') || 'home';
         notifyTabActivated(activeTab);
@@ -888,6 +1198,9 @@
     global.MetaAppShell = Object.freeze({
         bootstrap,
         notifyTabActivated,
+        openHomeMenu,
+        isHomeShellActive,
+        mountHomeShell,
         mountVerbUnzipShell,
         mountScenarioTrainerShell,
         handleScenarioScreenChange,

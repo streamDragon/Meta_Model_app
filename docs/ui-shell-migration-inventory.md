@@ -1,6 +1,6 @@
 # UI Shell Migration Inventory (Meta_Model_app)
 
-Last updated: 2026-02-27
+Last updated: 2026-03-07
 
 ## Completed (shell-ready)
 
@@ -13,6 +13,11 @@ Last updated: 2026-02-27
   - Compact toolbar added for settings/history/decomposition/action map/blueprint.
   - Safety notice promoted to blocking overlay path in shell mode.
   - Legacy mode kept available via `?ui=legacy`.
+- `home` (`?tab=home`)
+  - Default UI mode switched to `shell`.
+  - Compact hub stays inline; full `MENU`, `Help`, and `About` open in overlay.
+  - Last visited screen is surfaced as a resume action inside the shell.
+  - Legacy mode kept available via `?ui=legacy`.
 - Global infrastructure
   - Shared overlay provider/root with focus trap, ESC/backdrop close, swipe sheet on mobile, history back-close, and scroll lock/restore.
   - Per-screen `ui` mode resolution (`legacy`/`shell`) with URL override support.
@@ -21,8 +26,6 @@ Last updated: 2026-02-27
 
 ## Remaining inline panels to migrate
 
-- `home`
-  - Long explanatory/training content still appears inline; move to help/about overlay or dedicated route in shell mode.
 - `practice-question`
   - Secondary explanatory/history/stat blocks still inline in legacy layout.
 - `practice-radar`
@@ -44,8 +47,7 @@ Last updated: 2026-02-27
 
 ## Next migration order
 
-1. `home` (hub cleanup)
-2. `practice-radar`
-3. `practice-triples-radar`
-4. `prismlab`
-5. remaining secondary training tabs
+1. `practice-radar`
+2. `practice-triples-radar`
+3. `prismlab`
+4. remaining secondary training tabs

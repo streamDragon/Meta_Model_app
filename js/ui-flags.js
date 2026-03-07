@@ -13,9 +13,10 @@
             id: 'home',
             path: '?tab=home',
             title: 'Home Hub',
-            defaultUiMode: 'legacy',
+            defaultUiMode: 'shell',
             aliases: Object.freeze(['hub', 'menu']),
-            overlayPanels: Object.freeze(['help', 'about'])
+            overlayPanels: Object.freeze(['menu', 'help', 'about']),
+            notes: 'Compact hub; full menu/help/about open in overlay'
         }),
         'practice-question': Object.freeze({
             id: 'practice-question',

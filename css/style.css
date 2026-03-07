@@ -655,6 +655,26 @@ body.app-sticky-home-active #app-sticky-home-btn {
     padding: 8px;
 }
 
+.home-shell-workspace {
+    display: grid;
+    gap: 14px;
+}
+
+.home-shell-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.home-shell-menu-clone {
+    display: grid;
+    gap: 12px;
+}
+
+.home-shell-menu-clone .feature-map-grid {
+    margin-top: 0;
+}
+
 .scenario-shell-overlay-host {
     display: none !important;
 }
