@@ -126,3 +126,6 @@ Last updated: 2026-03-07
   - No migrated generic screen left visible inline secondary panels in shell mode.
   - Mobile portrait checks for `home`, `practice-radar`, and `blueprint` showed no horizontal overflow and a reachable overlay close button.
   - Reduced-motion media path still opened overlays correctly.
+- Repeatable smoke coverage
+  - `npm run test:shell-smoke` now runs the same shell-first browser checks through Playwright.
+  - The script can reuse an existing app server via `--base=<url>` or boot a temporary local `vite` server automatically.
