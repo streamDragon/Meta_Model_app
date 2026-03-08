@@ -549,8 +549,8 @@
                 state.feedback = {
                     tone: state.session.endReason === 'lives' ? 'danger' : 'warn',
                     text: state.session.endReason === 'lives'
-                        ? 'החיים נגמרו. מוצג דו"׳— ׳¡׳™׳•׳.'
-                        : '׳”׳–׳׳ ׳”׳¡׳×׳™׳™׳. ׳׳•׳¦׳’ ׳“׳•"׳— ׳¡׳™׳•׳.'
+                        ? 'החיים נגמרו. מוצג דוח סיום.'
+                        : 'הזמן הסתיים. מוצג דוח סיום.'
                 };
             }
             render();
@@ -577,7 +577,7 @@
             state.feedback = null;
             emitAlchemyFx('whoosh', { text: 'Next round' });
         } catch (error) {
-            state.feedback = { tone: 'warn', text: error.message || '׳׳ ׳ ׳™׳×׳ ׳׳”׳×׳—׳™׳ ׳¡׳‘׳‘ ׳—׳“׳© ׳¢׳“׳™׳™׳.' };
+            state.feedback = { tone: 'warn', text: error.message || 'לא ניתן להתחיל סבב חדש עדיין.' };
         }
         render();
     }
@@ -597,13 +597,13 @@
     function buildHintForStage(stage, round) {
         if (!round) return '';
         if (stage === 'question') {
-            return '׳—׳₪׳©/׳™ ׳©׳׳׳” ׳©׳׳—׳–׳™׳¨׳” ׳׳™׳“׳¢ ׳—׳¡׳¨ / ׳§׳¨׳™׳˜׳¨׳™׳•׳ / ׳×׳ ׳׳™׳, ׳•׳׳ ׳©׳׳׳” ׳©׳™׳₪׳•׳˜׳™׳× ׳׳• ׳₪׳×׳¨׳•׳ ׳׳•׳§׳“׳.';
+            return 'חפש/י שאלה שמחזירה מידע חסר / קריטריון / תנאים, ולא שאלה שיפוטית או פתרון מוקדם.';
         }
         if (stage === 'problem') {
-            return `ג€׳‘׳¢׳™׳”ג€ = ׳׳” ׳”׳׳‘׳ ׳” ׳”׳׳©׳•׳ ׳™ ׳™׳•׳¦׳¨ ׳‘׳׳₪׳”. ׳¨׳׳–: ${round.pattern.problem?.oneLiner || ''}`;
+            return `“בעיה” = מה המבנה הלשוני יוצר במפה. רמז: ${round.pattern.problem?.oneLiner || ''}`;
         }
         if (stage === 'goal') {
-            return `ג€׳׳˜׳¨׳”ג€ = ׳׳™׳–׳” ׳׳™׳“׳¢ ׳—׳¡׳¨ ׳ ׳—׳₪׳©. ׳¨׳׳–: ${round.pattern.goal?.oneLiner || ''}`;
+            return `“מטרה” = איזה מידע חסר נחפש. רמז: ${round.pattern.goal?.oneLiner || ''}`;
         }
         return '';
     }
@@ -616,7 +616,7 @@
         state.hintUsedByStage[round.stage] = true;
         state.hintMessage = buildHintForStage(round.stage, round);
         emitAlchemyFx('whoosh', { text: 'Hint' });
-        state.feedback = { tone: 'info', text: '׳¨׳׳– ׳׳•׳¦׳’ (׳₪׳¢׳ ׳׳—׳× ׳׳©׳׳‘).' };
+        state.feedback = { tone: 'info', text: 'רמז מוצג (פעם אחת לשלב).' };
         render();
     }
 
@@ -643,7 +643,7 @@
                 if (result.completedRound) {
                     state.feedback = {
                         tone: 'success',
-                        text: '׳¡׳‘׳‘ ׳”׳•׳©׳׳. ׳¢׳‘׳¨׳• ׳¢׳ ׳”׳¡׳™׳›׳•׳ ׳•׳׳– ׳”׳׳©׳™׳›׳• ׳׳×׳‘׳ ׳™׳× ׳”׳‘׳׳”.'
+                        text: 'סבב הושלם. עברו על הסיכום ואז המשיכו לתבנית הבאה.'
                     };
                     emitAlchemyFx('success', { text: 'Round complete' });
                     setExplanationEntry(buildExplanationEntry({
@@ -676,7 +676,7 @@
             } else if (state.mode === 'learning') {
                 state.feedback = {
                     tone: 'warn',
-                    text: result.explanation || '׳׳ ׳׳“׳•׳™׳§. ׳ ׳¡׳• ׳©׳•׳‘.'
+                    text: result.explanation || 'לא מדויק. נסו שוב.'
                 };
                 setExplanationEntry(buildExplanationEntry({
                     round,
@@ -686,10 +686,10 @@
                     tone: 'warn'
                 }), { autoOpen: true });
             } else {
-                const livesText = Number.isFinite(result.livesLeft) ? ` | ׳—׳™׳™׳: ${result.livesLeft}` : '';
+                const livesText = Number.isFinite(result.livesLeft) ? ` | חיים: ${result.livesLeft}` : '';
                 state.feedback = {
                     tone: result.livesLeft <= 0 ? 'danger' : 'warn',
-                    text: `׳׳ ׳ ׳›׳•׳.${livesText}`
+                    text: `לא נכון.${livesText}`
                 };
             }
 
@@ -699,13 +699,13 @@
             if (state.session.ended && !state.feedback) {
                 state.feedback = {
                     tone: 'danger',
-                    text: '׳”׳¡׳©׳ ׳”׳¡׳×׳™׳™׳.'
+                    text: 'הסשן הסתיים.'
                 };
             }
         } catch (error) {
             state.feedback = {
                 tone: 'danger',
-                text: 'אירעה תקלה זמנית בעיבוד התשובה. נסו שוב.'
+                text: '����� ���� ����� ������ ������. ��� ���.'
             };
             emitAlchemyFx('almost', { text: 'Retry' });
         } finally {
@@ -720,7 +720,7 @@
         state.paused = !state.paused;
         state.feedback = {
             tone: 'info',
-            text: state.paused ? '׳”׳˜׳™׳™׳׳¨ ׳׳•׳©׳”׳”.' : '׳”׳˜׳™׳™׳׳¨ ׳—׳•׳“׳©.'
+            text: state.paused ? 'הטיימר מושהה.' : 'הטיימר חודש.'
         };
         render();
     }
@@ -747,8 +747,8 @@
             state.feedback = {
                 tone: 'info',
                 text: nextFocus === 'all'
-                    ? '׳₪׳•׳§׳•׳¡ ׳׳©׳₪׳—׳” ׳‘׳•׳˜׳. ׳׳׳©׳™׳›׳™׳ ׳¢׳ ׳›׳ ׳”׳×׳‘׳ ׳™׳•׳×.'
-                    : `׳₪׳•׳§׳•׳¡ ׳×׳¨׳’׳•׳: ${familyFocusLabel(nextFocus)}. ׳ ׳₪׳×׳— ׳¡׳©׳ ׳—׳“׳© ׳׳₪׳™ ׳”׳׳©׳₪׳—׳” ׳©׳ ׳‘׳—׳¨׳”.`
+                    ? 'פוקוס משפחה בוטל. ממשיכים עם כל התבניות.'
+                    : `פוקוס תרגול: ${familyFocusLabel(nextFocus)}. נפתח סשן חדש לפי המשפחה שנבחרה.`
             };
         }
         render();
@@ -869,28 +869,28 @@
         const stage = round?.stage || '';
         if (stage === 'question') {
             return {
-                title: '׳‘׳—׳¨/׳™ ׳©׳׳׳” ׳׳×׳׳™׳׳” ׳׳×׳‘׳ ׳™׳×',
-                desc: '׳™׳© 2 ׳©׳׳׳•׳× ׳×׳§׳™׳ ׳•׳× ׳׳×׳•׳ 5. ׳׳¡׳₪׳™׳§ ׳׳‘׳—׳•׳¨ ׳׳—׳× ׳˜׳•׳‘׳” ׳›׳“׳™ ׳׳¢׳‘׳•׳¨ ׳©׳׳‘.',
+                title: 'בחר/י שאלה מתאימה לתבנית',
+                desc: 'יש 2 שאלות תקינות מתוך 5. מספיק לבחור אחת טובה כדי לעבור שלב.',
                 kicker: stageLabel(stage)
             };
         }
         if (stage === 'problem') {
             return {
-                title: '׳׳” ׳”׳‘׳¢׳™׳” ׳‘׳”׳₪׳¨׳” ׳”׳–׳•?',
-                desc: '׳‘׳—׳¨/׳™ ׳׳× ׳”׳×׳™׳׳•׳¨ ׳©׳׳×׳׳¨ ׳׳” ׳”׳׳‘׳ ׳” ׳”׳׳©׳•׳ ׳™ ׳™׳•׳¦׳¨ ׳‘׳׳₪׳”.',
+                title: 'מה הבעיה בהפרה הזו?',
+                desc: 'בחר/י את התיאור שמתאר מה המבנה הלשוני יוצר במפה.',
                 kicker: stageLabel(stage)
             };
         }
         if (stage === 'goal') {
             return {
-                title: '׳׳” ׳”׳׳˜׳¨׳” / ׳׳™׳–׳” ׳׳™׳“׳¢ ׳ ׳—׳₪׳©?',
-                desc: '׳‘׳—׳¨/׳™ ׳׳× ׳™׳¢׳“ ׳”׳׳™׳“׳¢ ׳”׳׳“׳•׳™׳§ ׳©׳ ׳¨׳¦׳” ׳׳”׳—׳–׳™׳¨ ׳‘׳©׳׳׳× ׳”׳׳˜׳”-׳׳•׳“׳.',
+                title: 'מה המטרה / איזה מידע נחפש?',
+                desc: 'בחר/י את יעד המידע המדויק שנרצה להחזיר בשאלת המטה-מודל.',
                 kicker: stageLabel(stage)
             };
         }
         return {
-            title: '׳¡׳™׳›׳•׳ ׳¡׳‘׳‘',
-            desc: '׳¡׳§׳™׳¨׳” ׳׳”׳™׳¨׳” ׳©׳ ׳”׳×׳‘׳ ׳™׳×, ׳”׳©׳׳׳•׳×, ׳”׳‘׳¢׳™׳” ׳•׳”׳׳˜׳¨׳” ׳׳₪׳ ׳™ ׳”׳׳¢׳‘׳¨ ׳׳¡׳‘׳‘ ׳”׳‘׳.',
+            title: 'סיכום סבב',
+            desc: 'סקירה מהירה של התבנית, השאלות, הבעיה והמטרה לפני המעבר לסבב הבא.',
             kicker: stageLabel(stage)
         };
     }
@@ -906,9 +906,9 @@
 
     function getFamilyHelpTexts() {
         return {
-            deletion: '׳׳—׳™׳§׳•׳×: ׳—׳¡׳¨ ׳׳™׳“׳¢ ׳§׳•׳ ׳§׳¨׳˜׳™ (׳׳™/׳׳”/׳׳™׳/׳׳×׳™).',
-            distortion: '׳¢׳™׳•׳•׳×׳™׳: ׳₪׳¨׳©׳ ׳•׳×/׳§׳©׳¨/׳׳©׳׳¢׳•׳× ׳׳•׳¦׳’׳™׳ ׳›׳¢׳•׳‘׳“׳”.',
-            generalization: '׳”׳›׳׳׳•׳×: ׳›׳׳ ׳¨׳—׳‘/׳§׳©׳™׳— ׳׳•׳—׳ ׳¢׳ ׳׳§׳¨׳™׳ ׳¨׳‘׳™׳.'
+            deletion: 'מחיקות: חסר מידע קונקרטי (מי/מה/איך/מתי).',
+            distortion: 'עיוותים: פרשנות/קשר/משמעות מוצגים כעובדה.',
+            generalization: 'הכללות: כלל רחב/קשיח מוחל על מקרים רבים.'
         };
     }
 
@@ -931,7 +931,7 @@
                 <h1>Classic Classic · מאמן מטא-מודל</h1>
                 <p>בוחרים שאלה, מזהים בעיה במפה, מגדירים יעד מידע, ומסכמים את התבנית.</p>
               </div>
-              <div class="cc-mode-toggle" role="tablist" aria-label="׳׳¦׳‘ ׳¢׳‘׳•׳“׳”">
+              <div class="cc-mode-toggle" role="tablist" aria-label="מצב עבודה">
                 <button type="button" class="cc-mode-btn ${state.mode === 'learning' ? 'is-active' : ''}" data-cc-action="mode-learning">למידה</button>
                 <button type="button" class="cc-mode-btn ${state.mode === 'exam' ? 'is-active' : ''}" data-cc-action="mode-exam">מבחן</button>
               </div>
@@ -950,7 +950,7 @@
                 <button type="button" class="cc-btn cc-btn-primary" data-cc-action="end-session" ${!session || session.ended ? 'disabled' : ''}>סיים סשן</button>
               </div>
             </div>
-            <div class="cc-inline-meta" aria-label="׳׳™׳“׳¢ ׳¢׳ ׳”׳¡׳‘׳‘">
+            <div class="cc-inline-meta" aria-label="מידע על הסבב">
               <span class="cc-focus-chip">פוקוס: <strong>${escapeHtml(focusLabel)}</strong></span>
               <span class="cc-focus-chip">שלב: <strong>${escapeHtml(currentStage)}</strong></span>
               ${round?.pattern ? `<span class="cc-focus-chip">תבנית: <strong>${escapeHtml(round.pattern.name)}</strong></span>` : ''}
@@ -966,7 +966,7 @@
         const currentFocus = normalizeFamilyFocus(state.familyFocus);
 
         return `
-          <aside class="cc-panel cc-side" aria-label="׳׳₪׳× Breen ׳׳׳©׳₪׳—׳•׳× ׳“׳₪׳•׳¡׳™׳">
+          <aside class="cc-panel cc-side" aria-label="מפת Breen למשפחות דפוסים">
             <div>
               <h2>מפת Michael Breen (משפחות דפוסים)</h2>
             </div>
@@ -1010,7 +1010,7 @@
         const currentIndex = steps.findIndex((step) => step.id === stage);
 
         return `
-          <section class="cc-flow-guide" aria-label="׳¨׳¦׳£ ׳©׳׳‘׳™ ׳”׳¡׳‘׳‘">
+          <section class="cc-flow-guide" aria-label="רצף שלבי הסבב">
             <div class="cc-flow-head">
               <strong>איך הסבב מתקדם</strong>
               <span>רואים את סדר השלבים כדי להבין איפה אתם עכשיו ומה יגיע מיד אחר כך.</span>
@@ -1057,7 +1057,7 @@
         };
         const task = taskMap[stage] || taskMap.question;
         return `
-          <section class="cc-task-compass" aria-label="׳׳¦׳₪׳ ׳”׳¦׳¢׳“ ׳”׳ ׳•׳›׳—׳™">
+          <section class="cc-task-compass" aria-label="מצפן הצעד הנוכחי">
             <div class="cc-task-head">
               <strong>מה עושים עכשיו</strong>
               <span>${escapeHtml(copy.kicker || '')}</span>
@@ -1094,7 +1094,7 @@
         const examples = Array.isArray(round.pattern?.examples) ? round.pattern.examples.slice(0, 2) : [];
 
         return `
-          <section class="cc-round-guide ${state.showRoundGuide ? 'is-open' : ''}" aria-label="׳”׳¡׳‘׳¨ ׳§׳¦׳¨ ׳׳×׳¨׳’׳™׳">
+          <section class="cc-round-guide ${state.showRoundGuide ? 'is-open' : ''}" aria-label="הסבר קצר לתרגיל">
             <div class="cc-round-guide-shell">
               <div class="cc-round-guide-copy">
                 <span class="cc-round-guide-kicker">${escapeHtml(copy.kicker || '')}</span>
@@ -1111,7 +1111,7 @@
               </button>
             </div>
 
-            <div class="cc-round-guide-progress" aria-label="׳”׳×׳§׳“׳׳•׳× ׳‘׳©׳׳‘׳™׳">
+            <div class="cc-round-guide-progress" aria-label="התקדמות בשלבים">
               ${steps.map((step, index) => {
                   const classes = [
                       'cc-round-guide-pill',
@@ -1130,7 +1130,7 @@
                   ${renderFlowGuide(round)}
                 </div>
 
-                <section class="cc-round-guide-example" aria-label="׳“׳•׳’׳׳” ׳•׳”׳¨׳—׳‘׳”">
+                <section class="cc-round-guide-example" aria-label="דוגמה והרחבה">
                   <div class="cc-round-guide-example-head">
                     <strong>דוגמה מהתבנית הנוכחית</strong>
                     <span>${escapeHtml(round.pattern?.name || '')}</span>
@@ -1160,7 +1160,7 @@
         const modeText = state.mode === 'exam' ? (copy.examMode || '') : (copy.learningMode || '');
 
         return `
-          <div class="cc-philosopher-overlay" role="dialog" aria-modal="true" aria-label="׳¢׳§׳¨׳•׳ ׳•׳× - ׳”׳¡׳‘׳¨">
+          <div class="cc-philosopher-overlay" role="dialog" aria-modal="true" aria-label="עקרונות - הסבר">
             <div class="cc-philosopher-dialog">
               <div class="cc-philosopher-head">
                 <div>
@@ -1303,7 +1303,7 @@
               <div class="cc-pattern-definition"><strong>פעולה:</strong> ${escapeHtml(operation.title)}</div>
             </div>
 
-            <div class="cc-examples" aria-label="׳“׳•׳’׳׳׳•׳×">
+            <div class="cc-examples" aria-label="דוגמאות">
               ${examples.map((example) => `<div class="cc-example-chip">${escapeHtml(example)}</div>`).join('')}
             </div>
 
@@ -1326,24 +1326,24 @@
         const patternMap = getPatternMap();
         const copy = state.copy || {};
         return `
-          <section class="cc-stage-card cc-report" aria-label="׳“׳•׳— ׳¡׳™׳•׳ ׳¡׳©׳">
+          <section class="cc-stage-card cc-report" aria-label="דוח סיום סשן">
             <div class="cc-stage-head">
               <span class="cc-stage-kicker">דוח סיום</span>
-              <h3>דו"׳— ׳¡׳©׳</h3>
+              <h3>דוח סשן</h3>
               <p>${escapeHtml(state.mode === 'learning' ? (copy.learningMode || '') : (copy.examMode || ''))}</p>
             </div>
 
             <div class="cc-report-grid">
-              <div class="cc-report-stat"><strong>${report.overall.accuracy}%</strong><span>׳“׳™׳•׳§ ׳›׳•׳׳</span></div>
-              <div class="cc-report-stat"><strong>${report.score}</strong><span>׳ ׳™׳§׳•׳“</span></div>
-              <div class="cc-report-stat"><strong>${report.completedRounds}</strong><span>׳¡׳‘׳‘׳™׳ ׳©׳”׳•׳©׳׳׳•</span></div>
+              <div class="cc-report-stat"><strong>${report.overall.accuracy}%</strong><span>דיוק כולל</span></div>
+              <div class="cc-report-stat"><strong>${report.score}</strong><span>ניקוד</span></div>
+              <div class="cc-report-stat"><strong>${report.completedRounds}</strong><span>סבבים שהושלמו</span></div>
             </div>
 
             <div class="cc-summary-block">
-              <h4>׳“׳™׳•׳§ ׳׳₪׳™ ׳׳©׳₪׳—׳”</h4>
+              <h4>דיוק לפי משפחה</h4>
               <table class="cc-table">
                 <thead>
-                  <tr><th>׳׳©׳₪׳—׳”</th><th>׳“׳™׳•׳§</th><th>׳ ׳›׳•׳</th><th>׳©׳’׳•׳™</th></tr>
+                  <tr><th>משפחה</th><th>דיוק</th><th>נכון</th><th>שגוי</th></tr>
                 </thead>
                 <tbody>
                   ${(report.perFamily || []).map((row) => `
@@ -1359,12 +1359,12 @@
             </div>
 
             <div class="cc-summary-block">
-              <h4>׳×׳‘׳ ׳™׳•׳× ׳—׳׳©׳•׳×</h4>
+              <h4>תבניות חלשות</h4>
               ${(report.weakPatterns || []).length ? `
                 <ul class="cc-bullet-list">
                   ${(report.weakPatterns || []).map((row) => {
                       const p = patternMap.get(row.patternId);
-                      return `<li><strong>${escapeHtml(p?.name || row.patternId)}</strong> ֲ· ${row.accuracy}% ֲ· ׳˜׳¢׳•׳™׳•׳×: ${row.wrongStages}</li>`;
+                      return `<li><strong>${escapeHtml(p?.name || row.patternId)}</strong> · ${row.accuracy}% · טעויות: ${row.wrongStages}</li>`;
                   }).join('')}
                 </ul>
               ` : `<div class="cc-empty">אין מספיק נתונים כדי לזהות דפוסים חלשים.</div>`}
@@ -1382,9 +1382,9 @@
             ` : ''}
 
             <div class="cc-inline-actions">
-              <button type="button" class="cc-btn cc-btn-primary" data-cc-action="restart-session">׳¡׳©׳ ׳—׳“׳©</button>
-              <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="mode-learning">׳¢׳‘׳•׳¨ ׳׳׳׳™׳“׳”</button>
-              <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="mode-exam">׳¢׳‘׳•׳¨ ׳׳׳‘׳—׳</button>
+              <button type="button" class="cc-btn cc-btn-primary" data-cc-action="restart-session">סשן חדש</button>
+              <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="mode-learning">עבור ללמידה</button>
+              <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="mode-exam">עבור למבחן</button>
             </div>
           </section>
         `;
@@ -1393,7 +1393,7 @@
     function renderMainPanel() {
         const session = state.session;
         if (!session) {
-            return `<main class="cc-panel cc-main"><div class="cc-loading">׳׳›׳™׳ ׳¡׳©׳...</div></main>`;
+            return `<main class="cc-panel cc-main"><div class="cc-loading">מכין סשן...</div></main>`;
         }
         const round = currentRound();
         const stageCard = session.ended ? renderReport() : renderStageCard(round);
@@ -1656,30 +1656,30 @@
         return `
           <div class="cc-settings-stack">
             <div class="cc-form-block">
-              <div class="cc-form-label">׳׳¦׳‘</div>
+              <div class="cc-form-label">מצב</div>
               <div class="cc-choice-row">
                 <label class="cc-choice-pill ${settings.mode === 'learning' ? 'is-active' : ''}">
                   <input type="radio" name="${modeName}" value="learning" data-cc-setting="mode" ${settings.mode === 'learning' ? 'checked' : ''}>
-                  <span>׳׳™׳׳•׳“</span>
+                  <span>לימוד</span>
                 </label>
                 <label class="cc-choice-pill ${settings.mode === 'exam' ? 'is-active' : ''}">
                   <input type="radio" name="${modeName}" value="exam" data-cc-setting="mode" ${settings.mode === 'exam' ? 'checked' : ''}>
-                  <span>׳׳‘׳—׳</span>
+                  <span>מבחן</span>
                 </label>
               </div>
             </div>
 
             <div class="cc-form-block">
               <div class="cc-form-label-row">
-                <span>׳§׳•׳©׳™</span>
+                <span>קושי</span>
                 <strong>${settings.difficulty}</strong>
               </div>
               <input class="cc-range" type="range" min="1" max="5" step="1" value="${settings.difficulty}" data-cc-setting="difficulty" aria-label="קושי">
-              <div class="cc-range-scale"><span>׳§׳</span><span>׳‘׳™׳ ׳•׳ ׳™</span><span>׳׳׳×׳’׳¨</span></div>
+              <div class="cc-range-scale"><span>קל</span><span>בינוני</span><span>מאתגר</span></div>
             </div>
 
             <div class="cc-form-block">
-              <div class="cc-form-label">׳׳¡׳₪׳¨ ׳©׳׳׳•׳×</div>
+              <div class="cc-form-label">מספר שאלות</div>
               <div class="cc-choice-row">
                 ${[5, 10, 15].map((count) => `
                   <label class="cc-choice-pill ${settings.questionCount === count ? 'is-active' : ''}">
@@ -1695,25 +1695,25 @@
                 <input type="checkbox" data-cc-setting="timerEnabled" ${settings.timerEnabled ? 'checked' : ''}>
                 <span class="cc-switch-track" aria-hidden="true"></span>
                 <span class="cc-switch-copy">
-                  <strong>׳˜׳™׳™׳׳¨</strong>
+                  <strong>טיימר</strong>
                   <small>${settings.timerEnabled ? 'פעיל' : 'כבוי'}</small>
                 </span>
               </label>
             </div>
 
             <details class="cc-advanced-panel" data-cc-details-key="advanced:${escapeHtml(scope)}" ${isDetailOpen(`advanced:${scope}`) ? 'open' : ''}>
-              <summary>׳׳₪׳©׳¨׳•׳™׳•׳× ׳׳×׳§׳“׳׳•׳×</summary>
+              <summary>אפשרויות מתקדמות</summary>
               <div class="cc-advanced-panel-body">
                 <label class="cc-field-vertical" for="${selectId}">
-                  <span>׳§׳˜׳’׳•׳¨׳™׳•׳× ׳׳×׳¨׳’׳•׳</span>
+                  <span>קטגוריות לתרגול</span>
                   <select id="${selectId}" class="cc-select" data-cc-setting="familyFocus">
-                    <option value="all" ${settings.familyFocus === 'all' ? 'selected' : ''}>׳”׳›׳•׳</option>
-                    <option value="deletion" ${settings.familyFocus === 'deletion' ? 'selected' : ''}>׳׳—׳™׳§׳•׳×</option>
-                    <option value="distortion" ${settings.familyFocus === 'distortion' ? 'selected' : ''}>׳¢׳™׳•׳•׳×׳™׳</option>
-                    <option value="generalization" ${settings.familyFocus === 'generalization' ? 'selected' : ''}>׳”׳›׳׳׳•׳×</option>
+                    <option value="all" ${settings.familyFocus === 'all' ? 'selected' : ''}>הכול</option>
+                    <option value="deletion" ${settings.familyFocus === 'deletion' ? 'selected' : ''}>מחיקות</option>
+                    <option value="distortion" ${settings.familyFocus === 'distortion' ? 'selected' : ''}>עיוותים</option>
+                    <option value="generalization" ${settings.familyFocus === 'generalization' ? 'selected' : ''}>הכללות</option>
                   </select>
                 </label>
-                <div class="cc-advanced-note">׳”׳”׳’׳“׳¨׳•׳× ׳ ׳©׳׳¨׳•׳× ׳׳•׳˜׳•׳׳˜׳™׳× ׳•׳™׳•׳¦׳¢׳• ׳‘׳₪׳¢׳ ׳”׳‘׳׳”.</div>
+                <div class="cc-advanced-note">ההגדרות נשמרות אוטומטית ויוצעו בפעם הבאה.</div>
               </div>
             </details>
           </div>
@@ -1725,8 +1725,8 @@
         return `
           <div class="cc-settings-summary-line">
             <span>${s.mode === 'exam' ? 'מבחן' : 'לימוד'}</span>
-            <span>׳§׳•׳©׳™ ${s.difficulty}</span>
-            <span>${s.questionCount} ׳©׳׳׳•׳×</span>
+            <span>קושי ${s.difficulty}</span>
+            <span>${s.questionCount} שאלות</span>
             <span>${s.timerEnabled ? 'עם טיימר' : 'ללא טיימר'}</span>
             <span>${familyLabelSimple(s.familyFocus)}</span>
           </div>
@@ -1741,16 +1741,16 @@
               <div class="cc-modal-head">
                 <div>
                   <div class="cc-modal-kicker">Classic Meta Model</div>
-                  <h2>Classic Meta Model ג€” ׳–׳™׳”׳•׳™ ׳×׳‘׳ ׳™׳•׳×</h2>
-                  <p>׳׳×׳ ׳׳§׳‘׳׳™׳ ׳§׳˜׳¢ ׳“׳™׳‘׳•׳¨ ׳§׳¦׳¨. ׳”׳׳©׳™׳׳”: ׳׳–׳”׳•׳× ׳׳× ׳”׳׳‘׳ ׳” ׳”׳׳¨׳›׳–׳™, ׳׳§׳‘׳ ׳׳©׳•׳‘, ׳•׳׳”׳׳©׳™׳ ׳‘׳§׳¦׳‘ ׳ ׳§׳™.</p>
+                  <h2>Classic Meta Model — זיהוי תבניות</h2>
+                  <p>אתם מקבלים קטע דיבור קצר. המשימה: לזהות את המבנה המרכזי, לקבל משוב, ולהמשיך בקצב נקי.</p>
                 </div>
                 <button type="button" class="cc-icon-btn" data-cc-action="close-setup" aria-label="סגור">ֳ—</button>
               </div>
               ${renderSettingsControls('setup')}
               <div class="cc-modal-actions">
-                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="start-session">׳”׳×׳—׳</button>
-                <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="random-start">׳”׳’׳¨׳</button>
-                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-setup">׳¡׳’׳•׳¨</button>
+                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="start-session">התחל</button>
+                <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="random-start">הגרל</button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-setup">סגור</button>
               </div>
               ${state.hasSavedSettings ? `<div class="cc-modal-foot"><button type="button" class="cc-link-btn" data-cc-action="continue-last-settings">המשך עם ההגדרות האחרונות</button></div>` : ''}
             </div>
@@ -1768,27 +1768,27 @@
             <div class="cc-modal-card cc-modal-card-wide">
               <div class="cc-modal-head">
                 <div>
-                  <div class="cc-modal-kicker">׳׳₪׳ ׳™ ׳©׳׳×׳—׳™׳׳™׳ (30 ׳©׳ ׳™׳•׳×)</div>
-                  <h2>׳׳” ׳”׳׳˜׳¨׳” ׳›׳׳?</h2>
-                  <p>׳”׳׳˜׳¨׳” ׳”׳™׳ ׳׳₪׳×׳— ׳¢׳™׳ ׳׳׳‘׳ ׳” ׳”׳©׳₪׳”: ׳׳–׳”׳•׳× ׳”׳›׳׳׳”, ׳׳—׳™׳§׳” ׳׳• ׳¢׳™׳•׳•׳× ׳׳₪׳ ׳™ ׳©׳ ׳›׳ ׳¡׳™׳ ׳׳₪׳¨׳©׳ ׳•׳×.</p>
+                  <div class="cc-modal-kicker">לפני שמתחילים (30 שניות)</div>
+                  <h2>מה המטרה כאן?</h2>
+                  <p>המטרה היא לפתח עין למבנה השפה: לזהות הכללה, מחיקה או עיוות לפני שנכנסים לפרשנות.</p>
                 </div>
                 <button type="button" class="cc-icon-btn" data-cc-action="close-philosopher" aria-label="סגור">ֳ—</button>
               </div>
               <div class="cc-summary-grid">
                 <div class="cc-summary-block">
-                  <h4>׳׳” ׳¢׳•׳©׳™׳ ׳‘׳₪׳•׳¢׳</h4>
+                  <h4>מה עושים בפועל</h4>
                   <p>${escapeHtml(copy.metaModelPurpose || 'מזהים מה חסר/מוכלל/מעוות בשפה ובוחרים תגובה מדויקת יותר.')}</p>
                 </div>
                 <div class="cc-summary-block">
-                  <h4>׳׳” ׳׳—׳₪׳©</h4>
+                  <h4>מה לחפש</h4>
                   <p>${escapeHtml(copy.problemDefinition || 'מה המבנה הלשוני יוצר במפה של הדובר/ת?')}</p>
                 </div>
                 <div class="cc-summary-block">
-                  <h4>׳׳” ׳”׳׳˜׳¨׳” ׳‘׳©׳׳׳”</h4>
+                  <h4>מה המטרה בשאלה</h4>
                   <p>${escapeHtml(copy.goalDefinition || 'להחזיר מידע חסר, לבדוק הנחה, או לצמצם הכללה.')}</p>
                 </div>
                 <div class="cc-summary-block">
-                  <h4>׳›׳™׳•׳•׳ ׳§׳׳׳¡׳™</h4>
+                  <h4>כיוון קלאסי</h4>
                   <p><strong>${escapeHtml(operation.code)}</strong> ֲ· ${escapeHtml(operation.title)}</p>
                   <p>${escapeHtml(operation.desc)}</p>
                 </div>
@@ -1916,7 +1916,7 @@
         return `
           <section class="cc-practice-card cc-round-summary-card">
             <div class="cc-practice-card-head">
-              <div class="cc-card-kicker">׳¡׳™׳•׳ ׳©׳׳׳”</div>
+              <div class="cc-card-kicker">סיום שאלה</div>
               <h2>${escapeHtml(round?.pattern?.name || 'סיכום')}</h2>
               <p>${escapeHtml(round?.pattern?.definition || '')}</p>
             </div>
@@ -1933,7 +1933,7 @@
             ${renderPersistentExplanation()}
             <div class="cc-primary-actions">
               <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="${primaryAction}">${primaryLabel}</button>
-              <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="end-session">׳¡׳™׳•׳ ׳¢׳›׳©׳™׳•</button>
+              <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="end-session">סיום עכשיו</button>
             </div>
           </section>
         `;
@@ -1985,9 +1985,9 @@
             ${renderPersistentExplanation()}
             ${renderOptions(round)}
             <div class="cc-practice-actions">
-              <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="use-hint" ${canUseHint ? '' : 'disabled'}>׳¨׳׳–</button>
+              <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="use-hint" ${canUseHint ? '' : 'disabled'}>רמז</button>
               <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="toggle-pause" ${state.mode !== 'learning' || state.session?.ended ? 'disabled' : ''}>${state.paused ? 'המשך' : 'השהיה'}</button>
-              <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="restart-session">׳”׳×׳—׳ ׳׳—׳“׳©</button>
+              <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="restart-session">התחל מחדש</button>
             </div>
           </section>
         `;
@@ -1998,14 +1998,14 @@
         const timerTone = timerEnabledForSession() && session?.timeLeftSeconds <= 30 ? 'warn' : '';
         const timerText = timerEnabledForSession() ? formatTime(session?.timeLeftSeconds || 0) : 'ללא טיימר';
         const livesChip = state.mode === 'exam'
-            ? `<div class="cc-top-chip" data-tone="${session?.livesLeft <= 1 ? 'warn' : ''}"><span>׳—׳™׳™׳</span><strong>${Number.isFinite(session?.livesLeft) ? session.livesLeft : '-'}</strong></div>`
+            ? `<div class="cc-top-chip" data-tone="${session?.livesLeft <= 1 ? 'warn' : ''}"><span>חיים</span><strong>${Number.isFinite(session?.livesLeft) ? session.livesLeft : '-'}</strong></div>`
             : '';
         return `
           <header class="cc-practice-bar">
             <div class="cc-practice-bar-main">
-              <div class="cc-top-chip"><span>׳©׳׳׳”</span><strong>${progress.current}/${progress.total}</strong></div>
-              <div class="cc-top-chip"><span>׳ ׳™׳§׳•׳“</span><strong>${session?.score ?? 0}</strong></div>
-              <div class="cc-top-chip" data-tone="${timerTone}"><span>׳–׳׳</span><strong>${escapeHtml(timerText)}</strong></div>
+              <div class="cc-top-chip"><span>שאלה</span><strong>${progress.current}/${progress.total}</strong></div>
+              <div class="cc-top-chip"><span>ניקוד</span><strong>${session?.score ?? 0}</strong></div>
+              <div class="cc-top-chip" data-tone="${timerTone}"><span>זמן</span><strong>${escapeHtml(timerText)}</strong></div>
               ${livesChip}
             </div>
             <div class="cc-practice-bar-actions">
@@ -2023,16 +2023,16 @@
             <div class="cc-drawer">
               <div class="cc-drawer-head">
                 <div>
-                  <div class="cc-modal-kicker">׳”׳’׳“׳¨׳•׳×</div>
-                  <h2>׳©׳™׳ ׳•׳™ ׳”׳’׳“׳¨׳•׳× ׳×׳¨׳’׳•׳</h2>
-                  <p>׳”׳’׳“׳¨׳•׳× ׳ ׳©׳׳¨׳•׳× ׳׳•׳˜׳•׳׳˜׳™׳×. ׳›׳“׳™ ׳׳”׳—׳™׳ ׳¢׳ ׳”׳¡׳©׳ ׳”׳ ׳•׳›׳—׳™, ׳”׳₪׳¢׳™׳׳• ׳׳—׳“׳©.</p>
+                  <div class="cc-modal-kicker">הגדרות</div>
+                  <h2>שינוי הגדרות תרגול</h2>
+                  <p>הגדרות נשמרות אוטומטית. כדי להחיל על הסשן הנוכחי, הפעילו מחדש.</p>
                 </div>
                 <button type="button" class="cc-icon-btn" data-cc-action="close-settings-drawer" aria-label="סגור">ֳ—</button>
               </div>
               ${renderSettingsControls('drawer')}
               <div class="cc-modal-actions">
-                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="apply-settings-and-restart">׳”׳₪׳¢׳ ׳׳—׳“׳© ׳¢׳ ׳”׳”׳’׳“׳¨׳•׳×</button>
-                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-settings-drawer">׳¡׳’׳•׳¨</button>
+                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="apply-settings-and-restart">הפעל מחדש עם ההגדרות</button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-settings-drawer">סגור</button>
               </div>
             </div>
           </div>
@@ -2046,7 +2046,7 @@
           <div class="cc-practice-shell" aria-label="תרגול מטה מודל">
             ${renderPracticeTopBar(session, round)}
             <div class="cc-practice-meta-row">
-              <button type="button" class="cc-link-btn" data-cc-action="show-before-start">׳׳₪׳ ׳™ ׳©׳׳×׳—׳™׳׳™׳ (30 ׳©׳ ׳™׳•׳×)</button>
+              <button type="button" class="cc-link-btn" data-cc-action="show-before-start">לפני שמתחילים (30 שניות)</button>
               ${renderSettingsSummaryLine()}
             </div>
             ${round ? renderStageProgressPills(round) : ''}
@@ -2063,11 +2063,11 @@
         const weakestFamily = (report.perFamily || []).slice().sort((a, b) => a.accuracy - b.accuracy)[0];
         const weakestPattern = (report.weakPatterns || [])[0];
         if (weakestFamily) {
-            suggestions.push(`׳¡׳©׳ ׳”׳‘׳: ׳׳”׳×׳׳§׳“ ׳‘-${familyLabelSimple(weakestFamily.family)} ׳›׳“׳™ ׳׳—׳–׳§ ׳“׳™׳•׳§ ׳‘׳¡׳™׳¡׳™.`);
+            suggestions.push(`סשן הבא: להתמקד ב-${familyLabelSimple(weakestFamily.family)} כדי לחזק דיוק בסיסי.`);
         }
         if (weakestPattern) {
             const patternName = patternMap.get(weakestPattern.patternId)?.name || weakestPattern.patternId;
-            suggestions.push(`׳—׳–׳¨׳” ׳׳׳•׳§׳“׳× ׳¢׳ "${patternName}" ׳׳₪׳ ׳™ ׳”׳¢׳׳׳× ׳§׳•׳©׳™.`);
+            suggestions.push(`חזרה ממוקדת על "${patternName}" לפני העלאת קושי.`);
         }
         if ((report.overall?.accuracy || 0) >= 80) {
             suggestions.push('אפשר לעלות קושי או לעבור למצב מבחן לסשן הבא.');
@@ -2091,39 +2091,39 @@
         return `
           <div class="cc-summary-shell" aria-label="סיכום תרגול">
             <section class="cc-summary-hero">
-              <div class="cc-modal-kicker">׳¡׳™׳›׳•׳</div>
-              <h1>׳¡׳™׳›׳•׳ ׳×׳¨׳’׳•׳ Meta Model</h1>
-              <p>׳¡׳™׳™׳׳×׳ ${report.completedRounds} ׳©׳׳׳•׳×. ׳”׳ ׳” ׳׳” ׳”׳©׳×׳₪׳¨, ׳׳™׳₪׳” ׳›׳“׳׳™ ׳׳“׳™׳™׳§, ׳•׳׳” ׳׳•׳׳׳¥ ׳׳×׳¨׳’׳ ׳‘׳”׳׳©׳.</p>
+              <div class="cc-modal-kicker">סיכום</div>
+              <h1>סיכום תרגול Meta Model</h1>
+              <p>סיימתם ${report.completedRounds} שאלות. הנה מה השתפר, איפה כדאי לדייק, ומה מומלץ לתרגל בהמשך.</p>
             </section>
 
             <div class="cc-report-grid cc-report-grid-modern">
-              <div class="cc-report-stat"><strong>${report.overall.accuracy}%</strong><span>׳“׳™׳•׳§ ׳›׳•׳׳</span></div>
-              <div class="cc-report-stat"><strong>${report.score}</strong><span>׳ ׳™׳§׳•׳“</span></div>
-              <div class="cc-report-stat"><strong>${report.completedRounds}</strong><span>׳©׳׳׳•׳× ׳©׳”׳•׳©׳׳׳•</span></div>
+              <div class="cc-report-stat"><strong>${report.overall.accuracy}%</strong><span>דיוק כולל</span></div>
+              <div class="cc-report-stat"><strong>${report.score}</strong><span>ניקוד</span></div>
+              <div class="cc-report-stat"><strong>${report.completedRounds}</strong><span>שאלות שהושלמו</span></div>
             </div>
 
             <div class="cc-summary-grid">
               <div class="cc-summary-block">
-                <h4>3 ׳”׳׳׳¦׳•׳× ׳׳™׳׳•׳</h4>
+                <h4>3 המלצות אימון</h4>
                 <ul>
                   ${suggestions.map((text) => `<li>${escapeHtml(text)}</li>`).join('')}
                 </ul>
               </div>
 
               <div class="cc-summary-block">
-                <h4>׳׳” ׳”׳›׳™ ׳”׳×׳‘׳׳‘׳</h4>
+                <h4>מה הכי התבלבל</h4>
                 ${weakPatterns.length ? `
                   <ul>
                     ${weakPatterns.map((row) => {
                         const p = patternMap.get(row.patternId);
-                        return `<li><strong>${escapeHtml(p?.name || row.patternId)}</strong> ֲ· ${row.accuracy}% ׳“׳™׳•׳§ ֲ· ׳˜׳¢׳•׳™׳•׳×: ${row.wrongStages}</li>`;
+                        return `<li><strong>${escapeHtml(p?.name || row.patternId)}</strong> · ${row.accuracy}% דיוק · טעויות: ${row.wrongStages}</li>`;
                     }).join('')}
                   </ul>
                 ` : '<p>אין מספיק נתונים כדי לזהות דפוסים חלשים.</p>'}
               </div>
 
               <div class="cc-summary-block">
-                <h4>׳׳” ׳”׳׳ ׳˜׳•׳‘</h4>
+                <h4>מה הלך טוב</h4>
                 ${strongestFamilies.length ? `
                   <ul>
                     ${strongestFamilies.map((row) => `<li>${escapeHtml(familyLabelSimple(row.family))} ֲ· ${row.accuracy}%</li>`).join('')}
@@ -2133,9 +2133,9 @@
             </div>
 
             <div class="cc-primary-actions">
-              <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="restart-session">׳×׳¨׳’׳•׳ ׳ ׳•׳¡׳£ ׳‘׳׳•׳×׳” ׳¨׳׳”</button>
-              <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="open-setup">׳©׳ ׳” ׳”׳’׳“׳¨׳•׳×</button>
-              <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="back-to-intro">׳—׳–׳¨׳” ׳׳₪׳×׳™׳—׳”</button>
+              <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="restart-session">תרגול נוסף באותה רמה</button>
+              <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="open-setup">שנה הגדרות</button>
+              <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="back-to-intro">חזרה לפתיחה</button>
             </div>
 
             ${renderSetupModal()}
@@ -2150,19 +2150,19 @@
           <div class="cc-entry-shell" aria-label="פתיחת תרגול">
             <section class="cc-entry-card">
               <div class="cc-modal-kicker">Classic Meta Model</div>
-              <h1>Classic Meta Model ג€” ׳–׳™׳”׳•׳™ ׳×׳‘׳ ׳™׳•׳×</h1>
-              <p>׳׳×׳ ׳׳§׳‘׳׳™׳ ׳§׳˜׳¢ ׳“׳™׳‘׳•׳¨ ׳©׳ ג€׳׳˜׳•׳₪׳ג€. ׳”׳׳©׳™׳׳”: ׳׳–׳”׳•׳× ׳׳× ׳”׳׳‘׳ ׳” ׳”׳׳¨׳›׳–׳™, ׳׳§׳‘׳ ׳׳©׳•׳‘ ׳׳™׳™׳“׳™, ׳•׳׳”׳׳©׳™׳ ׳׳©׳׳׳” ׳”׳‘׳׳”.</p>
-              <p class="cc-entry-sub">׳₪׳×׳™׳— ׳§׳¦׳¨ ׳₪׳¢׳ ׳׳—׳×, ׳•׳׳– ׳׳¡׳ ׳×׳¨׳’׳•׳ ׳ ׳§׳™ ׳‘׳׳™ ׳‘׳׳•׳§׳™ ׳”׳’׳“׳¨׳•׳× ׳§׳‘׳•׳¢׳™׳.</p>
+              <h1>Classic Meta Model — זיהוי תבניות</h1>
+              <p>אתם מקבלים קטע דיבור של “מטופל”. המשימה: לזהות את המבנה המרכזי, לקבל משוב מיידי, ולהמשיך לשאלה הבאה.</p>
+              <p class="cc-entry-sub">פתיח קצר פעם אחת, ואז מסך תרגול נקי בלי בלוקי הגדרות קבועים.</p>
               ${renderSettingsSummaryLine()}
               <div class="cc-primary-actions">
-                <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="open-setup">׳”׳×׳—׳ ׳×׳¨׳’׳•׳</button>
+                <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="open-setup">התחל תרגול</button>
                 ${state.hasSavedSettings ? `<button type="button" class="cc-btn cc-btn-secondary" data-cc-action="continue-last-settings">המשך עם ההגדרות האחרונות</button>` : ''}
-                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="show-before-start">׳׳₪׳ ׳™ ׳©׳׳×׳—׳™׳׳™׳ (30 ׳©׳ ׳™׳•׳×)</button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="show-before-start">לפני שמתחילים (30 שניות)</button>
               </div>
               <div class="cc-entry-mini">
-                <span>׳׳¦׳‘: ${settings.mode === 'exam' ? 'מבחן' : 'לימוד'}</span>
-                <span>׳§׳•׳©׳™: ${settings.difficulty}</span>
-                <span>׳§׳˜׳’׳•׳¨׳™׳”: ${familyLabelSimple(settings.familyFocus)}</span>
+                <span>מצב: ${settings.mode === 'exam' ? 'מבחן' : 'לימוד'}</span>
+                <span>קושי: ${settings.difficulty}</span>
+                <span>קטגוריה: ${familyLabelSimple(settings.familyFocus)}</span>
               </div>
             </section>
             ${renderSetupModal()}
@@ -2303,7 +2303,7 @@
             state.appStage = SESSION_STATE_INTRO;
             render();
         } catch (error) {
-            state.loadError = `׳©׳’׳™׳׳” ׳‘׳˜׳¢׳™׳ ׳× Classic Classic: ${error.message || error}`;
+            state.loadError = `שגיאה בטעינת Classic Classic: ${error.message || error}`;
             state.loaded = false;
             render();
         }
