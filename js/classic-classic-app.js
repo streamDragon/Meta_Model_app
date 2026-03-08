@@ -1874,7 +1874,7 @@
         const entry = state.explanationPanel?.entry;
         if (!entry || !state.explanationPanel?.open) return '';
         return `
-          <section class="cc-explanation-panel" data-tone="${escapeHtml(entry.tone || 'info')}" aria-label="הסבר מלא">
+          <section class="cc-explanation-panel" data-tone="${escapeHtml(entry.tone || 'info')}" data-alchemy-skip="1" aria-label="הסבר מלא">
             <div class="cc-explanation-head">
               <div>
                 <span class="cc-card-kicker">${escapeHtml(entry.stageLabel || '')}</span>
@@ -1914,7 +1914,7 @@
         const operation = operationProfileForFamily(round?.pattern?.family);
         const promptData = getPromptDisplayData(round);
         return `
-          <section class="cc-practice-card cc-round-summary-card">
+          <section class="cc-practice-card cc-round-summary-card" data-alchemy-skip="1">
             <div class="cc-practice-card-head">
               <div class="cc-card-kicker">סיום שאלה</div>
               <h2>${escapeHtml(round?.pattern?.name || 'סיכום')}</h2>
