@@ -20,6 +20,7 @@ const STATUS_BAR_ID = 'freemium-status-bar';
 const ERROR_BANNER_ID = 'freemium-error-banner';
 const GUEST_FREE_LIMIT = 10;
 const FREE_PACK_TOTAL = 60;
+const FREEMIUM_TEST_BYPASS = true;
 const AUTH_REQUIRED_SELECTORS = [
     '[data-auth-required-overlay]',
     '[data-auth-required]',
@@ -87,6 +88,29 @@ function createGuestUiEntitlements() {
         remaining: GUEST_FREE_LIMIT,
         daily_limit: GUEST_FREE_LIMIT,
         unlimited: false
+    };
+}
+
+function isFreemiumTestingBypassEnabled() {
+    return FREEMIUM_TEST_BYPASS === true;
+}
+
+function createTestingUiEntitlements() {
+    return {
+        role: 'pro',
+        plan: 'pro',
+        ads_enabled: false,
+        total_quota: FREE_PACK_TOTAL,
+        guest_daily_limit: GUEST_FREE_LIMIT,
+        guest_daily_used_today: 0,
+        guest_daily_remaining: GUEST_FREE_LIMIT,
+        free_total_limit: FREE_PACK_TOTAL,
+        free_total_used: 0,
+        free_total_remaining: FREE_PACK_TOTAL,
+        remaining: FREE_PACK_TOTAL,
+        daily_limit: FREE_PACK_TOTAL,
+        unlimited: true,
+        testing_bypass: true
     };
 }
 
@@ -192,7 +216,9 @@ function updateDebugSnapshot() {
     if (!root) return;
 
     const auth = getAuthSnapshot();
-    const ent = getEntitlementsSnapshot();
+    const ent = isFreemiumTestingBypassEnabled()
+        ? createTestingUiEntitlements()
+        : getEntitlementsSnapshot();
     const signedIn = String(auth?.status || '') === 'authenticated' ? 'yes' : 'no';
     const email = String(auth?.email || '').trim() || '-';
     const userId = String(auth?.user?.id || '').trim() || '-';
@@ -228,6 +254,17 @@ function appendDebugLog(message) {
 async function runDebugConsume(count = 1, requestId = '', source = 'debug') {
     const normalizedCount = Math.max(1, Math.min(100, Math.floor(Number(count) || 1)));
     const normalizedRequestId = String(requestId || '').trim() || createQuotaRequestId(source);
+    if (isFreemiumTestingBypassEnabled()) {
+        freemiumState.lastDebugRequestId = normalizedRequestId;
+        appendDebugLog(`consume count=${normalizedCount} request_id=${normalizedRequestId} rpc=testing_bypass ok=true reason=testing_bypass remaining=unlimited`);
+        updateDebugSnapshot();
+        return {
+            ok: true,
+            reason: 'testing_bypass',
+            rpc: 'testing_bypass',
+            entitlements: createTestingUiEntitlements()
+        };
+    }
     const result = await consumeSentence({
         count: normalizedCount,
         requestId: normalizedRequestId,
@@ -309,6 +346,8 @@ function setupDebugPanel() {
 }
 
 function ensureStatusBar() {
+    if (isFreemiumTestingBypassEnabled()) return null;
+
     let bar = document.getElementById(STATUS_BAR_ID);
     if (bar) return bar;
 
@@ -410,6 +449,19 @@ function unlockAuthRequiredUi() {
 }
 
 function updateStatusBar(entitlements, authState = null) {
+    if (isFreemiumTestingBypassEnabled()) {
+        const row = createTestingUiEntitlements();
+        freemiumState.currentRole = String(row.role || 'pro');
+        freemiumState.remaining = Number.POSITIVE_INFINITY;
+        const existingBar = document.getElementById(STATUS_BAR_ID);
+        if (existingBar) existingBar.remove();
+        const existingBanner = document.getElementById(ERROR_BANNER_ID);
+        if (existingBanner) existingBanner.classList.add('hidden');
+        document.documentElement.setAttribute('data-freemium-test-bypass', '1');
+        document.body.classList.add('freemium-test-bypass');
+        return row;
+    }
+
     const bar = ensureStatusBar();
     const roleEl = bar.querySelector('[data-freemium-role]');
     const meterEl = bar.querySelector('[data-freemium-meter]');
@@ -454,6 +506,8 @@ async function fetchJson(url, options = {}) {
 }
 
 async function createCheckout(plan) {
+    if (isFreemiumTestingBypassEnabled()) return;
+
     const token = await getAccessToken();
     if (!token) throw new Error('NO_TOKEN');
 
@@ -471,6 +525,8 @@ async function createCheckout(plan) {
 }
 
 async function openPortal() {
+    if (isFreemiumTestingBypassEnabled()) return;
+
     const token = await getAccessToken();
     if (!token) throw new Error('NO_TOKEN');
 
@@ -499,6 +555,17 @@ const paywallUi = createPaywallUi({
 });
 
 async function runRefresh(options = {}) {
+    if (isFreemiumTestingBypassEnabled()) {
+        const entitlements = updateStatusBar(createTestingUiEntitlements(), freemiumState.authState);
+        hideEntitlementsError();
+        paywallUi.closeModal();
+        AdsProvider.disable();
+        setGuestReadyState(true);
+        unlockAuthRequiredUi();
+        updateDebugSnapshot();
+        return entitlements;
+    }
+
     await ensureSession();
     const entitlements = await refreshEntitlements({
         force: Boolean(options.force),
@@ -527,7 +594,9 @@ async function refreshAll(forceOrOptions = false) {
     }
 
     freemiumState.refreshPromise = (async () => {
-        let lastEntitlements = getEntitlementsSnapshot() || createGuestUiEntitlements();
+        let lastEntitlements = isFreemiumTestingBypassEnabled()
+            ? createTestingUiEntitlements()
+            : (getEntitlementsSnapshot() || createGuestUiEntitlements());
         while (freemiumState.pendingRefreshOptions) {
             const nextRefresh = freemiumState.pendingRefreshOptions;
             freemiumState.pendingRefreshOptions = null;
@@ -542,7 +611,9 @@ async function refreshAll(forceOrOptions = false) {
         showEntitlementsError(error, async () => {
             await refreshAll({ force: true, reason: 'retry_after_error' });
         });
-        return getEntitlementsSnapshot() || createGuestUiEntitlements();
+        return isFreemiumTestingBypassEnabled()
+            ? createTestingUiEntitlements()
+            : (getEntitlementsSnapshot() || createGuestUiEntitlements());
     } finally {
         freemiumState.refreshPromise = null;
     }
@@ -564,6 +635,7 @@ function handleStripeReturn() {
 
 function bindStatusBarActions() {
     const bar = ensureStatusBar();
+    if (!bar) return;
     bar.addEventListener('click', async (event) => {
         const btn = event.target?.closest?.('[data-freemium-action-primary]');
         if (!btn) return;
@@ -590,6 +662,12 @@ function bindStatusBarActions() {
 }
 
 async function consumeSentenceOrPrompt(options = {}) {
+    if (isFreemiumTestingBypassEnabled()) {
+        updateStatusBar(createTestingUiEntitlements(), freemiumState.authState);
+        AdsProvider.disable();
+        return true;
+    }
+
     if (freemiumState.isBusy) return false;
 
     const count = Math.max(1, Math.min(100, Math.floor(Number(options.count) || 1)));
@@ -649,7 +727,9 @@ function exposeApi() {
     window.MetaFreemium = {
         refreshEntitlements: async (force = true) => refreshAll({ force: Boolean(force), reason: 'api_refresh' }),
         bootstrapAuth: async (reason = 'api_bootstrap') => bootstrapAuth(reason),
-        getEntitlements: () => getEntitlementsSnapshot(),
+        getEntitlements: () => isFreemiumTestingBypassEnabled()
+            ? createTestingUiEntitlements()
+            : getEntitlementsSnapshot(),
         getAuthSnapshot: () => getAuthSnapshot(),
         consumeSentenceOrPrompt,
         debugConsume: async (options = {}) => {
@@ -659,16 +739,31 @@ function exposeApi() {
             return runDebugConsume(count, requestId, source);
         },
         getLastDebugRequestId: () => String(freemiumState.lastDebugRequestId || ''),
-        openGuestLoginModal: () => paywallUi.openGuestAuthModal(),
-        openUpgradeModal: () => paywallUi.openFreeQuotaEndedModal(),
+        openGuestLoginModal: () => {
+            if (isFreemiumTestingBypassEnabled()) return false;
+            paywallUi.openGuestAuthModal();
+            return true;
+        },
+        openUpgradeModal: () => {
+            if (isFreemiumTestingBypassEnabled()) return false;
+            paywallUi.openFreeQuotaEndedModal();
+            return true;
+        },
         showLockedPreview: (items = []) => paywallUi.openLockedPreviewModal(items),
         showToast: (text, tone = 'info') => paywallUi.showToast(String(text || ''), tone),
-        openPortal,
+        openPortal: async () => {
+            if (isFreemiumTestingBypassEnabled()) return false;
+            return openPortal();
+        },
         signOut: async () => signOutNonGuest()
     };
 }
 
 function bindModalAdsSync() {
+    if (isFreemiumTestingBypassEnabled()) {
+        AdsProvider.disable();
+        return;
+    }
     window.addEventListener('freemium:modal-state', (event) => {
         const isOpen = Boolean(event?.detail?.open);
         if (isOpen) {
@@ -685,12 +780,24 @@ async function initializeFreemium() {
 
     try {
         setGuestReadyState(false);
+        exposeApi();
+        setupDebugPanel();
+
+        if (isFreemiumTestingBypassEnabled()) {
+            updateStatusBar(createTestingUiEntitlements(), freemiumState.authState);
+            hideEntitlementsError();
+            paywallUi.closeModal();
+            AdsProvider.disable();
+            setGuestReadyState(true);
+            unlockAuthRequiredUi();
+            updateDebugSnapshot();
+            return;
+        }
+
         bindStatusBarActions();
         bindModalAdsSync();
-        exposeApi();
         ensureStatusBar();
         ensureErrorBanner();
-        setupDebugPanel();
 
         onAuthSessionChange((snapshot) => {
             if (!snapshot?.ready) return;
@@ -755,7 +862,7 @@ async function initializeFreemium() {
             await refreshAll({ force: true, reason: 'init_retry' });
         });
         const bar = ensureStatusBar();
-        const meter = bar.querySelector('[data-freemium-meter]');
+        const meter = bar?.querySelector('[data-freemium-meter]');
         if (meter) {
             meter.innerHTML = `<span class="freemium-error">${escapeHtml(error?.message || 'לא זמין')}</span>`;
         }
@@ -768,7 +875,9 @@ export async function bootstrapAuth(reason = 'bootstrap') {
     freemiumState.bootstrapPromise = (async () => {
         await initializeFreemium();
         await refreshAll({ force: true, reason: String(reason || 'bootstrap') });
-        return getEntitlementsSnapshot() || createGuestUiEntitlements();
+        return isFreemiumTestingBypassEnabled()
+            ? createTestingUiEntitlements()
+            : (getEntitlementsSnapshot() || createGuestUiEntitlements());
     })();
 
     try {
