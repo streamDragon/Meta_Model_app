@@ -928,6 +928,15 @@
         }, 760);
     }
 
+    function clearTransientBursts() {
+        try {
+            var nodes = document.querySelectorAll('.alchemy-spark, .alchemy-confetti');
+            nodes.forEach(function (node) {
+                if (node && node.parentNode) node.parentNode.removeChild(node);
+            });
+        } catch (_error) {}
+    }
+
     function spawnSparks(x, y, count, radius) {
         if (prefersReducedMotion) return;
         var i;
@@ -943,13 +952,14 @@
             (function (node) {
                 setTimeout(function () {
                     if (node && node.parentNode) node.parentNode.removeChild(node);
-                }, 820);
+                }, 620);
             })(s);
         }
     }
 
     function celebrateAt(x, y, tier) {
         if (prefersReducedMotion) return;
+        clearTransientBursts();
         var count = tier === 'mastery' ? 40 : 24;
         var colors = ['#fbbf24', '#06b6d4', '#818cf8', '#ffffff', '#f59e0b'];
         var i;
@@ -967,7 +977,7 @@
             (function (node) {
                 setTimeout(function () {
                     if (node && node.parentNode) node.parentNode.removeChild(node);
-                }, 1900);
+                }, 1350);
             })(c);
         }
         spawnSparks(x, y, tier === 'mastery' ? 20 : 12, tier === 'mastery' ? 52 : 34);
