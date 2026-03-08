@@ -1392,9 +1392,14 @@
         });
     }
 
-    function openScenarioPanelById(screenState, panelId, options) {
-        if (!screenState) return;
+    function resolveScenarioPanelId(panelId) {
+        const safePanelId = String(panelId || '').trim();
+        if (safePanelId === 'setup' || safePanelId === 'wizard') return 'domain';
+        return safePanelId;
+    }
 
+    function getScenarioPanelMeta(panelId) {
+        const resolvedPanelId = resolveScenarioPanelId(panelId);
         const panelMeta = {
             home: { title: 'בית סצנות', size: 'lg' },
             domain: { title: 'עזרה קצרה', size: 'md' },
@@ -1402,9 +1407,15 @@
             history: { title: 'היסטוריית סצנות', size: 'lg' },
             blueprint: { title: 'הסבר מעמיק', size: 'xl' }
         };
-        const baseMeta = panelMeta[panelId] || { title: 'חלון משנה', size: 'lg' };
+        return { id: resolvedPanelId, ...(panelMeta[resolvedPanelId] || { title: 'חלון משנה', size: 'lg' }) };
+    }
+
+    function openScenarioPanelById(screenState, panelId, options) {
+        if (!screenState) return;
+
+        const baseMeta = getScenarioPanelMeta(panelId);
         const merged = { ...baseMeta, ...(options && typeof options === 'object' ? options : {}) };
-        openScenarioPanelOverlay(screenState, panelId, merged);
+        openScenarioPanelOverlay(screenState, baseMeta.id, merged);
     }
 
     function mountScenarioTrainerShell() {
@@ -1412,6 +1423,7 @@
         if (mode !== 'shell') return null;
 
         const section = document.getElementById(SCENARIO_SCREEN_ID);
+        const config = getShellRegistryEntry(SCENARIO_SCREEN_ID);
         if (!section) return null;
         if (stateByScreen[SCENARIO_SCREEN_ID] && stateByScreen[SCENARIO_SCREEN_ID].mounted) {
             return stateByScreen[SCENARIO_SCREEN_ID];
@@ -1482,11 +1494,24 @@
                 activeOverlayPanel: '',
                 currentInlineScreen: '',
                 wizardShown: readSessionFlag(SCENARIO_WIZARD_KEY),
+                config,
                 panelOpens: Object.create(null),
                 lastOpenedPanel: '',
                 lastOpenedPanelTitle: '',
                 lastPanelOpenAt: ''
             };
+
+            const headerActions = Array.isArray(config?.panels) ? config.panels : [];
+            headerActions.forEach((panel) => {
+                const panelId = typeof panel === 'string' ? panel : String(panel?.id || '').trim();
+                if (!panelId) return;
+                const panelMeta = getScenarioPanelMeta(panelId);
+                shell.headerActions.appendChild(createActionButton({
+                    label: (typeof panel === 'object' && panel ? panel.action || panel.title : '') || panelMeta.title || 'פרטים',
+                    icon: getPanelIcon(panelMeta.id),
+                    onClick: () => openScenarioPanelById(screenState, panelMeta.id)
+                }));
+            });
 
             container.prepend(shell.root);
             section.classList.add('shell-screen-active');
