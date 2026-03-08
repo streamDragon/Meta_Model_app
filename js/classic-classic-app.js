@@ -52,6 +52,16 @@
         }
     };
 
+    const DEFAULT_MOBILE_ZONE_ORDER = Object.freeze(['purpose', 'start', 'helper-steps', 'main', 'support']);
+    const MOBILE_ZONE_ALIASES = Object.freeze({
+        purpose: 'purpose',
+        start: 'start',
+        helper: 'helper-steps',
+        'helper-steps': 'helper-steps',
+        main: 'main',
+        support: 'support'
+    });
+
     function escapeHtml(value) {
         if (value === null || value === undefined) return '';
         return String(value)
@@ -60,6 +70,38 @@
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
+    }
+
+    function getMobileZoneOrder() {
+        const raw = Array.isArray(trainerContract?.mobilePriorityOrder) ? trainerContract.mobilePriorityOrder : [];
+        const seen = new Set();
+        const ordered = [];
+        raw.forEach((item) => {
+            const key = MOBILE_ZONE_ALIASES[String(item || '').trim()];
+            if (!key || seen.has(key)) return;
+            seen.add(key);
+            ordered.push(key);
+        });
+        DEFAULT_MOBILE_ZONE_ORDER.forEach((key) => {
+            if (seen.has(key)) return;
+            seen.add(key);
+            ordered.push(key);
+        });
+        return ordered;
+    }
+
+    function getMobileZoneOrderValue(zoneId) {
+        const ordered = getMobileZoneOrder();
+        const index = ordered.indexOf(zoneId);
+        return index === -1 ? DEFAULT_MOBILE_ZONE_ORDER.indexOf(zoneId) + 1 : index + 1;
+    }
+
+    function getMobileZoneStyle(zoneId) {
+        return `style="--cc-mobile-order:${getMobileZoneOrderValue(zoneId)}"`;
+    }
+
+    function getMobileOrderAttr() {
+        return escapeHtml(getMobileZoneOrder().join(','));
     }
 
     function detailStateKey(rawKey) {
@@ -1811,7 +1853,7 @@
         const steps = Array.isArray(trainerContract?.helperSteps) ? trainerContract.helperSteps : [];
         if (!steps.length) return '';
         return `
-          <section class="cc-platform-helper-strip" aria-label="שלבי התחלה">
+          <section class="cc-platform-helper-strip" aria-label="שלבי התחלה" data-trainer-zone="helper-steps" ${getMobileZoneStyle('helper-steps')}>
             ${steps.map((step) => `
               <article class="cc-platform-helper-step">
                 <strong>${escapeHtml(step.title || '')}</strong>
@@ -2165,7 +2207,7 @@
         const phase = getPhaseMeta(round?.stage || 'context');
         const steps = Array.isArray(trainerContract?.helperSteps) ? trainerContract.helperSteps : [];
         return `
-          <aside class="cc-platform-support" aria-label="תמיכה צדית" data-trainer-zone="support" data-trainer-support-mode="${escapeHtml(trainerContract?.supportRailMode || 'guided-explanation')}">
+          <aside class="cc-platform-support" aria-label="תמיכה צדית" data-trainer-zone="support" data-trainer-support-mode="${escapeHtml(trainerContract?.supportRailMode || 'guided-explanation')}" ${getMobileZoneStyle('support')}>
             <section class="cc-platform-support-card">
               <div class="cc-card-kicker">מה קורה עכשיו</div>
               <h3>${escapeHtml(phase.label)}</h3>
@@ -2203,14 +2245,14 @@
         const session = state.session;
         const round = currentRound();
         return `
-          <div class="cc-practice-shell" aria-label="תרגול מטה מודל" data-trainer-platform="1" data-trainer-id="classic-classic">
+          <div class="cc-practice-shell" aria-label="תרגול מטה מודל" data-trainer-platform="1" data-trainer-id="classic-classic" data-trainer-mobile-order="${getMobileOrderAttr()}">
             ${renderPracticeTopBar(session, round)}
             <div class="cc-practice-meta-row">
               <button type="button" class="cc-link-btn" data-cc-action="show-before-start">לפני שמתחילים (30 שניות)</button>
               <span class="cc-settings-preview-pill" data-trainer-summary="current">${escapeHtml(currentSettingsSummaryText())}</span>
             </div>
             <div class="cc-platform-practice-layout">
-              <div class="cc-platform-practice-main" data-trainer-zone="main">
+              <div class="cc-platform-practice-main" data-trainer-zone="main" ${getMobileZoneStyle('main')}>
                 ${round ? renderStageProgressPills(round) : ''}
                 ${renderPracticeCard(round)}
               </div>
@@ -2312,13 +2354,15 @@
     function renderIntroScreen() {
         const settings = normalizePracticeSettings(state.settings || defaultPracticeSettings());
         return `
-          <div class="cc-entry-shell" aria-label="פתיחת תרגול" data-trainer-platform="1" data-trainer-id="classic-classic">
+          <div class="cc-entry-shell" aria-label="פתיחת תרגול" data-trainer-platform="1" data-trainer-id="classic-classic" data-trainer-mobile-order="${getMobileOrderAttr()}">
             <section class="cc-entry-card">
-              <div class="cc-modal-kicker">${escapeHtml(trainerContract?.familyLabel || 'משפחת קלאסיק')}</div>
-              <h1>${escapeHtml(trainerContract?.title || 'Classic Classic — זיהוי תבניות')}</h1>
-              <p>${escapeHtml(trainerContract?.subtitle || 'מזהים את המבנה המרכזי, בודקים תשובה, ומבינים למה הבחירה נכונה או שגויה.')}</p>
-              <p class="cc-entry-sub">כאן שומעים משפט, מזהים איזה מבנה לשוני מחזיק אותו, ומקבלים הסבר יציב שמחבר בין השלב, הבחירה והלקח להמשך.</p>
-              <div class="cc-entry-start-strip">
+              <section class="cc-entry-purpose" data-trainer-zone="purpose" ${getMobileZoneStyle('purpose')}>
+                <div class="cc-modal-kicker">${escapeHtml(trainerContract?.familyLabel || 'משפחת קלאסיק')}</div>
+                <h1>${escapeHtml(trainerContract?.title || 'Classic Classic — זיהוי תבניות')}</h1>
+                <p>${escapeHtml(trainerContract?.subtitle || 'מזהים את המבנה המרכזי, בודקים תשובה, ומבינים למה הבחירה נכונה או שגויה.')}</p>
+                <p class="cc-entry-sub">כאן שומעים משפט, מזהים איזה מבנה לשוני מחזיק אותו, ומקבלים הסבר יציב שמחבר בין השלב, הבחירה והלקח להמשך.</p>
+              </section>
+              <div class="cc-entry-start-strip" data-trainer-zone="start" ${getMobileZoneStyle('start')}>
                 <div class="cc-entry-start-copy">
                   <strong>${escapeHtml(trainerContract?.quickStartLabel || 'מתחילים מכאן')}</strong>
                   <span>אפשר להתחיל מיד עם ברירת המחדל, או לפתוח הגדרות כדי לדייק עומס, קושי ומשפחת תרגול.</span>

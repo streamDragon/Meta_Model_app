@@ -12024,6 +12024,7 @@ function getDefaultScenarioSettings() {
         soundEnabled: true,
         defaultDifficulty: 'all',
         defaultDomain: 'all',
+        defaultRunSize: 6,
         prismWheelEnabled: true
     };
 }
@@ -12055,6 +12056,12 @@ function loadScenarioTrainerSettings() {
 
 function saveScenarioTrainerSettings() {
     localStorage.setItem(SCENARIO_STORAGE_KEYS.settings, JSON.stringify(scenarioTrainer.settings));
+}
+
+function clampScenarioRunSize(value) {
+    const parsed = parseInt(String(value ?? ''), 10);
+    if (!Number.isFinite(parsed)) return 6;
+    return Math.max(3, Math.min(10, parsed));
 }
 
 function loadScenarioTrainerProgress() {
@@ -12412,15 +12419,68 @@ function applyScenarioSettingsToControls() {
     const settingsDomainSelect = document.getElementById('scenario-setting-domain');
     const difficultySelect = document.getElementById('scenario-difficulty-select');
     const settingsDifficultySelect = document.getElementById('scenario-setting-difficulty');
+    const runSizeInput = document.getElementById('scenario-run-size');
+    const runSizeValue = document.getElementById('scenario-run-size-value');
+    const settingsRunSizeInput = document.getElementById('scenario-setting-run-size');
+    const settingsRunSizeValue = document.getElementById('scenario-setting-run-size-value');
     const soundToggle = document.getElementById('scenario-setting-sound');
     const prismToggle = document.getElementById('scenario-setting-prism');
+    const runSize = clampScenarioRunSize(scenarioTrainer.settings.defaultRunSize);
 
     if (domainSelect) domainSelect.value = scenarioTrainer.settings.defaultDomain || 'all';
     if (settingsDomainSelect) settingsDomainSelect.value = scenarioTrainer.settings.defaultDomain || 'all';
     if (difficultySelect) difficultySelect.value = scenarioTrainer.settings.defaultDifficulty || 'all';
     if (settingsDifficultySelect) settingsDifficultySelect.value = scenarioTrainer.settings.defaultDifficulty || 'all';
+    if (runSizeInput) runSizeInput.value = String(runSize);
+    if (runSizeValue) runSizeValue.textContent = String(runSize);
+    if (settingsRunSizeInput) settingsRunSizeInput.value = String(runSize);
+    if (settingsRunSizeValue) settingsRunSizeValue.textContent = String(runSize);
     if (soundToggle) soundToggle.checked = scenarioTrainer.settings.soundEnabled !== false;
     if (prismToggle) prismToggle.checked = scenarioTrainer.settings.prismWheelEnabled !== false;
+    renderScenarioSessionSummary();
+}
+
+function getScenarioDomainOptionLabel(domainId) {
+    const normalizedId = String(domainId || 'all');
+    if (normalizedId === 'all') return 'כל התחומים';
+    const match = (scenarioTrainerData.domains || []).find(item => String(item?.id) === normalizedId);
+    return normalizeScenarioCopy(match?.label, normalizedId);
+}
+
+function getScenarioDifficultyOptionLabel(difficultyId) {
+    const normalizedId = String(difficultyId || 'all');
+    if (normalizedId === 'all') return 'כל הרמות';
+    const match = (scenarioTrainerData.difficulties || []).find(item => String(item?.id) === normalizedId);
+    return normalizeScenarioCopy(match?.label, normalizedId);
+}
+
+function buildScenarioSessionSummary(options = {}) {
+    const preferSettings = !!options.preferSettings;
+    const domain = options.domain
+        || (preferSettings ? document.getElementById('scenario-setting-domain')?.value : document.getElementById('scenario-domain-select')?.value)
+        || (preferSettings ? document.getElementById('scenario-domain-select')?.value : document.getElementById('scenario-setting-domain')?.value)
+        || scenarioTrainer.settings.defaultDomain
+        || 'all';
+    const difficulty = options.difficulty
+        || (preferSettings ? document.getElementById('scenario-setting-difficulty')?.value : document.getElementById('scenario-difficulty-select')?.value)
+        || (preferSettings ? document.getElementById('scenario-difficulty-select')?.value : document.getElementById('scenario-setting-difficulty')?.value)
+        || scenarioTrainer.settings.defaultDifficulty
+        || 'all';
+    const runSize = clampScenarioRunSize(
+        options.runSize
+        || (preferSettings ? document.getElementById('scenario-setting-run-size')?.value : document.getElementById('scenario-run-size')?.value)
+        || (preferSettings ? document.getElementById('scenario-run-size')?.value : document.getElementById('scenario-setting-run-size')?.value)
+        || scenarioTrainer.settings.defaultRunSize
+        || 6
+    );
+    return `${runSize} סצנות · ${getScenarioDomainOptionLabel(domain)} · ${getScenarioDifficultyOptionLabel(difficulty)}`;
+}
+
+function renderScenarioSessionSummary() {
+    const currentSummary = document.getElementById('scenario-home-summary-pill');
+    const settingsSummary = document.getElementById('scenario-settings-summary-pill');
+    if (currentSummary) currentSummary.textContent = buildScenarioSessionSummary({ preferSettings: false });
+    if (settingsSummary) settingsSummary.textContent = buildScenarioSessionSummary({ preferSettings: true });
 }
 
 function renderScenarioHomeStats() {
@@ -12457,6 +12517,7 @@ function openScenarioHome() {
     scenarioTrainer.lastCommittedEntry = null;
     showScenarioScreen('home');
     renderScenarioHomeStats();
+    renderScenarioSessionSummary();
     setScenarioSafetyNoticeVisible(scenarioTrainer.safetyLocked);
 }
 
@@ -12479,6 +12540,7 @@ function openScenarioHistoryScreen() {
 
 function openScenarioSettingsScreen() {
     applyScenarioSettingsToControls();
+    renderScenarioSessionSummary();
     showScenarioScreen('settings');
 }
 
@@ -12543,8 +12605,8 @@ function getScenarioConsequenceLines(scenario, option, isGreen) {
         ? `מכאן אפשר לעבור אל השאלה המעשית: ${normalizeScenarioCopy(scenario?.deepeningQuestion, 'מה בדיוק קורה בפועל?')}`
         : `במקום לפתוח את השלב החסר, השיחה נשארת סביב תגובה אוטומטית והבעיה עצמה נשארת עמומה.`;
     return {
-        action: normalizeScenarioCopy(option?.feedback, emotionalLine),
-        result: processLine
+        action: normalizeScenarioCopy(option?.consequenceAction, emotionalLine),
+        result: normalizeScenarioCopy(option?.consequenceResult, processLine)
     };
 }
 
@@ -12563,11 +12625,13 @@ function startScenarioRun() {
     const runSizeInput = document.getElementById('scenario-run-size');
     const domain = domainSelect?.value || scenarioTrainer.settings.defaultDomain || 'all';
     const difficulty = difficultySelect?.value || scenarioTrainer.settings.defaultDifficulty || 'all';
-    const runSize = parseInt(runSizeInput?.value || '6', 10);
+    const runSize = clampScenarioRunSize(runSizeInput?.value || scenarioTrainer.settings.defaultRunSize || 6);
 
     scenarioTrainer.settings.defaultDomain = domain;
     scenarioTrainer.settings.defaultDifficulty = difficulty;
+    scenarioTrainer.settings.defaultRunSize = runSize;
     saveScenarioTrainerSettings();
+    renderScenarioSessionSummary();
 
     const queue = buildScenarioQueue(domain, difficulty, runSize);
     if (!queue.length) {
@@ -12722,8 +12786,8 @@ function renderScenarioFeedback(option, isGreen) {
         void mark.offsetWidth;
         mark.classList.add('animate');
     }
-    if (kind) kind.textContent = isGreen ? 'תגובה שמקדמת קשר ובהירות' : 'תגובה שמכבידה על הקשר ומשאירה עמימות';
-    if (title) title.textContent = isGreen ? 'השיחה מתחילה להיפתח' : 'השיחה עלולה להיסגר כאן';
+    if (kind) kind.textContent = isGreen ? 'כך זה כנראה יישמע בצד השני' : 'כך זה עלול להישמע בצד השני';
+    if (title) title.textContent = isGreen ? 'יש כאן מעבר מהתגוננות לבירור' : 'מכאן השיחה עלולה לעבור מהר להגנה או לריחוק';
     if (text) text.textContent = option.feedback || (isGreen ? 'בחרת תגובה שמקדמת פירוק ובהירות.' : 'התגובה שנבחרה משאירה את הסצנה מעורפלת או מאשימה.');
     if (choiceBubble) choiceBubble.textContent = option.text || option.speakerLine || '';
     if (otherBubble) otherBubble.textContent = normalizeScenarioCopy(option?.likelyOtherReply, 'הצד השני נשאר בלי תחושת בהירות.');
@@ -12734,8 +12798,8 @@ function renderScenarioFeedback(option, isGreen) {
     if (deepeningQuestionEl) deepeningQuestionEl.textContent = normalizeScenarioCopy(scenario?.deepeningQuestion, 'מה בדיוק קורה כאן בפועל?');
     if (metaCard && 'open' in metaCard) metaCard.open = false;
     if (note) note.textContent = isGreen
-        ? 'אפשר להמשיך מיד, או לפתוח ניתוח מעמיק כדי להפוך את התגובה הזאת לתוכנית פעולה קצרה.'
-        : 'אפשר להמשיך מיד, או לפתוח ניתוח מעמיק כדי לראות איזו שאלה הייתה פותחת את התקיעות במקום להחריף אותה.';
+        ? 'אפשר להמשיך מיד, או לפתוח עכשיו פירוק מעמיק כדי להפוך את התגובה הזאת לצעד הבא הקונקרטי.'
+        : 'אפשר להמשיך מיד, או לפתוח פירוק מעמיק כדי לראות איזו שאלה הייתה פותחת את התקיעות במקום להחריף אותה.';
     if (continueBtn) {
         const isLast = !!scenarioTrainer.session && scenarioTrainer.session.index >= scenarioTrainer.session.queue.length - 1;
         continueBtn.textContent = isLast ? 'סיום הסשן' : 'לסצנה הבאה';
@@ -13314,6 +13378,7 @@ function clearScenarioHistory() {
 function saveScenarioSettingsFromForm() {
     const domain = document.getElementById('scenario-setting-domain')?.value || 'all';
     const difficulty = document.getElementById('scenario-setting-difficulty')?.value || 'all';
+    const defaultRunSize = clampScenarioRunSize(document.getElementById('scenario-setting-run-size')?.value || scenarioTrainer.settings.defaultRunSize || 6);
     const soundEnabled = !!document.getElementById('scenario-setting-sound')?.checked;
     const prismWheelEnabled = !!document.getElementById('scenario-setting-prism')?.checked;
 
@@ -13321,11 +13386,13 @@ function saveScenarioSettingsFromForm() {
         ...scenarioTrainer.settings,
         defaultDomain: domain,
         defaultDifficulty: difficulty,
+        defaultRunSize,
         soundEnabled,
         prismWheelEnabled
     };
     saveScenarioTrainerSettings();
     applyScenarioSettingsToControls();
+    renderScenarioSessionSummary();
     showHint('הגדרות הסימולטור נשמרו');
     openScenarioHome();
 }
@@ -13357,13 +13424,31 @@ async function setupScenarioTrainerModule() {
 
     const runSlider = document.getElementById('scenario-run-size');
     const runValue = document.getElementById('scenario-run-size-value');
+    const settingsRunSlider = document.getElementById('scenario-setting-run-size');
+    const settingsRunValue = document.getElementById('scenario-setting-run-size-value');
     if (runSlider && runValue && runSlider.dataset.scenarioBound !== 'true') {
         runSlider.dataset.scenarioBound = 'true';
-        runValue.textContent = runSlider.value;
+        runValue.textContent = String(clampScenarioRunSize(runSlider.value));
         runSlider.addEventListener('input', () => {
-            runValue.textContent = runSlider.value;
+            runValue.textContent = String(clampScenarioRunSize(runSlider.value));
+            renderScenarioSessionSummary();
         });
     }
+    if (settingsRunSlider && settingsRunValue && settingsRunSlider.dataset.scenarioBound !== 'true') {
+        settingsRunSlider.dataset.scenarioBound = 'true';
+        settingsRunValue.textContent = String(clampScenarioRunSize(settingsRunSlider.value));
+        settingsRunSlider.addEventListener('input', () => {
+            settingsRunValue.textContent = String(clampScenarioRunSize(settingsRunSlider.value));
+            renderScenarioSessionSummary();
+        });
+    }
+
+    ['scenario-domain-select', 'scenario-difficulty-select', 'scenario-setting-domain', 'scenario-setting-difficulty'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el || el.dataset.scenarioBound === 'true') return;
+        el.dataset.scenarioBound = 'true';
+        el.addEventListener('change', renderScenarioSessionSummary);
+    });
 
     const loaded = await loadScenarioTrainerData();
     if (loaded) populateScenarioSelects();

@@ -2495,6 +2495,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         }
         helperSteps={helperSteps}
         supportRailMode={trainerContract.supportRailMode}
+        mobilePriorityOrder={trainerContract.mobilePriorityOrder}
         main={mainContent}
         support={supportContent}
       />

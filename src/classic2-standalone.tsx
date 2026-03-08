@@ -1,11 +1,13 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import Classic2Trainer from './components/Classic2Trainer';
+import { getTrainerContract } from './config/trainerContract';
 
 function bootClassic2(): void {
-  const mount = document.getElementById('classic2-root');
+  const mountId = getTrainerContract('classic2').wrapper.mountId || 'classic2-root';
+  const mount = document.getElementById(mountId);
   if (!mount) {
-    console.error('[Classic2] Missing #classic2-root mount node');
+    console.error(`[Classic2] Missing #${mountId} mount node`);
     return;
   }
 

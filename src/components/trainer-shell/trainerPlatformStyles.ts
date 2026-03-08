@@ -1,7 +1,7 @@
 export const TRAINER_PLATFORM_CSS = `
 .trp-page{direction:rtl;font-family:"Assistant","Heebo","Noto Sans Hebrew","Segoe UI",sans-serif;color:#10233e;max-width:1200px;margin:0 auto}
 .trp-page *{box-sizing:border-box}
-.trp-shell{background:radial-gradient(circle at top right,rgba(245,158,11,.16),transparent 28%),radial-gradient(circle at left top,rgba(59,130,246,.12),transparent 34%),linear-gradient(180deg,#f6f8fc 0%,#fcfdff 100%);border:1px solid #dbe4f0;border-radius:30px;padding:18px;box-shadow:0 28px 60px rgba(15,23,42,.08)}
+.trp-shell{display:grid;gap:14px;background:radial-gradient(circle at top right,rgba(245,158,11,.16),transparent 28%),radial-gradient(circle at left top,rgba(59,130,246,.12),transparent 34%),linear-gradient(180deg,#f6f8fc 0%,#fcfdff 100%);border:1px solid #dbe4f0;border-radius:30px;padding:18px;box-shadow:0 28px 60px rgba(15,23,42,.08)}
 .trp-card{background:rgba(255,255,255,.92);border:1px solid #dde6f2;border-radius:22px;padding:16px;box-shadow:0 16px 36px rgba(15,23,42,.05)}
 .trp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
 .trp-title-wrap{display:grid;gap:6px;max-width:760px}
@@ -17,16 +17,16 @@ export const TRAINER_PLATFORM_CSS = `
 .trp-btn.is-ghost{background:#ffffff;color:#0f4c81;border-color:#bad4ea}
 .trp-mode-pill,.trp-summary-pill{display:inline-flex;align-items:center;min-height:42px;padding:0 14px;border-radius:999px;border:1px solid #dce5f1;background:#f8fafc;font-weight:800;color:#334155}
 .trp-mode-pill{background:#ecfdf5;border-color:#bbf7d0;color:#166534}
-.trp-hero{margin-top:14px;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:14px}
+.trp-hero{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:14px}
 .trp-purpose{display:grid;gap:12px;align-content:start;align-self:start}
 .trp-purpose-body{line-height:1.65;color:#334155}
 .trp-start-strip{display:grid;gap:12px;align-content:start;align-self:start;border:1px solid #d7e5f5;background:linear-gradient(180deg,#ffffff 0%,#f7fbff 100%);border-radius:24px;padding:18px}
 .trp-start-copy{display:grid;gap:6px}
-.trp-step-strip{margin-top:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.trp-step-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .trp-step{border:1px dashed #cfdceb;border-radius:16px;background:#fcfdff;padding:12px}
 .trp-step strong{display:block;margin-bottom:4px;font-size:.85rem}
 .trp-step span{display:block;color:#64748b;font-size:.82rem;line-height:1.45}
-.trp-layout{margin-top:14px;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.82fr);gap:14px;align-items:start}
+.trp-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.82fr);gap:14px;align-items:start}
 .trp-main,.trp-support{display:grid;gap:12px}
 .trp-support-card{background:rgba(255,255,255,.94);border:1px solid #dde6f2;border-radius:20px;padding:14px;display:grid;gap:10px;box-shadow:0 14px 32px rgba(15,23,42,.05)}
 .trp-support-card h3,.trp-support-card h4{margin:0;font-size:.97rem;font-weight:900;color:#0f172a}
@@ -34,6 +34,11 @@ export const TRAINER_PLATFORM_CSS = `
 .trp-empty{border:1px dashed #cad8ec;background:#fbfdff;border-radius:20px;padding:18px;display:grid;gap:10px;text-align:center}
 .trp-empty h3{margin:0;font-size:1rem;font-weight:900}
 .trp-empty p{margin:0;color:#4d5e73;line-height:1.55}
+.trp-purpose{order:var(--trp-mobile-order-purpose,1)}
+.trp-start-strip{order:var(--trp-mobile-order-start,2)}
+.trp-step-strip{order:var(--trp-mobile-order-helper-steps,3)}
+.trp-main{order:var(--trp-mobile-order-main,4)}
+.trp-support{order:var(--trp-mobile-order-support,5)}
 
 .trs-overlay{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.48);backdrop-filter:blur(5px);display:flex;justify-content:center;align-items:flex-start;padding:16px;overflow:auto}
 .trs-modal{width:min(1040px,100%);background:linear-gradient(180deg,#f8fbff 0%,#fdfefe 100%);border:1px solid #d9e5f3;border-radius:28px;padding:18px;display:grid;gap:14px;box-shadow:0 28px 70px rgba(15,23,42,.22)}
@@ -60,6 +65,7 @@ export const TRAINER_PLATFORM_CSS = `
 
 @media (max-width:640px){
   .trp-shell{padding:12px}
+  .trp-hero,.trp-layout{display:contents}
   .trs-overlay{padding:10px}
   .trp-actions,.trp-chip-row,.trp-start-actions,.trp-settings-head-actions,.trp-settings-footer-actions,.trs-footer{display:grid;grid-template-columns:1fr}
   .trp-step-strip{grid-template-columns:1fr}

@@ -5,6 +5,43 @@ export interface TrainerHelperStep {
   description: string;
 }
 
+type TrainerZoneKey = 'purpose' | 'start' | 'helper-steps' | 'main' | 'support';
+
+const DEFAULT_MOBILE_ORDER: TrainerZoneKey[] = ['purpose', 'start', 'helper-steps', 'main', 'support'];
+const MOBILE_ORDER_ALIASES: Record<string, TrainerZoneKey> = {
+  purpose: 'purpose',
+  start: 'start',
+  helper: 'helper-steps',
+  'helper-steps': 'helper-steps',
+  main: 'main',
+  support: 'support'
+};
+
+function normalizeMobilePriorityOrder(order?: ReadonlyArray<string>): TrainerZoneKey[] {
+  const seen = new Set<TrainerZoneKey>();
+  const resolved: TrainerZoneKey[] = [];
+  (order || []).forEach((item) => {
+    const key = MOBILE_ORDER_ALIASES[String(item || '').trim()];
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    resolved.push(key);
+  });
+  DEFAULT_MOBILE_ORDER.forEach((key) => {
+    if (seen.has(key)) return;
+    seen.add(key);
+    resolved.push(key);
+  });
+  return resolved;
+}
+
+function buildMobilePriorityStyle(order?: ReadonlyArray<string>): React.CSSProperties {
+  const resolved = normalizeMobilePriorityOrder(order);
+  return resolved.reduce<React.CSSProperties>((style, key, index) => {
+    (style as Record<string, string>)[`--trp-mobile-order-${key}`] = String(index + 1);
+    return style;
+  }, {});
+}
+
 interface TrainerPlatformShellProps {
   trainerId?: string;
   title: string;
@@ -23,6 +60,7 @@ interface TrainerPlatformShellProps {
   startMeta?: React.ReactNode;
   helperSteps?: TrainerHelperStep[];
   supportRailMode?: string;
+  mobilePriorityOrder?: ReadonlyArray<string>;
   main: React.ReactNode;
   support: React.ReactNode;
 }
@@ -45,11 +83,21 @@ export function TrainerPlatformShell({
   startMeta,
   helperSteps = [],
   supportRailMode = 'default',
+  mobilePriorityOrder,
   main,
   support,
 }: TrainerPlatformShellProps): React.ReactElement {
+  const mobileOrder = normalizeMobilePriorityOrder(mobilePriorityOrder);
   return (
-    <div className="trp-page" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id={trainerId || ''}>
+    <div
+      className="trp-page"
+      dir="rtl"
+      lang="he"
+      data-trainer-platform="1"
+      data-trainer-id={trainerId || ''}
+      data-trainer-mobile-order={mobileOrder.join(',')}
+      style={buildMobilePriorityStyle(mobilePriorityOrder)}
+    >
       <div className="trp-shell">
         <header className="trp-card trp-top">
           <div className="trp-title-wrap">

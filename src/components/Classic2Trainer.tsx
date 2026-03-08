@@ -825,6 +825,7 @@ export default function Classic2Trainer(): React.ReactElement {
         }
         helperSteps={helperSteps}
         supportRailMode={trainerContract.supportRailMode}
+        mobilePriorityOrder={trainerContract.mobilePriorityOrder}
         main={mainContent}
         support={supportContent}
       />

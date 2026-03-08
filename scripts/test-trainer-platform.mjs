@@ -114,6 +114,37 @@ async function assert(condition, label, detail = '') {
     if (!condition) throw new Error(detail ? `${label} :: ${detail}` : label);
 }
 
+async function assertMobileZoneOrder(page, trainerId) {
+    const ordering = await page.evaluate((id) => {
+        const root = document.querySelector(`[data-trainer-platform="1"][data-trainer-id="${id}"]`);
+        if (!root) return null;
+        const declared = String(root.getAttribute('data-trainer-mobile-order') || '')
+            .split(',')
+            .map((item) => item.trim())
+            .filter(Boolean);
+        const visible = declared
+            .map((zone) => {
+                const node = root.querySelector(`[data-trainer-zone="${zone}"]`);
+                if (!node) return null;
+                const style = getComputedStyle(node);
+                const rect = node.getBoundingClientRect();
+                if (style.display === 'none' || style.visibility === 'hidden' || rect.width <= 0 || rect.height <= 0) return null;
+                return { zone, top: Math.round(rect.top) };
+            })
+            .filter(Boolean);
+        return {
+            declaredVisible: visible.map((item) => item.zone),
+            actualVisible: visible.slice().sort((a, b) => a.top - b.top).map((item) => item.zone)
+        };
+    }, trainerId);
+    await assert(!!ordering, `${trainerId} mobile order metadata exists`);
+    await assert(
+        JSON.stringify(ordering.actualVisible) === JSON.stringify(ordering.declaredVisible),
+        `${trainerId} mobile order follows contract`,
+        `${ordering.declaredVisible.join(' > ')} :: ${ordering.actualVisible.join(' > ')}`
+    );
+}
+
 async function openSettings(page, trainerId) {
     await page.locator(`[data-trainer-platform="1"][data-trainer-id="${trainerId}"] [data-trainer-action="open-settings"]`).first().click();
     await page.waitForSelector(`[data-trainer-settings-shell="1"][data-trainer-id="${trainerId}"]`);
@@ -208,6 +239,7 @@ async function runMobileChecks(page, baseUrl, trainer) {
         scrollWidth: document.documentElement.scrollWidth
     }));
     await assert(overflow.scrollWidth <= overflow.innerWidth + 1, `${trainer.id} mobile no horizontal overflow`, `${overflow.scrollWidth}/${overflow.innerWidth}`);
+    await assertMobileZoneOrder(page, trainer.id);
 
     await openSettings(page, trainer.id);
     const footerAction = page.locator(`[data-trainer-settings-shell="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="save-start"], [data-trainer-settings-shell="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="save-settings"]`).first();

@@ -1117,6 +1117,19 @@ body {
   gap: 14px;
 }
 
+.cc-entry-purpose,
+.cc-entry-start-strip,
+.cc-platform-helper-strip,
+.cc-platform-practice-main,
+.cc-platform-support {
+  order: var(--cc-mobile-order, 0);
+}
+
+.cc-entry-purpose {
+  display: grid;
+  gap: 8px;
+}
+
 .cc-entry-card h1,
 .cc-summary-hero h1,
 .cc-modal-head h2,
@@ -2403,6 +2416,10 @@ body {
   .cc-primary-actions,
   .cc-modal-actions {
     display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .cc-settings-shell-grid {
     grid-template-columns: 1fr;
   }
 
