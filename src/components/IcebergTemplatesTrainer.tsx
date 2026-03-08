@@ -42,6 +42,20 @@ type ScenarioFile = {
 
 type FeedbackTone = 'info' | 'success' | 'error';
 type Feedback = { tone: FeedbackTone; text: string };
+type WorkspaceStepId = 'read' | 'choose' | 'place' | 'reveal' | 'branch';
+type BranchCardTone = 'neutral' | 'info' | 'positive' | 'warn';
+type BranchCard = { label: string; text: string; tone?: BranchCardTone };
+type BranchModel = {
+  primaryTitle: string;
+  primaryItems: string[];
+  alternateTitle: string;
+  alternateItems: string[];
+  impactTitle: string;
+  impactItems: BranchCard[];
+  structureKind: string;
+  distinctionText: string;
+  explanationLead: string;
+};
 
 type ActiveMapping = { tokenId: string; templateType: TemplateType; setIndex: number };
 
@@ -124,32 +138,32 @@ const TEMPLATE_META: Record<TemplateType, TemplateMeta> = {
   CEQ: {
     type: 'CEQ',
     code: 'CEq',
-    titleHe: 'הקבלה מורכבת / קריטריונים',
-    titleEn: 'Complex Equivalence / Criteria',
-    shortHelp: 'מפרקים תווית/מושג לסימנים, קריטריונים ודוגמאות.',
+    titleHe: 'הכללה וקריטריונים',
+    titleEn: 'Inclusion / Criteria',
+    shortHelp: 'מפרקים שם כללי לסימנים, קריטריונים ודוגמאות כדי להבין מה באמת נחשב בפנים.',
     slotCount: 3,
-    gapHint: 'פער בין המילה לבין מה שבפועל נחשב כהוכחה/סימן.',
-    factPrompt: 'מה נצפה בפועל שמצדיק את המילה הזו?'
+    gapHint: 'הפער הוא בין שם כללי לבין הקריטריונים שצריכים להתקיים במציאות כדי להכניס משהו לתוך הקטגוריה.',
+    factPrompt: 'לפי מה בפועל הדבר הזה נכנס לקטגוריה הזו?'
   },
   CAUSE: {
     type: 'CAUSE',
     code: 'CE',
-    titleHe: 'סיבתיות / תנאים',
-    titleEn: 'Cause / Conditions',
-    shortHelp: 'מה גורם למה? ומה התנאים שמאפשרים את זה?',
+    titleHe: 'סיבות, תנאים והשלכות',
+    titleEn: 'Causes / Conditions / Outcomes',
+    shortHelp: 'לא מחפשים חץ אחד. מארגנים כמה גורמים אפשריים, חלופות, ותוצאות שונות.',
     slotCount: 2,
-    gapHint: 'פער בין תוצאה מורגשת לבין מנגנון/תנאים שלא פורטו.',
-    factPrompt: 'מה קרה קודם? באילו תנאים זה קורה?'
+    gapHint: 'הפער הוא בין מה שמרגישים או קובעים לבין כמה גורמים ותנאים שאולי מזינים את זה או נובעים ממנו.',
+    factPrompt: 'מה עוד תורם לזה, ומה עוד זה יכול לייצר?'
   },
   ASSUMPTIONS1: {
     type: 'ASSUMPTIONS1',
     code: 'A1',
-    titleHe: 'הנחות יסוד (אילוסטרציה)',
-    titleEn: 'Assumptions-1',
-    shortHelp: 'חושפים מה כבר מונח בפנים בלי שנאמר במפורש.',
+    titleHe: 'הנחות שמחזיקות את המשפט',
+    titleEn: 'Hidden Assumptions',
+    shortHelp: 'מוציאים לאור את מה שכבר מונח בפנים בלי להיאמר במפורש.',
     slotCount: 3,
-    gapHint: 'פער בין המשפט הגלוי לבין הנחות סמויות שמחזיקות אותו.',
-    factPrompt: 'איזו הנחה צריך לבדוק מול המציאות?'
+    gapHint: 'הפער הוא בין המשפט הגלוי לבין הנחות נסתרות שמחזיקות אותו בשקט.',
+    factPrompt: 'איזו הנחה כדאי לבדוק קודם מול המציאות?'
   }
 };
 
@@ -307,9 +321,16 @@ const DEBONO_FIELDS: Array<{ key: DebonoHatKey; labelHe: string; chip: string }>
 ];
 
 const INTRO_COPY =
-  'לפעמים מילה היא רק קצה-קרחון. כאן גוררים מילה/ביטוי לצורה שמגלה מבנה עומק אפשרי. התשובות הן אילוסטרציה בלבד — לא אמת.';
-const DISCLAIMER_COPY = 'אילוסטרציה בלבד — לא אמת. לחץ/י "מטופל אחר" כדי לראות וריאציות.';
-const OUTRO_COPY = 'נחשף מבנה אפשרי. לערעור/בדיקה/שינוי — במודול הבא.';
+  'כאן מתאמנים על ארגון פנימי של חשיבה: לוקחים אמירה אחת, בוחרים מבנה מתאים, ורואים איך היא מסתדרת בתוך עץ של הבחנות.';
+const DISCLAIMER_COPY = 'זהו מיפוי עבודה אפשרי, לא אמת סופית. המטרה היא לראות מבנה, חלופות וענפים נוספים.';
+const OUTRO_COPY = 'בסוף כל סבב בודקים מה נפתח: איזה ענף התחזק, איזו חלופה הופיעה, ומה כדאי לקחת לשיחה אמיתית.';
+const PROCESS_STEPS: Array<{ id: WorkspaceStepId; label: string; help: string }> = [
+  { id: 'read', label: '1. קוראים את האמירה', help: 'קולטים את המשפט המלא ולא רק טוקן בודד.' },
+  { id: 'choose', label: '2. בוחרים מבנה', help: 'מחליטים איזה סוג עץ מתאים לבדיקה.' },
+  { id: 'place', label: '3. משבצים את העוגן', help: 'ממקמים את המילה או הביטוי בתוך המבנה.' },
+  { id: 'reveal', label: '4. רואים את ההסתעפות', help: 'מבינים מה המבנה פותח ומה עוד יכול להתפצל.' },
+  { id: 'branch', label: '5. בודקים חלופה', help: 'שואלים מה קורה אם בוחרים ענף אחר או פירוש אחר.' }
+];
 
 const INITIAL_STATE: TrainerState = {
   currentScenarioIndex: 0,
@@ -498,6 +519,42 @@ const css = `
 .it-tree-tap-hint{color:#64748b;font-size:.76rem}
 @media (max-width:1180px){.it-focus-core-layout{grid-template-columns:1fr}.it-focus-side-column{order:2}.it-focus-result-column{order:1}}
 @media (max-width:860px){.it-reveal-branches.cols-3{grid-template-columns:1fr}.it-reveal-cause-layout{grid-template-columns:1fr}.it-tree-lab-grid{grid-template-columns:1fr}}
+.it-wrap-refined{background:radial-gradient(circle at top right,#fff4cf 0,#fffaf2 28%,#f7fbff 100%);padding:14px}
+.it-hero-panel{padding:16px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(247,251,255,.92));border-color:#f3d48e}
+.it-hero-top,.it-panel-head,.it-onboarding-head,.it-branch-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.it-start-strip{margin-top:12px;padding:12px 14px;border-radius:16px;border:1px solid #d9e7fb;background:linear-gradient(180deg,#f8fbff,#fff);display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.it-start-copy{display:grid;gap:4px}.it-start-copy strong{font-size:.95rem;color:#0f3e77}.it-start-copy span{color:#475569;line-height:1.45}
+.it-start-actions{display:flex;gap:8px;flex-wrap:wrap}
+.it-main-layout{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(300px,.72fr);gap:14px;align-items:start;margin-top:14px}
+.it-main-column,.it-support-column{display:grid;gap:12px}
+.it-panel-badge,.it-branch-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;background:#eef4ff;border:1px solid #bfd7ff;color:#1d4ed8;font-size:.76rem;font-weight:900}
+.it-textbox-prominent{padding:16px;border-width:1px;border-color:#f0d59a;background:linear-gradient(180deg,#fff,#fff8eb);font-size:1.02rem}
+.it-source-foot{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,.8fr);gap:10px;align-items:start}
+.it-selection-card{border:1px solid #cfe0fb;background:#f8fbff;border-radius:14px;padding:12px;display:grid;gap:4px}
+.it-selection-card strong{font-size:.82rem;color:#1d4ed8}.it-selection-card span{font-size:1rem;font-weight:900;color:#0f172a}.it-selection-card small{color:#64748b;line-height:1.4}
+.it-template-grid-refined{grid-template-columns:repeat(3,minmax(0,1fr))}
+.it-template-card{padding:12px;border-radius:16px;border-color:#dde7f0;box-shadow:0 10px 24px rgba(15,23,42,.04)}
+.it-template-card.is-active{background:linear-gradient(180deg,#effcf5,#fff);border-color:#8edbb7}
+.it-workspace-panel{border-color:#bfd7ee;background:linear-gradient(180deg,#fff,#f8fbff)}
+.it-workspace-empty strong{display:block;color:#1d4ed8;margin-bottom:6px}.it-workspace-empty p{margin:0;line-height:1.6}
+.it-coach-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:start}.it-coach-card{border:1px solid #dce7f3;border-radius:14px;background:#fff;padding:12px;display:grid;gap:6px}.it-coach-card strong{font-size:.84rem;color:#244e85}.it-coach-card p{margin:0;color:#334155;line-height:1.45}
+.it-branch-panel{border:1px solid #dce9f9;border-radius:16px;background:linear-gradient(180deg,#fff,#f9fbff);padding:12px;display:grid;gap:10px}
+.it-branch-head h3{margin:0;font-size:1rem;color:#0f3e77}.it-branch-head p{margin:4px 0 0;color:#516174;line-height:1.45}
+.it-branch-note{border:1px solid #dbeafe;background:#eff6ff;border-radius:12px;padding:10px;color:#1e3a8a;line-height:1.45}
+.it-branch-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.it-branch-card{border:1px solid #e2e8f0;border-radius:14px;background:#fff;padding:12px;display:grid;gap:8px}.it-branch-card h4{margin:0;color:#10233f;font-size:.9rem}
+.it-branch-list{display:grid;gap:8px}.it-branch-item{border:1px solid #e5e7eb;border-radius:10px;background:#f8fafc;padding:8px;line-height:1.4;color:#334155;font-weight:700}.it-branch-item.is-alt{background:#fffbeb;border-color:#f7d08b;color:#92400e}.it-branch-item.is-empty{color:#94a3b8;font-weight:700}
+.it-impact-card{border-radius:12px;padding:10px;display:grid;gap:5px;border:1px solid #e2e8f0;background:#fff}.it-impact-card strong{font-size:.8rem}.it-impact-card p{margin:0;line-height:1.45;color:#334155}.it-impact-card.tone-warn{background:#fff7ed;border-color:#fdba74}.it-impact-card.tone-positive{background:#effcf5;border-color:#86efac}.it-impact-card.tone-info{background:#eff6ff;border-color:#93c5fd}
+.it-support-summary{position:sticky;top:12px}.it-support-list{display:grid;gap:8px}.it-support-item{border:1px solid #e2e8f0;border-radius:12px;background:#fff;padding:10px;display:grid;gap:4px}.it-support-item strong{font-size:.8rem;color:#244e85}.it-support-item span{color:#334155;line-height:1.45}
+.it-onboarding-layer{position:fixed;inset:0;background:rgba(15,23,42,.48);backdrop-filter:blur(6px);display:grid;place-items:center;padding:18px;z-index:40}
+.it-onboarding-card{width:min(980px,100%);max-height:min(92vh,980px);overflow:auto;border-radius:24px;border:1px solid #f1d18b;background:linear-gradient(180deg,#fffaf0,#fff);padding:20px;box-shadow:0 28px 70px rgba(15,23,42,.28);display:grid;gap:16px}
+.it-onboarding-head h2{margin:4px 0 0;font-size:1.5rem;color:#0f172a}.it-onboarding-head p,.it-onboarding-copy p{margin:0;color:#4b5563;line-height:1.6}
+.it-onboarding-grid,.it-schema-compare{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.it-schema-compare{grid-template-columns:repeat(2,minmax(0,1fr))}
+.it-onboarding-note,.it-schema-card{border:1px solid #ecd9a4;border-radius:16px;background:#fff;padding:12px;display:grid;gap:6px}.it-onboarding-note strong,.it-schema-card strong{font-size:.88rem;color:#8a4b07}.it-onboarding-note p,.it-schema-card p{margin:0;color:#4b5563;line-height:1.5}
+.it-schema-card.is-part{border-color:#d7e5fb}.it-schema-tree{display:grid;gap:8px}.it-schema-node,.it-schema-child{border:1px solid #e2e8f0;border-radius:999px;background:#f8fafc;padding:6px 10px;text-align:center;font-weight:800;color:#1f2937}.it-schema-node.root{background:#eff6ff;border-color:#bfdbfe;color:#1e3a8a}.it-schema-branches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.it-schema-child{background:#fffbeb;border-color:#f7d08b;color:#92400e}
+.it-onboarding-actions{display:flex;justify-content:flex-start}
+@media (max-width:1180px){.it-template-grid-refined{grid-template-columns:1fr 1fr}.it-main-layout{grid-template-columns:1fr}.it-support-summary{position:static}.it-branch-grid,.it-coach-grid,.it-source-foot,.it-onboarding-grid,.it-schema-compare{grid-template-columns:1fr}}
+@media (max-width:720px){.it-wrap-refined{padding:10px}.it-hero-panel{padding:12px}.it-textbox-prominent{padding:12px}.it-template-grid-refined{grid-template-columns:1fr}.it-start-strip,.it-onboarding-card{padding:14px}.it-onboarding-head h2{font-size:1.25rem}}
 `;
 
 function assetUrl(path: string): string {
@@ -555,19 +612,19 @@ function formatTemplateLabel(type: TemplateType): string {
 
 function renderCauseDirectionLabel(payload: CauseTemplatePayload | TemplatePayloadBase): string | null {
   if (!('mode' in payload)) return null;
-  if (payload.mode === 'CAUSES_OF_TOKEN') return 'כיוון: מה גורם/מאפשר';
-  if (payload.mode === 'EFFECTS_OF_TOKEN') return 'כיוון: מה זה מאפשר/יוצר';
+  if (payload.mode === 'CAUSES_OF_TOKEN') return 'כאן שואלים מה מזין את העוגן ומה מחזיק אותו';
+  if (payload.mode === 'EFFECTS_OF_TOKEN') return 'כאן שואלים לאן העוגן הזה מתפצל ומה הוא עלול לייצר';
   return null;
 }
 
 function boardGapText(templateType: TemplateType | null, tokenText: string | null): string {
-  if (!templateType || !tokenText) return 'בחר/י מילה מודגשת והפעל/י תבנית כדי לראות איזה פער בודקים.';
-  if (templateType === 'CEQ') return `כאן בודקים פער בין "${tokenText}" (תווית/מושג) לבין עובדות/קריטריונים.`;
+  if (!templateType || !tokenText) return 'בחר/י מילה או ביטוי מודגש כדי לראות איזה סוג עץ יעזור לסדר את החשיבה.';
+  if (templateType === 'CEQ') return `כאן בודקים לפי מה "${tokenText}" נכנס לקטגוריה, ומה הקריטריונים שמחזיקים את השם הכללי.`;
   return TEMPLATE_META[templateType].gapHint;
 }
 
 function boardFactPrompt(templateType: TemplateType | null, tokenText: string | null): string {
-  if (!templateType || !tokenText) return 'מה קרה בפועל? מי אמר מה? באיזה הקשר?';
+  if (!templateType || !tokenText) return 'מה נאמר בפועל, מה הוקפץ כאן, ואיזה מיון כדאי לעשות עכשיו?';
   return `${TEMPLATE_META[templateType].factPrompt} סביב "${tokenText}"`;
 }
 
@@ -575,19 +632,19 @@ function buildChallengePrompts(templateType: TemplateType | null, tokenText: str
   if (!templateType || !tokenText) return [];
   const prompts: Record<TemplateType, string[]> = {
     CEQ: [
-      `איך בדיוק "${tokenText}" מוגדר אצלך — ומה העובדות שמראות שזה באמת כך?`,
-      `מה היה צריך לקרות כדי שזה לא ייחשב "${tokenText}"?`,
-      `איזה קריטריון כאן חשוב יותר: הכוונה, ההתנהגות, או התוצאה?`
+      `אם מישהו אחר היה משתמש ב"${tokenText}", לפי איזה קריטריון אחר הוא היה ממיין את זה?`,
+      `מה צריך לקרות בפועל כדי שזה כבר לא ייחשב "${tokenText}"?`,
+      `האם כאן מדובר בקטגוריה, בדוגמה, או בקריטריון שמגדיר את הקטגוריה?`
     ],
     CAUSE: [
-      `מה הראיה שהקשר סביב "${tokenText}" הוא סיבתי הכרחי ולא רק אפשרי?`,
-      `מה עוד יכול להסביר את "${tokenText}" מלבד הסיבה הראשונה שעלתה?`,
-      `באילו תנאים "${tokenText}" לא מופיע למרות אותם גורמים?`
+      `איזה גורם נוסף יכול להסביר את "${tokenText}" חוץ מהענף הראשון שעלה?`,
+      `אם "${tokenText}" הוא רק תוצאה, מה עוד היה יכול להוביל אליה?`,
+      `איזו תוצאה אחרת, אפילו חיובית או מפתיעה, יכולה לצמוח מאותו מצב סביב "${tokenText}"?`
     ],
     ASSUMPTIONS1: [
-      `איזו הנחה מתוך השלוש הכי כדאי לבדוק קודם מול המציאות?`,
-      `מה העובדות שתומכות בהנחה — ומה העובדות שלא בטוח תומכות?`,
-      `אם ההנחה הזו לא נכונה, מה משתנה במשמעות של "${tokenText}"?`
+      `איזו הנחה מתוך מה שנפתח סביב "${tokenText}" באמת כדאי לבדוק ראשונה מול המציאות?`,
+      `מה המשפט מניח כאן על אנשים, גבולות או אפשרויות בלי לומר זאת ישירות?`,
+      `אם ההנחה הזו נופלת, איזה ענף אחר של פירוש נעשה פתאום אפשרי?`
     ]
   };
   return prompts[templateType];
@@ -683,6 +740,61 @@ function TemplateSketch(props: { meta: TemplateMeta; tokenText?: string; causeMo
   );
 }
 
+function ProcessRail(props: { current: WorkspaceStepId }) {
+  const { current } = props;
+  const currentIndex = PROCESS_STEPS.findIndex((step) => step.id === current);
+
+  return (
+    <div className="it-process-rail" aria-label="מפת תהליך">
+      {PROCESS_STEPS.map((step, index) => {
+        const done = index < currentIndex;
+        const isCurrent = index === currentIndex;
+        return (
+          <div key={step.id} className={`it-process-step${done ? ' is-done' : ''}${isCurrent ? ' is-current' : ''}`}>
+            <div className="it-process-step-top">
+              <span className="it-process-step-index">{index + 1}</span>
+              <strong>{step.label}</strong>
+            </div>
+            <p>{step.help}</p>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function SchemaComparisonMini(): React.ReactElement {
+  return (
+    <div className="it-schema-compare" aria-label="הבחנה בין סוגי עצים">
+      <div className="it-schema-card">
+        <strong>הכללה לוגית</strong>
+        <p>קטגוריה רחבה שמצטמצמת כלפי מטה.</p>
+        <div className="it-schema-tree">
+          <div className="it-schema-node root">חיה</div>
+          <div className="it-schema-branches">
+            <div className="it-schema-node">כלב</div>
+            <div className="it-schema-node">חתול</div>
+          </div>
+          <div className="it-schema-child">בורדר קולי</div>
+        </div>
+      </div>
+
+      <div className="it-schema-card is-part">
+        <strong>חלקים של שלם</strong>
+        <p>אותו שלם, אבל עם רכיבים ולא עם תתי-קטגוריות.</p>
+        <div className="it-schema-tree">
+          <div className="it-schema-node root">אופניים</div>
+          <div className="it-schema-branches">
+            <div className="it-schema-node">גלגל</div>
+            <div className="it-schema-node">שרשרת</div>
+          </div>
+          <div className="it-schema-child">כידון</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PrototypeSketch(props: { schemaId: PrototypeSchemaId }) {
   const { schemaId } = props;
 
@@ -761,6 +873,150 @@ function cleanSnippet(text: string, max = 120): string {
   const trimmed = String(text || '').replace(/\s+/g, ' ').trim();
   if (!trimmed) return '';
   return trimmed.length > max ? `${trimmed.slice(0, max - 1)}…` : trimmed;
+}
+
+function deriveWorkspaceStep(args: {
+  selectedTokenId: string | null;
+  active: ActiveMapping | null;
+  focusStage: 'build' | 'reveal' | 'challenge';
+}): WorkspaceStepId {
+  if (!args.selectedTokenId && !args.active) return 'read';
+  if (args.selectedTokenId && !args.active) return 'choose';
+  if (args.active && args.focusStage === 'build') return 'place';
+  if (args.active && args.focusStage === 'reveal') return 'reveal';
+  return 'branch';
+}
+
+function collectAlternativeItems(payload: TemplatePayloadBase | CauseTemplatePayload | null, activeSet: string[]): string[] {
+  if (!payload) return [];
+  const seen = new Set(activeSet.map((item) => String(item || '').trim()).filter(Boolean));
+  const alternates: string[] = [];
+  (payload.sets || []).forEach((set) => {
+    (set || []).forEach((item) => {
+      const text = String(item || '').trim();
+      if (!text || seen.has(text) || alternates.includes(text)) return;
+      alternates.push(text);
+    });
+  });
+  return alternates.slice(0, 4);
+}
+
+function buildBranchModel(args: {
+  templateType: TemplateType;
+  tokenText: string;
+  payload: TemplatePayloadBase | CauseTemplatePayload | null;
+  activeSet: string[];
+}): BranchModel {
+  const tokenText = String(args.tokenText || '').trim() || 'העוגן';
+  const primaryItems = args.activeSet.map((item) => String(item || '').trim()).filter(Boolean);
+  const alternateItems = collectAlternativeItems(args.payload, primaryItems);
+
+  if (args.templateType === 'CEQ') {
+    return {
+      primaryTitle: 'מה מכניס את זה לקטגוריה',
+      primaryItems,
+      alternateTitle: 'עוד קריטריונים או דוגמאות אפשריים',
+      alternateItems: alternateItems.length
+        ? alternateItems
+        : [
+            `ייתכן שיש עוד סימן קטן שמגדיר מה נחשב "${tokenText}" אצל הדובר/ת.`,
+            `אפשר לבדוק אם יש דוגמה קונקרטית שמחזיקה את המילה "${tokenText}".`
+          ],
+      impactTitle: 'מה משתנה אם ממיינים אחרת',
+      impactItems: [
+        {
+          label: 'אם ההגדרה צרה יותר',
+          tone: 'info',
+          text: `אז "${tokenText}" ידרוש יותר הוכחות לפני שנקבל אותו כמובן מאליו.`
+        },
+        {
+          label: 'אם ההגדרה רחבה יותר',
+          tone: 'positive',
+          text: `יכול להיפתח מרחב להבין ש"${tokenText}" נראה אחרת במצבים שונים, ולא רק בצורה אחת.`
+        },
+        {
+          label: 'אם הקריטריון מתחלף',
+          tone: 'warn',
+          text: `השיחה יכולה לעבור מוויכוח על המילה "${tokenText}" לבדיקה של קריטריון אחר לגמרי.`
+        }
+      ],
+      structureKind: 'הירריית הכללה לוגית',
+      distinctionText: 'כאן לא בודקים חלקים של שלם, אלא מה מצרף משהו לקבוצה רחבה יותר ומה מצמצם אותה.',
+      explanationLead: `כאן בודקים לפי מה "${tokenText}" שייך לקטגוריה הזו, ואילו קריטריונים מחזיקים את השם הכללי.`
+    };
+  }
+
+  if (args.templateType === 'CAUSE') {
+    const payload = args.payload as CauseTemplatePayload | null;
+    const effectsMode = payload?.mode === 'EFFECTS_OF_TOKEN';
+    return {
+      primaryTitle: effectsMode ? 'מה כבר מסתעף מן העוגן' : 'מה מזין או מאפשר את העוגן',
+      primaryItems,
+      alternateTitle: effectsMode ? 'עוד כיוונים שאליהם זה עלול להתפתח' : 'עוד הסברים, תנאים וגורמים חלופיים',
+      alternateItems: alternateItems.length
+        ? alternateItems
+        : [
+            `אולי יש גורם נוסף סביב "${tokenText}" שלא הופיע בגרסה הראשונה.`,
+            `ייתכן שההקשר משנה את הכיוון הסיבתי, ולא רק הסיבה הראשונית.`
+          ],
+      impactTitle: 'לאן זה עוד יכול ללכת',
+      impactItems: [
+        {
+          label: 'תוצאה מכבידה',
+          tone: 'warn',
+          text: `אם "${tokenText}" נשאר כשרשרת סיבתית אחת ויחידה, קל לפספס גורמים נוספים ולהחריף את הסיפור.`
+        },
+        {
+          label: 'תוצאה בונה',
+          tone: 'positive',
+          text: `אם מזהים כמה גורמים או כמה תוצאות סביב "${tokenText}", אפשר לבחור איפה הכי כדאי להתערב קודם.`
+        },
+        {
+          label: 'הפתעה אפשרית',
+          tone: 'info',
+          text: `לפעמים דווקא "${tokenText}" מגלה שמה שחשבנו שהוא הסיבה הוא רק ענף אחד, ומתחתיו מסתתר כיוון אחר.`
+        }
+      ],
+      structureKind: 'עץ סיבות ותוצאות',
+      distinctionText: 'כאן מחפשים הסתעפות: כמה גורמים אפשריים, השפעות הדדיות, וכמה תוצאות אפשריות. לא חץ אחד.',
+      explanationLead: effectsMode
+        ? `כאן בודקים לאן "${tokenText}" עלול להתפצל ולהשפיע, ולא רק מה קדם לו.`
+        : `כאן בודקים מה תורם ל"${tokenText}", אילו תנאים מחזיקים אותו, ואילו כיוונים נוספים יכולים להסביר אותו.`
+    };
+  }
+
+  return {
+    primaryTitle: 'מה כבר מונח בתוך המשפט',
+    primaryItems,
+    alternateTitle: 'עוד הנחות שאפשר לבדוק',
+    alternateItems: alternateItems.length
+      ? alternateItems
+      : [
+          `אפשר לשאול איזו הנחה נוספת מחזיקה את "${tokenText}" גם אם לא נאמרה בקול.`,
+          `אולי יש כאן הנחת יסוד על מה נחשב תקין, אפשרי או ראוי.`
+        ],
+    impactTitle: 'מה קורה אם בודקים את ההנחות',
+    impactItems: [
+      {
+        label: 'אם ההנחה נכונה',
+        tone: 'positive',
+        text: `השיחה סביב "${tokenText}" נהיית מדויקת יותר, כי יודעים על מה בעצם נשען המשפט.`
+      },
+      {
+        label: 'אם ההנחה חלקית בלבד',
+        tone: 'info',
+        text: `אפשר להחזיק את "${tokenText}" פחות כעובדה ויותר כהשערה שצריך לברר.`
+      },
+      {
+        label: 'אם ההנחה לא מחזיקה',
+        tone: 'warn',
+        text: `המשמעות של "${tokenText}" יכולה להשתנות מהר, ולכן שווה לבדוק את היסוד לפני שמגיבים.`
+      }
+    ],
+    structureKind: 'שכבת הנחות תומכת',
+    distinctionText: 'כאן לא ממיינים חלקים וגם לא מחפשים סיבתיות ישירה, אלא את מה שהמשפט כבר מניח כדי להישמע הגיוני.',
+    explanationLead: `כאן בודקים אילו הנחות שקטות מחזיקות את "${tokenText}" גם בלי שנאמרו במפורש.`
+  };
 }
 
 function buildRelationalVoiceDraft(input: {
@@ -1009,6 +1265,63 @@ function SentenceBoard(props: {
             <div className="it-board-value">{activeReflection || 'כאן יופיע שיקוף קצר של מבנה עומק אפשרי (אילוסטרציה בלבד).'}</div>
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
+
+function BranchExplorer(props: {
+  templateType: TemplateType;
+  tokenText: string;
+  payload: TemplatePayloadBase | CauseTemplatePayload | null;
+  activeSet: string[];
+}) {
+  const branchModel = buildBranchModel(props);
+
+  return (
+    <section className="it-branch-panel" aria-label="עץ הבחנות והסתעפויות">
+      <div className="it-branch-head">
+        <div>
+          <h3>כאן המבנה מתארגן לעץ</h3>
+          <p>{branchModel.explanationLead}</p>
+        </div>
+        <span className="it-branch-badge">{branchModel.structureKind}</span>
+      </div>
+
+      <div className="it-branch-note">
+        <strong>הבחנה חשובה:</strong> {branchModel.distinctionText}
+      </div>
+
+      <div className="it-branch-grid">
+        <article className="it-branch-card">
+          <h4>{branchModel.primaryTitle}</h4>
+          <div className="it-branch-list">
+            {branchModel.primaryItems.length ? branchModel.primaryItems.map((item) => (
+              <div key={`primary-${item}`} className="it-branch-item">{item}</div>
+            )) : <div className="it-branch-item is-empty">עוד לא נפתחו ענפים לשדה הזה.</div>}
+          </div>
+        </article>
+
+        <article className="it-branch-card">
+          <h4>{branchModel.alternateTitle}</h4>
+          <div className="it-branch-list">
+            {branchModel.alternateItems.map((item) => (
+              <div key={`alt-${item}`} className="it-branch-item is-alt">{item}</div>
+            ))}
+          </div>
+        </article>
+
+        <article className="it-branch-card">
+          <h4>{branchModel.impactTitle}</h4>
+          <div className="it-branch-list">
+            {branchModel.impactItems.map((item) => (
+              <div key={`${item.label}-${item.text}`} className={`it-impact-card tone-${item.tone || 'neutral'}`}>
+                <strong>{item.label}</strong>
+                <p>{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </article>
       </div>
     </section>
   );
@@ -1291,8 +1604,9 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
   const [hoverTemplate, setHoverTemplate] = useState<TemplateType | null>(null);
   const [shakeTemplate, setShakeTemplate] = useState<TemplateType | null>(null);
   const [focusStage, setFocusStage] = useState<'build' | 'reveal' | 'challenge'>('build');
-  const [showFocusGuide, setShowFocusGuide] = useState(false);
-  const [showFocusSketch, setShowFocusSketch] = useState(false);
+  const [showFocusGuide, setShowFocusGuide] = useState(true);
+  const [showFocusSketch, setShowFocusSketch] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(true);
   const [state, setState] = useState<TrainerState>(INITIAL_STATE);
 
   useEffect(() => {
@@ -1365,7 +1679,6 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     setFocusStage((prev) => {
       if (!revealReady) return 'build';
       if (!challengeReady && prev === 'challenge') return 'reveal';
-      if (prev === 'build') return 'reveal';
       return prev;
     });
   }, [revealReady, challengeReady]);
@@ -1374,6 +1687,11 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     if (!scenario || !state.active) return '';
     return buildVariantKey(scenario.scenario_id, state.active.tokenId, state.active.templateType);
   }, [scenario, state.active]);
+
+  const workspaceStep = useMemo(
+    () => deriveWorkspaceStep({ selectedTokenId: state.selectedTokenId, active: state.active, focusStage }),
+    [focusStage, state.active, state.selectedTokenId]
+  );
 
   const segments = useMemo(() => (scenario ? getSegments(scenario.client_text, scenario.draggables) : []), [scenario]);
 
@@ -1396,6 +1714,8 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
       console.error('[IcebergTemplates] Missing payload', { scenarioId: scenario.scenario_id, tokenId, templateType });
       return failTemplate(templateType, 'תוכן חסר בקובץ התרגיל.');
     }
+    setShowOnboarding(false);
+    setFocusStage('build');
     setState((prev) => {
       const sameActive = prev.active?.tokenId === tokenId && prev.active?.templateType === templateType;
       return {
@@ -1406,7 +1726,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         scoreDrops: sameActive ? prev.scoreDrops : prev.scoreDrops + 1,
         feedback: {
           tone: 'success',
-          text: `מעולה. "${token.text}" הונח על ${formatTemplateLabel(templateType)} ונפתח Reveal של שאלה + חריצים.`
+          text: `העוגן "${token.text}" שובץ על ${formatTemplateLabel(templateType)}. עכשיו אפשר לראות איך העץ נפתח ולמה הוא מסודר כך.`
         }
       };
     });
@@ -1431,10 +1751,11 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
   }
 
   function clearActive() {
+    setFocusStage('build');
     setState((prev) => ({
       ...prev,
       active: null,
-      feedback: { tone: 'info', text: 'האזור הפעיל אופס. אפשר לגרור לאותה תבנית או לבחור תבנית אחרת.' }
+      feedback: { tone: 'info', text: 'האזור הפעיל אופס. אפשר לבחור שוב עוגן ולהחליט מחדש איזה מבנה מתאים לו.' }
     }));
   }
 
@@ -1451,11 +1772,12 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
       selectedTokenId: null,
       active: null,
       completedAtLeastOneDrop: false,
-      feedback: { tone: 'info', text: 'עברנו לתרחיש הבא. בחר/י מילה מודגשת וגרור/י לצורה המתאימה.' },
+      feedback: { tone: 'info', text: 'עברנו לתרחיש הבא. קרא/י את המשפט, בחר/י עוגן אחד, ואז בחרי מבנה שיסדר אותו.' },
       lastCompletedRecap: recap
     }));
     setHoverTemplate(null);
     setDraggingTokenId(null);
+    setFocusStage('build');
   }
 
   function onDragStart(event: React.DragEvent<HTMLButtonElement>, tokenId: string) {
@@ -1482,7 +1804,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         selectedTokenId: same ? null : tokenId,
         feedback: {
           tone: 'info',
-          text: same ? 'בוטל סימון הטוקן.' : 'טוקן נבחר. במובייל: הקש/י עכשיו על תבנית.'
+          text: same ? 'בוטל סימון העוגן.' : 'העוגן נבחר. עכשיו בחר/י איזה מבנה יעזור למיין אותו.'
         }
       };
     });
@@ -1552,7 +1874,15 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     return chips;
   })();
 
-  return (
+  const activeMeta = state.active ? TEMPLATE_META[state.active.templateType] : null;
+  const activeDirectionLabel = activePayload ? renderCauseDirectionLabel(activePayload) : null;
+  const selectedTokenLabel = selectedToken?.text ?? activeToken?.text ?? '';
+  const selectedTokenTemplateLabels = selectedToken
+    ? selectedToken.allowed_templates.map((type) => TEMPLATE_META[type].titleHe).join(' · ')
+    : '';
+  const currentProcessMeta = PROCESS_STEPS.find((step) => step.id === workspaceStep) ?? PROCESS_STEPS[0];
+
+  const legacyView = (
     <div className="it-wrap" dir="rtl" lang="he">
       <style>{css}</style>
 
@@ -1990,6 +2320,298 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
             </div>
           </details>
         </div>
+      </div>
+    </div>
+  );
+
+  void legacyView;
+
+  return (
+    <div className="it-wrap it-wrap-refined" dir="rtl" lang="he">
+      <style>{css}</style>
+
+      {showOnboarding ? (
+        <div className="it-onboarding-layer" role="dialog" aria-modal="true" aria-label="פתיחת אימון קצה קרחון">
+          <div className="it-onboarding-card">
+            <div className="it-onboarding-head">
+              <div>
+                <div className="it-kicker">אימון על ארגון פנימי של חשיבה</div>
+                <h2>קצה קרחון / עצי הבחנה</h2>
+                <p>כאן מתאמנים בלמיין חומר לשוני ולוגי לתוך סכמות פנימיות ברורות. זה מה שמעמיק הבנה, מזרז חשיבה, ומכוון לבחירה מדויקת יותר של ההתערבות הבאה.</p>
+              </div>
+              <button type="button" className="it-btn ghost" onClick={() => setShowOnboarding(false)}>סגור</button>
+            </div>
+            <div className="it-onboarding-copy">
+              <p>זה לא סולם דילטס ולא ערבוב של כובעים ורמות. כאן עובדים עם עץ של הכללה, סיבתיות מסתעפת, או הנחות שמחזיקות את המשפט.</p>
+              <p>המטרה היא להבין איזה סוג מיון אתה עושה, למה העוגן שייך לשם, ואיזה ענף חלופי גם יכול להתאים.</p>
+            </div>
+            <SchemaComparisonMini />
+            <div className="it-onboarding-grid">
+              <article className="it-onboarding-note"><strong>מה עושים כאן</strong><p>קוראים את המשפט, בוחרים עוגן אחד, בוחרים מבנה, ואז רואים איך העץ נפתח.</p></article>
+              <article className="it-onboarding-note"><strong>איך יודעים שהצלחת</strong><p>כשברור מהו סוג המבנה, מהו הענף המרכזי, ומה עוד אפשר לבדוק במקום להינעל על פירוש אחד.</p></article>
+              <article className="it-onboarding-note"><strong>דוגמה</strong><p>"מנוחה" יכולה להפוך מקריאת מצוקה כללית לעץ של קריטריונים, תנאים, או הנחות סמויות.</p></article>
+            </div>
+            <div className="it-onboarding-actions">
+              <button type="button" className="it-btn primary" onClick={() => setShowOnboarding(false)}>מתחילים למיין</button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <section className="it-panel it-hero-panel">
+        <div className="it-hero-top">
+          <div>
+            <div className="it-kicker">Iceberg Templates · מבני מיון</div>
+            <h1 className="it-title">קצה קרחון / עצי הבחנה</h1>
+            <p className="it-sub">{INTRO_COPY}</p>
+          </div>
+          <div className="it-topbar">
+            <span className="it-chip">תרחיש <strong>{state.currentScenarioIndex + 1}</strong> / {scenarioCount}</span>
+            <span className="it-chip">עוגנים ששובצו <strong>{state.scoreDrops}</strong></span>
+            <span className="it-chip">ענפים חלופיים <strong>{state.scoreVariants}</strong></span>
+          </div>
+        </div>
+        <div className="it-home-links">
+          <a className="it-home-link" href="index.html">דף ראשי</a>
+          <a className="it-home-link" href="classic2_trainer.html">Classic 2</a>
+          <a className="it-home-link" href="classic_classic_trainer.html">Classic Classic</a>
+        </div>
+        <div className="it-start-strip">
+          <div className="it-start-copy">
+            <strong>מה הצעד הבא עכשיו?</strong>
+            <span>{currentProcessMeta.help}</span>
+          </div>
+          <div className="it-start-actions">
+            <button type="button" className="it-btn primary" onClick={() => setShowOnboarding(true)}>פתח/י פתיחה מודרכת</button>
+            {state.active ? <button type="button" className="it-btn secondary" onClick={() => setFocusStage('reveal')}>חזור/י לעץ</button> : null}
+          </div>
+        </div>
+      </section>
+
+      <ProcessRail current={workspaceStep} />
+
+      <div className="it-main-layout">
+        <div className="it-main-column">
+          <section className="it-panel it-source-panel" aria-label="משפט המקור">
+            <div className="it-panel-head">
+              <div>
+                <div className="it-kicker">Scenario ID: <code>{scenario.scenario_id}</code></div>
+                <h2 className="it-title" style={{ fontSize: '1.08rem', marginTop: 4 }}>קוראים את המשפט המלא</h2>
+                <p className="it-sub">רואים את כל האמירה, ואז בוחרים איזה חלק כדאי להפוך לעוגן עבודה.</p>
+              </div>
+              <span className="it-panel-badge">שלב 1</span>
+            </div>
+            <div className="it-textbox it-textbox-prominent" aria-live="polite">
+              {segments.map((seg) => {
+                if (seg.kind === 'plain') return <span key={seg.key} className="it-seg">{seg.text}</span>;
+                const candidate = seg.candidate;
+                const isSelected = state.selectedTokenId === candidate.id;
+                const isActive = state.active?.tokenId === candidate.id;
+                const isDragging = draggingTokenId === candidate.id;
+                return (
+                  <button
+                    key={seg.key}
+                    type="button"
+                    draggable
+                    className={['it-token', isSelected ? 'sel' : '', isActive ? 'active' : '', isDragging ? 'dragging' : ''].filter(Boolean).join(' ')}
+                    onDragStart={(e) => onDragStart(e, candidate.id)}
+                    onDragEnd={onDragEnd}
+                    onClick={() => onTokenTap(candidate.id)}
+                    aria-pressed={isSelected}
+                    title={`תבניות אפשריות: ${candidate.allowed_templates.map((type) => TEMPLATE_META[type].code).join(', ')}`}
+                  >
+                    {candidate.text}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="it-source-foot">
+              <div className="it-help"><strong>מועמדים לעוגן:</strong> {scenario.draggables.map((d) => d.text).join(' · ')}</div>
+              <div className="it-selection-card">
+                <strong>העוגן הנוכחי</strong>
+                <span>{selectedTokenLabel || 'עדיין לא נבחר'}</span>
+                <small>{selectedTokenLabel ? `מבנים אפשריים: ${selectedTokenTemplateLabels}` : 'בחר/י מילה או ביטוי מודגש כדי להתקדם.'}</small>
+              </div>
+            </div>
+          </section>
+
+          <section className="it-panel it-structure-panel" aria-label="בחירת מבנה">
+            <div className="it-panel-head">
+              <div>
+                <h2 className="it-title" style={{ fontSize: '1.08rem' }}>בוחרים איזה סוג עץ מתאים</h2>
+                <p className="it-sub">כל כרטיס הוא סוג אחר של הבחנה. בחר/י את זה שמסדר הכי טוב את מה שנאמר.</p>
+              </div>
+              <span className="it-panel-badge">שלב 2</span>
+            </div>
+            <div className="it-template-grid it-template-grid-refined">
+              {(Object.keys(TEMPLATE_META) as TemplateType[]).map((type) => {
+                const meta = TEMPLATE_META[type];
+                const isActive = state.active?.templateType === type;
+                const isHover = hoverTemplate === type;
+                const payload = isActive && activePayload ? activePayload : null;
+                const causeMode = payload && 'mode' in payload ? payload.mode ?? null : null;
+                return (
+                  <div
+                    key={type}
+                    className={['it-template', 'it-template-card', isActive ? 'is-active' : '', shakeTemplate === type ? 'shake' : ''].filter(Boolean).join(' ')}
+                    data-over={isHover ? '1' : '0'}
+                    onDragOver={(e) => { e.preventDefault(); setHoverTemplate(type); }}
+                    onDragLeave={() => setHoverTemplate((prev) => (prev === type ? null : prev))}
+                    onDrop={(e) => handleTemplateDrop(e, type)}
+                    onClick={() => handleTemplateClick(type)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleTemplateClick(type);
+                      }
+                    }}
+                    aria-label={`מבנה ${meta.titleHe}`}
+                  >
+                    <div className="it-template-head">
+                      <div>
+                        <div className="it-template-title">{meta.titleHe}</div>
+                        <div className="it-template-mini">{meta.titleEn}</div>
+                      </div>
+                      <div className="it-template-meta">
+                        <span className="it-template-code">{meta.code}</span>
+                        <span className="it-template-mini">{meta.slotCount} ענפים</span>
+                      </div>
+                    </div>
+                    <div className="it-template-help">{meta.shortHelp}</div>
+                    <TemplateSketch meta={meta} tokenText={isActive && activeToken ? activeToken.text : undefined} causeMode={causeMode} active={isActive} />
+                    <div className={`it-dropzone${isActive ? ' has-active' : ''}`}>
+                      {isActive && activeToken ? <>עובדים עכשיו עם <strong style={{ marginInlineStart: 6 }}>{activeToken.text}</strong></> : 'גרור/י לכאן עוגן מודגש או הקש/י אחרי בחירה'}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="it-panel it-workspace-panel" aria-label="מרחב עבודה מרכזי">
+            <div className="it-panel-head">
+              <div>
+                <h2 className="it-title" style={{ fontSize: '1.12rem' }}>מרחב העבודה המרכזי</h2>
+                <p className="it-sub">כאן רואים מהו שלב העבודה, למה העוגן יושב בתוך המבנה, ואיך אפשר לפתוח ענף נוסף.</p>
+              </div>
+              <span className="it-panel-badge">שלבים 3-5</span>
+            </div>
+            <div className="it-focus-toolbar">
+              <button type="button" className="it-focus-mini-btn" onClick={() => setShowFocusGuide((prev) => !prev)} aria-pressed={showFocusGuide}>{showFocusGuide ? 'הסתר/י מפת עבודה' : 'הצג/י מפת עבודה'}</button>
+              <button type="button" className="it-focus-mini-btn" onClick={() => setShowFocusSketch((prev) => !prev)} aria-pressed={showFocusSketch} disabled={!revealReady}>{showFocusSketch ? 'הסתר/י סכמת מבנה' : 'הצג/י סכמת מבנה'}</button>
+            </div>
+            {showFocusGuide ? <div className="it-focus-help"><div className="it-focus-help-body"><div className="it-help"><strong>מה קורה כאן:</strong> קודם ממיינים, אחר כך רואים את העץ, ואז בודקים חלופה. לא קופצים ישר לפירוש סופי.</div></div></div> : null}
+            {!revealReady || !activeToken || !activeMeta || !state.active ? (
+              <div className="it-empty it-workspace-empty">
+                <strong>העבודה תתחיל ברגע שתבחר/י עוגן ומבנה.</strong>
+                <p>אחר כך תוכל/י לראות שאלה, הסתעפויות, חלופות, ומה כדאי לקחת לסבב הבא.</p>
+              </div>
+            ) : (
+              <div className="it-active" style={{ marginTop: 10 }}>
+                {showFocusSketch ? <div className={`it-focus-sketch ${focusStage !== 'build' ? 'is-compact' : ''}`}><TemplateSketch meta={activeMeta} tokenText={activeToken.text} causeMode={'mode' in activePayload ? activePayload.mode ?? null : null} active /></div> : null}
+                <div className="it-stage-switch" role="tablist" aria-label="שלבי העבודה">
+                  <button type="button" className={`it-stage-btn ${focusStage === 'build' ? 'is-active' : ''}`} onClick={() => setFocusStage('build')}>שלב 3 · משבצים</button>
+                  <button type="button" className={`it-stage-btn ${focusStage === 'reveal' ? 'is-active' : ''}`} onClick={() => setFocusStage('reveal')}>שלב 4 · רואים עץ</button>
+                  <button type="button" className={`it-stage-btn ${focusStage === 'challenge' ? 'is-active' : ''}`} onClick={() => setFocusStage('challenge')} disabled={!challengeReady}>שלב 5 · בודקים חלופה</button>
+                </div>
+                <div className="it-stage-card">
+                  {focusStage === 'build' ? (
+                    <div className="it-coach-grid">
+                      <div className="it-coach-card"><strong>העוגן</strong><p>{activeToken.text}</p></div>
+                      <div className="it-coach-card"><strong>המבנה</strong><p>{activeMeta.titleHe}</p></div>
+                      <div className="it-coach-card"><strong>מה בודקים כאן</strong><p>{activeMeta.shortHelp}</p></div>
+                      <div className="it-actions">
+                        <button type="button" className="it-btn primary" onClick={() => setFocusStage('reveal')}>פתח/י את העץ</button>
+                        <button type="button" className="it-btn ghost" onClick={clearActive}>בחר/י מבנה אחר</button>
+                      </div>
+                    </div>
+                  ) : null}
+                  {focusStage === 'reveal' ? (
+                    <div className="it-focus-core-layout">
+                      <div className="it-focus-result-column">
+                        <section className="it-reveal-visual" aria-label="העץ שנפתח">
+                          <div className="it-reveal-visual-head">
+                            <div><h4>כך המבנה נפתח כרגע</h4><p>העוגן במרכז, והענפים מראים מה המבנה פותח סביבו.</p></div>
+                            <span className="it-mini-tag code">{activeMeta.code}</span>
+                          </div>
+                          <RevealTemplateFigure templateType={state.active.templateType} tokenText={activeToken.text} slots={activeSet} causeMode={'mode' in activePayload ? activePayload.mode ?? null : null} />
+                          <div className={`it-slots cols-${activeMeta.slotCount}`}>{Array.from({ length: activeMeta.slotCount }).map((_, idx) => <div key={idx} className="it-slot">{activeSet[idx] || '—'}</div>)}</div>
+                        </section>
+                        <BranchExplorer templateType={state.active.templateType} tokenText={activeToken.text} payload={activePayload} activeSet={activeSet} />
+                      </div>
+                      <div className="it-focus-side-column">
+                        <div className="it-question">{activePayload.question}</div>
+                        <div className="it-reflection">{activeReflection}</div>
+                        <div className="it-disclaimer">{activeDirectionLabel || DISCLAIMER_COPY}</div>
+                        <div className="it-actions">
+                          <button type="button" className="it-btn secondary" onClick={cycleVariant}>הצג/י ענף חלופי</button>
+                          <button type="button" className="it-btn ghost" onClick={clearActive}>אפס/י מבנה</button>
+                          <button type="button" className="it-btn primary" onClick={() => setFocusStage('challenge')} disabled={!challengeReady}>עבור/י לשלב הבדיקה</button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+                  {focusStage === 'challenge' ? (
+                    <>
+                      <BranchExplorer templateType={state.active.templateType} tokenText={activeToken.text} payload={activePayload} activeSet={activeSet} />
+                      <div className="it-board-row"><div className="it-board-label">מה בודקים עכשיו</div><div className="it-board-value emph">איזה ענף מחזיק יותר, איזה ענף חלופי גם אפשרי, ומה משתנה אם ממיינים אחרת.</div></div>
+                      <div className="it-challenge-list">{challengePrompts.map((prompt, idx) => <div key={`${state.active?.templateType}-${idx}`} className="it-challenge-item">{idx + 1}. {prompt}</div>)}</div>
+                      <div className="it-challenge-note">בחר/י שאלה אחת בלבד, בדוק/י אותה, ואז חזור/י לעץ אם צריך לחדד את המיון.</div>
+                      <div className="it-actions">
+                        <button type="button" className="it-btn secondary" onClick={() => setFocusStage('reveal')}>חזור/י לעץ</button>
+                        <button type="button" className="it-btn ghost" onClick={cycleVariant}>עוד חלופה</button>
+                        <button type="button" className="it-btn primary" onClick={nextScenario}>סיים/י סבב ועבור/י הלאה</button>
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            )}
+            {state.feedback ? <div className={`it-feedback ${state.feedback.tone}`}>{state.feedback.text}</div> : null}
+            {state.lastCompletedRecap ? <div className="it-recap">{state.lastCompletedRecap}</div> : null}
+          </section>
+        </div>
+
+        <aside className="it-support-column">
+          <section className="it-panel it-support-summary">
+            <div className="it-panel-head">
+              <div>
+                <h2 className="it-title" style={{ fontSize: '1rem' }}>סיכום מצב נוכחי</h2>
+                <p className="it-sub">איפה אתה נמצא, עם איזה עוגן אתה עובד, ומה כדאי לעשות עכשיו.</p>
+              </div>
+            </div>
+            <div className="it-support-list">
+              <div className="it-support-item"><strong>שלב נוכחי</strong><span>{currentProcessMeta.label}</span></div>
+              <div className="it-support-item"><strong>עוגן פעיל</strong><span>{selectedTokenLabel || 'עדיין לא נבחר'}</span></div>
+              <div className="it-support-item"><strong>מבנה פעיל</strong><span>{activeMeta ? activeMeta.titleHe : 'עדיין לא נבחר'}</span></div>
+              <div className="it-support-item"><strong>הצעד הבא</strong><span>{currentProcessMeta.help}</span></div>
+            </div>
+            <div className="it-actions">
+              <button type="button" className="it-btn primary" disabled={!state.completedAtLeastOneDrop} onClick={nextScenario}>סיים/י סבב / הבא</button>
+              <button type="button" className="it-btn ghost" onClick={() => { setState(INITIAL_STATE); setFocusStage('build'); setShowOnboarding(true); }}>אתחל/י מודול</button>
+            </div>
+          </section>
+          <details className="it-collapse" open={!!state.active}>
+            <summary><span>לוח הבדיקה</span><span className="it-kicker">{state.active ? 'פתוח בזמן עבודה' : 'ייפתח אחרי שיבוץ'}</span></summary>
+            <div className="it-collapse-body">
+              <SentenceBoard scenario={scenario} selectedToken={selectedToken} activeTemplateType={state.active?.templateType ?? null} activeQuestion={activePayload?.question ?? ''} activeReflection={activeReflection} />
+            </div>
+          </details>
+          <details className="it-collapse">
+            <summary><span>מה לוקחים מהסבב</span><span className="it-kicker">סקירה מהירה</span></summary>
+            <div className="it-collapse-body">
+              <ul className="it-scenario-list">
+                <li><span>קראנו את המשפט השלם</span><span>✔</span></li>
+                <li><span>בחרנו עוגן ממוקד</span><span>{state.selectedTokenId ? '✔' : '—'}</span></li>
+                <li><span>מיפינו אותו למבנה</span><span>{state.completedAtLeastOneDrop ? '✔' : '—'}</span></li>
+                <li><span>ראינו ענפים וחלופות</span><span>{state.active ? '✔' : '—'}</span></li>
+                <li><span>זכרנו שזה מיפוי עבודה, לא אמת</span><span>✔</span></li>
+              </ul>
+            </div>
+          </details>
+        </aside>
       </div>
     </div>
   );

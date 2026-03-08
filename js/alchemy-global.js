@@ -1067,6 +1067,7 @@
         for (i = 0; i < limit; i++) {
             var el = candidates[i];
             if (!el || !el.textContent) continue;
+            if (el.closest && el.closest('[data-alchemy-skip="1"]')) continue;
             var text = String(el.textContent || '').trim();
             if (!text) continue;
             var sig = (el.className || '') + '|' + text.slice(0, 120);
