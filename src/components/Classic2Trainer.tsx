@@ -447,7 +447,7 @@ export default function Classic2Trainer(): React.ReactElement {
     if (cfg.categoryDisplay === 'group') {
       return (
         <div className="c2n-list">
-          {CANONICAL_BREEN_ORDER.filter((c) => vis.includes(c)).map((c) => {
+          {orderBreenCategories(vis).map((c) => {
             const present = !!round && round.sentences.some((s) => s.tags.includes(c));
             return (
               <button
@@ -496,324 +496,347 @@ export default function Classic2Trainer(): React.ReactElement {
   const draftDisplayLabel = draft.categoryDisplay === 'all' ? 'טבלת ברין מלאה' : `קבוצת ${draft.categoryGroup}`;
   const startSummary = `${settings.sentenceCount} פריטים · ${visibleCount} קטגוריות · ${displayLabel}`;
   const previewSummary = `${draft.sentenceCount} פריטים · ${draftVisibleCount} קטגוריות · ${draftDisplayLabel}`;
+  const headerModeLabel = started ? progressText(roundNo, settings.rounds) : 'מוכן להתחלה מיידית';
+  const primaryStartLabel = started ? 'התחל סשן חדש' : 'התחל סבב';
+  const helperSteps = [
+    { title: '1. בחר/י או השאר/י ברירת מחדל', description: 'אפשר להתחיל ישר או לכוונן עומס, תצוגה וקטגוריות.' },
+    { title: '2. קרא/י ועבוד/י בתוך הטקסט', description: 'בחר/י קטגוריה אחת ונסה/י לזהות איפה היא באמת מופיעה.' },
+    { title: '3. בדוק/י, למד/י והמשך/י', description: 'קבל/י משוב, פתח/י רמז או פתרון, ואז עבור/י לסבב הבא.' },
+  ];
+  const currentActionTitle = !started
+    ? 'מתחילים מהכפתור הראשי'
+    : finished
+      ? 'הסשן הסתיים'
+      : selectedCat
+        ? `עובדים עכשיו על ${selectedCat} / ${CAT[selectedCat].he}`
+        : 'השלב הבא: לבחור קטגוריה';
+  const currentActionBody = !started
+    ? 'הברירות כבר מוכנות. אפשר להתחיל מיד, או לפתוח הגדרות אם רוצים למקד תחום, עומס או מצב תצוגה.'
+    : finished
+      ? 'אפשר להפעיל שוב את אותו סט, או לעדכן הגדרות לפני הסשן הבא.'
+      : selectedCat
+        ? `${CAT[selectedCat].hint} ${CAT[selectedCat].note ?? ''}`.trim()
+        : 'בחר/י קטגוריה אחת מתוך טבלת ברין הקנונית, ואז סמן/י את כל המשפטים שבהם היא באמת מופיעה.';
+  const supportStatus = !started ? 'הדף מוכן להתחלה' : finished ? 'סשן הושלם' : progressText(roundNo, settings.rounds);
+  const summaryGrid = (
+    <div className="c2n-preview-grid">
+      <div className="c2n-kv"><b>תחום</b><span>{CTX_LABEL[settings.fieldContext]}</span></div>
+      <div className="c2n-kv"><b>תצוגה</b><span>{displayLabel}</span></div>
+      <div className="c2n-kv"><b>עומס</b><span>{settings.sentenceCount} משפטים · {roundsText(settings.rounds)} סבבים</span></div>
+      <div className="c2n-kv"><b>בדיקה</b><span>{rr.exact ? 'מלאה' : 'גמישה'}</span></div>
+    </div>
+  );
+  const previewGrid = (
+    <div className="c2n-preview-grid">
+      <div className="c2n-kv"><b>תחום</b><span>{CTX_LABEL[draft.fieldContext]}</span></div>
+      <div className="c2n-kv"><b>מצב</b><span>{draftDisplayLabel}</span></div>
+      <div className="c2n-kv"><b>סבבים</b><span>{roundsText(draft.rounds)}</span></div>
+      <div className="c2n-kv"><b>קושי</b><span>{draft.difficulty}/5</span></div>
+    </div>
+  );
+  const settingsSections: TrainerSettingsSection[] = [
+    {
+      id: 'what-to-practice',
+      title: 'מה לתרגל',
+      help: 'תחום הטקסט קובע את האווירה והדוגמאות של הסבב.',
+      content: (
+        <div className="c2n-seg">
+          {(Object.keys(CTX_LABEL) as FieldCtx[]).map((c) => (
+            <button key={c} type="button" className={`c2n-btn ${draft.fieldContext === c ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, fieldContext: c }))}>
+              {CTX_LABEL[c]}
+            </button>
+          ))}
+        </div>
+      )
+    },
+    {
+      id: 'session-load',
+      title: 'עומס / גודל סשן',
+      help: 'כמה משפטים יהיו בכל טקסט וכמה סבבים יכלול הסשן.',
+      content: (
+        <>
+          <div className="c2n-kv"><b>משפטים בטקסט</b><span>{draft.sentenceCount}</span></div>
+          <input className="c2n-range" type="range" min={3} max={8} step={1} value={draft.sentenceCount} onChange={(e) => setDraft((p) => ({ ...p, sentenceCount: Number(e.target.value) }))} />
+          <div className="c2n-seg">
+            {[5, 10, 'infinite'].map((r) => (
+              <button key={String(r)} type="button" className={`c2n-btn ${draft.rounds === r ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, rounds: r as RoundsChoice }))}>
+                {r === 'infinite' ? 'אינסופי' : r}
+              </button>
+            ))}
+          </div>
+        </>
+      )
+    },
+    {
+      id: 'display-mode',
+      title: 'מצב תצוגה',
+      help: 'אפשר לעבוד עם כל הטבלה בסדר הקנוני או עם קבוצה ממוקדת.',
+      content: (
+        <>
+          <label className="c2n-radio">
+            <input type="radio" name="disp" checked={draft.categoryDisplay === 'all'} onChange={() => setDraft((p) => ({ ...p, categoryDisplay: 'all' }))} />
+            <div><strong>כל הקטגוריות</strong><span>אותו סדר קבוע בכל סשן.</span></div>
+          </label>
+          <label className="c2n-radio">
+            <input type="radio" name="disp" checked={draft.categoryDisplay === 'group'} onChange={() => setDraft((p) => ({ ...p, categoryDisplay: 'group' }))} />
+            <div><strong>קבוצה אחת</strong><span>מיקוד ב- DIS / GEN / DEL.</span></div>
+          </label>
+        </>
+      )
+    },
+    {
+      id: 'categories',
+      title: 'קטגוריות',
+      help: 'במצב קבוצתי בוחרים קבוצה פעילה. אפשר לצרף גם CTX + VAK.',
+      content: (
+        <>
+          <div className="c2n-seg">
+            {(['GEN', 'DIS', 'DEL'] as GroupCode[]).map((g) => (
+              <button key={g} type="button" className={`c2n-btn ${draft.categoryGroup === g ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, categoryGroup: g }))}>
+                {g}
+              </button>
+            ))}
+          </div>
+          <label className="c2n-toggle">
+            <input type="checkbox" checked={draft.includeCtxVak} onChange={(e) => setDraft((p) => ({ ...p, includeCtxVak: e.target.checked }))} />
+            כולל CTX + VAK
+          </label>
+        </>
+      )
+    },
+    {
+      id: 'difficulty',
+      title: 'קושי',
+      help: 'משפיע על רמזי נוכחות, קשיחות הבדיקה, ורמז אוטומטי אחרי שגיאה.',
+      advanced: true,
+      content: (
+        <>
+          <div className="c2n-chip">{draft.difficulty}/5</div>
+          <input className="c2n-range" type="range" min={1} max={5} step={1} value={draft.difficulty} onChange={(e) => setDraft((p) => ({ ...p, difficulty: Number(e.target.value) }))} />
+        </>
+      )
+    },
+    {
+      id: 'text-source',
+      title: 'מקור טקסט',
+      help: 'מוכן להרחבה לטריינרים נוספים באותה מעטפת הגדרות.',
+      advanced: true,
+      content: (
+        <>
+          <label className="c2n-radio">
+            <input type="radio" name="src" checked={draft.textSource === 'built_in'} onChange={() => setDraft((p) => ({ ...p, textSource: 'built_in' }))} />
+            <div><strong>סט תרגול מובנה</strong><span>רצף תרחישים לפי הקשר.</span></div>
+          </label>
+          <label className="c2n-radio">
+            <input type="radio" name="src" checked={draft.textSource === 'random'} onChange={() => setDraft((p) => ({ ...p, textSource: 'random' }))} />
+            <div><strong>בחירה אקראית</strong><span>דילוג בין תרחישים וחלונות טקסט.</span></div>
+          </label>
+          <label className="c2n-radio dim">
+            <input type="radio" name="src" disabled />
+            <div><strong>הדבקה ידנית</strong><span>מוכן לשלב עתידי.</span></div>
+          </label>
+        </>
+      )
+    },
+  ];
+  const mainContent = !started ? (
+    <TrainerEmptyState
+      title="הסשן עוד לא התחיל"
+      body={<p>לחץ/י על &quot;התחל סבב&quot; כדי להיכנס ישר לתרגול עם ההגדרות הנוכחיות, או פתח/י הגדרות כדי לשנות תחום, עומס או תצוגת קטגוריות.</p>}
+    />
+  ) : started && finished ? (
+    <section className="c2n-card">
+      <h3 style={{ fontSize: '1rem', fontWeight: 900 }}>סיכום תרגול</h3>
+      <div className="c2n-sub" style={{ marginTop: 4 }}>הושלמו {done} סבבים ({correct} נכונים) · הקשר: {CTX_LABEL[settings.fieldContext]} · רמה: {settings.difficulty}/5</div>
+      <div className="c2n-row-actions">
+        <button type="button" className="c2n-btn p" onClick={() => startPractice(settings)}>הפעל שוב עם אותן הגדרות</button>
+        <button type="button" className="c2n-btn g" onClick={openSettings}>עדכן הגדרות</button>
+      </div>
+    </section>
+  ) : started && round ? (
+    <section className="c2n-card">
+      <div className="c2n-text-top">
+        <div>
+          <h3 style={{ fontSize: '1.02rem', fontWeight: 900 }}>{round.title}</h3>
+          <div className="c2n-sub">סבב {roundNo} · {round.contextLabel} · {round.sentences.length} משפטים</div>
+        </div>
+        <div className="c2n-meta">
+          <span className="c2n-chip">רמה {settings.difficulty}/5</span>
+          <span className="c2n-chip">{displayLabel}</span>
+          {rr.exact && <span className="c2n-chip">בדיקה מלאה</span>}
+        </div>
+      </div>
+
+      <div className="c2n-target" style={{ marginTop: 12 }}>
+        <strong>{selectedCat ? `הקטגוריה הפעילה: ${selectedCat} / ${CAT[selectedCat].he}` : 'הצעד הראשון: בחר/י קטגוריה ממפת ברין שבצד'}</strong>
+        <p>{selectedCat ? CAT[selectedCat].hint : 'לאחר הבחירה אפשר לסמן משפט אחד או יותר, או לדווח שאין מופע כזה בטקסט.'}</p>
+        {selectedCat && CAT[selectedCat].note && <p style={{ fontWeight: 800, color: '#0d3fae' }}>{CAT[selectedCat].note}</p>}
+      </div>
+
+      <div className="c2n-sents" style={{ marginTop: 12 }}>
+        {round.sentences.map((s, i) => {
+          const sel = selectedIds.includes(s.id);
+          const isMatch = !!selectedCat && s.tags.includes(selectedCat);
+          const showGood = !!selectedCat && (showSolution || result === 'correct') && isMatch;
+          const showBad = result === 'wrong' && sel && !isMatch;
+          return (
+            <button key={s.id} type="button" className={`c2n-sent${sel ? ' sel' : ''}${showGood ? ' good' : ''}${showBad ? ' bad' : ''}`} onClick={() => toggleSentence(s.id)} disabled={!selectedCat || result !== 'pending'} aria-pressed={sel}>
+              <div className="c2n-sent-top">
+                <span>משפט {i + 1}</span>
+                <span>{showGood ? 'נכון' : showBad ? 'לא מתאים' : sel ? 'מסומן' : 'לחיץ'}</span>
+              </div>
+              <span className="c2n-sent-text">{s.text}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="c2n-row-actions">
+        <button type="button" className="c2n-btn p" onClick={evaluate} disabled={!selectedCat || result !== 'pending'}>בדוק תשובה</button>
+        <button type="button" className="c2n-btn w" onClick={declareNoCategory} disabled={!selectedCat || result !== 'pending'}>אין את הקטגוריה בטקסט</button>
+        <button type="button" className="c2n-btn s" onClick={() => { setSelectedIds([]); setResult('pending'); setShowHint(false); setShowSolution(false); setFeedback(selectedCat ? { tone: 'info', message: 'נוקה הסימון. אפשר לנסות שוב.' } : { tone: 'info', message: 'בחר/י קטגוריה כדי להתחיל.' }); }}>נקה סימון</button>
+        <button type="button" className="c2n-btn g" onClick={() => setShowHint(true)} disabled={!selectedCat}>רמז</button>
+        <button type="button" className="c2n-btn g" onClick={() => setShowSolution(true)} disabled={!selectedCat}>פתרון</button>
+      </div>
+
+      {feedback && <div className={`c2n-fb ${feedback.tone}`}>{feedback.message}</div>}
+
+      {showHint && selectedCat && (
+        <div className="c2n-hint">
+          <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>רמז</h4>
+          <p>{CAT[selectedCat].hint}</p>
+          {hintIdx.length ? <p>בדוק/י במיוחד את משפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p> : <p>ייתכן שאין מופע של הקטגוריה הזו בטקסט.</p>}
+        </div>
+      )}
+
+      {showSolution && selectedCat && (
+        <div className="c2n-hint">
+          <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>פתרון</h4>
+          {hintIdx.length
+            ? <p>המופעים של {selectedCat} / {CAT[selectedCat].he} נמצאים במשפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p>
+            : <p>אין מופע של {selectedCat} / {CAT[selectedCat].he} בטקסט הזה.</p>}
+        </div>
+      )}
+
+      <div className="c2n-foot">
+        <div className="c2n-score">
+          <span className="c2n-chip">הושלמו: {done}</span>
+          <span className="c2n-chip">נכונים: {correct + (result === 'correct' ? 1 : 0)}</span>
+          <span className="c2n-chip">סבבים: {roundsText(settings.rounds)}</span>
+        </div>
+        <button type="button" className="c2n-btn p" onClick={nextRound} disabled={result !== 'correct'}>{settings.rounds === 'infinite' ? 'סבב הבא (∞)' : 'סבב הבא'}</button>
+      </div>
+    </section>
+  ) : (
+    <TrainerEmptyState title="אין כרגע סבב פעיל" body={<p>פתח/י סשן חדש או עדכן/י הגדרות כדי להמשיך.</p>} />
+  );
+  const supportContent = (
+    <>
+      <TrainerSupportCard title="מה קורה עכשיו" subtitle={supportStatus}>
+        <p>{currentActionTitle}</p>
+        <p>{currentActionBody}</p>
+        <button type="button" className="trp-btn is-ghost" onClick={() => setHelpOpen((v) => !v)} aria-expanded={helpOpen}>
+          {helpOpen ? 'הסתר הסבר קצר' : 'פתח הסבר קצר'}
+        </button>
+        {helpOpen ? <div className="c2n-help">1. בחר/י או השאר/י ברירת מחדל. 2. קרא/י את הטקסט וסמן/י רק את מה שמתאים לקטגוריה. 3. בדוק/י, קבל/י משוב, ועבור/י לסבב הבא.</div> : null}
+      </TrainerSupportCard>
+
+      <TrainerSupportCard
+        title="מפת הקטגוריות"
+        subtitle={settings.categoryDisplay === 'all' ? 'כל הקטגוריות נשמרות תמיד באותו סדר RTL. המיקום לא קופץ בין סשנים.' : `מצב ממוקד: ${settings.categoryGroup}${settings.includeCtxVak ? ' + CTX/VAK' : ''}.`}
+      >
+        {started && !finished ? renderCatPicker(settings, result === 'pending') : renderCatPicker(settings, false, true)}
+      </TrainerSupportCard>
+
+      <TrainerSupportCard title="הסשן הנוכחי יהיה…" subtitle="הסיכום מתעדכן מיד אחרי כל שמירה בהגדרות.">
+        {summaryGrid}
+      </TrainerSupportCard>
+    </>
+  );
 
   return (
     <div className="c2n" dir="rtl" lang="he">
-      <style>{CSS}</style>
-      <div className="c2n-shell">
-        <div className="c2n-top c2n-card">
-          <div className="c2n-title">
-            <h1>Classic 2 · Structure of Magic</h1>
-            <p>זיהוי קטגוריה, סימון משפטים, ובדיקה מול טבלת ברין קנונית אחת.</p>
-          </div>
-          <div className="c2n-actions">
-            <span className="c2n-chip strong">{started ? progressText(roundNo, settings.rounds) : 'מוכן להתחלה מיידית'}</span>
-            <button type="button" className="c2n-btn g" onClick={openSettings}>הגדרות</button>
-            <button type="button" className="c2n-btn s" onClick={() => setHelpOpen((v) => !v)} aria-expanded={helpOpen}>איך זה עובד</button>
-          </div>
-        </div>
+      <style>{`${TRAINER_PLATFORM_CSS}\n${CSS}`}</style>
+      <TrainerPlatformShell
+        title="Classic 2 · Structure of Magic"
+        subtitle="מזהים קטגוריה, מסמנים משפטים, ובודקים מול טבלת ברין אחת בסדר קנוני קבוע."
+        modePill={<span className="trp-mode-pill">{headerModeLabel}</span>}
+        headerActions={
+          <button type="button" className="trp-btn is-secondary" onClick={() => setHelpOpen((v) => !v)} aria-expanded={helpOpen}>
+            {helpOpen ? 'הסתר הסבר' : 'איך זה עובד'}
+          </button>
+        }
+        purposeKicker="מה עושים כאן?"
+        purposeTitle="מאמנים עין יציבה על קטגוריה אחת בתוך טקסט אמיתי"
+        purposeBody={
+          <p>
+            בכל סבב בוחרים קטגוריה מתוך טבלת ברין, קוראים טקסט קצר, ומסמנים את כל המשפטים שבהם הקטגוריה באמת מופיעה.
+            הצלחה בסבב היא לא רק &quot;להרגיש שזה שם&quot;, אלא לזהות נכון או לדעת לומר בביטחון שאין מופע כזה בטקסט.
+          </p>
+        }
+        purposeTags={
+          <>
+            <span className="c2n-chip">סדר קנוני קבוע</span>
+            <span className="c2n-chip">ברירות מחדל מוכנות</span>
+            <span className="c2n-chip">מתאים לדסקטופ ולמובייל</span>
+          </>
+        }
+        startKicker="מתחילים מכאן"
+        startTitle="אפשר להתחיל מיד"
+        startBody={<p>Classic 2 נטען עם ברירות מחדל שמישות. ההגדרות הן התאמה אישית, לא שער כניסה.</p>}
+        startActions={
+          <>
+            <button type="button" className="trp-btn is-primary" onClick={() => startPractice(settings)}>{primaryStartLabel}</button>
+            <button type="button" className="trp-btn is-secondary" onClick={openSettings}>הגדרות</button>
+            <span className="trp-summary-pill">{startSummary}</span>
+          </>
+        }
+        startMeta={
+          <>
+            <span className="c2n-chip">תחום: {CTX_LABEL[settings.fieldContext]}</span>
+            <span className="c2n-chip">רמה: {settings.difficulty}/5</span>
+            <span className="c2n-chip">סבבים: {roundsText(settings.rounds)}</span>
+          </>
+        }
+        helperSteps={helperSteps}
+        main={mainContent}
+        support={supportContent}
+      />
 
-        <section className="c2n-hero">
-          <div className="c2n-card c2n-hero-copy">
-            <span className="c2n-kicker">מה עושים כאן?</span>
-            <h2 style={{ fontSize: '1.08rem', fontWeight: 900 }}>מאמנים עין יציבה על קטגוריה אחת בתוך טקסט אמיתי.</h2>
-            <p>בכל סבב בוחרים קטגוריה מתוך טבלת ברין, קוראים טקסט קצר, ומסמנים את כל המשפטים שבהם הקטגוריה באמת מופיעה. הצלחה בסבב היא לא רק "להרגיש שזה שם", אלא לזהות נכון או לדעת לומר בביטחון שאין מופע כזה בטקסט.</p>
-            <div className="c2n-pillbar">
-              <span className="c2n-chip">סדר קנוני קבוע</span>
-              <span className="c2n-chip">ברירות מחדל מוכנות</span>
-              <span className="c2n-chip">מתאים לדסקטופ ולמובייל</span>
-            </div>
-          </div>
-          <div className="c2n-start-strip">
-            <div>
-              <span className="c2n-kicker">Start Here</span>
-              <h2 style={{ fontSize: '1.05rem', fontWeight: 900, marginTop: 4 }}>אפשר להתחיל מיד</h2>
-              <p className="c2n-sub" style={{ marginTop: 6 }}>Classic 2 נטען עם ברירות מחדל שמישות. ההגדרות הן התאמה אישית, לא שער כניסה.</p>
-            </div>
-            <div className="c2n-start-actions">
-              <button type="button" className="c2n-btn p" onClick={() => startPractice(settings)}>{started ? 'התחל סשן חדש' : 'התחל סבב'}</button>
-              <button type="button" className="c2n-btn s" onClick={openSettings}>הגדרות</button>
-              <span className="c2n-start-summary">{startSummary}</span>
-            </div>
-            <div className="c2n-pillbar">
-              <span className="c2n-chip">תחום: {CTX_LABEL[settings.fieldContext]}</span>
-              <span className="c2n-chip">רמה: {settings.difficulty}/5</span>
-              <span className="c2n-chip">סבבים: {roundsText(settings.rounds)}</span>
-            </div>
-          </div>
-        </section>
-
-        {helpOpen && <div className="c2n-help">1. בחר/י או השאר/י ברירת מחדל. 2. קרא/י את הטקסט וסמן/י רק את מה שמתאים לקטגוריה. 3. בדוק/י, קבל/י משוב, ועבור/י לסבב הבא.</div>}
-
-        <div className="c2n-step-strip">
-          <div className="c2n-step"><strong>1. בחר/י או השאר/י ברירת מחדל</strong><span className="c2n-sub">אפשר להתחיל ישר או לכוונן בהגדרות.</span></div>
-          <div className="c2n-step"><strong>2. קרא/י את הטקסט</strong><span className="c2n-sub">בחר/י קטגוריה אחת והתבונן/י בכל משפט.</span></div>
-          <div className="c2n-step"><strong>3. סמן/י / נתח/י / בדוק/י</strong><span className="c2n-sub">בדוק/י תשובה, בקש/י רמז, או דווח/י שאין מופע.</span></div>
-        </div>
-
-        {!started && (
-          <div className="c2n-empty">
-            <h2 style={{ fontSize: '1rem', fontWeight: 900 }}>הסשן עוד לא התחיל</h2>
-            <p>לחץ/י על "התחל סבב" כדי להיכנס ישר לתרגול עם ההגדרות הנוכחיות, או פתח/י הגדרות כדי לשנות תחום, עומס או תצוגת קטגוריות.</p>
-          </div>
-        )}
-
-        {started && !finished && round && (
-          <div className="c2n-layout">
-            <section className="c2n-main">
-              <div className="c2n-card">
-                <div className="c2n-text-top">
-                  <div>
-                    <h3 style={{ fontSize: '1.02rem', fontWeight: 900 }}>{round.title}</h3>
-                    <div className="c2n-sub">סבב {roundNo} · {round.contextLabel} · {round.sentences.length} משפטים</div>
-                  </div>
-                  <div className="c2n-meta">
-                    <span className="c2n-chip">רמה {settings.difficulty}/5</span>
-                    <span className="c2n-chip">{displayLabel}</span>
-                    {rr.exact && <span className="c2n-chip">בדיקה מלאה</span>}
-                  </div>
-                </div>
-
-                <div className="c2n-target" style={{ marginTop: 12 }}>
-                  <strong>{selectedCat ? `הקטגוריה הפעילה: ${selectedCat} / ${CAT[selectedCat].he}` : 'הצעד הראשון: בחר/י קטגוריה מהעמודה הימנית'}</strong>
-                  <p>{selectedCat ? CAT[selectedCat].hint : 'לאחר הבחירה אפשר לסמן משפט אחד או יותר, או לדווח שאין מופע כזה בטקסט.'}</p>
-                  {selectedCat && CAT[selectedCat].note && <p style={{ fontWeight: 800, color: '#0d3fae' }}>{CAT[selectedCat].note}</p>}
-                </div>
-
-                <div className="c2n-sents" style={{ marginTop: 12 }}>
-                  {round.sentences.map((s, i) => {
-                    const sel = selectedIds.includes(s.id);
-                    const isMatch = !!selectedCat && s.tags.includes(selectedCat);
-                    const showGood = !!selectedCat && (showSolution || result === 'correct') && isMatch;
-                    const showBad = result === 'wrong' && sel && !isMatch;
-                    return (
-                      <button key={s.id} type="button" className={`c2n-sent${sel ? ' sel' : ''}${showGood ? ' good' : ''}${showBad ? ' bad' : ''}`} onClick={() => toggleSentence(s.id)} disabled={!selectedCat || result !== 'pending'} aria-pressed={sel}>
-                        <div className="c2n-sent-top">
-                          <span>משפט {i + 1}</span>
-                          <span>{showGood ? 'נכון' : showBad ? 'לא מתאים' : sel ? 'מסומן' : 'לחיץ'}</span>
-                        </div>
-                        <span className="c2n-sent-text">{s.text}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="c2n-row-actions">
-                  <button type="button" className="c2n-btn p" onClick={evaluate} disabled={!selectedCat || result !== 'pending'}>בדוק תשובה</button>
-                  <button type="button" className="c2n-btn w" onClick={declareNoCategory} disabled={!selectedCat || result !== 'pending'}>אין את הקטגוריה בטקסט</button>
-                  <button type="button" className="c2n-btn s" onClick={() => { setSelectedIds([]); setResult('pending'); setShowHint(false); setShowSolution(false); setFeedback(selectedCat ? { tone: 'info', message: 'נוקה הסימון. אפשר לנסות שוב.' } : { tone: 'info', message: 'בחר/י קטגוריה כדי להתחיל.' }); }}>נקה סימון</button>
-                  <button type="button" className="c2n-btn g" onClick={() => setShowHint(true)} disabled={!selectedCat}>רמז</button>
-                  <button type="button" className="c2n-btn g" onClick={() => setShowSolution(true)} disabled={!selectedCat}>פתרון</button>
-                </div>
-
-                {feedback && <div className={`c2n-fb ${feedback.tone}`}>{feedback.message}</div>}
-
-                {showHint && selectedCat && (
-                  <div className="c2n-hint">
-                    <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>רמז</h4>
-                    <p>{CAT[selectedCat].hint}</p>
-                    {hintIdx.length ? <p>בדוק/י במיוחד את משפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p> : <p>ייתכן שאין מופע של הקטגוריה הזו בטקסט.</p>}
-                  </div>
-                )}
-
-                {showSolution && selectedCat && (
-                  <div className="c2n-hint">
-                    <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>פתרון</h4>
-                    {hintIdx.length
-                      ? <p>המופעים של {selectedCat} / {CAT[selectedCat].he} נמצאים במשפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p>
-                      : <p>אין מופע של {selectedCat} / {CAT[selectedCat].he} בטקסט הזה.</p>}
-                  </div>
-                )}
-
-                <div className="c2n-foot">
-                  <div className="c2n-score">
-                    <span className="c2n-chip">הושלמו: {done}</span>
-                    <span className="c2n-chip">נכונים: {correct + (result === 'correct' ? 1 : 0)}</span>
-                    <span className="c2n-chip">סבבים: {roundsText(settings.rounds)}</span>
-                  </div>
-                  <button type="button" className="c2n-btn p" onClick={nextRound} disabled={result !== 'correct'}>{settings.rounds === 'infinite' ? 'סבב הבא (∞)' : 'סבב הבא'}</button>
-                </div>
+      <TrainerSettingsShell
+        open={wizardOpen}
+        title="לוח הבקרה של Classic 2"
+        subtitle="מגדירים מה לתרגל, כמה עומס לשים, ואיך טבלת ברין תופיע. ברירת המחדל כבר מוכנה, אז אפשר גם רק לשמור ולצאת."
+        summaryPill={<span className="trp-summary-pill">{previewSummary}</span>}
+        preview={
+          <>
+            {previewGrid}
+            <section className="c2n-group">
+              <div className="c2n-group-head">
+                <h3>סדר הקטגוריות</h3>
+                <p className="c2n-sub">תמיד אותו מקור אמת. גם בתצוגה חלקית הסדר נשמר.</p>
               </div>
+              {renderCatPicker(draft, false, true)}
             </section>
-
-            <aside className="c2n-sidebar">
-              <div className="c2n-card">
-                <h3 style={{ fontSize: '.98rem', fontWeight: 900 }}>קטגוריות לפי סדר ברין הקנוני</h3>
-                <div className="c2n-sub" style={{ marginTop: 4 }}>
-                  {settings.categoryDisplay === 'all'
-                    ? 'כל הקטגוריות נשמרות תמיד באותו סדר RTL. המיקום לא קופץ בין סשנים.'
-                    : `מצב ממוקד: ${settings.categoryGroup}${settings.includeCtxVak ? ' + CTX/VAK' : ''}.`}
-                </div>
-                {renderCatPicker(settings, result === 'pending')}
-              </div>
-
-              <div className="c2n-summary-card">
-                <h3 style={{ fontSize: '.94rem', fontWeight: 900 }}>הסשן הנוכחי יהיה…</h3>
-                <div className="c2n-preview-grid">
-                  <div className="c2n-kv"><b>תחום</b><span>{CTX_LABEL[settings.fieldContext]}</span></div>
-                  <div className="c2n-kv"><b>תצוגה</b><span>{displayLabel}</span></div>
-                  <div className="c2n-kv"><b>עומס</b><span>{settings.sentenceCount} משפטים · {roundsText(settings.rounds)} סבבים</span></div>
-                  <div className="c2n-kv"><b>בדיקה</b><span>{rr.exact ? 'מלאה' : 'גמישה'}</span></div>
-                </div>
-              </div>
-            </aside>
-          </div>
-        )}
-
-        {started && finished && (
-          <section className="c2n-card" style={{ marginTop: 12 }}>
-            <h3 style={{ fontSize: '1rem', fontWeight: 900 }}>סיכום תרגול</h3>
-            <div className="c2n-sub" style={{ marginTop: 4 }}>הושלמו {done} סבבים ({correct} נכונים) · הקשר: {CTX_LABEL[settings.fieldContext]} · רמה: {settings.difficulty}/5</div>
-            <div className="c2n-row-actions">
-              <button type="button" className="c2n-btn p" onClick={() => startPractice(settings)}>הפעל שוב עם אותן הגדרות</button>
-              <button type="button" className="c2n-btn g" onClick={openSettings}>עדכן הגדרות</button>
-            </div>
-          </section>
-        )}
-      </div>
-
-      {wizardOpen && (
-        <div className="c2n-overlay" role="dialog" aria-modal="true" aria-label="Classic 2 settings">
-          <div className="c2n-modal">
-            <div className="c2n-modal-head">
-              <div>
-                <h2>לוח הבקרה של Classic 2</h2>
-                <p>מגדירים מה לתרגל, כמה עומס לשים, ואיך טבלת ברין תופיע. ברירת המחדל כבר מוכנה, אז אפשר גם רק לשמור ולצאת.</p>
-              </div>
-              <div className="c2n-main-acts">
-                <button type="button" className="c2n-btn s" onClick={() => setDraft({ ...DEFAULTS })}>ברירות מחדל</button>
-                <button type="button" className="c2n-btn s" onClick={() => setWizardOpen(false)}>סגור</button>
-              </div>
-            </div>
-
-            <div className="c2n-settings-grid">
-              <div className="c2n-settings-main">
-                <section className="c2n-group">
-                  <div className="c2n-group-head">
-                    <h3>מה לתרגל</h3>
-                    <p className="c2n-sub">תחום הטקסט קובע את האווירה והדוגמאות של הסבב.</p>
-                  </div>
-                  <div className="c2n-seg">
-                    {(Object.keys(CTX_LABEL) as FieldCtx[]).map((c) => (
-                      <button key={c} type="button" className={`c2n-btn ${draft.fieldContext === c ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, fieldContext: c }))}>{CTX_LABEL[c]}</button>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="c2n-group">
-                  <div className="c2n-group-head">
-                    <h3>עומס / גודל סשן</h3>
-                    <p className="c2n-sub">כמה משפטים יהיו בכל טקסט וכמה סבבים יכלול הסשן.</p>
-                  </div>
-                  <div className="c2n-kv"><b>משפטים בטקסט</b><span>{draft.sentenceCount}</span></div>
-                  <input className="c2n-range" type="range" min={3} max={8} step={1} value={draft.sentenceCount} onChange={(e) => setDraft((p) => ({ ...p, sentenceCount: Number(e.target.value) }))} />
-                  <div className="c2n-seg">
-                    {[5, 10, 'infinite'].map((r) => (
-                      <button key={String(r)} type="button" className={`c2n-btn ${draft.rounds === r ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, rounds: r as RoundsChoice }))}>{r === 'infinite' ? 'אינסופי' : r}</button>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="c2n-group">
-                  <div className="c2n-group-head">
-                    <h3>מצב תצוגה</h3>
-                    <p className="c2n-sub">אפשר לעבוד עם כל הטבלה בסדר הקנוני או עם קבוצה ממוקדת.</p>
-                  </div>
-                  <label className="c2n-radio">
-                    <input type="radio" name="disp" checked={draft.categoryDisplay === 'all'} onChange={() => setDraft((p) => ({ ...p, categoryDisplay: 'all' }))} />
-                    <div><strong>כל הקטגוריות</strong><span>אותו סדר קבוע בכל סשן.</span></div>
-                  </label>
-                  <label className="c2n-radio">
-                    <input type="radio" name="disp" checked={draft.categoryDisplay === 'group'} onChange={() => setDraft((p) => ({ ...p, categoryDisplay: 'group' }))} />
-                    <div><strong>קבוצה אחת</strong><span>מיקוד ב- DIS / GEN / DEL.</span></div>
-                  </label>
-                </section>
-
-                <section className="c2n-group">
-                  <div className="c2n-group-head">
-                    <h3>קטגוריות</h3>
-                    <p className="c2n-sub">במצב קבוצתי בוחרים קבוצה פעילה. אפשר לצרף גם CTX + VAK.</p>
-                  </div>
-                  <div className="c2n-seg">
-                    {(['GEN', 'DIS', 'DEL'] as GroupCode[]).map((g) => (
-                      <button key={g} type="button" className={`c2n-btn ${draft.categoryGroup === g ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, categoryGroup: g }))}>{g}</button>
-                    ))}
-                  </div>
-                  <label className="c2n-toggle">
-                    <input type="checkbox" checked={draft.includeCtxVak} onChange={(e) => setDraft((p) => ({ ...p, includeCtxVak: e.target.checked }))} />
-                    כולל CTX + VAK
-                  </label>
-                </section>
-
-                <details className="c2n-adv" open={advancedOpen} onToggle={(e) => setAdvancedOpen((e.target as HTMLDetailsElement).open)}>
-                  <summary>אפשרויות מתקדמות</summary>
-                  <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
-                    <section className="c2n-group">
-                      <div className="c2n-group-head">
-                        <h3>קושי</h3>
-                        <p className="c2n-sub">משפיע על רמזי נוכחות, קשיחות הבדיקה, ורמז אוטומטי אחרי שגיאה.</p>
-                      </div>
-                      <div className="c2n-chip">{draft.difficulty}/5</div>
-                      <input className="c2n-range" type="range" min={1} max={5} step={1} value={draft.difficulty} onChange={(e) => setDraft((p) => ({ ...p, difficulty: Number(e.target.value) }))} />
-                    </section>
-
-                    <section className="c2n-group">
-                      <div className="c2n-group-head">
-                        <h3>מקור טקסט</h3>
-                        <p className="c2n-sub">מוכן להרחבה לטריינרים נוספים באותה מעטפת הגדרות.</p>
-                      </div>
-                      <label className="c2n-radio">
-                        <input type="radio" name="src" checked={draft.textSource === 'built_in'} onChange={() => setDraft((p) => ({ ...p, textSource: 'built_in' }))} />
-                        <div><strong>סט תרגול מובנה</strong><span>רצף תרחישים לפי הקשר.</span></div>
-                      </label>
-                      <label className="c2n-radio">
-                        <input type="radio" name="src" checked={draft.textSource === 'random'} onChange={() => setDraft((p) => ({ ...p, textSource: 'random' }))} />
-                        <div><strong>בחירה אקראית</strong><span>דילוג בין תרחישים וחלונות טקסט.</span></div>
-                      </label>
-                      <label className="c2n-radio dim">
-                        <input type="radio" name="src" disabled />
-                        <div><strong>הדבקה ידנית</strong><span>מוכן לשלב עתידי.</span></div>
-                      </label>
-                    </section>
-                  </div>
-                </details>
-              </div>
-
-              <aside className="c2n-settings-side">
-                <section className="c2n-preview">
-                  <div className="c2n-group-head">
-                    <h3>תצוגה מקדימה / סיכום</h3>
-                    <p className="c2n-sub">כך הסשן הבא ייראה אם תשמור/י עכשיו.</p>
-                  </div>
-                  <span className="c2n-chip strong">{previewSummary}</span>
-                  <div className="c2n-preview-grid">
-                    <div className="c2n-kv"><b>תחום</b><span>{CTX_LABEL[draft.fieldContext]}</span></div>
-                    <div className="c2n-kv"><b>מצב</b><span>{draftDisplayLabel}</span></div>
-                    <div className="c2n-kv"><b>סבבים</b><span>{roundsText(draft.rounds)}</span></div>
-                    <div className="c2n-kv"><b>קושי</b><span>{draft.difficulty}/5</span></div>
-                  </div>
-                </section>
-                <section className="c2n-group">
-                  <div className="c2n-group-head">
-                    <h3>סדר הקטגוריות</h3>
-                    <p className="c2n-sub">תמיד אותו מקור אמת. גם בתצוגה חלקית הסדר נשמר.</p>
-                  </div>
-                  {renderCatPicker(draft, false, true)}
-                </section>
-              </aside>
-            </div>
-
-            <div className="c2n-modal-actions">
-              <button type="button" className="c2n-btn s" onClick={() => setWizardOpen(false)}>ביטול</button>
-              <div className="c2n-main-acts">
-                <button type="button" className="c2n-btn g" onClick={() => setDraft({ ...QUICK })}>ברירת מחדל מהירה</button>
-                <button type="button" className="c2n-btn g" onClick={() => setDraft({ ...DEFAULTS })}>איפוס</button>
-                <button type="button" className="c2n-btn p" onClick={() => applyDraftSettings(!started)}>{started ? 'שמור הגדרות' : 'שמור והתחל סשן'}</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+          </>
+        }
+        sections={settingsSections}
+        advancedOpen={advancedOpen}
+        onAdvancedToggle={setAdvancedOpen}
+        onClose={() => setWizardOpen(false)}
+        onResetDefaults={() => setDraft({ ...DEFAULTS })}
+        onCancel={() => setWizardOpen(false)}
+        footerNote="ברירת המחדל המהירה שומרת על זרימת התחלה מיידית, אבל אפשר לרדת גם לעומק דרך הקבוצות והקושי."
+        footerActions={
+          <>
+            <button type="button" className="trp-btn is-ghost" onClick={() => setDraft({ ...QUICK })}>ברירת מחדל מהירה</button>
+            <button type="button" className="trp-btn is-secondary" onClick={() => setDraft({ ...DEFAULTS })}>איפוס מלא</button>
+            <button type="button" className="trp-btn is-primary" onClick={() => applyDraftSettings(!started)}>
+              {started ? 'שמור הגדרות' : 'שמור והתחל סשן'}
+            </button>
+          </>
+        }
+      />
     </div>
   );
 }

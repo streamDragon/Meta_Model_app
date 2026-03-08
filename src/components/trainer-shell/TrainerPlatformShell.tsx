@@ -8,6 +8,7 @@ export interface TrainerHelperStep {
 interface TrainerPlatformShellProps {
   title: string;
   subtitle: string;
+  headerKicker?: string;
   modePill?: React.ReactNode;
   headerActions?: React.ReactNode;
   purposeKicker: string;
@@ -27,6 +28,7 @@ interface TrainerPlatformShellProps {
 export function TrainerPlatformShell({
   title,
   subtitle,
+  headerKicker = '\u05de\u05e2\u05d8\u05e4\u05ea \u05d0\u05d9\u05de\u05d5\u05df',
   modePill,
   headerActions,
   purposeKicker,
@@ -47,7 +49,7 @@ export function TrainerPlatformShell({
       <div className="trp-shell">
         <header className="trp-card trp-top">
           <div className="trp-title-wrap">
-            <span className="trp-kicker">Trainer Shell</span>
+            <span className="trp-kicker">{headerKicker}</span>
             <h1 className="trp-title">{title}</h1>
             <p className="trp-subtitle">{subtitle}</p>
           </div>

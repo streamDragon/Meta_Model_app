@@ -13,6 +13,13 @@ interface TrainerSettingsShellProps {
   open: boolean;
   title: string;
   subtitle: string;
+  headerKicker?: string;
+  previewTitle?: string;
+  previewSubtitle?: string;
+  advancedLabel?: string;
+  closeLabel?: string;
+  resetLabel?: string;
+  cancelLabel?: string;
   summaryPill?: React.ReactNode;
   preview: React.ReactNode;
   sections: TrainerSettingsSection[];
@@ -29,6 +36,13 @@ export function TrainerSettingsShell({
   open,
   title,
   subtitle,
+  headerKicker = '\u05dc\u05d5\u05d7 \u05d1\u05e7\u05e8\u05d4 \u05de\u05e9\u05d5\u05ea\u05e3',
+  previewTitle = '\u05ea\u05e6\u05d5\u05d2\u05d4 \u05de\u05e7\u05d3\u05d9\u05de\u05d4 / \u05e1\u05d9\u05db\u05d5\u05dd',
+  previewSubtitle = '\u05db\u05da \u05d4\u05e1\u05e9\u05df \u05d4\u05d1\u05d0 \u05d9\u05d9\u05e8\u05d0\u05d4 \u05d0\u05dd \u05ea\u05e9\u05de\u05d5\u05e8/\u05d9 \u05e2\u05db\u05e9\u05d9\u05d5.',
+  advancedLabel = '\u05d0\u05e4\u05e9\u05e8\u05d5\u05d9\u05d5\u05ea \u05de\u05ea\u05e7\u05d3\u05de\u05d5\u05ea',
+  closeLabel = '\u05e1\u05d2\u05d5\u05e8',
+  resetLabel = '\u05d1\u05e8\u05d9\u05e8\u05d5\u05ea \u05de\u05d7\u05d3\u05dc',
+  cancelLabel = '\u05d1\u05d9\u05d8\u05d5\u05dc',
   summaryPill,
   preview,
   sections,
@@ -51,15 +65,15 @@ export function TrainerSettingsShell({
       <div className="trs-modal">
         <div className="trs-head">
           <div className="trs-head-copy">
-            <span className="trp-kicker">Settings Shell</span>
+            <span className="trp-kicker">{headerKicker}</span>
             <h2>{title}</h2>
             <p>{subtitle}</p>
           </div>
           <div className="trp-settings-head-actions">
             {onResetDefaults ? (
-              <button type="button" className="trp-btn is-secondary" onClick={onResetDefaults}>ברירות מחדל</button>
+              <button type="button" className="trp-btn is-secondary" onClick={onResetDefaults}>{resetLabel}</button>
             ) : null}
-            <button type="button" className="trp-btn is-secondary" onClick={onClose}>סגור</button>
+            <button type="button" className="trp-btn is-secondary" onClick={onClose}>{closeLabel}</button>
           </div>
         </div>
 
@@ -76,8 +90,12 @@ export function TrainerSettingsShell({
             ))}
 
             {advancedSections.length ? (
-              <details className="trs-advanced" open={advancedOpen} onToggle={(event) => onAdvancedToggle((event.target as HTMLDetailsElement).open)}>
-                <summary>אפשרויות מתקדמות</summary>
+              <details
+                className="trs-advanced"
+                open={advancedOpen}
+                onToggle={(event) => onAdvancedToggle((event.target as HTMLDetailsElement).open)}
+              >
+                <summary>{advancedLabel}</summary>
                 <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
                   {advancedSections.map((section) => (
                     <section key={section.id} className="trs-section" data-kind="advanced">
@@ -96,8 +114,8 @@ export function TrainerSettingsShell({
           <aside className="trs-side">
             <section className="trs-preview">
               <div className="trs-section-head">
-                <h3>תצוגה מקדימה / סיכום</h3>
-                <p>כך הסשן הבא ייראה אם תשמור/י עכשיו.</p>
+                <h3>{previewTitle}</h3>
+                <p>{previewSubtitle}</p>
               </div>
               {summaryPill}
               {preview}
@@ -108,7 +126,7 @@ export function TrainerSettingsShell({
         <div className="trs-footer">
           <div className="trs-footer-note">{footerNote}</div>
           <div className="trp-settings-footer-actions">
-            {onCancel ? <button type="button" className="trp-btn is-secondary" onClick={onCancel}>ביטול</button> : null}
+            {onCancel ? <button type="button" className="trp-btn is-secondary" onClick={onCancel}>{cancelLabel}</button> : null}
             {footerActions}
           </div>
         </div>

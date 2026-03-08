@@ -48,7 +48,8 @@
         },
         ui: {
             isMobileViewport: false,
-            companionMinimized: readStoredCompanionMinimized()
+            companionMinimized: readStoredCompanionMinimized(),
+            automationSafe: detectAutomationMode()
         }
     };
 
@@ -100,6 +101,18 @@
         var el = document.createElement(tag);
         if (className) el.className = className;
         return el;
+    }
+
+    function detectAutomationMode() {
+        try {
+            if (window.__ALCHEMY_AUTOMATION_SAFE__) return true;
+            if (navigator && navigator.webdriver) return true;
+            if (document && document.documentElement && document.documentElement.hasAttribute('data-automation')) return true;
+            var url = new URL(window.location.href);
+            return url.searchParams.get('automation') === '1';
+        } catch (e) {
+            return false;
+        }
     }
 
     function isInteractiveTarget(target) {
@@ -186,16 +199,13 @@
     function boot() {
         if (!document.body) return;
         document.body.classList.add('alchemy-active');
+        document.body.classList.toggle('alchemy-automation-safe', !!state.ui.automationSafe);
         buildUi();
         bindEvents();
         syncCompanionLayout();
         setupParticles();
-        if (state.audio.consent === 'yes') {
-            updateMuteButton();
-        } else {
-            updateMuteButton();
-            if (!state.audio.consent) showConsent(true);
-        }
+        updateMuteButton();
+        applyAutomationUiState();
         observeFeedback();
         exposeApi();
     }
@@ -286,6 +296,7 @@
         bind(window, 'resize', onResize, { passive: true });
 
         bind(document, 'pointerover', function (event) {
+            if (state.ui.automationSafe) return;
             var el = isInteractiveTarget(event.target);
             if (!el) return;
             var now = Date.now();
@@ -297,6 +308,7 @@
         }, true);
 
         bind(document, 'click', function (event) {
+            if (state.ui.automationSafe) return;
             if (event.target && event.target.closest && event.target.closest('.alchemy-consent, .alchemy-mute, .alchemy-companion, .alchemy-companion-toggle')) {
                 return;
             }
@@ -436,6 +448,33 @@
         document.body.classList.toggle('alchemy-mobile-ui', state.ui.isMobileViewport);
         setCompanionMinimized(state.ui.companionMinimized, false);
         updateMuteButton();
+        applyAutomationUiState();
+    }
+
+    function applyAutomationUiState() {
+        if (!document.body) return;
+        var active = !!state.ui.automationSafe;
+        document.body.classList.toggle('alchemy-automation-safe', active);
+        if (!active) return;
+        if (state.consentEl) {
+            state.consentEl.hidden = true;
+            state.consentEl.setAttribute('aria-hidden', 'true');
+        }
+        if (state.root) {
+            state.root.setAttribute('aria-hidden', 'true');
+        }
+        if (state.companion) {
+            state.companion.hidden = true;
+            state.companion.setAttribute('aria-hidden', 'true');
+        }
+        if (state.companionToggle) {
+            state.companionToggle.hidden = true;
+            state.companionToggle.setAttribute('aria-hidden', 'true');
+        }
+        if (state.muteBtn) {
+            state.muteBtn.hidden = true;
+            state.muteBtn.setAttribute('aria-hidden', 'true');
+        }
     }
 
     function setCompanionMinimized(nextMinimized, persist) {
@@ -470,6 +509,10 @@
 
     function showConsent(show) {
         if (!state.consentEl) return;
+        if (state.ui.automationSafe) {
+            state.consentEl.hidden = true;
+            return;
+        }
         state.consentEl.hidden = !show;
         if (show) announceCompanion('Enable alchemy sounds?');
     }
