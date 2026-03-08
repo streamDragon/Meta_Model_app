@@ -410,6 +410,11 @@ const css = `
 .it-topbar{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.it-chip{background:#fff;border:1px solid #fde68a;border-radius:999px;padding:6px 10px;font-weight:800;font-size:.82rem}
 .it-home-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.it-home-link{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid #d1d5db;background:#fff;color:#111827;text-decoration:none;font-weight:800;font-size:.82rem}
 .it-home-link:hover{border-color:#2563eb;color:#1d4ed8}
+.it-settings-toggle-list{display:grid;gap:8px}
+.it-settings-toggle{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;border:1px solid #dce8f6;background:#fff;border-radius:14px;padding:10px 12px}
+.it-settings-toggle input{margin-top:4px}
+.it-settings-toggle strong{display:block;color:#0f172a;font-size:.9rem}
+.it-settings-toggle span{display:block;color:#64748b;font-size:.82rem;line-height:1.45}
 .it-textbox{margin-top:8px;border:1px solid #f3e8b3;background:#fff;border-radius:12px;padding:10px;line-height:1.85;min-height:96px}.it-seg{white-space:pre-wrap}
 .it-token{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;border:1px dashed #f59e0b;background:#fffbeb;color:#92400e;font-weight:800;cursor:grab;user-select:none}
 .it-token:hover{background:#fef3c7}.it-token.sel{border-style:solid;border-color:#2563eb;background:#eff6ff;color:#1d4ed8}.it-token.active{border-style:solid;border-color:#059669;background:#ecfdf5;color:#065f46}.it-token.dragging{opacity:.65}
@@ -1653,6 +1658,7 @@ function LogicalLevelsDebonoDragTree(props: {
 }
 
 export default function IcebergTemplatesTrainer(): React.ReactElement {
+  const trainerContract = getTrainerContract('iceberg-templates');
   const [data, setData] = useState<ScenarioFile | null>(null);
   const [loadingError, setLoadingError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -1660,9 +1666,13 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
   const [hoverTemplate, setHoverTemplate] = useState<TemplateType | null>(null);
   const [shakeTemplate, setShakeTemplate] = useState<TemplateType | null>(null);
   const [focusStage, setFocusStage] = useState<'build' | 'reveal' | 'challenge'>('build');
-  const [showFocusGuide, setShowFocusGuide] = useState(true);
-  const [showFocusSketch, setShowFocusSketch] = useState(true);
-  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [settings, setSettings] = useState<IcebergSettings>(() => loadIcebergSettings());
+  const [draftSettings, setDraftSettings] = useState<IcebergSettings>(() => loadIcebergSettings());
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [showFocusGuide, setShowFocusGuide] = useState(settings.showFocusGuide);
+  const [showFocusSketch, setShowFocusSketch] = useState(settings.showFocusSketch);
+  const [showOnboarding, setShowOnboarding] = useState(settings.launchMode === 'guided');
   const [state, setState] = useState<TrainerState>(INITIAL_STATE);
 
   useEffect(() => {
@@ -1675,8 +1685,14 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = (await res.json()) as ScenarioFile;
         if (!cancelled) {
+          const savedSettings = loadIcebergSettings(json.scenarios.length);
           setData(json);
-          setState(INITIAL_STATE);
+          setSettings(savedSettings);
+          setDraftSettings(savedSettings);
+          setShowFocusGuide(savedSettings.showFocusGuide);
+          setShowFocusSketch(savedSettings.showFocusSketch);
+          setShowOnboarding(savedSettings.launchMode === 'guided');
+          setState({ ...INITIAL_STATE, currentScenarioIndex: normalizeScenarioIndex(savedSettings.defaultScenarioIndex, json.scenarios.length) });
           setLoading(false);
         }
       } catch (err) {
@@ -1691,6 +1707,10 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    saveIcebergSettings(settings);
+  }, [settings]);
 
   useEffect(() => {
     if (!shakeTemplate) return;
@@ -1771,7 +1791,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
       return failTemplate(templateType, 'תוכן חסר בקובץ התרגיל.');
     }
     setShowOnboarding(false);
-    setFocusStage('build');
+    setFocusStage(settings.autoRevealAfterPlacement ? 'reveal' : 'build');
     setState((prev) => {
       const sameActive = prev.active?.tokenId === tokenId && prev.active?.templateType === templateType;
       return {
@@ -1782,7 +1802,9 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         scoreDrops: sameActive ? prev.scoreDrops : prev.scoreDrops + 1,
         feedback: {
           tone: 'success',
-          text: `העוגן "${token.text}" שובץ על ${formatTemplateLabel(templateType)}. עכשיו אפשר לראות איך העץ נפתח ולמה הוא מסודר כך.`
+          text: settings.autoRevealAfterPlacement
+            ? `העוגן "${token.text}" שובץ על ${formatTemplateLabel(templateType)} והעץ כבר פתוח. עכשיו אפשר לבדוק איך ההסתעפות מסדרת את מה שנאמר.`
+            : `העוגן "${token.text}" שובץ על ${formatTemplateLabel(templateType)}. עכשיו אפשר לראות איך העץ נפתח ולמה הוא מסודר כך.`
         }
       };
     });
@@ -1887,6 +1909,86 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     applyTokenToTemplate(state.selectedTokenId, templateType);
   }
 
+  function startIcebergSession(nextSettings?: IcebergSettings) {
+    const resolved = normalizeIcebergSettings(nextSettings ?? settings, scenarioCount);
+    const nextScenarioIndex = normalizeScenarioIndex(resolved.defaultScenarioIndex, scenarioCount);
+    setSettings(resolved);
+    setDraftSettings(resolved);
+    setSettingsOpen(false);
+    setAdvancedOpen(false);
+    setHoverTemplate(null);
+    setDraggingTokenId(null);
+    setShowFocusGuide(resolved.showFocusGuide);
+    setShowFocusSketch(resolved.showFocusSketch);
+    setShowOnboarding(resolved.launchMode === 'guided');
+    setFocusStage('build');
+    setState({
+      ...INITIAL_STATE,
+      currentScenarioIndex: nextScenarioIndex,
+      feedback: {
+        tone: 'info',
+        text:
+          resolved.launchMode === 'guided'
+            ? 'הפתיחה המודרכת מוכנה. קרא/י את המשפט, בחר/י עוגן אחד, ואז תני לעץ להיפתח בקצב מסודר.'
+            : 'הסשן מוכן לעבודה ישירה. קרא/י את המשפט, בחר/י עוגן אחד, והתאימי לו את המבנה המדויק ביותר.'
+      }
+    });
+  }
+
+  function openSettings() {
+    const snapshot = normalizeIcebergSettings(
+      {
+        ...settings,
+        defaultScenarioIndex: state.currentScenarioIndex,
+        showFocusGuide,
+        showFocusSketch
+      },
+      scenarioCount
+    );
+    setDraftSettings(snapshot);
+    setSettingsOpen(true);
+    setAdvancedOpen(false);
+  }
+
+  function applyDraftSettings(startNow = false) {
+    const resolved = normalizeIcebergSettings(draftSettings, scenarioCount);
+    setSettings(resolved);
+    setDraftSettings(resolved);
+    setShowFocusGuide(resolved.showFocusGuide);
+    setShowFocusSketch(resolved.showFocusSketch);
+    if (startNow) {
+      startIcebergSession(resolved);
+      return;
+    }
+    setSettingsOpen(false);
+    setFeedback({
+      tone: 'success',
+      text: 'ההגדרות נשמרו. הסיכום בראש העמוד עודכן מיד, ואת/ה יכול/ה להמשיך או לפתוח סשן חדש עם ההעדפות האלה.'
+    });
+  }
+
+  function resetDraftSettings() {
+    setDraftSettings(normalizeIcebergSettings(DEFAULT_ICEBERG_SETTINGS, scenarioCount));
+  }
+
+  function toggleFocusGuidePreference() {
+    setShowFocusGuide((prev) => {
+      const next = !prev;
+      setSettings((current) => ({ ...current, showFocusGuide: next }));
+      setDraftSettings((current) => ({ ...current, showFocusGuide: next }));
+      return next;
+    });
+  }
+
+  function toggleFocusSketchPreference() {
+    setShowFocusSketch((prev) => {
+      const next = !prev;
+      setSettings((current) => ({ ...current, showFocusSketch: next }));
+      setDraftSettings((current) => ({ ...current, showFocusSketch: next }));
+      return next;
+    });
+  }
+
   if (loading) {
     return (
       <div className="it-wrap" dir="rtl" lang="he">
@@ -1937,6 +2039,128 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     ? selectedToken.allowed_templates.map((type) => TEMPLATE_META[type].titleHe).join(' · ')
     : '';
   const currentProcessMeta = PROCESS_STEPS.find((step) => step.id === workspaceStep) ?? PROCESS_STEPS[0];
+  const launchModeLabel = settings.launchMode === 'guided' ? 'פתיחה מודרכת' : 'כניסה ישירה';
+  const draftLaunchModeLabel = draftSettings.launchMode === 'guided' ? 'פתיחה מודרכת' : 'כניסה ישירה';
+  const activeAidsLabel = [settings.showFocusGuide ? 'מפת עבודה' : null, settings.showFocusSketch ? 'סכמת מבנה' : null]
+    .filter(Boolean)
+    .join(' + ') || 'בלי עזרי עבודה';
+  const draftAidsLabel = [draftSettings.showFocusGuide ? 'מפת עבודה' : null, draftSettings.showFocusSketch ? 'סכמת מבנה' : null]
+    .filter(Boolean)
+    .join(' + ') || 'בלי עזרי עבודה';
+  const currentScenarioIndexLabel = normalizeScenarioIndex(settings.defaultScenarioIndex, scenarioCount) + 1;
+  const draftScenarioIndexLabel = normalizeScenarioIndex(draftSettings.defaultScenarioIndex, scenarioCount) + 1;
+  const currentSessionSummary = `תרחיש ${currentScenarioIndexLabel} · ${launchModeLabel} · ${activeAidsLabel}`;
+  const previewSummary = `תרחיש ${draftScenarioIndexLabel} · ${draftLaunchModeLabel} · ${draftAidsLabel}`;
+  const previewScenario = scenarios[normalizeScenarioIndex(draftSettings.defaultScenarioIndex, scenarioCount)] ?? scenario;
+  const liveScenario = scenarios[normalizeScenarioIndex(settings.defaultScenarioIndex, scenarioCount)] ?? scenario;
+  const helperSteps = trainerContract.helperSteps?.length ? [...trainerContract.helperSteps] : PROCESS_STEPS.slice(0, 3).map((step) => ({
+    title: step.label,
+    description: step.help
+  }));
+  const settingsSections: TrainerSettingsSection[] = [
+    {
+      id: 'scenario',
+      title: 'מה לתרגל',
+      help: 'בוחרים מאיזה משפט לפתוח את הסשן הבא. אפשר להתחיל גם בלי לגעת בזה.',
+      content: (
+        <div className="it-field">
+          <label htmlFor="iceberg-default-scenario">משפט פתיחה לסשן</label>
+          <select
+            id="iceberg-default-scenario"
+            className="it-select"
+            value={String(draftSettings.defaultScenarioIndex)}
+            onChange={(event) =>
+              setDraftSettings((prev) => ({
+                ...prev,
+                defaultScenarioIndex: normalizeScenarioIndex(Number(event.target.value), scenarioCount)
+              }))
+            }
+          >
+            {scenarios.map((item, index) => (
+              <option key={item.scenario_id} value={index}>
+                {index + 1}. {cleanSnippet(item.client_text, 72)}
+              </option>
+            ))}
+          </select>
+        </div>
+      )
+    },
+    {
+      id: 'launch-mode',
+      title: 'איך להיכנס לאימון',
+      help: 'האם לפתוח קודם overlay קצר שמכניס אותך לעץ, או להיכנס ישר למרחב העבודה.',
+      content: (
+        <div className="it-field-actions">
+          <button
+            type="button"
+            className={`trp-btn ${draftSettings.launchMode === 'guided' ? 'is-primary' : 'is-secondary'}`}
+            onClick={() => setDraftSettings((prev) => ({ ...prev, launchMode: 'guided' }))}
+          >
+            פתיחה מודרכת
+          </button>
+          <button
+            type="button"
+            className={`trp-btn ${draftSettings.launchMode === 'direct' ? 'is-primary' : 'is-secondary'}`}
+            onClick={() => setDraftSettings((prev) => ({ ...prev, launchMode: 'direct' }))}
+          >
+            כניסה ישר לעבודה
+          </button>
+        </div>
+      )
+    },
+    {
+      id: 'support-aids',
+      title: 'תמיכות עבודה',
+      help: 'מגדירים אילו שכבות עזר יופיעו כברירת מחדל בתוך הסשן.',
+      content: (
+        <div className="it-settings-toggle-list">
+          <label className="it-settings-toggle">
+            <input
+              type="checkbox"
+              checked={draftSettings.showFocusGuide}
+              onChange={(event) => setDraftSettings((prev) => ({ ...prev, showFocusGuide: event.target.checked }))}
+            />
+            <span>
+              <strong>מפת עבודה</strong>
+              <span>פותחת ניסוח קצר של מה עושים עכשיו, לפני שניגשים לענפים עצמם.</span>
+            </span>
+          </label>
+          <label className="it-settings-toggle">
+            <input
+              type="checkbox"
+              checked={draftSettings.showFocusSketch}
+              onChange={(event) => setDraftSettings((prev) => ({ ...prev, showFocusSketch: event.target.checked }))}
+            />
+            <span>
+              <strong>סכמת מבנה</strong>
+              <span>משאירה לידך ציור קטן של התבנית הפעילה כדי לשמור על אוריינטציה.</span>
+            </span>
+          </label>
+        </div>
+      )
+    },
+    {
+      id: 'advanced',
+      title: 'הפעלה מתקדמת',
+      help: 'למי שרוצה פחות חיכוך בין השיבוץ לבין חשיפת העץ.',
+      advanced: true,
+      content: (
+        <div className="it-settings-toggle-list">
+          <label className="it-settings-toggle">
+            <input
+              type="checkbox"
+              checked={draftSettings.autoRevealAfterPlacement}
+              onChange={(event) => setDraftSettings((prev) => ({ ...prev, autoRevealAfterPlacement: event.target.checked }))}
+            />
+            <span>
+              <strong>פתיחה אוטומטית של העץ אחרי שיבוץ</strong>
+              <span>מעביר ישירות לשלב ההסתעפות במקום לעצור קודם בכרטיס השיבוץ.</span>
+            </span>
+          </label>
+        </div>
+      )
+    }
+  ];
 
   const legacyView = (
     <div className="it-wrap" dir="rtl" lang="he">
@@ -2381,6 +2605,345 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
   );
 
   void legacyView;
+
+  const mainContent = (
+    <>
+      <ProcessRail current={workspaceStep} />
+
+      <section className="it-panel it-source-panel" aria-label="משפט המקור">
+        <div className="it-panel-head">
+          <div>
+            <div className="it-kicker">Scenario ID: <code>{scenario.scenario_id}</code></div>
+            <h2 className="it-title" style={{ fontSize: '1.08rem', marginTop: 4 }}>קוראים את המשפט המלא</h2>
+            <p className="it-sub">רואים את כל האמירה, ואז בוחרים איזה חלק כדאי להפוך לעוגן עבודה.</p>
+          </div>
+          <span className="it-panel-badge">שלב 1</span>
+        </div>
+        <div className="it-textbox it-textbox-prominent" aria-live="polite">
+          {segments.map((seg) => {
+            if (seg.kind === 'plain') return <span key={seg.key} className="it-seg">{seg.text}</span>;
+            const candidate = seg.candidate;
+            const isSelected = state.selectedTokenId === candidate.id;
+            const isActive = state.active?.tokenId === candidate.id;
+            const isDragging = draggingTokenId === candidate.id;
+            return (
+              <button
+                key={seg.key}
+                type="button"
+                draggable
+                className={['it-token', isSelected ? 'sel' : '', isActive ? 'active' : '', isDragging ? 'dragging' : ''].filter(Boolean).join(' ')}
+                onDragStart={(e) => onDragStart(e, candidate.id)}
+                onDragEnd={onDragEnd}
+                onClick={() => onTokenTap(candidate.id)}
+                aria-pressed={isSelected}
+                title={`תבניות אפשריות: ${candidate.allowed_templates.map((type) => TEMPLATE_META[type].code).join(', ')}`}
+              >
+                {candidate.text}
+              </button>
+            );
+          })}
+        </div>
+        <div className="it-source-foot">
+          <div className="it-help"><strong>מועמדים לעוגן:</strong> {scenario.draggables.map((d) => d.text).join(' · ')}</div>
+          <div className="it-selection-card">
+            <strong>העוגן הנוכחי</strong>
+            <span>{selectedTokenLabel || 'עדיין לא נבחר'}</span>
+            <small>{selectedTokenLabel ? `מבנים אפשריים: ${selectedTokenTemplateLabels}` : 'בחר/י מילה או ביטוי מודגש כדי להתקדם.'}</small>
+          </div>
+        </div>
+      </section>
+
+      <section className="it-panel it-structure-panel" aria-label="בחירת מבנה">
+        <div className="it-panel-head">
+          <div>
+            <h2 className="it-title" style={{ fontSize: '1.08rem' }}>בוחרים איזה סוג עץ מתאים</h2>
+            <p className="it-sub">כל כרטיס הוא סוג אחר של הבחנה. בחר/י את זה שמסדר הכי טוב את מה שנאמר.</p>
+          </div>
+          <span className="it-panel-badge">שלב 2</span>
+        </div>
+        <div className="it-template-grid it-template-grid-refined">
+          {(Object.keys(TEMPLATE_META) as TemplateType[]).map((type) => {
+            const meta = TEMPLATE_META[type];
+            const isActive = state.active?.templateType === type;
+            const isHover = hoverTemplate === type;
+            const payload = isActive && activePayload ? activePayload : null;
+            const causeMode = payload && 'mode' in payload ? payload.mode ?? null : null;
+            return (
+              <div
+                key={type}
+                className={['it-template', 'it-template-card', isActive ? 'is-active' : '', shakeTemplate === type ? 'shake' : ''].filter(Boolean).join(' ')}
+                data-over={isHover ? '1' : '0'}
+                onDragOver={(e) => { e.preventDefault(); setHoverTemplate(type); }}
+                onDragLeave={() => setHoverTemplate((prev) => (prev === type ? null : prev))}
+                onDrop={(e) => handleTemplateDrop(e, type)}
+                onClick={() => handleTemplateClick(type)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleTemplateClick(type);
+                  }
+                }}
+                aria-label={`מבנה ${meta.titleHe}`}
+              >
+                <div className="it-template-head">
+                  <div>
+                    <div className="it-template-title">{meta.titleHe}</div>
+                    <div className="it-template-mini">{meta.titleEn}</div>
+                  </div>
+                  <div className="it-template-meta">
+                    <span className="it-template-code">{meta.code}</span>
+                    <span className="it-template-mini">{meta.slotCount} ענפים</span>
+                  </div>
+                </div>
+                <div className="it-template-help">{meta.shortHelp}</div>
+                <TemplateSketch meta={meta} tokenText={isActive && activeToken ? activeToken.text : undefined} causeMode={causeMode} active={isActive} />
+                <div className={`it-dropzone${isActive ? ' has-active' : ''}`}>
+                  {isActive && activeToken ? <>עובדים עכשיו עם <strong style={{ marginInlineStart: 6 }}>{activeToken.text}</strong></> : 'גרור/י לכאן עוגן מודגש או הקש/י אחרי בחירה'}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="it-panel it-workspace-panel" aria-label="מרחב עבודה מרכזי">
+        <div className="it-panel-head">
+          <div>
+            <h2 className="it-title" style={{ fontSize: '1.12rem' }}>מרחב העבודה המרכזי</h2>
+            <p className="it-sub">כאן רואים מהו שלב העבודה, למה העוגן יושב בתוך המבנה, ואיך אפשר לפתוח ענף נוסף.</p>
+          </div>
+          <span className="it-panel-badge">שלבים 3-5</span>
+        </div>
+        <div className="it-focus-toolbar">
+          <button type="button" className="it-focus-mini-btn" onClick={toggleFocusGuidePreference} aria-pressed={showFocusGuide}>
+            {showFocusGuide ? 'הסתר/י מפת עבודה' : 'הצג/י מפת עבודה'}
+          </button>
+          <button type="button" className="it-focus-mini-btn" onClick={toggleFocusSketchPreference} aria-pressed={showFocusSketch} disabled={!revealReady}>
+            {showFocusSketch ? 'הסתר/י סכמת מבנה' : 'הצג/י סכמת מבנה'}
+          </button>
+        </div>
+        {showFocusGuide ? <div className="it-focus-help"><div className="it-focus-help-body"><div className="it-help"><strong>מה קורה כאן:</strong> קודם ממיינים, אחר כך רואים את העץ, ואז בודקים חלופה. לא קופצים ישר לפירוש סופי.</div></div></div> : null}
+        {!revealReady || !activeToken || !activeMeta || !state.active ? (
+          <div className="it-empty it-workspace-empty">
+            <strong>העבודה תתחיל ברגע שתבחר/י עוגן ומבנה.</strong>
+            <p>אחר כך תוכל/י לראות שאלה, הסתעפויות, חלופות, ומה כדאי לקחת לסבב הבא.</p>
+          </div>
+        ) : (
+          <div className="it-active" style={{ marginTop: 10 }}>
+            {showFocusSketch ? <div className={`it-focus-sketch ${focusStage !== 'build' ? 'is-compact' : ''}`}><TemplateSketch meta={activeMeta} tokenText={activeToken.text} causeMode={'mode' in activePayload ? activePayload.mode ?? null : null} active /></div> : null}
+            <div className="it-stage-switch" role="tablist" aria-label="שלבי העבודה">
+              <button type="button" className={`it-stage-btn ${focusStage === 'build' ? 'is-active' : ''}`} onClick={() => setFocusStage('build')}>שלב 3 · משבצים</button>
+              <button type="button" className={`it-stage-btn ${focusStage === 'reveal' ? 'is-active' : ''}`} onClick={() => setFocusStage('reveal')}>שלב 4 · רואים עץ</button>
+              <button type="button" className={`it-stage-btn ${focusStage === 'challenge' ? 'is-active' : ''}`} onClick={() => setFocusStage('challenge')} disabled={!challengeReady}>שלב 5 · בודקים חלופה</button>
+            </div>
+            <div className="it-stage-card">
+              {focusStage === 'build' ? (
+                <div className="it-coach-grid">
+                  <div className="it-coach-card"><strong>העוגן</strong><p>{activeToken.text}</p></div>
+                  <div className="it-coach-card"><strong>המבנה</strong><p>{activeMeta.titleHe}</p></div>
+                  <div className="it-coach-card"><strong>מה בודקים כאן</strong><p>{activeMeta.shortHelp}</p></div>
+                  <div className="it-actions">
+                    <button type="button" className="it-btn primary" onClick={() => setFocusStage('reveal')}>פתח/י את העץ</button>
+                    <button type="button" className="it-btn ghost" onClick={clearActive}>בחר/י מבנה אחר</button>
+                  </div>
+                </div>
+              ) : null}
+              {focusStage === 'reveal' ? (
+                <div className="it-focus-core-layout">
+                  <div className="it-focus-result-column">
+                    <section className="it-reveal-visual" aria-label="העץ שנפתח">
+                      <div className="it-reveal-visual-head">
+                        <div><h4>כך המבנה נפתח כרגע</h4><p>העוגן במרכז, והענפים מראים מה המבנה פותח סביבו.</p></div>
+                        <span className="it-mini-tag code">{activeMeta.code}</span>
+                      </div>
+                      <RevealTemplateFigure templateType={state.active.templateType} tokenText={activeToken.text} slots={activeSet} causeMode={'mode' in activePayload ? activePayload.mode ?? null : null} />
+                      <div className={`it-slots cols-${activeMeta.slotCount}`}>{Array.from({ length: activeMeta.slotCount }).map((_, idx) => <div key={idx} className="it-slot">{activeSet[idx] || '—'}</div>)}</div>
+                    </section>
+                    <BranchExplorer templateType={state.active.templateType} tokenText={activeToken.text} payload={activePayload} activeSet={activeSet} />
+                  </div>
+                  <div className="it-focus-side-column">
+                    <div className="it-question">{activePayload.question}</div>
+                    <div className="it-reflection">{activeReflection}</div>
+                    <div className="it-disclaimer">{activeDirectionLabel || DISCLAIMER_COPY}</div>
+                    <div className="it-actions">
+                      <button type="button" className="it-btn secondary" onClick={cycleVariant}>הצג/י ענף חלופי</button>
+                      <button type="button" className="it-btn ghost" onClick={clearActive}>אפס/י מבנה</button>
+                      <button type="button" className="it-btn primary" onClick={() => setFocusStage('challenge')} disabled={!challengeReady}>עבור/י לשלב הבדיקה</button>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+              {focusStage === 'challenge' ? (
+                <>
+                  <BranchExplorer templateType={state.active.templateType} tokenText={activeToken.text} payload={activePayload} activeSet={activeSet} />
+                  <div className="it-board-row"><div className="it-board-label">מה בודקים עכשיו</div><div className="it-board-value emph">איזה ענף מחזיק יותר, איזה ענף חלופי גם אפשרי, ומה משתנה אם ממיינים אחרת.</div></div>
+                  <div className="it-challenge-list">{challengePrompts.map((prompt, idx) => <div key={`${state.active?.templateType}-${idx}`} className="it-challenge-item">{idx + 1}. {prompt}</div>)}</div>
+                  <div className="it-challenge-note">בחר/י שאלה אחת בלבד, בדוק/י אותה, ואז חזור/י לעץ אם צריך לחדד את המיון.</div>
+                  <div className="it-actions">
+                    <button type="button" className="it-btn secondary" onClick={() => setFocusStage('reveal')}>חזור/י לעץ</button>
+                    <button type="button" className="it-btn ghost" onClick={cycleVariant}>עוד חלופה</button>
+                    <button type="button" className="it-btn primary" onClick={nextScenario}>סיים/י סבב ועבור/י הלאה</button>
+                  </div>
+                </>
+              ) : null}
+            </div>
+          </div>
+        )}
+        {state.feedback ? <div className={`it-feedback ${state.feedback.tone}`}>{state.feedback.text}</div> : null}
+        {state.lastCompletedRecap ? <div className="it-recap">{state.lastCompletedRecap}</div> : null}
+      </section>
+    </>
+  );
+
+  const supportContent = (
+    <>
+      <TrainerSupportCard title="מצב עבודה" subtitle="אותו shell של משפחת הטריינרים, עם דגש על עוגן, מבנה והצעד הבא.">
+        <div className="it-support-list">
+          <div className="it-support-item"><strong>שלב נוכחי</strong><span>{currentProcessMeta.label}</span></div>
+          <div className="it-support-item"><strong>עוגן פעיל</strong><span>{selectedTokenLabel || 'עדיין לא נבחר'}</span></div>
+          <div className="it-support-item"><strong>מבנה פעיל</strong><span>{activeMeta ? activeMeta.titleHe : 'עדיין לא נבחר'}</span></div>
+          <div className="it-support-item"><strong>הצעד הבא</strong><span>{currentProcessMeta.help}</span></div>
+        </div>
+        <div className="it-actions">
+          <button type="button" className="it-btn primary" disabled={!state.completedAtLeastOneDrop} onClick={nextScenario}>סיים/י סבב / הבא</button>
+          <button type="button" className="it-btn ghost" onClick={() => startIcebergSession(settings)}>אתחל/י סשן</button>
+        </div>
+      </TrainerSupportCard>
+
+      <TrainerSupportCard title="לוח הבדיקה" subtitle={state.active ? 'פתוח בזמן עבודה על עוגן ומבנה.' : 'ייפתח מיד כשיהיה עוגן ומבנה פעילים.'}>
+        <SentenceBoard scenario={scenario} selectedToken={selectedToken} activeTemplateType={state.active?.templateType ?? null} activeQuestion={activePayload?.question ?? ''} activeReflection={activeReflection} />
+      </TrainerSupportCard>
+
+      <TrainerSupportCard title="הסשן הנוכחי יהיה…" subtitle="הסיכום מתעדכן מיד אחרי שמירה בהגדרות.">
+        <div className="it-selection-card">
+          <strong>{launchModeLabel}</strong>
+          <span>{liveScenario.scenario_id}</span>
+          <small>{currentSessionSummary}</small>
+        </div>
+        <div className="it-help"><strong>משפט פתיחה:</strong> {cleanSnippet(liveScenario.client_text, 96)}</div>
+      </TrainerSupportCard>
+
+      <TrainerSupportCard title="מה לוקחים מהסבב" subtitle="צ'קליסט קצר שמחבר את הסיפור הלימודי.">
+        <ul className="it-scenario-list">
+          <li><span>קראנו את המשפט השלם</span><span>✔</span></li>
+          <li><span>בחרנו עוגן ממוקד</span><span>{state.selectedTokenId ? '✔' : '—'}</span></li>
+          <li><span>מיפינו אותו למבנה</span><span>{state.completedAtLeastOneDrop ? '✔' : '—'}</span></li>
+          <li><span>ראינו ענפים וחלופות</span><span>{state.active ? '✔' : '—'}</span></li>
+          <li><span>זכרנו שזה מיפוי עבודה, לא אמת</span><span>✔</span></li>
+        </ul>
+      </TrainerSupportCard>
+    </>
+  );
+
+  return (
+    <div className="it-wrap it-wrap-refined" dir="rtl" lang="he">
+      <style>{`${TRAINER_PLATFORM_CSS}\n${css}`}</style>
+
+      {showOnboarding ? (
+        <div className="it-onboarding-layer" role="dialog" aria-modal="true" aria-label="פתיחת אימון קצה קרחון">
+          <div className="it-onboarding-card">
+            <div className="it-onboarding-head">
+              <div>
+                <div className="it-kicker">אימון על ארגון פנימי של חשיבה</div>
+                <h2>{trainerContract.title}</h2>
+                <p>כאן מתאמנים בלמיין חומר לשוני ולוגי לתוך סכמות פנימיות ברורות. זה מה שמעמיק הבנה, מזרז חשיבה, ומכוון לבחירה מדויקת יותר של ההתערבות הבאה.</p>
+              </div>
+              <button type="button" className="it-btn ghost" onClick={() => setShowOnboarding(false)}>סגור</button>
+            </div>
+            <div className="it-onboarding-copy">
+              <p>זה לא סולם דילטס ולא ערבוב של כובעים ורמות. כאן עובדים עם עץ של הכללה, סיבתיות מסתעפת, או הנחות שמחזיקות את המשפט.</p>
+              <p>המטרה היא להבין איזה סוג מיון אתה עושה, למה העוגן שייך לשם, ואיזה ענף חלופי גם יכול להתאים.</p>
+            </div>
+            <SchemaComparisonMini />
+            <div className="it-onboarding-grid">
+              <article className="it-onboarding-note"><strong>מה עושים כאן</strong><p>קוראים את המשפט, בוחרים עוגן אחד, בוחרים מבנה, ואז רואים איך העץ נפתח.</p></article>
+              <article className="it-onboarding-note"><strong>איך יודעים שהצלחת</strong><p>כשברור מהו סוג המבנה, מהו הענף המרכזי, ומה עוד אפשר לבדוק במקום להינעל על פירוש אחד.</p></article>
+              <article className="it-onboarding-note"><strong>דוגמה</strong><p>"מנוחה" יכולה להפוך מקריאת מצוקה כללית לעץ של קריטריונים, תנאים, או הנחות סמויות.</p></article>
+            </div>
+            <div className="it-onboarding-actions">
+              <button type="button" className="it-btn primary" onClick={() => setShowOnboarding(false)}>מתחילים למיין</button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      <TrainerPlatformShell
+        title={trainerContract.title}
+        subtitle={trainerContract.subtitle}
+        headerKicker={trainerContract.familyLabel}
+        modePill={<span className="trp-mode-pill">{currentProcessMeta.label}</span>}
+        headerActions={
+          <>
+            <button type="button" className="trp-btn is-secondary" onClick={openSettings}>הגדרות</button>
+            <button type="button" className="trp-btn is-ghost" onClick={() => setShowOnboarding(true)}>פתיחה מודרכת</button>
+          </>
+        }
+        purposeKicker="מה זה מאמן?"
+        purposeTitle="אימון על ארגון פנימי של חשיבה, לא רק על גרירת טוקנים"
+        purposeBody={<p>{INTRO_COPY}</p>}
+        purposeTags={
+          <>
+            <span className="it-chip">תרחישים: {scenarioCount}</span>
+            <span className="it-chip">עוגנים ששובצו: {state.scoreDrops}</span>
+            <span className="it-chip">ענפים חלופיים: {state.scoreVariants}</span>
+          </>
+        }
+        startKicker={trainerContract.quickStartLabel}
+        startTitle="העבודה יכולה להתחיל מיד"
+        startBody={<p>המשפט הראשון, מצב הכניסה, ועזרי העבודה כבר מוכנים. ההגדרות רק מכוונות איך ייראה הסשן הבא.</p>}
+        startActions={
+          <>
+            <button type="button" className="trp-btn is-primary" onClick={() => startIcebergSession(settings)}>{trainerContract.startActionLabel}</button>
+            <button type="button" className="trp-btn is-secondary" onClick={openSettings}>הגדרות</button>
+            <span className="trp-summary-pill">{currentSessionSummary}</span>
+          </>
+        }
+        startMeta={
+          <>
+            <span className="it-chip">תרחיש פתיחה: {currentScenarioIndexLabel}</span>
+            <span className="it-chip">עוגן פעיל: {selectedTokenLabel || 'טרם נבחר'}</span>
+            <span className="it-chip">השלב הבא: {currentProcessMeta.help}</span>
+          </>
+        }
+        helperSteps={helperSteps}
+        main={mainContent}
+        support={supportContent}
+      />
+
+      <TrainerSettingsShell
+        open={settingsOpen}
+        title={trainerContract.settingsTitle}
+        subtitle={trainerContract.settingsSubtitle}
+        summaryPill={<span className="trp-summary-pill">{previewSummary}</span>}
+        preview={
+          <>
+            <div className="it-selection-card">
+              <strong>{draftLaunchModeLabel}</strong>
+              <span>{previewScenario.scenario_id}</span>
+              <small>{draftAidsLabel}{draftSettings.autoRevealAfterPlacement ? ' · עץ נפתח אוטומטית' : ''}</small>
+            </div>
+            <div className="it-help"><strong>משפט פתיחה:</strong> {cleanSnippet(previewScenario.client_text, 110)}</div>
+            <div className="it-help"><strong>עוגנים זמינים:</strong> {previewScenario.draggables.map((item) => item.text).join(' · ')}</div>
+          </>
+        }
+        sections={settingsSections}
+        advancedOpen={advancedOpen}
+        onAdvancedToggle={setAdvancedOpen}
+        onClose={() => setSettingsOpen(false)}
+        onResetDefaults={resetDraftSettings}
+        onCancel={() => setSettingsOpen(false)}
+        footerNote="השמירה מעדכנת מיד את סיכום הסשן למעלה. כדי להחיל תרחיש פתיחה חדש, שמרו והתחילו סשן."
+        footerActions={
+          <>
+            <button type="button" className="trp-btn is-secondary" onClick={() => applyDraftSettings(false)}>שמור</button>
+            <button type="button" className="trp-btn is-primary" onClick={() => applyDraftSettings(true)}>שמור והתחל סשן</button>
+          </>
+        }
+      />
+    </div>
+  );
 
   return (
     <div className="it-wrap it-wrap-refined" dir="rtl" lang="he">

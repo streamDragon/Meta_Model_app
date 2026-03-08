@@ -5,6 +5,9 @@
 
     const engine = root.classicClassicEngine;
     const configApi = root.classicClassicConfig;
+    const trainerContract = typeof root.getMetaTrainerPlatformContract === 'function'
+        ? root.getMetaTrainerPlatformContract('classic-classic')
+        : null;
     if (!engine || !configApi) {
         appEl.innerHTML = '<div class="cc-loading">שגיאה בטעינת מנוע Classic Classic.</div>';
         return;
@@ -788,6 +791,17 @@
         if (action === 'open-setup') {
             state.setupOpen = true;
             state.settingsDrawerOpen = false;
+            render();
+            return;
+        }
+        if (action === 'reset-practice-settings') {
+            applySettings(defaultPracticeSettings(), { render: false });
+            if (state.settingsDrawerOpen && state.session) {
+                state.feedback = {
+                    tone: 'info',
+                    text: 'ההגדרות חזרו לברירת המחדל. כדי להחיל אותן על הסשן הפעיל, הפעל/י מחדש.'
+                };
+            }
             render();
             return;
         }
@@ -1654,68 +1668,96 @@
         const selectId = `cc-family-${scope}`;
 
         return `
-          <div class="cc-settings-stack">
-            <div class="cc-form-block">
-              <div class="cc-form-label">מצב</div>
-              <div class="cc-choice-row">
-                <label class="cc-choice-pill ${settings.mode === 'learning' ? 'is-active' : ''}">
-                  <input type="radio" name="${modeName}" value="learning" data-cc-setting="mode" ${settings.mode === 'learning' ? 'checked' : ''}>
-                  <span>לימוד</span>
-                </label>
-                <label class="cc-choice-pill ${settings.mode === 'exam' ? 'is-active' : ''}">
-                  <input type="radio" name="${modeName}" value="exam" data-cc-setting="mode" ${settings.mode === 'exam' ? 'checked' : ''}>
-                  <span>מבחן</span>
-                </label>
-              </div>
-            </div>
+          <div class="cc-settings-shell-grid">
+            <div class="cc-settings-stack">
+              <section class="cc-settings-section" data-kind="basic">
+                <div class="cc-settings-section-head">
+                  <h3>מה לתרגל</h3>
+                  <p>בחר/י אם לעבוד במצב לימוד עם יותר משוב, או במצב מבחן קצר וישיר.</p>
+                </div>
+                <div class="cc-form-block">
+                  <div class="cc-form-label">מצב</div>
+                  <div class="cc-choice-row">
+                    <label class="cc-choice-pill ${settings.mode === 'learning' ? 'is-active' : ''}">
+                      <input type="radio" name="${modeName}" value="learning" data-cc-setting="mode" ${settings.mode === 'learning' ? 'checked' : ''}>
+                      <span>לימוד</span>
+                    </label>
+                    <label class="cc-choice-pill ${settings.mode === 'exam' ? 'is-active' : ''}">
+                      <input type="radio" name="${modeName}" value="exam" data-cc-setting="mode" ${settings.mode === 'exam' ? 'checked' : ''}>
+                      <span>מבחן</span>
+                    </label>
+                  </div>
+                </div>
+              </section>
 
-            <div class="cc-form-block">
-              <div class="cc-form-label-row">
-                <span>קושי</span>
-                <strong>${settings.difficulty}</strong>
-              </div>
-              <input class="cc-range" type="range" min="1" max="5" step="1" value="${settings.difficulty}" data-cc-setting="difficulty" aria-label="קושי">
-              <div class="cc-range-scale"><span>קל</span><span>בינוני</span><span>מאתגר</span></div>
-            </div>
+              <section class="cc-settings-section" data-kind="basic">
+                <div class="cc-settings-section-head">
+                  <h3>עומס סשן</h3>
+                  <p>כך מגדירים כמה שאלות יהיו בסבב וכמה מאתגר הוא ירגיש.</p>
+                </div>
+                <div class="cc-form-block">
+                  <div class="cc-form-label">מספר שאלות</div>
+                  <div class="cc-choice-row">
+                    ${[5, 10, 15].map((count) => `
+                      <label class="cc-choice-pill ${settings.questionCount === count ? 'is-active' : ''}">
+                        <input type="radio" name="${countName}" value="${count}" data-cc-setting="questionCount" ${settings.questionCount === count ? 'checked' : ''}>
+                        <span>${count}</span>
+                      </label>
+                    `).join('')}
+                  </div>
+                </div>
+                <div class="cc-form-block">
+                  <div class="cc-form-label-row">
+                    <span>קושי</span>
+                    <strong>${settings.difficulty}</strong>
+                  </div>
+                  <input class="cc-range" type="range" min="1" max="5" step="1" value="${settings.difficulty}" data-cc-setting="difficulty" aria-label="קושי">
+                  <div class="cc-range-scale"><span>קל</span><span>בינוני</span><span>מאתגר</span></div>
+                </div>
+              </section>
 
-            <div class="cc-form-block">
-              <div class="cc-form-label">מספר שאלות</div>
-              <div class="cc-choice-row">
-                ${[5, 10, 15].map((count) => `
-                  <label class="cc-choice-pill ${settings.questionCount === count ? 'is-active' : ''}">
-                    <input type="radio" name="${countName}" value="${count}" data-cc-setting="questionCount" ${settings.questionCount === count ? 'checked' : ''}>
-                    <span>${count}</span>
+              <section class="cc-settings-section" data-kind="basic">
+                <div class="cc-settings-section-head">
+                  <h3>קטגוריות</h3>
+                  <p>אפשר להשאיר את כל המשפחות או למקד את הסשן במשפחה אחת.</p>
+                </div>
+                <div class="cc-form-block">
+                  <label class="cc-field-vertical" for="${selectId}">
+                    <span>משפחת תרגול</span>
+                    <select id="${selectId}" class="cc-select" data-cc-setting="familyFocus">
+                      <option value="all" ${settings.familyFocus === 'all' ? 'selected' : ''}>הכול</option>
+                      <option value="deletion" ${settings.familyFocus === 'deletion' ? 'selected' : ''}>מחיקות</option>
+                      <option value="distortion" ${settings.familyFocus === 'distortion' ? 'selected' : ''}>עיוותים</option>
+                      <option value="generalization" ${settings.familyFocus === 'generalization' ? 'selected' : ''}>הכללות</option>
+                    </select>
                   </label>
-                `).join('')}
-              </div>
-            </div>
+                </div>
+              </section>
 
-            <div class="cc-form-block cc-toggle-row">
-              <label class="cc-switch">
-                <input type="checkbox" data-cc-setting="timerEnabled" ${settings.timerEnabled ? 'checked' : ''}>
-                <span class="cc-switch-track" aria-hidden="true"></span>
-                <span class="cc-switch-copy">
-                  <strong>טיימר</strong>
-                  <small>${settings.timerEnabled ? 'פעיל' : 'כבוי'}</small>
-                </span>
-              </label>
+              <details class="cc-advanced-panel" data-cc-details-key="advanced:${escapeHtml(scope)}" ${isDetailOpen(`advanced:${scope}`) ? 'open' : ''}>
+                <summary>אפשרויות מתקדמות</summary>
+                <div class="cc-advanced-panel-body">
+                  <section class="cc-settings-section" data-kind="advanced">
+                    <div class="cc-settings-section-head">
+                      <h3>קצב ובקרה</h3>
+                      <p>לא חייבים לגעת בזה. זו רק שכבת קצב נוספת למי שרוצה אימון לחוץ יותר.</p>
+                    </div>
+                    <div class="cc-form-block cc-toggle-row">
+                      <label class="cc-switch">
+                        <input type="checkbox" data-cc-setting="timerEnabled" ${settings.timerEnabled ? 'checked' : ''}>
+                        <span class="cc-switch-track" aria-hidden="true"></span>
+                        <span class="cc-switch-copy">
+                          <strong>טיימר</strong>
+                          <small>${settings.timerEnabled ? 'פעיל' : 'כבוי'}</small>
+                        </span>
+                      </label>
+                    </div>
+                    <div class="cc-advanced-note">ההגדרות נשמרות אוטומטית ויוצעו בפעם הבאה.</div>
+                  </section>
+                </div>
+              </details>
             </div>
-
-            <details class="cc-advanced-panel" data-cc-details-key="advanced:${escapeHtml(scope)}" ${isDetailOpen(`advanced:${scope}`) ? 'open' : ''}>
-              <summary>אפשרויות מתקדמות</summary>
-              <div class="cc-advanced-panel-body">
-                <label class="cc-field-vertical" for="${selectId}">
-                  <span>קטגוריות לתרגול</span>
-                  <select id="${selectId}" class="cc-select" data-cc-setting="familyFocus">
-                    <option value="all" ${settings.familyFocus === 'all' ? 'selected' : ''}>הכול</option>
-                    <option value="deletion" ${settings.familyFocus === 'deletion' ? 'selected' : ''}>מחיקות</option>
-                    <option value="distortion" ${settings.familyFocus === 'distortion' ? 'selected' : ''}>עיוותים</option>
-                    <option value="generalization" ${settings.familyFocus === 'generalization' ? 'selected' : ''}>הכללות</option>
-                  </select>
-                </label>
-                <div class="cc-advanced-note">ההגדרות נשמרות אוטומטית ויוצעו בפעם הבאה.</div>
-              </div>
-            </details>
+            ${renderSettingsPreviewCard()}
           </div>
         `;
     }
@@ -1733,6 +1775,54 @@
         `;
     }
 
+    function currentSettingsSummaryText() {
+        const s = normalizePracticeSettings(state.settings || defaultPracticeSettings());
+        return `${s.questionCount} שאלות · ${familyLabelSimple(s.familyFocus)} · ${s.mode === 'exam' ? 'מבחן' : 'לימוד'} · ${s.timerEnabled ? 'עם טיימר' : 'ללא טיימר'}`;
+    }
+
+    function renderHelperStepsStrip() {
+        const steps = Array.isArray(trainerContract?.helperSteps) ? trainerContract.helperSteps : [];
+        if (!steps.length) return '';
+        return `
+          <section class="cc-platform-helper-strip" aria-label="שלבי התחלה">
+            ${steps.map((step) => `
+              <article class="cc-platform-helper-step">
+                <strong>${escapeHtml(step.title || '')}</strong>
+                <span>${escapeHtml(step.description || '')}</span>
+              </article>
+            `).join('')}
+          </section>
+        `;
+    }
+
+    function renderSettingsPreviewCard() {
+        const s = normalizePracticeSettings(state.settings || defaultPracticeSettings());
+        return `
+          <aside class="cc-settings-preview-card" aria-label="תצוגה מקדימה של הסשן">
+            <div class="cc-card-kicker">כך הסשן הבא ייראה</div>
+            <div class="cc-settings-preview-pill">${escapeHtml(currentSettingsSummaryText())}</div>
+            <div class="cc-summary-grid">
+              <div class="cc-summary-block">
+                <h4>מצב עבודה</h4>
+                <p>${s.mode === 'exam' ? 'מבחן קצר עם פחות מרחב טעויות.' : 'לימוד מונחה עם משוב והסבר יציב.'}</p>
+              </div>
+              <div class="cc-summary-block">
+                <h4>עומס סשן</h4>
+                <p>${s.questionCount} שאלות · קושי ${s.difficulty}/5</p>
+              </div>
+              <div class="cc-summary-block">
+                <h4>קטגוריות</h4>
+                <p>${escapeHtml(familyLabelSimple(s.familyFocus))}</p>
+              </div>
+              <div class="cc-summary-block">
+                <h4>קצב</h4>
+                <p>${s.timerEnabled ? 'טיימר פעיל ושומר על פוקוס.' : 'ללא טיימר, לקריאה רגועה יותר.'}</p>
+              </div>
+            </div>
+          </aside>
+        `;
+    }
+
     function renderSetupModal() {
         if (!state.setupOpen) return '';
         return `
@@ -1740,17 +1830,17 @@
             <div class="cc-modal-card">
               <div class="cc-modal-head">
                 <div>
-                  <div class="cc-modal-kicker">Classic Meta Model</div>
-                  <h2>Classic Meta Model — זיהוי תבניות</h2>
-                  <p>אתם מקבלים קטע דיבור קצר. המשימה: לזהות את המבנה המרכזי, לקבל משוב, ולהמשיך בקצב נקי.</p>
+                  <div class="cc-modal-kicker">${escapeHtml(trainerContract?.settingsTitle || 'הגדרות Classic Classic')}</div>
+                  <h2>${escapeHtml(trainerContract?.title || 'Classic Classic — זיהוי תבניות')}</h2>
+                  <p>${escapeHtml(trainerContract?.settingsSubtitle || 'מכווננים מצב, קושי, עומס וסוגי קטגוריות לפני הסשן או במהלכו.')}</p>
                 </div>
                 <button type="button" class="cc-icon-btn" data-cc-action="close-setup" aria-label="סגור">ֳ—</button>
               </div>
               ${renderSettingsControls('setup')}
               <div class="cc-modal-actions">
-                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="start-session">התחל</button>
-                <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="random-start">הגרל</button>
-                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-setup">סגור</button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-setup">ביטול</button>
+                <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="reset-practice-settings">ברירות מחדל</button>
+                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="start-session">שמור והתחל סשן</button>
               </div>
               ${state.hasSavedSettings ? `<div class="cc-modal-foot"><button type="button" class="cc-link-btn" data-cc-action="continue-last-settings">המשך עם ההגדרות האחרונות</button></div>` : ''}
             </div>
@@ -2023,19 +2113,60 @@
             <div class="cc-drawer">
               <div class="cc-drawer-head">
                 <div>
-                  <div class="cc-modal-kicker">הגדרות</div>
-                  <h2>שינוי הגדרות תרגול</h2>
-                  <p>הגדרות נשמרות אוטומטית. כדי להחיל על הסשן הנוכחי, הפעילו מחדש.</p>
+                  <div class="cc-modal-kicker">${escapeHtml(trainerContract?.settingsTitle || 'הגדרות')}</div>
+                  <h2>${escapeHtml(trainerContract?.title || 'Classic Classic')}</h2>
+                  <p>${escapeHtml(trainerContract?.settingsSubtitle || 'הגדרות נשמרות אוטומטית. כדי להחיל על הסשן הנוכחי, הפעילו מחדש.')}</p>
                 </div>
                 <button type="button" class="cc-icon-btn" data-cc-action="close-settings-drawer" aria-label="סגור">ֳ—</button>
               </div>
               ${renderSettingsControls('drawer')}
               <div class="cc-modal-actions">
-                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="apply-settings-and-restart">הפעל מחדש עם ההגדרות</button>
-                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-settings-drawer">סגור</button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-settings-drawer">ביטול</button>
+                <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="reset-practice-settings">ברירות מחדל</button>
+                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="apply-settings-and-restart">שמור והפעל מחדש</button>
               </div>
             </div>
           </div>
+        `;
+    }
+
+    function renderPracticeSupportRail(round) {
+        const session = state.session;
+        const progress = currentQuestionPosition();
+        const phase = getPhaseMeta(round?.stage || 'context');
+        const steps = Array.isArray(trainerContract?.helperSteps) ? trainerContract.helperSteps : [];
+        return `
+          <aside class="cc-platform-support" aria-label="תמיכה צדית">
+            <section class="cc-platform-support-card">
+              <div class="cc-card-kicker">מה קורה עכשיו</div>
+              <h3>${escapeHtml(phase.label)}</h3>
+              <p>${escapeHtml(phase.goal)}</p>
+              <div class="cc-settings-summary-line">
+                <span>שאלה ${progress.current}/${progress.total}</span>
+                <span>ניקוד ${session?.score ?? 0}</span>
+                <span>${escapeHtml(familyLabelSimple(round?.pattern?.family || state.familyFocus))}</span>
+              </div>
+            </section>
+
+            <section class="cc-platform-support-card">
+              <div class="cc-card-kicker">הסשן הנוכחי</div>
+              <h3>כך בנוי הסבב</h3>
+              ${renderSettingsSummaryLine()}
+            </section>
+
+            <section class="cc-platform-support-card">
+              <div class="cc-card-kicker">עוגני ניווט</div>
+              <h3>איך מתקדמים מכאן</h3>
+              <div class="cc-platform-helper-list">
+                ${steps.map((step) => `
+                  <div class="cc-platform-helper-list-item">
+                    <strong>${escapeHtml(step.title || '')}</strong>
+                    <span>${escapeHtml(step.description || '')}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </section>
+          </aside>
         `;
     }
 
@@ -2047,10 +2178,15 @@
             ${renderPracticeTopBar(session, round)}
             <div class="cc-practice-meta-row">
               <button type="button" class="cc-link-btn" data-cc-action="show-before-start">לפני שמתחילים (30 שניות)</button>
-              ${renderSettingsSummaryLine()}
+              <span class="cc-settings-preview-pill">${escapeHtml(currentSettingsSummaryText())}</span>
             </div>
-            ${round ? renderStageProgressPills(round) : ''}
-            ${renderPracticeCard(round)}
+            <div class="cc-platform-practice-layout">
+              <div class="cc-platform-practice-main">
+                ${round ? renderStageProgressPills(round) : ''}
+                ${renderPracticeCard(round)}
+              </div>
+              ${renderPracticeSupportRail(round)}
+            </div>
             ${renderSettingsDrawer()}
             ${renderPhilosopherOverlay(round)}
           </div>
@@ -2149,14 +2285,24 @@
         return `
           <div class="cc-entry-shell" aria-label="פתיחת תרגול">
             <section class="cc-entry-card">
-              <div class="cc-modal-kicker">Classic Meta Model</div>
-              <h1>Classic Meta Model — זיהוי תבניות</h1>
-              <p>אתם מקבלים קטע דיבור של “מטופל”. המשימה: לזהות את המבנה המרכזי, לקבל משוב מיידי, ולהמשיך לשאלה הבאה.</p>
-              <p class="cc-entry-sub">פתיח קצר פעם אחת, ואז מסך תרגול נקי בלי בלוקי הגדרות קבועים.</p>
-              ${renderSettingsSummaryLine()}
+              <div class="cc-modal-kicker">${escapeHtml(trainerContract?.familyLabel || 'משפחת קלאסיק')}</div>
+              <h1>${escapeHtml(trainerContract?.title || 'Classic Classic — זיהוי תבניות')}</h1>
+              <p>${escapeHtml(trainerContract?.subtitle || 'מזהים את המבנה המרכזי, בודקים תשובה, ומבינים למה הבחירה נכונה או שגויה.')}</p>
+              <p class="cc-entry-sub">כאן שומעים משפט, מזהים איזה מבנה לשוני מחזיק אותו, ומקבלים הסבר יציב שמחבר בין השלב, הבחירה והלקח להמשך.</p>
+              <div class="cc-entry-start-strip">
+                <div class="cc-entry-start-copy">
+                  <strong>${escapeHtml(trainerContract?.quickStartLabel || 'מתחילים מכאן')}</strong>
+                  <span>אפשר להתחיל מיד עם ברירת המחדל, או לפתוח הגדרות כדי לדייק עומס, קושי ומשפחת תרגול.</span>
+                </div>
+                <div class="cc-primary-actions">
+                  <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="start-session">${escapeHtml(trainerContract?.startActionLabel || 'התחל תרגול')}</button>
+                  <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="open-setup">הגדרות</button>
+                  ${state.hasSavedSettings ? `<button type="button" class="cc-btn cc-btn-secondary" data-cc-action="continue-last-settings">המשך עם ההגדרות האחרונות</button>` : ''}
+                  <span class="cc-settings-preview-pill">${escapeHtml(currentSettingsSummaryText())}</span>
+                </div>
+              </div>
+              ${renderHelperStepsStrip()}
               <div class="cc-primary-actions">
-                <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="open-setup">התחל תרגול</button>
-                ${state.hasSavedSettings ? `<button type="button" class="cc-btn cc-btn-secondary" data-cc-action="continue-last-settings">המשך עם ההגדרות האחרונות</button>` : ''}
                 <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="show-before-start">לפני שמתחילים (30 שניות)</button>
               </div>
               <div class="cc-entry-mini">

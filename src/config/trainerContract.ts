@@ -28,6 +28,10 @@ export interface TrainerPlatformContract {
   settingsTitle: string;
   settingsSubtitle: string;
   helperSteps: ReadonlyArray<TrainerHelperStepContract>;
+  processSteps?: ReadonlyArray<TrainerHelperStepContract>;
+  supportRailMode?: string;
+  settingsGroups?: ReadonlyArray<string>;
+  mobilePriorityOrder?: ReadonlyArray<string>;
   wrapper: TrainerStandaloneWrapperContract;
 }
 

@@ -165,6 +165,7 @@
             '  50% { transform: translateY(-1px); }',
             '}',
             'body.trainer-shell-help-open { overflow: hidden; }',
+            'body.trainer-shell-modal-open .trainer-shell-nav { pointer-events: none; opacity: 0.58; }',
             '.trainer-shell-help-overlay {',
             '  position: fixed;',
             '  inset: 0;',
@@ -254,6 +255,33 @@
             '}'
         ].join('\n');
         document.head.appendChild(style);
+    }
+
+    function syncNavModalState() {
+        if (!document.body) return;
+        var hasBlockingDialog = !!document.querySelector(
+            '.trs-overlay,' +
+            '.cc-layer[role="dialog"],' +
+            '.it-onboarding-layer,' +
+            '.trainer-shell-help-overlay,' +
+            '[role="dialog"][aria-modal="true"]:not([hidden])'
+        );
+        document.body.classList.toggle('trainer-shell-modal-open', hasBlockingDialog);
+    }
+
+    function watchStandaloneDialogs() {
+        if (!document.body || document.body.__trainerShellDialogWatch) return;
+        document.body.__trainerShellDialogWatch = true;
+        syncNavModalState();
+        var observer = new MutationObserver(function () {
+            syncNavModalState();
+        });
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['class', 'hidden', 'style', 'open', 'aria-hidden']
+        });
     }
 
     function ensureExternalCss(id, path) {
@@ -617,6 +645,7 @@
 
         collapseInlineHelpDefaults();
         watchForLateHelpContent();
+        watchStandaloneDialogs();
     }
 
     if (document.readyState === 'loading') {

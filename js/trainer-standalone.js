@@ -258,12 +258,14 @@ body {
         const config = options && typeof options === 'object' ? options : {};
         const contract = getContract(config.trainerId);
         if (!contract) throw new Error('Unknown trainer contract: ' + config.trainerId);
-
-        const mountId = ensureSharedFrame(contract);
         const wrapper = contract.wrapper || {};
 
         async function start() {
+            const mountId = ensureSharedFrame(contract);
             try {
+                if (global.navigator && global.navigator.webdriver && document && document.documentElement) {
+                    document.documentElement.setAttribute('data-automation', '1');
+                }
                 const manifest = await fetchManifest(config.manifestKey || contract.id);
                 const buildMeta = {
                     version: normalizeToken(manifest && manifest.version),
