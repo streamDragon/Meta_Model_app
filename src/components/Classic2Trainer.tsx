@@ -1,6 +1,11 @@
 ﻿import React, { useEffect, useRef, useState } from 'react';
 
-type CategoryCode = 'MR' | 'CEq' | 'CE' | 'PRE' | 'NOM' | 'LP' | 'UQ' | 'MN' | 'MP' | 'UV' | 'UN' | 'COMP' | 'DEL' | 'CTX' | 'VAK';
+import { CANONICAL_BREEN_GRID_RTL, CANONICAL_BREEN_ORDER, orderBreenCategories, type CanonicalBreenCode } from '../config/canonicalBreenOrder';
+import { TrainerEmptyState, TrainerPlatformShell, TrainerSupportCard } from './trainer-shell/TrainerPlatformShell';
+import { TrainerSettingsShell, type TrainerSettingsSection } from './trainer-shell/TrainerSettingsShell';
+import { TRAINER_PLATFORM_CSS } from './trainer-shell/trainerPlatformStyles';
+
+type CategoryCode = CanonicalBreenCode;
 type GroupCode = 'DIS' | 'GEN' | 'DEL';
 type FamilyCell = GroupCode | 'CTX' | 'VAK';
 type TextSource = 'built_in' | 'random' | 'manual';
@@ -25,17 +30,6 @@ type Settings = {
 };
 
 const CLASSIC2_SETTINGS_STORAGE_KEY = 'classic2_settings_v1';
-
-// This is the only allowed render order for Classic 2 category UI.
-const CANONICAL_BREEN_ORDER: CategoryCode[] = ['MR', 'CEq', 'CE', 'PRE', 'NOM', 'LP', 'UQ', 'MN', 'MP', 'UV', 'UN', 'COMP', 'DEL', 'CTX', 'VAK'];
-
-const CANONICAL_BREEN_GRID_RTL: CategoryCode[][] = [
-  ['MR', 'CEq', 'CE'],
-  ['PRE', 'NOM', 'LP'],
-  ['UQ', 'MN', 'MP'],
-  ['UV', 'UN', 'COMP'],
-  ['DEL', 'CTX', 'VAK']
-];
 
 const CAT: Record<CategoryCode, { he: string; family: FamilyCell; familyHe: string; hint: string; note?: string }> = {
   MR: { he: 'קריאת מחשבות', family: 'DIS', familyHe: 'עיוות', hint: 'הנחה על מה האחר חושב/מרגיש בלי ראיה מפורשת.' },
@@ -239,7 +233,7 @@ function visibleCategories(s: Settings): CategoryCode[] {
   if (s.categoryDisplay === 'all') return [...CANONICAL_BREEN_ORDER];
   const base = CANONICAL_BREEN_ORDER.filter((c) => CAT[c].family === s.categoryGroup);
   const extra = s.includeCtxVak ? (['CTX', 'VAK'] as CategoryCode[]) : [];
-  return CANONICAL_BREEN_ORDER.filter((c) => [...base, ...extra].includes(c));
+  return orderBreenCategories([...base, ...extra]);
 }
 
 function scenarioPool(ctx: FieldCtx): Scenario[] {
