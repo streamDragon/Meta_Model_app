@@ -9666,6 +9666,10 @@ body[data-active-tab="scenario-trainer"] #scenario-trainer .scenario-trainer-car
     border-radius: 18px;
 }
 
+.scenario-shell-overlay-content .screen-read-guide {
+    display: none !important;
+}
+
 /* Comic Engine 2.0 */
 .comic-engine {
     --comic-text-scale: 1;
