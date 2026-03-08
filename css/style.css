@@ -8947,6 +8947,80 @@ a:hover {
     animation: fadeIn 0.3s ease;
 }
 
+.scenario-start-card,
+.scenario-overlay-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    padding: 16px;
+}
+
+.scenario-start-kicker,
+.scenario-panel-kicker {
+    margin: 0 0 8px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #1d4ed8;
+}
+
+.scenario-start-card h3,
+.scenario-overlay-card h3 {
+    margin-bottom: 8px;
+}
+
+.scenario-start-note,
+.scenario-help-note {
+    margin-bottom: 14px;
+    color: #334155;
+    line-height: 1.6;
+}
+
+.scenario-start-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.scenario-start-actions,
+.scenario-feedback-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.scenario-start-actions .btn,
+.scenario-feedback-actions .btn {
+    margin: 0;
+}
+
+.scenario-start-grid .q-card {
+    padding: 12px;
+    border-left-width: 3px;
+    box-shadow: none;
+}
+
+.scenario-start-grid .q-card label {
+    margin-bottom: 6px;
+}
+
+.scenario-start-actions #scenario-start-run-btn {
+    flex: 1 1 100%;
+}
+
+.scenario-start-actions .btn {
+    flex: 1 1 calc(33.333% - 6px);
+}
+
+.scenario-help-list {
+    margin: 0 0 14px;
+    padding-right: 18px;
+    display: grid;
+    gap: 8px;
+    color: #0f172a;
+    line-height: 1.6;
+}
+
 .scenario-home-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -9237,14 +9311,14 @@ a:hover {
 }
 
 .scenario-feedback-mark {
-    width: 92px;
-    height: 92px;
+    width: 78px;
+    height: 78px;
     margin: 10px auto 16px auto;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 800;
     opacity: 0;
     transform: scale(0.6);
@@ -9564,6 +9638,32 @@ a:hover {
     align-items: center;
     gap: 8px;
     font-weight: 600;
+}
+
+body[data-active-tab="scenario-trainer"] #scenario-trainer .feature-home-back-bar,
+body[data-active-tab="scenario-trainer"] #scenario-trainer .screen-read-guide,
+body[data-active-tab="scenario-trainer"] #scenario-trainer .app-shell-header,
+body[data-active-tab="scenario-trainer"] #scenario-trainer .lab-container-actions,
+body[data-active-tab="scenario-trainer"] #scenario-trainer .lab-container-bottom,
+body[data-active-tab="scenario-trainer"] #scenario-trainer .mobile-accordion {
+    display: none !important;
+}
+
+body[data-active-tab="scenario-trainer"] #scenario-trainer .app-shell,
+body[data-active-tab="scenario-trainer"] #scenario-trainer .lab-container,
+body[data-active-tab="scenario-trainer"] #scenario-trainer .lab-container-workspace {
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+body[data-active-tab="scenario-trainer"] #scenario-trainer .scenario-trainer-card {
+    padding: 16px;
+    margin-bottom: 0;
+    border-radius: 18px;
 }
 
 /* Comic Engine 2.0 */
@@ -10453,6 +10553,39 @@ a:hover {
         padding: 16px;
         margin-bottom: 0;
         border-radius: 18px;
+    }
+
+    body[data-active-tab="scenario-trainer"] #feature-map-toggle,
+    body[data-active-tab="scenario-trainer"] #mobile-sticky-cta {
+        display: none !important;
+    }
+
+    body[data-active-tab="scenario-trainer"] .audio-floating-control {
+        display: none !important;
+    }
+
+    body[data-active-tab="scenario-trainer"] .app-sticky-banner {
+        gap: 8px;
+        padding: calc(8px + var(--safe-top)) calc(12px + var(--safe-right)) 8px calc(12px + var(--safe-left));
+    }
+
+    body[data-active-tab="scenario-trainer"] .app-sticky-banner__eyebrow,
+    body[data-active-tab="scenario-trainer"] .app-sticky-banner__context,
+    body[data-active-tab="scenario-trainer"] .app-sticky-banner__version {
+        display: none !important;
+    }
+
+    body[data-active-tab="scenario-trainer"] .app-sticky-banner__main {
+        align-items: center;
+    }
+
+    body[data-active-tab="scenario-trainer"] .app-sticky-banner__actions {
+        gap: 6px;
+    }
+
+    body[data-active-tab="scenario-trainer"] .app-sticky-banner__action-btn.btn {
+        min-height: 34px;
+        padding-inline: 10px;
     }
 
     .app-sticky-banner__main {

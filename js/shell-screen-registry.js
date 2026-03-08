@@ -69,12 +69,12 @@
         'practice-verb-unzip': {
             id: 'practice-verb-unzip',
             adapter: 'verb-unzip',
-            panels: ['settings', 'help', 'stats', 'legacy']
+            panels: ['settings', 'help', 'stats']
         },
         'scenario-trainer': {
             id: 'scenario-trainer',
             adapter: 'scenario',
-            panels: ['setup', 'history', 'blueprint', 'settings', 'legacy']
+            panels: ['setup', 'history', 'blueprint', 'settings']
         },
         'comic-engine': {
             id: 'comic-engine',

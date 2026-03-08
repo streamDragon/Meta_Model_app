@@ -260,14 +260,14 @@
         fallback.setAttribute('data-shell-error-fallback', '1');
         fallback.innerHTML = `
             <h3>${escapeHtml(shellCopy?.SHELL?.fallbackTitle || 'המעבר למעטפת נכשל')}</h3>
-            <p>${escapeHtml(shellCopy?.SHELL?.fallbackBody || 'אפשר לעבור זמנית למצב הישן בלי לאבד את התרגול.')}</p>
-            <button type="button" class="btn btn-primary" data-shell-switch-legacy>${escapeHtml(shellCopy?.SHELL?.openLegacy || 'פתח מצב ישן')}</button>
+            <p>אפשר לרענן את המסך ולהמשיך לעבוד בלי לעבור למצב אחר.</p>
+            <button type="button" class="btn btn-primary" data-shell-retry>נסה שוב</button>
         `;
 
-        const button = fallback.querySelector('[data-shell-switch-legacy]');
+        const button = fallback.querySelector('[data-shell-retry]');
         if (button) {
             button.addEventListener('click', () => {
-                global.location.assign(buildUiModeUrl(screenId, 'legacy'));
+                global.location.assign(buildUiModeUrl(screenId, 'shell'));
             });
         }
 
@@ -644,7 +644,7 @@
                 lastPanelOpenAt: ''
             };
 
-            const headerActions = Array.isArray(config.panels) ? config.panels : [];
+            const headerActions = Array.isArray(config.panels) ? config.panels.filter((panel) => panel?.id !== 'legacy') : [];
             headerActions.forEach((panel) => {
                 shell.headerActions.appendChild(createActionButton({
                     label: panel.action || panel.title || 'פרטים',
@@ -652,12 +652,6 @@
                     onClick: () => openGenericPanelOverlay(screenState, panel.id)
                 }));
             });
-            shell.headerActions.appendChild(createActionButton({
-                label: getShellActionLabel('legacy', 'מצב ישן'),
-                icon: '↩',
-                className: 'shell-action-legacy',
-                onClick: () => global.location.assign(buildUiModeUrl(screenId, 'legacy'))
-            }));
 
             shell.workspace.appendChild(workspaceNode);
             container.prepend(shell.root);
@@ -1082,13 +1076,7 @@
             const headerActions = [
                 createActionButton({ label: 'תפריט', icon: '☰', onClick: () => openHomeMenuOverlay(screenState) }),
                 createActionButton({ label: 'רקע', icon: 'ℹ', onClick: () => openHomeAboutOverlay(screenState) }),
-                createActionButton({ label: 'עזרה', icon: '?', onClick: () => openHomeHelpOverlay(screenState) }),
-                createActionButton({
-                    label: getShellActionLabel('legacy', 'מצב ישן'),
-                    icon: '↩',
-                    className: 'shell-action-legacy',
-                    onClick: () => global.location.assign(buildUiModeUrl(HOME_SCREEN_ID, 'legacy'))
-                })
+                createActionButton({ label: 'עזרה', icon: '?', onClick: () => openHomeHelpOverlay(screenState) })
             ];
             headerActions.forEach((btn) => shell.headerActions.appendChild(btn));
 
@@ -1287,13 +1275,7 @@
             const headerActions = [
                 createActionButton({ label: 'הגדרות', icon: '⚙️', onClick: () => openVerbSettingsOverlay(screenState, { entry: false }) }),
                 createActionButton({ label: 'עזרה', icon: '?', onClick: () => openVerbHelpOverlay(screenState) }),
-                createActionButton({ label: 'נתונים', icon: '📈', onClick: () => openVerbStatsOverlay(screenState) }),
-                createActionButton({
-                    label: getShellActionLabel('legacy', 'מצב ישן'),
-                    icon: '↩',
-                    className: 'shell-action-legacy',
-                    onClick: () => global.location.assign(buildUiModeUrl(VERB_SCREEN_ID, 'legacy'))
-                })
+                createActionButton({ label: 'נתונים', icon: '📈', onClick: () => openVerbStatsOverlay(screenState) })
             ];
             headerActions.forEach((btn) => shell.headerActions.appendChild(btn));
 
@@ -1415,10 +1397,10 @@
 
         const panelMeta = {
             home: { title: 'בית סצנות', size: 'lg' },
-            domain: { title: 'הגדרות פתיחה', size: 'lg' },
+            domain: { title: 'עזרה קצרה', size: 'md' },
             settings: { title: 'הגדרות', size: 'lg' },
             history: { title: 'היסטוריית סצנות', size: 'lg' },
-            blueprint: { title: 'מפת פעולה + בונה מהלך', size: 'xl' }
+            blueprint: { title: 'הסבר מעמיק', size: 'xl' }
         };
         const baseMeta = panelMeta[panelId] || { title: 'חלון משנה', size: 'lg' };
         const merged = { ...baseMeta, ...(options && typeof options === 'object' ? options : {}) };
@@ -1464,8 +1446,8 @@
             card.prepend(overlayHost);
             card.prepend(inlineHost);
 
-            const overlayScreenNames = new Set(['home', 'domain', 'blueprint', 'history', 'settings']);
-            const inlineScreenNames = new Set(['play', 'feedback', 'score']);
+            const overlayScreenNames = new Set(['domain', 'blueprint', 'history', 'settings']);
+            const inlineScreenNames = new Set(['home', 'play', 'feedback', 'score']);
             screenNames.forEach((name) => {
                 const node = screenNodes[name];
                 if (!node) return;
@@ -1505,51 +1487,6 @@
                 lastOpenedPanelTitle: '',
                 lastPanelOpenAt: ''
             };
-
-            const toolbar = document.createElement('div');
-            toolbar.className = 'shell-inline-actions scenario-shell-toolbar';
-            toolbar.append(
-                createActionButton({ label: 'הגדרות', icon: '⚙️', onClick: () => openScenarioPanelById(screenState, 'settings') }),
-                createActionButton({ label: 'היסטוריה', icon: '🕘', onClick: () => openScenarioPanelById(screenState, 'history') }),
-                createActionButton({
-                    label: 'פירוק',
-                    icon: '🧩',
-                    onClick: () => openScenarioPanelById(screenState, 'blueprint', {
-                        title: 'פירוק',
-                        note: 'הצגת פירוק מפורט מחוץ למסך הפעולה.',
-                        scrollToSelector: '.scenario-question-engine'
-                    })
-                }),
-                createActionButton({
-                    label: 'מפת פעולה',
-                    icon: '🧭',
-                    onClick: () => openScenarioPanelById(screenState, 'blueprint', {
-                        title: 'מפת פעולה: TOTE + Loop',
-                        scrollToSelector: '.scenario-tote-map'
-                    })
-                }),
-                createActionButton({
-                    label: 'מהלך',
-                    icon: '🧱',
-                    onClick: () => openScenarioPanelById(screenState, 'blueprint', {
-                        title: 'בונה מהלך קומפקטי',
-                        scrollToSelector: '.scenario-blueprint-display'
-                    })
-                })
-            );
-            shell.actions.appendChild(toolbar);
-
-            const headerActions = [
-                createActionButton({ label: 'פתיחה', icon: '⚙️', onClick: () => openScenarioPanelById(screenState, 'domain') }),
-                createActionButton({ label: 'היסטוריה', icon: '🕘', onClick: () => openScenarioPanelById(screenState, 'history') }),
-                createActionButton({
-                    label: getShellActionLabel('legacy', 'מצב ישן'),
-                    icon: '↩',
-                    className: 'shell-action-legacy',
-                    onClick: () => global.location.assign(buildUiModeUrl(SCENARIO_SCREEN_ID, 'legacy'))
-                })
-            ];
-            headerActions.forEach((btn) => shell.headerActions.appendChild(btn));
 
             container.prepend(shell.root);
             section.classList.add('shell-screen-active');
@@ -1704,22 +1641,7 @@
             });
             renderHistoryFooter(screenState);
             if (!screenState.currentInlineScreen) {
-                showScenarioInlineScreen(screenState, 'play');
-            }
-
-            if (!screenState.wizardShown) {
-                screenState.wizardShown = true;
-                writeSessionFlag(SCENARIO_WIZARD_KEY, true);
-                scheduleEntryOverlay(SCENARIO_SCREEN_ID, () => {
-                    if (!global.MetaOverlayProvider || !global.MetaOverlayProvider.isOpen || !global.MetaOverlayProvider.isOpen()) {
-                        const setupButton = document.getElementById('scenario-home-scenes');
-                        if (setupButton) {
-                            setupButton.click();
-                        } else {
-                            openScenarioPanelById(screenState, 'domain');
-                        }
-                    }
-                });
+                showScenarioInlineScreen(screenState, 'home');
             }
             return;
         }

@@ -84,8 +84,8 @@ const SCENARIO_ALLOWED_TRANSITIONS = {
     [SCENARIO_STATES.DOMAIN_PICK]: [SCENARIO_STATES.SCENARIO, SCENARIO_STATES.HOME],
     [SCENARIO_STATES.SCENARIO]: [SCENARIO_STATES.OPTION_PICK, SCENARIO_STATES.HOME],
     [SCENARIO_STATES.OPTION_PICK]: [SCENARIO_STATES.FEEDBACK],
-    [SCENARIO_STATES.FEEDBACK]: [SCENARIO_STATES.BLUEPRINT],
-    [SCENARIO_STATES.BLUEPRINT]: [SCENARIO_STATES.SCORE, SCENARIO_STATES.HOME],
+    [SCENARIO_STATES.FEEDBACK]: [SCENARIO_STATES.BLUEPRINT, SCENARIO_STATES.NEXT_SCENARIO, SCENARIO_STATES.HOME],
+    [SCENARIO_STATES.BLUEPRINT]: [SCENARIO_STATES.FEEDBACK, SCENARIO_STATES.NEXT_SCENARIO, SCENARIO_STATES.HOME],
     [SCENARIO_STATES.SCORE]: [SCENARIO_STATES.NEXT_SCENARIO, SCENARIO_STATES.HOME],
     [SCENARIO_STATES.NEXT_SCENARIO]: [SCENARIO_STATES.SCENARIO, SCENARIO_STATES.HOME]
 };
@@ -99,7 +99,9 @@ let scenarioTrainer = {
     selectedOption: null,
     currentPredicateAnalysis: null,
     safetyLocked: false,
-    didRecordSession: false
+    didRecordSession: false,
+    sceneCommitted: false,
+    lastCommittedEntry: null
 };
 
 let audioState = {
@@ -12158,8 +12160,8 @@ function setScenarioSafetyNoticeVisible(visible) {
 
     notice.classList.toggle('hidden', !visible);
 
-    const scenesBtn = document.getElementById('scenario-home-scenes');
-    if (scenesBtn) scenesBtn.disabled = !!visible;
+    const startBtn = document.getElementById('scenario-start-run-btn');
+    if (startBtn) startBtn.disabled = !!visible;
 }
 
 function containsScenarioSafetyRisk(text) {
@@ -12261,9 +12263,17 @@ function renderScenarioHomeStats() {
 
 function openScenarioHome() {
     scenarioTransitionTo(SCENARIO_STATES.HOME, true);
+    scenarioTrainer.selectedOption = null;
+    scenarioTrainer.currentPredicateAnalysis = null;
+    scenarioTrainer.sceneCommitted = false;
+    scenarioTrainer.lastCommittedEntry = null;
     showScenarioScreen('home');
     renderScenarioHomeStats();
     setScenarioSafetyNoticeVisible(scenarioTrainer.safetyLocked);
+}
+
+function openScenarioHelpScreen() {
+    showScenarioScreen('domain');
 }
 
 function openScenarioDomainPicker() {
@@ -12271,13 +12281,7 @@ function openScenarioDomainPicker() {
         setScenarioSafetyNoticeVisible(true);
         return;
     }
-    if (!scenarioTrainerData.scenarios.length) {
-        showHint('אין סצנות זמינות כרגע');
-        return;
-    }
-    scenarioTransitionTo(SCENARIO_STATES.DOMAIN_PICK, true);
-    applyScenarioSettingsToControls();
-    showScenarioScreen('domain');
+    openScenarioHelpScreen();
 }
 
 function openScenarioHistoryScreen() {
@@ -12369,7 +12373,7 @@ function startScenarioRun() {
     const runSizeInput = document.getElementById('scenario-run-size');
     const domain = domainSelect?.value || scenarioTrainer.settings.defaultDomain || 'all';
     const difficulty = difficultySelect?.value || scenarioTrainer.settings.defaultDifficulty || 'all';
-    const runSize = parseInt(runSizeInput?.value || '10', 10);
+    const runSize = parseInt(runSizeInput?.value || '6', 10);
 
     scenarioTrainer.settings.defaultDomain = domain;
     scenarioTrainer.settings.defaultDifficulty = difficulty;
@@ -12395,6 +12399,8 @@ function startScenarioRun() {
     scenarioTrainer.activeScenario = null;
     scenarioTrainer.selectedOption = null;
     scenarioTrainer.currentPredicateAnalysis = null;
+    scenarioTrainer.sceneCommitted = false;
+    scenarioTrainer.lastCommittedEntry = null;
 
     scenarioTransitionTo(SCENARIO_STATES.SCENARIO, true);
     renderScenarioPlayScreen();
@@ -12408,6 +12414,8 @@ function renderScenarioPlayScreen() {
 
     scenarioTrainer.activeScenario = scenario;
     scenarioTrainer.selectedOption = null;
+    scenarioTrainer.sceneCommitted = false;
+    scenarioTrainer.lastCommittedEntry = null;
 
     const currentIndex = scenarioTrainer.session.index + 1;
     const total = scenarioTrainer.session.queue.length;
@@ -12430,9 +12438,9 @@ function renderScenarioPlayScreen() {
     if (sessionScoreEl) sessionScoreEl.textContent = String(scenarioTrainer.session.score);
     if (sessionStreakEl) sessionStreakEl.textContent = String(scenarioTrainer.session.streak);
     if (progressFill) progressFill.style.width = `${progress}%`;
-    if (roleEl) roleEl.textContent = `תפקיד: ${roleLabel}`;
+    if (roleEl) roleEl.textContent = `בתפקיד: ${roleLabel}`;
     if (titleEl) titleEl.textContent = scenario.title || 'סצנה';
-    if (unspecifiedEl) unspecifiedEl.textContent = `נו, פשוט ${scenario.unspecifiedVerb || 'תעשה את זה'}`;
+    if (unspecifiedEl) unspecifiedEl.textContent = String(scenario.unspecifiedVerb || 'תעשה את זה').trim();
 
     renderScenarioPredicateAnalysis(scenario);
 
@@ -12493,6 +12501,7 @@ function renderScenarioFeedback(option, isGreen) {
     const consequenceTitle = document.getElementById('scenario-consequence-title');
     const consequenceAction = document.getElementById('scenario-consequence-action');
     const consequenceResult = document.getElementById('scenario-consequence-result');
+    const continueBtn = document.getElementById('scenario-feedback-continue-btn');
 
     if (mark) {
         mark.textContent = isGreen ? '✓' : 'X';
@@ -12501,8 +12510,12 @@ function renderScenarioFeedback(option, isGreen) {
         void mark.offsetWidth;
         mark.classList.add('animate');
     }
-    if (title) title.textContent = isGreen ? 'תגובה ירוקה: פירוק לתהליך' : 'תגובה אדומה: האשמה/התחמקות';
-    if (text) text.textContent = option.feedback || '';
+    if (title) title.textContent = isGreen ? 'בחירה מקדמת' : 'בחירה שמעכבת';
+    if (text) text.textContent = option.feedback || (isGreen ? 'בחרת תגובה שמקדמת פירוק ובהירות.' : 'התגובה שנבחרה משאירה את הסצנה מעורפלת או מאשימה.');
+    if (continueBtn) {
+        const isLast = !!scenarioTrainer.session && scenarioTrainer.session.index >= scenarioTrainer.session.queue.length - 1;
+        continueBtn.textContent = isLast ? 'סיום הסשן' : 'לסצנה הבאה';
+    }
     renderScenarioConsequence(option, isGreen, consequenceBox, consequenceTitle, consequenceAction, consequenceResult);
 
     showScenarioScreen('feedback');
@@ -12782,12 +12795,10 @@ function runScenarioProbe(kind = 'open') {
 
 function showScenarioBlueprint() {
     if (!scenarioTrainer.activeScenario || !scenarioTrainer.selectedOption) return;
-    if (!scenarioTransitionTo(SCENARIO_STATES.BLUEPRINT, true)) return;
 
     const scenario = scenarioTrainer.activeScenario;
     const bp = scenario.greenBlueprint || {};
     const stepsEl = document.getElementById('scenario-blueprint-steps');
-    const noteEl = document.getElementById('scenario-user-note');
 
     const goalEl = document.getElementById('scenario-blueprint-goal');
     const firstStepEl = document.getElementById('scenario-blueprint-first-step');
@@ -12802,7 +12813,6 @@ function showScenarioBlueprint() {
     if (planBEl) planBEl.textContent = bp.planB || '';
     if (doneEl) doneEl.textContent = bp.doneDefinition || '';
     if (greenSentenceEl) greenSentenceEl.textContent = getScenarioGreenOptionText(scenario);
-    if (noteEl) noteEl.value = '';
 
     if (stepsEl) {
         stepsEl.innerHTML = '';
@@ -12930,19 +12940,29 @@ function applyScenarioResult(entry) {
     addXP(entry.score ? 8 : 4);
 }
 
-function finishScenarioBlueprint() {
-    const note = (document.getElementById('scenario-user-note')?.value || '').trim();
+function commitScenarioResult(note = '') {
+    if (scenarioTrainer.sceneCommitted) {
+        return scenarioTrainer.lastCommittedEntry;
+    }
+
     if (containsScenarioSafetyRisk(note)) {
         lockScenarioFlowForSafety();
-        return;
+        return null;
     }
 
     const entry = buildScenarioHistoryEntry(note);
-    if (!entry) return;
+    if (!entry) return null;
 
     applyScenarioResult(entry);
-    scenarioTransitionTo(SCENARIO_STATES.SCORE, true);
-    renderScenarioScore(entry);
+    scenarioTrainer.sceneCommitted = true;
+    scenarioTrainer.lastCommittedEntry = entry;
+    return entry;
+}
+
+function finishScenarioBlueprint() {
+    const entry = commitScenarioResult('');
+    if (!entry) return;
+    moveToNextScenario();
 }
 
 function renderScenarioScore(entry) {
@@ -12982,6 +13002,9 @@ function moveToNextScenario() {
         return;
     }
 
+    const entry = commitScenarioResult('');
+    if (!entry) return;
+
     const isLast = scenarioTrainer.session.index >= scenarioTrainer.session.queue.length - 1;
     if (isLast) {
         if (!scenarioTrainer.didRecordSession) {
@@ -12990,7 +13013,7 @@ function moveToNextScenario() {
         }
         playScenarioSound('finish');
         openScenarioHome();
-        showHint('סשן הושלם. המשך מעולה!');
+        showHint('הסשן הסתיים. אפשר להתחיל סבב חדש.');
         return;
     }
 
@@ -13081,7 +13104,7 @@ function saveScenarioSettingsFromForm() {
     };
     saveScenarioTrainerSettings();
     applyScenarioSettingsToControls();
-    showHint('הגדרות Scenario נשמרו');
+    showHint('הגדרות הסימולטור נשמרו');
     openScenarioHome();
 }
 
@@ -13091,8 +13114,7 @@ async function setupScenarioTrainerModule() {
     scenarioTrainer.settings = loadScenarioTrainerSettings();
     scenarioTrainer.progress = loadScenarioTrainerProgress();
 
-    bindScenarioClick('scenario-home-scenes', openScenarioDomainPicker);
-    bindScenarioClick('scenario-home-prisms', () => navigateTo('prismlab'));
+    bindScenarioClick('scenario-home-help', openScenarioHelpScreen);
     bindScenarioClick('scenario-home-history', openScenarioHistoryScreen);
     bindScenarioClick('scenario-home-settings', openScenarioSettingsScreen);
     bindScenarioClick('scenario-back-home-from-domain', openScenarioHome);
@@ -13100,6 +13122,7 @@ async function setupScenarioTrainerModule() {
     bindScenarioClick('scenario-back-home-from-settings', openScenarioHome);
     bindScenarioClick('scenario-start-run-btn', startScenarioRun);
     bindScenarioClick('scenario-show-blueprint-btn', showScenarioBlueprint);
+    bindScenarioClick('scenario-feedback-continue-btn', moveToNextScenario);
     bindScenarioClick('scenario-copy-green-btn', copyScenarioGreenSentence);
     bindScenarioClick('scenario-open-box-btn', () => runScenarioProbe('open'));
     bindScenarioClick('scenario-knife-btn', () => runScenarioProbe('knife'));
