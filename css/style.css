@@ -10397,6 +10397,64 @@ a:hover {
         border-radius: 18px;
     }
 
+    body[data-active-tab="practice-radar"] #feature-map-toggle,
+    body[data-active-tab="practice-radar"] #mobile-sticky-cta {
+        display: none !important;
+    }
+
+    body[data-active-tab="practice-radar"] .audio-floating-control {
+        display: none !important;
+    }
+
+    body[data-active-tab="practice-radar"] .app-sticky-banner {
+        gap: 8px;
+        padding: calc(8px + var(--safe-top)) calc(12px + var(--safe-right)) 8px calc(12px + var(--safe-left));
+    }
+
+    body[data-active-tab="practice-radar"] .app-sticky-banner__eyebrow,
+    body[data-active-tab="practice-radar"] .app-sticky-banner__context,
+    body[data-active-tab="practice-radar"] .app-sticky-banner__version {
+        display: none !important;
+    }
+
+    body[data-active-tab="practice-radar"] .app-sticky-banner__main {
+        align-items: center;
+    }
+
+    body[data-active-tab="practice-radar"] .app-sticky-banner__actions {
+        gap: 6px;
+    }
+
+    body[data-active-tab="practice-radar"] .app-sticky-banner__action-btn.btn {
+        min-height: 34px;
+        padding-inline: 10px;
+    }
+
+    body[data-active-tab="practice-radar"] #practice-radar .feature-home-back-bar,
+    body[data-active-tab="practice-radar"] #practice-radar .app-shell-header,
+    body[data-active-tab="practice-radar"] #practice-radar .lab-container-actions,
+    body[data-active-tab="practice-radar"] #practice-radar .lab-container-bottom,
+    body[data-active-tab="practice-radar"] #practice-radar .mobile-accordion {
+        display: none !important;
+    }
+
+    body[data-active-tab="practice-radar"] #practice-radar .app-shell,
+    body[data-active-tab="practice-radar"] #practice-radar .lab-container,
+    body[data-active-tab="practice-radar"] #practice-radar .lab-container-workspace {
+        margin: 0;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    body[data-active-tab="practice-radar"] #practice-radar .rapid-pattern-card {
+        padding: 16px;
+        margin-bottom: 0;
+        border-radius: 18px;
+    }
+
     .app-sticky-banner__main {
         display: grid;
         gap: 10px;
@@ -14240,6 +14298,217 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
     grid-template-columns: repeat(3, minmax(132px, 1fr));
 }
 
+.rapid-radar-prestart,
+.rapid-radar-live-shell,
+.rapid-radar-prompt-card,
+.rapid-radar-feedback-shell,
+.rapid-radar-overlay-content {
+    display: grid;
+    gap: 12px;
+}
+
+.rapid-radar-header h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: clamp(1.2rem, 2.4vw, 1.5rem);
+}
+
+.rapid-radar-header small {
+    color: #475569;
+    line-height: 1.5;
+}
+
+.rapid-radar-setup-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.rapid-radar-field {
+    display: grid;
+    gap: 8px;
+}
+
+.rapid-radar-field span {
+    font-weight: 700;
+    color: #0f2f55;
+}
+
+.rapid-radar-start-actions,
+.rapid-radar-secondary-actions,
+.rapid-radar-feedback-actions,
+.rapid-radar-footer-actions {
+    display: grid;
+    gap: 8px;
+}
+
+.rapid-radar-secondary-actions,
+.rapid-radar-feedback-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rapid-radar-start-actions .btn,
+.rapid-radar-secondary-actions .btn,
+.rapid-radar-feedback-actions .btn,
+.rapid-radar-footer-actions .btn {
+    margin: 0;
+}
+
+.rapid-session-note {
+    margin: 0;
+    color: #355372;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.rapid-radar-topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.rapid-radar-progress {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.rapid-compact-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid #cfe1f7;
+    background: rgba(255, 255, 255, 0.9);
+    color: #24466f;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.rapid-radar-mini-btn {
+    min-height: 36px;
+    border-radius: 999px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+    font-weight: 800;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.rapid-radar-mini-btn:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+}
+
+.rapid-radar-prompt-label {
+    margin: 0;
+    color: #0c4a6e;
+    font-weight: 800;
+}
+
+.rapid-monologue-box {
+    min-height: 124px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.rapid-monologue-text {
+    min-height: auto;
+}
+
+.rapid-timer-row {
+    gap: 8px;
+}
+
+.rapid-feedback {
+    min-width: 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid #dbeafe;
+    background: rgba(255, 255, 255, 0.86);
+}
+
+.rapid-pattern-buttons {
+    gap: 10px;
+}
+
+.rapid-pattern-btn {
+    direction: rtl;
+    text-align: right;
+    min-height: 72px;
+}
+
+.rapid-pattern-btn .rapid-pattern-sub {
+    margin-top: 5px;
+}
+
+.rapid-radar-result {
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid #dbeafe;
+    background: rgba(255, 255, 255, 0.94);
+}
+
+.rapid-radar-result[data-tone="success"] {
+    border-color: #86efac;
+    background: #f0fdf4;
+}
+
+.rapid-radar-result[data-tone="warn"] {
+    border-color: #fcd34d;
+    background: #fffbeb;
+}
+
+.rapid-radar-result[data-tone="danger"] {
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+
+.rapid-radar-result-title {
+    display: block;
+    margin-bottom: 4px;
+    color: #0f172a;
+}
+
+.rapid-radar-result-body {
+    margin: 0;
+    color: #334155;
+    line-height: 1.45;
+}
+
+.rapid-hidden-controls {
+    display: none !important;
+}
+
+.rapid-radar-overlay-block {
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    background: #f8fbff;
+    padding: 12px;
+}
+
+.rapid-radar-overlay-actions {
+    display: grid;
+    gap: 8px;
+}
+
+.rapid-radar-overlay-list {
+    margin: 0;
+}
+
+.rapid-radar-overlay-quote {
+    margin: 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border-inline-start: 4px solid #38bdf8;
+    background: #f8fafc;
+    color: #0f172a;
+    line-height: 1.6;
+}
+
 .prism-detail.prism-focus-layout .mapping-row {
     display: grid;
     grid-template-columns: minmax(270px, 320px) minmax(0, 1fr);
@@ -14356,9 +14625,27 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
     .rapid-pattern-side {
         grid-template-columns: minmax(0, 1fr);
     }
+
+    .rapid-radar-setup-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 @media (max-width: 560px) {
+    .rapid-pattern-buttons {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .rapid-radar-topbar {
+        flex-direction: column;
+    }
+
+    .rapid-radar-mini-btn {
+        justify-self: start;
+    }
+}
+
+@media (max-width: 380px) {
     .rapid-pattern-buttons {
         grid-template-columns: minmax(0, 1fr);
     }

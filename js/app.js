@@ -8531,21 +8531,21 @@ function setupQuestionDrill() {
 }
 
 const RAPID_PATTERN_BUTTONS = Object.freeze([
-    Object.freeze({ id: 'lost_performative', label: 'Lost Performative', hint: 'שלשה 1 | שמאל' }),
-    Object.freeze({ id: 'assumptions', label: 'Assumptions +1', hint: 'שלשה 1 | מרכז' }),
-    Object.freeze({ id: 'mind_reading', label: 'Mind Reading', hint: 'שלשה 1 | ימין' }),
-    Object.freeze({ id: 'universal_quantifier', label: 'Universal Quantifier', hint: 'שלשה 2 | שמאל' }),
-    Object.freeze({ id: 'modal_operator', label: 'Modal Operator', hint: 'שלשה 2 | מרכז' }),
-    Object.freeze({ id: 'cause_effect', label: 'Cause & Effect', hint: 'שלשה 2 | ימין' }),
-    Object.freeze({ id: 'nominalisations', label: 'Nominalisations', hint: 'שלשה 3 | שמאל' }),
-    Object.freeze({ id: 'identity_predicates', label: 'Identity Predicates', hint: 'שלשה 3 | מרכז' }),
-    Object.freeze({ id: 'complex_equivalence', label: 'Complex Equivalence', hint: 'שלשה 3 | ימין' }),
-    Object.freeze({ id: 'comparative_deletion', label: 'Comparative Deletion', hint: 'שלשה 4 | שמאל' }),
-    Object.freeze({ id: 'time_space_predicates', label: 'Time & Space Predicates', hint: 'שלשה 4 | מרכז' }),
-    Object.freeze({ id: 'lack_referential_index', label: 'Lack of Referential Index', hint: 'שלשה 4 | ימין' }),
-    Object.freeze({ id: 'non_referring_nouns', label: 'Non-referring nouns', hint: 'שלשה 5 | שמאל' }),
-    Object.freeze({ id: 'sensory_predicates', label: 'Sensory Predicates', hint: 'שלשה 5 | מרכז' }),
-    Object.freeze({ id: 'unspecified_verbs', label: 'Unspecified Verbs', hint: 'שלשה 5 | ימין' })
+    Object.freeze({ id: 'lost_performative', label: 'אמירה ללא מקור', hint: 'שלשה 1 • שמאל' }),
+    Object.freeze({ id: 'assumptions', label: 'הנחות יסוד', hint: 'שלשה 1 • מרכז' }),
+    Object.freeze({ id: 'mind_reading', label: 'קריאת מחשבות', hint: 'שלשה 1 • ימין' }),
+    Object.freeze({ id: 'universal_quantifier', label: 'הכללה גורפת', hint: 'שלשה 2 • שמאל' }),
+    Object.freeze({ id: 'modal_operator', label: 'אילוץ או אפשרות', hint: 'שלשה 2 • מרכז' }),
+    Object.freeze({ id: 'cause_effect', label: 'סיבה ותוצאה', hint: 'שלשה 2 • ימין' }),
+    Object.freeze({ id: 'nominalisations', label: 'שמות מופשטים', hint: 'שלשה 3 • שמאל' }),
+    Object.freeze({ id: 'identity_predicates', label: 'זהות מקובעת', hint: 'שלשה 3 • מרכז' }),
+    Object.freeze({ id: 'complex_equivalence', label: 'שקילות מורכבת', hint: 'שלשה 3 • ימין' }),
+    Object.freeze({ id: 'comparative_deletion', label: 'השוואה חסרה', hint: 'שלשה 4 • שמאל' }),
+    Object.freeze({ id: 'time_space_predicates', label: 'זמן ומרחב', hint: 'שלשה 4 • מרכז' }),
+    Object.freeze({ id: 'lack_referential_index', label: 'חסר ייחוס ברור', hint: 'שלשה 4 • ימין' }),
+    Object.freeze({ id: 'non_referring_nouns', label: 'שמות לא מפורטים', hint: 'שלשה 5 • שמאל' }),
+    Object.freeze({ id: 'sensory_predicates', label: 'חושים ותחושה', hint: 'שלשה 5 • מרכז' }),
+    Object.freeze({ id: 'unspecified_verbs', label: 'פעלים לא מפורטים', hint: 'שלשה 5 • ימין' })
 ]);
 
 const RAPID_PATTERN_ALIASES = Object.freeze({
@@ -8793,6 +8793,9 @@ const RAPID_PATTERN_SHOW_BREEN_REFERENCE = false;
 let rapidPatternArenaState = {
     active: false,
     paused: false,
+    sessionStarted: false,
+    sessionCompleted: false,
+    roundResolved: false,
     mode: 'learning',
     pauseReason: '',
     focusMode: false,
@@ -8810,6 +8813,9 @@ let rapidPatternArenaState = {
     endsAtMs: 0,
     tickTimer: null,
     nextTimer: null,
+    feedbackTone: 'info',
+    feedbackTitle: '',
+    feedbackBody: '',
     elements: {}
 };
 
@@ -8851,6 +8857,343 @@ function renderRapidPatternBreenReference(activePatternId = '') {
     });
 }
 
+function getRapidPatternCorrectCount() {
+    return rapidPatternArenaState.history.filter((item) => item.isCorrect).length;
+}
+
+function getRapidPatternUiStage() {
+    if (!rapidPatternArenaState.sessionStarted && !rapidPatternArenaState.sessionCompleted && !rapidPatternArenaState.currentCue) {
+        return 'setup';
+    }
+    if (rapidPatternArenaState.roundResolved || rapidPatternArenaState.sessionCompleted) {
+        return 'feedback';
+    }
+    return 'live';
+}
+
+function focusRapidPatternLiveSurface() {
+    const target = rapidPatternArenaState.elements.liveShell
+        || rapidPatternArenaState.elements.monologue
+        || rapidPatternArenaState.elements.root;
+    if (!target) return;
+
+    const stickyOffset = Math.round(document.getElementById('app-sticky-banner')?.getBoundingClientRect().height || 0);
+    const nextTop = Math.max(0, Math.round((window.scrollY || window.pageYOffset || 0) + target.getBoundingClientRect().top - stickyOffset - 12));
+    window.scrollTo({ top: nextTop, behavior: 'auto' });
+}
+
+function updateRapidPatternFeedbackCard() {
+    const titleEl = rapidPatternArenaState.elements.feedbackTitle;
+    const bodyEl = rapidPatternArenaState.elements.feedbackBody;
+    const card = rapidPatternArenaState.elements.resultCard;
+
+    if (titleEl) titleEl.textContent = rapidPatternArenaState.feedbackTitle || 'מה קרה עכשיו';
+    if (bodyEl) bodyEl.textContent = rapidPatternArenaState.feedbackBody || '';
+    if (card) card.dataset.tone = rapidPatternArenaState.feedbackTone || 'info';
+}
+
+function updateRapidPatternSessionNote() {
+    const noteEl = rapidPatternArenaState.elements.sessionNote;
+    if (!noteEl) return;
+
+    const totalRounds = RAPID_PATTERN_FEEDBACK_INTERVAL;
+    if (!rapidPatternArenaState.sessionStarted && !rapidPatternArenaState.sessionCompleted) {
+        noteEl.textContent = rapidPatternArenaState.mode === 'exam'
+            ? 'בחרו תחום וקצב, ואז לחצו "התחל מבחן".'
+            : 'בחרו מצב ותחום, ואז לחצו "התחל".';
+        return;
+    }
+
+    if (rapidPatternArenaState.sessionCompleted) {
+        noteEl.textContent = `הסבב הושלם. ${getRapidPatternCorrectCount()}/${Math.max(1, rapidPatternArenaState.history.length)} נכונות.`;
+        return;
+    }
+
+    if (rapidPatternArenaState.roundResolved) {
+        noteEl.textContent = rapidPatternArenaState.mode === 'exam'
+            ? `שאלה ${rapidPatternArenaState.round}/${totalRounds} נבדקה. לחצו "הבא".`
+            : `קיבלתם משוב קצר. לחצו "הבא" להמשך.`;
+        return;
+    }
+
+    noteEl.textContent = `סבב של ${totalRounds} שאלות. שאלה ${Math.max(1, rapidPatternArenaState.round)}/${totalRounds}.`;
+}
+
+function clearRapidPatternRoundFeedback() {
+    rapidPatternArenaState.roundResolved = false;
+    rapidPatternArenaState.feedbackTone = 'info';
+    rapidPatternArenaState.feedbackTitle = '';
+    rapidPatternArenaState.feedbackBody = '';
+    updateRapidPatternFeedbackCard();
+}
+
+function setRapidPatternRoundFeedback({ title = '', body = '', tone = 'info' } = {}) {
+    rapidPatternArenaState.roundResolved = true;
+    rapidPatternArenaState.feedbackTone = tone;
+    rapidPatternArenaState.feedbackTitle = title;
+    rapidPatternArenaState.feedbackBody = body;
+    updateRapidPatternFeedbackCard();
+    updateRapidPatternLayoutState();
+}
+
+function updateRapidPatternLayoutState({ focusLiveSurface = false } = {}) {
+    const stage = getRapidPatternUiStage();
+    const elements = rapidPatternArenaState.elements;
+
+    if (elements.root) {
+        elements.root.dataset.stage = stage;
+    }
+    if (elements.prestart) {
+        elements.prestart.classList.toggle('hidden', stage !== 'setup');
+    }
+    if (elements.liveShell) {
+        elements.liveShell.classList.toggle('hidden', stage === 'setup');
+    }
+    if (elements.feedbackShell) {
+        elements.feedbackShell.classList.toggle('hidden', stage !== 'feedback');
+    }
+    if (elements.openExplanationBtn) {
+        const showExplanation = Boolean(rapidPatternArenaState.currentCue) && (rapidPatternArenaState.roundResolved || rapidPatternArenaState.sessionCompleted);
+        elements.openExplanationBtn.classList.toggle('hidden', !showExplanation);
+    }
+    if (elements.nextBtn) {
+        elements.nextBtn.textContent = rapidPatternArenaState.sessionCompleted ? 'תרגול חדש' : 'הבא';
+    }
+    if (elements.skipBtn) {
+        const showSkip = stage === 'live' && Boolean(rapidPatternArenaState.currentCue) && !rapidPatternArenaState.paused;
+        elements.skipBtn.classList.toggle('hidden', !showSkip);
+    }
+
+    updateRapidPatternFeedbackCard();
+    updateRapidPatternSessionNote();
+
+    if (focusLiveSurface && stage !== 'setup') {
+        window.requestAnimationFrame(() => focusRapidPatternLiveSurface());
+    }
+}
+
+function openRapidPatternOverlay({ type = 'rapid-pattern', title = 'חלון', size = 'md', content = null } = {}) {
+    if (!window.MetaOverlayProvider || typeof window.MetaOverlayProvider.openOverlay !== 'function') return false;
+    window.MetaOverlayProvider.openOverlay({
+        type,
+        title,
+        size,
+        closeOnBackdrop: true,
+        content
+    });
+    return true;
+}
+
+function buildRapidPatternHelpOverlayContent() {
+    const wrapper = document.createElement('article');
+    wrapper.className = 'shell-overlay-content rapid-radar-overlay-content';
+    wrapper.innerHTML = `
+        <p class="shell-overlay-kicker">עזרה</p>
+        <h4>איך עובדים כאן</h4>
+        <ol class="shell-help-list">
+            <li>קראו את המשפט ושימו לב לביטוי המודגש.</li>
+            <li>בחרו את התבנית שהכי מתאימה.</li>
+            <li>קבלו משוב קצר והמשיכו לשאלה הבאה.</li>
+        </ol>
+    `;
+
+    const note = document.createElement('p');
+    note.className = 'shell-overlay-note';
+
+    if (rapidPatternArenaState.mode === 'exam' && rapidPatternArenaState.active) {
+        note.textContent = 'במצב מבחן אין עזרה בזמן השאלה. אפשר לבדוק כאן את שיטת העבודה בין שאלות.';
+        wrapper.appendChild(note);
+        return wrapper;
+    }
+
+    if (rapidPatternArenaState.currentCue && rapidPatternArenaState.mode === 'learning') {
+        const contextual = document.createElement('div');
+        contextual.className = 'rapid-radar-overlay-block';
+        contextual.innerHTML = buildRapidPatternHelpHtml(rapidPatternArenaState.currentCue);
+        wrapper.appendChild(contextual);
+        note.textContent = 'העזרה כאן ממוקדת לטריגר הנוכחי כדי שלא תצטרכו לחפש אותה בתוך המסך.';
+    } else {
+        note.textContent = 'בחרו מצב, תחום וקצב, ואז התחילו סבב של 10 שאלות.';
+    }
+
+    wrapper.appendChild(note);
+    return wrapper;
+}
+
+function buildRapidPatternStatsOverlayContent() {
+    const wrapper = document.createElement('article');
+    wrapper.className = 'shell-overlay-content rapid-radar-overlay-content';
+    const list = document.createElement('ul');
+    list.className = 'shell-stats-list rapid-radar-overlay-list';
+    const correctCount = getRapidPatternCorrectCount();
+    const attempts = rapidPatternArenaState.history.length;
+    const accuracy = attempts ? Math.round((correctCount / attempts) * 100) : 0;
+    const selectedType = rapidPatternArenaState.elements.typeSelect?.value || 'random';
+    const selectedTypeLabel = selectedType === 'random' ? 'אקראי' : selectedType;
+
+    [
+        `מצב: ${rapidPatternArenaState.mode === 'exam' ? 'מבחן' : 'למידה'}`,
+        `תחום: ${selectedTypeLabel}`,
+        `זמן לשאלה: ${rapidPatternArenaState.timeLimitSec} שנ׳`,
+        `שאלה נוכחית: ${rapidPatternArenaState.round}/${RAPID_PATTERN_FEEDBACK_INTERVAL}`,
+        `נכונות: ${correctCount}/${attempts || 0}`,
+        `ניקוד: ${rapidPatternArenaState.score}`,
+        `רצף: ${rapidPatternArenaState.streak}`,
+        `דיוק: ${accuracy}%`
+    ].forEach((line) => {
+        const item = document.createElement('li');
+        item.textContent = line;
+        list.appendChild(item);
+    });
+
+    wrapper.innerHTML = `
+        <p class="shell-overlay-kicker">נתונים</p>
+        <h4>${rapidPatternArenaState.sessionCompleted ? 'סיכום הסבב' : 'מצב נוכחי'}</h4>
+    `;
+    wrapper.appendChild(list);
+
+    if (rapidPatternArenaState.sessionCompleted && rapidPatternArenaState.history.length) {
+        const summary = document.createElement('div');
+        summary.className = 'rapid-radar-overlay-block';
+        summary.innerHTML = buildRapidPatternAiFeedbackHtml(
+            rapidPatternArenaState.history.slice(-RAPID_PATTERN_FEEDBACK_INTERVAL)
+        );
+        wrapper.appendChild(summary);
+    }
+
+    const note = document.createElement('p');
+    note.className = 'shell-overlay-note';
+    note.textContent = 'הנתונים המלאים נשארים מחוץ למסך הראשי כדי שהתרגול עצמו יישאר במרכז.';
+    wrapper.appendChild(note);
+    return wrapper;
+}
+
+function buildRapidPatternExplanationOverlayContent() {
+    const wrapper = document.createElement('article');
+    wrapper.className = 'shell-overlay-content rapid-radar-overlay-content';
+    const cue = rapidPatternArenaState.currentCue;
+
+    if (!cue) {
+        wrapper.innerHTML = `
+            <p class="shell-overlay-kicker">הסבר</p>
+            <h4>עדיין אין שאלה פעילה</h4>
+            <p class="shell-overlay-note">התחילו סבב כדי לקבל הסבר ממוקד על המשפט הנוכחי.</p>
+        `;
+        return wrapper;
+    }
+
+    const label = getRapidPatternLabel(normalizeRapidPatternId(cue.patternId));
+    const meta = RAPID_PATTERN_BUTTONS.find((item) => item.id === normalizeRapidPatternId(cue.patternId));
+    const quote = document.createElement('blockquote');
+    quote.className = 'rapid-radar-overlay-quote';
+    quote.textContent = cue.monologue || '';
+
+    wrapper.innerHTML = `
+        <p class="shell-overlay-kicker">הסבר</p>
+        <h4>${escapeHtml(label)}</h4>
+        <p>הטריגר כאן הוא "${escapeHtml(cue.highlight || 'הביטוי המודגש')}", והוא מכוון לתבנית הזאת.</p>
+        <p class="shell-overlay-note">${escapeHtml(meta?.hint || 'שימו לב לאופן שבו המשפט מציג הנחה, הכללה או קשר אוטומטי.')}</p>
+    `;
+    wrapper.appendChild(quote);
+    return wrapper;
+}
+
+function openRapidPatternHelpOverlay() {
+    openRapidPatternOverlay({
+        type: 'rapid-pattern-help',
+        title: 'עזרה',
+        size: 'md',
+        content: buildRapidPatternHelpOverlayContent()
+    });
+}
+
+function openRapidPatternStatsOverlay() {
+    openRapidPatternOverlay({
+        type: 'rapid-pattern-stats',
+        title: 'נתונים',
+        size: 'md',
+        content: buildRapidPatternStatsOverlayContent()
+    });
+}
+
+function openRapidPatternExplanationOverlay() {
+    openRapidPatternOverlay({
+        type: 'rapid-pattern-explanation',
+        title: 'למה זו התשובה',
+        size: 'md',
+        content: buildRapidPatternExplanationOverlayContent()
+    });
+}
+
+function openRapidPatternMenuOverlay() {
+    const wrapper = document.createElement('article');
+    wrapper.className = 'shell-overlay-content rapid-radar-overlay-content';
+    wrapper.innerHTML = `
+        <p class="shell-overlay-kicker">כלים</p>
+        <h4>פעולות משניות</h4>
+        <p class="shell-overlay-note">פותחים מכאן רק מה שצריך, בלי להעמיס על משטח התרגול.</p>
+    `;
+
+    const actions = document.createElement('div');
+    actions.className = 'shell-overlay-actions rapid-radar-overlay-actions';
+
+    const addAction = (label, className, handler) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = className;
+        button.textContent = label;
+        button.addEventListener('click', () => {
+            handler();
+        });
+        actions.appendChild(button);
+    };
+
+    addAction('עזרה', 'btn btn-secondary', () => {
+        window.MetaOverlayProvider?.closeOverlay('rapid-pattern-menu');
+        openRapidPatternHelpOverlay();
+    });
+    addAction('נתונים', 'btn btn-secondary', () => {
+        window.MetaOverlayProvider?.closeOverlay('rapid-pattern-menu');
+        openRapidPatternStatsOverlay();
+    });
+
+    if (rapidPatternArenaState.currentCue && (rapidPatternArenaState.roundResolved || rapidPatternArenaState.sessionCompleted)) {
+        addAction('הסבר', 'btn btn-secondary', () => {
+            window.MetaOverlayProvider?.closeOverlay('rapid-pattern-menu');
+            openRapidPatternExplanationOverlay();
+        });
+    }
+
+    if (rapidPatternArenaState.mode !== 'exam' && rapidPatternArenaState.sessionStarted && !rapidPatternArenaState.sessionCompleted) {
+        addAction(rapidPatternArenaState.paused ? 'המשך' : 'עצור', 'btn btn-secondary', () => {
+            toggleRapidPatternPause();
+            window.MetaOverlayProvider?.closeOverlay('rapid-pattern-menu');
+        });
+    }
+
+    addAction(audioState.muted ? 'הפעל צליל' : 'השתק צליל', 'btn btn-secondary', () => {
+        toggleAudioMute();
+        window.MetaOverlayProvider?.closeOverlay('rapid-pattern-menu');
+    });
+
+    addAction(
+        rapidPatternArenaState.sessionCompleted ? 'תרגול חדש' : 'התחל מחדש',
+        'btn btn-primary',
+        () => {
+            window.MetaOverlayProvider?.closeOverlay('rapid-pattern-menu');
+            resetRapidPatternToSetup({ preservePrefs: true });
+        }
+    );
+
+    wrapper.appendChild(actions);
+    openRapidPatternOverlay({
+        type: 'rapid-pattern-menu',
+        title: 'כלים',
+        size: 'sm',
+        content: wrapper
+    });
+}
+
 function setupRapidPatternArena() {
     const root = document.getElementById('rapid-pattern-arena');
     if (!root || root.dataset.rapidBound === 'true') return;
@@ -8858,6 +9201,9 @@ function setupRapidPatternArena() {
 
     rapidPatternArenaState.elements = {
         root,
+        prestart: document.getElementById('rapid-radar-prestart'),
+        liveShell: document.getElementById('rapid-radar-live-shell'),
+        sessionNote: document.getElementById('rapid-session-note'),
         typeSelect: document.getElementById('rapid-case-type'),
         timeLimit: document.getElementById('rapid-time-limit'),
         timeLimitValue: document.getElementById('rapid-time-limit-value'),
@@ -8882,11 +9228,30 @@ function setupRapidPatternArena() {
         aiFeedback: document.getElementById('rapid-ai-feedback'),
         helpPanel: document.getElementById('rapid-help-panel'),
         helpContent: document.getElementById('rapid-help-content'),
+        openHelpBtn: document.getElementById('rapid-open-help-prestart'),
+        openStatsBtn: document.getElementById('rapid-open-stats-prestart'),
+        openMenuBtn: document.getElementById('rapid-open-menu'),
+        compactRound: document.getElementById('rapid-compact-round'),
+        compactCorrect: document.getElementById('rapid-compact-correct'),
+        compactStreak: document.getElementById('rapid-compact-streak'),
+        feedbackShell: document.getElementById('rapid-radar-feedback-shell'),
+        resultCard: document.getElementById('rapid-result-card'),
+        feedbackTitle: document.getElementById('rapid-feedback-title'),
+        feedbackBody: document.getElementById('rapid-feedback-body'),
+        openExplanationBtn: document.getElementById('rapid-open-explanation'),
+        nextBtn: document.getElementById('rapid-next-btn'),
+        skipBtn: document.getElementById('rapid-skip-btn'),
         explainModal: document.getElementById('rapid-explain-modal'),
         explainCloseBtn: document.getElementById('rapid-explain-close-btn'),
         explainConfirmBtn: document.getElementById('rapid-explain-confirm-btn')
     };
 
+    rapidPatternArenaState.sessionStarted = false;
+    rapidPatternArenaState.sessionCompleted = false;
+    rapidPatternArenaState.roundResolved = false;
+    rapidPatternArenaState.feedbackTone = 'info';
+    rapidPatternArenaState.feedbackTitle = '';
+    rapidPatternArenaState.feedbackBody = '';
     const timeLimit = Number(rapidPatternArenaState.elements.timeLimit?.value || 12);
     rapidPatternArenaState.timeLimitSec = Number.isFinite(timeLimit) ? Math.max(6, Math.min(25, timeLimit)) : 12;
     updateRapidPatternTimeLabel();
@@ -8899,7 +9264,7 @@ function setupRapidPatternArena() {
     }
     setRapidPatternTrafficLight('green');
     updateRapidPatternScoreboard();
-    setRapidPatternFeedback('ממתין לתחילת סבב...', 'info');
+    setRapidPatternFeedback('בחרו מצב ותחום, ואז לחצו "התחל".', 'info');
     setRapidPatternButtonsDisabled(true);
     setRapidPatternPauseButtonState(false, false);
     setRapidPatternHelpButtonState(false);
@@ -8908,6 +9273,7 @@ function setupRapidPatternArena() {
     hideRapidPatternHelpPanel();
     hideRapidPatternExplanation({ resumeIfNeeded: false });
     setRapidPatternFocusMode(false);
+    clearRapidPatternRoundFeedback();
 
     const savedMode = localStorage.getItem(RAPID_PATTERN_MODE_STORAGE_KEY) || 'learning';
     setRapidPatternMode(savedMode, { persist: false, announce: false });
@@ -8931,21 +9297,31 @@ function setupRapidPatternArena() {
             hideRapidPatternExplanation({ resumeIfNeeded: true });
         }
     });
+    rapidPatternArenaState.elements.openHelpBtn?.addEventListener('click', openRapidPatternHelpOverlay);
+    rapidPatternArenaState.elements.openStatsBtn?.addEventListener('click', openRapidPatternStatsOverlay);
+    rapidPatternArenaState.elements.openMenuBtn?.addEventListener('click', openRapidPatternMenuOverlay);
+    rapidPatternArenaState.elements.openExplanationBtn?.addEventListener('click', openRapidPatternExplanationOverlay);
+    rapidPatternArenaState.elements.nextBtn?.addEventListener('click', handleRapidPatternNextAction);
+    rapidPatternArenaState.elements.skipBtn?.addEventListener('click', skipRapidPatternCue);
     document.addEventListener('keydown', handleRapidPatternGlobalKeydown);
     rapidPatternArenaState.elements.timeLimit?.addEventListener('input', () => {
         const value = Number(rapidPatternArenaState.elements.timeLimit?.value || 12);
         rapidPatternArenaState.timeLimitSec = Number.isFinite(value) ? Math.max(6, Math.min(25, value)) : 12;
         updateRapidPatternTimeLabel();
+        updateRapidPatternScoreboard();
+        updateRapidPatternSessionNote();
     });
     rapidPatternArenaState.elements.typeSelect?.addEventListener('change', () => {
         if (!rapidPatternArenaState.active && !rapidPatternArenaState.paused) {
             renderRapidPatternIdlePreview();
         }
+        updateRapidPatternSessionNote();
     });
     rapidPatternArenaState.elements.modeLearningBtn?.addEventListener('click', () => setRapidPatternMode('learning'));
     rapidPatternArenaState.elements.modeExamBtn?.addEventListener('click', () => setRapidPatternMode('exam'));
     rapidPatternArenaState.elements.buttons?.addEventListener('click', handleRapidPatternButtonClick);
     renderRapidPatternIdlePreview();
+    updateRapidPatternLayoutState();
 }
 
 function updateRapidPatternTimeLabel() {
@@ -8982,11 +9358,14 @@ function setRapidPatternMode(mode = 'learning', { persist = true, announce = tru
     }
     if (modeNote) {
         modeNote.textContent = isLearning
-            ? 'למידה: אפשר לעצור ולקבל HELP.'
-            : 'מבחן: אין עצירה ואין HELP.';
+            ? 'למידה: אפשר לעצור ולקבל עזרה.'
+            : 'מבחן: רצף מהיר בלי עצירה.';
     }
     if (root) {
         root.dataset.rapidMode = resolvedMode;
+    }
+    if (rapidPatternArenaState.elements.startBtn && !rapidPatternArenaState.sessionStarted && !rapidPatternArenaState.sessionCompleted) {
+        rapidPatternArenaState.elements.startBtn.textContent = isLearning ? 'התחל' : 'התחל מבחן';
     }
 
     if (isLearning) {
@@ -8997,8 +9376,10 @@ function setRapidPatternMode(mode = 'learning', { persist = true, announce = tru
         setRapidPatternHelpButtonState(true);
         updateRapidPatternExplainButtonState();
         if (announce) {
-            setRapidPatternFeedback('מצב למידה פעיל: HELP עוצר את הסבב ומציג הסבר.', 'info');
+            setRapidPatternFeedback('מצב לימוד פעיל: אפשר לעצור ולקבל עזרה.', 'info');
         }
+        updateRapidPatternScoreboard();
+        updateRapidPatternSessionNote();
         return;
     }
 
@@ -9011,8 +9392,10 @@ function setRapidPatternMode(mode = 'learning', { persist = true, announce = tru
     setRapidPatternHelpButtonState(false);
     updateRapidPatternExplainButtonState();
     if (announce) {
-        setRapidPatternFeedback('מצב מבחן פעיל: אין עצירה ואין HELP.', 'info');
+        setRapidPatternFeedback('מצב מבחן פעיל: עובדים ברצף בלי עצירה.', 'info');
     }
+    updateRapidPatternScoreboard();
+    updateRapidPatternSessionNote();
 }
 
 function setRapidPatternHelpButtonState(enabled = true) {
@@ -9129,7 +9512,7 @@ function showRapidPatternHelp() {
     if (rapidPatternArenaState.mode === 'exam') return;
 
     if (!rapidPatternArenaState.currentCue) {
-        setRapidPatternFeedback('התחילו סבב ואז לחצו HELP להסבר בזמן אמת.', 'warn');
+        setRapidPatternFeedback('התחילו סבב ואז פתחו עזרה ממוקדת לשאלה הפעילה.', 'warn');
         return;
     }
 
@@ -9147,7 +9530,7 @@ function populateRapidPatternTypes() {
     if (!select) return;
     const selected = select.value || 'random';
     const uniqueTypes = Array.from(new Set(RAPID_PATTERN_CUES.map(item => item.type))).sort((a, b) => a.localeCompare(b, 'he'));
-    select.innerHTML = '<option value="random">רנדומלי</option>';
+    select.innerHTML = '<option value="random">אקראי</option>';
     uniqueTypes.forEach((type) => {
         const option = document.createElement('option');
         option.value = type;
@@ -9176,14 +9559,62 @@ function renderRapidPatternIdlePreview() {
     renderRapidPatternMonologue(cue);
 }
 
+function resetRapidPatternToSetup({ preservePrefs = true } = {}) {
+    stopRapidPatternTimer();
+    clearRapidPatternNextTimer();
+    hideRapidPatternHelpPanel();
+    hideRapidPatternExplanation({ resumeIfNeeded: false });
+    clearRapidPatternAiFeedback();
+    setRapidPatternFocusMode(false);
+
+    rapidPatternArenaState.active = false;
+    rapidPatternArenaState.paused = false;
+    rapidPatternArenaState.sessionStarted = false;
+    rapidPatternArenaState.sessionCompleted = false;
+    rapidPatternArenaState.roundResolved = false;
+    rapidPatternArenaState.pauseReason = '';
+    rapidPatternArenaState.pendingNextCue = false;
+    rapidPatternArenaState.pausedRemainingMs = 0;
+    rapidPatternArenaState.score = 0;
+    rapidPatternArenaState.streak = 0;
+    rapidPatternArenaState.round = 0;
+    rapidPatternArenaState.errors = 0;
+    rapidPatternArenaState.currentCue = null;
+    rapidPatternArenaState.lastCueId = '';
+    rapidPatternArenaState.history = [];
+    rapidPatternArenaState.feedbackTone = 'info';
+    rapidPatternArenaState.feedbackTitle = '';
+    rapidPatternArenaState.feedbackBody = '';
+    if (!preservePrefs) {
+        setRapidPatternMode('learning');
+    }
+
+    if (rapidPatternArenaState.elements.startBtn) {
+        rapidPatternArenaState.elements.startBtn.textContent = rapidPatternArenaState.mode === 'exam' ? 'התחל מבחן' : 'התחל';
+    }
+    setRapidPatternTrafficLight('green');
+    updateRapidPatternScoreboard();
+    setRapidPatternButtonsDisabled(true);
+    setRapidPatternPauseButtonState(false, false);
+    setRapidPatternHelpButtonState(false);
+    updateRapidPatternExplainButtonState();
+    updateRapidPatternTimerVisual(rapidPatternArenaState.timeLimitSec * 1000);
+    setRapidPatternFeedback('בחרו מצב ותחום, ואז לחצו "התחל".', 'info');
+    renderRapidPatternIdlePreview();
+    updateRapidPatternLayoutState();
+}
+
 function startRapidPatternSession() {
     stopRapidPatternTimer();
     clearRapidPatternNextTimer();
     hideRapidPatternExplanation({ resumeIfNeeded: false });
-    setRapidPatternFocusMode(true);
+    setRapidPatternFocusMode(false);
 
     rapidPatternArenaState.active = true;
     rapidPatternArenaState.paused = false;
+    rapidPatternArenaState.sessionStarted = true;
+    rapidPatternArenaState.sessionCompleted = false;
+    rapidPatternArenaState.roundResolved = false;
     rapidPatternArenaState.pauseReason = '';
     rapidPatternArenaState.pendingNextCue = false;
     rapidPatternArenaState.pausedRemainingMs = 0;
@@ -9201,11 +9632,13 @@ function startRapidPatternSession() {
     playUISound('start');
 
     if (rapidPatternArenaState.elements.startBtn) {
-        rapidPatternArenaState.elements.startBtn.textContent = 'איפוס והתחלה מחדש';
+        rapidPatternArenaState.elements.startBtn.textContent = rapidPatternArenaState.mode === 'exam' ? 'התחל מבחן' : 'התחל';
     }
     setRapidPatternPauseButtonState(true, false);
     setRapidPatternHelpButtonState(true);
     updateRapidPatternExplainButtonState();
+    clearRapidPatternRoundFeedback();
+    updateRapidPatternLayoutState({ focusLiveSurface: true });
 
     moveToNextRapidPatternCue();
 }
@@ -9217,7 +9650,7 @@ function setRapidPatternPauseButtonState(enabled, paused = false) {
     btn.disabled = examMode || !enabled;
     btn.classList.toggle('is-hidden', examMode);
     btn.classList.toggle('is-paused', !!paused);
-    btn.textContent = paused ? 'RESUME' : 'PAUSE';
+    btn.textContent = paused ? 'המשך' : 'עצור';
 }
 
 function toggleRapidPatternPause() {
@@ -9240,15 +9673,16 @@ function pauseRapidPatternSession(reason = 'manual') {
     stopRapidPatternTimer();
     clearRapidPatternNextTimer();
     setRapidPatternButtonsDisabled(true);
-    setRapidPatternFeedback('הסבב בהשהיה. לחצו RESUME כדי להמשיך.', 'warn');
+    setRapidPatternFeedback('הסבב בהשהיה. כשתרצו, לחצו על "המשך".', 'warn');
     if (reason === 'help') {
-        setRapidPatternFeedback('HELP פתוח: הסבב בהשהיה. לחצו RESUME כדי להמשיך.', 'warn');
+        setRapidPatternFeedback('העזרה פתוחה. המשיכו כשתהיו מוכנים.', 'warn');
     }
     if (reason === 'explain') {
-        setRapidPatternFeedback('חלון ההסבר פתוח: הסבב בהשהיה. לחצו "הבנתי, ממשיכים" כדי לחזור.', 'warn');
+        setRapidPatternFeedback('ההסבר פתוח. חזרו לתרגול כשתסגרו אותו.', 'warn');
     }
     setRapidPatternPauseButtonState(true, true);
     updateRapidPatternExplainButtonState();
+    updateRapidPatternLayoutState();
 }
 
 function resumeRapidPatternSession() {
@@ -9271,8 +9705,60 @@ function resumeRapidPatternSession() {
     rapidPatternArenaState.pausedRemainingMs = 0;
     setRapidPatternButtonsDisabled(false);
     updateRapidPatternExplainButtonState();
-    setRapidPatternFeedback('המשך סבב: זהה את התבנית לפני שהזמן נגמר.', 'info');
+    setRapidPatternFeedback('המשיכו: זהו את התבנית לפני שנגמר הזמן.', 'info');
     startRapidPatternTimer(resumeMs);
+    updateRapidPatternLayoutState();
+}
+
+function completeRapidPatternRound({ title = '', body = '', tone = 'info' } = {}) {
+    stopRapidPatternTimer();
+    clearRapidPatternNextTimer();
+    rapidPatternArenaState.active = false;
+    rapidPatternArenaState.paused = false;
+    rapidPatternArenaState.pauseReason = '';
+    rapidPatternArenaState.pendingNextCue = false;
+    rapidPatternArenaState.pausedRemainingMs = 0;
+    setRapidPatternButtonsDisabled(true);
+    setRapidPatternPauseButtonState(false, false);
+    setRapidPatternHelpButtonState(false);
+    updateRapidPatternExplainButtonState();
+    setRapidPatternRoundFeedback({ title, body, tone });
+    updateRapidPatternLayoutState({ focusLiveSurface: true });
+}
+
+function handleRapidPatternNextAction() {
+    if (rapidPatternArenaState.sessionCompleted) {
+        resetRapidPatternToSetup({ preservePrefs: true });
+        return;
+    }
+    if (!rapidPatternArenaState.roundResolved) return;
+    moveToNextRapidPatternCue();
+}
+
+function skipRapidPatternCue() {
+    const cue = rapidPatternArenaState.currentCue;
+    if (!rapidPatternArenaState.active || !cue) return;
+
+    rapidPatternArenaState.errors = 2;
+    rapidPatternArenaState.streak = 0;
+    revealRapidPatternCorrectButton(normalizeRapidPatternId(cue.patternId));
+    setRapidPatternTrafficLight('red');
+    recordRapidPatternAttempt({
+        cue,
+        chosenPatternId: '',
+        isCorrect: false,
+        outcome: 'skipped',
+        remainingMs: Math.max(0, rapidPatternArenaState.endsAtMs - Date.now())
+    });
+    updateRapidPatternScoreboard();
+    setRapidPatternFeedback(`דילוג. התשובה: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`, 'warn');
+    playUISound('select_soft');
+    if (finishRapidPatternRoundIfNeeded()) return;
+    completeRapidPatternRound({
+        title: 'דילוג',
+        body: `התשובה הנכונה היא ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`,
+        tone: 'warn'
+    });
 }
 
 function handleRapidPatternButtonClick(event) {
@@ -9328,7 +9814,11 @@ function handleRapidPatternCorrectAnswer(button, cue, resolvedPatternId = '') {
     });
     updateRapidPatternScoreboard();
     if (finishRapidPatternRoundIfNeeded()) return;
-    queueNextRapidPatternCue();
+    completeRapidPatternRound({
+        title: 'נכון',
+        body: `${getRapidPatternLabel(normalizedPatternId)}. מעולה, ממשיכים.`,
+        tone: 'success'
+    });
 }
 
 function handleRapidPatternWrongAnswer(button, cue, chosenPattern = '') {
@@ -9352,7 +9842,11 @@ function handleRapidPatternWrongAnswer(button, cue, chosenPattern = '') {
             remainingMs: Math.max(0, rapidPatternArenaState.endsAtMs - Date.now())
         });
         if (finishRapidPatternRoundIfNeeded()) return;
-        queueNextRapidPatternCue();
+        completeRapidPatternRound({
+            title: 'לא מדויק',
+            body: `התשובה הנכונה היא ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`,
+            tone: 'danger'
+        });
         return;
     }
 
@@ -9382,7 +9876,11 @@ function handleRapidPatternTimeout() {
     playUISound('buzzer');
     updateRapidPatternScoreboard();
     if (finishRapidPatternRoundIfNeeded()) return;
-    queueNextRapidPatternCue();
+    completeRapidPatternRound({
+        title: 'נגמר הזמן',
+        body: `התשובה הנכונה היא ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`,
+        tone: 'danger'
+    });
 }
 
 function queueNextRapidPatternCue() {
@@ -9396,7 +9894,7 @@ function queueNextRapidPatternCue() {
 }
 
 function moveToNextRapidPatternCue() {
-    if (!rapidPatternArenaState.active || rapidPatternArenaState.paused) {
+    if (rapidPatternArenaState.paused) {
         rapidPatternArenaState.pendingNextCue = true;
         return;
     }
@@ -9406,14 +9904,24 @@ function moveToNextRapidPatternCue() {
     hideRapidPatternHelpPanel();
     hideRapidPatternExplanation({ resumeIfNeeded: false });
     rapidPatternArenaState.pendingNextCue = false;
+    rapidPatternArenaState.roundResolved = false;
+    rapidPatternArenaState.sessionStarted = true;
+    rapidPatternArenaState.sessionCompleted = false;
+    rapidPatternArenaState.active = true;
+    rapidPatternArenaState.paused = false;
+    rapidPatternArenaState.pauseReason = '';
+    rapidPatternArenaState.pausedRemainingMs = 0;
+    updateRapidPatternFeedbackCard();
 
     const cue = pickRapidPatternCue();
     if (!cue) {
+        rapidPatternArenaState.active = false;
         setRapidPatternFeedback('לא נמצאו מונולוגים זמינים למסנן שנבחר.', 'warn');
         setRapidPatternButtonsDisabled(true);
         setRapidPatternPauseButtonState(false);
         setRapidPatternHelpButtonState(false);
         updateRapidPatternExplainButtonState();
+        updateRapidPatternLayoutState({ focusLiveSurface: true });
         return;
     }
 
@@ -9427,6 +9935,7 @@ function moveToNextRapidPatternCue() {
     updateRapidPatternExplainButtonState();
     renderRapidPatternMonologue(cue);
     setRapidPatternFeedback('זהו/י את התבנית של הביטוי המודגש.', 'info');
+    updateRapidPatternLayoutState({ focusLiveSurface: true });
     startRapidPatternTimer(null);
 }
 
@@ -9544,6 +10053,9 @@ function finishRapidPatternRoundIfNeeded() {
     clearRapidPatternNextTimer();
     rapidPatternArenaState.active = false;
     rapidPatternArenaState.paused = false;
+    rapidPatternArenaState.sessionStarted = true;
+    rapidPatternArenaState.sessionCompleted = true;
+    rapidPatternArenaState.roundResolved = true;
     rapidPatternArenaState.pauseReason = '';
     rapidPatternArenaState.pendingNextCue = false;
     rapidPatternArenaState.pausedRemainingMs = 0;
@@ -9554,11 +10066,17 @@ function finishRapidPatternRoundIfNeeded() {
     setRapidPatternHelpButtonState(false);
     updateRapidPatternExplainButtonState();
     setRapidPatternTrafficLight('green');
-    setRapidPatternFeedback(`סיכום AI אחרי ${RAPID_PATTERN_FEEDBACK_INTERVAL} שאלות.`, 'info');
+    const correctCount = getRapidPatternCorrectCount();
+    setRapidPatternFeedback(`הסבב הושלם. ${correctCount}/${rapidPatternArenaState.history.length} נכונות.`, 'info');
     if (rapidPatternArenaState.elements.startBtn) {
-        rapidPatternArenaState.elements.startBtn.textContent = `התחל ${RAPID_PATTERN_FEEDBACK_INTERVAL} שאלות חדשות`;
+        rapidPatternArenaState.elements.startBtn.textContent = 'תרגול חדש';
     }
     renderRapidPatternAiFeedback();
+    setRapidPatternRoundFeedback({
+        title: 'הסבב הושלם',
+        body: `${correctCount}/${Math.max(1, rapidPatternArenaState.history.length)} נכונות. אפשר לפתוח נתונים או להתחיל שוב.`,
+        tone: 'info'
+    });
     return true;
 }
 
@@ -9639,7 +10157,7 @@ function buildRapidPatternAiFeedbackHtml(history) {
         <p class="rapid-ai-title">מה חסר או בעייתי כרגע</p>
         ${missesHtml}
         <p class="rapid-ai-summary">${escapeHtml(missingFocus)}</p>
-        <p class="rapid-ai-summary">להמשך: לחצו "איפוס והתחלה מחדש" לעוד בלוק של ${RAPID_PATTERN_FEEDBACK_INTERVAL} שאלות.</p>
+        <p class="rapid-ai-summary">להמשך: פתחו תרגול חדש לעוד בלוק של ${RAPID_PATTERN_FEEDBACK_INTERVAL} שאלות.</p>
     `;
 }
 
@@ -9737,9 +10255,25 @@ function updateRapidPatternScoreboard() {
     const scoreEl = rapidPatternArenaState.elements.score;
     const streakEl = rapidPatternArenaState.elements.streak;
     const roundEl = rapidPatternArenaState.elements.round;
+    const compactRoundEl = rapidPatternArenaState.elements.compactRound;
+    const compactCorrectEl = rapidPatternArenaState.elements.compactCorrect;
+    const compactStreakEl = rapidPatternArenaState.elements.compactStreak;
+    const correctCount = getRapidPatternCorrectCount();
     if (scoreEl) scoreEl.textContent = String(rapidPatternArenaState.score);
     if (streakEl) streakEl.textContent = String(rapidPatternArenaState.streak);
     if (roundEl) roundEl.textContent = String(rapidPatternArenaState.round);
+    if (compactRoundEl) {
+        const visibleRound = rapidPatternArenaState.round > 0 ? rapidPatternArenaState.round : 0;
+        compactRoundEl.textContent = `שאלה ${visibleRound}/${RAPID_PATTERN_FEEDBACK_INTERVAL}`;
+    }
+    if (compactCorrectEl) {
+        compactCorrectEl.textContent = `נכון ${correctCount}`;
+    }
+    if (compactStreakEl) {
+        compactStreakEl.textContent = rapidPatternArenaState.mode === 'exam'
+            ? `זמן ${rapidPatternArenaState.timeLimitSec}ש׳`
+            : `רצף ${rapidPatternArenaState.streak}`;
+    }
 }
 
 function getRapidPatternLabel(patternId) {

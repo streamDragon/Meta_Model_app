@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.197" data-build-time="1772925791717" data-build-iso="2026-03-07T23:23:11.717Z" data-git-commit="8cad01a">
+<html lang="he" dir="rtl" data-app-version="1.0.198" data-build-time="1772928438506" data-build-iso="2026-03-08T00:07:18.506Z" data-git-commit="d9ba36b">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1167,64 +1167,64 @@
                             <h3>2. מכ״ם מטה-מודל</h3>
                             <p>זיהוי מהיר של תבניות בזמן, עם ניקוד ורמזור טעויות.</p>
                         </div>
-                        <div id="rapid-pattern-arena" class="card rapid-pattern-card">
-                            <div class="rapid-pattern-header">
-                                <h3>⚡ מכ״ם מטה-מודל: מונולוג + תבנית</h3>
-                                <small>המילה/ביטוי המודגש הוא הטריגר. לחצו על אחת מ-15 התבניות לפני שנגמר הזמן.</small>
-                            </div>
+                        <div id="rapid-pattern-arena" class="card rapid-pattern-card" data-stage="setup">
+                            <div id="rapid-radar-prestart" class="rapid-radar-prestart">
+                                <div class="rapid-radar-header">
+                                    <h3>מכ״ם מטה-מודל</h3>
+                                    <small>קוראים את המשפט ולוחצים על התבנית של הביטוי המודגש.</small>
+                                </div>
 
-                            <div class="rapid-pattern-shell">
-                                <aside class="rapid-pattern-side">
+                                <div class="rapid-radar-setup-grid">
                                     <div class="rapid-panel rapid-mode-panel">
                                         <label>מצב</label>
                                         <div class="rapid-mode-switch" role="group" aria-label="בחירת מצב במכ״ם מטה-מודל">
                                             <button id="rapid-mode-learning-btn" type="button" class="rapid-mode-btn is-active">למידה</button>
                                             <button id="rapid-mode-exam-btn" type="button" class="rapid-mode-btn">מבחן</button>
                                         </div>
-                                        <small id="rapid-mode-note" class="rapid-mode-note">למידה: אפשר לעצור ולקבל עזרה.</small>
-                                        <div class="rapid-mode-utility-row">
-                                            <button id="rapid-explain-btn" type="button" class="rapid-inline-btn">הסבר התרגיל</button>
-                                            <button id="rapid-focus-exit-btn" type="button" class="rapid-inline-btn rapid-inline-btn-ghost hidden">יציאה מפוקוס</button>
-                                        </div>
+                                        <small id="rapid-mode-note" class="rapid-mode-note">למידה: עם עצירה ועזרה לפי הצורך.</small>
                                     </div>
 
-                                    <div class="rapid-panel">
-                                        <label for="rapid-case-type">סוג מטופל</label>
+                                    <label class="rapid-panel rapid-radar-field" for="rapid-case-type">
+                                        <span>תחום</span>
                                         <select id="rapid-case-type" class="rapid-control-select">
                                             <option value="random">אקראי</option>
                                         </select>
-                                    </div>
+                                    </label>
 
-                                    <div class="rapid-panel">
-                                        <label for="rapid-time-limit">רמת קושי (זמן): <strong id="rapid-time-limit-value">12</strong> שנ׳</label>
+                                    <label class="rapid-panel rapid-radar-field" for="rapid-time-limit">
+                                        <span>זמן לשאלה: <strong id="rapid-time-limit-value">12</strong> שנ׳</span>
                                         <input id="rapid-time-limit" type="range" min="6" max="25" value="12" />
-                                    </div>
+                                    </label>
+                                </div>
 
-                                    <div class="rapid-panel">
-                                        <label>רמזור טעויות</label>
-                                        <div id="rapid-traffic-light" class="rapid-traffic-light" data-state="green" aria-label="רמזור מצב">
-                                            <span class="rapid-light rapid-light-red" aria-hidden="true"></span>
-                                            <span class="rapid-light rapid-light-yellow" aria-hidden="true"></span>
-                                            <span class="rapid-light rapid-light-green" aria-hidden="true"></span>
-                                        </div>
-                                        <small id="rapid-errors-label">טעויות בשאלה: 0/2</small>
-                                    </div>
+                                <div class="rapid-radar-start-actions">
+                                    <button id="rapid-start-btn" class="btn btn-primary" type="button">התחל</button>
+                                </div>
 
-                                    <div class="rapid-panel rapid-score-panel">
-                                        <p>ניקוד: <strong id="rapid-score">0</strong></p>
-                                        <p>רצף: <strong id="rapid-streak">0</strong></p>
-                                        <p>שאלה: <strong id="rapid-round">0</strong></p>
+                                <div class="rapid-radar-secondary-actions">
+                                    <button id="rapid-open-help-prestart" class="btn btn-secondary" type="button">עזרה</button>
+                                    <button id="rapid-open-stats-prestart" class="btn btn-secondary" type="button">נתונים</button>
+                                </div>
+
+                                <p id="rapid-session-note" class="rapid-session-note" aria-live="polite">בחרו מצב ותחום, ואז לחצו "התחל".</p>
+                            </div>
+
+                            <div id="rapid-radar-live-shell" class="rapid-radar-live-shell hidden">
+                                <div class="rapid-radar-topbar">
+                                    <div class="rapid-radar-progress" aria-live="polite">
+                                        <span id="rapid-compact-round" class="rapid-compact-pill">שאלה 0/10</span>
+                                        <span id="rapid-compact-correct" class="rapid-compact-pill">נכון 0</span>
+                                        <span id="rapid-compact-streak" class="rapid-compact-pill">רצף 0</span>
                                     </div>
-                                    <div class="rapid-actions-row">
-                                        <button id="rapid-start-btn" class="btn btn-primary">התחל סבב</button>
-                                        <button id="rapid-pause-btn" class="btn btn-secondary rapid-pause-btn" disabled>עצור</button>
-                                        <button id="rapid-help-btn" class="btn btn-secondary rapid-help-btn" disabled>עזרה</button>
-                                    </div>
-                                </aside>
+                                    <button id="rapid-open-menu" class="rapid-radar-mini-btn" type="button">כלים</button>
+                                </div>
 
                                 <div class="rapid-pattern-main">
-                                    <div class="rapid-monologue-box">
-                                        <p id="rapid-monologue-text" class="rapid-monologue-text">לחצו על "התחל סבב" כדי להתחיל זיהוי תבניות בזמן אמת.</p>
+                                    <div class="rapid-radar-prompt-card">
+                                        <p class="rapid-radar-prompt-label">זהו/י את התבנית של הביטוי המודגש</p>
+                                        <div class="rapid-monologue-box">
+                                            <p id="rapid-monologue-text" class="rapid-monologue-text">לחצו על "התחל" כדי להתחיל.</p>
+                                        </div>
                                     </div>
 
                                     <div class="rapid-timer-row">
@@ -1234,28 +1234,61 @@
                                         <p id="rapid-feedback" class="rapid-feedback" data-tone="info">ממתין לתחילת סבב...</p>
                                     </div>
 
-                                    <div id="rapid-help-panel" class="rapid-help-panel hidden" aria-live="polite">
-                                        <h4>עזרה · מצב למידה</h4>
-                                        <div id="rapid-help-content"></div>
+                                    <div id="rapid-pattern-buttons" class="rapid-pattern-buttons" role="group" aria-label="כפתורי תבניות"></div>
+
+                                    <div id="rapid-radar-feedback-shell" class="rapid-radar-feedback-shell hidden">
+                                        <div id="rapid-result-card" class="rapid-radar-result" data-tone="info">
+                                            <strong id="rapid-feedback-title" class="rapid-radar-result-title">מה קרה עכשיו</strong>
+                                            <p id="rapid-feedback-body" class="rapid-radar-result-body"></p>
+                                        </div>
+                                        <div class="rapid-radar-feedback-actions">
+                                            <button id="rapid-open-explanation" class="btn btn-secondary hidden" type="button">הסבר</button>
+                                            <button id="rapid-next-btn" class="btn btn-primary" type="button">הבא</button>
+                                        </div>
                                     </div>
 
-                                    <div id="rapid-pattern-buttons" class="rapid-pattern-buttons" role="group" aria-label="כפתורי תבניות"></div>
-                                    <div id="rapid-ai-feedback" class="rapid-ai-feedback hidden" aria-live="polite"></div>
+                                    <div class="rapid-radar-footer-actions">
+                                        <button id="rapid-skip-btn" class="btn btn-secondary" type="button">דלג</button>
+                                    </div>
                                 </div>
+                            </div>
+
+                            <div class="rapid-hidden-controls" aria-hidden="true">
+                                <div id="rapid-traffic-light" class="rapid-traffic-light" data-state="green" aria-label="רמזור מצב">
+                                    <span class="rapid-light rapid-light-red" aria-hidden="true"></span>
+                                    <span class="rapid-light rapid-light-yellow" aria-hidden="true"></span>
+                                    <span class="rapid-light rapid-light-green" aria-hidden="true"></span>
+                                </div>
+                                <small id="rapid-errors-label">טעויות בשאלה: 0/2</small>
+                                <div class="rapid-panel rapid-score-panel">
+                                    <p>ניקוד: <strong id="rapid-score">0</strong></p>
+                                    <p>רצף: <strong id="rapid-streak">0</strong></p>
+                                    <p>שאלה: <strong id="rapid-round">0</strong></p>
+                                </div>
+                                <div class="rapid-actions-row">
+                                    <button id="rapid-pause-btn" class="btn btn-secondary rapid-pause-btn" type="button" disabled>עצור</button>
+                                    <button id="rapid-help-btn" class="btn btn-secondary rapid-help-btn" type="button" disabled>עזרה</button>
+                                    <button id="rapid-explain-btn" type="button" class="rapid-inline-btn">הסבר</button>
+                                    <button id="rapid-focus-exit-btn" type="button" class="rapid-inline-btn rapid-inline-btn-ghost hidden">יציאה מפוקוס</button>
+                                </div>
+                                <div id="rapid-help-panel" class="rapid-help-panel hidden" aria-live="polite">
+                                    <h4>עזרה</h4>
+                                    <div id="rapid-help-content"></div>
+                                </div>
+                                <div id="rapid-ai-feedback" class="rapid-ai-feedback hidden" aria-live="polite"></div>
                             </div>
 
                             <div id="rapid-explain-modal" class="rapid-explain-modal hidden" role="dialog" aria-modal="true" aria-labelledby="rapid-explain-title">
                                 <div class="rapid-explain-dialog">
                                     <button id="rapid-explain-close-btn" type="button" class="rapid-explain-close" aria-label="סגירה">×</button>
-                                    <h4 id="rapid-explain-title">מה עושים במכ״ם מטה-מודל?</h4>
-                                    <p>התרגול מאמן זיהוי מהיר של הפרות מטה-מודל בזמן אמת, ברגע שעולה טריגר לשוני במשפט.</p>
+                                    <h4 id="rapid-explain-title">איך עובדים כאן?</h4>
+                                    <p>מזהים מהר מה הביטוי המודגש מסמן, ולוחצים על התבנית המתאימה.</p>
                                     <ol>
-                                        <li>קוראים את הפסקה (4 שורות) ושמים לב למילה המודגשת.</li>
-                                        <li>מזהים איזה סוג הפרה מופעל כאן מתוך 15 הכפתורים.</li>
-                                        <li>לוחצים מהר ובדיוק לפני שנגמר הזמן.</li>
+                                        <li>קוראים את המשפט ושמים לב לביטוי המודגש.</li>
+                                        <li>בוחרים את התבנית הכי מדויקת מתוך הכפתורים.</li>
+                                        <li>מקבלים משוב קצר וממשיכים לשאלה הבאה.</li>
                                     </ol>
-                                    <p>ההיגיון: לא לנחש כפתור, אלא לבנות רפלקס של <strong>טריגר -> סוג הפרה -> בחירה</strong>.</p>
-                                    <p>בסוף התרגול אמורים לדעת לזהות מהר מה המילה המודגשת מסמנת, ולבחור תבנית מדויקת בלי להתקע.</p>
+                                    <p>המטרה היא לבנות רפלקס של <strong>טריגר -> תבנית -> בחירה</strong>, בלי לנחש.</p>
                                     <div class="rapid-explain-actions">
                                         <button id="rapid-explain-confirm-btn" type="button" class="btn btn-primary">הבנתי, ממשיכים</button>
                                     </div>
