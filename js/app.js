@@ -12080,17 +12080,205 @@ function saveScenarioTrainerProgress() {
     localStorage.setItem(SCENARIO_STORAGE_KEYS.progress, JSON.stringify(scenarioTrainer.progress));
 }
 
+const SCENARIO_OPTION_IDS = Object.freeze(['A', 'B', 'C', 'D']);
+const SCENARIO_TONE_LABELS = Object.freeze({
+    shame: 'בושה והשוואה',
+    comparison: 'השוואה לוחצת',
+    criticism: 'ביקורת אישית',
+    impatient_control: 'שליטה לחוצה',
+    control: 'שליטה לחוצה',
+    over_helping: 'הצלת יתר',
+    rescue: 'הצלת יתר',
+    dismissive_reassurance: 'הרגעה ריקה',
+    global_pressure: 'לחץ כוללני',
+    defensive_attack: 'התגוננות תוקפת',
+    minimize: 'מזעור',
+    shutdown: 'סגירה',
+    false_fix: 'תיקון מדומה',
+    pseudo_apology: 'סליחה חצי-סגורה',
+    stonewall: 'קיר אטום',
+    blame_reversal: 'החזרת אשמה',
+    pseudo_solution: 'פתרון מעורפל',
+    fake_agreement: 'הסכמה בלי בהירות',
+    vague_yes: 'כן בלי תוכן',
+    passive_aggressive: 'עקיצה פסיבית',
+    panic: 'לחץ מיידי',
+    panic_fix: 'תיקון מתוך פאניקה',
+    blame: 'אשמה',
+    false_confidence: 'ביטחון מופרז',
+    collapse: 'קריסה',
+    rage: 'זעם על המערכת',
+    magical_thinking: 'ניחוש',
+    random_guessing: 'ניסוי אקראי',
+    clarify_process: 'שאלה שמדייקת תהליך',
+    contain_and_clarify: 'הרגעה + פירוק',
+    contain_and_sequence: 'סדר צעדים',
+    clear_done_definition: 'הגדרת יעד ברור',
+    validate_and_repair: 'הכרה + תיקון',
+    validate_and_specify: 'תיקוף + דיוק',
+    clarify_deliverable: 'דיוק תוצר',
+    clarify_format_and_ownership: 'פורמט + בעלות',
+    define_done_and_owner: 'הגדרת Done',
+    organize_requirements: 'ארגון דרישות',
+    reduce_ambiguity: 'צמצום עמימות',
+    clarify_required_fields: 'מיון חובה מול עמום',
+    diagnose_then_act: 'אבחון לפני פעולה',
+    smallest_safe_step: 'צעד בטוח קטן',
+    diagnose_scope_first: 'בודקים היקף תקלה',
+    default_red: 'תגובה תחת לחץ',
+    default_green: 'תגובה שמקדמת בהירות'
+});
+
+function normalizeScenarioCopy(value, fallback = '') {
+    return normalizeText(value || fallback);
+}
+
+function scenarioOptionToneLabel(option, isGreen = false) {
+    const tone = normalizeScenarioCopy(option?.tone, isGreen ? 'default_green' : 'default_red');
+    return SCENARIO_TONE_LABELS[tone] || (isGreen ? SCENARIO_TONE_LABELS.default_green : SCENARIO_TONE_LABELS.default_red);
+}
+
+function normalizeScenarioOption(raw, fallbackId, isGreen = false) {
+    const line = normalizeScenarioCopy(raw?.speakerLine || raw?.text || raw?.say, isGreen ? 'בוא נבדוק יחד מה קורה בפועל.' : 'אני מגיב/ה מתוך לחץ.');
+    const why = normalizeScenarioCopy(
+        isGreen ? (raw?.whyItWorks || raw?.feedback) : (raw?.whyItHurts || raw?.feedback),
+        isGreen
+            ? 'התגובה הזו מחזירה את השיחה למה שקורה בפועל ומאפשרת להתחיל לפרק את הבעיה.'
+            : 'התגובה הזו מעבירה את השיחה ללחץ, הגנה או עמימות במקום לבהירות.'
+    );
+    return {
+        ...raw,
+        id: normalizeScenarioCopy(raw?.id, fallbackId),
+        tone: normalizeScenarioCopy(raw?.tone, isGreen ? 'default_green' : 'default_red'),
+        speakerLine: line,
+        text: line,
+        feedback: why,
+        whyItHurts: normalizeScenarioCopy(raw?.whyItHurts, isGreen ? '' : why),
+        whyItWorks: normalizeScenarioCopy(raw?.whyItWorks, isGreen ? why : ''),
+        likelyOtherReply: normalizeScenarioCopy(
+            raw?.likelyOtherReply || raw?.counterReply,
+            isGreen ? 'אוקיי, עכשיו אפשר להבין על מה בדיוק מדברים.' : 'רגע, זה לא באמת עוזר לי להבין מה קורה.'
+        ),
+        type: normalizeScenarioCopy(raw?.type, `${isGreen ? 'green' : 'red'}_${normalizeScenarioCopy(raw?.tone, isGreen ? 'default_green' : 'default_red')}`),
+        score: isGreen ? 1 : 0
+    };
+}
+
+function normalizeScenarioResponseSet(rawScenario) {
+    const responseSet = rawScenario?.responseSet && typeof rawScenario.responseSet === 'object' ? rawScenario.responseSet : {};
+    const legacyOptions = Array.isArray(rawScenario?.options) ? rawScenario.options : [];
+    const legacyRed = legacyOptions.filter(item => Number(item?.score) !== 1).slice(0, 4);
+    const legacyGreen = legacyOptions.find(item => Number(item?.score) === 1);
+    const redPool = Array.isArray(responseSet.red) && responseSet.red.length ? responseSet.red : legacyRed;
+    const red = redPool
+        .slice(0, 4)
+        .map((item, index) => normalizeScenarioOption(item, SCENARIO_OPTION_IDS[index] || String(index + 1), false));
+    const greenSource = responseSet.green || legacyGreen || { speakerLine: rawScenario?.greenSentence };
+    const green = normalizeScenarioOption(greenSource, 'E', true);
+    return {
+        red,
+        green,
+        flat: [...red, green]
+    };
+}
+
+function normalizeScenarioMicroPlan(rawScenario, metaModelCore, greenBlueprint = {}) {
+    return {
+        firstStep: normalizeScenarioCopy(rawScenario?.microPlan?.firstStep || greenBlueprint.firstStep, 'להגדיר צעד ראשון קטן וברור.'),
+        bottleneck: normalizeScenarioCopy(rawScenario?.microPlan?.bottleneck || greenBlueprint.stuckPoint || metaModelCore.hiddenGap, 'עדיין לא ברור איפה בדיוק נוצר הפקק.'),
+        successSign: normalizeScenarioCopy(rawScenario?.microPlan?.successSign || greenBlueprint.doneDefinition, 'יש סימן קטן שאפשר לראות ולבדוק במציאות.')
+    };
+}
+
+function normalizeScenarioTrainerScenario(rawScenario, index, domainLabels = {}) {
+    const scenarioId = normalizeScenarioCopy(rawScenario?.scenarioId || rawScenario?.id, `scenario_${index + 1}`);
+    const role = {
+        player: normalizeScenarioCopy(rawScenario?.role?.player || rawScenario?.expectation?.speaker, 'את/ה'),
+        other: normalizeScenarioCopy(rawScenario?.role?.other, 'הצד השני')
+    };
+    const sceneTitle = normalizeScenarioCopy(rawScenario?.sceneTitle || rawScenario?.title, `סצנה ${index + 1}`);
+    const contextIntro = normalizeScenarioCopy(rawScenario?.contextIntro || rawScenario?.story?.[0], '');
+    const openingLine = normalizeScenarioCopy(rawScenario?.openingLine || rawScenario?.story?.[1], '');
+    const metaModelCore = {
+        unspecifiedVerb: normalizeScenarioCopy(rawScenario?.metaModelCore?.unspecifiedVerb || rawScenario?.unspecifiedVerb || rawScenario?.predicate, 'לעשות את זה'),
+        hiddenGap: normalizeScenarioCopy(rawScenario?.metaModelCore?.hiddenGap || rawScenario?.stuckPointHint, 'עדיין לא ברור מה בדיוק קורה בפועל.'),
+        whyItSticks: normalizeScenarioCopy(rawScenario?.metaModelCore?.whyItSticks || rawScenario?.expectation?.belief, 'הבקשה נשמעת ברורה, אבל בפועל חסר פירוק של מה שקורה.')
+    };
+    const responseSet = normalizeScenarioResponseSet(rawScenario);
+    const rawBlueprint = rawScenario?.greenBlueprint || {};
+    const greenBlueprint = {
+        goal: normalizeScenarioCopy(rawBlueprint.goal, rawScenario?.humanNeed || rawScenario?.surfaceConflict || sceneTitle),
+        firstStep: normalizeScenarioCopy(rawBlueprint.firstStep, rawScenario?.microPlan?.firstStep || ''),
+        steps: (Array.isArray(rawBlueprint.steps) ? rawBlueprint.steps : []).map(item => normalizeScenarioCopy(item)).filter(Boolean).slice(0, 3),
+        stuckPoint: normalizeScenarioCopy(rawBlueprint.stuckPoint, rawScenario?.microPlan?.bottleneck || metaModelCore.hiddenGap),
+        planB: normalizeScenarioCopy(rawBlueprint.planB, ''),
+        doneDefinition: normalizeScenarioCopy(rawBlueprint.doneDefinition, rawScenario?.microPlan?.successSign || '')
+    };
+    const microPlan = normalizeScenarioMicroPlan(rawScenario, metaModelCore, greenBlueprint);
+    const hiddenSteps = (Array.isArray(rawScenario?.hiddenSteps) ? rawScenario.hiddenSteps : [])
+        .map(item => normalizeScenarioCopy(item))
+        .filter(Boolean);
+    if (!hiddenSteps.length && microPlan.firstStep) hiddenSteps.push(microPlan.firstStep);
+    if (!greenBlueprint.firstStep) greenBlueprint.firstStep = microPlan.firstStep;
+    if (!greenBlueprint.steps.length && microPlan.firstStep) greenBlueprint.steps = [microPlan.firstStep];
+    if (!greenBlueprint.doneDefinition) greenBlueprint.doneDefinition = microPlan.successSign;
+    return {
+        ...rawScenario,
+        scenarioId,
+        id: scenarioId,
+        title: sceneTitle,
+        sceneTitle,
+        domain: normalizeScenarioCopy(rawScenario?.domain, 'general'),
+        domainLabel: normalizeScenarioCopy(rawScenario?.domainLabel, domainLabels[normalizeScenarioCopy(rawScenario?.domain, 'general')] || normalizeScenarioCopy(rawScenario?.domain, 'כללי')),
+        difficulty: normalizeScenarioCopy(rawScenario?.difficulty, 'medium'),
+        level: Number(rawScenario?.level || 0) || ({ easy: 1, medium: 2, hard: 3 }[normalizeScenarioCopy(rawScenario?.difficulty, 'medium')] || 2),
+        role,
+        contextIntro,
+        openingLine,
+        humanNeed: normalizeScenarioCopy(rawScenario?.humanNeed, 'יש כאן צורך בקשר ובהירות במקום לחץ.'),
+        surfaceConflict: normalizeScenarioCopy(rawScenario?.surfaceConflict, sceneTitle),
+        metaModelCore,
+        responseSet: {
+            red: responseSet.red,
+            green: responseSet.green
+        },
+        options: responseSet.flat,
+        deepeningQuestion: normalizeScenarioCopy(rawScenario?.deepeningQuestion, 'מה בדיוק קורה כאן בפועל?'),
+        microPlan,
+        greenBlueprint,
+        hiddenSteps,
+        greenSentence: responseSet.green?.speakerLine || '',
+        unspecifiedVerb: metaModelCore.unspecifiedVerb,
+        predicate: metaModelCore.unspecifiedVerb,
+        stuckPointHint: metaModelCore.hiddenGap,
+        expectation: {
+            speaker: role.player,
+            belief: metaModelCore.whyItSticks,
+            pressure: normalizeScenarioCopy(rawScenario?.surfaceConflict, '')
+        },
+        story: [contextIntro, openingLine].filter(Boolean)
+    };
+}
+
 async function loadScenarioTrainerData() {
     try {
         const response = await fetch(resolveVersionedAssetPath('data/scenario-trainer-scenarios.json'));
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = deepNormalizeUiPayload(await response.json());
+        const domains = Array.isArray(data.domains) ? data.domains : [];
+        const domainLabels = domains.reduce((acc, item) => {
+            const id = normalizeScenarioCopy(item?.id);
+            if (id) acc[id] = normalizeScenarioCopy(item?.label, id);
+            return acc;
+        }, {});
         scenarioTrainerData = {
-            domains: Array.isArray(data.domains) ? data.domains : [],
+            domains,
             difficulties: Array.isArray(data.difficulties) ? data.difficulties : [],
-            optionTemplates: data.optionTemplates || { red: [], green: null },
-            consequenceTemplates: data.consequenceTemplates || {},
-            scenarios: Array.isArray(data.scenarios) ? data.scenarios : [],
+            optionTemplates: { red: [], green: null },
+            consequenceTemplates: {},
+            scenarios: Array.isArray(data.scenarios)
+                ? data.scenarios.map((item, index) => normalizeScenarioTrainerScenario(item, index, domainLabels))
+                : [],
             prismWheel: Array.isArray(data.prismWheel) ? data.prismWheel : [],
             safetyKeywords: Array.isArray(data.safetyKeywords) ? data.safetyKeywords : []
         };
@@ -12322,40 +12510,42 @@ function buildScenarioQueue(domainId, difficultyId, runSize) {
 }
 
 function getScenarioOptions(scenario) {
-    if (Array.isArray(scenario?.options) && scenario.options.length >= 5) {
+    if (Array.isArray(scenario?.options) && scenario.options.length) {
         return scenario.options;
     }
+    if (scenario?.responseSet?.green) {
+        const red = Array.isArray(scenario.responseSet.red) ? scenario.responseSet.red : [];
+        return [...red, scenario.responseSet.green];
+    }
+    return [];
+}
 
-    const defaultRed = (scenarioTrainerData.optionTemplates?.red || [
-        { id: 'A', emoji: '😡', text: 'מה הבעיה איתך? אתה עצלן.', type: 'red_identity_blame', score: 0, feedback: 'מאשים זהות במקום למפות ׳—סר.' },
-        { id: 'B', emoji: '🙄', text: 'בגילך כבר הייתי יודע לעשות את זה.', type: 'red_comparison_shame', score: 0, feedback: 'השוואה מעלה בושה ומורידה פתרון.' },
-        { id: 'C', emoji: '🥴', text: 'עזוב, אני אעשה את זה במקום.', type: 'red_overtake', score: 0, feedback: 'לקיחת משימה במקומך מונעת למידה.' },
-        { id: 'D', emoji: '😬', text: 'כן כן, אחר כך נטפל בזה.', type: 'red_avoid_pretend', score: 0, feedback: 'דחייה בלי פירוק מגדילה תקיעות.' }
-    ]).slice(0, 4);
+function buildScenarioMetaCardText(scenario, option, isGreen) {
+    const meta = scenario?.metaModelCore || {};
+    if (isGreen) {
+        return normalizeScenarioCopy(
+            option?.metaModelExplanation,
+            `כאן עברת מהכותרת הכללית "${meta.unspecifiedVerb || 'לעשות את זה'}" אל מה שאפשר לבדוק במציאות. במקום להישאר עם בקשה כללית, השיחה נפתחת אל ${meta.hiddenGap || 'השלב המדויק שבו נתקעים'}`
+        );
+    }
+    return normalizeScenarioCopy(
+        option?.metaModelExplanation,
+        `העמימות נשארת במקום: עדיין לא ברור ${meta.hiddenGap || 'מה בדיוק קורה בפועל'}, ולכן השיחה מחליקה להגנה, האשמה או הימנעות במקום לבדיקה.`
+    );
+}
 
-    const greenTemplate = scenarioTrainerData.optionTemplates?.green || {
-        id: 'E',
-        emoji: '✅🙂',
-        text: 'בוא נפרק: מה ניסית? איפה נתקעת? מה הצעד הראשון?',
-        type: 'green_meta_model',
-        score: 1,
-        feedback: 'מפרק הוראה עמומה לצעדים ניתנים לביצוע.'
+function getScenarioConsequenceLines(scenario, option, isGreen) {
+    const otherLabel = normalizeScenarioCopy(scenario?.role?.other, 'הצד השני');
+    const emotionalLine = isGreen
+        ? `${otherLabel} כנראה שומע כאן ניסיון להבין ולא רק לכבות את הרגע.`
+        : `${otherLabel} כנראה ישמע כאן לחץ, ביטול או התקפה, ולכן ייטה להתכווץ, להתגונן או להתרחק.`;
+    const processLine = isGreen
+        ? `מכאן אפשר לעבור אל השאלה המעשית: ${normalizeScenarioCopy(scenario?.deepeningQuestion, 'מה בדיוק קורה בפועל?')}`
+        : `במקום לפתוח את השלב החסר, השיחה נשארת סביב תגובה אוטומטית והבעיה עצמה נשארת עמומה.`;
+    return {
+        action: normalizeScenarioCopy(option?.feedback, emotionalLine),
+        result: processLine
     };
-
-    const greenText = scenario?.greenSentence || greenTemplate.text;
-    const redOptions = defaultRed.map((option, index) => ({
-        ...option,
-        id: option.id || ['A', 'B', 'C', 'D'][index]
-    }));
-
-    return [
-        ...redOptions,
-        {
-            ...greenTemplate,
-            id: greenTemplate.id || 'E',
-            text: greenText
-        }
-    ];
 }
 
 function startScenarioRun() {
@@ -12422,8 +12612,6 @@ function renderScenarioPlayScreen() {
     const progress = Math.round(((currentIndex - 1) / total) * 100);
     const storyContainer = document.getElementById('scenario-story-lines');
     const optionsContainer = document.getElementById('scenario-options-container');
-    const roleLabel = scenario?.expectation?.speaker || scenario?.role || 'דובר';
-
     const currentIndexEl = document.getElementById('scenario-current-index');
     const totalCountEl = document.getElementById('scenario-total-count');
     const sessionScoreEl = document.getElementById('scenario-session-score');
@@ -12431,22 +12619,34 @@ function renderScenarioPlayScreen() {
     const progressFill = document.getElementById('scenario-progress-fill');
     const roleEl = document.getElementById('scenario-role');
     const titleEl = document.getElementById('scenario-title');
-    const unspecifiedEl = document.getElementById('scenario-unspecified-verb');
+    const contextIntroEl = document.getElementById('scenario-context-intro');
+    const playerRoleEl = document.getElementById('scenario-player-role');
+    const otherRoleEl = document.getElementById('scenario-other-role');
+    const humanNeedEl = document.getElementById('scenario-human-need');
+    const surfaceConflictEl = document.getElementById('scenario-surface-conflict');
+    const openingSpeakerEl = document.getElementById('scenario-opening-speaker');
+    const openingLineEl = document.getElementById('scenario-opening-line');
 
     if (currentIndexEl) currentIndexEl.textContent = String(currentIndex);
     if (totalCountEl) totalCountEl.textContent = String(total);
     if (sessionScoreEl) sessionScoreEl.textContent = String(scenarioTrainer.session.score);
     if (sessionStreakEl) sessionStreakEl.textContent = String(scenarioTrainer.session.streak);
     if (progressFill) progressFill.style.width = `${progress}%`;
-    if (roleEl) roleEl.textContent = `בתפקיד: ${roleLabel}`;
-    if (titleEl) titleEl.textContent = scenario.title || 'סצנה';
-    if (unspecifiedEl) unspecifiedEl.textContent = String(scenario.unspecifiedVerb || 'תעשה את זה').trim();
+    if (roleEl) roleEl.textContent = `${normalizeScenarioCopy(scenario?.domainLabel, 'סצנה')} · בתפקיד ${normalizeScenarioCopy(scenario?.role?.player, 'את/ה')}`;
+    if (titleEl) titleEl.textContent = scenario.sceneTitle || scenario.title || 'סצנה';
+    if (contextIntroEl) contextIntroEl.textContent = normalizeScenarioCopy(scenario?.contextIntro, 'קודם רגע מבינים את הסיטואציה.');
+    if (playerRoleEl) playerRoleEl.textContent = `את/ה: ${normalizeScenarioCopy(scenario?.role?.player, 'את/ה')}`;
+    if (otherRoleEl) otherRoleEl.textContent = `מולך: ${normalizeScenarioCopy(scenario?.role?.other, 'הצד השני')}`;
+    if (humanNeedEl) humanNeedEl.textContent = normalizeScenarioCopy(scenario?.humanNeed, 'יש כאן צורך בקשר ובהירות.');
+    if (surfaceConflictEl) surfaceConflictEl.textContent = normalizeScenarioCopy(scenario?.surfaceConflict, scenario.sceneTitle || scenario.title || '');
+    if (openingSpeakerEl) openingSpeakerEl.textContent = normalizeScenarioCopy(scenario?.role?.other, 'הצד השני');
+    if (openingLineEl) openingLineEl.textContent = normalizeScenarioCopy(scenario?.openingLine, '...'); 
 
     renderScenarioPredicateAnalysis(scenario);
 
     if (storyContainer) {
         storyContainer.innerHTML = '';
-        (scenario.story || []).forEach(line => {
+        (Array.isArray(scenario?.story) ? scenario.story.slice(2) : []).forEach(line => {
             const p = document.createElement('p');
             p.textContent = line;
             storyContainer.appendChild(p);
@@ -12459,8 +12659,11 @@ function renderScenarioPlayScreen() {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = `scenario-option-btn ${String(option.type).includes('green') ? 'green' : 'red'}`;
-            btn.textContent = `${option.emoji || ''} ${option.text || ''}`.trim();
             btn.setAttribute('data-option-id', option.id);
+            btn.innerHTML = [
+                `<span class="scenario-option-kind">${escapeHtml(scenarioOptionToneLabel(option, Number(option.score) === 1))}</span>`,
+                `<span class="scenario-option-main">${escapeHtml(option.text || option.speakerLine || '')}</span>`
+            ].join('');
             btn.addEventListener('click', () => pickScenarioOption(option.id));
             optionsContainer.appendChild(btn);
         });
@@ -12494,9 +12697,19 @@ function pickScenarioOption(optionId) {
 }
 
 function renderScenarioFeedback(option, isGreen) {
+    const scenario = scenarioTrainer.activeScenario || {};
     const mark = document.getElementById('scenario-feedback-mark');
+    const kind = document.getElementById('scenario-feedback-kind');
     const title = document.getElementById('scenario-feedback-title');
     const text = document.getElementById('scenario-feedback-text');
+    const note = document.getElementById('scenario-feedback-note');
+    const choiceBubble = document.getElementById('scenario-feedback-choice-bubble');
+    const otherBubble = document.getElementById('scenario-feedback-other-bubble');
+    const playerLabel = document.getElementById('scenario-feedback-player-label');
+    const otherLabel = document.getElementById('scenario-feedback-other-label');
+    const metaText = document.getElementById('scenario-meta-card-text');
+    const deepeningQuestionEl = document.getElementById('scenario-deepening-question');
+    const metaCard = document.getElementById('scenario-meta-card');
     const consequenceBox = document.getElementById('scenario-consequence-box');
     const consequenceTitle = document.getElementById('scenario-consequence-title');
     const consequenceAction = document.getElementById('scenario-consequence-action');
@@ -12506,12 +12719,23 @@ function renderScenarioFeedback(option, isGreen) {
     if (mark) {
         mark.textContent = isGreen ? '✓' : 'X';
         mark.className = `scenario-feedback-mark ${isGreen ? 'success' : 'fail'}`;
-        // Restart animation each feedback screen.
         void mark.offsetWidth;
         mark.classList.add('animate');
     }
-    if (title) title.textContent = isGreen ? 'בחירה מקדמת' : 'בחירה שמעכבת';
+    if (kind) kind.textContent = isGreen ? 'תגובה שמקדמת קשר ובהירות' : 'תגובה שמכבידה על הקשר ומשאירה עמימות';
+    if (title) title.textContent = isGreen ? 'השיחה מתחילה להיפתח' : 'השיחה עלולה להיסגר כאן';
     if (text) text.textContent = option.feedback || (isGreen ? 'בחרת תגובה שמקדמת פירוק ובהירות.' : 'התגובה שנבחרה משאירה את הסצנה מעורפלת או מאשימה.');
+    if (choiceBubble) choiceBubble.textContent = option.text || option.speakerLine || '';
+    if (otherBubble) otherBubble.textContent = normalizeScenarioCopy(option?.likelyOtherReply, 'הצד השני נשאר בלי תחושת בהירות.');
+    if (choiceBubble?.parentElement) choiceBubble.parentElement.className = `scenario-bubble player selected ${isGreen ? 'green' : 'red'}`;
+    if (playerLabel) playerLabel.textContent = normalizeScenarioCopy(scenario?.role?.player, 'את/ה');
+    if (otherLabel) otherLabel.textContent = normalizeScenarioCopy(scenario?.role?.other, 'הצד השני');
+    if (metaText) metaText.textContent = buildScenarioMetaCardText(scenario, option, isGreen);
+    if (deepeningQuestionEl) deepeningQuestionEl.textContent = normalizeScenarioCopy(scenario?.deepeningQuestion, 'מה בדיוק קורה כאן בפועל?');
+    if (metaCard && 'open' in metaCard) metaCard.open = false;
+    if (note) note.textContent = isGreen
+        ? 'אפשר להמשיך מיד, או לפתוח ניתוח מעמיק כדי להפוך את התגובה הזאת לתוכנית פעולה קצרה.'
+        : 'אפשר להמשיך מיד, או לפתוח ניתוח מעמיק כדי לראות איזו שאלה הייתה פותחת את התקיעות במקום להחריף אותה.';
     if (continueBtn) {
         const isLast = !!scenarioTrainer.session && scenarioTrainer.session.index >= scenarioTrainer.session.queue.length - 1;
         continueBtn.textContent = isLast ? 'סיום הסשן' : 'לסצנה הבאה';
@@ -12523,29 +12747,12 @@ function renderScenarioFeedback(option, isGreen) {
 
 function resolveScenarioConsequence(option, isGreen) {
     const scenario = scenarioTrainer.activeScenario || {};
-    const type = option?.type || '';
-    const direct = scenario?.consequences?.[type];
-    if (direct && typeof direct === 'object') return direct;
-
-    const pool = scenarioTrainerData.consequenceTemplates?.[type];
-    if (Array.isArray(pool) && pool.length) {
-        return pool[0];
-    }
-
-    if (isGreen) {
-        return {
-            icon: '✅',
-            title: 'מה קורה אחרי בחירה ירוקה?',
-            action: 'שואלים שאלת פירוק במקום להאשים.',
-            result: 'המשימה הופכת לצעד ראשון שאפשר לבצע.'
-        };
-    }
-
+    const consequence = getScenarioConsequenceLines(scenario, option, isGreen);
     return {
-        icon: '💥',
-        title: 'מה קורה אם ממשיכים בדרך הישנה?',
-        action: 'ממשיכים לנחש/להאשים בלי לבדוק מה נתקע.',
-        result: 'המשימה נתקעת, הלחץ עולה, ולעיתים נוצרת תקלה אמיתית.'
+        icon: isGreen ? '✓' : '!',
+        title: 'איך זה נחת בצד השני',
+        action: consequence.action,
+        result: consequence.result
     };
 }
 
@@ -12604,15 +12811,26 @@ const SCENARIO_DYNAMIC_QUESTIONS = Object.freeze({
 });
 
 function getScenarioPredicateBaseText(scenario) {
-    const raw = String(scenario?.predicate || scenario?.unspecifiedVerb || '').trim();
+    const raw = String(
+        scenario?.metaModelCore?.unspecifiedVerb ||
+        scenario?.predicate ||
+        scenario?.unspecifiedVerb ||
+        ''
+    ).trim();
     return raw || 'לעשות את זה';
 }
 
 function inferScenarioPredicateType(scenario) {
     const predicate = normalizeText(getScenarioPredicateBaseText(scenario));
-    const story = normalizeText((scenario?.story || []).join(' '));
-    const stuck = normalizeText(scenario?.stuckPointHint || '');
-    const belief = normalizeText(scenario?.expectation?.belief || '');
+    const story = normalizeText(
+        [
+            ...(Array.isArray(scenario?.story) ? scenario.story : []),
+            scenario?.contextIntro,
+            scenario?.openingLine
+        ].filter(Boolean).join(' ')
+    );
+    const stuck = normalizeText(scenario?.metaModelCore?.hiddenGap || scenario?.stuckPointHint || '');
+    const belief = normalizeText(scenario?.metaModelCore?.whyItSticks || scenario?.expectation?.belief || '');
     const haystack = `${predicate} ${story} ${stuck} ${belief}`;
 
     if (
@@ -12632,7 +12850,11 @@ function inferScenarioPredicateType(scenario) {
 function resolveScenarioPredicateNormalization(predicate, type, scenario) {
     const normalizedPredicate = normalizeText(predicate);
     const bp = scenario?.greenBlueprint || {};
-    const fallbackMissing = bp.firstStep || (scenario?.hiddenSteps || [])[0] || 'להגדיר ולבצע צעד ראשון ברור';
+    const fallbackMissing =
+        scenario?.microPlan?.firstStep ||
+        bp.firstStep ||
+        (scenario?.hiddenSteps || [])[0] ||
+        'להגדיר ולבצע צעד ראשון ברור';
 
     if (type === 'state') {
         const matched = SCENARIO_STATE_NORMALIZATION_RULES.find((rule) => rule.pattern.test(normalizedPredicate));
@@ -12712,15 +12934,15 @@ function buildScenarioToteSlots(scenario, analysis) {
     const fallbackStep = analysis?.missingAction || bp.firstStep || 'לבחור פעולה קטנה ומדידה';
 
     return {
-        trigger: (scenario?.story || [])[0] || scenario?.title || 'לא זוהה טריגר מפורש',
-        preEvent: (scenario?.story || [])[1] || scenario?.expectation?.pressure || 'לא זוהה אירוע מקדים',
-        evidence: scenario?.stuckPointHint || 'איך רואים שזה קורה בפועל? מה עדות מדידה?',
+        trigger: scenario?.openingLine || (scenario?.story || [])[1] || scenario?.title || 'לא זוהה טריגר מפורש',
+        preEvent: scenario?.contextIntro || (scenario?.story || [])[0] || scenario?.expectation?.pressure || 'לא זוהה אירוע מקדים',
+        evidence: scenario?.metaModelCore?.hiddenGap || scenario?.stuckPointHint || 'איך רואים שזה קורה בפועל? מה עדות מדידה?',
         op1: steps[0] || fallbackStep,
         op2: steps[1] || bp.firstStep || 'להמשיך בצעד שני קצר וברור',
         op3: steps[2] || 'לסגור בדיקה קצרה: מה הושלם ומה עוד ׳—סר',
-        blocker: scenario?.expectation?.belief || bp.stuckPoint || scenario?.stuckPointHint || 'אמונה/כלל שעוצר את ה-Exit',
+        blocker: scenario?.metaModelCore?.whyItSticks || scenario?.expectation?.belief || bp.stuckPoint || scenario?.stuckPointHint || 'אמונה/כלל שעוצר את ה-Exit',
         autoLoop: resolveScenarioAutoLoopText(analysis?.type),
-        exit: bp.doneDefinition || 'יש סימן ביצוע ברור שאפשר לראות ולמדוד'
+        exit: scenario?.microPlan?.successSign || bp.doneDefinition || 'יש סימן ביצוע ברור שאפשר לראות ולמדוד'
     };
 }
 

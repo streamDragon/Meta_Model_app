@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.202" data-build-time="1772933880700" data-build-iso="2026-03-08T01:38:00.700Z" data-git-commit="8c20483">
+<html lang="he" dir="rtl" data-app-version="1.0.203" data-build-time="1772970418958" data-build-iso="2026-03-08T11:46:58.958Z" data-git-commit="76ebb60">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -561,15 +561,34 @@
                         <div class="progress-bar">
                             <div id="scenario-progress-fill" class="progress-fill"></div>
                         </div>
-                        <div class="scenario-story-card">
-                            <div class="scenario-role" id="scenario-role"></div>
-                            <h3 id="scenario-title"></h3>
-                            <div id="scenario-story-lines" class="scenario-story-lines"></div>
-                            <p class="scenario-unspecified-line">הפועל העמום: <strong id="scenario-unspecified-verb"></strong></p>
-                            <div class="scenario-predicate-panel">
-                                <p><strong>סוג הפועל:</strong> <span id="scenario-predicate-type"></span></p>
-                                <p><strong>מה זה אומר בפועל:</strong> <span id="scenario-predicate-normalized"></span></p>
-                                <p><strong>מה יעזור להתקדם:</strong> <span id="scenario-predicate-missing-action"></span></p>
+                        <div class="scenario-chat-shell">
+                            <div class="scenario-scene-card">
+                                <p class="scenario-scene-kicker" id="scenario-role"></p>
+                                <h3 id="scenario-title"></h3>
+                                <p id="scenario-context-intro" class="scenario-context-intro"></p>
+                                <div class="scenario-relationship-row">
+                                    <span id="scenario-player-role" class="scenario-role-chip"></span>
+                                    <span id="scenario-other-role" class="scenario-role-chip other"></span>
+                                </div>
+                                <div class="scenario-scene-meta">
+                                    <div class="scenario-scene-meta-card">
+                                        <span class="label">מה חשוב כאן</span>
+                                        <p id="scenario-human-need"></p>
+                                    </div>
+                                    <div class="scenario-scene-meta-card">
+                                        <span class="label">הקונפליקט הגלוי</span>
+                                        <p id="scenario-surface-conflict"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="scenario-story-card">
+                                <div class="scenario-chat-thread">
+                                    <div class="scenario-bubble other">
+                                        <span class="scenario-bubble-speaker" id="scenario-opening-speaker">הצד השני</span>
+                                        <p id="scenario-opening-line"></p>
+                                    </div>
+                                    <div id="scenario-story-lines" class="scenario-story-lines"></div>
+                                </div>
                             </div>
                         </div>
                         <div id="scenario-comic-stage" class="scenario-comic-stage" hidden>
@@ -589,17 +608,44 @@
 
                     <!-- FEEDBACK -->
                     <div id="scenario-screen-feedback" class="scenario-screen hidden">
-                        <p class="scenario-panel-kicker">משוב קצר</p>
+                        <p class="scenario-panel-kicker">אחרי הבחירה</p>
                         <div id="scenario-feedback-mark" class="scenario-feedback-mark"></div>
-                        <h3 id="scenario-feedback-title"></h3>
-                        <p id="scenario-feedback-text"></p>
+                        <div id="scenario-feedback-summary" class="scenario-feedback-summary-card">
+                            <p id="scenario-feedback-kind" class="scenario-feedback-kind"></p>
+                            <h3 id="scenario-feedback-title"></h3>
+                            <p id="scenario-feedback-text"></p>
+                        </div>
+                        <div class="scenario-feedback-thread">
+                            <div class="scenario-bubble player selected">
+                                <span class="scenario-bubble-speaker" id="scenario-feedback-player-label">התשובה שלך</span>
+                                <p id="scenario-feedback-choice-bubble"></p>
+                            </div>
+                            <div class="scenario-bubble other followup">
+                                <span class="scenario-bubble-speaker" id="scenario-feedback-other-label">התגובה שמולך</span>
+                                <p id="scenario-feedback-other-bubble"></p>
+                            </div>
+                        </div>
                         <div id="scenario-consequence-box" class="scenario-consequence-box hidden">
-                            <h4 id="scenario-consequence-title"></h4>
+                            <h4 id="scenario-consequence-title">איך זה נחת בצד השני</h4>
                             <p id="scenario-consequence-action"></p>
                             <p id="scenario-consequence-result"></p>
                         </div>
+                        <details id="scenario-meta-card" class="scenario-meta-accordion">
+                            <summary>מה היה עמום / מה נפתח כאן</summary>
+                            <div class="scenario-meta-accordion-body">
+                                <p id="scenario-meta-card-text" class="scenario-meta-card-text"></p>
+                                <div class="scenario-predicate-panel">
+                                    <p><strong>הפועל/המהלך העמום:</strong> <span id="scenario-unspecified-verb"></span></p>
+                                    <p><strong>מה נשאר חסר או נפתח כאן:</strong> <span id="scenario-predicate-normalized"></span></p>
+                                    <p><strong>שאלת ההעמקה הבאה:</strong> <span id="scenario-predicate-missing-action"></span></p>
+                                    <p><strong>שאלה מדייקת:</strong> <span id="scenario-deepening-question"></span></p>
+                                </div>
+                                <div id="scenario-predicate-type" class="hidden" aria-hidden="true"></div>
+                            </div>
+                        </details>
+                        <div class="scenario-feedback-note" id="scenario-feedback-note"></div>
                         <div class="scenario-feedback-actions">
-                            <button id="scenario-show-blueprint-btn" class="btn btn-secondary">הסבר מעמיק</button>
+                            <button id="scenario-show-blueprint-btn" class="btn btn-secondary">ניתוח מעמיק</button>
                             <button id="scenario-feedback-continue-btn" class="btn btn-primary">המשך</button>
                         </div>
                     </div>

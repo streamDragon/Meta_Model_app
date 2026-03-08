@@ -24,7 +24,12 @@ type Settings = {
   includeCtxVak: boolean;
 };
 
-const BREEN_GRID_RTL: CategoryCode[][] = [
+const CLASSIC2_SETTINGS_STORAGE_KEY = 'classic2_settings_v1';
+
+// This is the only allowed render order for Classic 2 category UI.
+const CANONICAL_BREEN_ORDER: CategoryCode[] = ['MR', 'CEq', 'CE', 'PRE', 'NOM', 'LP', 'UQ', 'MN', 'MP', 'UV', 'UN', 'COMP', 'DEL', 'CTX', 'VAK'];
+
+const CANONICAL_BREEN_GRID_RTL: CategoryCode[][] = [
   ['MR', 'CEq', 'CE'],
   ['PRE', 'NOM', 'LP'],
   ['UQ', 'MN', 'MP'],
@@ -50,8 +55,6 @@ const CAT: Record<CategoryCode, { he: string; family: FamilyCell; familyHe: stri
   VAK: { he: 'ערוצי חישה', family: 'VAK', familyHe: 'חושי', hint: 'ראייה/שמיעה/תחושה גופנית.' }
 };
 
-const ORDER = BREEN_GRID_RTL.flat();
-
 const CTX_LABEL: Record<FieldCtx, string> = {
   general: 'כללי',
   work: 'עבודה',
@@ -73,6 +76,29 @@ const DEFAULTS: Settings = {
 };
 
 const QUICK: Settings = { ...DEFAULTS, categoryDisplay: 'group', categoryGroup: 'DIS', sentenceCount: 4 };
+
+function loadClassic2Settings(): Settings {
+  if (typeof window === 'undefined') return { ...DEFAULTS };
+  try {
+    const raw = window.localStorage.getItem(CLASSIC2_SETTINGS_STORAGE_KEY);
+    if (!raw) return { ...DEFAULTS };
+    const parsed = JSON.parse(raw) as Partial<Settings>;
+    return {
+      ...DEFAULTS,
+      ...parsed,
+      difficulty: clamp(Number(parsed?.difficulty) || DEFAULTS.difficulty, 1, 5),
+      sentenceCount: clamp(Number(parsed?.sentenceCount) || DEFAULTS.sentenceCount, 3, 8),
+      rounds: parsed?.rounds === 10 || parsed?.rounds === 'infinite' ? parsed.rounds : DEFAULTS.rounds
+    };
+  } catch {
+    return { ...DEFAULTS };
+  }
+}
+
+function saveClassic2Settings(settings: Settings): void {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(CLASSIC2_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+}
 
 const SCENARIOS: Scenario[] = [
   {
@@ -173,42 +199,47 @@ const SCENARIOS: Scenario[] = [
 ];
 
 const CSS = `
-.c2n{direction:rtl;font-family:"Assistant","Rubik","Segoe UI",sans-serif;color:#0f172a;max-width:1180px;margin:0 auto}
-.c2n *{box-sizing:border-box}.c2n-shell{background:radial-gradient(circle at 8% -5%,#cfe4ff,transparent 45%),radial-gradient(circle at 92% 0,#ccf6dd,transparent 45%),linear-gradient(180deg,#f7faff,#fbfffd);border:1px solid #dae4f3;border-radius:22px;padding:14px;box-shadow:0 18px 45px rgba(15,23,42,.07)}
-.c2n h1,.c2n h2,.c2n h3,.c2n h4,.c2n p{margin:0}.c2n-card{background:#ffffffe8;border:1px solid #dde6f3;border-radius:16px;padding:12px}
-.c2n-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}.c2n-title h1{font-size:1.1rem;font-weight:900}.c2n-title p{font-size:.82rem;color:#526173}
-.c2n-actions{display:flex;flex-wrap:wrap;gap:8px}.c2n-btn{border:1px solid transparent;border-radius:12px;padding:10px 12px;font-weight:900;cursor:pointer;font-family:inherit}.c2n-btn:disabled{opacity:.55;cursor:not-allowed}
-.c2n-btn.p{background:#0f4cd6;color:#fff}.c2n-btn.s{background:#e8edf6;color:#0f172a}.c2n-btn.g{background:#fff;border-color:#c8d5ea;color:#173a8a}.c2n-btn.w{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
-.c2n-chip{display:inline-flex;align-items:center;border:1px solid #d7e0ee;background:#fff;border-radius:999px;padding:5px 10px;font-weight:800;font-size:.78rem}
-.c2n-intro{margin-top:12px;display:grid;gap:10px}.c2n-intro p{line-height:1.45;color:#243242}.c2n-help{border:1px dashed #c7d5ea;background:#f9fbff;border-radius:12px;padding:10px;line-height:1.4;color:#31465e}
-.c2n-layout{margin-top:12px;display:grid;grid-template-columns:340px 1fr;gap:12px}.c2n-sub{color:#546579;font-size:.82rem;line-height:1.35}.c2n-cta{margin-top:8px;border:1px solid #cbddff;background:#f3f7ff;border-radius:12px;padding:10px}.c2n-cta strong{display:block;color:#0d3fae}.c2n-cta span{display:block;margin-top:4px;color:#4a5d73;font-size:.82rem}
+.c2n{direction:rtl;font-family:"Assistant","Rubik","Segoe UI",sans-serif;color:#10233e;max-width:1200px;margin:0 auto}
+.c2n *{box-sizing:border-box}.c2n-shell{background:radial-gradient(circle at top right,rgba(245,158,11,.18),transparent 28%),radial-gradient(circle at left top,rgba(59,130,246,.14),transparent 34%),linear-gradient(180deg,#f6f8fc 0%,#fcfdff 100%);border:1px solid #dbe4f0;border-radius:28px;padding:16px;box-shadow:0 28px 60px rgba(15,23,42,.08)}
+.c2n h1,.c2n h2,.c2n h3,.c2n h4,.c2n p{margin:0}.c2n-card{background:rgba(255,255,255,.92);border:1px solid #dde6f2;border-radius:20px;padding:14px;box-shadow:0 16px 36px rgba(15,23,42,.05)}
+.c2n-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}.c2n-title h1{font-size:1.18rem;font-weight:900}.c2n-title p{font-size:.84rem;color:#526173}
+.c2n-actions,.c2n-row-actions,.c2n-main-acts,.c2n-modal-actions,.c2n-seg,.c2n-score,.c2n-meta,.c2n-pillbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.c2n-btn{border:1px solid transparent;border-radius:14px;padding:11px 14px;font-weight:900;cursor:pointer;font-family:inherit;transition:.18s ease}.c2n-btn:hover:not(:disabled){transform:translateY(-1px)}.c2n-btn:disabled{opacity:.55;cursor:not-allowed}
+.c2n-btn.p{background:#1358d3;color:#fff;box-shadow:0 12px 24px rgba(19,88,211,.22)}.c2n-btn.s{background:#eef2f8;color:#0f172a;border-color:#d8e0eb}.c2n-btn.g{background:#ffffff;color:#0f4c81;border-color:#bad4ea}.c2n-btn.w{background:#fff8eb;color:#9a3412;border-color:#fed7aa}
+.c2n-chip{display:inline-flex;align-items:center;border:1px solid #d7e0ee;background:#fff;border-radius:999px;padding:6px 11px;font-weight:800;font-size:.79rem}.c2n-chip.strong{background:#ecfdf5;border-color:#bbf7d0;color:#166534}
+.c2n-sub{color:#5a6c80;font-size:.84rem;line-height:1.45}.c2n-hero{margin-top:14px;display:grid;grid-template-columns:1.1fr .9fr;gap:12px}.c2n-hero-copy{display:grid;gap:10px}.c2n-hero-copy p{line-height:1.65}.c2n-kicker{font-size:.8rem;font-weight:900;color:#0f4c81;letter-spacing:.04em}
+.c2n-start-strip{display:grid;gap:12px;border:1px solid #d7e5f5;background:linear-gradient(180deg,#ffffff 0%,#f7fbff 100%);border-radius:22px;padding:16px}.c2n-start-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.c2n-start-summary{display:inline-flex;align-items:center;min-height:42px;padding:0 14px;border-radius:999px;background:#f8fafc;border:1px solid #dce5f1;font-weight:800;color:#334155}
+.c2n-step-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.c2n-step{border:1px dashed #cfdceb;border-radius:16px;background:#fcfdff;padding:12px}.c2n-step strong{display:block;margin-bottom:4px;font-size:.84rem}
+.c2n-help{border:1px dashed #d3deec;background:#fbfdff;border-radius:16px;padding:12px;line-height:1.55;color:#334155}
+.c2n-layout{margin-top:14px;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.85fr);gap:14px;align-items:start}.c2n-main,.c2n-sidebar{display:grid;gap:12px}
+.c2n-text-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:flex-start}.c2n-target{border:1px solid #d7e4f2;background:#f9fbff;border-radius:16px;padding:12px}.c2n-target p{margin-top:6px;color:#45596f;font-size:.86rem;line-height:1.45}
 .c2n-grid{display:grid;gap:8px;margin-top:10px}.c2n-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;direction:rtl}.c2n-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
-.c2n-cat{width:100%;text-align:right;border:1px solid #dbe5f2;background:#fff;border-radius:14px;padding:9px;display:grid;gap:6px;cursor:pointer;min-height:92px}.c2n-cat:hover:not(:disabled){border-color:#98b9ff;background:#f9fbff}.c2n-cat:disabled{opacity:.58;cursor:not-allowed}.c2n-cat.sel{border-color:#0f4cd6;background:#eaf1ff;box-shadow:0 0 0 2px rgba(15,76,214,.12)}
+.c2n-cat{width:100%;text-align:right;border:1px solid #dbe5f2;background:#fff;border-radius:16px;padding:10px;display:grid;gap:6px;cursor:pointer;min-height:96px;transition:.18s ease}.c2n-cat:hover:not(:disabled){border-color:#93b8ff;background:#f9fbff}.c2n-cat:disabled{opacity:.58;cursor:not-allowed}.c2n-cat.sel{border-color:#1358d3;background:#eaf1ff;box-shadow:0 0 0 2px rgba(19,88,211,.11)}
 .c2n-cat-top{display:flex;justify-content:space-between;gap:8px}.c2n-code{background:#eef3ff;color:#1d4ed8;border-radius:999px;padding:2px 8px;font-weight:900;font-size:.74rem}.c2n-fam{color:#64748b;font-size:.73rem;font-weight:700}.c2n-name{font-size:.82rem;font-weight:800;line-height:1.25}.c2n-badge{width:max-content;border-radius:999px;padding:2px 8px;font-weight:800;font-size:.68rem}.c2n-badge.ok{background:#ecfdf5;color:#0f766e}.c2n-badge.off{background:#f4f6fb;color:#64748b}
-.c2n-text-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}.c2n-meta{display:flex;flex-wrap:wrap;gap:6px}.c2n-target{margin-top:10px;border:1px dashed #c6d6ee;background:#f9fbff;border-radius:12px;padding:10px}.c2n-target p{margin-top:4px;color:#45596f;font-size:.84rem;line-height:1.35}
-.c2n-sents{margin-top:10px;display:grid;gap:8px}.c2n-sent{width:100%;text-align:right;border:1px solid #dce5f2;background:#fff;border-radius:14px;padding:10px 12px;display:grid;gap:6px;cursor:pointer}.c2n-sent:hover:not(:disabled){border-color:#9bbcff;background:#f9fbff}.c2n-sent:disabled{opacity:.75;cursor:not-allowed}
-.c2n-sent-top{display:flex;justify-content:space-between;gap:8px;font-size:.75rem;font-weight:900;color:#4e647c}.c2n-sent-text{font-weight:700;line-height:1.45}.c2n-sent.sel{border-color:#0f4cd6;background:#eaf1ff}.c2n-sent.good{border-color:#86efac;background:#f0fdf4}.c2n-sent.bad{border-color:#fca5a5;background:#fff5f5}
-.c2n-row-actions{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}.c2n-fb{margin-top:10px;border-radius:12px;padding:10px 12px;border:1px solid;font-weight:800;line-height:1.4}.c2n-fb.info{background:#eef4ff;border-color:#c8d8fb;color:#1e3a8a}.c2n-fb.success{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}.c2n-fb.error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
-.c2n-hint{margin-top:10px;border:1px dashed #c9d8ef;background:#f9fbff;border-radius:12px;padding:10px;display:grid;gap:6px}.c2n-hint p{font-size:.84rem;line-height:1.4;color:#334155}
-.c2n-foot{margin-top:12px;border:1px dashed #cad8ec;background:#fbfdff;border-radius:14px;padding:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;align-items:center}.c2n-score{display:flex;flex-wrap:wrap;gap:8px}
-.c2n-empty{margin-top:12px;border:1px dashed #cad8ec;background:#fbfdff;border-radius:16px;padding:18px;display:grid;gap:10px;text-align:center}.c2n-empty p{color:#4d5e73}
-.c2n-overlay{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.45);backdrop-filter:blur(4px);display:flex;justify-content:center;align-items:flex-start;padding:16px;overflow:auto}.c2n-modal{width:min(880px,100%);background:#fff;border:1px solid #dde6f2;border-radius:20px;padding:14px;display:grid;gap:12px;box-shadow:0 28px 70px rgba(15,23,42,.22)}
-.c2n-modal-head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:flex-start}.c2n-modal-head h2{font-size:1.05rem;font-weight:900}.c2n-modal-head p{margin-top:4px;font-size:.84rem;color:#536579;line-height:1.35}
-.c2n-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.c2n-field{border:1px solid #dde6f2;background:#fbfdff;border-radius:14px;padding:10px;display:grid;gap:8px}.c2n-field h3{font-size:.9rem;font-weight:900}
-.c2n-radio{display:flex;gap:8px;align-items:flex-start;border:1px solid #e3eaf5;background:#fff;border-radius:10px;padding:8px}.c2n-radio input{margin-top:3px}.c2n-radio strong{display:block;font-size:.83rem}.c2n-radio span{display:block;color:#64748b;font-size:.75rem;line-height:1.3}.c2n-radio.dim{opacity:.55}
-.c2n-seg{display:flex;flex-wrap:wrap;gap:6px}.c2n-seg .c2n-btn{padding:8px 10px;border-radius:999px}.c2n-toggle{display:flex;gap:8px;align-items:center;font-weight:700;font-size:.84rem}.c2n-range{width:100%}.c2n-modal-actions{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}.c2n-main-acts{display:flex;gap:8px;flex-wrap:wrap}
-@media (max-width:980px){.c2n-layout{grid-template-columns:1fr}.c2n-form{grid-template-columns:1fr}}
-@media (max-width:640px){.c2n-overlay{padding:10px}.c2n-row{grid-template-columns:1fr}.c2n-list{grid-template-columns:1fr}.c2n-actions,.c2n-row-actions,.c2n-main-acts,.c2n-modal-actions,.c2n-seg{display:grid;grid-template-columns:1fr}.c2n-btn{width:100%}}
+.c2n-sents{display:grid;gap:10px}.c2n-sent{width:100%;text-align:right;border:1px solid #dce5f2;background:#fff;border-radius:18px;padding:12px 13px;display:grid;gap:8px;cursor:pointer;transition:.18s ease}.c2n-sent:hover:not(:disabled){border-color:#9bbcff;background:#f9fbff}.c2n-sent:disabled{opacity:.75;cursor:not-allowed}
+.c2n-sent-top{display:flex;justify-content:space-between;gap:8px;font-size:.75rem;font-weight:900;color:#4e647c}.c2n-sent-text{font-weight:700;line-height:1.55}.c2n-sent.sel{border-color:#1358d3;background:#eaf1ff}.c2n-sent.good{border-color:#86efac;background:#f0fdf4}.c2n-sent.bad{border-color:#fca5a5;background:#fff5f5}
+.c2n-fb{border-radius:16px;padding:12px 13px;border:1px solid;font-weight:800;line-height:1.5}.c2n-fb.info{background:#eef4ff;border-color:#c8d8fb;color:#1e3a8a}.c2n-fb.success{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}.c2n-fb.error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+.c2n-hint,.c2n-summary-card{border:1px dashed #c9d8ef;background:#fbfdff;border-radius:16px;padding:12px;display:grid;gap:6px}.c2n-hint p{font-size:.84rem;line-height:1.45;color:#334155}
+.c2n-foot{border:1px dashed #cad8ec;background:#fbfdff;border-radius:18px;padding:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;align-items:center}.c2n-kv{display:grid;gap:6px}.c2n-kv b{font-size:.8rem;color:#64748b}
+.c2n-empty{margin-top:14px;border:1px dashed #cad8ec;background:#fbfdff;border-radius:20px;padding:18px;display:grid;gap:10px;text-align:center}.c2n-empty p{color:#4d5e73;line-height:1.55}
+.c2n-overlay{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.45);backdrop-filter:blur(4px);display:flex;justify-content:center;align-items:flex-start;padding:16px;overflow:auto}.c2n-modal{width:min(960px,100%);background:#f8fbff;border:1px solid #d9e5f3;border-radius:26px;padding:16px;display:grid;gap:14px;box-shadow:0 28px 70px rgba(15,23,42,.22)}
+.c2n-modal-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}.c2n-modal-head h2{font-size:1.1rem;font-weight:900}.c2n-modal-head p{margin-top:5px;font-size:.86rem;color:#536579;line-height:1.45}
+.c2n-settings-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:12px}.c2n-settings-main,.c2n-settings-side{display:grid;gap:12px}.c2n-group{border:1px solid #d9e5f3;background:#ffffff;border-radius:18px;padding:14px;display:grid;gap:10px}.c2n-group-head{display:grid;gap:4px}.c2n-group-head h3{font-size:.94rem;font-weight:900}
+.c2n-radio{display:flex;gap:8px;align-items:flex-start;border:1px solid #e3eaf5;background:#fff;border-radius:12px;padding:9px}.c2n-radio input{margin-top:3px}.c2n-radio strong{display:block;font-size:.84rem}.c2n-radio span{display:block;color:#64748b;font-size:.76rem;line-height:1.35}.c2n-radio.dim{opacity:.55}
+.c2n-toggle{display:flex;gap:8px;align-items:center;font-weight:700;font-size:.84rem}.c2n-range{width:100%}.c2n-adv{border:1px dashed #c6d4e6;background:#fbfdff;border-radius:16px;padding:12px}.c2n-adv summary{cursor:pointer;font-weight:900;color:#0f4c81}
+.c2n-preview{border:1px solid #cce0f0;background:linear-gradient(180deg,#f0f8ff 0%,#ffffff 100%);border-radius:18px;padding:14px;display:grid;gap:10px}.c2n-preview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.c2n-modal-actions{justify-content:space-between}.c2n-modal-actions .c2n-btn{min-width:120px}
+@media (max-width:980px){.c2n-hero,.c2n-layout,.c2n-settings-grid{grid-template-columns:1fr}.c2n-row{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.c2n-shell{padding:12px}.c2n-overlay{padding:10px}.c2n-row,.c2n-list,.c2n-step-strip,.c2n-preview-grid{grid-template-columns:1fr}.c2n-actions,.c2n-row-actions,.c2n-main-acts,.c2n-modal-actions,.c2n-seg,.c2n-start-actions{display:grid;grid-template-columns:1fr}.c2n-btn,.c2n-start-summary{width:100%}}
 `;
 
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
 const rand = (n: number) => Math.floor(Math.random() * n);
 
 function visibleCategories(s: Settings): CategoryCode[] {
-  if (s.categoryDisplay === 'all') return [...ORDER];
-  const base = ORDER.filter((c) => CAT[c].family === s.categoryGroup);
+  if (s.categoryDisplay === 'all') return [...CANONICAL_BREEN_ORDER];
+  const base = CANONICAL_BREEN_ORDER.filter((c) => CAT[c].family === s.categoryGroup);
   const extra = s.includeCtxVak ? (['CTX', 'VAK'] as CategoryCode[]) : [];
-  return ORDER.filter((c) => [...base, ...extra].includes(c));
+  return CANONICAL_BREEN_ORDER.filter((c) => [...base, ...extra].includes(c));
 }
 
 function scenarioPool(ctx: FieldCtx): Scenario[] {
@@ -239,9 +270,10 @@ const roundsText = (r: RoundsChoice) => (r === 'infinite' ? 'אינסופי' : S
 const rules = (s: Settings) => ({ showPresence: s.difficulty <= 2, exact: s.difficulty >= 4, autoHint: s.difficulty <= 2 });
 
 export default function Classic2Trainer(): React.ReactElement {
-  const [wizardOpen, setWizardOpen] = useState(true);
-  const [draft, setDraft] = useState<Settings>({ ...DEFAULTS });
-  const [settings, setSettings] = useState<Settings>({ ...DEFAULTS });
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [draft, setDraft] = useState<Settings>(() => loadClassic2Settings());
+  const [settings, setSettings] = useState<Settings>(() => loadClassic2Settings());
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -274,6 +306,10 @@ export default function Classic2Trainer(): React.ReactElement {
       window.scrollTo(0, scrollYRef.current);
     };
   }, [wizardOpen]);
+
+  useEffect(() => {
+    saveClassic2Settings(settings);
+  }, [settings]);
 
   const rr = rules(settings);
   const matches = round && selectedCat ? round.sentences.filter((s) => s.tags.includes(selectedCat)).map((s) => s.id) : [];
@@ -311,7 +347,19 @@ export default function Classic2Trainer(): React.ReactElement {
     resetInteraction(r1, normalized);
   };
 
-  const openSettings = () => { setDraft({ ...settings }); setWizardOpen(true); };
+  const applyDraftSettings = (startAfterSave = false) => {
+    const normalized: Settings = { ...draft, difficulty: clamp(draft.difficulty, 1, 5), sentenceCount: clamp(draft.sentenceCount, 3, 8) };
+    setSettings(normalized);
+    setDraft(normalized);
+    setWizardOpen(false);
+    if (startAfterSave) startPractice(normalized);
+  };
+
+  const openSettings = () => {
+    setDraft({ ...settings });
+    setAdvancedOpen(false);
+    setWizardOpen(true);
+  };
 
   const selectCat = (code: CategoryCode) => {
     if (result !== 'pending') return;
@@ -405,7 +453,7 @@ export default function Classic2Trainer(): React.ReactElement {
     if (cfg.categoryDisplay === 'group') {
       return (
         <div className="c2n-list">
-          {ORDER.filter((c) => vis.includes(c)).map((c) => {
+          {CANONICAL_BREEN_ORDER.filter((c) => vis.includes(c)).map((c) => {
             const present = !!round && round.sentences.some((s) => s.tags.includes(c));
             return (
               <button
@@ -427,7 +475,7 @@ export default function Classic2Trainer(): React.ReactElement {
     }
     return (
       <div className="c2n-grid">
-        {BREEN_GRID_RTL.map((row, i) => (
+        {CANONICAL_BREEN_GRID_RTL.map((row, i) => (
           <div key={i} className="c2n-row">
             {row.map((c) => {
               const enabled = vis.includes(c);
@@ -448,130 +496,173 @@ export default function Classic2Trainer(): React.ReactElement {
     );
   };
 
+  const visibleCount = visibleCategories(settings).length;
+  const draftVisibleCount = visibleCategories(draft).length;
+  const displayLabel = settings.categoryDisplay === 'all' ? 'טבלת ברין מלאה' : `קבוצת ${settings.categoryGroup}`;
+  const draftDisplayLabel = draft.categoryDisplay === 'all' ? 'טבלת ברין מלאה' : `קבוצת ${draft.categoryGroup}`;
+  const startSummary = `${settings.sentenceCount} פריטים · ${visibleCount} קטגוריות · ${displayLabel}`;
+  const previewSummary = `${draft.sentenceCount} פריטים · ${draftVisibleCount} קטגוריות · ${draftDisplayLabel}`;
+
   return (
     <div className="c2n" dir="rtl" lang="he">
       <style>{CSS}</style>
       <div className="c2n-shell">
         <div className="c2n-top c2n-card">
           <div className="c2n-title">
-            <h1>Meta-Model Content Trainer</h1>
-            <p>Classic 2 · Structure of Magic</p>
+            <h1>Classic 2 · Structure of Magic</h1>
+            <p>זיהוי קטגוריה, סימון משפטים, ובדיקה מול טבלת ברין קנונית אחת.</p>
           </div>
           <div className="c2n-actions">
-            <button type="button" className="c2n-btn g" onClick={openSettings}>חזרה ל-Settings</button>
-            <span className="c2n-chip">{started ? progressText(roundNo, settings.rounds) : 'טרם התחיל תרגול'}</span>
-            <button type="button" className="c2n-btn s" onClick={() => setHelpOpen((v) => !v)} aria-expanded={helpOpen}>עזרה / איך זה עובד</button>
+            <span className="c2n-chip strong">{started ? progressText(roundNo, settings.rounds) : 'מוכן להתחלה מיידית'}</span>
+            <button type="button" className="c2n-btn g" onClick={openSettings}>הגדרות</button>
+            <button type="button" className="c2n-btn s" onClick={() => setHelpOpen((v) => !v)} aria-expanded={helpOpen}>איך זה עובד</button>
           </div>
         </div>
 
-        <div className="c2n-intro">
-          <section className="c2n-card">
-            <h2 style={{ fontSize: '1rem', fontWeight: 900 }}>מטרת התרגול</h2>
-            <p>בוחרים קטגוריה מהמטה-מודל ולומדים לזהות אותה בתוך טקסט אמיתי. בכל סבב תקבל/י טקסט קצר. תסמן/י איפה הקטגוריה מופיעה או תדווח/י שהיא לא מופיעה בטקסט.</p>
-            <p className="c2n-sub" style={{ marginTop: 8 }}>הסברי קטגוריות מפורטים (רמזים/פירושים) נשארים בדף הזה; בדפי תרגול אחרים טבלת ברין נשמרת נקייה ללחיצה מהירה.</p>
-          </section>
-          {helpOpen && <div className="c2n-help">1) בוחרים קטגוריה. 2) מסמנים משפט/ים (מצב משפטים/צ׳יפים). 3) בודקים תשובה או משתמשים בכפתור "אין את הקטגוריה...". 4) ממשיכים לסבב הבא.</div>}
+        <section className="c2n-hero">
+          <div className="c2n-card c2n-hero-copy">
+            <span className="c2n-kicker">מה עושים כאן?</span>
+            <h2 style={{ fontSize: '1.08rem', fontWeight: 900 }}>מאמנים עין יציבה על קטגוריה אחת בתוך טקסט אמיתי.</h2>
+            <p>בכל סבב בוחרים קטגוריה מתוך טבלת ברין, קוראים טקסט קצר, ומסמנים את כל המשפטים שבהם הקטגוריה באמת מופיעה. הצלחה בסבב היא לא רק "להרגיש שזה שם", אלא לזהות נכון או לדעת לומר בביטחון שאין מופע כזה בטקסט.</p>
+            <div className="c2n-pillbar">
+              <span className="c2n-chip">סדר קנוני קבוע</span>
+              <span className="c2n-chip">ברירות מחדל מוכנות</span>
+              <span className="c2n-chip">מתאים לדסקטופ ולמובייל</span>
+            </div>
+          </div>
+          <div className="c2n-start-strip">
+            <div>
+              <span className="c2n-kicker">Start Here</span>
+              <h2 style={{ fontSize: '1.05rem', fontWeight: 900, marginTop: 4 }}>אפשר להתחיל מיד</h2>
+              <p className="c2n-sub" style={{ marginTop: 6 }}>Classic 2 נטען עם ברירות מחדל שמישות. ההגדרות הן התאמה אישית, לא שער כניסה.</p>
+            </div>
+            <div className="c2n-start-actions">
+              <button type="button" className="c2n-btn p" onClick={() => startPractice(settings)}>{started ? 'התחל סשן חדש' : 'התחל סבב'}</button>
+              <button type="button" className="c2n-btn s" onClick={openSettings}>הגדרות</button>
+              <span className="c2n-start-summary">{startSummary}</span>
+            </div>
+            <div className="c2n-pillbar">
+              <span className="c2n-chip">תחום: {CTX_LABEL[settings.fieldContext]}</span>
+              <span className="c2n-chip">רמה: {settings.difficulty}/5</span>
+              <span className="c2n-chip">סבבים: {roundsText(settings.rounds)}</span>
+            </div>
+          </div>
+        </section>
+
+        {helpOpen && <div className="c2n-help">1. בחר/י או השאר/י ברירת מחדל. 2. קרא/י את הטקסט וסמן/י רק את מה שמתאים לקטגוריה. 3. בדוק/י, קבל/י משוב, ועבור/י לסבב הבא.</div>}
+
+        <div className="c2n-step-strip">
+          <div className="c2n-step"><strong>1. בחר/י או השאר/י ברירת מחדל</strong><span className="c2n-sub">אפשר להתחיל ישר או לכוונן בהגדרות.</span></div>
+          <div className="c2n-step"><strong>2. קרא/י את הטקסט</strong><span className="c2n-sub">בחר/י קטגוריה אחת והתבונן/י בכל משפט.</span></div>
+          <div className="c2n-step"><strong>3. סמן/י / נתח/י / בדוק/י</strong><span className="c2n-sub">בדוק/י תשובה, בקש/י רמז, או דווח/י שאין מופע.</span></div>
         </div>
 
         {!started && (
           <div className="c2n-empty">
-            <h2 style={{ fontSize: '1rem', fontWeight: 900 }}>התרגול עוד לא הופעל</h2>
-            <p>המודאל נפתח אוטומטית בכניסה. אחרי "הפעל תרגול" נכנסים לטריינר.</p>
-            <div className="c2n-row-actions" style={{ marginTop: 0, justifyContent: 'center' }}>
-              <button type="button" className="c2n-btn p" onClick={() => setWizardOpen(true)}>פתח/י Settings</button>
-            </div>
+            <h2 style={{ fontSize: '1rem', fontWeight: 900 }}>הסשן עוד לא התחיל</h2>
+            <p>לחץ/י על "התחל סבב" כדי להיכנס ישר לתרגול עם ההגדרות הנוכחיות, או פתח/י הגדרות כדי לשנות תחום, עומס או תצוגת קטגוריות.</p>
           </div>
         )}
 
         {started && !finished && round && (
           <div className="c2n-layout">
-            <aside className="c2n-card">
-              <h3 style={{ fontSize: '.98rem', fontWeight: 900 }}>שלב 1: לחץ/י – בחר קטגוריה לאימון</h3>
-              <div className="c2n-sub">
-                {settings.categoryDisplay === 'all'
-                  ? 'כל הקטגוריות מוצגות תמיד בגריד RTL קבוע (MR בפינה הימנית-עליונה).'
-                  : `קבוצה ממוקדת: ${settings.categoryGroup}${settings.includeCtxVak ? ' + CTX/VAK' : ''}`}
-              </div>
-              <div className="c2n-cta">
-                <strong>בחר/י קטגוריה, ואז סמן/י משפט בטקסט</strong>
-                <span>אם אין מופע בטקסט, השתמש/י בכפתור הייעודי.</span>
-              </div>
-              {renderCatPicker(settings, result === 'pending')}
-            </aside>
-
-            <section className="c2n-card">
-              <div className="c2n-text-top">
-                <div>
-                  <h3 style={{ fontSize: '1rem', fontWeight: 900 }}>{round.title}</h3>
-                  <div className="c2n-sub">סבב {roundNo} · {round.contextLabel} · {round.sentences.length} משפטים</div>
+            <section className="c2n-main">
+              <div className="c2n-card">
+                <div className="c2n-text-top">
+                  <div>
+                    <h3 style={{ fontSize: '1.02rem', fontWeight: 900 }}>{round.title}</h3>
+                    <div className="c2n-sub">סבב {roundNo} · {round.contextLabel} · {round.sentences.length} משפטים</div>
+                  </div>
+                  <div className="c2n-meta">
+                    <span className="c2n-chip">רמה {settings.difficulty}/5</span>
+                    <span className="c2n-chip">{displayLabel}</span>
+                    {rr.exact && <span className="c2n-chip">בדיקה מלאה</span>}
+                  </div>
                 </div>
-                <div className="c2n-meta">
-                  <span className="c2n-chip">רמה {settings.difficulty}/5</span>
-                  <span className="c2n-chip">תצוגה: {settings.categoryDisplay === 'all' ? 'All Categories' : 'Group'}</span>
-                  {rr.exact && <span className="c2n-chip">בדיקה מלאה</span>}
+
+                <div className="c2n-target" style={{ marginTop: 12 }}>
+                  <strong>{selectedCat ? `הקטגוריה הפעילה: ${selectedCat} / ${CAT[selectedCat].he}` : 'הצעד הראשון: בחר/י קטגוריה מהעמודה הימנית'}</strong>
+                  <p>{selectedCat ? CAT[selectedCat].hint : 'לאחר הבחירה אפשר לסמן משפט אחד או יותר, או לדווח שאין מופע כזה בטקסט.'}</p>
+                  {selectedCat && CAT[selectedCat].note && <p style={{ fontWeight: 800, color: '#0d3fae' }}>{CAT[selectedCat].note}</p>}
                 </div>
-              </div>
 
-              <div className="c2n-target">
-                <strong>{selectedCat ? `הקטגוריה הפעילה: ${selectedCat} / ${CAT[selectedCat].he}` : 'בחר/י קטגוריה לאימון'}</strong>
-                <p>{selectedCat ? CAT[selectedCat].hint : 'התחל/י מהגריד משמאל. לאחר הבחירה ניתן לסמן משפטים.'}</p>
-                {selectedCat && CAT[selectedCat].note && <p style={{ fontWeight: 800, color: '#0d3fae' }}>{CAT[selectedCat].note}</p>}
-              </div>
-
-              <div className="c2n-sents">
-                {round.sentences.map((s, i) => {
-                  const sel = selectedIds.includes(s.id);
-                  const isMatch = !!selectedCat && s.tags.includes(selectedCat);
-                  const showGood = !!selectedCat && (showSolution || result === 'correct') && isMatch;
-                  const showBad = result === 'wrong' && sel && !isMatch;
-                  return (
-                    <button key={s.id} type="button" className={`c2n-sent${sel ? ' sel' : ''}${showGood ? ' good' : ''}${showBad ? ' bad' : ''}`} onClick={() => toggleSentence(s.id)} disabled={!selectedCat || result !== 'pending'} aria-pressed={sel}>
-                      <div className="c2n-sent-top">
-                        <span>משפט {i + 1}</span>
-                        <span>{showGood ? 'פתרון / נכון' : showBad ? 'לא מתאים' : sel ? 'מסומן' : 'לחיץ'}</span>
-                      </div>
-                      <span className="c2n-sent-text">{s.text}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="c2n-row-actions">
-                <button type="button" className="c2n-btn p" onClick={evaluate} disabled={!selectedCat || result !== 'pending'}>בדוק תשובה</button>
-                <button type="button" className="c2n-btn w" onClick={declareNoCategory} disabled={!selectedCat || result !== 'pending'}>אין את הקטגוריה המבוקשת בתוך הטקסט</button>
-                <button type="button" className="c2n-btn s" onClick={() => { setSelectedIds([]); setResult('pending'); setShowHint(false); setShowSolution(false); setFeedback(selectedCat ? { tone: 'info', message: 'נוקה סימון. נסה/י שוב.' } : { tone: 'info', message: 'בחר/י קטגוריה לאימון.' }); }}>נקה סימון</button>
-                <button type="button" className="c2n-btn g" onClick={() => setShowHint(true)} disabled={!selectedCat}>הצג רמז</button>
-                <button type="button" className="c2n-btn g" onClick={() => setShowSolution(true)} disabled={!selectedCat}>הצג פתרון</button>
-              </div>
-
-              {feedback && <div className={`c2n-fb ${feedback.tone}`}>{feedback.message}</div>}
-
-              {showHint && selectedCat && (
-                <div className="c2n-hint">
-                  <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>רמז</h4>
-                  <p>{CAT[selectedCat].hint}</p>
-                  {hintIdx.length ? <p>נסה/י לבדוק במיוחד את משפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p> : <p>ייתכן שאין מופע של הקטגוריה הזו בטקסט.</p>}
+                <div className="c2n-sents" style={{ marginTop: 12 }}>
+                  {round.sentences.map((s, i) => {
+                    const sel = selectedIds.includes(s.id);
+                    const isMatch = !!selectedCat && s.tags.includes(selectedCat);
+                    const showGood = !!selectedCat && (showSolution || result === 'correct') && isMatch;
+                    const showBad = result === 'wrong' && sel && !isMatch;
+                    return (
+                      <button key={s.id} type="button" className={`c2n-sent${sel ? ' sel' : ''}${showGood ? ' good' : ''}${showBad ? ' bad' : ''}`} onClick={() => toggleSentence(s.id)} disabled={!selectedCat || result !== 'pending'} aria-pressed={sel}>
+                        <div className="c2n-sent-top">
+                          <span>משפט {i + 1}</span>
+                          <span>{showGood ? 'נכון' : showBad ? 'לא מתאים' : sel ? 'מסומן' : 'לחיץ'}</span>
+                        </div>
+                        <span className="c2n-sent-text">{s.text}</span>
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
 
-              {showSolution && selectedCat && (
-                <div className="c2n-hint">
-                  <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>פתרון</h4>
-                  {hintIdx.length
-                    ? <p>המופעים של {selectedCat} / {CAT[selectedCat].he} נמצאים במשפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p>
-                    : <p>אין מופע של {selectedCat} / {CAT[selectedCat].he} בטקסט הזה.</p>}
+                <div className="c2n-row-actions">
+                  <button type="button" className="c2n-btn p" onClick={evaluate} disabled={!selectedCat || result !== 'pending'}>בדוק תשובה</button>
+                  <button type="button" className="c2n-btn w" onClick={declareNoCategory} disabled={!selectedCat || result !== 'pending'}>אין את הקטגוריה בטקסט</button>
+                  <button type="button" className="c2n-btn s" onClick={() => { setSelectedIds([]); setResult('pending'); setShowHint(false); setShowSolution(false); setFeedback(selectedCat ? { tone: 'info', message: 'נוקה הסימון. אפשר לנסות שוב.' } : { tone: 'info', message: 'בחר/י קטגוריה כדי להתחיל.' }); }}>נקה סימון</button>
+                  <button type="button" className="c2n-btn g" onClick={() => setShowHint(true)} disabled={!selectedCat}>רמז</button>
+                  <button type="button" className="c2n-btn g" onClick={() => setShowSolution(true)} disabled={!selectedCat}>פתרון</button>
                 </div>
-              )}
 
-              <div className="c2n-foot">
-                <div className="c2n-score">
-                  <span className="c2n-chip">הושלמו: {done}</span>
-                  <span className="c2n-chip">נכונים: {correct + (result === 'correct' ? 1 : 0)}</span>
-                  <span className="c2n-chip">סבבים: {roundsText(settings.rounds)}</span>
+                {feedback && <div className={`c2n-fb ${feedback.tone}`}>{feedback.message}</div>}
+
+                {showHint && selectedCat && (
+                  <div className="c2n-hint">
+                    <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>רמז</h4>
+                    <p>{CAT[selectedCat].hint}</p>
+                    {hintIdx.length ? <p>בדוק/י במיוחד את משפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p> : <p>ייתכן שאין מופע של הקטגוריה הזו בטקסט.</p>}
+                  </div>
+                )}
+
+                {showSolution && selectedCat && (
+                  <div className="c2n-hint">
+                    <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>פתרון</h4>
+                    {hintIdx.length
+                      ? <p>המופעים של {selectedCat} / {CAT[selectedCat].he} נמצאים במשפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p>
+                      : <p>אין מופע של {selectedCat} / {CAT[selectedCat].he} בטקסט הזה.</p>}
+                  </div>
+                )}
+
+                <div className="c2n-foot">
+                  <div className="c2n-score">
+                    <span className="c2n-chip">הושלמו: {done}</span>
+                    <span className="c2n-chip">נכונים: {correct + (result === 'correct' ? 1 : 0)}</span>
+                    <span className="c2n-chip">סבבים: {roundsText(settings.rounds)}</span>
+                  </div>
+                  <button type="button" className="c2n-btn p" onClick={nextRound} disabled={result !== 'correct'}>{settings.rounds === 'infinite' ? 'סבב הבא (∞)' : 'סבב הבא'}</button>
                 </div>
-                <button type="button" className="c2n-btn p" onClick={nextRound} disabled={result !== 'correct'}>{settings.rounds === 'infinite' ? 'סבב הבא (∞)' : 'סבב הבא'}</button>
               </div>
             </section>
+
+            <aside className="c2n-sidebar">
+              <div className="c2n-card">
+                <h3 style={{ fontSize: '.98rem', fontWeight: 900 }}>קטגוריות לפי סדר ברין הקנוני</h3>
+                <div className="c2n-sub" style={{ marginTop: 4 }}>
+                  {settings.categoryDisplay === 'all'
+                    ? 'כל הקטגוריות נשמרות תמיד באותו סדר RTL. המיקום לא קופץ בין סשנים.'
+                    : `מצב ממוקד: ${settings.categoryGroup}${settings.includeCtxVak ? ' + CTX/VAK' : ''}.`}
+                </div>
+                {renderCatPicker(settings, result === 'pending')}
+              </div>
+
+              <div className="c2n-summary-card">
+                <h3 style={{ fontSize: '.94rem', fontWeight: 900 }}>הסשן הנוכחי יהיה…</h3>
+                <div className="c2n-preview-grid">
+                  <div className="c2n-kv"><b>תחום</b><span>{CTX_LABEL[settings.fieldContext]}</span></div>
+                  <div className="c2n-kv"><b>תצוגה</b><span>{displayLabel}</span></div>
+                  <div className="c2n-kv"><b>עומס</b><span>{settings.sentenceCount} משפטים · {roundsText(settings.rounds)} סבבים</span></div>
+                  <div className="c2n-kv"><b>בדיקה</b><span>{rr.exact ? 'מלאה' : 'גמישה'}</span></div>
+                </div>
+              </div>
+            </aside>
           </div>
         )}
 
@@ -581,95 +672,149 @@ export default function Classic2Trainer(): React.ReactElement {
             <div className="c2n-sub" style={{ marginTop: 4 }}>הושלמו {done} סבבים ({correct} נכונים) · הקשר: {CTX_LABEL[settings.fieldContext]} · רמה: {settings.difficulty}/5</div>
             <div className="c2n-row-actions">
               <button type="button" className="c2n-btn p" onClick={() => startPractice(settings)}>הפעל שוב עם אותן הגדרות</button>
-              <button type="button" className="c2n-btn g" onClick={openSettings}>חזרה ל-Settings</button>
+              <button type="button" className="c2n-btn g" onClick={openSettings}>עדכן הגדרות</button>
             </div>
           </section>
         )}
       </div>
 
       {wizardOpen && (
-        <div className="c2n-overlay" role="dialog" aria-modal="true" aria-label="Settings Wizard">
+        <div className="c2n-overlay" role="dialog" aria-modal="true" aria-label="Classic 2 settings">
           <div className="c2n-modal">
             <div className="c2n-modal-head">
               <div>
-                <h2>Classic 2 · Structure of Magic — Settings</h2>
-                <p>המודאל נפתח מיד בכניסה. נעילת גלילת רקע מופעלת בזמן פתיחה.</p>
+                <h2>לוח הבקרה של Classic 2</h2>
+                <p>מגדירים מה לתרגל, כמה עומס לשים, ואיך טבלת ברין תופיע. ברירת המחדל כבר מוכנה, אז אפשר גם רק לשמור ולצאת.</p>
               </div>
-              <button type="button" className="c2n-btn s" onClick={() => setWizardOpen(false)}>צא</button>
+              <div className="c2n-main-acts">
+                <button type="button" className="c2n-btn s" onClick={() => setDraft({ ...DEFAULTS })}>ברירות מחדל</button>
+                <button type="button" className="c2n-btn s" onClick={() => setWizardOpen(false)}>סגור</button>
+              </div>
             </div>
 
-            <div className="c2n-form">
-              <section className="c2n-field">
-                <h3>A. מקור הטקסט</h3>
-                <label className="c2n-radio">
-                  <input type="radio" name="src" checked={draft.textSource === 'built_in'} onChange={() => setDraft((p) => ({ ...p, textSource: 'built_in' }))} />
-                  <div><strong>סט תרגול מובנה</strong><span>רצף תרחישים לפי ההקשר.</span></div>
-                </label>
-                <label className="c2n-radio">
-                  <input type="radio" name="src" checked={draft.textSource === 'random'} onChange={() => setDraft((p) => ({ ...p, textSource: 'random' }))} />
-                  <div><strong>טקסט רנדומלי</strong><span>בחירה אקראית של תרחיש/חלון משפטים.</span></div>
-                </label>
-                <label className="c2n-radio dim">
-                  <input type="radio" name="src" disabled />
-                  <div><strong>הדבק טקסט ידנית (אופציה עתידית)</strong><span>שמור לשלב הבא.</span></div>
-                </label>
-              </section>
+            <div className="c2n-settings-grid">
+              <div className="c2n-settings-main">
+                <section className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>מה לתרגל</h3>
+                    <p className="c2n-sub">תחום הטקסט קובע את האווירה והדוגמאות של הסבב.</p>
+                  </div>
+                  <div className="c2n-seg">
+                    {(Object.keys(CTX_LABEL) as FieldCtx[]).map((c) => (
+                      <button key={c} type="button" className={`c2n-btn ${draft.fieldContext === c ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, fieldContext: c }))}>{CTX_LABEL[c]}</button>
+                    ))}
+                  </div>
+                </section>
 
-              <section className="c2n-field">
-                <h3>B. סגנון טקסט / תחום</h3>
-                <div className="c2n-seg">
-                  {(Object.keys(CTX_LABEL) as FieldCtx[]).map((c) => (
-                    <button key={c} type="button" className={`c2n-btn ${draft.fieldContext === c ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, fieldContext: c }))}>{CTX_LABEL[c]}</button>
-                  ))}
-                </div>
-              </section>
+                <section className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>עומס / גודל סשן</h3>
+                    <p className="c2n-sub">כמה משפטים יהיו בכל טקסט וכמה סבבים יכלול הסשן.</p>
+                  </div>
+                  <div className="c2n-kv"><b>משפטים בטקסט</b><span>{draft.sentenceCount}</span></div>
+                  <input className="c2n-range" type="range" min={3} max={8} step={1} value={draft.sentenceCount} onChange={(e) => setDraft((p) => ({ ...p, sentenceCount: Number(e.target.value) }))} />
+                  <div className="c2n-seg">
+                    {[5, 10, 'infinite'].map((r) => (
+                      <button key={String(r)} type="button" className={`c2n-btn ${draft.rounds === r ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, rounds: r as RoundsChoice }))}>{r === 'infinite' ? 'אינסופי' : r}</button>
+                    ))}
+                  </div>
+                </section>
 
-              <section className="c2n-field">
-                <h3>C. רמת קושי</h3>
-                <div className="c2n-chip">{draft.difficulty}/5</div>
-                <input className="c2n-range" type="range" min={1} max={5} step={1} value={draft.difficulty} onChange={(e) => setDraft((p) => ({ ...p, difficulty: Number(e.target.value) }))} />
-                <div className="c2n-sub">משפיע על רמזי נוכחות, קשיחות בדיקה, ורמז אוטומטי אחרי שגיאה.</div>
+                <section className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>מצב תצוגה</h3>
+                    <p className="c2n-sub">אפשר לעבוד עם כל הטבלה בסדר הקנוני או עם קבוצה ממוקדת.</p>
+                  </div>
+                  <label className="c2n-radio">
+                    <input type="radio" name="disp" checked={draft.categoryDisplay === 'all'} onChange={() => setDraft((p) => ({ ...p, categoryDisplay: 'all' }))} />
+                    <div><strong>כל הקטגוריות</strong><span>אותו סדר קבוע בכל סשן.</span></div>
+                  </label>
+                  <label className="c2n-radio">
+                    <input type="radio" name="disp" checked={draft.categoryDisplay === 'group'} onChange={() => setDraft((p) => ({ ...p, categoryDisplay: 'group' }))} />
+                    <div><strong>קבוצה אחת</strong><span>מיקוד ב- DIS / GEN / DEL.</span></div>
+                  </label>
+                </section>
 
-                <h3 style={{ marginTop: 4 }}>D. אורך התרגול</h3>
-                <div className="c2n-sub">מספר משפטים בטקסט: {draft.sentenceCount}</div>
-                <input className="c2n-range" type="range" min={3} max={8} step={1} value={draft.sentenceCount} onChange={(e) => setDraft((p) => ({ ...p, sentenceCount: Number(e.target.value) }))} />
-                <div className="c2n-sub">מספר סבבים / טקסטים</div>
-                <div className="c2n-seg">
-                  {[5, 10, 'infinite'].map((r) => (
-                    <button key={String(r)} type="button" className={`c2n-btn ${draft.rounds === r ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, rounds: r as RoundsChoice }))}>{r === 'infinite' ? 'אינסופי' : r}</button>
-                  ))}
-                </div>
-              </section>
+                <section className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>קטגוריות</h3>
+                    <p className="c2n-sub">במצב קבוצתי בוחרים קבוצה פעילה. אפשר לצרף גם CTX + VAK.</p>
+                  </div>
+                  <div className="c2n-seg">
+                    {(['GEN', 'DIS', 'DEL'] as GroupCode[]).map((g) => (
+                      <button key={g} type="button" className={`c2n-btn ${draft.categoryGroup === g ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, categoryGroup: g }))}>{g}</button>
+                    ))}
+                  </div>
+                  <label className="c2n-toggle">
+                    <input type="checkbox" checked={draft.includeCtxVak} onChange={(e) => setDraft((p) => ({ ...p, includeCtxVak: e.target.checked }))} />
+                    כולל CTX + VAK
+                  </label>
+                </section>
 
-              <section className="c2n-field">
-                <h3>E. תצוגת קטגוריות</h3>
-                <label className="c2n-radio">
-                  <input type="radio" name="disp" checked={draft.categoryDisplay === 'all'} onChange={() => setDraft((p) => ({ ...p, categoryDisplay: 'all' }))} />
-                  <div><strong>כל הקטגוריות (טבלת מייקל ברין)</strong><span>סדר/מיקום קבועים ב-RTL.</span></div>
-                </label>
-                <label className="c2n-radio">
-                  <input type="radio" name="disp" checked={draft.categoryDisplay === 'group'} onChange={() => setDraft((p) => ({ ...p, categoryDisplay: 'group' }))} />
-                  <div><strong>רק קבוצה</strong><span>GEN / DIS / DEL.</span></div>
-                </label>
-                <div className="c2n-seg">
-                  {(['GEN', 'DIS', 'DEL'] as GroupCode[]).map((g) => (
-                    <button key={g} type="button" className={`c2n-btn ${draft.categoryGroup === g ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, categoryGroup: g }))}>{g}</button>
-                  ))}
-                </div>
-                <label className="c2n-toggle">
-                  <input type="checkbox" checked={draft.includeCtxVak} onChange={(e) => setDraft((p) => ({ ...p, includeCtxVak: e.target.checked }))} />
-                  כולל CTX + VAK
-                </label>
-                <div className="c2n-sub">Preview (אותו breen_grid_rtl הקבוע במצב All Categories)</div>
-                {renderCatPicker(draft, false, true)}
-              </section>
+                <details className="c2n-adv" open={advancedOpen} onToggle={(e) => setAdvancedOpen((e.target as HTMLDetailsElement).open)}>
+                  <summary>אפשרויות מתקדמות</summary>
+                  <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
+                    <section className="c2n-group">
+                      <div className="c2n-group-head">
+                        <h3>קושי</h3>
+                        <p className="c2n-sub">משפיע על רמזי נוכחות, קשיחות הבדיקה, ורמז אוטומטי אחרי שגיאה.</p>
+                      </div>
+                      <div className="c2n-chip">{draft.difficulty}/5</div>
+                      <input className="c2n-range" type="range" min={1} max={5} step={1} value={draft.difficulty} onChange={(e) => setDraft((p) => ({ ...p, difficulty: Number(e.target.value) }))} />
+                    </section>
+
+                    <section className="c2n-group">
+                      <div className="c2n-group-head">
+                        <h3>מקור טקסט</h3>
+                        <p className="c2n-sub">מוכן להרחבה לטריינרים נוספים באותה מעטפת הגדרות.</p>
+                      </div>
+                      <label className="c2n-radio">
+                        <input type="radio" name="src" checked={draft.textSource === 'built_in'} onChange={() => setDraft((p) => ({ ...p, textSource: 'built_in' }))} />
+                        <div><strong>סט תרגול מובנה</strong><span>רצף תרחישים לפי הקשר.</span></div>
+                      </label>
+                      <label className="c2n-radio">
+                        <input type="radio" name="src" checked={draft.textSource === 'random'} onChange={() => setDraft((p) => ({ ...p, textSource: 'random' }))} />
+                        <div><strong>בחירה אקראית</strong><span>דילוג בין תרחישים וחלונות טקסט.</span></div>
+                      </label>
+                      <label className="c2n-radio dim">
+                        <input type="radio" name="src" disabled />
+                        <div><strong>הדבקה ידנית</strong><span>מוכן לשלב עתידי.</span></div>
+                      </label>
+                    </section>
+                  </div>
+                </details>
+              </div>
+
+              <aside className="c2n-settings-side">
+                <section className="c2n-preview">
+                  <div className="c2n-group-head">
+                    <h3>תצוגה מקדימה / סיכום</h3>
+                    <p className="c2n-sub">כך הסשן הבא ייראה אם תשמור/י עכשיו.</p>
+                  </div>
+                  <span className="c2n-chip strong">{previewSummary}</span>
+                  <div className="c2n-preview-grid">
+                    <div className="c2n-kv"><b>תחום</b><span>{CTX_LABEL[draft.fieldContext]}</span></div>
+                    <div className="c2n-kv"><b>מצב</b><span>{draftDisplayLabel}</span></div>
+                    <div className="c2n-kv"><b>סבבים</b><span>{roundsText(draft.rounds)}</span></div>
+                    <div className="c2n-kv"><b>קושי</b><span>{draft.difficulty}/5</span></div>
+                  </div>
+                </section>
+                <section className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>סדר הקטגוריות</h3>
+                    <p className="c2n-sub">תמיד אותו מקור אמת. גם בתצוגה חלקית הסדר נשמר.</p>
+                  </div>
+                  {renderCatPicker(draft, false, true)}
+                </section>
+              </aside>
             </div>
 
             <div className="c2n-modal-actions">
-              <button type="button" className="c2n-btn s" onClick={() => setDraft({ ...QUICK })}>ברירת מחדל מהירה</button>
+              <button type="button" className="c2n-btn s" onClick={() => setWizardOpen(false)}>ביטול</button>
               <div className="c2n-main-acts">
-                <button type="button" className="c2n-btn g" onClick={() => setDraft({ ...DEFAULTS })}>איפוס הגדרות</button>
-                <button type="button" className="c2n-btn p" onClick={() => startPractice(draft)}>הפעל תרגול</button>
+                <button type="button" className="c2n-btn g" onClick={() => setDraft({ ...QUICK })}>ברירת מחדל מהירה</button>
+                <button type="button" className="c2n-btn g" onClick={() => setDraft({ ...DEFAULTS })}>איפוס</button>
+                <button type="button" className="c2n-btn p" onClick={() => applyDraftSettings(!started)}>{started ? 'שמור הגדרות' : 'שמור והתחל סשן'}</button>
               </div>
             </div>
           </div>
