@@ -18,9 +18,9 @@ export const TRAINER_PLATFORM_CSS = `
 .trp-mode-pill,.trp-summary-pill{display:inline-flex;align-items:center;min-height:42px;padding:0 14px;border-radius:999px;border:1px solid #dce5f1;background:#f8fafc;font-weight:800;color:#334155}
 .trp-mode-pill{background:#ecfdf5;border-color:#bbf7d0;color:#166534}
 .trp-hero{margin-top:14px;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:14px}
-.trp-purpose{display:grid;gap:12px}
+.trp-purpose{display:grid;gap:12px;align-content:start;align-self:start}
 .trp-purpose-body{line-height:1.65;color:#334155}
-.trp-start-strip{display:grid;gap:12px;border:1px solid #d7e5f5;background:linear-gradient(180deg,#ffffff 0%,#f7fbff 100%);border-radius:24px;padding:18px}
+.trp-start-strip{display:grid;gap:12px;align-content:start;align-self:start;border:1px solid #d7e5f5;background:linear-gradient(180deg,#ffffff 0%,#f7fbff 100%);border-radius:24px;padding:18px}
 .trp-start-copy{display:grid;gap:6px}
 .trp-step-strip{margin-top:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .trp-step{border:1px dashed #cfdceb;border-radius:16px;background:#fcfdff;padding:12px}

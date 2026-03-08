@@ -1,6 +1,6 @@
 {
   "name": "meta_model_app",
-  "version": "1.0.218",
+  "version": "1.0.219",
   "description": "כלי אינטרנט אינטראקטיבי לתרגול טכניקות **Meta Model** של NLP (Neuro-Linguistic Programming) על פי Richard Bandler ו-John Grinder.",
   "main": "index.js",
   "directories": {
@@ -26,6 +26,7 @@
     "test:wr2w": "node --test scripts/wr2w-path-core.test.cjs",
     "test:prism-research": "node --test scripts/prism-research-core.test.cjs",
     "test:ui-wiring": "node scripts/test-ui-wiring.mjs",
+    "test:trainer-platform": "node scripts/test-trainer-platform.mjs",
     "test:mobile": "node scripts/test-mobile-layout.mjs",
     "test:shell-smoke": "node scripts/test-shell-smoke.mjs",
     "audit:nav": "node scripts/audit-nav.mjs",

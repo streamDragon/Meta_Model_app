@@ -2427,7 +2427,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
       <style>{`${TRAINER_PLATFORM_CSS}\n${css}`}</style>
 
       {showOnboarding ? (
-        <div className="it-onboarding-layer" role="dialog" aria-modal="true" aria-label="פתיחת אימון קצה קרחון">
+        <div className="it-onboarding-layer" role="dialog" aria-modal="true" aria-label="פתיחת אימון קצה קרחון" data-trainer-onboarding="1">
           <div className="it-onboarding-card">
             <div className="it-onboarding-head">
               <div>
@@ -2435,7 +2435,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
                 <h2>{trainerContract.title}</h2>
                 <p>כאן מתאמנים בלמיין חומר לשוני ולוגי לתוך סכמות פנימיות ברורות. זה מה שמעמיק הבנה, מזרז חשיבה, ומכוון לבחירה מדויקת יותר של ההתערבות הבאה.</p>
               </div>
-              <button type="button" className="it-btn ghost" onClick={() => setShowOnboarding(false)}>סגור</button>
+              <button type="button" className="it-btn ghost" data-trainer-action="dismiss-onboarding" onClick={() => setShowOnboarding(false)}>סגור</button>
             </div>
             <div className="it-onboarding-copy">
               <p>זה לא סולם דילטס ולא ערבוב של כובעים ורמות. כאן עובדים עם עץ של הכללה, סיבתיות מסתעפת, או הנחות שמחזיקות את המשפט.</p>
@@ -2448,7 +2448,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
               <article className="it-onboarding-note"><strong>דוגמה</strong><p>"מנוחה" יכולה להפוך מקריאת מצוקה כללית לעץ של קריטריונים, תנאים, או הנחות סמויות.</p></article>
             </div>
             <div className="it-onboarding-actions">
-              <button type="button" className="it-btn primary" onClick={() => setShowOnboarding(false)}>מתחילים למיין</button>
+              <button type="button" className="it-btn primary" data-trainer-action="dismiss-onboarding" onClick={() => setShowOnboarding(false)}>מתחילים למיין</button>
             </div>
           </div>
         </div>
