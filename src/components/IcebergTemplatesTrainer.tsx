@@ -1,4 +1,8 @@
 ﻿import React, { useEffect, useMemo, useState } from 'react';
+import { getTrainerContract } from '../config/trainerContract';
+import { TrainerPlatformShell, TrainerSupportCard } from './trainer-shell/TrainerPlatformShell';
+import { TrainerSettingsShell, type TrainerSettingsSection } from './trainer-shell/TrainerSettingsShell';
+import { TRAINER_PLATFORM_CSS } from './trainer-shell/trainerPlatformStyles';
 
 type TemplateType = 'CEQ' | 'CAUSE' | 'ASSUMPTIONS1';
 type CauseMode = 'CAUSES_OF_TOKEN' | 'EFFECTS_OF_TOKEN';
@@ -69,6 +73,15 @@ type TrainerState = {
   scoreVariants: number;
   variantBonusAwardedKeys: Record<string, true>;
   lastCompletedRecap: string;
+};
+
+type IcebergLaunchMode = 'guided' | 'direct';
+type IcebergSettings = {
+  defaultScenarioIndex: number;
+  launchMode: IcebergLaunchMode;
+  showFocusGuide: boolean;
+  showFocusSketch: boolean;
+  autoRevealAfterPlacement: boolean;
 };
 
 type TemplateMeta = {
@@ -343,6 +356,49 @@ const INITIAL_STATE: TrainerState = {
   variantBonusAwardedKeys: {},
   lastCompletedRecap: ''
 };
+
+const ICEBERG_SETTINGS_STORAGE_KEY = 'iceberg_templates_settings_v1';
+const DEFAULT_ICEBERG_SETTINGS: IcebergSettings = {
+  defaultScenarioIndex: 0,
+  launchMode: 'guided',
+  showFocusGuide: true,
+  showFocusSketch: true,
+  autoRevealAfterPlacement: false
+};
+
+function normalizeScenarioIndex(value: number, scenarioCount = 0): number {
+  if (!Number.isFinite(value) || value < 0) return 0;
+  const rounded = Math.max(0, Math.floor(value));
+  if (!scenarioCount) return rounded;
+  return Math.min(rounded, Math.max(0, scenarioCount - 1));
+}
+
+function normalizeIcebergSettings(raw: Partial<IcebergSettings> | null | undefined, scenarioCount = 0): IcebergSettings {
+  const input = raw && typeof raw === 'object' ? raw : {};
+  return {
+    defaultScenarioIndex: normalizeScenarioIndex(Number(input.defaultScenarioIndex ?? DEFAULT_ICEBERG_SETTINGS.defaultScenarioIndex), scenarioCount),
+    launchMode: input.launchMode === 'direct' ? 'direct' : DEFAULT_ICEBERG_SETTINGS.launchMode,
+    showFocusGuide: typeof input.showFocusGuide === 'boolean' ? input.showFocusGuide : DEFAULT_ICEBERG_SETTINGS.showFocusGuide,
+    showFocusSketch: typeof input.showFocusSketch === 'boolean' ? input.showFocusSketch : DEFAULT_ICEBERG_SETTINGS.showFocusSketch,
+    autoRevealAfterPlacement: typeof input.autoRevealAfterPlacement === 'boolean' ? input.autoRevealAfterPlacement : DEFAULT_ICEBERG_SETTINGS.autoRevealAfterPlacement
+  };
+}
+
+function loadIcebergSettings(scenarioCount = 0): IcebergSettings {
+  if (typeof window === 'undefined') return normalizeIcebergSettings(DEFAULT_ICEBERG_SETTINGS, scenarioCount);
+  try {
+    const raw = window.localStorage.getItem(ICEBERG_SETTINGS_STORAGE_KEY);
+    if (!raw) return normalizeIcebergSettings(DEFAULT_ICEBERG_SETTINGS, scenarioCount);
+    return normalizeIcebergSettings(JSON.parse(raw) as Partial<IcebergSettings>, scenarioCount);
+  } catch {
+    return normalizeIcebergSettings(DEFAULT_ICEBERG_SETTINGS, scenarioCount);
+  }
+}
+
+function saveIcebergSettings(settings: IcebergSettings): void {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(ICEBERG_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+}
 
 const css = `
 .it-wrap{direction:rtl;font-family:"Assistant","Heebo","Noto Sans Hebrew","Segoe UI",sans-serif;background:radial-gradient(circle at 10% 0%,#fef3c7 0,#fffaf0 36%,#f8fafc 100%);color:#111827;max-width:1420px;margin:0 auto;border:1px solid #fde68a;border-radius:18px;padding:12px;box-shadow:0 16px 32px rgba(17,24,39,.06)}
