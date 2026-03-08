@@ -350,6 +350,20 @@
         };
     }
 
+    function compactPracticeSettings() {
+        return normalizePracticeSettings({
+            mode: 'learning',
+            difficulty: 2,
+            questionCount: 5,
+            timerEnabled: false,
+            familyFocus: 'distortion'
+        });
+    }
+
+    function standardPracticeSettings() {
+        return normalizePracticeSettings(defaultPracticeSettings());
+    }
+
     function normalizeModeSetting(mode) {
         return mode === 'exam' ? 'exam' : 'learning';
     }
@@ -795,13 +809,23 @@
             return;
         }
         if (action === 'reset-practice-settings') {
-            applySettings(defaultPracticeSettings(), { render: false });
+            applySettings(standardPracticeSettings(), { render: false });
             if (state.settingsDrawerOpen && state.session) {
                 state.feedback = {
                     tone: 'info',
                     text: 'ההגדרות חזרו לברירת המחדל. כדי להחיל אותן על הסשן הפעיל, הפעל/י מחדש.'
                 };
             }
+            render();
+            return;
+        }
+        if (action === 'preset-compact') {
+            applySettings(compactPracticeSettings(), { render: false });
+            render();
+            return;
+        }
+        if (action === 'preset-standard') {
+            applySettings(standardPracticeSettings(), { render: false });
             render();
             return;
         }
@@ -1443,38 +1467,25 @@
     }
 
     // New 3-state RTL UI (declared late so it overrides legacy render helpers)
-    const PHASE_STEPS = Object.freeze([
-        Object.freeze({
-            id: 'context',
-            label: 'שלב 1 — שומעים את המשפט',
-            shortLabel: 'שומעים',
-            goal: 'מקבלים הקשר מלא ורואים איפה כדאי לעצור את המבט.'
-        }),
-        Object.freeze({
-            id: 'question',
-            label: 'שלב 2 — בוחרים שאלת בירור',
-            shortLabel: 'שאלת בירור',
-            goal: 'מחזירים מידע חסר במקום לקפוץ לפרשנות או פתרון.'
-        }),
-        Object.freeze({
-            id: 'problem',
-            label: 'שלב 3 — מזהים את המבנה',
-            shortLabel: 'המבנה',
-            goal: 'נותנים שם לפער הלשוני המרכזי.'
-        }),
-        Object.freeze({
-            id: 'goal',
-            label: 'שלב 4 — מחדדים מה חסר',
-            shortLabel: 'מה חסר',
-            goal: 'מנסחים איזה מידע צריך להחזיר כדי שהמפה תהיה בת-בדיקה.'
-        }),
-        Object.freeze({
-            id: 'summary',
-            label: 'שלב 5 — מסכמים ולוקחים הלאה',
-            shortLabel: 'סיכום',
-            goal: 'מחברים את מה שנאמר, מה זוהה, ומה לוקחים לסבב הבא.'
-        })
-    ]);
+    const DEFAULT_PHASE_STEPS = [
+        { id: 'context', label: 'שלב 1 — שומעים את המשפט', shortLabel: 'שומעים', description: 'מקבלים הקשר מלא ורואים איפה כדאי לעצור את המבט.' },
+        { id: 'question', label: 'שלב 2 — בוחרים שאלת בירור', shortLabel: 'שאלת בירור', description: 'מחזירים מידע חסר במקום לקפוץ לפרשנות או פתרון.' },
+        { id: 'problem', label: 'שלב 3 — מזהים את המבנה', shortLabel: 'המבנה', description: 'נותנים שם לפער הלשוני המרכזי.' },
+        { id: 'goal', label: 'שלב 4 — מחדדים מה חסר', shortLabel: 'מה חסר', description: 'מנסחים איזה מידע צריך להחזיר כדי שהמפה תהיה בת-בדיקה.' },
+        { id: 'summary', label: 'שלב 5 — מסכמים ולוקחים הלאה', shortLabel: 'סיכום', description: 'מחברים את מה שנאמר, מה זוהה, ומה לוקחים לסבב הבא.' }
+    ];
+    const phaseSource = Array.isArray(trainerContract?.processSteps) && trainerContract.processSteps.length
+        ? trainerContract.processSteps
+        : DEFAULT_PHASE_STEPS;
+    const PHASE_STEPS = Object.freeze(phaseSource.map((step, index) => {
+        const fallback = DEFAULT_PHASE_STEPS[index] || DEFAULT_PHASE_STEPS[0];
+        return Object.freeze({
+            id: String(step?.id || fallback.id),
+            label: String(step?.label || fallback.label),
+            shortLabel: String(step?.shortLabel || fallback.shortLabel),
+            goal: String(step?.description || fallback.description)
+        });
+    }));
 
     const PROMPT_HIGHLIGHT_RULES = Object.freeze({
         unspecified_noun: ['בעיה', 'המצב הזה', 'התנגדות'],
@@ -1666,11 +1677,9 @@
         const modeName = `cc-mode-${scope}`;
         const countName = `cc-count-${scope}`;
         const selectId = `cc-family-${scope}`;
-
-        return `
-          <div class="cc-settings-shell-grid">
-            <div class="cc-settings-stack">
-              <section class="cc-settings-section" data-kind="basic">
+        const sections = {
+            'what-to-practice': `
+              <section class="cc-settings-section" data-kind="basic" data-trainer-settings-group="what-to-practice">
                 <div class="cc-settings-section-head">
                   <h3>מה לתרגל</h3>
                   <p>בחר/י אם לעבוד במצב לימוד עם יותר משוב, או במצב מבחן קצר וישיר.</p>
@@ -1689,8 +1698,9 @@
                   </div>
                 </div>
               </section>
-
-              <section class="cc-settings-section" data-kind="basic">
+            `,
+            'session-load': `
+              <section class="cc-settings-section" data-kind="basic" data-trainer-settings-group="session-load">
                 <div class="cc-settings-section-head">
                   <h3>עומס סשן</h3>
                   <p>כך מגדירים כמה שאלות יהיו בסבב וכמה מאתגר הוא ירגיש.</p>
@@ -1715,8 +1725,9 @@
                   <div class="cc-range-scale"><span>קל</span><span>בינוני</span><span>מאתגר</span></div>
                 </div>
               </section>
-
-              <section class="cc-settings-section" data-kind="basic">
+            `,
+            categories: `
+              <section class="cc-settings-section" data-kind="basic" data-trainer-settings-group="categories">
                 <div class="cc-settings-section-head">
                   <h3>קטגוריות</h3>
                   <p>אפשר להשאיר את כל המשפחות או למקד את הסשן במשפחה אחת.</p>
@@ -1733,11 +1744,12 @@
                   </label>
                 </div>
               </section>
-
+            `,
+            advanced: `
               <details class="cc-advanced-panel" data-cc-details-key="advanced:${escapeHtml(scope)}" ${isDetailOpen(`advanced:${scope}`) ? 'open' : ''}>
                 <summary>אפשרויות מתקדמות</summary>
                 <div class="cc-advanced-panel-body">
-                  <section class="cc-settings-section" data-kind="advanced">
+                  <section class="cc-settings-section" data-kind="advanced" data-trainer-settings-group="advanced">
                     <div class="cc-settings-section-head">
                       <h3>קצב ובקרה</h3>
                       <p>לא חייבים לגעת בזה. זו רק שכבת קצב נוספת למי שרוצה אימון לחוץ יותר.</p>
@@ -1756,6 +1768,21 @@
                   </section>
                 </div>
               </details>
+            `
+        };
+        const ordered = Array.isArray(trainerContract?.settingsGroups) && trainerContract.settingsGroups.length
+            ? trainerContract.settingsGroups
+            : Object.keys(sections);
+        const renderedSections = ordered
+            .map((key) => sections[key])
+            .filter(Boolean)
+            .concat(Object.keys(sections).filter((key) => !ordered.includes(key)).map((key) => sections[key]))
+            .join('');
+
+        return `
+          <div class="cc-settings-shell-grid">
+            <div class="cc-settings-stack">
+              ${renderedSections}
             </div>
             ${renderSettingsPreviewCard()}
           </div>
@@ -1800,7 +1827,7 @@
         return `
           <aside class="cc-settings-preview-card" aria-label="תצוגה מקדימה של הסשן">
             <div class="cc-card-kicker">כך הסשן הבא ייראה</div>
-            <div class="cc-settings-preview-pill">${escapeHtml(currentSettingsSummaryText())}</div>
+            <div class="cc-settings-preview-pill" data-trainer-summary="preview">${escapeHtml(currentSettingsSummaryText())}</div>
             <div class="cc-summary-grid">
               <div class="cc-summary-block">
                 <h4>מצב עבודה</h4>
@@ -1826,7 +1853,7 @@
     function renderSetupModal() {
         if (!state.setupOpen) return '';
         return `
-          <div class="cc-layer cc-layer-center" role="dialog" aria-modal="true" aria-label="הגדרות תרגול">
+          <div class="cc-layer cc-layer-center" role="dialog" aria-modal="true" aria-label="הגדרות תרגול" data-trainer-settings-shell="1" data-trainer-id="classic-classic">
             <div class="cc-modal-card">
               <div class="cc-modal-head">
                 <div>
@@ -1838,9 +1865,10 @@
               </div>
               ${renderSettingsControls('setup')}
               <div class="cc-modal-actions">
-                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-setup">ביטול</button>
-                <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="reset-practice-settings">ברירות מחדל</button>
-                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="start-session">שמור והתחל סשן</button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-setup" data-trainer-action="close-settings">ביטול</button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="preset-compact" data-trainer-preset="compact">סשן קצר</button>
+                <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="preset-standard" data-trainer-preset="standard">ברירת מחדל</button>
+                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="start-session" data-trainer-action="save-start">שמור והתחל סשן</button>
               </div>
               ${state.hasSavedSettings ? `<div class="cc-modal-foot"><button type="button" class="cc-link-btn" data-cc-action="continue-last-settings">המשך עם ההגדרות האחרונות</button></div>` : ''}
             </div>
@@ -2100,7 +2128,7 @@
             </div>
             <div class="cc-practice-bar-actions">
               <button type="button" class="cc-icon-btn" data-cc-action="show-before-start" aria-label="לפני שמתחילים">?</button>
-              <button type="button" class="cc-icon-btn" data-cc-action="open-settings-drawer" aria-label="הגדרות">ג™</button>
+              <button type="button" class="cc-icon-btn" data-cc-action="open-settings-drawer" data-trainer-action="open-settings" aria-label="הגדרות">ג™</button>
             </div>
           </header>
         `;
@@ -2109,7 +2137,7 @@
     function renderSettingsDrawer() {
         if (!state.settingsDrawerOpen) return '';
         return `
-          <div class="cc-layer cc-layer-side" role="dialog" aria-modal="true" aria-label="הגדרות">
+          <div class="cc-layer cc-layer-side" role="dialog" aria-modal="true" aria-label="הגדרות" data-trainer-settings-shell="1" data-trainer-id="classic-classic">
             <div class="cc-drawer">
               <div class="cc-drawer-head">
                 <div>
@@ -2121,9 +2149,10 @@
               </div>
               ${renderSettingsControls('drawer')}
               <div class="cc-modal-actions">
-                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-settings-drawer">ביטול</button>
-                <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="reset-practice-settings">ברירות מחדל</button>
-                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="apply-settings-and-restart">שמור והפעל מחדש</button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="close-settings-drawer" data-trainer-action="close-settings">ביטול</button>
+                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="preset-compact" data-trainer-preset="compact">סשן קצר</button>
+                <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="preset-standard" data-trainer-preset="standard">ברירת מחדל</button>
+                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="apply-settings-and-restart" data-trainer-action="save-settings">שמור והפעל מחדש</button>
               </div>
             </div>
           </div>
@@ -2136,7 +2165,7 @@
         const phase = getPhaseMeta(round?.stage || 'context');
         const steps = Array.isArray(trainerContract?.helperSteps) ? trainerContract.helperSteps : [];
         return `
-          <aside class="cc-platform-support" aria-label="תמיכה צדית">
+          <aside class="cc-platform-support" aria-label="תמיכה צדית" data-trainer-zone="support" data-trainer-support-mode="${escapeHtml(trainerContract?.supportRailMode || 'guided-explanation')}">
             <section class="cc-platform-support-card">
               <div class="cc-card-kicker">מה קורה עכשיו</div>
               <h3>${escapeHtml(phase.label)}</h3>
@@ -2174,14 +2203,14 @@
         const session = state.session;
         const round = currentRound();
         return `
-          <div class="cc-practice-shell" aria-label="תרגול מטה מודל">
+          <div class="cc-practice-shell" aria-label="תרגול מטה מודל" data-trainer-platform="1" data-trainer-id="classic-classic">
             ${renderPracticeTopBar(session, round)}
             <div class="cc-practice-meta-row">
               <button type="button" class="cc-link-btn" data-cc-action="show-before-start">לפני שמתחילים (30 שניות)</button>
-              <span class="cc-settings-preview-pill">${escapeHtml(currentSettingsSummaryText())}</span>
+              <span class="cc-settings-preview-pill" data-trainer-summary="current">${escapeHtml(currentSettingsSummaryText())}</span>
             </div>
             <div class="cc-platform-practice-layout">
-              <div class="cc-platform-practice-main">
+              <div class="cc-platform-practice-main" data-trainer-zone="main">
                 ${round ? renderStageProgressPills(round) : ''}
                 ${renderPracticeCard(round)}
               </div>
@@ -2225,7 +2254,7 @@
         const suggestions = buildSummarySuggestions(report);
 
         return `
-          <div class="cc-summary-shell" aria-label="סיכום תרגול">
+          <div class="cc-summary-shell" aria-label="סיכום תרגול" data-trainer-platform="1" data-trainer-id="classic-classic">
             <section class="cc-summary-hero">
               <div class="cc-modal-kicker">סיכום</div>
               <h1>סיכום תרגול Meta Model</h1>
@@ -2270,7 +2299,7 @@
 
             <div class="cc-primary-actions">
               <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="restart-session">תרגול נוסף באותה רמה</button>
-              <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="open-setup">שנה הגדרות</button>
+              <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="open-setup" data-trainer-action="open-settings">שנה הגדרות</button>
               <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="back-to-intro">חזרה לפתיחה</button>
             </div>
 
@@ -2283,7 +2312,7 @@
     function renderIntroScreen() {
         const settings = normalizePracticeSettings(state.settings || defaultPracticeSettings());
         return `
-          <div class="cc-entry-shell" aria-label="פתיחת תרגול">
+          <div class="cc-entry-shell" aria-label="פתיחת תרגול" data-trainer-platform="1" data-trainer-id="classic-classic">
             <section class="cc-entry-card">
               <div class="cc-modal-kicker">${escapeHtml(trainerContract?.familyLabel || 'משפחת קלאסיק')}</div>
               <h1>${escapeHtml(trainerContract?.title || 'Classic Classic — זיהוי תבניות')}</h1>
@@ -2295,10 +2324,10 @@
                   <span>אפשר להתחיל מיד עם ברירת המחדל, או לפתוח הגדרות כדי לדייק עומס, קושי ומשפחת תרגול.</span>
                 </div>
                 <div class="cc-primary-actions">
-                  <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="start-session">${escapeHtml(trainerContract?.startActionLabel || 'התחל תרגול')}</button>
-                  <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="open-setup">הגדרות</button>
+                  <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="start-session" data-trainer-action="start-session">${escapeHtml(trainerContract?.startActionLabel || 'התחל תרגול')}</button>
+                  <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="open-setup" data-trainer-action="open-settings">הגדרות</button>
                   ${state.hasSavedSettings ? `<button type="button" class="cc-btn cc-btn-secondary" data-cc-action="continue-last-settings">המשך עם ההגדרות האחרונות</button>` : ''}
-                  <span class="cc-settings-preview-pill">${escapeHtml(currentSettingsSummaryText())}</span>
+                  <span class="cc-settings-preview-pill" data-trainer-summary="current">${escapeHtml(currentSettingsSummaryText())}</span>
                 </div>
               </div>
               ${renderHelperStepsStrip()}

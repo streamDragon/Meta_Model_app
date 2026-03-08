@@ -1,6 +1,7 @@
 ﻿import React, { useEffect, useRef, useState } from 'react';
 
 import { CANONICAL_BREEN_GRID_RTL, CANONICAL_BREEN_ORDER, orderBreenCategories, type CanonicalBreenCode } from '../config/canonicalBreenOrder';
+import { getTrainerContract } from '../config/trainerContract';
 import { TrainerEmptyState, TrainerPlatformShell, TrainerSupportCard } from './trainer-shell/TrainerPlatformShell';
 import { TrainerSettingsShell, type TrainerSettingsSection } from './trainer-shell/TrainerSettingsShell';
 import { TRAINER_PLATFORM_CSS } from './trainer-shell/trainerPlatformStyles';
@@ -264,6 +265,7 @@ const roundsText = (r: RoundsChoice) => (r === 'infinite' ? 'אינסופי' : S
 const rules = (s: Settings) => ({ showPresence: s.difficulty <= 2, exact: s.difficulty >= 4, autoHint: s.difficulty <= 2 });
 
 export default function Classic2Trainer(): React.ReactElement {
+  const trainerContract = getTrainerContract('classic2');
   const [wizardOpen, setWizardOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [draft, setDraft] = useState<Settings>(() => loadClassic2Settings());
@@ -497,12 +499,13 @@ export default function Classic2Trainer(): React.ReactElement {
   const startSummary = `${settings.sentenceCount} פריטים · ${visibleCount} קטגוריות · ${displayLabel}`;
   const previewSummary = `${draft.sentenceCount} פריטים · ${draftVisibleCount} קטגוריות · ${draftDisplayLabel}`;
   const headerModeLabel = started ? progressText(roundNo, settings.rounds) : 'מוכן להתחלה מיידית';
-  const primaryStartLabel = started ? 'התחל סשן חדש' : 'התחל סבב';
-  const helperSteps = [
+  const primaryStartLabel = started ? 'התחל סשן חדש' : trainerContract.startActionLabel;
+  const helperSteps = trainerContract.helperSteps?.length ? [...trainerContract.helperSteps] : [
     { title: '1. בחר/י או השאר/י ברירת מחדל', description: 'אפשר להתחיל ישר או לכוונן עומס, תצוגה וקטגוריות.' },
     { title: '2. קרא/י ועבוד/י בתוך הטקסט', description: 'בחר/י קטגוריה אחת ונסה/י לזהות איפה היא באמת מופיעה.' },
     { title: '3. בדוק/י, למד/י והמשך/י', description: 'קבל/י משוב, פתח/י רמז או פתרון, ואז עבור/י לסבב הבא.' },
   ];
+  const processSteps = trainerContract.processSteps?.length ? [...trainerContract.processSteps] : [];
   const currentActionTitle = !started
     ? 'מתחילים מהכפתור הראשי'
     : finished
@@ -534,8 +537,8 @@ export default function Classic2Trainer(): React.ReactElement {
       <div className="c2n-kv"><b>קושי</b><span>{draft.difficulty}/5</span></div>
     </div>
   );
-  const settingsSections: TrainerSettingsSection[] = [
-    {
+  const settingsSectionMap: Record<string, TrainerSettingsSection> = {
+    'what-to-practice': {
       id: 'what-to-practice',
       title: 'מה לתרגל',
       help: 'תחום הטקסט קובע את האווירה והדוגמאות של הסבב.',
@@ -549,7 +552,7 @@ export default function Classic2Trainer(): React.ReactElement {
         </div>
       )
     },
-    {
+    'session-load': {
       id: 'session-load',
       title: 'עומס / גודל סשן',
       help: 'כמה משפטים יהיו בכל טקסט וכמה סבבים יכלול הסשן.',
@@ -567,7 +570,7 @@ export default function Classic2Trainer(): React.ReactElement {
         </>
       )
     },
-    {
+    'display-mode': {
       id: 'display-mode',
       title: 'מצב תצוגה',
       help: 'אפשר לעבוד עם כל הטבלה בסדר הקנוני או עם קבוצה ממוקדת.',
@@ -584,7 +587,7 @@ export default function Classic2Trainer(): React.ReactElement {
         </>
       )
     },
-    {
+    categories: {
       id: 'categories',
       title: 'קטגוריות',
       help: 'במצב קבוצתי בוחרים קבוצה פעילה. אפשר לצרף גם CTX + VAK.',
@@ -604,7 +607,7 @@ export default function Classic2Trainer(): React.ReactElement {
         </>
       )
     },
-    {
+    difficulty: {
       id: 'difficulty',
       title: 'קושי',
       help: 'משפיע על רמזי נוכחות, קשיחות הבדיקה, ורמז אוטומטי אחרי שגיאה.',
@@ -616,7 +619,7 @@ export default function Classic2Trainer(): React.ReactElement {
         </>
       )
     },
-    {
+    'text-source': {
       id: 'text-source',
       title: 'מקור טקסט',
       help: 'מוכן להרחבה לטריינרים נוספים באותה מעטפת הגדרות.',
@@ -637,7 +640,12 @@ export default function Classic2Trainer(): React.ReactElement {
           </label>
         </>
       )
-    },
+    }
+  };
+  const orderedSettingsIds = trainerContract.settingsGroups?.length ? trainerContract.settingsGroups : Object.keys(settingsSectionMap);
+  const settingsSections: TrainerSettingsSection[] = [
+    ...orderedSettingsIds.map((id) => settingsSectionMap[id]).filter(Boolean),
+    ...Object.values(settingsSectionMap).filter((section) => !orderedSettingsIds.includes(section.id))
   ];
   const mainContent = !started ? (
     <TrainerEmptyState
@@ -741,9 +749,24 @@ export default function Classic2Trainer(): React.ReactElement {
         {helpOpen ? <div className="c2n-help">1. בחר/י או השאר/י ברירת מחדל. 2. קרא/י את הטקסט וסמן/י רק את מה שמתאים לקטגוריה. 3. בדוק/י, קבל/י משוב, ועבור/י לסבב הבא.</div> : null}
       </TrainerSupportCard>
 
+      {processSteps.length ? (
+        <TrainerSupportCard title="תהליך העבודה" subtitle="אותו מהלך חוצה סשנים, כדי שהעין תלמד איפה היא נמצאת עכשיו.">
+          <div className="c2n-kv" style={{ gap: 10 }}>
+            {processSteps.map((step) => (
+              <div key={step.id}>
+                <b>{step.label}</b>
+                <span>{step.description}</span>
+              </div>
+            ))}
+          </div>
+        </TrainerSupportCard>
+      ) : null}
+
       <TrainerSupportCard
         title="מפת הקטגוריות"
-        subtitle={settings.categoryDisplay === 'all' ? 'כל הקטגוריות נשמרות תמיד באותו סדר RTL. המיקום לא קופץ בין סשנים.' : `מצב ממוקד: ${settings.categoryGroup}${settings.includeCtxVak ? ' + CTX/VAK' : ''}.`}
+        subtitle={trainerContract.supportRailMode === 'breen-map' && settings.categoryDisplay === 'all'
+          ? 'כל הקטגוריות נשמרות תמיד באותו סדר RTL. המיקום לא קופץ בין סשנים.'
+          : `מצב ממוקד: ${settings.categoryGroup}${settings.includeCtxVak ? ' + CTX/VAK' : ''}.`}
       >
         {started && !finished ? renderCatPicker(settings, result === 'pending') : renderCatPicker(settings, false, true)}
       </TrainerSupportCard>
@@ -758,8 +781,10 @@ export default function Classic2Trainer(): React.ReactElement {
     <div className="c2n" dir="rtl" lang="he">
       <style>{`${TRAINER_PLATFORM_CSS}\n${CSS}`}</style>
       <TrainerPlatformShell
-        title="Classic 2 · Structure of Magic"
-        subtitle="מזהים קטגוריה, מסמנים משפטים, ובודקים מול טבלת ברין אחת בסדר קנוני קבוע."
+        trainerId="classic2"
+        title={trainerContract.title}
+        subtitle={trainerContract.subtitle}
+        headerKicker={trainerContract.familyLabel}
         modePill={<span className="trp-mode-pill">{headerModeLabel}</span>}
         headerActions={
           <button type="button" className="trp-btn is-secondary" onClick={() => setHelpOpen((v) => !v)} aria-expanded={helpOpen}>
@@ -781,14 +806,14 @@ export default function Classic2Trainer(): React.ReactElement {
             <span className="c2n-chip">מתאים לדסקטופ ולמובייל</span>
           </>
         }
-        startKicker="מתחילים מכאן"
+        startKicker={trainerContract.quickStartLabel}
         startTitle="אפשר להתחיל מיד"
         startBody={<p>Classic 2 נטען עם ברירות מחדל שמישות. ההגדרות הן התאמה אישית, לא שער כניסה.</p>}
         startActions={
           <>
-            <button type="button" className="trp-btn is-primary" onClick={() => startPractice(settings)}>{primaryStartLabel}</button>
-            <button type="button" className="trp-btn is-secondary" onClick={openSettings}>הגדרות</button>
-            <span className="trp-summary-pill">{startSummary}</span>
+            <button type="button" className="trp-btn is-primary" data-trainer-action="start-session" onClick={() => startPractice(settings)}>{primaryStartLabel}</button>
+            <button type="button" className="trp-btn is-secondary" data-trainer-action="open-settings" onClick={openSettings}>הגדרות</button>
+            <span className="trp-summary-pill" data-trainer-summary="current">{startSummary}</span>
           </>
         }
         startMeta={
@@ -799,14 +824,16 @@ export default function Classic2Trainer(): React.ReactElement {
           </>
         }
         helperSteps={helperSteps}
+        supportRailMode={trainerContract.supportRailMode}
         main={mainContent}
         support={supportContent}
       />
 
       <TrainerSettingsShell
+        trainerId="classic2"
         open={wizardOpen}
-        title="לוח הבקרה של Classic 2"
-        subtitle="מגדירים מה לתרגל, כמה עומס לשים, ואיך טבלת ברין תופיע. ברירת המחדל כבר מוכנה, אז אפשר גם רק לשמור ולצאת."
+        title={trainerContract.settingsTitle}
+        subtitle={trainerContract.settingsSubtitle}
         summaryPill={<span className="trp-summary-pill">{previewSummary}</span>}
         preview={
           <>
@@ -829,9 +856,9 @@ export default function Classic2Trainer(): React.ReactElement {
         footerNote="ברירת המחדל המהירה שומרת על זרימת התחלה מיידית, אבל אפשר לרדת גם לעומק דרך הקבוצות והקושי."
         footerActions={
           <>
-            <button type="button" className="trp-btn is-ghost" onClick={() => setDraft({ ...QUICK })}>ברירת מחדל מהירה</button>
-            <button type="button" className="trp-btn is-secondary" onClick={() => setDraft({ ...DEFAULTS })}>איפוס מלא</button>
-            <button type="button" className="trp-btn is-primary" onClick={() => applyDraftSettings(!started)}>
+            <button type="button" className="trp-btn is-ghost" data-trainer-preset="compact" onClick={() => setDraft({ ...QUICK })}>ברירת מחדל מהירה</button>
+            <button type="button" className="trp-btn is-secondary" data-trainer-preset="standard" onClick={() => setDraft({ ...DEFAULTS })}>איפוס מלא</button>
+            <button type="button" className="trp-btn is-primary" data-trainer-action={started ? 'save-settings' : 'save-start'} onClick={() => applyDraftSettings(!started)}>
               {started ? 'שמור הגדרות' : 'שמור והתחל סשן'}
             </button>
           </>

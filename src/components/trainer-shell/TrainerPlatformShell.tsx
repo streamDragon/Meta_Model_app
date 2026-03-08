@@ -6,6 +6,7 @@ export interface TrainerHelperStep {
 }
 
 interface TrainerPlatformShellProps {
+  trainerId?: string;
   title: string;
   subtitle: string;
   headerKicker?: string;
@@ -21,11 +22,13 @@ interface TrainerPlatformShellProps {
   startActions: React.ReactNode;
   startMeta?: React.ReactNode;
   helperSteps?: TrainerHelperStep[];
+  supportRailMode?: string;
   main: React.ReactNode;
   support: React.ReactNode;
 }
 
 export function TrainerPlatformShell({
+  trainerId,
   title,
   subtitle,
   headerKicker = '\u05de\u05e2\u05d8\u05e4\u05ea \u05d0\u05d9\u05de\u05d5\u05df',
@@ -41,11 +44,12 @@ export function TrainerPlatformShell({
   startActions,
   startMeta,
   helperSteps = [],
+  supportRailMode = 'default',
   main,
   support,
 }: TrainerPlatformShellProps): React.ReactElement {
   return (
-    <div className="trp-page" dir="rtl" lang="he">
+    <div className="trp-page" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id={trainerId || ''}>
       <div className="trp-shell">
         <header className="trp-card trp-top">
           <div className="trp-title-wrap">
@@ -60,14 +64,14 @@ export function TrainerPlatformShell({
         </header>
 
         <section className="trp-hero">
-          <article className="trp-card trp-purpose">
+          <article className="trp-card trp-purpose" data-trainer-zone="purpose">
             <span className="trp-kicker">{purposeKicker}</span>
             <h2 className="trp-title" style={{ fontSize: '1.08rem' }}>{purposeTitle}</h2>
             <div className="trp-purpose-body">{purposeBody}</div>
             {purposeTags ? <div className="trp-chip-row">{purposeTags}</div> : null}
           </article>
 
-          <aside className="trp-start-strip">
+          <aside className="trp-start-strip" data-trainer-zone="start">
             <div className="trp-start-copy">
               <span className="trp-kicker">{startKicker}</span>
               <h2 className="trp-title" style={{ fontSize: '1.04rem' }}>{startTitle}</h2>
@@ -79,7 +83,7 @@ export function TrainerPlatformShell({
         </section>
 
         {helperSteps.length ? (
-          <div className="trp-step-strip">
+          <div className="trp-step-strip" data-trainer-zone="helper-steps">
             {helperSteps.map((step) => (
               <div key={step.title} className="trp-step">
                 <strong>{step.title}</strong>
@@ -90,8 +94,8 @@ export function TrainerPlatformShell({
         ) : null}
 
         <div className="trp-layout">
-          <main className="trp-main">{main}</main>
-          <aside className="trp-support">{support}</aside>
+          <main className="trp-main" data-trainer-zone="main">{main}</main>
+          <aside className="trp-support" data-trainer-zone="support" data-trainer-support-mode={supportRailMode}>{support}</aside>
         </div>
       </div>
     </div>

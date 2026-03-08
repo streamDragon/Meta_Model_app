@@ -10,6 +10,7 @@ export interface TrainerSettingsSection {
 }
 
 interface TrainerSettingsShellProps {
+  trainerId?: string;
   open: boolean;
   title: string;
   subtitle: string;
@@ -33,6 +34,7 @@ interface TrainerSettingsShellProps {
 }
 
 export function TrainerSettingsShell({
+  trainerId,
   open,
   title,
   subtitle,
@@ -61,7 +63,7 @@ export function TrainerSettingsShell({
   const advancedSections = visibleSections.filter((section) => section.advanced);
 
   return (
-    <div className="trs-overlay" role="dialog" aria-modal="true" aria-label={title}>
+    <div className="trs-overlay" role="dialog" aria-modal="true" aria-label={title} data-trainer-settings-shell="1" data-trainer-id={trainerId || ''}>
       <div className="trs-modal">
         <div className="trs-head">
           <div className="trs-head-copy">
@@ -80,7 +82,7 @@ export function TrainerSettingsShell({
         <div className="trs-grid">
           <div className="trs-main">
             {basicSections.map((section) => (
-              <section key={section.id} className="trs-section" data-kind="basic">
+              <section key={section.id} className="trs-section" data-kind="basic" data-trainer-settings-group={section.id}>
                 <div className="trs-section-head">
                   <h3>{section.title}</h3>
                   <p>{section.help}</p>
@@ -98,7 +100,7 @@ export function TrainerSettingsShell({
                 <summary>{advancedLabel}</summary>
                 <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
                   {advancedSections.map((section) => (
-                    <section key={section.id} className="trs-section" data-kind="advanced">
+                    <section key={section.id} className="trs-section" data-kind="advanced" data-trainer-settings-group={section.id}>
                       <div className="trs-section-head">
                         <h3>{section.title}</h3>
                         <p>{section.help}</p>
@@ -117,7 +119,7 @@ export function TrainerSettingsShell({
                 <h3>{previewTitle}</h3>
                 <p>{previewSubtitle}</p>
               </div>
-              {summaryPill}
+              {summaryPill ? <div data-trainer-summary="preview">{summaryPill}</div> : null}
               {preview}
             </section>
           </aside>

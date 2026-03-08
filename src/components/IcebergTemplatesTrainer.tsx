@@ -801,13 +801,13 @@ function TemplateSketch(props: { meta: TemplateMeta; tokenText?: string; causeMo
   );
 }
 
-function ProcessRail(props: { current: WorkspaceStepId }) {
-  const { current } = props;
-  const currentIndex = PROCESS_STEPS.findIndex((step) => step.id === current);
+function ProcessRail(props: { current: WorkspaceStepId; steps: Array<{ id: string; label: string; help?: string; description?: string }> }) {
+  const { current, steps } = props;
+  const currentIndex = steps.findIndex((step) => step.id === current);
 
   return (
     <div className="it-process-rail" aria-label="מפת תהליך">
-      {PROCESS_STEPS.map((step, index) => {
+      {steps.map((step, index) => {
         const done = index < currentIndex;
         const isCurrent = index === currentIndex;
         return (
@@ -816,7 +816,7 @@ function ProcessRail(props: { current: WorkspaceStepId }) {
               <span className="it-process-step-index">{index + 1}</span>
               <strong>{step.label}</strong>
             </div>
-            <p>{step.help}</p>
+            <p>{step.help ?? step.description ?? ''}</p>
           </div>
         );
       })}
@@ -2038,7 +2038,15 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
   const selectedTokenTemplateLabels = selectedToken
     ? selectedToken.allowed_templates.map((type) => TEMPLATE_META[type].titleHe).join(' · ')
     : '';
-  const currentProcessMeta = PROCESS_STEPS.find((step) => step.id === workspaceStep) ?? PROCESS_STEPS[0];
+  const processSteps = trainerContract.processSteps?.length
+    ? trainerContract.processSteps.map((step) => ({
+        id: step.id as WorkspaceStepId,
+        label: step.label,
+        help: step.description,
+        shortLabel: step.shortLabel
+      }))
+    : PROCESS_STEPS;
+  const currentProcessMeta = processSteps.find((step) => step.id === workspaceStep) ?? processSteps[0];
   const launchModeLabel = settings.launchMode === 'guided' ? 'פתיחה מודרכת' : 'כניסה ישירה';
   const draftLaunchModeLabel = draftSettings.launchMode === 'guided' ? 'פתיחה מודרכת' : 'כניסה ישירה';
   const activeAidsLabel = [settings.showFocusGuide ? 'מפת עבודה' : null, settings.showFocusSketch ? 'סכמת מבנה' : null]
@@ -2053,12 +2061,12 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
   const previewSummary = `תרחיש ${draftScenarioIndexLabel} · ${draftLaunchModeLabel} · ${draftAidsLabel}`;
   const previewScenario = scenarios[normalizeScenarioIndex(draftSettings.defaultScenarioIndex, scenarioCount)] ?? scenario;
   const liveScenario = scenarios[normalizeScenarioIndex(settings.defaultScenarioIndex, scenarioCount)] ?? scenario;
-  const helperSteps = trainerContract.helperSteps?.length ? [...trainerContract.helperSteps] : PROCESS_STEPS.slice(0, 3).map((step) => ({
+  const helperSteps = trainerContract.helperSteps?.length ? [...trainerContract.helperSteps] : processSteps.slice(0, 3).map((step) => ({
     title: step.label,
     description: step.help
   }));
-  const settingsSections: TrainerSettingsSection[] = [
-    {
+  const settingsSectionMap: Record<string, TrainerSettingsSection> = {
+    scenario: {
       id: 'scenario',
       title: 'מה לתרגל',
       help: 'בוחרים מאיזה משפט לפתוח את הסשן הבא. אפשר להתחיל גם בלי לגעת בזה.',
@@ -2085,8 +2093,8 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         </div>
       )
     },
-    {
-      id: 'launch-mode',
+    'entry-mode': {
+      id: 'entry-mode',
       title: 'איך להיכנס לאימון',
       help: 'האם לפתוח קודם overlay קצר שמכניס אותך לעץ, או להיכנס ישר למרחב העבודה.',
       content: (
@@ -2108,8 +2116,8 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         </div>
       )
     },
-    {
-      id: 'support-aids',
+    'workspace-aids': {
+      id: 'workspace-aids',
       title: 'תמיכות עבודה',
       help: 'מגדירים אילו שכבות עזר יופיעו כברירת מחדל בתוך הסשן.',
       content: (
@@ -2139,7 +2147,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         </div>
       )
     },
-    {
+    advanced: {
       id: 'advanced',
       title: 'הפעלה מתקדמת',
       help: 'למי שרוצה פחות חיכוך בין השיבוץ לבין חשיפת העץ.',
@@ -2160,31 +2168,12 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         </div>
       )
     }
+  };
+  const orderedSettingsIds = trainerContract.settingsGroups?.length ? trainerContract.settingsGroups : Object.keys(settingsSectionMap);
+  const settingsSections: TrainerSettingsSection[] = [
+    ...orderedSettingsIds.map((id) => settingsSectionMap[id]).filter(Boolean),
+    ...Object.values(settingsSectionMap).filter((section) => !orderedSettingsIds.includes(section.id))
   ];
-
-  const legacyView = (
-    <div className="it-wrap" dir="rtl" lang="he">
-      <style>{css}</style>
-
-      <div className="it-panel">
-        <div className="it-progress">
-          <div>
-            <h1 className="it-title">קצה קרחון / שלדי עומק</h1>
-            <p className="it-sub">Iceberg Templates · גרירת מילה/ביטוי לצורת עומק</p>
-          </div>
-          <div className="it-topbar">
-            <span className="it-chip">תרחיש <strong>{state.currentScenarioIndex + 1}</strong> / {scenarioCount}</span>
-            <span className="it-chip">ניקוד מבני: <strong>{state.scoreDrops}</strong></span>
-            <span className="it-chip">"מטופל אחר": <strong>{state.scoreVariants}</strong></span>
-          </div>
-        </div>
-        <div className="it-home-links">
-          <a className="it-home-link" href="index.html">🏠 דף ראשי</a>
-          <a className="it-home-link" href="classic2_trainer.html">Classic 2</a>
-          <a className="it-home-link" href="classic_classic_trainer.html">Classic Classic</a>
-        </div>
-        <div className="it-intro">{INTRO_COPY}</div>
-      </div>
 
       <div className="it-grid" style={{ marginTop: 12 }}>
         <div className="it-stack">
