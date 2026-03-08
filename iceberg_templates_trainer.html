@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Iceberg Templates - ??? ????? / ??? ?????</title>
+  <title>Iceberg Templates - Iceberg / Branch Trees</title>
   <style>
     html, body { margin: 0; padding: 0; }
     body {
@@ -64,7 +64,7 @@
         if (!mount) return;
         mount.innerHTML = [
           '<div class="it-loading-shell' + (isError ? ' it-error' : '') + '">',
-          '<p class="it-loading-title">' + (isError ? '????? ?????? ??? ?????' : '???? ??? ?????...') + '</p>',
+          '<p class="it-loading-title">' + (isError ? 'Iceberg load error' : 'Loading Iceberg...') + '</p>',
           '<p class="it-loading-text">' + (message || '') + '</p>',
           extra ? '<div class="it-loading-meta">' + extra + '</div>' : '',
           '</div>'
@@ -154,7 +154,7 @@
         script.src = withBuildQuery('js/iceberg-templates-trainer.bundle.js');
         script.defer = true;
         script.onerror = function () {
-          updateLoading('?? ???? ????? ?? iceberg-templates-trainer.bundle.js', '???? build/push', true);
+          updateLoading('Could not load iceberg-templates-trainer.bundle.js', 'Check build/push', true);
           console.error('[IcebergTemplates] Failed to load bundle');
         };
         document.head.appendChild(script);
