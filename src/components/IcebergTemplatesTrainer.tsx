@@ -2175,429 +2175,9 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     ...Object.values(settingsSectionMap).filter((section) => !orderedSettingsIds.includes(section.id))
   ];
 
-      <div className="it-grid" style={{ marginTop: 12 }}>
-        <div className="it-stack">
-          <div className="it-workbench-grid">
-            <section className="it-panel" aria-label="Scenario text">
-              <div className="it-kicker">Scenario ID: <code>{scenario.scenario_id}</code></div>
-              <h2 className="it-title" style={{ fontSize: '1.05rem', marginTop: 4 }}>משפט מטופל / חלון טקסט</h2>
-              <p className="it-sub">גרור/י רק מילים/ביטויים מודגשים. אפשר גם לבחור בלוק בלחיצה ואז ללחוץ על תבנית (ללא drag מדויק).</p>
-
-              <div className="it-textbox" aria-live="polite">
-                {segments.map((seg) => {
-                  if (seg.kind === 'plain') return <span key={seg.key} className="it-seg">{seg.text}</span>;
-                  const candidate = seg.candidate;
-                  const isSelected = state.selectedTokenId === candidate.id;
-                  const isActive = state.active?.tokenId === candidate.id;
-                  const isDragging = draggingTokenId === candidate.id;
-                  return (
-                    <button
-                      key={seg.key}
-                      type="button"
-                      draggable
-                      className={['it-token', isSelected ? 'sel' : '', isActive ? 'active' : '', isDragging ? 'dragging' : ''].filter(Boolean).join(' ')}
-                      onDragStart={(e) => onDragStart(e, candidate.id)}
-                      onDragEnd={onDragEnd}
-                      onClick={() => onTokenTap(candidate.id)}
-                      aria-pressed={isSelected}
-                      title={`תבניות מותרות: ${candidate.allowed_templates.join(', ')}`}
-                    >
-                      {candidate.text}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="it-help"><strong>מועמדים לגרירה:</strong> {scenario.draggables.map((d) => d.text).join(' · ')}</div>
-            </section>
-
-            <section className="it-panel" aria-label="Template gallery">
-              <h2 className="it-title" style={{ fontSize: '1.05rem' }}>גלריית צורות / Templates</h2>
-              <p className="it-sub">כדי לקצר מרחקי גרירה: אפשר לגרור מהמשפט, או להשתמש במגש הטוקנים הקרוב שמתחת.</p>
-
-              <div className="it-token-dock" aria-label="מגש טוקנים קרוב">
-                <div className="it-help"><strong>מגש טוקנים קרוב (drag / tap):</strong> נועד לקצר מרחק בין המשפט לבין הצורות.</div>
-                <div className="it-token-dock-row">
-                  {scenario.draggables.map((candidate) => {
-                    const isSelected = state.selectedTokenId === candidate.id;
-                    const isActive = state.active?.tokenId === candidate.id;
-                    const isDragging = draggingTokenId === candidate.id;
-                    return (
-                      <button
-                        key={`dock-${candidate.id}`}
-                        type="button"
-                        draggable
-                        className={['it-token', isSelected ? 'sel' : '', isActive ? 'active' : '', isDragging ? 'dragging' : ''].filter(Boolean).join(' ')}
-                        onDragStart={(e) => onDragStart(e, candidate.id)}
-                        onDragEnd={onDragEnd}
-                        onClick={() => onTokenTap(candidate.id)}
-                        aria-pressed={isSelected}
-                        title={`תבניות מותרות: ${candidate.allowed_templates.join(', ')}`}
-                      >
-                        {candidate.text}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="it-template-grid" style={{ marginTop: 8 }}>
-                {(Object.keys(TEMPLATE_META) as TemplateType[]).map((type) => {
-                  const meta = TEMPLATE_META[type];
-                  const isActive = state.active?.templateType === type;
-                  const isHover = hoverTemplate === type;
-                  const payload = isActive && activePayload ? activePayload : null;
-                  const slotCount = meta.slotCount;
-                  const causeMode = payload && 'mode' in payload ? payload.mode ?? null : null;
-
-                  return (
-                    <div
-                      key={type}
-                      className={['it-template', isActive ? 'is-active' : '', shakeTemplate === type ? 'shake' : ''].filter(Boolean).join(' ')}
-                      data-over={isHover ? '1' : '0'}
-                      onDragOver={(e) => { e.preventDefault(); setHoverTemplate(type); }}
-                      onDragLeave={() => setHoverTemplate((prev) => (prev === type ? null : prev))}
-                      onDrop={(e) => handleTemplateDrop(e, type)}
-                      onClick={() => handleTemplateClick(type)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleTemplateClick(type);
-                        }
-                      }}
-                      aria-label={`תבנית ${meta.titleHe}`}
-                    >
-                      <div className="it-template-head">
-                        <div>
-                          <div className="it-template-title">{meta.titleHe}</div>
-                          <div className="it-template-mini">{meta.titleEn}</div>
-                        </div>
-                        <div className="it-template-meta">
-                          <span className="it-template-code">{meta.code}</span>
-                          <span className="it-template-mini">{slotCount} slots</span>
-                        </div>
-                      </div>
-                      <div className="it-template-help">{meta.shortHelp}</div>
-                      <TemplateSketch meta={meta} tokenText={isActive && activeToken ? activeToken.text : undefined} causeMode={causeMode} active={isActive} />
-                      <div className={`it-dropzone${isActive ? ' has-active' : ''}`}>
-                        {isActive && activeToken ? <>טוקן פעיל: <strong style={{ marginInlineStart: 6 }}>{activeToken.text}</strong></> : 'גרור/י לכאן טוקן מודגש'}
-                      </div>
-                      {isActive && payload ? (
-                        <>
-                          {renderCauseDirectionLabel(payload) ? <div className="it-help"><strong>{renderCauseDirectionLabel(payload)}</strong></div> : null}
-                          <div className="it-help"><strong>סטטוס:</strong> התבנית פעילה. הפירוט המלא מוצג בפאנל המיקוד.</div>
-                        </>
-                      ) : null}
-                    </div>
-                  );
-                })}
-              </div>
-
-              <details className="it-collapse" style={{ marginTop: 8 }}>
-                <summary>
-                  <span>צורות חסרות / Prototype Shapes</span>
-                  <span className="it-kicker">דה בונו · רמות לוגיות · Russell/Grinder</span>
-                </summary>
-                <div className="it-collapse-body">
-                  <div className="it-template-grid">
-                    {PROTOTYPE_SCHEMAS.map((schema) => (
-                      <div key={schema.id} className="it-template is-proto" aria-disabled="true">
-                        <div className="it-template-head">
-                          <div>
-                            <div className="it-template-title">{schema.titleHe}</div>
-                            <div className="it-template-mini">{schema.titleEn}</div>
-                          </div>
-                          <div className="it-template-meta">
-                            <span className="it-template-code">{schema.code}</span>
-                            <span className="it-template-mini">prototype</span>
-                          </div>
-                        </div>
-                        <div className="it-template-help">{schema.shortHelp}</div>
-                        <PrototypeSketch schemaId={schema.id} />
-                        <div className="it-proto-note">{schema.note}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <LogicalLevelsRoleStudio
-                    anchorText={selectedToken?.text ?? activeToken?.text ?? ''}
-                    contextText={scenario.client_text}
-                  />
-                </div>
-              </details>
-            </section>
-          </div>
-
-          <details className="it-collapse" open={!!state.active}>
-            <summary>
-              <span>לוח משפטים / מפת בדיקה</span>
-              <span className="it-kicker">{state.active ? 'פתוח בזמן עבודה' : 'אופציונלי'}</span>
-            </summary>
-            <div className="it-collapse-body">
-              <SentenceBoard
-                scenario={scenario}
-                selectedToken={selectedToken}
-                activeTemplateType={state.active?.templateType ?? null}
-                activeQuestion={activePayload?.question ?? ''}
-                activeReflection={activeReflection}
-              />
-            </div>
-          </details>
-        </div>
-        <div className="it-stack">
-          <section className="it-panel it-focus-panel" aria-label="Focus output">
-            <div className="it-focus-top">
-              <div>
-                <h2 className="it-title" style={{ fontSize: '1.08rem' }}>אזור תוצאה ועבודה / Build → Reveal → Challenge</h2>
-                <p className="it-sub">זה חלק מהתרגיל (לא רק הסבר): כאן רואים ציור, Reveal, ותוצאות. ההוראות נפתחות/נסגרות בנפרד.</p>
-              </div>
-              {revealReady && activeToken && state.active ? (
-                <div className="it-focus-badge">
-                  {TEMPLATE_META[state.active.templateType].code} · {activeToken.text}
-                </div>
-              ) : null}
-            </div>
-
-            <div className="it-focus-toolbar">
-              <button type="button" className="it-focus-mini-btn" onClick={() => setShowFocusGuide((prev) => !prev)} aria-pressed={showFocusGuide}>
-                {showFocusGuide ? 'סגור הוראות' : 'מה עושים כאן?'}
-              </button>
-              <button
-                type="button"
-                className="it-focus-mini-btn"
-                onClick={() => setShowFocusSketch((prev) => !prev)}
-                aria-pressed={showFocusSketch}
-                disabled={!revealReady}
-                title={revealReady ? 'הצג/הסתר מפת סכמה' : 'הסכמה תופיע אחרי בחירת טוקן ותבנית'}
-              >
-                {showFocusSketch ? 'הסתר ציור' : 'הצג ציור'}
-              </button>
-            </div>
-
-            {showFocusGuide ? (
-              <div className="it-focus-help" aria-label="הוראות עבודה">
-                <div className="it-focus-help-body">
-                  <div className="it-help"><strong>איך עובדים כאן:</strong> בוחרים בלוק, גוררים לתבנית, רואים Reveal, ואז בודקים ב-Challenge.</div>
-                  <div className="it-steps" aria-label="Focus stages">
-                    <span className={`it-step ${state.selectedTokenId ? 'is-done' : 'is-on'}`}>1. בחר/י בלוק</span>
-                    <span className={`it-step ${state.active ? 'is-done' : state.selectedTokenId ? 'is-on' : ''}`}>2. גרירה לסכמה</span>
-                    <span className={`it-step ${revealReady ? 'is-done' : state.active ? 'is-on' : ''}`}>3. Reveal</span>
-                    <span className={`it-step ${challengeReady ? 'is-on' : ''}`}>4. Challenge</span>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
-            {!revealReady ? (
-              <div className="it-empty" style={{ marginTop: 10 }}>
-                הסכמה היא מרכז העבודה: בחר/י מילה מודגשת וגרור/י אותה לתבנית כדי לפתוח Reveal.
-              </div>
-            ) : (
-              <div className="it-active" style={{ marginTop: 10 }}>
-                {showFocusSketch || focusStage === 'build' ? (
-                  <div className={`it-focus-sketch ${focusStage !== 'build' ? 'is-compact' : ''}`}>
-                    <TemplateSketch
-                      meta={TEMPLATE_META[state.active.templateType]}
-                      tokenText={activeToken.text}
-                      causeMode={'mode' in activePayload ? activePayload.mode ?? null : null}
-                      active
-                    />
-                  </div>
-                ) : null}
-
-                <div className="it-stage-switch" role="tablist" aria-label="שלבי העבודה">
-                  <button
-                    type="button"
-                    className={`it-stage-btn ${focusStage === 'build' ? 'is-active' : ''}`}
-                    onClick={() => setFocusStage('build')}
-                    aria-pressed={focusStage === 'build'}
-                  >
-                    Build
-                  </button>
-                  <button
-                    type="button"
-                    className={`it-stage-btn ${focusStage === 'reveal' ? 'is-active' : ''}`}
-                    onClick={() => setFocusStage('reveal')}
-                    aria-pressed={focusStage === 'reveal'}
-                    disabled={!revealReady}
-                  >
-                    Reveal ({activeFilledSlots}/{activeSlotCount})
-                  </button>
-                  <button
-                    type="button"
-                    className={`it-stage-btn ${focusStage === 'challenge' ? 'is-active' : ''}`}
-                    onClick={() => setFocusStage('challenge')}
-                    aria-pressed={focusStage === 'challenge'}
-                    disabled={!challengeReady}
-                  >
-                    Challenge
-                  </button>
-                </div>
-
-                <div className="it-stage-card">
-                  {focusStage === 'build' ? (
-                    <>
-                      <div className="it-help"><strong>Build:</strong> בחר/י בלוק רלוונטי וגרור/י לתבנית. הסכמה מגדירה את סוג החשיפה.</div>
-                      <div className="it-board-row">
-                        <div className="it-board-label">בלוק נבחר</div>
-                        <div className="it-board-value">{activeToken.text}</div>
-                      </div>
-                      <div className="it-board-row">
-                        <div className="it-board-label">תבנית פעילה</div>
-                        <div className="it-board-value emph">{formatTemplateLabel(state.active.templateType)}</div>
-                      </div>
-                      <div className="it-board-row">
-                        <div className="it-board-label">מה יקרה בשלב הבא</div>
-                        <div className="it-board-value">המערכת תציג שאלה + חריצים + שיקוף. אחר כך תוכל/י לעבור לאתגר.</div>
-                      </div>
-                      <div className="it-actions">
-                        <button type="button" className="it-btn primary" onClick={() => setFocusStage('reveal')}>
-                          עבור ל-Reveal
-                        </button>
-                        <button type="button" className="it-btn ghost" onClick={clearActive}>
-                          אפס תבנית
-                        </button>
-                      </div>
-                    </>
-                  ) : null}
-
-                  {focusStage === 'reveal' ? (
-                    <>
-                      <div className="it-focus-core-layout">
-                        <div className="it-focus-result-column">
-                          <section className="it-reveal-visual" aria-label="תוצאת reveal חזותית">
-                            <div className="it-reveal-visual-head">
-                              <div>
-                                <h4>תוצאת Reveal בתוך ציור (מורחב)</h4>
-                                <p>לא רק מילים: השיבוץ מוצג בתוך מבנה הסכמה כדי לראות את ההיגיון בצורה מרחבית.</p>
-                              </div>
-                              <span className="it-mini-tag code">{TEMPLATE_META[state.active.templateType].code}</span>
-                            </div>
-
-                            <RevealTemplateFigure
-                              templateType={state.active.templateType}
-                              tokenText={activeToken.text}
-                              slots={activeSet}
-                              causeMode={'mode' in activePayload ? activePayload.mode ?? null : null}
-                            />
-
-                            <div className={`it-slots cols-${TEMPLATE_META[state.active.templateType].slotCount}`}>
-                              {Array.from({ length: TEMPLATE_META[state.active.templateType].slotCount }).map((_, idx) => (
-                                <div key={idx} className="it-slot">{activeSet[idx] || '—'}</div>
-                              ))}
-                            </div>
-                          </section>
-
-                          <details className="it-reveal-extra" open>
-                            <summary>שאלה + שיקוף (Reveal)</summary>
-                            <div className="it-reveal-extra-body">
-                              <div className="it-question">{activePayload.question}</div>
-                              <div className="it-reflection">{activeReflection}</div>
-                              <div className="it-disclaimer">{DISCLAIMER_COPY}</div>
-                            </div>
-                          </details>
-                        </div>
-
-                        <div className="it-focus-side-column">
-                          <LogicalLevelsDebonoDragTree
-                            seedKey={dragTreeSeedKey}
-                            anchorText={activeToken.text}
-                            sourceChips={dragTreeChips}
-                          />
-
-                          <div className="it-actions">
-                            <button type="button" className="it-btn secondary" onClick={cycleVariant}>
-                              מטופל אחר / תשובה אחרת
-                            </button>
-                            <button type="button" className="it-btn ghost" onClick={clearActive}>
-                              אפס תבנית
-                            </button>
-                            <button
-                              type="button"
-                              className="it-btn primary"
-                              onClick={() => setFocusStage('challenge')}
-                              disabled={!challengeReady}
-                            >
-                              עבור לאתגר
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  ) : null}
-
-                  {focusStage === 'challenge' ? (
-                    <>
-                      <div className="it-board-row">
-                        <div className="it-board-label">מה עושים כאן</div>
-                        <div className="it-board-value emph">שאלות בדיקה (לא תשובות). בודקים את ה-Reveal במקום להתווכח איתו מיד.</div>
-                      </div>
-                      <div className="it-challenge-list">
-                        {challengePrompts.map((prompt, idx) => (
-                          <div key={`${state.active?.templateType}-${idx}`} className="it-challenge-item">{idx + 1}. {prompt}</div>
-                        ))}
-                      </div>
-                      <details className="it-reveal-extra">
-                        <summary>למה השאלות האלה? (הסבר אתגר)</summary>
-                        <div className="it-reveal-extra-body">
-                          <div className="it-challenge-note">
-                            שלב האתגר מגיע אחרי החשיפה: קודם בונים מפה, ואז בודקים את מה שנחשף.
-                          </div>
-                          <div className="it-help"><strong>טיפ:</strong> קח/י שאלה אחת בלבד, ענה/י בקצרה, ואז חזור/י ל-Reveal אם צריך.</div>
-                        </div>
-                      </details>
-                      <div className="it-actions">
-                        <button type="button" className="it-btn secondary" onClick={() => setFocusStage('reveal')}>
-                          חזרה ל-Reveal
-                        </button>
-                        <button type="button" className="it-btn primary" onClick={nextScenario}>
-                          סיים סבב / הבא
-                        </button>
-                      </div>
-                    </>
-                  ) : null}
-                </div>
-              </div>
-            )}
-
-            {state.feedback ? <div className={`it-feedback ${state.feedback.tone}`}>{state.feedback.text}</div> : null}
-            {state.lastCompletedRecap ? <div className="it-recap">{state.lastCompletedRecap}</div> : null}
-
-            <div className="it-actions">
-              <button type="button" className="it-btn primary" disabled={!state.completedAtLeastOneDrop} onClick={nextScenario}>
-                סיים סבב / הבא
-              </button>
-              <button type="button" className="it-btn ghost" onClick={() => setState(INITIAL_STATE)}>
-                אתחל מודול
-              </button>
-            </div>
-          </section>
-
-          <details className="it-collapse" open={false}>
-            <summary>
-              <span>מה עשינו כאן? / צ'קליסט</span>
-              <span className="it-kicker">סקירה מהירה</span>
-            </summary>
-            <div className="it-collapse-body">
-              <ul className="it-scenario-list">
-                <li><span>1. בחרנו מילה/ביטוי</span><span>{state.selectedTokenId ? '✔' : '—'}</span></li>
-                <li><span>2. גרירה/התאמה לתבנית</span><span>{state.completedAtLeastOneDrop ? '✔' : '—'}</span></li>
-                <li><span>3. נחשפה שאלה + חריצים</span><span>{state.active ? '✔' : '—'}</span></li>
-                <li><span>4. וריאציית "מטופל אחר"</span><span>{state.scoreVariants > 0 ? '✔' : '—'}</span></li>
-                <li><span>5. Reveal-only (לא אמת)</span><span>✔</span></li>
-              </ul>
-            </div>
-          </details>
-        </div>
-      </div>
-    </div>
-  );
-
-  void legacyView;
-
   const mainContent = (
     <>
-      <ProcessRail current={workspaceStep} />
+      <ProcessRail current={workspaceStep} steps={processSteps} />
 
       <section className="it-panel it-source-panel" aria-label="משפט המקור">
         <div className="it-panel-head">
@@ -2788,7 +2368,12 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
 
   const supportContent = (
     <>
-      <TrainerSupportCard title="מצב עבודה" subtitle="אותו shell של משפחת הטריינרים, עם דגש על עוגן, מבנה והצעד הבא.">
+      <TrainerSupportCard
+        title="מצב עבודה"
+        subtitle={trainerContract.supportRailMode === 'branching-tree'
+          ? 'אותו shell של משפחת הטריינרים, עם דגש על עוגן, מבנה והצעד הבא.'
+          : 'לוח תמיכה משני שמראה איפה אתה עומד כרגע.'}
+      >
         <div className="it-support-list">
           <div className="it-support-item"><strong>שלב נוכחי</strong><span>{currentProcessMeta.label}</span></div>
           <div className="it-support-item"><strong>עוגן פעיל</strong><span>{selectedTokenLabel || 'עדיין לא נבחר'}</span></div>
@@ -2798,6 +2383,17 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         <div className="it-actions">
           <button type="button" className="it-btn primary" disabled={!state.completedAtLeastOneDrop} onClick={nextScenario}>סיים/י סבב / הבא</button>
           <button type="button" className="it-btn ghost" onClick={() => startIcebergSession(settings)}>אתחל/י סשן</button>
+        </div>
+      </TrainerSupportCard>
+
+      <TrainerSupportCard title="תהליך העבודה" subtitle="הצעד הבא נשאר ברור גם כשהעץ נפתח לכמה ענפים.">
+        <div className="it-support-list">
+          {processSteps.map((step) => (
+            <div key={step.id} className="it-support-item">
+              <strong>{step.label}</strong>
+              <span>{step.help}</span>
+            </div>
+          ))}
         </div>
       </TrainerSupportCard>
 
@@ -2859,13 +2455,14 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
       ) : null}
 
       <TrainerPlatformShell
+        trainerId="iceberg-templates"
         title={trainerContract.title}
         subtitle={trainerContract.subtitle}
         headerKicker={trainerContract.familyLabel}
         modePill={<span className="trp-mode-pill">{currentProcessMeta.label}</span>}
         headerActions={
           <>
-            <button type="button" className="trp-btn is-secondary" onClick={openSettings}>הגדרות</button>
+            <button type="button" className="trp-btn is-secondary" data-trainer-action="open-settings" onClick={openSettings}>הגדרות</button>
             <button type="button" className="trp-btn is-ghost" onClick={() => setShowOnboarding(true)}>פתיחה מודרכת</button>
           </>
         }
@@ -2884,9 +2481,9 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         startBody={<p>המשפט הראשון, מצב הכניסה, ועזרי העבודה כבר מוכנים. ההגדרות רק מכוונות איך ייראה הסשן הבא.</p>}
         startActions={
           <>
-            <button type="button" className="trp-btn is-primary" onClick={() => startIcebergSession(settings)}>{trainerContract.startActionLabel}</button>
-            <button type="button" className="trp-btn is-secondary" onClick={openSettings}>הגדרות</button>
-            <span className="trp-summary-pill">{currentSessionSummary}</span>
+            <button type="button" className="trp-btn is-primary" data-trainer-action="start-session" onClick={() => startIcebergSession(settings)}>{trainerContract.startActionLabel}</button>
+            <button type="button" className="trp-btn is-secondary" data-trainer-action="open-settings" onClick={openSettings}>הגדרות</button>
+            <span className="trp-summary-pill" data-trainer-summary="current">{currentSessionSummary}</span>
           </>
         }
         startMeta={
@@ -2897,11 +2494,13 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
           </>
         }
         helperSteps={helperSteps}
+        supportRailMode={trainerContract.supportRailMode}
         main={mainContent}
         support={supportContent}
       />
 
       <TrainerSettingsShell
+        trainerId="iceberg-templates"
         open={settingsOpen}
         title={trainerContract.settingsTitle}
         subtitle={trainerContract.settingsSubtitle}
@@ -2926,302 +2525,29 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         footerNote="השמירה מעדכנת מיד את סיכום הסשן למעלה. כדי להחיל תרחיש פתיחה חדש, שמרו והתחילו סשן."
         footerActions={
           <>
-            <button type="button" className="trp-btn is-secondary" onClick={() => applyDraftSettings(false)}>שמור</button>
-            <button type="button" className="trp-btn is-primary" onClick={() => applyDraftSettings(true)}>שמור והתחל סשן</button>
+            <button
+              type="button"
+              className="trp-btn is-ghost"
+              data-trainer-preset="compact"
+              onClick={() => setDraftSettings((prev) => ({
+                ...prev,
+                defaultScenarioIndex: normalizeScenarioIndex(prev.defaultScenarioIndex === 0 ? 1 : 0, scenarioCount),
+                launchMode: 'guided',
+                showFocusGuide: true,
+                showFocusSketch: false,
+                autoRevealAfterPlacement: false
+              }))}
+            >
+              מיקוד מהיר
+            </button>
+            <button type="button" className="trp-btn is-secondary" data-trainer-preset="standard" onClick={resetDraftSettings}>ברירת מחדל</button>
+            <button type="button" className="trp-btn is-secondary" data-trainer-action="save-settings" onClick={() => applyDraftSettings(false)}>שמור</button>
+            <button type="button" className="trp-btn is-primary" data-trainer-action="save-start" onClick={() => applyDraftSettings(true)}>שמור והתחל סשן</button>
           </>
         }
       />
     </div>
   );
 
-  return (
-    <div className="it-wrap it-wrap-refined" dir="rtl" lang="he">
-      <style>{css}</style>
-
-      {showOnboarding ? (
-        <div className="it-onboarding-layer" role="dialog" aria-modal="true" aria-label="פתיחת אימון קצה קרחון">
-          <div className="it-onboarding-card">
-            <div className="it-onboarding-head">
-              <div>
-                <div className="it-kicker">אימון על ארגון פנימי של חשיבה</div>
-                <h2>קצה קרחון / עצי הבחנה</h2>
-                <p>כאן מתאמנים בלמיין חומר לשוני ולוגי לתוך סכמות פנימיות ברורות. זה מה שמעמיק הבנה, מזרז חשיבה, ומכוון לבחירה מדויקת יותר של ההתערבות הבאה.</p>
-              </div>
-              <button type="button" className="it-btn ghost" onClick={() => setShowOnboarding(false)}>סגור</button>
-            </div>
-            <div className="it-onboarding-copy">
-              <p>זה לא סולם דילטס ולא ערבוב של כובעים ורמות. כאן עובדים עם עץ של הכללה, סיבתיות מסתעפת, או הנחות שמחזיקות את המשפט.</p>
-              <p>המטרה היא להבין איזה סוג מיון אתה עושה, למה העוגן שייך לשם, ואיזה ענף חלופי גם יכול להתאים.</p>
-            </div>
-            <SchemaComparisonMini />
-            <div className="it-onboarding-grid">
-              <article className="it-onboarding-note"><strong>מה עושים כאן</strong><p>קוראים את המשפט, בוחרים עוגן אחד, בוחרים מבנה, ואז רואים איך העץ נפתח.</p></article>
-              <article className="it-onboarding-note"><strong>איך יודעים שהצלחת</strong><p>כשברור מהו סוג המבנה, מהו הענף המרכזי, ומה עוד אפשר לבדוק במקום להינעל על פירוש אחד.</p></article>
-              <article className="it-onboarding-note"><strong>דוגמה</strong><p>"מנוחה" יכולה להפוך מקריאת מצוקה כללית לעץ של קריטריונים, תנאים, או הנחות סמויות.</p></article>
-            </div>
-            <div className="it-onboarding-actions">
-              <button type="button" className="it-btn primary" onClick={() => setShowOnboarding(false)}>מתחילים למיין</button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      <section className="it-panel it-hero-panel">
-        <div className="it-hero-top">
-          <div>
-            <div className="it-kicker">Iceberg Templates · מבני מיון</div>
-            <h1 className="it-title">קצה קרחון / עצי הבחנה</h1>
-            <p className="it-sub">{INTRO_COPY}</p>
-          </div>
-          <div className="it-topbar">
-            <span className="it-chip">תרחיש <strong>{state.currentScenarioIndex + 1}</strong> / {scenarioCount}</span>
-            <span className="it-chip">עוגנים ששובצו <strong>{state.scoreDrops}</strong></span>
-            <span className="it-chip">ענפים חלופיים <strong>{state.scoreVariants}</strong></span>
-          </div>
-        </div>
-        <div className="it-home-links">
-          <a className="it-home-link" href="index.html">דף ראשי</a>
-          <a className="it-home-link" href="classic2_trainer.html">Classic 2</a>
-          <a className="it-home-link" href="classic_classic_trainer.html">Classic Classic</a>
-        </div>
-        <div className="it-start-strip">
-          <div className="it-start-copy">
-            <strong>מה הצעד הבא עכשיו?</strong>
-            <span>{currentProcessMeta.help}</span>
-          </div>
-          <div className="it-start-actions">
-            <button type="button" className="it-btn primary" onClick={() => setShowOnboarding(true)}>פתח/י פתיחה מודרכת</button>
-            {state.active ? <button type="button" className="it-btn secondary" onClick={() => setFocusStage('reveal')}>חזור/י לעץ</button> : null}
-          </div>
-        </div>
-      </section>
-
-      <ProcessRail current={workspaceStep} />
-
-      <div className="it-main-layout">
-        <div className="it-main-column">
-          <section className="it-panel it-source-panel" aria-label="משפט המקור">
-            <div className="it-panel-head">
-              <div>
-                <div className="it-kicker">Scenario ID: <code>{scenario.scenario_id}</code></div>
-                <h2 className="it-title" style={{ fontSize: '1.08rem', marginTop: 4 }}>קוראים את המשפט המלא</h2>
-                <p className="it-sub">רואים את כל האמירה, ואז בוחרים איזה חלק כדאי להפוך לעוגן עבודה.</p>
-              </div>
-              <span className="it-panel-badge">שלב 1</span>
-            </div>
-            <div className="it-textbox it-textbox-prominent" aria-live="polite">
-              {segments.map((seg) => {
-                if (seg.kind === 'plain') return <span key={seg.key} className="it-seg">{seg.text}</span>;
-                const candidate = seg.candidate;
-                const isSelected = state.selectedTokenId === candidate.id;
-                const isActive = state.active?.tokenId === candidate.id;
-                const isDragging = draggingTokenId === candidate.id;
-                return (
-                  <button
-                    key={seg.key}
-                    type="button"
-                    draggable
-                    className={['it-token', isSelected ? 'sel' : '', isActive ? 'active' : '', isDragging ? 'dragging' : ''].filter(Boolean).join(' ')}
-                    onDragStart={(e) => onDragStart(e, candidate.id)}
-                    onDragEnd={onDragEnd}
-                    onClick={() => onTokenTap(candidate.id)}
-                    aria-pressed={isSelected}
-                    title={`תבניות אפשריות: ${candidate.allowed_templates.map((type) => TEMPLATE_META[type].code).join(', ')}`}
-                  >
-                    {candidate.text}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="it-source-foot">
-              <div className="it-help"><strong>מועמדים לעוגן:</strong> {scenario.draggables.map((d) => d.text).join(' · ')}</div>
-              <div className="it-selection-card">
-                <strong>העוגן הנוכחי</strong>
-                <span>{selectedTokenLabel || 'עדיין לא נבחר'}</span>
-                <small>{selectedTokenLabel ? `מבנים אפשריים: ${selectedTokenTemplateLabels}` : 'בחר/י מילה או ביטוי מודגש כדי להתקדם.'}</small>
-              </div>
-            </div>
-          </section>
-
-          <section className="it-panel it-structure-panel" aria-label="בחירת מבנה">
-            <div className="it-panel-head">
-              <div>
-                <h2 className="it-title" style={{ fontSize: '1.08rem' }}>בוחרים איזה סוג עץ מתאים</h2>
-                <p className="it-sub">כל כרטיס הוא סוג אחר של הבחנה. בחר/י את זה שמסדר הכי טוב את מה שנאמר.</p>
-              </div>
-              <span className="it-panel-badge">שלב 2</span>
-            </div>
-            <div className="it-template-grid it-template-grid-refined">
-              {(Object.keys(TEMPLATE_META) as TemplateType[]).map((type) => {
-                const meta = TEMPLATE_META[type];
-                const isActive = state.active?.templateType === type;
-                const isHover = hoverTemplate === type;
-                const payload = isActive && activePayload ? activePayload : null;
-                const causeMode = payload && 'mode' in payload ? payload.mode ?? null : null;
-                return (
-                  <div
-                    key={type}
-                    className={['it-template', 'it-template-card', isActive ? 'is-active' : '', shakeTemplate === type ? 'shake' : ''].filter(Boolean).join(' ')}
-                    data-over={isHover ? '1' : '0'}
-                    onDragOver={(e) => { e.preventDefault(); setHoverTemplate(type); }}
-                    onDragLeave={() => setHoverTemplate((prev) => (prev === type ? null : prev))}
-                    onDrop={(e) => handleTemplateDrop(e, type)}
-                    onClick={() => handleTemplateClick(type)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleTemplateClick(type);
-                      }
-                    }}
-                    aria-label={`מבנה ${meta.titleHe}`}
-                  >
-                    <div className="it-template-head">
-                      <div>
-                        <div className="it-template-title">{meta.titleHe}</div>
-                        <div className="it-template-mini">{meta.titleEn}</div>
-                      </div>
-                      <div className="it-template-meta">
-                        <span className="it-template-code">{meta.code}</span>
-                        <span className="it-template-mini">{meta.slotCount} ענפים</span>
-                      </div>
-                    </div>
-                    <div className="it-template-help">{meta.shortHelp}</div>
-                    <TemplateSketch meta={meta} tokenText={isActive && activeToken ? activeToken.text : undefined} causeMode={causeMode} active={isActive} />
-                    <div className={`it-dropzone${isActive ? ' has-active' : ''}`}>
-                      {isActive && activeToken ? <>עובדים עכשיו עם <strong style={{ marginInlineStart: 6 }}>{activeToken.text}</strong></> : 'גרור/י לכאן עוגן מודגש או הקש/י אחרי בחירה'}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
-          <section className="it-panel it-workspace-panel" aria-label="מרחב עבודה מרכזי">
-            <div className="it-panel-head">
-              <div>
-                <h2 className="it-title" style={{ fontSize: '1.12rem' }}>מרחב העבודה המרכזי</h2>
-                <p className="it-sub">כאן רואים מהו שלב העבודה, למה העוגן יושב בתוך המבנה, ואיך אפשר לפתוח ענף נוסף.</p>
-              </div>
-              <span className="it-panel-badge">שלבים 3-5</span>
-            </div>
-            <div className="it-focus-toolbar">
-              <button type="button" className="it-focus-mini-btn" onClick={() => setShowFocusGuide((prev) => !prev)} aria-pressed={showFocusGuide}>{showFocusGuide ? 'הסתר/י מפת עבודה' : 'הצג/י מפת עבודה'}</button>
-              <button type="button" className="it-focus-mini-btn" onClick={() => setShowFocusSketch((prev) => !prev)} aria-pressed={showFocusSketch} disabled={!revealReady}>{showFocusSketch ? 'הסתר/י סכמת מבנה' : 'הצג/י סכמת מבנה'}</button>
-            </div>
-            {showFocusGuide ? <div className="it-focus-help"><div className="it-focus-help-body"><div className="it-help"><strong>מה קורה כאן:</strong> קודם ממיינים, אחר כך רואים את העץ, ואז בודקים חלופה. לא קופצים ישר לפירוש סופי.</div></div></div> : null}
-            {!revealReady || !activeToken || !activeMeta || !state.active ? (
-              <div className="it-empty it-workspace-empty">
-                <strong>העבודה תתחיל ברגע שתבחר/י עוגן ומבנה.</strong>
-                <p>אחר כך תוכל/י לראות שאלה, הסתעפויות, חלופות, ומה כדאי לקחת לסבב הבא.</p>
-              </div>
-            ) : (
-              <div className="it-active" style={{ marginTop: 10 }}>
-                {showFocusSketch ? <div className={`it-focus-sketch ${focusStage !== 'build' ? 'is-compact' : ''}`}><TemplateSketch meta={activeMeta} tokenText={activeToken.text} causeMode={'mode' in activePayload ? activePayload.mode ?? null : null} active /></div> : null}
-                <div className="it-stage-switch" role="tablist" aria-label="שלבי העבודה">
-                  <button type="button" className={`it-stage-btn ${focusStage === 'build' ? 'is-active' : ''}`} onClick={() => setFocusStage('build')}>שלב 3 · משבצים</button>
-                  <button type="button" className={`it-stage-btn ${focusStage === 'reveal' ? 'is-active' : ''}`} onClick={() => setFocusStage('reveal')}>שלב 4 · רואים עץ</button>
-                  <button type="button" className={`it-stage-btn ${focusStage === 'challenge' ? 'is-active' : ''}`} onClick={() => setFocusStage('challenge')} disabled={!challengeReady}>שלב 5 · בודקים חלופה</button>
-                </div>
-                <div className="it-stage-card">
-                  {focusStage === 'build' ? (
-                    <div className="it-coach-grid">
-                      <div className="it-coach-card"><strong>העוגן</strong><p>{activeToken.text}</p></div>
-                      <div className="it-coach-card"><strong>המבנה</strong><p>{activeMeta.titleHe}</p></div>
-                      <div className="it-coach-card"><strong>מה בודקים כאן</strong><p>{activeMeta.shortHelp}</p></div>
-                      <div className="it-actions">
-                        <button type="button" className="it-btn primary" onClick={() => setFocusStage('reveal')}>פתח/י את העץ</button>
-                        <button type="button" className="it-btn ghost" onClick={clearActive}>בחר/י מבנה אחר</button>
-                      </div>
-                    </div>
-                  ) : null}
-                  {focusStage === 'reveal' ? (
-                    <div className="it-focus-core-layout">
-                      <div className="it-focus-result-column">
-                        <section className="it-reveal-visual" aria-label="העץ שנפתח">
-                          <div className="it-reveal-visual-head">
-                            <div><h4>כך המבנה נפתח כרגע</h4><p>העוגן במרכז, והענפים מראים מה המבנה פותח סביבו.</p></div>
-                            <span className="it-mini-tag code">{activeMeta.code}</span>
-                          </div>
-                          <RevealTemplateFigure templateType={state.active.templateType} tokenText={activeToken.text} slots={activeSet} causeMode={'mode' in activePayload ? activePayload.mode ?? null : null} />
-                          <div className={`it-slots cols-${activeMeta.slotCount}`}>{Array.from({ length: activeMeta.slotCount }).map((_, idx) => <div key={idx} className="it-slot">{activeSet[idx] || '—'}</div>)}</div>
-                        </section>
-                        <BranchExplorer templateType={state.active.templateType} tokenText={activeToken.text} payload={activePayload} activeSet={activeSet} />
-                      </div>
-                      <div className="it-focus-side-column">
-                        <div className="it-question">{activePayload.question}</div>
-                        <div className="it-reflection">{activeReflection}</div>
-                        <div className="it-disclaimer">{activeDirectionLabel || DISCLAIMER_COPY}</div>
-                        <div className="it-actions">
-                          <button type="button" className="it-btn secondary" onClick={cycleVariant}>הצג/י ענף חלופי</button>
-                          <button type="button" className="it-btn ghost" onClick={clearActive}>אפס/י מבנה</button>
-                          <button type="button" className="it-btn primary" onClick={() => setFocusStage('challenge')} disabled={!challengeReady}>עבור/י לשלב הבדיקה</button>
-                        </div>
-                      </div>
-                    </div>
-                  ) : null}
-                  {focusStage === 'challenge' ? (
-                    <>
-                      <BranchExplorer templateType={state.active.templateType} tokenText={activeToken.text} payload={activePayload} activeSet={activeSet} />
-                      <div className="it-board-row"><div className="it-board-label">מה בודקים עכשיו</div><div className="it-board-value emph">איזה ענף מחזיק יותר, איזה ענף חלופי גם אפשרי, ומה משתנה אם ממיינים אחרת.</div></div>
-                      <div className="it-challenge-list">{challengePrompts.map((prompt, idx) => <div key={`${state.active?.templateType}-${idx}`} className="it-challenge-item">{idx + 1}. {prompt}</div>)}</div>
-                      <div className="it-challenge-note">בחר/י שאלה אחת בלבד, בדוק/י אותה, ואז חזור/י לעץ אם צריך לחדד את המיון.</div>
-                      <div className="it-actions">
-                        <button type="button" className="it-btn secondary" onClick={() => setFocusStage('reveal')}>חזור/י לעץ</button>
-                        <button type="button" className="it-btn ghost" onClick={cycleVariant}>עוד חלופה</button>
-                        <button type="button" className="it-btn primary" onClick={nextScenario}>סיים/י סבב ועבור/י הלאה</button>
-                      </div>
-                    </>
-                  ) : null}
-                </div>
-              </div>
-            )}
-            {state.feedback ? <div className={`it-feedback ${state.feedback.tone}`}>{state.feedback.text}</div> : null}
-            {state.lastCompletedRecap ? <div className="it-recap">{state.lastCompletedRecap}</div> : null}
-          </section>
-        </div>
-
-        <aside className="it-support-column">
-          <section className="it-panel it-support-summary">
-            <div className="it-panel-head">
-              <div>
-                <h2 className="it-title" style={{ fontSize: '1rem' }}>סיכום מצב נוכחי</h2>
-                <p className="it-sub">איפה אתה נמצא, עם איזה עוגן אתה עובד, ומה כדאי לעשות עכשיו.</p>
-              </div>
-            </div>
-            <div className="it-support-list">
-              <div className="it-support-item"><strong>שלב נוכחי</strong><span>{currentProcessMeta.label}</span></div>
-              <div className="it-support-item"><strong>עוגן פעיל</strong><span>{selectedTokenLabel || 'עדיין לא נבחר'}</span></div>
-              <div className="it-support-item"><strong>מבנה פעיל</strong><span>{activeMeta ? activeMeta.titleHe : 'עדיין לא נבחר'}</span></div>
-              <div className="it-support-item"><strong>הצעד הבא</strong><span>{currentProcessMeta.help}</span></div>
-            </div>
-            <div className="it-actions">
-              <button type="button" className="it-btn primary" disabled={!state.completedAtLeastOneDrop} onClick={nextScenario}>סיים/י סבב / הבא</button>
-              <button type="button" className="it-btn ghost" onClick={() => { setState(INITIAL_STATE); setFocusStage('build'); setShowOnboarding(true); }}>אתחל/י מודול</button>
-            </div>
-          </section>
-          <details className="it-collapse" open={!!state.active}>
-            <summary><span>לוח הבדיקה</span><span className="it-kicker">{state.active ? 'פתוח בזמן עבודה' : 'ייפתח אחרי שיבוץ'}</span></summary>
-            <div className="it-collapse-body">
-              <SentenceBoard scenario={scenario} selectedToken={selectedToken} activeTemplateType={state.active?.templateType ?? null} activeQuestion={activePayload?.question ?? ''} activeReflection={activeReflection} />
-            </div>
-          </details>
-          <details className="it-collapse">
-            <summary><span>מה לוקחים מהסבב</span><span className="it-kicker">סקירה מהירה</span></summary>
-            <div className="it-collapse-body">
-              <ul className="it-scenario-list">
-                <li><span>קראנו את המשפט השלם</span><span>✔</span></li>
-                <li><span>בחרנו עוגן ממוקד</span><span>{state.selectedTokenId ? '✔' : '—'}</span></li>
-                <li><span>מיפינו אותו למבנה</span><span>{state.completedAtLeastOneDrop ? '✔' : '—'}</span></li>
-                <li><span>ראינו ענפים וחלופות</span><span>{state.active ? '✔' : '—'}</span></li>
-                <li><span>זכרנו שזה מיפוי עבודה, לא אמת</span><span>✔</span></li>
-              </ul>
-            </div>
-          </details>
-        </aside>
-      </div>
-    </div>
-  );
 }
 
