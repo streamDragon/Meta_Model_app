@@ -53,7 +53,7 @@
     const SCREENS = Object.freeze({
         home: Object.freeze({
             title: 'מסך הבית',
-            subtitle: 'בחירה מהירה של מסלול. תפריט, רקע ועזרה נפתחים בשכבה.'
+            subtitle: 'דף פתיחה קצר לבחירת מסלול. הבית נשאר שער כניסה, והשכבות נפתחות בלי להעמיס את המסך.'
         }),
         'practice-question': Object.freeze({
             title: 'תרגול זיהוי',
@@ -69,7 +69,7 @@
         }),
         'practice-wizard': Object.freeze({
             title: 'גשר תחושה-שפה',
-            subtitle: 'בונים הלימה בין משפט, חוויה ומציאות; תובנת Meta Model נפתחת רק אחרי הנחיתה.'
+            subtitle: 'בונים ניסוח שיושב גם בחוויה וגם במציאות; Meta Model נפתח רק אחרי ההלימה.'
         }),
         'practice-verb-unzip': Object.freeze({
             title: 'מרכז כלים',
@@ -77,7 +77,7 @@
         }),
         'scenario-trainer': Object.freeze({
             title: 'סימולטור סצנות',
-            subtitle: 'הסצנה הפעילה נשארת במרכז. מסכי עזר נפתחים בשכבה.'
+            subtitle: 'זהו משגר למסלול הסצנות העצמאי. הסימולטור המלא נפתח בעמוד הייעודי שלו.'
         }),
         'comic-engine': Object.freeze({
             title: 'במת קומיקס רגשי',

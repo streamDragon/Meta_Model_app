@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.226" data-build-time="1773089958692" data-build-iso="2026-03-09T20:59:18.692Z" data-git-commit="b484bcd">
+<html lang="he" dir="rtl" data-app-version="1.0.227" data-build-time="1773096113755" data-build-iso="2026-03-09T22:41:53.755Z" data-git-commit="5ce994f">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -375,7 +375,7 @@
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">בונה מהלך</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">במת קומיקס רגשי</button>
-                            <button type="button" class="btn btn-secondary" onclick="window.location.href='scenario_trainer.html'">סימולטור סצנות</button>
+                            <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">סימולטור סצנות</a>
                             <a class="btn btn-secondary" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html">מאמן Unzip</a>
                             <a class="btn btn-secondary" href="sentence_morpher_trainer.html" data-versioned-href="sentence_morpher_trainer.html">Sentence Morpher · ניסוח מחדש</a>
                         </div>
@@ -444,48 +444,91 @@
                 </div>
                 <div class="home-route-hero-copy">
                     <p id="app-version-chip" class="app-version-chip home-route-version">גרסה נוכחית: נטען...</p>
+                    <p class="home-route-eyebrow">שפה, חוויה, תגובה</p>
                     <h2 class="home-route-title">Meta Model Gym</h2>
                     <p class="home-route-subtitle">
-                        דף בית נקי להתחלה מהירה: בוחרים כלי, נכנסים לתרגול, ומקבלים פידבק ברור.
-                        כל פיצ'ר נפתח בעמוד נפרד במסלול הניווט.
+                        דף הבית הוא שער פתיחה קצר: בוחרים מסלול אחד, נכנסים לכלי החי שלו, וחוזרים לכאן רק כדי לבחור את הצעד הבא.
+                        כאן נפגשים זיהוי מהיר, גשר תחושה־שפה, מעבדות עומק וסימולציית שיחה.
                     </p>
+                    <div class="home-route-pill-row" aria-label="סוגי עבודה">
+                        <span class="home-route-pill">זיהוי</span>
+                        <span class="home-route-pill">הלימה</span>
+                        <span class="home-route-pill">מעבדה</span>
+                        <span class="home-route-pill">סימולציה</span>
+                    </div>
                     <div class="home-route-cta-row">
-                        <button type="button" class="btn btn-primary" onclick="navigateTo('practice-question')">התחל תרגול</button>
-                        <button type="button" class="btn btn-secondary" onclick="navigateTo('categories')">מרכז ידע</button>
+                        <button type="button" class="btn btn-primary" onclick="navigateTo('practice-wizard')">התחל עם גשר תחושה־שפה</button>
+                        <button type="button" class="btn btn-secondary" onclick="window.location.href='scenario_trainer.html'">פתח סימולטור סצנות</button>
                     </div>
                 </div>
             </article>
 
-            <section class="home-route-features home-route-desktop-only" aria-label="מסלולי תרגול">
-                <article class="home-route-feature-card">
-                    <h3>תרגול מהיר</h3>
-                    <p>תרגול זיהוי ומכ״ם מטה-מודל לעבודה מהירה על משפטים בזמן אמת.</p>
-                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">פתח תרגול מהיר</button>
+            <section class="home-route-features home-route-desktop-only" aria-label="שערי כניסה ראשיים">
+                <article class="home-route-feature-card" data-home-accent="indigo">
+                    <p class="home-route-feature-kicker">התחלה</p>
+                    <h3>גשר תחושה־שפה</h3>
+                    <p>לוקחים משפט דחוס, אוספים מה קורה בחוץ ומה נהיה בפנים, ובונים ניסוח שיושב לפני Meta Model.</p>
+                    <span class="home-route-feature-footnote">הפיצ'ר המעמיק של הסבב הזה</span>
+                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">פתח גשר</button>
                 </article>
-                <article class="home-route-feature-card">
-                    <h3>מעבדה</h3>
-                    <p>מעבדת פריזמות ומכ״ם שלשות לחקירה עמוקה ותכנון צעד המשך.</p>
+                <article class="home-route-feature-card" data-home-accent="sky">
+                    <p class="home-route-feature-kicker">מהיר</p>
+                    <h3>תרגול זיהוי</h3>
+                    <p>משפט אחד בכל סבב כדי לחדד זיהוי, משוב, ורפלקס שאלה מדויקת בזמן קצר.</p>
+                    <span class="home-route-feature-footnote">לכניסה מהירה לעבודה</span>
+                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">פתח תרגול זיהוי</button>
+                </article>
+                <article class="home-route-feature-card" data-home-accent="teal">
+                    <p class="home-route-feature-kicker">עומק</p>
+                    <h3>מעבדת פריזמות</h3>
+                    <p>חקירה שכבתית סביב מילה או ביטוי אחד, עם רמות לוגיות וצעד המשך פרקטי.</p>
+                    <span class="home-route-feature-footnote">כשצריך להבין את המפה ולא רק את הסימפטום</span>
                     <button type="button" class="btn btn-secondary" onclick="navigateTo('prismlab')">פתח מעבדה</button>
                 </article>
-                <article class="home-route-feature-card">
-                    <h3>ידע</h3>
-                    <p>מילון קטגוריות מאוחד עם דוגמאות ושאלות מדויקות לשימוש מיידי.</p>
-                    <button type="button" class="btn btn-secondary" onclick="navigateTo('categories')">פתח ידע</button>
+                <article class="home-route-feature-card" data-home-accent="gold">
+                    <p class="home-route-feature-kicker">ביצוע</p>
+                    <h3>סימולטור סצנות</h3>
+                    <p>מסלול עצמאי לשיחה מלאה: בחירה, תגובה, משוב ולמידה מתוך הקשר חי.</p>
+                    <span class="home-route-feature-footnote">נפתח בעמוד הייעודי של הסימולטור</span>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='scenario_trainer.html'">פתח סימולטור</button>
                 </article>
-                <article class="home-route-feature-card">
-                    <h3>ביצוע</h3>
-                    <p>סימולטור סצנות ובונה מהלך כדי להפוך תובנה לשיחה ולפעולה.</p>
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='scenario_trainer.html'">פתח ביצוע</button>
+                <article class="home-route-feature-card" data-home-accent="rose">
+                    <p class="home-route-feature-kicker">ידע</p>
+                    <h3>מילון ומפות</h3>
+                    <p>קטגוריות, שלשות ומפות עזר כדי להבין את הדפוסים לפני או אחרי התרגול.</p>
+                    <span class="home-route-feature-footnote">ללמוד את השטח ואז לחזור לעבודה</span>
+                    <button type="button" class="btn btn-secondary" onclick="navigateTo('categories')">פתח ידע</button>
                 </article>
             </section>
 
             <section class="home-route-primary-cta home-route-desktop-only">
-                <h3>כניסה מהירה לפיצ'רים</h3>
-                <p>התפריט זמין בכל עמוד ונותן מעבר ישיר בין בית, תרגול, מעבדה, ידע והגדרות.</p>
-                <div class="home-route-cta-row home-route-cta-row-center">
-                    <button type="button" class="btn btn-primary" onclick="window.location.href='scenario_trainer.html'">פתח סצנות</button>
-                    <button id="home-open-feature-map" type="button" class="btn btn-secondary">פתח תפריט מלא</button>
+                <div class="home-route-primary-grid">
+                    <article class="home-route-secondary">
+                        <div class="home-route-secondary-head">
+                            <h3>כניסה ברורה, לא מחסן פתוח</h3>
+                            <p>בחר/י שער אחד. שאר הכלים נשארים זמינים דרך התפריט המלא בלי להעמיס את הבית.</p>
+                        </div>
+                        <div class="home-route-cta-row">
+                            <button type="button" class="btn btn-primary" onclick="navigateTo('practice-question')">תרגול זיהוי</button>
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה־שפה</button>
+                            <button type="button" class="btn btn-secondary" onclick="window.location.href='scenario_trainer.html'">סימולטור סצנות</button>
+                        </div>
+                    </article>
+                    <article class="home-route-secondary home-route-secondary--support">
+                        <div class="home-route-secondary-head">
+                            <h3>כלים משלימים</h3>
+                            <p>Triples Radar, Comic Engine, Verb Unzip וכלי העומק המלאים נשארים נגישים בתפריט.</p>
+                        </div>
+                        <div class="home-route-cta-row">
+                            <button id="home-open-feature-map" type="button" class="btn btn-secondary">פתח תפריט מלא</button>
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">פתח במה רגשית</button>
+                        </div>
+                    </article>
                 </div>
+                <aside class="home-route-next-step" aria-label="המלצת התחלה">
+                    <span>מה מומלץ עכשיו</span>
+                    <strong>אם המשפט מרגיש גדול או דחוס, התחילו בגשר תחושה־שפה. אם צריך לתרגל תגובה בתוך סיטואציה, עברו לסימולטור הסצנות.</strong>
+                </aside>
                 <div class="home-route-preferences">
                     <button id="home-lobby-reduce-motion-toggle" class="btn btn-secondary" type="button" aria-pressed="false">הפחת אנימציות: כבוי</button>
                     <button id="home-lobby-mute-toggle" class="btn btn-secondary" type="button" aria-pressed="false">צלילים: פעיל</button>
@@ -494,7 +537,7 @@
         </section>
 
         <!-- SCENARIO TRAINER TAB -->
-        <section id="scenario-trainer" class="tab-content">
+        <section id="scenario-trainer" class="tab-content" data-skip-generic-screen-guide="true">
             <div class="scenario-trainer-container">
                 <div class="card scenario-trainer-card scenario-trainer-launcher">
                     <p class="scenario-panel-kicker">מסלול פלטפורמה עצמאי</p>
@@ -1129,7 +1172,7 @@
         </section>
 
         <!-- PRACTICE WIZARD TAB -->
-        <section id="practice-wizard" class="tab-content practice-tab-content">
+        <section id="practice-wizard" class="tab-content practice-tab-content" data-skip-generic-screen-guide="true">
             <div class="practice-container">
                 <div class="card practice-intro-card">
                     <h2>גשר תחושה-שפה</h2>
@@ -1173,7 +1216,7 @@
             <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">בונה מהלך</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('prismlab')">מעבדת פריזמות · רמות לוגיות</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">במת קומיקס רגשי</button>
-            <button type="button" class="btn btn-secondary" onclick="window.location.href='scenario_trainer.html'">סימולטור סצנות</button>
+            <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">סימולטור סצנות</a>
         </div>
     </div>
 

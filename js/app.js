@@ -2026,9 +2026,9 @@ function resolveMobileFeedThumbSrc(item = {}, index = 0) {
 }
 
 function getMobileFeedCategories() {
-    const globalCategories = Array.isArray(window.MetaModelFeedCategories)
-        ? window.MetaModelFeedCategories
-        : [];
+    const globalCategories = Array.isArray(window.MetaModelFeatureFeedCategories)
+        ? window.MetaModelFeatureFeedCategories
+        : (Array.isArray(window.MetaModelFeedCategories) ? window.MetaModelFeedCategories : [])
     if (globalCategories.length) return globalCategories;
     return [
         { key: 'all', label: 'הכול' },
@@ -2072,7 +2072,7 @@ function getMobileFeedItems() {
         .filter((entry) => {
             if (!entry.titleHe) return false;
             if (entry.tab && document.getElementById(entry.tab)) return true;
-            if (entry.route.startsWith('/feature/')) return true;
+            if (entry.route) return true;
             return false;
         });
 
@@ -2250,17 +2250,23 @@ function setupMobileFeedBindings() {
         listRoot.addEventListener('click', (event) => {
             const card = event.target?.closest?.('[data-mobile-feed-tab], [data-mobile-feed-route]');
             if (!card) return;
-            const tab = normalizeRequestedTab(card.getAttribute('data-mobile-feed-tab') || '');
-            if (tab && document.getElementById(tab)) {
-                navigateTo(tab, { playSound: true, scrollToTop: true });
-                return;
-            }
             const route = String(card.getAttribute('data-mobile-feed-route') || '').trim();
             if (route.startsWith('/feature/')) {
                 const routeTab = normalizeRequestedTab(route.slice('/feature/'.length));
                 if (routeTab && document.getElementById(routeTab)) {
                     navigateTo(routeTab, { playSound: true, scrollToTop: true });
+                    return;
                 }
+            } else if (route) {
+                const versionedRoute = typeof window.__withAssetVersion === 'function'
+                    ? window.__withAssetVersion(route)
+                    : route;
+                window.location.href = versionedRoute;
+                return;
+            }
+            const tab = normalizeRequestedTab(card.getAttribute('data-mobile-feed-tab') || '');
+            if (tab && document.getElementById(tab)) {
+                navigateTo(tab, { playSound: true, scrollToTop: true });
             }
         });
     }
@@ -2584,9 +2590,9 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: 'ראה/י את ההיילייט, בחר/י תבנית במהירות, ובדוק/י מה לתקן בסיכום.'
     }),
     'practice-wizard': Object.freeze({
-        logic: 'הדף הזה מאמן גישור בין תחושה למשפט לפני אתגור.',
-        goal: 'לבנות מיומנות SQHCEL עקבית עם אישור לפני פריצה.',
-        approach: 'עבוד/י בסדר קבוע: S -> Q -> H -> C -> כיוון עבודה -> E/L. הגוף מרגיש "אבסולוטי" לפני שהמילים אמרו "תמיד".'
+        logic: 'הדף הזה בונה הלימה בין משפט דחוס, מה שקורה בחוץ, ומה שנהיה בפנים לפני כל אתגור או תיקון.',
+        goal: 'לנסח משפט גשר שיושב גם בחוויה וגם במציאות, ורק אחר כך לפתוח תובנת Meta Model.',
+        approach: 'עובדים בהדרגה: עוצרים על הביטוי החי, אוספים ניסוח חיצוני, אוספים ניסוח פנימי, מחברים למשפט גשר, ואז בודקים עד כמה זה יושב.'
     }),
     'practice-verb-unzip': Object.freeze({
         logic: 'הדף הזה מאמן פירוק פועל לא מפורט באמצעות 15 שאלות קבועות וגרירה לסכמה קשיחה.',
@@ -2666,9 +2672,14 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
     'practice-wizard': Object.freeze({
         turns: Object.freeze([
             Object.freeze({ role: 'מטופל', text: 'אני רוצה להגיב אחרת, אבל הגוף שלי כבר נסגר.' }),
-            Object.freeze({ role: 'מטפל', text: 'לפני אתגור, נעבור דרך SQHCEL: מה אתה מרגיש, מה קורה בפנים, ואיך זה נהיה שפה.' }),
-            Object.freeze({ role: 'מטופל', text: 'כשאני עוצר על התחושה קודם, השאלה שאני שואל נהיית יותר רגועה.' }),
-            Object.freeze({ role: 'מטפל', text: 'זה בדיוק המודל: קודם ויסות וגשר, אחר כך דיוק לשוני.' })
+            Object.freeze({ role: 'מטפל', text: 'לפני שנשאל אם זה מדויק, בוא נבדוק מה קורה בחוץ כשזה נהיה נכון ומה נהיה בך אז.' }),
+            Object.freeze({ role: 'מטופל', text: 'כשאני מנסח את שני הצדדים יחד, זה כבר נשמע יותר קרוב למה שהתכוונתי.' }),
+            Object.freeze({ role: 'מטפל', text: 'בדיוק. קודם בונים משפט גשר שיושב, ורק אחר כך מסתכלים מה היה דחוס במשפט המקורי.' })
+        ]),
+        outcomes: Object.freeze([
+            'להבדיל בין מה שנצפה בחוץ לבין מה שנהיה בפנים.',
+            'לנסח משפט גשר שמחזיק גם חוויה פנימית וגם מציאות חיצונית.',
+            'לפתוח את Meta Model רק אחרי שיש תחושת הלימה ולא במקום הלימה.'
         ])
     }),
     'practice-verb-unzip': Object.freeze({
@@ -3590,13 +3601,13 @@ function setupGlobalFeatureMenuDropdown() {
     const seenKeys = new Set();
     const labelOverrides = Object.freeze({
         'tab:home': 'בית · התחלה והכוונה',
-        'tab:scenario-trainer': 'סימולטור סצנות',
+        'tab:scenario-trainer': 'סימולטור סצנות · משגר',
         'tab:comic-engine': 'במת קומיקס רגשי · תגובות ומהלכים',
         'tab:categories': 'מילון קטגוריות המטה-מודל',
         'tab:practice-question': 'תרגול זיהוי מטה-מודל',
         'tab:practice-radar': 'מכ"ם מטה-מודל',
         'tab:practice-triples-radar': 'מכ"ם שלשות (ברין)',
-        'tab:practice-wizard': 'כמתים נסתרים · הגשר שנסגר',
+        'tab:practice-wizard': 'גשר תחושה-שפה · הלימה לפני שינוי',
         'tab:practice-verb-unzip': 'מרכז כלים',
         'tab:blueprint': 'בונה מהלך',
         'tab:prismlab': 'מעבדת פריזמות · רמות לוגיות',
@@ -3999,6 +4010,7 @@ function setupReadBeforeStartGuides() {
     SCREEN_READ_GUIDE_TARGET_IDS.forEach((screenId) => {
         const screen = document.getElementById(screenId);
         if (!screen) return;
+        if (screen.getAttribute('data-skip-generic-screen-guide') === 'true') return;
         if (screen.querySelector(`.screen-read-guide[data-screen-guide="${screenId}"]`)) return;
         screen.prepend(buildScreenReadGuide(screenId));
     });
@@ -4198,14 +4210,14 @@ function setupFeatureLauncherTabs() {
     const featureLabelOverrides = Object.freeze({
         "nav:practice-question": "תרגול זיהוי מטה-מודל",
         "nav:practice-radar": "מכ״ם מטה-מודל",
-        "nav:practice-wizard": "כמתים נסתרים · גשר השפה",
+        "nav:practice-wizard": "גשר תחושה-שפה · הלימה לפני שינוי",
         "nav:practice-verb-unzip": "מרכז כלים",
         "nav:blueprint": "בונה מהלך",
         "nav:prismlab": "מעבדת פריזמות · רמות לוגיות",
         "nav:practice-triples-radar": "מכ״ם שלשות (ברין)",
         "nav:categories": "מילון קטגוריות המטה-מודל",
         "nav:comic-engine": "במת קומיקס רגשי",
-        "nav:scenario-trainer": "סימולטור סצנות",
+        "nav:scenario-trainer": "סימולטור סצנות · משגר",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: "Unzip Trainer · חלון נפרד",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/')]: "דף עבודה מעוגל · Verb Unzip",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: "Sentence Morpher · ניסוח מחדש",
@@ -15637,7 +15649,7 @@ const HOME_TRAINING_PROGRAMS = Object.freeze([
         description: 'מסלול בניית מסגרות: פריזמה, גשר תחושה-שפה, ואז סימולציה/קומיקס.',
         steps: Object.freeze([
             Object.freeze({ tab: 'prismlab', title: 'מעבדת פריזמות', note: 'מגדל לוגי + צעד הבא' }),
-            Object.freeze({ tab: 'practice-wizard', title: 'גשר תחושה-שפה', note: 'איסוף תהליך מובנה' }),
+            Object.freeze({ tab: 'practice-wizard', title: 'גשר תחושה-שפה', note: 'לנסח משפט שיושב גם בפנים וגם במציאות' }),
             Object.freeze({ tab: 'comic-engine', title: 'במת קומיקס רגשי', note: 'הדמיית תגובות ותוצאה' })
         ])
     })
@@ -20229,8 +20241,8 @@ function wr2wProcessCount(criteria) {
     return Object.values(criteria || {}).filter(Boolean).length;
 }
 
-const WR2W_WIZARD_TITLE = 'כמתים נסתרים – הגשר שנסגר';
-const WR2W_WIZARD_SLOGAN = 'כשהרגש גדול מהמילים — יש כמת נסתר. אנחנו לא מתקנים ולא מבטלים; אנחנו פותחים גשר בין הגוף, העולם והשפה.';
+const WR2W_WIZARD_TITLE = 'גשר תחושה-שפה – הלימה לפני שינוי';
+const WR2W_WIZARD_SLOGAN = 'כשהמשפט דחוס, לא מתקנים מיד. קודם בונים הלימה בין מה שקורה בחוץ, מה שנהיה בפנים, והמשפט שנולד ביניהם.';
 const WR2W_WIZARD_FORMULA_CANONICAL = 'Signal → Hidden Quantifier → Bridge → Confirm → PATH → Learning';
 const WR2W_WIZARD_FORMULA = 'מה עולה בגוף → איזה "תמיד/אף פעם" מסתתר → משפט מגשר + בדיקה → אישור/הלימה → בחירת כיוון עבודה → למידה חדשה';
 

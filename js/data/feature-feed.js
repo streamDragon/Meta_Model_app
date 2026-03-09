@@ -8,7 +8,7 @@
             descHe: 'משפט אחד, זיהוי מהיר, ופידבק ברור לכל סבב.',
             route: '/feature/practice-question',
             tab: 'practice-question',
-            tagHe: 'Exercises',
+            tagHe: 'תרגול',
             category: 'exercises',
             thumbType: 'svg',
             thumbSrc: '',
@@ -22,7 +22,7 @@
             descHe: 'זיהוי דפוסים בקצב מהיר, עם מדד התקדמות בזמן אמת.',
             route: '/feature/practice-radar',
             tab: 'practice-radar',
-            tagHe: 'Exercises',
+            tagHe: 'תרגול',
             category: 'exercises',
             thumbType: 'svg',
             thumbSrc: '',
@@ -36,7 +36,7 @@
             descHe: 'תרגול עם שלשות ברין לזיהוי משפחות דפוס מתקדמות.',
             route: '/feature/practice-triples-radar',
             tab: 'practice-triples-radar',
-            tagHe: 'Lab',
+            tagHe: 'מעבדה',
             category: 'lab',
             thumbType: 'svg',
             thumbSrc: '',
@@ -50,7 +50,7 @@
             descHe: 'הלימה בין המשפט, החוויה והמציאות. רק אחר כך נפתחת שכבת Meta Model.',
             route: '/feature/practice-wizard',
             tab: 'practice-wizard',
-            tagHe: 'Exercises',
+            tagHe: 'הלימה',
             category: 'exercises',
             thumbType: 'svg',
             thumbSrc: '',
@@ -60,11 +60,11 @@
         }),
         Object.freeze({
             id: 'scenario-trainer',
-            titleHe: 'Scenario Trainer',
-            descHe: 'סימולציות שיחה מלאות: בחירה, תוצאה, ולמידה מכל מהלך.',
-            route: '/feature/scenario-trainer',
+            titleHe: 'סימולטור סצנות',
+            descHe: 'סימולציית שיחה מלאה במסלול עצמאי: בחירה, תוצאה ולמידה מכל מהלך.',
+            route: '/scenario_trainer.html',
             tab: 'scenario-trainer',
-            tagHe: 'Execution',
+            tagHe: 'ביצוע',
             category: 'exercises',
             thumbType: 'svg',
             thumbSrc: '',
@@ -78,7 +78,7 @@
             descHe: 'תרגול תגובות דרך סצנות ויזואליות עם דיאלוג המשך.',
             route: '/feature/comic-engine',
             tab: 'comic-engine',
-            tagHe: 'Exercises',
+            tagHe: 'תרגול',
             category: 'exercises',
             thumbType: 'svg',
             thumbSrc: '',
@@ -92,7 +92,7 @@
             descHe: 'חקירה שכבתית ברמות לוגיות ובחירת צעד המשך פרקטי.',
             route: '/feature/prismlab',
             tab: 'prismlab',
-            tagHe: 'Lab',
+            tagHe: 'מעבדה',
             category: 'lab',
             thumbType: 'svg',
             thumbSrc: '',
@@ -106,7 +106,7 @@
             descHe: 'מרכז ידע מהיר עם דוגמאות ושאלות המשך לכל קטגוריה.',
             route: '/feature/categories',
             tab: 'categories',
-            tagHe: 'Knowledge',
+            tagHe: 'ידע',
             category: 'knowledge',
             thumbType: 'svg',
             thumbSrc: '',
@@ -120,7 +120,7 @@
             descHe: 'הפיכת תובנה לתכנית שיחה: מטרה, טקטיקה, ו-Plan B.',
             route: '/feature/blueprint',
             tab: 'blueprint',
-            tagHe: 'Lab',
+            tagHe: 'מעבדה',
             category: 'lab',
             thumbType: 'svg',
             thumbSrc: '',
@@ -134,7 +134,7 @@
             descHe: 'סיכום יכולות, גרסה, וקישורי מידע על הפרויקט.',
             route: '/feature/about',
             tab: 'about',
-            tagHe: 'Settings',
+            tagHe: 'הגדרות',
             category: 'settings',
             thumbType: 'svg',
             thumbSrc: '',
@@ -145,17 +145,17 @@
     ]);
 
     var TICKER_MESSAGES = Object.freeze([
-        'חדש: ניווט Route-based מלא - כל פיצ׳ר נפתח במסך נפרד.',
-        'טיפ: לחצו על כרטיס כדי להיכנס ישר לתרגול הרלוונטי.',
-        'עדכון: מצב מובייל מותאם לגלילה מהירה וכניסה בלחיצה אחת.'
+        'חדש: דף הבית נשאר שער פתיחה קצר, והמסלולים המלאים נפתחים בנתיב החי שלהם.',
+        'טיפ: אם המשפט מרגיש דחוס, התחילו בגשר תחושה-שפה לפני שמתקנים או מאתגרים.',
+        'עדכון: סימולטור הסצנות נפתח עכשיו במסלול עצמאי, והבית נשאר משגר נקי.'
     ]);
 
     var FEED_CATEGORIES = Object.freeze([
-        Object.freeze({ key: 'all', label: 'All' }),
-        Object.freeze({ key: 'exercises', label: 'Exercises' }),
-        Object.freeze({ key: 'lab', label: 'Lab' }),
-        Object.freeze({ key: 'knowledge', label: 'Knowledge' }),
-        Object.freeze({ key: 'settings', label: 'Settings' })
+        Object.freeze({ key: 'all', label: 'הכול' }),
+        Object.freeze({ key: 'exercises', label: 'תרגול' }),
+        Object.freeze({ key: 'lab', label: 'מעבדה' }),
+        Object.freeze({ key: 'knowledge', label: 'ידע' }),
+        Object.freeze({ key: 'settings', label: 'הגדרות' })
     ]);
 
     global.MetaModelFeatureFeedItems = FEED_ITEMS;
