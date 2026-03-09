@@ -15,8 +15,9 @@ export const TRAINER_PLATFORM_CSS = `
 .trp-btn.is-primary{background:#1358d3;color:#fff;box-shadow:0 12px 24px rgba(19,88,211,.22)}
 .trp-btn.is-secondary{background:#eef2f8;color:#0f172a;border-color:#d8e0eb}
 .trp-btn.is-ghost{background:#ffffff;color:#0f4c81;border-color:#bad4ea}
-.trp-mode-pill,.trp-summary-pill{display:inline-flex;align-items:center;min-height:42px;padding:0 14px;border-radius:999px;border:1px solid #dce5f1;background:#f8fafc;font-weight:800;color:#334155}
+.trp-mode-pill,.trp-summary-pill{display:inline-flex;align-items:center;min-height:42px;padding:0 14px;border-radius:999px;border:1px solid #dce5f1;background:#f8fafc;font-weight:800;color:#334155;box-shadow:inset 0 1px 0 rgba(255,255,255,.66)}
 .trp-mode-pill{background:#ecfdf5;border-color:#bbf7d0;color:#166534}
+.trp-summary-pill{background:linear-gradient(180deg,#eff6ff 0%,#ffffff 100%);border-color:#bfdbfe;color:#1d4ed8}
 .trp-hero{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:14px}
 .trp-purpose{display:grid;gap:12px;align-content:start;align-self:start}
 .trp-purpose-body{line-height:1.65;color:#334155}
@@ -28,7 +29,7 @@ export const TRAINER_PLATFORM_CSS = `
 .trp-step span{display:block;color:#64748b;font-size:.82rem;line-height:1.45}
 .trp-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.82fr);gap:14px;align-items:start}
 .trp-main,.trp-support{display:grid;gap:12px}
-.trp-support-card{background:rgba(255,255,255,.94);border:1px solid #dde6f2;border-radius:20px;padding:14px;display:grid;gap:10px;box-shadow:0 14px 32px rgba(15,23,42,.05)}
+.trp-support-card{background:linear-gradient(180deg,rgba(255,255,255,.96) 0%,rgba(248,250,252,.96) 100%);border:1px solid #dde6f2;border-radius:20px;padding:14px;display:grid;gap:10px;box-shadow:0 14px 32px rgba(15,23,42,.05)}
 .trp-support-card h3,.trp-support-card h4{margin:0;font-size:.97rem;font-weight:900;color:#0f172a}
 .trp-support-card p{margin:0;color:#526173;line-height:1.5}
 .trp-empty{border:1px dashed #cad8ec;background:#fbfdff;border-radius:20px;padding:18px;display:grid;gap:10px;text-align:center}
@@ -49,14 +50,14 @@ export const TRAINER_PLATFORM_CSS = `
 .trs-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:12px}
 .trs-main,.trs-side{display:grid;gap:12px}
 .trs-section{border:1px solid #d9e5f3;background:#ffffff;border-radius:20px;padding:14px;display:grid;gap:10px}
-.trs-section[data-kind="advanced"]{border-style:dashed;background:#fbfdff}
+.trs-section[data-kind="advanced"]{border-style:dashed;border-color:#c7d7ea;background:linear-gradient(180deg,#fbfdff 0%,#f8fafc 100%)}
 .trs-section-head{display:grid;gap:4px}
 .trs-section-head h3{margin:0;font-size:.96rem;font-weight:900}
 .trs-section-head p{margin:0;color:#64748b;font-size:.82rem;line-height:1.45}
 .trs-advanced{border:1px dashed #c6d4e6;background:#fbfdff;border-radius:18px;padding:12px}
 .trs-advanced summary{cursor:pointer;font-weight:900;color:#0f4c81}
-.trs-preview{border:1px solid #cce0f0;background:linear-gradient(180deg,#f0f8ff 0%,#ffffff 100%);border-radius:20px;padding:14px;display:grid;gap:10px}
-.trs-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.trs-preview{border:1px solid #cce0f0;background:linear-gradient(180deg,#eff7ff 0%,#ffffff 100%);border-radius:20px;padding:14px;display:grid;gap:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.72)}
+.trs-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding-top:4px}
 .trs-footer-note{color:#64748b;font-size:.82rem;line-height:1.45}
 
 @media (max-width:980px){
@@ -70,5 +71,6 @@ export const TRAINER_PLATFORM_CSS = `
   .trp-actions,.trp-chip-row,.trp-start-actions,.trp-settings-head-actions,.trp-settings-footer-actions,.trs-footer{display:grid;grid-template-columns:1fr}
   .trp-step-strip{grid-template-columns:1fr}
   .trp-mode-pill,.trp-summary-pill{width:100%}
+  .trs-footer{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(248,251,255,0),#f8fbff 28%);padding-top:12px}
 }
 `;

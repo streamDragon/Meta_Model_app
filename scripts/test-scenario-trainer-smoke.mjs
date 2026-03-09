@@ -139,6 +139,8 @@ async function runDesktopChecks(page, baseUrl) {
 
     await assert((await page.locator('#scenario-feedback-choice-bubble').count()) > 0, 'scenario chosen reply visible');
     await assert((await page.locator('#scenario-feedback-other-bubble').count()) > 0, 'scenario likely other reply visible');
+    await assert((await page.locator('[data-scenario-impact="emotion"]').count()) > 0, 'scenario emotional impact card visible');
+    await assert((await page.locator('[data-scenario-impact="process"]').count()) > 0, 'scenario process impact card visible');
     await assert((await page.locator('[data-scenario-consequence="1"]').count()) > 0, 'scenario consequence box visible');
     console.log(`desktop scenario-trainer: ${summaryBefore} -> ${summaryAfter}`);
 }

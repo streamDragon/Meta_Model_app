@@ -32,7 +32,7 @@
     });
     const PROCESS_STEP_BY_SCREEN = Object.freeze({
         home: null,
-        play: 'scene',
+        play: 'reply',
         feedback: 'impact',
         blueprint: 'clarify',
         score: 'continue',
@@ -52,10 +52,15 @@
         passive_aggressive: 'עקיצה פסיבית',
         panic: 'לחץ מיידי',
         blame: 'אשמה',
+        self_attack: 'הלקאה עצמית',
         collapse: 'קריסה',
         rage: 'זעם על המערכת',
         magical_thinking: 'ניחוש',
         random_guessing: 'ניסוי אקראי',
+        overconfidence: 'ביטחון מופרז',
+        false_confidence: 'ביטחון מופרז',
+        avoidance: 'דחייה והימנעות',
+        panic_reinstall: 'פתרון כבד מתוך לחץ',
         criticism: 'ביקורת אישית',
         comparison: 'השוואה לוחצת',
         shame: 'בושה והשוואה',
@@ -77,6 +82,61 @@
         diagnose_scope_first: 'בודקים היקף תקלה',
         default_red: 'תגובה תחת לחץ',
         default_green: 'תגובה שמקדמת בהירות'
+    });
+    const DOMAIN_PROCESS_FOCUS = Object.freeze({
+        parenting: 'איפה הילד נתקע, מה עדיין לא ברור לו, ומהו הצעד הראשון שאפשר להתחיל ממנו בלי להציף אותו',
+        relationships: 'איפה נוצר הפקק ביניכם בפועל, ואיזה תיאום רגשי או מעשי חסר בין שניכם',
+        work: 'מהו התוצר המדויק, מי הבעלים שלו, ובאיזה פורמט או דדליין צריך למסור אותו',
+        bureaucracy: 'איזה מסמך, שדה או תנאי בדיוק חסר כדי להתקדם בלי להיתקע שוב מול המערכת',
+        home_tech: 'מהו היקף התקלה, מה בטוח לבדוק קודם, ואיזה צעד קטן לא יסכן מידע או זמן'
+    });
+    const OPTION_HINTS = Object.freeze({
+        defensive_attack: 'מחזיר את השיחה למאבק',
+        minimize: 'מקטין את החוויה שמולך',
+        shutdown: 'סוגר את המגע ברגע הקריטי',
+        false_fix: 'מרגיע לרגע בלי לפתוח בהירות',
+        pseudo_apology: 'נשמע כמו תיקון בלי תיקון',
+        stonewall: 'עוצר את הקשר והבירור',
+        blame_reversal: 'מעביר את הדיון לאשמה',
+        vague_yes: 'נשמע מסכים בלי כיוון',
+        fake_agreement: 'כן בלי לפרק מה צריך לקרות',
+        passive_aggressive: 'מוסיף עקיצה במקום בהירות',
+        panic: 'מגיב מהלחץ ולא מהמשימה',
+        blame: 'צובע את האדם כבעיה',
+        collapse: 'משאיר אותך מוצף בלי סדר',
+        rage: 'שופך תסכול על המערכת',
+        magical_thinking: 'מקווה שזה יסתדר מעצמו',
+        random_guessing: 'קופץ לפעולה בלי אבחון',
+        self_attack: 'הופך קושי להלקאה עצמית',
+        overconfidence: 'בטוח מדי בלי בדיקה',
+        avoidance: 'דוחה את הבעיה במקום לארגן אותה',
+        panic_reinstall: 'קופץ לפתרון כבד מדי',
+        criticism: 'פוגע בערך של האדם',
+        comparison: 'מעלה בושה ותחרות',
+        shame: 'מקטין ומכווץ',
+        over_helping: 'מציל את הרגע אבל לא בונה יכולת',
+        impatient_control: 'לוחץ בלי לפרק את המשימה',
+        rescue: 'לוקח את המשימה מהצד השני',
+        dismissive_reassurance: 'מרגיע בלי להתמודד',
+        global_pressure: 'מגדיל מתח בלי יעד ברור',
+        control: 'שולט בלי לייצר בהירות',
+        false_confidence: 'קופץ למסקנה מוקדמת',
+        clarify_process: 'מעביר מהמופשט למה שקורה בפועל',
+        contain_and_clarify: 'מחזיק רגש ואז מדייק',
+        contain_and_sequence: 'בונה סדר שאפשר לבצע',
+        validate_and_repair: 'מכיר בפגיעה ומברר תיקון',
+        validate_and_specify: 'מתקף ואז שואל מדויק',
+        clarify_deliverable: 'מגדיר תוצר במקום ניחוש',
+        clarify_format_and_ownership: 'מגדיר פורמט ובעלות',
+        define_done_and_owner: 'מבהיר מה נחשב גמור',
+        organize_requirements: 'מסדר דרישות במקום עומס',
+        reduce_ambiguity: 'מוריד עמימות מהשלב הבא',
+        clarify_required_fields: 'מפריד בין חובה ללא ברור',
+        diagnose_then_act: 'בודק לפני שנוגעים במערכת',
+        smallest_safe_step: 'מתחיל מצעד בטוח וקטן',
+        diagnose_scope_first: 'ממפה היקף לפני פתרון',
+        default_red: 'מגיב מתוך לחץ',
+        default_green: 'פותח בהירות שאפשר לבדוק'
     });
 
     const state = {
@@ -241,6 +301,7 @@
             id: normalizeText(raw?.id, fallbackId),
             tone: normalizeText(raw?.tone, isGreen ? 'default_green' : 'default_red'),
             speakerLine: line,
+            choiceHint: normalizeText(raw?.choiceHint, OPTION_HINTS[normalizeText(raw?.tone, isGreen ? 'default_green' : 'default_red')] || OPTION_HINTS[isGreen ? 'default_green' : 'default_red']),
             feedback: why,
             whyItHurts: normalizeText(raw?.whyItHurts, isGreen ? '' : why),
             whyItWorks: normalizeText(raw?.whyItWorks, isGreen ? why : ''),
@@ -248,6 +309,14 @@
                 raw?.likelyOtherReply || raw?.counterReply,
                 isGreen ? 'אוקיי, עכשיו אפשר לראות מה בדיוק קורה.' : 'רגע, זה עדיין לא עוזר לי להבין מה קורה.'
             ),
+            feedbackHeadline: normalizeText(raw?.feedbackHeadline, ''),
+            emotionalImpact: normalizeText(raw?.emotionalImpact, ''),
+            processImpact: normalizeText(raw?.processImpact, ''),
+            repairMove: normalizeText(raw?.repairMove || raw?.nextMove, ''),
+            learningTakeaway: normalizeText(raw?.learningTakeaway, ''),
+            metaModelExplanation: normalizeText(raw?.metaModelExplanation, ''),
+            consequenceAction: normalizeText(raw?.consequenceAction, ''),
+            consequenceResult: normalizeText(raw?.consequenceResult, ''),
             score: isGreen ? 1 : 0
         };
     }
@@ -288,6 +357,8 @@
             openingLine: normalizeText(rawScenario?.openingLine || rawScenario?.story?.[1], ''),
             humanNeed: normalizeText(rawScenario?.humanNeed, 'יש כאן צורך בקשר ובהירות במקום לחץ.'),
             surfaceConflict: normalizeText(rawScenario?.surfaceConflict, normalizeText(rawScenario?.sceneTitle || rawScenario?.title, '')),
+            learningFocus: normalizeText(rawScenario?.learningFocus, `כאן מתרגלים איך לקחת את "${metaModelCore.unspecifiedVerb}" ולתרגם אותו למה שאפשר לזהות ולבדוק במציאות.`),
+            supportPrompt: normalizeText(rawScenario?.supportPrompt, ''),
             metaModelCore,
             responseSet,
             deepeningQuestion: normalizeText(rawScenario?.deepeningQuestion, 'מה בדיוק קורה כאן בפועל?'),
@@ -411,35 +482,149 @@
         return normalizeText(scenario?.responseSet?.green?.speakerLine || scenario?.greenSentence, '');
     }
 
+    function getOptionToneGroup(tone, isGreen) {
+        const normalizedTone = normalizeText(tone, isGreen ? 'default_green' : 'default_red');
+        if (isGreen) {
+            if (['clarify_process', 'contain_and_clarify', 'validate_and_specify'].includes(normalizedTone)) return 'clarify';
+            if (['contain_and_sequence', 'clear_done_definition', 'define_done_and_owner', 'clarify_format_and_ownership'].includes(normalizedTone)) return 'sequence';
+            if (['validate_and_repair'].includes(normalizedTone)) return 'repair';
+            if (['clarify_deliverable', 'organize_requirements', 'reduce_ambiguity', 'clarify_required_fields'].includes(normalizedTone)) return 'organize';
+            if (['diagnose_then_act', 'smallest_safe_step', 'diagnose_scope_first'].includes(normalizedTone)) return 'diagnose';
+            return 'clarify';
+        }
+        if (['defensive_attack', 'blame_reversal', 'blame', 'criticism', 'comparison', 'shame'].includes(normalizedTone)) return 'blame';
+        if (['shutdown', 'stonewall', 'collapse'].includes(normalizedTone)) return 'shutdown';
+        if (['impatient_control', 'control', 'global_pressure', 'panic', 'panic_fix'].includes(normalizedTone)) return 'control';
+        if (['over_helping', 'rescue', 'takeover'].includes(normalizedTone)) return 'rescue';
+        if (['minimize', 'dismissive_reassurance', 'false_fix', 'pseudo_apology', 'pseudo_solution', 'magical_thinking'].includes(normalizedTone)) return 'dismiss';
+        if (['vague_yes', 'fake_agreement', 'passive_aggressive', 'false_confidence', 'random_guessing', 'rage', 'avoidance', 'overconfidence', 'panic_reinstall', 'self_attack'].includes(normalizedTone)) return 'blur';
+        return 'default';
+    }
+
+    function getDomainProcessFocus(domain) {
+        return DOMAIN_PROCESS_FOCUS[normalizeText(domain, 'relationships')] || DOMAIN_PROCESS_FOCUS.relationships;
+    }
+
+    function buildScenarioLearningFocus(scenario) {
+        const custom = normalizeText(scenario?.learningFocus, '');
+        if (custom) return custom;
+        return `כאן מחפשים את השלב שבו "${scenario?.metaModelCore?.unspecifiedVerb || 'לעשות את זה'}" מפסיק להיות כותרת כללית ומתחיל לקבל צורה שאפשר לבדוק.`;
+    }
+
+    function buildFeedbackHeadline(scenario, option, isGreen, toneGroup) {
+        const custom = normalizeText(option?.feedbackHeadline, '');
+        if (custom) return custom;
+        if (isGreen) {
+            if (toneGroup === 'repair') return 'כאן יש גם הכרה בפגיעה וגם פתיחה לתיקון שאפשר לבדוק';
+            if (toneGroup === 'sequence') return 'כאן השיחה עוברת מהלחץ אל רצף צעדים שאפשר להחזיק';
+            if (toneGroup === 'organize') return 'כאן נוצר סדר במקום עומס וערפל';
+            if (toneGroup === 'diagnose') return 'כאן בוחרים לעצור, לבדוק, ורק אז לפעול';
+            return 'כאן השיחה זזה מהרגשה כללית אל משהו שאפשר לברר באמת';
+        }
+        if (toneGroup === 'blame') return 'כאן הדיון זז מהבעיה אל השאלה מי אשם';
+        if (toneGroup === 'control') return 'כאן יש יותר לחץ, אבל לא יותר בהירות';
+        if (toneGroup === 'rescue') return 'כאן אולי נרגע הרגע, אבל היכולת עצמה לא נבנית';
+        if (toneGroup === 'shutdown') return 'כאן הקשר נסגר בדיוק כשצריך אותו';
+        if (toneGroup === 'dismiss') return 'כאן המצוקה מצטמצמת, אבל התהליך נשאר עמום';
+        if (toneGroup === 'blur') return 'כאן נשמעת תגובה, אבל עדיין לא ברור מה עושים';
+        return 'כאן השיחה נתקעת סביב תגובה אוטומטית במקום סביב מה שקורה בפועל';
+    }
+
+    function buildEmotionalImpact(scenario, option, isGreen, toneGroup) {
+        const custom = normalizeText(option?.emotionalImpact, '');
+        if (custom) return custom;
+        const other = normalizeText(scenario?.role?.other, 'הצד השני');
+        const domain = normalizeText(scenario?.domain, 'relationships');
+        if (isGreen) {
+            if (domain === 'parenting') return `${other} כנראה ישמע כאן שיש לידו מבוגר שמחזיק גם את הלחץ וגם את המשימה. זה בדרך כלל מוריד בושה ומחזיר קצת תחושת מסוגלות.`;
+            if (domain === 'relationships') return `${other} שומע כאן לא רק ניסיון להירגע, אלא גם רצון להבין באמת מה קורה ביניכם. זה מקטין צורך להתגונן ומגדיל סיכוי לשיתוף כן.`;
+            if (domain === 'work') return `${other} שומע כאן מישהו שמנסה לייצר בהירות מקצועית במקום להעמיד פנים שהכול ברור. זה בונה אמון גם כשהמצב לחוץ.`;
+            if (domain === 'bureaucracy') return `התגובה הזו מחזירה תחושת שליטה. במקום להרגיש אבוד/ה מול מערכת או נציג, אפשר לנשום ולהחזיק שוב סדר.`;
+            if (domain === 'home_tech') return `${other} שומע כאן גישה עניינית וזהירה: לא מנחשים ולא נבהלים, אלא בודקים מה בטוח ומה קודם למה.`;
+            return `${other} כנראה ישמע כאן ניסיון להבין ולא רק להגיב. זה מרכך התנגדות ופותח מקום לשיתוף.`;
+        }
+        if (domain === 'parenting') {
+            if (toneGroup === 'rescue') return `${other} אולי נרגע לרגע, אבל גם שומע שלא באמת סומכים עליו להחזיק את המשימה בעצמו.`;
+            return `${other} כנראה ישמע כאן שהוא עצמו הבעיה או שהוא שוב מאכזב. זה בקלות הופך לקיפאון, בכי, התנגדות או "לא רוצה".`;
+        }
+        if (domain === 'relationships') {
+            if (toneGroup === 'shutdown') return `${other} יחווה כאן דלת נסגרת ברגע פגיע. זה מגדיל בדידות ומחזק את התחושה ש"איתך אי אפשר לדבר".`;
+            return `${other} ישמע כאן מאבק על אשמה או ביטול של החוויה שלו. במקום להתקרב, הוא ייטה להתכווץ, להחזיר אש או להיסגר.`;
+        }
+        if (domain === 'work') {
+            return `${other} ישמע כאן לחץ, הגנה או עמימות מקצועית. גם אם הטון נשאר מנומס, האמון ביכולת להחזיק את המשימה נחלש.`;
+        }
+        if (domain === 'bureaucracy') {
+            return `התגובה הזאת מחזקת תחושת הצפה. במקום להרגיש שיש דרך להתקדם, הכול נשמע כמו עוד שכבה של בלגן או ייאוש.`;
+        }
+        if (domain === 'home_tech') {
+            return `${other} שומע כאן או ניחוש או לחץ. זה מעלה חרדה סביב התקלה ויכול לגרום לפעולה לא בטוחה או להימנעות מוחלטת.`;
+        }
+        return `${other} כנראה ישמע כאן יותר לחץ מבהירות, ולכן ייטה להתגונן, להתרחק או להישאר סגור.`;
+    }
+
+    function buildProcessImpact(scenario, option, isGreen, toneGroup) {
+        const custom = normalizeText(option?.processImpact, '');
+        if (custom) return custom;
+        const hiddenGap = normalizeText(scenario?.metaModelCore?.hiddenGap, 'מה בדיוק קורה בפועל');
+        const domainFocus = getDomainProcessFocus(scenario?.domain);
+        if (isGreen) {
+            return `מבחינת התהליך, השיחה מפסיקה להסתובב סביב תחושה כללית ומתחילה להתקרב ל-${domainFocus}. כך אפשר לראות סוף סוף ${hiddenGap}.`;
+        }
+        const endings = {
+            blame: 'מאבק על זהות, אשמה או צדק',
+            control: 'ציות רגעי בלי הבנה או אחיזה',
+            rescue: 'תלות במישהו אחר שייקח את המשימה',
+            shutdown: 'עצירה של הקשר ושל הבירור',
+            dismiss: 'הרגעה רגעית בלי תנועה אמיתית',
+            blur: 'עמימות שנשמעת כמו תגובה אבל לא כמו דרך'
+        };
+        return `מבחינת התהליך, ${hiddenGap} נשאר עמום. במקום להתקרב ל-${domainFocus}, השיחה גולשת אל ${endings[toneGroup] || 'תגובה אוטומטית'} ולכן קשה יותר לדעת מה לעשות עכשיו.`;
+    }
+
+    function buildNextMove(scenario, option, isGreen) {
+        const custom = normalizeText(option?.repairMove, '');
+        if (custom) return custom;
+        if (isGreen) {
+            return `המשך טבעי מכאן הוא לעצור על שאלה אחת מדויקת: ${normalizeText(scenario?.deepeningQuestion, 'מה בדיוק קורה כאן בפועל?')}`;
+        }
+        return `אם רוצים לתקן את המסלול, כדאי לחזור לשאלה שמייצרת בהירות במקום תגובת נגד: ${normalizeText(scenario?.deepeningQuestion, 'מה בדיוק קורה כאן בפועל?')}`;
+    }
+
+    function buildLearningTakeaway(scenario, option, isGreen, toneGroup) {
+        const custom = normalizeText(option?.learningTakeaway, '');
+        if (custom) return custom;
+        if (isGreen) {
+            return `השורה התחתונה כאן: כשמחברים הכרה אנושית עם שאלה מדויקת, קל יותר להגיע לצעד ראשון שאפשר לבדוק במציאות ולא רק להירגע לרגע.`;
+        }
+        if (toneGroup === 'rescue') return 'השורה התחתונה כאן: הצלה מהירה יכולה להרגיע רגע, אבל היא משאירה את הכישורים והבהירות מחוץ לשיחה.';
+        return `השורה התחתונה כאן: ברגע שהתגובה נוגעת באשמה, לחץ או ערפל, הבעיה עצמה נשארת בלי שם ולכן גם בלי דרך מעשית להתקדם.`;
+    }
+
     function buildMetaCardText(scenario, option, isGreen) {
+        if (normalizeText(option?.metaModelExplanation, '')) return normalizeText(option.metaModelExplanation, '');
         const meta = scenario?.metaModelCore || {};
         if (isGreen) {
             return normalizeText(
-                option?.metaModelExplanation,
                 `כאן עברת מהכותרת הכללית "${meta.unspecifiedVerb || 'לעשות את זה'}" אל מה שאפשר לבדוק במציאות. במקום להישאר עם בקשה כללית, השיחה נפתחת אל ${meta.hiddenGap || 'השלב המדויק שבו נתקעים'}.`
             );
         }
         return normalizeText(
-            option?.metaModelExplanation,
             `העמימות נשארת במקום: עדיין לא ברור ${meta.hiddenGap || 'מה בדיוק קורה בפועל'}, ולכן השיחה מחליקה להגנה, האשמה או הימנעות במקום לבדיקה.`
         );
     }
 
-    function getConsequenceLines(scenario, option, isGreen) {
-        const otherLabel = normalizeText(scenario?.role?.other, 'הצד השני');
+    function buildFeedbackGuide(scenario, option, isGreen) {
+        const toneGroup = getOptionToneGroup(option?.tone, isGreen);
         return {
-            action: normalizeText(
-                option?.consequenceAction,
-                isGreen
-                    ? `${otherLabel} כנראה שומע כאן ניסיון להבין ולא רק לכבות את הרגע.`
-                    : `${otherLabel} כנראה ישמע כאן לחץ, ביטול או התקפה, ולכן ייטה להתכווץ, להתגונן או להתרחק.`
-            ),
-            result: normalizeText(
-                option?.consequenceResult,
-                isGreen
-                    ? `מכאן אפשר לעבור אל השאלה המעשית: ${normalizeText(scenario?.deepeningQuestion, 'מה בדיוק קורה בפועל?')}`
-                    : 'במקום לפתוח את השלב החסר, השיחה נשארת סביב תגובה אוטומטית והבעיה עצמה נשארת עמומה.'
-            )
+            headline: buildFeedbackHeadline(scenario, option, isGreen, toneGroup),
+            emotionalImpact: buildEmotionalImpact(scenario, option, isGreen, toneGroup),
+            processImpact: buildProcessImpact(scenario, option, isGreen, toneGroup),
+            nextMove: buildNextMove(scenario, option, isGreen),
+            learningTakeaway: buildLearningTakeaway(scenario, option, isGreen, toneGroup),
+            metaModelExplanation: buildMetaCardText(scenario, option, isGreen),
+            action: normalizeText(option?.consequenceAction, buildEmotionalImpact(scenario, option, isGreen, toneGroup)),
+            result: normalizeText(option?.consequenceResult, buildProcessImpact(scenario, option, isGreen, toneGroup))
         };
     }
 
@@ -467,7 +652,7 @@
             title: scenario.title,
             selectedOptionId: option.id,
             selectedOptionText: option.speakerLine,
-            feedback: isGreen ? option.whyItWorks : option.whyItHurts,
+            feedback: buildLearningTakeaway(scenario, option, isGreen, getOptionToneGroup(option?.tone, isGreen)),
             score: isGreen ? 1 : 0,
             stars: isGreen ? 1 : 0,
             greenSentence: getGreenOptionText(scenario),
@@ -792,7 +977,7 @@
           <button type="button" class="scenario-option-btn ${isGreen ? 'green' : 'red'}" data-scenario-action="pick-option" data-option-id="${escapeHtml(option.id)}">
             <span class="scenario-option-kind">${escapeHtml(toneLabel(option, isGreen))}</span>
             <span class="scenario-option-main">${escapeHtml(option.speakerLine)}</span>
-            <span class="scenario-option-hint">${escapeHtml(isGreen ? option.whyItWorks : option.whyItHurts)}</span>
+            <span class="scenario-option-hint">${escapeHtml(option.choiceHint || (isGreen ? option.whyItWorks : option.whyItHurts))}</span>
           </button>
         `;
     }
@@ -854,14 +1039,14 @@
         const option = state.selectedOption;
         if (!scenario || !option) return renderPlayScreen();
         const isGreen = Number(option.score) === 1;
-        const consequence = getConsequenceLines(scenario, option, isGreen);
+        const guide = buildFeedbackGuide(scenario, option, isGreen);
         return `
           <section class="scenario-workspace-card" data-scenario-feedback-thread="1">
             <p class="scenario-panel-kicker">אחרי הבחירה</p>
             <div class="scenario-feedback-mark ${isGreen ? 'green' : 'red'}" style="opacity:1;transform:scale(1);">${isGreen ? '✓' : '!'}</div>
             <div class="scenario-feedback-summary-card">
               <p class="scenario-feedback-kind">${escapeHtml(isGreen ? 'התגובה הזו פותחת מקום לבדיקה' : 'התגובה הזו כנראה תסגור את השיחה')}</p>
-              <h3>${escapeHtml(isGreen ? 'כאן עברת מהאשמה לתהליך' : 'כאן השיחה מחליקה מהתהליך למאבק')}</h3>
+              <h3>${escapeHtml(guide.headline)}</h3>
               <p>${escapeHtml(isGreen ? option.whyItWorks : option.whyItHurts)}</p>
             </div>
             <div class="scenario-feedback-thread">
@@ -874,15 +1059,27 @@
                 <p id="scenario-feedback-other-bubble">${escapeHtml(option.likelyOtherReply)}</p>
               </div>
             </div>
+            <div class="scenario-impact-grid">
+              <article class="scenario-impact-card" data-scenario-impact="emotion">
+                <p class="scenario-panel-kicker">איך זה נחת בצד השני</p>
+                <h4>${escapeHtml(isGreen ? 'יש כאן מקום לנשום ולהקשיב' : 'התגובה הזאת כנראה תלחיץ או תכווץ')}</h4>
+                <p>${escapeHtml(guide.emotionalImpact)}</p>
+              </article>
+              <article class="scenario-impact-card" data-scenario-impact="process">
+                <p class="scenario-panel-kicker">מה זה עושה לשיחה</p>
+                <h4>${escapeHtml(isGreen ? 'השיחה עוברת למה שאפשר לבדוק' : 'הבעיה נשארת בלי שם ברור')}</h4>
+                <p>${escapeHtml(guide.processImpact)}</p>
+              </article>
+            </div>
             <div id="scenario-consequence-box" class="scenario-consequence-box ${isGreen ? 'green' : 'red'}" data-scenario-consequence="1">
-              <h4>איך זה נחת בצד השני</h4>
-              <p>${escapeHtml(consequence.action)}</p>
-              <p>${escapeHtml(consequence.result)}</p>
+              <h4>${escapeHtml(isGreen ? 'איך ממשיכים מכאן' : 'מה אפשר לנסות במקום')}</h4>
+              <p>${escapeHtml(guide.nextMove)}</p>
+              <p>${escapeHtml(guide.learningTakeaway)}</p>
             </div>
             <details class="scenario-meta-accordion">
               <summary>מה היה עמום / מה נפתח כאן</summary>
               <div class="scenario-meta-accordion-body">
-                <p class="scenario-meta-card-text">${escapeHtml(buildMetaCardText(scenario, option, isGreen))}</p>
+                <p class="scenario-meta-card-text">${escapeHtml(guide.metaModelExplanation)}</p>
                 <div class="scenario-predicate-panel">
                   <p><strong>הפועל/המהלך העמום:</strong> ${escapeHtml(scenario.metaModelCore.unspecifiedVerb)}</p>
                   <p><strong>מה נשאר חסר או נפתח כאן:</strong> ${escapeHtml(scenario.metaModelCore.hiddenGap)}</p>
@@ -890,7 +1087,7 @@
                 </div>
               </div>
             </details>
-            <div class="scenario-feedback-note">${escapeHtml(isGreen ? 'מכאן אפשר או להתקדם לסצנה הבאה, או לפתוח רגע את מפת הפעולה הקצרה.' : 'כדאי לראות מה היה חסר בתהליך, ואז לנסות שוב בסצנה הבאה עם שאלה שמייצרת בהירות.')}</div>
+            <div class="scenario-feedback-note">${escapeHtml(isGreen ? 'כדאי לקחת את אותו קו לשאלה אחת נוספת או לפתוח את מפת הפעולה הקצרה.' : 'כדאי לעצור על מה שנסגר כאן, ואז לעבור לשאלה שמחזירה את השיחה לתהליך במקום לאשמה או לחץ.')}</div>
             <div class="scenario-feedback-actions">
               <button type="button" class="btn btn-secondary" data-scenario-action="show-blueprint">ניתוח מעמיק</button>
               <button type="button" class="btn btn-primary" data-scenario-action="continue-result">המשך</button>
@@ -904,16 +1101,17 @@
         const scenario = state.activeScenario;
         const option = state.selectedOption;
         const isGreen = Number(option?.score) === 1;
+        const guide = scenario && option ? buildFeedbackGuide(scenario, option, isGreen) : null;
         const statusText = state.session
             ? `סצנה ${state.session.index + 1}/${state.session.queue.length} · ${state.session.score} נקודות · רצף ${state.session.streak}`
             : `התקדמות כוללת · ${state.progress.completed} סצנות · ${state.progress.greenCount} בחירות ירוקות`;
         const cueTitle = scenario
-            ? (state.screen === SCREEN_IDS.feedback || state.screen === SCREEN_IDS.blueprint ? 'מה לקחת מהרגע הזה' : 'מה לחפש עכשיו')
+            ? (state.screen === SCREEN_IDS.feedback || state.screen === SCREEN_IDS.blueprint ? (isGreen ? 'מה לחזק מכאן' : 'מה לתקן מכאן') : 'מה להחזיק בסצנה')
             : 'מה ייחשב הצלחה';
         const cueBody = scenario
             ? (state.screen === SCREEN_IDS.feedback || state.screen === SCREEN_IDS.blueprint
-                ? (isGreen ? scenario.microPlan.firstStep : scenario.deepeningQuestion)
-                : scenario.humanNeed)
+                ? (guide ? guide.learningTakeaway : (isGreen ? scenario.microPlan.firstStep : scenario.deepeningQuestion))
+                : (normalizeText(scenario.supportPrompt, '') || buildScenarioLearningFocus(scenario)))
             : 'תגובה אחת שמורידה לחץ, מייצרת בהירות, ופותחת צעד שאפשר לבדוק בפועל.';
         return `
           <section class="scenario-support-card">

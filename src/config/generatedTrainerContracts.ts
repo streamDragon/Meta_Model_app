@@ -5,12 +5,12 @@ export const TRAINER_PLATFORM_CONTRACTS: TrainerPlatformContractMap = {
   "classic2": {
     "id": "classic2",
     "title": "Classic 2 · Structure of Magic",
-    "subtitle": "מזהים קטגוריות, מסמנים משפטים, ובודקים מול טבלת ברין אחת בסדר קנוני קבוע.",
+    "subtitle": "קוראים טקסט קצר, מסמנים איפה הקטגוריה באמת מופיעה, ובודקים הכול מול טבלת ברין אחת שנשארת תמיד באותו סדר.",
     "familyLabel": "משפחת קלאסיק",
     "quickStartLabel": "מתחילים מכאן",
     "startActionLabel": "התחל סבב",
     "settingsTitle": "לוח הבקרה של Classic 2",
-    "settingsSubtitle": "מגדירים מה לתרגל, כמה עומס לשים, ואיך טבלת ברין תופיע. ברירת המחדל כבר מוכנה.",
+    "settingsSubtitle": "מכווננים מה לתרגל, כמה עומס לשים, ואיך לראות את מפת ברין, בלי לאבד את נקודת ההתחלה המהירה.",
     "helperSteps": [
       {
         "title": "1. בחר/י או השאר/י ברירת מחדל",
@@ -114,12 +114,12 @@ export const TRAINER_PLATFORM_CONTRACTS: TrainerPlatformContractMap = {
   "classic-classic": {
     "id": "classic-classic",
     "title": "Classic Classic · זיהוי תבניות",
-    "subtitle": "מזהים את המבנה המרכזי, בודקים תשובה, ומבינים למה הבחירה נכונה או שגויה.",
+    "subtitle": "שומעים משפט, מזהים את המבנה הלשוני המרכזי, ובודקים למה הבחירה מדויקת או מפספסת.",
     "familyLabel": "משפחת קלאסיק",
     "quickStartLabel": "פתיחת תרגול",
     "startActionLabel": "התחל תרגול",
     "settingsTitle": "הגדרות Classic Classic",
-    "settingsSubtitle": "מכווננים מצב, קושי, עומס ומשפחת תרגול לפני הסשן או במהלכו.",
+    "settingsSubtitle": "מכווננים מצב, קושי, עומס ומשפחת תרגול, בלי להפוך את ההגדרות למחסום לפני תחילת הסשן.",
     "helperSteps": [
       {
         "title": "1. משאירים ברירת מחדל או משנים",
@@ -229,12 +229,12 @@ export const TRAINER_PLATFORM_CONTRACTS: TrainerPlatformContractMap = {
   "iceberg-templates": {
     "id": "iceberg-templates",
     "title": "קצה קרחון / עצי הבחנה",
-    "subtitle": "ממיינים אמירה לתוך מבנה חשיבה, רואים הסתעפויות, ובודקים חלופות במקום להינעל על פירוש אחד.",
+    "subtitle": "ממיינים אמירה לתוך מבנה חשיבה, רואים איך העץ מסתעף, ובודקים חלופות במקום להינעל על פירוש אחד.",
     "familyLabel": "משפחת עצים וסכמות",
     "quickStartLabel": "כניסה לאימון",
     "startActionLabel": "התחל אימון",
     "settingsTitle": "הגדרות Iceberg Templates",
-    "settingsSubtitle": "בוחרים איך להיכנס לאימון, אילו עזרי עבודה לראות, ואיך ייראה הסבב הבא.",
+    "settingsSubtitle": "בוחרים איך להיכנס לאימון, אילו עזרי עבודה יישארו פתוחים, ואיך ייראה הסבב הבא.",
     "helperSteps": [
       {
         "title": "1. קוראים את האמירה",
@@ -437,7 +437,8 @@ export const TRAINER_PLATFORM_CONTRACTS: TrainerPlatformContractMap = {
         "htmlFile": "scenario_trainer.html",
         "manifestKey": "_scenario_trainer",
         "css": [
-          "css/style.css"
+          "css/style.css",
+          "css/scenario-trainer.css"
         ],
         "scripts": [
           "js/scenario-trainer-app.js"

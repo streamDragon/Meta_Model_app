@@ -1,6 +1,6 @@
 # Trainer Platform DOM Adapter
 
-`Classic Classic` is the supported DOM-side adapter path for trainers that do not yet render through the React shell.
+`Classic Classic` and `Scenario Trainer` are the supported DOM-side adapter paths for trainers that do not yet render through the React shell.
 
 The adapter contract is intentionally small. A DOM trainer remains platform-compatible when it exposes the same shell semantics that the shared QA harness and standalone wrapper expect.
 
@@ -37,4 +37,4 @@ The DOM adapter must read `mobilePriorityOrder` from the shared trainer contract
 
 ## Current platform stance
 
-`Classic Classic` remains DOM-rendered for now, but it is a first-class platform citizen through this adapter contract. The educational engine stays in place, while shell behavior, settings semantics, wrapper boot, and cross-trainer QA remain shared.
+`Classic Classic` remains DOM-rendered for now, and `Scenario Trainer` uses the same adapter policy for its standalone dialogue runtime. Both remain first-class platform citizens through this adapter contract. Their educational engines stay in place, while shell behavior, settings semantics, wrapper boot, mobile ordering, and cross-trainer QA remain shared.
