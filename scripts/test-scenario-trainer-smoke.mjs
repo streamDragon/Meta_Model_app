@@ -82,12 +82,10 @@ async function visibleGlobalBlockers(page) {
     );
 }
 
-async function openScenarioTab(page, baseUrl) {
-    await page.goto(`${baseUrl}/index.html`, { waitUntil: 'networkidle' });
-    await page.waitForFunction(() => typeof window.navigateTo === 'function');
-    await page.evaluate(() => window.navigateTo('scenario-trainer'));
-    await page.waitForFunction(() => document.querySelector('#scenario-trainer')?.classList.contains('active'));
-    await page.waitForSelector('#scenario-home-summary-pill');
+async function openScenarioTrainer(page, baseUrl) {
+    await page.goto(`${baseUrl}/scenario_trainer.html`, { waitUntil: 'networkidle' });
+    await page.waitForSelector('[data-trainer-platform="1"][data-trainer-id="scenario-trainer"]');
+    await page.waitForSelector('[data-trainer-summary="current"]');
 }
 
 async function readText(page, selector) {
@@ -114,41 +112,39 @@ async function setSelectToNonCurrent(page, selector) {
 }
 
 async function runDesktopChecks(page, baseUrl) {
-    await openScenarioTab(page, baseUrl);
+    await openScenarioTrainer(page, baseUrl);
     await assert(await visibleGlobalBlockers(page) === 0, 'scenario desktop no visible global blockers');
 
-    const startButton = page.locator('#scenario-start-run-btn');
+    const startButton = page.locator('[data-trainer-action="start-session"]').first();
     const startBox = await startButton.boundingBox();
     await assert(!!startBox && startBox.y < 980, 'scenario start visible in first viewport', JSON.stringify(startBox));
 
-    const summaryBefore = await readText(page, '#scenario-home-summary-pill');
-    await page.locator('#scenario-home-settings').click();
-    await page.waitForFunction(() => !document.querySelector('#scenario-screen-settings')?.classList.contains('hidden'));
+    const summaryBefore = await readText(page, '[data-trainer-summary="current"]');
+    await page.locator('[data-trainer-action="open-settings"]').first().click();
+    await page.waitForSelector('[data-trainer-settings-shell="1"][data-trainer-id="scenario-trainer"]');
 
     await setRangeValue(page, '#scenario-setting-run-size', 4);
     await setSelectToNonCurrent(page, '#scenario-setting-domain');
-    const previewBeforeSave = await readText(page, '#scenario-settings-summary-pill');
-    await page.locator('#scenario-save-settings-btn').click();
-    await page.waitForFunction(() => !document.querySelector('#scenario-screen-home')?.classList.contains('hidden'));
-    const summaryAfter = await readText(page, '#scenario-home-summary-pill');
+    const previewBeforeSave = await readText(page, '[data-trainer-summary="preview"]');
+    await page.locator('[data-trainer-action="save-start"]').first().click();
+    await page.waitForFunction(() => !document.querySelector('[data-trainer-settings-shell="1"][data-trainer-id="scenario-trainer"]'));
+    const summaryAfter = await readText(page, '[data-trainer-summary="current"]');
 
     await assert(previewBeforeSave !== summaryBefore, 'scenario preview summary changed', `${summaryBefore} -> ${previewBeforeSave}`);
     await assert(summaryAfter !== summaryBefore, 'scenario current summary changed', `${summaryBefore} -> ${summaryAfter}`);
 
-    await page.locator('#scenario-start-run-btn').click();
-    await page.waitForFunction(() => !document.querySelector('#scenario-screen-play')?.classList.contains('hidden'));
     await page.waitForSelector('#scenario-options-container .scenario-option-btn');
     await page.locator('#scenario-options-container .scenario-option-btn').first().click();
-    await page.waitForFunction(() => !document.querySelector('#scenario-screen-feedback')?.classList.contains('hidden'));
+    await page.waitForSelector('[data-scenario-feedback-thread="1"]');
 
     await assert((await page.locator('#scenario-feedback-choice-bubble').count()) > 0, 'scenario chosen reply visible');
     await assert((await page.locator('#scenario-feedback-other-bubble').count()) > 0, 'scenario likely other reply visible');
-    await assert(await page.locator('#scenario-consequence-box').evaluate((node) => !node.classList.contains('hidden')), 'scenario consequence box visible');
+    await assert((await page.locator('[data-scenario-consequence="1"]').count()) > 0, 'scenario consequence box visible');
     console.log(`desktop scenario-trainer: ${summaryBefore} -> ${summaryAfter}`);
 }
 
 async function runMobileChecks(page, baseUrl) {
-    await openScenarioTab(page, baseUrl);
+    await openScenarioTrainer(page, baseUrl);
     await assert(await visibleGlobalBlockers(page) === 0, 'scenario mobile no visible global blockers');
 
     const overflow = await page.evaluate(() => ({
@@ -157,9 +153,9 @@ async function runMobileChecks(page, baseUrl) {
     }));
     await assert(overflow.scrollWidth <= overflow.innerWidth + 1, 'scenario mobile no horizontal overflow', `${overflow.scrollWidth}/${overflow.innerWidth}`);
 
-    await page.locator('#scenario-home-settings').click();
-    await page.waitForFunction(() => !document.querySelector('#scenario-screen-settings')?.classList.contains('hidden'));
-    const saveButton = page.locator('#scenario-save-settings-btn');
+    await page.locator('[data-trainer-action="open-settings"]').first().click();
+    await page.waitForSelector('[data-trainer-settings-shell="1"][data-trainer-id="scenario-trainer"]');
+    const saveButton = page.locator('[data-trainer-action="save-start"]').first();
     await saveButton.scrollIntoViewIfNeeded();
     await page.waitForTimeout(150);
     const box = await saveButton.boundingBox();

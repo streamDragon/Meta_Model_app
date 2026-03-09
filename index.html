@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.221" data-build-time="1773012166793" data-build-iso="2026-03-08T23:22:46.793Z" data-git-commit="4863270">
+<html lang="he" dir="rtl" data-app-version="1.0.222" data-build-time="1773024754689" data-build-iso="2026-03-09T02:52:34.689Z" data-git-commit="a3a489b">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -375,7 +375,7 @@
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">בונה מהלך</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">במת קומיקס רגשי</button>
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('scenario-trainer')">סימולטור סצנות</button>
+                            <button type="button" class="btn btn-secondary" onclick="window.location.href='scenario_trainer.html'">סימולטור סצנות</button>
                             <a class="btn btn-secondary" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html">מאמן Unzip</a>
                             <a class="btn btn-secondary" href="sentence_morpher_trainer.html" data-versioned-href="sentence_morpher_trainer.html">Sentence Morpher · ניסוח מחדש</a>
                         </div>
@@ -475,7 +475,7 @@
                 <article class="home-route-feature-card">
                     <h3>ביצוע</h3>
                     <p>סימולטור סצנות ובונה מהלך כדי להפוך תובנה לשיחה ולפעולה.</p>
-                    <button type="button" class="btn btn-secondary" onclick="navigateTo('scenario-trainer')">פתח ביצוע</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='scenario_trainer.html'">פתח ביצוע</button>
                 </article>
             </section>
 
@@ -483,7 +483,7 @@
                 <h3>כניסה מהירה לפיצ'רים</h3>
                 <p>התפריט זמין בכל עמוד ונותן מעבר ישיר בין בית, תרגול, מעבדה, ידע והגדרות.</p>
                 <div class="home-route-cta-row home-route-cta-row-center">
-                    <button type="button" class="btn btn-primary" onclick="navigateTo('scenario-trainer')">פתח סצנות</button>
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='scenario_trainer.html'">פתח סצנות</button>
                     <button id="home-open-feature-map" type="button" class="btn btn-secondary">פתח תפריט מלא</button>
                 </div>
                 <div class="home-route-preferences">
@@ -496,385 +496,20 @@
         <!-- SCENARIO TRAINER TAB -->
         <section id="scenario-trainer" class="tab-content">
             <div class="scenario-trainer-container">
-                <div class="card scenario-trainer-card">
-                    <h2>🎬 סימולטור סצנות</h2>
-                    <p class="subtitle">קוראים סצנה קצרה, בוחרים תגובה אחת, ומקבלים משוב מיידי.</p>
-
-                    <div id="scenario-safety-notice" class="scenario-safety-notice hidden" role="alert">
-                        נראה שהטקסט שכתבת מצביע על מצוקה חריפה. עצרנו את התרגול כרגע.
-                        אם יש סכנה מיידית: התקשרו ל־100. אפשר גם לפנות לער"ן: 1201.
+                <div class="card scenario-trainer-card scenario-trainer-launcher">
+                    <p class="scenario-panel-kicker">מסלול פלטפורמה עצמאי</p>
+                    <h2>סימולטור סצנות</h2>
+                    <p class="subtitle">הסימולטור עבר לעמוד עצמאי עם אותה מעטפת פלטפורמה כמו Classic 2, Classic Classic ו־Iceberg. הבית כאן נשאר רק כמשגר דק.</p>
+                    <div class="scenario-home-tag-row">
+                        <span class="scenario-home-tag">אותו shell</span>
+                        <span class="scenario-home-tag">אותן הגדרות שיתופיות</span>
+                        <span class="scenario-home-tag">אותו QA משפחתי</span>
                     </div>
-
-                    <!-- HOME -->
-                    <div id="scenario-screen-home" class="scenario-screen">
-                        <div class="scenario-platform-shell">
-                            <section class="scenario-home-purpose-card">
-                                <p class="scenario-home-kicker">מה עושים כאן?</p>
-                                <h3>סימולטור דיאלוג אנושי עם גב מטה-מודלי</h3>
-                                <p class="scenario-home-lead">נכנסים לסצנה קצרה, שומעים משפט אמיתי מהצד השני, בוחרים תגובה אחת, ורואים איך היא מתקבלת רגשית ומה היא פותחת או סוגרת בתהליך.</p>
-                                <div class="scenario-home-tag-row">
-                                    <span class="scenario-home-tag">הורות · זוגיות · עבודה · ביורוקרטיה · בית/טק</span>
-                                    <span class="scenario-home-tag">בחירה אחת בכל רגע</span>
-                                    <span class="scenario-home-tag">אפשר להעמיק אחרי המשוב</span>
-                                </div>
-                            </section>
-
-                            <section class="scenario-home-start-strip">
-                                <div class="scenario-home-start-copy">
-                                    <p class="scenario-home-kicker">מתחילים מכאן</p>
-                                    <h3>אפשר להיכנס ישר לשיחה</h3>
-                                    <p>ברירת המחדל כבר מכוונת לסשן שימושי. אם רוצים, אפשר לשנות תחום, רמה או כלים נוספים לפני ההתחלה.</p>
-                                </div>
-                                <div class="scenario-start-actions">
-                                    <button id="scenario-start-run-btn" class="btn btn-primary">התחל סשן</button>
-                                    <button id="scenario-home-settings" class="btn btn-secondary">הגדרות</button>
-                                    <span id="scenario-home-summary-pill" class="scenario-summary-pill" data-trainer-summary="current">6 סצנות · כל התחומים · כל הרמות</span>
-                                </div>
-                                <div class="scenario-home-inline-actions">
-                                    <button id="scenario-home-help" class="btn btn-secondary">איך זה עובד</button>
-                                    <button id="scenario-home-history" class="btn btn-secondary">היסטוריה</button>
-                                </div>
-                            </section>
-
-                            <section class="scenario-home-helper-strip" aria-label="מהלך האימון">
-                                <article class="scenario-home-helper-step">
-                                    <strong>1. בחר/י תחום או השאר/י ברירת מחדל</strong>
-                                    <span>אפשר להתחיל מיד או לכוונן את הסשן הבא.</span>
-                                </article>
-                                <article class="scenario-home-helper-step">
-                                    <strong>2. קרא/י את הפתיחה ובחר/י תגובה</strong>
-                                    <span>המטרה היא לא רק להירגע, אלא להבין מה יפתח את השיחה.</span>
-                                </article>
-                                <article class="scenario-home-helper-step">
-                                    <strong>3. בדוק/י מה קרה ואז העמק/י</strong>
-                                    <span>קודם רואים איך זה נחת, ורק אחר כך פותחים את הניתוח העמוק.</span>
-                                </article>
-                            </section>
-
-                            <section class="scenario-start-card scenario-home-setup-card">
-                                <div class="scenario-home-section-head">
-                                    <div>
-                                        <p class="scenario-home-kicker">כיוון הסשן</p>
-                                        <h4>כך ייראה הסבב הבא</h4>
-                                    </div>
-                                    <div id="scenario-home-stats" class="scenario-home-stats"></div>
-                                </div>
-                                <div class="blueprint-questions scenario-pick-grid scenario-start-grid">
-                                    <div class="q-card">
-                                        <label for="scenario-domain-select">תחום</label>
-                                        <select id="scenario-domain-select"></select>
-                                    </div>
-                                    <div class="q-card">
-                                        <label for="scenario-difficulty-select">רמה</label>
-                                        <select id="scenario-difficulty-select"></select>
-                                    </div>
-                                    <div class="q-card">
-                                        <label for="scenario-run-size">כמה סצנות?</label>
-                                        <input type="range" id="scenario-run-size" min="3" max="10" value="6" />
-                                        <span id="scenario-run-size-value">6</span>
-                                    </div>
-                                </div>
-                                <p class="scenario-home-footnote">הצלחה בסשן אחד נראית כמו תגובה שמקדמת יותר קשר, פחות עמימות, וצעד הבא שאפשר לבדוק במציאות.</p>
-                            </section>
-                        </div>
+                    <div class="scenario-feedback-actions">
+                        <a class="btn btn-primary" href="scenario_trainer.html">פתח סימולטור סצנות</a>
+                        <button type="button" class="btn btn-secondary" onclick="navigateTo('home')">חזרה לבית</button>
                     </div>
-
-                    <!-- HELP -->
-                    <div id="scenario-screen-domain" class="scenario-screen hidden">
-                        <div class="scenario-overlay-card">
-                            <p class="scenario-panel-kicker">עזרה</p>
-                            <h3>איך עובדים כאן?</h3>
-                            <ol class="scenario-help-list">
-                                <li>קוראים את הסצנה הקצרה.</li>
-                                <li>בוחרים תגובה אחת שהכי מקדמת בהירות ופעולה.</li>
-                                <li>מקבלים משוב קצר וממשיכים לסצנה הבאה.</li>
-                            </ol>
-                            <p class="scenario-help-note">אם תרצה/י, אפשר לפתוח אחרי המשוב גם פירוק מעמיק יותר.</p>
-                            <div class="step-buttons">
-                                <button id="scenario-back-home-from-domain" class="btn btn-primary">חזרה</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- SCENARIO -->
-                    <div id="scenario-screen-play" class="scenario-screen hidden">
-                        <div class="scenario-session-header">
-                            <p class="scenario-counter">סצנה <span id="scenario-current-index">1</span>/<span id="scenario-total-count">10</span></p>
-                            <p class="scenario-session-meta">נקודות: <span id="scenario-session-score">0</span> | רצף ירוק: <span id="scenario-session-streak">0</span></p>
-                        </div>
-                        <div class="progress-bar">
-                            <div id="scenario-progress-fill" class="progress-fill"></div>
-                        </div>
-                        <div class="scenario-chat-shell">
-                            <div class="scenario-scene-card">
-                                <p class="scenario-scene-kicker" id="scenario-role"></p>
-                                <h3 id="scenario-title"></h3>
-                                <p id="scenario-context-intro" class="scenario-context-intro"></p>
-                                <div class="scenario-relationship-row">
-                                    <span id="scenario-player-role" class="scenario-role-chip"></span>
-                                    <span id="scenario-other-role" class="scenario-role-chip other"></span>
-                                </div>
-                                <div class="scenario-scene-meta">
-                                    <div class="scenario-scene-meta-card">
-                                        <span class="label">מה חשוב כאן</span>
-                                        <p id="scenario-human-need"></p>
-                                    </div>
-                                    <div class="scenario-scene-meta-card">
-                                        <span class="label">הקונפליקט הגלוי</span>
-                                        <p id="scenario-surface-conflict"></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="scenario-story-card">
-                                <div class="scenario-chat-thread">
-                                    <div class="scenario-bubble other">
-                                        <span class="scenario-bubble-speaker" id="scenario-opening-speaker">הצד השני</span>
-                                        <p id="scenario-opening-line"></p>
-                                    </div>
-                                    <div id="scenario-story-lines" class="scenario-story-lines"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="scenario-comic-stage" class="scenario-comic-stage" hidden>
-                            <div class="scenario-comic-image-wrap">
-                                <img id="scenario-comic-image" src="" alt="" loading="lazy">
-                            </div>
-                            <div class="scenario-comic-caption">
-                                <p class="scenario-comic-label">רגע מהסצנה</p>
-                                <h4 id="scenario-comic-title"></h4>
-                                <p id="scenario-comic-subtitle"></p>
-                            </div>
-                        </div>
-                        <h4 class="scenario-options-title">מה תגיד/י עכשיו?</h4>
-                        <p class="scenario-options-subtitle">בחר/י תגובה אחת שהכי מקדמת פעולה.</p>
-                        <div id="scenario-options-container" class="scenario-options-container"></div>
-                    </div>
-
-                    <!-- FEEDBACK -->
-                    <div id="scenario-screen-feedback" class="scenario-screen hidden">
-                        <p class="scenario-panel-kicker">אחרי הבחירה</p>
-                        <div id="scenario-feedback-mark" class="scenario-feedback-mark"></div>
-                        <div id="scenario-feedback-summary" class="scenario-feedback-summary-card">
-                            <p id="scenario-feedback-kind" class="scenario-feedback-kind"></p>
-                            <h3 id="scenario-feedback-title"></h3>
-                            <p id="scenario-feedback-text"></p>
-                        </div>
-                        <div class="scenario-feedback-thread">
-                            <div class="scenario-bubble player selected">
-                                <span class="scenario-bubble-speaker" id="scenario-feedback-player-label">התשובה שלך</span>
-                                <p id="scenario-feedback-choice-bubble"></p>
-                            </div>
-                            <div class="scenario-bubble other followup">
-                                <span class="scenario-bubble-speaker" id="scenario-feedback-other-label">התגובה שמולך</span>
-                                <p id="scenario-feedback-other-bubble"></p>
-                            </div>
-                        </div>
-                        <div id="scenario-consequence-box" class="scenario-consequence-box hidden">
-                            <h4 id="scenario-consequence-title">איך זה נחת בצד השני</h4>
-                            <p id="scenario-consequence-action"></p>
-                            <p id="scenario-consequence-result"></p>
-                        </div>
-                        <details id="scenario-meta-card" class="scenario-meta-accordion">
-                            <summary>מה היה עמום / מה נפתח כאן</summary>
-                            <div class="scenario-meta-accordion-body">
-                                <p id="scenario-meta-card-text" class="scenario-meta-card-text"></p>
-                                <div class="scenario-predicate-panel">
-                                    <p><strong>הפועל/המהלך העמום:</strong> <span id="scenario-unspecified-verb"></span></p>
-                                    <p><strong>מה נשאר חסר או נפתח כאן:</strong> <span id="scenario-predicate-normalized"></span></p>
-                                    <p><strong>שאלת ההעמקה הבאה:</strong> <span id="scenario-predicate-missing-action"></span></p>
-                                    <p><strong>שאלה מדייקת:</strong> <span id="scenario-deepening-question"></span></p>
-                                </div>
-                                <div id="scenario-predicate-type" class="hidden" aria-hidden="true"></div>
-                            </div>
-                        </details>
-                        <div class="scenario-feedback-note" id="scenario-feedback-note"></div>
-                        <div class="scenario-feedback-actions">
-                            <button id="scenario-show-blueprint-btn" class="btn btn-secondary">ניתוח מעמיק</button>
-                            <button id="scenario-feedback-continue-btn" class="btn btn-primary">המשך</button>
-                        </div>
-                    </div>
-
-                    <!-- BLUEPRINT -->
-                    <div id="scenario-screen-blueprint" class="scenario-screen hidden">
-                        <p class="scenario-panel-kicker">פירוק</p>
-                        <h3>מפת פעולה קצרה</h3>
-                        <div class="scenario-tote-map">
-                            <h4>מפת תהליך</h4>
-                            <div class="scenario-tote-grid">
-                                <div class="scenario-tote-slot">
-                                    <h5>פתיחת הסצנה</h5>
-                                    <p id="scenario-tote-trigger"></p>
-                                </div>
-                                <div class="scenario-tote-slot">
-                                    <h5>מה קורה רגע לפני</h5>
-                                    <p id="scenario-tote-pre-event"></p>
-                                </div>
-                                <div class="scenario-tote-slot">
-                                    <h5>איך מזהים שזה קורה</h5>
-                                    <p id="scenario-tote-evidence"></p>
-                                </div>
-                                <div class="scenario-tote-slot">
-                                    <h5>צעד ראשון קטן</h5>
-                                    <p id="scenario-tote-op1"></p>
-                                </div>
-                                <div class="scenario-tote-slot">
-                                    <h5>צעד חיזוק</h5>
-                                    <p id="scenario-tote-op2"></p>
-                                </div>
-                                <div class="scenario-tote-slot">
-                                    <h5>בדיקה קצרה</h5>
-                                    <p id="scenario-tote-op3"></p>
-                                </div>
-                                <div class="scenario-tote-slot">
-                                    <h5>מה חוסם</h5>
-                                    <p id="scenario-tote-blocker"></p>
-                                </div>
-                                <div class="scenario-tote-slot">
-                                    <h5>מה קורה אוטומטית</h5>
-                                    <p id="scenario-tote-auto"></p>
-                                </div>
-                                <div class="scenario-tote-slot">
-                                    <h5>איך נראית יציאה מהתקיעות</h5>
-                                    <p id="scenario-tote-exit"></p>
-                                </div>
-                            </div>
-                            <div class="scenario-question-engine">
-                                <h5>שאלות מדייקות לפי סוג הפועל</h5>
-                                <ul id="scenario-dynamic-questions"></ul>
-                                <div class="scenario-probe-buttons">
-                                    <button id="scenario-open-box-btn" class="btn btn-secondary">פתח עוד</button>
-                                    <button id="scenario-knife-btn" class="btn btn-secondary">חתוך דבק</button>
-                                </div>
-                                <p id="scenario-probe-output" class="scenario-probe-output"></p>
-                            </div>
-                        </div>
-                        <h3>תוכנית קצרה</h3>
-                        <div class="final-blueprint-display scenario-blueprint-display">
-                            <div class="blueprint-section">
-                                <h4>🎯 מטרה</h4>
-                                <p id="scenario-blueprint-goal"></p>
-                            </div>
-                            <div class="blueprint-section">
-                                <h4>⏱️ צעד ראשון (10 דקות)</h4>
-                                <p id="scenario-blueprint-first-step"></p>
-                            </div>
-                            <div class="blueprint-section">
-                                <h4>🧭 שלבים</h4>
-                                <ul id="scenario-blueprint-steps"></ul>
-                            </div>
-                            <div class="blueprint-section">
-                                <h4>🧱 נקודת תקיעה</h4>
-                                <p id="scenario-blueprint-stuck"></p>
-                            </div>
-                            <div class="blueprint-section">
-                                <h4>🛟 חלופה / תחליף</h4>
-                                <p id="scenario-blueprint-planb"></p>
-                            </div>
-                            <div class="blueprint-section">
-                                <h4>✅ מדד הצלחה</h4>
-                                <p id="scenario-blueprint-done"></p>
-                            </div>
-                        </div>
-
-                        <div class="scenario-green-box">
-                            <h4>המשפט הירוק המוצע</h4>
-                            <p id="scenario-green-sentence"></p>
-                            <button id="scenario-copy-green-btn" class="btn btn-secondary">העתק משפט ירוק</button>
-                        </div>
-
-                        <div id="scenario-prism-wheel" class="scenario-prism-wheel hidden">
-                            <h4>גלגל פריזמות מהיר (אופציונלי)</h4>
-                            <div id="scenario-prism-items" class="scenario-prism-items"></div>
-                            <div id="scenario-prism-detail" class="scenario-prism-detail hidden"></div>
-                        </div>
-                    </div>
-
-                    <!-- SCORE -->
-                    <div id="scenario-screen-score" class="scenario-screen hidden">
-                        <div id="scenario-stars-row" class="scenario-stars-row"></div>
-                        <p id="scenario-score-line" class="scenario-score-line"></p>
-                        <p id="scenario-next-green-line" class="scenario-next-green-line"></p>
-                        <div id="scenario-result-summary" class="scenario-result-summary hidden">
-                            <p><strong>מטרה כללית:</strong> <span id="scenario-result-goal"></span></p>
-                            <p><strong>מדד הצלחה:</strong> <span id="scenario-result-metric"></span></p>
-                        </div>
-                        <div class="step-buttons">
-                            <button id="scenario-next-scene-btn" class="btn btn-primary">המשך לסצנה הבאה</button>
-                            <button id="scenario-back-home-btn" class="btn btn-secondary">חזרה לבית הסצנות</button>
-                        </div>
-                    </div>
-
-                    <!-- HISTORY -->
-                    <div id="scenario-screen-history" class="scenario-screen hidden">
-                        <h3>היסטוריית סצנות</h3>
-                        <div class="step-buttons">
-                            <button id="scenario-export-history-btn" class="btn btn-secondary">ייצא JSON</button>
-                            <button id="scenario-clear-history-btn" class="btn btn-secondary">נקה היסטוריה</button>
-                            <button id="scenario-back-home-from-history" class="btn btn-primary">חזרה</button>
-                        </div>
-                        <div id="scenario-history-list" class="scenario-history-list"></div>
-                    </div>
-
-                    <!-- SETTINGS -->
-                    <div id="scenario-screen-settings" class="scenario-screen hidden">
-                        <div class="scenario-settings-shell">
-                            <div class="scenario-settings-head">
-                                <div>
-                                    <p class="scenario-home-kicker">לוח בקרה</p>
-                                    <h3>הגדרות הסימולטור</h3>
-                                    <p class="scenario-settings-subtitle">מכאן מגדירים איך הסשן הבא יתחיל, ואילו כלי עזר יישארו פתוחים לאורך התרגול.</p>
-                                </div>
-                                <div id="scenario-settings-summary-pill" class="scenario-summary-pill" data-trainer-summary="preview">6 סצנות · כל התחומים · כל הרמות</div>
-                            </div>
-                            <div class="scenario-settings-grid">
-                                <section class="scenario-settings-card" data-kind="basic">
-                                    <div class="scenario-home-section-head">
-                                        <div>
-                                            <p class="scenario-home-kicker">בסיס הסשן</p>
-                                            <h4>מה לתרגל</h4>
-                                        </div>
-                                    </div>
-                                    <div class="blueprint-questions">
-                                        <div class="q-card">
-                                            <label for="scenario-setting-domain">תחום ברירת מחדל</label>
-                                            <select id="scenario-setting-domain"></select>
-                                        </div>
-                                        <div class="q-card">
-                                            <label for="scenario-setting-difficulty">רמת ברירת מחדל</label>
-                                            <select id="scenario-setting-difficulty"></select>
-                                        </div>
-                                        <div class="q-card">
-                                            <label for="scenario-setting-run-size">כמה סצנות כברירת מחדל?</label>
-                                            <input type="range" id="scenario-setting-run-size" min="3" max="10" value="6" />
-                                            <span id="scenario-setting-run-size-value">6</span>
-                                        </div>
-                                    </div>
-                                </section>
-                                <section class="scenario-settings-card" data-kind="advanced">
-                                    <div class="scenario-home-section-head">
-                                        <div>
-                                            <p class="scenario-home-kicker">כלי עזר</p>
-                                            <h4>מה יישאר פתוח במהלך האימון</h4>
-                                        </div>
-                                    </div>
-                                    <div class="q-card scenario-toggle-row">
-                                        <label>
-                                            <input type="checkbox" id="scenario-setting-sound" checked />
-                                            צלילים במסך הסצנות
-                                        </label>
-                                        <label>
-                                            <input type="checkbox" id="scenario-setting-prism" checked />
-                                            גלגל פריזמות אחרי תשובה ירוקה
-                                        </label>
-                                    </div>
-                                </section>
-                            </div>
-                            <div class="step-buttons scenario-settings-actions">
-                                <button id="scenario-back-home-from-settings" class="btn btn-secondary">ביטול</button>
-                                <button id="scenario-save-settings-btn" class="btn btn-primary">שמור הגדרות</button>
-                            </div>
-                        </div>
-                    </div>
+                    <p class="scenario-home-footnote">כל מסך הסצנות, ההגדרות, ההיסטוריה והמשוב החיים נמצאים עכשיו ב־<strong><a href="scenario_trainer.html">scenario_trainer.html</a></strong>.</p>
                 </div>
             </div>
         </section>
@@ -1576,7 +1211,7 @@
             <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">בונה מהלך</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('prismlab')">מעבדת פריזמות · רמות לוגיות</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">במת קומיקס רגשי</button>
-            <button type="button" class="btn btn-secondary" onclick="navigateTo('scenario-trainer')">סימולטור סצנות</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='scenario_trainer.html'">סימולטור סצנות</button>
         </div>
     </div>
 

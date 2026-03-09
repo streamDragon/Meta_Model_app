@@ -80,7 +80,8 @@
         "navLinks": [
           { "href": "index.html", "label": "חזרה לדף הראשי" },
           { "href": "classic_classic_trainer.html", "label": "Classic Classic" },
-          { "href": "iceberg_templates_trainer.html", "label": "Iceberg Templates" }
+          { "href": "iceberg_templates_trainer.html", "label": "Iceberg Templates" },
+          { "href": "scenario_trainer.html", "label": "סימולטור סצנות" }
         ],
         "accent": {
           "primary": "#1d4ed8",
@@ -174,7 +175,8 @@
         "navLinks": [
           { "href": "index.html", "label": "חזרה לדף הראשי" },
           { "href": "classic2_trainer.html", "label": "Classic 2" },
-          { "href": "iceberg_templates_trainer.html", "label": "Iceberg Templates" }
+          { "href": "iceberg_templates_trainer.html", "label": "Iceberg Templates" },
+          { "href": "scenario_trainer.html", "label": "סימולטור סצנות" }
         ],
         "accent": {
           "primary": "#2563eb",
@@ -276,7 +278,8 @@
         "navLinks": [
           { "href": "index.html", "label": "חזרה לדף הראשי" },
           { "href": "classic2_trainer.html", "label": "Classic 2" },
-          { "href": "classic_classic_trainer.html", "label": "Classic Classic" }
+          { "href": "classic_classic_trainer.html", "label": "Classic Classic" },
+          { "href": "scenario_trainer.html", "label": "סימולטור סצנות" }
         ],
         "accent": {
           "primary": "#92400e",
@@ -290,6 +293,105 @@
           "bundlePath": "js/iceberg-templates-trainer.bundle.js",
           "buildMetaGlobalKey": "__ICEBERG_TEMPLATES_BUILD_META__",
           "assetVersionGlobalKey": "__ICEBERG_TEMPLATES_ASSET_V__"
+        }
+      }
+    },
+    "scenario-trainer": {
+      "id": "scenario-trainer",
+      "title": "סימולטור סצנות",
+      "subtitle": "נכנסים לסצנה אנושית, בוחרים תגובה אחת, ורואים איך היא נוחתת רגשית ומה נפתח במודל המטה-מודלי.",
+      "familyLabel": "משפחת הסימולטורים",
+      "quickStartLabel": "מתחילים שיחה",
+      "startActionLabel": "התחל סשן",
+      "settingsTitle": "הגדרות סימולטור סצנות",
+      "settingsSubtitle": "מכווננים תחום, רמה, אורך סשן וכלי עזר, בלי לפרק את הדיאלוג לפני שהוא מתחיל.",
+      "helperSteps": [
+        {
+          "title": "1. בחר/י תחום או השאר/י ברירת מחדל",
+          "description": "אפשר להתחיל מיד, או לכוונן את הסשן הבא."
+        },
+        {
+          "title": "2. קרא/י את הפתיחה ובחר/י תגובה",
+          "description": "קודם רואים איך זה נוחת בשיחה אמיתית."
+        },
+        {
+          "title": "3. רואים תוצאה, מעמיקים, וממשיכים",
+          "description": "אחרי המשוב אפשר לפתוח מפת עומק או לעבור לסצנה הבאה."
+        }
+      ],
+      "processSteps": [
+        {
+          "id": "scene",
+          "label": "1. שומעים את הסצנה",
+          "shortLabel": "סצנה",
+          "description": "רואים מה ומי לוחץ ברגע הזה."
+        },
+        {
+          "id": "reply",
+          "label": "2. בוחרים תגובה",
+          "shortLabel": "תגובה",
+          "description": "בודקים איזו תגובה מקדמת קשר ובהירות."
+        },
+        {
+          "id": "impact",
+          "label": "3. רואים איך זה נוחת",
+          "shortLabel": "השפעה",
+          "description": "קוראים איך הצד השני עשוי לקלוט את התגובה."
+        },
+        {
+          "id": "clarify",
+          "label": "4. פותחים את הניתוח",
+          "shortLabel": "עומק",
+          "description": "רק אחרי החוויה האנושית פותחים את מה שהיה עמום."
+        },
+        {
+          "id": "continue",
+          "label": "5. ממשיכים לסצנה הבאה",
+          "shortLabel": "המשך",
+          "description": "לוקחים את הדיוק לשיחה הבאה."
+        }
+      ],
+      "supportRailMode": "dialogue-meta",
+      "settingsGroups": [
+        "domain-focus",
+        "difficulty",
+        "session-load",
+        "helpers"
+      ],
+      "mobilePriorityOrder": [
+        "start",
+        "purpose",
+        "helper-steps",
+        "main",
+        "support"
+      ],
+      "wrapper": {
+        "pageTitle": "Scenario Trainer - Meta Model Dialogue Simulator",
+        "mountId": "scenario-trainer-root",
+        "loadingTitle": "טוען את סימולטור הסצנות...",
+        "loadingText": "מכין את סביבת הדיאלוג עם בחירות, משוב ופירוק עומק במקום אחד.",
+        "errorTitle": "שגיאה בטעינת סימולטור סצנות",
+        "navLinks": [
+          { "href": "index.html", "label": "חזרה לדף הראשי" },
+          { "href": "classic2_trainer.html", "label": "Classic 2" },
+          { "href": "classic_classic_trainer.html", "label": "Classic Classic" },
+          { "href": "iceberg_templates_trainer.html", "label": "Iceberg Templates" }
+        ],
+        "accent": {
+          "primary": "#0f766e",
+          "border": "#99f6e4",
+          "glow": "rgba(15,118,110,0.16)",
+          "background": "radial-gradient(circle at 12% 10%, #ccfbf1, transparent 34%), radial-gradient(circle at 88% 18%, #fef3c7, transparent 30%), linear-gradient(165deg, #f0fdfa 0%, #f8fafc 60%, #fff7ed 100%)"
+        },
+        "standalone": {
+          "htmlFile": "scenario_trainer.html",
+          "manifestKey": "_scenario_trainer",
+          "css": [
+            "css/style.css"
+          ],
+          "scripts": [
+            "js/scenario-trainer-app.js"
+          ]
         }
       }
     }

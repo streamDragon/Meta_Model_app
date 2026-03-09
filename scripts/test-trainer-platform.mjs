@@ -9,7 +9,8 @@ const VITE_BIN = path.join(ROOT, 'node_modules', 'vite', 'bin', 'vite.js');
 const TRAINERS = [
     { id: 'classic2', path: 'classic2_trainer.html' },
     { id: 'classic-classic', path: 'classic_classic_trainer.html' },
-    { id: 'iceberg-templates', path: 'iceberg_templates_trainer.html' }
+    { id: 'iceberg-templates', path: 'iceberg_templates_trainer.html' },
+    { id: 'scenario-trainer', path: 'scenario_trainer.html' }
 ];
 
 function wait(ms) {

@@ -1,9 +1,9 @@
 {
-  "appVersion": "1.0.221",
-  "commitSha": "4863270",
-  "builtAt": "2026-03-08T23:22:46.793Z",
-  "version": "1.0.221",
-  "buildTime": "1773012166793",
-  "buildIso": "2026-03-08T23:22:46.793Z",
-  "gitCommit": "4863270"
+  "appVersion": "1.0.222",
+  "commitSha": "a3a489b",
+  "builtAt": "2026-03-09T02:52:34.689Z",
+  "version": "1.0.222",
+  "buildTime": "1773024754689",
+  "buildIso": "2026-03-09T02:52:34.689Z",
+  "gitCommit": "a3a489b"
 }

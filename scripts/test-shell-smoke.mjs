@@ -255,11 +255,12 @@ async function runShellSmoke(baseUrl) {
 
         await navigate('scenario-trainer');
         await closeOverlayIfOpen();
-        await assert((await page.locator('#scenario-trainer .app-shell').count()) > 0, 'scenario-trainer shell mounted');
-        await clickHeaderButton('scenario-trainer', 1);
-        const scenarioTitle = await getOverlayTitle();
-        await assert(Boolean(scenarioTitle), 'scenario-trainer overlay', scenarioTitle);
-        await closeOverlayWithButton();
+        await assert((await page.locator('#scenario-trainer a[href="scenario_trainer.html"]').count()) > 0, 'scenario-trainer launcher mounted');
+        const scenarioPage = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
+        await scenarioPage.goto(new URL('scenario_trainer.html', baseUrl).toString(), { waitUntil: 'networkidle' });
+        await assert((await scenarioPage.locator('[data-trainer-platform="1"][data-trainer-id="scenario-trainer"]').count()) > 0, 'scenario standalone shell mounted');
+        await assert((await scenarioPage.locator('.mtp-nav').count()) > 0, 'scenario standalone nav mounted');
+        await scenarioPage.close();
 
         await checkGenericScreen('comic-engine', 1);
         await checkGenericScreen('categories', 1);

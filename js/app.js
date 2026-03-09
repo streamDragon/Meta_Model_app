@@ -13398,7 +13398,16 @@ function saveScenarioSettingsFromForm() {
 }
 
 async function setupScenarioTrainerModule() {
-    if (!document.getElementById('scenario-trainer')) return;
+    const scenarioTab = document.getElementById('scenario-trainer');
+    if (!scenarioTab) return;
+
+    const launcherLink = scenarioTab.querySelector('a[href="scenario_trainer.html"]');
+    if (launcherLink) {
+        scenarioTab.setAttribute('data-scenario-host-mode', 'launcher');
+        return;
+    }
+
+    if (!document.getElementById('scenario-start-run-btn')) return;
 
     scenarioTrainer.settings = loadScenarioTrainerSettings();
     scenarioTrainer.progress = loadScenarioTrainerProgress();

@@ -1,0 +1,1202 @@
+(function attachScenarioTrainerApp() {
+    const root = typeof globalThis !== 'undefined' ? globalThis : window;
+    const trainerContract = typeof root.getMetaTrainerPlatformContract === 'function'
+        ? root.getMetaTrainerPlatformContract('scenario-trainer')
+        : null;
+    const mountId = trainerContract?.wrapper?.mountId || 'scenario-trainer-root';
+    const mount = document.getElementById(mountId);
+    if (!mount || !trainerContract) return;
+
+    const STORAGE_KEYS = Object.freeze({
+        settings: 'scenario_trainer_settings_v1',
+        progress: 'scenario_trainer_progress_v1'
+    });
+    const DEFAULT_MOBILE_ZONE_ORDER = Object.freeze(['purpose', 'start', 'helper-steps', 'main', 'support']);
+    const MOBILE_ZONE_ALIASES = Object.freeze({
+        purpose: 'purpose',
+        start: 'start',
+        helper: 'helper-steps',
+        'helper-steps': 'helper-steps',
+        main: 'main',
+        support: 'support'
+    });
+    const OPTION_IDS = Object.freeze(['A', 'B', 'C', 'D']);
+    const SCREEN_IDS = Object.freeze({
+        home: 'home',
+        play: 'play',
+        feedback: 'feedback',
+        blueprint: 'blueprint',
+        score: 'score',
+        history: 'history',
+        help: 'help'
+    });
+    const PROCESS_STEP_BY_SCREEN = Object.freeze({
+        home: null,
+        play: 'scene',
+        feedback: 'impact',
+        blueprint: 'clarify',
+        score: 'continue',
+        history: null,
+        help: null
+    });
+    const TONE_LABELS = Object.freeze({
+        defensive_attack: 'התגוננות תוקפת',
+        minimize: 'מזעור',
+        shutdown: 'סגירה',
+        false_fix: 'תיקון מדומה',
+        pseudo_apology: 'סליחה חצי-סגורה',
+        stonewall: 'קיר אטום',
+        blame_reversal: 'החזרת אשמה',
+        vague_yes: 'כן בלי תוכן',
+        fake_agreement: 'הסכמה בלי בהירות',
+        passive_aggressive: 'עקיצה פסיבית',
+        panic: 'לחץ מיידי',
+        blame: 'אשמה',
+        collapse: 'קריסה',
+        rage: 'זעם על המערכת',
+        magical_thinking: 'ניחוש',
+        random_guessing: 'ניסוי אקראי',
+        criticism: 'ביקורת אישית',
+        comparison: 'השוואה לוחצת',
+        shame: 'בושה והשוואה',
+        over_helping: 'הצלת יתר',
+        impatient_control: 'שליטה לחוצה',
+        clarify_process: 'שאלה שמדייקת תהליך',
+        contain_and_clarify: 'הרגעה + פירוק',
+        contain_and_sequence: 'סדר צעדים',
+        validate_and_repair: 'הכרה + תיקון',
+        validate_and_specify: 'תיקוף + דיוק',
+        clarify_deliverable: 'דיוק תוצר',
+        clarify_format_and_ownership: 'פורמט + בעלות',
+        define_done_and_owner: 'הגדרת Done',
+        organize_requirements: 'ארגון דרישות',
+        reduce_ambiguity: 'צמצום עמימות',
+        clarify_required_fields: 'מיון חובה מול עמום',
+        diagnose_then_act: 'אבחון לפני פעולה',
+        smallest_safe_step: 'צעד בטוח קטן',
+        diagnose_scope_first: 'בודקים היקף תקלה',
+        default_red: 'תגובה תחת לחץ',
+        default_green: 'תגובה שמקדמת בהירות'
+    });
+
+    const state = {
+        loading: true,
+        loadError: '',
+        data: { domains: [], difficulties: [], scenarios: [], prismWheel: [] },
+        screen: SCREEN_IDS.home,
+        settingsOpen: false,
+        settings: loadSettings(),
+        settingsDraft: null,
+        homeFilters: null,
+        progress: loadProgress(),
+        session: null,
+        activeScenario: null,
+        selectedOption: null,
+        lastEntry: null,
+        selectedPrismId: '',
+        toastMessage: '',
+        toastTimer: null
+    };
+    state.homeFilters = {
+        domain: state.settings.defaultDomain,
+        difficulty: state.settings.defaultDifficulty,
+        runSize: clampRunSize(state.settings.defaultRunSize)
+    };
+
+    mount.addEventListener('click', handleClick);
+    mount.addEventListener('change', handleChange);
+    mount.addEventListener('input', handleInput);
+
+    init().catch((error) => {
+        state.loading = false;
+        state.loadError = error?.message || 'שגיאה לא מזוהה';
+        render();
+    });
+
+    async function init() {
+        render();
+        state.data = await loadData();
+        state.loading = false;
+        render();
+    }
+
+    function escapeHtml(value) {
+        return String(value == null ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function normalizeText(value, fallback = '') {
+        const raw = String(value == null ? fallback : value);
+        const compact = raw.replace(/\s+/g, ' ').trim();
+        return compact || String(fallback || '').trim();
+    }
+
+    function clampRunSize(value) {
+        const parsed = Number.parseInt(String(value ?? ''), 10);
+        if (!Number.isFinite(parsed)) return 6;
+        return Math.max(3, Math.min(10, parsed));
+    }
+
+    function getDefaultSettings() {
+        return {
+            soundEnabled: true,
+            defaultDifficulty: 'all',
+            defaultDomain: 'all',
+            defaultRunSize: 6,
+            prismWheelEnabled: true
+        };
+    }
+
+    function loadSettings() {
+        const defaults = getDefaultSettings();
+        try {
+            const raw = localStorage.getItem(STORAGE_KEYS.settings);
+            if (!raw) return defaults;
+            return { ...defaults, ...(JSON.parse(raw) || {}) };
+        } catch (_error) {
+            return defaults;
+        }
+    }
+
+    function saveSettings() {
+        localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
+    }
+
+    function getDefaultProgress() {
+        return {
+            completed: 0,
+            greenCount: 0,
+            stars: 0,
+            currentGreenStreak: 0,
+            bestGreenStreak: 0,
+            history: [],
+            updatedAt: null
+        };
+    }
+
+    function loadProgress() {
+        const defaults = getDefaultProgress();
+        try {
+            const raw = localStorage.getItem(STORAGE_KEYS.progress);
+            if (!raw) return defaults;
+            const parsed = JSON.parse(raw);
+            return {
+                ...defaults,
+                ...(parsed || {}),
+                history: Array.isArray(parsed?.history) ? parsed.history.slice(0, 300) : []
+            };
+        } catch (_error) {
+            return defaults;
+        }
+    }
+
+    function saveProgress() {
+        state.progress.updatedAt = new Date().toISOString();
+        localStorage.setItem(STORAGE_KEYS.progress, JSON.stringify(state.progress));
+    }
+
+    function getMobileZoneOrder() {
+        const raw = Array.isArray(trainerContract.mobilePriorityOrder) ? trainerContract.mobilePriorityOrder : [];
+        const seen = new Set();
+        const resolved = [];
+        raw.forEach((item) => {
+            const key = MOBILE_ZONE_ALIASES[String(item || '').trim()];
+            if (!key || seen.has(key)) return;
+            seen.add(key);
+            resolved.push(key);
+        });
+        DEFAULT_MOBILE_ZONE_ORDER.forEach((key) => {
+            if (seen.has(key)) return;
+            seen.add(key);
+            resolved.push(key);
+        });
+        return resolved;
+    }
+
+    function buildRootStyle() {
+        return getMobileZoneOrder().map((zoneId, index) => `--scenario-mobile-order-${zoneId}:${index + 1}`).join(';');
+    }
+
+    function getZoneStyle(zoneId) {
+        const ordered = getMobileZoneOrder();
+        const index = ordered.indexOf(zoneId);
+        const order = index === -1 ? DEFAULT_MOBILE_ZONE_ORDER.indexOf(zoneId) + 1 : index + 1;
+        return `--scenario-mobile-order:${order}`;
+    }
+
+    function normalizeScenarioOption(raw, fallbackId, isGreen) {
+        const line = normalizeText(raw?.speakerLine || raw?.text || raw?.say, isGreen ? 'בוא/י נבדוק מה קורה כאן בפועל.' : 'אני מגיב/ה מתוך לחץ.');
+        const why = normalizeText(
+            isGreen ? (raw?.whyItWorks || raw?.feedback) : (raw?.whyItHurts || raw?.feedback),
+            isGreen
+                ? 'התגובה הזו מחזירה את השיחה למה שקורה בפועל ומאפשרת להתחיל לפרק את הבעיה.'
+                : 'התגובה הזו מחליפה בירור ממשי בלחץ, התגוננות או סתימה.'
+        );
+        return {
+            ...raw,
+            id: normalizeText(raw?.id, fallbackId),
+            tone: normalizeText(raw?.tone, isGreen ? 'default_green' : 'default_red'),
+            speakerLine: line,
+            feedback: why,
+            whyItHurts: normalizeText(raw?.whyItHurts, isGreen ? '' : why),
+            whyItWorks: normalizeText(raw?.whyItWorks, isGreen ? why : ''),
+            likelyOtherReply: normalizeText(
+                raw?.likelyOtherReply || raw?.counterReply,
+                isGreen ? 'אוקיי, עכשיו אפשר לראות מה בדיוק קורה.' : 'רגע, זה עדיין לא עוזר לי להבין מה קורה.'
+            ),
+            score: isGreen ? 1 : 0
+        };
+    }
+
+    function normalizeScenarioResponseSet(rawScenario) {
+        const responseSet = rawScenario?.responseSet && typeof rawScenario.responseSet === 'object' ? rawScenario.responseSet : {};
+        const legacyOptions = Array.isArray(rawScenario?.options) ? rawScenario.options : [];
+        const legacyRed = legacyOptions.filter((item) => Number(item?.score) !== 1).slice(0, 4);
+        const legacyGreen = legacyOptions.find((item) => Number(item?.score) === 1);
+        const redPool = Array.isArray(responseSet.red) && responseSet.red.length ? responseSet.red : legacyRed;
+        const red = redPool.slice(0, 4).map((item, index) => normalizeScenarioOption(item, OPTION_IDS[index] || String(index + 1), false));
+        const green = normalizeScenarioOption(responseSet.green || legacyGreen || { speakerLine: rawScenario?.greenSentence }, 'E', true);
+        return { red, green };
+    }
+
+    function normalizeScenario(rawScenario, index, domainLabels) {
+        const responseSet = normalizeScenarioResponseSet(rawScenario);
+        const metaModelCore = {
+            unspecifiedVerb: normalizeText(rawScenario?.metaModelCore?.unspecifiedVerb || rawScenario?.unspecifiedVerb, 'לעשות את זה'),
+            hiddenGap: normalizeText(rawScenario?.metaModelCore?.hiddenGap || rawScenario?.stuckPointHint, 'עדיין לא ברור מה בדיוק קורה בפועל.'),
+            whyItSticks: normalizeText(rawScenario?.metaModelCore?.whyItSticks || rawScenario?.expectation?.belief, 'הבקשה נשמעת פשוטה, אבל חסר פירוק של מה שקורה בדרך.')
+        };
+        const greenBlueprint = rawScenario?.greenBlueprint && typeof rawScenario.greenBlueprint === 'object' ? rawScenario.greenBlueprint : {};
+        const microPlan = rawScenario?.microPlan && typeof rawScenario.microPlan === 'object' ? rawScenario.microPlan : {};
+        return {
+            ...rawScenario,
+            scenarioId: normalizeText(rawScenario?.scenarioId || rawScenario?.id, `scenario_${index + 1}`),
+            title: normalizeText(rawScenario?.sceneTitle || rawScenario?.title, `סצנה ${index + 1}`),
+            sceneTitle: normalizeText(rawScenario?.sceneTitle || rawScenario?.title, `סצנה ${index + 1}`),
+            domain: normalizeText(rawScenario?.domain, 'general'),
+            domainLabel: normalizeText(rawScenario?.domainLabel, domainLabels[normalizeText(rawScenario?.domain, 'general')] || 'כללי'),
+            difficulty: normalizeText(rawScenario?.difficulty, 'medium'),
+            role: {
+                player: normalizeText(rawScenario?.role?.player, 'את/ה'),
+                other: normalizeText(rawScenario?.role?.other, 'הצד השני')
+            },
+            contextIntro: normalizeText(rawScenario?.contextIntro || rawScenario?.story?.[0], ''),
+            openingLine: normalizeText(rawScenario?.openingLine || rawScenario?.story?.[1], ''),
+            humanNeed: normalizeText(rawScenario?.humanNeed, 'יש כאן צורך בקשר ובהירות במקום לחץ.'),
+            surfaceConflict: normalizeText(rawScenario?.surfaceConflict, normalizeText(rawScenario?.sceneTitle || rawScenario?.title, '')),
+            metaModelCore,
+            responseSet,
+            deepeningQuestion: normalizeText(rawScenario?.deepeningQuestion, 'מה בדיוק קורה כאן בפועל?'),
+            microPlan: {
+                firstStep: normalizeText(microPlan.firstStep || greenBlueprint.firstStep, 'להגדיר צעד ראשון קטן וברור.'),
+                bottleneck: normalizeText(microPlan.bottleneck || greenBlueprint.stuckPoint || metaModelCore.hiddenGap, 'עדיין לא ברור איפה נוצר הפקק.'),
+                successSign: normalizeText(microPlan.successSign || greenBlueprint.doneDefinition, 'יש סימן קטן שאפשר לראות במציאות.')
+            },
+            greenBlueprint: {
+                goal: normalizeText(greenBlueprint.goal, rawScenario?.humanNeed || rawScenario?.surfaceConflict || rawScenario?.sceneTitle || ''),
+                firstStep: normalizeText(greenBlueprint.firstStep || microPlan.firstStep, 'להגדיר צעד ראשון קטן וברור.'),
+                steps: Array.isArray(greenBlueprint.steps) ? greenBlueprint.steps.map((item) => normalizeText(item)).filter(Boolean).slice(0, 4) : [],
+                stuckPoint: normalizeText(greenBlueprint.stuckPoint || microPlan.bottleneck || metaModelCore.hiddenGap, metaModelCore.hiddenGap),
+                planB: normalizeText(greenBlueprint.planB, ''),
+                doneDefinition: normalizeText(greenBlueprint.doneDefinition || microPlan.successSign, microPlan.successSign || 'יש סימן שאפשר למדוד.')
+            },
+            greenSentence: responseSet.green?.speakerLine || ''
+        };
+    }
+
+    async function loadData() {
+        const response = await fetch('data/scenario-trainer-scenarios.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        const domains = Array.isArray(data?.domains) ? data.domains : [];
+        const domainLabels = domains.reduce((acc, item) => {
+            const id = normalizeText(item?.id);
+            if (id) acc[id] = normalizeText(item?.label, id);
+            return acc;
+        }, {});
+        return {
+            domains,
+            difficulties: Array.isArray(data?.difficulties) ? data.difficulties : [],
+            prismWheel: Array.isArray(data?.prismWheel) ? data.prismWheel : [],
+            scenarios: Array.isArray(data?.scenarios) ? data.scenarios.map((item, index) => normalizeScenario(item, index, domainLabels)) : []
+        };
+    }
+
+    function getDomainLabel(id) {
+        if (id === 'all') return 'כל התחומים';
+        return normalizeText(state.data.domains.find((item) => item.id === id)?.label, 'כל התחומים');
+    }
+
+    function getDifficultyLabel(id) {
+        if (id === 'all') return 'כל הרמות';
+        return normalizeText(state.data.difficulties.find((item) => item.id === id)?.label, 'כל הרמות');
+    }
+
+    function buildSummary(config) {
+        const resolved = config || state.homeFilters;
+        return `${clampRunSize(resolved.runSize)} סצנות · ${getDomainLabel(resolved.domain)} · ${getDifficultyLabel(resolved.difficulty)}`;
+    }
+
+    function getCurrentSummary() {
+        if (state.session) {
+            return `${state.session.queue.length} סצנות · ${getDomainLabel(state.session.domain)} · ${getDifficultyLabel(state.session.difficulty)}`;
+        }
+        return buildSummary(state.homeFilters);
+    }
+
+    function getSettingsDraft() {
+        return state.settingsDraft || {
+            defaultDomain: state.homeFilters.domain,
+            defaultDifficulty: state.homeFilters.difficulty,
+            defaultRunSize: state.homeFilters.runSize,
+            soundEnabled: state.settings.soundEnabled,
+            prismWheelEnabled: state.settings.prismWheelEnabled
+        };
+    }
+
+    function createSessionQueue(domain, difficulty, runSize) {
+        const queue = state.data.scenarios.filter((scenario) => {
+            const domainMatch = domain === 'all' || scenario.domain === domain;
+            const difficultyMatch = difficulty === 'all' || scenario.difficulty === difficulty;
+            return domainMatch && difficultyMatch;
+        });
+        return queue.slice().sort(() => Math.random() - 0.5).slice(0, clampRunSize(runSize));
+    }
+
+    function openScreen(screenId) {
+        state.screen = screenId;
+        render();
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    function startSession(config) {
+        const next = config || state.homeFilters;
+        const queue = createSessionQueue(next.domain, next.difficulty, next.runSize);
+        if (!queue.length) {
+            showToast('לא נמצאו סצנות למסנן שבחרת.');
+            return;
+        }
+        state.settings.defaultDomain = next.domain;
+        state.settings.defaultDifficulty = next.difficulty;
+        state.settings.defaultRunSize = clampRunSize(next.runSize);
+        saveSettings();
+        state.homeFilters = { ...next, runSize: clampRunSize(next.runSize) };
+        state.session = {
+            domain: next.domain,
+            difficulty: next.difficulty,
+            queue,
+            index: 0,
+            score: 0,
+            stars: 0,
+            streak: 0,
+            completed: []
+        };
+        state.activeScenario = queue[0];
+        state.selectedOption = null;
+        state.lastEntry = null;
+        state.selectedPrismId = '';
+        openScreen(SCREEN_IDS.play);
+    }
+
+    function toneLabel(option, isGreen) {
+        const tone = normalizeText(option?.tone, isGreen ? 'default_green' : 'default_red');
+        return TONE_LABELS[tone] || (isGreen ? TONE_LABELS.default_green : TONE_LABELS.default_red);
+    }
+
+    function getGreenOptionText(scenario) {
+        return normalizeText(scenario?.responseSet?.green?.speakerLine || scenario?.greenSentence, '');
+    }
+
+    function buildMetaCardText(scenario, option, isGreen) {
+        const meta = scenario?.metaModelCore || {};
+        if (isGreen) {
+            return normalizeText(
+                option?.metaModelExplanation,
+                `כאן עברת מהכותרת הכללית "${meta.unspecifiedVerb || 'לעשות את זה'}" אל מה שאפשר לבדוק במציאות. במקום להישאר עם בקשה כללית, השיחה נפתחת אל ${meta.hiddenGap || 'השלב המדויק שבו נתקעים'}.`
+            );
+        }
+        return normalizeText(
+            option?.metaModelExplanation,
+            `העמימות נשארת במקום: עדיין לא ברור ${meta.hiddenGap || 'מה בדיוק קורה בפועל'}, ולכן השיחה מחליקה להגנה, האשמה או הימנעות במקום לבדיקה.`
+        );
+    }
+
+    function getConsequenceLines(scenario, option, isGreen) {
+        const otherLabel = normalizeText(scenario?.role?.other, 'הצד השני');
+        return {
+            action: normalizeText(
+                option?.consequenceAction,
+                isGreen
+                    ? `${otherLabel} כנראה שומע כאן ניסיון להבין ולא רק לכבות את הרגע.`
+                    : `${otherLabel} כנראה ישמע כאן לחץ, ביטול או התקפה, ולכן ייטה להתכווץ, להתגונן או להתרחק.`
+            ),
+            result: normalizeText(
+                option?.consequenceResult,
+                isGreen
+                    ? `מכאן אפשר לעבור אל השאלה המעשית: ${normalizeText(scenario?.deepeningQuestion, 'מה בדיוק קורה בפועל?')}`
+                    : 'במקום לפתוח את השלב החסר, השיחה נשארת סביב תגובה אוטומטית והבעיה עצמה נשארת עמומה.'
+            )
+        };
+    }
+
+    function pickOption(optionId) {
+        const scenario = state.activeScenario;
+        if (!scenario) return;
+        const allOptions = [...scenario.responseSet.red, scenario.responseSet.green];
+        const option = allOptions.find((item) => item.id === optionId);
+        if (!option) return;
+        state.selectedOption = option;
+        state.selectedPrismId = '';
+        openScreen(SCREEN_IDS.feedback);
+    }
+
+    function buildHistoryEntry() {
+        const scenario = state.activeScenario;
+        const option = state.selectedOption;
+        if (!scenario || !option) return null;
+        const isGreen = Number(option.score) === 1;
+        return {
+            timestamp: new Date().toISOString(),
+            scenarioId: scenario.scenarioId,
+            domain: scenario.domainLabel || scenario.domain,
+            difficulty: scenario.difficulty,
+            title: scenario.title,
+            selectedOptionId: option.id,
+            selectedOptionText: option.speakerLine,
+            feedback: isGreen ? option.whyItWorks : option.whyItHurts,
+            score: isGreen ? 1 : 0,
+            stars: isGreen ? 1 : 0,
+            greenSentence: getGreenOptionText(scenario),
+            goalGeneral: normalizeText(scenario.greenBlueprint?.goal, ''),
+            successMetric: normalizeText(scenario.greenBlueprint?.doneDefinition || scenario.microPlan?.successSign, '')
+        };
+    }
+
+    function commitCurrentResult() {
+        if (!state.session || !state.selectedOption || state.lastEntry) return state.lastEntry;
+        const entry = buildHistoryEntry();
+        if (!entry) return null;
+        state.lastEntry = entry;
+        state.session.completed.push(entry);
+        state.session.score += entry.score;
+        state.session.stars += entry.stars;
+        state.session.streak = entry.score ? state.session.streak + 1 : 0;
+        state.progress.completed += 1;
+        state.progress.greenCount += entry.score;
+        state.progress.stars += entry.stars;
+        state.progress.currentGreenStreak = entry.score ? state.progress.currentGreenStreak + 1 : 0;
+        state.progress.bestGreenStreak = Math.max(state.progress.bestGreenStreak || 0, state.progress.currentGreenStreak);
+        state.progress.history.unshift(entry);
+        state.progress.history = state.progress.history.slice(0, 300);
+        saveProgress();
+        return entry;
+    }
+
+    function continueFromResult() {
+        const entry = commitCurrentResult();
+        if (!entry) return;
+        openScreen(SCREEN_IDS.score);
+    }
+
+    function continueToNextScene() {
+        if (!state.session) {
+            state.lastEntry = null;
+            state.selectedOption = null;
+            state.activeScenario = null;
+            openScreen(SCREEN_IDS.home);
+            return;
+        }
+        const isLast = state.session.index >= state.session.queue.length - 1;
+        if (isLast) {
+            state.session = null;
+            state.activeScenario = null;
+            state.selectedOption = null;
+            state.lastEntry = null;
+            showToast('הסשן הסתיים. אפשר להתחיל סשן חדש.');
+            openScreen(SCREEN_IDS.home);
+            return;
+        }
+        state.session.index += 1;
+        state.activeScenario = state.session.queue[state.session.index];
+        state.selectedOption = null;
+        state.lastEntry = null;
+        state.selectedPrismId = '';
+        openScreen(SCREEN_IDS.play);
+    }
+
+    function applyPreset(kind) {
+        const defaults = getDefaultSettings();
+        const current = getSettingsDraft();
+        if (kind === 'compact') {
+            state.settingsDraft = {
+                ...current,
+                defaultRunSize: 4,
+                prismWheelEnabled: false
+            };
+        } else {
+            state.settingsDraft = {
+                ...current,
+                defaultDomain: defaults.defaultDomain,
+                defaultDifficulty: defaults.defaultDifficulty,
+                defaultRunSize: defaults.defaultRunSize,
+                soundEnabled: defaults.soundEnabled,
+                prismWheelEnabled: defaults.prismWheelEnabled
+            };
+        }
+        render();
+    }
+
+    function openSettings() {
+        state.settingsOpen = true;
+        state.settingsDraft = {
+            defaultDomain: state.homeFilters.domain,
+            defaultDifficulty: state.homeFilters.difficulty,
+            defaultRunSize: state.homeFilters.runSize,
+            soundEnabled: state.settings.soundEnabled,
+            prismWheelEnabled: state.settings.prismWheelEnabled
+        };
+        render();
+    }
+
+    function closeSettings() {
+        state.settingsOpen = false;
+        state.settingsDraft = null;
+        render();
+    }
+
+    function saveSettingsFromDraft(startAfterSave) {
+        const draft = getSettingsDraft();
+        state.settings = {
+            defaultDomain: draft.defaultDomain,
+            defaultDifficulty: draft.defaultDifficulty,
+            defaultRunSize: clampRunSize(draft.defaultRunSize),
+            soundEnabled: !!draft.soundEnabled,
+            prismWheelEnabled: !!draft.prismWheelEnabled
+        };
+        state.homeFilters = {
+            domain: state.settings.defaultDomain,
+            difficulty: state.settings.defaultDifficulty,
+            runSize: clampRunSize(state.settings.defaultRunSize)
+        };
+        saveSettings();
+        state.settingsOpen = false;
+        state.settingsDraft = null;
+        render();
+        if (startAfterSave) {
+            startSession(state.homeFilters);
+            return;
+        }
+        showToast('הגדרות הסימולטור נשמרו.');
+    }
+
+    function updateHomeFilter(key, value) {
+        if (key === 'runSize') state.homeFilters.runSize = clampRunSize(value);
+        else state.homeFilters[key] = value;
+        render();
+    }
+
+    function updateDraft(key, value) {
+        const draft = getSettingsDraft();
+        if (key === 'defaultRunSize') draft.defaultRunSize = clampRunSize(value);
+        else draft[key] = value;
+        state.settingsDraft = draft;
+        render();
+    }
+
+    function exportHistory() {
+        const payload = {
+            exportedAt: new Date().toISOString(),
+            progress: state.progress,
+            history: state.progress.history || []
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = `scenario_trainer_history_${Date.now()}.json`;
+        anchor.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function clearHistory() {
+        const ok = window.confirm('לנקות את כל היסטוריית הסצנות?');
+        if (!ok) return;
+        state.progress = getDefaultProgress();
+        saveProgress();
+        render();
+    }
+
+    function showToast(message) {
+        window.clearTimeout(state.toastTimer);
+        state.toastMessage = normalizeText(message, '');
+        render();
+        if (!state.toastMessage) return;
+        state.toastTimer = window.setTimeout(() => {
+            state.toastMessage = '';
+            render();
+        }, 2400);
+    }
+
+    function processStepState(stepId) {
+        const currentId = PROCESS_STEP_BY_SCREEN[state.screen];
+        if (!currentId) return '';
+        const steps = Array.isArray(trainerContract.processSteps) ? trainerContract.processSteps.map((item) => item.id) : [];
+        const currentIndex = steps.indexOf(currentId);
+        const stepIndex = steps.indexOf(stepId);
+        if (stepIndex === -1 || currentIndex === -1) return '';
+        if (stepIndex < currentIndex) return 'is-done';
+        if (stepIndex === currentIndex) return 'is-active';
+        return 'is-upcoming';
+    }
+
+    function render() {
+        mount.innerHTML = renderApp();
+    }
+
+    function renderApp() {
+        const currentSummary = getCurrentSummary();
+        const sessionMeta = state.session
+            ? `<span class="scenario-home-tag">סצנה ${escapeHtml(state.session.index + 1)}/${escapeHtml(state.session.queue.length)}</span><span class="scenario-home-tag">נקודות: ${escapeHtml(state.session.score)}</span>`
+            : `<span class="scenario-home-tag">${escapeHtml(trainerContract.quickStartLabel || '')}</span>`;
+        return `
+          <div id="scenario-trainer" class="scenario-platform-root" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id="scenario-trainer" data-trainer-mobile-order="${escapeHtml(getMobileZoneOrder().join(','))}" style="${escapeHtml(buildRootStyle())}">
+            <div class="scenario-platform-header">
+              <div class="scenario-platform-header-copy">
+                <p class="scenario-platform-family">${escapeHtml(trainerContract.familyLabel || '')}</p>
+                <h1>${escapeHtml(trainerContract.title || 'סימולטור סצנות')}</h1>
+                <p class="scenario-platform-subtitle">${escapeHtml(trainerContract.subtitle || '')}</p>
+              </div>
+              <div class="scenario-platform-header-meta">${sessionMeta}</div>
+            </div>
+            <div class="scenario-platform-shell">
+              <section class="scenario-home-purpose-card" data-trainer-zone="purpose" style="${escapeHtml(getZoneStyle('purpose'))}">
+                <p class="scenario-home-kicker">מה עושים כאן?</p>
+                <h3>סימולטור דיאלוג אנושי עם גב מטה-מודלי</h3>
+                <p class="scenario-home-lead">נכנסים לסצנה קצרה, שומעים משפט אמיתי מהצד השני, בוחרים תגובה אחת, ורואים איך היא מתקבלת רגשית ומה היא פותחת או סוגרת בתהליך.</p>
+                <div class="scenario-home-tag-row">
+                  <span class="scenario-home-tag">הורות · זוגיות · עבודה · ביורוקרטיה · בית/טק</span>
+                  <span class="scenario-home-tag">בחירה אחת בכל רגע</span>
+                  <span class="scenario-home-tag">קודם דיאלוג, אחר כך ניתוח</span>
+                </div>
+              </section>
+              <section class="scenario-home-start-strip" data-trainer-zone="start" style="${escapeHtml(getZoneStyle('start'))}">
+                <div class="scenario-home-start-copy">
+                  <p class="scenario-home-kicker">${escapeHtml(trainerContract.quickStartLabel || 'מתחילים מכאן')}</p>
+                  <h3>אפשר להיכנס ישר לשיחה</h3>
+                  <p>ברירת המחדל כבר מכוונת לסשן שימושי. אם רוצים, אפשר לשנות תחום, רמה או כלים נוספים לפני ההתחלה.</p>
+                </div>
+                <div class="scenario-start-actions">
+                  <button id="scenario-start-run-btn" type="button" class="btn btn-primary" data-trainer-action="start-session">${escapeHtml(trainerContract.startActionLabel || 'התחל סשן')}</button>
+                  <button id="scenario-home-settings" type="button" class="btn btn-secondary" data-trainer-action="open-settings">הגדרות</button>
+                  <span id="scenario-home-summary-pill" class="scenario-summary-pill" data-trainer-summary="current">${escapeHtml(currentSummary)}</span>
+                </div>
+                <div class="scenario-home-inline-actions">
+                  <button type="button" class="btn btn-secondary" data-scenario-action="open-help">איך זה עובד</button>
+                  <button type="button" class="btn btn-secondary" data-scenario-action="open-history">היסטוריה</button>
+                </div>
+              </section>
+              <section class="scenario-home-helper-strip" aria-label="מהלך האימון" data-trainer-zone="helper-steps" style="${escapeHtml(getZoneStyle('helper-steps'))}">
+                ${renderHelperSteps()}
+              </section>
+              <div class="scenario-standalone-layout">
+                <main class="scenario-standalone-main" data-trainer-zone="main" style="${escapeHtml(getZoneStyle('main'))}">
+                  ${renderMain()}
+                </main>
+                <aside class="scenario-platform-support" data-trainer-zone="support" data-trainer-support-mode="${escapeHtml(trainerContract.supportRailMode || 'dialogue-meta')}" style="${escapeHtml(getZoneStyle('support'))}">
+                  ${renderSupportRail()}
+                </aside>
+              </div>
+            </div>
+            ${state.settingsOpen ? renderSettingsModal() : ''}
+            ${state.toastMessage ? `<div class="scenario-toast">${escapeHtml(state.toastMessage)}</div>` : ''}
+          </div>
+        `;
+    }
+
+    function renderMain() {
+        if (state.loading) {
+            return `<section class="scenario-overlay-card scenario-workspace-card"><p class="scenario-panel-kicker">טוען</p><h3>מכין את הסימולטור</h3><p>עוד רגע יופיעו הסצנות, התחומים והגדרות הסשן.</p></section>`;
+        }
+        if (state.loadError) {
+            return `<section class="scenario-overlay-card scenario-workspace-card"><p class="scenario-panel-kicker">שגיאה</p><h3>לא הצלחנו לטעון את הסימולטור</h3><p>${escapeHtml(state.loadError)}</p></section>`;
+        }
+        switch (state.screen) {
+            case SCREEN_IDS.play:
+                return renderPlayScreen();
+            case SCREEN_IDS.feedback:
+                return renderFeedbackScreen();
+            case SCREEN_IDS.blueprint:
+                return renderBlueprintScreen();
+            case SCREEN_IDS.score:
+                return renderScoreScreen();
+            case SCREEN_IDS.history:
+                return renderHistoryScreen();
+            case SCREEN_IDS.help:
+                return renderHelpScreen();
+            default:
+                return renderHomeScreen();
+        }
+    }
+
+    function renderHelperSteps() {
+        const steps = Array.isArray(trainerContract.helperSteps) ? trainerContract.helperSteps : [];
+        return steps.map((step) => `
+          <article class="scenario-home-helper-step">
+            <strong>${escapeHtml(step.title)}</strong>
+            <span>${escapeHtml(step.description)}</span>
+          </article>
+        `).join('');
+    }
+
+    function renderHomeScreen() {
+        return `
+          <section class="scenario-start-card scenario-home-setup-card scenario-workspace-card">
+            <div class="scenario-home-section-head">
+              <div>
+                <p class="scenario-home-kicker">כיוון הסשן</p>
+                <h4>כך ייראה הסבב הבא</h4>
+              </div>
+              <div class="scenario-home-stats">
+                <div class="scenario-stat-item">סצנות שהושלמו: ${escapeHtml(state.progress.completed)}</div>
+                <div class="scenario-stat-item">בחירות ירוקות: ${escapeHtml(state.progress.greenCount)}</div>
+                <div class="scenario-stat-item">רצף ירוק נוכחי: ${escapeHtml(state.progress.currentGreenStreak)}</div>
+                <div class="scenario-stat-item">רצף ירוק מיטבי: ${escapeHtml(state.progress.bestGreenStreak)}</div>
+              </div>
+            </div>
+            <div class="blueprint-questions scenario-pick-grid scenario-start-grid">
+              <div class="q-card">
+                <label for="scenario-domain-select">תחום</label>
+                <select id="scenario-domain-select">${renderDomainOptions(state.homeFilters.domain)}</select>
+              </div>
+              <div class="q-card">
+                <label for="scenario-difficulty-select">רמה</label>
+                <select id="scenario-difficulty-select">${renderDifficultyOptions(state.homeFilters.difficulty)}</select>
+              </div>
+              <div class="q-card">
+                <label for="scenario-run-size">כמה סצנות?</label>
+                <input type="range" id="scenario-run-size" min="3" max="10" value="${escapeHtml(state.homeFilters.runSize)}" />
+                <span id="scenario-run-size-value">${escapeHtml(state.homeFilters.runSize)}</span>
+              </div>
+            </div>
+            <p class="scenario-home-footnote">הצלחה בסשן אחד נראית כמו תגובה שמקדמת יותר קשר, פחות עמימות, וצעד הבא שאפשר לבדוק במציאות.</p>
+          </section>
+        `;
+    }
+
+    function renderOptionButton(option, isGreen) {
+        return `
+          <button type="button" class="scenario-option-btn ${isGreen ? 'green' : 'red'}" data-scenario-action="pick-option" data-option-id="${escapeHtml(option.id)}">
+            <span class="scenario-option-kind">${escapeHtml(toneLabel(option, isGreen))}</span>
+            <span class="scenario-option-main">${escapeHtml(option.speakerLine)}</span>
+            <span class="scenario-option-hint">${escapeHtml(isGreen ? option.whyItWorks : option.whyItHurts)}</span>
+          </button>
+        `;
+    }
+
+    function renderPlayScreen() {
+        const scenario = state.activeScenario || state.session?.queue?.[state.session.index];
+        if (!scenario) return renderHomeScreen();
+        const options = [...scenario.responseSet.red, scenario.responseSet.green];
+        const currentIndex = (state.session?.index || 0) + 1;
+        const total = state.session?.queue?.length || 0;
+        const progress = total > 0 ? Math.round(((currentIndex - 1) / total) * 100) : 0;
+        return `
+          <section class="scenario-workspace-card">
+            <div class="scenario-session-header">
+              <p class="scenario-counter">סצנה <span>${escapeHtml(currentIndex)}</span>/<span>${escapeHtml(total)}</span></p>
+              <p class="scenario-session-meta">נקודות: <span>${escapeHtml(state.session?.score || 0)}</span> | רצף ירוק: <span>${escapeHtml(state.session?.streak || 0)}</span></p>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${escapeHtml(progress)}%"></div></div>
+            <div class="scenario-chat-shell">
+              <div class="scenario-scene-card">
+                <p class="scenario-scene-kicker">${escapeHtml(`${scenario.domainLabel} · בתפקיד ${scenario.role.player}`)}</p>
+                <h3>${escapeHtml(scenario.sceneTitle)}</h3>
+                <p class="scenario-context-intro">${escapeHtml(scenario.contextIntro)}</p>
+                <div class="scenario-relationship-row">
+                  <span class="scenario-role-chip">${escapeHtml(scenario.role.player)}</span>
+                  <span class="scenario-role-chip other">${escapeHtml(scenario.role.other)}</span>
+                </div>
+                <div class="scenario-scene-meta">
+                  <div class="scenario-scene-meta-card">
+                    <span class="label">מה חשוב כאן</span>
+                    <p>${escapeHtml(scenario.humanNeed)}</p>
+                  </div>
+                  <div class="scenario-scene-meta-card">
+                    <span class="label">הקונפליקט הגלוי</span>
+                    <p>${escapeHtml(scenario.surfaceConflict)}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="scenario-story-card">
+                <div class="scenario-chat-thread">
+                  <div class="scenario-bubble other">
+                    <span class="scenario-bubble-speaker">${escapeHtml(scenario.role.other)}</span>
+                    <p>${escapeHtml(scenario.openingLine)}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h4 class="scenario-options-title">מה תגיד/י עכשיו?</h4>
+            <p class="scenario-options-subtitle">בחר/י תגובה אחת שהכי מקדמת קשר, בהירות וצעד בדיקה.</p>
+            <div id="scenario-options-container" class="scenario-options-container">
+              ${options.map((option) => renderOptionButton(option, Number(option.score) === 1)).join('')}
+            </div>
+          </section>
+        `;
+    }
+
+    function renderFeedbackScreen() {
+        const scenario = state.activeScenario;
+        const option = state.selectedOption;
+        if (!scenario || !option) return renderPlayScreen();
+        const isGreen = Number(option.score) === 1;
+        const consequence = getConsequenceLines(scenario, option, isGreen);
+        return `
+          <section class="scenario-workspace-card" data-scenario-feedback-thread="1">
+            <p class="scenario-panel-kicker">אחרי הבחירה</p>
+            <div class="scenario-feedback-mark ${isGreen ? 'green' : 'red'}" style="opacity:1;transform:scale(1);">${isGreen ? '✓' : '!'}</div>
+            <div class="scenario-feedback-summary-card">
+              <p class="scenario-feedback-kind">${escapeHtml(isGreen ? 'התגובה הזו פותחת מקום לבדיקה' : 'התגובה הזו כנראה תסגור את השיחה')}</p>
+              <h3>${escapeHtml(isGreen ? 'כאן עברת מהאשמה לתהליך' : 'כאן השיחה מחליקה מהתהליך למאבק')}</h3>
+              <p>${escapeHtml(isGreen ? option.whyItWorks : option.whyItHurts)}</p>
+            </div>
+            <div class="scenario-feedback-thread">
+              <div class="scenario-bubble player selected ${isGreen ? 'green' : 'red'}">
+                <span class="scenario-bubble-speaker">התשובה שלך</span>
+                <p id="scenario-feedback-choice-bubble">${escapeHtml(option.speakerLine)}</p>
+              </div>
+              <div class="scenario-bubble other followup">
+                <span class="scenario-bubble-speaker">התגובה שמולך</span>
+                <p id="scenario-feedback-other-bubble">${escapeHtml(option.likelyOtherReply)}</p>
+              </div>
+            </div>
+            <div id="scenario-consequence-box" class="scenario-consequence-box ${isGreen ? 'green' : 'red'}" data-scenario-consequence="1">
+              <h4>איך זה נחת בצד השני</h4>
+              <p>${escapeHtml(consequence.action)}</p>
+              <p>${escapeHtml(consequence.result)}</p>
+            </div>
+            <details class="scenario-meta-accordion">
+              <summary>מה היה עמום / מה נפתח כאן</summary>
+              <div class="scenario-meta-accordion-body">
+                <p class="scenario-meta-card-text">${escapeHtml(buildMetaCardText(scenario, option, isGreen))}</p>
+                <div class="scenario-predicate-panel">
+                  <p><strong>הפועל/המהלך העמום:</strong> ${escapeHtml(scenario.metaModelCore.unspecifiedVerb)}</p>
+                  <p><strong>מה נשאר חסר או נפתח כאן:</strong> ${escapeHtml(scenario.metaModelCore.hiddenGap)}</p>
+                  <p><strong>שאלת ההעמקה הבאה:</strong> ${escapeHtml(scenario.deepeningQuestion)}</p>
+                </div>
+              </div>
+            </details>
+            <div class="scenario-feedback-note">${escapeHtml(isGreen ? 'מכאן אפשר או להתקדם לסצנה הבאה, או לפתוח רגע את מפת הפעולה הקצרה.' : 'כדאי לראות מה היה חסר בתהליך, ואז לנסות שוב בסצנה הבאה עם שאלה שמייצרת בהירות.')}</div>
+            <div class="scenario-feedback-actions">
+              <button type="button" class="btn btn-secondary" data-scenario-action="show-blueprint">ניתוח מעמיק</button>
+              <button type="button" class="btn btn-primary" data-scenario-action="continue-result">המשך</button>
+            </div>
+          </section>
+        `;
+    }
+
+    function renderSupportRail() {
+        const currentStepId = PROCESS_STEP_BY_SCREEN[state.screen];
+        const scenario = state.activeScenario;
+        const option = state.selectedOption;
+        const isGreen = Number(option?.score) === 1;
+        const statusText = state.session
+            ? `סצנה ${state.session.index + 1}/${state.session.queue.length} · ${state.session.score} נקודות · רצף ${state.session.streak}`
+            : `התקדמות כוללת · ${state.progress.completed} סצנות · ${state.progress.greenCount} בחירות ירוקות`;
+        const cueTitle = scenario
+            ? (state.screen === SCREEN_IDS.feedback || state.screen === SCREEN_IDS.blueprint ? 'מה לקחת מהרגע הזה' : 'מה לחפש עכשיו')
+            : 'מה ייחשב הצלחה';
+        const cueBody = scenario
+            ? (state.screen === SCREEN_IDS.feedback || state.screen === SCREEN_IDS.blueprint
+                ? (isGreen ? scenario.microPlan.firstStep : scenario.deepeningQuestion)
+                : scenario.humanNeed)
+            : 'תגובה אחת שמורידה לחץ, מייצרת בהירות, ופותחת צעד שאפשר לבדוק בפועל.';
+        return `
+          <section class="scenario-support-card">
+            <p class="scenario-panel-kicker">מצב נוכחי</p>
+            <h4>הסשן שלך</h4>
+            <p>${escapeHtml(statusText)}</p>
+          </section>
+          <section class="scenario-support-card">
+            <p class="scenario-panel-kicker">מפת התהליך</p>
+            <h4>איפה אתה/את נמצא/ת עכשיו</h4>
+            <div class="scenario-process-rail">
+              ${(Array.isArray(trainerContract.processSteps) ? trainerContract.processSteps : []).map((step) => `
+                <div class="scenario-process-step ${processStepState(step.id)}">
+                  <strong>${escapeHtml(step.label)}</strong>
+                  <span>${escapeHtml(step.description)}</span>
+                </div>
+              `).join('')}
+            </div>
+          </section>
+          <section class="scenario-support-card">
+            <p class="scenario-panel-kicker">${escapeHtml(cueTitle)}</p>
+            <h4>${escapeHtml(scenario ? scenario.sceneTitle : 'כך נראה סשן טוב')}</h4>
+            <p>${escapeHtml(cueBody)}</p>
+          </section>
+          ${currentStepId && scenario ? `
+            <section class="scenario-support-card">
+              <p class="scenario-panel-kicker">עוגן לשיחה</p>
+              <h4>מה היה עמום כאן</h4>
+              <p><strong>הפועל/המהלך:</strong> ${escapeHtml(scenario.metaModelCore.unspecifiedVerb)}</p>
+              <p><strong>החסר בפועל:</strong> ${escapeHtml(scenario.metaModelCore.hiddenGap)}</p>
+            </section>
+          ` : ''}
+        `;
+    }
+
+    function renderSettingsModal() {
+        const draft = getSettingsDraft();
+        return `
+          <div class="scenario-settings-backdrop">
+            <div class="scenario-settings-shell scenario-settings-modal" data-trainer-settings-shell="1" data-trainer-id="scenario-trainer">
+              <div class="scenario-settings-head">
+                <div>
+                  <p class="scenario-home-kicker">לוח בקרה</p>
+                  <h3>${escapeHtml(trainerContract.settingsTitle || 'הגדרות')}</h3>
+                  <p class="scenario-settings-subtitle">${escapeHtml(trainerContract.settingsSubtitle || '')}</p>
+                </div>
+                <div id="scenario-settings-summary-pill" class="scenario-summary-pill" data-trainer-summary="preview">${escapeHtml(buildSummary({ domain: draft.defaultDomain, difficulty: draft.defaultDifficulty, runSize: draft.defaultRunSize }))}</div>
+              </div>
+              <div class="scenario-settings-grid">
+                <section class="scenario-settings-card" data-kind="basic">
+                  <div class="scenario-home-section-head">
+                    <div>
+                      <p class="scenario-home-kicker">בסיס הסשן</p>
+                      <h4>מה לתרגל</h4>
+                    </div>
+                  </div>
+                  <div class="blueprint-questions">
+                    <div class="q-card">
+                      <label for="scenario-setting-domain">תחום ברירת מחדל</label>
+                      <select id="scenario-setting-domain">${renderDomainOptions(draft.defaultDomain)}</select>
+                    </div>
+                    <div class="q-card">
+                      <label for="scenario-setting-difficulty">רמת ברירת מחדל</label>
+                      <select id="scenario-setting-difficulty">${renderDifficultyOptions(draft.defaultDifficulty)}</select>
+                    </div>
+                    <div class="q-card">
+                      <label for="scenario-setting-run-size">כמה סצנות כברירת מחדל?</label>
+                      <input type="range" id="scenario-setting-run-size" min="3" max="10" value="${escapeHtml(clampRunSize(draft.defaultRunSize))}" />
+                      <span id="scenario-setting-run-size-value">${escapeHtml(clampRunSize(draft.defaultRunSize))}</span>
+                    </div>
+                  </div>
+                </section>
+                <section class="scenario-settings-card" data-kind="advanced">
+                  <div class="scenario-home-section-head">
+                    <div>
+                      <p class="scenario-home-kicker">כלי עזר</p>
+                      <h4>מה יישאר פתוח במהלך האימון</h4>
+                    </div>
+                  </div>
+                  <div class="q-card scenario-toggle-row">
+                    <label><input type="checkbox" id="scenario-setting-sound" ${draft.soundEnabled ? 'checked' : ''} /> צלילים במסך הסצנות</label>
+                    <label><input type="checkbox" id="scenario-setting-prism" ${draft.prismWheelEnabled ? 'checked' : ''} /> גלגל פריזמות אחרי תשובה ירוקה</label>
+                  </div>
+                </section>
+              </div>
+              <div class="scenario-feedback-actions scenario-settings-actions">
+                <button type="button" class="btn btn-secondary" data-trainer-action="close-settings">ביטול</button>
+                <button type="button" class="btn btn-secondary" data-trainer-preset="compact">סשן קצר</button>
+                <button type="button" class="btn btn-secondary" data-trainer-preset="standard">ברירת מחדל</button>
+                <button type="button" class="btn btn-secondary" data-trainer-action="save-settings">שמור הגדרות</button>
+                <button type="button" class="btn btn-primary" data-trainer-action="save-start">שמור והתחל סשן</button>
+              </div>
+            </div>
+          </div>
+        `;
+    }
+
+    function renderDomainOptions(currentValue) {
+        const items = [{ id: 'all', label: 'כל התחומים' }, ...state.data.domains];
+        return items.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === currentValue ? 'selected' : ''}>${escapeHtml(item.label)}</option>`).join('');
+    }
+
+    function renderDifficultyOptions(currentValue) {
+        const items = [{ id: 'all', label: 'כל הרמות' }, ...state.data.difficulties];
+        return items.map((item) => `<option value="${escapeHtml(item.id)}" ${item.id === currentValue ? 'selected' : ''}>${escapeHtml(item.label)}</option>`).join('');
+    }
+
+    function renderPrismWheel(prismItems, selectedPrism) {
+        return `
+          <div class="scenario-prism-wheel">
+            <h4>גלגל פריזמות מהיר</h4>
+            <div class="scenario-prism-items">
+              ${prismItems.map((item) => `<button type="button" class="scenario-prism-item" data-scenario-action="pick-prism" data-prism-id="${escapeHtml(item.id)}">${escapeHtml(item.label || item.id)}</button>`).join('')}
+            </div>
+            ${selectedPrism ? `
+              <div class="scenario-prism-detail">
+                <p><strong>שאלת Meta:</strong> ${escapeHtml(selectedPrism.question || '')}</p>
+                <p><strong>דוגמה:</strong> ${escapeHtml(selectedPrism.example || '')}</p>
+              </div>
+            ` : ''}
+          </div>
+        `;
+    }
+
+    function renderBlueprintScreen() {
+        const scenario = state.activeScenario;
+        if (!scenario) return renderPlayScreen();
+        const bp = scenario.greenBlueprint || {};
+        const isGreen = Number(state.selectedOption?.score) === 1;
+        const prismItems = state.settings.prismWheelEnabled && isGreen && Array.isArray(state.data.prismWheel) ? state.data.prismWheel : [];
+        const selectedPrism = prismItems.find((item) => item.id === state.selectedPrismId) || null;
+        return `
+          <section class="scenario-workspace-card">
+            <p class="scenario-panel-kicker">פירוק</p>
+            <h3>מפת פעולה קצרה</h3>
+            <div class="scenario-tote-grid">
+              <div class="scenario-tote-slot"><h5>פתיחת הסצנה</h5><p>${escapeHtml(scenario.openingLine)}</p></div>
+              <div class="scenario-tote-slot"><h5>מה נשאר עמום</h5><p>${escapeHtml(scenario.metaModelCore.hiddenGap)}</p></div>
+              <div class="scenario-tote-slot"><h5>צעד ראשון קטן</h5><p>${escapeHtml(scenario.microPlan.firstStep)}</p></div>
+              <div class="scenario-tote-slot"><h5>צוואר הבקבוק</h5><p>${escapeHtml(scenario.microPlan.bottleneck)}</p></div>
+              <div class="scenario-tote-slot"><h5>סימן הצלחה</h5><p>${escapeHtml(scenario.microPlan.successSign)}</p></div>
+              <div class="scenario-tote-slot"><h5>שאלת ההעמקה</h5><p>${escapeHtml(scenario.deepeningQuestion)}</p></div>
+            </div>
+            <div class="final-blueprint-display scenario-blueprint-display">
+              <div class="blueprint-section"><h4>מטרה</h4><p>${escapeHtml(bp.goal || scenario.humanNeed)}</p></div>
+              <div class="blueprint-section"><h4>צעד ראשון</h4><p>${escapeHtml(bp.firstStep || scenario.microPlan.firstStep)}</p></div>
+              <div class="blueprint-section"><h4>שלבים</h4><ul>${(bp.steps || [scenario.microPlan.firstStep]).map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ul></div>
+              <div class="blueprint-section"><h4>נקודת תקיעה</h4><p>${escapeHtml(bp.stuckPoint || scenario.microPlan.bottleneck)}</p></div>
+              <div class="blueprint-section"><h4>חלופה / תחליף</h4><p>${escapeHtml(bp.planB || 'אם נתקעים שוב, חוזרים לשאלה אחת שמבהירה מה בדיוק קורה בפועל.')}</p></div>
+              <div class="blueprint-section"><h4>מדד הצלחה</h4><p>${escapeHtml(bp.doneDefinition || scenario.microPlan.successSign)}</p></div>
+            </div>
+            <div class="scenario-green-box">
+              <h4>המשפט הירוק המוצע</h4>
+              <p>${escapeHtml(getGreenOptionText(scenario))}</p>
+              <button type="button" class="btn btn-secondary" data-scenario-action="copy-green">העתק משפט ירוק</button>
+            </div>
+            ${prismItems.length ? renderPrismWheel(prismItems, selectedPrism) : ''}
+            <div class="scenario-feedback-actions">
+              <button type="button" class="btn btn-secondary" data-scenario-action="back-to-feedback">חזרה למשוב</button>
+              <button type="button" class="btn btn-primary" data-scenario-action="continue-result">סיום ויציאה לסיכום</button>
+            </div>
+          </section>
+        `;
+    }
+
+    function renderScoreScreen() {
+        const entry = state.lastEntry;
+        if (!entry || !state.session) return renderHomeScreen();
+        const playedCount = state.session.index + 1;
+        const starVisual = '⭐'.repeat(state.session.stars) + '☆'.repeat(Math.max(playedCount - state.session.stars, 0));
+        const isLast = state.session.index >= state.session.queue.length - 1;
+        return `
+          <section class="scenario-workspace-card">
+            <div class="scenario-stars-row">${escapeHtml(starVisual || '☆☆☆☆☆')}</div>
+            <p class="scenario-score-line">סיימת סצנה ${escapeHtml(playedCount)}/${escapeHtml(state.session.queue.length)}. נקודות סשן: ${escapeHtml(state.session.score)}</p>
+            <p class="scenario-next-green-line">בפעם הבאה: "${escapeHtml(entry.greenSentence)}"</p>
+            ${(entry.goalGeneral || entry.successMetric) ? `
+              <div class="scenario-result-summary">
+                <p><strong>מטרה כללית:</strong> ${escapeHtml(entry.goalGeneral || 'לא הוגדר')}</p>
+                <p><strong>מדד הצלחה:</strong> ${escapeHtml(entry.successMetric || 'לא הוגדר')}</p>
+              </div>
+            ` : ''}
+            <div class="scenario-feedback-actions">
+              <button type="button" class="btn btn-primary" data-scenario-action="next-scene">${isLast ? 'סיום סשן וחזרה לבית' : 'המשך לסצנה הבאה'}</button>
+              <button type="button" class="btn btn-secondary" data-scenario-action="go-home">חזרה לבית הסצנות</button>
+            </div>
+          </section>
+        `;
+    }
+
+    function renderHistoryScreen() {
+        const history = Array.isArray(state.progress.history) ? state.progress.history : [];
+        return `
+          <section class="scenario-workspace-card">
+            <p class="scenario-panel-kicker">היסטוריה</p>
+            <h3>היסטוריית סצנות</h3>
+            <div class="scenario-feedback-actions">
+              <button type="button" class="btn btn-secondary" data-scenario-action="export-history">ייצא JSON</button>
+              <button type="button" class="btn btn-secondary" data-scenario-action="clear-history">נקה היסטוריה</button>
+              <button type="button" class="btn btn-primary" data-scenario-action="go-home">חזרה</button>
+            </div>
+            <div class="scenario-history-list">
+              ${history.length ? history.map((entry) => `
+                <div class="scenario-history-item">
+                  <strong>${escapeHtml(`${entry.title} (${entry.domain})`)}</strong>
+                  <p class="meta">${escapeHtml(`${entry.score ? '✓ ירוק' : '✕ אדום'} | ${entry.selectedOptionText} | ${new Date(entry.timestamp).toLocaleString('he-IL')}`)}</p>
+                </div>
+              `).join('') : `<div class="scenario-history-empty">עדיין אין היסטוריה. סצנה ראשונה תתחיל את היומן.</div>`}
+            </div>
+          </section>
+        `;
+    }
+
+    function renderHelpScreen() {
+        return `
+          <section class="scenario-overlay-card scenario-workspace-card">
+            <p class="scenario-panel-kicker">עזרה</p>
+            <h3>איך עובדים כאן?</h3>
+            <ol class="scenario-help-list">
+              <li>קוראים את הסצנה הקצרה ושומעים את המשפט הפותח.</li>
+              <li>בוחרים תגובה אחת שהכי מקדמת קשר, בהירות וצעד בדיקה.</li>
+              <li>רואים קודם איך זה נחת, ורק אחר כך פותחים את הניתוח העמוק.</li>
+            </ol>
+            <p class="scenario-help-note">המשימה כאן היא לא “להישמע טוב”, אלא לזהות איזו תגובה באמת מזיזה את השיחה מהמופשט אל מה שאפשר לבדוק.</p>
+            <div class="scenario-feedback-actions">
+              <button type="button" class="btn btn-primary" data-scenario-action="go-home">חזרה</button>
+            </div>
+          </section>
+        `;
+    }
+
+    function handleClick(event) {
+        const button = event.target.closest('button, [data-scenario-action]');
+        if (!button) return;
+        const trainerAction = button.getAttribute('data-trainer-action');
+        const scenarioAction = button.getAttribute('data-scenario-action');
+        const preset = button.getAttribute('data-trainer-preset');
+        if (preset) {
+            applyPreset(preset);
+            return;
+        }
+        if (trainerAction === 'start-session') return void startSession(state.homeFilters);
+        if (trainerAction === 'open-settings') return void openSettings();
+        if (trainerAction === 'close-settings') return void closeSettings();
+        if (trainerAction === 'save-settings') return void saveSettingsFromDraft(false);
+        if (trainerAction === 'save-start') return void saveSettingsFromDraft(true);
+        if (scenarioAction === 'open-help') return void openScreen(SCREEN_IDS.help);
+        if (scenarioAction === 'open-history') return void openScreen(SCREEN_IDS.history);
+        if (scenarioAction === 'pick-option') return void pickOption(button.getAttribute('data-option-id'));
+        if (scenarioAction === 'show-blueprint') return void openScreen(SCREEN_IDS.blueprint);
+        if (scenarioAction === 'continue-result') return void continueFromResult();
+        if (scenarioAction === 'next-scene') return void continueToNextScene();
+        if (scenarioAction === 'go-home') return void openScreen(SCREEN_IDS.home);
+        if (scenarioAction === 'export-history') return void exportHistory();
+        if (scenarioAction === 'clear-history') return void clearHistory();
+        if (scenarioAction === 'pick-prism') {
+            state.selectedPrismId = button.getAttribute('data-prism-id') || '';
+            render();
+            return;
+        }
+        if (scenarioAction === 'copy-green') {
+            const text = getGreenOptionText(state.activeScenario);
+            if (!text) return;
+            navigator.clipboard?.writeText(text).then(() => showToast('המשפט הירוק הועתק')).catch(() => showToast('לא הצלחנו להעתיק.'));
+            return;
+        }
+        if (scenarioAction === 'back-to-feedback') return void openScreen(SCREEN_IDS.feedback);
+    }
+
+    function handleChange(event) {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        if (target.id === 'scenario-domain-select') updateHomeFilter('domain', target.value);
+        if (target.id === 'scenario-difficulty-select') updateHomeFilter('difficulty', target.value);
+        if (target.id === 'scenario-run-size') updateHomeFilter('runSize', target.value);
+        if (target.id === 'scenario-setting-domain') updateDraft('defaultDomain', target.value);
+        if (target.id === 'scenario-setting-difficulty') updateDraft('defaultDifficulty', target.value);
+        if (target.id === 'scenario-setting-run-size') updateDraft('defaultRunSize', target.value);
+        if (target.id === 'scenario-setting-sound') updateDraft('soundEnabled', target.checked);
+        if (target.id === 'scenario-setting-prism') updateDraft('prismWheelEnabled', target.checked);
+    }
+
+    function handleInput(event) {
+        handleChange(event);
+    }
+})();
