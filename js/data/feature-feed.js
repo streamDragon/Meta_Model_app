@@ -18,7 +18,7 @@
         }),
         Object.freeze({
             id: 'practice-radar',
-            titleHe: 'Meta Radar',
+            titleHe: 'מכ"ם מטה-מודל',
             descHe: 'זיהוי דפוסים בקצב מהיר, עם מדד התקדמות בזמן אמת.',
             route: '/feature/practice-radar',
             tab: 'practice-radar',
@@ -32,7 +32,7 @@
         }),
         Object.freeze({
             id: 'practice-triples-radar',
-            titleHe: 'Triples Radar',
+            titleHe: 'מכ"ם שלשות',
             descHe: 'תרגול עם שלשות ברין לזיהוי משפחות דפוס מתקדמות.',
             route: '/feature/practice-triples-radar',
             tab: 'practice-triples-radar',
@@ -47,7 +47,7 @@
         Object.freeze({
             id: 'practice-wizard',
             titleHe: 'גשר תחושה-שפה',
-            descHe: 'הלימה בין המשפט, החוויה והמציאות. רק אחר כך נפתחת שכבת Meta Model.',
+            descHe: 'הלימה בין המשפט, החוויה והמציאות. רק אחר כך בודקים מה התבהר על המשפט.',
             route: '/feature/practice-wizard',
             tab: 'practice-wizard',
             tagHe: 'הלימה',
@@ -74,7 +74,7 @@
         }),
         Object.freeze({
             id: 'comic-engine',
-            titleHe: 'Comic Engine',
+            titleHe: 'במה רגשית',
             descHe: 'תרגול תגובות דרך סצנות ויזואליות עם דיאלוג המשך.',
             route: '/feature/comic-engine',
             tab: 'comic-engine',
@@ -88,7 +88,7 @@
         }),
         Object.freeze({
             id: 'prismlab',
-            titleHe: 'Prism Lab',
+            titleHe: 'מעבדת פריזמות',
             descHe: 'חקירה שכבתית ברמות לוגיות ובחירת צעד המשך פרקטי.',
             route: '/feature/prismlab',
             tab: 'prismlab',
@@ -116,7 +116,7 @@
         }),
         Object.freeze({
             id: 'blueprint',
-            titleHe: 'Blueprint Builder',
+            titleHe: 'בונה מהלך',
             descHe: 'הפיכת תובנה לתכנית שיחה: מטרה, טקטיקה, ו-Plan B.',
             route: '/feature/blueprint',
             tab: 'blueprint',

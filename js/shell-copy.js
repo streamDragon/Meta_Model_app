@@ -69,7 +69,7 @@
         }),
         'practice-wizard': Object.freeze({
             title: 'גשר תחושה-שפה',
-            subtitle: 'בונים ניסוח שיושב גם בחוויה וגם במציאות; Meta Model נפתח רק אחרי ההלימה.'
+            subtitle: 'בונים ניסוח שיושב גם בחוויה וגם במציאות; רק אחר כך בודקים מה התבהר על המשפט.'
         }),
         'practice-verb-unzip': Object.freeze({
             title: 'מרכז כלים',

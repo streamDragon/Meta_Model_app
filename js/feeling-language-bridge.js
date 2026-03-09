@@ -11,10 +11,10 @@
         Object.freeze({ id: 'insight', label: 'תובנה', kicker: 'אחרי הלימה' })
     ]);
     const CONGRUENCE_LEVELS = Object.freeze([
-        Object.freeze({ id: 'not-yet', label: 'עוד לא', note: 'יש כאן משהו חי, אבל הניסוח עוד לא יושב.' }),
-        Object.freeze({ id: 'close', label: 'קרוב', note: 'זה כבר מתקרב, אבל חסרה עוד התאמה קטנה.' }),
-        Object.freeze({ id: 'almost', label: 'כמעט', note: 'רובו כבר מדויק. נשאר ליטוש קטן.' }),
-        Object.freeze({ id: 'yes', label: 'כן, זה זה', note: 'המשפט הזה נשמע כמו מה שקורה, ולא רק כמו הכותרת של זה.' })
+        Object.freeze({ id: 'not-yet', label: 'עוד לא', note: 'עוד לא. יש כאן משהו חי, אבל זה עדיין לא נשמע כמו מה שהתכוונתי.' }),
+        Object.freeze({ id: 'close', label: 'קרוב', note: 'זה מתקרב. חלק מזה כבר יושב, אבל עוד לא לגמרי.' }),
+        Object.freeze({ id: 'almost', label: 'כמעט', note: 'כמעט. זה כבר קרוב למה שהתכוונתי, ונשאר רק ליטוש קטן.' }),
+        Object.freeze({ id: 'yes', label: 'כן, זה זה', note: 'כן. עכשיו זה נשמע כמו מה שהתכוונתי, גם בפנים וגם במציאות.' })
     ]);
     const OUTER_PROMPTS = Object.freeze(['כש...', 'בפעמים ש...', 'מה שקרה בפועל...', 'הוא עשה...', 'הוא לא עשה...', 'שמתי לב ש...']);
     const INNER_PROMPTS = Object.freeze(['עולה בי...', 'בגוף נהיה...', 'זה נהיה כמו...', 'אני מיד מרגיש/ה...', 'יש בי דחף...', 'מה שאני צריך/ה שם...']);
@@ -471,7 +471,7 @@
                 inner: 'ועכשיו, מה נהיה בך ברגעים האלה?',
                 bridge: 'ננסה למצוא ניסוח שיושב גם בפנים וגם במציאות.',
                 congruence: congruence.id === 'yes'
-                    ? 'עכשיו זה כבר נשמע יותר כמו מה שקורה, ולא רק כמו הכותרת של זה.'
+                    ? 'כן. עכשיו זה כבר נשמע כמו מה שהתכוונת, לא רק כמו הכותרת של זה.'
                     : 'לא מתקנים עדיין. קודם יוצרים הלימה.',
                 insight: 'רק עכשיו אפשר לראות מה היה חסר במשפט המקורי, בלי לקטול את החוויה.'
             };
@@ -752,7 +752,7 @@
                         <div>
                             <p class="flb-panel-kicker">שלב 5</p>
                             <h4>עד כמה זה יושב?</h4>
-                            <p>זה לא מד אמת. זה מד הלימה בין המשפט, החוויה והמציאות.</p>
+                            <p>השאלה עכשיו היא לא אם זה נכון. השאלה היא אם זה כבר נשמע כמו מה שהתכוונת.</p>
                         </div>
                         <button type="button" class="btn btn-secondary" data-action="go-stage" data-stage="bridge">לחזור לליטוש</button>
                     </div>
@@ -777,7 +777,7 @@
 
                     <div class="flb-inline-actions">
                         <button type="button" class="btn btn-primary" data-action="save-bridge-editor">עדכן ניסוח</button>
-                        <button type="button" class="btn btn-secondary" data-action="toggle-insight" ${!(state.congruenceLevel === 'almost' || state.congruenceLevel === 'yes') ? 'disabled' : ''}>לפתוח שכבת תובנה</button>
+                        <button type="button" class="btn btn-secondary" data-action="toggle-insight" ${!(state.congruenceLevel === 'almost' || state.congruenceLevel === 'yes') ? 'disabled' : ''}>לראות מה התבהר</button>
                     </div>
                 </section>
             `;
@@ -790,12 +790,12 @@
             return `
                 <section class="flb-insight-drawer${state.insightOpen ? ' is-open' : ''}">
                     <button type="button" class="flb-insight-toggle" data-action="toggle-insight">
-                        <span>שכבת תובנה</span>
+                        <span>אחרי שהמשפט יושב</span>
                         <strong>מה היה חסר במשפט המקורי?</strong>
                     </button>
                     <div class="flb-insight-body">
                         <article class="flb-insight-card">
-                            <span>Meta Model אחרי הלימה</span>
+                            <span>מה התבהר עכשיו</span>
                             <ul class="flb-insight-list">
                                 ${state.metaModelInsights.map((item) => `<li>${html(item)}</li>`).join('')}
                             </ul>
@@ -818,8 +818,8 @@
                 return `
                     <article class="flb-world flb-world--sentence">
                         <div class="flb-world__head">
-                            <span>WORLD A</span>
-                            <strong>Sentence</strong>
+                            <span>שפה</span>
+                            <strong>המשפט שאמרתי</strong>
                         </div>
                         <div class="flb-world__body">
                             <p class="flb-sentence-display">${highlightSentence(state.originalSentence, state.hotPhrase)}</p>
@@ -833,8 +833,8 @@
                 return `
                     <article class="flb-world flb-world--inner">
                         <div class="flb-world__head">
-                            <span>WORLD B</span>
-                            <strong>Inner Felt Experience</strong>
+                            <span>פנים</span>
+                            <strong>מה נהיה בי</strong>
                         </div>
                         <div class="flb-world__body">
                             <p>${html(getPrimaryInner() || 'עוד לא אספנו ניסוח פנימי.')}</p>
@@ -848,8 +848,8 @@
                 return `
                     <article class="flb-world flb-world--outer">
                         <div class="flb-world__head">
-                            <span>WORLD C</span>
-                            <strong>Outer Situation</strong>
+                            <span>חוץ</span>
+                            <strong>מה קורה במציאות</strong>
                         </div>
                         <div class="flb-world__body">
                             <p>${html(getPrimaryOuter() || 'עוד לא אספנו ניסוח חיצוני.')}</p>
@@ -902,7 +902,7 @@
                         </summary>
                         <div class="screen-read-guide-philosopher-panel">
                             <p>המסך הזה עוזר לקחת משפט דחוס ולחבר אותו מחדש לשלושה עולמות: מה נאמר, מה קורה בחוץ, ומה נהיה בפנים.</p>
-                            <p><strong>העיקרון:</strong> קודם בונים משפט שיושב גם בגוף וגם במציאות. רק אחר כך מסתכלים על התבנית המטה-מודלית.</p>
+                            <p><strong>העיקרון:</strong> קודם בונים משפט שיושב גם בגוף וגם במציאות. רק אחר כך בודקים מה התבהר על המשפט המקורי.</p>
                         </div>
                     </details>
                     <div class="screen-read-guide-content">
@@ -913,7 +913,7 @@
                             <li>מנסחים מה קורה בחוץ ברגעים שבהם זה מרגיש נכון.</li>
                             <li>מנסחים מה נהיה בפנים באותם רגעים.</li>
                             <li>מחברים את שני הצדדים למשפט גשר אחד.</li>
-                            <li>בודקים הלימה, ורק אחרי זה פותחים תובנה מטה-מודלית.</li>
+                            <li>בודקים הלימה, ורק אחרי זה בודקים מה התבהר על המשפט המקורי.</li>
                         </ol>
                         <div class="screen-read-guide-summary">לא מתקנים עדיין - קודם יוצרים הלימה.</div>
                     </div>
@@ -921,8 +921,8 @@
                         <h4>מה נקבל בסוף</h4>
                         <ul class="screen-demo-dialogue-list">
                             <li>משפט גשר משולב שמחזיק גם חוץ וגם פנים.</li>
-                            <li>תחושת "כן, זה זה" במקום רק דיוק לוגי.</li>
-                            <li>שכבת Meta Model עדינה שמופיעה רק אחרי שיש נחיתה.</li>
+                            <li>תחושת "כן, זה מה שהתכוונתי" במקום רק דיוק לוגי.</li>
+                            <li>הבנה חדשה על המשפט שמופיעה רק אחרי שיש נחיתה.</li>
                         </ul>
                         <p class="screen-demo-dialogue-footnote">המסך בנוי ככלי הלימה, לא כבודק שגיאות.</p>
                     </div>
@@ -930,7 +930,7 @@
 
                 <div class="practice-section-header">
                     <h3>גשר תחושה-שפה</h3>
-                    <p>מעבדה עדינה בין שלושה עולמות: המשפט הדחוס, מה שקורה בחוץ, ומה שנהיה בפנים. רק אחרי שיש הלימה נפתחת שכבת Meta Model.</p>
+                    <p>מעבדה עדינה בין שלושה עולמות: המשפט הדחוס, מה שקורה בחוץ, ומה שנהיה בפנים. רק אחרי שיש הלימה בודקים מה התבהר על המשפט.</p>
                 </div>
 
                 <div class="flb-shell">
