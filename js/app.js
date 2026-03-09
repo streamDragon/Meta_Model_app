@@ -5206,8 +5206,9 @@ function initializeMetaModelApp() {
     if (typeof setupTriplesRadarModule === 'function') {
         setupTriplesRadarModule();
     }
-    setupWrinkleGame();
-    setupConnectedBubblesTrainer();
+    if (typeof setupFeelingLanguageBridge === 'function') {
+        setupFeelingLanguageBridge();
+    }
     setupTrainerMode();
     setupBlueprintBuilder();
     setupPrismModule();
