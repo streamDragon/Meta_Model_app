@@ -47,7 +47,7 @@
         Object.freeze({
             id: 'practice-wizard',
             titleHe: 'גשר תחושה-שפה',
-            descHe: 'תהליך מובנה לאיסוף חוויה ולהפיכה לשפה מדויקת.',
+            descHe: 'הלימה בין המשפט, החוויה והמציאות. רק אחר כך נפתחת שכבת Meta Model.',
             route: '/feature/practice-wizard',
             tab: 'practice-wizard',
             tagHe: 'Exercises',
@@ -55,8 +55,8 @@
             thumbType: 'svg',
             thumbSrc: '',
             icon: 'W',
-            accentFrom: '#22c55e',
-            accentTo: '#15803d'
+            accentFrom: '#4f46e5',
+            accentTo: '#f59e0b'
         }),
         Object.freeze({
             id: 'scenario-trainer',

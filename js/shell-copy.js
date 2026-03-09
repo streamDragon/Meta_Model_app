@@ -69,7 +69,7 @@
         }),
         'practice-wizard': Object.freeze({
             title: 'גשר תחושה-שפה',
-            subtitle: 'התרגול נשאר רציף. מבוא והיגיון נפתחים בשכבה.'
+            subtitle: 'בונים הלימה בין משפט, חוויה ומציאות; תובנת Meta Model נפתחת רק אחרי הנחיתה.'
         }),
         'practice-verb-unzip': Object.freeze({
             title: 'מרכז כלים',

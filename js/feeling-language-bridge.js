@@ -1020,7 +1020,7 @@
             if (action === 'select-inner-imagery') { state.selectedInnerImagery = trimText(value, 72); render(); return; }
             if (action === 'commit-inner-preview') { addFragment('inner', composeInnerPreview()); render(); return; }
             if (action === 'choose-bridge-draft') { state.selectedBridgeDraft = trimText(value, 220); state.bridgeEditorDraft = state.selectedBridgeDraft; state.activeStage = 'congruence'; syncState({ preserveBridgeEditor: true }); playUi('prism_submit'); render(); return; }
-            if (action === 'save-bridge-editor') { state.bridgeEditorDraft = trimText(state.bridgeEditorDraft, 220); state.selectedBridgeDraft = state.bridgeEditorDraft; syncState({ preserveBridgeEditor: true }); playUi('prism_submit'); render(); return; }
+            if (action === 'save-bridge-editor') { state.bridgeEditorDraft = trimText(state.bridgeEditorDraft, 220); state.selectedBridgeDraft = state.bridgeEditorDraft; if (state.activeStage === 'bridge') state.activeStage = 'congruence'; syncState({ preserveBridgeEditor: true }); playUi('prism_submit'); render(); return; }
             if (action === 'set-congruence') { state.congruenceLevel = congruenceById(value).id; state.insightOpen = state.congruenceLevel === 'almost' || state.congruenceLevel === 'yes'; state.activeStage = state.insightOpen ? 'insight' : 'congruence'; syncState({ preserveBridgeEditor: true }); playUi(state.insightOpen ? 'prism_open' : 'select_soft'); render(); return; }
             if (action === 'toggle-insight' && (state.congruenceLevel === 'almost' || state.congruenceLevel === 'yes')) { state.insightOpen = !state.insightOpen; state.activeStage = state.insightOpen ? 'insight' : 'congruence'; render(); }
         });
