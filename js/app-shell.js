@@ -433,6 +433,291 @@
         wrapper.appendChild(contextHeader);
     }
 
+    function normalizePanelText(value) {
+        return String(value || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function compactPanelText(value, max = 190) {
+        const normalized = normalizePanelText(value);
+        if (!normalized) return '';
+        if (!Number.isFinite(max) || max < 16) return normalized;
+        if (normalized.length <= max) return normalized;
+        return `${normalized.slice(0, max - 1)}…`;
+    }
+
+    function queryPanelText(root, selector) {
+        if (!root || !selector) return '';
+        try {
+            return normalizePanelText(root.querySelector(selector)?.textContent || '');
+        } catch (_error) {
+            return '';
+        }
+    }
+
+    function getComicRoundSnapshot(screenState) {
+        const section = screenState?.section || document.getElementById('comic-engine');
+        const root = section?.querySelector('#comicEngine');
+        if (!root) return null;
+
+        const choiceNodes = Array.from(root.querySelectorAll('#ceflow-choice-deck .ceflow-choice'));
+        const choices = choiceNodes.map((node) => ({
+            id: String(node.getAttribute('data-choice-id') || '').trim(),
+            label: queryPanelText(node, '.ceflow-choice-top strong'),
+            tone: queryPanelText(node, '.ceflow-choice-tone'),
+            say: queryPanelText(node, '.ceflow-choice-line'),
+            preview: queryPanelText(node, '.ceflow-choice-preview strong'),
+            selected: node.classList.contains('is-selected')
+        })).filter((choice) => choice.id);
+
+        const selectedChoice = choices.find((choice) => choice.selected) || null;
+        const alternativeChoice = selectedChoice
+            ? (choices.find((choice) => choice.id === 'meta' && choice.id !== selectedChoice.id)
+                || choices.find((choice) => choice.id !== selectedChoice.id)
+                || null)
+            : (choices[0] || null);
+
+        const feedbackQuoteRows = Array.from(root.querySelectorAll('#ceflow-feedback .ceflow-feedback-quote')).map((quoteNode) => ({
+            title: queryPanelText(quoteNode, 'strong'),
+            text: queryPanelText(quoteNode, 'p')
+        })).filter((quote) => quote.title || quote.text);
+        const findQuote = (titleNeedle) => feedbackQuoteRows.find((item) => item.title.includes(titleNeedle))?.text || '';
+
+        const snapshotRows = Array.from(root.querySelectorAll('#ceflow-turn-snapshot .ceflow-turn-snapshot-card')).map((cardNode) => ({
+            title: queryPanelText(cardNode, 'strong'),
+            text: queryPanelText(cardNode, 'p')
+        })).filter((row) => row.title || row.text);
+        const findSnapshot = (titleNeedle) => snapshotRows.find((item) => item.title.includes(titleNeedle))?.text || '';
+
+        const metricRows = Array.from(root.querySelectorAll('#ceflow-overlay .ceflow-stat')).map((metricNode) => ({
+            label: queryPanelText(metricNode, '.ceflow-stat-head span') || queryPanelText(metricNode, 'span'),
+            meaning: queryPanelText(metricNode, '.ceflow-stat-meaning'),
+            reason: queryPanelText(metricNode, '.ceflow-stat-reason')
+        })).filter((metric) => metric.label || metric.reason || metric.meaning);
+
+        return {
+            sceneTitle: queryPanelText(root, '#ceflow-title'),
+            sceneSubtitle: queryPanelText(root, '#ceflow-scene-subtitle'),
+            choiceTitle: queryPanelText(root, '#ceflow-choice-title'),
+            choiceAffordance: queryPanelText(root, '#ceflow-choice-affordance'),
+            stageHeadline: queryPanelText(root, '#ceflow-stage-status strong'),
+            stageCopy: queryPanelText(root, '#ceflow-stage-status p:last-child'),
+            selectedChoice,
+            alternativeChoice,
+            choices,
+            userReply: findQuote('המשפט שבחרת עכשיו') || normalizePanelText(root.querySelector('#ceflow-reply-input')?.value || ''),
+            counterReply: findQuote('כך זה נשמע בצד השני'),
+            languageWorked: queryPanelText(root, '#ceflow-feedback .ceflow-language-effect-line.is-worked'),
+            languageBurden: queryPanelText(root, '#ceflow-feedback .ceflow-language-effect-line.is-burden'),
+            languageTakeaway: queryPanelText(root, '#ceflow-feedback .ceflow-language-effect-takeaway') || queryPanelText(root, '#ceflow-turn-snapshot .ceflow-turn-snapshot-note'),
+            panelWhy: queryPanelText(root, '#ceflow-overlay .ceflow-hud-why'),
+            metricRows,
+            snapshotShift: findSnapshot('מה זז'),
+            snapshotLanded: findSnapshot('איך זה נחת')
+        };
+    }
+
+    function buildComicRoundPanelShell(panel) {
+        const wrapper = document.createElement('article');
+        wrapper.className = 'shell-overlay-content comic-round-panel';
+        appendPanelContextHeader(wrapper, panel);
+        return wrapper;
+    }
+
+    function appendComicRoundFallback(wrapper, message) {
+        const empty = document.createElement('p');
+        empty.className = 'comic-round-empty';
+        empty.textContent = String(message || 'אין כרגע סבב פעיל להצגה.').trim();
+        wrapper.appendChild(empty);
+    }
+
+    function buildComicRoundGuidePanelContent(screenState, panel, snapshot) {
+        const wrapper = buildComicRoundPanelShell(panel);
+        if (!snapshot) {
+            appendComicRoundFallback(wrapper, 'לא נמצא סבב קומיקס פעיל כרגע.');
+            return wrapper;
+        }
+
+        const selected = snapshot.selectedChoice;
+        const selectedSummary = selected
+            ? `בסבב הזה בחרת: ${compactPanelText(selected.say || selected.label, 112)}`
+            : 'בסבב הזה עדיין לא ננעלה בחירה. אפשר לבחור כרטיס אחד ולפתוח את ההיגיון של הרגע.';
+        const logicLine = snapshot.languageWorked || snapshot.panelWhy || snapshot.stageCopy || 'ההיגיון בסבב נבנה מהטון שבחרת ומהדרך שבה הצד השני שומע אותו.';
+        const strongestMetric = snapshot.metricRows.find((metric) => metric.reason) || null;
+
+        const lead = document.createElement('p');
+        lead.className = 'comic-round-lead';
+        lead.textContent = compactPanelText(selectedSummary, 200);
+        wrapper.appendChild(lead);
+
+        const grid = document.createElement('section');
+        grid.className = 'comic-round-grid';
+        grid.innerHTML = `
+            <article class="comic-round-card">
+                <h5>מה קרה בסצנה הזו</h5>
+                <p><strong>${escapeHtml(compactPanelText(snapshot.sceneTitle || 'סצנה פעילה', 70))}</strong></p>
+                ${snapshot.stageHeadline ? `<p>${escapeHtml(compactPanelText(snapshot.stageHeadline, 120))}</p>` : ''}
+                ${snapshot.userReply ? `<p><strong>משפט ההמשך שלך:</strong> ${escapeHtml(compactPanelText(snapshot.userReply, 130))}</p>` : ''}
+            </article>
+            <article class="comic-round-card">
+                <h5>ההיגיון של הבחירה בסבב הזה</h5>
+                <p>${escapeHtml(compactPanelText(logicLine, 220))}</p>
+                ${strongestMetric ? `<p><strong>${escapeHtml(strongestMetric.label)}:</strong> ${escapeHtml(compactPanelText(strongestMetric.reason, 120))}</p>` : ''}
+            </article>
+        `;
+        wrapper.appendChild(grid);
+
+        if (snapshot.alternativeChoice && selected) {
+            const compare = document.createElement('section');
+            compare.className = 'comic-round-compare';
+            compare.innerHTML = `
+                <h5>מה הייתה אפשרות אחרת?</h5>
+                <p><strong>${escapeHtml(compactPanelText(snapshot.alternativeChoice.label || snapshot.alternativeChoice.tone || 'אפשרות אחרת', 66))}</strong></p>
+                <p>${escapeHtml(compactPanelText(snapshot.alternativeChoice.say || '', 136))}</p>
+                ${snapshot.alternativeChoice.preview ? `<p class="comic-round-note">סביר שהיה זז אחרת: ${escapeHtml(compactPanelText(snapshot.alternativeChoice.preview, 120))}</p>` : ''}
+            `;
+            wrapper.appendChild(compare);
+        }
+
+        return wrapper;
+    }
+
+    function buildComicRoundSetupPanelContent(screenState, panel, snapshot) {
+        const wrapper = buildComicRoundPanelShell(panel);
+        if (!snapshot) {
+            appendComicRoundFallback(wrapper, 'לא נמצא סבב קומיקס פעיל כרגע.');
+            return wrapper;
+        }
+
+        const selected = snapshot.selectedChoice;
+        const lead = document.createElement('p');
+        lead.className = 'comic-round-lead';
+        lead.textContent = selected
+            ? 'זה סיכום הבחירה שננעלה בסבב הזה, כדי לראות מה הופעל לפני המשוב.'
+            : 'עדיין לא ננעלה בחירה. הכרטיס שתבחר/י כאן יכתיב את כיוון השיחה והמשוב.';
+        wrapper.appendChild(lead);
+
+        const grid = document.createElement('section');
+        grid.className = 'comic-round-grid';
+        if (selected) {
+            grid.innerHTML = `
+                <article class="comic-round-card">
+                    <h5>הבחירה שננעלה</h5>
+                    <p><strong>${escapeHtml(compactPanelText(selected.label || selected.tone || 'תגובה נבחרת', 70))}</strong></p>
+                    ${selected.say ? `<p>${escapeHtml(compactPanelText(selected.say, 160))}</p>` : ''}
+                    ${selected.preview ? `<p class="comic-round-note">${escapeHtml(compactPanelText(selected.preview, 130))}</p>` : ''}
+                </article>
+                <article class="comic-round-card">
+                    <h5>מה לבחור בפעם הבאה</h5>
+                    <p>${escapeHtml(compactPanelText(snapshot.choiceAffordance || 'בחר/י ניסוח שמחזיק גבול וגם משאיר פתח לבירור.', 170))}</p>
+                    ${snapshot.sceneSubtitle ? `<p class="comic-round-note">${escapeHtml(compactPanelText(snapshot.sceneSubtitle, 130))}</p>` : ''}
+                </article>
+            `;
+        } else {
+            const options = snapshot.choices.slice(0, 3);
+            const optionsList = options.map((item) => `<li>${escapeHtml(compactPanelText(item.label || item.say || item.id, 78))}</li>`).join('');
+            grid.innerHTML = `
+                <article class="comic-round-card">
+                    <h5>לפני הנעילה</h5>
+                    <p>${escapeHtml(compactPanelText(snapshot.choiceTitle || 'בחר/י תגובה אחת לסבב הנוכחי.', 140))}</p>
+                    ${optionsList ? `<ul class="comic-round-list">${optionsList}</ul>` : ''}
+                </article>
+                <article class="comic-round-card">
+                    <h5>למה זה חשוב</h5>
+                    <p>כל ניסוח יוצר עולם שיחה אחר. אחרי הבחירה, פתח/י את המשוב כדי לראות מה בדיוק זז.</p>
+                </article>
+            `;
+        }
+        wrapper.appendChild(grid);
+
+        if (snapshot.alternativeChoice && selected) {
+            const compare = document.createElement('section');
+            compare.className = 'comic-round-compare';
+            compare.innerHTML = `
+                <h5>השוואה קצרה לניסוח אחר</h5>
+                <p><strong>${escapeHtml(compactPanelText(snapshot.alternativeChoice.label || 'אפשרות אחרת', 66))}</strong></p>
+                <p>${escapeHtml(compactPanelText(snapshot.alternativeChoice.say || '', 120))}</p>
+                ${snapshot.alternativeChoice.preview ? `<p class="comic-round-note">${escapeHtml(compactPanelText(snapshot.alternativeChoice.preview, 120))}</p>` : ''}
+            `;
+            wrapper.appendChild(compare);
+        }
+
+        return wrapper;
+    }
+
+    function buildComicRoundFeedbackPanelContent(screenState, panel, snapshot) {
+        const wrapper = buildComicRoundPanelShell(panel);
+        if (!snapshot) {
+            appendComicRoundFallback(wrapper, 'לא נמצא סבב קומיקס פעיל כרגע.');
+            return wrapper;
+        }
+
+        const selected = snapshot.selectedChoice;
+        if (!selected) {
+            appendComicRoundFallback(wrapper, 'אין עדיין בחירה להשוות. בחר/י כרטיס אחד ואז פתח/י שוב את המשוב.');
+            return wrapper;
+        }
+
+        const metricItems = snapshot.metricRows
+            .filter((metric) => metric.label || metric.reason)
+            .slice(0, 4)
+            .map((metric) => `<li><strong>${escapeHtml(compactPanelText(metric.label, 34))}:</strong> ${escapeHtml(compactPanelText(metric.reason || metric.meaning, 118))}</li>`)
+            .join('');
+
+        const lead = document.createElement('p');
+        lead.className = 'comic-round-lead';
+        lead.textContent = 'קריאה עמוקה של אותו סבב: תגובה, הדהוד בצד השני, השפעת המדדים, ומה לקחת הלאה.';
+        wrapper.appendChild(lead);
+
+        const grid = document.createElement('section');
+        grid.className = 'comic-round-grid';
+        grid.innerHTML = `
+            <article class="comic-round-card">
+                <h5>1. מה קרה בתגובה</h5>
+                <p><strong>בחירה:</strong> ${escapeHtml(compactPanelText(selected.say || selected.label, 128))}</p>
+                ${snapshot.userReply ? `<p><strong>משפט המשך:</strong> ${escapeHtml(compactPanelText(snapshot.userReply, 128))}</p>` : ''}
+            </article>
+            <article class="comic-round-card">
+                <h5>2. איך זה נשמע לצד השני</h5>
+                <p>${escapeHtml(compactPanelText(snapshot.counterReply || snapshot.snapshotLanded || 'כאן רואים את ההדהוד הרגשי של הניסוח.', 160))}</p>
+            </article>
+            <article class="comic-round-card">
+                <h5>3. מה זה עשה למדדים</h5>
+                ${metricItems ? `<ul class="comic-round-list">${metricItems}</ul>` : `<p>${escapeHtml(compactPanelText(snapshot.panelWhy || 'המדדים הושפעו מהניסוח ומהטון של הסבב.', 150))}</p>`}
+            </article>
+            <article class="comic-round-card">
+                <h5>4. מה ללמוד להמשך</h5>
+                ${snapshot.languageWorked ? `<p>${escapeHtml(compactPanelText(snapshot.languageWorked, 160))}</p>` : ''}
+                ${snapshot.languageBurden ? `<p>${escapeHtml(compactPanelText(snapshot.languageBurden, 160))}</p>` : ''}
+                <p class="comic-round-note">${escapeHtml(compactPanelText(snapshot.languageTakeaway || 'משפט מדויק משנה את איכות הקשר גם בתוך לחץ.', 160))}</p>
+            </article>
+        `;
+        wrapper.appendChild(grid);
+
+        if (snapshot.alternativeChoice) {
+            const compare = document.createElement('section');
+            compare.className = 'comic-round-compare';
+            compare.innerHTML = `
+                <h5>השוואה: איך ניסוח אחר היה משנה את התחושה?</h5>
+                <p><strong>${escapeHtml(compactPanelText(snapshot.alternativeChoice.label || 'אפשרות אחרת', 66))}</strong> ${escapeHtml(compactPanelText(snapshot.alternativeChoice.say || '', 100))}</p>
+                ${snapshot.alternativeChoice.preview ? `<p class="comic-round-note">השפעה אפשרית: ${escapeHtml(compactPanelText(snapshot.alternativeChoice.preview, 120))}</p>` : ''}
+            `;
+            wrapper.appendChild(compare);
+        }
+
+        return wrapper;
+    }
+
+    function buildComicRoundPanelContent(screenState, panel) {
+        if (screenState?.id !== 'comic-engine') return null;
+        const panelId = String(panel?.id || '').trim();
+        if (!panelId) return null;
+        const snapshot = getComicRoundSnapshot(screenState);
+        if (panelId === 'guide') return buildComicRoundGuidePanelContent(screenState, panel, snapshot);
+        if (panelId === 'setup') return buildComicRoundSetupPanelContent(screenState, panel, snapshot);
+        if (panelId === 'feedback') return buildComicRoundFeedbackPanelContent(screenState, panel, snapshot);
+        return null;
+    }
+
     function buildGuidePanelContent(screenState, panel) {
         const sourceId = String(panel?.guideId || screenState.id || '').trim();
         const guideRoot = screenState.section?.querySelector(`.screen-read-guide[data-screen-guide="${sourceId}"]`)
@@ -615,10 +900,12 @@
         });
         renderGenericFooter(screenState);
 
-        let content;
-        if (panel.type === 'guide') content = buildGuidePanelContent(screenState, panel);
-        else if (panel.type === 'buttons') content = buildButtonsPanelContent(panel);
-        else content = buildSelectorsPanelContent(screenState, panel);
+        let content = buildComicRoundPanelContent(screenState, panel);
+        if (!content) {
+            if (panel.type === 'guide') content = buildGuidePanelContent(screenState, panel);
+            else if (panel.type === 'buttons') content = buildButtonsPanelContent(panel);
+            else content = buildSelectorsPanelContent(screenState, panel);
+        }
 
         global.MetaOverlayProvider.openOverlay({
             type: `${screenState.id}-${panel.id}`,
