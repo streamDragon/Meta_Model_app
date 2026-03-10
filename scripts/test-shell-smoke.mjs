@@ -253,9 +253,12 @@ async function runShellSmoke(baseUrl) {
         await assert(Boolean(verbTitle), 'practice-verb-unzip overlay', verbTitle);
         await closeOverlayWithButton();
 
-        await navigate('scenario-trainer');
+        await navigate('home');
         await closeOverlayIfOpen();
-        await assert((await page.locator('#scenario-trainer a[href="scenario_trainer.html"]').count()) > 0, 'scenario-trainer launcher mounted');
+        await assert(
+            (await page.locator('#home a[data-versioned-href="scenario_trainer.html"]').count()) > 0,
+            'scenario launcher visible from home'
+        );
         const scenarioPage = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
         await scenarioPage.goto(new URL('scenario_trainer.html', baseUrl).toString(), { waitUntil: 'networkidle' });
         await assert((await scenarioPage.locator('[data-trainer-platform="1"][data-trainer-id="scenario-trainer"]').count()) > 0, 'scenario standalone shell mounted');

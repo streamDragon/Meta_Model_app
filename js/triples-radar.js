@@ -6,41 +6,171 @@
     root.setupTriplesRadarModule = api.setupTriplesRadarModule;
 })(function createTriplesRadarModule(root) {
     const STORAGE_KEY = 'triples_radar_progress_v1';
-    const UI_MODE_STORAGE_KEY = 'triples_radar_ui_mode_v1';
+    const UI_MODE_STORAGE_KEY = 'triples_radar_ui_mode_v2';
     const UI_MODE_BY_TOGGLE_KEY = Object.freeze({
-        triple: 'phone',
-        single: 'desktop'
+        details: 'details',
+        rules: 'rules'
     });
     const TOGGLE_KEY_BY_UI_MODE = Object.freeze({
-        phone: 'triple',
-        desktop: 'single'
+        details: 'details',
+        rules: 'rules'
+    });
+
+    const MODE_META = Object.freeze({
+        details: Object.freeze({
+            label: 'פרטים',
+            title: 'מצב פרטים · מחזירים את המשפט לקרקע',
+            note: 'מחפשים מה חסר בתוך המשפט: מי, מה, מתי, איך, ולפי מה.',
+            step: 'שלב 1: קרא/י את המשפט. שלב 2: בחר/י את כיוון החשיבה שמחזיר הכי מהר פרטים חסרים, ואז דייק/י לתבנית.',
+            solvedStep: 'הכיוון ברור. עכשיו אפשר לנסח מה חסר במשפט, או לעבור למקרה הבא.',
+            introFeedback: 'מצב פרטים: עובדים מבפנים ומחזירים למשפט שמות, הקשר, זמן, פעולה ומבחן מציאות.',
+            strongestTitle: 'מה הכיוון כאן?',
+            strongestLead: 'במצב פרטים זה הכיוון שמחזיר הכי מהר את המידע שחסר בתוך המשפט.',
+            nextMoveLabel: 'מה כדאי לשאול עכשיו',
+            rowBadge: 'כיוון חזק'
+        }),
+        rules: Object.freeze({
+            label: 'כללים',
+            title: 'מצב כללים · רואים את המסגרת שמארגנת את המשפט',
+            note: 'מחפשים איזה כלל, פירוש, שיפוט או מסגרת נותנים למשפט את המשמעות שלו.',
+            step: 'שלב 1: קרא/י את המשפט. שלב 2: בחר/י את כיוון החשיבה שמארגן את הסיפור לכלל, פירוש או מסגרת, ואז דייק/י לתבנית.',
+            solvedStep: 'המסגרת ברורה. עכשיו אפשר לנסח איזה כלל מנהל את המשפט, או לעבור למקרה הבא.',
+            introFeedback: 'מצב כללים: עובדים מלמעלה ובודקים איזה כלל, שיפוט או פירוש מחזיקים את האמירה במקום.',
+            strongestTitle: 'מה המסגרת החזקה כאן?',
+            strongestLead: 'במצב כללים זה הכיוון שמסביר איזה כלל או פירוש מארגנים את האמירה.',
+            nextMoveLabel: 'איך מפרקים את הכלל',
+            rowBadge: 'מסגרת חזקה'
+        })
     });
 
     const ROW_META = Object.freeze({
         row1: Object.freeze({
             colorClass: 'row-sky',
-            heLabel: 'שלשה 1 | מקור, הנחה וכוונה',
-            heInsight: 'בודקים מי מקור הסמכות, איזו הנחה פועלת מתחת לפני השטח, ואיזו כוונה מיוחסת בלי ראיה ישירה.'
+            canonicalLabel: 'שלשה 1',
+            directionLabel: 'כיוון 1',
+            heading: 'מקור, הנחה וכוונה',
+            directions: Object.freeze({
+                details: 'בודקים מי קבע, מה הונח מראש, ואיזו כוונה יוחסה בלי ראיה.',
+                rules: 'בודקים איזה שיפוט סמוי, הנחת יסוד או ייחוס כוונה מארגנים את המשפט.'
+            })
         }),
         row2: Object.freeze({
             colorClass: 'row-teal',
-            heLabel: 'שלשה 2 | חוקי משחק וגבולות',
-            heInsight: 'כאן חוקרים את חוקי המשחק: חייב/צריך/יכול, גבולות הנכונות, והנגזרת התפקודית של החוקים האלה.'
+            canonicalLabel: 'שלשה 2',
+            directionLabel: 'כיוון 2',
+            heading: 'חוקי משחק וגבולות',
+            directions: Object.freeze({
+                details: 'בודקים מה בדיוק חייב, אפשר או גורם למה, ואיפה חסר תנאי ברור.',
+                rules: 'בודקים איזה חוק משחק, מגבלה או חוק סיבתי קובעים כאן את הסיפור.'
+            })
         }),
         row3: Object.freeze({
             colorClass: 'row-amber',
-            heLabel: 'שלשה 3 | משמעות, זהות והסקה',
-            heInsight: 'מפרידים בין פעולה לזהות ובין סימן למסקנה, כדי לא להפוך רגע נקודתי להגדרת אדם.'
+            canonicalLabel: 'שלשה 3',
+            directionLabel: 'כיוון 3',
+            heading: 'משמעות, זהות והסקה',
+            directions: Object.freeze({
+                details: 'בודקים איפה פעולה חיה הפכה לשם, לזהות או למסקנה רחבה מדי.',
+                rules: 'בודקים איזה פירוש הופך אירוע למשמעות, לזהות או להוכחה.'
+            })
         }),
         row4: Object.freeze({
             colorClass: 'row-violet',
-            heLabel: 'שלשה 4 | הקשר, זמן וייחוס',
-            heInsight: 'מחדדים זמן, מקום והקשר: מול מי, ביחס למה, ומתי בדיוק הטענה נכונה או לא נכונה.'
+            canonicalLabel: 'שלשה 4',
+            directionLabel: 'כיוון 4',
+            heading: 'הקשר, זמן וייחוס',
+            directions: Object.freeze({
+                details: 'בודקים מי בדיוק, מתי בדיוק, איפה בדיוק וביחס למה.',
+                rules: 'בודקים איזו מסגרת הקשר גורמת לטענה להישמע מוחלטת למרות שהיא תלויה בזמן, מקום או ייחוס.'
+            })
         }),
         row5: Object.freeze({
             colorClass: 'row-rose',
-            heLabel: 'שלשה 5 | קרקע חושית ופעולה',
-            heInsight: 'מורידים לקרקע מדידה: מי/מה בדיוק, מה רואים/שומעים בפועל, ומה הצעד ההתנהגותי הבא.'
+            canonicalLabel: 'שלשה 5',
+            directionLabel: 'כיוון 5',
+            heading: 'קרקע חושית ופעולה',
+            directions: Object.freeze({
+                details: 'בודקים מה רואים, שומעים או מרגישים בפועל, ומה קורה צעד-צעד.',
+                rules: 'בודקים לאיזה מבחן מציאות או צעד התנהגותי צריך להחזיר את המשפט.'
+            })
+        })
+    });
+
+    const CATEGORY_META = Object.freeze({
+        lost_performative: Object.freeze({
+            detailsWhy: 'יש כאן שיפוט בלי לציין של מי הסטנדרט או לפי איזה קריטריון הוא נקבע.',
+            rulesWhy: 'המשפט מציג כלל ערכי כאילו הוא עובדה אובייקטיבית ולא עמדה של מישהו.',
+            nextPrompt: 'לפי מי זה נכון, לא נכון, הוגן או לא הוגן?'
+        }),
+        assumptions: Object.freeze({
+            detailsWhy: 'חסר כאן פרט שמונח מראש כדי שהמשפט יעבוד, אבל הוא לא נאמר ישירות.',
+            rulesWhy: 'המשמעות נבנית על הנחה סמויה שמארגנת את כל הקריאה של המשפט.',
+            nextPrompt: 'מה חייב להיות נכון כדי שהמשפט הזה יחזיק?'
+        }),
+        mind_reading: Object.freeze({
+            detailsWhy: 'מיוחסת כאן מחשבה, כוונה או עמדה פנימית בלי ראיה ישירה.',
+            rulesWhy: 'המשפט נשען על פירוש של העולם הפנימי של האחר במקום על מידע גלוי.',
+            nextPrompt: 'איך יודעים מה הצד השני חושב, מרגיש או מתכוון?'
+        }),
+        universal_quantifier: Object.freeze({
+            detailsWhy: 'המילים \"תמיד\", \"אף פעם\" או \"כולם\" מוחקות יוצאי דופן ומצמצמות את המציאות.',
+            rulesWhy: 'נבנה כאן כלל גורף שמוחל על כל המקרים בלי בדיקת גבולות.',
+            nextPrompt: 'באמת תמיד? מה היוצא מן הכלל הראשון?'
+        }),
+        modal_operator: Object.freeze({
+            detailsWhy: 'יש כאן חובה או מגבלה בלי פירוט של מה בדיוק מחייב או מונע.',
+            rulesWhy: 'המשפט מציג כלל של חובה או חוסר אפשרות כאילו הוא קבוע ולא תלוי תנאים.',
+            nextPrompt: 'מה בדיוק מונע? ומה יקרה אם כן?'
+        }),
+        cause_effect: Object.freeze({
+            detailsWhy: 'חסרים כאן שלבי הביניים שמחברים בין דבר אחד לתוצאה שמיוחסת לו.',
+            rulesWhy: 'המשפט יוצר חוק סיבתי קשיח בין שני דברים כאילו אחד מוכיח את השני.',
+            nextPrompt: 'איך בדיוק X מוביל ל-Y, שלב אחרי שלב?'
+        }),
+        nominalisations: Object.freeze({
+            detailsWhy: 'פעולה חיה הוקפאה לשם כללי, ולכן לא רואים מי עושה מה בפועל.',
+            rulesWhy: 'תהליך מוצג כישות קבועה, וכך קשה לפרק את הכלל שמחזיק אותו.',
+            nextPrompt: 'מה קורה כאן בפועל, ולא רק בשם כללי?'
+        }),
+        identity_predicates: Object.freeze({
+            detailsWhy: 'תיאור רגעי או חלקי מוצג כזהות כוללת של האדם.',
+            rulesWhy: 'מקרה אחד הופך כאן לכלל זהות: \"אני כזה\" או \"הוא כזה\".',
+            nextPrompt: 'באיזה תחום זה נכון, ובאיזה תחום זה לא בהכרח נכון?'
+        }),
+        complex_equivalence: Object.freeze({
+            detailsWhy: 'המשפט קושר שני דברים כאילו אחד מוכיח את השני, בלי להראות את הקשר.',
+            rulesWhy: 'נבנה כאן כלל פרשני מסוג \"אם X אז זה אומר Y\".',
+            nextPrompt: 'איך X דווקא אומר Y? מה הקריטריון?'
+        }),
+        comparative_deletion: Object.freeze({
+            detailsWhy: 'יש כאן השוואה בלי נקודת ייחוס, מדד או צד שני ברור.',
+            rulesWhy: 'המשמעות נשענת על כלל השוואתי שלא נאמר במפורש.',
+            nextPrompt: 'ביחס למה? לפי איזה מדד?'
+        }),
+        time_space_predicates: Object.freeze({
+            detailsWhy: 'חסר מתי, איפה או באיזה הקשר הטענה באמת נכונה.',
+            rulesWhy: 'המסגרת של זמן ומקום נעלמה, ולכן הטענה נשמעת מוחלטת יותר ממה שהיא.',
+            nextPrompt: 'מתי בדיוק? איפה בדיוק? ובאיזה הקשר?'
+        }),
+        lack_referential_index: Object.freeze({
+            detailsWhy: 'לא ברור מי בדיוק כלול ב\"הם\", \"כולם\" או \"מישהו\".',
+            rulesWhy: 'קבוצה עמומה מחזיקה את כל המשמעות בלי ייחוס ברור של אחריות או פעולה.',
+            nextPrompt: 'מי בדיוק? על מי זה נאמר?'
+        }),
+        non_referring_nouns: Object.freeze({
+            detailsWhy: 'מופיע כאן \"משהו\", \"עניין\" או \"זה\" בלי אובייקט ברור שאפשר לבדוק.',
+            rulesWhy: 'המשפט נשען על שם כללי לא מזוהה, ולכן הכלל נשאר מעורפל.',
+            nextPrompt: 'מה בדיוק הדבר הזה? תן/י שם או דוגמה.'
+        }),
+        sensory_predicates: Object.freeze({
+            detailsWhy: 'צריך להחזיר את המשפט למה שנראה, נשמע או מורגש ממש.',
+            rulesWhy: 'מבחן המציאות החושי נעלם, והמשמעות נשארת באוויר בלי עוגן.',
+            nextPrompt: 'מה רואים, שומעים או מרגישים ממש?'
+        }),
+        unspecified_verbs: Object.freeze({
+            detailsWhy: 'הפועל נשאר עמום, ולכן לא רואים מה באמת קורה בתוך הפעולה.',
+            rulesWhy: 'תהליך שלם נדחס לפועל כללי שמסתיר את המנגנון שמאחוריו.',
+            nextPrompt: 'מה קורה בפועל, צעד-צעד?'
         })
     });
 
@@ -56,7 +186,7 @@
         solved: false,
         selectedCategory: '',
         elements: null,
-        uiMode: 'desktop',
+        uiMode: 'details',
         phone: null,
         desktopRootMarkup: ''
     };
@@ -124,32 +254,19 @@
         return found?.label || normalized;
     }
 
-    function shouldUsePhoneFlow() {
-        try {
-            const url = new URL(window.location.href);
-            if (url.searchParams.get('triplesLegacy') === '1') return false;
-            if (url.searchParams.get('triplesAdvanced') === '0') return false;
-            if (url.searchParams.get('triplesAdvanced') === '1') return true;
-        } catch (error) {
-            // Ignore URL parsing issues and fall through.
-        }
-        // Restore classic 3x5 board as the default; use phone flow only on forced mobile.
-        if (typeof document === 'undefined' || !document.body) return false;
-        if (document.body.classList.contains('force-mobile-view')) return true;
-        if (document.body.classList.contains('view-mobile')) return true;
-        if (typeof window !== 'undefined' && window.innerWidth && window.innerWidth <= 640) return true;
-        return false;
-    }
-
     function getDefaultUiMode() {
-        return shouldUsePhoneFlow() ? 'phone' : 'desktop';
+        return 'details';
     }
 
     function normalizeUiMode(value) {
         const raw = String(value || '').trim().toLowerCase();
         if (!raw) return getDefaultUiMode();
-        if (raw === 'phone' || raw === 'triple' || raw === 'advanced' || raw === 'row') return 'phone';
-        if (raw === 'desktop' || raw === 'single' || raw === 'legacy' || raw === 'category') return 'desktop';
+        if (raw === 'details' || raw === 'detail' || raw === 'פרטים' || raw === 'phone' || raw === 'triple' || raw === 'advanced' || raw === 'row') {
+            return 'details';
+        }
+        if (raw === 'rules' || raw === 'rule' || raw === 'כללים' || raw === 'desktop' || raw === 'single' || raw === 'legacy' || raw === 'category') {
+            return 'rules';
+        }
         return getDefaultUiMode();
     }
 
@@ -170,7 +287,7 @@
     }
 
     function getToggleKeyByUiMode() {
-        return TOGGLE_KEY_BY_UI_MODE[state.uiMode] || 'triple';
+        return TOGGLE_KEY_BY_UI_MODE[state.uiMode] || 'details';
     }
 
     function updateModeToggleUI() {
@@ -184,18 +301,94 @@
             btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
         });
 
+        const modeMeta = MODE_META[state.uiMode] || MODE_META.details;
         const titleEl = document.getElementById('triples-radar-mode-title');
         const noteEl = document.getElementById('triples-radar-mode-note');
-        if (titleEl) {
-            titleEl.textContent = activeToggleKey === 'triple'
-                ? '׳׳‘׳˜ ׳©׳׳©׳” ֲ· ׳¢׳•׳‘׳“׳™׳ ׳¢׳ ׳”׳׳©׳₪׳—׳” ׳›׳•׳׳”'
-                : '׳׳‘׳˜ ׳׳׳•׳§׳“ ֲ· ׳×׳‘׳ ׳™׳× ׳׳—׳× ׳‘׳›׳ ׳₪׳¢׳';
+        if (titleEl) titleEl.textContent = modeMeta.title;
+        if (noteEl) noteEl.textContent = modeMeta.note;
+    }
+
+    function getModeMeta() {
+        return MODE_META[state.uiMode] || MODE_META.details;
+    }
+
+    function getRowMeta(rowId) {
+        return ROW_META[rowId] || ROW_META.row1;
+    }
+
+    function getCategoryMeta(categoryId) {
+        const normalized = root.triplesRadarCore.normalizeCategoryId(categoryId);
+        return CATEGORY_META[normalized] || null;
+    }
+
+    function getIntroFeedbackText() {
+        return getModeMeta().introFeedback;
+    }
+
+    function getStepText() {
+        return state.solved ? getModeMeta().solvedStep : getModeMeta().step;
+    }
+
+    function getFocusHintText(current) {
+        const hint = normalizeSpaces(current?.focusHint || '');
+        if (!hint) return '';
+        return `שאלת הכוונה: ${hint}`;
+    }
+
+    function buildDirectionSummary(currentEvaluation) {
+        const current = getCurrentScenario();
+        if (!current || !root.triplesRadarCore) return null;
+
+        const correctCategoryId = root.triplesRadarCore.normalizeCategoryId(current.correctCategory);
+        const correctRowId = root.triplesRadarCore.getRowIdByCategory(correctCategoryId);
+        const rowMeta = getRowMeta(correctRowId);
+        const categoryMeta = getCategoryMeta(correctCategoryId);
+        const modeMeta = getModeMeta();
+        const nextPrompt = normalizeSpaces(current.focusHint || categoryMeta?.nextPrompt || '');
+        let selectionNote = '';
+
+        if (currentEvaluation && state.selectedCategory) {
+            const selectedLabel = getCategoryLabelHe(state.selectedCategory);
+            if (currentEvaluation.status === 'exact') {
+                selectionNote = `הבחירה שלך: ${selectedLabel}. זה הדיוק המתאים בתוך ${rowMeta.heading}.`;
+            } else if (currentEvaluation.status === 'same_row') {
+                selectionNote = `הבחירה שלך: ${selectedLabel}. הכיוון הכללי נכון, אבל עדיין צריך לדייק בתוך ${rowMeta.heading}.`;
+            } else if (currentEvaluation.status === 'wrong_row') {
+                selectionNote = `הבחירה שלך: ${selectedLabel}. זה כיוון אחר; הכוח המרכזי במשפט הזה יושב יותר ב-${rowMeta.heading}.`;
+            }
         }
-        if (noteEl) {
-            noteEl.textContent = activeToggleKey === 'triple'
-                ? '׳‘׳•׳—׳¨׳™׳ ׳©׳•׳¨׳” ׳׳×׳׳™׳׳” ׳‘׳˜׳‘׳׳”, ׳•׳׳– ׳׳×׳¨׳’׳׳™׳ ׳©׳׳•׳© ׳©׳׳׳•׳× ׳׳©׳׳™׳׳•׳× ׳׳׳•׳×׳” ׳׳©׳₪׳—׳× ׳“׳₪׳•׳¡׳™׳.'
-                : '׳׳×׳¨׳’׳׳™׳ ׳–׳™׳”׳•׳™ ׳׳“׳•׳™׳§ ׳©׳ ׳×׳‘׳ ׳™׳× ׳׳—׳× ׳‘׳›׳ ׳׳©׳₪׳˜, ׳¢׳ ׳׳©׳•׳‘ ׳©׳׳›׳•׳•׳ ׳׳¦׳¢׳“ ׳”׳‘׳.';
+
+        return {
+            colorClass: rowMeta.colorClass,
+            title: `${modeMeta.strongestTitle} · ${rowMeta.directionLabel} · ${rowMeta.heading}`,
+            subtitle: `${rowMeta.canonicalLabel} בטבלת ברין`,
+            lead: modeMeta.strongestLead,
+            reason: state.uiMode === 'rules'
+                ? (categoryMeta?.rulesWhy || rowMeta.directions.rules)
+                : (categoryMeta?.detailsWhy || rowMeta.directions.details),
+            nextPrompt,
+            selectionNote
+        };
+    }
+
+    function renderDirectionSummary(currentEvaluation) {
+        if (!state.elements?.modeSummary) return;
+        const summary = buildDirectionSummary(currentEvaluation);
+        if (!summary) {
+            state.elements.modeSummary.innerHTML = '';
+            return;
         }
+
+        state.elements.modeSummary.innerHTML = `
+            <article class="triples-radar-summary ${escapeHtml(summary.colorClass)}">
+                <p class="triples-radar-summary-kicker">${escapeHtml(summary.subtitle)}</p>
+                <h4 class="triples-radar-summary-title">${escapeHtml(summary.title)}</h4>
+                <p class="triples-radar-summary-lead">${escapeHtml(summary.lead)}</p>
+                <p class="triples-radar-summary-body"><strong>למה דווקא כאן:</strong> ${escapeHtml(summary.reason)}</p>
+                ${summary.nextPrompt ? `<p class="triples-radar-summary-body"><strong>${escapeHtml(getModeMeta().nextMoveLabel)}:</strong> ${escapeHtml(summary.nextPrompt)}</p>` : ''}
+                ${summary.selectionNote ? `<p class="triples-radar-summary-note">${escapeHtml(summary.selectionNote)}</p>` : ''}
+            </article>
+        `;
     }
 
     function normalizeSpaces(text) {
@@ -919,21 +1112,26 @@
             : null;
         const correctCategoryNormalized = root.triplesRadarCore.normalizeCategoryId(current.correctCategory);
         const correctRowId = root.triplesRadarCore.getRowIdByCategory(current.correctCategory);
+        const modeMeta = getModeMeta();
 
         state.elements.statement.textContent = current.clientText || '';
-        state.elements.focusHint.textContent = current.focusHint ? `׳¨׳׳– ׳׳™׳§׳•׳“: ${current.focusHint}` : '';
+        state.elements.focusHint.textContent = getFocusHintText(current);
         state.elements.counter.textContent = `${state.index + 1}/${state.scenarios.length}`;
         state.elements.score.textContent = `${state.score}`;
         state.elements.solvedCount.textContent = `${state.solvedCount}`;
+        if (state.elements.step) state.elements.step.textContent = getStepText();
+        renderDirectionSummary(currentEvaluation);
 
         state.elements.rows.innerHTML = rows.map((row) => {
-            const rowMeta = ROW_META[row.id] || ROW_META.row1;
+            const rowMeta = getRowMeta(row.id);
             const isCorrectRow = correctRowId === row.id;
             const isHintRow = !state.solved && state.rowHintUsed && isCorrectRow;
             const isSolvedRow = state.solved && isCorrectRow;
+            const isStrongestRow = isCorrectRow;
             const rowClass = [
                 'triples-radar-row',
                 rowMeta.colorClass,
+                isStrongestRow ? 'is-strongest' : '',
                 isHintRow ? 'is-hint' : '',
                 isSolvedRow ? 'is-solved' : ''
             ].filter(Boolean).join(' ');
@@ -960,6 +1158,8 @@
                         type="button"
                         class="${categoryClass}"
                         data-category-id="${escapeHtml(normalizedCategory)}"
+                        title="${escapeHtml(getCategoryMeta(normalizedCategory)?.nextPrompt || getCategoryLabelHe(normalizedCategory))}"
+                        aria-label="${escapeHtml(`${getCategoryLabelHe(normalizedCategory)}. ${getCategoryMeta(normalizedCategory)?.nextPrompt || ''}`.trim())}"
                         ${state.solved ? 'disabled' : ''}>
                         <span class="cat-label">${escapeHtml(getCategoryLabelHe(normalizedCategory))}</span>
                     </button>
@@ -969,8 +1169,11 @@
             return `
                 <article class="${rowClass}" data-row-id="${row.id}">
                     <div class="triples-radar-row-head">
-                        <strong>${escapeHtml(rowMeta.heLabel)}</strong>
-                        <small>${escapeHtml(rowMeta.heInsight || '')}</small>
+                        <div class="triples-radar-row-headline">
+                            <strong>${escapeHtml(`${rowMeta.directionLabel} · ${rowMeta.heading}`)}</strong>
+                            ${isStrongestRow ? `<span class="triples-radar-row-badge">${escapeHtml(modeMeta.rowBadge)}</span>` : ''}
+                        </div>
+                        <small>${escapeHtml(`${rowMeta.canonicalLabel} בטבלת ברין · ${rowMeta.directions[state.uiMode] || rowMeta.directions.details}`)}</small>
                     </div>
                     <div class="triples-radar-row-cats">
                         ${cards}
@@ -982,21 +1185,23 @@
 
     function updateHintControls() {
         if (state.uiMode === 'phone') return;
-        if (!state.elements?.rowHintBtn) return;
-        if (!state.elements?.catHintBtn) return;
-        state.elements.rowHintBtn.disabled = state.solved || state.rowHintUsed;
-        state.elements.catHintBtn.disabled = state.solved || state.categoryHintUsed;
+        if (state.elements?.rowHintBtn) {
+            state.elements.rowHintBtn.disabled = state.solved || state.rowHintUsed;
+        }
+        if (state.elements?.catHintBtn) {
+            state.elements.catHintBtn.disabled = state.solved || state.categoryHintUsed;
+        }
     }
 
     function handleAutoHints(result) {
         if (state.solved) return;
         if (state.attemptsInScenario >= 2 && !state.rowHintUsed) {
             state.rowHintUsed = true;
-            setFeedback('׳¢׳“׳™׳™׳ ׳׳ ׳׳“׳•׳™׳§. ׳¡׳™׳׳ ׳×׳™ ׳׳× ׳׳©׳₪׳—׳× ׳”׳“׳₪׳•׳¡׳™׳ ׳”׳׳×׳׳™׳׳” ׳›׳“׳™ ׳׳¢׳–׳•׳¨ ׳׳ ׳׳“׳™׳™׳§.', 'warn');
+            setFeedback('הכיוון החזק כבר מודגש. עכשיו כדאי לדייק בתוך אותה שורה.', 'warn');
         }
         if (state.attemptsInScenario >= 3 && result.status !== 'exact' && !state.categoryHintUsed) {
             state.categoryHintUsed = true;
-            setFeedback('׳‘׳ ׳™׳¡׳™׳•׳ ׳”׳–׳” ׳¡׳™׳׳ ׳×׳™ ׳’׳ ׳׳× ׳”׳×׳‘׳ ׳™׳× ׳”׳׳“׳•׳™׳§׳×. ׳‘׳—׳¨/׳™ ׳׳•׳×׳” ׳›׳“׳™ ׳׳¨׳׳•׳× ׳׳× ׳”׳”׳™׳’׳™׳•׳.', 'warn');
+            setFeedback('אם עדיין קשה לדייק, סימנתי גם את התבנית המתאימה בתוך הכיוון הזה.', 'warn');
         }
     }
 
@@ -1009,27 +1214,33 @@
         state.attemptsInScenario += 1;
 
         const result = root.triplesRadarCore.evaluateSelection(current.correctCategory, categoryId);
+        const correctRowMeta = getRowMeta(result.correctRowId);
+        const correctLabel = getCategoryLabelHe(current.correctCategory);
         if (result.status === 'exact') {
             state.solved = true;
             state.solvedCount += 1;
             state.score += Math.max(1, 4 - Math.max(1, state.attemptsInScenario));
             saveProgress();
-            setFeedback('׳׳¢׳•׳׳”. ׳‘׳—׳¨׳× ׳׳× ׳”׳×׳‘׳ ׳™׳× ׳”׳׳“׳•׳™׳§׳× ׳‘׳×׳•׳ ׳”׳׳©׳₪׳—׳” ׳”׳ ׳›׳•׳ ׳”.', 'success');
-            setStepStatus('׳™׳₪׳”. ׳׳₪׳©׳¨ ׳׳¢׳‘׳•׳¨ ׳׳׳§׳¨׳” ׳”׳‘׳ ׳׳• ׳׳¢׳¦׳•׳¨ ׳¨׳’׳¢ ׳•׳׳—׳©׳•׳‘ ׳׳׳” ׳–׳• ׳”׳×׳‘׳ ׳™׳× ׳”׳׳×׳׳™׳׳”.');
+            setFeedback(`בחירה מדויקת: ${correctLabel}. זה הדיוק המתאים בתוך ${correctRowMeta.heading}.`, 'success');
+            setStepStatus(getStepText());
             if (typeof root.playUISound === 'function') root.playUISound('success');
         } else if (result.status === 'same_row') {
-            setFeedback('׳›׳™׳•׳•׳ ׳˜׳•׳‘. ׳׳×/׳” ׳‘׳׳•׳×׳” ׳׳©׳₪׳—׳× ׳“׳₪׳•׳¡׳™׳, ׳¢׳›׳©׳™׳• ׳¦׳¨׳™׳ ׳׳“׳™׳™׳§ ׳׳×׳‘׳ ׳™׳× ׳”׳ ׳›׳•׳ ׳”.', 'warn');
-            setStepStatus('׳”׳™׳©׳׳¨/׳™ ׳‘׳׳•׳×׳” ׳©׳•׳¨׳” ׳•׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳—׳¨׳× ׳׳×׳•׳ ׳׳•׳×׳” ׳׳©׳₪׳—׳”.');
+            setFeedback(`הכיוון נכון, אבל עדיין לא התבנית המדויקת. הישאר/י בתוך ${correctRowMeta.heading}.`, 'warn');
+            setStepStatus(state.uiMode === 'rules'
+                ? `המסגרת נכונה. עכשיו צריך לדייק איזה כלל או פירוש הוא המרכזי בתוך ${correctRowMeta.heading}.`
+                : `הכיוון נכון. עכשיו צריך לדייק איזה פרט חסר בדיוק בתוך ${correctRowMeta.heading}.`);
             if (typeof root.playUISound === 'function') root.playUISound('warning');
             handleAutoHints(result);
         } else if (result.status === 'wrong_row') {
-            setFeedback('׳¢׳“׳™׳™׳ ׳׳. ׳›׳¨׳’׳¢ ׳–׳” ׳ ׳¨׳׳” ׳›׳׳• ׳׳©׳₪׳—׳× ׳“׳₪׳•׳¡׳™׳ ׳׳—׳¨׳×.', 'danger');
-            setStepStatus('׳—׳₪׳©/׳™ ׳§׳•׳“׳ ׳׳× ׳”׳׳©׳₪׳—׳” ׳”׳׳×׳׳™׳׳” ׳‘׳˜׳‘׳׳”, ׳•׳׳– ׳“׳™׳™׳§/׳™ ׳׳×׳‘׳ ׳™׳× ׳©׳‘׳×׳•׳›׳”.');
+            setFeedback(`זה עדיין לא הכיוון המרכזי. המשפט הזה נשען יותר על ${correctRowMeta.heading}.`, 'danger');
+            setStepStatus(state.uiMode === 'rules'
+                ? 'חפש/י את הכיוון שמסביר איזה כלל, שיפוט או פירוש מארגנים את המשפט.'
+                : 'חפש/י את הכיוון שמחזיר למשפט את המידע שחסר כדי להבין מה באמת נאמר.');
             if (typeof root.playUISound === 'function') root.playUISound('error');
             handleAutoHints(result);
         } else {
-            setFeedback('׳׳ ׳”׳¦׳׳—׳×׳™ ׳׳–׳”׳•׳× ׳׳× ׳”׳‘׳—׳™׳¨׳”. ׳‘׳—׳¨/׳™ ׳©׳•׳‘ ׳×׳‘׳ ׳™׳× ׳׳×׳•׳ ׳”׳˜׳‘׳׳”.', 'warn');
-            setStepStatus('׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳×׳•׳ ׳׳—׳× ׳׳׳©׳₪׳—׳•׳× ׳”׳“׳₪׳•׳¡׳™׳ ׳‘׳˜׳‘׳׳”.');
+            setFeedback('לא הצלחתי לזהות בחירה תקפה. בחר/י שוב תבנית מתוך הטבלה.', 'warn');
+            setStepStatus(getStepText());
         }
 
         updateHintControls();
@@ -1045,8 +1256,8 @@
         state.solved = false;
         state.selectedCategory = '';
         if (state.uiMode === 'phone') resetPhoneScenarioFlow();
-        setFeedback('׳׳§׳¨׳” ׳—׳“׳©. ׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳ ׳•׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳₪׳×׳™׳—׳”.', 'info');
-        setStepStatus('׳©׳׳‘ 1: ׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳. ׳©׳׳‘ 2: ׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳¢׳‘׳•׳“׳”.');
+        setFeedback('מקרה חדש נטען. קרא/י את המשפט ובחר/י את כיוון החשיבה שנכון לפתוח ממנו.', 'info');
+        setStepStatus(getStepText());
         updateHintControls();
         renderBoard();
     }
@@ -1059,8 +1270,8 @@
         state.solved = false;
         state.selectedCategory = '';
         if (state.uiMode === 'phone') resetPhoneScenarioFlow();
-        setFeedback('׳”׳×׳—׳׳ ׳• ׳׳—׳“׳© ׳׳”׳”׳×׳—׳׳”, ׳›׳“׳™ ׳׳×׳¨׳’׳ ׳©׳•׳‘ ׳‘׳¨׳¦׳£ ׳ ׳§׳™.', 'info');
-        setStepStatus('׳©׳׳‘ 1: ׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳. ׳©׳׳‘ 2: ׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳¢׳‘׳•׳“׳”.');
+        setFeedback('התחלנו מחדש מההתחלה, עם אותו מבנה עבודה ובלי בחירות קודמות.', 'info');
+        setStepStatus(getStepText());
         updateHintControls();
         renderBoard();
     }
@@ -1068,7 +1279,7 @@
     function revealRowHint() {
         if (state.solved || state.rowHintUsed) return;
         state.rowHintUsed = true;
-        setFeedback('׳¨׳׳–: ׳¡׳™׳׳ ׳×׳™ ׳׳× ׳׳©׳₪׳—׳× ׳”׳“׳₪׳•׳¡׳™׳ ׳”׳׳×׳׳™׳׳” (׳”׳©׳•׳¨׳” ׳”׳ ׳›׳•׳ ׳”).', 'info');
+        setFeedback('הכיוון החזק כבר הודגש בטבלה. עכשיו אפשר להישאר בתוכו ולדייק לתבנית.', 'info');
         updateHintControls();
         renderBoard();
     }
@@ -1076,7 +1287,7 @@
     function revealCategoryHint() {
         if (state.solved || state.categoryHintUsed) return;
         state.categoryHintUsed = true;
-        setFeedback('׳¨׳׳– ׳׳“׳•׳™׳§: ׳¡׳™׳׳ ׳×׳™ ׳׳× ׳”׳×׳‘׳ ׳™׳× ׳”׳ ׳›׳•׳ ׳” ׳‘׳×׳•׳ ׳”׳©׳•׳¨׳”.', 'info');
+        setFeedback('סימנתי את התבנית המדויקת בתוך הכיוון החזק, כדי שאפשר יהיה לראות למה היא בולטת כאן.', 'info');
         updateHintControls();
         renderBoard();
     }
@@ -1144,6 +1355,7 @@
             root: document.getElementById('triples-radar-root'),
             statement: document.getElementById('triples-radar-statement'),
             focusHint: document.getElementById('triples-radar-focus-hint'),
+            modeSummary: document.getElementById('triples-radar-mode-summary'),
             rows: document.getElementById('triples-radar-rows'),
             feedback: document.getElementById('triples-radar-feedback'),
             counter: document.getElementById('triples-radar-counter'),
@@ -1203,6 +1415,7 @@
         const force = options.force === true;
         if (!force && normalizedMode === state.uiMode) {
             updateModeToggleUI();
+            renderBoard();
             return;
         }
 
@@ -1218,12 +1431,9 @@
 
         if (!state.scenarios.length || !state.elements?.root) return;
 
-        if (state.uiMode === 'desktop') {
-            setFeedback('׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳ ׳•׳‘׳—׳¨/׳™ ׳׳× ׳”׳×׳‘׳ ׳™׳× ׳©׳ ׳›׳•׳ ׳׳”׳×׳—׳™׳ ׳׳׳ ׳”.', 'info');
-            setStepStatus('׳©׳׳‘ 1: ׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳. ׳©׳׳‘ 2: ׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳¢׳‘׳•׳“׳”.');
-            updateHintControls();
-        }
-
+        setFeedback(getIntroFeedbackText(), 'info');
+        setStepStatus(getStepText());
+        updateHintControls();
         renderBoard();
     }
 
@@ -1234,7 +1444,7 @@
         updateModeToggleUI();
         if (!state.elements?.root) return;
         if (!root.triplesRadarCore) {
-            state.elements.root.innerHTML = '<p class="triples-radar-error">׳©׳’׳™׳׳”: ׳׳ ׳•׳¢ Triples Radar ׳׳ ׳ ׳˜׳¢׳.</p>';
+            state.elements.root.innerHTML = '<p class="triples-radar-error">שגיאה: מנוע מכ״ם השלשות לא נטען.</p>';
             return;
         }
 
@@ -1243,7 +1453,7 @@
                 state.data = await loadData();
                 state.scenarios = [...state.data.scenarios];
             } catch (error) {
-                state.elements.root.innerHTML = `<p class="triples-radar-error">׳©׳’׳™׳׳” ׳‘׳˜׳¢׳™׳ ׳× ׳”׳¡׳¦׳ ׳•׳×: ${escapeHtml(error.message || '׳׳ ׳™׳“׳•׳¢')}</p>`;
+                state.elements.root.innerHTML = `<p class="triples-radar-error">שגיאה בטעינת המקרים: ${escapeHtml(error.message || 'לא ידוע')}</p>`;
                 return;
             }
         }
@@ -1260,10 +1470,8 @@
         if (state.uiMode === 'phone') resetPhoneScenarioFlow();
 
         bindEvents();
-        if (state.uiMode === 'desktop') {
-            setFeedback('׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳ ׳•׳‘׳—׳¨/׳™ ׳׳× ׳”׳×׳‘׳ ׳™׳× ׳©׳ ׳›׳•׳ ׳׳”׳×׳—׳™׳ ׳׳׳ ׳”.', 'info');
-            setStepStatus('׳©׳׳‘ 1: ׳§׳¨׳/׳™ ׳׳× ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳. ׳©׳׳‘ 2: ׳‘׳—׳¨/׳™ ׳×׳‘׳ ׳™׳× ׳׳¢׳‘׳•׳“׳”.');
-        }
+        setFeedback(getIntroFeedbackText(), 'info');
+        setStepStatus(getStepText());
         updateHintControls();
         renderBoard();
     }

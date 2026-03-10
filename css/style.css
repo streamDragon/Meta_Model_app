@@ -14216,6 +14216,80 @@ body.force-desktop-view .mobile-tab-nav {
     font-size: 0.85rem;
 }
 
+.triples-radar-mode-summary {
+    margin-bottom: 10px;
+}
+
+.triples-radar-summary {
+    border: 1px solid #d3e3fb;
+    border-radius: 14px;
+    background: #ffffff;
+    padding: 12px;
+    display: grid;
+    gap: 6px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.triples-radar-summary.row-sky {
+    border-inline-start: 4px solid #5b9dff;
+}
+
+.triples-radar-summary.row-teal {
+    border-inline-start: 4px solid #06b6d4;
+}
+
+.triples-radar-summary.row-amber {
+    border-inline-start: 4px solid #f59e0b;
+}
+
+.triples-radar-summary.row-violet {
+    border-inline-start: 4px solid #8b5cf6;
+}
+
+.triples-radar-summary.row-rose {
+    border-inline-start: 4px solid #f43f5e;
+}
+
+.triples-radar-summary-kicker {
+    margin: 0;
+    color: #23589b;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.triples-radar-summary-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1rem;
+    line-height: 1.35;
+}
+
+.triples-radar-summary-lead,
+.triples-radar-summary-body,
+.triples-radar-summary-note {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.triples-radar-summary-lead {
+    color: #33577f;
+    font-size: 0.86rem;
+}
+
+.triples-radar-summary-body {
+    color: #1f3656;
+    font-size: 0.88rem;
+}
+
+.triples-radar-summary-note {
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.04);
+    color: #0f172a;
+    font-size: 0.86rem;
+    font-weight: 700;
+    padding: 8px 10px;
+}
+
 .triples-radar-rows {
     display: grid;
     gap: 8px;
@@ -14241,6 +14315,13 @@ body.force-desktop-view .mobile-tab-nav {
     min-width: 0;
 }
 
+.triples-radar-row-headline {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 .triples-radar-row-head strong {
     display: inline-flex;
     align-items: center;
@@ -14252,6 +14333,19 @@ body.force-desktop-view .mobile-tab-nav {
     background: rgba(37, 99, 235, 0.06);
     border: 1px dashed rgba(37, 99, 235, 0.22);
     line-height: 1.25;
+}
+
+.triples-radar-row-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    border-radius: 999px;
+    padding: 4px 10px;
+    background: rgba(15, 118, 110, 0.1);
+    color: #0f5e59;
+    font-size: 0.74rem;
+    font-weight: 800;
 }
 
 .triples-radar-row-head small {
@@ -14349,6 +14443,11 @@ body.force-desktop-view .mobile-tab-nav {
     border-right: 5px solid #f43f5e;
 }
 
+.triples-radar-row.is-strongest {
+    box-shadow: 0 0 0 1px rgba(29, 78, 216, 0.12), 0 12px 26px rgba(29, 78, 216, 0.08);
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
 .triples-radar-row.is-hint {
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35), 0 10px 24px rgba(37, 99, 235, 0.12);
 }
@@ -14426,6 +14525,14 @@ body.force-desktop-view .mobile-tab-nav {
         border-radius: 12px;
     }
 
+    .triples-radar-summary {
+        padding: 10px;
+    }
+
+    .triples-radar-summary-title {
+        font-size: 0.94rem;
+    }
+
     .triples-radar-mode-switch {
         display: grid;
         grid-template-columns: minmax(0, 1fr);
@@ -14464,6 +14571,10 @@ body.force-desktop-view .mobile-tab-nav {
         margin-bottom: 4px;
     }
 
+    .triples-radar-row-headline {
+        align-items: flex-start;
+    }
+
     .triples-radar-cat-btn {
         min-height: 56px;
         font-size: 0.9rem;
@@ -14481,6 +14592,10 @@ body.force-desktop-view .mobile-tab-nav {
 }
 
 @media (max-width: 430px) {
+    .triples-radar-row-badge {
+        width: 100%;
+    }
+
     .triples-radar-row-head strong {
         min-height: 38px;
         font-size: 0.82rem;
