@@ -1,299 +1,278 @@
 {
-  "generatedAt": "2026-03-10T03:29:28.735Z",
-  "baseUrl": "http://localhost:5173",
+  "generatedAt": "2026-03-10T12:09:14.144Z",
+  "baseUrl": "http://127.0.0.1:4176",
   "bootstrap": {
     "status": 200,
-    "finalUrl": "http://localhost:5173/?v=1.0.230&t=1773113179157",
+    "finalUrl": "http://127.0.0.1:4176/?v=1.0.231&t=1773113643379",
     "issues": {
       "consoleErrors": [],
       "pageErrors": [],
       "requestFailures": [
         {
-          "url": "http://localhost:5173/js/freemium/bootstrap.js",
+          "url": "http://127.0.0.1:4176/js/freemium/bootstrap-entry.js?v=1.0.231&t=1773113643379",
           "method": "GET",
           "errorText": "net::ERR_ABORTED",
           "resourceType": "script"
         },
         {
-          "url": "http://localhost:5173/js/lib/supabase-client.js",
+          "url": "http://127.0.0.1:4176/css/style.css?v=1.0.231&t=1773113643379",
           "method": "GET",
           "errorText": "net::ERR_ABORTED",
-          "resourceType": "script"
+          "resourceType": "stylesheet"
         },
         {
-          "url": "http://localhost:5173/js/freemium/entitlements-client.js",
+          "url": "http://127.0.0.1:4176/css/freemium.css?v=1.0.231&t=1773113643379",
           "method": "GET",
           "errorText": "net::ERR_ABORTED",
-          "resourceType": "script"
-        },
-        {
-          "url": "http://localhost:5173/js/freemium/auth-session.js",
-          "method": "GET",
-          "errorText": "net::ERR_ABORTED",
-          "resourceType": "script"
+          "resourceType": "stylesheet"
         }
       ],
       "topLevelResponses": [
         {
-          "url": "http://localhost:5173/",
+          "url": "http://127.0.0.1:4176/",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/version.json?_gscb=1773144534784-m9e34hutuwj",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/@vite/client",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/@vite/client",
+          "url": "http://127.0.0.1:4176/js/runtime-env.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/version.json?_gscb=1773113281084-4cxkayu6qmk",
+          "url": "http://127.0.0.1:4176/node_modules/vite/dist/client/env.mjs",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
+          "url": "http://127.0.0.1:4176/js/runtime-env.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-          "status": 200,
-          "method": "GET"
-        },
-        {
-          "url": "http://localhost:5173/?v=1.0.230&t=1773113179157",
-          "status": 200,
-          "method": "GET"
-        },
-        {
-          "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-          "status": 200,
-          "method": "GET"
-        },
-        {
-          "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-          "status": 200,
-          "method": "GET"
-        },
-        {
-          "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-          "status": 200,
-          "method": "GET"
-        },
-        {
-          "url": "http://localhost:5173/@vite/client",
+          "url": "http://127.0.0.1:4176/@vite/client",
           "status": 304,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/version.json?_gscb=1773113281398-7y7xtovtkgb",
+          "url": "http://127.0.0.1:4176/version.json?_gscb=1773144534995-ag1fv6ai0zd",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/freemium/bootstrap-entry.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
+          "url": "http://127.0.0.1:4176/node_modules/vite/dist/client/env.mjs",
           "status": 304,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/lib/supabase-client.js",
+          "url": "http://127.0.0.1:4176/js/lib/supabase-client.js",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/freemium/auth-session.js",
+          "url": "http://127.0.0.1:4176/js/freemium/auth-session.js",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/freemium/bootstrap.js",
+          "url": "http://127.0.0.1:4176/js/freemium/entitlements-client.js",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/freemium/entitlements-client.js",
+          "url": "http://127.0.0.1:4176/js/freemium/bootstrap.js",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/freemium/paywall-ui.js",
+          "url": "http://127.0.0.1:4176/js/freemium/paywall-ui.js",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/freemium/ads-provider.js",
+          "url": "http://127.0.0.1:4176/assets/svg/props/philosopher-guide.svg?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/assets/svg/props/philosopher-guide.svg?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/freemium/ads-provider.js",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/hebrew-sanitize.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/hebrew-sanitize.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/wr2w-path-core.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/css/freemium.css?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/triples-radar-core.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/css/style.css?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/prism-research-philosophy.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/wr2w-path-core.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/data/feature-feed.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/triples-radar-core.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/nav-map.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/prism-research-philosophy.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/shell-copy.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/data/feature-feed.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/ui-flags.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/nav-map.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/app-overlay.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/shell-copy.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/shell-screen-registry.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/ui-flags.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/app-shell.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/app-overlay.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/question-drill-engine.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/shell-screen-registry.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/feeling-language-bridge.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/app-shell.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/app.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/question-drill-engine.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/version.json?t=1773113179157&v=1.0.230",
+          "url": "http://127.0.0.1:4176/js/feeling-language-bridge.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/data/trap-words.json?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/js/app.js?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/data/meta-model-violations.json?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/version.json?t=1773113643379&v=1.0.231",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/data/meta_model_glossary_breakthroughs.he.json?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/data/trap-words.json?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/data/metaModelPatterns.he.json?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/data/meta_model_glossary_breakthroughs.he.json?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/data/meta_model_glossary_config.he.json?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/data/metaModelPatterns.he.json?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/data/meta_model_glossary_blueprint.he.json?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/data/meta-model-violations.json?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/data/comic-scenarios.json?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/data/meta_model_glossary_config.he.json?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/js/triples-radar.js?v=1.0.230&t=1773113179157",
+          "url": "http://127.0.0.1:4176/data/meta_model_glossary_blueprint.he.json?v=1.0.231&t=1773113643379",
           "status": 200,
           "method": "GET"
         },
         {
-          "url": "http://localhost:5173/assets/audio/the-flawed-map.mp3",
+          "url": "http://127.0.0.1:4176/data/comic-scenarios.json?v=1.0.231&t=1773113643379",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4176/js/triples-radar.js?v=1.0.231&t=1773113643379",
+          "status": 200,
+          "method": "GET"
+        },
+        {
+          "url": "http://127.0.0.1:4176/assets/audio/The_Inner_Task.mp3",
           "status": 206,
           "method": "GET"
         }
       ],
       "action": {
         "mode": "bootstrap",
-        "targetUrl": "http://localhost:5173"
+        "targetUrl": "http://127.0.0.1:4176"
       }
     }
   },
   "counts": {
-    "candidates": 84,
-    "ok": 17,
-    "broken": 1,
-    "skipped": 66,
-    "mainMenuBroken": 1
+    "candidates": 70,
+    "ok": 10,
+    "broken": 0,
+    "skipped": 60,
+    "mainMenuBroken": 0
   },
   "items": [
     {
       "text": "קלאסיק 1 · המבנה הקלאסי",
-      "selector": "a[href=\"http\\:\\/\\/localhost\\:5173\\/classic_classic_trainer\\.html\\?v\\=1\\.0\\.230\\&t\\=1773113179157\"]",
+      "selector": "a[href=\"http://127.0.0.1:4176/classic_classic_trainer.html?v=1.0.231&t=1773113643379\"]",
       "kind": "anchor",
-      "intended": "http://localhost:5173/classic_classic_trainer.html?v=1.0.230&t=1773113179157",
+      "intended": "http://127.0.0.1:4176/classic_classic_trainer.html?v=1.0.231&t=1773113643379",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/classic_classic_trainer.html?v=1.0.230&t=1773113179157",
+      "finalUrl": "http://127.0.0.1:4176/classic_classic_trainer.html?v=1.0.231&t=1773113643379",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -301,147 +280,147 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://localhost:5173/classic_classic_trainer.html?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/classic_classic_trainer.html?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/@vite/client",
+            "url": "http://127.0.0.1:4176/@vite/client",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-platform-contracts.js",
+            "url": "http://127.0.0.1:4176/node_modules/vite/dist/client/env.mjs",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-standalone.js",
+            "url": "http://127.0.0.1:4176/js/trainer-standalone.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
+            "url": "http://127.0.0.1:4176/js/trainer-platform-contracts.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/version.json?_classic_classic=1773113284261-s6ylg2ld99g",
+            "url": "http://127.0.0.1:4176/version.json?_classic_classic=1773144538754-cgvwgunzq3",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/classic-classic.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/classic-classic.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/classic-classic-config.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/classic-classic-config.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/classic-classic-rng.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/classic-classic-rng.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/classic-classic-engine.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/classic-classic-engine.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/classic-classic-app.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/classic-classic-app.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/data/metaModelPatterns.he.json?v=1.0.230-1773113179157",
+            "url": "http://127.0.0.1:4176/data/metaModelPatterns.he.json?v=1.0.231-1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/data/copy.he.json?v=1.0.230-1773113179157",
+            "url": "http://127.0.0.1:4176/data/copy.he.json?v=1.0.231-1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-shell-nav.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/trainer-shell-nav.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/alchemy-global.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/freemium.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/alchemy-global.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/alchemy-global.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/runtime-env.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/alchemy-global.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap-entry.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
+            "url": "http://127.0.0.1:4176/js/lib/supabase-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
+            "url": "http://127.0.0.1:4176/js/freemium/auth-session.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
+            "url": "http://127.0.0.1:4176/js/freemium/entitlements-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
+            "url": "http://127.0.0.1:4176/js/freemium/ads-provider.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
+            "url": "http://127.0.0.1:4176/js/freemium/paywall-ui.js",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://localhost:5173/classic_classic_trainer.html?v=1.0.230&t=1773113179157"
+          "targetUrl": "http://127.0.0.1:4176/classic_classic_trainer.html?v=1.0.231&t=1773113643379"
         }
       }
     },
     {
       "text": "קלאסיק 2 · מבנה הקסם",
-      "selector": "a[href=\"http\\:\\/\\/localhost\\:5173\\/classic2_trainer\\.html\\?v\\=1\\.0\\.230\\&t\\=1773113179157\"]",
+      "selector": "a[href=\"http://127.0.0.1:4176/classic2_trainer.html?v=1.0.231&t=1773113643379\"]",
       "kind": "anchor",
-      "intended": "http://localhost:5173/classic2_trainer.html?v=1.0.230&t=1773113179157",
+      "intended": "http://127.0.0.1:4176/classic2_trainer.html?v=1.0.231&t=1773113643379",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/classic2_trainer.html?v=1.0.230&t=1773113179157",
+      "finalUrl": "http://127.0.0.1:4176/classic2_trainer.html?v=1.0.231&t=1773113643379",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -449,117 +428,117 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://localhost:5173/classic2_trainer.html?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/classic2_trainer.html?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/@vite/client",
+            "url": "http://127.0.0.1:4176/@vite/client",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-platform-contracts.js",
+            "url": "http://127.0.0.1:4176/js/trainer-platform-contracts.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-standalone.js",
+            "url": "http://127.0.0.1:4176/js/trainer-standalone.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
+            "url": "http://127.0.0.1:4176/node_modules/vite/dist/client/env.mjs",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/version.json?_classic2=1773113286987-hghi75wsts6",
+            "url": "http://127.0.0.1:4176/version.json?_classic2=1773144539673-p79zp6uiel",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/classic2-trainer.bundle.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/classic2-trainer.bundle.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-shell-nav.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/trainer-shell-nav.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/alchemy-global.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/alchemy-global.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/freemium.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/alchemy-global.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/runtime-env.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/alchemy-global.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap-entry.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
+            "url": "http://127.0.0.1:4176/js/lib/supabase-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
+            "url": "http://127.0.0.1:4176/js/freemium/auth-session.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
+            "url": "http://127.0.0.1:4176/js/freemium/entitlements-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
+            "url": "http://127.0.0.1:4176/js/freemium/paywall-ui.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
+            "url": "http://127.0.0.1:4176/js/freemium/ads-provider.js",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://localhost:5173/classic2_trainer.html?v=1.0.230&t=1773113179157"
+          "targetUrl": "http://127.0.0.1:4176/classic2_trainer.html?v=1.0.231&t=1773113643379"
         }
       }
     },
     {
       "text": "קצה הקרחון · עצי הבחנה",
-      "selector": "a[href=\"http\\:\\/\\/localhost\\:5173\\/iceberg_templates_trainer\\.html\\?v\\=1\\.0\\.230\\&t\\=1773113179157\"]",
+      "selector": "a[href=\"http://127.0.0.1:4176/iceberg_templates_trainer.html?v=1.0.231&t=1773113643379\"]",
       "kind": "anchor",
-      "intended": "http://localhost:5173/iceberg_templates_trainer.html?v=1.0.230&t=1773113179157",
+      "intended": "http://127.0.0.1:4176/iceberg_templates_trainer.html?v=1.0.231&t=1773113643379",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/iceberg_templates_trainer.html?v=1.0.230&t=1773113179157",
+      "finalUrl": "http://127.0.0.1:4176/iceberg_templates_trainer.html?v=1.0.231&t=1773113643379",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -567,122 +546,122 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://localhost:5173/iceberg_templates_trainer.html?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/iceberg_templates_trainer.html?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/@vite/client",
+            "url": "http://127.0.0.1:4176/@vite/client",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-platform-contracts.js",
+            "url": "http://127.0.0.1:4176/js/trainer-platform-contracts.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-standalone.js",
+            "url": "http://127.0.0.1:4176/js/trainer-standalone.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
+            "url": "http://127.0.0.1:4176/node_modules/vite/dist/client/env.mjs",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/version.json?_iceberg=1773113288221-l1e9tt4tvbg",
+            "url": "http://127.0.0.1:4176/version.json?_iceberg=1773144540714-5ubxpkt1yvt",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/iceberg-templates-trainer.bundle.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/iceberg-templates-trainer.bundle.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-shell-nav.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/trainer-shell-nav.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/alchemy-global.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/data/iceberg-templates-scenarios.he.json?v=1.0.231-1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/alchemy-global.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/data/iceberg-templates-scenarios.he.json?v=1.0.230-1773113179157",
+            "url": "http://127.0.0.1:4176/css/freemium.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/runtime-env.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/alchemy-global.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/alchemy-global.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap-entry.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
+            "url": "http://127.0.0.1:4176/js/lib/supabase-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
+            "url": "http://127.0.0.1:4176/js/freemium/auth-session.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
+            "url": "http://127.0.0.1:4176/js/freemium/entitlements-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
+            "url": "http://127.0.0.1:4176/js/freemium/paywall-ui.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
+            "url": "http://127.0.0.1:4176/js/freemium/ads-provider.js",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://localhost:5173/iceberg_templates_trainer.html?v=1.0.230&t=1773113179157"
+          "targetUrl": "http://127.0.0.1:4176/iceberg_templates_trainer.html?v=1.0.231&t=1773113643379"
         }
       }
     },
     {
       "text": "מחקר פריזמות · חקירה בשרשרת",
-      "selector": "a[href=\"http\\:\\/\\/localhost\\:5173\\/prism_research_trainer\\.html\\?v\\=1\\.0\\.230\\&t\\=1773113179157\"]",
+      "selector": "a[href=\"http://127.0.0.1:4176/prism_research_trainer.html?v=1.0.231&t=1773113643379\"]",
       "kind": "anchor",
-      "intended": "http://localhost:5173/prism_research_trainer.html?v=1.0.230&t=1773113179157",
+      "intended": "http://127.0.0.1:4176/prism_research_trainer.html?v=1.0.231&t=1773113643379",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/prism_research_trainer.html?v=1.0.230&t=1773113179157",
+      "finalUrl": "http://127.0.0.1:4176/prism_research_trainer.html?v=1.0.231&t=1773113643379",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -690,122 +669,122 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://localhost:5173/prism_research_trainer.html?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/prism_research_trainer.html?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/prism-research.css?v=1773113289425",
+            "url": "http://127.0.0.1:4176/@vite/client",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/@vite/client",
+            "url": "http://127.0.0.1:4176/js/trainer-shell-nav.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
+            "url": "http://127.0.0.1:4176/node_modules/vite/dist/client/env.mjs",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-shell-nav.js",
+            "url": "http://127.0.0.1:4176/css/prism-research.css?v=1773144541620",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/freemium.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/alchemy-global.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/alchemy-global.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/prism-research-core.js?v=1773113289425",
+            "url": "http://127.0.0.1:4176/js/runtime-env.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/prism-research-core.js?v=1773144541620",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/alchemy-global.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/alchemy-global.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap-entry.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/prism-research-philosophy.js?v=1773113289425",
+            "url": "http://127.0.0.1:4176/js/prism-research-philosophy.js?v=1773144541620",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
+            "url": "http://127.0.0.1:4176/js/lib/supabase-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
+            "url": "http://127.0.0.1:4176/js/freemium/auth-session.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
+            "url": "http://127.0.0.1:4176/js/freemium/entitlements-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/prism-research-app.js?v=1773113289425",
+            "url": "http://127.0.0.1:4176/js/freemium/paywall-ui.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
+            "url": "http://127.0.0.1:4176/js/freemium/ads-provider.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
+            "url": "http://127.0.0.1:4176/js/prism-research-app.js?v=1773144541620",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/data/metaModelPatterns.he.json?v=1773113289425",
+            "url": "http://127.0.0.1:4176/data/metaModelPatterns.he.json?v=1773144541620",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://localhost:5173/prism_research_trainer.html?v=1.0.230&t=1773113179157"
+          "targetUrl": "http://127.0.0.1:4176/prism_research_trainer.html?v=1.0.231&t=1773113643379"
         }
       }
     },
     {
       "text": "שלשות חיות · תרגול המשפחה המלאה",
-      "selector": "a[href=\"http\\:\\/\\/localhost\\:5173\\/living_triples_trainer\\.html\\?v\\=1\\.0\\.230\\&t\\=1773113179157\"]",
+      "selector": "a[href=\"http://127.0.0.1:4176/living_triples_trainer.html?v=1.0.231&t=1773113643379\"]",
       "kind": "anchor",
-      "intended": "http://localhost:5173/living_triples_trainer.html?v=1.0.230&t=1773113179157",
+      "intended": "http://127.0.0.1:4176/living_triples_trainer.html?v=1.0.231&t=1773113643379",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/living_triples_trainer.html?v=1.0.230&t=1773113179157",
+      "finalUrl": "http://127.0.0.1:4176/living_triples_trainer.html?v=1.0.231&t=1773113643379",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -813,112 +792,112 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://localhost:5173/living_triples_trainer.html?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/living_triples_trainer.html?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/style.css?v=1773113290656",
+            "url": "http://127.0.0.1:4176/css/style.css?v=1773144542520",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/@vite/client",
+            "url": "http://127.0.0.1:4176/js/trainer-shell-nav.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-shell-nav.js",
+            "url": "http://127.0.0.1:4176/@vite/client",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/living-triples.js?v=1773113290656",
+            "url": "http://127.0.0.1:4176/js/living-triples.js?v=1773144542520",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
+            "url": "http://127.0.0.1:4176/css/freemium.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/runtime-env.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/alchemy-global.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/node_modules/vite/dist/client/env.mjs",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/alchemy-global.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/data/living-triples.json",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap-entry.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/data/living-triples.json",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/alchemy-global.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/alchemy-global.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
+            "url": "http://127.0.0.1:4176/js/lib/supabase-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
+            "url": "http://127.0.0.1:4176/js/freemium/auth-session.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
+            "url": "http://127.0.0.1:4176/js/freemium/entitlements-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
+            "url": "http://127.0.0.1:4176/js/freemium/paywall-ui.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
+            "url": "http://127.0.0.1:4176/js/freemium/ads-provider.js",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://localhost:5173/living_triples_trainer.html?v=1.0.230&t=1773113179157"
+          "targetUrl": "http://127.0.0.1:4176/living_triples_trainer.html?v=1.0.231&t=1773113643379"
         }
       }
     },
     {
       "text": "סימולטור סצנות",
-      "selector": "a[href=\"http\\:\\/\\/localhost\\:5173\\/scenario_trainer\\.html\\?v\\=1\\.0\\.230\\&t\\=1773113179157\"]",
+      "selector": "a[href=\"http://127.0.0.1:4176/scenario_trainer.html?v=1.0.231&t=1773113643379\"]",
       "kind": "anchor",
-      "intended": "http://localhost:5173/scenario_trainer.html?v=1.0.230&t=1773113179157",
+      "intended": "http://127.0.0.1:4176/scenario_trainer.html?v=1.0.231&t=1773113643379",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/scenario_trainer.html?v=1.0.230&t=1773113179157",
+      "finalUrl": "http://127.0.0.1:4176/scenario_trainer.html?v=1.0.231&t=1773113643379",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -926,132 +905,132 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://localhost:5173/scenario_trainer.html?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/scenario_trainer.html?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/@vite/client",
+            "url": "http://127.0.0.1:4176/@vite/client",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-platform-contracts.js",
+            "url": "http://127.0.0.1:4176/js/trainer-platform-contracts.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-standalone.js",
+            "url": "http://127.0.0.1:4176/js/trainer-standalone.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
+            "url": "http://127.0.0.1:4176/node_modules/vite/dist/client/env.mjs",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/version.json?_scenario_trainer=1773113291963-9us25sd2825",
+            "url": "http://127.0.0.1:4176/version.json?_scenario_trainer=1773144543592-lfrcl2xrt",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/style.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/scenario-trainer.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/scenario-trainer.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/scenario-trainer-app.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/scenario-trainer-app.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/data/scenario-trainer-scenarios.json",
+            "url": "http://127.0.0.1:4176/data/scenario-trainer-scenarios.json",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-shell-nav.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/trainer-shell-nav.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/alchemy-global.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/alchemy-global.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/freemium.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/runtime-env.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/alchemy-global.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/alchemy-global.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap-entry.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
+            "url": "http://127.0.0.1:4176/js/lib/supabase-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
+            "url": "http://127.0.0.1:4176/js/freemium/auth-session.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
+            "url": "http://127.0.0.1:4176/js/freemium/entitlements-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
+            "url": "http://127.0.0.1:4176/js/freemium/paywall-ui.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
+            "url": "http://127.0.0.1:4176/js/freemium/ads-provider.js",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://localhost:5173/scenario_trainer.html?v=1.0.230&t=1773113179157"
+          "targetUrl": "http://127.0.0.1:4176/scenario_trainer.html?v=1.0.231&t=1773113643379"
         }
       }
     },
     {
       "text": "מאמן פועל לא מפורט",
-      "selector": "a[href=\"http\\:\\/\\/localhost\\:5173\\/verb_unzip_trainer\\.html\\?v\\=1\\.0\\.230\\&t\\=1773113179157\"]",
+      "selector": "a[href=\"http://127.0.0.1:4176/verb_unzip_trainer.html?v=1.0.231&t=1773113643379\"]",
       "kind": "anchor",
-      "intended": "http://localhost:5173/verb_unzip_trainer.html?v=1.0.230&t=1773113179157",
+      "intended": "http://127.0.0.1:4176/verb_unzip_trainer.html?v=1.0.231&t=1773113643379",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/verb_unzip_trainer.html?v=1.0.230&t=1773113179157",
+      "finalUrl": "http://127.0.0.1:4176/verb_unzip_trainer.html?v=1.0.231&t=1773113643379",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -1059,107 +1038,107 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://localhost:5173/verb_unzip_trainer.html?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/verb_unzip_trainer.html?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/@vite/client",
+            "url": "http://127.0.0.1:4176/@vite/client",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/agreement-radar.js",
+            "url": "http://127.0.0.1:4176/node_modules/vite/dist/client/env.mjs",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/audio-manager.js",
+            "url": "http://127.0.0.1:4176/js/trainer-shell-nav.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-shell-nav.js",
+            "url": "http://127.0.0.1:4176/js/agreement-radar.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
+            "url": "http://127.0.0.1:4176/js/audio-manager.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/freemium.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/alchemy-global.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/alchemy-global.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/runtime-env.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/alchemy-global.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap-entry.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/alchemy-global.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
+            "url": "http://127.0.0.1:4176/js/freemium/auth-session.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
+            "url": "http://127.0.0.1:4176/js/freemium/entitlements-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
+            "url": "http://127.0.0.1:4176/js/lib/supabase-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
+            "url": "http://127.0.0.1:4176/js/freemium/paywall-ui.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
+            "url": "http://127.0.0.1:4176/js/freemium/ads-provider.js",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://localhost:5173/verb_unzip_trainer.html?v=1.0.230&t=1773113179157"
+          "targetUrl": "http://127.0.0.1:4176/verb_unzip_trainer.html?v=1.0.231&t=1773113643379"
         }
       }
     },
     {
       "text": "מעבדת שינוי ניסוח",
-      "selector": "a[href=\"http\\:\\/\\/localhost\\:5173\\/sentence_morpher_trainer\\.html\\?v\\=1\\.0\\.230\\&t\\=1773113179157\"]",
+      "selector": "a[href=\"http://127.0.0.1:4176/sentence_morpher_trainer.html?v=1.0.231&t=1773113643379\"]",
       "kind": "anchor",
-      "intended": "http://localhost:5173/sentence_morpher_trainer.html?v=1.0.230&t=1773113179157",
+      "intended": "http://127.0.0.1:4176/sentence_morpher_trainer.html?v=1.0.231&t=1773113643379",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/sentence_morpher_trainer.html?v=1.0.230&t=1773113179157",
+      "finalUrl": "http://127.0.0.1:4176/sentence_morpher_trainer.html?v=1.0.231&t=1773113643379",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -1167,117 +1146,117 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://localhost:5173/sentence_morpher_trainer.html?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/sentence_morpher_trainer.html?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/@vite/client",
+            "url": "http://127.0.0.1:4176/css/style.css?v=1773144545630",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/style.css?v=1773113294446",
+            "url": "http://127.0.0.1:4176/@vite/client",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
+            "url": "http://127.0.0.1:4176/js/trainer-shell-nav.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/trainer-shell-nav.js",
+            "url": "http://127.0.0.1:4176/js/sentence-morpher-core.js?v=1773144545630",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/sentence-morpher-core.js?v=1773113294446",
+            "url": "http://127.0.0.1:4176/css/freemium.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/runtime-env.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/css/alchemy-global.css?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/node_modules/vite/dist/client/env.mjs",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/sentence-morpher.js?v=1773144545630",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/alchemy-global.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap-entry.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/css/alchemy-global.css?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/sentence-morpher.js?v=1773113294446",
+            "url": "http://127.0.0.1:4176/js/lib/supabase-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
+            "url": "http://127.0.0.1:4176/js/freemium/auth-session.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
+            "url": "http://127.0.0.1:4176/js/freemium/entitlements-client.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
+            "url": "http://127.0.0.1:4176/js/alchemy-global.js?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/data/sentence-morpher-exercises.json",
+            "url": "http://127.0.0.1:4176/js/freemium/bootstrap.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
+            "url": "http://127.0.0.1:4176/data/sentence-morpher-exercises.json",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
+            "url": "http://127.0.0.1:4176/js/freemium/paywall-ui.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
+            "url": "http://127.0.0.1:4176/js/freemium/ads-provider.js",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://localhost:5173/sentence_morpher_trainer.html?v=1.0.230&t=1773113179157"
+          "targetUrl": "http://127.0.0.1:4176/sentence_morpher_trainer.html?v=1.0.231&t=1773113643379"
         }
       }
     },
     {
       "text": "פתח את הטבלה המלאה",
-      "selector": "a[href=\"http\\:\\/\\/localhost\\:5173\\/assets\\/svg\\/meta-model-breen-table\\.svg\\?v\\=1\\.0\\.230\\&t\\=1773113179157\"]",
+      "selector": "a[href=\"http://127.0.0.1:4176/assets/svg/meta-model-breen-table.svg?v=1.0.231&t=1773113643379\"]",
       "kind": "anchor",
-      "intended": "http://localhost:5173/assets/svg/meta-model-breen-table.svg?v=1.0.230&t=1773113179157",
+      "intended": "http://127.0.0.1:4176/assets/svg/meta-model-breen-table.svg?v=1.0.231&t=1773113643379",
       "mode": "goto",
       "ok": true,
       "skipped": false,
       "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/assets/svg/meta-model-breen-table.svg?v=1.0.230&t=1773113179157",
+      "finalUrl": "http://127.0.0.1:4176/assets/svg/meta-model-breen-table.svg?v=1.0.231&t=1773113643379",
       "error": null,
       "issues": {
         "consoleErrors": [],
@@ -1285,20 +1264,20 @@
         "requestFailures": [],
         "topLevelResponses": [
           {
-            "url": "http://localhost:5173/assets/svg/meta-model-breen-table.svg?v=1.0.230&t=1773113179157",
+            "url": "http://127.0.0.1:4176/assets/svg/meta-model-breen-table.svg?v=1.0.231&t=1773113643379",
             "status": 200,
             "method": "GET"
           }
         ],
         "action": {
           "mode": "goto",
-          "targetUrl": "http://localhost:5173/assets/svg/meta-model-breen-table.svg?v=1.0.230&t=1773113179157"
+          "targetUrl": "http://127.0.0.1:4176/assets/svg/meta-model-breen-table.svg?v=1.0.231&t=1773113643379"
         }
       }
     },
     {
       "text": "מאגר GitHub",
-      "selector": "a[href=\"https\\:\\/\\/github\\.com\\/streamDragon\\/Meta_Model_app\"]",
+      "selector": "a[href=\"https://github.com/streamDragon/Meta_Model_app\"]",
       "kind": "anchor",
       "intended": "https://github.com/streamDragon/Meta_Model_app",
       "mode": "goto",
@@ -1325,22 +1304,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/primer-react-css.99669752c9021bf4.module.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/54709.8ec14c2a9a0f5a10.module.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/light-34e4cafc720a680c.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/dark-2d2432946ac6e47f.css",
+            "url": "https://github.githubassets.com/assets/keyboard-shortcuts-dialog.24804fee9fc98092.module.css",
             "status": 200,
             "method": "GET"
           },
@@ -1350,37 +1314,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/primer-primitives-16480f699a2fb35f.css",
+            "url": "https://github.githubassets.com/assets/light-34e4cafc720a680c.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/react-core.f20f9d59fc03d59b.module.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/code-0eb15370f045c7e0.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/repository-6784600ba556c086.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/dark_high_contrast-9d25ab297b65d980.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/76936.0b53428c6e1a38ea.module.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/43690.163387653b6bb040.module.css",
+            "url": "https://github.githubassets.com/assets/54709.8ec14c2a9a0f5a10.module.css",
             "status": 200,
             "method": "GET"
           },
@@ -1390,17 +1329,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/notifications-subscriptions-menu.aad6907087c6cd73.module.css",
+            "url": "https://github.githubassets.com/assets/repository-6784600ba556c086.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/global-a469e846088cc1bf.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/code-view.29ca70990d63ae1f.module.css",
+            "url": "https://github.githubassets.com/assets/code-0eb15370f045c7e0.css",
             "status": 200,
             "method": "GET"
           },
@@ -1410,12 +1344,57 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/dark-2d2432946ac6e47f.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/code-view.29ca70990d63ae1f.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/notifications-subscriptions-menu.aad6907087c6cd73.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/76936.0b53428c6e1a38ea.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/primer-primitives-16480f699a2fb35f.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/primer-react-css.99669752c9021bf4.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/global-a469e846088cc1bf.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/github-6e7c458caf1e80bb.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/keyboard-shortcuts-dialog.24804fee9fc98092.module.css",
+            "url": "https://github.githubassets.com/assets/dark_high_contrast-9d25ab297b65d980.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/react-core.f20f9d59fc03d59b.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/43690.163387653b6bb040.module.css",
             "status": 200,
             "method": "GET"
           },
@@ -1425,27 +1404,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/wp-runtime-8c9633785ee77b18.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.githubassets.com/assets/28839-734cb6d8a7150172.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/environment-990d83f9bff5b0e9.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/runtime-helpers-3bb6f7d6b7a2f531.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/2966-f6796bfd155feae1.js",
+            "url": "https://github.githubassets.com/assets/wp-runtime-f501526071b2568d.js",
             "status": 200,
             "method": "GET"
           },
@@ -1455,7 +1419,17 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/41013-7a6deee6d6ff15eb.js",
+            "url": "https://github.githubassets.com/assets/34646-e68f26aaba7f2b0d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/runtime-helpers-3bb6f7d6b7a2f531.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/environment-990d83f9bff5b0e9.js",
             "status": 200,
             "method": "GET"
           },
@@ -1465,22 +1439,17 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/2966-f6796bfd155feae1.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/51210-3abb7238871a5b29.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/34646-e68f26aaba7f2b0d.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/element-registry-dabacad6389841f9.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/81683-1370179bf9bdc0f0.js",
+            "url": "https://github.githubassets.com/assets/41013-7a6deee6d6ff15eb.js",
             "status": 200,
             "method": "GET"
           },
@@ -1490,12 +1459,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/81751-2c06efb98b9460b1.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/react-core-ce3753a0f392ee71.js",
+            "url": "https://github.githubassets.com/assets/81683-1370179bf9bdc0f0.js",
             "status": 200,
             "method": "GET"
           },
@@ -1505,12 +1469,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/61110-93cf7706e5dc8bfa.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/79039-2565b539a6ebc09b.js",
+            "url": "https://github.githubassets.com/assets/element-registry-dabacad6389841f9.js",
             "status": 200,
             "method": "GET"
           },
@@ -1525,22 +1484,17 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/61110-93cf7706e5dc8bfa.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/2887-47ac9a4b8862e6bf.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/26533-2961d590db2a09c3.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/2498-7a413c8209222158.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/46287-7b500b5354119a88.js",
+            "url": "https://github.githubassets.com/assets/79039-2565b539a6ebc09b.js",
             "status": 200,
             "method": "GET"
           },
@@ -1550,7 +1504,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/54841-6de5d7633afc27d6.js",
+            "url": "https://github.githubassets.com/assets/81751-2c06efb98b9460b1.js",
             "status": 200,
             "method": "GET"
           },
@@ -1560,7 +1514,17 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/49029-6c429c0e1bbd1e79.js",
+            "url": "https://github.githubassets.com/assets/46287-7b500b5354119a88.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/54841-6de5d7633afc27d6.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/react-core-ce3753a0f392ee71.js",
             "status": 200,
             "method": "GET"
           },
@@ -1570,22 +1534,12 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/2498-7a413c8209222158.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/89627-fc3955a85261a02a.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/99328-5e06da57c4622e21.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/61075-6d5c1005b38602d6.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/38302-841b0fa97d5950a1.js",
             "status": 200,
             "method": "GET"
           },
@@ -1595,67 +1549,27 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/32225-0f598a4a1b50cbd4.js",
+            "url": "https://github.githubassets.com/assets/99328-5e06da57c4622e21.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/codespaces-f5257279c46939d1.js",
+            "url": "https://github.githubassets.com/assets/49029-6c429c0e1bbd1e79.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/behaviors-24134d767cd69dd5.js",
+            "url": "https://github.githubassets.com/assets/61075-6d5c1005b38602d6.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/19262-313c6e4aa6bc1abc.js",
+            "url": "https://github.githubassets.com/assets/26533-2961d590db2a09c3.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/19930-d7474e22a5e73a83.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/notifications-global-3413132b6df94f22.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/99291-6f4866190d0539e5.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/34140-bd56b738d77cb446.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/89756-4280abf10da82907.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/3064-ee1625cf0fbcd858.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/repositories-a4c95aa50e3afd70.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/code-menu-34c67a8e6616ccae.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/17383-515769b6825447e0.js",
+            "url": "https://github.githubassets.com/assets/38302-841b0fa97d5950a1.js",
             "status": 200,
             "method": "GET"
           },
@@ -1670,22 +1584,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/21122-b3cc5a80945950fe.js",
+            "url": "https://github.githubassets.com/assets/notifications-global-3413132b6df94f22.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/18549-7bd99002ba6af757.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/octicons-react-6e60bcde38f313de.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/68751-fe5cb40b5547c377.js",
+            "url": "https://github.githubassets.com/assets/19262-313c6e4aa6bc1abc.js",
             "status": 200,
             "method": "GET"
           },
@@ -1695,12 +1599,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/63991-125a5c660965e63e.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/26557-776b32c6f13b21b9.js",
+            "url": "https://github.githubassets.com/assets/repositories-a4c95aa50e3afd70.js",
             "status": 200,
             "method": "GET"
           },
@@ -1710,7 +1609,82 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/36600-c11fb7f0590d284c.js",
+            "url": "https://github.githubassets.com/assets/89756-4280abf10da82907.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/code-menu-34c67a8e6616ccae.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/68751-fe5cb40b5547c377.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/99291-6f4866190d0539e5.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/32225-0f598a4a1b50cbd4.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/34140-bd56b738d77cb446.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/3064-ee1625cf0fbcd858.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/codespaces-f5257279c46939d1.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/behaviors-24134d767cd69dd5.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/21122-b3cc5a80945950fe.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/19930-d7474e22a5e73a83.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/octicons-react-6e60bcde38f313de.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/17383-515769b6825447e0.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/18549-7bd99002ba6af757.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/26557-776b32c6f13b21b9.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/63991-125a5c660965e63e.js",
             "status": 200,
             "method": "GET"
           },
@@ -1720,22 +1694,17 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/primer-react-00bb000faf12211b.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.githubassets.com/assets/66231-e6e39ee93d5d7dba.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/24787-294e035d71f30b9e.js",
+            "url": "https://github.githubassets.com/assets/primer-react-00bb000faf12211b.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/7053-f4bd13214a8bd433.js",
+            "url": "https://github.githubassets.com/assets/36600-c11fb7f0590d284c.js",
             "status": 200,
             "method": "GET"
           },
@@ -1751,6 +1720,16 @@
           },
           {
             "url": "https://github.githubassets.com/assets/17363-e3dd517653b6b9ee.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/24787-294e035d71f30b9e.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/7053-f4bd13214a8bd433.js",
             "status": 200,
             "method": "GET"
           },
@@ -1775,8 +1754,18 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/18222-498ac30c45b2263a.js",
+            "url": "https://github.githubassets.com/assets/89979-8a9fde6ede233fbc.js",
             "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/49972-94c3370fcc3392bd.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.com/streamDragon/Meta_Model_app/hovercards/citation/sidebar_partial?tree_name=main",
+            "status": 204,
             "method": "GET"
           },
           {
@@ -1785,12 +1774,22 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/89979-8a9fde6ede233fbc.js",
+            "url": "https://github.githubassets.com/assets/38963.4471fd1028c7217e.module.css",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/49972-94c3370fcc3392bd.js",
+            "url": "https://github.githubassets.com/assets/18222-498ac30c45b2263a.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/54709-20a6df5daf162dc2.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.com/streamDragon/Meta_Model_app/packages_list?current_repository=Meta_Model_app",
             "status": 200,
             "method": "GET"
           },
@@ -1810,12 +1809,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/33684-3f07b96816e44898.js",
+            "url": "https://github.githubassets.com/assets/code-view-ae6047cbe729a2b7.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/code-view-ae6047cbe729a2b7.js",
+            "url": "https://github.githubassets.com/assets/33684-3f07b96816e44898.js",
             "status": 200,
             "method": "GET"
           },
@@ -1825,22 +1824,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/76936-fe137b79363a0da0.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/54709-20a6df5daf162dc2.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/26497-926b640b0bb639e2.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.githubassets.com/assets/50687-9093e1204eefab4c.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/51431-dba0579a3245b1fb.js",
             "status": 200,
             "method": "GET"
           },
@@ -1850,7 +1839,12 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/51431-dba0579a3245b1fb.js",
+            "url": "https://github.githubassets.com/assets/26497-926b640b0bb639e2.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/76936-fe137b79363a0da0.js",
             "status": 200,
             "method": "GET"
           },
@@ -1865,31 +1859,6 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/43690-49ca916ebb33e3d4.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/46752-46c707717fcbe6a9.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/38963.4471fd1028c7217e.module.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/70168.374ce4e648336309.module.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/chunk-51591-1317e890ac47146b.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.githubassets.com/assets/chunk-34877-fdaec2d7ab775509.js",
             "status": 200,
             "method": "GET"
@@ -1900,17 +1869,37 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/62758-90f5c6b8a7745117.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.githubassets.com/assets/chunk-82097-6038f37a0b084c85.js",
             "status": 200,
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/2694-eb7c55471169d0e6.js",
+            "url": "https://github.githubassets.com/assets/62758-90f5c6b8a7745117.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-51591-1317e890ac47146b.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/70168.374ce4e648336309.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.com/streamDragon/Meta_Model_app/contributors_list?current_repository=Meta_Model_app&deferred=true",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/43690-49ca916ebb33e3d4.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/46752-46c707717fcbe6a9.js",
             "status": 200,
             "method": "GET"
           },
@@ -1925,12 +1914,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-54704-60e579bce7e6a41e.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/55077-5c9ca4985817e0f1.js",
+            "url": "https://github.githubassets.com/assets/2694-eb7c55471169d0e6.js",
             "status": 200,
             "method": "GET"
           },
@@ -1945,6 +1929,41 @@
             "method": "GET"
           },
           {
+            "url": "https://github.githubassets.com/assets/55077-5c9ca4985817e0f1.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-54704-60e579bce7e6a41e.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/36469-51b6bcab1c59653f.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/24647-f06c333cee530497.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/71236-ed1398bff632952c.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/34287-a8b227a7a9cf3f08.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/86361-af64bbfd76b6ad06.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
             "url": "https://github.githubassets.com/assets/chunk-46661-ffaf826ae5730065.js",
             "status": 200,
             "method": "GET"
@@ -1955,42 +1974,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/24647-f06c333cee530497.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/36469-51b6bcab1c59653f.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/71236-ed1398bff632952c.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/86361-af64bbfd76b6ad06.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.githubassets.com/assets/34287-a8b227a7a9cf3f08.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
             "url": "https://github.githubassets.com/assets/39007.fa471facf86f7401.module.css",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.com/streamDragon/Meta_Model_app/branch-and-tag-count",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.com/streamDragon/Meta_Model_app/recently-touched-branches",
             "status": 200,
             "method": "GET"
           },
@@ -2000,12 +1984,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.com/streamDragon/Meta_Model_app/contributors_list?current_repository=Meta_Model_app&deferred=true",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.com/streamDragon/Meta_Model_app/packages_list?current_repository=Meta_Model_app",
+            "url": "https://github.com/streamDragon/Meta_Model_app/branch-and-tag-count",
             "status": 200,
             "method": "GET"
           },
@@ -2015,17 +1994,7 @@
             "method": "GET"
           },
           {
-            "url": "https://github.com/streamDragon/Meta_Model_app/hovercards/citation/sidebar_partial?tree_name=main",
-            "status": 204,
-            "method": "GET"
-          },
-          {
             "url": "https://github.com/streamDragon/Meta_Model_app/tree-commit-info",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "https://github.com/streamDragon/Meta_Model_app/refs?type=branch",
             "status": 200,
             "method": "GET"
           },
@@ -2035,12 +2004,47 @@
             "method": "GET"
           },
           {
-            "url": "https://github.githubassets.com/assets/chunk-85825-b95e00c532a6f285.js",
+            "url": "https://github.com/streamDragon/Meta_Model_app/recently-touched-branches",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.com/streamDragon/Meta_Model_app/refs?type=branch",
             "status": 200,
             "method": "GET"
           },
           {
             "url": "https://github.githubassets.com/assets/71849.b14e1e974c4f6e65.module.css",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://avatars.githubusercontent.com/u/64856880?s=64&v=4",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://avatars.githubusercontent.com/u/64856880?v=4&size=40",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-85825-b95e00c532a6f285.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/chunk-lazy-react-partial-appearance-settings-9ad68e554e3b5b47.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/8814-70e5196bf51a657d.js",
+            "status": 200,
+            "method": "GET"
+          },
+          {
+            "url": "https://github.githubassets.com/assets/31843-93e7479cb87d497d.js",
             "status": 200,
             "method": "GET"
           }
@@ -2056,283 +2060,13 @@
       "selector": "#app-sticky-home-btn",
       "kind": "button",
       "intended": "click",
-      "mode": "click",
-      "ok": false,
-      "skipped": false,
-      "responseStatus": 200,
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
       "finalUrl": null,
-      "error": "locator.click: Timeout 10000ms exceeded. Call log: \u001b[2m - waiting for locator('#app-sticky-home-btn').first()\u001b[22m \u001b[2m - locator resolved to <button disabled type=\"button\" aria-current=\"page\" id=\"app-sticky-home-btn\" class=\"btn btn-secondary app-sticky-banner__action-btn action-button\">חזרה לבית</…",
-      "issues": {
-        "consoleErrors": [],
-        "pageErrors": [],
-        "requestFailures": [
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          }
-        ],
-        "topLevelResponses": [
-          {
-            "url": "http://localhost:5173/",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113306302-cqw0nw48qum",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113306540-7g8xjlyb4g3",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/svg/props/philosopher-guide.svg?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/hebrew-sanitize.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/wr2w-path-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/prism-research-philosophy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/data/feature-feed.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/nav-map.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-copy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/ui-flags.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-overlay.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-screen-registry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-shell.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/question-drill-engine.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/feeling-language-bridge.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?t=1773113179157&v=1.0.230",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/trap-words.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta-model-violations.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_breakthroughs.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/metaModelPatterns.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_config.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_blueprint.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/comic-scenarios.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/audio/The_Inner_Task.mp3",
-            "status": 206,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          }
-        ],
-        "action": {
-          "mode": "click",
-          "selector": "#app-sticky-home-btn"
-        }
-      }
+      "error": null,
+      "issues": null
     },
     {
       "text": "✕",
@@ -2349,7 +2083,7 @@
     },
     {
       "text": "בית",
-      "selector": ".tab-btn[data-tab=\"home\"]",
+      "selector": "[data-tab=\"home\"]",
       "kind": "tab-button",
       "intended": "home",
       "mode": "skip",
@@ -2362,7 +2096,7 @@
     },
     {
       "text": "במת קומיקס רגשי",
-      "selector": ".tab-btn[data-tab=\"comic-engine\"]",
+      "selector": "[data-tab=\"comic-engine\"]",
       "kind": "tab-button",
       "intended": "comic-engine",
       "mode": "skip",
@@ -2375,7 +2109,7 @@
     },
     {
       "text": "מילון הקטגוריות",
-      "selector": ".tab-btn[data-tab=\"categories\"]",
+      "selector": "[data-tab=\"categories\"]",
       "kind": "tab-button",
       "intended": "categories",
       "mode": "skip",
@@ -2388,7 +2122,7 @@
     },
     {
       "text": "תרגול זיהוי",
-      "selector": ".tab-btn[data-tab=\"practice-question\"]",
+      "selector": "[data-tab=\"practice-question\"]",
       "kind": "tab-button",
       "intended": "practice-question",
       "mode": "skip",
@@ -2401,7 +2135,7 @@
     },
     {
       "text": "מכ״ם מטה-מודל",
-      "selector": ".tab-btn[data-tab=\"practice-radar\"]",
+      "selector": "[data-tab=\"practice-radar\"]",
       "kind": "tab-button",
       "intended": "practice-radar",
       "mode": "skip",
@@ -2414,7 +2148,7 @@
     },
     {
       "text": "מכ״ם שלשות",
-      "selector": ".tab-btn[data-tab=\"practice-triples-radar\"]",
+      "selector": "[data-tab=\"practice-triples-radar\"]",
       "kind": "tab-button",
       "intended": "practice-triples-radar",
       "mode": "skip",
@@ -2427,7 +2161,7 @@
     },
     {
       "text": "גשר תחושה-שפה",
-      "selector": ".tab-btn[data-tab=\"practice-wizard\"]",
+      "selector": "[data-tab=\"practice-wizard\"]",
       "kind": "tab-button",
       "intended": "practice-wizard",
       "mode": "skip",
@@ -2440,7 +2174,7 @@
     },
     {
       "text": "מרכז כלים",
-      "selector": ".tab-btn[data-tab=\"practice-verb-unzip\"]",
+      "selector": "[data-tab=\"practice-verb-unzip\"]",
       "kind": "tab-button",
       "intended": "practice-verb-unzip",
       "mode": "skip",
@@ -2453,7 +2187,7 @@
     },
     {
       "text": "בונה מהלך",
-      "selector": ".tab-btn[data-tab=\"blueprint\"]",
+      "selector": "[data-tab=\"blueprint\"]",
       "kind": "tab-button",
       "intended": "blueprint",
       "mode": "skip",
@@ -2466,7 +2200,7 @@
     },
     {
       "text": "מעבדת פריזמות",
-      "selector": ".tab-btn[data-tab=\"prismlab\"]",
+      "selector": "[data-tab=\"prismlab\"]",
       "kind": "tab-button",
       "intended": "prismlab",
       "mode": "skip",
@@ -2479,7 +2213,7 @@
     },
     {
       "text": "על המוצר",
-      "selector": ".tab-btn[data-tab=\"about\"]",
+      "selector": "[data-tab=\"about\"]",
       "kind": "tab-button",
       "intended": "about",
       "mode": "skip",
@@ -2492,7 +2226,7 @@
     },
     {
       "text": "מעבדת פריזמות · חקירה בשכבות",
-      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(2) > div.feature-map-links > button.btn.btn-secondary",
+      "selector": "button[onclick*=\"navigateTo\"][onclick*=\"prismlab\"]",
       "kind": "button",
       "intended": "prismlab",
       "mode": "skip",
@@ -2505,7 +2239,7 @@
     },
     {
       "text": "מכ״ם שלשות (ברין)",
-      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(3) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(1)",
+      "selector": "button[onclick*=\"navigateTo\"][onclick*=\"practice-triples-radar\"]",
       "kind": "button",
       "intended": "practice-triples-radar",
       "mode": "skip",
@@ -2518,7 +2252,7 @@
     },
     {
       "text": "מילון קטגוריות המטה-מודל",
-      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(3) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(2)",
+      "selector": "button[onclick*=\"navigateTo\"][onclick*=\"categories\"]",
       "kind": "button",
       "intended": "categories",
       "mode": "skip",
@@ -2531,7 +2265,7 @@
     },
     {
       "text": "תרגול זיהוי המטה-מודל",
-      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(4) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(1)",
+      "selector": "button[onclick*=\"navigateTo\"][onclick*=\"practice-question\"]",
       "kind": "button",
       "intended": "practice-question",
       "mode": "skip",
@@ -2544,7 +2278,7 @@
     },
     {
       "text": "מכ״ם מטה-מודל",
-      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(4) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(2)",
+      "selector": "button[onclick*=\"navigateTo\"][onclick*=\"practice-radar\"]",
       "kind": "button",
       "intended": "practice-radar",
       "mode": "skip",
@@ -2557,7 +2291,7 @@
     },
     {
       "text": "גשר תחושה-שפה",
-      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(4) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(3)",
+      "selector": "button[onclick*=\"navigateTo\"][onclick*=\"practice-wizard\"]",
       "kind": "button",
       "intended": "practice-wizard",
       "mode": "skip",
@@ -2570,7 +2304,7 @@
     },
     {
       "text": "בונה מהלך",
-      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(4) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(4)",
+      "selector": "button[onclick*=\"navigateTo\"][onclick*=\"blueprint\"]",
       "kind": "button",
       "intended": "blueprint",
       "mode": "skip",
@@ -2583,7 +2317,7 @@
     },
     {
       "text": "במת קומיקס רגשי",
-      "selector": "details.feature-map-toggle.is-menu-enhanced > div.feature-map-body > div.feature-map-grid:nth-of-type(2) > section.feature-map-card:nth-of-type(4) > div.feature-map-links > button.btn.btn-secondary:nth-of-type(5)",
+      "selector": "button[onclick*=\"navigateTo\"][onclick*=\"comic-engine\"]",
       "kind": "button",
       "intended": "comic-engine",
       "mode": "skip",
@@ -2621,1955 +2355,6 @@
       "issues": null
     },
     {
-      "text": "התחל עם גשר תחושה־שפה",
-      "selector": "div.lab-container-workspace:nth-of-type(1) > div.home-shell-workspace > article.home-route-hero.home-route-desktop-only > div.home-route-hero-copy:nth-of-type(2) > div.home-route-cta-row:nth-of-type(2) > button.btn.btn-primary",
-      "kind": "button",
-      "intended": "practice-wizard",
-      "mode": "click",
-      "ok": true,
-      "skipped": false,
-      "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/feature/practice-wizard?v=1.0.230&t=1773113179157",
-      "error": null,
-      "issues": {
-        "consoleErrors": [],
-        "pageErrors": [],
-        "requestFailures": [
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          }
-        ],
-        "topLevelResponses": [
-          {
-            "url": "http://localhost:5173/",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113319370-diyfcs367n",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113319616-2186s7dxrd2",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/svg/props/philosopher-guide.svg?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/hebrew-sanitize.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/wr2w-path-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/prism-research-philosophy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/data/feature-feed.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/nav-map.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-copy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/ui-flags.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-overlay.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-screen-registry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-shell.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/question-drill-engine.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/feeling-language-bridge.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?t=1773113179157&v=1.0.230",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/trap-words.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta-model-violations.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_breakthroughs.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/metaModelPatterns.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_config.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_blueprint.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/comic-scenarios.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/audio/the-flawed-map.mp3",
-            "status": 206,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/feature/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
-            "method": "GET"
-          }
-        ],
-        "action": {
-          "mode": "click",
-          "selector": "div.lab-container-workspace:nth-of-type(1) > div.home-shell-workspace > article.home-route-hero.home-route-desktop-only > div.home-route-hero-copy:nth-of-type(2) > div.home-route-cta-row:nth-of-type(2) > button.btn.btn-primary"
-        }
-      }
-    },
-    {
-      "text": "פתח גשר",
-      "selector": "div.lab-container > div.lab-container-workspace:nth-of-type(1) > div.home-shell-workspace > section.home-route-features.home-route-desktop-only:nth-of-type(2) > article.home-route-feature-card:nth-of-type(1) > button.btn.btn-secondary",
-      "kind": "button",
-      "intended": "practice-wizard",
-      "mode": "click",
-      "ok": true,
-      "skipped": false,
-      "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/feature/practice-wizard?v=1.0.230&t=1773113179157",
-      "error": null,
-      "issues": {
-        "consoleErrors": [],
-        "pageErrors": [],
-        "requestFailures": [
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          }
-        ],
-        "topLevelResponses": [
-          {
-            "url": "http://localhost:5173/",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113326701-3hankd7l678",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113326847-w8zissrq0mj",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/svg/props/philosopher-guide.svg?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/hebrew-sanitize.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/wr2w-path-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/prism-research-philosophy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/data/feature-feed.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/nav-map.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-copy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/ui-flags.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-overlay.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-screen-registry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-shell.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/question-drill-engine.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/feeling-language-bridge.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?t=1773113179157&v=1.0.230",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/trap-words.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta-model-violations.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_breakthroughs.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/metaModelPatterns.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_config.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_blueprint.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/comic-scenarios.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/audio/mind-alchemy.mp3",
-            "status": 206,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/feature/assets/audio/the-flawed-map.mp3",
-            "status": 200,
-            "method": "GET"
-          }
-        ],
-        "action": {
-          "mode": "click",
-          "selector": "div.lab-container > div.lab-container-workspace:nth-of-type(1) > div.home-shell-workspace > section.home-route-features.home-route-desktop-only:nth-of-type(2) > article.home-route-feature-card:nth-of-type(1) > button.btn.btn-secondary"
-        }
-      }
-    },
-    {
-      "text": "פתח תרגול זיהוי",
-      "selector": "div.lab-container > div.lab-container-workspace:nth-of-type(1) > div.home-shell-workspace > section.home-route-features.home-route-desktop-only:nth-of-type(2) > article.home-route-feature-card:nth-of-type(3) > button.btn.btn-secondary",
-      "kind": "button",
-      "intended": "practice-question",
-      "mode": "click",
-      "ok": true,
-      "skipped": false,
-      "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/feature/practice-question?v=1.0.230&t=1773113179157",
-      "error": null,
-      "issues": {
-        "consoleErrors": [],
-        "pageErrors": [],
-        "requestFailures": [
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          }
-        ],
-        "topLevelResponses": [
-          {
-            "url": "http://localhost:5173/",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113333751-2fgaxy93yvh",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113333894-02dw3h5o7h7c",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/svg/props/philosopher-guide.svg?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/hebrew-sanitize.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/wr2w-path-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/prism-research-philosophy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/data/feature-feed.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/nav-map.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-copy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/ui-flags.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-overlay.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-screen-registry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-shell.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/question-drill-engine.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/feeling-language-bridge.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?t=1773113179157&v=1.0.230",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/trap-words.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta-model-violations.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_breakthroughs.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/metaModelPatterns.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_config.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_blueprint.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/comic-scenarios.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/audio/mind-alchemy.mp3",
-            "status": 206,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/feature/assets/audio/The_Inner_Task.mp3",
-            "status": 200,
-            "method": "GET"
-          }
-        ],
-        "action": {
-          "mode": "click",
-          "selector": "div.lab-container > div.lab-container-workspace:nth-of-type(1) > div.home-shell-workspace > section.home-route-features.home-route-desktop-only:nth-of-type(2) > article.home-route-feature-card:nth-of-type(3) > button.btn.btn-secondary"
-        }
-      }
-    },
-    {
-      "text": "פתח מעבדה",
-      "selector": "div.lab-container > div.lab-container-workspace:nth-of-type(1) > div.home-shell-workspace > section.home-route-features.home-route-desktop-only:nth-of-type(2) > article.home-route-feature-card:nth-of-type(4) > button.btn.btn-secondary",
-      "kind": "button",
-      "intended": "prismlab",
-      "mode": "click",
-      "ok": true,
-      "skipped": false,
-      "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/feature/prismlab?v=1.0.230&t=1773113179157",
-      "error": null,
-      "issues": {
-        "consoleErrors": [],
-        "pageErrors": [],
-        "requestFailures": [
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          }
-        ],
-        "topLevelResponses": [
-          {
-            "url": "http://localhost:5173/",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113340790-pbhfpdpuhga",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113340932-nun8o5cjvfk",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/svg/props/philosopher-guide.svg?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/hebrew-sanitize.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/wr2w-path-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/prism-research-philosophy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/data/feature-feed.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/nav-map.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-copy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/ui-flags.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-overlay.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-screen-registry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-shell.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/question-drill-engine.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/feeling-language-bridge.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?t=1773113179157&v=1.0.230",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/trap-words.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta-model-violations.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_breakthroughs.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/metaModelPatterns.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_config.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_blueprint.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/comic-scenarios.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/audio/The_Inner_Task.mp3",
-            "status": 206,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/feature/assets/audio/mind-alchemy.mp3",
-            "status": 200,
-            "method": "GET"
-          }
-        ],
-        "action": {
-          "mode": "click",
-          "selector": "div.lab-container > div.lab-container-workspace:nth-of-type(1) > div.home-shell-workspace > section.home-route-features.home-route-desktop-only:nth-of-type(2) > article.home-route-feature-card:nth-of-type(4) > button.btn.btn-secondary"
-        }
-      }
-    },
-    {
-      "text": "גשר תחושה־שפה",
-      "selector": "div.home-shell-workspace > section.home-route-primary-cta.home-route-desktop-only:nth-of-type(3) > div.home-route-primary-grid:nth-of-type(1) > article.home-route-secondary:nth-of-type(1) > div.home-route-cta-row:nth-of-type(2) > button.btn.btn-secondary:nth-of-type(1)",
-      "kind": "button",
-      "intended": "practice-wizard",
-      "mode": "click",
-      "ok": true,
-      "skipped": false,
-      "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/feature/practice-wizard?v=1.0.230&t=1773113179157",
-      "error": null,
-      "issues": {
-        "consoleErrors": [],
-        "pageErrors": [],
-        "requestFailures": [
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          }
-        ],
-        "topLevelResponses": [
-          {
-            "url": "http://localhost:5173/",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113347852-4p3nhakqopq",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113348016-al8auvcd03v",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/hebrew-sanitize.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/svg/props/philosopher-guide.svg?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/wr2w-path-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/prism-research-philosophy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/data/feature-feed.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/nav-map.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-copy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/ui-flags.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-overlay.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-screen-registry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-shell.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/question-drill-engine.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/feeling-language-bridge.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?t=1773113179157&v=1.0.230",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/trap-words.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta-model-violations.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_breakthroughs.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/metaModelPatterns.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_config.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_blueprint.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/comic-scenarios.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/audio/the-flawed-map.mp3",
-            "status": 206,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/feature/assets/audio/alchemy-of-thought.mp3",
-            "status": 200,
-            "method": "GET"
-          }
-        ],
-        "action": {
-          "mode": "click",
-          "selector": "div.home-shell-workspace > section.home-route-primary-cta.home-route-desktop-only:nth-of-type(3) > div.home-route-primary-grid:nth-of-type(1) > article.home-route-secondary:nth-of-type(1) > div.home-route-cta-row:nth-of-type(2) > button.btn.btn-secondary:nth-of-type(1)"
-        }
-      }
-    },
-    {
-      "text": "תרגול זיהוי",
-      "selector": "div.home-shell-workspace > section.home-route-primary-cta.home-route-desktop-only:nth-of-type(3) > div.home-route-primary-grid:nth-of-type(1) > article.home-route-secondary:nth-of-type(1) > div.home-route-cta-row:nth-of-type(2) > button.btn.btn-primary:nth-of-type(2)",
-      "kind": "button",
-      "intended": "practice-question",
-      "mode": "click",
-      "ok": true,
-      "skipped": false,
-      "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/feature/practice-question?v=1.0.230&t=1773113179157",
-      "error": null,
-      "issues": {
-        "consoleErrors": [],
-        "pageErrors": [],
-        "requestFailures": [
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          }
-        ],
-        "topLevelResponses": [
-          {
-            "url": "http://localhost:5173/",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113354987-67s6vyayexv",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113355131-a4u48q3vpb7",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/svg/props/philosopher-guide.svg?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/hebrew-sanitize.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/wr2w-path-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/prism-research-philosophy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/data/feature-feed.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/nav-map.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-copy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/ui-flags.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-overlay.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-screen-registry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-shell.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/question-drill-engine.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/feeling-language-bridge.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?t=1773113179157&v=1.0.230",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/trap-words.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta-model-violations.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_breakthroughs.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/metaModelPatterns.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_config.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_blueprint.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/comic-scenarios.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/audio/The_Inner_Task.mp3",
-            "status": 206,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/feature/assets/audio/mind-alchemy.mp3",
-            "status": 200,
-            "method": "GET"
-          }
-        ],
-        "action": {
-          "mode": "click",
-          "selector": "div.home-shell-workspace > section.home-route-primary-cta.home-route-desktop-only:nth-of-type(3) > div.home-route-primary-grid:nth-of-type(1) > article.home-route-secondary:nth-of-type(1) > div.home-route-cta-row:nth-of-type(2) > button.btn.btn-primary:nth-of-type(2)"
-        }
-      }
-    },
-    {
-      "text": "פתח מילון",
-      "selector": "div.home-shell-workspace > section.home-route-primary-cta.home-route-desktop-only:nth-of-type(3) > div.home-route-primary-grid:nth-of-type(1) > article.home-route-secondary.home-route-secondary--support:nth-of-type(2) > div.home-route-cta-row:nth-of-type(2) > button.btn.btn-secondary:nth-of-type(2)",
-      "kind": "button",
-      "intended": "categories",
-      "mode": "click",
-      "ok": true,
-      "skipped": false,
-      "responseStatus": 200,
-      "finalUrl": "http://localhost:5173/feature/categories?v=1.0.230&t=1773113179157",
-      "error": null,
-      "issues": {
-        "consoleErrors": [],
-        "pageErrors": [],
-        "requestFailures": [
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          },
-          {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
-            "method": "GET",
-            "errorText": "net::ERR_ABORTED",
-            "resourceType": "script"
-          }
-        ],
-        "topLevelResponses": [
-          {
-            "url": "http://localhost:5173/",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113362029-7swmo781e5r",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/style.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/css/freemium.css?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/runtime-env.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap-entry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/@vite/client",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?_gscb=1773113362196-zh1mqcntpu",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/lib/supabase-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/auth-session.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/entitlements-client.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/node_modules/vite/dist/client/env.mjs",
-            "status": 304,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/bootstrap.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/svg/props/philosopher-guide.svg?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/paywall-ui.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/freemium/ads-provider.js",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/hebrew-sanitize.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/wr2w-path-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar-core.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/prism-research-philosophy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/data/feature-feed.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/nav-map.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-copy.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/ui-flags.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-overlay.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/shell-screen-registry.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app-shell.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/question-drill-engine.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/feeling-language-bridge.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/app.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/version.json?t=1773113179157&v=1.0.230",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/trap-words.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta-model-violations.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_breakthroughs.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/metaModelPatterns.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_config.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/meta_model_glossary_blueprint.he.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/data/comic-scenarios.json?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/assets/audio/The_Inner_Task.mp3",
-            "status": 206,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/js/triples-radar.js?v=1.0.230&t=1773113179157",
-            "status": 200,
-            "method": "GET"
-          },
-          {
-            "url": "http://localhost:5173/feature/assets/audio/alchemy-of-thought.mp3",
-            "status": 200,
-            "method": "GET"
-          }
-        ],
-        "action": {
-          "mode": "click",
-          "selector": "div.home-shell-workspace > section.home-route-primary-cta.home-route-desktop-only:nth-of-type(3) > div.home-route-primary-grid:nth-of-type(1) > article.home-route-secondary.home-route-secondary--support:nth-of-type(2) > div.home-route-cta-row:nth-of-type(2) > button.btn.btn-secondary:nth-of-type(2)"
-        }
-      }
-    },
-    {
       "text": "קרא/י לפני שמתחילים הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול",
       "selector": "body.hide-top-tabbar.freemium-test-bypass > div.container:nth-of-type(4) > section.tab-content:nth-of-type(4) > div.screen-read-guide:nth-of-type(1) > div.screen-read-guide-toolbar:nth-of-type(1) > button.btn.btn-primary:nth-of-type(1)",
       "kind": "button",
@@ -4585,6 +2370,19 @@
     {
       "text": "חזרה למסך הראשי",
       "selector": "html > body.hide-top-tabbar.freemium-test-bypass > div.container:nth-of-type(4) > section.tab-content:nth-of-type(4) > div.feature-home-back-bar:nth-of-type(2) > button.btn.btn-primary",
+      "kind": "button",
+      "intended": "click",
+      "mode": "skip",
+      "ok": true,
+      "skipped": true,
+      "responseStatus": null,
+      "finalUrl": null,
+      "error": null,
+      "issues": null
+    },
+    {
+      "text": "🧭 מהלך מטה-מודל ✅ מטה-מודל עצור. זה מסוכן. בוא נעביר יחד את הכלים לקופסה ואז נסביר לאט. כך זה כנראה יזוז נפתח מידע חדש והסוכנות חוזרת לשיח…",
+      "selector": "section.ceflow-engine > div.ceflow-scene-grid:nth-of-type(5) > aside.ceflow-side-column > section.ceflow-choice-panel > div.ceflow-choice-deck:nth-of-type(2) > button.ceflow-choice.ceflow-tone-good:nth-of-type(5)",
       "kind": "button",
       "intended": "click",
       "mode": "skip",
@@ -4847,110 +2645,6 @@
       "selector": "div.lab-container-workspace:nth-of-type(1) > div.card.practice-intro-card > div.shell-hidden-host:nth-of-type(2) > div.feature-launcher.feature-launcher--compact > div.feature-launcher-tabs:nth-of-type(3) > button.feature-launcher-tab.action-button:nth-of-type(2)",
       "kind": "button",
       "intended": "click",
-      "mode": "skip",
-      "ok": true,
-      "skipped": true,
-      "responseStatus": null,
-      "finalUrl": null,
-      "error": null,
-      "issues": null
-    },
-    {
-      "text": "תרגול זיהוי המטה-מודל",
-      "selector": "div.card.practice-intro-card > div.shell-hidden-host:nth-of-type(2) > div.feature-launcher.feature-launcher--compact > div.feature-launcher-panel.is-active:nth-of-type(4) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(1)",
-      "kind": "button",
-      "intended": "practice-question",
-      "mode": "skip",
-      "ok": true,
-      "skipped": true,
-      "responseStatus": null,
-      "finalUrl": null,
-      "error": null,
-      "issues": null
-    },
-    {
-      "text": "מכ״ם מטה-מודל",
-      "selector": "div.card.practice-intro-card > div.shell-hidden-host:nth-of-type(2) > div.feature-launcher.feature-launcher--compact > div.feature-launcher-panel.is-active:nth-of-type(4) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(2)",
-      "kind": "button",
-      "intended": "practice-radar",
-      "mode": "skip",
-      "ok": true,
-      "skipped": true,
-      "responseStatus": null,
-      "finalUrl": null,
-      "error": null,
-      "issues": null
-    },
-    {
-      "text": "גשר תחושה-שפה",
-      "selector": "div.card.practice-intro-card > div.shell-hidden-host:nth-of-type(2) > div.feature-launcher.feature-launcher--compact > div.feature-launcher-panel.is-active:nth-of-type(4) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(3)",
-      "kind": "button",
-      "intended": "practice-wizard",
-      "mode": "skip",
-      "ok": true,
-      "skipped": true,
-      "responseStatus": null,
-      "finalUrl": null,
-      "error": null,
-      "issues": null
-    },
-    {
-      "text": "בונה מהלך",
-      "selector": "div.card.practice-intro-card > div.shell-hidden-host:nth-of-type(2) > div.feature-launcher.feature-launcher--compact > div.feature-launcher-panel.is-active:nth-of-type(4) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(4)",
-      "kind": "button",
-      "intended": "blueprint",
-      "mode": "skip",
-      "ok": true,
-      "skipped": true,
-      "responseStatus": null,
-      "finalUrl": null,
-      "error": null,
-      "issues": null
-    },
-    {
-      "text": "מעבדת פריזמות · חקירה בשכבות",
-      "selector": "div.card.practice-intro-card > div.shell-hidden-host:nth-of-type(2) > div.feature-launcher.feature-launcher--compact > div.feature-launcher-panel.is-active:nth-of-type(4) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(5)",
-      "kind": "button",
-      "intended": "prismlab",
-      "mode": "skip",
-      "ok": true,
-      "skipped": true,
-      "responseStatus": null,
-      "finalUrl": null,
-      "error": null,
-      "issues": null
-    },
-    {
-      "text": "במת קומיקס רגשי",
-      "selector": "div.card.practice-intro-card > div.shell-hidden-host:nth-of-type(2) > div.feature-launcher.feature-launcher--compact > div.feature-launcher-panel.is-active:nth-of-type(4) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(6)",
-      "kind": "button",
-      "intended": "comic-engine",
-      "mode": "skip",
-      "ok": true,
-      "skipped": true,
-      "responseStatus": null,
-      "finalUrl": null,
-      "error": null,
-      "issues": null
-    },
-    {
-      "text": "מכ״ם שלשות (ברין)",
-      "selector": "div.card.practice-intro-card > div.shell-hidden-host:nth-of-type(2) > div.feature-launcher.feature-launcher--compact > div.feature-launcher-panel:nth-of-type(5) > div.feature-launcher-grid > button.btn.btn-primary:nth-of-type(1)",
-      "kind": "button",
-      "intended": "practice-triples-radar",
-      "mode": "skip",
-      "ok": true,
-      "skipped": true,
-      "responseStatus": null,
-      "finalUrl": null,
-      "error": null,
-      "issues": null
-    },
-    {
-      "text": "מילון קטגוריות המטה-מודל",
-      "selector": "div.card.practice-intro-card > div.shell-hidden-host:nth-of-type(2) > div.feature-launcher.feature-launcher--compact > div.feature-launcher-panel:nth-of-type(5) > div.feature-launcher-grid > button.btn.btn-secondary:nth-of-type(2)",
-      "kind": "button",
-      "intended": "categories",
       "mode": "skip",
       "ok": true,
       "skipped": true,

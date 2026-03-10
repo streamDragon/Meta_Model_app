@@ -1,11 +1,14 @@
+import net from 'node:net';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { spawn } from 'node:child_process';
 import { chromium } from 'playwright';
 
 const ROOT = process.cwd();
 const REPORTS_DIR = path.join(ROOT, 'reports');
 const REPORT_PATH = path.join(REPORTS_DIR, 'nav-audit.json');
+const VITE_BIN = path.join(ROOT, 'node_modules', 'vite', 'bin', 'vite.js');
 
 function parseArgs(argv) {
     const args = { base: process.env.BASE_URL || '' };
@@ -18,8 +21,47 @@ function parseArgs(argv) {
             args.base = token.slice('--base='.length);
         }
     }
-    if (!args.base) args.base = 'http://localhost:5173';
     return args;
+}
+
+function wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function formatLogs(lines) {
+    return lines.slice(-20).join('\n');
+}
+
+function listenProbe(port) {
+    return new Promise((resolve) => {
+        const server = net.createServer();
+        server.once('error', () => resolve(false));
+        server.once('listening', () => {
+            server.close(() => resolve(true));
+        });
+        server.listen(port, '127.0.0.1');
+    });
+}
+
+async function findAvailablePort(start = 4176, end = 4190) {
+    for (let port = start; port <= end; port += 1) {
+        if (await listenProbe(port)) return port;
+    }
+    throw new Error(`No free port found between ${start} and ${end}`);
+}
+
+async function waitForHttp(url, timeoutMs = 30000) {
+    const startedAt = Date.now();
+    while (Date.now() - startedAt < timeoutMs) {
+        try {
+            const response = await fetch(url, { redirect: 'manual' });
+            if (response.ok || response.status === 304) return;
+        } catch (_error) {
+            // keep polling
+        }
+        await wait(250);
+    }
+    throw new Error(`Timed out waiting for ${url}`);
 }
 
 function nowIso() {
@@ -144,6 +186,44 @@ async function createBrowser() {
     }
 }
 
+async function stopServer(server) {
+    if (!server || server.exitCode !== null || server.killed) return;
+    server.kill('SIGINT');
+    const closed = await Promise.race([
+        new Promise((resolve) => server.once('exit', () => resolve(true))),
+        wait(3000).then(() => false)
+    ]);
+    if (!closed && server.exitCode === null) {
+        server.kill('SIGTERM');
+    }
+}
+
+async function startLocalServer() {
+    const port = await findAvailablePort();
+    const base = `http://127.0.0.1:${port}`;
+    const logs = [];
+
+    const server = spawn(process.execPath, [VITE_BIN, '--host', '127.0.0.1', '--port', String(port), '--strictPort'], {
+        cwd: ROOT,
+        stdio: ['ignore', 'pipe', 'pipe']
+    });
+
+    server.stdout?.on('data', (chunk) => {
+        logs.push(String(chunk));
+    });
+    server.stderr?.on('data', (chunk) => {
+        logs.push(String(chunk));
+    });
+
+    try {
+        await waitForHttp(base, 30000);
+        return { base, server, logs };
+    } catch (error) {
+        await stopServer(server);
+        throw new Error(`${error.message}\n${formatLogs(logs)}`);
+    }
+}
+
 async function collectCandidates(page) {
     return page.evaluate(() => {
         const isVisible = (el) => {
@@ -167,16 +247,44 @@ async function collectCandidates(page) {
             }
         };
 
+        const cssAttrEscape = (value) => String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
+        const navigateTargetFromOnclick = (value) => {
+            const source = String(value || '');
+            const match = source.match(/navigateTo\(\s*['"]([^'"]+)['"]\s*\)/i);
+            return match ? match[1] : '';
+        };
+
         const buildSelector = (el) => {
             if (!(el instanceof Element)) return '';
             if (el.id) return `#${cssEscapeSafe(el.id)}`;
-            if (el.matches('.tab-btn[data-tab]')) {
-                return `.tab-btn[data-tab="${cssEscapeSafe(el.getAttribute('data-tab') || '')}"]`;
+
+            const dataTab = el.getAttribute('data-tab') || '';
+            if (dataTab && el.matches('.tab-btn[data-tab], [data-tab]')) {
+                return `[data-tab="${cssAttrEscape(dataTab)}"]`;
             }
+
+            const dataRoute = el.getAttribute('data-route') || '';
+            if (dataRoute) {
+                return `[data-route="${cssAttrEscape(dataRoute)}"]`;
+            }
+
+            const dataHref = el.getAttribute('data-href') || '';
+            if (dataHref) {
+                return `[data-href="${cssAttrEscape(dataHref)}"]`;
+            }
+
             if (el.tagName === 'A' && el.getAttribute('href')) {
                 const href = el.getAttribute('href');
-                return `a[href="${cssEscapeSafe(href)}"]`;
+                return `a[href="${cssAttrEscape(href)}"]`;
             }
+
+            const onclick = el.getAttribute('onclick') || '';
+            const navTarget = navigateTargetFromOnclick(onclick);
+            if (navTarget) {
+                return `${el.tagName.toLowerCase()}[onclick*="navigateTo"][onclick*="${cssAttrEscape(navTarget)}"]`;
+            }
+
             const parts = [];
             let node = el;
             while (node && node.nodeType === 1 && parts.length < 6) {
@@ -262,6 +370,7 @@ async function collectCandidates(page) {
                 selector: buildSelector(el),
                 text,
                 visible: isVisible(el),
+                disabled: (typeof el.matches === 'function' && el.matches(':disabled')) || el.getAttribute('aria-disabled') === 'true',
                 onclick,
                 dataTab,
                 dataHref,
@@ -408,6 +517,12 @@ async function auditSpaClick(browser, baseUrl, candidate, intended) {
         if (!(await locator.isVisible())) {
             throw new Error('Element is not visible');
         }
+        const isDisabled = await locator.evaluate((el) =>
+            (typeof el.matches === 'function' && el.matches(':disabled')) || el.getAttribute('aria-disabled') === 'true'
+        );
+        if (isDisabled) {
+            throw new Error('Element is disabled');
+        }
         await locator.click({ timeout: 10000 });
         await page.waitForTimeout(900);
         after = await getPageSnapshot(page);
@@ -435,10 +550,13 @@ async function auditSpaClick(browser, baseUrl, candidate, intended) {
             || JSON.stringify(before.bodyClass) !== JSON.stringify(after.bodyClass)
         );
 
-    const ok = !clickError && !!after && (
-        activeTarget
-        || (intended?.type !== 'spa-tab' && stateChanged)
-    ) && issues.pageErrors.length === 0;
+    const disabledSkip = typeof clickError === 'string' && clickError.includes('Element is disabled');
+    const ok = disabledSkip || (
+        !clickError && !!after && (
+            activeTarget
+            || (intended?.type !== 'spa-tab' && stateChanged)
+        ) && issues.pageErrors.length === 0
+    );
 
     let error = null;
     if (!ok) {
@@ -455,6 +573,8 @@ async function auditSpaClick(browser, baseUrl, candidate, intended) {
         intended,
         mode: 'click',
         ok,
+        skipped: disabledSkip,
+        note: disabledSkip ? 'Disabled candidate (skipped click)' : null,
         error,
         responseStatus,
         finalUrl: after?.url || null,
@@ -464,9 +584,7 @@ async function auditSpaClick(browser, baseUrl, candidate, intended) {
     };
 }
 
-async function run() {
-    const { base } = parseArgs(process.argv.slice(2));
-    const baseUrl = String(base || '').trim();
+async function run(baseUrl) {
     if (!baseUrl) {
         throw new Error('Missing base URL');
     }
@@ -490,6 +608,19 @@ async function run() {
             const intended = buildCandidateIntended(candidate, bootstrapUrl || baseUrl);
             const label = normalizeText(candidate.text || '');
             const normalizedTarget = typeof intended.target === 'string' ? intended.target.trim() : '';
+
+            if (candidate.disabled && intended.type !== 'url') {
+                results.push({
+                    candidate,
+                    intended,
+                    mode: 'skip',
+                    ok: true,
+                    skipped: true,
+                    error: null,
+                    note: 'Disabled candidate (skipped click)'
+                });
+                continue;
+            }
 
             if (candidate.visible === false && intended.type !== 'url') {
                 results.push({
@@ -586,7 +717,16 @@ async function run() {
     }
 }
 
-run().catch(async (error) => {
+const args = parseArgs(process.argv.slice(2));
+const externalBase = String(args.base || '').trim();
+let serverBundle = null;
+
+try {
+    const baseUrl = externalBase || (serverBundle = await startLocalServer(), serverBundle.base);
+    await run(baseUrl);
+} catch (error) {
     console.error(`FAIL: ${error?.message || error}`);
     process.exitCode = 1;
-});
+} finally {
+    await stopServer(serverBundle?.server);
+}
