@@ -56,22 +56,6 @@
             overlayPanels: Object.freeze(['settings', 'help', 'history', 'stats', 'import-export']),
             notes: 'מרכז כלים במעטפת shell'
         }),
-        'scenario-trainer': Object.freeze({
-            id: 'scenario-trainer',
-            path: '?tab=scenario-trainer',
-            title: 'סימולטור סצנות',
-            defaultUiMode: 'shell',
-            aliases: Object.freeze(['scenes', 'execution']),
-            overlayPanels: Object.freeze([
-                'setup',
-                'settings',
-                'history',
-                'decomposition',
-                'action-map',
-                'blueprint',
-                'diagnostics'
-            ])
-        }),
         'comic-engine': Object.freeze({
             id: 'comic-engine',
             path: '?tab=comic-engine',

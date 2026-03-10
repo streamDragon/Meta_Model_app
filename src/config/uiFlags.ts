@@ -64,14 +64,6 @@ export const UI_FLAG_REGISTRY: Record<string, ScreenUiFlag> = {
     defaultUiMode: 'legacy',
     overlayPanels: ['help', 'history', 'schema', 'import-export'],
   },
-  'scenario-trainer': {
-    id: 'scenario-trainer',
-    path: '?tab=scenario-trainer',
-    title: 'Scenes / Execution',
-    defaultUiMode: 'shell',
-    aliases: ['scenes', 'execution'],
-    overlayPanels: ['setup', 'settings', 'history', 'decomposition', 'action-map', 'blueprint', 'diagnostics'],
-  },
 };
 
 const VALID_UI_MODES: UiMode[] = ['legacy', 'shell'];

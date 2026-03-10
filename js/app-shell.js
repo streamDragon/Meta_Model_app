@@ -10,8 +10,6 @@
     const VERB_SCREEN_ID = 'practice-verb-unzip';
     const VERB_SESSION_KEY = 'verb_unzip_shell_session_started_v1';
     const VERB_WIZARD_KEY = 'verb_unzip_shell_wizard_seen_v1';
-    const SCENARIO_SCREEN_ID = 'scenario-trainer';
-    const SCENARIO_WIZARD_KEY = 'scenario_shell_setup_seen_v1';
 
     const stateByScreen = Object.create(null);
     const pendingEntryOverlayTimers = Object.create(null);
@@ -1139,12 +1137,6 @@
             return false;
         }
 
-        if (screenState.id === SCENARIO_SCREEN_ID) {
-            const mappedPanelId = safePanelId === 'wizard' ? 'domain' : safePanelId;
-            openScenarioPanelById(screenState, mappedPanelId);
-            return true;
-        }
-
         if (screenState.id === HOME_SCREEN_ID) {
             if (safePanelId === 'menu') return openHomeMenuOverlay(screenState);
             if (safePanelId === 'about') {
@@ -1185,14 +1177,13 @@
         if (!safeId) return null;
         if (safeId === HOME_SCREEN_ID) return mountHomeShell();
         if (safeId === VERB_SCREEN_ID) return mountVerbUnzipShell();
-        if (safeId === SCENARIO_SCREEN_ID) return mountScenarioTrainerShell();
         return mountGenericShell(safeId);
     }
 
     function isShellModeScreen(screenId) {
         const safeId = String(screenId || '').trim();
         if (!safeId) return false;
-        return getUiMode(safeId) === 'shell' && Boolean(getShellRegistryEntry(safeId) || safeId === VERB_SCREEN_ID || safeId === SCENARIO_SCREEN_ID || safeId === HOME_SCREEN_ID);
+        return getUiMode(safeId) === 'shell' && Boolean(getShellRegistryEntry(safeId) || safeId === VERB_SCREEN_ID || safeId === HOME_SCREEN_ID);
     }
 
     function mountVerbUnzipShell() {
@@ -1316,315 +1307,6 @@
         }
     }
 
-    function showScenarioInlineScreen(screenState, screenName) {
-        if (!screenState || !screenState.screens) return;
-        Object.values(screenState.screens).forEach((node) => {
-            if (node) node.classList.add('hidden');
-        });
-
-        const target = screenState.screens[screenName];
-        if (!target) return;
-        if (!screenState.inlineHost.contains(target)) {
-            screenState.inlineHost.appendChild(target);
-        }
-        target.classList.remove('hidden');
-        screenState.currentInlineScreen = screenName;
-    }
-
-    function openScenarioPanelOverlay(screenState, panelId, options) {
-        if (!screenState || !screenState.screens) return;
-        const panel = screenState.screens[panelId];
-        if (!panel) return;
-        ensureOverlayProvider();
-
-        const opts = options && typeof options === 'object' ? options : {};
-        recordPanelOpen(screenState, panelId, opts.title || panelId);
-        rememberContinueState(screenState.id, {
-            panelId,
-            panelTitle: opts.title || panelId,
-            screenTitle: getShellScreenCopy(screenState.id)?.title || getTabTitle(screenState.id)
-        });
-        renderHistoryFooter(screenState);
-
-        if (!screenState.overlayHost.contains(panel)) {
-            screenState.overlayHost.appendChild(panel);
-        }
-
-        const wrapper = document.createElement('div');
-        wrapper.className = 'shell-overlay-content scenario-shell-overlay-content';
-        if (opts.note) {
-            const note = document.createElement('p');
-            note.className = 'shell-overlay-note';
-            note.textContent = opts.note;
-            wrapper.appendChild(note);
-        }
-
-        panel.classList.remove('hidden');
-        wrapper.appendChild(panel);
-        screenState.activeOverlayPanel = panelId;
-
-        global.MetaOverlayProvider.openOverlay({
-            type: `scenario-${panelId}`,
-            title: opts.title || 'חלון משנה',
-            size: opts.size || 'lg',
-            closeOnBackdrop: true,
-            content: wrapper,
-            onOpen: () => {
-                const selector = opts.scrollToSelector;
-                if (!selector) return;
-                const anchor = panel.querySelector(selector);
-                if (!anchor || typeof anchor.scrollIntoView !== 'function') return;
-                try {
-                    anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                } catch (_error) {
-                    anchor.scrollIntoView();
-                }
-            },
-            onClose: () => {
-                if (!screenState.overlayHost.contains(panel)) {
-                    screenState.overlayHost.appendChild(panel);
-                }
-                panel.classList.add('hidden');
-                if (screenState.activeOverlayPanel === panelId) {
-                    screenState.activeOverlayPanel = '';
-                }
-                renderHistoryFooter(screenState);
-            }
-        });
-    }
-
-    function resolveScenarioPanelId(panelId) {
-        const safePanelId = String(panelId || '').trim();
-        if (safePanelId === 'setup' || safePanelId === 'wizard') return 'domain';
-        return safePanelId;
-    }
-
-    function getScenarioPanelMeta(panelId) {
-        const resolvedPanelId = resolveScenarioPanelId(panelId);
-        const panelMeta = {
-            home: { title: 'בית סצנות', size: 'lg' },
-            domain: { title: 'עזרה קצרה', size: 'md' },
-            settings: { title: 'הגדרות', size: 'lg' },
-            history: { title: 'היסטוריית סצנות', size: 'lg' },
-            blueprint: { title: 'הסבר מעמיק', size: 'xl' }
-        };
-        return { id: resolvedPanelId, ...(panelMeta[resolvedPanelId] || { title: 'חלון משנה', size: 'lg' }) };
-    }
-
-    function openScenarioPanelById(screenState, panelId, options) {
-        if (!screenState) return;
-
-        const baseMeta = getScenarioPanelMeta(panelId);
-        const merged = { ...baseMeta, ...(options && typeof options === 'object' ? options : {}) };
-        openScenarioPanelOverlay(screenState, baseMeta.id, merged);
-    }
-
-    function mountScenarioTrainerShell() {
-        const mode = getUiMode(SCENARIO_SCREEN_ID);
-        if (mode !== 'shell') return null;
-
-        const section = document.getElementById(SCENARIO_SCREEN_ID);
-        const config = getShellRegistryEntry(SCENARIO_SCREEN_ID);
-        if (!section) return null;
-        if (stateByScreen[SCENARIO_SCREEN_ID] && stateByScreen[SCENARIO_SCREEN_ID].mounted) {
-            return stateByScreen[SCENARIO_SCREEN_ID];
-        }
-
-        try {
-            const container = section.querySelector('.scenario-trainer-container');
-            const card = section.querySelector('.scenario-trainer-card');
-            const titleEl = card ? card.querySelector('h2') : null;
-            const subtitleEl = card ? card.querySelector('p.subtitle') : null;
-            if (!container || !card) return null;
-
-            const screenNames = ['home', 'domain', 'play', 'feedback', 'blueprint', 'score', 'history', 'settings'];
-            const screenNodes = {};
-            screenNames.forEach((name) => {
-                screenNodes[name] = document.getElementById(`scenario-screen-${name}`);
-            });
-            if (!screenNodes.play) return null;
-
-            const shell = createAppShellFrame({
-                screenId: SCENARIO_SCREEN_ID,
-                title: getShellScreenCopy(SCENARIO_SCREEN_ID)?.title || 'סימולטור סצנות',
-                subtitle: getShellScreenCopy(SCENARIO_SCREEN_ID)?.subtitle || 'הסצנה הפעילה נשארת במרכז. מסכי העזר נפתחים בשכבה.'
-            });
-
-            const inlineHost = document.createElement('div');
-            inlineHost.className = 'scenario-shell-inline-host';
-            const overlayHost = document.createElement('div');
-            overlayHost.className = 'scenario-shell-overlay-host';
-            overlayHost.hidden = true;
-            overlayHost.setAttribute('aria-hidden', 'true');
-            card.prepend(overlayHost);
-            card.prepend(inlineHost);
-
-            const overlayScreenNames = new Set(['domain', 'blueprint', 'history', 'settings']);
-            const inlineScreenNames = new Set(['home', 'play', 'feedback', 'score']);
-            screenNames.forEach((name) => {
-                const node = screenNodes[name];
-                if (!node) return;
-                if (overlayScreenNames.has(name)) overlayHost.appendChild(node);
-                else inlineHost.appendChild(node);
-                node.classList.add('hidden');
-            });
-
-            const safetyNotice = document.getElementById('scenario-safety-notice');
-            if (safetyNotice) safetyNotice.classList.add('shell-inline-hidden');
-            [titleEl, subtitleEl].forEach((node) => {
-                if (!node) return;
-                node.classList.add('shell-inline-hidden');
-            });
-
-            card.classList.add('shell-workspace-card', 'scenario-shell-card');
-            shell.workspace.appendChild(card);
-            shell.metrics.style.display = 'none';
-
-            const screenState = {
-                id: SCENARIO_SCREEN_ID,
-                mode,
-                mounted: true,
-                section,
-                shell,
-                card,
-                screens: screenNodes,
-                inlineHost,
-                overlayHost,
-                overlayScreenNames,
-                inlineScreenNames,
-                activeOverlayPanel: '',
-                currentInlineScreen: '',
-                wizardShown: readSessionFlag(SCENARIO_WIZARD_KEY),
-                config,
-                panelOpens: Object.create(null),
-                lastOpenedPanel: '',
-                lastOpenedPanelTitle: '',
-                lastPanelOpenAt: ''
-            };
-
-            const headerActions = Array.isArray(config?.panels) ? config.panels : [];
-            headerActions.forEach((panel) => {
-                const panelId = typeof panel === 'string' ? panel : String(panel?.id || '').trim();
-                if (!panelId) return;
-                const panelMeta = getScenarioPanelMeta(panelId);
-                shell.headerActions.appendChild(createActionButton({
-                    label: (typeof panel === 'object' && panel ? panel.action || panel.title : '') || panelMeta.title || 'פרטים',
-                    icon: getPanelIcon(panelMeta.id),
-                    onClick: () => openScenarioPanelById(screenState, panelMeta.id)
-                }));
-            });
-
-            container.prepend(shell.root);
-            section.classList.add('shell-screen-active');
-            section.setAttribute('data-ui-mode', 'shell');
-
-            renderHistoryFooter(screenState);
-            stateByScreen[SCENARIO_SCREEN_ID] = screenState;
-            return screenState;
-        } catch (error) {
-            renderShellFallback(section, SCENARIO_SCREEN_ID, error);
-            return null;
-        }
-    }
-
-    function handleScenarioScreenChange(screenName) {
-        const screenState = stateByScreen[SCENARIO_SCREEN_ID];
-        if (!screenState || screenState.mode !== 'shell') return false;
-        const name = String(screenName || '').trim();
-        if (!name || !screenState.screens[name]) return false;
-        const isActiveTab = !!screenState.section?.classList.contains('active');
-
-        if (!isActiveTab) {
-            Object.values(screenState.screens).forEach((node) => {
-                if (node) node.classList.add('hidden');
-            });
-            const target = screenState.screens[name];
-            if (screenState.overlayScreenNames.has(name)) {
-                if (!screenState.overlayHost.contains(target)) screenState.overlayHost.appendChild(target);
-            } else if (!screenState.inlineHost.contains(target)) {
-                screenState.inlineHost.appendChild(target);
-                screenState.currentInlineScreen = name;
-            }
-            target.classList.remove('hidden');
-            return true;
-        }
-
-        if (screenState.overlayScreenNames.has(name)) {
-            openScenarioPanelById(screenState, name);
-            return true;
-        }
-
-        if (screenState.activeOverlayPanel) {
-            try {
-                global.MetaOverlayProvider.closeOverlay('scenario-inline');
-            } catch (_error) {
-                // noop
-            }
-        }
-
-        showScenarioInlineScreen(screenState, name);
-        return true;
-    }
-
-    function handleScenarioSafetyNotice(visible, noticeElement) {
-        const screenState = stateByScreen[SCENARIO_SCREEN_ID];
-        if (!screenState || screenState.mode !== 'shell') return false;
-
-        if (noticeElement) noticeElement.classList.add('hidden');
-        if (!visible) {
-            if (screenState.activeOverlayPanel === 'safety') {
-                global.MetaOverlayProvider.closeOverlay('scenario-safety-clear');
-            }
-            return true;
-        }
-
-        const isHebrew = /^he\b/i.test(String(document.documentElement.lang || '').trim());
-        const panel = document.createElement('article');
-        panel.className = 'shell-overlay-content';
-        panel.innerHTML = `
-            <p class="shell-overlay-kicker">בטיחות</p>
-            <h4>נדרש עצירה לפני המשך התרגול</h4>
-            <p>זיהינו נוסח שיכול להצביע על מצוקה חריפה. עצרו רגע ובדקו תמיכה מיידית.</p>
-            <p>${isHebrew ? 'בישראל: אם יש סכנה מיידית התקשרו 100. לקו ער"ן: 1201 (24/7).' : 'If there is immediate danger call 911. You can also call/text 988 (24/7).'}</p>
-        `;
-        const actions = document.createElement('div');
-        actions.className = 'shell-overlay-actions';
-
-        const closeBtn = document.createElement('button');
-        closeBtn.type = 'button';
-        closeBtn.className = 'btn btn-secondary';
-        closeBtn.textContent = 'סגור';
-        closeBtn.addEventListener('click', () => global.MetaOverlayProvider.closeOverlay('scenario-safety-close'));
-        actions.appendChild(closeBtn);
-
-        const exitBtn = document.createElement('button');
-        exitBtn.type = 'button';
-        exitBtn.className = 'btn btn-primary';
-        exitBtn.textContent = 'יציאה למסך הבית';
-        exitBtn.addEventListener('click', () => {
-            global.MetaOverlayProvider.closeOverlay('scenario-safety-exit');
-            const homeBtn = document.getElementById('scenario-back-home-btn') || document.getElementById('scenario-back-home-from-domain');
-            if (homeBtn) homeBtn.click();
-        });
-        actions.appendChild(exitBtn);
-        panel.appendChild(actions);
-
-        screenState.activeOverlayPanel = 'safety';
-        global.MetaOverlayProvider.openOverlay({
-            type: 'scenario-safety',
-            title: 'מצב מצוקה',
-            size: 'md',
-            closeOnBackdrop: false,
-            content: panel,
-            onClose: () => {
-                if (screenState.activeOverlayPanel === 'safety') {
-                    screenState.activeOverlayPanel = '';
-                }
-            }
-        });
-        return true;
-    }
-
     function notifyTabActivated(tabId) {
         const id = String(tabId || '').trim();
         if (id === HOME_SCREEN_ID) {
@@ -1658,20 +1340,6 @@
             return;
         }
 
-        if (id === SCENARIO_SCREEN_ID) {
-            const screenState = stateByScreen[SCENARIO_SCREEN_ID] || mountScenarioTrainerShell();
-            if (!screenState || screenState.mode !== 'shell') return;
-
-            rememberContinueState(id, {
-                screenTitle: getShellScreenCopy(id)?.title || getTabTitle(id)
-            });
-            renderHistoryFooter(screenState);
-            if (!screenState.currentInlineScreen) {
-                showScenarioInlineScreen(screenState, 'home');
-            }
-            return;
-        }
-
         const registryEntry = getShellRegistryEntry(id);
         if (!registryEntry || registryEntry.adapter !== 'generic' || getUiMode(id) !== 'shell') {
             return;
@@ -1691,7 +1359,6 @@
     function bootstrapShellScreens() {
         mountHomeShell();
         mountVerbUnzipShell();
-        mountScenarioTrainerShell();
     }
 
     function hasMountedShellScreens() {
@@ -1706,7 +1373,7 @@
         } catch (_error) {
             // noop
         }
-        return [HOME_SCREEN_ID, VERB_SCREEN_ID, SCENARIO_SCREEN_ID];
+        return [HOME_SCREEN_ID, VERB_SCREEN_ID];
     }
 
     function bootstrap() {
@@ -1732,10 +1399,7 @@
         isShellModeScreen,
         mountHomeShell,
         mountVerbUnzipShell,
-        mountScenarioTrainerShell,
         mountScreenShell,
-        handleScenarioScreenChange,
-        handleScenarioSafetyNotice,
         createAppShellFrame,
         getUiMode
     });

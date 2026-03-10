@@ -71,11 +71,6 @@
             adapter: 'verb-unzip',
             panels: ['settings', 'help', 'stats']
         },
-        'scenario-trainer': {
-            id: 'scenario-trainer',
-            adapter: 'scenario',
-            panels: ['setup', 'history', 'blueprint', 'settings']
-        },
         'comic-engine': {
             id: 'comic-engine',
             adapter: 'generic',

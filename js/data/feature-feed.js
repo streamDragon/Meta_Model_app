@@ -4,7 +4,7 @@
     var FEED_ITEMS = Object.freeze([
         Object.freeze({
             id: 'practice-question',
-            titleHe: 'תרגול זיהוי Meta-Model',
+            titleHe: 'תרגול זיהוי המטה-מודל',
             descHe: 'משפט אחד, זיהוי מהיר, ופידבק ברור לכל סבב.',
             route: '/feature/practice-question',
             tab: 'practice-question',
@@ -12,7 +12,7 @@
             category: 'exercises',
             thumbType: 'svg',
             thumbSrc: '',
-            icon: 'Q',
+            icon: 'ז',
             accentFrom: '#0ea5e9',
             accentTo: '#1d4ed8'
         }),
@@ -26,7 +26,7 @@
             category: 'exercises',
             thumbType: 'svg',
             thumbSrc: '',
-            icon: 'R',
+            icon: 'מ',
             accentFrom: '#14b8a6',
             accentTo: '#0f766e'
         }),
@@ -40,7 +40,7 @@
             category: 'lab',
             thumbType: 'svg',
             thumbSrc: '',
-            icon: '3',
+            icon: 'ש',
             accentFrom: '#0ea5e9',
             accentTo: '#0369a1'
         }),
@@ -54,7 +54,7 @@
             category: 'exercises',
             thumbType: 'svg',
             thumbSrc: '',
-            icon: 'W',
+            icon: 'ג',
             accentFrom: '#4f46e5',
             accentTo: '#f59e0b'
         }),
@@ -63,12 +63,12 @@
             titleHe: 'סימולטור סצנות',
             descHe: 'סימולציית שיחה מלאה במסלול עצמאי: בחירה, תוצאה ולמידה מכל מהלך.',
             route: '/scenario_trainer.html',
-            tab: 'scenario-trainer',
+            tab: '',
             tagHe: 'ביצוע',
             category: 'exercises',
             thumbType: 'svg',
             thumbSrc: '',
-            icon: 'S',
+            icon: 'ס',
             accentFrom: '#f59e0b',
             accentTo: '#d97706'
         }),
@@ -82,7 +82,7 @@
             category: 'exercises',
             thumbType: 'svg',
             thumbSrc: '',
-            icon: 'C',
+            icon: 'ב',
             accentFrom: '#f97316',
             accentTo: '#c2410c'
         }),
@@ -96,7 +96,7 @@
             category: 'lab',
             thumbType: 'svg',
             thumbSrc: '',
-            icon: 'P',
+            icon: 'פ',
             accentFrom: '#8b5cf6',
             accentTo: '#6d28d9'
         }),
@@ -110,21 +110,21 @@
             category: 'knowledge',
             thumbType: 'svg',
             thumbSrc: '',
-            icon: 'K',
+            icon: 'י',
             accentFrom: '#0ea5e9',
             accentTo: '#1e3a8a'
         }),
         Object.freeze({
             id: 'blueprint',
             titleHe: 'בונה מהלך',
-            descHe: 'הפיכת תובנה לתכנית שיחה: מטרה, טקטיקה, ו-Plan B.',
+            descHe: 'הפיכת תובנה לתכנית שיחה: מטרה, טקטיקה, ומה עושים אם זה נתקע.',
             route: '/feature/blueprint',
             tab: 'blueprint',
             tagHe: 'מעבדה',
             category: 'lab',
             thumbType: 'svg',
             thumbSrc: '',
-            icon: 'B',
+            icon: 'מ',
             accentFrom: '#06b6d4',
             accentTo: '#0e7490'
         }),
@@ -138,7 +138,7 @@
             category: 'settings',
             thumbType: 'svg',
             thumbSrc: '',
-            icon: 'I',
+            icon: 'ע',
             accentFrom: '#64748b',
             accentTo: '#334155'
         })
