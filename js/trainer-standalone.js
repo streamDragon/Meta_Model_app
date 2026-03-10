@@ -171,12 +171,21 @@ body {
         const wrapper = contract?.wrapper || {};
         const mountId = wrapper.mountId || 'trainer-root';
         const accent = wrapper.accent || {};
-        document.title = wrapper.pageTitle || contract?.title || document.title;
+        const pageTitle = contract?.id === 'scenario-trainer'
+            ? 'סימולטור סצנות - אימון שיחה חי'
+            : (wrapper.pageTitle || contract?.title || document.title);
+        const navLinks = Array.isArray(wrapper.navLinks)
+            ? wrapper.navLinks.filter((link) => {
+                if (contract?.id !== 'scenario-trainer') return true;
+                return String(link?.href || '').trim() === 'index.html';
+            })
+            : [];
+        document.title = pageTitle;
         document.body.innerHTML = `
           <div class="mtp-page">
             <div class="mtp-nav" aria-label="ניווט עמוד ${contract?.title || ''}">
               <div class="mtp-nav-group">
-                ${(wrapper.navLinks || []).map((link) => `<a class="mtp-btn" data-mtp-link="${link.href}" href="${link.href}">${link.label}</a>`).join('')}
+                ${navLinks.map((link) => `<a class="mtp-btn" data-mtp-link="${link.href}" href="${link.href}">${link.label}</a>`).join('')}
               </div>
               <div id="${mountId}-meta" class="mtp-meta" aria-live="polite"></div>
             </div>

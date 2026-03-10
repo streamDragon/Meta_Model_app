@@ -838,6 +838,28 @@
         return 'is-upcoming';
     }
 
+    function getScenarioDisplayFamilyLabel() {
+        if (trainerContract?.id === 'scenario-trainer') return 'שיחה חיה';
+        return normalizeText(trainerContract?.familyLabel || '', '');
+    }
+
+    function getScenarioDisplaySubtitle() {
+        if (trainerContract?.id === 'scenario-trainer') {
+            return 'נכנסים לסצנה אנושית, בוחרים תגובה אחת, ורואים איך היא נוחתת רגשית ומה היא פותחת בהמשך השיחה.';
+        }
+        return normalizeText(trainerContract?.subtitle || '', '');
+    }
+
+    function getScenarioHomeEntryHint() {
+        return 'כניסה ראשונה? אפשר פשוט ללחוץ "התחל סשן". אם כבר ידוע מה רוצים לתרגל, פתחו הגדרות וכווננו תחום, רמה ואורך סשן.';
+    }
+
+    function getScenarioScoreNextHint(isLast) {
+        return isLast
+            ? 'להמשך: אפשר לפתוח סשן חדש, או לעבור לגשר תחושה-שפה אם צריך לדייק את המשפט לפני שיחה אמיתית.'
+            : 'להמשך: אם המשפט הירוק כבר יושב, המשיכו לסצנה הבאה. אם עדיין יש עמימות, פתחו שוב את הפירוק לפני שממשיכים.';
+    }
+
     function render() {
         mount.innerHTML = renderApp();
     }
@@ -851,9 +873,9 @@
           <div id="scenario-trainer" class="scenario-platform-root" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id="scenario-trainer" data-trainer-mobile-order="${escapeHtml(getMobileZoneOrder().join(','))}" style="${escapeHtml(buildRootStyle())}">
             <div class="scenario-platform-header">
               <div class="scenario-platform-header-copy">
-                <p class="scenario-platform-family">${escapeHtml(trainerContract.familyLabel || '')}</p>
+                <p class="scenario-platform-family">${escapeHtml(getScenarioDisplayFamilyLabel())}</p>
                 <h1>${escapeHtml(trainerContract.title || 'סימולטור סצנות')}</h1>
-                <p class="scenario-platform-subtitle">${escapeHtml(trainerContract.subtitle || '')}</p>
+                <p class="scenario-platform-subtitle">${escapeHtml(getScenarioDisplaySubtitle())}</p>
               </div>
               <div class="scenario-platform-header-meta">${sessionMeta}</div>
             </div>
@@ -968,6 +990,7 @@
               </div>
             </div>
             <p class="scenario-home-footnote">הצלחה בסשן אחד נראית כמו תגובה שמקדמת יותר קשר, פחות עמימות, וצעד הבא שאפשר לבדוק במציאות.</p>
+            <p class="scenario-feedback-next-hint">${escapeHtml(getScenarioHomeEntryHint())}</p>
           </section>
         `;
     }
@@ -1294,6 +1317,7 @@
                 <p><strong>מדד הצלחה:</strong> ${escapeHtml(entry.successMetric || 'לא הוגדר')}</p>
               </div>
             ` : ''}
+            <p class="scenario-feedback-next-hint">${escapeHtml(getScenarioScoreNextHint(isLast))}</p>
             <div class="scenario-feedback-actions">
               <button type="button" class="btn btn-primary" data-scenario-action="next-scene">${isLast ? 'סיום סשן וחזרה לבית' : 'המשך לסצנה הבאה'}</button>
               <button type="button" class="btn btn-secondary" data-scenario-action="go-home">חזרה לבית הסצנות</button>

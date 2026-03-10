@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.239" data-build-time="1773165239547" data-build-iso="2026-03-10T17:53:59.547Z" data-git-commit="a95e2c9">
+<html lang="he" dir="rtl" data-app-version="1.0.240" data-build-time="1773167856315" data-build-iso="2026-03-10T18:37:36.315Z" data-git-commit="650369c">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -419,6 +419,38 @@
         <!-- HOME TAB -->
         <section id="home" class="tab-content active home-route">
             <section id="mobile-feed-home" class="mobile-feed-home" hidden aria-label="ניווט מהיר במובייל">
+                <section class="mobile-feed-launchpad" aria-label="מסלולי התחלה מהירים">
+                    <div class="mobile-feed-launchpad-head">
+                        <p class="mobile-feed-launchpad-kicker">מתחילים מכאן</p>
+                        <h2 class="mobile-feed-launchpad-title">מסלול קצר וברור מהטלפון</h2>
+                        <p class="mobile-feed-launchpad-copy">בחרו מסלול אחד בלבד להתחלה. את שאר הכלים משאירים לפיד שמתחת, כדי לא להפוך את הבית שוב לספרייה עמוסה.</p>
+                    </div>
+                    <div class="mobile-feed-launchpad-grid">
+                        <article class="mobile-feed-launch-card" data-launch-track="beginner">
+                            <span class="mobile-feed-launch-card-kicker">למתחילים</span>
+                            <h3>גשר תחושה־שפה</h3>
+                            <p>כשעוד לא ברור מה קורה בחוץ ומה נהיה בפנים.</p>
+                            <button type="button" class="btn btn-primary" data-nav-key="practiceWizard">התחל/י כאן</button>
+                        </article>
+                        <article class="mobile-feed-launch-card" data-launch-track="intermediate">
+                            <span class="mobile-feed-launch-card-kicker">לביניים</span>
+                            <h3>תרגול זיהוי</h3>
+                            <p>כשצריך לזהות מהר אם זו מחיקה, עיוות או הכללה.</p>
+                            <button type="button" class="btn btn-secondary" data-nav-key="practiceQuestion">פתח/י תרגול</button>
+                        </article>
+                        <article class="mobile-feed-launch-card" data-launch-track="advanced">
+                            <span class="mobile-feed-launch-card-kicker">למתקדמים</span>
+                            <h3>סימולטור סצנות</h3>
+                            <p>כשרוצים לראות את הדפוס בתוך שיחה חיה ולא רק במשפט בודד.</p>
+                            <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html" data-nav-key="scenarioTrainer">פתח/י סימולטור</a>
+                        </article>
+                    </div>
+                    <div class="mobile-feed-launchpad-support">
+                        <button type="button" class="btn btn-secondary" data-nav-key="practiceTriplesRadar">מכ"ם שלשות</button>
+                        <button type="button" class="btn btn-secondary" data-nav-key="prismLab">מעבדת פריזמות</button>
+                        <button type="button" class="btn btn-secondary" data-nav-key="categories">מילון</button>
+                    </div>
+                </section>
                 <div class="mobile-feed-ticker" role="status" aria-live="polite">
                     <span class="mobile-feed-ticker-label">מה חדש</span>
                     <span id="mobile-feed-ticker-text">נטען...</span>
@@ -519,7 +551,7 @@
                 </div>
                 <aside class="home-route-next-step" aria-label="המלצת התחלה">
                     <span>מה מומלץ עכשיו</span>
-                    <strong>אם משהו במשפט מרגיש דחוס או לא יושב, התחילו בגשר תחושה־שפה. אם צריך לאמן תגובה בתוך הקשר חי, עברו לסימולטור הסצנות.</strong>
+                    <strong>מתחילים: גשר תחושה־שפה. כבר מזהים דפוסים: תרגול זיהוי ואז מכ"ם שלשות. מתקדמים: סימולטור סצנות או מעבדת פריזמות כדי לראות את זה בתוך הקשר חי.</strong>
                 </aside>
                 <div class="home-route-preferences">
                     <button id="home-lobby-reduce-motion-toggle" class="btn btn-secondary" type="button" aria-pressed="false">הפחת אנימציות: כבוי</button>

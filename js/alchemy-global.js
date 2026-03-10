@@ -224,7 +224,7 @@
 
         var companion = createEl('button', 'alchemy-companion');
         companion.type = 'button';
-        companion.setAttribute('aria-label', 'Alchemy companion');
+        companion.setAttribute('aria-label', 'עוזר צליל');
         companion.innerHTML = [
             '<span class="alchemy-companion__dismiss" title="Hide companion">\u00d7</span>',
             '<div class="alchemy-companion__label">Alchemy companion</div>',
@@ -238,12 +238,12 @@
 
         var muteBtn = createEl('button', 'alchemy-mute');
         muteBtn.type = 'button';
-        muteBtn.setAttribute('aria-label', 'Toggle alchemy sounds');
+        muteBtn.setAttribute('aria-label', 'הפעלת או השתקת צלילים');
         muteBtn.style.pointerEvents = 'auto';
 
         var companionToggle = createEl('button', 'alchemy-companion-toggle');
         companionToggle.type = 'button';
-        companionToggle.setAttribute('aria-label', 'Show Alchemy companion');
+        companionToggle.setAttribute('aria-label', 'הצגת עוזר הצליל');
         companionToggle.innerHTML = '<span aria-hidden="true">\u2728</span>';
         companionToggle.hidden = true;
         companionToggle.style.pointerEvents = 'auto';
@@ -251,12 +251,12 @@
         var consent = createEl('div', 'alchemy-consent');
         consent.hidden = true;
         consent.innerHTML = [
-            '<div class="alchemy-consent__card" role="dialog" aria-modal="true" aria-label="Enable Alchemy Sounds">',
-            '  <div class="alchemy-consent__title"><span class="alchemy-consent__title-dot" aria-hidden="true"></span><span>Enable magical alchemy sounds?</span></div>',
-            '  <div class="alchemy-consent__text">Low-volume ambient layer + small sound effects for clicks, success, almost, and mastery. You can mute anytime.</div>',
+            '<div class="alchemy-consent__card" role="dialog" aria-modal="true" aria-label="הפעלת צלילים">',
+            '  <div class="alchemy-consent__title"><span class="alchemy-consent__title-dot" aria-hidden="true"></span><span>להפעיל צלילים עדינים לאימון?</span></div>',
+            '  <div class="alchemy-consent__text">שכבת רקע שקטה ועוד צלילים קטנים ללחיצות, הצלחה וכמעט. אפשר להשתיק בכל רגע.</div>',
             '  <div class="alchemy-consent__actions">',
-            '    <button type="button" class="alchemy-consent__btn" data-alchemy-consent="no">No thanks</button>',
-            '    <button type="button" class="alchemy-consent__btn alchemy-consent__btn--primary" data-alchemy-consent="yes">Enable sounds</button>',
+            '    <button type="button" class="alchemy-consent__btn" data-alchemy-consent="no">לא עכשיו</button>',
+            '    <button type="button" class="alchemy-consent__btn alchemy-consent__btn--primary" data-alchemy-consent="yes">הפעל צלילים</button>',
             '  </div>',
             '</div>'
         ].join('');
@@ -281,7 +281,7 @@
         state.consentEl = consent;
 
         setCompanionMood('idle');
-        announceCompanion('Magic mode ready');
+        announceCompanion('מצב הצליל מוכן');
     }
 
     function bindEvents() {
@@ -329,19 +329,19 @@
                 if (state.audio.consent !== 'yes') {
                     showConsent(true);
                     setCompanionMood('wow', 1200);
-                    announceCompanion('Enable sound?');
+                    announceCompanion('להפעיל צלילים?');
                     return;
                 }
                 if (state.audio.muted) {
                     toggleMute(false);
-                    announceCompanion('Sound on');
+                    announceCompanion('הצליל פעיל');
                     return;
                 }
                 maybeStartAmbient({ durationMs: 14000 });
                 playFx('success');
                 celebrateAt(window.innerWidth - 72, window.innerHeight - 96, 'success');
                 setCompanionMood('dance', 1800);
-                announceCompanion('Woo!');
+                announceCompanion('יופי');
             });
         }
 
@@ -351,7 +351,7 @@
                 event.stopPropagation();
                 if (!state.ui.isMobileViewport) return;
                 setCompanionMinimized(true, true);
-                announceCompanion('Companion hidden');
+                announceCompanion('העוזר הוסתר');
             });
         }
 
@@ -361,7 +361,7 @@
                 event.stopPropagation();
                 setCompanionMinimized(false, true);
                 setCompanionMood('happy', 1000);
-                announceCompanion('Back in view');
+                announceCompanion('העוזר חזר');
                 playFx('whoosh');
             });
         }
@@ -389,14 +389,14 @@
                     safeStorageSet(STORAGE_MUTED, '0');
                     ensureAudioReady(true);
                     playFx('success');
-                    announceCompanion('Sound enabled');
+                    announceCompanion('הצליל הופעל');
                     setCompanionMood('happy', 1400);
                 } else {
                     state.audio.muted = true;
                     safeStorageSet(STORAGE_MUTED, '1');
                     stopAmbient(true);
                     stopTransientAudio();
-                    announceCompanion('Silent magic mode');
+                    announceCompanion('מצב שקט');
                     setCompanionMood('idle', 800);
                 }
                 updateMuteButton();
@@ -514,7 +514,7 @@
             return;
         }
         state.consentEl.hidden = !show;
-        if (show) announceCompanion('Enable alchemy sounds?');
+        if (show) announceCompanion('להפעיל צלילים?');
     }
 
     function updateMuteButton() {
@@ -523,12 +523,12 @@
         var compactMobileLabel = !!state.ui.isMobileViewport;
         state.muteBtn.setAttribute('data-muted', muted ? 'true' : 'false');
         if (state.audio.consent !== 'yes') {
-            state.muteBtn.textContent = compactMobileLabel ? '\ud83d\udd09?' : 'Sound: ask';
+            state.muteBtn.textContent = compactMobileLabel ? '\ud83d\udd09?' : 'צליל: שאל';
         } else {
-            state.muteBtn.textContent = compactMobileLabel ? (muted ? '\ud83d\udd07' : '\ud83d\udd0a') : (muted ? 'Sound: off' : 'Sound: on');
+            state.muteBtn.textContent = compactMobileLabel ? (muted ? '\ud83d\udd07' : '\ud83d\udd0a') : (muted ? 'צליל: כבוי' : 'צליל: פעיל');
         }
         state.muteBtn.setAttribute('aria-pressed', muted ? 'true' : 'false');
-        state.muteBtn.setAttribute('aria-label', muted ? 'Sound off' : 'Sound on');
+        state.muteBtn.setAttribute('aria-label', muted ? 'צליל כבוי' : 'צליל פעיל');
     }
 
     function toggleMute(nextMuted) {
@@ -550,7 +550,7 @@
             scheduleAmbientStop(AMBIENT_AUTO_STOP_MS);
         }
         updateMuteButton();
-        announceCompanion(state.audio.muted ? 'Muted' : 'Sound on');
+        announceCompanion(state.audio.muted ? 'הצליל כבוי' : 'הצליל פעיל');
         setCompanionMood(state.audio.muted ? 'idle' : 'happy', 900);
     }
 

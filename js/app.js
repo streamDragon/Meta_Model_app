@@ -3973,8 +3973,8 @@ function buildScreenReadGuide(screenId) {
     button.type = 'button';
     button.className = 'btn btn-primary screen-read-guide-btn';
     button.innerHTML = `
-        <span class="screen-read-guide-btn-main">קרא/י לפני שמתחילים</span>
-        <span class="screen-read-guide-btn-sub">הסבר מלא: היגיון, דרך עבודה ומה צפוי לדעת אחרי התרגול</span>
+        <span class="screen-read-guide-btn-main">לפני שמתחילים</span>
+        <span class="screen-read-guide-btn-sub">מה מחפשים כאן ואיך ניגשים לסבב ראשון</span>
     `;
 
     const modal = document.createElement('div');
@@ -4024,8 +4024,8 @@ function buildScreenReadGuide(screenId) {
     demoBtn.type = 'button';
     demoBtn.className = 'btn btn-secondary screen-read-guide-demo-btn';
     demoBtn.innerHTML = `
-        <span class="screen-read-guide-btn-main">דיאלוג טיפולי לדוגמה</span>
-        <span class="screen-read-guide-btn-sub">דוגמת שימוש שממחישה איך הכלי עוזר בשיחה אמיתית</span>
+        <span class="screen-read-guide-btn-main">כך זה נראה בשיחה</span>
+        <span class="screen-read-guide-btn-sub">דוגמה קצרה שממחישה איך הכלי עובד בתוך הקשר אמיתי</span>
     `;
 
     const demoModal = document.createElement('div');
@@ -4041,8 +4041,8 @@ function buildScreenReadGuide(screenId) {
     modal.innerHTML = `
         <div class="screen-read-guide-dialog">
             <button type="button" class="screen-read-guide-close" aria-label="סגירה">×</button>
-            <h3>קרא/י לפני שמתחילים: ${escapeHtml(title)}</h3>
-            <p class="screen-read-guide-lead">המטרה כאן היא לא רק לענות נכון, אלא להבין את ההיגיון של התרגול כדי ליישם אותו גם בשיחה אמיתית מחוץ לאפליקציה.</p>
+            <h3>לפני שמתחילים ב${escapeHtml(title)}</h3>
+            <p class="screen-read-guide-lead">הכוונה כאן היא שהסבב הראשון לא ירגיש אקראי: להבין מה מחפשים, איך ניגשים, ומה שווה לקחת אחר כך לשיחה אמיתית.</p>
             <div class="screen-read-guide-content">
                 <h4>מה ההיגיון של התרגול?</h4>
                 <p>${escapeHtml(copy.logic)}</p>
@@ -4083,7 +4083,7 @@ function buildScreenReadGuide(screenId) {
     demoModal.innerHTML = `
         <div class="screen-read-guide-dialog screen-read-guide-dialog-demo">
             <button type="button" class="screen-read-guide-close" aria-label="סגירה">×</button>
-            <h3>דיאלוג טיפולי לדוגמה: ${escapeHtml(title)}</h3>
+            <h3>כך זה נראה בשיחה: ${escapeHtml(title)}</h3>
             <p class="screen-read-guide-lead">${escapeHtml(demo.frame)}</p>
             <div class="screen-demo-dialogue-box">${demoTurnsHtml}</div>
             <div class="screen-demo-dialogue-summary">
@@ -4165,7 +4165,14 @@ function getScreenReadGuideTitle(screenId) {
     if (!screen) return 'מסך תרגול';
     const heading = screen.querySelector('h2, h3');
     const title = normalizeUiText(heading?.textContent?.trim() || '');
-    return looksLikeMojibakeText(title) ? 'מסך תרגול' : (title || 'מסך תרגול');
+    if (looksLikeMojibakeText(title)) return 'מסך תרגול';
+    const cleaned = title
+        .replace(/^(קרא\/י לפני שמתחילים|דיאלוג טיפולי לדוגמה|כך זה נראה בשיחה)\s*:\s*/u, '')
+        .replace(/^שם הלשונית של\s*/u, '')
+        .trim();
+    if (cleaned) return cleaned;
+    const fallback = normalizeUiText(APP_STICKY_TAB_TITLE_OVERRIDES[screenId] || getTabTitle(screenId) || '');
+    return fallback || 'מסך תרגול';
 }
 
 function setupReadBeforeStartGuides() {
@@ -7766,6 +7773,28 @@ function buildQuestionDrillLearningTakeaway(question = null, category = 'DELETIO
     return `${reason}. מה למדתי מהבחירה הזו? לחפש ${copy.target}.`;
 }
 
+function buildQuestionDrillSessionGuidance(accuracy = 0, { isTestMode = false } = {}) {
+    const safeAccuracy = Math.max(0, Math.min(100, Math.round(Number(accuracy) || 0)));
+    if (safeAccuracy >= 85) {
+        return {
+            takeaway: isTestMode
+                ? 'הדיוק כבר נשמר גם תחת לחץ. כנראה שהעין מזהה מהר את המילה שמפעילה את הקטגוריה.'
+                : 'הזיהוי כבר נהיה יציב יותר. כנראה שאת/ה תופס/ת מהר מה במשפט מפעיל את הקטגוריה.',
+            nextStep: 'להמשך: עברו למכ"ם שלשות או לקומיקס כדי לראות איך אותו דיוק עובד בתוך הקשר חי.'
+        };
+    }
+    if (safeAccuracy >= 60) {
+        return {
+            takeaway: 'יש בסיס טוב. החיזוק הבא הוא לעצור על המילה שמטה את המשפט לפני שלוחצים "בדוק".',
+            nextStep: 'להמשך: עשו עוד בלוק קצר, או עברו למכ"ם שלשות כדי להתאמן קודם על כיוון ואז על תבנית.'
+        };
+    }
+    return {
+        takeaway: 'עדיף לא לרדוף מהירות עדיין. קודם מחזקים את ההבדל בין מחיקה, עיוות והכללה דרך הנימוק.',
+        nextStep: 'להמשך: פתחו את מילון הקטגוריות או את ההסבר של השאלה האחרונה, וקחו תבנית אחת לעוד 3 ניסיונות.'
+    };
+}
+
 function renderQuestionDrillTargetLegend() {
     const legend = questionDrillState.elements.targetLegend;
     if (!legend) return;
@@ -8860,6 +8889,7 @@ function completeQuestionDrillSession() {
             const avgMs = questionDrillState.testReactionCount
                 ? Math.round(questionDrillState.testReactionTotalMs / questionDrillState.testReactionCount)
                 : 0;
+            const guidance = buildQuestionDrillSessionGuidance(accuracy, { isTestMode: true });
             summaryEl.innerHTML = `
                 <div class="question-drill-summary-head">
                     <strong>סשן משחק הושלם</strong>
@@ -8873,8 +8903,11 @@ function completeQuestionDrillSession() {
                     <div><small>נכונות</small><strong>${questionDrillState.roundsCorrect}/${plan.rounds}</strong></div>
                     <div><small>שיא אישי</small><strong>${questionDrillState.testBestScoreByDifficulty[questionDrillState.testDifficulty] || 0}</strong></div>
                 </div>
+                <p class="question-drill-summary-takeaway"><strong>מה לקחת מהסשן:</strong> ${guidance.takeaway}</p>
+                <p class="question-drill-summary-next-step"><strong>לאן ממשיכים מכאן:</strong> ${guidance.nextStep}</p>
             `;
         } else {
+            const guidance = buildQuestionDrillSessionGuidance(accuracy, { isTestMode: false });
             summaryEl.innerHTML = `
                 <div class="question-drill-summary-head">
                     <strong>${hitTarget ? 'יעד הושג' : 'סשן הושלם'}</strong>
@@ -8889,6 +8922,8 @@ function completeQuestionDrillSession() {
                     <div><small>יעד</small><strong>${plan.targetStars}⭐</strong></div>
                 </div>
                 ${bonusStars || bonusXP ? `<p class="question-drill-summary-bonus">בונוס: +${bonusStars}⭐ / +${bonusXP} XP</p>` : ''}
+                <p class="question-drill-summary-takeaway"><strong>מה לקחת מהסשן:</strong> ${guidance.takeaway}</p>
+                <p class="question-drill-summary-next-step"><strong>לאן ממשיכים מכאן:</strong> ${guidance.nextStep}</p>
             `;
         }
         applyOpenedContentFeedback(summaryEl, revealFeedbackState.lastActionButton);

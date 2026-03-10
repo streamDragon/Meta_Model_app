@@ -2904,6 +2904,16 @@ input[type="reset"] {
     opacity: 0.95;
 }
 
+body[data-user-level="advanced"] .screen-read-guide-philosopher-toggle {
+    display: none;
+}
+
+body[data-user-level="advanced"] .screen-read-guide-btn,
+body[data-user-level="advanced"] .screen-read-guide-demo-btn {
+    min-height: 42px;
+    padding: 7px 10px;
+}
+
 .practice-tab-content .practice-intro-card > h2,
 .practice-tab-content .practice-intro-card > .subtitle {
     display: none;
@@ -17198,6 +17208,10 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
     .home-route-features {
         grid-template-columns: 1fr;
     }
+
+    .mobile-feed-launchpad-support {
+        grid-template-columns: 1fr;
+    }
 }
 
 .mobile-feed-home {
@@ -17211,6 +17225,106 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
 .home-route.is-mobile-feed .mobile-feed-home {
     display: grid;
     gap: 10px;
+}
+
+.mobile-feed-launchpad {
+    display: grid;
+    gap: 10px;
+    border: 1px solid #d7e8ff;
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at top left, rgba(14, 165, 233, 0.14), transparent 34%),
+        linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+    padding: 12px;
+}
+
+.mobile-feed-launchpad-head {
+    display: grid;
+    gap: 4px;
+}
+
+.mobile-feed-launchpad-kicker {
+    margin: 0;
+    color: #0f766e;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.mobile-feed-launchpad-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.18rem;
+    line-height: 1.2;
+}
+
+.mobile-feed-launchpad-copy {
+    margin: 0;
+    color: #334155;
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+.mobile-feed-launchpad-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.mobile-feed-launch-card {
+    display: grid;
+    gap: 8px;
+    border-radius: 16px;
+    border: 1px solid #d8e6f5;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    padding: 12px;
+}
+
+.mobile-feed-launch-card[data-launch-track="beginner"] {
+    border-inline-start: 5px solid #0f766e;
+}
+
+.mobile-feed-launch-card[data-launch-track="intermediate"] {
+    border-inline-start: 5px solid #0284c7;
+}
+
+.mobile-feed-launch-card[data-launch-track="advanced"] {
+    border-inline-start: 5px solid #d97706;
+}
+
+.mobile-feed-launch-card-kicker {
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.mobile-feed-launch-card h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1rem;
+}
+
+.mobile-feed-launch-card p {
+    margin: 0;
+    color: #475569;
+    font-size: 0.86rem;
+    line-height: 1.5;
+}
+
+.mobile-feed-launch-card .btn {
+    width: 100%;
+}
+
+.mobile-feed-launchpad-support {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.mobile-feed-launchpad-support .btn {
+    min-height: 42px;
+    padding-inline: 8px;
+    font-size: 0.82rem;
 }
 
 .mobile-feed-ticker {
@@ -17365,6 +17479,19 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
     font-size: 0.72rem;
     font-weight: 800;
     padding: 2px 8px;
+}
+
+.question-drill-summary-takeaway,
+.question-drill-summary-next-step {
+    margin: 0;
+    line-height: 1.6;
+    color: #334155;
+    font-size: 0.86rem;
+}
+
+.question-drill-summary-next-step {
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 8px;
 }
 
 .mobile-feed-title {
