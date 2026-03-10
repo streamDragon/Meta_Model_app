@@ -984,6 +984,24 @@
                     }
                 }, 40);
             });
+            clone.querySelectorAll('[data-global-feature-menu-select]').forEach((selectNode) => {
+                selectNode.addEventListener('change', (event) => {
+                    const sourceKey = String(event?.target?.getAttribute?.('data-global-feature-menu-select') || '').trim();
+                    const selectedKey = String(event?.target?.value || '').trim();
+                    if (!sourceKey || !selectedKey) return;
+
+                    const liveSelect = featureMap?.querySelector?.(`[data-global-feature-menu-select="${sourceKey}"]`);
+                    if (!(liveSelect instanceof HTMLSelectElement)) return;
+
+                    liveSelect.value = selectedKey;
+                    liveSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    global.setTimeout(() => {
+                        if (global.MetaOverlayProvider && typeof global.MetaOverlayProvider.isOpen === 'function' && global.MetaOverlayProvider.isOpen()) {
+                            global.MetaOverlayProvider.closeOverlay('home-menu-select-action');
+                        }
+                    }, 40);
+                });
+            });
             panel.appendChild(clone);
         } else {
             const fallback = document.createElement('p');

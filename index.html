@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.230" data-build-time="1773107302660" data-build-iso="2026-03-10T01:48:22.660Z" data-git-commit="8b61f26">
+<html lang="he" dir="rtl" data-app-version="1.0.231" data-build-time="1773113643379" data-build-iso="2026-03-10T03:34:03.379Z" data-git-commit="ab58a87">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -817,10 +817,11 @@
 
                     <section class="practice-section practice-section-question" aria-label="תרגול זיהוי מטה-מודל">
                         <div id="question-drill" class="card question-drill-card" data-stage="setup">
+                            <div id="question-drill-fx-layer" class="question-drill-fx-layer" aria-hidden="true"></div>
                             <div id="question-drill-prestart" class="question-drill-prestart">
                                 <div class="question-drill-header">
                                     <h3 id="question-drill-main-title">זיהוי מטה-מודל</h3>
-                                    <small id="question-drill-subtitle">קוראים משפט ובוחרים את סוג ההפרה.</small>
+                                    <small id="question-drill-subtitle">קוראים משפט, מבינים איזה מידע חסר לנו, ובוחרים את שאלת הדיוק המתאימה.</small>
                                 </div>
                                 <div class="question-drill-session-panel">
                                     <div class="question-drill-session-config">
@@ -828,9 +829,9 @@
                                             <span class="question-drill-mode-label">מצב</span>
                                             <div class="question-drill-mode-switch" role="group" aria-label="בחירת מצב לתרגול זיהוי מטה-מודל">
                                                 <button id="question-drill-mode-learning" type="button" class="question-drill-mode-btn is-active" aria-pressed="true">לימוד</button>
-                                                <button id="question-drill-mode-exam" type="button" class="question-drill-mode-btn" aria-pressed="false">מבחן</button>
+                                                <button id="question-drill-mode-exam" type="button" class="question-drill-mode-btn" aria-pressed="false">משחק מהיר</button>
                                             </div>
-                                            <small id="question-drill-mode-note" class="question-drill-mode-note">לימוד: עם רמזים ומשוב קצר.</small>
+                                            <small id="question-drill-mode-note" class="question-drill-mode-note">לימוד: קושרים בין סוג המידע לשאלת הדיוק. משחק מהיר: זמן, ניקוד ורצף.</small>
                                         </div>
                                         <label class="question-drill-plan-box" for="question-drill-plan">
                                             <span>חבילה</span>
@@ -879,32 +880,72 @@
                                     <button id="question-drill-open-menu" class="question-drill-mini-btn" type="button">עוד</button>
                                 </div>
 
-                                <p id="question-drill-statement" class="question-drill-statement"></p>
-                                <div id="question-drill-test-banner" class="question-drill-test-banner hidden" aria-live="polite">
-                                    <p id="question-drill-test-banner-title">מצא את העיוות!!</p>
-                                    <small id="question-drill-test-banner-subtitle">לחץ מהר על התשובה הנכונה</small>
-                                </div>
-                                <div id="question-drill-options" class="question-drill-options" role="radiogroup" aria-label="בחירת תשובה לתרגיל"></div>
-                                <div class="question-drill-controls">
-                                    <label id="question-drill-category-wrap">
-                                        <span>קטגוריה</span>
-                                        <select id="question-drill-category">
-                                            <option value="DELETION">מחיקה</option>
-                                            <option value="DISTORTION">עיוות</option>
-                                            <option value="GENERALIZATION">הכללה</option>
-                                        </select>
-                                    </label>
-                                    <button id="question-drill-check" class="btn btn-primary">בדוק</button>
-                                    <button id="question-drill-next" class="btn btn-secondary">דלג</button>
+                                <div id="question-drill-target-bar" class="question-drill-target-bar hidden" aria-live="polite">
+                                    <p id="question-drill-target-copy" class="question-drill-target-copy"></p>
+                                    <div id="question-drill-target-legend" class="question-drill-target-legend"></div>
                                 </div>
 
-                                <div id="question-drill-feedback-shell" class="question-drill-feedback-shell hidden">
-                                    <div id="question-drill-feedback" class="question-drill-feedback">
-                                        <strong id="question-drill-feedback-title" class="question-drill-feedback-title">מה עושים עכשיו</strong>
-                                        <p id="question-drill-feedback-body" class="question-drill-feedback-body"></p>
+                                <div class="question-drill-live-grid">
+                                    <div class="question-drill-live-main">
+                                        <p id="question-drill-statement" class="question-drill-statement"></p>
+                                        <div id="question-drill-test-banner" class="question-drill-test-banner hidden" aria-live="polite">
+                                            <p id="question-drill-test-banner-title">מצא את העיוות!!</p>
+                                            <small id="question-drill-test-banner-subtitle">לחץ מהר על התשובה הנכונה</small>
+                                        </div>
+                                        <div id="question-drill-options" class="question-drill-options" role="radiogroup" aria-label="בחירת תשובה לתרגיל"></div>
+                                        <div class="question-drill-controls">
+                                            <label id="question-drill-category-wrap">
+                                                <span>קטגוריה</span>
+                                                <select id="question-drill-category">
+                                                    <option value="DELETION">השמטה</option>
+                                                    <option value="DISTORTION">עיוות</option>
+                                                    <option value="GENERALIZATION">הכללה</option>
+                                                </select>
+                                            </label>
+                                            <button id="question-drill-check" class="btn btn-primary">בדוק</button>
+                                            <button id="question-drill-next" class="btn btn-secondary">דלג</button>
+                                        </div>
+
+                                        <div id="question-drill-feedback-shell" class="question-drill-feedback-shell hidden">
+                                            <div id="question-drill-feedback" class="question-drill-feedback">
+                                                <strong id="question-drill-feedback-title" class="question-drill-feedback-title">מה עושים עכשיו</strong>
+                                                <p id="question-drill-feedback-body" class="question-drill-feedback-body"></p>
+                                            </div>
+                                            <div class="question-drill-feedback-actions">
+                                                <button id="question-drill-open-explanation" class="btn btn-secondary hidden" type="button">הסבר</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="question-drill-feedback-actions">
-                                        <button id="question-drill-open-explanation" class="btn btn-secondary hidden" type="button">הסבר</button>
+
+                                    <aside id="question-drill-game-hud" class="question-drill-game-hud" aria-live="polite">
+                                        <div class="question-drill-game-hud-head">
+                                            <strong>משחק קטן</strong>
+                                            <small id="question-drill-hud-mode">לימוד</small>
+                                        </div>
+                                        <div id="question-drill-traffic-light" class="question-drill-traffic-light" data-state="green" aria-label="רמזור מצב">
+                                            <span class="question-drill-light question-drill-light-red" aria-hidden="true"></span>
+                                            <span class="question-drill-light question-drill-light-yellow" aria-hidden="true"></span>
+                                            <span class="question-drill-light question-drill-light-green" aria-hidden="true"></span>
+                                        </div>
+                                        <p id="question-drill-traffic-label" class="question-drill-traffic-label">מוכן לסבב</p>
+                                        <div class="question-drill-hud-grid">
+                                            <div class="question-drill-hud-box">
+                                                <span id="question-drill-hud-time-label">זמן</span>
+                                                <strong id="question-drill-hud-time">--</strong>
+                                            </div>
+                                            <div class="question-drill-hud-box">
+                                                <span id="question-drill-hud-score-label">נקודות</span>
+                                                <strong id="question-drill-hud-score">0</strong>
+                                            </div>
+                                            <div class="question-drill-hud-box">
+                                                <span id="question-drill-hud-streak-label">רצף</span>
+                                                <strong id="question-drill-hud-streak">0</strong>
+                                            </div>
+                                            <div class="question-drill-hud-box">
+                                                <span id="question-drill-hud-bonus-label">בונוס</span>
+                                                <strong id="question-drill-hud-bonus">0</strong>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -5548,11 +5548,11 @@ function getBreenReferenceRows() {
     const coreRows = window.triplesRadarCore?.ROWS;
     if (Array.isArray(coreRows) && coreRows.length) return coreRows;
     return [
-        { id: 'row1', categories: ['lost_performative', 'assumptions', 'mind_reading'] },
-        { id: 'row2', categories: ['universal_quantifier', 'modal_operator', 'cause_effect'] },
-        { id: 'row3', categories: ['nominalisations', 'identity_predicates', 'complex_equivalence'] },
-        { id: 'row4', categories: ['comparative_deletion', 'time_space_predicates', 'lack_referential_index'] },
-        { id: 'row5', categories: ['non_referring_nouns', 'sensory_predicates', 'unspecified_verbs'] }
+        { id: 'row1', categories: ['mind_reading', 'assumptions', 'lost_performative'] },
+        { id: 'row2', categories: ['cause_effect', 'modal_operator', 'universal_quantifier'] },
+        { id: 'row3', categories: ['complex_equivalence', 'identity_predicates', 'nominalisations'] },
+        { id: 'row4', categories: ['lack_referential_index', 'time_space_predicates', 'comparative_deletion'] },
+        { id: 'row5', categories: ['unspecified_verbs', 'sensory_predicates', 'non_referring_nouns'] }
     ];
 }
 
@@ -6454,6 +6454,20 @@ function buildGlossaryConceptCard(item = {}, { lazyBody = false } = {}) {
     const normalizedId = normalizeGlossaryConceptId(item.id || '') || normalizeUiText(String(item.id || '').trim());
     const bodyMarkup = lazyBody ? '' : buildGlossaryConceptBody(item);
     const lazyAttr = lazyBody ? ' data-glossary-lazy="true"' : '';
+    const pills = [];
+    const seenPills = new Set();
+    [
+        { text: groupHe, className: 'glossary-pill glossary-pill-he' },
+        { text: groupEn, className: 'glossary-pill glossary-pill-en' },
+        { text: mainCategory, className: 'glossary-pill glossary-pill-en' }
+    ].forEach((pill) => {
+        const text = normalizeUiText(String(pill?.text || '').trim());
+        if (!text) return;
+        const key = text.toUpperCase();
+        if (seenPills.has(key)) return;
+        seenPills.add(key);
+        pills.push(`<span class="${pill.className}">${escapeHtml(text)}</span>`);
+    });
 
     return `
         <details class="category-card glossary-card glossary-category ${escapeHtml(getGlossaryGroupClass(groupEn))}" data-glossary-id="${escapeHtml(normalizedId)}">
@@ -6461,9 +6475,7 @@ function buildGlossaryConceptCard(item = {}, { lazyBody = false } = {}) {
                 <div class="glossary-card-head">
                     <h3>${icon ? `${escapeHtml(icon)} ` : ''}${escapeHtml(title)}</h3>
                     <div class="glossary-pills">
-                        ${groupHe ? `<span class="glossary-pill glossary-pill-he">${escapeHtml(groupHe)}</span>` : ''}
-                        ${groupEn ? `<span class="glossary-pill glossary-pill-en">${escapeHtml(groupEn)}</span>` : ''}
-                        ${mainCategory ? `<span class="glossary-pill glossary-pill-en">${escapeHtml(mainCategory)}</span>` : ''}
+                        ${pills.join('')}
                     </div>
                 </div>
             </summary>
@@ -6931,13 +6943,13 @@ const QUESTION_DRILL_KEYWORDS = {
 };
 
 const QUESTION_DRILL_CATEGORY_LABELS = Object.freeze({
-    DELETION: 'מחיקה',
+    DELETION: 'השמטה',
     DISTORTION: 'עיוות',
     GENERALIZATION: 'הכללה'
 });
 
 const QUESTION_DRILL_CATEGORY_SHORT_LABELS = Object.freeze({
-    DELETION: 'מחיקה',
+    DELETION: 'השמטה',
     DISTORTION: 'עיוות',
     GENERALIZATION: 'הכללה'
 });
@@ -6946,6 +6958,29 @@ const QUESTION_DRILL_TEST_PROMPTS = Object.freeze({
     DELETION: 'מצא את ההשמטה!!',
     DISTORTION: 'מצא את העיוות!!',
     GENERALIZATION: 'מצא את ההכללה!!'
+});
+
+const QUESTION_DRILL_TARGET_COPY = Object.freeze({
+    DELETION: Object.freeze({
+        label: 'השמטה',
+        goal: 'מחפשים את שאלת הדיוק שמחזירה פרטים חסרים למשפט.',
+        target: 'מי/מה/מתי/איך בדיוק חסר כאן'
+    }),
+    DISTORTION: Object.freeze({
+        label: 'עיוות',
+        goal: 'מחפשים את שאלת הדיוק שבודקת פירוש, מסקנה או קישור שלא בטוח נכונים.',
+        target: 'ראיות, פירוש חלופי או הנחת עומק'
+    }),
+    GENERALIZATION: Object.freeze({
+        label: 'הכללה',
+        goal: 'מחפשים את שאלת הדיוק שמחזירה חריגים, טווח והקשר.',
+        target: 'מתי זה לא תמיד נכון, אצל מי, ובאיזה תנאים'
+    })
+});
+
+const QUESTION_DRILL_TIMER_LIGHTS_MS = Object.freeze({
+    green: 2500,
+    yellow: 4800
 });
 
 const QUESTION_DRILL_DIFFICULTIES = Object.freeze([
@@ -7047,6 +7082,7 @@ const questionDrillState = {
     currentRoundAward: null,
     feedbackText: '',
     feedbackTone: 'info',
+    trafficState: 'green',
     elements: {}
 };
 
@@ -7154,7 +7190,7 @@ function saveQuestionDrillTestStats() {
 }
 
 function getQuestionDrillModeLabel(mode = questionDrillState.mode) {
-    return normalizeQuestionDrillMode(mode) === 'test' ? 'מבחן' : 'לימוד';
+    return normalizeQuestionDrillMode(mode) === 'test' ? 'משחק מהיר' : 'לימוד';
 }
 
 function getQuestionDrillFeedbackHeading(tone = 'info') {
@@ -7232,6 +7268,170 @@ function getQuestionDrillUiStage() {
     return 'live';
 }
 
+function getQuestionDrillTargetCopy(category = 'DELETION') {
+    const key = String(category || '').toUpperCase();
+    return QUESTION_DRILL_TARGET_COPY[key] || QUESTION_DRILL_TARGET_COPY.DELETION;
+}
+
+function renderQuestionDrillTargetLegend() {
+    const legend = questionDrillState.elements.targetLegend;
+    if (!legend) return;
+    const activeCategory = getQuestionDrillTargetCategory(questionDrillState.current);
+    legend.innerHTML = QUESTION_DRILL_CATEGORIES.map((category) => {
+        const copy = getQuestionDrillTargetCopy(category);
+        const activeClass = category === activeCategory ? ' is-active' : '';
+        return `<span class="question-drill-target-chip${activeClass}">${escapeHtml(copy.label)}</span>`;
+    }).join('');
+}
+
+function updateQuestionDrillTargetBar() {
+    const bar = questionDrillState.elements.targetBar;
+    if (!bar) return;
+    const shouldShow = questionDrillState.mode !== 'test' && Boolean(questionDrillState.current) && !questionDrillState.sessionCompleted;
+    bar.classList.toggle('hidden', !shouldShow);
+    if (!shouldShow) return;
+
+    const copy = getQuestionDrillTargetCopy(getQuestionDrillTargetCategory(questionDrillState.current));
+    if (questionDrillState.elements.targetCopy) {
+        questionDrillState.elements.targetCopy.textContent = `מטרת הסבב: מצא/י את שאלת הדיוק שמתאימה לקטגוריית המידע שאנחנו רוצים להשיג: ${copy.label}.`;
+    }
+    renderQuestionDrillTargetLegend();
+}
+
+function setQuestionDrillTrafficState(state = 'green', label = '') {
+    const nextState = ['green', 'yellow', 'red'].includes(String(state || '').trim().toLowerCase())
+        ? String(state || '').trim().toLowerCase()
+        : 'green';
+    const fallbackLabels = {
+        green: 'מוכן לסבב',
+        yellow: 'צריך עוד דיוק',
+        red: 'הסבב נסגר, עוברים הלאה'
+    };
+    questionDrillState.trafficState = nextState;
+    if (questionDrillState.elements.traffic) {
+        questionDrillState.elements.traffic.dataset.state = nextState;
+    }
+    if (questionDrillState.elements.trafficLabel) {
+        questionDrillState.elements.trafficLabel.textContent = String(label || fallbackLabels[nextState] || '').trim();
+    }
+}
+
+function refreshQuestionDrillTrafficState() {
+    if (questionDrillState.sessionCompleted) {
+        setQuestionDrillTrafficState('green', 'הסשן הושלם');
+        return;
+    }
+
+    if (questionDrillState.mode === 'test' && questionDrillState.current && !questionDrillState.roundFinalized) {
+        const elapsed = Math.max(0, Number(questionDrillState.testTimerMs) || 0);
+        if (elapsed <= QUESTION_DRILL_TIMER_LIGHTS_MS.green) {
+            setQuestionDrillTrafficState('green', 'חלון תגובה פתוח');
+            return;
+        }
+        if (elapsed <= QUESTION_DRILL_TIMER_LIGHTS_MS.yellow) {
+            setQuestionDrillTrafficState('yellow', 'להחליט עכשיו');
+            return;
+        }
+        setQuestionDrillTrafficState('red', 'האדום מתקרב');
+        return;
+    }
+
+    if (questionDrillState.roundFinalized) {
+        if (questionDrillState.roundCorrect) {
+            setQuestionDrillTrafficState('green', 'זיהוי נכון');
+            return;
+        }
+        setQuestionDrillTrafficState('red', 'סוגרים סבב וממשיכים');
+        return;
+    }
+
+    if (questionDrillState.roundChecks > 0 && !questionDrillState.roundCorrect) {
+        setQuestionDrillTrafficState('yellow', 'כיוון קרוב, נסו שוב');
+        return;
+    }
+
+    setQuestionDrillTrafficState('green', questionDrillState.mode === 'test' ? 'מוכן לזיהוי מהיר' : 'מוכן לסבב');
+}
+
+function updateQuestionDrillGameHud() {
+    const isTestMode = questionDrillState.mode === 'test';
+    const bestByDifficulty = questionDrillState.testBestScoreByDifficulty[questionDrillState.testDifficulty] || 0;
+    const roundAward = questionDrillState.currentRoundAward || null;
+    const roundAwardText = !isTestMode && roundAward && (roundAward.xp || roundAward.stars)
+        ? `+${roundAward.xp || 0} / +${roundAward.stars || 0}⭐`
+        : '';
+
+    if (questionDrillState.elements.hudMode) {
+        questionDrillState.elements.hudMode.textContent = getQuestionDrillModeLabel();
+    }
+    if (questionDrillState.elements.hudTimeLabel) {
+        questionDrillState.elements.hudTimeLabel.textContent = 'זמן';
+    }
+    if (questionDrillState.elements.hudTime) {
+        questionDrillState.elements.hudTime.textContent = isTestMode
+            ? `${formatQuestionDrillTimerMs(questionDrillState.testTimerMs)}ש׳`
+            : 'חופשי';
+    }
+    if (questionDrillState.elements.hudScoreLabel) {
+        questionDrillState.elements.hudScoreLabel.textContent = isTestMode ? 'ניקוד' : 'כוכבים';
+    }
+    if (questionDrillState.elements.hudScore) {
+        questionDrillState.elements.hudScore.textContent = String(isTestMode ? questionDrillState.testScore : questionDrillState.sessionStars);
+    }
+    if (questionDrillState.elements.hudStreakLabel) {
+        questionDrillState.elements.hudStreakLabel.textContent = 'רצף';
+    }
+    if (questionDrillState.elements.hudStreak) {
+        questionDrillState.elements.hudStreak.textContent = String(questionDrillState.streak);
+    }
+    if (questionDrillState.elements.hudBonusLabel) {
+        questionDrillState.elements.hudBonusLabel.textContent = isTestMode ? 'שיא' : (roundAwardText ? 'בונוס' : 'XP');
+    }
+    if (questionDrillState.elements.hudBonus) {
+        questionDrillState.elements.hudBonus.textContent = isTestMode
+            ? String(bestByDifficulty)
+            : (roundAwardText || String(questionDrillState.sessionXP));
+    }
+
+    updateQuestionDrillTargetBar();
+    refreshQuestionDrillTrafficState();
+}
+
+function triggerQuestionDrillCelebration(kind = 'success') {
+    const layer = questionDrillState.elements.fxLayer;
+    if (!layer || prefersReducedMotion()) return;
+
+    const glyphs = kind === 'finish'
+        ? ['⭐', '✨', '🎆', '🎇', '⚡']
+        : ['⭐', '✨', '⚡', '✦'];
+
+    layer.innerHTML = '';
+    for (let i = 0; i < (kind === 'finish' ? 18 : 10); i += 1) {
+        const particle = document.createElement('span');
+        particle.className = 'question-drill-fx-particle';
+        particle.textContent = glyphs[i % glyphs.length];
+        particle.style.left = `${10 + Math.random() * 78}%`;
+        particle.style.top = `${18 + Math.random() * 44}%`;
+        particle.style.setProperty('--x', `${Math.round((Math.random() - 0.5) * (kind === 'finish' ? 180 : 120))}px`);
+        particle.style.setProperty('--y', `${Math.round(-40 - Math.random() * 90)}px`);
+        particle.style.setProperty('--r', `${Math.round((Math.random() - 0.5) * 280)}deg`);
+        layer.appendChild(particle);
+    }
+
+    layer.classList.remove('is-active');
+    void layer.offsetWidth;
+    layer.classList.add('is-active');
+
+    if (layer.__questionDrillFxTimer) {
+        clearTimeout(layer.__questionDrillFxTimer);
+    }
+    layer.__questionDrillFxTimer = setTimeout(() => {
+        layer.classList.remove('is-active');
+        layer.innerHTML = '';
+        layer.__questionDrillFxTimer = null;
+    }, kind === 'finish' ? 1200 : 820);
+}
+
 function focusQuestionDrillLiveSurface() {
     const target = questionDrillState.elements.liveShell
         || questionDrillState.elements.statement
@@ -7248,6 +7448,7 @@ function updateQuestionDrillLayoutState({ focusLiveSurface = false } = {}) {
     const stage = getQuestionDrillUiStage();
     const showFeedback = stage !== 'setup' && Boolean(questionDrillState.feedbackText);
     const showExplanation = Boolean(questionDrillState.current) && (questionDrillState.roundChecks > 0 || questionDrillState.sessionCompleted);
+    const showHud = stage !== 'setup';
 
     if (elements.root) {
         elements.root.dataset.stage = stage;
@@ -7264,6 +7465,12 @@ function updateQuestionDrillLayoutState({ focusLiveSurface = false } = {}) {
     if (elements.openExplanationBtn) {
         elements.openExplanationBtn.classList.toggle('hidden', !showExplanation);
     }
+    if (elements.gameHud) {
+        elements.gameHud.classList.toggle('hidden', !showHud);
+    }
+
+    updateQuestionDrillTargetBar();
+    refreshQuestionDrillTrafficState();
 
     if (focusLiveSurface && stage !== 'setup') {
         window.requestAnimationFrame(() => focusQuestionDrillLiveSurface());
@@ -7290,10 +7497,10 @@ function buildQuestionDrillHelpOverlayContent() {
         <h4>איך עובדים כאן</h4>
         <ol class="shell-help-list">
             <li>קראו את המשפט.</li>
-            <li>בחרו את הסוג: מחיקה, עיוות או הכללה.</li>
-            <li>לחצו "בדוק" וקבלו משוב קצר.</li>
+            <li>במצב לימוד: רואים איזה סוג מידע רוצים להחזיר ובוחרים את שאלת הדיוק שמתאימה לו.</li>
+            <li>במשחק מהיר: לוחצים מהר על הקטגוריה הנכונה ובונים רצף.</li>
         </ol>
-        <p class="shell-overlay-note">במצב לימוד אפשר לפתוח רמז. במבחן עובדים מהר ועוברים מיד לשאלה הבאה.</p>
+        <p class="shell-overlay-note">במצב לימוד אפשר לפתוח רמז. במשחק מהיר עובדים מול זמן, ניקוד ורמזור קטן בצד.</p>
     `;
     return wrapper;
 }
@@ -7487,6 +7694,7 @@ function updateQuestionDrillTimerDisplay() {
     if (questionDrillState.elements.compactStreak && isTestMode && !questionDrillState.sessionCompleted) {
         questionDrillState.elements.compactStreak.textContent = `זמן ${formatQuestionDrillTimerMs(questionDrillState.testTimerMs)}ש׳`;
     }
+    updateQuestionDrillGameHud();
 }
 
 function stopQuestionDrillTimer({ freeze = true } = {}) {
@@ -7576,8 +7784,8 @@ function setQuestionDrillMode(mode = 'learning', { persist = true, refreshCurren
     }
     if (elements.modeNote) {
         elements.modeNote.textContent = isTestMode
-            ? 'מבחן: מהיר וללא רמזים.'
-            : 'לימוד: עם רמזים ומשוב קצר.';
+            ? 'משחק מהיר: זמן, ניקוד ורצף בלי רמזים.'
+            : 'לימוד: מחברים בין סוג המידע שחסר לבין שאלת הדיוק.';
     }
     if (elements.modeChip) {
         elements.modeChip.textContent = `מצב: ${getQuestionDrillModeLabel(resolved)}`;
@@ -7603,6 +7811,7 @@ function setQuestionDrillMode(mode = 'learning', { persist = true, refreshCurren
     updateQuestionDrillTestBanner();
     updateQuestionDrillSessionUI();
     updateQuestionDrillControlsState();
+    updateQuestionDrillTargetBar();
 }
 
 function setQuestionDrillDifficulty(difficulty = 'easy', { persist = true, rebuildDeck = true } = {}) {
@@ -7659,6 +7868,7 @@ function resetQuestionDrillSessionState({ preservePrefs = true } = {}) {
     questionDrillState.currentRoundAward = null;
     questionDrillState.feedbackText = '';
     questionDrillState.feedbackTone = 'info';
+    questionDrillState.trafficState = 'green';
     questionDrillState.testScore = 0;
     questionDrillState.testTimerMs = 0;
     questionDrillState.currentRoundReactionMs = 0;
@@ -7754,12 +7964,7 @@ function renderQuestionDrillOptions() {
         const label = document.createElement('span');
         label.className = 'question-drill-option-label';
         label.textContent = option.text;
-
-        const categoryTag = document.createElement('span');
-        categoryTag.className = 'question-drill-option-category';
-        categoryTag.textContent = getQuestionDrillCategoryLabel(option.category);
-
-        btn.append(label, categoryTag);
+        btn.append(label);
         fragment.appendChild(btn);
     });
 
@@ -7836,6 +8041,7 @@ function beginQuestionDrillRound(question) {
     const elements = questionDrillState.elements;
     const expectedCategory = getQuestionDrillTargetCategory(question);
     const isTestMode = questionDrillState.mode === 'test';
+    const targetCopy = getQuestionDrillTargetCopy(expectedCategory);
 
     clearQuestionDrillTestAutoAdvance();
     stopQuestionDrillTimer({ freeze: false });
@@ -7852,8 +8058,8 @@ function beginQuestionDrillRound(question) {
     if (elements.statement) elements.statement.textContent = question?.statement || '';
     renderQuestionDrillOptions();
     if (elements.category) {
-        elements.category.disabled = isTestMode;
         elements.category.value = expectedCategory;
+        elements.category.disabled = true;
     }
 
     updateQuestionDrillTestBanner();
@@ -7861,7 +8067,7 @@ function beginQuestionDrillRound(question) {
         setQuestionDrillFeedback('קראו את המשפט ולחצו מיד על הקטגוריה הנכונה.', 'info');
         startQuestionDrillTimer();
     } else {
-        setQuestionDrillFeedback('קראו את המשפט ובחרו את הכיוון הכי מדויק.', 'info');
+        setQuestionDrillFeedback(`מטרת הסבב: לבחור את שאלת הדיוק של ${targetCopy.label}.`, 'info');
     }
 
     if (elements.summary) {
@@ -7871,6 +8077,8 @@ function beginQuestionDrillRound(question) {
     }
     updateQuestionDrillControlsState();
     updateQuestionDrillSessionUI();
+    updateQuestionDrillTargetBar();
+    setQuestionDrillTrafficState('green', isTestMode ? 'חלון תגובה פתוח' : `מחפשים ${targetCopy.target}`);
     updateQuestionDrillLayoutState({ focusLiveSurface: true });
 }
 
@@ -7936,7 +8144,7 @@ function updateQuestionDrillSessionUI() {
     if (questionDrillState.elements.starsChip) {
         questionDrillState.elements.starsChip.textContent = isTestMode
             ? `ניקוד: ${questionDrillState.testScore}`
-            : `נכון: ${questionDrillState.roundsCorrect}`;
+            : `כוכבים: ${questionDrillState.sessionStars}`;
         questionDrillState.elements.starsChip.classList.toggle('is-goal', !isTestMode && targetReached && questionDrillState.sessionCompleted);
     }
     if (questionDrillState.elements.targetChip) {
@@ -7961,7 +8169,7 @@ function updateQuestionDrillSessionUI() {
     if (questionDrillState.elements.compactScore) {
         questionDrillState.elements.compactScore.textContent = isTestMode
             ? `ניקוד ${questionDrillState.testScore}`
-            : `נכון ${questionDrillState.roundsCorrect}`;
+            : `כוכבים ${questionDrillState.sessionStars}`;
     }
     if (questionDrillState.elements.compactStreak) {
         questionDrillState.elements.compactStreak.textContent = isTestMode
@@ -7978,7 +8186,7 @@ function updateQuestionDrillSessionUI() {
                     : `התרגול הושלם. דיוק ${accuracy}%.`);
         } else if (!questionDrillState.sessionActive) {
             questionDrillState.elements.sessionNote.textContent = isTestMode
-                ? 'בחרו קושי ולחצו "התחל".'
+                ? 'בחרו קושי ולחצו "התחל משחק".'
                 : `${plan.note} בחרו מצב ולחצו "התחל".`;
         } else if (questionDrillState.roundFinalized) {
             questionDrillState.elements.sessionNote.textContent = isTestMode
@@ -7986,10 +8194,11 @@ function updateQuestionDrillSessionUI() {
                 : `מוכנים לשאלה ${nextRound > roundsTotal ? roundsTotal : nextRound}.`;
         } else {
             questionDrillState.elements.sessionNote.textContent = isTestMode
-                ? 'מבחן מהיר: משפט אחד, בחירה אחת, ממשיכים.'
-                : 'בחרו את הסוג הכי מדויק והמשיכו.';
+                ? 'משחק מהיר: משפט אחד, בחירה אחת, ממשיכים.'
+                : 'קראו את המשפט ובחרו את שאלת הדיוק שמתאימה לקטגוריית המידע.';
         }
     }
+    updateQuestionDrillGameHud();
     updateQuestionDrillLayoutState();
 }
 
@@ -8016,16 +8225,16 @@ function updateQuestionDrillControlsState() {
         elements.nextBtn.classList.toggle('btn-secondary', !nextIsPrimary);
     }
     if (elements.startBtn) {
-        elements.startBtn.textContent = isTestMode ? 'התחל מבחן' : 'התחל';
+        elements.startBtn.textContent = isTestMode ? 'התחל משחק' : 'התחל';
     }
     if (elements.resetBtn) {
         elements.resetBtn.disabled = !questionDrillState.sessionActive && !questionDrillState.sessionCompleted && questionDrillState.attempts === 0;
     }
     if (elements.category) {
-        elements.category.disabled = isTestMode || sessionLocked || questionDrillState.roundFinalized;
+        elements.category.disabled = true;
     }
     if (elements.categoryWrap) {
-        elements.categoryWrap.classList.toggle('question-drill-control-hidden', isTestMode);
+        elements.categoryWrap.classList.add('question-drill-control-hidden');
     }
     if (elements.hintBtn) {
         elements.hintBtn.disabled = isTestMode || sessionLocked || questionDrillState.roundFinalized || !hasQuestion;
@@ -8048,6 +8257,8 @@ function resetQuestionDrillToSetup({ preservePrefs = true } = {}) {
         questionDrillState.elements.summary.classList.add('hidden');
         questionDrillState.elements.summary.innerHTML = '';
     }
+    updateQuestionDrillTargetBar();
+    setQuestionDrillTrafficState('green', 'מוכן לסבב');
     setQuestionDrillFeedback('בחרו מצב, חבילה וקושי ואז לחצו "התחל".', 'info');
     updateQuestionDrillSessionUI();
     updateQuestionDrillControlsState();
@@ -8060,6 +8271,7 @@ function startQuestionDrillSession({ announce = true } = {}) {
     questionDrillState.sessionRecorded = false;
     updateQuestionDrillStats();
     updateQuestionDrillSessionUI();
+    setQuestionDrillTrafficState('green', questionDrillState.mode === 'test' ? 'חלון תגובה פתוח' : 'מוכן לסבב');
     if (announce) {
         playUISound('start');
     }
@@ -8116,7 +8328,7 @@ function completeQuestionDrillSession() {
                 : 0;
             summaryEl.innerHTML = `
                 <div class="question-drill-summary-head">
-                    <strong>סשן מבחן הושלם</strong>
+                    <strong>סשן משחק הושלם</strong>
                     <span>${getQuestionDrillModeLabel()} · קושי ${(QUESTION_DRILL_DIFFICULTIES.find((item) => item.id === questionDrillState.testDifficulty)?.label) || 'קל'}</span>
                 </div>
                 <div class="question-drill-summary-grid">
@@ -8149,7 +8361,7 @@ function completeQuestionDrillSession() {
     }
 
     if (isTestMode) {
-        setQuestionDrillFeedback('המבחן נגמר. אפשר לפתוח תרגול חדש או לבדוק את הנתונים.', 'success');
+        setQuestionDrillFeedback('המשחק נגמר. אפשר לפתוח תרגול חדש או לבדוק את הנתונים.', 'success');
         playUISound('finish');
         saveQuestionDrillTestStats();
     } else {
@@ -8161,6 +8373,8 @@ function completeQuestionDrillSession() {
         );
         playUISound(hitTarget ? 'stars_big' : 'finish');
     }
+    triggerQuestionDrillCelebration('finish');
+    setQuestionDrillTrafficState('green', 'שלב הושלם');
     updateQuestionDrillSessionUI();
     updateQuestionDrillControlsState();
 }
@@ -8194,6 +8408,13 @@ function finalizeQuestionDrillRound(reason = 'next') {
         if (!wasCorrect && reason === 'skip') {
             setQuestionDrillFeedback('הסבב דולג. אין ניקוד על הסבב הזה.', 'warn');
             playUISound('skip');
+            setQuestionDrillTrafficState('red', 'סבב דולג');
+        }
+        if (wasCorrect) {
+            triggerQuestionDrillCelebration('success');
+            setQuestionDrillTrafficState('green', 'פגיעה מהירה');
+        } else if (reason !== 'skip') {
+            setQuestionDrillTrafficState('red', 'פספוס');
         }
         updateQuestionDrillSessionUI();
         updateQuestionDrillControlsState();
@@ -8216,6 +8437,8 @@ function finalizeQuestionDrillRound(reason = 'next') {
         questionDrillState.sessionStars += starGain;
         questionDrillState.currentRoundAward = { xp: baseXP, stars: starGain };
         playUISound(starGain >= 3 ? 'stars_big' : 'stars_soft');
+        triggerQuestionDrillCelebration(starGain >= 3 ? 'finish' : 'success');
+        setQuestionDrillTrafficState('green', starGain >= 3 ? `בינגו · +${starGain}⭐` : 'זיהוי נכון');
 
         const awardLine = ` (+${baseXP} XP, +${starGain}⭐)`;
         const currentText = String(questionDrillState.feedbackText || '');
@@ -8227,6 +8450,9 @@ function finalizeQuestionDrillRound(reason = 'next') {
         if (reason === 'skip') {
             setQuestionDrillFeedback('דילגתם על השאלה הזאת. ממשיכים.', 'warn');
             playUISound('skip');
+            setQuestionDrillTrafficState('red', 'דילוג');
+        } else {
+            setQuestionDrillTrafficState('red', 'לא נסגר נכון');
         }
     }
 
@@ -8270,15 +8496,16 @@ async function loadNextQuestionDrill(options = {}) {
 
 function showQuestionDrillHint() {
     if (questionDrillState.mode === 'test') {
-        setQuestionDrillFeedback('במבחן אין רמזים. עברו ללימוד אם צריך.', 'warn');
+        setQuestionDrillFeedback('במשחק מהיר אין רמזים. עברו ללימוד אם צריך.', 'warn');
         return;
     }
     if (!questionDrillState.current || questionDrillState.roundFinalized) return;
-    const selected = questionDrillState.elements.category?.value || 'DELETION';
-    const starters = (QUESTION_DRILL_KEYWORDS[selected] || []).slice(0, 3).join(', ');
     const expected = getQuestionDrillTargetCategory(questionDrillState.current);
-    const line = `רמז: חפשו שאלה שבוחנת ${getQuestionDrillCategoryLabel(selected)}. מילות כיוון: ${starters}. כיוון מומלץ לסבב הזה: ${getQuestionDrillCategoryLabel(expected)}.`;
+    const copy = getQuestionDrillTargetCopy(expected);
+    const starters = (QUESTION_DRILL_KEYWORDS[expected] || []).slice(0, 4).join(', ');
+    const line = `רמז: חפשו שאלה שמחזירה ${copy.target}. מילות כיוון: ${starters}.`;
     setQuestionDrillFeedback(line, 'info');
+    setQuestionDrillTrafficState('yellow', 'רמז פתוח');
     playUISound('hint');
 }
 
@@ -8361,6 +8588,7 @@ function evaluateQuestionDrill() {
                 'danger'
             );
             playUISound('wrong');
+            setQuestionDrillTrafficState('red', 'פספוס');
             finalizeQuestionDrillRound('test_fail');
         }
         updateQuestionDrillSessionUI();
@@ -8371,16 +8599,18 @@ function evaluateQuestionDrill() {
     }
 
     if (success) {
-        const selectedLabel = getQuestionDrillCategoryLabel(selectedCategory);
-        setQuestionDrillFeedback(`נכון. כאן זה ${selectedLabel}.`, 'success');
+        const selectedLabel = getQuestionDrillTargetCopy(selectedCategory).label;
+        setQuestionDrillFeedback(`נכון. זו שאלה שמחזירה ${selectedLabel}.`, 'success');
         playUISound('correct');
         finalizeQuestionDrillRound('correct');
         return;
     }
 
     playUISound('wrong');
-    const expectedLabel = getQuestionDrillCategoryLabel(expectedCategory);
-    setQuestionDrillFeedback(`לא מדויק. הכיוון כאן הוא ${expectedLabel}.`, 'warn');
+    const expectedCopy = getQuestionDrillTargetCopy(expectedCategory);
+    const selectedCopy = getQuestionDrillTargetCopy(selectedCategory);
+    setQuestionDrillFeedback(`לא מדויק. השאלה שבחרת מחפשת ${selectedCopy.label}, וכאן צריך ${expectedCopy.label}.`, 'warn');
+    setQuestionDrillTrafficState('yellow', 'נסו עוד פעם');
     updateQuestionDrillControlsState();
 }
 
@@ -8390,8 +8620,12 @@ function setupQuestionDrill() {
 
     questionDrillState.elements = {
         root: drillRoot,
+        fxLayer: document.getElementById('question-drill-fx-layer'),
         prestart: document.getElementById('question-drill-prestart'),
         liveShell: document.getElementById('question-drill-live-shell'),
+        targetBar: document.getElementById('question-drill-target-bar'),
+        targetCopy: document.getElementById('question-drill-target-copy'),
+        targetLegend: document.getElementById('question-drill-target-legend'),
         statement: document.getElementById('question-drill-statement'),
         options: document.getElementById('question-drill-options'),
         category: document.getElementById('question-drill-category'),
@@ -8428,6 +8662,18 @@ function setupQuestionDrill() {
         compactRound: document.getElementById('question-drill-compact-round'),
         compactScore: document.getElementById('question-drill-compact-score'),
         compactStreak: document.getElementById('question-drill-compact-streak'),
+        gameHud: document.getElementById('question-drill-game-hud'),
+        hudMode: document.getElementById('question-drill-hud-mode'),
+        traffic: document.getElementById('question-drill-traffic-light'),
+        trafficLabel: document.getElementById('question-drill-traffic-label'),
+        hudTimeLabel: document.getElementById('question-drill-hud-time-label'),
+        hudTime: document.getElementById('question-drill-hud-time'),
+        hudScoreLabel: document.getElementById('question-drill-hud-score-label'),
+        hudScore: document.getElementById('question-drill-hud-score'),
+        hudStreakLabel: document.getElementById('question-drill-hud-streak-label'),
+        hudStreak: document.getElementById('question-drill-hud-streak'),
+        hudBonusLabel: document.getElementById('question-drill-hud-bonus-label'),
+        hudBonus: document.getElementById('question-drill-hud-bonus'),
         openHelpBtn: document.getElementById('question-drill-open-help'),
         openStatsBtn: document.getElementById('question-drill-open-stats'),
         openMenuBtn: document.getElementById('question-drill-open-menu'),
@@ -8496,21 +8742,21 @@ function setupQuestionDrill() {
 }
 
 const RAPID_PATTERN_BUTTONS = Object.freeze([
-    Object.freeze({ id: 'lost_performative', label: 'אמירה ללא מקור', hint: 'שלשה 1 • שמאל' }),
-    Object.freeze({ id: 'assumptions', label: 'הנחות יסוד', hint: 'שלשה 1 • מרכז' }),
-    Object.freeze({ id: 'mind_reading', label: 'קריאת מחשבות', hint: 'שלשה 1 • ימין' }),
-    Object.freeze({ id: 'universal_quantifier', label: 'הכללה גורפת', hint: 'שלשה 2 • שמאל' }),
-    Object.freeze({ id: 'modal_operator', label: 'אילוץ או אפשרות', hint: 'שלשה 2 • מרכז' }),
-    Object.freeze({ id: 'cause_effect', label: 'סיבה ותוצאה', hint: 'שלשה 2 • ימין' }),
-    Object.freeze({ id: 'nominalisations', label: 'שמות מופשטים', hint: 'שלשה 3 • שמאל' }),
-    Object.freeze({ id: 'identity_predicates', label: 'זהות מקובעת', hint: 'שלשה 3 • מרכז' }),
-    Object.freeze({ id: 'complex_equivalence', label: 'שקילות מורכבת', hint: 'שלשה 3 • ימין' }),
-    Object.freeze({ id: 'comparative_deletion', label: 'השוואה חסרה', hint: 'שלשה 4 • שמאל' }),
-    Object.freeze({ id: 'time_space_predicates', label: 'זמן ומרחב', hint: 'שלשה 4 • מרכז' }),
-    Object.freeze({ id: 'lack_referential_index', label: 'חסר ייחוס ברור', hint: 'שלשה 4 • ימין' }),
-    Object.freeze({ id: 'non_referring_nouns', label: 'שמות לא מפורטים', hint: 'שלשה 5 • שמאל' }),
-    Object.freeze({ id: 'sensory_predicates', label: 'חושים ותחושה', hint: 'שלשה 5 • מרכז' }),
-    Object.freeze({ id: 'unspecified_verbs', label: 'פעלים לא מפורטים', hint: 'שלשה 5 • ימין' })
+    Object.freeze({ id: 'mind_reading', label: 'קריאת מחשבות' }),
+    Object.freeze({ id: 'assumptions', label: 'הנחות מוקדמות' }),
+    Object.freeze({ id: 'lost_performative', label: 'חסרון הדובר' }),
+    Object.freeze({ id: 'cause_effect', label: 'סיבה ותוצאה' }),
+    Object.freeze({ id: 'modal_operator', label: 'מודל פעולה' }),
+    Object.freeze({ id: 'universal_quantifier', label: 'הכללה' }),
+    Object.freeze({ id: 'complex_equivalence', label: 'שקילות מורכבת' }),
+    Object.freeze({ id: 'identity_predicates', label: 'פרדיקטי זהות' }),
+    Object.freeze({ id: 'nominalisations', label: 'נומינליזציה' }),
+    Object.freeze({ id: 'lack_referential_index', label: 'אובדן המצביע' }),
+    Object.freeze({ id: 'time_space_predicates', label: 'זמן ומקום' }),
+    Object.freeze({ id: 'comparative_deletion', label: 'השמטה השוואתית' }),
+    Object.freeze({ id: 'unspecified_verbs', label: 'פועל לא מפורט' }),
+    Object.freeze({ id: 'sensory_predicates', label: 'פרדיקטים חושיים' }),
+    Object.freeze({ id: 'non_referring_nouns', label: 'שם עצם חסר' })
 ]);
 
 const RAPID_PATTERN_ALIASES = Object.freeze({
@@ -9462,7 +9708,7 @@ function buildRapidPatternHelpHtml(cue) {
     const patternId = normalizeRapidPatternId(cue?.patternId || '');
     const label = getRapidPatternLabel(patternId);
     const buttonMeta = RAPID_PATTERN_BUTTONS.find((item) => item.id === patternId);
-    const hint = buttonMeta?.hint || 'בדקו איזו הנחה לשונית נחשפת במילה המודגשת.';
+    const hint = buttonMeta?.label || 'בדקו איזו הנחה לשונית נחשפת במילה המודגשת.';
     const highlight = String(cue?.highlight || '').trim() || 'המילה המודגשת במשפט';
 
     return `
@@ -9511,7 +9757,6 @@ function renderRapidPatternButtons() {
     container.innerHTML = RAPID_PATTERN_BUTTONS.map(item => `
         <button type="button" class="rapid-pattern-btn" data-rapid-pattern-id="${escapeHtml(item.id)}">
             ${escapeHtml(item.label)}
-            <span class="rapid-pattern-sub">${escapeHtml(item.hint)}</span>
         </button>
     `).join('');
 }
