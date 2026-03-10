@@ -16922,10 +16922,10 @@ const CEFLOW_UI = Object.freeze({
         'מודליות + הכללה': 'מודליות + הכללה'
     }),
     metrics: Object.freeze({
-        flow: Object.freeze({ label: 'זרימה', short: 'זרימה' }),
-        agency: Object.freeze({ label: 'סוכנות', short: 'סוכנות' }),
-        shame: Object.freeze({ label: 'בושה', short: 'בושה' }),
-        reactivity: Object.freeze({ label: 'תגובתיות', short: 'תגובתיות' })
+        flow: Object.freeze({ label: 'זרימה', short: 'זרימה', meaning: 'כמה השיחה מתקדמת במקום להיתקע.' }),
+        agency: Object.freeze({ label: 'סוכנות', short: 'סוכנות', meaning: 'כמה נשמרת בחירה פעילה וגבול ברור.' }),
+        shame: Object.freeze({ label: 'בושה', short: 'בושה', meaning: 'כמה הטון מצמצם ביטחון ושיתוף.' }),
+        reactivity: Object.freeze({ label: 'תגובתיות', short: 'תגובתיות', meaning: 'כמה התגובה אוטומטית תחת לחץ.' })
     })
 });
 
@@ -17084,6 +17084,19 @@ const CEFLOW_HL_RULES = Object.freeze([
     Object.freeze({ type: 'generalization', label: 'הכללה', css: 'hl-generalization', tokens: Object.freeze(['כולם', 'תמיד', 'אף אחד', 'כלום', 'בשום מצב']) }),
     Object.freeze({ type: 'modal', label: 'מודליות', css: 'hl-modal', tokens: Object.freeze(['אי אפשר', 'חייב', 'צריך', 'אסור', 'לא יכול']) }),
     Object.freeze({ type: 'vague', label: 'עמימות פעולה', css: 'hl-vague', tokens: Object.freeze(['לעשות', 'לסדר', 'לטפל', 'להתארגן', 'להגיע']) })
+]);
+
+const CEFLOW_COLLABORATIVE_CUES = Object.freeze([
+    'בוא',
+    'בואו',
+    'יחד',
+    'ביחד',
+    'ננסה',
+    'אפשר',
+    'מה בדיוק',
+    'צעד',
+    'נעשה',
+    'רגע'
 ]);
 
 const CEFLOW_DEFAULT_SHOT_CLOCK_SECONDS = 20;
@@ -18304,6 +18317,143 @@ async function setupComicEngine2({ force = false } = {}) {
         };
     };
 
+    const collectLanguageDrivers = (text) => {
+        const source = String(text || '').trim();
+        if (!source) return [];
+        const found = [];
+        CEFLOW_HL_RULES.forEach((rule) => {
+            rule.tokens.forEach((token) => {
+                if (!token || !source.includes(token)) return;
+                if (found.some((item) => item.token === token)) return;
+                found.push({ token, type: rule.type, label: rule.label });
+            });
+        });
+        return found.slice(0, 4);
+    };
+
+    const quoteFocusPhrase = (text, fallback = 'הניסוח שבחרת') => {
+        const normalized = String(text || '').trim().replace(/\s+/g, ' ').replace(/["'`]/g, '');
+        if (!normalized) return fallback;
+        const short = normalized.split(' ').slice(0, 5).join(' ');
+        if (!short) return fallback;
+        return `"${short}"`;
+    };
+
+    const deriveLanguageLearningArc = (hud) => {
+        const onboarding = 'בקומיקס הזה בוחרים תגובה ורואים איך המילים משנות זרימה, סוכנות, בושה ותגובתיות בשיחה.';
+        const noChoiceMetricWhy = Object.freeze({
+            flow: 'עדיין לא נבחר ניסוח, ולכן זה מדד פתיחה של הסצנה.',
+            agency: 'כרגע זה מצב בסיס לפני החלטה לשונית.',
+            shame: 'זה עומס התחלתי של הרגע, לפני תגובה שלך.',
+            reactivity: 'זה משקף בעיקר לחץ זמן והקשר התחלתי.'
+        });
+
+        if (!state.selectedChoice) {
+            return {
+                onboarding,
+                panelWhy: 'הפאנל למטה מציג את מצב הפתיחה של הסצנה, לפני בחירת תגובה.',
+                workedLine: '',
+                burdenLine: '',
+                takeaway: 'בחר/י כרטיס אחד כדי לראות מה בדיוק במילים יצר את השינוי במדדים.',
+                metricWhy: noChoiceMetricWhy
+            };
+        }
+
+        const choice = state.selectedChoice;
+        const choiceText = String(choice.say || '').trim();
+        const replyText = String(state.userReply || '').trim();
+        const choiceDrivers = collectLanguageDrivers(choiceText);
+        const replyDrivers = collectLanguageDrivers(replyText);
+        const allDrivers = [...choiceDrivers, ...replyDrivers];
+        const primaryDriver = replyDrivers[0] || choiceDrivers[0] || null;
+        const phraseRef = primaryDriver ? `"${primaryDriver.token}"` : quoteFocusPhrase(replyText || choiceText);
+        const joinedText = `${choiceText} ${replyText}`.trim();
+        const hasCollaborativeCue = CEFLOW_COLLABORATIVE_CUES.some((cue) => joinedText.includes(cue));
+        const hasRiskCue = allDrivers.some((driver) => driver.type === 'generalization' || driver.type === 'modal');
+        const hasVagueCue = allDrivers.some((driver) => driver.type === 'vague');
+
+        let workedLine = '';
+        let burdenLine = '';
+        let takeaway = '';
+
+        if (choice.id === 'meta') {
+            workedLine = `מה עבד כאן: מעבר לשאלה מדויקת כמו ${phraseRef} פותח מידע במקום מאבק.`;
+            burdenLine = hasVagueCue
+                ? `מה הכביד כאן: ניסוח כללי כמו ${phraseRef} יכול להשאיר את הצד השני בלי צעד ברור.`
+                : 'מה הכביד כאן: אם ממשיכים מהר להסבר ארוך מדי, הפתיחה יכולה להיסגר שוב.';
+            takeaway = 'משפט קצר שמבקש פירוט מחזיר סוכנות ומוריד עומס רגשי.';
+        } else if (choice.id === 'rescue') {
+            workedLine = hasCollaborativeCue
+                ? `מה עבד כאן: הניסוח ${phraseRef} שומר שותפות במקום לקחת הכול לבד.`
+                : 'מה עבד כאן: כשמוסיפים שאלה קטנה לצד השני, האחריות מתחילה להתחלק.';
+            burdenLine = `מה הכביד כאן: ההצלה הראשונית "${compactText(choiceText, 44)}" הורידה סוכנות גם אם הכוונה טובה.`;
+            takeaway = 'עזרה יעילה היא עזרה שמחזירה לצד השני יכולת פעולה, לא מחליפה אותו.';
+        } else if (choice.id === 'avoid') {
+            workedLine = hasCollaborativeCue
+                ? `מה עבד כאן: המשפט ${phraseRef} החזיר תנועה במקום דחייה.`
+                : 'מה עבד כאן: עצם המעבר מהתחמקות לניסוח מפורש מתחיל להוריד ערפל.';
+            burdenLine = `מה הכביד כאן: דחייה כמו "${compactText(choiceText, 44)}" קונה שקט רגעי אבל מעלה עומס בהמשך.`;
+            takeaway = 'כדאי משפט שמגדיר צעד מיידי קטן במקום לדחות את כל השיחה.';
+        } else if (choice.id === 'mock') {
+            workedLine = hasCollaborativeCue
+                ? `מה עבד כאן: הניסוח ${phraseRef} מפחית עקיצה ומחזיר קשר.`
+                : 'מה עבד כאן: כשעוברים משיפוט לשפה עניינית, יש יותר סיכוי לשיתוף.';
+            burdenLine = `מה הכביד כאן: עקיצה כמו "${compactText(choiceText, 44)}" מעלה בושה ומורידה זרימה.`;
+            takeaway = 'פחות השוואה ויותר דיוק עובד טוב יותר מקצרנות צינית.';
+        } else {
+            workedLine = hasCollaborativeCue
+                ? `מה עבד כאן: במשפט ${phraseRef} יש יותר אחריות משותפת ולכן מתחיל תיקון.`
+                : 'מה עבד כאן: משפט המשך רגוע יותר יכול לעצור הסלמה גם אחרי פתיחה קשה.';
+            burdenLine = `מה הכביד כאן: טון חד כמו "${compactText(choiceText, 44)}" דוחף את הצד השני למגננה.`;
+            takeaway = 'אפשר להחזיק גבול בלי התקפה: טון מדויק מוריד לחץ ושומר חיבור.';
+        }
+
+        if (hasRiskCue && replyText) {
+            burdenLine = `מה הכביד כאן: ניסוח מוחלט כמו ${phraseRef} נשמע סגור ולכן מעלה לחץ ובושה.`;
+        }
+        if (!workedLine && replyText) {
+            workedLine = hasCollaborativeCue
+                ? `מה עבד כאן: הניסוח ${phraseRef} משדר יותר שותפות ובחירה.`
+                : 'מה עבד כאן: עצם המעבר מתגובה אוטומטית למשפט מודע כבר משנה את הכיוון.';
+        }
+
+        const metricWhy = {
+            flow: hud.flow >= 65
+                ? `עלה כי ${phraseRef} מקדם תנועה בשיחה.`
+                : hud.flow >= 45
+                    ? `באמצע: יש תנועה, אבל ${phraseRef} עדיין יוצר חיכוך.`
+                    : `ירד כי ${phraseRef} נשמע סוגר או מאשים.`,
+            agency: hud.agency >= 65
+                ? `עלתה כי בניסוח יש יותר בחירה ואחריות.`
+                : hud.agency >= 45
+                    ? `חלקית: יש גבול, אבל לא מספיק ברור עדיין.`
+                    : `ירדה כי הניסוח נשמע פסיבי, תוקף או מבטל.`,
+            shame: hud.shame >= 65
+                ? `עלתה כי ${phraseRef} מצמצם ביטחון ושיתוף.`
+                : hud.shame >= 45
+                    ? `נשארה ברקע: יש עדיין התכווצות זהירה.`
+                    : `ירדה כי הניסוח נותן מקום לצד השני.`,
+            reactivity: hud.reactivity >= 65
+                ? `עלתה כי הטון נשאר דרוך ומהיר מדי.`
+                : hud.reactivity >= 45
+                    ? `ביניים: יש מתח, אבל אפשר עדיין לווסת.`
+                    : `ירדה כי התגובה נעשתה מדויקת ופחות אוטומטית.`
+        };
+
+        const panelWhy = !state.userReply
+            ? 'הפאנל למטה מגיב כרגע לטון של הכרטיס שבחרת, עוד לפני משפט ההמשך.'
+            : `הפאנל משווה בין הכרטיס הראשון לבין משפט ההמשך שלך (${phraseRef}), ולכן המדדים ממשיכים לזוז.`;
+
+        return {
+            onboarding,
+            panelWhy: compactText(panelWhy, 190),
+            workedLine: compactText(workedLine, 180),
+            burdenLine: compactText(burdenLine, 180),
+            takeaway: compactText(takeaway, 180),
+            metricWhy
+        };
+    };
+
     const describeMetric = (metric, value) => {
         if (metric === 'flow') {
             if (value >= 75) return 'הדיאלוג זורם ונשאר פתוח.';
@@ -18562,7 +18712,7 @@ async function setupComicEngine2({ force = false } = {}) {
                 atmosphere: hud.atmosphere,
                 subtitle: `ה${emotion} כבר באוויר, אבל עדיין יש לך חלון קטן לבחור טון אחר.`,
                 choiceTitle: 'בחר/י תגובה עם משקל רגשי',
-                choiceCopy: 'כל כרטיס הוא טון אחר. הבחירה שלך מיד משנה הבעה, זרימה ולחץ.',
+                choiceCopy: 'כל כרטיס הוא טון אחר. הבחירה שלך משנה מיד את ההבעה, ובפאנל למטה תרא/י איך זה מזיז זרימה, סוכנות ובושה.',
                 consequenceClass: 'is-neutral',
                 consequenceKicker: hud.pressureState === 'critical' ? 'הזמן סוגר עליך' : 'השיחה מחכה לבחירה שלך',
                 consequenceTitle: hud.pressureState === 'critical' ? 'עוד רגע והחלון נסגר.' : 'הבמה פתוחה, אבל לא רגועה.',
@@ -19078,18 +19228,30 @@ async function setupComicEngine2({ force = false } = {}) {
         if (!els.overlay) return;
         const hud = deriveEmotionalState();
         const narrative = deriveSceneNarrative();
+        const learningArc = deriveLanguageLearningArc(hud);
         const metricLinkCopy = !state.selectedChoice
             ? 'בחר/י כרטיס כדי לראות איך המדדים זזים בזמן אמת.'
             : (state.userReply
                 ? 'המדדים מחושבים לפי הכרטיס שבחרת וגם לפי משפט ההמשך שלך.'
                 : 'המדדים כבר זזים לפי הכרטיס שנבחר, עוד לפני משפט ההמשך.');
-        const renderStat = (label, value, cssName, note) => `
+        const renderStat = (metric, value, cssName) => {
+            const meta = ceflowMetricMeta(metric);
+            const meaning = compactText(meta.meaning || describeMetric(metric, value), 88);
+            const reason = compactText(learningArc.metricWhy?.[metric] || describeMetric(metric, value), 110);
+            return `
             <article class="ceflow-stat ${cssName}">
-                <span>${escapeHtml(label)}</span>
+                <div class="ceflow-stat-head">
+                    <span>${escapeHtml(meta.label)}</span>
+                    <small class="ceflow-stat-meaning">${escapeHtml(meaning)}</small>
+                </div>
                 <div class="ceflow-bar"><span style="width:${ceflowClamp(value, 50)}%"></span></div>
-                <small>${escapeHtml(note)}</small>
+                <small class="ceflow-stat-reason">למה זה זז: ${escapeHtml(reason)}</small>
             </article>
         `;
+        };
+        const onboardingLine = !state.selectedChoice
+            ? `<p class="ceflow-hud-onboarding">${escapeHtml(learningArc.onboarding)}</p>`
+            : '';
         els.overlay.innerHTML = `
             <div class="ceflow-hud-head">
                 <div class="ceflow-hud-copy">
@@ -19098,13 +19260,15 @@ async function setupComicEngine2({ force = false } = {}) {
                 </div>
                 <p class="ceflow-hud-caption">${escapeHtml(narrative.hudCaption)}</p>
             </div>
+            ${onboardingLine}
             <p class="ceflow-hud-link">${escapeHtml(metricLinkCopy)}</p>
+            <p class="ceflow-hud-why">${escapeHtml(learningArc.panelWhy)}</p>
             <div class="ceflow-xray-tags">${hud.xrayTags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('')}</div>
             <div class="ceflow-stats">
-                ${renderStat(ceflowMetricMeta('flow').label, hud.flow, 'is-flow', describeMetric('flow', hud.flow))}
-                ${renderStat(ceflowMetricMeta('agency').label, hud.agency, 'is-agency', describeMetric('agency', hud.agency))}
-                ${renderStat(ceflowMetricMeta('shame').label, hud.shame, 'is-shame', describeMetric('shame', hud.shame))}
-                ${renderStat(ceflowMetricMeta('reactivity').label, hud.reactivity, 'is-reactivity', describeMetric('reactivity', hud.reactivity))}
+                ${renderStat('flow', hud.flow, 'is-flow')}
+                ${renderStat('agency', hud.agency, 'is-agency')}
+                ${renderStat('shame', hud.shame, 'is-shame')}
+                ${renderStat('reactivity', hud.reactivity, 'is-reactivity')}
             </div>
         `;
         els.overlay.classList.remove('hidden');
@@ -19237,7 +19401,20 @@ async function setupComicEngine2({ force = false } = {}) {
             const interpretation = compactText(choice.interpretation, 210);
             const regulation = compactText(currentScenario().regulationNote, 220);
             const narrative = deriveSceneNarrative();
+            const hud = deriveEmotionalState();
+            const learningArc = deriveLanguageLearningArc(hud);
             const counterReply = compactText(choice.counterReply || CEFLOW_FALLBACKS[choice.id]?.counterReply || '', 180);
+            const highlightedChoiceSay = ceflowHighlight(choice.say, [], state.mode);
+            const highlightedUserReply = ceflowHighlight(state.userReply, [], state.mode);
+            const learningWorked = learningArc.workedLine
+                ? `<p class="ceflow-language-effect-line is-worked">✅ ${escapeHtml(learningArc.workedLine)}</p>`
+                : '';
+            const learningBurden = learningArc.burdenLine
+                ? `<p class="ceflow-language-effect-line is-burden">⚠️ ${escapeHtml(learningArc.burdenLine)}</p>`
+                : '';
+            const learningTakeaway = learningArc.takeaway
+                ? `<p class="ceflow-language-effect-takeaway">🧠 לקחת הלאה: ${escapeHtml(learningArc.takeaway)}</p>`
+                : '';
             const repairOptions = Array.isArray(choice.repairOptions) ? choice.repairOptions.slice(0, 4) : [];
             const repairBlock = (choice.id !== 'meta' && repairOptions.length)
                 ? `
@@ -19260,7 +19437,7 @@ async function setupComicEngine2({ force = false } = {}) {
                 </div>
                 <div class="ceflow-feedback-quote">
                     <strong>המשפט שיצא ממך</strong>
-                    <p>${escapeHtml(choice.say)}</p>
+                    <p class="ceflow-feedback-phrase">${highlightedChoiceSay}</p>
                 </div>
                 <div class="ceflow-feedback-quote">
                     <strong>כך זה נשמע בצד השני</strong>
@@ -19268,9 +19445,15 @@ async function setupComicEngine2({ force = false } = {}) {
                 </div>
                 <div class="ceflow-feedback-quote">
                     <strong>המשפט שבחרת עכשיו</strong>
-                    <p>${escapeHtml(state.userReply)}</p>
+                    <p class="ceflow-feedback-phrase">${highlightedUserReply}</p>
                 </div>
                 <div class="ceflow-outcomes">${(choice.impact?.microOutcome || []).map(item => `<span>${escapeHtml(item)}</span>`).join('')}</div>
+                <div class="ceflow-language-effect">
+                    <strong>מה במילים הזיז את התוצאה?</strong>
+                    ${learningWorked}
+                    ${learningBurden}
+                    ${learningTakeaway}
+                </div>
                 <p class="ceflow-interpretation">${escapeHtml(interpretation)}</p>
                 <div class="ceflow-feedback-actions">
                     <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(interpretation)}">🔍 פרשנות</button>
@@ -19291,6 +19474,7 @@ async function setupComicEngine2({ force = false } = {}) {
         if (!open) return;
         const narrative = deriveSceneNarrative();
         const visual = deriveSceneVisualState();
+        const learningArc = deriveLanguageLearningArc(deriveEmotionalState());
         const choice = state.selectedChoice;
         const pickedLabel = state.flowState === CEFLOW_STATES.TIMEOUT
             ? 'לא נבחרה תגובה בזמן'
@@ -19298,13 +19482,16 @@ async function setupComicEngine2({ force = false } = {}) {
         const landedCopy = state.flowState === CEFLOW_STATES.TIMEOUT
             ? deriveTimeoutCounterReply()
             : (choice?.counterReply || CEFLOW_FALLBACKS[choice?.id]?.counterReply || 'הטון התקשה והצד השני לא נשאר פתוח לגמרי.');
-        const nextTry = state.flowState === CEFLOW_STATES.TIMEOUT
+        const defaultNextTry = state.flowState === CEFLOW_STATES.TIMEOUT
             ? 'בפעם הבאה: משפט ראשון קצר עדיף על קיפאון מלא.'
             : choice?.id === 'meta'
                 ? 'בפעם הבאה: המשך/י עם שאלה קטנה אחת נוספת, בלי לעבור מהר מדי להסבר.'
                 : visual.impact === 'repair'
                     ? 'בפעם הבאה: החזק/י אחריות קצרה וברורה לפני עוד הסבר או הגנה.'
                     : 'בפעם הבאה: חפש/י ניסוח שגם מחזיק גבול וגם משאיר פתח לבירור.';
+        const nextTry = learningArc.takeaway
+            ? `לקחת הלאה: ${learningArc.takeaway}`
+            : defaultNextTry;
         const shiftCopy = Array.isArray(choice?.impact?.microOutcome) && choice.impact.microOutcome.length
             ? choice.impact.microOutcome.slice(0, 3).join(' · ')
             : narrative.consequenceCopy;
@@ -19542,7 +19729,11 @@ async function setupComicEngine2({ force = false } = {}) {
             hideFloatingNote();
             return;
         }
-        showFloatingNote(currentScenario()?.regulationNote || 'לכולנו יש תגובה אימפולסיבית ראשונה. כאן עוצרים רגע, מווסתים סטייט, ועוברים לשאלה מדויקת.');
+        const learningArc = deriveLanguageLearningArc(deriveEmotionalState());
+        const contextualNote = !state.selectedChoice
+            ? `${learningArc.onboarding} ${learningArc.panelWhy}`
+            : (learningArc.takeaway || learningArc.panelWhy);
+        showFloatingNote(contextualNote || currentScenario()?.regulationNote || 'לכולנו יש תגובה אימפולסיבית ראשונה. כאן עוצרים רגע, מווסתים סטייט, ועוברים לשאלה מדויקת.');
     });
     els.expandStage?.addEventListener('click', () => {
         state.stageExpanded = !state.stageExpanded;
