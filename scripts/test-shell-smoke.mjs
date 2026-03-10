@@ -203,6 +203,116 @@ async function runShellSmoke(baseUrl) {
         return overlayTitle;
     };
 
+    const checkComicExperience = async () => {
+        await navigate('comic-engine');
+        await closeOverlayIfOpen();
+        await page.waitForSelector('#ceflow-choice-deck button[data-choice-id]');
+
+        const initialState = await page.evaluate(() => {
+            const choiceButtons = Array.from(document.querySelectorAll('#ceflow-choice-deck button[data-choice-id]'));
+            const enabledChoices = choiceButtons.filter((button) => !button.disabled).length;
+            const affordance = document.getElementById('ceflow-choice-affordance');
+            const backButton = document.getElementById('ceflow-step-back');
+            const overlay = document.getElementById('ceflow-overlay');
+            const hudLink = document.querySelector('#ceflow-overlay .ceflow-hud-link');
+            const firstChoice = choiceButtons[0];
+            return {
+                choiceTitle: (document.getElementById('ceflow-choice-title')?.textContent || '').trim(),
+                choiceCount: choiceButtons.length,
+                enabledChoices,
+                firstChoiceCursor: firstChoice ? getComputedStyle(firstChoice).cursor : '',
+                affordanceText: (affordance?.textContent || '').trim(),
+                affordanceState: affordance?.dataset?.state || '',
+                backDisabled: !!backButton?.disabled,
+                overlayVisible: !!overlay && !overlay.classList.contains('hidden'),
+                hudLinkText: (hudLink?.textContent || '').trim()
+            };
+        });
+        await assert(initialState.choiceCount > 0, 'comic choices rendered', String(initialState.choiceCount));
+        await assert(initialState.enabledChoices > 0, 'comic choices enabled', String(initialState.enabledChoices));
+        await assert(initialState.firstChoiceCursor === 'pointer', 'comic choices look clickable');
+        await assert(initialState.affordanceState === 'ready', 'comic affordance ready state');
+        await assert(Boolean(initialState.choiceTitle), 'comic choice title visible', initialState.choiceTitle);
+        await assert(initialState.backDisabled, 'comic back disabled before action');
+        await assert(initialState.overlayVisible, 'comic evaluation panel visible');
+        await assert(Boolean(initialState.hudLinkText), 'comic evaluation link copy visible');
+
+        await page.locator('#ceflow-choice-deck button[data-choice-id]:not([disabled])').first().click();
+        await page.waitForTimeout(160);
+        const selectedState = await page.evaluate(() => {
+            const affordance = document.getElementById('ceflow-choice-affordance');
+            const backButton = document.getElementById('ceflow-step-back');
+            const replyBox = document.getElementById('ceflow-reply-box');
+            return {
+                selectedCount: document.querySelectorAll('#ceflow-choice-deck .ceflow-choice.is-selected').length,
+                disabledChoices: document.querySelectorAll('#ceflow-choice-deck button[data-choice-id][disabled]').length,
+                replyVisible: !!replyBox && !replyBox.classList.contains('hidden'),
+                affordanceState: affordance?.dataset?.state || '',
+                backDisabled: !!backButton?.disabled
+            };
+        });
+        await assert(selectedState.selectedCount === 1, 'comic choice selection visible');
+        await assert(selectedState.disabledChoices > 0, 'comic choice lock after selection', String(selectedState.disabledChoices));
+        await assert(selectedState.replyVisible, 'comic reply step opens');
+        await assert(selectedState.affordanceState === 'locked', 'comic affordance locked after selection');
+        await assert(!selectedState.backDisabled, 'comic back enabled after action');
+
+        await page.locator('#ceflow-step-back').click();
+        await page.waitForTimeout(160);
+        const rolledBackState = await page.evaluate(() => {
+            const affordance = document.getElementById('ceflow-choice-affordance');
+            const backButton = document.getElementById('ceflow-step-back');
+            const replyBox = document.getElementById('ceflow-reply-box');
+            return {
+                selectedCount: document.querySelectorAll('#ceflow-choice-deck .ceflow-choice.is-selected').length,
+                enabledChoices: document.querySelectorAll('#ceflow-choice-deck button[data-choice-id]:not([disabled])').length,
+                replyHidden: !!replyBox && replyBox.classList.contains('hidden'),
+                affordanceState: affordance?.dataset?.state || '',
+                backDisabled: !!backButton?.disabled
+            };
+        });
+        await assert(rolledBackState.selectedCount === 0, 'comic back clears selected choice');
+        await assert(rolledBackState.enabledChoices > 0, 'comic choices re-enabled after back', String(rolledBackState.enabledChoices));
+        await assert(rolledBackState.replyHidden, 'comic back restores pre-reply step');
+        await assert(rolledBackState.affordanceState === 'ready', 'comic affordance ready after back');
+        await assert(rolledBackState.backDisabled, 'comic back disabled when history empty');
+
+        const comicActionCount = await page.locator('#comic-engine .app-shell .app-shell-actions button').count();
+        const overlayChecks = Math.min(comicActionCount, 3);
+        for (let index = 0; index < overlayChecks; index += 1) {
+            await clickHeaderButton('comic-engine', index);
+            await page.waitForSelector('.overlay-root:not(.hidden) .overlay-title');
+            const overlayState = await page.evaluate(() => ({
+                title: (document.querySelector('.overlay-root:not(.hidden) .overlay-title')?.textContent || '').trim(),
+                contextTitle: (document.querySelector('.overlay-root:not(.hidden) .shell-panel-context-title')?.textContent || '').trim()
+            }));
+            await assert(Boolean(overlayState.title), `comic overlay ${index + 1} opened`, overlayState.title);
+            await assert(overlayState.contextTitle.includes('קומיקס'), `comic overlay ${index + 1} contextual title`, overlayState.contextTitle);
+            await closeOverlayWithButton();
+        }
+
+        await page.locator('#ceflow-choice-deck button[data-choice-id]:not([disabled])').first().click();
+        await page.locator('#ceflow-reply-input').fill('אני עוצר רגע ומנסה לדייק מה בעצם מפריע לך.');
+        await page.locator('#ceflow-reply-confirm').click();
+        await page.waitForTimeout(160);
+        const postReplyState = await page.evaluate(() => {
+            const feedback = document.getElementById('ceflow-feedback');
+            const snapshot = document.getElementById('ceflow-turn-snapshot');
+            return {
+                feedbackVisible: !!feedback && !feedback.classList.contains('hidden'),
+                snapshotVisible: !!snapshot && !snapshot.classList.contains('hidden'),
+                retryEnabled: !document.getElementById('ceflow-retry')?.disabled,
+                nextEnabled: !document.getElementById('ceflow-next-scene')?.disabled,
+                hudLinkText: (document.querySelector('#ceflow-overlay .ceflow-hud-link')?.textContent || '').trim()
+            };
+        });
+        await assert(postReplyState.feedbackVisible, 'comic feedback panel visible after reply');
+        await assert(postReplyState.snapshotVisible, 'comic turn snapshot visible after reply');
+        await assert(postReplyState.retryEnabled, 'comic retry enabled after reply');
+        await assert(postReplyState.nextEnabled, 'comic next scene enabled after reply');
+        await assert(/משפט ההמשך/.test(postReplyState.hudLinkText), 'comic evaluation panel linked to user reply');
+    };
+
     try {
         await page.goto(baseUrl, { waitUntil: 'networkidle' });
 
@@ -265,7 +375,7 @@ async function runShellSmoke(baseUrl) {
         await assert((await scenarioPage.locator('.mtp-nav').count()) > 0, 'scenario standalone nav mounted');
         await scenarioPage.close();
 
-        await checkGenericScreen('comic-engine', 1);
+        await checkComicExperience();
         await checkGenericScreen('categories', 1);
         await checkGenericScreen('blueprint', 1);
         await checkGenericScreen('prismlab', 1);
