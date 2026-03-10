@@ -79,8 +79,41 @@
             sectionHideSelectors: ['.screen-read-guide'],
             hideSelectors: ['.ceflow-shell-copy'],
             panels: [
-                { id: 'guide', type: 'guide', action: 'היגיון', title: 'איך עובדים במסך הזה', size: 'lg', sourceRoot: 'section' },
-                { id: 'setup', type: 'selectors', action: 'מבוא', title: 'מה המסך הזה מתרגל', size: 'md', selectors: ['.ceflow-shell-copy'] }
+                {
+                    id: 'guide',
+                    type: 'guide',
+                    action: 'היגיון של קומיקס',
+                    title: 'היגיון של קומיקס',
+                    icon: '💬',
+                    size: 'lg',
+                    sourceRoot: 'section',
+                    contextTitle: 'היגיון של קומיקס',
+                    contextSubtitle: 'איך קוראים את הדיאלוג החי, את הלחץ ואת המשמעות של כל בחירה.'
+                },
+                {
+                    id: 'setup',
+                    type: 'selectors',
+                    action: 'בחירה בקומיקס',
+                    title: 'בחירה בקומיקס',
+                    icon: '🗨️',
+                    size: 'md',
+                    sourceRoot: 'section',
+                    selectors: ['.ceflow-shell-copy', '.ceflow-choice-panel-head'],
+                    contextTitle: 'בחירה בקומיקס',
+                    contextSubtitle: 'מה בוחרים כאן בפועל, ואיך מזהים מה באמת לחיץ בכל רגע.'
+                },
+                {
+                    id: 'feedback',
+                    type: 'selectors',
+                    action: 'משוב של קומיקס',
+                    title: 'משוב של קומיקס',
+                    icon: '📈',
+                    size: 'lg',
+                    sourceRoot: 'section',
+                    selectors: ['#ceflow-turn-snapshot', '#ceflow-feedback', '#ceflow-overlay'],
+                    contextTitle: 'משוב של קומיקס',
+                    contextSubtitle: 'כך הבחירה שלך משנה זרימה, סוכנות ובושה בתוך הסצנה.'
+                }
             ]
         },
         categories: {

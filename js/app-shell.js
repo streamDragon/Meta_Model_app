@@ -411,6 +411,23 @@
         return root;
     }
 
+    function appendPanelContextHeader(wrapper, panel) {
+        if (!wrapper) return;
+        const contextTitle = String(panel?.contextTitle || '').trim();
+        const contextSubtitle = String(panel?.contextSubtitle || '').trim();
+        if (!contextTitle && !contextSubtitle) return;
+
+        const contextHeader = document.createElement('header');
+        contextHeader.className = 'shell-panel-context';
+        const icon = getPanelIcon(panel?.id, panel);
+        contextHeader.innerHTML = `
+            <p class="shell-panel-context-kicker">${escapeHtml(icon)} מסך פנימי</p>
+            ${contextTitle ? `<h4 class="shell-panel-context-title">${escapeHtml(contextTitle)}</h4>` : ''}
+            ${contextSubtitle ? `<p class="shell-panel-context-subtitle">${escapeHtml(contextSubtitle)}</p>` : ''}
+        `;
+        wrapper.appendChild(contextHeader);
+    }
+
     function buildGuidePanelContent(screenState, panel) {
         const sourceId = String(panel?.guideId || screenState.id || '').trim();
         const guideRoot = screenState.section?.querySelector(`.screen-read-guide[data-screen-guide="${sourceId}"]`)
@@ -424,6 +441,7 @@
 
         const wrapper = document.createElement('article');
         wrapper.className = 'shell-overlay-content';
+        appendPanelContextHeader(wrapper, panel);
 
         const philosopher = guideRoot.querySelector('.screen-read-guide-philosopher-toggle');
         const content = guideRoot.querySelector('.screen-read-guide-content');
@@ -451,6 +469,7 @@
     function buildSelectorsPanelContent(screenState, panel) {
         const wrapper = document.createElement('article');
         wrapper.className = 'shell-overlay-content';
+        appendPanelContextHeader(wrapper, panel);
         const root = resolvePanelSourceRoot(screenState, panel);
         const selectors = Array.isArray(panel?.selectors) ? panel.selectors : [];
         let matched = 0;
@@ -474,6 +493,7 @@
     function buildButtonsPanelContent(panel) {
         const wrapper = document.createElement('article');
         wrapper.className = 'shell-overlay-content';
+        appendPanelContextHeader(wrapper, panel);
         if (panel?.description) {
             const description = document.createElement('p');
             description.textContent = panel.description;
@@ -504,7 +524,9 @@
         return panels.find((panel) => String(panel?.id || '').trim() === String(panelId || '').trim()) || null;
     }
 
-    function getPanelIcon(panelId) {
+    function getPanelIcon(panelId, panelConfig = null) {
+        const explicit = String(panelConfig?.icon || '').trim();
+        if (explicit) return explicit;
         const id = String(panelId || '').trim();
         if (id.includes('guide') || id.includes('help')) return '❔';
         if (id.includes('history')) return '🕘';
@@ -646,7 +668,7 @@
             headerActions.forEach((panel) => {
                 shell.headerActions.appendChild(createActionButton({
                     label: panel.action || panel.title || 'פרטים',
-                    icon: getPanelIcon(panel.id),
+                    icon: getPanelIcon(panel.id, panel),
                     onClick: () => openGenericPanelOverlay(screenState, panel.id)
                 }));
             });

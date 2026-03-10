@@ -648,6 +648,36 @@ body.app-sticky-home-active #app-sticky-home-btn {
     color: #64748b;
 }
 
+.shell-panel-context {
+    display: grid;
+    gap: 4px;
+    padding: 10px 12px;
+    border: 1px solid #cfe4ff;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #f8fbff 0%, #edf5ff 100%);
+}
+
+.shell-panel-context-kicker {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #1e3a8a;
+    letter-spacing: 0.05em;
+}
+
+.shell-panel-context-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1rem;
+}
+
+.shell-panel-context-subtitle {
+    margin: 0;
+    color: #334155;
+    font-size: 0.86rem;
+    line-height: 1.45;
+}
+
 .shell-help-list,
 .shell-stats-list {
     margin: 0;
@@ -17475,6 +17505,17 @@ body.mobile-sticky-cta-visible {
     gap: 10px;
 }
 
+#ceflow-step-back {
+    border-color: rgba(14, 116, 144, 0.36);
+    background: linear-gradient(180deg, rgba(236, 254, 255, 0.96), rgba(224, 242, 254, 0.94));
+    color: #0f172a;
+}
+
+#ceflow-step-back[disabled] {
+    opacity: 0.58;
+    cursor: not-allowed;
+}
+
 .ceflow-shotclock-shell {
     margin-inline-start: auto;
     justify-self: end;
@@ -18431,6 +18472,13 @@ body.mobile-sticky-cta-visible {
     text-align: right;
 }
 
+.ceflow-hud-link {
+    margin: 6px 0 0;
+    color: rgba(191, 219, 254, 0.96);
+    font-size: 0.78rem;
+    line-height: 1.4;
+}
+
 .ceflow-dialog-intro {
     display: grid;
     gap: 4px;
@@ -18454,9 +18502,42 @@ body.mobile-sticky-cta-visible {
     font-size: 0.9rem;
 }
 
+.ceflow-choice-affordance {
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 12px;
+    border: 1px dashed rgba(148, 163, 184, 0.34);
+    background: rgba(15, 23, 42, 0.26);
+    color: rgba(241, 245, 249, 0.96);
+    font-size: 0.8rem;
+    line-height: 1.45;
+}
+
+.ceflow-choice-affordance::before {
+    content: "👆 ";
+}
+
+.ceflow-choice-affordance[data-state="ready"] {
+    border-color: rgba(110, 231, 183, 0.54);
+    background: rgba(6, 78, 59, 0.34);
+}
+
+.ceflow-choice-affordance[data-state="locked"] {
+    border-color: rgba(251, 191, 36, 0.5);
+    background: rgba(120, 53, 15, 0.3);
+}
+
 .ceflow-choice-deck {
     grid-template-columns: 1fr;
     gap: 12px;
+}
+
+.ceflow-choice-deck.is-interactive .ceflow-choice {
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.2);
+}
+
+.ceflow-choice-deck.is-locked .ceflow-choice {
+    cursor: not-allowed;
 }
 
 .ceflow-choice {
