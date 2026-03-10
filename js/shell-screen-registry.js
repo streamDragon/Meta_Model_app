@@ -87,31 +87,34 @@
                     icon: '💬',
                     size: 'lg',
                     sourceRoot: 'section',
+                    contextKicker: '💬 קומיקס · היגיון פנימי',
                     contextTitle: 'היגיון של קומיקס',
                     contextSubtitle: 'איך קוראים את הדיאלוג החי, את הלחץ ואת המשמעות של כל בחירה.'
                 },
                 {
                     id: 'setup',
                     type: 'selectors',
-                    action: 'בחירה בקומיקס',
-                    title: 'בחירה בקומיקס',
+                    action: 'הבחירה בקומיקס',
+                    title: 'הבחירה בקומיקס',
                     icon: '🗨️',
                     size: 'md',
                     sourceRoot: 'section',
                     selectors: ['.ceflow-shell-copy', '.ceflow-choice-panel-head'],
-                    contextTitle: 'בחירה בקומיקס',
+                    contextKicker: '🗨️ קומיקס · בחירה חיה',
+                    contextTitle: 'הבחירה בקומיקס',
                     contextSubtitle: 'מה בוחרים כאן בפועל, ואיך מזהים מה באמת לחיץ בכל רגע.'
                 },
                 {
                     id: 'feedback',
                     type: 'selectors',
-                    action: 'משוב של קומיקס',
-                    title: 'משוב של קומיקס',
+                    action: 'המשוב של קומיקס',
+                    title: 'המשוב של קומיקס',
                     icon: '📈',
                     size: 'lg',
                     sourceRoot: 'section',
                     selectors: ['#ceflow-turn-snapshot', '#ceflow-feedback', '#ceflow-overlay'],
-                    contextTitle: 'משוב של קומיקס',
+                    contextKicker: '📈 קומיקס · משוב חי',
+                    contextTitle: 'המשוב של קומיקס',
                     contextSubtitle: 'כך הבחירה שלך משנה זרימה, סוכנות ובושה בתוך הסצנה.'
                 }
             ]

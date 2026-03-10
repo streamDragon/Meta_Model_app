@@ -2613,7 +2613,7 @@ const SCREEN_READ_GUIDES = Object.freeze({
 
 const DEFAULT_THERAPEUTIC_DEMO = Object.freeze({
     banner: 'אילוסטרציה תהליכית: זה מודל הדגמה למה הכלי הזה בא למדל. זו דוגמה לימודית של תהליך, ומה שאתה מתרגל כאן הוא בדיוק מה שתרצה לקבל/לתת בשיחה אמיתית.',
-    frame: 'זו דוגמה תהליכית (אילוסטרציה) בלבד. המטרה כאן היא להראות את סוג התנועה שהפיצ׳ר מאמן: דיוק, חקירה, שיקוף, או בניית צעד הבא.',
+    frame: 'זו דוגמה תהליכית (אילוסטרציה) בלבד. המטרה כאן היא להראות את סוג התנועה שהכלי מאמן: דיוק, חקירה, שיקוף, או בניית צעד הבא.',
     turns: Object.freeze([
         Object.freeze({ role: 'מטופל', text: 'אני מרגיש שהכול תקוע, ואני לא בטוח מאיפה להתחיל.' }),
         Object.freeze({ role: 'מטפל', text: 'בוא נעבוד דרך הכלי הזה וניקח נקודה אחת בלבד, כדי להבין מה באמת קורה ולא רק איך זה מרגיש כרגע.' }),
@@ -2621,7 +2621,7 @@ const DEFAULT_THERAPEUTIC_DEMO = Object.freeze({
         Object.freeze({ role: 'מטפל', text: 'מעולה. עכשיו נבחר את השאלה/התגובה הכי מדויקת לשלב הבא, בלי לקפוץ למסקנה גדולה מדי.' }),
         Object.freeze({ role: 'מטופל', text: 'זה כבר מרגיש יותר ברור, ופחות כמו בלגן אחד גדול.' })
     ]),
-    outcomeTitle: 'מה הפיצ׳ר הזה בא למדל',
+    outcomeTitle: 'מה הכלי הזה בא למדל',
     outcomes: Object.freeze([
         'איך עוברים מעומס/עמימות לצעד ברור אחד.',
         'איך נשארים נוכחים ומדויקים בלי להמציא שאלות “חכמות” כל הזמן.',
@@ -2687,14 +2687,14 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
             Object.freeze({ role: 'מטופל', text: 'אני פשוט צריך להתקדם.' }),
             Object.freeze({ role: 'מטפל', text: 'בוא נפרק את “להתקדם”: מה קורה צעד-צעד בפועל? מה קודם למה?' }),
             Object.freeze({ role: 'מטופל', text: 'אוקיי… קודם אני צריך לפתוח מסמך, לסכם 3 נקודות, ואז לשלוח.' }),
-            Object.freeze({ role: 'מטפל', text: 'מעולה. Unzip הופך פועל עמום לפרוצדורה שאפשר לבצע.' })
+            Object.freeze({ role: 'מטפל', text: 'מעולה. כלי הפירוק הופך פועל עמום לפרוצדורה שאפשר לבצע.' })
         ])
     }),
     prismlab: Object.freeze({
         frame: `דוגמת שימוש במעבדת פריזמות: במקום להמשיך לשאלה חדשה על כל תשובה (חקירה רקורסיבית), עוצרים על מילה/ביטוי מרכזי אחד ("עוגן") ובודקים אותו דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי לבנות מפת עומק.`,
         turns: Object.freeze([
             Object.freeze({ role: 'מטופל', text: 'אני רוצה להבין למה כל פעם \"נדבר\" נשמע לי כמו כישלון.' }),
-            Object.freeze({ role: 'מטפל', text: 'מעולה. ב-Prism Research היינו ממשיכים ושואלים שוב על כל תשובה חדשה (חקירה רקורסיבית). כאן במעבדת פריזמות נעשה משהו אחר: נשאר על המילה \"נדבר\" ונבדוק אותה לעומק דרך רמות שונות.' }),
+            Object.freeze({ role: 'מטפל', text: 'מעולה. בחקירה בשרשרת היינו ממשיכים ושואלים שוב על כל תשובה חדשה. כאן במעבדת פריזמות נעשה משהו אחר: נשאר על המילה \"נדבר\" ונבדוק אותה לעומק דרך רמות שונות.' }),
             Object.freeze({ role: 'מטופל', text: 'כלומר לא מחליפים נושא - פשוט מסתכלים על אותה מילה דרך סביבה/התנהגות/יכולות/ערכים/זהות/שייכות?' }),
             Object.freeze({ role: 'מטפל', text: 'בדיוק. כך מקבלים מפה: איפה זה יושב, מה אתה עושה, איזו יכולת חסרה, איזה כלל מפעיל את זה, ומה צעד ההמשך הכי מדויק.' })
         ]),
@@ -3009,9 +3009,9 @@ const RUNTIME_CLEAN_SCREEN_GUIDE_OVERRIDES = Object.freeze({
         success: 'התקדמות נראית כשאת/ה מצליח/ה להסביר מה כל רכיב בשלשה תורם למפה הכוללת.'
     }),
     'practice-verb-unzip': Object.freeze({
-        logic: 'המסך הזה מרכז מעבר מהיר בין פיצ\'רים וגם מאפשר תרגול Unzip (פירוק פועל עמום) בתוך אותו עמוד.',
-        goal: 'לבחור פיצ\'ר מתאים מהר, בלי עומס כפתורים גדול על המסך.',
-        approach: 'בחר/י פיצ\'ר אחד מהתפריט היורד, פתח/י אותו, וסיים/י סבב קצר לפני מעבר לכלי הבא.'
+        logic: 'המסך הזה מרכז מעבר מהיר בין כלים וגם מאפשר תרגול פירוק פועל עמום בתוך אותו עמוד.',
+        goal: 'לבחור כלי מתאים מהר, בלי עומס כפתורים גדול על המסך.',
+        approach: 'בחר/י כלי אחד מהתפריט היורד, פתח/י אותו, וסיים/י סבב קצר לפני מעבר לכלי הבא.'
     })
 });
 
@@ -3085,7 +3085,7 @@ function getTherapeuticDemoContent(screenId, screenTitle, guideCopy) {
                 safeGuideCopy.goal || defaultDemo.outcomes[2]
             ].filter(Boolean).slice(0, 3));
 
-    const fallbackFrame = `${defaultDemo.frame} בפיצ'ר "${screenTitle}" המטרה היא: ${safeGuideCopy.goal || 'לתרגל דיוק ותהליך.'}`;
+    const fallbackFrame = `${defaultDemo.frame} בכלי "${screenTitle}" המטרה היא: ${safeGuideCopy.goal || 'לתרגל דיוק ותהליך.'}`;
 
     return {
         banner: pickReadableText(featureSpecificOverride.banner || featureSpecificRaw.banner, defaultDemo.banner),
@@ -3615,11 +3615,11 @@ function setupGlobalFeatureMenuDropdown() {
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classicClassic, 'classic_classic_trainer.html')]: 'קלאסיק 1 · המבנה הקלאסי',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classic2, 'classic2_trainer.html')]: 'קלאסיק 2 · מבנה הקסם',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.iceberg, 'iceberg_templates_trainer.html')]: 'קצה קרחון / שלדי עומק',
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html')]: 'Prism Research · חקירה בשרשרת',
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html')]: 'Living Triples · שלשות חיות',
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: 'Unzip Trainer · חלון נפרד',
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/')]: 'דף עבודה מעוגל · Verb Unzip',
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: 'Sentence Morpher · ניסוח מחדש',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html')]: 'מחקר פריזמות · חקירה בשרשרת',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html')]: 'שלשות חיות · תרגול מלא',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: 'כלי פירוק פועל · חלון נפרד',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/')]: 'דף עבודה מעוגל · פירוק פועל',
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: 'מעבדת שינוי ניסוח',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismLabStandalone, 'prism_lab_trainer.html')]: 'מעבדת פריזמות · חלון נפרד'
     });
     const groupLabels = Object.freeze({
@@ -4218,12 +4218,12 @@ function setupFeatureLauncherTabs() {
         "nav:categories": "מילון קטגוריות המטה-מודל",
         "nav:comic-engine": "במת קומיקס רגשי",
         "nav:scenario-trainer": "סימולטור סצנות · משגר",
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: "Unzip Trainer · חלון נפרד",
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/')]: "דף עבודה מעוגל · Verb Unzip",
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: "Sentence Morpher · ניסוח מחדש",
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html')]: "Prism Research · חקירה בשרשרת",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: "כלי פירוק פועל · חלון נפרד",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/')]: "דף עבודה מעוגל · פירוק פועל",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: "מעבדת שינוי ניסוח",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismResearch, 'prism_research_trainer.html')]: "מחקר פריזמות · חקירה בשרשרת",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.iceberg, 'iceberg_templates_trainer.html')]: "קצה קרחון / שלדי עומק",
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html')]: "Living Triples · שלשות חיות",
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.livingTriples, 'living_triples_trainer.html')]: "שלשות חיות · תרגול מלא",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classicClassic, 'classic_classic_trainer.html')]: "קלאסיק 1 · המבנה הקלאסי",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classic2, 'classic2_trainer.html')]: "קלאסיק 2 · מבנה הקסם"
     });
@@ -4283,7 +4283,7 @@ function setupFeatureLauncherTabs() {
 
         const headStrong = launcher.querySelector('.feature-launcher-head strong');
         const headP = launcher.querySelector('.feature-launcher-head p');
-        if (headStrong) headStrong.textContent = 'בחירת פיצ׳ר מהירה';
+        if (headStrong) headStrong.textContent = 'בחירת כלי מהירה';
         if (headP) headP.textContent = 'בחר/י כלי אחד מהתפריט היורד. הכפתורים הארוכים הוסתרו כדי לשמור על מסך נקי.';
 
         const buttons = Array.from(launcher.querySelectorAll('[data-feature-group-btn]'));
@@ -4344,7 +4344,7 @@ function setupFeatureLauncherTabs() {
         const selectId = `feature-launcher-select-${Math.random().toString(36).slice(2, 7)}`;
         pickerWrap.innerHTML = `
             <div class="feature-launcher-picker-head">
-                <label for="${selectId}">בחר/י פיצ׳ר</label>
+                <label for="${selectId}">בחר/י כלי</label>
                 <small>תפריט יורד במקום שורת כפתורים עליונה</small>
             </div>
             <div class="feature-launcher-picker-controls">
@@ -4433,7 +4433,7 @@ function loadUnzipEmbedFrame({ forceReload = false } = {}) {
     const source = String(frame.getAttribute('data-versioned-src') || '').trim();
     if (!source) {
         unzipEmbedRuntime.failed = true;
-        setUnzipEmbedStatus('לא נמצא מקור תקין ל־Unzip Embed.', 'danger');
+        setUnzipEmbedStatus('לא נמצא מקור תקין לכלי המוטמע.', 'danger');
         syncUnzipEmbedButtons();
         return;
     }
@@ -4445,7 +4445,7 @@ function loadUnzipEmbedFrame({ forceReload = false } = {}) {
     unzipEmbedRuntime.loading = true;
     unzipEmbedRuntime.failed = false;
     syncUnzipEmbedButtons();
-    setUnzipEmbedStatus('טוען את Unzip Embed…', 'info');
+    setUnzipEmbedStatus('טוען את הכלי המוטמע...', 'info');
 
     const handleLoaded = () => {
         clearUnzipEmbedLoadTimer();
@@ -4453,7 +4453,7 @@ function loadUnzipEmbedFrame({ forceReload = false } = {}) {
         unzipEmbedRuntime.loaded = true;
         unzipEmbedRuntime.failed = false;
         syncUnzipEmbedButtons();
-        setUnzipEmbedStatus('ה־Embed נטען בהצלחה.', 'success');
+        setUnzipEmbedStatus('הכלי המוטמע נטען בהצלחה.', 'success');
     };
 
     const handleFailed = () => {
@@ -4462,7 +4462,7 @@ function loadUnzipEmbedFrame({ forceReload = false } = {}) {
         unzipEmbedRuntime.loaded = true;
         unzipEmbedRuntime.failed = true;
         syncUnzipEmbedButtons();
-        setUnzipEmbedStatus('טעינת ה־Embed נכשלה או התעכבה. אפשר לנסות טעינה מחדש.', 'danger');
+        setUnzipEmbedStatus('טעינת הכלי המוטמע נכשלה או התעכבה. אפשר לנסות טעינה מחדש.', 'danger');
     };
 
     frame.addEventListener('load', handleLoaded, { once: true });
@@ -4502,7 +4502,7 @@ function setupUnzipEmbedLazyLoad() {
         });
     }
 
-    setUnzipEmbedStatus('כדי למנוע תקיעות, ה־Embed נטען רק בעת כניסה למסך או בלחיצה ידנית.', 'info');
+    setUnzipEmbedStatus('כדי למנוע תקיעות, הכלי המוטמע נטען רק בעת כניסה למסך או בלחיצה ידנית.', 'info');
     syncUnzipEmbedButtons();
 }
 
@@ -4768,7 +4768,7 @@ async function setupCodexTrapWordLab() {
 
     await loadCodexTrapWords();
     refreshCodexTrapAnalysis();
-    setCodexFeedback('הפיצ׳ר פעיל. אפשר להתחיל להקליד.', 'info');
+    setCodexFeedback('הכלי פעיל. אפשר להתחיל להקליד.', 'info');
 
     const els = codexTrapLabState.elements;
 
@@ -5258,7 +5258,7 @@ function updateRuntimeDebugInfoCard() {
     const savedTab = normalizeRequestedTab(localStorage.getItem(PRACTICE_ACTIVE_TAB_STORAGE_KEY) || '') || 'home';
     const density = (localStorage.getItem('header_density_v1') || 'compact').toLowerCase();
 
-    if (viewEl) viewEl.textContent = isEmbedded ? 'מוטמע (iframe / Google Sites)' : 'ישיר (עמוד מלא)';
+    if (viewEl) viewEl.textContent = isEmbedded ? 'מוטמע (בתוך מסגרת)' : 'ישיר (עמוד מלא)';
     if (viewportEl) viewportEl.textContent = `${width}×${height}`;
     if (tabEl) tabEl.textContent = savedTab;
     if (densityEl) densityEl.textContent = density === 'cozy' ? 'cozy' : 'compact';
@@ -12477,7 +12477,7 @@ function renderGlobalComicStrip(tabName = getActiveTabName(), scenario = null) {
     mainImg.src = selected.path;
     mainImg.alt = selected.title;
     mainTitle.textContent = selected.title;
-    mainSubtitle.textContent = selected.subtitle || 'Meta Model comic scene';
+    mainSubtitle.textContent = selected.subtitle || 'סצנת קומיקס מטה-מודל';
     selectedGlobalComicScene = selected;
     previewBtn.setAttribute('aria-label', `תצוגה: ${selected.title}`);
     practiceBtn.setAttribute('aria-label', `מעבר לתרגול: ${selected.title}`);
@@ -14402,9 +14402,9 @@ function renderPrismDeepGuide(prism) {
                         <p><strong>למה זה חשוב?</strong> ${intent}</p>
                     </div>
                     <div class="prism-guide-card">
-                        <h5>מעבדת פריזמות מול Prism Research</h5>
+                        <h5>מעבדת פריזמות מול חקירה בשרשרת</h5>
                         <p><strong>מעבדת פריזמות:</strong> מילה/ביטוי מרכזי אחד ("עוגן") + חתך עומק דרך רמות לוגיות.</p>
-                        <p><strong>Prism Research:</strong> שאלה רקורסיבית על כל תשובה חדשה בשרשרת חקירה.</p>
+                        <p><strong>חקירה בשרשרת:</strong> שאלה נוספת על כל תשובה חדשה לאורך הרצף.</p>
                         <p><strong>בקיצור:</strong> מעבדה = עומק על מוקד אחד. Research = תנועה בשרשרת.</p>
                     </div>
                 </div>
@@ -15536,9 +15536,9 @@ function renderPrismDeepGuideLegacy(prism) {
                         <p><strong>למה זה חשוב?</strong> ${intent}</p>
                     </div>
                     <div class="prism-guide-card">
-                        <h5>מעבדת פריזמות מול Prism Research</h5>
+                        <h5>מעבדת פריזמות מול חקירה בשרשרת</h5>
                         <p><strong>מעבדת פריזמות (מגדל רמות):</strong> מילה/ביטוי מרכזי אחד ("עוגן") + חתך עומק דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}).</p>
-                        <p><strong>Prism Research (חקירה בשרשרת):</strong> שואלים שוב על כל תשובה חדשה ("רקורסיבי" = אותה שאלה חוזרת על תוצאה חדשה).</p>
+                        <p><strong>חקירה בשרשרת:</strong> שואלים שוב על כל תשובה חדשה כדי להעמיק לאורך הרצף.</p>
                         <p><strong>בקיצור:</strong> מעבדה = עומק על מוקד אחד, Research = התקדמות בשרשרת.</p>
                     </div>
                 </div>

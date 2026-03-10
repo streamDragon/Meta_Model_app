@@ -413,15 +413,20 @@
 
     function appendPanelContextHeader(wrapper, panel) {
         if (!wrapper) return;
+        const contextKicker = String(panel?.contextKicker || '').trim();
         const contextTitle = String(panel?.contextTitle || '').trim();
         const contextSubtitle = String(panel?.contextSubtitle || '').trim();
-        if (!contextTitle && !contextSubtitle) return;
+        if (!contextKicker && !contextTitle && !contextSubtitle) return;
 
         const contextHeader = document.createElement('header');
         contextHeader.className = 'shell-panel-context';
         const icon = getPanelIcon(panel?.id, panel);
+        const inferredKicker = contextTitle.includes('קומיקס')
+            ? `${icon} קומיקס · מסך פנימי`
+            : `${icon} מסך פנימי`;
+        const kicker = contextKicker || inferredKicker;
         contextHeader.innerHTML = `
-            <p class="shell-panel-context-kicker">${escapeHtml(icon)} מסך פנימי</p>
+            <p class="shell-panel-context-kicker">${escapeHtml(kicker)}</p>
             ${contextTitle ? `<h4 class="shell-panel-context-title">${escapeHtml(contextTitle)}</h4>` : ''}
             ${contextSubtitle ? `<p class="shell-panel-context-subtitle">${escapeHtml(contextSubtitle)}</p>` : ''}
         `;

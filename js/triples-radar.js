@@ -46,8 +46,8 @@
     const ROW_META = Object.freeze({
         row1: Object.freeze({
             colorClass: 'row-sky',
-            canonicalLabel: 'שלשה 1',
-            directionLabel: 'כיוון 1',
+            canonicalLabel: 'שלשה ראשונה',
+            directionLabel: 'כיוון ראשון',
             heading: 'מקור, הנחה וכוונה',
             directions: Object.freeze({
                 details: 'בודקים מי קבע, מה הונח מראש, ואיזו כוונה יוחסה בלי ראיה.',
@@ -56,8 +56,8 @@
         }),
         row2: Object.freeze({
             colorClass: 'row-teal',
-            canonicalLabel: 'שלשה 2',
-            directionLabel: 'כיוון 2',
+            canonicalLabel: 'שלשה שנייה',
+            directionLabel: 'כיוון שני',
             heading: 'חוקי משחק וגבולות',
             directions: Object.freeze({
                 details: 'בודקים מה בדיוק חייב, אפשר או גורם למה, ואיפה חסר תנאי ברור.',
@@ -66,8 +66,8 @@
         }),
         row3: Object.freeze({
             colorClass: 'row-amber',
-            canonicalLabel: 'שלשה 3',
-            directionLabel: 'כיוון 3',
+            canonicalLabel: 'שלשה שלישית',
+            directionLabel: 'כיוון שלישי',
             heading: 'משמעות, זהות והסקה',
             directions: Object.freeze({
                 details: 'בודקים איפה פעולה חיה הפכה לשם, לזהות או למסקנה רחבה מדי.',
@@ -76,8 +76,8 @@
         }),
         row4: Object.freeze({
             colorClass: 'row-violet',
-            canonicalLabel: 'שלשה 4',
-            directionLabel: 'כיוון 4',
+            canonicalLabel: 'שלשה רביעית',
+            directionLabel: 'כיוון רביעי',
             heading: 'הקשר, זמן וייחוס',
             directions: Object.freeze({
                 details: 'בודקים מי בדיוק, מתי בדיוק, איפה בדיוק וביחס למה.',
@@ -86,8 +86,8 @@
         }),
         row5: Object.freeze({
             colorClass: 'row-rose',
-            canonicalLabel: 'שלשה 5',
-            directionLabel: 'כיוון 5',
+            canonicalLabel: 'שלשה חמישית',
+            directionLabel: 'כיוון חמישי',
             heading: 'קרקע חושית ופעולה',
             directions: Object.freeze({
                 details: 'בודקים מה רואים, שומעים או מרגישים בפועל, ומה קורה צעד-צעד.',
@@ -1453,7 +1453,7 @@
                 state.data = await loadData();
                 state.scenarios = [...state.data.scenarios];
             } catch (error) {
-                state.elements.root.innerHTML = `<p class="triples-radar-error">שגיאה בטעינת המקרים: ${escapeHtml(error.message || 'לא ידוע')}</p>`;
+                state.elements.root.innerHTML = '<p class="triples-radar-error">לא הצלחנו לטעון את מקרי התרגול כרגע. רעננו את העמוד ונסו שוב.</p>';
                 return;
             }
         }
