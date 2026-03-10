@@ -243,12 +243,14 @@ async function runShellSmoke(baseUrl) {
             const affordance = document.getElementById('ceflow-choice-affordance');
             const backButton = document.getElementById('ceflow-step-back');
             const replyBox = document.getElementById('ceflow-reply-box');
+            const replyBack = document.getElementById('ceflow-reply-step-back');
             return {
                 selectedCount: document.querySelectorAll('#ceflow-choice-deck .ceflow-choice.is-selected').length,
                 disabledChoices: document.querySelectorAll('#ceflow-choice-deck button[data-choice-id][disabled]').length,
                 replyVisible: !!replyBox && !replyBox.classList.contains('hidden'),
                 affordanceState: affordance?.dataset?.state || '',
-                backDisabled: !!backButton?.disabled
+                backDisabled: !!backButton?.disabled,
+                replyBackVisible: !!replyBack && !replyBack.disabled
             };
         });
         await assert(selectedState.selectedCount === 1, 'comic choice selection visible');
@@ -256,6 +258,7 @@ async function runShellSmoke(baseUrl) {
         await assert(selectedState.replyVisible, 'comic reply step opens');
         await assert(selectedState.affordanceState === 'locked', 'comic affordance locked after selection');
         await assert(!selectedState.backDisabled, 'comic back enabled after action');
+        await assert(selectedState.replyBackVisible, 'comic reply-local back visible');
 
         await page.locator('#ceflow-step-back').click();
         await page.waitForTimeout(160);
@@ -298,12 +301,14 @@ async function runShellSmoke(baseUrl) {
         const postReplyState = await page.evaluate(() => {
             const feedback = document.getElementById('ceflow-feedback');
             const snapshot = document.getElementById('ceflow-turn-snapshot');
+            const feedbackBack = feedback?.querySelector('button[data-feedback-step-back]');
             return {
                 feedbackVisible: !!feedback && !feedback.classList.contains('hidden'),
                 snapshotVisible: !!snapshot && !snapshot.classList.contains('hidden'),
                 retryEnabled: !document.getElementById('ceflow-retry')?.disabled,
                 nextEnabled: !document.getElementById('ceflow-next-scene')?.disabled,
-                hudLinkText: (document.querySelector('#ceflow-overlay .ceflow-hud-link')?.textContent || '').trim()
+                hudLinkText: (document.querySelector('#ceflow-overlay .ceflow-hud-link')?.textContent || '').trim(),
+                feedbackBackVisible: !!feedbackBack && !feedbackBack.disabled
             };
         });
         await assert(postReplyState.feedbackVisible, 'comic feedback panel visible after reply');
@@ -311,6 +316,7 @@ async function runShellSmoke(baseUrl) {
         await assert(postReplyState.retryEnabled, 'comic retry enabled after reply');
         await assert(postReplyState.nextEnabled, 'comic next scene enabled after reply');
         await assert(/משפט ההמשך/.test(postReplyState.hudLinkText), 'comic evaluation panel linked to user reply');
+        await assert(postReplyState.feedbackBackVisible, 'comic feedback-local back visible');
     };
 
     try {

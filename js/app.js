@@ -17759,6 +17759,7 @@ async function setupComicEngine2({ force = false } = {}) {
         replyTitle: document.getElementById('ceflow-reply-title'),
         replyQuick: document.getElementById('ceflow-reply-quick'),
         replyInput: document.getElementById('ceflow-reply-input'),
+        replyStepBack: document.getElementById('ceflow-reply-step-back'),
         replyConfirm: document.getElementById('ceflow-reply-confirm'),
         replyStatus: document.getElementById('ceflow-reply-status'),
         feedback: document.getElementById('ceflow-feedback'),
@@ -17891,12 +17892,18 @@ async function setupComicEngine2({ force = false } = {}) {
         if (els.root) els.root.dataset.ceflowBackReason = String(reason || '').trim();
         updateStepBackControl();
     };
+    const syncStepBackButton = (button, canGoBack) => {
+        if (!button) return;
+        button.disabled = !canGoBack;
+        button.setAttribute('aria-disabled', canGoBack ? 'false' : 'true');
+        button.title = canGoBack ? 'חזרה לצעד הקודם בתוך הסצנה' : 'אין צעד קודם לחזור אליו';
+    };
     const updateStepBackControl = () => {
-        if (!els.stepBack) return;
         const canGoBack = state.historyStack.length > 0;
-        els.stepBack.disabled = !canGoBack;
-        els.stepBack.setAttribute('aria-disabled', canGoBack ? 'false' : 'true');
-        els.stepBack.title = canGoBack ? 'חזרה לצעד הקודם בתוך הסצנה' : 'אין צעד קודם לחזור אליו';
+        syncStepBackButton(els.stepBack, canGoBack);
+        syncStepBackButton(els.replyStepBack, canGoBack);
+        const feedbackBack = els.feedbackRight?.querySelector('button[data-feedback-step-back]');
+        syncStepBackButton(feedbackBack, canGoBack);
     };
     const restoreHistorySnapshot = (snapshot) => {
         if (!snapshot || typeof snapshot !== 'object') return false;
@@ -19268,10 +19275,12 @@ async function setupComicEngine2({ force = false } = {}) {
                 <div class="ceflow-feedback-actions">
                     <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(interpretation)}">🔍 פרשנות</button>
                     <button type="button" class="ceflow-mini-btn" data-feedback-note="${escapeHtml(regulation)}">🧠 ויסות סטייט</button>
+                    <button type="button" class="ceflow-mini-btn ceflow-back-mini-btn" data-feedback-step-back="1">↩ חזרה צעד</button>
                 </div>
                 ${repairBlock}
                 <div class="ceflow-feedback-note hidden" aria-live="polite"></div>
             `;
+            updateStepBackControl();
         }
     };
 
@@ -19558,6 +19567,7 @@ async function setupComicEngine2({ force = false } = {}) {
         event.preventDefault();
         confirmReply();
     });
+    els.replyStepBack?.addEventListener('click', stepBackOneAction);
     els.replyConfirm?.addEventListener('click', confirmReply);
     els.powerQuestions?.addEventListener('click', (event) => {
         const button = event.target.closest('button[data-power-question]');
@@ -19572,6 +19582,11 @@ async function setupComicEngine2({ force = false } = {}) {
         render();
     });
     els.feedbackRight?.addEventListener('click', (event) => {
+        const backBtn = event.target.closest('button[data-feedback-step-back]');
+        if (backBtn) {
+            stepBackOneAction();
+            return;
+        }
         const repairBtn = event.target.closest('button[data-repair-option]');
         if (repairBtn) {
             const nextRepair = repairBtn.getAttribute('data-repair-option') || '';

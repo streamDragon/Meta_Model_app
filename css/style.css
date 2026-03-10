@@ -18787,6 +18787,26 @@ body.mobile-sticky-cta-visible {
 
 .ceflow-inline-actions {
     margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+#ceflow-reply-step-back {
+    border-color: rgba(14, 116, 144, 0.34);
+    background: linear-gradient(180deg, rgba(236, 254, 255, 0.96), rgba(224, 242, 254, 0.94));
+    color: #0f172a;
+}
+
+.ceflow-back-mini-btn {
+    border-color: rgba(14, 116, 144, 0.32);
+    background: rgba(240, 249, 255, 0.92);
+    color: #0f172a;
+}
+
+#ceflow-reply-status {
+    flex: 1 1 100%;
 }
 
 .ceflow-feedback {
