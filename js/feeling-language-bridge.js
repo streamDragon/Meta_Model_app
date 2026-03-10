@@ -3,12 +3,12 @@
 
     const STORAGE_KEY = 'feeling_language_bridge_v1';
     const STAGES = Object.freeze([
-        Object.freeze({ id: 'sentence', label: 'משפט', kicker: 'שלב 1' }),
-        Object.freeze({ id: 'outer', label: 'חוץ', kicker: 'שלב 2' }),
-        Object.freeze({ id: 'inner', label: 'פנים', kicker: 'שלב 3' }),
-        Object.freeze({ id: 'bridge', label: 'גשר', kicker: 'שלב 4' }),
-        Object.freeze({ id: 'congruence', label: 'הלימה', kicker: 'שלב 5' }),
-        Object.freeze({ id: 'insight', label: 'תובנה', kicker: 'אחרי הלימה' })
+        Object.freeze({ id: 'sentence', label: 'משפט', kicker: 'שלב 1', hint: 'המשפט המקורי, בלי תיקון.' }),
+        Object.freeze({ id: 'outer', label: 'חוץ', kicker: 'שלב 2', hint: 'מה קרה בפועל בחוץ.' }),
+        Object.freeze({ id: 'inner', label: 'פנים', kicker: 'שלב 3', hint: 'מה נהיה בי בפנים.' }),
+        Object.freeze({ id: 'bridge', label: 'גשר', kicker: 'שלב 4', hint: 'משפט שמחבר חוץ ופנים.' }),
+        Object.freeze({ id: 'congruence', label: 'הלימה', kicker: 'שלב 5', hint: 'כמה המשפט באמת יושב על מה שקורה בחוץ ובפנים.' }),
+        Object.freeze({ id: 'insight', label: 'תובנה', kicker: 'אחרי הלימה', hint: 'מה התבהר אחרי שהמשפט כבר יושב.' })
     ]);
     const CONGRUENCE_LEVELS = Object.freeze([
         Object.freeze({ id: 'not-yet', label: 'עוד לא', note: 'עוד לא. יש כאן משהו חי, אבל זה עדיין לא נשמע כמו מה שהתכוונתי.' }),
@@ -152,6 +152,13 @@
         const caseById = (caseId) => SEED_CASES.find((item) => item.id === String(caseId || '').trim()) || SEED_CASES[0];
         const zoneById = (zoneId) => INNER_ZONES.find((item) => item.id === zoneId) || null;
         const congruenceById = (levelId) => CONGRUENCE_LEVELS.find((item) => item.id === levelId) || CONGRUENCE_LEVELS[0];
+        const getCongruenceTakeaway = (levelId) => {
+            const key = congruenceById(levelId).id;
+            if (key === 'yes') return 'מה למדתי מהבחירה הזו? המשפט מחבר בין פנים לחוץ, ואפשר לעבור לתובנה.';
+            if (key === 'almost') return 'מה למדתי מהבחירה הזו? הכיוון נכון, ועכשיו צריך ליטוש קטן במילים.';
+            if (key === 'close') return 'מה למדתי מהבחירה הזו? יש בסיס טוב, אבל עדיין חסר דיוק שיחבר הכול.';
+            return 'מה למדתי מהבחירה הזו? המשפט עדיין לא יושב, ולכן חוזרים לליטוש הגשר.';
+        };
 
         function inferHotPhrases(sentence, seed) {
             const normalized = trimText(sentence, 180);
@@ -496,7 +503,7 @@
                 const done = completed[stage.id] ? ' is-done' : '';
                 const locked = !unlocked[stage.id] ? ' is-locked' : '';
                 return `
-                    <button type="button" class="flb-stage-pill${active}${done}${locked}" data-action="go-stage" data-stage="${html(stage.id)}" ${!unlocked[stage.id] ? 'disabled' : ''}>
+                    <button type="button" class="flb-stage-pill${active}${done}${locked}" data-action="go-stage" data-stage="${html(stage.id)}" title="${html(stage.hint || stage.label)}" ${!unlocked[stage.id] ? 'disabled' : ''}>
                         <span>${html(stage.kicker)}</span>
                         <strong>${html(stage.label)}</strong>
                     </button>
@@ -768,6 +775,7 @@
                             `).join('')}
                         </div>
                         <p class="flb-meter-note">${html(congruence.note)}</p>
+                        <p class="flb-meter-note"><strong>${html(getCongruenceTakeaway(state.congruenceLevel))}</strong></p>
                     </div>
 
                     <label class="flb-field">

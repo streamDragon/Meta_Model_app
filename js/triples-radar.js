@@ -47,51 +47,71 @@
         row1: Object.freeze({
             colorClass: 'row-sky',
             canonicalLabel: 'שלשה ראשונה',
-            directionLabel: 'כיוון ראשון',
+            directionLabel: 'תוכן חסר',
             heading: 'מקור, הנחה וכוונה',
             directions: Object.freeze({
                 details: 'בודקים מי קבע, מה הונח מראש, ואיזו כוונה יוחסה בלי ראיה.',
                 rules: 'בודקים איזה שיפוט סמוי, הנחת יסוד או ייחוס כוונה מארגנים את המשפט.'
+            }),
+            examples: Object.freeze({
+                details: 'דוגמה: מי בדיוק אמר שזה נכון, ולפי איזה בסיס?',
+                rules: 'דוגמה: איזה כלל סמוי קובע כאן מה נחשב נכון?'
             })
         }),
         row2: Object.freeze({
             colorClass: 'row-teal',
             canonicalLabel: 'שלשה שנייה',
-            directionLabel: 'כיוון שני',
+            directionLabel: 'חוק/סיבה',
             heading: 'חוקי משחק וגבולות',
             directions: Object.freeze({
                 details: 'בודקים מה בדיוק חייב, אפשר או גורם למה, ואיפה חסר תנאי ברור.',
                 rules: 'בודקים איזה חוק משחק, מגבלה או חוק סיבתי קובעים כאן את הסיפור.'
+            }),
+            examples: Object.freeze({
+                details: 'דוגמה: מה בדיוק מונע? ומה צריך כדי שזה כן יתאפשר?',
+                rules: 'דוגמה: איזה חוק סיבה-תוצאה מנהל את המשפט?'
             })
         }),
         row3: Object.freeze({
             colorClass: 'row-amber',
             canonicalLabel: 'שלשה שלישית',
-            directionLabel: 'כיוון שלישי',
+            directionLabel: 'פירוש וזהות',
             heading: 'משמעות, זהות והסקה',
             directions: Object.freeze({
                 details: 'בודקים איפה פעולה חיה הפכה לשם, לזהות או למסקנה רחבה מדי.',
                 rules: 'בודקים איזה פירוש הופך אירוע למשמעות, לזהות או להוכחה.'
+            }),
+            examples: Object.freeze({
+                details: 'דוגמה: מה הפעולה המדויקת שקורית כאן בפועל?',
+                rules: 'דוגמה: איך אירוע אחד הופך כאן לזהות או הוכחה?'
             })
         }),
         row4: Object.freeze({
             colorClass: 'row-violet',
             canonicalLabel: 'שלשה רביעית',
-            directionLabel: 'כיוון רביעי',
+            directionLabel: 'הקשר וזמן',
             heading: 'הקשר, זמן וייחוס',
             directions: Object.freeze({
                 details: 'בודקים מי בדיוק, מתי בדיוק, איפה בדיוק וביחס למה.',
                 rules: 'בודקים איזו מסגרת הקשר גורמת לטענה להישמע מוחלטת למרות שהיא תלויה בזמן, מקום או ייחוס.'
+            }),
+            examples: Object.freeze({
+                details: 'דוגמה: מתי זה כן קורה ומתי לא?',
+                rules: 'דוגמה: איזה הקשר חסר גורם לטענה להישמע מוחלטת?'
             })
         }),
         row5: Object.freeze({
             colorClass: 'row-rose',
             canonicalLabel: 'שלשה חמישית',
-            directionLabel: 'כיוון חמישי',
+            directionLabel: 'חוויה ופעולה',
             heading: 'קרקע חושית ופעולה',
             directions: Object.freeze({
                 details: 'בודקים מה רואים, שומעים או מרגישים בפועל, ומה קורה צעד-צעד.',
                 rules: 'בודקים לאיזה מבחן מציאות או צעד התנהגותי צריך להחזיר את המשפט.'
+            }),
+            examples: Object.freeze({
+                details: 'דוגמה: מה רואים או שומעים ממש, בלי פרשנות?',
+                rules: 'דוגמה: איזה צעד קטן בודק אם הפירוש נכון?'
             })
         })
     });
@@ -1124,6 +1144,7 @@
 
         state.elements.rows.innerHTML = rows.map((row) => {
             const rowMeta = getRowMeta(row.id);
+            const directionHelp = `${rowMeta.directions[state.uiMode] || rowMeta.directions.details} ${(rowMeta.examples?.[state.uiMode] || rowMeta.examples?.details || '').trim()}`.trim();
             const isCorrectRow = correctRowId === row.id;
             const isHintRow = !state.solved && state.rowHintUsed && isCorrectRow;
             const isSolvedRow = state.solved && isCorrectRow;
@@ -1168,7 +1189,7 @@
 
             return `
                 <article class="${rowClass}" data-row-id="${row.id}">
-                    <div class="triples-radar-row-head">
+                    <div class="triples-radar-row-head" title="${escapeHtml(directionHelp)}" aria-label="${escapeHtml(directionHelp)}">
                         <div class="triples-radar-row-headline">
                             <strong>${escapeHtml(`${rowMeta.directionLabel} · ${rowMeta.heading}`)}</strong>
                             ${isStrongestRow ? `<span class="triples-radar-row-badge">${escapeHtml(modeMeta.rowBadge)}</span>` : ''}

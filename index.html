@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.238" data-build-time="1773152394076" data-build-iso="2026-03-10T14:19:54.076Z" data-git-commit="6a75747">
+<html lang="he" dir="rtl" data-app-version="1.0.239" data-build-time="1773165239547" data-build-iso="2026-03-10T17:53:59.547Z" data-git-commit="a95e2c9">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -456,8 +456,8 @@
                         <span class="home-route-pill">שיחה חיה</span>
                     </div>
                     <div class="home-route-cta-row">
-                        <button type="button" class="btn btn-primary" onclick="navigateTo('practice-wizard')">התחל עם גשר תחושה־שפה</button>
-                        <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">פתח סימולטור סצנות</a>
+                        <button type="button" class="btn btn-primary" data-nav-key="practiceWizard">התחל עם גשר תחושה־שפה</button>
+                        <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html" data-nav-key="scenarioTrainer">פתח סימולטור סצנות</a>
                     </div>
                 </div>
             </article>
@@ -468,28 +468,28 @@
                     <h3>גשר תחושה־שפה</h3>
                     <p>מתחילים ממשפט דחוס, מחזירים לו חוץ ופנים, ובונים ניסוח שיושב לפני כל אתגור או תיקון.</p>
                     <span class="home-route-feature-footnote">המסלול הראשי כשצריך דיוק עם חוויה</span>
-                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">פתח גשר</button>
+                    <button type="button" class="btn btn-secondary" data-nav-key="practiceWizard">פתח גשר</button>
                 </article>
                 <article class="home-route-feature-card" data-home-accent="teal">
                     <p class="home-route-feature-kicker">שיחה חיה</p>
                     <h3>סימולטור סצנות</h3>
                     <p>מסלול עצמאי שבו בוחרים תגובה, רואים איך היא נוחתת, ורק אחר כך פותחים את העומק שמאחוריה.</p>
                     <span class="home-route-feature-footnote">נפתח כעמוד ייעודי ולא כחצי מסך בתוך הבית</span>
-                    <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">פתח סימולטור</a>
+                    <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html" data-nav-key="scenarioTrainer">פתח סימולטור</a>
                 </article>
                 <article class="home-route-feature-card" data-home-accent="sky">
                     <p class="home-route-feature-kicker">מהיר</p>
                     <h3>תרגול זיהוי</h3>
                     <p>משפט אחד בכל סבב כדי לחדד זיהוי, משוב, ורפלקס שאלה מדויקת בזמן קצר.</p>
                     <span class="home-route-feature-footnote">לכניסה מהירה לעבודה</span>
-                    <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">פתח תרגול זיהוי</button>
+                    <button type="button" class="btn btn-secondary" data-nav-key="practiceQuestion">פתח תרגול זיהוי</button>
                 </article>
                 <article class="home-route-feature-card" data-home-accent="rose">
                     <p class="home-route-feature-kicker">עומק</p>
                     <h3>מעבדת פריזמות</h3>
                     <p>חקירה שכבתית סביב מילה או ביטוי אחד, עם רמות לוגיות וצעד המשך פרקטי.</p>
                     <span class="home-route-feature-footnote">כשצריך להבין איפה העניין באמת יושב</span>
-                    <button type="button" class="btn btn-secondary" onclick="navigateTo('prismlab')">פתח מעבדה</button>
+                    <button type="button" class="btn btn-secondary" data-nav-key="prismLab">פתח מעבדה</button>
                 </article>
             </section>
 
@@ -501,9 +501,9 @@
                             <p>גשר להלימה, זיהוי מהיר, או סימולטור סצנות. שאר הכלים נשארים זמינים דרך התפריט המלא בלי להעמיס את הבית.</p>
                         </div>
                         <div class="home-route-cta-row">
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה־שפה</button>
-                            <button type="button" class="btn btn-primary" onclick="navigateTo('practice-question')">תרגול זיהוי</button>
-                            <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">סימולטור סצנות</a>
+                            <button type="button" class="btn btn-secondary" data-nav-key="practiceWizard">גשר תחושה־שפה</button>
+                            <button type="button" class="btn btn-primary" data-nav-key="practiceQuestion">תרגול זיהוי</button>
+                            <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html" data-nav-key="scenarioTrainer">סימולטור סצנות</a>
                         </div>
                     </article>
                     <article class="home-route-secondary home-route-secondary--support">
@@ -513,7 +513,7 @@
                         </div>
                         <div class="home-route-cta-row">
                             <button id="home-open-feature-map" type="button" class="btn btn-secondary">פתח תפריט מלא</button>
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('categories')">פתח מילון</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="categories">פתח מילון</button>
                         </div>
                     </article>
                 </div>
@@ -824,7 +824,7 @@
                             <div id="question-drill-prestart" class="question-drill-prestart">
                                 <div class="question-drill-header">
                                     <h3 id="question-drill-main-title">זיהוי מטה-מודל</h3>
-                                    <small id="question-drill-subtitle">קוראים משפט, מבינים איזה מידע חסר לנו, ובוחרים את שאלת הדיוק המתאימה.</small>
+                                    <small id="question-drill-subtitle">בחרו מהתפריט (או מהכפתורים בנייד) את סוג הדפוס: מחיקה, עיוות או הכללה; ואז לחצו "בדוק".</small>
                                 </div>
                                 <div class="question-drill-session-panel">
                                     <div class="question-drill-session-config">
@@ -905,6 +905,11 @@
                                                     <option value="GENERALIZATION">הכללה</option>
                                                 </select>
                                             </label>
+                                            <div id="question-drill-mobile-categories" class="question-drill-mobile-categories" role="group" aria-label="בחירת קטגוריה מהירה">
+                                                <button type="button" class="question-drill-mobile-category-btn" data-question-mobile-category="DELETION">השמטה</button>
+                                                <button type="button" class="question-drill-mobile-category-btn" data-question-mobile-category="DISTORTION">עיוות</button>
+                                                <button type="button" class="question-drill-mobile-category-btn" data-question-mobile-category="GENERALIZATION">הכללה</button>
+                                            </div>
                                             <button id="question-drill-check" class="btn btn-primary">בדוק</button>
                                             <button id="question-drill-next" class="btn btn-secondary">דלג</button>
                                         </div>
@@ -1554,7 +1559,6 @@
             var withAssetVersion = window.__withAssetVersion || function (path) { return path; };
             var scriptQueue = [
                 'js/hebrew-sanitize.js',
-                'js/wr2w-path-core.js',
                 'js/triples-radar-core.js',
                 'js/prism-research-philosophy.js',
                 'js/data/feature-feed.js',

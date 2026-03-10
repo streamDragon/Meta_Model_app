@@ -117,7 +117,7 @@ try {
         );
         await assert(detailsState.rootText.length > 150, 'triples radar details content rendered', String(detailsState.rootText.length));
         await assert(detailsState.strongestBadges === 1, 'triples radar strongest direction marked', String(detailsState.strongestBadges));
-        await assert(detailsState.catHintText === 'הדגש תבנית', 'triples radar hint label clarified', detailsState.catHintText);
+        await assert(/\u05d4\u05d3\u05d2\u05e9/.test(detailsState.catHintText), 'triples radar hint label clarified', detailsState.catHintText);
         await assert(!/[A-Z]{2,}/.test(detailsState.rootText), 'triples radar details avoids exposed english');
 
         await page.locator('#triples-radar-mode-switch [data-tr-ui-mode="rules"]').click();

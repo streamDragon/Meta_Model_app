@@ -50,12 +50,11 @@ try {
         return !pattern.test(appJs);
     });
 
-    const allIds = collectMatches(html, /\bid="([^"]+)"/gi);
+    const allIds = collectMatches(html, /\sid="([^"]+)"/gi);
     const duplicateIds = unique(allIds.filter((id, index) => allIds.indexOf(id) !== index));
 
     const scriptQueueExpected = [
         'js/hebrew-sanitize.js',
-        'js/wr2w-path-core.js',
         'js/triples-radar-core.js',
         'js/nav-map.js',
         'js/app.js',

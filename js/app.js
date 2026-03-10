@@ -123,9 +123,9 @@ const UI_SOUND_KIND_COOLDOWNS_MS = Object.freeze({
 });
 
 const TRAINER_CATEGORY_LABELS = {
-    DELETION: 'מחיקה (Deletion)',
-    DISTORTION: 'עיוות (Distortion)',
-    GENERALIZATION: 'הכללה (Generalization)'
+    DELETION: 'מחיקה',
+    DISTORTION: 'עיוות',
+    GENERALIZATION: 'הכללה'
 };
 
 const TRAINER_STAR_REWARDS = Object.freeze({
@@ -174,6 +174,120 @@ const MOBILE_FEED_SEARCH_DEBOUNCE_MS = 90;
 const MOBILE_STICKY_CTA_ID = 'mobile-sticky-cta';
 const MOBILE_STICKY_CTA_POLL_INTERVAL_MS = 2200;
 const MOBILE_STICKY_DISABLED_TABS = Object.freeze(new Set(['home', 'debug', 'categories', 'practice-question']));
+const FEATURE_STEP_BACK_STACK_KEY = 'meta_feature_step_back_stack_v1';
+const FEATURE_STEP_BACK_STACK_LIMIT = 28;
+const USER_LEVEL_STORAGE_KEY = 'meta_user_level_mode_v1';
+const USER_LEVEL_DEFAULT = 'beginner';
+const USER_LEVELS = Object.freeze({
+    beginner: 'beginner',
+    advanced: 'advanced'
+});
+
+const FEATURE_ICON_BY_TAB = Object.freeze({
+    home: '🏠',
+    'practice-question': '🧩',
+    'practice-radar': '🎯',
+    'practice-triples-radar': '📡',
+    'practice-wizard': '🌉',
+    'practice-verb-unzip': '🧰',
+    'comic-engine': '💬',
+    categories: '📚',
+    blueprint: '🧭',
+    prismlab: '🔬',
+    about: 'ℹ️'
+});
+
+const FEATURE_ONBOARDING_COPY = Object.freeze({
+    'practice-question': Object.freeze({
+        icon: '🧩',
+        kicker: 'תרגול זיהוי',
+        what: 'כאן מזהים אם המשפט מחסיר מידע, מעוות פירוש, או מכליל יותר מדי.',
+        steps: Object.freeze(['קראו משפט אחד', 'בחרו סוג דפוס', 'לחצו "בדוק" וקראו את הנימוק']),
+        success: 'הצלחה היא להבין למה זו הקטגוריה, לא רק לפגוע בתשובה.',
+        termKeys: Object.freeze(['deletion', 'distortion', 'generalization'])
+    }),
+    'practice-radar': Object.freeze({
+        icon: '🎯',
+        kicker: 'תרגול מהיר',
+        what: 'כאן עובדים במהירות: משפט מודגש, בחירת תבנית, משוב מיידי.',
+        steps: Object.freeze(['בוחרים מצב לימוד/מבחן', 'לוחצים על התבנית של הביטוי המודגש', 'ממשיכים לסבב הבא']),
+        success: 'הצלחה היא לזהות עקבי תחת זמן, בלי ניחוש.',
+        termKeys: Object.freeze(['distortion', 'generalization'])
+    }),
+    'practice-triples-radar': Object.freeze({
+        icon: '📡',
+        kicker: 'מכ״ם שלשות',
+        what: 'כאן ממיינים משפט ל-5 כיווני חשיבה, ואז מדייקים לתבנית הנכונה בתוך הכיוון.',
+        steps: Object.freeze(['בחרו מצב: פרטים או כללים', 'זהו את הכיוון המרכזי', 'דייקו לתבנית בתוך השורה']),
+        success: 'הצלחה היא לזהות כיוון ואז תבנית, בשני שלבים ברורים.',
+        termKeys: Object.freeze(['deletion', 'distortion', 'generalization'])
+    }),
+    'practice-wizard': Object.freeze({
+        icon: '🌉',
+        kicker: 'גשר תחושה-שפה',
+        what: 'כאן מחברים משפט, מציאות פנימית ומציאות חיצונית עד שמרגיש "כן, זה זה".',
+        steps: Object.freeze(['מנסחים מה נאמר', 'אוספים מה קורה בחוץ ומה קורה בפנים', 'בונים משפט גשר ובודקים עד כמה הוא יושב']),
+        success: 'הצלחה היא משפט שמחזיק גם פנים וגם חוץ בלי למחוק אף צד.',
+        termKeys: Object.freeze(['congruence', 'insight'])
+    }),
+    'comic-engine': Object.freeze({
+        icon: '💬',
+        kicker: 'סימולטור קומיקס',
+        what: 'כאן בוחרים תגובה בזמן אמת ורואים איך המילים מזיזות זרימה, סוכנות, בושה ותגובתיות.',
+        steps: Object.freeze(['בחרו תגובה', 'כתבו משפט המשך קצר', 'בדקו משוב והשוו לאפשרות אחרת']),
+        success: 'הצלחה היא להפחית תגובתיות ולהגדיל בהירות וקשר.',
+        termKeys: Object.freeze(['reactivity'])
+    }),
+    prismlab: Object.freeze({
+        icon: '🔬',
+        kicker: 'מעבדה',
+        what: 'כאן מפרקים מילה אחת לשכבות חשיבה ובונים צעד המשך מעשי.',
+        steps: Object.freeze(['בחרו פריזמה', 'מלאו שכבות', 'בדקו מפה וצעד הבא']),
+        success: 'הצלחה היא מיפוי ברור וצעד ראשון שניתן לבצע.',
+        termKeys: Object.freeze(['insight'])
+    }),
+    blueprint: Object.freeze({
+        icon: '🧭',
+        kicker: 'בונה מהלך',
+        what: 'כאן הופכים פעולה עמומה לתכנית קצרה וברורה.',
+        steps: Object.freeze(['מנסחים פעולה', 'ממלאים שלבי תהליך', 'מסיימים עם חלופה ומדד הצלחה']),
+        success: 'הצלחה היא לדעת מה עושים עכשיו, ולא רק מה רוצים שיקרה.',
+        termKeys: Object.freeze([])
+    }),
+    categories: Object.freeze({
+        icon: '📚',
+        kicker: 'מילון',
+        what: 'כאן מחפשים קטגוריות, הסברים ודוגמאות לשאלות מדויקות.',
+        steps: Object.freeze(['מחפשים מונח', 'פותחים קטגוריה', 'לוקחים שאלה אחת לשיחה בפועל']),
+        success: 'הצלחה היא לצאת עם שאלה ישימה אחת לפחות.',
+        termKeys: Object.freeze(['deletion', 'distortion', 'generalization'])
+    }),
+    'practice-verb-unzip': Object.freeze({
+        icon: '🧰',
+        kicker: 'מרכז כלים',
+        what: 'כאן בוחרים כלי אחד ועובדים בו ברצף בלי להעמיס את המסך הראשי.',
+        steps: Object.freeze(['בחרו כלי', 'פתחו סשן', 'בדקו נתונים בסוף סבב']),
+        success: 'הצלחה היא תרגול רציף בכלי אחד בכל פעם.',
+        termKeys: Object.freeze([])
+    }),
+    about: Object.freeze({
+        icon: 'ℹ️',
+        kicker: 'מידע',
+        what: 'כאן מקבלים הגדרות, גרסה והקשר של המוצר.',
+        steps: Object.freeze(['קוראים תקציר', 'פותחים קטע רלוונטי', 'חוזרים לכלי התרגול המתאים']),
+        success: 'הצלחה היא לבחור לאן ממשיכים מיד אחרי הקריאה.',
+        termKeys: Object.freeze([])
+    })
+});
+
+const TERM_TOOLTIP_COPY = Object.freeze({
+    congruence: Object.freeze({ label: 'הלימה', help: 'עד כמה המשפט יושב גם בפנים וגם במציאות החיצונית.' }),
+    insight: Object.freeze({ label: 'תובנה', help: 'מה התבהר אחרי שניסחתם משפט מדויק יותר.' }),
+    deletion: Object.freeze({ label: 'מחיקה', help: 'מידע חסר במשפט: מי, מה, מתי, איך או לפי מה.' }),
+    distortion: Object.freeze({ label: 'עיוות', help: 'פירוש או מסקנה שמוצגים כעובדה בלי בדיקה מספקת.' }),
+    generalization: Object.freeze({ label: 'הכללה', help: 'כלל רחב מדי כמו "תמיד", "אף פעם" או "כולם".' }),
+    reactivity: Object.freeze({ label: 'תגובתיות', help: 'עד כמה התגובה אוטומטית ומונעת מלחץ במקום מבחירה.' })
+});
 
 let unzipEmbedRuntime = {
     loaded: false,
@@ -200,6 +314,12 @@ let mobileExperienceRuntime = {
     accordionsBuilt: false,
     accordionBuildScheduled: false
 };
+
+let featureStepBackRuntime = {
+    stack: []
+};
+
+let userLevelMode = USER_LEVEL_DEFAULT;
 
 const CODEX_TRAP_FALLBACK_WORDS = Object.freeze([
     Object.freeze({ word: 'הם', category: 'referential', severity: 'high', hint: 'מי בדיוק הם?', suggestions: Object.freeze(['ההורים שלי', 'הבוס שלי', 'הצוות שלי']) }),
@@ -252,6 +372,34 @@ function toHrefFeatureKeyFromPath(rawPath = '') {
 
 function getNavHrefFeatureKey(navKey, fallbackPath = '') {
     return toHrefFeatureKeyFromPath(getGlobalNavPathByKey(navKey, fallbackPath));
+}
+
+function getNavKeyByTab(tabName = '') {
+    const targetTab = normalizeRequestedTab(tabName);
+    if (!targetTab || typeof window === 'undefined') return '';
+    const navMap = window.MetaModelNavMap && typeof window.MetaModelNavMap === 'object'
+        ? window.MetaModelNavMap
+        : {};
+    return Object.keys(navMap).find((key) => {
+        const entry = navMap[key];
+        return entry?.type === 'tab' && normalizeRequestedTab(entry.tab) === targetTab;
+    }) || '';
+}
+
+function resolveCanonicalRouteForFeature(tabName = '', fallbackRoute = '') {
+    const tab = normalizeRequestedTab(tabName);
+    if (tab && document.getElementById(tab)) {
+        return buildRoutePathForTab(tab);
+    }
+    const fallback = String(fallbackRoute || '').trim();
+    if (!fallback) return '';
+    const navKey = typeof window.getMetaModelNavKeyByPath === 'function'
+        ? String(window.getMetaModelNavKeyByPath(fallback) || '').trim()
+        : '';
+    if (navKey) {
+        return getGlobalNavPathByKey(navKey, fallback);
+    }
+    return fallback;
 }
 
 function normalizeText(value) {
@@ -2055,20 +2203,25 @@ function getMobileFeedItems() {
     }
 
     const normalized = globalItems
-        .map((entry) => ({
-            id: String(entry?.id || '').trim(),
-            titleHe: String(entry?.titleHe || '').trim(),
-            descHe: String(entry?.descHe || '').trim(),
-            route: String(entry?.route || '').trim(),
-            tab: normalizeRequestedTab(entry?.tab || ''),
-            tagHe: String(entry?.tagHe || '').trim(),
-            category: String(entry?.category || '').trim().toLowerCase() || 'exercises',
-            thumbType: String(entry?.thumbType || 'svg').trim().toLowerCase(),
-            thumbSrc: String(entry?.thumbSrc || '').trim(),
-            icon: String(entry?.icon || '').trim(),
-            accentFrom: String(entry?.accentFrom || '').trim(),
-            accentTo: String(entry?.accentTo || '').trim()
-        }))
+        .map((entry) => {
+            const tab = normalizeRequestedTab(entry?.tab || '');
+            const route = resolveCanonicalRouteForFeature(tab, String(entry?.route || '').trim());
+            const icon = FEATURE_ICON_BY_TAB[tab] || String(entry?.icon || '').trim() || '🧠';
+            return {
+                id: String(entry?.id || '').trim(),
+                titleHe: String(entry?.titleHe || '').trim(),
+                descHe: String(entry?.descHe || '').trim(),
+                route,
+                tab,
+                tagHe: String(entry?.tagHe || '').trim(),
+                category: String(entry?.category || '').trim().toLowerCase() || 'exercises',
+                thumbType: String(entry?.thumbType || 'svg').trim().toLowerCase(),
+                thumbSrc: String(entry?.thumbSrc || '').trim(),
+                icon,
+                accentFrom: String(entry?.accentFrom || '').trim(),
+                accentTo: String(entry?.accentTo || '').trim()
+            };
+        })
         .filter((entry) => {
             if (!entry.titleHe) return false;
             if (entry.tab && document.getElementById(entry.tab)) return true;
@@ -2251,18 +2404,26 @@ function setupMobileFeedBindings() {
             const card = event.target?.closest?.('[data-mobile-feed-tab], [data-mobile-feed-route]');
             if (!card) return;
             const route = String(card.getAttribute('data-mobile-feed-route') || '').trim();
-            if (route.startsWith('/feature/')) {
-                const routeTab = normalizeRequestedTab(route.slice('/feature/'.length));
-                if (routeTab && document.getElementById(routeTab)) {
-                    navigateTo(routeTab, { playSound: true, scrollToTop: true });
+            if (route) {
+                const navKey = typeof window.getMetaModelNavKeyByPath === 'function'
+                    ? String(window.getMetaModelNavKeyByPath(route) || '').trim()
+                    : '';
+                if (navKey && typeof window.navigateByNavKey === 'function') {
+                    if (window.navigateByNavKey(navKey, { versioned: true }) !== false) return;
+                }
+                if (route.startsWith('/feature/')) {
+                    const routeTab = normalizeRequestedTab(route.slice('/feature/'.length));
+                    if (routeTab && document.getElementById(routeTab)) {
+                        navigateTo(routeTab, { playSound: true, scrollToTop: true });
+                        return;
+                    }
+                } else {
+                    const versionedRoute = typeof window.__withAssetVersion === 'function'
+                        ? window.__withAssetVersion(route)
+                        : route;
+                    window.location.href = versionedRoute;
                     return;
                 }
-            } else if (route) {
-                const versionedRoute = typeof window.__withAssetVersion === 'function'
-                    ? window.__withAssetVersion(route)
-                    : route;
-                window.location.href = versionedRoute;
-                return;
             }
             const tab = normalizeRequestedTab(card.getAttribute('data-mobile-feed-tab') || '');
             if (tab && document.getElementById(tab)) {
@@ -2458,7 +2619,8 @@ function applyRouteFromLocation({ replaceRoute = false, scrollToTop = true } = {
     navigateTo(targetTab, {
         playSound: false,
         updateHistory: false,
-        scrollToTop
+        scrollToTop,
+        trackStepBack: false
     });
 
     const mobileTabSelect = document.getElementById('mobile-tab-select');
@@ -5181,6 +5343,7 @@ function initializeMetaModelApp() {
     });
     setupGlobalFeatureMenuDropdown();
     setupFeatureMapOverlayControls();
+    setupCanonicalNavLaunchers();
     setupAppStickyBanner();
     safeRunUiEnhancement(() => {
         if (window.MetaAppShell && typeof window.MetaAppShell.bootstrap === 'function') {
@@ -5209,6 +5372,7 @@ function initializeMetaModelApp() {
     loadMetaModelData();
     setupTabNavigation();
     setupFeatureHomeBackButtons();
+    setupFeatureOnboardingCards();
     setupReadBeforeStartGuides();
     applyInitialTabPreference();
     setupGlobalComicStripActions();
@@ -5221,11 +5385,17 @@ function initializeMetaModelApp() {
     if (typeof setupFeelingLanguageBridge === 'function') {
         setupFeelingLanguageBridge();
     }
-    setupTrainerMode();
+    if (document.getElementById('start-trainer-btn')) {
+        setupTrainerMode();
+    }
     setupBlueprintBuilder();
     setupPrismModule();
-    setupScenarioTrainerModule();
-    ensureComicEngineFlowReady({ force: true });
+    if (document.getElementById('scenario-trainer')) {
+        setupScenarioTrainerModule();
+    }
+    if (getCurrentActiveTabName() === 'comic-engine') {
+        ensureComicEngineFlowReady({ force: true });
+    }
     setupCommunityFeedbackWall();
     initializeProgressHub();
     safeRunUiEnhancement(setupGlobalTheoryLauncher, 'global-theory-launcher');
@@ -5426,28 +5596,330 @@ function activateTabByName(tabName = '', { playSound = false, scrollToTop = true
     return true;
 }
 
+function normalizeStepBackTab(tabName = '') {
+    const tab = normalizeRequestedTab(tabName);
+    if (!tab || tab === 'debug') return '';
+    return tab;
+}
+
+function loadFeatureStepBackHistory() {
+    let parsed = [];
+    try {
+        parsed = JSON.parse(sessionStorage.getItem(FEATURE_STEP_BACK_STACK_KEY) || '[]');
+    } catch (_error) {
+        parsed = [];
+    }
+    featureStepBackRuntime.stack = (Array.isArray(parsed) ? parsed : [])
+        .map((item) => normalizeStepBackTab(item))
+        .filter(Boolean)
+        .slice(-FEATURE_STEP_BACK_STACK_LIMIT);
+}
+
+function saveFeatureStepBackHistory() {
+    try {
+        sessionStorage.setItem(FEATURE_STEP_BACK_STACK_KEY, JSON.stringify(featureStepBackRuntime.stack.slice(-FEATURE_STEP_BACK_STACK_LIMIT)));
+    } catch (_error) {
+        // Ignore session storage errors.
+    }
+}
+
+function pushFeatureStepBackEntry(fromTab = '', toTab = '') {
+    const from = normalizeStepBackTab(fromTab);
+    const to = normalizeStepBackTab(toTab);
+    if (!from || !to || from === to) return;
+    if (!featureStepBackRuntime.stack.length) {
+        loadFeatureStepBackHistory();
+    }
+    const stack = featureStepBackRuntime.stack;
+    if (stack[stack.length - 1] === from) return;
+    stack.push(from);
+    if (stack.length > FEATURE_STEP_BACK_STACK_LIMIT) {
+        stack.splice(0, stack.length - FEATURE_STEP_BACK_STACK_LIMIT);
+    }
+    saveFeatureStepBackHistory();
+}
+
+function popFeatureStepBackEntry(currentTab = '') {
+    const current = normalizeStepBackTab(currentTab);
+    if (!featureStepBackRuntime.stack.length) {
+        loadFeatureStepBackHistory();
+    }
+    let next = '';
+    while (featureStepBackRuntime.stack.length) {
+        const candidate = normalizeStepBackTab(featureStepBackRuntime.stack.pop());
+        if (!candidate || candidate === current) continue;
+        if (!document.getElementById(candidate)) continue;
+        next = candidate;
+        break;
+    }
+    saveFeatureStepBackHistory();
+    return next;
+}
+
+function hasFeatureStepBackTarget(currentTab = '') {
+    const current = normalizeStepBackTab(currentTab || getCurrentActiveTabName());
+    if (!featureStepBackRuntime.stack.length) {
+        loadFeatureStepBackHistory();
+    }
+    return featureStepBackRuntime.stack.some((candidate) => {
+        const tab = normalizeStepBackTab(candidate);
+        return Boolean(tab && tab !== current && document.getElementById(tab));
+    });
+}
+
+function navigateFeatureStepBack() {
+    const current = normalizeRequestedTab(getCurrentActiveTabName());
+    const previous = popFeatureStepBackEntry(current);
+    if (!previous) return false;
+    navigateTo(previous, {
+        playSound: true,
+        scrollToTop: true,
+        trackStepBack: false
+    });
+    return true;
+}
+
+function refreshFeatureBackControls(activeTab = '') {
+    const currentTab = normalizeRequestedTab(activeTab) || getCurrentActiveTabName();
+    const hasStepBack = hasFeatureStepBackTarget(currentTab);
+    document.querySelectorAll('[data-feature-step-back-btn]').forEach((button) => {
+        const targetSection = button.closest('.tab-content');
+        const targetTab = normalizeRequestedTab(String(targetSection?.id || ''));
+        const disabled = !hasStepBack || !targetTab || targetTab === 'home' || targetTab === 'debug';
+        button.disabled = disabled;
+        button.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+        button.title = disabled ? 'אין עדיין צעד קודם לחזרה' : 'חזרה צעד למסך הקודם';
+    });
+}
+
 function setupFeatureHomeBackButtons() {
+    loadFeatureStepBackHistory();
     const sections = Array.from(document.querySelectorAll('.tab-content[id]'));
     if (!sections.length) return;
 
     sections.forEach((section) => {
         const tabId = String(section.id || '').trim();
-        if (!tabId || tabId === 'home') return;
-        if (section.querySelector('[data-feature-back-home-btn]')) return;
+        if (!tabId || tabId === 'home' || tabId === 'debug') return;
+        if (section.querySelector('[data-feature-back-home-btn], [data-feature-step-back-btn]')) return;
 
         const bar = document.createElement('div');
         bar.className = 'feature-home-back-bar';
 
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'btn btn-primary feature-home-back-btn';
-        button.textContent = 'חזרה למסך הראשי';
-        button.dataset.featureBackHomeBtn = 'true';
-        button.addEventListener('click', () => navigateTo('home'));
+        const stepBackBtn = document.createElement('button');
+        stepBackBtn.type = 'button';
+        stepBackBtn.className = 'btn btn-secondary feature-step-back-btn';
+        stepBackBtn.textContent = '↩ חזרה צעד';
+        stepBackBtn.dataset.featureStepBackBtn = 'true';
+        stepBackBtn.addEventListener('click', () => {
+            if (navigateFeatureStepBack()) return;
+            navigateTo('home', { playSound: true, scrollToTop: true, trackStepBack: false });
+        });
 
-        bar.appendChild(button);
+        const homeBtn = document.createElement('button');
+        homeBtn.type = 'button';
+        homeBtn.className = 'btn btn-primary feature-home-back-btn';
+        homeBtn.textContent = 'חזרה למסך הראשי';
+        homeBtn.dataset.featureBackHomeBtn = 'true';
+        homeBtn.addEventListener('click', () => navigateTo('home', { playSound: true, scrollToTop: true }));
+
+        bar.append(stepBackBtn, homeBtn);
         section.prepend(bar);
     });
+
+    refreshFeatureBackControls(getCurrentActiveTabName());
+}
+
+function bindElementToNavKey(element, navKey = '') {
+    const node = element instanceof Element ? element : null;
+    const resolvedNavKey = String(navKey || '').trim();
+    if (!node || !resolvedNavKey) return false;
+    if (node.dataset.navKeyBound === '1') return true;
+
+    const entry = typeof window.getMetaModelNavEntry === 'function'
+        ? window.getMetaModelNavEntry(resolvedNavKey)
+        : null;
+    if (!entry) return false;
+
+    const canonicalPath = getGlobalNavPathByKey(resolvedNavKey, String(entry.path || '').trim());
+    const versionedHref = typeof window.getMetaModelNavHref === 'function'
+        ? window.getMetaModelNavHref(resolvedNavKey, { versioned: true })
+        : (typeof window.__withAssetVersion === 'function' ? window.__withAssetVersion(canonicalPath) : canonicalPath);
+    node.dataset.navKey = resolvedNavKey;
+
+    if (node.tagName === 'A') {
+        if (canonicalPath && !node.hasAttribute('data-versioned-href')) {
+            node.setAttribute('data-versioned-href', canonicalPath);
+        }
+        if (versionedHref) {
+            node.setAttribute('href', versionedHref);
+        }
+        if (entry.type === 'tab') {
+            node.addEventListener('click', (event) => {
+                event.preventDefault();
+                if (typeof window.navigateByNavKey === 'function' && window.navigateByNavKey(resolvedNavKey, { versioned: true }) !== false) {
+                    return;
+                }
+                if (entry.tab) navigateTo(entry.tab, { playSound: true, scrollToTop: true });
+            });
+        }
+    } else {
+        node.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (typeof window.navigateByNavKey === 'function' && window.navigateByNavKey(resolvedNavKey, { versioned: true }) !== false) {
+                return;
+            }
+            if (entry.type === 'tab' && entry.tab) {
+                navigateTo(entry.tab, { playSound: true, scrollToTop: true });
+                return;
+            }
+            if (versionedHref) {
+                window.location.href = versionedHref;
+            }
+        });
+    }
+
+    node.dataset.navKeyBound = '1';
+    return true;
+}
+
+function setupCanonicalNavLaunchers() {
+    const directLaunchers = Array.from(document.querySelectorAll('[data-nav-key]'));
+    directLaunchers.forEach((node) => {
+        bindElementToNavKey(node, node.getAttribute('data-nav-key'));
+    });
+
+    const navFromInline = Array.from(document.querySelectorAll(
+        '.home-route [onclick*="navigateTo("], #feature-map-toggle [onclick*="navigateTo("], [data-feature-launcher] [onclick*="navigateTo("]'
+    ));
+    navFromInline.forEach((node) => {
+        const onclick = String(node.getAttribute('onclick') || '').trim();
+        const match = onclick.match(/navigateTo\('([^']+)'\)/);
+        if (!match) return;
+        const tab = normalizeRequestedTab(match[1]);
+        const navKey = getNavKeyByTab(tab);
+        if (!navKey) return;
+        node.removeAttribute('onclick');
+        bindElementToNavKey(node, navKey);
+    });
+
+    const linkedAnchors = Array.from(document.querySelectorAll(
+        '.home-route a[data-versioned-href], #feature-map-toggle a[data-versioned-href], [data-feature-launcher] a[data-versioned-href]'
+    ));
+    linkedAnchors.forEach((anchor) => {
+        if (anchor.dataset.navKeyBound === '1') return;
+        const href = String(anchor.getAttribute('data-versioned-href') || anchor.getAttribute('href') || '').trim();
+        if (!href) return;
+        const navKey = typeof window.getMetaModelNavKeyByPath === 'function'
+            ? String(window.getMetaModelNavKeyByPath(href) || '').trim()
+            : '';
+        if (!navKey) return;
+        bindElementToNavKey(anchor, navKey);
+    });
+}
+
+function normalizeUserLevelMode(mode = '') {
+    const key = String(mode || '').trim().toLowerCase();
+    if (key === USER_LEVELS.advanced) return USER_LEVELS.advanced;
+    return USER_LEVELS.beginner;
+}
+
+function loadUserLevelMode() {
+    try {
+        return normalizeUserLevelMode(localStorage.getItem(USER_LEVEL_STORAGE_KEY) || USER_LEVEL_DEFAULT);
+    } catch (_error) {
+        return USER_LEVEL_DEFAULT;
+    }
+}
+
+function syncUserLevelToggleButtons() {
+    const mode = normalizeUserLevelMode(userLevelMode);
+    document.querySelectorAll('[data-user-level-set]').forEach((button) => {
+        const buttonMode = normalizeUserLevelMode(button.getAttribute('data-user-level-set'));
+        const active = buttonMode === mode;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+}
+
+function applyUserLevelMode(mode = USER_LEVEL_DEFAULT, { persist = true } = {}) {
+    userLevelMode = normalizeUserLevelMode(mode);
+    if (document.body) {
+        document.body.dataset.userLevel = userLevelMode;
+    }
+    if (persist) {
+        try {
+            localStorage.setItem(USER_LEVEL_STORAGE_KEY, userLevelMode);
+        } catch (_error) {
+            // Ignore storage errors.
+        }
+    }
+    syncUserLevelToggleButtons();
+}
+
+function buildFeatureTermTooltipHtml(termKeys = []) {
+    const terms = (Array.isArray(termKeys) ? termKeys : [])
+        .map((key) => TERM_TOOLTIP_COPY[String(key || '').trim()])
+        .filter(Boolean);
+    if (!terms.length) return '';
+    return `
+        <div class="feature-onboarding-terms" aria-label="מונחים מהירים">
+            ${terms.map((term) => `
+                <button type="button" class="feature-term-pill" title="${escapeHtml(term.help)}" aria-label="${escapeHtml(`${term.label}: ${term.help}`)}">
+                    ${escapeHtml(term.label)}
+                </button>
+            `).join('')}
+        </div>
+    `;
+}
+
+function setupFeatureOnboardingCards() {
+    Object.entries(FEATURE_ONBOARDING_COPY).forEach(([tabId, copy]) => {
+        const section = document.getElementById(tabId);
+        if (!section || section.querySelector('[data-feature-onboarding="1"]')) return;
+        const title = APP_STICKY_TAB_TITLE_OVERRIDES[tabId] || String(copy.kicker || tabId).trim();
+        const steps = Array.isArray(copy.steps) ? copy.steps : [];
+
+        const card = document.createElement('section');
+        card.className = 'feature-onboarding-card';
+        card.setAttribute('data-feature-onboarding', '1');
+        card.innerHTML = `
+            <div class="feature-onboarding-head">
+                <p class="feature-onboarding-kicker">${escapeHtml(String(copy.icon || '🧭').trim())} ${escapeHtml(String(copy.kicker || title).trim())}</p>
+                <h3 class="feature-onboarding-title">שם הלשונית של ${escapeHtml(title)}</h3>
+            </div>
+            <p class="feature-onboarding-what"><strong>מה עושים כאן?</strong> ${escapeHtml(String(copy.what || '').trim())}</p>
+            <div class="feature-onboarding-details">
+                <p><strong>שלבים עיקריים:</strong></p>
+                <ol class="feature-onboarding-steps">
+                    ${steps.map((step) => `<li>${escapeHtml(String(step || '').trim())}</li>`).join('')}
+                </ol>
+                <p class="feature-onboarding-success"><strong>מה נחשב הצלחה?</strong> ${escapeHtml(String(copy.success || '').trim())}</p>
+            </div>
+            ${buildFeatureTermTooltipHtml(copy.termKeys)}
+            <div class="feature-onboarding-levels" role="group" aria-label="בחירת רמת תצוגה">
+                <button type="button" class="feature-onboarding-level-btn" data-user-level-set="beginner">למתחילים</button>
+                <button type="button" class="feature-onboarding-level-btn" data-user-level-set="advanced">למתקדמים</button>
+            </div>
+        `;
+
+        const backBar = section.querySelector('.feature-home-back-bar');
+        if (backBar) {
+            backBar.insertAdjacentElement('afterend', card);
+        } else {
+            section.prepend(card);
+        }
+    });
+
+    if (window.__featureOnboardingLevelBound !== true) {
+        window.__featureOnboardingLevelBound = true;
+        document.addEventListener('click', (event) => {
+            const button = event.target?.closest?.('[data-user-level-set]');
+            if (!button) return;
+            applyUserLevelMode(button.getAttribute('data-user-level-set') || USER_LEVEL_DEFAULT, { persist: true });
+        });
+    }
+
+    applyUserLevelMode(loadUserLevelMode(), { persist: false });
 }
 
 // Setup Tab Navigation
@@ -7273,6 +7745,27 @@ function getQuestionDrillTargetCopy(category = 'DELETION') {
     return QUESTION_DRILL_TARGET_COPY[key] || QUESTION_DRILL_TARGET_COPY.DELETION;
 }
 
+function buildQuestionDrillReasonLine(question = null, category = 'DELETION') {
+    const normalizedCategory = String(category || '').toUpperCase();
+    const label = getQuestionDrillTargetCopy(normalizedCategory).label;
+    const explanation = normalizeUiText(String(question?.explanation || '').trim());
+    if (!explanation) {
+        return `מדובר ב${label} כי כאן חסר/מוטה מידע שדורש שאלת דיוק מתאימה.`;
+    }
+    const cleaned = explanation
+        .replace(/^מחיקה[:\s-]*/i, '')
+        .replace(/^עיוות[:\s-]*/i, '')
+        .replace(/^הכללה[:\s-]*/i, '')
+        .trim();
+    return `מדובר ב${label} כי ${cleaned || explanation}`;
+}
+
+function buildQuestionDrillLearningTakeaway(question = null, category = 'DELETION') {
+    const copy = getQuestionDrillTargetCopy(category);
+    const reason = buildQuestionDrillReasonLine(question, category);
+    return `${reason}. מה למדתי מהבחירה הזו? לחפש ${copy.target}.`;
+}
+
 function renderQuestionDrillTargetLegend() {
     const legend = questionDrillState.elements.targetLegend;
     if (!legend) return;
@@ -7497,7 +7990,7 @@ function buildQuestionDrillHelpOverlayContent() {
         <h4>איך עובדים כאן</h4>
         <ol class="shell-help-list">
             <li>קראו את המשפט.</li>
-            <li>במצב לימוד: רואים איזה סוג מידע רוצים להחזיר ובוחרים את שאלת הדיוק שמתאימה לו.</li>
+            <li>במצב לימוד: בחרו סוג דפוס (מחיקה, עיוות, הכללה) מהתפריט או מהכפתורים ואז לחצו "בדוק".</li>
             <li>במשחק מהיר: לוחצים מהר על הקטגוריה הנכונה ובונים רצף.</li>
         </ol>
         <p class="shell-overlay-note">במצב לימוד אפשר לפתוח רמז. במשחק מהיר עובדים מול זמן, ניקוד ורמזור קטן בצד.</p>
@@ -7572,6 +8065,8 @@ function buildQuestionDrillExplanationOverlayContent() {
     }
 
     const targetCategory = getQuestionDrillTargetCategory(current);
+    const reasonLine = buildQuestionDrillReasonLine(current, targetCategory);
+    const targetCopy = getQuestionDrillTargetCopy(targetCategory);
     const probe = (QUESTION_DRILL_OPTION_BANK[targetCategory] || [])[0] || 'מה בדיוק חסר כאן?';
 
     const statement = document.createElement('blockquote');
@@ -7581,7 +8076,9 @@ function buildQuestionDrillExplanationOverlayContent() {
     wrapper.innerHTML = `
         <p class="shell-overlay-kicker">הסבר</p>
         <h4>${getQuestionDrillCategoryLabel(targetCategory)}</h4>
+        <p>${reasonLine}</p>
         <p>${current.explanation || 'זה הכיוון המתאים במשפט הזה.'}</p>
+        <p class="shell-overlay-note">מה למדתי מהבחירה הזו? לחפש ${targetCopy.target}.</p>
         <p class="shell-overlay-note">שאלה שיכולה לפתוח את המשפט: ${probe}</p>
     `;
     wrapper.appendChild(statement);
@@ -7785,7 +8282,7 @@ function setQuestionDrillMode(mode = 'learning', { persist = true, refreshCurren
     if (elements.modeNote) {
         elements.modeNote.textContent = isTestMode
             ? 'משחק מהיר: זמן, ניקוד ורצף בלי רמזים.'
-            : 'לימוד: מחברים בין סוג המידע שחסר לבין שאלת הדיוק.';
+            : 'לימוד: בוחרים מחיקה/עיוות/הכללה ואז לוחצים "בדוק".';
     }
     if (elements.modeChip) {
         elements.modeChip.textContent = `מצב: ${getQuestionDrillModeLabel(resolved)}`;
@@ -7970,6 +8467,7 @@ function renderQuestionDrillOptions() {
 
     optionsRoot.appendChild(fragment);
     updateQuestionDrillOptionButtonsState();
+    updateQuestionDrillMobileCategoryButtonsState();
 }
 
 function setQuestionDrillSelectedOption(optionId = '', { playSound = true } = {}) {
@@ -7987,12 +8485,47 @@ function setQuestionDrillSelectedOption(optionId = '', { playSound = true } = {}
         questionDrillState.elements.category.value = selected.category;
     }
     updateQuestionDrillOptionButtonsState();
+    updateQuestionDrillMobileCategoryButtonsState();
     updateQuestionDrillControlsState();
     if (playSound) playUISound('select_soft');
 
     if (questionDrillState.mode === 'test') {
         evaluateQuestionDrill();
     }
+}
+
+function selectQuestionDrillOptionByCategory(categoryId = '') {
+    const normalizedCategory = String(categoryId || '').trim().toUpperCase();
+    if (!QUESTION_DRILL_CATEGORIES.includes(normalizedCategory)) return false;
+    const selected = questionDrillState.options.find((option) => option.category === normalizedCategory) || null;
+    if (!selected) return false;
+    setQuestionDrillSelectedOption(selected.id, { playSound: true });
+    return true;
+}
+
+function updateQuestionDrillMobileCategoryButtonsState() {
+    const buttons = Array.isArray(questionDrillState.elements.mobileCategoryButtons)
+        ? questionDrillState.elements.mobileCategoryButtons
+        : [];
+    const container = questionDrillState.elements.mobileCategories;
+    if (!buttons.length) return;
+
+    const selected = questionDrillState.options.find((option) => option.id === questionDrillState.selectedOptionId) || null;
+    const selectedCategory = String(selected?.category || '').trim().toUpperCase();
+    const disable = !questionDrillState.current || questionDrillState.roundFinalized || questionDrillState.sessionCompleted;
+    const show = questionDrillState.mode !== 'test';
+    if (container) {
+        container.classList.toggle('question-drill-control-hidden', !show);
+    }
+
+    buttons.forEach((button) => {
+        const category = String(button.getAttribute('data-question-mobile-category') || '').trim().toUpperCase();
+        const active = Boolean(selectedCategory && category === selectedCategory);
+        button.disabled = disable;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        button.classList.toggle('question-drill-control-hidden', !show);
+    });
 }
 
 function revealQuestionDrillOptionResult({ selectedOptionId = '', success = false, expectedCategory = '' } = {}) {
@@ -8067,7 +8600,7 @@ function beginQuestionDrillRound(question) {
         setQuestionDrillFeedback('קראו את המשפט ולחצו מיד על הקטגוריה הנכונה.', 'info');
         startQuestionDrillTimer();
     } else {
-        setQuestionDrillFeedback(`מטרת הסבב: לבחור את שאלת הדיוק של ${targetCopy.label}.`, 'info');
+        setQuestionDrillFeedback(`מטרת הסבב: בחרו ${targetCopy.label} ואז לחצו "בדוק".`, 'info');
     }
 
     if (elements.summary) {
@@ -8244,6 +8777,7 @@ function updateQuestionDrillControlsState() {
         elements.difficultySelect.disabled = !isTestMode;
     }
     updateQuestionDrillOptionButtonsState();
+    updateQuestionDrillMobileCategoryButtonsState();
 }
 
 function resetQuestionDrillToSetup({ preservePrefs = true } = {}) {
@@ -8598,9 +9132,11 @@ function evaluateQuestionDrill() {
         return;
     }
 
+    const reasonLine = buildQuestionDrillReasonLine(questionDrillState.current, expectedCategory);
+
     if (success) {
-        const selectedLabel = getQuestionDrillTargetCopy(selectedCategory).label;
-        setQuestionDrillFeedback(`נכון. זו שאלה שמחזירה ${selectedLabel}.`, 'success');
+        const takeaway = buildQuestionDrillLearningTakeaway(questionDrillState.current, expectedCategory);
+        setQuestionDrillFeedback(`נכון. ${takeaway}`, 'success');
         playUISound('correct');
         finalizeQuestionDrillRound('correct');
         return;
@@ -8609,7 +9145,10 @@ function evaluateQuestionDrill() {
     playUISound('wrong');
     const expectedCopy = getQuestionDrillTargetCopy(expectedCategory);
     const selectedCopy = getQuestionDrillTargetCopy(selectedCategory);
-    setQuestionDrillFeedback(`לא מדויק. השאלה שבחרת מחפשת ${selectedCopy.label}, וכאן צריך ${expectedCopy.label}.`, 'warn');
+    setQuestionDrillFeedback(
+        `לא מדויק. בחרת ${selectedCopy.label}, וכאן צריך ${expectedCopy.label}. ${reasonLine}. צריך עוד בהירות? פתחו "הסבר".`,
+        'warn'
+    );
     setQuestionDrillTrafficState('yellow', 'נסו עוד פעם');
     updateQuestionDrillControlsState();
 }
@@ -8630,6 +9169,8 @@ function setupQuestionDrill() {
         options: document.getElementById('question-drill-options'),
         category: document.getElementById('question-drill-category'),
         categoryWrap: document.getElementById('question-drill-category-wrap'),
+        mobileCategories: document.getElementById('question-drill-mobile-categories'),
+        mobileCategoryButtons: Array.from(drillRoot.querySelectorAll('[data-question-mobile-category]')),
         difficultySelect: document.getElementById('question-drill-difficulty'),
         feedback: document.getElementById('question-drill-feedback'),
         feedbackShell: document.getElementById('question-drill-feedback-shell'),
@@ -8694,6 +9235,17 @@ function setupQuestionDrill() {
         const button = target.closest('.question-drill-option');
         if (!button) return;
         setQuestionDrillSelectedOption(String(button.dataset.optionId || ''));
+    });
+    questionDrillState.elements.mobileCategories?.addEventListener('click', (event) => {
+        const target = event.target instanceof Element ? event.target : null;
+        if (!target) return;
+        const button = target.closest('[data-question-mobile-category]');
+        if (!button) return;
+        const categoryId = String(button.getAttribute('data-question-mobile-category') || '').trim().toUpperCase();
+        if (!categoryId) return;
+        if (selectQuestionDrillOptionByCategory(categoryId)) {
+            playUISound('select_soft');
+        }
     });
 
     questionDrillState.elements.checkBtn?.addEventListener('click', evaluateQuestionDrill);
@@ -15812,6 +16364,12 @@ function navigateTo(tabName, options = {}) {
     const scrollToTop = opts.scrollToTop !== false;
     const updateHistory = opts.updateHistory !== false;
     const replaceHistory = Boolean(opts.replaceHistory);
+    const trackStepBack = opts.trackStepBack !== false;
+    const currentTabBefore = normalizeRequestedTab(getCurrentActiveTabName()) || 'home';
+
+    if (trackStepBack && resolvedTab !== currentTabBefore) {
+        pushFeatureStepBackEntry(currentTabBefore, resolvedTab);
+    }
 
     persistHomeLastVisitedTab(resolvedTab);
 
@@ -15819,6 +16377,7 @@ function navigateTo(tabName, options = {}) {
         if (updateHistory) {
             syncHistoryRouteForTab(resolvedTab, { replace: replaceHistory });
         }
+        refreshFeatureBackControls(resolvedTab);
         if (scrollToTop) scrollPageToTop();
         return;
     }
@@ -15852,6 +16411,7 @@ function navigateTo(tabName, options = {}) {
     syncHomeMobileFeedMode(resolvedTab);
     updateMobileStickyCta(resolvedTab);
     updateAppStickyBanner(resolvedTab);
+    refreshFeatureBackControls(resolvedTab);
     if (updateHistory) {
         syncHistoryRouteForTab(resolvedTab, { replace: replaceHistory });
     }
@@ -19234,6 +19794,7 @@ async function setupComicEngine2({ force = false } = {}) {
             : (state.userReply
                 ? 'המדדים מחושבים לפי הכרטיס שבחרת וגם לפי משפט ההמשך שלך.'
                 : 'המדדים כבר זזים לפי הכרטיס שנבחר, עוד לפני משפט ההמשך.');
+        const metricsLegendLine = 'מדדים: זרימה = קצב התקדמות השיחה, סוכנות = בחירה וגבול, בושה = עומס רגשי, תגובתיות = אוטומט תחת לחץ.';
         const renderStat = (metric, value, cssName) => {
             const meta = ceflowMetricMeta(metric);
             const meaning = compactText(meta.meaning || describeMetric(metric, value), 88);
@@ -19262,6 +19823,7 @@ async function setupComicEngine2({ force = false } = {}) {
             </div>
             ${onboardingLine}
             <p class="ceflow-hud-link">${escapeHtml(metricLinkCopy)}</p>
+            <p class="ceflow-hud-link">${escapeHtml(metricsLegendLine)}</p>
             <p class="ceflow-hud-why">${escapeHtml(learningArc.panelWhy)}</p>
             <div class="ceflow-xray-tags">${hud.xrayTags.map(tag => `<span>${escapeHtml(tag)}</span>`).join('')}</div>
             <div class="ceflow-stats">
@@ -20831,7 +21393,6 @@ function wr2wProcessCount(criteria) {
 
 const WR2W_WIZARD_TITLE = 'גשר תחושה-שפה – הלימה לפני שינוי';
 const WR2W_WIZARD_SLOGAN = 'כשהמשפט דחוס, לא מתקנים מיד. קודם בונים הלימה בין מה שקורה בחוץ, מה שנהיה בפנים, והמשפט שנולד ביניהם.';
-const WR2W_WIZARD_FORMULA_CANONICAL = 'Signal → Hidden Quantifier → Bridge → Confirm → PATH → Learning';
 const WR2W_WIZARD_FORMULA = 'מה עולה בגוף → איזה "תמיד/אף פעם" מסתתר → משפט מגשר + בדיקה → אישור/הלימה → בחירת כיוון עבודה → למידה חדשה';
 
 function setupWrinkleGame() {

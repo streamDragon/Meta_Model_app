@@ -1710,6 +1710,21 @@ body.hide-top-tabbar .mobile-tab-nav {
     box-shadow: 0 10px 22px rgba(15, 118, 110, 0.14);
     display: flex;
     justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.feature-step-back-btn {
+    width: auto;
+    min-width: 136px;
+    font-weight: 800;
+}
+
+.feature-step-back-btn[disabled] {
+    opacity: 0.56;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 .feature-home-back-btn {
@@ -1725,6 +1740,114 @@ body.hide-top-tabbar .mobile-tab-nav {
 .feature-home-back-btn:hover {
     transform: translateY(-1px);
     box-shadow: 0 10px 18px rgba(2, 132, 199, 0.28);
+}
+
+.feature-onboarding-card {
+    margin: 0 0 12px;
+    border: 1px solid #c6dcff;
+    border-radius: 14px;
+    background: linear-gradient(160deg, #ffffff 0%, #eef5ff 100%);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.08);
+    padding: 12px;
+    display: grid;
+    gap: 8px;
+}
+
+.feature-onboarding-head {
+    display: grid;
+    gap: 4px;
+}
+
+.feature-onboarding-kicker {
+    margin: 0;
+    color: #1d4ed8;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.feature-onboarding-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1rem;
+}
+
+.feature-onboarding-what,
+.feature-onboarding-success {
+    margin: 0;
+    color: #334155;
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.feature-onboarding-details p {
+    margin: 0 0 4px;
+}
+
+.feature-onboarding-steps {
+    margin: 0;
+    padding-inline-start: 18px;
+    color: #334155;
+    display: grid;
+    gap: 3px;
+    font-size: 0.87rem;
+}
+
+.feature-onboarding-terms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.feature-term-pill {
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.76rem;
+    font-weight: 800;
+    padding: 5px 10px;
+    cursor: help;
+}
+
+.feature-term-pill:hover {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.feature-onboarding-levels {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.feature-onboarding-level-btn {
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    background: #f8fafc;
+    color: #334155;
+    min-height: 30px;
+    padding: 4px 11px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.feature-onboarding-level-btn.is-active,
+.feature-onboarding-level-btn[aria-pressed="true"] {
+    border-color: #0f766e;
+    background: linear-gradient(135deg, #0f766e 0%, #0284c7 100%);
+    color: #ffffff;
+}
+
+body[data-user-level="advanced"] .feature-onboarding-card {
+    gap: 6px;
+    padding: 10px 12px;
+}
+
+body[data-user-level="advanced"] .feature-onboarding-what,
+body[data-user-level="advanced"] .feature-onboarding-details,
+body[data-user-level="advanced"] .feature-onboarding-terms {
+    display: none;
 }
 
 @keyframes fadeIn {
@@ -3704,6 +3827,42 @@ body.screen-guide-open {
     color: #0f172a;
 }
 
+.question-drill-mobile-categories {
+    display: none;
+    gap: 8px;
+}
+
+.question-drill-mobile-category-btn {
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #334155;
+    min-height: 44px;
+    padding: 8px 10px;
+    font-size: 0.86rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease;
+}
+
+.question-drill-mobile-category-btn:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.question-drill-mobile-category-btn.is-active,
+.question-drill-mobile-category-btn[aria-pressed="true"] {
+    border-color: #2563eb;
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.question-drill-mobile-category-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
 .question-drill-feedback-shell {
     display: grid;
     gap: 8px;
@@ -3957,6 +4116,16 @@ body.screen-guide-open {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    #question-drill-category-wrap {
+        display: none;
+    }
+
+    .question-drill-mobile-categories {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-column: 1 / -1;
+    }
+
     .question-drill-hud-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
@@ -3981,6 +4150,10 @@ body.screen-guide-open {
 
     .question-drill-secondary-actions {
         display: grid;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .question-drill-mobile-categories {
         grid-template-columns: minmax(0, 1fr);
     }
 
@@ -11520,6 +11693,16 @@ a:hover {
         margin-bottom: 10px;
     }
 
+    .feature-home-back-bar .btn {
+        flex: 1 1 180px;
+        min-width: 0;
+    }
+
+    .feature-onboarding-card {
+        padding: 10px;
+        gap: 7px;
+    }
+
     .feature-home-back-btn {
         width: auto;
     }
@@ -11557,6 +11740,7 @@ a:hover {
     }
 
     body[data-active-tab="practice-question"] #practice-question .feature-home-back-bar,
+    body[data-active-tab="practice-question"] #practice-question .feature-onboarding-card,
     body[data-active-tab="practice-question"] #practice-question .app-shell-header,
     body[data-active-tab="practice-question"] #practice-question .lab-container-actions,
     body[data-active-tab="practice-question"] #practice-question .lab-container-bottom,
@@ -11615,6 +11799,7 @@ a:hover {
     }
 
     body[data-active-tab="practice-radar"] #practice-radar .feature-home-back-bar,
+    body[data-active-tab="practice-radar"] #practice-radar .feature-onboarding-card,
     body[data-active-tab="practice-radar"] #practice-radar .app-shell-header,
     body[data-active-tab="practice-radar"] #practice-radar .lab-container-actions,
     body[data-active-tab="practice-radar"] #practice-radar .lab-container-bottom,
@@ -11651,6 +11836,15 @@ a:hover {
     body.embed-mode .tab-content,
     body.minimal-ui .tab-content {
         padding: 16px calc(12px + var(--safe-right)) calc(20px + var(--safe-bottom)) calc(12px + var(--safe-left));
+    }
+
+    .practice-container,
+    .question-drill-card,
+    .rapid-pattern-card,
+    .triples-radar-card,
+    .ceflow-engine {
+        max-width: 100%;
+        overflow-x: hidden;
     }
 
     .card {

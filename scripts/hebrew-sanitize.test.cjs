@@ -5,8 +5,8 @@ const path = require('node:path');
 
 const sanitize = require('../js/hebrew-sanitize.js');
 
-const REQUIRED_WIZARD_TITLE = 'כמתים נסתרים – הגשר שנסגר';
-const REQUIRED_WIZARD_FORMULA = 'Signal → Hidden Quantifier → Bridge → Confirm → PATH → Learning';
+const REQUIRED_WIZARD_TITLE = 'גשר תחושה-שפה – הלימה לפני שינוי';
+const REQUIRED_WIZARD_FORMULA = 'מה עולה בגוף → איזה "תמיד/אף פעם" מסתתר → משפט מגשר + בדיקה → אישור/הלימה → בחירת כיוון עבודה → למידה חדשה';
 
 test('sanitizeHebrewText fixes known typo words', () => {
     assert.equal(sanitize.sanitizeHebrewText('מפששט'), 'משפט');

@@ -411,23 +411,29 @@
         return root;
     }
 
-    function appendPanelContextHeader(wrapper, panel) {
+    function appendPanelContextHeader(wrapper, panel, screenState = null) {
         if (!wrapper) return;
         const contextKicker = String(panel?.contextKicker || '').trim();
         const contextTitle = String(panel?.contextTitle || '').trim();
         const contextSubtitle = String(panel?.contextSubtitle || '').trim();
-        if (!contextKicker && !contextTitle && !contextSubtitle) return;
+        const resolvedTitle = contextTitle || String(panel?.title || panel?.action || panel?.id || '').trim();
 
         const contextHeader = document.createElement('header');
         contextHeader.className = 'shell-panel-context';
         const icon = getPanelIcon(panel?.id, panel);
-        const inferredKicker = contextTitle.includes('קומיקס')
-            ? `${icon} קומיקס · מסך פנימי`
+        const featureTitle = String(
+            screenState?.id
+                ? getTabTitle(screenState.id)
+                : ''
+        ).trim();
+        if (!contextKicker && !resolvedTitle && !contextSubtitle && !featureTitle) return;
+        const inferredKicker = featureTitle
+            ? `${icon} שם הלשונית של ${featureTitle}`
             : `${icon} מסך פנימי`;
         const kicker = contextKicker || inferredKicker;
         contextHeader.innerHTML = `
             <p class="shell-panel-context-kicker">${escapeHtml(kicker)}</p>
-            ${contextTitle ? `<h4 class="shell-panel-context-title">${escapeHtml(contextTitle)}</h4>` : ''}
+            ${resolvedTitle ? `<h4 class="shell-panel-context-title">${escapeHtml(resolvedTitle)}</h4>` : ''}
             ${contextSubtitle ? `<p class="shell-panel-context-subtitle">${escapeHtml(contextSubtitle)}</p>` : ''}
         `;
         wrapper.appendChild(contextHeader);
@@ -516,10 +522,10 @@
         };
     }
 
-    function buildComicRoundPanelShell(panel) {
+    function buildComicRoundPanelShell(screenState, panel) {
         const wrapper = document.createElement('article');
         wrapper.className = 'shell-overlay-content comic-round-panel';
-        appendPanelContextHeader(wrapper, panel);
+        appendPanelContextHeader(wrapper, panel, screenState);
         return wrapper;
     }
 
@@ -531,7 +537,7 @@
     }
 
     function buildComicRoundGuidePanelContent(screenState, panel, snapshot) {
-        const wrapper = buildComicRoundPanelShell(panel);
+        const wrapper = buildComicRoundPanelShell(screenState, panel);
         if (!snapshot) {
             appendComicRoundFallback(wrapper, 'לא נמצא סבב קומיקס פעיל כרגע.');
             return wrapper;
@@ -582,7 +588,7 @@
     }
 
     function buildComicRoundSetupPanelContent(screenState, panel, snapshot) {
-        const wrapper = buildComicRoundPanelShell(panel);
+        const wrapper = buildComicRoundPanelShell(screenState, panel);
         if (!snapshot) {
             appendComicRoundFallback(wrapper, 'לא נמצא סבב קומיקס פעיל כרגע.');
             return wrapper;
@@ -645,7 +651,7 @@
     }
 
     function buildComicRoundFeedbackPanelContent(screenState, panel, snapshot) {
-        const wrapper = buildComicRoundPanelShell(panel);
+        const wrapper = buildComicRoundPanelShell(screenState, panel);
         if (!snapshot) {
             appendComicRoundFallback(wrapper, 'לא נמצא סבב קומיקס פעיל כרגע.');
             return wrapper;
@@ -731,7 +737,7 @@
 
         const wrapper = document.createElement('article');
         wrapper.className = 'shell-overlay-content';
-        appendPanelContextHeader(wrapper, panel);
+        appendPanelContextHeader(wrapper, panel, screenState);
 
         const philosopher = guideRoot.querySelector('.screen-read-guide-philosopher-toggle');
         const content = guideRoot.querySelector('.screen-read-guide-content');
@@ -759,7 +765,7 @@
     function buildSelectorsPanelContent(screenState, panel) {
         const wrapper = document.createElement('article');
         wrapper.className = 'shell-overlay-content';
-        appendPanelContextHeader(wrapper, panel);
+        appendPanelContextHeader(wrapper, panel, screenState);
         const root = resolvePanelSourceRoot(screenState, panel);
         const selectors = Array.isArray(panel?.selectors) ? panel.selectors : [];
         let matched = 0;
@@ -780,10 +786,10 @@
         return wrapper;
     }
 
-    function buildButtonsPanelContent(panel) {
+    function buildButtonsPanelContent(screenState, panel) {
         const wrapper = document.createElement('article');
         wrapper.className = 'shell-overlay-content';
-        appendPanelContextHeader(wrapper, panel);
+        appendPanelContextHeader(wrapper, panel, screenState);
         if (panel?.description) {
             const description = document.createElement('p');
             description.textContent = panel.description;
@@ -903,7 +909,7 @@
         let content = buildComicRoundPanelContent(screenState, panel);
         if (!content) {
             if (panel.type === 'guide') content = buildGuidePanelContent(screenState, panel);
-            else if (panel.type === 'buttons') content = buildButtonsPanelContent(panel);
+            else if (panel.type === 'buttons') content = buildButtonsPanelContent(screenState, panel);
             else content = buildSelectorsPanelContent(screenState, panel);
         }
 
@@ -1292,6 +1298,29 @@
             clone.addEventListener('click', (event) => {
                 const trigger = event.target?.closest?.('a, button');
                 if (!trigger) return;
+                const navKey = String(trigger.getAttribute('data-nav-key') || '').trim();
+                if (navKey && typeof global.navigateByNavKey === 'function') {
+                    event.preventDefault();
+                    if (global.navigateByNavKey(navKey, { versioned: true }) !== false) {
+                        window.setTimeout(() => {
+                            if (global.MetaOverlayProvider && typeof global.MetaOverlayProvider.isOpen === 'function' && global.MetaOverlayProvider.isOpen()) {
+                                global.MetaOverlayProvider.closeOverlay('home-menu-nav-key');
+                            }
+                        }, 40);
+                        return;
+                    }
+                }
+                if (trigger.tagName === 'BUTTON') {
+                    const fallbackHref = String(trigger.getAttribute('data-versioned-href') || '').trim();
+                    if (fallbackHref) {
+                        event.preventDefault();
+                        const versionedHref = typeof global.__withAssetVersion === 'function'
+                            ? global.__withAssetVersion(fallbackHref)
+                            : fallbackHref;
+                        global.location.assign(versionedHref);
+                        return;
+                    }
+                }
                 window.setTimeout(() => {
                     if (global.MetaOverlayProvider && typeof global.MetaOverlayProvider.isOpen === 'function' && global.MetaOverlayProvider.isOpen()) {
                         global.MetaOverlayProvider.closeOverlay('home-menu-action');
