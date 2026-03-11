@@ -7358,6 +7358,7 @@ function populateCategories() {
         if (!targetId || !label) return '';
         return `<a class="categories-glossary-chip" href="#pattern-${escapeHtml(targetId)}" data-breen-pattern-link="${escapeHtml(targetId)}">${escapeHtml(label)}</a>`;
     }).filter(Boolean).join('');
+    const familiesIllustrationSrc = resolveVersionedAssetPath('assets/svg/props/meta-model-families-he.svg');
 
     theoryIntro.innerHTML = `
         <h2>מילון קטגוריות המטה-מודל</h2>
@@ -7376,6 +7377,14 @@ function populateCategories() {
                 <p>כרטיסי הקשר בתוך המילון מסבירים איפה יש יחס של על/תת-סוג, איפה יש הרחבה, ואיפה רק מנקים כפילות בשם.</p>
             </section>
         </div>
+        <figure class="categories-glossary-hero">
+            <img
+                src="${escapeHtml(familiesIllustrationSrc || 'assets/svg/props/meta-model-families-he.svg')}"
+                alt="איור שמסכם את שלוש המשפחות הראשיות במטה-מודל: מחיקה, עיוות והכללה"
+                loading="eager"
+            >
+            <figcaption>התחלה מהירה: קודם מזהים אם המשפט מוחק מידע, מעוות משמעות או מכליל יתר על המידה. אחר כך פותחים את הכרטיס המדויק.</figcaption>
+        </figure>
         <p class="categories-theory-note"><strong>איך עובדים כאן:</strong> פותחים כרטיס, קוראים את ההגדרה, בודקים את קשרי המפה, ואז עוברים לדוגמאות ולשאלות.</p>
         <div class="categories-glossary-entry-points">
             <div class="categories-glossary-entry-group">
