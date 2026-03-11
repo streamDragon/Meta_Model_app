@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.240" data-build-time="1773167856315" data-build-iso="2026-03-10T18:37:36.315Z" data-git-commit="650369c">
+<html lang="he" dir="rtl" data-app-version="1.0.241" data-build-time="1773196178176" data-build-iso="2026-03-11T02:29:38.176Z" data-git-commit="c9eed8f">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -294,6 +294,7 @@
                     <p id="app-sticky-current-context" class="app-sticky-banner__context">שם האפליקציה והמסך הפעיל נשארים גלויים גם בזמן גלילה.</p>
                 </div>
                 <div class="app-sticky-banner__actions">
+                    <button type="button" id="app-sticky-local-back-btn" class="btn btn-secondary app-sticky-banner__action-btn" disabled>↩ חזרה צעד</button>
                     <button type="button" id="app-sticky-menu-btn" class="btn btn-secondary app-sticky-banner__action-btn">תפריט כלים</button>
                     <button type="button" id="app-sticky-home-btn" class="btn btn-secondary app-sticky-banner__action-btn">חזרה לבית</button>
                     <div id="app-sticky-version-chip" class="app-sticky-banner__version" aria-live="polite">גרסה: נטען...</div>
@@ -423,32 +424,38 @@
                     <div class="mobile-feed-launchpad-head">
                         <p class="mobile-feed-launchpad-kicker">מתחילים מכאן</p>
                         <h2 class="mobile-feed-launchpad-title">מסלול קצר וברור מהטלפון</h2>
-                        <p class="mobile-feed-launchpad-copy">בחרו מסלול אחד בלבד להתחלה. את שאר הכלים משאירים לפיד שמתחת, כדי לא להפוך את הבית שוב לספרייה עמוסה.</p>
+                        <p class="mobile-feed-launchpad-copy">בחרו מסלול אחד והיכנסו. ההסבר המלא כבר מחכה בתוך הכלי עצמו.</p>
                     </div>
                     <div class="mobile-feed-launchpad-grid">
                         <article class="mobile-feed-launch-card" data-launch-track="beginner">
                             <span class="mobile-feed-launch-card-kicker">למתחילים</span>
                             <h3>גשר תחושה־שפה</h3>
-                            <p>כשעוד לא ברור מה קורה בחוץ ומה נהיה בפנים.</p>
-                            <button type="button" class="btn btn-primary" data-nav-key="practiceWizard">התחל/י כאן</button>
+                            <p>כדי לברר מה קורה בחוץ ומה נהיה בפנים.</p>
+                            <button type="button" class="btn btn-primary" data-nav-key="practiceWizard">פתחו גשר</button>
                         </article>
                         <article class="mobile-feed-launch-card" data-launch-track="intermediate">
                             <span class="mobile-feed-launch-card-kicker">לביניים</span>
                             <h3>תרגול זיהוי</h3>
-                            <p>כשצריך לזהות מהר אם זו מחיקה, עיוות או הכללה.</p>
-                            <button type="button" class="btn btn-secondary" data-nav-key="practiceQuestion">פתח/י תרגול</button>
+                            <p>כדי לזהות מהר מחיקה, עיוות או הכללה.</p>
+                            <button type="button" class="btn btn-secondary" data-nav-key="practiceQuestion">עברו לתרגול</button>
                         </article>
                         <article class="mobile-feed-launch-card" data-launch-track="advanced">
                             <span class="mobile-feed-launch-card-kicker">למתקדמים</span>
                             <h3>סימולטור סצנות</h3>
-                            <p>כשרוצים לראות את הדפוס בתוך שיחה חיה ולא רק במשפט בודד.</p>
-                            <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html" data-nav-key="scenarioTrainer">פתח/י סימולטור</a>
+                            <p>כדי לתרגל תגובה בתוך שיחה חיה.</p>
+                            <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html" data-nav-key="scenarioTrainer">פתחו סצנה</a>
                         </article>
                     </div>
                     <div class="mobile-feed-launchpad-support">
-                        <button type="button" class="btn btn-secondary" data-nav-key="practiceTriplesRadar">מכ"ם שלשות</button>
-                        <button type="button" class="btn btn-secondary" data-nav-key="prismLab">מעבדת פריזמות</button>
-                        <button type="button" class="btn btn-secondary" data-nav-key="categories">מילון</button>
+                        <div class="mobile-feed-launchpad-support-head">
+                            <strong>כלים משלימים</strong>
+                            <span>אחרי שבחרתם מסלול ראשי, אפשר לפתוח גם כלי עומק או מילון.</span>
+                        </div>
+                        <div class="mobile-feed-launchpad-support-actions">
+                            <button type="button" class="btn btn-secondary" data-nav-key="practiceTriplesRadar">מכ"ם שלשות</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="prismLab">מעבדת פריזמות</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="categories">מילון</button>
+                        </div>
                     </div>
                 </section>
                 <div class="mobile-feed-ticker" role="status" aria-live="polite">
@@ -478,8 +485,7 @@
                     <p class="home-route-eyebrow">שער פתיחה</p>
                     <h2 class="home-route-title">בחר/י את המסלול של עכשיו</h2>
                     <p class="home-route-subtitle">
-                        הבית לא מארח חצאי חוויות. בוחרים כאן כיוון אחד, נכנסים לנתיב החי שלו, וחוזרים רק כדי לבחור את הצעד הבא.
-                        אם צריך הלימה בין שפה, מציאות וחוויה, מתחילים בגשר. אם צריך לתרגל תגובה בתוך הקשר חי, נכנסים לסימולטור הסצנות.
+                        בוחרים כאן מסלול אחד ונכנסים. ההסבר המלא והשלבים מחכים בתוך הכלי עצמו, כדי שהפתיחה תישאר קלה וברורה.
                     </p>
                     <div class="home-route-pill-row" aria-label="סוגי עבודה">
                         <span class="home-route-pill">הלימה</span>
@@ -530,7 +536,7 @@
                     <article class="home-route-secondary">
                         <div class="home-route-secondary-head">
                             <h3>שלושה שערים עיקריים</h3>
-                            <p>גשר להלימה, זיהוי מהיר, או סימולטור סצנות. שאר הכלים נשארים זמינים דרך התפריט המלא בלי להעמיס את הבית.</p>
+                            <p>גשר להלימה, זיהוי מהיר, או סימולטור סצנות. בחרו אחד ועברו פנימה.</p>
                         </div>
                         <div class="home-route-cta-row">
                             <button type="button" class="btn btn-secondary" data-nav-key="practiceWizard">גשר תחושה־שפה</button>
@@ -541,7 +547,7 @@
                     <article class="home-route-secondary home-route-secondary--support">
                         <div class="home-route-secondary-head">
                             <h3>כלים משלימים</h3>
-                            <p>מילון הקטגוריות, מכ"ם שלשות, הבמה הרגשית וכלי פירוק נוספים נשארים זמינים בתפריט.</p>
+                            <p>מילון, מכ"ם שלשות וכלי עומק נוספים נשארים כאן כשלב שני, אחרי שבחרתם מסלול ראשי.</p>
                         </div>
                         <div class="home-route-cta-row">
                             <button id="home-open-feature-map" type="button" class="btn btn-secondary">פתח תפריט מלא</button>
@@ -834,7 +840,17 @@
 
         <!-- CATEGORIES TAB -->
         <section id="categories" class="tab-content">
-            <div id="categories-container"></div>
+            <div id="categories-container">
+                <section class="screen-runtime-fallback card" data-runtime-recovery="true" data-runtime-recovery-tab="categories" data-runtime-recovery-state="loading">
+                    <h2>מילון הקטגוריות</h2>
+                    <p>טוענים את המילון. אם המסך נשאר ריק, אפשר לנסות שוב, לחזור צעד אחד, או לחזור לבית.</p>
+                    <div class="screen-runtime-fallback-actions">
+                        <button type="button" class="btn btn-primary" data-runtime-recovery-action="retry">נסה שוב</button>
+                        <button type="button" class="btn btn-secondary" data-runtime-recovery-action="back">↩ חזרה צעד</button>
+                        <button type="button" class="btn btn-secondary" data-runtime-recovery-action="home">חזרה לבית</button>
+                    </div>
+                </section>
+            </div>
         </section>
         <!-- PRACTICE QUESTION TAB -->
         <section id="practice-question" class="tab-content practice-tab-content">

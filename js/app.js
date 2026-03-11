@@ -319,6 +319,10 @@ let featureStepBackRuntime = {
     stack: []
 };
 
+let runtimeRecoveryState = {
+    blankCheckTimerId: 0
+};
+
 let userLevelMode = USER_LEVEL_DEFAULT;
 
 const CODEX_TRAP_FALLBACK_WORDS = Object.freeze([
@@ -2066,6 +2070,15 @@ function setupAppStickyBanner() {
     if (banner.dataset.boundStickyBanner !== 'true') {
         banner.dataset.boundStickyBanner = 'true';
 
+        const localBackBtn = document.getElementById('app-sticky-local-back-btn');
+        if (localBackBtn) {
+            localBackBtn.addEventListener('click', () => {
+                if (localBackBtn.disabled) return;
+                if (navigateFeatureStepBack()) return;
+                showHint('אין עדיין צעד קודם לחזרה. אם צריך, אפשר לחזור לבית.');
+            });
+        }
+
         const homeBtn = document.getElementById('app-sticky-home-btn');
         if (homeBtn) {
             homeBtn.addEventListener('click', () => {
@@ -2649,7 +2662,26 @@ function persistPracticeTabPreference(tabName = '') {
 
 function applyInitialTabPreference() {
     setupHistoryRouter();
-    applyRouteFromLocation({ replaceRoute: true, scrollToTop: false });
+    clearFeatureStepBackHistory();
+
+    const routeTab = getCurrentRouteTabFromPathname(window.location.pathname || '/');
+    const blockedDebugRoute = routeTab === 'debug' && !isDebugRouteEnabled();
+    const targetTab = blockedDebugRoute ? 'home' : resolveInitialRouteTab();
+
+    persistPracticeTabPreference(targetTab);
+    navigateTo(targetTab, {
+        playSound: false,
+        updateHistory: false,
+        scrollToTop: false,
+        trackStepBack: false
+    });
+
+    const mobileTabSelect = document.getElementById('mobile-tab-select');
+    if (mobileTabSelect) mobileTabSelect.value = targetTab;
+
+    syncHistoryRouteForTab(targetTab, { replace: true });
+    refreshFeatureBackControls(targetTab);
+    scheduleRuntimeRecoveryCheck(targetTab);
 }
 
 function setupMobileViewportSizing() {
@@ -2732,9 +2764,9 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: 'בחר/י פריזמה, כתוב/כתבי מילה/ביטוי מרכזי אחד מהמשפט, מלא/י כמה רמות, ואז בדוק/י את המפה ובחר/י צעד המשך. אם חסרה רמה - משלימים שכבה לפני שעוברים הלאה.'
     }),
     categories: Object.freeze({
-        logic: 'זהו שער למודל: כל קטגוריה חושפת שכבת מידע אחרת שנמחקה, עוותה או הוכללה בשפה.',
-        goal: 'לזהות במהירות את התבנית הפעילה ולבחור שאלה שמחזירה עומק ודיוק.',
-        approach: 'לעבור לפי סדר ברין, לעבוד קטגוריה-קטגוריה, ואז לחזור לתרגול עם שאלה אחת מדויקת לכל דפוס.'
+        logic: 'זהו מסך ייחוס: לא פותחים הכול בבת אחת, אלא מזהים משפחה, פותחים כרטיס אחד, ולוקחים ממנו שאלה אחת חזרה לשיחה או לתרגול.',
+        goal: 'לדעת לאן להסתכל כשמשפט נשמע עמום, דרמטי או מוחלט, ולחבר את המונח לשאלה מדויקת.',
+        approach: 'אם זו כניסה ראשונה, מתחילים בקריאת מחשבות, כמתים כוללים ואי-ספציפיות התייחסות; אחר כך פותחים הרחבות כמו קפיצה למסקנות או פרדיקטים חושיים רק כשצריך דיוק נוסף.'
     }),
     practice: Object.freeze({
         logic: 'מסך התרגול פוצל ל-4 דפים: שאלות, מכ"ם מטה-מודל, SQHCEL, ופועל לא מפורט.',
@@ -5376,6 +5408,7 @@ function initializeMetaModelApp() {
     
     loadUserProgress();
     showLoadingIndicator();
+    renderRuntimeRecoveryFallback('categories');
     loadMetaModelData();
     setupTabNavigation();
     setupFeatureHomeBackButtons();
@@ -5533,8 +5566,9 @@ async function loadMetaModelData() {
         if (document.getElementById('prism-library')) {
             renderPrismLibrary();
         }
-        
+
         hideLoadingIndicator();
+        scheduleRuntimeRecoveryCheck(getCurrentActiveTabName());
     } catch (error) {
         console.error('Error loading data:', error);
         hideLoadingIndicator();
@@ -5594,6 +5628,7 @@ function activateTabByName(tabName = '', { playSound = false, scrollToTop = true
     updateMobileStickyCta(resolvedTab);
     syncGlobalTheoryLauncherVisibility(resolvedTab);
     updateAppStickyBanner(resolvedTab);
+    scheduleRuntimeRecoveryCheck(resolvedTab);
 
     if (scrollToTop) {
         scrollPageToTop();
@@ -5628,6 +5663,11 @@ function saveFeatureStepBackHistory() {
     } catch (_error) {
         // Ignore session storage errors.
     }
+}
+
+function clearFeatureStepBackHistory() {
+    featureStepBackRuntime.stack = [];
+    saveFeatureStepBackHistory();
 }
 
 function pushFeatureStepBackEntry(fromTab = '', toTab = '') {
@@ -5697,6 +5737,14 @@ function refreshFeatureBackControls(activeTab = '') {
         button.setAttribute('aria-disabled', disabled ? 'true' : 'false');
         button.title = disabled ? 'אין עדיין צעד קודם לחזרה' : 'חזרה צעד למסך הקודם';
     });
+
+    const stickyBackBtn = document.getElementById('app-sticky-local-back-btn');
+    if (stickyBackBtn) {
+        const disabled = !hasStepBack || currentTab === 'home' || currentTab === 'debug';
+        stickyBackBtn.disabled = disabled;
+        stickyBackBtn.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+        stickyBackBtn.title = disabled ? 'אין עדיין צעד קודם לחזרה' : 'חזרה צעד למסך הקודם';
+    }
 }
 
 function setupFeatureHomeBackButtons() {
@@ -5719,7 +5767,7 @@ function setupFeatureHomeBackButtons() {
         stepBackBtn.dataset.featureStepBackBtn = 'true';
         stepBackBtn.addEventListener('click', () => {
             if (navigateFeatureStepBack()) return;
-            navigateTo('home', { playSound: true, scrollToTop: true, trackStepBack: false });
+            showHint('אין עדיין צעד קודם לחזרה. אם צריך, אפשר לחזור לבית.');
         });
 
         const homeBtn = document.createElement('button');
@@ -6785,6 +6833,102 @@ function collectGlossaryConcepts() {
     return sortGlossaryConceptsByRequiredOrder(Array.from(byId.values()).map((item) => enrichGlossaryConceptDepth(item)));
 }
 
+const GLOSSARY_RELATION_MAP = Object.freeze({
+    lack_referential_index: Object.freeze({
+        title: 'קשר במפה',
+        text: 'כאן חסר ה"מי". אם המשפט נשמע כללי בגלל שהדבר עצמו מעורפל ולא בגלל שהדובר לא ציין מי, פתחו את "שם עצם לא מפורט".',
+        links: Object.freeze([
+            Object.freeze({ id: 'non_referring_nouns', label: 'שם עצם לא מפורט' })
+        ])
+    }),
+    non_referring_nouns: Object.freeze({
+        title: 'קשר במפה',
+        text: 'כאן חסר ה"מה" או ה"דבר". אם מה שחסר הוא דווקא האדם או הקבוצה שאליהם מתייחסים, פתחו את "אי-ספציפיות התייחסות".',
+        links: Object.freeze([
+            Object.freeze({ id: 'lack_referential_index', label: 'אי-ספציפיות התייחסות' })
+        ])
+    }),
+    identity_predicates: Object.freeze({
+        title: 'קשר במפה',
+        text: 'כאן הזהות נאמרת במפורש: "אני כזה". ב"בלבול ברמות לוגיות" הבעיה היא הקפיצה מאירוע או התנהגות לרמת זהות.',
+        links: Object.freeze([
+            Object.freeze({ id: 'logical_types_confusion', label: 'בלבול ברמות לוגיות' })
+        ])
+    }),
+    logical_types_confusion: Object.freeze({
+        title: 'קשר במפה',
+        text: 'זו הרחבה של רמות לוגיות. שונה מפרדיקטים של זהות: כאן בודקים קפיצה בין רמות, לא רק תווית זהות שנאמרה במפורש.',
+        links: Object.freeze([
+            Object.freeze({ id: 'identity_predicates', label: 'פרדיקטים של זהות' })
+        ])
+    }),
+    sensory_predicates: Object.freeze({
+        title: 'קשר במפה',
+        text: 'זהו אותו מושג שמוכר גם כ-VAK. במילון הזה כל הווריאציות מרוכזות בכרטיס אחד כדי למנוע כפילות בין "VAK" לבין "פרדיקטים חושיים".',
+        links: Object.freeze([])
+    }),
+    false_dilemma: Object.freeze({
+        title: 'קשר במפה',
+        text: 'זו הרחבה לוגית שנשמרת כאן בנפרד כדי לתפוס ניסוחי "או־או". היא לא מחליפה הכללה או שקילות מורכבת, אלא מסמנת קיטוב של האפשרויות.',
+        links: Object.freeze([
+            Object.freeze({ id: 'universal_quantifier', label: 'כמתים כוללים' })
+        ])
+    }),
+    mind_reading: Object.freeze({
+        title: 'קשר במפה',
+        text: 'זהו תת-מקרה נפוץ של קפיצה למסקנות: המסקנה נסגרת סביב מה שמישהו אחר חושב, מרגיש או מתכוון.',
+        links: Object.freeze([
+            Object.freeze({ id: 'jumping_to_conclusions', label: 'קפיצה למסקנות' })
+        ])
+    }),
+    jumping_to_conclusions: Object.freeze({
+        title: 'קשר במפה',
+        text: 'כאן שומרים את קטגוריית-העל כדי לראות את משפחת ההסקה המהירה. כשברור שהמסקנה עוסקת במחשבות, במשמעות או בקשר סיבתי, פותחים אחר כך את התת-דפוס המתאים.',
+        links: Object.freeze([
+            Object.freeze({ id: 'mind_reading', label: 'קריאת מחשבות' }),
+            Object.freeze({ id: 'complex_equivalence', label: 'שקילות מורכבת' }),
+            Object.freeze({ id: 'cause_effect', label: 'סיבה-תוצאה' })
+        ])
+    })
+});
+
+function getGlossaryRelationMeta(item = {}) {
+    const conceptId = normalizeGlossaryConceptId(item?.id || item);
+    if (!conceptId) return null;
+    return GLOSSARY_RELATION_MAP[conceptId] || null;
+}
+
+function buildGlossaryRelationHtml(item = {}) {
+    const meta = getGlossaryRelationMeta(item);
+    if (!meta) return '';
+    const text = normalizeUiText(String(meta.text || '').trim());
+    const title = normalizeUiText(String(meta.title || 'קשר במפה').trim());
+    const links = Array.isArray(meta.links) ? meta.links : [];
+    const linksHtml = links
+        .map((entry) => {
+            const targetId = normalizeGlossaryConceptId(entry?.id || '');
+            const label = normalizeUiText(String(entry?.label || '').trim());
+            if (!targetId || !label) return '';
+            return `<a class="glossary-related-link" href="#pattern-${escapeHtml(targetId)}" data-breen-pattern-link="${escapeHtml(targetId)}">${escapeHtml(label)}</a>`;
+        })
+        .filter(Boolean)
+        .join('');
+
+    return `
+        <section class="glossary-relation-note" aria-label="${escapeHtml(title)}">
+            <p><strong>${escapeHtml(title)}:</strong> ${escapeHtml(text)}</p>
+            ${linksHtml ? `<div class="glossary-related-links">${linksHtml}</div>` : ''}
+        </section>
+    `;
+}
+
+function getGlossaryCardPreview(item = {}) {
+    const preferred = normalizeUiText(String(item.he_definition_short || item.question_goal || item.target_information || '').trim());
+    if (!preferred) return '';
+    if (preferred.length <= 132) return preferred;
+    return `${preferred.slice(0, 129).trim()}…`;
+}
+
 function buildGlossaryConceptBody(item = {}) {
     const definition = normalizeUiText(String(item.he_definition_short || item.definition || '').trim());
     const metaIntervention = normalizeUiText(String(item.meta_intervention || '').trim());
@@ -6808,6 +6952,13 @@ function buildGlossaryConceptBody(item = {}) {
     const markers = Array.isArray(item.markers)
         ? item.markers.map((entry) => normalizeUiText(String(entry || '').trim())).filter(Boolean).slice(0, 12)
         : [];
+    const userFacingMarkers = markers.filter((entry) => !/^[a-z0-9_:-]+$/i.test(entry));
+    const exampleCandidates = uniqueTrimmedList([
+        ...userFacingMarkers,
+        ...(storyClient ? [storyClient] : []),
+        ...triggers,
+        ...contextSignals.filter((entry) => String(entry || '').length <= 96)
+    ], 12);
     const questionsAll = Array.isArray(item.meta_model_questions)
         ? item.meta_model_questions.map((entry) => normalizeUiText(String(entry || '').trim())).filter(Boolean).slice(0, 14)
         : [];
@@ -6815,31 +6966,32 @@ function buildGlossaryConceptBody(item = {}) {
     const questionsCanonical = uniqueTrimmedList(questionSets.canonical || [], 14);
     const questionsDaily = uniqueTrimmedList(questionSets.daily || [], 14);
     const questionsIdentity = uniqueTrimmedList(questionSets.identity || [], 14);
+    const relationHtml = buildGlossaryRelationHtml(item);
 
-    const markersHtml = markers.length
-        ? `<ul class="glossary-inline-list">${markers.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
-        : '<p>דוגמאות יתווספו בהמשך.</p>';
+    const markersHtml = exampleCandidates.length
+        ? `<ul class="glossary-inline-list">${exampleCandidates.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
+        : '<p>החלק הזה בהשלמה כרגע.</p>';
     const triggerHtml = triggers.length
         ? `<ul class="glossary-inline-list">${triggers.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
-        : '<p>טריגרים לשוניים יתווספו בהמשך.</p>';
+        : '<p>החלק הזה בהשלמה כרגע.</p>';
     const contextSignalsHtml = contextSignals.length
         ? `<ul class="glossary-inline-list">${contextSignals.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
-        : '<p>סממנים לשוניים/קונטקסטואליים יתווספו בהמשך.</p>';
+        : '<p>החלק הזה בהשלמה כרגע.</p>';
     const questionsHtml = questionsAll.length
         ? `<ul class="glossary-inline-list">${questionsAll.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
-        : '<p>שאלות מטא־מודל יתווספו בהמשך.</p>';
+        : '<p>החלק הזה בהשלמה כרגע.</p>';
     const questionsCanonicalHtml = questionsCanonical.length
         ? `<ul class="glossary-inline-list">${questionsCanonical.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
-        : '<p>שאלות קאנוניות יתווספו בהמשך.</p>';
+        : '<p>החלק הזה בהשלמה כרגע.</p>';
     const questionsDailyHtml = questionsDaily.length
         ? `<ul class="glossary-inline-list">${questionsDaily.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
-        : '<p>שאלות יומיומיות יתווספו בהמשך.</p>';
+        : '<p>החלק הזה בהשלמה כרגע.</p>';
     const questionsIdentityHtml = questionsIdentity.length
         ? `<ul class="glossary-inline-list">${questionsIdentity.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
-        : '<p>שאלות זהות יתווספו בהמשך.</p>';
+        : '<p>החלק הזה בהשלמה כרגע.</p>';
     const antiPatternsHtml = antiPatterns.length
         ? `<ul class="glossary-inline-list">${antiPatterns.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}</ul>`
-        : '<p>אנטי-פאטרנים יתווספו בהמשך.</p>';
+        : '<p>החלק הזה בהשלמה כרגע.</p>';
     const diltsHtml = diltsLevels.length
         ? `<ul class="glossary-inline-list">${diltsLevels.map((entry) => {
             const levelHead = [entry.level, entry.label].filter(Boolean).join(' ');
@@ -6847,23 +6999,24 @@ function buildGlossaryConceptBody(item = {}) {
             const focus = entry.focus ? ` — ${entry.focus}` : '';
             return `<li><strong>${escapeHtml(levelHead || 'רמה')}</strong>${escapeHtml(focus + interventions)}</li>`;
         }).join('')}</ul>`
-        : '<p>רמות נוירולוגיות + התערבויות יתווספו בהמשך.</p>';
+        : '<p>החלק הזה בהשלמה כרגע.</p>';
     const storyEmpty = !storyClient && !storyIntervention && !transformation && !positiveEnd && !nextStep;
     const mapSectionEmpty = !violation && !problem && !emotionalMeaning && !philosophicalBackground && !jewishQuote;
 
     return `
         ${definition ? `<p class="glossary-definition">${escapeHtml(definition)}</p>` : ''}
         ${metaIntervention ? `<p><strong>התערבות מטא-מודל:</strong> ${escapeHtml(metaIntervention)}</p>` : ''}
+        ${relationHtml}
 
         <details class="glossary-layer">
-            <summary>מפת פרמטרים מלאה</summary>
+            <summary>היגיון הכרטיס + מפת פרמטרים</summary>
             <div class="glossary-layer-body">
                 ${violation ? `<p><strong>הפרה:</strong> ${escapeHtml(violation)}</p>` : ''}
                 ${problem ? `<p><strong>הבעיה:</strong> ${escapeHtml(problem)}</p>` : ''}
                 ${emotionalMeaning ? `<p><strong>משמעות רגשית:</strong> ${escapeHtml(emotionalMeaning)}</p>` : ''}
                 ${philosophicalBackground ? `<p><strong>רקע פילוסופי:</strong> ${escapeHtml(philosophicalBackground)}</p>` : ''}
                 ${jewishQuote ? `<p><strong>ציטוט יהודי:</strong> ${escapeHtml(jewishQuote)}</p>` : ''}
-                ${mapSectionEmpty ? '<p>שדות ההפרה/בעיה/משמעות/פילוסופיה יוזנו בהמשך.</p>' : ''}
+                ${mapSectionEmpty ? '<p>החלק הזה בהשלמה כרגע.</p>' : ''}
             </div>
         </details>
 
@@ -6878,14 +7031,14 @@ function buildGlossaryConceptBody(item = {}) {
         </details>
 
         <details class="glossary-layer">
-            <summary>הסיפור הקליני + נקודת השינוי</summary>
+            <summary>סיפור קליני + איך נפתח שינוי</summary>
             <div class="glossary-layer-body">
                 ${storyClient ? `<p><strong>משפט מטופל:</strong> ${escapeHtml(storyClient)}</p>` : ''}
                 ${storyIntervention ? `<p><strong>התערבות מטפל:</strong> ${escapeHtml(storyIntervention)}</p>` : ''}
                 ${transformation ? `<p><strong>רגע טרנספורמציה:</strong> ${escapeHtml(transformation)}</p>` : ''}
                 ${positiveEnd ? `<p><strong>סיום חיובי:</strong> ${escapeHtml(positiveEnd)}</p>` : ''}
                 ${nextStep ? `<p><strong>המשך:</strong> ${escapeHtml(nextStep)}</p>` : ''}
-                ${storyEmpty ? '<p>הרחבה קלינית מלאה תתווסף בהמשך. בינתיים התקדמו דרך הדוגמאות והשאלות של התבנית.</p>' : ''}
+                ${storyEmpty ? '<p>החלק הזה בהשלמה כרגע.</p>' : ''}
             </div>
         </details>
 
@@ -6895,7 +7048,7 @@ function buildGlossaryConceptBody(item = {}) {
         </details>
 
         <details class="glossary-layer">
-            <summary>מטרת שאלות + אוסף שאלות</summary>
+            <summary>מה השאלות באות לגלות</summary>
             <div class="glossary-layer-body">
                 ${questionGoal ? `<p><strong>מטרת השאלות:</strong> ${escapeHtml(questionGoal)}</p>` : ''}
                 ${targetInformation ? `<p><strong>מידע שאנחנו רוצים להשיג:</strong> ${escapeHtml(targetInformation)}</p>` : ''}
@@ -6911,7 +7064,7 @@ function buildGlossaryConceptBody(item = {}) {
         </details>
 
         <details class="glossary-layer">
-            <summary>אנטי-פאטרנים + רמות נוירולוגיות</summary>
+            <summary>מה להימנע ממנו + איך להתערב</summary>
             <div class="glossary-layer-body">
                 <p><strong>אנטי-פאטרנים:</strong></p>
                 ${antiPatternsHtml}
@@ -6932,6 +7085,7 @@ function buildGlossaryConceptCard(item = {}, { lazyBody = false } = {}) {
     const groupEn = normalizeUiText(String(item.group || '').trim());
     const normalizedId = normalizeGlossaryConceptId(item.id || '') || normalizeUiText(String(item.id || '').trim());
     const bodyMarkup = lazyBody ? '' : buildGlossaryConceptBody(item);
+    const preview = getGlossaryCardPreview(item);
     const lazyAttr = lazyBody ? ' data-glossary-lazy="true"' : '';
     const pills = [];
     const seenPills = new Set();
@@ -6957,6 +7111,7 @@ function buildGlossaryConceptCard(item = {}, { lazyBody = false } = {}) {
                         ${pills.join('')}
                     </div>
                 </div>
+                ${preview ? `<p class="glossary-card-preview">${escapeHtml(preview)}</p>` : ''}
             </summary>
             <div class="glossary-category-body"${lazyAttr}>${bodyMarkup}</div>
         </details>
@@ -7183,20 +7338,12 @@ function populateCategories() {
 
     const theoryIntro = document.createElement('section');
     theoryIntro.className = 'card categories-theory-intro categories-glossary-intro';
-    theoryIntro.innerHTML = `
-        <h2>מילון קטגוריות המטה-מודל</h2>
-        <p>
-            דף זה מציג את כל הקטגוריות בסדר המלא של Michael Breen,
-            ובסיומן הקטגוריות המורחבות של חגי.
-            לכל קטגוריה תמצאו שם סטנדרטי (עברית + אנגלית), דוגמאות ושאלות מטא־מודל.
-        </p>
-        <p class="categories-theory-note"><strong>למה:</strong> מעבר עקבי על הסדר הזה בונה שפה אחידה ומונע כפילויות/בלבול בין קטגוריות.</p>
-    `;
-    container.appendChild(theoryIntro);
-
-    const orderedList = document.createElement('section');
-    orderedList.className = 'categories-glossary-ordered-list';
     const orderedConcepts = sortGlossaryConceptsByRequiredOrder(glossaryItems);
+    const availableGlossaryIds = new Set(
+        orderedConcepts
+            .map((item) => normalizeGlossaryConceptId(item?.id || ''))
+            .filter(Boolean)
+    );
     glossaryConceptIndex = new Map();
     orderedConcepts.forEach((item) => {
         const normalizedId = normalizeGlossaryConceptId(item?.id || '');
@@ -7204,19 +7351,79 @@ function populateCategories() {
         if (normalizedId) glossaryConceptIndex.set(normalizedId, item);
         if (rawId && !glossaryConceptIndex.has(rawId)) glossaryConceptIndex.set(rawId, item);
     });
+
+    const buildIntroLinksHtml = (items = []) => items.map((entry) => {
+        const targetId = normalizeGlossaryConceptId(entry?.id || '');
+        const label = normalizeUiText(String(entry?.label || '').trim());
+        if (!targetId || !label) return '';
+        return `<a class="categories-glossary-chip" href="#pattern-${escapeHtml(targetId)}" data-breen-pattern-link="${escapeHtml(targetId)}">${escapeHtml(label)}</a>`;
+    }).filter(Boolean).join('');
+
+    theoryIntro.innerHTML = `
+        <h2>מילון קטגוריות המטה-מודל</h2>
+        <p class="categories-glossary-orientation">
+            זהו מסך ייחוס חי: פותחים כרטיס אחד לפי הצורך, מבינים מה חסר או הוסק מהר מדי, ולוקחים משם שאלה אחת חזרה לתרגול או לשיחה אמיתית.
+        </p>
+        <div class="categories-glossary-intro-grid">
+            <section class="categories-glossary-intro-block">
+                <h3>מבוא קצר</h3>
+                <p>העברית מיועדת לעבודה יומיומית מהירה. האנגלית נשמרת ליד השם כדי לחבר בין הכרטיסים לבין ספרות, קורסים ומונחים מוכרים.</p>
+                <p>אם זו הפעם הראשונה שלך כאן, לא צריך לקרוא הכול. פותחים קודם את הכרטיס שהכי דומה למשפט שמולך.</p>
+            </section>
+            <section class="categories-glossary-intro-block">
+                <h3>ההיגיון של המפה</h3>
+                <p>הסדר שומר על מפת ברין ועל תבניות המטה-מודל הקלאסיות, ובמקומות מסוימים מוסיף הרחבות רק כשיש הצדקה מושגית ברורה.</p>
+                <p>כרטיסי הקשר בתוך המילון מסבירים איפה יש יחס של על/תת-סוג, איפה יש הרחבה, ואיפה רק מנקים כפילות בשם.</p>
+            </section>
+        </div>
+        <p class="categories-theory-note"><strong>איך עובדים כאן:</strong> פותחים כרטיס, קוראים את ההגדרה, בודקים את קשרי המפה, ואז עוברים לדוגמאות ולשאלות.</p>
+        <div class="categories-glossary-entry-points">
+            <div class="categories-glossary-entry-group">
+                <strong>כניסה ראשונה מומלצת</strong>
+                <div class="categories-glossary-chip-row">
+                    ${buildIntroLinksHtml([
+                        { id: 'mind_reading', label: 'קריאת מחשבות' },
+                        { id: 'universal_quantifier', label: 'כמתים כוללים' },
+                        { id: 'lack_referential_index', label: 'אי-ספציפיות התייחסות' }
+                    ])}
+                </div>
+            </div>
+            <div class="categories-glossary-entry-group">
+                <strong>הרחבות ששווה לפתוח אחר כך</strong>
+                <div class="categories-glossary-chip-row">
+                    ${buildIntroLinksHtml([
+                        { id: 'jumping_to_conclusions', label: 'קפיצה למסקנות' },
+                        { id: 'sensory_predicates', label: 'פרדיקטים חושיים' },
+                        { id: 'logical_types_confusion', label: 'בלבול ברמות לוגיות' }
+                    ])}
+                </div>
+            </div>
+        </div>
+        ${buildBreenReferenceBoardHtml({
+            title: 'מפת ברין בקיצור',
+            note: 'לחיצה על תא פותחת את הכרטיס הרלוונטי במילון.',
+            mode: 'category-links',
+            availableCategoryIds: availableGlossaryIds
+        })}
+    `;
+    container.appendChild(theoryIntro);
+
+    const orderedList = document.createElement('section');
+    orderedList.className = 'categories-glossary-ordered-list';
     orderedList.innerHTML = orderedConcepts
         .map((item) => buildGlossaryConceptCard(item, { lazyBody: true }))
         .join('');
     container.appendChild(orderedList);
-    setupGlossarySingleCategoryBehavior(orderedList);
+    setupGlossarySingleCategoryBehavior(container);
     collapseAllGlossaryCategories(orderedList);
-    syncGlossaryHashTarget(orderedList);
+    syncGlossaryHashTarget(container);
 }
 
 // Populate Category Select in Practice Mode
 function populateCategorySelect() {
     const select = document.getElementById('category-select');
-    
+    if (!select) return;
+    select.innerHTML = '<option value="">הכל</option>';
     metaModelData.categories.forEach(category => {
         const option = document.createElement('option');
         option.value = category.id;
@@ -16372,8 +16579,129 @@ function hideLoadingIndicator() {
     if (loader) loader.style.display = 'none';
 }
 
+function getRuntimeRecoveryHost(tabName = '') {
+    const safeTab = normalizeRequestedTab(tabName) || 'home';
+    if (safeTab === 'categories') {
+        return document.getElementById('categories-container');
+    }
+    return document.getElementById(safeTab);
+}
+
+function getRuntimeRecoveryTitle(tabName = '') {
+    const safeTab = normalizeRequestedTab(tabName) || 'home';
+    if (safeTab === 'categories') return 'מילון הקטגוריות';
+    return getTabTitleForHome(safeTab) || 'המסך הזה';
+}
+
+function bindRuntimeRecoveryActions(card, tabName = '') {
+    const node = card instanceof Element ? card : null;
+    const safeTab = normalizeRequestedTab(tabName) || 'home';
+    if (!node || node.dataset.boundRuntimeRecovery === 'true') return;
+    node.dataset.boundRuntimeRecovery = 'true';
+    node.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-runtime-recovery-action]');
+        if (!button) return;
+        const action = String(button.getAttribute('data-runtime-recovery-action') || '').trim();
+        if (action === 'retry') {
+            if (safeTab === 'categories') {
+                renderRuntimeRecoveryFallback('categories', {
+                    state: 'loading',
+                    message: 'טוענים שוב את המילון. אם זה נשאר ריק, אפשר לחזור צעד אחד או לבית.'
+                });
+                loadMetaModelData();
+                return;
+            }
+            navigateTo(safeTab, {
+                playSound: false,
+                scrollToTop: true,
+                updateHistory: false,
+                trackStepBack: false
+            });
+            return;
+        }
+        if (action === 'back') {
+            if (navigateFeatureStepBack()) return;
+            showHint('אין עדיין צעד קודם לחזרה. אם צריך, אפשר לחזור לבית.');
+            return;
+        }
+        if (action === 'home') {
+            navigateTo('home', { playSound: true, scrollToTop: true, trackStepBack: false });
+        }
+    });
+}
+
+function renderRuntimeRecoveryFallback(tabName = '', options = {}) {
+    const safeTab = normalizeRequestedTab(tabName) || 'home';
+    const host = getRuntimeRecoveryHost(safeTab);
+    if (!host) return null;
+
+    const state = String(options.state || '').trim() === 'error' ? 'error' : 'loading';
+    const title = String(options.title || getRuntimeRecoveryTitle(safeTab)).trim();
+    const message = String(options.message || '').trim() || (
+        state === 'error'
+            ? 'המסך לא נטען כמו שצריך. אפשר לנסות שוב, לחזור צעד אחד, או לחזור לבית.'
+            : 'טוענים את המסך. אם הוא נשאר ריק, אפשר לנסות שוב, לחזור צעד אחד, או לחזור לבית.'
+    );
+
+    let card = host.querySelector(`[data-runtime-recovery="true"][data-runtime-recovery-tab="${safeTab}"]`);
+    if (!card) {
+        card = document.createElement('section');
+        card.className = 'screen-runtime-fallback card';
+        card.setAttribute('data-runtime-recovery', 'true');
+        card.setAttribute('data-runtime-recovery-tab', safeTab);
+        if (safeTab === 'categories') {
+            host.innerHTML = '';
+            host.appendChild(card);
+        } else {
+            host.prepend(card);
+        }
+    }
+
+    card.setAttribute('data-runtime-recovery-state', state);
+    card.innerHTML = `
+        <h2>${escapeHtml(title)}</h2>
+        <p>${escapeHtml(message)}</p>
+        <div class="screen-runtime-fallback-actions">
+            <button type="button" class="btn btn-primary" data-runtime-recovery-action="retry">נסה שוב</button>
+            <button type="button" class="btn btn-secondary" data-runtime-recovery-action="back">↩ חזרה צעד</button>
+            <button type="button" class="btn btn-secondary" data-runtime-recovery-action="home">חזרה לבית</button>
+        </div>
+    `;
+    bindRuntimeRecoveryActions(card, safeTab);
+    return card;
+}
+
+function scheduleRuntimeRecoveryCheck(tabName = '') {
+    const safeTab = normalizeRequestedTab(tabName) || getCurrentActiveTabName();
+    if (runtimeRecoveryState.blankCheckTimerId) {
+        clearTimeout(runtimeRecoveryState.blankCheckTimerId);
+        runtimeRecoveryState.blankCheckTimerId = 0;
+    }
+    if (safeTab !== 'categories') return;
+    runtimeRecoveryState.blankCheckTimerId = window.setTimeout(() => {
+        runtimeRecoveryState.blankCheckTimerId = 0;
+        const container = document.getElementById('categories-container');
+        if (!container) return;
+        const hasRealContent = Array.from(container.children).some((node) => (
+            node instanceof Element && node.getAttribute('data-runtime-recovery') !== 'true'
+        ));
+        if (!hasRealContent) {
+            renderRuntimeRecoveryFallback('categories');
+        }
+    }, 720);
+}
+
 function showErrorMessage(msg) {
-    alert('❌ ' + msg);
+    const message = String(msg || '').trim() || 'אירעה שגיאה בטעינת המסך.';
+    renderRuntimeRecoveryFallback(getCurrentActiveTabName(), {
+        state: 'error',
+        message
+    });
+    renderRuntimeRecoveryFallback('categories', {
+        state: 'error',
+        message: 'לא הצלחתי לטעון את המילון כרגע. אפשר לנסות שוב, לחזור צעד אחד, או לחזור לבית.'
+    });
+    showHint(message);
 }
 
 function showHint(text) {
@@ -16447,6 +16775,7 @@ function navigateTo(tabName, options = {}) {
     updateMobileStickyCta(resolvedTab);
     updateAppStickyBanner(resolvedTab);
     refreshFeatureBackControls(resolvedTab);
+    scheduleRuntimeRecoveryCheck(resolvedTab);
     if (updateHistory) {
         syncHistoryRouteForTab(resolvedTab, { replace: replaceHistory });
     }

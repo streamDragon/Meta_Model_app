@@ -145,7 +145,13 @@
     "unspecified_noun": "non_referring_nouns",
     "non_referring_noun": "non_referring_nouns",
     "non_referring_nouns": "non_referring_nouns",
-    "simple_deletion": "simple_deletion"
+    "simple_deletion": "simple_deletion",
+    "sensory_predicates_vak": "sensory_predicates",
+    "logical_levels": "logical_types_confusion",
+    "logical_level_confusion": "logical_types_confusion",
+    "dichotomous_thinking": "false_dilemma",
+    "either_or": "false_dilemma",
+    "either_or_thinking": "false_dilemma"
   },
   "fallback_group_by_id": {
     "simple_deletion": "DELETION",
