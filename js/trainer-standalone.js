@@ -252,7 +252,7 @@ body {
         if (!metaEl) return;
         const bits = [];
         if (buildMeta?.version) bits.push('גרסה ' + buildMeta.version);
-        if (buildMeta?.gitCommit) bits.push('build ' + String(buildMeta.gitCommit).slice(0, 7));
+        if (buildMeta?.gitCommit) bits.push('source ' + String(buildMeta.gitCommit).slice(0, 7));
         metaEl.textContent = bits.join(' · ');
     }
 

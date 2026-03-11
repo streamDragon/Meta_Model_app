@@ -4347,17 +4347,14 @@ function formatAppVersionDisplay(version) {
 }
 
 function formatVersionWithCommit(version) {
-    const visibleVersion = formatAppVersionDisplay(version);
-    const shortCommit = getShortBuildCommit();
-    if (!shortCommit) return visibleVersion;
-    return `${visibleVersion} (${shortCommit})`;
+    return formatAppVersionDisplay(version);
 }
 
 function buildAppVersionTitle(version) {
     const resolvedVersion = String(version || '').trim() || 'unknown';
     const meta = getBuildMetaFromHtmlAttributes();
     const parts = [`v${resolvedVersion}`];
-    if (meta.gitCommit) parts.push(`commit ${meta.gitCommit}`);
+    if (meta.gitCommit) parts.push(`source ${meta.gitCommit}`);
     if (meta.buildIso) parts.push(`build ${meta.buildIso}`);
     else if (meta.buildTime) parts.push(`buildTime ${meta.buildTime}`);
     return parts.join(' | ');
