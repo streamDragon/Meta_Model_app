@@ -2044,13 +2044,17 @@ function updateAppStickyBanner(tabName = '') {
     const titleEl = document.getElementById('app-sticky-current-title');
     const contextEl = document.getElementById('app-sticky-current-context');
     const homeBtn = document.getElementById('app-sticky-home-btn');
+    const menuBtn = document.getElementById('app-sticky-menu-btn');
 
     if (titleEl) titleEl.textContent = title;
     if (contextEl) contextEl.textContent = context;
     if (homeBtn) {
         homeBtn.disabled = resolvedTab === 'home';
+        homeBtn.hidden = resolvedTab === 'home';
         homeBtn.setAttribute('aria-current', resolvedTab === 'home' ? 'page' : 'false');
+        homeBtn.title = resolvedTab === 'home' ? '' : 'חזרה למסך הבית';
     }
+    if (menuBtn) menuBtn.title = 'מסלולים וכלים';
 
     banner.dataset.activeTab = resolvedTab;
     banner.dataset.activeTitle = title;
@@ -3319,13 +3323,63 @@ function setFeatureMapToggleOpen(isOpen) {
     else featureMap.removeAttribute('open');
 }
 
+function stripIdsFromElementTree(root) {
+    if (!(root instanceof Element)) return;
+    if (root.hasAttribute('id')) root.removeAttribute('id');
+    root.querySelectorAll('[id]').forEach((node) => node.removeAttribute('id'));
+}
+
+function buildFeatureMapOverlayContent() {
+    const featureMap = document.getElementById('feature-map-toggle');
+    const featureMapBody = featureMap?.querySelector('.feature-map-body');
+    if (!featureMapBody) return null;
+
+    const source = featureMapBody.querySelector('.feature-map-menu-box') || featureMapBody;
+    const clone = source.cloneNode(true);
+    stripIdsFromElementTree(clone);
+    clone.classList.add('feature-map-overlay-clone');
+
+    const wrapper = document.createElement('article');
+    wrapper.className = 'shell-overlay-content feature-map-overlay-content';
+    wrapper.innerHTML = `
+        <p class="shell-overlay-kicker">תפריט</p>
+        <h4>מסלולים וכלים</h4>
+        <p class="shell-overlay-note">בחר/י מסך או כלי, והמעבר נפתח מיד.</p>
+    `;
+    wrapper.appendChild(clone);
+
+    clone.querySelectorAll('[data-global-feature-menu-select]').forEach((selectNode) => {
+        selectNode.addEventListener('change', (event) => {
+            const sourceKey = String(event?.target?.getAttribute?.('data-global-feature-menu-select') || '').trim();
+            const selectedKey = String(event?.target?.value || '').trim();
+            if (!sourceKey || !selectedKey) return;
+
+            const liveSelect = featureMap.querySelector(`[data-global-feature-menu-select="${sourceKey}"]`);
+            if (!(liveSelect instanceof HTMLSelectElement)) return;
+
+            liveSelect.value = selectedKey;
+            liveSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            window.MetaOverlayProvider?.closeOverlay('feature-map-menu-select');
+        });
+    });
+
+    return wrapper;
+}
+
 function openFeatureMapMenu() {
-    if (window.MetaAppShell
-        && typeof window.MetaAppShell.isHomeShellActive === 'function'
-        && window.MetaAppShell.isHomeShellActive()
-        && typeof window.MetaAppShell.openHomeMenu === 'function') {
-        const handled = window.MetaAppShell.openHomeMenu();
-        if (handled) return;
+    const overlayContent = buildFeatureMapOverlayContent();
+    if (overlayContent && window.MetaOverlayProvider && typeof window.MetaOverlayProvider.openOverlay === 'function') {
+        if (typeof window.MetaOverlayProvider.ensureRoot === 'function') {
+            window.MetaOverlayProvider.ensureRoot();
+        }
+        window.MetaOverlayProvider.openOverlay({
+            type: 'feature-map-menu',
+            title: 'תפריט',
+            size: 'md',
+            closeOnBackdrop: true,
+            content: overlayContent
+        });
+        return;
     }
 
     const featureMap = document.getElementById('feature-map-toggle');
@@ -5742,6 +5796,7 @@ function refreshFeatureBackControls(activeTab = '') {
     if (stickyBackBtn) {
         const disabled = !hasStepBack || currentTab === 'home' || currentTab === 'debug';
         stickyBackBtn.disabled = disabled;
+        stickyBackBtn.hidden = disabled;
         stickyBackBtn.setAttribute('aria-disabled', disabled ? 'true' : 'false');
         stickyBackBtn.title = disabled ? 'אין עדיין צעד קודם לחזרה' : 'חזרה צעד למסך הקודם';
     }
@@ -5749,38 +5804,7 @@ function refreshFeatureBackControls(activeTab = '') {
 
 function setupFeatureHomeBackButtons() {
     loadFeatureStepBackHistory();
-    const sections = Array.from(document.querySelectorAll('.tab-content[id]'));
-    if (!sections.length) return;
-
-    sections.forEach((section) => {
-        const tabId = String(section.id || '').trim();
-        if (!tabId || tabId === 'home' || tabId === 'debug') return;
-        if (section.querySelector('[data-feature-back-home-btn], [data-feature-step-back-btn]')) return;
-
-        const bar = document.createElement('div');
-        bar.className = 'feature-home-back-bar';
-
-        const stepBackBtn = document.createElement('button');
-        stepBackBtn.type = 'button';
-        stepBackBtn.className = 'btn btn-secondary feature-step-back-btn';
-        stepBackBtn.textContent = '↩ חזרה צעד';
-        stepBackBtn.dataset.featureStepBackBtn = 'true';
-        stepBackBtn.addEventListener('click', () => {
-            if (navigateFeatureStepBack()) return;
-            showHint('אין עדיין צעד קודם לחזרה. אם צריך, אפשר לחזור לבית.');
-        });
-
-        const homeBtn = document.createElement('button');
-        homeBtn.type = 'button';
-        homeBtn.className = 'btn btn-primary feature-home-back-btn';
-        homeBtn.textContent = 'חזרה למסך הראשי';
-        homeBtn.dataset.featureBackHomeBtn = 'true';
-        homeBtn.addEventListener('click', () => navigateTo('home', { playSound: true, scrollToTop: true }));
-
-        bar.append(stepBackBtn, homeBtn);
-        section.prepend(bar);
-    });
-
+    document.querySelectorAll('.feature-home-back-bar').forEach((bar) => bar.remove());
     refreshFeatureBackControls(getCurrentActiveTabName());
 }
 
@@ -5940,7 +5964,7 @@ function setupFeatureOnboardingCards() {
         card.innerHTML = `
             <div class="feature-onboarding-head">
                 <p class="feature-onboarding-kicker">${escapeHtml(String(copy.icon || '🧭').trim())} ${escapeHtml(String(copy.kicker || title).trim())}</p>
-                <h3 class="feature-onboarding-title">שם הלשונית של ${escapeHtml(title)}</h3>
+                <h3 class="feature-onboarding-title">${escapeHtml(title)}</h3>
             </div>
             <p class="feature-onboarding-what"><strong>מה עושים כאן?</strong> ${escapeHtml(String(copy.what || '').trim())}</p>
             <div class="feature-onboarding-details">
