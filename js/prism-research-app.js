@@ -816,6 +816,45 @@
         `;
     }
 
+    function cleanupDuplicateReferenceBoards() {
+        const shell = appEl.querySelector('.prm-shell');
+        if (!shell) return;
+
+        const referenceBoards = Array.from(shell.querySelectorAll('.prm-breen-5x3-wrap'));
+        referenceBoards.slice(1).forEach((node) => node.remove());
+
+        const legacyBoardPhrases = [
+            'inside their map',
+            'outside their map',
+            'מפת העולם שלהם',
+            'המציאות מחוץ להם'
+        ];
+        const legacyCategoryPhrases = [
+            'lost performative',
+            'universal quantifier',
+            'nominalisation',
+            'comparative deletion',
+            'referential index',
+            'presuppositions',
+            'unspecified verb'
+        ];
+
+        const candidates = Array.from(shell.querySelectorAll('.prm-card, section, div'));
+        candidates.forEach((node) => {
+            if (!(node instanceof HTMLElement)) return;
+            if (node.querySelector('.prm-breen-5x3-wrap')) return;
+
+            const text = String(node.textContent || '').toLowerCase().replace(/\s+/g, ' ').trim();
+            if (!text) return;
+
+            const hasLegacyMapHeader = legacyBoardPhrases.some((phrase) => text.includes(phrase));
+            const legacyCategoryHits = legacyCategoryPhrases.filter((phrase) => text.includes(phrase)).length;
+            if (hasLegacyMapHeader && legacyCategoryHits >= 3) {
+                node.remove();
+            }
+        });
+    }
+
     function renderRecursiveGuidePanel() {
         return `
             <section class="prm-card prm-recursive-guide" aria-label="׳”׳¡׳‘׳¨ ׳¨׳§׳•׳¨׳¡׳™׳‘׳™ ׳•-Next Step Function">
@@ -1093,8 +1132,6 @@
                             ${renderBreenCategoryBoard()}
                         </section>
 
-                        ${renderTheoryBridgeCard()}
-
                         ${renderPendingQa()}
                     </div>
 
@@ -1108,6 +1145,8 @@
                 </section>
             </div>
         `;
+
+        cleanupDuplicateReferenceBoards();
     }
 
     function onAppClick(event) {
