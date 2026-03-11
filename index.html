@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.245" data-build-time="1773257051375" data-build-iso="2026-03-11T19:24:11.375Z" data-git-commit="ffe6dc0">
+<html lang="he" dir="rtl" data-app-version="1.0.246" data-build-time="1773272936743" data-build-iso="2026-03-11T23:48:56.743Z" data-git-commit="5e02934">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -266,6 +266,11 @@
             freemiumStylesheet.rel = 'stylesheet';
             freemiumStylesheet.href = withAssetVersion('css/freemium.css');
             document.head.appendChild(freemiumStylesheet);
+
+            var uiEnhancementsStylesheet = document.createElement('link');
+            uiEnhancementsStylesheet.rel = 'stylesheet';
+            uiEnhancementsStylesheet.href = withAssetVersion('css/ui-enhancements.css');
+            document.head.appendChild(uiEnhancementsStylesheet);
         })();
     </script>
 </head>
@@ -275,7 +280,7 @@
         <div class="splash-content">
             <div class="splash-logo">🧠</div>
             <h1 class="splash-title">Meta Model</h1>
-            <p class="splash-subtitle">מעבדת תרגול לשיחה מדויקת, הבנה וטיפול</p>
+            <p class="splash-subtitle">תרגל את השאלות שפותחות את מה שמאחורי המילים</p>
             <div class="splash-loading">
                 <span class="splash-dot"></span>
                 <span class="splash-dot"></span>

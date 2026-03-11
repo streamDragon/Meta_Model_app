@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Users/nlpis/vscode/Meta_Model_app/lab -type f -name *.html -o -name *.json)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
