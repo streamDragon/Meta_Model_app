@@ -123,7 +123,7 @@
         overlay.querySelector('#mm-ob-result-name').textContent  = rec.name;
         overlay.querySelector('#mm-ob-result-desc').textContent  = rec.desc;
         overlay.querySelector('#mm-ob-result-intro').textContent =
-            'כ' + roleMeta.label + ' ' + levelMeta + ', נמליץ להתחיל עם:';
+            'בהתאם למה שסיפרת, הכלי הכי מתאים לך הוא:';
     }
 
     /* ── Close overlay and go ── */
@@ -136,7 +136,11 @@
             injectGreetingBar(role, level);
             // Navigate to recommended tool
             if (rec.href) {
-                window.location.href = rec.href;
+                // Use versioned asset URL helper if available to avoid relative-path 404s
+                var targetHref = (typeof window.__withAssetVersion === 'function')
+                    ? window.__withAssetVersion(rec.href)
+                    : rec.href;
+                window.location.href = targetHref;
             } else if (rec.navKey && typeof window.navigateByNavKey === 'function') {
                 window.navigateByNavKey(rec.navKey);
             } else if (rec.navKey && typeof window.navigateTo === 'function') {
