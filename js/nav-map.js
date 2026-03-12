@@ -3,6 +3,7 @@
 
     var NAV_MAP = Object.freeze({
         home: Object.freeze({ type: 'tab', tab: 'home', path: '/' }),
+        sentenceMap: Object.freeze({ type: 'tab', tab: 'sentence-map', path: '/feature/sentence-map' }),
         about: Object.freeze({ type: 'tab', tab: 'about', path: '/feature/about' }),
         categories: Object.freeze({ type: 'tab', tab: 'categories', path: '/feature/categories' }),
         prismLab: Object.freeze({ type: 'tab', tab: 'prismlab', path: '/feature/prismlab' }),

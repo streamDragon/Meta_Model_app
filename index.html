@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.251" data-build-time="1773280266571" data-build-iso="2026-03-12T01:51:06.571Z" data-git-commit="3add471">
+<html lang="he" dir="rtl" data-app-version="1.0.252" data-build-time="1773280640908" data-build-iso="2026-03-12T01:57:20.908Z" data-git-commit="214fa89">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -412,6 +412,7 @@
 
         <nav class="tabs">
             <button class="tab-btn active" data-tab="home">בית</button>
+            <button class="tab-btn" data-tab="sentence-map">מפת המשפט</button>
             <button class="tab-btn" data-tab="comic-engine">במת קומיקס רגשי</button>
             <button class="tab-btn" data-tab="categories">מילון הקטגוריות</button>
             <button class="tab-btn" data-tab="practice-question">תרגול זיהוי</button>
@@ -470,6 +471,7 @@
                     <section class="feature-map-card">
                         <h4>כלים משלימים</h4>
                         <div class="feature-map-links">
+                            <button type="button" class="btn btn-secondary" onclick="navigateTo('sentence-map')">מפת המשפט</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול זיהוי המטה-מודל</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">מכ״ם מטה-מודל</button>
                             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה</button>
@@ -529,9 +531,9 @@
                     <div class="mobile-feed-launchpad-grid">
                         <article class="mobile-feed-launch-card" data-launch-track="beginner">
                             <span class="mobile-feed-launch-card-kicker">למתחילים</span>
-                            <h3>גשר תחושה־שפה</h3>
-                            <p>כדי לברר מה קורה בחוץ ומה נהיה בפנים.</p>
-                            <button type="button" class="btn btn-primary" data-nav-key="practiceWizard">פתחו גשר</button>
+                            <h3>מפת המשפט</h3>
+                            <p>כדי למפות מה קרה בחוץ, מה קורה בפנים, ומה המשפט מבקש.</p>
+                            <button type="button" class="btn btn-primary" data-nav-key="sentenceMap">פתחו מפה</button>
                         </article>
                         <article class="mobile-feed-launch-card" data-launch-track="intermediate">
                             <span class="mobile-feed-launch-card-kicker">לביניים</span>
@@ -585,16 +587,16 @@
                     <p class="home-route-eyebrow">שער פתיחה</p>
                     <h2 class="home-route-title">בחר/י את המסלול של עכשיו</h2>
                     <p class="home-route-subtitle">
-                        בוחרים כאן מסלול אחד ונכנסים. ההסבר המלא והשלבים מחכים בתוך הכלי עצמו, כדי שהפתיחה תישאר קלה וברורה.
+                        בוחרים כאן מסלול אחד ונכנסים. אם לא בטוחים איפה מתחילים, ממפים קודם את המשפט ורק אחר כך מאתגרים או מתקנים.
                     </p>
                     <div class="home-route-pill-row" aria-label="סוגי עבודה">
-                        <span class="home-route-pill">הלימה</span>
+                        <span class="home-route-pill">מיפוי</span>
                         <span class="home-route-pill">זיהוי</span>
                         <span class="home-route-pill">עומק</span>
                         <span class="home-route-pill">שיחה חיה</span>
                     </div>
                     <div class="home-route-cta-row">
-                        <button type="button" class="btn btn-primary" data-nav-key="practiceWizard">התחל עם גשר תחושה־שפה</button>
+                        <button type="button" class="btn btn-primary" data-nav-key="sentenceMap">התחל עם מפת המשפט</button>
                         <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html" data-nav-key="scenarioTrainer">פתח סימולטור סצנות</a>
                     </div>
                 </div>
@@ -602,11 +604,11 @@
 
             <section class="home-route-features home-route-desktop-only" aria-label="שערי כניסה ראשיים">
                 <article class="home-route-feature-card" data-home-accent="indigo">
-                    <p class="home-route-feature-kicker">הלימה</p>
-                    <h3>גשר תחושה־שפה</h3>
-                    <p>מתחילים ממשפט דחוס, מחזירים לו חוץ ופנים, ובונים ניסוח שיושב לפני כל אתגור או תיקון.</p>
-                    <span class="home-route-feature-footnote">המסלול הראשי כשצריך דיוק עם חוויה</span>
-                    <button type="button" class="btn btn-secondary" data-nav-key="practiceWizard">פתח גשר</button>
+                    <p class="home-route-feature-kicker">לפני אתגור</p>
+                    <h3>מפת המשפט</h3>
+                    <p>ממפים קודם מה קרה בפועל, מה הסיפור הפנימי, ומה המשפט מנסה להשיג בשיחה, ורק אחר כך בוחרים מה לשאול.</p>
+                    <span class="home-route-feature-footnote">המסלול הראשון כשצריך להבין איפה הלב של המקרה</span>
+                    <button type="button" class="btn btn-secondary" data-nav-key="sentenceMap">פתח מפה</button>
                 </article>
                 <article class="home-route-feature-card" data-home-accent="teal">
                     <p class="home-route-feature-kicker">שיחה חיה</p>
@@ -636,10 +638,10 @@
                     <article class="home-route-secondary">
                         <div class="home-route-secondary-head">
                             <h3>שלושה שערים עיקריים</h3>
-                            <p>גשר להלימה, זיהוי מהיר, או סימולטור סצנות. בחרו אחד ועברו פנימה.</p>
+                            <p>מפת משפט, זיהוי מהיר, או סימולטור סצנות. בחרו אחד ועברו פנימה.</p>
                         </div>
                         <div class="home-route-cta-row">
-                            <button type="button" class="btn btn-secondary" data-nav-key="practiceWizard">גשר תחושה־שפה</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="sentenceMap">מפת המשפט</button>
                             <button type="button" class="btn btn-primary" data-nav-key="practiceQuestion">תרגול זיהוי</button>
                             <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html" data-nav-key="scenarioTrainer">סימולטור סצנות</a>
                         </div>
@@ -657,7 +659,7 @@
                 </div>
                 <aside class="home-route-next-step" aria-label="המלצת התחלה">
                     <span>מה מומלץ עכשיו</span>
-                    <strong>מתחילים: גשר תחושה־שפה. כבר מזהים דפוסים: תרגול זיהוי ואז מכ"ם שלשות. מתקדמים: סימולטור סצנות או מעבדת פריזמות כדי לראות את זה בתוך הקשר חי.</strong>
+                    <strong>מתחילים: מפת המשפט. כבר מזהים דפוסים: תרגול זיהוי ואז מכ"ם שלשות. מתקדמים: סימולטור סצנות או מעבדת פריזמות כדי לראות את זה בתוך הקשר חי.</strong>
                 </aside>
                 <div class="home-route-preferences">
                     <button id="home-lobby-reduce-motion-toggle" class="btn btn-secondary" type="button" aria-pressed="false">הפחת אנימציות: כבוי</button>
@@ -1340,6 +1342,19 @@
             </div>
         </section>
 
+        <section id="sentence-map" class="tab-content practice-tab-content">
+            <div class="practice-container">
+                <div class="card practice-intro-card">
+                    <h2>מפת המשפט</h2>
+                    <p class="subtitle">לפני שמאתגרים - ממפים. קודם בודקים מה קרה בפועל, מה נהיה בפנים, ומה המשפט מבקש שיקרה בשיחה.</p>
+
+                    <section class="practice-section practice-section-sentence-map" aria-label="מפת המשפט">
+                        <div id="sentence-map-app" class="sentence-map-mount" aria-live="polite"></div>
+                    </section>
+                </div>
+            </div>
+        </section>
+
         <!-- PRACTICE WIZARD TAB -->
         <section id="practice-wizard" class="tab-content practice-tab-content">
             <div class="practice-container">
@@ -1381,6 +1396,7 @@
             <a class="btn btn-secondary" href="iceberg_templates_trainer.html" data-versioned-href="iceberg_templates_trainer.html">קצה הקרחון · עצי הבחנה</a>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול זיהוי המטה-מודל</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">מכ״ם מטה-מודל</button>
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('sentence-map')">מפת המשפט</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">בונה מהלך</button>
             <button type="button" class="btn btn-secondary" onclick="navigateTo('prismlab')">מעבדת פריזמות · חקירה בשכבות</button>
@@ -1710,6 +1726,7 @@
                 'js/triples-radar-core.js',
                 'js/prism-research-philosophy.js',
                 'js/data/feature-feed.js',
+                'js/data/sentence-map-cases.js',
                 'js/nav-map.js',
                 'js/shell-copy.js',
                 'js/ui-flags.js',
@@ -1718,6 +1735,7 @@
                 'js/app-shell.js',
                 'js/question-drill-engine.js',
                 'js/feeling-language-bridge.js',
+                'js/sentence-map.js',
                 'js/app.js',
                 'js/triples-radar.js',
                 'js/onboarding.js'

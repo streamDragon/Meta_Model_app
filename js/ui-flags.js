@@ -39,6 +39,14 @@
             defaultUiMode: 'shell',
             overlayPanels: Object.freeze(['guide', 'breen-map'])
         }),
+        'sentence-map': Object.freeze({
+            id: 'sentence-map',
+            path: '?tab=sentence-map',
+            title: 'מפת המשפט',
+            defaultUiMode: 'shell',
+            aliases: Object.freeze(['sentence-map-lab', 'mapper']),
+            overlayPanels: Object.freeze(['guide', 'method'])
+        }),
         'practice-wizard': Object.freeze({
             id: 'practice-wizard',
             path: '?tab=practice-wizard',

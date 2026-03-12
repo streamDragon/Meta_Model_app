@@ -3,6 +3,20 @@
 
     var FEED_ITEMS = Object.freeze([
         Object.freeze({
+            id: 'sentence-map',
+            titleHe: 'מפת המשפט',
+            descHe: 'לפני שמאתגרים - ממפים: חוץ, פנים והפונקציה של המשפט בתוך הקשר.',
+            route: '/feature/sentence-map',
+            tab: 'sentence-map',
+            tagHe: 'מעבדה',
+            category: 'lab',
+            thumbType: 'svg',
+            thumbSrc: '',
+            icon: '🗺️',
+            accentFrom: '#0ea5e9',
+            accentTo: '#fb7185'
+        }),
+        Object.freeze({
             id: 'practice-question',
             titleHe: 'תרגול זיהוי המטה-מודל',
             descHe: 'משפט אחד, זיהוי מהיר, ופידבק ברור לכל סבב.',
@@ -74,7 +88,7 @@
         }),
         Object.freeze({
             id: 'comic-engine',
-            titleHe: 'במה רגשית',
+            titleHe: 'במת קומיקס רגשי',
             descHe: 'תרגול תגובות דרך סצנות ויזואליות עם דיאלוג המשך.',
             route: '/feature/comic-engine',
             tab: 'comic-engine',
@@ -102,7 +116,7 @@
         }),
         Object.freeze({
             id: 'categories',
-            titleHe: 'מילון קטגוריות',
+            titleHe: 'מילון הקטגוריות',
             descHe: 'מרכז ידע מהיר עם דוגמאות ושאלות המשך לכל קטגוריה.',
             route: '/feature/categories',
             tab: 'categories',
@@ -145,8 +159,9 @@
     ]);
 
     var TICKER_MESSAGES = Object.freeze([
-        'חדש: דף הבית נשאר שער פתיחה קצר, והמסלולים המלאים נפתחים בנתיב החי שלהם.',
-        'טיפ: אם המשפט מרגיש דחוס, התחילו בגשר תחושה-שפה לפני שמתקנים או מאתגרים.',
+        'חדש: מפת המשפט עוזרת למפות חוץ, פנים וקשר לפני שמאתגרים את מה שנאמר.',
+        'הבית נשאר שער פתיחה קצר, והמסלולים המלאים נפתחים בנתיב החי שלהם.',
+        'טיפ: אם המשפט מרגיש דחוס, ממפים קודם את שלוש השכבות ורק אחר כך בוחרים שאלה או התערבות.',
         'עדכון: סימולטור הסצנות נפתח עכשיו במסלול עצמאי, והבית נשאר משגר נקי.'
     ]);
 
