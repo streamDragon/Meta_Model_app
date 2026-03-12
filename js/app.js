@@ -7735,6 +7735,108 @@ const QUESTION_DRILL_PACK = [
     })
 ];
 
+const QUESTION_DRILL_SUBPATTERN_LABELS = Object.freeze({
+    universal_quantifier: 'כמת אוניברסלי',
+    modal_necessity: 'מודליות הכרח',
+    modal_possibility: 'מודליות אפשרות',
+    complex_equivalence: 'שקילות מורכבת',
+    mind_reading: 'קריאת מחשבות',
+    cause_effect: 'סיבה ותוצאה',
+    unspecified_verb: 'פועל לא מפורט',
+    unspecified_noun: 'שם עצם לא מפורט',
+    comparative_deletion: 'השמטה השוואתית',
+    nominalization: 'נומינליזציה',
+    identity_predicates: 'פרדיקט זהות'
+});
+
+const QUESTION_DRILL_COACHING = Object.freeze({
+    mm_easy_001: Object.freeze({
+        highlight: 'כולם תמיד מתעלמים ממני',
+        feedbackDetail: 'הניסוח מעביר מכמה ישיבות קשות לקביעה גורפת על כולם ובכל פעם.',
+        precisionPrompt: 'מי כן מגיב לפעמים, ובאילו ישיבות זה פחות קורה?'
+    }),
+    mm_easy_002: Object.freeze({
+        highlight: 'אני חייב להסכים אחרת הכול יתפרק',
+        feedbackDetail: 'המילה "חייב" הופכת פחד או העדפה לחוק שאין ממנו יציאה.',
+        precisionPrompt: 'מה יקרה אם לא תסכים, ומה בדיוק הופך את זה לחובה גמורה?'
+    }),
+    mm_easy_003: Object.freeze({
+        highlight: 'אי אפשר לדבר איתו',
+        feedbackDetail: 'המשפט סוגר את כל טווח האפשרויות בלי לבדוק באילו תנאים כן אפשר לדבר.',
+        precisionPrompt: 'באילו רגעים כן אפשר לדבר קצת, ומה בדיוק חוסם בשאר הפעמים?'
+    }),
+    mm_easy_004: Object.freeze({
+        highlight: 'זה ברור לי שהוא לא מכבד אותי',
+        feedbackDetail: 'מהקטיעה עצמה קופצים למשמעות רחבה על כבוד, בלי לבדוק אם זו המשמעות היחידה.',
+        precisionPrompt: 'מה בדיוק הוא עשה בפועל, ואיך עוד אפשר לפרש את זה לפני שמסיקים על כבוד?'
+    }),
+    mm_easy_005: Object.freeze({
+        highlight: 'אני יודעת שהם חושבים שאני חלשה',
+        feedbackDetail: 'המבטים והשתיקה מתורגמים לידיעה על מחשבותיהם בלי ראיה ישירה.',
+        precisionPrompt: 'לפי מה את יודעת שזה מה שהם חשבו, ואיזו אפשרות אחרת יכולה להסביר את השתיקה?'
+    }),
+    mm_easy_006: Object.freeze({
+        highlight: 'אז ברור לי שלא באמת אכפת לו ממני',
+        feedbackDetail: 'האיחור הופך מיד להוכחה על האכפתיות שלו, כאילו יש כאן מסקנה אחת מחויבת.',
+        precisionPrompt: 'מה עוד יכול להסביר את האיחור, ומה בדיוק הקשר שאת עושה בינו לבין אכפתיות?'
+    }),
+    mm_easy_007: Object.freeze({
+        highlight: 'זה עדיין לא עובד לי כמו שצריך',
+        feedbackDetail: 'לא ברור מה בדיוק לא עובד, באיזה שלב, ואיך נראה "כמו שצריך".',
+        precisionPrompt: 'מה בדיוק לא עובד, באיזה רגע זה נתקע, ואיך היית יודעת שזה כן עובד?'
+    }),
+    mm_easy_008: Object.freeze({
+        highlight: 'הם אמרו שזה בעייתי',
+        feedbackDetail: 'לא ברור מי הם, מה נאמר בדיוק, ומהו הדבר שנחשב בעייתי.',
+        precisionPrompt: 'מי בדיוק אמר את זה, ועל מה בדיוק נאמר שהוא בעייתי?'
+    }),
+    mm_easy_009: Object.freeze({
+        highlight: 'זה יותר טוב עכשיו',
+        feedbackDetail: '"יותר טוב" נשאר תלוי באוויר כי אין כאן ביחס למה השיפור נמדד.',
+        precisionPrompt: 'יותר טוב ביחס למה, ובאיזה מדד או מצב קודם את משווה?'
+    }),
+    mm_medium_001: Object.freeze({
+        highlight: 'אני מיד יודעת שכבר לא באמת חשוב לו',
+        feedbackDetail: 'היעדר תגובה לשעות מתורגם לידיעה על החשיבות שלך עבורו, בלי לשאול מה עוד יכול להיות שם.',
+        precisionPrompt: 'לפי מה את יודעת שזה לא חשוב לו, ואילו פירושים נוספים יש לשתיקה הזו?'
+    }),
+    mm_medium_002: Object.freeze({
+        highlight: 'אני תמיד נתקעת',
+        feedbackDetail: 'המשפט הופך קבוצה מסוימת של פגישות לחוק קבוע על כל המקרים מהסוג הזה.',
+        precisionPrompt: 'באילו פגישות זה קצת אחרת, ומה מיוחד דווקא במנהלים או ביום הזה?'
+    }),
+    mm_medium_003: Object.freeze({
+        highlight: 'צריך להיות מושלם בכל פרט קטן',
+        feedbackDetail: '"צריך" בונה חוק נוקשה ואפס מרווח לטעות, ניסוי או למידה.',
+        precisionPrompt: 'מי קבע את החוק הזה, ומה יקרה אם יהיה מצוין אבל לא מושלם?'
+    }),
+    mm_medium_004: Object.freeze({
+        highlight: 'זה הוכיח שאני לא מתאימה לתפקיד הזה',
+        feedbackDetail: 'משוב נקודתי על מצגת אחת הופך להוכחה כוללת על הזהות המקצועית שלך.',
+        precisionPrompt: 'מה בדיוק נאמר במשוב, ואיך אפשר להפריד בין ביצוע אחד לבין התאמה כוללת לתפקיד?'
+    }),
+    mm_medium_005: Object.freeze({
+        highlight: 'הוא לא ברור לי בכלל מבחינת סדרי עדיפויות',
+        feedbackDetail: 'לא ברור מה בפרויקט מעורפל: משימות, אחריות, לוחות זמנים או החלטות.',
+        precisionPrompt: 'מה בדיוק לא ברור: מה קודם למה, מי מחליט, או מהו הצעד הבא?'
+    }),
+    mm_medium_006: Object.freeze({
+        highlight: 'זה פשוט גרם לי להיכשל לגמרי',
+        feedbackDetail: 'הטון החיצוני מוצג כגורם מוחלט לכישלון כולו, בלי לראות מה קרה באמצע.',
+        precisionPrompt: 'איך בדיוק הטון שלה השפיע עליך, ומה קרה באמצע בין הטון לבין הכישלון?'
+    }),
+    mm_medium_007: Object.freeze({
+        highlight: 'אני תמיד לא יציב במצבים כאלה',
+        feedbackDetail: 'מקרה אחד נהפך לכלל תמידי עליך במצבים כאלה.',
+        precisionPrompt: 'פעם אחת הופכת ל"תמיד" לפי מה, ואילו מצבים כן מראים יציבות?'
+    }),
+    mm_medium_008: Object.freeze({
+        highlight: 'הם רוצים שינוי',
+        feedbackDetail: 'מי הם "הם" ומהו אותו שינוי נשארים עמומים, ולכן חסר בסיס לפעולה מדויקת.',
+        precisionPrompt: 'מי בדיוק ביקש את השינוי, ומה צריך להשתנות בפועל ובאיזה תחום?'
+    })
+});
+
 const QUESTION_DRILL_KEYWORDS = {
     DELETION: ['מה', 'איך', 'איזה', 'מי', 'האם', 'למה', 'כמה'],
     DISTORTION: ['האם זה אומר', 'לפי מה', 'איך אתה יודע', 'זה בטוח', 'ממה אתה מסיק', 'לפי ההרגשה'],
@@ -7783,8 +7885,18 @@ const QUESTION_DRILL_TIMER_LIGHTS_MS = Object.freeze({
 });
 
 const QUESTION_DRILL_DIFFICULTIES = Object.freeze([
-    Object.freeze({ id: 'easy', label: 'קל', note: '3 תשובות: מחיקה / עיוות / הכללה' }),
-    Object.freeze({ id: 'medium', label: 'בינוני', note: 'משפטים מעורבים ועדינים יותר' })
+    Object.freeze({
+        id: 'easy',
+        label: 'קל',
+        note: 'סימנים ברורים יותר בין מחיקה, עיוות והכללה.',
+        shortNote: 'סימנים ברורים יותר'
+    }),
+    Object.freeze({
+        id: 'medium',
+        label: 'למתקדמים',
+        note: 'אותן 3 קטגוריות, אבל המשפטים מעורבים יותר וההבדלים בין האפשרויות דקים יותר.',
+        shortNote: 'משפטים מעורבים יותר'
+    })
 ]);
 const QUESTION_DRILL_TEST_AUTO_ADVANCE_MS = 900;
 
@@ -7879,6 +7991,7 @@ const questionDrillState = {
     roundCorrect: false,
     roundFinalized: false,
     currentRoundAward: null,
+    history: [],
     feedbackText: '',
     feedbackTone: 'info',
     trafficState: 'green',
