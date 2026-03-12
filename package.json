@@ -1,6 +1,6 @@
 {
   "name": "meta_model_app",
-  "version": "1.0.256",
+  "version": "1.0.257",
   "description": "כלי אינטרנט אינטראקטיבי לתרגול טכניקות **Meta Model** של NLP (Neuro-Linguistic Programming) על פי Richard Bandler ו-John Grinder.",
   "main": "index.js",
   "directories": {
@@ -19,9 +19,9 @@
     "validate:iceberg-templates": "node scripts/validate-iceberg-templates.mjs",
     "dev": "vite",
     "prebuild:web": "npm run generate:trainer-platform && npm run generate:version && npm run build:classic2 && npm run build:iceberg-templates",
-    "build:web": "vite build",
+    "build:web": "vite build && node scripts/prepare-dist.mjs",
     "prebuild": "npm run generate:trainer-platform && npm run generate:version && npm run build:classic2 && npm run build:iceberg-templates",
-    "build": "vite build && node scripts/prepare-dist.mjs",
+    "build": "npm run build:web",
     "test:hebrew": "node --test scripts/hebrew-sanitize.test.cjs",
     "test:morpher": "node --test scripts/sentence-morpher-core.test.cjs",
     "test:triples-radar": "node --test scripts/triples-radar-core.test.cjs",

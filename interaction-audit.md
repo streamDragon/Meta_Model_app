@@ -197,11 +197,16 @@ Interpretation:
 - Added explicit onboarding dismiss actions on early steps, plus backdrop and `Escape` exit.
 - Persisted onboarding dismissal so users who skip are not trapped again on the next reload.
 - Synced floating audio controls with mobile sticky CTA visibility and re-clamped pinned controls to the current safe zone.
+- Disabled drag behavior for floating audio controls on phone-size viewports and reduced mobile audio UI to a single mute control, so taps stay reliable and CTA areas stay clear.
+- Fixed production packaging so `scenario_trainer.html` is copied into `dist` and included by `build:web`, closing the `404` that appeared from home/menu links.
+- Hardened HTML cache headers for `/`, `/feature/*`, and `*.html` responses so stale HTML is less likely to survive refreshes.
+- Simplified the opening home copy and reduced duplicate CTA clutter so the app opens as a welcome/entry screen instead of an internal control panel.
 - Extended smoke coverage so desktop CTA clickability and mobile sticky/audio collision are now checked automatically.
 
 ## Verification After Fixes
 
 - `npm run test:shell-smoke` -> PASS
 - `npm run test:mobile` -> PASS
+- `npm run test:scenario-trainer` -> PASS
 - `npm run audit:nav` -> `broken=0`, `mainMenuBroken=0`
 - `npm run build:web` -> PASS

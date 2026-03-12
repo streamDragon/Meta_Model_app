@@ -93,6 +93,7 @@ function buildStandaloneHtml(contract) {
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>${contract.wrapper.pageTitle}</title>
+  <link rel="icon" href="data:,">
   <script src="js/trainer-platform-contracts.js"></script>
   <script src="js/trainer-standalone.js"></script>
   <script>

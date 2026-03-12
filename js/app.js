@@ -709,7 +709,7 @@ function updateFloatingMuteButtonUI() {
     const btn = document.getElementById('audio-master-mute-btn');
     if (!btn) return;
     if (audioState.muted) {
-        btn.innerHTML = '<span class="audio-fab-icon">🔇</span><span class="audio-fab-label">MUTE</span>';
+        btn.innerHTML = '<span class="audio-fab-icon">🔇</span><span class="audio-fab-label">שקט</span>';
         btn.setAttribute('aria-label', 'הפעל סאונד');
         btn.setAttribute('title', 'הפעל סאונד');
         btn.classList.add('is-muted');
@@ -717,7 +717,7 @@ function updateFloatingMuteButtonUI() {
         return;
     }
 
-    btn.innerHTML = '<span class="audio-fab-icon">🔊</span><span class="audio-fab-label">SOUND</span>';
+    btn.innerHTML = '<span class="audio-fab-icon">🔊</span><span class="audio-fab-label">צליל</span>';
     btn.setAttribute('aria-label', 'השתק סאונד');
     btn.setAttribute('title', 'השתק סאונד');
     btn.classList.add('is-active');
@@ -886,6 +886,7 @@ function bindAudioControlDrag(button, key) {
     };
 
     button.addEventListener('pointerdown', (event) => {
+        if (isMobileViewportMode()) return;
         if (event.button !== 0) return;
         drag.active = true;
         drag.pointerId = event.pointerId;
@@ -3360,6 +3361,9 @@ function stripIdsFromElementTree(root) {
 }
 
 function buildFeatureMapOverlayContent() {
+    if (typeof setupGlobalFeatureMenuDropdown === 'function') {
+        setupGlobalFeatureMenuDropdown();
+    }
     const featureMap = document.getElementById('feature-map-toggle');
     const featureMapBody = featureMap?.querySelector('.feature-map-body');
     if (!featureMapBody) return null;
@@ -3397,6 +3401,9 @@ function buildFeatureMapOverlayContent() {
 }
 
 function openFeatureMapMenu() {
+    if (typeof setupGlobalFeatureMenuDropdown === 'function') {
+        setupGlobalFeatureMenuDropdown();
+    }
     const overlayContent = buildFeatureMapOverlayContent();
     if (overlayContent && window.MetaOverlayProvider && typeof window.MetaOverlayProvider.openOverlay === 'function') {
         if (typeof window.MetaOverlayProvider.ensureRoot === 'function') {

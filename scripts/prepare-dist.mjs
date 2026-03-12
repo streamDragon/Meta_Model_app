@@ -12,6 +12,7 @@ const STATIC_FILES = [
   'verb_unzip_trainer.html',
   'classic_classic_trainer.html',
   'classic2_trainer.html',
+  'scenario_trainer.html',
   'iceberg_templates_trainer.html',
   'prism_research_trainer.html',
   'prism_lab_trainer.html',
