@@ -84,6 +84,10 @@ function pickBootConfig(contract) {
 
 function buildStandaloneHtml(contract) {
   const bootConfig = JSON.stringify(pickBootConfig(contract), null, 6);
+  const standalone = contract?.wrapper?.standalone || {};
+  const bodyHtml = standalone.bodyHtml || '';
+  const bodyScripts = Array.isArray(standalone.bodyScripts) ? standalone.bodyScripts : [];
+  const bodyScriptTags = bodyScripts.map(s => `  <script src="${s}"></script>`).join('\n');
   return `<!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -100,7 +104,7 @@ function buildStandaloneHtml(contract) {
     window.MetaTrainerStandalone.boot(${bootConfig});
   </script>
 </head>
-<body></body>
+<body>${bodyHtml ? '\n' + bodyHtml : ''}${bodyScriptTags ? '\n' + bodyScriptTags : ''}</body>
 </html>
 `;
 }
