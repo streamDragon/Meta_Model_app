@@ -223,7 +223,10 @@
         "manifestKey": "_classic_classic",
         "assetVersionGlobalKey": "__CC_ASSET_V__",
         "css": [
-          "css/classic-classic.css"
+          "css/style.css",
+          "css/classic-classic.css",
+          "css/ui-enhancements.css",
+          "css/meta-model-redesign.css"
         ],
         "scripts": [
           "js/classic-classic-config.js",
@@ -338,7 +341,12 @@
         "manifestKey": "_iceberg",
         "bundlePath": "js/iceberg-templates-trainer.bundle.js",
         "buildMetaGlobalKey": "__ICEBERG_TEMPLATES_BUILD_META__",
-        "assetVersionGlobalKey": "__ICEBERG_TEMPLATES_ASSET_V__"
+        "assetVersionGlobalKey": "__ICEBERG_TEMPLATES_ASSET_V__",
+        "css": [
+          "css/style.css",
+          "css/meta-model-redesign.css",
+          "css/ui-enhancements.css"
+        ]
       }
     }
   },
@@ -447,7 +455,8 @@
         "css": [
           "css/style.css",
           "css/scenario-trainer.css",
-          "css/ui-enhancements.css"
+          "css/ui-enhancements.css",
+          "css/meta-model-redesign.css"
         ],
         "scripts": [
           "js/scenario-trainer-app.js"
