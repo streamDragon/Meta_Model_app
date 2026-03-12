@@ -78,10 +78,22 @@
         "loadingText": "מכין את סביבת האימון של Structure of Magic עם טקסט, קטגוריות ומשוב חי.",
         "errorTitle": "שגיאה בטעינת Classic 2",
         "navLinks": [
-          { "href": "index.html", "label": "חזרה לדף הראשי" },
-          { "href": "classic_classic_trainer.html", "label": "Classic Classic" },
-          { "href": "iceberg_templates_trainer.html", "label": "Iceberg Templates" },
-          { "href": "scenario_trainer.html", "label": "סימולטור סצנות" }
+          {
+            "href": "index.html",
+            "label": "חזרה לדף הראשי"
+          },
+          {
+            "href": "classic_classic_trainer.html",
+            "label": "Classic Classic"
+          },
+          {
+            "href": "iceberg_templates_trainer.html",
+            "label": "Iceberg Templates"
+          },
+          {
+            "href": "scenario_trainer.html",
+            "label": "סימולטור סצנות"
+          }
         ],
         "accent": {
           "primary": "#1d4ed8",
@@ -173,10 +185,22 @@
         "loadingText": "מכין את מסך זיהוי התבניות עם שלבים, משוב והסבר יציב.",
         "errorTitle": "שגיאה בטעינת Classic Classic",
         "navLinks": [
-          { "href": "index.html", "label": "חזרה לדף הראשי" },
-          { "href": "classic2_trainer.html", "label": "Classic 2" },
-          { "href": "iceberg_templates_trainer.html", "label": "Iceberg Templates" },
-          { "href": "scenario_trainer.html", "label": "סימולטור סצנות" }
+          {
+            "href": "index.html",
+            "label": "חזרה לדף הראשי"
+          },
+          {
+            "href": "classic2_trainer.html",
+            "label": "Classic 2"
+          },
+          {
+            "href": "iceberg_templates_trainer.html",
+            "label": "Iceberg Templates"
+          },
+          {
+            "href": "scenario_trainer.html",
+            "label": "סימולטור סצנות"
+          }
         ],
         "accent": {
           "primary": "#2563eb",
@@ -189,7 +213,10 @@
           "manifestKey": "_classic_classic",
           "assetVersionGlobalKey": "__CC_ASSET_V__",
           "css": [
-            "css/classic-classic.css"
+            "css/style.css",
+            "css/classic-classic.css",
+            "css/ui-enhancements.css",
+            "css/meta-model-redesign.css"
           ],
           "scripts": [
             "js/classic-classic-config.js",
@@ -276,10 +303,22 @@
         "loadingText": "מכין את סביבת העבודה של עצי הבחנה, הסתעפויות וחלופות.",
         "errorTitle": "שגיאה בטעינת Iceberg Templates",
         "navLinks": [
-          { "href": "index.html", "label": "חזרה לדף הראשי" },
-          { "href": "classic2_trainer.html", "label": "Classic 2" },
-          { "href": "classic_classic_trainer.html", "label": "Classic Classic" },
-          { "href": "scenario_trainer.html", "label": "סימולטור סצנות" }
+          {
+            "href": "index.html",
+            "label": "חזרה לדף הראשי"
+          },
+          {
+            "href": "classic2_trainer.html",
+            "label": "Classic 2"
+          },
+          {
+            "href": "classic_classic_trainer.html",
+            "label": "Classic Classic"
+          },
+          {
+            "href": "scenario_trainer.html",
+            "label": "סימולטור סצנות"
+          }
         ],
         "accent": {
           "primary": "#92400e",
@@ -292,7 +331,12 @@
           "manifestKey": "_iceberg",
           "bundlePath": "js/iceberg-templates-trainer.bundle.js",
           "buildMetaGlobalKey": "__ICEBERG_TEMPLATES_BUILD_META__",
-          "assetVersionGlobalKey": "__ICEBERG_TEMPLATES_ASSET_V__"
+          "assetVersionGlobalKey": "__ICEBERG_TEMPLATES_ASSET_V__",
+          "css": [
+            "css/style.css",
+            "css/meta-model-redesign.css",
+            "css/ui-enhancements.css"
+          ]
         }
       }
     },
@@ -372,10 +416,22 @@
         "loadingText": "מכין את סביבת הדיאלוג עם בחירות, משוב ופירוק עומק במקום אחד.",
         "errorTitle": "שגיאה בטעינת סימולטור סצנות",
         "navLinks": [
-          { "href": "index.html", "label": "חזרה לדף הראשי" },
-          { "href": "classic2_trainer.html", "label": "Classic 2" },
-          { "href": "classic_classic_trainer.html", "label": "Classic Classic" },
-          { "href": "iceberg_templates_trainer.html", "label": "Iceberg Templates" }
+          {
+            "href": "index.html",
+            "label": "חזרה לדף הראשי"
+          },
+          {
+            "href": "classic2_trainer.html",
+            "label": "Classic 2"
+          },
+          {
+            "href": "classic_classic_trainer.html",
+            "label": "Classic Classic"
+          },
+          {
+            "href": "iceberg_templates_trainer.html",
+            "label": "Iceberg Templates"
+          }
         ],
         "accent": {
           "primary": "#0f766e",
@@ -386,11 +442,12 @@
         "standalone": {
           "htmlFile": "scenario_trainer.html",
           "manifestKey": "_scenario_trainer",
-        "css": [
-          "css/style.css",
-          "css/scenario-trainer.css",
-          "css/ui-enhancements.css"
-        ],
+          "css": [
+            "css/style.css",
+            "css/scenario-trainer.css",
+            "css/ui-enhancements.css",
+            "css/meta-model-redesign.css"
+          ],
           "scripts": [
             "js/scenario-trainer-app.js"
           ]
