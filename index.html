@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.246" data-build-time="1773272936743" data-build-iso="2026-03-11T23:48:56.743Z" data-git-commit="5e02934">
+<html lang="he" dir="rtl" data-app-version="1.0.247" data-build-time="1773273814471" data-build-iso="2026-03-12T00:03:34.471Z" data-git-commit="9605144">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -288,6 +288,101 @@
             </div>
         </div>
     </div>
+
+    <!-- ONBOARDING OVERLAY -->
+    <div id="mm-onboarding" class="mm-onboarding" aria-modal="true" role="dialog" aria-label="כניסה ראשונה" hidden>
+        <div class="mm-ob-backdrop"></div>
+        <div class="mm-ob-card">
+            <!-- Progress dots -->
+            <div class="mm-ob-progress" aria-label="שלב נוכחי">
+                <span class="mm-ob-dot" data-step="1"></span>
+                <span class="mm-ob-dot" data-step="2"></span>
+                <span class="mm-ob-dot" data-step="3"></span>
+            </div>
+
+            <!-- STEP 1: Who are you? -->
+            <div class="mm-ob-step" data-ob-step="1">
+                <div class="mm-ob-hero-icon">🧠</div>
+                <h2 class="mm-ob-title">ברוך/ה הבא/ה!</h2>
+                <p class="mm-ob-subtitle">לפני שנכנסים — ספר/י קצת עליך</p>
+                <div class="mm-ob-grid mm-ob-grid--2x2">
+                    <button class="mm-ob-choice" data-role="therapist" type="button">
+                        <span class="mm-ob-choice-emoji">🌿</span>
+                        <strong>מטפל/ת</strong>
+                        <small>עובד/ת עם לקוחות בשיחה טיפולית</small>
+                    </button>
+                    <button class="mm-ob-choice" data-role="coach" type="button">
+                        <span class="mm-ob-choice-emoji">🎯</span>
+                        <strong>מאמן/ת</strong>
+                        <small>מלווה תהליכים, קריירה, אישי</small>
+                    </button>
+                    <button class="mm-ob-choice" data-role="student" type="button">
+                        <span class="mm-ob-choice-emoji">📚</span>
+                        <strong>סטודנט/ית</strong>
+                        <small>לומד/ת NLP, פסיכולוגיה, תקשורת</small>
+                    </button>
+                    <button class="mm-ob-choice" data-role="self" type="button">
+                        <span class="mm-ob-choice-emoji">✨</span>
+                        <strong>צמיחה אישית</strong>
+                        <small>תקשורת טובה יותר, הקשבה עמוקה</small>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: Level -->
+            <div class="mm-ob-step" data-ob-step="2" hidden>
+                <div class="mm-ob-hero-icon">🔍</div>
+                <h2 class="mm-ob-title">איפה אתה/את עם Meta Model?</h2>
+                <p class="mm-ob-subtitle">נתאים את הכניסה הראשונה לרמה שלך</p>
+                <div class="mm-ob-grid mm-ob-grid--1col">
+                    <button class="mm-ob-choice mm-ob-choice--row" data-level="beginner" type="button">
+                        <span class="mm-ob-choice-emoji">🐣</span>
+                        <div class="mm-ob-choice-text">
+                            <strong>מתחיל/ה — זה חדש לי</strong>
+                            <small>רוצה להבין מה זה Meta Model ואיך זה עובד</small>
+                        </div>
+                    </button>
+                    <button class="mm-ob-choice mm-ob-choice--row" data-level="intermediate" type="button">
+                        <span class="mm-ob-choice-emoji">🔄</span>
+                        <div class="mm-ob-choice-text">
+                            <strong>מכיר/ה קצת — רוצה לתרגל</strong>
+                            <small>יודע/ת את הבסיס, רוצה לחדד ולהפוך את זה לרפלקס</small>
+                        </div>
+                    </button>
+                    <button class="mm-ob-choice mm-ob-choice--row" data-level="advanced" type="button">
+                        <span class="mm-ob-choice-emoji">⚡</span>
+                        <div class="mm-ob-choice-text">
+                            <strong>מתקדם/ת — כלי עומק</strong>
+                            <small>עובד/ת עם Meta Model, רוצה ניתוח עמוק יותר</small>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: Your path is ready -->
+            <div class="mm-ob-step mm-ob-step--result" data-ob-step="3" hidden>
+                <div class="mm-ob-celebration" aria-hidden="true">🎉</div>
+                <h2 class="mm-ob-title mm-ob-title--big">המסלול שלך מוכן!</h2>
+                <p class="mm-ob-subtitle" id="mm-ob-result-intro">מבוסס על מה שסיפרת, נמליץ להתחיל עם:</p>
+                <div class="mm-ob-result-card" id="mm-ob-result-card">
+                    <span class="mm-ob-result-emoji" id="mm-ob-result-emoji">🌉</span>
+                    <div class="mm-ob-result-info">
+                        <strong id="mm-ob-result-name">גשר תחושה‑שפה</strong>
+                        <small id="mm-ob-result-desc">הכלי שמחבר בין מה שמרגישים לבין מה שאומרים</small>
+                    </div>
+                    <span class="mm-ob-result-arrow">←</span>
+                </div>
+                <button class="mm-ob-cta-btn" id="mm-ob-launch-btn" type="button">
+                    בואו נתחיל
+                    <span class="mm-ob-cta-arrow">←</span>
+                </button>
+                <button class="mm-ob-skip-btn" id="mm-ob-explore-btn" type="button">
+                    אני מעדיף/ה לחקור לבד
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- /ONBOARDING OVERLAY -->
 
     <div id="app-version-floating" class="app-version-floating" aria-live="polite">גרסה פעילה: נטען...</div>
     <div class="container">
@@ -1624,7 +1719,8 @@
                 'js/question-drill-engine.js',
                 'js/feeling-language-bridge.js',
                 'js/app.js',
-                'js/triples-radar.js'
+                'js/triples-radar.js',
+                'js/onboarding.js'
             ];
 
             function loadScript(index) {
