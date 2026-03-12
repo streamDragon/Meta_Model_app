@@ -438,7 +438,8 @@ export const TRAINER_PLATFORM_CONTRACTS: TrainerPlatformContractMap = {
         "manifestKey": "_scenario_trainer",
         "css": [
           "css/style.css",
-          "css/scenario-trainer.css"
+          "css/scenario-trainer.css",
+          "css/ui-enhancements.css"
         ],
         "scripts": [
           "js/scenario-trainer-app.js"

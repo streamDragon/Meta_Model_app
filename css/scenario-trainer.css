@@ -1,7 +1,8 @@
-/* Standalone Scenario Trainer styles.
-   Shared app tokens still live in css/style.css; this file owns the active
-   dialogue-trainer surfaces and keeps scenario-specific polish out of the app sheet. */
+/* Standalone Scenario Trainer styles — with strong visual hierarchy.
+   Shared app tokens live in css/style.css; this file owns active dialogue
+   surfaces and scenario-specific visual differentiation. */
 
+/* ═══ TOKEN LAYER ═══ */
 .scenario-platform-root {
     --scenario-surface: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
     --scenario-border: #dbe7f3;
@@ -11,31 +12,261 @@
     --scenario-gold: #f59e0b;
 }
 
-.scenario-platform-header,
-.scenario-home-purpose-card,
-.scenario-home-start-strip,
-.scenario-workspace-card,
-.scenario-support-card,
-.scenario-settings-modal {
-    background: var(--scenario-surface);
-    border-color: var(--scenario-border);
-}
-
+/* ═══ HEADER — branded teal bar ═══ */
 .scenario-platform-header {
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.07);
+    background:
+        radial-gradient(circle at 8% 10%, rgba(255,255,255,0.14), transparent 32%),
+        linear-gradient(135deg, #0f766e 0%, #0369a1 58%, #0284c7 100%) !important;
+    border: none !important;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.22) !important;
+    color: #ffffff !important;
 }
 
-.scenario-home-purpose-card,
-.scenario-home-start-strip,
-.scenario-workspace-card,
-.scenario-support-card {
-    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
+.scenario-platform-header h1 {
+    color: #ffffff !important;
+    font-size: clamp(1.2rem, 2.8vw, 1.65rem) !important;
 }
 
+.scenario-platform-family {
+    color: rgba(186, 230, 253, 0.88) !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.07em !important;
+    text-transform: uppercase !important;
+}
+
+.scenario-platform-subtitle {
+    color: rgba(224, 242, 254, 0.86) !important;
+}
+
+.scenario-home-tag {
+    background: rgba(255,255,255,0.14) !important;
+    border-color: rgba(255,255,255,0.22) !important;
+    color: rgba(255,255,255,0.9) !important;
+}
+
+.scenario-platform-header .scenario-home-tag {
+    background: rgba(255,255,255,0.14) !important;
+}
+
+/* ═══ PURPOSE CARD — dark cinematic "what is this" ═══ */
+.scenario-home-purpose-card {
+    background:
+        radial-gradient(ellipse at 15% 15%, rgba(91,33,182,0.52) 0%, transparent 42%),
+        radial-gradient(ellipse at 88% 85%, rgba(6,182,212,0.42) 0%, transparent 42%),
+        radial-gradient(ellipse at 75% 10%, rgba(251,191,36,0.2) 0%, transparent 30%),
+        linear-gradient(145deg, #0f172a 0%, #1e1b4b 48%, #0c4a6e 100%) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    box-shadow: 0 28px 56px rgba(15,23,42,0.32) !important;
+    color: #ffffff !important;
+}
+
+.scenario-home-purpose-card .scenario-home-kicker {
+    color: #22d3ee !important;
+    font-weight: 800 !important;
+    font-size: 0.76rem !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+}
+
+.scenario-home-purpose-card h3 {
+    color: #ffffff !important;
+    font-size: clamp(1.25rem, 2.8vw, 1.8rem) !important;
+    line-height: 1.2 !important;
+    font-weight: 900 !important;
+}
+
+.scenario-home-purpose-card .scenario-home-lead {
+    color: rgba(186,230,253,0.9) !important;
+    font-size: 1rem !important;
+    line-height: 1.72 !important;
+}
+
+.scenario-home-purpose-card .scenario-home-tag-row .scenario-home-tag {
+    background: rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    color: rgba(255,255,255,0.82) !important;
+    font-size: 0.76rem !important;
+}
+
+/* ═══ START STRIP — clear action zone ═══ */
 .scenario-home-start-strip {
     background:
-        radial-gradient(circle at top left, rgba(13, 148, 136, 0.12), transparent 34%),
-        linear-gradient(180deg, #ffffff 0%, #f5fffb 100%);
+        radial-gradient(circle at 96% 8%, rgba(20,184,166,0.14), transparent 40%),
+        radial-gradient(circle at 4% 92%, rgba(56,189,248,0.1), transparent 36%),
+        linear-gradient(180deg, #ecfdf5 0%, #f0fdf4 100%) !important;
+    border: 1.5px solid rgba(15,118,110,0.22) !important;
+    box-shadow: 0 16px 36px rgba(15,118,110,0.1) !important;
+}
+
+.scenario-home-start-strip .scenario-home-kicker {
+    color: #047857 !important;
+    font-weight: 800 !important;
+    font-size: 0.76rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+}
+
+.scenario-home-start-strip h3 {
+    color: #064e3b !important;
+    font-size: clamp(1.1rem, 2.4vw, 1.4rem) !important;
+}
+
+.scenario-home-start-strip p {
+    color: #065f46 !important;
+}
+
+/* BIG start button */
+#scenario-start-run-btn {
+    background: linear-gradient(135deg, #0f766e 0%, #0369a1 55%, #0284c7 100%) !important;
+    box-shadow: 0 8px 24px rgba(15,118,110,0.34), 0 2px 4px rgba(0,0,0,0.1) !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    padding: 14px 28px !important;
+    border-radius: 16px !important;
+    min-height: 52px !important;
+    transition: transform 200ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 200ms ease !important;
+}
+
+#scenario-start-run-btn:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 14px 32px rgba(15,118,110,0.44) !important;
+}
+
+/* ═══ HELPER STEPS — numbered, color-coded ═══ */
+.scenario-home-helper-step {
+    border-radius: 14px !important;
+    padding: 12px 14px !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(15,23,42,0.06) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.scenario-home-helper-step::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; /* RTL: right edge */
+    width: 4px;
+    height: 100%;
+    border-radius: 4px 0 0 4px;
+}
+
+.scenario-home-helper-step:nth-child(1)::before { background: #6366f1; }
+.scenario-home-helper-step:nth-child(2)::before { background: #0369a1; }
+.scenario-home-helper-step:nth-child(3)::before { background: #0f766e; }
+
+.scenario-home-helper-step strong {
+    color: #0f172a !important;
+    font-size: 0.88rem !important;
+    font-weight: 800 !important;
+}
+
+.scenario-home-helper-step span {
+    color: #475569 !important;
+    font-size: 0.8rem !important;
+    line-height: 1.45 !important;
+}
+
+/* ═══ OPTION BUTTONS — clear red/green split ═══ */
+.scenario-option-btn {
+    border-width: 1.5px !important;
+    border-radius: 16px !important;
+    transition: transform 180ms ease, box-shadow 180ms ease !important;
+}
+
+.scenario-option-btn.red {
+    border-color: #fca5a5 !important;
+    background: linear-gradient(160deg, #fff5f5 0%, #ffffff 100%) !important;
+}
+
+.scenario-option-btn.green {
+    border-color: #6ee7b7 !important;
+    background: linear-gradient(160deg, #f0fdf4 0%, #ffffff 100%) !important;
+}
+
+.scenario-option-btn.red:hover {
+    border-color: #ef4444 !important;
+    box-shadow: 0 12px 28px rgba(239,68,68,0.16) !important;
+    transform: translateY(-3px) !important;
+}
+
+.scenario-option-btn.green:hover {
+    border-color: #10b981 !important;
+    box-shadow: 0 12px 28px rgba(16,185,129,0.16) !important;
+    transform: translateY(-3px) !important;
+}
+
+/* ═══ WORKSPACE & SUPPORT ═══ */
+.scenario-workspace-card,
+.scenario-support-card {
+    background: var(--scenario-surface) !important;
+    border-color: var(--scenario-border) !important;
+    box-shadow: 0 12px 28px rgba(15,23,42,0.06) !important;
+}
+
+.scenario-support-card {
+    border-inline-start: 3px solid #0f766e !important;
+}
+
+/* ═══ SUMMARY PILL ═══ */
+.scenario-summary-pill {
+    background: #ecfeff !important;
+    border-color: #bae6fd !important;
+    color: #155e75 !important;
+    font-weight: 700 !important;
+}
+
+/* ═══ FEEDBACK CARDS ═══ */
+.scenario-feedback-summary-card {
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.65) !important;
+}
+
+.scenario-impact-card[data-scenario-impact="emotion"] {
+    background: linear-gradient(160deg, #fffbeb 0%, #ffffff 100%) !important;
+    border-color: #fed7aa !important;
+    border-inline-start: 3px solid #f59e0b !important;
+}
+
+.scenario-impact-card[data-scenario-impact="process"] {
+    background: linear-gradient(160deg, #eff6ff 0%, #ffffff 100%) !important;
+    border-color: #bfdbfe !important;
+    border-inline-start: 3px solid #3b82f6 !important;
+}
+
+/* ═══ SETTINGS ═══ */
+.scenario-settings-actions {
+    position: sticky;
+    bottom: 0;
+    padding-top: 12px;
+    background: linear-gradient(180deg, rgba(248,250,252,0), #f8fafc 26%);
+}
+
+.scenario-settings-card[data-kind="advanced"] {
+    background: linear-gradient(180deg, #fcfffe 0%, #f8fafc 100%) !important;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 980px) {
+    .scenario-impact-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 840px) {
+    .scenario-home-start-strip,
+    .scenario-home-purpose-card,
+    .scenario-workspace-card,
+    .scenario-support-card,
+    .scenario-settings-modal {
+        border-radius: 20px;
+    }
+    .scenario-home-helper-strip { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+    .scenario-start-actions { flex-direction: column; }
+    .scenario-start-actions .btn,
+    .scenario-start-actions .scenario-summary-pill { width: 100%; }
+    .scenario-settings-actions { position: static; background: transparent; }
 }
 
 .scenario-summary-pill {

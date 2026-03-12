@@ -1208,6 +1208,16 @@ body {
     inset: 0;
     opacity: 0;
     transition: opacity 220ms ease;
+    pointer-events: none; /* must not block button clicks */
+    z-index: 0;
+}
+
+/* ensure card content is above ::before */
+.hhc-path-emoji,
+.hhc-path-content,
+.hhc-path-btn {
+    position: relative;
+    z-index: 1;
 }
 
 .hhc-path-card:hover {
