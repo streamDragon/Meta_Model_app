@@ -246,6 +246,82 @@
     background: linear-gradient(180deg, #fcfffe 0%, #f8fafc 100%) !important;
 }
 
+/* ═══ PROGRESSIVE DISCLOSURE — hide home UI when session is active ═══ */
+
+/* When not on the home screen, collapse the intro sections */
+.scenario-platform-root:not([data-screen="home"]) .scenario-home-purpose-card,
+.scenario-platform-root:not([data-screen="home"]) .scenario-home-start-strip,
+.scenario-platform-root:not([data-screen="home"]) .scenario-home-helper-strip {
+    display: none !important;
+}
+
+/* On home screen, hide the standalone layout (no active session content yet) */
+.scenario-platform-root[data-screen="home"] .scenario-standalone-layout {
+    display: none !important;
+}
+
+/* Compact session bar — shown when active */
+.scenario-session-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 14px;
+    background: rgba(15, 118, 110, 0.08);
+    border: 1px solid rgba(15, 118, 110, 0.18);
+    border-radius: 12px;
+    margin-bottom: 4px;
+    font-size: 0.84rem;
+}
+
+.scenario-session-bar-info {
+    color: #0f766e;
+    font-weight: 700;
+}
+
+.scenario-session-bar-end {
+    border: 1px solid rgba(15, 118, 110, 0.3);
+    background: #ffffff;
+    color: #0f766e;
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 150ms ease, transform 150ms ease;
+    white-space: nowrap;
+}
+
+.scenario-session-bar-end:hover {
+    background: #f0fdf4;
+    transform: translateY(-1px);
+}
+
+/* On home screen: make the home content visible with nice entrance */
+.scenario-platform-root[data-screen="home"] .scenario-home-purpose-card,
+.scenario-platform-root[data-screen="home"] .scenario-home-start-strip,
+.scenario-platform-root[data-screen="home"] .scenario-home-helper-strip {
+    animation: scFadeSlide 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.scenario-platform-root[data-screen="home"] .scenario-home-start-strip {
+    animation-delay: 0.06s;
+}
+
+.scenario-platform-root[data-screen="home"] .scenario-home-helper-strip {
+    animation-delay: 0.12s;
+}
+
+@keyframes scFadeSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Main content entrance */
+.scenario-platform-root:not([data-screen="home"]) .scenario-standalone-layout {
+    animation: scFadeSlide 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* ═══ RESPONSIVE ═══ */
 @media (max-width: 980px) {
     .scenario-impact-grid { grid-template-columns: 1fr; }

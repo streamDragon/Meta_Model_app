@@ -886,7 +886,7 @@
             ? `<span class="scenario-home-tag">סצנה ${escapeHtml(state.session.index + 1)}/${escapeHtml(state.session.queue.length)}</span><span class="scenario-home-tag">נקודות: ${escapeHtml(state.session.score)}</span>`
             : `<span class="scenario-home-tag">${escapeHtml(trainerContract.quickStartLabel || '')}</span>`;
         return `
-          <div id="scenario-trainer" class="scenario-platform-root" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id="scenario-trainer" data-trainer-mobile-order="${escapeHtml(getMobileZoneOrder().join(','))}" style="${escapeHtml(buildRootStyle())}">
+          <div id="scenario-trainer" class="scenario-platform-root" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id="scenario-trainer" data-screen="${state.screen}" data-trainer-mobile-order="${escapeHtml(getMobileZoneOrder().join(','))}" style="${escapeHtml(buildRootStyle())}">
             <div class="scenario-platform-header">
               <div class="scenario-platform-header-copy">
                 <p class="scenario-platform-family">${escapeHtml(getScenarioDisplayFamilyLabel())}</p>
@@ -895,6 +895,13 @@
               </div>
               <div class="scenario-platform-header-meta">${sessionMeta}</div>
             </div>
+            ${state.screen !== SCREEN_IDS.home ? `
+            <div class="scenario-session-bar" role="toolbar" aria-label="ניהול סשן">
+              <span class="scenario-session-bar-info">
+                ${state.session ? `סצנה ${escapeHtml(String(state.session.index + 1))}/${escapeHtml(String(state.session.queue.length))} · ${escapeHtml(String(state.session.score))} נק׳` : ''}
+              </span>
+              <button type="button" class="scenario-session-bar-end" data-scenario-action="go-home">↩ חזרה לבית</button>
+            </div>` : ''}
             <div class="scenario-platform-shell">
               <section class="scenario-home-purpose-card" data-trainer-zone="purpose" style="${escapeHtml(getZoneStyle('purpose'))}">
                 <p class="scenario-home-kicker">מה עושים כאן?</p>
