@@ -8951,9 +8951,8 @@ function setQuestionDrillSelectedOption(optionId = '', { playSound = true } = {}
     updateQuestionDrillControlsState();
     if (playSound) playUISound('select_soft');
 
-    if (questionDrillState.mode === 'test') {
-        evaluateQuestionDrill();
-    }
+    // Auto-evaluate immediately in all modes — no need for separate "בדוק" button
+    evaluateQuestionDrill();
 }
 
 function selectQuestionDrillOptionByCategory(categoryId = '') {

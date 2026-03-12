@@ -22872,3 +22872,60 @@ body.mobile-sticky-cta-visible {
         min-height: min(calc(100dvh - 200px), 600px);
     }
 }
+
+/* ═══ Practice Question — check button hidden (auto-evaluate on click) ═══ */
+#question-drill-check {
+    display: none !important;
+}
+
+/* ═══ Practice Question — layout locked to viewport, no overflow ═══ */
+#practice-question {
+    overflow: hidden;
+}
+
+#practice-question .practice-container {
+    max-height: calc(100dvh - 80px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.question-drill-card {
+    max-height: calc(100dvh - 140px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+/* Compact the left stats panel so it takes less space */
+.question-drill-live-side {
+    gap: 8px !important;
+}
+
+.question-drill-chip {
+    font-size: 0.78rem !important;
+    padding: 4px 8px !important;
+}
+
+/* Hide redundant nested header in triples radar */
+#practice-triples-radar .practice-section-header,
+#practice-radar .practice-section-header {
+    display: none !important;
+}
+
+/* Remove duplicate inner header in practice-radar */
+#practice-radar .rapid-radar-header {
+    display: none !important;
+}
+
+/* Compact practice-intro-card on mobile */
+@media (max-width: 900px) {
+    #practice-question .practice-container,
+    #practice-radar .practice-container {
+        max-height: calc(100dvh - 60px);
+        padding: 6px !important;
+    }
+
+    .question-drill-card {
+        max-height: calc(100dvh - 100px);
+        padding: 10px !important;
+    }
+}
