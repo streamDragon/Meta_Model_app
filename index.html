@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.257" data-build-time="1773302447067" data-build-iso="2026-03-12T08:00:47.067Z" data-git-commit="516b18f">
+<html lang="he" dir="rtl" data-app-version="1.0.258" data-build-time="1773312062990" data-build-iso="2026-03-12T10:41:02.990Z" data-git-commit="1462770">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -574,59 +574,162 @@
                 <div id="mobile-feed-list" class="mobile-feed-list" aria-live="polite"></div>
             </section>
 
-            <article class="home-route-hero home-route-desktop-only">
-                <div class="home-route-hero-media">
-                    <img
-                        class="home-route-hero-image"
-                        src=""
-                        data-versioned-src="assets/svg/props/philosopher-guide.svg"
-                        alt="איור Meta Model Gym לאימון חשיבה, רגש והבנה"
-                        loading="lazy"
-                    >
+            <!-- ═══ CINEMATIC HERO ═══ -->
+            <article class="hhc-hero home-route-desktop-only" aria-label="שער פתיחה ראשי">
+                <!-- Animated background orbs -->
+                <div class="hhc-bg" aria-hidden="true">
+                    <span class="hhc-orb hhc-orb--1"></span>
+                    <span class="hhc-orb hhc-orb--2"></span>
+                    <span class="hhc-orb hhc-orb--3"></span>
+                    <span class="hhc-orb hhc-orb--4"></span>
                 </div>
-                <div class="home-route-hero-copy">
-                    <p id="app-version-chip" class="app-version-chip home-route-version">גרסה נוכחית: נטען...</p>
-                    <p class="home-route-eyebrow">ברוכים הבאים</p>
-                    <h2 class="home-route-title">בחר/י איך להתחיל את התרגול של עכשיו</h2>
-                    <p class="home-route-subtitle">
-                        זו אפליקציה ללמידה ותרגול של מטה-מודל, דיוק בשפה, ומיומנויות שיחה. אם לא בטוחים איפה להתחיל, מפת המשפט היא השער הכי בטוח וברור.
-                    </p>
-                    <div class="home-route-pill-row" aria-label="סוגי עבודה">
-                        <span class="home-route-pill">מיפוי</span>
-                        <span class="home-route-pill">זיהוי</span>
-                        <span class="home-route-pill">עומק</span>
-                        <span class="home-route-pill">שיחה חיה</span>
+
+                <!-- Left: copy + CTA -->
+                <div class="hhc-copy">
+                    <div class="hhc-badge">
+                        <span class="hhc-badge-dot"></span>
+                        Meta Model Gym · מעבדת שיחה
                     </div>
-                    <div class="home-route-cta-row">
-                        <button type="button" class="btn btn-primary" data-nav-key="sentenceMap">התחל עם מפת המשפט</button>
-                        <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html" data-nav-key="scenarioTrainer">פתח סימולטור סצנות</a>
+                    <h2 class="hhc-title">
+                        שפר/י את<br>
+                        <span class="hhc-title-accent">השיחה שלך</span>
+                    </h2>
+                    <p class="hhc-subtitle">
+                        מיומנות אחת בסבב. דפוס אחד בשיחה.<br>
+                        תוצאה שמשנה כל מפגש.
+                    </p>
+
+                    <div class="hhc-daily-widget" aria-label="אתגר יומי">
+                        <div class="hhc-daily-icon">🔥</div>
+                        <div class="hhc-daily-text">
+                            <strong>אתגר היום</strong>
+                            <span>זהה מחיקה — ושאל את השאלה שפותחת את מה שמאחורי המילים</span>
+                        </div>
+                    </div>
+
+                    <div class="hhc-cta-group">
+                        <button type="button" class="hhc-btn-primary" data-nav-key="practiceQuestion">
+                            <span>התחל עכשיו</span>
+                            <span class="hhc-btn-arrow">←</span>
+                        </button>
+                        <a class="hhc-btn-ghost" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">
+                            סימולטור סצנות ↗
+                        </a>
+                    </div>
+
+                    <div class="hhc-stats" aria-label="נתוני האפליקציה">
+                        <div class="hhc-stat">
+                            <strong>12+</strong>
+                            <span>כלי תרגול</span>
+                        </div>
+                        <div class="hhc-stat-divider"></div>
+                        <div class="hhc-stat">
+                            <strong>3</strong>
+                            <span>רמות עומק</span>
+                        </div>
+                        <div class="hhc-stat-divider"></div>
+                        <div class="hhc-stat">
+                            <strong>∞</strong>
+                            <span>אפשרויות גדילה</span>
+                        </div>
+                    </div>
+
+                    <p id="app-version-chip" class="app-version-chip home-route-version" style="display:none">גרסה נוכחית: נטען...</p>
+                </div>
+
+                <!-- Right: floating pattern cards -->
+                <div class="hhc-visual" aria-hidden="true">
+                    <div class="hhc-card-stack">
+                        <div class="hhc-pattern-card hhc-pattern-card--1">
+                            <span class="hhc-pattern-sentence">הוא לא רואה אותי</span>
+                            <span class="hhc-pattern-tag hhc-pattern-tag--deletion">מחיקה 🔍</span>
+                        </div>
+                        <div class="hhc-pattern-card hhc-pattern-card--2">
+                            <span class="hhc-pattern-sentence">תמיד קורה לי כך</span>
+                            <span class="hhc-pattern-tag hhc-pattern-tag--generalization">הכללה ⚡</span>
+                        </div>
+                        <div class="hhc-pattern-card hhc-pattern-card--3">
+                            <span class="hhc-pattern-sentence">כולם חושבים שאני...</span>
+                            <span class="hhc-pattern-tag hhc-pattern-tag--distortion">עיוות 🌀</span>
+                        </div>
+                        <div class="hhc-radar-ring" aria-hidden="true">
+                            <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="60" cy="60" r="54" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                                <circle cx="60" cy="60" r="36" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                                <circle cx="60" cy="60" r="18" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                                <circle cx="60" cy="60" r="54" stroke="url(#ringGrad)" stroke-width="2.5"
+                                    stroke-dasharray="339" stroke-dashoffset="90"
+                                    stroke-linecap="round"/>
+                                <defs>
+                                    <linearGradient id="ringGrad" x1="60" y1="6" x2="60" y2="114" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#38bdf8"/>
+                                        <stop offset="100%" stop-color="#a78bfa"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </article>
+            <!-- ═══ /CINEMATIC HERO ═══ -->
 
-            <section class="home-route-features home-route-desktop-only" aria-label="שערי כניסה ראשיים">
-                <article class="home-route-feature-card" data-home-accent="indigo">
-                    <p class="home-route-feature-kicker">לפני אתגור</p>
-                    <h3>מפת המשפט</h3>
-                    <p>ממפים קודם מה קרה בפועל, מה הסיפור הפנימי, ומה המשפט מנסה להשיג בשיחה, ורק אחר כך בוחרים מה לשאול.</p>
-                    <span class="home-route-feature-footnote">המסלול הראשון כשצריך להבין איפה הלב של המקרה</span>
-                    <button type="button" class="btn btn-secondary" data-nav-key="sentenceMap">פתח מפה</button>
-                </article>
-                <article class="home-route-feature-card" data-home-accent="teal">
-                    <p class="home-route-feature-kicker">שיחה חיה</p>
-                    <h3>סימולטור סצנות</h3>
-                    <p>מסלול עצמאי שבו בוחרים תגובה, רואים איך היא נוחתת, ורק אחר כך פותחים את העומק שמאחוריה.</p>
-                    <span class="home-route-feature-footnote">נפתח כעמוד ייעודי ולא כחצי מסך בתוך הבית</span>
-                    <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html" data-nav-key="scenarioTrainer">פתח סימולטור</a>
-                </article>
-                <article class="home-route-feature-card" data-home-accent="sky">
-                    <p class="home-route-feature-kicker">מהיר</p>
-                    <h3>תרגול זיהוי</h3>
-                    <p>משפט אחד בכל סבב כדי לחדד זיהוי, משוב, ורפלקס שאלה מדויקת בזמן קצר.</p>
-                    <span class="home-route-feature-footnote">לכניסה מהירה לעבודה</span>
-                    <button type="button" class="btn btn-secondary" data-nav-key="practiceQuestion">פתח תרגול זיהוי</button>
-                </article>
+            <!-- ═══ BOLD FEATURE PATHS ═══ -->
+            <section class="hhc-paths home-route-desktop-only" aria-label="מסלולי תרגול ראשיים">
+                <div class="hhc-paths-head">
+                    <h3 class="hhc-paths-title">בחר/י את המסלול שלך</h3>
+                    <p class="hhc-paths-sub">כל מסלול בנוי להתמקד בהיבט אחד — בחר/י אחד והיכנס/י.</p>
+                </div>
+                <div class="hhc-paths-grid">
+                    <article class="hhc-path-card hhc-path-card--map">
+                        <div class="hhc-path-emoji">🗺️</div>
+                        <div class="hhc-path-content">
+                            <span class="hhc-path-level">שלב 1 · בסיס</span>
+                            <h4>מפת המשפט</h4>
+                            <p>ממפים מה קרה בפועל, מה הסיפור הפנימי, ומה המשפט מנסה להשיג — לפני שבוחרים מה לשאול.</p>
+                        </div>
+                        <button type="button" class="hhc-path-btn" data-nav-key="sentenceMap">
+                            התחל ←
+                        </button>
+                    </article>
+
+                    <article class="hhc-path-card hhc-path-card--identify">
+                        <div class="hhc-path-emoji">🔎</div>
+                        <div class="hhc-path-content">
+                            <span class="hhc-path-level">שלב 2 · זיהוי</span>
+                            <h4>תרגול זיהוי</h4>
+                            <p>משפט אחד בכל סבב — חדד זיהוי, קבל משוב מיידי, ובנה רפלקס שאלה מדויקת בזמן אמת.</p>
+                        </div>
+                        <button type="button" class="hhc-path-btn" data-nav-key="practiceQuestion">
+                            לתרגול ←
+                        </button>
+                    </article>
+
+                    <article class="hhc-path-card hhc-path-card--scenario">
+                        <div class="hhc-path-emoji">🎭</div>
+                        <div class="hhc-path-content">
+                            <span class="hhc-path-level">שלב 3 · שיחה חיה</span>
+                            <h4>סימולטור סצנות</h4>
+                            <p>בחר/י תגובה, ראה/י איך היא נוחתת, ופתח/י את העומק שמאחוריה — בתוך שיחה אמיתית.</p>
+                        </div>
+                        <a class="hhc-path-btn" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">
+                            פתח סצנה ↗
+                        </a>
+                    </article>
+
+                    <article class="hhc-path-card hhc-path-card--depth">
+                        <div class="hhc-path-emoji">🔬</div>
+                        <div class="hhc-path-content">
+                            <span class="hhc-path-level">עומק · מחקר</span>
+                            <h4>מעבדת פריזמות</h4>
+                            <p>חקירה שכבתית סביב מילה אחת — עם רמות לוגיות, דפוסים, וצעד המשך פרקטי לשיחה.</p>
+                        </div>
+                        <button type="button" class="hhc-path-btn" data-nav-key="prismLab">
+                            פתח מעבדה ←
+                        </button>
+                    </article>
+                </div>
             </section>
+            <!-- ═══ /BOLD FEATURE PATHS ═══ -->
 
             <section class="home-route-primary-cta home-route-desktop-only">
                 <div class="home-route-primary-grid">
