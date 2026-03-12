@@ -2796,7 +2796,7 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: 'קרא/י את המשפט, נסח/י שאלה מדויקת, ובדוק/י עם המשוב.'
     }),
     'practice-radar': Object.freeze({
-        logic: 'הדף הזה מאמן זיהוי תבניות בזמן אמת עם לחץ ׳–מן.',
+        logic: 'הדף הזה מאמן זיהוי תבניות בזמן אמת עם לחץ זמן.',
         goal: 'לחזק רפלקס דיוק מהיר במונולוג חי.',
         approach: 'ראה/י את ההיילייט, בחר/י תבנית במהירות, ובדוק/י מה לתקן בסיכום.'
     }),
@@ -9888,7 +9888,7 @@ const RAPID_PATTERN_CUES = Object.freeze([
         id: 'rp_relationship_5',
         type: 'זוגיות',
         monologue: 'אי אפשר לדבר איתו על כסף בלי פיצוץ, אז אני כבר מראש מוותר ונכנס לשקט.',
-        highlight: 'אי אפשר לדבר איתו על ׳›סף',
+        highlight: 'אי אפשר לדבר איתו על כסף',
         patternId: 'modal_possibility',
         acceptedPatterns: ['modal_possibility', 'modal_operator']
     }),
@@ -9950,7 +9950,7 @@ const RAPID_PATTERN_CUES = Object.freeze([
     }),
     Object.freeze({
         id: 'rp_money_1',
-        type: '׳›סף',
+        type: 'כסף',
         monologue: 'כשאני מסתכל על חשבון הבנק, זה תמיד קורה לי דווקא בזמן הכי לא נוח ואני מתנתק מכל תכנון.',
         highlight: 'זה תמיד קורה לי',
         patternId: 'universal_quantifier',
@@ -9958,7 +9958,7 @@ const RAPID_PATTERN_CUES = Object.freeze([
     }),
     Object.freeze({
         id: 'rp_money_2',
-        type: '׳›סף',
+        type: 'כסף',
         monologue: 'אני אומר לעצמי שזה חייב להיות ככה ואין שום אפשרות אחרת, אז אני לא בודק חלופות בכלל.',
         highlight: 'זה חייב להיות ככה ואין שום אפשרות אחרת',
         patternId: 'modal_operator',
@@ -10733,7 +10733,7 @@ function buildRapidPatternHelpHtml(cue) {
 
     return `
         <p><strong>איך לחשוב כאן:</strong> קודם מסתכלים על המילה המודגשת, ורק אחר כך בוחרים כפתור.</p>
-        <p><strong>רמז מהיר:</strong> "${escapeHtml(highlight)}" מצביע בדרך ׳›לל על <strong>${escapeHtml(label)}</strong>.</p>
+        <p><strong>רמז מהיר:</strong> "${escapeHtml(highlight)}" מצביע בדרך כלל על <strong>${escapeHtml(label)}</strong>.</p>
         <p><strong>למה:</strong> ${escapeHtml(hint)}.</p>
         <p><strong>תהליך 3 צעדים:</strong> טריגר מודגש -> זיהוי סוג ההפרה -> בחירת תבנית אחת מתוך 15.</p>
     `;
@@ -11872,7 +11872,7 @@ function handleWrinkleChallengeChoice(selectedKey, button) {
     button.disabled = true;
     button.classList.add('is-wrong');
     const fold = getWrinkleFoldByKey(card.foldKey);
-    setWrinkleFeedback(`כמעט. שאלת העוגן המדויקת ׳›אן: "${fold?.challengeQuestion || ''}"`, 'warn');
+    setWrinkleFeedback(`כמעט. שאלת העוגן המדויקת כאן: "${fold?.challengeQuestion || ''}"`, 'warn');
     playUISound('wrong');
 }
 
@@ -12183,7 +12183,7 @@ function showLegacyPracticeHint() {
     const hints = {
         'DELETION': '🔍 מחפשים את המידע החסר - מי? מה? לפי מי?',
         'DISTORTION': '🔄 מחפשים את השינוי או ההנחה - מה כאן לא בדיוק? מה מוכן?',
-        'GENERALIZATION': '📈 מחפשים את ההכללה - באמת תמיד? באמת אף ׳₪עם?'
+        'GENERALIZATION': '📈 מחפשים את ההכללה - באמת תמיד? באמת אף פעם?'
     };
     
     const difficultyHint = {
@@ -12505,7 +12505,7 @@ function buildDeletionCoachOptionSet(question) {
         lowQuestion = 'אפשר לתת עוד דוגמה להשוואה?';
     } else if (subtype.includes('referential')) {
         highQuestion = 'מי בדיוק אמר/קבע/חושב את זה, ואיזה מקור יש לכך?';
-        mediumQuestion = 'על אילו אנשים או גורמים מדובר ׳›אן?';
+        mediumQuestion = 'על אילו אנשים או גורמים מדובר כאן?';
         lowQuestion = 'יש עוד מישהו שקשור לזה?';
     } else if (subtype.includes('simple')) {
         highQuestion = 'מה בדיוק לא טוב, לפי מי, ובאיזה קריטריון זה נמדד?';
@@ -12551,7 +12551,7 @@ function buildDeletionCoachOptionSet(question) {
             quality: 'offtrack',
             purpose: 'בדיקת פרשנות/סיבתיות (לא מחיקה)',
             questionText: 'איך אתה יודע שזה נכון ומה ההוכחה לכך?',
-            why: 'זו שאלה על עיוות ולא על מידע ׳—סר.'
+            why: 'זו שאלה על עיוות ולא על מידע חסר.'
         },
         {
             id: 'N2',
@@ -12565,7 +12565,7 @@ function buildDeletionCoachOptionSet(question) {
             id: 'N3',
             focus: 'NON_DELETION',
             quality: 'offtrack',
-            purpose: 'קפיצה לפתרון בלי למפות מידע ׳—סר',
+            purpose: 'קפיצה לפתרון בלי למפות מידע חסר',
             questionText: 'מה כדאי לעשות עכשיו כדי לפתור את זה מהר?',
             why: 'שאלת פתרון מוקדם בלי לחשוף קודם את המידע החסר.'
         }
@@ -12880,7 +12880,7 @@ function showTrainerHint() {
         GENERALIZATION: 'בדוק מילים מוחלטות כמו תמיד/אף פעם/כולם/אי אפשר.'
     }[categoryKey] || 'בדוק איזו מילה במשפט סוגרת אפשרויות.';
 
-    const triggerWords = ['תמיד', 'אף ׳₪עם', 'כולם', 'חייב', 'לא יכול', 'גרם לי', 'יודע ש', 'ברור ש']
+    const triggerWords = ['תמיד', 'אף פעם', 'כולם', 'חייב', 'לא יכול', 'גרם לי', 'יודע ש', 'ברור ש']
         .filter(word => statementText.includes(word));
     const triggerLine = triggerWords.length
         ? `מילות טריגר במשפט: ${triggerWords.join(', ')}`
@@ -12906,7 +12906,7 @@ function showTrainerImportance() {
 
     if (trainerState.deletionCoachMode) {
         setPanelContent('why-display', `
-            <p><strong>מטרת השאלה ׳›אן:</strong></p>
+            <p><strong>מטרת השאלה כאן:</strong></p>
             <p>לא רק לזהות שיש מחיקה, אלא לבחור את שאלת המחיקה שחושפת את המידע החסר הכי משמעותי להבנה ולפעולה.</p>
             <p><strong>איך מודדים איכות?</strong></p>
             <ul>
@@ -12955,10 +12955,10 @@ function showTrainerDepth() {
     }
 
     const depthTrack = {
-        easy: ['שלב 1: זהה מילה בעייתית.', 'שלב 2: שאל מה ׳—סר.', 'שלב 3: נסח שאלה אחת מדויקת.'],
+        easy: ['שלב 1: זהה מילה בעייתית.', 'שלב 2: שאל מה חסר.', 'שלב 3: נסח שאלה אחת מדויקת.'],
         medium: ['שלב 1: זהה הנחה סמויה.', 'שלב 2: בדוק ראיות.', 'שלב 3: נסח חלופה מדויקת.'],
         hard: ['שלב 1: זהה דפוס שפה.', 'שלב 2: מפה רמות לוגיות (סביבה/התנהגות/יכולות/ערכים/זהות/שייכות) בקצרה.', 'שלב 3: בחר Small Win להתקדמות.']
-    }[question.difficulty] || ['שלב 1: זהה דפוס.', 'שלב 2: שאל מה ׳—סר.', 'שלב 3: בנה שאלה מדויקת.'];
+    }[question.difficulty] || ['שלב 1: זהה דפוס.', 'שלב 2: שאל מה חסר.', 'שלב 3: בנה שאלה מדויקת.'];
 
     setPanelContent('depth-display', `
         <p><strong>עומק מומלץ לשאלה:</strong></p>
@@ -16937,7 +16937,7 @@ function attachMappingDropHandlers() {
 
             const expectedLevel = getExpectedLevelFromInput(inp);
             if (inp.dataset.suggestedLevel && inp.dataset.suggestedLevel !== expectedLevel) {
-                setMappingInputStatus(inp, 'mismatch', `התוכן נראה כמו ${getLevelDisplay(inp.dataset.suggestedLevel)} ׳•לא ${getLevelDisplay(expectedLevel)}.`);
+                setMappingInputStatus(inp, 'mismatch', `התוכן נראה כמו ${getLevelDisplay(inp.dataset.suggestedLevel)} ולא ${getLevelDisplay(expectedLevel)}.`);
             } else {
                 clearMappingInputStatus(inp);
             }
@@ -18402,7 +18402,7 @@ const CEFLOW_EXPRESSION_MAP = Object.freeze({
 
 const CEFLOW_FALLBACKS = Object.freeze({
     angry: Object.freeze({
-        tone: 'danger', label: '׳›עס', emoji: '😡',
+        tone: 'danger', label: 'כעס', emoji: '😡',
         counterReply: 'אני נסגר/ת כשמדברים אליי ככה.',
         interpretation: 'תגובה אימפולסיבית הגבירה בושה וסגרה זרימת מידע.',
         impact: Object.freeze({ stats: Object.freeze({ flow: 24, agency: 20, shame: 88 }), xrayTags: Object.freeze(['😳 בושה', '🚪 סגירה']), microOutcome: Object.freeze(['📉 זרימה', '🧱 תקיעה', '🔒 הימנעות']) })
@@ -21210,7 +21210,7 @@ const WR2_SEED_SCENES = Object.freeze([
         visibleSentence: 'אני חייב להספיק הכל היום',
         template: 'אני חייב {Q} להספיק הכל היום',
         quantifiers: Object.freeze(['בכל תנאי', 'בלי לנשום', 'גם כשאני מותש', 'לא משנה מה המחיר']),
-        transformedSentence: 'אני בוחר להתמקד במה שחשוב היום, צעד אחד בכל ׳₪עם.'
+        transformedSentence: 'אני בוחר להתמקד במה שחשוב היום, צעד אחד בכל פעם.'
     }),
     Object.freeze({
         id: 'wr2_seed_3',
@@ -21264,7 +21264,7 @@ function wr2InferQuantifiers(sentence) {
         return ['אף פעם', 'בשום מצב רגשי', 'בשום סיטואציה', 'בשום צורה'];
     }
     if (/(תמיד|כל הזמן|אף פעם|כולם|אף אחד)/.test(normalized)) {
-        return ['בכל מצב', 'ללא יוצא דופן', 'עם כולם', 'בכל ׳–מן'];
+        return ['בכל מצב', 'ללא יוצא דופן', 'עם כולם', 'בכל זמן'];
     }
     if (/(חייב|צריך|אין ברירה|מוכרח)/.test(normalized)) {
         return ['בכל תנאי', 'ללא בחירה', 'גם כשאני עייף', 'לא משנה מה'];

@@ -28,8 +28,8 @@
         Object.freeze({ id: 'arms', label: 'כתפיים', locative: 'בכתפיים', top: '35%', left: '24%' }),
         Object.freeze({ id: 'heart', label: 'לב', locative: 'בלב', top: '42%', left: '32%' })
     ]);
-    const ABSOLUTE_RE = /(׳×׳׳™׳“|׳׳£ ׳₪׳¢׳|׳׳£-׳₪׳¢׳|׳›׳•׳׳|׳׳£ ׳׳—׳“|׳׳’׳׳¨׳™|׳׳™׳ ׳׳¦׳‘|׳׳™׳ ׳׳™ ׳“׳¨׳|׳‘׳©׳•׳ ׳“׳¨׳|׳׳¢׳•׳׳ ׳׳|׳₪׳©׳•׳˜)/;
-    const REFERENTIAL_RE = /(׳”׳•׳|׳”׳™׳|׳”׳|׳”׳|׳–׳”|׳–׳׳×|׳׳׳”|׳׳׳•)/;
+    const ABSOLUTE_RE = /(תמיד|אף פעם|אף-פעם|כולם|אף אחד|לגמרי|אין מצב|אין לי דרך|בשום דרך|לעולם לא|פשוט)/;
+    const REFERENTIAL_RE = /(הוא|היא|הם|הן|זה|זאת|אלה|אלו)/;
     const STOP_WORDS = new Set(['אני', 'אתה', 'את', 'הוא', 'היא', 'הם', 'הן', 'אנחנו', 'זה', 'זאת', 'של', 'על', 'עם', 'כי', 'אותי', 'לי', 'לו', 'לה', 'גם']);
     const SEED_CASES = Object.freeze([
         Object.freeze({
@@ -154,10 +154,10 @@
         const congruenceById = (levelId) => CONGRUENCE_LEVELS.find((item) => item.id === levelId) || CONGRUENCE_LEVELS[0];
         const getCongruenceTakeaway = (levelId) => {
             const key = congruenceById(levelId).id;
-            if (key === 'yes') return '׳׳” ׳׳׳“׳×׳™ ׳׳”׳‘׳—׳™׳¨׳” ׳”׳–׳•? ׳”׳׳©׳₪׳˜ ׳׳—׳‘׳¨ ׳‘׳™׳ ׳₪׳ ׳™׳ ׳׳—׳•׳¥, ׳•׳׳₪׳©׳¨ ׳׳¢׳‘׳•׳¨ ׳׳×׳•׳‘׳ ׳”.';
-            if (key === 'almost') return '׳׳” ׳׳׳“׳×׳™ ׳׳”׳‘׳—׳™׳¨׳” ׳”׳–׳•? ׳”׳›׳™׳•׳•׳ ׳ ׳›׳•׳, ׳•׳¢׳›׳©׳™׳• ׳¦׳¨׳™׳ ׳׳™׳˜׳•׳© ׳§׳˜׳ ׳‘׳׳™׳׳™׳.';
-            if (key === 'close') return '׳׳” ׳׳׳“׳×׳™ ׳׳”׳‘׳—׳™׳¨׳” ׳”׳–׳•? ׳™׳© ׳‘׳¡׳™׳¡ ׳˜׳•׳‘, ׳׳‘׳ ׳¢׳“׳™׳™׳ ׳—׳¡׳¨ ׳“׳™׳•׳§ ׳©׳™׳—׳‘׳¨ ׳”׳›׳•׳.';
-            return '׳׳” ׳׳׳“׳×׳™ ׳׳”׳‘׳—׳™׳¨׳” ׳”׳–׳•? ׳”׳׳©׳₪׳˜ ׳¢׳“׳™׳™׳ ׳׳ ׳™׳•׳©׳‘, ׳•׳׳›׳ ׳—׳•׳–׳¨׳™׳ ׳׳׳™׳˜׳•׳© ׳”׳’׳©׳¨.';
+            if (key === 'yes') return 'מה למדתי מהבחירה הזו? המשפט מחבר בין פנים לחוץ, ואפשר לעבור לתובנה.';
+            if (key === 'almost') return 'מה למדתי מהבחירה הזו? הכיוון נכון, ועכשיו צריך ליטוש קטן במילים.';
+            if (key === 'close') return 'מה למדתי מהבחירה הזו? יש בסיס טוב, אבל עדיין חסר דיוק שיחבר הכול.';
+            return 'מה למדתי מהבחירה הזו? המשפט עדיין לא יושב, ולכן חוזרים לליטוש הגשר.';
         };
 
         function inferHotPhrases(sentence, seed) {
@@ -272,7 +272,7 @@
             return '';
         }
 
-        function normalizeOuterForTemplate(text, prefix = '׳›׳©') {
+        function normalizeOuterForTemplate(text, prefix = 'כש') {
             const normalized = trimText(text, 180).replace(/[.]+$/, '');
             if (!normalized) return '';
             if (/^(כש|במצבים ש|לא תמיד, אבל כש|ברגעים שבהם)/.test(normalized)) return normalized;
@@ -301,19 +301,19 @@
             const original = normalize(state.originalSentence);
             if (!original) return [];
             const insights = [
-                '׳”׳׳©׳₪׳˜ ׳”׳׳§׳•׳¨׳™ ׳”׳™׳” ׳›׳•׳×׳¨׳× ׳“׳—׳•׳¡׳”; ׳›׳׳ ׳₪׳™׳¦׳׳ ׳• ׳‘׳™׳ ׳׳” ׳©׳§׳•׳¨׳” ׳‘׳—׳•׳¥ ׳׳‘׳™׳ ׳׳” ׳©׳ ׳”׳™׳” ׳‘׳₪׳ ׳™׳.'
+                'המשפט המקורי היה כותרת דחוסה; כאן פיצלנו בין מה שקורה בחוץ לבין מה שנהיה בפנים.'
             ];
             if (ABSOLUTE_RE.test(original)) {
-                insights.push('׳ ׳—׳©׳£ ׳›׳׳× ׳ ׳¡׳×׳¨ ׳׳• ׳׳•׳—׳׳˜׳•׳× ׳¡׳׳•׳™׳”, ׳•׳¢׳›׳©׳™׳• ׳™׳© ׳׳×׳™, ׳׳™׳₪׳” ׳•׳›׳׳” ׳‘׳׳§׳•׳ ׳›׳•׳×׳¨׳× ׳›׳•׳׳׳×.');
+                insights.push('נחשף כמת נסתר או מוחלטות סמויה, ועכשיו יש מתי, איפה וכמה במקום כותרת כוללת.');
             }
             if (state.outerFragments.length) {
-                insights.push('׳ ׳•׳¡׳₪׳” ׳©׳›׳‘׳× ׳—׳•׳¥: ׳׳™׳¨׳•׳¢׳™׳ ׳ ׳¦׳₪׳™׳, ׳–׳׳ ׳™׳, ׳”׳§׳©׳¨ ׳•׳׳” ׳©׳ ׳׳׳¨ ׳׳• ׳׳ ׳ ׳׳׳¨ ׳‘׳₪׳•׳¢׳.');
+                insights.push('נוספה שכבת חוץ: אירועים נצפים, זמנים, הקשר ומה שנאמר או לא נאמר בפועל.');
             }
             if (state.innerFragments.length) {
-                insights.push('׳ ׳•׳¡׳₪׳” ׳©׳›׳‘׳× ׳₪׳ ׳™׳: ׳×׳—׳•׳©׳”, ׳×׳—׳•׳©׳× ׳’׳•׳£, ׳“׳™׳׳•׳™ ׳׳• ׳׳©׳׳¢׳•׳× ׳©׳—׳•׳–׳¨׳× ׳‘׳¨׳’׳¢׳™׳ ׳”׳׳׳”.');
+                insights.push('נוספה שכבת פנים: תחושה, תחושת גוף, דימוי או משמעות שחוזרת ברגעים האלה.');
             }
             if (REFERENTIAL_RE.test(original)) {
-                insights.push('׳”׳—׳•׳•׳™׳” ׳”׳₪׳ ׳™׳׳™׳× ׳›׳‘׳¨ ׳׳ ׳׳•׳¦׳’׳× ׳›׳¢׳•׳‘׳“׳” ׳¢׳ ׳׳“׳ ׳׳—׳¨, ׳׳׳ ׳׳§׳‘׳׳× ׳ ׳™׳¡׳•׳— ׳ ׳₪׳¨׳“ ׳•׳׳“׳•׳™׳§ ׳™׳•׳×׳¨.');
+                insights.push('החוויה הפנימית כבר לא מוצגת כעובדה על אדם אחר, אלא מקבלת ניסוח נפרד ומדויק יותר.');
             }
             return uniqueTexts(insights, 4);
         }
@@ -327,7 +327,7 @@
             if ((state.congruenceLevel === 'almost' || state.congruenceLevel === 'close') && inner) {
                 return `מה עוד חסר במשפט כדי שגם ${inner.replace(/[.]+$/, '')} יקבל מקום בלי למחוק את מה שקורה בחוץ?`;
             }
-            return '׳׳” ׳¢׳•׳“ ׳¦׳¨׳™׳ ׳׳”׳™׳›׳ ׳¡ ׳׳׳©׳₪׳˜ ׳›׳“׳™ ׳©׳”׳•׳ ׳™׳™׳©׳‘ ׳’׳ ׳‘׳’׳•׳£ ׳•׳’׳ ׳‘׳׳¦׳™׳׳•׳×?';
+            return 'מה עוד צריך להיכנס למשפט כדי שהוא יישב גם בגוף וגם במציאות?';
         }
 
         function getCompletions() {
@@ -473,14 +473,14 @@
         function getGuideCopy() {
             const congruence = congruenceById(state.congruenceLevel);
             const map = {
-                sentence: '׳™׳© ׳›׳׳ ׳׳©׳”׳• ׳“׳—׳•׳¡. ׳‘׳•׳ ׳ ׳’׳׳” ׳׳” ׳—׳¡׳¨ ׳›׳“׳™ ׳©׳–׳” ׳™׳×׳׳™׳ ׳׳׳” ׳©׳§׳•׳¨׳”.',
-                outer: '׳‘׳•׳ ׳ ׳‘׳“׳•׳§ ׳׳” ׳§׳•׳¨׳” ׳‘׳—׳•׳¥ ׳›׳©׳–׳” ׳ ׳”׳™׳” ׳ ׳›׳•׳.',
-                inner: '׳•׳¢׳›׳©׳™׳•, ׳׳” ׳ ׳”׳™׳” ׳‘׳ ׳‘׳¨׳’׳¢׳™׳ ׳”׳׳׳”?',
-                bridge: '׳ ׳ ׳¡׳” ׳׳׳¦׳•׳ ׳ ׳™׳¡׳•׳— ׳©׳™׳•׳©׳‘ ׳’׳ ׳‘׳₪׳ ׳™׳ ׳•׳’׳ ׳‘׳׳¦׳™׳׳•׳×.',
+                sentence: 'יש כאן משהו דחוס. בוא נגלה מה חסר כדי שזה יתאים למה שקורה.',
+                outer: 'בוא נבדוק מה קורה בחוץ כשזה נהיה נכון.',
+                inner: 'ועכשיו, מה נהיה בך ברגעים האלה?',
+                bridge: 'ננסה למצוא ניסוח שיושב גם בפנים וגם במציאות.',
                 congruence: congruence.id === 'yes'
-                    ? '׳›׳. ׳¢׳›׳©׳™׳• ׳–׳” ׳›׳‘׳¨ ׳ ׳©׳׳¢ ׳›׳׳• ׳׳” ׳©׳”׳×׳›׳•׳•׳ ׳×, ׳׳ ׳¨׳§ ׳›׳׳• ׳”׳›׳•׳×׳¨׳× ׳©׳ ׳–׳”.'
-                    : '׳׳ ׳׳×׳§׳ ׳™׳ ׳¢׳“׳™׳™׳. ׳§׳•׳“׳ ׳™׳•׳¦׳¨׳™׳ ׳”׳׳™׳׳”.',
-                insight: '׳¨׳§ ׳¢׳›׳©׳™׳• ׳׳₪׳©׳¨ ׳׳¨׳׳•׳× ׳׳” ׳”׳™׳” ׳—׳¡׳¨ ׳‘׳׳©׳₪׳˜ ׳”׳׳§׳•׳¨׳™, ׳‘׳׳™ ׳׳§׳˜׳•׳ ׳׳× ׳”׳—׳•׳•׳™׳”.'
+                    ? 'כן. עכשיו זה כבר נשמע כמו מה שהתכוונת, לא רק כמו הכותרת של זה.'
+                    : 'לא מתקנים עדיין. קודם יוצרים הלימה.',
+                insight: 'רק עכשיו אפשר לראות מה היה חסר במשפט המקורי, בלי לקטול את החוויה.'
             };
             return map[state.activeStage] || map.sentence;
         }
@@ -513,14 +513,14 @@
 
         function renderFragmentTray(items, activeValue, kind) {
             if (!items.length) {
-                return `<p class="flb-empty-note">עוד לא אספנו ניסוח ${kind === 'outer' ? '׳—׳™׳¦׳•׳ ׳™' : '׳₪׳ ׳™׳׳™'}.</p>`;
+                return `<p class="flb-empty-note">עוד לא אספנו ניסוח ${kind === 'outer' ? 'חיצוני' : 'פנימי'}.</p>`;
             }
             return `
                 <div class="flb-fragment-tray">
                     ${items.map((item) => `
                         <span class="flb-fragment-pill${activeValue === item ? ' is-active' : ''}">
                             <button type="button" data-action="set-active-${kind}" data-value="${html(item)}">${html(item)}</button>
-                            <button type="button" class="flb-fragment-pill__remove" data-action="remove-${kind}" data-value="${html(item)}" aria-label="׳”׳¡׳¨">ֳ—</button>
+                            <button type="button" class="flb-fragment-pill__remove" data-action="remove-${kind}" data-value="${html(item)}" aria-label="הסר">ֳ—</button>
                         </span>
                     `).join('')}
                 </div>
@@ -533,7 +533,7 @@
                 <div class="flb-suggestion-grid">
                     ${items.map((item) => `
                         <button type="button" class="flb-suggestion-card${selectedItems.includes(item) ? ' is-selected' : ''}" data-action="add-${kind}" data-value="${html(item)}">
-                            <span>${kind === 'outer' ? '׳—׳•׳¥' : '׳₪׳ ׳™׳'}</span>
+                            <span>${kind === 'outer' ? 'חוץ' : 'פנים'}</span>
                             <strong>${html(item)}</strong>
                         </button>
                     `).join('')}
@@ -577,7 +577,7 @@
                                 <button type="button" class="flb-choice-chip${state.hotPhrase === phrase ? ' is-active' : ''}" data-action="set-hot-phrase" data-value="${html(phrase)}">${html(phrase)}</button>
                             `).join('')}
                         </div>
-                        <p class="flb-hot-note">כרגע עצרנו על: <strong>${html(state.hotPhrase || '׳‘׳—׳¨/׳™ ׳‘׳™׳˜׳•׳™')}</strong></p>
+                        <p class="flb-hot-note">כרגע עצרנו על: <strong>${html(state.hotPhrase || 'בחר/י ביטוי')}</strong></p>
                     </div>
                 </section>
             `;
@@ -668,7 +668,7 @@
 
                             <div class="flb-preview-card">
                                 <span>שורת felt-sense שנבנית עכשיו</span>
-                                <strong>${html(innerPreview || '׳‘׳—׳¨/׳™ ׳׳–׳•׳¨, ׳’׳•׳•׳ ׳׳• ׳“׳™׳׳•׳™ ׳›׳“׳™ ׳׳™׳™׳¦׳¨ ׳׳©׳₪׳˜ ׳₪׳ ׳™׳׳™ ׳§׳˜׳.')}</strong>
+                                <strong>${html(innerPreview || 'בחר/י אזור, גוון או דימוי כדי לייצר משפט פנימי קטן.')}</strong>
                                 <button type="button" class="btn btn-secondary" data-action="commit-inner-preview" ${innerPreview ? '' : 'disabled'}>הוסף לפנים</button>
                             </div>
                         </div>
@@ -718,13 +718,13 @@
                             <span>חוץ</span>
                             ${state.outerFragments.length ? state.outerFragments.map((item) => `
                                 <button type="button" class="flb-token${primaryOuter === item ? ' is-active' : ''}" data-action="set-active-outer" data-value="${html(item)}">${html(item)}</button>
-                            `).join('') : '<p class="flb-empty-note">׳‘׳—׳¨/׳™ ׳ ׳™׳¡׳•׳— ׳—׳•׳¥ ׳׳—׳“ ׳׳₪׳—׳•׳×.</p>'}
+                            `).join('') : '<p class="flb-empty-note">בחר/י ניסוח חוץ אחד לפחות.</p>'}
                         </div>
                         <div class="flb-token-group flb-token-group--inner">
                             <span>פנים</span>
                             ${state.innerFragments.length ? state.innerFragments.map((item) => `
                                 <button type="button" class="flb-token${primaryInner === item ? ' is-active' : ''}" data-action="set-active-inner" data-value="${html(item)}">${html(item)}</button>
-                            `).join('') : '<p class="flb-empty-note">׳‘׳—׳¨/׳™ ׳ ׳™׳¡׳•׳— ׳₪׳ ׳™׳ ׳׳—׳“ ׳׳₪׳—׳•׳×.</p>'}
+                            `).join('') : '<p class="flb-empty-note">בחר/י ניסוח פנים אחד לפחות.</p>'}
                         </div>
                     </div>
 
@@ -734,7 +734,7 @@
                                 <span>טיוטת גשר</span>
                                 <strong>${html(item)}</strong>
                             </button>
-                        `).join('') : '<p class="flb-empty-note">׳›׳“׳™ ׳׳‘׳ ׳•׳× ׳˜׳™׳•׳˜׳•׳×, ׳¦׳¨׳™׳ ׳׳₪׳—׳•׳× ׳ ׳™׳¡׳•׳— ׳׳—׳“ ׳‘׳—׳•׳¥ ׳•׳׳—׳“ ׳‘׳₪׳ ׳™׳.</p>'}
+                        `).join('') : '<p class="flb-empty-note">כדי לבנות טיוטות, צריך לפחות ניסוח אחד בחוץ ואחד בפנים.</p>'}
                     </div>
 
                     <label class="flb-field">
@@ -765,7 +765,7 @@
                     </div>
 
                     <div class="flb-landing-card flb-landing-card--${html(congruence.id)}">
-                        <p class="flb-landing-sentence">${html(bridgeValue || '׳‘׳—׳¨/׳™ ׳׳• ׳ ׳¡׳—/׳™ ׳׳©׳₪׳˜ ׳’׳©׳¨ ׳§׳•׳“׳.')}</p>
+                        <p class="flb-landing-sentence">${html(bridgeValue || 'בחר/י או נסח/י משפט גשר קודם.')}</p>
                         <div class="flb-meter-scale">
                             ${CONGRUENCE_LEVELS.map((item) => `
                                 <button type="button" class="flb-meter-chip${state.congruenceLevel === item.id ? ' is-active' : ''}" data-action="set-congruence" data-value="${html(item.id)}">
@@ -810,11 +810,11 @@
                         </article>
                         <article class="flb-insight-card">
                             <span>שאלה שכדאי לשאול</span>
-                            <strong>${html(state.nextQuestion || '׳׳” ׳¢׳•׳“ ׳¦׳¨׳™׳ ׳›׳“׳™ ׳©׳”׳׳©׳₪׳˜ ׳”׳–׳” ׳™׳™׳©׳‘?')}</strong>
+                            <strong>${html(state.nextQuestion || 'מה עוד צריך כדי שהמשפט הזה יישב?')}</strong>
                         </article>
                         <article class="flb-insight-card">
                             <span>ניסוח שכדאי לומר בקול</span>
-                            <strong>${html(sayOutLoud || '׳‘׳—׳¨/׳™ ׳§׳•׳“׳ ׳ ׳™׳¡׳•׳— ׳’׳©׳¨ ׳©׳׳¨׳’׳™׳© ׳™׳•׳©׳‘.')}</strong>
+                            <strong>${html(sayOutLoud || 'בחר/י קודם ניסוח גשר שמרגיש יושב.')}</strong>
                         </article>
                     </div>
                 </section>
@@ -831,7 +831,7 @@
                         </div>
                         <div class="flb-world__body">
                             <p class="flb-sentence-display">${highlightSentence(state.originalSentence, state.hotPhrase)}</p>
-                            <p class="flb-world__meta">הביטוי החי כרגע: <strong>${html(state.hotPhrase || '׳‘׳—׳¨/׳™ ׳‘׳™׳˜׳•׳™')}</strong></p>
+                            <p class="flb-world__meta">הביטוי החי כרגע: <strong>${html(state.hotPhrase || 'בחר/י ביטוי')}</strong></p>
                         </div>
                         <button type="button" class="flb-world__cta" data-action="go-stage" data-stage="sentence">לעבוד על המשפט</button>
                     </article>
@@ -845,8 +845,8 @@
                             <strong>מה נהיה בי</strong>
                         </div>
                         <div class="flb-world__body">
-                            <p>${html(getPrimaryInner() || '׳¢׳•׳“ ׳׳ ׳׳¡׳₪׳ ׳• ׳ ׳™׳¡׳•׳— ׳₪׳ ׳™׳׳™.')}</p>
-                            <p class="flb-world__meta">אזור נוכחי: <strong>${html(zoneById(state.selectedInnerZone)?.locative || '׳׳׳ ׳׳–׳•׳¨')}</strong></p>
+                            <p>${html(getPrimaryInner() || 'עוד לא אספנו ניסוח פנימי.')}</p>
+                            <p class="flb-world__meta">אזור נוכחי: <strong>${html(zoneById(state.selectedInnerZone)?.locative || 'ללא אזור')}</strong></p>
                         </div>
                         <button type="button" class="flb-world__cta" data-action="go-stage" data-stage="inner" ${!canOpenStage('inner') ? 'disabled' : ''}>לעבוד על הפנים</button>
                     </article>
@@ -860,7 +860,7 @@
                             <strong>מה קורה במציאות</strong>
                         </div>
                         <div class="flb-world__body">
-                            <p>${html(getPrimaryOuter() || '׳¢׳•׳“ ׳׳ ׳׳¡׳₪׳ ׳• ׳ ׳™׳¡׳•׳— ׳—׳™׳¦׳•׳ ׳™.')}</p>
+                            <p>${html(getPrimaryOuter() || 'עוד לא אספנו ניסוח חיצוני.')}</p>
                             <p class="flb-world__meta">המטרה כאן: לתפוס רגע, התנהגות, או הקשר שאפשר לראות.</p>
                         </div>
                         <button type="button" class="flb-world__cta" data-action="go-stage" data-stage="outer" ${!canOpenStage('outer') ? 'disabled' : ''}>לעבוד על החוץ</button>
@@ -875,7 +875,7 @@
                         <strong>${html(congruence.label)}</strong>
                     </div>
                     <div class="flb-world__body">
-                        <p>${html(trimText(state.bridgeEditorDraft || state.selectedBridgeDraft || '׳›׳׳ ׳ ׳‘׳ ׳” ׳׳× ׳”׳׳©׳₪׳˜ ׳”׳׳©׳•׳׳‘.', 220))}</p>
+                        <p>${html(trimText(state.bridgeEditorDraft || state.selectedBridgeDraft || 'כאן נבנה את המשפט המשולב.', 220))}</p>
                         <p class="flb-world__meta">${html(congruence.note)}</p>
                     </div>
                     <button type="button" class="flb-world__cta" data-action="go-stage" data-stage="bridge" ${!canOpenStage('bridge') ? 'disabled' : ''}>לעבוד על הגשר</button>

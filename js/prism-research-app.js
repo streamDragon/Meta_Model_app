@@ -11,10 +11,10 @@
 
     const STORAGE_KEY = 'prism_research_mode_v1';
     const DEMO_STORY = [
-        '׳׳—׳¨ ׳™׳© ׳׳™ ׳©׳™׳—׳” ׳¢׳ ׳”׳׳ ׳”׳ ׳•׳׳ ׳™ ׳›׳‘׳¨ ׳׳¨׳’׳™׳©/׳” ׳©׳–׳” ׳”׳•׳׳ ׳׳”׳™׳’׳׳¨ ׳¨׳¢.',
-        '׳”׳•׳ ׳‘׳˜׳— ׳—׳•׳©׳‘ ׳©׳׳ ׳™ ׳׳ ׳׳§׳¦׳•׳¢׳™/׳× ׳›׳™ ׳‘׳©׳‘׳•׳¢ ׳©׳¢׳‘׳¨ ׳ ׳×׳§׳¢׳×׳™ ׳‘׳×׳©׳•׳‘׳” ׳׳—׳×.',
-        '׳׳ ׳™ ׳—׳™׳™׳‘/׳× ׳׳”׳™׳•׳× ׳׳•׳©׳׳/׳× ׳©׳, ׳׳—׳¨׳× ׳–׳” ׳׳•׳׳¨ ׳©׳׳ ׳™ ׳›׳™׳©׳׳•׳.',
-        '׳›׳ ׳₪׳¢׳ ׳©׳™׳© ׳©׳™׳—׳” ׳›׳–׳׳× ׳׳ ׳™ ׳ ׳¡׳’׳¨/׳× ׳•׳׳ ׳׳¦׳׳™׳—/׳” ׳׳”׳¡׳‘׳™׳¨ ׳׳× ׳¢׳¦׳׳™.'
+        'מחר יש לי שיחה עם המנהל ואני כבר מרגיש/ה שזה הולך להיגמר רע.',
+        'הוא בטח חושב שאני לא מקצועי/ת כי בשבוע שעבר נתקעתי בתשובה אחת.',
+        'אני חייב/ת להיות מושלם/ת שם, אחרת זה אומר שאני כישלון.',
+        'כל פעם שיש שיחה כזאת אני נסגר/ת ולא מצליח/ה להסביר את עצמי.'
     ].join(' ');
 
     const state = {
@@ -71,78 +71,78 @@
     const PRISM_CATEGORY_UI_OVERRIDES = Object.freeze({
         lost_performative: Object.freeze({
             side: 'outside',
-            titleHe: '׳׳—׳™׳§׳” ׳©׳™׳₪׳•׳˜׳™׳× (Lost Performative)',
-            shortLine: '׳׳™ ׳§׳‘׳¢? ׳¢׳ ׳¡׳׳ ׳׳”?'
+            titleHe: 'מחיקה שיפוטית (Lost Performative)',
+            shortLine: 'מי קבע? על סמך מה?'
         }),
         universal_quantifiers: Object.freeze({
             side: 'outside',
-            titleHe: '׳›׳׳×׳™׳ ׳›׳•׳׳׳ ׳™׳™׳ (Universal Quantifier)',
-            shortLine: '׳×׳׳™׳“/׳׳£ ׳₪׳¢׳? ׳”׳™׳§׳£ ׳•׳—׳¨׳™׳’׳™׳'
+            titleHe: 'כמתים כוללניים (Universal Quantifier)',
+            shortLine: 'תמיד/אף פעם? היקף וחריגים'
         }),
         nominalization: Object.freeze({
             side: 'outside',
-            titleHe: '׳ ׳•׳׳™׳ ׳׳™׳–׳¦׳™׳” (Nominalisation)',
-            shortLine: '׳׳”׳—׳–׳™׳¨ ׳×׳”׳׳™׳ ׳‘׳׳§׳•׳ ׳©׳ ׳¢׳¦׳ ׳§׳₪׳•׳'
+            titleHe: 'נומינליזציה (Nominalisation)',
+            shortLine: 'להחזיר תהליך במקום שם עצם קפוא'
         }),
         comparative_deletion: Object.freeze({
             side: 'outside',
-            titleHe: '׳”׳©׳•׳•׳׳” ׳—׳¡׳¨׳” (Comparative Deletion)',
-            shortLine: '׳‘׳™׳—׳¡ ׳׳׳”? ׳׳₪׳™ ׳׳™׳–׳” ׳§׳¨׳™׳˜׳¨׳™׳•׳?'
+            titleHe: 'השוואה חסרה (Comparative Deletion)',
+            shortLine: 'ביחס למה? לפי איזה קריטריון?'
         }),
         unspecified_noun: Object.freeze({
             side: 'outside',
-            titleHe: '׳©׳ ׳¢׳¦׳ ׳׳-׳׳₪׳ ׳” / ׳׳ ׳׳₪׳•׳¨׳˜',
-            shortLine: '׳׳™/׳׳” ׳‘׳“׳™׳•׳§ ׳–׳”?'
+            titleHe: 'שם עצם לא-מפנה / לא מפורט',
+            shortLine: 'מי/מה בדיוק זה?'
         }),
         simple_deletion: Object.freeze({
             side: 'outside',
-            titleHe: '׳׳—׳™׳§׳” ׳₪׳©׳•׳˜׳” (׳›׳•׳׳ ׳–׳׳/׳׳¨׳—׳‘ ׳—׳¡׳¨)',
-            shortLine: '׳׳” ׳—׳¡׳¨ ׳›׳“׳™ ׳׳”׳‘׳™׳ ׳׳× ׳”׳×׳׳•׳ ׳”?'
+            titleHe: 'מחיקה פשוטה (כולל זמן/מרחב חסר)',
+            shortLine: 'מה חסר כדי להבין את התמונה?'
         }),
         presuppositions: Object.freeze({
             side: 'outside',
-            titleHe: '׳”׳ ׳—׳•׳× ׳¡׳׳•׳™׳•׳× (Presuppositions)',
-            shortLine: '׳׳” ׳—׳™׳™׳‘ ׳׳”׳™׳•׳× ׳ ׳›׳•׳ ׳›׳“׳™ ׳©׳”׳׳©׳₪׳˜ ׳™׳—׳–׳™׳§?'
+            titleHe: 'הנחות סמויות (Presuppositions)',
+            shortLine: 'מה חייב להיות נכון כדי שהמשפט יחזיק?'
         }),
         mind_reading: Object.freeze({
             side: 'inside',
-            titleHe: '׳§׳¨׳™׳׳× ׳׳—׳©׳‘׳•׳× / ׳§׳₪׳™׳¦׳” ׳׳׳¡׳§׳ ׳•׳×',
-            shortLine: '׳›׳•׳׳ Mind-Reading ׳¢׳¦׳׳™: "׳׳™׳ ׳׳ ׳™ ׳™׳•׳“׳¢/׳×?"'
+            titleHe: 'קריאת מחשבות / קפיצה למסקנות',
+            shortLine: 'כולל Mind-Reading עצמי: "איך אני יודע/ת?"'
         }),
         modal_necessity: Object.freeze({
             side: 'inside',
-            titleHe: '׳׳•׳₪׳¨׳˜׳•׳¨ ׳׳•׳“׳׳™ - ׳”׳›׳¨׳— (Modal)',
-            shortLine: '׳—׳™׳™׳‘/׳¦׳¨׳™׳ - ׳׳” ׳”׳׳—׳™׳¨ ׳׳ ׳׳?'
+            titleHe: 'אופרטור מודלי - הכרח (Modal)',
+            shortLine: 'חייב/צריך - מה המחיר אם לא?'
         }),
         modal_possibility: Object.freeze({
             side: 'inside',
-            titleHe: '׳׳•׳₪׳¨׳˜׳•׳¨ ׳׳•׳“׳׳™ - ׳׳₪׳©׳¨׳•׳× (Modal)',
-            shortLine: '׳׳ ׳™׳›׳•׳/׳” - ׳׳” ׳׳•׳ ׳¢ ׳•׳׳” ׳™׳׳₪׳©׳¨?'
+            titleHe: 'אופרטור מודלי - אפשרות (Modal)',
+            shortLine: 'לא יכול/ה - מה מונע ומה יאפשר?'
         }),
         cause_effect: Object.freeze({
             side: 'inside',
-            titleHe: '׳¡׳™׳‘׳” ׳•׳×׳•׳¦׳׳” (Cause & Effect)',
-            shortLine: '׳׳™׳ ׳‘׳“׳™׳•׳§ X ׳’׳•׳¨׳ ׳-Y?'
+            titleHe: 'סיבה ותוצאה (Cause & Effect)',
+            shortLine: 'איך בדיוק X גורם ל-Y?'
         }),
         complex_equivalence: Object.freeze({
             side: 'inside',
-            titleHe: '׳©׳§׳™׳׳•׳× ׳׳•׳¨׳›׳‘׳× (Complex Equivalence)',
-            shortLine: '׳׳™׳ X ׳׳•׳׳¨ ׳©-Y?'
+            titleHe: 'שקילות מורכבת (Complex Equivalence)',
+            shortLine: 'איך X אומר ש-Y?'
         }),
         lack_ref_index: Object.freeze({
             side: 'inside',
-            titleHe: '׳—׳•׳¡׳¨ ׳׳™׳ ׳“׳§׳¡ ׳™׳™׳—׳•׳¡ (Referential Index)',
-            shortLine: '׳׳׳™/׳׳׳” ׳‘׳“׳™׳•׳§ ׳–׳” ׳׳×׳™׳™׳—׳¡?'
+            titleHe: 'חוסר אינדקס ייחוס (Referential Index)',
+            shortLine: 'למי/למה בדיוק זה מתייחס?'
         }),
         unspecified_verb: Object.freeze({
             side: 'inside',
-            titleHe: '׳₪׳•׳¢׳ ׳׳ ׳׳₪׳•׳¨׳˜ (Unspecified Verb)',
-            shortLine: '׳׳” ׳‘׳“׳™׳•׳§ ׳§׳•׳¨׳” ׳‘׳₪׳•׳¢׳?'
+            titleHe: 'פועל לא מפורט (Unspecified Verb)',
+            shortLine: 'מה בדיוק קורה בפועל?'
         }),
         rules_generalization: Object.freeze({
             side: 'inside',
-            titleHe: '׳›׳׳׳™׳/׳—׳•׳§׳™׳ ׳₪׳ ׳™׳׳™׳™׳ (Rules)',
-            shortLine: '׳׳” ׳”׳›׳׳, ׳•׳׳×׳™ ׳”׳•׳ ׳׳ ׳¢׳•׳‘׳“?'
+            titleHe: 'כללים/חוקים פנימיים (Rules)',
+            shortLine: 'מה הכלל, ומתי הוא לא עובד?'
         })
     });
 
@@ -178,7 +178,7 @@
 
     function getCategoryDisplayTitle(category) {
         const override = getCategoryUiOverride(category && category.categoryId);
-        return String((override && override.titleHe) || (category && category.labelHe) || (category && category.categoryId) || '׳§׳˜׳’׳•׳¨׳™׳”');
+        return String((override && override.titleHe) || (category && category.labelHe) || (category && category.categoryId) || 'קטגוריה');
     }
 
     function getCategoryDisplayHint(category) {
@@ -191,7 +191,7 @@
     }
 
     function getMindReadingExtraNote() {
-        return 'Mind Reading ׳›׳•׳׳ ׳’׳ ׳§׳¨׳™׳׳× ׳׳—׳©׳‘׳•׳× ׳¢׳¦׳׳™׳× ("׳׳ ׳™ ׳¨׳¢׳‘/׳₪׳’׳•׳¢/׳׳ ׳׳¡׳•׳’׳" - ׳׳™׳ ׳׳ ׳™ ׳™׳•׳“׳¢/׳×?) ׳•׳’׳ ׳§׳₪׳™׳¦׳” ׳׳׳¡׳§׳ ׳•׳×.';
+        return 'Mind Reading כולל גם קריאת מחשבות עצמית ("אני רעב/פגוע/לא מסוגל" - איך אני יודע/ת?) וגם קפיצה למסקנות.';
     }
 
     function normalizeQuestionVariantText(text) {
@@ -227,18 +227,18 @@
             stepIndex
         }) || '').trim();
 
-        const firstBase = baseQuestions[0] || normalizeQuestionVariantText(fallbackCoreQuestion) || '׳׳” ׳‘׳“׳™׳•׳§ ׳§׳•׳¨׳” ׳›׳׳?';
+        const firstBase = baseQuestions[0] || normalizeQuestionVariantText(fallbackCoreQuestion) || 'מה בדיוק קורה כאן?';
         const shortSelection = selection.length > 44 ? `${selection.slice(0, 41)}...` : selection;
         const shortContext = context.length > 64 ? `${context.slice(0, 61)}...` : context;
 
         const wrappedVariants = [];
         if (shortSelection) {
-            wrappedVariants.push(`׳›׳©׳׳×/׳” ׳׳•׳׳¨/׳× "${shortSelection}" ג€” ${firstBase}`);
-            wrappedVariants.push(`׳‘׳•׳/׳™ ׳ ׳“׳™׳™׳§ ׳׳× "${shortSelection}": ${firstBase}`);
-            wrappedVariants.push(`׳›׳“׳™ ׳׳”׳‘׳™׳ ׳׳× "${shortSelection}" ׳˜׳•׳‘ ׳™׳•׳×׳¨: ${firstBase}`);
+            wrappedVariants.push(`כשאת/ה אומר/ת "${shortSelection}" ג€” ${firstBase}`);
+            wrappedVariants.push(`בוא/י נדייק את "${shortSelection}": ${firstBase}`);
+            wrappedVariants.push(`כדי להבין את "${shortSelection}" טוב יותר: ${firstBase}`);
         }
         if (shortContext) {
-            wrappedVariants.push(`׳‘׳×׳•׳ ׳”׳”׳§׳©׳¨ ׳”׳–׳”, ${firstBase}`);
+            wrappedVariants.push(`בתוך ההקשר הזה, ${firstBase}`);
         }
 
         const allVariants = uniqueQuestionList([
@@ -299,7 +299,7 @@
         resetSelection();
         resetPendingQa();
         state.lastReport = null;
-        state.uiMessage = '׳ ׳•׳¦׳¨ ׳¡׳©׳ ׳—׳“׳©. ׳¡׳׳/׳™ ׳§׳˜׳¢ ׳•׳‘׳—׳¨/׳™ ׳₪׳¨׳™׳–׳׳”.';
+        state.uiMessage = 'נוצר סשן חדש. סמן/י קטע ובחר/י פריזמה.';
         state.baseStoryDraft = normalizedBaseStory || DEMO_STORY;
         syncTokens();
         persistState();
@@ -338,7 +338,7 @@
 
     function selectTokenByVisualIndex(visualIndex) {
         if (state.pendingNodeId) {
-            state.uiMessage = '׳‘׳—׳¨/׳™ ׳§׳•׳“׳ ׳—׳–׳•׳¨ ׳׳‘׳¡׳™׳¡ ׳׳• ׳”׳׳©׳ ׳׳”׳×׳©׳•׳‘׳”.';
+            state.uiMessage = 'בחר/י קודם חזור לבסיס או המשך מהתשובה.';
             render();
             return;
         }
@@ -350,12 +350,12 @@
             updateSelectionFromTokenRange(state.selectionAnchorTokenIndex, visualIndex);
             state.selectionAnchorTokenIndex = null;
             state.selectionAwaitingEnd = false;
-            state.uiMessage = '׳”׳¡׳™׳׳•׳ ׳¢׳•׳“׳›׳. ׳¢׳›׳©׳™׳• ׳‘׳—׳¨/׳™ ׳§׳˜׳’׳•׳¨׳™׳” ׳׳©׳•׳ ׳™׳×-׳׳•׳’׳™׳×.';
+            state.uiMessage = 'הסימון עודכן. עכשיו בחר/י קטגוריה לשונית-לוגית.';
         } else {
             updateSelectionFromTokenRange(visualIndex, visualIndex);
             state.selectionAnchorTokenIndex = visualIndex;
             state.selectionAwaitingEnd = true;
-            state.uiMessage = '׳׳—׳™׳¦׳” ׳ ׳•׳¡׳₪׳× ׳×׳¨׳—׳™׳‘ ׳׳¡׳₪׳׳ ׳¨׳¦׳™׳£. ׳׳₪׳©׳¨ ׳’׳ ׳׳‘׳—׳•׳¨ ׳§׳˜׳’׳•׳¨׳™׳” ׳›׳‘׳¨ ׳¢׳›׳©׳™׳•.';
+            state.uiMessage = 'לחיצה נוספת תרחיב לספאן רציף. אפשר גם לבחור קטגוריה כבר עכשיו.';
         }
 
         render();
@@ -370,12 +370,12 @@
         const category = getCategory(categoryId);
         if (!category) return;
         if (state.pendingNodeId) {
-            state.uiMessage = '׳§׳™׳™׳ ׳¦׳¢׳“ ׳₪׳×׳•׳—. ׳‘׳—׳¨/׳™ ׳—׳–׳•׳¨ ׳׳‘׳¡׳™׳¡ ׳׳• ׳”׳׳©׳ ׳׳”׳×׳©׳•׳‘׳” ׳׳₪׳ ׳™ ׳©׳׳׳” ׳ ׳•׳¡׳₪׳×.';
+            state.uiMessage = 'קיים צעד פתוח. בחר/י חזור לבסיס או המשך מהתשובה לפני שאלה נוספת.';
             render();
             return;
         }
         if (!state.selection) {
-            state.uiMessage = '׳¦׳¨׳™׳ ׳¡׳™׳׳•׳ ׳˜׳§׳¡׳˜ ׳׳₪׳ ׳™ ׳‘׳—׳™׳¨׳× ׳₪׳¨׳™׳–׳׳”.';
+            state.uiMessage = 'צריך סימון טקסט לפני בחירת פריזמה.';
             render();
             return;
         }
@@ -423,7 +423,7 @@
             generatedSentence: node.generatedSentence
         };
         state.lastReport = null;
-        state.uiMessage = '׳ ׳•׳¦׳¨ ׳¦׳¢׳“ ׳—׳“׳©. ׳‘׳—׳¨/׳™ ׳—׳–׳•׳¨ ׳׳‘׳¡׳™׳¡ ׳׳• ׳”׳׳©׳ ׳׳”׳×׳©׳•׳‘׳”.';
+        state.uiMessage = 'נוצר צעד חדש. בחר/י חזור לבסיס או המשך מהתשובה.';
 
         render();
         persistState();
@@ -437,7 +437,7 @@
         syncTokens();
         resetSelection();
         resetPendingQa();
-        state.uiMessage = '׳—׳–׳¨׳ ׳• ׳׳‘׳¡׳™׳¡. ׳¡׳׳/׳™ ׳§׳˜׳¢ ׳—׳“׳© ׳•׳‘׳—׳¨/׳™ ׳₪׳¨׳™׳–׳׳”.';
+        state.uiMessage = 'חזרנו לבסיס. סמן/י קטע חדש ובחר/י פריזמה.';
         render();
         persistState();
     }
@@ -452,7 +452,7 @@
         syncTokens();
         resetSelection();
         resetPendingQa();
-        state.uiMessage = '׳”׳׳©׳›׳ ׳• ׳׳”׳×׳©׳•׳‘׳”. ׳¢׳›׳©׳™׳• ׳׳₪׳©׳¨ ׳׳¡׳׳ ׳׳× ׳”׳׳©׳₪׳˜ ׳”׳—׳“׳©.';
+        state.uiMessage = 'המשכנו מהתשובה. עכשיו אפשר לסמן את המשפט החדש.';
         render();
         persistState();
     }
@@ -474,7 +474,7 @@
             node.questionText = nextQuestion;
         }
 
-        state.uiMessage = '׳¢׳•׳“׳›׳ ׳ ׳™׳¡׳•׳— ׳”׳©׳׳׳” ׳׳׳•׳×׳” ׳§׳˜׳’׳•׳¨׳™׳” (׳׳•׳×׳” ׳›׳•׳•׳ ׳” ׳˜׳™׳₪׳•׳׳™׳×, ׳ ׳™׳¡׳•׳— ׳׳—׳¨).';
+        state.uiMessage = 'עודכן ניסוח השאלה לאותה קטגוריה (אותה כוונה טיפולית, ניסוח אחר).';
         render();
         persistState();
     }
@@ -482,7 +482,7 @@
     function generateReport() {
         if (!state.session) return;
         state.lastReport = core.buildAfaqReport(state.session, { categoriesById: state.categoriesById });
-        state.uiMessage = '׳¡׳™׳›׳•׳ ׳”׳—׳§׳™׳¨׳” ׳”׳•׳₪׳§ ׳׳”׳¡׳©׳ ׳”׳ ׳•׳›׳—׳™.';
+        state.uiMessage = 'סיכום החקירה הופק מהסשן הנוכחי.';
         render();
         persistState();
     }
@@ -492,13 +492,13 @@
         copyText(JSON.stringify({
             session: state.session,
             report: state.lastReport
-        }, null, 2), '׳”׳“׳•׳— ׳”׳•׳¢׳×׳§ ׳›-JSON.');
+        }, null, 2), 'הדוח הועתק כ-JSON.');
     }
 
     function copyReportMarkdown() {
         if (!state.lastReport) return;
         const markdown = core.reportToMarkdown(state.lastReport);
-        copyText(markdown, '׳”׳“׳•׳— ׳”׳•׳¢׳×׳§ ׳›-Markdown.');
+        copyText(markdown, 'הדוח הועתק כ-Markdown.');
     }
 
     function copyText(text, successMessage) {
@@ -573,7 +573,7 @@
             state.baseStoryEditorOpen = !!parsed.baseStoryEditorOpen;
             state.baseStoryDraft = String(parsed.baseStoryDraft || parsed.session.baseStoryText || '');
             syncTokens();
-            state.uiMessage = '׳©׳•׳—׳–׳¨ ׳¡׳©׳ ׳§׳•׳“׳.';
+            state.uiMessage = 'שוחזר סשן קודם.';
             return true;
         } catch (error) {
             return false;
@@ -613,7 +613,7 @@
         const value = String(getBaseStoryEditorValue() || '').trim();
         createFreshSession(value || DEMO_STORY);
         state.baseStoryEditorOpen = false;
-        state.uiMessage = '׳”׳˜׳§׳¡׳˜ ׳”׳—׳“׳© ׳”׳•׳˜׳׳¢ ׳•׳¢׳‘׳¨ ׳׳—׳׳•׳ ׳”׳׳¨׳›׳–׳™.';
+        state.uiMessage = 'הטקסט החדש הוטמע ועבר לחלון המרכזי.';
         render();
     }
 
@@ -626,7 +626,7 @@
 
     function renderTokenizedContext() {
         const source = String(state.currentContextText || '');
-        if (!source) return '<p class="prm-empty">׳׳™׳ ׳˜׳§׳¡׳˜ ׳₪׳¢׳™׳. ׳”׳›׳ ׳¡/׳™ ׳‘׳¡׳™׳¡ ׳•׳”׳×׳—׳/׳™ ׳¡׳©׳.</p>';
+        if (!source) return '<p class="prm-empty">אין טקסט פעיל. הכנס/י בסיס והתחל/י סשן.</p>';
         const tokens = state.tokens;
         const selectableTokenIndices = [];
         tokens.forEach((token, idx) => {
@@ -703,9 +703,9 @@
         ];
 
         return `
-            <div class="prm-breen-5x3-wrap" aria-label="׳˜׳‘׳׳× ׳‘׳¨׳™׳ ׳§׳׳׳¡׳™׳× 5x3">
-                <div class="prm-breen-5x3-title">׳˜׳‘׳׳× ׳‘׳¨׳™׳ ׳”׳§׳׳׳¡׳™׳× (5ֳ—3) ג€” ׳׳₪׳× ׳¢׳•׳’׳</div>
-                <p class="prm-breen-5x3-note">׳–׳•׳”׳™ ׳׳₪׳× ׳”׳™׳™׳—׳•׳¡ ׳”׳§׳‘׳•׳¢׳” ׳©׳ ׳§׳˜׳’׳•׳¨׳™׳•׳× ׳”׳׳˜׳”-׳׳•׳“׳ ׳׳×׳¨׳’׳•׳ ׳•׳׳ ׳™׳•׳•׳˜.</p>
+            <div class="prm-breen-5x3-wrap" aria-label="טבלת ברין קלאסית 5x3">
+                <div class="prm-breen-5x3-title">טבלת ברין הקלאסית (5ֳ—3) ג€” מפת עוגן</div>
+                <p class="prm-breen-5x3-note">זוהי מפת הייחוס הקבועה של קטגוריות המטה-מודל לתרגול ולניווט.</p>
                 <div class="prm-breen-5x3-grid">
                     ${rows.map((row) => `
                         <div class="prm-breen-5x3-row ${escapeHtml(row.id)}">
@@ -735,17 +735,17 @@
         if (entry) return entry;
         const fallbackQuestion = Array.isArray(category && category.primaryQuestions) && category.primaryQuestions.length
             ? String(category.primaryQuestions[0])
-            : '׳׳” ׳‘׳“׳™׳•׳§ ׳§׳•׳¨׳” ׳›׳׳?';
+            : 'מה בדיוק קורה כאן?';
         return {
             ask3x: fallbackQuestion,
-            school: '׳“׳™׳•׳§ ׳׳©׳•׳ ׳™ ׳•׳—׳§׳™׳¨׳” ׳₪׳ ׳•׳׳ ׳•׳׳•׳’׳™׳×',
-            why: '׳”׳§׳˜׳’׳•׳¨׳™׳” ׳”׳–׳• ׳¢׳•׳–׳¨׳× ׳׳”׳₪׳•׳ ׳ ׳™׳¡׳•׳— ׳¢׳׳•׳ ׳׳׳‘׳ ׳” ׳©׳ ׳™׳×׳ ׳׳‘׳“׳•׳§ ׳©׳׳‘-׳©׳׳‘.',
-            creates: '׳™׳•׳×׳¨ ׳₪׳™׳¨׳•׳˜, ׳×׳ ׳׳™׳, ׳¨׳׳™׳•׳× ׳׳• ׳׳ ׳’׳ ׳•׳ - ׳•׳₪׳—׳•׳× ׳׳¡׳§׳ ׳•׳× ׳׳•׳˜׳•׳׳˜׳™׳•׳×.',
-            therapistCalm: '׳׳ ׳—׳™׳™׳‘׳™׳ ׳׳“׳¢׳× ׳׳¨׳׳© ׳׳× ׳”׳×׳©׳•׳‘׳”; ׳׳¡׳₪׳™׳§ ׳׳”׳—׳–׳™׳§ ׳©׳׳׳” ׳™׳¦׳™׳‘׳”.',
-            patientGain: '׳™׳•׳×׳¨ ׳‘׳”׳™׳¨׳•׳× ׳•׳™׳•׳×׳¨ ׳׳₪׳©׳¨׳•׳™׳•׳× ׳₪׳¢׳•׳׳”.',
-            trap: '׳׳§׳₪׳•׳¥ ׳׳”׳¨ ׳׳“׳™ ׳׳₪׳×׳¨׳•׳.',
-            fix: '׳׳”׳™׳©׳׳¨ ׳¢׳•׳“ ׳—׳₪׳™׳¨׳” ׳׳—׳× ׳¢׳ ׳׳•׳×׳” ׳¢׳“׳©׳”.',
-            tooltip: '׳₪׳¨׳™׳–׳׳” ׳׳—׳×, ׳©׳׳•׳© ׳—׳₪׳™׳¨׳•׳×, ׳™׳•׳×׳¨ ׳©׳˜׳— ׳₪׳ ׳™׳׳™.'
+            school: 'דיוק לשוני וחקירה פנומנולוגית',
+            why: 'הקטגוריה הזו עוזרת להפוך ניסוח עמום למבנה שניתן לבדוק שלב-שלב.',
+            creates: 'יותר פירוט, תנאים, ראיות או מנגנון - ופחות מסקנות אוטומטיות.',
+            therapistCalm: 'לא חייבים לדעת מראש את התשובה; מספיק להחזיק שאלה יציבה.',
+            patientGain: 'יותר בהירות ויותר אפשרויות פעולה.',
+            trap: 'לקפוץ מהר מדי לפתרון.',
+            fix: 'להישאר עוד חפירה אחת על אותה עדשה.',
+            tooltip: 'פריזמה אחת, שלוש חפירות, יותר שטח פנימי.'
         };
     }
 
@@ -764,14 +764,14 @@
                         <small class="prm-philosophy-item-school">${escapeHtml(ph.school || '')}</small>
                     </summary>
                     <div class="prm-philosophy-item-body">
-                        <p class="prm-philosophy-q"><strong>׳”׳©׳׳׳” ׳”׳—׳•׳–׳¨׳× (3ֳ—):</strong> ${escapeHtml(ph.ask3x || '')}</p>
-                        <p><strong>׳©׳׳׳× ׳‘׳¡׳™׳¡ ׳׳”׳׳₪׳׳™׳§׳¦׳™׳”:</strong> ${escapeHtml(appQuestion || '')}</p>
-                        <p><strong>׳”׳‘׳¡׳™׳¡ ׳”׳₪׳™׳׳•׳¡׳•׳₪׳™:</strong> ${escapeHtml(ph.why || '')}</p>
-                        <p><strong>׳׳” ׳–׳” ׳׳™׳™׳¦׳¨ ׳‘׳₪׳•׳¢׳:</strong> ${escapeHtml(ph.creates || '')}</p>
-                        <p><strong>׳”׳©׳§׳˜ ׳©׳ ׳”׳׳˜׳₪׳:</strong> ${escapeHtml(ph.therapistCalm || '')}</p>
-                        <p><strong>׳”׳¨׳•׳•׳— ׳׳׳˜׳•׳₪׳:</strong> ${escapeHtml(ph.patientGain || '')}</p>
-                        <p><strong>׳׳׳›׳•׳“׳× ׳ ׳₪׳•׳¦׳”:</strong> ${escapeHtml(ph.trap || '')}</p>
-                        <p><strong>׳×׳™׳§׳•׳/׳›׳•׳•׳ ׳•׳:</strong> ${escapeHtml(ph.fix || '')}</p>
+                        <p class="prm-philosophy-q"><strong>השאלה החוזרת (3ֳ—):</strong> ${escapeHtml(ph.ask3x || '')}</p>
+                        <p><strong>שאלת בסיס מהאפליקציה:</strong> ${escapeHtml(appQuestion || '')}</p>
+                        <p><strong>הבסיס הפילוסופי:</strong> ${escapeHtml(ph.why || '')}</p>
+                        <p><strong>מה זה מייצר בפועל:</strong> ${escapeHtml(ph.creates || '')}</p>
+                        <p><strong>השקט של המטפל:</strong> ${escapeHtml(ph.therapistCalm || '')}</p>
+                        <p><strong>הרווח למטופל:</strong> ${escapeHtml(ph.patientGain || '')}</p>
+                        <p><strong>מלכודת נפוצה:</strong> ${escapeHtml(ph.trap || '')}</p>
+                        <p><strong>תיקון/כוונון:</strong> ${escapeHtml(ph.fix || '')}</p>
                         <p class="prm-philosophy-tooltip"><strong>Tooltip:</strong> ${escapeHtml(ph.tooltip || '')}</p>
                     </div>
                 </details>
@@ -782,13 +782,13 @@
             <section class="prm-card prm-philosophy-panel">
                 <details class="prm-philosophy-library">
                     <summary class="prm-philosophy-library-summary">
-                        <span>׳₪׳™׳׳•׳¡׳•׳₪׳™׳” ׳׳׳—׳•׳¨׳™ 15 ׳”׳₪׳¨׳™׳–׳׳•׳× (׳׳•׳¨׳—׳‘)</span>
-                        <small>׳׳׳” ׳׳•׳×׳¨ ׳׳©׳׳•׳ ׳׳× ׳׳•׳×׳” ׳©׳׳׳” ׳©׳•׳‘ ׳•׳©׳•׳‘ ֲ· 3ֳ—</small>
+                        <span>פילוסופיה מאחורי 15 הפריזמות (מורחב)</span>
+                        <small>למה מותר לשאול את אותה שאלה שוב ושוב ֲ· 3ֳ—</small>
                     </summary>
                     <div class="prm-philosophy-library-body">
                         <p class="prm-philosophy-intro">
-                            <strong>Prism Research = Chain / ׳—׳§׳™׳¨׳” ׳׳•׳¨׳›׳™׳×:</strong> ׳‘׳•׳—׳¨׳™׳ ׳¢׳“׳©׳” ׳׳—׳× ׳•׳׳׳©׳™׳›׳™׳ ׳§׳“׳™׳׳” ׳¢׳ ׳”׳׳©׳₪׳˜ ׳”׳—׳“׳© ׳©׳ ׳•׳׳“.
-                            <strong>Prism Lab = Vertical Stack:</strong> ׳׳•׳“׳•׳ ׳׳©׳׳™׳ ׳׳¢׳•׳׳§ ׳¢׳ ׳¢׳•׳’׳ ׳׳—׳“ ׳“׳¨׳ E/B/C/V/I/S.
+                            <strong>Prism Research = Chain / חקירה אורכית:</strong> בוחרים עדשה אחת וממשיכים קדימה על המשפט החדש שנולד.
+                            <strong>Prism Lab = Vertical Stack:</strong> מודול משלים לעומק על עוגן אחד דרך E/B/C/V/I/S.
                         </p>
                         <div class="prm-philosophy-list">
                             ${items}
@@ -802,15 +802,15 @@
     function renderTheoryBridgeCard() {
         return `
             <section class="prm-card prm-theory-bridge">
-                <h3>׳×׳™׳׳•׳¨׳™׳” ׳•׳₪׳™׳׳•׳¡׳•׳₪׳™׳” ׳©׳ ׳”׳₪׳¨׳™׳–׳׳•׳×</h3>
+                <h3>תיאוריה ופילוסופיה של הפריזמות</h3>
                 <p>
-                    ׳”׳”׳¡׳‘׳¨ ׳”׳׳¢׳׳™׳§ ׳¢׳ ׳›׳ ׳₪׳¨׳™׳–׳׳” (׳©׳׳׳•׳× / ׳׳˜׳¨׳” / ׳₪׳™׳׳•׳¡׳•׳₪׳™׳” / ׳׳׳›׳•׳“׳•׳×) ׳¢׳‘׳¨ ׳׳“׳£ ׳ ׳₪׳¨׳“ ׳›׳“׳™ ׳׳©׳׳•׳¨ ׳›׳׳ ׳¢׳ ׳׳¡׳ ׳×׳¨׳’׳•׳ ׳ ׳§׳™.
+                    ההסבר המעמיק על כל פריזמה (שאלות / מטרה / פילוסופיה / מלכודות) עבר לדף נפרד כדי לשמור כאן על מסך תרגול נקי.
                 </p>
                 <p class="prm-kicker">
-                    ׳₪׳×׳—/׳™ ׳׳× ׳“׳£ ׳§׳˜׳’׳•׳¨׳™׳•׳× ׳‘׳¨׳™׳ ׳׳”׳׳₪׳׳™׳§׳¦׳™׳” ׳”׳¨׳׳©׳™׳× ׳›׳“׳™ ׳׳׳׳•׳“ ׳©׳›׳‘׳•׳× ׳×׳׳•׳¨׳™׳” ׳‘׳׳™ ׳׳”׳¢׳׳™׳¡ ׳¢׳ ׳”׳—׳§׳™׳¨׳” ׳¢׳¦׳׳”.
+                    פתח/י את דף קטגוריות ברין מהאפליקציה הראשית כדי ללמוד שכבות תאוריה בלי להעמיס על החקירה עצמה.
                 </p>
                 <div class="prm-inline-actions">
-                    <a class="prm-small-btn prm-link-btn" href="index.html?tab=categories" target="_blank" rel="noopener">׳₪׳×׳—/׳™ ׳§׳˜׳’׳•׳¨׳™׳•׳× ׳‘׳¨׳™׳ (׳×׳׳•׳¨׳™׳”)</a>
+                    <a class="prm-small-btn prm-link-btn" href="index.html?tab=categories" target="_blank" rel="noopener">פתח/י קטגוריות ברין (תאוריה)</a>
                 </div>
             </section>
         `;
@@ -857,43 +857,43 @@
 
     function renderRecursiveGuidePanel() {
         return `
-            <section class="prm-card prm-recursive-guide" aria-label="׳”׳¡׳‘׳¨ ׳¨׳§׳•׳¨׳¡׳™׳‘׳™ ׳•-Next Step Function">
+            <section class="prm-card prm-recursive-guide" aria-label="הסבר רקורסיבי ו-Next Step Function">
                 <div class="prm-recursive-guide-head">
-                    <h2>׳׳” ׳–׳” "׳¨׳§׳•׳¨׳¡׳™׳‘׳™" ׳•׳׳׳” ׳–׳” ׳—׳©׳•׳‘ ׳›׳׳?</h2>
-                    <p class="prm-kicker">׳‘-Prism Research ׳׳ "׳¨׳¦׳™׳" ׳׳¢׳•׳“ ׳×׳™׳׳•׳¨׳™׳”. ׳©׳•׳׳׳™׳, ׳׳§׳‘׳׳™׳ ׳×׳©׳•׳‘׳” ׳—׳“׳©׳”, ׳•׳׳– ׳‘׳•׳“׳§׳™׳ ׳׳•׳×׳” ׳©׳•׳‘ ׳¢׳ ׳׳•׳×׳” ׳¢׳“׳©׳”.</p>
+                    <h2>מה זה "רקורסיבי" ולמה זה חשוב כאן?</h2>
+                    <p class="prm-kicker">ב-Prism Research לא "רצים" לעוד תיאוריה. שואלים, מקבלים תשובה חדשה, ואז בודקים אותה שוב עם אותה עדשה.</p>
                 </div>
 
                 <div class="prm-recursive-flow" aria-hidden="true">
-                    <span>׳׳©׳₪׳˜/׳§׳˜׳¢</span>
+                    <span>משפט/קטע</span>
                     <span class="prm-recursive-flow-arrow">ג†</span>
-                    <span>׳©׳׳׳” ׳׳“׳•׳™׳§׳×</span>
+                    <span>שאלה מדויקת</span>
                     <span class="prm-recursive-flow-arrow">ג†</span>
-                    <span>׳×׳©׳•׳‘׳” ׳—׳“׳©׳”</span>
+                    <span>תשובה חדשה</span>
                     <span class="prm-recursive-flow-arrow">ג†</span>
-                    <span>׳‘׳—׳™׳¨׳× ׳¦׳¢׳“ ׳”׳‘׳</span>
+                    <span>בחירת צעד הבא</span>
                 </div>
 
                 <div class="prm-recursive-grid">
                     <article class="prm-recursive-step">
                         <div class="prm-recursive-step-index">1</div>
-                        <h3>׳×׳׳•׳ ׳” ׳›׳׳׳™׳× + ׳׳•׳§׳“ ׳ ׳•׳›׳—׳™</h3>
-                        <p>׳׳—׳–׳™׳§׳™׳ ׳×׳׳•׳ ׳” ׳›׳׳׳™׳× ׳©׳ ׳”׳¡׳™׳₪׳•׳¨, ׳׳‘׳ ׳‘׳›׳ ׳¨׳’׳¢ ׳¢׳•׳‘׳“׳™׳ ׳¨׳§ ׳¢׳ ׳§׳˜׳¢ ׳׳¡׳•׳™׳ ׳©׳ ׳‘׳—׳¨. ׳–׳” ׳׳•׳ ׳¢ ׳”׳¦׳₪׳” ׳•׳׳׳§׳“ ׳׳× ׳”׳—׳§׳™׳¨׳”.</p>
+                        <h3>תמונה כללית + מוקד נוכחי</h3>
+                        <p>מחזיקים תמונה כללית של הסיפור, אבל בכל רגע עובדים רק על קטע מסוים שנבחר. זה מונע הצפה וממקד את החקירה.</p>
                     </article>
                     <article class="prm-recursive-step">
                         <div class="prm-recursive-step-index">2</div>
-                        <h3>Next Step Function (׳”׳¦׳¢׳“ ׳”׳‘׳)</h3>
-                        <p>׳‘׳¡׳₪׳¨׳™׳ ׳”׳¨׳׳©׳•׳ ׳™׳ ׳©׳ NLP ׳“׳™׳‘׳¨׳• ׳¢׳ <strong>Next Step Function</strong>: ׳׳ ׳—׳™׳™׳‘׳™׳ ׳׳“׳¢׳× ׳׳× ׳›׳ ׳”׳׳¡׳׳•׳ ׳׳¨׳׳©, ׳׳׳ ׳׳‘׳—׳•׳¨ ׳׳× ׳”׳¦׳¢׳“ ׳”׳‘׳ ׳”׳›׳™ ׳˜׳•׳‘ ׳׳₪׳™ ׳׳” ׳©׳ ׳׳¦׳ ׳¢׳›׳©׳™׳•.</p>
+                        <h3>Next Step Function (הצעד הבא)</h3>
+                        <p>בספרים הראשונים של NLP דיברו על <strong>Next Step Function</strong>: לא חייבים לדעת את כל המסלול מראש, אלא לבחור את הצעד הבא הכי טוב לפי מה שנמצא עכשיו.</p>
                     </article>
                     <article class="prm-recursive-step">
                         <div class="prm-recursive-step-index">3</div>
-                        <h3>׳₪׳™׳“׳‘׳§ (׳§׳™׳‘׳¨׳ ׳˜׳™׳§׳”) ׳‘׳׳§׳•׳ ׳ ׳™׳—׳•׳©</h3>
-                        <p>׳׳×׳—׳•׳ ׳”׳§׳™׳‘׳¨׳ ׳˜׳™׳§׳”: ׳›׳ ׳₪׳¢׳•׳׳” ׳׳™׳™׳¦׳¨׳× ׳”׳™׳–׳•׳ ׳—׳•׳–׳¨. ׳׳›׳ ׳׳ ׳׳’׳™׳‘׳™׳ ׳¨׳§ ׳׳׳” ׳©׳—׳©׳‘׳ ׳• ׳©׳™׳”׳™׳”, ׳׳׳ ׳׳׳” ׳©׳‘׳׳׳× ׳—׳–׳¨ ׳׳”׳©׳׳׳” - ׳•׳׳©׳ ׳‘׳•׳—׳¨׳™׳ ׳׳× ׳”׳¦׳¢׳“ ׳”׳‘׳.</p>
+                        <h3>פידבק (קיברנטיקה) במקום ניחוש</h3>
+                        <p>מתחום הקיברנטיקה: כל פעולה מייצרת היזון חוזר. לכן לא מגיבים רק למה שחשבנו שיהיה, אלא למה שבאמת חזר מהשאלה - ומשם בוחרים את הצעד הבא.</p>
                     </article>
                 </div>
 
                 <div class="prm-recursive-note">
-                    <strong>׳׳׳” ׳–׳” ׳¨׳׳•׳•׳ ׳˜׳™ ׳׳¢׳‘׳•׳“׳” ׳˜׳™׳₪׳•׳׳™׳×?</strong>
-                    <p>׳›׳™ ׳–׳” ׳׳©׳׳‘ ׳’׳ ׳›׳™׳•׳•׳ (׳׳׳ ׳׳ ׳—׳ ׳• ׳—׳•׳§׳¨׳™׳) ׳•׳’׳ ׳’׳׳™׳©׳•׳× (׳׳” ׳¢׳•׳©׳™׳ ׳¢׳›׳©׳™׳• ׳‘׳₪׳•׳¢׳ ׳׳₪׳™ ׳”׳×׳’׳•׳‘׳” ׳©׳§׳™׳‘׳׳ ׳•), ׳‘׳׳§׳•׳ ׳׳”׳™׳¦׳׳“ ׳׳₪׳¨׳©׳ ׳•׳× ׳׳•׳§׳“׳׳×.</p>
+                    <strong>למה זה רלוונטי לעבודה טיפולית?</strong>
+                    <p>כי זה משלב גם כיוון (לאן אנחנו חוקרים) וגם גמישות (מה עושים עכשיו בפועל לפי התגובה שקיבלנו), במקום להיצמד לפרשנות מוקדמת.</p>
                 </div>
             </section>
         `;
@@ -903,8 +903,8 @@
         if (!state.pendingQA) {
             return `
                 <div class="prm-card prm-qa-panel is-empty">
-                    <h3>׳׳”׳׳ ׳—׳§׳™׳¨׳” ׳”׳‘׳</h3>
-                    <p>׳‘׳—׳¨׳• ׳§׳˜׳’׳•׳¨׳™׳” ׳׳—׳¨׳™ ׳¡׳™׳׳•׳ ׳›׳“׳™ ׳׳§׳‘׳ ׳©׳׳׳” ׳׳“׳•׳™׳§׳× ׳•׳×׳©׳•׳‘׳× ׳”׳׳©׳.</p>
+                    <h3>מהלך חקירה הבא</h3>
+                    <p>בחרו קטגוריה אחרי סימון כדי לקבל שאלה מדויקת ותשובת המשך.</p>
                 </div>
             `;
         }
@@ -915,8 +915,8 @@
         const variantsHtml = variants.length > 1 ? `
             <div class="prm-question-variants">
                 <div class="prm-question-variants-head">
-                    <strong>׳ ׳™׳¡׳•׳—׳™׳ ׳—׳׳•׳₪׳™׳™׳ ׳׳׳•׳×׳” ׳©׳׳׳” (׳׳•׳×׳” ׳›׳•׳•׳ ׳” ׳˜׳™׳₪׳•׳׳™׳×)</strong>
-                    <small>׳׳₪׳©׳¨ ׳׳‘׳—׳•׳¨ ׳ ׳™׳¡׳•׳— ׳©׳׳¨׳’׳™׳© ׳׳ ׳˜׳‘׳¢׳™ ׳™׳•׳×׳¨ ׳׳•׳ ׳”׳׳˜׳•׳₪׳/׳×.</small>
+                    <strong>ניסוחים חלופיים לאותה שאלה (אותה כוונה טיפולית)</strong>
+                    <small>אפשר לבחור ניסוח שמרגיש לך טבעי יותר מול המטופל/ת.</small>
                 </div>
                 <div class="prm-question-variants-list">
                     ${variants.map((variant, index) => `
@@ -936,17 +936,17 @@
         ` : '';
         return `
             <div class="prm-card prm-qa-panel">
-                <h3>׳׳”׳׳ ׳—׳§׳™׳¨׳” ׳”׳‘׳</h3>
-                <p class="prm-kicker">׳₪׳¨׳™׳–׳׳” ׳©׳ ׳‘׳—׳¨׳”: ${escapeHtml(state.pendingQA.categoryLabelHe)}</p>
+                <h3>מהלך חקירה הבא</h3>
+                <p class="prm-kicker">פריזמה שנבחרה: ${escapeHtml(state.pendingQA.categoryLabelHe)}</p>
                 <div class="prm-qa-block">
-                    <div><strong>׳”׳©׳׳׳” ׳©׳ ׳‘׳—׳¨׳” ׳›׳¨׳’׳¢:</strong> ${escapeHtml(state.pendingQA.questionText)}</div>
-                    <div><strong>׳×׳©׳•׳‘׳× ׳”׳׳©׳:</strong> ${escapeHtml(state.pendingQA.answerText)}</div>
-                    <div><strong>׳׳©׳₪׳˜ ׳—׳“׳© ׳©׳ ׳•׳׳“:</strong> ${escapeHtml(state.pendingQA.generatedSentence)}</div>
+                    <div><strong>השאלה שנבחרה כרגע:</strong> ${escapeHtml(state.pendingQA.questionText)}</div>
+                    <div><strong>תשובת המשך:</strong> ${escapeHtml(state.pendingQA.answerText)}</div>
+                    <div><strong>משפט חדש שנולד:</strong> ${escapeHtml(state.pendingQA.generatedSentence)}</div>
                 </div>
                 ${variantsHtml}
                 <div class="prm-nav-actions">
-                    <button type="button" class="prm-big-btn secondary" data-action="back-base">׳—׳–׳¨׳” ׳׳˜׳§׳¡׳˜ ׳”׳׳¨׳›׳–׳™</button>
-                    <button type="button" class="prm-big-btn primary" data-action="continue-answer">׳”׳׳©׳ ׳׳×׳•׳ ׳×׳©׳•׳‘׳× ׳”׳”׳׳©׳</button>
+                    <button type="button" class="prm-big-btn secondary" data-action="back-base">חזרה לטקסט המרכזי</button>
+                    <button type="button" class="prm-big-btn primary" data-action="continue-answer">המשך מתוך תשובת ההמשך</button>
                 </div>
             </div>
         `;
@@ -955,7 +955,7 @@
     function renderPathLog() {
         const nodes = state.session && Array.isArray(state.session.nodes) ? state.session.nodes : [];
         if (!nodes.length) {
-            return '<p class="prm-empty">׳¢׳•׳“ ׳׳ ׳”׳×׳—׳™׳׳” ׳©׳¨׳©׳¨׳× ׳—׳§׳™׳¨׳”. ׳¡׳׳ ׳• ׳§׳˜׳¢ ׳‘׳˜׳§׳¡׳˜ ׳•׳‘׳—׳¨׳• ׳₪׳¨׳™׳–׳׳” ׳¨׳׳©׳•׳ ׳”.</p>';
+            return '<p class="prm-empty">עוד לא התחילה שרשרת חקירה. סמנו קטע בטקסט ובחרו פריזמה ראשונה.</p>';
         }
         const items = nodes.slice().reverse().slice(0, 14).map((node, idx) => `
             <li class="prm-log-item">
@@ -964,8 +964,8 @@
                     <span>${escapeHtml(node.categoryLabelHe)}</span>
                     <span class="prm-tagline">${escapeHtml((node.tags || []).join(', '))}</span>
                 </div>
-                <div class="prm-log-line"><strong>׳§׳˜׳¢ ׳©׳ ׳‘׳“׳§:</strong> ${escapeHtml(node.selection && node.selection.text)}</div>
-                <div class="prm-log-line"><strong>׳×׳©׳•׳‘׳× ׳”׳׳©׳:</strong> ${escapeHtml(node.answerText)}</div>
+                <div class="prm-log-line"><strong>קטע שנבדק:</strong> ${escapeHtml(node.selection && node.selection.text)}</div>
+                <div class="prm-log-line"><strong>תשובת המשך:</strong> ${escapeHtml(node.answerText)}</div>
             </li>
         `).join('');
         return `<ol class="prm-log-list">${items}</ol>`;
@@ -975,38 +975,38 @@
         if (!state.lastReport) {
             return `
                 <div class="prm-card prm-report-panel is-empty">
-                    <h3>׳¡׳™׳›׳•׳ ׳×׳•׳‘׳ ׳•׳× ׳׳”׳—׳§׳™׳¨׳”</h3>
-                    <p>׳”׳¡׳™׳›׳•׳ ׳™׳•׳₪׳™׳¢ ׳›׳׳ ׳׳—׳¨׳™ ׳׳₪׳—׳•׳× ${core.MIN_REPORT_NODES} ׳¦׳¢׳“׳™ ׳—׳§׳™׳¨׳”.</p>
+                    <h3>סיכום תובנות מהחקירה</h3>
+                    <p>הסיכום יופיע כאן אחרי לפחות ${core.MIN_REPORT_NODES} צעדי חקירה.</p>
                 </div>
             `;
         }
         const r = state.lastReport;
         const renderList = (items) => {
-            if (!Array.isArray(items) || !items.length) return '<li>׳¢׳“׳™׳™׳ ׳׳™׳ ׳׳¡׳₪׳™׳§ ׳×׳•׳›׳</li>';
+            if (!Array.isArray(items) || !items.length) return '<li>עדיין אין מספיק תוכן</li>';
             return items.map(item => `<li>${escapeHtml(item)}</li>`).join('');
         };
 
         return `
             <div class="prm-card prm-report-panel">
-                <h3>׳¡׳™׳›׳•׳ ׳×׳•׳‘׳ ׳•׳× ׳׳”׳—׳§׳™׳¨׳”</h3>
+                <h3>סיכום תובנות מהחקירה</h3>
                 <div class="prm-report-actions">
-                    <button type="button" class="prm-small-btn" data-action="copy-report-json">׳”׳¢׳×׳§ JSON</button>
-                    <button type="button" class="prm-small-btn" data-action="copy-report-md">׳”׳¢׳×׳§ ׳¡׳™׳›׳•׳</button>
+                    <button type="button" class="prm-small-btn" data-action="copy-report-json">העתק JSON</button>
+                    <button type="button" class="prm-small-btn" data-action="copy-report-md">העתק סיכום</button>
                 </div>
                 <div class="prm-report-grid">
-                    <section><h4>׳©׳¨׳©׳¨׳׳•׳× ׳¡׳™׳‘׳”</h4><ul>${renderList(r.sections.causalChains)}</ul></section>
-                    <section><h4>׳©׳¨׳©׳¨׳׳•׳× ׳׳©׳׳¢׳•׳×</h4><ul>${renderList(r.sections.meaningChains)}</ul></section>
-                    <section><h4>׳¨׳׳™׳•׳× / ׳§׳¨׳™׳˜׳¨׳™׳•׳ ׳™׳</h4><ul>${renderList(r.sections.evidenceCriteria)}</ul></section>
-                    <section><h4>׳×׳ ׳׳™׳ / ׳”׳™׳§׳£</h4><ul>${renderList(r.sections.conditionsScope)}</ul></section>
-                    <section><h4>׳׳™׳׳•׳¦׳™׳ ׳׳•׳“׳׳™׳™׳</h4><ul>${renderList(r.sections.modalConstraints)}</ul></section>
-                    <section><h4>׳”׳›׳׳׳•׳×</h4><ul>${renderList(r.sections.generalizations)}</ul></section>
+                    <section><h4>שרשראות סיבה</h4><ul>${renderList(r.sections.causalChains)}</ul></section>
+                    <section><h4>שרשראות משמעות</h4><ul>${renderList(r.sections.meaningChains)}</ul></section>
+                    <section><h4>ראיות / קריטריונים</h4><ul>${renderList(r.sections.evidenceCriteria)}</ul></section>
+                    <section><h4>תנאים / היקף</h4><ul>${renderList(r.sections.conditionsScope)}</ul></section>
+                    <section><h4>אילוצים מודליים</h4><ul>${renderList(r.sections.modalConstraints)}</ul></section>
+                    <section><h4>הכללות</h4><ul>${renderList(r.sections.generalizations)}</ul></section>
                 </div>
                 <section>
-                    <h4>׳×׳•׳‘׳ ׳•׳×</h4>
+                    <h4>תובנות</h4>
                     <ul>${renderList(r.insights)}</ul>
                 </section>
                 <section>
-                    <h4>׳¦׳¢׳“ ׳”׳׳©׳</h4>
+                    <h4>צעד המשך</h4>
                     <p>${escapeHtml(r.nextStep)}</p>
                 </section>
             </div>
@@ -1018,12 +1018,12 @@
         const reportEnabled = stats.totalNodes >= core.MIN_REPORT_NODES;
         return `
             <div class="prm-stats">
-                <span class="prm-chip">׳¦׳׳×׳™׳: <strong>${stats.totalNodes}</strong></span>
-                <span class="prm-chip">׳¢׳•׳׳§: <strong>${stats.maxDepth}</strong></span>
-                <span class="prm-chip">׳¢׳ ׳₪׳™׳: <strong>${stats.branchCount}</strong></span>
-                <span class="prm-chip">׳׳׳•׳¦׳¢ ׳¢׳•׳׳§: <strong>${stats.avgDepth.toFixed(1)}</strong></span>
+                <span class="prm-chip">צמתים: <strong>${stats.totalNodes}</strong></span>
+                <span class="prm-chip">עומק: <strong>${stats.maxDepth}</strong></span>
+                <span class="prm-chip">ענפים: <strong>${stats.branchCount}</strong></span>
+                <span class="prm-chip">ממוצע עומק: <strong>${stats.avgDepth.toFixed(1)}</strong></span>
                 <button type="button" class="prm-small-btn ${reportEnabled ? '' : 'is-disabled'}" data-action="generate-report" ${reportEnabled ? '' : 'disabled'}>
-                    ׳”׳₪׳§ ׳¡׳™׳›׳•׳ ׳—׳§׳™׳¨׳”
+                    הפק סיכום חקירה
                 </button>
             </div>
         `;
@@ -1033,39 +1033,39 @@
         const draftText = String(state.baseStoryDraft || (state.session && state.session.baseStoryText) || DEMO_STORY);
         const activeBase = String((state.session && state.session.baseStoryText) || '');
         const hasDraftChanges = draftText.trim() && draftText.trim() !== activeBase.trim();
-        const draftPreview = draftText.trim() || '׳׳™׳ ׳˜׳§׳¡׳˜ ׳˜׳™׳•׳˜׳” ׳¢׳“׳™׳™׳.';
+        const draftPreview = draftText.trim() || 'אין טקסט טיוטה עדיין.';
 
         return `
             <section class="prm-card prm-base-config ${state.baseStoryEditorOpen ? 'is-open' : 'is-collapsed'}">
                 <div class="prm-base-head">
                     <div>
-                        <h2>׳¡׳™׳₪׳•׳¨ ׳‘׳¡׳™׳¡ (׳׳˜׳™׳•׳˜׳” / ׳׳™׳׳•׳©)</h2>
+                        <h2>סיפור בסיס (לטיוטה / מימוש)</h2>
                         <p class="prm-kicker">
-                            ׳‘׳ ׳• ׳׳• ׳¢׳¨׳›׳• ׳˜׳§׳¡׳˜ ׳‘׳¡׳™׳¡׳™, ׳•׳׳– ׳׳—׳¦׳• "׳׳™׳׳•׳© ׳׳˜׳§׳¡׳˜ ׳”׳׳¨׳›׳–׳™". ׳“׳£ ׳”׳×׳¨׳’׳•׳ ׳ ׳©׳׳¨ ׳§׳•׳׳₪׳§׳˜׳™ ׳›׳©׳”׳¢׳•׳¨׳ ׳¡׳’׳•׳¨.
+                            בנו או ערכו טקסט בסיסי, ואז לחצו "מימוש לטקסט המרכזי". דף התרגול נשאר קומפקטי כשהעורך סגור.
                         </p>
                     </div>
                     <div class="prm-hero-actions">
                         <button type="button" class="prm-small-btn" data-action="toggle-base-editor">
-                            ${state.baseStoryEditorOpen ? '׳¡׳’׳•׳¨ ׳¢׳•׳¨׳ ׳¡׳™׳₪׳•׳¨' : '׳₪׳×׳— ׳¢׳•׳¨׳ ׳¡׳™׳₪׳•׳¨'}
+                            ${state.baseStoryEditorOpen ? 'סגור עורך סיפור' : 'פתח עורך סיפור'}
                         </button>
-                        <button type="button" class="prm-small-btn" data-action="apply-base">׳׳™׳׳•׳© ׳׳˜׳§׳¡׳˜ ׳”׳׳¨׳›׳–׳™</button>
-                        <button type="button" class="prm-small-btn" data-action="back-base">׳—׳–׳¨׳” ׳׳‘׳¡׳™׳¡</button>
+                        <button type="button" class="prm-small-btn" data-action="apply-base">מימוש לטקסט המרכזי</button>
+                        <button type="button" class="prm-small-btn" data-action="back-base">חזרה לבסיס</button>
                     </div>
                 </div>
 
                 <div class="prm-base-preview ${hasDraftChanges ? 'has-draft-changes' : ''}">
-                    <strong>׳˜׳™׳•׳˜׳” ׳ ׳•׳›׳—׳™׳×:</strong>
+                    <strong>טיוטה נוכחית:</strong>
                     <span>${escapeHtml(draftPreview.length > 240 ? `${draftPreview.slice(0, 237)}...` : draftPreview)}</span>
-                    ${hasDraftChanges ? '<small class="prm-badge-draft">׳™׳© ׳©׳™׳ ׳•׳™׳™׳ ׳©׳˜׳¨׳ ׳׳•׳׳©׳•</small>' : ''}
+                    ${hasDraftChanges ? '<small class="prm-badge-draft">יש שינויים שטרם מומשו</small>' : ''}
                 </div>
 
                 ${state.baseStoryEditorOpen ? `
-                    <label for="prm-base-input" class="prm-base-editor-label"><strong>׳¢׳•׳¨׳ ׳¡׳™׳₪׳•׳¨ ׳‘׳¡׳™׳¡</strong></label>
+                    <label for="prm-base-input" class="prm-base-editor-label"><strong>עורך סיפור בסיס</strong></label>
                     <textarea id="prm-base-input" rows="4" spellcheck="false">${escapeHtml(draftText)}</textarea>
                     <div class="prm-inline-actions">
-                        <button type="button" class="prm-small-btn" data-action="load-demo">׳˜׳¢׳ ׳“׳•׳’׳׳”</button>
-                        <button type="button" class="prm-small-btn" data-action="reset-session">׳¡׳©׳ ׳—׳“׳© ׳׳”׳˜׳™׳•׳˜׳”</button>
-                        <button type="button" class="prm-small-btn" data-action="toggle-base-editor">׳¡׳’׳•׳¨ ׳¢׳•׳¨׳</button>
+                        <button type="button" class="prm-small-btn" data-action="load-demo">טען דוגמה</button>
+                        <button type="button" class="prm-small-btn" data-action="reset-session">סשן חדש מהטיוטה</button>
+                        <button type="button" class="prm-small-btn" data-action="toggle-base-editor">סגור עורך</button>
                     </div>
                 ` : ''}
 
@@ -1077,7 +1077,7 @@
 
     function render() {
         if (!state.loaded) {
-            const msg = state.loadError ? escapeHtml(state.loadError) : '׳˜׳•׳¢׳ Prism Research Mode...';
+            const msg = state.loadError ? escapeHtml(state.loadError) : 'טוען Prism Research Mode...';
             appEl.innerHTML = `<div class="prm-loading">${msg}</div>`;
             return;
         }
@@ -1090,8 +1090,8 @@
                 <header class="prm-hero">
                     <div>
                         <p class="prm-eyebrow">Prism Research Mode</p>
-                        <h1>׳׳•׳“׳ ׳”׳₪׳¨׳™׳–׳׳”: ׳—׳§׳™׳¨׳× ׳˜׳§׳¡׳˜ ׳“׳¨׳ ׳§׳˜׳’׳•׳¨׳™׳•׳× ׳׳©׳•׳ ׳™׳•׳×-׳׳•׳’׳™׳•׳×</h1>
-                        <p class="prm-subtitle">׳׳•׳׳׳” ׳§׳‘׳•׳¢׳”: ׳¡׳™׳׳•׳ ג†’ ׳§׳˜׳’׳•׳¨׳™׳” ג†’ ׳©׳׳׳” ג†’ ׳×׳©׳•׳‘׳” ג†’ ׳—׳–׳•׳¨ ׳׳‘׳¡׳™׳¡ / ׳”׳׳©׳ ׳׳”׳×׳©׳•׳‘׳”.</p>
+                        <h1>מודל הפריזמה: חקירת טקסט דרך קטגוריות לשוניות-לוגיות</h1>
+                        <p class="prm-subtitle">לולאה קבועה: סימון ג†’ קטגוריה ג†’ שאלה ג†’ תשובה ג†’ חזור לבסיס / המשך מהתשובה.</p>
                         <div class="prm-hero-help-row">
                             <button
                                 type="button"
@@ -1099,15 +1099,15 @@
                                 data-action="toggle-recursive-guide"
                                 aria-expanded="${state.showRecursiveGuide ? 'true' : 'false'}"
                             >
-                                ${state.showRecursiveGuide ? '׳¡׳’׳•׳¨ ׳”׳¡׳‘׳¨ "׳¨׳§׳•׳¨׳¡׳™׳‘׳™"' : '׳׳” ׳–׳” "׳¨׳§׳•׳¨׳¡׳™׳‘׳™"?'}
+                                ${state.showRecursiveGuide ? 'סגור הסבר "רקורסיבי"' : 'מה זה "רקורסיבי"?'}
                             </button>
-                            <small>׳”׳¡׳‘׳¨ ׳§׳¦׳¨ ׳¢׳ Next Step Function + ׳”׳™׳–׳•׳ ׳—׳•׳–׳¨ (׳§׳™׳‘׳¨׳ ׳˜׳™׳§׳”)</small>
+                            <small>הסבר קצר על Next Step Function + היזון חוזר (קיברנטיקה)</small>
                         </div>
                     </div>
                     <div class="prm-hero-actions">
-                        <button type="button" class="prm-small-btn" data-action="load-demo">׳˜׳¢׳ ׳“׳•׳’׳׳”</button>
-                        <button type="button" class="prm-small-btn" data-action="reset-session">׳¡׳©׳ ׳—׳“׳©</button>
-                        <button type="button" class="prm-small-btn" data-action="clear-session">׳ ׳§׳” ׳©׳׳™׳¨׳”</button>
+                        <button type="button" class="prm-small-btn" data-action="load-demo">טען דוגמה</button>
+                        <button type="button" class="prm-small-btn" data-action="reset-session">סשן חדש</button>
+                        <button type="button" class="prm-small-btn" data-action="clear-session">נקה שמירה</button>
                     </div>
                 </header>
                 ${state.showRecursiveGuide ? renderRecursiveGuidePanel() : ''}
@@ -1116,19 +1116,19 @@
                 <section class="prm-layout">
                     <div class="prm-column">
                         <section class="prm-card">
-                             <h2>׳˜׳§׳¡׳˜ ׳‘׳¡׳™׳¡ / ׳˜׳§׳¡׳˜ ׳₪׳¢׳™׳</h2>
-                            <p class="prm-kicker">׳”׳§׳©׳¨ ׳ ׳•׳›׳—׳™: ${state.currentContextType === 'continued' ? '׳”׳׳©׳ ׳׳×׳©׳•׳‘׳× ׳”׳”׳׳©׳' : '׳˜׳§׳¡׳˜ ׳‘׳¡׳™׳¡'}</p>
+                             <h2>טקסט בסיס / טקסט פעיל</h2>
+                            <p class="prm-kicker">הקשר נוכחי: ${state.currentContextType === 'continued' ? 'המשך מתשובת ההמשך' : 'טקסט בסיס'}</p>
                             <div class="prm-context-text">${renderTokenizedContext()}</div>
                             <div class="prm-selection-box ${state.selection ? 'has-selection' : ''}">
-                                <strong>׳§׳˜׳¢ ׳׳¡׳•׳׳:</strong>
-                                <span>${escapeHtml(selectedText || '׳¢׳“׳™׳™׳ ׳׳ ׳¡׳•׳׳ ׳§׳˜׳¢')}</span>
+                                <strong>קטע מסומן:</strong>
+                                <span>${escapeHtml(selectedText || 'עדיין לא סומן קטע')}</span>
                                 ${state.selection ? `<small> [${state.selection.start}-${state.selection.end}]</small>` : ''}
                             </div>
                         </section>
 
                         
                         <section class="prm-card">
-                            <h2>׳˜׳‘׳׳× ׳‘׳¨׳™׳ - 15 ׳§׳˜׳’׳•׳¨׳™׳•׳× (׳¡׳“׳¨ ׳¢׳‘׳•׳“׳”)</h2>
+                            <h2>טבלת ברין - 15 קטגוריות (סדר עבודה)</h2>
                             ${renderBreenCategoryBoard()}
                         </section>
 
@@ -1137,7 +1137,7 @@
 
                     <div class="prm-column">
                         <section class="prm-card">
-                            <h2>׳™׳•׳׳ ׳׳¡׳׳•׳ ׳”׳—׳§׳™׳¨׳”</h2>
+                            <h2>יומן מסלול החקירה</h2>
                             ${renderPathLog()}
                         </section>
                         ${renderReportPanel()}
@@ -1229,7 +1229,7 @@
             render();
         } catch (error) {
             state.loaded = false;
-            state.loadError = `׳˜׳¢׳™׳ ׳× ׳ ׳×׳•׳ ׳™׳ ׳ ׳›׳©׳׳”: ${error && error.message ? error.message : String(error)}`;
+            state.loadError = `טעינת נתונים נכשלה: ${error && error.message ? error.message : String(error)}`;
             render();
         }
     }

@@ -613,24 +613,24 @@
         }
 
         const promptMap = {
-            lost_performative: '׳׳₪׳™ ׳׳™׳–׳” ׳¡׳˜׳ ׳“׳¨׳˜ ׳–׳” ׳ ׳©׳₪׳˜ ׳›׳׳?',
-            assumptions: '׳׳™׳–׳• ׳”׳ ׳—׳” ׳›׳׳ ׳—׳™׳™׳‘׳× ׳׳”׳™׳•׳× ׳ ׳›׳•׳ ׳” ׳›׳“׳™ ׳©׳–׳” ׳™׳—׳–׳™׳§?',
-            mind_reading: '׳׳™׳ ׳׳×׳” ׳™׳•׳“׳¢/׳× ׳׳” ׳”׳¦׳“ ׳”׳©׳ ׳™ ׳—׳•׳©׳‘ ׳׳• ׳׳×׳›׳•׳•׳?',
-            universal_quantifier: '׳×׳׳™׳“? ׳׳™׳ ׳׳₪׳™׳׳• ׳™׳•׳¦׳ ׳“׳•׳₪׳ ׳׳—׳“?',
-            modal_operator: '׳׳” ׳¢׳•׳¦׳¨ ׳׳•׳×׳ ׳‘׳₪׳•׳¢׳? ׳׳” ׳‘׳“׳™׳•׳§ ׳׳•׳ ׳¢?',
-            cause_effect: '׳׳™׳ ׳‘׳“׳™׳•׳§ X ׳׳•׳‘׳™׳ ׳-Y, ׳©׳׳‘ ׳׳—׳¨׳™ ׳©׳׳‘?',
-            nominalisations: '׳׳” ׳§׳•׳¨׳” ׳›׳׳ ׳‘׳₪׳•׳¢׳ (׳›׳₪׳¢׳•׳׳”) ׳•׳׳ ׳›׳©׳ ׳¢׳¦׳?',
-            identity_predicates: '׳‘׳׳™׳–׳” ׳×׳—׳•׳ ׳–׳” ׳ ׳›׳•׳, ׳•׳‘׳׳™׳–׳” ׳×׳—׳•׳ ׳׳ ׳‘׳”׳›׳¨׳—?',
-            complex_equivalence: '׳׳™׳ ׳”׳׳™׳¨׳•׳¢ ׳”׳–׳” ׳׳•׳׳¨ ׳׳× ׳”׳׳¡׳§׳ ׳” ׳”׳–׳׳×?',
-            comparative_deletion: '׳‘׳™׳—׳¡ ׳׳׳” ׳‘׳“׳™׳•׳§? ׳•׳׳” ׳”׳׳“׳“?',
-            time_space_predicates: '׳׳×׳™/׳׳™׳₪׳” ׳‘׳“׳™׳•׳§ ׳–׳” ׳§׳•׳¨׳” (׳•׳׳×׳™ ׳׳)?',
-            lack_referential_index: '׳׳™ ׳‘׳“׳™׳•׳§ ׳–׳” "׳”׳/׳›׳•׳׳" ׳›׳׳?',
-            non_referring_nouns: '׳׳׳” ׳‘׳“׳™׳•׳§ ׳׳×׳›׳•׳•׳ ׳™׳ ׳‘׳׳™׳׳” ׳”׳–׳׳×?',
-            sensory_predicates: '׳׳” ׳‘׳“׳™׳•׳§ ׳¨׳•׳׳™׳/׳©׳•׳׳¢׳™׳/׳׳¨׳’׳™׳©׳™׳ ׳‘׳’׳•׳£?',
-            unspecified_verbs: '׳׳” ׳§׳•׳¨׳” ׳›׳׳ ׳¦׳¢׳“-׳¦׳¢׳“ ׳‘׳₪׳•׳¢׳?'
+            lost_performative: 'לפי איזה סטנדרט זה נשפט כאן?',
+            assumptions: 'איזו הנחה כאן חייבת להיות נכונה כדי שזה יחזיק?',
+            mind_reading: 'איך אתה יודע/ת מה הצד השני חושב או מתכוון?',
+            universal_quantifier: 'תמיד? אין אפילו יוצא דופן אחד?',
+            modal_operator: 'מה עוצר אותך בפועל? מה בדיוק מונע?',
+            cause_effect: 'איך בדיוק X מוביל ל-Y, שלב אחרי שלב?',
+            nominalisations: 'מה קורה כאן בפועל (כפעולה) ולא כשם עצם?',
+            identity_predicates: 'באיזה תחום זה נכון, ובאיזה תחום לא בהכרח?',
+            complex_equivalence: 'איך האירוע הזה אומר את המסקנה הזאת?',
+            comparative_deletion: 'ביחס למה בדיוק? ומה המדד?',
+            time_space_predicates: 'מתי/איפה בדיוק זה קורה (ומתי לא)?',
+            lack_referential_index: 'מי בדיוק זה "הם/כולם" כאן?',
+            non_referring_nouns: 'למה בדיוק מתכוונים במילה הזאת?',
+            sensory_predicates: 'מה בדיוק רואים/שומעים/מרגישים בגוף?',
+            unspecified_verbs: 'מה קורה כאן צעד-צעד בפועל?'
         };
 
-        return promptMap[normalized] || `׳׳” ׳™׳¢׳–׳•׳¨ ׳׳“׳™׳™׳§ ׳›׳׳ ׳“׳¨׳ ${getShortCategoryChip(normalized)}?`;
+        return promptMap[normalized] || `מה יעזור לדייק כאן דרך ${getShortCategoryChip(normalized)}?`;
     }
 
     
@@ -640,9 +640,9 @@
         const anchorText = clipText(anchor?.text || current?.clientText || '', 72);
         const chip = getShortCategoryChip(categoryId);
         const variants = [
-            `׳›׳©"${anchorText}" ׳§׳•׳¨׳”, ׳׳ ׳™ ׳™׳©׳¨ ׳§׳•׳¨׳/׳× ׳׳× ׳–׳” ׳“׳¨׳ ${chip} ׳•׳׳’׳™׳‘/׳” ׳׳”׳¨.`,
-            `׳‘׳¨׳’׳¢ ׳”׳–׳” "${anchorText}" ׳׳¨׳’׳™׳© ׳׳™ ׳›׳׳• ׳”׳•׳›׳—׳”, ׳׳₪׳ ׳™ ׳©׳‘׳“׳§׳×׳™ ׳₪׳¨׳˜׳™׳.`,
-            `׳›׳©׳׳ ׳™ ׳ ׳×׳₪׳¡/׳× ׳¢׳ "${anchorText}", ׳”׳›׳•׳ ׳׳¦׳˜׳׳¦׳ ׳׳׳©׳׳¢׳•׳× ׳׳—׳× ׳•׳׳ ׳™ ׳׳₪׳¡׳₪׳¡/׳× ׳”׳§׳©׳¨.`
+            `כש"${anchorText}" קורה, אני ישר קורא/ת את זה דרך ${chip} ומגיב/ה מהר.`,
+            `ברגע הזה "${anchorText}" מרגיש לי כמו הוכחה, לפני שבדקתי פרטים.`,
+            `כשאני נתפס/ת על "${anchorText}", הכול מצטמצם למשמעות אחת ואני מפספס/ת הקשר.`
         ];
         const index = ensurePhoneScenarioFlow().qaFeed.length % variants.length;
         return variants[index];
@@ -660,15 +660,15 @@
         });
 
         const anchorText = clipText(anchor?.text || current?.clientText || '', 80);
-        const mirror = `׳©׳™׳§׳•׳£: "׳›׳©'${anchorText}' ׳₪׳•׳’׳© ׳׳•׳×׳, ׳–׳” ׳™׳›׳•׳ ׳׳”׳¨׳’׳™׳© ׳¡׳•׳₪׳™ ׳•׳›׳‘׳“."`;
-        const gap = '׳×׳•׳‘׳ ׳× ׳׳˜׳₪׳: "׳›׳¨׳’׳¢ ׳™׳© ׳§׳₪׳™׳¦׳” ׳׳”׳׳™׳¨׳•׳¢ ׳׳׳©׳׳¢׳•׳×. ׳ ׳‘׳“׳•׳§ ׳—׳׳§ ׳׳—׳“ ׳‘׳׳§׳•׳ ׳׳× ׳›׳ ׳”׳¡׳™׳₪׳•׳¨ ׳™׳—׳“."';
-        const next = '׳©׳׳׳× ׳”׳¢׳“׳₪׳”: "׳׳” ׳”׳›׳™ ׳ ׳›׳•׳ ׳׳ ׳׳‘׳“׳•׳§ ׳¢׳›׳©׳™׳• ג€” ׳¢׳•׳‘׳“׳”, ׳׳©׳׳¢׳•׳×, ׳׳• ׳×׳ ׳׳™?"';
+        const mirror = `שיקוף: "כש'${anchorText}' פוגש אותך, זה יכול להרגיש סופי וכבד."`;
+        const gap = 'תובנת מטפל: "כרגע יש קפיצה מהאירוע למשמעות. נבדוק חלק אחד במקום את כל הסיפור יחד."';
+        const next = 'שאלת העדפה: "מה הכי נכון לך לבדוק עכשיו ג€” עובדה, משמעות, או תנאי?"';
         return {
             bullets,
             mirror,
             gap,
             next,
-            actions: ['׳‘׳“׳™׳§׳× ׳¢׳•׳‘׳“׳•׳×', '׳•׳™׳¡׳•׳×/׳”׳׳˜׳”']
+            actions: ['בדיקת עובדות', 'ויסות/האטה']
         };
     }
 
@@ -677,33 +677,33 @@
         const phone = ensurePhoneScenarioFlow();
         const qaFeed = Array.isArray(phone.qaFeed) ? phone.qaFeed : [];
         const challengeByCategory = {
-            lost_performative: '׳׳₪׳™ ׳׳™ ׳‘׳“׳™׳•׳§ ׳–׳” "׳׳ ׳‘׳¡׳“׳¨" ׳׳• "׳¦׳¨׳™׳" ׳›׳׳?',
-            assumptions: '׳׳™׳–׳• ׳”׳ ׳—׳” ׳›׳׳ ׳”׳›׳™ ׳›׳“׳׳™ ׳׳‘׳“׳•׳§ ׳§׳•׳“׳ ׳׳•׳ ׳”׳׳¦׳™׳׳•׳×?',
-            mind_reading: '׳׳™׳ ׳ ׳‘׳“׳•׳§ ׳׳” ׳‘׳׳׳× ׳ ׳׳׳¨/׳ ׳¢׳©׳” ׳‘׳׳™ ׳׳ ׳—׳© ׳›׳•׳•׳ ׳”?',
-            universal_quantifier: '׳׳” ׳™׳•׳¦׳ ׳”׳“׳•׳₪׳ ׳”׳¨׳׳©׳•׳ ׳©׳׳—׳׳™׳© ׳׳× ׳”"׳×׳׳™׳“/׳׳£ ׳₪׳¢׳"?',
-            modal_operator: '׳׳” ׳׳•׳ ׳¢ ׳‘׳₪׳•׳¢׳, ׳•׳׳” ׳¦׳¢׳“ ׳§׳˜׳ ׳©׳›׳ ׳׳₪׳©׳¨׳™?',
-            cause_effect: '׳׳” ׳”׳©׳¨׳©׳¨׳× ׳‘׳₪׳•׳¢׳, ׳•׳׳” ׳¢׳•׳“ ׳™׳›׳•׳ ׳׳”׳¡׳‘׳™׳¨ ׳׳× ׳׳•׳×׳” ׳×׳•׳¦׳׳”?',
-            nominalisations: '׳׳” ׳§׳•׳¨׳” ׳‘׳₪׳•׳¢׳ ׳¦׳¢׳“-׳¦׳¢׳“ ׳‘׳׳§׳•׳ ׳©׳ ׳¢׳¦׳ ׳›׳׳׳™?',
-            identity_predicates: '׳‘׳׳™׳–׳” ׳×׳—׳•׳ ׳–׳” ׳ ׳›׳•׳, ׳•׳‘׳׳™׳–׳” ׳×׳—׳•׳ ׳–׳” ׳׳ ׳‘׳”׳›׳¨׳— ׳ ׳›׳•׳?',
-            complex_equivalence: '׳׳™׳ ׳‘׳“׳™׳•׳§ X ׳׳•׳׳¨ Y? ׳׳” ׳”׳§׳¨׳™׳˜׳¨׳™׳•׳ ׳׳• ׳”׳¨׳׳™׳”?',
-            comparative_deletion: '׳‘׳™׳—׳¡ ׳׳׳”/׳׳׳™? ׳•׳׳” ׳”׳׳“׳“?',
-            time_space_predicates: '׳׳×׳™/׳׳™׳₪׳” ׳‘׳“׳™׳•׳§ ׳–׳” ׳§׳•׳¨׳”, ׳•׳׳×׳™ ׳׳?',
-            lack_referential_index: '׳׳™ ׳‘׳“׳™׳•׳§ ׳–׳” "׳”׳" / "׳›׳•׳׳" ׳‘׳׳§׳¨׳” ׳”׳–׳”?',
-            non_referring_nouns: '׳׳׳” ׳‘׳“׳™׳•׳§ ׳׳×׳›׳•׳•׳ ׳™׳ ׳‘׳׳™׳׳” ׳”׳–׳•?',
-            sensory_predicates: '׳׳” ׳¨׳׳™׳×/׳©׳׳¢׳×/׳”׳¨׳’׳©׳× ׳‘׳’׳•׳£ ׳‘׳׳•׳₪׳ ׳§׳•׳ ׳§׳¨׳˜׳™?',
-            unspecified_verbs: '׳׳” ׳§׳•׳¨׳” ׳‘׳₪׳•׳¢׳ ׳¦׳¢׳“-׳¦׳¢׳“ ׳‘׳×׳•׳ ׳”׳₪׳•׳¢׳ ׳”׳–׳”?'
+            lost_performative: 'לפי מי בדיוק זה "לא בסדר" או "צריך" כאן?',
+            assumptions: 'איזו הנחה כאן הכי כדאי לבדוק קודם מול המציאות?',
+            mind_reading: 'איך נבדוק מה באמת נאמר/נעשה בלי לנחש כוונה?',
+            universal_quantifier: 'מה יוצא הדופן הראשון שמחליש את ה"תמיד/אף פעם"?',
+            modal_operator: 'מה מונע בפועל, ומה צעד קטן שכן אפשרי?',
+            cause_effect: 'מה השרשרת בפועל, ומה עוד יכול להסביר את אותה תוצאה?',
+            nominalisations: 'מה קורה בפועל צעד-צעד במקום שם עצם כללי?',
+            identity_predicates: 'באיזה תחום זה נכון, ובאיזה תחום זה לא בהכרח נכון?',
+            complex_equivalence: 'איך בדיוק X אומר Y? מה הקריטריון או הראיה?',
+            comparative_deletion: 'ביחס למה/למי? ומה המדד?',
+            time_space_predicates: 'מתי/איפה בדיוק זה קורה, ומתי לא?',
+            lack_referential_index: 'מי בדיוק זה "הם" / "כולם" במקרה הזה?',
+            non_referring_nouns: 'למה בדיוק מתכוונים במילה הזו?',
+            sensory_predicates: 'מה ראית/שמעת/הרגשת בגוף באופן קונקרטי?',
+            unspecified_verbs: 'מה קורה בפועל צעד-צעד בתוך הפועל הזה?'
         };
 
         const items = qaFeed.slice(0, 3).map((item) => ({
             letter: item.letter,
             categoryLabel: item.categoryLabel,
-            challenge: challengeByCategory[item.categoryId] || '׳׳” ׳”׳©׳׳׳” ׳”׳׳“׳•׳™׳§׳× ׳”׳‘׳׳” ׳©׳×׳‘׳“׳•׳§ ׳׳× ׳–׳” ׳׳•׳ ׳”׳׳¦׳™׳׳•׳×?'
+            challenge: challengeByCategory[item.categoryId] || 'מה השאלה המדויקת הבאה שתבדוק את זה מול המציאות?'
         }));
 
         return {
-            intro: '׳©׳׳‘ ׳׳×׳’׳¨: ׳׳—׳¨׳™ ׳”׳—׳©׳™׳₪׳”, ׳‘׳•׳“׳§׳™׳ ׳›׳ ׳׳—׳“ ׳׳©׳׳•׳©׳× ׳”׳₪׳¨׳™׳˜׳™׳ ׳©׳ ׳׳¡׳₪׳•.',
+            intro: 'שלב אתגר: אחרי החשיפה, בודקים כל אחד משלושת הפריטים שנאספו.',
             items,
-            therapistChoice: '׳׳” ׳”׳׳˜׳•׳₪׳ ׳׳¢׳“׳™׳£ ׳׳—׳§׳•׳¨ ׳¢׳›׳©׳™׳•: ׳¨׳׳™׳”? ׳׳©׳׳¢׳•׳×? ׳×׳ ׳׳™׳?'
+            therapistChoice: 'מה המטופל מעדיף לחקור עכשיו: ראיה? משמעות? תנאים?'
         };
     }
 
@@ -731,7 +731,7 @@
         const anchor = (phone.anchors || []).find((item) => item.id === anchorId);
         if (!anchor) return;
         if (!anchor.isTop) {
-            showPhoneToast('׳›׳¨׳’׳¢ ׳‘׳—׳¨/׳™ ׳׳—׳“ ׳׳©׳׳•׳©׳× ׳”׳¢׳•׳’׳ ׳™׳ ׳”׳׳•׳‘׳™׳׳™׳ ׳›׳“׳™ ׳׳₪׳×׳•׳— ׳¢׳‘׳•׳“׳” ׳׳“׳•׳™׳§׳×.', 'warn');
+            showPhoneToast('כרגע בחר/י אחד משלושת העוגנים המובילים כדי לפתוח עבודה מדויקת.', 'warn');
             return;
         }
         phone.selectedAnchorId = anchor.id;
@@ -828,18 +828,18 @@
         const canGenerate = qaFeed.length >= Math.min(3, rowCategories.length || 3);
 
         const stepSubtitleMap = {
-            anchors: '׳‘׳—׳¨/׳™ ׳§׳˜׳¢ ׳‘׳•׳׳˜ ׳׳×׳•׳ ׳©׳׳•׳©׳× ׳”׳¢׳•׳’׳ ׳™׳ ׳”׳׳¨׳›׳–׳™׳™׳ ׳‘׳׳©׳₪׳˜.',
-            focus: '׳”׳§׳˜׳¢ ׳ ׳‘׳—׳¨. ׳¢׳›׳©׳™׳• ׳ ׳₪׳×׳— ׳¢׳‘׳•׳“׳” ׳¢׳ ׳©׳׳•׳© ׳”׳×׳‘׳ ׳™׳•׳× ׳”׳©׳›׳ ׳•׳× ׳‘׳׳•׳×׳” ׳©׳•׳¨׳”.',
-            qa: `׳‘׳•׳ ׳™׳ 3 ׳©׳׳׳•׳× ׳•׳×׳©׳•׳‘׳•׳× ׳׳©׳׳™׳׳•׳× (׳©׳›׳/׳×׳‘׳ ׳™׳×/׳©׳›׳) ֲ· ${qaFeed.length}/3`,
+            anchors: 'בחר/י קטע בולט מתוך שלושת העוגנים המרכזיים במשפט.',
+            focus: 'הקטע נבחר. עכשיו נפתח עבודה על שלוש התבניות השכנות באותה שורה.',
+            qa: `בונים 3 שאלות ותשובות משלימות (שכן/תבנית/שכן) ֲ· ${qaFeed.length}/3`,
             done: phone.challenge
-                ? '׳©׳׳‘ ׳‘׳“׳™׳§׳× ׳”׳”׳׳©׳ ׳₪׳¢׳™׳: ׳‘׳•׳“׳§׳™׳ ׳׳× ׳©׳׳•׳© ׳”׳ ׳§׳•׳“׳•׳× ׳©׳¢׳׳•'
-                : (phone.reply ? '׳©׳׳‘ ׳”׳—׳©׳™׳₪׳” ׳”׳•׳©׳׳ ֲ· ׳™׳© ׳©׳™׳§׳•׳£ ׳•׳”׳¦׳¢׳× ׳”׳׳©׳' : '3/3 ׳”׳•׳©׳׳ ֲ· ׳‘׳ ׳”/׳™ ׳©׳™׳§׳•׳£')
+                ? 'שלב בדיקת ההמשך פעיל: בודקים את שלוש הנקודות שעלו'
+                : (phone.reply ? 'שלב החשיפה הושלם ֲ· יש שיקוף והצעת המשך' : '3/3 הושלם ֲ· בנה/י שיקוף')
         };
         const headerTitleMap = {
-            anchors: '׳׳‘׳˜ ׳©׳׳©׳” ֲ· ׳¢׳•׳’׳ ׳™׳ ׳׳”׳׳©׳₪׳˜',
-            focus: '׳‘׳—׳¨׳ ׳• ׳ ׳§׳•׳“׳× ׳₪׳×׳™׳—׳” ׳׳¢׳‘׳•׳“׳”',
-            qa: '׳©׳•׳׳׳™׳ ׳•׳׳“׳™׳™׳§׳™׳ ׳‘׳×׳•׳ ׳׳•׳×׳” ׳׳©׳₪׳—׳”',
-            done: phone.challenge ? '׳‘׳“׳™׳§׳× ׳”׳׳©׳ ׳-3 ׳”׳ ׳§׳•׳“׳•׳×' : (phone.reply ? '׳©׳™׳§׳•׳£ + ׳ ׳™׳¡׳•׳— ׳”׳׳©׳' : '3/3 ׳”׳•׳©׳׳')
+            anchors: 'מבט שלשה ֲ· עוגנים מהמשפט',
+            focus: 'בחרנו נקודת פתיחה לעבודה',
+            qa: 'שואלים ומדייקים בתוך אותה משפחה',
+            done: phone.challenge ? 'בדיקת המשך ל-3 הנקודות' : (phone.reply ? 'שיקוף + ניסוח המשך' : '3/3 הושלם')
         };
 
         const highlightButtons = (phone.anchors || []).map((anchor) => {
@@ -858,7 +858,7 @@
                     data-tr-phone-anchor-id="${escapeHtml(anchor.id)}"
                     ${disabled ? 'tabindex="-1" disabled' : ''}>
                     ${escapeHtml(anchor.text)}
-                    ${anchor.isTop ? '<span class="tr-phone-badge">׳¢׳•׳’׳ ׳׳•׳‘׳™׳</span>' : ''}
+                    ${anchor.isTop ? '<span class="tr-phone-badge">עוגן מוביל</span>' : ''}
                 </button>
             `;
         }).join('');
@@ -881,7 +881,7 @@
                     <span class="tr-phone-card-letter">${escapeHtml(getPhoneCardLetter(idx))}</span>
                     <span class="tr-phone-card-chip">${escapeHtml(getShortCategoryChip(normalized))}</span>
                     <small class="tr-phone-card-label">${escapeHtml(getCategoryLabelHe(normalized))}</small>
-                    ${used ? '<span class="tr-phone-card-used">׳ ׳©׳׳ ג“</span>' : ''}
+                    ${used ? '<span class="tr-phone-card-used">נשאל ג“</span>' : ''}
                 </button>
             `;
         }).join('');
@@ -889,12 +889,12 @@
         const qaFeedHtml = qaFeed.length
             ? qaFeed.map((item) => `
                 <article class="tr-phone-qa-item">
-                    <div class="tr-phone-qa-kicker">׳©׳׳׳”/׳×׳©׳•׳‘׳” ${escapeHtml(item.letter)} ֲ· ${escapeHtml(item.categoryLabel)}</div>
-                    <p class="tr-phone-q-line"><strong>׳©׳׳׳”:</strong> ${escapeHtml(item.question)}</p>
-                    <p class="tr-phone-a-line"><strong>׳×׳’׳•׳‘׳”:</strong> ${escapeHtml(item.answer)}</p>
+                    <div class="tr-phone-qa-kicker">שאלה/תשובה ${escapeHtml(item.letter)} ֲ· ${escapeHtml(item.categoryLabel)}</div>
+                    <p class="tr-phone-q-line"><strong>שאלה:</strong> ${escapeHtml(item.question)}</p>
+                    <p class="tr-phone-a-line"><strong>תגובה:</strong> ${escapeHtml(item.answer)}</p>
                 </article>
             `).join('')
-            : '<p class="tr-phone-muted">׳‘׳—׳¨/׳™ ׳›׳¨׳˜׳™׳¡ ׳׳—׳“ ׳׳×׳•׳ ׳”׳©׳׳©׳” ׳›׳“׳™ ׳׳™׳¦׳•׳¨ ׳©׳׳׳” ׳•׳×׳©׳•׳‘׳× ׳׳˜׳•׳₪׳.</p>';
+            : '<p class="tr-phone-muted">בחר/י כרטיס אחד מתוך השלשה כדי ליצור שאלה ותשובת מטופל.</p>';
 
         const collectedHtml = qaFeed.length
             ? qaFeed.map((item) => `<li><strong>${escapeHtml(item.letter)}</strong> ֲ· ${escapeHtml(getShortCategoryChip(item.categoryId))}: ${escapeHtml(clipText(item.answer, 56))}</li>`).join('')
@@ -902,7 +902,7 @@
 
         const wordBoardHtml = `
             <section class="tr-phone-panel tr-phone-wordboard">
-                <div class="tr-phone-panel-title">׳¢׳•׳’׳ ׳™׳ ׳‘׳•׳׳˜׳™׳ ׳׳×׳•׳ ׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳</div>
+                <div class="tr-phone-panel-title">עוגנים בולטים מתוך משפט המטופל</div>
                 <div class="tr-phone-wordboard-grid">
                     ${(phone.anchors || []).map((anchor) => {
                         const cls = [
@@ -913,13 +913,13 @@
                         return `<span class="${cls}">${escapeHtml(anchor.text)}</span>`;
                     }).join('')}
                 </div>
-                <p class="tr-phone-wordboard-note"><strong>3 ׳¢׳•׳’׳ ׳™׳ ׳׳•׳‘׳™׳׳™׳:</strong> ${escapeHtml(topAnchors.map((item) => item.text).join(' | '))}</p>
+                <p class="tr-phone-wordboard-note"><strong>3 עוגנים מובילים:</strong> ${escapeHtml(topAnchors.map((item) => item.text).join(' | '))}</p>
             </section>
         `;
 
         const breenTableHtml = `
             <section class="tr-phone-panel tr-phone-breen-panel">
-                <div class="tr-phone-panel-title">׳˜׳‘׳׳× ׳‘׳¨׳™׳ (׳׳₪׳× ׳”׳“׳₪׳•׳¡׳™׳ ׳”׳׳׳׳”)</div>
+                <div class="tr-phone-panel-title">טבלת ברין (מפת הדפוסים המלאה)</div>
                 <div class="tr-phone-breen-grid">
                     ${root.triplesRadarCore.ROWS.map((r) => {
                         const meta = ROW_META[r.id] || ROW_META.row1;
@@ -958,12 +958,12 @@
         const challengeHtml = phone.challenge
             ? `
                 <section class="tr-phone-panel tr-phone-challenge-panel">
-                    <div class="tr-phone-panel-title">׳׳×׳’׳•׳¨ 3 ׳”׳“׳‘׳¨׳™׳ ׳©׳ ׳—׳©׳₪׳•</div>
+                    <div class="tr-phone-panel-title">אתגור 3 הדברים שנחשפו</div>
                     <p class="tr-phone-challenge-intro">${escapeHtml(phone.challenge.intro || '')}</p>
                     <div class="tr-phone-challenge-list">
                         ${(phone.challenge.items || []).map((item) => `
                             <article class="tr-phone-challenge-item">
-                                <div class="tr-phone-qa-kicker">׳׳×׳’׳•׳¨ ${escapeHtml(item.letter)} ֲ· ${escapeHtml(item.categoryLabel)}</div>
+                                <div class="tr-phone-qa-kicker">אתגור ${escapeHtml(item.letter)} ֲ· ${escapeHtml(item.categoryLabel)}</div>
                                 <p>${escapeHtml(item.challenge)}</p>
                             </article>
                         `).join('')}
@@ -976,7 +976,7 @@
         const replyHtml = phone.reply
             ? `
                 <section class="tr-phone-panel">
-                    <div class="tr-phone-panel-title">׳©׳™׳§׳•׳£ + ׳×׳•׳‘׳ ׳” ׳©׳ ׳”׳׳˜׳₪׳ (׳˜׳™׳•׳˜׳”)</div>
+                    <div class="tr-phone-panel-title">שיקוף + תובנה של המטפל (טיוטה)</div>
                     <p>${escapeHtml(phone.reply.mirror)}</p>
                     <p>${escapeHtml(phone.reply.gap)}</p>
                     <p>${escapeHtml(phone.reply.next)}</p>
@@ -990,19 +990,19 @@
         const transcriptHtml = phone.transcriptOpen
             ? `
                 <section class="tr-phone-panel tr-phone-transcript">
-                    <div class="tr-phone-panel-title">׳×׳׳׳™׳ ׳”׳¡׳‘׳‘</div>
-                    <div class="tr-phone-transcript-block"><strong>׳׳˜׳•׳₪׳</strong><p>${escapeHtml(current.clientText || '')}</p></div>
-                    <div class="tr-phone-transcript-block"><strong>׳§׳˜׳¢ ׳©׳ ׳‘׳—׳¨</strong><p>${escapeHtml(selectedAnchor?.text || '')}</p></div>
+                    <div class="tr-phone-panel-title">תמליל הסבב</div>
+                    <div class="tr-phone-transcript-block"><strong>מטופל</strong><p>${escapeHtml(current.clientText || '')}</p></div>
+                    <div class="tr-phone-transcript-block"><strong>קטע שנבחר</strong><p>${escapeHtml(selectedAnchor?.text || '')}</p></div>
                     ${qaFeed.map((item) => `
                         <div class="tr-phone-transcript-block">
-                            <strong>׳©׳׳׳”/׳×׳©׳•׳‘׳” ${escapeHtml(item.letter)}</strong>
-                            <p><em>׳©׳׳׳”:</em> ${escapeHtml(item.question)}</p>
-                            <p><em>׳×׳’׳•׳‘׳”:</em> ${escapeHtml(item.answer)}</p>
+                            <strong>שאלה/תשובה ${escapeHtml(item.letter)}</strong>
+                            <p><em>שאלה:</em> ${escapeHtml(item.question)}</p>
+                            <p><em>תגובה:</em> ${escapeHtml(item.answer)}</p>
                         </div>
                     `).join('')}
                     ${phone.reply ? `
                         <div class="tr-phone-transcript-block">
-                            <strong>׳©׳™׳§׳•׳£/׳×׳•׳‘׳ ׳”</strong>
+                            <strong>שיקוף/תובנה</strong>
                             <p>${escapeHtml(phone.reply.mirror)}</p>
                             <p>${escapeHtml(phone.reply.gap)}</p>
                             <p>${escapeHtml(phone.reply.next)}</p>
@@ -1015,10 +1015,10 @@
         const focusPanelHtml = selectedAnchor
             ? `
                 <section class="tr-phone-panel tr-phone-anchor-panel">
-                    <div class="tr-phone-panel-title">׳”׳§׳˜׳¢ ׳©׳‘׳—׳¨׳× ׳׳¢׳‘׳•׳“׳”</div>
+                    <div class="tr-phone-panel-title">הקטע שבחרת לעבודה</div>
                     <p class="tr-phone-anchor-text">${escapeHtml(selectedAnchor.text)}</p>
                     ${phone.phase === 'focus' ? `
-                        <button type="button" class="tr-phone-meta-btn" data-tr-phone-action="meta">׳₪׳×׳—/׳™ ׳¢׳‘׳•׳“׳” ׳¢׳ ׳”׳©׳׳©׳”</button>
+                        <button type="button" class="tr-phone-meta-btn" data-tr-phone-action="meta">פתח/י עבודה על השלשה</button>
                     ` : ''}
                 </section>
             `
@@ -1027,13 +1027,13 @@
         const qaPanelHtml = selectedAnchor && (phone.phase === 'qa' || phone.phase === 'done' || phone.reply)
             ? `
                 <section class="tr-phone-panel tr-phone-locked-panel">
-                    <div class="tr-phone-panel-title">׳”׳©׳׳©׳” ׳”׳₪׳¢׳™׳׳” (׳”׳×׳‘׳ ׳™׳× ׳•׳”׳©׳›׳ ׳™׳ ׳©׳׳”)</div>
+                    <div class="tr-phone-panel-title">השלשה הפעילה (התבנית והשכנים שלה)</div>
                     <div class="tr-phone-row-note">
                         <strong>${escapeHtml(rowMeta.heLabel || '')}</strong>
                         <small>${escapeHtml(rowMeta.heInsight || '')}</small>
                     </div>
                     <div class="tr-phone-cards">${tripleCards}</div>
-                    <div class="tr-phone-panel-title">׳¨׳¦׳£ ׳”׳¢׳‘׳•׳“׳” (3 ׳©׳׳׳•׳× ׳•׳×׳©׳•׳‘׳•׳×)</div>
+                    <div class="tr-phone-panel-title">רצף העבודה (3 שאלות ותשובות)</div>
                     <div class="tr-phone-qa-feed">${qaFeedHtml}</div>
                 </section>
             `
@@ -1043,20 +1043,20 @@
             ? `
                 <section class="tr-phone-panel tr-phone-done-panel">
                     <div class="tr-phone-header-row">
-                        <div class="tr-phone-panel-title">3/3 ׳”׳•׳©׳׳ (׳©׳׳‘ ׳—׳©׳™׳₪׳”)</div>
-                        <div class="tr-phone-done-micro">׳¡׳¦׳ ׳” ${state.index + 1}/${state.scenarios.length}</div>
+                        <div class="tr-phone-panel-title">3/3 הושלם (שלב חשיפה)</div>
+                        <div class="tr-phone-done-micro">סצנה ${state.index + 1}/${state.scenarios.length}</div>
                     </div>
                     <div class="tr-phone-inline-actions">
-                        <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="generate" ${canGenerate ? '' : 'disabled'}>׳‘׳ ׳”/׳™ ׳©׳™׳§׳•׳£ ׳•׳”׳¦׳¢׳× ׳”׳׳©׳</button>
-                        <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="transcript">${phone.transcriptOpen ? '׳”׳¡׳×׳¨ ׳×׳׳׳™׳' : '׳×׳׳׳™׳'}</button>
+                        <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="generate" ${canGenerate ? '' : 'disabled'}>בנה/י שיקוף והצעת המשך</button>
+                        <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="transcript">${phone.transcriptOpen ? 'הסתר תמליל' : 'תמליל'}</button>
                     </div>
                     ${phone.reply ? `
                         <div class="tr-phone-inline-actions">
-                            <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="challenge">׳‘׳“׳™׳§׳× ׳”׳׳©׳ ׳-3 ׳”׳ ׳§׳•׳“׳•׳×</button>
-                            <button type="button" class="tr-phone-secondary-btn" disabled>׳§׳•׳“׳ ׳‘׳•׳ ׳™׳ ׳©׳™׳§׳•׳£, ׳•׳׳– ׳‘׳•׳“׳§׳™׳ ׳”׳׳©׳</button>
+                            <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="challenge">בדיקת המשך ל-3 הנקודות</button>
+                            <button type="button" class="tr-phone-secondary-btn" disabled>קודם בונים שיקוף, ואז בודקים המשך</button>
                         </div>
                     ` : ''}
-                    <div class="tr-phone-panel-title">׳׳” ׳ ׳׳¡׳£ ׳¢׳“ ׳¢׳›׳©׳™׳•</div>
+                    <div class="tr-phone-panel-title">מה נאסף עד עכשיו</div>
                     <ul class="tr-phone-collected-list">${collectedHtml}</ul>
                 </section>
             `
@@ -1066,21 +1066,21 @@
             <div class="triples-radar-phone-shell">
                 <div class="triples-radar-phone-header">
                     <div>
-                        <h4>${escapeHtml(headerTitleMap[phone.phase] || '׳׳‘׳˜ ׳©׳׳©׳” ֲ· ׳—׳©׳™׳₪׳” ׳•׳‘׳“׳™׳§׳× ׳”׳׳©׳')}</h4>
+                        <h4>${escapeHtml(headerTitleMap[phone.phase] || 'מבט שלשה ֲ· חשיפה ובדיקת המשך')}</h4>
                         <p>${escapeHtml(stepSubtitleMap[phone.phase] || '')}</p>
                     </div>
                     <div class="triples-radar-phone-stats">
-                        <span>׳׳§׳¨׳” ${state.index + 1}/${state.scenarios.length}</span>
-                        <span>׳ ׳§׳•׳“׳•׳× ${state.score}</span>
+                        <span>מקרה ${state.index + 1}/${state.scenarios.length}</span>
+                        <span>נקודות ${state.score}</span>
                     </div>
                 </div>
 
                 <section class="tr-phone-panel tr-phone-client-panel">
-                    <div class="tr-phone-panel-title">׳׳©׳₪׳˜ ׳”׳׳˜׳•׳₪׳ + ׳¢׳•׳’׳ ׳™׳ ׳׳¢׳‘׳•׳“׳”</div>
+                    <div class="tr-phone-panel-title">משפט המטופל + עוגנים לעבודה</div>
                     <p class="tr-phone-client-text">${escapeHtml(current.clientText || '')}</p>
                     <div class="tr-phone-highlights">${highlightButtons}</div>
                     <div class="tr-phone-top3-line">
-                        <strong>3 ׳¢׳•׳’׳ ׳™׳ ׳׳•׳‘׳™׳׳™׳:</strong>
+                        <strong>3 עוגנים מובילים:</strong>
                         <span>${escapeHtml(topAnchors.map((item) => item.text).join(' | '))}</span>
                     </div>
                 </section>
@@ -1095,8 +1095,8 @@
                 ${transcriptHtml}
 
                 <div class="tr-phone-footer-actions">
-                    <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="restart">׳׳”׳×׳—׳™׳ ׳׳—׳“׳©</button>
-                    <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="next">׳”׳׳§׳¨׳” ׳”׳‘׳</button>
+                    <button type="button" class="tr-phone-secondary-btn" data-tr-phone-action="restart">להתחיל מחדש</button>
+                    <button type="button" class="tr-phone-primary-btn" data-tr-phone-action="next">המקרה הבא</button>
                 </div>
 
                 ${phone.toast ? `<div class="tr-phone-toast" data-tone="${escapeHtml(phone.toastTone || 'info')}">${escapeHtml(phone.toast)}</div>` : ''}
