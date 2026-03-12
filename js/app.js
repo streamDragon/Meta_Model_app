@@ -14070,7 +14070,7 @@ function setupCommunityFeedbackWall() {
 
     const renderFeed = () => {
         if (!entries.length) {
-            els.feed.innerHTML = '<div class="community-empty">עדיין אין הודעות. כתבו ראשונים וקבלו פידבק על הניסוח.</div>';
+            els.feed.innerHTML = '<div class="community-empty">עדיין אין פוסטים בכיכר הזאת. אפשר להתחיל עם שאלה, מחשבה, תגובה או ניסוח קצר.</div>';
             return;
         }
 
@@ -14081,12 +14081,12 @@ function setupCommunityFeedbackWall() {
             const summary = escapeHtml(entry?.analysis?.summary || '');
             const tips = Array.isArray(entry?.analysis?.tips) ? entry.analysis.tips : [];
             const strengths = Array.isArray(entry?.analysis?.strengths) ? entry.analysis.strengths : [];
-            const author = escapeHtml(entry.author || 'משתמש/ת');
+            const author = escapeHtml(entry.author || 'אורח/ת');
             const message = escapeHtml(entry.message || '');
             const date = escapeHtml(formatDate(entry.createdAt));
 
             const tipsHtml = tips.map(tip => `<li>${escapeHtml(tip)}</li>`).join('');
-            const strengthsText = strengths.length ? `חוזקות: ${escapeHtml(strengths.join(' | '))}` : '';
+            const strengthsText = strengths.length ? `מה כבר עובד כאן: ${escapeHtml(strengths.join(' | '))}` : '';
 
             return `
                 <article class="community-item ${itemClass}">
@@ -14116,14 +14116,14 @@ function setupCommunityFeedbackWall() {
         const author = String(els.name?.value || '').trim();
 
         if (message.length < 6) {
-            setStatus('כתבו לפחות 6 תווים כדי לקבל פידבק שימושי.', true);
+            setStatus('כדאי לכתוב לפחות 6 תווים כדי שהכיכר תחזיר פידבק ראשוני עם ערך.', true);
             return;
         }
 
         const analysis = evaluateCommunityMessage(message);
         const entry = {
             id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-            author: author || 'משתמש/ת',
+            author: author || 'אורח/ת',
             message,
             createdAt: new Date().toISOString(),
             analysis
@@ -14135,7 +14135,7 @@ function setupCommunityFeedbackWall() {
         renderFeed();
 
         const scoreLabel = analysis.score >= 75 ? 'מצוין' : analysis.score >= 55 ? 'יפה מאוד' : 'יש כיוון';
-        setStatus(`נשמר. ציון ניסוח: ${analysis.score}/100 (${scoreLabel}).`);
+        setStatus(`הפוסט נשמר בכיכר. פידבק ראשוני: ${analysis.score}/100 (${scoreLabel}).`);
 
         els.message.value = '';
     });
@@ -14145,7 +14145,7 @@ function setupCommunityFeedbackWall() {
             entries = [];
             saveEntries();
             renderFeed();
-            setStatus('הקיר נוקה.');
+            setStatus('הכיכר נוקתה במכשיר הזה.');
         });
     }
 

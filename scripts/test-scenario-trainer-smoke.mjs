@@ -134,6 +134,17 @@ async function runDesktopChecks(page, baseUrl) {
     await assert(summaryAfter !== summaryBefore, 'scenario current summary changed', `${summaryBefore} -> ${summaryAfter}`);
 
     await page.waitForSelector('#scenario-options-container .scenario-option-btn');
+    const stageLayout = await page.evaluate(() => {
+        const main = document.querySelector('.scenario-standalone-main')?.getBoundingClientRect();
+        const support = document.querySelector('.scenario-platform-support')?.getBoundingClientRect();
+        return { main, support };
+    });
+    await assert(
+        !!stageLayout.main && !!stageLayout.support && stageLayout.support.top >= stageLayout.main.bottom - 2,
+        'scenario desktop support sits below main flow',
+        JSON.stringify(stageLayout)
+    );
+
     await page.locator('#scenario-options-container .scenario-option-btn').first().click();
     await page.waitForSelector('[data-scenario-feedback-thread="1"]');
 
@@ -142,6 +153,14 @@ async function runDesktopChecks(page, baseUrl) {
     await assert((await page.locator('[data-scenario-impact="emotion"]').count()) > 0, 'scenario emotional impact card visible');
     await assert((await page.locator('[data-scenario-impact="process"]').count()) > 0, 'scenario process impact card visible');
     await assert((await page.locator('[data-scenario-consequence="1"]').count()) > 0, 'scenario consequence box visible');
+    await assert((await page.locator('[data-scenario-flow-guide="feedback"]').count()) > 0, 'scenario feedback flow guide visible');
+
+    await page.locator('[data-scenario-action="show-blueprint"]').first().click();
+    await page.waitForSelector('[data-scenario-analysis="1"]');
+    await assert((await page.locator('[data-scenario-feedback-thread="1"]').count()) > 0, 'scenario analysis stays in same thread');
+
+    await page.locator('[data-scenario-action="show-blueprint"]').first().click();
+    await page.waitForFunction(() => !document.querySelector('[data-scenario-analysis="1"]'));
     console.log(`desktop scenario-trainer: ${summaryBefore} -> ${summaryAfter}`);
 }
 
@@ -154,6 +173,22 @@ async function runMobileChecks(page, baseUrl) {
         scrollWidth: document.documentElement.scrollWidth
     }));
     await assert(overflow.scrollWidth <= overflow.innerWidth + 1, 'scenario mobile no horizontal overflow', `${overflow.scrollWidth}/${overflow.innerWidth}`);
+
+    await page.locator('[data-trainer-action="start-session"]').first().click();
+    await page.waitForSelector('#scenario-options-container .scenario-option-btn');
+    await assert((await page.locator('[data-scenario-flow-guide="play"]').count()) > 0, 'scenario mobile play flow guide visible');
+    const mobileFlowOrder = await page.evaluate(() => {
+        const main = document.querySelector('.scenario-standalone-main')?.getBoundingClientRect();
+        const support = document.querySelector('.scenario-platform-support')?.getBoundingClientRect();
+        return { main, support };
+    });
+    await assert(
+        !!mobileFlowOrder.main && !!mobileFlowOrder.support && mobileFlowOrder.support.top >= mobileFlowOrder.main.bottom - 2,
+        'scenario mobile support follows main flow',
+        JSON.stringify(mobileFlowOrder)
+    );
+
+    await openScenarioTrainer(page, baseUrl);
 
     await page.locator('[data-trainer-action="open-settings"]').first().click();
     await page.waitForSelector('[data-trainer-settings-shell="1"][data-trainer-id="scenario-trainer"]');

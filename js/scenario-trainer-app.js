@@ -438,9 +438,17 @@
         return queue.slice().sort(() => Math.random() - 0.5).slice(0, clampRunSize(runSize));
     }
 
-    function openScreen(screenId) {
+    function openScreen(screenId, options = {}) {
         state.screen = screenId;
         render();
+        if (options.scrollTarget) {
+            const target = mount.querySelector(options.scrollTarget);
+            if (target && typeof target.scrollIntoView === 'function') {
+                target.scrollIntoView({ block: 'start', behavior: 'auto' });
+                return;
+            }
+        }
+        if (options.preserveScroll) return;
         window.scrollTo({ top: 0, behavior: 'auto' });
     }
 
@@ -685,6 +693,14 @@
         const entry = commitCurrentResult();
         if (!entry) return;
         openScreen(SCREEN_IDS.score);
+    }
+
+    function toggleBlueprintScreen() {
+        if (!state.activeScenario || !state.selectedOption) return;
+        const nextScreen = state.screen === SCREEN_IDS.blueprint ? SCREEN_IDS.feedback : SCREEN_IDS.blueprint;
+        openScreen(nextScreen, {
+            scrollTarget: nextScreen === SCREEN_IDS.blueprint ? '[data-scenario-analysis="1"]' : '[data-scenario-feedback-thread="1"]'
+        });
     }
 
     function continueToNextScene() {
@@ -959,6 +975,82 @@
         `).join('');
     }
 
+    function getFlowGuideContent() {
+        if (state.screen === SCREEN_IDS.play) {
+            return {
+                id: 'play',
+                kicker: 'מה קודם ומה אחר כך',
+                title: 'קודם בוחרים תגובה אחת, אחר כך רואים איך היא נוחתת',
+                body: 'אין כאן כמה מסלולים במקביל. בוחרים תשובה אחת, ואז מקבלים משוב על ההשפעה שלה.',
+                currentLabel: 'עכשיו',
+                currentText: 'קרא/י את פתיחת הסצנה ובחר/י תגובה אחת בלבד.',
+                nextLabel: 'מיד אחר כך',
+                nextText: 'ייפתח משוב קצר: איך זה נחת בצד השני ומה זה עושה לשיחה.'
+            };
+        }
+        if (state.screen === SCREEN_IDS.feedback) {
+            return {
+                id: 'feedback',
+                kicker: 'מה קודם ומה אחר כך',
+                title: 'קודם רואים את ההשפעה, ורק אחר כך מחליטים אם צריך ניתוח',
+                body: 'השלב הראשי כאן הוא להבין מה נפתח או נסגר. הניתוח המעמיק הוא שכבה משנית שנפתחת רק אם היא תעזור.',
+                currentLabel: 'עכשיו',
+                currentText: 'הסתכל/י על התגובה שמולך ועל שני כרטיסי ההשפעה.',
+                nextLabel: 'השלב הבא',
+                nextText: 'אפשר לסכם את הסצנה, או לפתוח ניתוח מעמיק בלי לעזוב את החוט הנוכחי.'
+            };
+        }
+        if (state.screen === SCREEN_IDS.blueprint) {
+            return {
+                id: 'blueprint',
+                kicker: 'מה קודם ומה אחר כך',
+                title: 'הניתוח נפתח בתוך אותה סצנה',
+                body: 'אין מעבר למסך אחר. המשוב, התגובה והעוגנים נשארים במקום, והניתוח נפתח מתחתיהם.',
+                currentLabel: 'עכשיו',
+                currentText: 'עבר/י על מפת הפעולה, המשפט הירוק והעוגנים שעוזרים לדייק את הסצנה.',
+                nextLabel: 'השלב הבא',
+                nextText: 'כשמספיק ברור, סוגרים את הניתוח או עוברים ישר לסיכום הסצנה.'
+            };
+        }
+        if (state.screen === SCREEN_IDS.score) {
+            return {
+                id: 'score',
+                kicker: 'מה קודם ומה אחר כך',
+                title: 'הסצנה נסגרת, והדיוק עובר הלאה',
+                body: 'כאן עוצרים רגע, לוקחים את המשפט הירוק ואת הלקח, ואז מחליטים אם להמשיך או לחזור לבית.',
+                currentLabel: 'עכשיו',
+                currentText: 'קרא/י את הסיכום הקצר ומה כדאי לקחת לסצנה הבאה.',
+                nextLabel: 'השלב הבא',
+                nextText: 'הכפתור הראשי ממשיך למסך הבא. הכפתור המשני מחזיר לבית הסצנות.'
+            };
+        }
+        return null;
+    }
+
+    function renderFlowGuide() {
+        const flow = getFlowGuideContent();
+        if (!flow) return '';
+        return `
+          <section class="scenario-flow-guide" data-scenario-flow-guide="${escapeHtml(flow.id)}">
+            <div class="scenario-flow-guide-head">
+              <p class="scenario-panel-kicker">${escapeHtml(flow.kicker)}</p>
+              <h4>${escapeHtml(flow.title)}</h4>
+              <p>${escapeHtml(flow.body)}</p>
+            </div>
+            <div class="scenario-flow-guide-grid">
+              <article class="scenario-flow-guide-card is-current">
+                <strong>${escapeHtml(flow.currentLabel)}</strong>
+                <span>${escapeHtml(flow.currentText)}</span>
+              </article>
+              <article class="scenario-flow-guide-card is-next">
+                <strong>${escapeHtml(flow.nextLabel)}</strong>
+                <span>${escapeHtml(flow.nextText)}</span>
+              </article>
+            </div>
+          </section>
+        `;
+    }
+
     function renderHomeScreen() {
         return `
           <section class="scenario-start-card scenario-home-setup-card scenario-workspace-card">
@@ -1019,6 +1111,7 @@
               <p class="scenario-session-meta">נקודות: <span>${escapeHtml(state.session?.score || 0)}</span> | רצף ירוק: <span>${escapeHtml(state.session?.streak || 0)}</span></p>
             </div>
             <div class="progress-bar"><div class="progress-fill" style="width:${escapeHtml(progress)}%"></div></div>
+            ${renderFlowGuide()}
             <div class="scenario-chat-shell">
               <div class="scenario-scene-card">
                 <p class="scenario-scene-kicker">${escapeHtml(`${scenario.domainLabel} · בתפקיד ${scenario.role.player}`)}</p>
@@ -1057,12 +1150,67 @@
         `;
     }
 
-    function renderFeedbackScreen() {
+    function renderFeedbackActionBar(analysisOpen) {
+        return `
+          <div class="scenario-flow-actions">
+            <div class="scenario-flow-actions-copy">
+              <strong>${escapeHtml(analysisOpen ? 'הניתוח פתוח בתוך אותה סצנה' : 'השלב הבא נשאר ברור וקרוב')}</strong>
+              <span>${escapeHtml(analysisOpen
+                  ? 'הסצנה עדיין נשארת מולך. אפשר לסגור את הניתוח או לעבור ישר לסיכום.'
+                  : 'הכפתור הראשי ממשיך לסיכום הסצנה. הניתוח המעמיק נפתח כאן רק אם צריך עוד שכבה אחת.')}</span>
+            </div>
+            <div class="scenario-feedback-actions scenario-feedback-actions--flow">
+              <button type="button" class="btn btn-primary" data-scenario-action="continue-result">לסיכום הסצנה</button>
+              <button type="button" class="btn btn-secondary" data-scenario-action="show-blueprint">${escapeHtml(analysisOpen ? 'סגור/י ניתוח מעמיק' : 'פתח/י ניתוח מעמיק')}</button>
+            </div>
+          </div>
+        `;
+    }
+
+    function renderBlueprintDetails(scenario, isGreen) {
+        const bp = scenario.greenBlueprint || {};
+        const prismItems = state.settings.prismWheelEnabled && isGreen && Array.isArray(state.data.prismWheel) ? state.data.prismWheel : [];
+        const selectedPrism = prismItems.find((item) => item.id === state.selectedPrismId) || null;
+        return `
+          <section class="scenario-analysis-panel" data-scenario-analysis="1">
+            <div class="scenario-analysis-head">
+              <p class="scenario-panel-kicker">ניתוח מעמיק</p>
+              <h4>מפת פעולה קצרה מתוך אותה סצנה</h4>
+              <p>כאן פותחים את מה שהיה עמום, בלי לעזוב את התגובה, את המשוב ואת הכיוון שכבר נבנו.</p>
+            </div>
+            <div class="scenario-tote-grid">
+              <div class="scenario-tote-slot"><h5>פתיחת הסצנה</h5><p>${escapeHtml(scenario.openingLine)}</p></div>
+              <div class="scenario-tote-slot"><h5>מה נשאר עמום</h5><p>${escapeHtml(scenario.metaModelCore.hiddenGap)}</p></div>
+              <div class="scenario-tote-slot"><h5>צעד ראשון קטן</h5><p>${escapeHtml(scenario.microPlan.firstStep)}</p></div>
+              <div class="scenario-tote-slot"><h5>צוואר הבקבוק</h5><p>${escapeHtml(scenario.microPlan.bottleneck)}</p></div>
+              <div class="scenario-tote-slot"><h5>סימן הצלחה</h5><p>${escapeHtml(scenario.microPlan.successSign)}</p></div>
+              <div class="scenario-tote-slot"><h5>שאלת ההעמקה</h5><p>${escapeHtml(scenario.deepeningQuestion)}</p></div>
+            </div>
+            <div class="final-blueprint-display scenario-blueprint-display">
+              <div class="blueprint-section"><h4>מטרה</h4><p>${escapeHtml(bp.goal || scenario.humanNeed)}</p></div>
+              <div class="blueprint-section"><h4>צעד ראשון</h4><p>${escapeHtml(bp.firstStep || scenario.microPlan.firstStep)}</p></div>
+              <div class="blueprint-section"><h4>שלבים</h4><ul>${(bp.steps || [scenario.microPlan.firstStep]).map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ul></div>
+              <div class="blueprint-section"><h4>נקודת תקיעה</h4><p>${escapeHtml(bp.stuckPoint || scenario.microPlan.bottleneck)}</p></div>
+              <div class="blueprint-section"><h4>חלופה / תחליף</h4><p>${escapeHtml(bp.planB || 'אם נתקעים שוב, חוזרים לשאלה אחת שמבהירה מה בדיוק קורה בפועל.')}</p></div>
+              <div class="blueprint-section"><h4>מדד הצלחה</h4><p>${escapeHtml(bp.doneDefinition || scenario.microPlan.successSign)}</p></div>
+            </div>
+            <div class="scenario-green-box">
+              <h4>המשפט הירוק המוצע</h4>
+              <p>${escapeHtml(getGreenOptionText(scenario))}</p>
+              <button type="button" class="btn btn-secondary" data-scenario-action="copy-green">העתק משפט ירוק</button>
+            </div>
+            ${prismItems.length ? renderPrismWheel(prismItems, selectedPrism) : ''}
+          </section>
+        `;
+    }
+
+    function renderFeedbackScreen(forceAnalysisOpen = false) {
         const scenario = state.activeScenario;
         const option = state.selectedOption;
         if (!scenario || !option) return renderPlayScreen();
         const isGreen = Number(option.score) === 1;
         const guide = buildFeedbackGuide(scenario, option, isGreen);
+        const analysisOpen = forceAnalysisOpen || state.screen === SCREEN_IDS.blueprint;
         return `
           <section class="scenario-workspace-card" data-scenario-feedback-thread="1">
             <p class="scenario-panel-kicker">אחרי הבחירה</p>
@@ -1072,6 +1220,7 @@
               <h3>${escapeHtml(guide.headline)}</h3>
               <p>${escapeHtml(isGreen ? option.whyItWorks : option.whyItHurts)}</p>
             </div>
+            ${renderFlowGuide()}
             <div class="scenario-feedback-thread">
               <div class="scenario-bubble player selected ${isGreen ? 'green' : 'red'}">
                 <span class="scenario-bubble-speaker">התשובה שלך</span>
@@ -1111,10 +1260,8 @@
               </div>
             </details>
             <div class="scenario-feedback-note">${escapeHtml(isGreen ? 'כדאי לקחת את אותו קו לשאלה אחת נוספת או לפתוח את מפת הפעולה הקצרה.' : 'כדאי לעצור על מה שנסגר כאן, ואז לעבור לשאלה שמחזירה את השיחה לתהליך במקום לאשמה או לחץ.')}</div>
-            <div class="scenario-feedback-actions">
-              <button type="button" class="btn btn-secondary" data-scenario-action="show-blueprint">ניתוח מעמיק</button>
-              <button type="button" class="btn btn-primary" data-scenario-action="continue-result">המשך</button>
-            </div>
+            ${analysisOpen ? renderBlueprintDetails(scenario, isGreen) : ''}
+            ${renderFeedbackActionBar(analysisOpen)}
           </section>
         `;
     }
@@ -1137,12 +1284,17 @@
                 : (normalizeText(scenario.supportPrompt, '') || buildScenarioLearningFocus(scenario)))
             : 'תגובה אחת שמורידה לחץ, מייצרת בהירות, ופותחת צעד שאפשר לבדוק בפועל.';
         return `
-          <section class="scenario-support-card">
+          <div class="scenario-support-intro">
+            <p class="scenario-panel-kicker">עוגנים ברקע</p>
+            <h3>מה מחזיקים לידך בלי לאבד את חוט השיחה</h3>
+            <p>המסלול הראשי נשאר למעלה. כאן נשמרים מצב הסשן, מפת התהליך והעוגן המטה-מודלי.</p>
+          </div>
+          <section class="scenario-support-card" data-support-kind="status">
             <p class="scenario-panel-kicker">מצב נוכחי</p>
             <h4>הסשן שלך</h4>
             <p>${escapeHtml(statusText)}</p>
           </section>
-          <section class="scenario-support-card">
+          <section class="scenario-support-card" data-support-kind="process">
             <p class="scenario-panel-kicker">מפת התהליך</p>
             <h4>איפה אתה/את נמצא/ת עכשיו</h4>
             <div class="scenario-process-rail">
@@ -1154,13 +1306,13 @@
               `).join('')}
             </div>
           </section>
-          <section class="scenario-support-card">
+          <section class="scenario-support-card" data-support-kind="cue">
             <p class="scenario-panel-kicker">${escapeHtml(cueTitle)}</p>
             <h4>${escapeHtml(scenario ? scenario.sceneTitle : 'כך נראה סשן טוב')}</h4>
             <p>${escapeHtml(cueBody)}</p>
           </section>
           ${currentStepId && scenario ? `
-            <section class="scenario-support-card">
+            <section class="scenario-support-card" data-support-kind="anchor">
               <p class="scenario-panel-kicker">עוגן לשיחה</p>
               <h4>מה היה עמום כאן</h4>
               <p><strong>הפועל/המהלך:</strong> ${escapeHtml(scenario.metaModelCore.unspecifiedVerb)}</p>
@@ -1260,44 +1412,7 @@
     }
 
     function renderBlueprintScreen() {
-        const scenario = state.activeScenario;
-        if (!scenario) return renderPlayScreen();
-        const bp = scenario.greenBlueprint || {};
-        const isGreen = Number(state.selectedOption?.score) === 1;
-        const prismItems = state.settings.prismWheelEnabled && isGreen && Array.isArray(state.data.prismWheel) ? state.data.prismWheel : [];
-        const selectedPrism = prismItems.find((item) => item.id === state.selectedPrismId) || null;
-        return `
-          <section class="scenario-workspace-card">
-            <p class="scenario-panel-kicker">פירוק</p>
-            <h3>מפת פעולה קצרה</h3>
-            <div class="scenario-tote-grid">
-              <div class="scenario-tote-slot"><h5>פתיחת הסצנה</h5><p>${escapeHtml(scenario.openingLine)}</p></div>
-              <div class="scenario-tote-slot"><h5>מה נשאר עמום</h5><p>${escapeHtml(scenario.metaModelCore.hiddenGap)}</p></div>
-              <div class="scenario-tote-slot"><h5>צעד ראשון קטן</h5><p>${escapeHtml(scenario.microPlan.firstStep)}</p></div>
-              <div class="scenario-tote-slot"><h5>צוואר הבקבוק</h5><p>${escapeHtml(scenario.microPlan.bottleneck)}</p></div>
-              <div class="scenario-tote-slot"><h5>סימן הצלחה</h5><p>${escapeHtml(scenario.microPlan.successSign)}</p></div>
-              <div class="scenario-tote-slot"><h5>שאלת ההעמקה</h5><p>${escapeHtml(scenario.deepeningQuestion)}</p></div>
-            </div>
-            <div class="final-blueprint-display scenario-blueprint-display">
-              <div class="blueprint-section"><h4>מטרה</h4><p>${escapeHtml(bp.goal || scenario.humanNeed)}</p></div>
-              <div class="blueprint-section"><h4>צעד ראשון</h4><p>${escapeHtml(bp.firstStep || scenario.microPlan.firstStep)}</p></div>
-              <div class="blueprint-section"><h4>שלבים</h4><ul>${(bp.steps || [scenario.microPlan.firstStep]).map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ul></div>
-              <div class="blueprint-section"><h4>נקודת תקיעה</h4><p>${escapeHtml(bp.stuckPoint || scenario.microPlan.bottleneck)}</p></div>
-              <div class="blueprint-section"><h4>חלופה / תחליף</h4><p>${escapeHtml(bp.planB || 'אם נתקעים שוב, חוזרים לשאלה אחת שמבהירה מה בדיוק קורה בפועל.')}</p></div>
-              <div class="blueprint-section"><h4>מדד הצלחה</h4><p>${escapeHtml(bp.doneDefinition || scenario.microPlan.successSign)}</p></div>
-            </div>
-            <div class="scenario-green-box">
-              <h4>המשפט הירוק המוצע</h4>
-              <p>${escapeHtml(getGreenOptionText(scenario))}</p>
-              <button type="button" class="btn btn-secondary" data-scenario-action="copy-green">העתק משפט ירוק</button>
-            </div>
-            ${prismItems.length ? renderPrismWheel(prismItems, selectedPrism) : ''}
-            <div class="scenario-feedback-actions">
-              <button type="button" class="btn btn-secondary" data-scenario-action="back-to-feedback">חזרה למשוב</button>
-              <button type="button" class="btn btn-primary" data-scenario-action="continue-result">סיום ויציאה לסיכום</button>
-            </div>
-          </section>
-        `;
+        return renderFeedbackScreen(true);
     }
 
     function renderScoreScreen() {
@@ -1317,10 +1432,19 @@
                 <p><strong>מדד הצלחה:</strong> ${escapeHtml(entry.successMetric || 'לא הוגדר')}</p>
               </div>
             ` : ''}
+            ${renderFlowGuide()}
             <p class="scenario-feedback-next-hint">${escapeHtml(getScenarioScoreNextHint(isLast))}</p>
-            <div class="scenario-feedback-actions">
-              <button type="button" class="btn btn-primary" data-scenario-action="next-scene">${isLast ? 'סיום סשן וחזרה לבית' : 'המשך לסצנה הבאה'}</button>
-              <button type="button" class="btn btn-secondary" data-scenario-action="go-home">חזרה לבית הסצנות</button>
+            <div class="scenario-flow-actions">
+              <div class="scenario-flow-actions-copy">
+                <strong>${escapeHtml(isLast ? 'זה סוף הסשן הנוכחי' : 'מכאן ממשיכים או עוצרים מסודר')}</strong>
+                <span>${escapeHtml(isLast
+                    ? 'הכפתור הראשי יסגור את הסשן ויחזיר לבית. אם צריך לעצור עכשיו בלי לסגור את המסלול, אפשר לחזור לבית באופן ידני.'
+                    : 'הכפתור הראשי ממשיך ישר לסצנה הבאה. הכפתור המשני מחזיר לבית אם רוצים לעצור כאן.')}</span>
+              </div>
+              <div class="scenario-feedback-actions scenario-feedback-actions--flow">
+                <button type="button" class="btn btn-primary" data-scenario-action="next-scene">${isLast ? 'סיום סשן וחזרה לבית' : 'המשך לסצנה הבאה'}</button>
+                <button type="button" class="btn btn-secondary" data-scenario-action="go-home">חזרה לבית הסצנות</button>
+              </div>
             </div>
           </section>
         `;
@@ -1385,7 +1509,7 @@
         if (scenarioAction === 'open-help') return void openScreen(SCREEN_IDS.help);
         if (scenarioAction === 'open-history') return void openScreen(SCREEN_IDS.history);
         if (scenarioAction === 'pick-option') return void pickOption(button.getAttribute('data-option-id'));
-        if (scenarioAction === 'show-blueprint') return void openScreen(SCREEN_IDS.blueprint);
+        if (scenarioAction === 'show-blueprint') return void toggleBlueprintScreen();
         if (scenarioAction === 'continue-result') return void continueFromResult();
         if (scenarioAction === 'next-scene') return void continueToNextScene();
         if (scenarioAction === 'go-home') return void openScreen(SCREEN_IDS.home);
@@ -1402,7 +1526,9 @@
             navigator.clipboard?.writeText(text).then(() => showToast('המשפט הירוק הועתק')).catch(() => showToast('לא הצלחנו להעתיק.'));
             return;
         }
-        if (scenarioAction === 'back-to-feedback') return void openScreen(SCREEN_IDS.feedback);
+        if (scenarioAction === 'back-to-feedback') {
+            return void openScreen(SCREEN_IDS.feedback, { scrollTarget: '[data-scenario-feedback-thread="1"]' });
+        }
     }
 
     function handleChange(event) {
