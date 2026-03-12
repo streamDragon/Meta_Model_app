@@ -25,5 +25,90 @@
 });
   </script>
 </head>
-<body></body>
+<body>
+  <div id="iceberg-stepper-wrap" class="stepper" style="display:none">
+    <div class="iceberg-hero">
+      <img src="assets/iceberg_lego/iceberg_lego.jpg" alt="פרויקט שלשות: ניתוח מערכתי" onerror="this.parentElement.style.display='none'" />
+    </div>
+    <div class="step-indicator">
+      <div class="step-dot active" data-step="1">
+        <span class="dot-num">1</span>
+        <span class="dot-label">הכנס מילה</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-dot" data-step="2">
+        <span class="dot-num">2</span>
+        <span class="dot-label">בחר תבנית</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-dot" data-step="3">
+        <span class="dot-num">3</span>
+        <span class="dot-label">ראה עץ</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-dot" data-step="4">
+        <span class="dot-num">4</span>
+        <span class="dot-label">קבל שאלה</span>
+      </div>
+    </div>
+    <div class="step-panel" id="step-1">
+      <h2 class="step-title">מה המילה שעוצרת אותך?</h2>
+      <p class="step-subtitle">הכנס מילה או ביטוי קצר שמישהו אמר — AI יציע מבנה חשיבה</p>
+      <div class="word-input-wrap">
+        <input type="text" id="word-input" placeholder='לדוגמה: "מנוחה" או "ריחוק"' class="word-input" />
+        <button id="btn-analyze" class="btn btn-primary" type="button">נתח →</button>
+      </div>
+      <div class="examples-row">
+        <span class="example-tag" onclick="fillWord('מנוחה')">מנוחה</span>
+        <span class="example-tag" onclick="fillWord('חיבור')">חיבור</span>
+        <span class="example-tag" onclick="fillWord('ריחוק')">ריחוק</span>
+        <span class="example-tag" onclick="fillWord('חופש')">חופש</span>
+        <span class="example-tag" onclick="fillWord('תקיעות')">תקיעות</span>
+      </div>
+    </div>
+    <div class="step-panel hidden" id="step-2">
+      <h2 class="step-title">איזו תבנית מתאימה?</h2>
+      <p class="step-subtitle">AI מנתח את "<span id="word-display"></span>" — בחר את מבנה החשיבה שנפתח</p>
+      <div id="template-cards" class="template-cards-grid"></div>
+      <button class="btn btn-secondary" onclick="goStep(1)" type="button">← חזור</button>
+    </div>
+    <div class="step-panel hidden" id="step-3">
+      <h2 class="step-title">עץ ההסתעפות</h2>
+      <p class="step-subtitle">כך "<span id="word-display-3"></span>" נפרש לכיווני חשיבה אפשריים</p>
+      <div id="tree-container" class="tree-container"></div>
+      <div class="tree-legend">
+        <span class="legend-item legend-root">שורש המילה</span>
+        <span class="legend-item legend-branch">קטגוריות</span>
+        <span class="legend-item legend-leaf">פירושים</span>
+      </div>
+      <div class="step3-actions">
+        <button class="btn btn-secondary" onclick="goStep(2)" type="button">← שנה תבנית</button>
+        <button class="btn btn-primary" onclick="goStep(4)" type="button">מה השאלה? →</button>
+      </div>
+    </div>
+    <div class="step-panel hidden" id="step-4">
+      <h2 class="step-title">השאלה המוצעת</h2>
+      <div id="question-card" class="question-card">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+      </div>
+      <div id="alt-questions" class="alt-questions"></div>
+      <div class="step4-actions">
+        <button class="btn btn-secondary" onclick="goStep(3)" type="button">← חזור לעץ</button>
+        <button class="btn btn-primary" onclick="startNew()" type="button">מילה חדשה ↺</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Show stepper after trainer mounts
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        var wrap = document.getElementById('iceberg-stepper-wrap');
+        if (wrap) {
+          wrap.style.display = '';
+          if (typeof goStep === 'function') goStep(1);
+        }
+      }, 800);
+    });
+  </script>
+  <script src="js/iceberg-stepper.js"></script></body>
 </html>
