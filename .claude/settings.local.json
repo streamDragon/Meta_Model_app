@@ -5,7 +5,9 @@
       "Bash(npm run:*)",
       "Bash(ls -1 /c/Users/nlpis/vscode/Meta_Model_app/*.html)",
       "Bash(ls /c/Users/nlpis/vscode/Meta_Model_app/js/*.js)",
-      "Bash(node scripts/generate-version.mjs)"
+      "Bash(node scripts/generate-version.mjs)",
+      "Bash(node scripts/fix-flb-encoding.mjs --dry-run)",
+      "Bash(node -e \":*)"
     ]
   }
 }

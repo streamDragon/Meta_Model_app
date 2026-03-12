@@ -3,113 +3,113 @@
 
     const STORAGE_KEY = 'feeling_language_bridge_v1';
     const STAGES = Object.freeze([
-        Object.freeze({ id: 'sentence', label: '׳׳©׳₪׳˜', kicker: '׳©׳׳‘ 1', hint: '׳”׳׳©׳₪׳˜ ׳”׳׳§׳•׳¨׳™, ׳‘׳׳™ ׳×׳™׳§׳•׳.' }),
-        Object.freeze({ id: 'outer', label: '׳—׳•׳¥', kicker: '׳©׳׳‘ 2', hint: '׳׳” ׳§׳¨׳” ׳‘׳₪׳•׳¢׳ ׳‘׳—׳•׳¥.' }),
-        Object.freeze({ id: 'inner', label: '׳₪׳ ׳™׳', kicker: '׳©׳׳‘ 3', hint: '׳׳” ׳ ׳”׳™׳” ׳‘׳™ ׳‘׳₪׳ ׳™׳.' }),
-        Object.freeze({ id: 'bridge', label: '׳’׳©׳¨', kicker: '׳©׳׳‘ 4', hint: '׳׳©׳₪׳˜ ׳©׳׳—׳‘׳¨ ׳—׳•׳¥ ׳•׳₪׳ ׳™׳.' }),
-        Object.freeze({ id: 'congruence', label: '׳”׳׳™׳׳”', kicker: '׳©׳׳‘ 5', hint: '׳›׳׳” ׳”׳׳©׳₪׳˜ ׳‘׳׳׳× ׳™׳•׳©׳‘ ׳¢׳ ׳׳” ׳©׳§׳•׳¨׳” ׳‘׳—׳•׳¥ ׳•׳‘׳₪׳ ׳™׳.' }),
-        Object.freeze({ id: 'insight', label: '׳×׳•׳‘׳ ׳”', kicker: '׳׳—׳¨׳™ ׳”׳׳™׳׳”', hint: '׳׳” ׳”׳×׳‘׳”׳¨ ׳׳—׳¨׳™ ׳©׳”׳׳©׳₪׳˜ ׳›׳‘׳¨ ׳™׳•׳©׳‘.' })
+        Object.freeze({ id: 'sentence', label: 'משפט', kicker: 'שלב 1', hint: 'המשפט המקורי, בלי תיקון.' }),
+        Object.freeze({ id: 'outer', label: 'חוץ', kicker: 'שלב 2', hint: 'מה קרה בפועל בחוץ.' }),
+        Object.freeze({ id: 'inner', label: 'פנים', kicker: 'שלב 3', hint: 'מה נהיה בי בפנים.' }),
+        Object.freeze({ id: 'bridge', label: 'גשר', kicker: 'שלב 4', hint: 'משפט שמחבר חוץ ופנים.' }),
+        Object.freeze({ id: 'congruence', label: 'הלימה', kicker: 'שלב 5', hint: 'כמה המשפט באמת יושב על מה שקורה בחוץ ובפנים.' }),
+        Object.freeze({ id: 'insight', label: 'תובנה', kicker: 'אחרי הלימה', hint: 'מה התבהר אחרי שהמשפט כבר יושב.' })
     ]);
     const CONGRUENCE_LEVELS = Object.freeze([
-        Object.freeze({ id: 'not-yet', label: '׳¢׳•׳“ ׳׳', note: '׳¢׳•׳“ ׳׳. ׳™׳© ׳›׳׳ ׳׳©׳”׳• ׳—׳™, ׳׳‘׳ ׳–׳” ׳¢׳“׳™׳™׳ ׳׳ ׳ ׳©׳׳¢ ׳›׳׳• ׳׳” ׳©׳”׳×׳›׳•׳•׳ ׳×׳™.' }),
-        Object.freeze({ id: 'close', label: '׳§׳¨׳•׳‘', note: '׳–׳” ׳׳×׳§׳¨׳‘. ׳—׳׳§ ׳׳–׳” ׳›׳‘׳¨ ׳™׳•׳©׳‘, ׳׳‘׳ ׳¢׳•׳“ ׳׳ ׳׳’׳׳¨׳™.' }),
-        Object.freeze({ id: 'almost', label: '׳›׳׳¢׳˜', note: '׳›׳׳¢׳˜. ׳–׳” ׳›׳‘׳¨ ׳§׳¨׳•׳‘ ׳׳׳” ׳©׳”׳×׳›׳•׳•׳ ׳×׳™, ׳•׳ ׳©׳׳¨ ׳¨׳§ ׳׳™׳˜׳•׳© ׳§׳˜׳.' }),
-        Object.freeze({ id: 'yes', label: '׳›׳, ׳–׳” ׳–׳”', note: '׳›׳. ׳¢׳›׳©׳™׳• ׳–׳” ׳ ׳©׳׳¢ ׳›׳׳• ׳׳” ׳©׳”׳×׳›׳•׳•׳ ׳×׳™, ׳’׳ ׳‘׳₪׳ ׳™׳ ׳•׳’׳ ׳‘׳׳¦׳™׳׳•׳×.' })
+        Object.freeze({ id: 'not-yet', label: 'עוד לא', note: 'עוד לא. יש כאן משהו חי, אבל זה עדיין לא נשמע כמו מה שהתכוונתי.' }),
+        Object.freeze({ id: 'close', label: 'קרוב', note: 'זה מתקרב. חלק מזה כבר יושב, אבל עוד לא לגמרי.' }),
+        Object.freeze({ id: 'almost', label: 'כמעט', note: 'כמעט. זה כבר קרוב למה שהתכוונתי, ונשאר רק ליטוש קטן.' }),
+        Object.freeze({ id: 'yes', label: 'כן, זה זה', note: 'כן. עכשיו זה נשמע כמו מה שהתכוונתי, גם בפנים וגם במציאות.' })
     ]);
-    const OUTER_PROMPTS = Object.freeze(['׳›׳©...', '׳‘׳₪׳¢׳׳™׳ ׳©...', '׳׳” ׳©׳§׳¨׳” ׳‘׳₪׳•׳¢׳...', '׳”׳•׳ ׳¢׳©׳”...', '׳”׳•׳ ׳׳ ׳¢׳©׳”...', '׳©׳׳×׳™ ׳׳‘ ׳©...']);
-    const INNER_PROMPTS = Object.freeze(['׳¢׳•׳׳” ׳‘׳™...', '׳‘׳’׳•׳£ ׳ ׳”׳™׳”...', '׳–׳” ׳ ׳”׳™׳” ׳›׳׳•...', '׳׳ ׳™ ׳׳™׳“ ׳׳¨׳’׳™׳©/׳”...', '׳™׳© ׳‘׳™ ׳“׳—׳£...', '׳׳” ׳©׳׳ ׳™ ׳¦׳¨׳™׳/׳” ׳©׳...']);
-    const INNER_TAGS = Object.freeze(['׳›׳™׳•׳•׳¥', '׳׳—׳¥', '׳¢׳׳‘׳•׳', '׳‘׳“׳™׳“׳•׳×', '׳©׳§׳™׳₪׳•׳×', '׳‘׳•׳©׳”', '׳“׳—׳£ ׳׳”׳×׳¨׳—׳§', '׳¨׳¦׳•׳ ׳©׳™׳¨׳׳• ׳׳•׳×׳™']);
-    const INNER_IMAGES = Object.freeze(['׳›׳׳™׳׳• ׳׳ ׳™ ׳ ׳¢׳׳', '׳›׳׳™׳׳• ׳׳™׳ ׳׳™ ׳׳§׳•׳', '׳›׳׳™׳׳• ׳׳ ׳™ ׳׳“׳‘׳¨ ׳׳§׳™׳¨', '׳›׳׳™׳׳• ׳¡׳’׳¨׳• ׳¢׳׳™׳™ ׳“׳׳×', '׳›׳׳™׳׳• ׳׳ ׳™ ׳§׳˜׳ ׳׳“׳™']);
+    const OUTER_PROMPTS = Object.freeze(['כש...', 'בפעמים ש...', 'מה שקרה בפועל...', 'הוא עשה...', 'הוא לא עשה...', 'שמתי לב ש...']);
+    const INNER_PROMPTS = Object.freeze(['עולה בי...', 'בגוף נהיה...', 'זה נהיה כמו...', 'אני מיד מרגיש/ה...', 'יש בי דחף...', 'מה שאני צריך/ה שם...']);
+    const INNER_TAGS = Object.freeze(['כיווץ', 'לחץ', 'עלבון', 'בדידות', 'שקיפות', 'בושה', 'דחף להתרחק', 'רצון שיראו אותי']);
+    const INNER_IMAGES = Object.freeze(['כאילו אני נעלם', 'כאילו אין לי מקום', 'כאילו אני מדבר לקיר', 'כאילו סגרו עליי דלת', 'כאילו אני קטן מדי']);
     const INNER_ZONES = Object.freeze([
-        Object.freeze({ id: 'head', label: '׳¨׳׳©', locative: '׳‘׳¨׳׳©', top: '10%', left: '49%' }),
-        Object.freeze({ id: 'throat', label: '׳’׳¨׳•׳', locative: '׳‘׳’׳¨׳•׳', top: '24%', left: '49%' }),
-        Object.freeze({ id: 'chest', label: '׳—׳–׳”', locative: '׳‘׳—׳–׳”', top: '39%', left: '49%' }),
-        Object.freeze({ id: 'solar', label: '׳‘׳˜׳', locative: '׳‘׳‘׳˜׳', top: '54%', left: '49%' }),
-        Object.freeze({ id: 'arms', label: '׳›׳×׳₪׳™׳™׳', locative: '׳‘׳›׳×׳₪׳™׳™׳', top: '35%', left: '24%' }),
-        Object.freeze({ id: 'heart', label: '׳׳‘', locative: '׳‘׳׳‘', top: '42%', left: '32%' })
+        Object.freeze({ id: 'head', label: 'ראש', locative: 'בראש', top: '10%', left: '49%' }),
+        Object.freeze({ id: 'throat', label: 'גרון', locative: 'בגרון', top: '24%', left: '49%' }),
+        Object.freeze({ id: 'chest', label: 'חזה', locative: 'בחזה', top: '39%', left: '49%' }),
+        Object.freeze({ id: 'solar', label: 'בטן', locative: 'בבטן', top: '54%', left: '49%' }),
+        Object.freeze({ id: 'arms', label: 'כתפיים', locative: 'בכתפיים', top: '35%', left: '24%' }),
+        Object.freeze({ id: 'heart', label: 'לב', locative: 'בלב', top: '42%', left: '32%' })
     ]);
     const ABSOLUTE_RE = /(׳×׳׳™׳“|׳׳£ ׳₪׳¢׳|׳׳£-׳₪׳¢׳|׳›׳•׳׳|׳׳£ ׳׳—׳“|׳׳’׳׳¨׳™|׳׳™׳ ׳׳¦׳‘|׳׳™׳ ׳׳™ ׳“׳¨׳|׳‘׳©׳•׳ ׳“׳¨׳|׳׳¢׳•׳׳ ׳׳|׳₪׳©׳•׳˜)/;
     const REFERENTIAL_RE = /(׳”׳•׳|׳”׳™׳|׳”׳|׳”׳|׳–׳”|׳–׳׳×|׳׳׳”|׳׳׳•)/;
-    const STOP_WORDS = new Set(['׳׳ ׳™', '׳׳×׳”', '׳׳×', '׳”׳•׳', '׳”׳™׳', '׳”׳', '׳”׳', '׳׳ ׳—׳ ׳•', '׳–׳”', '׳–׳׳×', '׳©׳', '׳¢׳', '׳¢׳', '׳›׳™', '׳׳•׳×׳™', '׳׳™', '׳׳•', '׳׳”', '׳’׳']);
+    const STOP_WORDS = new Set(['אני', 'אתה', 'את', 'הוא', 'היא', 'הם', 'הן', 'אנחנו', 'זה', 'זאת', 'של', 'על', 'עם', 'כי', 'אותי', 'לי', 'לו', 'לה', 'גם']);
     const SEED_CASES = Object.freeze([
         Object.freeze({
             id: 'seen',
-            label: '׳–׳•׳’׳™׳•׳×',
-            title: '׳”׳•׳ ׳׳ ׳¨׳•׳׳” ׳׳•׳×׳™',
-            originalSentence: '׳”׳•׳ ׳׳ ׳¨׳•׳׳” ׳׳•׳×׳™',
-            hotPhrases: Object.freeze(['׳׳ ׳¨׳•׳׳” ׳׳•׳×׳™', '׳׳•׳×׳™', '׳׳ ׳¨׳•׳׳”']),
+            label: 'זוגיות',
+            title: 'הוא לא רואה אותי',
+            originalSentence: 'הוא לא רואה אותי',
+            hotPhrases: Object.freeze(['לא רואה אותי', 'אותי', 'לא רואה']),
             outerSuggestions: Object.freeze([
-                '׳‘׳©׳׳•׳© ׳”׳©׳™׳—׳•׳× ׳”׳׳—׳¨׳•׳ ׳•׳× ׳”׳•׳ ׳›׳׳¢׳˜ ׳׳ ׳©׳׳ ׳׳•׳×׳™ ׳©׳׳׳•׳×.',
-                '׳›׳©׳׳ ׳™ ׳׳©׳×׳₪׳× ׳׳©׳”׳• ׳׳™׳©׳™, ׳”׳•׳ ׳¢׳•׳‘׳¨ ׳׳”׳¨ ׳׳“׳‘׳¨ ׳¢׳ ׳¢׳¦׳׳•.',
-                '׳‘׳‘׳™׳×, ׳׳™׳“ ׳”׳™׳׳“׳™׳, ׳”׳•׳ ׳›׳׳¢׳˜ ׳׳ ׳׳’׳™׳‘ ׳׳׳” ׳©׳׳ ׳™ ׳׳•׳׳¨׳×.'
+                'בשלוש השיחות האחרונות הוא כמעט לא שאל אותי שאלות.',
+                'כשאני משתפת משהו אישי, הוא עובר מהר לדבר על עצמו.',
+                'בבית, ליד הילדים, הוא כמעט לא מגיב למה שאני אומרת.'
             ]),
             innerSuggestions: Object.freeze([
-                '׳׳ ׳™ ׳׳™׳“ ׳׳×׳›׳•׳•׳¦׳× ׳•׳׳¨׳’׳™׳©׳” ׳׳ ׳—׳©׳•׳‘׳”.',
-                '׳¢׳•׳׳” ׳‘׳™ ׳×׳—׳•׳©׳× ׳©׳§׳™׳₪׳•׳×.',
-                '׳–׳” ׳ ׳”׳™׳” ׳›׳׳• ׳׳—׳™׳§׳”.'
+                'אני מיד מתכווצת ומרגישה לא חשובה.',
+                'עולה בי תחושת שקיפות.',
+                'זה נהיה כמו מחיקה.'
             ]),
-            innerTags: Object.freeze(['׳©׳§׳™׳₪׳•׳×', '׳¢׳׳‘׳•׳', '׳¨׳¦׳•׳ ׳©׳™׳¨׳׳• ׳׳•׳×׳™']),
-            innerImages: Object.freeze(['׳›׳׳™׳׳• ׳׳ ׳™ ׳ ׳¢׳׳׳×', '׳›׳׳™׳׳• ׳׳ ׳™ ׳׳“׳‘׳¨׳× ׳׳§׳™׳¨']),
+            innerTags: Object.freeze(['שקיפות', 'עלבון', 'רצון שיראו אותי']),
+            innerImages: Object.freeze(['כאילו אני נעלמת', 'כאילו אני מדברת לקיר']),
             defaultZone: 'chest'
         }),
         Object.freeze({
             id: 'capable',
-            label: '׳™׳›׳•׳׳×',
-            title: '׳׳ ׳™ ׳׳ ׳‘׳׳׳× ׳׳¡׳•׳’׳',
-            originalSentence: '׳׳ ׳™ ׳׳ ׳‘׳׳׳× ׳׳¡׳•׳’׳',
-            hotPhrases: Object.freeze(['׳׳ ׳‘׳׳׳× ׳׳¡׳•׳’׳', '׳‘׳׳׳× ׳׳¡׳•׳’׳', '׳׳ ׳׳¡׳•׳’׳']),
+            label: 'יכולת',
+            title: 'אני לא באמת מסוגל',
+            originalSentence: 'אני לא באמת מסוגל',
+            hotPhrases: Object.freeze(['לא באמת מסוגל', 'באמת מסוגל', 'לא מסוגל']),
             outerSuggestions: Object.freeze([
-                '׳‘׳©׳ ׳™ ׳”׳ ׳™׳¡׳™׳•׳ ׳•׳× ׳”׳׳—׳¨׳•׳ ׳™׳ ׳¢׳¦׳¨׳×׳™ ׳׳™׳“ ׳׳—׳¨׳™ ׳©׳”׳•׳₪׳™׳¢׳” ׳×׳§׳׳”.',
-                '׳›׳©׳׳ ׳™ ׳׳ ׳™׳•׳“׳¢ ׳׳™׳ ׳׳×׳—׳™׳׳™׳, ׳׳ ׳™ ׳¡׳•׳’׳¨ ׳׳”׳¨ ׳׳× ׳”׳׳©׳™׳׳”.',
-                '׳׳•׳ ׳׳©׳™׳׳•׳× ׳—׳“׳©׳•׳× ׳׳ ׳™ ׳›׳׳¢׳˜ ׳׳ ׳ ׳©׳׳¨ ׳׳¡׳₪׳™׳§ ׳–׳׳ ׳›׳“׳™ ׳׳׳׳•׳“ ׳׳•׳×׳.'
+                'בשני הניסיונות האחרונים עצרתי מיד אחרי שהופיעה תקלה.',
+                'כשאני לא יודע איך מתחילים, אני סוגר מהר את המשימה.',
+                'מול משימות חדשות אני כמעט לא נשאר מספיק זמן כדי ללמוד אותן.'
             ]),
             innerSuggestions: Object.freeze([
-                '׳׳ ׳™ ׳ ׳”׳™׳” ׳§׳˜׳ ׳•׳׳•׳•׳×׳¨ ׳׳”׳¨.',
-                '׳¢׳•׳׳” ׳‘׳™ ׳‘׳•׳©׳” ׳׳₪׳ ׳™ ׳©׳‘׳›׳׳ ׳ ׳™׳¡׳™׳×׳™ ׳¢׳“ ׳”׳¡׳•׳£.',
-                '׳‘׳‘׳˜׳ ׳ ׳”׳™׳” ׳›׳™׳•׳•׳¥ ׳—׳–׳§ ׳›׳׳™׳׳• ׳׳™׳ ׳׳™ ׳‘׳¡׳™׳¡.'
+                'אני נהיה קטן ומוותר מהר.',
+                'עולה בי בושה לפני שבכלל ניסיתי עד הסוף.',
+                'בבטן נהיה כיווץ חזק כאילו אין לי בסיס.'
             ]),
-            innerTags: Object.freeze(['׳‘׳•׳©׳”', '׳›׳™׳•׳•׳¥', '׳“׳—׳£ ׳׳”׳×׳¨׳—׳§']),
-            innerImages: Object.freeze(['׳›׳׳™׳׳• ׳׳™׳ ׳׳™ ׳‘׳¡׳™׳¡', '׳›׳׳™׳׳• ׳׳ ׳™ ׳›׳‘׳¨ ׳׳׳—׳•׳¨']),
+            innerTags: Object.freeze(['בושה', 'כיווץ', 'דחף להתרחק']),
+            innerImages: Object.freeze(['כאילו אין לי בסיס', 'כאילו אני כבר מאחור']),
             defaultZone: 'solar'
         }),
         Object.freeze({
             id: 'child',
-            label: '׳”׳•׳¨׳•׳×',
-            title: '׳”׳™׳׳“ ׳₪׳©׳•׳˜ ׳׳ ׳׳§׳©׳™׳‘',
-            originalSentence: '׳”׳™׳׳“ ׳₪׳©׳•׳˜ ׳׳ ׳׳§׳©׳™׳‘',
-            hotPhrases: Object.freeze(['׳₪׳©׳•׳˜ ׳׳ ׳׳§׳©׳™׳‘', '׳׳ ׳׳§׳©׳™׳‘', '׳₪׳©׳•׳˜']),
+            label: 'הורות',
+            title: 'הילד פשוט לא מקשיב',
+            originalSentence: 'הילד פשוט לא מקשיב',
+            hotPhrases: Object.freeze(['פשוט לא מקשיב', 'לא מקשיב', 'פשוט']),
             outerSuggestions: Object.freeze([
-                '׳‘׳‘׳•׳§׳¨, ׳›׳©׳׳ ׳™ ׳׳‘׳§׳© ׳׳׳ ׳• ׳׳”׳×׳׳‘׳©, ׳”׳•׳ ׳׳׳©׳™׳ ׳׳©׳—׳§ ׳•׳׳ ׳¢׳•׳ ׳”.',
-                '׳׳ ׳™ ׳¦׳¨׳™׳ ׳׳—׳–׳•׳¨ ׳©׳׳•׳© ׳₪׳¢׳׳™׳ ׳¢׳ ׳׳•׳×׳” ׳‘׳§׳©׳” ׳׳₪׳ ׳™ ׳©׳™׳© ׳×׳–׳•׳–׳”.',
-                '׳›׳©׳™׳© ׳׳¡׳ ׳₪׳×׳•׳— ׳‘׳¨׳§׳¢, ׳›׳׳¢׳˜ ׳׳™׳ ׳×׳’׳•׳‘׳” ׳׳׳” ׳©׳׳ ׳™ ׳׳•׳׳¨.'
+                'בבוקר, כשאני מבקש ממנו להתלבש, הוא ממשיך לשחק ולא עונה.',
+                'אני צריך לחזור שלוש פעמים על אותה בקשה לפני שיש תזוזה.',
+                'כשיש מסך פתוח ברקע, כמעט אין תגובה למה שאני אומר.'
             ]),
             innerSuggestions: Object.freeze([
-                '׳׳ ׳™ ׳׳™׳“ ׳¢׳•׳׳” ׳‘׳˜׳•׳ ׳•׳׳¨׳’׳™׳© ׳—׳¡׳¨ ׳׳•׳ ׳™׳.',
-                '׳‘׳›׳×׳₪׳™׳™׳ ׳ ׳”׳™׳” ׳¢׳•׳׳¡ ׳•׳›׳¢׳¡.',
-                '׳–׳” ׳ ׳”׳™׳” ׳›׳׳™׳׳• ׳׳ ׳™ ׳׳‘׳“ ׳׳•׳ ׳”׳§׳™׳¨.'
+                'אני מיד עולה בטון ומרגיש חסר אונים.',
+                'בכתפיים נהיה עומס וכעס.',
+                'זה נהיה כאילו אני לבד מול הקיר.'
             ]),
-            innerTags: Object.freeze(['׳׳—׳¥', '׳›׳¢׳¡', '׳—׳¡׳¨ ׳׳•׳ ׳™׳']),
-            innerImages: Object.freeze(['׳›׳׳™׳׳• ׳׳ ׳™ ׳׳‘׳“ ׳׳•׳ ׳”׳§׳™׳¨', '׳›׳׳™׳׳• ׳׳£ ׳׳—׳“ ׳׳ ׳₪׳•׳’׳© ׳׳•׳×׳™']),
+            innerTags: Object.freeze(['לחץ', 'כעס', 'חסר אונים']),
+            innerImages: Object.freeze(['כאילו אני לבד מול הקיר', 'כאילו אף אחד לא פוגש אותי']),
             defaultZone: 'arms'
         }),
         Object.freeze({
             id: 'exit',
-            label: '׳×׳§׳™׳¢׳•׳×',
-            title: '׳׳™׳ ׳׳™ ׳“׳¨׳ ׳׳¦׳׳× ׳׳–׳”',
-            originalSentence: '׳׳™׳ ׳׳™ ׳“׳¨׳ ׳׳¦׳׳× ׳׳–׳”',
-            hotPhrases: Object.freeze(['׳׳™׳ ׳׳™ ׳“׳¨׳', '׳׳¦׳׳× ׳׳–׳”', '׳׳™׳ ׳“׳¨׳']),
+            label: 'תקיעות',
+            title: 'אין לי דרך לצאת מזה',
+            originalSentence: 'אין לי דרך לצאת מזה',
+            hotPhrases: Object.freeze(['אין לי דרך', 'לצאת מזה', 'אין דרך']),
             outerSuggestions: Object.freeze([
-                '׳›׳¨׳’׳¢ ׳™׳© ׳©׳׳•׳© ׳‘׳¢׳™׳•׳× ׳©׳ ׳₪׳×׳—׳• ׳‘׳‘׳× ׳׳—׳× ׳•׳׳™׳ ׳׳™ ׳׳׳™ ׳׳”׳¢׳‘׳™׳¨ ׳—׳׳§ ׳׳”׳.',
-                '׳‘׳©׳‘׳•׳¢ ׳”׳׳—׳¨׳•׳ ׳›׳ ׳₪׳×׳¨׳•׳ ׳©׳ ׳™׳¡׳™׳×׳™ ׳˜׳™׳₪׳ ׳¨׳§ ׳‘׳—׳׳§ ׳§׳˜׳ ׳׳”׳׳¦׳‘.',
-                '׳›׳©׳׳ ׳™ ׳ ׳™׳’׳© ׳׳–׳” ׳׳‘׳“, ׳׳ ׳™ ׳ ׳×׳§׳¢ ׳›׳‘׳¨ ׳‘׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳.'
+                'כרגע יש שלוש בעיות שנפתחו בבת אחת ואין לי למי להעביר חלק מהן.',
+                'בשבוע האחרון כל פתרון שניסיתי טיפל רק בחלק קטן מהמצב.',
+                'כשאני ניגש לזה לבד, אני נתקע כבר בצעד הראשון.'
             ]),
             innerSuggestions: Object.freeze([
-                '׳”׳›׳•׳ ׳ ׳”׳™׳” ׳¦׳₪׳•׳£ ׳•׳׳›׳‘׳™׳“ ׳׳׳•׳“.',
-                '׳¢׳•׳׳” ׳‘׳™ ׳×׳—׳•׳©׳× ׳—׳•׳¡׳¨ ׳׳•׳ ׳™׳.',
-                '׳׳ ׳™ ׳׳¨׳’׳™׳© ׳׳›׳•׳“ ׳›׳׳™׳׳• ׳”׳“׳׳× ׳ ׳¡׳’׳¨׳”.'
+                'הכול נהיה צפוף ומכביד מאוד.',
+                'עולה בי תחושת חוסר אונים.',
+                'אני מרגיש לכוד כאילו הדלת נסגרה.'
             ]),
-            innerTags: Object.freeze(['׳׳—׳¥', '׳‘׳“׳™׳“׳•׳×', '׳—׳•׳¡׳¨ ׳׳•׳ ׳™׳']),
-            innerImages: Object.freeze(['׳›׳׳™׳׳• ׳”׳“׳׳× ׳ ׳¡׳’׳¨׳”', '׳›׳׳™׳׳• ׳׳™׳ ׳׳•׳•׳™׳¨']),
+            innerTags: Object.freeze(['לחץ', 'בדידות', 'חוסר אונים']),
+            innerImages: Object.freeze(['כאילו הדלת נסגרה', 'כאילו אין אוויר']),
             defaultZone: 'throat'
         })
     ]);
@@ -169,8 +169,8 @@
             words.forEach((word, index) => {
                 const clean = word.replace(/[.,!?]/g, '');
                 if (STOP_WORDS.has(clean)) return;
-                if (clean.length <= 2 && !/(׳׳|׳׳™׳)/.test(clean)) return;
-                if (/(׳׳|׳׳™׳|׳₪׳©׳•׳˜|׳‘׳׳׳×|׳×׳׳™׳“|׳׳£|׳׳¢׳•׳׳|׳׳¡׳•׳’׳|׳¨׳•׳׳”|׳׳§׳©׳™׳‘|׳“׳¨׳|׳׳¦׳׳×)/.test(clean)) {
+                if (clean.length <= 2 && !/(לא|אין)/.test(clean)) return;
+                if (/(לא|אין|פשוט|באמת|תמיד|אף|לעולם|מסוגל|רואה|מקשיב|דרך|לצאת)/.test(clean)) {
                     dynamic.push(words.slice(Math.max(0, index - 1), Math.min(words.length, index + 2)).join(' '));
                     dynamic.push(words.slice(index, Math.min(words.length, index + 2)).join(' '));
                 }
@@ -265,7 +265,7 @@
             const zoneText = zone ? `${zone.locative} ` : '';
             const toneText = trimText(state.selectedInnerTone, 42);
             const imageText = trimText(state.selectedInnerImagery, 72);
-            const base = toneText ? `${zoneText}׳ ׳”׳™׳” ${toneText}` : '';
+            const base = toneText ? `${zoneText}נהיה ${toneText}` : '';
             if (base && imageText) return `${base}, ${imageText}.`;
             if (base) return `${base}.`;
             if (imageText) return imageText.endsWith('.') ? imageText : `${imageText}.`;
@@ -275,13 +275,13 @@
         function normalizeOuterForTemplate(text, prefix = '׳›׳©') {
             const normalized = trimText(text, 180).replace(/[.]+$/, '');
             if (!normalized) return '';
-            if (/^(׳›׳©|׳‘׳׳¦׳‘׳™׳ ׳©|׳׳ ׳×׳׳™׳“, ׳׳‘׳ ׳›׳©|׳‘׳¨׳’׳¢׳™׳ ׳©׳‘׳”׳)/.test(normalized)) return normalized;
+            if (/^(כש|במצבים ש|לא תמיד, אבל כש|ברגעים שבהם)/.test(normalized)) return normalized;
             return `${prefix}${normalized.startsWith(' ') ? '' : ' '}${normalized}`;
         }
 
         function normalizeInnerForTemplate(text) {
             const normalized = trimText(text, 180).replace(/[.]+$/, '');
-            return normalized.replace(/^(׳׳ ׳™|׳¢׳•׳׳” ׳‘׳™|׳‘׳’׳•׳£ ׳ ׳”׳™׳”)\s*/, '').trim() || normalized;
+            return normalized.replace(/^(אני|עולה בי|בגוף נהיה)\s*/, '').trim() || normalized;
         }
 
         function buildBridgeDrafts() {
@@ -290,10 +290,10 @@
             if (!outer || !inner) return [];
             const normalizedInner = normalizeInnerForTemplate(inner);
             return uniqueTexts([
-                `${normalizeOuterForTemplate(outer)}, ׳¢׳•׳׳” ׳‘׳™ ${normalizedInner}.`,
-                `׳‘׳׳¦׳‘׳™׳ ׳©${outer.replace(/^׳›׳©\s*/, '')}, ׳׳ ׳™ ׳׳¨׳’׳™׳©/׳” ${normalizedInner}.`,
-                `${normalizeOuterForTemplate(outer)}, ׳–׳” ׳ ׳”׳™׳” ׳¢׳‘׳•׳¨׳™ ׳›׳׳• ${normalizedInner}.`,
-                `׳׳ ׳×׳׳™׳“, ׳׳‘׳ ${normalizeOuterForTemplate(outer)}, ׳¢׳•׳׳” ׳‘׳™ ׳—׳•׳•׳™׳” ׳©׳ ${normalizedInner}.`
+                `${normalizeOuterForTemplate(outer)}, עולה בי ${normalizedInner}.`,
+                `במצבים ש${outer.replace(/^כש\s*/, '')}, אני מרגיש/ה ${normalizedInner}.`,
+                `${normalizeOuterForTemplate(outer)}, זה נהיה עבורי כמו ${normalizedInner}.`,
+                `לא תמיד, אבל ${normalizeOuterForTemplate(outer)}, עולה בי חוויה של ${normalizedInner}.`
             ], 4);
         }
 
@@ -322,10 +322,10 @@
             const outer = getPrimaryOuter();
             const inner = getPrimaryInner();
             if (state.congruenceLevel === 'yes' && outer) {
-                return `׳›׳©׳–׳” ׳׳ ׳•׳¡׳— ׳›׳, ׳׳™׳–׳• ׳‘׳§׳©׳” ׳§׳˜׳ ׳” ׳׳• ׳¦׳¢׳“ ׳‘׳¨׳•׳¨ ׳”׳™׳™׳× ׳¨׳•׳¦׳” ׳׳”׳‘׳™׳ ׳׳¨׳’׳¢ ׳©׳‘׳• ${outer.replace(/[.]+$/, '')}?`;
+                return `כשזה מנוסח כך, איזו בקשה קטנה או צעד ברור היית רוצה להביא לרגע שבו ${outer.replace(/[.]+$/, '')}?`;
             }
             if ((state.congruenceLevel === 'almost' || state.congruenceLevel === 'close') && inner) {
-                return `׳׳” ׳¢׳•׳“ ׳—׳¡׳¨ ׳‘׳׳©׳₪׳˜ ׳›׳“׳™ ׳©׳’׳ ${inner.replace(/[.]+$/, '')} ׳™׳§׳‘׳ ׳׳§׳•׳ ׳‘׳׳™ ׳׳׳—׳•׳§ ׳׳× ׳׳” ׳©׳§׳•׳¨׳” ׳‘׳—׳•׳¥?`;
+                return `מה עוד חסר במשפט כדי שגם ${inner.replace(/[.]+$/, '')} יקבל מקום בלי למחוק את מה שקורה בחוץ?`;
             }
             return '׳׳” ׳¢׳•׳“ ׳¦׳¨׳™׳ ׳׳”׳™׳›׳ ׳¡ ׳׳׳©׳₪׳˜ ׳›׳“׳™ ׳©׳”׳•׳ ׳™׳™׳©׳‘ ׳’׳ ׳‘׳’׳•׳£ ׳•׳’׳ ׳‘׳׳¦׳™׳׳•׳×?';
         }
@@ -513,7 +513,7 @@
 
         function renderFragmentTray(items, activeValue, kind) {
             if (!items.length) {
-                return `<p class="flb-empty-note">׳¢׳•׳“ ׳׳ ׳׳¡׳₪׳ ׳• ׳ ׳™׳¡׳•׳— ${kind === 'outer' ? '׳—׳™׳¦׳•׳ ׳™' : '׳₪׳ ׳™׳׳™'}.</p>`;
+                return `<p class="flb-empty-note">עוד לא אספנו ניסוח ${kind === 'outer' ? '׳—׳™׳¦׳•׳ ׳™' : '׳₪׳ ׳™׳׳™'}.</p>`;
             }
             return `
                 <div class="flb-fragment-tray">
@@ -547,11 +547,11 @@
                 <section class="flb-panel flb-panel--sentence">
                     <div class="flb-panel-head">
                         <div>
-                            <p class="flb-panel-kicker">׳©׳׳‘ 1</p>
-                            <h4>׳¢׳ ׳׳™׳–׳• ׳׳™׳׳” ׳›׳“׳׳™ ׳׳¢׳¦׳•׳¨?</h4>
-                            <p>׳©׳•׳׳¨׳™׳ ׳׳× ׳”׳׳©׳₪׳˜ ׳”׳׳§׳•׳¨׳™, ׳׳ ׳׳×׳§׳ ׳™׳ ׳׳•׳×׳•, ׳•׳¨׳§ ׳‘׳•׳—׳¨׳™׳ ׳׳× ׳”׳—׳׳§ ׳©׳”׳›׳™ ׳—׳™ ׳¢׳›׳©׳™׳•.</p>
+                            <p class="flb-panel-kicker">שלב 1</p>
+                            <h4>על איזו מילה כדאי לעצור?</h4>
+                            <p>שומרים את המשפט המקורי, לא מתקנים אותו, ורק בוחרים את החלק שהכי חי עכשיו.</p>
                         </div>
-                        <button type="button" class="btn btn-secondary" data-action="go-stage" data-stage="outer" ${!getCompletions().sentence ? 'disabled' : ''}>׳׳”׳׳©׳™׳ ׳׳—׳•׳¥</button>
+                        <button type="button" class="btn btn-secondary" data-action="go-stage" data-stage="outer" ${!getCompletions().sentence ? 'disabled' : ''}>להמשיך לחוץ</button>
                     </div>
 
                     <div class="flb-case-row">
@@ -561,23 +561,23 @@
                     </div>
 
                     <label class="flb-field">
-                        <span>׳׳©׳₪׳˜ ׳₪׳×׳™׳—׳”</span>
-                        <textarea id="flb-sentence-draft" name="sentence-draft" rows="2" placeholder="׳׳“׳•׳’׳׳”: ׳”׳•׳ ׳׳ ׳¨׳•׳׳” ׳׳•׳×׳™">${html(state.sentenceDraft)}</textarea>
+                        <span>משפט פתיחה</span>
+                        <textarea id="flb-sentence-draft" name="sentence-draft" rows="2" placeholder="לדוגמה: הוא לא רואה אותי">${html(state.sentenceDraft)}</textarea>
                     </label>
 
                     <div class="flb-inline-actions">
-                        <button type="button" class="btn btn-primary" data-action="apply-sentence">׳©׳׳•׳¨ ׳׳× ׳”׳׳©׳₪׳˜</button>
-                        <span class="flb-inline-note">׳׳₪׳©׳¨ ׳׳”׳×׳—׳™׳ ׳׳“׳•׳’׳׳” ׳•׳׳– ׳׳©׳ ׳•׳× ׳׳׳©׳”׳• ׳©׳׳.</span>
+                        <button type="button" class="btn btn-primary" data-action="apply-sentence">שמור את המשפט</button>
+                        <span class="flb-inline-note">אפשר להתחיל מדוגמה ואז לשנות למשהו שלך.</span>
                     </div>
 
                     <div class="flb-chip-section">
-                        <p class="flb-chip-section__title">׳׳” ׳‘׳׳©׳₪׳˜ ׳”׳–׳” ׳”׳›׳™ ׳—׳™ ׳›׳¨׳’׳¢?</p>
+                        <p class="flb-chip-section__title">מה במשפט הזה הכי חי כרגע?</p>
                         <div class="flb-chip-cloud">
                             ${hotPhraseOptions.map((phrase) => `
                                 <button type="button" class="flb-choice-chip${state.hotPhrase === phrase ? ' is-active' : ''}" data-action="set-hot-phrase" data-value="${html(phrase)}">${html(phrase)}</button>
                             `).join('')}
                         </div>
-                        <p class="flb-hot-note">׳›׳¨׳’׳¢ ׳¢׳¦׳¨׳ ׳• ׳¢׳: <strong>${html(state.hotPhrase || '׳‘׳—׳¨/׳™ ׳‘׳™׳˜׳•׳™')}</strong></p>
+                        <p class="flb-hot-note">כרגע עצרנו על: <strong>${html(state.hotPhrase || '׳‘׳—׳¨/׳™ ׳‘׳™׳˜׳•׳™')}</strong></p>
                     </div>
                 </section>
             `;
@@ -588,17 +588,17 @@
                 <section class="flb-panel flb-panel--outer">
                     <div class="flb-panel-head">
                         <div>
-                            <p class="flb-panel-kicker">׳©׳׳‘ 2</p>
-                            <h4>׳׳” ׳§׳•׳¨׳” ׳‘׳—׳•׳¥ ׳›׳©׳–׳” ׳ ׳›׳•׳?</h4>
-                            <p>׳׳ ׳׳—׳₪׳©׳™׳ ׳׳ ׳”׳׳©׳₪׳˜ "׳ ׳›׳•׳". ׳׳—׳₪׳©׳™׳ ׳׳×׳™, ׳׳™׳₪׳”, ׳•׳׳” ׳§׳•׳¨׳” ׳‘׳₪׳•׳¢׳ ׳›׳©׳–׳” ׳׳¨׳’׳™׳© ׳ ׳›׳•׳.</p>
+                            <p class="flb-panel-kicker">שלב 2</p>
+                            <h4>מה קורה בחוץ כשזה נכון?</h4>
+                            <p>לא מחפשים אם המשפט "נכון". מחפשים מתי, איפה, ומה קורה בפועל כשזה מרגיש נכון.</p>
                         </div>
-                        <button type="button" class="btn btn-secondary" data-action="go-stage" data-stage="inner" ${!getCompletions().outer ? 'disabled' : ''}>׳׳”׳׳©׳™׳ ׳׳₪׳ ׳™׳</button>
+                        <button type="button" class="btn btn-secondary" data-action="go-stage" data-stage="inner" ${!getCompletions().outer ? 'disabled' : ''}>להמשיך לפנים</button>
                     </div>
 
                     ${renderFragmentTray(state.outerFragments, state.activeOuterFragment, 'outer')}
 
                     <div class="flb-chip-section">
-                        <p class="flb-chip-section__title">׳׳¡׳’׳¨׳•׳× ׳¢׳“׳™׳ ׳•׳× ׳׳׳™׳¡׳•׳£ ׳—׳•׳¥</p>
+                        <p class="flb-chip-section__title">מסגרות עדינות לאיסוף חוץ</p>
                         <div class="flb-chip-cloud">
                             ${OUTER_PROMPTS.map((item) => `
                                 <button type="button" class="flb-choice-chip" data-action="fill-outer-draft" data-value="${html(item)}">${html(item)}</button>
@@ -609,13 +609,13 @@
                     ${renderSuggestionCards(seed.outerSuggestions || [], 'outer')}
 
                     <label class="flb-field">
-                        <span>׳ ׳™׳¡׳•׳— ׳—׳™׳¦׳•׳ ׳™</span>
-                        <textarea id="flb-outer-draft" name="outer-draft" rows="3" placeholder="׳׳“׳•׳’׳׳”: ׳›׳©׳׳ ׳™ ׳׳©׳×׳₪׳× ׳׳©׳”׳• ׳׳™׳©׳™, ׳”׳•׳ ׳›׳׳¢׳˜ ׳׳ ׳׳’׳™׳‘.">${html(state.outerDraft)}</textarea>
+                        <span>ניסוח חיצוני</span>
+                        <textarea id="flb-outer-draft" name="outer-draft" rows="3" placeholder="לדוגמה: כשאני משתפת משהו אישי, הוא כמעט לא מגיב.">${html(state.outerDraft)}</textarea>
                     </label>
 
                     <div class="flb-inline-actions">
-                        <button type="button" class="btn btn-primary" data-action="commit-outer">׳”׳•׳¡׳£ ׳׳—׳•׳¥</button>
-                        <span class="flb-inline-note">׳›׳“׳׳™ ׳׳ ׳¡׳— ׳׳× ׳–׳” ׳›׳׳™׳¨׳•׳¢ ׳ ׳¦׳₪׳”, ׳׳ ׳›׳׳¡׳§׳ ׳” ׳¢׳ ׳”׳׳“׳.</span>
+                        <button type="button" class="btn btn-primary" data-action="commit-outer">הוסף לחוץ</button>
+                        <span class="flb-inline-note">כדאי לנסח את זה כאירוע נצפה, לא כמסקנה על האדם.</span>
                     </div>
                 </section>
             `;
@@ -629,11 +629,11 @@
                 <section class="flb-panel flb-panel--inner">
                     <div class="flb-panel-head">
                         <div>
-                            <p class="flb-panel-kicker">׳©׳׳‘ 3</p>
-                            <h4>׳•׳׳” ׳ ׳”׳™׳” ׳‘׳™ ׳׳–?</h4>
-                            <p>׳ ׳•׳×׳ ׳™׳ ׳׳—׳•׳•׳™׳” ׳”׳₪׳ ׳™׳׳™׳× ׳©׳, ׳׳§׳•׳ ׳•׳¦׳‘׳¢. ׳׳ ׳›׳”׳¡׳‘׳¨ ׳¨׳₪׳•׳׳™, ׳׳׳ ׳›׳©׳₪׳” ׳—׳™׳” ׳©׳ ׳’׳•׳£ ׳•׳¨׳’׳©.</p>
+                            <p class="flb-panel-kicker">שלב 3</p>
+                            <h4>ומה נהיה בי אז?</h4>
+                            <p>נותנים לחוויה הפנימית שם, מקום וצבע. לא כהסבר רפואי, אלא כשפה חיה של גוף ורגש.</p>
                         </div>
-                        <button type="button" class="btn btn-secondary" data-action="go-stage" data-stage="bridge" ${!getCompletions().inner ? 'disabled' : ''}>׳׳”׳׳©׳™׳ ׳׳’׳©׳¨</button>
+                        <button type="button" class="btn btn-secondary" data-action="go-stage" data-stage="bridge" ${!getCompletions().inner ? 'disabled' : ''}>להמשיך לגשר</button>
                     </div>
 
                     ${renderFragmentTray(state.innerFragments, state.activeInnerFragment, 'inner')}
@@ -649,7 +649,7 @@
 
                         <div class="flb-inner-builder">
                             <div class="flb-chip-section">
-                                <p class="flb-chip-section__title">׳׳™׳׳• ׳’׳•׳•׳ ׳™׳ ׳ ׳”׳™׳™׳ ׳©׳?</p>
+                                <p class="flb-chip-section__title">אילו גוונים נהיים שם?</p>
                                 <div class="flb-chip-cloud">
                                     ${tagOptions.map((item) => `
                                         <button type="button" class="flb-choice-chip${state.selectedInnerTone === item ? ' is-active' : ''}" data-action="select-inner-tone" data-value="${html(item)}">${html(item)}</button>
@@ -658,7 +658,7 @@
                             </div>
 
                             <div class="flb-chip-section">
-                                <p class="flb-chip-section__title">׳׳ ׳™׳© ׳“׳™׳׳•׳™ ׳§׳˜׳, ׳׳” ׳”׳•׳?</p>
+                                <p class="flb-chip-section__title">אם יש דימוי קטן, מה הוא?</p>
                                 <div class="flb-chip-cloud flb-chip-cloud--imagery">
                                     ${imageOptions.map((item) => `
                                         <button type="button" class="flb-choice-chip flb-choice-chip--imagery${state.selectedInnerImagery === item ? ' is-active' : ''}" data-action="select-inner-imagery" data-value="${html(item)}">${html(item)}</button>
@@ -667,9 +667,9 @@
                             </div>
 
                             <div class="flb-preview-card">
-                                <span>׳©׳•׳¨׳× felt-sense ׳©׳ ׳‘׳ ׳™׳× ׳¢׳›׳©׳™׳•</span>
+                                <span>שורת felt-sense שנבנית עכשיו</span>
                                 <strong>${html(innerPreview || '׳‘׳—׳¨/׳™ ׳׳–׳•׳¨, ׳’׳•׳•׳ ׳׳• ׳“׳™׳׳•׳™ ׳›׳“׳™ ׳׳™׳™׳¦׳¨ ׳׳©׳₪׳˜ ׳₪׳ ׳™׳׳™ ׳§׳˜׳.')}</strong>
-                                <button type="button" class="btn btn-secondary" data-action="commit-inner-preview" ${innerPreview ? '' : 'disabled'}>׳”׳•׳¡׳£ ׳׳₪׳ ׳™׳</button>
+                                <button type="button" class="btn btn-secondary" data-action="commit-inner-preview" ${innerPreview ? '' : 'disabled'}>הוסף לפנים</button>
                             </div>
                         </div>
                     </div>
@@ -677,7 +677,7 @@
                     ${renderSuggestionCards(seed.innerSuggestions || [], 'inner')}
 
                     <div class="flb-chip-section">
-                        <p class="flb-chip-section__title">׳₪׳×׳™׳—׳™ ׳ ׳™׳¡׳•׳— ׳₪׳ ׳™׳׳™׳™׳</p>
+                        <p class="flb-chip-section__title">פתיחי ניסוח פנימיים</p>
                         <div class="flb-chip-cloud">
                             ${INNER_PROMPTS.map((item) => `
                                 <button type="button" class="flb-choice-chip" data-action="fill-inner-draft" data-value="${html(item)}">${html(item)}</button>
@@ -686,13 +686,13 @@
                     </div>
 
                     <label class="flb-field">
-                        <span>׳ ׳™׳¡׳•׳— ׳₪׳ ׳™׳׳™</span>
-                        <textarea id="flb-inner-draft" name="inner-draft" rows="3" placeholder="׳׳“׳•׳’׳׳”: ׳׳ ׳™ ׳׳™׳“ ׳׳×׳›׳•׳•׳¦׳× ׳•׳׳¨׳’׳™׳©׳” ׳׳ ׳—׳©׳•׳‘׳”.">${html(state.innerDraft)}</textarea>
+                        <span>ניסוח פנימי</span>
+                        <textarea id="flb-inner-draft" name="inner-draft" rows="3" placeholder="לדוגמה: אני מיד מתכווצת ומרגישה לא חשובה.">${html(state.innerDraft)}</textarea>
                     </label>
 
                     <div class="flb-inline-actions">
-                        <button type="button" class="btn btn-primary" data-action="commit-inner">׳”׳•׳¡׳£ ׳׳₪׳ ׳™׳</button>
-                        <span class="flb-inline-note">׳׳•׳×׳¨ ׳©׳–׳” ׳™׳”׳™׳” ׳’׳•׳£, ׳¨׳’׳©, ׳“׳™׳׳•׳™ ׳׳• ׳¦׳•׳¨׳. ׳׳ ׳—׳™׳™׳‘׳™׳ ׳׳‘׳—׳•׳¨ ׳¨׳§ ׳׳—׳“.</span>
+                        <button type="button" class="btn btn-primary" data-action="commit-inner">הוסף לפנים</button>
+                        <span class="flb-inline-note">מותר שזה יהיה גוף, רגש, דימוי או צורך. לא חייבים לבחור רק אחד.</span>
                     </div>
                 </section>
             `;
@@ -706,22 +706,22 @@
                 <section class="flb-panel flb-panel--bridge">
                     <div class="flb-panel-head">
                         <div>
-                            <p class="flb-panel-kicker">׳©׳׳‘ 4</p>
-                            <h4>׳’׳©׳¨ ׳”׳׳™׳׳”</h4>
-                            <p>׳›׳׳ ׳׳—׳‘׳¨׳™׳ ׳‘׳™׳ ׳—׳•׳¥ ׳׳₪׳ ׳™׳ ׳‘׳׳©׳₪׳˜ ׳׳—׳“ ׳©׳׳—׳–׳™׳§ ׳’׳ ׳׳× ׳”׳׳¦׳™׳׳•׳× ׳•׳’׳ ׳׳× ׳”׳—׳•׳•׳™׳”.</p>
+                            <p class="flb-panel-kicker">שלב 4</p>
+                            <h4>גשר הלימה</h4>
+                            <p>כאן מחברים בין חוץ לפנים במשפט אחד שמחזיק גם את המציאות וגם את החוויה.</p>
                         </div>
-                        <button type="button" class="btn btn-secondary" data-action="go-stage" data-stage="congruence" ${!getCompletions().bridge ? 'disabled' : ''}>׳׳‘׳“׳™׳§׳× ׳”׳׳™׳׳”</button>
+                        <button type="button" class="btn btn-secondary" data-action="go-stage" data-stage="congruence" ${!getCompletions().bridge ? 'disabled' : ''}>לבדיקת הלימה</button>
                     </div>
 
                     <div class="flb-token-grid">
                         <div class="flb-token-group flb-token-group--outer">
-                            <span>׳—׳•׳¥</span>
+                            <span>חוץ</span>
                             ${state.outerFragments.length ? state.outerFragments.map((item) => `
                                 <button type="button" class="flb-token${primaryOuter === item ? ' is-active' : ''}" data-action="set-active-outer" data-value="${html(item)}">${html(item)}</button>
                             `).join('') : '<p class="flb-empty-note">׳‘׳—׳¨/׳™ ׳ ׳™׳¡׳•׳— ׳—׳•׳¥ ׳׳—׳“ ׳׳₪׳—׳•׳×.</p>'}
                         </div>
                         <div class="flb-token-group flb-token-group--inner">
-                            <span>׳₪׳ ׳™׳</span>
+                            <span>פנים</span>
                             ${state.innerFragments.length ? state.innerFragments.map((item) => `
                                 <button type="button" class="flb-token${primaryInner === item ? ' is-active' : ''}" data-action="set-active-inner" data-value="${html(item)}">${html(item)}</button>
                             `).join('') : '<p class="flb-empty-note">׳‘׳—׳¨/׳™ ׳ ׳™׳¡׳•׳— ׳₪׳ ׳™׳ ׳׳—׳“ ׳׳₪׳—׳•׳×.</p>'}
@@ -731,20 +731,20 @@
                     <div class="flb-draft-grid">
                         ${state.bridgeDrafts.length ? state.bridgeDrafts.map((item) => `
                             <button type="button" class="flb-draft-card${normalize(state.selectedBridgeDraft) === normalize(item) ? ' is-active' : ''}" data-action="choose-bridge-draft" data-value="${html(item)}">
-                                <span>׳˜׳™׳•׳˜׳× ׳’׳©׳¨</span>
+                                <span>טיוטת גשר</span>
                                 <strong>${html(item)}</strong>
                             </button>
                         `).join('') : '<p class="flb-empty-note">׳›׳“׳™ ׳׳‘׳ ׳•׳× ׳˜׳™׳•׳˜׳•׳×, ׳¦׳¨׳™׳ ׳׳₪׳—׳•׳× ׳ ׳™׳¡׳•׳— ׳׳—׳“ ׳‘׳—׳•׳¥ ׳•׳׳—׳“ ׳‘׳₪׳ ׳™׳.</p>'}
                     </div>
 
                     <label class="flb-field">
-                        <span>׳ ׳™׳¡׳•׳— ׳”׳’׳©׳¨</span>
-                        <textarea id="flb-bridge-editor" name="bridge-editor" rows="4" placeholder="׳›׳©..., ׳¢׳•׳׳” ׳‘׳™...">${html(bridgeValue)}</textarea>
+                        <span>ניסוח הגשר</span>
+                        <textarea id="flb-bridge-editor" name="bridge-editor" rows="4" placeholder="כש..., עולה בי...">${html(bridgeValue)}</textarea>
                     </label>
 
                     <div class="flb-inline-actions">
-                        <button type="button" class="btn btn-primary" data-action="save-bridge-editor">׳©׳׳•׳¨ ׳ ׳™׳¡׳•׳— ׳’׳©׳¨</button>
-                        <span class="flb-inline-note">׳”׳ ׳™׳¡׳•׳— ׳™׳›׳•׳ ׳׳”׳™׳•׳× ׳¢׳“׳™׳: "׳׳ ׳×׳׳™׳“, ׳׳‘׳ ׳›׳©..." ׳–׳” ׳—׳׳§ ׳׳”׳›׳׳™.</span>
+                        <button type="button" class="btn btn-primary" data-action="save-bridge-editor">שמור ניסוח גשר</button>
+                        <span class="flb-inline-note">הניסוח יכול להיות עדין: "לא תמיד, אבל כש..." זה חלק מהכלי.</span>
                     </div>
                 </section>
             `;
@@ -757,11 +757,11 @@
                 <section class="flb-panel flb-panel--congruence">
                     <div class="flb-panel-head">
                         <div>
-                            <p class="flb-panel-kicker">׳©׳׳‘ 5</p>
-                            <h4>׳¢׳“ ׳›׳׳” ׳–׳” ׳™׳•׳©׳‘?</h4>
-                            <p>׳”׳©׳׳׳” ׳¢׳›׳©׳™׳• ׳”׳™׳ ׳׳ ׳׳ ׳–׳” ׳ ׳›׳•׳. ׳”׳©׳׳׳” ׳”׳™׳ ׳׳ ׳–׳” ׳›׳‘׳¨ ׳ ׳©׳׳¢ ׳›׳׳• ׳׳” ׳©׳”׳×׳›׳•׳•׳ ׳×.</p>
+                            <p class="flb-panel-kicker">שלב 5</p>
+                            <h4>עד כמה זה יושב?</h4>
+                            <p>השאלה עכשיו היא לא אם זה נכון. השאלה היא אם זה כבר נשמע כמו מה שהתכוונת.</p>
                         </div>
-                        <button type="button" class="btn btn-secondary" data-action="go-stage" data-stage="bridge">׳׳—׳–׳•׳¨ ׳׳׳™׳˜׳•׳©</button>
+                        <button type="button" class="btn btn-secondary" data-action="go-stage" data-stage="bridge">לחזור לליטוש</button>
                     </div>
 
                     <div class="flb-landing-card flb-landing-card--${html(congruence.id)}">
@@ -779,13 +779,13 @@
                     </div>
 
                     <label class="flb-field">
-                        <span>׳׳™׳˜׳•׳© ׳׳—׳¨׳•׳</span>
-                        <textarea id="flb-bridge-editor-inline" name="bridge-editor" rows="3" placeholder="׳¢׳¨׳•׳/׳™ ׳¢׳“ ׳©׳–׳” ׳™׳™׳©׳‘">${html(bridgeValue)}</textarea>
+                        <span>ליטוש אחרון</span>
+                        <textarea id="flb-bridge-editor-inline" name="bridge-editor" rows="3" placeholder="ערוך/י עד שזה יישב">${html(bridgeValue)}</textarea>
                     </label>
 
                     <div class="flb-inline-actions">
-                        <button type="button" class="btn btn-primary" data-action="save-bridge-editor">׳¢׳“׳›׳ ׳ ׳™׳¡׳•׳—</button>
-                        <button type="button" class="btn btn-secondary" data-action="toggle-insight" ${!(state.congruenceLevel === 'almost' || state.congruenceLevel === 'yes') ? 'disabled' : ''}>׳׳¨׳׳•׳× ׳׳” ׳”׳×׳‘׳”׳¨</button>
+                        <button type="button" class="btn btn-primary" data-action="save-bridge-editor">עדכן ניסוח</button>
+                        <button type="button" class="btn btn-secondary" data-action="toggle-insight" ${!(state.congruenceLevel === 'almost' || state.congruenceLevel === 'yes') ? 'disabled' : ''}>לראות מה התבהר</button>
                     </div>
                 </section>
             `;
@@ -794,26 +794,26 @@
         function renderInsights() {
             if (!(state.congruenceLevel === 'almost' || state.congruenceLevel === 'yes')) return '';
             const bridgeSentence = trimText(state.bridgeEditorDraft || state.selectedBridgeDraft || '', 220);
-            const sayOutLoud = bridgeSentence ? `${bridgeSentence} ׳—׳©׳•׳‘ ׳׳™ ׳©׳ ׳¢׳¦׳•׳¨ ׳¢׳ ׳–׳” ׳¨׳’׳¢.` : '';
+            const sayOutLoud = bridgeSentence ? `${bridgeSentence} חשוב לי שנעצור על זה רגע.` : '';
             return `
                 <section class="flb-insight-drawer${state.insightOpen ? ' is-open' : ''}">
                     <button type="button" class="flb-insight-toggle" data-action="toggle-insight">
-                        <span>׳׳—׳¨׳™ ׳©׳”׳׳©׳₪׳˜ ׳™׳•׳©׳‘</span>
-                        <strong>׳׳” ׳”׳™׳” ׳—׳¡׳¨ ׳‘׳׳©׳₪׳˜ ׳”׳׳§׳•׳¨׳™?</strong>
+                        <span>אחרי שהמשפט יושב</span>
+                        <strong>מה היה חסר במשפט המקורי?</strong>
                     </button>
                     <div class="flb-insight-body">
                         <article class="flb-insight-card">
-                            <span>׳׳” ׳”׳×׳‘׳”׳¨ ׳¢׳›׳©׳™׳•</span>
+                            <span>מה התבהר עכשיו</span>
                             <ul class="flb-insight-list">
                                 ${state.metaModelInsights.map((item) => `<li>${html(item)}</li>`).join('')}
                             </ul>
                         </article>
                         <article class="flb-insight-card">
-                            <span>׳©׳׳׳” ׳©׳›׳“׳׳™ ׳׳©׳׳•׳</span>
+                            <span>שאלה שכדאי לשאול</span>
                             <strong>${html(state.nextQuestion || '׳׳” ׳¢׳•׳“ ׳¦׳¨׳™׳ ׳›׳“׳™ ׳©׳”׳׳©׳₪׳˜ ׳”׳–׳” ׳™׳™׳©׳‘?')}</strong>
                         </article>
                         <article class="flb-insight-card">
-                            <span>׳ ׳™׳¡׳•׳— ׳©׳›׳“׳׳™ ׳׳•׳׳¨ ׳‘׳§׳•׳</span>
+                            <span>ניסוח שכדאי לומר בקול</span>
                             <strong>${html(sayOutLoud || '׳‘׳—׳¨/׳™ ׳§׳•׳“׳ ׳ ׳™׳¡׳•׳— ׳’׳©׳¨ ׳©׳׳¨׳’׳™׳© ׳™׳•׳©׳‘.')}</strong>
                         </article>
                     </div>
@@ -826,14 +826,14 @@
                 return `
                     <article class="flb-world flb-world--sentence">
                         <div class="flb-world__head">
-                            <span>׳©׳₪׳”</span>
-                            <strong>׳”׳׳©׳₪׳˜ ׳©׳׳׳¨׳×׳™</strong>
+                            <span>שפה</span>
+                            <strong>המשפט שאמרתי</strong>
                         </div>
                         <div class="flb-world__body">
                             <p class="flb-sentence-display">${highlightSentence(state.originalSentence, state.hotPhrase)}</p>
-                            <p class="flb-world__meta">׳”׳‘׳™׳˜׳•׳™ ׳”׳—׳™ ׳›׳¨׳’׳¢: <strong>${html(state.hotPhrase || '׳‘׳—׳¨/׳™ ׳‘׳™׳˜׳•׳™')}</strong></p>
+                            <p class="flb-world__meta">הביטוי החי כרגע: <strong>${html(state.hotPhrase || '׳‘׳—׳¨/׳™ ׳‘׳™׳˜׳•׳™')}</strong></p>
                         </div>
-                        <button type="button" class="flb-world__cta" data-action="go-stage" data-stage="sentence">׳׳¢׳‘׳•׳“ ׳¢׳ ׳”׳׳©׳₪׳˜</button>
+                        <button type="button" class="flb-world__cta" data-action="go-stage" data-stage="sentence">לעבוד על המשפט</button>
                     </article>
                 `;
             }
@@ -841,14 +841,14 @@
                 return `
                     <article class="flb-world flb-world--inner">
                         <div class="flb-world__head">
-                            <span>׳₪׳ ׳™׳</span>
-                            <strong>׳׳” ׳ ׳”׳™׳” ׳‘׳™</strong>
+                            <span>פנים</span>
+                            <strong>מה נהיה בי</strong>
                         </div>
                         <div class="flb-world__body">
                             <p>${html(getPrimaryInner() || '׳¢׳•׳“ ׳׳ ׳׳¡׳₪׳ ׳• ׳ ׳™׳¡׳•׳— ׳₪׳ ׳™׳׳™.')}</p>
-                            <p class="flb-world__meta">׳׳–׳•׳¨ ׳ ׳•׳›׳—׳™: <strong>${html(zoneById(state.selectedInnerZone)?.locative || '׳׳׳ ׳׳–׳•׳¨')}</strong></p>
+                            <p class="flb-world__meta">אזור נוכחי: <strong>${html(zoneById(state.selectedInnerZone)?.locative || '׳׳׳ ׳׳–׳•׳¨')}</strong></p>
                         </div>
-                        <button type="button" class="flb-world__cta" data-action="go-stage" data-stage="inner" ${!canOpenStage('inner') ? 'disabled' : ''}>׳׳¢׳‘׳•׳“ ׳¢׳ ׳”׳₪׳ ׳™׳</button>
+                        <button type="button" class="flb-world__cta" data-action="go-stage" data-stage="inner" ${!canOpenStage('inner') ? 'disabled' : ''}>לעבוד על הפנים</button>
                     </article>
                 `;
             }
@@ -856,14 +856,14 @@
                 return `
                     <article class="flb-world flb-world--outer">
                         <div class="flb-world__head">
-                            <span>׳—׳•׳¥</span>
-                            <strong>׳׳” ׳§׳•׳¨׳” ׳‘׳׳¦׳™׳׳•׳×</strong>
+                            <span>חוץ</span>
+                            <strong>מה קורה במציאות</strong>
                         </div>
                         <div class="flb-world__body">
                             <p>${html(getPrimaryOuter() || '׳¢׳•׳“ ׳׳ ׳׳¡׳₪׳ ׳• ׳ ׳™׳¡׳•׳— ׳—׳™׳¦׳•׳ ׳™.')}</p>
-                            <p class="flb-world__meta">׳”׳׳˜׳¨׳” ׳›׳׳: ׳׳×׳₪׳•׳¡ ׳¨׳’׳¢, ׳”׳×׳ ׳”׳’׳•׳×, ׳׳• ׳”׳§׳©׳¨ ׳©׳׳₪׳©׳¨ ׳׳¨׳׳•׳×.</p>
+                            <p class="flb-world__meta">המטרה כאן: לתפוס רגע, התנהגות, או הקשר שאפשר לראות.</p>
                         </div>
-                        <button type="button" class="flb-world__cta" data-action="go-stage" data-stage="outer" ${!canOpenStage('outer') ? 'disabled' : ''}>׳׳¢׳‘׳•׳“ ׳¢׳ ׳”׳—׳•׳¥</button>
+                        <button type="button" class="flb-world__cta" data-action="go-stage" data-stage="outer" ${!canOpenStage('outer') ? 'disabled' : ''}>לעבוד על החוץ</button>
                     </article>
                 `;
             }
@@ -871,14 +871,14 @@
             return `
                 <article class="flb-world flb-world--bridge">
                     <div class="flb-world__head">
-                        <span>׳’׳©׳¨ ׳”׳׳™׳׳”</span>
+                        <span>גשר הלימה</span>
                         <strong>${html(congruence.label)}</strong>
                     </div>
                     <div class="flb-world__body">
                         <p>${html(trimText(state.bridgeEditorDraft || state.selectedBridgeDraft || '׳›׳׳ ׳ ׳‘׳ ׳” ׳׳× ׳”׳׳©׳₪׳˜ ׳”׳׳©׳•׳׳‘.', 220))}</p>
                         <p class="flb-world__meta">${html(congruence.note)}</p>
                     </div>
-                    <button type="button" class="flb-world__cta" data-action="go-stage" data-stage="bridge" ${!canOpenStage('bridge') ? 'disabled' : ''}>׳׳¢׳‘׳•׳“ ׳¢׳ ׳”׳’׳©׳¨</button>
+                    <button type="button" class="flb-world__cta" data-action="go-stage" data-stage="bridge" ${!canOpenStage('bridge') ? 'disabled' : ''}>לעבוד על הגשר</button>
                 </article>
             `;
         }
@@ -898,22 +898,22 @@
             root.className = `flb-root flb-root--${html(state.activeStage)} flb-root--${html(congruence.id)}`;
             root.innerHTML = `
                 <div class="practice-section-header">
-                    <h3>׳’׳©׳¨ ׳×׳—׳•׳©׳”-׳©׳₪׳”</h3>
-                    <p>׳׳¢׳‘׳“׳” ׳¢׳“׳™׳ ׳” ׳‘׳™׳ ׳©׳׳•׳©׳” ׳¢׳•׳׳׳•׳×: ׳”׳׳©׳₪׳˜ ׳”׳“׳—׳•׳¡, ׳׳” ׳©׳§׳•׳¨׳” ׳‘׳—׳•׳¥, ׳•׳׳” ׳©׳ ׳”׳™׳” ׳‘׳₪׳ ׳™׳. ׳¨׳§ ׳׳—׳¨׳™ ׳©׳™׳© ׳”׳׳™׳׳” ׳‘׳•׳“׳§׳™׳ ׳׳” ׳”׳×׳‘׳”׳¨ ׳¢׳ ׳”׳׳©׳₪׳˜.</p>
+                    <h3>גשר תחושה-שפה</h3>
+                    <p>מעבדה עדינה בין שלושה עולמות: המשפט הדחוס, מה שקורה בחוץ, ומה שנהיה בפנים. רק אחרי שיש הלימה בודקים מה התבהר על המשפט.</p>
                 </div>
 
                 <div class="flb-shell">
-                    <section class="flb-guide-card" aria-label="׳ ׳•׳›׳—׳•׳× ׳׳׳•׳•׳”">
+                    <section class="flb-guide-card" aria-label="נוכחות מלווה">
                         <div class="flb-guide-card__figure" aria-hidden="true"><span class="flb-guide-lantern"></span></div>
                         <div class="flb-guide-card__copy">
-                            <span>׳ ׳•׳›׳—׳•׳× ׳׳׳•׳•׳”</span>
+                            <span>נוכחות מלווה</span>
                             <strong>${html(getGuideCopy())}</strong>
                         </div>
                     </section>
 
-                    <div class="flb-stage-rail" role="tablist" aria-label="׳©׳׳‘׳™ ׳’׳©׳¨ ׳×׳—׳•׳©׳”-׳©׳₪׳”">${renderStagePills()}</div>
+                    <div class="flb-stage-rail" role="tablist" aria-label="שלבי גשר תחושה-שפה">${renderStagePills()}</div>
 
-                    <section class="flb-cosmos" aria-label="׳©׳׳•׳©׳× ׳”׳¢׳•׳׳׳•׳×">
+                    <section class="flb-cosmos" aria-label="שלושת העולמות">
                         ${renderWorldCard('sentence')}
                         ${renderWorldCard('inner')}
                         ${renderWorldCard('outer')}
