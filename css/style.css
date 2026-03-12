@@ -22799,10 +22799,8 @@ body.mobile-sticky-cta-visible {
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Tab switching entrance */
-.tab-content.active {
-    animation: tabEnter 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
+/* Tab switching entrance — JS-only, not on page load */
+/* .tab-content.active — tabEnter removed: caused white-page flicker on feature load */
 
 @keyframes tabEnter {
     from { opacity: 0; transform: translateY(6px); }
