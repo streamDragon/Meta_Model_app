@@ -9057,6 +9057,393 @@ body.global-guide-open {
     .global-guide-overlay-dialog { padding: 12px 10px; }
 }
 
+/* Prism Lab therapist-facing redesign */
+#prismlab .prism-shell-note {
+    margin: 10px 0 0;
+    padding: 12px 14px;
+    border: 1px solid #dbeafe;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #eff6ff, #f8fafc);
+    color: #1e3a8a;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+#prismlab .prism-lab-therapist {
+    display: grid;
+    gap: 18px;
+    margin-top: 22px;
+}
+
+#prismlab .prism-detail-toolbar,
+#prismlab .prism-stage-head,
+#prismlab .prism-section-head,
+#prismlab .prism-flow-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+#prismlab .prism-section-kicker,
+#prismlab .prism-card-kicker {
+    margin: 0 0 6px;
+    color: #0f766e;
+    font-size: 0.82rem;
+    font-weight: 900;
+}
+
+#prismlab .prism-stage-note,
+#prismlab .prism-section-note,
+#prismlab .prism-question-note,
+#prismlab .prism-recognition-note {
+    margin: 0;
+    color: #475569;
+    line-height: 1.55;
+}
+
+#prismlab .prism-client-stage,
+#prismlab .prism-recognition-card,
+#prismlab .prism-flow-card,
+#prismlab .prism-level-card,
+#prismlab .prism-helper-card,
+#prismlab .prism-drawer-card,
+#prismlab .prism-summary-card {
+    border-radius: 18px;
+    border: 1px solid #dbe7f5;
+    background: #ffffff;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+}
+
+#prismlab .prism-client-stage {
+    padding: 18px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+#prismlab .prism-field-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+#prismlab .prism-client-input {
+    min-height: 108px;
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+#prismlab .prism-anchor-input-card small {
+    display: block;
+    margin-top: 8px;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+#prismlab .prism-recognition-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+#prismlab .prism-recognition-card {
+    padding: 18px;
+}
+
+#prismlab .prism-inline-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+#prismlab .prism-inline-list span,
+#prismlab .prism-flow-steps span {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+#prismlab .prism-flow-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#prismlab .prism-flow-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+#prismlab .prism-flow-card {
+    display: grid;
+    gap: 12px;
+    padding: 18px;
+}
+
+#prismlab .prism-flow-card-join {
+    background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 100%);
+    border-color: #99f6e4;
+}
+
+#prismlab .prism-flow-card-lead {
+    background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+    border-color: #bfdbfe;
+}
+
+#prismlab .prism-flow-card-response {
+    background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
+    border-color: #fed7aa;
+}
+
+#prismlab .prism-question-copy {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.03rem;
+    font-weight: 800;
+    line-height: 1.7;
+}
+
+#prismlab .prism-target-level-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: #1e3a8a;
+    font-weight: 800;
+}
+
+#prismlab .prism-direction-toggle {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#prismlab .prism-direction-btn {
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #334155;
+    padding: 8px 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+#prismlab .prism-direction-btn.is-active {
+    border-color: #2563eb;
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+#prismlab .prism-direction-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+#prismlab .prism-openings-list,
+#prismlab .prism-drawer-list,
+#prismlab .prism-level-anchors {
+    margin: 0;
+    padding-inline-start: 18px;
+    line-height: 1.7;
+}
+
+#prismlab .prism-level-grid-select {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+#prismlab .prism-level-card {
+    display: grid;
+    gap: 10px;
+    padding: 16px;
+    text-align: right;
+    cursor: pointer;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+#prismlab .prism-level-card:hover {
+    transform: translateY(-2px);
+    border-color: #93c5fd;
+}
+
+#prismlab .prism-level-card.is-selected {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+#prismlab .prism-level-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+#prismlab .prism-level-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: #334155;
+    font-size: 0.78rem;
+    font-weight: 900;
+}
+
+#prismlab .prism-level-card.is-selected .prism-level-badge {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+#prismlab .prism-helper-callout {
+    padding: 14px 16px;
+    border: 1px solid #bae6fd;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ecfeff, #f8fafc);
+    color: #0f172a;
+    font-weight: 700;
+    line-height: 1.6;
+}
+
+#prismlab .prism-helper-callout p,
+#prismlab .prism-helper-card p,
+#prismlab .prism-summary-card p,
+#prismlab .prism-drawer-card p {
+    margin: 0;
+}
+
+#prismlab .prism-helper-grid,
+#prismlab .prism-summary-grid,
+#prismlab .prism-drawer-grid {
+    display: grid;
+    gap: 12px;
+}
+
+#prismlab .prism-helper-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#prismlab .prism-summary-grid,
+#prismlab .prism-drawer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+#prismlab .prism-helper-card,
+#prismlab .prism-summary-card,
+#prismlab .prism-drawer-card {
+    display: grid;
+    gap: 10px;
+    padding: 16px;
+}
+
+#prismlab .prism-helper-card-note,
+#prismlab .prism-card-example {
+    color: #64748b;
+    line-height: 1.5;
+}
+
+#prismlab .prism-helper-line {
+    margin: 0;
+    color: #334155;
+    line-height: 1.6;
+    font-weight: 700;
+}
+
+#prismlab .prism-secondary-section {
+    display: grid;
+    gap: 12px;
+}
+
+#prismlab .prism-drawer {
+    border: 1px dashed #cbd5e1;
+    border-radius: 16px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+#prismlab .prism-drawer > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 14px 16px;
+    color: #1e3a8a;
+    font-weight: 900;
+}
+
+#prismlab .prism-drawer > summary::-webkit-details-marker {
+    display: none;
+}
+
+#prismlab .prism-drawer[open] > summary {
+    border-bottom: 1px dashed #dbe7f5;
+    background: #f8fbff;
+}
+
+#prismlab .prism-drawer-body {
+    display: grid;
+    gap: 12px;
+    padding: 0 16px 16px;
+}
+
+@media (max-width: 1024px) {
+    #prismlab .prism-flow-grid,
+    #prismlab .prism-summary-grid,
+    #prismlab .prism-drawer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #prismlab .prism-level-grid-select {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    #prismlab .prism-recognition-grid,
+    #prismlab .prism-flow-grid,
+    #prismlab .prism-helper-grid,
+    #prismlab .prism-summary-grid,
+    #prismlab .prism-drawer-grid,
+    #prismlab .prism-level-grid-select {
+        grid-template-columns: 1fr;
+    }
+
+    #prismlab .prism-detail-toolbar .btn {
+        width: 100%;
+    }
+
+    #prismlab .prism-flow-card,
+    #prismlab .prism-recognition-card,
+    #prismlab .prism-client-stage,
+    #prismlab .prism-level-card,
+    #prismlab .prism-helper-card,
+    #prismlab .prism-summary-card,
+    #prismlab .prism-drawer-card {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 412px) {
+    #prismlab .prism-question-copy {
+        font-size: 0.98rem;
+    }
+
+    #prismlab .prism-direction-toggle {
+        width: 100%;
+    }
+
+    #prismlab .prism-direction-btn {
+        flex: 1 1 140px;
+        text-align: center;
+    }
+}
+
 /* Onboarding & CTA */
 .onboarding-card { background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); }
 .tagline { font-size: 1.1em; color: var(--secondary-color); margin-bottom: 30px; }

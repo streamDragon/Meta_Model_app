@@ -3382,6 +3382,23 @@ function buildFeatureMapOverlayContent() {
     `;
     wrapper.appendChild(clone);
 
+    const closeOverlayThen = (callback, reason = 'feature-map-menu-action') => {
+        if (typeof callback !== 'function') return;
+        const provider = window.MetaOverlayProvider;
+        const canCloseFirst = provider
+            && typeof provider.isOpen === 'function'
+            && typeof provider.closeOverlay === 'function'
+            && provider.isOpen();
+        if (!canCloseFirst) {
+            callback();
+            return;
+        }
+        provider.closeOverlay(reason);
+        window.setTimeout(() => {
+            callback();
+        }, 70);
+    };
+
     clone.querySelectorAll('[data-global-feature-menu-select]').forEach((selectNode) => {
         selectNode.addEventListener('change', (event) => {
             const sourceKey = String(event?.target?.getAttribute?.('data-global-feature-menu-select') || '').trim();
@@ -3391,9 +3408,10 @@ function buildFeatureMapOverlayContent() {
             const liveSelect = featureMap.querySelector(`[data-global-feature-menu-select="${sourceKey}"]`);
             if (!(liveSelect instanceof HTMLSelectElement)) return;
 
-            liveSelect.value = selectedKey;
-            liveSelect.dispatchEvent(new Event('change', { bubbles: true }));
-            window.MetaOverlayProvider?.closeOverlay('feature-map-menu-select');
+            closeOverlayThen(() => {
+                liveSelect.value = selectedKey;
+                liveSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            }, 'feature-map-menu-select');
         });
     });
 

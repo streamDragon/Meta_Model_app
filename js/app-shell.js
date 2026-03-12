@@ -1291,6 +1291,23 @@
             <p>כל מסלולי האימון מרוכזים כאן, בלי להאריך את דף הבית.</p>
         `;
 
+        const closeOverlayThen = (callback, reason = 'home-menu-action') => {
+            if (typeof callback !== 'function') return;
+            const provider = global.MetaOverlayProvider;
+            const canCloseFirst = provider
+                && typeof provider.isOpen === 'function'
+                && typeof provider.closeOverlay === 'function'
+                && provider.isOpen();
+            if (!canCloseFirst) {
+                callback();
+                return;
+            }
+            provider.closeOverlay(reason);
+            global.setTimeout(() => {
+                callback();
+            }, 70);
+        };
+
         if (featureMapBody) {
             const clone = featureMapBody.cloneNode(true);
             stripIdsFromCloneTree(clone);
@@ -1299,33 +1316,35 @@
                 const trigger = event.target?.closest?.('a, button');
                 if (!trigger) return;
                 const navKey = String(trigger.getAttribute('data-nav-key') || '').trim();
+                const fallbackHref = String(
+                    trigger.getAttribute('data-versioned-href')
+                    || trigger.getAttribute('href')
+                    || ''
+                ).trim();
                 if (navKey && typeof global.navigateByNavKey === 'function') {
                     event.preventDefault();
-                    if (global.navigateByNavKey(navKey, { versioned: true }) !== false) {
-                        window.setTimeout(() => {
-                            if (global.MetaOverlayProvider && typeof global.MetaOverlayProvider.isOpen === 'function' && global.MetaOverlayProvider.isOpen()) {
-                                global.MetaOverlayProvider.closeOverlay('home-menu-nav-key');
-                            }
-                        }, 40);
-                        return;
-                    }
+                    closeOverlayThen(() => {
+                        if (global.navigateByNavKey(navKey, { versioned: true }) !== false) return;
+                        if (fallbackHref) {
+                            const versionedHref = typeof global.__withAssetVersion === 'function'
+                                ? global.__withAssetVersion(fallbackHref)
+                                : fallbackHref;
+                            global.location.assign(versionedHref);
+                        }
+                    }, 'home-menu-nav-key');
+                    return;
                 }
-                if (trigger.tagName === 'BUTTON') {
-                    const fallbackHref = String(trigger.getAttribute('data-versioned-href') || '').trim();
-                    if (fallbackHref) {
-                        event.preventDefault();
+                if (fallbackHref) {
+                    event.preventDefault();
+                    closeOverlayThen(() => {
                         const versionedHref = typeof global.__withAssetVersion === 'function'
                             ? global.__withAssetVersion(fallbackHref)
                             : fallbackHref;
                         global.location.assign(versionedHref);
-                        return;
-                    }
+                    }, 'home-menu-action');
+                    return;
                 }
-                window.setTimeout(() => {
-                    if (global.MetaOverlayProvider && typeof global.MetaOverlayProvider.isOpen === 'function' && global.MetaOverlayProvider.isOpen()) {
-                        global.MetaOverlayProvider.closeOverlay('home-menu-action');
-                    }
-                }, 40);
+                closeOverlayThen(() => {}, 'home-menu-action');
             });
             clone.querySelectorAll('[data-global-feature-menu-select]').forEach((selectNode) => {
                 selectNode.addEventListener('change', (event) => {
@@ -1336,13 +1355,10 @@
                     const liveSelect = featureMap?.querySelector?.(`[data-global-feature-menu-select="${sourceKey}"]`);
                     if (!(liveSelect instanceof HTMLSelectElement)) return;
 
-                    liveSelect.value = selectedKey;
-                    liveSelect.dispatchEvent(new Event('change', { bubbles: true }));
-                    global.setTimeout(() => {
-                        if (global.MetaOverlayProvider && typeof global.MetaOverlayProvider.isOpen === 'function' && global.MetaOverlayProvider.isOpen()) {
-                            global.MetaOverlayProvider.closeOverlay('home-menu-select-action');
-                        }
-                    }, 40);
+                    closeOverlayThen(() => {
+                        liveSelect.value = selectedKey;
+                        liveSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    }, 'home-menu-select-action');
                 });
             });
             panel.appendChild(clone);
