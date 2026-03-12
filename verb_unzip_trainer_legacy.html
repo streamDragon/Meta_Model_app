@@ -882,7 +882,7 @@
     </main>
   </div>
 
-  <div id="summaryBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="summaryTitle">
+  <div id="summaryBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" hidden aria-labelledby="summaryTitle">
     <div class="modal">
       <h3 id="summaryTitle">סיכום תרגיל</h3>
 
@@ -1684,11 +1684,11 @@
         els.summarySuggestions.appendChild(li);
       });
 
-      els.summaryBackdrop.classList.add("open");
+      els.summaryBackdrop.classList.add("open"); els.summaryBackdrop.removeAttribute("hidden");
     }
 
     function closeSummary() {
-      els.summaryBackdrop.classList.remove("open");
+      els.summaryBackdrop.classList.remove("open"); els.summaryBackdrop.setAttribute("hidden", "");
     }
 
     function resetCaseState(targetCase) {
