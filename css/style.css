@@ -22647,3 +22647,62 @@ body.mobile-sticky-cta-visible {
 }
 
 
+
+/* ═══ PROGRESSIVE DISCLOSURE — FLB stage-based panel visibility ═══ */
+/* Only show panels at or before the current stage */
+/* Future panels (not yet unlocked) are hidden */
+.flb-root--sentence .flb-panel--outer,
+.flb-root--sentence .flb-panel--inner,
+.flb-root--sentence .flb-panel--bridge { display: none; }
+
+.flb-root--outer .flb-panel--inner,
+.flb-root--outer .flb-panel--bridge { display: none; }
+
+.flb-root--inner .flb-panel--bridge { display: none; }
+
+/* Completed panels (stages BEFORE active) collapse to a summary chip */
+.flb-root--outer .flb-panel--sentence,
+.flb-root--inner .flb-panel--sentence,
+.flb-root--inner .flb-panel--outer,
+.flb-root--bridge .flb-panel--sentence,
+.flb-root--bridge .flb-panel--outer,
+.flb-root--bridge .flb-panel--inner {
+    max-height: 56px;
+    overflow: hidden;
+    opacity: 0.7;
+    cursor: pointer;
+    padding: 12px 16px;
+    background: rgba(248, 250, 252, 0.8) !important;
+    border-color: rgba(148, 163, 184, 0.3) !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+    transition: max-height 300ms ease, opacity 200ms ease;
+}
+
+.flb-root--outer .flb-panel--sentence:hover,
+.flb-root--inner .flb-panel--sentence:hover,
+.flb-root--inner .flb-panel--outer:hover,
+.flb-root--bridge .flb-panel--sentence:hover,
+.flb-root--bridge .flb-panel--outer:hover,
+.flb-root--bridge .flb-panel--inner:hover {
+    opacity: 0.9;
+    max-height: 56px; /* stays collapsed on hover, expand via click handled by stage nav */
+}
+
+/* ═══ PROGRESSIVE DISCLOSURE — compact completed stage header ═══ */
+/* When a panel is collapsed, the head shows a ✓ chip */
+.flb-root--outer .flb-panel--sentence .flb-panel-head::after,
+.flb-root--inner .flb-panel--sentence .flb-panel-head::after,
+.flb-root--inner .flb-panel--outer .flb-panel-head::after,
+.flb-root--bridge .flb-panel--sentence .flb-panel-head::after,
+.flb-root--bridge .flb-panel--outer .flb-panel-head::after,
+.flb-root--bridge .flb-panel--inner .flb-panel-head::after {
+    content: "✓ הושלם";
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #0f766e;
+    background: #d1fae5;
+    border-radius: 999px;
+    padding: 3px 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
