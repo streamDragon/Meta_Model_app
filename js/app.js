@@ -185,6 +185,7 @@ const USER_LEVELS = Object.freeze({
 
 const FEATURE_ICON_BY_TAB = Object.freeze({
     home: '🏠',
+    'sentence-map': '🗺️',
     'practice-question': '🧩',
     'practice-radar': '🎯',
     'practice-triples-radar': '📡',
@@ -221,6 +222,14 @@ const FEATURE_ONBOARDING_COPY = Object.freeze({
         steps: Object.freeze(['בחרו מצב: פרטים או כללים', 'זהו את הכיוון המרכזי', 'דייקו לתבנית בתוך השורה']),
         success: 'הצלחה היא לזהות כיוון ואז תבנית, בשני שלבים ברורים.',
         termKeys: Object.freeze(['deletion', 'distortion', 'generalization'])
+    }),
+    'sentence-map': Object.freeze({
+        icon: '🗺️',
+        kicker: 'ממפים לפני שינוי',
+        what: 'כאן ממפים קודם מה קרה בפועל, מה הסיפור הפנימי, ומה המשפט עושה בתוך הקשר, ורק אחר כך בוחרים התערבות.',
+        steps: Object.freeze(['בחרו מקרה', 'פתחו את שלוש השכבות', 'אתרו מוקד חם ואז עברו להתערבות וניסוח חדש']),
+        success: 'הצלחה היא להבין איפה הלב של המקרה נמצא, לא רק לתפוס "טעות" בשפה.',
+        termKeys: Object.freeze(['congruence', 'insight'])
     }),
     'practice-wizard': Object.freeze({
         icon: '🌉',
@@ -1940,6 +1949,7 @@ function normalizeRequestedTab(tabName = '') {
     const raw = String(tabName || '').trim();
     const key = raw.toLowerCase();
     if (!raw) return '';
+    if (key === 'sentence-map' || key === 'sentence_map' || key === 'mapper' || key === 'map-lab' || key === 'multi-focus-mapper') return 'sentence-map';
     if (key === 'practice' || key === 'practice-question' || key === 'question') return 'practice-question';
     if (key === 'practice-radar' || key === 'radar' || key === 'meta-radar' || key === 'meta_radar') return 'practice-radar';
     if (key === 'practice-triples-radar' || key === 'triples-radar' || key === 'triples_radar' || key === 'breen-radar' || key === 'michael-breen') return 'practice-triples-radar';
@@ -1950,6 +1960,7 @@ function normalizeRequestedTab(tabName = '') {
 
 const APP_STICKY_TAB_TITLE_OVERRIDES = Object.freeze({
     home: 'בית · התחלה והכוונה',
+    'sentence-map': 'מפת המשפט',
     'scenario-trainer': 'סימולטור סצנות',
     'comic-engine': 'במת קומיקס רגשי',
     categories: 'מילון קטגוריות המטה-מודל',
@@ -1965,6 +1976,7 @@ const APP_STICKY_TAB_TITLE_OVERRIDES = Object.freeze({
 
 const APP_STICKY_TAB_CONTEXT_OVERRIDES = Object.freeze({
     home: 'שם האפליקציה והמסך הפעיל נשארים גלויים גם בזמן גלילה.',
+    'sentence-map': 'ממפים קודם חוץ, פנים וקשר, ולכן הכותרת נשארת גלויה לאורך כל השלבים.',
     'scenario-trainer': 'המסך הנוכחי נשאר מזוהה גם כשגוללים עמוק בתוך הסצנה.',
     'comic-engine': 'הכותרת נשארת קבועה גם בתוך עריכה ארוכה של הקומיקס.',
     categories: 'נוח להישאר ממוקדים גם כשגוללים הרבה בתוך המילון.',
@@ -3849,6 +3861,7 @@ function setupGlobalFeatureMenuDropdown() {
     const seenKeys = new Set();
     const labelOverrides = Object.freeze({
         'tab:home': 'בית · התחלה והכוונה',
+        'tab:sentence-map': 'מפת המשפט · לפני שמאתגרים — ממפים',
         'tab:scenario-trainer': 'סימולטור סצנות · משגר',
         'tab:comic-engine': 'במת קומיקס רגשי · תגובות ומהלכים',
         'tab:categories': 'מילון קטגוריות המטה-מודל',
@@ -3889,6 +3902,7 @@ function setupGlobalFeatureMenuDropdown() {
         if (key === 'tab:home') return groupLabels.home;
         if (key === 'tab:about') return groupLabels.settings;
         if ([
+            'tab:sentence-map',
             'tab:practice-question',
             'tab:practice-radar',
             'tab:practice-triples-radar',
@@ -4460,6 +4474,7 @@ function setupFeatureLauncherTabs() {
     if (!launchers.length) return;
 
     const featureLabelOverrides = Object.freeze({
+        "nav:sentenceMap": "מפת המשפט · לפני שמאתגרים — ממפים",
         "nav:practice-question": "תרגול זיהוי מטה-מודל",
         "nav:practice-radar": "מכ״ם מטה-מודל",
         "nav:practice-wizard": "גשר תחושה-שפה · הלימה לפני שינוי",
@@ -5475,6 +5490,9 @@ function initializeMetaModelApp() {
     }
     if (typeof setupFeelingLanguageBridge === 'function') {
         setupFeelingLanguageBridge();
+    }
+    if (typeof setupSentenceMap === 'function') {
+        setupSentenceMap();
     }
     if (document.getElementById('start-trainer-btn')) {
         setupTrainerMode();
@@ -16843,11 +16861,11 @@ const HOME_TRAINING_PROGRAMS = Object.freeze([
     }),
     Object.freeze({
         id: 'cognitive_design',
-        title: 'בניית מסגרת',
-        badge: 'מפה לוגית',
-        description: 'מסלול בניית מסגרות: פריזמה, גשר תחושה-שפה, ואז סימולציה/קומיקס.',
+        title: 'ממפים לפני אתגור',
+        badge: 'מיפוי → הלימה',
+        description: 'מסלול שמתחיל במפת המשפט, ממשיך לגשר תחושה-שפה, ואז עובר לסימולציה/קומיקס.',
         steps: Object.freeze([
-            Object.freeze({ tab: 'prismlab', title: 'מעבדת פריזמות', note: 'מגדל לוגי + צעד הבא' }),
+            Object.freeze({ tab: 'sentence-map', title: 'מפת המשפט', note: 'לזהות חוץ, פנים וצורך מהשיחה לפני התערבות' }),
             Object.freeze({ tab: 'practice-wizard', title: 'גשר תחושה-שפה', note: 'לנסח משפט שיושב גם בפנים וגם במציאות' }),
             Object.freeze({ tab: 'comic-engine', title: 'במת קומיקס רגשי', note: 'הדמיית תגובות ותוצאה' })
         ])

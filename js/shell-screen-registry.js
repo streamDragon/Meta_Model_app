@@ -54,6 +54,18 @@
                 { id: 'breen-map', type: 'selectors', action: 'טבלת ברין', title: 'טבלת ברין והעקרונות', size: 'lg', selectors: ['.triples-radar-concept', '.triples-radar-breen-figure', '.triples-radar-reference-actions'] }
             ]
         },
+        'sentence-map': {
+            id: 'sentence-map',
+            adapter: 'generic',
+            containerSelector: '.practice-container',
+            workspaceSelector: '.practice-intro-card',
+            sectionHideSelectors: ['.screen-read-guide'],
+            hideSelectors: ['> h2', '> .subtitle', '.practice-section-header'],
+            panels: [
+                { id: 'guide', type: 'guide', action: 'היגיון', title: 'איך עובדים במפת המשפט', size: 'lg', sourceRoot: 'section' },
+                { id: 'method', type: 'selectors', action: 'למה זה עובד', title: 'למה ממפים לפני שמאתגרים', size: 'md', selectors: ['.sentence-map-method-note'] }
+            ]
+        },
         'practice-wizard': {
             id: 'practice-wizard',
             adapter: 'generic',
