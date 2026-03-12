@@ -22834,3 +22834,41 @@ body.mobile-sticky-cta-visible {
     line-height: 1.5;
     margin-bottom: 16px;
 }
+
+/* ═══════════════════════════════════════════════════
+   MOBILE HOME — CSS-only fallback, no JS timing needed
+   Prevents cinematic hero from flashing on mobile
+═══════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+    /* Always hide desktop-only content on mobile,
+       regardless of whether JS has run yet */
+    .home-route .home-route-desktop-only {
+        display: none !important;
+    }
+
+    /* Always show the mobile feed on the home tab on mobile
+       (JS controls the hidden attribute, this is the CSS backup) */
+    #mobile-feed-home:not([hidden]) {
+        display: grid !important;
+        gap: 10px;
+    }
+
+    /* Fix the mobile live-shell content filling viewport */
+    #practice-radar .rapid-radar-live-shell:not(.hidden) {
+        min-height: calc(100dvh - 160px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    #practice-radar .rapid-pattern-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Ensure ltv2 practice fills screen */
+    #living-triples .ltv2-practice {
+        min-height: min(calc(100dvh - 200px), 600px);
+    }
+}

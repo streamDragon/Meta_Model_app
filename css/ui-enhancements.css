@@ -1304,3 +1304,315 @@ body {
     .hhc-path-card:nth-child(4) { animation: uiEnter 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.22s backwards; }
 }
 }
+
+/* ═══════════════════════════════════════════════════
+   FEATURE INTRO GATE — progressive disclosure
+═══════════════════════════════════════════════════ */
+
+/* Lock the task section until user confirms intro */
+[data-intro-locked] {
+    display: none !important;
+}
+
+/* Confirm button style */
+.fi-confirm-btn {
+    width: 100%;
+    padding: 14px 20px !important;
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    border-radius: 16px !important;
+    margin-top: 16px;
+    background: linear-gradient(135deg, #0f766e 0%, #0369a1 100%) !important;
+    box-shadow: 0 6px 20px rgba(15,118,110,0.3) !important;
+    transition: transform 180ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 180ms ease !important;
+}
+
+.fi-confirm-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 28px rgba(15,118,110,0.4) !important;
+}
+
+/* Intro seen state — collapse header */
+.practice-intro-card[data-intro-seen="1"] > h2,
+.practice-intro-card[data-intro-seen="1"] > .subtitle {
+    font-size: 0.82rem !important;
+    color: #64748b !important;
+    font-weight: 600 !important;
+    margin-bottom: 4px !important;
+    opacity: 0.7;
+}
+
+/* Task section slide-in animation */
+@keyframes fiSlideIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════
+   BANDLER & GRINDER COIN HELP BUTTON
+═══════════════════════════════════════════════════ */
+
+.bg-coin-btn {
+    position: absolute;
+    top: 12px;
+    left: 12px; /* left in RTL = visually right */
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    z-index: 10;
+    transition: transform 220ms cubic-bezier(0.34,1.56,0.64,1), filter 200ms ease;
+    filter: drop-shadow(0 3px 8px rgba(0,0,0,0.2));
+}
+
+.bg-coin-btn img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.bg-coin-btn:hover {
+    transform: scale(1.12) rotate(8deg);
+    filter: drop-shadow(0 6px 16px rgba(212,160,23,0.5));
+}
+
+.bg-coin-btn:active {
+    transform: scale(0.95);
+}
+
+/* The intro card needs relative positioning for the coin btn */
+.practice-intro-card {
+    position: relative;
+}
+
+/* ═══════════════════════════════════════════════════
+   B&G HELP OVERLAY
+═══════════════════════════════════════════════════ */
+
+.bg-help-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    background: rgba(5, 10, 25, 0.72);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 16px;
+    opacity: 0;
+    transition: opacity 250ms ease;
+}
+
+@media (min-width: 640px) {
+    .bg-help-overlay {
+        align-items: center;
+    }
+}
+
+.bg-help-overlay.is-open {
+    opacity: 1;
+}
+
+.bg-help-dialog {
+    background: #ffffff;
+    border-radius: 24px 24px 20px 20px;
+    padding: 20px;
+    width: min(560px, 100%);
+    max-height: 88dvh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 32px 64px rgba(0,0,0,0.4);
+    transform: translateY(30px);
+    transition: transform 300ms cubic-bezier(0.22,1,0.36,1);
+    overscroll-behavior: contain;
+}
+
+.bg-help-overlay.is-open .bg-help-dialog {
+    transform: translateY(0);
+}
+
+.bg-help-close {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    transition: background 150ms ease;
+}
+
+.bg-help-close:hover { background: #f1f5f9; }
+
+.bg-help-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.bg-coin-img-lg {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    filter: drop-shadow(0 4px 10px rgba(212,160,23,0.35));
+}
+
+.bg-help-from {
+    margin: 0 0 2px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #b45309;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.bg-help-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1.25;
+}
+
+.bg-help-steps {
+    margin: 0 0 14px;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+}
+
+.bg-help-steps li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: #334155;
+    line-height: 1.45;
+}
+
+.bg-step-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0f766e, #0369a1);
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.bg-example-box {
+    background: #f8faff;
+    border: 1px solid #c7d7f4;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+}
+
+.bg-example-label {
+    margin: 0 0 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #3b82f6;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.bg-example-text {
+    margin: 0;
+    font-size: 0.86rem;
+    color: #1e3a5f;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+.bg-tip {
+    margin: 0 0 16px;
+    font-size: 0.84rem;
+    color: #047857;
+    background: #f0fdf4;
+    border-radius: 10px;
+    padding: 8px 12px;
+    line-height: 1.4;
+}
+
+.bg-help-cta {
+    width: 100%;
+    padding: 13px !important;
+    font-size: 1rem !important;
+    font-weight: 800 !important;
+    border-radius: 14px !important;
+    background: linear-gradient(135deg, #0f766e 0%, #0369a1 100%) !important;
+    box-shadow: 0 6px 18px rgba(15,118,110,0.28) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   TRIPLES KIDS IMAGE HERO
+   Save image as: assets/triples-kids.jpg
+═══════════════════════════════════════════════════ */
+
+.triples-kids-hero {
+    width: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    min-height: 160px;
+    background-image: url('../assets/triples-kids.jpg');
+    background-size: cover;
+    background-position: center 20%;
+    margin-bottom: 12px;
+    box-shadow: 0 12px 30px rgba(15,23,42,0.18);
+}
+
+.triples-kids-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0.5));
+}
+
+.triples-kids-hero-text {
+    position: absolute;
+    bottom: 14px;
+    right: 16px;
+    z-index: 1;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+}
+
+.triples-kids-hero-text h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #ffffff;
+}
+
+.triples-kids-hero-text p {
+    margin: 2px 0 0;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.88);
+}
+
+/* Living Triples standalone page also gets the hero */
+.ltv2-header {
+    position: relative;
+}
