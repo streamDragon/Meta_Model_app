@@ -367,7 +367,7 @@
     <div id="compactRadar"></div>
   </aside>
 
-  <div id="reviewModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="reviewTitle">
+  <div id="reviewModal" class="modal" role="dialog" aria-modal="true" hidden aria-labelledby="reviewTitle">
     <section class="modal-card">
       <div class="modal-head">
         <div>
@@ -814,12 +814,12 @@
     function openReview(force) {
       if (!force && !isCompleted()) return;
       renderReview();
-      dom.reviewModal.classList.add('open');
+      dom.reviewModal.classList.add('open'); dom.reviewModal.removeAttribute('hidden');
       if (audio) audio.play('open');
     }
 
     function closeReview() {
-      dom.reviewModal.classList.remove('open');
+      dom.reviewModal.classList.remove('open'); dom.reviewModal.setAttribute('hidden', '');
       if (audio) audio.play('close');
     }
 

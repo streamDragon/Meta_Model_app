@@ -813,11 +813,13 @@ function restartPickStep() {
 
 function openMap() {
   state.el.mapModal.classList.remove('hidden');
+  state.el.mapModal.removeAttribute('hidden');
   document.body.classList.add('screen-guide-open');
 }
 
 function closeMap() {
   state.el.mapModal.classList.add('hidden');
+  state.el.mapModal.setAttribute('hidden', '');
   if (!document.querySelector('.screen-read-guide-modal:not(.hidden)')) {
     document.body.classList.remove('screen-guide-open');
   }
