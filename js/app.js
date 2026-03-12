@@ -2714,7 +2714,7 @@ function setupMobileViewportSizing() {
     window.addEventListener('orientationchange', setViewportHeight, { passive: true });
 }
 
-const LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT = 'סביבה, התנהגות, יכולות, ערכים/אמונות, זהות, שייכות';
+const LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT = 'סביבה, התנהגות, יכולת, ערכים / משמעות, זהות, שייכות / תמונה רחבה';
 
 const DEFAULT_SCREEN_READ_GUIDE = Object.freeze({
     logic: 'התרגול בנוי מלמטה למעלה: מזהים הנחה סמויה, מדייקים שפה, ואז פועלים צעד קטן.',
@@ -14479,46 +14479,249 @@ function logMetaModelData() {
 
 const LOGICAL_LEVEL_INFO = {
     E: {
-        name: 'Environment (E)',
+        name: 'Environment',
         hebrew: 'סביבה',
-        prompt: 'איפה, מתי, עם מי ובאיזה הקשר זה קורה?'
+        prompt: 'איפה, מתי, ועם מי זה קורה',
+        description: 'איפה, מתי, ועם מי זה קורה',
+        anchorQuestions: Object.freeze([
+            'מתי זה קורה יותר?',
+            'עם מי זה קורה פחות?',
+            'איפה זה כמעט לא קורה?'
+        ]),
+        therapistMiss: 'מטפלים לפעמים קופצים לפרשנות לפני שיש הקשר, זמן, ואנשים ברורים.',
+        responseSample: 'זה קורה בעיקר בערב, אחרי יום עמוס, ובדרך כלל מול בן או בת הזוג.',
+        openings: Object.freeze([
+            'הקשר מדויק יותר',
+            'יוצא דופן חשוב',
+            'מי מעורב ומתי זה משתנה'
+        ])
     },
     B: {
-        name: 'Behavior (B)',
+        name: 'Behavior',
         hebrew: 'התנהגות',
-        prompt: 'מה האדם עושה בפועל? מה הפעולה הנצפית?'
+        prompt: 'מה קורה בפועל שאפשר לראות או לשמוע',
+        description: 'מה קורה בפועל שאפשר לראות או לשמוע',
+        anchorQuestions: Object.freeze([
+            'מה קורה שם בפועל?',
+            'מה את/ה עושה?',
+            'מה הוא עושה או לא עושה?'
+        ]),
+        therapistMiss: 'כאן חשוב לבקש רצף התנהגותי, לא רק רגש או כותרת כללית.',
+        responseSample: 'הוא עונה קצר, לא שואל, ואני מפסיקה לשתף אחרי שתי שורות.',
+        openings: Object.freeze([
+            'יותר התנהגות קונקרטית',
+            'רצף אירועים ברור יותר',
+            'הבדל בין מה שקורה לבין מה שמסיקים מזה'
+        ])
     },
     C: {
-        name: 'Capabilities (C)',
-        hebrew: 'יכולות',
-        prompt: 'איזו מיומנות או אסטרטגיה נדרשת כאן?'
+        name: 'Capability',
+        hebrew: 'יכולת',
+        prompt: 'איך האדם מנסה לעשות, במה הוא נתקע, ומה חסר לו',
+        description: 'איך האדם מנסה לעשות, במה הוא נתקע, ומה חסר לו',
+        anchorQuestions: Object.freeze([
+            'איך את/ה מנסה לעשות את זה?',
+            'מה מקשה עליך לעשות זאת?',
+            'מה היה עוזר לך לעשות את זה אחרת?'
+        ]),
+        therapistMiss: 'כשלא בודקים יכולת, קל לטעות ולחשוב שמדובר רק בעמדה או באופי.',
+        responseSample: 'אני מנסה להסביר מהר ואז מתבלבלת; חסר לי איך לעצור ולנסח את זה פשוט.',
+        openings: Object.freeze([
+            'מיומנות חסרה',
+            'אסטרטגיה שלא עובדת',
+            'מה עשוי לעזור לעשות אחרת'
+        ])
     },
     V: {
-        name: 'Values/Beliefs (V)',
-        hebrew: 'ערכים/אמונות',
-        prompt: 'מה חשוב כאן? איזו אמונה מנהלת את ההתנהגות?'
+        name: 'Values / Meaning',
+        hebrew: 'ערכים / משמעות',
+        prompt: 'למה זה חשוב ומה זה אומר עבורו',
+        description: 'למה זה חשוב ומה זה אומר עבורו',
+        anchorQuestions: Object.freeze([
+            'מה המשמעות של זה בשבילך?',
+            'למה זה כל כך חשוב?',
+            'מה זה אומר על הקשר / על המצב?'
+        ]),
+        therapistMiss: 'אם מדלגים על המשמעות, מפספסים את הכלל או הפרשנות שמחזיקים את המשפט.',
+        responseSample: 'זה גורם לי להרגיש שאני לא באמת חשובה, ושקשר אמור להרגיש קרוב יותר מזה.',
+        openings: Object.freeze([
+            'משמעות רגשית חדשה',
+            'כלל פנימי או קריטריון',
+            'הבנה למה זה חשוב כל כך'
+        ])
     },
     I: {
-        name: 'Identity (I)',
+        name: 'Identity',
         hebrew: 'זהות',
-        prompt: 'מה זה אומר על הזהות: מי אני? איזה אדם אני?'
+        prompt: 'מה זה אומר עליי / עליו כאדם',
+        description: 'מה זה אומר עליי / עליו כאדם',
+        anchorQuestions: Object.freeze([
+            'כשאת/ה אומר/ת את זה, מה זה אומר עליך?',
+            'איזה אדם את/ה מרגיש/ה שאת/ה שם?',
+            'מי את/ה נהיה/ית בתוך המצב הזה?'
+        ]),
+        therapistMiss: 'עבודה ברמת זהות בלי הצטרפות קודם יכולה להישמע חדה או מאיימת מדי.',
+        responseSample: 'אני נהיית מישהי שמחזיקה הכול לבד, כאילו אין לי באמת על מי להישען.',
+        openings: Object.freeze([
+            'הבנת זהות שנבנית בתוך המצב',
+            'סיפור עצמי שמופעל',
+            'הבדל בין מה שקרה לבין מי שאני נהיה/ית'
+        ])
     },
     S: {
-        name: 'Belonging (S)',
-        hebrew: 'שייכות',
-        prompt: 'לאיזו קבוצה/קהילה/שייכות זה מתחבר?'
+        name: 'Belonging / Wider Story',
+        hebrew: 'שייכות / תמונה רחבה',
+        prompt: 'לאיזה סיפור רחב, קשר, או ייעוד זה מתחבר',
+        description: 'לאיזה סיפור רחב, קשר, או ייעוד זה מתחבר',
+        anchorQuestions: Object.freeze([
+            'לאיזה דפוס רחב יותר זה מתחבר?',
+            'מה זה אומר על המקום שלך בקשר / במשפחה / בעולם?',
+            'מה הסיפור הרחב שהמשפט הזה יושב בתוכו?'
+        ]),
+        therapistMiss: 'אם עולים מהר מדי לתמונה הרחבה, המטופל עלול להרגיש שעזבו את החוויה המיידית שלו.',
+        responseSample: 'זה מתחבר לתחושה שאני בחוץ גם כשאני בתוך הקשר, כאילו אין לי באמת מקום בטוח.',
+        openings: Object.freeze([
+            'דפוס רחב יותר',
+            'משמעות ביחסים או במשפחה',
+            'מקום ושייכות בתוך סיפור רחב'
+        ])
     }
 };
 
-const LOGICAL_LEVELS_SEQUENCE_FRIENDLY = 'סביבה → התנהגות → יכולות → ערכים/אמונות → זהות → שייכות';
+const LOGICAL_LEVELS_SEQUENCE_FRIENDLY = 'סביבה → התנהגות → יכולת → ערכים / משמעות → זהות → שייכות / תמונה רחבה';
+const PRISM_LAB_LEVEL_ORDER = Object.freeze(['E', 'B', 'C', 'V', 'I', 'S']);
+const PRISM_DEFAULT_LEVEL_BY_ID = Object.freeze({
+    cause_effect: 'V',
+    comparative_deletion: 'B',
+    comparisons: 'B',
+    nominalization: 'V',
+    nominalisations: 'V',
+    modal_operator: 'V',
+    modal_operators: 'V',
+    universal_quantifier: 'V',
+    universal_quantifiers: 'V',
+    mind_reading: 'V',
+    simple_deletion: 'B',
+    lack_referential_index: 'E',
+    lost_performative: 'V',
+    presupposition: 'V',
+    complex_equivalence: 'V',
+    unspecified_verb: 'B'
+});
+const PRISM_META_MODEL_FAMILY_INFO = Object.freeze({
+    DELETION: Object.freeze({
+        label: 'מחיקה',
+        therapistCopy: 'חסר כאן מידע שעדיין לא נאמר: מי, מה, איך, מתי, או לפי מה.'
+    }),
+    GENERALIZATION: Object.freeze({
+        label: 'הכללה',
+        therapistCopy: 'המשפט נשמע כמו כלל רחב, קבוע, או הכרחי מדי.'
+    }),
+    DISTORTION: Object.freeze({
+        label: 'עיוות / קיבוע משמעות',
+        therapistCopy: 'המשפט מחבר בין דברים או נותן להם משמעות כאילו זו עובדה סגורה.'
+    }),
+    default: Object.freeze({
+        label: 'תבנית לשונית',
+        therapistCopy: 'חפש/י מה בדיוק חסר, הוכלל, נקבע, או קיבל משמעות גדולה מדי.'
+    })
+});
+const PRISM_CATEGORY_LABEL_OVERRIDES = Object.freeze({
+    cause_effect: 'סיבה־תוצאה',
+    comparative_deletion: 'השוואה בלי בסיס ברור',
+    comparisons: 'השוואה בלי בסיס ברור',
+    nominalization: 'נומינליזציה',
+    nominalisations: 'נומינליזציה',
+    modal_operator: 'אופרטורים מודליים',
+    modal_operators: 'אופרטורים מודליים',
+    universal_quantifier: 'הכללה גורפת',
+    universal_quantifiers: 'הכללה גורפת',
+    mind_reading: 'קריאת מחשבות',
+    simple_deletion: 'מחיקה פשוטה',
+    lack_referential_index: 'חוסר אינדקס התייחסות',
+    lost_performative: 'פועל אבוד',
+    presupposition: 'הנחה מוקדמת',
+    complex_equivalence: 'שקילות מורכבת',
+    unspecified_verb: 'פועל לא ספציפי'
+});
+const PRISM_CATEGORY_THERAPIST_COPY = Object.freeze({
+    cause_effect: Object.freeze({
+        recognition: 'המשפט נשמע כאילו דבר אחד גורם באופן ישיר ומוחלט לדבר אחר.',
+        therapistMove: 'כדאי לבדוק מה בדיוק קורה באמצע בין האירוע לבין התוצאה שהמטופל מתאר.'
+    }),
+    comparative_deletion: Object.freeze({
+        recognition: 'יש כאן השוואה בלי בסיס ברור: טוב יותר, פחות, מספיק, לא מספיק.',
+        therapistMove: 'כדאי לברר ביחס למה, לפי איזה קריטריון, ואיפה ההשוואה משתנה.'
+    }),
+    comparisons: Object.freeze({
+        recognition: 'יש כאן השוואה בלי בסיס ברור: יותר, פחות, מספיק, לא מספיק.',
+        therapistMove: 'כדאי לברר ביחס למה, לפי איזה קריטריון, ואיפה ההשוואה משתנה.'
+    }),
+    nominalization: Object.freeze({
+        recognition: 'חוויה דינמית נשמעת כאן כמו דבר קבוע וסגור.',
+        therapistMove: 'כדאי לפרק את המילה לרגעים, פעולות, ורכיבים שאפשר לחקור.'
+    }),
+    nominalisations: Object.freeze({
+        recognition: 'חוויה דינמית נשמעת כאן כמו דבר קבוע וסגור.',
+        therapistMove: 'כדאי לפרק את המילה לרגעים, פעולות, ורכיבים שאפשר לחקור.'
+    }),
+    modal_operator: Object.freeze({
+        recognition: 'יש כאן חוק פנימי של חייב, צריך, אסור, או אי אפשר.',
+        therapistMove: 'כדאי לבדוק מה המחיר, מה מפחיד, ואיפה יש עוד אפשרות.'
+    }),
+    modal_operators: Object.freeze({
+        recognition: 'יש כאן חוק פנימי של חייב, צריך, אסור, או אי אפשר.',
+        therapistMove: 'כדאי לבדוק מה המחיר, מה מפחיד, ואיפה יש עוד אפשרות.'
+    }),
+    universal_quantifier: Object.freeze({
+        recognition: 'המשפט נשמע גורף: תמיד, אף פעם, אף אחד, כולם.',
+        therapistMove: 'כדאי לחפש יוצאי דופן, מצבים אחרים, והבדלים שעדיין לא קיבלו מקום.'
+    }),
+    universal_quantifiers: Object.freeze({
+        recognition: 'המשפט נשמע גורף: תמיד, אף פעם, אף אחד, כולם.',
+        therapistMove: 'כדאי לחפש יוצאי דופן, מצבים אחרים, והבדלים שעדיין לא קיבלו מקום.'
+    }),
+    mind_reading: Object.freeze({
+        recognition: 'יש כאן ידיעה לכאורה על מחשבות, כוונות, או עמדות של אדם אחר.',
+        therapistMove: 'כדאי להחזיר את העבודה לראיות, פרשנות, ובדיקה ישירה במקום ניחוש.'
+    }),
+    simple_deletion: Object.freeze({
+        recognition: 'המשפט משאיר בחוץ מידע בסיסי שבלעדיו קשה להבין מה באמת קורה.',
+        therapistMove: 'כדאי לבקש את הפרט החסר בצורה פשוטה ולא מתעמתת.'
+    }),
+    lack_referential_index: Object.freeze({
+        recognition: 'נאמר כאן משהו על אנשים או גורמים לא מוגדרים.',
+        therapistMove: 'כדאי לדייק מי בדיוק, עם מי זה קורה, ועל מי באמת מדברים.'
+    }),
+    lost_performative: Object.freeze({
+        recognition: 'יש כאן קביעה ערכית בלי מקור ברור: נכון, לא נכון, צריך, אסור.',
+        therapistMove: 'כדאי לברר לפי מי, מאיפה הכלל בא, ומה קורה אם בודקים אותו מחדש.'
+    }),
+    presupposition: Object.freeze({
+        recognition: 'המשפט נשען על הנחה שכבר הוכנסה פנימה כאילו היא עובדה.',
+        therapistMove: 'כדאי לבדוק מה כבר הונח כאן, ומה יקרה אם לא מניחים זאת מראש.'
+    }),
+    complex_equivalence: Object.freeze({
+        recognition: 'יש כאן חיבור בין דבר אחד למשמעות אחרת כאילו הם אותו דבר.',
+        therapistMove: 'כדאי להפריד בין מה שקרה לבין מה שהמטופל מסיק מזה.'
+    }),
+    unspecified_verb: Object.freeze({
+        recognition: 'הפועל נשאר עמום, ולכן קשה לדעת מה בדיוק קרה בפועל.',
+        therapistMove: 'כדאי לפרט איך בדיוק זה קרה, ומה נראה או נשמע ברגע עצמו.'
+    }),
+    default: Object.freeze({
+        recognition: 'יש כאן ניסוח שמצמצם מידע או מקבע משמעות באופן שכדאי לפתוח.',
+        therapistMove: 'אם יש ספק בקטגוריה, חפש/י מה בדיוק חסר, הוכלל, קובע, או קיבל משמעות גדולה מדי.'
+    })
+});
 
 const LOGICAL_LEVEL_KEYWORDS = {
-    E: ['סביבה', 'מקום', 'זמן', 'הקשר', 'בחדר', 'בעבודה', 'בבית', 'מתי', 'איפה'],
-    B: ['עושה', 'עשיתי', 'ביצוע', 'פעולה', 'התנהגות', 'מגיב', 'אומר', 'שואל'],
-    C: ['יכולת', 'מיומנות', 'אסטרטגיה', 'כלי', 'ללמוד', 'להתאמן', 'לתרגל', 'מסוגל'],
-    V: ['חשוב', 'ערך', 'אמונה', 'מאמין', 'צריך', 'נכון', 'לא נכון', 'עיקרון'],
-    I: ['אני', 'עצמי', 'זהות', 'מי אני', 'טיפש', 'מצליחן', 'כישלון', 'בן אדם'],
-    S: ['אנחנו', 'קבוצה', 'קהילה', 'צוות', 'משפחה', 'שייכות', 'חברה', 'ארגון']
+    E: ['סביבה', 'מקום', 'זמן', 'הקשר', 'בחדר', 'בעבודה', 'בבית', 'מתי', 'איפה', 'עם מי'],
+    B: ['עושה', 'עשיתי', 'ביצוע', 'פעולה', 'התנהגות', 'מגיב', 'אומר', 'שואל', 'בפועל'],
+    C: ['יכולת', 'יכולות', 'מיומנות', 'אסטרטגיה', 'כלי', 'ללמוד', 'להתאמן', 'לתרגל', 'מסוגל', 'חסר לי'],
+    V: ['חשוב', 'ערך', 'משמעות', 'אמונה', 'מאמין', 'צריך', 'נכון', 'לא נכון', 'עיקרון'],
+    I: ['אני', 'עצמי', 'זהות', 'מי אני', 'טיפש', 'מצליחן', 'כישלון', 'בן אדם', 'איזה אדם'],
+    S: ['אנחנו', 'קבוצה', 'קהילה', 'צוות', 'משפחה', 'שייכות', 'חברה', 'ארגון', 'מקום שלי', 'תמונה רחבה']
 };
 
 const PRISM_STACK_LEVEL_ORDER = Object.freeze(['E', 'B', 'C', 'V', 'I', 'S']);
