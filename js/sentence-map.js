@@ -5,16 +5,16 @@
     const STEP_ORDER = Object.freeze([
         Object.freeze({ id: 'intro', label: 'פתיחה' }),
         Object.freeze({ id: 'sentence', label: 'המשפט' }),
-        Object.freeze({ id: 'layers', label: 'שלוש שכבות' }),
-        Object.freeze({ id: 'focus', label: 'מוקד חם' }),
-        Object.freeze({ id: 'intervention', label: 'התערבות' }),
+        Object.freeze({ id: 'layers', label: 'כיוונים' }),
+        Object.freeze({ id: 'focus', label: 'מוקד' }),
+        Object.freeze({ id: 'intervention', label: 'מה לשאול' }),
         Object.freeze({ id: 'reformulation', label: 'ניסוח חדש' })
     ]);
-    const LAYER_ORDER = Object.freeze(['inside', 'relational', 'outside']);
+    const LAYER_ORDER = Object.freeze(['outside', 'inside', 'relational']);
     const FOCUS_OPTIONS = Object.freeze([
         Object.freeze({ id: 'outside', label: 'במה שקרה בחוץ' }),
-        Object.freeze({ id: 'inside', label: 'בסיפור הפנימי' }),
-        Object.freeze({ id: 'relational', label: 'בצורך מהשיחה' })
+        Object.freeze({ id: 'inside', label: 'במה שנהיה בפנים' }),
+        Object.freeze({ id: 'relational', label: 'במה שהמשפט מבקש בקשר' })
     ]);
     const MODE_COPY = Object.freeze({
         learn: Object.freeze({
@@ -26,26 +26,48 @@
             hint: 'פחות פיגומים, יותר ניווט עצמי בתוך המפה.'
         })
     });
+    const BRANCH_COPY = Object.freeze({
+        sentence: Object.freeze({
+            eyebrow: 'המשפט שנאמר',
+            description: 'מתחילים ממנו כמו שהוא, בלי לתקן ובלי להתווכח.'
+        }),
+        summary: Object.freeze({
+            eyebrow: 'איך קוראים את המפה',
+            text: 'אותו משפט יכול לדבר בבת אחת גם על מה שקרה בחוץ וגם על מה שנהיה בפנים. לפעמים הוא גם מבקש שמשהו יקרה בקשר. בשלב הזה לא בוחרים צד, רק ממפים.'
+        }),
+        outside: Object.freeze({
+            eyebrow: 'החוצה',
+            description: 'מה אפשר היה לראות או לשמוע בעולם החיצוני.'
+        }),
+        inside: Object.freeze({
+            eyebrow: 'פנימה',
+            description: 'מה נהיה בפנים: רגש, דימוי, משמעות או כיווץ.'
+        }),
+        relational: Object.freeze({
+            eyebrow: 'ביניכם',
+            description: 'מה המשפט מבקש שיקרה בשיחה או בקשר.'
+        })
+    });
     const LAYER_COPY = Object.freeze({
         outside: Object.freeze({
             title: 'מה קרה בפועל?',
             shortQuestion: 'אם היתה מצלמה - מה היא היתה רואה?',
-            meaning: 'זו המציאות הפיזית - לא פרשנות',
-            eyebrow: 'הבסיס',
+            meaning: 'מה אפשר היה לראות או לשמוע בלי לפרש',
+            eyebrow: 'כיוון חיצוני',
             tone: 'outside'
         }),
         inside: Object.freeze({
             title: 'מה הסיפור הפנימי?',
             shortQuestion: 'מה אתה רואה או מרגיש בפנים כשאתה אומר את זה?',
-            meaning: 'זו המפה הפנימית - לא השטח',
-            eyebrow: 'שכבת פנים',
+            meaning: 'מה נהיה בפנים: רגש, דימוי, משמעות או כיווץ',
+            eyebrow: 'כיוון פנימי',
             tone: 'inside'
         }),
         relational: Object.freeze({
-            title: 'מה המשפט עושה כאן?',
+            title: 'מה המשפט מבקש שיקרה ביניכם?',
             shortQuestion: 'מה הכי חשוב שיקרה כאן?',
-            meaning: 'זו הפונקציה היחסית של המשפט',
-            eyebrow: 'שכבת קשר',
+            meaning: 'מה המשפט מבקש מהקשר או מהשיחה',
+            eyebrow: 'כיוון יחסי',
             tone: 'relational'
         })
     });
@@ -387,14 +409,44 @@
             `;
         }
 
-        function renderLayerHierarchy(caseData, options = {}) {
+        function renderBranchLane(layerId, caseData, options = {}) {
+            const branchCopy = BRANCH_COPY[layerId] || {};
+            return `
+                <div class="sentence-map-branch-lane sentence-map-branch-lane--${escapeHtml(layerId)}">
+                    <div class="sentence-map-branch-lane__head">
+                        <span>${escapeHtml(branchCopy.eyebrow || '')}</span>
+                        <strong>${escapeHtml(branchCopy.description || '')}</strong>
+                    </div>
+                    ${renderLayerPreviewCard(layerId, caseData, options)}
+                </div>
+            `;
+        }
+
+        function renderSentenceBranchMap(caseData, options = {}) {
             const opts = options && typeof options === 'object' ? options : {};
             const interactive = opts.interactive === true;
             const openLayer = String(opts.openLayer || '').trim();
             const showSamples = opts.showSamples === true;
             return `
-                <section class="sentence-map-hierarchy" aria-label="מפת השכבות">
-                    ${LAYER_ORDER.map((layerId) => renderLayerPreviewCard(layerId, caseData, { interactive, openLayer, showSamples })).join('')}
+                <section class="sentence-map-branch-map" aria-label="מפת המשפט">
+                    <div class="sentence-map-branch-map__sentence">
+                        <div class="sentence-map-branch-map__sentence-head">
+                            <span>${escapeHtml(BRANCH_COPY.sentence.eyebrow)}</span>
+                            <strong>${escapeHtml(BRANCH_COPY.sentence.description)}</strong>
+                        </div>
+                        ${renderSentenceBubble(caseData.sentence)}
+                    </div>
+                    <div class="sentence-map-branch-map__fork" aria-hidden="true">
+                        <span class="sentence-map-branch-map__fork-line sentence-map-branch-map__fork-line--outside"></span>
+                        <span class="sentence-map-branch-map__fork-line sentence-map-branch-map__fork-line--inside"></span>
+                    </div>
+                    <div class="sentence-map-branch-map__summary">
+                        <span>${escapeHtml(BRANCH_COPY.summary.eyebrow)}</span>
+                        <p>${escapeHtml(BRANCH_COPY.summary.text)}</p>
+                    </div>
+                    <section class="sentence-map-hierarchy" aria-label="מפת הכיוונים של המשפט">
+                        ${LAYER_ORDER.map((layerId) => renderBranchLane(layerId, caseData, { interactive, openLayer, showSamples })).join('')}
+                    </section>
                 </section>
             `;
         }
@@ -405,12 +457,16 @@
                     <div class="sentence-map-stage-copy">
                         <p class="sentence-map-stage-kicker">מפת המשפט</p>
                         <h2>לפני שמאתגרים — ממפים</h2>
-                        <p class="sentence-map-stage-lead">כשמישהו אומר משפט, לפעמים הבעיה היא במה שקרה, לפעמים בסיפור הפנימי, ולפעמים במה שהוא צריך שיקרה ביניכם. הכלי הזה עוזר למפות את זה לפני ששואלים שאלה.</p>
-                        <p class="sentence-map-stage-subcopy">המטרה כאן אינה לקפוץ מיד אל "האמת", אלא לבנות הלימה טובה יותר בין החוויה, המציאות והקשר, ואז לבחור את ההתערבות הנכונה.</p>
+                        <p class="sentence-map-stage-lead">במטה מודל אנחנו לפעמים מפרטים, מערערים או בודקים מחדש את מה שנאמר. אבל לפני האתגר, חשוב קודם לשקף את המפה שהמשפט כבר מחזיק בתוכו.</p>
+                        <p class="sentence-map-stage-subcopy">אותו משפט יכול לדבר בבת אחת גם על מה שקרה בחוץ וגם על מה שנהיה בפנים. לפעמים הוא גם מנסה לגרום למשהו לקרות ביניכם. כאן עובדים עם המורכבות הזאת לפני שבוחרים שאלה.</p>
                     </div>
-                    ${renderLayerHierarchy(caseData, { interactive: false, showSamples: false })}
+                    <div class="sentence-map-preview-note">
+                        <strong>למה לא למהר לאתגר?</strong>
+                        <p>אם מדייקים או מערערים מוקדם מדי, זה עלול להישמע כאילו מתווכחים עם החוויה של האדם. כשממפים קודם, אפשר לשקף, להבין, ורק אחר כך לבחור התערבות מדויקת ועדינה יותר.</p>
+                    </div>
+                    ${renderSentenceBranchMap(caseData, { interactive: false, showSamples: false })}
                     <div class="sentence-map-stage-actions">
-                        <button type="button" class="btn btn-primary sentence-map-btn-main" data-action="start">התחל למפות</button>
+                        <button type="button" class="btn btn-primary sentence-map-btn-main" data-action="start">התחל/י למפות</button>
                     </div>
                 </section>
             `;
@@ -423,16 +479,15 @@
                         <div>
                             <p class="sentence-map-stage-kicker">שלב 2</p>
                             <h2>${escapeHtml(caseData.title)}</h2>
-                            <p>המשפט מוצג קודם כמו שהוא, בלי לתקן ובלי לנתח מהר מדי.</p>
+                            <p>המשפט נשאר כמו שנאמר. עכשיו בודקים לאן הוא מצביע בחוץ, בפנים, ולפעמים גם בקשר.</p>
                         </div>
                         <div class="sentence-map-progress-pill">${escapeHtml(getProgressLabel(getCurrentCaseUi()))}</div>
                     </div>
-                    ${renderSentenceBubble(caseData.sentence)}
                     <div class="sentence-map-preview-note">
-                        <strong>איך קוראים את המפה?</strong>
-                        <p>החוץ הוא הקרקע המשותפת. הסיפור הפנימי והפונקציה היחסית הן שכבות שמקיפות את מה שקרה בפועל.</p>
+                        <strong>עדיין לא מתקנים</strong>
+                        <p>בשלב הזה לא שואלים מי צודק. שואלים מה כאן נצפה בחוץ, מה כאן נחווה בפנים, ומה המשפט מנסה להזיז בשיחה או בקשר.</p>
                     </div>
-                    ${renderLayerHierarchy(caseData, { interactive: false, showSamples: false })}
+                    ${renderSentenceBranchMap(caseData, { interactive: false, showSamples: false })}
                 </section>
             `;
         }
@@ -443,14 +498,13 @@
                     <div class="sentence-map-stage-header">
                         <div>
                             <p class="sentence-map-stage-kicker">שלב 3</p>
-                            <h2>פותחים את שלוש השכבות</h2>
+                            <h2>פותחים את כיווני המשפט</h2>
                             <p>${state.mode === 'learn'
-                                ? 'לחצו על כל שכבה כדי לראות שאלת כניסה, תשובת לקוח לדוגמה והסבר קצר.'
-                                : 'לחצו על השכבות לפי הסדר שנראה לכם נכון. במצב תרגול יש פחות הסבר ויותר התמצאות.'}</p>
+                                ? 'פתחו כל כיוון כדי לראות שאלת כניסה, תשובת לקוח לדוגמה והסבר קצר. אין צורך לבחור עדיין מה קודם.'
+                                : 'פתחו את הכיוונים שנראים לכם רלוונטיים. במצב תרגול יש פחות הסבר ויותר התמצאות בתוך המפה.'}</p>
                         </div>
                     </div>
-                    ${renderSentenceBubble(caseData.sentence)}
-                    ${renderLayerHierarchy(caseData, { interactive: true, openLayer: caseUi.openLayer, showSamples: true })}
+                    ${renderSentenceBranchMap(caseData, { interactive: true, openLayer: caseUi.openLayer, showSamples: true })}
                 </section>
             `;
         }
@@ -464,8 +518,8 @@
                     <div class="sentence-map-stage-header">
                         <div>
                             <p class="sentence-map-stage-kicker">שלב 4</p>
-                            <h2>איפה הלב של זה?</h2>
-                            <p>בחרו את המוקד החם ביותר כרגע. אין כאן "טעות", יש רק מיפוי מדויק יותר או פחות למה שמבקש התערבות.</p>
+                            <h2>מאיפה נכון להתחיל?</h2>
+                            <p>אחרי שהחזקנו על המסך את החוץ, הפנים והקשר, בוחרים את הכיוון שהכי זקוק עכשיו להצטרפות, בדיקה או התערבות.</p>
                         </div>
                     </div>
                     <div class="sentence-map-focus-grid" role="list">
@@ -489,7 +543,7 @@
                             <p>${escapeHtml(feedbackText)}</p>
                         </div>
                     ` : `
-                        <p class="sentence-map-soft-note">בחרו מוקד אחד כדי לראות למה הוא יושב יותר קרוב ללב של המקרה.</p>
+                        <p class="sentence-map-soft-note">בחרו כיוון אחד כדי לראות מה כרגע הכי מבקש התערבות.</p>
                     `}
                 </section>
             `;
@@ -505,8 +559,8 @@
                     <div class="sentence-map-stage-header">
                         <div>
                             <p class="sentence-map-stage-kicker">שלב 5</p>
-                            <h2>מה מתאים לעשות עכשיו?</h2>
-                            <p>כאן בוחרים התערבות שמתאימה ללב של המקרה, ולא למה שהכי מפתה לתקן בשפה.</p>
+                            <h2>מה נכון לשאול עכשיו?</h2>
+                            <p>כאן בוחרים שאלה שמתאימה למפה שנפתחה, ולא רק למה שהכי מפתה לתקן בניסוח.</p>
                         </div>
                     </div>
                     <div class="sentence-map-intervention-status${aligned ? ' is-aligned' : ''}">
@@ -528,7 +582,7 @@
                         </article>
                     </div>
                     <article class="sentence-map-example-card">
-                        <span>דוגמה למשפט התערבות</span>
+                        <span>שאלה שאפשר לומר עכשיו</span>
                         <strong>${escapeHtml(caseData.intervention.example)}</strong>
                     </article>
                 </section>
@@ -544,7 +598,7 @@
                         <div>
                             <p class="sentence-map-stage-kicker">שלב 6</p>
                             <h2>ניסוח חדש שמחזיק גם פנים וגם חוץ</h2>
-                            <p>המטרה כאן היא לא למחוק את המציאות, אלא לנסח אותה בצורה רחבה, מדויקת וישימה יותר.</p>
+                            <p>המטרה כאן היא לא למחוק את החוויה או את המציאות, אלא לנסח אותן בצורה רחבה, מדויקת וישימה יותר.</p>
                         </div>
                     </div>
                     <div class="sentence-map-original-line">
@@ -596,10 +650,10 @@
 
         function renderMethodNote() {
             return `
-                <aside class="sentence-map-method-note" aria-label="למה זה חשוב">
-                    <span>למה זה חשוב</span>
-                    <strong>מטרת התשאול היא לא תמיד להגיע מיד ל"אמת" הטכנית.</strong>
-                    <p>לפעמים המשפט מנסה להחזיק גם את העולם הפנימי, גם את המציאות החיצונית וגם את הצורך ביחסים. כשממפים לפני שמאתגרים, האדם יכול לתאר את המציאות שלו בצורה טובה יותר, ומשם אפשר לבדוק, לשנות ולאתגר בעדינות דרך המטה מודל.</p>
+                <aside class="sentence-map-method-note" aria-label="עיקרון העבודה">
+                    <span>עיקרון העבודה</span>
+                    <strong>לפני בדיקה או ערעור, משקפים את המפה שהמשפט מחזיק.</strong>
+                    <p>במטה מודל יש רגעים שבהם נכון להחזיר פירוט, לבדוק הכללה או לאתגר ניסוח. אבל אם עושים את זה לפני שהאדם מרגיש שנקלטו גם החוץ וגם הפנים, ההתערבות עלולה להישמע כמו ויכוח. מפת המשפט עוזרת להחזיק יחד את המציאות החיצונית, את החוויה הפנימית ואת הצורך היחסי, ואז לבחור שאלה מדויקת יותר.</p>
                 </aside>
             `;
         }
@@ -636,7 +690,7 @@
                         <div class="sentence-map-header__copy">
                             <p class="sentence-map-header__eyebrow">מפת המשפט</p>
                             <h3 data-feature-title="מפת המשפט">לפני שמאתגרים — ממפים</h3>
-                            <p class="sentence-map-header__subtitle" data-feature-subtitle="ממפים קודם את החוץ, את הסיפור הפנימי ואת הפונקציה היחסית של המשפט.">ממפים קודם את החוץ, את הסיפור הפנימי ואת הפונקציה היחסית של המשפט.</p>
+                            <p class="sentence-map-header__subtitle" data-feature-subtitle="לפני שמדייקים או מערערים, ממפים איך אותו משפט מחזיק יחד חוץ, פנים ולפעמים גם בקשה ביחסים.">לפני שמדייקים או מערערים, ממפים איך אותו משפט מחזיק יחד חוץ, פנים ולפעמים גם בקשה ביחסים.</p>
                         </div>
                         ${renderModeToggle()}
                     </section>
