@@ -2073,7 +2073,7 @@ body.embed-mode .progress-hub {
     justify-content: center;
     align-items: center;
     z-index: 10000;
-    animation: splashFadeOut 0.6s ease-in-out 3s forwards;
+    animation: splashFadeOut 0.5s ease-in-out 1.4s forwards;
     pointer-events: auto;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
@@ -22705,4 +22705,134 @@ body.mobile-sticky-cta-visible {
     padding: 3px 10px;
     white-space: nowrap;
     flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PROGRESSIVE DISCLOSURE — intro headers hide when session active
+   Uses CSS :has() for zero-JS state detection
+═══════════════════════════════════════════════════════════ */
+
+/* Practice Question: hide intro h2+subtitle when drill session is active */
+#practice-question:has(#question-drill:not([data-stage="setup"])) .practice-intro-card > h2,
+#practice-question:has(#question-drill:not([data-stage="setup"])) .practice-intro-card > .subtitle,
+#practice-question:has(#question-drill:not([data-stage="setup"])) .practice-filters {
+    display: none !important;
+}
+
+/* Practice Radar: hide intro h2+subtitle when radar session is active */
+#practice-radar:has(#rapid-pattern-arena:not([data-stage="setup"])) .practice-intro-card > h2,
+#practice-radar:has(#rapid-pattern-arena:not([data-stage="setup"])) .practice-intro-card > .subtitle {
+    display: none !important;
+}
+
+/* Practice Triples Radar: hide intro header when session active */
+#practice-triples-radar:has([data-stage]:not([data-stage="setup"])) .practice-intro-card > h2,
+#practice-triples-radar:has([data-stage]:not([data-stage="setup"])) .practice-intro-card > .subtitle {
+    display: none !important;
+}
+
+/* Smooth hide with transition */
+.practice-intro-card > h2,
+.practice-intro-card > .subtitle,
+.practice-filters {
+    transition: opacity 300ms ease, transform 300ms ease;
+}
+
+/* ═══ FUN MICRO-ANIMATIONS ═══ */
+
+/* Correct answer celebration — JS adds .is-correct to the answer option */
+.question-drill-option.is-correct,
+.rapid-option.is-correct {
+    animation: correctPulse 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes correctPulse {
+    0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+    50%  { transform: scale(1.04); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { transform: scale(1); }
+}
+
+/* Wrong answer shake */
+.question-drill-option.is-wrong,
+.rapid-option.is-wrong {
+    animation: wrongShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes wrongShake {
+    10%, 90%  { transform: translateX(-2px); }
+    20%, 80%  { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-4px); }
+    40%, 60%  { transform: translateX(4px); }
+    100%      { transform: translateX(0); }
+}
+
+/* Stars/XP chip gain — JS adds .is-gaining to the chip briefly */
+.question-drill-chip.is-gaining,
+[class*="chip"].is-gaining {
+    animation: chipGain 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes chipGain {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.18); background: #fef3c7; color: #92400e; }
+    100% { transform: scale(1); }
+}
+
+/* Session complete celebration */
+.question-drill-summary:not(.hidden),
+[data-stage="summary"] {
+    animation: celebrationEntry 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes celebrationEntry {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Card entrance animation — applied to cards when they first appear */
+.question-drill-card[data-stage]:not([data-stage="setup"]) .question-drill-live-shell {
+    animation: slideUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Tab switching entrance */
+.tab-content.active {
+    animation: tabEnter 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes tabEnter {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══ FEATURE HEADER POLISH ═══ */
+
+/* Add a colored left border to practice intro cards based on section */
+#practice-question .practice-intro-card { border-right: 4px solid #6366f1; }
+#practice-radar .practice-intro-card    { border-right: 4px solid #f59e0b; }
+#practice-triples-radar .practice-intro-card { border-right: 4px solid #10b981; }
+#practice-wizard .practice-intro-card   { border-right: 4px solid #0f766e; }
+#blueprint .practice-intro-card        { border-right: 4px solid #0369a1; }
+#prismlab .practice-intro-card         { border-right: 4px solid #7c3aed; }
+#sentence-map .practice-intro-card     { border-right: 4px solid #be185d; }
+#categories .practice-intro-card       { border-right: 4px solid #0284c7; }
+
+/* Better intro card h2 */
+.practice-tab-content .practice-intro-card > h2 {
+    font-size: clamp(1.2rem, 2.5vw, 1.65rem);
+    font-weight: 900;
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+
+/* Better subtitle style */
+.practice-tab-content .practice-intro-card > .subtitle {
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
 }

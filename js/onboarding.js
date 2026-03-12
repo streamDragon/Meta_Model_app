@@ -9,7 +9,7 @@
 
     var STORAGE_KEY = 'mm_user_profile';
     var DISMISSED_KEY = 'mm_onboarding_dismissed_v1';
-    var SPLASH_DURATION_MS = 3700; // wait until after splash fades
+    var SPLASH_DURATION_MS = 1900; // splash fades at 1.6s, show onboarding at 1.9s
 
     /* ── Recommendation map ── */
     var RECOMMENDATIONS = {
