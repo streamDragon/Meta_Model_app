@@ -8,6 +8,7 @@
     'use strict';
 
     var STORAGE_KEY = 'mm_user_profile';
+    var DISMISSED_KEY = 'mm_onboarding_dismissed_v1';
     var SPLASH_DURATION_MS = 3700; // wait until after splash fades
 
     /* ── Recommendation map ── */
@@ -76,6 +77,26 @@
         } catch (e) { /* ignore */ }
     }
 
+    function isDismissed() {
+        try {
+            return localStorage.getItem(DISMISSED_KEY) === '1';
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function setDismissed() {
+        try {
+            localStorage.setItem(DISMISSED_KEY, '1');
+        } catch (e) { /* ignore */ }
+    }
+
+    function clearDismissed() {
+        try {
+            localStorage.removeItem(DISMISSED_KEY);
+        } catch (e) { /* ignore */ }
+    }
+
     function getRecommendation(role, level) {
         if (level === 'beginner') return RECOMMENDATIONS.beginner;
         if (level === 'intermediate') return RECOMMENDATIONS.intermediate;
@@ -129,9 +150,11 @@
     /* ── Close overlay and go ── */
     function launchAndClose(role, level) {
         var rec = getRecommendation(role, level);
+        setDismissed();
         overlay.classList.add('is-exiting');
         setTimeout(function () {
             overlay.hidden = true;
+            overlay.setAttribute('aria-hidden', 'true');
             overlay.classList.remove('is-exiting', 'is-visible');
             injectGreetingBar(role, level);
             // Navigate to recommended tool
@@ -159,9 +182,11 @@
     }
 
     function exploreAndClose() {
+        setDismissed();
         overlay.classList.add('is-exiting');
         setTimeout(function () {
             overlay.hidden = true;
+            overlay.setAttribute('aria-hidden', 'true');
             overlay.classList.remove('is-exiting', 'is-visible');
             if (selectedRole && selectedLevel) {
                 injectGreetingBar(selectedRole, selectedLevel);
@@ -195,6 +220,7 @@
 
         bar.querySelector('.mm-home-greeting-reset').addEventListener('click', function () {
             try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+            clearDismissed();
             bar.remove();
         });
     }
@@ -252,13 +278,36 @@
         }
     }
 
+    function wireDismissActions() {
+        var dismissButtons = overlay.querySelectorAll('[data-ob-dismiss]');
+        dismissButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                exploreAndClose();
+            });
+        });
+
+        var backdrop = overlay.querySelector('.mm-ob-backdrop');
+        if (backdrop) {
+            backdrop.addEventListener('click', function () {
+                exploreAndClose();
+            });
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key !== 'Escape') return;
+            if (!overlay || overlay.hidden || !overlay.classList.contains('is-visible')) return;
+            exploreAndClose();
+        });
+    }
+
     /* ── Init ── */
     function init() {
         overlay = document.getElementById('mm-onboarding');
         if (!overlay) return;
+        overlay.hidden = true;
+        overlay.setAttribute('aria-hidden', 'true');
 
         var profile = getProfile();
-
         if (profile && profile.role && profile.level) {
             // Returning user — just show greeting bar, no overlay
             showReturningGreeting(profile);
@@ -266,13 +315,19 @@
         }
 
         // First visit — show onboarding after splash
+        if (isDismissed()) {
+            return;
+        }
+
         wireStep1();
         wireStep2();
         wireStep3();
+        wireDismissActions();
         updateDots(1);
 
         setTimeout(function () {
             overlay.hidden = false;
+            overlay.setAttribute('aria-hidden', 'false');
             // Force reflow before adding is-visible for CSS transition
             void overlay.offsetHeight;
             overlay.classList.add('is-visible');

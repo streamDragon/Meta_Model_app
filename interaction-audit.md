@@ -190,3 +190,18 @@ Interpretation:
 - Some tabs may still have tab-specific interaction regressions hidden behind the onboarding blocker.
 - Mobile screens may still feel too long or too dense even if technically valid.
 - Copy encoding issues still exist in some files, but they are not the main interaction blocker in this pass.
+
+## Implemented In This Pass
+
+- Added a real hidden-state guard for `#mm-onboarding` so the overlay no longer intercepts clicks when closed.
+- Added explicit onboarding dismiss actions on early steps, plus backdrop and `Escape` exit.
+- Persisted onboarding dismissal so users who skip are not trapped again on the next reload.
+- Synced floating audio controls with mobile sticky CTA visibility and re-clamped pinned controls to the current safe zone.
+- Extended smoke coverage so desktop CTA clickability and mobile sticky/audio collision are now checked automatically.
+
+## Verification After Fixes
+
+- `npm run test:shell-smoke` -> PASS
+- `npm run test:mobile` -> PASS
+- `npm run audit:nav` -> `broken=0`, `mainMenuBroken=0`
+- `npm run build:web` -> PASS

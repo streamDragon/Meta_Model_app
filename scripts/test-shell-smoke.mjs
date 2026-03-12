@@ -163,6 +163,25 @@ async function runShellSmoke(baseUrl) {
         }
     };
 
+    const dismissOnboardingIfVisible = async (targetPage = page) => {
+        if ((await targetPage.locator('#mm-onboarding').count()) === 0) return false;
+        await targetPage.waitForTimeout(4200);
+        if ((await targetPage.locator('#mm-onboarding.is-visible').count()) === 0) return false;
+        const dismissBtn = targetPage.locator('#mm-onboarding [data-ob-dismiss]').first();
+        if ((await dismissBtn.count()) > 0) {
+            await dismissBtn.click();
+        } else {
+            await targetPage.locator('#mm-ob-explore-btn').click();
+        }
+        await targetPage.waitForFunction(() => {
+            const overlay = document.getElementById('mm-onboarding');
+            if (!overlay) return true;
+            const style = getComputedStyle(overlay);
+            return overlay.hidden || style.display === 'none' || style.pointerEvents === 'none';
+        });
+        return true;
+    };
+
     const clickHeaderButton = async (screenId, index, targetPage = page) => {
         await targetPage.locator(`#${screenId} .app-shell .app-shell-actions button`).nth(index).click();
     };
@@ -321,10 +340,21 @@ async function runShellSmoke(baseUrl) {
 
     try {
         await page.goto(baseUrl, { waitUntil: 'networkidle' });
+        await dismissOnboardingIfVisible(page);
 
         await navigate('home');
         const homeTitle = ((await page.locator('#home .app-shell-title').textContent()) || '').trim();
         await assert(Boolean(homeTitle), 'home shell loaded', homeTitle);
+
+        await page.locator('#home .home-route-hero [data-nav-key="sentenceMap"]').click();
+        await waitForActiveScreen('sentence-map');
+        await assert((await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab'))) === 'sentence-map', 'home hero CTA opens sentence map');
+
+        await navigate('home');
+        await page.locator('#home .home-route-feature-card:nth-of-type(3) .btn').click();
+        await waitForActiveScreen('practice-question');
+        await assert((await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab'))) === 'practice-question', 'home feature CTA opens practice-question');
+        await navigate('home');
 
         await clickHeaderButton('home', 0);
         const menuTitle = await getOverlayTitle();
@@ -389,7 +419,8 @@ async function runShellSmoke(baseUrl) {
 
         const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true });
         await mobile.goto(baseUrl, { waitUntil: 'networkidle' });
-        for (const screenId of ['home', 'practice-radar', 'blueprint']) {
+        await dismissOnboardingIfVisible(mobile);
+        for (const screenId of ['home', 'sentence-map', 'practice-question', 'practice-radar', 'practice-wizard', 'blueprint']) {
             await mobile.evaluate((id) => window.navigateTo(id), screenId);
             await waitForActiveScreen(screenId, mobile);
             await mobile.waitForTimeout(400);
@@ -400,6 +431,23 @@ async function runShellSmoke(baseUrl) {
             }));
             await assert(mobileCheck.scrollWidth <= mobileCheck.innerWidth + 1, `mobile ${screenId} no horizontal overflow`, `${mobileCheck.scrollWidth}/${mobileCheck.innerWidth}`);
             await assert(mobileCheck.activeElement === screenId, `mobile ${screenId} active`);
+        }
+        for (const screenId of ['sentence-map', 'practice-wizard', 'blueprint']) {
+            await mobile.evaluate((id) => window.navigateTo(id), screenId);
+            await waitForActiveScreen(screenId, mobile);
+            await mobile.waitForTimeout(500);
+            const stickyCheck = await mobile.evaluate(() => {
+                const sticky = document.getElementById('mobile-sticky-cta');
+                const stickyVisible = !!sticky && !sticky.classList.contains('hidden');
+                const stickyRect = stickyVisible ? sticky.getBoundingClientRect() : null;
+                const audioRects = Array.from(document.querySelectorAll('.audio-floating-control')).map((node) => node.getBoundingClientRect()).filter((rect) => rect.width > 0 && rect.height > 0);
+                const overlaps = stickyRect
+                    ? audioRects.some((rect) => !(rect.right <= stickyRect.left || rect.left >= stickyRect.right || rect.bottom <= stickyRect.top || rect.top >= stickyRect.bottom))
+                    : false;
+                return { stickyVisible, overlaps, audioCount: audioRects.length };
+            });
+            await assert(stickyCheck.stickyVisible, `mobile ${screenId} sticky CTA visible`);
+            await assert(!stickyCheck.overlaps, `mobile ${screenId} sticky CTA not covered by floating audio`, JSON.stringify(stickyCheck));
         }
         await mobile.evaluate(() => window.navigateTo('home'));
         await waitForActiveScreen('home', mobile);
@@ -412,6 +460,7 @@ async function runShellSmoke(baseUrl) {
         const reduced = await browser.newPage({ viewport: { width: 1280, height: 900 } });
         await reduced.emulateMedia({ reducedMotion: 'reduce' });
         await reduced.goto(baseUrl, { waitUntil: 'networkidle' });
+        await dismissOnboardingIfVisible(reduced);
         await reduced.evaluate(() => window.navigateTo('home'));
         await waitForActiveScreen('home', reduced);
         const prefersReduced = await reduced.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);

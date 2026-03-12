@@ -17,11 +17,18 @@
     justify-content: center;
     padding: 16px;
     opacity: 0;
+    pointer-events: none;
     transition: opacity 400ms ease;
+}
+
+.mm-onboarding[hidden] {
+    display: none !important;
+    pointer-events: none !important;
 }
 
 .mm-onboarding.is-visible {
     opacity: 1;
+    pointer-events: auto;
 }
 
 .mm-onboarding.is-exiting {

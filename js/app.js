@@ -3758,6 +3758,28 @@ function setMobileStickyCtaVisibility(isVisible) {
     const root = ensureMobileStickyCta();
     root.classList.toggle('hidden', !isVisible);
     document.body.classList.toggle('mobile-sticky-cta-visible', Boolean(isVisible));
+
+    const syncFloatingControls = () => {
+        syncFloatingAudioSafeZone();
+        releaseMobileAudioDockIfNotPinned();
+        ['music-toggle-btn', 'audio-master-mute-btn'].forEach((id) => {
+            const button = document.getElementById(id);
+            if (!button) return;
+            if (!button.style.left || !button.style.top) return;
+            const rect = button.getBoundingClientRect();
+            const clamped = clampAudioControlPosition(button, rect.left, rect.top);
+            button.style.left = `${clamped.left}px`;
+            button.style.top = `${clamped.top}px`;
+            button.style.right = 'auto';
+            button.style.bottom = 'auto';
+        });
+    };
+
+    if (typeof window.requestAnimationFrame === 'function') {
+        window.requestAnimationFrame(syncFloatingControls);
+        return;
+    }
+    setTimeout(syncFloatingControls, 0);
 }
 
 function updateMobileStickyCta(tabName = '') {

@@ -9,6 +9,7 @@ const ROOT = process.cwd();
 const REPORTS_DIR = path.join(ROOT, 'reports');
 const REPORT_PATH = path.join(REPORTS_DIR, 'nav-audit.json');
 const VITE_BIN = path.join(ROOT, 'node_modules', 'vite', 'bin', 'vite.js');
+const ONBOARDING_DISMISSED_KEY = 'mm_onboarding_dismissed_v1';
 
 function parseArgs(argv) {
     const args = { base: process.env.BASE_URL || '' };
@@ -117,6 +118,16 @@ function selectorIsLikelyStable(selector) {
 
 async function ensureReportsDir() {
     await fs.mkdir(REPORTS_DIR, { recursive: true });
+}
+
+async function seedAuditLocalState(context) {
+    await context.addInitScript((dismissedKey) => {
+        try {
+            window.localStorage.setItem(dismissedKey, '1');
+        } catch (_error) {
+            // Ignore storage restrictions in automation.
+        }
+    }, ONBOARDING_DISMISSED_KEY);
 }
 
 async function capturePageIssues(page, action) {
@@ -459,6 +470,7 @@ function buildCandidateIntended(candidate, basePageUrl) {
 
 async function auditUrlTarget(browser, baseUrl, candidate, targetUrl) {
     const context = await browser.newContext();
+    await seedAuditLocalState(context);
     const page = await context.newPage();
     const capture = await capturePageIssues(page, { mode: 'goto', targetUrl });
     let responseStatus = null;
@@ -497,6 +509,7 @@ async function auditUrlTarget(browser, baseUrl, candidate, targetUrl) {
 
 async function auditSpaClick(browser, baseUrl, candidate, intended) {
     const context = await browser.newContext();
+    await seedAuditLocalState(context);
     const page = await context.newPage();
     const capture = await capturePageIssues(page, { mode: 'click', selector: candidate.selector });
     let responseStatus = null;
@@ -592,6 +605,7 @@ async function run(baseUrl) {
     const browser = await createBrowser();
     try {
         const bootstrapContext = await browser.newContext();
+        await seedAuditLocalState(bootstrapContext);
         const bootstrapPage = await bootstrapContext.newPage();
         const bootstrapCapture = await capturePageIssues(bootstrapPage, { mode: 'bootstrap', targetUrl: baseUrl });
         const bootstrapResponse = await bootstrapPage.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
