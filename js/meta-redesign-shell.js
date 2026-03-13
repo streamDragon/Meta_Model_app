@@ -411,23 +411,37 @@
     function demoTurns(meta) {
         return (Array.isArray(meta.demo) ? meta.demo : []).map(function (turn) { return '<article class="meta-feature-shell__dialogue-turn"><span>' + escapeHtml(turn.role || 'דובר') + '</span><p>' + escapeHtml(turn.text || '') + '</p></article>'; }).join('');
     }
+    function compactExampleAnalysis(example) {
+        var type = String(example && example.type || '').trim();
+        var challenge = String(example && example.challenge || '').replace(/^שאלת דיוק[:\s]*/i, '').replace(/\s+/g, ' ').trim();
+        if (challenge.length > 58) challenge = challenge.slice(0, 55).trim() + '...';
+        if (type && challenge) return type + ' → ' + challenge;
+        return type || challenge || '';
+    }
+    function featureActionButton(name, icon, label) {
+        return '<button type="button" class="meta-feature-shell__action-btn" data-feature-modal="' + escapeHtml(name) + '"><span class="meta-feature-shell__action-icon">' + escapeHtml(icon) + '</span><span class="meta-feature-shell__action-label">' + escapeHtml(label) + '</span></button>';
+    }
+    function featureModalSheet(name, title, bodyHtml, extraClass) {
+        return '<div class="meta-feature-modal hidden" data-feature-modal-box="' + escapeHtml(name) + '" hidden><div class="meta-feature-modal__backdrop" data-feature-close></div><article class="meta-feature-modal__dialog meta-feature-modal__dialog--sheet' + (extraClass ? ' ' + extraClass : '') + '"><header class="meta-feature-modal__header"><strong class="meta-feature-modal__title">' + escapeHtml(title) + '</strong><button type="button" class="meta-feature-modal__close" data-feature-close>✕</button></header><div class="meta-feature-modal__content">' + bodyHtml + '</div></article></div>';
+    }
     function featureShellHtml(meta) {
         var state = getTabState(meta.tab);
         var locked = featureLocked(meta);
-        var progress = featureProgress(meta);
-        var summary = readGamification();
         var cta = locked ? ('נפתח ברמה ' + meta.unlockLevel) : pick(CTA_LABELS, meta.tab + '-cta');
+        var exampleSummary = compactExampleAnalysis(meta.example || {});
+        var philosopherSheet = featureModalSheet('philosopher', 'העמקה פילוסופית', '<div class="meta-feature-modal__philosopher"><span class="meta-feature-modal__avatar">' + meta.philosopher.avatar + '</span><h3>' + escapeHtml(meta.philosopher.name) + '</h3><p>' + escapeHtml(meta.philosopher.deep) + '</p></div>');
+        var videoSheet = featureModalSheet('demo', 'סרטון הדגמה', '<div class="meta-feature-modal__video"><div class="meta-feature-modal__video-frame"><span class="meta-feature-modal__video-play">▶</span></div><p class="meta-feature-modal__video-note">הסרטון יהיה זמין בקרוב. בינתיים אפשר לפתוח את התרגול ולהתחיל ישר בעבודה.</p></div>');
+        var settingsSheet = featureModalSheet('settings', 'הגדרות למשימה', '<div class="meta-feature-modal__settings">' + Object.keys(meta.settings).map(function (key) { return settingToggle(meta.tab, key, meta.settings[key], state); }).join('') + '</div>');
         return [
             '<div class="meta-feature-shell__frame" style="--meta-feature-accent:' + escapeHtml(meta.color) + ';--meta-feature-soft:' + escapeHtml(meta.soft) + ';">',
-            '<div class="meta-feature-shell__topbar"><button type="button" class="btn btn-secondary meta-feature-shell__back" data-feature-home>↩ חזרה לבית</button><div class="meta-feature-shell__mini"><span>⭐ ' + progress.stars + '/' + meta.progressTotal + '</span><span>🔥 ' + summary.streak + '</span><span>רמה ' + summary.level + '</span></div></div>',
-            '<section class="meta-feature-shell__hero"><div class="meta-feature-shell__icon-wrap"><span class="meta-feature-shell__icon">' + meta.icon + '</span></div><div class="meta-feature-shell__hero-copy"><span class="meta-feature-shell__badge" data-tone="' + escapeHtml(meta.tone) + '">' + escapeHtml(meta.badge) + '</span><h2>' + escapeHtml(meta.title) + '</h2><p>' + escapeHtml(meta.description) + '</p>' + (locked ? ('<p class="meta-feature-shell__lock-note">המסלול הזה נפתח ברמה ' + meta.unlockLevel + '. כרגע אתם ברמה ' + summary.level + ' — המשיכו לאסוף ני״ק וכוכבים.</p>') : '') + '</div></section>',
-            '<section class="meta-feature-shell__example"><div class="meta-feature-shell__section-head"><span>כך זה נראה בפועל ✨</span><strong>משפט אחד קטן שמגלה הרבה</strong></div><article class="meta-feature-shell__example-card"><p class="meta-feature-shell__example-sentence">' + escapeHtml(meta.example.sentence) + '</p><div class="meta-feature-shell__example-meta"><span>סוג: ' + escapeHtml(meta.example.type) + '</span><span>שאלת דיוק: ' + escapeHtml(meta.example.challenge) + '</span></div></article></section>',
-            '<div class="meta-feature-shell__actions"><button type="button" class="btn btn-secondary" data-feature-modal="demo">צפו ותראו איך זה עובד ▶️</button><button type="button" class="btn btn-secondary" data-feature-modal="philosopher">רגע של מחשבה 💭</button></div>',
-            '<section class="meta-feature-shell__settings"><div class="meta-feature-shell__section-head"><span>התאימו לעצמכם ⚙️</span><strong>רק מה שעוזר לכם להיכנס נכון לתרגול</strong></div>' + Object.keys(meta.settings).map(function (key) { return settingToggle(meta.tab, key, meta.settings[key], state); }).join('') + '</section>',
-            '<blockquote class="meta-feature-shell__quote"><p>' + escapeHtml(meta.philosopher.quote) + '</p><cite>' + escapeHtml(meta.philosopher.name) + '</cite></blockquote>',
+            '<section class="meta-feature-shell__hero"><div class="meta-feature-shell__icon-wrap"><span class="meta-feature-shell__icon">' + meta.icon + '</span></div><div class="meta-feature-shell__hero-copy"><span class="meta-feature-shell__badge" data-tone="' + escapeHtml(meta.tone) + '">' + escapeHtml(meta.badge) + '</span><h2>' + escapeHtml(meta.title) + '</h2><p class="meta-feature-shell__hero-desc">' + escapeHtml(meta.description) + '</p></div></section>',
+            '<article class="meta-feature-shell__example-card"><p class="meta-feature-shell__example-sentence">' + escapeHtml(meta.example.sentence) + '</p><p class="meta-feature-shell__example-analysis">' + escapeHtml(exampleSummary) + '</p></article>',
+            '<div class="meta-feature-shell__actions meta-feature-shell__actions--welcome">' + featureActionButton('philosopher', '💭', 'העמקה') + featureActionButton('demo', '▶', 'סרטון') + featureActionButton('settings', '⚙', 'הגדרות') + '</div>',
+            '<blockquote class="meta-feature-shell__quote meta-feature-shell__quote--compact"><p>' + escapeHtml(meta.philosopher.quote) + '</p><cite>' + escapeHtml(meta.philosopher.name) + '</cite></blockquote>',
             '<button type="button" class="btn btn-primary meta-feature-shell__cta" data-feature-enter="' + escapeHtml(meta.tab) + '"' + (locked ? ' disabled' : '') + '>' + escapeHtml(cta) + '</button>',
-            '<div class="meta-feature-modal hidden" data-feature-modal-box="philosopher" hidden><div class="meta-feature-modal__backdrop" data-feature-close></div><article class="meta-feature-modal__dialog"><button type="button" class="meta-feature-modal__close" data-feature-close>×</button><span class="meta-feature-modal__avatar">' + meta.philosopher.avatar + '</span><strong>' + escapeHtml(meta.philosopher.name) + '</strong><p>' + escapeHtml(meta.philosopher.deep) + '</p></article></div>',
-            '<div class="meta-feature-modal hidden" data-feature-modal-box="demo" hidden><div class="meta-feature-modal__backdrop" data-feature-close></div><article class="meta-feature-modal__dialog meta-feature-modal__dialog--wide"><button type="button" class="meta-feature-modal__close" data-feature-close>×</button><strong>צפו ותראו איך זה עובד ▶️</strong><div class="meta-feature-shell__dialogue">' + demoTurns(meta) + '</div></article></div>',
+            philosopherSheet,
+            videoSheet,
+            settingsSheet,
             '</div>'
         ].join('');
     }
@@ -556,6 +570,22 @@
         var safeTab = normalizeTab(tabName);
         var summary = readGamification();
         var title = navTitle(safeTab);
+        var isWelcome = isManaged(safeTab) && getTabState(safeTab).stage !== 'feature';
+        if (isWelcome) {
+            return {
+                top: [
+                    '<div class="meta-feature-chrome__bar meta-feature-chrome__bar--top meta-feature-chrome__bar--welcome">',
+                    '<button type="button" class="btn btn-secondary meta-feature-chrome__btn" data-shell-chrome-back="' + escapeHtml(safeTab) + '">↩ חזרה</button>',
+                    '<div class="meta-feature-chrome__title"><strong>' + escapeHtml(title) + '</strong></div>',
+                    '</div>'
+                ].join(''),
+                bottom: [
+                    '<div class="meta-feature-chrome__bar meta-feature-chrome__bar--bottom meta-feature-chrome__bar--welcome">',
+                    '<div class="meta-feature-chrome__meta meta-feature-chrome__meta--welcome"><span>רמה ' + escapeHtml(summary.level) + '</span><span>⭐ ' + escapeHtml(summary.totalStars) + '</span><span>🔥 ' + escapeHtml(summary.streak) + '</span></div>',
+                    '</div>'
+                ].join('')
+            };
+        }
         return {
             top: [
                 '<div class="meta-feature-chrome__bar meta-feature-chrome__bar--top">',
@@ -659,7 +689,17 @@
             if (toggle) {
                 var key = toggle.getAttribute('data-feature-toggle') || '';
                 var config = meta.settings[key];
-                if (config && config.enabled) { getTabState(meta.tab).settings[key] = !getTabState(meta.tab).settings[key]; saveFeatureState(); renderFeature(meta.tab, 'forward'); }
+                if (config && config.enabled) {
+                    var reopenModal = toggle.closest('[data-feature-modal-box="settings"]') ? 'settings' : '';
+                    getTabState(meta.tab).settings[key] = !getTabState(meta.tab).settings[key];
+                    saveFeatureState();
+                    renderFeature(meta.tab, 'forward');
+                    if (reopenModal) {
+                        var section = document.getElementById(meta.tab);
+                        var nextShell = section ? section.querySelector('.meta-feature-welcome-shell') : null;
+                        if (nextShell) openFeatureModal(nextShell, reopenModal);
+                    }
+                }
                 return;
             }
             var modalOpen = event.target.closest('[data-feature-modal]');
@@ -686,6 +726,7 @@
         shell.innerHTML = featureShellHtml(meta);
         bindFeatureShell(shell, meta);
         applyFeatureStage(meta.tab, direction || 'forward');
+        renderFeatureChrome(meta.tab);
     }
     function renderAllFeatures(direction) { MANAGED_TABS.forEach(function (tab) { renderFeature(tab, direction); }); }
     function syncShells(direction) {
