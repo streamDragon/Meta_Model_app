@@ -99,6 +99,18 @@ let revealFeedbackState = {
     lightweightMode: false
 };
 
+function awardMetaGamificationXp(amount, featureName) {
+    const api = window.MetaGamification;
+    if (!api || typeof api.addXP !== 'function') return;
+    api.addXP(amount, featureName);
+}
+
+function awardMetaGamificationStars(amount, featureName) {
+    const api = window.MetaGamification;
+    if (!api || typeof api.addStars !== 'function') return;
+    api.addStars(amount, featureName);
+}
+
 const MUSIC_TRACK_SOURCES = Object.freeze([
     'assets/audio/the-flawed-map.mp3',
     'assets/audio/alchemy-of-thought.mp3',
@@ -5576,6 +5588,7 @@ function initializeMetaModelApp() {
     if (typeof setupTriplesRadarModule === 'function') {
         setupTriplesRadarModule();
     }
+    setupTriplesRadarPresentation();
     if (typeof setupFeelingLanguageBridge === 'function') {
         setupFeelingLanguageBridge();
     }
@@ -8130,9 +8143,9 @@ function getQuestionDrillModeLabel(mode = questionDrillState.mode) {
 
 function getQuestionDrillFeedbackHeading(tone = 'info') {
     if (questionDrillState.sessionCompleted) return 'הסשן הושלם';
-    if (tone === 'success') return 'נכון';
-    if (tone === 'danger') return 'לא נכון';
-    if (tone === 'warn') return 'לא מדויק';
+    if (tone === 'success') return 'כל הכבוד!';
+    if (tone === 'danger') return 'עוד רגע מנסים שוב';
+    if (tone === 'warn') return 'בואו נדייק';
     return 'מה עושים עכשיו';
 }
 
@@ -8408,6 +8421,23 @@ function triggerQuestionDrillCelebration(kind = 'success') {
         layer.innerHTML = '';
         layer.__questionDrillFxTimer = null;
     }, kind === 'finish' ? 1200 : 820);
+}
+
+function showQuestionDrillStreakBadge(streak) {
+    const badge = questionDrillState.elements.streakBadge;
+    if (!badge) return;
+    badge.textContent = `🔥 רצף ${streak}!`;
+    badge.classList.remove('hidden', 'is-visible');
+    void badge.offsetWidth;
+    badge.classList.add('is-visible');
+    if (badge.__questionDrillStreakTimer) {
+        clearTimeout(badge.__questionDrillStreakTimer);
+    }
+    badge.__questionDrillStreakTimer = setTimeout(() => {
+        badge.classList.remove('is-visible');
+        badge.classList.add('hidden');
+        badge.__questionDrillStreakTimer = null;
+    }, 1400);
 }
 
 function focusQuestionDrillLiveSurface() {
@@ -9320,6 +9350,7 @@ function completeQuestionDrillSession() {
 
         if (bonusStars > 0) {
             addStars(bonusStars);
+            awardMetaGamificationStars(bonusStars, 'practiceQuestion');
             questionDrillState.sessionStars += bonusStars;
         }
         if (bonusXP > 0) {
@@ -9457,6 +9488,7 @@ function finalizeQuestionDrillRound(reason = 'next') {
 
         addXP(baseXP);
         addStars(starGain);
+        awardMetaGamificationStars(starGain, 'practiceQuestion');
         questionDrillState.sessionXP += baseXP;
         questionDrillState.sessionStars += starGain;
         questionDrillState.currentRoundAward = { xp: baseXP, stars: starGain };
@@ -9600,6 +9632,11 @@ function evaluateQuestionDrill() {
         saveQuestionDrillTestStats();
 
         if (success) {
+            const nextStreak = questionDrillState.streak + 1;
+            awardMetaGamificationXp(nextStreak >= 3 ? 15 : 5, 'practiceQuestion');
+            if ([3, 5, 10].includes(nextStreak)) {
+                showQuestionDrillStreakBadge(nextStreak);
+            }
             setQuestionDrillFeedback(
                 `נכון. ${QUESTION_DRILL_CATEGORY_SHORT_LABELS[expectedCategory]} · ${formatQuestionDrillTimerMs(rtMs)}ש׳ · +${scoreDelta.total}`,
                 'success'
@@ -9625,6 +9662,11 @@ function evaluateQuestionDrill() {
     const reasonLine = buildQuestionDrillReasonLine(questionDrillState.current, expectedCategory);
 
     if (success) {
+        const nextStreak = questionDrillState.streak + 1;
+        awardMetaGamificationXp(nextStreak >= 3 ? 15 : 5, 'practiceQuestion');
+        if ([3, 5, 10].includes(nextStreak)) {
+            showQuestionDrillStreakBadge(nextStreak);
+        }
         const takeaway = buildQuestionDrillLearningTakeaway(questionDrillState.current, expectedCategory);
         setQuestionDrillFeedback(`נכון. ${takeaway}`, 'success');
         playUISound('correct');
@@ -9666,6 +9708,7 @@ function setupQuestionDrill() {
         feedbackShell: document.getElementById('question-drill-feedback-shell'),
         feedbackTitle: document.getElementById('question-drill-feedback-title'),
         feedbackBody: document.getElementById('question-drill-feedback-body'),
+        streakBadge: document.getElementById('question-drill-streak-badge'),
         attempts: document.getElementById('question-drill-attempts'),
         hits: document.getElementById('question-drill-hits'),
         checkBtn: document.getElementById('question-drill-check'),
@@ -9707,6 +9750,7 @@ function setupQuestionDrill() {
         hudBonus: document.getElementById('question-drill-hud-bonus'),
         openHelpBtn: document.getElementById('question-drill-open-help'),
         openStatsBtn: document.getElementById('question-drill-open-stats'),
+        prestartMenuBtn: document.getElementById('question-drill-prestart-menu'),
         openMenuBtn: document.getElementById('question-drill-open-menu'),
         openExplanationBtn: document.getElementById('question-drill-open-explanation')
     };
@@ -9773,6 +9817,7 @@ function setupQuestionDrill() {
     });
     questionDrillState.elements.openHelpBtn?.addEventListener('click', openQuestionDrillHelpOverlay);
     questionDrillState.elements.openStatsBtn?.addEventListener('click', openQuestionDrillStatsOverlay);
+    questionDrillState.elements.prestartMenuBtn?.addEventListener('click', openQuestionDrillMenuOverlay);
     questionDrillState.elements.openMenuBtn?.addEventListener('click', openQuestionDrillMenuOverlay);
     questionDrillState.elements.openExplanationBtn?.addEventListener('click', openQuestionDrillExplanationOverlay);
 
@@ -9811,10 +9856,33 @@ const RAPID_PATTERN_ALIASES = Object.freeze({
     unspecified_verb: 'unspecified_verbs'
 });
 
+const RAPID_PATTERN_FAMILY_MAP = Object.freeze({
+    mind_reading: 'distortion',
+    assumptions: 'deletion',
+    lost_performative: 'distortion',
+    cause_effect: 'distortion',
+    modal_operator: 'generalization',
+    complex_equivalence: 'distortion',
+    universal_quantifier: 'generalization',
+    identity_predicates: 'generalization',
+    nominalisations: 'generalization',
+    lack_referential_index: 'deletion',
+    time_space_predicates: 'deletion',
+    comparative_deletion: 'deletion',
+    unspecified_verbs: 'deletion',
+    sensory_predicates: 'deletion',
+    non_referring_nouns: 'deletion'
+});
+
 function normalizeRapidPatternId(patternId) {
     const raw = String(patternId || '').trim().toLowerCase().replace(/\s+/g, '_');
     if (!raw) return '';
     return RAPID_PATTERN_ALIASES[raw] || raw;
+}
+
+function getRapidPatternFamily(patternId = '') {
+    const resolved = normalizeRapidPatternId(patternId);
+    return RAPID_PATTERN_FAMILY_MAP[resolved] || 'generalization';
 }
 
 const RAPID_PATTERN_CUES = Object.freeze([
@@ -10145,6 +10213,21 @@ function updateRapidPatternFeedbackCard() {
     if (card) card.dataset.tone = rapidPatternArenaState.feedbackTone || 'info';
 }
 
+function setRapidPatternResultMeta(patternId = '') {
+    const card = rapidPatternArenaState.elements.resultCard;
+    if (!card) return;
+    const resolved = normalizeRapidPatternId(patternId);
+    if (!resolved) {
+        delete card.dataset.patternId;
+        delete card.dataset.patternLabel;
+        delete card.dataset.family;
+        return;
+    }
+    card.dataset.patternId = resolved;
+    card.dataset.patternLabel = getRapidPatternLabel(resolved);
+    card.dataset.family = getRapidPatternFamily(resolved);
+}
+
 function updateRapidPatternSessionNote() {
     const noteEl = rapidPatternArenaState.elements.sessionNote;
     if (!noteEl) return;
@@ -10177,6 +10260,7 @@ function clearRapidPatternRoundFeedback() {
     rapidPatternArenaState.feedbackTone = 'info';
     rapidPatternArenaState.feedbackTitle = '';
     rapidPatternArenaState.feedbackBody = '';
+    setRapidPatternResultMeta('');
     updateRapidPatternFeedbackCard();
 }
 
@@ -10797,7 +10881,7 @@ function renderRapidPatternButtons() {
     const container = rapidPatternArenaState.elements.buttons;
     if (!container) return;
     container.innerHTML = RAPID_PATTERN_BUTTONS.map(item => `
-        <button type="button" class="rapid-pattern-btn" data-rapid-pattern-id="${escapeHtml(item.id)}">
+        <button type="button" class="rapid-pattern-btn" data-rapid-pattern-id="${escapeHtml(item.id)}" data-family="${escapeHtml(getRapidPatternFamily(item.id))}">
             ${escapeHtml(item.label)}
         </button>
     `).join('');
@@ -10993,6 +11077,7 @@ function skipRapidPatternCue() {
 
     rapidPatternArenaState.errors = 2;
     rapidPatternArenaState.streak = 0;
+    setRapidPatternResultMeta(cue.patternId);
     revealRapidPatternCorrectButton(normalizeRapidPatternId(cue.patternId));
     setRapidPatternTrafficLight('red');
     recordRapidPatternAttempt({
@@ -11048,12 +11133,15 @@ function handleRapidPatternCorrectAnswer(button, cue, resolvedPatternId = '') {
     rapidPatternArenaState.score += gained;
     rapidPatternArenaState.streak += 1;
     button.classList.add('is-correct');
+    setRapidPatternResultMeta(normalizedPatternId);
     setRapidPatternTrafficLight('green');
     setRapidPatternFeedback(`מעולה! זיהוי מדויק (+${gained} נק׳).`, 'success');
     playUISound('correct');
     addXP(Math.max(2, Math.min(8, Math.round(gained / 2))));
+    awardMetaGamificationXp(5, 'practiceRadar');
     if (rapidPatternArenaState.streak > 0 && rapidPatternArenaState.streak % 5 === 0) {
         addStars(1);
+        awardMetaGamificationStars(1, 'practiceRadar');
         playUISound('stars_soft');
     }
 
@@ -11082,6 +11170,7 @@ function handleRapidPatternWrongAnswer(button, cue, chosenPattern = '') {
     if (rapidPatternArenaState.errors >= 2) {
         stopRapidPatternTimer();
         setRapidPatternButtonsDisabled(true);
+        setRapidPatternResultMeta(cue.patternId);
         revealRapidPatternCorrectButton(normalizeRapidPatternId(cue.patternId));
         setRapidPatternTrafficLight('red');
         setRapidPatternFeedback(`טעות שנייה. התשובה הייתה: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`, 'danger');
@@ -11115,6 +11204,7 @@ function handleRapidPatternTimeout() {
     rapidPatternArenaState.errors = 2;
     rapidPatternArenaState.streak = 0;
     setRapidPatternButtonsDisabled(true);
+    setRapidPatternResultMeta(cue.patternId);
     revealRapidPatternCorrectButton(normalizeRapidPatternId(cue.patternId));
     setRapidPatternTrafficLight('red');
     setRapidPatternFeedback(`נגמר הזמן! התשובה: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`, 'danger');
@@ -11318,6 +11408,7 @@ function finishRapidPatternRoundIfNeeded() {
     setRapidPatternHelpButtonState(false);
     updateRapidPatternExplainButtonState();
     setRapidPatternTrafficLight('green');
+    setRapidPatternResultMeta('');
     const correctCount = getRapidPatternCorrectCount();
     setRapidPatternFeedback(`הסבב הושלם. ${correctCount}/${rapidPatternArenaState.history.length} נכונות.`, 'info');
     if (rapidPatternArenaState.elements.startBtn) {
@@ -11457,8 +11548,13 @@ function updateRapidPatternTimerVisual(remainingOverride = null) {
         ? Math.max(0, rapidPatternArenaState.endsAtMs - Date.now())
         : Math.max(0, remainingOverride);
     const ratio = Math.max(0, Math.min(1, remaining / totalMs));
+    const state = ratio <= 0.25
+        ? 'danger'
+        : (ratio <= 0.5 ? 'warn' : 'safe');
     fill.style.transform = `scaleX(${ratio})`;
     fill.style.filter = ratio <= RAPID_PATTERN_WARNING_RATIO ? 'saturate(1.35)' : 'none';
+    fill.dataset.state = state;
+    fill.parentElement?.setAttribute('data-state', state);
 }
 
 function setRapidPatternFeedback(text, tone = 'info') {
@@ -14359,6 +14455,47 @@ function buildBlueprintGuidedImageryText() {
     ].join(' ');
 }
 
+function setupTriplesRadarPresentation() {
+    const toggleBtn = document.querySelector('[data-triples-figure-toggle="true"]');
+    const figure = document.querySelector('.triples-radar-breen-figure');
+    if (!toggleBtn || !figure || toggleBtn.dataset.bound === 'true') return;
+
+    const syncExpandedState = (expanded) => {
+        figure.classList.toggle('is-expanded', !!expanded);
+        toggleBtn.textContent = expanded ? 'כווץ טבלה' : 'הגדל טבלה';
+    };
+
+    toggleBtn.dataset.bound = 'true';
+    syncExpandedState(figure.classList.contains('is-expanded'));
+    toggleBtn.addEventListener('click', () => {
+        syncExpandedState(!figure.classList.contains('is-expanded'));
+    });
+}
+
+function updateBlueprintProgress(stepNum = 1) {
+    const resolvedStep = Math.max(1, Math.min(4, Math.floor(Number(stepNum) || 1)));
+    const container = document.querySelector('#blueprint .blueprint-container');
+    const progress = document.querySelector('#blueprint .blueprint-progress');
+    const steps = Array.from(document.querySelectorAll('#blueprint [data-blueprint-progress-step]'));
+    const lines = Array.from(document.querySelectorAll('#blueprint .blueprint-progress-line'));
+
+    if (container) {
+        container.dataset.blueprintStep = String(resolvedStep);
+        container.classList.toggle('is-complete', resolvedStep >= 4);
+    }
+    if (progress) {
+        progress.dataset.activeStep = String(resolvedStep);
+    }
+    steps.forEach((stepEl) => {
+        const stepIndex = Math.max(1, Math.floor(Number(stepEl.getAttribute('data-blueprint-progress-step')) || 0));
+        stepEl.classList.toggle('is-active', stepIndex === resolvedStep);
+        stepEl.classList.toggle('is-completed', stepIndex < resolvedStep);
+    });
+    lines.forEach((lineEl, index) => {
+        lineEl.classList.toggle('is-complete', index < resolvedStep - 1);
+    });
+}
+
 function setupBlueprintBuilder() {
     // Step 1: Extract Button
     const extractBtn = document.getElementById('extract-btn');
@@ -14397,6 +14534,8 @@ function setupBlueprintBuilder() {
             updateReframeBox();
         });
     }
+
+    updateBlueprintProgress(1);
 }
 
 function goToStep(stepNum) {
@@ -14413,6 +14552,7 @@ function goToStep(stepNum) {
         targetStep.classList.remove('hidden');
         targetStep.classList.add('active');
     }
+    updateBlueprintProgress(stepNum);
     window.scrollTo({ top: 0, behavior: 'auto' });
 }
 

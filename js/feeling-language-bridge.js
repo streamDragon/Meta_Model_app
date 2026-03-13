@@ -520,7 +520,7 @@
                     ${items.map((item) => `
                         <span class="flb-fragment-pill${activeValue === item ? ' is-active' : ''}">
                             <button type="button" data-action="set-active-${kind}" data-value="${html(item)}">${html(item)}</button>
-                            <button type="button" class="flb-fragment-pill__remove" data-action="remove-${kind}" data-value="${html(item)}" aria-label="הסר">ֳ—</button>
+                            <button type="button" class="flb-fragment-pill__remove" data-action="remove-${kind}" data-value="${html(item)}" aria-label="הסר">&times;</button>
                         </span>
                     `).join('')}
                 </div>

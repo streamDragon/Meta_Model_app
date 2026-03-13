@@ -81,7 +81,7 @@
         const hasCaseId = (caseId) => caseIds.includes(String(caseId || '').trim());
         const hasLayerId = (layerId) => Object.prototype.hasOwnProperty.call(LAYER_META, String(layerId || '').trim());
         const hasFocusId = (focusId) => Object.prototype.hasOwnProperty.call(LAYER_META, String(focusId || '').trim());
-        const createCaseUiState = () => ({ stepIndex: 0, maxVisitedStep: 0, openLayer: 'outside', selectedFocus: '', showExampleParagraph: false });
+        const createCaseUiState = () => ({ stepIndex: 0, maxVisitedStep: 0, awardedStepIndex: 0, openLayer: 'outside', selectedFocus: '', showExampleParagraph: false });
 
         function sanitizeCaseUi(raw) {
             const safe = raw && typeof raw === 'object' ? raw : {};
@@ -89,6 +89,7 @@
             return {
                 stepIndex,
                 maxVisitedStep: Math.max(stepIndex, clampStep(safe.maxVisitedStep)),
+                awardedStepIndex: Math.max(stepIndex, clampStep(safe.awardedStepIndex)),
                 openLayer: hasLayerId(safe.openLayer) ? String(safe.openLayer).trim() : 'outside',
                 selectedFocus: hasFocusId(safe.selectedFocus) ? String(safe.selectedFocus).trim() : '',
                 showExampleParagraph: safe.showExampleParagraph === true
@@ -116,6 +117,14 @@
         const getCurrentCase = () => caseById(state.selectedCaseId);
         const getCurrentCaseUi = () => getCaseUi(state.selectedCaseId);
         const ensureStepUnlocked = (caseUi, targetStepIndex) => { if (caseUi) caseUi.maxVisitedStep = Math.max(caseUi.maxVisitedStep, clampStep(targetStepIndex)); };
+        const awardStepCompletion = (caseUi, targetStepIndex) => {
+            const resolvedStep = clampStep(targetStepIndex);
+            if (!caseUi || resolvedStep <= 0 || resolvedStep <= caseUi.awardedStepIndex) return;
+            caseUi.awardedStepIndex = resolvedStep;
+            if (global.MetaGamification && typeof global.MetaGamification.addXP === 'function') {
+                global.MetaGamification.addXP(10, 'sentenceMap');
+            }
+        };
         const canAdvance = (caseUi) => !(caseUi.stepIndex === 3 && !caseUi.selectedFocus) && caseUi.stepIndex < STEP_ORDER.length - 1;
         const getProgressLabel = (caseUi) => `${STEP_ORDER[caseUi.stepIndex]?.label || STEP_ORDER[0].label} · ${caseUi.stepIndex + 1}/${STEP_ORDER.length}`;
         const renderParagraphs = (text, className = '') => splitIntoParagraphs(text).map((item) => `<p${className ? ` class="${escapeHtml(className)}"` : ''}>${escapeHtml(item)}</p>`).join('');
@@ -131,11 +140,12 @@
             if (nextStep > caseUi.maxVisitedStep) return;
             if (nextStep >= 4 && !caseUi.selectedFocus) return;
             caseUi.stepIndex = nextStep;
+            awardStepCompletion(caseUi, nextStep);
             render();
         }
-        function goNext() { const caseUi = getCurrentCaseUi(); if (canAdvance(caseUi)) { const next = clampStep(caseUi.stepIndex + 1); ensureStepUnlocked(caseUi, next); caseUi.stepIndex = next; render(); } }
+        function goNext() { const caseUi = getCurrentCaseUi(); if (canAdvance(caseUi)) { const next = clampStep(caseUi.stepIndex + 1); ensureStepUnlocked(caseUi, next); caseUi.stepIndex = next; awardStepCompletion(caseUi, next); render(); } }
         function goBack() { const caseUi = getCurrentCaseUi(); caseUi.stepIndex = clampStep(caseUi.stepIndex - 1); render(); }
-        function startMapping() { const caseUi = getCurrentCaseUi(); ensureStepUnlocked(caseUi, 1); caseUi.stepIndex = 1; render(); }
+        function startMapping() { const caseUi = getCurrentCaseUi(); ensureStepUnlocked(caseUi, 1); caseUi.stepIndex = 1; awardStepCompletion(caseUi, 1); render(); }
         function toggleLayer(layerId) { if (hasLayerId(layerId)) { const caseUi = getCurrentCaseUi(); caseUi.openLayer = caseUi.openLayer === layerId ? '' : layerId; render(); } }
         function selectFocus(focusId) { if (hasFocusId(focusId)) { const caseUi = getCurrentCaseUi(); caseUi.selectedFocus = String(focusId).trim(); ensureStepUnlocked(caseUi, 4); render(); } }
         function toggleExampleParagraph() { const caseUi = getCurrentCaseUi(); caseUi.showExampleParagraph = !caseUi.showExampleParagraph; render(); }

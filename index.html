@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.304" data-build-time="1773399395422" data-build-iso="2026-03-13T10:56:35.422Z" data-git-commit="ea7ed23">
+<html lang="he" dir="rtl" data-app-version="1.0.305" data-build-time="1773401478663" data-build-iso="2026-03-13T11:31:18.663Z" data-git-commit="57cdccb">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1114,6 +1114,7 @@
                     <section class="practice-section practice-section-question" aria-label="תרגול זיהוי מטה-מודל">
                         <div id="question-drill" class="card question-drill-card" data-stage="setup">
                             <div id="question-drill-fx-layer" class="question-drill-fx-layer" aria-hidden="true"></div>
+                            <div id="question-drill-streak-badge" class="question-drill-streak-badge hidden" aria-live="assertive"></div>
                             <div id="question-drill-prestart" class="question-drill-prestart">
                                 <div class="question-drill-header">
                                     <h3 id="question-drill-main-title">זיהוי מטה-מודל</h3>
@@ -1143,6 +1144,7 @@
                                     </div>
                                     <div class="question-drill-session-actions">
                                         <button id="question-drill-start-session" class="btn btn-primary" type="button">התחל</button>
+                                        <button id="question-drill-prestart-menu" class="question-drill-mini-btn question-drill-prestart-menu-btn" type="button" aria-label="עוד אפשרויות">⋯</button>
                                     </div>
                                     <div class="question-drill-secondary-actions">
                                         <button id="question-drill-open-help" class="btn btn-secondary" type="button">עזרה</button>
@@ -1426,27 +1428,36 @@
                             <p>במקום רק לחפש שם קטגוריה, המכ״ם מסדר את המשפט ל-5 כיווני בדיקה קבועים של טבלת ברין, ואז עוזר לדייק בתוך הכיוון שנפתח.</p>
                         </div>
 
-                        <div class="triples-radar-concept" aria-label="רקע מושגי למכ״ם שלשות">
-                            <p>מבנה התרגיל מבוסס על טבלת המטה-מודל של מייקל ברין. במסגרת זו דפוסי המטה-מודל מאורגנים ב-5 שורות, כאשר בכל שורה מופיעה שלשה של הבחנות לשוניות קשורות שעובדות יחד בתקשורת טבעית.</p>
-                            <p>בשיחה אמיתית הפרות מטה-מודל כמעט אף פעם אינן מופיעות בבידוד. לרוב כמה הבחנות מופיעות יחד באותו משפט או חילוף קצר, ולכן זיהוי של האשכול כולו מחדד את ההבנה הקלינית.</p>
-                            <p>כאשר מזהים את השלשה יחד, ההתערבות הופכת קוהרנטית יותר: לא מגיבים לכל טריגר בנפרד, אלא בוחרים שאלה או שיקוף שמטפלים במבנה העמוק של האמירה, בהתאם ללוגיקה של טבלת ברין.</p>
-                            <p><strong>שלשה לדוגמה (שורה 1 בטבלת ברין):</strong> קריאת מחשבות, הנחות מוקדמות וחסר ייחוס שיפוט (מה שנקרא בספרות: Lost Performative). לעיתים שלושת הדפוסים מופיעים יחד ולכן נדרש מיקוד בשלשה ולא רק בסימן יחיד.</p>
-                        </div>
+                        <details class="triples-radar-reference-drawer" data-mobile-collapsible-title="רקע וטבלה">
+                            <summary class="triples-radar-reference-summary">
+                                <span>רקע מושגי + טבלת ברין</span>
+                                <small>קרא עוד</small>
+                            </summary>
+                            <div class="triples-radar-reference-body">
+                                <div class="triples-radar-concept" aria-label="רקע מושגי למכ״ם שלשות">
+                                    <p>מבנה התרגיל מבוסס על טבלת המטה-מודל של מייקל ברין. במסגרת זו דפוסי המטה-מודל מאורגנים ב-5 שורות, כאשר בכל שורה מופיעה שלשה של הבחנות לשוניות קשורות שעובדות יחד בתקשורת טבעית.</p>
+                                    <p>בשיחה אמיתית הפרות מטה-מודל כמעט אף פעם אינן מופיעות בבידוד. לרוב כמה הבחנות מופיעות יחד באותו משפט או חילוף קצר, ולכן זיהוי של האשכול כולו מחדד את ההבנה הקלינית.</p>
+                                    <p>כאשר מזהים את השלשה יחד, ההתערבות הופכת קוהרנטית יותר: לא מגיבים לכל טריגר בנפרד, אלא בוחרים שאלה או שיקוף שמטפלים במבנה העמוק של האמירה, בהתאם ללוגיקה של טבלת ברין.</p>
+                                    <p><strong>שלשה לדוגמה (שורה 1 בטבלת ברין):</strong> קריאת מחשבות, הנחות מוקדמות וחסר ייחוס שיפוט (מה שנקרא בספרות: Lost Performative). לעיתים שלושת הדפוסים מופיעים יחד ולכן נדרש מיקוד בשלשה ולא רק בסימן יחיד.</p>
+                                </div>
 
-                        <figure class="triples-radar-breen-figure">
-                            <img
-                                src="assets/svg/meta-model-breen-table.svg"
-                                data-versioned-src="assets/svg/meta-model-breen-table.svg"
-                                alt="טבלת המטה-מודל של מייקל ברין עם חמש שורות של שלשות קשורות"
-                                loading="lazy"
-                                decoding="async"
-                            >
-                            <figcaption>מייקל ברין – טבלת המבנה של המטה-מודל</figcaption>
-                        </figure>
+                                <figure class="triples-radar-breen-figure">
+                                    <img
+                                        src="assets/svg/meta-model-breen-table.svg"
+                                        data-versioned-src="assets/svg/meta-model-breen-table.svg"
+                                        alt="טבלת המטה-מודל של מייקל ברין עם חמש שורות של שלשות קשורות"
+                                        loading="lazy"
+                                        decoding="async"
+                                    >
+                                    <figcaption>מייקל ברין – טבלת המבנה של המטה-מודל</figcaption>
+                                </figure>
 
-                        <div class="triples-radar-reference-actions">
-                            <a class="btn btn-secondary" href="assets/svg/meta-model-breen-table.svg" data-versioned-href="assets/svg/meta-model-breen-table.svg" target="_blank" rel="noopener noreferrer">פתח את הטבלה המלאה</a>
-                        </div>
+                                <div class="triples-radar-reference-actions">
+                                    <button type="button" class="btn btn-secondary" data-triples-figure-toggle="true">הגדל טבלה</button>
+                                    <a class="btn btn-secondary" href="assets/svg/meta-model-breen-table.svg" data-versioned-href="assets/svg/meta-model-breen-table.svg" target="_blank" rel="noopener noreferrer">פתח את הטבלה המלאה</a>
+                                </div>
+                            </div>
+                        </details>
 
                         <div class="triples-radar-mode-bar" id="triples-radar-mode-bar">
                             <div class="triples-radar-mode-copy">
@@ -1481,9 +1492,9 @@
                             <p id="triples-radar-feedback" class="triples-radar-feedback" data-tone="info"></p>
 
                             <div class="triples-radar-actions">
-                                <button class="btn btn-secondary" data-tr-action="hint-category">רמז: הדגש תבנית מתאימה</button>
-                                <button class="btn btn-secondary" data-tr-action="restart">התחלה מחדש</button>
-                                <button class="btn btn-primary" data-tr-action="next">המקרה הבא</button>
+                                <button class="btn btn-secondary" data-tr-action="hint-category">💡 רמז</button>
+                                <button class="btn btn-secondary" data-tr-action="restart">↻ התחלה מחדש</button>
+                                <button class="btn btn-primary" data-tr-action="next">→ המקרה הבא</button>
                             </div>
                         </div>
                     </section>
@@ -1546,35 +1557,35 @@
 
     <div class="feature-launcher-panel is-active" data-feature-group-panel="without-breen">
         <div class="feature-launcher-grid">
-            <a class="btn btn-primary" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html">מאמן פועל לא מפורט</a>
-            <a class="btn btn-secondary" href="sentence_morpher_trainer.html" data-versioned-href="sentence_morpher_trainer.html">מעבדת שינוי ניסוח</a>
-            <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html">מחקר פריזמות · חקירה בשרשרת</a>
-            <a class="btn btn-secondary" href="iceberg_templates_trainer.html" data-versioned-href="iceberg_templates_trainer.html">קצה הקרחון · עצי הבחנה</a>
-            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול זיהוי המטה-מודל</button>
-            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">מכ״ם מטה-מודל</button>
-            <button type="button" class="btn btn-secondary" onclick="navigateTo('sentence-map')">מפת המשפט</button>
-            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה</button>
-            <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">בונה מהלך</button>
-            <button type="button" class="btn btn-secondary" onclick="navigateTo('prismlab')">מעבדת פריזמות · חקירה בשכבות</button>
-            <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">במת קומיקס רגשי</button>
-            <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">סימולטור סצנות</a>
+            <a class="btn btn-primary" data-tool-icon="🔬" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html">מאמן פועל לא מפורט</a>
+            <a class="btn btn-secondary" data-tool-icon="✍️" href="sentence_morpher_trainer.html" data-versioned-href="sentence_morpher_trainer.html">מעבדת שינוי ניסוח</a>
+            <a class="btn btn-secondary" data-tool-icon="🧠" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html">מחקר פריזמות · חקירה בשרשרת</a>
+            <a class="btn btn-secondary" data-tool-icon="🧊" href="iceberg_templates_trainer.html" data-versioned-href="iceberg_templates_trainer.html">קצה הקרחון · עצי הבחנה</a>
+            <button type="button" class="btn btn-secondary" data-tool-icon="🧩" onclick="navigateTo('practice-question')">תרגול זיהוי המטה-מודל</button>
+            <button type="button" class="btn btn-secondary" data-tool-icon="🎯" onclick="navigateTo('practice-radar')">מכ״ם מטה-מודל</button>
+            <button type="button" class="btn btn-secondary" data-tool-icon="🗺️" onclick="navigateTo('sentence-map')">מפת המשפט</button>
+            <button type="button" class="btn btn-secondary" data-tool-icon="🌉" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה</button>
+            <button type="button" class="btn btn-secondary" data-tool-icon="🧭" onclick="navigateTo('blueprint')">בונה מהלך</button>
+            <button type="button" class="btn btn-secondary" data-tool-icon="🔮" onclick="navigateTo('prismlab')">מעבדת פריזמות · חקירה בשכבות</button>
+            <button type="button" class="btn btn-secondary" data-tool-icon="🎭" onclick="navigateTo('comic-engine')">במת קומיקס רגשי</button>
+            <a class="btn btn-secondary" data-tool-icon="🎬" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">סימולטור סצנות</a>
         </div>
     </div>
 
     <div class="feature-launcher-panel" data-feature-group-panel="with-breen" hidden>
         <div class="feature-launcher-grid">
-            <button type="button" class="btn btn-primary" onclick="navigateTo('practice-triples-radar')">מכ״ם שלשות (ברין)</button>
-            <button type="button" class="btn btn-secondary" onclick="navigateTo('categories')">מילון קטגוריות המטה-מודל</button>
-            <a class="btn btn-secondary" href="living_triples_trainer.html" data-versioned-href="living_triples_trainer.html">שלשות חיות · תרגול המשפחה המלאה</a>
-            <a class="btn btn-secondary" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html">קלאסיק 1 · המבנה הקלאסי</a>
-            <a class="btn btn-secondary" href="classic2_trainer.html" data-versioned-href="classic2_trainer.html">קלאסיק 2 · מבנה הקסם</a>
+            <button type="button" class="btn btn-primary" data-tool-icon="📡" onclick="navigateTo('practice-triples-radar')">מכ״ם שלשות (ברין)</button>
+            <button type="button" class="btn btn-secondary" data-tool-icon="📚" onclick="navigateTo('categories')">מילון קטגוריות המטה-מודל</button>
+            <a class="btn btn-secondary" data-tool-icon="🧬" href="living_triples_trainer.html" data-versioned-href="living_triples_trainer.html">שלשות חיות · תרגול המשפחה המלאה</a>
+            <a class="btn btn-secondary" data-tool-icon="🪄" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html">קלאסיק 1 · המבנה הקלאסי</a>
+            <a class="btn btn-secondary" data-tool-icon="✨" href="classic2_trainer.html" data-versioned-href="classic2_trainer.html">קלאסיק 2 · מבנה הקסם</a>
         </div>
     </div>
 </div>
 <div class="feature-launcher-embed-title">כלי פירוק פועל (מוטמע)</div>
 </div>
                     <div id="codex-trap-lab" class="card codex-trap-card">
-                        <h3>קופסת מילכוד מילים</h3>
+                        <h3>📦 קופסת מילכוד מילים</h3>
                         <p class="codex-trap-subtitle">תרגול מיידי לזיהוי מילים עמומות בזמן כתיבה: מזהים, פותחים קופסה, ומדייקים למי/מה בדיוק הכוונה.</p>
                         <label for="codex-trap-input" class="codex-trap-label">כתבו משפט לתרגול</label>
                         <textarea id="codex-trap-input" rows="4" placeholder="דוגמה: הם לא מקשיבים לי אף פעם, זה תמיד קורה לי."></textarea>
@@ -1628,6 +1639,27 @@
                 <div class="card">
                     <h2>בונה מהלך - הפוך פעולה עמומה לתוכנית ביצוע</h2>
                     <p>הקלד פעולה שצריך לעשות, ואנחנו נהפוך אותה לתוכנית מפורטת עם צעדים, תנאים, וחלופות.</p>
+                    <div class="blueprint-progress" aria-label="התקדמות בונה מהלך">
+                        <div class="blueprint-progress-step is-active" data-blueprint-progress-step="1">
+                            <span class="step-number">1</span>
+                            <span class="blueprint-progress-label">ניסוח</span>
+                        </div>
+                        <div class="blueprint-progress-line" aria-hidden="true"></div>
+                        <div class="blueprint-progress-step" data-blueprint-progress-step="2">
+                            <span class="step-number">2</span>
+                            <span class="blueprint-progress-label">פירוק</span>
+                        </div>
+                        <div class="blueprint-progress-line" aria-hidden="true"></div>
+                        <div class="blueprint-progress-step" data-blueprint-progress-step="3">
+                            <span class="step-number">3</span>
+                            <span class="blueprint-progress-label">פער</span>
+                        </div>
+                        <div class="blueprint-progress-line" aria-hidden="true"></div>
+                        <div class="blueprint-progress-step" data-blueprint-progress-step="4">
+                            <span class="step-number">4</span>
+                            <span class="blueprint-progress-label">תוכנית</span>
+                        </div>
+                    </div>
 
                     <!-- STEP 1: CAPTURE -->
                     <div id="blueprint-step-1" class="blueprint-step active">
@@ -1877,6 +1909,8 @@
                 <p class="footer-text">פיתוח על ידי: streamDragon | 2026</p>
             </div>
         </section>
+
+        <div id="meta-gamification-root" aria-live="polite"></div>
     </div>
 
     <script>
@@ -1897,6 +1931,7 @@
                 'js/question-drill-engine.js',
                 'js/feeling-language-bridge.js',
                 'js/sentence-map.js',
+                'js/gamification.js',
                 'js/app.js',
                 'js/triples-radar.js',
                 'js/onboarding.js',
