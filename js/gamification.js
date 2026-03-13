@@ -1,21 +1,16 @@
-(function attachMetaGamification(global) {
+(function attachMetaGamification(global, document) {
     'use strict';
 
-    if (!global || global.MetaGamification) return;
+    if (!global || !document || global.MetaGamification) return;
 
     var STORAGE_KEY = 'meta_gamification_v1';
     var ROOT_ID = 'meta-gamification-root';
-    var LEVEL_THRESHOLDS = Object.freeze([
-        0, 40, 95, 165, 250,
-        350, 465, 595, 740, 900,
-        1075, 1265, 1470, 1690, 1925,
-        2175, 2440, 2720, 3015, 3325
-    ]);
+    var LEVEL_THRESHOLDS = Object.freeze([0, 50, 150, 300, 500, 800, 1200, 1800, 2500, 3500, 5000]);
     var FEATURE_ORDER = Object.freeze([
         'sentenceMap',
         'practiceQuestion',
-        'practiceRadar',
         'triplesRadar',
+        'practiceRadar',
         'feelingLanguageBridge',
         'blueprint',
         'prismLab',
@@ -25,45 +20,67 @@
     ]);
     var FEATURE_META = Object.freeze({
         sentenceMap: Object.freeze({
-            label: '\u05de\u05e4\u05ea \u05d4\u05de\u05e9\u05e4\u05d8',
-            icon: '\ud83d\uddfa\ufe0f'
+            label: 'מפת המשפט',
+            icon: '🗺️',
+            unlockLevel: 1
         }),
         practiceQuestion: Object.freeze({
-            label: '\u05ea\u05e8\u05d2\u05d5\u05dc \u05d6\u05d9\u05d4\u05d5\u05d9',
-            icon: '\ud83c\udfaf'
-        }),
-        practiceRadar: Object.freeze({
-            label: '\u05de\u05db\u05f4\u05dd \u05de\u05d8\u05d4-\u05de\u05d5\u05d3\u05dc',
-            icon: '\ud83d\udce1'
+            label: 'תרגול זיהוי',
+            icon: '🧩',
+            unlockLevel: 1
         }),
         triplesRadar: Object.freeze({
-            label: '\u05de\u05db\u05f4\u05dd \u05e9\u05dc\u05e9\u05d5\u05ea',
-            icon: '\ud83e\udde0'
+            label: 'מכ״ם שלשות',
+            icon: '📡',
+            unlockLevel: 2
+        }),
+        practiceRadar: Object.freeze({
+            label: 'מכ״ם מטה-מודל',
+            icon: '🎯',
+            unlockLevel: 5
         }),
         feelingLanguageBridge: Object.freeze({
-            label: '\u05d2\u05e9\u05e8 \u05ea\u05d7\u05d5\u05e9\u05d4-\u05e9\u05e4\u05d4',
-            icon: '\ud83c\udf09'
+            label: 'גשר תחושה-שפה',
+            icon: '🌉',
+            unlockLevel: 1
         }),
         blueprint: Object.freeze({
-            label: '\u05d1\u05d5\u05e0\u05d4 \u05de\u05d4\u05dc\u05da',
-            icon: '\ud83e\udded'
+            label: 'בונה מהלך',
+            icon: '🧭',
+            unlockLevel: 1
         }),
         prismLab: Object.freeze({
-            label: '\u05de\u05e2\u05d1\u05d3\u05ea \u05e4\u05e8\u05d9\u05d6\u05de\u05d5\u05ea',
-            icon: '\ud83d\udd2e'
+            label: 'מעבדת פריזמות',
+            icon: '🔬',
+            unlockLevel: 1
         }),
         comicEngine: Object.freeze({
-            label: '\u05d1\u05de\u05ea \u05e7\u05d5\u05de\u05d9\u05e7\u05e1',
-            icon: '\ud83c\udfad'
+            label: 'במת קומיקס',
+            icon: '🎭',
+            unlockLevel: 1
         }),
         toolCenter: Object.freeze({
-            label: '\u05de\u05e8\u05db\u05d6 \u05db\u05dc\u05d9\u05dd',
-            icon: '\ud83e\uddf0'
+            label: 'מרכז כלים',
+            icon: '🧰',
+            unlockLevel: 1
         }),
         legacy: Object.freeze({
-            label: '\u05db\u05dc\u05dc\u05d9',
-            icon: '\u2728'
+            label: 'כללי',
+            icon: '✨',
+            unlockLevel: 1
         })
+    });
+    var LEVEL_TITLES = Object.freeze({
+        1: 'צעד ראשון',
+        2: 'מתחיל סקרן',
+        3: 'מזהה דפוסים',
+        4: 'חוקר שפה',
+        5: 'מאתגר מחשבות',
+        6: 'פורץ גבולות',
+        7: 'מאסטר מטא-מודל',
+        8: 'גורו השפה',
+        9: 'מגלה אמיתות',
+        10: 'ברמה אחרת לגמרי'
     });
 
     var state = loadState();
@@ -73,11 +90,14 @@
         button: null,
         streak: null,
         stars: null,
-        level: null,
-        panel: null,
+        levelLabel: null,
+        levelNumber: null,
         total: null,
+        progressFill: null,
         breakdown: null,
-        flyup: null
+        panel: null,
+        flyup: null,
+        starIcon: null
     };
 
     function normalizeFeatureName(featureName) {
@@ -110,7 +130,10 @@
         return {
             xp: Math.max(0, Math.floor(Number(safe.xp) || 0)),
             streak: Math.max(0, Math.floor(Number(safe.streak) || 0)),
+            bestStreak: Math.max(0, Math.floor(Number(safe.bestStreak) || 0)),
+            streakFreezes: Math.max(0, Math.floor(Number(safe.streakFreezes) || 0)),
             lastActiveDate: typeof safe.lastActiveDate === 'string' ? safe.lastActiveDate : '',
+            lastCelebratedLevel: Math.max(1, Math.floor(Number(safe.lastCelebratedLevel) || 1)),
             starsPerFeature: normalizedStars
         };
     }
@@ -132,7 +155,7 @@
     }
 
     function escapeHtml(value) {
-        return String(value || '')
+        return String(value == null ? '' : value)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
@@ -172,15 +195,19 @@
         return 1;
     }
 
-    function getNextThreshold(level) {
-        if (level >= LEVEL_THRESHOLDS.length) {
-            return LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
-        }
-        return LEVEL_THRESHOLDS[Math.max(0, level)] || LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
+    function getLevelTitle(level) {
+        return LEVEL_TITLES[Math.max(1, Math.floor(Number(level) || 1))] || 'מומחה';
     }
 
     function getFeatureMeta(featureKey) {
         return FEATURE_META[featureKey] || FEATURE_META.legacy;
+    }
+
+    function getUnlockedFeaturesForLevel(level) {
+        var currentLevel = Math.max(1, Math.floor(Number(level) || 1));
+        return Object.keys(FEATURE_META).filter(function filterUnlocked(featureKey) {
+            return Math.max(1, Math.floor(Number(getFeatureMeta(featureKey).unlockLevel) || 1)) <= currentLevel;
+        });
     }
 
     function getTotalStars() {
@@ -201,27 +228,57 @@
                 key: key,
                 label: meta.label,
                 icon: meta.icon,
+                unlockLevel: meta.unlockLevel || 1,
                 stars: Math.max(0, Math.floor(Number(state.starsPerFeature[key]) || 0))
             };
         });
     }
 
-    function getLevel() {
-        return getLevelForXp(state.xp);
+    function getXPProgress() {
+        var level = getLevelForXp(state.xp);
+        var currentThreshold = LEVEL_THRESHOLDS[level - 1] || 0;
+        var nextThreshold = LEVEL_THRESHOLDS[level] || LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
+        var span = Math.max(1, nextThreshold - currentThreshold);
+        var progress = level >= LEVEL_THRESHOLDS.length
+            ? 1
+            : Math.max(0, Math.min(1, (state.xp - currentThreshold) / span));
+        return {
+            level: level,
+            currentThreshold: currentThreshold,
+            nextThreshold: nextThreshold,
+            progress: progress,
+            progressPct: Math.round(progress * 100)
+        };
     }
 
     function getSummary() {
-        var level = getLevel();
+        var xpProgress = getXPProgress();
         return {
             xp: state.xp,
             streak: state.streak,
+            bestStreak: Math.max(state.bestStreak, state.streak),
+            streakFreezes: state.streakFreezes,
             lastActiveDate: state.lastActiveDate,
+            lastPracticeDate: state.lastActiveDate,
             starsPerFeature: Object.assign({}, state.starsPerFeature),
             totalStars: getTotalStars(),
-            level: level,
-            nextLevelXp: getNextThreshold(level),
-            levelProgressXp: level >= LEVEL_THRESHOLDS.length ? 0 : Math.max(0, getNextThreshold(level) - state.xp)
+            level: xpProgress.level,
+            levelTitle: getLevelTitle(xpProgress.level),
+            currentLevelXp: xpProgress.currentThreshold,
+            nextLevelXp: xpProgress.nextThreshold,
+            xpProgress: xpProgress.progress,
+            xpProgressPct: xpProgress.progressPct,
+            xpToNextLevel: Math.max(0, xpProgress.nextThreshold - state.xp),
+            unlockedFeatures: getUnlockedFeaturesForLevel(xpProgress.level)
         };
+    }
+
+    function dispatchSafe(eventName, detail) {
+        try {
+            global.dispatchEvent(new global.CustomEvent(eventName, { detail: detail }));
+        } catch (_error) {
+            // ignore dispatch failures
+        }
     }
 
     function ensureHost() {
@@ -239,36 +296,70 @@
         if (!refs.shell || !refs.button) return;
         refs.shell.classList.toggle('is-expanded', !!expanded);
         refs.button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-        if (refs.panel) {
-            refs.panel.hidden = !expanded;
-        }
-        if (refs.breakdown) {
-            refs.breakdown.hidden = !expanded;
-        }
+        if (refs.panel) refs.panel.hidden = !expanded;
+        if (refs.breakdown) refs.breakdown.hidden = !expanded;
     }
 
-    function renderBreakdown() {
+    function renderBreakdown(summary) {
         if (!refs.breakdown) return;
+        var currentSummary = summary || getSummary();
         refs.breakdown.innerHTML = getBreakdownEntries().map(function renderEntry(entry) {
+            var unlocked = currentSummary.level >= Math.max(1, Number(entry.unlockLevel) || 1);
             return [
-                '<article class="meta-gamification-feature" data-feature="' + escapeHtml(entry.key) + '">',
+                '<article class="meta-gamification-feature' + (unlocked ? '' : ' is-locked') + '" data-feature="' + escapeHtml(entry.key) + '">',
                 '  <span class="meta-gamification-feature__icon" aria-hidden="true">' + entry.icon + '</span>',
-                '  <strong>' + escapeHtml(entry.label) + '</strong>',
-                '  <span>\u2b50 ' + entry.stars + '</span>',
+                '  <div class="meta-gamification-feature__copy">',
+                '    <strong>' + escapeHtml(entry.label) + '</strong>',
+                '    <small>' + (unlocked ? ('⭐ ' + entry.stars) : ('נפתח ברמה ' + entry.unlockLevel)) + '</small>',
+                '  </div>',
                 '</article>'
             ].join('');
         }).join('');
     }
 
-    function updateUi() {
-        var summary = getSummary();
-        if (refs.streak) refs.streak.textContent = String(summary.streak);
-        if (refs.stars) refs.stars.textContent = String(summary.totalStars);
-        if (refs.level) refs.level.textContent = '\u05e8\u05de\u05d4 ' + summary.level;
-        if (refs.total) {
-            refs.total.textContent = '\u05e8\u05de\u05d4 ' + summary.level + ' \u00b7 ' + summary.xp + ' \u05e0\u05d9\u05f4\u05e7 \u00b7 ' + summary.totalStars + ' \u05db\u05d5\u05db\u05d1\u05d9\u05dd';
+    function animateInteger(node, fromValue, toValue) {
+        if (!node) return;
+        var from = Math.max(0, Math.floor(Number(fromValue) || 0));
+        var to = Math.max(0, Math.floor(Number(toValue) || 0));
+        if (from === to) {
+            node.textContent = String(to);
+            return;
         }
-        renderBreakdown();
+
+        var start = Date.now();
+        var duration = Math.min(640, 140 + Math.abs(to - from) * 28);
+
+        function tick() {
+            var elapsed = Date.now() - start;
+            var progress = Math.min(1, elapsed / duration);
+            var eased = 1 - Math.pow(1 - progress, 3);
+            var current = from + Math.round((to - from) * eased);
+            node.textContent = String(current);
+            if (progress < 1) {
+                global.requestAnimationFrame(tick);
+            } else {
+                node.textContent = String(to);
+            }
+        }
+
+        global.requestAnimationFrame(tick);
+    }
+
+    function updateUi(previousSummary) {
+        var summary = getSummary();
+        var previous = previousSummary || summary;
+
+        if (refs.streak) animateInteger(refs.streak, previous.streak, summary.streak);
+        if (refs.stars) animateInteger(refs.stars, previous.totalStars, summary.totalStars);
+        if (refs.levelNumber) refs.levelNumber.textContent = String(summary.level);
+        if (refs.levelLabel) refs.levelLabel.textContent = 'רמה ' + summary.level;
+        if (refs.total) {
+            refs.total.textContent = summary.levelTitle + ' · ' + summary.xp + ' ני״ק · ' + summary.totalStars + ' כוכבים';
+        }
+        if (refs.progressFill) {
+            refs.progressFill.style.width = summary.xpProgressPct + '%';
+        }
+        renderBreakdown(summary);
     }
 
     function pulseShell() {
@@ -278,7 +369,7 @@
         refs.shell.classList.add('is-pulsing');
         global.setTimeout(function clearPulse() {
             if (refs.shell) refs.shell.classList.remove('is-pulsing');
-        }, 520);
+        }, 560);
     }
 
     function showFlyup(amount) {
@@ -289,7 +380,17 @@
         refs.flyup.classList.add('is-visible');
         global.setTimeout(function clearFlyup() {
             if (refs.flyup) refs.flyup.classList.remove('is-visible');
-        }, 900);
+        }, 980);
+    }
+
+    function popStarIcon() {
+        if (!refs.starIcon) return;
+        refs.starIcon.classList.remove('is-popping');
+        void refs.starIcon.offsetWidth;
+        refs.starIcon.classList.add('is-popping');
+        global.setTimeout(function clearPop() {
+            if (refs.starIcon) refs.starIcon.classList.remove('is-popping');
+        }, 420);
     }
 
     function ensureMounted() {
@@ -299,17 +400,20 @@
 
         host.innerHTML = [
             '<section class="meta-gamification-pill" data-meta-gamification="true">',
-            '  <button type="button" class="meta-gamification-pill__button" aria-expanded="false" aria-label="\u05e4\u05ea\u05d9\u05d7\u05ea \u05e1\u05d9\u05db\u05d5\u05dd \u05d4\u05d2\u05d9\u05d9\u05de\u05d9\u05e4\u05d9\u05e7\u05e6\u05d9\u05d4">',
-            '    <span class="meta-gamification-pill__metric"><span aria-hidden="true">\ud83d\udd25</span><strong data-meta-streak>0</strong><small>\u05e8\u05e6\u05e3</small></span>',
-            '    <span class="meta-gamification-pill__metric"><span aria-hidden="true">\u2b50</span><strong data-meta-stars>0</strong><small>\u05db\u05d5\u05db\u05d1\u05d9\u05dd</small></span>',
-            '    <span class="meta-gamification-pill__level" data-meta-level>\u05e8\u05de\u05d4 1</span>',
+            '  <button type="button" class="meta-gamification-pill__button" aria-expanded="false" aria-label="פתיחת סיכום ההתקדמות">',
+            '    <span class="meta-gamification-pill__metric"><span aria-hidden="true">🔥</span><strong data-meta-streak>0</strong><small>רצף</small></span>',
+            '    <span class="meta-gamification-pill__metric"><span aria-hidden="true" class="meta-gamification-pill__star" data-meta-star-icon>⭐</span><strong data-meta-stars>0</strong><small>כוכבים</small></span>',
+            '    <span class="meta-gamification-pill__level"><small>רמה</small><strong data-meta-level-number>1</strong></span>',
             '  </button>',
             '  <span class="meta-gamification-pill__flyup" data-meta-flyup aria-hidden="true"></span>',
             '  <div class="meta-gamification-panel" hidden>',
             '    <div class="meta-gamification-panel__head">',
-            '      <strong>\u05e1\u05d9\u05db\u05d5\u05dd \u05d0\u05d9\u05e9\u05d9</strong>',
-            '      <span data-meta-total>\u05e8\u05de\u05d4 1 \u00b7 0 \u05e0\u05d9\u05f4\u05e7 \u00b7 0 \u05db\u05d5\u05db\u05d1\u05d9\u05dd</span>',
+            '      <div>',
+            '        <strong data-meta-level>רמה 1</strong>',
+            '        <span data-meta-total>צעד ראשון · 0 ני״ק · 0 כוכבים</span>',
+            '      </div>',
             '    </div>',
+            '    <div class="meta-gamification-panel__progress" aria-hidden="true"><span data-meta-progress-fill style="width:0%;"></span></div>',
             '    <div class="meta-gamification-breakdown" data-meta-breakdown hidden></div>',
             '  </div>',
             '</section>'
@@ -320,11 +424,14 @@
         refs.button = host.querySelector('.meta-gamification-pill__button');
         refs.streak = host.querySelector('[data-meta-streak]');
         refs.stars = host.querySelector('[data-meta-stars]');
-        refs.level = host.querySelector('[data-meta-level]');
-        refs.panel = host.querySelector('.meta-gamification-panel');
+        refs.levelLabel = host.querySelector('[data-meta-level]');
+        refs.levelNumber = host.querySelector('[data-meta-level-number]');
         refs.total = host.querySelector('[data-meta-total]');
+        refs.progressFill = host.querySelector('[data-meta-progress-fill]');
         refs.breakdown = host.querySelector('[data-meta-breakdown]');
+        refs.panel = host.querySelector('.meta-gamification-panel');
         refs.flyup = host.querySelector('[data-meta-flyup]');
+        refs.starIcon = host.querySelector('[data-meta-star-icon]');
 
         if (refs.button) {
             refs.button.addEventListener('click', function togglePanel() {
@@ -343,36 +450,74 @@
 
     function checkStreak() {
         var today = getDateKey(new Date());
-        if (state.lastActiveDate === today) {
-            if (!state.streak) {
-                state.streak = 1;
-                saveState();
-                updateUi();
-            }
-            return state.streak;
-        }
+        var previous = state.streak;
+        var changed = false;
+        var usedFreeze = false;
+        var wasReset = false;
 
-        if (!state.lastActiveDate) {
+        if (state.lastActiveDate === today) {
+            if (state.streak < 1) {
+                state.streak = 1;
+                changed = true;
+            }
+        } else if (!state.lastActiveDate) {
             state.streak = 1;
+            changed = true;
         } else {
-            state.streak = getDayDiff(state.lastActiveDate, today) === 1
-                ? Math.max(1, state.streak + 1)
-                : 1;
+            var dayDiff = getDayDiff(state.lastActiveDate, today);
+            if (dayDiff === 1) {
+                state.streak = Math.max(1, state.streak + 1);
+                changed = true;
+            } else if (dayDiff > 1 && state.streakFreezes > 0) {
+                state.streakFreezes -= 1;
+                state.streak = Math.max(1, state.streak + 1);
+                usedFreeze = true;
+                changed = true;
+            } else {
+                wasReset = state.streak > 0;
+                if (state.streak > state.bestStreak) {
+                    state.bestStreak = state.streak;
+                }
+                state.streak = 1;
+                changed = true;
+            }
         }
 
         state.lastActiveDate = today;
+        state.bestStreak = Math.max(state.bestStreak, state.streak);
         saveState();
         updateUi();
+
+        if (changed) {
+            dispatchSafe('meta-streak-updated', {
+                streak: state.streak,
+                previous: previous,
+                usedFreeze: usedFreeze,
+                reset: wasReset,
+                firstTime: !previous
+            });
+        }
+
         return state.streak;
     }
 
     function addStars(amount, featureName) {
         var delta = Math.max(0, Math.floor(Number(amount) || 0));
         if (!delta) return getSummary();
+
+        ensureMounted();
+        var before = getSummary();
         var featureKey = normalizeFeatureName(featureName);
         state.starsPerFeature[featureKey] = Math.max(0, Math.floor(Number(state.starsPerFeature[featureKey]) || 0)) + delta;
         saveState();
-        updateUi();
+        updateUi(before);
+        popStarIcon();
+        dispatchSafe('meta-stars-gained', {
+            amount: delta,
+            feature: featureKey,
+            previousTotal: before.totalStars,
+            total: getSummary().totalStars
+        });
         return getSummary();
     }
 
@@ -381,27 +526,51 @@
         if (!delta) return getSummary();
 
         ensureMounted();
+        var before = getSummary();
+        var oldLevel = before.level;
+        var featureKey = normalizeFeatureName(featureName);
+
         checkStreak();
         state.xp += delta;
         saveState();
-        updateUi();
 
-        global.dispatchEvent(new global.CustomEvent('meta-xp-gained', {
-            detail: {
-                amount: delta,
-                total: state.xp,
-                feature: normalizeFeatureName(featureName)
-            }
-        }));
+        var after = getSummary();
+        updateUi(before);
+
+        dispatchSafe('meta-xp-gained', {
+            amount: delta,
+            total: after.xp,
+            feature: featureKey,
+            level: after.level,
+            previousLevel: oldLevel
+        });
+
+        if (after.level > oldLevel) {
+            state.lastCelebratedLevel = after.level;
+            saveState();
+            dispatchSafe('meta-level-up', {
+                level: after.level,
+                previousLevel: oldLevel,
+                title: after.levelTitle,
+                unlockedFeatures: getUnlockedFeaturesForLevel(after.level).filter(function onlyNewUnlocked(key) {
+                    return getFeatureMeta(key).unlockLevel === after.level;
+                }).map(function mapFeature(key) {
+                    return {
+                        key: key,
+                        label: getFeatureMeta(key).label,
+                        icon: getFeatureMeta(key).icon
+                    };
+                })
+            });
+        }
 
         pulseShell();
         showFlyup(delta);
-        return getSummary();
+        return after;
     }
 
     function init() {
         ensureMounted();
-        checkStreak();
         updateUi();
     }
 
@@ -412,21 +581,26 @@
         updateUi();
     });
 
-    document.addEventListener('visibilitychange', function handleVisibility() {
-        if (document.hidden) return;
-        checkStreak();
-    });
-
     var api = {
         addXP: addXP,
         addStars: addStars,
         checkStreak: checkStreak,
-        getLevel: getLevel,
-        getSummary: getSummary
+        getLevel: function getLevel() {
+            return getLevelForXp(state.xp);
+        },
+        getLevelTitle: getLevelTitle,
+        getXPProgress: getXPProgress,
+        getSummary: getSummary,
+        getUnlockedFeatures: function getUnlockedFeatures() {
+            return getUnlockedFeaturesForLevel(getLevelForXp(state.xp));
+        }
     };
+
     Object.defineProperty(api, 'level', {
         enumerable: true,
-        get: getLevel
+        get: function levelGetter() {
+            return getLevelForXp(state.xp);
+        }
     });
 
     global.MetaGamification = api;
@@ -436,4 +610,4 @@
     } else {
         init();
     }
-})(window);
+})(window, document);

@@ -1,9 +1,12 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.306" data-build-time="1773415363801" data-build-iso="2026-03-13T15:22:43.801Z" data-git-commit="e7868f3">
+<html lang="he" dir="rtl" data-app-version="1.0.307" data-build-time="1773431577556" data-build-iso="2026-03-13T19:52:57.556Z" data-git-commit="1b74049">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meta Model - כלי תרגול שאול מטה מודל</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" href="data:,">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -271,6 +274,11 @@
             uiEnhancementsStylesheet.rel = 'stylesheet';
             uiEnhancementsStylesheet.href = withAssetVersion('css/ui-enhancements.css');
             document.head.appendChild(uiEnhancementsStylesheet);
+
+            var metaRedesignRound2Stylesheet = document.createElement('link');
+            metaRedesignRound2Stylesheet.rel = 'stylesheet';
+            metaRedesignRound2Stylesheet.href = withAssetVersion('css/meta-redesign-round2.css');
+            document.head.appendChild(metaRedesignRound2Stylesheet);
         })();
     </script>
 </head>

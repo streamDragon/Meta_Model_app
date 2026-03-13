@@ -8142,6 +8142,10 @@ function getQuestionDrillModeLabel(mode = questionDrillState.mode) {
 }
 
 function getQuestionDrillFeedbackHeading(tone = 'info') {
+    const coach = window.MetaRedesignCoach;
+    if (coach && typeof coach.getQuestionFeedbackHeading === 'function') {
+        return coach.getQuestionFeedbackHeading(tone, questionDrillState.sessionCompleted);
+    }
     if (questionDrillState.sessionCompleted) return 'הסשן הושלם';
     if (tone === 'success') return 'כל הכבוד!';
     if (tone === 'danger') return 'עוד רגע מנסים שוב';
@@ -8426,7 +8430,10 @@ function triggerQuestionDrillCelebration(kind = 'success') {
 function showQuestionDrillStreakBadge(streak) {
     const badge = questionDrillState.elements.streakBadge;
     if (!badge) return;
-    badge.textContent = `🔥 רצף ${streak}!`;
+    const coach = window.MetaRedesignCoach;
+    badge.textContent = coach && typeof coach.getQuestionStreakBadge === 'function'
+        ? coach.getQuestionStreakBadge(streak)
+        : `🔥 רצף ${streak}!`;
     badge.classList.remove('hidden', 'is-visible');
     void badge.offsetWidth;
     badge.classList.add('is-visible');
@@ -9551,15 +9558,23 @@ async function loadNextQuestionDrill(options = {}) {
 }
 
 function showQuestionDrillHint() {
+    const coach = window.MetaRedesignCoach;
     if (questionDrillState.mode === 'test') {
-        setQuestionDrillFeedback('במשחק מהיר אין רמזים. עברו ללימוד אם צריך.', 'warn');
+        setQuestionDrillFeedback(
+            coach && typeof coach.getQuestionHintLocked === 'function'
+                ? coach.getQuestionHintLocked()
+                : 'במשחק מהיר אין רמזים. עברו ללימוד אם צריך.',
+            'warn'
+        );
         return;
     }
     if (!questionDrillState.current || questionDrillState.roundFinalized) return;
     const expected = getQuestionDrillTargetCategory(questionDrillState.current);
     const copy = getQuestionDrillTargetCopy(expected);
     const starters = (QUESTION_DRILL_KEYWORDS[expected] || []).slice(0, 4).join(', ');
-    const line = `רמז: חפשו שאלה שמחזירה ${copy.target}. מילות כיוון: ${starters}.`;
+    const line = coach && typeof coach.getQuestionHint === 'function'
+        ? coach.getQuestionHint({ target: copy.target, starters })
+        : `רמז: חפשו שאלה שמחזירה ${copy.target}. מילות כיוון: ${starters}.`;
     setQuestionDrillFeedback(line, 'info');
     setQuestionDrillTrafficState('yellow', 'רמז פתוח');
     playUISound('hint');
@@ -9569,17 +9584,25 @@ function evaluateQuestionDrill() {
     const feedbackEl = questionDrillState.elements.feedback;
     if (!feedbackEl || !questionDrillState.current) return;
     if (questionDrillState.sessionCompleted) return;
+    const coach = window.MetaRedesignCoach;
     if (questionDrillState.roundFinalized) {
-        setQuestionDrillFeedback('השאלה הזאת כבר נסגרה. עברו לבאה.', 'info');
+        setQuestionDrillFeedback(
+            coach && typeof coach.getQuestionRoundClosed === 'function'
+                ? coach.getQuestionRoundClosed()
+                : 'השאלה הזאת כבר נסגרה. עברו לבאה.',
+            'info'
+        );
         return;
     }
 
     const selectedOption = questionDrillState.options.find(option => option.id === questionDrillState.selectedOptionId);
     if (!selectedOption) {
         setQuestionDrillFeedback(
-            questionDrillState.mode === 'test'
-                ? 'בחרו קטגוריה לפני שממשיכים.'
-                : 'בחרו תשובה לפני שבודקים.',
+            coach && typeof coach.getQuestionNeedSelection === 'function'
+                ? coach.getQuestionNeedSelection(questionDrillState.mode === 'test')
+                : (questionDrillState.mode === 'test'
+                    ? 'בחרו קטגוריה לפני שממשיכים.'
+                    : 'בחרו תשובה לפני שבודקים.'),
             'warn'
         );
         return;
@@ -9637,15 +9660,31 @@ function evaluateQuestionDrill() {
             if ([3, 5, 10].includes(nextStreak)) {
                 showQuestionDrillStreakBadge(nextStreak);
             }
+            const expectedLabel = QUESTION_DRILL_CATEGORY_SHORT_LABELS[expectedCategory];
+            const takeaway = buildQuestionDrillLearningTakeaway(questionDrillState.current, expectedCategory);
             setQuestionDrillFeedback(
-                `נכון. ${QUESTION_DRILL_CATEGORY_SHORT_LABELS[expectedCategory]} · ${formatQuestionDrillTimerMs(rtMs)}ש׳ · +${scoreDelta.total}`,
+                coach && typeof coach.buildQuestionSuccess === 'function'
+                    ? coach.buildQuestionSuccess({
+                        mode: 'test',
+                        expectedLabel,
+                        rtText: formatQuestionDrillTimerMs(rtMs),
+                        scoreDelta: scoreDelta.total,
+                        takeaway
+                    })
+                    : `נכון. ${expectedLabel} · ${formatQuestionDrillTimerMs(rtMs)}ש׳ · +${scoreDelta.total}`,
                 'success'
             );
             playUISound('correct');
             finalizeQuestionDrillRound('correct');
         } else {
+            const expectedLabel = QUESTION_DRILL_CATEGORY_SHORT_LABELS[expectedCategory];
             setQuestionDrillFeedback(
-                `לא מדויק. כאן התשובה היא ${QUESTION_DRILL_CATEGORY_SHORT_LABELS[expectedCategory]}.`,
+                coach && typeof coach.buildQuestionWrong === 'function'
+                    ? coach.buildQuestionWrong({
+                        mode: 'test',
+                        expectedLabel
+                    })
+                    : `לא מדויק. כאן התשובה היא ${expectedLabel}.`,
                 'danger'
             );
             playUISound('wrong');
@@ -9668,7 +9707,16 @@ function evaluateQuestionDrill() {
             showQuestionDrillStreakBadge(nextStreak);
         }
         const takeaway = buildQuestionDrillLearningTakeaway(questionDrillState.current, expectedCategory);
-        setQuestionDrillFeedback(`נכון. ${takeaway}`, 'success');
+        setQuestionDrillFeedback(
+            coach && typeof coach.buildQuestionSuccess === 'function'
+                ? coach.buildQuestionSuccess({
+                    mode: 'learn',
+                    expectedLabel: getQuestionDrillTargetCopy(expectedCategory).label,
+                    takeaway
+                })
+                : `נכון. ${takeaway}`,
+            'success'
+        );
         playUISound('correct');
         finalizeQuestionDrillRound('correct');
         return;
@@ -9678,7 +9726,14 @@ function evaluateQuestionDrill() {
     const expectedCopy = getQuestionDrillTargetCopy(expectedCategory);
     const selectedCopy = getQuestionDrillTargetCopy(selectedCategory);
     setQuestionDrillFeedback(
-        `לא מדויק. בחרת ${selectedCopy.label}, וכאן צריך ${expectedCopy.label}. ${reasonLine}. צריך עוד בהירות? פתחו "הסבר".`,
+        coach && typeof coach.buildQuestionWrong === 'function'
+            ? coach.buildQuestionWrong({
+                mode: 'learn',
+                expectedLabel: expectedCopy.label,
+                selectedLabel: selectedCopy.label,
+                reasonLine
+            })
+            : `לא מדויק. בחרת ${selectedCopy.label}, וכאן צריך ${expectedCopy.label}. ${reasonLine}. צריך עוד בהירות? פתחו "הסבר".`,
         'warn'
     );
     setQuestionDrillTrafficState('yellow', 'נסו עוד פעם');
@@ -10204,11 +10259,17 @@ function focusRapidPatternLiveSurface() {
 }
 
 function updateRapidPatternFeedbackCard() {
+    const coach = window.MetaRedesignCoach;
     const titleEl = rapidPatternArenaState.elements.feedbackTitle;
     const bodyEl = rapidPatternArenaState.elements.feedbackBody;
     const card = rapidPatternArenaState.elements.resultCard;
 
-    if (titleEl) titleEl.textContent = rapidPatternArenaState.feedbackTitle || 'מה קרה עכשיו';
+    if (titleEl) {
+        titleEl.textContent = rapidPatternArenaState.feedbackTitle
+            || (coach && typeof coach.getRapidResultTitle === 'function'
+                ? coach.getRapidResultTitle(rapidPatternArenaState.feedbackTone)
+                : 'מה קרה עכשיו');
+    }
     if (bodyEl) bodyEl.textContent = rapidPatternArenaState.feedbackBody || '';
     if (card) card.dataset.tone = rapidPatternArenaState.feedbackTone || 'info';
 }
@@ -11041,7 +11102,12 @@ function resumeRapidPatternSession() {
     rapidPatternArenaState.pausedRemainingMs = 0;
     setRapidPatternButtonsDisabled(false);
     updateRapidPatternExplainButtonState();
-    setRapidPatternFeedback('המשיכו: זהו את התבנית לפני שנגמר הזמן.', 'info');
+    setRapidPatternFeedback(
+        window.MetaRedesignCoach && typeof window.MetaRedesignCoach.getRapidResumePrompt === 'function'
+            ? window.MetaRedesignCoach.getRapidResumePrompt()
+            : 'המשיכו: זהו את התבנית לפני שנגמר הזמן.',
+        'info'
+    );
     startRapidPatternTimer(resumeMs);
     updateRapidPatternLayoutState();
 }
@@ -11120,6 +11186,7 @@ function handleRapidPatternButtonClick(event) {
 }
 
 function handleRapidPatternCorrectAnswer(button, cue, resolvedPatternId = '') {
+    const coach = window.MetaRedesignCoach;
     stopRapidPatternTimer();
     setRapidPatternButtonsDisabled(true);
 
@@ -11135,7 +11202,16 @@ function handleRapidPatternCorrectAnswer(button, cue, resolvedPatternId = '') {
     button.classList.add('is-correct');
     setRapidPatternResultMeta(normalizedPatternId);
     setRapidPatternTrafficLight('green');
-    setRapidPatternFeedback(`מעולה! זיהוי מדויק (+${gained} נק׳).`, 'success');
+    setRapidPatternFeedback(
+        coach && typeof coach.buildRapidInlineFeedback === 'function'
+            ? coach.buildRapidInlineFeedback({
+                success: true,
+                gained,
+                label: getRapidPatternLabel(normalizedPatternId)
+            })
+            : `מעולה! זיהוי מדויק (+${gained} נק׳).`,
+        'success'
+    );
     playUISound('correct');
     addXP(Math.max(2, Math.min(8, Math.round(gained / 2))));
     awardMetaGamificationXp(5, 'practiceRadar');
@@ -11154,14 +11230,19 @@ function handleRapidPatternCorrectAnswer(button, cue, resolvedPatternId = '') {
     });
     updateRapidPatternScoreboard();
     if (finishRapidPatternRoundIfNeeded()) return;
-    completeRapidPatternRound({
-        title: 'נכון',
-        body: `${getRapidPatternLabel(normalizedPatternId)}. מעולה, ממשיכים.`,
-        tone: 'success'
-    });
+    completeRapidPatternRound(
+        coach && typeof coach.buildRapidRound === 'function'
+            ? coach.buildRapidRound({ success: true, label: getRapidPatternLabel(normalizedPatternId) })
+            : {
+                title: 'נכון',
+                body: `${getRapidPatternLabel(normalizedPatternId)}. מעולה, ממשיכים.`,
+                tone: 'success'
+            }
+    );
 }
 
 function handleRapidPatternWrongAnswer(button, cue, chosenPattern = '') {
+    const coach = window.MetaRedesignCoach;
     rapidPatternArenaState.errors += 1;
     rapidPatternArenaState.streak = 0;
     button.classList.add('is-wrong');
@@ -11173,7 +11254,15 @@ function handleRapidPatternWrongAnswer(button, cue, chosenPattern = '') {
         setRapidPatternResultMeta(cue.patternId);
         revealRapidPatternCorrectButton(normalizeRapidPatternId(cue.patternId));
         setRapidPatternTrafficLight('red');
-        setRapidPatternFeedback(`טעות שנייה. התשובה הייתה: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`, 'danger');
+        setRapidPatternFeedback(
+            coach && typeof coach.buildRapidInlineFeedback === 'function'
+                ? coach.buildRapidInlineFeedback({
+                    final: true,
+                    label: getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))
+                })
+                : `טעות שנייה. התשובה הייתה: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`,
+            'danger'
+        );
         updateRapidPatternScoreboard();
         recordRapidPatternAttempt({
             cue,
@@ -11183,20 +11272,30 @@ function handleRapidPatternWrongAnswer(button, cue, chosenPattern = '') {
             remainingMs: Math.max(0, rapidPatternArenaState.endsAtMs - Date.now())
         });
         if (finishRapidPatternRoundIfNeeded()) return;
-        completeRapidPatternRound({
-            title: 'לא מדויק',
-            body: `התשובה הנכונה היא ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`,
-            tone: 'danger'
-        });
+        completeRapidPatternRound(
+            coach && typeof coach.buildRapidRound === 'function'
+                ? coach.buildRapidRound({ label: getRapidPatternLabel(normalizeRapidPatternId(cue.patternId)) })
+                : {
+                    title: 'לא מדויק',
+                    body: `התשובה הנכונה היא ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`,
+                    tone: 'danger'
+                }
+        );
         return;
     }
 
     setRapidPatternTrafficLight('yellow');
-    setRapidPatternFeedback('טעות ראשונה. נסו שוב לפני שנגמר הזמן.', 'warn');
+    setRapidPatternFeedback(
+        coach && typeof coach.buildRapidInlineFeedback === 'function'
+            ? coach.buildRapidInlineFeedback({})
+            : 'טעות ראשונה. נסו שוב לפני שנגמר הזמן.',
+        'warn'
+    );
     updateRapidPatternScoreboard();
 }
 
 function handleRapidPatternTimeout() {
+    const coach = window.MetaRedesignCoach;
     const cue = rapidPatternArenaState.currentCue;
     if (!rapidPatternArenaState.active || !cue) return;
     stopRapidPatternTimer();
@@ -11207,7 +11306,15 @@ function handleRapidPatternTimeout() {
     setRapidPatternResultMeta(cue.patternId);
     revealRapidPatternCorrectButton(normalizeRapidPatternId(cue.patternId));
     setRapidPatternTrafficLight('red');
-    setRapidPatternFeedback(`נגמר הזמן! התשובה: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`, 'danger');
+    setRapidPatternFeedback(
+        coach && typeof coach.buildRapidInlineFeedback === 'function'
+            ? coach.buildRapidInlineFeedback({
+                timeout: true,
+                label: getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))
+            })
+            : `נגמר הזמן! התשובה: ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`,
+        'danger'
+    );
     recordRapidPatternAttempt({
         cue,
         chosenPatternId: '',
@@ -11218,11 +11325,18 @@ function handleRapidPatternTimeout() {
     playUISound('buzzer');
     updateRapidPatternScoreboard();
     if (finishRapidPatternRoundIfNeeded()) return;
-    completeRapidPatternRound({
-        title: 'נגמר הזמן',
-        body: `התשובה הנכונה היא ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`,
-        tone: 'danger'
-    });
+    completeRapidPatternRound(
+        coach && typeof coach.buildRapidRound === 'function'
+            ? coach.buildRapidRound({
+                timeout: true,
+                label: getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))
+            })
+            : {
+                title: 'נגמר הזמן',
+                body: `התשובה הנכונה היא ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`,
+                tone: 'danger'
+            }
+    );
 }
 
 function queueNextRapidPatternCue() {
@@ -11410,14 +11524,21 @@ function finishRapidPatternRoundIfNeeded() {
     setRapidPatternTrafficLight('green');
     setRapidPatternResultMeta('');
     const correctCount = getRapidPatternCorrectCount();
-    setRapidPatternFeedback(`הסבב הושלם. ${correctCount}/${rapidPatternArenaState.history.length} נכונות.`, 'info');
+    setRapidPatternFeedback(
+        window.MetaRedesignCoach && typeof window.MetaRedesignCoach.buildRapidSessionDone === 'function'
+            ? window.MetaRedesignCoach.buildRapidSessionDone(correctCount, rapidPatternArenaState.history.length)
+            : `הסבב הושלם. ${correctCount}/${rapidPatternArenaState.history.length} נכונות.`,
+        'info'
+    );
     if (rapidPatternArenaState.elements.startBtn) {
         rapidPatternArenaState.elements.startBtn.textContent = 'תרגול חדש';
     }
     renderRapidPatternAiFeedback();
     setRapidPatternRoundFeedback({
         title: 'הסבב הושלם',
-        body: `${correctCount}/${Math.max(1, rapidPatternArenaState.history.length)} נכונות. אפשר לפתוח נתונים או להתחיל שוב.`,
+        body: window.MetaRedesignCoach && typeof window.MetaRedesignCoach.buildRapidSessionDone === 'function'
+            ? window.MetaRedesignCoach.buildRapidSessionDone(correctCount, Math.max(1, rapidPatternArenaState.history.length))
+            : `${correctCount}/${Math.max(1, rapidPatternArenaState.history.length)} נכונות. אפשר לפתוח נתונים או להתחיל שוב.`,
         tone: 'info'
     });
     return true;
