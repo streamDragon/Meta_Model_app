@@ -635,10 +635,13 @@
     }
 
     function renderOverlay() {
-        const disabled = state.loading || !!state.loadError || !state.queue.length;
+        const isError = !!state.loadError;
+        const disabled = state.loading || (!state.queue.length && !isError);
         const helperText = state.loading
             ? 'טוען את הסצנות...'
-            : (state.loadError ? 'הטעינה לא הושלמה עדיין.' : 'שלוש סצנות מוכנות לתרגול.');
+            : (isError ? 'הטעינה לא הושלמה. אפשר לנסות שוב.' : 'שלוש סצנות מוכנות לתרגול.');
+        const action = isError ? 'retry-load' : 'dismiss-overlay';
+        const label = isError ? 'נסה שוב' : 'אני מוכן — בוא נתחיל';
         return `
           <section class="scenario-entry-overlay${state.overlayState === 'closing' ? ' is-closing' : ''}" aria-hidden="${state.overlayState === 'hidden' ? 'true' : 'false'}">
             <div class="scenario-entry-panel">
@@ -672,10 +675,10 @@
               <button
                 type="button"
                 class="scenario-entry-cta"
-                data-scenario-action="dismiss-overlay"
+                data-scenario-action="${escapeHtml(action)}"
                 ${disabled ? 'disabled' : ''}
               >
-                אני מוכן — בוא נתחיל
+                ${escapeHtml(label)}
               </button>
               <p class="scenario-entry-helper">${escapeHtml(helperText)}</p>
             </div>
