@@ -157,7 +157,13 @@
                 return `<article class="sentence-map-overview-layer sentence-map-overview-layer--${escapeHtml(layerId)}" aria-label="${escapeHtml(meta.name)}"><span class="sentence-map-overview-layer__icon" aria-hidden="true">${escapeHtml(meta.icon)}</span><strong>${escapeHtml(meta.name)}</strong><p>${escapeHtml(meta.description)}</p></article>`;
             }).join('');
             const howTo = HEADER_COPY.howToSteps.map((item, index) => `<li><span class="sentence-map-howto-list__count">${index + 1}</span><span>${escapeHtml(item)}</span></li>`).join('');
-            return `<section class="sentence-map-header"><div class="sentence-map-header__copy"><p class="sentence-map-header__eyebrow">${escapeHtml(HEADER_COPY.title)}</p><h3 data-feature-title="${escapeHtml(HEADER_COPY.title)}">${escapeHtml(HEADER_COPY.leadTitle)}</h3><p class="sentence-map-header__subtitle" data-feature-subtitle="${escapeHtml(HEADER_COPY.concept)}">${escapeHtml(HEADER_COPY.concept)}</p></div>${caseUi.stepIndex === 0 ? `<div class="sentence-map-overview"><section class="sentence-map-overview-block" aria-label="${escapeHtml(HEADER_COPY.layersTitle)}"><div class="sentence-map-overview-block__head"><span>מה יש כאן?</span><strong>${escapeHtml(HEADER_COPY.layersTitle)}</strong></div><div class="sentence-map-overview-grid">${overviewLayers}</div></section><section class="sentence-map-overview-block" aria-label="${escapeHtml(HEADER_COPY.howToTitle)}"><div class="sentence-map-overview-block__head"><span>מה עושים?</span><strong>${escapeHtml(HEADER_COPY.howToTitle)}</strong></div><ol class="sentence-map-howto-list">${howTo}</ol></section><p class="sentence-map-bridge-copy">${escapeHtml(HEADER_COPY.bridge)}</p></div>` : ''}</section>`;
+            return `<section class="sentence-map-header"><div class="sentence-map-header__copy"><p class="sentence-map-header__eyebrow">${escapeHtml(HEADER_COPY.title)}</p><h3 data-feature-title="${escapeHtml(HEADER_COPY.title)}">${escapeHtml(HEADER_COPY.leadTitle)}</h3><p class="sentence-map-header__subtitle" data-feature-subtitle="${escapeHtml(HEADER_COPY.concept)}">${escapeHtml(HEADER_COPY.concept)}</p></div>${caseUi.stepIndex === 0 ? `<div class="sentence-map-overview"><section class="sentence-map-overview-block" aria-label="${escapeHtml(HEADER_COPY.layersTitle)}"><div class="sentence-map-overview-block__head"><span>מה יש כאן?</span><strong>${escapeHtml(HEADER_COPY.layersTitle)}</strong></div><div class="sentence-map-overview-grid">${overviewLayers}</div></section><section class="sentence-map-overview-block" aria-label="${escapeHtml(HEADER_COPY.howToTitle)}"><div class="sentence-map-overview-block__head"><span>מה עושים?</span><strong>${escapeHtml(HEADER_COPY.howToTitle)}</strong></div><ol class="sentence-map-howto-list">${howTo}</ol></section><div class="sentence-map-bridge"><div class="sentence-map-bridge__icon" aria-hidden="true">🗺️</div><p class="sentence-map-bridge__text">${escapeHtml(HEADER_COPY.bridge)}</p></div></div>` : ''}</section>`;
+        }
+
+        function renderExerciseHeader() {
+            const caseData = getCurrentCase();
+            const caseUi = getCurrentCaseUi();
+            return `<div class="sentence-map-exercise-header"><div class="sentence-map-exercise-header__info"><p class="sentence-map-header__eyebrow">${escapeHtml(HEADER_COPY.title)}</p><strong>${escapeHtml(caseData.title)}</strong></div><span class="sentence-map-exercise-header__step">${escapeHtml(getProgressLabel(caseUi))}</span></div>`;
         }
 
         function renderStepper(caseUi) {
@@ -226,8 +232,13 @@
             const opts = options && typeof options === 'object' ? options : {};
             const caseData = getCurrentCase();
             const caseUi = getCurrentCaseUi();
-            root.className = `sentence-map-root sentence-map-root--${escapeHtml(state.mode)}`;
-            root.innerHTML = `<div class="sentence-map-shell">${renderHeader(caseUi)}${renderStepper(caseUi)}${renderCaseSelector()}${renderMethodNote()}${renderCurrentStep(caseData, caseUi)}${renderFooter(caseUi)}</div>`;
+            const isIntro = caseUi.stepIndex === 0;
+            root.className = `sentence-map-root sentence-map-root--${escapeHtml(state.mode)}${isIntro ? ' is-intro' : ' is-exercise'}`;
+            if (isIntro) {
+                root.innerHTML = `<div class="sentence-map-shell">${renderHeader(caseUi)}${renderCaseSelector()}${renderCurrentStep(caseData, caseUi)}</div>`;
+            } else {
+                root.innerHTML = `<div class="sentence-map-shell">${renderExerciseHeader()}${renderStepper(caseUi)}${renderCurrentStep(caseData, caseUi)}${caseUi.stepIndex === STEP_ORDER.length - 1 ? renderMethodNote() : ''}${renderFooter(caseUi)}</div>`;
+            }
             persistState();
             if (typeof global.requestAnimationFrame === 'function') global.requestAnimationFrame(() => maybeBringSectionIntoView(opts.forceFocus === true));
             else maybeBringSectionIntoView(opts.forceFocus === true);
