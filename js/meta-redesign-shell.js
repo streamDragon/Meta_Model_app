@@ -396,7 +396,7 @@
         return [
             '<div class="meta-home-shell__frame">',
             '<header class="meta-home-shell__topbar"><button type="button" class="meta-home-shell__menu btn btn-secondary" data-home-menu>☰ תפריט</button><div class="meta-home-shell__brand"><span class="meta-home-shell__eyebrow">מטען עבודה</span><strong>Meta Model בעברית</strong></div></header>',
-            homeHero(summary), homeStats(summary),
+            homeHero(summary), homeStats(summary), homeResume(),
             '<section class="meta-home-shell__cards">' + Object.keys(FEATURE_META).map(function (tab, index) { return homeCard(FEATURE_META[tab], index); }).join('') + '</section>',
             '<div class="meta-home-shell__divider" aria-hidden="true"></div>',
             homeBonusSection(),

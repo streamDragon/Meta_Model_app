@@ -7,6 +7,22 @@ import { chromium } from 'playwright';
 
 const projectRoot = process.cwd();
 const VITE_BIN = path.join(projectRoot, 'node_modules', 'vite', 'bin', 'vite.js');
+const MANAGED_SCREENS = new Set(['sentence-map', 'practice-question', 'practice-radar', 'practice-triples-radar']);
+const TEST_GAMIFICATION_STATE = Object.freeze({
+    xp: 600,
+    streak: 4,
+    bestStreak: 7,
+    streakFreezes: 1,
+    lastActiveDate: '2026-03-14',
+    lastCelebratedLevel: 5,
+    starsPerFeature: {
+        sentenceMap: 6,
+        practiceQuestion: 8,
+        triplesRadar: 4,
+        practiceRadar: 3,
+        blueprint: 2
+    }
+});
 
 const mustContain = (label, source, regex) => {
     if (!regex.test(source)) {
@@ -89,14 +105,26 @@ async function stopServer(server) {
 }
 
 async function dismissOnboardingIfVisible(page) {
-    if ((await page.locator('#mm-onboarding').count()) === 0) return false;
+    const overlay = page.locator('#mm-onboarding').first();
+    if ((await overlay.count()) === 0) return false;
     await page.waitForTimeout(4200);
-    if ((await page.locator('#mm-onboarding.is-visible').count()) === 0) return false;
-    const dismissBtn = page.locator('#mm-onboarding [data-ob-dismiss]').first();
+    const overlayVisibleNow = await overlay.evaluate((node) => {
+        const style = getComputedStyle(node);
+        const rect = node.getBoundingClientRect();
+        return node.classList.contains('is-visible')
+            && !node.hidden
+            && style.display !== 'none'
+            && style.visibility !== 'hidden'
+            && style.pointerEvents !== 'none'
+            && rect.width > 0
+            && rect.height > 0;
+    }).catch(() => false);
+    if (!overlayVisibleNow) return false;
+    const dismissBtn = page.locator('#mm-onboarding [data-ob-dismiss]:visible').first();
     if ((await dismissBtn.count()) > 0) {
         await dismissBtn.click();
     } else {
-        await page.locator('#mm-ob-explore-btn').click();
+        await page.locator('#mm-ob-explore-btn:visible').click();
     }
     await page.waitForFunction(() => {
         const overlay = document.getElementById('mm-onboarding');
@@ -107,24 +135,66 @@ async function dismissOnboardingIfVisible(page) {
     return true;
 }
 
+async function seedTestState(page) {
+    await page.addInitScript((seed) => {
+        [
+            'meta_feature_shell_v3',
+            'meta_shell_continue_v1',
+            'meta_home_last_tab_v1',
+            'meta_home_shell_ui_v2',
+            'meta_shell_preferences_v1',
+            'practice_active_tab_v1'
+        ].forEach((key) => window.localStorage.removeItem(key));
+        window.localStorage.setItem('meta_gamification_v1', JSON.stringify(seed));
+        window.localStorage.setItem('mm_onboarding_dismissed_v1', '1');
+    }, TEST_GAMIFICATION_STATE);
+}
+
 async function waitForActiveScreen(page, screenId) {
     await page.waitForFunction((id) => {
+        if (id === 'home') {
+            const root = document.getElementById('meta-home-shell');
+            if (!root || document.body?.dataset?.activeTab !== 'home') return false;
+            const style = getComputedStyle(root);
+            const rect = root.getBoundingClientRect();
+            return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+        }
         const section = document.getElementById(id);
         return !!section && section.classList.contains('active') && getComputedStyle(section).display !== 'none';
     }, screenId);
+}
+
+async function navigateToScreen(page, screenId) {
+    await page.evaluate((id) => window.navigateTo(id), screenId);
+    await waitForActiveScreen(page, screenId);
+    await page.waitForTimeout(400);
+}
+
+async function enterManagedFeatureStage(page, screenId) {
+    if (!MANAGED_SCREENS.has(screenId)) return false;
+    const stage = await page.evaluate((id) => document.getElementById(id)?.dataset?.metaFeatureStage || '', screenId);
+    if (stage === 'feature') return false;
+    const cta = page.locator(`#${screenId} [data-feature-enter]:visible`).first();
+    if ((await cta.count()) === 0) {
+        throw new Error(`Missing managed feature CTA on ${screenId}`);
+    }
+    await cta.click();
+    await page.waitForFunction((id) => document.getElementById(id)?.dataset?.metaFeatureStage === 'feature', screenId);
+    await page.waitForTimeout(500);
+    return true;
 }
 
 async function verifyRuntimeMobileLayout(baseUrl) {
     const browser = await chromium.launch({ headless: true });
     try {
         const page = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true });
+        await seedTestState(page);
         await page.goto(baseUrl, { waitUntil: 'networkidle' });
         await dismissOnboardingIfVisible(page);
 
         for (const screenId of ['home', 'sentence-map', 'practice-question', 'practice-radar', 'practice-wizard', 'blueprint']) {
-            await page.evaluate((id) => window.navigateTo(id), screenId);
-            await waitForActiveScreen(page, screenId);
-            await page.waitForTimeout(400);
+            await navigateToScreen(page, screenId);
+            await enterManagedFeatureStage(page, screenId);
 
             const overflow = await page.evaluate(() => ({
                 innerWidth: window.innerWidth,
@@ -141,9 +211,8 @@ async function verifyRuntimeMobileLayout(baseUrl) {
         }
 
         for (const screenId of ['sentence-map', 'practice-wizard', 'blueprint']) {
-            await page.evaluate((id) => window.navigateTo(id), screenId);
-            await waitForActiveScreen(page, screenId);
-            await page.waitForTimeout(500);
+            await navigateToScreen(page, screenId);
+            await enterManagedFeatureStage(page, screenId);
 
             const overlapCheck = await page.evaluate(() => {
                 const sticky = document.getElementById('mobile-sticky-cta');

@@ -120,6 +120,22 @@ async function startLocalServer() {
 async function runShellSmoke(baseUrl) {
     const browser = await createBrowser();
     const checks = [];
+    const MANAGED_SCREENS = new Set(['sentence-map', 'practice-question', 'practice-radar', 'practice-triples-radar']);
+    const TEST_GAMIFICATION_STATE = Object.freeze({
+        xp: 600,
+        streak: 4,
+        bestStreak: 7,
+        streakFreezes: 1,
+        lastActiveDate: '2026-03-14',
+        lastCelebratedLevel: 5,
+        starsPerFeature: {
+            sentenceMap: 6,
+            practiceQuestion: 8,
+            triplesRadar: 4,
+            practiceRadar: 3,
+            blueprint: 2
+        }
+    });
 
     const assert = async (condition, label, detail = '') => {
         if (!condition) {
@@ -130,8 +146,30 @@ async function runShellSmoke(baseUrl) {
 
     const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
 
+    const seedTestState = async (targetPage = page) => {
+        await targetPage.addInitScript((seed) => {
+            [
+                'meta_feature_shell_v3',
+                'meta_shell_continue_v1',
+                'meta_home_last_tab_v1',
+                'meta_home_shell_ui_v2',
+                'meta_shell_preferences_v1',
+                'practice_active_tab_v1'
+            ].forEach((key) => window.localStorage.removeItem(key));
+            window.localStorage.setItem('meta_gamification_v1', JSON.stringify(seed));
+            window.localStorage.setItem('mm_onboarding_dismissed_v1', '1');
+        }, TEST_GAMIFICATION_STATE);
+    };
+
     const waitForActiveScreen = async (screenId, targetPage = page) => {
         await targetPage.waitForFunction((id) => {
+            if (id === 'home') {
+                const root = document.getElementById('meta-home-shell');
+                if (!root || document.body?.dataset?.activeTab !== 'home') return false;
+                const style = getComputedStyle(root);
+                const rect = root.getBoundingClientRect();
+                return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+            }
             const section = document.getElementById(id);
             return !!section && section.classList.contains('active') && getComputedStyle(section).display !== 'none';
         }, screenId);
@@ -164,14 +202,26 @@ async function runShellSmoke(baseUrl) {
     };
 
     const dismissOnboardingIfVisible = async (targetPage = page) => {
-        if ((await targetPage.locator('#mm-onboarding').count()) === 0) return false;
+        const overlay = targetPage.locator('#mm-onboarding').first();
+        if ((await overlay.count()) === 0) return false;
         await targetPage.waitForTimeout(4200);
-        if ((await targetPage.locator('#mm-onboarding.is-visible').count()) === 0) return false;
-        const dismissBtn = targetPage.locator('#mm-onboarding [data-ob-dismiss]').first();
+        const overlayVisibleNow = await overlay.evaluate((node) => {
+            const style = getComputedStyle(node);
+            const rect = node.getBoundingClientRect();
+            return node.classList.contains('is-visible')
+                && !node.hidden
+                && style.display !== 'none'
+                && style.visibility !== 'hidden'
+                && style.pointerEvents !== 'none'
+                && rect.width > 0
+                && rect.height > 0;
+        }).catch(() => false);
+        if (!overlayVisibleNow) return false;
+        const dismissBtn = targetPage.locator('#mm-onboarding [data-ob-dismiss]:visible').first();
         if ((await dismissBtn.count()) > 0) {
             await dismissBtn.click();
         } else {
-            await targetPage.locator('#mm-ob-explore-btn').click();
+            await targetPage.locator('#mm-ob-explore-btn:visible').click();
         }
         await targetPage.waitForFunction(() => {
             const overlay = document.getElementById('mm-onboarding');
@@ -179,6 +229,20 @@ async function runShellSmoke(baseUrl) {
             const style = getComputedStyle(overlay);
             return overlay.hidden || style.display === 'none' || style.pointerEvents === 'none';
         });
+        return true;
+    };
+
+    const enterManagedFeatureStage = async (screenId, targetPage = page) => {
+        if (!MANAGED_SCREENS.has(screenId)) return false;
+        const stage = await targetPage.evaluate((id) => document.getElementById(id)?.dataset?.metaFeatureStage || '', screenId);
+        if (stage === 'feature') return false;
+        const cta = targetPage.locator(`#${screenId} [data-feature-enter]:visible`).first();
+        if ((await cta.count()) === 0) {
+            throw new Error(`Missing managed feature CTA on ${screenId}`);
+        }
+        await cta.click();
+        await targetPage.waitForFunction((id) => document.getElementById(id)?.dataset?.metaFeatureStage === 'feature', screenId);
+        await targetPage.waitForTimeout(500);
         return true;
     };
 
@@ -220,6 +284,71 @@ async function runShellSmoke(baseUrl) {
         }
         await closeOverlayWithButton();
         return overlayTitle;
+    };
+
+    const checkManagedScreen = async (screenId, options = {}) => {
+        const { verifyStatsRoute = false, verifyRestart = false } = options;
+        await navigate(screenId);
+        await closeOverlayIfOpen();
+        const welcomeState = await page.evaluate((id) => {
+            const section = document.getElementById(id);
+            const welcomeShell = section?.querySelector('.meta-feature-welcome-shell');
+            const cta = section?.querySelector('[data-feature-enter]');
+            return {
+                stage: section?.dataset?.metaFeatureStage || '',
+                hasWelcomeShell: !!welcomeShell && getComputedStyle(welcomeShell).display !== 'none',
+                ctaDisabled: !!cta?.disabled,
+                welcomeChromeVisible: !!section?.querySelector('[data-meta-feature-chrome="top"] .meta-feature-chrome__bar--welcome')
+            };
+        }, screenId);
+        await assert(welcomeState.stage === 'welcome', `${screenId} welcome stage active`, welcomeState.stage);
+        await assert(welcomeState.hasWelcomeShell, `${screenId} welcome shell visible`);
+        await assert(!welcomeState.ctaDisabled, `${screenId} welcome CTA unlocked`);
+        await assert(welcomeState.welcomeChromeVisible, `${screenId} welcome chrome visible`);
+
+        await page.locator(`#${screenId} [data-feature-modal="settings"]`).first().click();
+        await page.waitForSelector(`#${screenId} [data-feature-modal-box="settings"]:not([hidden])`);
+        await assert((await page.locator(`#${screenId} [data-feature-modal-box="settings"]:not([hidden])`).count()) > 0, `${screenId} settings sheet opens`);
+        await page.locator(`#${screenId} [data-feature-modal-box="settings"] .meta-feature-modal__close`).click();
+        await page.waitForFunction((id) => {
+            const node = document.querySelector(`#${id} [data-feature-modal-box="settings"]`);
+            return !node || node.hidden;
+        }, screenId);
+
+        await enterManagedFeatureStage(screenId);
+        const featureState = await page.evaluate((id) => {
+            const section = document.getElementById(id);
+            return {
+                stage: section?.dataset?.metaFeatureStage || '',
+                statsVisible: !!section?.querySelector('[data-shell-chrome-stats]'),
+                homeVisible: !!section?.querySelector('[data-shell-chrome-home]'),
+                restartVisible: !!section?.querySelector('[data-shell-chrome-restart]')
+            };
+        }, screenId);
+        await assert(featureState.stage === 'feature', `${screenId} feature stage active`, featureState.stage);
+        await assert(featureState.statsVisible, `${screenId} stats shortcut visible`);
+        await assert(featureState.homeVisible, `${screenId} home shortcut visible`);
+        await assert(featureState.restartVisible, `${screenId} restart shortcut visible`);
+
+        if (verifyStatsRoute) {
+            await page.locator(`#${screenId} [data-shell-chrome-stats]`).click();
+            await waitForActiveScreen('home');
+            const statsTitle = ((await page.locator('#meta-home-shell .meta-home-screen__header h2').textContent()) || '').trim();
+            await assert(Boolean(statsTitle), `${screenId} stats route opens home stats`, statsTitle);
+            await page.locator('#meta-home-shell .meta-home-screen__header [data-home-view="home"]').click();
+            await page.waitForSelector('#meta-home-shell .meta-home-shell__hero h2');
+        }
+
+        if (verifyRestart) {
+            await navigate(screenId);
+            await enterManagedFeatureStage(screenId);
+            await page.locator(`#${screenId} [data-shell-chrome-restart]`).click();
+            await page.waitForFunction((id) => document.getElementById(id)?.dataset?.metaFeatureStage === 'welcome', screenId);
+            await assert(
+                (await page.evaluate((id) => document.getElementById(id)?.dataset?.metaFeatureStage || '', screenId)) === 'welcome',
+                `${screenId} restart returns to welcome`
+            );
+        }
     };
 
     const checkComicExperience = async () => {
@@ -339,56 +468,59 @@ async function runShellSmoke(baseUrl) {
     };
 
     try {
+        await seedTestState(page);
         await page.goto(baseUrl, { waitUntil: 'networkidle' });
         await dismissOnboardingIfVisible(page);
 
         await navigate('home');
-        const homeTitle = ((await page.locator('#home .app-shell-title').textContent()) || '').trim();
+        const homeTitle = ((await page.locator('#meta-home-shell .meta-home-shell__hero h2').textContent()) || '').trim();
         await assert(Boolean(homeTitle), 'home shell loaded', homeTitle);
 
-        await page.locator('#home .hhc-hero [data-nav-key="sentenceMap"], #home .home-route-hero [data-nav-key="sentenceMap"]').first().click();
+        await page.locator('#meta-home-shell [data-open-feature="sentence-map"]').first().click();
         await waitForActiveScreen('sentence-map');
         await assert((await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab'))) === 'sentence-map', 'home hero CTA opens sentence map');
 
         await navigate('home');
-        await page.locator('#home .hhc-paths [data-nav-key="practiceQuestion"], #home .home-route-features [data-nav-key="practiceQuestion"], #home .home-route-feature-card [data-nav-key="practiceQuestion"]').first().click();
+        await page.locator('#meta-home-shell [data-open-feature="practice-question"]').first().click();
         await waitForActiveScreen('practice-question');
         await assert((await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab'))) === 'practice-question', 'home feature CTA opens practice-question');
         await navigate('home');
 
-        await clickHeaderButton('home', 0);
-        const menuTitle = await getOverlayTitle();
-        await assert(Boolean(menuTitle), 'home menu overlay', menuTitle);
-        await page.goBack();
-        await page.waitForFunction(() => document.querySelector('.overlay-root')?.classList.contains('hidden'));
-        await assert(!(await overlayVisible()), 'history back closes overlay');
+        await page.locator('#meta-home-shell [data-home-menu]').click();
+        await page.waitForSelector('.meta-home-drawer.is-open');
+        const drawerVersion = ((await page.locator('.meta-home-drawer.is-open .meta-home-drawer__footer strong').textContent()) || '').trim();
+        await assert(Boolean(drawerVersion), 'home drawer opens', drawerVersion);
+        await page.locator('.meta-home-drawer.is-open [data-home-view="help"]').click();
+        const helpTitle = ((await page.locator('#meta-home-shell .meta-home-screen__header h2').textContent()) || '').trim();
+        await assert(Boolean(helpTitle), 'home help view opens', helpTitle);
+        await page.locator('#meta-home-shell .meta-home-screen__header [data-home-view="home"]').click();
+        await page.waitForSelector('#meta-home-shell .meta-home-shell__hero h2');
 
-        await clickHeaderButton('home', 2);
-        const helpTitle = await getOverlayTitle();
-        await assert(Boolean(helpTitle), 'home help overlay', helpTitle);
-        await page.keyboard.press('Escape');
-        await page.waitForFunction(() => document.querySelector('.overlay-root')?.classList.contains('hidden'));
-        const activeText = (await page.evaluate(() => document.activeElement?.textContent || '')).trim();
-        await assert(Boolean(activeText), 'focus return after esc', activeText);
+        await page.locator('#meta-home-shell [data-home-menu]').click();
+        await page.waitForSelector('.meta-home-drawer.is-open');
+        await page.locator('.meta-home-drawer.is-open [data-home-nav="about"]').click();
+        await waitForActiveScreen('about');
+        await assert((await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab'))) === 'about', 'home drawer nav opens about');
+        await navigate('home');
 
-        await clickHeaderButton('home', 1);
-        const aboutTitle = await getOverlayTitle();
-        await assert(Boolean(aboutTitle), 'home about overlay', aboutTitle);
-        await closeOverlayWithButton();
-
-        await checkGenericScreen('practice-question', 1);
-        const radarPanelTitle = await checkGenericScreen('practice-radar', 1);
+        await checkManagedScreen('sentence-map', { verifyStatsRoute: true, verifyRestart: true });
+        await checkManagedScreen('practice-question');
+        await checkManagedScreen('practice-triples-radar');
 
         await navigate('home');
-        const resumeButtonCount = await page.locator('#home .home-shell-resume-btn').count();
+        await navigate('practice-radar');
+        await enterManagedFeatureStage('practice-radar');
+        await page.locator('#practice-radar [data-shell-chrome-home]').click();
+        await waitForActiveScreen('home');
+        const resumeButtonCount = await page.locator('#meta-home-shell [data-home-resume]').count();
         await assert(resumeButtonCount > 0, 'home resume action visible');
-        await page.locator('#home .home-shell-resume-btn').click();
+        await page.locator('#meta-home-shell [data-home-resume]').click();
         await waitForActiveScreen('practice-radar');
-        const resumedOverlayTitle = await getOverlayTitle();
-        await assert(resumedOverlayTitle === radarPanelTitle, 'home resume restores last panel', resumedOverlayTitle);
-        await closeOverlayWithButton();
+        await assert(
+            (await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab') || '')) === 'practice-radar',
+            'home resume restores last managed tab'
+        );
 
-        await checkGenericScreen('practice-triples-radar', 1);
         await checkGenericScreen('practice-wizard', 1);
 
         await navigate('practice-verb-unzip');
@@ -402,7 +534,7 @@ async function runShellSmoke(baseUrl) {
         await navigate('home');
         await closeOverlayIfOpen();
         await assert(
-            (await page.locator('#home a[data-versioned-href="scenario_trainer.html"]').count()) > 0,
+            (await page.locator('#meta-home-shell [data-home-href*="scenario_trainer.html"]').count()) > 0,
             'scenario launcher visible from home'
         );
         const scenarioPage = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
@@ -418,11 +550,13 @@ async function runShellSmoke(baseUrl) {
         await checkGenericScreen('about', 0);
 
         const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true });
+        await seedTestState(mobile);
         await mobile.goto(baseUrl, { waitUntil: 'networkidle' });
         await dismissOnboardingIfVisible(mobile);
         for (const screenId of ['home', 'sentence-map', 'practice-question', 'practice-radar', 'practice-wizard', 'blueprint']) {
             await mobile.evaluate((id) => window.navigateTo(id), screenId);
             await waitForActiveScreen(screenId, mobile);
+            await enterManagedFeatureStage(screenId, mobile);
             await mobile.waitForTimeout(400);
             const mobileCheck = await mobile.evaluate(() => ({
                 innerWidth: window.innerWidth,
@@ -435,6 +569,7 @@ async function runShellSmoke(baseUrl) {
         for (const screenId of ['sentence-map', 'practice-wizard', 'blueprint']) {
             await mobile.evaluate((id) => window.navigateTo(id), screenId);
             await waitForActiveScreen(screenId, mobile);
+            await enterManagedFeatureStage(screenId, mobile);
             await mobile.waitForTimeout(500);
             const stickyCheck = await mobile.evaluate(() => {
                 const sticky = document.getElementById('mobile-sticky-cta');
@@ -451,13 +586,14 @@ async function runShellSmoke(baseUrl) {
         }
         await mobile.evaluate(() => window.navigateTo('home'));
         await waitForActiveScreen('home', mobile);
-        await mobile.locator('#home .app-shell .app-shell-actions button').nth(0).click();
-        await mobile.waitForSelector('.overlay-root:not(.hidden)');
-        const closeBox = await mobile.locator('.overlay-root:not(.hidden) [data-overlay-close]').boundingBox();
+        await mobile.locator('#meta-home-shell [data-home-menu]').click();
+        await mobile.waitForSelector('.meta-home-drawer.is-open');
+        const closeBox = await mobile.locator('.meta-home-drawer.is-open .meta-home-drawer__close').boundingBox();
         await assert(!!closeBox && closeBox.x >= 0 && closeBox.y >= 0 && closeBox.x + closeBox.width <= 390 && closeBox.y + closeBox.height <= 844, 'mobile overlay close reachable', JSON.stringify(closeBox));
         await mobile.close();
 
         const reduced = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+        await seedTestState(reduced);
         await reduced.emulateMedia({ reducedMotion: 'reduce' });
         await reduced.goto(baseUrl, { waitUntil: 'networkidle' });
         await dismissOnboardingIfVisible(reduced);
@@ -465,9 +601,10 @@ async function runShellSmoke(baseUrl) {
         await waitForActiveScreen('home', reduced);
         const prefersReduced = await reduced.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         await assert(prefersReduced, 'reduced motion media applied');
-        await reduced.locator('#home .app-shell .app-shell-actions button').nth(0).click();
-        const reducedTitle = await getOverlayTitle(reduced);
-        await assert(Boolean(reducedTitle), 'reduced motion overlay path', reducedTitle);
+        await reduced.locator('#meta-home-shell [data-home-menu]').click();
+        await reduced.waitForSelector('.meta-home-drawer.is-open');
+        const reducedDrawer = ((await reduced.locator('.meta-home-drawer.is-open .meta-home-drawer__head strong').textContent()) || '').trim();
+        await assert(Boolean(reducedDrawer), 'reduced motion drawer path', reducedDrawer);
         await reduced.close();
 
         console.log(`PASS: shell smoke verified (${checks.length} checks).`);
