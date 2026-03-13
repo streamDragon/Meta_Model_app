@@ -571,12 +571,70 @@ body.shell-feature-active .tab-content.active {
         gap: 8px;
     }
 
+    .meta-feature-chrome__bar--welcome {
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 12px;
+    }
+
+    .meta-feature-chrome__bar--welcome .meta-feature-chrome__title {
+        order: 0;
+        flex: 1 1 auto;
+        flex-basis: auto;
+    }
+
+    .meta-feature-chrome__bar--welcome .meta-feature-chrome__btn {
+        flex: 0 0 auto;
+        min-height: 36px;
+        padding-inline: 12px;
+    }
+
+    .meta-feature-chrome__bar--welcome .meta-feature-chrome__meta--welcome {
+        width: auto;
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+
+    .meta-feature-chrome__bar--welcome .meta-feature-chrome__meta--welcome span {
+        min-height: 26px;
+        padding-inline: 8px;
+        font-size: 0.76rem;
+    }
+
     .meta-feature-shell__actions--welcome {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .meta-feature-chrome__bar--welcome {
         padding-inline: 12px;
+    }
+}
+
+@media (max-height: 700px) {
+    .meta-feature-chrome--top {
+        top: 6px;
+        margin-bottom: 8px;
+    }
+
+    .meta-feature-chrome--bottom {
+        bottom: 4px;
+        margin-top: 8px;
+    }
+
+    .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__frame {
+        gap: 6px;
+        padding-block: 2px 4px;
+    }
+
+    .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__hero {
+        padding: 12px 14px 10px;
+        gap: 6px;
+    }
+
+    .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__example-card,
+    .meta-feature-shell__quote--compact {
+        padding: 10px 12px;
     }
 }
 

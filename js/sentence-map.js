@@ -234,6 +234,7 @@
         function maybeBringSectionIntoView(force = false) {
             const section = document.getElementById('sentence-map');
             if (!section || !section.classList.contains('active')) return;
+            if (section.dataset.metaFeatureStage === 'welcome') return;
             if (typeof global.matchMedia === 'function' && !global.matchMedia('(max-width: 900px)').matches) return;
             if (!force && section.getBoundingClientRect().top <= 32) return;
             try { section.scrollIntoView({ behavior: 'auto', block: 'start', inline: 'nearest' }); }

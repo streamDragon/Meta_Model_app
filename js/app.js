@@ -2625,6 +2625,8 @@ function scrollPageToTop() {
 function scrollToActivatedTabStart(tabName = '') {
     const resolvedTab = normalizeRequestedTab(tabName);
     const section = resolvedTab ? document.getElementById(resolvedTab) : null;
+    const metaWelcomeStage = section && section.classList.contains('is-meta-feature-shell-ready') && section.dataset.metaFeatureStage === 'welcome';
+    if (metaWelcomeStage) return;
     if (section && section.hasAttribute('data-scroll-to-feature-start') && typeof section.scrollIntoView === 'function') {
         try {
             section.scrollIntoView({ behavior: 'auto', block: 'start', inline: 'nearest' });
