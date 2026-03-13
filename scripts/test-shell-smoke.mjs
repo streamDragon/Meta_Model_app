@@ -346,12 +346,12 @@ async function runShellSmoke(baseUrl) {
         const homeTitle = ((await page.locator('#home .app-shell-title').textContent()) || '').trim();
         await assert(Boolean(homeTitle), 'home shell loaded', homeTitle);
 
-        await page.locator('#home .home-route-hero [data-nav-key="sentenceMap"]').click();
+        await page.locator('#home .hhc-hero [data-nav-key="sentenceMap"], #home .home-route-hero [data-nav-key="sentenceMap"]').first().click();
         await waitForActiveScreen('sentence-map');
         await assert((await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab'))) === 'sentence-map', 'home hero CTA opens sentence map');
 
         await navigate('home');
-        await page.locator('#home .home-route-feature-card:nth-of-type(3) .btn').click();
+        await page.locator('#home .hhc-paths [data-nav-key="practiceQuestion"], #home .home-route-features [data-nav-key="practiceQuestion"], #home .home-route-feature-card [data-nav-key="practiceQuestion"]').first().click();
         await waitForActiveScreen('practice-question');
         await assert((await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab'))) === 'practice-question', 'home feature CTA opens practice-question');
         await navigate('home');

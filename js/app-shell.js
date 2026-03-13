@@ -1415,8 +1415,8 @@
 
         try {
             const mobileFeed = section.querySelector('#mobile-feed-home');
-            const hero = section.querySelector('.home-route-hero');
-            const features = section.querySelector('.home-route-features');
+            const hero = section.querySelector('.home-route-hero, .hhc-hero');
+            const features = section.querySelector('.home-route-features, .hhc-paths');
             const primaryCta = section.querySelector('.home-route-primary-cta');
             if (!hero || !features || !primaryCta) return null;
 
