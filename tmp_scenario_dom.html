@@ -1,0 +1,430 @@
+﻿<!DOCTYPE html>
+<html lang="he" dir="rtl" data-freemium-ready="1" data-freemium-test-bypass="1"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>סימולטור סצנות - אימון שיחה חי</title>
+  <link rel="icon" href="data:,">
+  <script src="js/trainer-platform-contracts.js"></script>
+  <script src="js/trainer-standalone.js"></script>
+  <script>
+    window.MetaTrainerStandalone.boot({
+      "trainerId": "scenario-trainer",
+      "manifestKey": "_scenario_trainer",
+      "css": [
+            "css/style.css",
+            "css/scenario-trainer-v2.css",
+            "css/ui-enhancements.css",
+            "css/meta-model-redesign.css"
+      ],
+      "scripts": [
+            "js/scenario-trainer-v2.js"
+      ]
+});
+  </script>
+<style data-trainer-standalone-style="scenario-trainer">
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Assistant", "Heebo", "Noto Sans Hebrew", "Segoe UI", sans-serif;
+  color: #0f172a;
+  background: radial-gradient(circle at 12% 10%, #ccfbf1, transparent 34%), radial-gradient(circle at 88% 18%, #fef3c7, transparent 30%), linear-gradient(165deg, #f0fdfa 0%, #f8fafc 60%, #fff7ed 100%);
+  min-height: 100vh;
+  padding: 12px;
+}
+.mtp-page {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+.mtp-nav {
+  max-width: 1240px;
+  margin: 0 auto 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+.mtp-nav-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.mtp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #99f6e4;
+  background: #ffffff;
+  color: #0f766e;
+  border-radius: 12px;
+  padding: 9px 12px;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
+}
+.mtp-btn:hover {
+  background: rgba(255,255,255,0.92);
+  border-color: #0f766e;
+}
+.mtp-meta {
+  color: #475569;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.mtp-shell {
+  max-width: 920px;
+  margin: 16px auto;
+  border: 1px solid #99f6e4;
+  background: rgba(255,255,255,0.92);
+  border-radius: 18px;
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.07), 0 0 0 1px rgba(15,118,110,0.16);
+  padding: 18px;
+}
+.mtp-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+.mtp-text {
+  margin: 0;
+  color: #475569;
+  line-height: 1.45;
+}
+.mtp-meta-line {
+  margin-top: 8px;
+  color: #0f766e;
+  font-weight: 700;
+  font-size: 0.86rem;
+}
+.mtp-error {
+  border-color: #fecaca;
+  background: #fff1f2;
+  color: #991b1b;
+}
+@media (max-width: 720px) {
+  body { padding: 10px; }
+  .mtp-nav {
+    align-items: stretch;
+  }
+  .mtp-nav,
+  .mtp-nav-group {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .mtp-btn {
+    width: 100%;
+  }
+}
+</style><link rel="stylesheet" href="file:///C:/Users/nlpis/vscode/Meta_Model_app/css/style.css?v=1.0.296&amp;t=1773372167597"><link rel="stylesheet" href="file:///C:/Users/nlpis/vscode/Meta_Model_app/css/scenario-trainer-v2.css?v=1.0.296&amp;t=1773372167597"><link rel="stylesheet" href="file:///C:/Users/nlpis/vscode/Meta_Model_app/css/ui-enhancements.css?v=1.0.296&amp;t=1773372167597"><link rel="stylesheet" href="file:///C:/Users/nlpis/vscode/Meta_Model_app/css/meta-model-redesign.css?v=1.0.296&amp;t=1773372167597"><script src="file:///C:/Users/nlpis/vscode/Meta_Model_app/js/scenario-trainer-v2.js?v=1.0.296&amp;t=1773372167597" defer=""></script><link id="alchemy-global-style" rel="stylesheet" href="file:///C:/Users/nlpis/vscode/Meta_Model_app/css/alchemy-global.css"><script id="alchemy-global-script" src="file:///C:/Users/nlpis/vscode/Meta_Model_app/js/alchemy-global.js"></script><link id="freemium-style" rel="stylesheet" href="file:///C:/Users/nlpis/vscode/Meta_Model_app/css/freemium.css"><script id="meta-runtime-env-script" src="file:///C:/Users/nlpis/vscode/Meta_Model_app/js/runtime-env.js" data-loaded="1"></script><style id="trainer-shell-nav-style">.trainer-shell-nav {
+  position: sticky;
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  z-index: 1000;
+  display: grid;
+  gap: 10px;
+  width: min(1180px, calc(100% - 16px));
+  margin: 8px auto 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(125, 211, 252, 0.28);
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.96), rgba(3, 105, 161, 0.94));
+  box-shadow: 0 14px 34px rgba(12, 18, 44, 0.18), inset 0 1px 0 rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+}
+.trainer-shell-nav__group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.trainer-shell-nav__group--title {
+  justify-content: space-between;
+  min-width: 0;
+}
+.trainer-shell-nav__title-block {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  text-align: end;
+}
+.trainer-shell-nav__brand {
+  color: rgba(224, 242, 254, 0.9);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.trainer-shell-nav__btn {
+  border: 1px solid rgba(255,255,255,0.28);
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  line-height: 1;
+  transition: transform 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+.trainer-shell-nav__btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.16);
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.14);
+}
+.trainer-shell-nav__btn:focus-visible {
+  outline: 2px solid #facc15;
+  outline-offset: 2px;
+}
+.trainer-shell-nav__btn--theory {
+  background: linear-gradient(135deg, rgba(251,191,36,0.24), rgba(34,211,238,0.12));
+  border-color: rgba(251,191,36,0.35);
+  box-shadow: 0 0 0 1px rgba(251,191,36,0.12) inset;
+}
+.trainer-shell-nav__meta {
+  color: #ffffff;
+  font-size: 0.98rem;
+  font-weight: 900;
+  line-height: 1.3;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+.trainer-shell-nav__meta-sub {
+  color: rgba(239, 246, 255, 0.82);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+.trainer-shell-nav__spark {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #facc15;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.9);
+  animation: trainerShellNavPulse 1.9s ease-in-out infinite;
+}
+@keyframes trainerShellNavPulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+@keyframes trainerShellNavFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-1px); }
+}
+body.trainer-shell-help-open { overflow: hidden; }
+body.trainer-shell-modal-open .trainer-shell-nav { pointer-events: none; opacity: 0.58; }
+.trainer-shell-help-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  background: rgba(2, 6, 23, 0.55);
+  backdrop-filter: blur(5px);
+  padding: 16px;
+  display: grid;
+  place-items: center;
+}
+.trainer-shell-help-overlay__dialog {
+  width: min(1100px, 100%);
+  max-height: min(92vh, 960px);
+  overflow: auto;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: linear-gradient(160deg, rgba(255,255,255,0.98), rgba(248,250,252,0.98));
+  box-shadow: 0 24px 60px rgba(2,6,23,0.35);
+  padding: 12px;
+  display: grid;
+  gap: 12px;
+}
+.trainer-shell-help-overlay__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.trainer-shell-help-overlay__kicker {
+  font-size: 0.8rem;
+  color: #1d4ed8;
+  font-weight: 800;
+}
+.trainer-shell-help-overlay__title {
+  margin: 2px 0 0;
+  color: #0f172a;
+  font-size: 1.15rem;
+}
+.trainer-shell-help-overlay__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.trainer-shell-help-overlay__btn {
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #0f172a;
+  min-height: 38px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+.trainer-shell-help-overlay__btn--theory {
+  border-color: rgba(250, 204, 21, 0.48);
+  background: linear-gradient(135deg, #fef3c7, #ecfeff);
+  color: #92400e;
+}
+.trainer-shell-help-overlay__body {
+  display: grid;
+  gap: 10px;
+}
+.trainer-shell-help-overlay__card {
+  border: 1px solid #dbe7f5;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 10px;
+  overflow: auto;
+}
+.trainer-shell-help-overlay__card--empty h3 { margin: 0 0 6px; color: #153b6a; }
+.trainer-shell-help-overlay__card--empty p { margin: 0; color: #475569; line-height: 1.4; }
+.trainer-shell-help-overlay__card--empty p + p { margin-top: 6px; }
+.trainer-shell-help-overlay__card details { margin: 0; }
+.trainer-shell-help-overlay__card summary { cursor: default; }
+@media (max-width: 720px) {
+  .trainer-shell-nav { width: calc(100% - 10px); margin: 6px auto 8px; padding: 8px; }
+  .trainer-shell-nav__group--title { align-items: flex-start; }
+  .trainer-shell-nav__meta { font-size: 0.88rem; }
+  .trainer-shell-nav__meta-sub { font-size: 0.72rem; }
+  .trainer-shell-nav__btn { padding: 8px 10px; }
+  .trainer-shell-help-overlay { padding: 10px; }
+  .trainer-shell-help-overlay__dialog { max-height: 94vh; padding: 10px; }
+  .trainer-shell-help-overlay__actions { width: 100%; }
+  .trainer-shell-help-overlay__btn { flex: 1 1 auto; }
+}</style><script id="meta-freemium-bootstrap" src="file:///C:/Users/nlpis/vscode/Meta_Model_app/js/freemium/bootstrap-entry.js" type="module" defer=""></script></head>
+<body class="alchemy-active alchemy-mobile-ui freemium-test-bypass freemium-ready"><div class="trainer-shell-nav" role="navigation" aria-label="ניווט עמוד standalone"><div class="trainer-shell-nav__group trainer-shell-nav__group--title">  <div class="trainer-shell-nav__title-block">    <div class="trainer-shell-nav__brand">Meta Model</div>    <div class="trainer-shell-nav__meta">סימולטור סצנות - אימון שיחה חי</div>    <div class="trainer-shell-nav__meta-sub">Standalone</div>  </div>  <span class="trainer-shell-nav__spark" aria-hidden="true"></span></div><div class="trainer-shell-nav__group">  <button type="button" class="trainer-shell-nav__btn" data-nav-action="back" title="חזרה לעמוד הקודם">← חזרה</button>  <button type="button" class="trainer-shell-nav__btn" data-nav-action="home" title="חזרה לדף הראשי">דף ראשי</button>  <button type="button" class="trainer-shell-nav__btn trainer-shell-nav__btn--theory" data-nav-action="theory" title="דף התאוריה המרכזי">תיאוריה</button>  <button type="button" class="trainer-shell-nav__btn" data-nav-action="help-overlay" title="עזרה למסך הנוכחי (מסך מלא)">עזרה למסך</button></div></div>
+          <div class="mtp-page">
+            <div class="mtp-nav" aria-label="ניווט עמוד סימולטור סצנות">
+              <div class="mtp-nav-group">
+                <a class="mtp-btn" data-mtp-link="index.html" href="index.html">חזרה לדף הראשי</a>
+              </div>
+              <div id="scenario-trainer-root-meta" class="mtp-meta" aria-live="polite">גרסה 1.0.296 · source 6734242</div>
+            </div>
+            <div id="scenario-trainer-root">
+          <div id="scenario-trainer" class="scenario-platform-root is-locked" dir="rtl" lang="he" style="--scenario-app-height:420px">
+            <div class="scenario-simulator-shell" aria-hidden="true">
+              <header class="scenario-sim-topbar">
+                <h2 class="scenario-sim-title">סימולטור סצינות</h2>
+                
+          <div class="scenario-progress-dots" aria-label="התקדמות בסצנות">
+            <span class="scenario-progress-dot is-active" aria-hidden="true"></span><span class="scenario-progress-dot is-pending" aria-hidden="true"></span><span class="scenario-progress-dot is-pending" aria-hidden="true"></span>
+          </div>
+        
+              </header>
+              
+          <div class="scenario-scene-strip">
+            <span class="scenario-scene-label">סצינה</span>
+            <strong>פשוט תתקין דרייבר</strong>
+          </div>
+        
+              <main class="scenario-chat-area">
+                
+          <div class="scenario-chat-scene">
+            <div class="scenario-avatars-row">
+              
+          <div class="scenario-avatar scenario-avatar-other">
+            <span class="scenario-avatar-emoji" aria-hidden="true">🙂</span>
+            <span class="scenario-avatar-name">חבר טכני</span>
+          </div>
+        
+              
+          <div class="scenario-avatar scenario-avatar-player">
+            <span class="scenario-avatar-emoji" aria-hidden="true">🧭</span>
+            <span class="scenario-avatar-name">בן בית</span>
+          </div>
+        
+            </div>
+            <div class="scenario-chat-stack">
+              
+          <article class="scenario-bubble-row is-other is-pop">
+            <div class="scenario-bubble is-opening">
+              <span class="scenario-bubble-speaker">חבר טכני</span>
+              <p>החבר אומר: "תתקין כבר את הדרייבר או לינוקס מחדש וזה יסתדר."</p>
+            </div>
+          </article>
+        
+              
+              
+              
+            </div>
+            
+          </div>
+        
+              </main>
+              <footer class="scenario-options-dock">
+                
+          <div class="scenario-options-panel">
+            <p class="scenario-options-label">בחרו את התגובה שלכם:</p>
+            <div class="scenario-option-list">
+              
+                    <button type="button" class="scenario-option-btn is-amber" data-scenario-action="pick-option" data-option-id="A">
+                      <span class="scenario-option-tag is-amber">עמום</span>
+                      <span class="scenario-option-text">"יאללה, אני מוריד את הדבר הראשון שאני מוצא ומתקין עכשיו."</span>
+                    </button>
+                  
+                    <button type="button" class="scenario-option-btn is-green" data-scenario-action="pick-option" data-option-id="E">
+                      <span class="scenario-option-tag is-green">מטה-מודל ✓</span>
+                      <span class="scenario-option-text">"לפני התקנה או פרמוט, אני רוצה לסגור תמונת מצב: מה הדגם המדויק, איזו גרסה רצה עכשיו, יש גיבוי, ומה הבדיקה הקטנה והבטוחה הראשונה שאפשר לעשות בלי לשבור כלום?"</span>
+                    </button>
+                  
+                    <button type="button" class="scenario-option-btn is-amber" data-scenario-action="pick-option" data-option-id="B">
+                      <span class="scenario-option-tag is-amber">לוחץ</span>
+                      <span class="scenario-option-text">"נמאס לי, אני פשוט אפרמט ואגמור עם זה."</span>
+                    </button>
+                  
+            </div>
+          </div>
+        
+              </footer>
+            </div>
+            
+          <section class="scenario-entry-overlay" aria-hidden="false">
+            <div class="scenario-entry-panel">
+              <span class="scenario-entry-badge">סימולטור סצינות · מטה מודל</span>
+              <h1 class="scenario-entry-title">לפני שמדברים —<br>מבינים מה קורה</h1>
+              <p class="scenario-entry-subtitle">משפטים נשמעים פשוטים, אבל הם מגיעים ממקומות שונים. כאן מתרגלים לזהות מאיפה הם באים לפני שבוחרים תגובה.</p>
+              <div class="scenario-entry-pillars" aria-label="שלוש שכבות">
+                <article class="scenario-entry-pillar is-blue">
+                  <span class="scenario-entry-pillar-icon" aria-hidden="true">🌍</span>
+                  <strong>חוץ</strong>
+                  <span>מה קרה בפועל</span>
+                </article>
+                <article class="scenario-entry-pillar is-orange">
+                  <span class="scenario-entry-pillar-icon" aria-hidden="true">🧠</span>
+                  <strong>פנים</strong>
+                  <span>הסיפור הפנימי</span>
+                </article>
+                <article class="scenario-entry-pillar is-purple">
+                  <span class="scenario-entry-pillar-icon" aria-hidden="true">🔗</span>
+                  <strong>פונקציה</strong>
+                  <span>מה המשפט עושה</span>
+                </article>
+              </div>
+              <div class="scenario-entry-flow" aria-label="זרימת התרגול">
+                <span>משפט פותח</span>
+                <span class="scenario-entry-arrow" aria-hidden="true">←</span>
+                <span>בוחרים</span>
+                <span class="scenario-entry-arrow" aria-hidden="true">←</span>
+                <span>רואים תוצאה</span>
+              </div>
+              <button type="button" class="scenario-entry-cta" data-scenario-action="dismiss-overlay">
+                אני מוכן — בוא נתחיל
+              </button>
+              <p class="scenario-entry-helper">שלוש סצנות מוכנות לתרגול.</p>
+            </div>
+          </section>
+        
+          </div>
+        </div>
+          </div>
+        <script src="file:///C:/Users/nlpis/vscode/Meta_Model_app/js/trainer-shell-nav.js?v=1.0.296&amp;t=1773372167597" data-trainer-shell-nav="1"></script><div class="alchemy-root" aria-hidden="true"><canvas class="alchemy-particles" width="762" height="484"></canvas><div class="alchemy-burst-layer"></div><div class="alchemy-consent" hidden=""><div class="alchemy-consent__card" role="dialog" aria-modal="true" aria-label="הפעלת צלילים">  <div class="alchemy-consent__title"><span class="alchemy-consent__title-dot" aria-hidden="true"></span><span>להפעיל צלילים עדינים לאימון?</span></div>  <div class="alchemy-consent__text">שכבת רקע שקטה ועוד צלילים קטנים ללחיצות, הצלחה וכמעט. אפשר להשתיק בכל רגע.</div>  <div class="alchemy-consent__actions">    <button type="button" class="alchemy-consent__btn" data-alchemy-consent="no">לא עכשיו</button>    <button type="button" class="alchemy-consent__btn alchemy-consent__btn--primary" data-alchemy-consent="yes">הפעל צלילים</button>  </div></div></div></div><button class="alchemy-mute" type="button" aria-label="צליל כבוי" data-muted="true" aria-pressed="true" style="pointer-events: auto;">🔉?</button><button class="alchemy-companion" type="button" aria-label="עוזר צליל" style="pointer-events: auto;"><span class="alchemy-companion__dismiss" title="Hide companion">×</span><div class="alchemy-companion__label">מצב הצליל מוכן</div><div class="alchemy-companion__face">  <div class="alchemy-companion__eyes"><span></span><span></span></div>  <div class="alchemy-companion__mouth"></div></div><div class="alchemy-companion__hands"></div></button><button class="alchemy-companion-toggle" type="button" aria-label="הצגת עוזר הצליל" hidden="" style="pointer-events: auto;" aria-hidden="true"><span aria-hidden="true">✨</span></button></body></html>
