@@ -6056,7 +6056,7 @@ function buildFeatureTermTooltipHtml(termKeys = []) {
 function setupFeatureOnboardingCards() {
     Object.entries(FEATURE_ONBOARDING_COPY).forEach(([tabId, copy]) => {
         const section = document.getElementById(tabId);
-        if (!section || section.querySelector('[data-feature-onboarding="1"]')) return;
+        if (!section || section.hasAttribute('data-feature-onboarding-opt-out') || section.querySelector('[data-feature-onboarding="1"]')) return;
         const title = APP_STICKY_TAB_TITLE_OVERRIDES[tabId] || String(copy.kicker || tabId).trim();
         const steps = Array.isArray(copy.steps) ? copy.steps : [];
 

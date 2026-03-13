@@ -183,8 +183,10 @@
             return `<section class="sentence-map-case-selector" aria-label="בחירת מקרה"><div class="sentence-map-section-heading"><div><span>${escapeHtml(HEADER_COPY.casesTitle)}</span><strong>${escapeHtml(HEADER_COPY.casesSubtitle)}</strong></div>${renderModeToggle()}</div><div class="sentence-map-case-grid">${cases.map((item) => `<button type="button" class="sentence-map-case-card${item.id === currentCase.id ? ' is-active' : ''}" data-action="select-case" data-case="${escapeHtml(item.id)}" aria-pressed="${item.id === currentCase.id ? 'true' : 'false'}"><span class="sentence-map-case-card__tag">${escapeHtml(item.title)}</span><strong>${escapeHtml(item.sentence)}</strong></button>`).join('')}</div></section>`;
         }
 
-        function renderMethodNote() {
-            return `<section class="sentence-map-method-note" aria-label="${escapeHtml(HEADER_COPY.methodTitle)}"><div class="sentence-map-section-heading"><div><span>${escapeHtml(HEADER_COPY.methodKicker)}</span><strong>${escapeHtml(HEADER_COPY.methodTitle)}</strong></div></div><p>${escapeHtml(HEADER_COPY.methodBody)}</p></section>`;
+        function renderMethodNote(options = {}) {
+            const opts = options && typeof options === 'object' ? options : {};
+            const hiddenAttr = opts.hidden ? ' hidden aria-hidden="true"' : '';
+            return `<section class="sentence-map-method-note" aria-label="${escapeHtml(HEADER_COPY.methodTitle)}"${hiddenAttr}><div class="sentence-map-section-heading"><div><span>${escapeHtml(HEADER_COPY.methodKicker)}</span><strong>${escapeHtml(HEADER_COPY.methodTitle)}</strong></div></div><p>${escapeHtml(HEADER_COPY.methodBody)}</p></section>`;
         }
 
         function renderLayerExplorerCard(layerId, caseData, caseUi) {
@@ -235,9 +237,9 @@
             const isIntro = caseUi.stepIndex === 0;
             root.className = `sentence-map-root sentence-map-root--${escapeHtml(state.mode)}${isIntro ? ' is-intro' : ' is-exercise'}`;
             if (isIntro) {
-                root.innerHTML = `<div class="sentence-map-shell">${renderHeader(caseUi)}${renderCaseSelector()}${renderCurrentStep(caseData, caseUi)}</div>`;
+                root.innerHTML = `<div class="sentence-map-shell">${renderHeader(caseUi)}${renderStepper(caseUi)}${renderCaseSelector()}${renderMethodNote({ hidden: true })}${renderCurrentStep(caseData, caseUi)}</div>`;
             } else {
-                root.innerHTML = `<div class="sentence-map-shell">${renderExerciseHeader()}${renderStepper(caseUi)}${renderCurrentStep(caseData, caseUi)}${caseUi.stepIndex === STEP_ORDER.length - 1 ? renderMethodNote() : ''}${renderFooter(caseUi)}</div>`;
+                root.innerHTML = `<div class="sentence-map-shell">${renderExerciseHeader()}${renderStepper(caseUi)}${renderMethodNote({ hidden: true })}${renderCurrentStep(caseData, caseUi)}${renderFooter(caseUi)}</div>`;
             }
             persistState();
             if (typeof global.requestAnimationFrame === 'function') global.requestAnimationFrame(() => maybeBringSectionIntoView(opts.forceFocus === true));
