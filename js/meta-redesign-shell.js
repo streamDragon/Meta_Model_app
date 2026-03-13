@@ -3,10 +3,12 @@
     window.__metaRedesignShellAttached = true;
 
     var HOME_SHELL_ID = 'meta-home-shell';
+    var SHELL_ROOT_ID = 'meta-shell-root';
     var FEATURE_STATE_KEY = 'meta_feature_shell_v3';
     var HOME_VIEW_KEY = 'meta_home_shell_ui_v2';
     var PREFS_KEY = 'meta_shell_preferences_v1';
     var MANAGED_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar'];
+    var FEATURE_CHROME_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'about'];
     var HOME_VIEWS = ['home', 'stats', 'theory', 'settings', 'help'];
     var CTA_LABELS = ['יאללה, בואו נתחיל', 'אני מוכן — קדימה', 'בואו נצלול פנימה'];
     var QUESTION_PROMPTS = [
@@ -138,6 +140,41 @@
     function savePrefs() { try { window.localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (_error) {} }
     function applyPrefs() { document.documentElement.setAttribute('data-meta-reduce-motion', prefs.reduceMotion ? '1' : '0'); }
     function getTabState(tab) { return featureState[normalizeTab(tab)] || defaultFeatureState()[normalizeTab(tab)]; }
+    function setOnboardingFlags() {
+        var flags = {
+            onboarding_complete: 'true',
+            mm_onboarding_done: 'true',
+            mm_onboarding_dismissed_v1: '1'
+        };
+        Object.keys(flags).forEach(function (key) {
+            try { window.localStorage.setItem(key, flags[key]); } catch (_error) {}
+        });
+    }
+    function getAppContainer() { return document.querySelector('.container') || document.body; }
+    function getShellRoot() {
+        var mount = document.getElementById(SHELL_ROOT_ID);
+        var container;
+        if (mount) return mount;
+        container = getAppContainer();
+        if (!container) return null;
+        mount = document.createElement('section');
+        mount.id = SHELL_ROOT_ID;
+        mount.className = 'meta-shell-root';
+        if (container.firstChild) container.insertBefore(mount, container.firstChild);
+        else container.appendChild(mount);
+        return mount;
+    }
+    function isShellHomeView() { return currentTabName() === 'home'; }
+    function updateBodyState(tabName) {
+        var safeTab = normalizeTab(tabName) || 'home';
+        var body = document.body;
+        if (!body) return;
+        body.classList.add('meta-shell-mode');
+        body.classList.toggle('shell-home-active', safeTab === 'home');
+        body.classList.toggle('shell-feature-active', safeTab !== 'home');
+        body.classList.toggle('shell-managed-feature-active', safeTab !== 'home' && isManaged(safeTab));
+        body.setAttribute('data-shell-active-tab', safeTab);
+    }
 
     function coachApi() {
         return {
@@ -203,6 +240,53 @@
             '<div class="meta-home-feature-card__meta"><span>⭐ ' + progress.stars + ' / ' + meta.progressTotal + '</span><span>' + (locked ? ('נפתח ברמה ' + meta.unlockLevel) : (progress.pct + '%')) + '</span></div>',
             '<button type="button" class="btn ' + (locked ? 'btn-secondary' : 'btn-primary') + ' meta-home-feature-card__cta" data-open-feature="' + escapeHtml(meta.tab) + '"' + (locked ? ' disabled' : '') + '>' + escapeHtml(cta) + '</button>',
             '</article>'
+        ].join('');
+    }
+    function withAssetVersion(path) {
+        return typeof window.__withAssetVersion === 'function' ? window.__withAssetVersion(path) : path;
+    }
+    function navTitle(tab) {
+        if (typeof window.getTabTitleForHome === 'function') return window.getTabTitleForHome(tab);
+        return getMeta(tab) ? getMeta(tab).title : tab;
+    }
+    function bonusCard(config, index) {
+        var href = config.href ? ' data-home-href="' + escapeHtml(withAssetVersion(config.href)) + '"' : '';
+        var tab = config.tab ? ' data-home-nav="' + escapeHtml(config.tab) + '"' : '';
+        return [
+            '<article class="meta-home-bonus-card" style="--meta-feature-accent:' + escapeHtml(config.color) + ';animation-delay:' + (index * 80) + 'ms;">',
+            '<div class="meta-home-bonus-card__head"><span class="meta-home-bonus-card__badge">' + escapeHtml(config.badge) + '</span><span class="meta-home-bonus-card__icon">' + escapeHtml(config.icon) + '</span></div>',
+            '<h3>' + escapeHtml(config.title) + '</h3>',
+            '<p>' + escapeHtml(config.copy) + '</p>',
+            '<button type="button" class="btn btn-secondary meta-home-bonus-card__cta"' + tab + href + '>' + escapeHtml(config.cta) + '</button>',
+            '</article>'
+        ].join('');
+    }
+    function homeBonusSection() {
+        var cards = [
+            {
+                icon: '🎭',
+                badge: 'בונוס',
+                title: 'סימולטור סצנות',
+                copy: 'כשרוצים לתרגם את הזיהוי לתגובה חיה בתוך שיחה אמיתית.',
+                cta: 'פתחו סצנה',
+                href: 'scenario_trainer.html',
+                color: '#b45309'
+            },
+            {
+                icon: '🔬',
+                badge: 'בונוס',
+                title: navTitle('prismlab'),
+                copy: 'שכבת חקירה עמוקה למי שרוצה להאט, לפרק, ולעבוד עם רמות.',
+                cta: 'פתחו מעבדה',
+                tab: 'prismlab',
+                color: '#2563eb'
+            }
+        ];
+        return [
+            '<section class="meta-home-shell__bonus">',
+            '<div class="meta-home-shell__section-head"><span>המשך והעמקה</span><strong>שני שערים נוספים כשצריך סימולציה חיה או חקירה עמוקה.</strong></div>',
+            '<div class="meta-home-shell__bonus-grid">' + cards.map(function (card, index) { return bonusCard(card, index); }).join('') + '</div>',
+            '</section>'
         ].join('');
     }
     function homeHero(summary) {
@@ -289,14 +373,19 @@
         ].join('');
     }
     function drawerHtml() {
-        var items = [
+        var viewItems = [
             { icon: '🏠', label: 'דף הבית', view: 'home' },
             { icon: '📊', label: 'הסטטיסטיקות שלי', view: 'stats' },
-            { icon: '📚', label: 'רקע תיאורטי', view: 'theory' },
             { icon: '⚙️', label: 'הגדרות כלליות', view: 'settings' },
             { icon: '❓', label: 'עזרה', view: 'help' }
         ];
-        return '<div class="meta-home-drawer' + (drawerOpen ? ' is-open' : '') + '"><button type="button" class="meta-home-drawer__backdrop" data-home-drawer-close></button><aside class="meta-home-drawer__panel"><div class="meta-home-drawer__head"><strong>תפריט</strong><button type="button" class="meta-home-drawer__close" data-home-drawer-close>×</button></div>' + items.map(function (item) { return '<button type="button" class="meta-home-drawer__item" data-home-view="' + item.view + '"><span>' + item.icon + '</span><strong>' + escapeHtml(item.label) + '</strong></button>'; }).join('') + '</aside></div>';
+        var navItems = [
+            { icon: '🧠', label: navTitle('about'), tab: 'about' },
+            { icon: '📚', label: navTitle('categories'), tab: 'categories' },
+            { icon: '🧰', label: navTitle('practice-verb-unzip'), tab: 'practice-verb-unzip' }
+        ];
+        var version = String(document.documentElement.getAttribute('data-app-version') || '').trim() || 'dev';
+        return '<div class="meta-home-drawer' + (drawerOpen ? ' is-open' : '') + '"><button type="button" class="meta-home-drawer__backdrop" data-home-drawer-close></button><aside class="meta-home-drawer__panel"><div class="meta-home-drawer__head"><strong>תפריט</strong><button type="button" class="meta-home-drawer__close" data-home-drawer-close>×</button></div><div class="meta-home-drawer__group">' + viewItems.map(function (item) { return '<button type="button" class="meta-home-drawer__item" data-home-view="' + item.view + '"><span>' + item.icon + '</span><strong>' + escapeHtml(item.label) + '</strong></button>'; }).join('') + '</div><div class="meta-home-drawer__group meta-home-drawer__group--links">' + navItems.map(function (item) { return '<button type="button" class="meta-home-drawer__item" data-home-nav="' + escapeHtml(item.tab) + '"><span>' + item.icon + '</span><strong>' + escapeHtml(item.label) + '</strong></button>'; }).join('') + '</div><div class="meta-home-drawer__footer"><span>גרסה</span><strong>' + escapeHtml(version) + '</strong></div></aside></div>';
     }
     function homeViewHtml() {
         var summary = readGamification();
@@ -307,8 +396,10 @@
         return [
             '<div class="meta-home-shell__frame">',
             '<header class="meta-home-shell__topbar"><button type="button" class="meta-home-shell__menu btn btn-secondary" data-home-menu>☰ תפריט</button><div class="meta-home-shell__brand"><span class="meta-home-shell__eyebrow">מטען עבודה</span><strong>Meta Model בעברית</strong></div></header>',
-            homeHero(summary), homeStats(summary), homeResume(),
+            homeHero(summary), homeStats(summary),
             '<section class="meta-home-shell__cards">' + Object.keys(FEATURE_META).map(function (tab, index) { return homeCard(FEATURE_META[tab], index); }).join('') + '</section>',
+            '<div class="meta-home-shell__divider" aria-hidden="true"></div>',
+            homeBonusSection(),
             '</div>'
         ].join('');
     }
@@ -374,6 +465,14 @@
         saveHomeUi();
         renderHome(homeUi.view === 'home' ? 'back' : 'forward');
     }
+    function navigateExternalFromHome(href) {
+        var nextHref = String(href || '').trim();
+        if (!nextHref) return;
+        drawerOpen = false;
+        homeUi.view = 'home';
+        saveHomeUi();
+        window.location.href = nextHref;
+    }
     function navigateFromHome(targetTab) {
         var root = document.getElementById(HOME_SHELL_ID);
         setPendingNav(targetTab, 'forward');
@@ -414,6 +513,10 @@
         root.onclick = function (event) {
             var openFeature = event.target.closest('[data-open-feature]');
             if (openFeature) { navigateFromHome(openFeature.getAttribute('data-open-feature') || ''); return; }
+            var openNav = event.target.closest('[data-home-nav]');
+            if (openNav) { navigateFromHome(openNav.getAttribute('data-home-nav') || ''); return; }
+            var openHref = event.target.closest('[data-home-href]');
+            if (openHref) { navigateExternalFromHome(openHref.getAttribute('data-home-href') || ''); return; }
             if (event.target.closest('[data-home-menu]')) { drawerOpen = true; renderHome('forward'); return; }
             if (event.target.closest('[data-home-drawer-close]')) { drawerOpen = false; renderHome('back'); return; }
             var viewBtn = event.target.closest('[data-home-view]');
@@ -433,14 +536,109 @@
         };
     }
     function renderHome(direction) {
-        var home = document.getElementById('home');
-        if (!home) return;
+        var mount = getShellRoot();
+        if (!mount) return;
         var root = document.getElementById(HOME_SHELL_ID);
-        if (!root) { root = document.createElement('section'); root.id = HOME_SHELL_ID; root.className = 'meta-home-shell'; home.insertBefore(root, home.firstChild); }
+        if (!root) {
+            root = document.createElement('section');
+            root.id = HOME_SHELL_ID;
+            root.className = 'meta-home-shell';
+            mount.appendChild(root);
+        } else if (root.parentNode !== mount) {
+            mount.appendChild(root);
+        }
         root.innerHTML = '<div class="meta-home-shell__surface" data-home-surface>' + homeViewHtml() + '</div>' + drawerHtml();
         root.setAttribute('data-view', homeUi.view);
         bindHome(root);
         applyEntry(root.querySelector('[data-home-surface]') || root, direction || 'forward');
+    }
+    function featureChromeHtml(tabName) {
+        var safeTab = normalizeTab(tabName);
+        var summary = readGamification();
+        var title = navTitle(safeTab);
+        return {
+            top: [
+                '<div class="meta-feature-chrome__bar meta-feature-chrome__bar--top">',
+                '<button type="button" class="btn btn-secondary meta-feature-chrome__btn" data-shell-chrome-back="' + escapeHtml(safeTab) + '">↩ חזרה</button>',
+                '<div class="meta-feature-chrome__title"><span class="meta-feature-chrome__kicker">מסלול פעיל</span><strong>' + escapeHtml(title) + '</strong></div>',
+                '<button type="button" class="btn btn-secondary meta-feature-chrome__btn" data-shell-chrome-stats="' + escapeHtml(safeTab) + '">📊 סטטיסטיקות</button>',
+                '</div>'
+            ].join(''),
+            bottom: [
+                '<div class="meta-feature-chrome__bar meta-feature-chrome__bar--bottom">',
+                '<div class="meta-feature-chrome__meta"><span>🔥 ' + escapeHtml(summary.streak) + '</span><span>⭐ ' + escapeHtml(summary.totalStars) + '</span><span>רמה ' + escapeHtml(summary.level) + '</span></div>',
+                '<div class="meta-feature-chrome__actions"><button type="button" class="btn btn-secondary meta-feature-chrome__btn" data-shell-chrome-home="' + escapeHtml(safeTab) + '">⌂ בית</button><button type="button" class="btn btn-primary meta-feature-chrome__btn" data-shell-chrome-restart="' + escapeHtml(safeTab) + '">↺ התחלה מחדש</button></div>',
+                '</div>'
+            ].join('')
+        };
+    }
+    function restartTab(tabName) {
+        var safeTab = normalizeTab(tabName);
+        if (!safeTab) return;
+        if (isManaged(safeTab)) {
+            getTabState(safeTab).stage = 'welcome';
+            saveFeatureState();
+            renderFeature(safeTab, 'back');
+            if (typeof window.scrollTo === 'function') window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+        if (typeof window.navigateTo === 'function') {
+            window.navigateTo(safeTab, { playSound: false, scrollToTop: true, updateHistory: false, trackStepBack: false });
+        }
+    }
+    function goHome(view) {
+        homeUi.view = HOME_VIEWS.indexOf(view) !== -1 ? view : 'home';
+        drawerOpen = false;
+        saveHomeUi();
+        setPendingNav('home', 'back');
+        if (typeof window.navigateTo === 'function') window.navigateTo('home', { playSound: true, scrollToTop: true, trackStepBack: false });
+    }
+    function bindFeatureChrome(section, tabName) {
+        if (!section || section.__metaFeatureChromeBound) return;
+        section.__metaFeatureChromeBound = true;
+        section.addEventListener('click', function (event) {
+            var backBtn = event.target.closest('[data-shell-chrome-back]');
+            if (backBtn) {
+                if (typeof window.navigateFeatureStepBack === 'function' && window.navigateFeatureStepBack()) return;
+                goHome('home');
+                return;
+            }
+            if (event.target.closest('[data-shell-chrome-home]')) { goHome('home'); return; }
+            if (event.target.closest('[data-shell-chrome-stats]')) { goHome('stats'); return; }
+            if (event.target.closest('[data-shell-chrome-restart]')) { restartTab(tabName); }
+        });
+    }
+    function renderFeatureChrome(tabName) {
+        var safeTab = normalizeTab(tabName);
+        var section, chrome, html, top, bottom;
+        if (!safeTab || FEATURE_CHROME_TABS.indexOf(safeTab) === -1) return;
+        section = document.getElementById(safeTab);
+        if (!section) return;
+        html = featureChromeHtml(safeTab);
+        top = section.querySelector('[data-meta-feature-chrome="top"]');
+        bottom = section.querySelector('[data-meta-feature-chrome="bottom"]');
+        if (!top) {
+            top = document.createElement('div');
+            top.className = 'meta-feature-chrome meta-feature-chrome--top';
+            top.setAttribute('data-meta-feature-chrome', 'top');
+            section.insertBefore(top, section.firstChild);
+        }
+        if (!bottom) {
+            bottom = document.createElement('div');
+            bottom.className = 'meta-feature-chrome meta-feature-chrome--bottom';
+            bottom.setAttribute('data-meta-feature-chrome', 'bottom');
+            section.appendChild(bottom);
+        }
+        top.innerHTML = html.top;
+        bottom.innerHTML = html.bottom;
+        section.classList.add('is-meta-shell-chrome-ready');
+        bindFeatureChrome(section, safeTab);
+    }
+    function renderFeatureChromes() {
+        FEATURE_CHROME_TABS.forEach(function (tab) { renderFeatureChrome(tab); });
+    }
+    function syncActiveShellState() {
+        updateBodyState(currentTabName());
     }
     function bindFeatureShell(shell, meta) {
         if (!shell) return;
@@ -490,7 +688,13 @@
         applyFeatureStage(meta.tab, direction || 'forward');
     }
     function renderAllFeatures(direction) { MANAGED_TABS.forEach(function (tab) { renderFeature(tab, direction); }); }
-    function syncShells(direction) { renderHome(direction || 'forward'); renderAllFeatures(direction || 'forward'); refreshPracticeCopy(); }
+    function syncShells(direction) {
+        renderHome(direction || 'forward');
+        renderAllFeatures(direction || 'forward');
+        renderFeatureChromes();
+        syncActiveShellState();
+        refreshPracticeCopy();
+    }
     function spawnStars(anchor) {
         if (!anchor || typeof anchor.getBoundingClientRect !== 'function') return;
         var rect = anchor.getBoundingClientRect();
@@ -576,6 +780,8 @@
             if (next === 'home') renderHome(takePendingDirection('home') || (isManaged(prev) ? 'back' : 'forward'));
             else if (isManaged(next)) renderFeature(next, takePendingDirection(next) || 'forward');
             else renderHome('forward');
+            renderFeatureChrome(next);
+            syncActiveShellState();
             refreshPracticeCopy();
         });
         activeTabObserver.observe(document.body, { attributes: true, attributeFilter: ['data-active-tab'] });
@@ -599,6 +805,6 @@
         document.addEventListener('visibilitychange', function () { if (document.hidden) return; featureState = loadFeatureState(); homeUi = loadHomeUi(); prefs = loadPrefs(); applyPrefs(); syncShells('forward'); });
         window.addEventListener('focus', function () { featureState = loadFeatureState(); homeUi = loadHomeUi(); prefs = loadPrefs(); applyPrefs(); syncShells('forward'); });
     }
-    function boot() { applyPrefs(); bindRealtime(); syncShells('forward'); }
+    function boot() { setOnboardingFlags(); applyPrefs(); bindRealtime(); syncShells('forward'); }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true }); else window.setTimeout(boot, 0);
 }(window, document));
