@@ -10910,6 +10910,14 @@ a:hover {
     align-items: start;
 }
 
+@media (min-width: 841px) {
+    .scenario-platform-support {
+        inline-size: min(100%, 520px);
+        justify-self: end;
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 .scenario-support-card {
     padding: 16px;
     display: grid;
