@@ -2610,6 +2610,23 @@ function scrollPageToTop() {
     window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
+function scrollToActivatedTabStart(tabName = '') {
+    const resolvedTab = normalizeRequestedTab(tabName);
+    const section = resolvedTab ? document.getElementById(resolvedTab) : null;
+    if (section && section.hasAttribute('data-scroll-to-feature-start') && typeof section.scrollIntoView === 'function') {
+        try {
+            section.scrollIntoView({ behavior: 'auto', block: 'start', inline: 'nearest' });
+            return;
+        } catch (_error) {
+            try {
+                section.scrollIntoView();
+                return;
+            } catch (_ignored) {}
+        }
+    }
+    scrollPageToTop();
+}
+
 function syncHistoryRouteForTab(tabName = '', { replace = false } = {}) {
     const resolvedTab = normalizeRequestedTab(tabName) || 'home';
     const targetPath = `${buildRoutePathForTab(resolvedTab)}${getRouteSearchWithoutLegacyTab()}`;
@@ -3649,7 +3666,12 @@ function resolveMobileAccordionTitle(source) {
 function isEligibleMobileAccordionSource(source) {
     if (!source || !(source instanceof Element)) return false;
     if (source.closest('.mobile-accordion') || source.classList.contains('mobile-accordion-source')) return false;
+    if (source.closest('[data-mobile-accordion-opt-out="true"]')) return false;
     if (source.matches('.hidden, [hidden], [aria-hidden="true"]')) return false;
+    if (typeof window.getComputedStyle === 'function') {
+        const computed = window.getComputedStyle(source);
+        if (computed.display === 'none' || computed.visibility === 'hidden') return false;
+    }
     if (source.querySelector('input, select, textarea, button, iframe, canvas, video')) return false;
     const text = normalizeUiText(source.textContent || '');
     return text.length >= 55;
@@ -5765,7 +5787,7 @@ function activateTabByName(tabName = '', { playSound = false, scrollToTop = true
     scheduleRuntimeRecoveryCheck(resolvedTab);
 
     if (scrollToTop) {
-        scrollPageToTop();
+        scrollToActivatedTabStart(resolvedTab);
     }
 
     if (playSound) playUISound('next');
@@ -17169,7 +17191,7 @@ function navigateTo(tabName, options = {}) {
             syncHistoryRouteForTab(resolvedTab, { replace: replaceHistory });
         }
         refreshFeatureBackControls(resolvedTab);
-        if (scrollToTop) scrollPageToTop();
+        if (scrollToTop) scrollToActivatedTabStart(resolvedTab);
         return;
     }
 
@@ -17207,7 +17229,7 @@ function navigateTo(tabName, options = {}) {
     if (updateHistory) {
         syncHistoryRouteForTab(resolvedTab, { replace: replaceHistory });
     }
-    if (scrollToTop) scrollPageToTop();
+    if (scrollToTop) scrollToActivatedTabStart(resolvedTab);
 }
 
 // ==================== PROGRESS TRACKING & GAMIFICATION ====================

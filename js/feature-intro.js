@@ -182,6 +182,11 @@
         // Always add B&G coin button
         addCoinBtn(id, introCard);
 
+        if (section.hasAttribute('data-feature-intro-opt-out')) {
+            introCard.setAttribute('data-intro-seen', '1');
+            return;
+        }
+
         if (seen[id]) {
             introCard.setAttribute('data-intro-seen', '1');
             return;
