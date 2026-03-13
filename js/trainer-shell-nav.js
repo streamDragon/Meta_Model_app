@@ -257,15 +257,32 @@
         document.head.appendChild(style);
     }
 
+    function isVisibleDialog(el) {
+        if (!el) return false;
+        if (el.hidden) return false;
+        if (el.getAttribute('aria-hidden') === 'true') return false;
+        // Check ancestors for aria-hidden or display:none
+        var node = el.parentElement;
+        while (node && node !== document.body) {
+            if (node.getAttribute('aria-hidden') === 'true') return false;
+            node = node.parentElement;
+        }
+        try {
+            var st = window.getComputedStyle(el);
+            if (st.display === 'none' || st.visibility === 'hidden' || parseFloat(st.opacity) < 0.01) return false;
+        } catch (e) {}
+        return true;
+    }
+
     function syncNavModalState() {
         if (!document.body) return;
-        var hasBlockingDialog = !!document.querySelector(
-            '.trs-overlay,' +
-            '.cc-layer[role="dialog"],' +
-            '.it-onboarding-layer,' +
-            '.trainer-shell-help-overlay,' +
-            '[role="dialog"][aria-modal="true"]:not([hidden])'
-        );
+        // Check for help overlay first (always blocking when open)
+        var helpOpen = !!document.querySelector('.trainer-shell-help-overlay');
+        // Check for cc-layer dialogs (classic-classic) - only when actually visible
+        var ccOpen = Array.from(document.querySelectorAll('.cc-layer[role="dialog"],.trs-overlay,.it-onboarding-layer')).some(isVisibleDialog);
+        // Check generic dialogs — must be visible, not just in DOM
+        var genericOpen = Array.from(document.querySelectorAll('[role="dialog"][aria-modal="true"]:not([hidden])')).some(isVisibleDialog);
+        var hasBlockingDialog = helpOpen || ccOpen || genericOpen;
         document.body.classList.toggle('trainer-shell-modal-open', hasBlockingDialog);
     }
 
