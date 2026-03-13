@@ -3789,6 +3789,7 @@ function resolveStickyPrimaryButton(section) {
         '[data-mobile-primary-action]',
         'button.btn.btn-primary',
         'button.btn-primary',
+        '[data-shell-header-actions] button',
         'button[data-tr-action="next"]',
         'button[id*="start"]',
         'button[id*="next"]'
