@@ -1,4 +1,5 @@
-/* Standalone Scenario Trainer styles — with strong visual hierarchy.
+/* PATCH TEST
+   Standalone Scenario Trainer styles — with strong visual hierarchy.
    Shared app tokens live in css/style.css; this file owns active dialogue
    surfaces and scenario-specific visual differentiation. */
 
