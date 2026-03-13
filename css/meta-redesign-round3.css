@@ -566,6 +566,52 @@ body.shell-feature-active .tab-content.active {
     padding: 14px 0;
 }
 
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-container {
+    padding: 0 !important;
+}
+
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .app-shell,
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .lab-container,
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .lab-container-workspace {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .app-shell-header,
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .app-shell-actions,
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .lab-container-actions,
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .lab-container-bottom,
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .feature-home-back-bar,
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .feature-onboarding-card,
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .mobile-accordion {
+    display: none !important;
+}
+
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-intro-card {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-intro-card > h2,
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-intro-card > .subtitle {
+    display: none !important;
+}
+
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-card,
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .rapid-pattern-card,
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .triples-radar-card {
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
 @media (max-width: 720px) {
     .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__frame {
         gap: 8px;

@@ -510,12 +510,17 @@
         if (!section) return;
         var shell = section.querySelector('.meta-feature-welcome-shell');
         var liveNodes = Array.prototype.slice.call(section.children || []).filter(function (node) { return node !== shell; });
-        if (!shell || !liveNodes.length) { section.dataset.metaFeatureStage = 'feature'; return; }
+        if (!shell || !liveNodes.length) {
+            section.dataset.metaFeatureStage = 'feature';
+            renderFeatureChrome(normalizeTab(tabName));
+            return;
+        }
         var clone = shell.cloneNode(true);
         clone.classList.add('meta-feature-stage-clone');
         section.appendChild(clone);
         clone.classList.add('meta-screen-out-forward');
         section.dataset.metaFeatureStage = 'feature';
+        renderFeatureChrome(normalizeTab(tabName));
         liveNodes.forEach(function (node) { node.classList.add('meta-screen-enter-forward', 'meta-screen-scale-in'); });
         window.setTimeout(function () {
             if (clone.parentNode) clone.parentNode.removeChild(clone);
