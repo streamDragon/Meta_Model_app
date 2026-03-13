@@ -23002,6 +23002,7 @@ body.mobile-sticky-cta-visible {
 .sentence-map-header,
 .sentence-map-stepper-block,
 .sentence-map-case-selector,
+.sentence-map-method-note,
 .sentence-map-stage-card,
 .sentence-map-footer {
     animation: sentence-map-rise 0.4s ease both;
@@ -23010,6 +23011,7 @@ body.mobile-sticky-cta-visible {
 .sentence-map-header,
 .sentence-map-stepper-block,
 .sentence-map-case-selector,
+.sentence-map-method-note,
 .sentence-map-stage-card {
     display: grid;
     gap: 10px;
@@ -23188,6 +23190,7 @@ body.mobile-sticky-cta-visible {
 .sentence-map-feedback-card,
 .sentence-map-inline-note,
 .sentence-map-paragraph-card,
+.sentence-map-method-note,
 .sentence-map-summary-card {
     padding: 14px 16px;
 }
@@ -23390,6 +23393,18 @@ button.sentence-map-stepper__item {
     padding: 12px;
     display: grid;
     gap: 10px;
+    height: auto;
+}
+
+.sentence-map-layer-card--outside,
+.sentence-map-layer-card--inside,
+.sentence-map-layer-card--relational {
+    grid-area: auto;
+}
+
+.sentence-map-method-note {
+    border-color: rgba(74, 222, 128, 0.18);
+    background: linear-gradient(160deg, rgba(21, 128, 61, 0.12), rgba(15, 23, 42, 0.82));
 }
 
 .sentence-map-layer-card__toggle {

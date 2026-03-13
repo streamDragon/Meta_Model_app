@@ -18,7 +18,7 @@
     const HEADER_COPY = Object.freeze({
         title: 'מפת המשפט',
         leadTitle: 'לפני שמאתגרים — ממפים',
-        concept: 'כאן לא מתקנים מיד את המשפט. קודם רואים מה קרה בחוץ, מה הופעל בפנים, ומה המשפט מנסה לעשות בתוך השיחה. כשהמפה ברורה, יותר קל לבחור תגובה מדויקת.',
+        concept: 'כאן לא מתקנים מיד את המשפט. קודם ממפים מה קרה בחוץ, מה הופעל בפנים, ומה המשפט מנסה לעשות בתוך השיחה כדי לבחור תגובה מדויקת.',
         layersTitle: 'שלוש שכבות',
         howToTitle: 'איך עובדים כאן',
         howToSteps: Object.freeze([
@@ -30,6 +30,9 @@
         stepperTitle: 'שלבי התרגיל',
         casesTitle: 'מקרי תרגול',
         casesSubtitle: 'שלושה מקרים קבועים, אותה שיטת מיפוי.',
+        methodKicker: 'למה זה עובד',
+        methodTitle: 'למה ממפים לפני שמאתגרים',
+        methodBody: 'כשמגיבים ישר למשפט, קל לפספס איפה באמת צריך מענה. המיפוי שומר חוץ, פנים ופונקציה מול העיניים לפני שבוחרים שאלה או ניסוח.',
         focusPrompt: 'לאחר שפתחת את השכבות — איפה לדעתך יושב הלב של המקרה?',
         summaryButton: 'נסה מקרה נוסף →',
         empty: 'מפת המשפט לא זמינה כרגע. נסו לרענן את המסך.'
@@ -174,6 +177,10 @@
             return `<section class="sentence-map-case-selector" aria-label="בחירת מקרה"><div class="sentence-map-section-heading"><div><span>${escapeHtml(HEADER_COPY.casesTitle)}</span><strong>${escapeHtml(HEADER_COPY.casesSubtitle)}</strong></div>${renderModeToggle()}</div><div class="sentence-map-case-grid">${cases.map((item) => `<button type="button" class="sentence-map-case-card${item.id === currentCase.id ? ' is-active' : ''}" data-action="select-case" data-case="${escapeHtml(item.id)}" aria-pressed="${item.id === currentCase.id ? 'true' : 'false'}"><span class="sentence-map-case-card__tag">${escapeHtml(item.title)}</span><strong>${escapeHtml(item.sentence)}</strong></button>`).join('')}</div></section>`;
         }
 
+        function renderMethodNote() {
+            return `<section class="sentence-map-method-note" aria-label="${escapeHtml(HEADER_COPY.methodTitle)}"><div class="sentence-map-section-heading"><div><span>${escapeHtml(HEADER_COPY.methodKicker)}</span><strong>${escapeHtml(HEADER_COPY.methodTitle)}</strong></div></div><p>${escapeHtml(HEADER_COPY.methodBody)}</p></section>`;
+        }
+
         function renderLayerExplorerCard(layerId, caseData, caseUi) {
             const meta = LAYER_META[layerId];
             const layer = caseData.layers?.[layerId] || {};
@@ -220,7 +227,7 @@
             const caseData = getCurrentCase();
             const caseUi = getCurrentCaseUi();
             root.className = `sentence-map-root sentence-map-root--${escapeHtml(state.mode)}`;
-            root.innerHTML = `<div class="sentence-map-shell">${renderHeader(caseUi)}${renderStepper(caseUi)}${renderCaseSelector()}${renderCurrentStep(caseData, caseUi)}${renderFooter(caseUi)}</div>`;
+            root.innerHTML = `<div class="sentence-map-shell">${renderHeader(caseUi)}${renderStepper(caseUi)}${renderCaseSelector()}${renderMethodNote()}${renderCurrentStep(caseData, caseUi)}${renderFooter(caseUi)}</div>`;
             persistState();
             if (typeof global.requestAnimationFrame === 'function') global.requestAnimationFrame(() => maybeBringSectionIntoView(opts.forceFocus === true));
             else maybeBringSectionIntoView(opts.forceFocus === true);
