@@ -206,6 +206,117 @@
     box-shadow: 0 12px 28px rgba(15,23,42,0.06) !important;
 }
 
+.scenario-home-setup-card {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.12), transparent 36%),
+        radial-gradient(circle at 0% 100%, rgba(20, 184, 166, 0.1), transparent 34%),
+        linear-gradient(180deg, #ffffff 0%, #f8fbff 100%) !important;
+    display: grid;
+    gap: 14px;
+}
+
+.scenario-home-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.scenario-home-preview-card {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.92);
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
+}
+
+.scenario-home-preview-card h5 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1rem;
+    line-height: 1.35;
+}
+
+.scenario-home-preview-card.is-example {
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(240,249,255,0.95) 100%);
+    border-color: rgba(56, 189, 248, 0.28);
+}
+
+.scenario-home-preview-card.is-tools {
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(240,253,250,0.96) 100%);
+    border-color: rgba(20, 184, 166, 0.24);
+}
+
+.scenario-home-preview-card.is-focus {
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,251,235,0.94) 100%);
+    border-color: rgba(245, 158, 11, 0.22);
+}
+
+.scenario-home-preview-copy {
+    margin: 0;
+    color: #475569;
+    line-height: 1.65;
+}
+
+.scenario-home-preview-quote {
+    border-radius: 16px;
+    border: 1px solid rgba(96, 165, 250, 0.22);
+    background: rgba(239, 246, 255, 0.92);
+    padding: 12px 14px;
+    color: #0f172a;
+    font-weight: 700;
+    line-height: 1.7;
+}
+
+.scenario-home-preview-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.scenario-home-preview-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    color: #35557d;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.scenario-home-tools-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 8px;
+}
+
+.scenario-home-tools-list li {
+    color: #475569;
+    line-height: 1.6;
+    padding-inline-start: 18px;
+    position: relative;
+}
+
+.scenario-home-tools-list li::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    top: 10px;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #0f766e, #0284c7);
+}
+
 .scenario-support-card {
     border-inline-start: 3px solid #0f766e !important;
 }
@@ -256,9 +367,9 @@
     display: none !important;
 }
 
-/* On home screen, hide the standalone layout (no active session content yet) */
+/* On home screen, keep the shared main/support layout visible so the intro uses the same shell. */
 .scenario-platform-root[data-screen="home"] .scenario-standalone-layout {
-    display: none !important;
+    display: grid !important;
 }
 
 /* Compact session bar — shown when active */
@@ -305,12 +416,25 @@
     animation: scFadeSlide 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.scenario-platform-root[data-screen="home"] .scenario-standalone-main,
+.scenario-platform-root[data-screen="home"] .scenario-platform-support {
+    animation: scFadeSlide 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .scenario-platform-root[data-screen="home"] .scenario-home-start-strip {
     animation-delay: 0.06s;
 }
 
 .scenario-platform-root[data-screen="home"] .scenario-home-helper-strip {
     animation-delay: 0.12s;
+}
+
+.scenario-platform-root[data-screen="home"] .scenario-standalone-main {
+    animation-delay: 0.18s;
+}
+
+.scenario-platform-root[data-screen="home"] .scenario-platform-support {
+    animation-delay: 0.24s;
 }
 
 @keyframes scFadeSlide {
@@ -326,6 +450,7 @@
 /* ═══ RESPONSIVE ═══ */
 @media (max-width: 980px) {
     .scenario-impact-grid { grid-template-columns: 1fr; }
+    .scenario-home-preview-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 840px) {
@@ -340,6 +465,9 @@
 }
 
 @media (max-width: 640px) {
+    .scenario-platform-root[data-screen="home"] .scenario-standalone-layout {
+        display: contents !important;
+    }
     .scenario-start-actions { flex-direction: column; }
     .scenario-start-actions .btn,
     .scenario-start-actions .scenario-summary-pill { width: 100%; }

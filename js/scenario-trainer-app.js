@@ -870,6 +870,76 @@
         return 'כניסה ראשונה? אפשר פשוט ללחוץ "התחל סשן". אם כבר ידוע מה רוצים לתרגל, פתחו הגדרות וכווננו תחום, רמה ואורך סשן.';
     }
 
+    function getHomePreviewScenario(config) {
+        const resolved = config || state.homeFilters;
+        const scenarios = Array.isArray(state.data?.scenarios) ? state.data.scenarios : [];
+        return scenarios.find((scenario) => {
+            const domainMatch = resolved.domain === 'all' || scenario.domain === resolved.domain;
+            const difficultyMatch = resolved.difficulty === 'all' || scenario.difficulty === resolved.difficulty;
+            return domainMatch && difficultyMatch;
+        }) || scenarios[0] || null;
+    }
+
+    function getScenarioHomeToolRows(draft) {
+        const resolved = draft || getSettingsDraft();
+        return [
+            resolved.prismWheelEnabled
+                ? 'גלגל פריזמות ייפתח אחרי תשובה ירוקה כדי להציע שאלת Meta והמחשה מהירה מתוך הסצנה.'
+                : 'גלגל פריזמות כבוי כרגע, כדי להשאיר את הסשן ממוקד רק בדיאלוג ובמשוב הראשוני.',
+            resolved.soundEnabled
+                ? 'צלילים קצרים נשארים פעילים במסך הסצנות ונותנים סימון עדין למעבר בין שלבים.'
+                : 'הצלילים כבויים כרגע, אם מעדיפים סשן שקט יותר או אימון ללא גירויים נוספים.'
+        ];
+    }
+
+    function renderHomePreviewCards() {
+        const previewScenario = getHomePreviewScenario(state.homeFilters);
+        const draft = getSettingsDraft();
+        const toolRows = getScenarioHomeToolRows(draft);
+        const processSteps = Array.isArray(trainerContract.processSteps) ? trainerContract.processSteps.slice(0, 3) : [];
+        const homeSummary = buildSummary({
+            domain: draft.defaultDomain,
+            difficulty: draft.defaultDifficulty,
+            runSize: draft.defaultRunSize
+        });
+        return `
+          <div class="scenario-home-preview-grid">
+            ${previewScenario ? `
+              <article class="scenario-home-preview-card is-example" data-home-card="example">
+                <p class="scenario-home-kicker">דוגמת סצנה</p>
+                <h5>${escapeHtml(previewScenario.sceneTitle)} · ${escapeHtml(previewScenario.domainLabel)}</h5>
+                <p class="scenario-home-preview-copy">כך נשמעת כניסה טיפוסית למסלול שבחרת, לפני שבוחרים תגובה אחת ורואים לאן השיחה נפתחת.</p>
+                ${previewScenario.contextIntro ? `<p class="scenario-home-preview-copy">${escapeHtml(previewScenario.contextIntro)}</p>` : ''}
+                ${previewScenario.openingLine ? `<div class="scenario-home-preview-quote">"${escapeHtml(previewScenario.openingLine)}"</div>` : ''}
+                <div class="scenario-home-preview-chip-row">
+                  <span class="scenario-home-preview-chip">תחום: ${escapeHtml(previewScenario.domainLabel)}</span>
+                  <span class="scenario-home-preview-chip">רמה: ${escapeHtml(getDifficultyLabel(previewScenario.difficulty))}</span>
+                </div>
+              </article>
+            ` : ''}
+            <article class="scenario-home-preview-card is-tools" data-home-card="tools">
+              <p class="scenario-home-kicker">מה פתוח כרגע</p>
+              <h5>כלי העזר שיישארו זמינים במהלך האימון</h5>
+              <ul class="scenario-home-tools-list">
+                ${toolRows.map((row) => `<li>${escapeHtml(row)}</li>`).join('')}
+              </ul>
+              <div class="scenario-home-preview-chip-row">
+                <span class="scenario-home-preview-chip">ברירת מחדל: ${escapeHtml(homeSummary)}</span>
+              </div>
+            </article>
+            <article class="scenario-home-preview-card is-focus" data-home-card="focus">
+              <p class="scenario-home-kicker">מה נרצה לראות</p>
+              <h5>איך נראה סשן טוב אחד</h5>
+              <p class="scenario-home-preview-copy">לא מחפשים תשובה יפה, אלא תגובה שמורידה לחץ, מחזירה את השיחה למה שקורה בפועל, ופותחת צעד שאפשר לבדוק במציאות.</p>
+              <p class="scenario-home-preview-copy">אחרי הבחירה רואים מיד גם את ההשפעה הרגשית וגם את הכיוון להמשך, כדי ללמוד מתוך הסצנה ולא רק לסמן תשובה.</p>
+              <div class="scenario-home-preview-chip-row">
+                ${processSteps.map((step) => `<span class="scenario-home-preview-chip">${escapeHtml(step.shortLabel || step.label)}</span>`).join('')}
+              </div>
+            </article>
+          </div>
+        `;
+    }
+
     function getScenarioScoreNextHint(isLast) {
         return isLast
             ? 'להמשך: אפשר לפתוח סשן חדש, או לעבור לגשר תחושה-שפה אם צריך לדייק את המשפט לפני שיחה אמיתית.'
@@ -1065,6 +1135,7 @@
               <div>
                 <p class="scenario-home-kicker">כיוון הסשן</p>
                 <h4>כך ייראה הסבב הבא</h4>
+                <p class="scenario-home-preview-copy">כאן אפשר לכוון את הסשן, לראות דוגמת כניסה, ולהבין אילו כלים יישארו פתוחים לאורך האימון בלי לעבור למסך פתיחה נפרד.</p>
               </div>
               <div class="scenario-home-stats">
                 <div class="scenario-stat-item">סצנות שהושלמו: ${escapeHtml(state.progress.completed)}</div>
@@ -1088,6 +1159,7 @@
                 <span id="scenario-run-size-value">${escapeHtml(state.homeFilters.runSize)}</span>
               </div>
             </div>
+            ${renderHomePreviewCards()}
             <p class="scenario-home-footnote">הצלחה בסשן אחד נראית כמו תגובה שמקדמת יותר קשר, פחות עמימות, וצעד הבא שאפשר לבדוק במציאות.</p>
             <p class="scenario-feedback-next-hint">${escapeHtml(getScenarioHomeEntryHint())}</p>
           </section>
