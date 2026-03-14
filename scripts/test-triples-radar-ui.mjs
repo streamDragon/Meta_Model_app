@@ -81,6 +81,37 @@ async function assert(condition, label, detail = '') {
     }
 }
 
+async function enterTriplesRadarFeature(page) {
+    await page.waitForFunction(() => {
+        const section = document.getElementById('practice-triples-radar');
+        return !!section && section.classList.contains('active');
+    });
+
+    const stage = await page.evaluate(() => (
+        document.getElementById('practice-triples-radar')?.dataset.metaFeatureStage || ''
+    ));
+
+    if (stage === 'feature') return;
+
+    const enterButton = page.locator('#practice-triples-radar [data-feature-enter]').first();
+    await assert(await enterButton.count() > 0, 'triples radar welcome CTA available');
+    await enterButton.click();
+    await page.waitForFunction(() => (
+        document.getElementById('practice-triples-radar')?.dataset.metaFeatureStage === 'feature'
+    ));
+
+    const introConfirm = page.locator('#practice-triples-radar [data-feature-confirm="practice-triples-radar"]').first();
+    if (await introConfirm.count() > 0) {
+        await introConfirm.click();
+    }
+
+    await page.waitForFunction(() => {
+        const section = document.querySelector('#practice-triples-radar .practice-section-triples-radar');
+        if (!section) return false;
+        return !section.hasAttribute('data-intro-locked') && section.getBoundingClientRect().width > 0;
+    });
+}
+
 let serverBundle = null;
 
 try {
@@ -92,13 +123,11 @@ try {
         await page.evaluate(() => {
             localStorage.removeItem('triples_radar_ui_mode_v1');
             localStorage.removeItem('triples_radar_ui_mode_v2');
+            localStorage.removeItem('meta_feature_shell_v3');
             window.navigateTo('practice-triples-radar');
         });
 
-        await page.waitForFunction(() => {
-            const section = document.getElementById('practice-triples-radar');
-            return !!section && section.classList.contains('active');
-        });
+        await enterTriplesRadarFeature(page);
         await page.waitForFunction(() => document.querySelectorAll('#triples-radar-rows .triples-radar-row').length === 5);
 
         const detailsState = await page.evaluate(() => ({
@@ -153,10 +182,7 @@ try {
         const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true });
         await mobile.goto(serverBundle.base, { waitUntil: 'networkidle' });
         await mobile.evaluate(() => window.navigateTo('practice-triples-radar'));
-        await mobile.waitForFunction(() => {
-            const section = document.getElementById('practice-triples-radar');
-            return !!section && section.classList.contains('active');
-        });
+        await enterTriplesRadarFeature(mobile);
         await mobile.waitForFunction(() => document.querySelectorAll('#triples-radar-rows .triples-radar-row').length === 5);
         const mobileCheck = await mobile.evaluate(() => ({
             innerWidth: window.innerWidth,
