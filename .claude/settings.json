@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(node -e \":*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(timeout 90 env SHELL_SMOKE_TRACE=1 node scripts/test-shell-smoke.mjs)"
     ]
   }
 }
