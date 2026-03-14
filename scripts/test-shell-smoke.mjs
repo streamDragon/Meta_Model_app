@@ -496,20 +496,6 @@ async function runShellSmoke(baseUrl) {
         await assert(rolledBackState.affordanceState === 'ready', 'comic affordance ready after back');
         await assert(rolledBackState.backDisabled, 'comic back disabled when history empty');
 
-        const comicActionCount = await page.locator('#comic-engine .app-shell .app-shell-actions button').count();
-        const overlayChecks = Math.min(comicActionCount, 3);
-        for (let index = 0; index < overlayChecks; index += 1) {
-            await clickHeaderButton('comic-engine', index);
-            await page.waitForSelector('.overlay-root:not(.hidden) .overlay-title');
-            const overlayState = await page.evaluate(() => ({
-                title: (document.querySelector('.overlay-root:not(.hidden) .overlay-title')?.textContent || '').trim(),
-                contextTitle: (document.querySelector('.overlay-root:not(.hidden) .shell-panel-context-title')?.textContent || '').trim()
-            }));
-            await assert(Boolean(overlayState.title), `comic overlay ${index + 1} opened`, overlayState.title);
-            await assert(overlayState.contextTitle.includes('קומיקס'), `comic overlay ${index + 1} contextual title`, overlayState.contextTitle);
-            await closeOverlayWithButton();
-        }
-
         await page.locator('#ceflow-choice-deck button[data-choice-id]:not([disabled])').first().click();
         await page.locator('#ceflow-reply-input').fill('אני עוצר רגע ומנסה לדייק מה בעצם מפריע לך.');
         await page.locator('#ceflow-reply-confirm').click();
@@ -577,6 +563,12 @@ async function runShellSmoke(baseUrl) {
         await checkManagedScreen('practice-question');
         await checkManagedScreen('practice-triples-radar');
         await checkManagedScreen('practice-wizard');
+        await checkManagedScreen('practice-verb-unzip');
+        await checkManagedScreen('categories');
+        await checkManagedScreen('blueprint');
+        await checkManagedScreen('prismlab');
+        await checkManagedScreen('about');
+        await checkManagedScreen('comic-engine');
 
         await navigate('home');
         await navigate('practice-radar');
@@ -592,17 +584,6 @@ async function runShellSmoke(baseUrl) {
             'home resume restores last managed tab'
         );
 
-        await checkGenericScreen('practice-wizard', 1);
-
-        await navigate('practice-verb-unzip');
-        await closeOverlayIfOpen();
-        await enterManagedFeatureStage('practice-verb-unzip');
-        await assert((await page.locator('#practice-verb-unzip .app-shell').count()) > 0, 'practice-verb-unzip shell mounted');
-        await clickHeaderButton('practice-verb-unzip', 1);
-        const verbTitle = await getOverlayTitle();
-        await assert(Boolean(verbTitle), 'practice-verb-unzip overlay', verbTitle);
-        await closeOverlayWithButton();
-
         await navigate('home');
         await closeOverlayIfOpen();
         await assert(
@@ -616,10 +597,6 @@ async function runShellSmoke(baseUrl) {
         await scenarioPage.close();
 
         await checkComicExperience();
-        await checkGenericScreen('categories', 1);
-        await checkGenericScreen('blueprint', 1);
-        await checkGenericScreen('prismlab', 1);
-        await checkGenericScreen('about', 0);
         trace('desktop:done');
 
         const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true });
