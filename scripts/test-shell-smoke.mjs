@@ -121,6 +121,12 @@ async function runShellSmoke(baseUrl) {
     const browser = await createBrowser();
     const checks = [];
     const MANAGED_SCREENS = new Set(['sentence-map', 'practice-question', 'practice-radar', 'practice-triples-radar']);
+    const MANAGED_CONTENT_SELECTOR_BY_SCREEN = Object.freeze({
+        'sentence-map': '#sentence-map .practice-section-sentence-map',
+        'practice-question': '#practice-question .practice-section-question',
+        'practice-radar': '#practice-radar .practice-section-radar',
+        'practice-triples-radar': '#practice-triples-radar .practice-section-triples-radar'
+    });
     const trace = (...args) => {
         if (process.env.SHELL_SMOKE_TRACE === '1') {
             console.log('[shell-smoke]', ...args);
@@ -242,17 +248,32 @@ async function runShellSmoke(baseUrl) {
     const enterManagedFeatureStage = async (screenId, targetPage = page) => {
         if (!MANAGED_SCREENS.has(screenId)) return false;
         trace('managed:enter:start', screenId);
+        const contentSelector = MANAGED_CONTENT_SELECTOR_BY_SCREEN[screenId] || '';
         const stage = await targetPage.evaluate((id) => document.getElementById(id)?.dataset?.metaFeatureStage || '', screenId);
-        if (stage === 'feature') return false;
-        const cta = targetPage.locator(`#${screenId} [data-feature-enter]:visible`).first();
-        if ((await cta.count()) === 0) {
-            throw new Error(`Missing managed feature CTA on ${screenId}`);
+        if (stage !== 'feature') {
+            const cta = targetPage.locator(`#${screenId} [data-feature-enter]:visible`).first();
+            if ((await cta.count()) === 0) {
+                throw new Error(`Missing managed feature CTA on ${screenId}`);
+            }
+            await cta.click();
+            await targetPage.waitForFunction((id) => document.getElementById(id)?.dataset?.metaFeatureStage === 'feature', screenId);
         }
-        await cta.click();
-        await targetPage.waitForFunction((id) => document.getElementById(id)?.dataset?.metaFeatureStage === 'feature', screenId);
+        await targetPage.waitForFunction(({ id, selector }) => {
+            const section = document.getElementById(id);
+            const content = selector ? document.querySelector(selector) : null;
+            if (!section || section.dataset?.metaFeatureStage !== 'feature' || !content) return false;
+            const style = getComputedStyle(content);
+            const rect = content.getBoundingClientRect();
+            return !content.hasAttribute('data-intro-locked')
+                && !content.hidden
+                && style.display !== 'none'
+                && style.visibility !== 'hidden'
+                && rect.width > 0
+                && rect.height > 0;
+        }, { id: screenId, selector: contentSelector });
         await targetPage.waitForTimeout(500);
         trace('managed:enter:ready', screenId);
-        return true;
+        return stage !== 'feature';
     };
 
     const clickHeaderButton = async (screenId, index, targetPage = page) => {
@@ -330,17 +351,20 @@ async function runShellSmoke(baseUrl) {
         await enterManagedFeatureStage(screenId);
         const featureState = await page.evaluate((id) => {
             const section = document.getElementById(id);
+            const legacyConfirm = section?.querySelector(`[data-feature-confirm="${id}"]`);
             return {
                 stage: section?.dataset?.metaFeatureStage || '',
                 statsVisible: !!section?.querySelector('[data-shell-chrome-stats]'),
                 homeVisible: !!section?.querySelector('[data-shell-chrome-home]'),
-                restartVisible: !!section?.querySelector('[data-shell-chrome-restart]')
+                restartVisible: !!section?.querySelector('[data-shell-chrome-restart]'),
+                legacyConfirmVisible: !!legacyConfirm && getComputedStyle(legacyConfirm).display !== 'none'
             };
         }, screenId);
         await assert(featureState.stage === 'feature', `${screenId} feature stage active`, featureState.stage);
         await assert(featureState.statsVisible, `${screenId} stats shortcut visible`);
         await assert(featureState.homeVisible, `${screenId} home shortcut visible`);
         await assert(featureState.restartVisible, `${screenId} restart shortcut visible`);
+        await assert(!featureState.legacyConfirmVisible, `${screenId} legacy intro gate removed`);
 
         if (verifyStatsRoute) {
             trace('managed:stats:start', screenId);

@@ -8,6 +8,12 @@ import { chromium } from 'playwright';
 const projectRoot = process.cwd();
 const VITE_BIN = path.join(projectRoot, 'node_modules', 'vite', 'bin', 'vite.js');
 const MANAGED_SCREENS = new Set(['sentence-map', 'practice-question', 'practice-radar', 'practice-triples-radar']);
+const MANAGED_CONTENT_SELECTOR_BY_SCREEN = Object.freeze({
+    'sentence-map': '#sentence-map .practice-section-sentence-map',
+    'practice-question': '#practice-question .practice-section-question',
+    'practice-radar': '#practice-radar .practice-section-radar',
+    'practice-triples-radar': '#practice-triples-radar .practice-section-triples-radar'
+});
 const TEST_GAMIFICATION_STATE = Object.freeze({
     xp: 600,
     streak: 4,
@@ -172,16 +178,31 @@ async function navigateToScreen(page, screenId) {
 
 async function enterManagedFeatureStage(page, screenId) {
     if (!MANAGED_SCREENS.has(screenId)) return false;
+    const contentSelector = MANAGED_CONTENT_SELECTOR_BY_SCREEN[screenId] || '';
     const stage = await page.evaluate((id) => document.getElementById(id)?.dataset?.metaFeatureStage || '', screenId);
-    if (stage === 'feature') return false;
-    const cta = page.locator(`#${screenId} [data-feature-enter]:visible`).first();
-    if ((await cta.count()) === 0) {
-        throw new Error(`Missing managed feature CTA on ${screenId}`);
+    if (stage !== 'feature') {
+        const cta = page.locator(`#${screenId} [data-feature-enter]:visible`).first();
+        if ((await cta.count()) === 0) {
+            throw new Error(`Missing managed feature CTA on ${screenId}`);
+        }
+        await cta.click();
+        await page.waitForFunction((id) => document.getElementById(id)?.dataset?.metaFeatureStage === 'feature', screenId);
     }
-    await cta.click();
-    await page.waitForFunction((id) => document.getElementById(id)?.dataset?.metaFeatureStage === 'feature', screenId);
+    await page.waitForFunction(({ id, selector }) => {
+        const section = document.getElementById(id);
+        const content = selector ? document.querySelector(selector) : null;
+        if (!section || section.dataset?.metaFeatureStage !== 'feature' || !content) return false;
+        const style = getComputedStyle(content);
+        const rect = content.getBoundingClientRect();
+        return !content.hasAttribute('data-intro-locked')
+            && !content.hidden
+            && style.display !== 'none'
+            && style.visibility !== 'hidden'
+            && rect.width > 0
+            && rect.height > 0;
+    }, { id: screenId, selector: contentSelector });
     await page.waitForTimeout(500);
-    return true;
+    return stage !== 'feature';
 }
 
 async function verifyRuntimeMobileLayout(baseUrl) {

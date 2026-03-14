@@ -101,9 +101,7 @@ async function enterTriplesRadarFeature(page) {
     ));
 
     const introConfirm = page.locator('#practice-triples-radar [data-feature-confirm="practice-triples-radar"]').first();
-    if (await introConfirm.count() > 0) {
-        await introConfirm.click();
-    }
+    await assert((await introConfirm.count()) === 0, 'triples radar legacy intro gate removed');
 
     await page.waitForFunction(() => {
         const section = document.querySelector('#practice-triples-radar .practice-section-triples-radar');

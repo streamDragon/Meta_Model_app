@@ -7,6 +7,7 @@
     'use strict';
 
     var SEEN_KEY = 'mm_feature_seen_v1';
+    var MANAGED_WELCOME_FEATURE_IDS = ['sentence-map', 'practice-question', 'practice-radar', 'practice-triples-radar'];
     var seen = {};
     try { seen = JSON.parse(localStorage.getItem(SEEN_KEY) || '{}'); } catch (_) {}
 
@@ -173,6 +174,10 @@
         container.appendChild(btn);
     }
 
+    function usesManagedWelcomeShell(featureId) {
+        return MANAGED_WELCOME_FEATURE_IDS.indexOf(String(featureId || '').trim()) !== -1;
+    }
+
     /* ── Progressive disclosure gate ── */
     function gateFeature(section) {
         var id = section.id;
@@ -181,6 +186,21 @@
 
         // Always add B&G coin button
         addCoinBtn(id, introCard);
+
+        if (usesManagedWelcomeShell(id)) {
+            if (!seen[id]) {
+                seen[id] = true;
+                saveSeen();
+            }
+            introCard.setAttribute('data-intro-seen', '1');
+            Array.from(section.querySelectorAll('.practice-section')).forEach(function (taskSection) {
+                taskSection.removeAttribute('data-intro-locked');
+            });
+            Array.from(introCard.querySelectorAll('[data-feature-confirm]')).forEach(function (node) {
+                node.remove();
+            });
+            return;
+        }
 
         if (section.hasAttribute('data-feature-intro-opt-out')) {
             introCard.setAttribute('data-intro-seen', '1');
