@@ -23,6 +23,12 @@ export const TRAINER_PLATFORM_CSS = `
 .trp-purpose-body{line-height:1.65;color:#334155}
 .trp-start-strip{display:grid;gap:12px;align-content:start;align-self:start;border:1px solid #d7e5f5;background:linear-gradient(180deg,#ffffff 0%,#f7fbff 100%);border-radius:24px;padding:18px}
 .trp-start-copy{display:grid;gap:6px}
+.trp-clarity-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.trp-clarity-card{border:1px solid #dce6f3;border-radius:18px;background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);padding:14px;display:grid;gap:6px;box-shadow:0 14px 28px rgba(15,23,42,.05)}
+.trp-clarity-kicker{font-size:.78rem;font-weight:900;letter-spacing:.04em;color:#1d4ed8}
+.trp-clarity-title{font-size:.96rem;color:#0f172a}
+.trp-clarity-body{color:#526173;line-height:1.6;font-size:.89rem}
+.trp-note-card{border:1px solid #d6e4f4;border-radius:18px;background:linear-gradient(180deg,#f7fbff 0%,#ffffff 100%);padding:14px 16px;color:#334155;line-height:1.65;box-shadow:0 12px 24px rgba(15,23,42,.04)}
 .trp-step-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .trp-step{border:1px dashed #cfdceb;border-radius:16px;background:#fcfdff;padding:12px}
 .trp-step strong{display:block;margin-bottom:4px;font-size:.85rem}
@@ -61,7 +67,7 @@ export const TRAINER_PLATFORM_CSS = `
 .trs-footer-note{color:#64748b;font-size:.82rem;line-height:1.45}
 
 @media (max-width:980px){
-  .trp-hero,.trp-layout,.trs-grid{grid-template-columns:1fr}
+  .trp-hero,.trp-layout,.trs-grid,.trp-clarity-strip{grid-template-columns:1fr}
 }
 
 @media (max-width:640px){

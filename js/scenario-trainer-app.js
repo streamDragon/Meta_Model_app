@@ -940,6 +940,29 @@
         `;
     }
 
+    function renderHomeClarityCards() {
+        const homeSummary = buildSummary(state.homeFilters);
+        return `
+          <section class="scenario-home-clarity-strip" aria-label="בהירות לפני התחלה">
+            <article class="scenario-home-clarity-card">
+              <p class="scenario-home-kicker">מה קורה בפועל</p>
+              <h5>נכנסים לסצנה אחת ובוחרים תגובה אחת</h5>
+              <p class="scenario-home-preview-copy">לא עוברים בין כמה מסלולים במקביל. שומעים פתיחת שיחה, בוחרים משפט אחד, ואז רואים מיד מה הוא פותח או סוגר.</p>
+            </article>
+            <article class="scenario-home-clarity-card">
+              <p class="scenario-home-kicker">למה לשים לב</p>
+              <h5>לא לתשובה "יפה" אלא לתשובה שמייצרת קרקע</h5>
+              <p class="scenario-home-preview-copy">תגובה טובה כאן מורידה לחץ, מחזירה את השיחה למה שקורה בפועל, ופותחת צעד שאפשר לבדוק במציאות ולא רק להרגיש.</p>
+            </article>
+            <article class="scenario-home-clarity-card">
+              <p class="scenario-home-kicker">מה מרוויחים</p>
+              <h5>משפט ירוק שאפשר לקחת לשיחה אמיתית</h5>
+              <p class="scenario-home-preview-copy">הסשן הנוכחי מכוון ל־${escapeHtml(homeSummary)}. כשמסיימים טוב, יוצאים עם ניסוח המשך, לקח, וכיוון ברור יותר לסצנה הבאה.</p>
+            </article>
+          </section>
+        `;
+    }
+
     function getScenarioScoreNextHint(isLast) {
         return isLast
             ? 'להמשך: אפשר לפתוח סשן חדש, או לעבור לגשר תחושה-שפה אם צריך לדייק את המשפט לפני שיחה אמיתית.'
@@ -1159,6 +1182,7 @@
                 <span id="scenario-run-size-value">${escapeHtml(state.homeFilters.runSize)}</span>
               </div>
             </div>
+            ${renderHomeClarityCards()}
             ${renderHomePreviewCards()}
             <p class="scenario-home-footnote">הצלחה בסשן אחד נראית כמו תגובה שמקדמת יותר קשר, פחות עמימות, וצעד הבא שאפשר לבדוק במציאות.</p>
             <p class="scenario-feedback-next-hint">${escapeHtml(getScenarioHomeEntryHint())}</p>

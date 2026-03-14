@@ -2065,6 +2065,23 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     title: step.label,
     description: step.help
   }));
+  const clarityCards = [
+    {
+      kicker: 'מה קורה בפועל',
+      title: 'קוראים משפט, בוחרים עוגן אחד, ובונים ממנו עץ',
+      body: <p>העבודה כאן מתחילה ממשפט אמיתי. לא גוררים סתם טוקנים, אלא בודקים איזה מבנה מחשבתי יושב מתחת למילה או לצירוף שבחרת.</p>
+    },
+    {
+      kicker: 'למה לשים לב',
+      title: 'לאיזה ענף המילה פותחת את השיחה',
+      body: <p>הצלחת התרגיל נראית כשברור מהו המבנה, איזה עוגן מחזיק אותו, ומה עוד אפשר לבדוק במקום להינעל על פירוש אחד.</p>
+    },
+    {
+      kicker: 'מה מרוויחים',
+      title: 'מעבר מפרשנות אחת למפת אפשרויות',
+      body: <p>בסוף הסשן לא נשארים עם "נראה לי שזה זה", אלא עם עץ שמראה חלופות, שאלות המשך, וכיוון ברור יותר לשיחה אמיתית.</p>
+    }
+  ];
   const settingsSectionMap: Record<string, TrainerSettingsSection> = {
     scenario: {
       id: 'scenario',
@@ -2493,6 +2510,8 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
             <span className="it-chip">השלב הבא: {currentProcessMeta.help}</span>
           </>
         }
+        clarityCards={clarityCards}
+        closingNote={<p>הצלחה בדף הפתיחה הזה היא להבין מראש איך מתחילים, מה מחפשים במהלך הבחירה, ואיך תיראה תובנה טובה אחת לפני שנוגעים במשפט.</p>}
         helperSteps={helperSteps}
         supportRailMode={trainerContract.supportRailMode}
         mobilePriorityOrder={trainerContract.mobilePriorityOrder}

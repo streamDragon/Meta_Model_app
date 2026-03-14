@@ -24,6 +24,13 @@ const DEFAULT_USER_PROGRESS = {
     lastChargeUsedDate: null,
     activityHistory: {}
 };
+const GAMMA_ACCESS_PROGRESS_BASELINE = Object.freeze({
+    xp: 500,
+    stars: 24,
+    streak: 10,
+    sessions: 12,
+    streakCharges: MAX_STREAK_CHARGES
+});
 let userProgress = { ...DEFAULT_USER_PROGRESS };
 let trainerState = {
     isActive: false,
@@ -18068,6 +18075,7 @@ function legacyLoadUserProgress() {
 }
 
 function saveUserProgress() {
+    userProgress = applyGammaProgressBaseline(userProgress);
     localStorage.setItem('userProgress', JSON.stringify(userProgress));
 }
 
@@ -18268,6 +18276,19 @@ function normalizeUserProgress(raw) {
     return merged;
 }
 
+function applyGammaProgressBaseline(raw) {
+    const today = toLocalDateKey();
+    const safe = normalizeUserProgress(raw);
+    safe.xp = Math.max(safe.xp, GAMMA_ACCESS_PROGRESS_BASELINE.xp);
+    safe.stars = Math.max(safe.stars, GAMMA_ACCESS_PROGRESS_BASELINE.stars);
+    safe.streak = Math.max(safe.streak, GAMMA_ACCESS_PROGRESS_BASELINE.streak);
+    safe.sessions = Math.max(safe.sessions, GAMMA_ACCESS_PROGRESS_BASELINE.sessions);
+    safe.streakCharges = Math.max(safe.streakCharges, GAMMA_ACCESS_PROGRESS_BASELINE.streakCharges);
+    safe.todayDate = today;
+    safe.lastSessionDate = today;
+    return safe;
+}
+
 function syncDailyProgressWindow() {
     const today = toLocalDateKey();
     if (userProgress.todayDate !== today) {
@@ -18307,16 +18328,16 @@ function registerDailyAction(amount = 1) {
 function loadUserProgress() {
     const saved = localStorage.getItem('userProgress');
     if (!saved) {
-        userProgress = normalizeUserProgress(DEFAULT_USER_PROGRESS);
+        userProgress = applyGammaProgressBaseline(DEFAULT_USER_PROGRESS);
         syncDailyProgressWindow();
         saveUserProgress();
         return;
     }
     try {
-        userProgress = normalizeUserProgress(JSON.parse(saved));
+        userProgress = applyGammaProgressBaseline(JSON.parse(saved));
     } catch (error) {
         console.warn('Failed to parse user progress. Resetting defaults.', error);
-        userProgress = normalizeUserProgress(DEFAULT_USER_PROGRESS);
+        userProgress = applyGammaProgressBaseline(DEFAULT_USER_PROGRESS);
     }
     syncDailyProgressWindow();
     saveUserProgress();

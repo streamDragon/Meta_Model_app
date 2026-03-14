@@ -83,6 +83,25 @@
         10: 'ברמה אחרת לגמרי'
     });
 
+    var GAMMA_ACCESS_BASELINE = Object.freeze({
+        xp: 900,
+        streak: 10,
+        bestStreak: 14,
+        streakFreezes: 2,
+        starsPerFeature: Object.freeze({
+            sentenceMap: 8,
+            practiceQuestion: 10,
+            triplesRadar: 7,
+            practiceRadar: 5,
+            feelingLanguageBridge: 4,
+            blueprint: 4,
+            prismLab: 3,
+            comicEngine: 3,
+            toolCenter: 3,
+            legacy: 1
+        })
+    });
+
     var state = loadState();
     var refs = {
         host: null,
@@ -138,16 +157,36 @@
         };
     }
 
+    function applyGammaAccessBaseline(raw) {
+        var safe = normalizeState(raw);
+        var baselineStars = GAMMA_ACCESS_BASELINE.starsPerFeature || {};
+
+        safe.xp = Math.max(safe.xp, Math.floor(Number(GAMMA_ACCESS_BASELINE.xp) || 0));
+        safe.streak = Math.max(safe.streak, Math.floor(Number(GAMMA_ACCESS_BASELINE.streak) || 0));
+        safe.bestStreak = Math.max(safe.bestStreak, Math.floor(Number(GAMMA_ACCESS_BASELINE.bestStreak) || 0), safe.streak);
+        safe.streakFreezes = Math.max(safe.streakFreezes, Math.floor(Number(GAMMA_ACCESS_BASELINE.streakFreezes) || 0));
+        safe.lastActiveDate = getDateKey(new Date());
+
+        Object.keys(baselineStars).forEach(function applyFeatureStars(key) {
+            var featureKey = normalizeFeatureName(key);
+            var amount = Math.max(0, Math.floor(Number(baselineStars[key]) || 0));
+            safe.starsPerFeature[featureKey] = Math.max(Math.max(0, Math.floor(Number(safe.starsPerFeature[featureKey]) || 0)), amount);
+        });
+
+        return safe;
+    }
+
     function loadState() {
         try {
-            return normalizeState(JSON.parse(global.localStorage.getItem(STORAGE_KEY) || '{}'));
+            return applyGammaAccessBaseline(JSON.parse(global.localStorage.getItem(STORAGE_KEY) || '{}'));
         } catch (_error) {
-            return normalizeState({});
+            return applyGammaAccessBaseline({});
         }
     }
 
     function saveState() {
         try {
+            state = applyGammaAccessBaseline(state);
             global.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         } catch (_error) {
             // ignore storage failures

@@ -5,6 +5,12 @@ export interface TrainerHelperStep {
   description: string;
 }
 
+export interface TrainerClarityCard {
+  kicker: string;
+  title: string;
+  body: React.ReactNode;
+}
+
 type TrainerZoneKey = 'purpose' | 'start' | 'helper-steps' | 'main' | 'support';
 
 const DEFAULT_MOBILE_ORDER: TrainerZoneKey[] = ['purpose', 'start', 'helper-steps', 'main', 'support'];
@@ -58,6 +64,8 @@ interface TrainerPlatformShellProps {
   startBody: React.ReactNode;
   startActions: React.ReactNode;
   startMeta?: React.ReactNode;
+  clarityCards?: TrainerClarityCard[];
+  closingNote?: React.ReactNode;
   helperSteps?: TrainerHelperStep[];
   supportRailMode?: string;
   mobilePriorityOrder?: ReadonlyArray<string>;
@@ -81,6 +89,8 @@ export function TrainerPlatformShell({
   startBody,
   startActions,
   startMeta,
+  clarityCards = [],
+  closingNote,
   helperSteps = [],
   supportRailMode = 'default',
   mobilePriorityOrder,
@@ -129,6 +139,20 @@ export function TrainerPlatformShell({
             {startMeta ? <div className="trp-chip-row">{startMeta}</div> : null}
           </aside>
         </section>
+
+        {clarityCards.length ? (
+          <section className="trp-clarity-strip" aria-label="בהירות לפני התחלה">
+            {clarityCards.map((card) => (
+              <article key={`${card.kicker}-${card.title}`} className="trp-clarity-card">
+                <span className="trp-clarity-kicker">{card.kicker}</span>
+                <strong className="trp-clarity-title">{card.title}</strong>
+                <div className="trp-clarity-body">{card.body}</div>
+              </article>
+            ))}
+          </section>
+        ) : null}
+
+        {closingNote ? <section className="trp-note-card">{closingNote}</section> : null}
 
         {helperSteps.length ? (
           <div className="trp-step-strip" data-trainer-zone="helper-steps">

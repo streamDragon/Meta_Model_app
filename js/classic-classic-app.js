@@ -1864,6 +1864,28 @@
         `;
     }
 
+    function renderIntroClarityStrip() {
+        return `
+          <section class="cc-entry-clarity-strip" aria-label="בהירות לפני התחלה">
+            <article class="cc-entry-clarity-card">
+              <span class="cc-card-kicker">מה קורה בפועל</span>
+              <strong>שומעים משפט, בוחרים שאלה, מזהים בעיה, ומסמנים יעד בירור</strong>
+              <p>המסלול לא קופץ ישר לפתרון. הוא מלמד לפרק את המשפט לשלב נכון בכל רגע, כך שהחשיבה נשארת יציבה ולא אינטואיטיבית בלבד.</p>
+            </article>
+            <article class="cc-entry-clarity-card">
+              <span class="cc-card-kicker">למה לשים לב</span>
+              <strong>להבדיל בין בעיה לשונית, שאלה טובה, ומטרה של הבירור</strong>
+              <p>הצלחה כאן היא לא רק "להרגיש" מה נכון, אלא לדעת למה שאלה מחזירה מידע, למה בחירה אחרת היא פרשנות, ואיזה יעד מידע באמת חסר.</p>
+            </article>
+            <article class="cc-entry-clarity-card">
+              <span class="cc-card-kicker">מה מרוויחים</span>
+              <strong>הסבר יציב שאפשר לקחת לסבב הבא</strong>
+              <p>בכל תרגול מקבלים חיבור ברור בין התבנית, הבעיה, השאלה והמטרה. כך נבנה דיוק שמחזיק גם במסך הבא ולא רק ברגע הנוכחי.</p>
+            </article>
+          </section>
+        `;
+    }
+
     function renderSettingsPreviewCard() {
         const s = normalizePracticeSettings(state.settings || defaultPracticeSettings());
         return `
@@ -2374,6 +2396,7 @@
                   <span class="cc-settings-preview-pill" data-trainer-summary="current">${escapeHtml(currentSettingsSummaryText())}</span>
                 </div>
               </div>
+              ${renderIntroClarityStrip()}
               ${renderHelperStepsStrip()}
               <div class="cc-primary-actions">
                 <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="show-before-start">לפני שמתחילים (30 שניות)</button>

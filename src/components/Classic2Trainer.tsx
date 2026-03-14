@@ -506,6 +506,23 @@ export default function Classic2Trainer(): React.ReactElement {
     { title: '3. בדוק/י, למד/י והמשך/י', description: 'קבל/י משוב, פתח/י רמז או פתרון, ואז עבור/י לסבב הבא.' },
   ];
   const processSteps = trainerContract.processSteps?.length ? [...trainerContract.processSteps] : [];
+  const clarityCards = [
+    {
+      kicker: 'מה קורה בפועל',
+      title: 'בוחרים קטגוריה אחת ומחפשים אותה בטקסט אמיתי',
+      body: <p>המטרה איננה תחושה כללית של "נדמה לי שזה שם", אלא סימון מדויק של כל המקומות שבהם הקטגוריה באמת מופיעה.</p>
+    },
+    {
+      kicker: 'למה לשים לב',
+      title: 'עובדים מול טבלת ברין יציבה',
+      body: <p>הסדר לא קופץ בין סשנים, ולכן לומדים לבנות זיכרון עבודה ברור: קטגוריה, טקסט, בדיקה, והמשך.</p>
+    },
+    {
+      kicker: 'מה מרוויחים',
+      title: 'דיוק שאפשר לקחת לטקסט הבא',
+      body: <p>אחרי כל סבב רואים מיד אם הזיהוי היה מלא, חלקי או שגוי, ולומדים למה. זה הופך קריאה אינטואיטיבית לקריאה בדיקה.</p>
+    }
+  ];
   const currentActionTitle = !started
     ? 'מתחילים מהכפתור הראשי'
     : finished
@@ -823,6 +840,8 @@ export default function Classic2Trainer(): React.ReactElement {
             <span className="c2n-chip">סבבים: {roundsText(settings.rounds)}</span>
           </>
         }
+        clarityCards={clarityCards}
+        closingNote={<p>הצלחה במסך הזה נראית כמו ידיעה ברורה מה מחפשים, איפה בודקים, ומה ייחשב תשובה מדויקת עוד לפני הלחיצה על תחילת הסשן.</p>}
         helperSteps={helperSteps}
         supportRailMode={trainerContract.supportRailMode}
         mobilePriorityOrder={trainerContract.mobilePriorityOrder}

@@ -47,6 +47,12 @@
             icon: '🗺️', title: 'מפת המשפט', badge: 'למתחילים', tone: 'beginner', color: '#1D9E75', soft: '#E1F5EE',
             homeDescription: 'בואו נלמד לקרוא בין השורות — מה באמת קרה, מה אנחנו מרגישים, ומה אנחנו באמת מבקשים.',
             description: 'כאן תלמדו לפרק כל משפט לשלוש שכבות: מה קרה בעולם החיצוני, מה קורה בתוכנו, ומה אנחנו באמת מבקשים.',
+            entryCards: [
+                { kicker: 'מה עושים כאן', title: 'מפרקים את המשפט לשלוש שכבות', body: 'לא נשארים עם התחושה הכללית. עוצרים על מה קרה בחוץ, מה קרה בפנים, ומהו הצורך או הבקשה שמתחבאים מתחת למשפט.' },
+                { kicker: 'למה לשים לב', title: 'מחפשים מעבר מהצפה לבהירות', body: 'ברגע שמבדילים בין עובדה, רגש ובקשה, השיחה כבר פחות נתקעת בתוך ערבוב. זה השלב שבו אפשר להתחיל לדבר ברור יותר.' },
+                { kicker: 'מה מרוויחים', title: 'שפה שאפשר לעבוד איתה', body: 'בסוף המסלול יוצאים עם ניסוח שאפשר לבדוק במציאות ולא רק להרגיש בתוכו. פחות "אף אחד לא מבין אותי", יותר "זה מה שקרה וזה מה שאני צריך".' }
+            ],
+            successNote: 'הצלחה כאן נראית כמו משפט שהופך מהצהרה עמומה למפה פשוטה: חוץ, פנים, וצעד שאפשר לבקש.',
             philosopher: {
                 name: 'סוקרטס',
                 avatar: '🏛️',
@@ -69,6 +75,12 @@
             icon: '🧩', title: 'תרגול זיהוי', badge: 'לביניים', tone: 'intermediate', color: '#378ADD', soft: '#E6F1FB',
             homeDescription: 'תשמעו משפט — ותזהו מה מתחבא בתוכו. מחיקה? עיוות? הכללה? הבחירה שלכם.',
             description: 'שמעתם משפט? מצוין. עכשיו תגידו לנו — מה הדפוס שמסתתר בפנים? תרגול מהיר וממוקד.',
+            entryCards: [
+                { kicker: 'מה עושים כאן', title: 'מזהים את הדפוס לפני שמגיבים', body: 'בכל סבב שומעים משפט אחד ובודקים איזה מבנה לשוני באמת פועל בו: הכללה, מחיקה, עיוות או שילוב ביניהם.' },
+                { kicker: 'למה לשים לב', title: 'לא לתוכן בלבד אלא לאופן שבו הוא נאמר', body: 'המשימה כאן היא לא להסכים או לא להסכים עם המשפט, אלא לזהות מה בשפה הופך אותו לסגור, כוללני או מטעה.' },
+                { kicker: 'מה מרוויחים', title: 'עין מהירה ויציבה על דפוסים', body: 'אחרי כמה סבבים מתחילים לשמוע מילים כמו "תמיד", "ברור", "כולם" או "הוא מתעלם" ולדעת מיד איפה חסר מידע ומה כבר קפץ לפרשנות.' }
+            ],
+            successNote: 'הצלחה כאן היא לזהות את המבנה בלי לריב עם התוכן, ואז לדעת איזו שאלה תחזיר את המשפט לקרקע.',
             philosopher: {
                 name: 'ויטגנשטיין',
                 avatar: '📘',
@@ -91,6 +103,12 @@
             icon: '📡', title: 'מכ״ם שלשות', badge: 'לביניים', tone: 'advanced', color: '#7F77DD', soft: '#EEEDFE',
             homeDescription: 'כל משפט מסתיר משפחה שלמה של דפוסים. כאן תלמדו לגלות את כולם, לא רק אחד.',
             description: 'ברמה הזו לא מחפשים דפוס אחד — מחפשים את כל המשפחה. כל משפט יכול להכיל מחיקה, עיוות והכללה בו־זמנית.',
+            entryCards: [
+                { kicker: 'מה עושים כאן', title: 'רואים כמה דפוסים באותו משפט', body: 'במקום לעצור על הטריגר הראשון, פותחים את כל המפה: מה הוכלל, מה חסר, ואיזה פירוש נכנס כאילו הוא כבר עובדה.' },
+                { kicker: 'למה לשים לב', title: 'להצטברות ולא רק לסעיף בודד', body: 'רוב המשפטים האנושיים לא "טועים" במקום אחד. הם אורגים כמה קיצורי דרך יחד, ולכן גם הפירוק כאן רחב ועדין יותר.' },
+                { kicker: 'מה מרוויחים', title: 'מפת עומק של הסיפור הלשוני', body: 'המסלול הזה מלמד לראות את המפה השלמה לפני שבוחרים צעד. כך התגובה הבאה מדויקת יותר ולא ננעלת על פרט יחיד.' }
+            ],
+            successNote: 'הצלחה כאן נראית כמו היכולת לומר: זה לא רק דפוס אחד, אלא שלם קטן של הכללה, מחיקה ופירוש שהתחפש לעובדה.',
             philosopher: {
                 name: 'בנדלר',
                 avatar: '🧠',
@@ -113,6 +131,12 @@
             icon: '🎯', title: 'מכ״ם מטה-מודל', badge: 'למתקדמים', tone: 'challenge', color: '#D85A30', soft: '#FFF0E8',
             homeDescription: 'המסלול המהיר — זיהוי ושאילת שאלות מפרקות תחת לחץ זמן. למי שמוכן לאתגר האמיתי.',
             description: 'המסלול המתקדם ביותר: זיהוי מהיר ושאילת שאלות מפרקות תחת לחץ זמן. כאן הכל מתחבר.',
+            entryCards: [
+                { kicker: 'מה עושים כאן', title: 'מתרגלים דיוק מהיר בזמן אמת', body: 'המשפט מגיע, הזמן קצר, והמשימה היא לזהות מה סגור בו ולבחור שאלה אחת חדה שמחזירה את השיחה לקרקע.' },
+                { kicker: 'למה לשים לב', title: 'שאלה אחת טובה עדיפה על שלוש חכמות', body: 'במקום להציף, מחפשים את החור המרכזי במפה: מי, מה, איך, מתי או לפי מה. שאלה אחת מדויקת פותחת יותר מעשר תגובות חכמות.' },
+                { kicker: 'מה מרוויחים', title: 'יכולת אמיתית לשיחה חיה', body: 'זה המקום שבו הזיהוי, הפירוק והשאילה מתחברים להרגל אחד. פחות קיפאון או תגובת־נגד, יותר שאלה שמייצרת תנועה.' }
+            ],
+            successNote: 'הצלחה כאן היא לדעת לבחור את השאלה הקטנה שמורידה ערפל בלי לשבור את הקשר או את הקצב.',
             philosopher: {
                 name: 'גרינדר',
                 avatar: '🪄',
@@ -520,6 +544,19 @@
         if (type && challenge) return type + ' → ' + challenge;
         return type || challenge || '';
     }
+    function featureEntryCardsHtml(meta) {
+        var cards = Array.isArray(meta && meta.entryCards) ? meta.entryCards : [];
+        if (!cards.length) return '';
+        return '<section class="meta-feature-shell__entry-grid">' + cards.map(function (card) {
+            return [
+                '<article class="meta-feature-shell__entry-card">',
+                '<span class="meta-feature-shell__entry-kicker">' + escapeHtml(card.kicker || '') + '</span>',
+                '<strong class="meta-feature-shell__entry-title">' + escapeHtml(card.title || '') + '</strong>',
+                '<p class="meta-feature-shell__entry-copy">' + escapeHtml(card.body || '') + '</p>',
+                '</article>'
+            ].join('');
+        }).join('') + '</section>';
+    }
     function featureActionButton(name, icon, label) {
         return '<button type="button" class="meta-feature-shell__action-btn" data-feature-modal="' + escapeHtml(name) + '"><span class="meta-feature-shell__action-icon">' + escapeHtml(icon) + '</span><span class="meta-feature-shell__action-label">' + escapeHtml(label) + '</span></button>';
     }
@@ -531,15 +568,18 @@
         var locked = featureLocked(meta);
         var cta = locked ? ('נפתח ברמה ' + meta.unlockLevel) : pick(CTA_LABELS, meta.tab + '-cta');
         var exampleSummary = compactExampleAnalysis(meta.example || {});
+        var exampleChallenge = String(meta && meta.example && meta.example.challenge || '').trim();
         var philosopherSheet = featureModalSheet('philosopher', 'העמקה פילוסופית', philosopherModalHtml(meta));
         var videoSheet = featureModalSheet('demo', 'סרטון הדגמה', videoModalHtml(meta));
         var settingsSheet = featureModalSheet('settings', 'הגדרות למשימה', settingsModalHtml(meta, state));
         return [
             '<div class="meta-feature-shell__frame" style="--meta-feature-accent:' + escapeHtml(meta.color) + ';--meta-feature-soft:' + escapeHtml(meta.soft) + ';">',
             '<section class="meta-feature-shell__hero"><div class="meta-feature-shell__icon-wrap"><span class="meta-feature-shell__icon">' + meta.icon + '</span></div><div class="meta-feature-shell__hero-copy"><span class="meta-feature-shell__badge" data-tone="' + escapeHtml(meta.tone) + '">' + escapeHtml(meta.badge) + '</span><h2>' + escapeHtml(meta.title) + '</h2><p class="meta-feature-shell__hero-desc">' + escapeHtml(meta.description) + '</p></div></section>',
-            '<article class="meta-feature-shell__example-card"><p class="meta-feature-shell__example-sentence">' + escapeHtml(meta.example.sentence) + '</p><p class="meta-feature-shell__example-analysis">' + escapeHtml(exampleSummary) + '</p></article>',
+            featureEntryCardsHtml(meta),
+            '<article class="meta-feature-shell__example-card"><div class="meta-feature-shell__example-head"><span>איך זה נראה בפועל</span><strong>דוגמת פתיחה למסלול</strong></div><p class="meta-feature-shell__example-sentence">' + escapeHtml(meta.example.sentence) + '</p><p class="meta-feature-shell__example-analysis">' + escapeHtml(exampleSummary) + '</p>' + (exampleChallenge ? '<p class="meta-feature-shell__example-challenge"><strong>שאלת מיקוד:</strong> ' + escapeHtml(exampleChallenge) + '</p>' : '') + '</article>',
             '<div class="meta-feature-shell__actions meta-feature-shell__actions--welcome">' + featureActionButton('philosopher', '💭', 'העמקה') + featureActionButton('demo', '▶', 'סרטון') + featureActionButton('settings', '⚙', 'הגדרות') + '</div>',
             '<blockquote class="meta-feature-shell__quote meta-feature-shell__quote--compact"><p>' + escapeHtml(meta.philosopher.quote) + '</p><cite>' + escapeHtml(meta.philosopher.name) + '</cite></blockquote>',
+            '<p class="meta-feature-shell__success-note">' + escapeHtml(meta.successNote || '') + '</p>',
             '<button type="button" class="btn btn-primary meta-feature-shell__cta" data-feature-enter="' + escapeHtml(meta.tab) + '"' + (locked ? ' disabled' : '') + '>' + escapeHtml(cta) + '</button>',
             philosopherSheet,
             videoSheet,
