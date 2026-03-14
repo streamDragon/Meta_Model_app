@@ -121,6 +121,11 @@ async function runShellSmoke(baseUrl) {
     const browser = await createBrowser();
     const checks = [];
     const MANAGED_SCREENS = new Set(['sentence-map', 'practice-question', 'practice-radar', 'practice-triples-radar']);
+    const trace = (...args) => {
+        if (process.env.SHELL_SMOKE_TRACE === '1') {
+            console.log('[shell-smoke]', ...args);
+        }
+    };
     const TEST_GAMIFICATION_STATE = Object.freeze({
         xp: 600,
         streak: 4,
@@ -176,9 +181,11 @@ async function runShellSmoke(baseUrl) {
     };
 
     const navigate = async (screenId) => {
+        trace('navigate:start', screenId);
         await page.evaluate((id) => window.navigateTo(id), screenId);
         await waitForActiveScreen(screenId);
         await page.waitForTimeout(500);
+        trace('navigate:ready', screenId);
     };
 
     const overlayVisible = async (targetPage = page) =>
@@ -234,6 +241,7 @@ async function runShellSmoke(baseUrl) {
 
     const enterManagedFeatureStage = async (screenId, targetPage = page) => {
         if (!MANAGED_SCREENS.has(screenId)) return false;
+        trace('managed:enter:start', screenId);
         const stage = await targetPage.evaluate((id) => document.getElementById(id)?.dataset?.metaFeatureStage || '', screenId);
         if (stage === 'feature') return false;
         const cta = targetPage.locator(`#${screenId} [data-feature-enter]:visible`).first();
@@ -243,6 +251,7 @@ async function runShellSmoke(baseUrl) {
         await cta.click();
         await targetPage.waitForFunction((id) => document.getElementById(id)?.dataset?.metaFeatureStage === 'feature', screenId);
         await targetPage.waitForTimeout(500);
+        trace('managed:enter:ready', screenId);
         return true;
     };
 
@@ -251,6 +260,7 @@ async function runShellSmoke(baseUrl) {
     };
 
     const checkGenericScreen = async (screenId, buttonIndex) => {
+        trace('generic:start', screenId);
         await navigate(screenId);
         await closeOverlayIfOpen();
         const shellInfo = await page.evaluate(({ screenId, buttonIndex }) => {
@@ -283,11 +293,13 @@ async function runShellSmoke(baseUrl) {
             await assert(overlayTitle === shellInfo.expectedTitle, `${screenId} overlay title matches registry`, `${overlayTitle} === ${shellInfo.expectedTitle}`);
         }
         await closeOverlayWithButton();
+        trace('generic:done', screenId);
         return overlayTitle;
     };
 
     const checkManagedScreen = async (screenId, options = {}) => {
         const { verifyStatsRoute = false, verifyRestart = false } = options;
+        trace('managed:start', screenId);
         await navigate(screenId);
         await closeOverlayIfOpen();
         const welcomeState = await page.evaluate((id) => {
@@ -331,15 +343,18 @@ async function runShellSmoke(baseUrl) {
         await assert(featureState.restartVisible, `${screenId} restart shortcut visible`);
 
         if (verifyStatsRoute) {
+            trace('managed:stats:start', screenId);
             await page.locator(`#${screenId} [data-shell-chrome-stats]`).click();
             await waitForActiveScreen('home');
             const statsTitle = ((await page.locator('#meta-home-shell .meta-home-screen__header h2').textContent()) || '').trim();
             await assert(Boolean(statsTitle), `${screenId} stats route opens home stats`, statsTitle);
             await page.locator('#meta-home-shell .meta-home-screen__header [data-home-view="home"]').click();
             await page.waitForSelector('#meta-home-shell .meta-home-shell__hero h2');
+            trace('managed:stats:done', screenId);
         }
 
         if (verifyRestart) {
+            trace('managed:restart:start', screenId);
             await navigate(screenId);
             await enterManagedFeatureStage(screenId);
             await page.locator(`#${screenId} [data-shell-chrome-restart]`).click();
@@ -348,7 +363,9 @@ async function runShellSmoke(baseUrl) {
                 (await page.evaluate((id) => document.getElementById(id)?.dataset?.metaFeatureStage || '', screenId)) === 'welcome',
                 `${screenId} restart returns to welcome`
             );
+            trace('managed:restart:done', screenId);
         }
+        trace('managed:done', screenId);
     };
 
     const checkComicExperience = async () => {
@@ -468,9 +485,11 @@ async function runShellSmoke(baseUrl) {
     };
 
     try {
+        trace('boot:start');
         await seedTestState(page);
         await page.goto(baseUrl, { waitUntil: 'networkidle' });
         await dismissOnboardingIfVisible(page);
+        trace('boot:ready');
 
         await navigate('home');
         const homeTitle = ((await page.locator('#meta-home-shell .meta-home-shell__hero h2').textContent()) || '').trim();
@@ -548,12 +567,14 @@ async function runShellSmoke(baseUrl) {
         await checkGenericScreen('blueprint', 1);
         await checkGenericScreen('prismlab', 1);
         await checkGenericScreen('about', 0);
+        trace('desktop:done');
 
         const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true });
         await seedTestState(mobile);
         await mobile.goto(baseUrl, { waitUntil: 'networkidle' });
         await dismissOnboardingIfVisible(mobile);
         for (const screenId of ['home', 'sentence-map', 'practice-question', 'practice-radar', 'practice-wizard', 'blueprint']) {
+            trace('mobile:start', screenId);
             await mobile.evaluate((id) => window.navigateTo(id), screenId);
             await waitForActiveScreen(screenId, mobile);
             await enterManagedFeatureStage(screenId, mobile);
@@ -565,8 +586,10 @@ async function runShellSmoke(baseUrl) {
             }));
             await assert(mobileCheck.scrollWidth <= mobileCheck.innerWidth + 1, `mobile ${screenId} no horizontal overflow`, `${mobileCheck.scrollWidth}/${mobileCheck.innerWidth}`);
             await assert(mobileCheck.activeElement === screenId, `mobile ${screenId} active`);
+            trace('mobile:done', screenId);
         }
         for (const screenId of ['sentence-map', 'practice-wizard', 'blueprint']) {
+            trace('sticky:start', screenId);
             await mobile.evaluate((id) => window.navigateTo(id), screenId);
             await waitForActiveScreen(screenId, mobile);
             await enterManagedFeatureStage(screenId, mobile);
@@ -583,6 +606,7 @@ async function runShellSmoke(baseUrl) {
             });
             await assert(stickyCheck.stickyVisible, `mobile ${screenId} sticky CTA visible`);
             await assert(!stickyCheck.overlaps, `mobile ${screenId} sticky CTA not covered by floating audio`, JSON.stringify(stickyCheck));
+            trace('sticky:done', screenId);
         }
         await mobile.evaluate(() => window.navigateTo('home'));
         await waitForActiveScreen('home', mobile);
@@ -606,6 +630,7 @@ async function runShellSmoke(baseUrl) {
         const reducedDrawer = ((await reduced.locator('.meta-home-drawer.is-open .meta-home-drawer__head strong').textContent()) || '').trim();
         await assert(Boolean(reducedDrawer), 'reduced motion drawer path', reducedDrawer);
         await reduced.close();
+        trace('reduced:done');
 
         console.log(`PASS: shell smoke verified (${checks.length} checks).`);
     } finally {
