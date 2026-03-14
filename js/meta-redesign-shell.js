@@ -7,7 +7,7 @@
     var FEATURE_STATE_KEY = 'meta_feature_shell_v3';
     var HOME_VIEW_KEY = 'meta_home_shell_ui_v2';
     var PREFS_KEY = 'meta_shell_preferences_v1';
-    var MANAGED_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar'];
+    var MANAGED_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'about'];
     var FEATURE_CHROME_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'about'];
     var HOME_VIEWS = ['home', 'stats', 'theory', 'settings', 'help'];
     var CTA_LABELS = ['יאללה, בואו נתחיל', 'אני מוכן — קדימה', 'בואו נצלול פנימה'];
@@ -155,6 +155,338 @@
             settings: { adaptiveDifficulty: { enabled: true, defaultValue: true }, showHints: { enabled: false, defaultValue: false }, advancedMode: { enabled: true, defaultValue: true }, timer: { enabled: true, defaultValue: true } }
         }
     };
+    Object.assign(FEATURE_META, {
+        'practice-wizard': {
+            tab: 'practice-wizard', navKey: 'practiceWizard', progressKey: 'practiceWizard', progressTotal: 12, unlockLevel: 1, showOnHome: false,
+            icon: '🌉', title: 'גשר תחושה-שפה', badge: 'ליישום', tone: 'intermediate', color: '#0f766e', soft: '#ddf6f1',
+            description: 'כאן מחברים בין מה שקרה בחוץ, מה שנהיה בפנים, ומה שאפשר לומר באופן שגם נשמע אנושי וגם נשאר מחובר למציאות.',
+            entryCards: [
+                { kicker: 'מה עושים כאן', title: 'בונים משפט שאפשר לעמוד עליו', body: 'לא מתקנים ישר את המשפט המקורי. קודם מזהים מה קרה בפועל, מה החוויה שנוצרה, ואיזה ניסוח יכול להחזיק את שניהם יחד.' },
+                { kicker: 'למה זה חשוב', title: 'כדי לא להיתקע בין רגש לעובדה', body: 'כשיש רק חוויה בלי קרקע, השיחה מתפזרת. כשיש רק עובדה בלי חוויה, האדם נעלם. הגשר מחזיר את שניהם לאותו משפט.' },
+                { kicker: 'מה מרוויחים', title: 'ניסוח שאפשר לשמוע בלי להתגונן', body: 'בסוף המסלול יוצאים עם דרך לומר את מה שכואב או חסר, בלי להאשים ובלי להיעלם בתוך עמימות.' }
+            ],
+            successNote: 'הצלחה כאן נראית כמו משפט שמכבד גם את מה שקרה וגם את מה שהאדם מרגיש, ואז מזמין שיחה ולא ויכוח.',
+            example: { sentence: '״הוא לא רואה אותי״', type: 'גשר בין חוץ, פנים וצורך', challenge: 'מה קרה בפועל, מה נהיה בפנים, ואיך אומרים את זה בלי להיעלם?' },
+            quote: { text: 'כשיש הלימה בין החוויה למציאות, השפה מפסיקה להילחם ומתחילה לחבר.', author: 'Meta Model Gym' },
+            ctaLabel: 'בואו נבנה גשר',
+            modals: [
+                {
+                    id: 'workflow',
+                    icon: '🧭',
+                    label: 'איך עובדים',
+                    title: 'איך עובדים בגשר תחושה-שפה',
+                    eyebrow: 'מסלול עבודה',
+                    lead: 'לא מחפשים ניסוח יפה. מחפשים ניסוח אמיתי שאפשר גם לבדוק וגם לשמוע.',
+                    cardsTitle: 'שלושת הצעדים במסלול',
+                    cards: [
+                        { kicker: '1. חוץ', title: 'מה קרה בפועל', body: 'מה ראו, שמעו, או קרה במציאות בלי פרשנות.' },
+                        { kicker: '2. פנים', title: 'מה נהיה בפנים', body: 'מה החוויה, התחושה או ההשפעה שנוצרה בעקבות אותו רגע.' },
+                        { kicker: '3. גשר', title: 'איך אומרים את שניהם יחד', body: 'ניסוח קצר שמחבר בין החוץ לפנים בלי לעוות אף אחד מהם.' }
+                    ],
+                    tipTitle: 'טיפ להתחלה',
+                    tip: 'אם אחד משלושת החלקים חסר, בדרך כלל גם המשפט החדש עדיין לא יושב.'
+                },
+                {
+                    id: 'example',
+                    icon: '💬',
+                    label: 'דוגמה',
+                    title: 'איך זה נשמע בפועל',
+                    eyebrow: 'מעבר לדוגמה',
+                    lead: 'מהמשפט ״הוא לא רואה אותי״ אפשר לעבור לניסוח שעושה סדר ולא רק פורק כאב.',
+                    sectionTitle: 'דוגמת מעבר',
+                    paragraphs: [
+                        'בחוץ: הוא המשיך לדבר בלי להסתכל ובלי להגיב למה שאמרתי.',
+                        'בפנים: הרגשתי שאני מצטמצמת ושאין לי מקום בשיחה.',
+                        'גשר: כשאתה ממשיך לדבר בלי לעצור לרגע למה שאמרתי, אני מרגישה שאני נעלמת בתוך השיחה.'
+                    ],
+                    tipTitle: 'מה מחפשים',
+                    tip: 'המשפט הטוב הוא לא הכי דרמטי, אלא זה שאפשר להקשיב לו ולענות עליו.'
+                }
+            ]
+        },
+        'practice-verb-unzip': {
+            tab: 'practice-verb-unzip', navKey: 'practiceVerbUnzip', progressKey: 'practiceVerbUnzip', progressTotal: 10, unlockLevel: 1, showOnHome: false,
+            icon: '🧰', title: 'מרכז כלים', badge: 'ניווט', tone: 'beginner', color: '#0f4c81', soft: '#e2eef9',
+            description: 'זהו שער עבודה לכל המאמנים והמעבדות. בוחרים מסלול אחד, פותחים אותו נכון, ואז ממשיכים בלי לאבד הקשר.',
+            entryCards: [
+                { kicker: 'מה עושים כאן', title: 'בוחרים משפחת כלים', body: 'יש מסלולים בלי ברין, מסלולים עם ברין, והטמעה מהירה של כלי פירוק פועל בתוך הדף עצמו.' },
+                { kicker: 'למה זה חשוב', title: 'כדי לא לפתוח הכול יחד', body: 'במקום להיטבע בעומס, המרכז עוזר לבחור כלי אחד שמתאים לסוג העבודה שלפניך.' },
+                { kicker: 'מה מרוויחים', title: 'מעבר נקי בין כלים', body: 'אפשר לעבור בין מסכים משלימים בלי ללכת לאיבוד, ולפתוח גם מאמנים חיצוניים כשצריך עומק נוסף.' }
+            ],
+            successNote: 'הצלחה כאן נראית כמו בחירה מודעת של כלי אחד למסלול הנוכחי, במקום קפיצה אקראית בין כמה מסכים במקביל.',
+            ctaLabel: 'פתחו את מרכז הכלים',
+            modals: [
+                {
+                    id: 'tracks',
+                    icon: '🗂',
+                    label: 'המסלולים',
+                    title: 'מה מחכה בתוך מרכז הכלים',
+                    eyebrow: 'מפת מסלולים',
+                    lead: 'המסך הזה לא נועד ש״נסיים״ אותו, אלא שנבחר ממנו נכון את התחנה הבאה.',
+                    cardsTitle: 'שלושת אזורי העבודה',
+                    cards: [
+                        { kicker: 'בלי ברין', title: 'כלים לשפה, פירוק וניסוח', body: 'מאמן פועל, שינוי ניסוח, פריזמות, קצה הקרחון ושאר מסלולי הדיוק.' },
+                        { kicker: 'עם ברין', title: 'כלים למשפחות ותבניות', body: 'מכ״ם שלשות, מילון קטגוריות, ושלשות חיות או מאמנים קלאסיים.' },
+                        { kicker: 'הטמעה', title: 'כלי מהיר בתוך הדף', body: 'פירוק פועל מוטמע וקופסת מילכוד מילים לתרגול מיידי בלי לצאת מהמסך.' }
+                    ],
+                    tipTitle: 'איך לבחור נכון',
+                    tip: 'בחרו קודם סוג עבודה: זיהוי, פירוק, ניסוח, משפחות או סימולציה. אחר כך בחרו כלי אחד בלבד.'
+                },
+                {
+                    id: 'embed',
+                    icon: '⚙',
+                    label: 'איך להתחיל',
+                    title: 'איך להיכנס בלי עומס',
+                    eyebrow: 'פתיחה חכמה',
+                    lead: 'אם לא ברור מאיפה להתחיל, אפשר להשתמש במסך הזה כמו עוזר החלטה קטן.',
+                    sectionTitle: 'המלצת פתיחה',
+                    paragraphs: [
+                        'כשצריך זיהוי מהיר: עברו לתרגול זיהוי או למכ״ם מטה-מודל.',
+                        'כשצריך לפרק ניסוח עמום: פתחו את מאמן הפועל או את בונה המהלך.',
+                        'כשצריך להבין מבנה שיחה: עברו למפת המשפט, לגשר תחושה-שפה, או לסימולטור.'
+                    ],
+                    tipTitle: 'טיפ למסך הזה',
+                    tip: 'אל תשאירו את מרכז הכלים פתוח כיעד בפני עצמו. הוא שער, לא תחנה סופית.'
+                }
+            ]
+        },
+        blueprint: {
+            tab: 'blueprint', navKey: 'blueprint', progressKey: 'blueprint', progressTotal: 10, unlockLevel: 1, showOnHome: false,
+            icon: '🧭', title: 'בונה מהלך', badge: 'ביצוע', tone: 'advanced', color: '#0369a1', soft: '#e0f2fe',
+            description: 'כאן הופכים פעולה עמומה לתוכנית שאפשר באמת לבצע: מנסחים יעד, מפרקים צעדים, בודקים פער, ויוצאים עם מהלך עבודה.',
+            entryCards: [
+                { kicker: 'מה עושים כאן', title: 'מפרקים משימה עד שנשארת פעולה', body: 'מתחילים ממשפט כללי כמו ״אני צריך להשתפר״ ומוציאים ממנו צעדים, תנאים, חסמים ואלטרנטיבות.' },
+                { kicker: 'למה זה חשוב', title: 'כי עמימות לא נעלמת מעצמה', body: 'כל עוד המשימה נשארת סיסמה, אין איך להתחיל. הבונה מחזיר אותה לשפה שאפשר לפעול מתוכה.' },
+                { kicker: 'מה מרוויחים', title: 'צעד הבא ברור', body: 'בסוף הסשן נשארים עם פעולה קטנה, תנאי התחלה, ותוכנית גיבוי אם נתקעים.' }
+            ],
+            successNote: 'הצלחה כאן נראית כמו מעבר מ״אני צריך לעשות משהו״ לצעד ראשון ברור שאפשר לבצע כבר היום.',
+            example: { sentence: '״אשפר את ההקשבה שלי בשיחות״', type: 'הפיכת כוונה כללית לתוכנית', challenge: 'איך נראית הצלחה, מה הצעד הראשון, ומה חוסם בדרך?' },
+            ctaLabel: 'בואו נבנה מהלך',
+            modals: [
+                {
+                    id: 'steps',
+                    icon: '🪜',
+                    label: '4 שלבים',
+                    title: 'ארבעת שלבי בונה המהלך',
+                    eyebrow: 'סדר עבודה',
+                    lead: 'לא קופצים ישר לפתרון. עוברים דרך ארבע תחנות שבונות קרקע לביצוע.',
+                    cardsTitle: 'מה קורה בכל שלב',
+                    cards: [
+                        { kicker: '1. ניסוח', title: 'מה בעצם צריך לעשות', body: 'לוכדים את המשימה כמו שהיא נאמרת בראש או בשיחה.' },
+                        { kicker: '2. פירוק', title: 'ממה המהלך מורכב', body: 'מגדירים תוצאה, צעד ראשון, צעד אחרון, אמצע, תנאים וחסמים.' },
+                        { kicker: '3. פער', title: 'מה מצופה מול מה אפשר כרגע', body: 'בודקים ציפייה, הנחה סמויה, ויכולת נוכחית כדי לצמצם אשליה או האשמה.' },
+                        { kicker: '4. תוכנית', title: 'מה עושים עכשיו', body: 'יוצאים עם צעד פיזי, מסלול גיבוי, וייצוא של המהלך.' }
+                    ],
+                    tipTitle: 'מפתח למסך הזה',
+                    tip: 'אם עדיין אין צעד ראשון קטן, סימן שהשלב הקודם עוד לא פורק מספיק.'
+                },
+                {
+                    id: 'gap',
+                    icon: '🎯',
+                    label: 'פער ציפיות',
+                    title: 'למה שלב הפער כל כך חשוב',
+                    eyebrow: 'בדיקת מציאות',
+                    lead: 'הרבה משימות נשברות לא בגלל עצלנות אלא בגלל ציפייה לא ריאלית שמתחפשת לדרישה ברורה.',
+                    sectionTitle: 'מה בודקים כאן',
+                    paragraphs: [
+                        'מי בכלל מצפה: אני, אדם אחר, או מערכת.',
+                        'מה ההנחה הסמויה: למשל שזה אמור להיות קל, קצר, או ברור מאליו.',
+                        'מה חסר כדי לעלות עוד נקודה אחת ביכולת ולא רק להרגיש אשמה.'
+                    ],
+                    tipTitle: 'איך יודעים שזה עובד',
+                    tip: 'כשהניסוח מחדש הופך פחות מאשים ויותר תפעולי, המסך כבר עשה את העבודה שלו.'
+                }
+            ]
+        },
+        prismlab: {
+            tab: 'prismlab', navKey: 'prismLab', progressKey: 'prismLab', progressTotal: 14, unlockLevel: 1, showOnHome: false,
+            icon: '🔮', title: 'מעבדת פריזמות', badge: 'עומק', tone: 'advanced', color: '#2563eb', soft: '#e7f0ff',
+            description: 'כאן מאיטים, מפרקים מילה או ביטוי אחד, ובודקים מאיזו רמה החוויה מדברת ואיזו שאלה יכולה לפתוח אותה בעדינות.',
+            entryCards: [
+                { kicker: 'מה עושים כאן', title: 'עובדים על משפט אחד לעומק', body: 'בוחרים משפט, מזהים עוגן מרכזי, וממפים קטגוריה, רמה, שאלת הצטרפות, שאלת הובלה ותגובה אפשרית.' },
+                { kicker: 'למה זה חשוב', title: 'כדי לא להישאר רק בזיהוי', body: 'המעבדה לא עוצרת בשם הקטגוריה. היא שואלת מה נכון לשאול עכשיו ואיך זה עשוי להזיז את המפה.' },
+                { kicker: 'מה מרוויחים', title: 'מהלך התערבות שאפשר להרגיש', body: 'בסוף רואים לא רק מה בלט בשפה אלא גם איך אפשר להצטרף, להוביל, ולפתוח שכבה חדשה.' }
+            ],
+            successNote: 'הצלחה כאן נראית כמו מעבר ממילה תקועה אחת למסלול ברור של הצטרפות, הובלה ופתיחת אפשרות חדשה.',
+            example: { sentence: '״יש בינינו ניתוק מוחלט״', type: 'מילה/ביטוי לעבודה', challenge: 'מה בדיוק ניתוק, באיזו רמה זה נאמר, ומה נכון לשאול קודם?' },
+            ctaLabel: 'פתחו את המעבדה',
+            modals: [
+                {
+                    id: 'flow',
+                    icon: '🪜',
+                    label: 'סדר עבודה',
+                    title: 'סדר העבודה במעבדת הפריזמות',
+                    eyebrow: 'מסלול עבודה',
+                    lead: 'המעבדה בנויה כמו רצף התערבות: קודם מבינים מה בולט, ואז בודקים מה נכון לעשות עם זה.',
+                    cardsTitle: 'חמשת שלבי העבודה',
+                    cards: [
+                        { kicker: '1. זיהוי', title: 'מה המשפט אומר', body: 'תופסים את המשפט והמילה שכדאי לעבוד דרכה.' },
+                        { kicker: '2. קטגוריה', title: 'איזה דפוס בולט', body: 'מזהים את סוג המחיקה, ההכללה או העיוות שנמצא במרכז.' },
+                        { kicker: '3. רמה', title: 'מאיזו שכבה זה נאמר', body: 'בודקים אם המשפט מדבר על עובדה, יכולת, ערך, זהות או תמונה רחבה.' },
+                        { kicker: '4. שאלה', title: 'איך להצטרף ולהוביל', body: 'מנסחים שאלה מצטרפת, ואז שאלה שמזיזה את המבט צעד אחד.' },
+                        { kicker: '5. פתיחה', title: 'מה עשוי להיפתח', body: 'רואים אילו תגובות, אפשרויות ותנועות חדשות עלולות להופיע.' }
+                    ],
+                    tipTitle: 'טיפ למעבדה',
+                    tip: 'אם קשה לבחור רמה, קצרו קודם את המשפט לעוגן אחד. אחר כך הכול נהיה קריא יותר.'
+                },
+                {
+                    id: 'layers',
+                    icon: '🧠',
+                    label: 'רמות',
+                    title: 'למה הרמות משנות את ההתערבות',
+                    eyebrow: 'עבודה בשכבות',
+                    lead: 'אותו ניסוח יכול להישמע כמו עובדה, כמו ערך, או כמו זהות. כל רמה דורשת שאלה אחרת.',
+                    sectionTitle: 'מה כדאי לשים לב אליו',
+                    paragraphs: [
+                        'כשמשפט נאמר ברמת עובדה, בדרך כלל נרצה להחזיר אותו לקרקע ולפרטים.',
+                        'כשמשפט נאמר ברמת ערך או משמעות, נבדוק מה חשוב כאן ומה מאוים.',
+                        'כשמשפט נשמע כמו זהות, נצטרך להיזהר לא להקפיא את האדם בתוך ההגדרה.'
+                    ],
+                    tipTitle: 'בדיקה מהירה',
+                    tip: 'שאלו: האם המשפט מדבר על מה שקרה, על איך עושים, על מה זה אומר, או על מי האדם נעשה בתוך זה?'
+                }
+            ]
+        },
+        categories: {
+            tab: 'categories', navKey: 'categories', progressKey: 'categories', progressTotal: 8, unlockLevel: 1, showOnHome: false,
+            icon: '📚', title: 'מילון הקטגוריות', badge: 'ידע', tone: 'beginner', color: '#0284c7', soft: '#e0f2fe',
+            description: 'כאן פותחים את משפחות המטה-מודל, רואים מה מבדיל בין מחיקה, עיוות והכללה, ומקבלים עוגן לעבודה בתוך שיחה חיה.',
+            entryCards: [
+                { kicker: 'מה עושים כאן', title: 'מחפשים קטגוריה ומבינים אותה', body: 'המילון מאפשר לעבור בין דפוסים, לראות הגדרה, דוגמאות, ועוגני דיוק קצרים.' },
+                { kicker: 'למה זה חשוב', title: 'כדי לא לעבוד רק מהזיכרון', body: 'במקום לנחש אם משפט מסוים הוא מחיקה או עיוות, אפשר לפתוח את המשפחה הרלוונטית ולבדוק.' },
+                { kicker: 'מה מרוויחים', title: 'אוצר מילים יציב לעבודה', body: 'ככל שהמושגים נהיים בהירים יותר, גם הזיהוי בשיחה נהיה רגוע ומהיר יותר.' }
+            ],
+            successNote: 'הצלחה כאן נראית כמו היכולת לפתוח קטגוריה אחת, להבין מה היא שואלת, ולחזור ממנה ישר לתרגול.',
+            ctaLabel: 'פתחו את המילון',
+            modals: [
+                {
+                    id: 'families',
+                    icon: '🧩',
+                    label: 'שלוש משפחות',
+                    title: 'שלוש המשפחות המרכזיות',
+                    eyebrow: 'מפת יסוד',
+                    lead: 'כל דפוס במילון שייך בסוף למשפחה אחת מתוך שלוש, וכל משפחה מחזירה סוג אחר של מידע.',
+                    cardsTitle: 'איך לקרוא את המילון',
+                    cards: [
+                        { kicker: 'מחיקה', title: 'מה חסר כאן', body: 'מידע שלא נאמר אבל חייבים אותו כדי להבין את המפה.' },
+                        { kicker: 'עיוות', title: 'איזה פירוש כבר הוצמד', body: 'המשמעות שנוספה כאילו הייתה עובדה.' },
+                        { kicker: 'הכללה', title: 'איפה מקרה אחד הפך לחוק', body: 'מסקנה רחבה מדי שמוחקת שונות, תנאים או חריגים.' }
+                    ],
+                    tipTitle: 'טיפ למילון',
+                    tip: 'אל תנסו לקרוא הכול. בחרו קטגוריה אחת, בדקו אותה, ואז חזרו לתרגול עם אותה עדשה.'
+                },
+                {
+                    id: 'usage',
+                    icon: '🔍',
+                    label: 'איך משתמשים',
+                    title: 'איך להשתמש במילון בלי להיתקע בו',
+                    eyebrow: 'שימוש חכם',
+                    lead: 'המילון הוא עוגן עבודה, לא עוד מסך ידע שצריך לסיים.',
+                    sectionTitle: 'שיטת שימוש קצרה',
+                    paragraphs: [
+                        'התחילו ממשפט אמיתי או מתרגול שנתקעתם בו.',
+                        'פתחו קטגוריה אחת והשוו בין ההגדרה לבין הדוגמה שבידכם.',
+                        'חזרו מיד לשיחה, לתרגול או למכ״ם עם שאלה אחת לבדיקה.'
+                    ],
+                    tipTitle: 'מה לא לעשות',
+                    tip: 'אם אתם רק קוראים עוד ועוד הגדרות בלי לחזור לשפה חיה, סימן שהמילון הפך למטרה במקום לכלי.'
+                }
+            ]
+        },
+        'comic-engine': {
+            tab: 'comic-engine', navKey: 'comicEngine', progressKey: 'comicEngine', progressTotal: 10, unlockLevel: 1, showOnHome: false,
+            icon: '🎭', title: 'במת קומיקס רגשי', badge: 'סצנה', tone: 'challenge', color: '#b45309', soft: '#ffedd5',
+            description: 'כאן מתרגלים תגובה בתוך רגע חי: בוחרים טון, רואים איך הוא נוחת על הזרימה, הסוכנות והבושה, וממשיכים את הסצנה מתוך התוצאה.',
+            entryCards: [
+                { kicker: 'מה עושים כאן', title: 'בוחרים תגובה עם משקל רגשי', body: 'בכל סצנה מקבלים רגע טעון, כמה אפשרויות תגובה, ומשוב מיידי על מה שהבחירה יצרה.' },
+                { kicker: 'למה זה חשוב', title: 'כי מילה משנה את כל הבמה', body: 'התרגול לא עוסק רק במה נכון לומר, אלא גם באיך זה נשמע, מה זה עושה לצד השני, ואיך זה משנה את ההמשך.' },
+                { kicker: 'מה מרוויחים', title: 'חיבור בין דיוק לטון', body: 'במקום תשובה ״נכונה״ על הנייר, רואים איך תגובה משפיעה על מערכת יחסים חיה תחת לחץ.' }
+            ],
+            successNote: 'הצלחה כאן נראית כמו בחירה שמורידה הגנה, משאירה סוכנות, ופותחת את הצעד הבא בסצנה.',
+            ctaLabel: 'היכנסו לבמה',
+            modals: [
+                {
+                    id: 'stage',
+                    icon: '🎬',
+                    label: 'איך קוראים',
+                    title: 'איך קוראים את הבמה',
+                    eyebrow: 'קריאת סצנה',
+                    lead: 'לפני שבוחרים תגובה, כדאי להבין מה קורה בחדר: מי בלחץ, מי מצטמצם, ומה מנסה להתייצב.',
+                    cardsTitle: 'שלושת ערוצי הקריאה',
+                    cards: [
+                        { kicker: 'הקשר', title: 'מה קרה רגע לפני', body: 'הסצנה תמיד מגיעה עם לחץ, היסטוריה או טריגר שצריך לראות.' },
+                        { kicker: 'תגובה', title: 'איזה טון אתם בוחרים', body: 'כל כרטיס תגובה מביא איתו סגנון אחר: חקירה, הגנה, חיבור, לעג או מרחק.' },
+                        { kicker: 'השפעה', title: 'מה זה עושה לזירה', body: 'המערכת מחזירה שינוי בזרימה, בסוכנות ובבושה כדי להבין את המחיר והפוטנציאל.' }
+                    ],
+                    tipTitle: 'לפני לחיצה',
+                    tip: 'חפשו לא רק מה ״חכם״ לומר, אלא מה ישאיר את הסצנה חיה ויעזור לשני הצדדים לנשום.'
+                },
+                {
+                    id: 'feedback',
+                    icon: '💥',
+                    label: 'מה משתנה',
+                    title: 'מה המשוב מראה לכם',
+                    eyebrow: 'קריאת השפעה',
+                    lead: 'אחרי כל בחירה, הסצנה לא רק מסבירה אלא גם מראה לאן הלחץ זז.',
+                    sectionTitle: 'שלושת המדדים שעל הבמה',
+                    paragraphs: [
+                        'זרימה: עד כמה השיחה ממשיכה לנוע במקום להיתקע או להתפוצץ.',
+                        'סוכנות: עד כמה הצדדים עדיין מרגישים שיש להם בחירה ומרחב פעולה.',
+                        'בושה: עד כמה הבחירה מצמצמת, משפילה או מציפה את הדמות שמולכם.'
+                    ],
+                    tipTitle: 'איך להשתמש בזה',
+                    tip: 'לא חייבים לחפש בחירה מושלמת. מספיק לראות איזה מחיר רגשי כל תגובה גובה, ואז לבחור יותר במודעות.'
+                }
+            ]
+        },
+        about: {
+            tab: 'about', navKey: 'about', progressKey: 'about', progressTotal: 6, unlockLevel: 1, showOnHome: false,
+            icon: '🤝', title: 'על המוצר והקהילה', badge: 'קהילה', tone: 'beginner', color: '#64748b', soft: '#eef2f7',
+            description: 'זהו שער הרקע של האפליקציה ושל כיכר השוק: מהו Meta Model Gym, למה הוא נבנה, ואיפה אפשר לשאול, לשתף ולדייק יחד.',
+            entryCards: [
+                { kicker: 'מה יש כאן', title: 'רקע על המוצר', body: 'מסבירים מה האפליקציה מנסה לאמן, אילו משפחות מרכזיות היא מחזיקה, ואיך לגשת אליה בלי ללכת לאיבוד.' },
+                { kicker: 'המרחב האנושי', title: 'כיכר השוק', body: 'יש כאן גם מקום פתוח לשאלות, תגובות וניסוחים, לא רק מסכי אימון.' },
+                { kicker: 'מה מרוויחים', title: 'כניסה רכה לאפליקציה', body: 'גם מי שלא רוצה להתחיל ישר מתרגול יכול להבין את השפה, את הכיוון, ואת רוח המקום.' }
+            ],
+            successNote: 'הצלחה כאן נראית כמו תחושת התמצאות: מהו המוצר, איך לדבר בו, ואיפה אפשר לפגוש אנשים ושאלות בתוך הדרך.',
+            ctaLabel: 'פתחו את כיכר השוק',
+            modals: [
+                {
+                    id: 'product',
+                    icon: '🧠',
+                    label: 'על המוצר',
+                    title: 'מהו Meta Model Gym',
+                    eyebrow: 'מעטפת עבודה',
+                    lead: 'האפליקציה נבנתה כדי לעזור ללומדים ולמתרגלים לשמוע שפה בצורה חדה יותר, לשאול שאלות מדויקות, ולתרגל תגובה בזמן אמת.',
+                    cardsTitle: 'שלוש המשפחות במרכז',
+                    cards: [
+                        { kicker: 'מחיקה', title: 'מה חסר במשפט', body: 'מידע חשוב שנשמט וצריך להחזיר כדי להבין.' },
+                        { kicker: 'עיוות', title: 'איזה פירוש הודבק לעובדה', body: 'משמעות, ניחוש או חוק שנוצרו כאילו היו המציאות עצמה.' },
+                        { kicker: 'הכללה', title: 'איפה מקרה אחד הפך לכלל', body: 'ניסוח שמרחיב מקרה יחיד לחוק רחב מדי.' }
+                    ],
+                    tipTitle: 'איך להיכנס',
+                    tip: 'לא צריך להבין הכול מראש. מספיק לבחור מסלול אחד ולחזור לכאן כשצריך הקשר רחב יותר.'
+                },
+                {
+                    id: 'community',
+                    icon: '🗣',
+                    label: 'כיכר השוק',
+                    title: 'מהי כיכר השוק',
+                    eyebrow: 'מרחב קהילתי',
+                    lead: 'זהו המקום הפתוח של האפליקציה: לשאול, לנסח, להגיב ולפגוש קולות נוספים סביב מטה-מודל ושפה.',
+                    sectionTitle: 'מה אפשר לעשות כאן',
+                    paragraphs: [
+                        'להעלות שאלה או ניסוח שתרצו לדייק.',
+                        'לקרוא תגובות ופוסטים שנשמרו בכיכר המקומית בדפדפן.',
+                        'להשתמש בכיכר כמרחב אנושי משלים למסכי האימון.'
+                    ],
+                    tipTitle: 'רוח המקום',
+                    tip: 'הכיכר נועדה לשיח פתוח ומכבד. לא צריך להיות “מוכן” כדי להיכנס אליה.'
+                }
+            ]
+        }
+    });
+
     var STATIC_VIEWS = {
         theory: { title: 'רקע תיאורטי', kicker: 'איך לחשוב עם המטא-מודל', body: 'המטא-מודל לא מחפש "לתפוס טעויות", אלא להחזיר בחירה, דיוק והקשר.', bullets: ['מחיקה: מה חסר כדי להבין את התמונה?', 'עיוות: איזו משמעות נוספה בלי בדיקה?', 'הכללה: איפה מקרה אחד הפך לחוק על הכל?'] },
         help: { title: 'עזרה קצרה', kicker: 'איך משתמשים בבית החדש', body: 'הבית מציג ארבעה מסלולי ליבה. בכל כניסה למסלול יש warm-up קצר, ואז רק התרגול עצמו בלי עומס מיותר.', bullets: ['כוכבים מצטברים בכל פיצ׳ר.', 'ני״ק מעלים רמות ופותחים מסלולים.', 'כשתצאו מפיצ׳ר ותחזרו, תתחילו שוב ממסך ה-welcome.'] }
@@ -176,6 +508,11 @@
     function parseJson(raw, fallback) { try { return JSON.parse(raw); } catch (_error) { return fallback; } }
     function isManaged(tabName) { return MANAGED_TABS.indexOf(normalizeTab(tabName)) !== -1; }
     function getMeta(tabName) { return FEATURE_META[normalizeTab(tabName)] || null; }
+    function featureTabsForHome() {
+        return Object.keys(FEATURE_META).filter(function (tab) {
+            return FEATURE_META[tab] && FEATURE_META[tab].showOnHome !== false;
+        });
+    }
     function hashValue(value) { var hash = 0; var input = String(value || ''); for (var i = 0; i < input.length; i += 1) { hash = ((hash << 5) - hash) + input.charCodeAt(i); hash |= 0; } return Math.abs(hash); }
     function pick(list, seed) { return Array.isArray(list) && list.length ? list[hashValue(seed + '|' + new Date().toDateString()) % list.length] : ''; }
 
@@ -296,7 +633,7 @@
     function resumeCopy(resume) { if (!resume || !resume.tab) return 'הבית מחזיק את ארבעת מסלולי הליבה, וכל שאר הכלים נשארים זמינים מהתפריט.'; if (typeof window.formatRelativeTimeShort === 'function') { var rel = String(window.formatRelativeTimeShort(resume.at) || '').trim(); if (rel) return 'הייתם שם ' + rel + '. אפשר לחזור ישר בדיוק מאותה נקודה.'; } return 'אפשר לחזור בדיוק מהמקום שבו עצרתם, בלי לחפש שוב את הדרך פנימה.'; }
     function nextUnlock(summary) {
         var found = null;
-        Object.keys(FEATURE_META).forEach(function (tab) { var meta = getMeta(tab); if (summary.level < meta.unlockLevel && (!found || meta.unlockLevel < found.unlockLevel)) found = meta; });
+        featureTabsForHome().forEach(function (tab) { var meta = getMeta(tab); if (summary.level < meta.unlockLevel && (!found || meta.unlockLevel < found.unlockLevel)) found = meta; });
         return found;
     }
     function homeCard(meta, index) {
@@ -412,7 +749,7 @@
             '<div class="meta-home-screen__frame">',
             '<header class="meta-home-screen__header"><button type="button" class="btn btn-secondary" data-home-view="home">↩ חזרה</button><div><span class="meta-home-screen__kicker">המסע שלכם</span><h2>הסטטיסטיקות שלי</h2></div></header>',
             '<section class="meta-home-screen__stats-grid"><article class="meta-home-screen__mini-stat"><span>⭐</span><strong>' + summary.totalStars + '</strong><small>כוכבים</small></article><article class="meta-home-screen__mini-stat"><span>🔥</span><strong>' + summary.streak + '</strong><small>ימים</small></article><article class="meta-home-screen__mini-stat"><span>📈</span><strong>רמה ' + summary.level + '</strong><small>' + escapeHtml(summary.levelTitle || LEVEL_TITLES[summary.level] || 'צעד ראשון') + '</small></article></section>',
-            '<section class="meta-home-screen__panel"><div class="meta-home-screen__section-head"><span>התקדמות בפיצ׳רים</span><strong>ככל שמצטברים כוכבים, הדרך נעשית ברורה יותר</strong></div>' + Object.keys(FEATURE_META).map(function (tab) { return statsRow(FEATURE_META[tab]); }).join('') + '</section>',
+            '<section class="meta-home-screen__panel"><div class="meta-home-screen__section-head"><span>התקדמות בפיצ׳רים</span><strong>ככל שמצטברים כוכבים, הדרך נעשית ברורה יותר</strong></div>' + featureTabsForHome().map(function (tab) { return statsRow(FEATURE_META[tab]); }).join('') + '</section>',
             '<section class="meta-home-screen__panel"><div class="meta-home-screen__section-head"><span>הישגים</span><strong>אבני דרך קטנות שמראות שאתם באמת בתנועה</strong></div>' +
             achievement('צעד ראשון', 'תרגיל ראשון או כוכב ראשון במערכת', summary.totalStars > 0 || summary.xp > 0) +
             achievement('שבוע של רצף', '7 ימים של נוכחות והקשבה', summary.streak >= 7 || summary.bestStreak >= 7) +
@@ -469,7 +806,7 @@
             '<div class="meta-home-shell__frame">',
             '<header class="meta-home-shell__topbar"><button type="button" class="meta-home-shell__menu btn btn-secondary" data-home-menu>☰ תפריט</button><div class="meta-home-shell__brand"><span class="meta-home-shell__eyebrow">מטען עבודה</span><strong>Meta Model בעברית</strong></div></header>',
             homeHero(summary), homeStats(summary), homeResume(),
-            '<section class="meta-home-shell__cards">' + Object.keys(FEATURE_META).map(function (tab, index) { return homeCard(FEATURE_META[tab], index); }).join('') + '</section>',
+            '<section class="meta-home-shell__cards">' + featureTabsForHome().map(function (tab, index) { return homeCard(FEATURE_META[tab], index); }).join('') + '</section>',
             '<div class="meta-home-shell__divider" aria-hidden="true"></div>',
             homeBonusSection(),
             '</div>'
@@ -563,7 +900,90 @@
     function featureModalSheet(name, title, bodyHtml, extraClass) {
         return '<div class="meta-feature-modal hidden" data-feature-modal-box="' + escapeHtml(name) + '" hidden><div class="meta-feature-modal__backdrop" data-feature-close></div><article class="meta-feature-modal__dialog meta-feature-modal__dialog--sheet' + (extraClass ? ' ' + extraClass : '') + '"><header class="meta-feature-modal__header"><strong class="meta-feature-modal__title">' + escapeHtml(title) + '</strong><button type="button" class="meta-feature-modal__close" data-feature-close>✕</button></header><div class="meta-feature-modal__content">' + bodyHtml + '</div></article></div>';
     }
+    function genericFeatureModalHtml(modal) {
+        var safeModal = modal && typeof modal === 'object' ? modal : {};
+        var heroTitle = String(safeModal.heroTitle || '').trim();
+        var lead = String(safeModal.lead || '').trim();
+        var paragraphs = Array.isArray(safeModal.paragraphs) ? safeModal.paragraphs : [];
+        var quote = safeModal.quote && typeof safeModal.quote === 'object' ? safeModal.quote : null;
+        var cardsMeta = { entryCards: Array.isArray(safeModal.cards) ? safeModal.cards : [] };
+        var parts = [];
+        if (safeModal.icon || safeModal.eyebrow || heroTitle || lead) {
+            parts.push('<div class="meta-feature-modal__hero">' + (safeModal.icon ? '<span class="meta-feature-modal__avatar">' + escapeHtml(safeModal.icon) + '</span>' : '') + '<div class="meta-feature-modal__hero-copy">' + (safeModal.eyebrow ? '<span class="meta-feature-modal__eyebrow">' + escapeHtml(safeModal.eyebrow) + '</span>' : '') + (heroTitle ? '<h3>' + escapeHtml(heroTitle) + '</h3>' : '') + (lead ? '<p class="meta-feature-modal__lead">' + escapeHtml(lead) + '</p>' : '') + '</div></div>');
+        }
+        if (quote && quote.text) {
+            parts.push('<blockquote class="meta-feature-modal__quote"><p>' + escapeHtml(quote.text || '') + '</p><cite>' + escapeHtml(quote.author || '') + '</cite></blockquote>');
+        }
+        if (paragraphs.length) {
+            parts.push('<section class="meta-feature-modal__surface"><span class="meta-feature-modal__eyebrow">' + escapeHtml(safeModal.sectionTitle || 'מה חשוב לדעת') + '</span>' + richParagraphs(paragraphs) + '</section>');
+        }
+        if (cardsMeta.entryCards.length) {
+            parts.push('<section class="meta-feature-modal__surface meta-feature-modal__surface--tint"><span class="meta-feature-modal__eyebrow">' + escapeHtml(safeModal.cardsTitle || 'כמה צעדים קצרים') + '</span>' + featureEntryCardsHtml(cardsMeta) + '</section>');
+        }
+        if (safeModal.tip) {
+            parts.push('<section class="meta-feature-modal__tip"><strong>' + escapeHtml(safeModal.tipTitle || 'טיפ להתחלה') + '</strong><p>' + escapeHtml(safeModal.tip) + '</p></section>');
+        }
+        parts.push('<button type="button" class="btn btn-primary meta-feature-modal__cta" data-feature-close>' + escapeHtml(safeModal.ctaLabel || 'הבנתי, בואו נתרגל') + '</button>');
+        return parts.join('');
+    }
+    function featureActionButtonsHtml(meta) {
+        var actions = [];
+        if (Array.isArray(meta.modals) && meta.modals.length) {
+            actions = meta.modals.map(function (modal) {
+                return featureActionButton(modal.id || 'info', modal.icon || 'ℹ', modal.label || modal.title || 'מידע');
+            });
+        } else {
+            if (meta.philosopher) actions.push(featureActionButton('philosopher', '💭', 'העמקה'));
+            if (meta.demo || meta.example) actions.push(featureActionButton('demo', '▶', 'סרטון'));
+            if (meta.settings && Object.keys(meta.settings).length) actions.push(featureActionButton('settings', '⚙', 'הגדרות'));
+        }
+        return actions.length ? '<div class="meta-feature-shell__actions meta-feature-shell__actions--welcome">' + actions.join('') + '</div>' : '';
+    }
+    function featureModalSheetsHtml(meta, state) {
+        if (Array.isArray(meta.modals) && meta.modals.length) {
+            return meta.modals.map(function (modal) {
+                return featureModalSheet(modal.id || 'info', modal.title || modal.label || 'מידע', typeof modal.bodyHtml === 'string' ? modal.bodyHtml : genericFeatureModalHtml(modal), modal.extraClass || '');
+            }).join('');
+        }
+        return [
+            meta.philosopher ? featureModalSheet('philosopher', 'העמקה פילוסופית', philosopherModalHtml(meta)) : '',
+            (meta.demo || meta.example) ? featureModalSheet('demo', 'סרטון הדגמה', videoModalHtml(meta)) : '',
+            (meta.settings && Object.keys(meta.settings).length) ? featureModalSheet('settings', 'הגדרות למשימה', settingsModalHtml(meta, state)) : ''
+        ].join('');
+    }
+    function featureQuoteHtml(meta) {
+        var quote = meta && meta.quote && meta.quote.text ? meta.quote : ((meta && meta.philosopher && meta.philosopher.quote) ? { text: meta.philosopher.quote, author: meta.philosopher.name } : null);
+        if (!quote) return '';
+        return '<blockquote class="meta-feature-shell__quote meta-feature-shell__quote--compact"><p>' + escapeHtml(quote.text || '') + '</p><cite>' + escapeHtml(quote.author || '') + '</cite></blockquote>';
+    }
+    function featureExampleHtml(meta) {
+        var example = meta && meta.example && typeof meta.example === 'object' ? meta.example : null;
+        var exampleSummary;
+        var exampleChallenge;
+        if (!example || !example.sentence) return '';
+        exampleSummary = compactExampleAnalysis(example || {});
+        exampleChallenge = String(example.challenge || '').trim();
+        return '<article class="meta-feature-shell__example-card"><div class="meta-feature-shell__example-head"><span>איך זה נראה בפועל</span><strong>דוגמת פתיחה למסלול</strong></div><p class="meta-feature-shell__example-sentence">' + escapeHtml(example.sentence || '') + '</p>' + (exampleSummary ? '<p class="meta-feature-shell__example-analysis">' + escapeHtml(exampleSummary) + '</p>' : '') + (exampleChallenge ? '<p class="meta-feature-shell__example-challenge"><strong>שאלת מיקוד:</strong> ' + escapeHtml(exampleChallenge) + '</p>' : '') + '</article>';
+    }
+    function buildFeatureShellHtml(meta) {
+        var state = getTabState(meta.tab);
+        var locked = featureLocked(meta);
+        var cta = locked ? ('נפתח ברמה ' + meta.unlockLevel) : String(meta.ctaLabel || pick(CTA_LABELS, meta.tab + '-cta'));
+        return [
+            '<div class="meta-feature-shell__frame" style="--meta-feature-accent:' + escapeHtml(meta.color) + ';--meta-feature-soft:' + escapeHtml(meta.soft) + ';">',
+            '<section class="meta-feature-shell__hero"><div class="meta-feature-shell__icon-wrap"><span class="meta-feature-shell__icon">' + meta.icon + '</span></div><div class="meta-feature-shell__hero-copy"><span class="meta-feature-shell__badge" data-tone="' + escapeHtml(meta.tone) + '">' + escapeHtml(meta.badge) + '</span><h2>' + escapeHtml(meta.title) + '</h2><p class="meta-feature-shell__hero-desc">' + escapeHtml(meta.description) + '</p></div></section>',
+            featureEntryCardsHtml(meta),
+            featureExampleHtml(meta),
+            featureActionButtonsHtml(meta),
+            featureQuoteHtml(meta),
+            (meta.successNote ? '<p class="meta-feature-shell__success-note">' + escapeHtml(meta.successNote || '') + '</p>' : ''),
+            '<button type="button" class="btn btn-primary meta-feature-shell__cta" data-feature-enter="' + escapeHtml(meta.tab) + '"' + (locked ? ' disabled' : '') + '>' + escapeHtml(cta) + '</button>',
+            featureModalSheetsHtml(meta, state),
+            '</div>'
+        ].join('');
+    }
     function featureShellHtml(meta) {
+        return buildFeatureShellHtml(meta);
         var state = getTabState(meta.tab);
         var locked = featureLocked(meta);
         var cta = locked ? ('נפתח ברמה ' + meta.unlockLevel) : pick(CTA_LABELS, meta.tab + '-cta');

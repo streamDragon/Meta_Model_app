@@ -7,7 +7,7 @@
     'use strict';
 
     var SEEN_KEY = 'mm_feature_seen_v1';
-    var MANAGED_WELCOME_FEATURE_IDS = ['sentence-map', 'practice-question', 'practice-radar', 'practice-triples-radar'];
+    var MANAGED_WELCOME_FEATURE_IDS = ['sentence-map', 'practice-question', 'practice-radar', 'practice-triples-radar', 'practice-wizard'];
     var seen = {};
     try { seen = JSON.parse(localStorage.getItem(SEEN_KEY) || '{}'); } catch (_) {}
 
