@@ -172,6 +172,7 @@ async function runShellSmoke(baseUrl) {
 
     const seedTestState = async (targetPage = page) => {
         await targetPage.addInitScript((seed) => {
+            if (window.top !== window) return;
             [
                 'meta_feature_shell_v3',
                 'meta_shell_continue_v1',
