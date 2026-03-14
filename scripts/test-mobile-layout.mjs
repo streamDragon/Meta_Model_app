@@ -143,6 +143,7 @@ async function dismissOnboardingIfVisible(page) {
 
 async function seedTestState(page) {
     await page.addInitScript((seed) => {
+        if (window.top !== window) return;
         [
             'meta_feature_shell_v3',
             'meta_shell_continue_v1',
