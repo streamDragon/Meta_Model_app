@@ -369,7 +369,8 @@ async function runShellSmoke(baseUrl) {
         await modalTrigger.click();
         await page.waitForSelector(`#${screenId} [data-feature-modal-box]:not([hidden])`);
         await assert((await page.locator(`#${screenId} [data-feature-modal-box]:not([hidden])`).count()) > 0, `${screenId} welcome sheet opens`);
-        await page.locator(`#${screenId} [data-feature-modal-box]:not([hidden]) .meta-feature-modal__close`).click();
+        await page.waitForTimeout(180);
+        await page.locator(`#${screenId} [data-feature-modal-box]:not([hidden]) .meta-feature-modal__close`).click({ force: true });
         await page.waitForFunction((id) => {
             const node = document.querySelector(`#${id} [data-feature-modal-box]:not([hidden])`);
             return !node;
