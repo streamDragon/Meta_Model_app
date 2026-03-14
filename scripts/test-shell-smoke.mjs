@@ -263,6 +263,7 @@ async function runShellSmoke(baseUrl) {
         trace('managed:enter:start', screenId);
         const contentSelector = MANAGED_CONTENT_SELECTOR_BY_SCREEN[screenId] || '';
         const stage = await targetPage.evaluate((id) => document.getElementById(id)?.dataset?.metaFeatureStage || '', screenId);
+        await closeOverlayIfOpen(targetPage);
         if (stage !== 'feature') {
             const cta = targetPage.locator(`#${screenId} [data-feature-enter]:visible`).first();
             if ((await cta.count()) === 0) {
