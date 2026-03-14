@@ -120,12 +120,25 @@ async function startLocalServer() {
 async function runShellSmoke(baseUrl) {
     const browser = await createBrowser();
     const checks = [];
-    const MANAGED_SCREENS = new Set(['sentence-map', 'practice-question', 'practice-radar', 'practice-triples-radar']);
+    const MANAGED_SCREENS = new Set([
+        'sentence-map',
+        'practice-question',
+        'practice-radar',
+        'practice-triples-radar',
+        'practice-wizard',
+        'practice-verb-unzip',
+        'blueprint',
+        'prismlab',
+        'categories',
+        'comic-engine',
+        'about'
+    ]);
     const MANAGED_CONTENT_SELECTOR_BY_SCREEN = Object.freeze({
         'sentence-map': '#sentence-map .practice-section-sentence-map',
         'practice-question': '#practice-question .practice-section-question',
         'practice-radar': '#practice-radar .practice-section-radar',
-        'practice-triples-radar': '#practice-triples-radar .practice-section-triples-radar'
+        'practice-triples-radar': '#practice-triples-radar .practice-section-triples-radar',
+        'practice-wizard': '#practice-wizard .practice-section-wizard'
     });
     const trace = (...args) => {
         if (process.env.SHELL_SMOKE_TRACE === '1') {
@@ -260,16 +273,25 @@ async function runShellSmoke(baseUrl) {
         }
         await targetPage.waitForFunction(({ id, selector }) => {
             const section = document.getElementById(id);
-            const content = selector ? document.querySelector(selector) : null;
-            if (!section || section.dataset?.metaFeatureStage !== 'feature' || !content) return false;
-            const style = getComputedStyle(content);
-            const rect = content.getBoundingClientRect();
-            return !content.hasAttribute('data-intro-locked')
-                && !content.hidden
-                && style.display !== 'none'
-                && style.visibility !== 'hidden'
-                && rect.width > 0
-                && rect.height > 0;
+            const contentNodes = selector
+                ? [document.querySelector(selector)].filter(Boolean)
+                : Array.from(section?.children || []).filter((node) => {
+                    if (!(node instanceof HTMLElement)) return false;
+                    if (node.classList.contains('meta-feature-welcome-shell')) return false;
+                    if (node.hasAttribute('data-meta-feature-chrome')) return false;
+                    return true;
+                });
+            if (!section || section.dataset?.metaFeatureStage !== 'feature' || !contentNodes.length) return false;
+            return contentNodes.some((content) => {
+                const style = getComputedStyle(content);
+                const rect = content.getBoundingClientRect();
+                return !content.hasAttribute('data-intro-locked')
+                    && !content.hidden
+                    && style.display !== 'none'
+                    && style.visibility !== 'hidden'
+                    && rect.width > 0
+                    && rect.height > 0;
+            });
         }, { id: screenId, selector: contentSelector });
         await targetPage.waitForTimeout(500);
         trace('managed:enter:ready', screenId);
@@ -284,6 +306,8 @@ async function runShellSmoke(baseUrl) {
         trace('generic:start', screenId);
         await navigate(screenId);
         await closeOverlayIfOpen();
+        await enterManagedFeatureStage(screenId);
+        await page.waitForSelector(`#${screenId} .app-shell`);
         const shellInfo = await page.evaluate(({ screenId, buttonIndex }) => {
             const section = document.getElementById(screenId);
             const shell = section?.querySelector('.app-shell');
@@ -339,13 +363,15 @@ async function runShellSmoke(baseUrl) {
         await assert(!welcomeState.ctaDisabled, `${screenId} welcome CTA unlocked`);
         await assert(welcomeState.welcomeChromeVisible, `${screenId} welcome chrome visible`);
 
-        await page.locator(`#${screenId} [data-feature-modal="settings"]`).first().click();
-        await page.waitForSelector(`#${screenId} [data-feature-modal-box="settings"]:not([hidden])`);
-        await assert((await page.locator(`#${screenId} [data-feature-modal-box="settings"]:not([hidden])`).count()) > 0, `${screenId} settings sheet opens`);
-        await page.locator(`#${screenId} [data-feature-modal-box="settings"] .meta-feature-modal__close`).click();
+        const modalTrigger = page.locator(`#${screenId} [data-feature-modal]:visible`).first();
+        await assert((await modalTrigger.count()) > 0, `${screenId} welcome modal action visible`);
+        await modalTrigger.click();
+        await page.waitForSelector(`#${screenId} [data-feature-modal-box]:not([hidden])`);
+        await assert((await page.locator(`#${screenId} [data-feature-modal-box]:not([hidden])`).count()) > 0, `${screenId} welcome sheet opens`);
+        await page.locator(`#${screenId} [data-feature-modal-box]:not([hidden]) .meta-feature-modal__close`).click();
         await page.waitForFunction((id) => {
-            const node = document.querySelector(`#${id} [data-feature-modal-box="settings"]`);
-            return !node || node.hidden;
+            const node = document.querySelector(`#${id} [data-feature-modal-box]:not([hidden])`);
+            return !node;
         }, screenId);
 
         await enterManagedFeatureStage(screenId);
@@ -395,6 +421,7 @@ async function runShellSmoke(baseUrl) {
     const checkComicExperience = async () => {
         await navigate('comic-engine');
         await closeOverlayIfOpen();
+        await enterManagedFeatureStage('comic-engine');
         await page.waitForSelector('#ceflow-choice-deck button[data-choice-id]');
 
         const initialState = await page.evaluate(() => {
@@ -549,6 +576,7 @@ async function runShellSmoke(baseUrl) {
         await checkManagedScreen('sentence-map', { verifyStatsRoute: true, verifyRestart: true });
         await checkManagedScreen('practice-question');
         await checkManagedScreen('practice-triples-radar');
+        await checkManagedScreen('practice-wizard');
 
         await navigate('home');
         await navigate('practice-radar');
@@ -568,6 +596,7 @@ async function runShellSmoke(baseUrl) {
 
         await navigate('practice-verb-unzip');
         await closeOverlayIfOpen();
+        await enterManagedFeatureStage('practice-verb-unzip');
         await assert((await page.locator('#practice-verb-unzip .app-shell').count()) > 0, 'practice-verb-unzip shell mounted');
         await clickHeaderButton('practice-verb-unzip', 1);
         const verbTitle = await getOverlayTitle();
