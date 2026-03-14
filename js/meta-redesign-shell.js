@@ -47,7 +47,19 @@
             icon: '🗺️', title: 'מפת המשפט', badge: 'למתחילים', tone: 'beginner', color: '#1D9E75', soft: '#E1F5EE',
             homeDescription: 'בואו נלמד לקרוא בין השורות — מה באמת קרה, מה אנחנו מרגישים, ומה אנחנו באמת מבקשים.',
             description: 'כאן תלמדו לפרק כל משפט לשלוש שכבות: מה קרה בעולם החיצוני, מה קורה בתוכנו, ומה אנחנו באמת מבקשים.',
-            philosopher: { name: 'סוקרטס', avatar: '🏛️', quote: 'דע את עצמך — כל שאלה טובה מתחילה מהקשבה עמוקה.', deep: 'סוקרטס האמין שרוב הסבל האנושי נובע מחוסר בהירות. כשאנחנו מפרקים משפט לשכבות, אנחנו שואלים "מה באמת קורה כאן?" במקום לקבל את פני השטח כמובן מאליו.' },
+            philosopher: {
+                name: 'סוקרטס',
+                avatar: '🏛️',
+                quote: 'דע את עצמך — כל שאלה טובה מתחילה מהקשבה עמוקה.',
+                deep: 'סוקרטס האמין שרוב הסבל האנושי נובע מחוסר בהירות. כשאנחנו מפרקים משפט לשכבות, אנחנו שואלים "מה באמת קורה כאן?" במקום לקבל את פני השטח כמובן מאליו.',
+                lead: 'סוקרטס לא מחפש תשובה מהירה, אלא בהירות שמאפשרת לראות את מה שבאמת קורה בשיחה.',
+                deepLines: [
+                    'סוקרטס לא קיבל אמירה כללית כאמת סופית. הוא שאל שוב ושוב עד שהמילים הפכו למשהו שאפשר לבדוק, להרגיש ולפגוש במציאות.',
+                    'במפת המשפט זה בדיוק המהלך: לא להישאר עם "אף אחד לא מבין אותי", אלא לפתוח מה קרה בחוץ, מה קרה בפנים, ומהו הצורך שמבקש הכרה.',
+                    'הדיוק הזה לא מקטין את החוויה. להפך: הוא מכבד אותה מספיק כדי לתת לה צורה שאפשר לעבוד איתה ולא רק לסבול אותה.'
+                ],
+                practicalTip: 'לפני כל תגובה, עצרו עם שלוש שאלות: מה קרה בפועל, מה הורגש בפנים, ומה אני בעצם צריך עכשיו?'
+            },
             example: { sentence: 'אף אחד לא מבין אותי', type: 'הכללה (universal quantifier)', challenge: 'אף אחד? ממש אף אחד? מי ספציפית לא מבין?' },
             demo: [{ role: 'אדם', text: 'אף אחד לא מבין אותי בבית.' }, { role: 'מאמן', text: 'מה קרה בחוץ, מה קרה בפנים, ומה בעצם היית רוצה שיקרה?' }, { role: 'אדם', text: 'בחוץ שתקו, בפנים הרגשתי לבד, ובאמת רציתי שישאלו אותי מה עובר עליי.' }],
             settings: { adaptiveDifficulty: { enabled: true, defaultValue: true }, showHints: { enabled: true, defaultValue: true }, advancedMode: { enabled: false, defaultValue: false }, timer: { enabled: false, defaultValue: false } }
@@ -57,7 +69,19 @@
             icon: '🧩', title: 'תרגול זיהוי', badge: 'לביניים', tone: 'intermediate', color: '#378ADD', soft: '#E6F1FB',
             homeDescription: 'תשמעו משפט — ותזהו מה מתחבא בתוכו. מחיקה? עיוות? הכללה? הבחירה שלכם.',
             description: 'שמעתם משפט? מצוין. עכשיו תגידו לנו — מה הדפוס שמסתתר בפנים? תרגול מהיר וממוקד.',
-            philosopher: { name: 'ויטגנשטיין', avatar: '📘', quote: 'גבולות שפתי הם גבולות עולמי.', deep: 'השפה שלנו לא רק מתארת את העולם — היא יוצרת אותו. כשאנחנו מזהים דפוסי שפה, אנחנו מרחיבים את גבולות העולם שלנו.' },
+            philosopher: {
+                name: 'ויטגנשטיין',
+                avatar: '📘',
+                quote: 'גבולות שפתי הם גבולות עולמי.',
+                deep: 'השפה שלנו לא רק מתארת את העולם — היא יוצרת אותו. כשאנחנו מזהים דפוסי שפה, אנחנו מרחיבים את גבולות העולם שלנו.',
+                lead: 'ויטגנשטיין מזכיר לנו שהמילים אינן רק אריזה של החוויה, אלא המסגרת שמעצבת אותה.',
+                deepLines: [
+                    'כשמישהו אומר "הוא תמיד מתעלם ממני", הוא לא רק מדווח על עובדה. הוא כבר בונה עולם שבו ההתנהגות של האחר נצבעת כקבועה, חד-משמעית וידועה מראש.',
+                    'תרגול הזיהוי עוזר לעצור בדיוק ברגע הזה: לזהות האם יש כאן הכללה, מחיקה או עיוות, ולפתוח מחדש את האפשרות לראות יותר מאפשרות אחת.',
+                    'ברגע שהשפה מתרככת ונעשית מדויקת יותר, גם מרחב הבחירה מתרחב. לא שברנו את החוויה, רק הפסקנו לכלוא אותה בתוך ניסוח אחד קשיח.'
+                ],
+                practicalTip: 'כשאתם שומעים מילים כמו "תמיד", "אף פעם", "ברור" או "הוא מתעלם", שאלו: מה בדיוק קרה כאן, ומה הוספתי בפרשנות שלי?'
+            },
             example: { sentence: 'הוא תמיד מתעלם ממני', type: 'הכללה + מחיקה', challenge: 'תמיד? בכל רגע? ואיך בדיוק הוא "מתעלם"?' },
             demo: [{ role: 'אדם', text: 'הוא תמיד מתעלם ממני.' }, { role: 'מאמן', text: 'יש כאן גם הכללה וגם משהו לא מפורט. מה בדיוק קורה כשהוא "מתעלם"?' }, { role: 'אדם', text: 'בעצם הוא לא עונה מהר להודעות, ואז אני ישר מרגיש לא חשוב.' }],
             settings: { adaptiveDifficulty: { enabled: true, defaultValue: true }, showHints: { enabled: true, defaultValue: true }, advancedMode: { enabled: false, defaultValue: false }, timer: { enabled: false, defaultValue: false } }
@@ -67,7 +91,19 @@
             icon: '📡', title: 'מכ״ם שלשות', badge: 'לביניים', tone: 'advanced', color: '#7F77DD', soft: '#EEEDFE',
             homeDescription: 'כל משפט מסתיר משפחה שלמה של דפוסים. כאן תלמדו לגלות את כולם, לא רק אחד.',
             description: 'ברמה הזו לא מחפשים דפוס אחד — מחפשים את כל המשפחה. כל משפט יכול להכיל מחיקה, עיוות והכללה בו־זמנית.',
-            philosopher: { name: 'בנדלר', avatar: '🧠', quote: 'המפה אינה השטח — אבל אפשר לצייר מפה טובה יותר.', deep: 'כשמוצאים שלשות של דפוסים, מזהים את כל הדרכים שבהן המפה שלנו שונה מהשטח, ולא רק טריגר לשוני אחד.' },
+            philosopher: {
+                name: 'בנדלר',
+                avatar: '🧠',
+                quote: 'המפה אינה השטח — אבל אפשר לצייר מפה טובה יותר.',
+                deep: 'כשמוצאים שלשות של דפוסים, מזהים את כל הדרכים שבהן המפה שלנו שונה מהשטח, ולא רק טריגר לשוני אחד.',
+                lead: 'בנדלר מחפש לא רק איפה השפה החליקה, אלא איזו מפה שלמה נבנתה מאותה החלקה.',
+                deepLines: [
+                    'במכ"ם שלשות אנחנו מפסיקים להתווכח עם מילה אחת ומתחילים לראות משפחה שלמה של דפוסים: מה הוכלל, מה נמחק, ואיזה פירוש כבר קפץ כאילו היה עובדה.',
+                    'זה חשוב כי רוב המשפטים האנושיים לא "טועים" רק במקום אחד. הם אורגים יחד כמה קיצורי דרך, ולכן גם הפירוק צריך להיות רחב יותר ועדין יותר.',
+                    'ברגע שרואים את המפה כשלמה, אפשר להתערב בצורה חכמה יותר: לא רק להגיב לטריגר, אלא להבין את הסיפור שהשפה מנסה לכפות על המציאות.'
+                ],
+                practicalTip: 'אל תעצרו בטריגר הראשון. נסו למנות לפחות שלושה רכיבים במשפט: מי הוכלל, מה חסר, ואיזה פירוש התחפש לעובדה.'
+            },
             example: { sentence: 'כולם יודעים שזה בלתי אפשרי', type: 'הכללה + מחיקה + עיוות', challenge: 'כולם — מי? יודעים — מאיפה? בלתי אפשרי — מה בדיוק מונע?' },
             demo: [{ role: 'אדם', text: 'כולם יודעים שזה בלתי אפשרי.' }, { role: 'מאמן', text: 'יש כאן משפחה שלמה: מי זה כולם, איך יודעים, ומה הופך את זה לבלתי אפשרי?' }, { role: 'אדם', text: 'פתאום אני קולט שאני מערבב הנחה, הכללה וחוק נוקשה באותו משפט.' }],
             settings: { adaptiveDifficulty: { enabled: true, defaultValue: true }, showHints: { enabled: false, defaultValue: false }, advancedMode: { enabled: true, defaultValue: false }, timer: { enabled: false, defaultValue: false } }
@@ -77,7 +113,19 @@
             icon: '🎯', title: 'מכ״ם מטה-מודל', badge: 'למתקדמים', tone: 'challenge', color: '#D85A30', soft: '#FFF0E8',
             homeDescription: 'המסלול המהיר — זיהוי ושאילת שאלות מפרקות תחת לחץ זמן. למי שמוכן לאתגר האמיתי.',
             description: 'המסלול המתקדם ביותר: זיהוי מהיר ושאילת שאלות מפרקות תחת לחץ זמן. כאן הכל מתחבר.',
-            philosopher: { name: 'גרינדר', avatar: '🪄', quote: 'בין המילים למשמעות יש דלת — שאלות הן המפתח.', deep: 'כשאתם שואלים "מי ספציפית?" או "איך בדיוק?", אתם מחזירים לאנשים את הבחירה ומוציאים את המשפט מערפל אוטומטי.' },
+            philosopher: {
+                name: 'גרינדר',
+                avatar: '🪄',
+                quote: 'בין המילים למשמעות יש דלת — שאלות הן המפתח.',
+                deep: 'כשאתם שואלים "מי ספציפית?" או "איך בדיוק?", אתם מחזירים לאנשים את הבחירה ומוציאים את המשפט מערפל אוטומטי.',
+                lead: 'גרינדר מזכיר שהשאלה הנכונה לא תוקפת את האדם, אלא פותחת חריץ קטן שבו אפשר שוב לבחור.',
+                deepLines: [
+                    'במכ"ם המהיר אין זמן להרצאה, ולכן השאלה חייבת להיות חדה, אנושית ומדויקת. לא שלוש שאלות בבת אחת, אלא צעד אחד שמחזיר קרקע.',
+                    'כששואלים "מי ספציפית?" או "איך בדיוק?" אנחנו מאטים את האוטומט ומחזירים את השיחה ממסקנה סופית למשהו שאפשר לבדוק מחדש.',
+                    'זה הכוח של השאלה הטובה: לא לנצח בוויכוח, אלא להוציא את האדם ממשפט שנשמע סגור ולתת לו שוב תנועה.'
+                ],
+                practicalTip: 'שאלו שאלה אחת קטנה ומדויקת, לא שלוש ברצף. שאלה טובה מאטה את הערפל בלי לשבור את הקשר.'
+            },
             example: { sentence: 'אי אפשר להצליח בארץ הזו', type: 'הכללה + מחיקה + modal operator', challenge: 'אי אפשר — מה מונע? להצליח — במה? בארץ הזו — לעומת איפה?' },
             demo: [{ role: 'אדם', text: 'אי אפשר להצליח בארץ הזו.' }, { role: 'מאמן', text: 'מה בדיוק אי אפשר, להצליח במה, ולפי מה החלטת שזה נכון לכל הארץ?' }, { role: 'אדם', text: 'פתאום זה נשמע פחות כמו עובדה ויותר כמו ייאוש של הרגע.' }],
             settings: { adaptiveDifficulty: { enabled: true, defaultValue: true }, showHints: { enabled: false, defaultValue: false }, advancedMode: { enabled: true, defaultValue: true }, timer: { enabled: true, defaultValue: true } }
@@ -411,6 +459,60 @@
     function demoTurns(meta) {
         return (Array.isArray(meta.demo) ? meta.demo : []).map(function (turn) { return '<article class="meta-feature-shell__dialogue-turn"><span>' + escapeHtml(turn.role || 'דובר') + '</span><p>' + escapeHtml(turn.text || '') + '</p></article>'; }).join('');
     }
+    function richParagraphs(lines) {
+        var items = Array.isArray(lines) && lines.length ? lines : [];
+        if (!items.length) {
+            var fallback = String(lines || '').trim();
+            if (fallback) items = [fallback];
+        }
+        return items.map(function (line) { return '<p>' + escapeHtml(line) + '</p>'; }).join('');
+    }
+    function activeSettingLabels(meta, state) {
+        return Object.keys(meta.settings || {}).filter(function (key) {
+            var config = meta.settings[key];
+            return config && config.enabled && Boolean(state.settings[key]);
+        }).map(function (key) { return SETTING_LABELS[key] || key; });
+    }
+    function philosopherModalHtml(meta) {
+        var philosopher = meta.philosopher || {};
+        var bridge = String(philosopher.practiceBridge || meta.example.challenge || meta.description || '').trim();
+        return [
+            '<div class="meta-feature-modal__philosopher">',
+            '<div class="meta-feature-modal__hero">',
+            '<span class="meta-feature-modal__avatar">' + (philosopher.avatar || '💭') + '</span>',
+            '<div class="meta-feature-modal__hero-copy"><span class="meta-feature-modal__kicker">פילוסוף מלווה</span><h3>' + escapeHtml(philosopher.name || '') + '</h3><p class="meta-feature-modal__lead">' + escapeHtml(philosopher.lead || ('כאן לא לומדים רק לזהות דפוס, אלא גם איך להקשיב לו בצורה חכמה יותר.')) + '</p></div>',
+            '</div>',
+            '<blockquote class="meta-feature-modal__quote"><p>' + escapeHtml(philosopher.quote || '') + '</p><cite>' + escapeHtml(philosopher.name || '') + '</cite></blockquote>',
+            '<section class="meta-feature-modal__surface"><span class="meta-feature-modal__eyebrow">למה זה חשוב כאן</span>' + richParagraphs(philosopher.deepLines || philosopher.deep) + '</section>',
+            bridge ? ('<section class="meta-feature-modal__surface meta-feature-modal__surface--tint"><span class="meta-feature-modal__eyebrow">מה נבדוק מיד</span><p>' + escapeHtml(bridge) + '</p></section>') : '',
+            philosopher.practicalTip ? ('<section class="meta-feature-modal__tip"><strong>טיפ לתרגול מיידי</strong><p>' + escapeHtml(philosopher.practicalTip) + '</p></section>') : '',
+            '<button type="button" class="btn btn-primary meta-feature-modal__cta" data-feature-close>הבנתי, בואו נתרגל</button>',
+            '</div>'
+        ].join('');
+    }
+    function videoModalHtml(meta) {
+        var sampleDialogue = demoTurns(meta);
+        return [
+            '<div class="meta-feature-modal__video">',
+            '<div class="meta-feature-modal__video-frame"><span class="meta-feature-modal__video-play">▶</span></div>',
+            '<section class="meta-feature-modal__surface"><span class="meta-feature-modal__eyebrow">מה יהיה כאן</span><p class="meta-feature-modal__video-note">הסרטון המלא עוד בדרך, אבל המבנה כבר מוכן: נראה משפט, נפרק אותו, ואז נתרגם את הזיהוי לשאלה אחת מדויקת.</p></section>',
+            sampleDialogue ? ('<section class="meta-feature-modal__surface"><span class="meta-feature-modal__eyebrow">טעימה מהדיאלוג</span><div class="meta-feature-shell__dialogue">' + sampleDialogue + '</div></section>') : '',
+            '<section class="meta-feature-modal__tip"><strong>שווה לשים לב</strong><p>' + escapeHtml(meta.example.challenge || meta.description || '') + '</p></section>',
+            '<button type="button" class="btn btn-primary meta-feature-modal__cta" data-feature-close>סגור והמשיכו לתרגול</button>',
+            '</div>'
+        ].join('');
+    }
+    function settingsModalHtml(meta, state) {
+        var activeLabels = activeSettingLabels(meta, state);
+        return [
+            '<div class="meta-feature-modal__settings-stack">',
+            '<section class="meta-feature-modal__surface"><span class="meta-feature-modal__eyebrow">איך המסלול ירגיש</span><p>ההגדרות כאן משנות את הקצב, רמת העזרה, וכמה מאתגר הסשן ירגיש בדקות הקרובות. אפשר לעדכן אותן בכל רגע בלי לאבד התקדמות.</p></section>',
+            '<div class="meta-feature-modal__settings">' + Object.keys(meta.settings || {}).map(function (key) { return settingToggle(meta.tab, key, meta.settings[key], state); }).join('') + '</div>',
+            '<section class="meta-feature-modal__tip"><strong>כרגע פעיל</strong><p>' + escapeHtml(activeLabels.length ? activeLabels.join(' · ') : 'מצב ברירת המחדל של המסלול, בלי עומס מיותר.') + '</p></section>',
+            '<button type="button" class="btn btn-primary meta-feature-modal__cta" data-feature-close>שמרתי, בואו נתרגל</button>',
+            '</div>'
+        ].join('');
+    }
     function compactExampleAnalysis(example) {
         var type = String(example && example.type || '').trim();
         var challenge = String(example && example.challenge || '').replace(/^שאלת דיוק[:\s]*/i, '').replace(/\s+/g, ' ').trim();
@@ -429,9 +531,9 @@
         var locked = featureLocked(meta);
         var cta = locked ? ('נפתח ברמה ' + meta.unlockLevel) : pick(CTA_LABELS, meta.tab + '-cta');
         var exampleSummary = compactExampleAnalysis(meta.example || {});
-        var philosopherSheet = featureModalSheet('philosopher', 'העמקה פילוסופית', '<div class="meta-feature-modal__philosopher"><span class="meta-feature-modal__avatar">' + meta.philosopher.avatar + '</span><h3>' + escapeHtml(meta.philosopher.name) + '</h3><p>' + escapeHtml(meta.philosopher.deep) + '</p></div>');
-        var videoSheet = featureModalSheet('demo', 'סרטון הדגמה', '<div class="meta-feature-modal__video"><div class="meta-feature-modal__video-frame"><span class="meta-feature-modal__video-play">▶</span></div><p class="meta-feature-modal__video-note">הסרטון יהיה זמין בקרוב. בינתיים אפשר לפתוח את התרגול ולהתחיל ישר בעבודה.</p></div>');
-        var settingsSheet = featureModalSheet('settings', 'הגדרות למשימה', '<div class="meta-feature-modal__settings">' + Object.keys(meta.settings).map(function (key) { return settingToggle(meta.tab, key, meta.settings[key], state); }).join('') + '</div>');
+        var philosopherSheet = featureModalSheet('philosopher', 'העמקה פילוסופית', philosopherModalHtml(meta));
+        var videoSheet = featureModalSheet('demo', 'סרטון הדגמה', videoModalHtml(meta));
+        var settingsSheet = featureModalSheet('settings', 'הגדרות למשימה', settingsModalHtml(meta, state));
         return [
             '<div class="meta-feature-shell__frame" style="--meta-feature-accent:' + escapeHtml(meta.color) + ';--meta-feature-soft:' + escapeHtml(meta.soft) + ';">',
             '<section class="meta-feature-shell__hero"><div class="meta-feature-shell__icon-wrap"><span class="meta-feature-shell__icon">' + meta.icon + '</span></div><div class="meta-feature-shell__hero-copy"><span class="meta-feature-shell__badge" data-tone="' + escapeHtml(meta.tone) + '">' + escapeHtml(meta.badge) + '</span><h2>' + escapeHtml(meta.title) + '</h2><p class="meta-feature-shell__hero-desc">' + escapeHtml(meta.description) + '</p></div></section>',
@@ -447,6 +549,10 @@
     }
     function setPendingNav(target, direction) { pendingNav = { target: normalizeTab(target), direction: direction === 'back' ? 'back' : 'forward' }; }
     function takePendingDirection(target) { if (!pendingNav || pendingNav.target !== normalizeTab(target)) return ''; var direction = pendingNav.direction; pendingNav = null; return direction; }
+    function syncFeatureModalState() {
+        if (!document.body) return;
+        document.body.classList.toggle('meta-shell-modal-open', !!document.querySelector('.meta-feature-modal:not(.hidden):not([hidden])'));
+    }
     function applyEntry(node, direction) {
         if (!node) return;
         node.classList.remove('meta-screen-enter-forward', 'meta-screen-enter-back');
@@ -464,6 +570,7 @@
     function closeFeatureModals(shell) {
         if (!shell) return;
         shell.querySelectorAll('.meta-feature-modal').forEach(function (node) { node.classList.add('hidden'); node.hidden = true; });
+        syncFeatureModalState();
     }
     function openFeatureModal(shell, name) {
         if (!shell) return;
@@ -472,6 +579,7 @@
         if (!node) return;
         node.hidden = false;
         node.classList.remove('hidden');
+        syncFeatureModalState();
     }
     function openHomeView(view) {
         homeUi.view = HOME_VIEWS.indexOf(view) !== -1 ? view : 'home';
@@ -570,6 +678,7 @@
         root.setAttribute('data-view', homeUi.view);
         bindHome(root);
         applyEntry(root.querySelector('[data-home-surface]') || root, direction || 'forward');
+        syncFeatureModalState();
     }
     function featureChromeHtml(tabName) {
         var safeTab = normalizeTab(tabName);
@@ -732,6 +841,7 @@
         bindFeatureShell(shell, meta);
         applyFeatureStage(meta.tab, direction || 'forward');
         renderFeatureChrome(meta.tab);
+        syncFeatureModalState();
     }
     function renderAllFeatures(direction) { MANAGED_TABS.forEach(function (tab) { renderFeature(tab, direction); }); }
     function syncShells(direction) {
