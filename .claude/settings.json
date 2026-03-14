@@ -3,7 +3,8 @@
     "allow": [
       "Bash(node -e \":*)",
       "WebSearch",
-      "Bash(timeout 90 env SHELL_SMOKE_TRACE=1 node scripts/test-shell-smoke.mjs)"
+      "Bash(timeout 90 env SHELL_SMOKE_TRACE=1 node scripts/test-shell-smoke.mjs)",
+      "Bash(timeout 120 env SHELL_SMOKE_TRACE=1 node scripts/test-shell-smoke.mjs)"
     ]
   }
 }
