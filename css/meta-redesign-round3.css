@@ -296,13 +296,35 @@ body.shell-feature-active .tab-content.active {
     }
 
     .meta-feature-chrome__bar {
-        justify-content: center;
-        text-align: center;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 12px;
     }
 
     .meta-feature-chrome__title {
-        order: -1;
-        flex-basis: 100%;
+        order: 0;
+        flex-basis: auto;
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .meta-feature-chrome__kicker {
+        display: none;
+    }
+
+    .meta-feature-chrome__title strong {
+        font-size: 0.88rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .meta-feature-chrome__btn {
+        min-height: 36px;
+        padding-inline: 10px;
+        font-size: 0.82rem;
+        flex: 0 0 auto;
     }
 
     .meta-feature-chrome__meta,

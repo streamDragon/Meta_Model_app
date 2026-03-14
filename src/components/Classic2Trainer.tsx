@@ -224,7 +224,7 @@ const CSS = `
 .c2n-preview{border:1px solid #cce0f0;background:linear-gradient(180deg,#f0f8ff 0%,#ffffff 100%);border-radius:18px;padding:14px;display:grid;gap:10px}.c2n-preview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .c2n-modal-actions{justify-content:space-between}.c2n-modal-actions .c2n-btn{min-width:120px}
 @media (max-width:980px){.c2n-hero,.c2n-layout,.c2n-settings-grid{grid-template-columns:1fr}.c2n-row{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:640px){.c2n-shell{padding:12px}.c2n-overlay{padding:10px}.c2n-row,.c2n-list,.c2n-step-strip,.c2n-preview-grid{grid-template-columns:1fr}.c2n-actions,.c2n-row-actions,.c2n-main-acts,.c2n-modal-actions,.c2n-seg,.c2n-start-actions{display:grid;grid-template-columns:1fr}.c2n-btn,.c2n-start-summary{width:100%}}
+@media (max-width:640px){.c2n-shell{padding:12px}.c2n-overlay{padding:10px}.c2n-list,.c2n-step-strip,.c2n-preview-grid{grid-template-columns:1fr}.c2n-actions,.c2n-row-actions,.c2n-main-acts,.c2n-modal-actions,.c2n-seg,.c2n-start-actions{display:grid;grid-template-columns:1fr}.c2n-btn,.c2n-start-summary{width:100%}.c2n-cat{min-height:72px;padding:7px}.c2n-name{font-size:.75rem}.c2n-code{font-size:.68rem}}
 `;
 
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));

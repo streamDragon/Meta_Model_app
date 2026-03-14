@@ -71,12 +71,17 @@ export const TRAINER_PLATFORM_CSS = `
 }
 
 @media (max-width:640px){
-  .trp-shell{padding:12px}
+  .trp-shell{padding:10px;gap:8px}
   .trp-hero,.trp-layout{display:contents}
   .trs-overlay{padding:10px}
   .trp-actions,.trp-chip-row,.trp-start-actions,.trp-settings-head-actions,.trp-settings-footer-actions,.trs-footer{display:grid;grid-template-columns:1fr}
   .trp-step-strip{grid-template-columns:1fr}
   .trp-mode-pill,.trp-summary-pill{width:100%}
   .trs-footer{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(248,251,255,0),#f8fbff 28%);padding-top:12px}
+  .trp-purpose,.trp-clarity-strip,.trp-note-card,.trp-step-strip{display:none}
+  .trp-top{gap:8px}
+  .trp-title-wrap .trp-subtitle{display:none}
+  .trp-start-strip{padding:12px;gap:8px;border-radius:16px}
+  .trp-start-copy .trp-subtitle{display:none}
 }
 `;
