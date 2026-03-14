@@ -2,6 +2,22 @@
 const LIVING_TRIPLES_STORAGE_KEY = 'living_triples_progress_v2';
 const LIVING_TRIPLES_DATA_URL = 'data/living-triples.json';
 
+function awardXP(amount) {
+  try {
+    if (window.MetaGamification && typeof window.MetaGamification.addXP === 'function') {
+      window.MetaGamification.addXP(amount, 'livingTriples');
+    }
+  } catch (_) {}
+}
+
+function awardStars(amount) {
+  try {
+    if (window.MetaGamification && typeof window.MetaGamification.addStars === 'function') {
+      window.MetaGamification.addStars(amount, 'livingTriples');
+    }
+  } catch (_) {}
+}
+
 const DEFAULT_TRIPLES_MAP = {
   rows: {
     '1': ['Lost Performative', 'Assumptions', 'Mind Reading'],
@@ -678,6 +694,7 @@ function handleCategoryPick(catKey, button) {
     state.activeRow = cat.row;
     initReveal(cat.row);
     state.score += 80;
+    awardXP(10); // correct_identification
     state.el.step1Feedback.textContent = `נבחר: ${cat.he}. השלשה הפעילה: ${getRowMeta(cat.row).title}. עכשיו משלימים Reveal מלא.`;
     setStep(2);
     render();
@@ -706,6 +723,8 @@ function maybeToReflection() {
   const c = revealCount();
   if (c.total && c.asked === c.total) {
     state.el.step2Feedback.textContent = 'מעולה. השלשה הושלמה (3/3). עוברים לשיקוף...';
+    awardXP(20); // triple_complete bonus
+    awardStars(1); // award a star for completing a triple
     state.autoTimer = setTimeout(() => {
       state.reflectionText = buildReflection();
       setStep(3);
@@ -728,6 +747,7 @@ function handleRevealAction(catKey, action, option) {
     slot.summary = safeText(ans.summary, slot.answer);
     slot.helpHint = '';
     state.score += 55;
+    awardXP(5); // reveal_question asked
     renderReveal();
     updateTop();
     maybeToReflection();
