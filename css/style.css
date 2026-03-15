@@ -26259,6 +26259,14 @@ header h1 {
 
     #practice-radar .rapid-pattern-buttons {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 5px;
+    }
+
+    #practice-radar .rapid-pattern-btn {
+        min-height: 44px;
+        padding: 8px 10px;
+        font-size: 0.78rem;
+        border-radius: 12px;
     }
 
     #practice-verb-unzip .feature-launcher-grid {
