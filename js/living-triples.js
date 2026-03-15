@@ -1,6 +1,19 @@
-﻿
-const LIVING_TRIPLES_STORAGE_KEY = 'living_triples_progress_v2';
+const LIVING_TRIPLES_STORAGE_KEY = 'living_triples_progress_v3';
+const LIVING_TRIPLES_PREFS_KEY = 'living_triples_prefs_v1';
 const LIVING_TRIPLES_DATA_URL = 'data/living-triples.json';
+
+const STEP_META = Object.freeze([
+  Object.freeze({ key: 'context', label: 'הקשר' }),
+  Object.freeze({ key: 'identify', label: 'זיהוי' }),
+  Object.freeze({ key: 'questions', label: '3 שאלות' }),
+  Object.freeze({ key: 'landing', label: 'שיקוף' })
+]);
+
+const SLOT_META = Object.freeze([
+  Object.freeze({ key: 'left', color: '#E24B4A' }),
+  Object.freeze({ key: 'center', color: '#7F77DD' }),
+  Object.freeze({ key: 'right', color: '#1D9E75' })
+]);
 
 function awardXP(amount) {
   try {
@@ -98,7 +111,7 @@ const FALLBACK_SCENARIOS = [
         summary: 'פרשנות פנימית לשתיקה.'
       }
     },
-    insight: 'מעניין... הפכתי זמן תגובה למדד מוחלט של אהבה.'
+    insight: 'אולי הפכתי זמן תגובה למדד מוחלט של אהבה.'
   },
   {
     id: 'fallback_row2',
@@ -130,17 +143,22 @@ const state = {
   queue: [],
   index: 0,
   current: null,
-  step: 1,
-  activeRow: 0,
-  selectedCategory: '',
-  reveal: {},
-  reflectionText: '',
-  score: 0,
+  screen: 'onboarding',
+  step: 'context',
+  selectedRow: 0,
+  wrongRow: 0,
+  identifyAttempts: 0,
+  identifySolved: false,
+  asked: {},
+  questionChat: [],
+  landingCursor: 0,
+  landingVisible: [],
+  debriefOpen: false,
+  roundScore: 0,
   progress: null,
-  editTimer: null,
-  autoTimer: null,
-  toastTimer: null,
-  el: null
+  prefs: null,
+  toastTimer: 0,
+  els: null
 };
 
 function esc(v) {
@@ -153,35 +171,34 @@ function esc(v) {
     .replace(/'/g, '&#39;');
 }
 
+function safeText(v, fallback = '') {
+  const text = String(v || '').trim();
+  return text || String(fallback || '').trim();
+}
+
 function normKey(v) {
-  return String(v || '').toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9\u0590-\u05FF]+/g, '_').replace(/^_+|_+$/g, '');
+  return String(v || '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9\u0590-\u05FF]+/g, '_')
+    .replace(/^_+|_+$/g, '');
 }
 
 function parseRow(v) {
   if (typeof v === 'number') return v >= 1 && v <= 5 ? v : 0;
-  const t = String(v || '').trim();
-  if (/^[1-5]$/.test(t)) return Number(t);
-  if (/^row[1-5]$/i.test(t)) return Number(t.replace(/[^\d]/g, ''));
+  const text = String(v || '').trim();
+  if (/^[1-5]$/.test(text)) return Number(text);
+  if (/^row[1-5]$/i.test(text)) return Number(text.replace(/[^\d]/g, ''));
   return 0;
 }
 
-function safeText(v, fallback = '') {
-  const t = String(v || '').trim();
-  if (!t) return String(fallback || '').trim();
-  const qm = (t.match(/\?/g) || []).length;
-  const he = (t.match(/[\u0590-\u05FF]/g) || []).length;
-  const en = (t.match(/[A-Za-z]/g) || []).length;
-  if (qm >= 3 && he === 0 && en === 0) return String(fallback || '').trim();
-  return t;
-}
-
 function shuffle(items) {
-  const a = [...items];
-  for (let i = a.length - 1; i > 0; i -= 1) {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+    [out[i], out[j]] = [out[j], out[i]];
   }
-  return a;
+  return out;
 }
 
 function defaultQuestion(cat) {
@@ -205,87 +222,106 @@ function defaultQuestion(cat) {
   return q[cat] || 'מה השאלה המדויקת שכדאי לשאול כאן?';
 }
 
+function categoryColor(index) {
+  return SLOT_META[index]?.color || '#1D9E75';
+}
+
+function extractThemeName(title) {
+  const raw = safeText(title);
+  const parts = raw.split('|').map((part) => part.trim()).filter(Boolean);
+  return parts[1] || parts[0] || raw || 'השורה הזו';
+}
+
+function shortSentence(text, max = 120) {
+  const compact = safeText(text).replace(/\s+/g, ' ');
+  return compact.length > max ? `${compact.slice(0, max - 1).trim()}…` : compact;
+}
+
+function splitSentence(text) {
+  return safeText(text)
+    .split(/(?<=[.!?…])\s+/)
+    .map((part) => safeText(part))
+    .filter(Boolean);
+}
+
+function speakerLabel(from) {
+  const key = normKey(from);
+  if (key === 'therapist') return 'מטפל/ת';
+  if (key === 'client') return 'מטופל/ת';
+  if (key === 'narrator' || key === 'system') return 'מערכת';
+  return '';
+}
+
 function normalizeMap(payload) {
   const from = payload?.triplesMap || {};
   const rows = {};
 
   if (from.rows && typeof from.rows === 'object' && !Array.isArray(from.rows)) {
-    Object.entries(from.rows).forEach(([k, v]) => {
-      const row = parseRow(k);
-      if (!row || !Array.isArray(v)) return;
-      rows[String(row)] = v.map((x) => safeText(x)).filter(Boolean);
-    });
-  }
-
-  if (!Object.keys(rows).length && Array.isArray(payload?.rows)) {
-    payload.rows.forEach((rowItem, idx) => {
-      const row = parseRow(rowItem?.id || rowItem?.rowId || idx + 1);
-      if (!row) return;
-      const cats = (Array.isArray(rowItem?.categories) ? rowItem.categories : [])
-        .map((c) => typeof c === 'string' ? safeText(c) : safeText(c?.label || c?.id))
-        .filter(Boolean);
-      if (cats.length) rows[String(row)] = cats;
+    Object.entries(from.rows).forEach(([rowKey, cats]) => {
+      const row = parseRow(rowKey);
+      if (!row || !Array.isArray(cats)) return;
+      rows[String(row)] = cats.map((item) => safeText(item)).filter(Boolean);
     });
   }
 
   if (!Object.keys(rows).length) return JSON.parse(JSON.stringify(DEFAULT_TRIPLES_MAP));
 
   const allCats = Object.values(rows).flat();
-  const pickCat = (raw) => allCats.find((c) => normKey(c) === normKey(raw)) || safeText(raw);
+  const pickCat = (raw) => allCats.find((cat) => normKey(cat) === normKey(raw)) || safeText(raw);
 
   const categoryToRow = {};
   Object.entries(from.categoryToRow || {}).forEach(([cat, row]) => {
-    const p = pickCat(cat);
-    const r = parseRow(row);
-    if (p && r) categoryToRow[p] = r;
+    const picked = pickCat(cat);
+    const parsed = parseRow(row);
+    if (picked && parsed) categoryToRow[picked] = parsed;
   });
-  Object.entries(rows).forEach(([row, cats]) => cats.forEach((cat) => { if (!categoryToRow[cat]) categoryToRow[cat] = Number(row); }));
+  Object.entries(rows).forEach(([rowKey, cats]) => {
+    cats.forEach((cat) => {
+      if (!categoryToRow[cat]) categoryToRow[cat] = Number(rowKey);
+    });
+  });
 
   const labelsHe = {};
-  Object.entries(from.labelsHe || {}).forEach(([cat, he]) => {
-    const p = pickCat(cat);
-    const t = safeText(he);
-    if (p && t) labelsHe[p] = t;
+  Object.entries(from.labelsHe || {}).forEach(([cat, label]) => {
+    const picked = pickCat(cat);
+    if (picked && safeText(label)) labelsHe[picked] = safeText(label);
   });
-  Object.keys(categoryToRow).forEach((cat) => { if (!labelsHe[cat]) labelsHe[cat] = DEFAULT_TRIPLES_MAP.labelsHe[cat] || cat; });
+  Object.keys(categoryToRow).forEach((cat) => {
+    if (!labelsHe[cat]) labelsHe[cat] = DEFAULT_TRIPLES_MAP.labelsHe[cat] || cat;
+  });
 
   const rowTitlesHe = {};
   const rowInsightsHe = {};
   Object.keys(rows).forEach((rowKey) => {
-    const fallbackTitle = DEFAULT_TRIPLES_MAP.rowTitlesHe?.[rowKey] || `שלשה ${rowKey}`;
-    const fallbackInsight = DEFAULT_TRIPLES_MAP.rowInsightsHe?.[rowKey] || '';
-    rowTitlesHe[rowKey] = fallbackTitle;
-    rowInsightsHe[rowKey] = fallbackInsight;
+    rowTitlesHe[rowKey] = DEFAULT_TRIPLES_MAP.rowTitlesHe[rowKey] || `שלשה ${rowKey}`;
+    rowInsightsHe[rowKey] = DEFAULT_TRIPLES_MAP.rowInsightsHe[rowKey] || '';
   });
   Object.entries(from.rowTitlesHe || {}).forEach(([rowKey, title]) => {
     const parsed = parseRow(rowKey);
-    if (!parsed) return;
-    const text = safeText(title);
-    if (text) rowTitlesHe[String(parsed)] = text;
+    if (parsed && safeText(title)) rowTitlesHe[String(parsed)] = safeText(title);
   });
   Object.entries(from.rowInsightsHe || {}).forEach(([rowKey, insight]) => {
     const parsed = parseRow(rowKey);
-    if (!parsed) return;
-    const text = safeText(insight);
-    if (text) rowInsightsHe[String(parsed)] = text;
+    if (parsed && safeText(insight)) rowInsightsHe[String(parsed)] = safeText(insight);
   });
 
   return { rows, categoryToRow, labelsHe, rowTitlesHe, rowInsightsHe };
 }
 
 function pickScenarioText(raw) {
-  const keys = ['sentence', 'clientSentence', 'client_sentence', 'title', 'scenario_title', 'text', 'client_text'];
-  for (const k of keys) {
-    const v = raw?.[k];
-    if (Array.isArray(v)) {
-      const joined = v.map((x) => safeText(x)).filter(Boolean).join(' ').trim();
+  const keys = ['target', 'sentence', 'clientSentence', 'client_sentence', 'text', 'client_text'];
+  for (const key of keys) {
+    const value = raw?.[key];
+    if (Array.isArray(value)) {
+      const joined = value.map((item) => safeText(item)).filter(Boolean).join(' ').trim();
       if (joined) return joined;
     }
-    const t = safeText(v);
-    if (t) return t;
+    const text = safeText(value);
+    if (text) return text;
   }
   return 'משפט לתרגול';
 }
+
 function getAnswerByCat(answerObj, cat) {
   if (!answerObj || typeof answerObj !== 'object') return null;
   if (answerObj[cat]) return answerObj[cat];
@@ -296,10 +332,144 @@ function getAnswerByCat(answerObj, cat) {
   return null;
 }
 
+function normalizeContextEntry(entry, fallbackText, highlight = false) {
+  if (typeof entry === 'string') {
+    return { from: 'client', text: safeText(entry, fallbackText), highlight };
+  }
+  const from = safeText(entry?.from, highlight ? 'client' : 'narrator');
+  const text = safeText(entry?.text, fallbackText);
+  if (!text) return null;
+  return {
+    from,
+    text,
+    highlight: !!entry?.highlight || highlight,
+    label: safeText(entry?.label, highlight ? '← המשפט לעבודה' : '')
+  };
+}
+
+function normalizeLandingEntry(entry) {
+  if (typeof entry === 'string') return { from: 'client', text: safeText(entry) };
+  const from = safeText(entry?.from, 'client');
+  const text = safeText(entry?.text);
+  if (!text) return null;
+  return { from, text };
+}
+
+function normalizeDebriefItem(entry, fallbackIcon) {
+  if (typeof entry === 'string') {
+    return { icon: fallbackIcon, bold: '', text: safeText(entry) };
+  }
+  const text = safeText(entry?.text);
+  if (!text) return null;
+  return {
+    icon: safeText(entry?.icon, fallbackIcon),
+    bold: safeText(entry?.bold),
+    text
+  };
+}
+
+function defaultContext(sentence, rowMeta) {
+  const parts = splitSentence(sentence);
+  const leadLine = parts.length > 1 ? parts[0] : 'זה יושב עליי כבר כמה זמן.';
+  const secondLine = parts.length > 1
+    ? 'וכל פעם שאני חוזר/ת לזה, זה נהיה עוד יותר חד.'
+    : `זה מתקשר לי ישר ל-${extractThemeName(rowMeta.title)}.`;
+  return [
+    { from: 'narrator', text: `שיחת טיפול. המטופל/ת מתאר/ת משפט טעון סביב ${extractThemeName(rowMeta.title)}.` },
+    { from: 'client', text: safeText(leadLine, 'זה יושב עליי כבר כמה זמן.') },
+    { from: 'client', text: safeText(secondLine, 'וכל פעם שאני חוזר/ת לזה, זה נהיה עוד יותר חד.') },
+    { from: 'client', text: sentence, highlight: true, label: '← המשפט לעבודה' }
+  ];
+}
+
+function buildTriple(raw, rowCats, labelsHe) {
+  const explicitTriple = raw?.triple && typeof raw.triple === 'object' ? raw.triple : null;
+  return SLOT_META.map((slotMeta, index) => {
+    const fallbackCat = rowCats[index] || `slot_${index + 1}`;
+    const block = explicitTriple?.[slotMeta.key] || getAnswerByCat(raw?.answers, fallbackCat) || {};
+    const explicitCategory = safeText(block?.category, fallbackCat);
+    const answerBlock = getAnswerByCat(raw?.answers, explicitCategory) || getAnswerByCat(raw?.answers, fallbackCat) || {};
+    const category = safeText(explicitCategory, fallbackCat);
+    return {
+      slot: slotMeta.key,
+      color: slotMeta.color,
+      category,
+      labelHe: safeText(labelsHe[category], labelsHe[fallbackCat] || category),
+      question: safeText(block?.question || answerBlock?.question, defaultQuestion(category)),
+      response: safeText(block?.response || block?.answer || answerBlock?.answer, '...'),
+      summary: safeText(block?.summary || answerBlock?.summary, block?.response || block?.answer || answerBlock?.answer || '...')
+    };
+  });
+}
+
+function defaultWrongHint(rowMeta, triple) {
+  return `חפש/י את המשפחה של "${extractThemeName(rowMeta.title)}": ${triple.map((item) => item.labelHe).join(' · ')}.`;
+}
+
+function defaultLanding(scenario, rowMeta) {
+  const [left, center, right] = scenario.triple;
+  const theme = extractThemeName(rowMeta.title);
+  return [
+    { from: 'label', text: 'שיקוף' },
+    {
+      from: 'therapist',
+      text: `אני שומע/ת שכאן יש ${shortSentence(left.summary, 70)}, שמתחת לזה יושב גם ${shortSentence(center.summary, 70)}, ושמזה נבנית עוד מסקנה של ${shortSentence(right.summary, 70)}.`
+    },
+    { from: 'client', text: '[שתיקה קצרה]' },
+    { from: 'client', text: 'כן... כששמים את זה ככה, אני שומע/ת כמה מהר זה נסגר עליי מבפנים.' },
+    { from: 'label', text: 'ריפריימינג' },
+    {
+      from: 'therapist',
+      text: `אולי זה לא פסק דין עלייך, אלא דרך ישנה שהמחשבה מנסה להגן דרכה על ${theme}.`
+    },
+    { from: 'client', text: '...' },
+    { from: 'client', text: safeText(scenario.insight, 'זה פותח לי דרך אחרת להסתכל על זה.') },
+    { from: 'label', text: 'שאלת המשך' },
+    {
+      from: 'therapist',
+      text: `מה היית רוצה לבדוק עכשיו, כששלושת החלקים של ${theme} כבר על השולחן?`
+    },
+    {
+      from: 'client',
+      text: 'אני רוצה להישאר רגע עם זה, ולבדוק מה קורה אם אני לא רץ/ה מיד לאותה מסקנה.'
+    }
+  ];
+}
+
+function defaultDebrief(scenario, rowMeta) {
+  const names = scenario.triple.map((item) => item.labelHe).join(' · ');
+  return [
+    {
+      icon: '🧩',
+      bold: '3 שאלות מאותה שורה',
+      text: `פתחו יחד את ${names} בתוך "${extractThemeName(rowMeta.title)}".`
+    },
+    {
+      icon: '🪞',
+      bold: 'שיקוף',
+      text: 'אסף את שלושת החלקים בלי לתקן מהר ובלי להתווכח עם החוויה.'
+    },
+    {
+      icon: '🔄',
+      bold: 'ריפריימינג',
+      text: 'הזיז את המסגור מפסק דין סגור לאפשרות שאפשר לבדוק מחדש.'
+    },
+    {
+      icon: '🧭',
+      bold: 'שאלת המשך',
+      text: 'החזירה בחירה וסוכנות למה שהמטופל/ת רוצה לבדוק עכשיו.'
+    },
+    {
+      icon: '🌱',
+      bold: 'תוצאה',
+      text: safeText(scenario.insight, rowMeta.insight || 'המשפט התחיל להיפתח במקום להישאר מסקנה סגורה.')
+    }
+  ];
+}
+
 function normalizeScenario(raw, index, triplesMap) {
   if (!raw || typeof raw !== 'object') return null;
-
-  let targetRow = parseRow(raw.targetRow || raw.target_row || raw.rowId || raw.row_id || raw.targetRowId || raw.target_row_id);
+  let targetRow = parseRow(raw.targetRow || raw.target_row || raw.correct_row || raw.rowId || raw.row_id);
   const directCategory = safeText(raw.correctCategory || raw.correct_category);
   if (!targetRow && directCategory) {
     const entry = Object.entries(triplesMap.categoryToRow).find(([cat]) => normKey(cat) === normKey(directCategory));
@@ -308,50 +478,62 @@ function normalizeScenario(raw, index, triplesMap) {
   if (!targetRow || !triplesMap.rows[String(targetRow)]?.length) return null;
 
   const rowCats = triplesMap.rows[String(targetRow)] || [];
-  const answers = {};
-  const anchors = Array.isArray(raw.anchors) ? raw.anchors.map((x) => safeText(x)) : [];
-  const revealArr = Array.isArray(raw.revealAnswers || raw.reveal_answers) ? (raw.revealAnswers || raw.reveal_answers) : [];
+  const rowMeta = {
+    title: safeText(triplesMap.rowTitlesHe?.[String(targetRow)], DEFAULT_TRIPLES_MAP.rowTitlesHe[String(targetRow)] || `שלשה ${targetRow}`),
+    insight: safeText(triplesMap.rowInsightsHe?.[String(targetRow)], DEFAULT_TRIPLES_MAP.rowInsightsHe[String(targetRow)] || '')
+  };
+  const sentence = pickScenarioText(raw);
+  const triple = buildTriple(raw, rowCats, triplesMap.labelsHe || {});
 
-  rowCats.forEach((cat, idx) => {
-    const answerBlock = getAnswerByCat(raw.answers, cat);
-    const revealRaw = revealArr[idx];
-    const revealText = Array.isArray(revealRaw)
-      ? safeText(revealRaw.find((x) => safeText(x)))
-      : safeText(revealRaw);
+  const contextSource = Array.isArray(raw.context) && raw.context.length
+    ? raw.context.map((entry, entryIndex) => normalizeContextEntry(entry, entryIndex === 0 ? sentence : '')).filter(Boolean)
+    : defaultContext(sentence, rowMeta).map((entry) => normalizeContextEntry(entry, sentence, !!entry.highlight)).filter(Boolean);
+  const hasHighlighted = contextSource.some((entry) => entry.highlight);
+  const context = hasHighlighted
+    ? contextSource
+    : [...contextSource, normalizeContextEntry({ from: 'client', text: sentence, highlight: true, label: '← המשפט לעבודה' }, sentence, true)].filter(Boolean);
 
-    const question = safeText(answerBlock?.question || anchors[idx], defaultQuestion(cat));
-    const answer = safeText(answerBlock?.answer || revealText, 'אין תשובה מוכנה. נסו לשאול מחדש בקצרה.');
-    const summary = safeText(answerBlock?.summary, answer.length > 100 ? `${answer.slice(0, 97).trim()}...` : answer);
+  const landing = (Array.isArray(raw.landing) ? raw.landing : defaultLanding({ triple, insight: raw.insight }, rowMeta))
+    .map((entry) => normalizeLandingEntry(entry))
+    .filter(Boolean);
 
-    answers[cat] = { question, answer, summary };
-  });
+  const debrief = (Array.isArray(raw.debrief) ? raw.debrief : defaultDebrief({ triple, insight: raw.insight }, rowMeta))
+    .map((entry, entryIndex) => normalizeDebriefItem(entry, ['🧩', '🪞', '🔄', '🧭', '🌱'][entryIndex] || '•'))
+    .filter(Boolean);
 
   return {
     id: safeText(raw.id || raw.scenarioId || raw.scenario_id, `lt_scn_${index + 1}`),
     targetRow,
-    sentence: pickScenarioText(raw),
-    answers,
-    insight: safeText(raw.insight, 'מעניין... כשמחזיקים את כל השלשה יחד, התמונה נעשית מדויקת יותר.')
+    theme: extractThemeName(rowMeta.title),
+    rowTitle: rowMeta.title,
+    rowInsight: rowMeta.insight,
+    context,
+    target: safeText(raw.target, sentence),
+    wrongHint: safeText(raw.wrong_hint || raw.wrongHint, defaultWrongHint(rowMeta, triple)),
+    triple,
+    landing,
+    debrief,
+    insight: safeText(raw.insight, 'מעניין... כשהמשפט נפתח דרך כל השלשה, התמונה נעשית מדויקת יותר.')
   };
 }
 
 function normalizeData(payload) {
   const triplesMap = normalizeMap(payload || {});
   const scenarios = (Array.isArray(payload?.scenarios) ? payload.scenarios : [])
-    .map((item, i) => normalizeScenario(item, i, triplesMap))
+    .map((item, index) => normalizeScenario(item, index, triplesMap))
     .filter(Boolean);
 
   if (!scenarios.length) {
     return {
-      version: '1.1.0',
+      version: '1.0.0',
       language: 'he',
       triplesMap: JSON.parse(JSON.stringify(DEFAULT_TRIPLES_MAP)),
-      scenarios: JSON.parse(JSON.stringify(FALLBACK_SCENARIOS))
+      scenarios: FALLBACK_SCENARIOS.map((item, index) => normalizeScenario(item, index, DEFAULT_TRIPLES_MAP)).filter(Boolean)
     };
   }
 
   return {
-    version: safeText(payload?.version, '1.1.0'),
+    version: safeText(payload?.version, '1.0.0'),
     language: safeText(payload?.language, 'he'),
     triplesMap,
     scenarios
@@ -364,64 +546,14 @@ async function loadData() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     return normalizeData(json);
-  } catch (e) {
-    console.warn('Cannot load living triples data, fallback in use.', e);
+  } catch (error) {
+    console.warn('Cannot load living triples data, fallback in use.', error);
     return normalizeData({ triplesMap: DEFAULT_TRIPLES_MAP, scenarios: FALLBACK_SCENARIOS });
   }
 }
 
-function getElements() {
-  return {
-    root: document.getElementById('ltv2-root'),
-    onboarding: document.getElementById('ltv2-onboarding'),
-    practice: document.getElementById('ltv2-practice'),
-    startBtn: document.getElementById('ltv2-start-btn'),
-    openMapTopBtn: document.getElementById('ltv2-open-map-top'),
-    openMapBtn: document.getElementById('ltv2-open-map-btn'),
-    closeMapBtn: document.getElementById('ltv2-close-map-btn'),
-    mapModal: document.getElementById('ltv2-map-modal'),
-    mapContent: document.getElementById('ltv2-map-content'),
-    resetSceneBtn: document.getElementById('ltv2-reset-scene-btn'),
-    sceneIndex: document.getElementById('ltv2-scene-index'),
-    sceneTotal: document.getElementById('ltv2-scene-total'),
-    score: document.getElementById('ltv2-score'),
-    sentenceText: document.getElementById('ltv2-sentence-text'),
-    categoryChips: document.getElementById('ltv2-category-chips'),
-    step1Feedback: document.getElementById('ltv2-step1-feedback'),
-    rowSticky: document.getElementById('ltv2-row-sticky'),
-    rowTitle: document.getElementById('ltv2-row-title'),
-    rowInsight: document.getElementById('ltv2-row-insight'),
-    rowMembers: document.getElementById('ltv2-row-members'),
-    changeRowBtn: document.getElementById('ltv2-change-row-btn'),
-    step1: document.getElementById('ltv2-step-1'),
-    step2: document.getElementById('ltv2-step-2'),
-    revealCategories: document.getElementById('ltv2-reveal-categories'),
-    revealProgress: document.getElementById('ltv2-reveal-progress'),
-    revealCards: document.getElementById('ltv2-reveal-cards'),
-    step2Feedback: document.getElementById('ltv2-step2-feedback'),
-    step3: document.getElementById('ltv2-step-3'),
-    reflectionCard: document.getElementById('ltv2-reflection-card'),
-    editReflectBtn: document.getElementById('ltv2-edit-reflect-btn'),
-    editTimer: document.getElementById('ltv2-edit-timer'),
-    editWrap: document.getElementById('ltv2-edit-wrap'),
-    reflectInput: document.getElementById('ltv2-reflect-input'),
-    saveReflectBtn: document.getElementById('ltv2-save-reflect-btn'),
-    toInsightBtn: document.getElementById('ltv2-to-insight-btn'),
-    step4: document.getElementById('ltv2-step-4'),
-    insightCard: document.getElementById('ltv2-insight-card'),
-    nextBtn: document.getElementById('ltv2-next-btn'),
-    stepperItems: Array.from(document.querySelectorAll('.ltv2-stepper [data-step]')),
-    toast: document.getElementById('ltv2-toast')
-  };
-}
-
-function saveProgress() {
-  if (!state.progress) return;
-  localStorage.setItem(LIVING_TRIPLES_STORAGE_KEY, JSON.stringify(state.progress));
-}
-
 function loadProgress() {
-  const base = { played: 0, totalScore: 0, bestScore: 0, lastPlayedAt: null };
+  const base = { played: 0, totalScore: 0, bestRound: 0, lastPlayedAt: null };
   try {
     const raw = localStorage.getItem(LIVING_TRIPLES_STORAGE_KEY);
     if (!raw) return base;
@@ -431,502 +563,599 @@ function loadProgress() {
   }
 }
 
-function showToast(text, cls = 'info') {
-  const t = state.el.toast;
-  if (!t) return;
-  t.className = `ltv2-toast ${cls}`;
-  t.textContent = text;
-  t.classList.remove('hidden');
-  clearTimeout(state.toastTimer);
-  state.toastTimer = setTimeout(() => t.classList.add('hidden'), 2200);
+function saveProgress() {
+  if (!state.progress) return;
+  localStorage.setItem(LIVING_TRIPLES_STORAGE_KEY, JSON.stringify(state.progress));
 }
 
-function categories() {
-  const out = [];
-  const map = state.data.triplesMap;
-  Object.keys(map.rows).map(Number).sort((a, b) => a - b).forEach((row) => {
-    (map.rows[String(row)] || []).forEach((cat) => {
-      out.push({ key: cat, row, he: map.labelsHe[cat] || cat, en: cat });
-    });
-  });
-  return out;
+function loadPrefs() {
+  const base = { onboardingDone: false };
+  try {
+    const raw = localStorage.getItem(LIVING_TRIPLES_PREFS_KEY);
+    if (!raw) return base;
+    return { ...base, ...(JSON.parse(raw) || {}) };
+  } catch {
+    return base;
+  }
 }
 
-function catByKey(key) {
-  return categories().find((c) => c.key === key) || null;
+function savePrefs() {
+  if (!state.prefs) return;
+  localStorage.setItem(LIVING_TRIPLES_PREFS_KEY, JSON.stringify(state.prefs));
+}
+
+function currentStepIndex() {
+  return Math.max(0, STEP_META.findIndex((item) => item.key === state.step));
 }
 
 function getRowMeta(row) {
   const parsed = parseRow(row);
-  const rowKey = parsed ? String(parsed) : '';
+  const rowKey = String(parsed || '');
   const map = state.data?.triplesMap || DEFAULT_TRIPLES_MAP;
   return {
-    title: safeText(map?.rowTitlesHe?.[rowKey], DEFAULT_TRIPLES_MAP.rowTitlesHe?.[rowKey] || `שלשה ${rowKey || '?'}`),
-    insight: safeText(map?.rowInsightsHe?.[rowKey], DEFAULT_TRIPLES_MAP.rowInsightsHe?.[rowKey] || '')
+    row: parsed,
+    title: safeText(map.rowTitlesHe?.[rowKey], DEFAULT_TRIPLES_MAP.rowTitlesHe[rowKey] || `שלשה ${rowKey}`),
+    insight: safeText(map.rowInsightsHe?.[rowKey], DEFAULT_TRIPLES_MAP.rowInsightsHe[rowKey] || ''),
+    categories: (map.rows?.[rowKey] || []).map((cat, index) => ({
+      category: cat,
+      labelHe: safeText(map.labelsHe?.[cat], cat),
+      color: categoryColor(index)
+    }))
   };
 }
 
-function setStep(step) {
-  state.step = step;
-  state.el.stepperItems.forEach((item) => {
-    const s = Number(item.getAttribute('data-step'));
-    item.classList.toggle('is-active', s === step);
-    item.classList.toggle('is-done', s < step);
-  });
-  state.el.step1.classList.toggle('hidden', step !== 1);
-  state.el.step2.classList.toggle('hidden', step !== 2);
-  state.el.step3.classList.toggle('hidden', step !== 3);
-  state.el.step4.classList.toggle('hidden', step !== 4);
+function showToast(text, tone = 'info') {
+  const toast = state.els.toast;
+  if (!toast) return;
+  toast.textContent = safeText(text);
+  toast.className = `ltv2-toast ${tone}`;
+  toast.classList.remove('hidden');
+  clearTimeout(state.toastTimer);
+  state.toastTimer = setTimeout(() => {
+    toast.classList.add('hidden');
+  }, 1800);
 }
 
-function updateTop() {
-  state.el.sceneIndex.textContent = String(state.index + 1);
-  state.el.sceneTotal.textContent = String(state.queue.length || 1);
-  state.el.score.textContent = String(state.score);
+function addScore(points) {
+  state.roundScore += Number(points || 0);
 }
 
-function renderSentence() {
-  state.el.sentenceText.textContent = safeText(state.current?.sentence, 'משפט לתרגול');
-}
-
-function renderMap() {
-  const rows = state.data.triplesMap.rows;
-  const labels = state.data.triplesMap.labelsHe;
-  state.el.mapContent.innerHTML = Object.keys(rows).map(Number).sort((a, b) => a - b).map((row) => {
-    const rowMeta = getRowMeta(row);
-    const chips = (rows[String(row)] || []).map((cat) => `
-      <div class="ltv2-map-chip"><strong>${esc(labels[cat] || cat)}</strong><small>${esc(cat)}</small></div>
-    `).join('');
-    return `
-      <section class="ltv2-map-row">
-        <div class="ltv2-map-row-head">
-          <h4>${esc(rowMeta.title)}</h4>
-          <p class="ltv2-map-row-insight">${esc(rowMeta.insight)}</p>
-        </div>
-        <div class="ltv2-map-row-cells">${chips}</div>
-      </section>
-    `;
-  }).join('');
-}
-function resetRound() {
-  clearInterval(state.editTimer);
-  clearTimeout(state.autoTimer);
-  state.editTimer = null;
-  state.autoTimer = null;
-  state.step = 1;
-  state.activeRow = 0;
-  state.selectedCategory = '';
-  state.reveal = {};
-  state.reflectionText = '';
-
-  state.el.step1Feedback.textContent = '';
-  state.el.step2Feedback.textContent = '';
-  state.el.revealCards.innerHTML = '';
-  if (state.el.revealCategories) state.el.revealCategories.innerHTML = '';
-  state.el.revealProgress.textContent = '0/3';
-  state.el.rowSticky.classList.add('hidden');
-  if (state.el.rowInsight) state.el.rowInsight.textContent = '';
-  state.el.rowMembers.innerHTML = '';
-  state.el.editWrap.classList.add('hidden');
-  state.el.editTimer.textContent = '';
-  state.el.reflectInput.value = '';
-  state.el.reflectionCard.innerHTML = '';
-  state.el.insightCard.innerHTML = '';
-}
-
-function initReveal(row) {
-  const slots = {};
-  (state.data.triplesMap.rows[String(row)] || []).forEach((cat) => {
-    slots[cat] = { asked: false, showHelp: false, helpHint: '', answer: '', summary: '' };
-  });
-  state.reveal = slots;
-}
-
-function renderCategoryChips() {
-  state.el.categoryChips.innerHTML = categories().map((c) => {
-    const selected = c.key === state.selectedCategory;
-    const rowMeta = getRowMeta(c.row);
-    return `
-      <button type="button" class="ltv2-category-chip ${selected ? 'is-selected' : ''}" data-ltv2-category="${encodeURIComponent(c.key)}" aria-pressed="${selected ? 'true' : 'false'}">
-        <strong>${esc(c.he)}</strong>
-        <small>${esc(c.en)} ֲ· ${esc(rowMeta.title)}</small>
-      </button>
-    `;
-  }).join('');
-}
-
-function renderRowSticky() {
-  if (!state.activeRow) {
-    state.el.rowSticky.classList.add('hidden');
-    if (state.el.rowInsight) state.el.rowInsight.textContent = '';
-    state.el.rowMembers.innerHTML = '';
-    return;
-  }
-
-  const labels = state.data.triplesMap.labelsHe;
-  const rowCats = state.data.triplesMap.rows[String(state.activeRow)] || [];
-  const rowMeta = getRowMeta(state.activeRow);
-  state.el.rowTitle.textContent = rowMeta.title;
-  if (state.el.rowInsight) state.el.rowInsight.textContent = rowMeta.insight;
-  state.el.rowMembers.innerHTML = rowCats.map((cat) => {
-    const selected = cat === state.selectedCategory;
-    return `<span class="ltv2-row-member ${selected ? 'is-selected' : ''}">${esc(labels[cat] || cat)}</span>`;
-  }).join('');
-  state.el.rowSticky.classList.remove('hidden');
-}
-
-function revealCount() {
-  const keys = Object.keys(state.reveal);
-  const asked = keys.filter((k) => state.reveal[k]?.asked).length;
-  return { asked, total: keys.length };
-}
-
-function helpHint(cat, option) {
-  const slot = state.reveal[cat] || {};
-  const labels = state.data.triplesMap.labelsHe;
-  if (Number(option) === 1) {
-    return `דוגמה קטנה: במקום משפט כללי, נסח/י מקרה אחד ממשי. (${labels[cat] || cat})`;
-  }
-  const short = (slot.answer || '').length > 90 ? `${slot.answer.slice(0, 88).trim()}...` : (slot.answer || '');
-  return `שאלה עדינה: מתי כן / מי כן היה יודע? רמז: ${short}`;
-}
-
-function renderReveal() {
-  const labels = state.data.triplesMap.labelsHe;
-  const rowCats = state.data.triplesMap.rows[String(state.activeRow)] || [];
-
-  state.el.revealCards.innerHTML = rowCats.map((cat) => {
-    const slot = state.reveal[cat] || {};
-    const ans = state.current?.answers?.[cat] || {};
-    const answered = Boolean(slot.asked);
-
-    return `
-      <article class="ltv2-reveal-card ${answered ? 'is-answered opened-content' : ''}" data-ltv2-card="${encodeURIComponent(cat)}">
-        <header><h5>${esc(labels[cat] || cat)}</h5><small>${esc(cat)}</small></header>
-        <p class="ltv2-reveal-question">${esc(ans.question || defaultQuestion(cat))}</p>
-        <div class="ltv2-reveal-actions">
-          <button type="button" class="btn btn-primary" data-ltv2-act="ask" data-ltv2-cat="${encodeURIComponent(cat)}" ${answered ? 'disabled' : ''}>${answered ? 'נשאל ג“' : 'שאל'}</button>
-          <button type="button" class="btn btn-secondary" data-ltv2-act="help" data-ltv2-cat="${encodeURIComponent(cat)}" ${answered ? 'disabled' : ''}>אני לא יודע</button>
-        </div>
-        ${slot.showHelp && !answered ? `
-          <div class="ltv2-help-popover opened-content">
-            <button type="button" class="btn btn-secondary" data-ltv2-act="help-option" data-ltv2-option="1" data-ltv2-cat="${encodeURIComponent(cat)}">ננסה דוגמה אחת קטנה?</button>
-            <button type="button" class="btn btn-secondary" data-ltv2-act="help-option" data-ltv2-option="2" data-ltv2-cat="${encodeURIComponent(cat)}">מתי כן / מי כן היה יודע?</button>
-          </div>
-        ` : ''}
-        ${slot.helpHint ? `<p class="ltv2-help-hint">${esc(slot.helpHint)}</p>` : ''}
-        ${answered ? `<p class="ltv2-answer-text">ג… ${esc(slot.answer)}</p>` : ''}
-      </article>
-    `;
-  }).join('');
-
-  const c = revealCount();
-  state.el.revealProgress.textContent = `${c.asked}/${c.total}`;
-}
-
-function renderRevealCategories() {
-  if (!state.el.revealCategories) return;
-  const activeRow = state.activeRow;
-  state.el.revealCategories.innerHTML = categories().map((c) => {
-    const isRow = c.row === activeRow;
-    return `
-      <button type="button" class="ltv2-reveal-cat ${isRow ? 'is-row' : ''}" data-ltv2-category="${encodeURIComponent(c.key)}">
-        ${esc(c.he)}
-      </button>
-    `;
-  }).join('');
-}
-
-function buildReflection() {
-  const labels = state.data.triplesMap.labelsHe;
-  const rowCats = state.data.triplesMap.rows[String(state.activeRow)] || [];
-  const lines = rowCats.map((cat, i) => {
-    const slot = state.reveal[cat] || {};
-    const summary = safeText(slot.summary || slot.answer, '---');
-    return `(${i + 1}) ${labels[cat] || cat}: ${summary}`;
-  });
-  return `אז אם אני מבין נכון:\n${lines.join('\n')}`;
-}
-
-function renderReflection() {
-  state.el.reflectionCard.innerHTML = `<p>${esc(state.reflectionText).replace(/\n/g, '<br>')}</p>`;
-}
-
-function renderInsight() {
-  const text = safeText(state.current?.insight, 'מעניין... לא חשבתי על זה ככה.');
-  state.el.insightCard.innerHTML = `<p class="ltv2-insight-quote">"${esc(text)}"</p><p class="ltv2-insight-sub">יפה. השלשה הושלמה ונוצרה תמונה טיפולית ברורה יותר.</p>`;
-}
-
-function render() {
-  setStep(state.step);
-  updateTop();
-  renderSentence();
-  renderCategoryChips();
-  renderRowSticky();
-  if (state.step >= 2) {
-    renderRevealCategories();
-    renderReveal();
-  }
-  if (state.step >= 3) renderReflection();
-  if (state.step >= 4) renderInsight();
-}
-
-function wrongShake(node) {
-  if (!node) return;
-  node.classList.add('ltv2-shake');
-  setTimeout(() => node.classList.remove('ltv2-shake'), 320);
-}
-
-function handleCategoryPick(catKey, button) {
-  const cat = catByKey(catKey);
-  if (!cat || !state.current) return;
-
-  if (state.step === 1) {
-    if (cat.row !== state.current.targetRow) {
-      state.score = Math.max(0, state.score - 15);
-      state.el.step1Feedback.textContent = 'נסה/י שוב: חפש/י קטגוריה ששייכת לשורה הפעילה במשפט הזה.';
-      wrongShake(button);
-      updateTop();
-      return;
-    }
-
-    state.selectedCategory = cat.key;
-    state.activeRow = cat.row;
-    initReveal(cat.row);
-    state.score += 80;
-    awardXP(10); // correct_identification
-    state.el.step1Feedback.textContent = `נבחר: ${cat.he}. השלשה הפעילה: ${getRowMeta(cat.row).title}. עכשיו משלימים Reveal מלא.`;
-    setStep(2);
-    render();
-    state.el.step2.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
-
-  if (state.step === 2) {
-    if (cat.row !== state.activeRow) {
-      const selected = catByKey(state.selectedCategory);
-      state.el.step2Feedback.textContent = `❌ לא באותה שלשה. חפש/י את שתי האחיות של ${selected?.he || 'הקטגוריה הנוכחית'} בתוך "${getRowMeta(state.activeRow).title}".`;
-      wrongShake(button);
-      showToast('לא באותה שלשה', 'danger');
-      return;
-    }
-    const card = state.el.revealCards.querySelector(`[data-ltv2-card="${encodeURIComponent(cat.key)}"]`);
-    if (card) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      card.classList.add('opened-content');
-      setTimeout(() => card.classList.remove('opened-content'), 900);
-    }
-  }
-}
-
-function maybeToReflection() {
-  const c = revealCount();
-  if (c.total && c.asked === c.total) {
-    state.el.step2Feedback.textContent = 'מעולה. השלשה הושלמה (3/3). עוברים לשיקוף...';
-    awardXP(20); // triple_complete bonus
-    awardStars(1); // award a star for completing a triple
-    state.autoTimer = setTimeout(() => {
-      state.reflectionText = buildReflection();
-      setStep(3);
-      render();
-      state.el.step3.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 420);
-  }
-}
-
-function handleRevealAction(catKey, action, option) {
-  const slot = state.reveal[catKey];
-  if (!slot) return;
-
-  if (action === 'ask') {
-    if (slot.asked) return;
-    const ans = state.current?.answers?.[catKey] || {};
-    slot.asked = true;
-    slot.showHelp = false;
-    slot.answer = safeText(ans.answer, 'אין תשובה מוכנה. נסו לשאול מחדש בקצרה.');
-    slot.summary = safeText(ans.summary, slot.answer);
-    slot.helpHint = '';
-    state.score += 55;
-    awardXP(5); // reveal_question asked
-    renderReveal();
-    updateTop();
-    maybeToReflection();
-    return;
-  }
-
-  if (action === 'help') {
-    Object.keys(state.reveal).forEach((k) => { if (k !== catKey) state.reveal[k].showHelp = false; });
-    slot.showHelp = !slot.showHelp;
-    renderReveal();
-    return;
-  }
-
-  if (action === 'help-option') {
-    slot.showHelp = false;
-    slot.helpHint = helpHint(catKey, option);
-    renderReveal();
-  }
-}
-function startEditReflection() {
-  state.el.editWrap.classList.remove('hidden');
-  state.el.reflectInput.value = state.reflectionText;
-  const started = Date.now();
-  const limit = 10000;
-  clearInterval(state.editTimer);
-  state.editTimer = setInterval(() => {
-    const left = Math.max(0, limit - (Date.now() - started));
-    state.el.editTimer.textContent = `נותרו ${(left / 1000).toFixed(1)} שניות`;
-    if (left <= 0) saveEditReflection();
-  }, 120);
-}
-
-function saveEditReflection() {
-  clearInterval(state.editTimer);
-  state.editTimer = null;
-  state.reflectionText = safeText(state.el.reflectInput.value, state.reflectionText);
-  state.el.editWrap.classList.add('hidden');
-  state.el.editTimer.textContent = 'השיקוף נשמר.';
-  renderReflection();
-}
-
-function toInsight() {
-  setStep(4);
-  render();
-  state.el.step4.scrollIntoView({ behavior: 'smooth', block: 'center' });
+function resetRoundState() {
+  state.step = 'context';
+  state.selectedRow = 0;
+  state.wrongRow = 0;
+  state.identifyAttempts = 0;
+  state.identifySolved = false;
+  state.asked = {};
+  state.questionChat = [];
+  state.landingCursor = 0;
+  state.landingVisible = [];
+  state.debriefOpen = false;
+  state.roundScore = 0;
 }
 
 function loadCurrentScenario() {
   if (!state.queue.length) {
-    state.queue = shuffle([...state.data.scenarios]);
+    state.queue = shuffle([...(state.data?.scenarios || [])]);
     state.index = 0;
   }
-  state.current = state.queue[state.index] || state.data.scenarios[0];
-  resetRound();
-  setStep(1);
+  state.current = state.queue[state.index] || state.data?.scenarios?.[0] || null;
+  resetRoundState();
+}
+
+function beginPractice() {
+  state.screen = 'practice';
+  state.prefs.onboardingDone = true;
+  savePrefs();
+  if (!state.current) loadCurrentScenario();
+  render();
+}
+
+function showOnboarding() {
+  state.screen = 'onboarding';
+  render();
+}
+
+function resetProfile() {
+  state.prefs.onboardingDone = false;
+  savePrefs();
+  showToast('הפרופיל אופס. פתיחת ההדרכה תחזור בפעם הבאה.', 'info');
+  showOnboarding();
+}
+
+function openMap() {
+  if (!state.els.mapModal) return;
+  state.els.mapModal.classList.remove('hidden');
+  state.els.mapModal.removeAttribute('hidden');
+  document.body.classList.add('screen-guide-open');
+}
+
+function closeMap() {
+  if (!state.els.mapModal) return;
+  state.els.mapModal.classList.add('hidden');
+  state.els.mapModal.setAttribute('hidden', '');
+  document.body.classList.remove('screen-guide-open');
+}
+
+function renderMap() {
+  if (!state.els.mapContent || !state.data?.triplesMap) return;
+  const rows = Object.keys(state.data.triplesMap.rows).map(Number).sort((a, b) => a - b);
+  state.els.mapContent.innerHTML = `
+    <div class="ltv3-map-grid">
+      ${rows.map((row) => {
+        const rowMeta = getRowMeta(row);
+        return `
+          <article class="ltv3-map-row">
+            <div class="ltv3-map-row-head">
+              <span class="ltv3-map-row-index">${row}</span>
+              <div>
+                <strong>${esc(extractThemeName(rowMeta.title))}</strong>
+                <p>${esc(rowMeta.insight)}</p>
+              </div>
+            </div>
+            <div class="ltv3-map-row-cells">
+              ${rowMeta.categories.map((cat) => `
+                <span class="ltv3-map-chip" style="--ltv3-cat:${esc(cat.color)};">
+                  <strong>${esc(cat.labelHe)}</strong>
+                  <small>${esc(cat.category)}</small>
+                </span>
+              `).join('')}
+            </div>
+          </article>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function advanceStep(stepKey) {
+  state.step = stepKey;
+  render();
+}
+
+function selectRow(row) {
+  if (!state.current || state.step !== 'identify') return;
+  const parsed = parseRow(row);
+  state.selectedRow = parsed;
+  if (parsed === state.current.targetRow) {
+    state.identifySolved = true;
+    state.wrongRow = 0;
+    addScore(10);
+    awardXP(10);
+    if (state.identifyAttempts === 0) {
+      addScore(5);
+      awardXP(5);
+    }
+    showToast('נכון!', 'info');
+  } else {
+    state.identifyAttempts += 1;
+    state.wrongRow = parsed;
+    showToast('עדיין לא. חפש/י את המשפחה הנכונה.', 'danger');
+  }
+  render();
+}
+
+function prepareQuestions() {
+  if (!state.current || !state.identifySolved) return;
+  state.asked = {};
+  state.current.triple.forEach((item) => {
+    state.asked[item.slot] = false;
+  });
+  advanceStep('questions');
+}
+
+function allQuestionsAsked() {
+  return state.current?.triple?.every((item) => state.asked[item.slot]) || false;
+}
+
+function askQuestion(slotKey) {
+  if (!state.current || state.step !== 'questions') return;
+  const item = state.current.triple.find((entry) => entry.slot === slotKey);
+  if (!item || state.asked[item.slot]) return;
+  state.asked[item.slot] = true;
+  state.questionChat.push(
+    { from: 'therapist', text: item.question, category: item.labelHe, color: item.color },
+    { from: 'client', text: item.response, category: item.labelHe }
+  );
+  addScore(10);
+  awardXP(5);
+  if (allQuestionsAsked()) {
+    addScore(20);
+    awardXP(20);
+    awardStars(1);
+    showToast('3/3 הושלמו', 'info');
+  }
+  render();
+  queueChatScroll('#ltv3-questions-chat');
+}
+
+function beginLanding() {
+  if (!allQuestionsAsked()) return;
+  state.landingCursor = 0;
+  state.landingVisible = [];
+  state.debriefOpen = false;
+  advanceStep('landing');
+}
+
+function revealNextLandingLine() {
+  if (!state.current || state.step !== 'landing') return;
+  const next = state.current.landing[state.landingCursor];
+  if (!next) return;
+  state.landingVisible.push(next);
+  state.landingCursor += 1;
+  render();
+  queueChatScroll('#ltv3-landing-chat');
+}
+
+function openDebrief() {
+  if (!state.current || state.step !== 'landing') return;
+  state.debriefOpen = true;
+  render();
+}
+
+function retryScene() {
+  if (!state.current) return;
+  resetRoundState();
   render();
 }
 
 function nextScenario() {
   state.progress.played += 1;
-  state.progress.totalScore += state.score;
-  state.progress.bestScore = Math.max(Number(state.progress.bestScore || 0), Number(state.score || 0));
+  state.progress.totalScore += Number(state.roundScore || 0);
+  state.progress.bestRound = Math.max(Number(state.progress.bestRound || 0), Number(state.roundScore || 0));
   state.progress.lastPlayedAt = new Date().toISOString();
   saveProgress();
 
   state.index += 1;
   if (state.index >= state.queue.length) {
-    state.queue = shuffle([...state.data.scenarios]);
+    state.queue = shuffle([...(state.data?.scenarios || [])]);
     state.index = 0;
   }
   loadCurrentScenario();
-}
-
-function restartPickStep() {
-  state.activeRow = 0;
-  state.selectedCategory = '';
-  state.reveal = {};
-  state.el.step1Feedback.textContent = 'בחר/י קטגוריה חדשה כדי להתחיל שוב את השלשה.';
-  state.el.step2Feedback.textContent = '';
-  setStep(1);
   render();
 }
 
-function openMap() {
-  state.el.mapModal.classList.remove('hidden');
-  state.el.mapModal.removeAttribute('hidden');
-  document.body.classList.add('screen-guide-open');
+function buildProgressMarkup() {
+  const activeIndex = currentStepIndex();
+  return `
+    <div class="ltv3-progress-shell">
+      ${STEP_META.map((step, index) => `
+        <div class="ltv3-progress-item ${index <= activeIndex ? 'is-reached' : ''}${index === activeIndex ? ' is-current' : ''}">
+          <span class="ltv3-progress-dot" aria-hidden="true"></span>
+          <span>${esc(step.label)}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
 }
 
-function closeMap() {
-  state.el.mapModal.classList.add('hidden');
-  state.el.mapModal.setAttribute('hidden', '');
-  if (!document.querySelector('.screen-read-guide-modal:not(.hidden)')) {
-    document.body.classList.remove('screen-guide-open');
-  }
+function buildChatMarkup(items, { allowHighlight = false } = {}) {
+  return items.map((item) => {
+    const from = normKey(item.from);
+    if (from === 'label' || from === 't_label') {
+      return `<div class="ltv3-section-label">${esc(item.text)}</div>`;
+    }
+    if (from === 'narrator' || from === 'system') {
+      return `<div class="ltv3-bubble ltv3-bubble--narrator">${esc(item.text)}</div>`;
+    }
+    const isTherapist = from === 'therapist';
+    const bubbleClass = isTherapist ? 'ltv3-bubble--therapist' : 'ltv3-bubble--client';
+    const highlightClass = allowHighlight && item.highlight ? ' is-target' : '';
+    const label = speakerLabel(item.from);
+    return `
+      <article class="ltv3-bubble ${bubbleClass}${highlightClass}">
+        ${label ? `<span class="ltv3-bubble-sender">${esc(label)}</span>` : ''}
+        <p class="ltv3-bubble-text">${esc(item.text)}</p>
+        ${allowHighlight && item.highlight ? `<span class="ltv3-target-tag">${esc(item.label || '← המשפט לעבודה')}</span>` : ''}
+      </article>
+    `;
+  }).join('');
 }
 
-function startPractice() {
-  state.el.onboarding.classList.add('hidden');
-  state.el.practice.classList.remove('hidden');
-  state.queue = shuffle([...state.data.scenarios]);
-  state.index = 0;
-  state.score = 0;
-  loadCurrentScenario();
+function buildOnboardingMarkup() {
+  return `
+    <section class="ltv3-onboarding-card">
+      <p class="ltv3-kicker">שלשות חיות</p>
+      <h2>הקשר → זיהוי → 3 שאלות → שיקוף</h2>
+      <p class="ltv3-lead">המשפט לא נפתח דרך הסבר תיאורטי, אלא דרך שיחת WhatsApp טיפולית: קודם רואים הקשר, אחר כך בוחרים שורה, ואז שואלים את כל שלוש השאלות עד שנוצרת נחיתה.</p>
+      <ol class="ltv3-onboarding-list">
+        <li>קוראים את ההקשר ורואים איזה משפט מסומן לעבודה.</li>
+        <li>מזהים את השורה הנכונה מתוך 5 משפחות קומפקטיות.</li>
+        <li>שואלים את כל 3 השאלות של אותה שורה בתוך שיחת WhatsApp.</li>
+        <li>חושפים שיקוף, ריפריימינג ושאלת המשך, ואז רואים מה קרה כאן.</li>
+      </ol>
+      <div class="ltv3-inline-actions">
+        <button type="button" class="btn btn-primary" data-action="start-practice">התחל תרגול</button>
+        <button type="button" class="btn btn-secondary" data-action="open-map">מפת השלשות</button>
+        <button type="button" class="btn btn-secondary" data-action="reset-profile">שנה פרופיל</button>
+      </div>
+      <p class="ltv3-mini-stats">הושלמו עד עכשיו: <strong>${Number(state.progress?.played || 0)}</strong> · שיא נקודות: <strong>${Number(state.progress?.bestRound || 0)}</strong></p>
+    </section>
+  `;
+}
+
+function buildContextStage() {
+  return `
+    <section class="ltv3-stage-card">
+      <div class="ltv3-stage-head">
+        <p class="ltv3-kicker">שלב 1</p>
+        <h3>הקשר</h3>
+        <p>המשפט לעבודה כבר מסומן בתוך השיחה. קודם קוראים את הרגע, ורק אחר כך מזהים את השורה.</p>
+      </div>
+      <div class="ltv3-chat chat-bg">
+        ${buildChatMarkup(state.current.context, { allowHighlight: true })}
+      </div>
+      <div class="ltv3-inline-actions">
+        <button type="button" class="btn btn-primary" data-action="go-identify">זיהוי ההפרה ←</button>
+      </div>
+    </section>
+  `;
+}
+
+function buildIdentifyStage() {
+  const rows = Object.keys(state.data?.triplesMap?.rows || {}).map(Number).sort((a, b) => a - b);
+  const feedbackTone = state.identifySolved ? 'success' : state.wrongRow ? 'danger' : 'info';
+  const feedbackText = state.identifySolved
+    ? 'נכון! זו המשפחה הפעילה במשפט. עכשיו פותחים את שלוש השאלות.'
+    : state.wrongRow
+      ? state.current.wrongHint
+      : 'בחר/י את המשפחה המתאימה למשפט המסומן.';
+  return `
+    <section class="ltv3-stage-card">
+      <div class="ltv3-stage-head">
+        <p class="ltv3-kicker">שלב 2</p>
+        <h3>זיהוי</h3>
+        <p>כאן בוחרים שורה אחת בלבד. אם טעית, מקבלים רמז ומנסים שוב.</p>
+      </div>
+      <section class="ltv3-target-card">
+        <span class="ltv3-target-kicker">המשפט לעבודה</span>
+        <p>${esc(state.current.target)}</p>
+      </section>
+      <div class="ltv3-row-list">
+        ${rows.map((row) => {
+          const meta = getRowMeta(row);
+          const isCorrect = state.identifySolved && row === state.current.targetRow;
+          const isWrong = !state.identifySolved && row === state.wrongRow;
+          const joined = meta.categories.map((cat) => cat.labelHe).join(' · ');
+          return `
+            <button
+              type="button"
+              class="ltv3-row-button${isCorrect ? ' is-correct' : ''}${isWrong ? ' is-wrong' : ''}"
+              data-action="pick-row"
+              data-row="${row}"
+            >
+              <span class="ltv3-row-number">${row}</span>
+              <span class="ltv3-row-copy">
+                <strong>${esc(extractThemeName(meta.title))}</strong>
+                <small>${esc(joined)}</small>
+              </span>
+            </button>
+          `;
+        }).join('')}
+      </div>
+      <p class="ltv3-feedback is-${feedbackTone}">${esc(feedbackText)}</p>
+      ${state.identifySolved ? `
+        <div class="ltv3-inline-actions">
+          <button type="button" class="btn btn-primary" data-action="go-questions">לשלוש השאלות ←</button>
+        </div>
+      ` : ''}
+    </section>
+  `;
+}
+
+function buildTripleGrid() {
+  return `
+    <div class="ltv3-triple-grid">
+      ${state.current.triple.map((item) => {
+        const done = !!state.asked[item.slot];
+        return `
+          <div class="ltv3-triple-cell ${done ? 'is-done' : 'is-pending'}" style="--ltv3-slot:${esc(item.color)};">
+            <strong>${esc(item.labelHe)}</strong>
+            <span>${done ? '✓ נשאלה' : 'ממתינה'}</span>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function buildQuestionStage() {
+  const askedCount = state.current.triple.filter((item) => state.asked[item.slot]).length;
+  return `
+    <section class="ltv3-stage-card">
+      <div class="ltv3-stage-head">
+        <p class="ltv3-kicker">שלב 3</p>
+        <h3>3 שאלות</h3>
+        <p>צריך לשאול את כל שלוש השאלות של אותה שורה. כל לחיצה מוסיפה שאלה ירוקה ותשובת מטופל לבנה.</p>
+      </div>
+      <section class="ltv3-target-card is-compact">
+        <span class="ltv3-target-kicker">המשפט לעבודה</span>
+        <p>${esc(state.current.target)}</p>
+      </section>
+      ${buildTripleGrid()}
+      <div id="ltv3-questions-chat" class="ltv3-chat chat-bg">
+        ${state.questionChat.length ? buildChatMarkup(state.questionChat) : '<div class="ltv3-empty-chat">הצ\'אט עוד ריק. בחר/י את השאלה הראשונה.</div>'}
+      </div>
+      <div class="ltv3-question-list">
+        ${state.current.triple.map((item) => {
+          const done = !!state.asked[item.slot];
+          return `
+            <button
+              type="button"
+              class="ltv3-question-btn${done ? ' is-done' : ''}"
+              style="--ltv3-slot:${esc(item.color)};"
+              data-action="ask-question"
+              data-slot="${esc(item.slot)}"
+              ${done ? 'disabled' : ''}
+            >
+              <span class="ltv3-question-cat">${esc(item.labelHe)}</span>
+              <strong>${esc(item.question)}</strong>
+              <small>${done ? 'נשאלה' : 'לחץ/י כדי לשאול'}</small>
+            </button>
+          `;
+        }).join('')}
+      </div>
+      <p class="ltv3-feedback">${askedCount}/3 שאלות נשאלו</p>
+      ${allQuestionsAsked() ? `
+        <div class="ltv3-inline-actions">
+          <button type="button" class="btn btn-primary" data-action="go-landing">שיקוף + סיום ←</button>
+        </div>
+      ` : ''}
+    </section>
+  `;
+}
+
+function buildLandingStage() {
+  const allLandingShown = state.landingCursor >= state.current.landing.length;
+  const allChat = [...state.questionChat, ...state.landingVisible];
+  return `
+    <section class="ltv3-stage-card">
+      <div class="ltv3-stage-head">
+        <p class="ltv3-kicker">שלב 4</p>
+        <h3>שיקוף + נחיתה</h3>
+        <p>כאן לא כותבים. חושפים את השיחה הודעה אחרי הודעה, ואז רואים מה קרה כאן.</p>
+      </div>
+      <section class="ltv3-target-card is-compact">
+        <span class="ltv3-target-kicker">המשפט שנפתח</span>
+        <p>${esc(state.current.target)}</p>
+      </section>
+      <div id="ltv3-landing-chat" class="ltv3-chat chat-bg">
+        ${buildChatMarkup(allChat)}
+      </div>
+      <div class="ltv3-inline-actions">
+        ${!allLandingShown ? '<button type="button" class="btn btn-primary" data-action="next-landing-line">הודעה הבאה</button>' : ''}
+        ${allLandingShown && !state.debriefOpen ? '<button type="button" class="btn btn-primary" data-action="open-debrief">מה קרה כאן? ←</button>' : ''}
+      </div>
+      ${state.debriefOpen ? `
+        <section class="ltv3-debrief">
+          <h4>מה קרה כאן?</h4>
+          <div class="ltv3-debrief-items">
+            ${state.current.debrief.map((item) => `
+              <article class="ltv3-debrief-item">
+                <span class="ltv3-debrief-icon">${esc(item.icon)}</span>
+                <div>
+                  ${item.bold ? `<strong>${esc(item.bold)}</strong>` : ''}
+                  <p>${esc(item.text)}</p>
+                </div>
+              </article>
+            `).join('')}
+          </div>
+          <div class="ltv3-inline-actions">
+            <button type="button" class="btn btn-secondary" data-action="retry-scene">נסה שוב</button>
+            <button type="button" class="btn btn-primary" data-action="next-scene">משפט הבא ←</button>
+          </div>
+        </section>
+      ` : ''}
+    </section>
+  `;
+}
+
+function buildPracticeMarkup() {
+  const completed = Number(state.progress?.played || 0);
+  return `
+    <section class="ltv3-practice-shell">
+      <div class="ltv3-topbar">
+        <div class="ltv3-pill-row">
+          <span class="ltv3-pill">תרחיש <strong>${state.index + 1}</strong>/<strong>${state.queue.length || state.data.scenarios.length}</strong></span>
+          <span class="ltv3-pill">נקודות <strong>${state.roundScore}</strong></span>
+          <span class="ltv3-pill">הושלמו <strong>${completed}</strong></span>
+        </div>
+        <div class="ltv3-pill-row">
+          <button type="button" class="btn btn-secondary" data-action="open-map">מפת השלשות</button>
+          <button type="button" class="btn btn-secondary" data-action="retry-scene">נסה שוב</button>
+          <button type="button" class="btn btn-secondary" data-action="reset-profile">שנה פרופיל</button>
+        </div>
+      </div>
+      ${buildProgressMarkup()}
+      ${state.step === 'context' ? buildContextStage() : ''}
+      ${state.step === 'identify' ? buildIdentifyStage() : ''}
+      ${state.step === 'questions' ? buildQuestionStage() : ''}
+      ${state.step === 'landing' ? buildLandingStage() : ''}
+    </section>
+  `;
+}
+
+function buildShellMarkup() {
+  return `
+    <div class="ltv3-shell">
+      ${state.screen === 'onboarding' ? buildOnboardingMarkup() : buildPracticeMarkup()}
+    </div>
+  `;
+}
+
+function render() {
+  if (!state.els.root) return;
+  state.els.root.innerHTML = buildShellMarkup();
+}
+
+function queueChatScroll(selector) {
+  window.requestAnimationFrame(() => {
+    const node = document.querySelector(selector);
+    if (!node) return;
+    node.scrollTop = node.scrollHeight;
+  });
+}
+
+function handleRootClick(event) {
+  const button = event.target.closest('[data-action]');
+  if (!button) return;
+  const action = button.getAttribute('data-action') || '';
+  if (action === 'start-practice') return void beginPractice();
+  if (action === 'open-map') return void openMap();
+  if (action === 'reset-profile') return void resetProfile();
+  if (action === 'go-identify') return void advanceStep('identify');
+  if (action === 'pick-row') return void selectRow(button.getAttribute('data-row'));
+  if (action === 'go-questions') return void prepareQuestions();
+  if (action === 'ask-question') return void askQuestion(button.getAttribute('data-slot') || '');
+  if (action === 'go-landing') return void beginLanding();
+  if (action === 'next-landing-line') return void revealNextLandingLine();
+  if (action === 'open-debrief') return void openDebrief();
+  if (action === 'retry-scene') return void retryScene();
+  if (action === 'next-scene') return void nextScenario();
 }
 
 function bindEvents() {
-  state.el.startBtn.addEventListener('click', startPractice);
-  state.el.openMapTopBtn.addEventListener('click', openMap);
-  state.el.openMapBtn.addEventListener('click', openMap);
-  state.el.closeMapBtn.addEventListener('click', closeMap);
-
-  state.el.mapModal.addEventListener('click', (e) => {
-    if (e.target === state.el.mapModal) closeMap();
+  state.els.root.addEventListener('click', handleRootClick);
+  state.els.mapModal?.addEventListener('click', (event) => {
+    if (event.target === state.els.mapModal) closeMap();
   });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !state.el.mapModal.classList.contains('hidden')) closeMap();
+  state.els.closeMapBtn?.addEventListener('click', closeMap);
+  state.els.openMapTopBtn?.addEventListener('click', openMap);
+  state.els.resetProfileTopBtn?.addEventListener('click', resetProfile);
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeMap();
   });
-
-  state.el.resetSceneBtn.addEventListener('click', () => {
-    state.queue = shuffle([...state.data.scenarios]);
-    state.index = 0;
-    loadCurrentScenario();
-    showToast('נטען תרחיש חדש', 'info');
-  });
-
-  state.el.changeRowBtn.addEventListener('click', restartPickStep);
-
-  state.el.categoryChips.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-ltv2-category]');
-    if (!btn) return;
-    const catKey = decodeURIComponent(btn.getAttribute('data-ltv2-category') || '');
-    handleCategoryPick(catKey, btn);
-  });
-
-  state.el.revealCards.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-ltv2-act]');
-    if (!btn) return;
-    const action = btn.getAttribute('data-ltv2-act') || '';
-    const catKey = decodeURIComponent(btn.getAttribute('data-ltv2-cat') || '');
-    const option = btn.getAttribute('data-ltv2-option') || '';
-    if (!catKey) return;
-    handleRevealAction(catKey, action, option);
-  });
-
-  state.el.revealCategories?.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-ltv2-category]');
-    if (!btn) return;
-    const catKey = decodeURIComponent(btn.getAttribute('data-ltv2-category') || '');
-    handleCategoryPick(catKey, btn);
-  });
-
-  state.el.editReflectBtn.addEventListener('click', startEditReflection);
-  state.el.saveReflectBtn.addEventListener('click', saveEditReflection);
-  state.el.toInsightBtn.addEventListener('click', toInsight);
-  state.el.nextBtn.addEventListener('click', nextScenario);
 }
 
-function renderInit() {
-  state.el.onboarding.classList.remove('hidden');
-  state.el.practice.classList.add('hidden');
-  renderMap();
+function collectElements() {
+  return {
+    root: document.getElementById('ltv2-root'),
+    mapModal: document.getElementById('ltv2-map-modal'),
+    mapContent: document.getElementById('ltv2-map-content'),
+    closeMapBtn: document.getElementById('ltv2-close-map-btn'),
+    openMapTopBtn: document.getElementById('ltv2-open-map-top'),
+    resetProfileTopBtn: document.getElementById('ltv2-reset-profile-top'),
+    toast: document.getElementById('ltv2-toast')
+  };
 }
 
 async function setupLivingTriplesModule() {
-  state.el = getElements();
-  if (!state.el.root) return;
+  state.els = collectElements();
+  if (!state.els.root) return;
 
   state.progress = loadProgress();
+  state.prefs = loadPrefs();
   state.data = await loadData();
 
-  if (!Array.isArray(state.data.scenarios) || !state.data.scenarios.length) {
+  if (!Array.isArray(state.data?.scenarios) || !state.data.scenarios.length) {
     state.data = normalizeData({ triplesMap: DEFAULT_TRIPLES_MAP, scenarios: FALLBACK_SCENARIOS });
   }
 
+  loadCurrentScenario();
+  state.screen = state.prefs.onboardingDone ? 'practice' : 'onboarding';
+  renderMap();
   bindEvents();
-  renderInit();
+  render();
 }
 
 window.setupLivingTriplesModule = setupLivingTriplesModule;
-

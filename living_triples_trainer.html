@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Living Triples - Meta Model Trainer</title>
+  <title>שלשות חיות - Meta Model App</title>
   <link rel="icon" href="data:,">
   <script>
     (function () {
@@ -56,95 +56,21 @@
           <p>E = mc³ (שלשולוגיה)</p>
         </div>
       </div>
-      <h1>Living Triples</h1>
-      <p>קטגוריה אחת ברורה -> Reveal מלא 3/3 -> שיקוף -> Insight</p>
+      <h1>שלשות חיות</h1>
+      <p>הקשר → זיהוי → 3 שאלות → שיקוף. שיחת WhatsApp טיפולית שמחזיקה את כל המשפחה יחד.</p>
       <div class="ltv2-header-actions">
         <a class="btn btn-secondary" href="index.html?tab=practice-triples-radar">חזרה ל-Triples Radar באפליקציה</a>
         <button id="ltv2-open-map-top" type="button" class="btn btn-secondary">מפת השלשות</button>
+        <button id="ltv2-reset-profile-top" type="button" class="btn btn-secondary">שנה פרופיל</button>
       </div>
     </header>
 
     <section id="living-triples" class="tab-content active practice-tab-content">
       <div class="practice-container">
         <div id="ltv2-root" class="card practice-intro-card living-triples-card ltv2-root">
-          <div id="ltv2-onboarding" class="ltv2-onboarding" role="region" aria-label="הדרכת פתיחה">
-            <h2>איך עובדים כאן?</h2>
-            <ol>
-              <li>המטרה: לא לזהות דפוס אחד, אלא להשלים שלשה.</li>
-              <li>קליק אחד -> השורה נצבעת -> שואלים 3 שאלות.</li>
-              <li>בסוף מתקבל שיקוף + אינסייט, ואז ממשיכים למשפט הבא.</li>
-            </ol>
-            <button id="ltv2-start-btn" type="button" class="btn btn-primary">התחל תרגול</button>
-          </div>
-
-          <div id="ltv2-practice" class="ltv2-practice hidden" role="region" aria-label="תרגול שלשות">
-            <div class="ltv2-topbar">
-              <p class="ltv2-chip">סצנה <strong id="ltv2-scene-index">1</strong>/<strong id="ltv2-scene-total">1</strong></p>
-              <p class="ltv2-chip">ניקוד <strong id="ltv2-score">0</strong></p>
-              <button id="ltv2-open-map-btn" type="button" class="btn btn-secondary">מפת השלשות</button>
-              <button id="ltv2-reset-scene-btn" type="button" class="btn btn-secondary">תרחיש חדש</button>
-            </div>
-
-            <ol class="ltv2-stepper" aria-label="שלבי עבודה">
-              <li data-step="1" class="is-active">1. בחר/י קטגוריה מהמשפט</li>
-              <li data-step="2">2. Reveal 0/3 -> 3/3</li>
-              <li data-step="3">3. שיקוף</li>
-              <li data-step="4">4. Insight + סיום</li>
-            </ol>
-
-            <section class="ltv2-sentence-card opened-content" aria-live="polite">
-              <h3>משפט לתרגול</h3>
-              <p id="ltv2-sentence-text"></p>
-            </section>
-
-            <section id="ltv2-step-1" class="ltv2-stage" aria-label="שלב בחירת קטגוריה">
-              <h4>בחר/י קטגוריה אחת ברורה</h4>
-              <p class="ltv2-sub">לחיצה אחת מספיקה. אחר כך משלימים את שתי האחיות באותה שורה.</p>
-              <div id="ltv2-category-chips" class="ltv2-category-chips"></div>
-              <p id="ltv2-step1-feedback" class="ltv2-feedback" aria-live="polite"></p>
-            </section>
-
-            <section id="ltv2-row-sticky" class="ltv2-row-sticky hidden" aria-label="שורה פעילה">
-              <div class="ltv2-row-head">
-                <div class="ltv2-row-title-wrap">
-                  <strong id="ltv2-row-title" class="ltv2-row-title">שלשה 1 | מקור, הנחה וכוונה</strong>
-                  <p id="ltv2-row-insight" class="ltv2-row-insight">מזהים מי קובע מה נכון, מה מונח מראש, ואיזו כוונה מיוחסת לאחר.</p>
-                </div>
-                <button id="ltv2-change-row-btn" type="button" class="btn btn-secondary">החלף שורה</button>
-              </div>
-              <div id="ltv2-row-members" class="ltv2-row-members"></div>
-            </section>
-
-            <section id="ltv2-step-2" class="ltv2-stage hidden" aria-label="שלב Reveal">
-              <h4>Reveal: השלם/י 3 מתוך 3</h4>
-              <p id="ltv2-reveal-progress" class="ltv2-sub">0/3</p>
-              <div id="ltv2-reveal-categories" class="ltv2-reveal-categories"></div>
-              <div id="ltv2-reveal-cards" class="ltv2-reveal-cards"></div>
-              <p id="ltv2-step2-feedback" class="ltv2-feedback" aria-live="polite"></p>
-            </section>
-
-            <section id="ltv2-step-3" class="ltv2-stage hidden" aria-label="שלב שיקוף">
-              <h4>שיקוף</h4>
-              <div id="ltv2-reflection-card" class="ltv2-reflection-card opened-content"></div>
-              <div class="ltv2-reflection-actions">
-                <button id="ltv2-edit-reflect-btn" type="button" class="btn btn-secondary">ערוך 10 שניות</button>
-                <span id="ltv2-edit-timer" class="ltv2-edit-timer" aria-live="polite"></span>
-              </div>
-              <div id="ltv2-edit-wrap" class="hidden">
-                <textarea id="ltv2-reflect-input" rows="6" placeholder="ערוך את השיקוף בקצרה..."></textarea>
-                <button id="ltv2-save-reflect-btn" type="button" class="btn btn-secondary">שמור שיקוף</button>
-              </div>
-              <div class="ltv2-reflection-actions">
-                <button id="ltv2-to-insight-btn" type="button" class="btn btn-primary">המשך ל-Insight</button>
-              </div>
-            </section>
-
-            <section id="ltv2-step-4" class="ltv2-stage hidden" aria-label="שלב Insight">
-              <h4>Insight</h4>
-              <div id="ltv2-insight-card" class="ltv2-insight-card opened-content"></div>
-              <p class="ltv2-end-note">מכאן הטיפול ימשיך בדרכו…</p>
-              <button id="ltv2-next-btn" type="button" class="btn btn-primary">משפט הבא</button>
-            </section>
+          <div class="ltv2-onboarding" role="status" aria-live="polite">
+            <h2>טוען/ת שלשות חיות…</h2>
+            <p>מכינים את שיחת ה־WhatsApp, טבלת השורות והתרחיש הראשון.</p>
           </div>
         </div>
       </div>

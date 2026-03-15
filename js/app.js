@@ -19359,6 +19359,10 @@ function renderComicEngineLoadError(els, message = 'אירעה תקלה בטעי
 }
 
 function ensureComicEngineFlowReady({ force = false } = {}) {
+    if (window.ComicEngineEscalationV3 && typeof window.ComicEngineEscalationV3.ensureReady === 'function') {
+        window.ComicEngineEscalationV3.ensureReady({ force });
+        return;
+    }
     const root = document.getElementById('comicEngine');
     if (!root) return;
     const bootState = String(root.dataset.ceflowBootState || '').trim();
@@ -19385,6 +19389,9 @@ function ensureComicEngineFlowReady({ force = false } = {}) {
 }
 
 async function setupComicEngine2({ force = false } = {}) {
+    if (window.ComicEngineEscalationV3 && typeof window.ComicEngineEscalationV3.ensureReady === 'function') {
+        return window.ComicEngineEscalationV3.ensureReady({ force });
+    }
     const root = document.getElementById('comicEngine');
     if (!root) return;
     const bootState = String(root.dataset.ceflowBootState || '').trim();

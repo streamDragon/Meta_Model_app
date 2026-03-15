@@ -799,6 +799,7 @@
                         <p id="ceflow-choice-copy" class="ceflow-choice-copy">כל בחירה כאן לא רק נשמעת אחרת, אלא דוחפת את הילד לשיתוף, הגנה או קיפאון.</p>
                         <p id="ceflow-choice-affordance" class="ceflow-choice-affordance" data-state="ready">בחר/י אחת מארבע התגובות בקשת כדי לכוון את הרגע הבא.</p>
                     </div>
+                    <section id="ceflow-scene-rail" class="ceflow-scene-rail" aria-live="polite"></section>
                     <div id="ceflow-choice-deck" class="ceflow-choice-deck ceflow-choice-deck--arc" role="group" aria-label="אפשרויות תגובה"></div>
                     <section id="ceflow-reply-box" class="ceflow-reply-box hidden" aria-live="polite">
                         <div class="ceflow-section-head">
@@ -857,6 +858,7 @@
             choiceTitle: root.querySelector('#ceflow-choice-title'),
             choiceCopy: root.querySelector('#ceflow-choice-copy'),
             choiceAffordance: root.querySelector('#ceflow-choice-affordance'),
+            sceneRail: root.querySelector('#ceflow-scene-rail'),
             deck: root.querySelector('#ceflow-choice-deck'),
             replyBox: root.querySelector('#ceflow-reply-box'),
             replyTitle: root.querySelector('#ceflow-reply-title'),
@@ -1259,6 +1261,33 @@
         runtime.els.choiceAffordance.textContent = text;
     }
 
+    function renderSceneRail(runtime) {
+        if (!runtime.els.sceneRail) return;
+        if (runtime.state.phase === PHASES.ANALYSIS) {
+            runtime.els.sceneRail.classList.add('hidden');
+            runtime.els.sceneRail.innerHTML = '';
+            return;
+        }
+        const layerData = getBranchLayerData(runtime.scenario, runtime.state.layerIndex, runtime.state.branchKey);
+        const prompt = compact(layerData?.prompt || runtime.scenario.contextIntro || runtime.scenario.supportPrompt);
+        const latestChild = [...runtime.state.transcript].reverse().find((line) => line.role === 'child') || runtime.state.transcript[0];
+        runtime.els.sceneRail.classList.remove('hidden');
+        runtime.els.sceneRail.innerHTML = `
+            ${prompt ? `
+                <article class="ceflow-bubble is-left is-counter ceflow-scene-rail-bubble">
+                    <p class="ceflow-bubble-speaker">המערכת</p>
+                    <p class="ceflow-bubble-text">${escapeHtml(prompt)}</p>
+                </article>
+            ` : ''}
+            ${latestChild ? `
+                <article class="ceflow-bubble is-left is-tone-${escapeHtml(bubbleTone(latestChild))} ceflow-scene-rail-bubble is-scene-line">
+                    <p class="ceflow-bubble-speaker">${escapeHtml(latestChild.speaker)}</p>
+                    <p class="ceflow-bubble-text">${escapeHtml(latestChild.text)}</p>
+                </article>
+            ` : ''}
+        `;
+    }
+
     function renderChoiceDeck(runtime) {
         if (!runtime.els.deck) return;
         if (runtime.state.phase === PHASES.ANALYSIS) {
@@ -1267,7 +1296,12 @@
         }
         const disabled = runtime.state.phase !== PHASES.DECISION && runtime.state.phase !== PHASES.PREVIEW;
         const choices = visibleChoiceSet(runtime);
-        runtime.els.deck.innerHTML = choices.map((choice, index) => `
+        runtime.els.deck.innerHTML = `
+            <div class="ceflow-choice-target" aria-hidden="true">
+                <span class="ceflow-choice-target-icon">💬</span>
+                <small>מכוונים את התגובה</small>
+            </div>
+        ` + choices.map((choice, index) => `
             <button
                 type="button"
                 class="ceflow-choice ceflow-choice--arc ${toneClass(choice)}${runtime.state.selectedChoiceId === choice.id ? ' is-selected' : ''}${choice.rhetorical ? ' is-rhetorical' : ''}"
@@ -1421,6 +1455,7 @@
         renderTurnLayer(runtime);
         renderDialog(runtime);
         renderChoiceAffordance(runtime);
+        renderSceneRail(runtime);
         renderChoiceDeck(runtime);
         renderReply(runtime);
         renderTimeout(runtime);
@@ -1442,7 +1477,7 @@
         runtime.state.phase = PHASES.PREVIEW;
         runtime.state.timerRemainingMs = Math.max(0, runtime.state.timerRemainingMs);
         render(runtime);
-        runtime.els.replyInput?.focus();
+        runtime.els.replyConfirm?.focus();
     }
 
     function stepBack(runtime) {
@@ -1691,4 +1726,4 @@
             global.setTimeout(() => ensureReady({ force: true }), 0);
         }
     }
-})();
+})(typeof window !== 'undefined' ? window : globalThis);
