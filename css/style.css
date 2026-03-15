@@ -23708,7 +23708,7 @@ body.mobile-sticky-cta-visible {
 
 /* ═══ Practice Question — layout locked to viewport, no overflow ═══ */
 #practice-question {
-    overflow: visible;
+    overflow: hidden;
 }
 
 #practice-question .practice-container {
