@@ -4,10 +4,21 @@ body,
     -webkit-font-smoothing: antialiased;
 }
 
-#home:has(#meta-home-shell) #mobile-feed-home,
-#home:has(#meta-home-shell) .hhc-hero,
-#home:has(#meta-home-shell) .hhc-paths,
-#home:has(#meta-home-shell) .home-route-primary-cta {
+/* Hide static hero immediately — shell JS will show its own home view */
+#home .hhc-hero,
+#home .hhc-paths,
+#home .home-route-primary-cta {
+    display: none !important;
+}
+
+/* Fallback: if shell JS never ran (no meta-shell-mode on body), reveal static hero */
+body:not(.meta-shell-mode) #home .hhc-hero,
+body:not(.meta-shell-mode) #home .hhc-paths,
+body:not(.meta-shell-mode) #home .home-route-primary-cta {
+    display: block !important;
+}
+
+#home:has(#meta-home-shell) #mobile-feed-home {
     display: none !important;
 }
 
