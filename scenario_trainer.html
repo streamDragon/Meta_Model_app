@@ -32,10 +32,8 @@
       }
 
       function startSimulator() {
-        var onboardingSection = document.getElementById('scenario-onboarding-section');
-        var appSection = document.getElementById('scenario-app-section');
-        if (onboardingSection) onboardingSection.style.display = 'none';
-        if (appSection) appSection.style.display = 'block';
+        var overlay = document.getElementById('scenario-trainer-onboarding-overlay');
+        if (overlay) overlay.style.display = 'none';
       }
 
       function boot() {
@@ -69,35 +67,32 @@
   </script>
 </head>
 <body>
-  <section id="scenario-onboarding-section" style="display: block;">
-    <div class="container ltv2-page">
-      <header class="ltv2-header">
-        <h1>סימולטור סצנות 🎭</h1>
-        <p>דיאלוג אנושי עם בחירה מודעת של תגובה</p>
-        <div class="ltv2-header-actions">
-          <a class="btn btn-secondary" href="index.html?tab=practice-verb-unzip">חזרה למרכז כלים באפליקציה</a>
-        </div>
-      </header>
+  <div class="container ltv2-page">
+    <header class="ltv2-header">
+      <h1>סימולטור סצנות 🎭</h1>
+      <p>דיאלוג אנושי עם בחירה מודעת של תגובה</p>
+      <div class="ltv2-header-actions">
+        <a class="btn btn-secondary" href="index.html?tab=practice-verb-unzip">חזרה למרכז כלים באפליקציה</a>
+      </div>
+    </header>
 
-      <section class="tab-content active practice-tab-content">
-        <div class="practice-container">
-          <div class="card practice-intro-card living-triples-card">
-            <div class="ltv2-onboarding" role="region" aria-label="הדרכת פתיחה">
-              <h2>איך עובדים כאן?</h2>
-              <ol>
-                <li>נכנסים לסצנה קצרה מתחומי חיים שונים (הורות, זוגיות, עבודה, וכו׳)</li>
-                <li>שומעים משפט אמיתי מהצד השני של השיחה</li>
-                <li>בוחרים תגובה אחת מארבע אפשרויות וכל אחת מנצחת בדרך שונה</li>
-                <li>רואים מיידית איך התגובה מתקבלת רגשית ומה היא פותחת או סוגרת בתהליך</li>
-              </ol>
-              <button id="scenario-trainer-onboarding-btn" type="button" class="btn btn-primary">התחל הדרכה</button>
-            </div>
+    <section class="tab-content active practice-tab-content">
+      <div class="practice-container">
+        <div id="scenario-trainer-onboarding-overlay" class="card practice-intro-card living-triples-card" style="position: relative; z-index: 100;">
+          <div class="ltv2-onboarding" role="region" aria-label="הדרכת פתיחה">
+            <h2>איך עובדים כאן?</h2>
+            <ol>
+              <li>נכנסים לסצנה קצרה מתחומי חיים שונים (הורות, זוגיות, עבודה, וכו׳)</li>
+              <li>שומעים משפט אמיתי מהצד השני של השיחה</li>
+              <li>בוחרים תגובה אחת מארבע אפשרויות וכל אחת מנצחת בדרך שונה</li>
+              <li>רואים מיידית איך התגובה מתקבלת רגשית ומה היא פותחת או סוגרת בתהליך</li>
+            </ol>
+            <button id="scenario-trainer-onboarding-btn" type="button" class="btn btn-primary">התחל הדרכה</button>
           </div>
         </div>
-      </section>
-    </div>
-  </section>
-
-  <section id="scenario-app-section" style="display: none;"></section>
+        <div id="scenario-trainer-root"></div>
+      </div>
+    </section>
+  </div>
 </body>
 </html>
