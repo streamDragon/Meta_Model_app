@@ -440,15 +440,14 @@ async function runShellSmoke(baseUrl) {
                 choiceCount: choiceButtons.length,
                 enabledChoices,
                 firstChoiceCursor: firstChoice ? getComputedStyle(firstChoice).cursor : '',
-                affordanceText: (affordance?.textContent || '').trim(),
                 affordanceState: affordance?.dataset?.state || '',
                 backDisabled: !!backButton?.disabled,
                 overlayVisible: !!overlay && !overlay.classList.contains('hidden'),
                 hudLinkText: (hudLink?.textContent || '').trim()
             };
         });
-        await assert(initialState.choiceCount > 0, 'comic choices rendered', String(initialState.choiceCount));
-        await assert(initialState.enabledChoices > 0, 'comic choices enabled', String(initialState.enabledChoices));
+        await assert(initialState.choiceCount === 4, 'comic renders 4 arc choices', String(initialState.choiceCount));
+        await assert(initialState.enabledChoices === 4, 'comic choices enabled', String(initialState.enabledChoices));
         await assert(initialState.firstChoiceCursor === 'pointer', 'comic choices look clickable');
         await assert(initialState.affordanceState === 'ready', 'comic affordance ready state');
         await assert(Boolean(initialState.choiceTitle), 'comic choice title visible', initialState.choiceTitle);
@@ -463,13 +462,15 @@ async function runShellSmoke(baseUrl) {
             const backButton = document.getElementById('ceflow-step-back');
             const replyBox = document.getElementById('ceflow-reply-box');
             const replyBack = document.getElementById('ceflow-reply-step-back');
+            const replyInput = document.getElementById('ceflow-reply-input');
             return {
                 selectedCount: document.querySelectorAll('#ceflow-choice-deck .ceflow-choice.is-selected').length,
                 disabledChoices: document.querySelectorAll('#ceflow-choice-deck button[data-choice-id][disabled]').length,
                 replyVisible: !!replyBox && !replyBox.classList.contains('hidden'),
                 affordanceState: affordance?.dataset?.state || '',
                 backDisabled: !!backButton?.disabled,
-                replyBackVisible: !!replyBack && !replyBack.disabled
+                replyBackVisible: !!replyBack && !replyBack.disabled,
+                previewValue: (replyInput?.value || '').trim()
             };
         });
         await assert(selectedState.selectedCount === 1, 'comic choice selection visible');
@@ -478,6 +479,7 @@ async function runShellSmoke(baseUrl) {
         await assert(selectedState.affordanceState === 'locked', 'comic affordance locked after selection');
         await assert(!selectedState.backDisabled, 'comic back enabled after action');
         await assert(selectedState.replyBackVisible, 'comic reply-local back visible');
+        await assert(Boolean(selectedState.previewValue), 'comic selected sentence preview visible', selectedState.previewValue);
 
         await page.locator('#ceflow-step-back').click();
         await page.waitForTimeout(160);
@@ -494,34 +496,40 @@ async function runShellSmoke(baseUrl) {
             };
         });
         await assert(rolledBackState.selectedCount === 0, 'comic back clears selected choice');
-        await assert(rolledBackState.enabledChoices > 0, 'comic choices re-enabled after back', String(rolledBackState.enabledChoices));
+        await assert(rolledBackState.enabledChoices === 4, 'comic choices re-enabled after back', String(rolledBackState.enabledChoices));
         await assert(rolledBackState.replyHidden, 'comic back restores pre-reply step');
         await assert(rolledBackState.affordanceState === 'ready', 'comic affordance ready after back');
         await assert(rolledBackState.backDisabled, 'comic back disabled when history empty');
 
         await page.locator('#ceflow-choice-deck button[data-choice-id]:not([disabled])').first().click();
-        await page.locator('#ceflow-reply-input').fill('אני עוצר רגע ומנסה לדייק מה בעצם מפריע לך.');
         await page.locator('#ceflow-reply-confirm').click();
-        await page.waitForTimeout(160);
+        await page.waitForTimeout(760);
         const postReplyState = await page.evaluate(() => {
             const feedback = document.getElementById('ceflow-feedback');
             const snapshot = document.getElementById('ceflow-turn-snapshot');
-            const feedbackBack = feedback?.querySelector('button[data-feedback-step-back]');
             return {
                 feedbackVisible: !!feedback && !feedback.classList.contains('hidden'),
                 snapshotVisible: !!snapshot && !snapshot.classList.contains('hidden'),
-                retryEnabled: !document.getElementById('ceflow-retry')?.disabled,
-                nextEnabled: !document.getElementById('ceflow-next-scene')?.disabled,
+                retryVisible: !!document.getElementById('ceflow-retry'),
+                nextHidden: !!document.getElementById('ceflow-next-scene')?.classList.contains('hidden'),
                 hudLinkText: (document.querySelector('#ceflow-overlay .ceflow-hud-link')?.textContent || '').trim(),
-                feedbackBackVisible: !!feedbackBack && !feedbackBack.disabled
+                progressText: (document.getElementById('ceflow-progress')?.textContent || '').trim(),
+                affordanceState: document.getElementById('ceflow-choice-affordance')?.dataset?.state || '',
+                choiceCount: document.querySelectorAll('#ceflow-choice-deck button[data-choice-id]').length,
+                dialogCount: document.querySelectorAll('#ceflow-dialog .ceflow-bubble').length,
+                analysisHidden: !!document.getElementById('ceflow-analysis')?.classList.contains('hidden')
             };
         });
         await assert(postReplyState.feedbackVisible, 'comic feedback panel visible after reply');
         await assert(postReplyState.snapshotVisible, 'comic turn snapshot visible after reply');
-        await assert(postReplyState.retryEnabled, 'comic retry enabled after reply');
-        await assert(postReplyState.nextEnabled, 'comic next scene enabled after reply');
-        await assert(/משפט ההמשך/.test(postReplyState.hudLinkText), 'comic evaluation panel linked to user reply');
-        await assert(postReplyState.feedbackBackVisible, 'comic feedback-local back visible');
+        await assert(postReplyState.retryVisible, 'comic retry control visible after reply');
+        await assert(postReplyState.nextHidden, 'comic next-scene button hidden in auto-analysis flow');
+        await assert(Boolean(postReplyState.hudLinkText), 'comic metrics banner keeps detail affordance');
+        await assert(/2\s*\/\s*3/.test(postReplyState.progressText), 'comic advances to next escalation layer', postReplyState.progressText);
+        await assert(postReplyState.affordanceState === 'ready', 'comic affordance resets for next layer');
+        await assert(postReplyState.choiceCount === 4, 'comic next layer still shows 4 arc choices', String(postReplyState.choiceCount));
+        await assert(postReplyState.dialogCount >= 4, 'comic chat flow shows sent + reply + narrator', String(postReplyState.dialogCount));
+        await assert(postReplyState.analysisHidden, 'comic analysis waits until final outcome');
     };
 
     try {
