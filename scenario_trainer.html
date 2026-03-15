@@ -31,19 +31,9 @@
         document.head.appendChild(link);
       }
 
-      function enterSimulator() {
-        var welcome = document.getElementById('scenario-welcome-shell');
-        var root = document.getElementById('scenario-trainer-root');
-        if (welcome) { welcome.style.display = 'none'; }
-        if (root) { root.style.display = 'block'; }
-      }
-
       function boot() {
         if (window.__scenarioTrainerBooted) return;
         window.__scenarioTrainerBooted = true;
-
-        var cta = document.getElementById('scenario-welcome-cta');
-        if (cta) cta.addEventListener('click', enterSimulator);
 
         window.MetaTrainerStandalone.boot({
           "trainerId": "scenario-trainer",
