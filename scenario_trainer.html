@@ -11,20 +11,91 @@
   <script src="js/trainer-platform-contracts.js"></script>
   <script src="js/trainer-standalone.js"></script>
   <script>
-    window.MetaTrainerStandalone.boot({
-      "trainerId": "scenario-trainer",
-      "manifestKey": "_scenario_trainer",
-      "css": [
-            "css/style.css",
-            "css/scenario-trainer.css",
-            "css/ui-enhancements.css",
-            "css/meta-model-redesign.css"
-      ],
-      "scripts": [
-            "js/scenario-trainer-app.js"
-      ]
-});
+    (function () {
+      var v = String(Date.now());
+      function withV(path) {
+        try {
+          var u = new URL(path, location.href);
+          u.searchParams.set('v', v);
+          return u.toString();
+        } catch (e) {
+          return path + (path.indexOf('?') === -1 ? '?' : '&') + 'v=' + encodeURIComponent(v);
+        }
+      }
+      function addCss(path) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = withV(path);
+        document.head.appendChild(link);
+      }
+      function addScript(path, cb) {
+        var s = document.createElement('script');
+        s.src = withV(path);
+        s.onload = function () { if (cb) cb(); };
+        document.head.appendChild(s);
+      }
+      function boot() {
+        if (window.__scenarioTrainerBootStarted) return;
+        if (!document.getElementById('scenario-trainer-onboarding-btn')) return;
+        window.__scenarioTrainerBootStarted = true;
+        setupScenarioOnboarding();
+      }
+      document.addEventListener('DOMContentLoaded', boot);
+      addCss('css/style.css');
+      addCss('css/scenario-trainer.css');
+      addCss('css/ui-enhancements.css');
+      addCss('css/meta-model-redesign.css');
+      addScript('js/trainer-platform-contracts.js');
+      addScript('js/trainer-standalone.js', function () {
+        window.MetaTrainerStandalone.boot({
+          "trainerId": "scenario-trainer",
+          "manifestKey": "_scenario_trainer",
+          "css": [],
+          "scripts": ["js/scenario-trainer-app.js"]
+        });
+      });
+    })();
+
+    function setupScenarioOnboarding() {
+      var onboardingDiv = document.getElementById('scenario-trainer-onboarding');
+      var onboardingBtn = document.getElementById('scenario-trainer-onboarding-btn');
+      var rootDiv = document.getElementById('scenario-trainer-root');
+
+      if (onboardingBtn) {
+        onboardingBtn.addEventListener('click', function () {
+          if (onboardingDiv) onboardingDiv.classList.add('hidden');
+          if (rootDiv) rootDiv.classList.add('hidden');
+        });
+      }
+    }
   </script>
 </head>
-<body></body>
+<body>
+  <div class="container ltv2-page">
+    <header class="ltv2-header">
+      <h1>סימולטור סצנות 🎭</h1>
+      <p>דיאלוג אנושי עם בחירה מודעת של תגובה</p>
+      <div class="ltv2-header-actions">
+        <a class="btn btn-secondary" href="index.html?tab=practice-verb-unzip">חזרה למרכז כלים באפליקציה</a>
+      </div>
+    </header>
+
+    <section id="scenario-trainer" class="tab-content active practice-tab-content">
+      <div class="practice-container">
+        <div id="scenario-trainer-root" class="card practice-intro-card living-triples-card">
+          <div id="scenario-trainer-onboarding" class="ltv2-onboarding" role="region" aria-label="הדרכת פתיחה">
+            <h2>איך עובדים כאן?</h2>
+            <ol>
+              <li>נכנסים לסצנה קצרה מתחומי חיים שונים (הורות, זוגיות, עבודה, וכו׳)</li>
+              <li>שומעים משפט אמיתי מהצד השני של השיחה</li>
+              <li>בוחרים תגובה אחת מארבע אפשרויות וכל אחת מנצחת בדרך שונה</li>
+              <li>רואים מיידית איך התגובה מתקבלת רגשית ומה היא פותחת או סוגרת בתהליך</li>
+            </ol>
+            <button id="scenario-trainer-onboarding-btn" type="button" class="btn btn-primary">התחל הדרכה</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
 </html>
