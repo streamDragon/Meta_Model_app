@@ -1,783 +1,805 @@
-﻿(function attachPrismLab() {
+(function attachPrismLab() {
+  'use strict';
   const root = document.getElementById('prism-lab-app');
   if (!root) return;
 
-  const DRAFT_KEY = 'prism_lab_draft_v1';
-  const SAVED_KEY = 'prism_lab_saved_v1';
-  const DEMO_STORY = 'ביום שני יש לי שיחה עם המנהל. אני בטוח שהוא חושב שאני מורה גרוע. תמיד כשאני מדבר מולו אני נתקע. זה אומר שאין לי מה להציע בבית הספר. אני חייב להוכיח את עצמי, אבל אני לא יכול להשתנות.';
+  const DRAFT_KEY = 'prism_lab_draft_v2';
+  const SAVED_KEY = 'prism_lab_saved_v2';
+
+  const DEMO_SENTENCE = "I'm sure my manager thinks I'm not good enough. I always freeze in meetings. This means I have nothing to offer.";
 
   const PRISMS = [
-    { id: 'unspecified_verb', icon: '⚙️', nameHe: 'פועל לא-מפורט', desc: 'הופכים תחושה לרצף פעולות.', q: 'מה בדיוק אתה עושה כש־X?', type: 'process' },
-    { id: 'unspecified_noun', icon: '🧩', nameHe: 'שם עצם לא-מפורט', desc: 'מבררים מי/מה בדיוק עומד מאחורי המילה.', q: 'מי/מה בדיוק X?', type: 'referent' },
-    { id: 'nominalization', icon: '🎬', nameHe: 'נומינליזציה', desc: 'מחזירים מושג מופשט לתנועה בפועל.', q: 'איך זה נראה בפועל כשיש X?', type: 'process' },
-    { id: 'universal_quantifier', icon: '♾️', nameHe: 'כמתים אוניברסליים', desc: 'בודקים תמיד/אף פעם ומחפשים חריגים.', q: 'תמיד? מתי כן/לא?', type: 'scope' },
-    { id: 'necessity_modal', icon: '📌', nameHe: 'מודאלי הכרח', desc: 'חושפים את המחיר מאחורי חייב/צריך.', q: 'מה יקרה אם לא X?', type: 'fear' },
-    { id: 'possibility_modal', icon: '🧱', nameHe: 'מודאלי אפשרות', desc: 'מפרקים לא-יכול לחסם בר-טיפול.', q: 'מה מונע ממך X?', type: 'barrier' },
-    { id: 'cause_effect', icon: '🔗', nameHe: 'סיבת-תוצאה', desc: 'בונים מנגנון X⇢Y במקום קסם.', q: 'איך בדיוק X גורם ל־Y?', type: 'mechanism' },
-    { id: 'complex_equivalence', icon: '🪢', nameHe: 'הקבלה מורכבת', desc: 'מפרקים את הדבק של “זה אומר ש…”.', q: 'איך X אומר ש־Y?', type: 'meaning' },
-    { id: 'mind_reading', icon: '🧠', nameHe: 'קריאת מחשבות', desc: 'מבדילים בין נתון לפרשנות.', q: 'איך אתה יודע ש־X?', type: 'evidence' },
-    { id: 'comparison', icon: '📏', nameHe: 'השמטה השוואתית', desc: 'מוצאים ביחס למה/מי מודדים.', q: 'יותר/פחות ביחס ל־מה/מי?', type: 'criterion' },
-    { id: 'lost_performative', icon: '🏛️', nameHe: 'Lost Performative', desc: 'מגלים מי אמר ולפי איזה כלל.', q: 'לפי מי/איזה כלל X?', type: 'authority' },
-    { id: 'presupposition', icon: '🧱', nameHe: 'הנחות יסוד', desc: 'חושפים מה חייב להיות נכון ברקע.', q: 'מה חייב להיות נכון כדי שהמשפט הזה יהיה נכון?', type: 'assumption' },
-    { id: 'unspecified_time', icon: '⏱️', nameHe: 'זמן לא מוגדר', desc: 'מוצאים חלון זמן מדויק.', q: 'מתי בדיוק X?', type: 'time' },
-    { id: 'context_place', icon: '📍', nameHe: 'מקום/הקשר', desc: 'ממפים טריגרים סביבתיים והקשר.', q: 'איפה/באיזה הקשר X?', type: 'context' },
-    { id: 'logical_levels', icon: '🗼', nameHe: 'רמות לוגיות', desc: 'מזהים רמה וקפיצות רמה.', q: 'באיזו רמה אתה מדבר עכשיו?', type: 'levels' }
+    { id: 'unspecified_verb',    icon: '⚙️',  name: 'Unspecified Verb',       desc: 'Turns a vague action into a concrete sequence of steps.',        q: 'What exactly do you do when X?',                             type: 'process'   },
+    { id: 'unspecified_noun',    icon: '🧩',  name: 'Unspecified Noun',        desc: 'Clarifies who or what exactly stands behind the word.',          q: 'Who or what exactly is X?',                                  type: 'referent'  },
+    { id: 'nominalization',      icon: '🎬',  name: 'Nominalization',          desc: 'Returns an abstract concept to real movement.',                  q: 'What does it look like in practice when there is X?',        type: 'process'   },
+    { id: 'universal_quantifier',icon: '♾️',  name: 'Universal Quantifier',   desc: 'Tests "always/never" — looks for exceptions.',                  q: 'Always? When yes, when no?',                                 type: 'scope'     },
+    { id: 'necessity_modal',     icon: '📌',  name: 'Necessity Modal',         desc: 'Exposes the hidden cost behind "must/have to".',                 q: 'What will happen if you don\'t X?',                          type: 'fear'      },
+    { id: 'possibility_modal',   icon: '🧱',  name: 'Possibility Modal',       desc: 'Breaks "can\'t" into a specific, treatable barrier.',            q: 'What prevents you from X?',                                  type: 'barrier'   },
+    { id: 'cause_effect',        icon: '🔗',  name: 'Cause & Effect',          desc: 'Builds a mechanism instead of a vague causal link.',             q: 'How exactly does X cause Y?',                                type: 'mechanism' },
+    { id: 'complex_equivalence', icon: '🪢',  name: 'Complex Equivalence',     desc: 'Unpacks the interpretive glue of "that means…"',                q: 'How does X mean Y?',                                         type: 'meaning'   },
+    { id: 'mind_reading',        icon: '🧠',  name: 'Mind Reading',            desc: 'Separates data from interpretation.',                            q: 'How do you know X?',                                         type: 'evidence'  },
+    { id: 'comparison',          icon: '📏',  name: 'Comparative Deletion',    desc: 'Finds who or what you\'re measuring against.',                   q: 'More or less compared to what or whom?',                     type: 'criterion' },
+    { id: 'lost_performative',   icon: '🏛️', name: 'Lost Performative',       desc: 'Reveals who said it and by which rule.',                        q: 'According to whom or which rule is X true?',                 type: 'authority' },
+    { id: 'presupposition',      icon: '🪟',  name: 'Presupposition',          desc: 'Exposes what must be true in the background.',                   q: 'What must be true for this sentence to be correct?',         type: 'assumption'},
+    { id: 'unspecified_time',    icon: '⏱️',  name: 'Unspecified Time',        desc: 'Finds a precise time window.',                                   q: 'When exactly is X?',                                         type: 'time'      },
+    { id: 'context_place',       icon: '📍',  name: 'Context & Place',         desc: 'Maps environmental triggers and context.',                       q: 'Where or in what context is X?',                             type: 'context'   },
+    { id: 'logical_levels',      icon: '🗼',  name: 'Logical Levels',          desc: 'Identifies the level of speaking and possible level-jumps.',     q: 'What level are you speaking from right now?',                type: 'levels'    }
   ];
 
-  const BREEN_ROWS = Object.freeze([
-    Object.freeze({ id: 'row1', categories: Object.freeze(['lost_performative', 'assumptions', 'mind_reading']) }),
-    Object.freeze({ id: 'row2', categories: Object.freeze(['universal_quantifier', 'modal_operator', 'cause_effect']) }),
-    Object.freeze({ id: 'row3', categories: Object.freeze(['nominalisations', 'identity_predicates', 'complex_equivalence']) }),
-    Object.freeze({ id: 'row4', categories: Object.freeze(['comparative_deletion', 'time_space_predicates', 'lack_referential_index']) }),
-    Object.freeze({ id: 'row5', categories: Object.freeze(['non_referring_nouns', 'sensory_predicates', 'unspecified_verbs']) })
-  ]);
+  const PRISM_BY_ID = Object.fromEntries(PRISMS.map(p => [p.id, p]));
 
-  const BREEN_ROW_META = Object.freeze({
-    row1: Object.freeze({
-      colorClass: 'row-sky',
-      heLabel: 'שלשה 1 | מקור, הנחה וכוונה',
-      heInsight: 'בודקים מי מקור הסמכות, איזו הנחה פועלת מתחת לפני השטח, ואיזו כוונה מיוחסת בלי ראיה ישירה.'
-    }),
-    row2: Object.freeze({
-      colorClass: 'row-teal',
-      heLabel: 'שלשה 2 | חוקי משחק וגבולות',
-      heInsight: 'כאן חוקרים את חוקי המשחק: חייב/צריך/יכול, גבולות הנכונות, והנגזרת התפקודית של החוקים האלה.'
-    }),
-    row3: Object.freeze({
-      colorClass: 'row-amber',
-      heLabel: 'שלשה 3 | משמעות, זהות והסקה',
-      heInsight: 'מפרידים בין פעולה לזהות ובין סימן למסקנה, כדי לא להפוך רגע נקודתי להגדרת אדם.'
-    }),
-    row4: Object.freeze({
-      colorClass: 'row-violet',
-      heLabel: 'שלשה 4 | הקשר, זמן וייחוס',
-      heInsight: 'מחדדים זמן, מקום והקשר: מול מי, ביחס למה, ומתי בדיוק הטענה נכונה או לא נכונה.'
-    }),
-    row5: Object.freeze({
-      colorClass: 'row-rose',
-      heLabel: 'שלשה 5 | קרקע חושית ופעולה',
-      heInsight: 'מורידים לקרקע מדידה: מי/מה בדיוק, מה רואים/שומעים בפועל, ומה הצעד ההתנהגותי הבא.'
-    })
-  });
+  // Keyword-based prism suggestions
+  const SUGGEST_RULES = [
+    { kw: ['always', 'never', 'every time', 'nobody', 'everyone', 'all the time'],    ids: ['universal_quantifier', 'unspecified_verb', 'lost_performative', 'presupposition'] },
+    { kw: ["can't", 'cannot', 'impossible', 'unable', "can not"],                     ids: ['possibility_modal', 'necessity_modal', 'presupposition', 'unspecified_verb'] },
+    { kw: ['must', 'have to', 'should', 'need to', 'supposed to', 'ought'],           ids: ['necessity_modal', 'lost_performative', 'presupposition', 'comparison'] },
+    { kw: ['thinks', 'knows', 'believes', 'sure that', 'certain that', 'he thinks'],  ids: ['mind_reading', 'presupposition', 'complex_equivalence', 'lost_performative'] },
+    { kw: ['means', 'that means', 'shows that', 'proves', 'indicates'],               ids: ['complex_equivalence', 'presupposition', 'cause_effect', 'mind_reading'] },
+    { kw: ['because', 'causes', 'leads to', 'makes me', 'results in'],               ids: ['cause_effect', 'complex_equivalence', 'presupposition', 'unspecified_verb'] },
+    { kw: ['bad', 'not good enough', 'worse', 'better', 'best', 'worst', 'enough'],   ids: ['comparison', 'lost_performative', 'presupposition', 'mind_reading'] },
+    { kw: ['freeze', 'stuck', 'block', 'stop', 'shut down'],                          ids: ['unspecified_verb', 'possibility_modal', 'cause_effect', 'context_place'] },
+  ];
+  const DEFAULT_SUGGESTIONS = ['unspecified_verb', 'universal_quantifier', 'possibility_modal', 'mind_reading'];
 
-  const BREEN_LABELS_HE = Object.freeze({
-    lost_performative: 'חסרון הדובר',
-    assumptions: 'הנחות מוקדמות',
-    mind_reading: 'קריאת מחשבות',
-    universal_quantifier: 'הכללה',
-    modal_operator: 'מודל פעולה',
-    cause_effect: 'סיבה ותוצאה',
-    nominalisations: 'נומינליזציה',
-    identity_predicates: 'זהות',
-    complex_equivalence: 'הקבלה מורכבת',
-    comparative_deletion: 'השמטה השוואתית',
-    time_space_predicates: 'זמן ומרחב',
-    lack_referential_index: 'אובדן המצביע',
-    non_referring_nouns: 'שם עצם לא מפורט',
-    sensory_predicates: 'פרדיקטים חושיים',
-    unspecified_verbs: 'פועל לא מפורט'
-  });
+  function suggestPrisms(focus, sentence) {
+    const text = (focus + ' ' + sentence).toLowerCase();
+    for (const rule of SUGGEST_RULES) {
+      if (rule.kw.some(kw => text.includes(kw))) return rule.ids;
+    }
+    return DEFAULT_SUGGESTIONS;
+  }
 
-  const BREEN_PRISM_ALIASES = Object.freeze({
-    presupposition: 'assumptions',
-    nominalization: 'nominalisations',
-    necessity_modal: 'modal_operator',
-    possibility_modal: 'modal_operator',
-    comparison: 'comparative_deletion',
-    unspecified_noun: 'non_referring_nouns',
-    unspecified_verb: 'unspecified_verbs',
-    unspecified_time: 'time_space_predicates',
-    context_place: 'time_space_predicates'
-  });
-
-  const PRISM_BY_ID = Object.fromEntries(PRISMS.map((p) => [p.id, p]));
-  const MOBILE_BREAKPOINT = 900;
-  const STEP_GUIDE = Object.freeze([
-    Object.freeze({
-      title: 'בחירת פריזמה',
-      subtitle: 'בחר עדשה/פריזמה להתחלה. היא תקבע איזה סוג חקירה תתרגל.'
-    }),
-    Object.freeze({
-      title: 'איסוף חומר גלם',
-      subtitle: 'כתוב משפט קצר מהחיים (או טען דוגמה). המטרה: שיהיה משפט שאפשר לשאול עליו שאלות.'
-    }),
-    Object.freeze({
-      title: 'חפירה עמוקה (3 שכבות)',
-      subtitle: 'ענה על שאלות שמדייקות: מה בדיוק? איך יודעים? לפי מי? ואז תקבל שאלות עומק נוספות.'
-    })
-  ]);
-
-  const state = {
-    baseStory: DEMO_STORY,
-    selectedPrismId: null,
-    ex: null,
-    saved: [],
-    uiMessage: 'בחר/י פריזמה אחת והתחילו חפירה של 3 שלבים.',
-    mobileActionsOpen: false
+  // Summary copy
+  const SUMMARY_LEAD = {
+    process:   'The excavation moved from a general feeling to a sequence you can see and describe.',
+    referent:  'The excavation turned a general word into a specific person or thing with clear attributes.',
+    scope:     'The excavation began to break a broad generalization and expose conditions and exceptions.',
+    fear:      'The excavation exposed the chain of costs that holds the "must" in place.',
+    barrier:   'The excavation unpacked "can\'t" into a barrier you can actually work with.',
+    mechanism: 'The excavation built a mechanism — not just a general cause-and-effect.',
+    meaning:   'The excavation exposed the interpretation rule connecting event to meaning.',
+    evidence:  'The excavation distinguished between data, interpretation, and sense of knowing.',
+    criterion: 'The excavation uncovered the hidden criterion driving the comparison.',
+    authority: 'The excavation revealed the source or rule standing behind the judgment.',
+    assumption:'The excavation opened the assumption layer holding the sentence together.',
+    time:      'The excavation narrowed the story to a precise time window.',
+    context:   'The excavation created a map of contexts and environmental triggers.',
+    levels:    'The excavation helped distinguish the level of speaking from possible level-jumps.'
+  };
+  const SUMMARY_NEXT = {
+    process:   'Which single action in this sequence could you change next time?',
+    referent:  'What additional detail would further clarify the referent or criterion?',
+    scope:     'Where does a counter-example already exist that could become a success condition?',
+    fear:      'What is likely to actually happen, and what small step protects you without getting stuck?',
+    barrier:   'What small resource or skill would make this 10% more possible?',
+    mechanism: 'At which point in this chain is it easiest to intervene right now?',
+    meaning:   'What alternative translation could you test for the same X?',
+    evidence:  'What is the next piece of data that could test this interpretation?',
+    criterion: 'Does this criterion fit this context?',
+    authority: 'Is this rule still serving you here, and where does it have limits?',
+    assumption:'Which single assumption is most important to examine first?',
+    time:      'What can you do exactly when this moment is identified?',
+    context:   'In which other context would it be easier to practice?',
+    levels:    'Which level should you move up or down to now to restore options?'
   };
 
+  // Dialogue coaching messages per state
+  const DIALOGUE = {
+    input:        { what: 'Write a sentence from real life.',              why: 'Something someone said, or a thought you\'ve had.',                       tip: 'Sentences with "always", "can\'t", "must", or "that means" work especially well.' },
+    detect:       { what: 'Notice what stands out.',                       why: 'Look for words that assume, generalize, or hide the specifics.',           tip: 'These are your entry points for deeper questioning.' },
+    choose_prism: { what: 'Each prism asks one type of question.',         why: 'Pick the one that feels most useful right now.',                           tip: 'You can try a different prism on the same sentence later.' },
+    layer1:       { what: 'Layer 1 of 3.',                                 why: 'Break the abstract into something concrete and describable.',              tip: 'Your answer becomes the new X in the next layer.' },
+    layer2:       { what: 'Layer 2 of 3.',                                 why: 'Same question — but X now comes from your previous answer.',               tip: 'Notice how each layer gets more specific.' },
+    layer3:       { what: 'Layer 3 of 3 — the final layer.',               why: 'Push one more level.',                                                    tip: 'What emerges when you dig again?' },
+    output:       { what: 'Investigation complete.',                       why: 'You moved from an abstraction to something actionable.',                   tip: null },
+  };
+
+  // ─── State ────────────────────────────────────────────────────────────────
+  const state = {
+    screen: 'welcome', // welcome | input | detect | choose_prism | layer1 | layer2 | layer3 | output | review
+    sentence: '',
+    focus: '',
+    prismId: null,
+    layers:  ['', '', ''],
+    anchors: ['', '', ''],
+    anchorY: '',
+    saved: [],
+    hasDraft: false,
+    toastMsg: null,
+  };
+
+  // ─── Utilities ────────────────────────────────────────────────────────────
   function esc(v) {
-    return String(v ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+    return String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
-
-  function norm(v) {
-    return String(v || '').replace(/\s+/g, ' ').trim();
-  }
-
-  function normalizeBreenPrismId(prismId) {
-    const raw = String(prismId || '').trim().toLowerCase().replace(/\s+/g, '_');
-    if (!raw) return '';
-    return BREEN_PRISM_ALIASES[raw] || raw;
-  }
-
-  function splitSentences(text) {
-    return norm(text)
-      .split(/(?<=[.!?])\s+|\n+/)
-      .map((s) => norm(s))
-      .filter(Boolean);
-  }
-
-  function shrink(text, max = 72) {
-    const t = norm(text).replace(/^["'״׳]+|["'״׳]+$/g, '');
+  function norm(v) { return String(v || '').replace(/\s+/g, ' ').trim(); }
+  function shrink(text, max) {
+    max = max || 72;
+    const t = norm(text).replace(/^["']+|["']+$/g, '');
     if (!t) return '';
     if (t.length <= max) return t;
     const cut = t.slice(0, max);
     const idx = Math.max(cut.lastIndexOf(' '), cut.lastIndexOf(','));
-    return `${(idx > 18 ? cut.slice(0, idx) : cut).trim()}…`;
+    return (idx > 12 ? cut.slice(0, idx) : cut).trim() + '…';
   }
+  function stripEnd(text) { return String(text || '').replace(/[.!?…,:;]+$/g, '').trim(); }
+  function splitSentences(text) { return norm(text).split(/(?<=[.!?])\s+|\n+/).map(s => norm(s)).filter(Boolean); }
+  function pickAfter(text, re) { const m = re.exec(String(text || '')); return m ? stripEnd(shrink(m[1] || m[0], 70)) : ''; }
 
-  function stripEnd(text) {
-    return String(text || '').replace(/[.!?…,:;־-]+$/g, '').trim();
-  }
-
-  function firstClause(text) {
-    const s = splitSentences(text)[0] || norm(text);
-    return stripEnd((s || '').split(/[,:;]/)[0] || s);
-  }
-
-  function pickAfter(text, re) {
-    const m = re.exec(String(text || ''));
-    return m ? stripEnd(shrink(m[1] || m[0], 70)) : '';
-  }
-
-  function deriveSeed(prism, story) {
-    const text = norm(story);
-    const ss = splitSentences(text);
+  // ─── Anchor logic ─────────────────────────────────────────────────────────
+  function deriveSeedX(prism, sentence) {
+    if (state.focus) return stripEnd(shrink(state.focus, 70));
+    const text = norm(sentence);
     let x = '';
-    let y = '';
-    if (!prism) return { x: 'האמירה המרכזית', y: '' };
-
-    if (prism.id === 'mind_reading') x = pickAfter(text, /(?:חושב(?:ת)?|בטוח(?:ה)?(?: ש)?)([^.?!]+)/);
-    if (prism.id === 'necessity_modal') x = pickAfter(text, /(?:חייב(?:ת)?|צריך(?:ה)?)([^.?!]+)/);
-    if (prism.id === 'possibility_modal') x = pickAfter(text, /(?:לא יכול(?:ה)?|אי אפשר)([^.?!]+)/);
-    if (prism.id === 'comparison') x = pickAfter(text, /(?:יותר|פחות|גרוע|טוב)([^.?!]+)/);
-    if ((prism.id === 'cause_effect' || prism.id === 'complex_equivalence') && !x) x = pickAfter(text, /(?:זה אומר|גורם|כי)([^.?!]+)/);
-    if (!x) x = shrink(firstClause(text) || ss[0] || 'האמירה המרכזית', 70);
-
-    if (prism.id === 'cause_effect' || prism.id === 'complex_equivalence') {
-      y = pickAfter(text, /זה אומר([^.?!]+)/) || pickAfter(text, /(?:מרגיש(?:ה)?|מרגיש)([^.?!]+)/) || shrink(ss[1] || ss[0] || (prism.id === 'cause_effect' ? 'תוצאה' : 'משמעות'), 56);
-      if (!y) y = prism.id === 'cause_effect' ? 'תוצאה' : 'משמעות';
-    }
-
-    return { x: stripEnd(x) || 'האמירה המרכזית', y: stripEnd(y) || '' };
+    if (prism.id === 'mind_reading')       x = pickAfter(text, /(?:thinks?|sure that|believes?)\s+(?:that\s+)?(?:I\s*(?:am|'m)\s*)([^.?!]+)/i);
+    if (prism.id === 'necessity_modal')    x = pickAfter(text, /(?:must|have to|should|need to)\s+([^.?!]+)/i);
+    if (prism.id === 'possibility_modal')  x = pickAfter(text, /(?:can't|cannot|impossible|unable to)\s+([^.?!]+)/i);
+    if (prism.id === 'comparison')         x = pickAfter(text, /(?:more|less|worse|better|enough)\s+([^.?!]+)/i);
+    if (prism.id === 'cause_effect' || prism.id === 'complex_equivalence')
+                                            x = x || pickAfter(text, /(?:means|that means|causes|leads to)\s+([^.?!]+)/i);
+    if (!x) x = shrink((splitSentences(text)[0] || text), 70);
+    return stripEnd(x) || 'the main statement';
   }
-
-  function nextAnchor(answer, fallback) {
-    const t = norm(answer);
-    if (!t) return fallback || 'האמירה החדשה';
-    const p = t.split(/[.!?]/)[0] || t;
-    const c = p.split(/(?:,| ואז | אבל | כי )/)[0] || p;
-    return stripEnd(shrink(c, 72)) || fallback || 'האמירה החדשה';
+  function deriveSeedY(prism, sentence) {
+    if (prism.id !== 'cause_effect' && prism.id !== 'complex_equivalence') return '';
+    const text = norm(sentence);
+    return pickAfter(text, /(?:means that|that means|results in|leads to)\s+([^.?!]+)/i)
+      || shrink(splitSentences(text)[1] || '', 56)
+      || (prism.id === 'cause_effect' ? 'outcome' : 'meaning');
   }
-
-  function renderQuestion(prism, x, y) {
-    if (!prism) return '';
+  function renderQ(prism, x, y) {
     let q = prism.q;
-    if (q.includes('X')) q = q.replaceAll('X', x || 'זה');
-    if (q.includes('Y')) q = q.replaceAll('Y', y || 'תוצאה');
+    if (q.includes('X')) q = q.replaceAll('X', x || 'this');
+    if (q.includes('Y')) q = q.replaceAll('Y', y || 'outcome');
     return q;
   }
-
-  function blankStep(i) {
-    return { i, anchorX: '', anchorY: '', q: '', a: '' };
+  function nextAnchor(answer, fallback) {
+    const t = norm(answer);
+    if (!t) return fallback || 'the new statement';
+    const p = t.split(/[.!?]/)[0] || t;
+    const c = p.split(/(?:,| and | but | because )/)[0] || p;
+    return stripEnd(shrink(c, 72)) || fallback || 'the new statement';
+  }
+  function getLayerQ(idx) {
+    const prism = PRISM_BY_ID[state.prismId];
+    if (!prism) return '';
+    const x = state.anchors[idx] || deriveSeedX(prism, state.sentence);
+    const y = state.anchorY || deriveSeedY(prism, state.sentence);
+    return renderQ(prism, x, y);
+  }
+  function getX(idx) {
+    const prism = PRISM_BY_ID[state.prismId];
+    if (!prism) return '';
+    return state.anchors[idx] || deriveSeedX(prism, state.sentence);
   }
 
-  function makeExcavation(prismId) {
-    const prism = PRISM_BY_ID[prismId];
-    if (!prism) return null;
-    const seed = deriveSeed(prism, state.baseStory);
-    const steps = [blankStep(0), blankStep(1), blankStep(2)];
-    steps[0].anchorX = seed.x;
-    steps[0].anchorY = seed.y;
-    steps[0].q = renderQuestion(prism, seed.x, seed.y);
-    return { prismId, seedX: seed.x, seedY: seed.y, visible: 1, steps, summary: null };
+  // ─── Summary ──────────────────────────────────────────────────────────────
+  function summaryInsight() {
+    const p = PRISM_BY_ID[state.prismId];
+    return p ? (SUMMARY_LEAD[p.type] || 'The excavation created more precision and more choice points.') : '';
+  }
+  function summaryNextQ() {
+    const p = PRISM_BY_ID[state.prismId];
+    return p ? (SUMMARY_NEXT[p.type] || 'What question continues the same lens and increases precision?') : '';
   }
 
-  function prism() {
-    return PRISM_BY_ID[state.selectedPrismId] || null;
-  }
-
-  function answers() {
-    return (state.ex?.steps || []).map((s) => ({ q: s.q || '', a: norm(s.a || ''), x: s.anchorX || '', y: s.anchorY || '' }));
-  }
-
-  function resetDownstream(fromIdx) {
-    if (!state.ex) return;
-    for (let i = fromIdx; i < 3; i += 1) state.ex.steps[i] = blankStep(i);
-    state.ex.summary = null;
-  }
-
-  function selectPrism(prismId) {
-    if (!PRISM_BY_ID[prismId]) return;
-    state.selectedPrismId = prismId;
-    state.ex = makeExcavation(prismId);
-    state.uiMessage = `נבחרה פריזמה: ${PRISM_BY_ID[prismId].nameHe}.`; 
-    persistDraft();
-    render();
-  }
-
-  function setStepAnswer(idx, val) {
-    if (!state.ex || !state.ex.steps[idx]) return;
-    state.ex.steps[idx].a = String(val || '');
-    if (idx === 0) { resetDownstream(1); state.ex.visible = 1; }
-    if (idx === 1) { resetDownstream(2); if (state.ex.visible > 2) state.ex.visible = 2; }
-    persistDraft();
-    const saveBtn = root.querySelector('[data-action="save-current"]');
-    if (saveBtn) saveBtn.disabled = !canSave();
-  }
-
-  function continueStep(idx) {
-    const p = prism();
-    if (!p || !state.ex || idx < 0 || idx > 1) return;
-    const cur = state.ex.steps[idx];
-    if (!norm(cur.a)) { state.uiMessage = `צריך למלא תשובה בשלב ${idx + 1}.`; render(); return; }
-    const next = state.ex.steps[idx + 1];
-    const nx = nextAnchor(cur.a, cur.anchorX || state.ex.seedX);
-    next.anchorX = nx;
-    next.anchorY = cur.anchorY || state.ex.seedY;
-    next.q = renderQuestion(p, nx, next.anchorY);
-    state.ex.visible = Math.max(state.ex.visible, idx + 2);
-    state.uiMessage = `נבנה שלב ${idx + 2}: אותה שאלה, X מעודכן מתוך התשובה הקודמת.`;
-    persistDraft();
-    render();
-  }
-
-  function summaryLead(type) {
-    const map = {
-      process: 'החפירה הזיזה את הטקסט ממושג כללי לתהליך שאפשר לראות ולתאר.',
-      referent: 'החפירה הפכה מילה כללית לרפרנט/דמות עם מאפיינים ברורים.',
-      scope: 'החפירה התחילה לשבור הכללה רחבה ולחשוף תנאים וחריגים.',
-      fear: 'החפירה חשפה את שרשרת המחירים שמחזיקה את ה״חייב״.',
-      barrier: 'החפירה פירקה את ה״לא יכול״ לחסם שניתן לעבוד עליו.',
-      mechanism: 'החפירה בנתה מנגנון ולא רק קשר כללי של סיבה-תוצאה.',
-      meaning: 'החפירה חשפה את כלל הפרשנות שמחבר אירוע למשמעות.',
-      evidence: 'החפירה הבדילה בין נתון, פרשנות ותחושת ידיעה.',
-      criterion: 'החפירה חשפה את הקריטריון הסמוי שמנהל את ההשוואה.',
-      authority: 'החפירה גילתה מקור סמכות/כלל שמאחורי השיפוט.',
-      assumption: 'החפירה פתחה את שכבת ההנחות שמחזיקה את המשפט.',
-      time: 'החפירה צמצמה את הסיפור לחלון זמן מדויק.',
-      context: 'החפירה יצרה מפה של הקשרים וטריגרים סביבתיים.',
-      levels: 'החפירה עזרה להבחין ברמה שבה מדברים ובקפיצות אפשריות.'
-    };
-    return map[type] || 'החפירה יצרה יותר דיוק, יותר שטח ויותר נקודות בחירה.';
-  }
-
-  function summaryNext(type) {
-    const map = {
-      process: 'איזו פעולה אחת קטנה ברצף הזה אפשר לשנות בפעם הבאה?',
-      referent: 'איזה פרט נוסף צריך כדי לדייק עוד את הרפרנט/הקריטריון?',
-      scope: 'איפה כבר קיימת דוגמה נגדית שיכולה להפוך לתנאי הצלחה?',
-      fear: 'מה סביר באמת שיקרה, ומה צעד קטן שיגן עליך בלי להיתקע?',
-      barrier: 'איזה משאב/מיומנות קטן יהפוך את זה לאפשרי ב-10% יותר?',
-      mechanism: 'באיזה שלב בשרשרת הכי קל להתערב כרגע?',
-      meaning: 'איזה תרגום חלופי אפשר לבדוק לאותו X?',
-      evidence: 'מה הנתון הבא שיכול לבדוק את הפרשנות?',
-      criterion: 'האם הקריטריון הזה מתאים להקשר הזה?',
-      authority: 'האם הכלל הזה עדיין משרת אותך כאן, ובאיזה גבול?',
-      assumption: 'איזו הנחה אחת הכי חשוב לבדוק קודם?',
-      time: 'מה אפשר לעשות בדיוק ברגע שזוהה?',
-      context: 'באיזה הקשר אחר יהיה קל יותר לתרגל?',
-      levels: 'לאיזו רמה כדאי לרדת/לעלות עכשיו כדי להחזיר פתירות?'
-    };
-    return map[type] || 'מה השאלה הבאה שתמשיך את אותה עדשה ותגדיל דיוק?';
-  }
-
-  function buildSummary() {
-    const p = prism();
-    const ex = state.ex;
-    if (!p || !ex) return;
-    const s = answers();
-    if (!(s[0]?.a && s[1]?.a && s[2]?.a)) { state.uiMessage = 'צריך להשלים 3 שלבים לפני סיכום.'; render(); return; }
-    ex.summary = {
-      title: 'מה נהיה משמעותי?',
-      lead: summaryLead(p.type),
-      bullets: [
-        `העוגן ההתחלתי היה "${shrink(ex.seedX, 40)}", ובשלב השלישי כבר עבדנו עם "${shrink(ex.steps[2].anchorX || s[2].a, 40)}".`,
-        `נוצר רצף ברור: "${shrink(s[0].a, 64)}" → "${shrink(s[1].a, 64)}" → "${shrink(s[2].a, 64)}".`,
-        'עכשיו יש יותר מפת פעולה ופחות מסקנה כללית: אפשר לעבוד עם מנגנון, תנאי, קריטריון או כלל.'
-      ],
-      next: summaryNext(p.type)
-    };
-    state.uiMessage = 'נוצר סיכום אוטומטי על בסיס שלושת שלבי החפירה.';
-    persistDraft();
-    render();
-  }
-
-  function canSave() {
-    return !!(state.selectedPrismId && state.ex && answers().some((x) => x.a));
-  }
-
-  function saveCurrent() {
-    if (!canSave()) { state.uiMessage = 'אין עדיין תוכן לשמירה.'; render(); return; }
-    const p = prism();
-    const entry = {
-      id: `pl-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      savedAt: new Date().toISOString(),
-      baseStory: state.baseStory,
-      prismId: p.id,
-      prismNameHe: p.nameHe,
-      ex: JSON.parse(JSON.stringify(state.ex))
-    };
-    state.saved.unshift(entry);
-    state.saved = state.saved.slice(0, 30);
-    persistSaved();
-    state.uiMessage = `נשמרה פריזמה: ${p.nameHe}.`;
-    render();
-  }
-
-  function chooseAnother() {
-    state.selectedPrismId = null;
-    state.ex = null;
-    state.uiMessage = 'אפשר לבחור פריזמה אחרת על אותו Base Story.';
-    persistDraft();
-    render();
-  }
-
-  function loadSaved(id) {
-    const item = state.saved.find((x) => x.id === id);
-    if (!item || !PRISM_BY_ID[item.prismId]) return;
-    state.baseStory = String(item.baseStory || DEMO_STORY);
-    state.selectedPrismId = item.prismId;
-    state.ex = item.ex && typeof item.ex === 'object' ? item.ex : makeExcavation(item.prismId);
-    if (!state.ex || !Array.isArray(state.ex.steps)) state.ex = makeExcavation(item.prismId);
-    state.uiMessage = `נטענה פריזמה שמורה: ${item.prismNameHe || PRISM_BY_ID[item.prismId].nameHe}.`;
-    persistDraft();
-    render();
-  }
-
-  function removeSaved(id) {
-    const n = state.saved.length;
-    state.saved = state.saved.filter((x) => x.id !== id);
-    if (state.saved.length !== n) { persistSaved(); state.uiMessage = 'נמחקה פריזמה שמורה.'; render(); }
-  }
-
+  // ─── Persistence ──────────────────────────────────────────────────────────
   function persistDraft() {
-    try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify({ baseStory: state.baseStory, selectedPrismId: state.selectedPrismId, ex: state.ex }));
-    } catch (e) {}
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ sentence: state.sentence, focus: state.focus, prismId: state.prismId, layers: state.layers, anchors: state.anchors, anchorY: state.anchorY, screen: state.screen })); } catch(e) {}
   }
-
   function persistSaved() {
-    try { localStorage.setItem(SAVED_KEY, JSON.stringify(state.saved)); } catch (e) {}
+    try { localStorage.setItem(SAVED_KEY, JSON.stringify(state.saved)); } catch(e) {}
   }
-
-  function restoreAll() {
-    try {
-      const s = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
-      if (Array.isArray(s)) state.saved = s;
-    } catch (e) {}
-    try {
-      const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
-      if (d && typeof d === 'object') {
-        state.baseStory = String(d.baseStory || DEMO_STORY);
-        if (d.selectedPrismId && PRISM_BY_ID[d.selectedPrismId]) {
-          state.selectedPrismId = d.selectedPrismId;
-          state.ex = d.ex && typeof d.ex === 'object' ? d.ex : makeExcavation(d.selectedPrismId);
-          if (!state.ex || !Array.isArray(state.ex.steps)) state.ex = makeExcavation(d.selectedPrismId);
-          for (let i = 0; i < 3; i += 1) {
-            if (!state.ex.steps[i]) state.ex.steps[i] = blankStep(i);
-          }
-        }
-      }
-    } catch (e) {}
-  }
-
   function fmtDate(iso) {
     const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return '';
+    if (isNaN(d.getTime())) return '';
+    try { return new Intl.DateTimeFormat('en-US', { dateStyle: 'short', timeStyle: 'short' }).format(d); } catch(e) { return d.toLocaleString(); }
+  }
+  function restoreAll() {
+    try { const s = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]'); if (Array.isArray(s)) state.saved = s; } catch(e) {}
     try {
-      return new Intl.DateTimeFormat('he-IL', { dateStyle: 'short', timeStyle: 'short' }).format(d);
-    } catch (e) {
-      return d.toLocaleString();
-    }
-  }
-
-  function isMobileView() {
-    if (typeof window.matchMedia !== 'function') return window.innerWidth <= MOBILE_BREAKPOINT;
-    return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
-  }
-
-  function stepGuide(idx) {
-    return STEP_GUIDE[idx] || {
-      title: `שלב ${idx + 1}`,
-      subtitle: 'המשך חקירה ממוקד על אותו עוגן.'
-    };
-  }
-
-  function pendingMicrocopy() {
-    if (!state.selectedPrismId) return 'בחר פריזמה כדי להתחיל';
-    return 'כתוב משפט כדי להמשיך';
-  }
-
-  function renderPrismGrid() {
-    return PRISMS.map((p) => `
-      <button type="button" class="pl-btn pl-prism-btn${p.id === state.selectedPrismId ? ' is-active' : ''}" data-action="select-prism" data-id="${esc(p.id)}" title="${esc(p.q)}">
-        <span class="pl-prism-head"><span class="pl-prism-icon">${esc(p.icon)}</span><span class="pl-prism-name">${esc(p.nameHe)}</span></span>
-        <p class="pl-prism-desc">${esc(p.desc)}</p>
-      </button>
-    `).join('');
-  }
-
-  function renderBreenReferenceBoard() {
-    const activeId = normalizeBreenPrismId(state.selectedPrismId);
-    const activeRowId = BREEN_ROWS.find((row) => row.categories.includes(activeId))?.id || '';
-
-    const rowsHtml = BREEN_ROWS.map((row) => {
-      const meta = BREEN_ROW_META[row.id] || BREEN_ROW_META.row1;
-      const isActiveRow = !!activeRowId && activeRowId === row.id;
-      const cellsHtml = row.categories.map((categoryId) => {
-        const isActive = !!activeId && activeId === categoryId;
-        const classes = ['pl-breen-cell'];
-        if (isActiveRow) classes.push('is-row');
-        if (isActive) classes.push('is-active');
-        return `
-          <div class="${classes.join(' ')}">
-            <span class="pl-breen-chip">${esc((categoryId || '').slice(0, 2).toUpperCase())}</span>
-            <small>${esc(BREEN_LABELS_HE[categoryId] || categoryId)}</small>
-          </div>
-        `;
-      }).join('');
-
-      return `
-        <div class="pl-breen-row ${esc(meta.colorClass || '')}${isActiveRow ? ' is-active' : ''}">
-          <div class="pl-breen-row-head">
-            <strong>${esc(meta.heLabel || row.id)}</strong>
-            <small>${esc(meta.heInsight || '')}</small>
-          </div>
-          <div class="pl-breen-row-cells">${cellsHtml}</div>
-        </div>
-      `;
-    }).join('');
-
-    const selectedPrismName = state.selectedPrismId && PRISM_BY_ID[state.selectedPrismId]
-      ? PRISM_BY_ID[state.selectedPrismId].nameHe
-      : '';
-    const note = selectedPrismName
-      ? (activeId
-          ? `הפריזמה הנבחרת (${selectedPrismName}) מסומנת בטבלת ברין כשיש התאמה ישירה/אליאס.`
-          : `הפריזמה הנבחרת (${selectedPrismName}) היא הרחבה שאינה תא ברין ישיר.`)
-      : 'טבלת ברין משמשת כמפת עוגן (5×3) בין העדשות השונות.';
-
-    return `
-      <section class="pl-card pl-breen-board">
-        <h2>טבלת ברין — מפת 5×3</h2>
-        <p class="pl-kicker">${esc(note)}</p>
-        <div class="pl-breen-grid">${rowsHtml}</div>
-      </section>
-    `;
-  }
-
-  function renderBaseActions(isMobile) {
-    if (!isMobile) {
-      return `
-        <div class="pl-inline-actions">
-          <button type="button" class="pl-btn" data-action="load-demo">טען דוגמת בסיס</button>
-          <button type="button" class="pl-btn" data-action="refresh-anchor" ${state.selectedPrismId ? '' : 'disabled'}>רענן עוגן אוטומטי</button>
-          <button type="button" class="pl-btn" data-action="clear-draft">נקה טיוטה</button>
-        </div>
-      `;
-    }
-
-    return `
-      <div class="pl-mobile-actions-wrap${state.mobileActionsOpen ? ' is-open' : ''}" data-mobile-actions-root>
-        <button
-          type="button"
-          class="pl-btn pl-mobile-actions-toggle"
-          data-action="toggle-mobile-actions"
-          aria-expanded="${state.mobileActionsOpen ? 'true' : 'false'}"
-          aria-controls="pl-mobile-actions-menu"
-        >
-          פעולות
-        </button>
-        <div
-          id="pl-mobile-actions-menu"
-          class="pl-mobile-actions-menu${state.mobileActionsOpen ? ' is-open' : ''}"
-          role="menu"
-          aria-hidden="${state.mobileActionsOpen ? 'false' : 'true'}"
-        >
-          <button type="button" class="pl-btn pl-mobile-actions-item" data-action="load-demo" role="menuitem">טען דוגמת בסיס</button>
-          <button type="button" class="pl-btn pl-mobile-actions-item" data-action="refresh-anchor" role="menuitem" ${state.selectedPrismId ? '' : 'disabled'}>רענן עוגן אוטומטי</button>
-          <button type="button" class="pl-btn pl-mobile-actions-item" data-action="clear-draft" role="menuitem">נקה טיוטה</button>
-        </div>
-      </div>
-    `;
-  }
-
-  function renderStep(step, idx, p, ex) {
-    const visible = ex.visible >= idx + 1;
-    if (!visible) return '';
-    const guide = stepGuide(idx);
-    const hasA = !!norm(step.a);
-    const statusText = hasA ? 'נכתב' : pendingMicrocopy();
-    const q = step.q || renderQuestion(p, step.anchorX || ex.seedX, step.anchorY || ex.seedY);
-    const nextVisible = ex.visible >= idx + 2;
-    return `
-      <article class="pl-step-card${hasA ? ' is-locked' : ''}">
-        <div class="pl-step-head">
-          <div class="pl-step-label">שלב ${idx + 1} · ${esc(guide.title)}</div>
-          <div class="pl-step-status${hasA ? ' done' : ''}">${esc(statusText)}</div>
-        </div>
-        <p class="pl-step-guidance">${esc(guide.subtitle)}</p>
-        <p class="pl-step-question"><strong>השאלה:</strong> ${esc(q)}</p>
-        <p class="pl-step-context">עוגן ${idx + 1}: <code>${esc(step.anchorX || ex.seedX || '—')}</code>${p.q.includes('Y') ? ` · Y: <code>${esc(step.anchorY || ex.seedY || 'תוצאה')}</code>` : ''}</p>
-        <textarea data-action="step-answer" data-step="${idx}" spellcheck="false" placeholder="כתבו כאן את תשובת שלב ${idx + 1}...">${esc(step.a || '')}</textarea>
-        <div class="pl-step-actions">
-          ${idx < 2 && hasA ? `<button type="button" class="pl-btn primary" data-action="continue-step" data-step="${idx}">${nextVisible ? `עדכן שלב ${idx + 2}` : `המשך לשלב ${idx + 2}`}</button>` : ''}
-        </div>
-      </article>
-    `;
-  }
-
-  function renderExcavation() {
-    const p = prism();
-    const ex = state.ex;
-    if (!p || !ex) return `
-      <section class="pl-card"><h2>אזור החפירה</h2><div class="pl-excavation-empty">בחר/י אחת מ-15 הפריזמות כדי להתחיל חפירה עמוקה של 3 שלבים עם אותה שאלה חוזרת.</div></section>
-    `;
-    const canSumm = ex.visible >= 3 && !!norm(ex.steps[2]?.a);
-    return `
-      <section class="pl-card">
-        <div class="pl-excavation-header">
-          <h2 class="pl-excavation-title">פריזמה: ${esc(p.nameHe)} <small>| שאלה חוזרת</small></h2>
-          <div class="pl-anchor-chip"><span>עוגן התחלתי:</span><code>${esc(ex.seedX || '—')}</code></div>
-          ${p.q.includes('Y') ? `<div class="pl-anchor-chip"><span>Y (נגזר אוטומטית):</span><code>${esc(ex.seedY || 'תוצאה')}</code></div>` : ''}
-          <p class="pl-kicker">אותה שאלה בדיוק. בכל שלב ה-<code>X</code> מתעדכן מהתשובה הקודמת.</p>
-        </div>
-        <div class="pl-step-list">${ex.steps.map((s, i) => renderStep(s, i, p, ex)).join('')}</div>
-        ${canSumm ? `<div class="pl-inline-actions"><button type="button" class="pl-btn green big" data-action="make-summary">מה נהיה משמעותי?</button></div>` : ''}
-        ${ex.summary ? `
-          <section class="pl-summary-card" aria-live="polite">
-            <h3 class="pl-summary-title">${esc(ex.summary.title || 'מה נהיה משמעותי?')}</h3>
-            <p class="pl-summary-lead">${esc(ex.summary.lead || '')}</p>
-            <ul class="pl-summary-list">${(ex.summary.bullets || []).map((b) => `<li>${esc(b)}</li>`).join('')}</ul>
-            <div class="pl-summary-next">שאלה הבאה מומלצת: ${esc(ex.summary.next || '')}</div>
-          </section>` : ''}
-      </section>
-    `;
-  }
-
-  function renderHistory() {
-    const p = prism();
-    const ex = state.ex;
-    const steps = ex?.steps || [blankStep(0), blankStep(1), blankStep(2)];
-    const items = steps.map((s, i) => {
-      const guide = stepGuide(i);
-      const title = `שלב ${i + 1} · ${guide.title}`;
-      const hasQ = !!norm(s.q);
-      const hasA = !!norm(s.a);
-      if (!hasQ) {
-        return `<div class="pl-history-item is-empty"><div class="pl-history-item-head"><strong>${esc(title)}</strong><span>${esc(pendingMicrocopy())}</span></div><p>${esc(guide.subtitle)}</p><p>${state.selectedPrismId ? 'השאלה תופיע אחרי שממלאים את השלב הקודם.' : 'השאלה תופיע אחרי בחירת פריזמה.'}</p></div>`;
+      const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+      if (d && d.sentence) {
+        state.sentence = d.sentence || '';
+        state.focus    = d.focus || '';
+        state.prismId  = d.prismId || null;
+        state.layers   = Array.isArray(d.layers)  ? d.layers  : ['', '', ''];
+        state.anchors  = Array.isArray(d.anchors) ? d.anchors : ['', '', ''];
+        state.anchorY  = d.anchorY || '';
+        state.hasDraft = true;
       }
-      return `<div class="pl-history-item${hasA ? '' : ' is-empty'}"><div class="pl-history-item-head"><strong>${esc(title)}</strong><span>${hasA ? 'נכתב' : esc(pendingMicrocopy())}</span></div><p>${esc(guide.subtitle)}</p><p>${esc(s.q)}</p><p class="pl-history-answer">${hasA ? esc(s.a) : 'כתוב משפט כדי להמשיך.'}</p></div>`;
-    }).join('');
-
-    const savedHtml = state.saved.length
-      ? state.saved.map((it) => `
-        <article class="pl-saved-item">
-          <h5>${esc(it.prismNameHe || it.prismId || 'פריזמה')}</h5>
-          <p>${esc(fmtDate(it.savedAt))} · עוגן: ${esc(shrink(it.ex?.seedX || '', 26) || '—')}</p>
-          <p>${esc(shrink(it.ex?.steps?.[2]?.a || it.ex?.steps?.[0]?.a || '', 66) || 'ללא תשובה')}</p>
-          <div class="pl-inline-actions">
-            <button type="button" class="pl-btn" data-action="load-saved" data-id="${esc(it.id)}">פתח</button>
-            <button type="button" class="pl-btn" data-action="delete-saved" data-id="${esc(it.id)}">מחק</button>
-          </div>
-        </article>`).join('')
-      : '<div class="pl-history-item is-empty"><p>עדיין אין שמירות. אפשר לשמור אחרי שממלאים תשובה אחת לפחות.</p></div>';
-
-    return `
-      <aside class="pl-side">
-        <section class="pl-card pl-side-card">
-          <h3>היסטוריה של 3 השלבים</h3>
-          <p class="pl-kicker">קריאה בלבד · רואים את כל הרצף בלי לגלול.</p>
-          <div class="pl-history-list">${items}</div>
-          <div class="pl-side-actions">
-            <button type="button" class="pl-btn primary" data-action="save-current" ${canSave() ? '' : 'disabled'}>שמור פריזמה זו</button>
-            <button type="button" class="pl-btn" data-action="choose-another" ${p ? '' : 'disabled'}>בחר פריזמה אחרת</button>
-          </div>
-          <p class="pl-message">${esc(state.uiMessage || '')}</p>
-        </section>
-        <section class="pl-card pl-side-card">
-          <h3>פריזמות שמורות</h3>
-          <p class="pl-kicker">טעינה מהירה של חפירות קודמות בדפדפן זה.</p>
-          <div class="pl-saved-list">${savedHtml}</div>
-        </section>
-      </aside>
-    `;
+    } catch(e) {}
   }
 
-  function render() {
-    const mobileView = isMobileView();
-    root.innerHTML = `
-      <div class="pl-shell" dir="rtl">
-        <header class="pl-hero">
-          <p class="pl-eyebrow">Prism Lab</p>
-          <h1>Prism Lab – חפירה עמוקה עם עדשות</h1>
-          <p>בוחרים עדשה אחת (פריזמה) ומבצעים חפירה עמוקה של 3 שלבים עם אותה שאלה בדיוק. בכל שלב <code>X</code> מתעדכן אוטומטית מהתשובה הקודמת.</p>
-        </header>
-        <div class="pl-layout">
-          <main class="pl-main">
-            <section class="pl-card pl-base">
-              <h2>Base Story</h2>
-              <p class="pl-kicker">כתבו/ערכו את הפסקה כאן. שלב 1 יקבל עוגן אוטומטי, ואז ההמשך נבנה מתוך התשובות.</p>
-              <textarea id="pl-base-story" spellcheck="false">${esc(state.baseStory || '')}</textarea>
-              ${renderBaseActions(mobileView)}
-            </section>
+  // ─── Toast ────────────────────────────────────────────────────────────────
+  let toastTimer = null;
+  function showToast(msg) {
+    state.toastMsg = msg;
+    render();
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { state.toastMsg = null; render(); }, 3000);
+  }
 
-            ${mobileView ? '' : renderBreenReferenceBoard()}
+  // ─── Overlay state ────────────────────────────────────────────────────────
+  let overlay = null; // null | 'all-prisms' | 'saved'
 
-            <section class="pl-card">
-              <h2>15 פריזמות</h2>
-              <p class="pl-kicker">בוחרים פריזמה אחת וחופרים איתה 3 פעמים ברצף.</p>
-              <div class="pl-prisms-grid">${renderPrismGrid()}</div>
-            </section>
+  // ─── Render helpers ───────────────────────────────────────────────────────
+  const SCREEN_ORDER = ['input', 'detect', 'choose_prism', 'layer1', 'layer2', 'layer3', 'output'];
 
-            ${renderExcavation()}
-          </main>
+  function renderDialogue() {
+    const d = DIALOGUE[state.screen];
+    if (!d) return '';
+    return `<div class="pl2-dialogue" role="status">
+      <span class="pl2-d-what">${esc(d.what)}</span>
+      <span class="pl2-d-sep">·</span>
+      <span class="pl2-d-why">${esc(d.why)}</span>
+      ${d.tip ? `<span class="pl2-d-tip">${esc(d.tip)}</span>` : ''}
+    </div>`;
+  }
 
-          ${renderHistory()}
+  function renderCollapsedSteps() {
+    const curIdx = SCREEN_ORDER.indexOf(state.screen);
+    if (curIdx <= 0) return '';
+    const items = [];
+
+    if (curIdx > 0 && state.sentence) items.push({ label: 'Sentence', val: state.sentence,               back: 'input'        });
+    if (curIdx > 1 && state.focus)    items.push({ label: 'Focus',    val: state.focus,                  back: 'detect'       });
+    if (curIdx > 2 && state.prismId)  { const p = PRISM_BY_ID[state.prismId]; items.push({ label: 'Prism', val: p ? p.icon + ' ' + p.name : state.prismId, back: 'choose_prism' }); }
+    if (curIdx > 3 && state.layers[0]) items.push({ label: 'Layer 1', val: state.layers[0],              back: 'layer1'       });
+    if (curIdx > 4 && state.layers[1]) items.push({ label: 'Layer 2', val: state.layers[1],              back: 'layer2'       });
+    if (curIdx > 5 && state.layers[2]) items.push({ label: 'Layer 3', val: state.layers[2],              back: 'layer3'       });
+
+    if (!items.length) return '';
+    return `<div class="pl2-collapsed-steps">${items.map(it => `
+      <div class="pl2-collapsed-item">
+        <span class="pl2-ci-check">✓</span>
+        <span class="pl2-ci-label">${esc(it.label)}</span>
+        <span class="pl2-ci-val">${esc(shrink(it.val, 56))}</span>
+        <button type="button" class="pl2-ci-edit" data-action="edit-step" data-screen="${esc(it.back)}">edit</button>
+      </div>`).join('')}</div>`;
+  }
+
+  function renderProgress() {
+    const cur = SCREEN_ORDER.indexOf(state.screen);
+    return `<div class="pl2-progress" aria-label="Step ${Math.max(cur+1,1)} of ${SCREEN_ORDER.length}">${
+      SCREEN_ORDER.map((_, i) => `<span class="pl2-dot ${i < cur ? 'done' : i === cur ? 'active' : 'pending'}"></span>`).join('')
+    }</div>`;
+  }
+
+  function renderHeader() {
+    const isWelcome = state.screen === 'welcome';
+    const showProgress = !isWelcome && state.screen !== 'output' && state.screen !== 'review';
+    return `<header class="pl2-header">
+      <button type="button" class="pl2-hdr-btn" data-action="go-back" aria-label="Back">←</button>
+      <span class="pl2-hdr-title">Prism Lab</span>
+      ${showProgress ? renderProgress() : '<span></span>'}
+      <button type="button" class="pl2-hdr-btn" data-action="open-help" aria-label="Help">?</button>
+    </header>`;
+  }
+
+  function renderToast() {
+    if (!state.toastMsg) return '';
+    return `<div class="pl2-toast" role="alert">${esc(state.toastMsg)}</div>`;
+  }
+
+  // ─── Screens ──────────────────────────────────────────────────────────────
+  function renderWelcome() {
+    return `<div class="pl2-shell pl2-welcome">
+      <header class="pl2-header pl2-header-welcome">
+        <span></span>
+        <span class="pl2-hdr-title">Prism Lab</span>
+        <button type="button" class="pl2-hdr-btn" data-action="open-help" aria-label="Help">?</button>
+      </header>
+      <main class="pl2-welcome-main">
+        <div class="pl2-welcome-hero">
+          <p class="pl2-eyebrow">Prism Lab</p>
+          <h1 class="pl2-welcome-h1">One sentence.<br>One lens.<br>Three layers of clarity.</h1>
+          <p class="pl2-welcome-sub">Choose a questioning prism and ask the same question three times. Each time, X updates from your previous answer — each layer goes deeper.</p>
         </div>
 
-        <footer class="pl-card">
-          <p class="pl-footnote">המסך הזה ייעודי ל-Chain Recursive Prism: החקירה מתקדמת קדימה על המשפט החדש שנולד בכל תשובה, בלי להחליף כלי בין השלבים.</p>
-        </footer>
-      </div>
-    `;
+        <div class="pl2-benefits">
+          <div class="pl2-benefit">
+            <span class="pl2-benefit-icon">🔍</span>
+            <strong>See what stands out</strong>
+            <p>Find the vague word, hidden assumption, or loaded phrase.</p>
+          </div>
+          <div class="pl2-benefit">
+            <span class="pl2-benefit-icon">🎯</span>
+            <strong>Choose a lens</strong>
+            <p>One prism. One type of question. Applied three times.</p>
+          </div>
+          <div class="pl2-benefit">
+            <span class="pl2-benefit-icon">💡</span>
+            <strong>Discover what was hidden</strong>
+            <p>Move from abstraction to something concrete and actionable.</p>
+          </div>
+        </div>
+
+        <section class="pl2-how-it-works">
+          <h2>How it works</h2>
+          <ol class="pl2-how-list">
+            <li><strong>Write a sentence</strong> — something someone said, or a thought you've had.</li>
+            <li><strong>Pick one prism</strong> — a specific questioning lens from 15 options.</li>
+            <li><strong>Answer the same question 3 times.</strong> X updates from your previous answer each time.</li>
+          </ol>
+        </section>
+
+        <section class="pl2-example">
+          <h2>Worked example</h2>
+          <div class="pl2-ex-sentence">"I can't change."</div>
+          <div class="pl2-ex-prism">Prism: 🧱 Possibility Modal — <em>"What prevents you from X?"</em></div>
+          <div class="pl2-ex-trace">
+            <div class="pl2-ex-row"><span class="pl2-ex-layer">Layer 1</span><span class="pl2-ex-x">X = "changing"</span><span class="pl2-ex-arr">→</span><span class="pl2-ex-a">"I don't know what to do differently"</span></div>
+            <div class="pl2-ex-row"><span class="pl2-ex-layer">Layer 2</span><span class="pl2-ex-x">X = "knowing what to do"</span><span class="pl2-ex-arr">→</span><span class="pl2-ex-a">"Nobody showed me options"</span></div>
+            <div class="pl2-ex-row"><span class="pl2-ex-layer">Layer 3</span><span class="pl2-ex-x">X = "seeing options"</span><span class="pl2-ex-arr">→</span><span class="pl2-ex-a">"I haven't asked anyone"</span></div>
+          </div>
+          <div class="pl2-ex-result">
+            <span class="pl2-ex-from">"I can't change"</span>
+            <span class="pl2-ex-arrfull">→</span>
+            <span class="pl2-ex-to">"I haven't asked anyone to show me options"</span>
+          </div>
+        </section>
+
+        <div class="pl2-welcome-cta">
+          ${state.hasDraft && state.sentence ? `<button type="button" class="pl2-btn-primary" data-action="resume-draft">Continue where you left off →</button>` : ''}
+          <button type="button" class="pl2-btn-${state.hasDraft && state.sentence ? 'secondary' : 'primary'}" data-action="start-practice">Start Practice →</button>
+          <div class="pl2-welcome-links">
+            <button type="button" class="pl2-link-btn" data-action="open-help">See all 15 prisms</button>
+            ${state.saved.length ? `<button type="button" class="pl2-link-btn" data-action="open-saved">Saved investigations (${state.saved.length})</button>` : ''}
+          </div>
+        </div>
+
+        <p class="pl2-not-this">Not therapy. Not a quiz. Not graded. A thinking tool for linguistic clarity.</p>
+      </main>
+    </div>`;
   }
 
-  function refreshAnchor() {
-    if (!state.selectedPrismId) return;
-    if (answers().some((x) => x.a)) {
-      state.uiMessage = 'כבר התחילה חפירה. כדי לרענן עוגן - בחר/י פריזמה אחרת או נקה טיוטה.';
-      render();
-      return;
+  function renderInput() {
+    return `<div class="pl2-shell pl2-work">
+      ${renderHeader()}
+      <main class="pl2-work-main">
+        ${renderCollapsedSteps()}
+        <div class="pl2-card">
+          <p class="pl2-prompt">Write a sentence from real life.</p>
+          <p class="pl2-sub">Something someone said, or a thought you've had.</p>
+          <textarea class="pl2-textarea" id="pl2-sentence-ta" data-action="input-sentence" placeholder="Type or paste a sentence…" spellcheck="false">${esc(state.sentence)}</textarea>
+          <div class="pl2-card-links">
+            <button type="button" class="pl2-link-btn" data-action="load-demo">Load example sentence</button>
+          </div>
+          <div class="pl2-card-footer">
+            <button type="button" class="pl2-btn-primary" data-action="submit-sentence" ${norm(state.sentence) ? '' : 'disabled'}>Continue →</button>
+          </div>
+        </div>
+        ${renderDialogue()}
+      </main>
+      ${renderToast()}
+    </div>`;
+  }
+
+  function renderDetect() {
+    // Generate phrase chips from sentence using pattern matching
+    const chips = [];
+    const patterns = [
+      /\b(always|never|every time|nobody|everyone)\s+\w+(?:\s+\w+)?/i,
+      /\b(can't|cannot|unable to|impossible to)\s+\w+(?:\s+\w+)?/i,
+      /\b(must|have to|should|need to)\s+\w+(?:\s+\w+)?/i,
+      /\b(?:thinks?|sure|believes?)\s+(?:that\s+)?(?:I\s+(?:am|'m)\s+)?\w+(?:\s+\w+)?/i,
+      /\b(?:means?|that means?|this means?)\s+\w+(?:\s+\w+)?/i,
+    ];
+    for (const pat of patterns) {
+      const m = pat.exec(state.sentence);
+      if (m) {
+        const chip = shrink(m[0], 40);
+        if (chip && !chips.includes(chip)) chips.push(chip);
+      }
+      if (chips.length >= 4) break;
     }
-    state.ex = makeExcavation(state.selectedPrismId);
-    state.uiMessage = 'העוגן ההתחלתי רוענן מתוך Base Story.';
+    const displaySentence = shrink(state.sentence, 140);
+    return `<div class="pl2-shell pl2-work">
+      ${renderHeader()}
+      <main class="pl2-work-main">
+        ${renderCollapsedSteps()}
+        <div class="pl2-card">
+          <p class="pl2-prompt">What stands out in this sentence?</p>
+          <div class="pl2-sentence-display">"${esc(displaySentence)}"</div>
+          <p class="pl2-sub">Which word or phrase feels loaded, vague, or worth questioning?</p>
+          <input type="text" class="pl2-input" id="pl2-focus-in" data-action="input-focus" placeholder="Type the word or phrase…" value="${esc(state.focus)}" spellcheck="false" autocomplete="off" />
+          ${chips.length ? `<div class="pl2-chips">${chips.map(c => `<button type="button" class="pl2-chip${state.focus === c ? ' active' : ''}" data-action="select-focus" data-val="${esc(c)}">${esc(c)}</button>`).join('')}</div>` : ''}
+          <div class="pl2-card-footer">
+            <button type="button" class="pl2-btn-primary" data-action="submit-focus" ${norm(state.focus) ? '' : 'disabled'}>Continue →</button>
+          </div>
+        </div>
+        ${renderDialogue()}
+      </main>
+      ${renderToast()}
+    </div>`;
+  }
+
+  function renderChoosePrism() {
+    const ids = suggestPrisms(state.focus, state.sentence);
+    const suggested = ids.map(id => PRISM_BY_ID[id]).filter(Boolean);
+    return `<div class="pl2-shell pl2-work">
+      ${renderHeader()}
+      <main class="pl2-work-main">
+        ${renderCollapsedSteps()}
+        <div class="pl2-card">
+          <p class="pl2-prompt">Which lens do you want to use?</p>
+          <p class="pl2-sub">Suggested for <strong>"${esc(shrink(state.focus, 40))}"</strong>:</p>
+          <div class="pl2-prism-options">
+            ${suggested.map(p => `
+              <button type="button" class="pl2-prism-opt${state.prismId === p.id ? ' active' : ''}" data-action="select-prism" data-id="${esc(p.id)}">
+                <span class="pl2-po-icon">${esc(p.icon)}</span>
+                <div class="pl2-po-body">
+                  <strong class="pl2-po-name">${esc(p.name)}</strong>
+                  <p class="pl2-po-desc">${esc(p.desc)}</p>
+                  <span class="pl2-po-q">${esc(p.q)}</span>
+                </div>
+              </button>`).join('')}
+          </div>
+          <div class="pl2-card-links">
+            <button type="button" class="pl2-link-btn" data-action="open-help">Show all 15 prisms</button>
+          </div>
+        </div>
+        ${renderDialogue()}
+      </main>
+      ${renderToast()}
+    </div>`;
+  }
+
+  function renderLayer(idx) {
+    const question = getLayerQ(idx);
+    const x = getX(idx);
+    const isLast = idx === 2;
+    return `<div class="pl2-shell pl2-work">
+      ${renderHeader()}
+      <main class="pl2-work-main">
+        ${renderCollapsedSteps()}
+        <div class="pl2-card">
+          <span class="pl2-layer-badge">Layer ${idx + 1} of 3</span>
+          <div class="pl2-question-box">${esc(question)}</div>
+          <div class="pl2-x-context">X = "<span class="pl2-x-val">${esc(shrink(x, 60))}</span>"</div>
+          <textarea class="pl2-textarea" data-action="input-layer" data-layer="${idx}" placeholder="Your answer…" spellcheck="false">${esc(state.layers[idx])}</textarea>
+          <div class="pl2-card-footer">
+            <button type="button" class="pl2-btn-primary" data-action="submit-layer" data-layer="${idx}" ${norm(state.layers[idx]) ? '' : 'disabled'}>${isLast ? 'Finish →' : 'Continue →'}</button>
+          </div>
+        </div>
+        ${renderDialogue()}
+      </main>
+      ${renderToast()}
+    </div>`;
+  }
+
+  function renderOutput() {
+    const prism = PRISM_BY_ID[state.prismId];
+    const x0 = getX(0);
+    const traceItems = [
+      { x: x0,                a: state.layers[0] },
+      { x: state.anchors[1],  a: state.layers[1] },
+      { x: state.anchors[2],  a: state.layers[2] },
+    ].filter(r => r.a);
+
+    return `<div class="pl2-shell pl2-output-shell">
+      ${renderHeader()}
+      <main class="pl2-work-main">
+        <div class="pl2-card pl2-output-card">
+          <h2 class="pl2-output-h2">What became clear</h2>
+          <div class="pl2-output-meta">
+            <span class="pl2-om-sentence">"${esc(shrink(state.sentence, 90))}"</span>
+            ${prism ? `<span class="pl2-om-prism">${esc(prism.icon + ' ' + prism.name)}</span>` : ''}
+          </div>
+          <div class="pl2-trace">
+            <div class="pl2-trace-seed">"${esc(shrink(x0, 60))}"</div>
+            ${traceItems.map(r => `
+              <div class="pl2-trace-step">
+                <div class="pl2-trace-down">↓</div>
+                <div class="pl2-trace-answer">"${esc(shrink(r.a, 80))}"</div>
+              </div>`).join('')}
+          </div>
+          <div class="pl2-output-insight"><p>${esc(summaryInsight())}</p></div>
+          <div class="pl2-output-next"><strong>Next question:</strong> ${esc(summaryNextQ())}</div>
+        </div>
+
+        <div class="pl2-output-actions">
+          <button type="button" class="pl2-btn-primary" data-action="start-practice">Try another sentence →</button>
+          <button type="button" class="pl2-btn-secondary" data-action="try-another-prism">Try a different prism on this sentence</button>
+          <button type="button" class="pl2-btn-secondary" data-action="save-investigation">Save this investigation</button>
+          <button type="button" class="pl2-link-btn" data-action="open-review">Review all steps</button>
+        </div>
+
+        ${renderDialogue()}
+      </main>
+      ${renderToast()}
+    </div>`;
+  }
+
+  function renderReview() {
+    const prism = PRISM_BY_ID[state.prismId];
+    return `<div class="pl2-shell pl2-work">
+      ${renderHeader()}
+      <main class="pl2-work-main">
+        <h2 class="pl2-review-h2">Full Investigation Trace</h2>
+        <div class="pl2-review-meta">
+          <div><strong>Sentence:</strong> "${esc(state.sentence)}"</div>
+          <div><strong>Focus:</strong> "${esc(state.focus)}"</div>
+          ${prism ? `<div><strong>Prism:</strong> ${esc(prism.icon + ' ' + prism.name)}</div>` : ''}
+        </div>
+        <div class="pl2-review-layers">
+          ${[0, 1, 2].map(i => !state.layers[i] ? '' : `
+            <div class="pl2-review-layer">
+              <span class="pl2-rl-label">Layer ${i + 1}</span>
+              <div class="pl2-rl-q"><strong>Q:</strong> ${esc(getLayerQ(i))}</div>
+              <div class="pl2-rl-a"><strong>A:</strong> "${esc(state.layers[i])}"</div>
+            </div>`).join('')}
+        </div>
+        <div class="pl2-review-insight"><p>${esc(summaryInsight())}</p></div>
+        <div class="pl2-review-actions">
+          <button type="button" class="pl2-btn-primary" data-action="back-to-output">Back to result</button>
+          <button type="button" class="pl2-link-btn" data-action="open-help">Learn the underlying model</button>
+          <button type="button" class="pl2-link-btn" data-action="try-another-prism">Try different prism</button>
+          <button type="button" class="pl2-link-btn" data-action="start-practice">Start new sentence</button>
+        </div>
+      </main>
+      ${renderToast()}
+    </div>`;
+  }
+
+  // ─── Overlays ─────────────────────────────────────────────────────────────
+  function renderAllPrismsOverlay() {
+    return `<div class="pl2-overlay" data-action="close-overlay" role="dialog" aria-modal="true" aria-label="All 15 Prisms">
+      <div class="pl2-overlay-panel" role="document">
+        <div class="pl2-overlay-hdr">
+          <h3>All 15 Prisms</h3>
+          <button type="button" class="pl2-overlay-close" data-action="close-overlay" aria-label="Close">×</button>
+        </div>
+        <p class="pl2-overlay-sub">Tap a prism to select it and start excavating.</p>
+        <div class="pl2-all-prisms">
+          ${PRISMS.map(p => `
+            <button type="button" class="pl2-ap-btn${state.prismId === p.id ? ' active' : ''}" data-action="select-prism-overlay" data-id="${esc(p.id)}">
+              <span class="pl2-ap-icon">${esc(p.icon)}</span>
+              <span class="pl2-ap-name">${esc(p.name)}</span>
+              <span class="pl2-ap-desc">${esc(p.desc)}</span>
+            </button>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function renderSavedOverlay() {
+    if (!state.saved.length) return '';
+    return `<div class="pl2-overlay" data-action="close-overlay" role="dialog" aria-modal="true" aria-label="Saved Investigations">
+      <div class="pl2-overlay-panel" role="document">
+        <div class="pl2-overlay-hdr">
+          <h3>Saved Investigations</h3>
+          <button type="button" class="pl2-overlay-close" data-action="close-overlay" aria-label="Close">×</button>
+        </div>
+        <div class="pl2-saved-list">
+          ${state.saved.map(item => {
+            const p = PRISM_BY_ID[item.prismId];
+            return `<div class="pl2-saved-item">
+              <div class="pl2-si-head">
+                <strong>${esc(p ? p.icon + ' ' + p.name : item.prismId)}</strong>
+                <span class="pl2-si-date">${esc(fmtDate(item.savedAt))}</span>
+              </div>
+              <p class="pl2-si-sentence">"${esc(shrink(item.sentence || '', 70))}"</p>
+              ${item.layers && item.layers[2] ? `<p class="pl2-si-result">${esc(shrink(item.layers[2] || item.layers[0] || '', 70))}</p>` : ''}
+              <div class="pl2-si-actions">
+                <button type="button" class="pl2-btn-small" data-action="load-saved" data-id="${esc(item.id)}">Load</button>
+                <button type="button" class="pl2-btn-small pl2-btn-ghost" data-action="delete-saved" data-id="${esc(item.id)}">Delete</button>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ─── Main render ──────────────────────────────────────────────────────────
+  function render() {
+    let html = '';
+    switch (state.screen) {
+      case 'welcome':      html = renderWelcome(); break;
+      case 'input':        html = renderInput(); break;
+      case 'detect':       html = renderDetect(); break;
+      case 'choose_prism': html = renderChoosePrism(); break;
+      case 'layer1':       html = renderLayer(0); break;
+      case 'layer2':       html = renderLayer(1); break;
+      case 'layer3':       html = renderLayer(2); break;
+      case 'output':       html = renderOutput(); break;
+      case 'review':       html = renderReview(); break;
+      default:             html = renderWelcome();
+    }
+    if (overlay === 'all-prisms') html += renderAllPrismsOverlay();
+    if (overlay === 'saved')      html += renderSavedOverlay();
+    root.innerHTML = html;
+  }
+
+  // ─── Navigation ───────────────────────────────────────────────────────────
+  function goto(screen) {
+    state.screen = screen;
     persistDraft();
     render();
+    root.scrollIntoView && root.scrollIntoView({ behavior: 'instant', block: 'start' });
   }
 
-  function clearDraft() {
-    state.baseStory = DEMO_STORY;
-    state.selectedPrismId = null;
-    state.ex = null;
-    state.uiMessage = 'הטיוטה נוקתה. אפשר להתחיל מחדש.';
-    try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
-    render();
+  function editStep(screen) {
+    // Clear downstream state when going back to edit
+    if (screen === 'input')        { state.focus = ''; state.prismId = null; state.layers = ['','','']; state.anchors = ['','','']; state.anchorY = ''; }
+    else if (screen === 'detect')  { state.prismId = null; state.layers = ['','','']; state.anchors = ['','','']; state.anchorY = ''; }
+    else if (screen === 'choose_prism') { state.layers = ['','','']; state.anchors = ['','','']; state.anchorY = ''; }
+    else if (screen === 'layer1')  { state.layers = ['','','']; state.anchors[1] = ''; state.anchors[2] = ''; }
+    else if (screen === 'layer2')  { state.layers[1] = ''; state.layers[2] = ''; state.anchors[2] = ''; }
+    else if (screen === 'layer3')  { state.layers[2] = ''; }
+    goto(screen);
+  }
+
+  function initPrism(id) {
+    if (!PRISM_BY_ID[id]) return;
+    state.prismId = id;
+    const prism = PRISM_BY_ID[id];
+    state.anchors[0] = deriveSeedX(prism, state.sentence);
+    state.anchorY    = deriveSeedY(prism, state.sentence);
+    state.layers     = ['', '', ''];
+    state.anchors[1] = '';
+    state.anchors[2] = '';
+  }
+
+  // ─── Event handlers ───────────────────────────────────────────────────────
+  function onClick(e) {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.getAttribute('data-action');
+
+    // Overlay close
+    if (action === 'close-overlay') { overlay = null; render(); return; }
+
+    // Overlay open
+    if (action === 'open-help')   { overlay = 'all-prisms'; render(); return; }
+    if (action === 'open-saved')  { overlay = 'saved'; render(); return; }
+    if (action === 'show-all-prisms') { overlay = 'all-prisms'; render(); return; }
+
+    // Welcome actions
+    if (action === 'start-practice') {
+      state.sentence = ''; state.focus = ''; state.prismId = null;
+      state.layers = ['','','']; state.anchors = ['','','']; state.anchorY = '';
+      state.hasDraft = false;
+      goto('input'); return;
+    }
+    if (action === 'resume-draft') { goto('input'); return; }
+
+    // Navigation
+    if (action === 'go-back') {
+      if (state.screen === 'review') { goto('output'); return; }
+      const i = SCREEN_ORDER.indexOf(state.screen);
+      if (i > 0) goto(SCREEN_ORDER[i - 1]);
+      else goto('welcome');
+      return;
+    }
+    if (action === 'edit-step') { editStep(btn.getAttribute('data-screen')); return; }
+
+    // Input screen
+    if (action === 'load-demo') { state.sentence = DEMO_SENTENCE; render(); return; }
+    if (action === 'submit-sentence') { if (!norm(state.sentence)) return; goto('detect'); return; }
+
+    // Detect screen
+    if (action === 'select-focus') {
+      state.focus = btn.getAttribute('data-val') || '';
+      render(); return;
+    }
+    if (action === 'submit-focus') { if (!norm(state.focus)) return; goto('choose_prism'); return; }
+
+    // Prism selection
+    if (action === 'select-prism') {
+      initPrism(btn.getAttribute('data-id'));
+      goto('layer1'); return;
+    }
+    if (action === 'select-prism-overlay') {
+      initPrism(btn.getAttribute('data-id'));
+      overlay = null;
+      if (!state.sentence) { goto('input'); return; }
+      if (!state.focus)    { goto('detect'); return; }
+      goto('layer1'); return;
+    }
+
+    // Layer screens
+    if (action === 'submit-layer') {
+      const idx = Number(btn.getAttribute('data-layer'));
+      const ans = norm(state.layers[idx]);
+      if (!ans) return;
+      if (idx < 2) {
+        state.anchors[idx + 1] = nextAnchor(ans, state.anchors[idx]);
+        goto(['layer1','layer2','layer3'][idx + 1]);
+      } else {
+        goto('output');
+      }
+      return;
+    }
+
+    // Output/review
+    if (action === 'try-another-prism') {
+      state.prismId = null; state.layers = ['','','']; state.anchors = ['','','']; state.anchorY = '';
+      goto('choose_prism'); return;
+    }
+    if (action === 'save-investigation') {
+      const prism = PRISM_BY_ID[state.prismId];
+      state.saved.unshift({
+        id: 'pl-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
+        savedAt: new Date().toISOString(),
+        sentence: state.sentence, focus: state.focus,
+        prismId: state.prismId, prismName: prism ? prism.name : '',
+        layers: [...state.layers], anchors: [...state.anchors]
+      });
+      state.saved = state.saved.slice(0, 30);
+      persistSaved();
+      showToast('Investigation saved.');
+      return;
+    }
+    if (action === 'open-review')    { goto('review'); return; }
+    if (action === 'back-to-output') { goto('output'); return; }
+
+    // Saved overlay actions
+    if (action === 'load-saved') {
+      const item = state.saved.find(x => x.id === btn.getAttribute('data-id'));
+      if (!item) return;
+      state.sentence = item.sentence || '';
+      state.focus    = item.focus || '';
+      state.prismId  = item.prismId || null;
+      state.layers   = Array.isArray(item.layers)  ? [...item.layers]  : ['','',''];
+      state.anchors  = Array.isArray(item.anchors) ? [...item.anchors] : ['','',''];
+      overlay = null;
+      goto('output'); return;
+    }
+    if (action === 'delete-saved') {
+      state.saved = state.saved.filter(x => x.id !== btn.getAttribute('data-id'));
+      persistSaved(); render(); return;
+    }
   }
 
   function onInput(e) {
     const t = e.target;
     if (!t) return;
-    if (t.id === 'pl-base-story') {
-      state.baseStory = String(t.value || '');
-      if (state.selectedPrismId && state.ex && !answers().some((x) => x.a)) state.ex = makeExcavation(state.selectedPrismId);
-      persistDraft();
+    const action = t.getAttribute('data-action');
+
+    if (action === 'input-sentence') {
+      state.sentence = t.value || '';
+      const btn = root.querySelector('[data-action="submit-sentence"]');
+      if (btn) btn.disabled = !norm(state.sentence);
       return;
     }
-    if (t.getAttribute('data-action') === 'step-answer') {
-      const idx = Number(t.getAttribute('data-step'));
-      if (Number.isInteger(idx)) setStepAnswer(idx, t.value);
+    if (action === 'input-focus') {
+      state.focus = t.value || '';
+      const btn = root.querySelector('[data-action="submit-focus"]');
+      if (btn) btn.disabled = !norm(state.focus);
+      return;
+    }
+    if (action === 'input-layer') {
+      const idx = Number(t.getAttribute('data-layer'));
+      if (Number.isInteger(idx)) {
+        state.layers[idx] = t.value || '';
+        const btn = root.querySelector(`[data-action="submit-layer"][data-layer="${idx}"]`);
+        if (btn) btn.disabled = !norm(state.layers[idx]);
+      }
+      return;
     }
   }
 
-  function onClick(e) {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    const action = btn.getAttribute('data-action');
-    if (action === 'toggle-mobile-actions') {
-      state.mobileActionsOpen = !state.mobileActionsOpen;
-      render();
-      return;
-    }
-    if (state.mobileActionsOpen && (action === 'load-demo' || action === 'refresh-anchor' || action === 'clear-draft')) {
-      state.mobileActionsOpen = false;
-    }
-    if (action === 'select-prism') return selectPrism(btn.getAttribute('data-id'));
-    if (action === 'continue-step') return continueStep(Number(btn.getAttribute('data-step')));
-    if (action === 'make-summary') return buildSummary();
-    if (action === 'save-current') return saveCurrent();
-    if (action === 'choose-another') return chooseAnother();
-    if (action === 'load-saved') return loadSaved(btn.getAttribute('data-id'));
-    if (action === 'delete-saved') return removeSaved(btn.getAttribute('data-id'));
-    if (action === 'load-demo') {
-      state.baseStory = DEMO_STORY;
-      if (state.selectedPrismId && state.ex && !answers().some((x) => x.a)) state.ex = makeExcavation(state.selectedPrismId);
-      state.uiMessage = 'נטענה פסקת בסיס לדוגמה.';
-      persistDraft();
-      render();
-      return;
-    }
-    if (action === 'refresh-anchor') return refreshAnchor();
-    if (action === 'clear-draft') return clearDraft();
+  function onKeydown(e) {
+    if (e.key === 'Escape' && overlay) { overlay = null; render(); }
   }
 
-  function onDocumentClick(event) {
-    if (!state.mobileActionsOpen) return;
-    const wrap = root.querySelector('[data-mobile-actions-root]');
-    if (!wrap) {
-      state.mobileActionsOpen = false;
-      return;
-    }
-    const target = event.target;
-    if (target instanceof Node && wrap.contains(target)) return;
-    state.mobileActionsOpen = false;
-    render();
-  }
-
-  function onDocumentKeydown(event) {
-    if (!state.mobileActionsOpen) return;
-    if (event.key !== 'Escape') return;
-    state.mobileActionsOpen = false;
-    render();
-  }
-
-  function bindViewportListener() {
-    if (typeof window.matchMedia !== 'function') return;
-    const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
-    const onChange = () => {
-      state.mobileActionsOpen = false;
-      render();
-    };
-    if (typeof mq.addEventListener === 'function') {
-      mq.addEventListener('change', onChange);
-      return;
-    }
-    if (typeof mq.addListener === 'function') {
-      mq.addListener(onChange);
+  // Close overlay when clicking outside the panel
+  function onOverlayBackdrop(e) {
+    if (!overlay) return;
+    const panel = root.querySelector('.pl2-overlay-panel');
+    if (panel && !panel.contains(e.target) && e.target.closest('.pl2-overlay')) {
+      overlay = null; render();
     }
   }
 
+  // ─── Init ─────────────────────────────────────────────────────────────────
   restoreAll();
   root.addEventListener('input', onInput);
   root.addEventListener('click', onClick);
-  document.addEventListener('click', onDocumentClick, true);
-  document.addEventListener('keydown', onDocumentKeydown);
-  bindViewportListener();
+  root.addEventListener('click', onOverlayBackdrop);
+  document.addEventListener('keydown', onKeydown);
   render();
 })();
