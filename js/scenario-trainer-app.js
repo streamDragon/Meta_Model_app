@@ -1233,57 +1233,25 @@
         `;
     }
 
-    function renderFeedbackActionBar(analysisOpen) {
-        return `
-          <div class="scenario-flow-actions">
-            <div class="scenario-flow-actions-copy">
-              <strong>${escapeHtml(analysisOpen ? 'הניתוח פתוח בתוך אותה סצנה' : 'השלב הבא נשאר ברור וקרוב')}</strong>
-              <span>${escapeHtml(analysisOpen
-                  ? 'הסצנה עדיין נשארת מולך. אפשר לסגור את הניתוח או לעבור ישר לסיכום.'
-                  : 'הכפתור הראשי ממשיך לסיכום הסצנה. הניתוח המעמיק נפתח כאן רק אם צריך עוד שכבה אחת.')}</span>
-            </div>
-            <div class="scenario-feedback-actions scenario-feedback-actions--flow">
-              <button type="button" class="btn btn-primary" data-scenario-action="continue-result">לסיכום הסצנה</button>
-              <button type="button" class="btn btn-secondary" data-scenario-action="show-blueprint">${escapeHtml(analysisOpen ? 'סגור/י ניתוח מעמיק' : 'פתח/י ניתוח מעמיק')}</button>
-            </div>
-          </div>
-        `;
-    }
+    /* renderFeedbackActionBar — removed: action bar is now inline in renderFeedbackScreen */
 
     function renderBlueprintDetails(scenario, isGreen) {
         const bp = scenario.greenBlueprint || {};
         const prismItems = state.settings.prismWheelEnabled && isGreen && Array.isArray(state.data.prismWheel) ? state.data.prismWheel : [];
         const selectedPrism = prismItems.find((item) => item.id === state.selectedPrismId) || null;
         return `
-          <section class="scenario-analysis-panel" data-scenario-analysis="1">
-            <div class="scenario-analysis-head">
-              <p class="scenario-panel-kicker">ניתוח מעמיק</p>
-              <h4>מפת פעולה קצרה מתוך אותה סצנה</h4>
-              <p>כאן פותחים את מה שהיה עמום, בלי לעזוב את התגובה, את המשוב ואת הכיוון שכבר נבנו.</p>
-            </div>
             <div class="scenario-tote-grid">
-              <div class="scenario-tote-slot"><h5>פתיחת הסצנה</h5><p>${escapeHtml(scenario.openingLine)}</p></div>
               <div class="scenario-tote-slot"><h5>מה נשאר עמום</h5><p>${escapeHtml(scenario.metaModelCore.hiddenGap)}</p></div>
               <div class="scenario-tote-slot"><h5>צעד ראשון קטן</h5><p>${escapeHtml(scenario.microPlan.firstStep)}</p></div>
               <div class="scenario-tote-slot"><h5>צוואר הבקבוק</h5><p>${escapeHtml(scenario.microPlan.bottleneck)}</p></div>
               <div class="scenario-tote-slot"><h5>סימן הצלחה</h5><p>${escapeHtml(scenario.microPlan.successSign)}</p></div>
-              <div class="scenario-tote-slot"><h5>שאלת ההעמקה</h5><p>${escapeHtml(scenario.deepeningQuestion)}</p></div>
-            </div>
-            <div class="final-blueprint-display scenario-blueprint-display">
-              <div class="blueprint-section"><h4>מטרה</h4><p>${escapeHtml(bp.goal || scenario.humanNeed)}</p></div>
-              <div class="blueprint-section"><h4>צעד ראשון</h4><p>${escapeHtml(bp.firstStep || scenario.microPlan.firstStep)}</p></div>
-              <div class="blueprint-section"><h4>שלבים</h4><ul>${(bp.steps || [scenario.microPlan.firstStep]).map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ul></div>
-              <div class="blueprint-section"><h4>נקודת תקיעה</h4><p>${escapeHtml(bp.stuckPoint || scenario.microPlan.bottleneck)}</p></div>
-              <div class="blueprint-section"><h4>חלופה / תחליף</h4><p>${escapeHtml(bp.planB || 'אם נתקעים שוב, חוזרים לשאלה אחת שמבהירה מה בדיוק קורה בפועל.')}</p></div>
-              <div class="blueprint-section"><h4>מדד הצלחה</h4><p>${escapeHtml(bp.doneDefinition || scenario.microPlan.successSign)}</p></div>
             </div>
             <div class="scenario-green-box">
-              <h4>המשפט הירוק המוצע</h4>
+              <h4>המשפט הירוק</h4>
               <p>${escapeHtml(getGreenOptionText(scenario))}</p>
-              <button type="button" class="btn btn-secondary" data-scenario-action="copy-green">העתק משפט ירוק</button>
+              <button type="button" class="btn btn-secondary" data-scenario-action="copy-green">העתק</button>
             </div>
             ${prismItems.length ? renderPrismWheel(prismItems, selectedPrism) : ''}
-          </section>
         `;
     }
 
@@ -1293,58 +1261,56 @@
         if (!scenario || !option) return renderPlayScreen();
         const isGreen = Number(option.score) === 1;
         const guide = buildFeedbackGuide(scenario, option, isGreen);
-        const analysisOpen = forceAnalysisOpen || state.screen === SCREEN_IDS.blueprint;
         return `
           <section class="scenario-workspace-card" data-scenario-feedback-thread="1">
-            <p class="scenario-panel-kicker">אחרי הבחירה</p>
-            <div class="scenario-feedback-mark ${isGreen ? 'green' : 'red'}" style="opacity:1;transform:scale(1);">${isGreen ? '✓' : '!'}</div>
+            <div class="scenario-feedback-mark ${isGreen ? 'green' : 'red'}">${isGreen ? '✓' : '!'}</div>
             <div class="scenario-feedback-summary-card">
-              <p class="scenario-feedback-kind">${escapeHtml(isGreen ? 'התגובה הזו פותחת מקום לבדיקה' : 'התגובה הזו כנראה תסגור את השיחה')}</p>
+              <p class="scenario-feedback-kind">${escapeHtml(isGreen ? 'פותחת מקום לבדיקה' : 'כנראה תסגור את השיחה')}</p>
               <h3>${escapeHtml(guide.headline)}</h3>
               <p>${escapeHtml(isGreen ? option.whyItWorks : option.whyItHurts)}</p>
             </div>
-            ${renderFlowGuide()}
             <div class="scenario-feedback-thread">
               <div class="scenario-bubble player selected ${isGreen ? 'green' : 'red'}">
                 <span class="scenario-bubble-speaker">התשובה שלך</span>
-                <p id="scenario-feedback-choice-bubble">${escapeHtml(option.speakerLine)}</p>
+                <p>${escapeHtml(option.speakerLine)}</p>
               </div>
               <div class="scenario-bubble other followup">
                 <span class="scenario-bubble-speaker">התגובה שמולך</span>
-                <p id="scenario-feedback-other-bubble">${escapeHtml(option.likelyOtherReply)}</p>
+                <p>${escapeHtml(option.likelyOtherReply)}</p>
               </div>
             </div>
             <div class="scenario-impact-grid">
               <article class="scenario-impact-card" data-scenario-impact="emotion">
-                <p class="scenario-panel-kicker">איך זה נחת בצד השני</p>
-                <h4>${escapeHtml(isGreen ? 'יש כאן מקום לנשום ולהקשיב' : 'התגובה הזאת כנראה תלחיץ או תכווץ')}</h4>
+                <h4>${escapeHtml(isGreen ? 'יש מקום לנשום ולהקשיב' : 'כנראה תלחיץ או תכווץ')}</h4>
                 <p>${escapeHtml(guide.emotionalImpact)}</p>
               </article>
               <article class="scenario-impact-card" data-scenario-impact="process">
-                <p class="scenario-panel-kicker">מה זה עושה לשיחה</p>
-                <h4>${escapeHtml(isGreen ? 'השיחה עוברת למה שאפשר לבדוק' : 'הבעיה נשארת בלי שם ברור')}</h4>
+                <h4>${escapeHtml(isGreen ? 'השיחה עוברת לבדיקה' : 'הבעיה נשארת בלי שם')}</h4>
                 <p>${escapeHtml(guide.processImpact)}</p>
               </article>
             </div>
-            <div id="scenario-consequence-box" class="scenario-consequence-box ${isGreen ? 'green' : 'red'}" data-scenario-consequence="1">
+            <div class="scenario-consequence-box ${isGreen ? 'green' : 'red'}">
               <h4>${escapeHtml(isGreen ? 'איך ממשיכים מכאן' : 'מה אפשר לנסות במקום')}</h4>
               <p>${escapeHtml(guide.nextMove)}</p>
-              <p>${escapeHtml(guide.learningTakeaway)}</p>
+            </div>
+            <div class="scenario-feedback-actions scenario-feedback-actions--primary">
+              <button type="button" class="btn btn-primary" data-scenario-action="continue-result">לסיכום הסצנה</button>
             </div>
             <details class="scenario-meta-accordion">
               <summary>מה היה עמום / מה נפתח כאן</summary>
               <div class="scenario-meta-accordion-body">
-                <p class="scenario-meta-card-text">${escapeHtml(guide.metaModelExplanation)}</p>
-                <div class="scenario-predicate-panel">
-                  <p><strong>הפועל/המהלך העמום:</strong> ${escapeHtml(scenario.metaModelCore.unspecifiedVerb)}</p>
-                  <p><strong>מה נשאר חסר או נפתח כאן:</strong> ${escapeHtml(scenario.metaModelCore.hiddenGap)}</p>
-                  <p><strong>שאלת ההעמקה הבאה:</strong> ${escapeHtml(scenario.deepeningQuestion)}</p>
-                </div>
+                <p>${escapeHtml(guide.metaModelExplanation)}</p>
+                <p><strong>הפועל/המהלך העמום:</strong> ${escapeHtml(scenario.metaModelCore.unspecifiedVerb)}</p>
+                <p><strong>מה נשאר חסר:</strong> ${escapeHtml(scenario.metaModelCore.hiddenGap)}</p>
+                <p><strong>שאלת העמקה:</strong> ${escapeHtml(scenario.deepeningQuestion)}</p>
               </div>
             </details>
-            <div class="scenario-feedback-note">${escapeHtml(isGreen ? 'כדאי לקחת את אותו קו לשאלה אחת נוספת או לפתוח את מפת הפעולה הקצרה.' : 'כדאי לעצור על מה שנסגר כאן, ואז לעבור לשאלה שמחזירה את השיחה לתהליך במקום לאשמה או לחץ.')}</div>
-            ${analysisOpen ? renderBlueprintDetails(scenario, isGreen) : ''}
-            ${renderFeedbackActionBar(analysisOpen)}
+            <details class="scenario-meta-accordion">
+              <summary>ניתוח מעמיק — מפת פעולה</summary>
+              <div class="scenario-meta-accordion-body">
+                ${renderBlueprintDetails(scenario, isGreen)}
+              </div>
+            </details>
           </section>
         `;
     }
@@ -1507,27 +1473,14 @@
         return `
           <section class="scenario-workspace-card">
             <div class="scenario-stars-row">${escapeHtml(starVisual || '☆☆☆☆☆')}</div>
-            <p class="scenario-score-line">סיימת סצנה ${escapeHtml(playedCount)}/${escapeHtml(state.session.queue.length)}. נקודות סשן: ${escapeHtml(state.session.score)}</p>
-            <p class="scenario-next-green-line">בפעם הבאה: "${escapeHtml(entry.greenSentence)}"</p>
-            ${(entry.goalGeneral || entry.successMetric) ? `
-              <div class="scenario-result-summary">
-                <p><strong>מטרה כללית:</strong> ${escapeHtml(entry.goalGeneral || 'לא הוגדר')}</p>
-                <p><strong>מדד הצלחה:</strong> ${escapeHtml(entry.successMetric || 'לא הוגדר')}</p>
-              </div>
-            ` : ''}
-            ${renderFlowGuide()}
-            <p class="scenario-feedback-next-hint">${escapeHtml(getScenarioScoreNextHint(isLast))}</p>
-            <div class="scenario-flow-actions">
-              <div class="scenario-flow-actions-copy">
-                <strong>${escapeHtml(isLast ? 'זה סוף הסשן הנוכחי' : 'מכאן ממשיכים או עוצרים מסודר')}</strong>
-                <span>${escapeHtml(isLast
-                    ? 'הכפתור הראשי יסגור את הסשן ויחזיר לבית. אם צריך לעצור עכשיו בלי לסגור את המסלול, אפשר לחזור לבית באופן ידני.'
-                    : 'הכפתור הראשי ממשיך ישר לסצנה הבאה. הכפתור המשני מחזיר לבית אם רוצים לעצור כאן.')}</span>
-              </div>
-              <div class="scenario-feedback-actions scenario-feedback-actions--flow">
-                <button type="button" class="btn btn-primary" data-scenario-action="next-scene">${isLast ? 'סיום סשן וחזרה לבית' : 'המשך לסצנה הבאה'}</button>
-                <button type="button" class="btn btn-secondary" data-scenario-action="go-home">חזרה לבית הסצנות</button>
-              </div>
+            <p class="scenario-score-line">סצנה ${escapeHtml(playedCount)}/${escapeHtml(state.session.queue.length)} · ${escapeHtml(state.session.score)} נקודות</p>
+            <div class="scenario-consequence-box green">
+              <h4>המשפט הירוק לשיחה אמיתית</h4>
+              <p>"${escapeHtml(entry.greenSentence)}"</p>
+            </div>
+            <div class="scenario-feedback-actions scenario-feedback-actions--primary">
+              <button type="button" class="btn btn-primary" data-scenario-action="next-scene">${isLast ? 'סיום סשן' : 'סצנה הבאה'}</button>
+              <button type="button" class="btn btn-secondary" data-scenario-action="go-home">חזרה לבית</button>
             </div>
           </section>
         `;
