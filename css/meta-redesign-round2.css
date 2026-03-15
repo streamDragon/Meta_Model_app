@@ -4,10 +4,10 @@ body,
     -webkit-font-smoothing: antialiased;
 }
 
-/* Always hide the old static hero — meta-home-shell is the single home view */
-#home .hhc-hero,
-#home .hhc-paths,
-#home .home-route-primary-cta {
+/* Hide the old static hero elements that are direct children of #home (not inside shell) */
+#home > .hhc-hero,
+#home > .hhc-paths,
+#home > .home-route-primary-cta {
     display: none !important;
 }
 

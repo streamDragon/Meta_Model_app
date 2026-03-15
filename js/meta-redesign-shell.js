@@ -698,6 +698,41 @@
             '</section>'
         ].join('');
     }
+    function homeCinematicHero() {
+        return [
+            '<article class="hhc-hero hhc-hero--embedded" aria-label="שער פתיחה ראשי">',
+            '<div class="hhc-bg" aria-hidden="true">',
+            '<span class="hhc-orb hhc-orb--1"></span><span class="hhc-orb hhc-orb--2"></span>',
+            '<span class="hhc-orb hhc-orb--3"></span><span class="hhc-orb hhc-orb--4"></span>',
+            '</div>',
+            '<div class="hhc-copy">',
+            '<div class="hhc-badge"><span class="hhc-badge-dot"></span>Meta Model Gym · מעבדת שיחה</div>',
+            '<h2 class="hhc-title">שפר/י את<br><span class="hhc-title-accent">השיחה שלך</span></h2>',
+            '<p class="hhc-subtitle">מיומנות אחת בסבב. דפוס אחד בשיחה.<br>תוצאה שמשנה כל מפגש.</p>',
+            '<div class="hhc-daily-widget" aria-label="אתגר יומי">',
+            '<div class="hhc-daily-icon">🔥</div>',
+            '<div class="hhc-daily-text"><strong>אתגר היום</strong><span>זהה מחיקה — ושאל את השאלה שפותחת את מה שמאחורי המילים</span></div>',
+            '</div>',
+            '<div class="hhc-cta-group">',
+            '<button type="button" class="hhc-btn-primary" data-nav-key="sentenceMap"><span>התחל עכשיו</span><span class="hhc-btn-arrow">←</span></button>',
+            '<a class="hhc-btn-ghost" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">סימולטור סצנות ↗</a>',
+            '</div>',
+            '<div class="hhc-stats" aria-label="נתוני האפליקציה">',
+            '<div class="hhc-stat"><strong>12+</strong><span>כלי תרגול</span></div>',
+            '<div class="hhc-stat-divider"></div>',
+            '<div class="hhc-stat"><strong>3</strong><span>רמות עומק</span></div>',
+            '<div class="hhc-stat-divider"></div>',
+            '<div class="hhc-stat"><strong>∞</strong><span>אפשרויות גדילה</span></div>',
+            '</div>',
+            '</div>',
+            '<div class="hhc-visual" aria-hidden="true"><div class="hhc-card-stack">',
+            '<div class="hhc-pattern-card hhc-pattern-card--1"><span class="hhc-pattern-sentence">הוא לא רואה אותי</span><span class="hhc-pattern-tag hhc-pattern-tag--deletion">מחיקה 🔍</span></div>',
+            '<div class="hhc-pattern-card hhc-pattern-card--2"><span class="hhc-pattern-sentence">תמיד קורה לי כך</span><span class="hhc-pattern-tag hhc-pattern-tag--generalization">הכללה ⚡</span></div>',
+            '<div class="hhc-pattern-card hhc-pattern-card--3"><span class="hhc-pattern-sentence">כולם חושבים שאני...</span><span class="hhc-pattern-tag hhc-pattern-tag--distortion">עיוות 🌀</span></div>',
+            '</div></div>',
+            '</article>'
+        ].join('');
+    }
     function homeHero(summary) {
         var copy = greeting(summary);
         var unlock = nextUnlock(summary);
@@ -805,6 +840,7 @@
         return [
             '<div class="meta-home-shell__frame">',
             '<header class="meta-home-shell__topbar"><button type="button" class="meta-home-shell__menu btn btn-secondary" data-home-menu>☰ תפריט</button><div class="meta-home-shell__brand"><span class="meta-home-shell__eyebrow">מטען עבודה</span><strong>Meta Model בעברית</strong></div></header>',
+            homeCinematicHero(),
             homeHero(summary), homeStats(summary), homeResume(),
             '<section class="meta-home-shell__cards">' + featureTabsForHome().map(function (tab, index) { return homeCard(FEATURE_META[tab], index); }).join('') + '</section>',
             '<div class="meta-home-shell__divider" aria-hidden="true"></div>',
