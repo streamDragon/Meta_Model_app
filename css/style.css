@@ -17134,6 +17134,8 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
 
 .tr-phone-breen-panel {
     background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    max-width: 560px;
+    width: 100%;
 }
 
 .tr-phone-breen-grid {
@@ -26290,6 +26292,47 @@ header h1 {
     #practice-triples-radar .triples-radar-breen-figure,
     #practice-triples-radar [data-triples-figure-toggle="true"] {
         display: none;
+    }
+
+    .tr-phone-breen-panel {
+        max-width: 100%;
+    }
+
+    .tr-phone-breen-grid {
+        gap: 4px;
+    }
+
+    .tr-phone-breen-row {
+        padding: 5px;
+        gap: 5px;
+    }
+
+    .tr-phone-breen-row-cells {
+        gap: 4px;
+    }
+
+    .tr-phone-breen-cell {
+        min-height: 44px;
+        padding: 4px;
+        gap: 2px;
+    }
+
+    .tr-phone-breen-chip {
+        min-height: 18px;
+        font-size: 0.55rem;
+        padding: 2px 4px;
+    }
+
+    .tr-phone-breen-cell small {
+        font-size: 0.6rem;
+    }
+
+    .tr-phone-breen-row-head strong {
+        font-size: 0.68rem;
+    }
+
+    .tr-phone-breen-row-head small {
+        font-size: 0.6rem;
     }
 
     #blueprint .blueprint-progress {
