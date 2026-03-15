@@ -1315,61 +1315,7 @@
         `;
     }
 
-    function renderSupportRail() {
-        const currentStepId = PROCESS_STEP_BY_SCREEN[state.screen];
-        const scenario = state.activeScenario;
-        const option = state.selectedOption;
-        const isGreen = Number(option?.score) === 1;
-        const guide = scenario && option ? buildFeedbackGuide(scenario, option, isGreen) : null;
-        const statusText = state.session
-            ? `סצנה ${state.session.index + 1}/${state.session.queue.length} · ${state.session.score} נקודות · רצף ${state.session.streak}`
-            : `התקדמות כוללת · ${state.progress.completed} סצנות · ${state.progress.greenCount} בחירות ירוקות`;
-        const cueTitle = scenario
-            ? (state.screen === SCREEN_IDS.feedback || state.screen === SCREEN_IDS.blueprint ? (isGreen ? 'מה לחזק מכאן' : 'מה לתקן מכאן') : 'מה להחזיק בסצנה')
-            : 'מה ייחשב הצלחה';
-        const cueBody = scenario
-            ? (state.screen === SCREEN_IDS.feedback || state.screen === SCREEN_IDS.blueprint
-                ? (guide ? guide.learningTakeaway : (isGreen ? scenario.microPlan.firstStep : scenario.deepeningQuestion))
-                : (normalizeText(scenario.supportPrompt, '') || buildScenarioLearningFocus(scenario)))
-            : 'תגובה אחת שמורידה לחץ, מייצרת בהירות, ופותחת צעד שאפשר לבדוק בפועל.';
-        return `
-          <div class="scenario-support-intro">
-            <p class="scenario-panel-kicker">עוגנים ברקע</p>
-            <h3>מה מחזיקים לידך בלי לאבד את חוט השיחה</h3>
-            <p>המסלול הראשי נשאר למעלה. כאן נשמרים מצב הסשן, מפת התהליך והעוגן המטה-מודלי.</p>
-          </div>
-          <section class="scenario-support-card" data-support-kind="status">
-            <p class="scenario-panel-kicker">מצב נוכחי</p>
-            <h4>הסשן שלך</h4>
-            <p>${escapeHtml(statusText)}</p>
-          </section>
-          <section class="scenario-support-card" data-support-kind="process">
-            <p class="scenario-panel-kicker">מפת התהליך</p>
-            <h4>איפה אתה/את נמצא/ת עכשיו</h4>
-            <div class="scenario-process-rail">
-              ${(Array.isArray(trainerContract.processSteps) ? trainerContract.processSteps : []).map((step) => `
-                <div class="scenario-process-step ${processStepState(step.id)}">
-                  <strong>${escapeHtml(step.label)}</strong>
-                  <span>${escapeHtml(step.description)}</span>
-                </div>
-              `).join('')}
-            </div>
-          </section>
-          <section class="scenario-support-card" data-support-kind="cue">
-            <p class="scenario-panel-kicker">${escapeHtml(cueTitle)}</p>
-            <h4>${escapeHtml(scenario ? scenario.sceneTitle : 'כך נראה סשן טוב')}</h4>
-            <p>${escapeHtml(cueBody)}</p>
-          </section>
-          ${currentStepId && scenario ? `
-            <section class="scenario-support-card" data-support-kind="anchor">
-              <p class="scenario-panel-kicker">עוגן לשיחה</p>
-              <h4>מה היה עמום כאן</h4>
-              <p><strong>הפועל/המהלך:</strong> ${escapeHtml(scenario.metaModelCore.unspecifiedVerb)}</p>
-              <p><strong>החסר בפועל:</strong> ${escapeHtml(scenario.metaModelCore.hiddenGap)}</p>
-            </section>
-          ` : ''}
-        `;
-    }
+    /* renderSupportRail — removed: content moved to collapsible sections in main flow */
 
     function renderSettingsModal() {
         const draft = getSettingsDraft();
