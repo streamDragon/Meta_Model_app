@@ -974,20 +974,8 @@
     }
 
     function renderApp() {
-        const currentSummary = getCurrentSummary();
-        const sessionMeta = state.session
-            ? `<span class="scenario-home-tag">סצנה ${escapeHtml(state.session.index + 1)}/${escapeHtml(state.session.queue.length)}</span><span class="scenario-home-tag">נקודות: ${escapeHtml(state.session.score)}</span>`
-            : `<span class="scenario-home-tag">${escapeHtml(trainerContract.quickStartLabel || '')}</span>`;
         return `
-          <div id="scenario-trainer" class="scenario-platform-root" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id="scenario-trainer" data-screen="${state.screen}" data-trainer-mobile-order="${escapeHtml(getMobileZoneOrder().join(','))}" style="${escapeHtml(buildRootStyle())}">
-            <div class="scenario-platform-header">
-              <div class="scenario-platform-header-copy">
-                <p class="scenario-platform-family">${escapeHtml(getScenarioDisplayFamilyLabel())}</p>
-                <h1>${escapeHtml(trainerContract.title || 'סימולטור סצנות')}</h1>
-                <p class="scenario-platform-subtitle">${escapeHtml(getScenarioDisplaySubtitle())}</p>
-              </div>
-              <div class="scenario-platform-header-meta">${sessionMeta}</div>
-            </div>
+          <div id="scenario-trainer" class="scenario-platform-root" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id="scenario-trainer" data-screen="${state.screen}">
             ${state.screen !== SCREEN_IDS.home ? `
             <div class="scenario-session-bar" role="toolbar" aria-label="ניהול סשן">
               <span class="scenario-session-bar-info">
@@ -995,45 +983,9 @@
               </span>
               <button type="button" class="scenario-session-bar-end" data-scenario-action="go-home">↩ חזרה לבית</button>
             </div>` : ''}
-            <div class="scenario-platform-shell">
-              <section class="scenario-home-purpose-card" data-trainer-zone="purpose" style="${escapeHtml(getZoneStyle('purpose'))}">
-                <p class="scenario-home-kicker">מה עושים כאן?</p>
-                <h3>סימולטור דיאלוג אנושי עם גב מטה-מודלי</h3>
-                <p class="scenario-home-lead">נכנסים לסצנה קצרה, שומעים משפט אמיתי מהצד השני, בוחרים תגובה אחת, ורואים איך היא מתקבלת רגשית ומה היא פותחת או סוגרת בתהליך.</p>
-                <div class="scenario-home-tag-row">
-                  <span class="scenario-home-tag">הורות · זוגיות · עבודה · ביורוקרטיה · בית/טק</span>
-                  <span class="scenario-home-tag">בחירה אחת בכל רגע</span>
-                  <span class="scenario-home-tag">קודם דיאלוג, אחר כך ניתוח</span>
-                </div>
-              </section>
-              <section class="scenario-home-start-strip" data-trainer-zone="start" style="${escapeHtml(getZoneStyle('start'))}">
-                <div class="scenario-home-start-copy">
-                  <p class="scenario-home-kicker">${escapeHtml(trainerContract.quickStartLabel || 'מתחילים מכאן')}</p>
-                  <h3>אפשר להיכנס ישר לשיחה</h3>
-                  <p>ברירת המחדל כבר מכוונת לסשן שימושי. אם רוצים, אפשר לשנות תחום, רמה או כלים נוספים לפני ההתחלה.</p>
-                </div>
-                <div class="scenario-start-actions">
-                  <button id="scenario-start-run-btn" type="button" class="btn btn-primary" data-trainer-action="start-session">${escapeHtml(trainerContract.startActionLabel || 'התחל סשן')}</button>
-                  <button id="scenario-home-settings" type="button" class="btn btn-secondary" data-trainer-action="open-settings">הגדרות</button>
-                  <span id="scenario-home-summary-pill" class="scenario-summary-pill" data-trainer-summary="current">${escapeHtml(currentSummary)}</span>
-                </div>
-                <div class="scenario-home-inline-actions">
-                  <button type="button" class="btn btn-secondary" data-scenario-action="open-help">איך זה עובד</button>
-                  <button type="button" class="btn btn-secondary" data-scenario-action="open-history">היסטוריה</button>
-                </div>
-              </section>
-              <section class="scenario-home-helper-strip" aria-label="מהלך האימון" data-trainer-zone="helper-steps" style="${escapeHtml(getZoneStyle('helper-steps'))}">
-                ${renderHelperSteps()}
-              </section>
-              <div class="scenario-standalone-layout">
-                <main class="scenario-standalone-main" data-trainer-zone="main" style="${escapeHtml(getZoneStyle('main'))}">
-                  ${renderMain()}
-                </main>
-                <aside class="scenario-platform-support" data-trainer-zone="support" data-trainer-support-mode="${escapeHtml(trainerContract.supportRailMode || 'dialogue-meta')}" style="${escapeHtml(getZoneStyle('support'))}">
-                  ${renderSupportRail()}
-                </aside>
-              </div>
-            </div>
+            <main class="scenario-main-area">
+              ${renderMain()}
+            </main>
             ${state.settingsOpen ? renderSettingsModal() : ''}
             ${state.toastMessage ? `<div class="scenario-toast">${escapeHtml(state.toastMessage)}</div>` : ''}
           </div>
