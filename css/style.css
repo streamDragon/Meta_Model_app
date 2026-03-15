@@ -23706,7 +23706,7 @@ body.mobile-sticky-cta-visible {
 
 /* ═══ Practice Question — layout locked to viewport, no overflow ═══ */
 #practice-question {
-    overflow: hidden;
+    overflow: visible;
 }
 
 #practice-question .practice-container {
@@ -25427,8 +25427,8 @@ header h1 {
 
 #practice-radar .rapid-pattern-buttons {
     display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 #practice-radar .rapid-pattern-btn {
@@ -26257,7 +26257,10 @@ header h1 {
         display: none;
     }
 
-    #practice-radar .rapid-pattern-buttons,
+    #practice-radar .rapid-pattern-buttons {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     #practice-verb-unzip .feature-launcher-grid {
         grid-template-columns: 1fr;
     }
