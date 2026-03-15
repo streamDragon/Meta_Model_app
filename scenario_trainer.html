@@ -13,6 +13,8 @@
   <script>
     (function () {
       var v = String(Date.now());
+      var onboardingShown = false;
+
       function withV(path) {
         try {
           var u = new URL(path, location.href);
@@ -22,52 +24,52 @@
           return path + (path.indexOf('?') === -1 ? '?' : '&') + 'v=' + encodeURIComponent(v);
         }
       }
+
       function addCss(path) {
         var link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = withV(path);
         document.head.appendChild(link);
       }
-      function addScript(path, cb) {
-        var s = document.createElement('script');
-        s.src = withV(path);
-        s.onload = function () { if (cb) cb(); };
-        document.head.appendChild(s);
+
+      function setupOnboarding() {
+        var onboardingDiv = document.getElementById('scenario-trainer-onboarding');
+        var onboardingBtn = document.getElementById('scenario-trainer-onboarding-btn');
+        var rootDiv = document.getElementById('scenario-trainer-root');
+
+        if (onboardingBtn && !onboardingShown) {
+          onboardingShown = true;
+          onboardingBtn.addEventListener('click', function () {
+            if (onboardingDiv) onboardingDiv.classList.add('hidden');
+            if (rootDiv) rootDiv.classList.add('hidden');
+          });
+        }
       }
+
       function boot() {
-        if (window.__scenarioTrainerBootStarted) return;
+        if (window.__scenarioTrainerBooted) return;
         if (!document.getElementById('scenario-trainer-onboarding-btn')) return;
-        window.__scenarioTrainerBootStarted = true;
-        setupScenarioOnboarding();
+        window.__scenarioTrainerBooted = true;
+        window.MetaTrainerStandalone.boot({
+          "trainerId": "scenario-trainer",
+          "manifestKey": "_scenario_trainer",
+          "css": [
+            "css/style.css",
+            "css/scenario-trainer.css",
+            "css/ui-enhancements.css",
+            "css/meta-model-redesign.css"
+          ],
+          "scripts": ["js/scenario-trainer-app.js"]
+        });
+        setupOnboarding();
       }
+
       document.addEventListener('DOMContentLoaded', boot);
       addCss('css/style.css');
       addCss('css/scenario-trainer.css');
       addCss('css/ui-enhancements.css');
       addCss('css/meta-model-redesign.css');
-      addScript('js/trainer-platform-contracts.js');
-      addScript('js/trainer-standalone.js', function () {
-        window.MetaTrainerStandalone.boot({
-          "trainerId": "scenario-trainer",
-          "manifestKey": "_scenario_trainer",
-          "css": [],
-          "scripts": ["js/scenario-trainer-app.js"]
-        });
-      });
     })();
-
-    function setupScenarioOnboarding() {
-      var onboardingDiv = document.getElementById('scenario-trainer-onboarding');
-      var onboardingBtn = document.getElementById('scenario-trainer-onboarding-btn');
-      var rootDiv = document.getElementById('scenario-trainer-root');
-
-      if (onboardingBtn) {
-        onboardingBtn.addEventListener('click', function () {
-          if (onboardingDiv) onboardingDiv.classList.add('hidden');
-          if (rootDiv) rootDiv.classList.add('hidden');
-        });
-      }
-    }
   </script>
 </head>
 <body>
