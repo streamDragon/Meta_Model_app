@@ -892,76 +892,7 @@
         ];
     }
 
-    function renderHomePreviewCards() {
-        const previewScenario = getHomePreviewScenario(state.homeFilters);
-        const draft = getSettingsDraft();
-        const toolRows = getScenarioHomeToolRows(draft);
-        const processSteps = Array.isArray(trainerContract.processSteps) ? trainerContract.processSteps.slice(0, 3) : [];
-        const homeSummary = buildSummary({
-            domain: draft.defaultDomain,
-            difficulty: draft.defaultDifficulty,
-            runSize: draft.defaultRunSize
-        });
-        return `
-          <div class="scenario-home-preview-grid">
-            ${previewScenario ? `
-              <article class="scenario-home-preview-card is-example" data-home-card="example">
-                <p class="scenario-home-kicker">דוגמת סצנה</p>
-                <h5>${escapeHtml(previewScenario.sceneTitle)} · ${escapeHtml(previewScenario.domainLabel)}</h5>
-                <p class="scenario-home-preview-copy">כך נשמעת כניסה טיפוסית למסלול שבחרת, לפני שבוחרים תגובה אחת ורואים לאן השיחה נפתחת.</p>
-                ${previewScenario.contextIntro ? `<p class="scenario-home-preview-copy">${escapeHtml(previewScenario.contextIntro)}</p>` : ''}
-                ${previewScenario.openingLine ? `<div class="scenario-home-preview-quote">"${escapeHtml(previewScenario.openingLine)}"</div>` : ''}
-                <div class="scenario-home-preview-chip-row">
-                  <span class="scenario-home-preview-chip">תחום: ${escapeHtml(previewScenario.domainLabel)}</span>
-                  <span class="scenario-home-preview-chip">רמה: ${escapeHtml(getDifficultyLabel(previewScenario.difficulty))}</span>
-                </div>
-              </article>
-            ` : ''}
-            <article class="scenario-home-preview-card is-tools" data-home-card="tools">
-              <p class="scenario-home-kicker">מה פתוח כרגע</p>
-              <h5>כלי העזר שיישארו זמינים במהלך האימון</h5>
-              <ul class="scenario-home-tools-list">
-                ${toolRows.map((row) => `<li>${escapeHtml(row)}</li>`).join('')}
-              </ul>
-              <div class="scenario-home-preview-chip-row">
-                <span class="scenario-home-preview-chip">ברירת מחדל: ${escapeHtml(homeSummary)}</span>
-              </div>
-            </article>
-            <article class="scenario-home-preview-card is-focus" data-home-card="focus">
-              <p class="scenario-home-kicker">מה נרצה לראות</p>
-              <h5>איך נראה סשן טוב אחד</h5>
-              <p class="scenario-home-preview-copy">לא מחפשים תשובה יפה, אלא תגובה שמורידה לחץ, מחזירה את השיחה למה שקורה בפועל, ופותחת צעד שאפשר לבדוק במציאות.</p>
-              <p class="scenario-home-preview-copy">אחרי הבחירה רואים מיד גם את ההשפעה הרגשית וגם את הכיוון להמשך, כדי ללמוד מתוך הסצנה ולא רק לסמן תשובה.</p>
-              <div class="scenario-home-preview-chip-row">
-                ${processSteps.map((step) => `<span class="scenario-home-preview-chip">${escapeHtml(step.shortLabel || step.label)}</span>`).join('')}
-              </div>
-            </article>
-          </div>
-        `;
-    }
-
-    function renderHomeClarityCards() {
-        const homeSummary = buildSummary(state.homeFilters);
-        return `
-          <section class="scenario-home-clarity-strip" aria-label="בהירות לפני התחלה">
-            <article class="scenario-home-clarity-card">
-              <p class="scenario-home-kicker">מה קורה בפועל</p>
-              <h5>נכנסים לסצנה אחת ובוחרים תגובה אחת</h5>
-              <p class="scenario-home-preview-copy">לא עוברים בין כמה מסלולים במקביל. שומעים פתיחת שיחה, בוחרים משפט אחד, ואז רואים מיד מה הוא פותח או סוגר.</p>
-            </article>
-            <article class="scenario-home-clarity-card">
-              <p class="scenario-home-kicker">למה לשים לב</p>
-              <h5>לא לתשובה "יפה" אלא לתשובה שמייצרת קרקע</h5>
-              <p class="scenario-home-preview-copy">תגובה טובה כאן מורידה לחץ, מחזירה את השיחה למה שקורה בפועל, ופותחת צעד שאפשר לבדוק במציאות ולא רק להרגיש.</p>
-            </article>
-            <article class="scenario-home-clarity-card">
-              <p class="scenario-home-kicker">מה מרוויחים</p>
-              <h5>משפט ירוק שאפשר לקחת לשיחה אמיתית</h5>
-              <p class="scenario-home-preview-copy">הסשן הנוכחי מכוון ל־${escapeHtml(homeSummary)}. כשמסיימים טוב, יוצאים עם ניסוח המשך, לקח, וכיוון ברור יותר לסצנה הבאה.</p>
-            </article>
-          </section>
-        `;
-    }
+    /* renderHomePreviewCards, renderHomeClarityCards — removed: replaced by integrated home sections */
 
     function getScenarioScoreNextHint(isLast) {
         return isLast
