@@ -144,6 +144,7 @@ const state = {
   index: 0,
   current: null,
   screen: 'onboarding',
+  overlay: '',
   step: 'context',
   selectedRow: 0,
   wrongRow: 0,
@@ -160,6 +161,38 @@ const state = {
   toastTimer: 0,
   els: null
 };
+
+const LIVING_TRIPLES_WELCOME_META = Object.freeze({
+  icon: '🧬',
+  title: 'שלשות חיות',
+  badge: 'עם ברין',
+  tone: 'advanced',
+  color: '#0f766e',
+  soft: '#ddf6f1',
+  description: 'אותו שלד פתיחה כמו שאר הפיצ׳רים: מבינים את המסלול, פותחים משפט חי, ואז נכנסים לטריינר עצמו.',
+  entryCards: Object.freeze([
+    Object.freeze({
+      kicker: 'מה עושים כאן',
+      title: 'לא מחפשים דפוס אחד אלא משפחה שלמה',
+      body: 'קוראים הקשר קצר, מזהים את השורה הנכונה מתוך חמש משפחות, ואז שואלים את כל שלוש השאלות של אותה שלשה.'
+    }),
+    Object.freeze({
+      kicker: 'למה זה חשוב',
+      title: 'כי השאלה השלישית תלויה בשתיים שלפניה',
+      body: 'השאלות כאן לא מבודדות. כל שאלה מזיזה עוד שכבה במשפט, עד שנוצרת נחיתה טיפולית ולא רק זיהוי טכני.'
+    }),
+    Object.freeze({
+      kicker: 'עם מה יוצאים',
+      title: 'Insight, reframing ושאלת המשך אחת',
+      body: 'בסוף כל סבב רואים מה המשפט החזיק מבפנים, מה השתנה בשפה, ואיזו שאלה אפשר לשאת הלאה לשיחה אמיתית.'
+    })
+  ]),
+  quote: Object.freeze({
+    text: 'לא שואלים כדי להוכיח. שואלים כדי לגלות מה מחזיק את המשפט מבפנים.',
+    author: 'Meta Model Gym'
+  }),
+  successNote: 'הצלחה במסלול הזה נראית כמו מעבר ממשפט כבד אחד, אל משפחה של דפוסים שאפשר לעבוד איתה צעד אחר צעד.'
+});
 
 function esc(v) {
   if (v === null || v === undefined) return '';
@@ -588,6 +621,30 @@ function currentStepIndex() {
   return Math.max(0, STEP_META.findIndex((item) => item.key === state.step));
 }
 
+function readGamificationSummary() {
+  try {
+    if (window.MetaGamification && typeof window.MetaGamification.getSummary === 'function') {
+      return window.MetaGamification.getSummary();
+    }
+  } catch (_) {}
+  return {
+    level: 1,
+    totalStars: 0,
+    streak: 0,
+    xp: 0,
+    xpProgressPct: 0,
+    levelTitle: 'צעד ראשון'
+  };
+}
+
+function isReturningUser() {
+  return !!state.prefs?.onboardingDone || Number(state.progress?.played || 0) > 0;
+}
+
+function welcomeCtaLabel() {
+  return isReturningUser() ? 'כניסה לתרגול' : 'יאללה, בואו נתחיל';
+}
+
 function getRowMeta(row) {
   const parsed = parseRow(row);
   const rowKey = String(parsed || '');
@@ -645,6 +702,7 @@ function loadCurrentScenario() {
 
 function beginPractice() {
   state.screen = 'practice';
+  state.overlay = '';
   state.prefs.onboardingDone = true;
   savePrefs();
   if (!state.current) loadCurrentScenario();
@@ -653,34 +711,37 @@ function beginPractice() {
 
 function showOnboarding() {
   state.screen = 'onboarding';
+  state.overlay = '';
   render();
+}
+
+function setOverlay(name = '') {
+
+  state.overlay = safeText(name);
+  document.body.classList.toggle('meta-shell-modal-open', !!state.overlay);
 }
 
 function resetProfile() {
   state.prefs.onboardingDone = false;
   savePrefs();
-  showToast('הפרופיל אופס. פתיחת ההדרכה תחזור בפעם הבאה.', 'info');
+  showToast('פתיחת המסלול תישאר זמינה גם בכניסה הבאה.', 'info');
   showOnboarding();
 }
 
 function openMap() {
-  if (!state.els.mapModal) return;
-  state.els.mapModal.classList.remove('hidden');
-  state.els.mapModal.removeAttribute('hidden');
-  document.body.classList.add('screen-guide-open');
+  setOverlay('map');
+  render();
 }
 
 function closeMap() {
-  if (!state.els.mapModal) return;
-  state.els.mapModal.classList.add('hidden');
-  state.els.mapModal.setAttribute('hidden', '');
-  document.body.classList.remove('screen-guide-open');
+  setOverlay('');
+  render();
 }
 
-function renderMap() {
-  if (!state.els.mapContent || !state.data?.triplesMap) return;
+function buildMapMarkup() {
+  if (!state.data?.triplesMap) return '';
   const rows = Object.keys(state.data.triplesMap.rows).map(Number).sort((a, b) => a - b);
-  state.els.mapContent.innerHTML = `
+  return `
     <div class="ltv3-map-grid">
       ${rows.map((row) => {
         const rowMeta = getRowMeta(row);
@@ -706,6 +767,10 @@ function renderMap() {
       }).join('')}
     </div>
   `;
+}
+
+function renderMap() {
+  return buildMapMarkup();
 }
 
 function advanceStep(stepKey) {
@@ -852,29 +917,8 @@ function buildChatMarkup(items, { allowHighlight = false } = {}) {
   }).join('');
 }
 
-function buildOnboardingMarkup() {
-  return `
-    <section class="ltv3-onboarding-card">
-      <p class="ltv3-kicker">שלשות חיות</p>
-      <h2>הקשר → זיהוי → 3 שאלות → שיקוף</h2>
-      <p class="ltv3-lead">המשפט לא נפתח דרך הסבר תיאורטי, אלא דרך שיחת WhatsApp טיפולית: קודם רואים הקשר, אחר כך בוחרים שורה, ואז שואלים את כל שלוש השאלות עד שנוצרת נחיתה.</p>
-      <ol class="ltv3-onboarding-list">
-        <li>קוראים את ההקשר ורואים איזה משפט מסומן לעבודה.</li>
-        <li>מזהים את השורה הנכונה מתוך 5 משפחות קומפקטיות.</li>
-        <li>שואלים את כל 3 השאלות של אותה שורה בתוך שיחת WhatsApp.</li>
-        <li>חושפים שיקוף, ריפריימינג ושאלת המשך, ואז רואים מה קרה כאן.</li>
-      </ol>
-      <div class="ltv3-inline-actions">
-        <button type="button" class="btn btn-primary" data-action="start-practice">התחל תרגול</button>
-        <button type="button" class="btn btn-secondary" data-action="open-map">מפת השלשות</button>
-        <button type="button" class="btn btn-secondary" data-action="reset-profile">שנה פרופיל</button>
-      </div>
-      <p class="ltv3-mini-stats">הושלמו עד עכשיו: <strong>${Number(state.progress?.played || 0)}</strong> · שיא נקודות: <strong>${Number(state.progress?.bestRound || 0)}</strong></p>
-    </section>
-  `;
-}
-
 function buildContextStage() {
+
   return `
     <section class="ltv3-stage-card">
       <div class="ltv3-stage-head">
@@ -1050,6 +1094,230 @@ function buildLandingStage() {
   `;
 }
 
+function buildWelcomeChromeTopMarkup() {
+
+  return `
+    <div class="meta-feature-chrome meta-feature-chrome--top">
+      <div class="meta-feature-chrome__bar meta-feature-chrome__bar--welcome">
+        <button type="button" class="btn btn-secondary meta-feature-chrome__btn" data-action="go-home">↩ חזרה</button>
+        <div class="meta-feature-chrome__title">
+          <strong>${esc(LIVING_TRIPLES_WELCOME_META.title)}</strong>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function buildWelcomeChromeBottomMarkup() {
+  const summary = readGamificationSummary();
+  return `
+    <div class="meta-feature-chrome meta-feature-chrome--bottom">
+      <div class="meta-feature-chrome__bar meta-feature-chrome__bar--welcome">
+        <div class="meta-feature-chrome__meta meta-feature-chrome__meta--welcome">
+          <span>רמה ${esc(summary.level)}</span>
+          <span>⭐ ${esc(summary.totalStars)}</span>
+          <span>🔥 ${esc(summary.streak)}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function buildWelcomeEntryCardsMarkup() {
+  return `
+    <section class="meta-feature-shell__entry-grid">
+      ${LIVING_TRIPLES_WELCOME_META.entryCards.map((card) => `
+        <article class="meta-feature-shell__entry-card">
+          <span class="meta-feature-shell__entry-kicker">${esc(card.kicker)}</span>
+          <strong class="meta-feature-shell__entry-title">${esc(card.title)}</strong>
+          <p class="meta-feature-shell__entry-copy">${esc(card.body)}</p>
+        </article>
+      `).join('')}
+    </section>
+  `;
+}
+
+function buildWelcomeExampleMarkup() {
+  const rowMeta = getRowMeta(state.current?.targetRow || 1);
+  const categories = rowMeta.categories.map((cat) => cat.labelHe).join(' · ');
+  const exampleSentence = safeText(state.current?.target, 'משפט לדוגמה יופיע כאן');
+  return `
+    <article class="meta-feature-shell__example-card">
+      <div class="meta-feature-shell__example-head">
+        <span>איך זה נראה בפועל</span>
+        <strong>משפט פתיחה למסלול</strong>
+      </div>
+      <p class="meta-feature-shell__example-sentence">${esc(exampleSentence)}</p>
+      <p class="meta-feature-shell__example-analysis">${esc(`${extractThemeName(rowMeta.title)} · ${categories}`)}</p>
+      <p class="meta-feature-shell__example-challenge"><strong>שאלת מיקוד:</strong> ${esc(rowMeta.insight || 'קודם מזהים את המשפחה, ואז פותחים את כל שלוש השאלות.')}</p>
+    </article>
+  `;
+}
+
+function buildWelcomeActionsMarkup() {
+  return `
+    <div class="meta-feature-shell__actions meta-feature-shell__actions--welcome">
+      <button type="button" class="meta-feature-shell__action-btn" data-action="open-guide">
+        <span class="meta-feature-shell__action-icon">🧭</span>
+        <span class="meta-feature-shell__action-label">איך עובדים</span>
+      </button>
+      <button type="button" class="meta-feature-shell__action-btn" data-action="open-map">
+        <span class="meta-feature-shell__action-icon">🗺️</span>
+        <span class="meta-feature-shell__action-label">מפת השלשות</span>
+      </button>
+      <button type="button" class="meta-feature-shell__action-btn" data-action="open-progress">
+        <span class="meta-feature-shell__action-icon">📊</span>
+        <span class="meta-feature-shell__action-label">התקדמות</span>
+      </button>
+    </div>
+  `;
+}
+
+function buildGuideOverlayMarkup() {
+  return `
+    <div class="meta-feature-modal__hero">
+      <span class="meta-feature-modal__avatar">${LIVING_TRIPLES_WELCOME_META.icon}</span>
+      <div class="meta-feature-modal__hero-copy">
+        <span class="meta-feature-modal__eyebrow">מסלול העבודה</span>
+        <h3>איך עובדים עם שלשות חיות</h3>
+        <p class="meta-feature-modal__lead">אותו שלד פתיחה כמו בשאר המערכת, אבל עם עומק של משפחות: הקשר, זיהוי, שלוש שאלות, ושיקוף.</p>
+      </div>
+    </div>
+    <section class="meta-feature-modal__surface meta-feature-modal__surface--tint">
+      <span class="meta-feature-modal__eyebrow">4 תחנות קצרות</span>
+      <p>1. קוראים את ההקשר ורואים איזה משפט מסומן לעבודה.</p>
+      <p>2. בוחרים את השורה הנכונה מתוך 5 משפחות של ברין.</p>
+      <p>3. פותחים את כל 3 השאלות של אותה שורה בתוך שיחת WhatsApp טיפולית.</p>
+      <p>4. נוחתים ל-insight, reframing ושאלת המשך אחת.</p>
+    </section>
+    <section class="meta-feature-modal__tip">
+      <strong>מה לא עושים כאן</strong>
+      <p>לא קופצים לקטגוריה בודדת. הערך של המסלול הוא לראות את השלשה כמשפחה אחת שעובדת יחד.</p>
+    </section>
+    <button type="button" class="btn btn-primary meta-feature-modal__cta" data-action="close-overlay">הבנתי, בואו נתחיל</button>
+  `;
+}
+
+function buildProgressOverlayMarkup() {
+  const summary = readGamificationSummary();
+  const played = Number(state.progress?.played || 0);
+  const bestRound = Number(state.progress?.bestRound || 0);
+  const totalScore = Number(state.progress?.totalScore || 0);
+  return `
+    <div class="meta-feature-modal__hero">
+      <span class="meta-feature-modal__avatar">📊</span>
+      <div class="meta-feature-modal__hero-copy">
+        <span class="meta-feature-modal__eyebrow">התקדמות</span>
+        <h3>איפה את/ה עומד/ת עכשיו</h3>
+        <p class="meta-feature-modal__lead">המספרים נשארים קומפקטיים בפתיחה, אבל כאן רואים את תמונת המצב המלאה.</p>
+      </div>
+    </div>
+    <section class="meta-feature-modal__surface">
+      <span class="meta-feature-modal__eyebrow">במסלול הזה</span>
+      <p>הושלמו <strong>${esc(played)}</strong> תרחישים.</p>
+      <p>שיא ניקוד לסבב: <strong>${esc(bestRound)}</strong>.</p>
+      <p>ניקוד מצטבר: <strong>${esc(totalScore)}</strong>.</p>
+    </section>
+    <section class="meta-feature-modal__surface meta-feature-modal__surface--tint">
+      <span class="meta-feature-modal__eyebrow">במערכת כולה</span>
+      <p>רמה <strong>${esc(summary.level)}</strong> · ${esc(summary.levelTitle || '')}</p>
+      <p>כוכבים <strong>${esc(summary.totalStars)}</strong> · רצף <strong>${esc(summary.streak)}</strong></p>
+      <p>XP מצטבר <strong>${esc(summary.xp)}</strong> · התקדמות לרמה הבאה <strong>${esc(summary.xpProgressPct)}%</strong></p>
+    </section>
+    <button type="button" class="btn btn-primary meta-feature-modal__cta" data-action="close-overlay">סגור</button>
+  `;
+}
+
+function buildMapOverlayMarkup() {
+  return `
+    <div class="meta-feature-modal__hero">
+      <span class="meta-feature-modal__avatar">🗺️</span>
+      <div class="meta-feature-modal__hero-copy">
+        <span class="meta-feature-modal__eyebrow">מפת השלשות</span>
+        <h3>כל 5 המשפחות במקום אחד</h3>
+        <p class="meta-feature-modal__lead">זו אותה טבלה שעומדת מאחורי התרגול. בפתיחה היא עוזרת להבין את השפה, ובאמצע סשן היא עוזרת להיזכר בכיוון.</p>
+      </div>
+    </div>
+    <section class="meta-feature-modal__surface meta-feature-modal__surface--tint">
+      ${buildMapMarkup()}
+    </section>
+    <section class="meta-feature-modal__tip">
+      <strong>איך להשתמש במפה</strong>
+      <p>אל תנסו לזכור הכול בבת אחת. בחרו קודם שורה אחת, ואז תנו לשלוש השאלות שלה לעשות את העבודה.</p>
+    </section>
+    <button type="button" class="btn btn-primary meta-feature-modal__cta" data-action="close-overlay">חזרה למסלול</button>
+  `;
+}
+
+function buildOverlayMarkup() {
+  if (!state.overlay) return '';
+  const titleMap = {
+    guide: 'איך עובדים',
+    map: 'מפת השלשות',
+    progress: 'התקדמות'
+  };
+  const bodyMap = {
+    guide: buildGuideOverlayMarkup(),
+    map: buildMapOverlayMarkup(),
+    progress: buildProgressOverlayMarkup()
+  };
+  const title = titleMap[state.overlay] || 'מידע';
+  const body = bodyMap[state.overlay] || '';
+  return `
+    <div class="meta-feature-modal" data-ltv3-overlay>
+      <div class="meta-feature-modal__backdrop" data-action="close-overlay"></div>
+      <article class="meta-feature-modal__dialog meta-feature-modal__dialog--sheet">
+        <header class="meta-feature-modal__header">
+          <strong class="meta-feature-modal__title">${esc(title)}</strong>
+          <button type="button" class="meta-feature-modal__close" data-action="close-overlay" aria-label="סגירה">✕</button>
+        </header>
+        <div class="meta-feature-modal__content">
+          ${body}
+        </div>
+      </article>
+    </div>
+  `;
+}
+
+function buildOnboardingMarkup() {
+  const completed = Number(state.progress?.played || 0);
+  const bestRound = Number(state.progress?.bestRound || 0);
+  const ctaLabel = welcomeCtaLabel();
+  const returningLead = isReturningUser()
+    ? `חוזרים לפתיחה אחידה ואז נכנסים בלחיצה אחת. עד עכשיו הושלמו ${completed} תרחישים, ושיא הניקוד הוא ${bestRound}.`
+    : 'כמו בשאר הפיצ׳רים, מתחילים במסך פתיחה אחיד עם כל המידע הרלוונטי, ואז לוחצים על כפתור אחד ונכנסים לטריינר.';
+  return `
+    <div class="ltv3-welcome-page">
+      ${buildWelcomeChromeTopMarkup()}
+      <section class="meta-feature-welcome-shell ltv3-welcome-shell">
+        <div class="meta-feature-shell__frame" style="--meta-feature-accent:${esc(LIVING_TRIPLES_WELCOME_META.color)};--meta-feature-soft:${esc(LIVING_TRIPLES_WELCOME_META.soft)};">
+          <section class="meta-feature-shell__hero">
+            <div class="meta-feature-shell__icon-wrap">
+              <span class="meta-feature-shell__icon">${LIVING_TRIPLES_WELCOME_META.icon}</span>
+            </div>
+            <div class="meta-feature-shell__hero-copy">
+              <span class="meta-feature-shell__badge" data-tone="${esc(LIVING_TRIPLES_WELCOME_META.tone)}">${esc(LIVING_TRIPLES_WELCOME_META.badge)}</span>
+              <h2>${esc(LIVING_TRIPLES_WELCOME_META.title)}</h2>
+              <p class="meta-feature-shell__hero-desc">${esc(LIVING_TRIPLES_WELCOME_META.description)}</p>
+              <p class="ltv3-welcome-note">${esc(returningLead)}</p>
+            </div>
+          </section>
+          ${buildWelcomeEntryCardsMarkup()}
+          ${buildWelcomeExampleMarkup()}
+          ${buildWelcomeActionsMarkup()}
+          <blockquote class="meta-feature-shell__quote meta-feature-shell__quote--compact">
+            <p>${esc(LIVING_TRIPLES_WELCOME_META.quote.text)}</p>
+            <cite>${esc(LIVING_TRIPLES_WELCOME_META.quote.author)}</cite>
+          </blockquote>
+          <p class="meta-feature-shell__success-note">${esc(LIVING_TRIPLES_WELCOME_META.successNote)}</p>
+          <button type="button" class="btn btn-primary meta-feature-shell__cta" data-action="start-practice">${esc(ctaLabel)}</button>
+        </div>
+      </section>
+      ${buildWelcomeChromeBottomMarkup()}
+    </div>
+  `;
+}
+
 function buildPracticeMarkup() {
   const completed = Number(state.progress?.played || 0);
   return `
@@ -1061,9 +1329,10 @@ function buildPracticeMarkup() {
           <span class="ltv3-pill">הושלמו <strong>${completed}</strong></span>
         </div>
         <div class="ltv3-pill-row">
+          <button type="button" class="btn btn-secondary" data-action="show-onboarding">פתיחה</button>
           <button type="button" class="btn btn-secondary" data-action="open-map">מפת השלשות</button>
+          <button type="button" class="btn btn-secondary" data-action="open-progress">התקדמות</button>
           <button type="button" class="btn btn-secondary" data-action="retry-scene">נסה שוב</button>
-          <button type="button" class="btn btn-secondary" data-action="reset-profile">שנה פרופיל</button>
         </div>
       </div>
       ${buildProgressMarkup()}
@@ -1079,6 +1348,7 @@ function buildShellMarkup() {
   return `
     <div class="ltv3-shell">
       ${state.screen === 'onboarding' ? buildOnboardingMarkup() : buildPracticeMarkup()}
+      ${buildOverlayMarkup()}
     </div>
   `;
 }
@@ -1097,10 +1367,30 @@ function queueChatScroll(selector) {
 }
 
 function handleRootClick(event) {
+
   const button = event.target.closest('[data-action]');
   if (!button) return;
   const action = button.getAttribute('data-action') || '';
+  if (action === 'go-home') {
+    window.location.href = 'index.html?tab=practice-triples-radar';
+    return;
+  }
   if (action === 'start-practice') return void beginPractice();
+  if (action === 'show-onboarding') return void showOnboarding();
+  if (action === 'open-guide') {
+    setOverlay('guide');
+    render();
+    return;
+  }
+  if (action === 'open-progress') {
+    setOverlay('progress');
+    render();
+    return;
+  }
+  if (action === 'close-overlay') {
+    closeMap();
+    return;
+  }
   if (action === 'open-map') return void openMap();
   if (action === 'reset-profile') return void resetProfile();
   if (action === 'go-identify') return void advanceStep('identify');
@@ -1116,25 +1406,14 @@ function handleRootClick(event) {
 
 function bindEvents() {
   state.els.root.addEventListener('click', handleRootClick);
-  state.els.mapModal?.addEventListener('click', (event) => {
-    if (event.target === state.els.mapModal) closeMap();
-  });
-  state.els.closeMapBtn?.addEventListener('click', closeMap);
-  state.els.openMapTopBtn?.addEventListener('click', openMap);
-  state.els.resetProfileTopBtn?.addEventListener('click', resetProfile);
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeMap();
+    if (event.key === 'Escape' && state.overlay) closeMap();
   });
 }
 
 function collectElements() {
   return {
     root: document.getElementById('ltv2-root'),
-    mapModal: document.getElementById('ltv2-map-modal'),
-    mapContent: document.getElementById('ltv2-map-content'),
-    closeMapBtn: document.getElementById('ltv2-close-map-btn'),
-    openMapTopBtn: document.getElementById('ltv2-open-map-top'),
-    resetProfileTopBtn: document.getElementById('ltv2-reset-profile-top'),
     toast: document.getElementById('ltv2-toast')
   };
 }
@@ -1152,8 +1431,8 @@ async function setupLivingTriplesModule() {
   }
 
   loadCurrentScenario();
-  state.screen = state.prefs.onboardingDone ? 'practice' : 'onboarding';
-  renderMap();
+  state.screen = 'onboarding';
+  setOverlay('');
   bindEvents();
   render();
 }

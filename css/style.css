@@ -18531,6 +18531,101 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
     gap: 14px;
 }
 
+.ltv3-root {
+    display: grid;
+    gap: 14px;
+}
+
+.ltv3-root.living-triples-card {
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+.ltv3-welcome-page {
+    display: grid;
+    gap: 12px;
+}
+
+.ltv3-welcome-page .meta-feature-welcome-shell {
+    width: min(100%, 760px);
+    margin: 0 auto;
+}
+
+.ltv3-welcome-page .meta-feature-shell__frame {
+    gap: 10px;
+    padding: 6px 0 8px;
+}
+
+.ltv3-welcome-page .meta-feature-shell__hero {
+    padding: 16px 18px 12px;
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 8px;
+    text-align: center;
+}
+
+.ltv3-welcome-page .meta-feature-shell__hero-copy {
+    justify-items: center;
+    gap: 4px;
+}
+
+.ltv3-welcome-page .meta-feature-shell__icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+}
+
+.ltv3-welcome-page .meta-feature-shell__icon {
+    font-size: 1.3rem;
+}
+
+.ltv3-welcome-page .meta-feature-shell__badge {
+    min-height: 22px;
+    padding-inline: 10px;
+    font-size: 0.68rem;
+}
+
+.ltv3-welcome-page .meta-feature-shell__hero-copy h2 {
+    font-size: clamp(1.1rem, 4vw, 1.35rem);
+    line-height: 1.1;
+}
+
+.ltv3-welcome-page .meta-feature-shell__hero-desc {
+    max-width: 28ch;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    margin: 0;
+    color: #475569;
+}
+
+.ltv3-welcome-note {
+    max-width: 32ch;
+    margin: 0;
+    color: #64748b;
+    font-size: 0.82rem;
+    line-height: 1.6;
+}
+
+.ltv3-welcome-page .meta-feature-shell__example-card {
+    padding: 12px 14px;
+    gap: 6px;
+    border-radius: 12px;
+}
+
+.ltv3-welcome-page .meta-feature-shell__example-sentence {
+    font-size: clamp(0.98rem, 2.6vw, 1.08rem);
+    line-height: 1.45;
+}
+
+.ltv3-welcome-page .meta-feature-shell__cta {
+    min-height: 52px;
+    border-radius: 999px;
+    font-size: 0.96rem;
+    width: 100%;
+}
+
 .ltv3-onboarding-card,
 .ltv3-stage-card {
     border: 1px solid rgba(15, 23, 42, 0.08);

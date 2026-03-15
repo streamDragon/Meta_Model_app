@@ -42,6 +42,7 @@
       document.addEventListener('DOMContentLoaded', boot);
       addCss('css/style.css');
       addCss('css/ui-enhancements.css');
+      addCss('css/meta-redesign-round3.css');
       addScript('js/gamification.js');
       addScript('js/living-triples.js', boot);
     })();
@@ -49,41 +50,16 @@
 </head>
 <body>
   <div class="container ltv2-page">
-    <header class="ltv2-header">
-      <div class="triples-kids-hero" role="img" aria-label="פרויקט שלשות">
-        <div class="triples-kids-hero-text">
-          <h3>פרויקט שלשות 🔬</h3>
-          <p>E = mc³ (שלשולוגיה)</p>
-        </div>
-      </div>
-      <h1>שלשות חיות</h1>
-      <p>הקשר → זיהוי → 3 שאלות → שיקוף. שיחת WhatsApp טיפולית שמחזיקה את כל המשפחה יחד.</p>
-      <div class="ltv2-header-actions">
-        <a class="btn btn-secondary" href="index.html?tab=practice-triples-radar">חזרה ל-Triples Radar באפליקציה</a>
-        <button id="ltv2-open-map-top" type="button" class="btn btn-secondary">מפת השלשות</button>
-        <button id="ltv2-reset-profile-top" type="button" class="btn btn-secondary">שנה פרופיל</button>
-      </div>
-    </header>
-
     <section id="living-triples" class="tab-content active practice-tab-content">
       <div class="practice-container">
-        <div id="ltv2-root" class="card practice-intro-card living-triples-card ltv2-root">
+        <div id="ltv2-root" class="ltv3-root living-triples-card">
           <div class="ltv2-onboarding" role="status" aria-live="polite">
             <h2>טוען/ת שלשות חיות…</h2>
-            <p>מכינים את שיחת ה־WhatsApp, טבלת השורות והתרחיש הראשון.</p>
+            <p>מכינים את שיחת ה-WhatsApp, טבלת השורות והתרחיש הראשון.</p>
           </div>
         </div>
       </div>
     </section>
-  </div>
-
-  <div id="ltv2-map-modal" class="ltv2-modal hidden" hidden role="dialog" aria-modal="true" aria-labelledby="ltv2-map-title">
-    <div class="ltv2-modal-card">
-      <button id="ltv2-close-map-btn" type="button" class="ltv2-modal-close" aria-label="סגירה">×</button>
-      <h3 id="ltv2-map-title">מפת השלשות</h3>
-      <p class="ltv2-sub">בזמן תרגול הטבלה מתקפלת. כאן אפשר להיזכר במבנה המלא.</p>
-      <div id="ltv2-map-content" class="ltv2-map-content"></div>
-    </div>
   </div>
 
   <div id="ltv2-toast" class="ltv2-toast hidden" aria-live="assertive"></div>
