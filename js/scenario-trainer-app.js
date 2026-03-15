@@ -1152,7 +1152,7 @@
                 <p><strong>שאלת העמקה:</strong> ${escapeHtml(scenario.deepeningQuestion)}</p>
               </div>
             </details>
-            <details class="scenario-meta-accordion">
+            <details class="scenario-meta-accordion" ${forceAnalysisOpen ? 'open' : ''}>
               <summary>ניתוח מעמיק — מפת פעולה</summary>
               <div class="scenario-meta-accordion-body">
                 ${renderBlueprintDetails(scenario, isGreen)}
