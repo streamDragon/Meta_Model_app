@@ -13,7 +13,6 @@
   <script>
     (function () {
       var v = String(Date.now());
-      var onboardingShown = false;
 
       function withV(path) {
         try {
@@ -32,24 +31,22 @@
         document.head.appendChild(link);
       }
 
-      function setupOnboarding() {
-        var onboardingDiv = document.getElementById('scenario-trainer-onboarding');
-        var onboardingBtn = document.getElementById('scenario-trainer-onboarding-btn');
-        var rootDiv = document.getElementById('scenario-trainer-root');
-
-        if (onboardingBtn && !onboardingShown) {
-          onboardingShown = true;
-          onboardingBtn.addEventListener('click', function () {
-            if (onboardingDiv) onboardingDiv.classList.add('hidden');
-            if (rootDiv) rootDiv.classList.add('hidden');
-          });
-        }
+      function startSimulator() {
+        var onboardingSection = document.getElementById('scenario-onboarding-section');
+        var appSection = document.getElementById('scenario-app-section');
+        if (onboardingSection) onboardingSection.style.display = 'none';
+        if (appSection) appSection.style.display = 'block';
       }
 
       function boot() {
         if (window.__scenarioTrainerBooted) return;
-        if (!document.getElementById('scenario-trainer-onboarding-btn')) return;
         window.__scenarioTrainerBooted = true;
+
+        var btn = document.getElementById('scenario-trainer-onboarding-btn');
+        if (btn) {
+          btn.addEventListener('click', startSimulator);
+        }
+
         window.MetaTrainerStandalone.boot({
           "trainerId": "scenario-trainer",
           "manifestKey": "_scenario_trainer",
@@ -61,7 +58,6 @@
           ],
           "scripts": ["js/scenario-trainer-app.js"]
         });
-        setupOnboarding();
       }
 
       document.addEventListener('DOMContentLoaded', boot);
@@ -73,31 +69,35 @@
   </script>
 </head>
 <body>
-  <div class="container ltv2-page">
-    <header class="ltv2-header">
-      <h1>סימולטור סצנות 🎭</h1>
-      <p>דיאלוג אנושי עם בחירה מודעת של תגובה</p>
-      <div class="ltv2-header-actions">
-        <a class="btn btn-secondary" href="index.html?tab=practice-verb-unzip">חזרה למרכז כלים באפליקציה</a>
-      </div>
-    </header>
+  <section id="scenario-onboarding-section" style="display: block;">
+    <div class="container ltv2-page">
+      <header class="ltv2-header">
+        <h1>סימולטור סצנות 🎭</h1>
+        <p>דיאלוג אנושי עם בחירה מודעת של תגובה</p>
+        <div class="ltv2-header-actions">
+          <a class="btn btn-secondary" href="index.html?tab=practice-verb-unzip">חזרה למרכז כלים באפליקציה</a>
+        </div>
+      </header>
 
-    <section id="scenario-trainer" class="tab-content active practice-tab-content">
-      <div class="practice-container">
-        <div id="scenario-trainer-root" class="card practice-intro-card living-triples-card">
-          <div id="scenario-trainer-onboarding" class="ltv2-onboarding" role="region" aria-label="הדרכת פתיחה">
-            <h2>איך עובדים כאן?</h2>
-            <ol>
-              <li>נכנסים לסצנה קצרה מתחומי חיים שונים (הורות, זוגיות, עבודה, וכו׳)</li>
-              <li>שומעים משפט אמיתי מהצד השני של השיחה</li>
-              <li>בוחרים תגובה אחת מארבע אפשרויות וכל אחת מנצחת בדרך שונה</li>
-              <li>רואים מיידית איך התגובה מתקבלת רגשית ומה היא פותחת או סוגרת בתהליך</li>
-            </ol>
-            <button id="scenario-trainer-onboarding-btn" type="button" class="btn btn-primary">התחל הדרכה</button>
+      <section class="tab-content active practice-tab-content">
+        <div class="practice-container">
+          <div class="card practice-intro-card living-triples-card">
+            <div class="ltv2-onboarding" role="region" aria-label="הדרכת פתיחה">
+              <h2>איך עובדים כאן?</h2>
+              <ol>
+                <li>נכנסים לסצנה קצרה מתחומי חיים שונים (הורות, זוגיות, עבודה, וכו׳)</li>
+                <li>שומעים משפט אמיתי מהצד השני של השיחה</li>
+                <li>בוחרים תגובה אחת מארבע אפשרויות וכל אחת מנצחת בדרך שונה</li>
+                <li>רואים מיידית איך התגובה מתקבלת רגשית ומה היא פותחת או סוגרת בתהליך</li>
+              </ol>
+              <button id="scenario-trainer-onboarding-btn" type="button" class="btn btn-primary">התחל הדרכה</button>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-  </div>
+      </section>
+    </div>
+  </section>
+
+  <section id="scenario-app-section" style="display: none;"></section>
 </body>
 </html>
