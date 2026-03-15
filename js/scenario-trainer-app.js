@@ -1105,30 +1105,61 @@
 
     function renderHomeScreen() {
         const hasHistory = state.progress.completed > 0;
+        const previewScenario = getHomePreviewScenario(state.homeFilters);
+        const processSteps = Array.isArray(trainerContract.processSteps) ? trainerContract.processSteps : [];
         return `
-          <section class="scenario-home-welcome scenario-workspace-card">
-            <div class="scenario-home-welcome-hero">
-              <span class="scenario-home-welcome-badge">מתקדמים</span>
-              <h3>סימולטור סצנות 🎭</h3>
-              <p class="scenario-home-lead">נכנסים לסצנה קצרה, שומעים משפט אמיתי מהצד השני, בוחרים תגובה אחת, ורואים איך היא מתקבלת רגשית ומה היא פותחת או סוגרת בתהליך.</p>
+          <section class="scenario-workspace-card scenario-home-card">
+
+            <div class="scenario-home-hero">
+              <h2>סימולטור סצנות</h2>
+              <p>נכנסים לסצנה, בוחרים תגובה אחת, רואים איך היא נוחתת.</p>
             </div>
 
-            <div class="scenario-home-steps">
-              <div class="scenario-home-step">
-                <span class="scenario-home-step-num">1</span>
-                <div><strong>נכנסים לסצנה</strong><p>בוחרים תחום — הורות, זוגיות, עבודה — ושומעים משפט אמיתי מהצד השני.</p></div>
-              </div>
-              <div class="scenario-home-step">
-                <span class="scenario-home-step-num">2</span>
-                <div><strong>בוחרים תגובה</strong><p>מבין חמש אפשרויות — אחת ירוקה, ארבע אדומות. כל אחת נוחתת אחרת.</p></div>
-              </div>
-              <div class="scenario-home-step">
-                <span class="scenario-home-step-num">3</span>
-                <div><strong>רואים מה קרה</strong><p>פידבק מיידי על ההשפעה הרגשית ומה הבחירה פתחה או סגרה.</p></div>
+            <div class="scenario-home-section">
+              <h4>למה זה חשוב</h4>
+              <p>רוב הטעויות בשיחה קורות לא בגלל כוונה רעה, אלא בגלל תגובה אוטומטית ברגע לחוץ. כאן מתרגלים לזהות את הרגע הזה ולבחור אחרת — בלי סיכון.</p>
+            </div>
+
+            <div class="scenario-home-section">
+              <h4>מה עושים כאן</h4>
+              <div class="scenario-home-steps">
+                <div class="scenario-home-step"><span class="scenario-home-step-num">1</span><div><strong>נכנסים לסצנה</strong><p>שומעים משפט אמיתי מהצד השני.</p></div></div>
+                <div class="scenario-home-step"><span class="scenario-home-step-num">2</span><div><strong>בוחרים תגובה</strong><p>אחת מתוך חמש — רק אחת פותחת בהירות.</p></div></div>
+                <div class="scenario-home-step"><span class="scenario-home-step-num">3</span><div><strong>רואים מה קרה</strong><p>פידבק מיידי על ההשפעה ועל מה שנפתח או נסגר.</p></div></div>
               </div>
             </div>
 
-            <div class="scenario-home-filters-compact">
+            ${previewScenario ? `
+            <div class="scenario-home-section scenario-home-example">
+              <h4>דוגמה קצרה</h4>
+              <p class="scenario-home-example-title">${escapeHtml(previewScenario.sceneTitle)} · ${escapeHtml(previewScenario.domainLabel)}</p>
+              ${previewScenario.openingLine ? `<blockquote class="scenario-home-example-quote">"${escapeHtml(previewScenario.openingLine)}"</blockquote>` : ''}
+              <p class="scenario-home-example-note">בסשן אמיתי תראו 5 תגובות אפשריות ותבחרו אחת.</p>
+            </div>` : ''}
+
+            <details class="scenario-home-details">
+              <summary>איך זה עובד — מפת התהליך</summary>
+              <div class="scenario-home-details-body">
+                ${processSteps.map((step) => `
+                  <div class="scenario-home-process-step">
+                    <strong>${escapeHtml(step.label)}</strong>
+                    <span>${escapeHtml(step.description)}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </details>
+
+            <div class="scenario-home-section">
+              <h4>מה בונים כאן</h4>
+              <div class="scenario-home-skills">
+                <span class="scenario-home-skill-chip">זיהוי תגובות אוטומטיות</span>
+                <span class="scenario-home-skill-chip">בחירת תגובה שפותחת בהירות</span>
+                <span class="scenario-home-skill-chip">קריאת השפעה רגשית</span>
+                <span class="scenario-home-skill-chip">בניית משפט ירוק לשיחה אמיתית</span>
+              </div>
+            </div>
+
+            <div class="scenario-home-cta-section">
               <div class="scenario-home-filter-row">
                 <label for="scenario-domain-select">תחום:</label>
                 <select id="scenario-domain-select">${renderDomainOptions(state.homeFilters.domain)}</select>
@@ -1137,19 +1168,19 @@
                 <label for="scenario-run-size">${escapeHtml(state.homeFilters.runSize)} סצנות:</label>
                 <input type="range" id="scenario-run-size" min="3" max="10" value="${escapeHtml(state.homeFilters.runSize)}" />
               </div>
+              <div class="scenario-home-cta-row">
+                <button id="scenario-start-run-btn" type="button" class="btn btn-primary" data-trainer-action="start-session">התחל סשן</button>
+                <button type="button" class="btn btn-secondary" data-trainer-action="open-settings">הגדרות</button>
+                ${hasHistory ? `<button type="button" class="btn btn-secondary" data-scenario-action="open-history">היסטוריה (${escapeHtml(state.progress.completed)})</button>` : ''}
+              </div>
+              ${hasHistory ? `
+              <div class="scenario-home-stats-row">
+                <span>${escapeHtml(state.progress.greenCount)} ירוקות</span>
+                <span>רצף: ${escapeHtml(state.progress.currentGreenStreak)}</span>
+                <span>שיא: ${escapeHtml(state.progress.bestGreenStreak)}</span>
+              </div>` : ''}
             </div>
 
-            <div class="scenario-home-cta-row">
-              <button id="scenario-start-run-btn" type="button" class="btn btn-primary scenario-home-start-btn" data-trainer-action="start-session">יאללה, בואו נתחיל ←</button>
-              ${hasHistory ? `<button type="button" class="btn btn-secondary" data-scenario-action="open-history">היסטוריה (${escapeHtml(state.progress.completed)})</button>` : ''}
-            </div>
-
-            ${hasHistory ? `
-            <div class="scenario-home-stats-row">
-              <span>✅ ${escapeHtml(state.progress.greenCount)} ירוקות</span>
-              <span>🔥 רצף נוכחי: ${escapeHtml(state.progress.currentGreenStreak)}</span>
-              <span>🏆 שיא: ${escapeHtml(state.progress.bestGreenStreak)}</span>
-            </div>` : ''}
           </section>
         `;
     }
@@ -1178,38 +1209,23 @@
               <p class="scenario-session-meta">נקודות: <span>${escapeHtml(state.session?.score || 0)}</span> | רצף ירוק: <span>${escapeHtml(state.session?.streak || 0)}</span></p>
             </div>
             <div class="progress-bar"><div class="progress-fill" style="width:${escapeHtml(progress)}%"></div></div>
-            ${renderFlowGuide()}
-            <div class="scenario-chat-shell">
-              <div class="scenario-scene-card">
-                <p class="scenario-scene-kicker">${escapeHtml(`${scenario.domainLabel} · בתפקיד ${scenario.role.player}`)}</p>
-                <h3>${escapeHtml(scenario.sceneTitle)}</h3>
-                <p class="scenario-context-intro">${escapeHtml(scenario.contextIntro)}</p>
-                <div class="scenario-relationship-row">
-                  <span class="scenario-role-chip">${escapeHtml(scenario.role.player)}</span>
-                  <span class="scenario-role-chip other">${escapeHtml(scenario.role.other)}</span>
-                </div>
+            <div class="scenario-scene-card">
+              <p class="scenario-scene-kicker">${escapeHtml(`${scenario.domainLabel} · ${scenario.role.player} מול ${scenario.role.other}`)}</p>
+              <h3>${escapeHtml(scenario.sceneTitle)}</h3>
+              <p class="scenario-context-intro">${escapeHtml(scenario.contextIntro)}</p>
+              <div class="scenario-bubble other">
+                <span class="scenario-bubble-speaker">${escapeHtml(scenario.role.other)}</span>
+                <p>${escapeHtml(scenario.openingLine)}</p>
+              </div>
+              <details class="scenario-scene-depth">
+                <summary>רקע נוסף על הסצנה</summary>
                 <div class="scenario-scene-meta">
-                  <div class="scenario-scene-meta-card">
-                    <span class="label">מה חשוב כאן</span>
-                    <p>${escapeHtml(scenario.humanNeed)}</p>
-                  </div>
-                  <div class="scenario-scene-meta-card">
-                    <span class="label">הקונפליקט הגלוי</span>
-                    <p>${escapeHtml(scenario.surfaceConflict)}</p>
-                  </div>
+                  <div class="scenario-scene-meta-card"><span class="label">מה חשוב כאן</span><p>${escapeHtml(scenario.humanNeed)}</p></div>
+                  <div class="scenario-scene-meta-card"><span class="label">הקונפליקט הגלוי</span><p>${escapeHtml(scenario.surfaceConflict)}</p></div>
                 </div>
-              </div>
-              <div class="scenario-story-card">
-                <div class="scenario-chat-thread">
-                  <div class="scenario-bubble other">
-                    <span class="scenario-bubble-speaker">${escapeHtml(scenario.role.other)}</span>
-                    <p>${escapeHtml(scenario.openingLine)}</p>
-                  </div>
-                </div>
-              </div>
+              </details>
             </div>
             <h4 class="scenario-options-title">מה תגיד/י עכשיו?</h4>
-            <p class="scenario-options-subtitle">בחר/י תגובה אחת שהכי מקדמת קשר, בהירות וצעד בדיקה.</p>
             <div id="scenario-options-container" class="scenario-options-container">
               ${options.map((option) => renderOptionButton(option, Number(option.score) === 1)).join('')}
             </div>
