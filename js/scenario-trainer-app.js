@@ -1152,40 +1152,52 @@
     }
 
     function renderHomeScreen() {
+        const hasHistory = state.progress.completed > 0;
         return `
-          <section class="scenario-start-card scenario-home-setup-card scenario-workspace-card">
-            <div class="scenario-home-section-head">
-              <div>
-                <p class="scenario-home-kicker">כיוון הסשן</p>
-                <h4>כך ייראה הסבב הבא</h4>
-                <p class="scenario-home-preview-copy">כאן אפשר לכוון את הסשן, לראות דוגמת כניסה, ולהבין אילו כלים יישארו פתוחים לאורך האימון בלי לעבור למסך פתיחה נפרד.</p>
+          <section class="scenario-home-welcome scenario-workspace-card">
+            <div class="scenario-home-welcome-hero">
+              <span class="scenario-home-welcome-badge">מתקדמים</span>
+              <h3>סימולטור סצנות 🎭</h3>
+              <p class="scenario-home-lead">נכנסים לסצנה קצרה, שומעים משפט אמיתי מהצד השני, בוחרים תגובה אחת, ורואים איך היא מתקבלת רגשית ומה היא פותחת או סוגרת בתהליך.</p>
+            </div>
+
+            <div class="scenario-home-steps">
+              <div class="scenario-home-step">
+                <span class="scenario-home-step-num">1</span>
+                <div><strong>נכנסים לסצנה</strong><p>בוחרים תחום — הורות, זוגיות, עבודה — ושומעים משפט אמיתי מהצד השני.</p></div>
               </div>
-              <div class="scenario-home-stats">
-                <div class="scenario-stat-item">סצנות שהושלמו: ${escapeHtml(state.progress.completed)}</div>
-                <div class="scenario-stat-item">בחירות ירוקות: ${escapeHtml(state.progress.greenCount)}</div>
-                <div class="scenario-stat-item">רצף ירוק נוכחי: ${escapeHtml(state.progress.currentGreenStreak)}</div>
-                <div class="scenario-stat-item">רצף ירוק מיטבי: ${escapeHtml(state.progress.bestGreenStreak)}</div>
+              <div class="scenario-home-step">
+                <span class="scenario-home-step-num">2</span>
+                <div><strong>בוחרים תגובה</strong><p>מבין חמש אפשרויות — אחת ירוקה, ארבע אדומות. כל אחת נוחתת אחרת.</p></div>
+              </div>
+              <div class="scenario-home-step">
+                <span class="scenario-home-step-num">3</span>
+                <div><strong>רואים מה קרה</strong><p>פידבק מיידי על ההשפעה הרגשית ומה הבחירה פתחה או סגרה.</p></div>
               </div>
             </div>
-            <div class="blueprint-questions scenario-pick-grid scenario-start-grid">
-              <div class="q-card">
-                <label for="scenario-domain-select">תחום</label>
+
+            <div class="scenario-home-filters-compact">
+              <div class="scenario-home-filter-row">
+                <label for="scenario-domain-select">תחום:</label>
                 <select id="scenario-domain-select">${renderDomainOptions(state.homeFilters.domain)}</select>
-              </div>
-              <div class="q-card">
-                <label for="scenario-difficulty-select">רמה</label>
+                <label for="scenario-difficulty-select">רמה:</label>
                 <select id="scenario-difficulty-select">${renderDifficultyOptions(state.homeFilters.difficulty)}</select>
-              </div>
-              <div class="q-card">
-                <label for="scenario-run-size">כמה סצנות?</label>
+                <label for="scenario-run-size">${escapeHtml(state.homeFilters.runSize)} סצנות:</label>
                 <input type="range" id="scenario-run-size" min="3" max="10" value="${escapeHtml(state.homeFilters.runSize)}" />
-                <span id="scenario-run-size-value">${escapeHtml(state.homeFilters.runSize)}</span>
               </div>
             </div>
-            ${renderHomeClarityCards()}
-            ${renderHomePreviewCards()}
-            <p class="scenario-home-footnote">הצלחה בסשן אחד נראית כמו תגובה שמקדמת יותר קשר, פחות עמימות, וצעד הבא שאפשר לבדוק במציאות.</p>
-            <p class="scenario-feedback-next-hint">${escapeHtml(getScenarioHomeEntryHint())}</p>
+
+            <div class="scenario-home-cta-row">
+              <button id="scenario-start-run-btn" type="button" class="btn btn-primary scenario-home-start-btn" data-trainer-action="start-session">יאללה, בואו נתחיל ←</button>
+              ${hasHistory ? `<button type="button" class="btn btn-secondary" data-scenario-action="open-history">היסטוריה (${escapeHtml(state.progress.completed)})</button>` : ''}
+            </div>
+
+            ${hasHistory ? `
+            <div class="scenario-home-stats-row">
+              <span>✅ ${escapeHtml(state.progress.greenCount)} ירוקות</span>
+              <span>🔥 רצף נוכחי: ${escapeHtml(state.progress.currentGreenStreak)}</span>
+              <span>🏆 שיא: ${escapeHtml(state.progress.bestGreenStreak)}</span>
+            </div>` : ''}
           </section>
         `;
     }
