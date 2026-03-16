@@ -28283,3 +28283,465 @@ header h1 {
 #comic-engine .ceflow-choice-deck--arc .ceflow-choice.is-selected::after {
     content: none !important;
 }
+
+/* Sentence Map result-stage refactor */
+.sentence-map-stage-card--decision,
+.sentence-map-stage-card--reformulation {
+    --sm-bg: linear-gradient(180deg, #07111f 0%, #0b1730 100%);
+    --sm-surface: rgba(10, 20, 40, 0.72);
+    --sm-surface-strong: rgba(12, 24, 48, 0.88);
+    --sm-border: rgba(148, 163, 184, 0.16);
+    --sm-text: #f8fbff;
+    --sm-text-soft: rgba(232, 240, 255, 0.74);
+    --sm-accent: #47c7ff;
+    --sm-yes: #36d399;
+    --sm-no: #fb7185;
+    --sm-glow: 0 16px 40px rgba(0, 0, 0, 0.22);
+    --sm-blur: blur(12px);
+    --sm-radius: 22px;
+    gap: clamp(18px, 2.4vw, 26px);
+    padding: clamp(20px, 3vw, 30px);
+    border: 1px solid var(--sm-border);
+    background:
+        radial-gradient(circle at 12% 10%, rgba(71, 199, 255, 0.18), transparent 28%),
+        radial-gradient(circle at 86% 84%, rgba(54, 211, 153, 0.12), transparent 24%),
+        var(--sm-bg);
+    box-shadow: var(--sm-glow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    color: var(--sm-text);
+}
+
+.sentence-map-stage-card--decision .sentence-map-stage-header,
+.sentence-map-stage-card--reformulation .sentence-map-stage-header {
+    gap: 10px;
+}
+
+.sentence-map-stage-card--decision .sentence-map-stage-kicker,
+.sentence-map-stage-card--reformulation .sentence-map-stage-kicker {
+    color: rgba(71, 199, 255, 0.88);
+}
+
+.sentence-map-stage-card--decision h2,
+.sentence-map-stage-card--reformulation h2 {
+    color: var(--sm-text);
+}
+
+.sentence-map-stage-card--decision .sentence-map-stage-note,
+.sentence-map-stage-card--reformulation .sentence-map-stage-note {
+    max-width: 70ch;
+    color: var(--sm-text-soft);
+}
+
+.sentence-map-result-context,
+.sentence-map-decision-primary,
+.sentence-map-decision-detail-grid,
+.sentence-map-reform-summary,
+.sentence-map-reform-strengths,
+.sentence-map-reform-actions {
+    display: grid;
+    gap: 14px;
+}
+
+.sentence-map-result-context {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sentence-map-result-context__item,
+.sentence-map-decision-rationale,
+.sentence-map-decision-purpose,
+.sentence-map-decision-note,
+.sentence-map-reform-zone {
+    border: 1px solid var(--sm-border);
+    border-radius: var(--sm-radius);
+    background: var(--sm-surface);
+    backdrop-filter: var(--sm-blur);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), var(--sm-glow);
+}
+
+.sentence-map-result-context__item {
+    display: grid;
+    gap: 10px;
+    min-height: 100%;
+    padding: 16px 18px;
+}
+
+.sentence-map-result-context__item--focus {
+    background:
+        radial-gradient(circle at 88% 20%, rgba(71, 199, 255, 0.12), transparent 28%),
+        var(--sm-surface);
+}
+
+.sentence-map-result-context__item span,
+.sentence-map-decision-card__label,
+.sentence-map-decision-block__head span,
+.sentence-map-reform-zone__head span,
+.sentence-map-reform-strength-card span,
+.sentence-map-reform-next-step span,
+.sentence-map-stage-card--reformulation .sentence-map-checklist-card > span {
+    color: var(--sm-text-soft);
+    font-size: 0.82rem;
+    font-weight: 900;
+    letter-spacing: 0.01em;
+}
+
+.sentence-map-result-context__item strong {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: var(--sm-text);
+    font-size: clamp(1.05rem, 2.1vw, 1.3rem);
+    line-height: 1.75;
+}
+
+.sentence-map-result-context__item p,
+.sentence-map-decision-rationale__row p,
+.sentence-map-decision-card__hint,
+.sentence-map-decision-question__purpose,
+.sentence-map-decision-question__helper,
+.sentence-map-decision-purpose__row p,
+.sentence-map-decision-purpose__row small,
+.sentence-map-decision-note p,
+.sentence-map-reform-next-step p,
+.sentence-map-stage-card--reformulation .sentence-map-soft-note,
+.sentence-map-stage-card--reformulation .sentence-map-checklist-card li {
+    margin: 0;
+    color: var(--sm-text-soft);
+    line-height: 1.72;
+}
+
+.sentence-map-decision-primary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sentence-map-decision-card {
+    min-height: 188px;
+    padding: 22px;
+    border: 1px solid var(--sm-border);
+    border-radius: calc(var(--sm-radius) + 2px);
+    display: grid;
+    gap: 14px;
+    box-shadow: 0 18px 34px rgba(2, 8, 23, 0.26);
+}
+
+.sentence-map-decision-card__top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sentence-map-decision-card__icon {
+    width: 44px;
+    height: 44px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 999px;
+    font-size: 1.18rem;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+
+.sentence-map-decision-card__value {
+    color: var(--sm-text);
+    font-size: clamp(1.18rem, 2.3vw, 1.72rem);
+    line-height: 1.5;
+}
+
+.sentence-map-decision-card--do {
+    border-color: rgba(54, 211, 153, 0.3);
+    background:
+        radial-gradient(circle at 84% 14%, rgba(54, 211, 153, 0.18), transparent 26%),
+        linear-gradient(160deg, rgba(17, 57, 54, 0.9), rgba(10, 20, 40, 0.94));
+}
+
+.sentence-map-decision-card--avoid {
+    border-color: rgba(251, 113, 133, 0.28);
+    background:
+        radial-gradient(circle at 14% 16%, rgba(251, 113, 133, 0.18), transparent 26%),
+        linear-gradient(160deg, rgba(72, 23, 39, 0.88), rgba(10, 20, 40, 0.94));
+}
+
+.sentence-map-decision-card--do .sentence-map-decision-card__icon {
+    background: rgba(54, 211, 153, 0.14);
+    color: var(--sm-yes);
+}
+
+.sentence-map-decision-card--avoid .sentence-map-decision-card__icon {
+    background: rgba(251, 113, 133, 0.16);
+    color: var(--sm-no);
+}
+
+.sentence-map-decision-question {
+    display: grid;
+    gap: 14px;
+    padding: 20px 22px;
+    border: 1px solid rgba(71, 199, 255, 0.24);
+    border-radius: calc(var(--sm-radius) + 2px);
+    background:
+        radial-gradient(circle at 90% 12%, rgba(71, 199, 255, 0.18), transparent 26%),
+        linear-gradient(145deg, rgba(15, 52, 79, 0.92), rgba(12, 24, 48, 0.96));
+    box-shadow: 0 18px 36px rgba(5, 19, 39, 0.28);
+}
+
+.sentence-map-decision-question__text {
+    margin: 0;
+    color: var(--sm-text);
+    font-size: clamp(1.32rem, 2.8vw, 2rem);
+    line-height: 1.7;
+    font-weight: 800;
+}
+
+.sentence-map-decision-question__purpose strong {
+    color: var(--sm-accent);
+}
+
+.sentence-map-decision-question__helper {
+    font-size: 0.96rem;
+}
+
+.sentence-map-decision-detail-grid {
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+    align-items: start;
+}
+
+.sentence-map-decision-rationale,
+.sentence-map-decision-purpose,
+.sentence-map-decision-note,
+.sentence-map-reform-zone {
+    padding: 18px 20px;
+}
+
+.sentence-map-decision-block__head,
+.sentence-map-reform-zone__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sentence-map-decision-block__head small {
+    color: var(--sm-text-soft);
+    font-size: 0.82rem;
+    font-weight: 700;
+    max-width: 46ch;
+}
+
+.sentence-map-decision-rationale__rows,
+.sentence-map-decision-purpose__rows {
+    display: grid;
+    gap: 10px;
+}
+
+.sentence-map-decision-rationale__row {
+    display: grid;
+    grid-template-columns: minmax(132px, 168px) minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+    padding: 12px 14px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.sentence-map-decision-rationale__row strong,
+.sentence-map-decision-purpose__row strong,
+.sentence-map-reform-strength-card strong,
+.sentence-map-reform-next-step strong,
+.sentence-map-stage-card--reformulation .sentence-map-checklist-card strong {
+    color: var(--sm-text);
+}
+
+.sentence-map-decision-purpose__row {
+    display: grid;
+    gap: 6px;
+    padding: 13px 14px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border-inline-start: 3px solid rgba(71, 199, 255, 0.28);
+}
+
+.sentence-map-decision-purpose__row--imagery {
+    border-inline-start-color: rgba(96, 165, 250, 0.52);
+}
+
+.sentence-map-decision-purpose__row--clarification {
+    border-inline-start-color: rgba(71, 199, 255, 0.52);
+}
+
+.sentence-map-decision-purpose__row--reflective {
+    border-inline-start-color: rgba(251, 113, 133, 0.46);
+}
+
+.sentence-map-decision-purpose__row--reframing {
+    border-inline-start-color: rgba(250, 204, 21, 0.5);
+}
+
+.sentence-map-decision-note {
+    border-inline-start: 4px solid rgba(71, 199, 255, 0.58);
+    background:
+        linear-gradient(135deg, rgba(71, 199, 255, 0.12), rgba(10, 20, 40, 0.88)),
+        var(--sm-surface);
+}
+
+.sentence-map-reform-summary {
+    gap: 16px;
+}
+
+.sentence-map-reform-zone--wording {
+    background:
+        radial-gradient(circle at 88% 12%, rgba(71, 199, 255, 0.14), transparent 24%),
+        rgba(12, 24, 48, 0.9);
+}
+
+.sentence-map-reform-zone__head strong {
+    color: var(--sm-text);
+    font-size: 1rem;
+}
+
+.sentence-map-reform-zone__head--paragraph {
+    align-items: center;
+}
+
+.sentence-map-reform-strengths {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sentence-map-reform-strength-card,
+.sentence-map-stage-card--reformulation .sentence-map-checklist-card,
+.sentence-map-reform-next-step,
+.sentence-map-therapist-wording {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.sentence-map-reform-strength-card {
+    display: grid;
+    gap: 10px;
+    min-height: 100%;
+    padding: 15px 16px;
+}
+
+.sentence-map-reform-strength-card--inside {
+    background: linear-gradient(160deg, rgba(251, 146, 60, 0.14), rgba(255, 255, 255, 0.05));
+}
+
+.sentence-map-reform-strength-card--outside {
+    background: linear-gradient(160deg, rgba(56, 189, 248, 0.14), rgba(255, 255, 255, 0.05));
+}
+
+.sentence-map-reform-strength-card--gap {
+    background: linear-gradient(160deg, rgba(251, 113, 133, 0.14), rgba(255, 255, 255, 0.05));
+}
+
+.sentence-map-reform-strength-card--action {
+    background: linear-gradient(160deg, rgba(54, 211, 153, 0.14), rgba(255, 255, 255, 0.05));
+}
+
+.sentence-map-therapist-wording {
+    padding: 18px 20px;
+}
+
+.sentence-map-therapist-wording p {
+    margin: 0;
+    color: var(--sm-text);
+    font-size: clamp(1.06rem, 2.1vw, 1.28rem);
+    line-height: 1.9;
+}
+
+.sentence-map-therapist-wording p + p {
+    margin-top: 12px;
+}
+
+.sentence-map-reform-next-step {
+    display: grid;
+    gap: 10px;
+    padding: 16px 18px;
+    background: linear-gradient(160deg, rgba(54, 211, 153, 0.12), rgba(255, 255, 255, 0.05));
+}
+
+.sentence-map-stage-card--reformulation .sentence-map-checklist-card {
+    display: grid;
+    gap: 12px;
+    padding: 16px 18px;
+    box-shadow: none;
+}
+
+.sentence-map-stage-card--reformulation .sentence-map-checklist-card ul {
+    margin: 0;
+    padding-inline-start: 18px;
+}
+
+.sentence-map-stage-card--reformulation .sentence-map-checklist-card li::before {
+    color: var(--sm-yes);
+}
+
+.sentence-map-stage-card--reformulation .sentence-map-inline-btn {
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--sm-text);
+    box-shadow: none;
+}
+
+.sentence-map-stage-card--reformulation .sentence-map-summary-card__button {
+    min-width: 220px;
+    border: 0;
+    background: linear-gradient(135deg, #36d399, #0ea5e9);
+    box-shadow: 0 14px 28px rgba(14, 165, 233, 0.24);
+}
+
+.sentence-map-stage-card--reformulation .sentence-map-summary-card__button:hover,
+.sentence-map-stage-card--reformulation .sentence-map-inline-btn:not(:disabled):hover {
+    transform: translateY(-1px);
+}
+
+@media (min-width: 1100px) {
+    .sentence-map-reform-strengths {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 919px) {
+    .sentence-map-result-context,
+    .sentence-map-decision-primary,
+    .sentence-map-decision-detail-grid,
+    .sentence-map-reform-strengths {
+        grid-template-columns: 1fr;
+    }
+
+    .sentence-map-decision-card {
+        min-height: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .sentence-map-stage-card--decision,
+    .sentence-map-stage-card--reformulation {
+        padding: 16px;
+        gap: 14px;
+    }
+
+    .sentence-map-result-context__item,
+    .sentence-map-decision-question,
+    .sentence-map-decision-rationale,
+    .sentence-map-decision-purpose,
+    .sentence-map-decision-note,
+    .sentence-map-reform-zone {
+        padding: 15px 16px;
+    }
+
+    .sentence-map-decision-rationale__row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .sentence-map-reform-zone__head--paragraph {
+        align-items: flex-start;
+    }
+
+    .sentence-map-stage-card--reformulation .sentence-map-inline-btn,
+    .sentence-map-stage-card--reformulation .sentence-map-summary-card__button {
+        width: 100%;
+    }
+}

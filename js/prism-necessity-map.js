@@ -41,6 +41,7 @@
         Object.freeze({ id: 'reflect', label: 'שיקוף' }),
         Object.freeze({ id: 'summary', label: 'סיכום' })
     ]);
+    const EMBEDDED_STAGES = Object.freeze(STAGES.filter((stage) => stage.id !== 'intro'));
 
     function escapeHtml(value) {
         return String(value ?? '')
@@ -95,6 +96,19 @@
 
     function getQuestionKey(question) {
         return `${question.level}:${question.side}`;
+    }
+
+    function getInitialStage(mode = 'embedded') {
+        return mode === 'standalone' ? 'intro' : 'build';
+    }
+
+    function getVisibleStages(state) {
+        return state.mode === 'standalone' ? STAGES : EMBEDDED_STAGES;
+    }
+
+    function getEffectiveStage(state) {
+        if (state.mode !== 'standalone' && state.stage === 'intro') return 'build';
+        return state.stage;
     }
 
     function sortQuestions(rawQuestions) {
@@ -174,17 +188,19 @@
     }
 
     function createState(root) {
+        const mode = root.getAttribute('data-prism-necessity-mode') || 'embedded';
         return {
             root,
-            mode: root.getAttribute('data-prism-necessity-mode') || 'embedded',
+            mode,
             loaded: false,
             error: '',
             exercises: [],
             exerciseIndex: 0,
-            stage: 'intro',
+            stage: getInitialStage(mode),
             questionIndex: 0,
             reflectionIndex: 0,
-            cells: {}
+            cells: {},
+            mapOverlayOpen: false
         };
     }
 
@@ -212,18 +228,21 @@
         return 'crack';
     }
 
-    function getStageIndex(stage) {
-        return Math.max(0, STAGES.findIndex((item) => item.id === stage));
+    function getStageIndex(state) {
+        const stages = getVisibleStages(state);
+        const activeStage = getEffectiveStage(state);
+        return Math.max(0, stages.findIndex((item) => item.id === activeStage));
     }
 
     function resetExercise(state, nextIndex) {
         if (Number.isInteger(nextIndex)) {
             state.exerciseIndex = ((nextIndex % state.exercises.length) + state.exercises.length) % state.exercises.length;
         }
-        state.stage = 'intro';
+        state.stage = getInitialStage(state.mode);
         state.questionIndex = 0;
         state.reflectionIndex = 0;
         state.cells = {};
+        state.mapOverlayOpen = false;
     }
 
     function revealAnswer(state) {
@@ -263,13 +282,14 @@
     }
 
     function renderStageRail(state, exercise) {
-        const stageIndex = getStageIndex(state.stage);
+        const stages = getVisibleStages(state);
+        const stageIndex = getStageIndex(state);
         const questionTotal = exercise.questions.length;
         const answeredCount = getAnsweredCount(state);
 
         return `
             <div class="pnm-stage-rail" aria-label="מפת שלבים">
-                ${STAGES.map((stage, index) => `
+                ${stages.map((stage, index) => `
                     <div class="pnm-stage-pill${index < stageIndex ? ' is-done' : ''}${index === stageIndex ? ' is-active' : ''}">
                         <span class="pnm-stage-pill-index">${index + 1}</span>
                         <strong>${escapeHtml(stage.label)}</strong>
@@ -377,8 +397,9 @@
 
     function renderMap(state, exercise, options = {}) {
         const showBadges = !!options.showBadges;
+        const mapClass = `pnm-map-card${options.compact ? ' pnm-map-card--compact' : ''}${options.overlay ? ' pnm-map-card--overlay' : ''}`;
         return `
-            <section class="pnm-map-card">
+            <section class="${mapClass}">
                 <div class="pnm-map-sentence">
                     <span class="pnm-label">המשפט במרכז</span>
                     <strong>"${escapeHtml(exercise.sentence)}"</strong>
@@ -420,8 +441,72 @@
         `;
     }
 
-    function renderQuestionCard(state, exercise) {
+    function renderActionButtons(actions, className = '') {
+        const safeActions = Array.isArray(actions) ? actions.filter(Boolean) : [];
+        if (!safeActions.length) return '';
+        const safeClass = className ? ` ${className}` : '';
+        return `
+            <div class="pnm-actions${safeClass}">
+                ${safeActions.map((action) => `
+                    <button
+                        type="button"
+                        class="pnm-btn ${action.tone === 'ghost' ? 'pnm-btn--ghost' : 'pnm-btn--primary'}"
+                        data-action="${escapeHtml(action.id)}"
+                    >${escapeHtml(action.label)}</button>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    function renderToolbar(copy, actions) {
+        return `
+            <section class="pnm-toolbar">
+                <div class="pnm-toolbar-copy">
+                    <span class="pnm-toolbar-kicker">${escapeHtml(copy?.kicker || 'מסלול עבודה')}</span>
+                    <strong>${escapeHtml(copy?.title || '')}</strong>
+                    ${copy?.detail ? `<small>${escapeHtml(copy.detail)}</small>` : ''}
+                </div>
+                ${renderActionButtons(actions, 'pnm-actions--desktop pnm-actions--toolbar')}
+            </section>
+        `;
+    }
+
+    function getBuildActions(state, exercise) {
+        if (!getCurrentQuestion(state)) {
+            return [
+                { id: 'go-reflect', label: 'שיקוף + גרעין + סדק', tone: 'primary' },
+                { id: 'restart-exercise', label: 'התחל מחדש', tone: 'ghost' },
+                { id: 'next-exercise', label: 'משפט אחר', tone: 'ghost' }
+            ];
+        }
+        return [
+            { id: 'reveal-answer', label: 'חשוף את התשובה במפה', tone: 'primary' },
+            { id: 'restart-exercise', label: 'התחל מחדש', tone: 'ghost' },
+            { id: 'next-exercise', label: 'משפט אחר', tone: 'ghost' }
+        ];
+    }
+
+    function getReflectionActions(state, exercise) {
+        const script = buildReflectionScript(exercise);
+        const isDone = state.reflectionIndex >= script.length;
+        return [
+            { id: isDone ? 'go-summary' : 'reveal-reflection', label: isDone ? 'לסיכום' : 'הודעה הבאה', tone: 'primary' },
+            { id: 'open-map-overlay', label: 'מפת הרמות', tone: 'ghost' },
+            { id: 'restart-exercise', label: 'התחל מחדש', tone: 'ghost' }
+        ];
+    }
+
+    function getSummaryActions() {
+        return [
+            { id: 'next-exercise', label: 'משפט הבא', tone: 'primary' },
+            { id: 'open-map-overlay', label: 'מפת הרמות', tone: 'ghost' },
+            { id: 'restart-exercise', label: 'נסה שוב', tone: 'ghost' }
+        ];
+    }
+
+    function renderQuestionCard(state, exercise, options = {}) {
         const question = getCurrentQuestion(state);
+        const mobileActions = Array.isArray(options.actions) ? options.actions : [];
         if (!question) {
             return `
                 <section class="pnm-question-card pnm-question-card--done">
@@ -433,10 +518,7 @@
                         <div class="pnm-progress-ring">${exercise.questions.length}/${exercise.questions.length}</div>
                     </div>
                     <p class="pnm-copy">כל 12 החוליות נחשפו. אפשר לעבור לשיקוף, לזהות את הגרעין, ולחפש איפה כבר יש סדק לשינוי.</p>
-                    <div class="pnm-actions">
-                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="go-reflect">שיקוף + גרעין + סדק</button>
-                        <button type="button" class="pnm-btn pnm-btn--ghost" data-action="restart-exercise">התחל מחדש</button>
-                    </div>
+                    ${renderActionButtons(mobileActions, 'pnm-actions--mobile')}
                 </section>
             `;
         }
@@ -460,15 +542,25 @@
                     <strong>נחשפת רק חוליה אחת, ואז היא נכנסת ישר למפה.</strong>
                 </div>
 
-                <div class="pnm-actions">
-                    <button type="button" class="pnm-btn pnm-btn--primary" data-action="reveal-answer">חשוף את התשובה במפה</button>
-                    <button type="button" class="pnm-btn pnm-btn--ghost" data-action="restart-exercise">התחל מחדש</button>
-                </div>
+                ${renderActionButtons(mobileActions, 'pnm-actions--mobile')}
             </section>
         `;
     }
 
     function renderBuild(state, exercise) {
+        const actions = getBuildActions(state, exercise);
+        const question = getCurrentQuestion(state);
+        const toolbarCopy = question
+            ? {
+                kicker: 'כפתורי העבודה עברו למעלה',
+                title: `חוליה ${state.questionIndex + 1}/${exercise.questions.length} · ${getLevel(question.level).label} · צד ${question.side === 'a' ? 'A' : 'B'}`,
+                detail: 'כך המפה נשארת פתוחה במסך המחשב בלי לרדת לסוף העמוד בכל צעד.'
+            }
+            : {
+                kicker: 'המפה הושלמה',
+                title: 'כל 12 החוליות נחשפו',
+                detail: 'מכאן עוברים לשיח, לגרעין, לסדק ולשאלת הפאנץ׳.'
+            };
         return `
             <section class="pnm-stage-card pnm-stage-card--build">
                 <div class="pnm-hero pnm-hero--compact">
@@ -482,9 +574,67 @@
                     </div>
                 </div>
                 ${renderStageRail(state, exercise)}
-                ${renderMap(state, exercise, { showBadges: isBuildComplete(state) })}
-                ${renderQuestionCard(state, exercise)}
+                ${renderToolbar(toolbarCopy, actions)}
+                <div class="pnm-stage-layout pnm-stage-layout--build">
+                    <div class="pnm-stage-main">
+                        ${renderMap(state, exercise, { showBadges: isBuildComplete(state), compact: state.mode !== 'standalone' })}
+                    </div>
+                    <aside class="pnm-stage-side">
+                        ${renderQuestionCard(state, exercise, { actions })}
+                    </aside>
+                </div>
             </section>
+        `;
+    }
+
+    function renderFocusStack(exercise) {
+        const coreLevel = getLevel(exercise.core);
+        const crackLevel = getLevel(exercise.crack);
+        return `
+            <aside class="pnm-insight-stack">
+                <div class="pnm-insight-intro">
+                    <span class="pnm-label">מוקד העבודה עכשיו</span>
+                    <strong>המפה כבר עשתה את שלה. עכשיו נשארים עם השיחה, הגרעין, הסדק והפאנץ׳.</strong>
+                    <p class="pnm-copy pnm-copy--muted">מפת הרמות נשארה זמינה ב־overlay דרך הכפתור למעלה, בלי לתפוס את כל המסך.</p>
+                </div>
+                <article class="pnm-insight-card pnm-insight-card--core" style="--pnm-tone:${coreLevel.color};--pnm-fill:${coreLevel.fill};">
+                    <span class="pnm-label">גרעין</span>
+                    <strong>${escapeHtml(coreLevel.label)}</strong>
+                    <p>${escapeHtml(exercise.reflectCore)}</p>
+                </article>
+                <article class="pnm-insight-card pnm-insight-card--crack" style="--pnm-tone:${crackLevel.color};--pnm-fill:${crackLevel.fill};">
+                    <span class="pnm-label">סדק</span>
+                    <strong>${escapeHtml(crackLevel.label)}</strong>
+                    <p>${escapeHtml(exercise.reflectCrack)}</p>
+                </article>
+                <article class="pnm-insight-card pnm-insight-card--punch">
+                    <span class="pnm-label">שאלת פאנץ׳</span>
+                    <strong>${escapeHtml(exercise.punchQ)}</strong>
+                    <p>${escapeHtml(exercise.punchA)}</p>
+                </article>
+            </aside>
+        `;
+    }
+
+    function renderMapOverlay(state, exercise, options = {}) {
+        if (!state.mapOverlayOpen) return '';
+        return `
+            <div class="pnm-overlay">
+                <button type="button" class="pnm-overlay-backdrop" data-action="close-map-overlay" aria-label="סגירת מפת הרמות"></button>
+                <article class="pnm-overlay-panel" role="dialog" aria-modal="true" aria-labelledby="pnm-overlay-title">
+                    <header class="pnm-overlay-head">
+                        <div class="pnm-overlay-copy">
+                            <span class="pnm-label">מפת הרמות</span>
+                            <h2 id="pnm-overlay-title">${escapeHtml(options.title || 'המפה שמאחורי השיח')}</h2>
+                            <p class="pnm-copy pnm-copy--muted">כאן אפשר לחזור לרמות הלוגיות בלי לאבד את המסך המרכזי של השיחה.</p>
+                        </div>
+                        <button type="button" class="pnm-overlay-close" data-action="close-map-overlay">סגור</button>
+                    </header>
+                    <div class="pnm-overlay-body">
+                        ${renderMap(state, exercise, { showBadges: options.showBadges, overlay: true })}
+                    </div>
+                </article>
+            </div>
         `;
     }
 
@@ -492,6 +642,7 @@
         const script = buildReflectionScript(exercise);
         const visibleItems = script.slice(0, state.reflectionIndex);
         const isDone = state.reflectionIndex >= script.length;
+        const actions = getReflectionActions(state, exercise);
 
         return `
             <section class="pnm-stage-card pnm-stage-card--reflect">
@@ -503,30 +654,40 @@
                     <div class="pnm-count-chip">${state.reflectionIndex}/${script.length}</div>
                 </div>
                 ${renderStageRail(state, exercise)}
-                ${renderMap(state, exercise, { showBadges: true })}
+                ${renderToolbar({
+                    kicker: 'שלב השיקוף',
+                    title: isDone ? 'השיחה הושלמה, אפשר לעבור לסיכום' : 'הטבלה ירדה לרקע, והשיחה עלתה למרכז',
+                    detail: 'במחשב הכפתורים נשארים למעלה, והמפה נגישה רק כשצריך.'
+                }, actions)}
 
-                <section class="pnm-chat-card">
-                    <div class="pnm-chat-thread">
-                        ${visibleItems.map((item) => {
-                            if (item.kind === 'label') {
-                                return `<div class="pnm-chat-label">${escapeHtml(item.text)}</div>`;
-                            }
-                            return `
-                                <article class="pnm-chat-bubble pnm-chat-bubble--${item.kind}">
-                                    <span class="pnm-chat-role">${item.kind === 'therapist' ? 'מטפל/ת' : 'מטופל/ת'}</span>
-                                    <p>${escapeHtml(item.text)}</p>
-                                </article>
-                            `;
-                        }).join('')}
-                    </div>
+                <div class="pnm-stage-layout pnm-stage-layout--reflect">
+                    <section class="pnm-chat-card pnm-chat-card--conversation">
+                        <div class="pnm-chat-head">
+                            <div>
+                                <span class="pnm-label">שיח עם המטופל/ת</span>
+                                <h2>הודעה אחר הודעה, כמו רצף ווטסאפ טיפולי</h2>
+                            </div>
+                            <div class="pnm-progress-ring">${state.reflectionIndex}/${script.length}</div>
+                        </div>
+                        <div class="pnm-chat-thread">
+                            ${visibleItems.map((item) => {
+                                if (item.kind === 'label') {
+                                    return `<div class="pnm-chat-label">${escapeHtml(item.text)}</div>`;
+                                }
+                                return `
+                                    <article class="pnm-chat-bubble pnm-chat-bubble--${item.kind}">
+                                        <span class="pnm-chat-role">${item.kind === 'therapist' ? 'מטפל/ת' : 'מטופל/ת'}</span>
+                                        <p>${escapeHtml(item.text)}</p>
+                                    </article>
+                                `;
+                            }).join('')}
+                        </div>
+                        ${renderActionButtons(actions, 'pnm-actions--mobile')}
+                    </section>
 
-                    <div class="pnm-actions">
-                        ${!isDone
-                            ? '<button type="button" class="pnm-btn pnm-btn--primary" data-action="reveal-reflection">הודעה הבאה</button>'
-                            : '<button type="button" class="pnm-btn pnm-btn--primary" data-action="go-summary">לסיכום</button>'}
-                        <button type="button" class="pnm-btn pnm-btn--ghost" data-action="restart-exercise">התחל מחדש</button>
-                    </div>
-                </section>
+                    ${renderFocusStack(exercise)}
+                </div>
+                ${renderMapOverlay(state, exercise, { showBadges: true, title: 'מפת הרמות שמאחורי השיח' })}
             </section>
         `;
     }
@@ -534,6 +695,7 @@
     function renderSummary(state, exercise) {
         const coreLevel = getLevel(exercise.core);
         const crackLevel = getLevel(exercise.crack);
+        const actions = getSummaryActions();
         return `
             <section class="pnm-stage-card pnm-stage-card--summary">
                 <div class="pnm-hero">
@@ -545,7 +707,11 @@
                     <div class="pnm-count-chip">סיום תרגיל</div>
                 </div>
                 ${renderStageRail(state, exercise)}
-                ${renderMap(state, exercise, { showBadges: true })}
+                ${renderToolbar({
+                    kicker: 'שלושת מוקדי היציאה',
+                    title: 'הגרעין, הסדק והפאנץ׳ נשארים במרכז',
+                    detail: 'המפה עדיין שם אם צריך לחזור אליה, אבל לא תופסת את כל המסך.'
+                }, actions)}
 
                 <div class="pnm-summary-grid">
                     <article class="pnm-summary-card" style="--pnm-tone:${coreLevel.color};--pnm-fill:${coreLevel.fill};">
@@ -565,10 +731,8 @@
                     </article>
                 </div>
 
-                <div class="pnm-actions">
-                    <button type="button" class="pnm-btn pnm-btn--primary" data-action="next-exercise">משפט הבא</button>
-                    <button type="button" class="pnm-btn pnm-btn--ghost" data-action="restart-exercise">נסה שוב</button>
-                </div>
+                ${renderActionButtons(actions, 'pnm-actions--mobile')}
+                ${renderMapOverlay(state, exercise, { showBadges: true, title: 'המפה המלאה של התרגיל' })}
             </section>
         `;
     }
@@ -581,11 +745,12 @@
         if (!exercise) return renderError({ error: 'לא נמצא תרגיל זמין בנתונים.' });
 
         const shellClass = state.mode === 'standalone' ? 'pnm-shell pnm-shell--standalone' : 'pnm-shell pnm-shell--embedded';
+        const stage = getEffectiveStage(state);
         let body = renderIntro(state, exercise);
 
-        if (state.stage === 'build') body = renderBuild(state, exercise);
-        if (state.stage === 'reflect') body = renderReflection(state, exercise);
-        if (state.stage === 'summary') body = renderSummary(state, exercise);
+        if (stage === 'build') body = renderBuild(state, exercise);
+        if (stage === 'reflect') body = renderReflection(state, exercise);
+        if (stage === 'summary') body = renderSummary(state, exercise);
 
         return `
             <section class="${shellClass}" dir="rtl" lang="he">
@@ -628,6 +793,7 @@
 
         if (action === 'start-build') {
             state.stage = 'build';
+            state.mapOverlayOpen = false;
             render(state);
             return;
         }
@@ -641,6 +807,7 @@
         if (action === 'go-reflect') {
             state.stage = 'reflect';
             state.reflectionIndex = 0;
+            state.mapOverlayOpen = false;
             render(state);
             return;
         }
@@ -654,6 +821,19 @@
 
         if (action === 'go-summary') {
             state.stage = 'summary';
+            state.mapOverlayOpen = false;
+            render(state);
+            return;
+        }
+
+        if (action === 'open-map-overlay') {
+            state.mapOverlayOpen = true;
+            render(state);
+            return;
+        }
+
+        if (action === 'close-map-overlay') {
+            state.mapOverlayOpen = false;
             render(state);
             return;
         }
@@ -675,6 +855,11 @@
             const actionEl = event.target.closest('[data-action]');
             if (!actionEl) return;
             handleAction(state, actionEl.getAttribute('data-action'));
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape' || !state.mapOverlayOpen) return;
+            state.mapOverlayOpen = false;
+            render(state);
         });
     }
 
