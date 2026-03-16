@@ -519,6 +519,11 @@ body {
 .prm-philosophy-panel {
   padding: 0;
   overflow: hidden;
+  border-color: rgba(15, 118, 110, 0.18);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(15, 118, 110, 0.08), transparent 34%),
+    radial-gradient(circle at 0% 100%, rgba(180, 83, 9, 0.08), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 250, 240, 0.96));
 }
 
 .prm-philosophy-library {
@@ -528,11 +533,13 @@ body {
 .prm-philosophy-library-summary {
   list-style: none;
   cursor: pointer;
-  padding: 12px 14px;
+  padding: 14px 16px;
   display: grid;
-  gap: 4px;
-  background: linear-gradient(180deg, rgba(15, 118, 110, 0.08), rgba(15, 118, 110, 0.04));
-  border-bottom: 1px solid rgba(15, 118, 110, 0.14);
+  gap: 5px;
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(15, 118, 110, 0.04)),
+    rgba(255, 255, 255, 0.82);
+  border-bottom: 1px solid rgba(15, 118, 110, 0.16);
 }
 
 .prm-philosophy-library-summary::-webkit-details-marker {
@@ -550,43 +557,79 @@ body {
 }
 
 .prm-philosophy-library-body {
-  padding: 12px 14px 14px;
+  padding: 14px 16px 16px;
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .prm-philosophy-intro {
   margin: 0;
-  padding: 10px 12px;
-  border: 1px solid rgba(15, 118, 110, 0.15);
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(15, 118, 110, 0.14);
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 14px;
   line-height: 1.55;
 }
 
 .prm-philosophy-list {
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .prm-philosophy-item {
   border: 1px solid var(--prm-line);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.85);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
   overflow: hidden;
+  box-shadow: 0 10px 24px rgba(34, 28, 12, 0.06);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.prm-philosophy-item[open] {
+  border-color: rgba(15, 118, 110, 0.24);
+  box-shadow: 0 16px 34px rgba(34, 28, 12, 0.1);
+  transform: translateY(-1px);
 }
 
 .prm-philosophy-item-summary {
   list-style: none;
   cursor: pointer;
-  padding: 10px 12px;
+  padding: 12px 44px 12px 14px;
   display: grid;
-  gap: 2px;
-  background: linear-gradient(180deg, rgba(180, 83, 9, 0.07), rgba(180, 83, 9, 0.02));
+  gap: 4px;
+  position: relative;
+  background:
+    linear-gradient(135deg, rgba(180, 83, 9, 0.11), rgba(180, 83, 9, 0.03)),
+    rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(180, 83, 9, 0.12);
 }
 
 .prm-philosophy-item-summary::-webkit-details-marker {
   display: none;
+}
+
+.prm-philosophy-item-summary::after {
+  content: "+";
+  position: absolute;
+  inset-inline-start: 14px;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--prm-accent);
+  font-size: 18px;
+  font-weight: 700;
+  transform: translateY(-50%);
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.prm-philosophy-item[open] .prm-philosophy-item-summary::after {
+  content: "−";
+  background: rgba(15, 118, 110, 0.1);
 }
 
 .prm-philosophy-item-title {
@@ -601,28 +644,198 @@ body {
 }
 
 .prm-philosophy-item-body {
-  padding: 10px 12px 12px;
+  padding: 14px;
   display: grid;
-  gap: 7px;
+  gap: 12px;
 }
 
-.prm-philosophy-item-body p {
+.prm-philosophy-item-body > * {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.prm-philosophy-item[open] .prm-philosophy-item-body > * {
+  animation: prmPhilosophyReveal 420ms ease forwards;
+}
+
+.prm-philosophy-item[open] .prm-philosophy-item-body > *:nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.prm-philosophy-item[open] .prm-philosophy-item-body > *:nth-child(3) {
+  animation-delay: 130ms;
+}
+
+.prm-philosophy-guidance {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
+}
+
+.prm-philosophy-guidance-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.prm-philosophy-guidance-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 55%);
+  pointer-events: none;
+}
+
+.prm-philosophy-guidance-card strong,
+.prm-philosophy-guidance-card small,
+.prm-philosophy-guidance-kicker {
+  position: relative;
+  z-index: 1;
+}
+
+.prm-philosophy-guidance-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.prm-philosophy-guidance-card strong {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--prm-ink);
+}
+
+.prm-philosophy-guidance-card small {
+  color: rgba(31, 29, 23, 0.72);
+  line-height: 1.45;
+}
+
+.prm-philosophy-guidance-card--avoid {
+  border-color: rgba(185, 28, 28, 0.18);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(185, 28, 28, 0.12), transparent 42%),
+    linear-gradient(180deg, rgba(255, 244, 242, 0.98), rgba(255, 250, 245, 0.96));
+}
+
+.prm-philosophy-guidance-card--avoid .prm-philosophy-guidance-kicker {
+  color: #991b1b;
+}
+
+.prm-philosophy-guidance-card--do {
+  border-color: rgba(15, 118, 110, 0.22);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(15, 118, 110, 0.14), transparent 42%),
+    linear-gradient(180deg, rgba(239, 253, 250, 0.98), rgba(250, 255, 252, 0.96));
+}
+
+.prm-philosophy-guidance-card--do .prm-philosophy-guidance-kicker {
+  color: var(--prm-accent);
+}
+
+.prm-philosophy-guidance-arrow {
+  position: relative;
+  align-self: center;
+  min-height: 100%;
+}
+
+.prm-philosophy-guidance-arrow::before {
+  content: "";
+  position: absolute;
+  inset: 50% 5px auto;
+  border-top: 2px dashed rgba(15, 118, 110, 0.32);
+  transform: translateY(-50%);
+}
+
+.prm-philosophy-guidance-arrow::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 5px);
+  left: 6px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid rgba(15, 118, 110, 0.5);
+  border-left: 2px solid rgba(15, 118, 110, 0.5);
+  transform: rotate(-45deg);
+  animation: prmGuidancePulse 1.8s ease-in-out infinite;
+}
+
+.prm-philosophy-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.prm-philosophy-fact {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 14px;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 236, 0.9));
+  display: grid;
+  gap: 6px;
+}
+
+.prm-philosophy-fact--question {
+  border-color: rgba(37, 99, 235, 0.18);
+  background: linear-gradient(180deg, rgba(239, 246, 255, 0.98), rgba(255, 255, 255, 0.94));
+}
+
+.prm-philosophy-fact--benefit {
+  border-color: rgba(15, 118, 110, 0.16);
+  background: linear-gradient(180deg, rgba(240, 253, 250, 0.98), rgba(255, 255, 255, 0.94));
+}
+
+.prm-philosophy-fact-label {
+  color: var(--prm-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.prm-philosophy-fact-value {
+  color: var(--prm-ink);
+  line-height: 1.55;
+  font-size: 14px;
+}
+
+.prm-philosophy-tooltip {
   margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px dashed rgba(37, 99, 235, 0.28);
+  background: rgba(239, 246, 255, 0.76);
+  color: #1e3a8a;
   line-height: 1.55;
   font-size: 13px;
 }
 
-.prm-philosophy-q {
-  border: 1px dashed rgba(37, 99, 235, 0.25);
-  background: rgba(239, 246, 255, 0.85);
-  border-radius: 10px;
-  padding: 8px 10px;
+@keyframes prmPhilosophyReveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.prm-philosophy-tooltip {
-  border-top: 1px dashed var(--prm-line);
-  padding-top: 7px;
-  color: #1e3a8a;
+@keyframes prmGuidancePulse {
+  0%, 100% {
+    transform: rotate(-45deg) translateX(0);
+    opacity: 0.72;
+  }
+  50% {
+    transform: rotate(-45deg) translateX(-3px);
+    opacity: 1;
+  }
 }
 
 .prm-qa-panel.is-empty,
@@ -899,9 +1112,33 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .prm-philosophy-guidance,
+  .prm-philosophy-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .prm-philosophy-guidance-arrow {
+    display: none;
+  }
+
   .prm-philosophy-library-summary,
   .prm-philosophy-item-summary,
   .prm-philosophy-item-body {
     padding-inline: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prm-philosophy-item,
+  .prm-philosophy-item-summary::after {
+    transition: none;
+  }
+
+  .prm-philosophy-item-body > *,
+  .prm-philosophy-item[open] .prm-philosophy-item-body > *,
+  .prm-philosophy-guidance-arrow::after {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }

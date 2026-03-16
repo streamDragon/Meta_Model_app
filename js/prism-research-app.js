@@ -749,6 +749,17 @@
         };
     }
 
+    function renderPhilosophyFact(label, value, modifier) {
+        if (!value) return '';
+        const className = modifier ? ` prm-philosophy-fact--${modifier}` : '';
+        return `
+            <article class="prm-philosophy-fact${className}">
+                <span class="prm-philosophy-fact-label">${escapeHtml(label)}</span>
+                <strong class="prm-philosophy-fact-value">${escapeHtml(value)}</strong>
+            </article>
+        `;
+    }
+
     function renderPhilosophyLibrary() {
         if (!Array.isArray(state.categories) || !state.categories.length) return '';
 
@@ -757,6 +768,14 @@
             const appQuestion = Array.isArray(category.primaryQuestions) && category.primaryQuestions.length
                 ? category.primaryQuestions[0]
                 : ph.ask3x;
+            const facts = [
+                renderPhilosophyFact('השאלה החוזרת x3', ph.ask3x, 'question'),
+                renderPhilosophyFact('שאלת הבסיס מהאפליקציה', appQuestion, 'question'),
+                renderPhilosophyFact('הבסיס הפילוסופי', ph.why),
+                renderPhilosophyFact('מה זה מייצר בפועל', ph.creates),
+                renderPhilosophyFact('השקט של המטפל', ph.therapistCalm, 'benefit'),
+                renderPhilosophyFact('הרווח למטופל', ph.patientGain, 'benefit')
+            ].join('');
             return `
                 <details class="prm-philosophy-item">
                     <summary class="prm-philosophy-item-summary">
@@ -764,15 +783,23 @@
                         <small class="prm-philosophy-item-school">${escapeHtml(ph.school || '')}</small>
                     </summary>
                     <div class="prm-philosophy-item-body">
-                        <p class="prm-philosophy-q"><strong>השאלה החוזרת (3ֳ—):</strong> ${escapeHtml(ph.ask3x || '')}</p>
-                        <p><strong>שאלת בסיס מהאפליקציה:</strong> ${escapeHtml(appQuestion || '')}</p>
-                        <p><strong>הבסיס הפילוסופי:</strong> ${escapeHtml(ph.why || '')}</p>
-                        <p><strong>מה זה מייצר בפועל:</strong> ${escapeHtml(ph.creates || '')}</p>
-                        <p><strong>השקט של המטפל:</strong> ${escapeHtml(ph.therapistCalm || '')}</p>
-                        <p><strong>הרווח למטופל:</strong> ${escapeHtml(ph.patientGain || '')}</p>
-                        <p><strong>מלכודת נפוצה:</strong> ${escapeHtml(ph.trap || '')}</p>
-                        <p><strong>תיקון/כוונון:</strong> ${escapeHtml(ph.fix || '')}</p>
-                        <p class="prm-philosophy-tooltip"><strong>Tooltip:</strong> ${escapeHtml(ph.tooltip || '')}</p>
+                        <div class="prm-philosophy-guidance" aria-label="הכוונה מעשית">
+                            <article class="prm-philosophy-guidance-card prm-philosophy-guidance-card--avoid">
+                                <span class="prm-philosophy-guidance-kicker">מה לא לעשות</span>
+                                <strong>${escapeHtml(ph.trap || '')}</strong>
+                                <small>הטעות שקל ליפול אליה כשנשארים ברמת הכותרת.</small>
+                            </article>
+                            <div class="prm-philosophy-guidance-arrow" aria-hidden="true"></div>
+                            <article class="prm-philosophy-guidance-card prm-philosophy-guidance-card--do">
+                                <span class="prm-philosophy-guidance-kicker">מה כן לעשות</span>
+                                <strong>${escapeHtml(ph.fix || '')}</strong>
+                                <small>המהלך הקטן שמחזיר את הפריזמה למסלול מדויק ושימושי.</small>
+                            </article>
+                        </div>
+                        <div class="prm-philosophy-facts">
+                            ${facts}
+                        </div>
+                        <p class="prm-philosophy-tooltip"><strong>רעיון קצר:</strong> ${escapeHtml(ph.tooltip || '')}</p>
                     </div>
                 </details>
             `;
@@ -783,7 +810,7 @@
                 <details class="prm-philosophy-library">
                     <summary class="prm-philosophy-library-summary">
                         <span>פילוסופיה מאחורי 15 הפריזמות (מורחב)</span>
-                        <small>למה מותר לשאול את אותה שאלה שוב ושוב ֲ· 3ֳ—</small>
+                        <small>פותחים כל פריזמה: קודם מה לא, מה כן, ואז למה זה עובד.</small>
                     </summary>
                     <div class="prm-philosophy-library-body">
                         <p class="prm-philosophy-intro">
