@@ -1053,8 +1053,22 @@
         }
     }
 
+    function pauseTimer(runtime) {
+        if (!runtime || !runtime.state) return;
+        if (runtime.state.timerHandle) {
+            const elapsed = Math.max(0, Date.now() - (runtime.state.timerStartedAt || Date.now()));
+            runtime.state.timerRemainingMs = Math.max(0, runtime.state.timerRemainingMs - elapsed);
+        }
+        stopTimer(runtime);
+        renderShotClock(runtime);
+    }
+
     function updateTimer(runtime) {
         const { state } = runtime;
+        if (!isTabActive() || global.document.hidden) {
+            pauseTimer(runtime);
+            return;
+        }
         if (state.phase !== PHASES.DECISION) {
             stopTimer(runtime);
             renderShotClock(runtime);
@@ -1631,8 +1645,8 @@
             showFloatingMessage(runtime, runtime.scenario.learningFocus || runtime.scenario.supportPrompt || 'התרגול כאן הוא לזהות טון, לחץ ומבנה שפה לפני שמאוחר מדי.');
         });
         runtime.onVisibilityChange = () => {
-            if (global.document.hidden) {
-                stopTimer(runtime);
+            if (global.document.hidden || !isTabActive()) {
+                pauseTimer(runtime);
                 return;
             }
             if (runtime.state.phase === PHASES.DECISION && isTabActive()) {
