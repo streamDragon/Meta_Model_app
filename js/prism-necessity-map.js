@@ -616,6 +616,107 @@
         `;
     }
 
+    function getExerciseQuestion(exercise, levelId, side) {
+        return (exercise?.questions || []).find((question) => question.level === levelId && question.side === side) || null;
+    }
+
+    function getCellEntry(state, exercise, levelId, side) {
+        const key = `${levelId}:${side}`;
+        if (state.cells[key]) return state.cells[key];
+        const question = getExerciseQuestion(exercise, levelId, side);
+        return question ? { answer: question.answer, score: question.score } : null;
+    }
+
+    function getLevelPair(state, exercise, levelId) {
+        return {
+            level: getLevel(levelId),
+            a: getCellEntry(state, exercise, levelId, 'a'),
+            b: getCellEntry(state, exercise, levelId, 'b')
+        };
+    }
+
+    function getPreferredPair(state, exercise, levelIds) {
+        const candidates = Array.isArray(levelIds) && levelIds.length ? levelIds : [LEVELS[0].id];
+        for (const levelId of candidates) {
+            const pair = getLevelPair(state, exercise, levelId);
+            if (pair.a || pair.b) return pair;
+        }
+        return getLevelPair(state, exercise, candidates[0]);
+    }
+
+    function buildSummaryExplanation(exercise, corePair) {
+        const parts = [
+            `במפה הזו ההכרח מתחזק במיוחד ברמת ${corePair.level.label}.`,
+            corePair.a?.answer ? `מבחוץ הוא נאסף סביב: ${corePair.a.answer}` : '',
+            corePair.b?.answer ? `מבפנים הוא נסגר סביב: ${corePair.b.answer}` : '',
+            `לכן "${exercise.keyPhrase || exercise.sentence}" כבר לא נשמע כאן רק כמו תיאור, אלא כמו מבנה שמרגיש מחייב כמעט מעצמו.`
+        ];
+        return parts.filter(Boolean).join(' ');
+    }
+
+    function renderHierarchicalSummary(state, exercise) {
+        const corePair = getLevelPair(state, exercise, exercise.core);
+        const concretePair = getPreferredPair(state, exercise, ['behavior', 'environment']);
+        const coreLevel = getLevel(exercise.core);
+        const crackLevel = getLevel(exercise.crack);
+        const explanation = buildSummaryExplanation(exercise, corePair);
+
+        return `
+            <section class="pnm-story-flow"
+                style="--pnm-core-tone:${coreLevel.color};--pnm-core-fill:${coreLevel.fill};--pnm-core-dark:${coreLevel.dark};--pnm-crack-tone:${crackLevel.color};--pnm-crack-fill:${crackLevel.fill};--pnm-crack-dark:${crackLevel.dark};--pnm-concrete-tone:${concretePair.level.color};--pnm-concrete-fill:${concretePair.level.fill};--pnm-concrete-dark:${concretePair.level.dark};">
+                <article class="pnm-story-step pnm-story-step--title">
+                    <span class="pnm-story-chip">מפת ההכרח המלאה</span>
+                    <strong>"${escapeHtml(exercise.sentence)}"</strong>
+                    <p>${escapeHtml(getCategoryLabel(exercise.category))} · ${escapeHtml(exercise.keyPhrase)}</p>
+                </article>
+
+                <article class="pnm-story-step pnm-story-step--core">
+                    <span class="pnm-story-chip pnm-story-chip--core">גרעין · ${escapeHtml(coreLevel.label)}</span>
+                    <h2>ליבת ההכרח</h2>
+                    <p>${escapeHtml(exercise.reflectCore)}</p>
+                </article>
+
+                <section class="pnm-story-step pnm-story-step--split">
+                    <div class="pnm-story-head">
+                        <h2>מה קורה לי בפועל</h2>
+                        <p>כאן רואים את הצמד שהחזיק את הסצנה ברמה הקונקרטית יותר של המפה.</p>
+                    </div>
+                    <div class="pnm-story-split">
+                        <article class="pnm-story-mini pnm-story-mini--outside">
+                            <span class="pnm-story-mini__eyebrow">בחוץ</span>
+                            <strong>${escapeHtml(exercise.sideA)}</strong>
+                            <p>${escapeHtml(concretePair.a?.answer || 'הצד החיצוני עוד לא קיבל ניסוח כאן.')}</p>
+                            <small>רמת ${escapeHtml(concretePair.level.label)}</small>
+                        </article>
+                        <article class="pnm-story-mini pnm-story-mini--inside">
+                            <span class="pnm-story-mini__eyebrow">בפנים</span>
+                            <strong>${escapeHtml(exercise.sideB)}</strong>
+                            <p>${escapeHtml(concretePair.b?.answer || 'הצד הפנימי עוד לא קיבל ניסוח כאן.')}</p>
+                            <small>רמת ${escapeHtml(concretePair.level.label)}</small>
+                        </article>
+                    </div>
+                </section>
+
+                <article class="pnm-story-step pnm-story-step--explain">
+                    <h2>הסבר</h2>
+                    <p>${escapeHtml(explanation)}</p>
+                </article>
+
+                <article class="pnm-story-step pnm-story-step--next">
+                    <span class="pnm-story-chip pnm-story-chip--crack">סדק · ${escapeHtml(crackLevel.label)}</span>
+                    <h2>הצעד הבא</h2>
+                    <p class="pnm-story-question">${escapeHtml(exercise.punchQ)}</p>
+                    <p class="pnm-story-answer">${escapeHtml(exercise.punchA)}</p>
+                </article>
+
+                <article class="pnm-story-step pnm-story-step--integrated">
+                    <h2>מה כבר מתחיל לזוז</h2>
+                    <p>${escapeHtml(exercise.reflectCrack)}</p>
+                </article>
+            </section>
+        `;
+    }
+
     function renderMapOverlay(state, exercise, options = {}) {
         if (!state.mapOverlayOpen) return '';
         return `
@@ -693,8 +794,6 @@
     }
 
     function renderSummary(state, exercise) {
-        const coreLevel = getLevel(exercise.core);
-        const crackLevel = getLevel(exercise.crack);
         const actions = getSummaryActions();
         return `
             <section class="pnm-stage-card pnm-stage-card--summary">
@@ -713,23 +812,7 @@
                     detail: 'המפה עדיין שם אם צריך לחזור אליה, אבל לא תופסת את כל המסך.'
                 }, actions)}
 
-                <div class="pnm-summary-grid">
-                    <article class="pnm-summary-card" style="--pnm-tone:${coreLevel.color};--pnm-fill:${coreLevel.fill};">
-                        <span class="pnm-label">גרעין</span>
-                        <strong>${escapeHtml(coreLevel.label)}</strong>
-                        <p>${escapeHtml(exercise.reflectCore)}</p>
-                    </article>
-                    <article class="pnm-summary-card" style="--pnm-tone:${crackLevel.color};--pnm-fill:${crackLevel.fill};">
-                        <span class="pnm-label">סדק</span>
-                        <strong>${escapeHtml(crackLevel.label)}</strong>
-                        <p>${escapeHtml(exercise.reflectCrack)}</p>
-                    </article>
-                    <article class="pnm-summary-card pnm-summary-card--punch">
-                        <span class="pnm-label">שאלת פאנץ׳</span>
-                        <strong>${escapeHtml(exercise.punchQ)}</strong>
-                        <p>${escapeHtml(exercise.punchA)}</p>
-                    </article>
-                </div>
+                ${renderHierarchicalSummary(state, exercise)}
 
                 ${renderActionButtons(actions, 'pnm-actions--mobile')}
                 ${renderMapOverlay(state, exercise, { showBadges: true, title: 'המפה המלאה של התרגיל' })}
