@@ -1308,7 +1308,7 @@
             runtime.els.deck.innerHTML = '';
             return;
         }
-        const disabled = runtime.state.phase !== PHASES.DECISION && runtime.state.phase !== PHASES.PREVIEW;
+        const disabled = runtime.state.phase !== PHASES.DECISION;
         const choices = visibleChoiceSet(runtime);
         runtime.els.deck.innerHTML = `
             <div class="ceflow-choice-target" aria-hidden="true">

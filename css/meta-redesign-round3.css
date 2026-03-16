@@ -542,7 +542,7 @@ body.shell-feature-active .tab-content.active {
     overflow: hidden;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.99));
     box-shadow: 0 32px 80px rgba(15, 23, 42, 0.24);
-    animation: overlaySlideUp 0.28s ease both;
+    animation: overlaySlideUp 0.16s ease both;
 }
 
 @keyframes overlaySlideUp {
