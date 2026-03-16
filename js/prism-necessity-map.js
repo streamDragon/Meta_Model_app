@@ -57,6 +57,13 @@
         return String(value ?? '').replace(/\s+/g, ' ').trim();
     }
 
+    function compactCopy(value, wordLimit = 18) {
+        const words = normalizeText(value).split(' ').filter(Boolean);
+        if (!words.length) return '';
+        if (words.length <= wordLimit) return words.join(' ');
+        return `${words.slice(0, wordLimit).join(' ')}...`;
+    }
+
     function resolveAssetPath(path) {
         if (typeof scope.__withAssetVersion === 'function') {
             try {
@@ -462,8 +469,7 @@
         if (!getCurrentQuestion(state)) {
             return [
                 { id: 'go-reflect', label: 'המשך לשיחה', tone: 'primary' },
-                { id: 'open-map-overlay', label: MAP_OVERLAY_LABEL, tone: 'accent' },
-                { id: 'next-exercise', label: 'משפט אחר', tone: 'ghost' }
+                { id: 'open-map-overlay', label: MAP_OVERLAY_LABEL, tone: 'accent' }
             ];
         }
         return [
@@ -496,22 +502,26 @@
         const compact = !!options.compact;
         const coreLevel = getLevel(exercise.core);
         const crackLevel = getLevel(exercise.crack);
+        const punchTitle = compact ? 'השאלה שמזיזה' : exercise.punchQ;
+        const coreCopy = compact ? compactCopy(exercise.reflectCore, 14) : exercise.reflectCore;
+        const crackCopy = compact ? compactCopy(exercise.reflectCrack, 14) : exercise.reflectCrack;
+        const punchCopy = compact ? compactCopy(exercise.punchQ, 14) : exercise.punchA;
         return `
             <div class="pnm-insight-grid${compact ? ' pnm-insight-grid--compact' : ''}">
                 <article class="pnm-insight-card pnm-insight-card--core" style="--pnm-tone:${coreLevel.color};--pnm-fill:${coreLevel.fill};">
                     <span class="pnm-label">גרעין</span>
                     <strong>${escapeHtml(coreLevel.label)}</strong>
-                    <p>${escapeHtml(exercise.reflectCore)}</p>
+                    <p>${escapeHtml(coreCopy)}</p>
                 </article>
                 <article class="pnm-insight-card pnm-insight-card--crack" style="--pnm-tone:${crackLevel.color};--pnm-fill:${crackLevel.fill};">
                     <span class="pnm-label">סדק</span>
                     <strong>${escapeHtml(crackLevel.label)}</strong>
-                    <p>${escapeHtml(exercise.reflectCrack)}</p>
+                    <p>${escapeHtml(crackCopy)}</p>
                 </article>
                 <article class="pnm-insight-card pnm-insight-card--punch">
                     <span class="pnm-label">פאנץ׳</span>
-                    <strong>${escapeHtml(exercise.punchQ)}</strong>
-                    <p>${escapeHtml(exercise.punchA)}</p>
+                    <strong>${escapeHtml(punchTitle)}</strong>
+                    <p>${escapeHtml(punchCopy)}</p>
                 </article>
             </div>
         `;
