@@ -4232,8 +4232,8 @@ function buildScreenReadGuide(screenId) {
     demoBtn.type = 'button';
     demoBtn.className = 'btn btn-secondary screen-read-guide-demo-btn';
     demoBtn.innerHTML = `
-        <span class="screen-read-guide-btn-main">כך זה נראה בשיחה</span>
-        <span class="screen-read-guide-btn-sub">דוגמה קצרה שממחישה איך הכלי עובד בתוך הקשר אמיתי</span>
+        <span class="screen-read-guide-btn-main">דיאלוג טיפולי</span>
+        <span class="screen-read-guide-btn-sub">דוגמה קצרה שממחישה איך הכלי יוצר תנועה בתוך שיחה אמיתית</span>
     `;
 
     const demoModal = document.createElement('div');
@@ -4291,7 +4291,7 @@ function buildScreenReadGuide(screenId) {
     demoModal.innerHTML = `
         <div class="screen-read-guide-dialog screen-read-guide-dialog-demo">
             <button type="button" class="screen-read-guide-close" aria-label="סגירה">×</button>
-            <h3>כך זה נראה בשיחה: ${escapeHtml(title)}</h3>
+            <h3>דיאלוג טיפולי לדוגמה: ${escapeHtml(title)}</h3>
             <p class="screen-read-guide-lead">${escapeHtml(demo.frame)}</p>
             <div class="screen-demo-dialogue-box">${demoTurnsHtml}</div>
             <div class="screen-demo-dialogue-summary">

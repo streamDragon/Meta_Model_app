@@ -45,29 +45,43 @@
         'sentence-map': {
             tab: 'sentence-map', navKey: 'sentenceMap', progressKey: 'sentenceMap', progressTotal: 20, unlockLevel: 1,
             icon: '🗺️', title: 'מפת המשפט', badge: 'למתחילים', tone: 'beginner', color: '#1D9E75', soft: '#E1F5EE',
-            homeDescription: 'בואו נלמד לקרוא בין השורות — מה באמת קרה, מה אנחנו מרגישים, ומה אנחנו באמת מבקשים.',
-            description: 'כאן תלמדו לפרק כל משפט לשלוש שכבות: מה קרה בעולם החיצוני, מה קורה בתוכנו, ומה אנחנו באמת מבקשים.',
+            homeDescription: 'כאן לא ממהרים לאתגר. קודם ממפים מה קרה בחוץ, מה נהיה בפנים, ומה המשפט מנסה להשיג בקשר.',
+            description: 'מפת המשפט מלמדת להחזיק יחד שלוש שכבות של אותה אמירה: מה ניתן לראות בפועל, מה נחשף על עולמו הפנימי של הדובר, ואיזה מהלך המשפט מנסה לייצר מול מי ששומע אותו. רק אחרי שיש מפה ברורה בוחרים מוקד, שאלה והתערבות.',
             entryCards: [
-                { kicker: 'מה עושים כאן', title: 'מפרקים את המשפט לשלוש שכבות', body: 'לא נשארים עם התחושה הכללית. עוצרים על מה קרה בחוץ, מה קרה בפנים, ומהו הצורך או הבקשה שמתחבאים מתחת למשפט.' },
-                { kicker: 'למה לשים לב', title: 'מחפשים מעבר מהצפה לבהירות', body: 'ברגע שמבדילים בין עובדה, רגש ובקשה, השיחה כבר פחות נתקעת בתוך ערבוב. זה השלב שבו אפשר להתחיל לדבר ברור יותר.' },
-                { kicker: 'מה מרוויחים', title: 'שפה שאפשר לעבוד איתה', body: 'בסוף המסלול יוצאים עם ניסוח שאפשר לבדוק במציאות ולא רק להרגיש בתוכו. פחות "אף אחד לא מבין אותי", יותר "זה מה שקרה וזה מה שאני צריך".' }
+                { kicker: 'מה ממפים', title: 'חוץ, פנים, ומה המשפט מנסה לעשות', body: 'אותו משפט יכול להיות בו-זמנית דיווח על אירוע, חשיפה של כאב או פחד, וגם ניסיון להשיג הכרה, הגנה או קרבה. כאן מפרידים ביניהם בלי למחוק אף שכבה.' },
+                { kicker: 'למה לא למהר', title: 'אתגור מוקדם מדי מפספס את לב המקרה', body: 'אם מתקנים מיד את הניסוח, לפעמים מאבדים את החוויה הפנימית או את הבקשה היחסית שמסתתרת מתחתיו. המיפוי עוזר לבחור התערבות שמתאימה למה שבאמת זקוק למענה.' },
+                { kicker: 'איך עובדים', title: 'שישה צעדים קבועים שמארגנים את ההקשבה', body: 'קוראים את המשפט, פותחים את שלוש השכבות, מסמנים את המוקד החם, בוחרים שאלה מתאימה, ואז בונים ניסוח חדש שמחזיק גם מציאות, גם חוויה, וגם צעד אפשרי.' },
+                { kicker: 'מה יוצא מזה', title: 'פחות ויכוח על הניסוח, יותר תנועה טיפולית', body: 'בסוף המסלול מתקבל ניסוח שאפשר לעבוד איתו: לא רק "אני עצלן" או "אף אחד לא מבין אותי", אלא תמונה שמבחינה בין מה שקרה, מה כאב, ומה צריך עכשיו.' }
             ],
-            successNote: 'הצלחה כאן נראית כמו משפט שהופך מהצהרה עמומה למפה פשוטה: חוץ, פנים, וצעד שאפשר לבקש.',
+            successNote: 'הצלחה כאן נראית כמו מעבר ממשפט דחוס ומוחלט למפה שאפשר לעבוד איתה: מה קרה, מה נהיה בי, ומה נכון שיקרה עכשיו בשיחה.',
+            philosopherButtonLabel: 'הבסיס התיאורטי',
+            philosopherModalTitle: 'הבסיס התיאורטי של מפת המשפט',
+            philosopherKicker: 'בלשנות, תקשורת ופסיכולוגיה',
             philosopher: {
-                name: 'סוקרטס',
-                avatar: '🏛️',
-                quote: 'דע את עצמך — כל שאלה טובה מתחילה מהקשבה עמוקה.',
-                deep: 'סוקרטס האמין שרוב הסבל האנושי נובע מחוסר בהירות. כשאנחנו מפרקים משפט לשכבות, אנחנו שואלים "מה באמת קורה כאן?" במקום לקבל את פני השטח כמובן מאליו.',
-                lead: 'סוקרטס לא מחפש תשובה מהירה, אלא בהירות שמאפשרת לראות את מה שבאמת קורה בשיחה.',
+                name: 'קרל ביהלר, עם הרחבה של שולץ פון תון ואוסטין',
+                avatar: '🧠',
+                quote: 'לפני שמאתגרים משפט, כדאי לשמוע מה הוא מייצג, מה הוא מבטא, ומה הוא מנסה לחולל.',
+                lead: 'סוקרטס חשוב כרוח של חקירה, אבל הוא לא העוגן התאורטי המדויק ביותר לחלוקה של חוץ, פנים ומטרת המשפט. כאן הבסיס המתאים יותר מגיע מתיאוריות של שפה ותקשורת.',
                 deepLines: [
-                    'סוקרטס לא קיבל אמירה כללית כאמת סופית. הוא שאל שוב ושוב עד שהמילים הפכו למשהו שאפשר לבדוק, להרגיש ולפגוש במציאות.',
-                    'במפת המשפט זה בדיוק המהלך: לא להישאר עם "אף אחד לא מבין אותי", אלא לפתוח מה קרה בחוץ, מה קרה בפנים, ומהו הצורך שמבקש הכרה.',
-                    'הדיוק הזה לא מקטין את החוויה. להפך: הוא מכבד אותה מספיק כדי לתת לה צורה שאפשר לעבוד איתה ולא רק לסבול אותה.'
+                    'קרל ביהלר תיאר את השפה ככלי שיש לו שלוש פונקציות בסיסיות: ייצוג של מצב עניינים, ביטוי של עמדת הדובר או עולמו הפנימי, ופנייה אל הזולת. זו כמעט התאמה ישירה לשלושת הצירים של הפיצ׳ר: חוץ, פנים, ומה המשפט מנסה לעשות בקשר.',
+                    'פרידמן שולץ פון תון הרחיב את הכיוון הזה בפסיכולוגיה של תקשורת: בכל אמירה יש בו-זמנית מידע עובדתי, גילוי עצמי, רמז על היחס, וגם אפיל או בקשה. לכן במשפט טעון לא מספיק לשאול אם הוא "נכון"; צריך לשמוע גם מה הוא מגלה ומה הוא מבקש.',
+                    'אוסטין הוסיף ששפה אינה רק תיאור של מציאות אלא גם פעולה. משפטים עושים משהו: מגינים, מאשימים, מזמינים קרבה, מרחיקים, או מבקשים הכרה. בגלל זה מפת המשפט בודקת לא רק מה נאמר, אלא איזה מהלך מתרחש דרך האמירה.',
+                    'המסקנה הפרקטית היא שסוקרטס נשאר השראה לשאול היטב, אבל למסך הזה המסגרת המדויקת יותר היא ביהלר, עם הרחבה תקשורתית של שולץ פון תון, ותזכורת מאוסטין שמשפט הוא גם מעשה.'
                 ],
-                practicalTip: 'לפני כל תגובה, עצרו עם שלוש שאלות: מה קרה בפועל, מה הורגש בפנים, ומה אני בעצם צריך עכשיו?'
+                practiceBridge: 'כשתפגוש/י משפט טעון, עצור/י רגע לפני התיקון ושאל/י: מה כאן ניתן לצפייה, מה כאן נחשף על עולמו של הדובר, ומה הוא מנסה לחולל מול מי ששומע אותו?',
+                practicalTip: 'אם יש ספק איפה המוקד, התחילו ב־3 שאלות קבועות: מה קרה בפועל, מה נהיה בפנים, ומה הכי חשוב שהשיחה הזו תאפשר עכשיו?'
             },
-            example: { sentence: 'אף אחד לא מבין אותי', type: 'הכללה (universal quantifier)', challenge: 'אף אחד? ממש אף אחד? מי ספציפית לא מבין?' },
-            demo: [{ role: 'אדם', text: 'אף אחד לא מבין אותי בבית.' }, { role: 'מאמן', text: 'מה קרה בחוץ, מה קרה בפנים, ומה בעצם היית רוצה שיקרה?' }, { role: 'אדם', text: 'בחוץ שתקו, בפנים הרגשתי לבד, ובאמת רציתי שישאלו אותי מה עובר עליי.' }],
+            example: { sentence: 'אף אחד לא מבין אותי', type: 'משפט דחוס עם חוץ, פנים ופנייה לקשר', challenge: 'מה קרה בפועל, מה נהיה בפנים, ומה בעצם מבוקש מהאדם שמולך?' },
+            demoButtonLabel: 'דיאלוג טיפולי',
+            demoModalTitle: 'דיאלוג טיפולי לדוגמה',
+            demoLead: 'כאן לא מחפשים "תשובה חכמה" אלא תנועה טיפולית: מעבר מהדבקה של זהות או הכללה למפה שמחזיקה גם חוויה, גם מציאות, וגם בקשה שאפשר לעבוד איתה.',
+            demoImpact: 'זה השינוי שמפת המשפט מנסה לייצר: פחות להילחם עם המשפט, יותר להבין מה הוא נושא ומה צריך לקרות עכשיו כדי שהשיחה תתקדם.',
+            demo: [
+                { role: 'אדם', text: 'אני פשוט לא מצליח להתחיל כלום. אני עצלן.' },
+                { role: 'מטפל', text: 'לפני שנחליט אם זה נכון, בוא נמפה רגע: מה באמת קורה בחוץ כשאתה מנסה להתחיל, מה נהיה בך בפנים, ומה אתה צריך ממני עכשיו בשיחה הזו?' },
+                { role: 'אדם', text: 'בחוץ אני מתקרב למשימה ואז בורח. בפנים יש לחץ ופחד ענק. ומה שאני צריך זה שלא יקפצו ישר לביקורת.' },
+                { role: 'מטפל', text: 'מעולה. עכשיו כבר רואים שהמילה "עצלן" דחסה יחד מציאות, פחד ובקשה להגנה. מכאן אפשר לבחור שאלה והתערבות שמתאימות ללב של המקרה.' }
+            ],
             settings: { adaptiveDifficulty: { enabled: true, defaultValue: true }, showHints: { enabled: true, defaultValue: true }, advancedMode: { enabled: false, defaultValue: false }, timer: { enabled: false, defaultValue: false } }
         },
         'practice-question': {
@@ -873,29 +887,40 @@
     function philosopherModalHtml(meta) {
         var philosopher = meta.philosopher || {};
         var bridge = String(philosopher.practiceBridge || meta.example.challenge || meta.description || '').trim();
+        var kicker = String(philosopher.kicker || meta.philosopherKicker || 'תיאוריה מלווה').trim();
+        var sectionTitle = String(philosopher.sectionTitle || meta.philosopherSectionTitle || 'למה זה חשוב כאן').trim();
+        var bridgeTitle = String(philosopher.bridgeTitle || meta.philosopherBridgeTitle || 'מה נבדוק מיד').trim();
+        var tipTitle = String(philosopher.tipTitle || meta.philosopherTipTitle || 'טיפ לתרגול מיידי').trim();
+        var quoteHtml = philosopher.quote ? ('<blockquote class="meta-feature-modal__quote"><p>' + escapeHtml(philosopher.quote || '') + '</p><cite>' + escapeHtml(philosopher.name || '') + '</cite></blockquote>') : '';
         return [
             '<div class="meta-feature-modal__philosopher">',
             '<div class="meta-feature-modal__hero">',
             '<span class="meta-feature-modal__avatar">' + (philosopher.avatar || '💭') + '</span>',
-            '<div class="meta-feature-modal__hero-copy"><span class="meta-feature-modal__kicker">פילוסוף מלווה</span><h3>' + escapeHtml(philosopher.name || '') + '</h3><p class="meta-feature-modal__lead">' + escapeHtml(philosopher.lead || ('כאן לא לומדים רק לזהות דפוס, אלא גם איך להקשיב לו בצורה חכמה יותר.')) + '</p></div>',
+            '<div class="meta-feature-modal__hero-copy"><span class="meta-feature-modal__kicker">' + escapeHtml(kicker) + '</span><h3>' + escapeHtml(philosopher.name || '') + '</h3><p class="meta-feature-modal__lead">' + escapeHtml(philosopher.lead || ('כאן לא לומדים רק לזהות דפוס, אלא גם איך להקשיב לו בצורה חכמה יותר.')) + '</p></div>',
             '</div>',
-            '<blockquote class="meta-feature-modal__quote"><p>' + escapeHtml(philosopher.quote || '') + '</p><cite>' + escapeHtml(philosopher.name || '') + '</cite></blockquote>',
-            '<section class="meta-feature-modal__surface"><span class="meta-feature-modal__eyebrow">למה זה חשוב כאן</span>' + richParagraphs(philosopher.deepLines || philosopher.deep) + '</section>',
-            bridge ? ('<section class="meta-feature-modal__surface meta-feature-modal__surface--tint"><span class="meta-feature-modal__eyebrow">מה נבדוק מיד</span><p>' + escapeHtml(bridge) + '</p></section>') : '',
-            philosopher.practicalTip ? ('<section class="meta-feature-modal__tip"><strong>טיפ לתרגול מיידי</strong><p>' + escapeHtml(philosopher.practicalTip) + '</p></section>') : '',
+            quoteHtml,
+            '<section class="meta-feature-modal__surface"><span class="meta-feature-modal__eyebrow">' + escapeHtml(sectionTitle) + '</span>' + richParagraphs(philosopher.deepLines || philosopher.deep) + '</section>',
+            bridge ? ('<section class="meta-feature-modal__surface meta-feature-modal__surface--tint"><span class="meta-feature-modal__eyebrow">' + escapeHtml(bridgeTitle) + '</span><p>' + escapeHtml(bridge) + '</p></section>') : '',
+            philosopher.practicalTip ? ('<section class="meta-feature-modal__tip"><strong>' + escapeHtml(tipTitle) + '</strong><p>' + escapeHtml(philosopher.practicalTip) + '</p></section>') : '',
             '<button type="button" class="btn btn-primary meta-feature-modal__cta" data-feature-close>הבנתי, בואו נתרגל</button>',
             '</div>'
         ].join('');
     }
     function videoModalHtml(meta) {
         var sampleDialogue = demoTurns(meta);
+        var lead = String(meta.demoLead || 'זו הדגמת שיחה קצרה שממחישה איזה שינוי הכלי הזה מנסה ליצור בפועל.').trim();
+        var eyebrow = String(meta.demoEyebrow || 'איך זה נראה בשיחה').trim();
+        var impactTitle = String(meta.demoImpactTitle || 'מה משתנה בזכות הכלי').trim();
+        var impact = String(meta.demoImpact || meta.successNote || meta.description || '').trim();
+        var practiceNote = String(meta.example.challenge || meta.description || '').trim();
         return [
             '<div class="meta-feature-modal__video">',
-            '<div class="meta-feature-modal__video-frame"><span class="meta-feature-modal__video-play">▶</span></div>',
-            '<section class="meta-feature-modal__surface"><span class="meta-feature-modal__eyebrow">מה יהיה כאן</span><p class="meta-feature-modal__video-note">הסרטון המלא עוד בדרך, אבל המבנה כבר מוכן: נראה משפט, נפרק אותו, ואז נתרגם את הזיהוי לשאלה אחת מדויקת.</p></section>',
-            sampleDialogue ? ('<section class="meta-feature-modal__surface"><span class="meta-feature-modal__eyebrow">טעימה מהדיאלוג</span><div class="meta-feature-shell__dialogue">' + sampleDialogue + '</div></section>') : '',
-            '<section class="meta-feature-modal__tip"><strong>שווה לשים לב</strong><p>' + escapeHtml(meta.example.challenge || meta.description || '') + '</p></section>',
-            '<button type="button" class="btn btn-primary meta-feature-modal__cta" data-feature-close>סגור והמשיכו לתרגול</button>',
+            '<div class="meta-feature-modal__video-frame"><span class="meta-feature-modal__video-play">💬</span></div>',
+            '<section class="meta-feature-modal__surface"><span class="meta-feature-modal__eyebrow">' + escapeHtml(eyebrow) + '</span><p class="meta-feature-modal__video-note">' + escapeHtml(lead) + '</p></section>',
+            sampleDialogue ? ('<section class="meta-feature-modal__surface"><span class="meta-feature-modal__eyebrow">דיאלוג קצר</span><div class="meta-feature-shell__dialogue">' + sampleDialogue + '</div></section>') : '',
+            impact ? ('<section class="meta-feature-modal__tip"><strong>' + escapeHtml(impactTitle) + '</strong><p>' + escapeHtml(impact) + '</p></section>') : '',
+            practiceNote ? ('<section class="meta-feature-modal__surface meta-feature-modal__surface--tint"><span class="meta-feature-modal__eyebrow">מה לקחת לתרגול</span><p>' + escapeHtml(practiceNote) + '</p></section>') : '',
+            '<button type="button" class="btn btn-primary meta-feature-modal__cta" data-feature-close>' + escapeHtml(meta.demoCtaLabel || 'סגור והמשיכו לתרגול') + '</button>',
             '</div>'
         ].join('');
     }
@@ -962,16 +987,21 @@
         parts.push('<button type="button" class="btn btn-primary meta-feature-modal__cta" data-feature-close>' + escapeHtml(safeModal.ctaLabel || 'הבנתי, בואו נתרגל') + '</button>');
         return parts.join('');
     }
-    function featureActionButtonsHtml(meta) {
+function featureActionButtonsHtml(meta) {
         var actions = [];
+        var theoryLabel = String(meta.philosopherButtonLabel || 'רקע תיאורטי').trim();
+        var theoryIcon = String(meta.philosopherButtonIcon || '🧠').trim();
+        var demoLabel = String(meta.demoButtonLabel || 'דיאלוג טיפולי').trim();
+        var demoIcon = String(meta.demoButtonIcon || '💬').trim();
+        var settingsLabel = String(meta.settingsButtonLabel || 'הגדרות').trim();
         if (Array.isArray(meta.modals) && meta.modals.length) {
             actions = meta.modals.map(function (modal) {
                 return featureActionButton(modal.id || 'info', modal.icon || 'ℹ', modal.label || modal.title || 'מידע');
             });
         } else {
-            if (meta.philosopher) actions.push(featureActionButton('philosopher', '💭', 'העמקה'));
-            if (meta.demo || meta.example) actions.push(featureActionButton('demo', '▶', 'סרטון'));
-            if (meta.settings && Object.keys(meta.settings).length) actions.push(featureActionButton('settings', '⚙', 'הגדרות'));
+            if (meta.philosopher) actions.push(featureActionButton('philosopher', theoryIcon, theoryLabel));
+            if (meta.demo || meta.example) actions.push(featureActionButton('demo', demoIcon, demoLabel));
+            if (meta.settings && Object.keys(meta.settings).length) actions.push(featureActionButton('settings', '⚙', settingsLabel));
         }
         return actions.length ? '<div class="meta-feature-shell__actions meta-feature-shell__actions--welcome">' + actions.join('') + '</div>' : '';
     }
@@ -982,8 +1012,8 @@
             }).join('');
         }
         return [
-            meta.philosopher ? featureModalSheet('philosopher', 'העמקה פילוסופית', philosopherModalHtml(meta)) : '',
-            (meta.demo || meta.example) ? featureModalSheet('demo', 'סרטון הדגמה', videoModalHtml(meta)) : '',
+            meta.philosopher ? featureModalSheet('philosopher', meta.philosopherModalTitle || 'רקע תיאורטי', philosopherModalHtml(meta)) : '',
+            (meta.demo || meta.example) ? featureModalSheet('demo', meta.demoModalTitle || 'דיאלוג טיפולי לדוגמה', videoModalHtml(meta)) : '',
             (meta.settings && Object.keys(meta.settings).length) ? featureModalSheet('settings', 'הגדרות למשימה', settingsModalHtml(meta, state)) : ''
         ].join('');
     }
