@@ -6,6 +6,8 @@
     const DATA_PATH = 'data/prism-necessity.json';
     const STYLE_PATH = 'css/prism-necessity.css';
     const MAP_OVERLAY_LABEL = 'הרמות הלוגיות של דילטס';
+    let exercisesCache = null;
+    let exercisesRequest = null;
 
     const LEVELS = Object.freeze([
         Object.freeze({ id: 'environment', label: 'סביבה', color: '#85B7EB', fill: '#E6F1FB', dark: '#0C447C' }),
@@ -162,23 +164,42 @@
         };
     }
 
-    async function loadExercises() {
-        const response = await fetch(resolveAssetPath(DATA_PATH), { cache: 'no-store' });
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+    async function loadExercises(options = {}) {
+        const force = !!options.force;
+        if (!force && Array.isArray(exercisesCache) && exercisesCache.length) {
+            return exercisesCache;
+        }
+        if (!force && exercisesRequest) {
+            return exercisesRequest;
         }
 
-        const payload = await response.json();
-        const items = Array.isArray(payload) ? payload : Array.isArray(payload?.exercises) ? payload.exercises : [];
-        const exercises = items
-            .map((item, index) => normalizeExercise(item, index))
-            .filter(Boolean);
+        exercisesRequest = fetch(resolveAssetPath(DATA_PATH), { cache: 'force-cache' })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((payload) => {
+                const items = Array.isArray(payload) ? payload : Array.isArray(payload?.exercises) ? payload.exercises : [];
+                const exercises = items
+                    .map((item, index) => normalizeExercise(item, index))
+                    .filter(Boolean);
 
-        if (!exercises.length) {
-            throw new Error('No exercises found in prism necessity dataset');
-        }
+                if (!exercises.length) {
+                    throw new Error('No exercises found in prism necessity dataset');
+                }
 
-        return exercises;
+                exercisesCache = Object.freeze(exercises.slice());
+                return exercisesCache;
+            })
+            .catch((error) => {
+                exercisesRequest = null;
+                if (force) exercisesCache = null;
+                throw error;
+            });
+
+        return exercisesRequest;
     }
 
     function createState(root) {
@@ -820,7 +841,7 @@
         render(state);
 
         try {
-            state.exercises = await loadExercises();
+            state.exercises = await loadExercises({ force: true });
             state.loaded = true;
             state.error = '';
             resetExercise(state, state.exerciseIndex);
