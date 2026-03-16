@@ -16278,6 +16278,10 @@ function renderVerticalStackResult(stackState) {
     `;
 }
 function setupPrismModule() {
+    const necessityRoot = document.querySelector('[data-prism-necessity-app]');
+    if (necessityRoot && !document.getElementById('prism-library') && !document.getElementById('prism-detail')) {
+        return;
+    }
     if (typeof applyPrismLabCompactRuntimeCopy === 'function') applyPrismLabCompactRuntimeCopy();
     if (typeof ensurePrismLabWorkLayout === 'function') ensurePrismLabWorkLayout();
     renderPrismLibrary();

@@ -7,7 +7,7 @@
         Object.freeze({ id: 'sentence', label: 'המשפט' }),
         Object.freeze({ id: 'layers', label: 'כיוונים' }),
         Object.freeze({ id: 'focus', label: 'מוקד' }),
-        Object.freeze({ id: 'intervention', label: 'מה לשאול' }),
+        Object.freeze({ id: 'intervention', label: 'ההמלצה' }),
         Object.freeze({ id: 'reformulation', label: 'ניסוח חדש' })
     ]);
     const LAYER_ORDER = Object.freeze(['outside', 'inside', 'relational']);
@@ -18,7 +18,7 @@ const MODE_COPY = Object.freeze({
     const HEADER_COPY = Object.freeze({
         title: 'מפת המשפט',
         leadTitle: 'מפת העבודה',
-        concept: 'בחרו מקרה אחד והתקדמו דרך ששת השלבים: משפט, שכבות, מוקד, שאלה וניסוח חדש.',
+        concept: 'בחרו מקרה אחד והתקדמו דרך ששת השלבים: משפט, שכבות, מוקד, המלצה וניסוח חדש.',
         stepperTitle: 'ששת השלבים',
         casesTitle: 'מקרי תרגול',
         casesSubtitle: 'שלושה מקרים קבועים, אותה מפה.',
@@ -29,6 +29,39 @@ const MODE_COPY = Object.freeze({
         outside: Object.freeze({ icon: '🌍', name: 'חוץ', tag: '🌍 חוץ', title: 'מה קרה בפועל?', description: 'מה קרה בפועל, פיזי, כאן ועכשיו' }),
         inside: Object.freeze({ icon: '🧠', name: 'פנים', tag: '🧠 פנים', title: 'מה הסיפור הפנימי?', description: 'הסיפור הפנימי, רגש, תמונה, ערכים' }),
         relational: Object.freeze({ icon: '🔗', name: 'פונקציה', tag: '🔗 פונקציה', title: 'מה המשפט עושה בשיחה?', description: 'מה המשפט עושה בתוך השיחה' })
+    });
+    const DECISION_COPY = Object.freeze({
+        title: 'ההמלצה כרגע',
+        subtitle: 'על בסיס ניתוח המשפט, זהו הצעד הבא המומלץ — בכפוף למצב המטופל, למטרה, ולשיקול הדעת הקליני שלך.',
+        sentenceLabel: 'המשפט שנבדק',
+        focusLabel: 'מוקד העבודה כרגע',
+        doNow: 'מה לעשות עכשיו',
+        avoidNow: 'ממה להימנע עכשיו',
+        whyTitle: 'למה זה הכיוון כרגע',
+        nextQuestionTitle: 'שאלת ההמשך המומלצת',
+        questionPurposeLabel: 'מטרת השאלה',
+        wordingTitle: 'ניסוח אפשרי למטפל',
+        wordingHint: 'דוגמה — לא נוסח חובה',
+        processTitle: 'מה התהליך הזה אמור לעשות',
+        clinicalNote: 'חשוב: ההמלצה כאן היא כיוון עבודה אפשרי. הצעד הבא נכון רק אם הוא מתכתב עם מצב המטופל, העומס הרגשי, שלב הטיפול, והמטרה שאליה הולכים.'
+    });
+    const INTERVENTION_FAMILY_COPY = Object.freeze({
+        imagery: Object.freeze({
+            title: 'עבודה עם דימוי מודרך',
+            description: 'עבודה עם דימוי מודרך פועלת על החוויה הפנימית ועל הייצוג החושי שלה.'
+        }),
+        clarification: Object.freeze({
+            title: 'שאלות הבהרה',
+            description: 'שאלות הבהרה עובדות על דיוק, רצף והבחנה בין הכללה לבין רגע קונקרטי.'
+        }),
+        reframing: Object.freeze({
+            title: 'מסגור מחדש',
+            description: 'מסגור מחדש משנה משמעות בלי למחוק את החוויה ופותח מרחב לתגובה אחרת.'
+        }),
+        reflective: Object.freeze({
+            title: 'שפה רפלקטיבית ותיקוף',
+            description: 'שפה רפלקטיבית מייצבת ביטחון וברית טיפולית לפני אתגור או תיקון.'
+        })
     });
 
     function clampStep(value) {
@@ -121,6 +154,70 @@ const MODE_COPY = Object.freeze({
         const renderFocusBadge = (focusId) => LAYER_META[focusId] ? `<span class="sentence-map-focus-pill sentence-map-focus-pill--${escapeHtml(focusId)}">${escapeHtml(LAYER_META[focusId].icon)} ${escapeHtml(LAYER_META[focusId].name)}</span>` : '';
         const renderWorkbench = (label, innerHtml, tone = 'map') => `<div class="sentence-map-workbench sentence-map-workbench--${escapeHtml(tone)}"><div class="sentence-map-workbench__label">${escapeHtml(label)}</div>${innerHtml}</div>`;
         const renderSidePanel = (label, innerHtml, tone = 'feedback') => `<aside class="sentence-map-side-panel sentence-map-side-panel--${escapeHtml(tone)}"><div class="sentence-map-side-panel__label">${escapeHtml(label)}</div>${innerHtml}</aside>`;
+        const cleanDirectiveText = (text, prefix) => String(text || '').replace(prefix, '').replace(/\s+/g, ' ').trim();
+        const stripQuestionMark = (text) => String(text || '').replace(/[?؟]+\s*$/u, '').trim();
+        const getRecommendedFocus = (caseData) => hasFocusId(caseData?.hotFocus) ? String(caseData.hotFocus).trim() : 'inside';
+        const getFocusSummary = (focusId) => {
+            if (focusId === 'outside') return 'זוהה כאן קודם כל צורך בדיוק וברצף נצפה, לפני פרשנות או הכללה.';
+            if (focusId === 'relational') return 'זוהתה כאן קודם כל פונקציה יחסית: המשפט מנסה להשיג נראות, הכרה או תגובה אחרת בקשר.';
+            return 'זוהתה כאן קודם כל חוויה פנימית שמארגנת את המשמעות: דימוי, תחושת גוף או סיפור פנימי.';
+        };
+        const getFocusPurpose = (focusId) => {
+            if (focusId === 'outside') return 'כאן ההתערבות מכוונת קודם לעובדות, לרצף ולרגע קונקרטי שאפשר לבדוק.';
+            if (focusId === 'relational') return 'כאן ההתערבות מכוונת קודם למה שהמשפט עושה בקשר, לפני ויכוח על העובדות.';
+            return 'כאן ההתערבות מכוונת קודם למה שקורה בתוך החוויה, לפני תיקון מהיר של הניסוח.';
+        };
+        const getClinicalRisk = (focusId) => {
+            if (focusId === 'outside') return 'אם נשארים רק עם התחושה או הפרשנות, קל לפספס את הרצף הקונקרטי שממנו אפשר לייצר דיוק ושינוי.';
+            if (focusId === 'relational') return 'אם מתקנים את העובדות מוקדם מדי, קל להחריף נתק, עלבון או תחושת חוסר נראות.';
+            return 'אם עוברים מהר מדי לאתגר או לעצה, קל לפספס את הדימוי והעומס שמחזיקים את התקיעות מבפנים.';
+        };
+        const inferInterventionFamilies = (caseData, focusId) => {
+            const haystack = `${caseData?.intervention?.title || ''} ${caseData?.intervention?.explanation || ''} ${caseData?.intervention?.example || ''}`;
+            const families = [];
+            if (focusId === 'inside' || /ייצוג|תמונה|דימוי|חוויה פנימית|סרט/i.test(haystack)) families.push('imagery');
+            if (focusId === 'outside' || /מצלמה|לדייק|דיוק|להבהיר|בפועל/i.test(haystack)) families.push('clarification');
+            if (focusId === 'relational' || /תיקוף|שומע|נראות|קשר|ביניכם/i.test(haystack)) families.push('reflective');
+            if (/משמעות|מסגור|הכללה|לדייק את ההכללה/i.test(haystack)) families.push('reframing');
+            if (!families.length) families.push(focusId === 'outside' ? 'clarification' : focusId === 'relational' ? 'reflective' : 'imagery');
+            return Array.from(new Set(families));
+        };
+        const getQuestionPurpose = (focusId, familyKeys) => {
+            if (familyKeys.includes('imagery') && familyKeys.includes('reflective')) return 'לתקף את החוויה, להאט הצפה, ואז להבדיל בין מה שנחווה בפנים לבין מה שנצפה בחוץ.';
+            if (familyKeys.includes('imagery')) return 'לגעת בדימוי או בתחושת הגוף שמחזיקים את התקיעות, ולהכניס בהם מעט תנועה.';
+            if (familyKeys.includes('clarification') && focusId === 'relational') return 'להבין מה המשפט מנסה להשיג בקשר לפני שמבררים אם התיאור שלו מדויק.';
+            if (familyKeys.includes('clarification')) return 'להעביר את השיחה מהכללה לרגע אחד מדויק שאפשר לבדוק ולבנות ממנו עבודה.';
+            if (familyKeys.includes('reframing')) return 'להרחיב את המשמעות בלי למחוק את החוויה, כדי לא להיתקע בפרשנות יחידה.';
+            if (focusId === 'relational') return 'להבין מה המטופל צריך שייקלט או ישתנה בקשר לפני כל תיקון אחר.';
+            return 'להחזיק את החוויה באופן שמאפשר המשך חקירה מדויק ובטוח יותר.';
+        };
+        const getTherapistWording = (caseData, focusId, familyKeys) => {
+            const focusQuestion = stripQuestionMark(caseData?.layers?.[focusId]?.question || '');
+            if (focusId === 'relational') return focusQuestion ? `לפני שנבדוק אם זה תמיד כך, ${focusQuestion}?` : 'לפני שנבדוק את העובדות, מה הכי חשוב שייקלט כאן בקשר?';
+            if (familyKeys.includes('imagery') && familyKeys.includes('reflective')) return focusQuestion ? `אני לא ממהר להתווכח עם החוויה. ${focusQuestion}?` : 'אני רוצה קודם לתת מקום לחוויה, ואז לבדוק בעדינות מה הסרט הפנימי עושה כאן.';
+            if (familyKeys.includes('imagery')) return focusQuestion ? `אם נישאר רגע עם מה שקורה בפנים לפני שנפתור, ${focusQuestion}?` : 'אם נישאר רגע עם התמונה או התחושה מבפנים, מה הדבר הראשון שכדאי להזיז בעדינות?';
+            if (familyKeys.includes('clarification')) return focusQuestion ? `כדי לדייק בלי למהר לפרשנות, ${focusQuestion}?` : 'אם נחזור לרגע אחד מדויק, מה בעצם קרה שם בפועל?';
+            return 'אני רוצה להתקדם בקצב שמחזיק גם את החוויה וגם את הדיוק. מאיפה נכון להתחיל עכשיו?';
+        };
+        const getDecisionRationaleRows = (caseData, focusId) => {
+            const avoidText = cleanDirectiveText(caseData?.intervention?.notThis || '', /^לא עכשיו:\s*/u);
+            return [
+                Object.freeze({ label: 'מה זוהה', text: getFocusSummary(focusId) }),
+                Object.freeze({ label: 'למה זה מתאים', text: String(caseData?.intervention?.explanation || '').trim() || getFocusPurpose(focusId) }),
+                Object.freeze({ label: 'למה לא מסלול אחר עדיין', text: avoidText || 'עדיין לא נכון לעבור לאתגר, עצה או דיוק עובדתי לפני שיש מגע עם לב החוויה.' }),
+                Object.freeze({ label: 'הסיכון אם זזים מהר מדי', text: getClinicalRisk(focusId) })
+            ];
+        };
+        const renderDecisionPrimary = (caseData) => {
+            const doNow = String(caseData?.intervention?.title || '').trim();
+            const avoidNow = cleanDirectiveText(caseData?.intervention?.notThis || '', /^לא עכשיו:\s*/u);
+            return `<section class="sentence-map-decision-primary" aria-label="ההחלטה המרכזית"><article class="sentence-map-decision-card sentence-map-decision-card--do"><span class="sentence-map-decision-card__label">${escapeHtml(DECISION_COPY.doNow)}</span><strong class="sentence-map-decision-card__value">${escapeHtml(doNow || 'להישאר עם ההמלצה הקלינית המרכזית של המפה')}</strong><p class="sentence-map-decision-card__hint">צעד אחד ברור, לפני הרחבות ולפני פיצול לכמה כיוונים.</p></article><article class="sentence-map-decision-card sentence-map-decision-card--avoid"><span class="sentence-map-decision-card__label">${escapeHtml(DECISION_COPY.avoidNow)}</span><strong class="sentence-map-decision-card__value">${escapeHtml(avoidNow || 'לא למהר לתקן, להתווכח או לתת פתרון לפני שהמוקד התבהר.')}</strong><p class="sentence-map-decision-card__hint">זה לא "לעולם לא" — זה פשוט לא הצעד הבא כרגע.</p></article></section>`;
+        };
+        const renderDecisionRationale = (rows) => `<section class="sentence-map-decision-rationale" aria-label="${escapeHtml(DECISION_COPY.whyTitle)}"><div class="sentence-map-decision-block__head"><span>${escapeHtml(DECISION_COPY.whyTitle)}</span></div><div class="sentence-map-decision-rationale__rows">${rows.map((row) => `<article class="sentence-map-decision-rationale__row"><strong>${escapeHtml(row.label)}</strong><p>${escapeHtml(row.text)}</p></article>`).join('')}</div></section>`;
+        const renderDecisionQuestion = (questionText, purposeText) => `<section class="sentence-map-decision-question" aria-label="${escapeHtml(DECISION_COPY.nextQuestionTitle)}"><div class="sentence-map-decision-block__head"><span>${escapeHtml(DECISION_COPY.nextQuestionTitle)}</span></div><blockquote class="sentence-map-decision-question__text">"${escapeHtml(questionText || 'מה נכון לשאול כאן כדי להישאר קרוב ללב המקרה?')}"</blockquote><p class="sentence-map-decision-question__purpose"><strong>${escapeHtml(DECISION_COPY.questionPurposeLabel)}:</strong> ${escapeHtml(purposeText)}</p></section>`;
+        const renderDecisionWording = (wordingText) => `<section class="sentence-map-decision-wording" aria-label="${escapeHtml(DECISION_COPY.wordingTitle)}"><div class="sentence-map-decision-block__head"><span>${escapeHtml(DECISION_COPY.wordingTitle)}</span><small>${escapeHtml(DECISION_COPY.wordingHint)}</small></div><p class="sentence-map-decision-wording__text">${escapeHtml(wordingText)}</p></section>`;
+        const renderDecisionFamilies = (familyKeys) => `<section class="sentence-map-decision-families" aria-label="${escapeHtml(DECISION_COPY.processTitle)}"><div class="sentence-map-decision-block__head"><span>${escapeHtml(DECISION_COPY.processTitle)}</span></div><div class="sentence-map-decision-family-list">${Object.entries(INTERVENTION_FAMILY_COPY).map(([familyId, family]) => `<article class="sentence-map-decision-family-item${familyKeys.includes(familyId) ? ' is-active' : ''}"><div class="sentence-map-decision-family-item__head"><strong>${escapeHtml(family.title)}</strong>${familyKeys.includes(familyId) ? '<span class="sentence-map-decision-family-item__badge">רלוונטי כאן</span>' : ''}</div><p>${escapeHtml(family.description)}</p></article>`).join('')}</div></section>`;
+        const renderDecisionNote = () => `<section class="sentence-map-decision-note" aria-label="הערה קלינית"><p>${escapeHtml(DECISION_COPY.clinicalNote)}</p></section>`;
 
         function setMode(mode) { state.mode = mode === 'practice' ? 'practice' : 'learn'; render(); }
         function setCase(caseId) { if (hasCaseId(caseId)) { state.selectedCaseId = String(caseId).trim(); render(); } }
@@ -201,8 +298,12 @@ const MODE_COPY = Object.freeze({
                 return `<section class="sentence-map-stage-card">${renderStageHeader(3, 'איפה הלב של המקרה?', 'לוח העבודה והפידבק מופרדים כדי שיהיה ברור מה ממפים ומה כבר מסיקים.')}<div class="sentence-map-stage-split">${renderWorkbench('מפת המשפט והשכבות', `${renderSentenceBubble(caseData.sentence, caseData.title)}<div class="sentence-map-focus-grid" role="list">${LAYER_ORDER.map((focusId) => `<button type="button" class="sentence-map-focus-card sentence-map-focus-card--${escapeHtml(focusId)}${selectedFocus === focusId ? ' is-selected' : ''}${caseData.hotFocus === focusId ? ' is-recommended' : ''}" data-action="select-focus" data-focus="${escapeHtml(focusId)}" aria-pressed="${selectedFocus === focusId ? 'true' : 'false'}"><span>${escapeHtml(LAYER_META[focusId].icon)} ${escapeHtml(LAYER_META[focusId].name)}</span><strong>${escapeHtml(LAYER_META[focusId].title)}</strong><p>${escapeHtml(LAYER_META[focusId].description)}</p></button>`).join('')}</div>`)}${selectedFocus ? renderSidePanel('פידבק על הבחירה', `<div class="sentence-map-feedback-card${selectedFocus === caseData.hotFocus ? ' is-right' : ''}" role="status" aria-live="polite"><span>המוקד שנבחר</span><strong>${renderFocusBadge(selectedFocus)}</strong>${renderParagraphs(feedbackText)}</div>`) : renderSidePanel('פידבק יופיע כאן', '<p class="sentence-map-soft-note">בחרו כיוון אחד כדי לראות פידבק נפרד וברור.</p>', 'placeholder')}</div></section>`;
             }
             if (caseUi.stepIndex === 4) {
-                const activeFocus = caseUi.selectedFocus || caseData.hotFocus;
-                return `<section class="sentence-map-stage-card">${renderStageHeader(4, 'מה נכון לשאול עכשיו?', 'המשפט, המוקד והתגובה נשמרים בתוך אותו לוח עבודה ברור.')}<div class="sentence-map-stage-split">${renderWorkbench('לוח ההתערבות', `${renderSentenceBubble(caseData.sentence, caseData.title)}<div class="sentence-map-intervention-status"><span>המוקד שעליו עובדים</span><strong>${renderFocusBadge(activeFocus)}</strong></div><div class="sentence-map-intervention-grid"><article class="sentence-map-info-card sentence-map-info-card--warm"><span>מה מתאים עכשיו</span><strong>${escapeHtml(caseData.intervention?.title || '')}</strong></article><article class="sentence-map-info-card sentence-map-info-card--rose"><span>מה לא עכשיו</span><strong>${escapeHtml(caseData.intervention?.notThis || '')}</strong></article></div>`)}${renderSidePanel('שאלה להמשך השיחה', `<article class="sentence-map-example-card"><span>שאלה שאפשר לומר עכשיו</span><strong>${escapeHtml(caseData.intervention?.example || '')}</strong></article>`, 'guidance')}</div></section>`;
+                const focusId = getRecommendedFocus(caseData);
+                const familyKeys = inferInterventionFamilies(caseData, focusId);
+                const rationaleRows = getDecisionRationaleRows(caseData, focusId);
+                const questionPurpose = getQuestionPurpose(focusId, familyKeys);
+                const therapistWording = getTherapistWording(caseData, focusId, familyKeys);
+                return `<section class="sentence-map-stage-card sentence-map-stage-card--decision">${renderStageHeader(4, DECISION_COPY.title, DECISION_COPY.subtitle)}<div class="sentence-map-decision-context"><article class="sentence-map-decision-context__card"><span>${escapeHtml(DECISION_COPY.sentenceLabel)}</span><strong>"${escapeHtml(caseData.sentence || '')}"</strong></article><article class="sentence-map-decision-context__card sentence-map-decision-context__card--focus"><span>${escapeHtml(DECISION_COPY.focusLabel)}</span><strong>${renderFocusBadge(focusId)}</strong><p>${escapeHtml(getFocusPurpose(focusId))}</p></article></div>${renderDecisionPrimary(caseData)}${renderDecisionRationale(rationaleRows)}${renderDecisionQuestion(caseData.intervention?.example || '', questionPurpose)}<div class="sentence-map-decision-secondary">${renderDecisionWording(therapistWording)}${renderDecisionFamilies(familyKeys)}</div>${renderDecisionNote()}</section>`;
             }
             const parts = caseData.reformulation?.parts || {};
             const showExampleParagraph = state.mode === 'learn' || caseUi.showExampleParagraph;

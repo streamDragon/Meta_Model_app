@@ -1,4 +1,8 @@
 (function prismLabTherapistOverride() {
+    if (document.querySelector('[data-prism-necessity-app]') && !document.getElementById('prism-library')) {
+        return;
+    }
+
     function therapistGetPrismFamilyInfo(prism) {
         const key = String(prism?.meta_model_category || '').trim().toUpperCase();
         return PRISM_META_MODEL_FAMILY_INFO[key] || PRISM_META_MODEL_FAMILY_INFO.default;

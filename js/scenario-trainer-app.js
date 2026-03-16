@@ -900,13 +900,113 @@
             : 'להמשך: אם המשפט הירוק כבר יושב, המשיכו לסצנה הבאה. אם עדיין יש עמימות, פתחו שוב את הפירוק לפני שממשיכים.';
     }
 
+    function getMobileOrderAttr() {
+        return getMobileZoneOrder().join(',');
+    }
+
+    function getCurrentFlowGuideMode() {
+        if (state.screen === SCREEN_IDS.play) return 'play';
+        if (state.screen === SCREEN_IDS.feedback || state.screen === SCREEN_IDS.blueprint) return 'feedback';
+        if (state.screen === SCREEN_IDS.score) return 'score';
+        return 'home';
+    }
+
+    function renderFlowGuideSteps() {
+        const steps = Array.isArray(trainerContract.processSteps) ? trainerContract.processSteps : [];
+        if (!steps.length) return '';
+        return `
+          <div class="scenario-flow-guide-steps" aria-label="רצף שלבי האימון">
+            ${steps.map((step, index) => {
+                const stateClass = processStepState(step.id);
+                const className = ['scenario-flow-guide-step', stateClass].filter(Boolean).join(' ');
+                return `<span class="${className}">${escapeHtml(step.shortLabel || step.label || String(index + 1))}</span>`;
+            }).join('')}
+          </div>
+        `;
+    }
+
+    function renderSupportRail() {
+        const flowMode = getCurrentFlowGuideMode();
+        const scenario = state.activeScenario || state.session?.queue?.[state.session.index] || getHomePreviewScenario(state.homeFilters);
+        const option = state.selectedOption;
+        const isGreen = !!option && Number(option.score) === 1;
+        const guide = scenario && option ? buildFeedbackGuide(scenario, option, isGreen) : null;
+        const toolRows = getScenarioHomeToolRows();
+        const isLast = !!state.session && state.session.index >= state.session.queue.length - 1;
+        const summaryTitle = flowMode === 'play'
+            ? 'מה לבדוק לפני שבוחרים תגובה'
+            : flowMode === 'feedback'
+                ? 'מה התגובה עשתה לשיחה'
+                : flowMode === 'score'
+                    ? 'איך לוקחים את זה לסצנה הבאה'
+                    : 'איך נכנסים נכון לסשן';
+        const summaryText = flowMode === 'play'
+            ? escapeHtml(buildScenarioLearningFocus(scenario))
+            : flowMode === 'feedback'
+                ? escapeHtml(guide?.nextMove || 'כאן רואים קודם איך זה נחת, ואז פותחים את הניתוח המעמיק רק אם צריך.')
+                : flowMode === 'score'
+                    ? escapeHtml(getScenarioScoreNextHint(isLast))
+                    : escapeHtml(getScenarioHomeEntryHint());
+        const detailTitle = flowMode === 'feedback'
+            ? 'לקחת מהמסך הזה'
+            : flowMode === 'play'
+                ? 'שאלת הדיוק של הסצנה'
+                : flowMode === 'score'
+                    ? 'המשפט הירוק הנוכחי'
+                    : 'כלי העזר הפעילים';
+        const detailBody = flowMode === 'feedback'
+            ? `
+              <ul class="scenario-support-list">
+                <li>${escapeHtml(guide?.learningTakeaway || 'מזהים איפה השיחה נפתחה או נסגרה.')}</li>
+                <li>${escapeHtml(guide?.metaModelExplanation || 'מחפשים מה נשאר עמום ואיך מחזירים אותו לבירור.')}</li>
+              </ul>
+            `
+            : flowMode === 'play'
+                ? `
+                  <div class="scenario-support-quote">${escapeHtml(scenario?.deepeningQuestion || 'מה בדיוק קורה כאן בפועל?')}</div>
+                  <p class="scenario-support-note">${escapeHtml(getDomainProcessFocus(scenario?.domain))}</p>
+                `
+                : flowMode === 'score'
+                    ? `
+                      <div class="scenario-support-quote">${escapeHtml(state.lastEntry?.greenSentence || getGreenOptionText(scenario) || 'המשפט הירוק יופיע כאן אחרי הסצנה.')}</div>
+                      <p class="scenario-support-note">${escapeHtml(state.lastEntry?.feedback || 'זה המשפט שאפשר לקחת קדימה לשיחה אמיתית.')}</p>
+                    `
+                    : `
+                      <ul class="scenario-support-list">
+                        ${toolRows.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                      </ul>
+                    `;
+
+        return `
+          <section class="scenario-support-card" data-scenario-flow-guide="${escapeHtml(flowMode)}">
+            <p class="scenario-panel-kicker">מצפן התהליך</p>
+            <h4>${summaryTitle}</h4>
+            ${renderFlowGuideSteps()}
+            <p class="scenario-support-note">${summaryText}</p>
+          </section>
+          <section class="scenario-support-card">
+            <p class="scenario-panel-kicker">פוקוס עכשיו</p>
+            <h4>${detailTitle}</h4>
+            ${detailBody}
+          </section>
+        `;
+    }
+
     function render() {
         mount.innerHTML = renderApp();
     }
 
     function renderApp() {
         return `
-          <div id="scenario-trainer" class="scenario-platform-root" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id="scenario-trainer" data-screen="${state.screen}">
+          <div id="scenario-trainer" class="scenario-platform-root" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id="scenario-trainer" data-screen="${state.screen}" data-trainer-mobile-order="${escapeHtml(getMobileOrderAttr())}">
+            <div class="scenario-summary-strip" data-trainer-zone="start">
+              <div class="scenario-summary-pill" data-trainer-summary="current">${escapeHtml(getCurrentSummary())}</div>
+              ${state.screen === SCREEN_IDS.home ? `
+              <div class="scenario-summary-actions">
+                <button type="button" class="btn btn-primary" data-trainer-action="start-session">התחל סשן</button>
+                <button type="button" class="btn btn-secondary" data-trainer-action="open-settings">הגדרות</button>
+              </div>` : ''}
+            </div>
             ${state.screen !== SCREEN_IDS.home ? `
             <div class="scenario-session-bar" role="toolbar" aria-label="ניהול סשן">
               <span class="scenario-session-bar-info">
@@ -914,9 +1014,14 @@
               </span>
               <button type="button" class="scenario-session-bar-end" data-scenario-action="go-home">↩ חזרה לבית</button>
             </div>` : ''}
-            <main class="scenario-main-area">
-              ${renderMain()}
-            </main>
+            <div class="scenario-standalone-shell">
+              <main class="scenario-main-area scenario-standalone-main" data-trainer-zone="main">
+                ${renderMain()}
+              </main>
+              <aside class="scenario-platform-support" aria-label="תמיכה והדרכת תהליך" data-trainer-zone="support">
+                ${renderSupportRail()}
+              </aside>
+            </div>
             ${state.settingsOpen ? renderSettingsModal() : ''}
             ${state.toastMessage ? `<div class="scenario-toast">${escapeHtml(state.toastMessage)}</div>` : ''}
           </div>
@@ -1108,6 +1213,7 @@
         if (!scenario || !option) return renderPlayScreen();
         const isGreen = Number(option.score) === 1;
         const guide = buildFeedbackGuide(scenario, option, isGreen);
+        const analysisOpen = !!forceAnalysisOpen;
         return `
           <section class="scenario-workspace-card" data-scenario-feedback-thread="1">
             <div class="scenario-feedback-mark ${isGreen ? 'green' : 'red'}">${isGreen ? '✓' : '!'}</div>
@@ -1117,11 +1223,11 @@
               <p>${escapeHtml(isGreen ? option.whyItWorks : option.whyItHurts)}</p>
             </div>
             <div class="scenario-feedback-thread">
-              <div class="scenario-bubble player selected ${isGreen ? 'green' : 'red'}">
+              <div id="scenario-feedback-choice-bubble" class="scenario-bubble player selected ${isGreen ? 'green' : 'red'}">
                 <span class="scenario-bubble-speaker">התשובה שלך</span>
                 <p>${escapeHtml(option.speakerLine)}</p>
               </div>
-              <div class="scenario-bubble other followup">
+              <div id="scenario-feedback-other-bubble" class="scenario-bubble other followup">
                 <span class="scenario-bubble-speaker">התגובה שמולך</span>
                 <p>${escapeHtml(option.likelyOtherReply)}</p>
               </div>
@@ -1136,11 +1242,12 @@
                 <p>${escapeHtml(guide.processImpact)}</p>
               </article>
             </div>
-            <div class="scenario-consequence-box ${isGreen ? 'green' : 'red'}">
+            <div class="scenario-consequence-box ${isGreen ? 'green' : 'red'}" data-scenario-consequence="1">
               <h4>${escapeHtml(isGreen ? 'איך ממשיכים מכאן' : 'מה אפשר לנסות במקום')}</h4>
               <p>${escapeHtml(guide.nextMove)}</p>
             </div>
             <div class="scenario-feedback-actions scenario-feedback-actions--primary">
+              <button type="button" class="btn btn-secondary" data-scenario-action="show-blueprint">${analysisOpen ? 'סגור מפת פעולה' : 'פתח מפת פעולה'}</button>
               <button type="button" class="btn btn-primary" data-scenario-action="continue-result">לסיכום הסצנה</button>
             </div>
             <details class="scenario-meta-accordion">
@@ -1152,7 +1259,7 @@
                 <p><strong>שאלת העמקה:</strong> ${escapeHtml(scenario.deepeningQuestion)}</p>
               </div>
             </details>
-            <details class="scenario-meta-accordion" ${forceAnalysisOpen ? 'open' : ''}>
+            <details class="scenario-meta-accordion" ${analysisOpen ? 'open data-scenario-analysis="1"' : ''}>
               <summary>ניתוח מעמיק — מפת פעולה</summary>
               <div class="scenario-meta-accordion-body">
                 ${renderBlueprintDetails(scenario, isGreen)}

@@ -11,6 +11,122 @@
     --scenario-gold: #f59e0b;
 }
 
+.scenario-summary-strip {
+    max-width: 740px;
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.scenario-summary-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.scenario-standalone-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.scenario-standalone-main {
+    width: 100%;
+}
+
+.scenario-platform-support {
+    max-width: 740px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.scenario-support-card {
+    background: var(--scenario-surface);
+    border: 1px solid var(--scenario-border);
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 12px 28px rgba(15,23,42,0.05);
+}
+
+.scenario-support-card h4 {
+    margin: 0 0 10px;
+    color: var(--scenario-ink);
+    font-size: 1rem;
+}
+
+.scenario-support-note {
+    margin: 0;
+    color: var(--scenario-soft-ink);
+    line-height: 1.65;
+    font-size: 0.9rem;
+}
+
+.scenario-support-quote {
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #dbe7f3;
+    color: var(--scenario-ink);
+    font-weight: 700;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.scenario-support-list {
+    margin: 0;
+    padding-inline-start: 18px;
+    color: var(--scenario-soft-ink);
+    display: grid;
+    gap: 8px;
+    line-height: 1.55;
+    font-size: 0.9rem;
+}
+
+.scenario-flow-guide-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.scenario-flow-guide-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid #dbe7f3;
+    background: #ffffff;
+    color: #64748b;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.scenario-flow-guide-step.is-done {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #065f46;
+}
+
+.scenario-flow-guide-step.is-active {
+    background: #ecfeff;
+    border-color: #67e8f9;
+    color: #155e75;
+}
+
+.scenario-flow-guide-step.is-upcoming {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    color: #94a3b8;
+}
+
 /* ═══ MAIN AREA ═══ */
 .scenario-main-area {
     max-width: 740px;
@@ -902,6 +1018,13 @@
 }
 
 @media (max-width: 640px) {
+    .scenario-summary-strip {
+        margin-bottom: 12px;
+    }
+    .scenario-support-card {
+        padding: 16px;
+        border-radius: 14px;
+    }
     .scenario-workspace-card {
         padding: 16px;
         border-radius: 14px;
