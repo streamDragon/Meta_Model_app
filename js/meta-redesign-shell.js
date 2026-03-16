@@ -1331,18 +1331,22 @@ function featureActionButtonsHtml(meta) {
     function bindFeatureShell(shell, meta) {
         if (!shell) return;
         shell.querySelectorAll('[data-feature-modal]').forEach(function (node) {
-            node.onclick = function (event) {
+            var openHandler = function (event) {
                 event.preventDefault();
                 event.stopPropagation();
                 openFeatureModal(node.closest('.meta-feature-welcome-shell') || shell, node.getAttribute('data-feature-modal') || '');
             };
+            node.onpointerdown = openHandler;
+            node.onclick = openHandler;
         });
         shell.querySelectorAll('[data-feature-close]').forEach(function (node) {
-            node.onclick = function (event) {
+            var closeHandler = function (event) {
                 event.preventDefault();
                 event.stopPropagation();
                 closeFeatureModals(node.closest('.meta-feature-welcome-shell') || shell);
             };
+            node.onpointerdown = closeHandler;
+            node.onclick = closeHandler;
         });
         shell.onclick = function (event) {
             if (event.target.closest('[data-feature-enter]')) {
