@@ -11,66 +11,20 @@
   <script src="js/trainer-platform-contracts.js"></script>
   <script src="js/trainer-standalone.js"></script>
   <script>
-    (function () {
-      var v = String(Date.now());
-
-      function withV(path) {
-        try {
-          var u = new URL(path, location.href);
-          u.searchParams.set('v', v);
-          return u.toString();
-        } catch (e) {
-          return path + (path.indexOf('?') === -1 ? '?' : '&') + 'v=' + encodeURIComponent(v);
-        }
-      }
-
-      function addCss(path) {
-        var link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = withV(path);
-        document.head.appendChild(link);
-      }
-
-      function boot() {
-        if (window.__scenarioTrainerBooted) return;
-        window.__scenarioTrainerBooted = true;
-
-        window.MetaTrainerStandalone.boot({
-          "trainerId": "scenario-trainer",
-          "manifestKey": "_scenario_trainer",
-          "css": [
+    window.MetaTrainerStandalone.boot({
+      "trainerId": "scenario-trainer",
+      "manifestKey": "_scenario_trainer",
+      "css": [
             "css/style.css",
             "css/scenario-trainer.css",
             "css/ui-enhancements.css",
             "css/meta-model-redesign.css"
-          ],
-          "scripts": ["js/scenario-trainer-app.js"]
-        });
-      }
-
-      document.addEventListener('DOMContentLoaded', boot);
-      addCss('css/style.css');
-      addCss('css/scenario-trainer.css');
-      addCss('css/ui-enhancements.css');
-      addCss('css/meta-model-redesign.css');
-    })();
+      ],
+      "scripts": [
+            "js/scenario-trainer-app.js"
+      ]
+});
   </script>
 </head>
-<body>
-  <div class="container ltv2-page">
-    <header class="ltv2-header">
-      <h1>סימולטור סצנות 🎭</h1>
-      <p>דיאלוג אנושי עם בחירה מודעת של תגובה</p>
-      <div class="ltv2-header-actions">
-        <a class="btn btn-secondary" href="index.html?tab=practice-verb-unzip">חזרה למרכז כלים באפליקציה</a>
-      </div>
-    </header>
-
-    <section class="tab-content active practice-tab-content">
-      <div class="practice-container">
-        <div id="scenario-trainer-root"></div>
-      </div>
-    </section>
-  </div>
-</body>
+<body></body>
 </html>

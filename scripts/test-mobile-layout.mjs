@@ -7,6 +7,8 @@ import { chromium } from 'playwright';
 
 const projectRoot = process.cwd();
 const VITE_BIN = path.join(projectRoot, 'node_modules', 'vite', 'bin', 'vite.js');
+const APP_READY_TIMEOUT_MS = 45000;
+const STEP_TIMEOUT_MS = 15000;
 const MANAGED_SCREENS = new Set(['sentence-map', 'practice-question', 'practice-radar', 'practice-triples-radar']);
 const MANAGED_CONTENT_SELECTOR_BY_SCREEN = Object.freeze({
     'sentence-map': '#sentence-map .practice-section-sentence-map',
@@ -53,6 +55,8 @@ const resolvePrimaryHtmlPath = async () => {
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const formatLogs = (lines) => lines.slice(-20).join('\n');
+
 const listenProbe = async (port) => new Promise((resolve) => {
     const server = net.createServer();
     server.once('error', () => resolve(false));
@@ -81,20 +85,39 @@ async function waitForHttp(url, timeoutMs = 30000) {
     throw new Error(`Timed out waiting for ${url}`);
 }
 
+async function createBrowser() {
+    try {
+        return await chromium.launch({ headless: true });
+    } catch (error) {
+        const message = String(error?.message || error);
+        if (/Executable doesn't exist|browser.*not found/i.test(message)) {
+            throw new Error('Playwright Chromium is not installed. Run: npx playwright install chromium');
+        }
+        throw error;
+    }
+}
+
 async function startLocalServer() {
     const port = await findAvailablePort();
     const base = `http://127.0.0.1:${port}`;
+    const logs = [];
     const server = spawn(process.execPath, [VITE_BIN, '--host', '127.0.0.1', '--port', String(port), '--strictPort'], {
         cwd: projectRoot,
         stdio: ['ignore', 'pipe', 'pipe']
     });
+    server.stdout?.on('data', (chunk) => {
+        logs.push(String(chunk));
+    });
+    server.stderr?.on('data', (chunk) => {
+        logs.push(String(chunk));
+    });
 
     try {
         await waitForHttp(base);
-        return { base, server };
+        return { base, server, logs };
     } catch (error) {
         await stopServer(server);
-        throw error;
+        throw new Error(`${error.message}\n${formatLogs(logs)}`);
     }
 }
 
@@ -137,7 +160,7 @@ async function dismissOnboardingIfVisible(page) {
         if (!overlay) return true;
         const style = getComputedStyle(overlay);
         return overlay.hidden || style.display === 'none' || style.pointerEvents === 'none';
-    });
+    }, null, { timeout: STEP_TIMEOUT_MS });
     return true;
 }
 
@@ -157,8 +180,49 @@ async function seedTestState(page) {
     }, TEST_GAMIFICATION_STATE);
 }
 
+async function captureScreenState(page, screenId = '') {
+    return page.evaluate((id) => {
+        const section = id ? document.getElementById(id) : null;
+        const cta = section?.querySelector('[data-feature-enter]');
+        const activeSection = document.querySelector('.tab-content.active');
+        return {
+            screenId: id || '',
+            bodyActiveTab: document.body?.dataset?.activeTab || '',
+            activeButtonTab: document.querySelector('.tab-btn.active')?.getAttribute('data-tab') || '',
+            activeSectionId: activeSection?.id || '',
+            sectionActive: !!section?.classList.contains('active'),
+            sectionDisplay: section ? getComputedStyle(section).display : '',
+            metaFeatureStage: section?.dataset?.metaFeatureStage || '',
+            ctaCount: section ? section.querySelectorAll('[data-feature-enter]').length : 0,
+            ctaVisible: !!cta && !cta.hidden && getComputedStyle(cta).display !== 'none',
+            navigateToReady: typeof window.navigateTo === 'function'
+        };
+    }, screenId).catch(() => null);
+}
+
+async function runStep(page, label, action, screenId = '') {
+    try {
+        return await action();
+    } catch (error) {
+        const state = await captureScreenState(page, screenId);
+        const suffix = state ? ` :: ${JSON.stringify(state)}` : '';
+        throw new Error(`${label}: ${error.message}${suffix}`);
+    }
+}
+
+async function waitForAppReady(page) {
+    await page.waitForFunction(() => {
+        const homeShell = document.getElementById('meta-home-shell');
+        const hasActiveButton = !!document.querySelector('.tab-btn.active');
+        return typeof window.navigateTo === 'function'
+            && !!homeShell
+            && hasActiveButton
+            && document.body?.dataset?.activeTab === 'home';
+    }, null, { timeout: APP_READY_TIMEOUT_MS });
+}
+
 async function waitForActiveScreen(page, screenId) {
-    await page.waitForFunction((id) => {
+    await runStep(page, `waitForActiveScreen(${screenId})`, () => page.waitForFunction((id) => {
         if (id === 'home') {
             const root = document.getElementById('meta-home-shell');
             if (!root || document.body?.dataset?.activeTab !== 'home') return false;
@@ -168,11 +232,16 @@ async function waitForActiveScreen(page, screenId) {
         }
         const section = document.getElementById(id);
         return !!section && section.classList.contains('active') && getComputedStyle(section).display !== 'none';
-    }, screenId);
+    }, screenId, { timeout: STEP_TIMEOUT_MS }), screenId);
 }
 
 async function navigateToScreen(page, screenId) {
-    await page.evaluate((id) => window.navigateTo(id), screenId);
+    await runStep(page, `navigateTo(${screenId})`, () => page.evaluate((id) => {
+        if (typeof window.navigateTo !== 'function') {
+            throw new Error('window.navigateTo is not ready');
+        }
+        window.navigateTo(id);
+    }, screenId), screenId);
     await waitForActiveScreen(page, screenId);
     await page.waitForTimeout(400);
 }
@@ -187,9 +256,11 @@ async function enterManagedFeatureStage(page, screenId) {
             throw new Error(`Missing managed feature CTA on ${screenId}`);
         }
         await cta.click();
-        await page.waitForFunction((id) => document.getElementById(id)?.dataset?.metaFeatureStage === 'feature', screenId);
+        await runStep(page, `enterManagedFeatureStage(${screenId})`, () => page.waitForFunction((id) => {
+            return document.getElementById(id)?.dataset?.metaFeatureStage === 'feature';
+        }, screenId, { timeout: STEP_TIMEOUT_MS }), screenId);
     }
-    await page.waitForFunction(({ id, selector }) => {
+    await runStep(page, `waitForManagedContent(${screenId})`, () => page.waitForFunction(({ id, selector }) => {
         const section = document.getElementById(id);
         const content = selector ? document.querySelector(selector) : null;
         if (!section || section.dataset?.metaFeatureStage !== 'feature' || !content) return false;
@@ -201,17 +272,18 @@ async function enterManagedFeatureStage(page, screenId) {
             && style.visibility !== 'hidden'
             && rect.width > 0
             && rect.height > 0;
-    }, { id: screenId, selector: contentSelector });
+    }, { id: screenId, selector: contentSelector }, { timeout: STEP_TIMEOUT_MS }), screenId);
     await page.waitForTimeout(500);
     return stage !== 'feature';
 }
 
 async function verifyRuntimeMobileLayout(baseUrl) {
-    const browser = await chromium.launch({ headless: true });
+    const browser = await createBrowser();
     try {
         const page = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true });
         await seedTestState(page);
         await page.goto(baseUrl, { waitUntil: 'networkidle' });
+        await waitForAppReady(page);
         await dismissOnboardingIfVisible(page);
 
         for (const screenId of ['home', 'sentence-map', 'practice-question', 'practice-radar', 'practice-wizard', 'blueprint']) {

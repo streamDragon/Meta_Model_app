@@ -63,7 +63,7 @@ async function loadCreateClient() {
         cachedCreateClient = window.supabase.createClient;
         return cachedCreateClient;
     }
-    const mod = await import(SUPABASE_JS_CDN);
+    const mod = await import(/* @vite-ignore */ SUPABASE_JS_CDN);
     if (!mod || typeof mod.createClient !== 'function') {
         throw new Error('SUPABASE_CLIENT_LOAD_FAILED');
     }
