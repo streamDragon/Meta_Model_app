@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.373" data-build-time="1773630710887" data-build-iso="2026-03-16T03:11:50.887Z" data-git-commit="7d01fcc">
+<html lang="he" dir="rtl" data-app-version="1.0.374" data-build-time="1773630930703" data-build-iso="2026-03-16T03:15:30.703Z" data-git-commit="0c83243">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -952,156 +952,9 @@
 
         <!-- PRISM LAB TAB -->
         <section id="prismlab" class="tab-content">
-            <div class="prism-container prism-therapist-shell">
-                <div class="card">
-                    <h2>מעבדת הפריזמות</h2>
-                    <p>כאן עובדים על המשפט עצמו. מזהים מה בולט בשפה, מזהים מאיזו רמה החוויה מדברת, ואז בונים שאלה מצטרפת, שאלת הובלה, ומה עשוי להיפתח בתגובה.</p>
-                    <p class="prism-shell-note">המשפט נשאר מולך כל הזמן. העמקה, דוגמאות, טעויות נפוצות וסיכום נפתחים רק כשצריך.</p>
-
-                    <div class="prism-grid" id="prism-library">
-                        <!-- Prism cards will be rendered here -->
-                    </div>
-
-                    <div id="prism-detail" class="prism-detail prism-lab-therapist hidden">
-                        <div class="prism-detail-toolbar">
-                            <button id="prism-cancel" class="btn btn-secondary">חזרה לקטגוריות</button>
-                            <button id="prism-submit" class="btn btn-primary">שמור/י סיכום עבודה</button>
-                        </div>
-
-                        <div id="prism-deep-guide" class="prism-deep-guide"></div>
-
-                        <section class="prism-client-stage" aria-labelledby="prism-client-stage-title">
-                            <div class="prism-stage-head">
-                                <div>
-                                    <p class="prism-section-kicker">1. זיהוי</p>
-                                    <h3 id="prism-client-stage-title">המשפט שעובדים עליו עכשיו</h3>
-                                </div>
-                                <p class="prism-stage-note">המטרה איננה לתקן את המטופל/ת - אלא לפתוח את המפה.</p>
-                            </div>
-
-                            <label class="prism-field-label" for="prism-client-sentence">מה המטופל/ת אמר/ה?</label>
-                            <textarea id="prism-client-sentence" class="mapping-input prism-client-input" rows="3" placeholder="לדוגמה: יש בינינו ניתוק מוחלט"></textarea>
-                            <div class="prism-anchor-input-card">
-                                <label for="prism-anchor-input">מה המילה או הביטוי שכדאי לפתוח מתוך המשפט?</label>
-                                <input id="prism-anchor-input" class="mapping-input prism-anchor-input" type="text" placeholder="לדוגמה: ניתוק / תמיד / הוא לא רוצה" />
-                                <small>אם יש ספק, קצר/י את המשפט למילה או ביטוי אחד שמרכזים את העבודה.</small>
-                            </div>
-                            <div id="prism-active-sentence" class="prism-active-sentence" aria-live="polite"></div>
-                        </section>
-
-                        <section class="prism-recognition-section" aria-labelledby="prism-recognition-title">
-                            <div class="prism-section-head">
-                                <div>
-                                    <p class="prism-section-kicker">מה אני מזהה כאן?</p>
-                                    <h3 id="prism-recognition-title">קטגוריה ורמה</h3>
-                                </div>
-                                <p class="prism-section-note">הקטגוריה מסבירה איזה סוג מחיקה, הכללה, או קיבוע משמעות בולט בשפה. הרמה מסבירה מאיזו שכבת חוויה המשפט נאמר כרגע.</p>
-                            </div>
-
-                            <div class="prism-recognition-grid">
-                                <article class="prism-recognition-card">
-                                    <p class="prism-card-kicker">איזו קטגוריית מטה-מודל בולטת כאן?</p>
-                                    <h4 id="prism-name"></h4>
-                                    <p id="prism-desc"></p>
-                                    <p id="prism-anchor" class="prism-recognition-note"></p>
-                                </article>
-
-                                <article class="prism-recognition-card prism-recognition-card-level">
-                                    <p class="prism-card-kicker">באיזו רמה המשפט פועל עכשיו?</p>
-                                    <h4 id="prism-selected-level-name"></h4>
-                                    <p id="prism-selected-level-desc"></p>
-                                    <div id="prism-selected-level-anchors" class="prism-inline-list"></div>
-                                </article>
-                            </div>
-                        </section>
-
-                        <section class="prism-flow-section" aria-labelledby="prism-flow-title">
-                            <div class="prism-section-head">
-                                <div>
-                                    <p class="prism-section-kicker">מה כדאי לשאול עכשיו?</p>
-                                    <h3 id="prism-flow-title">מהלך ההתערבות</h3>
-                                </div>
-                                <p class="prism-section-note">חפש/י מידע חדש, הבדל חדש, או שינוי ברמת המבט.</p>
-                            </div>
-
-                            <div class="prism-flow-steps" aria-label="שלבי העבודה">
-                                <span>1. זיהוי</span>
-                                <span>2. הצטרפות</span>
-                                <span>3. הובלה</span>
-                                <span>4. תגובה אפשרית</span>
-                            </div>
-
-                            <div class="prism-flow-grid">
-                                <article class="prism-flow-card prism-flow-card-join">
-                                    <p class="prism-section-kicker">2. הצטרפות</p>
-                                    <h4>שאלה מצטרפת</h4>
-                                    <p id="prism-joining-question" class="prism-question-copy"></p>
-                                    <p id="prism-joining-note" class="prism-question-note"></p>
-                                </article>
-
-                                <article class="prism-flow-card prism-flow-card-lead">
-                                    <div class="prism-flow-card-head">
-                                        <div>
-                                            <p class="prism-section-kicker">3. הובלה</p>
-                                            <h4>שאלת הובלה</h4>
-                                        </div>
-                                        <div class="prism-direction-toggle" role="group" aria-label="כיוון הובלה">
-                                            <button type="button" class="prism-direction-btn" data-prism-direction="ground">להוביל לקרקע</button>
-                                            <button type="button" class="prism-direction-btn" data-prism-direction="expand">להוביל למשמעות</button>
-                                        </div>
-                                    </div>
-                                    <p id="prism-leading-question" class="prism-question-copy"></p>
-                                    <p id="prism-leading-note" class="prism-question-note"></p>
-                                    <div class="prism-target-level-line">
-                                        <span>מוביל/ה אל:</span>
-                                        <strong id="prism-target-level"></strong>
-                                    </div>
-                                </article>
-
-                                <article class="prism-flow-card prism-flow-card-response">
-                                    <p class="prism-section-kicker">4. תגובת מטופל אפשרית</p>
-                                    <h4>מה עשוי להיפתח בתגובה?</h4>
-                                    <p id="prism-possible-response" class="prism-question-copy"></p>
-                                    <ul id="prism-openings-list" class="prism-openings-list"></ul>
-                                </article>
-                            </div>
-                        </section>
-
-                        <section class="prism-level-selector-section" aria-labelledby="prism-level-selector-title">
-                            <div class="prism-section-head">
-                                <div>
-                                    <p class="prism-section-kicker">בדיקה מהירה</p>
-                                    <h3 id="prism-level-selector-title">בדוק/י אם בחרת את הרמה הנכונה</h3>
-                                </div>
-                                <p class="prism-section-note">אם יש ספק ברמה, קצר/י את המשפט לשורה קונקרטית אחת ובדוק/י אם הוא מדבר על מה שקורה, על איך עושים, על מה זה אומר, או על מי האדם נעשה בתוך זה.</p>
-                            </div>
-                            <div id="prism-level-grid" class="prism-level-grid-select"></div>
-                        </section>
-
-                        <section class="prism-secondary-section" aria-label="העמקה וסיכום">
-                            <details class="prism-drawer" id="prism-deepening-drawer">
-                                <summary>העמקה</summary>
-                                <div id="prism-deepening-body" class="prism-drawer-body"></div>
-                            </details>
-
-                            <details class="prism-drawer" id="prism-examples-drawer">
-                                <summary>שאלות עוגן ודוגמאות</summary>
-                                <div id="prism-examples-body" class="prism-drawer-body"></div>
-                            </details>
-
-                            <details class="prism-drawer" id="prism-mistakes-drawer">
-                                <summary>טעויות נפוצות וטיפ</summary>
-                                <div id="prism-mistakes-body" class="prism-drawer-body"></div>
-                            </details>
-
-                            <details class="prism-drawer" id="prism-summary-drawer">
-                                <summary>סיכום / ייצוא</summary>
-                                <div class="prism-drawer-body">
-                                    <div id="prism-result" class="prism-summary-panel"></div>
-                                </div>
-                            </details>
-                        </section>
-                    </div>
+            <div id="prism-necessity-root" data-prism-necessity-app data-prism-necessity-mode="embedded" aria-live="polite">
+                <div class="card" style="max-width:980px;margin:0 auto;">
+                    טוענים את מפת ההכרח...
                 </div>
             </div>
         </section>
@@ -1924,6 +1777,7 @@
                 'js/triples-radar.js',
                 'js/onboarding.js',
                 'js/prism-lab-therapist.js',
+                'js/prism-necessity-map.js',
                 'js/feature-intro.js',
                 'js/meta-redesign-shell.js'
             ];
