@@ -26944,85 +26944,39 @@ header h1 {
 
 /* Triples radar */
 
-#practice-triples-radar .practice-section-triples-radar {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-#practice-triples-radar .triples-radar-reference-drawer {
-    order: 3;
-    border-radius: 22px;
-    border: 1px solid rgba(148, 163, 184, 0.18);
-    background: rgba(255, 255, 255, 0.88);
-    box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+body.triples-radar-overlay-open {
     overflow: hidden;
 }
 
-#practice-triples-radar .triples-radar-reference-summary {
+#practice-triples-radar .practice-section-triples-radar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#practice-triples-radar .triples-radar-reference-bar {
+    order: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 16px 18px;
-    list-style: none;
-    cursor: pointer;
-    font-weight: 800;
-}
-
-#practice-triples-radar .triples-radar-reference-summary::-webkit-details-marker {
-    display: none;
-}
-
-#practice-triples-radar .triples-radar-reference-summary small {
-    color: #0f766e;
-}
-
-#practice-triples-radar .triples-radar-reference-body {
-    display: grid;
-    gap: 14px;
-    padding: 0 18px 18px;
-}
-
-#practice-triples-radar .triples-radar-concept {
-    display: grid;
-    gap: 10px;
-    padding: 16px;
+    padding: 12px 16px;
     border-radius: 18px;
-    background: linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(255, 255, 255, 0.98));
-    color: #334155;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.05);
 }
 
-#practice-triples-radar .triples-radar-breen-figure {
-    display: grid;
-    gap: 8px;
-    padding: 14px;
-    border-radius: 20px;
-    background: rgba(248, 250, 252, 0.96);
-    max-height: 200px;
-    overflow: hidden;
-    transition: max-height 0.3s ease, box-shadow 0.3s ease;
+#practice-triples-radar .triples-radar-reference-bar p {
+    margin: 0;
+    color: #4b607d;
+    font-size: 0.84rem;
+    line-height: 1.45;
 }
 
-#practice-triples-radar .triples-radar-breen-figure img {
-    width: 100%;
-    max-height: 200px;
-    object-fit: contain;
-}
-
-#practice-triples-radar .triples-radar-breen-figure.is-expanded {
-    max-height: 520px;
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
-}
-
-#practice-triples-radar .triples-radar-breen-figure.is-expanded img {
-    max-height: 460px;
-}
-
-#practice-triples-radar .triples-radar-reference-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+#practice-triples-radar .triples-radar-reference-trigger {
+    flex: 0 0 auto;
+    min-height: 40px;
 }
 
 #practice-triples-radar .triples-radar-mode-bar {
@@ -27031,11 +26985,11 @@ header h1 {
     align-items: center;
     justify-content: space-between;
     gap: 14px;
-    padding: 16px 18px;
-    border-radius: 24px;
+    padding: 14px 16px;
+    border-radius: 20px;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(148, 163, 184, 0.18);
-    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.05);
 }
 
 #practice-triples-radar .triples-radar-mode-btn.is-active {
@@ -27044,28 +26998,72 @@ header h1 {
     box-shadow: 0 10px 20px rgba(14, 165, 233, 0.2);
 }
 
+#practice-triples-radar .triples-radar-mode-groups {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#practice-triples-radar .triples-radar-mode-group {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+#practice-triples-radar .triples-radar-mode-group-label {
+    color: #5f7290;
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
 #triples-radar-root {
     order: 1;
-    padding: 20px;
-    border-radius: 26px;
+    padding: 16px;
+    border-radius: 24px;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 246, 255, 0.98));
     border: 1px solid rgba(148, 163, 184, 0.16);
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 18px 34px rgba(15, 23, 42, 0.06);
+}
+
+#practice-triples-radar .triples-radar-shell {
+    display: grid;
+    grid-template-columns: minmax(292px, 0.9fr) minmax(0, 1.4fr);
+    gap: 14px;
+    align-items: start;
+}
+
+#practice-triples-radar .triples-radar-main-panel,
+#practice-triples-radar .triples-radar-board-panel {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
 }
 
 #practice-triples-radar .triples-radar-topbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
 }
 
 #practice-triples-radar .triples-radar-topbar > span {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    border-radius: 999px;
+    display: grid;
+    gap: 2px;
+    padding: 8px 10px;
+    border-radius: 16px;
     font-weight: 800;
+    text-align: center;
+}
+
+#practice-triples-radar .triples-radar-topbar > span small {
+    font-size: 0.7rem;
+    color: #61738f;
+}
+
+#practice-triples-radar .triples-radar-topbar > span strong {
+    font-size: 1rem;
+    line-height: 1.1;
 }
 
 #practice-triples-radar .triples-radar-topbar > span:nth-child(1) {
@@ -27074,32 +27072,175 @@ header h1 {
 }
 
 #practice-triples-radar .triples-radar-topbar > span:nth-child(2) {
-    background: rgba(34, 197, 94, 0.14);
+    background: rgba(16, 185, 129, 0.14);
     color: #166534;
 }
 
 #practice-triples-radar .triples-radar-topbar > span:nth-child(3) {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1d4ed8;
+}
+
+#practice-triples-radar .triples-radar-topbar > span:nth-child(4) {
+    background: rgba(250, 204, 21, 0.14);
+    color: #8a520a;
+}
+
+#practice-triples-radar .triples-radar-topbar > span:nth-child(5) {
     background: rgba(139, 92, 246, 0.16);
     color: #6d28d9;
 }
 
+#practice-triples-radar .triples-radar-topbar > span[data-time-state="warning"] {
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.22);
+}
+
 #practice-triples-radar .triples-radar-statement-wrap {
-    padding: 20px;
-    border-radius: 22px;
+    padding: 16px;
+    border-radius: 20px;
     background: linear-gradient(180deg, rgba(2, 6, 23, 0.76), rgba(15, 23, 42, 0.94));
     border: 1px solid rgba(148, 163, 184, 0.18);
-    box-shadow: 0 22px 40px rgba(2, 6, 23, 0.24);
+    box-shadow: 0 20px 34px rgba(2, 6, 23, 0.2);
 }
 
 #practice-triples-radar .triples-radar-statement {
     color: #f8fafc;
-    font-size: clamp(1.05rem, 2.4vw, 1.35rem);
-    line-height: 1.9;
+    font-size: clamp(1rem, 1.9vw, 1.22rem);
+    line-height: 1.75;
+}
+
+#practice-triples-radar .triples-radar-support-strip {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+#practice-triples-radar .triples-radar-mini-action {
+    flex: 0 0 auto;
+    min-height: 40px;
+    padding-inline: 14px;
+}
+
+#practice-triples-radar .triples-radar-step {
+    margin: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
+#practice-triples-radar .triples-radar-focus-hint:empty,
+#practice-triples-radar .triples-radar-feedback:empty {
+    display: none;
+}
+
+#practice-triples-radar .triples-radar-mode-summary {
+    margin-bottom: 0;
+}
+
+#practice-triples-radar .triples-radar-summary {
+    padding: 10px 12px;
+    box-shadow: none;
+    min-height: 0;
+}
+
+#practice-triples-radar .triples-radar-summary-title {
+    font-size: 0.96rem;
+}
+
+#practice-triples-radar .triples-radar-summary-lead,
+#practice-triples-radar .triples-radar-summary-body,
+#practice-triples-radar .triples-radar-summary-note {
+    font-size: 0.82rem;
+}
+
+#practice-triples-radar .triples-radar-board-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+#practice-triples-radar .triples-radar-board-kicker {
+    margin: 0 0 4px 0;
+    color: #0f766e;
+    font-size: 0.74rem;
+    font-weight: 800;
+}
+
+#practice-triples-radar .triples-radar-board-top h4 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1rem;
+    line-height: 1.25;
+}
+
+#practice-triples-radar .triples-radar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+#practice-triples-radar .triples-radar-actions .btn {
+    min-height: 38px;
+    padding-inline: 12px;
+    font-size: 0.82rem;
+}
+
+#practice-triples-radar .triples-radar-rows {
+    gap: 6px;
+}
+
+#practice-triples-radar .triples-radar-row {
+    padding: 7px 8px;
+    grid-template-columns: minmax(210px, 252px) minmax(0, 1fr);
+    gap: 8px;
+    border-radius: 14px;
+    border-inline-start-width: 5px;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
 }
 
 #practice-triples-radar .triples-radar-row {
     border-inline-start: 4px solid transparent;
-    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.06);
+}
+
+#practice-triples-radar .triples-radar-row-head {
+    gap: 5px;
+}
+
+#practice-triples-radar .triples-radar-row-head strong {
+    min-height: 0;
+    padding: 6px 8px;
+    font-size: 0.83rem;
+}
+
+#practice-triples-radar .triples-radar-row-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+#practice-triples-radar .triples-radar-row-head small {
+    font-size: 0.72rem;
+    line-height: 1.35;
+}
+
+#practice-triples-radar .triples-radar-row-detail-btn {
+    border: 1px solid rgba(15, 118, 110, 0.24);
+    background: rgba(15, 118, 110, 0.08);
+    color: #0f5e59;
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    cursor: pointer;
+    flex: 0 0 auto;
+}
+
+#practice-triples-radar .triples-radar-row-detail-btn:hover {
+    background: rgba(15, 118, 110, 0.14);
 }
 
 #practice-triples-radar .triples-radar-row.row-sky { border-inline-start-color: #0ea5e9; }
@@ -27107,6 +27248,17 @@ header h1 {
 #practice-triples-radar .triples-radar-row.row-amber { border-inline-start-color: #f59e0b; }
 #practice-triples-radar .triples-radar-row.row-violet { border-inline-start-color: #8b5cf6; }
 #practice-triples-radar .triples-radar-row.row-rose { border-inline-start-color: #f43f5e; }
+
+#practice-triples-radar .triples-radar-cat-btn {
+    min-height: 44px;
+    padding: 6px 5px;
+    font-size: 0.8rem;
+}
+
+#practice-triples-radar .triples-radar-feedback {
+    margin: 0;
+    font-size: 0.84rem;
+}
 
 #triples-radar-feedback[data-tone="success"] {
     border-color: rgba(34, 197, 94, 0.3);
@@ -27118,6 +27270,235 @@ header h1 {
 #triples-radar-feedback[data-tone="warn"] {
     background: rgba(254, 242, 242, 0.82);
     color: #991b1b;
+}
+
+#practice-triples-radar .triples-radar-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2200;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+#practice-triples-radar .triples-radar-overlay[hidden] {
+    display: none;
+}
+
+#practice-triples-radar .triples-radar-overlay-backdrop {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    background: rgba(15, 23, 42, 0.54);
+    backdrop-filter: blur(4px);
+}
+
+#practice-triples-radar .triples-radar-overlay-dialog {
+    position: relative;
+    z-index: 1;
+    width: min(980px, 100%);
+    max-height: min(88vh, 860px);
+    overflow: auto;
+    padding: 18px;
+    border-radius: 24px;
+    background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    box-shadow: 0 28px 80px rgba(15, 23, 42, 0.28);
+}
+
+#practice-triples-radar .triples-radar-overlay-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+#practice-triples-radar .triples-radar-overlay-kicker {
+    margin: 0 0 4px 0;
+    color: #0f766e;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+#practice-triples-radar .triples-radar-overlay-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: clamp(1.18rem, 2vw, 1.42rem);
+    line-height: 1.2;
+}
+
+#practice-triples-radar .triples-radar-overlay-close {
+    border: 0;
+    background: rgba(148, 163, 184, 0.14);
+    color: #294c76;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+#practice-triples-radar .triples-radar-overlay-body {
+    display: grid;
+    gap: 12px;
+}
+
+#practice-triples-radar .triples-radar-overlay-block {
+    padding: 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(191, 209, 234, 0.64);
+    background: #ffffff;
+}
+
+#practice-triples-radar .triples-radar-overlay-block h4 {
+    margin: 0 0 8px 0;
+    color: #123f7b;
+    font-size: 0.96rem;
+}
+
+#practice-triples-radar .triples-radar-overlay-block p {
+    margin: 0;
+    color: #294d78;
+    font-size: 0.9rem;
+    line-height: 1.65;
+}
+
+#practice-triples-radar .triples-radar-overlay-block p + p {
+    margin-top: 8px;
+}
+
+#practice-triples-radar .triples-radar-overlay-bullets {
+    display: grid;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+#practice-triples-radar .triples-radar-overlay-row-grid,
+#practice-triples-radar .triples-radar-overlay-category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+#practice-triples-radar .triples-radar-overlay-row-card,
+#practice-triples-radar .triples-radar-overlay-category-card,
+#practice-triples-radar .triples-radar-overlay-neighbor {
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(191, 209, 234, 0.7);
+    background: linear-gradient(180deg, #fcfdff 0%, #f6faff 100%);
+}
+
+#practice-triples-radar .triples-radar-overlay-row-card strong,
+#practice-triples-radar .triples-radar-overlay-category-card strong,
+#practice-triples-radar .triples-radar-overlay-neighbor strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #0f172a;
+}
+
+#practice-triples-radar .triples-radar-overlay-row-card small,
+#practice-triples-radar .triples-radar-overlay-category-card small,
+#practice-triples-radar .triples-radar-overlay-neighbor span {
+    color: #5d7290;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+#practice-triples-radar .triples-radar-overlay-row-card.is-active {
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.18);
+}
+
+#practice-triples-radar .triples-radar-overlay-neighbors {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+#practice-triples-radar .triples-radar-overlay-neighbor.is-empty {
+    opacity: 0.78;
+}
+
+#practice-triples-radar .triples-radar-overlay-figure {
+    display: grid;
+    gap: 8px;
+    margin: 12px 0 0 0;
+}
+
+#practice-triples-radar .triples-radar-overlay-figure img {
+    width: 100%;
+    max-height: 260px;
+    object-fit: contain;
+    border-radius: 16px;
+    border: 1px solid rgba(191, 209, 234, 0.7);
+    background: #f8fbff;
+}
+
+#practice-triples-radar .triples-radar-overlay-figure figcaption {
+    color: #5d7290;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+#practice-triples-radar .triples-radar-overlay-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+@media (max-width: 1180px) {
+    #practice-triples-radar .triples-radar-shell {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #practice-triples-radar .triples-radar-topbar {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    #practice-triples-radar .triples-radar-board-top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+@media (max-width: 760px) {
+    #practice-triples-radar .triples-radar-reference-bar,
+    #practice-triples-radar .triples-radar-support-strip {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #practice-triples-radar .triples-radar-mode-groups {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    #practice-triples-radar .triples-radar-mode-group {
+        width: 100%;
+    }
+
+    #practice-triples-radar .triples-radar-topbar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #practice-triples-radar .triples-radar-row-meta {
+        gap: 6px;
+    }
+
+    #practice-triples-radar .triples-radar-row-detail-btn {
+        padding: 3px 8px;
+        font-size: 0.66rem;
+    }
+
+    #practice-triples-radar .triples-radar-overlay-row-grid,
+    #practice-triples-radar .triples-radar-overlay-category-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 /* Prism lab */
@@ -28150,13 +28531,45 @@ header h1 {
         align-items: stretch;
     }
 
-    #practice-triples-radar .triples-radar-reference-drawer {
+    #practice-triples-radar .triples-radar-reference-bar {
         order: 3;
+        flex-direction: column;
+        align-items: stretch;
     }
 
-    #practice-triples-radar .triples-radar-breen-figure,
-    #practice-triples-radar [data-triples-figure-toggle="true"] {
-        display: none;
+    #practice-triples-radar .triples-radar-shell {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #practice-triples-radar .triples-radar-topbar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #practice-triples-radar .triples-radar-support-strip,
+    #practice-triples-radar .triples-radar-board-top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #practice-triples-radar .triples-radar-actions {
+        justify-content: stretch;
+    }
+
+    #practice-triples-radar .triples-radar-actions .btn {
+        flex: 1 1 auto;
+    }
+
+    #practice-triples-radar .triples-radar-overlay {
+        padding: 12px;
+    }
+
+    #practice-triples-radar .triples-radar-overlay-dialog {
+        padding: 14px;
+        border-radius: 20px;
+    }
+
+    #practice-triples-radar .triples-radar-overlay-neighbors {
+        grid-template-columns: minmax(0, 1fr);
     }
 
     .tr-phone-breen-panel {

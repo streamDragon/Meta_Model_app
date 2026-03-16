@@ -7,6 +7,9 @@
 })(function createTriplesRadarModule(root) {
     const STORAGE_KEY = 'triples_radar_progress_v1';
     const UI_MODE_STORAGE_KEY = 'triples_radar_ui_mode_v2';
+    const SESSION_MODE_STORAGE_KEY = 'triples_radar_session_mode_v1';
+    const EXAM_TIME_LIMIT_SECONDS = 75;
+    const EXAM_WARNING_SECONDS = 15;
     const UI_MODE_BY_TOGGLE_KEY = Object.freeze({
         details: 'details',
         rules: 'rules'
@@ -40,6 +43,25 @@
             strongestLead: 'במצב כללים זה הכיוון שמסביר איזה כלל או פירוש מארגנים את האמירה.',
             nextMoveLabel: 'איך מפרקים את הכלל',
             rowBadge: 'מסגרת חזקה'
+        })
+    });
+
+    const SESSION_MODE_META = Object.freeze({
+        learn: Object.freeze({
+            label: 'למידה',
+            badge: 'למידה',
+            timerLabel: 'קצב',
+            timerIdle: 'פתוח',
+            feedbackIntro: 'מצב למידה: הטבלה פתוחה להבנה, אפשר להעמיק בכל שורה, ויש גם רמזים אם צריך.',
+            summaryLead: 'כאן מותר לעצור, לקרוא, ולהבין למה הבחירה עובדת לפני שעוברים הלאה.'
+        }),
+        exam: Object.freeze({
+            label: 'מבחן',
+            badge: 'מבחן',
+            timerLabel: 'זמן',
+            timerIdle: '01:15',
+            feedbackIntro: 'מצב מבחן: בלי רמזים, עם זמן, נקודות וצלילים. בוחרים וממשיכים.',
+            summaryLead: 'כאן עובדים מהר ונקי: בלי עזרה באמצע, עם שעון שרץ עד שהדיוק נסגר.'
         })
     });
 
@@ -194,6 +216,39 @@
         })
     });
 
+    const ROW_DETAIL_META = Object.freeze({
+        row1: Object.freeze({
+            lead: 'השורה הראשונה בודקת מי קבע את הסטנדרט, מה כבר הונח מראש, ואיזו כוונה יוחסה בלי ראיה.',
+            impact: 'כשבוחרים את השורה הזו נכון, מתברר שהמשפט לא נשען על עובדה מוצקה אלא על מקור סמוי, הנחה או קריאת כוונה.',
+            videoPrep: 'לפני וידאו או הדגמה, שימו לב אם המטופל מצטט אמת מוחלטת, קופץ לכוונת האחר, או בונה את הכול על הנחה שטרם נאמרה.',
+            bridge: 'זו נקודת הכניסה העליונה של המפה: לפני שמגיעים לחוקים, סיבות או זהויות, בודקים קודם מי אמר, מה הונח, ומה יוחס.'
+        }),
+        row2: Object.freeze({
+            lead: 'השורה השנייה עוסקת בכלל שמארגן את המשפט: מה חייב לקרות, מה אי אפשר, ומה כביכול גורם למה.',
+            impact: 'בחירה בשורה הזאת אומרת שהבעיה אינה רק פרט חסר, אלא חוק משחק, גבול או סיבתיות קשיחה שתופסים את כל המרחב.',
+            videoPrep: 'לפני וידאו או הדגמה, חפשו מילים של חובה, אי-אפשר, תמיד, או קשר אוטומטי בין אירוע אחד לתוצאה אחרת.',
+            bridge: 'אחרי שבודקים מקור/הנחה, המפה יורדת לחוקי המשחק. מכאן אפשר להמשיך למישור של זהות ומשמעות או לחזור להקשר ממשי.'
+        }),
+        row3: Object.freeze({
+            lead: 'השורה השלישית עוסקת ברגע שבו פעולה חיה הופכת למשמעות קבועה, לזהות או למסקנה.',
+            impact: 'בחירה כאן מצביעה על כך שהמטופל כבר לא רק מתאר מה קרה, אלא מסיק מי הוא, מה זה אומר, או מה זה מוכיח.',
+            videoPrep: 'לפני וידאו או הדגמה, בדקו אם פעולה הוקפאה לשם עצם, אם מקרה אחד הפך לזהות, או אם אירוע אחד נהיה הוכחה רחבה.',
+            bridge: 'זו שורת האמצע: היא מחברת בין חוקים וסיבות לבין הקשר, זמן וייחוס. כאן נבנה הסיפור על "מה זה אומר עליי".'
+        }),
+        row4: Object.freeze({
+            lead: 'השורה הרביעית מחזירה את המשפט לזמן, מקום, מדד וייחוס: מי בדיוק, מתי בדיוק, ביחס למה בדיוק.',
+            impact: 'כשזו השורה הנכונה, המשמעות משתנה ברגע שמחזירים את ההקשר החסר. הטענה נשמעה מוחלטת רק כי המסגרת נעלמה.',
+            videoPrep: 'לפני וידאו או הדגמה, חפשו השוואה בלי מדד, זמן/מקום שלא נאמרו, או קבוצה עמומה כמו "הם" או "כולם".',
+            bridge: 'כאן המפה כבר יורדת לקרקע: מה שהתחיל כפירוש או זהות מתגלה כתלוי הקשר, זמן, מקום או ייחוס חסר.'
+        }),
+        row5: Object.freeze({
+            lead: 'השורה החמישית מחזירה את השפה לחושים ולפעולה: מה באמת רואים, שומעים, מרגישים, ומה קורה צעד-צעד.',
+            impact: 'בחירה בשורה הזאת אומרת שהעבודה המרכזית היא להפסיק לדבר באוויר ולהחזיר את המשפט לקרקע חושית והתנהגותית.',
+            videoPrep: 'לפני וידאו או הדגמה, בדקו אם יש "זה", "משהו", פועל כללי מדי, או חוויה שאין לה מבחן מציאות קונקרטי.',
+            bridge: 'זו תחתית המפה: אחרי פירושים, חוקים והקשרים, כאן בודקים מה בכלל ניתן לראות, לשמוע או לעשות בפועל.'
+        })
+    });
+
     const state = {
         data: null,
         scenarios: [],
@@ -207,6 +262,16 @@
         selectedCategory: '',
         elements: null,
         uiMode: 'details',
+        sessionMode: 'learn',
+        examDeadlineTs: 0,
+        examSecondsLeft: EXAM_TIME_LIMIT_SECONDS,
+        examExpired: false,
+        timerInterval: null,
+        overlay: {
+            type: '',
+            rowId: '',
+            locked: false
+        },
         phone: null,
         desktopRootMarkup: ''
     };
@@ -306,6 +371,38 @@
         }
     }
 
+    function getDefaultSessionMode() {
+        return 'learn';
+    }
+
+    function normalizeSessionMode(value) {
+        const raw = String(value || '').trim().toLowerCase();
+        if (!raw) return getDefaultSessionMode();
+        if (raw === 'learn' || raw === 'learning' || raw === 'לימוד' || raw === 'למידה') return 'learn';
+        if (raw === 'exam' || raw === 'test' || raw === 'quiz' || raw === 'מבחן') return 'exam';
+        return getDefaultSessionMode();
+    }
+
+    function loadSessionModePreference() {
+        try {
+            return normalizeSessionMode(localStorage.getItem(SESSION_MODE_STORAGE_KEY) || '');
+        } catch (error) {
+            return getDefaultSessionMode();
+        }
+    }
+
+    function saveSessionModePreference() {
+        try {
+            localStorage.setItem(SESSION_MODE_STORAGE_KEY, state.sessionMode);
+        } catch (error) {
+            // Ignore storage errors.
+        }
+    }
+
+    function getSessionModeMeta() {
+        return SESSION_MODE_META[state.sessionMode] || SESSION_MODE_META.learn;
+    }
+
     function getToggleKeyByUiMode() {
         return TOGGLE_KEY_BY_UI_MODE[state.uiMode] || 'details';
     }
@@ -326,6 +423,19 @@
         const noteEl = document.getElementById('triples-radar-mode-note');
         if (titleEl) titleEl.textContent = modeMeta.title;
         if (noteEl) noteEl.textContent = modeMeta.note;
+
+        const sessionSwitch = document.getElementById('triples-radar-session-switch');
+        if (sessionSwitch) {
+            sessionSwitch.querySelectorAll('[data-tr-session-mode]').forEach((btn) => {
+                const isActive = normalizeSessionMode(btn.getAttribute('data-tr-session-mode') || '') === state.sessionMode;
+                btn.classList.toggle('is-active', isActive);
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+        }
+
+        const sessionMeta = getSessionModeMeta();
+        if (state.elements?.sessionBadge) state.elements.sessionBadge.textContent = sessionMeta.badge;
+        if (state.elements?.timerLabel) state.elements.timerLabel.textContent = sessionMeta.timerLabel;
     }
 
     function getModeMeta() {
@@ -341,15 +451,281 @@
         return CATEGORY_META[normalized] || null;
     }
 
+    function getRowDetailMeta(rowId) {
+        return ROW_DETAIL_META[rowId] || ROW_DETAIL_META.row1;
+    }
+
+    function getRowById(rowId) {
+        return (root.triplesRadarCore?.ROWS || []).find((row) => row.id === rowId) || null;
+    }
+
+    function formatSeconds(totalSeconds) {
+        const safe = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+        const minutes = Math.floor(safe / 60);
+        const seconds = safe % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function updateTimerUI() {
+        if (!state.elements?.timer || state.uiMode === 'phone') return;
+        if (state.sessionMode === 'exam') {
+            state.elements.timer.textContent = formatSeconds(state.examSecondsLeft);
+            state.elements.timer.closest('span')?.setAttribute('data-time-state', state.examSecondsLeft <= EXAM_WARNING_SECONDS ? 'warning' : 'active');
+            return;
+        }
+        state.elements.timer.textContent = getSessionModeMeta().timerIdle;
+        state.elements.timer.closest('span')?.setAttribute('data-time-state', 'idle');
+    }
+
+    function stopExamTimer() {
+        if (state.timerInterval) {
+            clearInterval(state.timerInterval);
+            state.timerInterval = null;
+        }
+        state.examDeadlineTs = 0;
+    }
+
+    function applyExamTimeout() {
+        if (state.sessionMode !== 'exam' || state.solved || state.examExpired) return;
+        const current = getCurrentScenario();
+        if (!current || !root.triplesRadarCore) return;
+
+        state.examExpired = true;
+        state.rowHintUsed = true;
+        state.categoryHintUsed = true;
+        stopExamTimer();
+        state.examSecondsLeft = 0;
+        updateTimerUI();
+        setFeedback('הזמן הסתיים. אפשר לראות עכשיו מה היה הדיוק המתאים ולעבור למקרה הבא.', 'danger');
+        renderBoard();
+        openOverlay('timeout');
+        if (typeof root.playUISound === 'function') root.playUISound('error');
+    }
+
+    function startExamTimer() {
+        stopExamTimer();
+        if (state.sessionMode !== 'exam' || state.solved || state.examExpired || !state.scenarios.length) {
+            updateTimerUI();
+            return;
+        }
+
+        state.examSecondsLeft = EXAM_TIME_LIMIT_SECONDS;
+        state.examDeadlineTs = Date.now() + (EXAM_TIME_LIMIT_SECONDS * 1000);
+        updateTimerUI();
+        state.timerInterval = setInterval(() => {
+            if (state.sessionMode !== 'exam') {
+                stopExamTimer();
+                return;
+            }
+            const next = Math.max(0, Math.ceil((state.examDeadlineTs - Date.now()) / 1000));
+            state.examSecondsLeft = next;
+            updateTimerUI();
+            if (state.uiMode === 'phone' && state.elements?.root) renderBoard();
+            if (next <= 0) applyExamTimeout();
+        }, 1000);
+    }
+
+    function playResultSound(tone) {
+        if (state.sessionMode !== 'exam' || typeof root.playUISound !== 'function') return;
+        if (tone === 'success') root.playUISound('success');
+        if (tone === 'warn') root.playUISound('warning');
+        if (tone === 'danger') root.playUISound('error');
+    }
+
+    function closeOverlay() {
+        const overlay = state.elements?.overlay;
+        if (!overlay) return;
+        state.overlay = { type: '', rowId: '', locked: false };
+        overlay.hidden = true;
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('triples-radar-overlay-open');
+    }
+
+    function renderOverlay(type) {
+        const overlay = state.elements?.overlay;
+        const titleEl = state.elements?.overlayTitle;
+        const kickerEl = state.elements?.overlayKicker;
+        const bodyEl = state.elements?.overlayBody;
+        const actionsEl = state.elements?.overlayActions;
+        if (!overlay || !titleEl || !kickerEl || !bodyEl || !actionsEl) return;
+
+        const current = getCurrentScenario();
+        const correctCategoryId = root.triplesRadarCore?.normalizeCategoryId(current?.correctCategory || '') || '';
+        const correctRowId = root.triplesRadarCore?.getRowIdByCategory(correctCategoryId) || '';
+        const correctRow = getRowById(correctRowId);
+        const correctRowMeta = getRowMeta(correctRowId);
+        const correctRowDetail = getRowDetailMeta(correctRowId);
+        const categoryMeta = getCategoryMeta(correctCategoryId);
+
+        if (type === 'concept') {
+            const focusRowId = state.overlay.rowId || correctRowId || 'row1';
+            const focusRow = getRowById(focusRowId);
+            const focusMeta = getRowMeta(focusRowId);
+            const focusDetail = getRowDetailMeta(focusRowId);
+            const rowCards = (root.triplesRadarCore?.ROWS || []).map((row) => {
+                const meta = getRowMeta(row.id);
+                const categories = row.categories.map((categoryId) => getCategoryLabelHe(categoryId)).reverse().join(' · ');
+                return `
+                    <article class="triples-radar-overlay-row-card ${escapeHtml(meta.colorClass)} ${row.id === focusRowId ? 'is-active' : ''}">
+                        <strong>${escapeHtml(`${meta.canonicalLabel} · ${meta.heading}`)}</strong>
+                        <p>${escapeHtml(meta.directions[state.uiMode] || meta.directions.details)}</p>
+                        <small>${escapeHtml(categories)}</small>
+                    </article>
+                `;
+            }).join('');
+
+            titleEl.textContent = 'רקע מושגי + טבלת ברין';
+            kickerEl.textContent = 'הכנה לעבודה על השלשה והקשר שלה בתוך המפה';
+            bodyEl.innerHTML = `
+                <section class="triples-radar-overlay-block">
+                    <p>${escapeHtml(getSessionModeMeta().summaryLead)}</p>
+                    <div class="triples-radar-overlay-bullets">
+                        <p><strong>לפני וידאו/הדגמה:</strong> ${escapeHtml(focusDetail.videoPrep)}</p>
+                        <p><strong>השורה הפעילה כרגע:</strong> ${escapeHtml(`${focusMeta.canonicalLabel} · ${focusMeta.heading}`)}</p>
+                        <p><strong>למה היא חשובה:</strong> ${escapeHtml(focusDetail.impact)}</p>
+                    </div>
+                </section>
+                <section class="triples-radar-overlay-block">
+                    <h4>טבלת ברין - המפה המלאה</h4>
+                    <div class="triples-radar-overlay-row-grid">${rowCards}</div>
+                </section>
+                <section class="triples-radar-overlay-block triples-radar-overlay-block--focus">
+                    <h4>${escapeHtml(`${focusMeta.canonicalLabel} · ${focusMeta.heading}`)}</h4>
+                    <p>${escapeHtml(focusDetail.lead)}</p>
+                    <p>${escapeHtml(focusDetail.bridge)}</p>
+                    <figure class="triples-radar-overlay-figure">
+                        <img src="assets/svg/meta-model-breen-table.svg" data-versioned-src="assets/svg/meta-model-breen-table.svg" alt="טבלת המטה-מודל של מייקל ברין עם חמש שורות של שלשות קשורות" loading="lazy" decoding="async">
+                        <figcaption>טבלת ברין המלאה - חמש שורות, שלוש קטגוריות בכל שורה.</figcaption>
+                    </figure>
+                </section>
+            `;
+            actionsEl.innerHTML = `
+                ${focusRow ? `<button type="button" class="btn btn-secondary" data-tr-action="row-detail" data-row-id="${escapeHtml(focusRow.id)}">העמקה על השורה הפעילה</button>` : ''}
+                <a class="btn btn-secondary" href="assets/svg/meta-model-breen-table.svg" data-versioned-href="assets/svg/meta-model-breen-table.svg" target="_blank" rel="noopener noreferrer">פתח את הטבלה המלאה</a>
+                <button type="button" class="btn btn-primary" data-tr-action="close-overlay">חזרה ללוח</button>
+            `;
+            return;
+        }
+
+        if (type === 'row-detail') {
+            const rowId = state.overlay.rowId || correctRowId || 'row1';
+            const row = getRowById(rowId);
+            const rowMeta = getRowMeta(rowId);
+            const rowDetail = getRowDetailMeta(rowId);
+            const rowIndex = Math.max(0, (root.triplesRadarCore?.ROWS || []).findIndex((item) => item.id === rowId));
+            const prevRow = root.triplesRadarCore?.ROWS?.[rowIndex - 1] || null;
+            const nextRow = root.triplesRadarCore?.ROWS?.[rowIndex + 1] || null;
+            const categoryCards = (row?.categories || []).map((categoryId) => {
+                const category = getCategoryMeta(categoryId);
+                return `
+                    <article class="triples-radar-overlay-category-card">
+                        <strong>${escapeHtml(getCategoryLabelHe(categoryId))}</strong>
+                        <p>${escapeHtml(state.uiMode === 'rules' ? (category?.rulesWhy || '') : (category?.detailsWhy || ''))}</p>
+                        <small>${escapeHtml(category?.nextPrompt || '')}</small>
+                    </article>
+                `;
+            }).reverse().join('');
+
+            titleEl.textContent = `${rowMeta.canonicalLabel} · ${rowMeta.heading}`;
+            kickerEl.textContent = 'העמקה על השורה, המשמעות שלה, והקשר לשורות הסמוכות';
+            bodyEl.innerHTML = `
+                <section class="triples-radar-overlay-block">
+                    <p>${escapeHtml(rowDetail.lead)}</p>
+                    <div class="triples-radar-overlay-bullets">
+                        <p><strong>מה אומרת בחירה בשורה הזו:</strong> ${escapeHtml(rowDetail.impact)}</p>
+                        <p><strong>ככה מזהים אותה מהר:</strong> ${escapeHtml(rowDetail.videoPrep)}</p>
+                        <p><strong>הקשר בתוך המפה:</strong> ${escapeHtml(rowDetail.bridge)}</p>
+                    </div>
+                </section>
+                <section class="triples-radar-overlay-block">
+                    <h4>שלוש הקטגוריות של השורה</h4>
+                    <div class="triples-radar-overlay-category-grid">${categoryCards}</div>
+                </section>
+                <section class="triples-radar-overlay-block">
+                    <h4>שכנים במפה</h4>
+                    <div class="triples-radar-overlay-neighbors">
+                        <article class="triples-radar-overlay-neighbor ${prevRow ? '' : 'is-empty'}">
+                            <span>לפני</span>
+                            <strong>${escapeHtml(prevRow ? getRowMeta(prevRow.id).heading : 'זו שורת הפתיחה של המפה')}</strong>
+                            <p>${escapeHtml(prevRow ? getRowMeta(prevRow.id).directions[state.uiMode] || getRowMeta(prevRow.id).directions.details : 'מכאן מתחילים בבדיקת מקור, הנחה וכוונה לפני שיורדים לחוקים ולהקשרים.')}</p>
+                        </article>
+                        <article class="triples-radar-overlay-neighbor ${nextRow ? '' : 'is-empty'}">
+                            <span>אחרי</span>
+                            <strong>${escapeHtml(nextRow ? getRowMeta(nextRow.id).heading : 'זו שורת הקרקע של המפה')}</strong>
+                            <p>${escapeHtml(nextRow ? getRowMeta(nextRow.id).directions[state.uiMode] || getRowMeta(nextRow.id).directions.details : 'מכאן כבר מחזירים את הכול למה שניתן לראות, לשמוע או לעשות בפועל.')}</p>
+                        </article>
+                    </div>
+                </section>
+            `;
+            actionsEl.innerHTML = `
+                <button type="button" class="btn btn-secondary" data-tr-action="open-concept" data-row-id="${escapeHtml(rowId)}">חזרה לטבלת ברין</button>
+                <button type="button" class="btn btn-primary" data-tr-action="close-overlay">סגור</button>
+            `;
+            return;
+        }
+
+        if (type === 'result' || type === 'timeout') {
+            const selectedLabel = getCategoryLabelHe(type === 'timeout' ? correctCategoryId : state.selectedCategory || correctCategoryId);
+            const nextPrompt = normalizeSpaces(current?.focusHint || categoryMeta?.nextPrompt || '');
+            titleEl.textContent = type === 'timeout' ? 'סיכום סבב: הזמן הסתיים' : 'בחירה מדויקת';
+            kickerEl.textContent = type === 'timeout'
+                ? 'הנה המיקוד שהיה סוגר את הסבב הזה בצורה הכי נקייה'
+                : 'הבחירה נסגרה. עכשיו אפשר לראות למה היא משמעותית';
+            bodyEl.innerHTML = `
+                <section class="triples-radar-overlay-block">
+                    <p><strong>המשפט:</strong> ${escapeHtml(current?.clientText || '')}</p>
+                    <p><strong>השורה שנושאת את המשקל:</strong> ${escapeHtml(`${correctRowMeta.canonicalLabel} · ${correctRowMeta.heading}`)}</p>
+                    <p><strong>התבנית המדויקת:</strong> ${escapeHtml(selectedLabel)}</p>
+                </section>
+                <section class="triples-radar-overlay-block">
+                    <h4>מה המשמעות של הבחירה הזו</h4>
+                    <p>${escapeHtml(correctRowDetail.impact)}</p>
+                    <p>${escapeHtml(state.uiMode === 'rules' ? (categoryMeta?.rulesWhy || correctRowMeta.directions.rules) : (categoryMeta?.detailsWhy || correctRowMeta.directions.details))}</p>
+                </section>
+                <section class="triples-radar-overlay-block">
+                    <h4>מה כדאי לעשות עם זה בשיחה</h4>
+                    <p>${escapeHtml(nextPrompt || correctRowMeta.examples[state.uiMode] || '')}</p>
+                    <p>${escapeHtml(correctRowDetail.bridge)}</p>
+                </section>
+            `;
+            actionsEl.innerHTML = `
+                <button type="button" class="btn btn-secondary" data-tr-action="open-concept" data-row-id="${escapeHtml(correctRowId)}">היזכר/י בטבלת ברין</button>
+                <button type="button" class="btn btn-secondary" data-tr-action="row-detail" data-row-id="${escapeHtml(correctRowId)}">העמקה על השורה</button>
+                <button type="button" class="btn btn-primary" data-tr-action="next">המקרה הבא</button>
+            `;
+        }
+    }
+
+    function openOverlay(type, options = {}) {
+        const overlay = state.elements?.overlay;
+        if (!overlay) return;
+        state.overlay = {
+            type,
+            rowId: String(options.rowId || state.overlay.rowId || ''),
+            locked: options.locked === true
+        };
+        renderOverlay(type);
+        overlay.hidden = false;
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('triples-radar-overlay-open');
+    }
+
     function getIntroFeedbackText() {
-        return getModeMeta().introFeedback;
+        return `${getModeMeta().introFeedback} ${getSessionModeMeta().feedbackIntro}`;
     }
 
     function getStepText() {
+        if (state.examExpired) {
+            return 'הזמן הסתיים. אפשר לעבור דרך הסיכום ולסגור את הסבב הבא.';
+        }
+        if (state.sessionMode === 'exam' && !state.solved) {
+            return `${getModeMeta().step} במצב מבחן אין רמזים - בוחרים וממשיכים.`;
+        }
         return state.solved ? getModeMeta().solvedStep : getModeMeta().step;
     }
 
     function getFocusHintText(current) {
+        if (!state.solved && !state.categoryHintUsed && !state.examExpired) return '';
         const hint = normalizeSpaces(current?.focusHint || '');
         if (!hint) return '';
         return `שאלת הכוונה: ${hint}`;
@@ -358,6 +734,54 @@
     function buildDirectionSummary(currentEvaluation) {
         const current = getCurrentScenario();
         if (!current || !root.triplesRadarCore) return null;
+
+        if (!currentEvaluation && !state.rowHintUsed && !state.solved && !state.examExpired) {
+            return {
+                colorClass: '',
+                title: state.sessionMode === 'exam'
+                    ? `מצב ${getSessionModeMeta().label} · בוחרים בלי רמזים`
+                    : 'חמש שורות, שלוש אפשרויות בכל שורה',
+                subtitle: state.sessionMode === 'exam'
+                    ? 'הטבלה נשארת ניטרלית עד לבחירה'
+                    : 'לחיצה על "העמקה" תפתח הסבר על כל שורה',
+                lead: getSessionModeMeta().summaryLead,
+                reason: state.uiMode === 'rules'
+                    ? 'במבט כללים מחפשים איזה חוק, פירוש או מסגרת מחזיקים את המשפט כולו.'
+                    : 'במבט פרטים מחפשים איפה חסר מקור, זמן, ייחוס, שלב ביניים או עוגן חושי.',
+                nextPrompt: state.sessionMode === 'exam'
+                    ? 'קרא/י את המשפט, בחר/י שורה, ואז דייק/י לתבנית בלי רמז בדרך.'
+                    : 'לא בטוח/ה? פתח/י העמקה על השורה שמסקרנת אותך, ואז חזור/י ללוח.',
+                selectionNote: ''
+            };
+        }
+
+        if (state.sessionMode === 'exam' && !state.solved && !state.examExpired) {
+            return {
+                colorClass: '',
+                title: `מצב ${getSessionModeMeta().label} · הטבלה עוד פתוחה`,
+                subtitle: 'הפידבק המלא נפתח רק אחרי דיוק או בסיום הזמן',
+                lead: getSessionModeMeta().summaryLead,
+                reason: state.uiMode === 'rules'
+                    ? 'כרגע בודקים איזה כלל או פירוש מחזיקים את המשפט, בלי לחשוף את השורה המובילה.'
+                    : 'כרגע בודקים איפה חסר מידע, בלי לחשוף מראש איפה המרכז של המקרה.',
+                nextPrompt: 'אם בחרת - המשוב נשמר למטה, אבל המפה עצמה לא תספר את התשובה מראש.',
+                selectionNote: state.selectedCategory ? `הבחירה שלך כרגע: ${getCategoryLabelHe(state.selectedCategory)}.` : ''
+            };
+        }
+
+        if (currentEvaluation?.status === 'wrong_row' && !state.rowHintUsed && !state.categoryHintUsed && !state.solved) {
+            return {
+                colorClass: '',
+                title: 'הבחירה סומנה, אבל המפה עוד לא נפתחה',
+                subtitle: 'כרגע עדיף להישאר עם המשוב הקצר ולבדוק שוב',
+                lead: 'אם צריך, אפשר לפתוח "העמקה" על שורה מסוימת בלי לחשוף מיד את השורה הנכונה.',
+                reason: state.uiMode === 'rules'
+                    ? 'במבט כללים שואלים איזה חוק או פירוש מחזיקים את המשפט, ורק אחר כך סוגרים על התבנית.'
+                    : 'במבט פרטים שואלים איזה מידע חסר במשפט, ורק אחר כך מצמידים לו קטגוריה מדויקת.',
+                nextPrompt: 'אפשר לבחור שוב, או להשתמש ברמז ממוקד אם זה מצב למידה.',
+                selectionNote: state.selectedCategory ? `הבחירה שלך כרגע: ${getCategoryLabelHe(state.selectedCategory)}.` : ''
+            };
+        }
 
         const correctCategoryId = root.triplesRadarCore.normalizeCategoryId(current.correctCategory);
         const correctRowId = root.triplesRadarCore.getRowIdByCategory(correctCategoryId);
@@ -1071,6 +1495,7 @@
                     </div>
                     <div class="triples-radar-phone-stats">
                         <span>מקרה ${state.index + 1}/${state.scenarios.length}</span>
+                        <span>${escapeHtml(getSessionModeMeta().badge)} ${escapeHtml(state.sessionMode === 'exam' ? formatSeconds(state.examSecondsLeft) : getSessionModeMeta().timerIdle)}</span>
                         <span>נקודות ${state.score}</span>
                     </div>
                 </div>
@@ -1132,14 +1557,16 @@
             : null;
         const correctCategoryNormalized = root.triplesRadarCore.normalizeCategoryId(current.correctCategory);
         const correctRowId = root.triplesRadarCore.getRowIdByCategory(current.correctCategory);
-        const modeMeta = getModeMeta();
+        const showSolvedDetails = state.solved || state.examExpired;
 
         state.elements.statement.textContent = current.clientText || '';
         state.elements.focusHint.textContent = getFocusHintText(current);
         state.elements.counter.textContent = `${state.index + 1}/${state.scenarios.length}`;
         state.elements.score.textContent = `${state.score}`;
         state.elements.solvedCount.textContent = `${state.solvedCount}`;
+        if (state.elements.sessionBadge) state.elements.sessionBadge.textContent = getSessionModeMeta().badge;
         if (state.elements.step) state.elements.step.textContent = getStepText();
+        updateTimerUI();
         renderDirectionSummary(currentEvaluation);
 
         state.elements.rows.innerHTML = rows.map((row) => {
@@ -1147,8 +1574,8 @@
             const directionHelp = `${rowMeta.directions[state.uiMode] || rowMeta.directions.details} ${(rowMeta.examples?.[state.uiMode] || rowMeta.examples?.details || '').trim()}`.trim();
             const isCorrectRow = correctRowId === row.id;
             const isHintRow = !state.solved && state.rowHintUsed && isCorrectRow;
-            const isSolvedRow = state.solved && isCorrectRow;
-            const isStrongestRow = isCorrectRow;
+            const isSolvedRow = showSolvedDetails && isCorrectRow;
+            const isStrongestRow = (state.rowHintUsed || showSolvedDetails) && isCorrectRow;
             const rowClass = [
                 'triples-radar-row',
                 rowMeta.colorClass,
@@ -1163,15 +1590,15 @@
                 const normalizedCategory = root.triplesRadarCore.normalizeCategoryId(categoryId);
                 const isSelected = root.triplesRadarCore.normalizeCategoryId(state.selectedCategory) === normalizedCategory;
                 const isCorrectCategory = correctCategoryNormalized === normalizedCategory;
-                const shouldRevealCorrectCategory = !state.solved && state.categoryHintUsed && isCorrectCategory;
+                const shouldRevealCorrectCategory = ((state.categoryHintUsed && !state.solved) || showSolvedDetails) && isCorrectCategory;
 
                 const categoryClass = [
                     'triples-radar-cat-btn',
                     isSelected ? 'is-selected' : '',
-                    state.solved && isCorrectCategory ? 'is-correct' : '',
+                    showSolvedDetails && isCorrectCategory ? 'is-correct' : '',
                     shouldRevealCorrectCategory ? 'is-reveal' : '',
                     (!state.solved && isSelected && currentEvaluation?.status === 'same_row') ? 'is-close' : '',
-                    (!state.solved && isSelected && currentEvaluation?.status === 'wrong_row') ? 'is-wrong' : ''
+                    (!state.solved && !state.examExpired && isSelected && currentEvaluation?.status === 'wrong_row') ? 'is-wrong' : ''
                 ].filter(Boolean).join(' ');
 
                 return `
@@ -1181,7 +1608,7 @@
                         data-category-id="${escapeHtml(normalizedCategory)}"
                         title="${escapeHtml(getCategoryMeta(normalizedCategory)?.nextPrompt || getCategoryLabelHe(normalizedCategory))}"
                         aria-label="${escapeHtml(`${getCategoryLabelHe(normalizedCategory)}. ${getCategoryMeta(normalizedCategory)?.nextPrompt || ''}`.trim())}"
-                        ${state.solved ? 'disabled' : ''}>
+                        ${state.solved || state.examExpired ? 'disabled' : ''}>
                         <span class="cat-label">${escapeHtml(getCategoryLabelHe(normalizedCategory))}</span>
                     </button>
                 `;
@@ -1192,9 +1619,13 @@
                     <div class="triples-radar-row-head" title="${escapeHtml(directionHelp)}" aria-label="${escapeHtml(directionHelp)}">
                         <div class="triples-radar-row-headline">
                             <strong>${escapeHtml(`${rowMeta.directionLabel} · ${rowMeta.heading}`)}</strong>
-                            ${isStrongestRow ? `<span class="triples-radar-row-badge">${escapeHtml(modeMeta.rowBadge)}</span>` : ''}
+                            ${isStrongestRow ? `<span class="triples-radar-row-badge">${escapeHtml(getModeMeta().rowBadge)}</span>` : ''}
                         </div>
-                        <small>${escapeHtml(`${rowMeta.canonicalLabel} בטבלת ברין · ${rowMeta.directions[state.uiMode] || rowMeta.directions.details}`)}</small>
+                        <div class="triples-radar-row-meta">
+                            <small>${escapeHtml(`${rowMeta.canonicalLabel} בטבלת ברין`)}</small>
+                            <button type="button" class="triples-radar-row-detail-btn" data-tr-action="row-detail" data-row-id="${escapeHtml(row.id)}">העמקה</button>
+                        </div>
+                        <small>${escapeHtml(rowMeta.directions[state.uiMode] || rowMeta.directions.details)}</small>
                     </div>
                     <div class="triples-radar-row-cats">
                         ${cards}
@@ -1210,12 +1641,13 @@
             state.elements.rowHintBtn.disabled = state.solved || state.rowHintUsed;
         }
         if (state.elements?.catHintBtn) {
-            state.elements.catHintBtn.disabled = state.solved || state.categoryHintUsed;
+            state.elements.catHintBtn.hidden = state.sessionMode === 'exam';
+            state.elements.catHintBtn.disabled = state.sessionMode === 'exam' || state.solved || state.examExpired || state.categoryHintUsed;
         }
     }
 
     function handleAutoHints(result) {
-        if (state.solved) return;
+        if (state.solved || state.sessionMode === 'exam') return;
         if (state.attemptsInScenario >= 2 && !state.rowHintUsed) {
             state.rowHintUsed = true;
             setFeedback('הכיוון החזק כבר מודגש. עכשיו כדאי לדייק בתוך אותה שורה.', 'warn');
@@ -1227,7 +1659,7 @@
     }
 
     function evaluatePick(categoryId) {
-        if (state.solved) return;
+        if (state.solved || state.examExpired) return;
         const current = getCurrentScenario();
         if (!current) return;
 
@@ -1240,24 +1672,36 @@
         if (result.status === 'exact') {
             state.solved = true;
             state.solvedCount += 1;
-            state.score += Math.max(1, 4 - Math.max(1, state.attemptsInScenario));
+            stopExamTimer();
+            const baseScore = Math.max(1, 4 - Math.max(1, state.attemptsInScenario));
+            const timeBonus = state.sessionMode === 'exam' ? Math.max(0, Math.ceil(state.examSecondsLeft / 15)) : 0;
+            state.score += baseScore + timeBonus;
             saveProgress();
-            setFeedback(`בחירה מדויקת: ${correctLabel}. זה הדיוק המתאים בתוך ${correctRowMeta.heading}.`, 'success');
+            setFeedback(
+                state.sessionMode === 'exam'
+                    ? `בחירה מדויקת: ${correctLabel}. נסגרו ${baseScore + timeBonus} נקודות בסבב הזה.`
+                    : `בחירה מדויקת: ${correctLabel}. זה הדיוק המתאים בתוך ${correctRowMeta.heading}.`,
+                'success'
+            );
             setStepStatus(getStepText());
-            if (typeof root.playUISound === 'function') root.playUISound('success');
+            playResultSound('success');
+            renderBoard();
+            openOverlay('result', { rowId: result.correctRowId, locked: true });
+            updateHintControls();
+            return;
         } else if (result.status === 'same_row') {
             setFeedback(`הכיוון נכון, אבל עדיין לא התבנית המדויקת. הישאר/י בתוך ${correctRowMeta.heading}.`, 'warn');
             setStepStatus(state.uiMode === 'rules'
                 ? `המסגרת נכונה. עכשיו צריך לדייק איזה כלל או פירוש הוא המרכזי בתוך ${correctRowMeta.heading}.`
                 : `הכיוון נכון. עכשיו צריך לדייק איזה פרט חסר בדיוק בתוך ${correctRowMeta.heading}.`);
-            if (typeof root.playUISound === 'function') root.playUISound('warning');
+            playResultSound('warn');
             handleAutoHints(result);
         } else if (result.status === 'wrong_row') {
             setFeedback(`זה עדיין לא הכיוון המרכזי. המשפט הזה נשען יותר על ${correctRowMeta.heading}.`, 'danger');
             setStepStatus(state.uiMode === 'rules'
                 ? 'חפש/י את הכיוון שמסביר איזה כלל, שיפוט או פירוש מארגנים את המשפט.'
                 : 'חפש/י את הכיוון שמחזיר למשפט את המידע שחסר כדי להבין מה באמת נאמר.');
-            if (typeof root.playUISound === 'function') root.playUISound('error');
+            playResultSound('danger');
             handleAutoHints(result);
         } else {
             setFeedback('לא הצלחתי לזהות בחירה תקפה. בחר/י שוב תבנית מתוך הטבלה.', 'warn');
@@ -1270,35 +1714,45 @@
 
     function nextScenario() {
         if (!state.scenarios.length) return;
+        closeOverlay();
         state.index = (state.index + 1) % state.scenarios.length;
         state.attemptsInScenario = 0;
         state.rowHintUsed = false;
         state.categoryHintUsed = false;
         state.solved = false;
         state.selectedCategory = '';
+        state.examExpired = false;
+        state.examSecondsLeft = EXAM_TIME_LIMIT_SECONDS;
         if (state.uiMode === 'phone') resetPhoneScenarioFlow();
         setFeedback('מקרה חדש נטען. קרא/י את המשפט ובחר/י את כיוון החשיבה שנכון לפתוח ממנו.', 'info');
         setStepStatus(getStepText());
+        if (state.sessionMode === 'exam') startExamTimer();
+        else updateTimerUI();
         updateHintControls();
         renderBoard();
     }
 
     function restartRun() {
+        closeOverlay();
         state.index = 0;
         state.attemptsInScenario = 0;
         state.rowHintUsed = false;
         state.categoryHintUsed = false;
         state.solved = false;
         state.selectedCategory = '';
+        state.examExpired = false;
+        state.examSecondsLeft = EXAM_TIME_LIMIT_SECONDS;
         if (state.uiMode === 'phone') resetPhoneScenarioFlow();
         setFeedback('התחלנו מחדש מההתחלה, עם אותו מבנה עבודה ובלי בחירות קודמות.', 'info');
         setStepStatus(getStepText());
+        if (state.sessionMode === 'exam') startExamTimer();
+        else updateTimerUI();
         updateHintControls();
         renderBoard();
     }
 
     function revealRowHint() {
-        if (state.solved || state.rowHintUsed) return;
+        if (state.solved || state.rowHintUsed || state.examExpired || state.sessionMode === 'exam') return;
         state.rowHintUsed = true;
         setFeedback('הכיוון החזק כבר הודגש בטבלה. עכשיו אפשר להישאר בתוכו ולדייק לתבנית.', 'info');
         updateHintControls();
@@ -1306,7 +1760,7 @@
     }
 
     function revealCategoryHint() {
-        if (state.solved || state.categoryHintUsed) return;
+        if (state.solved || state.categoryHintUsed || state.examExpired || state.sessionMode === 'exam') return;
         state.categoryHintUsed = true;
         setFeedback('סימנתי את התבנית המדויקת בתוך הכיוון החזק, כדי שאפשר יהיה לראות למה היא בולטת כאן.', 'info');
         updateHintControls();
@@ -1314,11 +1768,11 @@
     }
 
     function bindEvents() {
-        const rootEl = state.elements?.root;
-        if (!rootEl || rootEl.dataset.boundTriplesRadar === 'true') return;
-        rootEl.dataset.boundTriplesRadar = 'true';
+        const hostEl = document.getElementById('practice-triples-radar');
+        if (!hostEl || hostEl.dataset.boundTriplesRadar === 'true') return;
+        hostEl.dataset.boundTriplesRadar = 'true';
 
-        rootEl.addEventListener('click', (event) => {
+        hostEl.addEventListener('click', (event) => {
             const phoneAnchorBtn = event.target.closest('[data-tr-phone-anchor-id]');
             if (phoneAnchorBtn) {
                 const anchorId = phoneAnchorBtn.getAttribute('data-tr-phone-anchor-id') || '';
@@ -1355,10 +1809,28 @@
             const actionBtn = event.target.closest('[data-tr-action]');
             if (!actionBtn) return;
             const action = actionBtn.getAttribute('data-tr-action');
+            if (action === 'open-concept') {
+                openOverlay('concept', { rowId: actionBtn.getAttribute('data-row-id') || '' });
+                return;
+            }
+            if (action === 'row-detail') {
+                openOverlay('row-detail', { rowId: actionBtn.getAttribute('data-row-id') || '' });
+                return;
+            }
+            if (action === 'close-overlay') {
+                closeOverlay();
+                return;
+            }
             if (action === 'next') nextScenario();
             if (action === 'restart') restartRun();
             if (action === 'hint-row') revealRowHint();
             if (action === 'hint-category') revealCategoryHint();
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape') return;
+            if (!state.elements?.overlay || state.elements.overlay.hidden) return;
+            closeOverlay();
         });
     }
 
@@ -1382,9 +1854,17 @@
             counter: document.getElementById('triples-radar-counter'),
             score: document.getElementById('triples-radar-score'),
             solvedCount: document.getElementById('triples-radar-solved-count'),
+            sessionBadge: document.getElementById('triples-radar-session-badge'),
+            timer: document.getElementById('triples-radar-timer'),
+            timerLabel: document.getElementById('triples-radar-timer-label'),
             step: document.getElementById('triples-radar-step'),
             rowHintBtn: document.querySelector('[data-tr-action="hint-row"]'),
-            catHintBtn: document.querySelector('[data-tr-action="hint-category"]')
+            catHintBtn: document.querySelector('[data-tr-action="hint-category"]'),
+            overlay: document.getElementById('triples-radar-overlay'),
+            overlayTitle: document.getElementById('triples-radar-overlay-title'),
+            overlayKicker: document.getElementById('triples-radar-overlay-kicker'),
+            overlayBody: document.getElementById('triples-radar-overlay-body'),
+            overlayActions: document.getElementById('triples-radar-overlay-actions')
         };
     }
 
@@ -1405,7 +1885,14 @@
         }
 
         if (state.uiMode === 'phone') {
-            state.elements = { root: rootEl };
+            state.elements = {
+                root: rootEl,
+                overlay: document.getElementById('triples-radar-overlay'),
+                overlayTitle: document.getElementById('triples-radar-overlay-title'),
+                overlayKicker: document.getElementById('triples-radar-overlay-kicker'),
+                overlayBody: document.getElementById('triples-radar-overlay-body'),
+                overlayActions: document.getElementById('triples-radar-overlay-actions')
+            };
             return;
         }
 
@@ -1431,6 +1918,19 @@
         });
     }
 
+    function bindSessionToggleEvents() {
+        const sessionSwitch = document.getElementById('triples-radar-session-switch');
+        if (!sessionSwitch || sessionSwitch.dataset.boundTriplesSession === 'true') return;
+        sessionSwitch.dataset.boundTriplesSession = 'true';
+
+        sessionSwitch.addEventListener('click', (event) => {
+            const btn = event.target.closest('[data-tr-session-mode]');
+            if (!btn) return;
+            const nextMode = normalizeSessionMode(btn.getAttribute('data-tr-session-mode') || '');
+            setSessionMode(nextMode);
+        });
+    }
+
     function setUiMode(nextMode, options = {}) {
         const normalizedMode = normalizeUiMode(nextMode);
         const force = options.force === true;
@@ -1440,6 +1940,7 @@
             return;
         }
 
+        closeOverlay();
         state.uiMode = normalizedMode;
         saveUiModePreference();
         setupElementsForCurrentMode();
@@ -1458,9 +1959,48 @@
         renderBoard();
     }
 
+    function setSessionMode(nextMode, options = {}) {
+        const normalizedMode = normalizeSessionMode(nextMode);
+        const force = options.force === true;
+        if (!force && normalizedMode === state.sessionMode) {
+            updateModeToggleUI();
+            updateHintControls();
+            updateTimerUI();
+            return;
+        }
+
+        state.sessionMode = normalizedMode;
+        saveSessionModePreference();
+        state.attemptsInScenario = 0;
+        state.rowHintUsed = false;
+        state.categoryHintUsed = false;
+        state.solved = false;
+        state.examExpired = false;
+        state.examSecondsLeft = EXAM_TIME_LIMIT_SECONDS;
+        state.selectedCategory = '';
+        if (state.uiMode === 'phone' && state.scenarios.length) resetPhoneScenarioFlow();
+        closeOverlay();
+        updateModeToggleUI();
+
+        if (state.sessionMode === 'exam' && state.scenarios.length) startExamTimer();
+        else {
+            stopExamTimer();
+            updateTimerUI();
+        }
+
+        if (!state.scenarios.length || !state.elements?.root) return;
+
+        setFeedback(getIntroFeedbackText(), 'info');
+        setStepStatus(getStepText());
+        updateHintControls();
+        renderBoard();
+    }
+
     async function setupTriplesRadarModule() {
         bindModeToggleEvents();
+        bindSessionToggleEvents();
         state.uiMode = loadUiModePreference();
+        state.sessionMode = loadSessionModePreference();
         setupElementsForCurrentMode();
         updateModeToggleUI();
         if (!state.elements?.root) return;
@@ -1488,9 +2028,13 @@
         state.categoryHintUsed = false;
         state.solved = false;
         state.selectedCategory = '';
+        state.examExpired = false;
+        state.examSecondsLeft = EXAM_TIME_LIMIT_SECONDS;
         if (state.uiMode === 'phone') resetPhoneScenarioFlow();
 
         bindEvents();
+        if (state.sessionMode === 'exam') startExamTimer();
+        else updateTimerUI();
         setFeedback(getIntroFeedbackText(), 'info');
         setStepStatus(getStepText());
         updateHintControls();

@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.392" data-build-time="1773692581772" data-build-iso="2026-03-16T20:23:01.772Z" data-git-commit="c5f3f46">
+<html lang="he" dir="rtl" data-app-version="1.0.393" data-build-time="1773696925393" data-build-iso="2026-03-16T21:35:25.393Z" data-git-commit="0f47ed7">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1314,73 +1314,112 @@
                             <p>במקום רק לחפש שם קטגוריה, המכ״ם מסדר את המשפט ל-5 כיווני בדיקה קבועים של טבלת ברין, ואז עוזר לדייק בתוך הכיוון שנפתח.</p>
                         </div>
 
-                        <details class="triples-radar-reference-drawer" data-mobile-collapsible-title="רקע וטבלה">
-                            <summary class="triples-radar-reference-summary">
-                                <span>רקע מושגי + טבלת ברין</span>
-                                <small>קרא עוד</small>
-                            </summary>
-                            <div class="triples-radar-reference-body">
-                                <div class="triples-radar-concept" aria-label="רקע מושגי למכ״ם שלשות">
-                                    <p>מבנה התרגיל מבוסס על טבלת המטה-מודל של מייקל ברין. במסגרת זו דפוסי המטה-מודל מאורגנים ב-5 שורות, כאשר בכל שורה מופיעה שלשה של הבחנות לשוניות קשורות שעובדות יחד בתקשורת טבעית.</p>
-                                    <p>בשיחה אמיתית הפרות מטה-מודל כמעט אף פעם אינן מופיעות בבידוד. לרוב כמה הבחנות מופיעות יחד באותו משפט או חילוף קצר, ולכן זיהוי של האשכול כולו מחדד את ההבנה הקלינית.</p>
-                                    <p>כאשר מזהים את השלשה יחד, ההתערבות הופכת קוהרנטית יותר: לא מגיבים לכל טריגר בנפרד, אלא בוחרים שאלה או שיקוף שמטפלים במבנה העמוק של האמירה, בהתאם ללוגיקה של טבלת ברין.</p>
-                                    <p><strong>שלשה לדוגמה (שורה 1 בטבלת ברין):</strong> קריאת מחשבות, הנחות מוקדמות וחסר ייחוס שיפוט (מה שנקרא בספרות: Lost Performative). לעיתים שלושת הדפוסים מופיעים יחד ולכן נדרש מיקוד בשלשה ולא רק בסימן יחיד.</p>
-                                </div>
-
-                                <figure class="triples-radar-breen-figure">
-                                    <img
-                                        src="assets/svg/meta-model-breen-table.svg"
-                                        data-versioned-src="assets/svg/meta-model-breen-table.svg"
-                                        alt="טבלת המטה-מודל של מייקל ברין עם חמש שורות של שלשות קשורות"
-                                        loading="lazy"
-                                        decoding="async"
-                                    >
-                                    <figcaption>מייקל ברין – טבלת המבנה של המטה-מודל</figcaption>
-                                </figure>
-
-                                <div class="triples-radar-reference-actions">
-                                    <button type="button" class="btn btn-secondary" data-triples-figure-toggle="true">הגדל טבלה</button>
-                                    <a class="btn btn-secondary" href="assets/svg/meta-model-breen-table.svg" data-versioned-href="assets/svg/meta-model-breen-table.svg" target="_blank" rel="noopener noreferrer">פתח את הטבלה המלאה</a>
-                                </div>
-                            </div>
-                        </details>
+                        <div class="triples-radar-reference-bar">
+                            <button type="button" class="btn btn-secondary triples-radar-reference-trigger" data-tr-action="open-concept">רקע מושגי + טבלת ברין</button>
+                            <p>פתיחה קצרה, טבלת ברין המלאה, והסבר על הקשר בין השורה הפעילה לשורות הסמוכות.</p>
+                        </div>
 
                         <div class="triples-radar-mode-bar" id="triples-radar-mode-bar">
                             <div class="triples-radar-mode-copy">
                                 <strong id="triples-radar-mode-title">מצב פרטים · מחזירים את המשפט לקרקע</strong>
                                 <p id="triples-radar-mode-note">מחפשים מה חסר בתוך המשפט: מי, מה, מתי, איך, ולפי מה.</p>
                             </div>
-                            <div id="triples-radar-mode-switch" class="triples-radar-mode-switch" role="group" aria-label="בחירת אופן עבודה במכ״ם שלשות">
-                                <button type="button" class="triples-radar-mode-btn is-active" data-tr-ui-mode="details" aria-pressed="true">פרטים</button>
-                                <button type="button" class="triples-radar-mode-btn" data-tr-ui-mode="rules" aria-pressed="false">כללים</button>
+                            <div class="triples-radar-mode-groups">
+                                <div class="triples-radar-mode-group">
+                                    <span class="triples-radar-mode-group-label">מבט</span>
+                                    <div id="triples-radar-mode-switch" class="triples-radar-mode-switch" role="group" aria-label="בחירת אופן עבודה במכ״ם שלשות">
+                                        <button type="button" class="triples-radar-mode-btn is-active" data-tr-ui-mode="details" aria-pressed="true">פרטים</button>
+                                        <button type="button" class="triples-radar-mode-btn" data-tr-ui-mode="rules" aria-pressed="false">כללים</button>
+                                    </div>
+                                </div>
+                                <div class="triples-radar-mode-group">
+                                    <span class="triples-radar-mode-group-label">קצב</span>
+                                    <div id="triples-radar-session-switch" class="triples-radar-mode-switch" role="group" aria-label="בחירת מצב עבודה במכ״ם שלשות">
+                                        <button type="button" class="triples-radar-mode-btn is-active" data-tr-session-mode="learn" aria-pressed="true">למידה</button>
+                                        <button type="button" class="triples-radar-mode-btn" data-tr-session-mode="exam" aria-pressed="false">מבחן</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div id="triples-radar-root" class="triples-radar-card">
-                            <div class="triples-radar-topbar">
-                                <span>מקרה <strong id="triples-radar-counter">1/15</strong></span>
-                                <span>נקודות <strong id="triples-radar-score">0</strong></span>
-                                <span>בחירות מדויקות <strong id="triples-radar-solved-count">0</strong></span>
+                            <div class="triples-radar-shell">
+                                <section class="triples-radar-main-panel">
+                                    <div class="triples-radar-topbar">
+                                        <span><small>מקרה</small><strong id="triples-radar-counter">1/15</strong></span>
+                                        <span><small>מצב</small><strong id="triples-radar-session-badge">למידה</strong></span>
+                                        <span><small id="triples-radar-timer-label">קצב</small><strong id="triples-radar-timer">פתוח</strong></span>
+                                        <span><small>נקודות</small><strong id="triples-radar-score">0</strong></span>
+                                        <span><small>דיוקים</small><strong id="triples-radar-solved-count">0</strong></span>
+                                    </div>
+
+                                    <div class="triples-radar-statement-wrap">
+                                        <p class="triples-radar-kicker">משפט מטופל</p>
+                                        <p id="triples-radar-statement" class="triples-radar-statement"></p>
+                                        <p id="triples-radar-focus-hint" class="triples-radar-focus-hint"></p>
+                                    </div>
+
+                                    <div class="triples-radar-support-strip">
+                                        <p id="triples-radar-step" class="triples-radar-step">שלב 1: קרא/י את המשפט. שלב 2: בחר/י את כיוון החשיבה שמתאים לעבודה כרגע, ואז דייק/י לתבנית.</p>
+                                        <button type="button" class="btn btn-secondary triples-radar-mini-action" data-tr-action="open-concept">טבלת ברין</button>
+                                    </div>
+
+                                    <div id="triples-radar-mode-summary" class="triples-radar-mode-summary" aria-live="polite"></div>
+
+                                    <p id="triples-radar-feedback" class="triples-radar-feedback" data-tone="info"></p>
+                                </section>
+
+                                <section class="triples-radar-board-panel">
+                                    <div class="triples-radar-board-top">
+                                        <div>
+                                            <p class="triples-radar-board-kicker">מפת השלשות</p>
+                                            <h4>בחר/י שורה, ואז דייק/י לתבנית המתאימה</h4>
+                                        </div>
+                                        <div class="triples-radar-actions">
+                                            <button class="btn btn-secondary" data-tr-action="hint-category">💡 רמז ממוקד</button>
+                                            <button class="btn btn-secondary" data-tr-action="restart">↻ התחלה מחדש</button>
+                                            <button class="btn btn-primary" data-tr-action="next">→ המקרה הבא</button>
+                                        </div>
+                                    </div>
+
+                                    <div id="triples-radar-rows" class="triples-radar-rows"></div>
+                                </section>
                             </div>
+                        </div>
 
-                            <p id="triples-radar-step" class="triples-radar-step">שלב 1: קרא/י את המשפט. שלב 2: בחר/י את כיוון החשיבה שמתאים לעבודה כרגע, ואז דייק/י לתבנית.</p>
-
-                            <div class="triples-radar-statement-wrap">
-                                <p class="triples-radar-kicker">משפט מטופל</p>
-                                <p id="triples-radar-statement" class="triples-radar-statement"></p>
-                                <p id="triples-radar-focus-hint" class="triples-radar-focus-hint"></p>
+                        <div id="triples-radar-overlay" class="triples-radar-overlay" hidden aria-hidden="true">
+                            <button type="button" class="triples-radar-overlay-backdrop" data-tr-action="close-overlay" aria-label="סגור חלון"></button>
+                            <div class="triples-radar-overlay-dialog" role="dialog" aria-modal="true" aria-labelledby="triples-radar-overlay-title">
+                                <div class="triples-radar-overlay-head">
+                                    <div>
+                                        <p id="triples-radar-overlay-kicker" class="triples-radar-overlay-kicker"></p>
+                                        <h3 id="triples-radar-overlay-title" class="triples-radar-overlay-title"></h3>
+                                    </div>
+                                    <button type="button" class="triples-radar-overlay-close" data-tr-action="close-overlay" aria-label="סגור">×</button>
+                                </div>
+                                <div id="triples-radar-overlay-body" class="triples-radar-overlay-body"></div>
+                                <div id="triples-radar-overlay-actions" class="triples-radar-overlay-actions"></div>
                             </div>
+                        </div>
 
-                            <div id="triples-radar-mode-summary" class="triples-radar-mode-summary" aria-live="polite"></div>
-
-                            <div id="triples-radar-rows" class="triples-radar-rows"></div>
-
-                            <p id="triples-radar-feedback" class="triples-radar-feedback" data-tone="info"></p>
-
-                            <div class="triples-radar-actions">
-                                <button class="btn btn-secondary" data-tr-action="hint-category">💡 רמז: הדגש תבנית מתאימה</button>
-                                <button class="btn btn-secondary" data-tr-action="restart">↻ התחלה מחדש</button>
-                                <button class="btn btn-primary" data-tr-action="next">→ המקרה הבא</button>
+                        <div class="triples-radar-panel-source" hidden aria-hidden="true">
+                            <div class="triples-radar-concept" aria-label="רקע מושגי למכ״ם שלשות">
+                                <p>מבנה התרגיל מבוסס על טבלת המטה-מודל של מייקל ברין: חמש שורות קבועות, שלוש קטגוריות בכל שורה, ומעבר מכוון בין מקור/כוונה, חוק/סיבה, משמעות/זהות, הקשר/ייחוס וקרקע חושית/פעולה.</p>
+                                <p>הרעיון המרכזי הוא לא לזהות "טריגר" בודד, אלא לראות משפחה שלמה של דפוסים שחיים יחד באותו משפט.</p>
+                                <p>ככל שהזיהוי נעשה שורשי יותר, כך גם השאלה או השיקוף הבאים הופכים מדויקים יותר.</p>
+                            </div>
+                            <figure class="triples-radar-breen-figure">
+                                <img
+                                    src="assets/svg/meta-model-breen-table.svg"
+                                    data-versioned-src="assets/svg/meta-model-breen-table.svg"
+                                    alt="טבלת המטה-מודל של מייקל ברין עם חמש שורות של שלשות קשורות"
+                                    loading="lazy"
+                                    decoding="async"
+                                >
+                                <figcaption>טבלת ברין המלאה - חמש שורות, שלוש קטגוריות בכל שורה.</figcaption>
+                            </figure>
+                            <div class="triples-radar-reference-actions">
+                                <a class="btn btn-secondary" href="assets/svg/meta-model-breen-table.svg" data-versioned-href="assets/svg/meta-model-breen-table.svg" target="_blank" rel="noopener noreferrer">פתח את הטבלה המלאה</a>
                             </div>
                         </div>
                     </section>

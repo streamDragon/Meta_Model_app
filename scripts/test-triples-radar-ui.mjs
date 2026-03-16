@@ -121,6 +121,7 @@ try {
         await page.evaluate(() => {
             localStorage.removeItem('triples_radar_ui_mode_v1');
             localStorage.removeItem('triples_radar_ui_mode_v2');
+            localStorage.removeItem('triples_radar_session_mode_v1');
             localStorage.removeItem('meta_feature_shell_v3');
             window.navigateTo('practice-triples-radar');
         });
@@ -130,11 +131,14 @@ try {
 
         const detailsState = await page.evaluate(() => ({
             modeButtons: Array.from(document.querySelectorAll('#triples-radar-mode-switch [data-tr-ui-mode]')).map((btn) => btn.textContent.trim()),
+            sessionButtons: Array.from(document.querySelectorAll('#triples-radar-session-switch [data-tr-session-mode]')).map((btn) => btn.textContent.trim()),
             modeTitle: document.getElementById('triples-radar-mode-title')?.textContent?.trim() || '',
             step: document.getElementById('triples-radar-step')?.textContent?.trim() || '',
             rootText: document.getElementById('triples-radar-root')?.textContent?.replace(/\s+/g, ' ').trim() || '',
             strongestBadges: document.querySelectorAll('#triples-radar-rows .triples-radar-row-badge').length,
-            catHintText: document.querySelector('#practice-triples-radar [data-tr-action="hint-category"]')?.textContent?.trim() || ''
+            catHintText: document.querySelector('#practice-triples-radar [data-tr-action="hint-category"]')?.textContent?.trim() || '',
+            focusHint: document.getElementById('triples-radar-focus-hint')?.textContent?.trim() || '',
+            conceptTrigger: document.querySelector('#practice-triples-radar [data-tr-action="open-concept"]')?.textContent?.trim() || ''
         }));
 
         await assert(
@@ -142,9 +146,16 @@ try {
             'triples radar mode labels',
             detailsState.modeButtons.join(', ')
         );
+        await assert(
+            JSON.stringify(detailsState.sessionButtons) === JSON.stringify(['למידה', 'מבחן']),
+            'triples radar session labels',
+            detailsState.sessionButtons.join(', ')
+        );
         await assert(detailsState.rootText.length > 150, 'triples radar details content rendered', String(detailsState.rootText.length));
-        await assert(detailsState.strongestBadges === 1, 'triples radar strongest direction marked', String(detailsState.strongestBadges));
-        await assert(/\u05d4\u05d3\u05d2\u05e9/.test(detailsState.catHintText), 'triples radar hint label clarified', detailsState.catHintText);
+        await assert(detailsState.strongestBadges === 0, 'triples radar strongest direction hidden at start', String(detailsState.strongestBadges));
+        await assert(detailsState.focusHint === '', 'triples radar focus hint hidden at start', detailsState.focusHint);
+        await assert(/\u05e8\u05de\u05d6/.test(detailsState.catHintText), 'triples radar hint label clarified', detailsState.catHintText);
+        await assert(/\u05d8\u05d1\u05dc\u05ea/.test(detailsState.conceptTrigger), 'triples radar concept trigger available', detailsState.conceptTrigger);
         await assert(!/[A-Z]{2,}/.test(detailsState.rootText), 'triples radar details avoids exposed english');
 
         await page.locator('#triples-radar-mode-switch [data-tr-ui-mode="rules"]').click();
@@ -161,6 +172,21 @@ try {
         await assert(detailsState.rootText !== rulesState.rootText, 'triples radar content reframes input by mode');
         await assert(!/[A-Z]{2,}/.test(rulesState.rootText), 'triples radar rules avoids exposed english');
 
+        await page.locator('#triples-radar-session-switch [data-tr-session-mode="exam"]').click();
+        await page.waitForTimeout(250);
+        const examState = await page.evaluate(() => ({
+            sessionBadge: document.getElementById('triples-radar-session-badge')?.textContent?.trim() || '',
+            timerLabel: document.getElementById('triples-radar-timer-label')?.textContent?.trim() || '',
+            timerValue: document.getElementById('triples-radar-timer')?.textContent?.trim() || '',
+            hintHidden: !!document.querySelector('#practice-triples-radar [data-tr-action="hint-category"]')?.hidden
+        }));
+        await assert(examState.sessionBadge === 'מבחן', 'triples radar exam badge updates', examState.sessionBadge);
+        await assert(examState.timerLabel === 'זמן', 'triples radar exam timer label updates', examState.timerLabel);
+        await assert(/^\d{2}:\d{2}$/.test(examState.timerValue), 'triples radar exam timer visible', examState.timerValue);
+        await assert(examState.hintHidden, 'triples radar exam hides hints');
+
+        await page.locator('#triples-radar-session-switch [data-tr-session-mode="learn"]').click();
+        await page.waitForTimeout(250);
         await page.locator('#practice-triples-radar [data-tr-action="hint-category"]').click();
         await page.waitForTimeout(150);
         const revealCount = await page.evaluate(() => document.querySelectorAll('#triples-radar-rows .triples-radar-cat-btn.is-reveal').length);

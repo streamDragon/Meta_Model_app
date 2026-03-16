@@ -810,6 +810,10 @@ body.shell-feature-active .tab-content.active {
     box-shadow: none !important;
 }
 
+#practice-triples-radar.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] [data-meta-feature-chrome="bottom"] {
+    display: none !important;
+}
+
 @media (max-width: 720px) {
     .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__frame {
         gap: 8px;

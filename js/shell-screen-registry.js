@@ -48,7 +48,7 @@
             containerSelector: '.practice-container',
             workspaceSelector: '.practice-intro-card',
             sectionHideSelectors: ['.screen-read-guide'],
-            hideSelectors: ['> h2', '> .subtitle', '.practice-section-header', '.triples-radar-concept', '.triples-radar-breen-figure', '.triples-radar-reference-actions'],
+            hideSelectors: ['> h2', '> .subtitle', '.practice-section-header'],
             panels: [
                 { id: 'guide', type: 'guide', action: 'היגיון', title: 'איך עובדים במסך הזה', size: 'lg', sourceRoot: 'section' },
                 { id: 'breen-map', type: 'selectors', action: 'טבלת ברין', title: 'טבלת ברין והעקרונות', size: 'lg', selectors: ['.triples-radar-concept', '.triples-radar-breen-figure', '.triples-radar-reference-actions'] }
