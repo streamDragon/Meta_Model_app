@@ -9,6 +9,7 @@
     var PREFS_KEY = 'meta_shell_preferences_v1';
     var MANAGED_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'about'];
     var FEATURE_CHROME_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'about'];
+    var FAST_FEATURE_ENTRY_TABS = ['prismlab'];
     var HOME_VIEWS = ['home', 'stats', 'theory', 'settings', 'help'];
     var CTA_LABELS = ['יאללה, בואו נתחיל', 'אני מוכן — קדימה', 'בואו נצלול פנימה'];
     var QUESTION_PROMPTS = [
@@ -523,6 +524,33 @@
     function parseJson(raw, fallback) { try { return JSON.parse(raw); } catch (_error) { return fallback; } }
     function isManaged(tabName) { return MANAGED_TABS.indexOf(normalizeTab(tabName)) !== -1; }
     function getMeta(tabName) { return FEATURE_META[normalizeTab(tabName)] || null; }
+    function prefersReducedMotion() {
+        return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    }
+    function useInstantFeatureEntry(tabName) {
+        var safeTab = normalizeTab(tabName);
+        return FAST_FEATURE_ENTRY_TABS.indexOf(safeTab) !== -1 || prefersReducedMotion();
+    }
+    function scrollViewportToSection(section, options) {
+        if (!section || typeof window.scrollTo !== 'function') return;
+        var instant = !!(options && options.instant);
+        var offset = typeof (options && options.offset) === 'number' ? options.offset : 12;
+        var commit = function () {
+            var currentTop = Math.round(window.scrollY || window.pageYOffset || 0);
+            var targetTop = Math.max(0, Math.round(currentTop + section.getBoundingClientRect().top - offset));
+            if (Math.abs(targetTop - currentTop) < 20) return;
+            try {
+                window.scrollTo({ top: targetTop, behavior: instant ? 'auto' : 'smooth' });
+            } catch (_error) {
+                window.scrollTo(0, targetTop);
+            }
+        };
+        if (typeof window.requestAnimationFrame === 'function') {
+            window.requestAnimationFrame(commit);
+            return;
+        }
+        commit();
+    }
     function featureTabsForHome() {
         return Object.keys(FEATURE_META).filter(function (tab) {
             return FEATURE_META[tab] && FEATURE_META[tab].showOnHome !== false;
@@ -1153,17 +1181,18 @@ function featureActionButtonsHtml(meta) {
         state.stage = 'welcome';
         saveFeatureState();
         renderFeature(safeTab, 'back');
-        if (typeof window.scrollTo === 'function') window.scrollTo({ top: 0, behavior: 'smooth' });
+        scrollViewportToSection(document.getElementById(safeTab), { instant: useInstantFeatureEntry(safeTab) });
         return true;
     }
     function transitionWelcomeToFeature(tabName) {
-        var section = document.getElementById(normalizeTab(tabName));
+        var safeTab = normalizeTab(tabName);
+        var section = document.getElementById(safeTab);
         if (!section) return;
         var shell = section.querySelector('.meta-feature-welcome-shell');
         var liveNodes = Array.prototype.slice.call(section.children || []).filter(function (node) { return node !== shell; });
-        if (!shell || !liveNodes.length) {
+        if (!shell || !liveNodes.length || useInstantFeatureEntry(safeTab)) {
             section.dataset.metaFeatureStage = 'feature';
-            renderFeatureChrome(normalizeTab(tabName));
+            renderFeatureChrome(safeTab);
             return;
         }
         var clone = shell.cloneNode(true);
@@ -1171,7 +1200,7 @@ function featureActionButtonsHtml(meta) {
         section.appendChild(clone);
         clone.classList.add('meta-screen-out-forward');
         section.dataset.metaFeatureStage = 'feature';
-        renderFeatureChrome(normalizeTab(tabName));
+        renderFeatureChrome(safeTab);
         liveNodes.forEach(function (node) { node.classList.add('meta-screen-enter-forward', 'meta-screen-scale-in'); });
         window.setTimeout(function () {
             if (clone.parentNode) clone.parentNode.removeChild(clone);
@@ -1267,7 +1296,7 @@ function featureActionButtonsHtml(meta) {
             getTabState(safeTab).stage = 'welcome';
             saveFeatureState();
             renderFeature(safeTab, 'back');
-            if (typeof window.scrollTo === 'function') window.scrollTo({ top: 0, behavior: 'smooth' });
+            scrollViewportToSection(document.getElementById(safeTab), { instant: useInstantFeatureEntry(safeTab) });
             return;
         }
         if (typeof window.navigateTo === 'function') {
@@ -1361,7 +1390,7 @@ function featureActionButtonsHtml(meta) {
                     if (typeof window.playUISound === 'function') window.playUISound('success');
                     transitionWelcomeToFeature(meta.tab);
                     var section = document.getElementById(meta.tab);
-                    if (section && typeof section.scrollIntoView === 'function') section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    scrollViewportToSection(section, { instant: useInstantFeatureEntry(meta.tab) });
                 }
                 return;
             }
@@ -1410,6 +1439,7 @@ function featureActionButtonsHtml(meta) {
         section.querySelectorAll('.feature-onboarding-card, .screen-read-guide').forEach(function (node) { node.remove(); });
         var shell = section.querySelector('.meta-feature-welcome-shell');
         if (!shell) { shell = document.createElement('section'); shell.className = 'meta-feature-welcome-shell'; section.insertBefore(shell, section.firstChild); }
+        shell.setAttribute('data-entry-mode', useInstantFeatureEntry(meta.tab) ? 'fast' : 'animated');
         shell.innerHTML = featureShellHtml(meta);
         bindFeatureShell(shell, meta);
         applyFeatureStage(meta.tab, direction || 'forward');

@@ -567,6 +567,10 @@ body,
     animation: metaCtaBreath 2.6s ease-in-out infinite;
 }
 
+.meta-feature-welcome-shell[data-entry-mode="fast"] .meta-feature-shell__cta {
+    animation: none;
+}
+
 .meta-feature-stage-clone,
 .meta-feature-modal,
 .meta-level-up-overlay {
