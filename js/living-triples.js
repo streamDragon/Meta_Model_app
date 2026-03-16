@@ -1372,7 +1372,11 @@ function handleRootClick(event) {
   if (!button) return;
   const action = button.getAttribute('data-action') || '';
   if (action === 'go-home') {
-    window.location.href = 'index.html?tab=practice-triples-radar';
+    if (window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+    window.location.href = 'index.html';
     return;
   }
   if (action === 'start-practice') return void beginPractice();

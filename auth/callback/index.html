@@ -63,6 +63,21 @@
             background: #e2e8f0;
         }
 
+        .auth-callback-btn--icon {
+            width: 38px;
+            min-width: 38px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-callback-btn--icon svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+        }
+
         .auth-callback-link {
             display: inline-flex;
             align-items: center;
@@ -81,12 +96,36 @@
         <h1>מסיימים את ההתחברות...</h1>
         <p class="auth-callback-status" data-auth-callback-status data-tone="info">מאמתים התחברות מול Google...</p>
         <div class="auth-callback-actions">
+            <button type="button" class="auth-callback-btn auth-callback-btn--icon" data-auth-callback-back aria-label="חזרה לעמוד הקודם" title="חזרה לעמוד הקודם">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+                </svg>
+            </button>
             <button type="button" class="auth-callback-btn hidden" data-auth-callback-retry>Retry</button>
-            <a class="auth-callback-link" href="../../index.html">חזרה למסך הבית</a>
+            <a class="auth-callback-link auth-callback-btn auth-callback-btn--icon" href="../../index.html" aria-label="מעבר לעמוד הבית" title="מעבר לעמוד הבית">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M4 10.5 12 4l8 6.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+                    <path d="M6.5 10v9h11v-9" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+                    <path d="M10 19v-5h4v5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+                </svg>
+            </a>
         </div>
     </main>
 
     <script src="../../js/runtime-env.js"></script>
+    <script>
+        (function () {
+            const backButton = document.querySelector('[data-auth-callback-back]');
+            if (!backButton) return;
+            backButton.addEventListener('click', function () {
+                if (window.history.length > 1) {
+                    window.history.back();
+                    return;
+                }
+                window.location.assign('../../index.html');
+            });
+        })();
+    </script>
     <script type="module" src="../../js/freemium/auth-callback-page.js"></script>
 </body>
 </html>

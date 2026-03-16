@@ -2110,8 +2110,7 @@ function setupAppStickyBanner() {
         if (localBackBtn) {
             localBackBtn.addEventListener('click', () => {
                 if (localBackBtn.disabled) return;
-                if (navigateFeatureStepBack()) return;
-                showHint('אין עדיין צעד קודם לחזרה. אם צריך, אפשר לחזור לבית.');
+                navigateBrowserBackOrHome('home');
             });
         }
 
@@ -5905,6 +5904,34 @@ function navigateFeatureStepBack() {
     return true;
 }
 
+function canUseBrowserBack() {
+    try {
+        return window.history.length > 1;
+    } catch (_error) {
+        return false;
+    }
+}
+
+function navigateBrowserBackOrHome(fallbackTab = 'home') {
+    if (canUseBrowserBack()) {
+        window.history.back();
+        return true;
+    }
+    navigateTo(fallbackTab, {
+        playSound: true,
+        scrollToTop: true,
+        trackStepBack: false
+    });
+    return false;
+}
+
+function getNavIconMarkup(kind = 'back') {
+    if (kind === 'home') {
+        return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 10.5 12 4l8 6.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path><path d="M6.5 10v9h11v-9" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path><path d="M10 19v-5h4v5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path></svg>';
+    }
+    return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path></svg>';
+}
+
 function refreshFeatureBackControls(activeTab = '') {
     const currentTab = normalizeRequestedTab(activeTab) || getCurrentActiveTabName();
     const hasStepBack = hasFeatureStepBackTarget(currentTab);
@@ -5919,11 +5946,11 @@ function refreshFeatureBackControls(activeTab = '') {
 
     const stickyBackBtn = document.getElementById('app-sticky-local-back-btn');
     if (stickyBackBtn) {
-        const disabled = !hasStepBack || currentTab === 'home' || currentTab === 'debug';
+        const disabled = !canUseBrowserBack();
         stickyBackBtn.disabled = disabled;
         stickyBackBtn.hidden = disabled;
         stickyBackBtn.setAttribute('aria-disabled', disabled ? 'true' : 'false');
-        stickyBackBtn.title = disabled ? 'אין עדיין צעד קודם לחזרה' : 'חזרה צעד למסך הקודם';
+        stickyBackBtn.title = disabled ? 'אין עמוד קודם לחזרה' : 'חזרה לעמוד הקודם';
     }
 }
 
@@ -17341,8 +17368,7 @@ function bindRuntimeRecoveryActions(card, tabName = '') {
             return;
         }
         if (action === 'back') {
-            if (navigateFeatureStepBack()) return;
-            showHint('אין עדיין צעד קודם לחזרה. אם צריך, אפשר לחזור לבית.');
+            navigateBrowserBackOrHome('home');
             return;
         }
         if (action === 'home') {
@@ -17384,8 +17410,8 @@ function renderRuntimeRecoveryFallback(tabName = '', options = {}) {
         <p>${escapeHtml(message)}</p>
         <div class="screen-runtime-fallback-actions">
             <button type="button" class="btn btn-primary" data-runtime-recovery-action="retry">נסה שוב</button>
-            <button type="button" class="btn btn-secondary" data-runtime-recovery-action="back">↩ חזרה צעד</button>
-            <button type="button" class="btn btn-secondary" data-runtime-recovery-action="home">חזרה לבית</button>
+            <button type="button" class="btn btn-secondary app-icon-nav-btn" data-runtime-recovery-action="back" aria-label="חזרה לעמוד הקודם" title="חזרה לעמוד הקודם">${getNavIconMarkup('back')}</button>
+            <button type="button" class="btn btn-secondary app-icon-nav-btn" data-runtime-recovery-action="home" aria-label="מעבר לעמוד הבית" title="מעבר לעמוד הבית">${getNavIconMarkup('home')}</button>
         </div>
     `;
     bindRuntimeRecoveryActions(card, safeTab);

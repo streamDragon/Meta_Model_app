@@ -926,6 +926,26 @@ body.force-mobile-view .app-version-floating {
     background: rgba(255, 255, 255, 0.18);
 }
 
+.app-icon-nav-btn.btn {
+    width: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-icon-nav-btn.btn svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+.app-sticky-banner__action-btn.app-icon-nav-btn.btn {
+    padding-inline: 0;
+}
+
 #app-sticky-local-back-btn {
     font-weight: 800;
 }

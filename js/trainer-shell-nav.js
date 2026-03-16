@@ -54,15 +54,18 @@
     }
 
     function canUseHistoryBack() {
-        if (window.history.length < 2) return false;
-        var ref = String(document.referrer || '');
-        if (!ref) return false;
         try {
-            var refUrl = new URL(ref);
-            return refUrl.origin === window.location.origin;
+            return window.history.length > 1;
         } catch (e) {
             return false;
         }
+    }
+
+    function getNavIconSvg(kind) {
+        if (kind === 'home') {
+            return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 10.5 12 4l8 6.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path><path d="M6.5 10v9h11v-9" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path><path d="M10 19v-5h4v5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path></svg>';
+        }
+        return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path></svg>';
     }
 
     function injectStyles() {
@@ -109,6 +112,10 @@
             '  text-transform: uppercase;',
             '}',
             '.trainer-shell-nav__btn {',
+            '  display: inline-flex;',
+            '  align-items: center;',
+            '  justify-content: center;',
+            '  gap: 6px;',
             '  border: 1px solid rgba(255,255,255,0.28);',
             '  color: #fff;',
             '  background: rgba(255,255,255,0.08);',
@@ -128,6 +135,17 @@
             '.trainer-shell-nav__btn:focus-visible {',
             '  outline: 2px solid #facc15;',
             '  outline-offset: 2px;',
+            '}',
+            '.trainer-shell-nav__btn--icon {',
+            '  width: 40px;',
+            '  min-width: 40px;',
+            '  min-height: 40px;',
+            '  padding: 0;',
+            '  border-radius: 12px;',
+            '}',
+            '.trainer-shell-nav__btn--icon svg {',
+            '  width: 18px;',
+            '  height: 18px;',
             '}',
             '.trainer-shell-nav__btn--theory {',
             '  background: linear-gradient(135deg, rgba(251,191,36,0.24), rgba(34,211,238,0.12));',
@@ -248,6 +266,7 @@
             '  .trainer-shell-nav__meta { font-size: 0.88rem; }',
             '  .trainer-shell-nav__meta-sub { font-size: 0.72rem; }',
             '  .trainer-shell-nav__btn { padding: 8px 10px; }',
+            '  .trainer-shell-nav__btn--icon { width: 38px; min-width: 38px; min-height: 38px; padding: 0; }',
             '  .trainer-shell-help-overlay { padding: 10px; }',
             '  .trainer-shell-help-overlay__dialog { max-height: 94vh; padding: 10px; }',
             '  .trainer-shell-help-overlay__actions { width: 100%; }',
@@ -625,8 +644,8 @@
             '  <span class="trainer-shell-nav__spark" aria-hidden="true"></span>',
             '</div>',
             '<div class="trainer-shell-nav__group">',
-            '  <button type="button" class="trainer-shell-nav__btn" data-nav-action="back" title="\u05D7\u05D6\u05E8\u05D4 \u05DC\u05E2\u05DE\u05D5\u05D3 \u05D4\u05E7\u05D5\u05D3\u05DD">\u2190 \u05D7\u05D6\u05E8\u05D4</button>',
-            '  <button type="button" class="trainer-shell-nav__btn" data-nav-action="home" title="\u05D7\u05D6\u05E8\u05D4 \u05DC\u05D3\u05E3 \u05D4\u05E8\u05D0\u05E9\u05D9">\u05D3\u05E3 \u05E8\u05D0\u05E9\u05D9</button>',
+            '  <button type="button" class="trainer-shell-nav__btn trainer-shell-nav__btn--icon" data-nav-action="back" aria-label="\u05D7\u05D6\u05E8\u05D4 \u05DC\u05E2\u05DE\u05D5\u05D3 \u05D4\u05E7\u05D5\u05D3\u05DD" title="\u05D7\u05D6\u05E8\u05D4 \u05DC\u05E2\u05DE\u05D5\u05D3 \u05D4\u05E7\u05D5\u05D3\u05DD">' + getNavIconSvg('back') + '</button>',
+            '  <button type="button" class="trainer-shell-nav__btn trainer-shell-nav__btn--icon" data-nav-action="home" aria-label="\u05DE\u05E2\u05D1\u05E8 \u05DC\u05E2\u05DE\u05D5\u05D3 \u05D4\u05D1\u05D9\u05EA" title="\u05DE\u05E2\u05D1\u05E8 \u05DC\u05E2\u05DE\u05D5\u05D3 \u05D4\u05D1\u05D9\u05EA">' + getNavIconSvg('home') + '</button>',
             '  <button type="button" class="trainer-shell-nav__btn trainer-shell-nav__btn--theory" data-nav-action="theory" title="\u05D3\u05E3 \u05D4\u05EA\u05D0\u05D5\u05E8\u05D9\u05D4 \u05D4\u05DE\u05E8\u05DB\u05D6\u05D9">\u05EA\u05D9\u05D0\u05D5\u05E8\u05D9\u05D4</button>',
             '  <button type="button" class="trainer-shell-nav__btn" data-nav-action="help-overlay" title="\u05E2\u05D6\u05E8\u05D4 \u05DC\u05DE\u05E1\u05DA \u05D4\u05E0\u05D5\u05DB\u05D7\u05D9 (\u05DE\u05E1\u05DA \u05DE\u05DC\u05D0)">\u05E2\u05D6\u05E8\u05D4 \u05DC\u05DE\u05E1\u05DA</button>',
             '</div>'

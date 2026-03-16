@@ -1239,6 +1239,10 @@
         section.addEventListener('click', function (event) {
             var backBtn = event.target.closest('[data-shell-chrome-back]');
             if (backBtn) {
+                if (window.history && window.history.length > 1) {
+                    window.history.back();
+                    return;
+                }
                 if (typeof window.navigateFeatureStepBack === 'function' && window.navigateFeatureStepBack()) return;
                 goHome('home');
                 return;

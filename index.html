@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.368" data-build-time="1773603366348" data-build-iso="2026-03-15T19:36:06.348Z" data-git-commit="a4996de">
+<html lang="he" dir="rtl" data-app-version="1.0.369" data-build-time="1773627781456" data-build-iso="2026-03-16T02:23:01.456Z" data-git-commit="bfaaf6e">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -409,9 +409,19 @@
                     <p id="app-sticky-current-context" class="app-sticky-banner__context">בחר/י כלי תרגול מהתפריט ותצא/י לדרך.</p>
                 </div>
                 <div class="app-sticky-banner__actions">
-                    <button type="button" id="app-sticky-local-back-btn" class="btn btn-secondary app-sticky-banner__action-btn" aria-label="חזרה צעד">↩ חזרה</button>
+                    <button type="button" id="app-sticky-local-back-btn" class="btn btn-secondary app-sticky-banner__action-btn app-icon-nav-btn" aria-label="חזרה לעמוד הקודם" title="חזרה לעמוד הקודם">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+                        </svg>
+                    </button>
                     <button type="button" id="app-sticky-menu-btn" class="btn btn-secondary app-sticky-banner__action-btn" aria-label="תפריט מסלולים וכלים">☰ תפריט</button>
-                    <button type="button" id="app-sticky-home-btn" class="btn btn-secondary app-sticky-banner__action-btn" aria-label="חזרה לבית">⌂ בית</button>
+                    <button type="button" id="app-sticky-home-btn" class="btn btn-secondary app-sticky-banner__action-btn app-icon-nav-btn" aria-label="מעבר לעמוד הבית" title="מעבר לעמוד הבית">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M4 10.5 12 4l8 6.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+                            <path d="M6.5 10v9h11v-9" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+                            <path d="M10 19v-5h4v5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+                        </svg>
+                    </button>
                     <div id="app-sticky-version-chip" class="app-sticky-banner__version" aria-live="polite">גרסה: נטען...</div>
                 </div>
             </div>
@@ -1104,8 +1114,18 @@
                     <p>טוענים את המילון. אם המסך נשאר ריק, אפשר לנסות שוב, לחזור צעד אחד, או לחזור לבית.</p>
                     <div class="screen-runtime-fallback-actions">
                         <button type="button" class="btn btn-primary" data-runtime-recovery-action="retry">נסה שוב</button>
-                        <button type="button" class="btn btn-secondary" data-runtime-recovery-action="back">↩ חזרה צעד</button>
-                        <button type="button" class="btn btn-secondary" data-runtime-recovery-action="home">חזרה לבית</button>
+                        <button type="button" class="btn btn-secondary app-icon-nav-btn" data-runtime-recovery-action="back" aria-label="חזרה לעמוד הקודם" title="חזרה לעמוד הקודם">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+                            </svg>
+                        </button>
+                        <button type="button" class="btn btn-secondary app-icon-nav-btn" data-runtime-recovery-action="home" aria-label="מעבר לעמוד הבית" title="מעבר לעמוד הבית">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M4 10.5 12 4l8 6.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+                                <path d="M6.5 10v9h11v-9" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+                                <path d="M10 19v-5h4v5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+                            </svg>
+                        </button>
                     </div>
                 </section>
             </div>

@@ -90,6 +90,17 @@
     button:hover, .btn-link:hover { background: rgba(255,255,255,.22); }
     button.primary { background: #fff; color: var(--teal); border-color: #fff; }
     button.primary:hover { background: #ecfeff; }
+    .toolbar-icon-link {
+      width: 40px;
+      min-width: 40px;
+      padding: 0;
+      justify-content: center;
+    }
+    .toolbar-icon-link svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
 
     .progress-chip {
       border: 1px solid rgba(255,255,255,.5);
@@ -321,7 +332,18 @@
         <button id="nextBtn" type="button">הבא</button>
         <button id="showMapBtn" type="button">הצג מפה</button>
         <a class="btn-link" href="worksheets/verb-unzip/">דף עבודה מעוגל</a>
-        <a class="btn-link" href="index.html">חזרה למסך הראשי</a>
+        <button class="btn-link toolbar-icon-link" type="button" aria-label="חזרה לעמוד הקודם" title="חזרה לעמוד הקודם" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.assign('index.html'); }">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+          </svg>
+        </button>
+        <a class="btn-link toolbar-icon-link" href="index.html" aria-label="מעבר לעמוד הבית" title="מעבר לעמוד הבית">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 10.5 12 4l8 6.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+            <path d="M6.5 10v9h11v-9" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+            <path d="M10 19v-5h4v5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+          </svg>
+        </a>
       </div>
     </header>
 

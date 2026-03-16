@@ -180,12 +180,13 @@ body {
                 return String(link?.href || '').trim() === 'index.html';
             })
             : [];
+        const secondaryNavLinks = navLinks.filter((link) => String(link?.href || '').trim() !== 'index.html');
         document.title = pageTitle;
         document.body.innerHTML = `
           <div class="mtp-page">
             <div class="mtp-nav" aria-label="ניווט עמוד ${contract?.title || ''}">
               <div class="mtp-nav-group">
-                ${navLinks.map((link) => `<a class="mtp-btn" data-mtp-link="${link.href}" href="${link.href}">${link.label}</a>`).join('')}
+                ${secondaryNavLinks.map((link) => `<a class="mtp-btn" data-mtp-link="${link.href}" href="${link.href}">${link.label}</a>`).join('')}
               </div>
               <div id="${mountId}-meta" class="mtp-meta" aria-live="polite"></div>
             </div>
