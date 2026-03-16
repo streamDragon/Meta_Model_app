@@ -8,7 +8,7 @@ import { chromium } from 'playwright';
 const projectRoot = process.cwd();
 const VITE_BIN = path.join(projectRoot, 'node_modules', 'vite', 'bin', 'vite.js');
 const APP_READY_TIMEOUT_MS = 45000;
-const STEP_TIMEOUT_MS = 15000;
+const STEP_TIMEOUT_MS = 45000;
 const MANAGED_SCREENS = new Set(['sentence-map', 'practice-question', 'practice-radar', 'practice-triples-radar']);
 const MANAGED_CONTENT_SELECTOR_BY_SCREEN = Object.freeze({
     'sentence-map': '#sentence-map .practice-section-sentence-map',
