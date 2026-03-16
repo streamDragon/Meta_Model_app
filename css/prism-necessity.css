@@ -385,6 +385,43 @@
   color: var(--pnm-deep-2);
 }
 
+.pnm-btn--accent {
+  border-color: rgba(24, 48, 85, 0.22);
+  background: rgba(24, 48, 85, 0.1);
+  color: var(--pnm-deep);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+
+.pnm-build-workspace {
+  display: grid;
+}
+
+.pnm-build-map-wrap {
+  position: relative;
+  isolation: isolate;
+}
+
+.pnm-build-question-overlay {
+  position: absolute;
+  inset-inline: 14px;
+  top: 14px;
+  z-index: 4;
+  display: grid;
+  justify-items: center;
+  pointer-events: none;
+}
+
+.pnm-build-question-overlay .pnm-question-card {
+  width: min(100%, 560px);
+  pointer-events: auto;
+  box-shadow: 0 24px 54px rgba(4, 10, 22, 0.28);
+  backdrop-filter: blur(12px);
+}
+
+.pnm-build-map-wrap.is-complete .pnm-build-question-overlay .pnm-question-card {
+  width: min(100%, 740px);
+}
+
 .pnm-map-card {
   display: grid;
   gap: 14px;
@@ -619,6 +656,7 @@
 .pnm-question-card {
   display: grid;
   gap: 14px;
+  overflow: hidden;
   border-color: color-mix(in srgb, var(--pnm-tone, #355f9d) 18%, #ffffff);
   background:
     radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--pnm-tone, #355f9d) 14%, #ffffff), transparent 36%),
@@ -644,6 +682,12 @@
   font-size: clamp(1.05rem, 3.1vw, 1.35rem);
   line-height: 1.55;
   font-weight: 700;
+}
+
+.pnm-question-card .pnm-actions--mobile {
+  position: static;
+  padding-top: 0;
+  background: none;
 }
 
 .pnm-question-hint {
@@ -692,6 +736,21 @@
   align-content: start;
 }
 
+.pnm-chat-step {
+  display: grid;
+  gap: 8px;
+}
+
+.pnm-chat-placeholder {
+  padding: 16px 18px;
+  border-radius: 20px;
+  border: 1px dashed rgba(53, 95, 157, 0.2);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--pnm-muted);
+  text-align: center;
+  line-height: 1.65;
+}
+
 .pnm-chat-label {
   justify-self: center;
   padding: 5px 12px;
@@ -735,6 +794,13 @@
   line-height: 1.7;
 }
 
+.pnm-insight-grid,
+.pnm-insight-intro,
+.pnm-insight-card {
+  display: grid;
+  gap: 12px;
+}
+
 .pnm-insight-intro,
 .pnm-insight-card {
   border: 1px solid rgba(53, 95, 157, 0.12);
@@ -742,11 +808,6 @@
   padding: 14px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: var(--pnm-shadow-soft);
-}
-
-.pnm-insight-intro {
-  display: grid;
-  gap: 8px;
 }
 
 .pnm-insight-card {
@@ -770,6 +831,11 @@
   grid-template-columns: 1fr;
 }
 
+.pnm-summary-stack {
+  display: grid;
+  gap: 12px;
+}
+
 .pnm-summary-card {
   display: grid;
   gap: 10px;
@@ -784,6 +850,15 @@
 
 .pnm-summary-card strong {
   font-size: 1.02rem;
+}
+
+.pnm-summary-card--learned strong {
+  line-height: 1.7;
+}
+
+.pnm-summary-card--next,
+.pnm-summary-card--punch {
+  height: 100%;
 }
 
 .pnm-story-flow {
@@ -1128,6 +1203,10 @@ code {
   background: rgba(17, 35, 61, 0.08);
 }
 
+body.pnm-overlay-open {
+  overflow: hidden;
+}
+
 @keyframes pnmRevealCell {
   from {
     opacity: 0.55;
@@ -1214,6 +1293,11 @@ code {
     align-items: start;
   }
 
+  .pnm-build-question-overlay {
+    inset-inline: 22px;
+    top: 22px;
+  }
+
   .pnm-stage-layout--reflect {
     grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
     align-items: start;
@@ -1257,6 +1341,18 @@ code {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     overflow: hidden;
+  }
+
+  .pnm-insight-grid:not(.pnm-insight-grid--compact) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .pnm-summary-stack {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pnm-summary-stack > .pnm-insight-grid {
+    grid-column: 1 / -1;
   }
 
   .pnm-shell--embedded .pnm-stage-pill {
@@ -1372,13 +1468,13 @@ code {
   }
 
   .pnm-overlay {
-    align-items: end;
+    align-items: start;
     padding: 10px;
   }
 
   .pnm-overlay-panel {
     width: 100%;
-    max-height: 88vh;
+    max-height: calc(100dvh - 20px);
     padding: 14px;
     border-radius: 24px 24px 18px 18px;
   }
@@ -1399,6 +1495,16 @@ code {
   .pnm-chat-card,
   .pnm-overlay-panel {
     border-radius: 20px;
+  }
+
+  .pnm-build-question-overlay {
+    inset-inline: 10px;
+    top: 10px;
+  }
+
+  .pnm-build-question-overlay .pnm-question-card,
+  .pnm-build-map-wrap.is-complete .pnm-build-question-overlay .pnm-question-card {
+    width: 100%;
   }
 
   .pnm-map-shell {
