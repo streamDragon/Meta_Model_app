@@ -25098,6 +25098,256 @@ button.sentence-map-stepper__item {
     color: #f8fafc;
 }
 
+.sentence-map-stage-card--decision {
+    gap: 18px;
+    padding: clamp(18px, 2.8vw, 26px);
+    border-color: rgba(148, 163, 184, 0.18);
+    background:
+        radial-gradient(circle at 12% 10%, rgba(125, 211, 252, 0.12), transparent 28%),
+        radial-gradient(circle at 88% 82%, rgba(52, 211, 153, 0.1), transparent 24%),
+        linear-gradient(180deg, rgba(18, 26, 45, 0.84), rgba(10, 16, 30, 0.9));
+    box-shadow: 0 22px 46px rgba(2, 6, 23, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.sentence-map-stage-card--decision .sentence-map-stage-note {
+    max-width: 68ch;
+}
+
+.sentence-map-stage-card--decision .sentence-map-stage-header {
+    gap: 8px;
+}
+
+.sentence-map-decision-context,
+.sentence-map-decision-primary,
+.sentence-map-decision-secondary,
+.sentence-map-decision-rationale__rows,
+.sentence-map-decision-family-list {
+    display: grid;
+    gap: 12px;
+}
+
+.sentence-map-decision-block__head,
+.sentence-map-decision-family-item__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sentence-map-decision-block__head span,
+.sentence-map-decision-context__card span,
+.sentence-map-decision-card__label,
+.sentence-map-decision-family-item__badge {
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.sentence-map-decision-block__head span,
+.sentence-map-decision-context__card span,
+.sentence-map-decision-card__label {
+    color: rgba(191, 219, 254, 0.76);
+}
+
+.sentence-map-decision-context__card,
+.sentence-map-decision-card,
+.sentence-map-decision-rationale,
+.sentence-map-decision-question,
+.sentence-map-decision-wording,
+.sentence-map-decision-families,
+.sentence-map-decision-note {
+    position: relative;
+    overflow: hidden;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.04));
+    backdrop-filter: blur(12px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 16px 28px rgba(2, 6, 23, 0.16);
+}
+
+.sentence-map-decision-context__card,
+.sentence-map-decision-rationale,
+.sentence-map-decision-question,
+.sentence-map-decision-wording,
+.sentence-map-decision-families,
+.sentence-map-decision-note {
+    padding: 16px 18px;
+}
+
+.sentence-map-decision-context__card {
+    display: grid;
+    gap: 10px;
+    min-height: 100%;
+}
+
+.sentence-map-decision-context__card strong {
+    margin: 0;
+    color: #f8fafc;
+    font-size: clamp(1.02rem, 2.4vw, 1.22rem);
+    line-height: 1.7;
+}
+
+.sentence-map-decision-context__card p {
+    margin: 0;
+    color: rgba(226, 232, 240, 0.82);
+    line-height: 1.58;
+}
+
+.sentence-map-decision-context__card--focus strong {
+    display: flex;
+}
+
+.sentence-map-decision-card {
+    display: grid;
+    gap: 12px;
+    padding: 18px 18px 16px;
+    min-height: 178px;
+}
+
+.sentence-map-decision-card::before,
+.sentence-map-decision-question::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.sentence-map-decision-card::before {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 46%);
+}
+
+.sentence-map-decision-card > *,
+.sentence-map-decision-question > * {
+    position: relative;
+    z-index: 1;
+}
+
+.sentence-map-decision-card__value {
+    display: block;
+    color: #f8fafc;
+    font-size: clamp(1.18rem, 3.4vw, 1.68rem);
+    line-height: 1.45;
+}
+
+.sentence-map-decision-card__hint,
+.sentence-map-decision-rationale__row p,
+.sentence-map-decision-wording__text,
+.sentence-map-decision-family-item p,
+.sentence-map-decision-note p,
+.sentence-map-decision-question__purpose {
+    margin: 0;
+    color: rgba(226, 232, 240, 0.84);
+    line-height: 1.68;
+}
+
+.sentence-map-decision-card--do {
+    background:
+        radial-gradient(circle at 84% 14%, rgba(45, 212, 191, 0.18), transparent 30%),
+        linear-gradient(180deg, rgba(15, 118, 110, 0.16), rgba(255, 255, 255, 0.05));
+}
+
+.sentence-map-decision-card--avoid {
+    background:
+        radial-gradient(circle at 14% 16%, rgba(251, 191, 36, 0.16), transparent 30%),
+        linear-gradient(180deg, rgba(190, 24, 93, 0.12), rgba(255, 255, 255, 0.05));
+}
+
+.sentence-map-decision-rationale {
+    display: grid;
+    gap: 12px;
+}
+
+.sentence-map-decision-rationale__row {
+    display: grid;
+    gap: 6px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(15, 23, 42, 0.34);
+}
+
+.sentence-map-decision-rationale__row strong,
+.sentence-map-decision-family-item strong {
+    color: #f8fafc;
+    font-size: 0.98rem;
+}
+
+.sentence-map-decision-question {
+    display: grid;
+    gap: 14px;
+    border: 1px solid rgba(125, 211, 252, 0.18);
+    background:
+        radial-gradient(circle at 88% 12%, rgba(125, 211, 252, 0.18), transparent 28%),
+        linear-gradient(145deg, rgba(14, 116, 144, 0.22), rgba(15, 23, 42, 0.34));
+}
+
+.sentence-map-decision-question::before {
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.06), transparent 44%);
+}
+
+.sentence-map-decision-question__text {
+    margin: 0;
+    color: #f8fafc;
+    font-size: clamp(1.3rem, 4vw, 1.95rem);
+    line-height: 1.72;
+    font-weight: 800;
+}
+
+.sentence-map-decision-question__purpose strong {
+    color: #e0f2fe;
+}
+
+.sentence-map-decision-wording,
+.sentence-map-decision-families {
+    display: grid;
+    gap: 12px;
+}
+
+.sentence-map-decision-block__head small {
+    color: rgba(191, 219, 254, 0.74);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.sentence-map-decision-wording__text {
+    font-size: 1rem;
+}
+
+.sentence-map-decision-family-item {
+    display: grid;
+    gap: 8px;
+    padding: 14px 15px;
+    border-radius: 18px;
+    background: rgba(15, 23, 42, 0.32);
+}
+
+.sentence-map-decision-family-item.is-active {
+    background: linear-gradient(180deg, rgba(14, 165, 233, 0.16), rgba(15, 23, 42, 0.36));
+    box-shadow: inset 0 0 0 1px rgba(125, 211, 252, 0.18);
+}
+
+.sentence-map-decision-family-item__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(125, 211, 252, 0.18);
+    color: #e0f2fe;
+}
+
+.sentence-map-decision-note {
+    padding: 14px 16px;
+    border-inline-start: 4px solid rgba(125, 211, 252, 0.46);
+    background: rgba(15, 23, 42, 0.42);
+}
+
+.sentence-map-stage-card--decision .sentence-map-decision-primary,
+.sentence-map-stage-card--decision .sentence-map-decision-question,
+.sentence-map-stage-card--decision .sentence-map-decision-secondary {
+    animation: sentence-map-rise 0.45s ease both;
+}
+
 .sentence-map-summary-card {
     border-color: rgba(34, 197, 94, 0.32);
     background: linear-gradient(160deg, rgba(21, 128, 61, 0.16), rgba(15, 23, 42, 0.9));
@@ -25188,6 +25438,18 @@ button.sentence-map-stepper__item:hover {
     border-color: rgba(125, 211, 252, 0.3);
 }
 
+@media (min-width: 900px) {
+    .sentence-map-decision-context {
+        grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+    }
+
+    .sentence-map-decision-primary,
+    .sentence-map-decision-secondary,
+    .sentence-map-decision-rationale__rows {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (min-width: 980px) {
     .sentence-map-stage-split {
         grid-template-columns: minmax(0, 1.55fr) minmax(290px, 0.95fr);
@@ -25275,6 +25537,28 @@ button.sentence-map-stepper__item:active,
     .sentence-map-summary-card__button,
     .sentence-map-btn-main {
         width: 100%;
+    }
+
+    .sentence-map-stage-card--decision {
+        gap: 14px;
+    }
+
+    .sentence-map-decision-context__card,
+    .sentence-map-decision-rationale,
+    .sentence-map-decision-question,
+    .sentence-map-decision-wording,
+    .sentence-map-decision-families,
+    .sentence-map-decision-note {
+        padding: 14px;
+    }
+
+    .sentence-map-decision-card {
+        min-height: auto;
+        padding: 16px 14px 14px;
+    }
+
+    .sentence-map-decision-question__text {
+        font-size: 1.18rem;
     }
 
     .sentence-map-footer {

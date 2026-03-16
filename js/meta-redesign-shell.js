@@ -1250,7 +1250,7 @@ function featureActionButtonsHtml(meta) {
             bottom: [
                 '<div class="meta-feature-chrome__bar meta-feature-chrome__bar--bottom">',
                 '<div class="meta-feature-chrome__meta"><span>🔥 ' + escapeHtml(summary.streak) + '</span><span>⭐ ' + escapeHtml(summary.totalStars) + '</span><span>רמה ' + escapeHtml(summary.level) + '</span></div>',
-                '<div class="meta-feature-chrome__actions"><button type="button" class="btn btn-secondary meta-feature-chrome__btn" data-shell-chrome-home="' + escapeHtml(safeTab) + '">⌂ בית</button><button type="button" class="btn btn-primary meta-feature-chrome__btn" data-shell-chrome-restart="' + escapeHtml(safeTab) + '">↺ התחלה מחדש</button></div>',
+                '<div class="meta-feature-chrome__actions"><button type="button" class="btn btn-secondary meta-feature-chrome__btn" data-shell-chrome-home-bottom="' + escapeHtml(safeTab) + '">⌂ בית</button><button type="button" class="btn btn-primary meta-feature-chrome__btn" data-shell-chrome-restart="' + escapeHtml(safeTab) + '">↺ התחלה מחדש</button></div>',
                 '</div>'
             ].join('')
         };
@@ -1291,7 +1291,7 @@ function featureActionButtonsHtml(meta) {
                 goHome('home');
                 return;
             }
-            if (event.target.closest('[data-shell-chrome-home]')) { goHome('home'); return; }
+            if (event.target.closest('[data-shell-chrome-home]') || event.target.closest('[data-shell-chrome-home-bottom]')) { goHome('home'); return; }
             if (event.target.closest('[data-shell-chrome-stats]')) { goHome('stats'); return; }
             if (event.target.closest('[data-shell-chrome-restart]')) { restartTab(tabName); }
         });
@@ -1330,6 +1330,20 @@ function featureActionButtonsHtml(meta) {
     }
     function bindFeatureShell(shell, meta) {
         if (!shell) return;
+        shell.querySelectorAll('[data-feature-modal]').forEach(function (node) {
+            node.onclick = function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                openFeatureModal(node.closest('.meta-feature-welcome-shell') || shell, node.getAttribute('data-feature-modal') || '');
+            };
+        });
+        shell.querySelectorAll('[data-feature-close]').forEach(function (node) {
+            node.onclick = function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                closeFeatureModals(node.closest('.meta-feature-welcome-shell') || shell);
+            };
+        });
         shell.onclick = function (event) {
             if (event.target.closest('[data-feature-enter]')) {
                 if (!featureLocked(meta)) {
@@ -1361,8 +1375,14 @@ function featureActionButtonsHtml(meta) {
                 return;
             }
             var modalOpen = event.target.closest('[data-feature-modal]');
-            if (modalOpen) { openFeatureModal(shell, modalOpen.getAttribute('data-feature-modal') || ''); return; }
-            if (event.target.closest('[data-feature-close]')) closeFeatureModals(shell);
+            if (modalOpen) {
+                openFeatureModal(modalOpen.closest('.meta-feature-welcome-shell') || shell, modalOpen.getAttribute('data-feature-modal') || '');
+                return;
+            }
+            var modalClose = event.target.closest('[data-feature-close]');
+            if (modalClose) {
+                closeFeatureModals(modalClose.closest('.meta-feature-welcome-shell') || shell);
+            }
         };
     }
     function applyFeatureStage(tabName, direction) {
