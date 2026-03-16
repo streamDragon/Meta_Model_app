@@ -1093,13 +1093,17 @@ function featureActionButtonsHtml(meta) {
         node.classList.add(direction === 'back' ? 'meta-screen-out-back' : 'meta-screen-out-forward');
         window.setTimeout(function () { node.classList.remove('meta-screen-out-forward', 'meta-screen-out-back'); if (typeof done === 'function') done(); }, 220);
     }
-    function closeFeatureModals(shell) {
+    function closeFeatureModals(shell, options) {
         if (!shell) return;
+        if (options && options.suppressOpen) {
+            shell.__metaFeatureModalSuppressOpenUntil = Date.now() + 320;
+        }
         shell.querySelectorAll('.meta-feature-modal').forEach(function (node) { node.classList.add('hidden'); node.hidden = true; });
         syncFeatureModalState();
     }
     function openFeatureModal(shell, name) {
         if (!shell) return;
+        if ((shell.__metaFeatureModalSuppressOpenUntil || 0) > Date.now()) return;
         closeFeatureModals(shell);
         var node = shell.querySelector('[data-feature-modal-box="' + name + '"]');
         if (!node) return;
@@ -1343,7 +1347,7 @@ function featureActionButtonsHtml(meta) {
             var closeHandler = function (event) {
                 event.preventDefault();
                 event.stopPropagation();
-                closeFeatureModals(node.closest('.meta-feature-welcome-shell') || shell);
+                closeFeatureModals(node.closest('.meta-feature-welcome-shell') || shell, { suppressOpen: true });
             };
             node.onpointerdown = closeHandler;
             node.onclick = closeHandler;
