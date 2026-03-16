@@ -7,8 +7,8 @@
         Object.freeze({ id: 'sentence', label: 'המשפט' }),
         Object.freeze({ id: 'layers', label: 'כיוונים' }),
         Object.freeze({ id: 'focus', label: 'מוקד' }),
-        Object.freeze({ id: 'intervention', label: 'ההמלצה' }),
-        Object.freeze({ id: 'reformulation', label: 'ניסוח חדש' })
+        Object.freeze({ id: 'intervention', label: 'כיוון טיפולי' }),
+        Object.freeze({ id: 'reformulation', label: 'שיקוף וניסוח' })
     ]);
     const LAYER_ORDER = Object.freeze(['outside', 'inside', 'relational']);
     const MODE_COPY = Object.freeze({
@@ -31,37 +31,59 @@
         relational: Object.freeze({ icon: '🔗', name: 'פונקציה', tag: '🔗 פונקציה', title: 'מה המשפט עושה בשיחה?', description: 'מה המשפט עושה בתוך השיחה' })
     });
     const DECISION_COPY = Object.freeze({
-        title: 'ההמלצה כרגע',
-        subtitle: 'על בסיס ניתוח המשפט, זהו הצעד הבא המומלץ — בכפוף למצב המטופל, למטרה, ולשיקול הדעת הקליני שלך.',
+        title: 'המלצות להמשך הטיפול',
+        subtitle: 'זהו מסך הנחיה למטפל/ת: מה נכון לעשות עכשיו, ממה עדיף להימנע כרגע, ואיזה צעד המשך נשען על המפה. הכול בכפוף למומחיות שלך, למצב המטופל/ת, ולמטרת הטיפול.',
         sentenceLabel: 'המשפט שנבדק',
-        focusLabel: 'מוקד העבודה כרגע',
+        focusLabel: 'מוקד העבודה שנבחר',
         doNow: 'מה לעשות עכשיו',
-        avoidNow: 'ממה להימנע עכשיו',
-        whyTitle: 'למה זה הכיוון כרגע',
-        nextQuestionTitle: 'שאלת ההמשך המומלצת',
-        questionPurposeLabel: 'מטרת השאלה',
-        wordingTitle: 'ניסוח אפשרי למטפל',
-        wordingHint: 'דוגמה — לא נוסח חובה',
-        processTitle: 'מה התהליך הזה אמור לעשות',
-        clinicalNote: 'חשוב: ההמלצה כאן היא כיוון עבודה אפשרי. הצעד הבא נכון רק אם הוא מתכתב עם מצב המטופל, העומס הרגשי, שלב הטיפול, והמטרה שאליה הולכים.'
+        avoidNow: 'מה לא לעשות עכשיו',
+        whyTitle: 'למה זה הכיוון המתאים כרגע',
+        nextQuestionTitle: 'שאלת ההמשך המומלצת היא',
+        questionPurposeLabel: 'מה השאלה אמורה לעשות',
+        mirrorTitle: 'שיקוף מומלץ לפתיחה',
+        mirrorHint: 'לפני אתגור, תיקון או פתרון',
+        wordingTitle: 'איך אפשר לומר את זה בחדר',
+        wordingHint: 'ניסוח לדוגמה — להתאמה לפי המטפל/ת, הקשר והמטרה',
+        processTitle: 'אופציות התערבות למטפל/ת',
+        processIntro: 'כל תהליך למטה אמור לעשות משהו אחר. בוחרים רק את מה שמתאים להכשרה שלך, לברית הטיפולית, ולעומס שהמטופל/ת יכול/ה לשאת כרגע.',
+        activeBadge: 'מומלץ עכשיו',
+        optionalBadge: 'אפשר לשקול בהמשך',
+        clinicalTitle: 'מתי ההמלצה באמת נכונה',
+        clinicalNote: 'הצעד הבא חשוב רק כל עוד הוא נשען על ניתוח המצב ועל המטרה שאליה הולכים. אם הוא לא מתכתב עם המפה, עדיף להאט, לשקף, ולבדוק מחדש.'
     });
     const INTERVENTION_FAMILY_COPY = Object.freeze({
         imagery: Object.freeze({
-            title: 'עבודה עם דימוי מודרך',
-            description: 'עבודה עם דימוי מודרך פועלת על החוויה הפנימית ועל הייצוג החושי שלה.'
+            title: 'דמיון או דימוי מודרך',
+            description: 'נשאר עם התמונה, התחושה או חוויית הגוף במקום למהר להסביר אותן.',
+            purpose: 'מטפל בחוויה הפנימית עצמה ומכניס בה מעט תנועה לפני ויכוח על התוכן.'
         }),
         clarification: Object.freeze({
             title: 'שאלות הבהרה',
-            description: 'שאלות הבהרה עובדות על דיוק, רצף והבחנה בין הכללה לבין רגע קונקרטי.'
+            description: 'מחזיר את השיחה לעובדות, לרצף, ולרגע אחד שאפשר לראות ולבדוק.',
+            purpose: 'מטפל בערפול, בכלליות ובהסקות מהירות על ידי דיוק של מה קרה בפועל.'
         }),
         reframing: Object.freeze({
             title: 'מסגור מחדש',
-            description: 'מסגור מחדש משנה משמעות בלי למחוק את החוויה ופותח מרחב לתגובה אחרת.'
+            description: 'מרחיב את המשמעות בלי למחוק את הכאב או להפוך אותו ל"טעות".',
+            purpose: 'מטפל בפרשנות היחידה ומאפשר לראות עוד דרך להבין את מה שקורה.'
         }),
         reflective: Object.freeze({
-            title: 'שפה רפלקטיבית ותיקוף',
-            description: 'שפה רפלקטיבית מייצבת ביטחון וברית טיפולית לפני אתגור או תיקון.'
+            title: 'שיקוף ותיקוף',
+            description: 'נותן שם למה שנחווה ועוזר למטופל/ת להרגיש שנקלט/ה לפני שמזיזים משהו.',
+            purpose: 'מטפל בחוסר נראות, בבושה או בעומס רגשי דרך ביסוס ברית, הכרה ונשיאה משותפת.'
         })
+    });
+    const REFORMULATION_COPY = Object.freeze({
+        title: 'שיקוף וניסוח שמחזיקים את התמונה',
+        subtitle: 'אחרי שיש לנו חוץ, פנים, קשר וכיוון עבודה, אפשר לנסח שיקוף אחד ברור שמחזיק את כל המפה בלי לחזור על אותו סיכום פעמיים.',
+        workbenchLabel: 'לוח השיקוף והניסוח',
+        paragraphTitle: 'שיקוף משולב למטפל/ת',
+        paragraphToggleShow: 'הצג ניסוח לדוגמה',
+        paragraphToggleHide: 'הסתר ניסוח לדוגמה',
+        paragraphPlaceholder: 'כאן יופיע ניסוח לדוגמה שמחזיק יחד את מה שקורה בפנים, בחוץ, בקשר, ואת הצעד הבא.',
+        checklistKicker: 'בדיקת איכות קצרה',
+        checklistTitle: 'מה הניסוח החדש צריך להחזיק',
+        closingNote: 'הצעד הבא נשאר נכון רק כל עוד הוא ממשיך להתכתב עם ניתוח המצב, עם מטרת הטיפול, ועם הקצב שמתאים למטופל/ת.'
     });
 
     function clampStep(value) {
@@ -199,6 +221,7 @@
             if (familyKeys.includes('clarification')) return focusQuestion ? `כדי לדייק בלי למהר לפרשנות, ${focusQuestion}?` : 'אם נחזור לרגע אחד מדויק, מה בעצם קרה שם בפועל?';
             return 'אני רוצה להתקדם בקצב שמחזיק גם את החוויה וגם את הדיוק. מאיפה נכון להתחיל עכשיו?';
         };
+        const getDecisionMirrorParagraphs = (caseData) => splitIntoParagraphs(caseData?.reformulation?.integratedParagraph || '', 1).slice(0, 2);
         const getDecisionRationaleRows = (caseData, focusId) => {
             const avoidText = cleanDirectiveText(caseData?.intervention?.notThis || '', /^לא עכשיו:\s*/u);
             return [
@@ -208,16 +231,28 @@
                 Object.freeze({ label: 'הסיכון אם זזים מהר מדי', text: getClinicalRisk(focusId) })
             ];
         };
+        const renderChecklistCard = (items) => {
+            const safeItems = Array.isArray(items) ? items.filter(Boolean) : [];
+            if (!safeItems.length) return '';
+            return `<article class="sentence-map-checklist-card"><span>${escapeHtml(REFORMULATION_COPY.checklistKicker)}</span><strong>${escapeHtml(REFORMULATION_COPY.checklistTitle)}</strong><ul>${safeItems.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul></article>`;
+        };
         const renderDecisionPrimary = (caseData) => {
             const doNow = String(caseData?.intervention?.title || '').trim();
             const avoidNow = cleanDirectiveText(caseData?.intervention?.notThis || '', /^לא עכשיו:\s*/u);
-            return `<section class="sentence-map-decision-primary" aria-label="ההחלטה המרכזית"><article class="sentence-map-decision-card sentence-map-decision-card--do"><span class="sentence-map-decision-card__label">${escapeHtml(DECISION_COPY.doNow)}</span><strong class="sentence-map-decision-card__value">${escapeHtml(doNow || 'להישאר עם ההמלצה הקלינית המרכזית של המפה')}</strong><p class="sentence-map-decision-card__hint">צעד אחד ברור, לפני הרחבות ולפני פיצול לכמה כיוונים.</p></article><article class="sentence-map-decision-card sentence-map-decision-card--avoid"><span class="sentence-map-decision-card__label">${escapeHtml(DECISION_COPY.avoidNow)}</span><strong class="sentence-map-decision-card__value">${escapeHtml(avoidNow || 'לא למהר לתקן, להתווכח או לתת פתרון לפני שהמוקד התבהר.')}</strong><p class="sentence-map-decision-card__hint">זה לא "לעולם לא", זה פשוט לא הצעד הבא כרגע.</p></article></section>`;
+            return `<section class="sentence-map-decision-primary" aria-label="ההחלטה המרכזית"><article class="sentence-map-decision-card sentence-map-decision-card--do"><div class="sentence-map-decision-card__top"><span class="sentence-map-decision-card__icon" aria-hidden="true">✓</span><span class="sentence-map-decision-card__label">${escapeHtml(DECISION_COPY.doNow)}</span></div><strong class="sentence-map-decision-card__value">${escapeHtml(doNow || 'להישאר עם ההמלצה הקלינית המרכזית של המפה')}</strong><p class="sentence-map-decision-card__hint">צעד אחד ברור, לפני הרחבות ולפני פיצול לכמה כיוונים.</p></article><article class="sentence-map-decision-card sentence-map-decision-card--avoid"><div class="sentence-map-decision-card__top"><span class="sentence-map-decision-card__icon" aria-hidden="true">✕</span><span class="sentence-map-decision-card__label">${escapeHtml(DECISION_COPY.avoidNow)}</span></div><strong class="sentence-map-decision-card__value">${escapeHtml(avoidNow || 'לא למהר לתקן, להתווכח או לתת פתרון לפני שהמוקד התבהר.')}</strong><p class="sentence-map-decision-card__hint">זה לא "לעולם לא", זה פשוט לא הצעד הבא כרגע.</p></article></section>`;
         };
         const renderDecisionRationale = (rows) => `<section class="sentence-map-decision-rationale" aria-label="${escapeHtml(DECISION_COPY.whyTitle)}"><div class="sentence-map-decision-block__head"><span>${escapeHtml(DECISION_COPY.whyTitle)}</span></div><div class="sentence-map-decision-rationale__rows">${rows.map((row) => `<article class="sentence-map-decision-rationale__row"><strong>${escapeHtml(row.label)}</strong><p>${escapeHtml(row.text)}</p></article>`).join('')}</div></section>`;
         const renderDecisionQuestion = (questionText, purposeText) => `<section class="sentence-map-decision-question" aria-label="${escapeHtml(DECISION_COPY.nextQuestionTitle)}"><div class="sentence-map-decision-block__head"><span>${escapeHtml(DECISION_COPY.nextQuestionTitle)}</span></div><blockquote class="sentence-map-decision-question__text">"${escapeHtml(questionText || 'מה נכון לשאול כאן כדי להישאר קרוב ללב המקרה?')}"</blockquote><p class="sentence-map-decision-question__purpose"><strong>${escapeHtml(DECISION_COPY.questionPurposeLabel)}:</strong> ${escapeHtml(purposeText)}</p></section>`;
+        const renderDecisionMirror = (caseData) => {
+            const paragraphs = getDecisionMirrorParagraphs(caseData);
+            const body = paragraphs.length
+                ? paragraphs.map((item) => `<p>${escapeHtml(item)}</p>`).join('')
+                : '<p>לפני הצעד הבא, כדאי לנסח שיקוף שמחזיק יחד את החוויה, את המציאות ואת מה שהמשפט מנסה לעשות בקשר.</p>';
+            return `<section class="sentence-map-decision-mirror" aria-label="${escapeHtml(DECISION_COPY.mirrorTitle)}"><div class="sentence-map-decision-block__head"><span>${escapeHtml(DECISION_COPY.mirrorTitle)}</span><small>${escapeHtml(DECISION_COPY.mirrorHint)}</small></div><div class="sentence-map-decision-mirror__body">${body}</div></section>`;
+        };
         const renderDecisionWording = (wordingText) => `<section class="sentence-map-decision-wording" aria-label="${escapeHtml(DECISION_COPY.wordingTitle)}"><div class="sentence-map-decision-block__head"><span>${escapeHtml(DECISION_COPY.wordingTitle)}</span><small>${escapeHtml(DECISION_COPY.wordingHint)}</small></div><p class="sentence-map-decision-wording__text">${escapeHtml(wordingText)}</p></section>`;
-        const renderDecisionFamilies = (familyKeys) => `<section class="sentence-map-decision-families" aria-label="${escapeHtml(DECISION_COPY.processTitle)}"><div class="sentence-map-decision-block__head"><span>${escapeHtml(DECISION_COPY.processTitle)}</span></div><div class="sentence-map-decision-family-list">${Object.entries(INTERVENTION_FAMILY_COPY).map(([familyId, family]) => `<article class="sentence-map-decision-family-item${familyKeys.includes(familyId) ? ' is-active' : ''}"><div class="sentence-map-decision-family-item__head"><strong>${escapeHtml(family.title)}</strong>${familyKeys.includes(familyId) ? '<span class="sentence-map-decision-family-item__badge">רלוונטי כאן</span>' : ''}</div><p>${escapeHtml(family.description)}</p></article>`).join('')}</div></section>`;
-        const renderDecisionNote = () => `<section class="sentence-map-decision-note" aria-label="הערה קלינית"><p>${escapeHtml(DECISION_COPY.clinicalNote)}</p></section>`;
+        const renderDecisionFamilies = (familyKeys) => `<section class="sentence-map-decision-families" aria-label="${escapeHtml(DECISION_COPY.processTitle)}"><div class="sentence-map-decision-block__head"><span>${escapeHtml(DECISION_COPY.processTitle)}</span><small>${escapeHtml(DECISION_COPY.processIntro)}</small></div><div class="sentence-map-decision-family-list">${Object.entries(INTERVENTION_FAMILY_COPY).map(([familyId, family]) => `<article class="sentence-map-decision-family-item${familyKeys.includes(familyId) ? ' is-active' : ''}"><div class="sentence-map-decision-family-item__head"><strong>${escapeHtml(family.title)}</strong><span class="sentence-map-decision-family-item__badge">${escapeHtml(familyKeys.includes(familyId) ? DECISION_COPY.activeBadge : DECISION_COPY.optionalBadge)}</span></div><p>${escapeHtml(family.description)}</p><p class="sentence-map-decision-family-item__purpose"><strong>מה הוא אמור לעשות:</strong> ${escapeHtml(family.purpose)}</p></article>`).join('')}</div></section>`;
+        const renderDecisionNote = () => `<section class="sentence-map-decision-note" aria-label="הערה קלינית"><div class="sentence-map-decision-block__head"><span>${escapeHtml(DECISION_COPY.clinicalTitle)}</span></div><p>${escapeHtml(DECISION_COPY.clinicalNote)}</p></section>`;
 
         function setMode(mode) { state.mode = mode === 'practice' ? 'practice' : 'learn'; render(); }
         function setCase(caseId) { if (hasCaseId(caseId)) { state.selectedCaseId = String(caseId).trim(); render(); } }
@@ -298,17 +333,16 @@
                 return `<section class="sentence-map-stage-card">${renderStageHeader(3, 'איפה הלב של המקרה?', 'לוח העבודה והפידבק מופרדים כדי שיהיה ברור מה ממפים ומה כבר מסיקים.')}<div class="sentence-map-stage-split">${renderWorkbench('מפת המשפט והשכבות', `${renderSentenceBubble(caseData.sentence, caseData.title)}<div class="sentence-map-focus-grid" role="list">${LAYER_ORDER.map((focusId) => `<button type="button" class="sentence-map-focus-card sentence-map-focus-card--${escapeHtml(focusId)}${selectedFocus === focusId ? ' is-selected' : ''}${caseData.hotFocus === focusId ? ' is-recommended' : ''}" data-action="select-focus" data-focus="${escapeHtml(focusId)}" aria-pressed="${selectedFocus === focusId ? 'true' : 'false'}"><span>${escapeHtml(LAYER_META[focusId].icon)} ${escapeHtml(LAYER_META[focusId].name)}</span><strong>${escapeHtml(LAYER_META[focusId].title)}</strong><p>${escapeHtml(LAYER_META[focusId].description)}</p></button>`).join('')}</div>`)}${selectedFocus ? renderSidePanel('פידבק על הבחירה', `<div class="sentence-map-feedback-card${selectedFocus === caseData.hotFocus ? ' is-right' : ''}" role="status" aria-live="polite"><span>המוקד שנבחר</span><strong>${renderFocusBadge(selectedFocus)}</strong>${renderParagraphs(feedbackText)}</div>`) : renderSidePanel('פידבק יופיע כאן', '<p class="sentence-map-soft-note">בחרו כיוון אחד כדי לראות פידבק נפרד וברור.</p>', 'placeholder')}</div></section>`;
             }
             if (caseUi.stepIndex === 4) {
-                const focusId = getRecommendedFocus(caseData);
+                const focusId = caseUi.selectedFocus || getRecommendedFocus(caseData);
                 const familyKeys = inferInterventionFamilies(caseData, focusId);
                 const rationaleRows = getDecisionRationaleRows(caseData, focusId);
                 const questionPurpose = getQuestionPurpose(focusId, familyKeys);
                 const therapistWording = getTherapistWording(caseData, focusId, familyKeys);
-                return `<section class="sentence-map-stage-card sentence-map-stage-card--decision">${renderStageHeader(4, DECISION_COPY.title, DECISION_COPY.subtitle)}<div class="sentence-map-decision-context"><article class="sentence-map-decision-context__card"><span>${escapeHtml(DECISION_COPY.sentenceLabel)}</span><strong>"${escapeHtml(caseData.sentence || '')}"</strong></article><article class="sentence-map-decision-context__card sentence-map-decision-context__card--focus"><span>${escapeHtml(DECISION_COPY.focusLabel)}</span><strong>${renderFocusBadge(focusId)}</strong><p>${escapeHtml(getFocusPurpose(focusId))}</p></article></div>${renderDecisionPrimary(caseData)}${renderDecisionRationale(rationaleRows)}${renderDecisionQuestion(caseData.intervention?.example || '', questionPurpose)}<div class="sentence-map-decision-secondary">${renderDecisionWording(therapistWording)}${renderDecisionFamilies(familyKeys)}</div>${renderDecisionNote()}</section>`;
+                return `<section class="sentence-map-stage-card sentence-map-stage-card--decision">${renderStageHeader(4, DECISION_COPY.title, DECISION_COPY.subtitle)}<div class="sentence-map-decision-context"><article class="sentence-map-decision-context__card"><span>${escapeHtml(DECISION_COPY.sentenceLabel)}</span><strong>"${escapeHtml(caseData.sentence || '')}"</strong></article><article class="sentence-map-decision-context__card sentence-map-decision-context__card--focus"><span>${escapeHtml(DECISION_COPY.focusLabel)}</span><strong>${renderFocusBadge(focusId)}</strong><p>${escapeHtml(getFocusPurpose(focusId))}</p></article></div>${renderDecisionPrimary(caseData)}${renderDecisionRationale(rationaleRows)}${renderDecisionMirror(caseData)}${renderDecisionQuestion(caseData.intervention?.example || '', questionPurpose)}<div class="sentence-map-decision-secondary">${renderDecisionWording(therapistWording)}${renderDecisionFamilies(familyKeys)}</div>${renderDecisionNote()}</section>`;
             }
             const parts = caseData.reformulation?.parts || {};
             const showExampleParagraph = state.mode === 'learn' || caseUi.showExampleParagraph;
-            const selectedFocus = caseUi.selectedFocus || caseData.hotFocus;
-            return `<section class="sentence-map-stage-card sentence-map-stage-card--reformulation">${renderStageHeader(5, 'ניסוח חדש שמחזיק את התמונה', 'המפה נשארת בלוח אחד, והסיכום הסופי יושב בפאנל נפרד.')}${renderWorkbench('לוח הניסוח', `${renderSentenceBubble(caseData.sentence, caseData.title)}<div class="sentence-map-reform-grid"><article class="sentence-map-part-card sentence-map-part-card--inside"><span>בפנים</span><strong>${escapeHtml(parts.inner || '')}</strong></article><article class="sentence-map-part-card sentence-map-part-card--outside"><span>בחוץ</span><strong>${escapeHtml(parts.outer || '')}</strong></article><article class="sentence-map-part-card sentence-map-part-card--relational"><span>הפער</span><strong>${escapeHtml(parts.gap || '')}</strong></article><article class="sentence-map-part-card sentence-map-part-card--action"><span>הצעד הבא</span><strong>${escapeHtml(parts.action || '')}</strong></article></div><article class="sentence-map-paragraph-card"><div class="sentence-map-paragraph-card__head"><span>ניסוח משולב</span>${state.mode === 'practice' ? `<button type="button" class="btn btn-secondary sentence-map-inline-btn" data-action="toggle-example-paragraph">${showExampleParagraph ? 'הסתר ניסוח לדוגמה' : 'הצג ניסוח לדוגמה'}</button>` : ''}</div>${showExampleParagraph ? renderParagraphs(caseData.reformulation?.integratedParagraph || '') : ''}</article>`, 'summary')}${renderSidePanel('סיכום נפרד', `<article class="sentence-map-summary-card" aria-label="סיכום התרגיל"><span>סיכום קצר</span><blockquote class="sentence-map-summary-card__quote">"${escapeHtml(caseData.sentence)}"</blockquote><div class="sentence-map-summary-card__focus"><span>המוקד שנבחר</span><strong>${renderFocusBadge(selectedFocus)}</strong></div><div class="sentence-map-summary-card__reframe"><span>הניסוח החדש</span>${renderParagraphs(caseData.reformulation?.integratedParagraph || '', 'sentence-map-summary-card__reframe-line')}</div><button type="button" class="btn btn-primary sentence-map-summary-card__button" data-action="next-case">${escapeHtml(HEADER_COPY.summaryButton)}</button></article>`, 'summary')}</section>`;
+            return `<section class="sentence-map-stage-card sentence-map-stage-card--reformulation">${renderStageHeader(5, REFORMULATION_COPY.title, REFORMULATION_COPY.subtitle)}${renderWorkbench(REFORMULATION_COPY.workbenchLabel, `${renderSentenceBubble(caseData.sentence, caseData.title)}<div class="sentence-map-reform-grid"><article class="sentence-map-part-card sentence-map-part-card--inside"><span>בפנים</span><strong>${escapeHtml(parts.inner || '')}</strong></article><article class="sentence-map-part-card sentence-map-part-card--outside"><span>בחוץ</span><strong>${escapeHtml(parts.outer || '')}</strong></article><article class="sentence-map-part-card sentence-map-part-card--relational"><span>הפער</span><strong>${escapeHtml(parts.gap || '')}</strong></article><article class="sentence-map-part-card sentence-map-part-card--action"><span>הצעד הבא</span><strong>${escapeHtml(parts.action || '')}</strong></article></div><article class="sentence-map-paragraph-card"><div class="sentence-map-paragraph-card__head"><div><span>${escapeHtml(REFORMULATION_COPY.paragraphTitle)}</span><strong>שיקוף אחד שמחזיק את המפה</strong></div>${state.mode === 'practice' ? `<button type="button" class="btn btn-secondary sentence-map-inline-btn" data-action="toggle-example-paragraph">${showExampleParagraph ? escapeHtml(REFORMULATION_COPY.paragraphToggleHide) : escapeHtml(REFORMULATION_COPY.paragraphToggleShow)}</button>` : ''}</div>${showExampleParagraph ? renderParagraphs(caseData.reformulation?.integratedParagraph || '') : `<p class="sentence-map-soft-note">${escapeHtml(REFORMULATION_COPY.paragraphPlaceholder)}</p>`}</article>${renderChecklistCard(caseData.reformulation?.checklistItems || [])}<div class="sentence-map-reform-actions"><p class="sentence-map-reform-note">${escapeHtml(REFORMULATION_COPY.closingNote)}</p><button type="button" class="btn btn-primary sentence-map-summary-card__button" data-action="next-case">${escapeHtml(HEADER_COPY.summaryButton)}</button></div>`, 'summary')}</section>`;
         }
 
         function renderFooter(caseUi) {
