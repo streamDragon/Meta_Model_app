@@ -10,6 +10,7 @@
     var MANAGED_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'about'];
     var FEATURE_CHROME_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'about'];
     var FAST_FEATURE_ENTRY_TABS = ['prismlab'];
+    var DIRECT_FEATURE_STAGE_TABS = ['prismlab'];
     var HOME_VIEWS = ['home', 'stats', 'theory', 'settings', 'help'];
     var CTA_LABELS = ['יאללה, בואו נתחיל', 'אני מוכן — קדימה', 'בואו נצלול פנימה'];
     var QUESTION_PROMPTS = [
@@ -527,6 +528,12 @@
     function prefersReducedMotion() {
         return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     }
+    function prefersDirectFeatureStage(tabName) {
+        return DIRECT_FEATURE_STAGE_TABS.indexOf(normalizeTab(tabName)) !== -1;
+    }
+    function preferredFeatureStage(tabName) {
+        return prefersDirectFeatureStage(tabName) ? 'feature' : 'welcome';
+    }
     function useInstantFeatureEntry(tabName) {
         var safeTab = normalizeTab(tabName);
         return FAST_FEATURE_ENTRY_TABS.indexOf(safeTab) !== -1 || prefersReducedMotion();
@@ -571,7 +578,7 @@
     function defaultFeatureState() {
         return MANAGED_TABS.reduce(function (acc, tab) {
             var meta = getMeta(tab);
-            acc[tab] = { stage: 'welcome', settings: normalizeFeatureSettings(meta, {}) };
+            acc[tab] = { stage: preferredFeatureStage(tab), settings: normalizeFeatureSettings(meta, {}) };
             return acc;
         }, {});
     }
@@ -581,7 +588,8 @@
         Object.keys(defaults).forEach(function (tab) {
             var meta = getMeta(tab);
             var raw = source[tab] && typeof source[tab] === 'object' ? source[tab] : {};
-            defaults[tab] = { stage: raw.stage === 'feature' ? 'feature' : 'welcome', settings: normalizeFeatureSettings(meta, raw.settings) };
+            var stage = raw.stage === 'feature' || preferredFeatureStage(tab) === 'feature' ? 'feature' : 'welcome';
+            defaults[tab] = { stage: stage, settings: normalizeFeatureSettings(meta, raw.settings) };
         });
         return defaults;
     }
@@ -1176,6 +1184,7 @@ function featureActionButtonsHtml(meta) {
         var safeTab = normalizeTab(tabName);
         var state;
         if (!safeTab || !isManaged(safeTab)) return false;
+        if (prefersDirectFeatureStage(safeTab)) return false;
         state = getTabState(safeTab);
         if (!state || state.stage !== 'feature') return false;
         state.stage = 'welcome';
@@ -1293,9 +1302,9 @@ function featureActionButtonsHtml(meta) {
         var safeTab = normalizeTab(tabName);
         if (!safeTab) return;
         if (isManaged(safeTab)) {
-            getTabState(safeTab).stage = 'welcome';
+            getTabState(safeTab).stage = preferredFeatureStage(safeTab);
             saveFeatureState();
-            renderFeature(safeTab, 'back');
+            renderFeature(safeTab, prefersDirectFeatureStage(safeTab) ? 'forward' : 'back');
             scrollViewportToSection(document.getElementById(safeTab), { instant: useInstantFeatureEntry(safeTab) });
             return;
         }
@@ -1534,7 +1543,7 @@ function featureActionButtonsHtml(meta) {
             var next = currentTabName();
             var prev = activeTab;
             if (!next || next === prev) return;
-            if (isManaged(prev)) { getTabState(prev).stage = 'welcome'; saveFeatureState(); applyFeatureStage(prev, 'back'); }
+            if (isManaged(prev)) { getTabState(prev).stage = preferredFeatureStage(prev); saveFeatureState(); applyFeatureStage(prev, 'back'); }
             activeTab = next;
             if (next === 'home') renderHome(takePendingDirection('home') || (isManaged(prev) ? 'back' : 'forward'));
             else if (isManaged(next)) renderFeature(next, takePendingDirection(next) || 'forward');

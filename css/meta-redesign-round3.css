@@ -506,6 +506,14 @@ body.shell-feature-active .tab-content.active {
     width: 100%;
 }
 
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] #prism-necessity-root {
+    display: none !important;
+}
+
+.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #prism-necessity-root {
+    display: block;
+}
+
 .meta-feature-chrome__bar--welcome {
     min-height: 44px;
     justify-content: space-between;
