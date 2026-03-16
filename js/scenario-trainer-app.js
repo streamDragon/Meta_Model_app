@@ -153,6 +153,7 @@
         activeScenario: null,
         selectedOption: null,
         lastEntry: null,
+        previewedOptionId: '',
         selectedPrismId: '',
         toastMessage: '',
         toastTimer: null
@@ -164,6 +165,10 @@
     };
 
     mount.addEventListener('click', handleClick);
+    mount.addEventListener('mouseover', handleMouseOver);
+    mount.addEventListener('mouseout', handleMouseOut);
+    mount.addEventListener('focusin', handleFocusIn);
+    mount.addEventListener('focusout', handleFocusOut);
     mount.addEventListener('change', handleChange);
     mount.addEventListener('input', handleInput);
 
@@ -193,6 +198,10 @@
         const raw = String(value == null ? fallback : value);
         const compact = raw.replace(/\s+/g, ' ').trim();
         return compact || String(fallback || '').trim();
+    }
+
+    function escapeRegExp(value) {
+        return String(value == null ? '' : value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
     function clampRunSize(value) {
@@ -439,6 +448,7 @@
     }
 
     function openScreen(screenId, options = {}) {
+        if (screenId !== SCREEN_IDS.play) state.previewedOptionId = '';
         state.screen = screenId;
         render();
         if (options.scrollTarget) {
@@ -477,6 +487,7 @@
         state.activeScenario = queue[0];
         state.selectedOption = null;
         state.lastEntry = null;
+        state.previewedOptionId = '';
         state.selectedPrismId = '';
         openScreen(SCREEN_IDS.play);
     }
@@ -488,6 +499,54 @@
 
     function getGreenOptionText(scenario) {
         return normalizeText(scenario?.responseSet?.green?.speakerLine || scenario?.greenSentence, '');
+    }
+
+    function getScenarioPlayOptions(scenario) {
+        return Array.isArray(scenario?.responseSet?.red)
+            ? [...scenario.responseSet.red, scenario.responseSet.green].filter(Boolean).slice(0, 5)
+            : [];
+    }
+
+    function isTouchPreviewMode() {
+        const coarsePointer = !!(window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches);
+        const mobileUserAgent = /Android|webOS|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+        const hasTouch = (navigator.maxTouchPoints || 0) > 0 || ('ontouchstart' in window) || mobileUserAgent;
+        return mobileUserAgent || (coarsePointer && hasTouch);
+    }
+
+    function supportsHoverPreview() {
+        return !isTouchPreviewMode();
+    }
+
+    function setPreviewedOption(optionId) {
+        const nextId = normalizeText(optionId, '');
+        if (state.previewedOptionId === nextId) return;
+        state.previewedOptionId = nextId;
+        render();
+    }
+
+    function clearPreviewedOption() {
+        if (!state.previewedOptionId) return;
+        state.previewedOptionId = '';
+        render();
+    }
+
+    function getScenarioPlayPreviewOption(scenario) {
+        return getScenarioPlayOptions(scenario).find((option) => option.id === state.previewedOptionId) || null;
+    }
+
+    function getScenarioSpeechLine(scenario) {
+        const rawLine = normalizeText(scenario?.openingLine, '');
+        const speaker = normalizeText(scenario?.role?.other, '');
+        if (!rawLine || !speaker) return rawLine;
+        const speakerPattern = new RegExp(`^${escapeRegExp(speaker)}\\s+אומר(?:ת)?\\s*:\\s*`, 'u');
+        return normalizeText(rawLine.replace(speakerPattern, ''), rawLine);
+    }
+
+    function trimText(value, maxLength) {
+        const text = normalizeText(value, '');
+        if (!text || text.length <= maxLength) return text;
+        return `${text.slice(0, Math.max(0, maxLength - 1)).trim()}…`;
     }
 
     function getOptionToneGroup(tone, isGreen) {
@@ -643,6 +702,7 @@
         const option = allOptions.find((item) => item.id === optionId);
         if (!option) return;
         state.selectedOption = option;
+        state.previewedOptionId = '';
         state.selectedPrismId = '';
         openScreen(SCREEN_IDS.feedback);
     }
@@ -725,6 +785,7 @@
         state.activeScenario = state.session.queue[state.session.index];
         state.selectedOption = null;
         state.lastEntry = null;
+        state.previewedOptionId = '';
         state.selectedPrismId = '';
         openScreen(SCREEN_IDS.play);
     }
@@ -997,8 +1058,10 @@
     }
 
     function renderApp() {
+        const isPlayScreen = state.screen === SCREEN_IDS.play;
         return `
           <div id="scenario-trainer" class="scenario-platform-root" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id="scenario-trainer" data-screen="${state.screen}" data-trainer-mobile-order="${escapeHtml(getMobileOrderAttr())}">
+            ${isPlayScreen ? '' : `
             <div class="scenario-summary-strip" data-trainer-zone="start">
               <div class="scenario-summary-pill" data-trainer-summary="current">${escapeHtml(getCurrentSummary())}</div>
               ${state.screen === SCREEN_IDS.home ? `
@@ -1006,21 +1069,23 @@
                 <button type="button" class="btn btn-primary" data-trainer-action="start-session">התחל סשן</button>
                 <button type="button" class="btn btn-secondary" data-trainer-action="open-settings">הגדרות</button>
               </div>` : ''}
-            </div>
-            ${state.screen !== SCREEN_IDS.home ? `
+            </div>`}
+            ${isPlayScreen ? renderPlayTopBar() : ''}
+            ${state.screen !== SCREEN_IDS.home && !isPlayScreen ? `
             <div class="scenario-session-bar" role="toolbar" aria-label="ניהול סשן">
               <span class="scenario-session-bar-info">
                 ${state.session ? `סצנה ${escapeHtml(String(state.session.index + 1))}/${escapeHtml(String(state.session.queue.length))} · ${escapeHtml(String(state.session.score))} נק׳` : ''}
               </span>
               <button type="button" class="scenario-session-bar-end" data-scenario-action="go-home">↩ חזרה לבית</button>
             </div>` : ''}
-            <div class="scenario-standalone-shell">
+            <div class="scenario-standalone-shell ${isPlayScreen ? 'scenario-standalone-shell--play' : ''}">
               <main class="scenario-main-area scenario-standalone-main" data-trainer-zone="main">
                 ${renderMain()}
               </main>
+              ${isPlayScreen ? '' : `
               <aside class="scenario-platform-support" aria-label="תמיכה והדרכת תהליך" data-trainer-zone="support">
                 ${renderSupportRail()}
-              </aside>
+              </aside>`}
             </div>
             ${state.settingsOpen ? renderSettingsModal() : ''}
             ${state.toastMessage ? `<div class="scenario-toast">${escapeHtml(state.toastMessage)}</div>` : ''}
@@ -1137,12 +1202,185 @@
         `;
     }
 
-    function renderOptionButton(option, isGreen) {
+    function renderPlayTopBar() {
+        const currentIndex = (state.session?.index || 0) + 1;
+        const total = state.session?.queue?.length || 0;
+        const score = state.session?.score || 0;
+        const streak = state.session?.streak || 0;
         return `
-          <button type="button" class="scenario-option-btn ${isGreen ? 'green' : 'red'}" data-scenario-action="pick-option" data-option-id="${escapeHtml(option.id)}">
-            <span class="scenario-option-kind">${escapeHtml(toneLabel(option, isGreen))}</span>
-            <span class="scenario-option-main">${escapeHtml(option.speakerLine)}</span>
-            <span class="scenario-option-hint">${escapeHtml(option.choiceHint || (isGreen ? option.whyItWorks : option.whyItHurts))}</span>
+          <div class="scenario-play-topbar" role="toolbar" aria-label="ניווט בסצנה">
+            <button type="button" class="scenario-play-topbar-btn scenario-play-topbar-btn--ghost" data-scenario-action="go-home" aria-label="חזרה לבית">
+              <span class="scenario-play-topbar-icon" aria-hidden="true">⌂</span>
+              <span>בית</span>
+            </button>
+            <div class="scenario-play-topbar-status" aria-live="polite">
+              <span class="scenario-play-status-pill">${escapeHtml(String(currentIndex))}/${escapeHtml(String(total))}</span>
+              <span class="scenario-play-status-pill">נק׳ ${escapeHtml(String(score))}</span>
+              <span class="scenario-play-status-pill">רצף ${escapeHtml(String(streak))}</span>
+            </div>
+            <button type="button" class="scenario-play-topbar-btn" data-scenario-action="open-help" aria-label="עזרה קצרה">
+              <span aria-hidden="true">?</span>
+            </button>
+          </div>
+        `;
+    }
+
+    function getPlayOptionVisual(option, isGreen) {
+        const toneGroup = getOptionToneGroup(option?.tone, isGreen);
+        if (isGreen) {
+            if (toneGroup === 'sequence') return { label: 'סדר', icon: '1', support: 'מארגן צעד ראשון' };
+            if (toneGroup === 'repair') return { label: 'תיקון', icon: '+', support: 'מכיר ופותח תיקון' };
+            if (toneGroup === 'organize') return { label: 'ארגון', icon: '=', support: 'מסדר את הערפל' };
+            if (toneGroup === 'diagnose') return { label: 'אבחון', icon: '*', support: 'בודק לפני שפועלים' };
+            return { label: 'דיוק', icon: '?', support: 'מקרב למה שקורה בפועל' };
+        }
+        if (toneGroup === 'blame') return { label: 'אשמה', icon: '!', support: 'מעביר להתגוננות' };
+        if (toneGroup === 'shutdown') return { label: 'סגירה', icon: 'X', support: 'סוגר את המגע' };
+        if (toneGroup === 'control') return { label: 'לחץ', icon: '>>', support: 'דוחף בלי לפרק' };
+        if (toneGroup === 'rescue') return { label: 'הצלה', icon: '+/-', support: 'לוקח את המשימה' };
+        if (toneGroup === 'dismiss') return { label: 'טשטוש', icon: '~', support: 'מרגיע בלי לברר' };
+        if (toneGroup === 'blur') return { label: 'עמימות', icon: '...', support: 'תגובה בלי כיוון' };
+        return { label: trimText(toneLabel(option, isGreen), 18), icon: '-', support: 'תגובה אוטומטית' };
+    }
+
+    function getPlayOptionEffect(option, isGreen) {
+        const toneGroup = getOptionToneGroup(option?.tone, isGreen);
+        if (isGreen) {
+            if (toneGroup === 'sequence') return 'מפרק את הרגע לרצף קצר שאפשר להתחיל ממנו כבר עכשיו.';
+            if (toneGroup === 'repair') return 'מכיר בפגיעה או בקושי ואז פותח מרחב לתיקון מדויק.';
+            if (toneGroup === 'organize') return 'אוסף את הפרטים החסרים ומחליף עומס במבנה ברור.';
+            if (toneGroup === 'diagnose') return 'עוצר את הדחף לפעול מהר מדי ובודק מה בטוח ומה באמת ידוע.';
+            return 'מחזיר את השיחה ממשפט כללי למה שאפשר לזהות, לתחום ולבדוק.';
+        }
+        if (toneGroup === 'blame') return 'מזיז את השיחה מהקושי עצמו לשאלה מי אשם ומי הבעיה.';
+        if (toneGroup === 'shutdown') return 'מוריד את האפשרות לקשר ולבירור בדיוק כשצריך לפתוח אותם.';
+        if (toneGroup === 'control') return 'לוחץ לזוז מהר, אבל לא מגלה איפה באמת נתקעים.';
+        if (toneGroup === 'rescue') return 'מרגיע את הרגע על חשבון היכולת של הצד השני להחזיק את הצעד הבא.';
+        if (toneGroup === 'dismiss') return 'נותן הקלה רגעית בלי לגעת במה שחסר כדי להתקדם.';
+        if (toneGroup === 'blur') return 'נשמע כמו תגובה, אבל משאיר את המשימה או הקושי עמומים.';
+        return 'מגיב מתוך עומס ולחץ במקום לייצר בהירות בתוך הסיטואציה.';
+    }
+
+    function getPlayOptionWhenItFits(scenario, option, isGreen) {
+        const toneGroup = getOptionToneGroup(option?.tone, isGreen);
+        if (isGreen) return `כשחשוב להחזיק גם את ${normalizeText(scenario?.humanNeed, 'הקושי האנושי שמולך')} וגם את הבדיקה של מה שקורה בפועל.`;
+        if (toneGroup === 'blame') return 'מפתה במיוחד כשמרגישים מותקפים ורוצים להחזיר את הכאב החוצה.';
+        if (toneGroup === 'shutdown') return 'מופיע הרבה כשאין כוח להיכנס לעוד שיחה או לעוד אי-ודאות.';
+        if (toneGroup === 'control') return 'מפתה ברגעים של לחץ זמן, עומס, או רצון "שזה כבר יזוז".';
+        if (toneGroup === 'rescue') return 'עולה כשקשה לראות את הצד השני נאבק ורוצים להוציא אותו מזה מהר.';
+        if (toneGroup === 'dismiss') return 'מופיע כשמנסים להרגיע מהר כדי לא להישאר בתוך האי-נוחות של הרגע.';
+        if (toneGroup === 'blur') return 'מופיע כשצריך להשיב מיד אבל עדיין אין בהירות אמיתית על המצב.';
+        return 'זו תגובה נפוצה כשיש מתח, עומס או רצון להחזיר שליטה מיידית.';
+    }
+
+    function getPlayOptionRisk(option, isGreen) {
+        const toneGroup = getOptionToneGroup(option?.tone, isGreen);
+        if (isGreen) {
+            if (toneGroup === 'repair') return 'אם קופצים ישר לתיקון בלי להחזיק את הרגש, זה יכול להישמע מנומס אבל לא מורגש.';
+            if (toneGroup === 'sequence') return 'אם מפרקים מהר מדי בלי לעצור רגע עם הלחץ, זה עלול להישמע טכני או ניהולי.';
+            if (toneGroup === 'diagnose') return 'אם נשארים רק באבחון בלי להציע צעד ראשון, השיחה עלולה להרגיש תקועה וקרה.';
+            return 'אם משתמשים במהלך הזה כתבנית מוכנה בלי להקשיב באמת, הוא יאבד את האמון והחדות שלו.';
+        }
+        return trimText(option?.whyItHurts || option?.feedback, 160);
+    }
+
+    function renderSpeechBubble(scenario) {
+        return `
+          <div class="scenario-stage-bubble-wrap">
+            <div class="scenario-stage-bubble">
+              <span class="scenario-stage-bubble-speaker">${escapeHtml(scenario.role.other)}</span>
+              <p>${escapeHtml(getScenarioSpeechLine(scenario))}</p>
+            </div>
+          </div>
+        `;
+    }
+
+    function renderOptionPreviewCard(scenario, option) {
+        const isGreen = Number(option.score) === 1;
+        const visual = getPlayOptionVisual(option, isGreen);
+        return `
+          <article id="scenario-play-preview-card" class="scenario-option-preview-card" data-option-tone="${escapeHtml(getOptionToneGroup(option?.tone, isGreen))}">
+            <div class="scenario-option-preview-heading">
+              <span class="scenario-option-preview-icon" aria-hidden="true">${escapeHtml(visual.icon)}</span>
+              <div>
+                <p class="scenario-option-preview-kicker">מהלך אפשרי</p>
+                <h3>${escapeHtml(toneLabel(option, isGreen))}</h3>
+              </div>
+            </div>
+            <dl class="scenario-option-preview-list">
+              <div>
+                <dt>מה זה עושה</dt>
+                <dd>${escapeHtml(getPlayOptionEffect(option, isGreen))}</dd>
+              </div>
+              <div>
+                <dt>מתי זה עולה</dt>
+                <dd>${escapeHtml(getPlayOptionWhenItFits(scenario, option, isGreen))}</dd>
+              </div>
+              <div>
+                <dt>שאלת המשך</dt>
+                <dd>${escapeHtml(normalizeText(scenario?.deepeningQuestion, 'מה בדיוק קורה כאן בפועל?'))}</dd>
+              </div>
+              <div>
+                <dt>סיכון</dt>
+                <dd>${escapeHtml(getPlayOptionRisk(option, isGreen))}</dd>
+              </div>
+            </dl>
+          </article>
+        `;
+    }
+
+    function renderAmbientPreviewCard(scenario) {
+        return `
+          <article id="scenario-play-preview-card" class="scenario-option-preview-card scenario-option-preview-card--ambient" data-preview-state="idle">
+            <p class="scenario-option-preview-kicker">מה מחפשים כאן</p>
+            <h3>${escapeHtml(scenario.surfaceConflict)}</h3>
+            <dl class="scenario-option-preview-list">
+              <div>
+                <dt>הצורך האנושי</dt>
+                <dd>${escapeHtml(trimText(scenario.humanNeed, 170))}</dd>
+              </div>
+              <div>
+                <dt>השאלה שמקדמת</dt>
+                <dd>${escapeHtml(normalizeText(scenario?.deepeningQuestion, 'מה בדיוק קורה כאן בפועל?'))}</dd>
+              </div>
+              <div>
+                <dt>קו מנחה</dt>
+                <dd>${escapeHtml(trimText(scenario.supportPrompt || scenario.learningFocus, 170))}</dd>
+              </div>
+            </dl>
+          </article>
+        `;
+    }
+
+    function getArcRise(index, count) {
+        const patterns = {
+            3: [26, 8, 26],
+            4: [40, 12, 12, 40],
+            5: [58, 24, 0, 24, 58]
+        };
+        return (patterns[count] || patterns[5] || [0])[index] || 0;
+    }
+
+    function renderArcOption(option, index, options) {
+        const isGreen = Number(option.score) === 1;
+        const visual = getPlayOptionVisual(option, isGreen);
+        const isPreviewed = state.previewedOptionId === option.id;
+        return `
+          <button
+            type="button"
+            class="scenario-arc-option ${isPreviewed ? 'is-previewed' : ''}"
+            data-scenario-action="pick-option"
+            data-option-id="${escapeHtml(option.id)}"
+            data-option-tone="${escapeHtml(getOptionToneGroup(option?.tone, isGreen))}"
+            style="--scenario-option-rise:${getArcRise(index, options.length)}px"
+            aria-describedby="scenario-play-preview-card"
+            aria-pressed="${isPreviewed ? 'true' : 'false'}"
+          >
+            <span class="scenario-arc-option-icon" aria-hidden="true">${escapeHtml(visual.icon)}</span>
+            <span class="scenario-arc-option-copy">
+              <span class="scenario-arc-option-label">${escapeHtml(visual.label)}</span>
+              <span class="scenario-arc-option-support">${escapeHtml(trimText(option.choiceHint || visual.support, 52))}</span>
+            </span>
           </button>
         `;
     }
@@ -1150,36 +1388,40 @@
     function renderPlayScreen() {
         const scenario = state.activeScenario || state.session?.queue?.[state.session.index];
         if (!scenario) return renderHomeScreen();
-        const options = [...scenario.responseSet.red, scenario.responseSet.green];
+        const options = getScenarioPlayOptions(scenario);
         const currentIndex = (state.session?.index || 0) + 1;
         const total = state.session?.queue?.length || 0;
         const progress = total > 0 ? Math.round(((currentIndex - 1) / total) * 100) : 0;
+        const previewOption = getScenarioPlayPreviewOption(scenario);
         return `
-          <section class="scenario-workspace-card">
-            <div class="scenario-session-header">
-              <p class="scenario-counter">סצנה <span>${escapeHtml(currentIndex)}</span>/<span>${escapeHtml(total)}</span></p>
-              <p class="scenario-session-meta">נקודות: <span>${escapeHtml(state.session?.score || 0)}</span> | רצף ירוק: <span>${escapeHtml(state.session?.streak || 0)}</span></p>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" style="width:${escapeHtml(progress)}%"></div></div>
-            <div class="scenario-scene-card">
-              <p class="scenario-scene-kicker">${escapeHtml(`${scenario.domainLabel} · ${scenario.role.player} מול ${scenario.role.other}`)}</p>
-              <h3>${escapeHtml(scenario.sceneTitle)}</h3>
-              <p class="scenario-context-intro">${escapeHtml(scenario.contextIntro)}</p>
-              <div class="scenario-bubble other">
-                <span class="scenario-bubble-speaker">${escapeHtml(scenario.role.other)}</span>
-                <p>${escapeHtml(scenario.openingLine)}</p>
+          <section class="scenario-play-view" data-scenario-stage="1" data-domain="${escapeHtml(scenario.domain)}">
+            <div class="scenario-play-stage" data-domain="${escapeHtml(scenario.domain)}" style="--scenario-progress:${escapeHtml(progress)}%">
+              <div class="scenario-play-stage-atmosphere" aria-hidden="true">
+                <div class="scenario-play-stage-gradient"></div>
+                <div class="scenario-play-stage-glow scenario-play-stage-glow--a"></div>
+                <div class="scenario-play-stage-glow scenario-play-stage-glow--b"></div>
+                ${scenario.sceneArt ? `<div class="scenario-play-stage-art"><img src="${escapeHtml(scenario.sceneArt)}" alt="" loading="eager" decoding="async" /></div>` : ''}
               </div>
-              <details class="scenario-scene-depth">
-                <summary>רקע נוסף על הסצנה</summary>
-                <div class="scenario-scene-meta">
-                  <div class="scenario-scene-meta-card"><span class="label">מה חשוב כאן</span><p>${escapeHtml(scenario.humanNeed)}</p></div>
-                  <div class="scenario-scene-meta-card"><span class="label">הקונפליקט הגלוי</span><p>${escapeHtml(scenario.surfaceConflict)}</p></div>
+              <div class="scenario-play-stage-overlay">
+                <header class="scenario-play-scene-head">
+                  <p class="scenario-play-scene-kicker">${escapeHtml(`${scenario.domainLabel} · ${scenario.role.player} מול ${scenario.role.other}`)}</p>
+                  <h2>${escapeHtml(scenario.sceneTitle)}</h2>
+                  <p class="scenario-play-scene-context">${escapeHtml(trimText(scenario.contextIntro, 220))}</p>
+                </header>
+                ${renderSpeechBubble(scenario)}
+                <div class="scenario-play-preview-slot">
+                  ${previewOption ? renderOptionPreviewCard(scenario, previewOption) : renderAmbientPreviewCard(scenario)}
                 </div>
-              </details>
-            </div>
-            <h4 class="scenario-options-title">מה תגיד/י עכשיו?</h4>
-            <div id="scenario-options-container" class="scenario-options-container">
-              ${options.map((option) => renderOptionButton(option, Number(option.score) === 1)).join('')}
+                <div class="scenario-play-choice-band">
+                  <div class="scenario-play-choice-heading">
+                    <span class="scenario-play-choice-kicker">מהלך אפשרי</span>
+                    <strong>מה תגיד/י עכשיו?</strong>
+                  </div>
+                  <div id="scenario-options-container" class="scenario-arc-options" role="list" aria-label="אפשרויות תגובה">
+                    ${options.map((option, index) => renderArcOption(option, index, options)).join('')}
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         `;
@@ -1444,7 +1686,16 @@
         if (trainerAction === 'save-start') return void saveSettingsFromDraft(true);
         if (scenarioAction === 'open-help') return void openScreen(SCREEN_IDS.help);
         if (scenarioAction === 'open-history') return void openScreen(SCREEN_IDS.history);
-        if (scenarioAction === 'pick-option') return void pickOption(button.getAttribute('data-option-id'));
+        if (scenarioAction === 'pick-option') {
+            const optionId = button.getAttribute('data-option-id');
+            if (state.screen === SCREEN_IDS.play && isTouchPreviewMode()) {
+                if (state.previewedOptionId !== optionId) {
+                    setPreviewedOption(optionId);
+                    return;
+                }
+            }
+            return void pickOption(optionId);
+        }
         if (scenarioAction === 'show-blueprint') return void toggleBlueprintScreen();
         if (scenarioAction === 'continue-result') return void continueFromResult();
         if (scenarioAction === 'next-scene') return void continueToNextScene();
@@ -1465,6 +1716,42 @@
         if (scenarioAction === 'back-to-feedback') {
             return void openScreen(SCREEN_IDS.feedback, { scrollTarget: '[data-scenario-feedback-thread="1"]' });
         }
+    }
+
+    function getOptionButtonFromTarget(target) {
+        return target instanceof Element
+            ? target.closest('button[data-scenario-action="pick-option"][data-option-id]')
+            : null;
+    }
+
+    function handleMouseOver(event) {
+        if (state.screen !== SCREEN_IDS.play || !supportsHoverPreview()) return;
+        const button = getOptionButtonFromTarget(event.target);
+        if (!button) return;
+        setPreviewedOption(button.getAttribute('data-option-id'));
+    }
+
+    function handleMouseOut(event) {
+        if (state.screen !== SCREEN_IDS.play || !supportsHoverPreview()) return;
+        const button = getOptionButtonFromTarget(event.target);
+        if (!button) return;
+        const nextButton = getOptionButtonFromTarget(event.relatedTarget);
+        if (nextButton) return;
+        clearPreviewedOption();
+    }
+
+    function handleFocusIn(event) {
+        if (state.screen !== SCREEN_IDS.play || !supportsHoverPreview()) return;
+        const button = getOptionButtonFromTarget(event.target);
+        if (!button) return;
+        setPreviewedOption(button.getAttribute('data-option-id'));
+    }
+
+    function handleFocusOut(event) {
+        if (state.screen !== SCREEN_IDS.play || !supportsHoverPreview()) return;
+        const nextButton = getOptionButtonFromTarget(event.relatedTarget);
+        if (nextButton) return;
+        clearPreviewedOption();
     }
 
     function handleChange(event) {

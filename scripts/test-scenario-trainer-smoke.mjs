@@ -128,24 +128,30 @@ async function runDesktopChecks(page, baseUrl) {
     const previewBeforeSave = await readText(page, '[data-trainer-summary="preview"]');
     await page.locator('[data-trainer-action="save-start"]').first().click();
     await page.waitForFunction(() => !document.querySelector('[data-trainer-settings-shell="1"][data-trainer-id="scenario-trainer"]'));
-    const summaryAfter = await readText(page, '[data-trainer-summary="current"]');
+    await page.waitForSelector('.scenario-play-stage');
+    const topbarStatus = await readText(page, '.scenario-play-topbar-status');
 
     await assert(previewBeforeSave !== summaryBefore, 'scenario preview summary changed', `${summaryBefore} -> ${previewBeforeSave}`);
-    await assert(summaryAfter !== summaryBefore, 'scenario current summary changed', `${summaryBefore} -> ${summaryAfter}`);
+    await assert(/1\/\d+/.test(topbarStatus), 'scenario play topbar reflects live session progress', topbarStatus);
 
-    await page.waitForSelector('#scenario-options-container .scenario-option-btn');
-    const stageLayout = await page.evaluate(() => {
-        const main = document.querySelector('.scenario-standalone-main')?.getBoundingClientRect();
-        const support = document.querySelector('.scenario-platform-support')?.getBoundingClientRect();
-        return { main, support };
-    });
+    await page.waitForSelector('#scenario-options-container .scenario-arc-option');
+    const stageLayout = await page.evaluate(() => ({
+        stage: document.querySelector('.scenario-play-stage')?.getBoundingClientRect(),
+        supportCount: document.querySelectorAll('.scenario-platform-support').length
+    }));
     await assert(
-        !!stageLayout.main && !!stageLayout.support && stageLayout.support.top >= stageLayout.main.bottom - 2,
-        'scenario desktop support sits below main flow',
+        !!stageLayout.stage && stageLayout.stage.height > 480 && stageLayout.supportCount === 0,
+        'scenario desktop stage dominates without support rail',
         JSON.stringify(stageLayout)
     );
 
-    await page.locator('#scenario-options-container .scenario-option-btn').first().click();
+    const previewBeforeHover = await readText(page, '#scenario-play-preview-card');
+    await page.locator('#scenario-options-container .scenario-arc-option').first().dispatchEvent('mouseover');
+    await page.waitForTimeout(150);
+    const previewAfterHover = await readText(page, '#scenario-play-preview-card');
+    await assert(previewAfterHover !== previewBeforeHover, 'scenario desktop hover updates in-scene preview');
+
+    await page.locator('#scenario-options-container .scenario-arc-option').first().click();
     await page.waitForSelector('[data-scenario-feedback-thread="1"]');
 
     await assert((await page.locator('#scenario-feedback-choice-bubble').count()) > 0, 'scenario chosen reply visible');
@@ -161,7 +167,7 @@ async function runDesktopChecks(page, baseUrl) {
 
     await page.locator('[data-scenario-action="show-blueprint"]').first().click();
     await page.waitForFunction(() => !document.querySelector('[data-scenario-analysis="1"]'));
-    console.log(`desktop scenario-trainer: ${summaryBefore} -> ${summaryAfter}`);
+    console.log(`desktop scenario-trainer: ${summaryBefore} -> ${topbarStatus}`);
 }
 
 async function runMobileChecks(page, baseUrl) {
@@ -175,18 +181,28 @@ async function runMobileChecks(page, baseUrl) {
     await assert(overflow.scrollWidth <= overflow.innerWidth + 1, 'scenario mobile no horizontal overflow', `${overflow.scrollWidth}/${overflow.innerWidth}`);
 
     await page.locator('[data-trainer-action="start-session"]').first().click();
-    await page.waitForSelector('#scenario-options-container .scenario-option-btn');
-    await assert((await page.locator('[data-scenario-flow-guide="play"]').count()) > 0, 'scenario mobile play flow guide visible');
-    const mobileFlowOrder = await page.evaluate(() => {
-        const main = document.querySelector('.scenario-standalone-main')?.getBoundingClientRect();
-        const support = document.querySelector('.scenario-platform-support')?.getBoundingClientRect();
-        return { main, support };
-    });
+    await page.waitForSelector('#scenario-options-container .scenario-arc-option');
+    await assert((await page.locator('.scenario-play-topbar').count()) > 0, 'scenario mobile topbar visible');
+    await assert((await page.locator('#scenario-play-preview-card').count()) > 0, 'scenario mobile in-scene preview visible');
+    const mobileFlowOrder = await page.evaluate(() => ({
+        stage: document.querySelector('.scenario-play-stage')?.getBoundingClientRect(),
+        supportCount: document.querySelectorAll('.scenario-platform-support').length
+    }));
     await assert(
-        !!mobileFlowOrder.main && !!mobileFlowOrder.support && mobileFlowOrder.support.top >= mobileFlowOrder.main.bottom - 2,
-        'scenario mobile support follows main flow',
+        !!mobileFlowOrder.stage && mobileFlowOrder.stage.height > 440 && mobileFlowOrder.supportCount === 0,
+        'scenario mobile uses single-stage composition',
         JSON.stringify(mobileFlowOrder)
     );
+
+    const mobileFirstOption = page.locator('#scenario-options-container .scenario-arc-option').first();
+    const mobilePreviewBefore = await readText(page, '#scenario-play-preview-card');
+    await mobileFirstOption.click();
+    await page.waitForTimeout(150);
+    const mobilePreviewAfter = await readText(page, '#scenario-play-preview-card');
+    await assert((await page.locator('[data-scenario-feedback-thread="1"]').count()) === 0, 'scenario mobile first tap previews only');
+    await assert(mobilePreviewAfter !== mobilePreviewBefore, 'scenario mobile first tap updates preview');
+    await mobileFirstOption.click();
+    await page.waitForSelector('[data-scenario-feedback-thread="1"]');
 
     await openScenarioTrainer(page, baseUrl);
 
@@ -210,7 +226,12 @@ try {
         await runDesktopChecks(desktop, serverBundle.base);
         await desktop.close();
 
-        const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true });
+        const mobile = await browser.newPage({
+            viewport: { width: 390, height: 844 },
+            isMobile: true,
+            hasTouch: true,
+            userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1'
+        });
         await runMobileChecks(mobile, serverBundle.base);
         await mobile.close();
     } finally {
