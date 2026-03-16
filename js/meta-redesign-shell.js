@@ -1139,6 +1139,18 @@ function featureActionButtonsHtml(meta) {
             if (typeof window.navigateTo === 'function') window.navigateTo('home', { playSound: true, scrollToTop: true });
         });
     }
+    function stepBackInsideFeature(tabName) {
+        var safeTab = normalizeTab(tabName);
+        var state;
+        if (!safeTab || !isManaged(safeTab)) return false;
+        state = getTabState(safeTab);
+        if (!state || state.stage !== 'feature') return false;
+        state.stage = 'welcome';
+        saveFeatureState();
+        renderFeature(safeTab, 'back');
+        if (typeof window.scrollTo === 'function') window.scrollTo({ top: 0, behavior: 'smooth' });
+        return true;
+    }
     function transitionWelcomeToFeature(tabName) {
         var section = document.getElementById(normalizeTab(tabName));
         if (!section) return;
@@ -1215,8 +1227,9 @@ function featureActionButtonsHtml(meta) {
             return {
                 top: [
                     '<div class="meta-feature-chrome__bar meta-feature-chrome__bar--top meta-feature-chrome__bar--welcome">',
-                    '<button type="button" class="btn btn-secondary meta-feature-chrome__btn" data-shell-chrome-back="' + escapeHtml(safeTab) + '">↩ חזרה</button>',
+                    '<button type="button" class="btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon" data-shell-chrome-back="' + escapeHtml(safeTab) + '" aria-label="חזרה צעד אחד אחורה"><span aria-hidden="true">←</span></button>',
                     '<div class="meta-feature-chrome__title"><strong>' + escapeHtml(title) + '</strong></div>',
+                    '<div class="meta-feature-chrome__controls"><button type="button" class="btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon" data-shell-chrome-home="' + escapeHtml(safeTab) + '" aria-label="חזרה לדף הבית"><span aria-hidden="true">⌂</span></button></div>',
                     '</div>'
                 ].join(''),
                 bottom: [
@@ -1229,9 +1242,9 @@ function featureActionButtonsHtml(meta) {
         return {
             top: [
                 '<div class="meta-feature-chrome__bar meta-feature-chrome__bar--top">',
-                '<button type="button" class="btn btn-secondary meta-feature-chrome__btn" data-shell-chrome-back="' + escapeHtml(safeTab) + '">↩ חזרה</button>',
+                '<button type="button" class="btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon" data-shell-chrome-back="' + escapeHtml(safeTab) + '" aria-label="חזרה צעד אחד אחורה"><span aria-hidden="true">←</span></button>',
                 '<div class="meta-feature-chrome__title"><span class="meta-feature-chrome__kicker">מסלול פעיל</span><strong>' + escapeHtml(title) + '</strong></div>',
-                '<button type="button" class="btn btn-secondary meta-feature-chrome__btn" data-shell-chrome-stats="' + escapeHtml(safeTab) + '">📊 סטטיסטיקות</button>',
+                '<div class="meta-feature-chrome__controls"><button type="button" class="btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon" data-shell-chrome-home="' + escapeHtml(safeTab) + '" aria-label="חזרה לדף הבית"><span aria-hidden="true">⌂</span></button><button type="button" class="btn btn-secondary meta-feature-chrome__btn" data-shell-chrome-stats="' + escapeHtml(safeTab) + '">📊 סטטיסטיקות</button></div>',
                 '</div>'
             ].join(''),
             bottom: [
@@ -1269,11 +1282,12 @@ function featureActionButtonsHtml(meta) {
         section.addEventListener('click', function (event) {
             var backBtn = event.target.closest('[data-shell-chrome-back]');
             if (backBtn) {
+                if (stepBackInsideFeature(tabName)) return;
+                if (typeof window.navigateFeatureStepBack === 'function' && window.navigateFeatureStepBack()) return;
                 if (window.history && window.history.length > 1) {
                     window.history.back();
                     return;
                 }
-                if (typeof window.navigateFeatureStepBack === 'function' && window.navigateFeatureStepBack()) return;
                 goHome('home');
                 return;
             }

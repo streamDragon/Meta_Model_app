@@ -237,6 +237,13 @@ body.shell-feature-active .tab-content.active {
     pointer-events: auto;
 }
 
+.meta-feature-chrome__controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
 .meta-feature-chrome__title {
     display: grid;
     gap: 2px;
@@ -283,6 +290,14 @@ body.shell-feature-active .tab-content.active {
     border-radius: 999px;
 }
 
+.meta-feature-chrome__btn--icon {
+    width: 42px;
+    min-width: 42px;
+    padding: 0;
+    font-size: 1.18rem;
+    line-height: 1;
+}
+
 @media (max-width: 900px) {
     .meta-home-shell__bonus-grid {
         grid-template-columns: 1fr;
@@ -327,10 +342,20 @@ body.shell-feature-active .tab-content.active {
         flex: 0 0 auto;
     }
 
+    .meta-feature-chrome__btn--icon {
+        width: 36px;
+        min-width: 36px;
+        padding: 0;
+    }
+
     .meta-feature-chrome__meta,
     .meta-feature-chrome__actions {
         justify-content: center;
         width: 100%;
+    }
+
+    .meta-feature-chrome__controls {
+        gap: 6px;
     }
 
     .meta-feature-chrome__actions .btn {
