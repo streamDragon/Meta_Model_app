@@ -353,14 +353,14 @@
 
     function restartCurrentSession(state) {
         if (state.view !== 'workspace') {
-            render(state);
+            renderApp(state);
             return true;
         }
         state.exerciseIndex = 0;
         state.probeIndex = 0;
         state.revealOpen = false;
         state.deepenOpen = false;
-        render(state);
+        renderApp(state);
         return true;
     }
 
@@ -368,32 +368,32 @@
         if (state.view === 'workspace') {
             if (state.deepenOpen) {
                 state.deepenOpen = false;
-                render(state);
+                renderApp(state);
                 return true;
             }
             if (state.revealOpen) {
                 state.revealOpen = false;
-                render(state);
+                renderApp(state);
                 return true;
             }
             if (state.probeIndex > 0) {
                 state.probeIndex -= 1;
-                render(state);
+                renderApp(state);
                 return true;
             }
             if (state.exerciseIndex > 0) {
                 state.exerciseIndex -= 1;
                 state.probeIndex = Math.max(0, (getExercise(state)?.probes?.length || 1) - 1);
-                render(state);
+                renderApp(state);
                 return true;
             }
             goToCategories(state, state.pathId);
-            render(state);
+            renderApp(state);
             return true;
         }
         if (state.view === 'categories') {
             goToLanding(state);
-            render(state);
+            renderApp(state);
             return true;
         }
         return false;

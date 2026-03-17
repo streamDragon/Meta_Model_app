@@ -1319,9 +1319,17 @@ function featureActionButtonsHtml(meta) {
             ].join('')
         };
     }
+    function getFeatureController(tabName) {
+        var safeTab = normalizeTab(tabName);
+        var controllers = window.__metaFeatureControllers;
+        if (!safeTab || !controllers || typeof controllers !== 'object') return null;
+        return controllers[safeTab] || null;
+    }
     function restartTab(tabName) {
         var safeTab = normalizeTab(tabName);
+        var controller = getFeatureController(safeTab);
         if (!safeTab) return;
+        if (controller && typeof controller.restart === 'function' && controller.restart()) return;
         if (isManaged(safeTab)) {
             getTabState(safeTab).stage = preferredFeatureStage(safeTab);
             saveFeatureState();
@@ -1345,7 +1353,9 @@ function featureActionButtonsHtml(meta) {
         section.__metaFeatureChromeBound = true;
         section.addEventListener('click', function (event) {
             var backBtn = event.target.closest('[data-shell-chrome-back]');
+            var controller = getFeatureController(tabName);
             if (backBtn) {
+                if (controller && typeof controller.stepBack === 'function' && controller.stepBack()) return;
                 if (stepBackInsideFeature(tabName)) return;
                 if (typeof window.navigateFeatureStepBack === 'function' && window.navigateFeatureStepBack()) return;
                 if (window.history && window.history.length > 1) {

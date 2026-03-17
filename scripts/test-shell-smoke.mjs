@@ -445,6 +445,35 @@ async function runShellSmoke(baseUrl) {
         trace('managed:start', screenId);
         await navigate(screenId);
         await closeOverlayIfOpen();
+        if (screenId === 'prismlab') {
+            await enterManagedFeatureStage(screenId);
+            const landingState = await page.evaluate((id) => {
+                const section = document.getElementById(id);
+                return {
+                    stage: section?.dataset?.metaFeatureStage || '',
+                    landingVisible: !!section?.querySelector('.pnm-view--landing'),
+                    startVisible: !!section?.querySelector('[data-action="start-lab"]'),
+                    homeVisible: !!section?.querySelector('[data-shell-chrome-home]'),
+                    restartVisible: !!section?.querySelector('[data-shell-chrome-restart]')
+                };
+            }, screenId);
+            await assert(landingState.stage === 'feature', 'prismlab feature stage active from entry', landingState.stage);
+            await assert(landingState.landingVisible, 'prismlab landing visible');
+            await assert(landingState.startVisible, 'prismlab landing CTA visible');
+            await assert(landingState.homeVisible, 'prismlab home shortcut visible');
+            await assert(landingState.restartVisible, 'prismlab restart shortcut visible');
+
+            await page.locator('#prismlab [data-action="start-lab"]').click();
+            await page.waitForSelector('#prismlab .pnm-view--categories');
+            await page.locator('#prismlab [data-action="open-category"]').first().click();
+            await page.waitForSelector('#prismlab .pnm-view--workspace');
+            await page.locator('#prismlab [data-shell-chrome-back]').click();
+            await page.waitForSelector('#prismlab .pnm-view--categories');
+            await page.locator('#prismlab [data-shell-chrome-back]').click();
+            await page.waitForSelector('#prismlab .pnm-view--landing');
+            trace('managed:done', screenId);
+            return;
+        }
         const welcomeState = await page.evaluate((id) => {
             const section = document.getElementById(id);
             const welcomeShell = section?.querySelector('.meta-feature-welcome-shell');
@@ -716,6 +745,12 @@ async function runShellSmoke(baseUrl) {
             await mobile.evaluate((id) => window.navigateTo(id), screenId);
             await waitForActiveScreen(screenId, mobile);
             await enterManagedFeatureStage(screenId, mobile);
+            if (screenId === 'prismlab') {
+                await mobile.locator('#prismlab [data-action="start-lab"]').click();
+                await mobile.waitForSelector('#prismlab .pnm-view--categories');
+                await mobile.locator('#prismlab [data-action="open-category"]').first().click();
+                await mobile.waitForSelector('#prismlab .pnm-view--workspace');
+            }
             await mobile.waitForTimeout(400);
             const mobileCheck = await mobile.evaluate(() => ({
                 innerWidth: window.innerWidth,

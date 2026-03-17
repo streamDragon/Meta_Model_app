@@ -158,13 +158,13 @@
         prismlab: {
             id: 'prismlab',
             adapter: 'generic',
-            containerSelector: '.prism-container',
-            workspaceSelector: '.card',
+            containerSelector: '#prism-necessity-root .pnm-app',
+            workspaceSelector: '#prism-necessity-root .pnm-view',
             sectionHideSelectors: ['.screen-read-guide'],
-            hideSelectors: ['> h2', '> p', '#prism-deep-guide'],
+            hideSelectors: [],
             panels: [
                 { id: 'guide', type: 'guide', action: 'היגיון', title: 'איך עובדים במסך הזה', size: 'lg', sourceRoot: 'section' },
-                { id: 'deep-guide', type: 'selectors', action: 'עומק', title: 'שכבת עומק', size: 'lg', selectors: ['#prism-deep-guide'] },
+                { id: 'deep-guide', type: 'selectors', action: 'עומק', title: 'שכבת עומק', size: 'lg', selectors: ['#prism-necessity-root [data-prism-panel="theory"]'] },
                 { id: 'export', type: 'buttons', action: 'ייצוא', title: 'ייצוא הסשן', size: 'sm', description: 'הייצוא זמין גם מתוך תוצאות המעבדה, וכאן נשאר כפעולת משנה.', buttons: [{ label: 'ייצא סשן', handler: 'exportPrismSession', style: 'primary' }] }
             ]
         },
