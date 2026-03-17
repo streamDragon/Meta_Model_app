@@ -1,195 +1,482 @@
-(function () {
+﻿(function () {
     const ROOT_ID = 'blueprint-builder-root';
-    const ROLE_LABELS = Object.freeze({ therapist: 'מטפל/ת', patient: 'מטופל/ת', system: 'המפה' });
-    const STATUS_LABELS = Object.freeze({ locked: 'נעול', available: 'זמין', partial: 'חלקי', complete: 'מלא' });
+    const ROLE_LABELS = Object.freeze({ therapist: '׳׳˜׳₪׳/׳×', patient: '׳׳˜׳•׳₪׳/׳×', system: '׳”׳׳₪׳”' });
+    const STATUS_LABELS = Object.freeze({ locked: '׳ ׳¢׳•׳', available: '׳–׳׳™׳', partial: '׳—׳׳§׳™', complete: '׳׳׳' });
+
+    const STAGES = Object.freeze([
+        { id: 'test1', label: 'TEST 1 | מה רוצים במקום?', subLabel: 'Clarify outcome', tone: 'cool', defaultOpen: true },
+        { id: 'operateBuild', label: 'OPERATE | Build the action', subLabel: 'Make it visible', tone: 'amber', defaultOpen: false },
+        { id: 'operateProtect', label: 'OPERATE | Protection & flexibility', subLabel: 'Keep safety', tone: 'sand', defaultOpen: false },
+        { id: 'test2', label: 'TEST 2 | Is the plan good?', subLabel: 'Quality checks', tone: 'mint', defaultOpen: false },
+        { id: 'exit', label: 'EXIT | Commit & close', subLabel: 'Commitment', tone: 'sage', defaultOpen: false }
+    ]);
+    const STAGE_BY_ID = Object.freeze(STAGES.reduce((acc, stage) => { acc[stage.id] = stage; return acc; }, {}));
+    const SEED_PATH = 'data/action-blueprint/action_verbs_seed_he.json';
+    const SUGGESTION_KEY_BY_NODE = Object.freeze({
+        rawStatement: 'raw_statement_options',
+        desiredOutcome: 'desired_outcome_options',
+        successSign: 'success_sign_options',
+        positiveIntention: 'positive_intention_options',
+        goalImagery: 'goal_imagery_options',
+        processImagery: 'process_imagery_options',
+        visibleAction: 'visible_action_options',
+        emotionalDriver: 'emotional_driver_options',
+        executionConditions: 'execution_conditions_options',
+        obstacle: 'obstacle_options',
+        alternativePlan: 'alternative_plan_options',
+        preservePositiveIntention: 'preserve_positive_intention_options',
+        clearCheck: 'clear_check_options',
+        realisticCheck: 'realistic_check_options',
+        measurableCheck: 'measurable_check_options',
+        firstStepImagery: 'first_step_imagery_options',
+        firstStep: 'first_step_options',
+        finalWording: 'final_wording_options'
+    });
 
     const NODES = Object.freeze([
         Object.freeze({
             id: 'desiredOutcome',
-            icon: '🎯',
-            label: 'יעד רצוי',
+            stage: 'test1',
+            icon: '📍',
+            label: 'Desired Outcome',
             shortLabel: 'יעד',
-            phase: 'target',
+            subgroup: 'clarify',
             recommendedOrder: 1,
             hardPrerequisites: Object.freeze([]),
             orderPrerequisites: Object.freeze([]),
+            wrongOrderPenalty: 0,
+            imageryType: '',
+            positiveIntentionRelated: false,
             questionTemplates: Object.freeze([
-                'אם זה יתחיל לעבוד טוב יותר, מה תרצה/י לראות או לשמוע במקום המשפט הגולמי?',
-                'מה תהיה הגרסה החיובית, המדויקת והמציאותית של מה שהמטופל/ת רוצה שיקרה?'
+                'אם זה יעבוד טוב יותר, מה בדיוק נראה או נשמע במקום המצב הנוכחי?',
+                'מהי גרסה חיובית ומציאותית של מה שהמטופל/ת רוצה?'
             ]),
             followUpTemplates: Object.freeze([
-                'מה עוד צריך להיות שם כדי שהיעד יישמע חיובי, ברור ובן-השגה?'
+                'מה עוד צריך להיות שם כדי שהיעד יהיה ברור וממשי?'
             ]),
-            composerPlaceholder: 'כתבו יעד חיובי, ברור, ולא רק מה לא רוצים.',
+            composerPlaceholder: 'כתבו יעד חיובי, ברור ומציאותי.',
             captureKey: 'desiredOutcome',
-            minWords: 5,
-            minChars: 22,
-            wrongOrderPenalty: 0,
-            help: 'מנסחים תוצאה חיובית במקום להישאר עם תלונה או הימנעות.'
+            minWords: 4,
+            minChars: 18,
+            summaryFormatter: (text) => text
         }),
         Object.freeze({
-            id: 'visibleAction',
-            icon: '👁️',
-            label: 'פעולה נראית לעין',
-            shortLabel: 'פעולה',
-            phase: 'behavior',
+            id: 'successSign',
+            stage: 'test1',
+            icon: '✅',
+            label: 'Success Sign',
+            shortLabel: 'סימן הצלחה',
+            subgroup: 'clarify',
             recommendedOrder: 2,
             hardPrerequisites: Object.freeze([]),
             orderPrerequisites: Object.freeze(['desiredOutcome']),
+            wrongOrderPenalty: 3,
+            imageryType: '',
+            positiveIntentionRelated: false,
             questionTemplates: Object.freeze([
-                'כשזה יקרה בפועל, מה מישהו מבחוץ יוכל לראות או לשמוע שאת/ה עושה?',
-                'איזו פעולה קונקרטית תראה שהכוונה באמת ירדה לקרקע?'
+                'איך נדע שזה מתחיל לעבוד? מה יראו או ישמעו אחרת?',
+                'מה הסימן הראשון שמראה שהיעד קורה?'
             ]),
             followUpTemplates: Object.freeze([
-                'אפשר לדייק את הפעולה עוד צעד אחד כך שהיא תהיה ממש נראית או נשמעת?'
+                'מה עוד ייחשב הצלחה קטנה ומדידה?'
             ]),
-            composerPlaceholder: 'כתבו פעולה שאפשר לזהות במציאות, לא רק כוונה כללית.',
-            captureKey: 'visibleAction',
-            minWords: 5,
-            minChars: 20,
-            wrongOrderPenalty: 6,
-            help: 'מורידים את הכוונה מהראש להתנהגות שאפשר לראות.'
+            composerPlaceholder: 'כתבו סימן זיהוי קטן שמראה שזה מתקדם.',
+            captureKey: 'successSign',
+            minWords: 3,
+            minChars: 14,
+            summaryFormatter: (text) => text
         }),
         Object.freeze({
-            id: 'emotionalLever',
-            icon: '❤️',
-            label: 'מניע רגשי',
-            shortLabel: 'מניע',
-            phase: 'motivation',
+            id: 'positiveIntention',
+            stage: 'test1',
+            icon: '🛡️',
+            label: 'Positive Intention (Old Behavior)',
+            shortLabel: 'כוונה חיובית',
+            subgroup: 'clarify',
             recommendedOrder: 3,
             hardPrerequisites: Object.freeze([]),
-            orderPrerequisites: Object.freeze(['desiredOutcome', 'visibleAction']),
+            orderPrerequisites: Object.freeze([]),
+            wrongOrderPenalty: 4,
+            imageryType: '',
+            positiveIntentionRelated: true,
             questionTemplates: Object.freeze([
-                'למה זה חשוב עכשיו? מה נהיה אחרת בפנים אם זה יקרה?',
-                'איזה צורך, ערך או הקלה רגשית יושבים מתחת לרצון הזה?'
+                'מה ההתנהגות הישנה ניסתה להגן או להשיג עבורך?',
+                'איזו כוונה טובה הסתתרה מאחורי ההימנעות או הקיפאון?'
             ]),
             followUpTemplates: Object.freeze([
-                'מה עוד הופך את זה למשמעותי מספיק כדי שהגוף יסכים לזוז?'
+                'איך אפשר לנסח את הכוונה הטובה בשפה שמכבדת את ההגנה?'
             ]),
-            composerPlaceholder: 'כתבו למה זה חשוב, איזה ערך זה ישרת, או מה ישתנה בפנים.',
-            captureKey: 'emotionalLever',
-            minWords: 4,
-            minChars: 18,
-            wrongOrderPenalty: 8,
-            help: 'מחברים את התוכנית למשמעות, לא רק למשימה.'
+            composerPlaceholder: 'כתבו את הכוונה הטובה של ההתנהגות הישנה.',
+            captureKey: 'positiveIntention',
+            minWords: 3,
+            minChars: 14,
+            summaryFormatter: (text) => text
         }),
         Object.freeze({
-            id: 'obstacles',
-            icon: '🪨',
-            label: 'חסמים צפויים',
-            shortLabel: 'חסמים',
-            phase: 'resistance',
+            id: 'goalImagery',
+            stage: 'test1',
+            icon: '🖼️',
+            label: 'Goal Imagery',
+            shortLabel: 'דימוי יעד',
+            subgroup: 'imagery',
             recommendedOrder: 4,
-            hardPrerequisites: Object.freeze([]),
-            orderPrerequisites: Object.freeze(['desiredOutcome', 'visibleAction']),
+            hardPrerequisites: Object.freeze(['desiredOutcome']),
+            orderPrerequisites: Object.freeze(['desiredOutcome']),
+            wrongOrderPenalty: 4,
+            imageryType: 'goal',
+            positiveIntentionRelated: false,
             questionTemplates: Object.freeze([
-                'איפה זה בדרך כלל נתקע? מה עלול לחסום את זה ברגע הביצוע?',
-                'מה הסצנה הרגילה שבה התוכנית מתמסמסת או נופלת?'
+                'אפשר לדמיין את היעד? איך הוא נראה/נשמע/מרגיש?',
+                'אם קשה לדמיין, מהי גרסה קטנה יותר שניתנת לדמיון?'
             ]),
             followUpTemplates: Object.freeze([
-                'איזה חסם הוא הכי ריאלי כרגע, ואיך הוא נראה בזמן אמת?'
+                'מה חסר בדימוי כדי שיהיה אמין ובטוח?'
             ]),
-            composerPlaceholder: 'כתבו חסם סביר אחד או שניים, לא רשימת סכנות כללית.',
-            captureKey: 'obstacles',
-            minWords: 4,
-            minChars: 18,
-            wrongOrderPenalty: 12,
-            help: 'מזהים איפה זה נופל לפני שמתחייבים מדי.'
+            composerPlaceholder: 'תארו תמונה או תחושה של היעד.',
+            captureKey: 'goalImagery',
+            minWords: 3,
+            minChars: 14,
+            summaryFormatter: (text) => text
         }),
         Object.freeze({
-            id: 'alternatives',
-            icon: '🔁',
-            label: 'חלופה / Plan B',
-            shortLabel: 'חלופה',
-            phase: 'flexibility',
+            id: 'processImagery',
+            stage: 'test1',
+            icon: '🖼️',
+            label: 'Process Imagery',
+            shortLabel: 'דימוי תהליך',
+            subgroup: 'imagery',
             recommendedOrder: 5,
-            hardPrerequisites: Object.freeze([]),
-            orderPrerequisites: Object.freeze(['desiredOutcome', 'visibleAction', 'obstacles']),
+            hardPrerequisites: Object.freeze(['desiredOutcome']),
+            orderPrerequisites: Object.freeze(['desiredOutcome']),
+            wrongOrderPenalty: 4,
+            imageryType: 'process',
+            positiveIntentionRelated: false,
             questionTemplates: Object.freeze([
-                'אם זה נתקע, מה גרסת ה-Plan B ששומרת על הכיוון בלי לוותר עליו?',
-                'איזו תגובה גמישה תאפשר להישאר בתנועה גם אם החסם מופיע?'
+                'אפשר לדמיין את עצמך עושה את התהליך? מה רואים בגוף או בסביבה?',
+                'אם זה גדול מדי, איזה חלק זעיר ניתן לדמיין?'
             ]),
             followUpTemplates: Object.freeze([
-                'אפשר לדייק חלופה קטנה יותר, נגישה יותר, שלא דורשת להתחיל הכול מהתחלה?'
+                'מה הופך את הדימוי ליותר בטוח ובר-ביצוע?'
             ]),
-            composerPlaceholder: 'כתבו חלופה שממשיכה את הכיוון ולא בריחה מהתוכנית.',
-            captureKey: 'alternatives',
+            composerPlaceholder: 'תארו תמונה או תחושה של הדרך, לא רק היעד.',
+            captureKey: 'processImagery',
+            minWords: 3,
+            minChars: 14,
+            summaryFormatter: (text) => text
+        }),
+        Object.freeze({
+            id: 'visibleAction',
+            stage: 'operateBuild',
+            icon: '👁️',
+            label: 'Visible Action',
+            shortLabel: 'פעולה',
+            subgroup: 'build',
+            recommendedOrder: 6,
+            hardPrerequisites: Object.freeze([]),
+            orderPrerequisites: Object.freeze(['desiredOutcome', 'successSign']),
+            wrongOrderPenalty: 6,
+            imageryType: '',
+            positiveIntentionRelated: false,
+            questionTemplates: Object.freeze([
+                'מה פעולה נראית או נשמעת שתראה שהכוונה ירדה לקרקע?',
+                'איזה צעד קטן ניתן לראות או לשמוע?'
+            ]),
+            followUpTemplates: Object.freeze([
+                'אפשר לחדד כדי שיהיה ברור מבחוץ?'
+            ]),
+            composerPlaceholder: 'כתבו פעולה נראית או נשמעת, לא רק מחשבה.',
+            captureKey: 'visibleAction',
             minWords: 4,
-            minChars: 18,
-            wrongOrderPenalty: 12,
-            help: 'בונים גמישות: אם לא דרך A, מהי דרך B.'
+            minChars: 16,
+            summaryFormatter: (text) => text
+        }),
+        Object.freeze({
+            id: 'emotionalDriver',
+            stage: 'operateBuild',
+            icon: '❤️',
+            label: 'Emotional Driver',
+            shortLabel: 'מניע רגשי',
+            subgroup: 'build',
+            recommendedOrder: 7,
+            hardPrerequisites: Object.freeze([]),
+            orderPrerequisites: Object.freeze(['desiredOutcome', 'visibleAction']),
+            wrongOrderPenalty: 6,
+            imageryType: '',
+            positiveIntentionRelated: false,
+            questionTemplates: Object.freeze([
+                'למה זה חשוב עכשיו? איזה צורך או ערך זה משרת?',
+                'מה ירגיש טוב או יקל כשתעשה זאת?'
+            ]),
+            followUpTemplates: Object.freeze([
+                'איזה משפט קצר יחבר אותך למניע ברגע אמת?'
+            ]),
+            composerPlaceholder: 'כתבו למה זה חשוב, רגשית או ערכית.',
+            captureKey: 'emotionalDriver',
+            minWords: 3,
+            minChars: 14,
+            summaryFormatter: (text) => text
         }),
         Object.freeze({
             id: 'executionConditions',
-            icon: '📍',
-            label: 'תנאי ביצוע',
+            stage: 'operateBuild',
+            icon: '🗓️',
+            label: 'Execution Conditions',
             shortLabel: 'תנאים',
-            phase: 'conditions',
-            recommendedOrder: 6,
+            subgroup: 'build',
+            recommendedOrder: 8,
             hardPrerequisites: Object.freeze([]),
             orderPrerequisites: Object.freeze(['desiredOutcome', 'visibleAction']),
+            wrongOrderPenalty: 6,
+            imageryType: '',
+            positiveIntentionRelated: false,
             questionTemplates: Object.freeze([
-                'מתי, איפה, עם מי ובאיזה חלון זמן זה באמת אמור לקרות?',
-                'באילו תנאים הפעולה הזאת תהיה מציאותית ולא רק נכונה על הנייר?'
+                'מתי, איפה, עם מי ובאיזה הקשר זה יקרה?',
+                'מה תנאי ההתחלה שמאפשרים ביצוע בטוח?'
             ]),
             followUpTemplates: Object.freeze([
-                'מה עוד צריך להיות ברור בתנאי ההתחלה כדי שהביצוע יחזיק?'
+                'מה עוד צריך להיות ידוע מראש (זמן, מקום, אדם)?'
             ]),
-            composerPlaceholder: 'כתבו זמן, מקום, אדם, או הקשר שבו המהלך אמור לקרות.',
+            composerPlaceholder: 'כתבו זמן/מקום/אנשים/טריגר לביצוע.',
             captureKey: 'executionConditions',
-            minWords: 5,
-            minChars: 20,
+            minWords: 4,
+            minChars: 16,
+            summaryFormatter: (text) => text
+        }),
+        Object.freeze({
+            id: 'obstacle',
+            stage: 'operateProtect',
+            icon: '⛔',
+            label: 'Obstacle',
+            shortLabel: 'חסם',
+            subgroup: 'protect',
+            recommendedOrder: 9,
+            hardPrerequisites: Object.freeze([]),
+            orderPrerequisites: Object.freeze(['desiredOutcome', 'visibleAction']),
             wrongOrderPenalty: 8,
-            help: 'מכניסים את התוכנית לקונטקסט אמיתי של ביצוע.'
+            imageryType: '',
+            positiveIntentionRelated: false,
+            questionTemplates: Object.freeze([
+                'מה עלול לחסום את זה בזמן אמת?',
+                'איפה לרוב זה נתקע עבורך?'
+            ]),
+            followUpTemplates: Object.freeze([
+                'מה החסם הכי סביר וקריטי כרגע?'
+            ]),
+            composerPlaceholder: 'כתבו חסם אחד או שניים סבירים.',
+            captureKey: 'obstacle',
+            minWords: 3,
+            minChars: 14,
+            summaryFormatter: (text) => text
+        }),
+        Object.freeze({
+            id: 'alternativePlan',
+            stage: 'operateProtect',
+            icon: '🔀',
+            label: 'Alternative / Plan B',
+            shortLabel: 'חלופה',
+            subgroup: 'protect',
+            recommendedOrder: 10,
+            hardPrerequisites: Object.freeze([]),
+            orderPrerequisites: Object.freeze(['obstacle']),
+            wrongOrderPenalty: 8,
+            imageryType: '',
+            positiveIntentionRelated: false,
+            questionTemplates: Object.freeze([
+                'אם החסם מופיע, מה Plan B שעדיין שומר על כיוון?',
+                'מהי גרסה קטנה או גמישה יותר אם המהלך המלא קשה?'
+            ]),
+            followUpTemplates: Object.freeze([
+                'איזו חלופה תהיה נגישה גם בהצפה?'
+            ]),
+            composerPlaceholder: 'כתבו חלופה גמישה, לא בריחה מוחלטת.',
+            captureKey: 'alternativePlan',
+            minWords: 3,
+            minChars: 14,
+            summaryFormatter: (text) => text
+        }),
+        Object.freeze({
+            id: 'preservePositiveIntention',
+            stage: 'operateProtect',
+            icon: '🧭',
+            label: 'Preserve Positive Intention',
+            shortLabel: 'שימור הכוונה',
+            subgroup: 'protect',
+            recommendedOrder: 11,
+            hardPrerequisites: Object.freeze(['positiveIntention']),
+            orderPrerequisites: Object.freeze(['positiveIntention']),
+            wrongOrderPenalty: 10,
+            imageryType: '',
+            positiveIntentionRelated: true,
+            questionTemplates: Object.freeze([
+                'איך נשמור על ההגנה או הכוונה הטובה בצורה בריאה יותר?',
+                'מה ירגיש עדיין בטוח ומגן בלי ההימנעות הישנה?'
+            ]),
+            followUpTemplates: Object.freeze([
+                'מה העדכון הבריא של ההגנה הישנה בתוך התוכנית החדשה?'
+            ]),
+            composerPlaceholder: 'תארו איך שומרים על ההגנה אבל בצורה תומכת ובריאה.',
+            captureKey: 'preservePositiveIntention',
+            minWords: 4,
+            minChars: 16,
+            summaryFormatter: (text) => text
+        }),
+        Object.freeze({
+            id: 'clearCheck',
+            stage: 'test2',
+            icon: '✨',
+            label: 'Clear?',
+            shortLabel: 'בהיר?',
+            subgroup: 'quality',
+            recommendedOrder: 12,
+            hardPrerequisites: Object.freeze([]),
+            orderPrerequisites: Object.freeze(['visibleAction']),
+            wrongOrderPenalty: 6,
+            imageryType: '',
+            positiveIntentionRelated: false,
+            questionTemplates: Object.freeze([
+                'האם התוכנית ספציפית מספיק? מה עוד צריך להבהיר?',
+                'אם מישהו אחר יראה את זה, האם יבין מה עושים?'
+            ]),
+            followUpTemplates: Object.freeze([
+                'מה משפט אחד שמחדד את הבהירות?'
+            ]),
+            composerPlaceholder: 'בדקו בהירות: מה לא ברור עדיין?',
+            captureKey: 'clearCheck',
+            minWords: 3,
+            minChars: 14,
+            summaryFormatter: (text) => text
+        }),
+        Object.freeze({
+            id: 'realisticCheck',
+            stage: 'test2',
+            icon: '📏',
+            label: 'Realistic?',
+            shortLabel: 'ריאלי?',
+            subgroup: 'quality',
+            recommendedOrder: 13,
+            hardPrerequisites: Object.freeze([]),
+            orderPrerequisites: Object.freeze(['visibleAction', 'executionConditions']),
+            wrongOrderPenalty: 6,
+            imageryType: '',
+            positiveIntentionRelated: false,
+            questionTemplates: Object.freeze([
+                'זה ריאלי בגודל, קצב ותנאים? מה צריך לפשט כדי שיהיה אפשרי השבוע?',
+                'איזה חלק קטן יותר אפשרי אם זה גדול מדי?'
+            ]),
+            followUpTemplates: Object.freeze([
+                'מה התאמה קטנה שתהפוך את זה לביצועי?'
+            ]),
+            composerPlaceholder: 'בדקו ריאליות: מה הופך את זה לאפשרי עכשיו?',
+            captureKey: 'realisticCheck',
+            minWords: 3,
+            minChars: 14,
+            summaryFormatter: (text) => text
+        }),
+        Object.freeze({
+            id: 'measurableCheck',
+            stage: 'test2',
+            icon: '📊',
+            label: 'Measurable?',
+            shortLabel: 'מדיד?',
+            subgroup: 'quality',
+            recommendedOrder: 14,
+            hardPrerequisites: Object.freeze([]),
+            orderPrerequisites: Object.freeze(['successSign']),
+            wrongOrderPenalty: 6,
+            imageryType: '',
+            positiveIntentionRelated: false,
+            questionTemplates: Object.freeze([
+                'איך נמדוד התקדמות קטנה? מה ייחשב ציון הצלחה?',
+                'מה יקרה בגוף או בסביבה שיוכיח שזה נע?'
+            ]),
+            followUpTemplates: Object.freeze([
+                'איזה סמן מדידה יחיד הכי פשוט לעקוב אחריו?'
+            ]),
+            composerPlaceholder: 'כתבו איך תזהו התקדמות קטנה.',
+            captureKey: 'measurableCheck',
+            minWords: 3,
+            minChars: 14,
+            summaryFormatter: (text) => text
+        }),
+        Object.freeze({
+            id: 'firstStepImagery',
+            stage: 'test2',
+            icon: '🖼️',
+            label: 'First Step Imagery',
+            shortLabel: 'דימוי צעד ראשון',
+            subgroup: 'imagery',
+            recommendedOrder: 15,
+            hardPrerequisites: Object.freeze(['firstStep']),
+            orderPrerequisites: Object.freeze(['firstStep']),
+            wrongOrderPenalty: 6,
+            imageryType: 'firstStep',
+            positiveIntentionRelated: false,
+            questionTemplates: Object.freeze([
+                'אפשר לדמיין את הצעד הראשון? מה רואים בגוף או בסביבה?',
+                'אם לא, מה גרסה עוד יותר קטנה שניתנת לדמיון?'
+            ]),
+            followUpTemplates: Object.freeze([
+                'מה צריך כדי שהדימוי יהיה בטוח וברור?'
+            ]),
+            composerPlaceholder: 'תארו איך נראה או נשמע צעד ראשון.',
+            captureKey: 'firstStepImagery',
+            minWords: 3,
+            minChars: 14,
+            summaryFormatter: (text) => text
         }),
         Object.freeze({
             id: 'firstStep',
-            icon: '🟢',
-            label: 'צעד ראשון',
+            stage: 'exit',
+            icon: '🪜',
+            label: 'First Step',
             shortLabel: 'צעד ראשון',
-            phase: 'commitment',
-            recommendedOrder: 7,
+            subgroup: 'exit',
+            recommendedOrder: 16,
             hardPrerequisites: Object.freeze([]),
-            orderPrerequisites: Object.freeze(['desiredOutcome', 'visibleAction', 'executionConditions']),
+            orderPrerequisites: Object.freeze(['visibleAction', 'executionConditions']),
+            wrongOrderPenalty: 10,
+            imageryType: '',
+            positiveIntentionRelated: false,
             questionTemplates: Object.freeze([
-                'מה הצעד הראשון הקטן והברור שאפשר לבצע בלי להתווכח עם עצמך?',
-                'אם יוצאים מכאן רק עם התחלה אחת, מה בדיוק יקרה קודם?'
+                'מה הצעד הראשון הקטן והבטוח שתעשה/י?',
+                'מה תעשה/י היום או מחר כדי להתחיל?'
             ]),
             followUpTemplates: Object.freeze([
-                'אפשר לנסח את הצעד הראשון כך שיהיה קטן, ברור ומיידי עוד יותר?'
+                'אפשר להפוך אותו לעוד יותר קטן וברור?'
             ]),
-            composerPlaceholder: 'כתבו צעד ראשון קטן, מעשי, וניתן לביצוע.',
+            composerPlaceholder: 'כתבו צעד ראשון ברור ובטוח.',
             captureKey: 'firstStep',
-            minWords: 4,
-            minChars: 16,
-            wrongOrderPenalty: 14,
-            help: 'סוגרים מחויבות רק כשהתוכנית כבר מחזיקה.'
+            minWords: 3,
+            minChars: 14,
+            summaryFormatter: (text) => text
         }),
         Object.freeze({
-            id: 'finalTest',
-            icon: '✅',
-            label: 'בדיקת סיום',
-            shortLabel: 'בדיקה',
-            phase: 'validation',
-            recommendedOrder: 8,
-            hardPrerequisites: Object.freeze(['desiredOutcome', 'visibleAction', 'firstStep']),
-            orderPrerequisites: Object.freeze(['desiredOutcome', 'visibleAction', 'firstStep']),
+            id: 'finalWording',
+            stage: 'exit',
+            icon: '📝',
+            label: 'Final Wording',
+            shortLabel: 'ניסוח סופי',
+            subgroup: 'exit',
+            recommendedOrder: 17,
+            hardPrerequisites: Object.freeze(['firstStep']),
+            orderPrerequisites: Object.freeze(['firstStep']),
+            wrongOrderPenalty: 6,
+            imageryType: '',
+            positiveIntentionRelated: false,
             questionTemplates: Object.freeze([
-                'לפני שסוגרים: איך נדע שהתוכנית הזאת ברורה, מציאותית וניתנת למדידה?',
-                'מה המשפט שבודק אם המהלך מספיק חד כדי לצאת איתו לשבוע הקרוב?'
+                'נסח/י משפט מחויבות קצר שמחזיק את התוכנית וההגנה הבריאה.',
+                'איך תאמר/י את זה בקול לעצמך או למישהו אחר?'
             ]),
             followUpTemplates: Object.freeze([
-                'מה עוד צריך בבדיקת הסיום כדי להרגיש שהתוכנית באמת מחזיקה ברגע אמת?'
+                'אפשר לקצר עוד יותר כדי שיישמע טבעי?'
             ]),
-            composerPlaceholder: 'כתבו משפט שבודק בהירות, מציאותיות ומדד הצלחה.',
-            captureKey: 'finalTest',
-            minWords: 5,
-            minChars: 22,
-            wrongOrderPenalty: 16,
-            help: 'הצומת הזה נפתח רק אחרי שיש יעד, פעולה וצעד ראשון.'
+            composerPlaceholder: 'כתבו ניסוח מחויבות קצר וברור.',
+            captureKey: 'finalWording',
+            minWords: 3,
+            minChars: 12,
+            summaryFormatter: (text) => text
         })
     ]);
-
     const NODE_BY_ID = Object.freeze(NODES.reduce((acc, node) => { acc[node.id] = node; return acc; }, {}));
     let root = null;
     let state = null;
@@ -214,26 +501,81 @@
 
     function shorten(value, max = 100) {
         const text = clean(value);
-        return text.length <= max ? text : `${text.slice(0, max - 1).trim()}…`;
+        return text.length <= max ? text : `${text.slice(0, max - 1).trim()}ג€¦`;
     }
 
     function joinNatural(items) {
         const cleanItems = (items || []).map((item) => clean(item)).filter(Boolean);
         if (!cleanItems.length) return '';
         if (cleanItems.length === 1) return cleanItems[0];
-        if (cleanItems.length === 2) return `${cleanItems[0]} ו-${cleanItems[1]}`;
-        return `${cleanItems.slice(0, -1).join(', ')} ו-${cleanItems[cleanItems.length - 1]}`;
+        if (cleanItems.length === 2) return `${cleanItems[0]} ׳•-${cleanItems[1]}`;
+        return `${cleanItems.slice(0, -1).join(', ')} ׳•-${cleanItems[cleanItems.length - 1]}`;
     }
 
     function timebox(value) {
         const text = clean(value);
-        const match = text.match(/(\d+\s*(?:דקות|דקה|שעות|שעה|ימים|יום))/);
+        const match = text.match(/(\d+\s*(?:׳“׳§׳•׳×|׳“׳§׳”|׳©׳¢׳•׳×|׳©׳¢׳”|׳™׳׳™׳|׳™׳•׳))/);
         return match ? match[1] : text;
     }
 
     function msg(role, text, opts = {}) {
         messageId += 1;
         return { id: `bp-msg-${messageId}`, role, text: clean(text), nodeId: clean(opts.nodeId), tone: clean(opts.tone) || 'default' };
+    }
+
+    let seedsPromise = null;
+
+    function ensureSeedsLoaded() {
+        if (state?.seedLoaded) return Promise.resolve(state.verbSeeds);
+        if (!seedsPromise) {
+            seedsPromise = fetch(SEED_PATH)
+                .then((res) => (res.ok ? res.json() : []))
+                .catch(() => [])
+                .then((list) => (Array.isArray(list) ? list : []));
+        }
+        return seedsPromise.then((list) => {
+            state.verbSeeds = list;
+            state.seedLoaded = true;
+            if (!state.selectedVerbId && list.length) state.selectedVerbId = clean(list[0].id || '');
+            return state.verbSeeds;
+        });
+    }
+
+    function activeVerb() {
+        const verbId = clean(state?.selectedVerbId);
+        return (state?.verbSeeds || []).find((item) => clean(item.id) === verbId) || null;
+    }
+
+    function optionsForNode(nodeId) {
+        const seed = activeVerb();
+        const key = SUGGESTION_KEY_BY_NODE[nodeId];
+        const values = key && seed ? seed[key] : null;
+        return Array.isArray(values) ? values.filter(Boolean) : [];
+    }
+
+    function rawStatementOptions() {
+        const seed = activeVerb();
+        return seed && Array.isArray(seed.raw_statement_options) ? seed.raw_statement_options.filter(Boolean) : [];
+    }
+
+    function selectVerb(verbId) {
+        const normalized = clean(verbId);
+        const next = (state.verbSeeds || []).find((item) => clean(item.id) === normalized);
+        if (!next) return false;
+        state.selectedVerbId = normalized;
+        if (!clean(state.rawStatement) && Array.isArray(next.raw_statement_options) && next.raw_statement_options.length) {
+            state.rawStatement = clean(next.raw_statement_options[0]);
+            queue('patient', state.rawStatement, { tone: 'statement' });
+        }
+        render();
+        return true;
+    }
+
+    function toggleStage(stageId) {
+        if (!state?.stageOpen) return;
+        if (state.stageOpen[stageId] == null) return;
+        state.stageOpen[stageId] = !state.stageOpen[stageId];
+        render();
     }
 
     function initialState() {
@@ -244,9 +586,13 @@
             nodeAnswers: {},
             askedOrder: [],
             orderEvents: {},
+            stageOpen: STAGES.reduce((acc, stage) => { acc[stage.id] = Boolean(stage.defaultOpen); return acc; }, {}),
+            selectedVerbId: '',
+            verbSeeds: [],
+            seedLoaded: false,
             messages: [
-                msg('therapist', 'הביאו לכאן תלונה, משאלה, הימנעות או פועל עמום. משם נבנה מהלך טיפולי צעד-צעד.', { tone: 'intro' }),
-                msg('system', 'אחרי המשפט הגולמי לוחצים על צומת במפה. כל לחיצה מייצרת שאלה בצ׳אט, וכל תשובה נשמרת חזרה למפה.', { tone: 'info' })
+                msg('therapist', '׳”׳‘׳™׳׳• ׳׳›׳׳ ׳×׳׳•׳ ׳”, ׳׳©׳׳׳”, ׳”׳™׳׳ ׳¢׳•׳× ׳׳• ׳₪׳•׳¢׳ ׳¢׳׳•׳. ׳׳©׳ ׳ ׳‘׳ ׳” ׳׳”׳׳ ׳˜׳™׳₪׳•׳׳™ ׳¦׳¢׳“-׳¦׳¢׳“.', { tone: 'intro' }),
+                msg('system', '׳׳—׳¨׳™ ׳”׳׳©׳₪׳˜ ׳”׳’׳•׳׳׳™ ׳׳•׳—׳¦׳™׳ ׳¢׳ ׳¦׳•׳׳× ׳‘׳׳₪׳”. ׳›׳ ׳׳—׳™׳¦׳” ׳׳™׳™׳¦׳¨׳× ׳©׳׳׳” ׳‘׳¦׳³׳׳˜, ׳•׳›׳ ׳×׳©׳•׳‘׳” ׳ ׳©׳׳¨׳× ׳—׳–׳¨׳” ׳׳׳₪׳”.', { tone: 'info' })
             ]
         };
     }
@@ -314,12 +660,12 @@
     function stageLabel() {
         const raw = clean(state?.rawStatement);
         const completeness = completenessScore();
-        if (!raw) return 'איסוף משפט גולמי';
-        if (completeness < 25) return 'מגדירים יעד ופעולה';
-        if (completeness < 50) return 'מוצאים מניע וחסמים';
-        if (completeness < 75) return 'בונים חלופות ותנאים';
-        if (completeness < 100) return 'סוגרים צעד ראשון ובדיקת סיום';
-        return 'מפת פעולה מוכנה';
+        if (!raw) return '׳׳™׳¡׳•׳£ ׳׳©׳₪׳˜ ׳’׳•׳׳׳™';
+        if (completeness < 25) return '׳׳’׳“׳™׳¨׳™׳ ׳™׳¢׳“ ׳•׳₪׳¢׳•׳׳”';
+        if (completeness < 50) return '׳׳•׳¦׳׳™׳ ׳׳ ׳™׳¢ ׳•׳—׳¡׳׳™׳';
+        if (completeness < 75) return '׳‘׳•׳ ׳™׳ ׳—׳׳•׳₪׳•׳× ׳•׳×׳ ׳׳™׳';
+        if (completeness < 100) return '׳¡׳•׳’׳¨׳™׳ ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳•׳‘׳“׳™׳§׳× ׳¡׳™׳•׳';
+        return '׳׳₪׳× ׳₪׳¢׳•׳׳” ׳׳•׳›׳ ׳”';
     }
 
     function formattedLabels(ids) {
@@ -341,8 +687,8 @@
             penalty,
             wasEarly: penalty > 0,
             note: penalty > 0
-                ? `השאלה "${node.label}" נשאלה לפני שנסגרו ${formattedLabels(misses)}. זה אפשרי, אבל מפחית את ציון הסדר.`
-                : `בחירה טובה: "${node.label}" נשאלה בזמן שמקדם מהלך טיפולי יציב.`
+                ? `׳”׳©׳׳׳” "${node.label}" ׳ ׳©׳׳׳” ׳׳₪׳ ׳™ ׳©׳ ׳¡׳’׳¨׳• ${formattedLabels(misses)}. ׳–׳” ׳׳₪׳©׳¨׳™, ׳׳‘׳ ׳׳₪׳—׳™׳× ׳׳× ׳¦׳™׳•׳ ׳”׳¡׳“׳¨.`
+                : `׳‘׳—׳™׳¨׳” ׳˜׳•׳‘׳”: "${node.label}" ׳ ׳©׳׳׳” ׳‘׳–׳׳ ׳©׳׳§׳“׳ ׳׳”׳׳ ׳˜׳™׳₪׳•׳׳™ ׳™׳¦׳™׳‘.`
         };
         state.askedOrder.push(node.id);
         state.orderEvents[node.id] = event;
@@ -357,38 +703,38 @@
 
     function transformedOutcome(data) {
         if (clean(data.desiredOutcome)) return data.desiredOutcome;
-        if (clean(data.rawStatement)) return `במקום "${data.rawStatement}" עדיין צריך לנסח יעד חיובי וברור יותר.`;
-        return 'היעד החיובי עוד לא נוסח.';
+        if (clean(data.rawStatement)) return `׳‘׳׳§׳•׳ "${data.rawStatement}" ׳¢׳“׳™׳™׳ ׳¦׳¨׳™׳ ׳׳ ׳¡׳— ׳™׳¢׳“ ׳—׳™׳•׳‘׳™ ׳•׳‘׳¨׳•׳¨ ׳™׳•׳×׳¨.`;
+        return '׳”׳™׳¢׳“ ׳”׳—׳™׳•׳‘׳™ ׳¢׳•׳“ ׳׳ ׳ ׳•׳¡׳—.';
     }
 
     function commitment(data) {
         const parts = [];
         if (data.desiredOutcome) parts.push(data.desiredOutcome);
-        if (data.firstStep) parts.push(`מתחיל/ה ב-${data.firstStep}`);
-        if (data.executionConditions) parts.push(`בתוך ${data.executionConditions}`);
-        return parts.length ? parts.join(' • ') : 'כשהיעד, הפעולה והצעד הראשון ייסגרו, כאן תופיע שורת המחויבות.';
+        if (data.firstStep) parts.push(`׳׳×׳—׳™׳/׳” ׳‘-${data.firstStep}`);
+        if (data.executionConditions) parts.push(`׳‘׳×׳•׳ ${data.executionConditions}`);
+        return parts.length ? parts.join(' ג€¢ ') : '׳›׳©׳”׳™׳¢׳“, ׳”׳₪׳¢׳•׳׳” ׳•׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳ ׳™׳™׳¡׳’׳¨׳•, ׳›׳׳ ׳×׳•׳₪׳™׳¢ ׳©׳•׳¨׳× ׳”׳׳—׳•׳™׳‘׳•׳×.';
     }
 
     function therapistSummary(data) {
         const lines = [];
-        if (data.rawStatement) lines.push(`המשפט הגולמי הוא "${data.rawStatement}".`);
-        if (data.desiredOutcome) lines.push(`היעד שנבנה הוא "${data.desiredOutcome}".`);
-        if (data.visibleAction) lines.push(`הפעולה הגלויה נראית כך: ${data.visibleAction}.`);
-        if (data.emotionalLever) lines.push(`המשמעות הרגשית שמחזיקה את המהלך: ${data.emotionalLever}.`);
-        if (data.obstacles) lines.push(`החסם המרכזי כרגע: ${data.obstacles}.`);
-        if (data.alternatives) lines.push(`חלופה אפשרית אם תהיה תקיעה: ${data.alternatives}.`);
-        if (data.executionConditions) lines.push(`תנאי הביצוע שנאספו: ${data.executionConditions}.`);
-        if (data.firstStep) lines.push(`הצעד הראשון שנבחר: "${data.firstStep}".`);
-        if (data.finalTest) lines.push(`בדיקת הסיום אומרת: ${data.finalTest}.`);
-        return lines.join(' ') || 'המפה עדיין נבנית מתוך השיחה.';
+        if (data.rawStatement) lines.push(`׳”׳׳©׳₪׳˜ ׳”׳’׳•׳׳׳™ ׳”׳•׳ "${data.rawStatement}".`);
+        if (data.desiredOutcome) lines.push(`׳”׳™׳¢׳“ ׳©׳ ׳‘׳ ׳” ׳”׳•׳ "${data.desiredOutcome}".`);
+        if (data.visibleAction) lines.push(`׳”׳₪׳¢׳•׳׳” ׳”׳’׳׳•׳™׳” ׳ ׳¨׳׳™׳× ׳›׳: ${data.visibleAction}.`);
+        if (data.emotionalLever) lines.push(`׳”׳׳©׳׳¢׳•׳× ׳”׳¨׳’׳©׳™׳× ׳©׳׳—׳–׳™׳§׳” ׳׳× ׳”׳׳”׳׳: ${data.emotionalLever}.`);
+        if (data.obstacles) lines.push(`׳”׳—׳¡׳ ׳”׳׳¨׳›׳–׳™ ׳›׳¨׳’׳¢: ${data.obstacles}.`);
+        if (data.alternatives) lines.push(`׳—׳׳•׳₪׳” ׳׳₪׳©׳¨׳™׳× ׳׳ ׳×׳”׳™׳” ׳×׳§׳™׳¢׳”: ${data.alternatives}.`);
+        if (data.executionConditions) lines.push(`׳×׳ ׳׳™ ׳”׳‘׳™׳¦׳•׳¢ ׳©׳ ׳׳¡׳₪׳•: ${data.executionConditions}.`);
+        if (data.firstStep) lines.push(`׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳ ׳©׳ ׳‘׳—׳¨: "${data.firstStep}".`);
+        if (data.finalTest) lines.push(`׳‘׳“׳™׳§׳× ׳”׳¡׳™׳•׳ ׳׳•׳׳¨׳×: ${data.finalTest}.`);
+        return lines.join(' ') || '׳”׳׳₪׳” ׳¢׳“׳™׳™׳ ׳ ׳‘׳ ׳™׳× ׳׳×׳•׳ ׳”׳©׳™׳—׳”.';
     }
 
     function guidedImagery(data) {
         return [
-            'קח/י נשימה אחת איטית.',
-            `דמיין/י את עצמך מגיע/ה לרגע שבו מתחיל/ים ב-"${data.firstStep || 'הצעד הראשון'}".`,
-            `שימי/ם לב איך ${data.emotionalLever || 'המשמעות שנאספה כאן'} מחזיקה את הכיוון בפנים.`,
-            `ועכשיו ראה/י איך "${data.desiredOutcome || 'הכיוון הרצוי'}" מתחיל לקבל צורה במציאות.`
+            '׳§׳—/׳™ ׳ ׳©׳™׳׳” ׳׳—׳× ׳׳™׳˜׳™׳×.',
+            `׳“׳׳™׳™׳/׳™ ׳׳× ׳¢׳¦׳׳ ׳׳’׳™׳¢/׳” ׳׳¨׳’׳¢ ׳©׳‘׳• ׳׳×׳—׳™׳/׳™׳ ׳‘-"${data.firstStep || '׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳'}".`,
+            `׳©׳™׳׳™/׳ ׳׳‘ ׳׳™׳ ${data.emotionalLever || '׳”׳׳©׳׳¢׳•׳× ׳©׳ ׳׳¡׳₪׳” ׳›׳׳'} ׳׳—׳–׳™׳§׳” ׳׳× ׳”׳›׳™׳•׳•׳ ׳‘׳₪׳ ׳™׳.`,
+            `׳•׳¢׳›׳©׳™׳• ׳¨׳׳”/׳™ ׳׳™׳ "${data.desiredOutcome || '׳”׳›׳™׳•׳•׳ ׳”׳¨׳¦׳•׳™'}" ׳׳×׳—׳™׳ ׳׳§׳‘׳ ׳¦׳•׳¨׳” ׳‘׳׳¦׳™׳׳•׳×.`
         ].join(' ');
     }
 
@@ -407,7 +753,7 @@
             executionConditions: clean(answer('executionConditions').text),
             firstStep: clean(answer('firstStep').text),
             finalTest: clean(answer('finalTest').text),
-            time: timebox(answer('executionConditions').text) || 'חלון זמן שעדיין דורש דיוק',
+            time: timebox(answer('executionConditions').text) || '׳—׳׳•׳ ׳–׳׳ ׳©׳¢׳“׳™׳™׳ ׳“׳•׳¨׳© ׳“׳™׳•׳§',
             prerequisites: clean(answer('executionConditions').text),
             resourceBlockers: clean(answer('obstacles').text),
             resourceEnablers: clean(answer('executionConditions').text),
@@ -434,11 +780,11 @@
         const node = NODE_BY_ID[id];
         if (!node) return;
         if (!clean(state.rawStatement)) {
-            queue('system', 'קודם שומרים כאן את המשפט הגולמי, ורק אחר כך המפה נפתחת לשאלות.', { tone: 'warn' });
+            queue('system', '׳§׳•׳“׳ ׳©׳•׳׳¨׳™׳ ׳›׳׳ ׳׳× ׳”׳׳©׳₪׳˜ ׳”׳’׳•׳׳׳™, ׳•׳¨׳§ ׳׳—׳¨ ׳›׳ ׳”׳׳₪׳” ׳ ׳₪׳×׳—׳× ׳׳©׳׳׳•׳×.', { tone: 'warn' });
             return render();
         }
         if (!unlocked(node)) {
-            queue('system', `הצומת "${node.label}" נפתח רק אחרי ${formattedLabels(node.hardPrerequisites)}.`, { tone: 'warn', nodeId: node.id });
+            queue('system', `׳”׳¦׳•׳׳× "${node.label}" ׳ ׳₪׳×׳— ׳¨׳§ ׳׳—׳¨׳™ ${formattedLabels(node.hardPrerequisites)}.`, { tone: 'warn', nodeId: node.id });
             return render();
         }
         state.activeNodeId = node.id;
@@ -451,18 +797,18 @@
     function submit(text) {
         const value = clean(text);
         if (!value) {
-            queue('system', 'כדי לשמור משהו במפה צריך תשובה אחת ברורה בצ׳אט.', { tone: 'warn' });
+            queue('system', '׳›׳“׳™ ׳׳©׳׳•׳¨ ׳׳©׳”׳• ׳‘׳׳₪׳” ׳¦׳¨׳™׳ ׳×׳©׳•׳‘׳” ׳׳—׳× ׳‘׳¨׳•׳¨׳” ׳‘׳¦׳³׳׳˜.', { tone: 'warn' });
             return render();
         }
         if (!clean(state.rawStatement)) {
             state.rawStatement = value;
             queue('patient', value, { tone: 'statement' });
             const nextId = recommendedNextId();
-            if (nextId) queue('system', `המשפט נשמר. עכשיו לחצו על "${NODE_BY_ID[nextId].label}" כדי שהשאלה הבאה תצא מהמפה ולא מטופס.`, { tone: 'info', nodeId: nextId });
+            if (nextId) queue('system', `׳”׳׳©׳₪׳˜ ׳ ׳©׳׳¨. ׳¢׳›׳©׳™׳• ׳׳—׳¦׳• ׳¢׳ "${NODE_BY_ID[nextId].label}" ׳›׳“׳™ ׳©׳”׳©׳׳׳” ׳”׳‘׳׳” ׳×׳¦׳ ׳׳”׳׳₪׳” ׳•׳׳ ׳׳˜׳•׳₪׳¡.`, { tone: 'info', nodeId: nextId });
             return render();
         }
         if (!state.activeNodeId) {
-            queue('system', 'אין כרגע שאלה פתוחה. לחצו על צומת במפה כדי לייצר את השאלה הבאה.', { tone: 'warn' });
+            queue('system', '׳׳™׳ ׳›׳¨׳’׳¢ ׳©׳׳׳” ׳₪׳×׳•׳—׳”. ׳׳—׳¦׳• ׳¢׳ ׳¦׳•׳׳× ׳‘׳׳₪׳” ׳›׳“׳™ ׳׳™׳™׳¦׳¨ ׳׳× ׳”׳©׳׳׳” ׳”׳‘׳׳”.', { tone: 'warn' });
             return render();
         }
         const node = NODE_BY_ID[state.activeNodeId];
@@ -477,21 +823,21 @@
         state.activeNodeId = '';
         queue('patient', value, { tone: 'response', nodeId: node.id });
         queue('system', result.status === 'complete'
-            ? `${node.label} נסגר/ה היטב ונכנס/ה למפה.`
-            : `נאסף חומר חלקי על "${node.label}". יש כבר אחיזה, אבל שווה לחזור ולדייק.`, { tone: result.status === 'complete' ? 'success' : 'info', nodeId: node.id });
+            ? `${node.label} ׳ ׳¡׳’׳¨/׳” ׳”׳™׳˜׳‘ ׳•׳ ׳›׳ ׳¡/׳” ׳׳׳₪׳”.`
+            : `׳ ׳׳¡׳£ ׳—׳•׳׳¨ ׳—׳׳§׳™ ׳¢׳ "${node.label}". ׳™׳© ׳›׳‘׳¨ ׳׳—׳™׳–׳”, ׳׳‘׳ ׳©׳•׳•׳” ׳׳—׳–׳•׳¨ ׳•׳׳“׳™׳™׳§.`, { tone: result.status === 'complete' ? 'success' : 'info', nodeId: node.id });
         const nextId = recommendedNextId();
-        if (nextId) queue('system', `הצומת המומלץ הבא: "${NODE_BY_ID[nextId].label}".`, { tone: 'hint', nodeId: nextId });
+        if (nextId) queue('system', `׳”׳¦׳•׳׳× ׳”׳׳•׳׳׳¥ ׳”׳‘׳: "${NODE_BY_ID[nextId].label}".`, { tone: 'hint', nodeId: nextId });
         render();
     }
 
     function lastOrderNote() {
-        if (!clean(state?.rawStatement)) return 'התחילו במשפט גולמי אחד. אחר כך סדר השאלות יקבל משמעות טיפולית.';
+        if (!clean(state?.rawStatement)) return '׳”׳×׳—׳™׳׳• ׳‘׳׳©׳₪׳˜ ׳’׳•׳׳׳™ ׳׳—׳“. ׳׳—׳¨ ׳›׳ ׳¡׳“׳¨ ׳”׳©׳׳׳•׳× ׳™׳§׳‘׳ ׳׳©׳׳¢׳•׳× ׳˜׳™׳₪׳•׳׳™׳×.';
         const lastId = state.askedOrder[state.askedOrder.length - 1];
         if (!lastId) {
             const nextId = recommendedNextId();
-            return nextId ? `עדיין לא נשאלה שאלה מתוך המפה. מומלץ להתחיל ב-"${NODE_BY_ID[nextId].label}".` : 'הצמתים פתוחים לבחירה.';
+            return nextId ? `׳¢׳“׳™׳™׳ ׳׳ ׳ ׳©׳׳׳” ׳©׳׳׳” ׳׳×׳•׳ ׳”׳׳₪׳”. ׳׳•׳׳׳¥ ׳׳”׳×׳—׳™׳ ׳‘-"${NODE_BY_ID[nextId].label}".` : '׳”׳¦׳׳×׳™׳ ׳₪׳×׳•׳—׳™׳ ׳׳‘׳—׳™׳¨׳”.';
         }
-        return state.orderEvents[lastId]?.note || 'המפה ממשיכה להתעדכן.';
+        return state.orderEvents[lastId]?.note || '׳”׳׳₪׳” ׳׳׳©׳™׳›׳” ׳׳”׳×׳¢׳“׳›׳.';
     }
 
     function nodeView(node) {
@@ -513,8 +859,8 @@
             quality: Math.round((current.score || 0) * 100),
             preview: current.text ? shorten(current.text) : node.help,
             orderLabel: orderEvent
-                ? (orderEvent.wasEarly ? 'נשאל מוקדם' : 'נשאל בזמן טוב')
-                : (nextId === node.id ? 'מומלץ עכשיו' : `סדר ${node.recommendedOrder}`),
+                ? (orderEvent.wasEarly ? '׳ ׳©׳׳ ׳׳•׳§׳“׳' : '׳ ׳©׳׳ ׳‘׳–׳׳ ׳˜׳•׳‘')
+                : (nextId === node.id ? '׳׳•׳׳׳¥ ׳¢׳›׳©׳™׳•' : `׳¡׳“׳¨ ${node.recommendedOrder}`),
             orderTone: orderEvent
                 ? (orderEvent.wasEarly ? 'warn' : 'success')
                 : (nextId === node.id ? 'info' : 'neutral')
@@ -542,15 +888,15 @@
             summaryReady,
             composerEnabled: !rawStatement || Boolean(activeNode),
             composerPlaceholder: !rawStatement
-                ? 'כתבו כאן את המשפט הגולמי של המטופל/ת: תלונה, משאלה, הימנעות או פועל עמום.'
+                ? '׳›׳×׳‘׳• ׳›׳׳ ׳׳× ׳”׳׳©׳₪׳˜ ׳”׳’׳•׳׳׳™ ׳©׳ ׳”׳׳˜׳•׳₪׳/׳×: ׳×׳׳•׳ ׳”, ׳׳©׳׳׳”, ׳”׳™׳׳ ׳¢׳•׳× ׳׳• ׳₪׳•׳¢׳ ׳¢׳׳•׳.'
                 : activeNode
                     ? activeNode.composerPlaceholder
-                    : 'לחצו על צומת במפה כדי לייצר את השאלה הבאה בצ׳אט.',
+                    : '׳׳—׳¦׳• ׳¢׳ ׳¦׳•׳׳× ׳‘׳׳₪׳” ׳›׳“׳™ ׳׳™׳™׳¦׳¨ ׳׳× ׳”׳©׳׳׳” ׳”׳‘׳׳” ׳‘׳¦׳³׳׳˜.',
             composerHint: !rawStatement
-                ? 'בלי המשפט הגולמי המפה נשארת סגורה.'
+                ? '׳‘׳׳™ ׳”׳׳©׳₪׳˜ ׳”׳’׳•׳׳׳™ ׳”׳׳₪׳” ׳ ׳©׳׳¨׳× ׳¡׳’׳•׳¨׳”.'
                 : activeNode
-                    ? `התשובה שתיכתב עכשיו תישמר בצומת "${activeNode.label}".`
-                    : 'כרגע אין שאלה פתוחה. המפה היא משטח השליטה בשיחה.',
+                    ? `׳”׳×׳©׳•׳‘׳” ׳©׳×׳™׳›׳×׳‘ ׳¢׳›׳©׳™׳• ׳×׳™׳©׳׳¨ ׳‘׳¦׳•׳׳× "${activeNode.label}".`
+                    : '׳›׳¨׳’׳¢ ׳׳™׳ ׳©׳׳׳” ׳₪׳×׳•׳—׳”. ׳”׳׳₪׳” ׳”׳™׳ ׳׳©׳˜׳— ׳”׳©׳׳™׳˜׳” ׳‘׳©׳™׳—׳”.',
             lastOrderNote: lastOrderNote()
         };
     }
@@ -571,7 +917,7 @@
             <div class="blueprint-bubble-row is-${esc(entry.role)}">
                 <article class="blueprint-bubble blueprint-bubble--${esc(entry.role)}" data-tone="${esc(entry.tone || 'default')}">
                     <div class="blueprint-bubble-top">
-                        <span class="blueprint-bubble-role">${esc(ROLE_LABELS[entry.role] || 'המפה')}</span>
+                        <span class="blueprint-bubble-role">${esc(ROLE_LABELS[entry.role] || '׳”׳׳₪׳”')}</span>
                         ${nodeLabel ? `<span class="blueprint-bubble-node">${esc(nodeLabel)}</span>` : ''}
                     </div>
                     <p>${esc(entry.text)}</p>
@@ -599,7 +945,7 @@
                 <p class="blueprint-node-help">${esc(node.help)}</p>
                 <div class="blueprint-node-meta">
                     <span class="blueprint-node-chip" data-tone="${esc(node.orderTone)}">${esc(node.orderLabel)}</span>
-                    <span class="blueprint-node-chip" data-tone="${node.status === 'complete' ? 'success' : node.status === 'partial' ? 'info' : 'neutral'}">${esc(String(node.quality))}% מידע</span>
+                    <span class="blueprint-node-chip" data-tone="${node.status === 'complete' ? 'success' : node.status === 'partial' ? 'info' : 'neutral'}">${esc(String(node.quality))}% ׳׳™׳“׳¢</span>
                 </div>
                 <p class="blueprint-node-preview">${esc(node.preview)}</p>
             </button>
@@ -611,7 +957,7 @@
         return `
             <article class="blueprint-summary-card" data-tone="${esc(tone || 'default')}" data-empty="${text ? 'false' : 'true'}">
                 <span class="blueprint-summary-label">${esc(title)}</span>
-                <p class="blueprint-summary-value"${contentId ? ` id="${esc(contentId)}"` : ''}>${esc(text || 'עדיין לא נבנה')}</p>
+                <p class="blueprint-summary-value"${contentId ? ` id="${esc(contentId)}"` : ''}>${esc(text || '׳¢׳“׳™׳™׳ ׳׳ ׳ ׳‘׳ ׳”')}</p>
                 ${note ? `<p class="blueprint-summary-note">${esc(note)}</p>` : ''}
             </article>
         `;
@@ -623,33 +969,33 @@
         root.innerHTML = `
             <section class="blueprint-progress-strip" aria-live="polite">
                 <article class="blueprint-progress-highlight">
-                    <span class="blueprint-panel-kicker">שלב נוכחי</span>
+                    <span class="blueprint-panel-kicker">׳©׳׳‘ ׳ ׳•׳›׳—׳™</span>
                     <strong>${esc(view.stageLabel)}</strong>
-                    <p>המערכת בודקת גם כמה מידע נאסף וגם האם השאלות נשאלו בסדר שעוזר טיפולית.</p>
+                    <p>׳”׳׳¢׳¨׳›׳× ׳‘׳•׳“׳§׳× ׳’׳ ׳›׳׳” ׳׳™׳“׳¢ ׳ ׳׳¡׳£ ׳•׳’׳ ׳”׳׳ ׳”׳©׳׳׳•׳× ׳ ׳©׳׳׳• ׳‘׳¡׳“׳¨ ׳©׳¢׳•׳–׳¨ ׳˜׳™׳₪׳•׳׳™׳×.</p>
                 </article>
-                ${metric('שלמות מידע', `${view.completenessScore}%`, `${view.data.completedNodes}/${NODES.length} צמתים מלאים`, view.completenessScore >= 70 ? 'success' : 'info')}
-                ${metric('סדר שאלות', `${view.orderScore}%`, view.orderScore >= 85 ? 'מהלך יציב' : 'יש קפיצות מוקדמות', view.orderScore >= 85 ? 'success' : 'warn')}
-                ${metric('ציון משולב', `${view.combinedScore}%`, 'משוב מאמן, לא משחק', view.combinedScore >= 80 ? 'success' : 'neutral')}
-                ${metric('צומת מומלץ', view.nextNode ? view.nextNode.shortLabel : 'קודם משפט', view.nextNode ? view.nextNode.label : 'שומרים משפט גולמי', 'neutral')}
+                ${metric('׳©׳׳׳•׳× ׳׳™׳“׳¢', `${view.completenessScore}%`, `${view.data.completedNodes}/${NODES.length} ׳¦׳׳×׳™׳ ׳׳׳׳™׳`, view.completenessScore >= 70 ? 'success' : 'info')}
+                ${metric('׳¡׳“׳¨ ׳©׳׳׳•׳×', `${view.orderScore}%`, view.orderScore >= 85 ? '׳׳”׳׳ ׳™׳¦׳™׳‘' : '׳™׳© ׳§׳₪׳™׳¦׳•׳× ׳׳•׳§׳“׳׳•׳×', view.orderScore >= 85 ? 'success' : 'warn')}
+                ${metric('׳¦׳™׳•׳ ׳׳©׳•׳׳‘', `${view.combinedScore}%`, '׳׳©׳•׳‘ ׳׳׳׳, ׳׳ ׳׳©׳—׳§', view.combinedScore >= 80 ? 'success' : 'neutral')}
+                ${metric('׳¦׳•׳׳× ׳׳•׳׳׳¥', view.nextNode ? view.nextNode.shortLabel : '׳§׳•׳“׳ ׳׳©׳₪׳˜', view.nextNode ? view.nextNode.label : '׳©׳•׳׳¨׳™׳ ׳׳©׳₪׳˜ ׳’׳•׳׳׳™', 'neutral')}
             </section>
 
             <section class="blueprint-dialogue-stage">
                 <aside class="blueprint-stage-card blueprint-stage-card--context">
-                    <span class="blueprint-panel-kicker">עוגן השיחה</span>
-                    <h3>מה הגיע מהמטופל/ת</h3>
-                    <blockquote class="blueprint-raw-quote">${esc(view.rawStatement || 'עדיין לא נשמר כאן משפט גולמי.')}</blockquote>
-                    <p class="blueprint-stage-note">${esc(view.rawStatement ? 'המשפט הזה נשאר גלוי לאורך כל המהלך כדי שלא נחליק חזרה לטופס.' : 'התחילו במשפט אחד. ממנו המפה תיפתח ותציע סדר שאלות.' )}</p>
-                    ${view.nextNode ? `<div class="blueprint-stage-highlight"><span>מומלץ עכשיו</span><strong>${esc(view.nextNode.label)}</strong></div>` : ''}
+                    <span class="blueprint-panel-kicker">׳¢׳•׳’׳ ׳”׳©׳™׳—׳”</span>
+                    <h3>׳׳” ׳”׳’׳™׳¢ ׳׳”׳׳˜׳•׳₪׳/׳×</h3>
+                    <blockquote class="blueprint-raw-quote">${esc(view.rawStatement || '׳¢׳“׳™׳™׳ ׳׳ ׳ ׳©׳׳¨ ׳›׳׳ ׳׳©׳₪׳˜ ׳’׳•׳׳׳™.')}</blockquote>
+                    <p class="blueprint-stage-note">${esc(view.rawStatement ? '׳”׳׳©׳₪׳˜ ׳”׳–׳” ׳ ׳©׳׳¨ ׳’׳׳•׳™ ׳׳׳•׳¨׳ ׳›׳ ׳”׳׳”׳׳ ׳›׳“׳™ ׳©׳׳ ׳ ׳—׳׳™׳§ ׳—׳–׳¨׳” ׳׳˜׳•׳₪׳¡.' : '׳”׳×׳—׳™׳׳• ׳‘׳׳©׳₪׳˜ ׳׳—׳“. ׳׳׳ ׳• ׳”׳׳₪׳” ׳×׳™׳₪׳×׳— ׳•׳×׳¦׳™׳¢ ׳¡׳“׳¨ ׳©׳׳׳•׳×.' )}</p>
+                    ${view.nextNode ? `<div class="blueprint-stage-highlight"><span>׳׳•׳׳׳¥ ׳¢׳›׳©׳™׳•</span><strong>${esc(view.nextNode.label)}</strong></div>` : ''}
                 </aside>
 
-                <section class="blueprint-phone-shell" aria-label="שיחה טיפולית">
+                <section class="blueprint-phone-shell" aria-label="׳©׳™׳—׳” ׳˜׳™׳₪׳•׳׳™׳×">
                     <div class="blueprint-phone-card">
                         <div class="blueprint-phone-head">
                             <div>
-                                <span class="blueprint-panel-kicker">דיאלוג מונחה</span>
-                                <h3>מטפל/ת ↔ מטופל/ת</h3>
+                                <span class="blueprint-panel-kicker">׳“׳™׳׳׳•׳’ ׳׳•׳ ׳—׳”</span>
+                                <h3>׳׳˜׳₪׳/׳× ג†” ׳׳˜׳•׳₪׳/׳×</h3>
                             </div>
-                            <span class="blueprint-phone-status">${esc(view.activeNode ? `שאלה פתוחה: ${view.activeNode.label}` : 'ממתין לבחירת צומת')}</span>
+                            <span class="blueprint-phone-status">${esc(view.activeNode ? `׳©׳׳׳” ׳₪׳×׳•׳—׳”: ${view.activeNode.label}` : '׳׳׳×׳™׳ ׳׳‘׳—׳™׳¨׳× ׳¦׳•׳׳×')}</span>
                         </div>
                         <div class="blueprint-chat-thread" data-blueprint-chat-thread="1" role="log" aria-live="polite">
                             ${view.messages.map(bubble).join('')}
@@ -661,40 +1007,40 @@
                                       ${view.composerEnabled ? '' : 'disabled'}></textarea>
                             <div class="blueprint-composer-footer">
                                 <span class="blueprint-composer-hint">${esc(view.composerHint)}</span>
-                                <button type="submit" class="btn btn-primary" ${view.composerEnabled ? '' : 'disabled'}>${esc(view.rawStatement ? 'שמור תשובה' : 'שמור משפט')}</button>
+                                <button type="submit" class="btn btn-primary" ${view.composerEnabled ? '' : 'disabled'}>${esc(view.rawStatement ? '׳©׳׳•׳¨ ׳×׳©׳•׳‘׳”' : '׳©׳׳•׳¨ ׳׳©׳₪׳˜')}</button>
                             </div>
                         </form>
                     </div>
                 </section>
 
                 <aside class="blueprint-stage-card blueprint-stage-card--feedback">
-                    <span class="blueprint-panel-kicker">משוב מאמן</span>
-                    <h3>מה איכות המהלך כרגע</h3>
+                    <span class="blueprint-panel-kicker">׳׳©׳•׳‘ ׳׳׳׳</span>
+                    <h3>׳׳” ׳׳™׳›׳•׳× ׳”׳׳”׳׳ ׳›׳¨׳’׳¢</h3>
                     <p class="blueprint-stage-note">${esc(view.lastOrderNote)}</p>
                     <div class="blueprint-feedback-grid">
-                        <div><strong>${esc(String(view.data.completedNodes))}</strong><span>צמתים מלאים</span></div>
-                        <div><strong>${esc(String(view.data.partialNodes))}</strong><span>צמתים חלקיים</span></div>
-                        <div><strong>${esc(String(view.orderScore))}%</strong><span>איכות סדר</span></div>
+                        <div><strong>${esc(String(view.data.completedNodes))}</strong><span>׳¦׳׳×׳™׳ ׳׳׳׳™׳</span></div>
+                        <div><strong>${esc(String(view.data.partialNodes))}</strong><span>׳¦׳׳×׳™׳ ׳—׳׳§׳™׳™׳</span></div>
+                        <div><strong>${esc(String(view.orderScore))}%</strong><span>׳׳™׳›׳•׳× ׳¡׳“׳¨</span></div>
                     </div>
                     <div class="blueprint-stage-highlight blueprint-stage-highlight--soft">
-                        <span>${view.activeNode ? 'הצומת הפעיל' : 'איך עובדים'}</span>
-                        <strong>${esc(view.activeNode ? view.activeNode.label : 'הצ׳אט לא חופשי לגמרי')}</strong>
-                        <p>${esc(view.activeNode ? view.activeNode.help : 'המפה מייצרת את השאלה, הצ׳אט מחזיק את התשובה, והסיכום נבנה משניהם יחד.')}</p>
+                        <span>${view.activeNode ? '׳”׳¦׳•׳׳× ׳”׳₪׳¢׳™׳' : '׳׳™׳ ׳¢׳•׳‘׳“׳™׳'}</span>
+                        <strong>${esc(view.activeNode ? view.activeNode.label : '׳”׳¦׳³׳׳˜ ׳׳ ׳—׳•׳₪׳©׳™ ׳׳’׳׳¨׳™')}</strong>
+                        <p>${esc(view.activeNode ? view.activeNode.help : '׳”׳׳₪׳” ׳׳™׳™׳¦׳¨׳× ׳׳× ׳”׳©׳׳׳”, ׳”׳¦׳³׳׳˜ ׳׳—׳–׳™׳§ ׳׳× ׳”׳×׳©׳•׳‘׳”, ׳•׳”׳¡׳™׳›׳•׳ ׳ ׳‘׳ ׳” ׳׳©׳ ׳™׳”׳ ׳™׳—׳“.')}</p>
                     </div>
                 </aside>
             </section>
 
-            <section class="blueprint-flow-shell" aria-label="מפת פעולה אינטראקטיבית">
+            <section class="blueprint-flow-shell" aria-label="׳׳₪׳× ׳₪׳¢׳•׳׳” ׳׳™׳ ׳˜׳¨׳׳§׳˜׳™׳‘׳™׳×">
                 <div class="blueprint-section-head">
                     <div>
                         <span class="blueprint-panel-kicker">TOTE / Action Flow</span>
-                        <h3>המפה שמייצרת את השאלות</h3>
+                        <h3>׳”׳׳₪׳” ׳©׳׳™׳™׳¦׳¨׳× ׳׳× ׳”׳©׳׳׳•׳×</h3>
                     </div>
                     <div class="blueprint-flow-legend" aria-hidden="true">
-                        <span data-tone="locked">נעול</span>
-                        <span data-tone="available">זמין</span>
-                        <span data-tone="partial">חלקי</span>
-                        <span data-tone="complete">מלא</span>
+                        <span data-tone="locked">׳ ׳¢׳•׳</span>
+                        <span data-tone="available">׳–׳׳™׳</span>
+                        <span data-tone="partial">׳—׳׳§׳™</span>
+                        <span data-tone="complete">׳׳׳</span>
                     </div>
                 </div>
                 <div class="blueprint-flow-board">
@@ -702,34 +1048,34 @@
                 </div>
             </section>
 
-            <section class="blueprint-summary-shell ${view.summaryReady ? 'is-ready' : 'is-building'}" aria-label="מפת פעולה סופית">
+            <section class="blueprint-summary-shell ${view.summaryReady ? 'is-ready' : 'is-building'}" aria-label="׳׳₪׳× ׳₪׳¢׳•׳׳” ׳¡׳•׳₪׳™׳×">
                 <div class="blueprint-section-head">
                     <div>
-                        <span class="blueprint-panel-kicker">המפה שבנינו</span>
-                        <h3>סיכום מהלך / תוכנית ביצוע</h3>
+                        <span class="blueprint-panel-kicker">׳”׳׳₪׳” ׳©׳‘׳ ׳™׳ ׳•</span>
+                        <h3>׳¡׳™׳›׳•׳ ׳׳”׳׳ / ׳×׳•׳›׳ ׳™׳× ׳‘׳™׳¦׳•׳¢</h3>
                     </div>
-                    <span class="blueprint-summary-state">${esc(view.summaryReady ? 'מוכן לביצוע' : 'עדיין בבנייה')}</span>
+                    <span class="blueprint-summary-state">${esc(view.summaryReady ? '׳׳•׳›׳ ׳׳‘׳™׳¦׳•׳¢' : '׳¢׳“׳™׳™׳ ׳‘׳‘׳ ׳™׳™׳”')}</span>
                 </div>
                 <div class="blueprint-commitment-banner">
-                    <span class="blueprint-panel-kicker">משפט מחויבות קצר</span>
+                    <span class="blueprint-panel-kicker">׳׳©׳₪׳˜ ׳׳—׳•׳™׳‘׳•׳× ׳§׳¦׳¨</span>
                     <strong>${esc(view.data.conciseCommitment)}</strong>
                 </div>
                 <div id="final-blueprint" class="blueprint-summary-grid">
-                    ${summaryCard('המשפט הגולמי', view.data.rawStatement, 'מאיפה יצאנו', 'raw')}
-                    ${summaryCard('היעד שעבר טרנספורמציה', view.data.transformedOutcome, 'מה רוצים שיקרה במקום', 'success')}
-                    ${summaryCard('הפעולה הנראית', view.data.visibleAction, 'מה אפשר לראות או לשמוע במציאות', 'default')}
-                    ${summaryCard('המניע הרגשי', view.data.emotionalLever, 'למה זה באמת חשוב', 'default')}
-                    ${summaryCard('החסם הצפוי', view.data.obstacles, 'איפה זה עלול להיתקע', 'warn')}
-                    ${summaryCard('חלופה / Plan B', view.data.alternatives, 'מה עושים אם יש תקיעה', 'info', 'if-stuck-content')}
-                    ${summaryCard('תנאי ביצוע', view.data.executionConditions, 'מתי, איפה ועם מי זה קורה', 'default')}
-                    ${summaryCard('הצעד הראשון', view.data.firstStep, 'הצעד הכי קטן שאפשר לבצע עכשיו', 'success', 'next-physical-action')}
-                    ${summaryCard('בדיקת סיום', view.data.finalTest, 'איך נדע שהתוכנית ברורה, מציאותית ומדידה', 'default')}
+                    ${summaryCard('׳”׳׳©׳₪׳˜ ׳”׳’׳•׳׳׳™', view.data.rawStatement, '׳׳׳™׳₪׳” ׳™׳¦׳׳ ׳•', 'raw')}
+                    ${summaryCard('׳”׳™׳¢׳“ ׳©׳¢׳‘׳¨ ׳˜׳¨׳ ׳¡׳₪׳•׳¨׳׳¦׳™׳”', view.data.transformedOutcome, '׳׳” ׳¨׳•׳¦׳™׳ ׳©׳™׳§׳¨׳” ׳‘׳׳§׳•׳', 'success')}
+                    ${summaryCard('׳”׳₪׳¢׳•׳׳” ׳”׳ ׳¨׳׳™׳×', view.data.visibleAction, '׳׳” ׳׳₪׳©׳¨ ׳׳¨׳׳•׳× ׳׳• ׳׳©׳׳•׳¢ ׳‘׳׳¦׳™׳׳•׳×', 'default')}
+                    ${summaryCard('׳”׳׳ ׳™׳¢ ׳”׳¨׳’׳©׳™', view.data.emotionalLever, '׳׳׳” ׳–׳” ׳‘׳׳׳× ׳—׳©׳•׳‘', 'default')}
+                    ${summaryCard('׳”׳—׳¡׳ ׳”׳¦׳₪׳•׳™', view.data.obstacles, '׳׳™׳₪׳” ׳–׳” ׳¢׳׳•׳ ׳׳”׳™׳×׳§׳¢', 'warn')}
+                    ${summaryCard('׳—׳׳•׳₪׳” / Plan B', view.data.alternatives, '׳׳” ׳¢׳•׳©׳™׳ ׳׳ ׳™׳© ׳×׳§׳™׳¢׳”', 'info', 'if-stuck-content')}
+                    ${summaryCard('׳×׳ ׳׳™ ׳‘׳™׳¦׳•׳¢', view.data.executionConditions, '׳׳×׳™, ׳׳™׳₪׳” ׳•׳¢׳ ׳׳™ ׳–׳” ׳§׳•׳¨׳”', 'default')}
+                    ${summaryCard('׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳', view.data.firstStep, '׳”׳¦׳¢׳“ ׳”׳›׳™ ׳§׳˜׳ ׳©׳׳₪׳©׳¨ ׳׳‘׳¦׳¢ ׳¢׳›׳©׳™׳•', 'success', 'next-physical-action')}
+                    ${summaryCard('׳‘׳“׳™׳§׳× ׳¡׳™׳•׳', view.data.finalTest, '׳׳™׳ ׳ ׳“׳¢ ׳©׳”׳×׳•׳›׳ ׳™׳× ׳‘׳¨׳•׳¨׳”, ׳׳¦׳™׳׳•׳×׳™׳× ׳•׳׳“׳™׳“׳”', 'default')}
                 </div>
                 <div class="blueprint-summary-note">${esc(view.data.therapistSummary)}</div>
                 <div class="blueprint-action-row">
-                    <button id="export-json-btn" type="button" class="btn btn-secondary" data-blueprint-action="export">📥 ייצא JSON</button>
-                    <button id="start-over-btn" type="button" class="btn btn-secondary" data-blueprint-action="reset">🔄 מהלך חדש</button>
-                    <button id="do-it-now-btn" type="button" class="btn btn-primary" data-blueprint-action="start">⏱️ להתחיל בצעד הראשון</button>
+                    <button id="export-json-btn" type="button" class="btn btn-secondary" data-blueprint-action="export">נ“¥ ׳™׳™׳¦׳ JSON</button>
+                    <button id="start-over-btn" type="button" class="btn btn-secondary" data-blueprint-action="reset">נ”„ ׳׳”׳׳ ׳—׳“׳©</button>
+                    <button id="do-it-now-btn" type="button" class="btn btn-primary" data-blueprint-action="start">ג±ן¸ ׳׳”׳×׳—׳™׳ ׳‘׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳</button>
                 </div>
             </section>
         `;
@@ -781,17 +1127,17 @@
     function startNow() {
         const data = snapshot();
         if (!data.firstStep) {
-            alert('כדי להתחיל עכשיו צריך קודם לסגור צעד ראשון ברור במפה.');
+            alert('׳›׳“׳™ ׳׳”׳×׳—׳™׳ ׳¢׳›׳©׳™׳• ׳¦׳¨׳™׳ ׳§׳•׳“׳ ׳׳¡׳’׳•׳¨ ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳‘׳¨׳•׳¨ ׳‘׳׳₪׳”.');
             return false;
         }
-        alert(`מתחילים עכשיו.\n\nהצעד הראשון שלך: ${data.firstStep}\n\nהחזיקו את הכיוון: ${data.desiredOutcome || data.transformedOutcome}`);
+        alert(`׳׳×׳—׳™׳׳™׳ ׳¢׳›׳©׳™׳•.\n\n׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳ ׳©׳׳: ${data.firstStep}\n\n׳”׳—׳–׳™׳§׳• ׳׳× ׳”׳›׳™׳•׳•׳: ${data.desiredOutcome || data.transformedOutcome}`);
         return true;
     }
 
     function exportJson() {
         const data = snapshot();
         if (!data.rawStatement) {
-            alert('כדאי להתחיל ממשפט גולמי אחד לפני ייצוא.');
+            alert('׳›׳“׳׳™ ׳׳”׳×׳—׳™׳ ׳׳׳©׳₪׳˜ ׳’׳•׳׳׳™ ׳׳—׳“ ׳׳₪׳ ׳™ ׳™׳™׳¦׳•׳.');
             return false;
         }
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -820,3 +1166,4 @@
         buildGuidedImagery: guidedImagery
     });
 })();
+
