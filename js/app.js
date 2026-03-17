@@ -14572,6 +14572,10 @@ function blueprintJoinListNatural(items) {
 }
 
 function buildBlueprintTherapistSummaryText() {
+    if (window.BlueprintDialogueBuilder && typeof window.BlueprintDialogueBuilder.buildTherapistSummary === 'function') {
+        blueprintData = window.BlueprintDialogueBuilder.snapshot();
+        return window.BlueprintDialogueBuilder.buildTherapistSummary(blueprintData);
+    }
     const blockers = blueprintSplitList(blueprintData.resourceBlockers || blueprintData.friction);
     const enablers = blueprintSplitList(blueprintData.resourceEnablers || blueprintData.prerequisites);
     const valuesIfYes = blueprintSplitList(blueprintData.valuesIfYes);
@@ -14604,6 +14608,10 @@ function buildBlueprintTherapistSummaryText() {
 }
 
 function buildBlueprintGuidedImageryText() {
+    if (window.BlueprintDialogueBuilder && typeof window.BlueprintDialogueBuilder.buildGuidedImagery === 'function') {
+        blueprintData = window.BlueprintDialogueBuilder.snapshot();
+        return window.BlueprintDialogueBuilder.buildGuidedImagery(blueprintData);
+    }
     const firstStep = String(blueprintData.firstStep || '').trim();
     const success = String(blueprintData.success || '').trim();
     const enablers = blueprintSplitList(blueprintData.resourceEnablers || blueprintData.prerequisites);
@@ -14642,6 +14650,10 @@ function setupTriplesRadarPresentation() {
 }
 
 function updateBlueprintProgress(stepNum = 1) {
+    if (window.BlueprintDialogueBuilder && typeof window.BlueprintDialogueBuilder.snapshot === 'function') {
+        blueprintData = window.BlueprintDialogueBuilder.snapshot();
+        return;
+    }
     const resolvedStep = Math.max(1, Math.min(4, Math.floor(Number(stepNum) || 1)));
     const container = document.querySelector('#blueprint .blueprint-container');
     const progress = document.querySelector('#blueprint .blueprint-progress');
@@ -14666,6 +14678,11 @@ function updateBlueprintProgress(stepNum = 1) {
 }
 
 function setupBlueprintBuilder() {
+    if (window.BlueprintDialogueBuilder && typeof window.BlueprintDialogueBuilder.setup === 'function') {
+        window.BlueprintDialogueBuilder.setup();
+        blueprintData = window.BlueprintDialogueBuilder.snapshot();
+        return;
+    }
     // Step 1: Extract Button
     const extractBtn = document.getElementById('extract-btn');
     if (extractBtn) {
@@ -14708,6 +14725,15 @@ function setupBlueprintBuilder() {
 }
 
 function goToStep(stepNum) {
+    if (window.BlueprintDialogueBuilder) {
+        if (Number(stepNum) <= 1 && typeof window.BlueprintDialogueBuilder.reset === 'function') {
+            window.BlueprintDialogueBuilder.reset();
+        } else if (typeof window.BlueprintDialogueBuilder.goToRecommended === 'function') {
+            window.BlueprintDialogueBuilder.goToRecommended();
+        }
+        blueprintData = window.BlueprintDialogueBuilder.snapshot();
+        return;
+    }
     const targetId = `blueprint-step-${stepNum}`;
     document.querySelectorAll('.blueprint-step').forEach(step => {
         const isTarget = step.id === targetId;
@@ -14726,6 +14752,10 @@ function goToStep(stepNum) {
 }
 
 function extractAndMoveToStep2() {
+    if (window.BlueprintDialogueBuilder) {
+        goToStep(2);
+        return;
+    }
     const actionInput = document.getElementById('action-input').value.trim();
 
     if (!actionInput) {
@@ -14738,6 +14768,10 @@ function extractAndMoveToStep2() {
 }
 
 function extractAndMoveToStep3() {
+    if (window.BlueprintDialogueBuilder) {
+        goToStep(3);
+        return;
+    }
     // Collect data from Step 2
     blueprintData.success = document.getElementById('q-success').value.trim();
     blueprintData.firstStep = document.getElementById('q-first-step').value.trim();
@@ -14757,6 +14791,10 @@ function extractAndMoveToStep3() {
 }
 
 function extractAndMoveToStep4() {
+    if (window.BlueprintDialogueBuilder && typeof window.BlueprintDialogueBuilder.snapshot === 'function') {
+        blueprintData = window.BlueprintDialogueBuilder.snapshot();
+        return blueprintData;
+    }
     // Collect data from Step 3
     blueprintData.whoExpects = document.getElementById('q-who-expects').value;
     blueprintData.expectation = document.getElementById('q-expectation').value.trim();
@@ -14779,6 +14817,10 @@ function extractAndMoveToStep4() {
 }
 
 function updateReframeBox() {
+    if (window.BlueprintDialogueBuilder && typeof window.BlueprintDialogueBuilder.snapshot === 'function') {
+        blueprintData = window.BlueprintDialogueBuilder.snapshot();
+        return;
+    }
     const ability = parseInt(document.getElementById('q-ability').value);
     const gap = document.getElementById('q-gap').value.trim();
 
@@ -14797,6 +14839,10 @@ function updateReframeBox() {
 }
 
 function generateFinalBlueprint() {
+    if (window.BlueprintDialogueBuilder && typeof window.BlueprintDialogueBuilder.snapshot === 'function') {
+        blueprintData = window.BlueprintDialogueBuilder.snapshot();
+        return blueprintData;
+    }
     const whoExpectsMap = {
         self: 'אני בעצמי',
         other: 'מישהו אחר',
@@ -14894,6 +14940,10 @@ function generateFinalBlueprint() {
 }
 
 function generateNextAction() {
+    if (window.BlueprintDialogueBuilder && typeof window.BlueprintDialogueBuilder.snapshot === 'function') {
+        blueprintData = window.BlueprintDialogueBuilder.snapshot();
+        return blueprintData.firstStep || '';
+    }
     const nextActionBox = document.getElementById('next-physical-action');
     const ifStuckBox = document.getElementById('if-stuck-content');
 
@@ -14915,11 +14965,21 @@ function generateNextAction() {
 }
 
 function startTenMinuteTimer() {
+    if (window.BlueprintDialogueBuilder && typeof window.BlueprintDialogueBuilder.startNow === 'function') {
+        blueprintData = window.BlueprintDialogueBuilder.snapshot();
+        window.BlueprintDialogueBuilder.startNow();
+        return;
+    }
     alert(`מתחילים עכשיו.\n\nהצעד הראשון שלך: ${blueprintData.firstStep || 'צעד ראשון'}\n\nיש לך 10 דקות. קדימה.`);
     // Could implement actual timer here
 }
 
 function exportBlueprint() {
+    if (window.BlueprintDialogueBuilder && typeof window.BlueprintDialogueBuilder.exportJson === 'function') {
+        blueprintData = window.BlueprintDialogueBuilder.snapshot();
+        window.BlueprintDialogueBuilder.exportJson();
+        return;
+    }
     const blueprintJSON = JSON.stringify(blueprintData, null, 2);
     const blob = new Blob([blueprintJSON], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
