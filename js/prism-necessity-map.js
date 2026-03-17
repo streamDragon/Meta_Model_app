@@ -302,7 +302,8 @@
             exerciseIndex: 0,
             probeIndex: 0,
             revealOpen: false,
-            deepenOpen: false
+            deepenOpen: false,
+            scrollToTop: false
         };
     }
 
@@ -330,6 +331,7 @@
         state.probeIndex = 0;
         state.revealOpen = false;
         state.deepenOpen = false;
+        state.scrollToTop = true;
     }
 
     function goToCategories(state, pathId = '') {
@@ -340,6 +342,7 @@
         state.probeIndex = 0;
         state.revealOpen = false;
         state.deepenOpen = false;
+        state.scrollToTop = true;
     }
 
     function openCategoryWorkspace(state, categoryId) {
@@ -349,6 +352,7 @@
         state.probeIndex = 0;
         state.revealOpen = false;
         state.deepenOpen = false;
+        state.scrollToTop = true;
     }
 
     function restartCurrentSession(state) {
@@ -360,6 +364,7 @@
         state.probeIndex = 0;
         state.revealOpen = false;
         state.deepenOpen = false;
+        state.scrollToTop = true;
         renderApp(state);
         return true;
     }
@@ -649,6 +654,15 @@
         else body = renderLanding(state);
         state.root.innerHTML = `<div class="${shellClass}" data-view="${escapeHtml(state.view)}">${body}</div>`;
         registerController(state);
+        if (state.scrollToTop) {
+            const scroller = state.root.querySelector('.pnm-view');
+            if (scroller) {
+                global.requestAnimationFrame(() => {
+                    scroller.scrollTop = 0;
+                });
+            }
+            state.scrollToTop = false;
+        }
     }
 
     function goNextProbe(state) {
@@ -666,6 +680,7 @@
         }
         state.revealOpen = false;
         state.deepenOpen = false;
+        state.scrollToTop = true;
     }
 
     function bindEvents(state) {

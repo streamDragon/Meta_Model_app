@@ -21,15 +21,15 @@
     "חשוף תשובה",
     "העמקה"
   ],
-  "progressElements": 1,
+  "progressElements": 0,
   "viewportHeight": 844,
-  "questionCardBottom": 831,
-  "questionMostlyInView": true,
-  "bottomBarTop": 856,
-  "primaryButtonTop": 718,
-  "primaryButtonBottom": 763,
+  "questionCardBottom": 1114,
+  "questionMostlyInView": false,
+  "bottomBarTop": 1135,
+  "primaryButtonTop": 1057,
+  "primaryButtonBottom": 1101,
   "primaryButtonClearOfBottomBar": true,
-  "contextTop": 159,
-  "instructionTop": 421,
-  "questionTop": 582
+  "contextTop": -77,
+  "instructionTop": 588,
+  "questionTop": 931
 }
