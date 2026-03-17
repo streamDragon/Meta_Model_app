@@ -493,3 +493,330 @@
         }
         return state.orderEvents[lastId]?.note || 'המפה ממשיכה להתעדכן.';
     }
+
+    function nodeView(node) {
+        const current = answer(node.id);
+        const currentStatus = nodeStatus(node);
+        const nextId = recommendedNextId();
+        const orderEvent = state.orderEvents[node.id] || null;
+        return {
+            id: node.id,
+            icon: node.icon,
+            label: node.label,
+            shortLabel: node.shortLabel,
+            help: node.help,
+            recommendedOrder: node.recommendedOrder,
+            active: state.activeNodeId === node.id,
+            recommended: nextId === node.id,
+            status: currentStatus,
+            statusLabel: STATUS_LABELS[currentStatus] || currentStatus,
+            quality: Math.round((current.score || 0) * 100),
+            preview: current.text ? shorten(current.text) : node.help,
+            orderLabel: orderEvent
+                ? (orderEvent.wasEarly ? 'נשאל מוקדם' : 'נשאל בזמן טוב')
+                : (nextId === node.id ? 'מומלץ עכשיו' : `סדר ${node.recommendedOrder}`),
+            orderTone: orderEvent
+                ? (orderEvent.wasEarly ? 'warn' : 'success')
+                : (nextId === node.id ? 'info' : 'neutral')
+        };
+    }
+
+    function currentView() {
+        const data = snapshot();
+        const nextId = recommendedNextId();
+        const nextNode = nextId ? NODE_BY_ID[nextId] : null;
+        const activeNode = state.activeNodeId ? NODE_BY_ID[state.activeNodeId] : null;
+        const rawStatement = clean(state.rawStatement);
+        const summaryReady = Boolean(rawStatement && data.desiredOutcome && data.visibleAction && data.firstStep);
+        return {
+            rawStatement,
+            data,
+            nextNode,
+            activeNode,
+            nodes: NODES.map(nodeView),
+            messages: state.messages.slice(),
+            stageLabel: stageLabel(),
+            completenessScore: data.completenessScore,
+            orderScore: data.orderScore,
+            combinedScore: data.combinedScore,
+            summaryReady,
+            composerEnabled: !rawStatement || Boolean(activeNode),
+            composerPlaceholder: !rawStatement
+                ? 'כתבו כאן את המשפט הגולמי של המטופל/ת: תלונה, משאלה, הימנעות או פועל עמום.'
+                : activeNode
+                    ? activeNode.composerPlaceholder
+                    : 'לחצו על צומת במפה כדי לייצר את השאלה הבאה בצ׳אט.',
+            composerHint: !rawStatement
+                ? 'בלי המשפט הגולמי המפה נשארת סגורה.'
+                : activeNode
+                    ? `התשובה שתיכתב עכשיו תישמר בצומת "${activeNode.label}".`
+                    : 'כרגע אין שאלה פתוחה. המפה היא משטח השליטה בשיחה.',
+            lastOrderNote: lastOrderNote()
+        };
+    }
+
+    function metric(label, value, note, tone) {
+        return `
+            <article class="blueprint-metric" data-tone="${esc(tone || 'neutral')}">
+                <span class="blueprint-metric-label">${esc(label)}</span>
+                <strong class="blueprint-metric-value">${esc(value)}</strong>
+                <span class="blueprint-metric-note">${esc(note)}</span>
+            </article>
+        `;
+    }
+
+    function bubble(entry) {
+        const nodeLabel = entry.nodeId && NODE_BY_ID[entry.nodeId] ? NODE_BY_ID[entry.nodeId].shortLabel : '';
+        return `
+            <div class="blueprint-bubble-row is-${esc(entry.role)}">
+                <article class="blueprint-bubble blueprint-bubble--${esc(entry.role)}" data-tone="${esc(entry.tone || 'default')}">
+                    <div class="blueprint-bubble-top">
+                        <span class="blueprint-bubble-role">${esc(ROLE_LABELS[entry.role] || 'המפה')}</span>
+                        ${nodeLabel ? `<span class="blueprint-bubble-node">${esc(nodeLabel)}</span>` : ''}
+                    </div>
+                    <p>${esc(entry.text)}</p>
+                </article>
+            </div>
+        `;
+    }
+
+    function nodeCard(node) {
+        return `
+            <button type="button"
+                    class="blueprint-node-card ${node.active ? 'is-active' : ''} ${node.recommended ? 'is-recommended' : ''}"
+                    data-blueprint-node="${esc(node.id)}"
+                    data-status="${esc(node.status)}"
+                    aria-pressed="${node.active ? 'true' : 'false'}"
+                    ${node.status === 'locked' ? 'disabled' : ''}>
+                <div class="blueprint-node-head">
+                    <span class="blueprint-node-order">${esc(String(node.recommendedOrder))}</span>
+                    <span class="blueprint-node-icon" aria-hidden="true">${esc(node.icon)}</span>
+                    <div class="blueprint-node-title-wrap">
+                        <strong>${esc(node.label)}</strong>
+                        <span class="blueprint-node-status">${esc(node.statusLabel)}</span>
+                    </div>
+                </div>
+                <p class="blueprint-node-help">${esc(node.help)}</p>
+                <div class="blueprint-node-meta">
+                    <span class="blueprint-node-chip" data-tone="${esc(node.orderTone)}">${esc(node.orderLabel)}</span>
+                    <span class="blueprint-node-chip" data-tone="${node.status === 'complete' ? 'success' : node.status === 'partial' ? 'info' : 'neutral'}">${esc(String(node.quality))}% מידע</span>
+                </div>
+                <p class="blueprint-node-preview">${esc(node.preview)}</p>
+            </button>
+        `;
+    }
+
+    function summaryCard(title, value, note, tone, contentId) {
+        const text = clean(value);
+        return `
+            <article class="blueprint-summary-card" data-tone="${esc(tone || 'default')}" data-empty="${text ? 'false' : 'true'}">
+                <span class="blueprint-summary-label">${esc(title)}</span>
+                <p class="blueprint-summary-value"${contentId ? ` id="${esc(contentId)}"` : ''}>${esc(text || 'עדיין לא נבנה')}</p>
+                ${note ? `<p class="blueprint-summary-note">${esc(note)}</p>` : ''}
+            </article>
+        `;
+    }
+
+    function render() {
+        if (!root) return false;
+        const view = currentView();
+        root.innerHTML = `
+            <section class="blueprint-progress-strip" aria-live="polite">
+                <article class="blueprint-progress-highlight">
+                    <span class="blueprint-panel-kicker">שלב נוכחי</span>
+                    <strong>${esc(view.stageLabel)}</strong>
+                    <p>המערכת בודקת גם כמה מידע נאסף וגם האם השאלות נשאלו בסדר שעוזר טיפולית.</p>
+                </article>
+                ${metric('שלמות מידע', `${view.completenessScore}%`, `${view.data.completedNodes}/${NODES.length} צמתים מלאים`, view.completenessScore >= 70 ? 'success' : 'info')}
+                ${metric('סדר שאלות', `${view.orderScore}%`, view.orderScore >= 85 ? 'מהלך יציב' : 'יש קפיצות מוקדמות', view.orderScore >= 85 ? 'success' : 'warn')}
+                ${metric('ציון משולב', `${view.combinedScore}%`, 'משוב מאמן, לא משחק', view.combinedScore >= 80 ? 'success' : 'neutral')}
+                ${metric('צומת מומלץ', view.nextNode ? view.nextNode.shortLabel : 'קודם משפט', view.nextNode ? view.nextNode.label : 'שומרים משפט גולמי', 'neutral')}
+            </section>
+
+            <section class="blueprint-dialogue-stage">
+                <aside class="blueprint-stage-card blueprint-stage-card--context">
+                    <span class="blueprint-panel-kicker">עוגן השיחה</span>
+                    <h3>מה הגיע מהמטופל/ת</h3>
+                    <blockquote class="blueprint-raw-quote">${esc(view.rawStatement || 'עדיין לא נשמר כאן משפט גולמי.')}</blockquote>
+                    <p class="blueprint-stage-note">${esc(view.rawStatement ? 'המשפט הזה נשאר גלוי לאורך כל המהלך כדי שלא נחליק חזרה לטופס.' : 'התחילו במשפט אחד. ממנו המפה תיפתח ותציע סדר שאלות.' )}</p>
+                    ${view.nextNode ? `<div class="blueprint-stage-highlight"><span>מומלץ עכשיו</span><strong>${esc(view.nextNode.label)}</strong></div>` : ''}
+                </aside>
+
+                <section class="blueprint-phone-shell" aria-label="שיחה טיפולית">
+                    <div class="blueprint-phone-card">
+                        <div class="blueprint-phone-head">
+                            <div>
+                                <span class="blueprint-panel-kicker">דיאלוג מונחה</span>
+                                <h3>מטפל/ת ↔ מטופל/ת</h3>
+                            </div>
+                            <span class="blueprint-phone-status">${esc(view.activeNode ? `שאלה פתוחה: ${view.activeNode.label}` : 'ממתין לבחירת צומת')}</span>
+                        </div>
+                        <div class="blueprint-chat-thread" data-blueprint-chat-thread="1" role="log" aria-live="polite">
+                            ${view.messages.map(bubble).join('')}
+                        </div>
+                        <form class="blueprint-composer" data-blueprint-composer="1">
+                            <textarea name="reply"
+                                      rows="${view.rawStatement ? 2 : 3}"
+                                      placeholder="${esc(view.composerPlaceholder)}"
+                                      ${view.composerEnabled ? '' : 'disabled'}></textarea>
+                            <div class="blueprint-composer-footer">
+                                <span class="blueprint-composer-hint">${esc(view.composerHint)}</span>
+                                <button type="submit" class="btn btn-primary" ${view.composerEnabled ? '' : 'disabled'}>${esc(view.rawStatement ? 'שמור תשובה' : 'שמור משפט')}</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <aside class="blueprint-stage-card blueprint-stage-card--feedback">
+                    <span class="blueprint-panel-kicker">משוב מאמן</span>
+                    <h3>מה איכות המהלך כרגע</h3>
+                    <p class="blueprint-stage-note">${esc(view.lastOrderNote)}</p>
+                    <div class="blueprint-feedback-grid">
+                        <div><strong>${esc(String(view.data.completedNodes))}</strong><span>צמתים מלאים</span></div>
+                        <div><strong>${esc(String(view.data.partialNodes))}</strong><span>צמתים חלקיים</span></div>
+                        <div><strong>${esc(String(view.orderScore))}%</strong><span>איכות סדר</span></div>
+                    </div>
+                    <div class="blueprint-stage-highlight blueprint-stage-highlight--soft">
+                        <span>${view.activeNode ? 'הצומת הפעיל' : 'איך עובדים'}</span>
+                        <strong>${esc(view.activeNode ? view.activeNode.label : 'הצ׳אט לא חופשי לגמרי')}</strong>
+                        <p>${esc(view.activeNode ? view.activeNode.help : 'המפה מייצרת את השאלה, הצ׳אט מחזיק את התשובה, והסיכום נבנה משניהם יחד.')}</p>
+                    </div>
+                </aside>
+            </section>
+
+            <section class="blueprint-flow-shell" aria-label="מפת פעולה אינטראקטיבית">
+                <div class="blueprint-section-head">
+                    <div>
+                        <span class="blueprint-panel-kicker">TOTE / Action Flow</span>
+                        <h3>המפה שמייצרת את השאלות</h3>
+                    </div>
+                    <div class="blueprint-flow-legend" aria-hidden="true">
+                        <span data-tone="locked">נעול</span>
+                        <span data-tone="available">זמין</span>
+                        <span data-tone="partial">חלקי</span>
+                        <span data-tone="complete">מלא</span>
+                    </div>
+                </div>
+                <div class="blueprint-flow-board">
+                    ${view.nodes.map(nodeCard).join('')}
+                </div>
+            </section>
+
+            <section class="blueprint-summary-shell ${view.summaryReady ? 'is-ready' : 'is-building'}" aria-label="מפת פעולה סופית">
+                <div class="blueprint-section-head">
+                    <div>
+                        <span class="blueprint-panel-kicker">המפה שבנינו</span>
+                        <h3>סיכום מהלך / תוכנית ביצוע</h3>
+                    </div>
+                    <span class="blueprint-summary-state">${esc(view.summaryReady ? 'מוכן לביצוע' : 'עדיין בבנייה')}</span>
+                </div>
+                <div class="blueprint-commitment-banner">
+                    <span class="blueprint-panel-kicker">משפט מחויבות קצר</span>
+                    <strong>${esc(view.data.conciseCommitment)}</strong>
+                </div>
+                <div id="final-blueprint" class="blueprint-summary-grid">
+                    ${summaryCard('המשפט הגולמי', view.data.rawStatement, 'מאיפה יצאנו', 'raw')}
+                    ${summaryCard('היעד שעבר טרנספורמציה', view.data.transformedOutcome, 'מה רוצים שיקרה במקום', 'success')}
+                    ${summaryCard('הפעולה הנראית', view.data.visibleAction, 'מה אפשר לראות או לשמוע במציאות', 'default')}
+                    ${summaryCard('המניע הרגשי', view.data.emotionalLever, 'למה זה באמת חשוב', 'default')}
+                    ${summaryCard('החסם הצפוי', view.data.obstacles, 'איפה זה עלול להיתקע', 'warn')}
+                    ${summaryCard('חלופה / Plan B', view.data.alternatives, 'מה עושים אם יש תקיעה', 'info', 'if-stuck-content')}
+                    ${summaryCard('תנאי ביצוע', view.data.executionConditions, 'מתי, איפה ועם מי זה קורה', 'default')}
+                    ${summaryCard('הצעד הראשון', view.data.firstStep, 'הצעד הכי קטן שאפשר לבצע עכשיו', 'success', 'next-physical-action')}
+                    ${summaryCard('בדיקת סיום', view.data.finalTest, 'איך נדע שהתוכנית ברורה, מציאותית ומדידה', 'default')}
+                </div>
+                <div class="blueprint-summary-note">${esc(view.data.therapistSummary)}</div>
+                <div class="blueprint-action-row">
+                    <button id="export-json-btn" type="button" class="btn btn-secondary" data-blueprint-action="export">📥 ייצא JSON</button>
+                    <button id="start-over-btn" type="button" class="btn btn-secondary" data-blueprint-action="reset">🔄 מהלך חדש</button>
+                    <button id="do-it-now-btn" type="button" class="btn btn-primary" data-blueprint-action="start">⏱️ להתחיל בצעד הראשון</button>
+                </div>
+            </section>
+        `;
+        window.requestAnimationFrame(() => {
+            const thread = root.querySelector('[data-blueprint-chat-thread="1"]');
+            if (thread) thread.scrollTop = thread.scrollHeight;
+        });
+        return true;
+    }
+
+    function handleClick(event) {
+        const nodeButton = event.target.closest('[data-blueprint-node]');
+        if (nodeButton) {
+            askNode(clean(nodeButton.getAttribute('data-blueprint-node')));
+            return;
+        }
+        const actionButton = event.target.closest('[data-blueprint-action]');
+        if (!actionButton) return;
+        const action = clean(actionButton.getAttribute('data-blueprint-action'));
+        if (action === 'reset') return reset();
+        if (action === 'export') return exportJson();
+        if (action === 'start') return startNow();
+    }
+
+    function handleSubmit(event) {
+        const form = event.target.closest('[data-blueprint-composer="1"]');
+        if (!form) return;
+        event.preventDefault();
+        submit(form.querySelector('textarea[name="reply"]')?.value || '');
+    }
+
+    function setup() {
+        root = document.getElementById(ROOT_ID);
+        if (!root) return false;
+        if (root.dataset.blueprintBound !== 'true') {
+            root.dataset.blueprintBound = 'true';
+            root.addEventListener('click', handleClick);
+            root.addEventListener('submit', handleSubmit);
+        }
+        if (!state) state = initialState();
+        return render();
+    }
+
+    function reset() {
+        state = initialState();
+        return render();
+    }
+
+    function startNow() {
+        const data = snapshot();
+        if (!data.firstStep) {
+            alert('כדי להתחיל עכשיו צריך קודם לסגור צעד ראשון ברור במפה.');
+            return false;
+        }
+        alert(`מתחילים עכשיו.\n\nהצעד הראשון שלך: ${data.firstStep}\n\nהחזיקו את הכיוון: ${data.desiredOutcome || data.transformedOutcome}`);
+        return true;
+    }
+
+    function exportJson() {
+        const data = snapshot();
+        if (!data.rawStatement) {
+            alert('כדאי להתחיל ממשפט גולמי אחד לפני ייצוא.');
+            return false;
+        }
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `blueprint_${Date.now()}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+        return true;
+    }
+
+    window.BlueprintDialogueBuilder = Object.freeze({
+        setup,
+        reset,
+        snapshot,
+        exportJson,
+        startNow,
+        askNode,
+        goToRecommended: function () {
+            const nextId = recommendedNextId();
+            if (nextId) askNode(nextId);
+            return nextId;
+        },
+        buildTherapistSummary: therapistSummary,
+        buildGuidedImagery: guidedImagery
+    });
+})();
