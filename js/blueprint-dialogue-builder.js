@@ -1024,6 +1024,7 @@
                 </header>
                 <div class="tote-stage-body"${stage.open ? '' : ' hidden'}>
                     ${stage.nodes.map(toteNode).join('')}
+                    ${stage.id === 'exit' ? '<button type="button" class="tote-node tote-node--action" data-blueprint-action="summary">🗺️ Generate Action Map</button>' : ''}
                 </div>
             </article>
         `).join('');
