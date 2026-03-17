@@ -404,19 +404,11 @@
         "description": "לוקחים את הדיוק לשיחה הבאה."
       }
     ],
-    "supportRailMode": "dialogue-meta",
     "settingsGroups": [
       "domain-focus",
       "difficulty",
       "session-load",
       "helpers"
-    ],
-    "mobilePriorityOrder": [
-      "start",
-      "purpose",
-      "helper-steps",
-      "main",
-      "support"
     ],
     "wrapper": {
       "pageTitle": "Scenario Trainer - Meta Model Dialogue Simulator",

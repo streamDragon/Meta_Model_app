@@ -376,9 +376,13 @@
         };
         const greenBlueprint = rawScenario?.greenBlueprint && typeof rawScenario.greenBlueprint === 'object' ? rawScenario.greenBlueprint : {};
         const microPlan = rawScenario?.microPlan && typeof rawScenario.microPlan === 'object' ? rawScenario.microPlan : {};
+        const coverImage = normalizeText(rawScenario?.coverImage || rawScenario?.sceneArt, '');
+        const sceneArt = normalizeText(rawScenario?.sceneArt || rawScenario?.coverImage, '');
+        const storySlides = normalizeStorySlides({ ...rawScenario, coverImage, sceneArt }, responseSet, metaModelCore);
         return {
             ...rawScenario,
             scenarioId: normalizeText(rawScenario?.scenarioId || rawScenario?.id, `scenario_${index + 1}`),
+            slug: normalizeText(rawScenario?.slug || rawScenario?.scenarioId || rawScenario?.id, `scenario_${index + 1}`),
             title: normalizeText(rawScenario?.sceneTitle || rawScenario?.title, `סצנה ${index + 1}`),
             sceneTitle: normalizeText(rawScenario?.sceneTitle || rawScenario?.title, `סצנה ${index + 1}`),
             domain: normalizeText(rawScenario?.domain, 'general'),
@@ -390,6 +394,9 @@
             },
             contextIntro: normalizeText(rawScenario?.contextIntro || rawScenario?.story?.[0], ''),
             openingLine: normalizeText(rawScenario?.openingLine || rawScenario?.story?.[1], ''),
+            coverImage,
+            sceneArt,
+            storySlides,
             humanNeed: normalizeText(rawScenario?.humanNeed, 'יש כאן צורך בקשר ובהירות במקום לחץ.'),
             surfaceConflict: normalizeText(rawScenario?.surfaceConflict, normalizeText(rawScenario?.sceneTitle || rawScenario?.title, '')),
             learningFocus: normalizeText(rawScenario?.learningFocus, `כאן מתרגלים איך לקחת את "${metaModelCore.unspecifiedVerb}" ולתרגם אותו למה שאפשר לזהות ולבדוק במציאות.`),
@@ -474,7 +481,6 @@
     }
 
     function openScreen(screenId, options = {}) {
-        if (screenId !== SCREEN_IDS.play) state.previewedOptionId = '';
         state.screen = screenId;
         render();
         if (options.scrollTarget) {
@@ -511,9 +517,9 @@
             completed: []
         };
         state.activeScenario = queue[0];
+        state.activeStorySlideId = normalizeText(queue[0]?.storySlides?.[0]?.id, 'setup');
         state.selectedOption = null;
         state.lastEntry = null;
-        state.previewedOptionId = '';
         state.selectedPrismId = '';
         openScreen(SCREEN_IDS.play);
     }
@@ -533,32 +539,20 @@
             : [];
     }
 
-    function isTouchPreviewMode() {
-        const coarsePointer = !!(window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches);
-        const mobileUserAgent = /Android|webOS|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
-        const hasTouch = (navigator.maxTouchPoints || 0) > 0 || ('ontouchstart' in window) || mobileUserAgent;
-        return mobileUserAgent || (coarsePointer && hasTouch);
+    function getScenarioStorySlides(scenario) {
+        return Array.isArray(scenario?.storySlides) ? scenario.storySlides.filter(Boolean) : [];
     }
 
-    function supportsHoverPreview() {
-        return !isTouchPreviewMode();
+    function getActiveStorySlide(scenario) {
+        const slides = getScenarioStorySlides(scenario);
+        return slides.find((slide) => slide.id === state.activeStorySlideId) || slides[0] || null;
     }
 
-    function setPreviewedOption(optionId) {
-        const nextId = normalizeText(optionId, '');
-        if (state.previewedOptionId === nextId) return;
-        state.previewedOptionId = nextId;
+    function setActiveStorySlide(slideId) {
+        const nextId = normalizeText(slideId, '');
+        if (!nextId || state.activeStorySlideId === nextId) return;
+        state.activeStorySlideId = nextId;
         render();
-    }
-
-    function clearPreviewedOption() {
-        if (!state.previewedOptionId) return;
-        state.previewedOptionId = '';
-        render();
-    }
-
-    function getScenarioPlayPreviewOption(scenario) {
-        return getScenarioPlayOptions(scenario).find((option) => option.id === state.previewedOptionId) || null;
     }
 
     function getScenarioSpeechLine(scenario) {
@@ -728,7 +722,6 @@
         const option = allOptions.find((item) => item.id === optionId);
         if (!option) return;
         state.selectedOption = option;
-        state.previewedOptionId = '';
         state.selectedPrismId = '';
         openScreen(SCREEN_IDS.feedback);
     }
@@ -794,6 +787,7 @@
             state.lastEntry = null;
             state.selectedOption = null;
             state.activeScenario = null;
+            state.activeStorySlideId = '';
             openScreen(SCREEN_IDS.home);
             return;
         }
@@ -801,6 +795,7 @@
         if (isLast) {
             state.session = null;
             state.activeScenario = null;
+            state.activeStorySlideId = '';
             state.selectedOption = null;
             state.lastEntry = null;
             showToast('הסשן הסתיים. אפשר להתחיל סשן חדש.');
@@ -809,9 +804,9 @@
         }
         state.session.index += 1;
         state.activeScenario = state.session.queue[state.session.index];
+        state.activeStorySlideId = normalizeText(state.activeScenario?.storySlides?.[0]?.id, 'setup');
         state.selectedOption = null;
         state.lastEntry = null;
-        state.previewedOptionId = '';
         state.selectedPrismId = '';
         openScreen(SCREEN_IDS.play);
     }
@@ -1080,13 +1075,36 @@
     }
 
     function render() {
-        mount.innerHTML = renderApp();
+        mount.innerHTML = renderAppV2();
+    }
+
+    function renderAppV2() {
+        const isPlayScreen = state.screen === SCREEN_IDS.play;
+        return `
+          <div id="scenario-trainer" class="scenario-platform-root" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id="scenario-trainer" data-screen="${state.screen}">
+            ${isPlayScreen ? renderPlayTopBar() : ''}
+            ${state.screen !== SCREEN_IDS.home && !isPlayScreen ? `
+            <div class="scenario-session-bar" role="toolbar" aria-label="ניהול סשן">
+              <span class="scenario-session-bar-info">
+                ${state.session ? `סצנה ${escapeHtml(String(state.session.index + 1))}/${escapeHtml(String(state.session.queue.length))} · ${escapeHtml(String(state.session.score))} נק׳` : ''}
+              </span>
+              <button type="button" class="scenario-session-bar-end" data-scenario-action="go-home">חזרה לבית</button>
+            </div>` : ''}
+            <div class="scenario-standalone-shell ${isPlayScreen ? 'scenario-standalone-shell--play' : ''}">
+              <main class="scenario-main-area scenario-standalone-main" data-trainer-zone="main">
+                ${renderMain()}
+              </main>
+            </div>
+            ${state.settingsOpen ? renderSettingsModal() : ''}
+            ${state.toastMessage ? `<div class="scenario-toast">${escapeHtml(state.toastMessage)}</div>` : ''}
+          </div>
+        `;
     }
 
     function renderApp() {
         const isPlayScreen = state.screen === SCREEN_IDS.play;
         return `
-          <div id="scenario-trainer" class="scenario-platform-root" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id="scenario-trainer" data-screen="${state.screen}" data-trainer-mobile-order="${escapeHtml(getMobileOrderAttr())}">
+          <div id="scenario-trainer" class="scenario-platform-root" dir="rtl" lang="he" data-trainer-platform="1" data-trainer-id="scenario-trainer" data-screen="${state.screen}">
             ${isPlayScreen ? '' : `
             <div class="scenario-summary-strip" data-trainer-zone="start">
               <div class="scenario-summary-pill" data-trainer-summary="current">${escapeHtml(getCurrentSummary())}</div>
@@ -1127,7 +1145,7 @@
         }
         switch (state.screen) {
             case SCREEN_IDS.play:
-                return renderPlayScreen();
+                return renderPlayScreenV2();
             case SCREEN_IDS.feedback:
                 return renderFeedbackScreen();
             case SCREEN_IDS.blueprint:
@@ -1139,7 +1157,7 @@
             case SCREEN_IDS.help:
                 return renderHelpScreen();
             default:
-                return renderHomeScreen();
+                return renderHomeScreenV2();
         }
     }
 
@@ -1418,7 +1436,7 @@
 
     function renderPlayScreen() {
         const scenario = state.activeScenario || state.session?.queue?.[state.session.index];
-        if (!scenario) return renderHomeScreen();
+        if (!scenario) return renderHomeScreenV2();
         const options = getScenarioPlayOptions(scenario);
         const currentIndex = (state.session?.index || 0) + 1;
         const total = state.session?.queue?.length || 0;
@@ -1458,6 +1476,206 @@
         `;
     }
 
+    function renderStageImage(frame, scenario) {
+        const src = normalizeText(frame?.image || scenario?.coverImage || scenario?.sceneArt, '');
+        const fallback = normalizeText(scenario?.sceneArt || scenario?.coverImage, '');
+        if (!src && !fallback) {
+            return `<div class="scenario-story-stage-image scenario-story-stage-image--placeholder" aria-hidden="true"></div>`;
+        }
+        const resolvedSrc = src || fallback;
+        const onError = fallback && fallback !== resolvedSrc
+            ? `this.onerror=null;this.src='${escapeHtml(fallback)}';`
+            : '';
+        return `<img class="scenario-story-stage-image" src="${escapeHtml(resolvedSrc)}" alt="${escapeHtml(frame?.title || scenario?.sceneTitle || '')}" loading="eager" decoding="async" ${onError ? `onerror="${onError}"` : ''} />`;
+    }
+
+    function renderStoryFrameChips(scenario, activeSlide) {
+        return getScenarioStorySlides(scenario).map((slide) => `
+          <button
+            type="button"
+            class="scenario-story-chip ${activeSlide?.id === slide.id ? 'is-active' : ''}"
+            data-scenario-action="pick-story-slide"
+            data-story-slide-id="${escapeHtml(slide.id)}"
+            aria-pressed="${activeSlide?.id === slide.id ? 'true' : 'false'}"
+          >${escapeHtml(slide.label)}</button>
+        `).join('');
+    }
+
+    function renderCompactPlayOption(option) {
+        const isGreen = Number(option.score) === 1;
+        const visual = getPlayOptionVisual(option, isGreen);
+        return `
+          <button
+            type="button"
+            class="scenario-compact-option ${isGreen ? 'is-green' : 'is-red'}"
+            data-scenario-action="pick-option"
+            data-option-id="${escapeHtml(option.id)}"
+            data-option-tone="${escapeHtml(getOptionToneGroup(option?.tone, isGreen))}"
+          >
+            <span class="scenario-compact-option-head">
+              <span class="scenario-compact-option-icon" aria-hidden="true">${escapeHtml(visual.icon)}</span>
+              <span class="scenario-compact-option-label">${escapeHtml(toneLabel(option, isGreen))}</span>
+            </span>
+            <span class="scenario-compact-option-text">${escapeHtml(option.speakerLine)}</span>
+            <span class="scenario-compact-option-note">${escapeHtml(trimText(option.choiceHint || visual.support, 84))}</span>
+          </button>
+        `;
+    }
+
+    function renderHomeScreenV2() {
+        const hasHistory = state.progress.completed > 0;
+        const previewScenario = getHomePreviewScenario(state.homeFilters);
+        const processSteps = Array.isArray(trainerContract.processSteps) ? trainerContract.processSteps : [];
+        return `
+          <section class="scenario-workspace-card scenario-home-card scenario-home-card--landing">
+            <div class="scenario-home-hero scenario-home-hero--landing">
+              <p class="scenario-panel-kicker">Scenario Simulator</p>
+              <h2>סימולטור הסצנות</h2>
+              <p class="scenario-home-hero-subtitle">נכנסים לסיטואציה אנושית, רואים איך היא בנויה, ורק אז בוחרים תגובה.</p>
+              <p class="scenario-home-hero-note">כל ההסבר וההגדרות נשארים כאן. בזמן הריצה המסך מתפקס רק בסיפור הפעיל.</p>
+            </div>
+
+            <section class="scenario-home-setup-card">
+              <div class="scenario-home-setup-head">
+                <div>
+                  <p class="scenario-panel-kicker">הגדרות פתיחה</p>
+                  <h3>${escapeHtml(getCurrentSummary())}</h3>
+                </div>
+                ${hasHistory ? `<button type="button" class="btn btn-secondary" data-scenario-action="open-history">היסטוריה (${escapeHtml(state.progress.completed)})</button>` : ''}
+              </div>
+              <div class="scenario-home-filter-row">
+                <label for="scenario-domain-select">תחום</label>
+                <select id="scenario-domain-select">${renderDomainOptions(state.homeFilters.domain)}</select>
+                <label for="scenario-difficulty-select">רמה</label>
+                <select id="scenario-difficulty-select">${renderDifficultyOptions(state.homeFilters.difficulty)}</select>
+                <label for="scenario-run-size">אורך סשן</label>
+                <input type="range" id="scenario-run-size" min="3" max="10" value="${escapeHtml(state.homeFilters.runSize)}" />
+                <span class="scenario-home-range-value">${escapeHtml(state.homeFilters.runSize)} סצנות</span>
+              </div>
+              <div class="scenario-home-cta-row">
+                <button id="scenario-start-run-btn" type="button" class="btn btn-primary" data-trainer-action="start-session">התחל סשן</button>
+                <button type="button" class="btn btn-secondary" data-trainer-action="open-settings">הגדרות</button>
+              </div>
+              ${hasHistory ? `
+              <div class="scenario-home-stats-row">
+                <span>${escapeHtml(state.progress.greenCount)} ירוקות</span>
+                <span>רצף: ${escapeHtml(state.progress.currentGreenStreak)}</span>
+                <span>שיא: ${escapeHtml(state.progress.bestGreenStreak)}</span>
+              </div>` : ''}
+            </section>
+
+            ${previewScenario ? `
+            <section class="scenario-home-preview-card">
+              <div class="scenario-home-preview-copy">
+                <p class="scenario-panel-kicker">הצצה לסשן</p>
+                <h3>${escapeHtml(previewScenario.sceneTitle)}</h3>
+                <p>${escapeHtml(previewScenario.contextIntro)}</p>
+                ${previewScenario.openingLine ? `<blockquote class="scenario-home-example-quote">"${escapeHtml(previewScenario.openingLine)}"</blockquote>` : ''}
+              </div>
+              <div class="scenario-home-preview-media">
+                ${renderStageImage({ image: previewScenario.coverImage || previewScenario.sceneArt, title: previewScenario.sceneTitle }, previewScenario)}
+              </div>
+            </section>` : ''}
+
+            <div class="scenario-home-details-grid">
+              <details class="scenario-home-details">
+                <summary>מה זה הפיצ'ר</summary>
+                <div class="scenario-home-details-body">
+                  <p>זהו אימון תגובה חי. לא עוד עמוד הסבר ארוך, אלא כניסה לסצנה, זיהוי עומס, ובחירת תגובה שבונה בהירות במקום לייצר עוד לחץ.</p>
+                </div>
+              </details>
+              <details class="scenario-home-details">
+                <summary>איך זה עובד</summary>
+                <div class="scenario-home-details-body">
+                  ${processSteps.map((step) => `
+                    <div class="scenario-home-process-step">
+                      <strong>${escapeHtml(step.label)}</strong>
+                      <span>${escapeHtml(step.description)}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </details>
+              <details class="scenario-home-details">
+                <summary>דוגמה קצרה</summary>
+                <div class="scenario-home-details-body">
+                  <p>בשלב הריצה תרא/י סטייג' קבוע עם פריימים של הסיפור. הצ'יפים למטה מחליפים זווית הסתכלות בלי לפתוח בלוקים ענקיים ובלי לקפוץ במסך.</p>
+                </div>
+              </details>
+              <details class="scenario-home-details">
+                <summary>מה מרוויחים</summary>
+                <div class="scenario-home-details-body">
+                  <ul class="scenario-support-list">
+                    <li>לזהות איפה הסצנה ננעלת ולא רק מי צודק.</li>
+                    <li>לראות מה חסר לפני שממהרים לענות.</li>
+                    <li>לשמור על מסך ריצה נקי שמחזיק רק את הסיפור הפעיל.</li>
+                  </ul>
+                </div>
+              </details>
+            </div>
+          </section>
+        `;
+    }
+
+    function renderPlayScreenV2() {
+        const scenario = state.activeScenario || state.session?.queue?.[state.session.index];
+        if (!scenario) return renderHomeScreenV2();
+        const options = getScenarioPlayOptions(scenario);
+        const currentIndex = (state.session?.index || 0) + 1;
+        const total = state.session?.queue?.length || 0;
+        const progress = total > 0 ? Math.round(((currentIndex - 1) / total) * 100) : 0;
+        const activeSlide = getActiveStorySlide(scenario);
+        return `
+          <section class="scenario-play-view scenario-play-view--story" data-scenario-stage="1" data-domain="${escapeHtml(scenario.domain)}">
+            <article class="scenario-story-stage" data-domain="${escapeHtml(scenario.domain)}" style="--scenario-progress:${escapeHtml(progress)}%">
+              <div class="scenario-story-stage-media">
+                ${renderStageImage(activeSlide, scenario)}
+              </div>
+              <div class="scenario-story-stage-body">
+                <div class="scenario-story-stage-head">
+                  <p class="scenario-play-scene-kicker">${escapeHtml(`${scenario.domainLabel} · ${scenario.role.player} מול ${scenario.role.other}`)}</p>
+                  <h2>${escapeHtml(scenario.sceneTitle)}</h2>
+                  <p class="scenario-story-stage-context">${escapeHtml(scenario.contextIntro)}</p>
+                </div>
+                <div class="scenario-story-frame-card">
+                  <div class="scenario-story-frame-copy">
+                    <p class="scenario-panel-kicker">${escapeHtml(activeSlide?.label || 'פריים פעיל')}</p>
+                    <h3>${escapeHtml(activeSlide?.title || scenario.sceneTitle)}</h3>
+                    <p>${escapeHtml(activeSlide?.caption || scenario.surfaceConflict)}</p>
+                    ${activeSlide?.quote ? `<blockquote class="scenario-story-quote">"${escapeHtml(activeSlide.quote)}"</blockquote>` : ''}
+                  </div>
+                  <div class="scenario-story-focus-box">
+                    <span class="scenario-story-focus-label">מה מחפשים עכשיו</span>
+                    <strong>${escapeHtml(scenario.metaModelCore.hiddenGap)}</strong>
+                    <span>${escapeHtml(scenario.deepeningQuestion)}</span>
+                  </div>
+                </div>
+                <div class="scenario-story-chip-row" role="tablist" aria-label="פריימים של הסיפור">
+                  ${renderStoryFrameChips(scenario, activeSlide)}
+                </div>
+              </div>
+            </article>
+
+            <section class="scenario-play-options-card">
+              <div class="scenario-play-options-head">
+                <p class="scenario-panel-kicker">בחירת תגובה</p>
+                <h3>מה תגיד/י עכשיו?</h3>
+                <p>הסיפור נשאר קבוע למעלה. התגובה שבוחרים כאן קובעת איך הסצנה תזוז הלאה.</p>
+              </div>
+              <div class="scenario-compact-options-grid">
+                ${options.map((option) => renderCompactPlayOption(option)).join('')}
+              </div>
+              <details class="scenario-meta-accordion scenario-meta-accordion--inline">
+                <summary>מה בודקים בסצנה הזאת</summary>
+                <div class="scenario-meta-accordion-body">
+                  <p>${escapeHtml(scenario.learningFocus)}</p>
+                  <p><strong>שאלת דיוק:</strong> ${escapeHtml(scenario.deepeningQuestion)}</p>
+                </div>
+              </details>
+            </section>
+          </section>
+        `;
+    }
+
     /* renderFeedbackActionBar — removed: action bar is now inline in renderFeedbackScreen */
 
     function renderBlueprintDetails(scenario, isGreen) {
@@ -1483,7 +1701,7 @@
     function renderFeedbackScreen(forceAnalysisOpen = false) {
         const scenario = state.activeScenario;
         const option = state.selectedOption;
-        if (!scenario || !option) return renderPlayScreen();
+        if (!scenario || !option) return renderPlayScreenV2();
         const isGreen = Number(option.score) === 1;
         const guide = buildFeedbackGuide(scenario, option, isGreen);
         const analysisOpen = !!forceAnalysisOpen;
@@ -1639,7 +1857,7 @@
 
     function renderScoreScreen() {
         const entry = state.lastEntry;
-        if (!entry || !state.session) return renderHomeScreen();
+        if (!entry || !state.session) return renderHomeScreenV2();
         const playedCount = state.session.index + 1;
         const starVisual = '⭐'.repeat(state.session.stars) + '☆'.repeat(Math.max(playedCount - state.session.stars, 0));
         const isLast = state.session.index >= state.session.queue.length - 1;
@@ -1717,14 +1935,9 @@
         if (trainerAction === 'save-start') return void saveSettingsFromDraft(true);
         if (scenarioAction === 'open-help') return void openScreen(SCREEN_IDS.help);
         if (scenarioAction === 'open-history') return void openScreen(SCREEN_IDS.history);
+        if (scenarioAction === 'pick-story-slide') return void setActiveStorySlide(button.getAttribute('data-story-slide-id'));
         if (scenarioAction === 'pick-option') {
             const optionId = button.getAttribute('data-option-id');
-            if (state.screen === SCREEN_IDS.play && isTouchPreviewMode()) {
-                if (state.previewedOptionId !== optionId) {
-                    setPreviewedOption(optionId);
-                    return;
-                }
-            }
             return void pickOption(optionId);
         }
         if (scenarioAction === 'show-blueprint') return void toggleBlueprintScreen();
