@@ -59,6 +59,9 @@ interface TrainerPlatformShellProps {
   purposeTitle: string;
   purposeBody: React.ReactNode;
   purposeTags?: React.ReactNode;
+  problemKicker?: string;
+  problemTitle?: string;
+  problemBody?: React.ReactNode;
   startKicker: string;
   startTitle: string;
   startBody: React.ReactNode;
@@ -84,6 +87,9 @@ export function TrainerPlatformShell({
   purposeTitle,
   purposeBody,
   purposeTags,
+  problemKicker,
+  problemTitle,
+  problemBody,
   startKicker,
   startTitle,
   startBody,
@@ -139,6 +145,14 @@ export function TrainerPlatformShell({
             {startMeta ? <div className="trp-chip-row">{startMeta}</div> : null}
           </aside>
         </section>
+
+        {problemBody ? (
+          <section className="trp-problem-card">
+            {problemKicker ? <span className="trp-kicker">{problemKicker}</span> : null}
+            {problemTitle ? <strong className="trp-problem-title">{problemTitle}</strong> : null}
+            <div className="trp-problem-body">{problemBody}</div>
+          </section>
+        ) : null}
 
         {clarityCards.length ? (
           <section className="trp-clarity-strip" aria-label="בהירות לפני התחלה">

@@ -222,6 +222,7 @@ const FEATURE_ONBOARDING_COPY = Object.freeze({
         icon: '🧩',
         kicker: 'תרגול זיהוי',
         what: 'כאן מזהים אם המשפט מחסיר מידע, מעוות פירוש, או מכליל יותר מדי.',
+        problem: 'הבעיה היא שמשפט נשמע "לא מדויק", אבל בלי שם לדפוס קשה לדעת מה בדיוק חסר, מה הוכלל, או איזה פירוש הודבק לעובדה.',
         steps: Object.freeze(['קראו משפט אחד', 'בחרו סוג דפוס', 'לחצו "בדוק" וקראו את הנימוק']),
         success: 'הצלחה היא להבין למה זו הקטגוריה, לא רק לפגוע בתשובה.',
         termKeys: Object.freeze(['deletion', 'distortion', 'generalization'])
@@ -230,6 +231,7 @@ const FEATURE_ONBOARDING_COPY = Object.freeze({
         icon: '🎯',
         kicker: 'תרגול מהיר',
         what: 'כאן עובדים במהירות: משפט מודגש, בחירת תבנית, משוב מיידי.',
+        problem: 'הבעיה היא שבזמן אמת הדפוס חולף מהר, והתגובה האוטומטית קודמת לזיהוי מדויק של מה באמת סגור במשפט.',
         steps: Object.freeze(['בוחרים מצב לימוד/מבחן', 'לוחצים על התבנית של הביטוי המודגש', 'ממשיכים לסבב הבא']),
         success: 'הצלחה היא לזהות עקבי תחת זמן, בלי ניחוש.',
         termKeys: Object.freeze(['distortion', 'generalization'])
@@ -238,6 +240,7 @@ const FEATURE_ONBOARDING_COPY = Object.freeze({
         icon: '📡',
         kicker: 'מכ״ם שלשות',
         what: 'כאן ממיינים משפט ל-5 כיווני חשיבה, ואז מדייקים לתבנית הנכונה בתוך הכיוון.',
+        problem: 'הבעיה היא שרואים שיש משהו בעייתי במשפט, אבל לא ברור מאיזה כיוון להתחיל: מחיקה, עיוות או הכללה, ואיזו שאלה לפתוח קודם.',
         steps: Object.freeze(['בחרו מצב: פרטים או כללים', 'זהו את הכיוון המרכזי', 'דייקו לתבנית בתוך השורה']),
         success: 'הצלחה היא לזהות כיוון ואז תבנית, בשני שלבים ברורים.',
         termKeys: Object.freeze(['deletion', 'distortion', 'generalization'])
@@ -246,6 +249,7 @@ const FEATURE_ONBOARDING_COPY = Object.freeze({
         icon: '🗺️',
         kicker: 'ממפים לפני שינוי',
         what: 'כאן ממפים קודם מה קרה בפועל, מה הסיפור הפנימי, ומה המשפט עושה בתוך הקשר, ורק אחר כך בוחרים התערבות.',
+        problem: 'הבעיה היא שקופצים ישר לתקן או לאתגר, לפני שמבינים מה באמת קרה בחוץ, מה נחווה בפנים, ומה המשפט מנסה לעשות בקשר.',
         steps: Object.freeze(['בחרו מקרה', 'פתחו את שלוש השכבות', 'אתרו מוקד חם ואז עברו להתערבות וניסוח חדש']),
         success: 'הצלחה היא להבין איפה הלב של המקרה נמצא, לא רק לתפוס "טעות" בשפה.',
         termKeys: Object.freeze(['congruence', 'insight'])
@@ -254,6 +258,7 @@ const FEATURE_ONBOARDING_COPY = Object.freeze({
         icon: '🌉',
         kicker: 'גשר תחושה-שפה',
         what: 'כאן מחברים משפט, מציאות פנימית ומציאות חיצונית עד שמרגיש "כן, זה זה".',
+        problem: 'הבעיה היא שיש פער בין מה שנאמר, מה שקרה בפועל, ומה שנחווה בפנים, ואז המשפט שנשאר ביד מרגיש לא מדויק ולא מחזיק.',
         steps: Object.freeze(['מנסחים מה נאמר', 'אוספים מה קורה בחוץ ומה קורה בפנים', 'בונים משפט גשר ובודקים עד כמה הוא יושב']),
         success: 'הצלחה היא משפט שמחזיק גם פנים וגם חוץ בלי למחוק אף צד.',
         termKeys: Object.freeze(['congruence', 'insight'])
@@ -262,6 +267,7 @@ const FEATURE_ONBOARDING_COPY = Object.freeze({
         icon: '💬',
         kicker: 'סימולטור קומיקס',
         what: 'כאן בוחרים תגובה בזמן אמת ורואים איך המילים מזיזות זרימה, סוכנות, בושה ותגובתיות.',
+        problem: 'הבעיה היא שברגע טעון בוחרים תגובה אוטומטית מתוך לחץ, ואז השיחה מסלימה או נסגרת לפני שנוצרה בהירות.',
         steps: Object.freeze(['בחרו תגובה', 'כתבו משפט המשך קצר', 'בדקו משוב והשוו לאפשרות אחרת']),
         success: 'הצלחה היא להפחית תגובתיות ולהגדיל בהירות וקשר.',
         termKeys: Object.freeze(['reactivity'])
@@ -270,6 +276,7 @@ const FEATURE_ONBOARDING_COPY = Object.freeze({
         icon: '🔬',
         kicker: 'מעבדה',
         what: 'כאן מפרקים מילה אחת לשכבות חשיבה ובונים צעד המשך מעשי.',
+        problem: 'הבעיה היא שמושג אחד גדול או הכרח אחד סגור תופסים את כל התמונה, בלי לראות באיזו רמה זה יושב ואיפה כבר יש סדק שאפשר לעבוד איתו.',
         steps: Object.freeze(['בחרו פריזמה', 'מלאו שכבות', 'בדקו מפה וצעד הבא']),
         success: 'הצלחה היא מיפוי ברור וצעד ראשון שניתן לבצע.',
         termKeys: Object.freeze(['insight'])
@@ -278,6 +285,7 @@ const FEATURE_ONBOARDING_COPY = Object.freeze({
         icon: '🧭',
         kicker: 'בונה מהלך',
         what: 'כאן הופכים פעולה עמומה לתכנית קצרה וברורה.',
+        problem: 'הבעיה היא שנשארים עם כוונה כללית או "צריך לעשות משהו", אבל בלי צעד ראשון ברור, תנאי התחלה וחלופה כשנתקעים.',
         steps: Object.freeze(['מנסחים פעולה', 'ממלאים שלבי תהליך', 'מסיימים עם חלופה ומדד הצלחה']),
         success: 'הצלחה היא לדעת מה עושים עכשיו, ולא רק מה רוצים שיקרה.',
         termKeys: Object.freeze([])
@@ -286,6 +294,7 @@ const FEATURE_ONBOARDING_COPY = Object.freeze({
         icon: '📚',
         kicker: 'מילון',
         what: 'כאן מחפשים קטגוריות, הסברים ודוגמאות לשאלות מדויקות.',
+        problem: 'הבעיה היא שכאשר לא זוכרים מה כל קטגוריה בודקת, קל להתבלבל בין מחיקה, עיוות והכללה ולשאול שאלה לא מדויקת.',
         steps: Object.freeze(['מחפשים מונח', 'פותחים קטגוריה', 'לוקחים שאלה אחת לשיחה בפועל']),
         success: 'הצלחה היא לצאת עם שאלה ישימה אחת לפחות.',
         termKeys: Object.freeze(['deletion', 'distortion', 'generalization'])
@@ -294,6 +303,7 @@ const FEATURE_ONBOARDING_COPY = Object.freeze({
         icon: '🧰',
         kicker: 'מרכז כלים',
         what: 'כאן בוחרים כלי אחד ועובדים בו ברצף בלי להעמיס את המסך הראשי.',
+        problem: 'הבעיה היא שפעלים כלליים כמו "להתקדם", "להסתדר" או "לכבד" נשמעים ברורים, אבל בלי פירוק אי אפשר לדעת מה לעשות בפועל.',
         steps: Object.freeze(['בחרו כלי', 'פתחו סשן', 'בדקו נתונים בסוף סבב']),
         success: 'הצלחה היא תרגול רציף בכלי אחד בכל פעם.',
         termKeys: Object.freeze([])
@@ -302,6 +312,7 @@ const FEATURE_ONBOARDING_COPY = Object.freeze({
         icon: 'ℹ️',
         kicker: 'מידע',
         what: 'כאן מקבלים הגדרות, גרסה והקשר של המוצר.',
+        problem: 'הבעיה היא שבלי הקשר ברור על מה המוצר עושה ואיך המסלולים מתחברים, קשה לבחור איפה להתחיל ואיך להשתמש בו נכון.',
         steps: Object.freeze(['קוראים תקציר', 'פותחים קטע רלוונטי', 'חוזרים לכלי התרגול המתאים']),
         success: 'הצלחה היא לבחור לאן ממשיכים מיד אחרי הקריאה.',
         termKeys: Object.freeze([])
@@ -6119,6 +6130,7 @@ function setupFeatureOnboardingCards() {
                 <h3 class="feature-onboarding-title">${escapeHtml(title)}</h3>
             </div>
             <p class="feature-onboarding-what"><strong>מה עושים כאן?</strong> ${escapeHtml(String(copy.what || '').trim())}</p>
+            ${copy.problem ? `<p class="feature-onboarding-problem"><strong>מה הבעיה שמנסים לפתור?</strong> ${escapeHtml(String(copy.problem || '').trim())}</p>` : ''}
             <div class="feature-onboarding-details">
                 <p><strong>שלבים עיקריים:</strong></p>
                 <ol class="feature-onboarding-steps">

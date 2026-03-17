@@ -2493,6 +2493,14 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
             <span className="it-chip">ענפים חלופיים: {state.scoreVariants}</span>
           </>
         }
+        problemKicker="מה הבעיה שמנסים לפתור?"
+        problemTitle="בלי מיון, מילה אחת גדולה סוגרת את החשיבה"
+        problemBody={
+          <p>
+            מילה או ביטוי אחד יכולים לגרור פירוש מהיר מדי, כאילו כבר ברור למה הכוונה.
+            כאן עוצרים לפני ההיצמדות לפירוש אחד, ובודקים איזה מבנה מחשבתי באמת נפתח ואילו חלופות עדיין חיות.
+          </p>
+        }
         startKicker={trainerContract.quickStartLabel}
         startTitle="העבודה יכולה להתחיל מיד"
         startBody={<p>המשפט הראשון, מצב הכניסה, ועזרי העבודה כבר מוכנים. ההגדרות רק מכוונות איך ייראה הסשן הבא.</p>}

@@ -21,6 +21,9 @@ export const TRAINER_PLATFORM_CSS = `
 .trp-hero{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:14px}
 .trp-purpose{display:grid;gap:12px;align-content:start;align-self:start}
 .trp-purpose-body{line-height:1.65;color:#334155}
+.trp-problem-card{border:1px solid #d6e4f4;border-radius:18px;background:linear-gradient(180deg,#f7fbff 0%,#ffffff 100%);padding:14px 16px;display:grid;gap:6px;color:#334155;line-height:1.65;box-shadow:0 12px 24px rgba(15,23,42,.04)}
+.trp-problem-title{font-size:.98rem;color:#0f172a}
+.trp-problem-body{color:#526173;line-height:1.65}
 .trp-start-strip{display:grid;gap:12px;align-content:start;align-self:start;border:1px solid #d7e5f5;background:linear-gradient(180deg,#ffffff 0%,#f7fbff 100%);border-radius:24px;padding:18px}
 .trp-start-copy{display:grid;gap:6px}
 .trp-clarity-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}

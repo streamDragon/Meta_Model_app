@@ -170,6 +170,7 @@ const LIVING_TRIPLES_WELCOME_META = Object.freeze({
   color: '#0f766e',
   soft: '#ddf6f1',
   description: 'אותו שלד פתיחה כמו שאר הפיצ׳רים: מבינים את המסלול, פותחים משפט חי, ואז נכנסים לטריינר עצמו.',
+  problem: 'הבעיה היא שכאשר נשארים עם דפוס אחד בלבד, מפספסים את המשפחה השלמה של השאלות שיכולה לפתוח את המשפט צעד אחר צעד.',
   entryCards: Object.freeze([
     Object.freeze({
       kicker: 'מה עושים כאן',
@@ -1302,6 +1303,7 @@ function buildOnboardingMarkup() {
               <p class="ltv3-welcome-note">${esc(returningLead)}</p>
             </div>
           </section>
+          ${LIVING_TRIPLES_WELCOME_META.problem ? `<section class="meta-feature-shell__problem-note"><span class="meta-feature-shell__problem-kicker">מה הבעיה שמנסים לפתור?</span><p>${esc(LIVING_TRIPLES_WELCOME_META.problem)}</p></section>` : ''}
           ${buildWelcomeEntryCardsMarkup()}
           ${buildWelcomeExampleMarkup()}
           ${buildWelcomeActionsMarkup()}

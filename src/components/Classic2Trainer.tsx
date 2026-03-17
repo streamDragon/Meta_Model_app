@@ -823,6 +823,14 @@ export default function Classic2Trainer(): React.ReactElement {
             <span className="c2n-chip">מתאים לדסקטופ ולמובייל</span>
           </>
         }
+        problemKicker="מה הבעיה שמנסים לפתור?"
+        problemTitle="בלי עין יציבה, הטקסט נשאר תחושה כללית"
+        problemBody={
+          <p>
+            כשקוראים טקסט דרך תחושה בלבד, קל לפספס איפה הקטגוריה באמת מופיעה, או לסמן משפטים שלא שייכים לה בכלל.
+            המסך הזה נועד להפוך זיהוי אינטואיטיבי לבדיקה מדויקת שאפשר לחזור עליה גם בטקסט הבא.
+          </p>
+        }
         startKicker={trainerContract.quickStartLabel}
         startTitle="אפשר להתחיל מיד"
         startBody={<p>Classic 2 נטען עם ברירות מחדל שמישות. ההגדרות הן התאמה אישית, לא שער כניסה.</p>}

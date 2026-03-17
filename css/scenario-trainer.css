@@ -38,7 +38,8 @@
     width: 100%;
 }
 
-.scenario-platform-support {
+.scenario-platform-support,
+.scenario-play-support {
     max-width: 740px;
     margin: 0 auto;
     display: flex;

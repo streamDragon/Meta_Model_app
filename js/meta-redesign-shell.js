@@ -10,7 +10,7 @@
     var MANAGED_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'about'];
     var FEATURE_CHROME_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'about'];
     var FAST_FEATURE_ENTRY_TABS = ['prismlab'];
-    var DIRECT_FEATURE_STAGE_TABS = ['prismlab'];
+    var DIRECT_FEATURE_STAGE_TABS = [];
     var HOME_VIEWS = ['home', 'stats', 'theory', 'settings', 'help'];
     var CTA_LABELS = ['יאללה, בואו נתחיל', 'אני מוכן — קדימה', 'בואו נצלול פנימה'];
     var QUESTION_PROMPTS = [
@@ -49,6 +49,7 @@
             icon: '🗺️', title: 'מפת המשפט', badge: 'למתחילים', tone: 'beginner', color: '#1D9E75', soft: '#E1F5EE',
             homeDescription: 'כאן לא ממהרים לאתגר. קודם ממפים מה קרה בחוץ, מה נהיה בפנים, ומה המשפט מנסה להשיג בקשר.',
             description: 'מפת המשפט מלמדת להחזיק יחד שלוש שכבות של אותה אמירה: מה ניתן לראות בפועל, מה נחשף על עולמו הפנימי של הדובר, ואיזה מהלך המשפט מנסה לייצר מול מי ששומע אותו. רק אחרי שיש מפה ברורה בוחרים מוקד, שאלה והתערבות.',
+            problem: 'הבעיה היא שקופצים ישר לתקן או לאתגר, לפני שמבינים מה באמת קרה בחוץ, מה נחווה בפנים, ומה המשפט מנסה לעשות בקשר.',
             entryCards: [
                 { kicker: 'מה ממפים', title: 'חוץ, פנים, ומה המשפט מנסה לעשות', body: 'אותו משפט יכול להיות בו-זמנית דיווח על אירוע, חשיפה של כאב או פחד, וגם ניסיון להשיג הכרה, הגנה או קרבה. כאן מפרידים ביניהם בלי למחוק אף שכבה.' },
                 { kicker: 'למה לא למהר', title: 'אתגור מוקדם מדי מפספס את לב המקרה', body: 'אם מתקנים מיד את הניסוח, לפעמים מאבדים את החוויה הפנימית או את הבקשה היחסית שמסתתרת מתחתיו. המיפוי עוזר לבחור התערבות שמתאימה למה שבאמת זקוק למענה.' },
@@ -91,6 +92,7 @@
             icon: '🧩', title: 'תרגול זיהוי', badge: 'לביניים', tone: 'intermediate', color: '#378ADD', soft: '#E6F1FB',
             homeDescription: 'תשמעו משפט — ותזהו מה מתחבא בתוכו. מחיקה? עיוות? הכללה? הבחירה שלכם.',
             description: 'שמעתם משפט? מצוין. עכשיו תגידו לנו — מה הדפוס שמסתתר בפנים? תרגול מהיר וממוקד.',
+            problem: 'הבעיה היא שמשפט נשמע "לא מדויק", אבל בלי שם לדפוס קשה לדעת מה בדיוק חסר, מה הוכלל, או איזה פירוש הודבק לעובדה.',
             entryCards: [
                 { kicker: 'מה עושים כאן', title: 'מזהים את הדפוס לפני שמגיבים', body: 'בכל סבב שומעים משפט אחד ובודקים איזה מבנה לשוני באמת פועל בו: הכללה, מחיקה, עיוות או שילוב ביניהם.' },
                 { kicker: 'למה לשים לב', title: 'לא לתוכן בלבד אלא לאופן שבו הוא נאמר', body: 'המשימה כאן היא לא להסכים או לא להסכים עם המשפט, אלא לזהות מה בשפה הופך אותו לסגור, כוללני או מטעה.' },
@@ -119,6 +121,7 @@
             icon: '📡', title: 'מכ״ם שלשות', badge: 'לביניים', tone: 'advanced', color: '#7F77DD', soft: '#EEEDFE',
             homeDescription: 'כל משפט מסתיר משפחה שלמה של דפוסים. כאן תלמדו לגלות את כולם, לא רק אחד.',
             description: 'ברמה הזו לא מחפשים דפוס אחד — מחפשים את כל המשפחה. כל משפט יכול להכיל מחיקה, עיוות והכללה בו־זמנית.',
+            problem: 'הבעיה היא שרואים שיש משהו בעייתי במשפט, אבל לא ברור מאיזה כיוון להתחיל: מחיקה, עיוות או הכללה, ואיזו שאלה לפתוח קודם.',
             entryCards: [
                 { kicker: 'מה עושים כאן', title: 'רואים כמה דפוסים באותו משפט', body: 'במקום לעצור על הטריגר הראשון, פותחים את כל המפה: מה הוכלל, מה חסר, ואיזה פירוש נכנס כאילו הוא כבר עובדה.' },
                 { kicker: 'למה לשים לב', title: 'להצטברות ולא רק לסעיף בודד', body: 'רוב המשפטים האנושיים לא "טועים" במקום אחד. הם אורגים כמה קיצורי דרך יחד, ולכן גם הפירוק כאן רחב ועדין יותר.' },
@@ -147,6 +150,7 @@
             icon: '🎯', title: 'מכ״ם מטה-מודל', badge: 'למתקדמים', tone: 'challenge', color: '#D85A30', soft: '#FFF0E8',
             homeDescription: 'המסלול המהיר — זיהוי ושאילת שאלות מפרקות תחת לחץ זמן. למי שמוכן לאתגר האמיתי.',
             description: 'המסלול המתקדם ביותר: זיהוי מהיר ושאילת שאלות מפרקות תחת לחץ זמן. כאן הכל מתחבר.',
+            problem: 'הבעיה היא שבזמן אמת הדפוס חולף מהר, והתגובה האוטומטית קודמת לזיהוי מדויק של מה באמת סגור במשפט.',
             entryCards: [
                 { kicker: 'מה עושים כאן', title: 'מתרגלים דיוק מהיר בזמן אמת', body: 'המשפט מגיע, הזמן קצר, והמשימה היא לזהות מה סגור בו ולבחור שאלה אחת חדה שמחזירה את השיחה לקרקע.' },
                 { kicker: 'למה לשים לב', title: 'שאלה אחת טובה עדיפה על שלוש חכמות', body: 'במקום להציף, מחפשים את החור המרכזי במפה: מי, מה, איך, מתי או לפי מה. שאלה אחת מדויקת פותחת יותר מעשר תגובות חכמות.' },
@@ -176,6 +180,7 @@
             tab: 'practice-wizard', navKey: 'practiceWizard', progressKey: 'practiceWizard', progressTotal: 12, unlockLevel: 1, showOnHome: false,
             icon: '🌉', title: 'גשר תחושה-שפה', badge: 'ליישום', tone: 'intermediate', color: '#0f766e', soft: '#ddf6f1',
             description: 'כאן מחברים בין מה שקרה בחוץ, מה שנהיה בפנים, ומה שאפשר לומר באופן שגם נשמע אנושי וגם נשאר מחובר למציאות.',
+            problem: 'הבעיה היא שיש פער בין מה שנאמר, מה שקרה בפועל, ומה שנחווה בפנים, ואז המשפט שנשאר ביד מרגיש לא מדויק ולא מחזיק.',
             entryCards: [
                 { kicker: 'מה עושים כאן', title: 'בונים משפט שאפשר לעמוד עליו', body: 'לא מתקנים ישר את המשפט המקורי. קודם מזהים מה קרה בפועל, מה החוויה שנוצרה, ואיזה ניסוח יכול להחזיק את שניהם יחד.' },
                 { kicker: 'למה זה חשוב', title: 'כדי לא להיתקע בין רגש לעובדה', body: 'כשיש רק חוויה בלי קרקע, השיחה מתפזרת. כשיש רק עובדה בלי חוויה, האדם נעלם. הגשר מחזיר את שניהם לאותו משפט.' },
@@ -224,6 +229,7 @@
             tab: 'practice-verb-unzip', navKey: 'practiceVerbUnzip', progressKey: 'practiceVerbUnzip', progressTotal: 10, unlockLevel: 1, showOnHome: false,
             icon: '🧰', title: 'מרכז כלים', badge: 'ניווט', tone: 'beginner', color: '#0f4c81', soft: '#e2eef9',
             description: 'זהו שער עבודה לכל המאמנים והמעבדות. בוחרים מסלול אחד, פותחים אותו נכון, ואז ממשיכים בלי לאבד הקשר.',
+            problem: 'הבעיה היא שפעלים כלליים כמו "להתקדם", "להסתדר" או "לכבד" נשמעים ברורים, אבל בלי פירוק אי אפשר לדעת מה לעשות בפועל.',
             entryCards: [
                 { kicker: 'מה עושים כאן', title: 'בוחרים משפחת כלים', body: 'יש מסלולים בלי ברין, מסלולים עם ברין, והטמעה מהירה של כלי פירוק פועל בתוך הדף עצמו.' },
                 { kicker: 'למה זה חשוב', title: 'כדי לא לפתוח הכול יחד', body: 'במקום להיטבע בעומס, המרכז עוזר לבחור כלי אחד שמתאים לסוג העבודה שלפניך.' },
@@ -270,6 +276,7 @@
             tab: 'blueprint', navKey: 'blueprint', progressKey: 'blueprint', progressTotal: 10, unlockLevel: 1, showOnHome: false,
             icon: '🧭', title: 'בונה מהלך', badge: 'ביצוע', tone: 'advanced', color: '#0369a1', soft: '#e0f2fe',
             description: 'כאן הופכים פעולה עמומה לתוכנית שאפשר באמת לבצע: מנסחים יעד, מפרקים צעדים, בודקים פער, ויוצאים עם מהלך עבודה.',
+            problem: 'הבעיה היא שנשארים עם כוונה כללית או "צריך לעשות משהו", אבל בלי צעד ראשון ברור, תנאי התחלה וחלופה כשנתקעים.',
             entryCards: [
                 { kicker: 'מה עושים כאן', title: 'מפרקים משימה עד שנשארת פעולה', body: 'מתחילים ממשפט כללי כמו ״אני צריך להשתפר״ ומוציאים ממנו צעדים, תנאים, חסמים ואלטרנטיבות.' },
                 { kicker: 'למה זה חשוב', title: 'כי עמימות לא נעלמת מעצמה', body: 'כל עוד המשימה נשארת סיסמה, אין איך להתחיל. הבונה מחזיר אותה לשפה שאפשר לפעול מתוכה.' },
@@ -318,6 +325,7 @@
             tab: 'prismlab', navKey: 'prismLab', progressKey: 'prismLab', progressTotal: 14, unlockLevel: 1, showOnHome: false,
             icon: '🔮', title: 'מעבדת פריזמות', badge: 'עומק', tone: 'advanced', color: '#2563eb', soft: '#e7f0ff',
             description: 'כאן בונים מפת הכרח מלאה: שתי עמודות, 12 חוליות על פני הרמות הלוגיות, ואז שיחה ממוקדת על גרעין, סדק ושאלת פאנץ׳.',
+            problem: 'הבעיה היא שמושג אחד גדול או הכרח אחד סגור תופסים את כל התמונה, בלי לראות באיזו רמה זה יושב ואיפה כבר יש סדק שאפשר לעבוד איתו.',
             entryCards: [
                 { kicker: 'מה בונים כאן', title: 'שתי עמודות על אותה אמירה', body: 'המפה מפרידה בין צד A למה שקורה בחוץ או מפעיל, לבין צד B למה שנהיה בפנים, מה זה אומר ומה המחיר.' },
                 { kicker: 'איך מתקדמים', title: '12 שאלות, חוליה אחת בכל רגע', body: 'לא חושפים הכול בבת אחת. כל שאלה ממלאת תא אחד במפת הרמות הלוגיות, עד שרואים איפה ההכרח מחזיק חזק ואיפה כבר יש סדק.' },
@@ -368,6 +376,7 @@
             tab: 'categories', navKey: 'categories', progressKey: 'categories', progressTotal: 8, unlockLevel: 1, showOnHome: false,
             icon: '📚', title: 'מילון הקטגוריות', badge: 'ידע', tone: 'beginner', color: '#0284c7', soft: '#e0f2fe',
             description: 'כאן פותחים את משפחות המטה-מודל, רואים מה מבדיל בין מחיקה, עיוות והכללה, ומקבלים עוגן לעבודה בתוך שיחה חיה.',
+            problem: 'הבעיה היא שכאשר לא זוכרים מה כל קטגוריה בודקת, קל להתבלבל בין מחיקה, עיוות והכללה ולשאול שאלה לא מדויקת.',
             entryCards: [
                 { kicker: 'מה עושים כאן', title: 'מחפשים קטגוריה ומבינים אותה', body: 'המילון מאפשר לעבור בין דפוסים, לראות הגדרה, דוגמאות, ועוגני דיוק קצרים.' },
                 { kicker: 'למה זה חשוב', title: 'כדי לא לעבוד רק מהזיכרון', body: 'במקום לנחש אם משפט מסוים הוא מחיקה או עיוות, אפשר לפתוח את המשפחה הרלוונטית ולבדוק.' },
@@ -414,6 +423,7 @@
             tab: 'comic-engine', navKey: 'comicEngine', progressKey: 'comicEngine', progressTotal: 10, unlockLevel: 1, showOnHome: false,
             icon: '🎭', title: 'במת קומיקס רגשי', badge: 'סצנה', tone: 'challenge', color: '#b45309', soft: '#ffedd5',
             description: 'כאן מתרגלים תגובה בתוך רגע חי: בוחרים טון, רואים איך הוא נוחת על הזרימה, הסוכנות והבושה, וממשיכים את הסצנה מתוך התוצאה.',
+            problem: 'הבעיה היא שברגע טעון בוחרים תגובה אוטומטית מתוך לחץ, ואז השיחה מסלימה או נסגרת לפני שנוצרה בהירות.',
             entryCards: [
                 { kicker: 'מה עושים כאן', title: 'בוחרים תגובה עם משקל רגשי', body: 'בכל סצנה מקבלים רגע טעון, כמה אפשרויות תגובה, ומשוב מיידי על מה שהבחירה יצרה.' },
                 { kicker: 'למה זה חשוב', title: 'כי מילה משנה את כל הבמה', body: 'התרגול לא עוסק רק במה נכון לומר, אלא גם באיך זה נשמע, מה זה עושה לצד השני, ואיך זה משנה את ההמשך.' },
@@ -460,6 +470,7 @@
             tab: 'about', navKey: 'about', progressKey: 'about', progressTotal: 6, unlockLevel: 1, showOnHome: false,
             icon: '🤝', title: 'על המוצר והקהילה', badge: 'קהילה', tone: 'beginner', color: '#64748b', soft: '#eef2f7',
             description: 'זהו שער הרקע של האפליקציה ושל כיכר השוק: מהו Meta Model Gym, למה הוא נבנה, ואיפה אפשר לשאול, לשתף ולדייק יחד.',
+            problem: 'הבעיה היא שבלי הקשר ברור על מה המוצר עושה ואיך המסלולים מתחברים, קשה לבחור איפה להתחיל ואיך להשתמש בו נכון.',
             entryCards: [
                 { kicker: 'מה יש כאן', title: 'רקע על המוצר', body: 'מסבירים מה האפליקציה מנסה לאמן, אילו משפחות מרכזיות היא מחזיקה, ואיך לגשת אליה בלי ללכת לאיבוד.' },
                 { kicker: 'המרחב האנושי', title: 'כיכר השוק', body: 'יש כאן גם מקום פתוח לשאלות, תגובות וניסוחים, לא רק מסכי אימון.' },
@@ -992,6 +1003,16 @@
             ].join('');
         }).join('') + '</section>';
     }
+    function featureProblemHtml(meta) {
+        var problem = String(meta && meta.problem || '').trim();
+        if (!problem) return '';
+        return [
+            '<section class="meta-feature-shell__problem-note">',
+            '<span class="meta-feature-shell__problem-kicker">מה הבעיה שמנסים לפתור?</span>',
+            '<p>' + escapeHtml(problem) + '</p>',
+            '</section>'
+        ].join('');
+    }
     function featureActionButton(name, icon, label) {
         return '<button type="button" class="meta-feature-shell__action-btn" data-feature-modal="' + escapeHtml(name) + '"><span class="meta-feature-shell__action-icon">' + escapeHtml(icon) + '</span><span class="meta-feature-shell__action-label">' + escapeHtml(label) + '</span></button>';
     }
@@ -1075,6 +1096,7 @@ function featureActionButtonsHtml(meta) {
         return [
             '<div class="meta-feature-shell__frame" style="--meta-feature-accent:' + escapeHtml(meta.color) + ';--meta-feature-soft:' + escapeHtml(meta.soft) + ';">',
             '<section class="meta-feature-shell__hero"><div class="meta-feature-shell__icon-wrap"><span class="meta-feature-shell__icon">' + meta.icon + '</span></div><div class="meta-feature-shell__hero-copy"><span class="meta-feature-shell__badge" data-tone="' + escapeHtml(meta.tone) + '">' + escapeHtml(meta.badge) + '</span><h2>' + escapeHtml(meta.title) + '</h2><p class="meta-feature-shell__hero-desc">' + escapeHtml(meta.description) + '</p></div></section>',
+            featureProblemHtml(meta),
             featureEntryCardsHtml(meta),
             featureExampleHtml(meta),
             featureActionButtonsHtml(meta),

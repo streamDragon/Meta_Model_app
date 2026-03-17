@@ -2383,6 +2383,7 @@
                 <h1>${escapeHtml(trainerContract?.title || 'Classic Classic — זיהוי תבניות')}</h1>
                 <p>${escapeHtml(trainerContract?.subtitle || 'מזהים את המבנה המרכזי, בודקים תשובה, ומבינים למה הבחירה נכונה או שגויה.')}</p>
                 <p class="cc-entry-sub">כאן שומעים משפט, מזהים איזה מבנה לשוני מחזיק אותו, ומקבלים הסבר יציב שמחבר בין השלב, הבחירה והלקח להמשך.</p>
+                <p class="cc-entry-sub"><strong>מה הבעיה שמנסים לפתור?</strong> כששומעים רק את התוכן של המשפט, קל להתבלבל בין שאלה טובה, הבעיה הלשונית עצמה, ויעד הבירור.</p>
               </section>
               <div class="cc-entry-start-strip" data-trainer-zone="start" ${getMobileZoneStyle('start')}>
                 <div class="cc-entry-start-copy">

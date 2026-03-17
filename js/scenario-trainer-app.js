@@ -1082,10 +1082,9 @@
               <main class="scenario-main-area scenario-standalone-main" data-trainer-zone="main">
                 ${renderMain()}
               </main>
-              ${isPlayScreen ? '' : `
-              <aside class="scenario-platform-support" aria-label="תמיכה והדרכת תהליך" data-trainer-zone="support">
+              <aside class="${isPlayScreen ? 'scenario-play-support' : 'scenario-platform-support'}" aria-label="תמיכה והדרכת תהליך" data-trainer-zone="support">
                 ${renderSupportRail()}
-              </aside>`}
+              </aside>
             </div>
             ${state.settingsOpen ? renderSettingsModal() : ''}
             ${state.toastMessage ? `<div class="scenario-toast">${escapeHtml(state.toastMessage)}</div>` : ''}
@@ -1130,6 +1129,11 @@
             <div class="scenario-home-hero">
               <h2>סימולטור סצנות</h2>
               <p>נכנסים לסצנה, בוחרים תגובה אחת, רואים איך היא נוחתת.</p>
+            </div>
+
+            <div class="scenario-home-section">
+              <h4>מה הבעיה שמנסים לפתור?</h4>
+              <p>הבעיה היא שברגע אנושי טעון מגיבים אוטומטית, ואז הדיון זז לאשמה, לחץ או ערפל במקום לקבל שם ברור למה שקורה ולבחור תגובה שמקדמת את השיחה.</p>
             </div>
 
             <div class="scenario-home-section">
@@ -1217,6 +1221,7 @@
               <span class="scenario-play-status-pill">${escapeHtml(String(currentIndex))}/${escapeHtml(String(total))}</span>
               <span class="scenario-play-status-pill">נק׳ ${escapeHtml(String(score))}</span>
               <span class="scenario-play-status-pill">רצף ${escapeHtml(String(streak))}</span>
+              <span class="scenario-play-status-pill" data-trainer-summary="current">${escapeHtml(getCurrentSummary())}</span>
             </div>
             <button type="button" class="scenario-play-topbar-btn" data-scenario-action="open-help" aria-label="עזרה קצרה">
               <span aria-hidden="true">?</span>
