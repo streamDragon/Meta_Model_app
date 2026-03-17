@@ -6,6 +6,7 @@
     const DATA_PATH = 'data/prism-necessity.json';
     const STYLE_PATH = 'css/prism-necessity.css';
     const MAP_OVERLAY_LABEL = 'הרמות הלוגיות של דילטס';
+    const DEEPEN_LABEL = 'העמקה';
     let exercisesCache = null;
     let exercisesRequest = null;
 
@@ -311,10 +312,64 @@
                     </div>
                 `).join('')}
                 <div class="pnm-stage-progress">
-                    <span>שאלות שנחשפו</span>
                     <strong>${answeredCount}/${questionTotal}</strong>
                 </div>
             </div>
+        `;
+    }
+
+    function buildContextItems(exercise) {
+        const outsideScene = getExerciseQuestion(exercise, 'environment', 'a')?.answer
+            || getExerciseQuestion(exercise, 'environment', 'b')?.answer
+            || '';
+        const stuck = getExerciseQuestion(exercise, 'behavior', 'b')?.answer
+            || getExerciseQuestion(exercise, 'capability', 'b')?.answer
+            || '';
+        const whyItMatters = getExerciseQuestion(exercise, 'values_beliefs', 'b')?.answer
+            || getExerciseQuestion(exercise, 'identity', 'b')?.answer
+            || exercise.reflectCore
+            || exercise.punchQ;
+        const seen = new Set();
+        return [
+            { label: 'מי בזירה', text: `${exercise.sideA} מול ${exercise.sideB}` },
+            { label: 'מה קורה', text: compactCopy(outsideScene, 12) },
+            { label: 'מה נתקע', text: compactCopy(stuck, 12) },
+            { label: 'למה זה חשוב', text: compactCopy(whyItMatters, 14) }
+        ].filter((item) => {
+            const text = normalizeText(item?.text);
+            if (!text || seen.has(text)) return false;
+            seen.add(text);
+            return true;
+        }).slice(0, 4);
+    }
+
+    function renderContextCard(exercise) {
+        const items = buildContextItems(exercise);
+        return `
+            <section class="pnm-context-card" aria-label="הקשר הבעיה">
+                <div class="pnm-context-head">
+                    <span class="pnm-label">הקשר הבעיה</span>
+                    <strong>"${escapeHtml(exercise.sentence)}"</strong>
+                </div>
+                <div class="pnm-context-lines">
+                    ${items.map((item) => `
+                        <div class="pnm-context-line">
+                            <span class="pnm-context-term">${escapeHtml(item.label)}</span>
+                            <p class="pnm-context-copy">${escapeHtml(item.text)}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            </section>
+        `;
+    }
+
+    function renderInstructionCard(title, copy, detail = '') {
+        return `
+            <section class="pnm-instruction-card" aria-label="${escapeHtml(title)}">
+                <span class="pnm-label">${escapeHtml(title)}</span>
+                <strong>${escapeHtml(copy)}</strong>
+                ${detail ? `<small>${escapeHtml(detail)}</small>` : ''}
+            </section>
         `;
     }
 
@@ -489,14 +544,13 @@
     function getBuildActions(state, exercise) {
         if (!getCurrentQuestion(state)) {
             return [
-                { id: 'go-reflect', label: 'המשך לשיחה', tone: 'primary' },
-                { id: 'open-map-overlay', label: MAP_OVERLAY_LABEL, tone: 'accent' }
+                { id: 'go-reflect', label: 'המשך לשיקוף', tone: 'primary' },
+                { id: 'open-map-overlay', label: DEEPEN_LABEL, tone: 'accent' }
             ];
         }
         return [
             { id: 'reveal-answer', label: 'חשוף תשובה', tone: 'primary' },
-            { id: 'restart-exercise', label: 'התחל מחדש', tone: 'ghost' },
-            { id: 'next-exercise', label: 'משפט אחר', tone: 'ghost' }
+            { id: 'open-map-overlay', label: DEEPEN_LABEL, tone: 'accent' }
         ];
     }
 
@@ -506,16 +560,14 @@
         const isDone = state.reflectionIndex >= beats.length;
         return [
             { id: isDone ? 'go-summary' : 'reveal-reflection', label: isDone ? 'לסיכום' : nextBeat?.ctaLabel || 'המשך', tone: 'primary' },
-            { id: 'open-map-overlay', label: MAP_OVERLAY_LABEL, tone: 'accent' },
-            { id: 'restart-exercise', label: 'התחל מחדש', tone: 'ghost' }
+            { id: 'open-map-overlay', label: DEEPEN_LABEL, tone: 'accent' }
         ];
     }
 
     function getSummaryActions() {
         return [
-            { id: 'next-exercise', label: 'משפט הבא', tone: 'primary' },
-            { id: 'open-map-overlay', label: MAP_OVERLAY_LABEL, tone: 'accent' },
-            { id: 'restart-exercise', label: 'התחל מחדש', tone: 'ghost' }
+            { id: 'next-exercise', label: 'למשפט הבא', tone: 'primary' },
+            { id: 'open-map-overlay', label: DEEPEN_LABEL, tone: 'accent' }
         ];
     }
 
@@ -573,10 +625,13 @@
             <section class="pnm-question-card" style="--pnm-tone:${level.color};--pnm-fill:${level.fill};--pnm-dark:${level.dark};">
                 <div class="pnm-question-head">
                     <div>
-                        <span class="pnm-label">השאלה הבאה</span>
-                        <h2>${escapeHtml(level.label)} · צד ${question.side === 'a' ? 'A' : 'B'}</h2>
+                        <span class="pnm-label">הפעולה הראשית</span>
+                        <div class="pnm-question-meta">
+                            <span class="pnm-question-chip">חוליה ${currentIndex}/${exercise.questions.length}</span>
+                            <span class="pnm-question-chip pnm-question-chip--tone">${escapeHtml(level.label)}</span>
+                            <span class="pnm-question-chip">צד ${question.side === 'a' ? 'A' : 'B'}</span>
+                        </div>
                     </div>
-                    <div class="pnm-progress-ring">${currentIndex}/${exercise.questions.length}</div>
                 </div>
 
                 <p class="pnm-question-text">"${escapeHtml(question.question)}"</p>
@@ -589,37 +644,22 @@
     function renderBuild(state, exercise) {
         const actions = getBuildActions(state, exercise);
         const question = getCurrentQuestion(state);
-        const toolbarCopy = question
-            ? {
-                kicker: 'בניית המפה',
-                title: `חוליה ${state.questionIndex + 1}/${exercise.questions.length} · ${getLevel(question.level).label} · צד ${question.side === 'a' ? 'A' : 'B'}`
-            }
-            : {
-                kicker: 'הטבלה הושלמה',
-                title: 'עוברים מהמפה אל השיחה'
-            };
+        const instructionCopy = question
+            ? 'קרא/י את ההקשר ואז לחץ/י על הכפתור הראשי כדי לחשוף את התשובה לחוליה הבאה.'
+            : 'המפה כבר נבנתה. עכשיו אפשר לעבור לשלב השיקוף או לפתוח העמקה.';
         return `
             <section class="pnm-stage-card pnm-stage-card--build">
-                <div class="pnm-hero pnm-hero--compact">
-                    <div>
+                <div class="pnm-stage-headline">
+                    <div class="pnm-stage-headline-copy">
                         <p class="pnm-kicker">Prism Lab · מפת ההכרח</p>
-                        <h1>הבנייה מתקדמת חוליה אחר חוליה</h1>
-                    </div>
-                    <div class="pnm-chip-row">
-                        <span class="pnm-chip">תרגיל ${state.exerciseIndex + 1}</span>
-                        <span class="pnm-chip pnm-chip--warm">${getAnsweredCount(state)}/${exercise.questions.length} תשובות</span>
+                        <h1>מפת ההכרח</h1>
                     </div>
                 </div>
+                ${renderContextCard(exercise)}
+                ${renderInstructionCard('מה עושים עכשיו', instructionCopy)}
                 ${renderStageRail(state, exercise)}
-                ${renderToolbar(toolbarCopy, actions)}
-                <div class="pnm-build-workspace${question ? '' : ' is-complete'}">
-                    <div class="pnm-build-map-wrap${question ? '' : ' is-complete'}">
-                        ${renderMap(state, exercise, { showBadges: isBuildComplete(state), compact: state.mode !== 'standalone' })}
-                        <div class="pnm-build-question-overlay">
-                            ${renderQuestionCard(state, exercise, { actions })}
-                        </div>
-                    </div>
-                </div>
+                ${renderQuestionCard(state, exercise, { actions })}
+                ${renderMapOverlay(state, exercise, { showBadges: isBuildComplete(state), title: MAP_OVERLAY_LABEL })}
             </section>
         `;
     }
@@ -744,10 +784,11 @@
                     <div class="pnm-count-chip">${state.reflectionIndex}/${beats.length}</div>
                 </div>
                 ${renderStageRail(state, exercise)}
-                ${renderToolbar({
-                    kicker: 'שלב השיקוף',
-                    title: isDone ? 'השיחה הושלמה' : `הצעד הבא: ${nextBeat?.label || 'המשך'}`
-                }, actions)}
+                ${renderInstructionCard(
+                    'מה עושים עכשיו',
+                    isDone ? 'שלב השיקוף הושלם. אפשר לעבור לסיכום או לפתוח העמקה.' : `הצעד הבא בשיחה הוא ${nextBeat?.label || 'המשך'}.`,
+                    'הכפתור הראשי ממשיך את רצף השיחה. העמקה פותחת את המפה המלאה.'
+                )}
 
                 <section class="pnm-chat-card pnm-chat-card--conversation">
                     <div class="pnm-chat-head">
@@ -787,10 +828,11 @@
                     <div class="pnm-count-chip">סיום תרגיל</div>
                 </div>
                 ${renderStageRail(state, exercise)}
-                ${renderToolbar({
-                    kicker: 'סיום',
-                    title: 'אפשר לבחור משפט הבא או להיזכר במפה'
-                }, actions)}
+                ${renderInstructionCard(
+                    'מה עושים עכשיו',
+                    'זה סיכום קצר של מה שנבנה. אפשר לעבור למשפט הבא או לפתוח העמקה.',
+                    'הניקוד נשאר בתחתית. כאן נשארים רק הסיכום והפעולה הבאה.'
+                )}
 
                 ${renderSummaryPanel(state, exercise)}
 

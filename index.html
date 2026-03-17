@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.401" data-build-time="1773718291351" data-build-iso="2026-03-17T03:31:31.351Z" data-git-commit="4b7717e">
+<html lang="he" dir="rtl" data-app-version="1.0.408" data-build-time="1773776877887" data-build-iso="2026-03-17T19:47:57.887Z" data-git-commit="2d43fd4">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1057,9 +1057,9 @@
                             <div id="question-drill-live-shell" class="question-drill-live-shell hidden">
                                 <div class="question-drill-compact-bar">
                                     <div class="question-drill-compact-stats" aria-live="polite">
-                                        <span id="question-drill-compact-round" class="question-drill-compact-pill">שאלה 0/0</span>
-                                        <span id="question-drill-compact-score" class="question-drill-compact-pill">נכון 0</span>
-                                        <span id="question-drill-compact-streak" class="question-drill-compact-pill">רצף 0</span>
+                                        <span id="question-drill-compact-round" class="question-drill-compact-pill question-drill-compact-pill--round">שאלה 0/0</span>
+                                        <span id="question-drill-compact-score" class="question-drill-compact-pill question-drill-compact-pill--score">נכון 0</span>
+                                        <span id="question-drill-compact-streak" class="question-drill-compact-pill question-drill-compact-pill--streak">רצף 0</span>
                                     </div>
                                     <button id="question-drill-open-menu" class="question-drill-mini-btn" type="button">עוד</button>
                                 </div>
@@ -1208,9 +1208,9 @@
                             <div id="rapid-radar-live-shell" class="rapid-radar-live-shell hidden">
                                 <div class="rapid-radar-topbar">
                                     <div class="rapid-radar-progress" aria-live="polite">
-                                        <span id="rapid-compact-round" class="rapid-compact-pill">שאלה 0/10</span>
-                                        <span id="rapid-compact-correct" class="rapid-compact-pill">נכון 0</span>
-                                        <span id="rapid-compact-streak" class="rapid-compact-pill">רצף 0</span>
+                                        <span id="rapid-compact-round" class="rapid-compact-pill rapid-compact-pill--round">שאלה 0/10</span>
+                                        <span id="rapid-compact-correct" class="rapid-compact-pill rapid-compact-pill--correct">נכון 0</span>
+                                        <span id="rapid-compact-streak" class="rapid-compact-pill rapid-compact-pill--streak">רצף 0</span>
                                     </div>
                                     <button id="rapid-open-menu" class="rapid-radar-mini-btn" type="button">כלים</button>
                                 </div>
@@ -1346,11 +1346,11 @@
                             <div class="triples-radar-shell">
                                 <section class="triples-radar-main-panel">
                                     <div class="triples-radar-topbar">
-                                        <span><small>מקרה</small><strong id="triples-radar-counter">1/15</strong></span>
-                                        <span><small>מצב</small><strong id="triples-radar-session-badge">למידה</strong></span>
-                                        <span><small id="triples-radar-timer-label">קצב</small><strong id="triples-radar-timer">פתוח</strong></span>
-                                        <span><small>נקודות</small><strong id="triples-radar-score">0</strong></span>
-                                        <span><small>דיוקים</small><strong id="triples-radar-solved-count">0</strong></span>
+                                        <span class="triples-radar-topbar-item triples-radar-topbar-item--case"><small>מקרה</small><strong id="triples-radar-counter">1/15</strong></span>
+                                        <span class="triples-radar-topbar-item triples-radar-topbar-item--mode"><small>מצב</small><strong id="triples-radar-session-badge">למידה</strong></span>
+                                        <span class="triples-radar-topbar-item triples-radar-topbar-item--timer"><small id="triples-radar-timer-label">קצב</small><strong id="triples-radar-timer">פתוח</strong></span>
+                                        <span class="triples-radar-topbar-item triples-radar-topbar-item--score"><small>נקודות</small><strong id="triples-radar-score">0</strong></span>
+                                        <span class="triples-radar-topbar-item triples-radar-topbar-item--solved"><small>דיוקים</small><strong id="triples-radar-solved-count">0</strong></span>
                                     </div>
 
                                     <div class="triples-radar-statement-wrap">
@@ -1361,7 +1361,7 @@
 
                                     <div class="triples-radar-support-strip">
                                         <p id="triples-radar-step" class="triples-radar-step">שלב 1: קרא/י את המשפט. שלב 2: בחר/י את כיוון החשיבה שמתאים לעבודה כרגע, ואז דייק/י לתבנית.</p>
-                                        <button type="button" class="btn btn-secondary triples-radar-mini-action" data-tr-action="open-concept">טבלת ברין</button>
+                                        <button type="button" class="btn btn-secondary triples-radar-mini-action triples-radar-mini-action--concept" data-tr-action="open-concept">טבלת ברין</button>
                                     </div>
 
                                     <div id="triples-radar-mode-summary" class="triples-radar-mode-summary" aria-live="polite"></div>
@@ -1376,9 +1376,9 @@
                                             <h4>בחר/י שורה, ואז דייק/י לתבנית המתאימה</h4>
                                         </div>
                                         <div class="triples-radar-actions">
-                                            <button class="btn btn-secondary" data-tr-action="hint-category">💡 רמז ממוקד</button>
-                                            <button class="btn btn-secondary" data-tr-action="restart">↻ התחלה מחדש</button>
-                                            <button class="btn btn-primary" data-tr-action="next">→ המקרה הבא</button>
+                                            <button class="btn btn-secondary triples-radar-action triples-radar-action--hint" data-tr-action="hint-category">💡 רמז ממוקד</button>
+                                            <button class="btn btn-secondary triples-radar-action triples-radar-action--restart" data-tr-action="restart">↻ התחלה מחדש</button>
+                                            <button class="btn btn-primary triples-radar-action triples-radar-action--next" data-tr-action="next">→ המקרה הבא</button>
                                         </div>
                                     </div>
 

@@ -1309,13 +1309,12 @@ function featureActionButtonsHtml(meta) {
                 '<div class="meta-feature-chrome__bar meta-feature-chrome__bar--top">',
                 '<button type="button" class="btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon" data-shell-chrome-back="' + escapeHtml(safeTab) + '" aria-label="חזרה צעד אחד אחורה"><span aria-hidden="true">←</span></button>',
                 '<div class="meta-feature-chrome__title"><span class="meta-feature-chrome__kicker">מסלול פעיל</span><strong>' + escapeHtml(title) + '</strong></div>',
-                '<div class="meta-feature-chrome__controls"><button type="button" class="btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon" data-shell-chrome-home="' + escapeHtml(safeTab) + '" aria-label="חזרה לדף הבית"><span aria-hidden="true">⌂</span></button><button type="button" class="btn btn-secondary meta-feature-chrome__btn" data-shell-chrome-stats="' + escapeHtml(safeTab) + '">📊 סטטיסטיקות</button></div>',
+                '<div class="meta-feature-chrome__controls"><button type="button" class="btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon" data-shell-chrome-home="' + escapeHtml(safeTab) + '" aria-label="חזרה לדף הבית"><span aria-hidden="true">⌂</span></button><button type="button" class="btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon" data-shell-chrome-restart="' + escapeHtml(safeTab) + '" aria-label="התחלה מחדש"><span aria-hidden="true">↺</span></button><button type="button" class="btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon" data-shell-chrome-stats="' + escapeHtml(safeTab) + '" aria-label="פתיחת סטטיסטיקות"><span aria-hidden="true">⋯</span></button></div>',
                 '</div>'
             ].join(''),
             bottom: [
                 '<div class="meta-feature-chrome__bar meta-feature-chrome__bar--bottom">',
                 '<div class="meta-feature-chrome__meta"><span>🔥 ' + escapeHtml(summary.streak) + '</span><span>⭐ ' + escapeHtml(summary.totalStars) + '</span><span>רמה ' + escapeHtml(summary.level) + '</span></div>',
-                '<div class="meta-feature-chrome__actions"><button type="button" class="btn btn-secondary meta-feature-chrome__btn" data-shell-chrome-home-bottom="' + escapeHtml(safeTab) + '">⌂ בית</button><button type="button" class="btn btn-primary meta-feature-chrome__btn" data-shell-chrome-restart="' + escapeHtml(safeTab) + '">↺ התחלה מחדש</button></div>',
                 '</div>'
             ].join('')
         };
@@ -1549,12 +1548,45 @@ function featureActionButtonsHtml(meta) {
         var qTitle = document.getElementById('question-drill-main-title');
         var qSub = document.getElementById('question-drill-subtitle');
         var qStart = document.getElementById('question-drill-start-session');
+        var qSessionNote = document.getElementById('question-drill-session-note');
+        var qStatement = document.getElementById('question-drill-statement');
+        var qControls = document.querySelector('#practice-question .question-drill-controls');
+        var qSessionStatus = document.querySelector('#practice-question .question-drill-session-status');
         var rapidPrompt = document.querySelector('.rapid-radar-prompt-label');
         var rapidStart = document.getElementById('rapid-start-btn');
+        var rapidHeaderNote = document.querySelector('#practice-radar .rapid-radar-header small');
+        var rapidSessionNote = document.getElementById('rapid-session-note');
+        var rapidPromptCard = document.querySelector('#practice-radar .rapid-radar-prompt-card');
+        var rapidPatternButtons = document.getElementById('rapid-pattern-buttons');
+        var triplesStatement = document.querySelector('#practice-triples-radar .triples-radar-statement-wrap');
+        var triplesStep = document.getElementById('triples-radar-step');
+        var comicContext = document.getElementById('ceflow-context-card');
+        var comicChoiceAffordance = document.getElementById('ceflow-choice-affordance');
+        var comicChoiceCopy = document.getElementById('ceflow-choice-copy');
+        var blueprintSummary = document.querySelector('#blueprint .blueprint-progress-highlight');
+        var blueprintFeedback = document.querySelector('#blueprint .blueprint-stage-card--feedback');
         if (qTitle) qTitle.textContent = 'זיהוי מטה-מודל עם אוזן חדה';
         if (qSub) qSub.textContent = 'קוראים משפט קטן, מקשיבים למה שחסר בו, ובוחרים את השאלה שמחזירה בהירות.';
         if (qStart) qStart.textContent = 'יאללה, בואו נתחיל';
+        if (qSessionNote) qSessionNote.textContent = 'מה עושים עכשיו: בוחרים מצב ותחום, ואז מתחילים לעבוד עם משפט אחד בכל פעם.';
+        if (qStatement) qStatement.setAttribute('data-meta-context-frame', 'question-drill');
+        if (qControls) qControls.setAttribute('data-meta-instruction-frame', 'question-drill');
+        if (qSessionStatus) qSessionStatus.setAttribute('data-meta-instruction-frame', 'question-drill');
         if (rapidPrompt) rapidPrompt.textContent = coach.getRapidPrompt();
+        if (rapidHeaderNote) rapidHeaderNote.textContent = 'קראו את המשפט, שימו לב לביטוי המודגש, ואז בחרו תבנית אחת מדויקת.';
+        if (rapidSessionNote) rapidSessionNote.textContent = 'מה עושים עכשיו: בחרו מצב ותחום, ואז התחילו סבב קצר וברור.';
+        if (rapidPromptCard) rapidPromptCard.setAttribute('data-meta-context-frame', 'rapid-radar');
+        if (rapidPatternButtons) rapidPatternButtons.setAttribute('data-meta-instruction-frame', 'rapid-radar');
+        if (triplesStatement) triplesStatement.setAttribute('data-meta-context-frame', 'triples-radar');
+        if (triplesStep) triplesStep.setAttribute('data-meta-instruction-frame', 'triples-radar');
+        if (comicContext) comicContext.setAttribute('data-meta-context-frame', 'comic-engine');
+        if (comicChoiceAffordance) {
+            comicChoiceAffordance.setAttribute('data-meta-instruction-frame', 'comic-engine');
+            comicChoiceAffordance.textContent = 'מה עושים עכשיו: בחרו תגובה אחת כדי לראות לאן הלחץ והשיחה זזים.';
+        }
+        if (comicChoiceCopy) comicChoiceCopy.textContent = 'ההקשר למעלה. הפעולה כאן: בחרו תגובה אחת ותנו למסך להראות מה היא עושה.';
+        if (blueprintSummary) blueprintSummary.setAttribute('data-meta-context-frame', 'blueprint');
+        if (blueprintFeedback) blueprintFeedback.setAttribute('data-meta-instruction-frame', 'blueprint');
         if (rapidStart) rapidStart.textContent = 'יאללה, בואו נתחיל';
     }
     function currentTabName() { return normalizeTab(document.body.dataset.activeTab || (typeof window.getCurrentActiveTabName === 'function' ? window.getCurrentActiveTabName() : 'home')) || 'home'; }

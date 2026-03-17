@@ -1,4 +1,5 @@
 import net from 'node:net';
+import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { spawn } from 'node:child_process';
@@ -120,6 +121,9 @@ async function startLocalServer() {
 async function runShellSmoke(baseUrl) {
     const browser = await createBrowser();
     const checks = [];
+    const prismMobileReportPath = path.join(ROOT, 'reports', 'prismlab-mobile-verify.json');
+    const prismMobileShotPath = path.join(ROOT, 'reports', 'prismlab-mobile-verify.png');
+    const mobileUiReportPath = path.join(ROOT, 'reports', 'mobile-ui-cleanup-report.json');
     const MANAGED_SCREENS = new Set([
         'sentence-map',
         'practice-question',
@@ -166,6 +170,98 @@ async function runShellSmoke(baseUrl) {
             throw new Error(detail ? `${label} :: ${detail}` : label);
         }
         checks.push(label + (detail ? ` :: ${detail}` : ''));
+    };
+
+    const MOBILE_UI_AUDIT_CONFIG = Object.freeze({
+        'practice-question': Object.freeze({
+            contextSelectors: ['#question-drill-prestart .question-drill-session-panel', '[data-meta-context-frame]'],
+            instructionSelectors: ['#question-drill-session-note', '[data-meta-instruction-frame]'],
+            taskSelectors: ['#question-drill-start-session', '#question-drill-check'],
+            duplicateSelectors: ['#question-drill-secondary-actions', '#question-drill-compact-score', '#question-drill-compact-streak', '#question-drill-game-hud'],
+            maxLargeBodyActions: 2
+        }),
+        'practice-radar': Object.freeze({
+            contextSelectors: ['#rapid-radar-prestart', '[data-meta-context-frame]'],
+            instructionSelectors: ['#rapid-session-note', '[data-meta-instruction-frame]'],
+            taskSelectors: ['#rapid-start-btn', '#rapid-next-btn', '#rapid-skip-btn'],
+            duplicateSelectors: ['.rapid-radar-secondary-actions', '#rapid-compact-correct', '#rapid-compact-streak'],
+            maxLargeBodyActions: 2
+        }),
+        'practice-triples-radar': Object.freeze({
+            contextSelectors: ['[data-meta-context-frame]', '.triples-radar-statement-wrap'],
+            instructionSelectors: ['[data-meta-instruction-frame]', '.triples-radar-support-strip'],
+            taskSelectors: ['.triples-radar-action--next', '.triples-radar-actions'],
+            duplicateSelectors: ['.triples-radar-topbar-item--score', '.triples-radar-topbar-item--solved', '.triples-radar-action--restart'],
+            maxLargeBodyActions: 2
+        }),
+        blueprint: Object.freeze({
+            contextSelectors: ['[data-meta-context-frame]', '.blueprint-progress-highlight'],
+            instructionSelectors: ['[data-meta-instruction-frame]', '.blueprint-stage-card--feedback'],
+            taskSelectors: ['.blueprint-composer', '#do-it-now-btn', '.step-buttons .btn.btn-primary'],
+            duplicateSelectors: [],
+            maxLargeBodyActions: 2
+        }),
+        'comic-engine': Object.freeze({
+            contextSelectors: ['[data-meta-context-frame]', '#ceflow-context-card'],
+            instructionSelectors: ['[data-meta-instruction-frame]', '#ceflow-choice-affordance'],
+            taskSelectors: ['.ceflow-choice-panel', '#ceflow-next-scene'],
+            duplicateSelectors: ['#ceflow-level', '#ceflow-info-btn', '#ceflow-expand-stage', '#ceflow-retry'],
+            maxLargeBodyActions: 2
+        }),
+        prismlab: Object.freeze({
+            contextSelectors: ['#prismlab .pnm-context-card'],
+            instructionSelectors: ['#prismlab .pnm-instruction-card'],
+            taskSelectors: ['#prismlab .pnm-question-card'],
+            duplicateSelectors: [],
+            maxLargeBodyActions: 2
+        })
+    });
+
+    const collectMobileUiAudit = async (screenId, targetPage = page) => {
+        const config = MOBILE_UI_AUDIT_CONFIG[screenId];
+        if (!config) return null;
+        return targetPage.evaluate((entry) => {
+            const active = document.getElementById(entry.screenId);
+            const top = active?.querySelector('[data-meta-feature-chrome="top"]');
+            const bottom = active?.querySelector('[data-meta-feature-chrome="bottom"]');
+            const isVisible = (node) => {
+                if (!(node instanceof HTMLElement)) return false;
+                const style = getComputedStyle(node);
+                const rect = node.getBoundingClientRect();
+                return !node.hidden && style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+            };
+            const anyVisible = (selectors) => (selectors || []).some((selector) => Array.from(active?.querySelectorAll(selector) || []).some((node) => isVisible(node)));
+            const visibleDuplicates = (entry.duplicateSelectors || []).filter((selector) => Array.from(active?.querySelectorAll(selector) || []).some((node) => isVisible(node)));
+            const visibleButtons = Array.from(active?.querySelectorAll('.btn') || []).filter((node) => {
+                if (!isVisible(node)) return false;
+                if (node.closest('[data-meta-feature-chrome]') || node.closest('.meta-feature-welcome-shell')) return false;
+                return true;
+            });
+            const largeBodyButtons = visibleButtons.filter((node) => node.getBoundingClientRect().height >= 38).map((node) => ({
+                label: (node.textContent || '').trim(),
+                height: Math.round(node.getBoundingClientRect().height)
+            }));
+            const taskNode = (entry.taskSelectors || []).map((selector) => active?.querySelector(selector)).find((node) => isVisible(node)) || null;
+            const taskRect = taskNode?.getBoundingClientRect() || null;
+            const bottomRect = bottom?.getBoundingClientRect() || null;
+            return {
+                screenId: entry.screenId,
+                topIcons: {
+                    back: !!top?.querySelector('[data-shell-chrome-back]'),
+                    home: !!top?.querySelector('[data-shell-chrome-home]'),
+                    restart: !!top?.querySelector('[data-shell-chrome-restart]'),
+                    stats: !!top?.querySelector('[data-shell-chrome-stats]')
+                },
+                contextVisible: anyVisible(entry.contextSelectors),
+                instructionVisible: anyVisible(entry.instructionSelectors),
+                largeBodyButtons,
+                duplicateSelectorsVisible: visibleDuplicates,
+                taskBottom: taskRect ? Math.round(taskRect.bottom) : null,
+                bottomBarTop: bottomRect ? Math.round(bottomRect.top) : null,
+                taskMostlyInView: !!taskRect && (!bottomRect || taskRect.bottom <= bottomRect.top),
+                quickComprehensionLikely: anyVisible(entry.contextSelectors) && anyVisible(entry.instructionSelectors) && largeBodyButtons.length <= (entry.maxLargeBodyActions || 2)
+            };
+        }, { ...config, screenId });
     };
 
     const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
@@ -611,10 +707,11 @@ async function runShellSmoke(baseUrl) {
         trace('desktop:done');
 
         const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true });
+        const mobileUiAudit = {};
         await seedTestState(mobile);
         await mobile.goto(baseUrl, { waitUntil: 'networkidle' });
         await dismissOnboardingIfVisible(mobile);
-        for (const screenId of ['home', 'sentence-map', 'practice-question', 'practice-radar', 'practice-wizard', 'blueprint']) {
+        for (const screenId of ['home', 'sentence-map', 'practice-question', 'practice-radar', 'practice-wizard', 'blueprint', 'prismlab']) {
             trace('mobile:start', screenId);
             await mobile.evaluate((id) => window.navigateTo(id), screenId);
             await waitForActiveScreen(screenId, mobile);
@@ -627,8 +724,86 @@ async function runShellSmoke(baseUrl) {
             }));
             await assert(mobileCheck.scrollWidth <= mobileCheck.innerWidth + 1, `mobile ${screenId} no horizontal overflow`, `${mobileCheck.scrollWidth}/${mobileCheck.innerWidth}`);
             await assert(mobileCheck.activeElement === screenId, `mobile ${screenId} active`);
+            if (MOBILE_UI_AUDIT_CONFIG[screenId]) {
+                const audit = await collectMobileUiAudit(screenId, mobile);
+                mobileUiAudit[screenId] = audit;
+                await assert(audit.topIcons.back && audit.topIcons.home && audit.topIcons.restart, `mobile ${screenId} top icon bar visible`);
+                await assert(audit.largeBodyButtons.length <= (MOBILE_UI_AUDIT_CONFIG[screenId].maxLargeBodyActions || 2), `mobile ${screenId} keeps body CTA count`, audit.largeBodyButtons.map((item) => item.label).join(', '));
+                await assert(audit.duplicateSelectorsVisible.length === 0, `mobile ${screenId} removes duplicate stats/actions`, audit.duplicateSelectorsVisible.join(', '));
+            }
+            if (screenId === 'prismlab') {
+                const prismMetrics = await mobile.evaluate(() => {
+                    const active = document.querySelector('#prismlab.active');
+                    const top = active?.querySelector('[data-meta-feature-chrome="top"]');
+                    const bottom = active?.querySelector('[data-meta-feature-chrome="bottom"]');
+                    const contextCard = active?.querySelector('.pnm-context-card');
+                    const instructionCard = active?.querySelector('.pnm-instruction-card');
+                    const questionCard = active?.querySelector('.pnm-question-card');
+                    const primaryButton = active?.querySelector('.pnm-question-card [data-action="reveal-answer"], .pnm-question-card [data-action="go-reflect"]');
+                    const bodyActions = Array.from(active?.querySelectorAll('.pnm-question-card .pnm-btn') || []).filter((el) => {
+                        const rect = el.getBoundingClientRect();
+                        const style = getComputedStyle(el);
+                        return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+                    });
+                    const questionRect = questionCard?.getBoundingClientRect();
+                    const primaryRect = primaryButton?.getBoundingClientRect();
+                    const bottomRect = bottom?.getBoundingClientRect();
+                    return {
+                        icons: {
+                            back: !!top?.querySelector('[data-shell-chrome-back]'),
+                            home: !!top?.querySelector('[data-shell-chrome-home]'),
+                            restart: !!top?.querySelector('[data-shell-chrome-restart]'),
+                            stats: !!top?.querySelector('[data-shell-chrome-stats]')
+                        },
+                        bottomBar: {
+                            meta: Array.from(bottom?.querySelectorAll('.meta-feature-chrome__meta span') || []).map((el) => (el.textContent || '').trim()),
+                            hasExtraActions: !!active?.querySelector('[data-shell-chrome-home-bottom]'),
+                            duplicatedMetaInsideBody: !!active?.querySelector('.pnm-stage-card .meta-feature-chrome__meta')
+                        },
+                        contextVisible: !!contextCard,
+                        instructionVisible: !!instructionCard,
+                        bodyActionCount: bodyActions.length,
+                        bodyActionLabels: bodyActions.map((el) => (el.textContent || '').trim()),
+                        progressElements: active ? active.querySelectorAll('.pnm-stage-progress, .pnm-progress-ring').length : 0,
+                        viewportHeight: window.innerHeight,
+                        questionCardBottom: questionRect ? Math.round(questionRect.bottom) : null,
+                        questionMostlyInView: !!questionRect && questionRect.bottom <= window.innerHeight,
+                        bottomBarTop: bottomRect ? Math.round(bottomRect.top) : null,
+                        primaryButtonTop: primaryRect ? Math.round(primaryRect.top) : null,
+                        primaryButtonBottom: primaryRect ? Math.round(primaryRect.bottom) : null,
+                        primaryButtonClearOfBottomBar: !!primaryRect && !!bottomRect && primaryRect.bottom <= bottomRect.top,
+                        contextTop: contextCard ? Math.round(contextCard.getBoundingClientRect().top) : null,
+                        instructionTop: instructionCard ? Math.round(instructionCard.getBoundingClientRect().top) : null,
+                        questionTop: questionCard ? Math.round(questionCard.getBoundingClientRect().top) : null
+                    };
+                });
+                await mobile.screenshot({ path: prismMobileShotPath, fullPage: true });
+                await writeFile(prismMobileReportPath, JSON.stringify(prismMetrics, null, 2), 'utf8');
+                await assert(prismMetrics.contextVisible, 'mobile prismlab context card visible');
+                await assert(prismMetrics.instructionVisible, 'mobile prismlab instruction card visible');
+                await assert(prismMetrics.bodyActionCount <= 2, 'mobile prismlab keeps two main body actions', prismMetrics.bodyActionLabels.join(', '));
+                await assert(prismMetrics.icons.back && prismMetrics.icons.home && prismMetrics.icons.restart, 'mobile prismlab top icon bar keeps nav controls');
+                await assert(!prismMetrics.bottomBar.hasExtraActions, 'mobile prismlab bottom bar has no extra action buttons');
+            }
             trace('mobile:done', screenId);
         }
+        await mobile.evaluate(() => window.navigateTo('practice-triples-radar'));
+        await waitForActiveScreen('practice-triples-radar', mobile);
+        await enterManagedFeatureStage('practice-triples-radar', mobile);
+        await mobile.waitForTimeout(400);
+        mobileUiAudit['practice-triples-radar'] = await collectMobileUiAudit('practice-triples-radar', mobile);
+        await assert(mobileUiAudit['practice-triples-radar'].topIcons.back && mobileUiAudit['practice-triples-radar'].topIcons.home && mobileUiAudit['practice-triples-radar'].topIcons.restart, 'mobile practice-triples-radar top icon bar visible');
+        await assert(mobileUiAudit['practice-triples-radar'].largeBodyButtons.length <= 2, 'mobile practice-triples-radar keeps body CTA count', mobileUiAudit['practice-triples-radar'].largeBodyButtons.map((item) => item.label).join(', '));
+        await assert(mobileUiAudit['practice-triples-radar'].duplicateSelectorsVisible.length === 0, 'mobile practice-triples-radar removes duplicate stats/actions', mobileUiAudit['practice-triples-radar'].duplicateSelectorsVisible.join(', '));
+        await mobile.evaluate(() => window.navigateTo('comic-engine'));
+        await waitForActiveScreen('comic-engine', mobile);
+        await enterManagedFeatureStage('comic-engine', mobile);
+        await mobile.waitForTimeout(400);
+        mobileUiAudit['comic-engine'] = await collectMobileUiAudit('comic-engine', mobile);
+        await assert(mobileUiAudit['comic-engine'].topIcons.back && mobileUiAudit['comic-engine'].topIcons.home && mobileUiAudit['comic-engine'].topIcons.restart, 'mobile comic-engine top icon bar visible');
+        await assert(mobileUiAudit['comic-engine'].largeBodyButtons.length <= 2, 'mobile comic-engine keeps body CTA count', mobileUiAudit['comic-engine'].largeBodyButtons.map((item) => item.label).join(', '));
+        await assert(mobileUiAudit['comic-engine'].duplicateSelectorsVisible.length === 0, 'mobile comic-engine removes duplicate stats/actions', mobileUiAudit['comic-engine'].duplicateSelectorsVisible.join(', '));
+        await writeFile(mobileUiReportPath, JSON.stringify(mobileUiAudit, null, 2), 'utf8');
         for (const screenId of ['sentence-map', 'practice-wizard', 'blueprint']) {
             trace('sticky:start', screenId);
             await mobile.evaluate((id) => window.navigateTo(id), screenId);

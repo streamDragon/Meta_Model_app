@@ -1,0 +1,119 @@
+{
+  "practice-question": {
+    "screenId": "practice-question",
+    "topIcons": {
+      "back": true,
+      "home": true,
+      "restart": true,
+      "stats": true
+    },
+    "contextVisible": true,
+    "instructionVisible": false,
+    "largeBodyButtons": [
+      {
+        "label": "יאללה, בואו נתחיל",
+        "height": 52
+      }
+    ],
+    "duplicateSelectorsVisible": [],
+    "taskBottom": 583,
+    "bottomBarTop": 701,
+    "taskMostlyInView": true,
+    "quickComprehensionLikely": false
+  },
+  "practice-radar": {
+    "screenId": "practice-radar",
+    "topIcons": {
+      "back": true,
+      "home": true,
+      "restart": true,
+      "stats": true
+    },
+    "contextVisible": true,
+    "instructionVisible": true,
+    "largeBodyButtons": [
+      {
+        "label": "יאללה, בואו נתחיל",
+        "height": 52
+      }
+    ],
+    "duplicateSelectorsVisible": [],
+    "taskBottom": 641,
+    "bottomBarTop": 809,
+    "taskMostlyInView": true,
+    "quickComprehensionLikely": true
+  },
+  "blueprint": {
+    "screenId": "blueprint",
+    "topIcons": {
+      "back": true,
+      "home": true,
+      "restart": true,
+      "stats": true
+    },
+    "contextVisible": true,
+    "instructionVisible": true,
+    "largeBodyButtons": [
+      {
+        "label": "▶️ צעד ראשון",
+        "height": 46
+      }
+    ],
+    "duplicateSelectorsVisible": [],
+    "taskBottom": 1473,
+    "bottomBarTop": 802,
+    "taskMostlyInView": false,
+    "quickComprehensionLikely": true
+  },
+  "prismlab": {
+    "screenId": "prismlab",
+    "topIcons": {
+      "back": true,
+      "home": true,
+      "restart": true,
+      "stats": true
+    },
+    "contextVisible": true,
+    "instructionVisible": true,
+    "largeBodyButtons": [],
+    "duplicateSelectorsVisible": [],
+    "taskBottom": 831,
+    "bottomBarTop": 856,
+    "taskMostlyInView": true,
+    "quickComprehensionLikely": true
+  },
+  "practice-triples-radar": {
+    "screenId": "practice-triples-radar",
+    "topIcons": {
+      "back": true,
+      "home": true,
+      "restart": true,
+      "stats": true
+    },
+    "contextVisible": false,
+    "instructionVisible": false,
+    "largeBodyButtons": [],
+    "duplicateSelectorsVisible": [],
+    "taskBottom": null,
+    "bottomBarTop": 0,
+    "taskMostlyInView": false,
+    "quickComprehensionLikely": false
+  },
+  "comic-engine": {
+    "screenId": "comic-engine",
+    "topIcons": {
+      "back": true,
+      "home": true,
+      "restart": true,
+      "stats": true
+    },
+    "contextVisible": false,
+    "instructionVisible": true,
+    "largeBodyButtons": [],
+    "duplicateSelectorsVisible": [],
+    "taskBottom": 1141,
+    "bottomBarTop": 1666,
+    "taskMostlyInView": true,
+    "quickComprehensionLikely": false
+  }
+}

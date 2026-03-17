@@ -1,0 +1,35 @@
+{
+  "icons": {
+    "back": true,
+    "home": true,
+    "restart": true,
+    "stats": true
+  },
+  "bottomBar": {
+    "meta": [
+      "🔥 10",
+      "⭐ 48",
+      "רמה 6"
+    ],
+    "hasExtraActions": false,
+    "duplicatedMetaInsideBody": false
+  },
+  "contextVisible": true,
+  "instructionVisible": true,
+  "bodyActionCount": 2,
+  "bodyActionLabels": [
+    "חשוף תשובה",
+    "העמקה"
+  ],
+  "progressElements": 1,
+  "viewportHeight": 844,
+  "questionCardBottom": 831,
+  "questionMostlyInView": true,
+  "bottomBarTop": 856,
+  "primaryButtonTop": 718,
+  "primaryButtonBottom": 763,
+  "primaryButtonClearOfBottomBar": true,
+  "contextTop": 159,
+  "instructionTop": 421,
+  "questionTop": 582
+}
