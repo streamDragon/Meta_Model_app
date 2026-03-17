@@ -1925,6 +1925,37 @@
         renderBoard();
     }
 
+    function stepBackInsideTriplesRadar() {
+        if (state.elements?.overlay && !state.elements.overlay.hidden) {
+            closeOverlay();
+            return true;
+        }
+        if (state.expandedRowId) {
+            state.expandedRowId = '';
+            renderBoard();
+            return true;
+        }
+        if (state.inlineHintRowId) {
+            state.inlineHintRowId = '';
+            renderBoard();
+            return true;
+        }
+        return false;
+    }
+
+    function registerShellController() {
+        root.__metaFeatureControllers = root.__metaFeatureControllers || {};
+        root.__metaFeatureControllers['practice-triples-radar'] = {
+            stepBack() {
+                return stepBackInsideTriplesRadar();
+            },
+            restart() {
+                restartRun();
+                return true;
+            }
+        };
+    }
+
     function bindEvents() {
         const hostEl = document.getElementById('practice-triples-radar');
         if (!hostEl || hostEl.dataset.boundTriplesRadar === 'true') return;
@@ -2111,6 +2142,7 @@
         state.inlineHintRowId = '';
         setupElementsForCurrentMode();
         bindEvents();
+        registerShellController();
         updateModeToggleUI();
 
         if (state.uiMode === 'phone' && state.scenarios.length) {
@@ -2203,6 +2235,7 @@
         if (state.uiMode === 'phone') resetPhoneScenarioFlow();
 
         bindEvents();
+        registerShellController();
         if (state.sessionMode === 'exam') startExamTimer();
         else updateTimerUI();
         setFeedback(getIntroFeedbackText(), 'info');
