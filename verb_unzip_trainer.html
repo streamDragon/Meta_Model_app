@@ -236,10 +236,11 @@
 
     .map-anchor {
       position: fixed;
-      inset-inline-start: 12px;
+      inset-inline-start: auto;
+      inset-inline-end: 12px;
       bottom: max(14px, env(safe-area-inset-bottom));
       z-index: 80;
-      width: min(290px, calc(100vw - 24px));
+      width: min(240px, calc(100vw - 24px));
       border: 1px solid #c8dff2;
       border-radius: 16px;
       background: rgba(255,255,255,.96);
@@ -258,7 +259,7 @@
     }
 
     .map-anchor-head strong { color: #1b4468; font-size: .87rem; }
-    .map-anchor-head button { min-height: 34px; padding: 6px 10px; color: #fff; border: none; background: linear-gradient(140deg, #0f766e, #1d4ed8); }
+    .map-anchor-head button { min-height: 32px; padding: 5px 10px; color: #fff; border: none; border-radius: 999px; background: linear-gradient(140deg, #0f766e, #1d4ed8); }
 
     .modal {
       position: fixed;

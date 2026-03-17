@@ -185,6 +185,7 @@ function App(): ReactElement {
   const [knifePrompts, setKnifePrompts] = useState<string[]>([]);
   const [pendingSuggestion, setPendingSuggestion] = useState<PendingSuggestion | null>(null);
   const [simulateCyclesLeft, setSimulateCyclesLeft] = useState<number>(0);
+  const [toolsPanelOpen, setToolsPanelOpen] = useState<boolean>(false);
 
   const filteredQuestions = useMemo(
     () => questions.filter((question) => question.predicateTypes.includes(utterance.predicateType)),
@@ -202,6 +203,7 @@ function App(): ReactElement {
     () => (activeDragId ? answerBlocks.find((block) => block.id === activeDragId) ?? null : null),
     [activeDragId, answerBlocks],
   );
+  const activeQuestion = useMemo(() => (activeQuestionId ? QUESTION_MAP.get(activeQuestionId) : undefined), [activeQuestionId]);
 
   useEffect(() => {
     if (simulateCyclesLeft <= 0) {
@@ -212,6 +214,19 @@ function App(): ReactElement {
     }, 700);
     return () => window.clearTimeout(timerId);
   }, [simulateCyclesLeft]);
+
+  useEffect(() => {
+    if (!toolsPanelOpen) {
+      return undefined;
+    }
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') {
+        setToolsPanelOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toolsPanelOpen]);
 
   const analyzeUtterance = (): void => {
     const extracted = extractPredicate(utterance.text);
@@ -486,6 +501,21 @@ function App(): ReactElement {
 
       <div className="workspace">
         <section className="map-section">
+          <section className="workspace-toolbar">
+            <div className="workspace-toolbar__copy">
+              <strong>מרכז העבודה</strong>
+              <span>המפה נשארת במרכז. שאלות, טיוטה ורמזים נפתחים רק לפי צורך.</span>
+            </div>
+            <div className="workspace-toolbar__actions">
+              <button type="button" onClick={() => setToolsPanelOpen(true)}>
+                שאלות
+              </button>
+              <button type="button" onClick={() => setToolsPanelOpen(true)}>
+                טיוטה
+              </button>
+            </div>
+          </section>
+
           <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div className="ellipse-map">
               <svg className="ellipse-map__svg" viewBox="0 0 1000 680" aria-hidden="true">
@@ -542,7 +572,20 @@ function App(): ReactElement {
           </DndContext>
         </section>
 
-        <aside className="right-panel">
+        {toolsPanelOpen ? (
+          <div className="tools-modal" role="dialog" aria-modal="true" aria-label="כלי עזר">
+            <button type="button" className="tools-modal__backdrop" onClick={() => setToolsPanelOpen(false)} aria-label="סגור" />
+            <section className="tools-modal__panel">
+              <header className="tools-modal__head">
+                <div>
+                  <h2>כלי עזר</h2>
+                  <p>שאלות, טיוטה והכוונה נשארות משניות. המפה עצמה נשארת במרכז.</p>
+                </div>
+                <button type="button" className="tools-modal__close" onClick={() => setToolsPanelOpen(false)} aria-label="סגור">
+                  ×
+                </button>
+              </header>
+              <aside className="right-panel">
           <h2>Question Bank</h2>
           <ul className="question-list">
             {filteredQuestions.map((question) => (
@@ -562,10 +605,10 @@ function App(): ReactElement {
             Ask
           </button>
 
-          {activeQuestionId ? (
+          {activeQuestion ? (
             <section className="answer-composer">
               <h3>Draft Answer</h3>
-              <p>{QUESTION_MAP.get(activeQuestionId)?.text}</p>
+              <p>{activeQuestion.text}</p>
               <textarea value={answerDraft} onChange={(event) => setAnswerDraft(event.target.value)} rows={4} />
               <button type="button" onClick={submitAnswer}>
                 Create AnswerBlock
@@ -584,7 +627,10 @@ function App(): ReactElement {
               </ul>
             </section>
           ) : null}
-        </aside>
+              </aside>
+            </section>
+          </div>
+        ) : null}
       </div>
 
       {pendingSuggestion ? (

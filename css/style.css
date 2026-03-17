@@ -30073,3 +30073,156 @@ body.triples-radar-overlay-open {
         width: 100%;
     }
 }
+
+/* RTL attention flow cleanup */
+
+body[dir="rtl"] .practice-section-header {
+    max-width: 66ch;
+    margin-inline: auto;
+    text-align: center;
+}
+
+#practice-triples-radar .practice-section-header,
+#practice-triples-radar .triples-radar-reference-bar p,
+#practice-triples-radar .triples-radar-mode-note {
+    display: none;
+}
+
+#practice-triples-radar .triples-radar-reference-bar {
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+#practice-triples-radar .triples-radar-reference-trigger,
+#practice-triples-radar .triples-radar-mini-action,
+#practice-triples-radar .triples-radar-row-detail-btn,
+#practice-triples-radar .triples-radar-row-hint-btn,
+#comic-engine .ceflow-small-btn,
+#question-drill .btn.btn-secondary,
+#practice-question .question-drill-secondary-actions .btn {
+    min-height: 34px;
+    padding-inline: 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+}
+
+#practice-triples-radar .triples-radar-mode-bar {
+    padding: 10px 12px;
+    gap: 10px;
+}
+
+#practice-triples-radar .triples-radar-mode-copy strong {
+    font-size: 0.84rem;
+    color: #0f3b79;
+}
+
+#practice-triples-radar .triples-radar-topbar {
+    grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
+}
+
+#practice-triples-radar .triples-radar-topbar > span {
+    padding: 6px 8px;
+}
+
+#practice-triples-radar .triples-radar-statement-wrap {
+    padding: 16px 18px;
+}
+
+#practice-triples-radar .triples-radar-actions {
+    justify-content: center;
+}
+
+#practice-triples-radar .triples-radar-actions .btn {
+    min-height: 34px;
+    padding-inline: 12px;
+    font-size: 0.8rem;
+}
+
+#comic-engine .ceflow-top-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+#comic-engine .ceflow-action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#comic-engine .ceflow-shotclock-shell {
+    margin-inline-start: auto;
+}
+
+#comic-engine .ceflow-shotclock {
+    padding: 6px 10px;
+    border-radius: 999px;
+    gap: 8px;
+}
+
+#comic-engine .ceflow-shotclock-copy strong {
+    font-size: 0.74rem;
+}
+
+#comic-engine .ceflow-shotclock-copy small,
+#comic-engine .ceflow-choice-copy {
+    display: none;
+}
+
+#comic-engine .ceflow-scene-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+}
+
+#comic-engine .ceflow-side-column {
+    order: 2;
+}
+
+#comic-engine .ceflow-choice-panel {
+    padding: 14px 16px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.98));
+    box-shadow: 0 16px 28px rgba(15, 23, 42, 0.06);
+}
+
+#comic-engine .ceflow-choice-affordance {
+    margin: 0;
+    color: #475569;
+    font-size: 0.84rem;
+}
+
+#comic-engine .ceflow-controls {
+    justify-content: center;
+}
+
+#question-drill[data-stage="setup"] .question-drill-session-panel {
+    max-width: 860px;
+    margin-inline: auto;
+}
+
+#question-drill[data-stage="setup"] .question-drill-secondary-actions {
+    justify-content: center;
+}
+
+@media (max-width: 760px) {
+    #practice-triples-radar .triples-radar-mode-bar,
+    #comic-engine .ceflow-top-actions {
+        align-items: stretch;
+    }
+
+    #comic-engine .ceflow-shotclock-shell {
+        margin-inline-start: 0;
+        width: 100%;
+    }
+
+    #comic-engine .ceflow-shotclock {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -2466,3 +2466,46 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* RTL attention flow cleanup */
+
+.cc-layout,
+.cc-platform-practice-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cc-side,
+.cc-platform-support {
+  position: static;
+  top: auto;
+  order: 2;
+  max-width: 920px;
+  margin-inline: auto;
+}
+
+.cc-side {
+  width: 100%;
+}
+
+.cc-platform-support {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cc-platform-support-card {
+  min-height: 0;
+}
+
+.cc-btn-ghost,
+.cc-btn-secondary,
+.cc-tag-btn {
+  min-height: 34px;
+  border-radius: 999px;
+}
+
+@media (max-width: 980px) {
+  .cc-platform-support {
+    grid-template-columns: 1fr;
+  }
+}

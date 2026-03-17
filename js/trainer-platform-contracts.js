@@ -65,7 +65,7 @@
         "description": "לוקחים את הדיוק לסשן הבא בלי לאבד את אותו סדר מסך."
       }
     ],
-    "supportRailMode": "breen-map",
+    "supportRailMode": "secondary-on-demand",
     "settingsGroups": [
       "what-to-practice",
       "session-load",
@@ -78,8 +78,7 @@
       "start",
       "purpose",
       "helper-steps",
-      "main",
-      "support"
+      "main"
     ],
     "wrapper": {
       "pageTitle": "Classic 2 - Structure of Magic Trainer",
@@ -174,7 +173,7 @@
         "description": "מחברים את מה שנאמר, מה זוהה, ומה לוקחים לסבב הבא."
       }
     ],
-    "supportRailMode": "guided-explanation",
+    "supportRailMode": "secondary-on-demand",
     "settingsGroups": [
       "what-to-practice",
       "session-load",
@@ -185,8 +184,7 @@
       "start",
       "purpose",
       "helper-steps",
-      "main",
-      "support"
+      "main"
     ],
     "wrapper": {
       "pageTitle": "Classic Classic - Meta Model Trainer",
@@ -292,7 +290,7 @@
         "description": "שואלים מה קורה אם בוחרים ענף אחר או פירוש אחר."
       }
     ],
-    "supportRailMode": "branching-tree",
+    "supportRailMode": "secondary-on-demand",
     "settingsGroups": [
       "entry-mode",
       "scenario",
@@ -303,8 +301,7 @@
       "start",
       "purpose",
       "helper-steps",
-      "main",
-      "support"
+      "main"
     ],
     "wrapper": {
       "pageTitle": "Iceberg Templates - Iceberg / Branch Trees",

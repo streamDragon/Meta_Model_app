@@ -118,8 +118,47 @@
 
 .workspace {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 1fr;
   gap: 14px;
+}
+
+.workspace-toolbar {
+  margin-bottom: 12px;
+  border: 1px solid #d7e4f7;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff, #f7fbff);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.workspace-toolbar__copy {
+  display: grid;
+  gap: 4px;
+}
+
+.workspace-toolbar__copy strong {
+  color: #0f1d37;
+}
+
+.workspace-toolbar__copy span {
+  color: #5a6d90;
+  font-size: 0.84rem;
+}
+
+.workspace-toolbar__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.workspace-toolbar__actions button {
+  border-radius: 999px;
+  min-height: 36px;
+  padding: 0 12px;
 }
 
 .map-section {
@@ -344,7 +383,7 @@
   border-radius: 14px;
   background: #f9fbff;
   padding: 12px;
-  max-height: 980px;
+  max-height: min(72vh, 980px);
   overflow: auto;
 }
 
@@ -418,6 +457,64 @@
   margin: 0 0 6px;
 }
 
+.tools-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.tools-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(15, 23, 42, 0.52);
+}
+
+.tools-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(880px, calc(100vw - 24px));
+  max-height: min(88vh, 860px);
+  overflow: auto;
+  border: 1px solid #d5e2f5;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 22px 44px rgba(15, 23, 42, 0.2);
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.tools-modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tools-modal__head h2 {
+  margin: 0 0 4px;
+}
+
+.tools-modal__head p {
+  margin: 0;
+  color: #5a6d90;
+  font-size: 0.88rem;
+}
+
+.tools-modal__close {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid #d5e2f5;
+  background: #f8fbff;
+  cursor: pointer;
+}
+
 .soft-hint {
   margin-top: 10px;
   background: #fff8e7;
@@ -446,6 +543,7 @@
 }
 
 .bottom-actions button,
+.workspace-toolbar__actions button,
 .ask-btn,
 .answer-composer button,
 .utterance-controls button {
@@ -560,5 +658,27 @@
   .center-circle {
     width: 220px;
     min-height: 150px;
+  }
+
+  .workspace-toolbar {
+    align-items: stretch;
+  }
+
+  .workspace-toolbar__actions {
+    width: 100%;
+  }
+
+  .workspace-toolbar__actions button {
+    flex: 1 1 0;
+  }
+
+  .tools-modal {
+    padding: 10px;
+  }
+
+  .tools-modal__panel {
+    width: calc(100vw - 12px);
+    max-height: 92vh;
+    padding: 12px;
   }
 }
