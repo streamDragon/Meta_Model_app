@@ -134,6 +134,8 @@ try {
             sessionButtons: Array.from(document.querySelectorAll('#triples-radar-session-switch [data-tr-session-mode]')).map((btn) => btn.textContent.trim()),
             modeTitle: document.getElementById('triples-radar-mode-title')?.textContent?.trim() || '',
             step: document.getElementById('triples-radar-step')?.textContent?.trim() || '',
+            contextLine: document.getElementById('triples-radar-context-line')?.textContent?.trim() || '',
+            sentenceHelper: document.getElementById('triples-radar-statement-helper')?.textContent?.trim() || '',
             rootText: document.getElementById('triples-radar-root')?.textContent?.replace(/\s+/g, ' ').trim() || '',
             strongestBadges: document.querySelectorAll('#triples-radar-rows .triples-radar-row-badge').length,
             catHintText: document.querySelector('#practice-triples-radar [data-tr-action="hint-category"]')?.textContent?.trim() || '',
@@ -153,7 +155,9 @@ try {
         );
         await assert(detailsState.rootText.length > 150, 'triples radar details content rendered', String(detailsState.rootText.length));
         await assert(detailsState.strongestBadges === 0, 'triples radar strongest direction hidden at start', String(detailsState.strongestBadges));
-        await assert(detailsState.focusHint === '', 'triples radar focus hint hidden at start', detailsState.focusHint);
+        await assert(detailsState.contextLine.length > 8, 'triples radar context line visible', detailsState.contextLine);
+        await assert(/\u05de\u05d5\u05e7\u05d3\u05d9\u05dd/.test(detailsState.sentenceHelper), 'triples radar sentence helper visible', detailsState.sentenceHelper);
+        await assert(/\u05d1\u05d7\u05e8\/\u05d9 \u05e9\u05d5\u05e8\u05d4|\u05db\u05e2\u05ea \u05d1\u05d5\u05d3\u05e7\u05d9\u05dd/.test(detailsState.focusHint), 'triples radar focus strip visible', detailsState.focusHint);
         await assert(/\u05e8\u05de\u05d6/.test(detailsState.catHintText), 'triples radar hint label clarified', detailsState.catHintText);
         await assert(/\u05d8\u05d1\u05dc\u05ea/.test(detailsState.conceptTrigger), 'triples radar concept trigger available', detailsState.conceptTrigger);
         await assert(!/[A-Z]{2,}/.test(detailsState.rootText), 'triples radar details avoids exposed english');
@@ -198,7 +202,7 @@ try {
         const counterAfterNext = ((await page.locator('#triples-radar-counter').textContent()) || '').trim();
         await assert(counterAfterNext !== counterBefore, 'triples radar next advances case', `${counterBefore} -> ${counterAfterNext}`);
 
-        await page.locator('#practice-triples-radar [data-tr-action="restart"]').click();
+        await page.locator('#practice-triples-radar [data-shell-chrome-restart="practice-triples-radar"]').click();
         await page.waitForTimeout(200);
         const counterAfterRestart = ((await page.locator('#triples-radar-counter').textContent()) || '').trim();
         await assert(counterAfterRestart === '1/15', 'triples radar restart resets case', counterAfterRestart);

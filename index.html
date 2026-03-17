@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.414" data-build-time="1773783504856" data-build-iso="2026-03-17T21:38:24.856Z" data-git-commit="6336bea">
+<html lang="he" dir="rtl" data-app-version="1.0.415" data-build-time="1773784275411" data-build-iso="2026-03-17T21:51:15.411Z" data-git-commit="47f1ce7">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1354,17 +1354,21 @@
                                     </div>
 
                                     <div class="triples-radar-statement-wrap">
-                                        <p class="triples-radar-kicker">משפט מטופל</p>
-                                        <p id="triples-radar-statement" class="triples-radar-statement"></p>
-                                        <p id="triples-radar-focus-hint" class="triples-radar-focus-hint"></p>
+                                        <p class="triples-radar-kicker">משפט לבדיקה</p>
+                                        <p id="triples-radar-context-line" class="triples-radar-context-line"></p>
+                                        <div id="triples-radar-statement" class="triples-radar-statement" aria-live="polite"></div>
+                                        <p id="triples-radar-statement-helper" class="triples-radar-statement-helper">מילים מסומנות = מוקדים אפשריים לבדיקה</p>
                                     </div>
 
-                                    <div class="triples-radar-support-strip">
-                                        <p id="triples-radar-step" class="triples-radar-step">שלב 1: קרא/י את המשפט. שלב 2: בחר/י את כיוון החשיבה שמתאים לעבודה כרגע, ואז דייק/י לתבנית.</p>
+                                    <div class="triples-radar-support-strip" data-meta-instruction-frame="triples-radar">
+                                        <div class="triples-radar-support-copy">
+                                            <p id="triples-radar-focus-hint" class="triples-radar-focus-hint"></p>
+                                            <p id="triples-radar-step" class="triples-radar-step">בחר/י שורה כדי לראות איזה חלק במשפט היא בודקת, ואז דייק/י לתבנית.</p>
+                                        </div>
                                         <button type="button" class="btn btn-secondary triples-radar-mini-action triples-radar-mini-action--concept" data-tr-action="open-concept">טבלת ברין</button>
                                     </div>
 
-                                    <div id="triples-radar-mode-summary" class="triples-radar-mode-summary" aria-live="polite"></div>
+                                    <div id="triples-radar-mode-summary" class="triples-radar-mode-summary" aria-live="polite" hidden></div>
 
                                     <p id="triples-radar-feedback" class="triples-radar-feedback" data-tone="info"></p>
                                 </section>
@@ -1372,17 +1376,18 @@
                                 <section class="triples-radar-board-panel">
                                     <div class="triples-radar-board-top">
                                         <div>
-                                            <p class="triples-radar-board-kicker">מפת השלשות</p>
+                                            <p class="triples-radar-board-kicker">חמש שורות לבדיקה</p>
                                             <h4>בחר/י שורה, ואז דייק/י לתבנית המתאימה</h4>
-                                        </div>
-                                        <div class="triples-radar-actions">
-                                            <button class="btn btn-secondary triples-radar-action triples-radar-action--hint" data-tr-action="hint-category">💡 רמז ממוקד</button>
-                                            <button class="btn btn-secondary triples-radar-action triples-radar-action--restart" data-tr-action="restart">↻ התחלה מחדש</button>
-                                            <button class="btn btn-primary triples-radar-action triples-radar-action--next" data-tr-action="next">→ המקרה הבא</button>
                                         </div>
                                     </div>
 
                                     <div id="triples-radar-rows" class="triples-radar-rows"></div>
+
+                                    <div class="triples-radar-actions">
+                                        <button class="btn btn-secondary triples-radar-action triples-radar-action--hint" data-tr-action="hint-category">💡 רמז ממוקד</button>
+                                        <button class="btn btn-secondary triples-radar-action triples-radar-action--restart" data-tr-action="restart">↻ התחלה מחדש</button>
+                                        <button class="btn btn-primary triples-radar-action triples-radar-action--next" data-tr-action="next">→ המקרה הבא</button>
+                                    </div>
                                 </section>
                             </div>
                         </div>

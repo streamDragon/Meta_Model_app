@@ -79,91 +79,167 @@
   "scenarios": [
     {
       "id": "tr_001",
+      "contextHe": "שיחת אכזבה אחרי ציפייה למענה שלא הגיע בזמן.",
       "clientText": "זה לא הוגן שהם לא חזרו אליי באותו יום.",
+      "highlightGroups": {
+        "row1": ["הוגן"],
+        "row4": ["שהם", "באותו יום"],
+        "row5": ["חזרו אליי"]
+      },
       "focusHint": "לפי איזה סטנדרט זה לא הוגן?",
       "correctCategory": "lost_performative"
     },
     {
       "id": "tr_002",
+      "contextHe": "בדיקת קשר ומשמעות סביב יוזמה שלא הגיעה מהצד השני.",
       "clientText": "אם באמת היה אכפת לו, הוא היה יוזם לבד.",
+      "highlightGroups": {
+        "row1": ["באמת", "אכפת לו"],
+        "row5": ["יוזם לבד"]
+      },
       "focusHint": "מה אתה מניח שחייב להיות נכון כדי שהמשפט יעמוד?",
       "correctCategory": "assumptions"
     },
     {
       "id": "tr_003",
+      "contextHe": "תגובה למבט או לאווירה שנתפסים כהערכה שלילית.",
       "clientText": "אני יודע שהיא חושבת שאני חלש.",
+      "highlightGroups": {
+        "row1": ["אני יודע", "היא חושבת"],
+        "row3": ["חלש"]
+      },
       "focusHint": "איך בדיוק אתה יודע מה היא חושבת?",
       "correctCategory": "mind_reading"
     },
     {
       "id": "tr_004",
+      "contextHe": "זיכרון עבודה מול לקוחות שהופך מהר לכלל גורף.",
       "clientText": "זה תמיד קורה לי מול לקוחות.",
+      "highlightGroups": {
+        "row2": ["תמיד"],
+        "row4": ["מול לקוחות"]
+      },
       "focusHint": "באמת תמיד? יש יוצא דופן כלשהו?",
       "correctCategory": "universal_quantifier"
     },
     {
       "id": "tr_005",
+      "contextHe": "בקשת העלאה שנחווית כחסומה מראש.",
       "clientText": "אני לא יכול לבקש העלאה עכשיו.",
+      "highlightGroups": {
+        "row2": ["לא יכול", "עכשיו"],
+        "row5": ["לבקש העלאה"]
+      },
       "focusHint": "מה מונע ממך ומה יקרה אם כן תבקש?",
       "correctCategory": "modal_operator"
     },
     {
       "id": "tr_006",
+      "contextHe": "פירוש מהיר לשתיקה בתוך קשר כגורם לנזק.",
       "clientText": "כל פעם שהיא שותקת, זה הורס את הקשר.",
+      "highlightGroups": {
+        "row2": ["כל פעם", "זה הורס"],
+        "row4": ["הקשר"],
+        "row5": ["שותקת"]
+      },
       "focusHint": "איך בדיוק X גורם ל-Y? מה השרשרת?",
       "correctCategory": "cause_effect"
     },
     {
       "id": "tr_007",
+      "contextHe": "תיאור ביתי עמום שבו תהליך חי קופא לשם כללי.",
       "clientText": "יש אצלנו חוסר תקשורת רציני בבית.",
+      "highlightGroups": {
+        "row3": ["חוסר תקשורת רציני"],
+        "row4": ["אצלנו", "בבית"]
+      },
       "focusHint": "מה קורה בפועל? מי עושה מה?",
       "correctCategory": "nominalisations"
     },
     {
       "id": "tr_008",
+      "contextHe": "רגע של הסקת מסקנה כוללת על העצמי.",
       "clientText": "אני פשוט כישלון.",
+      "highlightGroups": {
+        "row1": ["פשוט"],
+        "row3": ["כישלון"]
+      },
       "focusHint": "באיזה תחום? מתי זה לא נכון?",
       "correctCategory": "identity_predicates"
     },
     {
       "id": "tr_009",
+      "contextHe": "איחור קטן שמתפרש כהוכחה לחוסר אכפתיות.",
       "clientText": "אם היא איחרה, זה אומר שלא אכפת לה ממני.",
+      "highlightGroups": {
+        "row3": ["זה אומר", "לא אכפת לה"],
+        "row4": ["היא איחרה"]
+      },
       "focusHint": "איך X אומר Y? מה הקריטריון?",
       "correctCategory": "complex_equivalence"
     },
     {
       "id": "tr_010",
+      "contextHe": "השוואה חברתית בתוך ישיבה בלי מדד ברור.",
       "clientText": "אני פחות טוב מהם בישיבות.",
+      "highlightGroups": {
+        "row4": ["פחות טוב", "מהם", "בישיבות"]
+      },
       "focusHint": "פחות טוב ביחס למה או למי?",
       "correctCategory": "comparative_deletion"
     },
     {
       "id": "tr_011",
+      "contextHe": "הרגל בוקר שנשמע מוחלט כי ההקשר נשמט.",
       "clientText": "ככה זה תמיד אצלי בבוקר.",
+      "highlightGroups": {
+        "row2": ["תמיד"],
+        "row4": ["אצלי", "בבוקר"]
+      },
       "focusHint": "מתי בדיוק? איפה בדיוק?",
       "correctCategory": "time_space_predicates"
     },
     {
       "id": "tr_012",
+      "contextHe": "תחושת מחיקה מול קבוצה לא מוגדרת.",
       "clientText": "הם לא נותנים לי מקום.",
+      "highlightGroups": {
+        "row4": ["הם"],
+        "row5": ["מקום"]
+      },
       "focusHint": "מי בדיוק הם? ומה בדיוק לא נותנים?",
       "correctCategory": "lack_referential_index"
     },
     {
       "id": "tr_013",
+      "contextHe": "סיפור מעורפל עם אובייקט לא מזוהה.",
       "clientText": "יש שם משהו לא ברור בסיפור הזה.",
+      "highlightGroups": {
+        "row4": ["שם"],
+        "row5": ["משהו לא ברור"]
+      },
       "focusHint": "מה זה בדיוק המשהו הזה?",
       "correctCategory": "non_referring_nouns"
     },
     {
       "id": "tr_014",
+      "contextHe": "תגובה רגשית שמבקשת לחזור לעוגן חושי וגופני.",
       "clientText": "אני מרגיש רע כשזה קורה.",
+      "highlightGroups": {
+        "row4": ["כשזה קורה"],
+        "row5": ["מרגיש רע"]
+      },
       "focusHint": "איך אתה יודע? מה אתה רואה/שומע/מרגיש בגוף?",
       "correctCategory": "sensory_predicates"
     },
     {
       "id": "tr_015",
+      "contextHe": "רגע לחץ שמתואר כפועל כללי בלי פירוק התהליך.",
       "clientText": "ואז אני פשוט מתפרק לגמרי.",
+      "highlightGroups": {
+        "row1": ["פשוט"],
+        "row5": ["מתפרק לגמרי", "ואז"]
+      },
       "focusHint": "מה קורה צעד-צעד בפועל?",
       "correctCategory": "unspecified_verbs"
     }
