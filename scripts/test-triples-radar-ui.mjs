@@ -138,28 +138,34 @@ try {
             sentenceHelper: document.getElementById('triples-radar-statement-helper')?.textContent?.trim() || '',
             rootText: document.getElementById('triples-radar-root')?.textContent?.replace(/\s+/g, ' ').trim() || '',
             strongestBadges: document.querySelectorAll('#triples-radar-rows .triples-radar-row-badge').length,
+            rowHintText: document.querySelector('#practice-triples-radar [data-tr-action="hint-row"]')?.textContent?.trim() || '',
             catHintText: document.querySelector('#practice-triples-radar [data-tr-action="hint-category"]')?.textContent?.trim() || '',
             focusHint: document.getElementById('triples-radar-focus-hint')?.textContent?.trim() || '',
             conceptTrigger: document.querySelector('#practice-triples-radar [data-tr-action="open-concept"]')?.textContent?.trim() || ''
         }));
 
         await assert(
-            JSON.stringify(detailsState.modeButtons) === JSON.stringify(['פרטים', 'כללים']),
+            detailsState.modeButtons.length === 2
+                && /פרטים/.test(detailsState.modeButtons[0] || '')
+                && /כללים/.test(detailsState.modeButtons[1] || ''),
             'triples radar mode labels',
             detailsState.modeButtons.join(', ')
         );
         await assert(
-            JSON.stringify(detailsState.sessionButtons) === JSON.stringify(['למידה', 'מבחן']),
+            detailsState.sessionButtons.length === 2
+                && /למידה/.test(detailsState.sessionButtons[0] || '')
+                && /משחק/.test(detailsState.sessionButtons[1] || ''),
             'triples radar session labels',
             detailsState.sessionButtons.join(', ')
         );
         await assert(detailsState.rootText.length > 150, 'triples radar details content rendered', String(detailsState.rootText.length));
         await assert(detailsState.strongestBadges === 0, 'triples radar strongest direction hidden at start', String(detailsState.strongestBadges));
         await assert(detailsState.contextLine.length > 8, 'triples radar context line visible', detailsState.contextLine);
-        await assert(/\u05de\u05d5\u05e7\u05d3\u05d9\u05dd/.test(detailsState.sentenceHelper), 'triples radar sentence helper visible', detailsState.sentenceHelper);
-        await assert(/\u05d1\u05d7\u05e8\/\u05d9 \u05e9\u05d5\u05e8\u05d4|\u05db\u05e2\u05ea \u05d1\u05d5\u05d3\u05e7\u05d9\u05dd/.test(detailsState.focusHint), 'triples radar focus strip visible', detailsState.focusHint);
-        await assert(/\u05e8\u05de\u05d6/.test(detailsState.catHintText), 'triples radar hint label clarified', detailsState.catHintText);
-        await assert(/\u05d8\u05d1\u05dc\u05ea/.test(detailsState.conceptTrigger), 'triples radar concept trigger available', detailsState.conceptTrigger);
+        await assert(/מוקדים/.test(detailsState.sentenceHelper), 'triples radar sentence helper visible', detailsState.sentenceHelper);
+        await assert(/בחר\/י שורה|כעת בודקים/.test(detailsState.focusHint), 'triples radar focus strip visible', detailsState.focusHint);
+        await assert(/רמזון/.test(detailsState.rowHintText), 'triples radar game hint label clarified', detailsState.rowHintText);
+        await assert(/רמז/.test(detailsState.catHintText), 'triples radar hint label clarified', detailsState.catHintText);
+        await assert(/מכ/.test(detailsState.conceptTrigger), 'triples radar concept trigger available', detailsState.conceptTrigger);
         await assert(!/[A-Z]{2,}/.test(detailsState.rootText), 'triples radar details avoids exposed english');
 
         await page.locator('#triples-radar-mode-switch [data-tr-ui-mode="rules"]').click();
@@ -178,16 +184,22 @@ try {
 
         await page.locator('#triples-radar-session-switch [data-tr-session-mode="exam"]').click();
         await page.waitForTimeout(250);
-        const examState = await page.evaluate(() => ({
+        const gameState = await page.evaluate(() => ({
             sessionBadge: document.getElementById('triples-radar-session-badge')?.textContent?.trim() || '',
             timerLabel: document.getElementById('triples-radar-timer-label')?.textContent?.trim() || '',
             timerValue: document.getElementById('triples-radar-timer')?.textContent?.trim() || '',
-            hintHidden: !!document.querySelector('#practice-triples-radar [data-tr-action="hint-category"]')?.hidden
+            categoryHintHidden: !!document.querySelector('#practice-triples-radar [data-tr-action="hint-category"]')?.hidden,
+            gameLine: document.getElementById('triples-radar-game-line')?.textContent?.trim() || '',
+            gameStripHidden: !!document.getElementById('triples-radar-game-strip')?.hidden,
+            rowHintHidden: !!document.querySelector('#practice-triples-radar [data-tr-action="hint-row"]')?.hidden
         }));
-        await assert(examState.sessionBadge === 'מבחן', 'triples radar exam badge updates', examState.sessionBadge);
-        await assert(examState.timerLabel === 'זמן', 'triples radar exam timer label updates', examState.timerLabel);
-        await assert(/^\d{2}:\d{2}$/.test(examState.timerValue), 'triples radar exam timer visible', examState.timerValue);
-        await assert(examState.hintHidden, 'triples radar exam hides hints');
+        await assert(/משחק/.test(gameState.sessionBadge), 'triples radar game badge updates', gameState.sessionBadge);
+        await assert(/זמן/.test(gameState.timerLabel), 'triples radar game timer label updates', gameState.timerLabel);
+        await assert(/^\d{2}:\d{2}$/.test(gameState.timerValue), 'triples radar game timer visible', gameState.timerValue);
+        await assert(gameState.categoryHintHidden, 'triples radar game hides category hint');
+        await assert(!gameState.gameStripHidden, 'triples radar game strip visible');
+        await assert(/רמזון|משחק/.test(gameState.gameLine), 'triples radar game strip copy visible', gameState.gameLine);
+        await assert(!gameState.rowHintHidden, 'triples radar game row hint visible');
 
         await page.locator('#triples-radar-session-switch [data-tr-session-mode="learn"]').click();
         await page.waitForTimeout(250);

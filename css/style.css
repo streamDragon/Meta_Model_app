@@ -30083,18 +30083,9 @@ body[dir="rtl"] .practice-section-header {
 }
 
 #practice-triples-radar .practice-section-header,
-#practice-triples-radar .triples-radar-reference-bar p,
+#practice-triples-radar .triples-radar-reference-bar,
 #practice-triples-radar .triples-radar-mode-note {
     display: none;
-}
-
-#practice-triples-radar .triples-radar-reference-bar {
-    justify-content: flex-start;
-    gap: 8px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
 }
 
 #practice-triples-radar .triples-radar-reference-trigger,
@@ -30113,6 +30104,14 @@ body[dir="rtl"] .practice-section-header {
 #practice-triples-radar .triples-radar-mode-bar {
     padding: 10px 12px;
     gap: 10px;
+    align-items: center;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.92));
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.06);
+}
+
+#practice-triples-radar .triples-radar-mode-copy {
+    gap: 2px;
 }
 
 #practice-triples-radar .triples-radar-mode-copy strong {
@@ -30120,26 +30119,129 @@ body[dir="rtl"] .practice-section-header {
     color: #0f3b79;
 }
 
+#practice-triples-radar .triples-radar-shell {
+    gap: 14px;
+}
+
+#practice-triples-radar .triples-radar-main-panel,
+#practice-triples-radar .triples-radar-board-panel {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+    border: 1px solid rgba(191, 209, 234, 0.72);
+    box-shadow: 0 20px 36px rgba(15, 23, 42, 0.06);
+}
+
 #practice-triples-radar .triples-radar-topbar {
     grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
+    gap: 8px;
 }
 
 #practice-triples-radar .triples-radar-topbar > span {
     padding: 6px 8px;
+    border-radius: 16px;
 }
 
 #practice-triples-radar .triples-radar-statement-wrap {
-    padding: 16px 18px;
+    max-width: 880px;
+    margin-inline: auto;
+    padding: 18px 20px;
+    gap: 8px;
+}
+
+#practice-triples-radar .triples-radar-statement {
+    font-size: clamp(1.22rem, 2vw, 1.72rem);
+    line-height: 1.95;
+}
+
+#practice-triples-radar .triples-radar-support-strip {
+    max-width: 880px;
+    margin-inline: auto;
+    justify-content: center;
+    text-align: center;
+    padding: 10px 14px;
+}
+
+#practice-triples-radar .triples-radar-utility-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    max-width: 880px;
+    margin-inline: auto;
+}
+
+#practice-triples-radar .triples-radar-mini-action {
+    min-width: 74px;
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(191, 209, 234, 0.9);
+    color: #28415e;
+}
+
+#practice-triples-radar .triples-radar-mini-action--concept {
+    color: #0f5e59;
+}
+
+#practice-triples-radar .triples-radar-game-strip {
+    max-width: 880px;
+    margin-inline: auto;
+    padding: 10px 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(59, 130, 246, 0.18);
+    background: linear-gradient(135deg, rgba(239, 246, 255, 0.96), rgba(224, 242, 254, 0.92));
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.08);
+}
+
+#practice-triples-radar .triples-radar-game-line {
+    margin: 0;
+    text-align: center;
+    color: #174ea6;
+    font-size: 0.82rem;
+    font-weight: 800;
+    line-height: 1.45;
+}
+
+#practice-triples-radar .triples-radar-feedback {
+    max-width: 880px;
+    margin-inline: auto;
+}
+
+#practice-triples-radar .triples-radar-board-panel {
+    gap: 12px;
+}
+
+#practice-triples-radar .triples-radar-board-top {
+    max-width: 880px;
+    margin-inline: auto;
+}
+
+#practice-triples-radar .triples-radar-rows {
+    max-width: 880px;
+    margin-inline: auto;
 }
 
 #practice-triples-radar .triples-radar-actions {
     justify-content: center;
+    max-width: 880px;
+    margin-inline: auto;
 }
 
 #practice-triples-radar .triples-radar-actions .btn {
     min-height: 34px;
     padding-inline: 12px;
     font-size: 0.8rem;
+}
+
+#practice-triples-radar .triples-radar-action--restart {
+    background: rgba(255, 255, 255, 0.92);
+}
+
+#practice-triples-radar .triples-radar-row-actions {
+    justify-content: flex-end;
+}
+
+#practice-triples-radar .triples-radar-row-inline-hint,
+#practice-triples-radar .triples-radar-row-accordion {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 #comic-engine .ceflow-top-actions {
@@ -30214,6 +30316,21 @@ body[dir="rtl"] .practice-section-header {
     #practice-triples-radar .triples-radar-mode-bar,
     #comic-engine .ceflow-top-actions {
         align-items: stretch;
+    }
+
+    #practice-triples-radar .triples-radar-statement-wrap,
+    #practice-triples-radar .triples-radar-support-strip,
+    #practice-triples-radar .triples-radar-utility-row,
+    #practice-triples-radar .triples-radar-game-strip,
+    #practice-triples-radar .triples-radar-feedback,
+    #practice-triples-radar .triples-radar-board-top,
+    #practice-triples-radar .triples-radar-rows,
+    #practice-triples-radar .triples-radar-actions {
+        max-width: none;
+    }
+
+    #practice-triples-radar .triples-radar-row-actions {
+        justify-content: flex-start;
     }
 
     #comic-engine .ceflow-shotclock-shell {

@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.420" data-build-time="1773790230025" data-build-iso="2026-03-17T23:30:30.025Z" data-git-commit="3839e50">
+<html lang="he" dir="rtl" data-app-version="1.0.421" data-build-time="1773791271108" data-build-iso="2026-03-17T23:47:51.108Z" data-git-commit="7528767">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1314,11 +1314,6 @@
                             <p>במקום רק לחפש שם קטגוריה, המכ״ם מסדר את המשפט ל-5 כיווני בדיקה קבועים של טבלת ברין, ואז עוזר לדייק בתוך הכיוון שנפתח.</p>
                         </div>
 
-                        <div class="triples-radar-reference-bar">
-                            <button type="button" class="btn btn-secondary triples-radar-reference-trigger" data-tr-action="open-concept">טבלת ברין</button>
-                            <p>פתיחה קצרה, טבלת ברין המלאה, והסבר על הקשר בין השורה הפעילה לשורות הסמוכות.</p>
-                        </div>
-
                         <div class="triples-radar-mode-bar" id="triples-radar-mode-bar">
                             <div class="triples-radar-mode-copy">
                                             <strong id="triples-radar-mode-title">מבט נוכחי · איפה לדייק עכשיו</strong>
@@ -1336,7 +1331,7 @@
                                     <span class="triples-radar-mode-group-label">קצב</span>
                                     <div id="triples-radar-session-switch" class="triples-radar-mode-switch" role="group" aria-label="בחירת מצב עבודה במכ״ם שלשות">
                                         <button type="button" class="triples-radar-mode-btn is-active" data-tr-session-mode="learn" aria-pressed="true">למידה</button>
-                                        <button type="button" class="triples-radar-mode-btn" data-tr-session-mode="exam" aria-pressed="false">מבחן</button>
+                                        <button type="button" class="triples-radar-mode-btn" data-tr-session-mode="exam" aria-pressed="false">משחק</button>
                                     </div>
                                 </div>
                             </div>
@@ -1365,7 +1360,16 @@
                                             <p id="triples-radar-focus-hint" class="triples-radar-focus-hint"></p>
                                             <p id="triples-radar-step" class="triples-radar-step">בחר/י שורה כדי לראות איזה חלק במשפט היא בודקת, ואז דייק/י לתבנית.</p>
                                         </div>
-                                        <button type="button" class="btn btn-secondary triples-radar-mini-action triples-radar-mini-action--concept" data-tr-action="open-concept">טבלת ברין</button>
+                                    </div>
+
+                                    <div class="triples-radar-utility-row" aria-label="כלי עזר קומפקטיים">
+                                        <button type="button" class="btn btn-secondary triples-radar-mini-action" data-tr-action="hint-row">רמזון</button>
+                                        <button type="button" class="btn btn-secondary triples-radar-mini-action" data-tr-action="hint-category">רמז</button>
+                                        <button type="button" class="btn btn-secondary triples-radar-mini-action triples-radar-mini-action--concept" data-tr-action="open-concept">מכ"ם</button>
+                                    </div>
+
+                                    <div id="triples-radar-game-strip" class="triples-radar-game-strip" hidden aria-live="polite">
+                                        <p id="triples-radar-game-line" class="triples-radar-game-line"></p>
                                     </div>
 
                                     <div id="triples-radar-mode-summary" class="triples-radar-mode-summary" aria-live="polite" hidden></div>
@@ -1384,7 +1388,6 @@
                                     <div id="triples-radar-rows" class="triples-radar-rows"></div>
 
                                     <div class="triples-radar-actions">
-                                        <button class="btn btn-secondary triples-radar-action triples-radar-action--hint" data-tr-action="hint-category">💡 רמז</button>
                                         <button class="btn btn-secondary triples-radar-action triples-radar-action--restart" data-tr-action="restart">↻ איפוס</button>
                                         <button class="btn btn-primary triples-radar-action triples-radar-action--next" data-tr-action="next">→ הבא</button>
                                     </div>

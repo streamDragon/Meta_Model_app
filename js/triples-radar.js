@@ -10,6 +10,7 @@
     const SESSION_MODE_STORAGE_KEY = 'triples_radar_session_mode_v1';
     const EXAM_TIME_LIMIT_SECONDS = 75;
     const EXAM_WARNING_SECONDS = 15;
+    const GAME_HINT_TIME_PENALTY_SECONDS = 8;
     const UI_MODE_BY_TOGGLE_KEY = Object.freeze({
         details: 'details',
         rules: 'rules'
@@ -56,12 +57,12 @@
             summaryLead: 'כאן מותר לעצור, לקרוא, ולהבין למה הבחירה עובדת לפני שעוברים הלאה.'
         }),
         exam: Object.freeze({
-            label: 'מבחן',
-            badge: 'מבחן',
+            label: 'משחק',
+            badge: 'משחק',
             timerLabel: 'זמן',
             timerIdle: '01:15',
-            feedbackIntro: 'מצב מבחן: בלי רמזים, עם זמן, נקודות וצלילים. בוחרים וממשיכים.',
-            summaryLead: 'כאן עובדים מהר ונקי: בלי עזרה באמצע, עם שעון שרץ עד שהדיוק נסגר.'
+            feedbackIntro: 'מצב משחק: יש שעון, נקודות וצלילי זמן. רמזון קיים, אבל עולה בזמן.',
+            summaryLead: 'כאן עובדים מהר ונקי: הטיימר דוחף קדימה, ורמזון נותן כיוון במחיר של זמן.'
         })
     });
 
@@ -268,6 +269,7 @@
         examDeadlineTs: 0,
         examSecondsLeft: EXAM_TIME_LIMIT_SECONDS,
         examExpired: false,
+        lastTimerSoundSecond: null,
         timerInterval: null,
         overlay: {
             type: '',
@@ -381,7 +383,7 @@
         const raw = String(value || '').trim().toLowerCase();
         if (!raw) return getDefaultSessionMode();
         if (raw === 'learn' || raw === 'learning' || raw === 'לימוד' || raw === 'למידה') return 'learn';
-        if (raw === 'exam' || raw === 'test' || raw === 'quiz' || raw === 'מבחן') return 'exam';
+        if (raw === 'exam' || raw === 'test' || raw === 'quiz' || raw === 'מבחן' || raw === 'משחק' || raw === 'game') return 'exam';
         return getDefaultSessionMode();
     }
 
@@ -485,6 +487,23 @@
             state.timerInterval = null;
         }
         state.examDeadlineTs = 0;
+        state.lastTimerSoundSecond = null;
+    }
+
+    function emitExamTimerSoundTick(next) {
+        if (state.sessionMode !== 'exam' || typeof root.playUISound !== 'function') return;
+        const safeSecond = Math.max(0, Math.floor(Number(next) || 0));
+        if (safeSecond === state.lastTimerSoundSecond) return;
+        state.lastTimerSoundSecond = safeSecond;
+
+        if (safeSecond <= 0) return;
+        if (safeSecond <= 10) {
+            root.playUISound('warning');
+            return;
+        }
+        if (safeSecond % 15 === 0) {
+            root.playUISound('tap_soft');
+        }
     }
 
     function applyExamTimeout() {
@@ -513,6 +532,7 @@
 
         state.examSecondsLeft = EXAM_TIME_LIMIT_SECONDS;
         state.examDeadlineTs = Date.now() + (EXAM_TIME_LIMIT_SECONDS * 1000);
+        state.lastTimerSoundSecond = null;
         updateTimerUI();
         state.timerInterval = setInterval(() => {
             if (state.sessionMode !== 'exam') {
@@ -521,6 +541,7 @@
             }
             const next = Math.max(0, Math.ceil((state.examDeadlineTs - Date.now()) / 1000));
             state.examSecondsLeft = next;
+            emitExamTimerSoundTick(next);
             updateTimerUI();
             if (state.uiMode === 'phone' && state.elements?.root) renderBoard();
             if (next <= 0) applyExamTimeout();
@@ -721,9 +742,29 @@
             return 'הזמן הסתיים. אפשר לעבור דרך הסיכום ולסגור את הסבב הבא.';
         }
         if (state.sessionMode === 'exam' && !state.solved) {
-            return `${getModeMeta().step} במצב מבחן אין רמזים - בוחרים וממשיכים.`;
+            return `${getModeMeta().step} במצב משחק אפשר להפעיל רמזון, אבל הוא מוריד ${GAME_HINT_TIME_PENALTY_SECONDS} שניות מהשעון.`;
         }
         return state.solved ? getModeMeta().solvedStep : getModeMeta().step;
+    }
+
+    function getGameStripText(currentEvaluation) {
+        if (state.sessionMode !== 'exam') return '';
+        if (state.examExpired) {
+            return 'הסבב נסגר כי הזמן נגמר. אפשר לראות את הסיכום ולהמשיך למקרה הבא.';
+        }
+        if (state.solved) {
+            return `הסבב נסגר. נשארו ${formatSeconds(state.examSecondsLeft)} על השעון.`;
+        }
+        if (state.rowHintUsed) {
+            return `רמזון הופעל. השורה המובילה הודגשה, והשעון ירד ב-${GAME_HINT_TIME_PENALTY_SECONDS} שניות.`;
+        }
+        if (currentEvaluation?.status === 'same_row') {
+            return 'הכיוון כבר קרוב. נשאר לדייק בתוך אותה שורה לפני שהשעון ייגמר.';
+        }
+        if (currentEvaluation?.status === 'wrong_row') {
+            return 'השעון רץ. שחרר/י את הבחירה האחרונה וחפש/י שורה אחרת לפני שימוש ברמזון.';
+        }
+        return `משחק מהיר: הזמן רץ. רמזון קיים, אבל עולה ${GAME_HINT_TIME_PENALTY_SECONDS} שניות.`;
     }
 
     function getFocusHintText(current) {
@@ -741,17 +782,17 @@
             return {
                 colorClass: '',
                 title: state.sessionMode === 'exam'
-                    ? `מצב ${getSessionModeMeta().label} · בוחרים בלי רמזים`
+                    ? `מצב ${getSessionModeMeta().label} · בוחרים לפני שהשעון יכריע`
                     : 'חמש שורות, שלוש אפשרויות בכל שורה',
                 subtitle: state.sessionMode === 'exam'
-                    ? 'הטבלה נשארת ניטרלית עד לבחירה'
+                    ? 'הטבלה נשארת נקייה. רק רמזון זמין אם צריך כיוון מהיר'
                     : 'לחיצה על "העמקה" תפתח הסבר על כל שורה',
                 lead: getSessionModeMeta().summaryLead,
                 reason: state.uiMode === 'rules'
                     ? 'במבט כללים מחפשים איזה חוק, פירוש או מסגרת מחזיקים את המשפט כולו.'
                     : 'במבט פרטים מחפשים איפה חסר מקור, זמן, ייחוס, שלב ביניים או עוגן חושי.',
                 nextPrompt: state.sessionMode === 'exam'
-                    ? 'קרא/י את המשפט, בחר/י שורה, ואז דייק/י לתבנית בלי רמז בדרך.'
+                    ? `קרא/י את המשפט, בחר/י שורה, ואז דייק/י לתבנית. רמזון יעלה ${GAME_HINT_TIME_PENALTY_SECONDS} שניות אם מפעילים אותו.`
                     : 'לא בטוח/ה? פתח/י העמקה על השורה שמסקרנת אותך, ואז חזור/י ללוח.',
                 selectionNote: ''
             };
@@ -766,7 +807,7 @@
                 reason: state.uiMode === 'rules'
                     ? 'כרגע בודקים איזה כלל או פירוש מחזיקים את המשפט, בלי לחשוף את השורה המובילה.'
                     : 'כרגע בודקים איפה חסר מידע, בלי לחשוף מראש איפה המרכז של המקרה.',
-                nextPrompt: 'אם בחרת - המשוב נשמר למטה, אבל המפה עצמה לא תספר את התשובה מראש.',
+                nextPrompt: `אם צריך דחיפה, אפשר להפעיל רמזון חד-פעמי. הוא יאיר את הכיוון, אבל יוריד ${GAME_HINT_TIME_PENALTY_SECONDS} שניות.`,
                 selectionNote: state.selectedCategory ? `הבחירה שלך כרגע: ${getCategoryLabelHe(state.selectedCategory)}.` : ''
             };
         }
@@ -1662,6 +1703,8 @@
         if (state.elements.contextLine) state.elements.contextLine.textContent = getScenarioContext(current);
         state.elements.statement.innerHTML = renderHighlightedSentence(current.clientText || '', highlightEntries, activeRowId);
         state.elements.focusHint.textContent = getFocusStripText(currentEvaluation);
+        if (state.elements.gameLine) state.elements.gameLine.textContent = getGameStripText(currentEvaluation);
+        if (state.elements.gameStrip) state.elements.gameStrip.hidden = state.sessionMode !== 'exam';
         state.elements.counter.textContent = `${state.index + 1}/${state.scenarios.length}`;
         state.elements.score.textContent = `${state.score}`;
         state.elements.solvedCount.textContent = `${state.solvedCount}`;
@@ -1734,7 +1777,7 @@
                     </div>
                     <div class="triples-radar-row-actions">
                         <button type="button" class="triples-radar-row-detail-btn" data-tr-action="row-detail" data-row-id="${escapeHtml(row.id)}" aria-expanded="${isExpanded ? 'true' : 'false'}">העמקה</button>
-                        <button type="button" class="triples-radar-row-hint-btn" data-tr-action="row-hint" data-row-id="${escapeHtml(row.id)}" aria-expanded="${showInlineHint ? 'true' : 'false'}">רמז</button>
+                        ${state.sessionMode === 'learn' ? `<button type="button" class="triples-radar-row-hint-btn" data-tr-action="row-hint" data-row-id="${escapeHtml(row.id)}" aria-expanded="${showInlineHint ? 'true' : 'false'}">רמז</button>` : ''}
                     </div>
                     ${showInlineHint ? `
                         <div class="triples-radar-row-inline-hint">
@@ -1774,7 +1817,8 @@
     function updateHintControls() {
         if (state.uiMode === 'phone') return;
         if (state.elements?.rowHintBtn) {
-            state.elements.rowHintBtn.disabled = state.solved || state.rowHintUsed;
+            state.elements.rowHintBtn.hidden = state.sessionMode !== 'exam';
+            state.elements.rowHintBtn.disabled = state.solved || state.rowHintUsed || state.examExpired;
         }
         if (state.elements?.catHintBtn) {
             state.elements.catHintBtn.hidden = state.sessionMode === 'exam';
@@ -1894,9 +1938,21 @@
     }
 
     function revealRowHint() {
-        if (state.solved || state.rowHintUsed || state.examExpired || state.sessionMode === 'exam') return;
+        if (state.solved || state.rowHintUsed || state.examExpired) return;
         state.rowHintUsed = true;
-        setFeedback('הכיוון החזק כבר הודגש בטבלה. עכשיו אפשר להישאר בתוכו ולדייק לתבנית.', 'info');
+        if (state.sessionMode === 'exam') {
+            state.examDeadlineTs = Math.max(Date.now(), state.examDeadlineTs - (GAME_HINT_TIME_PENALTY_SECONDS * 1000));
+            state.examSecondsLeft = Math.max(0, Math.ceil((state.examDeadlineTs - Date.now()) / 1000));
+            updateTimerUI();
+            if (state.examSecondsLeft <= 0) {
+                applyExamTimeout();
+                return;
+            }
+            if (typeof root.playUISound === 'function') root.playUISound('warning');
+            setFeedback(`רמזון הופעל. השורה החזקה הודגשה והשעון ירד ב-${GAME_HINT_TIME_PENALTY_SECONDS} שניות.`, 'warn');
+        } else {
+            setFeedback('הכיוון החזק כבר הודגש בטבלה. עכשיו אפשר להישאר בתוכו ולדייק לתבנית.', 'info');
+        }
         updateHintControls();
         renderBoard();
     }
@@ -2053,6 +2109,8 @@
             timer: document.getElementById('triples-radar-timer'),
             timerLabel: document.getElementById('triples-radar-timer-label'),
             step: document.getElementById('triples-radar-step'),
+            gameStrip: document.getElementById('triples-radar-game-strip'),
+            gameLine: document.getElementById('triples-radar-game-line'),
             rowHintBtn: document.querySelector('[data-tr-action="hint-row"]'),
             catHintBtn: document.querySelector('[data-tr-action="hint-category"]'),
             overlay: document.getElementById('triples-radar-overlay'),
