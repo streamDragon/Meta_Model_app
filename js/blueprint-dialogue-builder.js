@@ -824,6 +824,10 @@
             return render();
         }
         const node = NODE_BY_ID[state.activeNodeId];
+        if (!unlocked(node)) {
+            queue('system', `הצומת "${node.label}" עדיין נעול. קדימו לפי הסדר: ${formattedLabels(node.hardPrerequisites)}.`, { tone: 'warn', nodeId: node.id });
+            return render();
+        }
         const current = answer(node.id);
         const result = evaluate(node, value);
         state.nodeAnswers[node.id] = {
@@ -862,14 +866,14 @@
             icon: node.icon,
             label: node.label,
             shortLabel: node.shortLabel,
-            help: node.help,
+            help: node.help || node.composerPlaceholder || node.label,
             recommendedOrder: node.recommendedOrder,
             active: state.activeNodeId === node.id,
             recommended: nextId === node.id,
             status: currentStatus,
             statusLabel: STATUS_LABELS[currentStatus] || currentStatus,
             quality: Math.round((current.score || 0) * 100),
-            preview: current.text ? shorten(current.text) : node.help,
+            preview: current.text ? shorten(current.text) : (node.help || node.composerPlaceholder || node.label),
             orderLabel: orderEvent
                 ? (orderEvent.wasEarly ? '׳ ׳©׳׳ ׳׳•׳§׳“׳' : '׳ ׳©׳׳ ׳‘׳–׳׳ ׳˜׳•׳‘')
                 : (nextId === node.id ? '׳׳•׳׳׳¥ ׳¢׳›׳©׳™׳•' : `׳¡׳“׳¨ ${node.recommendedOrder}`),
@@ -885,13 +889,30 @@
         const nextNode = nextId ? NODE_BY_ID[nextId] : null;
         const activeNode = state.activeNodeId ? NODE_BY_ID[state.activeNodeId] : null;
         const rawStatement = clean(state.rawStatement);
-        const summaryReady = Boolean(rawStatement && data.desiredOutcome && data.visibleAction && data.firstStep);
+        const summaryReady = Boolean(rawStatement && data.desiredOutcome && data.visibleAction && data.firstStep && data.finalWording);
+        const stageViews = STAGES.map((stage) => {
+            const nodes = NODES.filter((node) => node.stage === stage.id).map(nodeView);
+            const complete = nodes.filter((n) => n.status === 'complete').length;
+            return Object.assign({}, stage, {
+                open: Boolean(state.stageOpen?.[stage.id]),
+                nodes,
+                complete,
+                total: nodes.length
+            });
+        });
+        const suggestedOptions = activeNode ? optionsForNode(activeNode.id) : [];
+        const rawOptions = rawStatement ? [] : rawStatementOptions();
         return {
             rawStatement,
             data,
             nextNode,
             activeNode,
             nodes: NODES.map(nodeView),
+            stages: stageViews,
+            suggestedOptions,
+            rawOptions,
+            verbSeeds: state.verbSeeds || [],
+            selectedVerbId: state.selectedVerbId,
             messages: state.messages.slice(),
             stageLabel: stageLabel(),
             completenessScore: data.completenessScore,
@@ -900,12 +921,12 @@
             summaryReady,
             composerEnabled: !rawStatement || Boolean(activeNode),
             composerPlaceholder: !rawStatement
-                ? '׳›׳×׳‘׳• ׳›׳׳ ׳׳× ׳”׳׳©׳₪׳˜ ׳”׳’׳•׳׳׳™ ׳©׳ ׳”׳׳˜׳•׳₪׳/׳×: ׳×׳׳•׳ ׳”, ׳׳©׳׳׳”, ׳”׳™׳׳ ׳¢׳•׳× ׳׳• ׳₪׳•׳¢׳ ׳¢׳׳•׳.'
+                ? 'כתבו כאן את המשפט הגולמי של המטופל/ת, או בחרו אחד מהשבבים המוצעים.'
                 : activeNode
                     ? activeNode.composerPlaceholder
                     : '׳׳—׳¦׳• ׳¢׳ ׳¦׳•׳׳× ׳‘׳׳₪׳” ׳›׳“׳™ ׳׳™׳™׳¦׳¨ ׳׳× ׳”׳©׳׳׳” ׳”׳‘׳׳” ׳‘׳¦׳³׳׳˜.',
             composerHint: !rawStatement
-                ? '׳‘׳׳™ ׳”׳׳©׳₪׳˜ ׳”׳’׳•׳׳׳™ ׳”׳׳₪׳” ׳ ׳©׳׳¨׳× ׳¡׳’׳•׳¨׳”.'
+                ? 'בחרו משפט גולמי והתחילו משם.'
                 : activeNode
                     ? `׳”׳×׳©׳•׳‘׳” ׳©׳×׳™׳›׳×׳‘ ׳¢׳›׳©׳™׳• ׳×׳™׳©׳׳¨ ׳‘׳¦׳•׳׳× "${activeNode.label}".`
                     : '׳›׳¨׳’׳¢ ׳׳™׳ ׳©׳׳׳” ׳₪׳×׳•׳—׳”. ׳”׳׳₪׳” ׳”׳™׳ ׳׳©׳˜׳— ׳”׳©׳׳™׳˜׳” ׳‘׳©׳™׳—׳”.',
@@ -978,116 +999,159 @@
     function render() {
         if (!root) return false;
         const view = currentView();
+        const toteNode = (node) => `
+            <button type="button" class="tote-node ${node.status ? 'is-' + node.status : ''} ${node.recommended ? 'is-recommended' : ''}" data-blueprint-node="${esc(node.id)}" aria-label="${esc(node.label)}">
+                <div class="tote-node-head">
+                    <span class="tote-node-icon">${esc(node.icon || '•')}</span>
+                    <span class="tote-node-title">${esc(node.label)}</span>
+                    <span class="tote-node-order">#${esc(node.recommendedOrder)}</span>
+                </div>
+                <div class="tote-node-meta">
+                    <span class="tote-node-status">${esc(node.statusLabel)}</span>
+                    <span class="tote-node-quality">${esc(String(node.quality))}%</span>
+                </div>
+                <p class="tote-node-preview">${esc(node.preview)}</p>
+            </button>
+        `;
+        const stageBoard = view.stages.map((stage) => `
+            <article class="tote-stage" data-stage="${esc(stage.id)}" data-open="${stage.open ? 'true' : 'false'}">
+                <header class="tote-stage-head" data-stage-toggle="${esc(stage.id)}">
+                    <div>
+                        <span class="tote-stage-kicker">${esc(stage.subLabel)}</span>
+                        <h4>${esc(stage.label)}</h4>
+                    </div>
+                    <div class="tote-stage-count">${esc(stage.complete)}/${esc(stage.total)}</div>
+                </header>
+                <div class="tote-stage-body"${stage.open ? '' : ' hidden'}>
+                    ${stage.nodes.map(toteNode).join('')}
+                </div>
+            </article>
+        `).join('');
+        const verbChips = (view.verbSeeds || []).map((seed) => `
+            <button type="button" class="chip chip--verb${seed.id === view.selectedVerbId ? ' is-active' : ''}" data-verb-id="${esc(seed.id)}">${esc(seed.verb_he || seed.verb_en || seed.id)}</button>
+        `).join('');
+        const rawChips = (view.rawOptions || []).map((option) => `
+            <button type="button" class="chip chip--raw" data-chip-raw="1" data-chip-value="${esc(option)}">${esc(option)}</button>
+        `).join('');
+        const suggestionChips = (view.suggestedOptions || []).map((option) => `
+            <button type="button" class="chip chip--suggestion" data-chip-node="${esc(view.activeNode ? view.activeNode.id : '')}" data-chip-value="${esc(option)}">${esc(option)}</button>
+        `).join('');
         root.innerHTML = `
             <section class="blueprint-progress-strip" aria-live="polite">
                 <article class="blueprint-progress-highlight">
-                    <span class="blueprint-panel-kicker">׳©׳׳‘ ׳ ׳•׳›׳—׳™</span>
+                    <span class="blueprint-panel-kicker">שלב נוכחי</span>
                     <strong>${esc(view.stageLabel)}</strong>
-                    <p>׳”׳׳¢׳¨׳›׳× ׳‘׳•׳“׳§׳× ׳’׳ ׳›׳׳” ׳׳™׳“׳¢ ׳ ׳׳¡׳£ ׳•׳’׳ ׳”׳׳ ׳”׳©׳׳׳•׳× ׳ ׳©׳׳׳• ׳‘׳¡׳“׳¨ ׳©׳¢׳•׳–׳¨ ׳˜׳™׳₪׳•׳׳™׳×.</p>
+                    <p>מסלול TOTE עם כוונה חיובית ושאלות מדודות.</p>
                 </article>
-                ${metric('׳©׳׳׳•׳× ׳׳™׳“׳¢', `${view.completenessScore}%`, `${view.data.completedNodes}/${NODES.length} ׳¦׳׳×׳™׳ ׳׳׳׳™׳`, view.completenessScore >= 70 ? 'success' : 'info')}
-                ${metric('׳¡׳“׳¨ ׳©׳׳׳•׳×', `${view.orderScore}%`, view.orderScore >= 85 ? '׳׳”׳׳ ׳™׳¦׳™׳‘' : '׳™׳© ׳§׳₪׳™׳¦׳•׳× ׳׳•׳§׳“׳׳•׳×', view.orderScore >= 85 ? 'success' : 'warn')}
-                ${metric('׳¦׳™׳•׳ ׳׳©׳•׳׳‘', `${view.combinedScore}%`, '׳׳©׳•׳‘ ׳׳׳׳, ׳׳ ׳׳©׳—׳§', view.combinedScore >= 80 ? 'success' : 'neutral')}
-                ${metric('׳¦׳•׳׳× ׳׳•׳׳׳¥', view.nextNode ? view.nextNode.shortLabel : '׳§׳•׳“׳ ׳׳©׳₪׳˜', view.nextNode ? view.nextNode.label : '׳©׳•׳׳¨׳™׳ ׳׳©׳₪׳˜ ׳’׳•׳׳׳™', 'neutral')}
+                ${metric('שלמות מידע', `${view.completenessScore}%`, `${view.data.completedNodes}/${NODES.length} צמתים מלאים`, view.completenessScore >= 70 ? 'success' : 'info')}
+                ${metric('סדר שאלות', `${view.orderScore}%`, view.orderScore >= 85 ? 'מהלך יציב' : 'יש קפיצות מוקדמות', view.orderScore >= 85 ? 'success' : 'warn')}
+                ${metric('ציון משולב', `${view.combinedScore}%`, 'מאמן, לא משחק', view.combinedScore >= 80 ? 'success' : 'neutral')}
+                ${metric('צומת מומלץ', view.nextNode ? view.nextNode.shortLabel : 'קודם משפט', view.nextNode ? view.nextNode.label : 'שומרים על סדר טיפולי', 'neutral')}
             </section>
 
             <section class="blueprint-dialogue-stage">
                 <aside class="blueprint-stage-card blueprint-stage-card--context">
-                    <span class="blueprint-panel-kicker">׳¢׳•׳’׳ ׳”׳©׳™׳—׳”</span>
-                    <h3>׳׳” ׳”׳’׳™׳¢ ׳׳”׳׳˜׳•׳₪׳/׳×</h3>
-                    <blockquote class="blueprint-raw-quote">${esc(view.rawStatement || '׳¢׳“׳™׳™׳ ׳׳ ׳ ׳©׳׳¨ ׳›׳׳ ׳׳©׳₪׳˜ ׳’׳•׳׳׳™.')}</blockquote>
-                    <p class="blueprint-stage-note">${esc(view.rawStatement ? '׳”׳׳©׳₪׳˜ ׳”׳–׳” ׳ ׳©׳׳¨ ׳’׳׳•׳™ ׳׳׳•׳¨׳ ׳›׳ ׳”׳׳”׳׳ ׳›׳“׳™ ׳©׳׳ ׳ ׳—׳׳™׳§ ׳—׳–׳¨׳” ׳׳˜׳•׳₪׳¡.' : '׳”׳×׳—׳™׳׳• ׳‘׳׳©׳₪׳˜ ׳׳—׳“. ׳׳׳ ׳• ׳”׳׳₪׳” ׳×׳™׳₪׳×׳— ׳•׳×׳¦׳™׳¢ ׳¡׳“׳¨ ׳©׳׳׳•׳×.' )}</p>
-                    ${view.nextNode ? `<div class="blueprint-stage-highlight"><span>׳׳•׳׳׳¥ ׳¢׳›׳©׳™׳•</span><strong>${esc(view.nextNode.label)}</strong></div>` : ''}
+                    <span class="blueprint-panel-kicker">בחירת פועל / משפט</span>
+                    <h3>מה המשפט הגולמי?</h3>
+                    <div class="verb-chip-row">${verbChips}</div>
+                    <blockquote class="blueprint-raw-quote">${esc(view.rawStatement || 'עדיין אין משפט גולמי')}</blockquote>
+                    ${rawChips ? `<div class="chip-cloud chip-cloud--raw">${rawChips}</div>` : ''}
+                    <p class="blueprint-stage-note">${esc(view.rawStatement ? 'אפשר לערוך את המשפט או להמשיך לצמתים.' : 'בחרו פועל וקליק על שבב כדי להתחיל')}</p>
                 </aside>
 
-                <section class="blueprint-phone-shell" aria-label="׳©׳™׳—׳” ׳˜׳™׳₪׳•׳׳™׳×">
+                <section class="blueprint-phone-shell" aria-label="שיחה טיפולית">
                     <div class="blueprint-phone-card">
                         <div class="blueprint-phone-head">
                             <div>
-                                <span class="blueprint-panel-kicker">׳“׳™׳׳׳•׳’ ׳׳•׳ ׳—׳”</span>
-                                <h3>׳׳˜׳₪׳/׳× ג†” ׳׳˜׳•׳₪׳/׳×</h3>
+                                <span class="blueprint-panel-kicker">דיאלוג מונחה</span>
+                                <h3>מטפל/ת ⇄ מטופל/ת</h3>
                             </div>
-                            <span class="blueprint-phone-status">${esc(view.activeNode ? `׳©׳׳׳” ׳₪׳×׳•׳—׳”: ${view.activeNode.label}` : '׳׳׳×׳™׳ ׳׳‘׳—׳™׳¨׳× ׳¦׳•׳׳×')}</span>
+                            <span class="blueprint-phone-status">${esc(view.activeNode ? `שאלה פתוחה: ${view.activeNode.label}` : 'בחרו צומת במפה')}</span>
                         </div>
                         <div class="blueprint-chat-thread" data-blueprint-chat-thread="1" role="log" aria-live="polite">
                             ${view.messages.map(bubble).join('')}
                         </div>
+                        ${suggestionChips ? `<div class="chip-cloud chip-cloud--suggestions">${suggestionChips}</div>` : ''}
                         <form class="blueprint-composer" data-blueprint-composer="1">
-                            <textarea name="reply"
-                                      rows="${view.rawStatement ? 2 : 3}"
-                                      placeholder="${esc(view.composerPlaceholder)}"
-                                      ${view.composerEnabled ? '' : 'disabled'}></textarea>
+                            <textarea name="reply" rows="${view.rawStatement ? 2 : 3}" placeholder="${esc(view.composerPlaceholder)}" ${view.composerEnabled ? '' : 'disabled'}></textarea>
                             <div class="blueprint-composer-footer">
                                 <span class="blueprint-composer-hint">${esc(view.composerHint)}</span>
-                                <button type="submit" class="btn btn-primary" ${view.composerEnabled ? '' : 'disabled'}>${esc(view.rawStatement ? '׳©׳׳•׳¨ ׳×׳©׳•׳‘׳”' : '׳©׳׳•׳¨ ׳׳©׳₪׳˜')}</button>
+                                <button type="submit" class="btn btn-primary" ${view.composerEnabled ? '' : 'disabled'}>${esc(view.rawStatement ? 'שמור תשובה' : 'שמור משפט')}</button>
                             </div>
                         </form>
                     </div>
                 </section>
 
                 <aside class="blueprint-stage-card blueprint-stage-card--feedback">
-                    <span class="blueprint-panel-kicker">׳׳©׳•׳‘ ׳׳׳׳</span>
-                    <h3>׳׳” ׳׳™׳›׳•׳× ׳”׳׳”׳׳ ׳›׳¨׳’׳¢</h3>
+                    <span class="blueprint-panel-kicker">משוב מאמן</span>
+                    <h3>איפה להתמקד עכשיו</h3>
                     <p class="blueprint-stage-note">${esc(view.lastOrderNote)}</p>
                     <div class="blueprint-feedback-grid">
-                        <div><strong>${esc(String(view.data.completedNodes))}</strong><span>׳¦׳׳×׳™׳ ׳׳׳׳™׳</span></div>
-                        <div><strong>${esc(String(view.data.partialNodes))}</strong><span>׳¦׳׳×׳™׳ ׳—׳׳§׳™׳™׳</span></div>
-                        <div><strong>${esc(String(view.orderScore))}%</strong><span>׳׳™׳›׳•׳× ׳¡׳“׳¨</span></div>
+                        <div><strong>${esc(String(view.data.completedNodes))}</strong><span>צמתים מלאים</span></div>
+                        <div><strong>${esc(String(view.data.partialNodes))}</strong><span>צמתים חלקיים</span></div>
+                        <div><strong>${esc(String(view.orderScore))}%</strong><span>איכות סדר</span></div>
                     </div>
                     <div class="blueprint-stage-highlight blueprint-stage-highlight--soft">
-                        <span>${view.activeNode ? '׳”׳¦׳•׳׳× ׳”׳₪׳¢׳™׳' : '׳׳™׳ ׳¢׳•׳‘׳“׳™׳'}</span>
-                        <strong>${esc(view.activeNode ? view.activeNode.label : '׳”׳¦׳³׳׳˜ ׳׳ ׳—׳•׳₪׳©׳™ ׳׳’׳׳¨׳™')}</strong>
-                        <p>${esc(view.activeNode ? view.activeNode.help : '׳”׳׳₪׳” ׳׳™׳™׳¦׳¨׳× ׳׳× ׳”׳©׳׳׳”, ׳”׳¦׳³׳׳˜ ׳׳—׳–׳™׳§ ׳׳× ׳”׳×׳©׳•׳‘׳”, ׳•׳”׳¡׳™׳›׳•׳ ׳ ׳‘׳ ׳” ׳׳©׳ ׳™׳”׳ ׳™׳—׳“.')}</p>
+                        <span>${view.activeNode ? 'צומת פעיל' : 'המלצה'}</span>
+                        <strong>${esc(view.activeNode ? view.activeNode.label : (view.nextNode ? view.nextNode.label : 'בחרו צומת ראשון'))}</strong>
+                        <p>${esc(view.activeNode ? view.activeNode.help : 'המסלול מתקדם לפי שלבים פתוחים. לחצו על שלב כדי לפתוח תתי-שאלות.')}</p>
                     </div>
                 </aside>
             </section>
 
-            <section class="blueprint-flow-shell" aria-label="׳׳₪׳× ׳₪׳¢׳•׳׳” ׳׳™׳ ׳˜׳¨׳׳§׳˜׳™׳‘׳™׳×">
+            <section class="blueprint-flow-shell" aria-label="מפת שלבים">
                 <div class="blueprint-section-head">
                     <div>
-                        <span class="blueprint-panel-kicker">TOTE / Action Flow</span>
-                        <h3>׳”׳׳₪׳” ׳©׳׳™׳™׳¦׳¨׳× ׳׳× ׳”׳©׳׳׳•׳×</h3>
+                        <span class="blueprint-panel-kicker">TOTE Flow</span>
+                        <h3>מפת שלבים מתכווצת</h3>
                     </div>
                     <div class="blueprint-flow-legend" aria-hidden="true">
-                        <span data-tone="locked">׳ ׳¢׳•׳</span>
-                        <span data-tone="available">׳–׳׳™׳</span>
-                        <span data-tone="partial">׳—׳׳§׳™</span>
-                        <span data-tone="complete">׳׳׳</span>
+                        <span data-tone="locked">נעול</span>
+                        <span data-tone="available">זמין</span>
+                        <span data-tone="partial">חלקי</span>
+                        <span data-tone="complete">מלא</span>
                     </div>
                 </div>
-                <div class="blueprint-flow-board">
-                    ${view.nodes.map(nodeCard).join('')}
+                <div class="tote-board">
+                    ${stageBoard}
                 </div>
             </section>
 
-            <section class="blueprint-summary-shell ${view.summaryReady ? 'is-ready' : 'is-building'}" aria-label="׳׳₪׳× ׳₪׳¢׳•׳׳” ׳¡׳•׳₪׳™׳×">
+            <section class="blueprint-summary-shell ${view.summaryReady ? 'is-ready' : 'is-building'}" aria-label="מפת פעולה סופית">
                 <div class="blueprint-section-head">
                     <div>
-                        <span class="blueprint-panel-kicker">׳”׳׳₪׳” ׳©׳‘׳ ׳™׳ ׳•</span>
-                        <h3>׳¡׳™׳›׳•׳ ׳׳”׳׳ / ׳×׳•׳›׳ ׳™׳× ׳‘׳™׳¦׳•׳¢</h3>
+                        <span class="blueprint-panel-kicker">התוצר שבנינו</span>
+                        <h3>Therapeutic Action Map</h3>
                     </div>
-                    <span class="blueprint-summary-state">${esc(view.summaryReady ? '׳׳•׳›׳ ׳׳‘׳™׳¦׳•׳¢' : '׳¢׳“׳™׳™׳ ׳‘׳‘׳ ׳™׳™׳”')}</span>
+                    <span class="blueprint-summary-state">${esc(view.summaryReady ? 'מוכן לביצוע' : 'עוד בבנייה')}</span>
                 </div>
                 <div class="blueprint-commitment-banner">
-                    <span class="blueprint-panel-kicker">׳׳©׳₪׳˜ ׳׳—׳•׳™׳‘׳•׳× ׳§׳¦׳¨</span>
+                    <span class="blueprint-panel-kicker">מחויבות קצרה</span>
                     <strong>${esc(view.data.conciseCommitment)}</strong>
                 </div>
                 <div id="final-blueprint" class="blueprint-summary-grid">
-                    ${summaryCard('׳”׳׳©׳₪׳˜ ׳”׳’׳•׳׳׳™', view.data.rawStatement, '׳׳׳™׳₪׳” ׳™׳¦׳׳ ׳•', 'raw')}
-                    ${summaryCard('׳”׳™׳¢׳“ ׳©׳¢׳‘׳¨ ׳˜׳¨׳ ׳¡׳₪׳•׳¨׳׳¦׳™׳”', view.data.transformedOutcome, '׳׳” ׳¨׳•׳¦׳™׳ ׳©׳™׳§׳¨׳” ׳‘׳׳§׳•׳', 'success')}
-                    ${summaryCard('׳”׳₪׳¢׳•׳׳” ׳”׳ ׳¨׳׳™׳×', view.data.visibleAction, '׳׳” ׳׳₪׳©׳¨ ׳׳¨׳׳•׳× ׳׳• ׳׳©׳׳•׳¢ ׳‘׳׳¦׳™׳׳•׳×', 'default')}
-                    ${summaryCard('׳”׳׳ ׳™׳¢ ׳”׳¨׳’׳©׳™', view.data.emotionalLever, '׳׳׳” ׳–׳” ׳‘׳׳׳× ׳—׳©׳•׳‘', 'default')}
-                    ${summaryCard('׳”׳—׳¡׳ ׳”׳¦׳₪׳•׳™', view.data.obstacles, '׳׳™׳₪׳” ׳–׳” ׳¢׳׳•׳ ׳׳”׳™׳×׳§׳¢', 'warn')}
-                    ${summaryCard('׳—׳׳•׳₪׳” / Plan B', view.data.alternatives, '׳׳” ׳¢׳•׳©׳™׳ ׳׳ ׳™׳© ׳×׳§׳™׳¢׳”', 'info', 'if-stuck-content')}
-                    ${summaryCard('׳×׳ ׳׳™ ׳‘׳™׳¦׳•׳¢', view.data.executionConditions, '׳׳×׳™, ׳׳™׳₪׳” ׳•׳¢׳ ׳׳™ ׳–׳” ׳§׳•׳¨׳”', 'default')}
-                    ${summaryCard('׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳', view.data.firstStep, '׳”׳¦׳¢׳“ ׳”׳›׳™ ׳§׳˜׳ ׳©׳׳₪׳©׳¨ ׳׳‘׳¦׳¢ ׳¢׳›׳©׳™׳•', 'success', 'next-physical-action')}
-                    ${summaryCard('׳‘׳“׳™׳§׳× ׳¡׳™׳•׳', view.data.finalTest, '׳׳™׳ ׳ ׳“׳¢ ׳©׳”׳×׳•׳›׳ ׳™׳× ׳‘׳¨׳•׳¨׳”, ׳׳¦׳™׳׳•׳×׳™׳× ׳•׳׳“׳™׳“׳”', 'default')}
+                    ${summaryCard('Raw Statement', view.data.rawStatement, '', 'raw')}
+                    ${summaryCard('Desired Outcome', view.data.desiredOutcome, '', 'success')}
+                    ${summaryCard('Success Sign', view.data.successSign, '', 'info')}
+                    ${summaryCard('Positive Intention (old)', view.data.positiveIntention, '', 'info')}
+                    ${summaryCard('Preserve Intention (updated)', view.data.preservePositiveIntention, '', 'success')}
+                    ${summaryCard('Visible Action', view.data.visibleAction, '', 'default')}
+                    ${summaryCard('Emotional Driver', view.data.emotionalDriver, '', 'default')}
+                    ${summaryCard('Execution Conditions', view.data.executionConditions, '', 'default')}
+                    ${summaryCard('Obstacle', view.data.obstacle, '', 'warn')}
+                    ${summaryCard('Alternative / Plan B', view.data.alternativePlan, '', 'info')}
+                    ${summaryCard('Goal Imagery', view.data.goalImagery, '', 'info')}
+                    ${summaryCard('Process Imagery', view.data.processImagery, '', 'info')}
+                    ${summaryCard('First Step Imagery', view.data.firstStepImagery, '', 'info')}
+                    ${summaryCard('Clear / Realistic / Measurable', [view.data.clearCheck, view.data.realisticCheck, view.data.measurableCheck].filter(Boolean).join(' | '), '', 'neutral')}
+                    ${summaryCard('First Step', view.data.firstStep, '', 'success')}
+                    ${summaryCard('Final Wording', view.data.finalWording, '', 'success')}
                 </div>
                 <div class="blueprint-summary-note">${esc(view.data.therapistSummary)}</div>
                 <div class="blueprint-action-row">
-                    <button id="export-json-btn" type="button" class="btn btn-secondary" data-blueprint-action="export">נ“¥ ׳™׳™׳¦׳ JSON</button>
-                    <button id="start-over-btn" type="button" class="btn btn-secondary" data-blueprint-action="reset">נ”„ ׳׳”׳׳ ׳—׳“׳©</button>
-                    <button id="do-it-now-btn" type="button" class="btn btn-primary" data-blueprint-action="start">ג±ן¸ ׳׳”׳×׳—׳™׳ ׳‘׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳</button>
+                    <button id="export-json-btn" type="button" class="btn btn-secondary" data-blueprint-action="export">📥 יצוא JSON</button>
+                    <button id="start-over-btn" type="button" class="btn btn-secondary" data-blueprint-action="reset">🔄 מהתחלה</button>
+                    <button id="do-it-now-btn" type="button" class="btn btn-primary" data-blueprint-action="start">▶️ צעד ראשון</button>
                 </div>
             </section>
         `;
@@ -1097,8 +1161,33 @@
         });
         return true;
     }
-
     function handleClick(event) {
+        const stageToggle = event.target.closest('[data-stage-toggle]');
+        if (stageToggle) { toggleStage(clean(stageToggle.getAttribute('data-stage-toggle'))); return; }
+
+        const verbButton = event.target.closest('[data-verb-id]');
+        if (verbButton) { selectVerb(clean(verbButton.getAttribute('data-verb-id'))); return; }
+
+        const chipRaw = event.target.closest('[data-chip-raw]');
+        if (chipRaw) {
+            const value = clean(chipRaw.getAttribute('data-chip-value'));
+            if (value) {
+                state.rawStatement = value;
+                queue('patient', value, { tone: 'statement' });
+                render();
+            }
+            return;
+        }
+
+        const chipSuggestion = event.target.closest('[data-chip-node]');
+        if (chipSuggestion) {
+            const value = clean(chipSuggestion.getAttribute('data-chip-value'));
+            const nodeId = clean(chipSuggestion.getAttribute('data-chip-node')) || state.activeNodeId;
+            if (nodeId) state.activeNodeId = nodeId;
+            if (value) submit(value);
+            return;
+        }
+
         const nodeButton = event.target.closest('[data-blueprint-node]');
         if (nodeButton) {
             askNode(clean(nodeButton.getAttribute('data-blueprint-node')));
@@ -1110,8 +1199,12 @@
         if (action === 'reset') return reset();
         if (action === 'export') return exportJson();
         if (action === 'start') return startNow();
+        if (action === 'summary') {
+            const summaryEl = root.querySelector('#final-blueprint');
+            if (summaryEl) summaryEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            return true;
+        }
     }
-
     function handleSubmit(event) {
         const form = event.target.closest('[data-blueprint-composer="1"]');
         if (!form) return;
@@ -1128,11 +1221,24 @@
             root.addEventListener('submit', handleSubmit);
         }
         if (!state) state = initialState();
-        return render();
+        render();
+        ensureSeedsLoaded().then(() => {
+            if (!clean(state.selectedVerbId) && state.verbSeeds.length) {
+                selectVerb(state.verbSeeds[0].id);
+            } else {
+                render();
+            }
+        });
+        return true;
     }
 
     function reset() {
+        const existingSeeds = state?.verbSeeds || [];
+        const loaded = state?.seedLoaded || false;
         state = initialState();
+        state.verbSeeds = existingSeeds;
+        state.seedLoaded = loaded;
+        if (loaded && existingSeeds.length && !state.selectedVerbId) state.selectedVerbId = clean(existingSeeds[0].id || '');
         return render();
     }
 
@@ -1178,4 +1284,6 @@
         buildGuidedImagery: guidedImagery
     });
 })();
+
+
 
