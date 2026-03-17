@@ -11,16 +11,13 @@
         settings: 'scenario_trainer_settings_v1',
         progress: 'scenario_trainer_progress_v1'
     });
-    const DEFAULT_MOBILE_ZONE_ORDER = Object.freeze(['purpose', 'start', 'helper-steps', 'main', 'support']);
-    const MOBILE_ZONE_ALIASES = Object.freeze({
-        purpose: 'purpose',
-        start: 'start',
-        helper: 'helper-steps',
-        'helper-steps': 'helper-steps',
-        main: 'main',
-        support: 'support'
-    });
     const OPTION_IDS = Object.freeze(['A', 'B', 'C', 'D']);
+    const STORY_FRAME_LABELS = Object.freeze({
+        setup: 'פתיחה',
+        trigger: 'רגע מפעיל',
+        'under-surface': 'מתחת לפני השטח',
+        response: 'כיוון תגובה'
+    });
     const SCREEN_IDS = Object.freeze({
         home: 'home',
         play: 'play',
@@ -151,9 +148,9 @@
         progress: loadProgress(),
         session: null,
         activeScenario: null,
+        activeStorySlideId: '',
         selectedOption: null,
         lastEntry: null,
-        previewedOptionId: '',
         selectedPrismId: '',
         toastMessage: '',
         toastTimer: null
@@ -165,10 +162,6 @@
     };
 
     mount.addEventListener('click', handleClick);
-    mount.addEventListener('mouseover', handleMouseOver);
-    mount.addEventListener('mouseout', handleMouseOut);
-    mount.addEventListener('focusin', handleFocusIn);
-    mount.addEventListener('focusout', handleFocusOut);
     mount.addEventListener('change', handleChange);
     mount.addEventListener('input', handleInput);
 
@@ -268,35 +261,6 @@
         localStorage.setItem(STORAGE_KEYS.progress, JSON.stringify(state.progress));
     }
 
-    function getMobileZoneOrder() {
-        const raw = Array.isArray(trainerContract.mobilePriorityOrder) ? trainerContract.mobilePriorityOrder : [];
-        const seen = new Set();
-        const resolved = [];
-        raw.forEach((item) => {
-            const key = MOBILE_ZONE_ALIASES[String(item || '').trim()];
-            if (!key || seen.has(key)) return;
-            seen.add(key);
-            resolved.push(key);
-        });
-        DEFAULT_MOBILE_ZONE_ORDER.forEach((key) => {
-            if (seen.has(key)) return;
-            seen.add(key);
-            resolved.push(key);
-        });
-        return resolved;
-    }
-
-    function buildRootStyle() {
-        return getMobileZoneOrder().map((zoneId, index) => `--scenario-mobile-order-${zoneId}:${index + 1}`).join(';');
-    }
-
-    function getZoneStyle(zoneId) {
-        const ordered = getMobileZoneOrder();
-        const index = ordered.indexOf(zoneId);
-        const order = index === -1 ? DEFAULT_MOBILE_ZONE_ORDER.indexOf(zoneId) + 1 : index + 1;
-        return `--scenario-mobile-order:${order}`;
-    }
-
     function normalizeScenarioOption(raw, fallbackId, isGreen) {
         const line = normalizeText(raw?.speakerLine || raw?.text || raw?.say, isGreen ? 'בוא/י נבדוק מה קורה כאן בפועל.' : 'אני מגיב/ה מתוך לחץ.');
         const why = normalizeText(
@@ -339,6 +303,68 @@
         const red = redPool.slice(0, 4).map((item, index) => normalizeScenarioOption(item, OPTION_IDS[index] || String(index + 1), false));
         const green = normalizeScenarioOption(responseSet.green || legacyGreen || { speakerLine: rawScenario?.greenSentence }, 'E', true);
         return { red, green };
+    }
+
+    function buildDefaultStorySlides(rawScenario, responseSet, metaModelCore) {
+        const greenLine = normalizeText(responseSet?.green?.speakerLine || rawScenario?.greenSentence, '');
+        return [
+            {
+                id: 'setup',
+                frame: 'setup',
+                label: STORY_FRAME_LABELS.setup,
+                title: normalizeText(rawScenario?.sceneTitle || rawScenario?.title, 'פתיחה'),
+                image: normalizeText(rawScenario?.coverImage || rawScenario?.sceneArt, ''),
+                caption: normalizeText(rawScenario?.contextIntro, ''),
+                quote: ''
+            },
+            {
+                id: 'trigger',
+                frame: 'trigger',
+                label: STORY_FRAME_LABELS.trigger,
+                title: 'מה נאמר ברגע הזה',
+                image: normalizeText(rawScenario?.sceneArt || rawScenario?.coverImage, ''),
+                caption: normalizeText(rawScenario?.surfaceConflict || rawScenario?.openingLine, ''),
+                quote: normalizeText(rawScenario?.openingLine, '')
+            },
+            {
+                id: 'under-surface',
+                frame: 'under-surface',
+                label: STORY_FRAME_LABELS['under-surface'],
+                title: 'מה יושב מתחת לפני השטח',
+                image: normalizeText(rawScenario?.sceneArt || rawScenario?.coverImage, ''),
+                caption: normalizeText(rawScenario?.humanNeed || metaModelCore?.hiddenGap, ''),
+                quote: normalizeText(metaModelCore?.hiddenGap, '')
+            },
+            {
+                id: 'response',
+                frame: 'response',
+                label: STORY_FRAME_LABELS.response,
+                title: 'לאן כדאי לכוון את התגובה',
+                image: normalizeText(rawScenario?.sceneArt || rawScenario?.coverImage, ''),
+                caption: normalizeText(rawScenario?.deepeningQuestion || rawScenario?.supportPrompt, ''),
+                quote: greenLine
+            }
+        ];
+    }
+
+    function normalizeStorySlides(rawScenario, responseSet, metaModelCore) {
+        const rawSlides = Array.isArray(rawScenario?.storySlides) && rawScenario.storySlides.length
+            ? rawScenario.storySlides
+            : buildDefaultStorySlides(rawScenario, responseSet, metaModelCore);
+        const normalized = rawSlides.map((slide, index) => {
+            const frame = normalizeText(slide?.frame || slide?.id, ['setup', 'trigger', 'under-surface', 'response'][index] || `frame-${index + 1}`);
+            const id = normalizeText(slide?.id, frame);
+            return {
+                id,
+                frame,
+                label: normalizeText(slide?.label, STORY_FRAME_LABELS[frame] || `שלב ${index + 1}`),
+                title: normalizeText(slide?.title, normalizeText(rawScenario?.sceneTitle || rawScenario?.title, `שלב ${index + 1}`)),
+                image: normalizeText(slide?.image, ''),
+                caption: normalizeText(slide?.caption, ''),
+                quote: normalizeText(slide?.quote, '')
+            };
+        }).filter((slide) => slide.id);
+        return normalized.length ? normalized : buildDefaultStorySlides(rawScenario, responseSet, metaModelCore);
     }
 
     function normalizeScenario(rawScenario, index, domainLabels) {
