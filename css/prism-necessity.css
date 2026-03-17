@@ -357,6 +357,7 @@ body.shell-feature-active[data-active-tab="prismlab"] {
   .pnm-view {
     padding: 8px;
     border-radius: 22px;
+    gap: 6px;
   }
 
   .pnm-title-block h1 {
@@ -364,11 +365,74 @@ body.shell-feature-active[data-active-tab="prismlab"] {
   }
 
   .pnm-btn {
-    min-height: 38px;
-    padding: 8px 14px;
+    min-height: 36px;
+    padding: 7px 14px;
+  }
+
+  .pnm-panel,
+  .pnm-context-card,
+  .pnm-instruction-card,
+  .pnm-question-card,
+  .pnm-band {
+    padding: 8px 10px;
+    gap: 5px;
+  }
+
+  .pnm-work-header {
+    gap: 6px;
+  }
+
+  .pnm-context-lines {
+    gap: 4px;
+  }
+
+  .pnm-work-header h2,
+  .pnm-title-block h2 {
+    font-size: 1rem;
+  }
+
+  .pnm-kicker,
+  .pnm-section-label {
+    font-size: 0.72rem;
+  }
+
+  .pnm-context-lines p,
+  .pnm-band p,
+  .pnm-instruction-card p,
+  .pnm-question-card p,
+  .pnm-question-card h3 {
+    line-height: 1.4;
+  }
+
+  .pnm-context-lines p,
+  .pnm-band p,
+  .pnm-instruction-card p,
+  .pnm-question-card p {
+    font-size: 0.88rem;
+  }
+
+  .pnm-band p,
+  .pnm-instruction-card p {
+    line-height: 1.3;
+  }
+
+  .pnm-sentence {
+    font-size: 0.94rem;
+  }
+
+  .pnm-view--workspace > .pnm-question-card {
+    order: 5;
+  }
+
+  .pnm-view--workspace > .pnm-band--recover {
+    order: 6;
+  }
+
+  .pnm-view--workspace > .pnm-level-strip-wrap {
+    order: 7;
   }
 
   .pnm-level-strip {
-    grid-auto-columns: 78%;
+    grid-auto-columns: 76%;
   }
 }
