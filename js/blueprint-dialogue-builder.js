@@ -710,32 +710,43 @@
     function commitment(data) {
         const parts = [];
         if (data.desiredOutcome) parts.push(data.desiredOutcome);
-        if (data.firstStep) parts.push(`׳׳×׳—׳™׳/׳” ׳‘-${data.firstStep}`);
-        if (data.executionConditions) parts.push(`׳‘׳×׳•׳ ${data.executionConditions}`);
-        return parts.length ? parts.join(' ג€¢ ') : '׳›׳©׳”׳™׳¢׳“, ׳”׳₪׳¢׳•׳׳” ׳•׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳ ׳™׳™׳¡׳’׳¨׳•, ׳›׳׳ ׳×׳•׳₪׳™׳¢ ׳©׳•׳¨׳× ׳”׳׳—׳•׳™׳‘׳•׳×.';
+        if (data.firstStep) parts.push(`מתחיל/ה ב-${data.firstStep}`);
+        if (data.executionConditions) parts.push(`בתנאי ${data.executionConditions}`);
+        if (data.preservePositiveIntention) parts.push(`תוך שמירה על ${data.preservePositiveIntention}`);
+        if (data.finalWording) parts.push(data.finalWording);
+        return parts.length ? parts.join(' · ') : 'כשהיעד, הפעולה והצעד הראשון כתובים, החיבור ביניהם מייצר מחויבות מעשית.';
     }
 
     function therapistSummary(data) {
         const lines = [];
         if (data.rawStatement) lines.push(`׳”׳׳©׳₪׳˜ ׳”׳’׳•׳׳׳™ ׳”׳•׳ "${data.rawStatement}".`);
         if (data.desiredOutcome) lines.push(`׳”׳™׳¢׳“ ׳©׳ ׳‘׳ ׳” ׳”׳•׳ "${data.desiredOutcome}".`);
-        if (data.visibleAction) lines.push(`׳”׳₪׳¢׳•׳׳” ׳”׳’׳׳•׳™׳” ׳ ׳¨׳׳™׳× ׳›׳: ${data.visibleAction}.`);
-        if (data.emotionalLever) lines.push(`׳”׳׳©׳׳¢׳•׳× ׳”׳¨׳’׳©׳™׳× ׳©׳׳—׳–׳™׳§׳” ׳׳× ׳”׳׳”׳׳: ${data.emotionalLever}.`);
-        if (data.obstacles) lines.push(`׳”׳—׳¡׳ ׳”׳׳¨׳›׳–׳™ ׳›׳¨׳’׳¢: ${data.obstacles}.`);
-        if (data.alternatives) lines.push(`׳—׳׳•׳₪׳” ׳׳₪׳©׳¨׳™׳× ׳׳ ׳×׳”׳™׳” ׳×׳§׳™׳¢׳”: ${data.alternatives}.`);
-        if (data.executionConditions) lines.push(`׳×׳ ׳׳™ ׳”׳‘׳™׳¦׳•׳¢ ׳©׳ ׳׳¡׳₪׳•: ${data.executionConditions}.`);
-        if (data.firstStep) lines.push(`׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳ ׳©׳ ׳‘׳—׳¨: "${data.firstStep}".`);
-        if (data.finalTest) lines.push(`׳‘׳“׳™׳§׳× ׳”׳¡׳™׳•׳ ׳׳•׳׳¨׳×: ${data.finalTest}.`);
+        if (data.successSign) lines.push(`׳¡׳™׳׳ן ׳”׳”׳¦׳׳—׳”: ${data.successSign}.`);
+        if (data.positiveIntention) lines.push(`׳›׳•׳•׳ ׳” ׳—׳™׳•׳‘׳™׳× ׳©׳ ׳ ׳©׳ž׳¢ ׳׳×׳—׳™׳׳: ${data.positiveIntention}.`);
+        if (data.preservePositiveIntention) lines.push(`׳”׳¦׳¢׳ ׳׳©׳׳¨ ׳׳ª ׳”׳›׳•׳•׳ ׳” ׳‘׳×׳•׳¨׳ ׳‚׳׳׳×: ${data.preservePositiveIntention}.`);
+        if (data.visibleAction) lines.push(`׳₪׳¢׳•׳׳” ׳ ׳¨׳׳™׳×: ${data.visibleAction}.`);
+        if (data.emotionalDriver) lines.push(`׳ž׳ ׳™׳¢ ׳¨׳’׳©׳™: ${data.emotionalDriver}.`);
+        if (data.executionConditions) lines.push(`׳×׳ ׳׳™ ׳‘׳™׳¦׳•׳¢: ${data.executionConditions}.`);
+        if (data.obstacle) lines.push(`׳—׳¡׳ ׳’׳“׳•׳: ${data.obstacle}.`);
+        if (data.alternativePlan) lines.push(`Plan B: ${data.alternativePlan}.`);
+        if (data.clearCheck) lines.push(`׳‘׳”׳™׳¨׳•׳×: ${data.clearCheck}.`);
+        if (data.realisticCheck) lines.push(`׳¨׳™׳׳׳™׳•׳ª: ${data.realisticCheck}.`);
+        if (data.measurableCheck) lines.push(`׳ž׳“׳™׳“׳•׳ª: ${data.measurableCheck}.`);
+        if (data.firstStepImagery) lines.push(`׳“׳™׳ž׳•׳™ ׳¦׳¢׳“ ׳¨׳׳©׳•׳: ${data.firstStepImagery}.`);
+        if (data.firstStep) lines.push(`׳¦׳¢׳“ ׳¨׳׳©׳•׳: "${data.firstStep}".`);
+        if (data.finalWording) lines.push(`׳ ׳™׳¡׳•׳— ׳¡׳•׳£׳™: "${data.finalWording}".`);
         return lines.join(' ') || '׳”׳׳₪׳” ׳¢׳“׳™׳™׳ ׳ ׳‘׳ ׳™׳× ׳׳×׳•׳ ׳”׳©׳™׳—׳”.';
     }
 
     function guidedImagery(data) {
         return [
-            '׳§׳—/׳™ ׳ ׳©׳™׳׳” ׳׳—׳× ׳׳™׳˜׳™׳×.',
-            `׳“׳׳™׳™׳/׳™ ׳׳× ׳¢׳¦׳׳ ׳׳’׳™׳¢/׳” ׳׳¨׳’׳¢ ׳©׳‘׳• ׳׳×׳—׳™׳/׳™׳ ׳‘-"${data.firstStep || '׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳'}".`,
-            `׳©׳™׳׳™/׳ ׳׳‘ ׳׳™׳ ${data.emotionalLever || '׳”׳׳©׳׳¢׳•׳× ׳©׳ ׳׳¡׳₪׳” ׳›׳׳'} ׳׳—׳–׳™׳§׳” ׳׳× ׳”׳›׳™׳•׳•׳ ׳‘׳₪׳ ׳™׳.`,
-            `׳•׳¢׳›׳©׳™׳• ׳¨׳׳”/׳™ ׳׳™׳ "${data.desiredOutcome || '׳”׳›׳™׳•׳•׳ ׳”׳¨׳¦׳•׳™'}" ׳׳×׳—׳™׳ ׳׳§׳‘׳ ׳¦׳•׳¨׳” ׳‘׳׳¦׳™׳׳•׳×.`
-        ].join(' ');
+            data.goalImagery || 'דמיינו את קצה המסלול אחרי שינוי קטן.',
+            data.processImagery || 'ראו אתכם עושים גרסה קטנה ובטוחה של התהליך.',
+            data.firstStepImagery || `דמיינו את הצעד הראשון "${data.firstStep || 'קטן וברור'}".`,
+            data.preservePositiveIntention || data.positiveIntention
+                ? `שימרו בראש את ההגנה: ${data.preservePositiveIntention || data.positiveIntention}.`
+                : ''
+        ].filter(Boolean).join(' ');
     }
 
     function snapshot() {
@@ -744,22 +755,23 @@
             rawStatement,
             action: rawStatement,
             desiredOutcome: clean(answer('desiredOutcome').text),
-            success: clean(answer('desiredOutcome').text),
+            successSign: clean(answer('successSign').text),
+            positiveIntention: clean(answer('positiveIntention').text),
+            goalImagery: clean(answer('goalImagery').text),
+            processImagery: clean(answer('processImagery').text),
             visibleAction: clean(answer('visibleAction').text),
-            emotionalLever: clean(answer('emotionalLever').text),
-            obstacles: clean(answer('obstacles').text),
-            friction: clean(answer('obstacles').text),
-            alternatives: clean(answer('alternatives').text),
+            emotionalDriver: clean(answer('emotionalDriver').text),
             executionConditions: clean(answer('executionConditions').text),
+            obstacle: clean(answer('obstacle').text),
+            alternativePlan: clean(answer('alternativePlan').text),
+            preservePositiveIntention: clean(answer('preservePositiveIntention').text),
+            clearCheck: clean(answer('clearCheck').text),
+            realisticCheck: clean(answer('realisticCheck').text),
+            measurableCheck: clean(answer('measurableCheck').text),
+            firstStepImagery: clean(answer('firstStepImagery').text),
             firstStep: clean(answer('firstStep').text),
-            finalTest: clean(answer('finalTest').text),
-            time: timebox(answer('executionConditions').text) || '׳—׳׳•׳ ׳–׳׳ ׳©׳¢׳“׳™׳™׳ ׳“׳•׳¨׳© ׳“׳™׳•׳§',
-            prerequisites: clean(answer('executionConditions').text),
-            resourceBlockers: clean(answer('obstacles').text),
-            resourceEnablers: clean(answer('executionConditions').text),
-            resourceImportance: clean(answer('emotionalLever').text),
-            valuesIfYes: clean(answer('emotionalLever').text),
-            valuesIfNo: clean(answer('alternatives').text),
+            finalWording: clean(answer('finalWording').text),
+            time: timebox(answer('executionConditions').text) || 'חלון זמן שיתווסף בהמשך',
             completedNodes: NODES.filter((node) => nodeStatus(node) === 'complete').length,
             partialNodes: NODES.filter((node) => nodeStatus(node) === 'partial').length,
             completenessScore: completenessScore(),
