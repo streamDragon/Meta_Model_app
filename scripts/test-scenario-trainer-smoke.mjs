@@ -85,7 +85,7 @@ async function visibleGlobalBlockers(page) {
 async function openScenarioTrainer(page, baseUrl) {
     await page.goto(`${baseUrl}/scenario_trainer.html`, { waitUntil: 'networkidle' });
     await page.waitForSelector('[data-trainer-platform="1"][data-trainer-id="scenario-trainer"]');
-    await page.waitForSelector('[data-trainer-summary="current"]');
+    await page.waitForSelector('.scenario-home-card--landing');
 }
 
 async function readText(page, selector) {
@@ -119,7 +119,7 @@ async function runDesktopChecks(page, baseUrl) {
     const startBox = await startButton.boundingBox();
     await assert(!!startBox && startBox.y < 980, 'scenario start visible in first viewport', JSON.stringify(startBox));
 
-    const summaryBefore = await readText(page, '[data-trainer-summary="current"]');
+    const summaryBefore = await readText(page, '.scenario-home-setup-head h3');
     await page.locator('[data-trainer-action="open-settings"]').first().click();
     await page.waitForSelector('[data-trainer-settings-shell="1"][data-trainer-id="scenario-trainer"]');
 
@@ -128,15 +128,15 @@ async function runDesktopChecks(page, baseUrl) {
     const previewBeforeSave = await readText(page, '[data-trainer-summary="preview"]');
     await page.locator('[data-trainer-action="save-start"]').first().click();
     await page.waitForFunction(() => !document.querySelector('[data-trainer-settings-shell="1"][data-trainer-id="scenario-trainer"]'));
-    await page.waitForSelector('.scenario-play-stage');
+    await page.waitForSelector('.scenario-story-stage');
     const topbarStatus = await readText(page, '.scenario-play-topbar-status');
 
     await assert(previewBeforeSave !== summaryBefore, 'scenario preview summary changed', `${summaryBefore} -> ${previewBeforeSave}`);
     await assert(/1\/\d+/.test(topbarStatus), 'scenario play topbar reflects live session progress', topbarStatus);
 
-    await page.waitForSelector('#scenario-options-container .scenario-arc-option');
+    await page.waitForSelector('.scenario-compact-option');
     const stageLayout = await page.evaluate(() => ({
-        stage: document.querySelector('.scenario-play-stage')?.getBoundingClientRect(),
+        stage: document.querySelector('.scenario-story-stage')?.getBoundingClientRect(),
         supportCount: document.querySelectorAll('.scenario-platform-support').length
     }));
     await assert(
@@ -145,13 +145,19 @@ async function runDesktopChecks(page, baseUrl) {
         JSON.stringify(stageLayout)
     );
 
-    const previewBeforeHover = await readText(page, '#scenario-play-preview-card');
-    await page.locator('#scenario-options-container .scenario-arc-option').first().dispatchEvent('mouseover');
+    const frameBefore = await readText(page, '.scenario-story-frame-copy h3');
+    await page.locator('.scenario-story-chip').nth(1).click();
     await page.waitForTimeout(150);
-    const previewAfterHover = await readText(page, '#scenario-play-preview-card');
-    await assert(previewAfterHover !== previewBeforeHover, 'scenario desktop hover updates in-scene preview');
+    const frameAfter = await readText(page, '.scenario-story-frame-copy h3');
+    const stableHeights = await page.evaluate(() => {
+        const stage = document.querySelector('.scenario-story-stage');
+        const rect = stage?.getBoundingClientRect();
+        return rect ? rect.height : 0;
+    });
+    await assert(frameAfter !== frameBefore, 'scenario desktop chip switch updates active story frame');
+    await assert(stableHeights > 480, 'scenario desktop stage height remains stable');
 
-    await page.locator('#scenario-options-container .scenario-arc-option').first().click();
+    await page.locator('.scenario-compact-option').first().click();
     await page.waitForSelector('[data-scenario-feedback-thread="1"]');
 
     await assert((await page.locator('#scenario-feedback-choice-bubble').count()) > 0, 'scenario chosen reply visible');
@@ -159,7 +165,7 @@ async function runDesktopChecks(page, baseUrl) {
     await assert((await page.locator('[data-scenario-impact="emotion"]').count()) > 0, 'scenario emotional impact card visible');
     await assert((await page.locator('[data-scenario-impact="process"]').count()) > 0, 'scenario process impact card visible');
     await assert((await page.locator('[data-scenario-consequence="1"]').count()) > 0, 'scenario consequence box visible');
-    await assert((await page.locator('[data-scenario-flow-guide="feedback"]').count()) > 0, 'scenario feedback flow guide visible');
+    await assert((await page.locator('.scenario-meta-accordion').count()) > 0, 'scenario feedback accordions visible');
 
     await page.locator('[data-scenario-action="show-blueprint"]').first().click();
     await page.waitForSelector('[data-scenario-analysis="1"]');
@@ -181,11 +187,11 @@ async function runMobileChecks(page, baseUrl) {
     await assert(overflow.scrollWidth <= overflow.innerWidth + 1, 'scenario mobile no horizontal overflow', `${overflow.scrollWidth}/${overflow.innerWidth}`);
 
     await page.locator('[data-trainer-action="start-session"]').first().click();
-    await page.waitForSelector('#scenario-options-container .scenario-arc-option');
+    await page.waitForSelector('.scenario-compact-option');
     await assert((await page.locator('.scenario-play-topbar').count()) > 0, 'scenario mobile topbar visible');
-    await assert((await page.locator('#scenario-play-preview-card').count()) > 0, 'scenario mobile in-scene preview visible');
+    await assert((await page.locator('.scenario-story-frame-card').count()) > 0, 'scenario mobile story frame visible');
     const mobileFlowOrder = await page.evaluate(() => ({
-        stage: document.querySelector('.scenario-play-stage')?.getBoundingClientRect(),
+        stage: document.querySelector('.scenario-story-stage')?.getBoundingClientRect(),
         supportCount: document.querySelectorAll('.scenario-platform-support').length
     }));
     await assert(
@@ -194,13 +200,7 @@ async function runMobileChecks(page, baseUrl) {
         JSON.stringify(mobileFlowOrder)
     );
 
-    const mobileFirstOption = page.locator('#scenario-options-container .scenario-arc-option').first();
-    const mobilePreviewBefore = await readText(page, '#scenario-play-preview-card');
-    await mobileFirstOption.click();
-    await page.waitForTimeout(150);
-    const mobilePreviewAfter = await readText(page, '#scenario-play-preview-card');
-    await assert((await page.locator('[data-scenario-feedback-thread="1"]').count()) === 0, 'scenario mobile first tap previews only');
-    await assert(mobilePreviewAfter !== mobilePreviewBefore, 'scenario mobile first tap updates preview');
+    const mobileFirstOption = page.locator('.scenario-compact-option').first();
     await mobileFirstOption.click();
     await page.waitForSelector('[data-scenario-feedback-thread="1"]');
 
