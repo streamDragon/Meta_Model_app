@@ -23,13 +23,13 @@
   ],
   "progressElements": 0,
   "viewportHeight": 844,
-  "questionCardBottom": 822,
+  "questionCardBottom": 816,
   "questionMostlyInView": true,
-  "bottomBarTop": 1232,
-  "primaryButtonTop": 769,
-  "primaryButtonBottom": 813,
+  "bottomBarTop": 1224,
+  "primaryButtonTop": 763,
+  "primaryButtonBottom": 807,
   "primaryButtonClearOfBottomBar": true,
-  "contextTop": 159,
-  "instructionTop": 531,
-  "questionTop": 643
+  "contextTop": 153,
+  "instructionTop": 525,
+  "questionTop": 637
 }
