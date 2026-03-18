@@ -5562,87 +5562,89 @@ function initializeMetaModelApp() {
     if (hasInitializedApp) return;
     hasInitializedApp = true;
 
-    enforceTopMenuOnlyMode();
-    setupMojibakeAutoRepair();
+    const run = (label, fn) => safeRunUiEnhancement(fn, label);
+
+    // Never keep the app trapped behind the splash if a later init step fails.
+    hideSplashScreen();
+
+    run('top-menu-only-mode', enforceTopMenuOnlyMode);
+    run('mojibake-auto-repair', setupMojibakeAutoRepair);
 
     Promise.resolve(setupAppVersionChip()).catch((error) => {
         console.error('Failed to resolve or render app version:', error);
         applyAppVersion('לא ידוע');
     });
 
-    setupFeatureLauncherTabs();
-    setupUnzipEmbedLazyLoad();
+    run('feature-launcher-tabs', setupFeatureLauncherTabs);
+    run('unzip-embed-lazy-load', setupUnzipEmbedLazyLoad);
     Promise.resolve(setupCodexTrapWordLab()).catch((error) => {
         console.warn('Failed to initialize Codex Trap lab', error);
     });
-    setupGlobalFeatureMenuDropdown();
-    setupFeatureMapOverlayControls();
-    setupCanonicalNavLaunchers();
-    setupAppStickyBanner();
-    safeRunUiEnhancement(() => {
+    run('global-feature-menu-dropdown', setupGlobalFeatureMenuDropdown);
+    run('feature-map-overlay-controls', setupFeatureMapOverlayControls);
+    run('canonical-nav-launchers', setupCanonicalNavLaunchers);
+    run('app-sticky-banner', setupAppStickyBanner);
+    run('app-shell-bootstrap', () => {
         if (window.MetaAppShell && typeof window.MetaAppShell.bootstrap === 'function') {
             window.MetaAppShell.bootstrap();
         }
-    }, 'app-shell-bootstrap');
-    setupMobileViewportSizing();
-    applyEmbeddedCompactMode();
-    enforceTopMenuOnlyMode();
-    applyHeaderDensityPreference();
-    updateRuntimeDebugInfoCard();
-    loadAudioSettings();
-    setupAudioInteractionArm();
-    setupAudioMuteButtons();
-    setupMusicToggleButton();
-    setupHomeLobbyExperience();
-    setupMobileExperienceLayer();
-    setupGlobalAudioSafety();
-    setupOpeningMusicOnFirstEntry();
-    
-    // Hide splash after animation
-    hideSplashScreen();
-    
-    loadUserProgress();
+    });
+    run('mobile-viewport-sizing', setupMobileViewportSizing);
+    run('embedded-compact-mode', applyEmbeddedCompactMode);
+    run('top-menu-only-mode-reapply', enforceTopMenuOnlyMode);
+    run('header-density-preference', applyHeaderDensityPreference);
+    run('runtime-debug-card', updateRuntimeDebugInfoCard);
+    run('audio-settings', loadAudioSettings);
+    run('audio-interaction-arm', setupAudioInteractionArm);
+    run('audio-mute-buttons', setupAudioMuteButtons);
+    run('music-toggle-button', setupMusicToggleButton);
+    run('home-lobby-experience', setupHomeLobbyExperience);
+    run('mobile-experience-layer', setupMobileExperienceLayer);
+    run('global-audio-safety', setupGlobalAudioSafety);
+    run('opening-music-on-first-entry', setupOpeningMusicOnFirstEntry);
+
+    run('user-progress', loadUserProgress);
     showLoadingIndicator();
-    renderRuntimeRecoveryFallback('categories');
-    loadMetaModelData();
-    setupTabNavigation();
-    setupFeatureHomeBackButtons();
-    setupFeatureOnboardingCards();
-    setupReadBeforeStartGuides();
-    applyInitialTabPreference();
-    setupGlobalComicStripActions();
-    setupPracticeMode();
-    setupQuestionDrill();
-    setupRapidPatternArena();
+    run('categories-runtime-recovery', () => renderRuntimeRecoveryFallback('categories'));
+    run('tab-navigation', setupTabNavigation);
+    run('feature-home-back-buttons', setupFeatureHomeBackButtons);
+    run('feature-onboarding-cards', setupFeatureOnboardingCards);
+    run('read-before-start-guides', setupReadBeforeStartGuides);
+    run('initial-tab-preference', applyInitialTabPreference);
+    run('meta-model-data', loadMetaModelData);
+    run('global-comic-strip-actions', setupGlobalComicStripActions);
+    run('practice-mode', setupPracticeMode);
+    run('question-drill', setupQuestionDrill);
+    run('rapid-pattern-arena', setupRapidPatternArena);
     if (typeof setupTriplesRadarModule === 'function') {
-        setupTriplesRadarModule();
+        run('triples-radar-module', setupTriplesRadarModule);
     }
-    setupTriplesRadarPresentation();
+    run('triples-radar-presentation', setupTriplesRadarPresentation);
     if (typeof setupFeelingLanguageBridge === 'function') {
-        setupFeelingLanguageBridge();
+        run('feeling-language-bridge', setupFeelingLanguageBridge);
     }
     if (typeof setupSentenceMap === 'function') {
-        setupSentenceMap();
+        run('sentence-map', setupSentenceMap);
     }
     if (document.getElementById('start-trainer-btn')) {
-        setupTrainerMode();
+        run('trainer-mode', setupTrainerMode);
     }
-    setupBlueprintBuilder();
-    setupPrismModule();
+    run('blueprint-builder', setupBlueprintBuilder);
+    run('prism-module', setupPrismModule);
     if (document.getElementById('scenario-trainer')) {
-        setupScenarioTrainerModule();
+        run('scenario-trainer-module', setupScenarioTrainerModule);
     }
     if (getCurrentActiveTabName() === 'comic-engine') {
-        ensureComicEngineFlowReady({ force: true });
+        run('comic-engine-flow-ready', () => ensureComicEngineFlowReady({ force: true }));
     }
-    setupCommunityFeedbackWall();
-    initializeProgressHub();
-    safeRunUiEnhancement(setupGlobalTheoryLauncher, 'global-theory-launcher');
-    safeRunUiEnhancement(setupGlobalCollapsedHelpDetails, 'global-collapsed-help-details');
-    safeRunUiEnhancement(setupGlobalGuideDetailsOverlay, 'global-guide-details-overlay');
-    setupGlobalInteractionSounds();
-    setupGlobalRevealFeedback();
-    renderGlobalComicStrip(getActiveTabName());
+    run('community-feedback-wall', setupCommunityFeedbackWall);
+    run('progress-hub', initializeProgressHub);
+    run('global-theory-launcher', setupGlobalTheoryLauncher);
+    run('global-collapsed-help-details', setupGlobalCollapsedHelpDetails);
+    run('global-guide-details-overlay', setupGlobalGuideDetailsOverlay);
+    run('global-interaction-sounds', setupGlobalInteractionSounds);
+    run('global-reveal-feedback', setupGlobalRevealFeedback);
+    run('global-comic-strip-render', () => renderGlobalComicStrip(getActiveTabName()));
     window.addEventListener('resize', updateRuntimeDebugInfoCard);
 }
 
