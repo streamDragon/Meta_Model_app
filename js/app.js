@@ -463,7 +463,8 @@ async function gateSentenceConsumption(options = {}) {
         });
         return allowed !== false;
     } catch (error) {
-        return false;
+        console.warn('[freemium] gateSentenceConsumption failed, allowing session to continue', error);
+        return true;
     }
 }
 
@@ -9442,6 +9443,29 @@ function startQuestionDrillSession({ announce = true } = {}) {
     loadNextQuestionDrill({ initial: true, playSound: false });
 }
 
+function restoreQuestionDrillSetupState(message = '', tone = 'warn') {
+    questionDrillState.sessionActive = false;
+    questionDrillState.sessionCompleted = false;
+    questionDrillState.current = null;
+    questionDrillState.options = [];
+    questionDrillState.selectedOptionId = '';
+    questionDrillState.roundChecks = 0;
+    questionDrillState.roundCorrect = false;
+    questionDrillState.roundFinalized = false;
+    questionDrillState.currentRoundAward = null;
+
+    renderQuestionDrillOptions();
+    updateQuestionDrillTestBanner();
+    updateQuestionDrillTargetBar();
+    setQuestionDrillTrafficState('yellow', 'ממתין לסבב');
+    setQuestionDrillFeedback(
+        message || 'לא הצלחנו לפתוח כרגע שאלה חדשה. נסו שוב בעוד רגע.',
+        tone
+    );
+    updateQuestionDrillSessionUI();
+    updateQuestionDrillControlsState();
+}
+
 function completeQuestionDrillSession() {
     clearQuestionDrillTestAutoAdvance();
     stopQuestionDrillTimer({ freeze: false });
@@ -9637,7 +9661,10 @@ function finalizeQuestionDrillRound(reason = 'next') {
 
 async function loadNextQuestionDrill(options = {}) {
     const { initial = false, playSound = true } = options || {};
-    if (!QUESTION_DRILL_PACK.length) return;
+    if (!QUESTION_DRILL_PACK.length) {
+        restoreQuestionDrillSetupState('אין כרגע שאלות זמינות לתרגול הזיהוי.', 'warn');
+        return;
+    }
 
     clearQuestionDrillTestAutoAdvance();
     if (!questionDrillState.sessionActive && !questionDrillState.sessionCompleted) {
@@ -9656,12 +9683,19 @@ async function loadNextQuestionDrill(options = {}) {
 
     const canProceed = await gateSentenceConsumption({ source: 'question-drill', count: 1 });
     if (!canProceed) {
+        if (!questionDrillState.current) {
+            restoreQuestionDrillSetupState('לא ניתן לפתוח כרגע שאלה חדשה. נסו שוב בעוד רגע.', 'warn');
+            return;
+        }
         updateQuestionDrillControlsState();
         return;
     }
 
     const next = getNextQuestionDrillItem();
-    if (!next) return;
+    if (!next) {
+        restoreQuestionDrillSetupState('לא נטענה שאלה חדשה לתרגול. נסו להתחיל שוב.', 'warn');
+        return;
+    }
     beginQuestionDrillRound(next);
     if (!initial && playSound) playUISound('next');
 }
