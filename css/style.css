@@ -24358,14 +24358,24 @@ body.mobile-sticky-cta-visible {
     overscroll-behavior: contain;
 }
 
-/* Let the active practice-question feature grow naturally instead of trapping
-   the live drill inside a short internal scroller. */
-#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] {
+/* Let managed practice features grow naturally instead of trapping their live
+   content inside short internal scrollers. */
+#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"],
+#practice-radar.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"],
+#practice-triples-radar.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"],
+#practice-wizard.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"],
+#sentence-map.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] {
     overflow: visible;
 }
 
 #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-container,
-#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-card {
+#practice-radar.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-container,
+#practice-triples-radar.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-container,
+#practice-wizard.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-container,
+#sentence-map.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-container,
+#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-card,
+#practice-radar.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .rapid-pattern-card,
+#practice-triples-radar.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .triples-radar-card {
     max-height: none;
     overflow: visible;
     overscroll-behavior: auto;
@@ -24406,7 +24416,13 @@ body.mobile-sticky-cta-visible {
     }
 
     #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-container,
-    #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-card {
+    #practice-radar.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-container,
+    #practice-triples-radar.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-container,
+    #practice-wizard.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-container,
+    #sentence-map.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-container,
+    #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-card,
+    #practice-radar.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .rapid-pattern-card,
+    #practice-triples-radar.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .triples-radar-card {
         max-height: none;
         overflow: visible;
     }
