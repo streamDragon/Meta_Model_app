@@ -1881,26 +1881,18 @@ function hideSplashScreen() {
 
     const finalizeHide = () => {
         splashScreen.classList.add('hidden');
+        splashScreen.setAttribute('hidden', 'hidden');
+        splashScreen.setAttribute('aria-hidden', 'true');
         splashScreen.style.pointerEvents = 'none';
         splashScreen.style.display = 'none';
+        if (splashScreen.parentNode) {
+            window.setTimeout(() => {
+                if (splashScreen.parentNode) splashScreen.parentNode.removeChild(splashScreen);
+            }, 0);
+        }
     };
 
-    if (document.body.classList.contains('embed-mode')) {
-        finalizeHide();
-        return;
-    }
-
-    if (splashScreen.dataset.hideBound !== '1') {
-        splashScreen.dataset.hideBound = '1';
-        splashScreen.addEventListener('animationend', (event) => {
-            if (event.animationName === 'splashFadeOut') {
-                finalizeHide();
-            }
-        }, { once: true });
-    }
-
-    // Fallback in case animationend does not fire on a given platform.
-    setTimeout(finalizeHide, 2100);
+    finalizeHide();
 }
 
 function normalizeViewMode(rawMode = '') {
