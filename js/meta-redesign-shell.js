@@ -1448,6 +1448,22 @@ function featureActionButtonsHtml(meta) {
     }
     function bindFeatureShell(shell, meta) {
         if (!shell) return;
+        function enterFeature(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            if (featureLocked(meta)) return;
+            getTabState(meta.tab).stage = 'feature';
+            saveFeatureState();
+            if (typeof window.playUISound === 'function') window.playUISound('success');
+            transitionWelcomeToFeature(meta.tab);
+            var section = document.getElementById(meta.tab);
+            scrollViewportToSection(section, { instant: useInstantFeatureEntry(meta.tab) });
+        }
+        shell.querySelectorAll('[data-feature-enter]').forEach(function (node) {
+            node.onclick = enterFeature;
+        });
         shell.querySelectorAll('[data-feature-modal]').forEach(function (node) {
             var openHandler = function (event) {
                 event.preventDefault();
@@ -1468,14 +1484,7 @@ function featureActionButtonsHtml(meta) {
         });
         shell.onclick = function (event) {
             if (event.target.closest('[data-feature-enter]')) {
-                if (!featureLocked(meta)) {
-                    getTabState(meta.tab).stage = 'feature';
-                    saveFeatureState();
-                    if (typeof window.playUISound === 'function') window.playUISound('success');
-                    transitionWelcomeToFeature(meta.tab);
-                    var section = document.getElementById(meta.tab);
-                    scrollViewportToSection(section, { instant: useInstantFeatureEntry(meta.tab) });
-                }
+                enterFeature(event);
                 return;
             }
             if (event.target.closest('[data-feature-home]')) { navigateHome(shell); return; }
