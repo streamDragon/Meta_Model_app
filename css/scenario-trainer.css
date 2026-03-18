@@ -135,7 +135,8 @@
 }
 
 /* Play screen: cinematic stage-first simulator */
-.scenario-platform-root[data-screen="play"] .scenario-main-area {
+.scenario-platform-root[data-screen="play"] .scenario-main-area,
+.scenario-platform-root[data-screen="feedback"] .scenario-main-area {
     max-width: min(1320px, calc(100vw - 24px));
 }
 
@@ -2072,10 +2073,243 @@
     margin-top: 2px;
 }
 
+.scenario-runtime-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(320px, 1.05fr);
+    gap: 18px;
+    align-items: stretch;
+}
+
+.scenario-runtime-stage-panel,
+.scenario-runtime-chat-panel {
+    position: relative;
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 24px;
+    border: 1px solid #dbe7f3;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.94));
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+}
+
+.scenario-runtime-stage-panel {
+    grid-template-rows: auto 1fr auto;
+    min-height: 620px;
+}
+
+.scenario-runtime-stage-panel::after {
+    content: "";
+    position: absolute;
+    inset-inline: 22px;
+    bottom: 12px;
+    height: 3px;
+    border-radius: 999px;
+    background:
+        linear-gradient(90deg,
+            rgba(15, 118, 110, 0.92) 0%,
+            rgba(56, 189, 248, 0.94) var(--scenario-progress, 0%),
+            rgba(226, 232, 240, 0.72) var(--scenario-progress, 0%),
+            rgba(226, 232, 240, 0.72) 100%);
+    opacity: 0.78;
+}
+
+.scenario-runtime-context-card {
+    display: grid;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(191, 219, 254, 0.9);
+    background: linear-gradient(180deg, rgba(239, 246, 255, 0.96), rgba(255, 255, 255, 0.96));
+}
+
+.scenario-runtime-context-card h2 {
+    margin: 0;
+    color: var(--scenario-ink);
+    font-size: clamp(1.24rem, 2vw, 1.82rem);
+    line-height: 1.15;
+}
+
+.scenario-runtime-context-text {
+    margin: 0;
+    color: var(--scenario-soft-ink);
+    line-height: 1.7;
+    font-size: 0.94rem;
+}
+
+.scenario-tv-card {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 14px;
+}
+
+.scenario-tv-frame {
+    width: min(100%, 430px);
+    padding: 14px 14px 18px;
+    border-radius: 28px;
+    border: 1px solid rgba(15, 23, 42, 0.18);
+    background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.84),
+        0 18px 32px rgba(15, 23, 42, 0.12);
+}
+
+.scenario-tv-screen {
+    aspect-ratio: 4 / 3;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 8px solid #111827;
+    background: #dbeafe;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.scenario-tv-screen .scenario-story-stage-image,
+.scenario-tv-screen .scenario-story-stage-image--placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.scenario-runtime-stage-panel .scenario-story-chip-row {
+    justify-content: center;
+}
+
+.scenario-reaction-dock {
+    display: grid;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(191, 209, 234, 0.78);
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.scenario-reaction-head {
+    display: grid;
+    gap: 4px;
+}
+
+.scenario-reaction-head p:last-child {
+    margin: 0;
+    color: var(--scenario-soft-ink);
+    line-height: 1.55;
+    font-size: 0.88rem;
+}
+
+.scenario-reaction-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.scenario-reaction-btn {
+    min-height: 42px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 1px solid #dbe7f3;
+    background: #ffffff;
+    color: var(--scenario-ink);
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.scenario-reaction-btn:hover,
+.scenario-reaction-btn:focus-visible {
+    transform: translateY(-1px);
+    outline: none;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+}
+
+.scenario-reaction-btn.is-red {
+    border-color: rgba(248, 113, 113, 0.42);
+    background: linear-gradient(180deg, #fff7f7 0%, #ffffff 100%);
+}
+
+.scenario-reaction-btn.is-green {
+    border-color: rgba(16, 185, 129, 0.34);
+    background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+}
+
+.scenario-reaction-btn.is-active {
+    border-color: #0f766e;
+    background: linear-gradient(180deg, #0f766e 0%, #115e59 100%);
+    color: #f8fafc;
+    box-shadow: 0 16px 28px rgba(15, 118, 110, 0.2);
+}
+
+.scenario-runtime-chat-panel {
+    min-height: 620px;
+    grid-template-rows: auto 1fr;
+    background:
+        radial-gradient(circle at top left, rgba(16, 185, 129, 0.08), transparent 34%),
+        linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.95));
+}
+
+.scenario-runtime-chat-head {
+    display: grid;
+    gap: 6px;
+}
+
+.scenario-runtime-chat-head h3 {
+    margin: 0;
+    color: var(--scenario-ink);
+    font-size: 1.08rem;
+}
+
+.scenario-chat-shell {
+    min-height: 100%;
+    padding: 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(191, 209, 234, 0.74);
+    background:
+        linear-gradient(135deg, rgba(255,255,255,0.78), rgba(248,250,252,0.92)),
+        radial-gradient(circle at 18% 16%, rgba(16, 185, 129, 0.08), transparent 24%);
+}
+
+.scenario-chat-thread {
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    min-height: 100%;
+}
+
+.scenario-bubble--system {
+    background: linear-gradient(180deg, #eff6ff 0%, #f8fafc 100%);
+    border: 1px solid #bfdbfe;
+}
+
+.scenario-runtime-results-card,
+.scenario-play-options-card--supporting {
+    max-width: 1080px;
+    margin-inline: auto;
+}
+
+.scenario-play-options-card--supporting {
+    gap: 10px;
+}
+
 @media (max-width: 980px) {
     .scenario-home-preview-card,
     .scenario-story-frame-card {
         grid-template-columns: 1fr;
+    }
+
+    .scenario-runtime-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .scenario-runtime-stage-panel,
+    .scenario-runtime-chat-panel {
+        min-height: auto;
+    }
+
+    .scenario-tv-frame {
+        width: min(100%, 360px);
+    }
+
+    .scenario-reaction-row {
+        justify-content: flex-start;
     }
 
     .scenario-story-stage-media {
@@ -2092,7 +2326,9 @@
     .scenario-home-card--landing,
     .scenario-home-setup-card,
     .scenario-home-preview-card,
-    .scenario-play-options-card {
+    .scenario-play-options-card,
+    .scenario-runtime-stage-panel,
+    .scenario-runtime-chat-panel {
         padding: 16px;
     }
 
@@ -2129,6 +2365,24 @@
         min-height: 36px;
         padding: 0 12px;
         font-size: 0.82rem;
+    }
+
+    .scenario-tv-frame {
+        width: 100%;
+        padding: 10px 10px 14px;
+    }
+
+    .scenario-tv-screen {
+        border-width: 6px;
+    }
+
+    .scenario-reaction-row {
+        gap: 8px;
+    }
+
+    .scenario-reaction-btn {
+        min-height: 38px;
+        padding-inline: 14px;
     }
 
     .scenario-compact-option {
