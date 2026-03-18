@@ -18,6 +18,8 @@
         'under-surface': 'מתחת לפני השטח',
         response: 'כיוון תגובה'
     });
+    const FEATURED_SCENARIO_IDS = Object.freeze(['driver-update', 'couple-shutdown', 'boss-feedback']);
+    const DIALOGUE_MAX_TURNS = 3;
     const SCREEN_IDS = Object.freeze({
         home: 'home',
         play: 'play',
@@ -149,6 +151,8 @@
         session: null,
         activeScenario: null,
         activeStorySlideId: '',
+        selectedScenarioId: '',
+        conversationTrail: [],
         selectedOption: null,
         lastEntry: null,
         selectedPrismId: '',
@@ -174,6 +178,7 @@
     async function init() {
         render();
         state.data = await loadData();
+        syncSelectedScenarioId();
         state.loading = false;
         render();
     }
@@ -439,6 +444,26 @@
         };
     }
 
+    function getScenarioMenuScenarios() {
+        const featured = state.data.scenarios.filter((scenario) => FEATURED_SCENARIO_IDS.includes(scenario.scenarioId));
+        return featured.length ? featured : state.data.scenarios.slice(0, 3);
+    }
+
+    function syncSelectedScenarioId() {
+        const scenarios = getScenarioMenuScenarios();
+        if (!scenarios.length) {
+            state.selectedScenarioId = '';
+            return;
+        }
+        const exists = scenarios.some((scenario) => scenario.scenarioId === state.selectedScenarioId);
+        if (!exists) state.selectedScenarioId = scenarios[0].scenarioId;
+    }
+
+    function getSelectedScenarioFromMenu() {
+        syncSelectedScenarioId();
+        return getScenarioMenuScenarios().find((scenario) => scenario.scenarioId === state.selectedScenarioId) || null;
+    }
+
     function getDomainLabel(id) {
         if (id === 'all') return 'כל התחומים';
         return normalizeText(state.data.domains.find((item) => item.id === id)?.label, 'כל התחומים');
@@ -471,8 +496,13 @@
         };
     }
 
-    function createSessionQueue(domain, difficulty, runSize) {
-        const queue = state.data.scenarios.filter((scenario) => {
+    function createSessionQueue(domain, difficulty, runSize, scenarioId = '') {
+        const availableScenarios = getScenarioMenuScenarios();
+        if (scenarioId) {
+            const selectedScenario = availableScenarios.find((scenario) => scenario.scenarioId === scenarioId);
+            return selectedScenario ? [selectedScenario] : [];
+        }
+        const queue = availableScenarios.filter((scenario) => {
             const domainMatch = domain === 'all' || scenario.domain === domain;
             const difficultyMatch = difficulty === 'all' || scenario.difficulty === difficulty;
             return domainMatch && difficultyMatch;
@@ -496,7 +526,8 @@
 
     function startSession(config) {
         const next = config || state.homeFilters;
-        const queue = createSessionQueue(next.domain, next.difficulty, next.runSize);
+        const scenarioId = normalizeText(next?.scenarioId || state.selectedScenarioId, '');
+        const queue = createSessionQueue(next.domain, next.difficulty, next.runSize, scenarioId);
         if (!queue.length) {
             showToast('לא נמצאו סצנות למסנן שבחרת.');
             return;
@@ -506,9 +537,11 @@
         state.settings.defaultRunSize = clampRunSize(next.runSize);
         saveSettings();
         state.homeFilters = { ...next, runSize: clampRunSize(next.runSize) };
+        state.selectedScenarioId = scenarioId || queue[0]?.scenarioId || '';
         state.session = {
             domain: next.domain,
             difficulty: next.difficulty,
+            scenarioId: state.selectedScenarioId,
             queue,
             index: 0,
             score: 0,
@@ -518,6 +551,7 @@
         };
         state.activeScenario = queue[0];
         state.activeStorySlideId = normalizeText(queue[0]?.storySlides?.[0]?.id, 'setup');
+        state.conversationTrail = [];
         state.selectedOption = null;
         state.lastEntry = null;
         state.selectedPrismId = '';
@@ -723,21 +757,304 @@
         };
     }
 
+    function setSelectedScenario(scenarioId) {
+        const nextId = normalizeText(scenarioId, '');
+        if (!nextId) return;
+        state.selectedScenarioId = nextId;
+        render();
+    }
+
+    function startSelectedScenario() {
+        syncSelectedScenarioId();
+        if (!state.selectedScenarioId) {
+            showToast('בחר/י סיטואציה כדי להתחיל.');
+            return;
+        }
+        startSession({
+            ...state.homeFilters,
+            scenarioId: state.selectedScenarioId,
+            runSize: 1
+        });
+    }
+
+    function getConversationTrail() {
+        return Array.isArray(state.conversationTrail) ? state.conversationTrail : [];
+    }
+
+    function getConversationStepCount() {
+        return getConversationTrail().length;
+    }
+
+    function isConversationComplete() {
+        return getConversationStepCount() >= DIALOGUE_MAX_TURNS;
+    }
+
+    function getProgressStorySlideForTurn(scenario, turnCount) {
+        const slides = getScenarioStorySlides(scenario);
+        if (!slides.length) return null;
+        return slides[Math.min(turnCount, slides.length - 1)] || slides[0];
+    }
+
+    function buildGreenContinuation(scenario, turnIndex) {
+        if (turnIndex === 1) {
+            return {
+                playerLine: `בוא/י נעצור רגע על הדבר המדויק: ${normalizeText(scenario?.deepeningQuestion, 'מה בדיוק קורה כאן בפועל?')}`,
+                otherReply: `מה שהכי חסר לי כרגע זה ${normalizeText(scenario?.metaModelCore?.hiddenGap, 'שעדיין לא ברור לי מה השלב הבא')}.`
+            };
+        }
+        return {
+            playerLine: `אז נתקדם רק עם צעד אחד: ${normalizeText(scenario?.microPlan?.firstStep, 'בוא/י נתחיל מצעד קטן וברור.')}`,
+            otherReply: `ככה זה כבר מרגיש יותר אפשרי. ${normalizeText(scenario?.microPlan?.successSign, 'עכשיו כבר רואים איך אפשר להתקדם.')}`
+        };
+    }
+
+    function buildRedContinuation(toneGroup, turnIndex) {
+        const variants = {
+            blame: {
+                secondPlayer: 'אבל גם אתה/את חלק גדול ממה שתקוע כאן.',
+                secondOther: 'ככה אני כבר לא מצליח/ה להסביר מה באמת קורה לי.',
+                thirdPlayer: 'אם היית מתנהל/ת אחרת לא היינו מגיעים לזה בכלל.',
+                thirdOther: 'עכשיו זה כבר הפך להאשמה, לא לשיחה.'
+            },
+            control: {
+                secondPlayer: 'פשוט תעשה/י את זה עכשיו ודי עם כל זה.',
+                secondOther: 'כשזה נשמע ככה אני רק נלחץ/ת יותר ולא מבין/ה מה לעשות.',
+                thirdPlayer: 'אין זמן להסברים, פשוט תגמור/י עם זה.',
+                thirdOther: 'אז שוב נשארתי בלי הבנה ובלי דרך להתחיל.'
+            },
+            rescue: {
+                secondPlayer: 'עזוב/י, אני כבר אטפל בזה בעצמי.',
+                secondOther: 'בסדר... אז אני כבר לא באמת חלק מהפתרון.',
+                thirdPlayer: 'עדיף שאני אעשה את זה לבד מאשר להיתקע כאן.',
+                thirdOther: 'ככה נשארתי בחוץ, וגם לא למדתי מה לעשות בפעם הבאה.'
+            },
+            shutdown: {
+                secondPlayer: 'אין לי כוח לזה עכשיו, די.',
+                secondOther: 'אוקיי, אז גם לי אין איפה להמשיך מכאן.',
+                thirdPlayer: 'בוא/י נסגור את זה כאן.',
+                thirdOther: 'אז נשארנו בדיוק באותו מקום, רק יותר רחוקים.'
+            },
+            dismiss: {
+                secondPlayer: 'זה לא כזה סיפור, באמת לא צריך להיכנס לזה.',
+                secondOther: 'אבל אצלי זה כן נשאר חשוב ולא פתור.',
+                thirdPlayer: 'נו באמת, נעבור הלאה.',
+                thirdOther: 'אז זה נשאר בלי שם ובלי פתרון.'
+            },
+            blur: {
+                secondPlayer: 'נראה כבר אחר כך, עכשיו לא.',
+                secondOther: 'ככה שוב לא ברור מה באמת חסר כאן.',
+                thirdPlayer: 'נדבר בהמשך, אין לי מה להוסיף.',
+                thirdOther: 'שוב דחינו את זה, וזה רק נהיה יותר כבד.'
+            }
+        };
+        const variant = variants[toneGroup] || variants.blur;
+        if (turnIndex === 1) {
+            return {
+                playerLine: variant.secondPlayer,
+                otherReply: variant.secondOther
+            };
+        }
+        return {
+            playerLine: variant.thirdPlayer,
+            otherReply: variant.thirdOther
+        };
+    }
+
+    function buildConversationTurn(scenario, option, turnIndex) {
+        const isGreen = Number(option?.score) === 1;
+        if (turnIndex === 0) {
+            return {
+                id: `${option.id}-turn-1`,
+                turnIndex,
+                optionId: option.id,
+                option,
+                isGreen,
+                label: getReactionButtonLabel(option),
+                playerLine: normalizeText(option?.speakerLine, ''),
+                otherReply: normalizeText(option?.likelyOtherReply, '')
+            };
+        }
+        const toneGroup = getOptionToneGroup(option?.tone, isGreen);
+        const continuation = isGreen
+            ? buildGreenContinuation(scenario, turnIndex)
+            : buildRedContinuation(toneGroup, turnIndex);
+        return {
+            id: `${option.id}-turn-${turnIndex + 1}`,
+            turnIndex,
+            optionId: option.id,
+            option,
+            isGreen,
+            label: getReactionButtonLabel(option),
+            playerLine: normalizeText(continuation?.playerLine, option?.speakerLine || ''),
+            otherReply: normalizeText(continuation?.otherReply, option?.likelyOtherReply || '')
+        };
+    }
+
+    function getConversationOutcome(scenario = state.activeScenario) {
+        const trail = getConversationTrail();
+        const greenCount = trail.filter((turn) => turn.isGreen).length;
+        const complete = trail.length >= DIALOGUE_MAX_TURNS;
+        if (!trail.length) {
+            return {
+                status: 'idle',
+                headline: 'המסלול עוד פתוח',
+                summary: 'בחר/י תגובה רגשית מתחת למסך כדי לראות איך השיחה זזה.',
+                score: 0,
+                stars: 0
+            };
+        }
+        if (!complete) {
+            return {
+                status: 'building',
+                headline: `מהלך ${trail.length} מתוך ${DIALOGUE_MAX_TURNS}`,
+                summary: trail[trail.length - 1]?.isGreen
+                    ? 'נפתח כאן חלון קטן של בהירות. אפשר לבחור אם להמשיך לבנות אותו או לסגור אותו.'
+                    : 'המסלול מתחיל להיסגר, אבל אפשר עדיין לשנות כיוון במהלך הבא.',
+                score: 0,
+                stars: 0
+            };
+        }
+        if (greenCount >= 2) {
+            return {
+                status: 'resolved',
+                headline: 'הסיטואציה מתחילה להיפתח',
+                summary: normalizeText(scenario?.microPlan?.successSign, 'בסוף המסלול כבר רואים צעד קטן שאפשר להחזיק בבטחה.'),
+                score: 1,
+                stars: 1
+            };
+        }
+        if (greenCount === 1) {
+            return {
+                status: 'mixed',
+                headline: 'המסלול נשאר מעורבב',
+                summary: 'היו כאן גם רגעים שפתחו וגם רגעים שסגרו. צריך עוד דיוק כדי שלא להחליק חזרה ללחץ.',
+                score: 0,
+                stars: 0
+            };
+        }
+        return {
+            status: 'closed',
+            headline: 'הסיטואציה נסגרת ומתקשחת',
+            summary: normalizeText(scenario?.metaModelCore?.hiddenGap, 'מה שחסר נשאר בלי שם, ולכן גם בלי דרך להתקדם.'),
+            score: 0,
+            stars: 0
+        };
+    }
+
+    function openInvestigationScreen() {
+        if (!state.activeScenario || !getConversationTrail().length) {
+            showToast('בחר/י לפחות תגובה אחת לפני שנכנסים לחקירה.');
+            return;
+        }
+        openScreen(SCREEN_IDS.feedback);
+    }
+
+    function getMetaModelRepairQuestion(scenario, option) {
+        const isGreen = Number(option?.score) === 1;
+        const toneGroup = getOptionToneGroup(option?.tone, isGreen);
+        if (toneGroup === 'blame') return 'מה בדיוק קרה או נאמר כאן בפועל, לפני שזה נהיה ויכוח על מי אשם?';
+        if (toneGroup === 'control') return 'מה בדיוק חסר כרגע כדי שאפשר יהיה לעשות רק צעד אחד, בלי להילחץ מכל התמונה?';
+        if (toneGroup === 'rescue') return 'מה האדם שמולי כן יכול לעשות בעצמו, אם נפרק את זה לצעד ראשון קטן?';
+        if (toneGroup === 'shutdown') return 'מה הכי קשה כאן כרגע, ומה צריך כדי שאפשר יהיה להישאר עוד רגע בשיחה בלי להיסגר?';
+        if (toneGroup === 'dismiss' || toneGroup === 'blur') return 'מה בדיוק עדיין מעורפל או לא ברור כאן כרגע, במקום רק להרגיע את הרגע?';
+        return normalizeText(scenario?.deepeningQuestion, 'מה בדיוק קורה כאן בפועל?');
+    }
+
+    function getMetaModelRepairBenefit(scenario, option) {
+        const isGreen = Number(option?.score) === 1;
+        const toneGroup = getOptionToneGroup(option?.tone, isGreen);
+        if (toneGroup === 'blame') return 'היתרון הרגשי: השאלה מחזירה את השיחה מאשמה לבירור, ולכן מורידה התגוננות.';
+        if (toneGroup === 'control') return 'היתרון הרגשי: במקום לחץ כללי, השאלה יוצרת תחושת אפשרות וצעד ראשון שאפשר להחזיק.';
+        if (toneGroup === 'rescue') return 'היתרון הרגשי: השאלה משאירה את האדם השני בפנים, לא רק מרגיעה אותו מבחוץ.';
+        if (toneGroup === 'shutdown') return 'היתרון הרגשי: השאלה מאפשרת להישאר בקשר בלי להציף, ולכן פותחת מקום לנשימה.';
+        if (toneGroup === 'dismiss' || toneGroup === 'blur') return 'היתרון הרגשי: במקום טשטוש, השאלה נותנת שם למה שחסר וכך מפחיתה חוסר אונים.';
+        return `היתרון הרגשי: שאלת מטה־מודל טובה פותחת בהירות ומחזירה את השיחה למה שאפשר לזהות, לשחזר ולבדוק. ${normalizeText(scenario?.metaModelCore?.hiddenGap, '')}`;
+    }
+
+    function getMetaModelRepairReply(option) {
+        const isGreen = Number(option?.score) === 1;
+        const toneGroup = getOptionToneGroup(option?.tone, isGreen);
+        if (toneGroup === 'blame') return 'כששואלים אותי ככה, יותר קל לי להסביר מה באמת קרה ולא רק להתגונן.';
+        if (toneGroup === 'control') return 'ככה אני מצליח/ה לראות צעד אחד, במקום להילחץ מכל מה שפתוח.';
+        if (toneGroup === 'rescue') return 'זה עוזר לי להישאר חלק מהפתרון, ולא רק שמישהו אחר יציל את המצב.';
+        if (toneGroup === 'shutdown') return 'השאלה הזאת מרגיעה אותי כי היא לא דוחפת, אבל גם לא נעלמת מהבעיה.';
+        if (toneGroup === 'dismiss' || toneGroup === 'blur') return 'עכשיו זה כבר נשמע יותר ברור, ואני יכול/ה להגיד מה באמת חסר לי כאן.';
+        return 'השאלה הזאת עוזרת לי לדייק מה חסר, ולא להישאר רק בתוך התגובה הרגשית.';
+    }
+
+    function buildMetaModelRepairTurn(scenario, sourceOption, turnIndex) {
+        const question = getMetaModelRepairQuestion(scenario, sourceOption);
+        const reply = getMetaModelRepairReply(sourceOption);
+        return {
+            id: `MM-${turnIndex + 1}`,
+            turnIndex,
+            optionId: `MM-${turnIndex + 1}`,
+            option: {
+                id: `MM-${turnIndex + 1}`,
+                tone: 'meta_model_question',
+                speakerLine: question,
+                likelyOtherReply: reply,
+                whyItWorks: getMetaModelRepairBenefit(scenario, sourceOption),
+                score: 1
+            },
+            isGreen: true,
+            label: 'מטה־מודל',
+            playerLine: question,
+            otherReply: reply
+        };
+    }
+
+    function addMetaModelTurn() {
+        const scenario = state.activeScenario;
+        const trail = getConversationTrail();
+        if (!scenario || !trail.length) {
+            showToast('בחר/י קודם תגובה אחת, ואז אפשר להזרים פנימה שאלת מטה־מודל.');
+            return;
+        }
+        if (isConversationComplete()) {
+            showToast('המסלול הושלם. אפשר להיכנס לחקירה או לחזור בזמן.');
+            return;
+        }
+        const sourceOption = trail[trail.length - 1]?.option || state.selectedOption || scenario.responseSet.green;
+        const turn = buildMetaModelRepairTurn(scenario, sourceOption, getConversationStepCount());
+        state.conversationTrail = [...trail, turn];
+        state.selectedOption = turn.option;
+        state.selectedPrismId = '';
+        const responseSlide = getProgressStorySlideForTurn(scenario, getConversationStepCount());
+        if (responseSlide?.id) state.activeStorySlideId = responseSlide.id;
+        render();
+        const lastBubble = mount.querySelector('.scenario-chat-thread .scenario-bubble:last-child');
+        if (lastBubble && typeof lastBubble.scrollIntoView === 'function') {
+            lastBubble.scrollIntoView({ block: 'end', behavior: 'smooth' });
+        }
+    }
+
     function pickOption(optionId) {
         const scenario = state.activeScenario;
         if (!scenario) return;
+        if (isConversationComplete()) {
+            showToast('המסלול הזה כבר הושלם. אפשר לחזור בזמן או לעבור לחקירה.');
+            return;
+        }
         const allOptions = [...scenario.responseSet.red, scenario.responseSet.green];
         const option = allOptions.find((item) => item.id === optionId);
         if (!option) return;
+        const nextTurn = buildConversationTurn(scenario, option, getConversationStepCount());
+        state.conversationTrail = [...getConversationTrail(), nextTurn];
         state.selectedOption = option;
         state.selectedPrismId = '';
-        const responseSlide = getResponseStorySlide(scenario);
+        const responseSlide = getProgressStorySlideForTurn(scenario, getConversationStepCount());
         if (responseSlide?.id) state.activeStorySlideId = responseSlide.id;
-        openScreen(SCREEN_IDS.feedback);
+        render();
+        const lastBubble = mount.querySelector('.scenario-chat-thread .scenario-bubble:last-child');
+        if (lastBubble && typeof lastBubble.scrollIntoView === 'function') {
+            lastBubble.scrollIntoView({ block: 'end', behavior: 'smooth' });
+        }
     }
 
     function restartCurrentScene() {
         if (!state.activeScenario) return;
+        state.conversationTrail = [];
         state.selectedOption = null;
         state.lastEntry = null;
         state.selectedPrismId = '';
@@ -749,6 +1066,8 @@
         const scenario = state.activeScenario;
         const option = state.selectedOption;
         if (!scenario || !option) return null;
+        const trail = getConversationTrail();
+        const outcome = getConversationOutcome(scenario);
         const isGreen = Number(option.score) === 1;
         return {
             timestamp: new Date().toISOString(),
@@ -756,11 +1075,11 @@
             domain: scenario.domainLabel || scenario.domain,
             difficulty: scenario.difficulty,
             title: scenario.title,
-            selectedOptionId: option.id,
-            selectedOptionText: option.speakerLine,
-            feedback: buildLearningTakeaway(scenario, option, isGreen, getOptionToneGroup(option?.tone, isGreen)),
-            score: isGreen ? 1 : 0,
-            stars: isGreen ? 1 : 0,
+            selectedOptionId: trail.map((turn) => turn.optionId).join('>'),
+            selectedOptionText: trail.map((turn) => turn.label).join(' → '),
+            feedback: outcome.summary || buildLearningTakeaway(scenario, option, isGreen, getOptionToneGroup(option?.tone, isGreen)),
+            score: outcome.score,
+            stars: outcome.stars,
             greenSentence: getGreenOptionText(scenario),
             goalGeneral: normalizeText(scenario.greenBlueprint?.goal, ''),
             successMetric: normalizeText(scenario.greenBlueprint?.doneDefinition || scenario.microPlan?.successSign, '')
@@ -768,7 +1087,7 @@
     }
 
     function commitCurrentResult() {
-        if (!state.session || !state.selectedOption || state.lastEntry) return state.lastEntry;
+        if (!state.session || !state.selectedOption || state.lastEntry || !isConversationComplete()) return state.lastEntry;
         const entry = buildHistoryEntry();
         if (!entry) return null;
         state.lastEntry = entry;
@@ -788,6 +1107,10 @@
     }
 
     function continueFromResult() {
+        if (!isConversationComplete()) {
+            showToast(`כדי לראות לאן הסיטואציה הולכת צריך להשלים ${DIALOGUE_MAX_TURNS} מהלכים.`);
+            return;
+        }
         const entry = commitCurrentResult();
         if (!entry) return;
         openScreen(SCREEN_IDS.score);
@@ -803,6 +1126,7 @@
 
     function continueToNextScene() {
         if (!state.session) {
+            state.conversationTrail = [];
             state.lastEntry = null;
             state.selectedOption = null;
             state.activeScenario = null;
@@ -815,6 +1139,7 @@
             state.session = null;
             state.activeScenario = null;
             state.activeStorySlideId = '';
+            state.conversationTrail = [];
             state.selectedOption = null;
             state.lastEntry = null;
             showToast('הסשן הסתיים. אפשר להתחיל סשן חדש.');
@@ -824,6 +1149,7 @@
         state.session.index += 1;
         state.activeScenario = state.session.queue[state.session.index];
         state.activeStorySlideId = normalizeText(state.activeScenario?.storySlides?.[0]?.id, 'setup');
+        state.conversationTrail = [];
         state.selectedOption = null;
         state.lastEntry = null;
         state.selectedPrismId = '';
@@ -889,7 +1215,7 @@
         state.settingsDraft = null;
         render();
         if (startAfterSave) {
-            startSession(state.homeFilters);
+            startSession({ ...state.homeFilters, scenarioId: state.selectedScenarioId });
             return;
         }
         showToast('הגדרות הסימולטור נשמרו.');
@@ -1526,7 +1852,7 @@
         return normalizeText(visual?.label, trimText(toneLabel(option, isGreen), 18));
     }
 
-    function renderReactionButtons(options, selectedOption) {
+    function renderReactionButtons(options, selectedOption, disabled = false) {
         const selectedId = normalizeText(selectedOption?.id, '');
         return options.map((option) => {
             const isGreen = Number(option.score) === 1;
@@ -1539,6 +1865,7 @@
                 data-option-tone="${escapeHtml(getOptionToneGroup(option?.tone, isGreen))}"
                 title="${escapeHtml(option.speakerLine)}"
                 aria-pressed="${selectedId === option.id ? 'true' : 'false'}"
+                ${disabled ? 'disabled' : ''}
               >
                 <span class="scenario-reaction-btn-label">${escapeHtml(getReactionButtonLabel(option))}</span>
               </button>
@@ -1629,6 +1956,161 @@
         `;
     }
 
+    function renderRuntimeChatThreadV2(scenario) {
+        const openingLine = getScenarioSpeechLine(scenario);
+        const trail = getConversationTrail();
+        const outcome = getConversationOutcome(scenario);
+        const chunks = [
+            `
+              <div class="scenario-bubble other">
+                <span class="scenario-bubble-speaker">${escapeHtml(scenario.role.other)}</span>
+                <p>${escapeHtml(openingLine)}</p>
+              </div>
+            `
+        ];
+        trail.forEach((turn, index) => {
+            const isLastTurn = index === trail.length - 1;
+            chunks.push(`
+              <div ${isLastTurn ? 'id="scenario-feedback-choice-bubble"' : ''} class="scenario-bubble player selected ${turn.isGreen ? 'green' : 'red'}">
+                <span class="scenario-bubble-speaker">התגובה שלך</span>
+                <p>${escapeHtml(turn.playerLine)}</p>
+              </div>
+              <div ${isLastTurn ? 'id="scenario-feedback-other-bubble"' : ''} class="scenario-bubble other followup">
+                <span class="scenario-bubble-speaker">התגובה שמולך</span>
+                <p>${escapeHtml(turn.otherReply)}</p>
+              </div>
+            `);
+        });
+        if (!trail.length) {
+            chunks.push(`
+              <div class="scenario-bubble scenario-bubble--system">
+                <span class="scenario-bubble-speaker">המסלול עוד פתוח</span>
+                <p>בחר/י תגובה רגשית מתחת למסך כדי לראות איך השיחה נפתחת, ננעלת או משנה כיוון.</p>
+              </div>
+            `);
+        } else if (trail.length < DIALOGUE_MAX_TURNS) {
+            chunks.push(`
+              <div class="scenario-bubble scenario-bubble--system">
+                <span class="scenario-bubble-speaker">מהלך ${trail.length}/${DIALOGUE_MAX_TURNS}</span>
+                <p>${escapeHtml(outcome.summary)}</p>
+              </div>
+            `);
+        } else {
+            chunks.push(`
+              <div class="scenario-bubble scenario-bubble--system">
+                <span class="scenario-bubble-speaker">לאן זה הלך</span>
+                <p>${escapeHtml(outcome.summary)}</p>
+              </div>
+            `);
+        }
+        return chunks.join('');
+    }
+
+    function renderMetaModelRepairCard(scenario) {
+        const trail = getConversationTrail();
+        if (!trail.length || isConversationComplete()) return '';
+        const sourceOption = trail[trail.length - 1]?.option || state.selectedOption || scenario.responseSet.green;
+        const question = getMetaModelRepairQuestion(scenario, sourceOption);
+        const benefit = getMetaModelRepairBenefit(scenario, sourceOption);
+        return `
+          <div class="scenario-meta-model-repair" data-scenario-meta-model="1">
+            <div class="scenario-meta-model-repair-head">
+              <p class="scenario-panel-kicker">שאלת מטה־מודל שפותחת כאן</p>
+              <button type="button" class="btn btn-secondary scenario-runtime-action" data-scenario-action="add-meta-model-turn">הוסף לשיחה</button>
+            </div>
+            <p class="scenario-meta-model-repair-question">${escapeHtml(question)}</p>
+            <p class="scenario-meta-model-repair-note">${escapeHtml(benefit)}</p>
+          </div>
+        `;
+    }
+
+    function renderRuntimeWorkspaceV2(scenario, options, activeSlide, progress, mode) {
+        const trail = getConversationTrail();
+        const outcome = getConversationOutcome(scenario);
+        const isFeedback = mode === 'feedback';
+        const isComplete = isConversationComplete();
+        const statusLine = trail.length
+            ? `${outcome.headline} · מהלך ${Math.min(trail.length, DIALOGUE_MAX_TURNS)}/${DIALOGUE_MAX_TURNS}`
+            : 'בחר/י תגובה רגשית קצרה וראה/י איך השיחה מתחילה לזוז.';
+        return `
+          <section class="scenario-runtime-shell" data-scenario-runtime="1" data-runtime-mode="${escapeHtml(mode)}" style="--scenario-progress:${escapeHtml(progress)}%">
+            <article class="scenario-runtime-stage-panel" data-domain="${escapeHtml(scenario.domain)}">
+              <div class="scenario-runtime-context-card">
+                <p class="scenario-play-scene-kicker">${escapeHtml(`${scenario.domainLabel} · ${scenario.role.player} מול ${scenario.role.other}`)}</p>
+                <h2>${escapeHtml(scenario.sceneTitle)}</h2>
+                <p class="scenario-runtime-context-text">${escapeHtml(scenario.contextIntro)}</p>
+              </div>
+
+              <div class="scenario-tv-card">
+                <div class="scenario-tv-frame">
+                  <div class="scenario-tv-screen">
+                    ${renderStageImage(activeSlide, scenario)}
+                  </div>
+                </div>
+                <div class="scenario-story-chip-row" role="tablist" aria-label="פריימים של הסיפור">
+                  ${renderStoryFrameChips(scenario, activeSlide)}
+                </div>
+              </div>
+
+              <div class="scenario-reaction-dock">
+                <div class="scenario-reaction-head">
+                  <p class="scenario-panel-kicker">עץ תגובות</p>
+                  <p>${escapeHtml(statusLine)}</p>
+                </div>
+                <div class="scenario-reaction-row" role="list" aria-label="תגובות רגשיות אפשריות">
+                  ${renderReactionButtons(options, state.selectedOption, isComplete && !isFeedback)}
+                </div>
+                ${renderMetaModelRepairCard(scenario)}
+                <div class="scenario-reaction-actions">
+                  <button type="button" class="btn btn-secondary scenario-runtime-action" data-scenario-action="open-investigation" ${trail.length ? '' : 'disabled'}>חקירה</button>
+                  <button type="button" class="btn btn-secondary scenario-runtime-action" data-scenario-action="restart-scene">חזור בזמן ונסה מהתחלה!</button>
+                  ${isComplete ? `<button type="button" class="btn btn-primary scenario-runtime-action" data-scenario-action="continue-result">סיום הסצנה</button>` : `<div class="scenario-runtime-steps-left">עוד ${escapeHtml(String(Math.max(DIALOGUE_MAX_TURNS - trail.length, 0)))} מהלכים כדי לראות לאן זה הולך</div>`}
+                </div>
+              </div>
+            </article>
+
+            <article class="scenario-runtime-chat-panel" data-scenario-feedback-thread="${isFeedback ? '1' : '0'}">
+              <div class="scenario-runtime-chat-head">
+                <p class="scenario-panel-kicker">מסלול השיחה</p>
+                <h3>${escapeHtml(isFeedback ? 'כאן רואים את המסלול שנבנה' : 'כאן נבנה הדיאלוג צעד אחרי צעד')}</h3>
+              </div>
+              <div class="scenario-chat-shell">
+                <div class="scenario-chat-thread">
+                  ${renderRuntimeChatThreadV2(scenario)}
+                </div>
+              </div>
+            </article>
+          </section>
+        `;
+    }
+
+    function renderRuntimeProgressCard(scenario) {
+        const trail = getConversationTrail();
+        const outcome = getConversationOutcome(scenario);
+        const trailLabels = trail.map((turn) => turn.label).join(' ← ');
+        if (!trail.length) {
+            return `
+              <section class="scenario-play-options-card scenario-play-options-card--supporting">
+                <div class="scenario-play-options-head">
+                  <p class="scenario-panel-kicker">מה עושים עכשיו</p>
+                  <h3>בוחרים תגובה ראשונה</h3>
+                  <p>הלחיצה לא פותחת מסך תוצאה. היא מוסיפה משפט למסלול השיחה, מציגה את תגובת הצד השני, ומקדמת את ה־TV לשלב הבא.</p>
+                </div>
+              </section>
+            `;
+        }
+        return `
+          <section class="scenario-play-options-card scenario-play-options-card--supporting">
+            <div class="scenario-play-options-head">
+              <p class="scenario-panel-kicker">${escapeHtml(isConversationComplete() ? 'לאן הסיטואציה הלכה' : 'המסלול נבנה')}</p>
+              <h3>${escapeHtml(outcome.headline)}</h3>
+              <p>${escapeHtml(outcome.summary)}</p>
+              ${trailLabels ? `<p class="scenario-runtime-route-line">תגובות שנבחרו: ${escapeHtml(trailLabels)}</p>` : ''}
+            </div>
+          </section>
+        `;
+    }
+
     function renderCompactPlayOption(option) {
         const isGreen = Number(option.score) === 1;
         const visual = getPlayOptionVisual(option, isGreen);
@@ -1657,10 +2139,10 @@
         const currentIndex = (state.session?.index || 0) + 1;
         const total = state.session?.queue?.length || 0;
         const progress = total > 0 ? Math.round(((currentIndex - 1) / total) * 100) : 0;
-        const activeSlide = getActiveStorySlide(scenario);
+        const activeSlide = getActiveStorySlide(scenario) || getProgressStorySlideForTurn(scenario, getConversationStepCount());
         return `
           <section class="scenario-play-view scenario-play-view--story" data-scenario-stage="1" data-domain="${escapeHtml(scenario.domain)}">
-            ${renderRuntimeWorkspace(scenario, options, activeSlide, null, progress, 'play')}
+            ${renderRuntimeWorkspaceV2(scenario, options, activeSlide, progress, 'play')}
             <section class="scenario-play-options-card scenario-play-options-card--supporting">
               <div class="scenario-play-options-head">
                 <p class="scenario-panel-kicker">מה בודקים כאן</p>
@@ -1693,7 +2175,7 @@
         const activeSlide = getActiveStorySlide(scenario) || getResponseStorySlide(scenario);
         return `
           <section class="scenario-play-view scenario-play-view--story" data-scenario-stage="1" data-domain="${escapeHtml(scenario.domain)}">
-            ${renderRuntimeWorkspace(scenario, options, activeSlide, option, progress, 'feedback')}
+            ${renderRuntimeWorkspaceV2(scenario, options, activeSlide, progress, 'feedback')}
             <section class="scenario-workspace-card scenario-runtime-results-card" data-scenario-feedback-thread="1">
               <div class="scenario-feedback-summary-card">
                 <p class="scenario-feedback-kind">${escapeHtml(isGreen ? 'כיוון שפותח בדיקה' : 'כיוון שסוגר את השיחה')}</p>
@@ -1713,6 +2195,13 @@
               <div class="scenario-consequence-box ${isGreen ? 'green' : 'red'}" data-scenario-consequence="1">
                 <h4>${escapeHtml(isGreen ? 'איך ממשיכים מכאן' : 'מה אפשר לנסות במקום')}</h4>
                 <p>${escapeHtml(guide.nextMove)}</p>
+              </div>
+              <div class="scenario-meta-model-repair scenario-meta-model-repair--analysis">
+                <div class="scenario-meta-model-repair-head">
+                  <p class="scenario-panel-kicker">שאלת מטה־מודל שיכולה לשנות את הכיוון</p>
+                </div>
+                <p class="scenario-meta-model-repair-question">${escapeHtml(getMetaModelRepairQuestion(scenario, option))}</p>
+                <p class="scenario-meta-model-repair-note">${escapeHtml(getMetaModelRepairBenefit(scenario, option))}</p>
               </div>
               <div class="scenario-feedback-actions scenario-feedback-actions--primary">
                 <button type="button" class="btn btn-secondary" data-scenario-action="show-blueprint">${analysisOpen ? 'סגור מפת פעולה' : 'פתח מפת פעולה'}</button>
@@ -1741,7 +2230,8 @@
 
     function renderHomeScreenV2() {
         const hasHistory = state.progress.completed > 0;
-        const previewScenario = getHomePreviewScenario(state.homeFilters);
+        const featuredScenarios = getScenarioMenuScenarios();
+        const previewScenario = getSelectedScenarioFromMenu() || getHomePreviewScenario(state.homeFilters);
         const processSteps = Array.isArray(trainerContract.processSteps) ? trainerContract.processSteps : [];
         return `
           <section class="scenario-workspace-card scenario-home-card scenario-home-card--landing">
@@ -1756,9 +2246,24 @@
               <div class="scenario-home-setup-head">
                 <div>
                   <p class="scenario-panel-kicker">הגדרות פתיחה</p>
-                  <h3>${escapeHtml(getCurrentSummary())}</h3>
+                  <h3>${escapeHtml(previewScenario ? `מסלול ממוקד · ${previewScenario.sceneTitle}` : getCurrentSummary())}</h3>
                 </div>
                 ${hasHistory ? `<button type="button" class="btn btn-secondary" data-scenario-action="open-history">היסטוריה (${escapeHtml(state.progress.completed)})</button>` : ''}
+              </div>
+              <div class="scenario-home-scenario-grid">
+                ${featuredScenarios.map((scenario) => `
+                  <button
+                    type="button"
+                    class="scenario-home-scenario-card ${state.selectedScenarioId === scenario.scenarioId ? 'is-active' : ''}"
+                    data-scenario-action="select-scenario"
+                    data-scenario-id="${escapeHtml(scenario.scenarioId)}"
+                    aria-pressed="${state.selectedScenarioId === scenario.scenarioId ? 'true' : 'false'}"
+                  >
+                    <span class="scenario-home-scenario-kicker">${escapeHtml(scenario.domainLabel)}</span>
+                    <strong>${escapeHtml(scenario.sceneTitle)}</strong>
+                    <span>${escapeHtml(trimText(scenario.contextIntro, 118))}</span>
+                  </button>
+                `).join('')}
               </div>
               <div class="scenario-home-filter-row">
                 <label for="scenario-domain-select">תחום</label>
@@ -2145,11 +2650,12 @@
             applyPreset(preset);
             return;
         }
-        if (trainerAction === 'start-session') return void startSession(state.homeFilters);
+        if (trainerAction === 'start-session') return void startSelectedScenario();
         if (trainerAction === 'open-settings') return void openSettings();
         if (trainerAction === 'close-settings') return void closeSettings();
         if (trainerAction === 'save-settings') return void saveSettingsFromDraft(false);
         if (trainerAction === 'save-start') return void saveSettingsFromDraft(true);
+        if (scenarioAction === 'select-scenario') return void setSelectedScenario(button.getAttribute('data-scenario-id'));
         if (scenarioAction === 'open-help') return void openScreen(SCREEN_IDS.help);
         if (scenarioAction === 'open-history') return void openScreen(SCREEN_IDS.history);
         if (scenarioAction === 'pick-story-slide') return void setActiveStorySlide(button.getAttribute('data-story-slide-id'));
@@ -2157,10 +2663,13 @@
             const optionId = button.getAttribute('data-option-id');
             return void pickOption(optionId);
         }
+        if (scenarioAction === 'add-meta-model-turn') return void addMetaModelTurn();
+        if (scenarioAction === 'open-investigation') return void openInvestigationScreen();
         if (scenarioAction === 'show-blueprint') return void toggleBlueprintScreen();
         if (scenarioAction === 'continue-result') return void continueFromResult();
         if (scenarioAction === 'restart-scene') return void restartCurrentScene();
         if (scenarioAction === 'next-scene') return void continueToNextScene();
+        if (scenarioAction === 'resume-scene') return void openScreen(SCREEN_IDS.play, { preserveScroll: true });
         if (scenarioAction === 'go-home') return void openScreen(SCREEN_IDS.home);
         if (scenarioAction === 'export-history') return void exportHistory();
         if (scenarioAction === 'clear-history') return void clearHistory();
