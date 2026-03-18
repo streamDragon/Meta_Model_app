@@ -93,11 +93,13 @@ try {
         });
 
         const response = await page.goto(`${serverBundle.base}/scenario_trainer.html`, {
-            waitUntil: 'domcontentloaded'
+            waitUntil: 'networkidle'
         });
 
         console.log('status', response?.status());
-        await page.waitForTimeout(3000);
+        await page.waitForTimeout(1000);
+        const visibility = await page.locator('[data-trainer-platform="1"][data-trainer-id="scenario-trainer"]').isVisible().catch(() => false);
+        console.log('trainer visible', visibility);
 
         const snapshot = await page.evaluate(() => ({
             title: document.title,
