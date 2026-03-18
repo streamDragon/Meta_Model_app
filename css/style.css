@@ -24358,6 +24358,19 @@ body.mobile-sticky-cta-visible {
     overscroll-behavior: contain;
 }
 
+/* Let the active practice-question feature grow naturally instead of trapping
+   the live drill inside a short internal scroller. */
+#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] {
+    overflow: visible;
+}
+
+#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-container,
+#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-card {
+    max-height: none;
+    overflow: visible;
+    overscroll-behavior: auto;
+}
+
 /* Compact the left stats panel so it takes less space */
 .question-drill-live-side {
     gap: 8px !important;
@@ -24390,6 +24403,12 @@ body.mobile-sticky-cta-visible {
     .question-drill-card {
         max-height: calc(100dvh - 100px);
         padding: 10px !important;
+    }
+
+    #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .practice-container,
+    #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-card {
+        max-height: none;
+        overflow: visible;
     }
 }
 
