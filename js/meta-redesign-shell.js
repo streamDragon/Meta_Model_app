@@ -611,16 +611,6 @@
     function savePrefs() { try { window.localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (_error) {} }
     function applyPrefs() { document.documentElement.setAttribute('data-meta-reduce-motion', prefs.reduceMotion ? '1' : '0'); }
     function getTabState(tab) { return featureState[normalizeTab(tab)] || defaultFeatureState()[normalizeTab(tab)]; }
-    function setOnboardingFlags() {
-        var flags = {
-            onboarding_complete: 'true',
-            mm_onboarding_done: 'true',
-            mm_onboarding_dismissed_v1: '1'
-        };
-        Object.keys(flags).forEach(function (key) {
-            try { window.localStorage.setItem(key, flags[key]); } catch (_error) {}
-        });
-    }
     function getAppContainer() { return document.querySelector('.container') || document.body; }
     function getShellRoot() {
         var mount = document.getElementById(SHELL_ROOT_ID);
@@ -1677,6 +1667,6 @@ function featureActionButtonsHtml(meta) {
         document.addEventListener('visibilitychange', function () { if (document.hidden) return; featureState = loadFeatureState(); homeUi = loadHomeUi(); prefs = loadPrefs(); applyPrefs(); syncShells('forward'); });
         window.addEventListener('focus', function () { featureState = loadFeatureState(); homeUi = loadHomeUi(); prefs = loadPrefs(); applyPrefs(); syncShells('forward'); });
     }
-    function boot() { setOnboardingFlags(); applyPrefs(); bindRealtime(); syncShells('forward'); }
+    function boot() { applyPrefs(); bindRealtime(); syncShells('forward'); }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true }); else window.setTimeout(boot, 0);
 }(window, document));

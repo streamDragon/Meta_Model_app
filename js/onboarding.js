@@ -8,7 +8,8 @@
     'use strict';
 
     var STORAGE_KEY = 'mm_user_profile';
-    var DISMISSED_KEY = 'mm_onboarding_dismissed_v1';
+    var DISMISSED_KEY = 'mm_onboarding_dismissed_v2';
+    var LEGACY_DISMISSED_KEYS = ['mm_onboarding_dismissed_v1', 'mm_onboarding_done', 'onboarding_complete'];
     var SPLASH_DURATION_MS = 1900; // splash fades at 1.6s, show onboarding at 1.9s
 
     /* ── Recommendation map ── */
@@ -94,6 +95,9 @@
     function clearDismissed() {
         try {
             localStorage.removeItem(DISMISSED_KEY);
+            LEGACY_DISMISSED_KEYS.forEach(function (key) {
+                localStorage.removeItem(key);
+            });
         } catch (e) { /* ignore */ }
     }
 

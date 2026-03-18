@@ -21,7 +21,6 @@
     z-index: 1;
 }
 
-body.meta-shell-mode #mm-onboarding,
 body.meta-shell-mode #hint-box,
 body.meta-shell-mode #splash-screen,
 body.meta-shell-mode #app-sticky-banner,
@@ -31,8 +30,7 @@ body.meta-shell-mode .mobile-tab-nav,
 body.meta-shell-mode #feature-map-toggle,
 body.meta-shell-mode #global-comic-strip,
 body.meta-shell-mode #comicPreviewModal,
-body.meta-shell-mode #debug,
-body.meta-shell-mode #mm-home-greeting {
+body.meta-shell-mode #debug {
     display: none !important;
 }
 
