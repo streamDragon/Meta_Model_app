@@ -1352,6 +1352,108 @@
         if (els.replyStepBack) els.replyStepBack.disabled = state.history.length === 0;
     }
 
+    function feedbackPatternLabel(item) {
+        if (!item) return 'מהלך שיח';
+        if (item.rhetorical) return 'שאלה רטורית או האשמה עקיפה';
+        const tone = compact(item.tone);
+        if (String(item.choiceId || '').indexOf('timeout_') === 0 || tone === 'freeze') {
+            return 'קיפאון או היעלמות תגובתית';
+        }
+        if (tone === 'repair') return 'תגובה מתקנת שמחזירה קשר ובירור';
+        if (tone === 'hot') return 'לחץ חם שמעלה הגנה ובושה';
+        if (tone === 'control') return 'שליטה מהירה במקום פירוק קושי';
+        if (tone === 'rescue') return 'הצלה מהירה במקום בניית יכולת';
+        if (tone === 'avoid') return 'הרגעה או דחייה שמפספסת את הקושי';
+        return compact(item.choiceLabel || 'מהלך שיח מרכזי');
+    }
+
+    function feedbackFollowUpQuestion(item) {
+        const repairMove = compact(item?.repairMove);
+        if (repairMove) return repairMove;
+        if (item?.rhetorical) return 'מה בדיוק היה קשה במשימה הזאת, ואיפה נתקעת ממש עכשיו?';
+        const tone = compact(item?.tone);
+        if (tone === 'control') return 'איזה צעד ראשון אפשר להתחיל עכשיו בלי להציף אותך?';
+        if (tone === 'rescue') return 'איפה צריך עזרה קטנה, ומה את/ה כן יכול/ה לנסות לבד?';
+        if (tone === 'repair') return 'מה הצעד הראשון שנראה לך אפשרי עכשיו?';
+        if (tone === 'freeze' || String(item?.choiceId || '').indexOf('timeout_') === 0) {
+            return 'אני איתך. מה בדיוק נהיה גדול מדי או לא ברור?';
+        }
+        return 'איזה מידע חסר עכשיו כדי להחזיר אחיזה, קשר וצעד ראשון ברור?';
+    }
+
+    function feedbackCaution(item) {
+        const tone = compact(item?.tone);
+        if (item?.rhetorical || tone === 'hot') {
+            return 'שאלה שנשמעת כמו האשמה לא אוספת מידע חדש. היא מעבירה את הילד להגנה במקום לחשיבה משותפת.';
+        }
+        if (tone === 'freeze' || String(item?.choiceId || '').indexOf('timeout_') === 0) {
+            return 'גם אי-תגובה היא תגובה. כשהמבוגר נעלם, הילד נשאר לבד מול העומס וצריך לנחש מה קורה.';
+        }
+        if (tone === 'control') {
+            return 'לחץ מהיר יכול לייצר ציות חיצוני, אבל לא תמיד יוצר הבנה, ביטחון או שיתוף פעולה אמיתי.';
+        }
+        if (tone === 'rescue') {
+            return 'הצלה מהירה מרגיעה רגעית, אבל עלולה להשאיר את הילד בלי בעלות על התהליך ובלי צעד פנימי משלו.';
+        }
+        if (tone === 'avoid') {
+            return 'הרגעה כללית בלי פירוק קונקרטי משאירה את הקושי בשם גדול, בלי דרך מעשית להמשיך.';
+        }
+        return 'כדאי לבדוק שהתגובה שומרת גם קשר וגם בירור, ולא רק משתיקה זמנית את הרגע.';
+    }
+
+    function feedbackNextStep(runtime, item) {
+        const outcome = compact(runtime?.state?.outcome || item?.result?.outcome || '');
+        if (outcome === 'repair') {
+            return 'שמרו על אותו קו: הכרה בחוויה, פירוק לצעד קטן, ואז בדיקה אם הילד חוזר להיות שותף.';
+        }
+        if (outcome === 'late_repair') {
+            return 'יש ערך לתיקון, אבל כאן צריך קודם להכיר בפגיעה שכבר נוצרה לפני שממשיכים למשימה.';
+        }
+        if (outcome === 'explosion') {
+            return 'לא ממשיכים ללחוץ. עוצרים, מווסתים, ורק אחר כך חוזרים לברר מה היה גדול מדי או לא ברור.';
+        }
+        return 'בסיבוב הבא חפשו תגובה שמורידה בושה, מחזירה מידע חסר, ופותחת צעד ראשון שאפשר לבצע.';
+    }
+
+    function renderTherapeuticFeedbackCard(runtime, item) {
+        if (!item) return '';
+        return `
+            <section class="product-coach-card" data-ceflow-therapeutic-guide="1">
+                <div class="product-coach-card__head">
+                    <span class="product-coach-card__kicker">מדריך עבודה טיפולי</span>
+                    <h4>${escapeHtml(compact(item.result?.outcome) === 'repair' ? 'מה עזר ולמה לשמר את זה' : 'מה קרה כאן ואיך מתקנים')}</h4>
+                    <p>התרגום כאן הוא לא רק למשחק, אלא לדרך החשיבה של מטפל/ת או הורה בזמן אמת.</p>
+                </div>
+                <div class="product-coach-card__grid">
+                    <div class="product-coach-card__item">
+                        <strong>מה זוהה כאן</strong>
+                        <p>${escapeHtml(feedbackPatternLabel(item))}</p>
+                    </div>
+                    <div class="product-coach-card__item">
+                        <strong>למה זה חשוב</strong>
+                        <p>${escapeHtml(compact(item.whyItMatters || item.metaModelExplanation || item.summary || ''))}</p>
+                    </div>
+                    <div class="product-coach-card__item">
+                        <strong>שאלת המשך מומלצת</strong>
+                        <p>${escapeHtml(feedbackFollowUpQuestion(item))}</p>
+                    </div>
+                    <div class="product-coach-card__item" data-tone="caution">
+                        <strong>זהירות טיפולית</strong>
+                        <p>${escapeHtml(feedbackCaution(item))}</p>
+                    </div>
+                    <div class="product-coach-card__item" data-tone="next">
+                        <strong>הצעד הבא</strong>
+                        <p>${escapeHtml(feedbackNextStep(runtime, item))}</p>
+                    </div>
+                </div>
+                <div class="product-coach-card__quote">
+                    <span>התגובה שנבחרה</span>
+                    ${escapeHtml(compact(item.parentLine || item.choiceLabel || item.summary || ''))}
+                </div>
+            </section>
+        `;
+    }
+
     function renderFeedback(runtime) {
         const item = runtime.state.path[runtime.state.path.length - 1];
         runtime.els.feedback?.classList.toggle('hidden', !item);
@@ -1368,6 +1470,7 @@
                 <p class="ceflow-language-effect-takeaway">${escapeHtml(item.metaModelExplanation)}</p>
                 ${item.repairMove ? `<p class="ceflow-feedback-note">${escapeHtml(`מה היה יכול לפתוח יותר: ${item.repairMove}`)}</p>` : ''}
             </div>
+            ${renderTherapeuticFeedbackCard(runtime, item)}
         `;
     }
 
@@ -1521,6 +1624,8 @@
             whyItMatters: choice.whyItMatters,
             repairMove: choice.repairMove,
             metaModelExplanation: choice.metaModelExplanation,
+            tone: choice.tone,
+            rhetorical: !!choice.rhetorical,
             metrics: choice.metrics,
             result: choice.result
         };

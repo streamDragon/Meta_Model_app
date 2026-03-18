@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.440" data-build-time="1773839503077" data-build-iso="2026-03-18T13:11:43.077Z" data-git-commit="88731af">
+<html lang="he" dir="rtl" data-app-version="1.0.441" data-build-time="1773844979360" data-build-iso="2026-03-18T14:42:59.360Z" data-git-commit="e60f8e6">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -275,6 +275,11 @@
             uiEnhancementsStylesheet.href = withAssetVersion('css/ui-enhancements.css');
             document.head.appendChild(uiEnhancementsStylesheet);
 
+            var productGuidanceStylesheet = document.createElement('link');
+            productGuidanceStylesheet.rel = 'stylesheet';
+            productGuidanceStylesheet.href = withAssetVersion('css/product-guidance.css');
+            document.head.appendChild(productGuidanceStylesheet);
+
             var metaRedesignRound2Stylesheet = document.createElement('link');
             metaRedesignRound2Stylesheet.rel = 'stylesheet';
             metaRedesignRound2Stylesheet.href = withAssetVersion('css/meta-redesign-round2.css');
@@ -465,48 +470,57 @@
 
                 <div class="feature-map-grid">
                     <section class="feature-map-card">
-                        <h4>קלאסיק / מבנה הקסם</h4>
+                        <h4>Practice · תרגול</h4>
                         <div class="feature-map-links">
+                            <button type="button" class="btn btn-secondary" data-nav-key="practiceQuestion">תרגול זיהוי המטה-מודל</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="practiceRadar">מכ״ם מטה-מודל</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="practiceTriplesRadar">מכ״ם שלשות (ברין)</button>
                             <a class="btn btn-secondary" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html">קלאסיק 1 · המבנה הקלאסי</a>
                             <a class="btn btn-secondary" href="classic2_trainer.html" data-versioned-href="classic2_trainer.html">קלאסיק 2 · מבנה הקסם</a>
-                            <a class="btn btn-secondary" href="iceberg_templates_trainer.html" data-versioned-href="iceberg_templates_trainer.html">קצה הקרחון · עצי הבחנה</a>
+                            <a class="btn btn-secondary" href="living_triples_trainer.html" data-versioned-href="living_triples_trainer.html">שלשות חיות</a>
                         </div>
-                        <p class="feature-map-note">כל אחד מהכלים האלה נפתח במסך עבודה מלא משלו.</p>
+                        <p class="feature-map-note">כאן נכנסים לאימונים חזרתיים שמחדדים זיהוי, מהירות ושאלת המשך.</p>
                     </section>
 
                     <section class="feature-map-card">
-                        <h4>חקירת עומק</h4>
+                        <h4>Analysis · ניתוח</h4>
                         <div class="feature-map-links">
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('prismlab')">מעבדת פריזמות · חקירה בשכבות</button>
-                            <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html">מחקר פריזמות · חקירה בשרשרת</a>
-                        </div>
-                        <p class="feature-map-note">כאן עוברים בין חקירה בתוך האפליקציה לבין חקירה רציפה במסך ייעודי.</p>
-                    </section>
-
-                    <section class="feature-map-card">
-                        <h4>עם טבלאות ברין</h4>
-                        <div class="feature-map-links">
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-triples-radar')">מכ״ם שלשות (ברין)</button>
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('categories')">מילון קטגוריות המטה-מודל</button>
-                            <a class="btn btn-secondary" href="living_triples_trainer.html" data-versioned-href="living_triples_trainer.html">שלשות חיות · תרגול המשפחה המלאה</a>
-                        </div>
-                        <p class="feature-map-note">כאן נמצאים כלי ברין והידע המשלים שמחזק את הזיהוי בשיחה.</p>
-                    </section>
-
-                    <section class="feature-map-card">
-                        <h4>כלים משלימים</h4>
-                        <div class="feature-map-links">
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('sentence-map')">מפת המשפט</button>
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-question')">תרגול זיהוי המטה-מודל</button>
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">מכ״ם מטה-מודל</button>
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה</button>
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">בונה מהלך</button>
-                            <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">במת קומיקס רגשי</button>
-                            <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">סימולטור סצנות</a>
+                            <button type="button" class="btn btn-secondary" data-nav-key="sentenceMap">מפת המשפט</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="categories">מילון קטגוריות המטה-מודל</button>
                             <a class="btn btn-secondary" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html">מאמן פועל לא מפורט</a>
                             <a class="btn btn-secondary" href="sentence_morpher_trainer.html" data-versioned-href="sentence_morpher_trainer.html">מעבדת שינוי ניסוח</a>
+                            <a class="btn btn-secondary" href="iceberg_templates_trainer.html" data-versioned-href="iceberg_templates_trainer.html">קצה הקרחון · עצי הבחנה</a>
+                            <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html">מחקר פריזמות</a>
                         </div>
-                        <p class="feature-map-note">כאן תמצאו כלי המשך כשצריך להעמיק, לדייק, או לעבור לתרגול אחר.</p>
+                        <p class="feature-map-note">כאן ממפים, מפרקים ומרחיבים את המפה לפני שמתערבים או בוחרים שאלה.</p>
+                    </section>
+
+                    <section class="feature-map-card">
+                        <h4>Simulation · סימולציה</h4>
+                        <div class="feature-map-links">
+                            <a class="btn btn-secondary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">סימולטור סצנות</a>
+                            <button type="button" class="btn btn-secondary" data-nav-key="comicEngine">במת קומיקס רגשי</button>
+                        </div>
+                        <p class="feature-map-note">כאן בודקים איך ניסוח נוחת בפועל ומה הוא עושה לקשר, לבושה ולסוכנות.</p>
+                    </section>
+
+                    <section class="feature-map-card">
+                        <h4>Learning · למידה</h4>
+                        <div class="feature-map-links">
+                            <button type="button" class="btn btn-secondary" data-nav-key="practiceWizard">גשר תחושה-שפה</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="about">על המוצר והקהילה</button>
+                        </div>
+                        <p class="feature-map-note">כאן לומדים את השפה, ההלימה וההקשר שמחזיקים את שאר הכלים.</p>
+                    </section>
+
+                    <section class="feature-map-card">
+                        <h4>Therapist Tools · כלי מטפל</h4>
+                        <div class="feature-map-links">
+                            <button type="button" class="btn btn-secondary" data-nav-key="prismLab">מעבדת פריזמות</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="blueprint">בונה מהלך</button>
+                            <a class="btn btn-secondary" href="lab/context-radar/" data-versioned-href="lab/context-radar/">מכ"ם הקשר</a>
+                        </div>
+                        <p class="feature-map-note">כאן עוברים ממבנה לשוני אל חשיבה קלינית: איפה לעבוד עכשיו, ואיך לבנות מהלך.</p>
                     </section>
                 </div>
             </div>
@@ -695,6 +709,75 @@
                 </div>
             </article>
             <!-- ═══ /CINEMATIC HERO ═══ -->
+
+            <section class="product-family-hub" aria-label="משפחות העבודה של המוצר">
+                <div class="product-family-hub__head">
+                    <span class="product-family-kicker">מפת המוצר</span>
+                    <h3>5 משפחות עבודה ברורות</h3>
+                    <p>במקום לקפוץ בין כלים, בוחרים קודם משפחת עבודה אחת: תרגול, ניתוח, סימולציה, למידה או כלי מטפל.</p>
+                </div>
+                <div class="product-family-grid">
+                    <article class="product-family-card" data-family="practice">
+                        <div class="product-family-card__head">
+                            <span class="product-family-card__badge">Practice · תרגול</span>
+                            <h4>חדוד האוזן והתגובה</h4>
+                            <p>לזיהוי מהיר של דפוסי מטה-מודל, חיזוק רפלקס שאלת המשך, ועבודה חזרתית על תבניות.</p>
+                        </div>
+                        <div class="product-family-card__actions">
+                            <button type="button" class="btn btn-primary" data-nav-key="practiceQuestion">תרגול זיהוי</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="practiceRadar">מכ"ם מטה-מודל</button>
+                        </div>
+                    </article>
+
+                    <article class="product-family-card" data-family="analysis">
+                        <div class="product-family-card__head">
+                            <span class="product-family-card__badge">Analysis · ניתוח</span>
+                            <h4>ממפים לפני שמתערבים</h4>
+                            <p>כאן מפרקים משפט, הקשר או מושג עמום כדי להבין מה באמת קורה לפני בחירת שאלה או מהלך.</p>
+                        </div>
+                        <div class="product-family-card__actions">
+                            <button type="button" class="btn btn-primary" data-nav-key="sentenceMap">מפת המשפט</button>
+                            <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html">מחקר פריזמות</a>
+                        </div>
+                    </article>
+
+                    <article class="product-family-card" data-family="simulation">
+                        <div class="product-family-card__head">
+                            <span class="product-family-card__badge">Simulation · סימולציה</span>
+                            <h4>בודקים איך השפה נוחתת</h4>
+                            <p>סימולטורים שמראים מה התגובה עושה בפועל: האם היא פותחת בדיקה, מגבירה בושה, או מסלימה את השיחה.</p>
+                        </div>
+                        <div class="product-family-card__actions">
+                            <a class="btn btn-primary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">סימולטור סצנות</a>
+                            <button type="button" class="btn btn-secondary" data-nav-key="comicEngine">במת קומיקס רגשי</button>
+                        </div>
+                    </article>
+
+                    <article class="product-family-card" data-family="learning">
+                        <div class="product-family-card__head">
+                            <span class="product-family-card__badge">Learning · למידה</span>
+                            <h4>מבינים שפה, הלימה ומונחים</h4>
+                            <p>מסכים שמלמדים את השפה המקצועית, את הגשר בין חוויה לניסוח, ואת ההקשר של המוצר כולו.</p>
+                        </div>
+                        <div class="product-family-card__actions">
+                            <button type="button" class="btn btn-primary" data-nav-key="practiceWizard">גשר תחושה-שפה</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="categories">מילון הקטגוריות</button>
+                        </div>
+                    </article>
+
+                    <article class="product-family-card" data-family="therapist">
+                        <div class="product-family-card__head">
+                            <span class="product-family-card__badge">Therapist Tools · כלי מטפל</span>
+                            <h4>מכאן בונים מהלך קליני</h4>
+                            <p>כלי עומק למטפלים ולסטודנטים מתקדמים: מיפוי רב-שכבתי, בחירת כיוון עבודה, ותכנון צעד המשך.</p>
+                        </div>
+                        <div class="product-family-card__actions">
+                            <button type="button" class="btn btn-primary" data-nav-key="prismLab">מעבדת פריזמות</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="blueprint">בונה מהלך</button>
+                        </div>
+                    </article>
+                </div>
+            </section>
 
             <!-- ═══ BOLD FEATURE PATHS ═══ -->
             <section class="hhc-paths home-route-desktop-only" aria-label="מסלולי תרגול ראשיים" hidden>
@@ -1476,46 +1559,75 @@
                     <p class="subtitle">גישה מהירה לכל המודולים: מעבר בין מסלולים בלי ברין / עם ברין. אפשר גם לפתוח את כלי הפירוק בחלון נפרד.</p>
                     <p style="margin:0 0 10px;color:#335a7d;">כאן תמצא/י גישה מהירה לכל כלי — מבנה קלאסי, מעבדות, ומאמנים עצמאיים.</p>
                     
-<div class="feature-launcher" data-feature-launcher>
-    <div class="feature-launcher-head">
-        <div>
-            <strong>מסלול עבודה</strong>
-            <p>בחרו קבוצת כלים לפי סוג התרגול. אפשר לעבור בין מסכים בלי לאבד הקשר.</p>
-        </div>
-    </div>
-    <div class="feature-launcher-tabs" role="tablist" aria-label="קבוצות תרגול">
-        <button type="button" class="feature-launcher-tab is-active" data-feature-group-btn="without-breen" aria-selected="true">בלי טבלאות ברין</button>
-        <button type="button" class="feature-launcher-tab" data-feature-group-btn="with-breen" aria-selected="false">עם טבלאות ברין</button>
-    </div>
+                    <div class="product-tool-families">
+                        <article class="product-family-card" data-family="practice">
+                            <div class="product-family-card__head">
+                                <span class="product-family-card__badge">Practice · תרגול</span>
+                                <h4>אימונים חזרתיים</h4>
+                                <p>בחרו אם אתם רוצים לחדד זיהוי מהיר, לעבוד עם ברין, או להיכנס למסלול קלאסי מלא.</p>
+                            </div>
+                            <div class="product-family-card__actions">
+                                <button type="button" class="btn btn-primary" onclick="navigateTo('practice-question')">תרגול זיהוי</button>
+                                <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-radar')">מכ"ם מטה-מודל</button>
+                                <button type="button" class="btn btn-secondary" onclick="navigateTo('practice-triples-radar')">מכ"ם שלשות</button>
+                                <a class="btn btn-secondary" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html">קלאסיק 1</a>
+                                <a class="btn btn-secondary" href="classic2_trainer.html" data-versioned-href="classic2_trainer.html">קלאסיק 2</a>
+                                <a class="btn btn-secondary" href="living_triples_trainer.html" data-versioned-href="living_triples_trainer.html">שלשות חיות</a>
+                            </div>
+                        </article>
 
-    <div class="feature-launcher-panel is-active" data-feature-group-panel="without-breen">
-        <div class="feature-launcher-grid">
-            <a class="btn btn-primary" data-tool-icon="🔬" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html">מאמן פועל לא מפורט</a>
-            <a class="btn btn-secondary" data-tool-icon="✍️" href="sentence_morpher_trainer.html" data-versioned-href="sentence_morpher_trainer.html">מעבדת שינוי ניסוח</a>
-            <a class="btn btn-secondary" data-tool-icon="🧠" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html">מחקר פריזמות · חקירה בשרשרת</a>
-            <a class="btn btn-secondary" data-tool-icon="🧊" href="iceberg_templates_trainer.html" data-versioned-href="iceberg_templates_trainer.html">קצה הקרחון · עצי הבחנה</a>
-            <button type="button" class="btn btn-secondary" data-tool-icon="🧩" onclick="navigateTo('practice-question')">תרגול זיהוי המטה-מודל</button>
-            <button type="button" class="btn btn-secondary" data-tool-icon="🎯" onclick="navigateTo('practice-radar')">מכ״ם מטה-מודל</button>
-            <button type="button" class="btn btn-secondary" data-tool-icon="🗺️" onclick="navigateTo('sentence-map')">מפת המשפט</button>
-            <button type="button" class="btn btn-secondary" data-tool-icon="🌉" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה</button>
-            <button type="button" class="btn btn-secondary" data-tool-icon="🧭" onclick="navigateTo('blueprint')">בונה מהלך</button>
-            <button type="button" class="btn btn-secondary" data-tool-icon="🔮" onclick="navigateTo('prismlab')">מעבדת פריזמות · חקירה בשכבות</button>
-            <button type="button" class="btn btn-secondary" data-tool-icon="🎭" onclick="navigateTo('comic-engine')">במת קומיקס רגשי</button>
-            <a class="btn btn-secondary" data-tool-icon="🎬" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">סימולטור סצנות</a>
-        </div>
-    </div>
+                        <article class="product-family-card" data-family="analysis">
+                            <div class="product-family-card__head">
+                                <span class="product-family-card__badge">Analysis · ניתוח</span>
+                                <h4>מפרקים לפני שבוחרים פעולה</h4>
+                                <p>כאן נמצאים הכלים שמחזירים ניסוח עמום למפה ברורה, ענף אחרי ענף או פועל אחרי פועל.</p>
+                            </div>
+                            <div class="product-family-card__actions">
+                                <button type="button" class="btn btn-primary" onclick="navigateTo('sentence-map')">מפת המשפט</button>
+                                <a class="btn btn-secondary" href="verb_unzip_trainer.html" data-versioned-href="verb_unzip_trainer.html">מאמן פועל לא מפורט</a>
+                                <a class="btn btn-secondary" href="sentence_morpher_trainer.html" data-versioned-href="sentence_morpher_trainer.html">מעבדת שינוי ניסוח</a>
+                                <a class="btn btn-secondary" href="iceberg_templates_trainer.html" data-versioned-href="iceberg_templates_trainer.html">קצה הקרחון</a>
+                                <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html">מחקר פריזמות</a>
+                            </div>
+                        </article>
 
-    <div class="feature-launcher-panel" data-feature-group-panel="with-breen" hidden>
-        <div class="feature-launcher-grid">
-            <button type="button" class="btn btn-primary" data-tool-icon="📡" onclick="navigateTo('practice-triples-radar')">מכ״ם שלשות (ברין)</button>
-            <button type="button" class="btn btn-secondary" data-tool-icon="📚" onclick="navigateTo('categories')">מילון קטגוריות המטה-מודל</button>
-            <a class="btn btn-secondary" data-tool-icon="🧬" href="living_triples_trainer.html" data-versioned-href="living_triples_trainer.html">שלשות חיות · תרגול המשפחה המלאה</a>
-            <a class="btn btn-secondary" data-tool-icon="🪄" href="classic_classic_trainer.html" data-versioned-href="classic_classic_trainer.html">קלאסיק 1 · המבנה הקלאסי</a>
-            <a class="btn btn-secondary" data-tool-icon="✨" href="classic2_trainer.html" data-versioned-href="classic2_trainer.html">קלאסיק 2 · מבנה הקסם</a>
-        </div>
-    </div>
-</div>
-</div>
+                        <article class="product-family-card" data-family="simulation">
+                            <div class="product-family-card__head">
+                                <span class="product-family-card__badge">Simulation · סימולציה</span>
+                                <h4>איך השפה נוחתת בשיחה חיה</h4>
+                                <p>הסימולטורים בודקים לא רק אם המשפט “נכון”, אלא מה הוא עושה לקשר, לקצב ולסוכנות.</p>
+                            </div>
+                            <div class="product-family-card__actions">
+                                <a class="btn btn-primary" href="scenario_trainer.html" data-versioned-href="scenario_trainer.html">סימולטור סצנות</a>
+                                <button type="button" class="btn btn-secondary" onclick="navigateTo('comic-engine')">במת קומיקס רגשי</button>
+                            </div>
+                        </article>
+
+                        <article class="product-family-card" data-family="learning">
+                            <div class="product-family-card__head">
+                                <span class="product-family-card__badge">Learning · למידה</span>
+                                <h4>שפה, הלימה ומונחים</h4>
+                                <p>כאן עובדים על הקשר, על ניסוח מחובר, ועל השפה המקצועית שמחזיקה את כל המערכת.</p>
+                            </div>
+                            <div class="product-family-card__actions">
+                                <button type="button" class="btn btn-primary" onclick="navigateTo('practice-wizard')">גשר תחושה-שפה</button>
+                                <button type="button" class="btn btn-secondary" onclick="navigateTo('categories')">מילון הקטגוריות</button>
+                                <button type="button" class="btn btn-secondary" onclick="navigateTo('about')">על המוצר</button>
+                            </div>
+                        </article>
+
+                        <article class="product-family-card" data-family="therapist">
+                            <div class="product-family-card__head">
+                                <span class="product-family-card__badge">Therapist Tools · כלי מטפל</span>
+                                <h4>מכאן בונים מהלך קליני</h4>
+                                <p>כלי עומק לבחירת כיוון עבודה, בדיקת שכבה מתאימה, ובניית שאלת המשך או תוכנית פעולה.</p>
+                            </div>
+                            <div class="product-family-card__actions">
+                                <button type="button" class="btn btn-primary" onclick="navigateTo('prismlab')">מעבדת פריזמות</button>
+                                <button type="button" class="btn btn-secondary" onclick="navigateTo('blueprint')">בונה מהלך</button>
+                            </div>
+                        </article>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1635,6 +1747,7 @@
                 'js/data/sentence-map-cases.js',
                 'js/nav-map.js',
                 'js/shell-copy.js',
+                'js/product-guidance.js',
                 'js/ui-flags.js',
                 'js/app-overlay.js',
                 'js/shell-screen-registry.js',

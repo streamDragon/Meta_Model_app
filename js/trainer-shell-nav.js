@@ -468,6 +468,14 @@
         }, { once: true });
     }
 
+    function ensureProductGuidanceLayer() {
+        if (!isStandaloneShellPage()) return;
+        ensureExternalCss('product-guidance-style', 'css/product-guidance.css');
+        ensureExternalScript('product-guidance-script', 'js/product-guidance.js', {
+            defer: true
+        });
+    }
+
     function escapeHtml(value) {
         return String(value || '')
             .replace(/&/g, '&amp;')
@@ -693,6 +701,7 @@
 
         ensureAlchemyLayer();
         ensureFreemiumLayer();
+        ensureProductGuidanceLayer();
         injectStyles();
 
         var nav = document.createElement('div');
@@ -793,5 +802,6 @@
 
     if (isStandaloneTrainerPage()) {
         ensureFreemiumLayer();
+        ensureProductGuidanceLayer();
     }
 })();

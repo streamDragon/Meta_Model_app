@@ -2052,6 +2052,115 @@
         `;
     }
 
+    function getCoachFollowUpQuestion(round) {
+        const questionOptions = Array.isArray(round?.options?.question) ? round.options.question : [];
+        const correctQuestion = questionOptions.find((item) => item && item.isCorrect && String(item.text || '').trim());
+        const questionText = String(correctQuestion?.text || '').trim();
+        if (questionText) return questionText;
+        const goalText = String(round?.pattern?.goal?.oneLiner || '').trim();
+        if (goalText) return `כדי לפתוח את המשפט, שאל/י: ${goalText}`;
+        return 'איזה מידע חסר כאן כדי להפוך את המשפט ליותר מדויק ויותר בר-בדיקה?';
+    }
+
+    function getCoachCaution(round) {
+        const stage = String(round?.stage || '').trim();
+        if (stage === 'question') {
+            return 'שאלת מטא-מודל לא אמורה להישמע כמו חקירה, הטפה או מבחן. קודם אוספים מידע, ורק אחר כך מפרשים או מתקנים.';
+        }
+        if (stage === 'problem') {
+            return 'לא ממהרים להסביר את הסיפור של הדובר/ת. קודם מגדירים מה נמחק, עוות או הוכלל בתוך המשפט עצמו.';
+        }
+        if (stage === 'goal') {
+            return 'גם יעד מידע מדויק צריך להתאים לעומס הרגשי. אם האדם מוצף, בונים אחיזה וביטחון לפני עוד דיוק.';
+        }
+        return 'התבנית היא כיוון עבודה ולא תווית על האדם. תמיד בודקים אותה מול ההקשר, הטון והחוויה.';
+    }
+
+    function getCoachNextStep(round, entry) {
+        const takeForward = String(entry?.takeForward || '').trim();
+        if (takeForward) return takeForward;
+        const stage = String(round?.stage || '').trim();
+        if (stage === 'question') {
+            return 'עברו עכשיו לזיהוי הבעיה הלשונית המרכזית שהשאלה באה לתקן.';
+        }
+        if (stage === 'problem') {
+            return 'עברו להגדרת יעד המידע: מה בדיוק חסר כדי שהמפה תהיה ברורה וניתנת לבדיקה.';
+        }
+        if (stage === 'goal') {
+            return 'עצרו לסיכום קצר: מה נאמר, איזה מבנה זוהה, ואיזו שאלה הייתה הכי מועילה.';
+        }
+        return 'קחו את אותו רצף חשיבה לתבנית הבאה: משפט, מבנה, שאלה, ויעד מידע.';
+    }
+
+    function getCoachPatternLabel(round, entry) {
+        const patternName = String(round?.pattern?.name || '').trim();
+        const structurePoint = String(round?.pattern?.problem?.oneLiner || entry?.structurePoint || '').trim();
+        if (patternName && structurePoint) return `${patternName} · ${structurePoint}`;
+        return patternName || structurePoint || 'מבנה לשוני שדורש בירור';
+    }
+
+    function getCoachWhyItMatters(round, entry) {
+        const explicitWhy = String(entry?.whyChoice || '').trim();
+        if (explicitWhy) return explicitWhy;
+        const structurePoint = String(round?.pattern?.problem?.oneLiner || '').trim();
+        if (structurePoint) return structurePoint;
+        const goalText = String(round?.pattern?.goal?.oneLiner || '').trim();
+        if (goalText) return `העבודה כאן חשובה כי היא מגדירה איזה מידע חסר צריך להחזיר: ${goalText}`;
+        return 'כאן עוצרים על המבנה הלשוני לפני שמגיבים אינטואיטיבית לתוכן.';
+    }
+
+    function renderTherapeuticCoachCard(round) {
+        if (!round || (!state.feedback && !state.hintMessage && !state.explanationPanel?.entry)) return '';
+        const entry = state.explanationPanel?.entry || null;
+        const tone = state.feedback?.tone || entry?.tone || 'info';
+        const cardTitle = tone === 'success' ? 'מה לזהות ולחזק כאן' : 'מה לזהות ולדייק כאן';
+        const selectedLine = String(
+            entry?.selectedLine
+            || getStageOptionCopy(round, round.stage, state.lastSelectedOptionId)?.text
+            || ''
+        ).trim();
+        const promptText = String(entry?.whatWasSaid || getPromptTextForRound(round) || '').trim();
+        const quoteText = selectedLine || promptText;
+        const quoteLabel = selectedLine ? 'הבחירה שנבדקה עכשיו' : 'המשפט שעובדים עליו';
+        return `
+          <section class="product-coach-card" data-cc-therapeutic-guide="1" data-tone="${escapeHtml(tone)}">
+            <div class="product-coach-card__head">
+              <span class="product-coach-card__kicker">מדריך עבודה טיפולי · ${escapeHtml(stageLabel(round.stage || ''))}</span>
+              <h4>${escapeHtml(cardTitle)}</h4>
+              <p>המשוב כאן מחבר בין זיהוי התבנית הלשונית לבין ההיגיון הטיפולי של ההתערבות.</p>
+            </div>
+            <div class="product-coach-card__grid">
+              <div class="product-coach-card__item">
+                <strong>מה זוהה כאן</strong>
+                <p>${escapeHtml(getCoachPatternLabel(round, entry))}</p>
+              </div>
+              <div class="product-coach-card__item">
+                <strong>למה זה חשוב</strong>
+                <p>${escapeHtml(getCoachWhyItMatters(round, entry))}</p>
+              </div>
+              <div class="product-coach-card__item">
+                <strong>שאלת המשך מומלצת</strong>
+                <p>${escapeHtml(getCoachFollowUpQuestion(round))}</p>
+              </div>
+              <div class="product-coach-card__item" data-tone="caution">
+                <strong>זהירות טיפולית</strong>
+                <p>${escapeHtml(getCoachCaution(round))}</p>
+              </div>
+              <div class="product-coach-card__item" data-tone="next">
+                <strong>הצעד הבא</strong>
+                <p>${escapeHtml(getCoachNextStep(round, entry))}</p>
+              </div>
+            </div>
+            ${quoteText ? `
+              <div class="product-coach-card__quote">
+                <span>${escapeHtml(quoteLabel)}</span>
+                ${escapeHtml(quoteText)}
+              </div>
+            ` : ''}
+          </section>
+        `;
+    }
+
     function renderPersistentExplanation() {
         const entry = state.explanationPanel?.entry;
         if (!entry || !state.explanationPanel?.open) return '';
@@ -2112,6 +2221,7 @@
               <div class="cc-summary-block"><h4>כיוון העבודה</h4><p>${escapeHtml(operation.title)}</p><p>${escapeHtml(operation.desc)}</p></div>
             </div>
             ${renderFeedbackBox(round)}
+            ${renderTherapeuticCoachCard(round)}
             ${renderPersistentExplanation()}
             <div class="cc-primary-actions">
               <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="${primaryAction}">${primaryLabel}</button>
@@ -2164,6 +2274,7 @@
             <div class="cc-question-line" data-cc-stage="${escapeHtml(round.stage || '')}"><strong>${escapeHtml(stageQuestionPrompt(round))}</strong><span>${escapeHtml(operation.title)}</span></div>
             ${renderStageTransitionBanner(round)}
             ${renderFeedbackBox(round)}
+            ${renderTherapeuticCoachCard(round)}
             ${renderPersistentExplanation()}
             ${renderOptions(round)}
             <div class="cc-practice-actions">

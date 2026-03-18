@@ -1,0 +1,353 @@
+:root {
+    --product-surface: rgba(255, 255, 255, 0.94);
+    --product-surface-strong: #ffffff;
+    --product-border: rgba(148, 163, 184, 0.24);
+    --product-border-strong: rgba(14, 116, 144, 0.24);
+    --product-text: #0f172a;
+    --product-text-soft: #475569;
+    --product-kicker: #0f766e;
+    --product-soft-fill: linear-gradient(145deg, rgba(240, 253, 250, 0.92), rgba(248, 250, 252, 0.96));
+    --product-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+}
+
+.product-family-hub,
+.product-tool-families,
+.product-feature-guidance,
+.product-coach-card {
+    direction: rtl;
+}
+
+.product-family-hub {
+    display: grid;
+    gap: 18px;
+    margin: 22px 0 28px;
+}
+
+.product-family-hub__head {
+    display: grid;
+    gap: 6px;
+}
+
+.product-family-hub__head p,
+.product-family-card p,
+.product-feature-guidance p,
+.product-coach-card p {
+    margin: 0;
+    color: var(--product-text-soft);
+    line-height: 1.65;
+}
+
+.product-family-kicker,
+.product-orientation__kicker,
+.product-intro__eyebrow {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 118, 110, 0.14);
+    background: rgba(240, 253, 250, 0.95);
+    color: var(--product-kicker);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.product-family-hub__head h3,
+.product-family-card h4,
+.product-intro__title,
+.product-coach-card h4 {
+    margin: 0;
+    color: var(--product-text);
+}
+
+.product-family-grid,
+.product-tool-families {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.product-family-card {
+    display: grid;
+    gap: 12px;
+    padding: 18px;
+    border-radius: 22px;
+    border: 1px solid var(--product-border);
+    background: var(--product-soft-fill);
+    box-shadow: var(--product-shadow);
+}
+
+.product-family-card[data-family="practice"] {
+    --family-accent: #0f766e;
+    background: linear-gradient(155deg, rgba(236, 253, 245, 0.98), rgba(255, 255, 255, 0.98));
+}
+
+.product-family-card[data-family="analysis"] {
+    --family-accent: #0369a1;
+    background: linear-gradient(155deg, rgba(239, 246, 255, 0.98), rgba(255, 255, 255, 0.98));
+}
+
+.product-family-card[data-family="simulation"] {
+    --family-accent: #7c3aed;
+    background: linear-gradient(155deg, rgba(245, 243, 255, 0.98), rgba(255, 255, 255, 0.98));
+}
+
+.product-family-card[data-family="learning"] {
+    --family-accent: #b45309;
+    background: linear-gradient(155deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.98));
+}
+
+.product-family-card[data-family="therapist"] {
+    --family-accent: #be185d;
+    background: linear-gradient(155deg, rgba(255, 241, 242, 0.98), rgba(255, 255, 255, 0.98));
+}
+
+.product-family-card__head {
+    display: grid;
+    gap: 8px;
+}
+
+.product-family-card__badge {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--family-accent, #0f766e) 12%, white);
+    color: var(--family-accent, #0f766e);
+    font-size: 0.76rem;
+    font-weight: 800;
+}
+
+.product-family-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.product-family-card__actions .btn {
+    flex: 1 1 180px;
+}
+
+.product-feature-guidance {
+    display: grid;
+    gap: 14px;
+    margin: 0 0 18px;
+    padding: 18px;
+    border-radius: 22px;
+    border: 1px solid var(--product-border-strong);
+    background: linear-gradient(155deg, rgba(255, 255, 255, 0.98), rgba(240, 249, 255, 0.96));
+    box-shadow: var(--product-shadow);
+}
+
+.product-feature-guidance--standalone {
+    width: min(1180px, calc(100% - 16px));
+    margin: 0 auto 14px;
+}
+
+.product-orientation {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.product-orientation__copy {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+}
+
+.product-orientation__trail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    color: #1e293b;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.product-orientation__trail span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.product-orientation__trail span + span::before {
+    content: "›";
+    color: #94a3b8;
+}
+
+.product-orientation__now {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(2, 132, 199, 0.16);
+    background: rgba(239, 246, 255, 0.95);
+    color: #0c4a6e;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.product-orientation__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.product-orientation__actions .btn {
+    min-height: 40px;
+}
+
+.product-intro {
+    display: grid;
+    gap: 12px;
+}
+
+.product-intro__head {
+    display: grid;
+    gap: 6px;
+}
+
+.product-intro__title {
+    font-size: 1.16rem;
+    line-height: 1.3;
+}
+
+.product-intro__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.product-intro__item,
+.product-coach-card__item {
+    display: grid;
+    gap: 6px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(255, 255, 255, 0.82);
+}
+
+.product-intro__item strong,
+.product-coach-card__item strong {
+    color: #0f172a;
+    font-size: 0.86rem;
+}
+
+.product-intro__example,
+.product-coach-card__quote {
+    padding: 12px 14px;
+    border-radius: 16px;
+    border: 1px dashed rgba(14, 116, 144, 0.26);
+    background: rgba(248, 250, 252, 0.92);
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.product-intro__example span,
+.product-coach-card__quote span {
+    display: block;
+    margin-bottom: 6px;
+    color: #0f766e;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.product-coach-card {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(14, 116, 144, 0.18);
+    background: linear-gradient(145deg, rgba(248, 250, 252, 0.98), rgba(240, 249, 255, 0.98));
+}
+
+.product-coach-card__head {
+    display: grid;
+    gap: 6px;
+}
+
+.product-coach-card__kicker {
+    color: #0369a1;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.product-coach-card__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.product-coach-card__item[data-tone="caution"] {
+    background: rgba(255, 251, 235, 0.92);
+    border-color: rgba(245, 158, 11, 0.22);
+}
+
+.product-coach-card__item[data-tone="next"] {
+    background: rgba(236, 253, 245, 0.92);
+    border-color: rgba(16, 185, 129, 0.18);
+}
+
+.product-surface-muted {
+    color: var(--product-text-soft);
+}
+
+.practice-intro-card,
+.blueprint-shell,
+.comic-engine-shell,
+#categories > .card,
+#about > .card {
+    position: relative;
+}
+
+.practice-intro-card > h2,
+.blueprint-shell > h2,
+.comic-engine-shell > .ceflow-shell-copy h2,
+#categories > .card > h2,
+#about > .card > h2 {
+    margin-bottom: 8px;
+}
+
+.practice-intro-card > .subtitle,
+.blueprint-shell > p,
+.comic-engine-shell > .ceflow-shell-copy .subtitle {
+    margin-bottom: 12px;
+}
+
+@media (max-width: 900px) {
+    .product-intro__grid,
+    .product-coach-card__grid,
+    .product-family-grid,
+    .product-tool-families {
+        grid-template-columns: 1fr;
+    }
+
+    .product-feature-guidance--standalone {
+        width: calc(100% - 10px);
+        margin-bottom: 10px;
+    }
+
+    .product-orientation {
+        align-items: stretch;
+    }
+
+    .product-orientation__actions {
+        width: 100%;
+    }
+
+    .product-orientation__actions .btn {
+        flex: 1 1 auto;
+    }
+}

@@ -856,6 +856,65 @@
         };
     }
 
+    function buildTherapeuticCaution(option, isGreen, toneGroup) {
+        if (isGreen) {
+            return 'גם תגובה טובה לא מחליפה בדיקה. לא למהר לפתור או להסכים עם הכול לפני שהחוויה והעובדות התבהרו.';
+        }
+        if (toneGroup === 'blame') {
+            return 'אשמה או ביקורת לרוב מחזקות הגנה ובושה, ולכן מקטינות את הסיכוי לקבל מידע אמיתי.';
+        }
+        if (toneGroup === 'shutdown') {
+            return 'סגירה או קיפאון נשמעים לפעמים כמו ויסות, אבל בפועל הם משאירים את האדם לבד מול העמימות.';
+        }
+        if (toneGroup === 'control') {
+            return 'כשמנסים לשלוט מהר מדי, השיחה נעה לציות או מאבק במקום לבירור משותף.';
+        }
+        if (toneGroup === 'rescue') {
+            return 'הצלה מהירה יכולה להרגיע רגעית, אבל לעיתים משאירה את האדם בלי בעלות על הבדיקה והצעד הבא.';
+        }
+        if (toneGroup === 'dismiss') {
+            return 'הרגעה כללית בלי פירוק קונקרטי עלולה להישמע מנחמת, אבל להשאיר את הבעיה בלי שם ובלי דרך.';
+        }
+        return 'כדאי להיזהר מכל תגובה שמדלגת מעל החוויה, מפרשת מוקדם מדי, או לא מחזירה את השיחה למה שבאמת קורה.';
+    }
+
+    function renderTherapeuticGuideCard(scenario, option, guide, isGreen) {
+        const toneGroup = getOptionToneGroup(option?.tone, isGreen);
+        const followUpQuestion = getMetaModelRepairQuestion(scenario, option);
+        const followUpWhy = getMetaModelRepairBenefit(scenario, option);
+        return `
+          <section class="product-coach-card" data-scenario-therapeutic-guide="1">
+            <div class="product-coach-card__head">
+              <span class="product-coach-card__kicker">מדריך עבודה טיפולי</span>
+              <h4>${escapeHtml(isGreen ? 'מה לזהות ולשמר כאן' : 'מה לזהות ולתקן כאן')}</h4>
+              <p>${escapeHtml(guide.learningTakeaway)}</p>
+            </div>
+            <div class="product-coach-card__grid">
+              <div class="product-coach-card__item">
+                <strong>הדפוס שזוהה</strong>
+                <p>${escapeHtml(toneLabel(option, isGreen))}</p>
+              </div>
+              <div class="product-coach-card__item">
+                <strong>למה זה חשוב</strong>
+                <p>${escapeHtml(followUpWhy || guide.processImpact)}</p>
+              </div>
+              <div class="product-coach-card__item">
+                <strong>שאלת המשך מומלצת</strong>
+                <p>${escapeHtml(followUpQuestion)}</p>
+              </div>
+              <div class="product-coach-card__item" data-tone="caution">
+                <strong>זהירות טיפולית</strong>
+                <p>${escapeHtml(buildTherapeuticCaution(option, isGreen, toneGroup))}</p>
+              </div>
+              <div class="product-coach-card__item" data-tone="next">
+                <strong>הצעד הבא</strong>
+                <p>${escapeHtml(guide.nextMove)}</p>
+              </div>
+            </div>
+          </section>
+        `;
+    }
+
     function setSelectedScenario(scenarioId) {
         const nextId = normalizeText(scenarioId, '');
         if (!nextId) return;
@@ -2327,6 +2386,7 @@
                 <h4>${escapeHtml(isGreen ? 'איך ממשיכים מכאן' : 'מה אפשר לנסות במקום')}</h4>
                 <p>${escapeHtml(guide.nextMove)}</p>
               </div>
+              ${renderTherapeuticGuideCard(scenario, option, guide, isGreen)}
               <div class="scenario-meta-model-repair scenario-meta-model-repair--analysis">
                 <div class="scenario-meta-model-repair-head">
                   <p class="scenario-panel-kicker">שאלת מטה־מודל שיכולה לשנות את הכיוון</p>
@@ -2590,6 +2650,7 @@
               <h4>${escapeHtml(isGreen ? 'איך ממשיכים מכאן' : 'מה אפשר לנסות במקום')}</h4>
               <p>${escapeHtml(guide.nextMove)}</p>
             </div>
+            ${renderTherapeuticGuideCard(scenario, option, guide, isGreen)}
             <div class="scenario-feedback-actions scenario-feedback-actions--primary">
               <button type="button" class="btn btn-secondary" data-scenario-action="show-blueprint">${analysisOpen ? 'סגור מפת פעולה' : 'פתח מפת פעולה'}</button>
               <button type="button" class="btn btn-primary" data-scenario-action="continue-result">לסיכום הסצנה</button>
