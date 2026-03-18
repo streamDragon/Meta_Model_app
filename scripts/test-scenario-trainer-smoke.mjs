@@ -86,6 +86,7 @@ async function openScenarioTrainer(page, baseUrl) {
     await page.goto(`${baseUrl}/scenario_trainer.html`, { waitUntil: 'networkidle' });
     await page.waitForSelector('[data-trainer-platform="1"][data-trainer-id="scenario-trainer"]');
     await page.waitForSelector('.scenario-home-card--landing');
+    await page.waitForSelector('.trainer-shell-nav');
 }
 
 async function readText(page, selector) {
@@ -144,6 +145,16 @@ async function runDesktopChecks(page, baseUrl) {
         'scenario desktop stage dominates without support rail',
         JSON.stringify(stageLayout)
     );
+    await assert(
+        (await page.locator('.trainer-shell-nav [data-nav-action="restart"]:not([hidden])').count()) > 0,
+        'scenario desktop standalone restart visible during active scene'
+    );
+
+    await page.locator('.scenario-play-topbar [data-scenario-action="open-help"]').click();
+    await page.waitForSelector('.scenario-help-list');
+    await page.locator('.trainer-shell-nav [data-nav-action="back"]').click();
+    await page.waitForSelector('.scenario-story-stage');
+    await assert((await page.locator('.scenario-help-list').count()) === 0, 'scenario standalone back returns from help to play');
 
     const frameBefore = await readText(page, '.scenario-story-frame-copy h3');
     await page.locator('.scenario-story-chip').nth(1).click();
@@ -166,6 +177,15 @@ async function runDesktopChecks(page, baseUrl) {
     await assert((await page.locator('[data-scenario-impact="process"]').count()) > 0, 'scenario process impact card visible');
     await assert((await page.locator('[data-scenario-consequence="1"]').count()) > 0, 'scenario consequence box visible');
     await assert((await page.locator('.scenario-meta-accordion').count()) > 0, 'scenario feedback accordions visible');
+
+    await page.locator('.trainer-shell-nav [data-nav-action="restart"]:not([hidden])').click();
+    await page.waitForSelector('.scenario-story-stage');
+    await page.waitForFunction(() => !document.querySelector('[data-scenario-feedback-thread="1"]'));
+    const restartedStatus = await readText(page, '.scenario-play-topbar-status');
+    await assert(/1\/\d+/.test(restartedStatus), 'scenario standalone restart keeps current scene progress shell', restartedStatus);
+
+    await page.locator('.scenario-compact-option').first().click();
+    await page.waitForSelector('[data-scenario-feedback-thread="1"]');
 
     await page.locator('[data-scenario-action="show-blueprint"]').first().click();
     await page.waitForSelector('[data-scenario-analysis="1"]');

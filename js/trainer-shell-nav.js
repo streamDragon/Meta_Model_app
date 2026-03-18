@@ -65,7 +65,85 @@
         if (kind === 'home') {
             return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 10.5 12 4l8 6.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path><path d="M6.5 10v9h11v-9" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path><path d="M10 19v-5h4v5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path></svg>';
         }
+        if (kind === 'restart') {
+            return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path><path d="M20 4v6h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path></svg>';
+        }
         return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path></svg>';
+    }
+
+    var STANDALONE_CONTROLLER_KEY_BY_PATH = {
+        '/scenario_trainer.html': 'scenario-trainer',
+        '/prism_lab_trainer.html': 'prismlab',
+        '/classic_classic_trainer.html': 'classic-classic',
+        '/classic2_trainer.html': 'classic2',
+        '/iceberg_templates_trainer.html': 'iceberg-templates',
+        '/prism_research_trainer.html': 'prism-research',
+        '/living_triples_trainer.html': 'living-triples',
+        '/verb_unzip_trainer.html': 'practice-verb-unzip',
+        '/worksheets/verb-unzip/': 'practice-verb-unzip',
+        '/worksheets/verb-unzip/index.html': 'practice-verb-unzip',
+        '/lab/context-radar/': 'context-radar',
+        '/lab/context-radar/index.html': 'context-radar'
+    };
+
+    function normalizeStandalonePath(value) {
+        var raw = String(value || '').trim().toLowerCase();
+        if (!raw) return '';
+        if (raw.charAt(0) !== '/') raw = '/' + raw;
+        raw = raw.replace(/\/{2,}/g, '/');
+        if (raw === '/index.html') return '/';
+        return raw;
+    }
+
+    function detectStandaloneControllerKey() {
+        var trainerRoot = document.querySelector('[data-trainer-platform="1"][data-trainer-id]');
+        if (trainerRoot) {
+            var trainerId = String(trainerRoot.getAttribute('data-trainer-id') || '').trim();
+            if (trainerId) return trainerId;
+        }
+        if (document.querySelector('[data-prism-necessity-app]')) {
+            return 'prismlab';
+        }
+        return STANDALONE_CONTROLLER_KEY_BY_PATH[normalizeStandalonePath(location.pathname)] || '';
+    }
+
+    function getStandaloneController() {
+        var key = detectStandaloneControllerKey();
+        var registry = window.__metaFeatureControllers;
+        if (!key || !registry || typeof registry !== 'object') return null;
+        return registry[key] || null;
+    }
+
+    function syncControllerActionState(navRoot) {
+        var nav = navRoot || document.querySelector('.trainer-shell-nav');
+        if (!nav) return;
+        var controller = getStandaloneController();
+        var restartBtn = nav.querySelector('[data-nav-action="restart"]');
+        var backBtn = nav.querySelector('[data-nav-action="back"]');
+        var hasInternalBack = !!(controller && typeof controller.stepBack === 'function');
+        var canRestart = !!(controller && typeof controller.restart === 'function');
+
+        if (canRestart && typeof controller.canRestart === 'function') {
+            try {
+                canRestart = controller.canRestart() !== false;
+            } catch (e) {
+                canRestart = true;
+            }
+        }
+
+        if (restartBtn) {
+            restartBtn.hidden = !canRestart;
+            restartBtn.disabled = !canRestart;
+            restartBtn.setAttribute('aria-disabled', canRestart ? 'false' : 'true');
+            restartBtn.setAttribute('aria-hidden', canRestart ? 'false' : 'true');
+            restartBtn.title = canRestart ? 'התחלה מחדש של התרגול הנוכחי' : '';
+        }
+
+        if (backBtn) {
+            backBtn.title = hasInternalBack
+                ? 'חזרה למסך הקודם בתוך התרגול'
+                : 'חזרה לעמוד הקודם';
+        }
     }
 
     function injectStyles() {
@@ -305,12 +383,14 @@
         document.body.classList.toggle('trainer-shell-modal-open', hasBlockingDialog);
     }
 
-    function watchStandaloneDialogs() {
+    function watchStandaloneDialogs(navRoot) {
         if (!document.body || document.body.__trainerShellDialogWatch) return;
         document.body.__trainerShellDialogWatch = true;
         syncNavModalState();
+        syncControllerActionState(navRoot);
         var observer = new MutationObserver(function () {
             syncNavModalState();
+            syncControllerActionState(navRoot);
         });
         observer.observe(document.body, {
             childList: true,
@@ -646,6 +726,7 @@
             '<div class="trainer-shell-nav__group">',
             '  <button type="button" class="trainer-shell-nav__btn trainer-shell-nav__btn--icon" data-nav-action="back" aria-label="\u05D7\u05D6\u05E8\u05D4 \u05DC\u05E2\u05DE\u05D5\u05D3 \u05D4\u05E7\u05D5\u05D3\u05DD" title="\u05D7\u05D6\u05E8\u05D4 \u05DC\u05E2\u05DE\u05D5\u05D3 \u05D4\u05E7\u05D5\u05D3\u05DD">' + getNavIconSvg('back') + '</button>',
             '  <button type="button" class="trainer-shell-nav__btn trainer-shell-nav__btn--icon" data-nav-action="home" aria-label="\u05DE\u05E2\u05D1\u05E8 \u05DC\u05E2\u05DE\u05D5\u05D3 \u05D4\u05D1\u05D9\u05EA" title="\u05DE\u05E2\u05D1\u05E8 \u05DC\u05E2\u05DE\u05D5\u05D3 \u05D4\u05D1\u05D9\u05EA">' + getNavIconSvg('home') + '</button>',
+            '  <button type="button" class="trainer-shell-nav__btn trainer-shell-nav__btn--icon" data-nav-action="restart" hidden aria-label="\u05D4\u05EA\u05D7\u05DC\u05D4 \u05DE\u05D7\u05D3\u05E9" title="\u05D4\u05EA\u05D7\u05DC\u05D4 \u05DE\u05D7\u05D3\u05E9">' + getNavIconSvg('restart') + '</button>',
             '  <button type="button" class="trainer-shell-nav__btn trainer-shell-nav__btn--theory" data-nav-action="theory" title="\u05D3\u05E3 \u05D4\u05EA\u05D0\u05D5\u05E8\u05D9\u05D4 \u05D4\u05DE\u05E8\u05DB\u05D6\u05D9">\u05EA\u05D9\u05D0\u05D5\u05E8\u05D9\u05D4</button>',
             '  <button type="button" class="trainer-shell-nav__btn" data-nav-action="help-overlay" title="\u05E2\u05D6\u05E8\u05D4 \u05DC\u05DE\u05E1\u05DA \u05D4\u05E0\u05D5\u05DB\u05D7\u05D9 (\u05DE\u05E1\u05DA \u05DE\u05DC\u05D0)">\u05E2\u05D6\u05E8\u05D4 \u05DC\u05DE\u05E1\u05DA</button>',
             '</div>'
@@ -658,6 +739,7 @@
             var btn = event.target.closest('[data-nav-action]');
             if (!btn) return;
             var action = btn.getAttribute('data-nav-action');
+            var controller = getStandaloneController();
             if (action === 'home') {
                 window.location.assign(homeUrl);
                 return;
@@ -670,7 +752,25 @@
                 openTrainerHelpOverlay({ title: titleText, theoryUrl: theoryUrl });
                 return;
             }
+            if (action === 'restart') {
+                if (controller && typeof controller.restart === 'function') {
+                    try {
+                        if (controller.restart() === true) {
+                            syncControllerActionState(nav);
+                        }
+                    } catch (e) {}
+                }
+                return;
+            }
             if (action === 'back') {
+                if (controller && typeof controller.stepBack === 'function') {
+                    try {
+                        if (controller.stepBack() === true) {
+                            syncControllerActionState(nav);
+                            return;
+                        }
+                    } catch (e) {}
+                }
                 if (canUseHistoryBack()) {
                     window.history.back();
                 } else {
@@ -679,9 +779,10 @@
             }
         });
 
+        syncControllerActionState(nav);
         collapseInlineHelpDefaults();
         watchForLateHelpContent();
-        watchStandaloneDialogs();
+        watchStandaloneDialogs(nav);
     }
 
     if (document.readyState === 'loading') {

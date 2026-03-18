@@ -20,6 +20,9 @@
     });
     const FEATURED_SCENARIO_IDS = Object.freeze(['driver-update', 'couple-shutdown', 'boss-feedback']);
     const DIALOGUE_MAX_TURNS = 3;
+    const SCREEN_HISTORY_LIMIT = 16;
+    const FEATURE_START_LABEL = 'פתיחה';
+    const RETURN_TO_FEATURE_START_LABEL = 'חזרה לפתיחה';
     const SCREEN_IDS = Object.freeze({
         home: 'home',
         play: 'play',
@@ -156,6 +159,7 @@
         selectedOption: null,
         lastEntry: null,
         selectedPrismId: '',
+        screenHistory: [],
         toastMessage: '',
         toastTimer: null
     };
@@ -168,6 +172,7 @@
     mount.addEventListener('click', handleClick);
     mount.addEventListener('change', handleChange);
     mount.addEventListener('input', handleInput);
+    registerStandaloneController();
 
     init().catch((error) => {
         state.loading = false;
@@ -510,8 +515,44 @@
         return queue.slice().sort(() => Math.random() - 0.5).slice(0, clampRunSize(runSize));
     }
 
+    function pushScreenHistory(nextScreenId, currentScreenId) {
+        const next = normalizeText(nextScreenId, '');
+        const current = normalizeText(currentScreenId, '');
+        if (!current || !next || current === next) return;
+
+        const stack = Array.isArray(state.screenHistory) ? state.screenHistory.slice() : [];
+        if (stack[stack.length - 1] !== current) {
+            stack.push(current);
+        }
+        state.screenHistory = stack.slice(-SCREEN_HISTORY_LIMIT);
+    }
+
+    function popPreviousScreen(currentScreenId = state.screen) {
+        const current = normalizeText(currentScreenId, '');
+        const stack = Array.isArray(state.screenHistory) ? state.screenHistory.slice() : [];
+        let previous = '';
+
+        while (stack.length) {
+            const candidate = normalizeText(stack.pop(), '');
+            if (!candidate || candidate === current) continue;
+            previous = candidate;
+            break;
+        }
+
+        state.screenHistory = stack;
+        return previous;
+    }
+
     function openScreen(screenId, options = {}) {
-        state.screen = screenId;
+        const nextScreenId = normalizeText(screenId, SCREEN_IDS.home);
+        const currentScreenId = normalizeText(state.screen, SCREEN_IDS.home);
+        if (options.clearHistory === true) {
+            state.screenHistory = [];
+        } else if (options.trackHistory !== false && nextScreenId !== currentScreenId) {
+            pushScreenHistory(nextScreenId, currentScreenId);
+        }
+
+        state.screen = nextScreenId;
         render();
         if (options.scrollTarget) {
             const target = mount.querySelector(options.scrollTarget);
@@ -522,6 +563,63 @@
         }
         if (options.preserveScroll) return;
         window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    function goFeatureStart() {
+        openScreen(SCREEN_IDS.home, {
+            clearHistory: true,
+            trackHistory: false
+        });
+    }
+
+    function goBackScreen() {
+        if (state.settingsOpen) {
+            closeSettings();
+            return true;
+        }
+
+        const previousScreen = popPreviousScreen();
+        if (previousScreen) {
+            openScreen(previousScreen, {
+                trackHistory: false,
+                preserveScroll: true
+            });
+            return true;
+        }
+
+        if (state.screen !== SCREEN_IDS.home) {
+            goFeatureStart();
+            return true;
+        }
+
+        return false;
+    }
+
+    function canRestartCurrentFlow() {
+        if (state.settingsOpen) return false;
+        if (!state.activeScenario || !state.session) return false;
+        return state.screen !== SCREEN_IDS.home;
+    }
+
+    function restartCurrentFlow() {
+        if (!canRestartCurrentFlow()) return false;
+        restartCurrentScene();
+        return true;
+    }
+
+    function registerStandaloneController() {
+        root.__metaFeatureControllers = root.__metaFeatureControllers || {};
+        root.__metaFeatureControllers['scenario-trainer'] = {
+            stepBack() {
+                return goBackScreen();
+            },
+            restart() {
+                return restartCurrentFlow();
+            },
+            canRestart() {
+                return canRestartCurrentFlow();
+            }
+        };
     }
 
     function startSession(config) {
@@ -555,6 +653,7 @@
         state.selectedOption = null;
         state.lastEntry = null;
         state.selectedPrismId = '';
+        state.screenHistory = [];
         openScreen(SCREEN_IDS.play);
     }
 
@@ -1059,7 +1158,7 @@
         state.lastEntry = null;
         state.selectedPrismId = '';
         state.activeStorySlideId = normalizeText(state.activeScenario?.storySlides?.[0]?.id, 'setup');
-        openScreen(SCREEN_IDS.play);
+        openScreen(SCREEN_IDS.play, { trackHistory: false });
     }
 
     function buildHistoryEntry() {
@@ -1131,7 +1230,7 @@
             state.selectedOption = null;
             state.activeScenario = null;
             state.activeStorySlideId = '';
-            openScreen(SCREEN_IDS.home);
+            goFeatureStart();
             return;
         }
         const isLast = state.session.index >= state.session.queue.length - 1;
@@ -1143,7 +1242,7 @@
             state.selectedOption = null;
             state.lastEntry = null;
             showToast('הסשן הסתיים. אפשר להתחיל סשן חדש.');
-            openScreen(SCREEN_IDS.home);
+            goFeatureStart();
             return;
         }
         state.session.index += 1;
@@ -1419,8 +1518,40 @@
         `;
     }
 
+    function syncScenarioChrome() {
+        const startButtons = Array.from(mount.querySelectorAll('[data-scenario-action="go-home"]'));
+        startButtons.forEach((button) => {
+            if (!(button instanceof HTMLElement)) return;
+            const inTopbar = !!button.closest('.scenario-play-topbar');
+            const inSessionBar = !!button.closest('.scenario-session-bar');
+            const inPrimaryActions = !!button.closest('.scenario-feedback-actions--primary');
+
+            if (state.screen === SCREEN_IDS.help || state.screen === SCREEN_IDS.history) {
+                if (!inSessionBar) {
+                    button.setAttribute('data-scenario-action', 'go-back');
+                    button.textContent = 'חזרה';
+                }
+                return;
+            }
+
+            if (inTopbar) {
+                const icon = button.querySelector('.scenario-play-topbar-icon');
+                const label = button.querySelector('span:last-child');
+                if (icon) icon.textContent = '↩';
+                if (label) label.textContent = FEATURE_START_LABEL;
+                button.setAttribute('aria-label', 'חזרה לפתיחת הסימולטור');
+                return;
+            }
+
+            if (inSessionBar || inPrimaryActions) {
+                button.textContent = RETURN_TO_FEATURE_START_LABEL;
+            }
+        });
+    }
+
     function render() {
         mount.innerHTML = renderAppV2();
+        syncScenarioChrome();
     }
 
     function renderAppV2() {
@@ -2670,7 +2801,8 @@
         if (scenarioAction === 'restart-scene') return void restartCurrentScene();
         if (scenarioAction === 'next-scene') return void continueToNextScene();
         if (scenarioAction === 'resume-scene') return void openScreen(SCREEN_IDS.play, { preserveScroll: true });
-        if (scenarioAction === 'go-home') return void openScreen(SCREEN_IDS.home);
+        if (scenarioAction === 'go-home') return void goFeatureStart();
+        if (scenarioAction === 'go-back') return void goBackScreen();
         if (scenarioAction === 'export-history') return void exportHistory();
         if (scenarioAction === 'clear-history') return void clearHistory();
         if (scenarioAction === 'pick-prism') {
