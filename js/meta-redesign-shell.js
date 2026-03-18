@@ -1199,7 +1199,7 @@ function featureActionButtonsHtml(meta) {
         homeUi.view = 'home';
         saveHomeUi();
         animateOut(shell, 'back', function () {
-            if (typeof window.navigateTo === 'function') window.navigateTo('home', { playSound: true, scrollToTop: true });
+            if (typeof window.navigateTo === 'function') window.navigateTo('home', { playSound: true, scrollToTop: true, featureEntry: 'preserve' });
         });
     }
     function stepBackInsideFeature(tabName) {
@@ -1214,6 +1214,57 @@ function featureActionButtonsHtml(meta) {
         renderFeature(safeTab, 'back');
         scrollViewportToSection(document.getElementById(safeTab), { instant: useInstantFeatureEntry(safeTab) });
         return true;
+    }
+    function normalizeFeatureEntryMode(mode) {
+        var key = String(mode || '').trim().toLowerCase();
+        if (key === 'welcome' || key === 'feature') return key;
+        return 'preserve';
+    }
+    function getManagedFeatureStage(tabName) {
+        var safeTab = normalizeTab(tabName);
+        if (!safeTab || !isManaged(safeTab)) return '';
+        return getTabState(safeTab).stage === 'feature' ? 'feature' : 'welcome';
+    }
+    function resolveEntryStage(tabName, entryMode) {
+        var safeTab = normalizeTab(tabName);
+        var mode = normalizeFeatureEntryMode(entryMode);
+        if (!safeTab || !isManaged(safeTab)) return '';
+        if (mode === 'feature') return 'feature';
+        if (mode === 'welcome') return preferredFeatureStage(safeTab);
+        return getManagedFeatureStage(safeTab) || preferredFeatureStage(safeTab);
+    }
+    function prepareManagedFeatureEntry(tabName, options) {
+        var safeTab = normalizeTab(tabName);
+        var opts = options && typeof options === 'object' ? options : {};
+        var nextStage;
+        var direction;
+        if (!safeTab || !isManaged(safeTab)) return '';
+        nextStage = resolveEntryStage(safeTab, opts.entryMode);
+        if (!nextStage) return '';
+        getTabState(safeTab).stage = nextStage;
+        saveFeatureState();
+        direction = typeof opts.direction === 'string' && opts.direction ? opts.direction : (nextStage === 'welcome' ? 'back' : 'forward');
+        renderFeature(safeTab, direction);
+        if (opts.scrollIntoView) {
+            scrollViewportToSection(document.getElementById(safeTab), { instant: useInstantFeatureEntry(safeTab) });
+        }
+        return nextStage;
+    }
+    function canStepBackHierarchy(tabName) {
+        var safeTab = normalizeTab(tabName);
+        var controller = getFeatureController(safeTab);
+        if (!safeTab || !isManaged(safeTab)) return false;
+        if (controller && typeof controller.canStepBack === 'function') {
+            return !!controller.canStepBack();
+        }
+        return getManagedFeatureStage(safeTab) === 'feature' && !prefersDirectFeatureStage(safeTab);
+    }
+    function stepBackHierarchy(tabName) {
+        var safeTab = normalizeTab(tabName);
+        var controller = getFeatureController(safeTab);
+        if (!safeTab || !isManaged(safeTab)) return false;
+        if (controller && typeof controller.stepBack === 'function' && controller.stepBack()) return true;
+        return stepBackInsideFeature(safeTab);
     }
     function transitionWelcomeToFeature(tabName) {
         var safeTab = normalizeTab(tabName);
@@ -1261,7 +1312,7 @@ function featureActionButtonsHtml(meta) {
                 var resume = resumeState();
                 if (!resume || !resume.tab || typeof window.navigateTo !== 'function') return;
                 setPendingNav(resume.tab, 'forward');
-                animateOut(root.querySelector('[data-home-surface]'), 'forward', function () { window.navigateTo(resume.tab, { playSound: true, scrollToTop: true }); });
+                animateOut(root.querySelector('[data-home-surface]'), 'forward', function () { window.navigateTo(resume.tab, { playSound: true, scrollToTop: true, featureEntry: 'preserve' }); });
             }
         };
     }
@@ -1346,22 +1397,15 @@ function featureActionButtonsHtml(meta) {
         drawerOpen = false;
         saveHomeUi();
         setPendingNav('home', 'back');
-        if (typeof window.navigateTo === 'function') window.navigateTo('home', { playSound: true, scrollToTop: true, trackStepBack: false });
+        if (typeof window.navigateTo === 'function') window.navigateTo('home', { playSound: true, scrollToTop: true, trackStepBack: false, featureEntry: 'preserve' });
     }
     function bindFeatureChrome(section, tabName) {
         if (!section || section.__metaFeatureChromeBound) return;
         section.__metaFeatureChromeBound = true;
         section.addEventListener('click', function (event) {
             var backBtn = event.target.closest('[data-shell-chrome-back]');
-            var controller = getFeatureController(tabName);
             if (backBtn) {
-                if (controller && typeof controller.stepBack === 'function' && controller.stepBack()) return;
-                if (stepBackInsideFeature(tabName)) return;
-                if (typeof window.navigateFeatureStepBack === 'function' && window.navigateFeatureStepBack()) return;
-                if (window.history && window.history.length > 1) {
-                    window.history.back();
-                    return;
-                }
+                if (typeof window.navigateHierarchicalBack === 'function' && window.navigateHierarchicalBack('home')) return;
                 goHome('home');
                 return;
             }
@@ -1621,6 +1665,14 @@ function featureActionButtonsHtml(meta) {
     function bindRealtime() {
         if (window.__metaRedesignShellSyncBound) return;
         window.__metaRedesignShellSyncBound = true;
+        window.MetaFeatureShell = Object.assign(window.MetaFeatureShell || {}, {
+            isManaged: isManaged,
+            getStage: getManagedFeatureStage,
+            prepareEntry: prepareManagedFeatureEntry,
+            canStepBackHierarchy: canStepBackHierarchy,
+            stepBackHierarchy: stepBackHierarchy,
+            stepBackInsideFeature: stepBackInsideFeature
+        });
         observeActiveTab();
         observeBursts();
         window.addEventListener('meta-xp-gained', function () { syncShells('forward'); });

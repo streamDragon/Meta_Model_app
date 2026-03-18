@@ -2121,7 +2121,7 @@ function setupAppStickyBanner() {
         if (localBackBtn) {
             localBackBtn.addEventListener('click', () => {
                 if (localBackBtn.disabled) return;
-                navigateBrowserBackOrHome('home');
+                navigateHierarchicalBack('home');
             });
         }
 
@@ -2698,7 +2698,8 @@ function applyRouteFromLocation({ replaceRoute = false, scrollToTop = true } = {
         playSound: false,
         updateHistory: false,
         scrollToTop,
-        trackStepBack: false
+        trackStepBack: false,
+        featureEntry: 'preserve'
     });
 
     const mobileTabSelect = document.getElementById('mobile-tab-select');
@@ -2738,7 +2739,8 @@ function applyInitialTabPreference() {
         playSound: false,
         updateHistory: false,
         scrollToTop: false,
-        trackStepBack: false
+        trackStepBack: false,
+        featureEntry: 'preserve'
     });
 
     const mobileTabSelect = document.getElementById('mobile-tab-select');
@@ -5833,6 +5835,18 @@ function normalizeStepBackTab(tabName = '') {
     return tab;
 }
 
+function normalizeFeatureEntryMode(mode = '') {
+    const key = String(mode || '').trim().toLowerCase();
+    if (key === 'welcome' || key === 'feature') return key;
+    return 'preserve';
+}
+
+function syncManagedFeatureEntryMode(tabName = '', entryMode = 'preserve') {
+    const shell = window.MetaFeatureShell;
+    if (!shell || typeof shell.prepareEntry !== 'function') return '';
+    return String(shell.prepareEntry(tabName, { entryMode: normalizeFeatureEntryMode(entryMode) }) || '').trim();
+}
+
 function loadFeatureStepBackHistory() {
     let parsed = [];
     try {
@@ -5910,7 +5924,8 @@ function navigateFeatureStepBack() {
     navigateTo(previous, {
         playSound: true,
         scrollToTop: true,
-        trackStepBack: false
+        trackStepBack: false,
+        featureEntry: 'preserve'
     });
     return true;
 }
@@ -5931,10 +5946,55 @@ function navigateBrowserBackOrHome(fallbackTab = 'home') {
     navigateTo(fallbackTab, {
         playSound: true,
         scrollToTop: true,
-        trackStepBack: false
+        trackStepBack: false,
+        featureEntry: 'preserve'
     });
     return false;
 }
+
+function canNavigateHierarchicalBack(activeTab = '') {
+    const currentTab = normalizeRequestedTab(activeTab) || getCurrentActiveTabName();
+    return Boolean(currentTab && currentTab !== 'home' && currentTab !== 'debug');
+}
+
+function getHierarchicalBackTitle(activeTab = '') {
+    const currentTab = normalizeRequestedTab(activeTab) || getCurrentActiveTabName();
+    if (!canNavigateHierarchicalBack(currentTab)) return 'אין עדיין צעד קודם לחזרה';
+
+    const shell = window.MetaFeatureShell;
+    if (shell && typeof shell.isManaged === 'function' && shell.isManaged(currentTab)) {
+        const stage = typeof shell.getStage === 'function' ? String(shell.getStage(currentTab) || '').trim() : '';
+        const hasInnerBack = typeof shell.canStepBackHierarchy === 'function'
+            ? shell.canStepBackHierarchy(currentTab)
+            : stage === 'feature';
+        if (hasInnerBack) return 'חזרה צעד אחד אחורה';
+        if (stage === 'welcome') return 'חזרה לבית';
+        return 'חזרה למסך הפתיחה של הכלי';
+    }
+
+    return 'חזרה לבית';
+}
+
+function navigateHierarchicalBack(fallbackTab = 'home') {
+    const currentTab = normalizeRequestedTab(getCurrentActiveTabName()) || 'home';
+    if (!canNavigateHierarchicalBack(currentTab)) return false;
+
+    const shell = window.MetaFeatureShell;
+    if (shell && typeof shell.stepBackHierarchy === 'function' && shell.stepBackHierarchy(currentTab)) {
+        refreshFeatureBackControls(currentTab);
+        return true;
+    }
+
+    navigateTo(fallbackTab, {
+        playSound: true,
+        scrollToTop: true,
+        trackStepBack: false,
+        featureEntry: 'preserve'
+    });
+    return true;
+}
+
+window.navigateHierarchicalBack = navigateHierarchicalBack;
 
 function getNavIconMarkup(kind = 'back') {
     if (kind === 'home') {
@@ -5945,23 +6005,24 @@ function getNavIconMarkup(kind = 'back') {
 
 function refreshFeatureBackControls(activeTab = '') {
     const currentTab = normalizeRequestedTab(activeTab) || getCurrentActiveTabName();
-    const hasStepBack = hasFeatureStepBackTarget(currentTab);
+    const hasHierarchicalBack = canNavigateHierarchicalBack(currentTab);
+    const backTitle = getHierarchicalBackTitle(currentTab);
     document.querySelectorAll('[data-feature-step-back-btn]').forEach((button) => {
         const targetSection = button.closest('.tab-content');
         const targetTab = normalizeRequestedTab(String(targetSection?.id || ''));
-        const disabled = !hasStepBack || !targetTab || targetTab === 'home' || targetTab === 'debug';
+        const disabled = !hasHierarchicalBack || !targetTab || targetTab !== currentTab;
         button.disabled = disabled;
         button.setAttribute('aria-disabled', disabled ? 'true' : 'false');
-        button.title = disabled ? 'אין עדיין צעד קודם לחזרה' : 'חזרה צעד למסך הקודם';
+        button.title = disabled ? 'אין עדיין צעד קודם לחזרה' : backTitle;
     });
 
     const stickyBackBtn = document.getElementById('app-sticky-local-back-btn');
     if (stickyBackBtn) {
-        const disabled = !canUseBrowserBack();
+        const disabled = !hasHierarchicalBack;
         stickyBackBtn.disabled = disabled;
         stickyBackBtn.hidden = disabled;
         stickyBackBtn.setAttribute('aria-disabled', disabled ? 'true' : 'false');
-        stickyBackBtn.title = disabled ? 'אין עמוד קודם לחזרה' : 'חזרה לעמוד הקודם';
+        stickyBackBtn.title = disabled ? 'אין עדיין צעד קודם לחזרה' : backTitle;
     }
 }
 
@@ -6001,7 +6062,7 @@ function bindElementToNavKey(element, navKey = '') {
                 if (typeof window.navigateByNavKey === 'function' && window.navigateByNavKey(resolvedNavKey, { versioned: true }) !== false) {
                     return;
                 }
-                if (entry.tab) navigateTo(entry.tab, { playSound: true, scrollToTop: true });
+                if (entry.tab) navigateTo(entry.tab, { playSound: true, scrollToTop: true, featureEntry: 'welcome' });
             });
         }
     } else {
@@ -6011,7 +6072,7 @@ function bindElementToNavKey(element, navKey = '') {
                 return;
             }
             if (entry.type === 'tab' && entry.tab) {
-                navigateTo(entry.tab, { playSound: true, scrollToTop: true });
+                navigateTo(entry.tab, { playSound: true, scrollToTop: true, featureEntry: 'welcome' });
                 return;
             }
             if (versionedHref) {
@@ -6173,7 +6234,7 @@ function setupTabNavigation() {
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const tabName = btn.getAttribute('data-tab');
-            navigateTo(tabName, { playSound: true, scrollToTop: true });
+            navigateTo(tabName, { playSound: true, scrollToTop: true, featureEntry: 'welcome' });
         });
     });
 
@@ -6187,7 +6248,7 @@ function setupTabNavigation() {
 
         mobileTabSelect.addEventListener('change', () => {
             const targetTab = mobileTabSelect.value;
-            navigateTo(targetTab, { playSound: true, scrollToTop: true });
+            navigateTo(targetTab, { playSound: true, scrollToTop: true, featureEntry: 'welcome' });
         });
     }
 }
@@ -17439,16 +17500,17 @@ function bindRuntimeRecoveryActions(card, tabName = '') {
                 playSound: false,
                 scrollToTop: true,
                 updateHistory: false,
-                trackStepBack: false
+                trackStepBack: false,
+                featureEntry: 'preserve'
             });
             return;
         }
         if (action === 'back') {
-            navigateBrowserBackOrHome('home');
+            navigateHierarchicalBack('home');
             return;
         }
         if (action === 'home') {
-            navigateTo('home', { playSound: true, scrollToTop: true, trackStepBack: false });
+            navigateTo('home', { playSound: true, scrollToTop: true, trackStepBack: false, featureEntry: 'preserve' });
         }
     });
 }
@@ -17552,6 +17614,11 @@ function navigateTo(tabName, options = {}) {
     const replaceHistory = Boolean(opts.replaceHistory);
     const trackStepBack = opts.trackStepBack !== false;
     const currentTabBefore = normalizeRequestedTab(getCurrentActiveTabName()) || 'home';
+    const featureEntry = normalizeFeatureEntryMode(
+        Object.prototype.hasOwnProperty.call(opts, 'featureEntry')
+            ? opts.featureEntry
+            : (resolvedTab !== currentTabBefore ? 'welcome' : 'preserve')
+    );
 
     if (trackStepBack && resolvedTab !== currentTabBefore) {
         pushFeatureStepBackEntry(currentTabBefore, resolvedTab);
@@ -17560,6 +17627,7 @@ function navigateTo(tabName, options = {}) {
     persistHomeLastVisitedTab(resolvedTab);
 
     if (activateTabByName(resolvedTab, { playSound, scrollToTop: false })) {
+        syncManagedFeatureEntryMode(resolvedTab, featureEntry);
         if (updateHistory) {
             syncHistoryRouteForTab(resolvedTab, { replace: replaceHistory });
         }
@@ -17597,6 +17665,7 @@ function navigateTo(tabName, options = {}) {
     syncHomeMobileFeedMode(resolvedTab);
     updateMobileStickyCta(resolvedTab);
     updateAppStickyBanner(resolvedTab);
+    syncManagedFeatureEntryMode(resolvedTab, featureEntry);
     refreshFeatureBackControls(resolvedTab);
     scheduleRuntimeRecoveryCheck(resolvedTab);
     if (updateHistory) {
@@ -18073,7 +18142,7 @@ function launchHomeProgramStep(programId) {
     if (step?.tab) {
         showHint(`פותח/ת מסלול "${program.title}" · שלב ${Math.min(state.stepIndex + 1, program.steps.length)}: ${step.title}`);
         playUISound('start');
-        navigateTo(step.tab);
+        navigateTo(step.tab, { featureEntry: 'welcome' });
     }
 }
 
@@ -18141,7 +18210,7 @@ function setupProgressHubEnhancements() {
             if (window.MetaAppShell && typeof window.MetaAppShell.resumeContinueState === 'function' && window.MetaAppShell.resumeContinueState()) {
                 return;
             }
-            navigateTo(last.tab);
+            navigateTo(last.tab, { featureEntry: 'preserve' });
         });
     }
 

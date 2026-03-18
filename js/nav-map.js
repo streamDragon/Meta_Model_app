@@ -84,7 +84,7 @@
 
         if (entry.type === 'tab' && typeof global.navigateTo === 'function' && opts.forcePage !== true) {
             try {
-                global.navigateTo(entry.tab);
+                global.navigateTo(entry.tab, { featureEntry: opts.featureEntry || 'welcome' });
                 return true;
             } catch (_error) {
                 // fall through to full-page navigation

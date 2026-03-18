@@ -313,6 +313,31 @@
             state.caseUiById[nextCaseId] = createCaseUiState();
             render({ forceFocus: true });
         }
+        function canStepBack() {
+            const caseUi = getCurrentCaseUi();
+            return Boolean(caseUi && caseUi.stepIndex > 0);
+        }
+        function restartCurrentCase() {
+            state.caseUiById[state.selectedCaseId] = createCaseUiState();
+            render({ forceFocus: true });
+            return true;
+        }
+        function registerShellController() {
+            global.__metaFeatureControllers = global.__metaFeatureControllers || {};
+            global.__metaFeatureControllers['sentence-map'] = {
+                canStepBack() {
+                    return canStepBack();
+                },
+                stepBack() {
+                    if (!canStepBack()) return false;
+                    goBack();
+                    return true;
+                },
+                restart() {
+                    return restartCurrentCase();
+                }
+            };
+        }
 
         function renderModeToggle() {
             return `<div class="sentence-map-mode-toggle" aria-label="מצב עבודה"><div class="sentence-map-mode-toggle__buttons">${Object.entries(MODE_COPY).map(([modeId, copy]) => `<button type="button" class="sentence-map-segment${state.mode === modeId ? ' is-active' : ''}" data-action="set-mode" data-mode="${escapeHtml(modeId)}" aria-pressed="${state.mode === modeId ? 'true' : 'false'}">${escapeHtml(copy.label)}</button>`).join('')}</div><p class="sentence-map-toolbar-note">${escapeHtml(MODE_COPY[state.mode].hint)}</p></div>`;
@@ -427,6 +452,7 @@
             if (action === 'next-case') return void goToNextCase();
         });
 
+        registerShellController();
         render();
     }
 

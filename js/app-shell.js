@@ -1551,7 +1551,7 @@
             return true;
         }
 
-        global.navigateTo(continueState.screenId, { playSound: true, scrollToTop: true });
+        global.navigateTo(continueState.screenId, { playSound: true, scrollToTop: true, featureEntry: 'preserve' });
         if (!continueState.panelId) return true;
 
         global.setTimeout(() => {
