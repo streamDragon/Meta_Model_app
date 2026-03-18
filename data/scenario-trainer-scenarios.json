@@ -189,6 +189,8 @@
       "domain": "parenting",
       "domainLabel": "הורות",
       "difficulty": "medium",
+      "coverImage": "assets/images/scenario-trainer/scenes/parenting-morning__cover.webp",
+      "sceneArt": "assets/images/scenario-trainer/scenes/parenting-morning__cover.webp",
       "role": {
         "player": "הורה",
         "other": "ילדה"
@@ -261,6 +263,9 @@
       "domain": "parenting",
       "domainLabel": "הורות",
       "difficulty": "medium",
+      "coverImage": "assets/images/scenario-trainer/scenes/parenting-room__cover.webp",
+      "sceneArt": "assets/images/scenario-trainer/scenes/parenting-room__cover.webp",
+
       "role": {
         "player": "הורה",
         "other": "ילד"
@@ -406,6 +411,8 @@
       "domain": "relationships",
       "domainLabel": "זוגיות",
       "difficulty": "medium",
+      "coverImage": "assets/images/scenario-trainer/scenes/relationships-on-time__cover.webp",
+      "sceneArt": "assets/images/scenario-trainer/scenes/relationships-on-time__cover.webp",
       "role": {
         "player": "בן זוג",
         "other": "בת זוג"
@@ -508,6 +515,8 @@
       "domain": "relationships",
       "domainLabel": "זוגיות",
       "difficulty": "hard",
+      "coverImage": "assets/images/scenario-trainer/scenes/relationships-talk__cover.webp",
+      "sceneArt": "assets/images/scenario-trainer/scenes/relationships-talk__cover.webp",
       "role": {
         "player": "בת זוג",
         "other": "בן זוג"
@@ -792,6 +801,8 @@
       "domain": "work",
       "domainLabel": "עבודה",
       "difficulty": "medium",
+      "coverImage": "assets/images/scenario-trainer/scenes/work-client-update__cover.webp",
+      "sceneArt": "assets/images/scenario-trainer/scenes/work-client-update__cover.webp",
       "role": {
         "player": "מנהלת לקוח",
         "other": "ראש צוות"
@@ -864,6 +875,9 @@
       "domain": "work",
       "domainLabel": "עבודה",
       "difficulty": "hard",
+
+      "coverImage": "assets/images/scenario-trainer/scenes/work-bugfix__cover.webp",
+      "sceneArt": "assets/images/scenario-trainer/scenes/work-bugfix__cover.webp",
       "role": {
         "player": "מפתח",
         "other": "מנהלת מוצר"
@@ -1044,6 +1058,8 @@
       "domain": "bureaucracy",
       "domainLabel": "ביורוקרטיה",
       "difficulty": "easy",
+      "coverImage": "assets/images/scenario-trainer/scenes/bureaucracy-arnona__cover.webp",
+      "sceneArt": "assets/images/scenario-trainer/scenes/bureaucracy-arnona__cover.webp",
       "role": {
         "player": "אזרח",
         "other": "מוקדנית"
@@ -1146,6 +1162,10 @@
       "domain": "bureaucracy",
       "domainLabel": "ביורוקרטיה",
       "difficulty": "medium",
+
+      "coverImage": "assets/images/scenario-trainer/scenes/bureaucracy-upload-docs__cover.webp",
+      "sceneArt": "assets/images/scenario-trainer/scenes/bureaucracy-upload-docs__cover.webp",
+
       "role": {
         "player": "מגישת בקשה",
         "other": "נציגת שירות"
@@ -1502,6 +1522,8 @@
       "domain": "home_tech",
       "domainLabel": "בית / טכני",
       "difficulty": "medium",
+      "coverImage": "assets/images/scenario-trainer/scenes/home-wifi__cover.webp",
+      "sceneArt": "assets/images/scenario-trainer/scenes/home-wifi__cover.webp",
       "role": {
         "player": "בן בית",
         "other": "בת זוג"
