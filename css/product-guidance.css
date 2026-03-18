@@ -304,6 +304,11 @@
     color: var(--product-text-soft);
 }
 
+.ceflow-feedback > .product-coach-card {
+    grid-column: 1 / -1;
+    margin-top: 2px;
+}
+
 .practice-intro-card,
 .blueprint-shell,
 .comic-engine-shell,
