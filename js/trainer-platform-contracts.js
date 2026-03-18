@@ -65,7 +65,7 @@
         "description": "לוקחים את הדיוק לסשן הבא בלי לאבד את אותו סדר מסך."
       }
     ],
-    "supportRailMode": "secondary-on-demand",
+    "supportRailMode": "breen-map",
     "settingsGroups": [
       "what-to-practice",
       "session-load",
@@ -78,7 +78,8 @@
       "start",
       "purpose",
       "helper-steps",
-      "main"
+      "main",
+      "support"
     ],
     "wrapper": {
       "pageTitle": "Classic 2 - Structure of Magic Trainer",
@@ -173,7 +174,7 @@
         "description": "מחברים את מה שנאמר, מה זוהה, ומה לוקחים לסבב הבא."
       }
     ],
-    "supportRailMode": "secondary-on-demand",
+    "supportRailMode": "guided-explanation",
     "settingsGroups": [
       "what-to-practice",
       "session-load",
@@ -184,7 +185,8 @@
       "start",
       "purpose",
       "helper-steps",
-      "main"
+      "main",
+      "support"
     ],
     "wrapper": {
       "pageTitle": "Classic Classic - Meta Model Trainer",
@@ -290,7 +292,7 @@
         "description": "שואלים מה קורה אם בוחרים ענף אחר או פירוש אחר."
       }
     ],
-    "supportRailMode": "secondary-on-demand",
+    "supportRailMode": "branching-tree",
     "settingsGroups": [
       "entry-mode",
       "scenario",
@@ -301,7 +303,8 @@
       "start",
       "purpose",
       "helper-steps",
-      "main"
+      "main",
+      "support"
     ],
     "wrapper": {
       "pageTitle": "Iceberg Templates - Iceberg / Branch Trees",
@@ -401,11 +404,19 @@
         "description": "לוקחים את הדיוק לשיחה הבאה."
       }
     ],
+    "supportRailMode": "dialogue-meta",
     "settingsGroups": [
       "domain-focus",
       "difficulty",
       "session-load",
       "helpers"
+    ],
+    "mobilePriorityOrder": [
+      "start",
+      "purpose",
+      "helper-steps",
+      "main",
+      "support"
     ],
     "wrapper": {
       "pageTitle": "Scenario Trainer - Meta Model Dialogue Simulator",
