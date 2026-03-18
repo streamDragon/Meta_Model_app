@@ -92,22 +92,63 @@ try {
             console.log('[requestfailed]', request.url(), request.failure()?.errorText || '');
         });
 
+        const click = async (selector, index = 0) => {
+            await page.waitForFunction(
+                ([css, nth]) => document.querySelectorAll(css).length > nth,
+                [selector, index]
+            );
+            await page.evaluate(([css, nth]) => {
+                const node = document.querySelectorAll(css)[nth];
+                if (!node) throw new Error(`Missing click target: ${css} @ ${nth}`);
+                node.click();
+            }, [selector, index]);
+        };
+
         const response = await page.goto(`${serverBundle.base}/scenario_trainer.html`, {
-            waitUntil: 'networkidle'
+            waitUntil: 'domcontentloaded'
         });
 
         console.log('status', response?.status());
-        await page.waitForTimeout(1000);
-        const visibility = await page.locator('[data-trainer-platform="1"][data-trainer-id="scenario-trainer"]').isVisible().catch(() => false);
-        console.log('trainer visible', visibility);
+        await page.waitForFunction(() => !!document.querySelector('[data-trainer-platform="1"][data-trainer-id="scenario-trainer"]'));
+        console.log('home ready');
+
+        await click('[data-trainer-action="open-settings"]');
+        await page.waitForFunction(() => !!document.querySelector('[data-trainer-settings-shell="1"][data-trainer-id="scenario-trainer"]'));
+        console.log('settings opened');
+
+        await page.evaluate(() => {
+            const range = document.querySelector('#scenario-setting-run-size');
+            if (range) {
+                range.value = '4';
+                range.dispatchEvent(new Event('input', { bubbles: true }));
+                range.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+        await click('[data-trainer-action="save-start"]');
+        await page.waitForFunction(() => !!document.querySelector('.scenario-story-stage'));
+        console.log('stage opened');
+
+        await click('.scenario-play-topbar [data-scenario-action="open-help"]');
+        await page.waitForFunction(() => !!document.querySelector('.scenario-help-list'));
+        console.log('help opened');
+
+        await click('.trainer-shell-nav [data-nav-action="back"]');
+        await page.waitForFunction(() => !!document.querySelector('.scenario-story-stage'));
+        console.log('back to stage');
+
+        await click('.scenario-compact-option');
+        await page.waitForFunction(() => !!document.querySelector('[data-scenario-feedback-thread="1"]'));
+        console.log('feedback opened');
+
+        await click('.trainer-shell-nav [data-nav-action="restart"]:not([hidden])');
+        await page.waitForFunction(() => !!document.querySelector('.scenario-story-stage'));
+        await page.waitForFunction(() => !document.querySelector('[data-scenario-feedback-thread="1"]'));
+        console.log('restart returned to stage');
 
         const snapshot = await page.evaluate(() => ({
-            title: document.title,
-            bodyText: document.body.innerText,
-            bodyHtml: document.body.innerHTML.slice(0, 3000),
-            hasMount: !!document.getElementById('scenario-trainer-root'),
-            hasTrainerShell: !!document.querySelector('[data-trainer-platform="1"][data-trainer-id="scenario-trainer"]'),
-            hasNav: !!document.querySelector('.trainer-shell-nav')
+            screen: document.querySelector('[data-trainer-platform="1"][data-trainer-id="scenario-trainer"]')?.getAttribute('data-screen') || '',
+            topbar: document.querySelector('.scenario-play-topbar-status')?.textContent?.trim() || '',
+            restartVisible: !!document.querySelector('.trainer-shell-nav [data-nav-action="restart"]:not([hidden])')
         }));
 
         console.log(JSON.stringify(snapshot, null, 2));
