@@ -82,6 +82,10 @@ async function visibleGlobalBlockers(page) {
     );
 }
 
+function trace(label) {
+    console.log(`[trace] ${label}`);
+}
+
 async function openScenarioTrainer(page, baseUrl) {
     await page.goto(`${baseUrl}/scenario_trainer.html`, { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(
@@ -101,6 +105,13 @@ async function readText(page, selector) {
 
 async function countMatches(page, selector) {
     return page.evaluate((css) => document.querySelectorAll(css).length, selector);
+}
+
+async function waitForMatch(page, selector, minimum = 1) {
+    await page.waitForFunction(
+        ([css, count]) => document.querySelectorAll(css).length >= count,
+        [selector, minimum]
+    );
 }
 
 async function readRect(page, selector, index = 0) {
@@ -159,28 +170,32 @@ async function setSelectToNonCurrent(page, selector) {
 }
 
 async function runDesktopChecks(page, baseUrl) {
+    trace('desktop: open');
     await openScenarioTrainer(page, baseUrl);
+    trace('desktop: opened');
     await assert(await visibleGlobalBlockers(page) === 0, 'scenario desktop no visible global blockers');
 
     const startBox = await readRect(page, '[data-trainer-action="start-session"]');
     await assert(!!startBox && startBox.y < 980, 'scenario start visible in first viewport', JSON.stringify(startBox));
 
     const summaryBefore = await readText(page, '.scenario-home-setup-head h3');
+    trace('desktop: open settings');
     await clickStable(page, '[data-trainer-action="open-settings"]');
-    await page.waitForSelector('[data-trainer-settings-shell="1"][data-trainer-id="scenario-trainer"]');
+    await waitForMatch(page, '[data-trainer-settings-shell="1"][data-trainer-id="scenario-trainer"]');
 
     await setRangeValue(page, '#scenario-setting-run-size', 4);
     await setSelectToNonCurrent(page, '#scenario-setting-domain');
     const previewBeforeSave = await readText(page, '[data-trainer-summary="preview"]');
+    trace('desktop: save and start');
     await clickStable(page, '[data-trainer-action="save-start"]');
     await page.waitForFunction(() => !document.querySelector('[data-trainer-settings-shell="1"][data-trainer-id="scenario-trainer"]'));
-    await page.waitForSelector('.scenario-story-stage');
+    await waitForMatch(page, '.scenario-story-stage');
     const topbarStatus = await readText(page, '.scenario-play-topbar-status');
 
     await assert(previewBeforeSave !== summaryBefore, 'scenario preview summary changed', `${summaryBefore} -> ${previewBeforeSave}`);
     await assert(/1\/\d+/.test(topbarStatus), 'scenario play topbar reflects live session progress', topbarStatus);
 
-    await page.waitForSelector('.scenario-compact-option');
+    await waitForMatch(page, '.scenario-compact-option');
     const stageLayout = await page.evaluate(() => ({
         stage: document.querySelector('.scenario-story-stage')?.getBoundingClientRect(),
         supportCount: document.querySelectorAll('.scenario-platform-support').length
@@ -195,10 +210,12 @@ async function runDesktopChecks(page, baseUrl) {
         'scenario desktop standalone restart visible during active scene'
     );
 
+    trace('desktop: help');
     await clickStable(page, '.scenario-play-topbar [data-scenario-action="open-help"]');
-    await page.waitForSelector('.scenario-help-list');
+    await waitForMatch(page, '.scenario-help-list');
+    trace('desktop: back');
     await clickStable(page, '.trainer-shell-nav [data-nav-action="back"]');
-    await page.waitForSelector('.scenario-story-stage');
+    await waitForMatch(page, '.scenario-story-stage');
     await assert((await countMatches(page, '.scenario-help-list')) === 0, 'scenario standalone back returns from help to play');
 
     const frameBefore = await readText(page, '.scenario-story-frame-copy h3');
@@ -213,8 +230,9 @@ async function runDesktopChecks(page, baseUrl) {
     await assert(frameAfter !== frameBefore, 'scenario desktop chip switch updates active story frame');
     await assert(stableHeights > 480, 'scenario desktop stage height remains stable');
 
+    trace('desktop: pick option');
     await clickStable(page, '.scenario-compact-option');
-    await page.waitForSelector('[data-scenario-feedback-thread="1"]');
+    await waitForMatch(page, '[data-scenario-feedback-thread="1"]');
 
     await assert((await countMatches(page, '#scenario-feedback-choice-bubble')) > 0, 'scenario chosen reply visible');
     await assert((await countMatches(page, '#scenario-feedback-other-bubble')) > 0, 'scenario likely other reply visible');
@@ -223,17 +241,20 @@ async function runDesktopChecks(page, baseUrl) {
     await assert((await countMatches(page, '[data-scenario-consequence="1"]')) > 0, 'scenario consequence box visible');
     await assert((await countMatches(page, '.scenario-meta-accordion')) > 0, 'scenario feedback accordions visible');
 
+    trace('desktop: restart');
     await clickStable(page, '.trainer-shell-nav [data-nav-action="restart"]:not([hidden])');
-    await page.waitForSelector('.scenario-story-stage');
+    await waitForMatch(page, '.scenario-story-stage');
     await page.waitForFunction(() => !document.querySelector('[data-scenario-feedback-thread="1"]'));
     const restartedStatus = await readText(page, '.scenario-play-topbar-status');
     await assert(/1\/\d+/.test(restartedStatus), 'scenario standalone restart keeps current scene progress shell', restartedStatus);
 
+    trace('desktop: pick option again');
     await clickStable(page, '.scenario-compact-option');
-    await page.waitForSelector('[data-scenario-feedback-thread="1"]');
+    await waitForMatch(page, '[data-scenario-feedback-thread="1"]');
 
+    trace('desktop: blueprint toggle');
     await clickStable(page, '[data-scenario-action="show-blueprint"]');
-    await page.waitForSelector('[data-scenario-analysis="1"]');
+    await waitForMatch(page, '[data-scenario-analysis="1"]');
     await assert((await countMatches(page, '[data-scenario-feedback-thread="1"]')) > 0, 'scenario analysis stays in same thread');
 
     await clickStable(page, '[data-scenario-action="show-blueprint"]');
@@ -242,7 +263,9 @@ async function runDesktopChecks(page, baseUrl) {
 }
 
 async function runMobileChecks(page, baseUrl) {
+    trace('mobile: open');
     await openScenarioTrainer(page, baseUrl);
+    trace('mobile: opened');
     await assert(await visibleGlobalBlockers(page) === 0, 'scenario mobile no visible global blockers');
 
     const overflow = await page.evaluate(() => ({
@@ -251,8 +274,9 @@ async function runMobileChecks(page, baseUrl) {
     }));
     await assert(overflow.scrollWidth <= overflow.innerWidth + 1, 'scenario mobile no horizontal overflow', `${overflow.scrollWidth}/${overflow.innerWidth}`);
 
+    trace('mobile: start');
     await clickStable(page, '[data-trainer-action="start-session"]');
-    await page.waitForSelector('.scenario-compact-option');
+    await waitForMatch(page, '.scenario-compact-option');
     await assert((await countMatches(page, '.scenario-play-topbar')) > 0, 'scenario mobile topbar visible');
     await assert((await countMatches(page, '.scenario-story-frame-card')) > 0, 'scenario mobile story frame visible');
     const mobileFlowOrder = await page.evaluate(() => ({
@@ -265,13 +289,16 @@ async function runMobileChecks(page, baseUrl) {
         JSON.stringify(mobileFlowOrder)
     );
 
+    trace('mobile: pick option');
     await clickStable(page, '.scenario-compact-option');
-    await page.waitForSelector('[data-scenario-feedback-thread="1"]');
+    await waitForMatch(page, '[data-scenario-feedback-thread="1"]');
 
+    trace('mobile: reopen home');
     await openScenarioTrainer(page, baseUrl);
 
+    trace('mobile: open settings');
     await clickStable(page, '[data-trainer-action="open-settings"]');
-    await page.waitForSelector('[data-trainer-settings-shell="1"][data-trainer-id="scenario-trainer"]');
+    await waitForMatch(page, '[data-trainer-settings-shell="1"][data-trainer-id="scenario-trainer"]');
     await page.waitForTimeout(150);
     const box = await readRect(page, '[data-trainer-action="save-start"]');
     await assert(!!box && box.x >= 0 && box.y >= 0 && box.x + box.width <= 390 && box.y + box.height <= 844, 'scenario mobile settings footer reachable', JSON.stringify(box));
