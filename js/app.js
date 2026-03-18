@@ -1879,21 +1879,28 @@ function hideSplashScreen() {
     const splashScreen = document.getElementById('splash-screen');
     if (!splashScreen) return;
 
-    if (document.body.classList.contains('embed-mode')) {
+    const finalizeHide = () => {
         splashScreen.classList.add('hidden');
         splashScreen.style.pointerEvents = 'none';
         splashScreen.style.display = 'none';
+    };
+
+    if (document.body.classList.contains('embed-mode')) {
+        finalizeHide();
         return;
     }
 
-    // The animation handles the fade out after 3 seconds
-    // Just ensure it's hidden after animation
-    setTimeout(() => {
-        if (splashScreen) {
-            splashScreen.classList.add('hidden');
-            splashScreen.style.pointerEvents = 'none'; // Ensure clicks pass through
-        }
-    }, 3600);
+    if (splashScreen.dataset.hideBound !== '1') {
+        splashScreen.dataset.hideBound = '1';
+        splashScreen.addEventListener('animationend', (event) => {
+            if (event.animationName === 'splashFadeOut') {
+                finalizeHide();
+            }
+        }, { once: true });
+    }
+
+    // Fallback in case animationend does not fire on a given platform.
+    setTimeout(finalizeHide, 2100);
 }
 
 function normalizeViewMode(rawMode = '') {

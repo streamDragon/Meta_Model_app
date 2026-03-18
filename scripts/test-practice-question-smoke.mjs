@@ -77,6 +77,23 @@ function extractState(page) {
     }));
 }
 
+function extractSplashState(page) {
+    return page.evaluate(() => {
+        const splash = document.getElementById('splash-screen');
+        if (!splash) return { exists: false };
+        const style = window.getComputedStyle(splash);
+        return {
+            exists: true,
+            className: splash.className,
+            display: style.display,
+            visibility: style.visibility,
+            opacity: style.opacity,
+            pointerEvents: style.pointerEvents,
+            hiddenAttr: splash.hidden === true
+        };
+    });
+}
+
 let serverBundle = null;
 let browser = null;
 
@@ -95,12 +112,33 @@ try {
     });
 
     await page.goto(`${serverBundle.base}/`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1200);
+    await page.waitForTimeout(400);
+    const splash = page.locator('#splash-screen');
+    if (await splash.count()) {
+        try {
+            await splash.waitFor({ state: 'hidden', timeout: 4000 });
+        } catch (_error) {
+            process.stdout.write(`SPLASH_STUCK ${JSON.stringify(await extractSplashState(page))}\n`);
+            process.stdout.write(`INIT_STATE ${JSON.stringify(await extractState(page))}\n`);
+            await page.evaluate(() => {
+                const node = document.getElementById('splash-screen');
+                if (!node) return;
+                node.classList.add('hidden');
+                node.style.pointerEvents = 'none';
+                node.style.display = 'none';
+            });
+            await page.waitForTimeout(120);
+        }
+    }
 
-    const homeButtons = page.locator('[data-nav-key="practiceQuestion"]');
+    const homeButtons = page.locator([
+        '[data-open-feature="practice-question"]:visible',
+        '[data-home-nav="practice-question"]:visible',
+        '[data-nav-key="practiceQuestion"]:visible'
+    ].join(', '));
     const homeCount = await homeButtons.count();
     if (!homeCount) {
-        throw new Error(`No home launcher found for practiceQuestion.\n${JSON.stringify(await extractState(page), null, 2)}`);
+        throw new Error(`No visible home launcher found for practiceQuestion.\n${JSON.stringify(await extractState(page), null, 2)}`);
     }
 
     await homeButtons.first().click();

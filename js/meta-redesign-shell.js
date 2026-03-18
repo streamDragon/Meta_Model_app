@@ -1185,22 +1185,17 @@ function featureActionButtonsHtml(meta) {
         window.location.href = nextHref;
     }
     function navigateFromHome(targetTab) {
-        var root = document.getElementById(HOME_SHELL_ID);
         setPendingNav(targetTab, 'forward');
         homeUi.view = 'home';
         drawerOpen = false;
         saveHomeUi();
-        animateOut(root ? root.querySelector('[data-home-surface]') : null, 'forward', function () {
-            if (typeof window.navigateTo === 'function') window.navigateTo(targetTab, { playSound: true, scrollToTop: true });
-        });
+        if (typeof window.navigateTo === 'function') window.navigateTo(targetTab, { playSound: true, scrollToTop: true, featureEntry: 'welcome' });
     }
     function navigateHome(shell) {
         setPendingNav('home', 'back');
         homeUi.view = 'home';
         saveHomeUi();
-        animateOut(shell, 'back', function () {
-            if (typeof window.navigateTo === 'function') window.navigateTo('home', { playSound: true, scrollToTop: true, featureEntry: 'preserve' });
-        });
+        if (typeof window.navigateTo === 'function') window.navigateTo('home', { playSound: true, scrollToTop: true, featureEntry: 'preserve' });
     }
     function stepBackInsideFeature(tabName) {
         var safeTab = normalizeTab(tabName);
@@ -1270,24 +1265,8 @@ function featureActionButtonsHtml(meta) {
         var safeTab = normalizeTab(tabName);
         var section = document.getElementById(safeTab);
         if (!section) return;
-        var shell = section.querySelector('.meta-feature-welcome-shell');
-        var liveNodes = Array.prototype.slice.call(section.children || []).filter(function (node) { return node !== shell; });
-        if (!shell || !liveNodes.length || useInstantFeatureEntry(safeTab)) {
-            section.dataset.metaFeatureStage = 'feature';
-            renderFeatureChrome(safeTab);
-            return;
-        }
-        var clone = shell.cloneNode(true);
-        clone.classList.add('meta-feature-stage-clone');
-        section.appendChild(clone);
-        clone.classList.add('meta-screen-out-forward');
         section.dataset.metaFeatureStage = 'feature';
         renderFeatureChrome(safeTab);
-        liveNodes.forEach(function (node) { node.classList.add('meta-screen-enter-forward', 'meta-screen-scale-in'); });
-        window.setTimeout(function () {
-            if (clone.parentNode) clone.parentNode.removeChild(clone);
-            liveNodes.forEach(function (node) { node.classList.remove('meta-screen-enter-forward', 'meta-screen-scale-in'); });
-        }, 420);
     }
     function bindHome(root) {
         if (!root) return;
