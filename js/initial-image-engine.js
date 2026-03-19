@@ -269,11 +269,17 @@
         }
         html.push('</div>');
 
-        // ── Bottom panel: text grid
+        // ── Bottom panel: core sentence + text grid
         html.push('<div class="' + CSS_PREFIX + '-text-panel">');
+        // Core sentence above the grid
+        html.push(
+            '<div class="' + CSS_PREFIX + '-text-cell ' + CSS_PREFIX + '-text-core">' +
+            '<span class="' + CSS_PREFIX + '-core-sentence">' + esc(ex.originalSentence) + '</span>' +
+            '</div>'
+        );
+        // Reveal slots grid (all non-core)
         html.push('<div class="' + CSS_PREFIX + '-text-grid">');
         var slots = ex.textSlots;
-        // Determine grid dimensions from slot positions
         var maxRow = 0; var maxCol = 0;
         for (var s = 0; s < slots.length; s++) {
             if (slots[s].row > maxRow) maxRow = slots[s].row;
@@ -284,23 +290,15 @@
         html.push('<div class="' + CSS_PREFIX + '-text-cells" style="--iids-text-rows:' + textRows + ';--iids-text-cols:' + textCols + ';">');
         for (var si = 0; si < slots.length; si++) {
             var slot = slots[si];
-            if (slot.category === 'core') {
-                html.push(
-                    '<div class="' + CSS_PREFIX + '-text-cell ' + CSS_PREFIX + '-text-core" style="grid-row:' + (slot.row + 1) + ';grid-column:' + (slot.col + 1) + ';">' +
-                    '<span class="' + CSS_PREFIX + '-core-sentence">' + esc(ex.originalSentence) + '</span>' +
-                    '</div>'
-                );
-            } else {
-                var revealData = isSlotRevealed(slot.id);
-                var catClass = slot.category === 'deletion' ? 'del' : slot.category === 'distortion' ? 'dis' : 'gen';
-                html.push(
-                    '<div class="' + CSS_PREFIX + '-text-cell ' + CSS_PREFIX + '-text-slot ' + CSS_PREFIX + '-cat-' + catClass +
-                    (revealData ? ' is-revealed' : '') +
-                    '" data-slot="' + esc(slot.id) + '" style="grid-row:' + (slot.row + 1) + ';grid-column:' + (slot.col + 1) + ';">' +
-                    (revealData ? '<span class="' + CSS_PREFIX + '-slot-text">' + esc(revealData.text) + '</span>' : '<span class="' + CSS_PREFIX + '-slot-placeholder">?</span>') +
-                    '</div>'
-                );
-            }
+            var revealData = isSlotRevealed(slot.id);
+            var catClass = slot.category === 'deletion' ? 'del' : slot.category === 'distortion' ? 'dis' : 'gen';
+            html.push(
+                '<div class="' + CSS_PREFIX + '-text-cell ' + CSS_PREFIX + '-text-slot ' + CSS_PREFIX + '-cat-' + catClass +
+                (revealData ? ' is-revealed' : '') +
+                '" data-slot="' + esc(slot.id) + '" style="grid-row:' + (slot.row + 1) + ';grid-column:' + (slot.col + 1) + ';">' +
+                (revealData ? '<span class="' + CSS_PREFIX + '-slot-text">' + esc(revealData.text) + '</span>' : '<span class="' + CSS_PREFIX + '-slot-placeholder">?</span>') +
+                '</div>'
+            );
         }
         html.push('</div></div></div>');
 
