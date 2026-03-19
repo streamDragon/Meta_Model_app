@@ -3243,52 +3243,13 @@ function repairMojibakeDomSubtree(root) {
 }
 
 function setupMojibakeAutoRepair() {
-    const repairRoot = document.documentElement || document.body;
-
-    if (mojibakeMutationObserver || typeof MutationObserver !== 'function') {
-        repairMojibakeDomSubtree(repairRoot);
-        return;
-    }
-
-    repairMojibakeDomSubtree(repairRoot);
-
-    let mojibakeDebounceTimer = null;
-    let mojibakePendingNodes = new Set();
-
-    mojibakeMutationObserver = new MutationObserver((mutations) => {
-        if (isApplyingMojibakeRepair) return;
-        for (const mutation of mutations) {
-            if (mutation.type === 'attributes') {
-                mojibakePendingNodes.add(mutation.target);
-            } else {
-                mutation.addedNodes.forEach((node) => mojibakePendingNodes.add(node));
-            }
-        }
-        if (mojibakeDebounceTimer || !mojibakePendingNodes.size) return;
-        mojibakeDebounceTimer = setTimeout(() => {
-            mojibakeDebounceTimer = null;
-            const nodes = Array.from(mojibakePendingNodes);
-            mojibakePendingNodes.clear();
-            nodes.forEach((node) => repairMojibakeDomSubtree(node));
-        }, 120);
-    });
-
-    mojibakeMutationObserver.observe(document.body, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['title', 'aria-label', 'placeholder', 'value', 'alt']
-    });
-
-    // One-shot delayed safety scan instead of a recurring interval.
-    // The MutationObserver already handles all new/changed content, so a
-    // periodic full-tree walk is not needed and was blocking the main thread
-    // for seconds on large pages, causing "page not responding" dialogs.
-    if (!mojibakeSafetyTimer && typeof window !== 'undefined') {
-        mojibakeSafetyTimer = window.setTimeout(() => {
-            mojibakeSafetyTimer = null;
-            repairMojibakeDomSubtree(document.documentElement || document.body);
-        }, 4000);
+    // Single one-shot repair at init.  The MutationObserver + interval combo
+    // was crashing the browser tab (STATUS_ACCESS_VIOLATION) by triggering
+    // too many DOM walks, especially when combined with ad-blocker extensions.
+    try {
+        repairMojibakeDomSubtree(document.documentElement || document.body);
+    } catch (_err) {
+        // ignore — mojibake repair is cosmetic, must never block the app
     }
 }
 
