@@ -74,8 +74,7 @@
     grid-template-columns: repeat(var(--iids-grid-cols, 3), 1fr);
     gap: 2px;
     aspect-ratio: 3 / 2;
-    max-height: 360px;
-    margin: 0 auto;
+    width: 100%;
 }
 
 .iids-tile {
@@ -514,10 +513,6 @@
 @media (max-width: 640px) {
     .iids-engine-root {
         gap: 12px;
-    }
-
-    .iids-image-grid {
-        max-height: 280px;
     }
 
     .iids-action-btn {
