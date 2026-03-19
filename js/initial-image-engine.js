@@ -295,11 +295,21 @@
 
         // Hypothesis info bar (guess phase only)
         if (phase === 'guess') {
+            // Dot navigation row
+            var dotsHtml = '';
+            for (var d = 0; d < hyps.length; d++) {
+                dotsHtml += '<button type="button" class="' + CSS_PREFIX + '-dot' + (d === viewIdx ? ' is-active' : '') + '" data-dot="' + d + '" aria-label="תמונה ' + (d + 1) + '"></button>';
+            }
             html.push(
                 '<div class="' + CSS_PREFIX + '-hyp-bar">' +
-                '<span class="' + CSS_PREFIX + '-hyp-counter">' + (viewIdx + 1) + ' / ' + hyps.length + '</span>' +
+                '<div class="' + CSS_PREFIX + '-hyp-nav-row">' +
+                '<button type="button" class="' + CSS_PREFIX + '-nav-arrow" data-dir="prev" aria-label="הקודם">&#8250;</button>' +
+                '<div class="' + CSS_PREFIX + '-dots">' + dotsHtml + '</div>' +
+                '<button type="button" class="' + CSS_PREFIX + '-nav-arrow" data-dir="next" aria-label="הבא">&#8249;</button>' +
+                '</div>' +
                 '<span class="' + CSS_PREFIX + '-hyp-label">' + esc(hyps[viewIdx].label) + '</span>' +
                 '<span class="' + CSS_PREFIX + '-hyp-subtitle">' + esc(hyps[viewIdx].subtitle) + '</span>' +
+                '<span class="' + CSS_PREFIX + '-hyp-hint">החליפו בין התמונות כדי לבחור</span>' +
                 '</div>'
             );
         }
@@ -309,12 +319,6 @@
         var resolvedTruth = resolveAssetPath(ex.truthImage);
 
         html.push('<div class="' + CSS_PREFIX + '-grid-wrap">');
-
-        // Arrows (guess phase)
-        if (phase === 'guess' && hyps.length > 1) {
-            html.push('<button type="button" class="' + CSS_PREFIX + '-arrow ' + CSS_PREFIX + '-arrow-right" data-dir="prev" aria-label="הקודם">&rsaquo;</button>');
-            html.push('<button type="button" class="' + CSS_PREFIX + '-arrow ' + CSS_PREFIX + '-arrow-left" data-dir="next" aria-label="הבא">&lsaquo;</button>');
-        }
 
         html.push('<div class="' + CSS_PREFIX + '-image-grid' + (complete ? ' is-complete' : '') + '" style="--iids-grid-rows:' + grid.rows + ';--iids-grid-cols:' + grid.cols + ';">');
 
@@ -505,10 +509,16 @@
             confirmBtn.addEventListener('click', handleConfirm);
         }
 
-        // Arrows
-        var arrows = rootEl.querySelectorAll('.' + CSS_PREFIX + '-arrow');
-        for (var a = 0; a < arrows.length; a++) {
-            arrows[a].addEventListener('click', handleArrow);
+        // Nav arrows (in hyp-bar)
+        var navArrows = rootEl.querySelectorAll('.' + CSS_PREFIX + '-nav-arrow');
+        for (var a = 0; a < navArrows.length; a++) {
+            navArrows[a].addEventListener('click', handleArrow);
+        }
+
+        // Dot navigation
+        var dots = rootEl.querySelectorAll('.' + CSS_PREFIX + '-dot');
+        for (var d = 0; d < dots.length; d++) {
+            dots[d].addEventListener('click', handleDot);
         }
 
         // Restart button
@@ -528,6 +538,15 @@
             viewingHypothesisIndex = (viewingHypothesisIndex - 1 + len) % len;
         }
         renderAll();
+    }
+
+    function handleDot(event) {
+        if (phase !== 'guess' || !currentExercise) return;
+        var idx = parseInt(event.currentTarget.getAttribute('data-dot'), 10);
+        if (idx >= 0 && idx < currentExercise.hypothesisImages.length) {
+            viewingHypothesisIndex = idx;
+            renderAll();
+        }
     }
 
     function handleConfirm() {

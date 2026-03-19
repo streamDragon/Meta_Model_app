@@ -111,41 +111,66 @@
     opacity: 1;
 }
 
-/* ─── Carousel Arrows ─────────────────────────── */
-.iids-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-    width: 36px;
-    height: 36px;
-    border: none;
+/* ─── Carousel Navigation (in hyp-bar) ───────── */
+.iids-hyp-nav-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+.iids-nav-arrow {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #6d28d9;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.85);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    font-size: 1.4rem;
+    background: #fff;
+    color: #6d28d9;
+    font-size: 1.3rem;
     line-height: 1;
-    color: #1e293b;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s, box-shadow 0.2s;
+    transition: background 0.2s, color 0.2s;
     font-family: inherit;
 }
 
-.iids-arrow:hover {
+.iids-nav-arrow:hover {
+    background: #6d28d9;
+    color: #fff;
+}
+
+.iids-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.iids-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #6d28d9;
     background: #fff;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s;
 }
 
-/* RTL: right arrow = prev (on the right side), left arrow = next (on the left side) */
-.iids-arrow-right {
-    right: 8px;
+.iids-dot.is-active {
+    background: #6d28d9;
 }
 
-.iids-arrow-left {
-    left: 8px;
+.iids-dot:hover:not(.is-active) {
+    background: #ede9fe;
+}
+
+.iids-hyp-hint {
+    font-size: 0.72rem;
+    color: #6d28d9;
+    font-weight: 600;
+    animation: iids-instruction-pulse 2.5s ease-in-out infinite;
 }
 
 /* ─── Complete state: seamless final image ──────── */
@@ -554,10 +579,10 @@
         font-size: 0.78rem;
     }
 
-    .iids-arrow {
-        width: 30px;
-        height: 30px;
-        font-size: 1.2rem;
+    .iids-nav-arrow {
+        width: 28px;
+        height: 28px;
+        font-size: 1.1rem;
     }
 
     .iids-confirm-btn {
@@ -580,9 +605,14 @@
         display: none;
     }
 
-    .iids-arrow {
-        width: 26px;
-        height: 26px;
-        font-size: 1rem;
+    .iids-nav-arrow {
+        width: 24px;
+        height: 24px;
+        font-size: 0.9rem;
+    }
+
+    .iids-dot {
+        width: 8px;
+        height: 8px;
     }
 }
