@@ -1560,12 +1560,17 @@ function featureActionButtonsHtml(meta) {
         syncFeatureModalState();
     }
     function renderAllFeatures(direction) { MANAGED_TABS.forEach(function (tab) { try { renderFeature(tab, direction); } catch (err) { console.warn('[shell] renderFeature failed for ' + tab, err); } }); }
+    var shellSyncTimer = null;
     function syncShells(direction) {
         try { renderHome(direction || 'forward'); } catch (err) { console.warn('[shell] renderHome failed', err); }
         try { renderAllFeatures(direction || 'forward'); } catch (err) { console.warn('[shell] renderAllFeatures failed', err); }
         try { renderFeatureChromes(); } catch (err) { console.warn('[shell] renderFeatureChromes failed', err); }
         try { syncActiveShellState(); } catch (err) { console.warn('[shell] syncActiveShellState failed', err); }
         try { refreshPracticeCopy(); } catch (err) { console.warn('[shell] refreshPracticeCopy failed', err); }
+    }
+    function debouncedSyncShells(direction) {
+        if (shellSyncTimer) return;
+        shellSyncTimer = setTimeout(function () { shellSyncTimer = null; syncShells(direction || 'forward'); }, 80);
     }
     function spawnStars(anchor) {
         if (!anchor || typeof anchor.getBoundingClientRect !== 'function') return;
@@ -1713,10 +1718,10 @@ function featureActionButtonsHtml(meta) {
             if (event.key === FEATURE_STATE_KEY) featureState = loadFeatureState();
             if (event.key === HOME_VIEW_KEY) homeUi = loadHomeUi();
             if (event.key === PREFS_KEY) { prefs = loadPrefs(); applyPrefs(); }
-            syncShells('forward');
+            debouncedSyncShells('forward');
         });
-        document.addEventListener('visibilitychange', function () { if (document.hidden) return; featureState = loadFeatureState(); homeUi = loadHomeUi(); prefs = loadPrefs(); applyPrefs(); syncShells('forward'); });
-        window.addEventListener('focus', function () { featureState = loadFeatureState(); homeUi = loadHomeUi(); prefs = loadPrefs(); applyPrefs(); syncShells('forward'); });
+        document.addEventListener('visibilitychange', function () { if (document.hidden) return; featureState = loadFeatureState(); homeUi = loadHomeUi(); prefs = loadPrefs(); applyPrefs(); debouncedSyncShells('forward'); });
+        window.addEventListener('focus', function () { featureState = loadFeatureState(); homeUi = loadHomeUi(); prefs = loadPrefs(); applyPrefs(); debouncedSyncShells('forward'); });
     }
     function boot() { applyPrefs(); bindRealtime(); syncShells('forward'); }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true }); else window.setTimeout(boot, 0);

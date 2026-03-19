@@ -3245,33 +3245,43 @@ function setupMojibakeAutoRepair() {
 
     repairMojibakeDomSubtree(repairRoot);
 
+    let mojibakeDebounceTimer = null;
+    let mojibakePendingNodes = new Set();
+
     mojibakeMutationObserver = new MutationObserver((mutations) => {
         if (isApplyingMojibakeRepair) return;
         for (const mutation of mutations) {
-            if (mutation.type === 'characterData') {
-                repairMojibakeDomSubtree(mutation.target);
-                continue;
-            }
             if (mutation.type === 'attributes') {
-                repairMojibakeDomSubtree(mutation.target);
-                continue;
+                mojibakePendingNodes.add(mutation.target);
+            } else {
+                mutation.addedNodes.forEach((node) => mojibakePendingNodes.add(node));
             }
-            mutation.addedNodes.forEach((node) => repairMojibakeDomSubtree(node));
         }
+        if (mojibakeDebounceTimer || !mojibakePendingNodes.size) return;
+        mojibakeDebounceTimer = setTimeout(() => {
+            mojibakeDebounceTimer = null;
+            const nodes = Array.from(mojibakePendingNodes);
+            mojibakePendingNodes.clear();
+            nodes.forEach((node) => repairMojibakeDomSubtree(node));
+        }, 120);
     });
 
     mojibakeMutationObserver.observe(document.body, {
         childList: true,
         subtree: true,
-        characterData: true,
         attributes: true,
         attributeFilter: ['title', 'aria-label', 'placeholder', 'value', 'alt']
     });
 
+    // One-shot delayed safety scan instead of a recurring interval.
+    // The MutationObserver already handles all new/changed content, so a
+    // periodic full-tree walk is not needed and was blocking the main thread
+    // for seconds on large pages, causing "page not responding" dialogs.
     if (!mojibakeSafetyTimer && typeof window !== 'undefined') {
-        mojibakeSafetyTimer = window.setInterval(() => {
+        mojibakeSafetyTimer = window.setTimeout(() => {
+            mojibakeSafetyTimer = null;
             repairMojibakeDomSubtree(document.documentElement || document.body);
-        }, 2400);
+        }, 4000);
     }
 }
 
