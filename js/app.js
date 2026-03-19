@@ -1887,22 +1887,20 @@ function setupGlobalAudioSafety() {
 // Hide Splash Screen
 function hideSplashScreen() {
     const splashScreen = document.getElementById('splash-screen');
-    if (!splashScreen) return;
+    if (!splashScreen || splashScreen.classList.contains('hidden')) return;
 
-    const finalizeHide = () => {
+    // Let the CSS animation finish (splashFadeOut: 0.5s after 1.4s delay),
+    // then fully remove. Total: ~2 seconds of visible splash.
+    splashScreen.style.pointerEvents = 'none';
+    setTimeout(() => {
         splashScreen.classList.add('hidden');
         splashScreen.setAttribute('hidden', 'hidden');
         splashScreen.setAttribute('aria-hidden', 'true');
-        splashScreen.style.pointerEvents = 'none';
         splashScreen.style.display = 'none';
         if (splashScreen.parentNode) {
-            window.setTimeout(() => {
-                if (splashScreen.parentNode) splashScreen.parentNode.removeChild(splashScreen);
-            }, 0);
+            try { splashScreen.parentNode.removeChild(splashScreen); } catch (_e) {}
         }
-    };
-
-    finalizeHide();
+    }, 2200);
 }
 
 function normalizeViewMode(rawMode = '') {

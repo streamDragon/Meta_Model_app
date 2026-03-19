@@ -1724,13 +1724,24 @@ function featureActionButtonsHtml(meta) {
         window.addEventListener('focus', function () { featureState = loadFeatureState(); homeUi = loadHomeUi(); prefs = loadPrefs(); applyPrefs(); debouncedSyncShells('forward'); });
     }
     function boot() {
-        console.log('[shell] boot() start');
+        console.log('[shell] boot() start, container:', !!document.querySelector('.container'), 'body:', !!document.body);
         try { applyPrefs(); } catch (err) { console.error('[shell] applyPrefs failed', err); }
         try { bindRealtime(); } catch (err) { console.error('[shell] bindRealtime failed', err); }
-        try { syncShells('forward'); } catch (err) { console.error('[shell] syncShells failed', err); }
+        try {
+            syncShells('forward');
+        } catch (err) {
+            console.error('[shell] syncShells failed', err);
+        }
         // Fallback: ensure body has shell mode even if rendering partly failed
-        try { if (document.body && !document.body.classList.contains('meta-shell-mode')) { updateBodyState(currentTabName()); } } catch (err) { console.error('[shell] fallback updateBodyState failed', err); }
-        console.log('[shell] boot() done, meta-shell-mode:', document.body && document.body.classList.contains('meta-shell-mode'));
+        try {
+            if (document.body && !document.body.classList.contains('meta-shell-mode')) {
+                updateBodyState(currentTabName());
+            }
+        } catch (err) { console.error('[shell] fallback updateBodyState failed', err); }
+        var hasMode = document.body && document.body.classList.contains('meta-shell-mode');
+        var shellRoot = document.getElementById(SHELL_ROOT_ID);
+        var homeShell = document.getElementById(HOME_SHELL_ID);
+        console.log('[shell] boot() done — meta-shell-mode:', hasMode, 'shellRoot:', !!shellRoot, 'homeShell:', !!homeShell, 'homeShell.children:', homeShell ? homeShell.children.length : 0);
     }
     console.log('[shell] IIFE loaded, readyState:', document.readyState);
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true }); else window.setTimeout(boot, 0);
