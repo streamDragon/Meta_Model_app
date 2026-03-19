@@ -904,6 +904,10 @@ body {
     animation: uiEnter 0.45s ease-out 0.22s backwards;
 }
 
+.hhc-subtitle + .hhc-subtitle {
+    margin-top: 0.6em;
+}
+
 /* Daily challenge widget */
 .hhc-daily-widget {
     display: flex;

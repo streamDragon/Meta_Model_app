@@ -7,64 +7,114 @@
     direction: rtl;
     text-align: right;
     font-family: "Assistant", "Heebo", "Noto Sans Hebrew", "Segoe UI", sans-serif;
-    max-width: 560px;
+    max-width: 680px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     padding: 4px 0;
 }
 
-/* ─── Image label ──────────────────────────────── */
-.iids-image-label {
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: #64748b;
-    letter-spacing: 0.02em;
-    text-align: center;
+/* ═══════════════════════════════════════════════════
+   TOP ROW: image (right) + side controls (left)
+   ═══════════════════════════════════════════════════ */
+.iids-top-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
 }
 
-/* ─── Image Panel (top) ────────────────────────── */
-.iids-image-panel {
-    border-radius: 12px;
+/* ─── Image Column ────────────────────────────── */
+.iids-image-col {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
     overflow: hidden;
     border: 1px solid #e2e8f0;
     background: #f8fafc;
 }
 
-/* ─── Hypothesis Bar ──────────────────────────── */
-.iids-hyp-bar {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1px;
-    padding: 6px 12px 5px;
+.iids-image-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-align: center;
+    padding: 4px 8px;
     background: #f1f5f9;
     border-bottom: 1px solid #e2e8f0;
 }
 
-.iids-hyp-counter {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #94a3b8;
-    letter-spacing: 0.05em;
+/* ─── Hypothesis Bar (carousel controls) ─────── */
+.iids-hyp-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 5px 8px 4px;
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .iids-hyp-label {
-    font-size: 0.95rem;
+    font-size: 0.82rem;
     font-weight: 800;
     color: #1e293b;
 }
 
-.iids-hyp-subtitle {
-    font-size: 0.78rem;
-    color: #64748b;
-    font-weight: 400;
+.iids-hyp-nav-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
 }
 
-/* ─── Grid Wrap (relative container for arrows) ── */
-.iids-grid-wrap {
-    position: relative;
+.iids-nav-arrow {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #6d28d9;
+    border-radius: 50%;
+    background: #fff;
+    color: #6d28d9;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+    font-family: inherit;
+}
+
+.iids-nav-arrow:hover {
+    background: #6d28d9;
+    color: #fff;
+}
+
+.iids-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.iids-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 2px solid #6d28d9;
+    background: #fff;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s;
+}
+
+.iids-dot.is-active {
+    background: #6d28d9;
+}
+
+.iids-dot:hover:not(.is-active) {
+    background: #ede9fe;
 }
 
 /* ─── Image Grid ──────────────────────────────── */
@@ -73,8 +123,9 @@
     grid-template-rows: repeat(var(--iids-grid-rows, 3), 1fr);
     grid-template-columns: repeat(var(--iids-grid-cols, 3), 1fr);
     gap: 2px;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 4 / 3;
     width: 100%;
+    flex: 1;
 }
 
 .iids-tile {
@@ -111,72 +162,10 @@
     opacity: 1;
 }
 
-/* ─── Carousel Navigation (in hyp-bar) ───────── */
-.iids-hyp-nav-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: center;
-}
-
-.iids-nav-arrow {
-    width: 32px;
-    height: 32px;
-    border: 2px solid #6d28d9;
-    border-radius: 50%;
-    background: #fff;
-    color: #6d28d9;
-    font-size: 1.3rem;
-    line-height: 1;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s, color 0.2s;
-    font-family: inherit;
-}
-
-.iids-nav-arrow:hover {
-    background: #6d28d9;
-    color: #fff;
-}
-
-.iids-dots {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.iids-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    border: 2px solid #6d28d9;
-    background: #fff;
-    cursor: pointer;
-    padding: 0;
-    transition: background 0.2s;
-}
-
-.iids-dot.is-active {
-    background: #6d28d9;
-}
-
-.iids-dot:hover:not(.is-active) {
-    background: #ede9fe;
-}
-
-.iids-hyp-hint {
-    font-size: 0.72rem;
-    color: #6d28d9;
-    font-weight: 600;
-    animation: iids-instruction-pulse 2.5s ease-in-out infinite;
-}
-
 /* ─── Complete state: seamless final image ──────── */
 .iids-image-grid.is-complete {
     gap: 0;
-    border-radius: 12px;
+    border-radius: 0 0 10px 10px;
     overflow: hidden;
 }
 
@@ -184,31 +173,107 @@
     border-radius: 0;
 }
 
-/* ─── Confirm Button ──────────────────────────── */
-.iids-confirm-wrap {
+/* ═══════════════════════════════════════════════════
+   SIDE CONTROLS (TV remote style — left of image)
+   ═══════════════════════════════════════════════════ */
+.iids-side-controls {
+    width: 90px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: center;
+}
+
+/* ─── Side Buttons (stacked category buttons) ─── */
+.iids-side-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
-    padding: 6px 12px;
+    justify-content: center;
+    gap: 1px;
+    padding: 10px 6px 8px;
+    border: 2px solid #d1d5db;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.15s;
+    font-family: inherit;
+    flex: 1;
+    min-height: 0;
 }
 
-.iids-guess-instruction {
+.iids-side-btn:hover:not(:disabled) {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transform: scale(1.03);
+}
+
+.iids-side-btn:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.iids-side-btn.is-exhausted {
+    opacity: 0.4;
+    cursor: default;
+    border-color: #e5e7eb;
+}
+
+.iids-side-btn-label {
     font-size: 0.82rem;
-    color: #64748b;
-    text-align: center;
-    line-height: 1.5;
-    margin: 0;
+    font-weight: 800;
+    color: #1e293b;
 }
 
+.iids-side-btn-sub {
+    font-size: 0.62rem;
+    color: #64748b;
+    font-weight: 400;
+}
+
+.iids-side-btn-count {
+    font-size: 0.62rem;
+    color: #94a3b8;
+    font-weight: 600;
+    margin-top: 1px;
+}
+
+/* Category accents for side buttons */
+.iids-side-btn[data-category="deletion"]:not(.is-exhausted) {
+    border-color: #f59e0b;
+}
+.iids-side-btn[data-category="deletion"]:hover:not(:disabled) {
+    background: #fffbeb;
+    border-color: #d97706;
+}
+
+.iids-side-btn[data-category="distortion"]:not(.is-exhausted) {
+    border-color: #8b5cf6;
+}
+.iids-side-btn[data-category="distortion"]:hover:not(:disabled) {
+    background: #f5f3ff;
+    border-color: #7c3aed;
+}
+
+.iids-side-btn[data-category="generalization"]:not(.is-exhausted) {
+    border-color: #10b981;
+}
+.iids-side-btn[data-category="generalization"]:hover:not(:disabled) {
+    background: #ecfdf5;
+    border-color: #059669;
+}
+
+/* ─── Confirm Button (guess phase — in side panel) */
 .iids-confirm-btn {
-    display: inline-block;
-    padding: 10px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 8px;
     border: 2px solid #6d28d9;
     border-radius: 10px;
     background: #fff;
     color: #6d28d9;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
@@ -221,15 +286,19 @@
     box-shadow: 0 2px 10px rgba(109, 40, 217, 0.25);
 }
 
-/* ─── Reveal Instruction ──────────────────────── */
+/* ─── Instruction Lines ──────────────────────── */
+.iids-guess-instruction,
 .iids-reveal-instruction {
-    font-size: 0.88rem;
-    font-weight: 700;
+    font-size: 0.78rem;
+    font-weight: 600;
     color: #6d28d9;
     text-align: center;
     margin: 0;
-    padding: 6px 12px;
-    line-height: 1.5;
+    padding: 2px 8px;
+    line-height: 1.4;
+}
+
+.iids-reveal-instruction {
     animation: iids-instruction-pulse 2s ease-in-out infinite;
 }
 
@@ -238,126 +307,36 @@
     50% { opacity: 0.6; }
 }
 
-/* ─── Action Buttons ───────────────────────────── */
-.iids-actions {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.iids-action-btn {
-    flex: 1 1 0;
-    min-width: 90px;
-    max-width: 170px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1px;
-    padding: 7px 10px 5px;
-    border: 1.5px solid #d1d5db;
-    border-radius: 8px;
-    background: #fff;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-    font-family: inherit;
-}
-
-.iids-action-btn:hover:not(:disabled) {
-    border-color: #6d28d9;
-    background: #f5f3ff;
-    box-shadow: 0 2px 8px rgba(109, 40, 217, 0.1);
-}
-
-.iids-action-btn:active:not(:disabled) {
-    transform: scale(0.97);
-}
-
-.iids-action-btn.is-exhausted {
-    opacity: 0.45;
-    cursor: default;
-    border-color: #e5e7eb;
-}
-
-/* Locked state — guess phase, buttons disabled */
-.iids-action-btn.is-locked {
-    opacity: 0.35;
-    cursor: not-allowed;
-    filter: grayscale(0.6);
-}
-
-.iids-action-label {
-    font-size: 0.95rem;
-    font-weight: 800;
-    color: #1e293b;
-}
-
-.iids-action-sub {
-    font-size: 0.72rem;
-    color: #64748b;
-    font-weight: 400;
-}
-
-.iids-action-count {
-    font-size: 0.7rem;
-    color: #94a3b8;
-    font-weight: 600;
-    margin-top: 2px;
-}
-
-/* category-specific button accents */
-.iids-action-btn[data-category="deletion"]:not(.is-exhausted):not(.is-locked) {
-    border-color: #f59e0b;
-}
-.iids-action-btn[data-category="deletion"]:hover:not(:disabled) {
-    background: #fffbeb;
-    border-color: #d97706;
-}
-
-.iids-action-btn[data-category="distortion"]:not(.is-exhausted):not(.is-locked) {
-    border-color: #8b5cf6;
-}
-.iids-action-btn[data-category="distortion"]:hover:not(:disabled) {
-    background: #f5f3ff;
-    border-color: #7c3aed;
-}
-
-.iids-action-btn[data-category="generalization"]:not(.is-exhausted):not(.is-locked) {
-    border-color: #10b981;
-}
-.iids-action-btn[data-category="generalization"]:hover:not(:disabled) {
-    background: #ecfdf5;
-    border-color: #059669;
-}
-
-/* ─── Text Panel (bottom) ──────────────────────── */
+/* ═══════════════════════════════════════════════════
+   BOTTOM: Text Panel (bigger, clearer)
+   ═══════════════════════════════════════════════════ */
 .iids-text-panel {
     border-radius: 10px;
     border: 1px solid #e2e8f0;
     background: #f8fafc;
-    padding: 8px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
 }
 
 .iids-text-grid {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
 }
 
 .iids-text-cells {
     display: grid;
     grid-template-rows: repeat(var(--iids-text-rows, 3), auto);
     grid-template-columns: repeat(var(--iids-text-cols, 3), 1fr);
-    gap: 4px;
+    gap: 5px;
 }
 
 .iids-text-cell {
-    border-radius: 6px;
-    padding: 6px 6px;
-    min-height: 38px;
+    border-radius: 8px;
+    padding: 8px 8px;
+    min-height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -370,10 +349,10 @@
     background: #1e293b;
     color: #fff;
     font-weight: 700;
-    font-size: 0.82rem;
-    line-height: 1.4;
+    font-size: 0.88rem;
+    line-height: 1.5;
     border-radius: 8px;
-    padding: 8px 10px;
+    padding: 10px 12px;
 }
 
 .iids-core-sentence {
@@ -387,7 +366,7 @@
 }
 
 .iids-slot-placeholder {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #94a3b8;
 }
@@ -399,7 +378,7 @@
 }
 
 .iids-slot-text {
-    font-size: 0.72rem;
+    font-size: 0.76rem;
     line-height: 1.45;
     font-weight: 500;
     color: #1e293b;
@@ -455,10 +434,10 @@
 
 .iids-box-label {
     display: block;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.03em;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     opacity: 0.7;
 }
 
@@ -476,7 +455,7 @@
 
 /* ─── Completion Card ──────────────────────────── */
 .iids-completion {
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 .iids-completion-card {
@@ -488,34 +467,34 @@
 }
 
 .iids-completion-card h3 {
-    margin: 0 0 10px;
-    font-size: 1.1rem;
+    margin: 0 0 8px;
+    font-size: 1rem;
     font-weight: 800;
     color: #4c1d95;
 }
 
 .iids-completion-text {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     line-height: 1.6;
     color: #1e293b;
-    margin: 0 0 12px;
+    margin: 0 0 10px;
 }
 
 .iids-completion-closing {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     color: #475569;
-    margin: 0 0 16px;
+    margin: 0 0 12px;
     font-style: italic;
 }
 
 .iids-restart-btn {
     display: inline-block;
-    padding: 10px 28px;
+    padding: 8px 24px;
     border: none;
     border-radius: 8px;
     background: #6d28d9;
     color: #fff;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
@@ -531,14 +510,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: #64748b;
     font-weight: 600;
 }
 
 .iids-progress-bar {
     flex: 1;
-    height: 6px;
+    height: 5px;
     border-radius: 3px;
     background: #e2e8f0;
     overflow: hidden;
@@ -552,67 +531,68 @@
 }
 
 /* ─── Responsive ───────────────────────────────── */
-@media (max-width: 640px) {
-    .iids-engine-root {
-        gap: 6px;
+@media (max-width: 540px) {
+    .iids-top-row {
+        gap: 5px;
     }
 
-    .iids-action-btn {
-        min-width: 75px;
-        padding: 6px 6px 4px;
+    .iids-side-controls {
+        width: 72px;
     }
 
-    .iids-action-label {
-        font-size: 0.82rem;
+    .iids-side-btn {
+        padding: 8px 4px 6px;
+    }
+
+    .iids-side-btn-label {
+        font-size: 0.75rem;
+    }
+
+    .iids-side-btn-sub {
+        display: none;
     }
 
     .iids-text-cell {
-        padding: 5px 4px;
-        min-height: 34px;
+        padding: 6px 5px;
+        min-height: 40px;
     }
 
     .iids-slot-text {
         font-size: 0.7rem;
     }
 
-    .iids-core-sentence {
-        font-size: 0.78rem;
-    }
-
-    .iids-nav-arrow {
-        width: 28px;
-        height: 28px;
-        font-size: 1.1rem;
-    }
-
-    .iids-confirm-btn {
-        padding: 7px 18px;
+    .iids-text-core {
         font-size: 0.8rem;
-    }
-
-    .iids-reveal-instruction {
-        font-size: 0.8rem;
-        padding: 4px 8px;
-    }
-}
-
-@media (max-width: 400px) {
-    .iids-actions {
-        gap: 4px;
-    }
-
-    .iids-action-sub {
-        display: none;
+        padding: 8px;
     }
 
     .iids-nav-arrow {
         width: 24px;
         height: 24px;
-        font-size: 0.9rem;
+        font-size: 1rem;
+    }
+
+    .iids-confirm-btn {
+        font-size: 0.78rem;
+        padding: 10px 6px;
+    }
+}
+
+@media (max-width: 380px) {
+    .iids-side-controls {
+        width: 60px;
+    }
+
+    .iids-side-btn-count {
+        display: none;
     }
 
     .iids-dot {
-        width: 8px;
-        height: 8px;
+        width: 7px;
+        height: 7px;
+    }
+
+    .iids-dots {
+        gap: 4px;
     }
 }
