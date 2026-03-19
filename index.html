@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.483" data-build-time="1773930435924" data-build-iso="2026-03-19T14:27:15.924Z" data-git-commit="cc3dd5d">
+<html lang="he" dir="rtl" data-app-version="1.0.484" data-build-time="1773932352395" data-build-iso="2026-03-19T14:59:12.395Z" data-git-commit="2757742">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -309,6 +309,7 @@
                 <span class="splash-dot"></span>
                 <span class="splash-dot"></span>
             </div>
+            <p id="splash-boot-stage" style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.5);font-family:monospace">init</p>
         </div>
     </div>
 
@@ -1758,10 +1759,12 @@
         var t0 = Date.now();
         window.__bootStage = 'init';
         window.__bootLog = [];
+        var indicator = document.getElementById('splash-boot-stage');
         window.__setBootStage = function (stage) {
             window.__bootStage = stage;
             window.__bootLog.push({ s: stage, t: Date.now() - t0 });
             document.documentElement.dataset.bootStage = stage;
+            if (indicator) indicator.textContent = stage + ' (' + (Date.now() - t0) + 'ms)';
         };
         window.__setBootStage('init');
     })();
@@ -1771,18 +1774,26 @@
     <script>
     (function () {
         var timerId = setTimeout(function () {
-            if (window.__bootStage === 'app-init' || window.__bootStage === 'shell-boot' || window.__bootStage === 'all-scripts-loaded') return;
+            var stage = window.__bootStage || 'unknown';
+            if (stage === 'app-init' || stage === 'shell-boot' || stage === 'all-scripts-loaded') return;
+            // Force-hide splash
             var splash = document.getElementById('splash-screen');
             if (splash) { splash.style.display = 'none'; splash.setAttribute('hidden', 'hidden'); splash.classList.add('hidden'); }
-            document.body.classList.remove('hide-top-tabbar');
+            // Restore navigation: ensure home tab is visible
+            document.body.classList.remove('hide-top-tabbar', 'meta-shell-mode', 'shell-home-active', 'shell-feature-active');
+            // Ensure the home section is active
+            var home = document.getElementById('home');
+            if (home) home.classList.add('active');
+            document.body.setAttribute('data-active-tab', 'home');
+            // Show status banner
             var b = document.createElement('div');
             b.id = 'boot-failsafe-banner';
             b.setAttribute('role', 'alert');
             b.setAttribute('dir', 'rtl');
-            b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#fff3cd;color:#856404;padding:8px 16px;font-size:14px;text-align:center;border-bottom:1px solid #ffc107;font-family:sans-serif';
-            b.textContent = '\u05D8\u05D5\u05E2\u05DF \u05D0\u05D9\u05D8\u05D9 \u2013 \u05E9\u05DC\u05D1: ' + (window.__bootStage || 'unknown');
+            b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#fff3cd;color:#856404;padding:10px 16px;font-size:14px;text-align:center;border-bottom:2px solid #ffc107;font-family:sans-serif';
+            b.textContent = '\u05D4\u05D0\u05E4\u05DC\u05D9\u05E7\u05E6\u05D9\u05D4 \u05E0\u05D8\u05E2\u05E0\u05EA \u05DC\u05D0\u05D8 \u2013 \u05E9\u05DC\u05D1: ' + stage + ' \u2013 \u05E0\u05E1\u05D4 \u05DC\u05E8\u05E2\u05E0\u05DF (Ctrl+Shift+R)';
             document.body.insertBefore(b, document.body.firstChild);
-            console.warn('[failsafe] Boot stalled at stage:', window.__bootStage, 'Log:', JSON.stringify(window.__bootLog));
+            console.warn('[failsafe] Boot stalled at stage:', stage, 'Log:', JSON.stringify(window.__bootLog));
         }, 5000);
         window.__cancelBootFailsafe = function () {
             clearTimeout(timerId);
