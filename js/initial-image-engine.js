@@ -262,13 +262,13 @@
     // ─── TILE POSITION MATH ──────────────────────────────────
     // For a 3x3 grid with background-size: 300% 300%
     // each tile shows exactly 1/9 of the image.
-    // background-position percentage formula:
-    //   col/(cols-1)*100 , row/(rows-1)*100
-    // This yields 0%, 50%, 100% for indices 0,1,2 which correctly
-    // selects the left/centre/right (or top/centre/bottom) third.
+    // RTL fix: CSS grid lays columns right-to-left in RTL,
+    // so col 0 is visually on the RIGHT. We flip the X axis
+    // so the rightmost tile shows the rightmost part of the image.
 
     function tileBgPos(row, col, rows, cols) {
-        var pctX = cols > 1 ? (col / (cols - 1)) * 100 : 50;
+        var flippedCol = cols - 1 - col; // RTL: flip horizontal
+        var pctX = cols > 1 ? (flippedCol / (cols - 1)) * 100 : 50;
         var pctY = rows > 1 ? (row / (rows - 1)) * 100 : 50;
         return pctX + '% ' + pctY + '%';
     }
