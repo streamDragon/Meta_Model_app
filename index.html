@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.485" data-build-time="1773934878730" data-build-iso="2026-03-19T15:41:18.730Z" data-git-commit="9d79d1c">
+<html lang="he" dir="rtl" data-app-version="1.0.486" data-build-time="1773935142436" data-build-iso="2026-03-19T15:45:42.436Z" data-git-commit="a95670c">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1859,30 +1859,40 @@
             ];
 
             function loadScript(index) {
-                if (index >= scriptQueue.length) {
-                    if (typeof window.__setBootStage === 'function') window.__setBootStage('all-scripts-loaded');
+                var total = scriptQueue.length;
+                if (index >= total) {
+                    if (typeof window.__setBootStage === 'function') window.__setBootStage('all-scripts-loaded', total + ' scripts');
                     return;
                 }
-                if (typeof window.__setBootStage === 'function') window.__setBootStage('script-' + index + ':' + scriptQueue[index]);
+                var path = scriptQueue[index];
+                var label = (index + 1) + '/' + total + ': ' + path;
+                if (typeof window.__setBootStage === 'function') window.__setBootStage('script-' + index, 'loading ' + label);
+                console.log('[boot] loading script', label);
+                var scriptStart = Date.now();
 
                 var script = document.createElement('script');
                 script.async = false;
-                script.src = withAssetVersion(scriptQueue[index]);
+                script.src = withAssetVersion(path);
                 var moved = false;
-                var next = function () {
+                var next = function (status) {
                     if (moved) return;
                     moved = true;
                     clearTimeout(timer);
+                    var elapsed = Date.now() - scriptStart;
+                    console.log('[boot]', status, label, 'in', elapsed + 'ms');
+                    if (typeof window.__setBootStage === 'function') window.__setBootStage('script-' + index + '-done', status + ' ' + label + ' in ' + elapsed + 'ms');
                     loadScript(index + 1);
                 };
                 var timer = setTimeout(function () {
-                    console.warn('[boot] Script timed out after 10s:', scriptQueue[index]);
-                    next();
+                    console.warn('[boot] TIMEOUT script', label, 'after 10000ms');
+                    if (typeof window.__setBootError === 'function') window.__setBootError('TIMEOUT: ' + path + ' after 10s');
+                    next('TIMEOUT');
                 }, 10000);
-                script.onload = next;
+                script.onload = function () { next('loaded'); };
                 script.onerror = function () {
-                    console.error('Failed to load script:', scriptQueue[index]);
-                    next();
+                    console.error('[boot] ERROR script', label);
+                    if (typeof window.__setBootError === 'function') window.__setBootError('FAILED: ' + path);
+                    next('ERROR');
                 };
                 document.body.appendChild(script);
             }
