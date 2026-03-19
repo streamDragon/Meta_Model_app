@@ -1526,3 +1526,120 @@ body.shell-feature-active .tab-content.active {
         align-self: flex-start;
     }
 }
+
+/* ═══════════════════════════════════════════════════
+   Home Entry Gate — primary 3-card entrance
+   ═══════════════════════════════════════════════════ */
+.meta-home-shell__entry-gate {
+    display: grid;
+    gap: 14px;
+}
+
+.meta-home-entry-card {
+    display: grid;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 18px;
+    border: 1.5px solid color-mix(in srgb, var(--meta-feature-accent, #6d28d9) 30%, rgba(15, 23, 42, 0.08));
+    background:
+        radial-gradient(circle at top right, color-mix(in srgb, var(--meta-feature-accent, #6d28d9) 10%, white) 0%, transparent 40%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 248, 246, 0.98));
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.07);
+}
+
+.meta-home-entry-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.meta-home-entry-card__badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: rgba(15, 23, 42, 0.06);
+    color: #334155;
+}
+
+.meta-home-entry-card__badge[data-tone="advanced"] { background: #EEEDFE; color: #3C3489; }
+.meta-home-entry-card__badge[data-tone="intermediate"] { background: #E6F1FB; color: #0C447C; }
+
+.meta-home-entry-card__step {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.04em;
+}
+
+.meta-home-entry-card h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.2rem;
+}
+
+.meta-home-entry-card__subtitle {
+    margin: 0;
+    color: var(--meta-feature-accent, #6d28d9);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.meta-home-entry-card > p {
+    margin: 0;
+    color: #475569;
+    line-height: 1.6;
+    font-size: 0.9rem;
+}
+
+.meta-home-entry-card__cta {
+    justify-self: start;
+    margin-top: 4px;
+}
+
+.meta-home-entry-card--resume {
+    opacity: 0.85;
+}
+
+/* ─── Theory note (collapsible) ────────────────── */
+.meta-home-theory-note {
+    margin-top: 8px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.04);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    cursor: default;
+}
+
+.meta-home-theory-note summary {
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+}
+
+.meta-home-theory-note summary::-webkit-details-marker { display: none; }
+
+.meta-home-theory-note summary::before {
+    content: "▸ ";
+    font-size: 0.8em;
+    color: #94a3b8;
+}
+
+.meta-home-theory-note[open] summary::before {
+    content: "▾ ";
+}
+
+.meta-home-theory-note summary strong {
+    color: #0f172a;
+}
+
+.meta-home-theory-note p {
+    margin: 8px 0 0;
+    color: #475569;
+}
