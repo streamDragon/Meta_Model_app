@@ -5642,9 +5642,8 @@ function initializeMetaModelApp() {
         };
 
         function forceNavigate(tabName) {
-            console.warn('[nav-fallback] forceNavigate →', tabName);
             if (typeof navigateTo === 'function') {
-                try { navigateTo(tabName, { playSound: true, scrollToTop: true, featureEntry: 'welcome' }); return; } catch (e) { console.error('[nav-fallback] navigateTo threw', e); }
+                try { navigateTo(tabName, { playSound: true, scrollToTop: true, featureEntry: 'welcome' }); return; } catch (_e) { /* fall through */ }
             }
             // Ultra-fallback: manually toggle tab sections
             document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));

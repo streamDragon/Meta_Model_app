@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.480" data-build-time="1773926964304" data-build-iso="2026-03-19T13:29:24.304Z" data-git-commit="a082083">
+<html lang="he" dir="rtl" data-app-version="1.0.481" data-build-time="1773927944823" data-build-iso="2026-03-19T13:45:44.823Z" data-git-commit="c542f92">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -731,8 +731,8 @@
                             <p>לזיהוי מהיר של דפוסי מטה-מודל, חיזוק רפלקס שאלת המשך, ועבודה חזרתית על תבניות.</p>
                         </div>
                         <div class="product-family-card__actions">
-                            <button type="button" class="btn btn-primary" data-nav-key="practiceQuestion" onclick="if(window.navigateTo){window.navigateTo('practice-question',{scrollToTop:true,featureEntry:'welcome'})}else{document.querySelectorAll('.tab-content').forEach(function(s){s.classList.remove('active')});var t=document.getElementById('practice-question');if(t)t.classList.add('active');document.body.setAttribute('data-active-tab','practice-question')}">תרגול זיהוי</button>
-                            <button type="button" class="btn btn-secondary" data-nav-key="practiceRadar" onclick="if(window.navigateTo){window.navigateTo('practice-radar',{scrollToTop:true,featureEntry:'welcome'})}else{document.querySelectorAll('.tab-content').forEach(function(s){s.classList.remove('active')});var t=document.getElementById('practice-radar');if(t)t.classList.add('active');document.body.setAttribute('data-active-tab','practice-radar')}">מכ"ם מטה-מודל</button>
+                            <button type="button" class="btn btn-primary" data-nav-key="practiceQuestion">תרגול זיהוי</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="practiceRadar">מכ"ם מטה-מודל</button>
                         </div>
                     </article>
 
@@ -743,7 +743,7 @@
                             <p>כאן מפרקים משפט, הקשר או מושג עמום כדי להבין מה באמת קורה לפני בחירת שאלה או מהלך.</p>
                         </div>
                         <div class="product-family-card__actions">
-                            <button type="button" class="btn btn-primary" data-nav-key="sentenceMap" onclick="if(window.navigateTo){window.navigateTo('sentence-map',{scrollToTop:true,featureEntry:'welcome'})}else{document.querySelectorAll('.tab-content').forEach(function(s){s.classList.remove('active')});var t=document.getElementById('sentence-map');if(t)t.classList.add('active');document.body.setAttribute('data-active-tab','sentence-map')}">מפת המשפט</button>
+                            <button type="button" class="btn btn-primary" data-nav-key="sentenceMap">מפת המשפט</button>
                             <a class="btn btn-secondary" href="prism_research_trainer.html" data-versioned-href="prism_research_trainer.html">מחקר פריזמות</a>
                         </div>
                     </article>
@@ -1843,65 +1843,6 @@
         })();
     </script>
 
-    <!-- EMERGENCY NAV FALLBACK: runs after 6s, zero deps on any module -->
-    <script>
-    /* Click diagnostic: shows visible red flash on ANY click — remove after debugging */
-    document.addEventListener('click', function(e) {
-        var d = document.createElement('div');
-        d.textContent = 'CLICK: ' + (e.target.tagName || '?') + ' ' + (e.target.textContent || '').substring(0,30);
-        d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:999999;background:red;color:white;padding:8px;text-align:center;font-size:16px;font-weight:bold';
-        document.body.appendChild(d);
-        setTimeout(function() { d.remove(); }, 2000);
-    }, true);
-    </script>
-
-    <script>
-    (function emergencyNavFallback() {
-        var KEY_TO_TAB = {
-            home:'home', sentenceMap:'sentence-map', about:'about',
-            categories:'categories', prismLab:'prismlab', blueprint:'blueprint',
-            comicEngine:'comic-engine', practiceQuestion:'practice-question',
-            practiceRadar:'practice-radar', practiceTriplesRadar:'practice-triples-radar',
-            practiceWizard:'practice-wizard', practiceVerbUnzip:'practice-verb-unzip',
-            initialImageVsDeepStructure:'initial-image-vs-deep-structure'
-        };
-        var armed = false;
-
-        function arm() {
-            if (armed) return;
-            armed = true;
-            document.addEventListener('click', function (e) {
-                var el = e.target;
-                if (!el || typeof el.closest !== 'function') return;
-                var navEl = el.closest('[data-nav-key]');
-                if (!navEl) return;
-                var key = navEl.getAttribute('data-nav-key');
-                var tab = KEY_TO_TAB[key];
-                if (!tab) return;
-                e.preventDefault();
-                console.log('[emergency-nav] click:', key, '→', tab);
-                if (typeof window.navigateTo === 'function') {
-                    try { window.navigateTo(tab, {scrollToTop:true, featureEntry:'welcome'}); return; } catch(err) { console.error('[emergency-nav]', err); }
-                }
-                // Ultra-fallback: raw tab switch
-                var sections = document.querySelectorAll('.tab-content');
-                for (var i = 0; i < sections.length; i++) sections[i].classList.remove('active');
-                var target = document.getElementById(tab);
-                if (target) target.classList.add('active');
-                if (document.body) document.body.setAttribute('data-active-tab', tab);
-            }, true);
-        }
-
-        // Arm after 6 seconds — gives normal handlers time to bind first
-        setTimeout(arm, 6000);
-        // Also arm on any click if not already armed after 2s
-        setTimeout(function() {
-            document.addEventListener('click', function once() {
-                document.removeEventListener('click', once, true);
-                arm();
-            }, true);
-        }, 2000);
-    })();
     </script>
 </body>
 </html>
