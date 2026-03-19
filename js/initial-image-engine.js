@@ -1,9 +1,9 @@
 /**
  * Initial Image vs Deep Structure Engine
- * תמונה ראשונית מול מבנה עומק
+ * מתמונת שטח למבנה עומק
  *
- * Practice screen for the surface-to-deep-structure training feature.
- * Data-driven: exercises are defined in EXERCISES array below.
+ * Three-phase engine: guess → reveal → complete
+ * Data-driven: exercises defined in EXERCISES array below.
  */
 (function attachInitialImageEngine(window, document) {
     'use strict';
@@ -11,18 +11,38 @@
     window.__initialImageEngineAttached = true;
 
     var ROOT_ID = 'initial-image-engine-root';
-    var STORAGE_KEY = 'initial_image_deep_state_v1';
+    var STORAGE_KEY = 'initial_image_deep_state_v2';
     var CSS_PREFIX = 'iids';
 
     // ─── EXERCISE DATA ───────────────────────────────────────
     var EXERCISES = [
         {
-            id: 'initial-image-vs-deep-structure-anger-01',
+            id: 'initial-image-vs-deep-structure-couple-01',
             feature: 'initial-image-vs-deep-structure',
-            title: 'תמונה ראשונית מול מבנה עומק',
-            originalSentence: 'הוא הרגיז אותי אז צרחתי עליו',
-            imageA: 'assets/images/initial-image-vs-deep-structure/anger_initial.jpg',
-            imageB: 'assets/images/initial-image-vs-deep-structure/anger_deep.jpg',
+            title: 'מתמונת שטח למבנה עומק',
+            originalSentence: 'כשהיא אמרה את זה ככה, הרגשתי מושפל ופשוט נאטמתי.',
+            subjectName: 'אורי',
+            hypothesisImages: [
+                {
+                    id: 'h1',
+                    label: 'היא תוקפת אותו',
+                    subtitle: 'הוא חווה אותה כתוקפת ומאשימה',
+                    image: 'assets/images/initial-image-vs-deep-structure/couples_scene/couple_guess_1.jpg'
+                },
+                {
+                    id: 'h2',
+                    label: 'היא משפילה אותו',
+                    subtitle: 'ביקורת נחווית אצלו כהשפלה',
+                    image: 'assets/images/initial-image-vs-deep-structure/couples_scene/couple_guess_2.jpg'
+                },
+                {
+                    id: 'h3',
+                    label: 'אין לו סיכוי מולה',
+                    subtitle: 'מולה הוא מרגיש שאין תשובה נכונה',
+                    image: 'assets/images/initial-image-vs-deep-structure/couples_scene/couple_guess_3.jpg'
+                }
+            ],
+            truthImage: 'assets/images/initial-image-vs-deep-structure/couples_scene/couple_truth.jpg',
             imageGrid: { rows: 3, cols: 3 },
             textSlots: [
                 { id: 'd1', category: 'deletion', order: 1, row: 0, col: 0 },
@@ -39,97 +59,91 @@
                 deletion: [
                     {
                         id: 'deletion-1',
-                        text: 'כשדיבר אליי בטון מסוים',
-                        question: 'אחרי מה זה קרה? מה היה ההקשר המדויק?',
-                        rationale: 'השאלה מחזירה את ההקשר שנמחק, כדי שהמשפט לא יישמע כאילו הופיע בלי סיבה ובלי רצף.',
-                        targetTextSlot: 'd1',
-                        targetImageTiles: [0]
+                        text: 'היא אמרה: ״אי אפשר לדבר איתך על שום דבר רציני.״',
+                        question: 'מה בדיוק היא אמרה שגרם לך להיסגר?',
+                        rationale: 'השאלה מחזירה את המשפט המדויק במקום הכותרת הכללית ״היא השפילה אותי״.',
+                        targetTextSlot: 'd1'
                     },
                     {
                         id: 'deletion-2',
-                        text: 'ואני לא פירקתי מה בדיוק קרה',
-                        question: 'מה בדיוק הוא עשה או אמר?',
-                        rationale: 'השאלה מחליפה כותרת כללית כמו \'הרגיז\' בתיאור מדויק יותר של מה שקרה בפועל.',
-                        targetTextSlot: 'd2',
-                        targetImageTiles: [1]
+                        text: 'זה היה בערב, אחרי כמה ימים של מתח בינינו.',
+                        question: 'באיזה הקשר זה קרה?',
+                        rationale: 'הקשר מחזיר רצף ונותן עומק למה שנשמע קודם כמו אירוע מבודד.',
+                        targetTextSlot: 'd2'
                     },
                     {
                         id: 'deletion-3',
-                        text: 'וגם לא שמתי לב מה קרה לי בגוף',
+                        text: 'באותו רגע הגוף שלי נסגר והלב התחיל לדפוק.',
                         question: 'מה קרה לך בפנים באותו רגע?',
-                        rationale: 'השאלה מחזירה את החוויה הפנימית שנמחקה מן המשפט, כי לעיתים שם נמצאת חוליה קריטית להבנה.',
-                        targetTextSlot: 'd3',
-                        targetImageTiles: [6]
+                        rationale: 'השאלה מחזירה את החוויה הפנימית שהושמטה מהמשפט.',
+                        targetTextSlot: 'd3'
                     }
                 ],
                 distortion: [
                     {
                         id: 'distortion-1',
-                        text: 'פירשתי את זה כהשפלה',
-                        question: 'איך זה נהיה אצלך השפלה?',
-                        rationale: 'השאלה מפרידה בין מה שקרה בפועל לבין המשמעות שנבנתה סביבו בתוך עולמו של האדם.',
-                        targetTextSlot: 'x1',
-                        targetImageTiles: [2]
+                        text: 'לא שמעתי בזה רק תסכול — שמעתי בזה שאני קטן ולא ראוי.',
+                        question: 'איך זה נהיה אצלך השפלה ולא רק ביקורת?',
+                        rationale: 'כאן נחשף הפירוש שנכנס בין מה שהיא אמרה לבין מה שהוא הרגיש.',
+                        targetTextSlot: 'x1'
                     },
                     {
                         id: 'distortion-2',
-                        text: 'הרגשתי שאני קטן וחסר אונים',
-                        question: 'מה זה גרם לך להרגיש על עצמך?',
-                        rationale: 'השאלה חושפת את התרגום האישי שהאירוע קיבל ואת הדרך שבה הוא פגע בתחושת העצמי.',
-                        targetTextSlot: 'x2',
-                        targetImageTiles: [3]
+                        text: 'אצלי ביקורת בלי ריכוך נחווית כמעט מיד כהשפלה.',
+                        question: 'איזה כלל פנימי הופך ביקורת להשפלה?',
+                        rationale: 'השאלה חושפת את העיוות: הביקורת נחווית כאמירה על הערך העצמי.',
+                        targetTextSlot: 'x2'
                     },
                     {
                         id: 'distortion-3',
-                        text: 'ובתוכי זה נהיה כאילו חייבים להחזיר כוח',
-                        question: 'איך זה נהיה אצלך משהו שחייבים להגיב אליו כך?',
-                        rationale: 'השאלה חושפת את המעבר ממשמעות רגשית לתחושת הכרח פנימית.',
-                        targetTextSlot: 'x3',
-                        targetImageTiles: [7]
+                        text: 'בתוכי זה נהיה כאילו היא לא מדברת איתי — אלא פוסקת על הערך שלי.',
+                        question: 'מה המשמעות שנתת למילים שלה?',
+                        rationale: 'השאלה מפרידה בין דבריה לבין המשמעות שהוא בנה סביבם.',
+                        targetTextSlot: 'x3'
                     }
                 ],
                 generalization: [
                     {
                         id: 'generalization-1',
-                        text: 'כי אצלי כשמשפילים אותי אסור להישאר חלש',
-                        question: 'איזה חוק פעל אצלך במצב הזה?',
-                        rationale: 'השאלה מחפשת את החוק הרחב או הכלל הפנימי שפועלים מאחורי התגובה.',
-                        targetTextSlot: 'g1',
-                        targetImageTiles: [5]
+                        text: 'יש בי כלל ישן: כשאישה מאוכזבת ממני, עדיף להיסגר.',
+                        question: 'איזה חוק פעל אצלך ברגע הזה?',
+                        rationale: 'כאן מתגלה הכלל הרחב שמכוון את התגובה.',
+                        targetTextSlot: 'g1'
                     },
                     {
                         id: 'generalization-2',
-                        text: 'ובתור ילד זו הייתה דרך מוכרת להגן על עצמי',
-                        question: 'מאיפה למדת שזו הדרך להגיב?',
-                        rationale: 'השאלה מחפשת את מקור הדפוס ומראה שהתגובה נשענת על למידה קודמת, לא רק על הרגע הנוכחי.',
-                        targetTextSlot: 'g2',
-                        targetImageTiles: [8]
+                        text: 'אני מכיר את התחושה הזו ממקומות מוקדמים שבהם לא היה לי איך לענות.',
+                        question: 'מאיפה הדפוס הזה מוכר לך?',
+                        rationale: 'השאלה מחברת את ההווה לדפוס ישן ולא משאירה הכול רק בזוגיות העכשווית.',
+                        targetTextSlot: 'g2'
                     },
                     {
                         id: 'generalization-3',
-                        text: 'ולכן הצעקה הרגישה כמעט בלתי נמנעת',
-                        question: 'איך זה נהיה משהו שמרגיש כאילו אין דרך אחרת?',
-                        rationale: 'השאלה עוזרת לחשוף שה\'הכרח\' הוא מבנה פנימי שנבנה, ולא חוק טבע.',
-                        targetTextSlot: 'g3',
-                        targetImageTiles: [4]
+                        text: 'לכן השתיקה הרגישה לא כמו בחירה, אלא כמו מנגנון ישן שקפץ לבד.',
+                        question: 'איך זה נהיה כמעט בלתי נמנע?',
+                        rationale: 'כאן רואים שה״אין ברירה״ הוא מבנה פנימי, לא חוק טבע.',
+                        targetTextSlot: 'g3'
                     }
                 ]
             },
             completionPrompt: {
-                title: 'עכשיו התמונה רחבה יותר',
-                text: 'מה אתה מבין עכשיו שלא היה ברור לפני החקירה? איך השתנתה ההבנה שלך לגבי המשפט ולגבי האדם שאמר אותו?',
-                closing: 'הגעת למבנה עומק רחב יותר. עכשיו אפשר להמשיך את הטיפול מתוך הבנה מדויקת יותר.'
+                title: 'עכשיו רואים את המעבר מן החוץ אל הפנים',
+                text: 'מה התברר עכשיו על הפירוש, על החוק הפנימי, ועל החלק המופעל שלא היה נראה במשפט המקורי?',
+                closing: 'המטרה כאן איננה לבטל את החוויה החיצונית, אלא לראות איך היא נשענת על מבנה עומק שאפשר להבין, לשאול עליו, ולעבוד איתו טיפולית.'
             }
         }
     ];
 
     // ─── STATE ────────────────────────────────────────────────
     var currentExercise = null;
-    var revealedIds = [];      // ids of revealed items
-    var currentReveal = null;  // last revealed item (for yellow/blue boxes)
-    var revealedTileIndexes = [];  // tile indices that have been flipped to imageB
-    var tileRevealOrder = [];      // shuffled [0..8] for random tile reveal
-    var pendingTileReveal = -1;    // tile index currently being animated (excluded from .is-revealed in HTML, added after paint)
+    var phase = 'guess';                   // 'guess' | 'reveal' | 'complete'
+    var selectedHypothesisIndex = -1;      // confirmed choice
+    var viewingHypothesisIndex = 0;        // currently browsed
+    var revealedIds = [];
+    var currentReveal = null;
+    var revealedTileIndexes = [];
+    var tileRevealOrder = [];
+    var pendingTileReveal = -1;
     var rootEl = null;
     var mounted = false;
 
@@ -210,10 +224,26 @@
         return revealedTileIndexes.indexOf(tileIndex) !== -1;
     }
 
+    function getActiveImage() {
+        if (!currentExercise) return '';
+        if (phase === 'guess') {
+            var hyps = currentExercise.hypothesisImages;
+            var idx = viewingHypothesisIndex >= 0 && viewingHypothesisIndex < hyps.length ? viewingHypothesisIndex : 0;
+            return hyps[idx].image;
+        }
+        // reveal / complete: use selected hypothesis
+        var hyps2 = currentExercise.hypothesisImages;
+        var si = selectedHypothesisIndex >= 0 && selectedHypothesisIndex < hyps2.length ? selectedHypothesisIndex : 0;
+        return hyps2[si].image;
+    }
+
     function saveState() {
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify({
                 exerciseId: currentExercise ? currentExercise.id : null,
+                phase: phase,
+                selectedHypothesisIndex: selectedHypothesisIndex,
+                viewingHypothesisIndex: viewingHypothesisIndex,
                 revealedIds: revealedIds,
                 currentRevealId: currentReveal ? currentReveal.id : null,
                 revealedTileIndexes: revealedTileIndexes,
@@ -229,60 +259,115 @@
         } catch (e) { return null; }
     }
 
+    // ─── TILE POSITION MATH ──────────────────────────────────
+    // For a 3x3 grid with background-size: 300% 300%
+    // each tile shows exactly 1/9 of the image.
+    // background-position percentage formula:
+    //   col/(cols-1)*100 , row/(rows-1)*100
+    // This yields 0%, 50%, 100% for indices 0,1,2 which correctly
+    // selects the left/centre/right (or top/centre/bottom) third.
+
+    function tileBgPos(row, col, rows, cols) {
+        var pctX = cols > 1 ? (col / (cols - 1)) * 100 : 50;
+        var pctY = rows > 1 ? (row / (rows - 1)) * 100 : 50;
+        return pctX + '% ' + pctY + '%';
+    }
+
     // ─── RENDER ───────────────────────────────────────────────
     function renderAll() {
         if (!rootEl || !currentExercise) return;
         var ex = currentExercise;
         var grid = ex.imageGrid;
         var totalTiles = grid.rows * grid.cols;
-        var complete = isComplete();
+        var complete = phase === 'complete';
 
         var html = [];
+        var hyps = ex.hypothesisImages;
+        var viewIdx = viewingHypothesisIndex;
+        if (viewIdx < 0 || viewIdx >= hyps.length) viewIdx = 0;
 
         // ── Image panel label
-        html.push('<div class="' + CSS_PREFIX + '-image-label">' + esc(complete ? 'התמונה נחשפת מחדש' : 'התמונה הראשונית') + '</div>');
+        var labelText = complete ? 'מבנה העומק נחשף' : (phase === 'guess' ? 'תמונת השטח הנוכחית' : 'כאן המבנה העמוק מתחיל להיחשף');
+        html.push('<div class="' + CSS_PREFIX + '-image-label">' + esc(labelText) + '</div>');
 
-        // ── Top panel: image grid
+        // ── Top panel: image grid + optional carousel arrows
         html.push('<div class="' + CSS_PREFIX + '-image-panel">');
-        var resolvedImageA = resolveAssetPath(ex.imageA);
-        var resolvedImageB = resolveAssetPath(ex.imageB);
+
+        // Hypothesis info bar (guess phase only)
+        if (phase === 'guess') {
+            html.push(
+                '<div class="' + CSS_PREFIX + '-hyp-bar">' +
+                '<span class="' + CSS_PREFIX + '-hyp-counter">' + (viewIdx + 1) + ' / ' + hyps.length + '</span>' +
+                '<span class="' + CSS_PREFIX + '-hyp-label">' + esc(hyps[viewIdx].label) + '</span>' +
+                '<span class="' + CSS_PREFIX + '-hyp-subtitle">' + esc(hyps[viewIdx].subtitle) + '</span>' +
+                '</div>'
+            );
+        }
+
+        // The grid itself
+        var resolvedSurface = resolveAssetPath(getActiveImage());
+        var resolvedTruth = resolveAssetPath(ex.truthImage);
+
+        html.push('<div class="' + CSS_PREFIX + '-grid-wrap">');
+
+        // Arrows (guess phase)
+        if (phase === 'guess' && hyps.length > 1) {
+            html.push('<button type="button" class="' + CSS_PREFIX + '-arrow ' + CSS_PREFIX + '-arrow-right" data-dir="prev" aria-label="הקודם">&rsaquo;</button>');
+            html.push('<button type="button" class="' + CSS_PREFIX + '-arrow ' + CSS_PREFIX + '-arrow-left" data-dir="next" aria-label="הבא">&lsaquo;</button>');
+        }
+
         html.push('<div class="' + CSS_PREFIX + '-image-grid' + (complete ? ' is-complete' : '') + '" style="--iids-grid-rows:' + grid.rows + ';--iids-grid-cols:' + grid.cols + ';">');
+
         var capturedPending = pendingTileReveal;
         pendingTileReveal = -1;
+
         for (var t = 0; t < totalTiles; t++) {
-            // Pending tile: render WITHOUT .is-revealed so CSS transition can fire after paint
-            var revealed = isTileRevealed(t) && t !== capturedPending;
+            var tileIsRevealed = isTileRevealed(t) && t !== capturedPending;
             var row = Math.floor(t / grid.cols);
             var col = t % grid.cols;
-            var pctX = grid.cols > 1 ? (col / (grid.cols - 1)) * 100 : 50;
-            var pctY = grid.rows > 1 ? (row / (grid.rows - 1)) * 100 : 50;
+            var bgPos = tileBgPos(row, col, grid.rows, grid.cols);
             html.push(
-                '<div class="' + CSS_PREFIX + '-tile' + (revealed ? ' is-revealed' : '') + '" data-tile="' + t + '">' +
+                '<div class="' + CSS_PREFIX + '-tile' + (tileIsRevealed ? ' is-revealed' : '') + '" data-tile="' + t + '">' +
                 '<div class="' + CSS_PREFIX + '-tile-inner">' +
-                '<div class="' + CSS_PREFIX + '-tile-face ' + CSS_PREFIX + '-tile-a" style="background-image:url(\'' + esc(resolvedImageA) + '\');background-position:' + pctX + '% ' + pctY + '%;"></div>' +
-                '<div class="' + CSS_PREFIX + '-tile-face ' + CSS_PREFIX + '-tile-b" style="background-image:url(\'' + esc(resolvedImageB) + '\');background-position:' + pctX + '% ' + pctY + '%;"></div>' +
+                '<div class="' + CSS_PREFIX + '-tile-face ' + CSS_PREFIX + '-tile-a" style="background-image:url(\'' + esc(resolvedSurface) + '\');background-position:' + bgPos + ';"></div>' +
+                '<div class="' + CSS_PREFIX + '-tile-face ' + CSS_PREFIX + '-tile-b" style="background-image:url(\'' + esc(resolvedTruth) + '\');background-position:' + bgPos + ';"></div>' +
                 '</div></div>'
             );
         }
-        html.push('</div></div>');
+        html.push('</div>'); // grid
+        html.push('</div>'); // grid-wrap
+        html.push('</div>'); // image-panel
+
+        // ── Confirm button (guess phase)
+        if (phase === 'guess') {
+            html.push(
+                '<div class="' + CSS_PREFIX + '-confirm-wrap">' +
+                '<p class="' + CSS_PREFIX + '-guess-instruction">' + esc('עברו בין שלוש תמונות השטח, בחרו את זו שנראית הכי קרובה לפירוש הגלוי, ואז התחילו לחשוף את מבנה העומק.') + '</p>' +
+                '<button type="button" class="' + CSS_PREFIX + '-confirm-btn">' + esc('זה הפירוש הגלוי שאני רואה') + '</button>' +
+                '</div>'
+            );
+        }
 
         // ── Action buttons
         var categories = [
-            { key: 'deletion', label: 'השמטה', sub: 'מה חסר כאן?' },
+            { key: 'deletion', label: 'השמטה', sub: 'מה חסר במפה?' },
             { key: 'distortion', label: 'עיוות', sub: 'איזה פירוש נכנס?' },
             { key: 'generalization', label: 'הכללה', sub: 'איזה כלל פועל כאן?' }
         ];
+        var revealDisabled = phase === 'guess';
         html.push('<div class="' + CSS_PREFIX + '-actions">');
         for (var b = 0; b < categories.length; b++) {
             var cat = categories[b];
             var catReveals = (ex.reveals[cat.key] || []).length;
             var catDone = getRevealedCount(cat.key);
             var catExhausted = catDone >= catReveals;
+            var btnDisabled = revealDisabled || catExhausted;
             html.push(
                 '<button type="button" class="' + CSS_PREFIX + '-action-btn' +
                 (catExhausted ? ' is-exhausted' : '') +
+                (revealDisabled ? ' is-locked' : '') +
                 '" data-category="' + cat.key + '"' +
-                (catExhausted ? ' disabled' : '') + '>' +
+                (btnDisabled ? ' disabled' : '') + '>' +
                 '<span class="' + CSS_PREFIX + '-action-label">' + esc(cat.label) + '</span>' +
                 '<span class="' + CSS_PREFIX + '-action-sub">' + esc(cat.sub) + '</span>' +
                 '<span class="' + CSS_PREFIX + '-action-count">' + catDone + '/' + catReveals + '</span>' +
@@ -291,15 +376,13 @@
         }
         html.push('</div>');
 
-        // ── Bottom panel: core sentence + text grid
+        // ── Core sentence + text grid
         html.push('<div class="' + CSS_PREFIX + '-text-panel">');
-        // Core sentence above the grid
         html.push(
             '<div class="' + CSS_PREFIX + '-text-cell ' + CSS_PREFIX + '-text-core">' +
             '<span class="' + CSS_PREFIX + '-core-sentence">' + esc(ex.originalSentence) + '</span>' +
             '</div>'
         );
-        // Reveal slots grid (all non-core)
         html.push('<div class="' + CSS_PREFIX + '-text-grid">');
         var slots = ex.textSlots;
         var maxRow = 0; var maxCol = 0;
@@ -307,9 +390,7 @@
             if (slots[s].row > maxRow) maxRow = slots[s].row;
             if (slots[s].col > maxCol) maxCol = slots[s].col;
         }
-        var textRows = maxRow + 1;
-        var textCols = maxCol + 1;
-        html.push('<div class="' + CSS_PREFIX + '-text-cells" style="--iids-text-rows:' + textRows + ';--iids-text-cols:' + textCols + ';">');
+        html.push('<div class="' + CSS_PREFIX + '-text-cells" style="--iids-text-rows:' + (maxRow + 1) + ';--iids-text-cols:' + (maxCol + 1) + ';">');
         for (var si = 0; si < slots.length; si++) {
             var slot = slots[si];
             var revealData = isSlotRevealed(slot.id);
@@ -324,26 +405,35 @@
         }
         html.push('</div></div></div>');
 
-        // ── Yellow box (question) and blue box (rationale)
-        if (currentReveal && !complete) {
+        // ── Yellow / blue info boxes
+        if (phase === 'reveal' && currentReveal && !complete) {
             html.push(
                 '<div class="' + CSS_PREFIX + '-info-boxes">' +
                 '<div class="' + CSS_PREFIX + '-box-yellow">' +
-                '<span class="' + CSS_PREFIX + '-box-label">השאלה שנשאלת עכשיו</span>' +
+                '<span class="' + CSS_PREFIX + '-box-label">שאלת העומק הנוכחית</span>' +
                 '<p>' + esc(currentReveal.question) + '</p>' +
                 '</div>' +
                 '<div class="' + CSS_PREFIX + '-box-blue">' +
-                '<span class="' + CSS_PREFIX + '-box-label">למה השאלה הזו</span>' +
+                '<span class="' + CSS_PREFIX + '-box-label">מה השאלה הזאת מחזירה למפה</span>' +
                 '<p>' + esc(currentReveal.rationale) + '</p>' +
                 '</div>' +
                 '</div>'
             );
-        } else if (!currentReveal && !complete) {
+        } else if (phase === 'reveal' && !currentReveal && !complete) {
             html.push(
                 '<div class="' + CSS_PREFIX + '-info-boxes">' +
                 '<div class="' + CSS_PREFIX + '-box-yellow ' + CSS_PREFIX + '-box-initial">' +
-                '<span class="' + CSS_PREFIX + '-box-label">התחילו לחקור</span>' +
-                '<p>לחצו על אחד מהכפתורים למעלה כדי להתחיל לחשוף את מבנה העומק.</p>' +
+                '<span class="' + CSS_PREFIX + '-box-label">לפני שמתחילים</span>' +
+                '<p>עוד לפני ששואלים, המוח כבר משלים: מי אשם, מה הכוונה, ומה ״ברור״ שקרה. כאן מנסים לעצור רגע לפני הסגירה.</p>' +
+                '</div>' +
+                '</div>'
+            );
+        } else if (phase === 'guess') {
+            html.push(
+                '<div class="' + CSS_PREFIX + '-info-boxes">' +
+                '<div class="' + CSS_PREFIX + '-box-yellow ' + CSS_PREFIX + '-box-initial">' +
+                '<span class="' + CSS_PREFIX + '-box-label">לפני שמתחילים</span>' +
+                '<p>בחרו קודם את תמונת השטח. אחר כך התחילו לחשוף מה חסר, איזה פירוש נכנס, ואיזה חוק פנימי פועל מאחורי התגובה.</p>' +
                 '</div>' +
                 '</div>'
             );
@@ -364,7 +454,7 @@
             );
         }
 
-        // ── Progress indicator
+        // ── Progress
         html.push(
             '<div class="' + CSS_PREFIX + '-progress">' +
             '<span>' + revealedIds.length + ' / ' + getTotalReveals() + ' חשיפות</span>' +
@@ -374,8 +464,7 @@
 
         rootEl.innerHTML = html.join('');
 
-        // ── Trigger CSS transition for the pending (just-revealed) tile
-        // capturedPending is the tile that was rendered WITHOUT .is-revealed so we can animate it
+        // ── Trigger CSS transition for pending tile
         if (capturedPending >= 0) {
             (function (idx) {
                 requestAnimationFrame(function () {
@@ -388,34 +477,60 @@
             })(capturedPending);
         }
 
-        // ── Bind events
         bindEvents();
     }
 
+    // ─── EVENTS ──────────────────────────────────────────────
     function bindEvents() {
         if (!rootEl) return;
 
-        // Action buttons
+        // Category reveal buttons
         var btns = rootEl.querySelectorAll('.' + CSS_PREFIX + '-action-btn');
         for (var i = 0; i < btns.length; i++) {
             btns[i].addEventListener('click', handleCategoryClick);
         }
 
+        // Confirm button
+        var confirmBtn = rootEl.querySelector('.' + CSS_PREFIX + '-confirm-btn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', handleConfirm);
+        }
+
+        // Arrows
+        var arrows = rootEl.querySelectorAll('.' + CSS_PREFIX + '-arrow');
+        for (var a = 0; a < arrows.length; a++) {
+            arrows[a].addEventListener('click', handleArrow);
+        }
+
         // Restart button
         var restartBtn = rootEl.querySelector('.' + CSS_PREFIX + '-restart-btn');
         if (restartBtn) {
-            restartBtn.addEventListener('click', function () {
-                revealedIds = [];
-                revealedTileIndexes = [];
-                currentReveal = null;
-                initTileRevealOrder();
-                saveState();
-                renderAll();
-            });
+            restartBtn.addEventListener('click', handleRestart);
         }
     }
 
+    function handleArrow(event) {
+        if (phase !== 'guess' || !currentExercise) return;
+        var dir = event.currentTarget.getAttribute('data-dir');
+        var len = currentExercise.hypothesisImages.length;
+        if (dir === 'next') {
+            viewingHypothesisIndex = (viewingHypothesisIndex + 1) % len;
+        } else {
+            viewingHypothesisIndex = (viewingHypothesisIndex - 1 + len) % len;
+        }
+        renderAll();
+    }
+
+    function handleConfirm() {
+        if (phase !== 'guess') return;
+        selectedHypothesisIndex = viewingHypothesisIndex;
+        phase = 'reveal';
+        saveState();
+        renderAll();
+    }
+
     function handleCategoryClick(event) {
+        if (phase !== 'reveal') return;
         var btn = event.currentTarget;
         var category = btn.getAttribute('data-category');
         if (!category) return;
@@ -426,23 +541,26 @@
         revealedIds.push(reveal.id);
         currentReveal = reveal;
 
-        // Reveal next random tile and mark it as pending for CSS animation
+        // Reveal next random tile
         var tileIdx = revealedTileIndexes.length;
         if (tileIdx < tileRevealOrder.length) {
             revealedTileIndexes.push(tileRevealOrder[tileIdx]);
             pendingTileReveal = tileRevealOrder[tileIdx];
         }
 
+        // Check completion
+        if (isComplete()) {
+            phase = 'complete';
+        }
+
         saveState();
 
-        // Award XP if gamification is available
         if (typeof window.awardMetaGamificationXp === 'function') {
             window.awardMetaGamificationXp(5, 'initial-image-vs-deep-structure');
         }
 
         renderAll();
 
-        // Smooth scroll to info boxes after reveal
         var infoBoxes = rootEl.querySelector('.' + CSS_PREFIX + '-info-boxes');
         if (infoBoxes) {
             setTimeout(function () {
@@ -451,18 +569,33 @@
         }
     }
 
+    function handleRestart() {
+        phase = 'guess';
+        selectedHypothesisIndex = -1;
+        viewingHypothesisIndex = 0;
+        revealedIds = [];
+        revealedTileIndexes = [];
+        currentReveal = null;
+        pendingTileReveal = -1;
+        initTileRevealOrder();
+        saveState();
+        renderAll();
+    }
+
     // ─── MOUNT ────────────────────────────────────────────────
     function mount() {
         rootEl = document.getElementById(ROOT_ID);
         if (!rootEl || mounted) return;
         mounted = true;
 
-        // Pick exercise (first for now; expandable later)
         currentExercise = EXERCISES[0];
 
-        // Restore state if available
+        // Restore state
         var saved = loadState();
         if (saved && saved.exerciseId === currentExercise.id) {
+            phase = saved.phase || 'guess';
+            selectedHypothesisIndex = typeof saved.selectedHypothesisIndex === 'number' ? saved.selectedHypothesisIndex : -1;
+            viewingHypothesisIndex = typeof saved.viewingHypothesisIndex === 'number' ? saved.viewingHypothesisIndex : 0;
             revealedIds = Array.isArray(saved.revealedIds) ? saved.revealedIds : [];
             revealedTileIndexes = Array.isArray(saved.revealedTileIndexes) ? saved.revealedTileIndexes : [];
             tileRevealOrder = Array.isArray(saved.tileRevealOrder) ? saved.tileRevealOrder : [];
@@ -479,39 +612,34 @@
             }
         }
 
-        // Ensure tile reveal order exists
         if (!tileRevealOrder.length) {
             initTileRevealOrder();
         }
 
-        // Migrate old saved state that lacks tile data:
-        // sync revealedTileIndexes count with revealedIds count
+        // Sync tiles with reveals (migration from old state)
         while (revealedTileIndexes.length < revealedIds.length && revealedTileIndexes.length < tileRevealOrder.length) {
             revealedTileIndexes.push(tileRevealOrder[revealedTileIndexes.length]);
         }
 
+        // Fix phase consistency
+        if (isComplete() && phase !== 'complete') phase = 'complete';
+        if (revealedIds.length > 0 && phase === 'guess') phase = 'reveal';
+
         renderAll();
     }
 
-    // ─── CONTROLLER (for shell nav) ──────────────────────────
+    // ─── CONTROLLER ──────────────────────────────────────────
     window.__metaFeatureControllers = window.__metaFeatureControllers || {};
     window.__metaFeatureControllers['initial-image-vs-deep-structure'] = {
-        stepBack: function () {
-            return false; // let the shell handle back navigation
-        },
+        stepBack: function () { return false; },
         canRestart: function () { return true; },
         restart: function () {
-            revealedIds = [];
-            revealedTileIndexes = [];
-            currentReveal = null;
-            initTileRevealOrder();
-            saveState();
-            renderAll();
+            handleRestart();
             return true;
         }
     };
 
-    // ─── BOOT ─────────────────────────────────────────────────
+    // ─── BOOT ────────────────────────────────────────────────
     function tryMount() {
         if (document.getElementById(ROOT_ID)) mount();
     }
@@ -522,7 +650,6 @@
         tryMount();
     }
 
-    // Also observe tab switches to mount when needed
     if (typeof MutationObserver === 'function' && document.body) {
         var observer = new MutationObserver(function () {
             if (!mounted && document.getElementById(ROOT_ID)) {
