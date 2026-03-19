@@ -484,8 +484,8 @@
     function bindEvents() {
         if (!rootEl) return;
 
-        // Category reveal buttons
-        var btns = rootEl.querySelectorAll('.' + CSS_PREFIX + '-action-btn');
+        // Category reveal buttons (side panel)
+        var btns = rootEl.querySelectorAll('.' + CSS_PREFIX + '-side-btn');
         for (var i = 0; i < btns.length; i++) {
             btns[i].addEventListener('click', handleCategoryClick);
         }
