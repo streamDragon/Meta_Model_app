@@ -27,13 +27,13 @@
             textSlots: [
                 { id: 'd1', category: 'deletion', order: 1, row: 0, col: 0 },
                 { id: 'd2', category: 'deletion', order: 2, row: 0, col: 1 },
-                { id: 'x1', category: 'distortion', order: 1, row: 0, col: 2 },
-                { id: 'x2', category: 'distortion', order: 2, row: 1, col: 0 },
-                { id: 'core', category: 'core', order: 0, row: 1, col: 1 },
-                { id: 'g1', category: 'generalization', order: 1, row: 1, col: 2 },
-                { id: 'd3', category: 'deletion', order: 3, row: 2, col: 0 },
-                { id: 'x3', category: 'distortion', order: 3, row: 2, col: 1 },
-                { id: 'g2', category: 'generalization', order: 2, row: 2, col: 2 }
+                { id: 'd3', category: 'deletion', order: 3, row: 0, col: 2 },
+                { id: 'x1', category: 'distortion', order: 1, row: 1, col: 0 },
+                { id: 'x2', category: 'distortion', order: 2, row: 1, col: 1 },
+                { id: 'x3', category: 'distortion', order: 3, row: 1, col: 2 },
+                { id: 'g1', category: 'generalization', order: 1, row: 2, col: 0 },
+                { id: 'g2', category: 'generalization', order: 2, row: 2, col: 1 },
+                { id: 'g3', category: 'generalization', order: 3, row: 2, col: 2 }
             ],
             reveals: {
                 deletion: [
