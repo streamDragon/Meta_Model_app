@@ -8,66 +8,57 @@ async function main() {
     await server.listen();
     console.log('Vite OK');
 
-    const browser = await chromium.launch({ headless: true });
-    const page = await browser.newPage();
+    const browser = await chromium.launch({ headless: true, args: ['--disable-web-security'] });
+    const ctx = await browser.newContext({ ignoreHTTPSErrors: true });
+    const page = await ctx.newPage();
 
     const errors = [];
     const pageErrors = [];
-    const failedRequests = [];
 
     page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
     page.on('pageerror', err => pageErrors.push(err.message));
-    page.on('requestfailed', req => failedRequests.push(req.url()));
 
-    // Use domcontentloaded which fires earlier
     try {
-        await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded', timeout: 15000 });
-        console.log('DOMContentLoaded OK');
+        await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded', timeout: 10000 });
     } catch (e) {
-        console.log('NAV ERR: ' + e.message.split('\n')[0]);
+        console.log('NAV ERR:', e.message.split('\n')[0]);
     }
 
-    // Give scripts time to load via the script chain
-    await page.waitForTimeout(8000);
+    // Poll for navigateTo to appear (scripts loaded via chain)
+    let ready = false;
+    for (let i = 0; i < 20; i++) {
+        ready = await page.evaluate(() => typeof window.navigateTo === 'function').catch(() => false);
+        if (ready) break;
+        await new Promise(r => setTimeout(r, 500));
+    }
 
-    const state = await page.evaluate(() => {
-        return {
-            tabBtns: document.querySelectorAll('.tab-btn').length,
-            navigateTo: typeof window.navigateTo === 'function',
-            shellReady: document.querySelectorAll('.is-meta-feature-shell-ready').length,
-            welcomeShells: document.querySelectorAll('.meta-feature-welcome-shell').length,
-            activeTab: document.body?.getAttribute('data-active-tab'),
-            scripts: document.querySelectorAll('script[src]').length,
-            blockers: (() => {
-                const b = [];
-                document.querySelectorAll('*').forEach(el => {
-                    const s = getComputedStyle(el);
-                    if (s.position === 'fixed' && s.display !== 'none' && !el.hidden &&
-                        s.pointerEvents !== 'none' && el.offsetWidth > 200 && el.offsetHeight > 200) {
-                        b.push({ id: el.id, cls: (el.className+'').slice(0,80), z: s.zIndex });
-                    }
-                });
-                return b;
-            })()
-        };
-    });
-    console.log('STATE:', JSON.stringify(state, null, 2));
+    console.log('navigateTo available:', ready);
 
-    // Test click
-    const click = await page.evaluate(() => {
-        const btn = document.querySelector('.tab-btn[data-tab="practice-question"]');
-        if (!btn) return 'no btn';
-        const before = document.body?.getAttribute('data-active-tab');
-        btn.click();
-        return new Promise(r => setTimeout(() => {
-            r({ before, after: document.body?.getAttribute('data-active-tab') });
-        }, 300));
-    });
-    console.log('CLICK:', JSON.stringify(click));
+    const state = await page.evaluate(() => ({
+        tabBtns: document.querySelectorAll('.tab-btn').length,
+        shells: document.querySelectorAll('.meta-feature-welcome-shell').length,
+        activeTab: document.body?.getAttribute('data-active-tab') || 'none',
+        hasNavigateTo: typeof window.navigateTo === 'function',
+    })).catch(e => ({ error: e.message }));
 
-    console.log('Console errors:', errors.length, errors.length ? errors : '');
-    console.log('Page errors:', pageErrors.length, pageErrors.length ? pageErrors : '');
-    console.log('Failed requests:', failedRequests.length, failedRequests.length ? failedRequests : '');
+    console.log('State:', JSON.stringify(state));
+
+    // Try click
+    if (state.hasNavigateTo) {
+        const click = await page.evaluate(() => {
+            const b = document.body?.getAttribute('data-active-tab');
+            const btn = document.querySelector('.tab-btn[data-tab="practice-question"]');
+            if (btn) btn.click();
+            return new Promise(r => setTimeout(() => r({
+                before: b,
+                after: document.body?.getAttribute('data-active-tab')
+            }), 200));
+        }).catch(e => ({ error: e.message }));
+        console.log('Click:', JSON.stringify(click));
+    }
+
+    console.log('Errors:', errors.length ? errors : 'none');
+    console.log('Page errors:', pageErrors.length ? pageErrors : 'none');
 
     await browser.close();
     await server.close();
