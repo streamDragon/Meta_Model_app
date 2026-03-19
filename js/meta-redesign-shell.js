@@ -1559,7 +1559,7 @@ function featureActionButtonsHtml(meta) {
         renderFeatureChrome(meta.tab);
         syncFeatureModalState();
     }
-    function renderAllFeatures(direction) { MANAGED_TABS.forEach(function (tab) { renderFeature(tab, direction); }); }
+    function renderAllFeatures(direction) { MANAGED_TABS.forEach(function (tab) { try { renderFeature(tab, direction); } catch (err) { console.warn('[shell] renderFeature failed for ' + tab, err); } }); }
     function syncShells(direction) {
         renderHome(direction || 'forward');
         renderAllFeatures(direction || 'forward');
