@@ -24,7 +24,8 @@
         contextRadar: Object.freeze({ type: 'page', path: '/lab/context-radar/' }),
         livingTriples: Object.freeze({ type: 'page', path: '/living_triples_trainer.html' }),
         verbUnzipStandalone: Object.freeze({ type: 'page', path: '/verb_unzip_trainer.html' }),
-        sentenceMorpher: Object.freeze({ type: 'page', path: '/sentence_morpher_trainer.html' })
+        sentenceMorpher: Object.freeze({ type: 'page', path: '/sentence_morpher_trainer.html' }),
+        initialImageVsDeepStructure: Object.freeze({ type: 'tab', tab: 'initial-image-vs-deep-structure', path: '/feature/initial-image-vs-deep-structure' })
     });
 
     var PATH_TO_KEY = (function buildPathMap() {

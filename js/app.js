@@ -214,6 +214,7 @@ const FEATURE_ICON_BY_TAB = Object.freeze({
     categories: '📚',
     blueprint: '🧭',
     prismlab: '🔬',
+    'initial-image-vs-deep-structure': '🖼️',
     about: 'ℹ️'
 });
 
@@ -307,6 +308,15 @@ const FEATURE_ONBOARDING_COPY = Object.freeze({
         steps: Object.freeze(['בחרו כלי', 'פתחו סשן', 'בדקו נתונים בסוף סבב']),
         success: 'הצלחה היא תרגול רציף בכלי אחד בכל פעם.',
         termKeys: Object.freeze([])
+    }),
+    'initial-image-vs-deep-structure': Object.freeze({
+        icon: '🖼️',
+        kicker: 'תמונה ראשונית מול עומק',
+        what: 'כאן מתאמנים על המעבר מפרשנות מיידית למבנה עומק — דרך חקירת השמטה, עיוות והכללה.',
+        problem: 'הבעיה היא שכששומעים משפט, בונים מיד תמונה פנימית שנראית מלאה, אבל היא בעצם חלקית ומוטית.',
+        steps: Object.freeze(['קוראים משפט מקור', 'לוחצים השמטה / עיוות / הכללה לחשיפת מבנה עומק', 'רואים איך התמונה וההבנה משתנות']),
+        success: 'הצלחה היא לראות שהפרשנות הראשונית הייתה חלקית, ולהבין מה נחשף אחרי החקירה.',
+        termKeys: Object.freeze(['deletion', 'distortion', 'generalization'])
     }),
     about: Object.freeze({
         icon: 'ℹ️',
@@ -1986,6 +1996,7 @@ function normalizeRequestedTab(tabName = '') {
     if (key === 'practice-triples-radar' || key === 'triples-radar' || key === 'triples_radar' || key === 'breen-radar' || key === 'michael-breen') return 'practice-triples-radar';
     if (key === 'practice-wizard' || key === 'wizard' || key === 'sqhcel') return 'practice-wizard';
     if (key === 'practice-verb-unzip' || key === 'verb-unzip' || key === 'unspecified-verb' || key === 'unzip') return 'practice-verb-unzip';
+    if (key === 'initial-image-vs-deep-structure' || key === 'initial-image' || key === 'deep-structure') return 'initial-image-vs-deep-structure';
     return raw;
 }
 
@@ -2002,6 +2013,7 @@ const APP_STICKY_TAB_TITLE_OVERRIDES = Object.freeze({
     'practice-verb-unzip': 'מרכז כלים',
     blueprint: 'בונה מהלך',
     prismlab: 'מעבדת פריזמות · רמות לוגיות',
+    'initial-image-vs-deep-structure': 'תמונה ראשונית מול מבנה עומק',
     about: 'על המוצר'
 });
 
@@ -2018,6 +2030,7 @@ const APP_STICKY_TAB_CONTEXT_OVERRIDES = Object.freeze({
     'practice-verb-unzip': 'הכותרת נשארת מול העיניים גם כשיורדים עמוק בתוך הפירוק.',
     blueprint: 'נשאר ברור באיזה שלב של הבנייה אתם נמצאים.',
     prismlab: 'הכותרת קבועה גם כשעובדים עמוק בתוך רמות ופאנלים.',
+    'initial-image-vs-deep-structure': 'הכותרת נשארת גלויה לאורך כל שלבי חשיפת מבנה העומק.',
     about: 'גם במסך המידע והקהילה שם האפליקציה נשאר גלוי.'
 });
 
