@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.476" data-build-time="1773925777730" data-build-iso="2026-03-19T13:09:37.730Z" data-git-commit="d50eb22">
+<html lang="he" dir="rtl" data-app-version="1.0.477" data-build-time="1773925984803" data-build-iso="2026-03-19T13:13:04.803Z" data-git-commit="2da6057">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1868,7 +1868,6 @@
                 var tab = KEY_TO_TAB[key];
                 if (!tab) return;
                 e.preventDefault();
-                e.stopPropagation();
                 console.log('[emergency-nav] click:', key, '→', tab);
                 if (typeof window.navigateTo === 'function') {
                     try { window.navigateTo(tab, {scrollToTop:true, featureEntry:'welcome'}); return; } catch(err) { console.error('[emergency-nav]', err); }
