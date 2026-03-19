@@ -7,8 +7,8 @@
     var FEATURE_STATE_KEY = 'meta_feature_shell_v3';
     var HOME_VIEW_KEY = 'meta_home_shell_ui_v2';
     var PREFS_KEY = 'meta_shell_preferences_v1';
-    var MANAGED_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'about'];
-    var FEATURE_CHROME_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'about'];
+    var MANAGED_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'initial-image-vs-deep-structure', 'about'];
+    var FEATURE_CHROME_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'initial-image-vs-deep-structure', 'about'];
     var FAST_FEATURE_ENTRY_TABS = ['prismlab'];
     var DIRECT_FEATURE_STAGE_TABS = [];
     var HOME_VIEWS = ['home', 'stats', 'theory', 'settings', 'help'];
