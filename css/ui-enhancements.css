@@ -1566,7 +1566,7 @@ body {
 
 /* ═══════════════════════════════════════════════════
    TRIPLES KIDS IMAGE HERO
-   Save image as: assets/triples-kids.jpg
+   Save image as: assets/triples-kids.png
 ═══════════════════════════════════════════════════ */
 
 .triples-kids-hero {
@@ -1575,7 +1575,7 @@ body {
     overflow: hidden;
     position: relative;
     min-height: 160px;
-    background-image: url('../assets/triples-kids.jpg');
+    background-image: url('../assets/images/triples-kids.png');
     background-size: cover;
     background-position: center 20%;
     margin-bottom: 12px;
