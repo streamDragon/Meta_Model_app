@@ -465,6 +465,12 @@
             initTileRevealOrder();
         }
 
+        // Migrate old saved state that lacks tile data:
+        // sync revealedTileIndexes count with revealedIds count
+        while (revealedTileIndexes.length < revealedIds.length && revealedTileIndexes.length < tileRevealOrder.length) {
+            revealedTileIndexes.push(tileRevealOrder[revealedTileIndexes.length]);
+        }
+
         renderAll();
     }
 
