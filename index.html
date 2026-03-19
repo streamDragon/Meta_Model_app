@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.482" data-build-time="1773928324026" data-build-iso="2026-03-19T13:52:04.026Z" data-git-commit="f0c8979">
+<html lang="he" dir="rtl" data-app-version="1.0.483" data-build-time="1773930435924" data-build-iso="2026-03-19T14:27:15.924Z" data-git-commit="cc3dd5d">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1752,6 +1752,47 @@
         <div id="meta-gamification-root" aria-live="polite"></div>
     </div>
 
+    <!-- Boot stage tracker — must run before any other script -->
+    <script>
+    (function () {
+        var t0 = Date.now();
+        window.__bootStage = 'init';
+        window.__bootLog = [];
+        window.__setBootStage = function (stage) {
+            window.__bootStage = stage;
+            window.__bootLog.push({ s: stage, t: Date.now() - t0 });
+            document.documentElement.dataset.bootStage = stage;
+        };
+        window.__setBootStage('init');
+    })();
+    </script>
+
+    <!-- Hard failsafe: if app hasn't initialized after 5s, unblock the user -->
+    <script>
+    (function () {
+        var timerId = setTimeout(function () {
+            if (window.__bootStage === 'app-init' || window.__bootStage === 'shell-boot' || window.__bootStage === 'all-scripts-loaded') return;
+            var splash = document.getElementById('splash-screen');
+            if (splash) { splash.style.display = 'none'; splash.setAttribute('hidden', 'hidden'); splash.classList.add('hidden'); }
+            document.body.classList.remove('hide-top-tabbar');
+            var b = document.createElement('div');
+            b.id = 'boot-failsafe-banner';
+            b.setAttribute('role', 'alert');
+            b.setAttribute('dir', 'rtl');
+            b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#fff3cd;color:#856404;padding:8px 16px;font-size:14px;text-align:center;border-bottom:1px solid #ffc107;font-family:sans-serif';
+            b.textContent = '\u05D8\u05D5\u05E2\u05DF \u05D0\u05D9\u05D8\u05D9 \u2013 \u05E9\u05DC\u05D1: ' + (window.__bootStage || 'unknown');
+            document.body.insertBefore(b, document.body.firstChild);
+            console.warn('[failsafe] Boot stalled at stage:', window.__bootStage, 'Log:', JSON.stringify(window.__bootLog));
+        }, 5000);
+        window.__cancelBootFailsafe = function () {
+            clearTimeout(timerId);
+            var existing = document.getElementById('boot-failsafe-banner');
+            if (existing) existing.remove();
+        };
+    })();
+    </script>
+
+    <!-- Script loader with timeouts -->
     <script>
         (function () {
             var withAssetVersion = window.__withAssetVersion || function (path) { return path; };
@@ -1786,30 +1827,54 @@
 
             function loadScript(index) {
                 if (index >= scriptQueue.length) {
+                    if (typeof window.__setBootStage === 'function') window.__setBootStage('all-scripts-loaded');
                     return;
                 }
+                if (typeof window.__setBootStage === 'function') window.__setBootStage('script-' + index + ':' + scriptQueue[index]);
 
                 var script = document.createElement('script');
                 script.async = false;
                 script.src = withAssetVersion(scriptQueue[index]);
-                script.onload = function () {
+                var moved = false;
+                var next = function () {
+                    if (moved) return;
+                    moved = true;
+                    clearTimeout(timer);
                     loadScript(index + 1);
                 };
+                var timer = setTimeout(function () {
+                    console.warn('[boot] Script timed out after 10s:', scriptQueue[index]);
+                    next();
+                }, 10000);
+                script.onload = next;
                 script.onerror = function () {
                     console.error('Failed to load script:', scriptQueue[index]);
-                    loadScript(index + 1);
+                    next();
                 };
                 document.body.appendChild(script);
             }
 
             function loadFreemiumModule(onReady) {
+                if (typeof window.__setBootStage === 'function') window.__setBootStage('freemium-load');
+                var finished = false;
+                var finish = function () {
+                    if (finished) return;
+                    finished = true;
+                    clearTimeout(moduleTimeout);
+                    if (typeof window.__setBootStage === 'function') window.__setBootStage('freemium-done');
+                    if (typeof onReady === 'function') onReady();
+                };
+
+                var moduleTimeout = setTimeout(function () {
+                    console.warn('[boot] Freemium module timed out after 3s');
+                    finish();
+                }, 3000);
+
                 var moduleScript = document.createElement('script');
                 moduleScript.type = 'module';
                 moduleScript.src = withAssetVersion('js/freemium/bootstrap-entry.js');
                 moduleScript.onload = function () {
-                    var finish = function () {
-                        if (typeof onReady === 'function') onReady();
-                    };
+                    if (typeof window.__setBootStage === 'function') window.__setBootStage('freemium-module-loaded');
                     var bootstrapReady = window.MetaFreemiumReady;
                     if (bootstrapReady && typeof bootstrapReady.then === 'function') {
                         bootstrapReady.then(finish).catch(function (error) {
@@ -1821,8 +1886,8 @@
                     finish();
                 };
                 moduleScript.onerror = function () {
-                    console.error('Failed to load script:', 'js/freemium/bootstrap-entry.js');
-                    if (typeof onReady === 'function') onReady();
+                    console.error('Failed to load freemium module');
+                    finish();
                 };
                 document.body.appendChild(moduleScript);
             }
@@ -1830,12 +1895,16 @@
             var runtimeEnvScript = document.createElement('script');
             runtimeEnvScript.src = withAssetVersion('js/runtime-env.js');
             runtimeEnvScript.onload = function () {
+                if (typeof window.__setBootStage === 'function') window.__setBootStage('runtime-env-loaded');
                 loadFreemiumModule(function () {
+                    if (typeof window.__setBootStage === 'function') window.__setBootStage('script-queue-start');
                     loadScript(0);
                 });
             };
             runtimeEnvScript.onerror = function () {
+                if (typeof window.__setBootStage === 'function') window.__setBootStage('runtime-env-failed');
                 loadFreemiumModule(function () {
+                    if (typeof window.__setBootStage === 'function') window.__setBootStage('script-queue-start');
                     loadScript(0);
                 });
             };

@@ -1724,6 +1724,7 @@ function featureActionButtonsHtml(meta) {
         window.addEventListener('focus', function () { featureState = loadFeatureState(); homeUi = loadHomeUi(); prefs = loadPrefs(); applyPrefs(); debouncedSyncShells('forward'); });
     }
     function boot() {
+        if (typeof window.__setBootStage === 'function') window.__setBootStage('shell-boot');
         try { applyPrefs(); } catch (err) { console.error('[shell] applyPrefs failed', err); }
         try { bindRealtime(); } catch (err) { console.error('[shell] bindRealtime failed', err); }
         try { syncShells('forward'); } catch (err) { console.error('[shell] syncShells failed', err); }

@@ -5542,6 +5542,8 @@ function ensurePracticeTabHydration(tabId = '') {
 function initializeMetaModelApp() {
     if (hasInitializedApp) return;
     hasInitializedApp = true;
+    if (typeof window.__setBootStage === 'function') window.__setBootStage('app-init');
+    if (typeof window.__cancelBootFailsafe === 'function') window.__cancelBootFailsafe();
 
     const run = (label, fn) => safeRunUiEnhancement(fn, label);
 
