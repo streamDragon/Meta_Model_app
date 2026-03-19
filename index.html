@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.459" data-build-time="1773885256106" data-build-iso="2026-03-19T01:54:16.106Z" data-git-commit="1ade2b1">
+<html lang="he" dir="rtl" data-app-version="1.0.460" data-build-time="1773887841928" data-build-iso="2026-03-19T02:37:21.928Z" data-git-commit="2b4a355">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -289,6 +289,11 @@
             metaRedesignRound3Stylesheet.rel = 'stylesheet';
             metaRedesignRound3Stylesheet.href = withAssetVersion('css/meta-redesign-round3.css');
             document.head.appendChild(metaRedesignRound3Stylesheet);
+
+            var initialImageStylesheet = document.createElement('link');
+            initialImageStylesheet.rel = 'stylesheet';
+            initialImageStylesheet.href = withAssetVersion('css/initial-image-engine.css');
+            document.head.appendChild(initialImageStylesheet);
         })();
     </script>
 </head>
@@ -519,6 +524,7 @@
                         <div class="feature-map-links">
                             <button type="button" class="btn btn-secondary" data-nav-key="prismLab">מעבדת פריזמות</button>
                             <button type="button" class="btn btn-secondary" data-nav-key="blueprint">בונה מהלך</button>
+                            <button type="button" class="btn btn-secondary" data-nav-key="initialImageVsDeepStructure">תמונה ראשונית מול עומק</button>
                             <a class="btn btn-secondary" href="lab/context-radar/" data-versioned-href="lab/context-radar/">מכ"ם הקשר</a>
                         </div>
                         <p class="feature-map-note">כאן עוברים ממבנה לשוני אל חשיבה קלינית: איפה לעבוד עכשיו, ואיך לבנות מהלך.</p>
@@ -1774,7 +1780,8 @@
                 'js/prism-lab-therapist.js',
                 'js/prism-necessity-map.js',
                 'js/feature-intro.js',
-                'js/meta-redesign-shell.js'
+                'js/meta-redesign-shell.js',
+                'js/initial-image-engine.js'
             ];
 
             function loadScript(index) {

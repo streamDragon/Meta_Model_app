@@ -1,0 +1,425 @@
+/* ═══════════════════════════════════════════════════
+   Initial Image vs Deep Structure Engine
+   תמונה ראשונית מול מבנה עומק
+   ═══════════════════════════════════════════════════ */
+
+.iids-engine-root {
+    direction: rtl;
+    text-align: right;
+    font-family: "Assistant", "Heebo", "Noto Sans Hebrew", "Segoe UI", sans-serif;
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 8px 0;
+}
+
+/* ─── Image label ──────────────────────────────── */
+.iids-image-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.02em;
+    text-align: center;
+}
+
+/* ─── Image Panel (top) ────────────────────────── */
+.iids-image-panel {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.iids-image-grid {
+    display: grid;
+    grid-template-rows: repeat(var(--iids-grid-rows, 3), 1fr);
+    grid-template-columns: repeat(var(--iids-grid-cols, 3), 1fr);
+    gap: 2px;
+    aspect-ratio: 1 / 1;
+    max-height: 360px;
+    margin: 0 auto;
+}
+
+.iids-tile {
+    position: relative;
+    overflow: hidden;
+    background: #e2e8f0;
+}
+
+.iids-tile-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.iids-tile-face {
+    position: absolute;
+    inset: 0;
+    background-size: 300% 300%;
+    background-repeat: no-repeat;
+    transition: opacity 0.6s ease;
+}
+
+.iids-tile-a {
+    opacity: 1;
+    z-index: 1;
+}
+
+.iids-tile-b {
+    opacity: 0;
+    z-index: 2;
+}
+
+.iids-tile.is-revealed .iids-tile-a {
+    opacity: 0;
+}
+
+.iids-tile.is-revealed .iids-tile-b {
+    opacity: 1;
+}
+
+/* ─── Action Buttons ───────────────────────────── */
+.iids-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.iids-action-btn {
+    flex: 1 1 0;
+    min-width: 100px;
+    max-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 12px 8px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+}
+
+.iids-action-btn:hover:not(:disabled) {
+    border-color: #6d28d9;
+    background: #f5f3ff;
+    box-shadow: 0 2px 8px rgba(109, 40, 217, 0.1);
+}
+
+.iids-action-btn:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.iids-action-btn.is-exhausted {
+    opacity: 0.45;
+    cursor: default;
+    border-color: #e5e7eb;
+}
+
+.iids-action-label {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.iids-action-sub {
+    font-size: 0.72rem;
+    color: #64748b;
+    font-weight: 400;
+}
+
+.iids-action-count {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+/* category-specific button accents */
+.iids-action-btn[data-category="deletion"]:not(.is-exhausted) {
+    border-color: #f59e0b;
+}
+.iids-action-btn[data-category="deletion"]:hover:not(:disabled) {
+    background: #fffbeb;
+    border-color: #d97706;
+}
+
+.iids-action-btn[data-category="distortion"]:not(.is-exhausted) {
+    border-color: #8b5cf6;
+}
+.iids-action-btn[data-category="distortion"]:hover:not(:disabled) {
+    background: #f5f3ff;
+    border-color: #7c3aed;
+}
+
+.iids-action-btn[data-category="generalization"]:not(.is-exhausted) {
+    border-color: #10b981;
+}
+.iids-action-btn[data-category="generalization"]:hover:not(:disabled) {
+    background: #ecfdf5;
+    border-color: #059669;
+}
+
+/* ─── Text Panel (bottom) ──────────────────────── */
+.iids-text-panel {
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    padding: 12px;
+}
+
+.iids-text-cells {
+    display: grid;
+    grid-template-rows: repeat(var(--iids-text-rows, 3), auto);
+    grid-template-columns: repeat(var(--iids-text-cols, 3), 1fr);
+    gap: 6px;
+}
+
+.iids-text-cell {
+    border-radius: 8px;
+    padding: 10px 8px;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: background 0.4s, border-color 0.4s;
+}
+
+/* core sentence cell */
+.iids-text-core {
+    background: #1e293b;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    border-radius: 10px;
+    padding: 14px 10px;
+}
+
+.iids-core-sentence {
+    display: block;
+}
+
+/* unrevealed slots */
+.iids-text-slot {
+    background: #f1f5f9;
+    border: 1.5px dashed #cbd5e1;
+}
+
+.iids-slot-placeholder {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+/* revealed slots */
+.iids-text-slot.is-revealed {
+    border-style: solid;
+    animation: iids-slot-pop 0.4s ease;
+}
+
+.iids-slot-text {
+    font-size: 0.78rem;
+    line-height: 1.45;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+/* category colors for slots */
+.iids-cat-del.is-revealed {
+    background: #fffbeb;
+    border-color: #f59e0b;
+}
+
+.iids-cat-dis.is-revealed {
+    background: #f5f3ff;
+    border-color: #8b5cf6;
+}
+
+.iids-cat-gen.is-revealed {
+    background: #ecfdf5;
+    border-color: #10b981;
+}
+
+@keyframes iids-slot-pop {
+    0% { transform: scale(0.92); opacity: 0.4; }
+    60% { transform: scale(1.03); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* ─── Yellow / Blue Info Boxes ─────────────────── */
+.iids-info-boxes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.iids-box-yellow,
+.iids-box-blue {
+    border-radius: 10px;
+    padding: 12px 14px;
+    line-height: 1.55;
+}
+
+.iids-box-yellow {
+    background: #fef9c3;
+    border: 1px solid #fbbf24;
+    color: #78350f;
+}
+
+.iids-box-blue {
+    background: #dbeafe;
+    border: 1px solid #60a5fa;
+    color: #1e3a5f;
+}
+
+.iids-box-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 4px;
+    opacity: 0.7;
+}
+
+.iids-box-yellow p,
+.iids-box-blue p {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.iids-box-initial {
+    text-align: center;
+    opacity: 0.8;
+}
+
+/* ─── Completion Card ──────────────────────────── */
+.iids-completion {
+    margin-top: 4px;
+}
+
+.iids-completion-card {
+    border-radius: 14px;
+    background: linear-gradient(135deg, #ede9fe 0%, #dbeafe 100%);
+    border: 1px solid #c4b5fd;
+    padding: 24px 20px;
+    text-align: center;
+}
+
+.iids-completion-card h3 {
+    margin: 0 0 10px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #4c1d95;
+}
+
+.iids-completion-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #1e293b;
+    margin: 0 0 12px;
+}
+
+.iids-completion-closing {
+    font-size: 0.82rem;
+    color: #475569;
+    margin: 0 0 16px;
+    font-style: italic;
+}
+
+.iids-restart-btn {
+    display: inline-block;
+    padding: 10px 28px;
+    border: none;
+    border-radius: 8px;
+    background: #6d28d9;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+}
+
+.iids-restart-btn:hover {
+    background: #5b21b6;
+}
+
+/* ─── Progress Bar ─────────────────────────────── */
+.iids-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.iids-progress-bar {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: #e2e8f0;
+    overflow: hidden;
+}
+
+.iids-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: #6d28d9;
+    transition: width 0.4s ease;
+}
+
+/* ─── Responsive ───────────────────────────────── */
+@media (max-width: 640px) {
+    .iids-engine-root {
+        gap: 12px;
+    }
+
+    .iids-image-grid {
+        max-height: 280px;
+    }
+
+    .iids-action-btn {
+        min-width: 80px;
+        padding: 8px 8px 6px;
+    }
+
+    .iids-action-label {
+        font-size: 0.85rem;
+    }
+
+    .iids-text-cell {
+        padding: 8px 6px;
+        min-height: 48px;
+    }
+
+    .iids-slot-text {
+        font-size: 0.72rem;
+    }
+
+    .iids-core-sentence {
+        font-size: 0.82rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .iids-actions {
+        gap: 6px;
+    }
+
+    .iids-action-sub {
+        display: none;
+    }
+
+    .iids-image-grid {
+        max-height: 220px;
+    }
+}
