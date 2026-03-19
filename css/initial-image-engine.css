@@ -196,6 +196,23 @@
     box-shadow: 0 2px 10px rgba(109, 40, 217, 0.25);
 }
 
+/* ─── Reveal Instruction ──────────────────────── */
+.iids-reveal-instruction {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #6d28d9;
+    text-align: center;
+    margin: 0;
+    padding: 6px 12px;
+    line-height: 1.5;
+    animation: iids-instruction-pulse 2s ease-in-out infinite;
+}
+
+@keyframes iids-instruction-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
 /* ─── Action Buttons ───────────────────────────── */
 .iids-actions {
     display: flex;

@@ -348,6 +348,15 @@
             );
         }
 
+        // ── Reveal-phase instruction
+        if (phase === 'reveal' && !complete) {
+            html.push(
+                '<p class="' + CSS_PREFIX + '-reveal-instruction">' +
+                esc('לחצו על הכפתורים אחד אחד כדי לחשוף את התמונה האמיתית') +
+                '</p>'
+            );
+        }
+
         // ── Action buttons
         var categories = [
             { key: 'deletion', label: 'השמטה', sub: 'מה חסר במפה?' },
