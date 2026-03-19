@@ -286,39 +286,38 @@
         var viewIdx = viewingHypothesisIndex;
         if (viewIdx < 0 || viewIdx >= hyps.length) viewIdx = 0;
 
-        // ── Image panel label
-        var labelText = complete ? 'מבנה העומק נחשף' : (phase === 'guess' ? 'תמונת השטח הנוכחית' : 'כאן המבנה העמוק מתחיל להיחשף');
-        html.push('<div class="' + CSS_PREFIX + '-image-label">' + esc(labelText) + '</div>');
+        // ══════════════════════════════════════════════════
+        // TOP ROW: image (right) + side controls (left)
+        // ══════════════════════════════════════════════════
+        html.push('<div class="' + CSS_PREFIX + '-top-row">');
 
-        // ── Top panel: image grid + optional carousel arrows
-        html.push('<div class="' + CSS_PREFIX + '-image-panel">');
+        // ── Image column (right in RTL) ──
+        html.push('<div class="' + CSS_PREFIX + '-image-col">');
 
-        // Hypothesis info bar (guess phase only)
+        // Hypothesis carousel nav (guess phase)
         if (phase === 'guess') {
-            // Dot navigation row
             var dotsHtml = '';
             for (var d = 0; d < hyps.length; d++) {
-                dotsHtml += '<button type="button" class="' + CSS_PREFIX + '-dot' + (d === viewIdx ? ' is-active' : '') + '" data-dot="' + d + '" aria-label="תמונה ' + (d + 1) + '"></button>';
+                dotsHtml += '<button type="button" class="' + CSS_PREFIX + '-dot' + (d === viewIdx ? ' is-active' : '') + '" data-dot="' + d + '"></button>';
             }
             html.push(
                 '<div class="' + CSS_PREFIX + '-hyp-bar">' +
                 '<div class="' + CSS_PREFIX + '-hyp-nav-row">' +
-                '<button type="button" class="' + CSS_PREFIX + '-nav-arrow" data-dir="prev" aria-label="הקודם">&#8250;</button>' +
+                '<button type="button" class="' + CSS_PREFIX + '-nav-arrow" data-dir="prev">&#8250;</button>' +
                 '<div class="' + CSS_PREFIX + '-dots">' + dotsHtml + '</div>' +
-                '<button type="button" class="' + CSS_PREFIX + '-nav-arrow" data-dir="next" aria-label="הבא">&#8249;</button>' +
+                '<button type="button" class="' + CSS_PREFIX + '-nav-arrow" data-dir="next">&#8249;</button>' +
                 '</div>' +
                 '<span class="' + CSS_PREFIX + '-hyp-label">' + esc(hyps[viewIdx].label) + '</span>' +
-                '<span class="' + CSS_PREFIX + '-hyp-subtitle">' + esc(hyps[viewIdx].subtitle) + '</span>' +
-                '<span class="' + CSS_PREFIX + '-hyp-hint">החליפו בין התמונות כדי לבחור</span>' +
                 '</div>'
             );
+        } else {
+            var labelText = complete ? 'מבנה העומק נחשף' : 'התמונה מתחילה להתחלף';
+            html.push('<div class="' + CSS_PREFIX + '-image-label">' + esc(labelText) + '</div>');
         }
 
-        // The grid itself
+        // Image grid
         var resolvedSurface = resolveAssetPath(getActiveImage());
         var resolvedTruth = resolveAssetPath(ex.truthImage);
-
-        html.push('<div class="' + CSS_PREFIX + '-grid-wrap">');
 
         html.push('<div class="' + CSS_PREFIX + '-image-grid' + (complete ? ' is-complete' : '') + '" style="--iids-grid-rows:' + grid.rows + ';--iids-grid-cols:' + grid.cols + ';">');
 
@@ -339,57 +338,55 @@
             );
         }
         html.push('</div>'); // grid
-        html.push('</div>'); // grid-wrap
-        html.push('</div>'); // image-panel
 
-        // ── Confirm button (guess phase)
+        html.push('</div>'); // image-col
+
+        // ── Side controls column (left in RTL) ──
+        html.push('<div class="' + CSS_PREFIX + '-side-controls">');
+
         if (phase === 'guess') {
+            // Confirm button in side panel
             html.push(
-                '<div class="' + CSS_PREFIX + '-confirm-wrap">' +
-                '<p class="' + CSS_PREFIX + '-guess-instruction">' + esc('בחרו את תמונת השטח שנראית לכם הכי קרובה לפירוש הגלוי.') + '</p>' +
-                '<button type="button" class="' + CSS_PREFIX + '-confirm-btn">' + esc('זה הפירוש הגלוי שאני רואה') + '</button>' +
-                '</div>'
+                '<button type="button" class="' + CSS_PREFIX + '-confirm-btn">' + esc('בחרתי ✓') + '</button>'
             );
+        } else {
+            // Reveal-phase: 3 stacked category buttons (TV remote style)
+            var categories = [
+                { key: 'deletion', label: 'השמטה', sub: 'מה חסר?' },
+                { key: 'distortion', label: 'עיוות', sub: 'מה נכנס?' },
+                { key: 'generalization', label: 'הכללה', sub: 'איזה חוק?' }
+            ];
+            for (var b = 0; b < categories.length; b++) {
+                var cat = categories[b];
+                var catReveals = (ex.reveals[cat.key] || []).length;
+                var catDone = getRevealedCount(cat.key);
+                var catExhausted = catDone >= catReveals;
+                html.push(
+                    '<button type="button" class="' + CSS_PREFIX + '-side-btn' +
+                    (catExhausted ? ' is-exhausted' : '') +
+                    '" data-category="' + cat.key + '"' +
+                    (catExhausted ? ' disabled' : '') + '>' +
+                    '<span class="' + CSS_PREFIX + '-side-btn-label">' + esc(cat.label) + '</span>' +
+                    '<span class="' + CSS_PREFIX + '-side-btn-sub">' + esc(cat.sub) + '</span>' +
+                    '<span class="' + CSS_PREFIX + '-side-btn-count">' + catDone + '/' + catReveals + '</span>' +
+                    '</button>'
+                );
+            }
         }
 
-        // ── Reveal-phase instruction
-        if (phase === 'reveal' && !complete) {
-            html.push(
-                '<p class="' + CSS_PREFIX + '-reveal-instruction">' +
-                esc('לחצו על הכפתורים אחד אחד כדי לחשוף את התמונה האמיתית') +
-                '</p>'
-            );
+        html.push('</div>'); // side-controls
+        html.push('</div>'); // top-row
+
+        // ── Instruction line
+        if (phase === 'guess') {
+            html.push('<p class="' + CSS_PREFIX + '-guess-instruction">' + esc('החליפו בין התמונות עם החצים — ובחרו את תמונת השטח') + '</p>');
+        } else if (phase === 'reveal' && !complete) {
+            html.push('<p class="' + CSS_PREFIX + '-reveal-instruction">' + esc('לחצו על הכפתורים אחד אחד כדי לחשוף את התמונה האמיתית') + '</p>');
         }
 
-        // ── Action buttons
-        var categories = [
-            { key: 'deletion', label: 'השמטה', sub: 'מה חסר במפה?' },
-            { key: 'distortion', label: 'עיוות', sub: 'איזה פירוש נכנס?' },
-            { key: 'generalization', label: 'הכללה', sub: 'איזה כלל פועל כאן?' }
-        ];
-        var revealDisabled = phase === 'guess';
-        html.push('<div class="' + CSS_PREFIX + '-actions">');
-        for (var b = 0; b < categories.length; b++) {
-            var cat = categories[b];
-            var catReveals = (ex.reveals[cat.key] || []).length;
-            var catDone = getRevealedCount(cat.key);
-            var catExhausted = catDone >= catReveals;
-            var btnDisabled = revealDisabled || catExhausted;
-            html.push(
-                '<button type="button" class="' + CSS_PREFIX + '-action-btn' +
-                (catExhausted ? ' is-exhausted' : '') +
-                (revealDisabled ? ' is-locked' : '') +
-                '" data-category="' + cat.key + '"' +
-                (btnDisabled ? ' disabled' : '') + '>' +
-                '<span class="' + CSS_PREFIX + '-action-label">' + esc(cat.label) + '</span>' +
-                '<span class="' + CSS_PREFIX + '-action-sub">' + esc(cat.sub) + '</span>' +
-                '<span class="' + CSS_PREFIX + '-action-count">' + catDone + '/' + catReveals + '</span>' +
-                '</button>'
-            );
-        }
-        html.push('</div>');
-
-        // ── Core sentence + text grid
+        // ══════════════════════════════════════════════════
+        // BOTTOM: Text panel (bigger, clearer)
+        // ══════════════════════════════════════════════════
         html.push('<div class="' + CSS_PREFIX + '-text-panel">');
         html.push(
             '<div class="' + CSS_PREFIX + '-text-cell ' + CSS_PREFIX + '-text-core">' +
@@ -436,17 +433,7 @@
             html.push(
                 '<div class="' + CSS_PREFIX + '-info-boxes">' +
                 '<div class="' + CSS_PREFIX + '-box-yellow ' + CSS_PREFIX + '-box-initial">' +
-                '<span class="' + CSS_PREFIX + '-box-label">לפני שמתחילים</span>' +
-                '<p>עוד לפני ששואלים, המוח כבר משלים: מי אשם, מה הכוונה, ומה ״ברור״ שקרה. כאן מנסים לעצור רגע לפני הסגירה.</p>' +
-                '</div>' +
-                '</div>'
-            );
-        } else if (phase === 'guess') {
-            html.push(
-                '<div class="' + CSS_PREFIX + '-info-boxes">' +
-                '<div class="' + CSS_PREFIX + '-box-yellow ' + CSS_PREFIX + '-box-initial">' +
-                '<span class="' + CSS_PREFIX + '-box-label">לפני שמתחילים</span>' +
-                '<p>בחרו קודם את תמונת השטח. אחר כך התחילו לחשוף מה חסר, איזה פירוש נכנס, ואיזה חוק פנימי פועל מאחורי התגובה.</p>' +
+                '<p>לחצו על הכפתורים כדי לחשוף שכבות — השמטה, עיוות והכללה</p>' +
                 '</div>' +
                 '</div>'
             );
