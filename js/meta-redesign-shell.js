@@ -1723,6 +1723,15 @@ function featureActionButtonsHtml(meta) {
         document.addEventListener('visibilitychange', function () { if (document.hidden) return; featureState = loadFeatureState(); homeUi = loadHomeUi(); prefs = loadPrefs(); applyPrefs(); debouncedSyncShells('forward'); });
         window.addEventListener('focus', function () { featureState = loadFeatureState(); homeUi = loadHomeUi(); prefs = loadPrefs(); applyPrefs(); debouncedSyncShells('forward'); });
     }
-    function boot() { applyPrefs(); bindRealtime(); syncShells('forward'); }
+    function boot() {
+        console.log('[shell] boot() start');
+        try { applyPrefs(); } catch (err) { console.error('[shell] applyPrefs failed', err); }
+        try { bindRealtime(); } catch (err) { console.error('[shell] bindRealtime failed', err); }
+        try { syncShells('forward'); } catch (err) { console.error('[shell] syncShells failed', err); }
+        // Fallback: ensure body has shell mode even if rendering partly failed
+        try { if (document.body && !document.body.classList.contains('meta-shell-mode')) { updateBodyState(currentTabName()); } } catch (err) { console.error('[shell] fallback updateBodyState failed', err); }
+        console.log('[shell] boot() done, meta-shell-mode:', document.body && document.body.classList.contains('meta-shell-mode'));
+    }
+    console.log('[shell] IIFE loaded, readyState:', document.readyState);
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true }); else window.setTimeout(boot, 0);
 }(window, document));

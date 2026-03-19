@@ -1954,22 +1954,29 @@ function applyEmbeddedCompactMode() {
 function enforceTopMenuOnlyMode() {
     const body = document.body;
     if (!body) return;
+    // CSS rule `body.hide-top-tabbar .tabs/.mobile-tab-nav` handles hiding.
+    // We only add the class — no inline styles, so navigation can be restored
+    // if the shell system fails to boot.
     body.classList.add('hide-top-tabbar');
+}
 
-    ['.tabs', '.mobile-tab-nav'].forEach((selector) => {
-        document.querySelectorAll(selector).forEach((el) => {
-            el.setAttribute('aria-hidden', 'true');
-            try {
-                el.style.setProperty('display', 'none', 'important');
-                el.style.setProperty('visibility', 'hidden', 'important');
-                el.style.setProperty('height', '0', 'important');
-                el.style.setProperty('overflow', 'hidden', 'important');
-                el.style.setProperty('pointer-events', 'none', 'important');
-            } catch (_error) {
-                // ignore style application failures
-            }
-        });
-    });
+// Safety net: if the shell never boots (or boots but fails to render content),
+// restore original navigation so the app is still usable.
+function scheduleShellBootGuard() {
+    setTimeout(() => {
+        const body = document.body;
+        if (!body) return;
+
+        const shellHasContent = (() => {
+            const root = document.getElementById('meta-shell-root');
+            return root && root.children.length > 0 && root.innerHTML.trim().length > 50;
+        })();
+
+        if (body.classList.contains('meta-shell-mode') && shellHasContent) return; // shell OK
+
+        console.warn('[shell-guard] Shell missing or empty — restoring original navigation');
+        body.classList.remove('hide-top-tabbar', 'meta-shell-mode', 'shell-home-active', 'shell-feature-active');
+    }, 4000);
 }
 
 function applyHeaderDensityPreference() {
@@ -5583,6 +5590,7 @@ function initializeMetaModelApp() {
     hideSplashScreen();
 
     run('top-menu-only-mode', enforceTopMenuOnlyMode);
+    run('shell-boot-guard', scheduleShellBootGuard);
     run('mojibake-auto-repair', setupMojibakeAutoRepair);
 
     Promise.resolve(setupAppVersionChip()).catch((error) => {
@@ -5607,7 +5615,6 @@ function initializeMetaModelApp() {
     });
     run('mobile-viewport-sizing', setupMobileViewportSizing);
     run('embedded-compact-mode', applyEmbeddedCompactMode);
-    run('top-menu-only-mode-reapply', enforceTopMenuOnlyMode);
     run('header-density-preference', applyHeaderDensityPreference);
     run('runtime-debug-card', updateRuntimeDebugInfoCard);
     run('audio-settings', loadAudioSettings);
