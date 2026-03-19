@@ -171,6 +171,9 @@
     border: 1px solid #e2e8f0;
     background: #f8fafc;
     padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .iids-text-cells {
@@ -191,7 +194,7 @@
     transition: background 0.4s, border-color 0.4s;
 }
 
-/* core sentence cell */
+/* core sentence cell — standalone above the grid */
 .iids-text-core {
     background: #1e293b;
     color: #fff;
