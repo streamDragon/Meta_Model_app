@@ -129,6 +129,7 @@
     var currentReveal = null;  // last revealed item (for yellow/blue boxes)
     var revealedTileIndexes = [];  // tile indices that have been flipped to imageB
     var tileRevealOrder = [];      // shuffled [0..8] for random tile reveal
+    var pendingTileReveal = -1;    // tile index currently being animated (excluded from .is-revealed in HTML, added after paint)
     var rootEl = null;
     var mounted = false;
 
@@ -246,8 +247,11 @@
         var resolvedImageA = resolveAssetPath(ex.imageA);
         var resolvedImageB = resolveAssetPath(ex.imageB);
         html.push('<div class="' + CSS_PREFIX + '-image-grid' + (complete ? ' is-complete' : '') + '" style="--iids-grid-rows:' + grid.rows + ';--iids-grid-cols:' + grid.cols + ';">');
+        var capturedPending = pendingTileReveal;
+        pendingTileReveal = -1;
         for (var t = 0; t < totalTiles; t++) {
-            var revealed = isTileRevealed(t);
+            // Pending tile: render WITHOUT .is-revealed so CSS transition can fire after paint
+            var revealed = isTileRevealed(t) && t !== capturedPending;
             var row = Math.floor(t / grid.cols);
             var col = t % grid.cols;
             var pctX = grid.cols > 1 ? (col / (grid.cols - 1)) * 100 : 50;
@@ -370,6 +374,20 @@
 
         rootEl.innerHTML = html.join('');
 
+        // ── Trigger CSS transition for the pending (just-revealed) tile
+        // capturedPending is the tile that was rendered WITHOUT .is-revealed so we can animate it
+        if (capturedPending >= 0) {
+            (function (idx) {
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () {
+                        if (!rootEl) return;
+                        var el = rootEl.querySelector('[data-tile="' + idx + '"]');
+                        if (el) el.classList.add('is-revealed');
+                    });
+                });
+            })(capturedPending);
+        }
+
         // ── Bind events
         bindEvents();
     }
@@ -408,10 +426,11 @@
         revealedIds.push(reveal.id);
         currentReveal = reveal;
 
-        // Reveal next random tile
+        // Reveal next random tile and mark it as pending for CSS animation
         var tileIdx = revealedTileIndexes.length;
         if (tileIdx < tileRevealOrder.length) {
             revealedTileIndexes.push(tileRevealOrder[tileIdx]);
+            pendingTileReveal = tileRevealOrder[tileIdx];
         }
 
         saveState();
