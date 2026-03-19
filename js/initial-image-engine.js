@@ -127,10 +127,36 @@
     var currentExercise = null;
     var revealedIds = [];      // ids of revealed items
     var currentReveal = null;  // last revealed item (for yellow/blue boxes)
+    var revealedTileIndexes = [];  // tile indices that have been flipped to imageB
+    var tileRevealOrder = [];      // shuffled [0..8] for random tile reveal
     var rootEl = null;
     var mounted = false;
 
     // ─── HELPERS ──────────────────────────────────────────────
+    function resolveAssetPath(path) {
+        if (typeof window.__withAssetVersion === 'function') {
+            try { return window.__withAssetVersion(path); } catch (e) { /* fall through */ }
+        }
+        return path;
+    }
+
+    function shuffleArray(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+        }
+        return a;
+    }
+
+    function initTileRevealOrder() {
+        if (!currentExercise) return;
+        var total = currentExercise.imageGrid.rows * currentExercise.imageGrid.cols;
+        var indices = [];
+        for (var i = 0; i < total; i++) indices.push(i);
+        tileRevealOrder = shuffleArray(indices);
+    }
+
     function esc(value) {
         return String(value == null ? '' : value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
@@ -180,19 +206,7 @@
     }
 
     function isTileRevealed(tileIndex) {
-        if (!currentExercise) return false;
-        var categories = ['deletion', 'distortion', 'generalization'];
-        for (var c = 0; c < categories.length; c++) {
-            var reveals = currentExercise.reveals[categories[c]] || [];
-            for (var r = 0; r < reveals.length; r++) {
-                if (revealedIds.indexOf(reveals[r].id) !== -1 &&
-                    reveals[r].targetImageTiles &&
-                    reveals[r].targetImageTiles.indexOf(tileIndex) !== -1) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return revealedTileIndexes.indexOf(tileIndex) !== -1;
     }
 
     function saveState() {
@@ -200,7 +214,9 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify({
                 exerciseId: currentExercise ? currentExercise.id : null,
                 revealedIds: revealedIds,
-                currentRevealId: currentReveal ? currentReveal.id : null
+                currentRevealId: currentReveal ? currentReveal.id : null,
+                revealedTileIndexes: revealedTileIndexes,
+                tileRevealOrder: tileRevealOrder
             }));
         } catch (e) { /* ignore */ }
     }
@@ -227,7 +243,9 @@
 
         // ── Top panel: image grid
         html.push('<div class="' + CSS_PREFIX + '-image-panel">');
-        html.push('<div class="' + CSS_PREFIX + '-image-grid" style="--iids-grid-rows:' + grid.rows + ';--iids-grid-cols:' + grid.cols + ';">');
+        var resolvedImageA = resolveAssetPath(ex.imageA);
+        var resolvedImageB = resolveAssetPath(ex.imageB);
+        html.push('<div class="' + CSS_PREFIX + '-image-grid' + (complete ? ' is-complete' : '') + '" style="--iids-grid-rows:' + grid.rows + ';--iids-grid-cols:' + grid.cols + ';">');
         for (var t = 0; t < totalTiles; t++) {
             var revealed = isTileRevealed(t);
             var row = Math.floor(t / grid.cols);
@@ -237,8 +255,8 @@
             html.push(
                 '<div class="' + CSS_PREFIX + '-tile' + (revealed ? ' is-revealed' : '') + '" data-tile="' + t + '">' +
                 '<div class="' + CSS_PREFIX + '-tile-inner">' +
-                '<div class="' + CSS_PREFIX + '-tile-face ' + CSS_PREFIX + '-tile-a" style="background-image:url(\'' + esc(ex.imageA) + '\');background-position:' + pctX + '% ' + pctY + '%;"></div>' +
-                '<div class="' + CSS_PREFIX + '-tile-face ' + CSS_PREFIX + '-tile-b" style="background-image:url(\'' + esc(ex.imageB) + '\');background-position:' + pctX + '% ' + pctY + '%;"></div>' +
+                '<div class="' + CSS_PREFIX + '-tile-face ' + CSS_PREFIX + '-tile-a" style="background-image:url(\'' + esc(resolvedImageA) + '\');background-position:' + pctX + '% ' + pctY + '%;"></div>' +
+                '<div class="' + CSS_PREFIX + '-tile-face ' + CSS_PREFIX + '-tile-b" style="background-image:url(\'' + esc(resolvedImageB) + '\');background-position:' + pctX + '% ' + pctY + '%;"></div>' +
                 '</div></div>'
             );
         }
@@ -370,7 +388,9 @@
         if (restartBtn) {
             restartBtn.addEventListener('click', function () {
                 revealedIds = [];
+                revealedTileIndexes = [];
                 currentReveal = null;
+                initTileRevealOrder();
                 saveState();
                 renderAll();
             });
@@ -387,6 +407,13 @@
 
         revealedIds.push(reveal.id);
         currentReveal = reveal;
+
+        // Reveal next random tile
+        var tileIdx = revealedTileIndexes.length;
+        if (tileIdx < tileRevealOrder.length) {
+            revealedTileIndexes.push(tileRevealOrder[tileIdx]);
+        }
+
         saveState();
 
         // Award XP if gamification is available
@@ -418,6 +445,8 @@
         var saved = loadState();
         if (saved && saved.exerciseId === currentExercise.id) {
             revealedIds = Array.isArray(saved.revealedIds) ? saved.revealedIds : [];
+            revealedTileIndexes = Array.isArray(saved.revealedTileIndexes) ? saved.revealedTileIndexes : [];
+            tileRevealOrder = Array.isArray(saved.tileRevealOrder) ? saved.tileRevealOrder : [];
             if (saved.currentRevealId) {
                 var categories = ['deletion', 'distortion', 'generalization'];
                 for (var c = 0; c < categories.length; c++) {
@@ -429,6 +458,11 @@
                     }
                 }
             }
+        }
+
+        // Ensure tile reveal order exists
+        if (!tileRevealOrder.length) {
+            initTileRevealOrder();
         }
 
         renderAll();
@@ -443,7 +477,9 @@
         canRestart: function () { return true; },
         restart: function () {
             revealedIds = [];
+            revealedTileIndexes = [];
             currentReveal = null;
+            initTileRevealOrder();
             saveState();
             renderAll();
             return true;

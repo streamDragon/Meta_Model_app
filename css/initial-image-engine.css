@@ -80,6 +80,17 @@
     opacity: 1;
 }
 
+/* ─── Complete state: seamless final image ──────── */
+.iids-image-grid.is-complete {
+    gap: 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.iids-image-grid.is-complete .iids-tile {
+    border-radius: 0;
+}
+
 /* ─── Action Buttons ───────────────────────────── */
 .iids-actions {
     display: flex;
