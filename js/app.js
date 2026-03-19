@@ -2744,13 +2744,23 @@ function persistPracticeTabPreference(tabName = '') {
     }
 }
 
+const META_SESSION_KEY = 'meta_session_started_v1';
+
 function applyInitialTabPreference() {
     setupHistoryRouter();
     clearFeatureStepBackHistory();
 
     const routeTab = getCurrentRouteTabFromPathname(window.location.pathname || '/');
     const blockedDebugRoute = routeTab === 'debug' && !isDebugRouteEnabled();
-    const targetTab = blockedDebugRoute ? 'home' : resolveInitialRouteTab();
+
+    // On a fresh browser session (tab just opened or browser restarted), always start at
+    // the home screen. On a page refresh within the same session, honour the current URL.
+    // sessionStorage is cleared when the tab/window is closed, so it distinguishes
+    // "re-open app" (fresh session → home) from "F5 refresh" (same session → keep tab).
+    const isPageRefresh = sessionStorage.getItem(META_SESSION_KEY) === 'true';
+    sessionStorage.setItem(META_SESSION_KEY, 'true');
+
+    const targetTab = (!isPageRefresh || blockedDebugRoute) ? 'home' : resolveInitialRouteTab();
 
     persistPracticeTabPreference(targetTab);
     navigateTo(targetTab, {
@@ -17906,7 +17916,17 @@ function getXpLevelMeta(xpTotal = 0) {
     };
 }
 
+function isEmailAuthenticatedUser() {
+    try {
+        const snap = window.MetaFreemium?.getAuthSnapshot?.();
+        return snap != null && snap.status === 'authenticated' && !snap.isGuest;
+    } catch (e) {
+        return false;
+    }
+}
+
 function persistHomeLastVisitedTab(tabName = '') {
+    if (!isEmailAuthenticatedUser()) return;   // only save for signed-in users
     const safeTab = normalizeRequestedTab(String(tabName || '').trim());
     if (!safeTab || safeTab === 'home') return;
     try {
@@ -17920,6 +17940,7 @@ function persistHomeLastVisitedTab(tabName = '') {
 }
 
 function loadHomeLastVisitedTab() {
+    if (!isEmailAuthenticatedUser()) return null;   // only expose to signed-in users
     try {
         const shellRaw = localStorage.getItem(SHELL_CONTINUE_KEY);
         if (shellRaw) {
