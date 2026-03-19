@@ -16,7 +16,11 @@ const server = http.createServer((req, res) => {
     let url = new URL(req.url, `http://localhost:${PORT}`);
     let filePath = path.join(DIST, decodeURIComponent(url.pathname));
     if (filePath.endsWith('/') || filePath === DIST) filePath = path.join(filePath, 'index.html');
-    if (!fs.existsSync(filePath)) { res.writeHead(404); res.end('Not found'); return; }
+    if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+        const indexPath = path.join(filePath, 'index.html');
+        if (fs.existsSync(indexPath)) { filePath = indexPath; }
+        else { res.writeHead(404); res.end('Not found'); return; }
+    }
     const ext = path.extname(filePath);
     res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
     fs.createReadStream(filePath).pipe(res);
