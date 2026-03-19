@@ -822,16 +822,13 @@
             '</article>'
         ].join('');
     }
-    function homeHero(summary) {
-        var copy = greeting(summary);
-        var unlock = nextUnlock(summary);
-        var note = unlock ? ('עוד ' + Math.max(0, unlock.unlockLevel - summary.level) + ' רמות ל-' + unlock.title + '.') : 'כל מסלולי הליבה כבר פתוחים — עכשיו נשאר להעמיק.';
+    function homeHero() {
         return [
             '<section class="meta-home-shell__hero">',
-            '<span class="meta-home-shell__hero-kicker">Duolingo למטא-מודל, אבל עם נשימה אנושית</span>',
-            '<h2>' + escapeHtml(copy.title) + '</h2>',
-            '<p>' + escapeHtml(copy.subtitle) + '</p>',
-            '<div class="meta-home-shell__hero-note"><strong>' + escapeHtml(summary.levelTitle || LEVEL_TITLES[summary.level] || 'צעד ראשון') + '</strong><span>' + escapeHtml(note) + '</span></div>',
+            '<span class="meta-home-shell__hero-kicker">למה בכלל ללמוד מטה\u2011מודל?</span>',
+            '<p>כי כל משפט הוא מצומצם יחסית. הוא לא מכיל את כל ההקשר, את כל החוויה, או את כל החוק הפנימי שפועל מאחוריו. לכן אנחנו נוטים למלא את החסר לבד. המטה\u2011מודל עוזר לזהות מה הושמט, איזה פירוש נכנס, ואיזה כלל רחב התחיל לעבוד — כדי שנוכל לראות את האדם ואת עולמו בבהירות גדולה יותר.</p>',
+            '<div class="meta-home-shell__hero-note"><strong>מה אנחנו מנסים לעשות כאן?</strong><span>לא למהר לסגור סיפור. לא להחליף את האדם שמולנו בפרשנות שלנו. אלא לשמוע את המשפט, לזהות איך הוא נבנה, ולתת לסיפור של האדם להתגלות סביבו — לא סביבנו.</span></div>',
+            '<details class="meta-home-theory-note"><summary><strong>רקע קצר: מבנה שטח ומבנה עומק</strong></summary><p>כשאנחנו שומעים משפט, אנחנו פוגשים בדרך כלל את מבנה השטח שלו — מה שנאמר בגלוי. אבל מתחת לפני השטח יש לעיתים מידע שנמחק, פירוש שנכנס, וחוק פנימי שכבר התחיל לעבוד. בהשראת ההבחנה של חומסקי בין מבנה שטח למבנה עומק, ובאופן שבו בנדלר וגריינדר הפכו אותה ב\u2011NLP לכלי עבודה, המטה\u2011מודל עוזר לנו לעבור מן המשפט הגלוי אל המבנה העמוק יותר שמארגן את החוויה.</p></details>',
             '</section>'
         ].join('');
     }
