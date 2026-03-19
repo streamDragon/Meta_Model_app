@@ -1,16 +1,33 @@
-import { createServer } from 'vite';
+import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
 import { chromium } from 'playwright';
 
 const PORT = 4199;
+const DIST = path.join(process.cwd(), 'dist');
+
+const MIME = {
+    '.html': 'text/html', '.js': 'application/javascript', '.mjs': 'application/javascript',
+    '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml',
+    '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2',
+};
+
+const server = http.createServer((req, res) => {
+    let url = new URL(req.url, `http://localhost:${PORT}`);
+    let filePath = path.join(DIST, decodeURIComponent(url.pathname));
+    if (filePath.endsWith('/') || filePath === DIST) filePath = path.join(filePath, 'index.html');
+    if (!fs.existsSync(filePath)) { res.writeHead(404); res.end('Not found'); return; }
+    const ext = path.extname(filePath);
+    res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+    fs.createReadStream(filePath).pipe(res);
+});
 
 async function main() {
-    const server = await createServer({ server: { port: PORT, strictPort: true }, logLevel: 'silent' });
-    await server.listen();
-    console.log('Vite OK');
+    await new Promise(r => server.listen(PORT, r));
+    console.log('Server OK on', PORT);
 
-    const browser = await chromium.launch({ headless: true, args: ['--disable-web-security'] });
-    const ctx = await browser.newContext({ ignoreHTTPSErrors: true });
-    const page = await ctx.newPage();
+    const browser = await chromium.launch({ headless: true });
+    const page = await browser.newPage();
 
     const errors = [];
     const pageErrors = [];
@@ -20,19 +37,19 @@ async function main() {
 
     try {
         await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded', timeout: 10000 });
+        console.log('Page loaded');
     } catch (e) {
         console.log('NAV ERR:', e.message.split('\n')[0]);
     }
 
-    // Poll for navigateTo to appear (scripts loaded via chain)
+    // Poll for navigateTo
     let ready = false;
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 15; i++) {
         ready = await page.evaluate(() => typeof window.navigateTo === 'function').catch(() => false);
         if (ready) break;
         await new Promise(r => setTimeout(r, 500));
     }
-
-    console.log('navigateTo available:', ready);
+    console.log('navigateTo:', ready);
 
     const state = await page.evaluate(() => ({
         tabBtns: document.querySelectorAll('.tab-btn').length,
@@ -40,29 +57,25 @@ async function main() {
         activeTab: document.body?.getAttribute('data-active-tab') || 'none',
         hasNavigateTo: typeof window.navigateTo === 'function',
     })).catch(e => ({ error: e.message }));
-
     console.log('State:', JSON.stringify(state));
 
-    // Try click
     if (state.hasNavigateTo) {
         const click = await page.evaluate(() => {
-            const b = document.body?.getAttribute('data-active-tab');
-            const btn = document.querySelector('.tab-btn[data-tab="practice-question"]');
-            if (btn) btn.click();
+            const before = document.body?.getAttribute('data-active-tab');
+            document.querySelector('.tab-btn[data-tab="practice-question"]')?.click();
             return new Promise(r => setTimeout(() => r({
-                before: b,
-                after: document.body?.getAttribute('data-active-tab')
+                before, after: document.body?.getAttribute('data-active-tab')
             }), 200));
         }).catch(e => ({ error: e.message }));
         console.log('Click:', JSON.stringify(click));
     }
 
-    console.log('Errors:', errors.length ? errors : 'none');
+    console.log('Console errors:', errors.length ? errors : 'none');
     console.log('Page errors:', pageErrors.length ? pageErrors : 'none');
 
     await browser.close();
-    await server.close();
+    server.close();
     process.exit(0);
 }
 
-main().catch(e => { console.error('FATAL:', e.message); process.exit(1); });
+main().catch(e => { console.error('FATAL:', e.message); server.close(); process.exit(1); });
