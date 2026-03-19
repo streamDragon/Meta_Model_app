@@ -342,7 +342,7 @@
         if (phase === 'guess') {
             html.push(
                 '<div class="' + CSS_PREFIX + '-confirm-wrap">' +
-                '<p class="' + CSS_PREFIX + '-guess-instruction">' + esc('עברו בין שלוש תמונות השטח, בחרו את זו שנראית הכי קרובה לפירוש הגלוי, ואז התחילו לחשוף את מבנה העומק.') + '</p>' +
+                '<p class="' + CSS_PREFIX + '-guess-instruction">' + esc('בחרו את תמונת השטח שנראית לכם הכי קרובה לפירוש הגלוי.') + '</p>' +
                 '<button type="button" class="' + CSS_PREFIX + '-confirm-btn">' + esc('זה הפירוש הגלוי שאני רואה') + '</button>' +
                 '</div>'
             );
