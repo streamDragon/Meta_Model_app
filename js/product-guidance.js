@@ -3,6 +3,17 @@
 
     if (!global || global.MetaProductGuidance) return;
 
+    console.log('[product-guidance] boot start');
+
+    // ── Module-level guards ──────────────────────────────────────────
+    var observer = null;
+    var isApplying = false;
+    var isScheduled = false;
+    var lastApplyReason = '';
+    var mutationCount = 0;
+    var mutationWindowStart = 0;
+    var MUTATION_STORM_THRESHOLD = 100; // mutations per second
+
     const INLINE_MENU_BUTTON_TEXT = 'תפריט מלא';
     const FEATURE_META = Object.freeze({
         'practice-question': Object.freeze({
@@ -92,7 +103,7 @@
             summary: 'סימולטור שמראה איך ניסוח משפיע על זרימה, בושה, סוכנות ותגובתיות בשיחה חיה.',
             what: 'מציג בחירה בזמן אמת ואת המחיר הרגשי והיחסי של כל תגובה.',
             trains: 'קריאת השלכות, שפת תיקוף מול לחץ, ובחירה מודעת יותר תחת טעינה רגשית.',
-            when: 'כשצריך לראות לא רק האם משפט “נכון”, אלא איך הוא נוחת אצל האדם שמולך.',
+            when: 'כשצריך לראות לא רק האם משפט "נכון", אלא איך הוא נוחת אצל האדם שמולך.',
             why: 'זה מחבר את המטה-מודל להתערבות טיפולית בפועל: שפה משנה state, לא רק מבנה.',
             example: 'במקום ״למה את תמיד ככה?״ בודקים תגובה שמחזיקה קושי ופותחת בדיקה.'
         }),
@@ -156,7 +167,7 @@
             summary: 'סימולציה חיה לבחירת תגובה בתוך סיטואציה אנושית טעונה.',
             what: 'מראה איך תגובה אחת משנה את החוויה, את התהליך, ואת מה שנפתח או נסגר אחריה.',
             trains: 'תיקוף, דיוק, קריאת השפעה, ושאלת המשך טיפולית בתוך שיחה.',
-            when: 'כשצריך לתרגל לא רק “איזו קטגוריה יש כאן”, אלא “מה להגיד עכשיו”.',
+            when: 'כשצריך לתרגל לא רק "איזו קטגוריה יש כאן", אלא "מה להגיד עכשיו".',
             why: 'זה מחבר בין Meta Model לבין מיומנות קלינית: להבין למה תגובה עוזרת, מתי היא מסלימה, ואיך לתקן.',
             example: '״אני לא מתווכח עכשיו״ → בודקים האם התגובה לוחצת, מצילה, או פותחת מקום לבדיקה.',
             stateLabels: Object.freeze({
@@ -178,7 +189,7 @@
             what: 'מסדר את העבודה לפי שלבי מטה-מודל קלאסיים במקום לדלג ישר לתשובה.',
             trains: 'שפה מבנית, זיהוי משפחות דפוס, וניסוח יעד מידע מדויק.',
             when: 'כשרוצים לחזק שלד קליני ברור, שאלה אחרי שאלה.',
-            why: 'זה בונה יסודות יציבים לסטודנט/ית ומחדד חשיבה של “מה חסר כאן” למטפל/ת.',
+            why: 'זה בונה יסודות יציבים לסטודנט/ית ומחדד חשיבה של "מה חסר כאן" למטפל/ת.',
             example: 'משפט כמו ״אני חייב״ עובר דרך שם המבנה, ואז ליעד המידע שחסר כדי לפתוח אותו.'
         }),
         classic2: Object.freeze({
@@ -202,7 +213,7 @@
             what: 'בונה הסתעפות של פירושים, הנחות ושאלות במקום להינעל על קריאה אחת.',
             trains: 'חשיבת ענפים, בדיקת חלופות, והשהיית ודאות מוקדמת.',
             when: 'כשרוצים לראות מה עוד יכול להיות מתחת למשפט אחד שנשמע סגור.',
-            why: 'זה חשוב לטיפול ול-NLP כי המשמעות היא לא רק “מה נאמר”, אלא גם מה עוד לא נבדק.',
+            why: 'זה חשוב לטיפול ול-NLP כי המשמעות היא לא רק "מה נאמר", אלא גם מה עוד לא נבדק.',
             example: '״הוא פשוט אדיש״ → מפרקים בין אדישות, עייפות, הימנעות, או חוסר כלים.'
         }),
         'prism-research': Object.freeze({
@@ -214,8 +225,8 @@
             what: 'פותח את ההנחות שמתחבאות בתוך מילה או ציר משמעות אחד.',
             trains: 'חקירת עומק, מעבר בין שכבות, והרחבת אפשרויות קריאה.',
             when: 'כשרוצים לאתגר הנחה מרכזית בלי לקפוץ ישר לעימות.',
-            why: 'מאפשר עבודה טיפולית עדינה: לא “להוכיח שהמטופל טועה”, אלא להרחיב את המפה.',
-            example: '״אם אני לא מושלם, אין לי ערך״ → בודקים איך המושגים “מושלם” ו“ערך” מחזיקים זה את זה.'
+            why: 'מאפשר עבודה טיפולית עדינה: לא "להוכיח שהמטופל טועה", אלא להרחיב את המפה.',
+            example: '״אם אני לא מושלם, אין לי ערך״ → בודקים איך המושגים "מושלם" ו"ערך" מחזיקים זה את זה.'
         }),
         'living-triples': Object.freeze({
             familyLabel: 'Practice',
@@ -234,7 +245,7 @@
             familyName: 'ניתוח',
             title: 'מאמן פועל לא מפורט',
             trail: ['בית', 'ניתוח', 'פועל לא מפורט'],
-            summary: 'מסך שמתמקד בפעלים עמומים כמו “להסתדר” או “לטפל” ומחזיר אותם לפעולות בנות בדיקה.',
+            summary: 'מסך שמתמקד בפעלים עמומים כמו "להסתדר" או "לטפל" ומחזיר אותם לפעולות בנות בדיקה.',
             what: 'מפרק מילה כללית לרצף פעולות, תנאים ומדדים.',
             trains: 'שאלת דיוק, פירוק לעשייה, והמרת כוונה כללית להתנהגות.',
             when: 'כששומעים פועל גדול מדי שאין דרך לדעת מה הוא אומר בפועל.',
@@ -263,7 +274,7 @@
             trains: 'עיגון הקשר, בדיקת תנאים, והימנעות מהסקה מהירה מדי.',
             when: 'כשברור שיש כאן יותר ממשפט אחד, וצריך להבין את המערכת שסביבו.',
             why: 'מטפלים צריכים לא רק דיוק לשוני אלא גם קריאת הקשר; אחרת השאלה נכונה תאורטית אך לא פוגשת את האדם.',
-            example: 'לפני ששואלים “מי בדיוק?”, בודקים גם באיזה מצב, עם מי, ובאיזו רמת איום זה קורה.'
+            example: 'לפני ששואלים "מי בדיוק?", בודקים גם באיזה מצב, עם מי, ובאיזו רמת איום זה קורה.'
         })
     });
 
@@ -400,6 +411,7 @@
         });
     }
 
+    // ── Idempotent DOM write: skip innerHTML if content unchanged ─────
     function upsertGuidanceBlock(container, featureKey, html, className) {
         if (!container) return null;
         let block = container.querySelector(`[data-product-guidance="${featureKey}"]`);
@@ -418,10 +430,16 @@
                     container.insertBefore(block, container.firstChild || null);
                 }
             }
-        } else if (block.className !== className) {
+            block.innerHTML = html;
+            return block;
+        }
+        if (block.className !== className) {
             block.className = className;
         }
-        block.innerHTML = html;
+        // Only write innerHTML if content actually changed
+        if (block.innerHTML !== html) {
+            block.innerHTML = html;
+        }
         return block;
     }
 
@@ -456,30 +474,76 @@
             block.className = 'product-feature-guidance product-feature-guidance--standalone';
             nav.insertAdjacentElement('afterend', block);
         }
-        block.innerHTML = `${renderOrientation(meta, getStandaloneStateLabel(meta), false)}${renderIntro(meta)}`;
+        const html = `${renderOrientation(meta, getStandaloneStateLabel(meta), false)}${renderIntro(meta)}`;
+        if (block.innerHTML !== html) {
+            block.innerHTML = html;
+        }
     }
 
-    function applyEnhancements() {
-        enhanceInlineFeatures();
-        enhanceStandaloneFeature();
+    function applyEnhancements(reason) {
+        if (isApplying) return;
+        isApplying = true;
+        lastApplyReason = reason || 'unknown';
+        var t0 = Date.now();
+        console.log('[product-guidance] apply start reason=' + lastApplyReason);
+        try {
+            // Disconnect observer before DOM writes to prevent mutation storm
+            if (observer) observer.disconnect();
+            enhanceInlineFeatures();
+            enhanceStandaloneFeature();
+            console.log('[product-guidance] apply done duration=' + (Date.now() - t0) + 'ms');
+        } catch (error) {
+            console.error('[product-guidance] apply failed', error);
+        } finally {
+            isApplying = false;
+            // Reconnect observer after DOM writes complete
+            if (observer) {
+                try { reconnectObserver(); } catch (_e) { /* ignore */ }
+            }
+        }
     }
 
-    function scheduleApply() {
-        applyEnhancements();
-        global.requestAnimationFrame(() => applyEnhancements());
-    }
-
-    function boot() {
-        scheduleApply();
-        const observer = new MutationObserver(() => {
-            scheduleApply();
+    function scheduleApply(reason) {
+        if (isScheduled) return;
+        isScheduled = true;
+        console.log('[product-guidance] scheduleApply reason=' + (reason || 'unknown'));
+        global.requestAnimationFrame(function () {
+            isScheduled = false;
+            applyEnhancements(reason);
         });
+    }
+
+    function reconnectObserver() {
+        if (!observer) return;
         observer.observe(document.body, {
             childList: true,
             subtree: true,
             attributes: true,
             attributeFilter: ['class', 'data-screen', 'hidden', 'open']
         });
+    }
+
+    function boot() {
+        console.log('[product-guidance] boot');
+        // Initial synchronous apply (no observer yet, safe)
+        applyEnhancements('boot');
+
+        // Set up observer with storm protection
+        observer = new MutationObserver(function (mutations) {
+            // Mutation storm detection
+            var now = Date.now();
+            if (now - mutationWindowStart > 1000) {
+                mutationCount = 0;
+                mutationWindowStart = now;
+            }
+            mutationCount += mutations.length;
+            if (mutationCount > MUTATION_STORM_THRESHOLD) {
+                console.warn('[product-guidance] mutation storm detected: ' + mutationCount + ' mutations in 1s, skipping');
+                return;
+            }
+            scheduleApply('observer');
+        });
+        reconnectObserver();
     }
 
     global.MetaProductGuidance = Object.freeze({
@@ -492,4 +556,6 @@
     } else {
         boot();
     }
+
+    console.log('[product-guidance] module loaded');
 })(typeof window !== 'undefined' ? window : globalThis);

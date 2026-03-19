@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.484" data-build-time="1773932352395" data-build-iso="2026-03-19T14:59:12.395Z" data-git-commit="2757742">
+<html lang="he" dir="rtl" data-app-version="1.0.485" data-build-time="1773934878730" data-build-iso="2026-03-19T15:41:18.730Z" data-git-commit="9d79d1c">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -310,6 +310,8 @@
                 <span class="splash-dot"></span>
             </div>
             <p id="splash-boot-stage" style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.5);font-family:monospace">init</p>
+            <p id="splash-boot-detail" style="margin-top:4px;font-size:10px;color:rgba(255,255,255,0.35);font-family:monospace"></p>
+            <p id="splash-boot-error" style="margin-top:4px;font-size:10px;color:#ff6b6b;font-family:monospace"></p>
         </div>
     </div>
 
@@ -1759,14 +1761,34 @@
         var t0 = Date.now();
         window.__bootStage = 'init';
         window.__bootLog = [];
-        var indicator = document.getElementById('splash-boot-stage');
-        window.__setBootStage = function (stage) {
+        var stageEl = document.getElementById('splash-boot-stage');
+        var detailEl = document.getElementById('splash-boot-detail');
+        var errorEl = document.getElementById('splash-boot-error');
+        window.__setBootStage = function (stage, detail) {
             window.__bootStage = stage;
-            window.__bootLog.push({ s: stage, t: Date.now() - t0 });
+            var elapsed = Date.now() - t0;
+            window.__bootLog.push({ s: stage, d: detail || '', t: elapsed });
             document.documentElement.dataset.bootStage = stage;
-            if (indicator) indicator.textContent = stage + ' (' + (Date.now() - t0) + 'ms)';
+            console.log('[boot]', stage, detail || '', elapsed + 'ms');
+            if (stageEl) stageEl.textContent = stage + ' (' + elapsed + 'ms)';
+            if (detailEl && detail) detailEl.textContent = detail;
+        };
+        window.__setBootError = function (message) {
+            console.error('[boot] ERROR:', message);
+            if (errorEl) errorEl.textContent = message;
+            window.__bootLog.push({ s: 'ERROR', d: message, t: Date.now() - t0 });
         };
         window.__setBootStage('init');
+
+        // Global error handlers — catch runtime errors during boot
+        window.addEventListener('error', function (e) {
+            var msg = (e.filename || '') + ':' + (e.lineno || '?') + ' ' + (e.message || 'unknown error');
+            if (typeof window.__setBootError === 'function') window.__setBootError(msg);
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+            var msg = 'Unhandled rejection: ' + String(e.reason && e.reason.message ? e.reason.message : e.reason || 'unknown');
+            if (typeof window.__setBootError === 'function') window.__setBootError(msg);
+        });
     })();
     </script>
 
