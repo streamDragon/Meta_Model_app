@@ -851,6 +851,35 @@
             '</section>'
         ].join('');
     }
+    function homeEntryGate() {
+        var resume = resumeState();
+        return [
+            '<section class="meta-home-shell__entry-gate">',
+            '<div class="meta-home-shell__section-head"><span>שערי הכניסה</span><strong>שני צעדים להבנת מטה\u2011מודל</strong></div>',
+            '<article class="meta-home-entry-card" style="--meta-feature-accent:#6d28d9;--meta-feature-soft:#ede9fe;">',
+            '<div class="meta-home-entry-card__head"><span class="meta-home-entry-card__badge" data-tone="advanced">שער ראשי</span><span class="meta-home-entry-card__step">שלב 1</span></div>',
+            '<h3>מתמונת שטח למבנה עומק</h3>',
+            '<p class="meta-home-entry-card__subtitle">המשפט הגלוי, הפירוש החיצוני, ומה שמופעל בפנים</p>',
+            '<p>כאן מתחילים מן הסיפור שעל פני השטח: מי נראה אשם, מי פגע, ומה נדמה שקרה. דרך השמטה, עיוות והכללה נחשף בהדרגה מה חסר, איזה פירוש נכנס, ואיזה חוק פנימי מפעיל את התגובה. זהו השער הראשי להבנת המטה\u2011מודל.</p>',
+            '<button type="button" class="btn btn-primary meta-home-entry-card__cta" data-open-feature="initial-image-vs-deep-structure">פתחו את השער למבנה העומק</button>',
+            '</article>',
+            '<article class="meta-home-entry-card" style="--meta-feature-accent:#0ea5e9;--meta-feature-soft:#e0f2fe;">',
+            '<div class="meta-home-entry-card__head"><span class="meta-home-entry-card__badge" data-tone="intermediate">שער שני</span><span class="meta-home-entry-card__step">שלב 2</span></div>',
+            '<h3>תרגול זיהוי</h3>',
+            '<p class="meta-home-entry-card__subtitle">שמעתם משפט? עכשיו תגידו — איזה דפוס מסתתר בפנים?</p>',
+            '<p>אחרי שהבנתם למה בכלל צריך מטה\u2011מודל, כאן לומדים לזהות את שלושת הדפוסים הבסיסיים: השמטה, עיוות והכללה. זהו שער הכניסה המעשי לעבודה עם השפה של המטופל.</p>',
+            '<button type="button" class="btn btn-primary meta-home-entry-card__cta" data-open-feature="practice-question">עברו לתרגול זיהוי</button>',
+            '</article>',
+            '<article class="meta-home-entry-card meta-home-entry-card--resume" style="--meta-feature-accent:#64748b;--meta-feature-soft:#f1f5f9;">',
+            '<div class="meta-home-entry-card__head"><span class="meta-home-entry-card__badge">המשך</span></div>',
+            '<h3>חזרה למקום שבו עצרת</h3>',
+            '<p class="meta-home-entry-card__subtitle">להמשיך בדיוק מאיפה שהפסקת</p>',
+            '<p>כבר התחלתם מסלול? חזרו ישר לתרגיל, לפיצ\'ר, או לשלב שבו הייתם, בלי לחפש מחדש.</p>',
+            '<button type="button" class="btn btn-secondary meta-home-entry-card__cta" data-home-resume' + (!resume || !resume.tab ? ' disabled' : '') + '>המשך מאיפה שעצרת</button>',
+            '</article>',
+            '</section>'
+        ].join('');
+    }
     function statsRow(meta) {
         var progress = featureProgress(meta);
         var locked = featureLocked(meta);
@@ -925,10 +954,11 @@
         if (homeUi.view === 'help') return infoView('help');
         return [
             '<div class="meta-home-shell__frame">',
-            '<header class="meta-home-shell__topbar"><button type="button" class="meta-home-shell__menu btn btn-secondary" data-home-menu>☰ תפריט</button><div class="meta-home-shell__brand"><span class="meta-home-shell__eyebrow">מטען עבודה</span><strong>Meta Model בעברית</strong></div></header>',
+            '<header class="meta-home-shell__topbar"><button type="button" class="meta-home-shell__menu btn btn-secondary" data-home-menu>☰ תפריט</button><div class="meta-home-shell__brand"><span class="meta-home-shell__eyebrow">NLP · Meta Model · הבסיס</span><strong>Meta Model Gym</strong></div></header>',
             homeCinematicHero(),
-            homeHero(summary), homeStats(summary), homeResume(),
-            '<section class="meta-home-shell__cards">' + featureTabsForHome().map(function (tab, index) { return homeCard(FEATURE_META[tab], index); }).join('') + '</section>',
+            homeHero(), homeEntryGate(),
+            '<div class="meta-home-shell__divider" aria-hidden="true"></div>',
+            homeStats(summary),
             '<div class="meta-home-shell__divider" aria-hidden="true"></div>',
             homeBonusSection(),
             '</div>'
