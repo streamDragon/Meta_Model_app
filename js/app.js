@@ -5669,6 +5669,55 @@ function initializeMetaModelApp() {
     run('global-reveal-feedback', setupGlobalRevealFeedback);
     run('global-comic-strip-render', () => renderGlobalComicStrip(getActiveTabName()));
     window.addEventListener('resize', updateRuntimeDebugInfoCard);
+
+    // ── Nuclear fallback: guarantee ALL clickable navigation always works ──
+    // Zero dependencies on nav-map.js or any other module.
+    run('nav-key-fallback', () => {
+        const NAV_KEY_TO_TAB = {
+            home: 'home', sentenceMap: 'sentence-map', about: 'about',
+            categories: 'categories', prismLab: 'prismlab', blueprint: 'blueprint',
+            comicEngine: 'comic-engine', practiceQuestion: 'practice-question',
+            practiceRadar: 'practice-radar', practiceTriplesRadar: 'practice-triples-radar',
+            practiceWizard: 'practice-wizard', practiceVerbUnzip: 'practice-verb-unzip',
+            initialImageVsDeepStructure: 'initial-image-vs-deep-structure'
+        };
+
+        function forceNavigate(tabName) {
+            console.warn('[nav-fallback] forceNavigate →', tabName);
+            if (typeof navigateTo === 'function') {
+                try { navigateTo(tabName, { playSound: true, scrollToTop: true, featureEntry: 'welcome' }); return; } catch (e) { console.error('[nav-fallback] navigateTo threw', e); }
+            }
+            // Ultra-fallback: manually toggle tab sections
+            document.querySelectorAll('.tab-content').forEach(s => s.classList.remove('active'));
+            const sec = document.getElementById(tabName);
+            if (sec) sec.classList.add('active');
+            if (document.body) document.body.setAttribute('data-active-tab', tabName);
+        }
+
+        document.addEventListener('click', (event) => {
+            if (!event.target || !(event.target instanceof Element)) return;
+            const navEl = event.target.closest('[data-nav-key]');
+            if (navEl) {
+                const navKey = String(navEl.getAttribute('data-nav-key') || '').trim();
+                const tab = NAV_KEY_TO_TAB[navKey];
+                if (tab) {
+                    event.preventDefault();
+                    forceNavigate(tab);
+                    return;
+                }
+            }
+            // Also handle .tab-btn clicks directly
+            const tabBtn = event.target.closest('.tab-btn[data-tab]');
+            if (tabBtn) {
+                const tab = String(tabBtn.getAttribute('data-tab') || '').trim();
+                if (tab) {
+                    event.preventDefault();
+                    forceNavigate(tab);
+                    return;
+                }
+            }
+        }, true); // capture phase — fires FIRST, before any other handler
+    });
 }
 
 function updateRuntimeDebugInfoCard() {

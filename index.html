@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="he" dir="rtl" data-app-version="1.0.475" data-build-time="1773921552551" data-build-iso="2026-03-19T11:59:12.551Z" data-git-commit="f672cf6">
+<html lang="he" dir="rtl" data-app-version="1.0.476" data-build-time="1773925777730" data-build-iso="2026-03-19T13:09:37.730Z" data-git-commit="d50eb22">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1841,6 +1841,57 @@
             };
             document.body.appendChild(runtimeEnvScript);
         })();
+    </script>
+
+    <!-- EMERGENCY NAV FALLBACK: runs after 6s, zero deps on any module -->
+    <script>
+    (function emergencyNavFallback() {
+        var KEY_TO_TAB = {
+            home:'home', sentenceMap:'sentence-map', about:'about',
+            categories:'categories', prismLab:'prismlab', blueprint:'blueprint',
+            comicEngine:'comic-engine', practiceQuestion:'practice-question',
+            practiceRadar:'practice-radar', practiceTriplesRadar:'practice-triples-radar',
+            practiceWizard:'practice-wizard', practiceVerbUnzip:'practice-verb-unzip',
+            initialImageVsDeepStructure:'initial-image-vs-deep-structure'
+        };
+        var armed = false;
+
+        function arm() {
+            if (armed) return;
+            armed = true;
+            document.addEventListener('click', function (e) {
+                var el = e.target;
+                if (!el || typeof el.closest !== 'function') return;
+                var navEl = el.closest('[data-nav-key]');
+                if (!navEl) return;
+                var key = navEl.getAttribute('data-nav-key');
+                var tab = KEY_TO_TAB[key];
+                if (!tab) return;
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('[emergency-nav] click:', key, '→', tab);
+                if (typeof window.navigateTo === 'function') {
+                    try { window.navigateTo(tab, {scrollToTop:true, featureEntry:'welcome'}); return; } catch(err) { console.error('[emergency-nav]', err); }
+                }
+                // Ultra-fallback: raw tab switch
+                var sections = document.querySelectorAll('.tab-content');
+                for (var i = 0; i < sections.length; i++) sections[i].classList.remove('active');
+                var target = document.getElementById(tab);
+                if (target) target.classList.add('active');
+                if (document.body) document.body.setAttribute('data-active-tab', tab);
+            }, true);
+        }
+
+        // Arm after 6 seconds — gives normal handlers time to bind first
+        setTimeout(arm, 6000);
+        // Also arm on any click if not already armed after 2s
+        setTimeout(function() {
+            document.addEventListener('click', function once() {
+                document.removeEventListener('click', once, true);
+                arm();
+            }, true);
+        }, 2000);
+    })();
     </script>
 </body>
 </html>
