@@ -21,6 +21,8 @@
     display: grid;
     gap: 18px;
     margin: 22px 0 28px;
+    position: relative;
+    z-index: 2;
 }
 
 .product-family-hub__head {
@@ -77,6 +79,9 @@
     border: 1px solid var(--product-border);
     background: var(--product-soft-fill);
     box-shadow: var(--product-shadow);
+    position: relative;
+    isolation: isolate;
+    z-index: 1;
 }
 
 .product-family-card[data-family="practice"] {
@@ -126,10 +131,15 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    position: relative;
+    z-index: 2;
 }
 
 .product-family-card__actions .btn {
     flex: 1 1 180px;
+    position: relative;
+    z-index: 3;
+    pointer-events: auto;
 }
 
 .product-feature-guidance {

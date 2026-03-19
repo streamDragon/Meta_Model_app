@@ -5575,6 +5575,7 @@ function initializeMetaModelApp() {
     run('global-feature-menu-dropdown', setupGlobalFeatureMenuDropdown);
     run('feature-map-overlay-controls', setupFeatureMapOverlayControls);
     run('canonical-nav-launchers', setupCanonicalNavLaunchers);
+    run('home-launcher-click-recovery', setupHomeLauncherClickRecovery);
     run('app-sticky-banner', setupAppStickyBanner);
     run('app-shell-bootstrap', () => {
         if (window.MetaAppShell && typeof window.MetaAppShell.bootstrap === 'function') {
@@ -6085,6 +6086,38 @@ function bindElementToNavKey(element, navKey = '') {
 
     node.dataset.navKeyBound = '1';
     return true;
+}
+
+function setupHomeLauncherClickRecovery() {
+    if (!document.body || document.body.dataset.homeLauncherRecoveryBound === '1') return;
+    document.body.dataset.homeLauncherRecoveryBound = '1';
+
+    document.addEventListener('click', (event) => {
+        if (event.defaultPrevented) return;
+        if (!(event.target instanceof Element)) return;
+        if (getCurrentActiveTabName() !== 'home') return;
+        if ('button' in event && Number(event.button) !== 0) return;
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        if (event.target.closest('#home [data-nav-key], #home a[data-versioned-href], #home button, #home a, #home summary, #home input, #home select, #home textarea, #home label')) {
+            return;
+        }
+        if (typeof document.elementsFromPoint !== 'function') return;
+
+        const fallbackLauncher = document.elementsFromPoint(event.clientX, event.clientY).find((node) => {
+            if (!(node instanceof HTMLElement)) return false;
+            if (!node.matches('#home [data-nav-key], #home a[data-versioned-href]')) return false;
+            if (!isElementActuallyVisible(node)) return false;
+            if (node.hasAttribute('disabled')) return false;
+            if (node.getAttribute('aria-disabled') === 'true') return false;
+            return true;
+        });
+
+        if (!fallbackLauncher) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        fallbackLauncher.click();
+    }, true);
 }
 
 function setupCanonicalNavLaunchers() {
