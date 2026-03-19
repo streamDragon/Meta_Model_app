@@ -1561,11 +1561,11 @@ function featureActionButtonsHtml(meta) {
     }
     function renderAllFeatures(direction) { MANAGED_TABS.forEach(function (tab) { try { renderFeature(tab, direction); } catch (err) { console.warn('[shell] renderFeature failed for ' + tab, err); } }); }
     function syncShells(direction) {
-        renderHome(direction || 'forward');
-        renderAllFeatures(direction || 'forward');
-        renderFeatureChromes();
-        syncActiveShellState();
-        refreshPracticeCopy();
+        try { renderHome(direction || 'forward'); } catch (err) { console.warn('[shell] renderHome failed', err); }
+        try { renderAllFeatures(direction || 'forward'); } catch (err) { console.warn('[shell] renderAllFeatures failed', err); }
+        try { renderFeatureChromes(); } catch (err) { console.warn('[shell] renderFeatureChromes failed', err); }
+        try { syncActiveShellState(); } catch (err) { console.warn('[shell] syncActiveShellState failed', err); }
+        try { refreshPracticeCopy(); } catch (err) { console.warn('[shell] refreshPracticeCopy failed', err); }
     }
     function spawnStars(anchor) {
         if (!anchor || typeof anchor.getBoundingClientRect !== 'function') return;

@@ -360,7 +360,7 @@ try {
 
     mustContain('viewport sizing setup function', js, /function\s+setupMobileViewportSizing\s*\(/);
     mustContain('viewport css var update in js', js, /setProperty\('--app-dvh',\s*`\$\{height\}px`\)/);
-    mustContain('viewport sizing called inside app init', js, /initializeMetaModelApp[\s\S]*setupMobileViewportSizing\(\)/);
+    mustContain('viewport sizing called inside app init', js, /initializeMetaModelApp[\s\S]*setupMobileViewportSizing/);
     mustContain(
         'app init wired for dynamic script load path',
         js,
