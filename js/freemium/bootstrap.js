@@ -677,9 +677,13 @@ async function consumeSentenceOrPrompt(options = {}) {
     freemiumState.isBusy = true;
     try {
         let result = null;
+        const CONSUME_TIMEOUT_MS = 8000;
         for (let attempt = 0; attempt < 2; attempt += 1) {
             try {
-                result = await consumeSentence({ count, source, requestId });
+                result = await Promise.race([
+                    consumeSentence({ count, source, requestId }),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('consume timeout')), CONSUME_TIMEOUT_MS))
+                ]);
                 break;
             } catch (error) {
                 if (attempt === 0) {

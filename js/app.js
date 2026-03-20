@@ -1663,8 +1663,18 @@ function refreshActionButtonDecorators(root = document) {
 }
 
 function handleRevealFeedbackMutations(records) {
+    if (revealFeedbackState._processing) return;
     const mutationList = Array.from(records || []);
     if (!mutationList.length) return;
+    revealFeedbackState._processing = true;
+    try {
+    _handleRevealFeedbackMutationsInner(mutationList);
+    } finally {
+        revealFeedbackState._processing = false;
+    }
+}
+
+function _handleRevealFeedbackMutationsInner(mutationList) {
     const now = Date.now();
     const withinActionWindow = (now - Number(revealFeedbackState.lastActionAt || 0)) <= OPENED_CONTENT_ACTION_WINDOW_MS;
     const candidateElements = new Set();
@@ -1691,6 +1701,7 @@ function handleRevealFeedbackMutations(records) {
                         target.classList.contains('opened-content')
                         || target.classList.contains('opened-content-pulse')
                         || target.classList.contains('action-button-active')
+                        || target.classList.contains('action-button')
                     )
                 ) {
                     return;
@@ -8464,19 +8475,19 @@ function buildQuestionDrillSessionGuidance(accuracy = 0, { isTestMode = false } 
     if (safeAccuracy >= 85) {
         return {
             takeaway: isTestMode
-                ? 'הדיוק כבר נשמר גם תחת לחץ. כנראה שהעין מזהה מהר את המילה שמפעילה את הקטגוריה.'
-                : 'הזיהוי כבר נהיה יציב יותר. כנראה שאת/ה תופס/ת מהר מה במשפט מפעיל את הקטגוריה.',
+                ? 'הדיוק כבר נשמר גם תחת לחץ. כנראה שהעין מזהה מהר איזו שאלה תפתח את המשפט.'
+                : 'הזיהוי כבר נהיה יציב יותר. כנראה שאת/ה תופס/ת מהר איזו שאלה חושפת את לב הבעיה.',
             nextStep: 'להמשך: עברו למכ"ם שלשות או לקומיקס כדי לראות איך אותו דיוק עובד בתוך הקשר חי.'
         };
     }
     if (safeAccuracy >= 60) {
         return {
-            takeaway: 'יש בסיס טוב. החיזוק הבא הוא לעצור על המילה שמטה את המשפט לפני שלוחצים "בדוק".',
+            takeaway: 'יש בסיס טוב. החיזוק הבא הוא לעצור על המילה שמטה את המשפט לפני שבוחרים את השאלה.',
             nextStep: 'להמשך: עשו עוד בלוק קצר, או עברו למכ"ם שלשות כדי להתאמן קודם על כיוון ואז על תבנית.'
         };
     }
     return {
-        takeaway: 'עדיף לא לרדוף מהירות עדיין. קודם מחזקים את ההבדל בין מחיקה, עיוות והכללה דרך הנימוק.',
+        takeaway: 'עדיף לא לרדוף מהירות עדיין. קודם מחזקים את ההבדל בין מידע חסר, פרשנות מיותרת וכלל גורף דרך הנימוק.',
         nextStep: 'להמשך: פתחו את מילון הקטגוריות או את ההסבר של השאלה האחרונה, וקחו תבנית אחת לעוד 3 ניסיונות.'
     };
 }
@@ -8882,7 +8893,7 @@ function openQuestionDrillMenuOverlay() {
         actions.appendChild(button);
     };
 
-    addAction('עזרה', 'btn btn-secondary', () => {
+    addAction('יועץ NLP', 'btn btn-secondary', () => {
         window.MetaOverlayProvider?.closeOverlay('question-drill-menu-help');
         openQuestionDrillHelpOverlay();
     });
@@ -9060,6 +9071,13 @@ function setQuestionDrillMode(mode = 'learning', { persist = true, refreshCurren
             questionDrillState.selectedOptionId = '';
             renderQuestionDrillOptions();
             if (isTestMode) startQuestionDrillTimer();
+            const targetCopy = getQuestionDrillTargetCopy(getQuestionDrillTargetCategory(questionDrillState.current));
+            setQuestionDrillFeedback(
+                isTestMode
+                    ? 'קראו את המשפט ובחרו מיד את שאלת הדיוק שחושפת הכי מהר את מוקד הבעיה.'
+                    : targetCopy.livePrompt,
+                'info'
+            );
         }
     }
     updateQuestionDrillTestBanner();
@@ -9654,7 +9672,7 @@ function completeQuestionDrillSession() {
     }
 
     if (isTestMode) {
-        setQuestionDrillFeedback('המשחק נגמר. אפשר לפתוח תרגול חדש או לבדוק את הנתונים.', 'success');
+        setQuestionDrillFeedback('הסשן הסתיים. אפשר לפתוח תרגול חדש או לעיין בנתונים.', 'success');
         playUISound('finish');
         saveQuestionDrillTestStats();
     } else {
@@ -9804,7 +9822,7 @@ function showQuestionDrillHint() {
         setQuestionDrillFeedback(
             coach && typeof coach.getQuestionHintLocked === 'function'
                 ? coach.getQuestionHintLocked()
-                : 'במשחק מהיר אין רמזים. עברו ללימוד אם צריך.',
+                : 'בזמן אמת אין רמזים. עברו ללימוד אם צריך.',
             'warn'
         );
         return;
@@ -16613,68 +16631,6 @@ function setupPrismModule() {
 
     if (typeof applyPrismLabCompactRuntimeCopy === 'function') applyPrismLabCompactRuntimeCopy();
     if (typeof ensurePrismLabWorkLayout === 'function') ensurePrismLabWorkLayout();
-}
-
-function renderPrismLibrary() {
-    const lib = document.getElementById('prism-library');
-    if (!lib || !metaModelData.prisms) return;
-    lib.innerHTML = '';
-    metaModelData.prisms.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'prism-card';
-        div.innerHTML = `
-            <h4>${p.name_he}</h4>
-            <p>${p.philosophy_core}</p>
-            <p><strong>שאלת עוגן:</strong> ${p.anchor_question_templates[0]}</p>
-            <div style="margin-top:10px"><button class="btn prism-open-btn" data-ui-sound="off" data-id="${p.id}">בחר פריזמה</button></div>
-        `;
-        // Direct binding fallback (helps in some embedded hosts).
-        const openBtn = div.querySelector('.prism-open-btn');
-        if (openBtn) {
-            openBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openPrism(p.id);
-            });
-        }
-
-        lib.appendChild(div);
-    });
-}
-
-function openPrism(id) {
-    const prism = getPrismById(id);
-    if (!prism) return alert('פריזמה לא נמצאה');
-    document.getElementById('prism-library').classList.add('hidden');
-    const detail = document.getElementById('prism-detail');
-    detail.classList.remove('hidden');
-    document.getElementById('prism-name').textContent = `${prism.name_he} - ${prism.name_en}`;
-    document.getElementById('prism-desc').textContent = prism.philosophy_core;
-    document.getElementById('prism-anchor').textContent = prism.anchor_question_templates[0];
-    renderPrismDeepGuide(prism);
-    playUISound('prism_open');
-    const resultBox = document.getElementById('prism-result');
-    if (resultBox) {
-        resultBox.classList.add('hidden');
-        resultBox.innerHTML = '';
-    }
-    // store current prism in a temp
-    detail.setAttribute('data-prism-id', id);
-    const pivotToggle = document.getElementById('prepared-pivot-toggle');
-    if (pivotToggle) pivotToggle.checked = false;
-
-    const draft = loadPrismVerticalStackDraft(id);
-    applyVerticalStackStateToUI(prism, draft || {
-        categoryId: prism.id,
-        categoryLabelHe: prism.name_he || '',
-        coreQuestion: getPrismCoreQuestion(prism),
-        anchorText: deriveDefaultPrismAnchor(prism),
-        answers: {},
-        emotion: 3,
-        resistance: 2
-    });
-
-    attachMappingDropHandlers();
-    refreshPrismVerticalStackForCurrentPrism({ forceDefaultAnchor: true });
 }
 
 function handlePrismSubmit() {

@@ -1038,14 +1038,10 @@ body.shell-feature-active .tab-content.active {
     border-radius: 18px;
 }
 
-#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-secondary-actions,
 #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #question-drill-chip-stars,
 #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #question-drill-chip-target,
 #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #question-drill-chip-streak,
 #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #question-drill-chip-timer,
-#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #question-drill-compact-score,
-#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #question-drill-compact-streak,
-#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #question-drill-game-hud,
 #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-progress {
     display: none !important;
 }
@@ -1071,15 +1067,20 @@ body.shell-feature-active .tab-content.active {
     font-weight: 700;
 }
 
-#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-compact-bar {
-    justify-content: flex-start;
+#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-live-toolbar {
+    align-items: stretch;
     gap: 8px;
 }
 
-#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #question-drill-open-menu {
-    min-height: 32px;
-    padding-inline: 11px;
-    font-size: 0.74rem;
+#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-live-actions {
+    gap: 6px;
+    justify-content: flex-start;
+}
+
+#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-inline-tool {
+    min-height: 34px;
+    padding-inline: 12px;
+    font-size: 0.78rem;
 }
 
 #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-live-main {
@@ -1122,6 +1123,10 @@ body.shell-feature-active .tab-content.active {
 
 #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-feedback {
     padding: 10px 12px;
+}
+
+#practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #question-drill-game-hud {
+    display: grid !important;
 }
 
 #practice-radar.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #rapid-radar-prestart {
@@ -1467,22 +1472,16 @@ body.shell-feature-active .tab-content.active {
 }
 
 @media (max-width: 760px) {
-    #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-compact-bar {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
+    #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-live-toolbar {
+        flex-direction: column;
     }
 
-    #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #question-drill-open-menu {
-        width: auto;
+    #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-live-actions {
+        width: 100%;
     }
 
     #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-controls {
         grid-template-columns: minmax(0, 1fr);
-    }
-
-    #practice-question.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .question-drill-mobile-categories {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     #practice-radar.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .rapid-radar-topbar {
