@@ -616,6 +616,125 @@ const css = `
 .it-onboarding-actions{display:flex;justify-content:flex-start}
 @media (max-width:1180px){.it-template-grid-refined{grid-template-columns:1fr 1fr}.it-main-layout{grid-template-columns:1fr}.it-support-summary{position:static}.it-branch-grid,.it-coach-grid,.it-source-foot,.it-onboarding-grid,.it-schema-compare{grid-template-columns:1fr}}
 @media (max-width:720px){.it-wrap-refined{padding:10px}.it-hero-panel{padding:12px}.it-textbox-prominent{padding:12px}.it-template-grid-refined{grid-template-columns:1fr}.it-start-strip,.it-onboarding-card{padding:14px}.it-onboarding-head h2{font-size:1.25rem}}
+/* Restrained first-pass workspace cleanup */
+.mtp-page,.mtp-nav{max-width:min(1520px,calc(100vw - 24px))}
+.trp-page{width:100%;max-width:none;padding:0 0 28px}
+.trp-shell{gap:16px;padding:16px 18px 20px;border-radius:28px;border-color:#e3ebf4;background:radial-gradient(circle at top right,rgba(245,158,11,.12),transparent 26%),radial-gradient(circle at left top,rgba(59,130,246,.08),transparent 32%),linear-gradient(180deg,#f7f9fc 0%,#fcfdff 100%);box-shadow:0 22px 52px rgba(15,23,42,.06)}
+.trp-card,.trp-support-card,.trp-problem-card,.trp-note-card,.trp-clarity-card,.trp-start-strip{box-shadow:none}
+.trp-card{padding:14px 16px;border-radius:20px;border-color:#e5edf6;background:rgba(255,255,255,.94)}
+.trp-top{align-items:center;gap:10px}
+.trp-title-wrap{gap:4px;max-width:880px}
+.trp-kicker{font-size:.76rem;letter-spacing:.03em;color:#6280a3}
+.trp-title{margin:0;font-size:1.32rem;line-height:1.25}
+.trp-subtitle{font-size:.97rem;line-height:1.72;color:#5b6b7f}
+.trp-actions,.trp-chip-row,.trp-start-actions{gap:10px}
+.trp-btn{padding:10px 14px;border-radius:12px}
+.trp-btn.is-primary{box-shadow:0 10px 20px rgba(19,88,211,.14)}
+.trp-mode-pill,.trp-summary-pill{min-height:38px;padding:0 12px;font-size:.86rem}
+.trp-hero{grid-template-columns:minmax(0,1.28fr) minmax(320px,.72fr);gap:16px}
+.trp-purpose{gap:10px}
+.trp-purpose-body,.trp-problem-body,.trp-note-card{font-size:1rem;line-height:1.78}
+.trp-start-strip{padding:14px 16px;border-radius:20px;gap:10px}
+.trp-clarity-strip{gap:12px}
+.trp-clarity-card{padding:12px 14px;border-radius:16px;border-color:#e5edf6;background:rgba(255,255,255,.86)}
+.trp-clarity-title{font-size:.98rem}
+.trp-clarity-body{font-size:.9rem;color:#617285}
+.trp-problem-card,.trp-note-card{padding:12px 14px;border-radius:16px;background:rgba(249,251,254,.9)}
+.trp-problem-title{font-size:1rem}
+.trp-step-strip{gap:12px}
+.trp-step{padding:10px 12px;border-radius:14px;border:1px solid #e1e9f3;background:rgba(255,255,255,.66)}
+.trp-step strong{font-size:.9rem}
+.trp-step span{font-size:.85rem;line-height:1.55}
+.trp-layout{grid-template-columns:minmax(0,1.72fr) minmax(290px,.6fr);gap:18px}
+.trp-main{gap:16px}
+.trp-support{gap:12px}
+.trp-support-card{padding:12px 14px;border-radius:18px;border-color:#e7eef6;background:rgba(251,253,255,.94)}
+.trp-support-card h3,.trp-support-card h4{font-size:.98rem}
+.trp-support-card p{font-size:.88rem;color:#6a7788}
+.trp-support-card>.it-panel{padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.it-wrap{max-width:none;margin:0;border:0;border-radius:0;padding:0;background:none;box-shadow:none}
+.it-wrap-refined{padding:0;background:none}
+.it-panel{padding:16px 18px;border-radius:18px;border-color:#e5edf6;background:rgba(255,255,255,.96);box-shadow:none}
+.it-title{font-size:1.26rem;line-height:1.3}
+.it-sub{margin:8px 0 0;font-size:1rem;line-height:1.7;color:#536476}
+.it-kicker{font-size:.74rem;font-weight:800;color:#7a8da6}
+.it-kicker code{font-size:.73rem;background:#f6f8fb;border:1px solid #e3eaf2;border-radius:999px;padding:2px 8px;color:#5d6b7d}
+.it-panel-head{gap:10px}
+.it-panel-badge,.it-branch-badge{padding:4px 9px;border-radius:999px;background:#f4f8ff;border-color:#d9e6fb;color:#476b9c;font-size:.72rem}
+.it-chip{display:inline-flex;align-items:center;min-height:32px;padding:6px 12px;border-color:#dbe6f2;background:#f8fafc;color:#42556d;font-size:.82rem;line-height:1.3}
+.it-process-rail{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.it-process-step{display:grid;gap:8px;padding:12px;border:1px solid #e3ebf5;border-radius:16px;background:rgba(255,255,255,.86)}
+.it-process-step-top{display:flex;align-items:center;gap:8px}
+.it-process-step-index{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:999px;background:#eef2f8;color:#566579;font-size:.82rem;font-weight:900}
+.it-process-step strong{font-size:.9rem;color:#10233f}
+.it-process-step p{margin:0;color:#607287;font-size:.87rem;line-height:1.55}
+.it-process-step.is-current{border-color:#bfd7ff;background:linear-gradient(180deg,#eff6ff 0%,#fff 100%)}
+.it-process-step.is-current .it-process-step-index{background:#1d4ed8;color:#fff}
+.it-process-step.is-done{border-color:#ccebd8;background:linear-gradient(180deg,#effcf5 0%,#fff 100%)}
+.it-process-step.is-done .it-process-step-index{background:#16a34a;color:#fff}
+.it-textbox{margin-top:10px;padding:14px 16px;border-radius:16px;border-color:#ebe0bf;background:linear-gradient(180deg,#fffefa 0%,#fffdf7 100%);min-height:108px;line-height:1.95;font-size:1rem}
+.it-token{padding:4px 10px;font-size:.95rem}
+.it-source-foot{margin-top:12px;gap:12px}
+.it-help{margin-top:10px;font-size:.92rem;line-height:1.65;color:#67768a}
+.it-selection-card{padding:13px 14px;border-radius:16px;border-color:#d8e6f8;background:linear-gradient(180deg,#fbfdff 0%,#f7fbff 100%)}
+.it-selection-card strong{font-size:.78rem}
+.it-selection-card span{font-size:1.04rem;line-height:1.45}
+.it-selection-card small{font-size:.86rem;line-height:1.55}
+.it-template-grid-refined{gap:10px}
+.it-template-card{padding:14px;border-radius:16px;border-color:#e2e9f2;box-shadow:none}
+.it-template-card:hover{border-color:#bfd7ff;background:#fbfdff}
+.it-template-head{gap:10px}
+.it-template-title{font-size:1rem;line-height:1.35}
+.it-template-mini{font-size:.72rem;color:#8a97a8}
+.it-template-help{margin-top:8px;font-size:.9rem;line-height:1.55;color:#465569}
+.it-template-code{font-size:.68rem;padding:3px 8px;background:#344054}
+.it-dropzone{margin-top:10px;padding:10px;border-radius:12px;background:#fcfdff}
+.it-workspace-panel{border-color:#c9ddf4;background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);box-shadow:0 10px 28px rgba(37,99,235,.06)}
+.it-focus-toolbar{margin-top:10px;gap:10px;padding-block-end:2px}
+.it-focus-mini-btn{padding:7px 12px;border-color:#d9e4ef;background:#f8fbff;color:#42556d;font-size:.82rem}
+.it-focus-help{padding:10px 12px;border-radius:12px}
+.it-empty{padding:18px;border-radius:16px;line-height:1.7}
+.it-active{gap:12px}
+.it-stage-switch{display:inline-flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding:4px;border:1px solid #e1eaf3;background:#f8fbff;border-radius:16px;max-width:100%}
+.it-stage-btn{padding:8px 12px;border-radius:999px;border:1px solid transparent;background:transparent;font-size:.84rem}
+.it-stage-btn.is-active{border-color:#c8daf7;background:#fff;color:#1d4ed8;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.it-stage-card{padding:16px;border-radius:18px;border-color:#dbe7f5;background:linear-gradient(180deg,#fff 0%,#fbfdff 100%)}
+.it-question,.it-reflection,.it-disclaimer,.it-branch-note,.it-impact-card,.it-support-item,.it-board-card,.it-level-card,.it-hat-card,.it-rg-card,.it-tree-lab,.it-reveal-visual,.it-reveal-figure,.it-tree-board,.it-tree-level-slot,.it-tree-fan-slot,.it-branch-card{box-shadow:none}
+.it-question,.it-reflection,.it-disclaimer{padding:12px;border-radius:12px;line-height:1.6;font-size:.95rem}
+.it-disclaimer{font-size:.88rem}
+.it-actions{margin-top:12px;gap:10px}
+.it-btn{padding:10px 14px;border-radius:12px;border:1px solid transparent;line-height:1.2}
+.it-btn.primary{background:#1d5ed8;box-shadow:0 10px 20px rgba(29,94,216,.14)}
+.it-btn.secondary{background:#eef2f7;color:#10233f;border-color:#d8e1eb}
+.it-btn.ghost{background:#fff;color:#23436f;border-color:#d8e1eb}
+.it-feedback,.it-recap{padding:10px 12px;border-radius:12px;line-height:1.55}
+.it-mini-tag{padding:3px 8px;border-color:#d8e1eb;background:#f8fafc;color:#516174;font-size:.73rem}
+.it-mini-tag.code{background:#334155;border-color:#334155}
+.it-board-card{padding:12px;border-radius:14px;border-color:#e5edf5}
+.it-board-card h3{margin:0 0 8px;font-size:1rem}
+.it-board-card p{font-size:.95rem;line-height:1.65}
+.it-board-row{gap:12px}
+.it-board-label{font-size:.8rem;color:#516174}
+.it-board-value{padding:10px 12px;border-radius:12px;line-height:1.55}
+.it-coach-grid{gap:12px}
+.it-coach-card{padding:14px;border-radius:16px;border-color:#dbe7f3}
+.it-coach-card strong{font-size:.88rem}
+.it-coach-card p{line-height:1.6}
+.it-branch-panel{padding:14px;border-radius:18px;border-color:#dbe7f5;background:linear-gradient(180deg,#fff 0%,#fbfdff 100%)}
+.it-branch-head h3{font-size:1.06rem}
+.it-branch-head p{line-height:1.6}
+.it-branch-grid{gap:12px}
+.it-branch-card h4{font-size:.95rem}
+.it-support-summary{top:16px}
+.it-support-list{gap:10px}
+.it-support-item{padding:11px 12px;border-radius:14px;border-color:#e6edf5;background:#fff}
+.it-support-item strong{font-size:.77rem;color:#60748c}
+.it-support-item span{font-size:.95rem;line-height:1.55}
+.it-scenario-list li{padding:8px 10px;border-color:#edf2f7}
+@media (min-width:1280px){.trp-layout{grid-template-columns:minmax(0,1.8fr) minmax(300px,.56fr)}.it-source-foot{grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr)}}
+@media (max-width:1100px){.it-process-rail{grid-template-columns:1fr 1fr}.trp-layout{grid-template-columns:minmax(0,1.55fr) minmax(280px,.72fr)}}
+@media (max-width:980px){.trp-page{width:100%;max-width:none}.it-panel{padding:14px 15px}.it-stage-switch{width:100%}.it-process-rail{grid-template-columns:1fr}}
+@media (max-width:720px){.it-wrap-refined{padding:0}.it-stage-switch{display:grid;grid-template-columns:1fr;width:100%}.it-stage-btn{text-align:center}}
 `;
 
 function assetUrl(path: string): string {
@@ -1322,7 +1441,7 @@ function SentenceBoard(props: {
             <div className="it-board-value warn">{activeQuestion || 'אחרי גרירה תקינה תופיע כאן השאלה האוטומטית'}</div>
           </div>
           <div className="it-board-row" style={{ marginTop: 8 }}>
-            <div className="it-board-label">Reveal</div>
+            <div className="it-board-label">שיקוף מבנה</div>
             <div className="it-board-value">{activeReflection || 'כאן יופיע שיקוף קצר של מבנה עומק אפשרי (אילוסטרציה בלבד).'}</div>
           </div>
         </div>
@@ -1407,7 +1526,7 @@ function RevealTemplateFigure(props: {
   if (templateType === 'CAUSE') {
     const labels = causeMode === 'EFFECTS_OF_TOKEN' ? ['אפקט 1', 'אפקט 2'] : ['תנאי 1', 'תנאי 2'];
     return (
-      <div className="it-reveal-figure" aria-label="Reveal visual map">
+      <div className="it-reveal-figure" aria-label="מפת שיקוף חזותית">
         <div className="it-reveal-cause-layout">
           <div className="it-reveal-cause-side">
             {labels.map((label, idx) => renderNode(label, safeSlots[idx], `cause-${idx}`))}
@@ -1431,7 +1550,7 @@ function RevealTemplateFigure(props: {
 
   const labels = templateType === 'CEQ' ? ['סימן', 'קריטריון', 'דוגמה'] : ['הנחה 1', 'הנחה 2', 'הנחה 3'];
   return (
-    <div className="it-reveal-figure" aria-label="Reveal visual map">
+    <div className="it-reveal-figure" aria-label="מפת שיקוף חזותית">
       <div className="it-reveal-anchor">
         <div className="it-reveal-node anchor">
           <strong>עוגן</strong>
@@ -2028,7 +2147,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
       chips.push({ id: `chip-slot-${idx}`, label: `Slot ${idx + 1}`, text });
     });
     if (activePayload?.question) chips.push({ id: 'chip-question', label: 'שאלה', text: cleanSnippet(activePayload.question, 80) });
-    if (activeReflection) chips.push({ id: 'chip-reveal', label: 'Reveal', text: cleanSnippet(activeReflection, 80) });
+    if (activeReflection) chips.push({ id: 'chip-reveal', label: 'שיקוף', text: cleanSnippet(activeReflection, 80) });
     return chips;
   })();
 
@@ -2199,7 +2318,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
       <section className="it-panel it-source-panel" aria-label="משפט המקור">
         <div className="it-panel-head">
           <div>
-            <div className="it-kicker">Scenario ID: <code>{scenario.scenario_id}</code></div>
+            <div className="it-kicker">תרחיש <code>{scenario.scenario_id}</code></div>
             <h2 className="it-title" style={{ fontSize: '1.08rem', marginTop: 4 }}>קוראים את המשפט המלא</h2>
             <p className="it-sub">רואים את כל האמירה, ואז בוחרים איזה חלק כדאי להפוך לעוגן עבודה.</p>
           </div>
