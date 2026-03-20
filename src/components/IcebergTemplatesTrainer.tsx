@@ -1,6 +1,6 @@
 ﻿import React, { useEffect, useMemo, useState } from 'react';
 import { getTrainerContract } from '../config/trainerContract';
-import { TrainerPlatformShell, TrainerSupportCard } from './trainer-shell/TrainerPlatformShell';
+import { TrainerPlatformShell } from './trainer-shell/TrainerPlatformShell';
 import { TrainerSettingsShell, type TrainerSettingsSection } from './trainer-shell/TrainerSettingsShell';
 import { TRAINER_PLATFORM_CSS } from './trainer-shell/trainerPlatformStyles';
 
@@ -179,6 +179,8 @@ const TEMPLATE_META: Record<TemplateType, TemplateMeta> = {
     factPrompt: 'איזו הנחה כדאי לבדוק קודם מול המציאות?'
   }
 };
+
+const TEMPLATE_TYPES: TemplateType[] = ['CEQ', 'CAUSE', 'ASSUMPTIONS1'];
 
 const PROTOTYPE_SCHEMAS: PrototypeSchemaMeta[] = [
   {
@@ -360,7 +362,7 @@ const INITIAL_STATE: TrainerState = {
 const ICEBERG_SETTINGS_STORAGE_KEY = 'iceberg_templates_settings_v1';
 const DEFAULT_ICEBERG_SETTINGS: IcebergSettings = {
   defaultScenarioIndex: 0,
-  launchMode: 'guided',
+  launchMode: 'direct',
   showFocusGuide: true,
   showFocusSketch: true,
   autoRevealAfterPlacement: false
@@ -731,10 +733,69 @@ const css = `
 .it-support-item strong{font-size:.77rem;color:#60748c}
 .it-support-item span{font-size:.95rem;line-height:1.55}
 .it-scenario-list li{padding:8px 10px;border-color:#edf2f7}
+.trp-page[data-trainer-id="iceberg-templates"] .trp-hero,
+.trp-page[data-trainer-id="iceberg-templates"] .trp-problem-card,
+.trp-page[data-trainer-id="iceberg-templates"] .trp-clarity-strip,
+.trp-page[data-trainer-id="iceberg-templates"] .trp-note-card,
+.trp-page[data-trainer-id="iceberg-templates"] .trp-step-strip{display:none}
+.trp-page[data-trainer-id="iceberg-templates"] .trp-top{padding:10px 14px;border-radius:18px;min-height:0}
+.trp-page[data-trainer-id="iceberg-templates"] .trp-title{font-size:1.02rem}
+.trp-page[data-trainer-id="iceberg-templates"] .trp-subtitle{margin-top:4px;font-size:.84rem;line-height:1.45}
+.trp-page[data-trainer-id="iceberg-templates"] .trp-actions{gap:8px}
+.trp-page[data-trainer-id="iceberg-templates"] .trp-layout{grid-template-columns:minmax(0,1fr)}
+.trp-page[data-trainer-id="iceberg-templates"] .trp-support{display:none}
+.it-guided-stage{display:grid;gap:14px}
+.it-guided-stage-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.it-context-strip{padding:12px 14px;border:1px solid #dbe7f5;background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);border-radius:16px;color:#23436f;font-weight:800}
+.it-dialogue-panel{display:grid;gap:14px;padding:18px 20px;border:1px solid #e8eef6;border-radius:22px;background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%)}
+.it-dialogue-label{font-size:.82rem;font-weight:900;color:#6b7c92}
+.it-dialogue-quote{margin:0;font-size:1.3rem;line-height:1.85;font-weight:700;color:#0f172a}
+.it-dialogue-anchors,.it-workspace-anchors{display:flex;flex-wrap:wrap;gap:10px}
+.it-guided-anchor{min-height:40px;padding:8px 14px;border-style:solid;border-color:#ead7a5;background:#fffdf5;color:#8a5200}
+.it-guided-selection-card{margin-top:0}
+.it-guided-cta-stage{display:grid;justify-items:center;gap:10px;padding:4px 0 2px}
+.it-guided-cta{display:inline-flex;align-items:center;justify-content:center;min-width:min(100%,340px);padding:16px 26px;border:0;border-radius:999px;background:linear-gradient(135deg,#1d4ed8 0%,#0f766e 100%);color:#fff;font-size:1.05rem;font-weight:900;cursor:pointer;box-shadow:0 16px 32px rgba(29,78,216,.18)}
+.it-guided-cta:disabled{cursor:not-allowed;opacity:.55;box-shadow:none}
+.it-guided-cta-note{margin:0;color:#607287;font-size:.92rem;line-height:1.6;text-align:center}
+.it-selector-panel{border-color:#d8e6f8}
+.it-selector-shell{display:grid;gap:16px;justify-items:center}
+.it-selector-nav{display:flex;align-items:center;justify-content:center;gap:12px}
+.it-selector-arrow{width:42px;height:42px;border-radius:999px;border:1px solid #d7e3f2;background:#fff;color:#23436f;font-size:1.1rem;font-weight:900;cursor:pointer}
+.it-selector-count{min-width:140px;text-align:center;font-weight:800;color:#475569}
+.it-selector-card{width:min(100%,560px);display:grid;gap:12px;padding:18px;border:1px solid #dbe7f4;border-radius:24px;background:linear-gradient(180deg,#ffffff 0%,#f9fbff 100%);justify-items:center;text-align:center}
+.it-selector-card.is-chosen{border-color:#bfd7ff;box-shadow:0 16px 30px rgba(37,99,235,.08)}
+.it-selector-sketch{width:min(100%,420px)}
+.it-selector-title{margin:0;font-size:1.18rem;color:#10233f}
+.it-selector-note{margin:0;color:#5e7289;line-height:1.65;max-width:44ch}
+.it-selector-warning{padding:10px 12px;border-radius:14px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;line-height:1.55}
+.it-selector-select-btn{min-width:min(100%,280px)}
+.it-guided-workspace-panel{border-color:#c9ddf4;background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%)}
+.it-guided-focus-note{padding:12px 14px;border:1px solid #dbe7f4;border-radius:16px;background:#f8fbff;color:#315375;line-height:1.65}
+.it-guided-focus-sketch{max-width:520px;margin:0 auto}
+.it-guided-tree-drop{display:grid;gap:18px;padding:18px;border:1px dashed #bfd7ff;border-radius:24px;background:linear-gradient(180deg,#fbfdff 0%,#f6faff 100%)}
+.it-guided-drop-node{display:grid;gap:8px;align-content:center;justify-items:center;min-height:110px;padding:16px;border:1px solid #dbe6f3;border-radius:18px;background:#fff;color:#10233f;cursor:pointer;text-align:center}
+.it-guided-drop-node strong{font-size:1rem}
+.it-guided-drop-node span{font-size:.88rem;line-height:1.55;color:#64748b}
+.it-guided-drop-node.is-root{min-height:126px;border-color:#bfd7ff;background:linear-gradient(180deg,#ffffff 0%,#eef6ff 100%)}
+.it-guided-drop-branches{display:grid;gap:12px}
+.it-guided-drop-branches.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.it-guided-drop-branches.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.it-guided-result-stack{display:grid;gap:16px}
+.it-guided-reveal-visual{padding:16px;border-radius:22px}
+.it-guide-bubble{padding:14px 16px;border-radius:18px;background:linear-gradient(180deg,#eff6ff 0%,#ffffff 100%);border:1px solid #c7dcff;color:#1d4ed8;font-weight:900;line-height:1.6}
+.it-guided-insight-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.it-guided-insight-card{padding:16px;border-radius:18px;border:1px solid #dbe6f3;background:#fff;display:grid;gap:8px}
+.it-guided-insight-card.is-secondary{background:#fbfdff}
+.it-guided-insight-card strong{font-size:.84rem;color:#516174}
+.it-guided-insight-card p{margin:0;line-height:1.7;color:#10233f}
+.it-next-actions{display:flex;flex-wrap:wrap;gap:10px}
+.it-guided-details{border:1px solid #dbe6f3;border-radius:18px;background:#fbfdff;padding:10px 14px}
+.it-guided-details summary{cursor:pointer;font-weight:900;color:#23436f}
+.it-guided-details-body{display:grid;gap:14px;margin-top:12px}
 @media (min-width:1280px){.trp-layout{grid-template-columns:minmax(0,1.8fr) minmax(300px,.56fr)}.it-source-foot{grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr)}}
 @media (max-width:1100px){.it-process-rail{grid-template-columns:1fr 1fr}.trp-layout{grid-template-columns:minmax(0,1.55fr) minmax(280px,.72fr)}}
-@media (max-width:980px){.trp-page{width:100%;max-width:none}.it-panel{padding:14px 15px}.it-stage-switch{width:100%}.it-process-rail{grid-template-columns:1fr}}
-@media (max-width:720px){.it-wrap-refined{padding:0}.it-stage-switch{display:grid;grid-template-columns:1fr;width:100%}.it-stage-btn{text-align:center}}
+@media (max-width:980px){.trp-page{width:100%;max-width:none}.it-panel{padding:14px 15px}.it-stage-switch{width:100%}.it-process-rail{grid-template-columns:1fr}.it-guided-insight-grid{grid-template-columns:1fr}.it-guided-drop-branches.cols-3{grid-template-columns:1fr}.it-dialogue-quote{font-size:1.14rem}}
+@media (max-width:720px){.it-wrap-refined{padding:0}.it-stage-switch{display:grid;grid-template-columns:1fr;width:100%}.it-stage-btn{text-align:center}.trp-page[data-trainer-id="iceberg-templates"] .trp-top{padding:10px 12px}.it-guided-stage-head{display:grid}.it-dialogue-panel{padding:16px 14px}.it-guided-cta{width:100%}.it-selector-card{padding:16px}.it-guided-drop-branches.cols-2,.it-guided-drop-branches.cols-3{grid-template-columns:1fr}.it-next-actions{display:grid}.it-selector-count{min-width:0}}
 `;
 
 function assetUrl(path: string): string {
@@ -795,6 +856,12 @@ function renderCauseDirectionLabel(payload: CauseTemplatePayload | TemplatePaylo
   if (payload.mode === 'CAUSES_OF_TOKEN') return 'כאן שואלים מה מזין את העוגן ומה מחזיק אותו';
   if (payload.mode === 'EFFECTS_OF_TOKEN') return 'כאן שואלים לאן העוגן הזה מתפצל ומה הוא עלול לייצר';
   return null;
+}
+
+function getTemplateSlotLabels(templateType: TemplateType, causeMode?: CauseMode | null): string[] {
+  if (templateType === 'CEQ') return ['סימן', 'קריטריון', 'דוגמה'];
+  if (templateType === 'CAUSE') return causeMode === 'EFFECTS_OF_TOKEN' ? ['אפקט 1', 'אפקט 2'] : ['תנאי 1', 'תנאי 2'];
+  return ['הנחה 1', 'הנחה 2', 'הנחה 3'];
 }
 
 function boardGapText(templateType: TemplateType | null, tokenText: string | null): string {
@@ -1785,13 +1852,17 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
   const [hoverTemplate, setHoverTemplate] = useState<TemplateType | null>(null);
   const [shakeTemplate, setShakeTemplate] = useState<TemplateType | null>(null);
   const [focusStage, setFocusStage] = useState<'build' | 'reveal' | 'challenge'>('build');
+  const [selectorOpen, setSelectorOpen] = useState(false);
+  const [selectorIndex, setSelectorIndex] = useState(0);
+  const [selectedTemplateType, setSelectedTemplateType] = useState<TemplateType | null>(null);
+  const [selectorTouchStartX, setSelectorTouchStartX] = useState<number | null>(null);
   const [settings, setSettings] = useState<IcebergSettings>(() => loadIcebergSettings());
   const [draftSettings, setDraftSettings] = useState<IcebergSettings>(() => loadIcebergSettings());
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [showFocusGuide, setShowFocusGuide] = useState(settings.showFocusGuide);
   const [showFocusSketch, setShowFocusSketch] = useState(settings.showFocusSketch);
-  const [showOnboarding, setShowOnboarding] = useState(settings.launchMode === 'guided');
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [state, setState] = useState<TrainerState>(INITIAL_STATE);
 
   useEffect(() => {
@@ -1810,7 +1881,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
           setDraftSettings(savedSettings);
           setShowFocusGuide(savedSettings.showFocusGuide);
           setShowFocusSketch(savedSettings.showFocusSketch);
-          setShowOnboarding(savedSettings.launchMode === 'guided');
+          setShowOnboarding(false);
           setState({ ...INITIAL_STATE, currentScenarioIndex: normalizeScenarioIndex(savedSettings.defaultScenarioIndex, json.scenarios.length) });
           setLoading(false);
         }
@@ -1836,6 +1907,14 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     const t = window.setTimeout(() => setShakeTemplate(null), 320);
     return () => window.clearTimeout(t);
   }, [shakeTemplate]);
+
+  useEffect(() => {
+    if (!state.active?.templateType) return;
+    const nextIndex = TEMPLATE_TYPES.indexOf(state.active.templateType);
+    if (nextIndex >= 0) setSelectorIndex(nextIndex);
+    setSelectedTemplateType(state.active.templateType);
+    setSelectorOpen(true);
+  }, [state.active?.templateType]);
 
   const scenarios = data?.scenarios ?? [];
   const scenarioCount = scenarios.length;
@@ -1887,8 +1966,6 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     () => deriveWorkspaceStep({ selectedTokenId: state.selectedTokenId, active: state.active, focusStage }),
     [focusStage, state.active, state.selectedTokenId]
   );
-
-  const segments = useMemo(() => (scenario ? getSegments(scenario.client_text, scenario.draggables) : []), [scenario]);
 
   function setFeedback(feedback: Feedback | null) {
     setState((prev) => ({ ...prev, feedback }));
@@ -1975,6 +2052,9 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     setHoverTemplate(null);
     setDraggingTokenId(null);
     setFocusStage('build');
+    setSelectorOpen(false);
+    setSelectedTemplateType(null);
+    setSelectorIndex(0);
   }
 
   function onDragStart(event: React.DragEvent<HTMLButtonElement>, tokenId: string) {
@@ -1994,14 +2074,21 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
   }
 
   function onTokenTap(tokenId: string) {
+    if (state.active?.tokenId && state.active.tokenId !== tokenId) setFocusStage('build');
     setState((prev) => {
       const same = prev.selectedTokenId === tokenId;
+      const changedFromActive = !!prev.active && prev.active.tokenId !== tokenId;
       return {
         ...prev,
         selectedTokenId: same ? null : tokenId,
+        active: changedFromActive ? null : prev.active,
         feedback: {
           tone: 'info',
-          text: same ? 'בוטל סימון העוגן.' : 'העוגן נבחר. עכשיו בחר/י איזה מבנה יעזור למיין אותו.'
+          text: same
+            ? 'בוטל סימון העוגן.'
+            : changedFromActive
+              ? 'נבחר עוגן חדש. העץ הקודם הוסר כדי שתוכל/י לבדוק עכשיו את אותה צורת חשיבה על העוגן החדש.'
+              : 'העוגן נבחר. עכשיו בחר/י איזה מבנה יעזור למיין אותו.'
         }
       };
     });
@@ -2028,6 +2115,75 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     applyTokenToTemplate(state.selectedTokenId, templateType);
   }
 
+  function moveSelector(offset: number) {
+    setSelectorIndex((prev) => {
+      const next = (prev + offset + TEMPLATE_TYPES.length) % TEMPLATE_TYPES.length;
+      return next;
+    });
+  }
+
+  function openTreeSelector() {
+    if (!selectedToken) {
+      setFeedback({ tone: 'info', text: 'בחר/י קודם עוגן אחד מתוך המשפט, ואז אפשר לעבור לבחירת ההיגיון החזותי.' });
+      return;
+    }
+    const preferredType = selectedTemplateType || selectedToken.allowed_templates[0] || selectorTemplateType;
+    const preferredIndex = TEMPLATE_TYPES.indexOf(preferredType);
+    if (preferredIndex >= 0) setSelectorIndex(preferredIndex);
+    setSelectorOpen(true);
+    setFeedback({ tone: 'info', text: 'נפתח בוחר ההיגיונות. עוברים על עץ אחד בכל פעם ובוחרים את זה שמסדר הכי טוב את מה שנאמר.' });
+  }
+
+  function chooseTemplate(templateType: TemplateType) {
+    if (!selectedToken) {
+      setFeedback({ tone: 'info', text: 'כדי לבחור היגיון צריך קודם לבחור עוגן אחד לעבוד עליו.' });
+      return;
+    }
+    if (!selectedToken.allowed_templates.includes(templateType)) {
+      setFeedback({ tone: 'error', text: `העוגן "${selectedToken.text}" לא יושב בתרחיש הזה על ${formatTemplateLabel(templateType)}.` });
+      return;
+    }
+    setSelectedTemplateType(templateType);
+    setFocusStage('build');
+    setFeedback({ tone: 'success', text: `נבחר "${formatTemplateLabel(templateType)}". עכשיו גרור/י את "${selectedToken.text}" אל העץ כדי לראות מה נפתח.` });
+  }
+
+  function applyTokenToSelectedTemplate(tokenId: string, templateType: TemplateType) {
+    setSelectedTemplateType(templateType);
+    applyTokenToTemplate(tokenId, templateType);
+    setFocusStage('reveal');
+  }
+
+  function handleWorkspaceTreeDrop(event: React.DragEvent<HTMLButtonElement | HTMLDivElement>, templateType: TemplateType) {
+    event.preventDefault();
+    let tokenId = '';
+    try {
+      tokenId = event.dataTransfer.getData('text/plain');
+    } catch {
+      tokenId = '';
+    }
+    if (!tokenId) tokenId = draggingTokenId || state.selectedTokenId || '';
+    if (!tokenId) {
+      setFeedback({ tone: 'info', text: 'בחר/י או גרור/י עוגן אחד כדי למקם אותו בתוך העץ.' });
+      return;
+    }
+    applyTokenToSelectedTemplate(tokenId, templateType);
+  }
+
+  function handleWorkspaceTreeClick(templateType: TemplateType) {
+    if (!state.selectedTokenId) {
+      setFeedback({ tone: 'info', text: 'במובייל: הקש/י קודם על אחד העוגנים, ואז הקש/י על המקום הרצוי בעץ.' });
+      return;
+    }
+    applyTokenToSelectedTemplate(state.selectedTokenId, templateType);
+  }
+
+  function chooseAnotherTree() {
+    clearActive();
+    setSelectedTemplateType(null);
+    setSelectorOpen(true);
+  }
+
   function startIcebergSession(nextSettings?: IcebergSettings) {
     const resolved = normalizeIcebergSettings(nextSettings ?? settings, scenarioCount);
     const nextScenarioIndex = normalizeScenarioIndex(resolved.defaultScenarioIndex, scenarioCount);
@@ -2039,8 +2195,11 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     setDraggingTokenId(null);
     setShowFocusGuide(resolved.showFocusGuide);
     setShowFocusSketch(resolved.showFocusSketch);
-    setShowOnboarding(resolved.launchMode === 'guided');
+    setShowOnboarding(false);
     setFocusStage('build');
+    setSelectorOpen(false);
+    setSelectedTemplateType(null);
+    setSelectorIndex(0);
     setState({
       ...INITIAL_STATE,
       currentScenarioIndex: nextScenarioIndex,
@@ -2136,22 +2295,19 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     (scenario.draggables.find((d) => d.id === state.selectedTokenId) ?? null) ||
     activeToken ||
     null;
+  const selectorTemplateType = TEMPLATE_TYPES[selectorIndex] ?? TEMPLATE_TYPES[0];
+  const selectorMeta = TEMPLATE_META[selectorTemplateType];
+  const selectorPayload = selectedToken ? getTemplatePayload(scenario, selectedToken.id, selectorTemplateType) : null;
+  const selectorCauseMode = selectorPayload && 'mode' in selectorPayload ? selectorPayload.mode ?? null : null;
+  const selectorAllowsToken = !selectedToken || selectedToken.allowed_templates.includes(selectorTemplateType);
+  const workspaceTemplateType = selectedTemplateType;
+  const workspaceMeta = workspaceTemplateType ? TEMPLATE_META[workspaceTemplateType] : null;
+  const workspacePreviewPayload = selectedToken && workspaceTemplateType ? getTemplatePayload(scenario, selectedToken.id, workspaceTemplateType) : null;
+  const workspacePreviewCauseMode =
+    workspacePreviewPayload && 'mode' in workspacePreviewPayload ? workspacePreviewPayload.mode ?? null : null;
+  const workspaceSlotLabels = workspaceTemplateType ? getTemplateSlotLabels(workspaceTemplateType, workspacePreviewCauseMode) : [];
+  const activeMatchesWorkspace = !!(revealReady && state.active?.templateType === workspaceTemplateType && activeToken);
 
-  const dragTreeSeedKey = `${activeVariantKey}|${state.active?.setIndex ?? 0}|${focusStage}`;
-  const dragTreeChips: TreeChip[] = (() => {
-    if (!revealReady || !state.active || !activeToken) return [];
-    const chips: TreeChip[] = [{ id: 'chip-anchor', label: 'עוגן', text: activeToken.text }];
-    activeSet.forEach((value, idx) => {
-      const text = String(value || '').trim();
-      if (!text) return;
-      chips.push({ id: `chip-slot-${idx}`, label: `Slot ${idx + 1}`, text });
-    });
-    if (activePayload?.question) chips.push({ id: 'chip-question', label: 'שאלה', text: cleanSnippet(activePayload.question, 80) });
-    if (activeReflection) chips.push({ id: 'chip-reveal', label: 'שיקוף', text: cleanSnippet(activeReflection, 80) });
-    return chips;
-  })();
-
-  const activeMeta = state.active ? TEMPLATE_META[state.active.templateType] : null;
   const activeDirectionLabel = activePayload ? renderCauseDirectionLabel(activePayload) : null;
   const selectedTokenLabel = selectedToken?.text ?? activeToken?.text ?? '';
   const selectedTokenTemplateLabels = selectedToken
@@ -2313,257 +2469,263 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
 
   const mainContent = (
     <>
-      <ProcessRail current={workspaceStep} steps={processSteps} />
-
-      <section className="it-panel it-source-panel" aria-label="משפט המקור">
-        <div className="it-panel-head">
+      <section className="it-panel it-guided-stage" aria-label="הקשר ומשפט העבודה">
+        <div className="it-guided-stage-head">
           <div>
             <div className="it-kicker">תרחיש <code>{scenario.scenario_id}</code></div>
-            <h2 className="it-title" style={{ fontSize: '1.08rem', marginTop: 4 }}>קוראים את המשפט המלא</h2>
-            <p className="it-sub">רואים את כל האמירה, ואז בוחרים איזה חלק כדאי להפוך לעוגן עבודה.</p>
+            <h2 className="it-title" style={{ fontSize: '1.08rem', marginTop: 4 }}>מתחילים ממשפט אחד ברור</h2>
           </div>
           <span className="it-panel-badge">שלב 1</span>
         </div>
-        <div className="it-textbox it-textbox-prominent" aria-live="polite">
-          {segments.map((seg) => {
-            if (seg.kind === 'plain') return <span key={seg.key} className="it-seg">{seg.text}</span>;
-            const candidate = seg.candidate;
-            const isSelected = state.selectedTokenId === candidate.id;
-            const isActive = state.active?.tokenId === candidate.id;
-            const isDragging = draggingTokenId === candidate.id;
-            return (
-              <button
-                key={seg.key}
-                type="button"
-                draggable
-                className={['it-token', isSelected ? 'sel' : '', isActive ? 'active' : '', isDragging ? 'dragging' : ''].filter(Boolean).join(' ')}
-                onDragStart={(e) => onDragStart(e, candidate.id)}
-                onDragEnd={onDragEnd}
-                onClick={() => onTokenTap(candidate.id)}
-                aria-pressed={isSelected}
-                title={`תבניות אפשריות: ${candidate.allowed_templates.map((type) => TEMPLATE_META[type].code).join(', ')}`}
-              >
-                {candidate.text}
+
+        <div className="it-context-strip">את/ה המטפל/ת. האדם שמולך נכנס/ת ואומר/ת:</div>
+
+        <div className="it-dialogue-panel">
+          <div className="it-dialogue-label">אדם אומר:</div>
+          <p className="it-dialogue-quote">"{scenario.client_text}"</p>
+
+          <div className="it-dialogue-anchors" aria-label="עוגנים זמינים">
+            {scenario.draggables.map((candidate) => {
+              const isSelected = state.selectedTokenId === candidate.id;
+              const isActive = state.active?.tokenId === candidate.id;
+              const isDragging = draggingTokenId === candidate.id;
+              return (
+                <button
+                  key={candidate.id}
+                  type="button"
+                  draggable
+                  className={['it-token', 'it-guided-anchor', isSelected ? 'sel' : '', isActive ? 'active' : '', isDragging ? 'dragging' : ''].filter(Boolean).join(' ')}
+                  onDragStart={(e) => onDragStart(e, candidate.id)}
+                  onDragEnd={onDragEnd}
+                  onClick={() => onTokenTap(candidate.id)}
+                  aria-pressed={isSelected}
+                  title={`מבנים אפשריים: ${candidate.allowed_templates.map((type) => TEMPLATE_META[type].titleHe).join(' · ')}`}
+                >
+                  {candidate.text}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="it-selection-card it-guided-selection-card">
+          <strong>העוגן שעובדים עליו עכשיו</strong>
+          <span>{selectedTokenLabel || 'עדיין לא נבחר עוגן'}</span>
+          <small>{selectedTokenLabel ? `מבנים אפשריים: ${selectedTokenTemplateLabels}` : 'בחר/י מילה או ביטוי אחד כדי לפתוח את ההמשך.'}</small>
+        </div>
+      </section>
+
+      <section className="it-guided-cta-stage" aria-label="מעבר לבחירת היגיון חזותי">
+        <button type="button" className="it-guided-cta" onClick={openTreeSelector} disabled={!selectedToken}>
+          היגיון ויזואלי לפעולה!
+        </button>
+        <p className="it-guided-cta-note">
+          {selectedToken
+            ? `נבחר העוגן "${selectedToken.text}". עכשיו עוברים לעץ אחד בכל פעם.`
+            : 'בחר/י קודם עוגן אחד מתוך המשפט כדי לפתוח את בוחר ההיגיונות.'}
+        </p>
+      </section>
+
+      {selectorOpen ? (
+        <section className="it-panel it-guided-stage it-selector-panel" aria-label="בחירת עץ לוגי">
+          <div className="it-guided-stage-head">
+            <div>
+              <div className="it-kicker">שלב 2</div>
+              <h2 className="it-title" style={{ fontSize: '1.06rem', marginTop: 4 }}>בוחרים היגיון חזותי אחד</h2>
+              <p className="it-sub">לא רואים ספריית עצים שלמה. מתקדמים היגיון אחד בכל פעם עד שמרגיש שזה המבנה הנכון.</p>
+            </div>
+            <span className="it-panel-badge">עץ {selectorIndex + 1} מתוך {TEMPLATE_TYPES.length}</span>
+          </div>
+
+          <div
+            className="it-selector-shell"
+            onTouchStart={(event) => setSelectorTouchStartX(event.changedTouches[0]?.clientX ?? null)}
+            onTouchEnd={(event) => {
+              if (selectorTouchStartX === null) return;
+              const delta = (event.changedTouches[0]?.clientX ?? selectorTouchStartX) - selectorTouchStartX;
+              if (Math.abs(delta) > 40) moveSelector(delta > 0 ? -1 : 1);
+              setSelectorTouchStartX(null);
+            }}
+          >
+            <div className="it-selector-nav" aria-label="ניווט בין עצים">
+              <button type="button" className="it-selector-arrow" onClick={() => moveSelector(-1)} aria-label="העץ הקודם">
+                {'<'}
               </button>
-            );
-          })}
-        </div>
-        <div className="it-source-foot">
-          <div className="it-help"><strong>מועמדים לעוגן:</strong> {scenario.draggables.map((d) => d.text).join(' · ')}</div>
-          <div className="it-selection-card">
-            <strong>העוגן הנוכחי</strong>
-            <span>{selectedTokenLabel || 'עדיין לא נבחר'}</span>
-            <small>{selectedTokenLabel ? `מבנים אפשריים: ${selectedTokenTemplateLabels}` : 'בחר/י מילה או ביטוי מודגש כדי להתקדם.'}</small>
-          </div>
-        </div>
-      </section>
+              <div className="it-selector-count">היגיון {selectorIndex + 1} / {TEMPLATE_TYPES.length}</div>
+              <button type="button" className="it-selector-arrow" onClick={() => moveSelector(1)} aria-label="העץ הבא">
+                {'>'}
+              </button>
+            </div>
 
-      <section className="it-panel it-structure-panel" aria-label="בחירת מבנה">
-        <div className="it-panel-head">
-          <div>
-            <h2 className="it-title" style={{ fontSize: '1.08rem' }}>בוחרים איזה סוג עץ מתאים</h2>
-            <p className="it-sub">כל כרטיס הוא סוג אחר של הבחנה. בחר/י את זה שמסדר הכי טוב את מה שנאמר.</p>
-          </div>
-          <span className="it-panel-badge">שלב 2</span>
-        </div>
-        <div className="it-template-grid it-template-grid-refined">
-          {(Object.keys(TEMPLATE_META) as TemplateType[]).map((type) => {
-            const meta = TEMPLATE_META[type];
-            const isActive = state.active?.templateType === type;
-            const isHover = hoverTemplate === type;
-            const payload = isActive && activePayload ? activePayload : null;
-            const causeMode = payload && 'mode' in payload ? payload.mode ?? null : null;
-            return (
-              <div
-                key={type}
-                className={['it-template', 'it-template-card', isActive ? 'is-active' : '', shakeTemplate === type ? 'shake' : ''].filter(Boolean).join(' ')}
-                data-over={isHover ? '1' : '0'}
-                onDragOver={(e) => { e.preventDefault(); setHoverTemplate(type); }}
-                onDragLeave={() => setHoverTemplate((prev) => (prev === type ? null : prev))}
-                onDrop={(e) => handleTemplateDrop(e, type)}
-                onClick={() => handleTemplateClick(type)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleTemplateClick(type);
-                  }
-                }}
-                aria-label={`מבנה ${meta.titleHe}`}
-              >
-                <div className="it-template-head">
-                  <div>
-                    <div className="it-template-title">{meta.titleHe}</div>
-                    <div className="it-template-mini">{meta.titleEn}</div>
-                  </div>
-                  <div className="it-template-meta">
-                    <span className="it-template-code">{meta.code}</span>
-                    <span className="it-template-mini">{meta.slotCount} ענפים</span>
-                  </div>
-                </div>
-                <div className="it-template-help">{meta.shortHelp}</div>
-                <TemplateSketch meta={meta} tokenText={isActive && activeToken ? activeToken.text : undefined} causeMode={causeMode} active={isActive} />
-                <div className={`it-dropzone${isActive ? ' has-active' : ''}`}>
-                  {isActive && activeToken ? <>עובדים עכשיו עם <strong style={{ marginInlineStart: 6 }}>{activeToken.text}</strong></> : 'גרור/י לכאן עוגן מודגש או הקש/י אחרי בחירה'}
-                </div>
+            <div className={`it-selector-card${selectedTemplateType === selectorTemplateType ? ' is-chosen' : ''}`}>
+              <div className="it-selector-sketch">
+                <TemplateSketch meta={selectorMeta} tokenText={selectedToken?.text} causeMode={selectorCauseMode} active={selectedTemplateType === selectorTemplateType} />
               </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="it-panel it-workspace-panel" aria-label="מרחב עבודה מרכזי">
-        <div className="it-panel-head">
-          <div>
-            <h2 className="it-title" style={{ fontSize: '1.12rem' }}>מרחב העבודה המרכזי</h2>
-            <p className="it-sub">כאן רואים מהו שלב העבודה, למה העוגן יושב בתוך המבנה, ואיך אפשר לפתוח ענף נוסף.</p>
-          </div>
-          <span className="it-panel-badge">שלבים 3-5</span>
-        </div>
-        <div className="it-focus-toolbar">
-          <button type="button" className="it-focus-mini-btn" onClick={toggleFocusGuidePreference} aria-pressed={showFocusGuide}>
-            {showFocusGuide ? 'הסתר/י מפת עבודה' : 'הצג/י מפת עבודה'}
-          </button>
-          <button type="button" className="it-focus-mini-btn" onClick={toggleFocusSketchPreference} aria-pressed={showFocusSketch} disabled={!revealReady}>
-            {showFocusSketch ? 'הסתר/י סכמת מבנה' : 'הצג/י סכמת מבנה'}
-          </button>
-        </div>
-        {showFocusGuide ? <div className="it-focus-help"><div className="it-focus-help-body"><div className="it-help"><strong>מה קורה כאן:</strong> קודם ממיינים, אחר כך רואים את העץ, ואז בודקים חלופה. לא קופצים ישר לפירוש סופי.</div></div></div> : null}
-        {!revealReady || !activeToken || !activeMeta || !state.active ? (
-          <div className="it-empty it-workspace-empty">
-            <strong>העבודה תתחיל ברגע שתבחר/י עוגן ומבנה.</strong>
-            <p>אחר כך תוכל/י לראות שאלה, הסתעפויות, חלופות, ומה כדאי לקחת לסבב הבא.</p>
-          </div>
-        ) : (
-          <div className="it-active" style={{ marginTop: 10 }}>
-            {showFocusSketch ? <div className={`it-focus-sketch ${focusStage !== 'build' ? 'is-compact' : ''}`}><TemplateSketch meta={activeMeta} tokenText={activeToken.text} causeMode={'mode' in activePayload ? activePayload.mode ?? null : null} active /></div> : null}
-            <div className="it-stage-switch" role="tablist" aria-label="שלבי העבודה">
-              <button type="button" className={`it-stage-btn ${focusStage === 'build' ? 'is-active' : ''}`} onClick={() => setFocusStage('build')}>שלב 3 · משבצים</button>
-              <button type="button" className={`it-stage-btn ${focusStage === 'reveal' ? 'is-active' : ''}`} onClick={() => setFocusStage('reveal')}>שלב 4 · רואים עץ</button>
-              <button type="button" className={`it-stage-btn ${focusStage === 'challenge' ? 'is-active' : ''}`} onClick={() => setFocusStage('challenge')} disabled={!challengeReady}>שלב 5 · בודקים חלופה</button>
+              <h3 className="it-selector-title">{selectorMeta.titleHe}</h3>
+              <p className="it-selector-note">{selectorMeta.shortHelp}</p>
+              {selectedToken && !selectorAllowsToken ? (
+                <div className="it-selector-warning">העוגן "{selectedToken.text}" לא משויך כרגע להיגיון הזה בתרחיש הזה. אפשר לעבור לעץ הבא או לבחור עוגן אחר.</div>
+              ) : null}
+              <div className="it-actions">
+                <button
+                  type="button"
+                  className="it-btn primary it-selector-select-btn"
+                  onClick={() => chooseTemplate(selectorTemplateType)}
+                  disabled={!selectedToken || !selectorAllowsToken}
+                >
+                  בחר את ההיגיון הזה
+                </button>
+              </div>
             </div>
-            <div className="it-stage-card">
-              {focusStage === 'build' ? (
-                <div className="it-coach-grid">
-                  <div className="it-coach-card"><strong>העוגן</strong><p>{activeToken.text}</p></div>
-                  <div className="it-coach-card"><strong>המבנה</strong><p>{activeMeta.titleHe}</p></div>
-                  <div className="it-coach-card"><strong>מה בודקים כאן</strong><p>{activeMeta.shortHelp}</p></div>
-                  <div className="it-actions">
-                    <button type="button" className="it-btn primary" onClick={() => setFocusStage('reveal')}>פתח/י את העץ</button>
-                    <button type="button" className="it-btn ghost" onClick={clearActive}>בחר/י מבנה אחר</button>
+          </div>
+        </section>
+      ) : null}
+
+      {workspaceMeta ? (
+        <section className="it-panel it-guided-stage it-guided-workspace-panel" aria-label="אזור העבודה עם העץ שנבחר">
+          <div className="it-guided-stage-head">
+            <div>
+              <div className="it-kicker">שלב 3</div>
+              <h2 className="it-title" style={{ fontSize: '1.08rem', marginTop: 4 }}>{workspaceMeta.titleHe}</h2>
+              <p className="it-sub">גרור את המושג שאתה רוצה לתוך המקום הרצוי בעץ וגלה איזו אינפורמציה נוספת מופיעה כשחושבים כך.</p>
+            </div>
+            <span className="it-panel-badge">{workspaceMeta.code}</span>
+          </div>
+
+          {showFocusGuide ? (
+            <div className="it-guided-focus-note">כאן אנחנו לא מחפשים תשובה אחת "נכונה", אלא בודקים איזה מבנה מחשבתי גורם למשפט להיראות אחרת.</div>
+          ) : null}
+
+          {showFocusSketch ? (
+            <div className="it-guided-focus-sketch">
+              <TemplateSketch meta={workspaceMeta} tokenText={selectedToken?.text} causeMode={workspacePreviewCauseMode} active />
+            </div>
+          ) : null}
+
+          <div className="it-workspace-anchors" aria-label="עוגנים לגרירה">
+            {scenario.draggables.map((candidate) => {
+              const isSelected = state.selectedTokenId === candidate.id;
+              const isActive = state.active?.tokenId === candidate.id;
+              return (
+                <button
+                  key={`workspace-${candidate.id}`}
+                  type="button"
+                  draggable
+                  className={['it-token', 'it-guided-anchor', isSelected ? 'sel' : '', isActive ? 'active' : ''].filter(Boolean).join(' ')}
+                  onDragStart={(e) => onDragStart(e, candidate.id)}
+                  onDragEnd={onDragEnd}
+                  onClick={() => onTokenTap(candidate.id)}
+                  aria-pressed={isSelected}
+                >
+                  {candidate.text}
+                </button>
+              );
+            })}
+          </div>
+
+          {!activeMatchesWorkspace || !state.active || !activeToken ? (
+            <div className="it-guided-tree-drop" data-template={workspaceTemplateType}>
+              <button
+                type="button"
+                className="it-guided-drop-node is-root"
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => handleWorkspaceTreeDrop(event, workspaceTemplateType)}
+                onClick={() => handleWorkspaceTreeClick(workspaceTemplateType)}
+              >
+                <strong>{selectedToken ? selectedToken.text : 'גרור/י עוגן לכאן'}</strong>
+                <span>{selectedToken ? 'אפשר לשחרר את העוגן במרכז העץ או באחד הענפים.' : 'בחר/י עוגן אחד ואז שחרר/י אותו כאן.'}</span>
+              </button>
+
+              <div className={`it-guided-drop-branches cols-${workspaceSlotLabels.length || 1}`}>
+                {workspaceSlotLabels.map((label) => (
+                  <button
+                    key={`${workspaceTemplateType}-${label}`}
+                    type="button"
+                    className="it-guided-drop-node"
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={(event) => handleWorkspaceTreeDrop(event, workspaceTemplateType)}
+                    onClick={() => handleWorkspaceTreeClick(workspaceTemplateType)}
+                  >
+                    <strong>{label}</strong>
+                    <span>{selectedToken ? `שחרר/י כאן את "${selectedToken.text}"` : 'בחר/י עוגן כדי להתקדם'}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="it-guided-result-stack">
+              <section className="it-reveal-visual it-guided-reveal-visual" aria-label="העץ שנפתח">
+                <div className="it-reveal-visual-head">
+                  <div>
+                    <h4>כך ההיגיון שנבחר מסדר כרגע את המשפט</h4>
+                    <p>המערכת ממלאת את ההסתעפות לפי המבנה שבחרת, כדי שאפשר יהיה לראות מה הופך גלוי.</p>
                   </div>
+                  <span className="it-mini-tag code">{workspaceMeta.code}</span>
                 </div>
-              ) : null}
-              {focusStage === 'reveal' ? (
-                <div className="it-focus-core-layout">
-                  <div className="it-focus-result-column">
-                    <section className="it-reveal-visual" aria-label="העץ שנפתח">
-                      <div className="it-reveal-visual-head">
-                        <div><h4>כך המבנה נפתח כרגע</h4><p>העוגן במרכז, והענפים מראים מה המבנה פותח סביבו.</p></div>
-                        <span className="it-mini-tag code">{activeMeta.code}</span>
-                      </div>
-                      <RevealTemplateFigure templateType={state.active.templateType} tokenText={activeToken.text} slots={activeSet} causeMode={'mode' in activePayload ? activePayload.mode ?? null : null} />
-                      <div className={`it-slots cols-${activeMeta.slotCount}`}>{Array.from({ length: activeMeta.slotCount }).map((_, idx) => <div key={idx} className="it-slot">{activeSet[idx] || '—'}</div>)}</div>
-                    </section>
-                    <BranchExplorer templateType={state.active.templateType} tokenText={activeToken.text} payload={activePayload} activeSet={activeSet} />
-                  </div>
-                  <div className="it-focus-side-column">
-                    <div className="it-question">{activePayload.question}</div>
-                    <div className="it-reflection">{activeReflection}</div>
-                    <div className="it-disclaimer">{activeDirectionLabel || DISCLAIMER_COPY}</div>
-                    <div className="it-actions">
-                      <button type="button" className="it-btn secondary" onClick={cycleVariant}>הצג/י ענף חלופי</button>
-                      <button type="button" className="it-btn ghost" onClick={clearActive}>אפס/י מבנה</button>
-                      <button type="button" className="it-btn primary" onClick={() => setFocusStage('challenge')} disabled={!challengeReady}>עבור/י לשלב הבדיקה</button>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-              {focusStage === 'challenge' ? (
-                <>
+                <RevealTemplateFigure
+                  templateType={state.active.templateType}
+                  tokenText={activeToken.text}
+                  slots={activeSet}
+                  causeMode={'mode' in activePayload ? activePayload.mode ?? null : null}
+                />
+              </section>
+
+              <div className="it-guide-bubble">שים לב — מה אנו יכולים ללמוד כעת מצורת החשיבה הזאת?</div>
+
+              <div className="it-guided-insight-grid">
+                <article className="it-guided-insight-card">
+                  <strong>מה נהיה ברור יותר</strong>
+                  <p>{activeReflection}</p>
+                </article>
+
+                <article className="it-guided-insight-card is-secondary">
+                  <strong>מה ההיגיון הזה בודק</strong>
+                  <p>{activeDirectionLabel || workspaceMeta.shortHelp}</p>
+                </article>
+
+                <article className="it-guided-insight-card is-secondary">
+                  <strong>שאלת המשך אפשרית</strong>
+                  <p>{activePayload?.question || 'איך היית בודק/ת את הייצוג הזה מול מה שנאמר בפועל?'}</p>
+                </article>
+              </div>
+
+              <div className="it-next-actions">
+                <button type="button" className="it-btn secondary" onClick={clearActive}>נסה עוגן אחר</button>
+                <button type="button" className="it-btn ghost" onClick={chooseAnotherTree}>בחר עץ אחר</button>
+                <button type="button" className="it-btn primary" onClick={nextScenario}>לתרגיל הבא</button>
+              </div>
+
+              <details className="it-guided-details">
+                <summary>העמקה נוספת לפי בקשה</summary>
+                <div className="it-guided-details-body">
                   <BranchExplorer templateType={state.active.templateType} tokenText={activeToken.text} payload={activePayload} activeSet={activeSet} />
-                  <div className="it-board-row"><div className="it-board-label">מה בודקים עכשיו</div><div className="it-board-value emph">איזה ענף מחזיק יותר, איזה ענף חלופי גם אפשרי, ומה משתנה אם ממיינים אחרת.</div></div>
-                  <div className="it-challenge-list">{challengePrompts.map((prompt, idx) => <div key={`${state.active?.templateType}-${idx}`} className="it-challenge-item">{idx + 1}. {prompt}</div>)}</div>
-                  <div className="it-challenge-note">בחר/י שאלה אחת בלבד, בדוק/י אותה, ואז חזור/י לעץ אם צריך לחדד את המיון.</div>
-                  <div className="it-actions">
-                    <button type="button" className="it-btn secondary" onClick={() => setFocusStage('reveal')}>חזור/י לעץ</button>
-                    <button type="button" className="it-btn ghost" onClick={cycleVariant}>עוד חלופה</button>
-                    <button type="button" className="it-btn primary" onClick={nextScenario}>סיים/י סבב ועבור/י הלאה</button>
-                  </div>
-                </>
-              ) : null}
+                  <SentenceBoard
+                    scenario={scenario}
+                    selectedToken={selectedToken}
+                    activeTemplateType={state.active.templateType}
+                    activeQuestion={activePayload?.question ?? ''}
+                    activeReflection={activeReflection}
+                  />
+                </div>
+              </details>
             </div>
-          </div>
-        )}
-        {state.feedback ? <div className={`it-feedback ${state.feedback.tone}`}>{state.feedback.text}</div> : null}
-        {state.lastCompletedRecap ? <div className="it-recap">{state.lastCompletedRecap}</div> : null}
-      </section>
+          )}
+        </section>
+      ) : null}
+
+      {state.feedback ? <div className={`it-feedback ${state.feedback.tone}`}>{state.feedback.text}</div> : null}
+      {state.lastCompletedRecap ? <div className="it-recap">{state.lastCompletedRecap}</div> : null}
     </>
   );
 
-  const supportContent = (
-    <>
-      <TrainerSupportCard
-        title="מצב עבודה"
-        subtitle={trainerContract.supportRailMode === 'branching-tree'
-          ? 'אותו shell של משפחת הטריינרים, עם דגש על עוגן, מבנה והצעד הבא.'
-          : 'לוח תמיכה משני שמראה איפה אתה עומד כרגע.'}
-      >
-        <div className="it-support-list">
-          <div className="it-support-item"><strong>שלב נוכחי</strong><span>{currentProcessMeta.label}</span></div>
-          <div className="it-support-item"><strong>עוגן פעיל</strong><span>{selectedTokenLabel || 'עדיין לא נבחר'}</span></div>
-          <div className="it-support-item"><strong>מבנה פעיל</strong><span>{activeMeta ? activeMeta.titleHe : 'עדיין לא נבחר'}</span></div>
-          <div className="it-support-item"><strong>הצעד הבא</strong><span>{currentProcessMeta.help}</span></div>
-        </div>
-        <div className="it-actions">
-          <button type="button" className="it-btn primary" disabled={!state.completedAtLeastOneDrop} onClick={nextScenario}>סיים/י סבב / הבא</button>
-          <button type="button" className="it-btn ghost" onClick={() => startIcebergSession(settings)}>אתחל/י סשן</button>
-        </div>
-      </TrainerSupportCard>
-
-      <TrainerSupportCard title="תהליך העבודה" subtitle="הצעד הבא נשאר ברור גם כשהעץ נפתח לכמה ענפים.">
-        <div className="it-support-list">
-          {processSteps.map((step) => (
-            <div key={step.id} className="it-support-item">
-              <strong>{step.label}</strong>
-              <span>{step.help}</span>
-            </div>
-          ))}
-        </div>
-      </TrainerSupportCard>
-
-      <TrainerSupportCard title="לוח הבדיקה" subtitle={state.active ? 'פתוח בזמן עבודה על עוגן ומבנה.' : 'ייפתח מיד כשיהיה עוגן ומבנה פעילים.'}>
-        <SentenceBoard scenario={scenario} selectedToken={selectedToken} activeTemplateType={state.active?.templateType ?? null} activeQuestion={activePayload?.question ?? ''} activeReflection={activeReflection} />
-      </TrainerSupportCard>
-
-      <TrainerSupportCard title="הסשן הנוכחי יהיה…" subtitle="הסיכום מתעדכן מיד אחרי שמירה בהגדרות.">
-        <div className="it-selection-card">
-          <strong>{launchModeLabel}</strong>
-          <span>{liveScenario.scenario_id}</span>
-          <small>{currentSessionSummary}</small>
-        </div>
-        <div className="it-help"><strong>משפט פתיחה:</strong> {cleanSnippet(liveScenario.client_text, 96)}</div>
-      </TrainerSupportCard>
-
-      <TrainerSupportCard title="מה לוקחים מהסבב" subtitle="צ'קליסט קצר שמחבר את הסיפור הלימודי.">
-        <ul className="it-scenario-list">
-          <li><span>קראנו את המשפט השלם</span><span>✔</span></li>
-          <li><span>בחרנו עוגן ממוקד</span><span>{state.selectedTokenId ? '✔' : '—'}</span></li>
-          <li><span>מיפינו אותו למבנה</span><span>{state.completedAtLeastOneDrop ? '✔' : '—'}</span></li>
-          <li><span>ראינו ענפים וחלופות</span><span>{state.active ? '✔' : '—'}</span></li>
-          <li><span>זכרנו שזה מיפוי עבודה, לא אמת</span><span>✔</span></li>
-        </ul>
-      </TrainerSupportCard>
-    </>
-  );
+  const supportContent = <></>;
 
   return (
     <div className="it-wrap it-wrap-refined" dir="rtl" lang="he">
       <style>{`${TRAINER_PLATFORM_CSS}\n${css}`}</style>
 
       {showOnboarding ? (
-        <div className="it-onboarding-layer" role="dialog" aria-modal="true" aria-label="פתיחת אימון קצה קרחון" data-trainer-onboarding="1">
+        <div className="it-onboarding-layer" role="dialog" aria-modal="true" aria-label="יועץ NLP למסך קצה קרחון" data-trainer-onboarding="1">
           <div className="it-onboarding-card">
             <div className="it-onboarding-head">
               <div>
@@ -2584,7 +2746,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
               <article className="it-onboarding-note"><strong>דוגמה</strong><p>"מנוחה" יכולה להפוך מקריאת מצוקה כללית לעץ של קריטריונים, תנאים, או הנחות סמויות.</p></article>
             </div>
             <div className="it-onboarding-actions">
-              <button type="button" className="it-btn primary" data-trainer-action="dismiss-onboarding" onClick={() => setShowOnboarding(false)}>מתחילים למיין</button>
+              <button type="button" className="it-btn primary" data-trainer-action="dismiss-onboarding" onClick={() => setShowOnboarding(false)}>חוזרים לעבודה</button>
             </div>
           </div>
         </div>
@@ -2599,7 +2761,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         headerActions={
           <>
             <button type="button" className="trp-btn is-secondary" data-trainer-action="open-settings" onClick={openSettings}>הגדרות</button>
-            <button type="button" className="trp-btn is-ghost" onClick={() => setShowOnboarding(true)}>פתיחה מודרכת</button>
+            <button type="button" className="trp-btn is-ghost" onClick={() => setShowOnboarding(true)}>יועץ NLP</button>
           </>
         }
         purposeKicker="מה זה מאמן?"
