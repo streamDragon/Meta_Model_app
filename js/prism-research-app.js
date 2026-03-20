@@ -1274,5 +1274,6 @@
     }
 
     boot();
+    } // end startApp
 })();
 
