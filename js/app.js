@@ -21247,8 +21247,7 @@ async function setupComicEngine2({ force = false } = {}) {
     }
 }
 
-// ==================== WRINKLE REVEAL FLOW (OVERRIDE) ===================
-
+// ==================== WRINKLE REVEAL HELPERS ===================
 
 function wr2TrimText(value, maxLen = 180) {
     const clean = String(value || '').replace(/\s+/g, ' ').trim();

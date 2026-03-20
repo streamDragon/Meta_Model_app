@@ -173,6 +173,10 @@
     mount.addEventListener('click', handleClick);
     mount.addEventListener('change', handleChange);
     mount.addEventListener('input', handleInput);
+    mount.addEventListener('mouseover', handleMouseOver);
+    mount.addEventListener('mouseout', handleMouseOut);
+    mount.addEventListener('focusin', handleFocusIn);
+    mount.addEventListener('focusout', handleFocusOut);
     registerStandaloneController();
 
     init().catch((error) => {
