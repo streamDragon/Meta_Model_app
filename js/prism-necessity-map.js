@@ -6,6 +6,20 @@
     const ROOT_SELECTOR = '[data-prism-necessity-app]';
     const STYLE_PATH = 'css/prism-necessity.css';
     const DATA_SOURCE = 'data/prism-necessity.json';
+    const CATEGORY_SOURCE = 'data/prism-lab-categories.he.json';
+
+    const CATEGORY_ID_MAP = Object.freeze({
+        comparison: 'comparative_deletion',
+        time_place: 'time_space_predicate',
+        modal_operator: 'modal_operators_action',
+        cause_effect: 'cause_effect',
+        complex_equivalence: 'complex_equivalence',
+        mind_reading: 'mind_reading',
+        universal_quantifier: 'universal_quantifier',
+        nominalization: 'nominalization',
+        unspecified_verb: 'unspecified_verb',
+        lost_performative: 'lost_performative'
+    });
 
     const LEVEL_ORDER = Object.freeze([
         'environment',
@@ -137,7 +151,25 @@
         };
     }
 
-    function mapSession(rawSession, index) {
+    function humanizeCategoryId(categoryId) {
+        return normalizeText(categoryId)
+            .split(/[_-]+/)
+            .filter(Boolean)
+            .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+            .join(' ');
+    }
+
+    function buildCategoryMeta(rawCategory) {
+        return {
+            id: normalizeText(rawCategory?.id),
+            label: normalizeText(rawCategory?.label_he) || humanizeCategoryId(rawCategory?.id),
+            subtitle: normalizeText(rawCategory?.short_subtitle_he),
+            tag: normalizeText(rawCategory?.category_tag_he),
+            focus: normalizeText(rawCategory?.conceptual_focus_he)
+        };
+    }
+
+    function mapSession(rawSession, index, categoriesById) {
         const orderedQuestions = (Array.isArray(rawSession?.questions) ? rawSession.questions : [])
             .map((entry, questionIndex) => mapQuestion(entry, questionIndex))
             .filter(Boolean)
@@ -164,10 +196,25 @@
             rowsByLevel[question.levelId][question.side] = question;
         });
 
+        const rawCategoryId = normalizeText(rawSession?.category);
+        const categoryId = CATEGORY_ID_MAP[rawCategoryId] || rawCategoryId;
+        const categoryMeta = categoriesById?.[categoryId] || {
+            id: categoryId,
+            label: humanizeCategoryId(categoryId),
+            subtitle: '',
+            tag: 'קטגוריה',
+            focus: ''
+        };
+
         return {
             id: String(rawSession?.id ?? index + 1),
             sentence: normalizeText(rawSession?.sentence),
-            category: normalizeText(rawSession?.category),
+            category: rawCategoryId,
+            categoryId,
+            categoryLabel: categoryMeta.label,
+            categorySubtitle: categoryMeta.subtitle,
+            categoryTag: categoryMeta.tag,
+            categoryFocus: categoryMeta.focus,
             sideALabel: normalizeText(rawSession?.sideA_label) || 'צד מקור / טריגר',
             sideBLabel: normalizeText(rawSession?.sideB_label) || 'צד תוצאה / עצמי',
             questions: orderedQuestions,
@@ -185,17 +232,54 @@
         if (payloadCache) return payloadCache;
         if (payloadPromise) return payloadPromise;
 
-        payloadPromise = fetchJson(DATA_SOURCE)
-            .then((rawPayload) => {
+        payloadPromise = Promise.all([
+            fetchJson(DATA_SOURCE),
+            fetchJson(CATEGORY_SOURCE)
+        ])
+            .then(([rawPayload, rawCategoriesPayload]) => {
+                const rawCategories = Array.isArray(rawCategoriesPayload?.categories) ? rawCategoriesPayload.categories : [];
+                const categoriesById = rawCategories.reduce((acc, entry) => {
+                    const category = buildCategoryMeta(entry);
+                    if (category.id) acc[category.id] = category;
+                    return acc;
+                }, {});
+
                 const sessions = (Array.isArray(rawPayload) ? rawPayload : [])
-                    .map((entry, index) => mapSession(entry, index))
+                    .map((entry, index) => mapSession(entry, index, categoriesById))
                     .filter(Boolean);
 
                 if (!sessions.length) {
                     throw new Error('No Necessity Map sessions were found in the dataset.');
                 }
 
-                payloadCache = { sessions };
+                const sessionsByCategory = sessions.reduce((acc, session) => {
+                    (acc[session.categoryId] = acc[session.categoryId] || []).push(session);
+                    return acc;
+                }, {});
+
+                const categories = rawCategories
+                    .map((entry) => buildCategoryMeta(entry))
+                    .filter((category) => category.id && Array.isArray(sessionsByCategory[category.id]) && sessionsByCategory[category.id].length);
+
+                Object.keys(sessionsByCategory).forEach((categoryId) => {
+                    if (categoriesById[categoryId]) return;
+                    const fallback = {
+                        id: categoryId,
+                        label: sessionsByCategory[categoryId][0]?.categoryLabel || humanizeCategoryId(categoryId),
+                        subtitle: sessionsByCategory[categoryId][0]?.categorySubtitle || '',
+                        tag: sessionsByCategory[categoryId][0]?.categoryTag || 'קטגוריה',
+                        focus: sessionsByCategory[categoryId][0]?.categoryFocus || ''
+                    };
+                    categories.push(fallback);
+                    categoriesById[categoryId] = fallback;
+                });
+
+                payloadCache = {
+                    sessions,
+                    categories,
+                    categoriesById,
+                    sessionsByCategory
+                };
                 return payloadCache;
             })
             .finally(() => {
@@ -212,15 +296,17 @@
             loaded: false,
             error: '',
             payload: null,
-            stage: 'intro',
+            stage: 'welcome',
+            selectedCategoryId: '',
             sessionIndex: 0,
             stepIndex: 0,
+            insightOpen: false,
             scrollToTop: false
         };
     }
 
-    function getSessions(state) {
-        return Array.isArray(state.payload?.sessions) ? state.payload.sessions : [];
+    function getCategories(state) {
+        return Array.isArray(state.payload?.categories) ? state.payload.categories : [];
     }
 
     function wrapIndex(index, total) {
@@ -228,8 +314,16 @@
         return ((index % total) + total) % total;
     }
 
+    function getCategory(state) {
+        return state.payload?.categoriesById?.[state.selectedCategoryId] || null;
+    }
+
+    function getCategorySessions(state) {
+        return state.payload?.sessionsByCategory?.[state.selectedCategoryId] || [];
+    }
+
     function getSession(state) {
-        const sessions = getSessions(state);
+        const sessions = getCategorySessions(state);
         if (!sessions.length) return null;
         return sessions[wrapIndex(state.sessionIndex, sessions.length)] || null;
     }
@@ -254,31 +348,71 @@
         return (1.5 + (normalizeScore(score) * 0.85)).toFixed(2);
     }
 
-    function openSession(state, index) {
-        const sessions = getSessions(state);
+    function openCategory(state, categoryId) {
+        const category = state.payload?.categoriesById?.[categoryId];
+        if (!category) return false;
+        state.selectedCategoryId = categoryId;
+        state.sessionIndex = 0;
+        state.stepIndex = 0;
+        state.insightOpen = false;
+        state.stage = 'towers';
+        state.scrollToTop = true;
+        return true;
+    }
+
+    function openCategorySession(state, index) {
+        const sessions = getCategorySessions(state);
         if (!sessions.length) return false;
         state.sessionIndex = wrapIndex(index, sessions.length);
-        state.stage = 'intro';
         state.stepIndex = 0;
+        state.insightOpen = false;
+        state.stage = 'towers';
         state.scrollToTop = true;
         return true;
     }
 
-    function goToIntro(state) {
-        state.stage = 'intro';
+    function goToWelcome(state) {
+        state.stage = 'welcome';
+        state.insightOpen = false;
         state.scrollToTop = true;
         return true;
     }
 
-    function goToBuild(state) {
-        state.stage = 'build';
+    function goToSelect(state) {
+        state.stage = 'select';
+        state.insightOpen = false;
         state.scrollToTop = true;
         return true;
     }
 
-    function goToReflect(state) {
-        if (!isSessionComplete(state)) return false;
-        state.stage = 'reflect';
+    function goToTowers(state) {
+        if (!state.selectedCategoryId || !getCategorySessions(state).length) return false;
+        state.stage = 'towers';
+        state.scrollToTop = true;
+        return true;
+    }
+
+    function closeInsight(state) {
+        if (!state.insightOpen) return false;
+        state.insightOpen = false;
+        return true;
+    }
+
+    function resetCurrentTowers(state) {
+        if (!getSession(state)) return false;
+        state.stage = 'towers';
+        state.stepIndex = 0;
+        state.insightOpen = false;
+        state.scrollToTop = true;
+        return true;
+    }
+
+    function restartFeature(state) {
+        state.stage = 'welcome';
+        state.selectedCategoryId = '';
+        state.sessionIndex = 0;
+        state.stepIndex = 0;
+        state.insightOpen = false;
         state.scrollToTop = true;
         return true;
     }
@@ -289,34 +423,37 @@
         const filledCount = getFilledCount(state, session);
         if (filledCount >= session.questions.length) return false;
         state.stepIndex = filledCount + 1;
+        if (state.stepIndex >= session.questions.length) {
+            state.insightOpen = true;
+        }
         return true;
     }
 
     function restartCurrentSession(state) {
-        if (!getSession(state)) return false;
-        state.stage = 'intro';
-        state.stepIndex = 0;
-        state.scrollToTop = true;
-        return true;
+        return restartFeature(state);
     }
 
     function stepBack(state) {
-        const session = getSession(state);
-        if (!session) return false;
-
-        if (state.stage === 'reflect') {
-            state.stage = 'build';
+        if (state.stage === 'towers') {
+            if (state.insightOpen) {
+                state.insightOpen = false;
+                return true;
+            }
+            const session = getSession(state);
+            if (session) {
+                const filledCount = getFilledCount(state, session);
+                if (filledCount > 0) {
+                    state.stepIndex = filledCount - 1;
+                    return true;
+                }
+            }
+            state.stage = 'select';
             state.scrollToTop = true;
             return true;
         }
 
-        if (state.stage === 'build') {
-            const filledCount = getFilledCount(state, session);
-            if (filledCount > 0) {
-                state.stepIndex = filledCount - 1;
-                return true;
-            }
-            state.stage = 'intro';
+        if (state.stage === 'select') {
+            state.stage = 'welcome';
             state.scrollToTop = true;
             return true;
         }
@@ -333,7 +470,7 @@
                 return handled;
             },
             restart() {
-                const handled = restartCurrentSession(state);
+                const handled = restartFeature(state);
                 if (handled) renderApp(state);
                 return handled;
             }
