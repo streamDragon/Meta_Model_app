@@ -572,7 +572,7 @@
         const rootTitle = rootCard?.querySelector(':scope > h2');
         const rootIntro = rootCard?.querySelector(':scope > p');
         const shellNote = rootCard?.querySelector('.prism-shell-note');
-        if (rootTitle) rootTitle.textContent = 'מעבדת הפריזמות';
+        if (rootTitle) rootTitle.textContent = 'מפת רמות ומטה-מודל';
         if (rootIntro) rootIntro.textContent = 'כאן עובדים על המשפט עצמו. מזהים מה בולט בשפה, מזהים מאיזו רמה החוויה מדברת, ואז בונים שאלה מצטרפת, שאלת הובלה, ומה עשוי להיפתח בתגובה.';
         if (shellNote) shellNote.textContent = 'המשפט נשאר מולך כל הזמן. העמקה, דוגמאות, טעויות נפוצות וסיכום נפתחים רק כשצריך.';
     };

@@ -50,7 +50,7 @@
             unlockLevel: 1
         }),
         prismLab: Object.freeze({
-            label: 'מעבדת פריזמות',
+            label: 'מפת רמות ומטה-מודל',
             icon: '🔬',
             unlockLevel: 1
         }),
