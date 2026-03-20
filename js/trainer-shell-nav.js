@@ -114,6 +114,64 @@
         return registry[key] || null;
     }
 
+    function setBooleanProperty(node, key, nextValue) {
+        if (!node) return false;
+        var resolved = !!nextValue;
+        if (!!node[key] === resolved) return false;
+        node[key] = resolved;
+        return true;
+    }
+
+    function setAttributeIfChanged(node, name, value) {
+        if (!node) return false;
+        var next = value == null ? null : String(value);
+        var current = node.getAttribute(name);
+        if (next == null) {
+            if (current == null) return false;
+            node.removeAttribute(name);
+            return true;
+        }
+        if (current === next) return false;
+        node.setAttribute(name, next);
+        return true;
+    }
+
+    function scheduleStandaloneDialogSync(navRoot) {
+        if (!document.body) return;
+        var state = document.body.__trainerShellDialogSyncState;
+        if (!state) {
+            state = {
+                scheduled: false,
+                processing: false,
+                navRoot: navRoot || null
+            };
+            document.body.__trainerShellDialogSyncState = state;
+        } else if (navRoot) {
+            state.navRoot = navRoot;
+        }
+
+        if (state.scheduled || state.processing) return;
+        state.scheduled = true;
+
+        var runner = function () {
+            state.scheduled = false;
+            if (state.processing) return;
+            state.processing = true;
+            try {
+                syncNavModalState();
+                syncControllerActionState(state.navRoot || navRoot || null);
+            } finally {
+                state.processing = false;
+            }
+        };
+
+        if (typeof window.requestAnimationFrame === 'function') {
+            window.requestAnimationFrame(runner);
+            return;
+        }
+        window.setTimeout(runner, 0);
+    }
+
     function syncControllerActionState(navRoot) {
         var nav = navRoot || document.querySelector('.trainer-shell-nav');
         if (!nav) return;
@@ -391,6 +449,63 @@
         var observer = new MutationObserver(function () {
             syncNavModalState();
             syncControllerActionState(navRoot);
+        });
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['class', 'hidden', 'style', 'open', 'aria-hidden']
+        });
+    }
+
+    function syncControllerActionState(navRoot) {
+        var nav = navRoot || document.querySelector('.trainer-shell-nav');
+        if (!nav) return;
+        var controller = getStandaloneController();
+        var restartBtn = nav.querySelector('[data-nav-action="restart"]');
+        var backBtn = nav.querySelector('[data-nav-action="back"]');
+        var hasInternalBack = !!(controller && typeof controller.stepBack === 'function');
+        var canRestart = !!(controller && typeof controller.restart === 'function');
+        var restartTitle = '׳”׳×׳—׳׳” ׳׳—׳“׳© ׳©׳ ׳”׳×׳¨׳’׳•׳ ׳”׳ ׳•׳›׳—׳™';
+        var backTitle = hasInternalBack
+            ? '׳—׳–׳¨׳” ׳׳׳¡׳ ׳”׳§׳•׳“׳ ׳‘׳×׳•׳ ׳”׳×׳¨׳’׳•׳'
+            : '׳—׳–׳¨׳” ׳׳¢׳׳•׳“ ׳”׳§׳•׳“׳';
+
+        if (canRestart && typeof controller.canRestart === 'function') {
+            try {
+                canRestart = controller.canRestart() !== false;
+            } catch (e) {
+                canRestart = true;
+            }
+        }
+
+        if (restartBtn) {
+            setBooleanProperty(restartBtn, 'hidden', !canRestart);
+            setBooleanProperty(restartBtn, 'disabled', !canRestart);
+            setAttributeIfChanged(restartBtn, 'aria-disabled', canRestart ? 'false' : 'true');
+            setAttributeIfChanged(restartBtn, 'aria-hidden', canRestart ? 'false' : 'true');
+            setAttributeIfChanged(restartBtn, 'title', canRestart ? restartTitle : null);
+        }
+
+        if (backBtn) {
+            setAttributeIfChanged(backBtn, 'title', backTitle);
+        }
+    }
+
+    function watchStandaloneDialogs(navRoot) {
+        if (!document.body || document.body.__trainerShellDialogWatch) return;
+        document.body.__trainerShellDialogWatch = true;
+        scheduleStandaloneDialogSync(navRoot);
+        var observer = new MutationObserver(function (mutations) {
+            var nav = navRoot || document.querySelector('.trainer-shell-nav');
+            if (nav && Array.prototype.every.call(mutations || [], function (mutation) {
+                return mutation
+                    && mutation.target instanceof Element
+                    && nav.contains(mutation.target);
+            })) {
+                return;
+            }
+            scheduleStandaloneDialogSync(navRoot);
         });
         observer.observe(document.body, {
             childList: true,
