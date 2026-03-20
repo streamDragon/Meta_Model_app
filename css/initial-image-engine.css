@@ -349,14 +349,27 @@
     background: #1e293b;
     color: #fff;
     font-weight: 700;
-    font-size: 0.88rem;
-    line-height: 1.5;
     border-radius: 8px;
     padding: 10px 12px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.iids-core-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #94a3b8;
+    letter-spacing: 0.03em;
+    text-align: right;
 }
 
 .iids-core-sentence {
     display: block;
+    font-size: 1.05rem;
+    font-weight: 800;
+    line-height: 1.6;
 }
 
 /* unrevealed slots */

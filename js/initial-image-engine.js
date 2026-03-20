@@ -373,7 +373,8 @@
     var selectedHypothesisIndex = -1;      // confirmed choice
     var viewingHypothesisIndex = 0;        // currently browsed
     var revealedIds = [];
-    var currentReveal = null;
+    var currentReveal = null;              // last committed reveal (for display)
+    var pendingAskReveal = null;           // reveal staged but not yet confirmed with ASK
     var revealedTileIndexes = [];
     var tileRevealOrder = [];
     var pendingTileReveal = -1;
@@ -718,6 +719,7 @@
         html.push('<div class="' + CSS_PREFIX + '-text-panel">');
         html.push(
             '<div class="' + CSS_PREFIX + '-text-cell ' + CSS_PREFIX + '-text-core">' +
+            '<span class="' + CSS_PREFIX + '-core-label">מבנה השטח — המשפט הנאמר:</span>' +
             '<span class="' + CSS_PREFIX + '-core-sentence">' + esc(ex.originalSentence) + '</span>' +
             '</div>'
         );
@@ -743,26 +745,19 @@
         }
         html.push('</div></div></div>');
 
-        // ── Yellow / blue info boxes
-        if (phase === 'reveal' && currentReveal && !complete) {
+        // ── Ask popup (opens when category button clicked, closes on ASK)
+        if (phase === 'reveal' && pendingAskReveal && !complete) {
             html.push(
-                '<div class="' + CSS_PREFIX + '-info-boxes">' +
+                '<div class="' + CSS_PREFIX + '-ask-popup">' +
                 '<div class="' + CSS_PREFIX + '-box-yellow">' +
                 '<span class="' + CSS_PREFIX + '-box-label">שאלת העומק הנוכחית</span>' +
-                '<p>' + esc(currentReveal.question) + '</p>' +
+                '<p>' + esc(pendingAskReveal.question) + '</p>' +
                 '</div>' +
                 '<div class="' + CSS_PREFIX + '-box-blue">' +
                 '<span class="' + CSS_PREFIX + '-box-label">מה השאלה הזאת מחזירה למפה</span>' +
-                '<p>' + esc(currentReveal.rationale) + '</p>' +
+                '<p>' + esc(pendingAskReveal.rationale) + '</p>' +
                 '</div>' +
-                '</div>'
-            );
-        } else if (phase === 'reveal' && !currentReveal && !complete) {
-            html.push(
-                '<div class="' + CSS_PREFIX + '-info-boxes">' +
-                '<div class="' + CSS_PREFIX + '-box-yellow ' + CSS_PREFIX + '-box-initial">' +
-                '<p>לחצו על הכפתורים כדי לחשוף שכבות — השמטה, עיוות והכללה</p>' +
-                '</div>' +
+                '<button type="button" class="' + CSS_PREFIX + '-ask-btn">ASK — שאל!</button>' +
                 '</div>'
             );
         }
@@ -836,6 +831,12 @@
             dots[d].addEventListener('click', handleDot);
         }
 
+        // ASK button
+        var askBtn = rootEl.querySelector('.' + CSS_PREFIX + '-ask-btn');
+        if (askBtn) {
+            askBtn.addEventListener('click', handleAsk);
+        }
+
         // Restart button
         var restartBtn = rootEl.querySelector('.' + CSS_PREFIX + '-restart-btn');
         if (restartBtn) {
@@ -881,6 +882,24 @@
         var reveal = getNextReveal(category);
         if (!reveal) return;
 
+        // Stage the reveal — show popup but don't commit yet
+        pendingAskReveal = reveal;
+        renderAll();
+
+        var popup = rootEl.querySelector('.' + CSS_PREFIX + '-ask-popup');
+        if (popup) {
+            setTimeout(function () {
+                popup.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 60);
+        }
+    }
+
+    function handleAsk() {
+        if (!pendingAskReveal) return;
+
+        var reveal = pendingAskReveal;
+        pendingAskReveal = null;
+
         revealedIds.push(reveal.id);
         currentReveal = reveal;
 
@@ -903,13 +922,6 @@
         }
 
         renderAll();
-
-        var infoBoxes = rootEl.querySelector('.' + CSS_PREFIX + '-info-boxes');
-        if (infoBoxes) {
-            setTimeout(function () {
-                infoBoxes.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 100);
-        }
     }
 
     function handleRestart() {
@@ -920,6 +932,7 @@
         revealedIds = [];
         revealedTileIndexes = [];
         currentReveal = null;
+        pendingAskReveal = null;
         pendingTileReveal = -1;
         tileRevealOrder = [];
         try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
