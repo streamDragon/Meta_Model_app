@@ -419,11 +419,17 @@
     100% { transform: scale(1); opacity: 1; }
 }
 
-/* ─── Yellow / Blue Info Boxes ─────────────────── */
-.iids-info-boxes {
+/* ─── Ask Popup (yellow + blue + ASK button) ───── */
+.iids-ask-popup {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    animation: iids-popup-in 0.25s ease;
+}
+
+@keyframes iids-popup-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 .iids-box-yellow,
