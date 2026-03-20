@@ -8085,26 +8085,41 @@ const QUESTION_DRILL_CATEGORY_SHORT_LABELS = Object.freeze({
 });
 
 const QUESTION_DRILL_TEST_PROMPTS = Object.freeze({
-    DELETION: 'מצא את ההשמטה!!',
-    DISTORTION: 'מצא את העיוות!!',
-    GENERALIZATION: 'מצא את ההכללה!!'
+    DELETION: Object.freeze({
+        title: 'מה חסר כאן כדי להבין את ההיגיון?',
+        subtitle: 'במשפט הזה חסר מידע חשוב שמחזיק את הבעיה. איזו שאלה תחשוף אותו?'
+    }),
+    DISTORTION: Object.freeze({
+        title: 'איזו פרשנות לא הכרחית נכנסה כאן?',
+        subtitle: 'במשפט הזה יש פירוש או מסקנה שלא חייבים להיות נכונים. איזו שאלה תבדוק אותם?'
+    }),
+    GENERALIZATION: Object.freeze({
+        title: 'איזה כלל סמוי תורם לבעיה כאן?',
+        subtitle: 'במשפט הזה יש כלל רחב שמתרחב מעבר למה שבאמת קרה. איזו שאלה תאתר אותו?'
+    })
 });
 
 const QUESTION_DRILL_TARGET_COPY = Object.freeze({
     DELETION: Object.freeze({
         label: 'השמטה',
         goal: 'מחפשים את שאלת הדיוק שמחזירה פרטים חסרים למשפט.',
-        target: 'מי/מה/מתי/איך בדיוק חסר כאן'
+        target: 'מי/מה/מתי/איך בדיוק חסר כאן',
+        livePrompt: 'דמיינו שחבר אומר לכם את המשפט הזה. איזו שאלה תחשוף מה חסר כאן כדי להבין אותו באמת?',
+        advisorCue: 'מה חסר פה במשפט שאם נחשוף אותו, ההיגיון של הבעיה יהיה ברור יותר?'
     }),
     DISTORTION: Object.freeze({
         label: 'עיוות',
         goal: 'מחפשים את שאלת הדיוק שבודקת פירוש, מסקנה או קישור שלא בטוח נכונים.',
-        target: 'ראיות, פירוש חלופי או הנחת עומק'
+        target: 'ראיות, פירוש חלופי או הנחת עומק',
+        livePrompt: 'דמיינו שחבר אומר לכם את המשפט הזה. איזו שאלה תבדוק את הפרשנות שקופצת כאן מהר מדי?',
+        advisorCue: 'איזו פרשנות לא הכרחית, מסקנה מהירה או קישור מיידי תורמים כאן לבעיה?'
     }),
     GENERALIZATION: Object.freeze({
         label: 'הכללה',
         goal: 'מחפשים את שאלת הדיוק שמחזירה חריגים, טווח והקשר.',
-        target: 'מתי זה לא תמיד נכון, אצל מי, ובאיזה תנאים'
+        target: 'מתי זה לא תמיד נכון, אצל מי, ובאיזה תנאים',
+        livePrompt: 'דמיינו שחבר אומר לכם את המשפט הזה. איזו שאלה תאתר את הכלל הסמוי שמכליל כאן יותר מדי?',
+        advisorCue: 'איזה כלל סמוי, כמו "תמיד", "כולם" או "אף פעם", מחזיק כאן את הבעיה?'
     })
 });
 
@@ -8331,10 +8346,11 @@ function saveQuestionDrillTestStats() {
 }
 
 function getQuestionDrillModeLabel(mode = questionDrillState.mode) {
-    return normalizeQuestionDrillMode(mode) === 'test' ? 'משחק מהיר' : 'לימוד';
+    return normalizeQuestionDrillMode(mode) === 'test' ? 'זמן אמת' : 'לימוד';
 }
 
 function getQuestionDrillFeedbackHeading(tone = 'info') {
+    if (tone === 'info' && !questionDrillState.sessionCompleted) return '';
     const coach = window.MetaRedesignCoach;
     if (coach && typeof coach.getQuestionFeedbackHeading === 'function') {
         return coach.getQuestionFeedbackHeading(tone, questionDrillState.sessionCompleted);
@@ -8418,6 +8434,10 @@ function getQuestionDrillTargetCopy(category = 'DELETION') {
     return QUESTION_DRILL_TARGET_COPY[key] || QUESTION_DRILL_TARGET_COPY.DELETION;
 }
 
+function getQuestionDrillAdvisorCue(category = 'DELETION') {
+    return getQuestionDrillTargetCopy(category).advisorCue || 'איזו שאלה תעזור לפתוח כאן את ההיגיון?';
+}
+
 function buildQuestionDrillReasonLine(question = null, category = 'DELETION') {
     const normalizedCategory = String(category || '').toUpperCase();
     const label = getQuestionDrillTargetCopy(normalizedCategory).label;
@@ -8464,12 +8484,8 @@ function buildQuestionDrillSessionGuidance(accuracy = 0, { isTestMode = false } 
 function renderQuestionDrillTargetLegend() {
     const legend = questionDrillState.elements.targetLegend;
     if (!legend) return;
-    const activeCategory = getQuestionDrillTargetCategory(questionDrillState.current);
-    legend.innerHTML = QUESTION_DRILL_CATEGORIES.map((category) => {
-        const copy = getQuestionDrillTargetCopy(category);
-        const activeClass = category === activeCategory ? ' is-active' : '';
-        return `<span class="question-drill-target-chip${activeClass}">${escapeHtml(copy.label)}</span>`;
-    }).join('');
+    legend.innerHTML = '';
+    legend.classList.add('hidden');
 }
 
 function updateQuestionDrillTargetBar() {
@@ -8481,7 +8497,7 @@ function updateQuestionDrillTargetBar() {
 
     const copy = getQuestionDrillTargetCopy(getQuestionDrillTargetCategory(questionDrillState.current));
     if (questionDrillState.elements.targetCopy) {
-        questionDrillState.elements.targetCopy.textContent = `מטרת הסבב: מצא/י את שאלת הדיוק שמתאימה לקטגוריית המידע שאנחנו רוצים להשיג: ${copy.label}.`;
+        questionDrillState.elements.targetCopy.textContent = copy.livePrompt;
     }
     renderQuestionDrillTargetLegend();
 }
@@ -8700,16 +8716,32 @@ function openQuestionDrillOverlay({ type = 'question-drill', title = 'חלון',
 function buildQuestionDrillHelpOverlayContent() {
     const wrapper = document.createElement('article');
     wrapper.className = 'shell-overlay-content question-drill-overlay-content';
+    const activeCategory = questionDrillState.current ? getQuestionDrillTargetCategory(questionDrillState.current) : '';
+    const activeCopy = activeCategory ? getQuestionDrillTargetCopy(activeCategory) : null;
+    const activeStatement = String(questionDrillState.current?.statement || '').trim();
     wrapper.innerHTML = `
-        <p class="shell-overlay-kicker">עזרה</p>
-        <h4>איך עובדים כאן</h4>
-        <ol class="shell-help-list">
-            <li>קראו את המשפט.</li>
-            <li>במצב לימוד: בחרו סוג דפוס (מחיקה, עיוות, הכללה) מהתפריט או מהכפתורים ואז לחצו "בדוק".</li>
-            <li>במשחק מהיר: לוחצים מהר על הקטגוריה הנכונה ובונים רצף.</li>
-        </ol>
-        <p class="shell-overlay-note">במצב לימוד אפשר לפתוח רמז. במשחק מהיר עובדים מול זמן, ניקוד ורמזור קטן בצד.</p>
+        <p class="shell-overlay-kicker">יועץ NLP</p>
+        <h4>איך לבחור כאן את השאלה הנכונה</h4>
+        <p>לא צריך לשנן שמות. מחפשים מה במשפט מחזיק את הבעיה: משהו חסר, פרשנות לא הכרחית, או כלל רחב מדי.</p>
+        <ul class="shell-help-list">
+            <li><strong>השמטה:</strong> ${escapeHtml(getQuestionDrillAdvisorCue('DELETION'))}</li>
+            <li><strong>עיוות:</strong> ${escapeHtml(getQuestionDrillAdvisorCue('DISTORTION'))}</li>
+            <li><strong>הכללה:</strong> ${escapeHtml(getQuestionDrillAdvisorCue('GENERALIZATION'))}</li>
+        </ul>
+        <p class="shell-overlay-note">בלימוד אפשר לפתוח גם רמז. בזמן אמת בוחרים מהר את שאלת הדיוק ועובדים מול רמזור, זמן וניקוד.</p>
     `;
+    if (activeStatement) {
+        const quote = document.createElement('blockquote');
+        quote.className = 'question-drill-overlay-quote';
+        quote.textContent = activeStatement;
+        wrapper.appendChild(quote);
+    }
+    if (activeCopy) {
+        const note = document.createElement('p');
+        note.className = 'shell-overlay-note';
+        note.textContent = `למשפט הפעיל: ${activeCopy.livePrompt}`;
+        wrapper.appendChild(note);
+    }
     return wrapper;
 }
 
@@ -8789,8 +8821,8 @@ function buildQuestionDrillExplanationOverlayContent() {
     statement.textContent = current.statement || '';
 
     wrapper.innerHTML = `
-        <p class="shell-overlay-kicker">הסבר</p>
-        <h4>${getQuestionDrillCategoryLabel(targetCategory)}</h4>
+        <p class="shell-overlay-kicker">פירוק התשובה</p>
+        <h4>${targetCopy.advisorCue}</h4>
         <p>${reasonLine}</p>
         <p>${current.explanation || 'זה הכיוון המתאים במשפט הזה.'}</p>
         <p class="shell-overlay-note">מה למדתי מהבחירה הזו? לחפש ${targetCopy.target}.</p>
@@ -8803,7 +8835,7 @@ function buildQuestionDrillExplanationOverlayContent() {
 function openQuestionDrillHelpOverlay() {
     openQuestionDrillOverlay({
         type: 'question-drill-help',
-        title: 'איך עובדים כאן',
+        title: 'יועץ NLP',
         size: 'md',
         content: buildQuestionDrillHelpOverlayContent()
     });
@@ -8821,7 +8853,7 @@ function openQuestionDrillStatsOverlay() {
 function openQuestionDrillExplanationOverlay() {
     openQuestionDrillOverlay({
         type: 'question-drill-explanation',
-        title: 'למה זו התשובה',
+        title: 'פירוק התשובה',
         size: 'md',
         content: buildQuestionDrillExplanationOverlayContent()
     });
@@ -8989,15 +9021,25 @@ function setQuestionDrillMode(mode = 'learning', { persist = true, refreshCurren
         elements.modeLearningBtn.classList.toggle('is-active', active);
         elements.modeLearningBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
+    if (elements.liveModeLearningBtn) {
+        const active = !isTestMode;
+        elements.liveModeLearningBtn.classList.toggle('is-active', active);
+        elements.liveModeLearningBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
     if (elements.modeExamBtn) {
         const active = isTestMode;
         elements.modeExamBtn.classList.toggle('is-active', active);
         elements.modeExamBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
     }
+    if (elements.liveModeExamBtn) {
+        const active = isTestMode;
+        elements.liveModeExamBtn.classList.toggle('is-active', active);
+        elements.liveModeExamBtn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
     if (elements.modeNote) {
         elements.modeNote.textContent = isTestMode
-            ? 'משחק מהיר: זמן, ניקוד ורצף בלי רמזים.'
-            : 'לימוד: בוחרים מחיקה/עיוות/הכללה ואז לוחצים "בדוק".';
+            ? 'זמן אמת: בוחרים מהר את שאלת הדיוק, עם רמזור, זמן וניקוד.'
+            : 'לימוד: קוראים כאילו מישהו אומר לכם את המשפט ובוחרים את השאלה שתפתח אותו.';
     }
     if (elements.modeChip) {
         elements.modeChip.textContent = `מצב: ${getQuestionDrillModeLabel(resolved)}`;
@@ -9101,40 +9143,17 @@ function getQuestionDrillCategoryLabel(category = '') {
 
 function buildQuestionDrillOptions(question) {
     const expectedCategory = getQuestionDrillTargetCategory(question);
-
-    if (questionDrillState.mode === 'test') {
-        return shuffleArray(
-            QUESTION_DRILL_CATEGORIES.map((category) => ({
-                id: `${question?.id || 'question'}-${category}-test`,
-                text: QUESTION_DRILL_CATEGORY_SHORT_LABELS[category] || getQuestionDrillCategoryLabel(category),
+    return shuffleArray(
+        QUESTION_DRILL_CATEGORIES.map((category) => {
+            const pool = shuffleArray((QUESTION_DRILL_OPTION_BANK[category] || []).slice());
+            return {
+                id: `${question?.id || 'question'}-${category}-${questionDrillState.mode}`,
+                text: pool[0] || 'אפשר לדייק את הניסוח?',
                 category,
                 isCorrect: category === expectedCategory
-            }))
-        );
-    }
-
-    const distractorCategories = QUESTION_DRILL_CATEGORIES.filter(category => category !== expectedCategory);
-    const correctPool = shuffleArray((QUESTION_DRILL_OPTION_BANK[expectedCategory] || []).slice());
-    const options = [];
-
-    options.push({
-        id: `${question?.id || 'question'}-${expectedCategory}-correct`,
-        text: correctPool[0] || 'מה בדיוק הכוונה כאן?',
-        category: expectedCategory,
-        isCorrect: true
-    });
-
-    distractorCategories.forEach((category) => {
-        const pool = shuffleArray((QUESTION_DRILL_OPTION_BANK[category] || []).slice());
-        options.push({
-            id: `${question?.id || 'question'}-${category}-distractor`,
-            text: pool[0] || 'אפשר לדייק את הניסוח?',
-            category,
-            isCorrect: false
-        });
-    });
-
-    return shuffleArray(options);
+            };
+        })
+    );
 }
 
 function updateQuestionDrillOptionButtonsState() {
@@ -9275,12 +9294,13 @@ function updateQuestionDrillTestBanner() {
 
     const targetCategory = getQuestionDrillTargetCategory(questionDrillState.current);
     const difficulty = QUESTION_DRILL_DIFFICULTIES.find((item) => item.id === questionDrillState.testDifficulty);
+    const prompt = QUESTION_DRILL_TEST_PROMPTS[targetCategory] || QUESTION_DRILL_TEST_PROMPTS.DELETION;
     banner.dataset.tone = targetCategory;
     if (questionDrillState.elements.testBannerTitle) {
-        questionDrillState.elements.testBannerTitle.textContent = QUESTION_DRILL_TEST_PROMPTS[targetCategory] || 'מצא את הקטגוריה!!';
+        questionDrillState.elements.testBannerTitle.textContent = prompt.title;
     }
     if (questionDrillState.elements.testBannerSubtitle) {
-        questionDrillState.elements.testBannerSubtitle.textContent = `לחץ מהר על התשובה הנכונה${difficulty ? ` · רמה: ${difficulty.label}` : ''}`;
+        questionDrillState.elements.testBannerSubtitle.textContent = `${prompt.subtitle}${difficulty ? ` · רמה: ${difficulty.label}` : ''}`;
     }
 }
 
@@ -9311,10 +9331,10 @@ function beginQuestionDrillRound(question) {
 
     updateQuestionDrillTestBanner();
     if (isTestMode) {
-        setQuestionDrillFeedback('קראו את המשפט ולחצו מיד על הקטגוריה הנכונה.', 'info');
+        setQuestionDrillFeedback('קראו את המשפט ובחרו מיד את שאלת הדיוק שחושפת הכי מהר את מוקד הבעיה.', 'info');
         startQuestionDrillTimer();
     } else {
-        setQuestionDrillFeedback(`מטרת הסבב: בחרו ${targetCopy.label} ואז לחצו "בדוק".`, 'info');
+        setQuestionDrillFeedback(targetCopy.livePrompt, 'info');
     }
 
     if (elements.summary) {
@@ -9371,7 +9391,6 @@ function updateQuestionDrillSessionUI() {
     const roundsTotal = Math.max(1, plan.rounds);
     const roundsDone = Math.min(questionDrillState.roundsDone, roundsTotal);
     const progressPct = Math.round((roundsDone / roundsTotal) * 100);
-    const nextRound = Math.min(roundsTotal, roundsDone + (questionDrillState.sessionCompleted ? 0 : 1));
     const visibleRound = questionDrillState.sessionCompleted
         ? roundsDone
         : Math.min(roundsTotal, roundsDone + (questionDrillState.current ? 1 : 0));
@@ -9425,25 +9444,20 @@ function updateQuestionDrillSessionUI() {
     }
     updateQuestionDrillTimerDisplay();
     if (questionDrillState.elements.sessionNote) {
+        let sessionNote = '';
         if (questionDrillState.sessionCompleted) {
-            questionDrillState.elements.sessionNote.textContent = isTestMode
+            sessionNote = isTestMode
                 ? `המבחן הסתיים. ניקוד ${questionDrillState.testScore}, דיוק ${accuracy}%.`
                 : (targetReached
                     ? `התרגול הושלם. הגעת ליעד.`
                     : `התרגול הושלם. דיוק ${accuracy}%.`);
         } else if (!questionDrillState.sessionActive) {
-            questionDrillState.elements.sessionNote.textContent = isTestMode
-                ? 'בחרו קושי ולחצו "התחל משחק".'
-                : `${plan.note} בחרו מצב ולחצו "התחל".`;
-        } else if (questionDrillState.roundFinalized) {
-            questionDrillState.elements.sessionNote.textContent = isTestMode
-                ? `המשך מוכן לשאלה ${nextRound > roundsTotal ? roundsTotal : nextRound}.`
-                : `מוכנים לשאלה ${nextRound > roundsTotal ? roundsTotal : nextRound}.`;
-        } else {
-            questionDrillState.elements.sessionNote.textContent = isTestMode
-                ? 'משחק מהיר: משפט אחד, בחירה אחת, ממשיכים.'
-                : 'קראו את המשפט ובחרו את שאלת הדיוק שמתאימה לקטגוריית המידע.';
+            sessionNote = isTestMode
+                ? 'בחרו קושי והתחילו כשאתם מוכנים.'
+                : `${plan.note} לחיצה אחת ומתחילים.`;
         }
+        questionDrillState.elements.sessionNote.textContent = sessionNote;
+        questionDrillState.elements.sessionNote.classList.toggle('hidden', !sessionNote);
     }
     updateQuestionDrillGameHud();
     updateQuestionDrillLayoutState();
@@ -9466,13 +9480,13 @@ function updateQuestionDrillControlsState() {
         elements.nextBtn.disabled = questionDrillState.sessionCompleted ? false : !hasQuestion;
         elements.nextBtn.textContent = questionDrillState.sessionCompleted
             ? 'תרגול חדש'
-            : (questionDrillState.roundFinalized ? 'הבא' : 'דלג');
+            : (questionDrillState.roundFinalized ? 'המשפט הבא' : 'דלג');
         const nextIsPrimary = questionDrillState.sessionCompleted || questionDrillState.roundFinalized || isTestMode;
         elements.nextBtn.classList.toggle('btn-primary', nextIsPrimary);
         elements.nextBtn.classList.toggle('btn-secondary', !nextIsPrimary);
     }
     if (elements.startBtn) {
-        elements.startBtn.textContent = isTestMode ? 'התחל משחק' : 'התחל';
+        elements.startBtn.textContent = isTestMode ? 'התחל זמן אמת' : 'התחל לימוד';
     }
     if (elements.resetBtn) {
         elements.resetBtn.disabled = !questionDrillState.sessionActive && !questionDrillState.sessionCompleted && questionDrillState.attempts === 0;
@@ -9483,10 +9497,11 @@ function updateQuestionDrillControlsState() {
     if (elements.categoryWrap) {
         elements.categoryWrap.classList.add('question-drill-control-hidden');
     }
-    if (elements.hintBtn) {
-        elements.hintBtn.disabled = isTestMode || sessionLocked || questionDrillState.roundFinalized || !hasQuestion;
-        elements.hintBtn.classList.toggle('question-drill-control-hidden', isTestMode);
-    }
+    [elements.hintBtn, elements.liveHintBtn].forEach((button) => {
+        if (!button) return;
+        button.disabled = isTestMode || sessionLocked || questionDrillState.roundFinalized || !hasQuestion;
+        button.classList.toggle('question-drill-control-hidden', isTestMode);
+    });
     if (elements.difficultySelect) {
         elements.difficultySelect.disabled = !isTestMode;
     }
@@ -9507,7 +9522,7 @@ function resetQuestionDrillToSetup({ preservePrefs = true } = {}) {
     }
     updateQuestionDrillTargetBar();
     setQuestionDrillTrafficState('green', 'מוכן לסבב');
-    setQuestionDrillFeedback('בחרו מצב, חבילה וקושי ואז לחצו "התחל".', 'info');
+    setQuestionDrillFeedback('בחרו מצב, חבילה וקושי ואז התחילו. היועץ נשאר זמין בכל רגע.', 'info');
     updateQuestionDrillSessionUI();
     updateQuestionDrillControlsState();
 }
@@ -9824,11 +9839,9 @@ function evaluateQuestionDrill() {
     const selectedOption = questionDrillState.options.find(option => option.id === questionDrillState.selectedOptionId);
     if (!selectedOption) {
         setQuestionDrillFeedback(
-            coach && typeof coach.getQuestionNeedSelection === 'function'
-                ? coach.getQuestionNeedSelection(questionDrillState.mode === 'test')
-                : (questionDrillState.mode === 'test'
-                    ? 'בחרו קטגוריה לפני שממשיכים.'
-                    : 'בחרו תשובה לפני שבודקים.'),
+            questionDrillState.mode === 'test'
+                ? 'בחרו שאלה אחת והמשיכו מיד.'
+                : 'בחרו את שאלת הדיוק שהכי תעזור לפתוח את המשפט.',
             'warn'
         );
         return;
@@ -9838,6 +9851,8 @@ function evaluateQuestionDrill() {
     const selectedCategory = selectedOption.category || 'DELETION';
     const success = selectedCategory === expectedCategory;
     const isTestMode = questionDrillState.mode === 'test';
+    const expectedCue = getQuestionDrillAdvisorCue(expectedCategory);
+    const selectedCue = getQuestionDrillAdvisorCue(selectedCategory);
 
     if (questionDrillState.elements.category && !isTestMode) {
         questionDrillState.elements.category.value = selectedCategory;
@@ -9886,31 +9901,15 @@ function evaluateQuestionDrill() {
             if ([3, 5, 10].includes(nextStreak)) {
                 showQuestionDrillStreakBadge(nextStreak);
             }
-            const expectedLabel = QUESTION_DRILL_CATEGORY_SHORT_LABELS[expectedCategory];
-            const takeaway = buildQuestionDrillLearningTakeaway(questionDrillState.current, expectedCategory);
             setQuestionDrillFeedback(
-                coach && typeof coach.buildQuestionSuccess === 'function'
-                    ? coach.buildQuestionSuccess({
-                        mode: 'test',
-                        expectedLabel,
-                        rtText: formatQuestionDrillTimerMs(rtMs),
-                        scoreDelta: scoreDelta.total,
-                        takeaway
-                    })
-                    : `נכון. ${expectedLabel} · ${formatQuestionDrillTimerMs(rtMs)}ש׳ · +${scoreDelta.total}`,
+                `נכון. בחרת את השאלה שחושפת כאן: ${expectedCue} ${formatQuestionDrillTimerMs(rtMs)}ש׳ · +${scoreDelta.total}`,
                 'success'
             );
             playUISound('correct');
             finalizeQuestionDrillRound('correct');
         } else {
-            const expectedLabel = QUESTION_DRILL_CATEGORY_SHORT_LABELS[expectedCategory];
             setQuestionDrillFeedback(
-                coach && typeof coach.buildQuestionWrong === 'function'
-                    ? coach.buildQuestionWrong({
-                        mode: 'test',
-                        expectedLabel
-                    })
-                    : `לא מדויק. כאן התשובה היא ${expectedLabel}.`,
+                `לא מדויק. כאן חיפשנו שאלה שבודקת: ${expectedCue}`,
                 'danger'
             );
             playUISound('wrong');
@@ -9933,33 +9932,15 @@ function evaluateQuestionDrill() {
             showQuestionDrillStreakBadge(nextStreak);
         }
         const takeaway = buildQuestionDrillLearningTakeaway(questionDrillState.current, expectedCategory);
-        setQuestionDrillFeedback(
-            coach && typeof coach.buildQuestionSuccess === 'function'
-                ? coach.buildQuestionSuccess({
-                    mode: 'learn',
-                    expectedLabel: getQuestionDrillTargetCopy(expectedCategory).label,
-                    takeaway
-                })
-                : `נכון. ${takeaway}`,
-            'success'
-        );
+        setQuestionDrillFeedback(`נכון. ${takeaway}`, 'success');
         playUISound('correct');
         finalizeQuestionDrillRound('correct');
         return;
     }
 
     playUISound('wrong');
-    const expectedCopy = getQuestionDrillTargetCopy(expectedCategory);
-    const selectedCopy = getQuestionDrillTargetCopy(selectedCategory);
     setQuestionDrillFeedback(
-        coach && typeof coach.buildQuestionWrong === 'function'
-            ? coach.buildQuestionWrong({
-                mode: 'learn',
-                expectedLabel: expectedCopy.label,
-                selectedLabel: selectedCopy.label,
-                reasonLine
-            })
-            : `לא מדויק. בחרת ${selectedCopy.label}, וכאן צריך ${expectedCopy.label}. ${reasonLine}. צריך עוד בהירות? פתחו "הסבר".`,
+        `כמעט. בחרת כיוון של "${selectedCue}", אבל כאן צריך שאלה שבודקת: ${expectedCue}. ${reasonLine}`,
         'warn'
     );
     setQuestionDrillTrafficState('yellow', 'נסו עוד פעם');
@@ -9997,6 +9978,8 @@ function setupQuestionDrill() {
         hintBtn: document.getElementById('question-drill-hint'),
         modeLearningBtn: document.getElementById('question-drill-mode-learning'),
         modeExamBtn: document.getElementById('question-drill-mode-exam'),
+        liveModeLearningBtn: document.getElementById('question-drill-live-mode-learning'),
+        liveModeExamBtn: document.getElementById('question-drill-live-mode-exam'),
         modeNote: document.getElementById('question-drill-mode-note'),
         testBanner: document.getElementById('question-drill-test-banner'),
         testBannerTitle: document.getElementById('question-drill-test-banner-title'),
@@ -10030,7 +10013,10 @@ function setupQuestionDrill() {
         hudBonusLabel: document.getElementById('question-drill-hud-bonus-label'),
         hudBonus: document.getElementById('question-drill-hud-bonus'),
         openHelpBtn: document.getElementById('question-drill-open-help'),
+        openHelpLiveBtn: document.getElementById('question-drill-open-help-live'),
         openStatsBtn: document.getElementById('question-drill-open-stats'),
+        openStatsLiveBtn: document.getElementById('question-drill-open-stats-live'),
+        liveHintBtn: document.getElementById('question-drill-live-hint'),
         prestartMenuBtn: document.getElementById('question-drill-prestart-menu'),
         openMenuBtn: document.getElementById('question-drill-open-menu'),
         openExplanationBtn: document.getElementById('question-drill-open-explanation')
@@ -10076,7 +10062,15 @@ function setupQuestionDrill() {
         setQuestionDrillMode('learning', { refreshCurrent: true });
         playUISound('select_soft');
     });
+    questionDrillState.elements.liveModeLearningBtn?.addEventListener('click', () => {
+        setQuestionDrillMode('learning', { refreshCurrent: true });
+        playUISound('select_soft');
+    });
     questionDrillState.elements.modeExamBtn?.addEventListener('click', () => {
+        setQuestionDrillMode('test', { refreshCurrent: true });
+        playUISound('select_soft');
+    });
+    questionDrillState.elements.liveModeExamBtn?.addEventListener('click', () => {
         setQuestionDrillMode('test', { refreshCurrent: true });
         playUISound('select_soft');
     });
@@ -10097,10 +10091,13 @@ function setupQuestionDrill() {
         playUISound('skip');
     });
     questionDrillState.elements.openHelpBtn?.addEventListener('click', openQuestionDrillHelpOverlay);
+    questionDrillState.elements.openHelpLiveBtn?.addEventListener('click', openQuestionDrillHelpOverlay);
     questionDrillState.elements.openStatsBtn?.addEventListener('click', openQuestionDrillStatsOverlay);
+    questionDrillState.elements.openStatsLiveBtn?.addEventListener('click', openQuestionDrillStatsOverlay);
     questionDrillState.elements.prestartMenuBtn?.addEventListener('click', openQuestionDrillMenuOverlay);
     questionDrillState.elements.openMenuBtn?.addEventListener('click', openQuestionDrillMenuOverlay);
     questionDrillState.elements.openExplanationBtn?.addEventListener('click', openQuestionDrillExplanationOverlay);
+    questionDrillState.elements.liveHintBtn?.addEventListener('click', showQuestionDrillHint);
 
     setupAudioMuteButtons();
     updateQuestionDrillStats();
