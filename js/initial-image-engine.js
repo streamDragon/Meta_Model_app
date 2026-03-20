@@ -131,6 +131,238 @@
                 text: 'עכשיו כבר לא רואים רק את הסיפור החיצוני. רואים גם את הפירוש, את החוק, ואת החלק הפנימי שהופעל ברגע הזה.',
                 closing: 'המטרה כאן איננה לבטל את החוויה החיצונית, אלא לראות איך היא נשענת על מבנה עומק שאפשר להבין, לשאול עליו, ולעבוד איתו טיפולית.'
             }
+        },
+        {
+            id: 'initial-image-vs-deep-structure-obesity-01',
+            feature: 'initial-image-vs-deep-structure',
+            title: 'מתמונת שטח למבנה עומק',
+            originalSentence: "כשהיא אמרה לי 'אתה לא באמת רעב', רק רציתי לאכול עוד.",
+            subjectName: 'רן',
+            hypothesisImages: [
+                {
+                    id: 'h1',
+                    label: 'הוא פשוט לא שולט',
+                    subtitle: 'נראה שהוא נמשך מיד לאוכל',
+                    image: 'assets/images/initial-image-vs-deep-structure/obesity_scene/obesity_guess_1.jpg'
+                },
+                {
+                    id: 'h2',
+                    label: 'הוא מורד בביקורת',
+                    subtitle: 'ההערה מפעילה אצלו תגובת נגד',
+                    image: 'assets/images/initial-image-vs-deep-structure/obesity_scene/obesity_guess_2.jpg'
+                },
+                {
+                    id: 'h3',
+                    label: 'האוכל מנחם אותו',
+                    subtitle: 'האכילה נראית כמו נחמה וריכוך',
+                    image: 'assets/images/initial-image-vs-deep-structure/obesity_scene/obesity_guess_3.jpg'
+                }
+            ],
+            truthImage: 'assets/images/initial-image-vs-deep-structure/obesity_scene/obesity_truth.jpg',
+            imageGrid: { rows: 3, cols: 3 },
+            textSlots: [
+                { id: 'd1', category: 'deletion', order: 1, row: 0, col: 0 },
+                { id: 'd2', category: 'deletion', order: 2, row: 0, col: 1 },
+                { id: 'd3', category: 'deletion', order: 3, row: 0, col: 2 },
+                { id: 'x1', category: 'distortion', order: 1, row: 1, col: 0 },
+                { id: 'x2', category: 'distortion', order: 2, row: 1, col: 1 },
+                { id: 'x3', category: 'distortion', order: 3, row: 1, col: 2 },
+                { id: 'g1', category: 'generalization', order: 1, row: 2, col: 0 },
+                { id: 'g2', category: 'generalization', order: 2, row: 2, col: 1 },
+                { id: 'g3', category: 'generalization', order: 3, row: 2, col: 2 }
+            ],
+            reveals: {
+                deletion: [
+                    {
+                        id: 'obesity-deletion-1',
+                        text: "היא אמרה: 'אתה לא באמת רעב, אתה שוב בורח לאוכל.'",
+                        question: 'מה בדיוק היא אמרה שגרם לך לרצות לאכול עוד?',
+                        rationale: "השאלה מחזירה את המשפט המדויק במקום הכותרת הכללית 'זה הפעיל אותי'.",
+                        targetTextSlot: 'd1'
+                    },
+                    {
+                        id: 'obesity-deletion-2',
+                        text: 'זה היה אחרי יום ארוך, כשהוא כבר הרגיש מותש וריק.',
+                        question: 'באיזה הקשר זה קרה?',
+                        rationale: 'ההקשר מחזיר עומק לחוויה, ולא משאיר אותה כאירוע מבודד.',
+                        targetTextSlot: 'd2'
+                    },
+                    {
+                        id: 'obesity-deletion-3',
+                        text: 'באותו רגע הוא הרגיש חום בפנים, כיווץ בחזה, ודחף חזק למתוק.',
+                        question: 'מה קרה לך בגוף באותו רגע?',
+                        rationale: 'השאלה מחזירה את החוויה הגופנית שנמחקה מן הסיפור.',
+                        targetTextSlot: 'd3'
+                    }
+                ],
+                distortion: [
+                    {
+                        id: 'obesity-distortion-1',
+                        text: 'הוא לא שמע בזה רק דאגה — אלא כאילו היא רואה בו כישלון.',
+                        question: 'איך זה נהיה אצלך הערה על הערך שלך — ולא רק על האוכל?',
+                        rationale: 'כאן נחשף הפירוש שנכנס בין דבריה לבין החוויה שלו.',
+                        targetTextSlot: 'x1'
+                    },
+                    {
+                        id: 'obesity-distortion-2',
+                        text: 'אצלו הערה על אוכל נחווית כמעט מיד כבושה וגועל עצמי.',
+                        question: 'איזה פירוש הופך הערה על אוכל לבושה?',
+                        rationale: 'השאלה חושפת את העיוות: ההערה נהיית חוויה של השפלה פנימית.',
+                        targetTextSlot: 'x2'
+                    },
+                    {
+                        id: 'obesity-distortion-3',
+                        text: 'בתוך שניות האוכל נהיה לא פינוק — אלא דרך לא להרגיש חשוף.',
+                        question: 'מה האוכל עושה בשבילך ברגע הזה?',
+                        rationale: 'השאלה מגלה שהאכילה ממלאת תפקיד מגן, לא רק תפקיד של תשוקה.',
+                        targetTextSlot: 'x3'
+                    }
+                ],
+                generalization: [
+                    {
+                        id: 'obesity-generalization-1',
+                        text: 'יש בו כלל ישן: כשמביישים אותי, אוכל מציל אותי.',
+                        question: 'איזה חוק פועל אצלך ברגע הזה?',
+                        rationale: 'כאן מתגלה הכלל הרחב שמנהל את התגובה.',
+                        targetTextSlot: 'g1'
+                    },
+                    {
+                        id: 'obesity-generalization-2',
+                        text: 'הוא מכיר את התחושה ממקומות מוקדמים שבהם העירו על הגוף והאוכל.',
+                        question: 'מאיפה הדפוס הזה מוכר לך?',
+                        rationale: 'השאלה מחברת את ההווה לחוויה ישנה יותר.',
+                        targetTextSlot: 'g2'
+                    },
+                    {
+                        id: 'obesity-generalization-3',
+                        text: 'לכן האכילה הרגישה כמעט אוטומטית — כמו הגנה, לא כמו בחירה.',
+                        question: 'איך זה נהיה כמעט בלתי נמנע?',
+                        rationale: "כאן רואים שה'אין ברירה' הוא מנגנון שנבנה, לא חוק טבע.",
+                        targetTextSlot: 'g3'
+                    }
+                ]
+            },
+            completionPrompt: {
+                title: 'עכשיו רואים את האוכל אחרת',
+                text: 'מה התברר עכשיו על הבושה, על ההגנה, ועל התפקיד שהאוכל ממלא בתוך הרגע?',
+                closing: 'כאן כבר לא רואים רק אכילה — רואים מנגנון פנימי של הגנה מפני בושה.'
+            }
+        },
+        {
+            id: 'initial-image-vs-deep-structure-social-anxiety-01',
+            feature: 'initial-image-vs-deep-structure',
+            title: 'מתמונת שטח למבנה עומק',
+            originalSentence: 'כשביקשו ממני להגיד שתי מילים על עצמי, פשוט נמחקתי.',
+            subjectName: 'איתן',
+            hypothesisImages: [
+                {
+                    id: 'h1',
+                    label: 'כולם שופטים אותו',
+                    subtitle: 'הוא חווה את החדר כעויין',
+                    image: 'assets/images/initial-image-vs-deep-structure/social_anxiety_scene/social_guess_1.jpg'
+                },
+                {
+                    id: 'h2',
+                    label: 'אסור לו לטעות',
+                    subtitle: 'טעות אחת מרגישה אסון',
+                    image: 'assets/images/initial-image-vs-deep-structure/social_anxiety_scene/social_guess_2.jpg'
+                },
+                {
+                    id: 'h3',
+                    label: 'הוא פשוט ביישן',
+                    subtitle: 'על פני השטח זה נראה כמו ביישנות',
+                    image: 'assets/images/initial-image-vs-deep-structure/social_anxiety_scene/social_guess_3.jpg'
+                }
+            ],
+            truthImage: 'assets/images/initial-image-vs-deep-structure/social_anxiety_scene/social_truth.jpg',
+            imageGrid: { rows: 3, cols: 3 },
+            textSlots: [
+                { id: 'd1', category: 'deletion', order: 1, row: 0, col: 0 },
+                { id: 'd2', category: 'deletion', order: 2, row: 0, col: 1 },
+                { id: 'd3', category: 'deletion', order: 3, row: 0, col: 2 },
+                { id: 'x1', category: 'distortion', order: 1, row: 1, col: 0 },
+                { id: 'x2', category: 'distortion', order: 2, row: 1, col: 1 },
+                { id: 'x3', category: 'distortion', order: 3, row: 1, col: 2 },
+                { id: 'g1', category: 'generalization', order: 1, row: 2, col: 0 },
+                { id: 'g2', category: 'generalization', order: 2, row: 2, col: 1 },
+                { id: 'g3', category: 'generalization', order: 3, row: 2, col: 2 }
+            ],
+            reveals: {
+                deletion: [
+                    {
+                        id: 'social-deletion-1',
+                        text: "המנחה אמרה בעדינות: 'בוא תספר על עצמך בשתי מילים.'",
+                        question: 'מה בדיוק ביקשו ממך?',
+                        rationale: "השאלה מחזירה את הניסוח המדויק במקום התחושה הכוללת של 'זה היה נורא'.",
+                        targetTextSlot: 'd1'
+                    },
+                    {
+                        id: 'social-deletion-2',
+                        text: 'כל העיניים בחדר עברו אליו בבת אחת.',
+                        question: 'מה קרה סביבך באותו רגע?',
+                        rationale: 'ההקשר החברתי מחזיר את תנאי הרגע ולא משאיר רק כותרת רגשית.',
+                        targetTextSlot: 'd2'
+                    },
+                    {
+                        id: 'social-deletion-3',
+                        text: 'באותו רגע הגרון נסגר, הראש התרוקן, והוא הפסיק לנשום רגיל.',
+                        question: 'מה קרה לך בפנים באותו רגע?',
+                        rationale: 'השאלה מחזירה את החוויה הגופנית והמיידית שנמחקה מן המשפט.',
+                        targetTextSlot: 'd3'
+                    }
+                ],
+                distortion: [
+                    {
+                        id: 'social-distortion-1',
+                        text: 'הוא לא שמע בזה הזמנה — אלא מבחן.',
+                        question: 'איך ההזמנה נהייתה אצלך מבחן?',
+                        rationale: 'כאן נחשף הפירוש שנכנס בין מה שנאמר לבין מה שנחווה.',
+                        targetTextSlot: 'x1'
+                    },
+                    {
+                        id: 'social-distortion-2',
+                        text: 'אצלו מבט של קבוצה נהיה מיד סכנת השפלה.',
+                        question: 'מה המשמעות שמבט של קבוצה מקבל אצלך?',
+                        rationale: 'השאלה מפרידה בין המבט עצמו לבין המשמעות שנכנסה אליו.',
+                        targetTextSlot: 'x2'
+                    },
+                    {
+                        id: 'social-distortion-3',
+                        text: 'בתוכו זה נהיה כאילו אם יראה את עצמו — יתגלה שאין לו מקום.',
+                        question: 'מה היה קורה, מבחינתך, אם היו באמת רואים אותך?',
+                        rationale: 'כאן נחשף הקישור הפנימי בין נראות לבין סכנה.',
+                        targetTextSlot: 'x3'
+                    }
+                ],
+                generalization: [
+                    {
+                        id: 'social-generalization-1',
+                        text: 'יש בו כלל ישן: עדיף להיעלם מאשר להיחשף.',
+                        question: 'איזה חוק פעל אצלך ברגע הזה?',
+                        rationale: 'כאן מתגלה הכלל הרחב שמכוון את המחיקה.',
+                        targetTextSlot: 'g1'
+                    },
+                    {
+                        id: 'social-generalization-2',
+                        text: 'התחושה מוכרת לו ממקומות מוקדמים של מבוכה ולעג.',
+                        question: 'מאיפה הדפוס הזה מוכר לך?',
+                        rationale: 'השאלה מחברת את ההווה לניסיון קודם ולא משאירה הכול רק בסיטואציה הנוכחית.',
+                        targetTextSlot: 'g2'
+                    },
+                    {
+                        id: 'social-generalization-3',
+                        text: 'לכן המחיקה הרגישה לא כמו בחירה — אלא כמו מנגנון הצלה.',
+                        question: 'איך זה נהיה כמעט בלתי נמנע?',
+                        rationale: "כאן מתגלה שה'אין ברירה' הוא מנגנון פנימי שנבנה לאורך זמן.",
+                        targetTextSlot: 'g3'
+                    }
+                ]
+            },
+            completionPrompt: {
+                title: 'עכשיו רואים שהבעיה אינה רק חברתית',
+                text: 'מה התברר עכשיו על החשיפה, על המבט, ועל החוק הפנימי שמופעל כשמסתכלים עליו?',
+                closing: 'כאן כבר לא רואים רק ביישנות — רואים מבנה פנימי של סכנה תחת מבט.'
+            }
         }
     ];
 
