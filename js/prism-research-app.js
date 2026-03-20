@@ -1225,11 +1225,13 @@
     }
 
     async function boot() {
+        console.log('[prism-research] boot start');
         appEl.addEventListener('click', onAppClick);
         appEl.addEventListener('input', onAppInput);
         render();
         try {
             const data = await fetchJson('data/metaModelPatterns.he.json');
+            console.log('[prism-research] data loaded, patterns:', (data && data.patterns || []).length);
             const categories = (Array.isArray(data && data.patterns) ? data.patterns : [])
                 .map((pattern, idx) => core.normalizeCategoryFromPattern(pattern, idx))
                 .filter(Boolean)
