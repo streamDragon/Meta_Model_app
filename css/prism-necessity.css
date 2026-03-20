@@ -10,18 +10,26 @@ body.shell-feature-active[data-active-tab="prismlab"] {
 }
 
 #prismlab.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] {
-  display: grid;
-  grid-template-rows: auto auto auto;
-  min-height: calc(var(--app-dvh, 100svh) - 24px);
+  /* Let the document own scrolling; grid rows here were trapping the feature
+     at some desktop zoom / short-height combinations. */
+  display: flex;
+  flex-direction: column;
+  min-height: auto;
   max-height: none;
   overflow: visible;
   padding-bottom: 0;
-  align-content: start;
+  align-items: stretch;
+}
+
+#prismlab.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] > [data-meta-feature-chrome="top"],
+#prismlab.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] > [data-meta-feature-chrome="bottom"],
+#prismlab.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #prism-necessity-root {
+  width: 100%;
 }
 
 #prismlab.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] #prism-necessity-root {
-  display: flex;
-  flex: 1 1 auto;
+  display: block;
+  flex: 0 0 auto;
   min-height: 0;
   height: auto;
   overflow: visible;
@@ -41,7 +49,7 @@ body.shell-feature-active[data-active-tab="prismlab"] {
 
 #prismlab.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .pnm-view {
   block-size: auto;
-  min-block-size: min(calc(var(--app-dvh, 100svh) - 176px), 860px);
+  min-block-size: 0;
   max-block-size: none;
 }
 
@@ -833,9 +841,10 @@ body.shell-feature-active[data-active-tab="prismlab"] {
   }
 
   #prismlab.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] {
+    display: flex;
+    flex-direction: column;
     min-height: auto;
     max-height: none;
-    grid-template-rows: auto minmax(0, 1fr) auto;
   }
 
   #prismlab.tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="feature"] .pnm-view {
