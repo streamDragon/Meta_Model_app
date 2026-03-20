@@ -8,9 +8,8 @@
   <meta http-equiv="Expires" content="0">
   <title>Prism Research Mode - Meta Model Trainer</title>
   <link rel="icon" href="data:,">
-  <script>
-    window.__PRISM_RESEARCH_ASSET_V__ = String(Date.now());
-  </script>
+  <link rel="stylesheet" href="css/prism-research.css">
+  <script>window.__PRISM_RESEARCH_ASSET_V__ = String(Date.now());</script>
 </head>
 <body>
   <div id="prism-research-app" aria-live="polite">
@@ -18,38 +17,9 @@
       Loading Prism Research Mode...
     </div>
   </div>
-  <script>
-    (function () {
-      var v = window.__PRISM_RESEARCH_ASSET_V__ || String(Date.now());
-      function withV(path) {
-        try {
-          var u = new URL(path, location.href);
-          u.searchParams.set('v', v);
-          return u.toString();
-        } catch (e) {
-          return path + (path.indexOf('?') === -1 ? '?' : '&') + 'v=' + encodeURIComponent(v);
-        }
-      }
-      function addCss(path) {
-        var link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = withV(path);
-        document.head.appendChild(link);
-      }
-      function addScript(path, cb) {
-        var s = document.createElement('script');
-        s.src = withV(path);
-        s.onload = function () { if (cb) cb(); };
-        document.body.appendChild(s);
-      }
-      addCss('css/prism-research.css');
-      addScript('js/prism-research-core.js', function () {
-        addScript('js/prism-research-philosophy.js', function () {
-          addScript('js/prism-research-app.js');
-        });
-      });
-    })();
-  </script>
+  <script src="js/prism-research-core.js"></script>
+  <script src="js/prism-research-philosophy.js"></script>
+  <script src="js/prism-research-app.js"></script>
   <script src="js/trainer-shell-nav.js"></script>
 </body>
 </html>

@@ -1,25 +1,17 @@
 ﻿(function attachPrismResearchApp() {
     const root = typeof globalThis !== 'undefined' ? globalThis : window;
-
-    function init() {
-        const appEl = document.getElementById('prism-research-app');
-        if (!appEl) return;
-
-        const core = root.prismResearchCore;
-        if (!core) {
-            appEl.innerHTML = '<div class="prm-error">Prism Research core failed to load.</div>';
-            return;
-        }
-        startApp(appEl, core);
+    const appEl = document.getElementById('prism-research-app');
+    if (!appEl) {
+        console.error('[prism-research] #prism-research-app not found in DOM');
+        return;
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init, { once: true });
-    } else {
-        init();
+    const core = root.prismResearchCore;
+    if (!core) {
+        appEl.innerHTML = '<div class="prm-error">Prism Research core failed to load.</div>';
+        console.error('[prism-research] prismResearchCore not found on globalThis');
+        return;
     }
-
-    function startApp(appEl, core) {
 
     const STORAGE_KEY = 'prism_research_mode_v1';
     const DEMO_STORY = [
@@ -1274,6 +1266,5 @@
     }
 
     boot();
-    } // end startApp
 })();
 
