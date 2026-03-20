@@ -477,16 +477,16 @@
         };
     }
 
-    function renderSessionNavigator(state) {
-        const sessions = getSessions(state);
+    function renderCategorySessionNavigator(state, category) {
+        const sessions = getCategorySessions(state);
         if (!sessions.length) return '';
 
         return `
             <div class="pnm-case-nav">
                 <button type="button" class="pnm-mini-btn" data-action="prev-session">הקודם</button>
                 <label class="pnm-case-select">
-                    <span class="pnm-section-label">מקרה</span>
-                    <select data-role="session-picker" aria-label="בחירת מקרה">
+                    <span class="pnm-section-label">${escapeHtml(category?.label || 'מקרה')}</span>
+                    <select data-role="session-picker" aria-label="בחירת מקרה בתוך הקטגוריה">
                         ${sessions.map((session, index) => `
                             <option value="${index}"${index === state.sessionIndex ? ' selected' : ''}>
                                 ${escapeHtml(`${index + 1}. ${shortenText(session.sentence, 72)}`)}
@@ -499,16 +499,16 @@
         `;
     }
 
-    function renderStageRail(state, session) {
-        const reflectAvailable = isSessionComplete(state, session);
+    function renderStageRail(state) {
+        const towersAvailable = !!state.selectedCategoryId && getCategorySessions(state).length > 0;
         const stages = [
-            { id: 'intro', label: 'פתיחה', index: '1', action: 'go-intro', available: true },
-            { id: 'build', label: 'בנייה', index: '2', action: 'go-build', available: true },
-            { id: 'reflect', label: 'קריאה', index: '3', action: 'go-reflect', available: reflectAvailable }
+            { id: 'welcome', label: 'קבלת פנים', index: '1', action: 'go-welcome', available: true },
+            { id: 'select', label: 'בחירה', index: '2', action: 'go-select', available: true },
+            { id: 'towers', label: 'מגדלים', index: '3', action: 'go-towers', available: towersAvailable }
         ];
 
         return `
-            <div class="pnm-stage-rail" aria-label="שלבי המפה">
+            <div class="pnm-stage-rail" aria-label="שלבי התרגול">
                 ${stages.map((stageEntry) => {
                     const isCurrent = stageEntry.id === state.stage;
                     const className = [
@@ -610,57 +610,86 @@
         `;
     }
 
-    function renderIntroStage(state, session) {
-        const filledCount = getFilledCount(state, session);
-        const isComplete = isSessionComplete(state, session);
-        const primaryAction = isComplete ? 'go-reflect' : 'go-build';
-        const primaryLabel = isComplete
-            ? 'עוברים לקריאה'
-            : filledCount > 0
-                ? 'ממשיכים בבנייה'
-                : 'מתחילים בבנייה';
-        const introCopy = isComplete
-            ? 'המפה כבר מלאה. עכשיו קוראים ליבה, סדק ושאלת אגרוף.'
-            : filledCount > 0
-                ? 'הבנייה מחכה בדיוק מהתא הבא.'
-                : 'שאלה אחת בכל פעם. כל תשובה ממלאה תא אחד.';
-
+    function renderWelcomeStage(state) {
         return `
-            <section class="pnm-view pnm-view--intro">
-                ${renderSessionNavigator(state)}
-                ${renderStageRail(state, session)}
+            <section class="pnm-view pnm-view--welcome">
+                ${renderStageRail(state)}
                 <article class="pnm-hero-card">
                     <div class="pnm-stage-head">
                         <div class="pnm-stage-head__copy">
-                            <p class="pnm-kicker">Necessity Map</p>
-                            <h1 class="pnm-stage-title">"${escapeHtml(session.sentence)}"</h1>
-                            <p class="pnm-copy">${escapeHtml(introCopy)}</p>
-                        </div>
-                        <div class="pnm-inline-actions">
-                            <span class="pnm-chip">${filledCount}/${session.questions.length} תאים</span>
+                            <p class="pnm-kicker">רמות לוגיות + מטה מודל</p>
+                            <h1 class="pnm-stage-title">מפה משולבת של רמות לוגיות וקטגוריות מטה־מודל</h1>
+                            <p class="pnm-copy">כאן עובדים עם שני מגדלים של רמות לוגיות ועם הקשרים ביניהם. בוחרים הפרת מטה־מודל, בונים את מגדל A ואת מגדל B, ובסוף פותחים חלון תובנה עם הגרעין המהותי, הסדק והפאנץ'.</p>
                         </div>
                     </div>
                     <div class="pnm-chip-row">
-                        <span class="pnm-chip">6 רמות בכל צד</span>
-                        <span class="pnm-chip">12 תאים</span>
-                        <span class="pnm-chip">חיבורים לפי עוצמה</span>
+                        <span class="pnm-chip">שלב 1 · קבלת פנים</span>
+                        <span class="pnm-chip">שלב 2 · בחירה</span>
+                        <span class="pnm-chip">שלב 3 · מגדלים</span>
                     </div>
                     <div class="pnm-action-row">
-                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="${primaryAction}">${escapeHtml(primaryLabel)}</button>
-                        ${filledCount > 0 ? '<button type="button" class="pnm-btn pnm-btn--ghost" data-action="restart-session">בונים מחדש</button>' : ''}
+                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="go-select">עוברים לבחירה</button>
                     </div>
                 </article>
-                <div class="pnm-side-preview">
+                <div class="pnm-welcome-grid">
                     <article class="pnm-side-card">
-                        <span class="pnm-section-label">A · מקור / טריגר</span>
-                        <strong>${escapeHtml(session.sideALabel)}</strong>
+                        <span class="pnm-section-label">מה בוחנים כאן</span>
+                        <strong>איך קטגוריית מטה־מודל פועלת יחד עם הרמות הלוגיות ולא רק ברמת המשפט.</strong>
                     </article>
                     <article class="pnm-side-card">
-                        <span class="pnm-section-label">B · תוצאה / עצמי</span>
-                        <strong>${escapeHtml(session.sideBLabel)}</strong>
+                        <span class="pnm-section-label">איך בונים</span>
+                        <strong>שאלה אחת בכל פעם, תא אחד בכל פעם, עד ששני המגדלים שלמים ומחוברים.</strong>
+                    </article>
+                    <article class="pnm-side-card">
+                        <span class="pnm-section-label">מה נפתח בסוף</span>
+                        <strong>חלון שיחה עם הגרעין, הסדק, הפאנץ' ואמירת השינוי של המטופל/ת.</strong>
                     </article>
                 </div>
-                ${renderBuilderMap(session, filledCount, { activeOrderIndex: -1 })}
+            </section>
+        `;
+    }
+
+    function renderCategoryCard(category, count) {
+        return `
+            <button type="button" class="pnm-category-card" data-action="open-category" data-category-id="${escapeHtml(category.id)}">
+                <div class="pnm-question-meta">
+                    ${category.tag ? `<span class="pnm-chip">${escapeHtml(category.tag)}</span>` : ''}
+                    <span class="pnm-chip">${count} מקרים</span>
+                </div>
+                <strong>${escapeHtml(category.label)}</strong>
+                ${category.subtitle ? `<p>${escapeHtml(category.subtitle)}</p>` : ''}
+                ${category.focus ? `<small>${escapeHtml(category.focus)}</small>` : ''}
+            </button>
+        `;
+    }
+
+    function renderSelectStage(state) {
+        const categories = getCategories(state);
+        return `
+            <section class="pnm-view pnm-view--select">
+                ${renderStageRail(state)}
+                <article class="pnm-hero-card pnm-hero-card--compact">
+                    <div class="pnm-stage-head">
+                        <div class="pnm-stage-head__copy">
+                            <p class="pnm-kicker">בחירה</p>
+                            <h2 class="pnm-stage-title">בחר מהי הפרת המטה־מודל שאתה רוצה לחקור כיום</h2>
+                            <p class="pnm-copy">פה תוכל לבחור איזה שילוב מרתק אתה רוצה לבחון, לשפר וללמוד טוב יותר: קטגוריית מטה־מודל שפועלת יחד עם הרמות הלוגיות.</p>
+                        </div>
+                    </div>
+                </article>
+                <div class="pnm-select-intro">
+                    <article class="pnm-side-card">
+                        <span class="pnm-section-label">הקשר בין השכבות</span>
+                        <strong>אותה הפרת מטה־מודל נראית אחרת לגמרי כשהיא נשענת על סביבה, התנהגות, זהות או משמעות.</strong>
+                    </article>
+                    <article class="pnm-side-card">
+                        <span class="pnm-section-label">מכאן ממשיכים</span>
+                        <strong>בוחרים קטגוריה, עוברים למגדלים, חושפים תשובות, ובסוף פותחים חלון תובנה.</strong>
+                    </article>
+                </div>
+                <div class="pnm-category-grid">
+                    ${categories.map((category) => renderCategoryCard(category, (state.payload?.sessionsByCategory?.[category.id] || []).length)).join('')}
+                </div>
             </section>
         `;
     }
@@ -674,9 +703,9 @@
                         <span class="pnm-chip">${session.questions.length}/${session.questions.length}</span>
                     </div>
                     <h3>המפה הושלמה.</h3>
-                    <p class="pnm-copy">מכאן אפשר לעבור לקריאה של הליבה, הסדק ושאלת האגרוף.</p>
+                    <p class="pnm-copy">המגדלים הושלמו. עכשיו אפשר לפתוח את חלון התובנה עם הגרעין, הסדק והפאנץ'.</p>
                     <div class="pnm-action-row">
-                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="go-reflect">לשלב הקריאה</button>
+                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="open-insight">פתח חלון תובנה</button>
                         <button type="button" class="pnm-btn pnm-btn--ghost" data-action="step-back">צעד אחורה</button>
                     </div>
                 </article>
@@ -692,35 +721,35 @@
                 </div>
                 <strong class="pnm-question-side">${escapeHtml(getSideTitle(session, question.side))}</strong>
                 <h3>${escapeHtml(question.question)}</h3>
-                <p class="pnm-copy">בלחיצה, התשובה נכנסת ישירות לתא המסומן במפה.</p>
+                <p class="pnm-copy">בלחיצה חושפים את התשובה, ממלאים תא אחד במגדל, ומחזקים את הקשר בין הצדדים.</p>
                 <div class="pnm-action-row">
-                    <button type="button" class="pnm-btn pnm-btn--primary" data-action="fill-active">ממלאים תא</button>
+                    <button type="button" class="pnm-btn pnm-btn--primary" data-action="fill-active">חשוף תשובה</button>
                     ${getFilledCount(state, session) > 0 ? '<button type="button" class="pnm-btn pnm-btn--ghost" data-action="step-back">צעד אחורה</button>' : ''}
                 </div>
             </article>
         `;
     }
 
-    function renderBuildStage(state, session) {
+    function renderTowersStage(state, session, category) {
         const filledCount = getFilledCount(state, session);
         const progress = session.questions.length
             ? Math.round((filledCount / session.questions.length) * 100)
             : 0;
 
         return `
-            <section class="pnm-view pnm-view--build">
-                ${renderSessionNavigator(state)}
-                ${renderStageRail(state, session)}
+            <section class="pnm-view pnm-view--towers">
+                ${renderStageRail(state)}
+                ${renderCategorySessionNavigator(state, category)}
                 <article class="pnm-hero-card pnm-hero-card--compact">
                     <div class="pnm-stage-head">
                         <div class="pnm-stage-head__copy">
-                            <p class="pnm-kicker">Build</p>
+                            <p class="pnm-kicker">${escapeHtml(category?.label || 'מגדלים')}</p>
                             <h2 class="pnm-stage-title">"${escapeHtml(session.sentence)}"</h2>
-                            <p class="pnm-copy">שאלה אחת בכל פעם. כל תשובה ממלאה תא אחד בתוך המפה.</p>
+                            <p class="pnm-copy">זהו דף המגדלים: חושפים תשובות, ממלאים את שני המגדלים, ורואים איך הקשרים בין הרמות הלוגיות יוצרים את התנועה בין A ל־B.</p>
                         </div>
                         <div class="pnm-inline-actions">
                             <span class="pnm-chip">${filledCount}/${session.questions.length} תאים</span>
-                            <button type="button" class="pnm-mini-btn" data-action="go-intro">פתיחה</button>
+                            <button type="button" class="pnm-mini-btn" data-action="go-select">חזרה לבחירה</button>
                         </div>
                     </div>
                     <div class="pnm-progress">
@@ -743,7 +772,7 @@
         if (session.core === session.crack) {
             return `הליבה והסדק יושבים על ${coreLabel}.`;
         }
-        return `הליבה: ${coreLabel}. הסדק: ${crackLabel}.`;
+        return `הליבה נשענת על ${coreLabel}, והסדק שדרכו מתחילה התנועה נמצא ב-${crackLabel}.`;
     }
 
     function renderReflectCard(label, body, modifier = '') {
@@ -755,64 +784,59 @@
         `;
     }
 
-    function renderReflectStage(state, session) {
+    function renderInsightModal(state, session) {
+        if (!state.insightOpen) return '';
         return `
-            <section class="pnm-view pnm-view--reflect">
-                ${renderSessionNavigator(state)}
-                ${renderStageRail(state, session)}
-                <article class="pnm-hero-card pnm-hero-card--compact">
+            <div class="pnm-insight-backdrop">
+                <div class="pnm-insight-modal" role="dialog" aria-modal="true" aria-label="חלון תובנה">
                     <div class="pnm-stage-head">
                         <div class="pnm-stage-head__copy">
-                            <p class="pnm-kicker">Reflect</p>
-                            <h2 class="pnm-stage-title">"${escapeHtml(session.sentence)}"</h2>
-                            <p class="pnm-copy">הליבה והסדק נקראים מתוך המפה שכבר נבנתה.</p>
+                            <p class="pnm-kicker">חלון תובנה</p>
+                            <h3 class="pnm-stage-title">הגרעין, הסדק והפאנץ'</h3>
+                            <p class="pnm-copy">אחרי שהמגדלים נבנו, נפתחת כאן שיחה קצרה שמזקקת את מה שנחשף במפה.</p>
                         </div>
                         <div class="pnm-inline-actions">
-                            <button type="button" class="pnm-mini-btn" data-action="go-build">חזרה לבנייה</button>
+                            <button type="button" class="pnm-mini-btn" data-action="close-insight">סגור</button>
                         </div>
                     </div>
-                </article>
-                ${renderBuilderMap(session, session.questions.length, {
-                    activeOrderIndex: -1,
-                    reflectMode: true
-                })}
-                <div class="pnm-reflect-stats">
-                    <article class="pnm-reflect-stat pnm-reflect-stat--core">
-                        <span class="pnm-section-label">רמת ליבה</span>
-                        <strong>${escapeHtml(getLevelLabel(session.core))}</strong>
+                    <div class="pnm-reflect-stats">
+                        <article class="pnm-reflect-stat pnm-reflect-stat--core">
+                            <span class="pnm-section-label">הגרעין המהותי</span>
+                            <strong>${escapeHtml(getLevelLabel(session.core))}</strong>
+                        </article>
+                        <article class="pnm-reflect-stat pnm-reflect-stat--crack">
+                            <span class="pnm-section-label">הסדק</span>
+                            <strong>${escapeHtml(getLevelLabel(session.crack))}</strong>
+                        </article>
+                    </div>
+                    <div class="pnm-reflect-grid">
+                        ${renderReflectCard('מטפל/ת · הגרעין', session.reflectCore)}
+                        ${renderReflectCard('מטפל/ת · הסדק', session.reflectCrack)}
+                        ${renderReflectCard('הפאנץ׳', session.punchQuestion, 'pnm-reflect-card--question')}
+                        ${renderReflectCard('מטופל/ת · מה השתנה', session.punchAnswer, 'pnm-reflect-card--answer')}
+                    </div>
+                    <article class="pnm-summary-banner">
+                        <span class="pnm-section-label">כיוון להמשך</span>
+                        <strong>${escapeHtml(buildFinalSummary(session))}</strong>
                     </article>
-                    <article class="pnm-reflect-stat pnm-reflect-stat--crack">
-                        <span class="pnm-section-label">רמת סדק</span>
-                        <strong>${escapeHtml(getLevelLabel(session.crack))}</strong>
-                    </article>
+                    <div class="pnm-action-row">
+                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="reset-towers">בונים מחדש</button>
+                        <button type="button" class="pnm-btn pnm-btn--ghost" data-action="go-select">חזרה לבחירה</button>
+                    </div>
                 </div>
-                <div class="pnm-reflect-grid">
-                    ${renderReflectCard('קריאת מטפל/ת', session.reflectCore)}
-                    ${renderReflectCard('קריאת הסדק', session.reflectCrack)}
-                    ${renderReflectCard('שאלת אגרוף', session.punchQuestion, 'pnm-reflect-card--question')}
-                    ${renderReflectCard('תשובת לקוח', session.punchAnswer, 'pnm-reflect-card--answer')}
-                </div>
-                <article class="pnm-summary-banner">
-                    <span class="pnm-section-label">סיכום קצר</span>
-                    <strong>${escapeHtml(buildFinalSummary(session))}</strong>
-                </article>
-                <div class="pnm-action-row">
-                    <button type="button" class="pnm-btn pnm-btn--primary" data-action="restart-session">בונים מחדש</button>
-                    <button type="button" class="pnm-btn pnm-btn--ghost" data-action="next-session">למקרה הבא</button>
-                </div>
-            </section>
+            </div>
         `;
     }
 
     function renderLoading() {
-        return '<section class="pnm-view"><div class="pnm-panel pnm-panel--loading">טוענים את מפת ההכרח...</div></section>';
+        return '<section class="pnm-view"><div class="pnm-panel pnm-panel--loading">טוענים את המפה המשולבת...</div></section>';
     }
 
     function renderError(state) {
         return `
             <section class="pnm-view">
                 <div class="pnm-panel pnm-panel--error">
-                    <strong>מפת ההכרח לא נטענה.</strong>
+                    <strong>המפה לא נטענה.</strong>
                     <p>${escapeHtml(state.error || 'תקלה לא ידועה')}</p>
                     <button type="button" class="pnm-btn pnm-btn--primary" data-action="retry-load">נסה שוב</button>
                 </div>
@@ -822,6 +846,7 @@
 
     function renderApp(state) {
         const shellClass = state.mode === 'standalone' ? 'pnm-app pnm-app--standalone' : 'pnm-app pnm-app--embedded';
+        const category = getCategory(state);
         const session = getSession(state);
         let body = '';
 
@@ -829,14 +854,14 @@
             body = renderError(state);
         } else if (!state.loaded || !state.payload) {
             body = renderLoading();
-        } else if (!session) {
+        } else if (state.stage === 'welcome') {
+            body = renderWelcomeStage(state);
+        } else if (state.stage === 'select') {
+            body = renderSelectStage(state);
+        } else if (!session || !category) {
             body = renderError({ error: 'No session available.' });
-        } else if (state.stage === 'build') {
-            body = renderBuildStage(state, session);
-        } else if (state.stage === 'reflect') {
-            body = renderReflectStage(state, session);
         } else {
-            body = renderIntroStage(state, session);
+            body = `${renderTowersStage(state, session, category)}${renderInsightModal(state, session)}`;
         }
 
         state.root.innerHTML = `<div class="${shellClass}" data-stage="${escapeHtml(state.stage)}">${body}</div>`;
@@ -878,13 +903,17 @@
 
             let handled = false;
 
-            if (action === 'prev-session') handled = openSession(state, state.sessionIndex - 1);
-            if (action === 'next-session') handled = openSession(state, state.sessionIndex + 1);
-            if (action === 'go-intro') handled = goToIntro(state);
-            if (action === 'go-build' || action === 'start-build') handled = goToBuild(state);
-            if (action === 'go-reflect') handled = goToReflect(state);
+            if (action === 'prev-session') handled = openCategorySession(state, state.sessionIndex - 1);
+            if (action === 'next-session') handled = openCategorySession(state, state.sessionIndex + 1);
+            if (action === 'go-welcome') handled = goToWelcome(state);
+            if (action === 'go-select') handled = goToSelect(state);
+            if (action === 'go-towers') handled = goToTowers(state);
+            if (action === 'open-category') handled = openCategory(state, normalizeText(actionNode.getAttribute('data-category-id')));
+            if (action === 'open-insight') handled = isSessionComplete(state) ? (state.insightOpen = true, true) : false;
+            if (action === 'close-insight') handled = closeInsight(state);
             if (action === 'fill-active') handled = advanceBuild(state);
             if (action === 'restart-session') handled = restartCurrentSession(state);
+            if (action === 'reset-towers') handled = resetCurrentTowers(state);
             if (action === 'step-back') handled = stepBack(state);
 
             if (handled) renderApp(state);
@@ -896,7 +925,7 @@
             if (!picker) return;
             const nextIndex = Number(picker.value);
             if (!Number.isInteger(nextIndex)) return;
-            if (openSession(state, nextIndex)) renderApp(state);
+            if (openCategorySession(state, nextIndex)) renderApp(state);
         };
     }
 
