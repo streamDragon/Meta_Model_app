@@ -2017,7 +2017,7 @@ const APP_STICKY_TAB_TITLE_OVERRIDES = Object.freeze({
     'practice-wizard': 'גשר תחושה-שפה',
     'practice-verb-unzip': 'מרכז כלים',
     blueprint: 'בונה מהלך',
-    prismlab: 'מעבדת פריזמות · רמות לוגיות',
+    prismlab: 'מפת רמות ומטה-מודל',
     'initial-image-vs-deep-structure': 'מתמונת שטח למבנה עומק',
     about: 'על המוצר'
 });
@@ -2034,7 +2034,7 @@ const APP_STICKY_TAB_CONTEXT_OVERRIDES = Object.freeze({
     'practice-wizard': 'הבאנר שומר את שם המסך גלוי לאורך כל השלבים.',
     'practice-verb-unzip': 'הכותרת נשארת מול העיניים גם כשיורדים עמוק בתוך הפירוק.',
     blueprint: 'נשאר ברור באיזה שלב של הבנייה אתם נמצאים.',
-    prismlab: 'הכותרת קבועה גם כשעובדים עמוק בתוך רמות ופאנלים.',
+    prismlab: 'הכותרת קבועה גם כשבונים את המפה, ממלאים תאים ונכנסים לחלון התובנה.',
     'initial-image-vs-deep-structure': 'הכותרת נשארת גלויה לאורך כל שלבי חשיפת מבנה העומק.',
     about: 'גם במסך המידע והקהילה שם האפליקציה נשאר גלוי.'
 });
@@ -2854,7 +2854,7 @@ const SCREEN_READ_GUIDES = Object.freeze({
         approach: 'בחר/י תגובה, אשר/י ניסוח קצר, ואז פתח/י את קלף הכוח ואת בונה המהלך.'
     }),
     prismlab: Object.freeze({
-        logic: `מעבדת פריזמות היא כלי עומק: בוחרים קטגוריה + מילה/ביטוי מרכזי אחד ("עוגן"), ובודקים אותו דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי להבין איפה באמת נמצא הקושי.`,
+        logic: `מפת רמות ומטה-מודל היא כלי עומק: בוחרים קטגוריה + מילה או משפט מרכזיים, ובודקים אותם דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי להבין איפה באמת נמצא הקושי.`,
         goal: 'להבדיל בין חקירה בשרשרת (שאלה על כל תשובה חדשה) לבין חקירת עומק על אותו נושא, ולבחור צעד המשך מדויק על בסיס מפה.',
         approach: 'בחר/י פריזמה, כתוב/כתבי מילה/ביטוי מרכזי אחד מהמשפט, מלא/י כמה רמות, ואז בדוק/י את המפה ובחר/י צעד המשך. אם חסרה רמה - משלימים שכבה לפני שעוברים הלאה.'
     }),
@@ -2998,10 +2998,10 @@ const THERAPEUTIC_DEMO_BY_SCREEN = Object.freeze({
         ])
     }),
     prismlab: Object.freeze({
-        frame: `דוגמת שימוש במעבדת פריזמות: במקום להמשיך לשאלה חדשה על כל תשובה (חקירה רקורסיבית), עוצרים על מילה/ביטוי מרכזי אחד ("עוגן") ובודקים אותו דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי לבנות מפת עומק.`,
+        frame: `דוגמת שימוש במפת רמות ומטה-מודל: במקום להמשיך לשאלה חדשה על כל תשובה (חקירה רקורסיבית), עוצרים על מילה או משפט מרכזיים ובודקים אותם דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}) כדי לבנות מפת עומק.`,
         turns: Object.freeze([
             Object.freeze({ role: 'מטופל', text: 'אני רוצה להבין למה כל פעם \"נדבר\" נשמע לי כמו כישלון.' }),
-            Object.freeze({ role: 'מטפל', text: 'מעולה. בחקירה בשרשרת היינו ממשיכים ושואלים שוב על כל תשובה חדשה. כאן במעבדת פריזמות נעשה משהו אחר: נשאר על המילה \"נדבר\" ונבדוק אותה לעומק דרך רמות שונות.' }),
+            Object.freeze({ role: 'מטפל', text: 'מעולה. בחקירה בשרשרת היינו ממשיכים ושואלים שוב על כל תשובה חדשה. כאן במפת רמות ומטה-מודל נעשה משהו אחר: נשאר על המילה \"נדבר\" ונבדוק אותה לעומק דרך רמות שונות.' }),
             Object.freeze({ role: 'מטופל', text: 'כלומר לא מחליפים נושא - פשוט מסתכלים על אותה מילה דרך סביבה/התנהגות/יכולות/ערכים/זהות/שייכות?' }),
             Object.freeze({ role: 'מטפל', text: 'בדיוק. כך מקבלים מפה: איפה זה יושב, מה אתה עושה, איזו יכולת חסרה, איזה כלל מפעיל את זה, ומה צעד ההמשך הכי מדויק.' })
         ]),
@@ -3991,7 +3991,7 @@ function setupGlobalFeatureMenuDropdown() {
         'tab:practice-wizard': 'גשר תחושה-שפה · הלימה לפני שינוי',
         'tab:practice-verb-unzip': 'מרכז כלים',
         'tab:blueprint': 'בונה מהלך',
-        'tab:prismlab': 'מעבדת פריזמות · רמות לוגיות',
+        'tab:prismlab': 'מפת רמות ומטה-מודל',
         'tab:about': 'על המוצר',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classicClassic, 'classic_classic_trainer.html')]: 'קלאסיק 1 · המבנה הקלאסי',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.classic2, 'classic2_trainer.html')]: 'קלאסיק 2 · מבנה הקסם',
@@ -4001,7 +4001,7 @@ function setupGlobalFeatureMenuDropdown() {
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: 'כלי פירוק פועל · חלון נפרד',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/')]: 'דף עבודה מעוגל · פירוק פועל',
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: 'מעבדת שינוי ניסוח',
-        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismLabStandalone, 'prism_lab_trainer.html')]: 'מעבדת פריזמות · חלון נפרד'
+        [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.prismLabStandalone, 'prism_lab_trainer.html')]: 'מפת רמות ומטה-מודל · חלון נפרד'
     });
     const groupLabels = Object.freeze({
         home: 'בית',
@@ -4600,7 +4600,7 @@ function setupFeatureLauncherTabs() {
         "nav:practice-wizard": "גשר תחושה-שפה · הלימה לפני שינוי",
         "nav:practice-verb-unzip": "מרכז כלים",
         "nav:blueprint": "בונה מהלך",
-        "nav:prismlab": "מעבדת פריזמות · רמות לוגיות",
+        "nav:prismlab": "מפת רמות ומטה-מודל",
         "nav:practice-triples-radar": "מכ״ם שלשות (ברין)",
         "nav:categories": "מילון קטגוריות המטה-מודל",
         "nav:comic-engine": "במת קומיקס רגשי",
@@ -16194,8 +16194,8 @@ function renderPrismDeepGuide(prism) {
                         <p><strong>למה זה חשוב?</strong> ${intent}</p>
                     </div>
                     <div class="prism-guide-card">
-                        <h5>מעבדת פריזמות מול חקירה בשרשרת</h5>
-                        <p><strong>מעבדת פריזמות:</strong> מילה/ביטוי מרכזי אחד ("עוגן") + חתך עומק דרך רמות לוגיות.</p>
+                        <h5>מפת רמות ומטה-מודל מול חקירה בשרשרת</h5>
+                        <p><strong>מפת רמות ומטה-מודל:</strong> מילה או משפט אחד, ושתי עמודות של רמות לוגיות שמעמיקות את הקריאה.</p>
                         <p><strong>חקירה בשרשרת:</strong> שאלה נוספת על כל תשובה חדשה לאורך הרצף.</p>
                         <p><strong>בקיצור:</strong> מעבדה = עומק על מוקד אחד. Research = תנועה בשרשרת.</p>
                     </div>
@@ -17176,8 +17176,8 @@ function applyPrismLabCompactRuntimeCopy() {
     const rootCard = root.querySelector('.prism-container .card');
     const rootTitle = rootCard?.querySelector(':scope > h2');
     const rootIntro = rootCard?.querySelector(':scope > p');
-    if (rootTitle) rootTitle.textContent = 'מעבדת פריזמות';
-    if (rootIntro) rootIntro.textContent = `בחר/י פריזמה, בחר/י מילה/ביטוי מרכזי אחד מתוך המשפט ("עוגן"), ואז בדוק/י אותו דרך רמות לוגיות: ${LOGICAL_LEVELS_SEQUENCE_FRIENDLY}.`;
+    if (rootTitle) rootTitle.textContent = 'מפת רמות ומטה-מודל';
+    if (rootIntro) rootIntro.textContent = `בחר/י מקרה, התמקד/י במשפט או בביטוי שמחזיק את המבנה, ואז בדוק/י אותו דרך רמות לוגיות: ${LOGICAL_LEVELS_SEQUENCE_FRIENDLY}.`;
 
     const anchorStrong = root.querySelector('#prism-detail .anchor-box strong');
     if (anchorStrong) anchorStrong.textContent = 'שאלת מיקוד (על המילה/ביטוי שבחרת):';
@@ -17213,7 +17213,7 @@ function applyPrismLabCompactRuntimeCopy() {
 
     const cancelBtn = root.querySelector('#prism-cancel');
     const submitBtn = root.querySelector('#prism-submit');
-    if (cancelBtn) cancelBtn.textContent = 'חזרה לפריזמות';
+    if (cancelBtn) cancelBtn.textContent = 'חזרה למפה';
     if (submitBtn) {
         submitBtn.textContent = 'בדוק/י מפה + קבל/י צעד הבא';
         submitBtn.setAttribute('title', 'מנתח את המילוי, מציג תוצאות, ומציע צעד הבא להמשך');
@@ -17332,8 +17332,8 @@ function renderPrismDeepGuideLegacy(prism) {
                         <p><strong>למה זה חשוב?</strong> ${intent}</p>
                     </div>
                     <div class="prism-guide-card">
-                        <h5>מעבדת פריזמות מול חקירה בשרשרת</h5>
-                        <p><strong>מעבדת פריזמות (מגדל רמות):</strong> מילה/ביטוי מרכזי אחד ("עוגן") + חתך עומק דרך רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}).</p>
+                        <h5>מפת רמות ומטה-מודל מול חקירה בשרשרת</h5>
+                        <p><strong>מפת רמות ומטה-מודל:</strong> מילה או משפט אחד, ושתי עמודות של רמות לוגיות (${LOGICAL_LEVELS_SEQUENCE_FRIENDLY_SHORT}).</p>
                         <p><strong>חקירה בשרשרת:</strong> שואלים שוב על כל תשובה חדשה כדי להעמיק לאורך הרצף.</p>
                         <p><strong>בקיצור:</strong> מעבדה = עומק על מוקד אחד, Research = התקדמות בשרשרת.</p>
                     </div>

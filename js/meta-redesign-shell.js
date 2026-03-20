@@ -323,7 +323,7 @@
         },
         prismlab: {
             tab: 'prismlab', navKey: 'prismLab', progressKey: 'prismLab', progressTotal: 14, unlockLevel: 1, showOnHome: false,
-            icon: '🔮', title: 'מעבדת פריזמות', badge: 'עומק', tone: 'advanced', color: '#2563eb', soft: '#e7f0ff',
+            icon: '🔮', title: 'מפת רמות ומטה-מודל', badge: 'עומק', tone: 'advanced', color: '#2563eb', soft: '#e7f0ff',
             description: 'כאן בונים מפת הכרח מלאה: שתי עמודות, 12 חוליות על פני הרמות הלוגיות, ואז שיחה ממוקדת על גרעין, סדק ושאלת פאנץ׳.',
             problem: 'הבעיה היא שמושג אחד גדול או הכרח אחד סגור תופסים את כל התמונה, בלי לראות באיזו רמה זה יושב ואיפה כבר יש סדק שאפשר לעבוד איתו.',
             entryCards: [
@@ -340,7 +340,7 @@
                     id: 'flow',
                     icon: '🪜',
                     label: 'סדר עבודה',
-                    title: 'סדר העבודה במעבדת הפריזמות',
+                    title: 'סדר העבודה במפת הרמות והמטה-מודל',
                     eyebrow: 'מסלול עבודה',
                     lead: 'המסלול בנוי כמו מעבר ממבנה מלא לשיחה ממוקדת: קודם בונים את המבנה, אחר כך עובדים איתו בצעדים קצרים.',
                     cardsTitle: 'חמשת שלבי העבודה',
