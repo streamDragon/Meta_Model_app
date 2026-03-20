@@ -511,12 +511,12 @@
     function renderPicker() {
         if (!rootEl) return;
         var ex = EXERCISES[pickerIndex];
-        var previewImage = resolveAssetPath(ex.hypothesisImages[0].image);
         var total = EXERCISES.length;
 
+        // Build dots
         var dotsHtml = '';
         for (var d = 0; d < total; d++) {
-            dotsHtml += '<button type="button" class="' + CSS_PREFIX + '-picker-dot' + (d === pickerIndex ? ' is-active' : '') + '" data-picker-dot="' + d + '"></button>';
+            dotsHtml += '<span class="' + CSS_PREFIX + '-picker-dot' + (d === pickerIndex ? ' is-active' : '') + '"></span>';
         }
 
         var html = [];
@@ -526,26 +526,28 @@
         // Sentence at top
         html.push('<p class="' + CSS_PREFIX + '-picker-sentence">' + esc(ex.originalSentence) + '</p>');
 
-        // Large image
-        html.push('<div class="' + CSS_PREFIX + '-picker-image-wrap">');
-        html.push('<img class="' + CSS_PREFIX + '-picker-image" src="' + esc(previewImage) + '" alt="">');
-        html.push('</div>');
+        // Large image (clickable to cycle)
+        html.push(
+            '<div class="' + CSS_PREFIX + '-picker-image-wrap">' +
+            '<img class="' + CSS_PREFIX + '-picker-image" src="' + esc(resolveAssetPath(ex.hypothesisImages[0].image)) + '" alt="">' +
+            '</div>'
+        );
 
-        // Subject name
-        html.push('<p class="' + CSS_PREFIX + '-picker-subject">' + esc(ex.subjectName) + '</p>');
+        // Subject name + dots row
+        html.push(
+            '<div class="' + CSS_PREFIX + '-picker-meta">' +
+            '<span class="' + CSS_PREFIX + '-picker-subject">' + esc(ex.subjectName) + '</span>' +
+            '<div class="' + CSS_PREFIX + '-picker-dots">' + dotsHtml + '</div>' +
+            '</div>'
+        );
 
-        // Navigation row: arrows + dots
-        html.push('<div class="' + CSS_PREFIX + '-picker-nav">');
-        html.push('<button type="button" class="' + CSS_PREFIX + '-picker-arrow" data-picker-dir="prev">&#8250;</button>');
-        html.push('<div class="' + CSS_PREFIX + '-picker-dots">' + dotsHtml + '</div>');
-        html.push('<button type="button" class="' + CSS_PREFIX + '-picker-arrow" data-picker-dir="next">&#8249;</button>');
-        html.push('</div>');
-
-        // Counter
-        html.push('<p class="' + CSS_PREFIX + '-picker-counter">' + (pickerIndex + 1) + ' / ' + total + '</p>');
-
-        // Confirm button
-        html.push('<button type="button" class="' + CSS_PREFIX + '-picker-confirm">' + esc('כן, זה הנושא שלי') + '</button>');
+        // Single cycle button + confirm on same row
+        html.push(
+            '<div class="' + CSS_PREFIX + '-picker-actions">' +
+            '<button type="button" class="' + CSS_PREFIX + '-picker-cycle">&#8249;</button>' +
+            '<button type="button" class="' + CSS_PREFIX + '-picker-confirm">' + esc('כן, זה הנושא שלי') + '</button>' +
+            '</div>'
+        );
 
         html.push('</div>'); // card
         html.push('</div>'); // overlay
@@ -557,28 +559,12 @@
     function bindPickerEvents() {
         if (!rootEl) return;
 
-        var arrows = rootEl.querySelectorAll('.' + CSS_PREFIX + '-picker-arrow');
-        for (var i = 0; i < arrows.length; i++) {
-            arrows[i].addEventListener('click', function (e) {
-                var dir = e.currentTarget.getAttribute('data-picker-dir');
-                var len = EXERCISES.length;
-                if (dir === 'next') {
-                    pickerIndex = (pickerIndex + 1) % len;
-                } else {
-                    pickerIndex = (pickerIndex - 1 + len) % len;
-                }
+        // Single cycle button — advances forward (wraps)
+        var cycleBtn = rootEl.querySelector('.' + CSS_PREFIX + '-picker-cycle');
+        if (cycleBtn) {
+            cycleBtn.addEventListener('click', function () {
+                pickerIndex = (pickerIndex + 1) % EXERCISES.length;
                 renderPicker();
-            });
-        }
-
-        var dots = rootEl.querySelectorAll('.' + CSS_PREFIX + '-picker-dot');
-        for (var d = 0; d < dots.length; d++) {
-            dots[d].addEventListener('click', function (e) {
-                var idx = parseInt(e.currentTarget.getAttribute('data-picker-dot'), 10);
-                if (idx >= 0 && idx < EXERCISES.length) {
-                    pickerIndex = idx;
-                    renderPicker();
-                }
             });
         }
 
@@ -592,6 +578,7 @@
                 revealedIds = [];
                 revealedTileIndexes = [];
                 currentReveal = null;
+                pendingAskReveal = null;
                 pendingTileReveal = -1;
                 initTileRevealOrder();
                 saveState();
@@ -644,9 +631,28 @@
             html.push('<div class="' + CSS_PREFIX + '-image-label">' + esc(labelText) + '</div>');
         }
 
-        // Image grid
+        // Image grid + ask popup overlay wrapper
         var resolvedSurface = resolveAssetPath(getActiveImage());
         var resolvedTruth = resolveAssetPath(ex.truthImage);
+
+        html.push('<div class="' + CSS_PREFIX + '-image-grid-wrap">');
+
+        // Ask popup overlay (floats over the image)
+        if (phase === 'reveal' && pendingAskReveal && !complete) {
+            html.push(
+                '<div class="' + CSS_PREFIX + '-ask-popup">' +
+                '<div class="' + CSS_PREFIX + '-box-yellow">' +
+                '<span class="' + CSS_PREFIX + '-box-label">שאלת העומק הנוכחית</span>' +
+                '<p>' + esc(pendingAskReveal.question) + '</p>' +
+                '</div>' +
+                '<div class="' + CSS_PREFIX + '-box-blue">' +
+                '<span class="' + CSS_PREFIX + '-box-label">מה השאלה הזאת מחזירה למפה</span>' +
+                '<p>' + esc(pendingAskReveal.rationale) + '</p>' +
+                '</div>' +
+                '<button type="button" class="' + CSS_PREFIX + '-ask-btn">ASK — שאל!</button>' +
+                '</div>'
+            );
+        }
 
         html.push('<div class="' + CSS_PREFIX + '-image-grid' + (complete ? ' is-complete' : '') + '" style="--iids-grid-rows:' + grid.rows + ';--iids-grid-cols:' + grid.cols + ';">');
 
@@ -667,6 +673,7 @@
             );
         }
         html.push('</div>'); // grid
+        html.push('</div>'); // image-grid-wrap
 
         html.push('</div>'); // image-col
 
@@ -744,23 +751,6 @@
             );
         }
         html.push('</div></div></div>');
-
-        // ── Ask popup (opens when category button clicked, closes on ASK)
-        if (phase === 'reveal' && pendingAskReveal && !complete) {
-            html.push(
-                '<div class="' + CSS_PREFIX + '-ask-popup">' +
-                '<div class="' + CSS_PREFIX + '-box-yellow">' +
-                '<span class="' + CSS_PREFIX + '-box-label">שאלת העומק הנוכחית</span>' +
-                '<p>' + esc(pendingAskReveal.question) + '</p>' +
-                '</div>' +
-                '<div class="' + CSS_PREFIX + '-box-blue">' +
-                '<span class="' + CSS_PREFIX + '-box-label">מה השאלה הזאת מחזירה למפה</span>' +
-                '<p>' + esc(pendingAskReveal.rationale) + '</p>' +
-                '</div>' +
-                '<button type="button" class="' + CSS_PREFIX + '-ask-btn">ASK — שאל!</button>' +
-                '</div>'
-            );
-        }
 
         // ── Completion card
         if (complete) {
