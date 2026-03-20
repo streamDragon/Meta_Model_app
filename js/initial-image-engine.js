@@ -136,29 +136,30 @@
             id: 'initial-image-vs-deep-structure-obesity-01',
             feature: 'initial-image-vs-deep-structure',
             title: 'מתמונת שטח למבנה עומק',
-            originalSentence: "כשהיא אמרה לי 'אתה לא באמת רעב', רק רציתי לאכול עוד.",
+            originalSentence: "כשהיא אמרה לי 'אתה שוב אוכל בלי שליטה', ישר רציתי לקחת משהו מתוק.",
             subjectName: 'רן',
             hypothesisImages: [
                 {
                     id: 'h1',
                     label: 'הוא פשוט לא שולט',
-                    subtitle: 'נראה שהוא נמשך מיד לאוכל',
+                    subtitle: 'האוכל תופס אותו מיד',
                     image: 'assets/images/initial-image-vs-deep-structure/obesity_scene/obesity_guess_1.jpg'
                 },
                 {
                     id: 'h2',
                     label: 'הוא מורד בביקורת',
-                    subtitle: 'ההערה מפעילה אצלו תגובת נגד',
+                    subtitle: 'ההערה מפעילה דווקא',
                     image: 'assets/images/initial-image-vs-deep-structure/obesity_scene/obesity_guess_2.jpg'
                 },
                 {
                     id: 'h3',
                     label: 'האוכל מנחם אותו',
-                    subtitle: 'האכילה נראית כמו נחמה וריכוך',
+                    subtitle: 'הוא מרכך בדידות וריקנות',
                     image: 'assets/images/initial-image-vs-deep-structure/obesity_scene/obesity_guess_3.jpg'
                 }
             ],
             truthImage: 'assets/images/initial-image-vs-deep-structure/obesity_scene/obesity_truth.jpg',
+            truthLabel: 'האוכל הוא מגן מפני בושה',
             imageGrid: { rows: 3, cols: 3 },
             textSlots: [
                 { id: 'd1', category: 'deletion', order: 1, row: 0, col: 0 },
@@ -175,21 +176,21 @@
                 deletion: [
                     {
                         id: 'obesity-deletion-1',
-                        text: "היא אמרה: 'אתה לא באמת רעב, אתה שוב בורח לאוכל.'",
+                        text: "היא אמרה: 'אתה שוב אוכל בלי שליטה.'",
                         question: 'מה בדיוק היא אמרה שגרם לך לרצות לאכול עוד?',
                         rationale: "השאלה מחזירה את המשפט המדויק במקום הכותרת הכללית 'זה הפעיל אותי'.",
                         targetTextSlot: 'd1'
                     },
                     {
                         id: 'obesity-deletion-2',
-                        text: 'זה היה אחרי יום ארוך, כשהוא כבר הרגיש מותש וריק.',
+                        text: 'זה קרה אחרי רגע של מתח וביקורת.',
                         question: 'באיזה הקשר זה קרה?',
                         rationale: 'ההקשר מחזיר עומק לחוויה, ולא משאיר אותה כאירוע מבודד.',
                         targetTextSlot: 'd2'
                     },
                     {
                         id: 'obesity-deletion-3',
-                        text: 'באותו רגע הוא הרגיש חום בפנים, כיווץ בחזה, ודחף חזק למתוק.',
+                        text: 'באותו רגע הגוף שלו התכווץ והופיע דחף מיידי למתוק.',
                         question: 'מה קרה לך בגוף באותו רגע?',
                         rationale: 'השאלה מחזירה את החוויה הגופנית שנמחקה מן הסיפור.',
                         targetTextSlot: 'd3'
@@ -198,21 +199,21 @@
                 distortion: [
                     {
                         id: 'obesity-distortion-1',
-                        text: 'הוא לא שמע בזה רק דאגה — אלא כאילו היא רואה בו כישלון.',
+                        text: 'הוא לא שמע בזה רק הערה על אוכל — אלא כאילו אומרים עליו שהוא חלש ועלוב.',
                         question: 'איך זה נהיה אצלך הערה על הערך שלך — ולא רק על האוכל?',
                         rationale: 'כאן נחשף הפירוש שנכנס בין דבריה לבין החוויה שלו.',
                         targetTextSlot: 'x1'
                     },
                     {
                         id: 'obesity-distortion-2',
-                        text: 'אצלו הערה על אוכל נחווית כמעט מיד כבושה וגועל עצמי.',
+                        text: 'אצלו ביקורת על אכילה נהיית מהר מאוד בושה.',
                         question: 'איזה פירוש הופך הערה על אוכל לבושה?',
                         rationale: 'השאלה חושפת את העיוות: ההערה נהיית חוויה של השפלה פנימית.',
                         targetTextSlot: 'x2'
                     },
                     {
                         id: 'obesity-distortion-3',
-                        text: 'בתוך שניות האוכל נהיה לא פינוק — אלא דרך לא להרגיש חשוף.',
+                        text: 'האוכל נהיה לא רק פיתוי — אלא דרך לא להרגיש מושפל.',
                         question: 'מה האוכל עושה בשבילך ברגע הזה?',
                         rationale: 'השאלה מגלה שהאכילה ממלאת תפקיד מגן, לא רק תפקיד של תשוקה.',
                         targetTextSlot: 'x3'
@@ -221,14 +222,14 @@
                 generalization: [
                     {
                         id: 'obesity-generalization-1',
-                        text: 'יש בו כלל ישן: כשמביישים אותי, אוכל מציל אותי.',
+                        text: 'יש בו כלל ישן: כששופטים אותי, אוכל מגן עליי.',
                         question: 'איזה חוק פועל אצלך ברגע הזה?',
                         rationale: 'כאן מתגלה הכלל הרחב שמנהל את התגובה.',
                         targetTextSlot: 'g1'
                     },
                     {
                         id: 'obesity-generalization-2',
-                        text: 'הוא מכיר את התחושה ממקומות מוקדמים שבהם העירו על הגוף והאוכל.',
+                        text: 'הוא מכיר את התחושה ממקומות מוקדמים שבהם הרגיש שמבקרים את הגוף שלו.',
                         question: 'מאיפה הדפוס הזה מוכר לך?',
                         rationale: 'השאלה מחברת את ההווה לחוויה ישנה יותר.',
                         targetTextSlot: 'g2'
@@ -244,37 +245,38 @@
             },
             completionPrompt: {
                 title: 'עכשיו רואים את האוכל אחרת',
-                text: 'מה התברר עכשיו על הבושה, על ההגנה, ועל התפקיד שהאוכל ממלא בתוך הרגע?',
-                closing: 'כאן כבר לא רואים רק אכילה — רואים מנגנון פנימי של הגנה מפני בושה.'
+                text: 'מה התברר עכשיו על הבושה, על ההגנה, ועל התפקיד שהאוכל ממלא ברגע הזה?',
+                closing: 'כאן כבר לא רואים רק אכילה — רואים מנגנון פנימי שמנסה להגן מפני פגיעה בערך העצמי.'
             }
         },
         {
             id: 'initial-image-vs-deep-structure-social-anxiety-01',
             feature: 'initial-image-vs-deep-structure',
             title: 'מתמונת שטח למבנה עומק',
-            originalSentence: 'כשביקשו ממני להגיד שתי מילים על עצמי, פשוט נמחקתי.',
-            subjectName: 'איתן',
+            originalSentence: 'כשביקשו ממני להגיד כמה מילים על עצמי, פשוט נמחקתי.',
+            subjectName: 'תמר',
             hypothesisImages: [
                 {
                     id: 'h1',
-                    label: 'כולם שופטים אותו',
-                    subtitle: 'הוא חווה את החדר כעויין',
+                    label: 'כולן שופטות אותי',
+                    subtitle: 'כל המבטים מרגישים עליה',
                     image: 'assets/images/initial-image-vs-deep-structure/social_anxiety_scene/social_guess_1.jpg'
                 },
                 {
                     id: 'h2',
-                    label: 'אסור לו לטעות',
-                    subtitle: 'טעות אחת מרגישה אסון',
+                    label: 'אסור לי לטעות',
+                    subtitle: 'הבקשה נחווית כמבחן',
                     image: 'assets/images/initial-image-vs-deep-structure/social_anxiety_scene/social_guess_2.jpg'
                 },
                 {
                     id: 'h3',
-                    label: 'הוא פשוט ביישן',
-                    subtitle: 'על פני השטח זה נראה כמו ביישנות',
+                    label: 'היא פשוט ביישנית',
+                    subtitle: 'מבחוץ זה נראה רק כמו מבוכה',
                     image: 'assets/images/initial-image-vs-deep-structure/social_anxiety_scene/social_guess_3.jpg'
                 }
             ],
             truthImage: 'assets/images/initial-image-vs-deep-structure/social_anxiety_scene/social_truth.jpg',
+            truthLabel: 'להיראות מרגיש מסוכן',
             imageGrid: { rows: 3, cols: 3 },
             textSlots: [
                 { id: 'd1', category: 'deletion', order: 1, row: 0, col: 0 },
@@ -291,21 +293,21 @@
                 deletion: [
                     {
                         id: 'social-deletion-1',
-                        text: "המנחה אמרה בעדינות: 'בוא תספר על עצמך בשתי מילים.'",
+                        text: "ביקשו ממנה בעדינות: 'אולי תגידי כמה מילים על עצמך?'",
                         question: 'מה בדיוק ביקשו ממך?',
                         rationale: "השאלה מחזירה את הניסוח המדויק במקום התחושה הכוללת של 'זה היה נורא'.",
                         targetTextSlot: 'd1'
                     },
                     {
                         id: 'social-deletion-2',
-                        text: 'כל העיניים בחדר עברו אליו בבת אחת.',
+                        text: 'כל המעגל עבר להביט בה באותו רגע.',
                         question: 'מה קרה סביבך באותו רגע?',
                         rationale: 'ההקשר החברתי מחזיר את תנאי הרגע ולא משאיר רק כותרת רגשית.',
                         targetTextSlot: 'd2'
                     },
                     {
                         id: 'social-deletion-3',
-                        text: 'באותו רגע הגרון נסגר, הראש התרוקן, והוא הפסיק לנשום רגיל.',
+                        text: 'הגרון נסגר, המחשבות נעלמו, והגוף קפא.',
                         question: 'מה קרה לך בפנים באותו רגע?',
                         rationale: 'השאלה מחזירה את החוויה הגופנית והמיידית שנמחקה מן המשפט.',
                         targetTextSlot: 'd3'
@@ -314,21 +316,21 @@
                 distortion: [
                     {
                         id: 'social-distortion-1',
-                        text: 'הוא לא שמע בזה הזמנה — אלא מבחן.',
+                        text: 'היא לא שמעה בזה רק הזמנה — אלא מבחן.',
                         question: 'איך ההזמנה נהייתה אצלך מבחן?',
                         rationale: 'כאן נחשף הפירוש שנכנס בין מה שנאמר לבין מה שנחווה.',
                         targetTextSlot: 'x1'
                     },
                     {
                         id: 'social-distortion-2',
-                        text: 'אצלו מבט של קבוצה נהיה מיד סכנת השפלה.',
+                        text: 'המבט של הקבוצה נהיה אצלה סימן לסכנה.',
                         question: 'מה המשמעות שמבט של קבוצה מקבל אצלך?',
                         rationale: 'השאלה מפרידה בין המבט עצמו לבין המשמעות שנכנסה אליו.',
                         targetTextSlot: 'x2'
                     },
                     {
                         id: 'social-distortion-3',
-                        text: 'בתוכו זה נהיה כאילו אם יראה את עצמו — יתגלה שאין לו מקום.',
+                        text: 'בתוכה זה נהיה כאילו אם יראו אותה באמת — משהו בה יקרוס.',
                         question: 'מה היה קורה, מבחינתך, אם היו באמת רואים אותך?',
                         rationale: 'כאן נחשף הקישור הפנימי בין נראות לבין סכנה.',
                         targetTextSlot: 'x3'
@@ -337,14 +339,14 @@
                 generalization: [
                     {
                         id: 'social-generalization-1',
-                        text: 'יש בו כלל ישן: עדיף להיעלם מאשר להיחשף.',
+                        text: 'יש בה כלל ישן: עדיף להיעלם מאשר להיחשף.',
                         question: 'איזה חוק פעל אצלך ברגע הזה?',
                         rationale: 'כאן מתגלה הכלל הרחב שמכוון את המחיקה.',
                         targetTextSlot: 'g1'
                     },
                     {
                         id: 'social-generalization-2',
-                        text: 'התחושה מוכרת לו ממקומות מוקדמים של מבוכה ולעג.',
+                        text: 'התחושה מוכרת לה ממקומות מוקדמים של מבוכה וחשיפה.',
                         question: 'מאיפה הדפוס הזה מוכר לך?',
                         rationale: 'השאלה מחברת את ההווה לניסיון קודם ולא משאירה הכול רק בסיטואציה הנוכחית.',
                         targetTextSlot: 'g2'
@@ -359,16 +361,17 @@
                 ]
             },
             completionPrompt: {
-                title: 'עכשיו רואים שהבעיה אינה רק חברתית',
-                text: 'מה התברר עכשיו על החשיפה, על המבט, ועל החוק הפנימי שמופעל כשמסתכלים עליו?',
-                closing: 'כאן כבר לא רואים רק ביישנות — רואים מבנה פנימי של סכנה תחת מבט.'
+                title: 'עכשיו רואים שהקושי איננו רק חברתי',
+                text: 'מה התברר עכשיו על החשיפה, על המבט, ועל החוק הפנימי שפועל כשמבקשים ממנה להיראות?',
+                closing: 'כאן כבר לא רואים רק ביישנות — רואים מבנה פנימי שבו עצם החשיפה נחווית כסכנה.'
             }
         }
     ];
 
     // ─── STATE ────────────────────────────────────────────────
     var currentExercise = null;
-    var phase = 'guess';                   // 'guess' | 'reveal' | 'complete'
+    var phase = 'pick';                    // 'pick' | 'guess' | 'reveal' | 'complete'
+    var pickerIndex = 0;                   // which exercise is shown in topic picker
     var selectedHypothesisIndex = -1;      // confirmed choice
     var viewingHypothesisIndex = 0;        // currently browsed
     var revealedIds = [];
@@ -505,9 +508,104 @@
         return pctX + '% ' + pctY + '%';
     }
 
+    // ─── TOPIC PICKER OVERLAY ───────────────────────────────
+    function renderPicker() {
+        if (!rootEl) return;
+        var ex = EXERCISES[pickerIndex];
+        var previewImage = resolveAssetPath(ex.hypothesisImages[0].image);
+        var total = EXERCISES.length;
+
+        var dotsHtml = '';
+        for (var d = 0; d < total; d++) {
+            dotsHtml += '<button type="button" class="' + CSS_PREFIX + '-picker-dot' + (d === pickerIndex ? ' is-active' : '') + '" data-picker-dot="' + d + '"></button>';
+        }
+
+        var html = [];
+        html.push('<div class="' + CSS_PREFIX + '-picker-overlay">');
+        html.push('<div class="' + CSS_PREFIX + '-picker-card">');
+
+        // Sentence at top
+        html.push('<p class="' + CSS_PREFIX + '-picker-sentence">' + esc(ex.originalSentence) + '</p>');
+
+        // Large image
+        html.push('<div class="' + CSS_PREFIX + '-picker-image-wrap">');
+        html.push('<img class="' + CSS_PREFIX + '-picker-image" src="' + esc(previewImage) + '" alt="">');
+        html.push('</div>');
+
+        // Subject name
+        html.push('<p class="' + CSS_PREFIX + '-picker-subject">' + esc(ex.subjectName) + '</p>');
+
+        // Navigation row: arrows + dots
+        html.push('<div class="' + CSS_PREFIX + '-picker-nav">');
+        html.push('<button type="button" class="' + CSS_PREFIX + '-picker-arrow" data-picker-dir="prev">&#8250;</button>');
+        html.push('<div class="' + CSS_PREFIX + '-picker-dots">' + dotsHtml + '</div>');
+        html.push('<button type="button" class="' + CSS_PREFIX + '-picker-arrow" data-picker-dir="next">&#8249;</button>');
+        html.push('</div>');
+
+        // Counter
+        html.push('<p class="' + CSS_PREFIX + '-picker-counter">' + (pickerIndex + 1) + ' / ' + total + '</p>');
+
+        // Confirm button
+        html.push('<button type="button" class="' + CSS_PREFIX + '-picker-confirm">' + esc('כן, זה הנושא שלי') + '</button>');
+
+        html.push('</div>'); // card
+        html.push('</div>'); // overlay
+
+        rootEl.innerHTML = html.join('');
+        bindPickerEvents();
+    }
+
+    function bindPickerEvents() {
+        if (!rootEl) return;
+
+        var arrows = rootEl.querySelectorAll('.' + CSS_PREFIX + '-picker-arrow');
+        for (var i = 0; i < arrows.length; i++) {
+            arrows[i].addEventListener('click', function (e) {
+                var dir = e.currentTarget.getAttribute('data-picker-dir');
+                var len = EXERCISES.length;
+                if (dir === 'next') {
+                    pickerIndex = (pickerIndex + 1) % len;
+                } else {
+                    pickerIndex = (pickerIndex - 1 + len) % len;
+                }
+                renderPicker();
+            });
+        }
+
+        var dots = rootEl.querySelectorAll('.' + CSS_PREFIX + '-picker-dot');
+        for (var d = 0; d < dots.length; d++) {
+            dots[d].addEventListener('click', function (e) {
+                var idx = parseInt(e.currentTarget.getAttribute('data-picker-dot'), 10);
+                if (idx >= 0 && idx < EXERCISES.length) {
+                    pickerIndex = idx;
+                    renderPicker();
+                }
+            });
+        }
+
+        var confirmBtn = rootEl.querySelector('.' + CSS_PREFIX + '-picker-confirm');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', function () {
+                currentExercise = EXERCISES[pickerIndex];
+                phase = 'guess';
+                viewingHypothesisIndex = 0;
+                selectedHypothesisIndex = -1;
+                revealedIds = [];
+                revealedTileIndexes = [];
+                currentReveal = null;
+                pendingTileReveal = -1;
+                initTileRevealOrder();
+                saveState();
+                renderAll();
+            });
+        }
+    }
+
     // ─── RENDER ───────────────────────────────────────────────
     function renderAll() {
-        if (!rootEl || !currentExercise) return;
+        if (!rootEl) return;
+        if (phase === 'pick') { renderPicker(); return; }
+        if (!currentExercise) return;
         var ex = currentExercise;
         var grid = ex.imageGrid;
         var totalTiles = grid.rows * grid.cols;
@@ -817,15 +915,16 @@
     }
 
     function handleRestart() {
-        phase = 'guess';
+        phase = 'pick';
+        currentExercise = null;
         selectedHypothesisIndex = -1;
         viewingHypothesisIndex = 0;
         revealedIds = [];
         revealedTileIndexes = [];
         currentReveal = null;
         pendingTileReveal = -1;
-        initTileRevealOrder();
-        saveState();
+        tileRevealOrder = [];
+        try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
         renderAll();
     }
 
@@ -835,42 +934,57 @@
         if (!rootEl || mounted) return;
         mounted = true;
 
-        currentExercise = EXERCISES[0];
-
         // Restore state
         var saved = loadState();
-        if (saved && saved.exerciseId === currentExercise.id) {
-            phase = saved.phase || 'guess';
-            selectedHypothesisIndex = typeof saved.selectedHypothesisIndex === 'number' ? saved.selectedHypothesisIndex : -1;
-            viewingHypothesisIndex = typeof saved.viewingHypothesisIndex === 'number' ? saved.viewingHypothesisIndex : 0;
-            revealedIds = Array.isArray(saved.revealedIds) ? saved.revealedIds : [];
-            revealedTileIndexes = Array.isArray(saved.revealedTileIndexes) ? saved.revealedTileIndexes : [];
-            tileRevealOrder = Array.isArray(saved.tileRevealOrder) ? saved.tileRevealOrder : [];
-            if (saved.currentRevealId) {
-                var categories = ['deletion', 'distortion', 'generalization'];
-                for (var c = 0; c < categories.length; c++) {
-                    var reveals = currentExercise.reveals[categories[c]] || [];
-                    for (var r = 0; r < reveals.length; r++) {
-                        if (reveals[r].id === saved.currentRevealId) {
-                            currentReveal = reveals[r];
+        if (saved && saved.exerciseId) {
+            // Find the saved exercise
+            var foundEx = null;
+            for (var ei = 0; ei < EXERCISES.length; ei++) {
+                if (EXERCISES[ei].id === saved.exerciseId) {
+                    foundEx = EXERCISES[ei];
+                    pickerIndex = ei;
+                    break;
+                }
+            }
+            if (foundEx) {
+                currentExercise = foundEx;
+                phase = saved.phase || 'guess';
+                if (phase === 'pick') phase = 'guess'; // don't restore back to picker
+                selectedHypothesisIndex = typeof saved.selectedHypothesisIndex === 'number' ? saved.selectedHypothesisIndex : -1;
+                viewingHypothesisIndex = typeof saved.viewingHypothesisIndex === 'number' ? saved.viewingHypothesisIndex : 0;
+                revealedIds = Array.isArray(saved.revealedIds) ? saved.revealedIds : [];
+                revealedTileIndexes = Array.isArray(saved.revealedTileIndexes) ? saved.revealedTileIndexes : [];
+                tileRevealOrder = Array.isArray(saved.tileRevealOrder) ? saved.tileRevealOrder : [];
+                if (saved.currentRevealId) {
+                    var categories = ['deletion', 'distortion', 'generalization'];
+                    for (var c = 0; c < categories.length; c++) {
+                        var reveals = currentExercise.reveals[categories[c]] || [];
+                        for (var r = 0; r < reveals.length; r++) {
+                            if (reveals[r].id === saved.currentRevealId) {
+                                currentReveal = reveals[r];
+                            }
                         }
                     }
                 }
+
+                if (!tileRevealOrder.length) {
+                    initTileRevealOrder();
+                }
+
+                // Sync tiles with reveals (migration from old state)
+                while (revealedTileIndexes.length < revealedIds.length && revealedTileIndexes.length < tileRevealOrder.length) {
+                    revealedTileIndexes.push(tileRevealOrder[revealedTileIndexes.length]);
+                }
+
+                // Fix phase consistency
+                if (isComplete() && phase !== 'complete') phase = 'complete';
+                if (revealedIds.length > 0 && phase === 'guess') phase = 'reveal';
+            } else {
+                phase = 'pick';
             }
+        } else {
+            phase = 'pick';
         }
-
-        if (!tileRevealOrder.length) {
-            initTileRevealOrder();
-        }
-
-        // Sync tiles with reveals (migration from old state)
-        while (revealedTileIndexes.length < revealedIds.length && revealedTileIndexes.length < tileRevealOrder.length) {
-            revealedTileIndexes.push(tileRevealOrder[revealedTileIndexes.length]);
-        }
-
-        // Fix phase consistency
-        if (isComplete() && phase !== 'complete') phase = 'complete';
-        if (revealedIds.length > 0 && phase === 'guess') phase = 'reveal';
 
         renderAll();
     }
