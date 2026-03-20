@@ -7,6 +7,7 @@
 
     // ── Module-level guards ──────────────────────────────────────────
     var observer = null;
+    var observerDisabled = false; // permanently disable after standalone-only pages insert their block
     var isApplying = false;
     var isScheduled = false;
     var lastApplyReason = '';
@@ -482,9 +483,9 @@
         // On standalone pages without dynamic state labels, stop observing after
         // the block is inserted — the orientation content never changes, so
         // continued observation only causes a mutation-storm loop.
-        if (!meta.stateLabels && observer) {
-            observer.disconnect();
-            observer = null;
+        if (!meta.stateLabels) {
+            if (observer) { observer.disconnect(); observer = null; }
+            observerDisabled = true;
         }
     }
 
@@ -536,7 +537,8 @@
         // Initial synchronous apply (no observer yet, safe)
         applyEnhancements('boot');
 
-        // Set up observer with storm protection
+        // Set up observer with storm protection (skip on standalone-only pages)
+        if (observerDisabled) return;
         observer = new MutationObserver(function (mutations) {
             // Mutation storm detection
             var now = Date.now();
