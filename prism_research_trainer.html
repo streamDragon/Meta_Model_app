@@ -10,8 +10,13 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="css/prism-research.css">
   <script>window.__PRISM_RESEARCH_ASSET_V__ = String(Date.now());</script>
+  <style>
+    body[data-product-guidance-screen="home"] #prism-research-app {
+      display: none !important;
+    }
+  </style>
 </head>
-<body>
+<body data-product-guidance-screen="home" class="product-guidance-screen-home">
   <div id="prism-research-app" aria-live="polite">
     <div style="max-width:960px;margin:32px auto;padding:16px;border:1px solid #ddd;border-radius:12px;background:#fff;">
       Loading Prism Research Mode...

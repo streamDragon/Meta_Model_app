@@ -312,9 +312,15 @@
       .map-anchor { width: min(250px, calc(100vw - 20px)); }
       .controls select { min-width: 170px; }
     }
+
+    body[data-product-guidance-screen="home"] main.page,
+    body[data-product-guidance-screen="home"] .map-anchor,
+    body[data-product-guidance-screen="home"] #reviewModal {
+      display: none !important;
+    }
   </style>
 </head>
-<body>
+<body data-product-guidance-screen="home" class="product-guidance-screen-home">
   <main class="page">
     <header class="card topbar">
       <div class="topbar-head">

@@ -158,6 +158,10 @@
     margin: 0 auto 14px;
 }
 
+body[data-product-guidance-screen="play"] [data-product-guidance-welcome] {
+    display: none !important;
+}
+
 .product-orientation {
     display: flex;
     align-items: flex-start;

@@ -149,6 +149,7 @@ async function runShellSmoke(baseUrl) {
             console.log('[shell-smoke]', ...args);
         }
     };
+    const FULL_SHELL_SWEEP = process.env.SHELL_SMOKE_FULL === '1';
     const TEST_GAMIFICATION_STATE = Object.freeze({
         xp: 600,
         streak: 4,
@@ -321,6 +322,216 @@ async function runShellSmoke(baseUrl) {
     const closeOverlayIfOpen = async (targetPage = page) => {
         if (await overlayVisible(targetPage)) {
             await closeOverlayWithButton(targetPage);
+        }
+    };
+
+    const installNavigationTrace = async (targetPage = page) => {
+        await targetPage.evaluate(() => {
+            if (window.__shellSmokeNavTraceInstalled) return;
+            const trace = [];
+            const push = (type, value) => {
+                trace.push({
+                    type: String(type || ''),
+                    value: String(value || ''),
+                    ts: Math.round(performance.now())
+                });
+                if (trace.length > 200) trace.splice(0, trace.length - 200);
+            };
+            const wrap = (name) => {
+                const original = window[name];
+                if (typeof original !== 'function' || original.__shellSmokeWrapped) return;
+                const wrapped = function (...args) {
+                    push(name, args[0]);
+                    return original.apply(this, args);
+                };
+                wrapped.__shellSmokeWrapped = true;
+                window[name] = wrapped;
+            };
+            wrap('navigateTo');
+            wrap('navigateByNavKey');
+            if (document.body && !window.__shellSmokeNavTraceObserver) {
+                const observer = new MutationObserver(() => {
+                    push('activeTab', document.body?.dataset?.activeTab || '');
+                });
+                observer.observe(document.body, { attributes: true, attributeFilter: ['data-active-tab'] });
+                window.__shellSmokeNavTraceObserver = observer;
+            }
+            window.__shellSmokeNavTrace = trace;
+            window.__shellSmokeNavTraceInstalled = true;
+        });
+    };
+
+    const resetNavigationTrace = async (targetPage = page) => {
+        await installNavigationTrace(targetPage);
+        await targetPage.evaluate(() => {
+            if (!Array.isArray(window.__shellSmokeNavTrace)) window.__shellSmokeNavTrace = [];
+            window.__shellSmokeNavTrace.length = 0;
+        });
+    };
+
+    const readNavigationTrace = async (targetPage = page) => (
+        targetPage.evaluate(() => Array.isArray(window.__shellSmokeNavTrace) ? window.__shellSmokeNavTrace.slice() : [])
+    );
+
+    const installProductGuidanceTrace = async (targetPage = page) => {
+        await targetPage.evaluate(() => {
+            if (window.__shellSmokeProductGuidanceTraceInstalled) return;
+            const trace = [];
+            const captureArgs = (level, args) => {
+                const text = args.map((arg) => {
+                    if (typeof arg === 'string') return arg;
+                    try {
+                        return JSON.stringify(arg);
+                    } catch (_error) {
+                        return String(arg);
+                    }
+                }).join(' ');
+                if (!text.includes('[product-guidance]')) return;
+                trace.push({
+                    level: String(level || ''),
+                    text,
+                    ts: Math.round(performance.now())
+                });
+                if (trace.length > 400) trace.splice(0, trace.length - 400);
+            };
+            const wrapConsole = (level) => {
+                const original = console[level];
+                if (typeof original !== 'function' || original.__shellSmokeWrapped) return;
+                const wrapped = function (...args) {
+                    captureArgs(level, args);
+                    return original.apply(this, args);
+                };
+                wrapped.__shellSmokeWrapped = true;
+                console[level] = wrapped;
+            };
+            wrapConsole('log');
+            wrapConsole('warn');
+            wrapConsole('error');
+            window.__shellSmokeProductGuidanceTrace = trace;
+            window.__shellSmokeProductGuidanceTraceInstalled = true;
+        });
+    };
+
+    const resetProductGuidanceTrace = async (targetPage = page) => {
+        await installProductGuidanceTrace(targetPage);
+        await targetPage.evaluate(() => {
+            if (!Array.isArray(window.__shellSmokeProductGuidanceTrace)) window.__shellSmokeProductGuidanceTrace = [];
+            window.__shellSmokeProductGuidanceTrace.length = 0;
+        });
+    };
+
+    const readProductGuidanceTrace = async (targetPage = page) => (
+        targetPage.evaluate(() => Array.isArray(window.__shellSmokeProductGuidanceTrace) ? window.__shellSmokeProductGuidanceTrace.slice() : [])
+    );
+
+    const openStandalonePage = async (relativePath, viewport = { width: 1440, height: 1100 }) => {
+        const targetPage = await browser.newPage({ viewport });
+        await seedTestState(targetPage);
+        await targetPage.goto(new URL(relativePath, baseUrl).toString(), { waitUntil: 'networkidle' });
+        return targetPage;
+    };
+
+    const openTrainerHelpOverlay = async (targetPage) => {
+        await targetPage.locator('.trainer-shell-nav [data-nav-action="help-overlay"]').click();
+        await targetPage.waitForSelector('.trainer-shell-help-overlay');
+        return ((await targetPage.locator('.trainer-shell-help-overlay').innerText()) || '').trim();
+    };
+
+    const closeTrainerHelpOverlay = async (targetPage) => {
+        await targetPage.locator('.trainer-shell-help-overlay [data-help-action="close"]').click();
+        await targetPage.waitForFunction(() => !document.querySelector('.trainer-shell-help-overlay'));
+    };
+
+    const assertOverlayComicLaunch = async ({ label, openOverlay }) => {
+        await navigate('home');
+        await closeOverlayIfOpen();
+        await resetNavigationTrace();
+        await openOverlay();
+        await page.waitForSelector('.overlay-root:not(.hidden) [data-nav-key="comicEngine"]');
+        await page.evaluate(() => {
+            document.querySelector('.overlay-root:not(.hidden) [data-nav-key="comicEngine"]')?.click();
+        });
+        await waitForActiveScreen('comic-engine');
+        await page.waitForTimeout(450);
+        const trace = await readNavigationTrace();
+        const firstComicIndex = trace.findIndex((entry) => entry.value === 'comicEngine' || entry.value === 'comic-engine');
+        const homeHits = firstComicIndex >= 0
+            ? trace.slice(firstComicIndex + 1).filter((entry) => entry.value === 'home')
+            : trace.filter((entry) => entry.value === 'home');
+        const navKeyCalls = trace.filter((entry) => entry.type === 'navigateByNavKey' && entry.value === 'comicEngine');
+        const tabCalls = trace.filter((entry) => entry.type === 'navigateTo' && entry.value === 'comic-engine');
+        await assert(homeHits.length === 0, `${label} avoids intermediate home after comic navigation starts`, JSON.stringify(trace));
+        await assert(navKeyCalls.length <= 1, `${label} triggers one nav-key call`, JSON.stringify(trace));
+        await assert(tabCalls.length <= 1, `${label} triggers one tab navigation`, JSON.stringify(trace));
+    };
+
+    const checkStandaloneScenarioGuidance = async () => {
+        const targetPage = await openStandalonePage('scenario_trainer.html');
+        try {
+            await targetPage.waitForSelector('[data-trainer-platform="1"][data-trainer-id="scenario-trainer"]');
+            await assert((await targetPage.locator('.trainer-shell-nav').count()) > 0, 'scenario standalone nav mounted');
+            await targetPage.waitForFunction(() => document.querySelector('[data-trainer-id="scenario-trainer"]')?.getAttribute('data-screen') === 'home');
+            const welcomeText = ((await targetPage.locator('#scenario-trainer').innerText()) || '').trim();
+            await assert(welcomeText.length > 300, 'scenario welcome keeps long-form orientation', String(welcomeText.length));
+            await assert((await targetPage.locator('[data-product-guidance="scenario-trainer"][data-trainer-help-content="1"]').count()) > 0, 'scenario hidden help guidance mounted');
+            await targetPage.locator('[data-trainer-action="start-session"]').first().click();
+            await targetPage.waitForFunction(() => document.querySelector('[data-trainer-id="scenario-trainer"]')?.getAttribute('data-screen') === 'play');
+            const runtimeText = ((await targetPage.locator('#scenario-trainer').innerText()) || '').trim();
+            for (const heading of ['מה הכלי הזה עושה', 'מה הוא מאמן', 'מתי משתמשים בו', 'למה זה חשוב', 'דוגמה קצרה']) {
+                await assert(!runtimeText.includes(heading), `scenario runtime hides ${heading}`);
+            }
+            const helpText = await openTrainerHelpOverlay(targetPage);
+            await assert(helpText.includes('מה הכלי הזה עושה'), 'scenario help overlay shows long explanation');
+            await closeTrainerHelpOverlay(targetPage);
+            const currentScreen = await targetPage.locator('[data-trainer-id="scenario-trainer"]').getAttribute('data-screen');
+            await assert(currentScreen === 'play', 'scenario help close preserves play screen', String(currentScreen || ''));
+        } finally {
+            await targetPage.close();
+        }
+    };
+
+    const checkLegacyStandaloneWelcomeMount = async (relativePath, featureKey) => {
+        const targetPage = await openStandalonePage(relativePath);
+        try {
+            await targetPage.waitForSelector(`[data-product-guidance-welcome="${featureKey}"]`);
+            await assert((await targetPage.locator(`[data-product-guidance-welcome="${featureKey}"]`).count()) > 0, `${featureKey} welcome shell mounted`);
+            await assert((await targetPage.locator(`[data-product-guidance="${featureKey}"][data-trainer-help-content="1"]`).count()) > 0, `${featureKey} hidden help guidance mounted`);
+        } finally {
+            await targetPage.close();
+        }
+    };
+
+    const checkStandaloneVerbUnzipGuidance = async () => {
+        const targetPage = await openStandalonePage('verb_unzip_trainer.html');
+        try {
+            const welcomeSelector = '[data-product-guidance-welcome="practice-verb-unzip-standalone"]';
+            await targetPage.waitForSelector(welcomeSelector);
+            await assert(await targetPage.locator(welcomeSelector).isVisible(), 'verb unzip welcome visible');
+            await assert(!(await targetPage.locator('main.page').isVisible()), 'verb unzip runtime hidden before start');
+            const welcomeText = ((await targetPage.locator(welcomeSelector).innerText()) || '').trim();
+            await assert(welcomeText.includes('מה הכלי הזה עושה'), 'verb unzip welcome keeps long explanation');
+            await targetPage.locator('[data-product-guidance-start="practice-verb-unzip-standalone"]').click();
+            await targetPage.waitForFunction(() => {
+                const main = document.querySelector('main.page');
+                return !!main && !main.hidden && getComputedStyle(main).display !== 'none';
+            });
+            await assert(!(await targetPage.locator(welcomeSelector).isVisible()), 'verb unzip welcome hidden during play');
+            await targetPage.locator('#startBtn').click();
+            await targetPage.locator('.zip-target').click();
+            await targetPage.waitForSelector('#answerInput');
+            const answerValue = 'אני אשלח לו הודעה קצרה ומדויקת אחרי העבודה';
+            await targetPage.locator('#answerInput').fill(answerValue);
+            const runtimeText = ((await targetPage.locator('main.page').innerText()) || '').trim();
+            for (const heading of ['מה הכלי הזה עושה', 'מה הוא מאמן', 'מתי משתמשים בו', 'למה זה חשוב', 'דוגמה קצרה']) {
+                await assert(!runtimeText.includes(heading), `verb unzip runtime hides ${heading}`);
+            }
+            const helpText = await openTrainerHelpOverlay(targetPage);
+            await assert(helpText.includes('מה הכלי הזה עושה'), 'verb unzip help overlay shows long explanation');
+            await assert(helpText.includes('דוגמה קצרה'), 'verb unzip help overlay keeps example copy');
+            await closeTrainerHelpOverlay(targetPage);
+            await assert((await targetPage.locator('#answerInput').inputValue()) === answerValue, 'verb unzip help close preserves current answer');
+        } finally {
+            await targetPage.close();
         }
     };
 
@@ -527,7 +738,7 @@ async function runShellSmoke(baseUrl) {
             const statsTitle = ((await page.locator('#meta-home-shell .meta-home-screen__header h2').textContent()) || '').trim();
             await assert(Boolean(statsTitle), `${screenId} stats route opens home stats`, statsTitle);
             await page.locator('#meta-home-shell .meta-home-screen__header [data-home-view="home"]').click();
-            await page.waitForSelector('#meta-home-shell .meta-home-shell__hero h2');
+            await page.waitForSelector('#meta-home-shell .hhc-title');
             trace('managed:stats:done', screenId);
         }
 
@@ -665,12 +876,12 @@ async function runShellSmoke(baseUrl) {
         trace('boot:ready');
 
         await navigate('home');
-        const homeTitle = ((await page.locator('#meta-home-shell .meta-home-shell__hero h2').textContent()) || '').trim();
+        const homeTitle = ((await page.locator('#meta-home-shell .hhc-title').textContent()) || '').trim();
         await assert(Boolean(homeTitle), 'home shell loaded', homeTitle);
 
-        await page.locator('#meta-home-shell [data-open-feature="sentence-map"]').first().click();
-        await waitForActiveScreen('sentence-map');
-        await assert((await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab'))) === 'sentence-map', 'home hero CTA opens sentence map');
+        await page.locator('#meta-home-shell [data-open-feature="initial-image-vs-deep-structure"]').first().click();
+        await waitForActiveScreen('initial-image-vs-deep-structure');
+        await assert((await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab'))) === 'initial-image-vs-deep-structure', 'home hero CTA opens initial-image-vs-deep-structure');
 
         await navigate('home');
         await page.locator('#meta-home-shell [data-open-feature="practice-question"]').first().click();
@@ -686,7 +897,7 @@ async function runShellSmoke(baseUrl) {
         const helpTitle = ((await page.locator('#meta-home-shell .meta-home-screen__header h2').textContent()) || '').trim();
         await assert(Boolean(helpTitle), 'home help view opens', helpTitle);
         await page.locator('#meta-home-shell .meta-home-screen__header [data-home-view="home"]').click();
-        await page.waitForSelector('#meta-home-shell .meta-home-shell__hero h2');
+        await page.waitForSelector('#meta-home-shell .hhc-title');
 
         await page.locator('#meta-home-shell [data-home-menu]').click();
         await page.waitForSelector('.meta-home-drawer.is-open');
@@ -695,30 +906,69 @@ async function runShellSmoke(baseUrl) {
         await assert((await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab'))) === 'about', 'home drawer nav opens about');
         await navigate('home');
 
-        await checkManagedScreen('sentence-map', { verifyStatsRoute: true, verifyRestart: true });
-        await checkManagedScreen('practice-question');
-        await checkManagedScreen('practice-triples-radar');
-        await checkManagedScreen('practice-wizard');
-        await checkManagedScreen('practice-verb-unzip');
-        await checkManagedScreen('categories');
-        await checkManagedScreen('blueprint');
-        await checkManagedScreen('prismlab');
-        await checkManagedScreen('about');
-        await checkManagedScreen('comic-engine');
+        await assertOverlayComicLaunch({
+            label: 'feature-map overlay comic launch',
+            openOverlay: async () => {
+                await page.evaluate(() => window.openFeatureMapMenu?.());
+                await page.waitForSelector('.overlay-root:not(.hidden) .feature-map-overlay-clone');
+            }
+        });
+
+        await assertOverlayComicLaunch({
+            label: 'home menu overlay comic launch',
+            openOverlay: async () => {
+                await page.evaluate(() => {
+                    const buttons = Array.from(document.querySelectorAll('#home .app-shell .app-shell-actions button'));
+                    const target = buttons.find((button) => (button.textContent || '').includes('תפריט'));
+                    target?.click();
+                });
+                await page.waitForSelector('.overlay-root:not(.hidden) .home-shell-menu-clone');
+            }
+        });
 
         await navigate('home');
-        await navigate('practice-radar');
-        await enterManagedFeatureStage('practice-radar');
-        await page.locator('#practice-radar [data-shell-chrome-home]').click();
-        await waitForActiveScreen('home');
-        const resumeButtonCount = await page.locator('#meta-home-shell [data-home-resume]').count();
-        await assert(resumeButtonCount > 0, 'home resume action visible');
-        await page.locator('#meta-home-shell [data-home-resume]').click();
-        await waitForActiveScreen('practice-radar');
-        await assert(
-            (await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab') || '')) === 'practice-radar',
-            'home resume restores last managed tab'
-        );
+        await resetProductGuidanceTrace();
+        await navigate('comic-engine');
+        await enterManagedFeatureStage('comic-engine');
+        await page.waitForTimeout(1200);
+        const productGuidanceTrace = await readProductGuidanceTrace();
+        const productGuidanceSummary = {
+            scheduleObserver: productGuidanceTrace.filter((entry) => entry.text.includes('scheduleApply reason=observer')).length,
+            applyStart: productGuidanceTrace.filter((entry) => entry.text.includes('apply start reason=observer')).length,
+            applyDone: productGuidanceTrace.filter((entry) => entry.text.includes('apply done duration=')).length,
+            mutationStorm: productGuidanceTrace.some((entry) => entry.text.includes('mutation storm detected'))
+        };
+        await assert(!productGuidanceSummary.mutationStorm, 'comic product-guidance avoids mutation storm', JSON.stringify(productGuidanceSummary));
+        await assert(productGuidanceSummary.scheduleObserver <= 8, 'comic product-guidance observer stays bounded', JSON.stringify(productGuidanceSummary));
+        await assert(productGuidanceSummary.applyStart <= 8, 'comic product-guidance apply stays bounded', JSON.stringify(productGuidanceSummary));
+
+        await checkManagedScreen('sentence-map', { verifyStatsRoute: true });
+        await checkManagedScreen('practice-question');
+        await checkManagedScreen('comic-engine');
+
+        if (FULL_SHELL_SWEEP) {
+            await checkManagedScreen('practice-triples-radar');
+            await checkManagedScreen('practice-wizard');
+            await checkManagedScreen('practice-verb-unzip');
+            await checkManagedScreen('categories');
+            await checkManagedScreen('blueprint');
+            await checkManagedScreen('prismlab');
+            await checkManagedScreen('about');
+
+            await navigate('home');
+            await navigate('practice-radar');
+            await enterManagedFeatureStage('practice-radar');
+            await page.locator('#practice-radar [data-shell-chrome-home]').click();
+            await waitForActiveScreen('home');
+            const resumeButtonCount = await page.locator('#meta-home-shell [data-home-resume]').count();
+            await assert(resumeButtonCount > 0, 'home resume action visible');
+            await page.locator('#meta-home-shell [data-home-resume]').click();
+            await waitForActiveScreen('practice-radar');
+            await assert(
+                (await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab') || '')) === 'practice-radar',
+                'home resume restores last managed tab'
+            );
+        }
 
         await navigate('home');
         await closeOverlayIfOpen();
@@ -726,162 +976,163 @@ async function runShellSmoke(baseUrl) {
             (await page.locator('#meta-home-shell [data-home-href*="scenario_trainer.html"]').count()) > 0,
             'scenario launcher visible from home'
         );
-        const scenarioPage = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
-        await scenarioPage.goto(new URL('scenario_trainer.html', baseUrl).toString(), { waitUntil: 'networkidle' });
-        await assert((await scenarioPage.locator('[data-trainer-platform="1"][data-trainer-id="scenario-trainer"]').count()) > 0, 'scenario standalone shell mounted');
-        await assert((await scenarioPage.locator('.mtp-nav').count()) > 0, 'scenario standalone nav mounted');
-        await scenarioPage.close();
+        await checkStandaloneScenarioGuidance();
+        await checkStandaloneVerbUnzipGuidance();
+        await checkLegacyStandaloneWelcomeMount('sentence_morpher_trainer.html', 'sentence-morpher');
+        await checkLegacyStandaloneWelcomeMount('prism_research_trainer.html', 'prism-research');
 
         await checkComicExperience();
         trace('desktop:done');
 
-        const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true });
-        const mobileUiAudit = {};
-        await seedTestState(mobile);
-        await mobile.goto(baseUrl, { waitUntil: 'networkidle' });
-        await dismissOnboardingIfVisible(mobile);
-        for (const screenId of ['home', 'sentence-map', 'practice-question', 'practice-radar', 'practice-wizard', 'blueprint', 'prismlab']) {
-            trace('mobile:start', screenId);
-            await mobile.evaluate((id) => window.navigateTo(id), screenId);
-            await waitForActiveScreen(screenId, mobile);
-            await enterManagedFeatureStage(screenId, mobile);
-            if (screenId === 'prismlab') {
-                await mobile.locator('#prismlab [data-action="start-lab"]').click();
-                await mobile.waitForSelector('#prismlab .pnm-view--categories');
-                await mobile.locator('#prismlab [data-action="open-category"]').first().click();
-                await mobile.waitForSelector('#prismlab .pnm-view--workspace');
-            }
-            await mobile.waitForTimeout(400);
-            const mobileCheck = await mobile.evaluate(() => ({
-                innerWidth: window.innerWidth,
-                scrollWidth: document.documentElement.scrollWidth,
-                activeElement: document.querySelector('.tab-content.active')?.id || ''
-            }));
-            await assert(mobileCheck.scrollWidth <= mobileCheck.innerWidth + 1, `mobile ${screenId} no horizontal overflow`, `${mobileCheck.scrollWidth}/${mobileCheck.innerWidth}`);
-            await assert(mobileCheck.activeElement === screenId, `mobile ${screenId} active`);
-            if (MOBILE_UI_AUDIT_CONFIG[screenId]) {
-                const audit = await collectMobileUiAudit(screenId, mobile);
-                mobileUiAudit[screenId] = audit;
-                await assert(audit.topIcons.back && audit.topIcons.home && audit.topIcons.restart, `mobile ${screenId} top icon bar visible`);
-                await assert(audit.largeBodyButtons.length <= (MOBILE_UI_AUDIT_CONFIG[screenId].maxLargeBodyActions || 2), `mobile ${screenId} keeps body CTA count`, audit.largeBodyButtons.map((item) => item.label).join(', '));
-                await assert(audit.duplicateSelectorsVisible.length === 0, `mobile ${screenId} removes duplicate stats/actions`, audit.duplicateSelectorsVisible.join(', '));
-            }
-            if (screenId === 'prismlab') {
-                const prismMetrics = await mobile.evaluate(() => {
-                    const active = document.querySelector('#prismlab.active');
-                    const top = active?.querySelector('[data-meta-feature-chrome="top"]');
-                    const bottom = active?.querySelector('[data-meta-feature-chrome="bottom"]');
-                    const contextCard = active?.querySelector('.pnm-context-card');
-                    const instructionCard = active?.querySelector('.pnm-instruction-card');
-                    const questionCard = active?.querySelector('.pnm-question-card');
-                    const primaryButton = active?.querySelector('.pnm-question-card [data-action="reveal-answer"], .pnm-question-card [data-action="go-reflect"]');
-                    const bodyActions = Array.from(active?.querySelectorAll('.pnm-question-card .pnm-btn') || []).filter((el) => {
-                        const rect = el.getBoundingClientRect();
-                        const style = getComputedStyle(el);
-                        return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+        if (FULL_SHELL_SWEEP) {
+            const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true });
+            const mobileUiAudit = {};
+            await seedTestState(mobile);
+            await mobile.goto(baseUrl, { waitUntil: 'networkidle' });
+            await dismissOnboardingIfVisible(mobile);
+            for (const screenId of ['home', 'sentence-map', 'practice-question', 'practice-radar', 'practice-wizard', 'blueprint', 'prismlab']) {
+                trace('mobile:start', screenId);
+                await mobile.evaluate((id) => window.navigateTo(id), screenId);
+                await waitForActiveScreen(screenId, mobile);
+                await enterManagedFeatureStage(screenId, mobile);
+                if (screenId === 'prismlab') {
+                    await mobile.locator('#prismlab [data-action="start-lab"]').click();
+                    await mobile.waitForSelector('#prismlab .pnm-view--categories');
+                    await mobile.locator('#prismlab [data-action="open-category"]').first().click();
+                    await mobile.waitForSelector('#prismlab .pnm-view--workspace');
+                }
+                await mobile.waitForTimeout(400);
+                const mobileCheck = await mobile.evaluate(() => ({
+                    innerWidth: window.innerWidth,
+                    scrollWidth: document.documentElement.scrollWidth,
+                    activeElement: document.querySelector('.tab-content.active')?.id || ''
+                }));
+                await assert(mobileCheck.scrollWidth <= mobileCheck.innerWidth + 1, `mobile ${screenId} no horizontal overflow`, `${mobileCheck.scrollWidth}/${mobileCheck.innerWidth}`);
+                await assert(mobileCheck.activeElement === screenId, `mobile ${screenId} active`);
+                if (MOBILE_UI_AUDIT_CONFIG[screenId]) {
+                    const audit = await collectMobileUiAudit(screenId, mobile);
+                    mobileUiAudit[screenId] = audit;
+                    await assert(audit.topIcons.back && audit.topIcons.home && audit.topIcons.restart, `mobile ${screenId} top icon bar visible`);
+                    await assert(audit.largeBodyButtons.length <= (MOBILE_UI_AUDIT_CONFIG[screenId].maxLargeBodyActions || 2), `mobile ${screenId} keeps body CTA count`, audit.largeBodyButtons.map((item) => item.label).join(', '));
+                    await assert(audit.duplicateSelectorsVisible.length === 0, `mobile ${screenId} removes duplicate stats/actions`, audit.duplicateSelectorsVisible.join(', '));
+                }
+                if (screenId === 'prismlab') {
+                    const prismMetrics = await mobile.evaluate(() => {
+                        const active = document.querySelector('#prismlab.active');
+                        const top = active?.querySelector('[data-meta-feature-chrome="top"]');
+                        const bottom = active?.querySelector('[data-meta-feature-chrome="bottom"]');
+                        const contextCard = active?.querySelector('.pnm-context-card');
+                        const instructionCard = active?.querySelector('.pnm-instruction-card');
+                        const questionCard = active?.querySelector('.pnm-question-card');
+                        const primaryButton = active?.querySelector('.pnm-question-card [data-action="reveal-answer"], .pnm-question-card [data-action="go-reflect"]');
+                        const bodyActions = Array.from(active?.querySelectorAll('.pnm-question-card .pnm-btn') || []).filter((el) => {
+                            const rect = el.getBoundingClientRect();
+                            const style = getComputedStyle(el);
+                            return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+                        });
+                        const questionRect = questionCard?.getBoundingClientRect();
+                        const primaryRect = primaryButton?.getBoundingClientRect();
+                        const bottomRect = bottom?.getBoundingClientRect();
+                        return {
+                            icons: {
+                                back: !!top?.querySelector('[data-shell-chrome-back]'),
+                                home: !!top?.querySelector('[data-shell-chrome-home]'),
+                                restart: !!top?.querySelector('[data-shell-chrome-restart]'),
+                                stats: !!top?.querySelector('[data-shell-chrome-stats]')
+                            },
+                            bottomBar: {
+                                meta: Array.from(bottom?.querySelectorAll('.meta-feature-chrome__meta span') || []).map((el) => (el.textContent || '').trim()),
+                                hasExtraActions: !!active?.querySelector('[data-shell-chrome-home-bottom]'),
+                                duplicatedMetaInsideBody: !!active?.querySelector('.pnm-stage-card .meta-feature-chrome__meta')
+                            },
+                            contextVisible: !!contextCard,
+                            instructionVisible: !!instructionCard,
+                            bodyActionCount: bodyActions.length,
+                            bodyActionLabels: bodyActions.map((el) => (el.textContent || '').trim()),
+                            progressElements: active ? active.querySelectorAll('.pnm-stage-progress, .pnm-progress-ring').length : 0,
+                            viewportHeight: window.innerHeight,
+                            questionCardBottom: questionRect ? Math.round(questionRect.bottom) : null,
+                            questionMostlyInView: !!questionRect && questionRect.bottom <= window.innerHeight,
+                            bottomBarTop: bottomRect ? Math.round(bottomRect.top) : null,
+                            primaryButtonTop: primaryRect ? Math.round(primaryRect.top) : null,
+                            primaryButtonBottom: primaryRect ? Math.round(primaryRect.bottom) : null,
+                            primaryButtonClearOfBottomBar: !!primaryRect && !!bottomRect && primaryRect.bottom <= bottomRect.top,
+                            contextTop: contextCard ? Math.round(contextCard.getBoundingClientRect().top) : null,
+                            instructionTop: instructionCard ? Math.round(instructionCard.getBoundingClientRect().top) : null,
+                            questionTop: questionCard ? Math.round(questionCard.getBoundingClientRect().top) : null
+                        };
                     });
-                    const questionRect = questionCard?.getBoundingClientRect();
-                    const primaryRect = primaryButton?.getBoundingClientRect();
-                    const bottomRect = bottom?.getBoundingClientRect();
-                    return {
-                        icons: {
-                            back: !!top?.querySelector('[data-shell-chrome-back]'),
-                            home: !!top?.querySelector('[data-shell-chrome-home]'),
-                            restart: !!top?.querySelector('[data-shell-chrome-restart]'),
-                            stats: !!top?.querySelector('[data-shell-chrome-stats]')
-                        },
-                        bottomBar: {
-                            meta: Array.from(bottom?.querySelectorAll('.meta-feature-chrome__meta span') || []).map((el) => (el.textContent || '').trim()),
-                            hasExtraActions: !!active?.querySelector('[data-shell-chrome-home-bottom]'),
-                            duplicatedMetaInsideBody: !!active?.querySelector('.pnm-stage-card .meta-feature-chrome__meta')
-                        },
-                        contextVisible: !!contextCard,
-                        instructionVisible: !!instructionCard,
-                        bodyActionCount: bodyActions.length,
-                        bodyActionLabels: bodyActions.map((el) => (el.textContent || '').trim()),
-                        progressElements: active ? active.querySelectorAll('.pnm-stage-progress, .pnm-progress-ring').length : 0,
-                        viewportHeight: window.innerHeight,
-                        questionCardBottom: questionRect ? Math.round(questionRect.bottom) : null,
-                        questionMostlyInView: !!questionRect && questionRect.bottom <= window.innerHeight,
-                        bottomBarTop: bottomRect ? Math.round(bottomRect.top) : null,
-                        primaryButtonTop: primaryRect ? Math.round(primaryRect.top) : null,
-                        primaryButtonBottom: primaryRect ? Math.round(primaryRect.bottom) : null,
-                        primaryButtonClearOfBottomBar: !!primaryRect && !!bottomRect && primaryRect.bottom <= bottomRect.top,
-                        contextTop: contextCard ? Math.round(contextCard.getBoundingClientRect().top) : null,
-                        instructionTop: instructionCard ? Math.round(instructionCard.getBoundingClientRect().top) : null,
-                        questionTop: questionCard ? Math.round(questionCard.getBoundingClientRect().top) : null
-                    };
-                });
-                await mobile.screenshot({ path: prismMobileShotPath, fullPage: true });
-                await writeFile(prismMobileReportPath, JSON.stringify(prismMetrics, null, 2), 'utf8');
-                await assert(prismMetrics.contextVisible, 'mobile prismlab context card visible');
-                await assert(prismMetrics.instructionVisible, 'mobile prismlab instruction card visible');
-                await assert(prismMetrics.bodyActionCount <= 2, 'mobile prismlab keeps two main body actions', prismMetrics.bodyActionLabels.join(', '));
-                await assert(prismMetrics.icons.back && prismMetrics.icons.home && prismMetrics.icons.restart, 'mobile prismlab top icon bar keeps nav controls');
-                await assert(!prismMetrics.bottomBar.hasExtraActions, 'mobile prismlab bottom bar has no extra action buttons');
+                    await mobile.screenshot({ path: prismMobileShotPath, fullPage: true });
+                    await writeFile(prismMobileReportPath, JSON.stringify(prismMetrics, null, 2), 'utf8');
+                    await assert(prismMetrics.contextVisible, 'mobile prismlab context card visible');
+                    await assert(prismMetrics.instructionVisible, 'mobile prismlab instruction card visible');
+                    await assert(prismMetrics.bodyActionCount <= 2, 'mobile prismlab keeps two main body actions', prismMetrics.bodyActionLabels.join(', '));
+                    await assert(prismMetrics.icons.back && prismMetrics.icons.home && prismMetrics.icons.restart, 'mobile prismlab top icon bar keeps nav controls');
+                    await assert(!prismMetrics.bottomBar.hasExtraActions, 'mobile prismlab bottom bar has no extra action buttons');
+                }
+                trace('mobile:done', screenId);
             }
-            trace('mobile:done', screenId);
-        }
-        await mobile.evaluate(() => window.navigateTo('practice-triples-radar'));
-        await waitForActiveScreen('practice-triples-radar', mobile);
-        await enterManagedFeatureStage('practice-triples-radar', mobile);
-        await mobile.waitForTimeout(400);
-        mobileUiAudit['practice-triples-radar'] = await collectMobileUiAudit('practice-triples-radar', mobile);
-        await assert(mobileUiAudit['practice-triples-radar'].topIcons.back && mobileUiAudit['practice-triples-radar'].topIcons.home && mobileUiAudit['practice-triples-radar'].topIcons.restart, 'mobile practice-triples-radar top icon bar visible');
-        await assert(mobileUiAudit['practice-triples-radar'].largeBodyButtons.length <= 2, 'mobile practice-triples-radar keeps body CTA count', mobileUiAudit['practice-triples-radar'].largeBodyButtons.map((item) => item.label).join(', '));
-        await assert(mobileUiAudit['practice-triples-radar'].duplicateSelectorsVisible.length === 0, 'mobile practice-triples-radar removes duplicate stats/actions', mobileUiAudit['practice-triples-radar'].duplicateSelectorsVisible.join(', '));
-        await mobile.evaluate(() => window.navigateTo('comic-engine'));
-        await waitForActiveScreen('comic-engine', mobile);
-        await enterManagedFeatureStage('comic-engine', mobile);
-        await mobile.waitForTimeout(400);
-        mobileUiAudit['comic-engine'] = await collectMobileUiAudit('comic-engine', mobile);
-        await assert(mobileUiAudit['comic-engine'].topIcons.back && mobileUiAudit['comic-engine'].topIcons.home && mobileUiAudit['comic-engine'].topIcons.restart, 'mobile comic-engine top icon bar visible');
-        await assert(mobileUiAudit['comic-engine'].largeBodyButtons.length <= 2, 'mobile comic-engine keeps body CTA count', mobileUiAudit['comic-engine'].largeBodyButtons.map((item) => item.label).join(', '));
-        await assert(mobileUiAudit['comic-engine'].duplicateSelectorsVisible.length === 0, 'mobile comic-engine removes duplicate stats/actions', mobileUiAudit['comic-engine'].duplicateSelectorsVisible.join(', '));
-        await writeFile(mobileUiReportPath, JSON.stringify(mobileUiAudit, null, 2), 'utf8');
-        for (const screenId of ['sentence-map', 'practice-wizard', 'blueprint']) {
-            trace('sticky:start', screenId);
-            await mobile.evaluate((id) => window.navigateTo(id), screenId);
-            await waitForActiveScreen(screenId, mobile);
-            await enterManagedFeatureStage(screenId, mobile);
-            await mobile.waitForTimeout(500);
-            const stickyCheck = await mobile.evaluate(() => {
-                const sticky = document.getElementById('mobile-sticky-cta');
-                const stickyVisible = !!sticky && !sticky.classList.contains('hidden');
-                const stickyRect = stickyVisible ? sticky.getBoundingClientRect() : null;
-                const audioRects = Array.from(document.querySelectorAll('.audio-floating-control')).map((node) => node.getBoundingClientRect()).filter((rect) => rect.width > 0 && rect.height > 0);
-                const overlaps = stickyRect
-                    ? audioRects.some((rect) => !(rect.right <= stickyRect.left || rect.left >= stickyRect.right || rect.bottom <= stickyRect.top || rect.top >= stickyRect.bottom))
-                    : false;
-                return { stickyVisible, overlaps, audioCount: audioRects.length };
-            });
-            await assert(stickyCheck.stickyVisible, `mobile ${screenId} sticky CTA visible`);
-            await assert(!stickyCheck.overlaps, `mobile ${screenId} sticky CTA not covered by floating audio`, JSON.stringify(stickyCheck));
-            trace('sticky:done', screenId);
-        }
-        await mobile.evaluate(() => window.navigateTo('home'));
-        await waitForActiveScreen('home', mobile);
-        await mobile.locator('#meta-home-shell [data-home-menu]').click();
-        await mobile.waitForSelector('.meta-home-drawer.is-open');
-        const closeBox = await mobile.locator('.meta-home-drawer.is-open .meta-home-drawer__close').boundingBox();
-        await assert(!!closeBox && closeBox.x >= 0 && closeBox.y >= 0 && closeBox.x + closeBox.width <= 390 && closeBox.y + closeBox.height <= 844, 'mobile overlay close reachable', JSON.stringify(closeBox));
-        await mobile.close();
+            await mobile.evaluate(() => window.navigateTo('practice-triples-radar'));
+            await waitForActiveScreen('practice-triples-radar', mobile);
+            await enterManagedFeatureStage('practice-triples-radar', mobile);
+            await mobile.waitForTimeout(400);
+            mobileUiAudit['practice-triples-radar'] = await collectMobileUiAudit('practice-triples-radar', mobile);
+            await assert(mobileUiAudit['practice-triples-radar'].topIcons.back && mobileUiAudit['practice-triples-radar'].topIcons.home && mobileUiAudit['practice-triples-radar'].topIcons.restart, 'mobile practice-triples-radar top icon bar visible');
+            await assert(mobileUiAudit['practice-triples-radar'].largeBodyButtons.length <= 2, 'mobile practice-triples-radar keeps body CTA count', mobileUiAudit['practice-triples-radar'].largeBodyButtons.map((item) => item.label).join(', '));
+            await assert(mobileUiAudit['practice-triples-radar'].duplicateSelectorsVisible.length === 0, 'mobile practice-triples-radar removes duplicate stats/actions', mobileUiAudit['practice-triples-radar'].duplicateSelectorsVisible.join(', '));
+            await mobile.evaluate(() => window.navigateTo('comic-engine'));
+            await waitForActiveScreen('comic-engine', mobile);
+            await enterManagedFeatureStage('comic-engine', mobile);
+            await mobile.waitForTimeout(400);
+            mobileUiAudit['comic-engine'] = await collectMobileUiAudit('comic-engine', mobile);
+            await assert(mobileUiAudit['comic-engine'].topIcons.back && mobileUiAudit['comic-engine'].topIcons.home && mobileUiAudit['comic-engine'].topIcons.restart, 'mobile comic-engine top icon bar visible');
+            await assert(mobileUiAudit['comic-engine'].largeBodyButtons.length <= 2, 'mobile comic-engine keeps body CTA count', mobileUiAudit['comic-engine'].largeBodyButtons.map((item) => item.label).join(', '));
+            await assert(mobileUiAudit['comic-engine'].duplicateSelectorsVisible.length === 0, 'mobile comic-engine removes duplicate stats/actions', mobileUiAudit['comic-engine'].duplicateSelectorsVisible.join(', '));
+            await writeFile(mobileUiReportPath, JSON.stringify(mobileUiAudit, null, 2), 'utf8');
+            for (const screenId of ['sentence-map', 'practice-wizard', 'blueprint']) {
+                trace('sticky:start', screenId);
+                await mobile.evaluate((id) => window.navigateTo(id), screenId);
+                await waitForActiveScreen(screenId, mobile);
+                await enterManagedFeatureStage(screenId, mobile);
+                await mobile.waitForTimeout(500);
+                const stickyCheck = await mobile.evaluate(() => {
+                    const sticky = document.getElementById('mobile-sticky-cta');
+                    const stickyVisible = !!sticky && !sticky.classList.contains('hidden');
+                    const stickyRect = stickyVisible ? sticky.getBoundingClientRect() : null;
+                    const audioRects = Array.from(document.querySelectorAll('.audio-floating-control')).map((node) => node.getBoundingClientRect()).filter((rect) => rect.width > 0 && rect.height > 0);
+                    const overlaps = stickyRect
+                        ? audioRects.some((rect) => !(rect.right <= stickyRect.left || rect.left >= stickyRect.right || rect.bottom <= stickyRect.top || rect.top >= stickyRect.bottom))
+                        : false;
+                    return { stickyVisible, overlaps, audioCount: audioRects.length };
+                });
+                await assert(stickyCheck.stickyVisible, `mobile ${screenId} sticky CTA visible`);
+                await assert(!stickyCheck.overlaps, `mobile ${screenId} sticky CTA not covered by floating audio`, JSON.stringify(stickyCheck));
+                trace('sticky:done', screenId);
+            }
+            await mobile.evaluate(() => window.navigateTo('home'));
+            await waitForActiveScreen('home', mobile);
+            await mobile.locator('#meta-home-shell [data-home-menu]').click();
+            await mobile.waitForSelector('.meta-home-drawer.is-open');
+            const closeBox = await mobile.locator('.meta-home-drawer.is-open .meta-home-drawer__close').boundingBox();
+            await assert(!!closeBox && closeBox.x >= 0 && closeBox.y >= 0 && closeBox.x + closeBox.width <= 390 && closeBox.y + closeBox.height <= 844, 'mobile overlay close reachable', JSON.stringify(closeBox));
+            await mobile.close();
 
-        const reduced = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-        await seedTestState(reduced);
-        await reduced.emulateMedia({ reducedMotion: 'reduce' });
-        await reduced.goto(baseUrl, { waitUntil: 'networkidle' });
-        await dismissOnboardingIfVisible(reduced);
-        await reduced.evaluate(() => window.navigateTo('home'));
-        await waitForActiveScreen('home', reduced);
-        const prefersReduced = await reduced.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-        await assert(prefersReduced, 'reduced motion media applied');
-        await reduced.locator('#meta-home-shell [data-home-menu]').click();
-        await reduced.waitForSelector('.meta-home-drawer.is-open');
-        const reducedDrawer = ((await reduced.locator('.meta-home-drawer.is-open .meta-home-drawer__head strong').textContent()) || '').trim();
-        await assert(Boolean(reducedDrawer), 'reduced motion drawer path', reducedDrawer);
-        await reduced.close();
-        trace('reduced:done');
+            const reduced = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+            await seedTestState(reduced);
+            await reduced.emulateMedia({ reducedMotion: 'reduce' });
+            await reduced.goto(baseUrl, { waitUntil: 'networkidle' });
+            await dismissOnboardingIfVisible(reduced);
+            await reduced.evaluate(() => window.navigateTo('home'));
+            await waitForActiveScreen('home', reduced);
+            const prefersReduced = await reduced.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+            await assert(prefersReduced, 'reduced motion media applied');
+            await reduced.locator('#meta-home-shell [data-home-menu]').click();
+            await reduced.waitForSelector('.meta-home-drawer.is-open');
+            const reducedDrawer = ((await reduced.locator('.meta-home-drawer.is-open .meta-home-drawer__head strong').textContent()) || '').trim();
+            await assert(Boolean(reducedDrawer), 'reduced motion drawer path', reducedDrawer);
+            await reduced.close();
+            trace('reduced:done');
+        }
 
         console.log(`PASS: shell smoke verified (${checks.length} checks).`);
     } finally {

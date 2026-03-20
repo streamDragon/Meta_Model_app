@@ -310,6 +310,15 @@
     const LEGACY_RUNTIME_ATTR = 'data-product-guidance-runtime-root';
     const ACTION_BOUND_PROP = '__productGuidanceBound';
     const RENDER_KEY_PROP = '__productGuidanceRenderKey';
+    const OBSERVED_ATTRS = Object.freeze(['data-screen']);
+    const RELEVANT_SURFACE_SELECTORS = Object.freeze(Array.from(new Set([
+        '[data-trainer-platform="1"][data-trainer-id]',
+        '.trainer-shell-nav',
+        '[data-product-guidance]',
+        `[${LEGACY_WELCOME_ATTR}]`,
+        `[${LEGACY_STATE_ATTR}="1"]`,
+        ...Object.keys(FEATURE_META).map((featureKey) => FEATURE_META[featureKey]?.containerSelector).filter(Boolean)
+    ])));
 
     function escapeHtml(value) {
         return String(value == null ? '' : value)
@@ -629,6 +638,30 @@
         });
     }
 
+    function nodeTouchesRelevantSurface(node) {
+        if (!(node instanceof Element)) return false;
+        return RELEVANT_SURFACE_SELECTORS.some((selector) => {
+            try {
+                if (node.matches(selector)) return true;
+                return !!node.querySelector(selector);
+            } catch (_error) {
+                return false;
+            }
+        });
+    }
+
+    function mutationsNeedApply(mutations) {
+        return Array.from(mutations || []).some((mutation) => {
+            if (!mutation) return false;
+            if (mutation.type === 'attributes') {
+                return nodeTouchesRelevantSurface(mutation.target);
+            }
+            if (mutation.type !== 'childList') return false;
+            return Array.from(mutation.addedNodes || []).some(nodeTouchesRelevantSurface)
+                || Array.from(mutation.removedNodes || []).some(nodeTouchesRelevantSurface);
+        });
+    }
+
     // ── Idempotent DOM write: skip innerHTML if content unchanged ─────
     function upsertGuidanceBlock(container, featureKey, html, className) {
         if (!container) return null;
@@ -658,12 +691,33 @@
         return block;
     }
 
+    function isManagedInlineContainer(container) {
+        if (!container || !container.closest) return false;
+        const section = container.closest('.tab-content');
+        if (!(section instanceof HTMLElement)) return false;
+        return section.classList.contains('is-meta-feature-shell-ready')
+            || String(section.dataset?.metaFeatureStage || '').trim() !== ''
+            || !!section.querySelector('.meta-feature-welcome-shell');
+    }
+
+    function removeInlineGuidanceBlock(container, featureKey) {
+        if (!container) return;
+        const block = container.querySelector(`[data-product-guidance="${featureKey}"]`);
+        if (block && typeof block.remove === 'function') {
+            block.remove();
+        }
+    }
+
     function enhanceInlineFeatures() {
         Object.keys(FEATURE_META).forEach((featureKey) => {
             const meta = FEATURE_META[featureKey];
             if (!meta || !meta.containerSelector) return;
             const container = document.querySelector(meta.containerSelector);
             if (!container) return;
+            if (isManagedInlineContainer(container)) {
+                removeInlineGuidanceBlock(container, featureKey);
+                return;
+            }
             const html = `${renderOrientation(meta, '', true)}${renderIntro(meta)}`;
             const block = upsertGuidanceBlock(container, featureKey, html, 'product-feature-guidance');
             bindInlineActions(block);
@@ -734,7 +788,7 @@
             childList: true,
             subtree: true,
             attributes: true,
-            attributeFilter: ['class', 'data-screen', 'hidden', 'open']
+            attributeFilter: OBSERVED_ATTRS
         });
     }
 
@@ -745,6 +799,7 @@
 
         // Set up observer with storm protection
         observer = new MutationObserver(function (mutations) {
+            if (!mutationsNeedApply(mutations)) return;
             // Mutation storm detection
             var now = Date.now();
             if (now - mutationWindowStart > 1000) {

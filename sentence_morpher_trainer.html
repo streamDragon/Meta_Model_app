@@ -46,8 +46,13 @@
       });
     })();
   </script>
+  <style>
+    body[data-product-guidance-screen="home"] > .container {
+      display: none !important;
+    }
+  </style>
 </head>
-<body>
+<body data-product-guidance-screen="home" class="product-guidance-screen-home">
   <div class="container">
     <header>
       <h1>Sentence Morpher</h1>
