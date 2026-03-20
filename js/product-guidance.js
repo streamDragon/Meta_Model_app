@@ -474,9 +474,17 @@
             block.className = 'product-feature-guidance product-feature-guidance--standalone';
             nav.insertAdjacentElement('afterend', block);
         }
-        const html = `${renderOrientation(meta, getStandaloneStateLabel(meta), false)}${renderIntro(meta)}`;
+        const stateLabel = getStandaloneStateLabel(meta);
+        const html = `${renderOrientation(meta, stateLabel, false)}${renderIntro(meta)}`;
         if (block.innerHTML !== html) {
             block.innerHTML = html;
+        }
+        // On standalone pages without dynamic state labels, stop observing after
+        // the block is inserted — the orientation content never changes, so
+        // continued observation only causes a mutation-storm loop.
+        if (!meta.stateLabels && observer) {
+            observer.disconnect();
+            observer = null;
         }
     }
 
