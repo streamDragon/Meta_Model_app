@@ -161,7 +161,8 @@
         selectedPrismId: '',
         screenHistory: [],
         toastMessage: '',
-        toastTimer: null
+        toastTimer: null,
+        previewedOptionId: ''
     };
     state.homeFilters = {
         domain: state.settings.defaultDomain,
@@ -2886,6 +2887,22 @@
         return target instanceof Element
             ? target.closest('button[data-scenario-action="pick-option"][data-option-id]')
             : null;
+    }
+
+    function supportsHoverPreview() {
+        return typeof window.matchMedia === 'function' && window.matchMedia('(hover: hover)').matches;
+    }
+
+    function setPreviewedOption(optionId) {
+        if (state.previewedOptionId === optionId) return;
+        state.previewedOptionId = optionId || '';
+        render();
+    }
+
+    function clearPreviewedOption() {
+        if (!state.previewedOptionId) return;
+        state.previewedOptionId = '';
+        render();
     }
 
     function handleMouseOver(event) {
