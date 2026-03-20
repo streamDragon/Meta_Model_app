@@ -7,6 +7,7 @@
     const STYLE_PATH = 'css/prism-necessity.css';
     const DATA_SOURCE = 'data/prism-necessity.json';
     const CATEGORY_SOURCE = 'data/prism-lab-categories.he.json';
+    const STANDALONE_PAGE = '/prism_lab_trainer.html';
 
     const CATEGORY_ID_MAP = Object.freeze({
         comparison: 'comparative_deletion',
@@ -139,6 +140,95 @@
         const version = String(global.__META_MODEL_ASSET_V__ || global.__PRISM_LAB_ASSET_V__ || '').trim();
         if (!version) return filePath;
         return `${filePath}${filePath.includes('?') ? '&' : '?'}v=${encodeURIComponent(version)}`;
+    }
+
+    function readInitialRouteState() {
+        try {
+            const url = new URL(global.location.href);
+            const parseInteger = (key) => {
+                const numeric = Number(url.searchParams.get(key));
+                return Number.isInteger(numeric) ? numeric : null;
+            };
+            return {
+                stage: normalizeText(url.searchParams.get('pnmStage')).toLowerCase(),
+                categoryId: normalizeText(url.searchParams.get('pnmCategory')),
+                sessionIndex: parseInteger('pnmSession'),
+                stepIndex: parseInteger('pnmStep'),
+                insightOpen: url.searchParams.get('pnmInsight') === '1'
+            };
+        } catch (_error) {
+            return null;
+        }
+    }
+
+    function copyBuildQueryParams(sourceUrl, targetUrl) {
+        ['v', 't'].forEach((key) => {
+            const value = sourceUrl.searchParams.get(key);
+            if (value) targetUrl.searchParams.set(key, value);
+        });
+    }
+
+    function buildStandaloneWindowUrl(state) {
+        try {
+            const currentUrl = new URL(global.location.href);
+            const targetUrl = new URL(STANDALONE_PAGE, currentUrl.origin);
+            copyBuildQueryParams(currentUrl, targetUrl);
+
+            const stage = state?.stage === 'towers' || state?.stage === 'select'
+                ? state.stage
+                : 'welcome';
+
+            if (stage !== 'welcome') targetUrl.searchParams.set('pnmStage', stage);
+            if (state?.selectedCategoryId) targetUrl.searchParams.set('pnmCategory', state.selectedCategoryId);
+            if (Number.isInteger(state?.sessionIndex) && state.sessionIndex > 0) {
+                targetUrl.searchParams.set('pnmSession', String(state.sessionIndex));
+            }
+            if (Number.isInteger(state?.stepIndex) && state.stepIndex > 0) {
+                targetUrl.searchParams.set('pnmStep', String(state.stepIndex));
+            }
+            if (state?.insightOpen) targetUrl.searchParams.set('pnmInsight', '1');
+
+            return targetUrl.toString();
+        } catch (_error) {
+            return STANDALONE_PAGE;
+        }
+    }
+
+    function buildStandaloneWindowFeatures() {
+        const screenRef = global.screen || {};
+        const availWidth = Number(screenRef.availWidth) || 1440;
+        const availHeight = Number(screenRef.availHeight) || 1020;
+        const availLeft = Number(screenRef.availLeft) || 0;
+        const availTop = Number(screenRef.availTop) || 0;
+        const width = Math.max(1120, Math.min(1480, availWidth - 56));
+        const height = Math.max(820, Math.min(1040, availHeight - 64));
+        const left = Math.max(availLeft, Math.round(availLeft + ((availWidth - width) / 2)));
+        const top = Math.max(availTop, Math.round(availTop + ((availHeight - height) / 2)));
+        return [
+            'popup=yes',
+            'resizable=yes',
+            'scrollbars=yes',
+            `width=${Math.round(width)}`,
+            `height=${Math.round(height)}`,
+            `left=${left}`,
+            `top=${top}`
+        ].join(',');
+    }
+
+    function openWindowedMode(state) {
+        const url = buildStandaloneWindowUrl(state);
+        if (typeof global.open === 'function') {
+            const opened = global.open(url, 'meta-model-logical-levels-map', buildStandaloneWindowFeatures());
+            if (opened) {
+                if (typeof opened.focus === 'function') opened.focus();
+                return true;
+            }
+        }
+        if (global.location && typeof global.location.assign === 'function') {
+            global.location.assign(url);
+            return true;
+        }
+        return false;
     }
 
     function ensureStylesheet() {
@@ -353,7 +443,8 @@
             stepIndex: 0,
             insightOpen: false,
             welcomeOverlay: '',
-            scrollToTop: false
+            scrollToTop: false,
+            initialRouteState: readInitialRouteState()
         };
     }
 
@@ -537,6 +628,39 @@
         return false;
     }
 
+    function applyInitialRouteState(state) {
+        const routeState = state.initialRouteState;
+        if (!routeState || !state.payload) return;
+
+        state.initialRouteState = null;
+
+        const requestedCategoryId = routeState.categoryId;
+        const hasRequestedCategory = !!requestedCategoryId && !!state.payload?.categoriesById?.[requestedCategoryId];
+
+        if (hasRequestedCategory) {
+            state.selectedCategoryId = requestedCategoryId;
+            const sessions = state.payload?.sessionsByCategory?.[requestedCategoryId] || [];
+            if (sessions.length && Number.isInteger(routeState.sessionIndex)) {
+                state.sessionIndex = wrapIndex(routeState.sessionIndex, sessions.length);
+            }
+            const activeSession = sessions[wrapIndex(state.sessionIndex, sessions.length)] || null;
+            const totalQuestions = activeSession?.questions?.length || 0;
+            if (Number.isInteger(routeState.stepIndex)) {
+                state.stepIndex = Math.max(0, Math.min(totalQuestions, routeState.stepIndex));
+            }
+        }
+
+        if (routeState.stage === 'select') {
+            state.stage = 'select';
+        } else if (routeState.stage === 'towers' && hasRequestedCategory) {
+            state.stage = 'towers';
+        }
+
+        if (routeState.insightOpen && hasRequestedCategory && isSessionComplete(state)) {
+            state.insightOpen = true;
+        }
+    }
+
     function registerController(state) {
         global.__metaFeatureControllers = global.__metaFeatureControllers || {};
         global.__metaFeatureControllers.prismlab = {
@@ -551,6 +675,28 @@
                 return handled;
             }
         };
+    }
+
+    function renderWindowedAction(state, className = 'pnm-btn pnm-btn--ghost') {
+        if (state.mode === 'standalone') return '';
+        return `<button type="button" class="${escapeHtml(className)}" data-action="open-windowed">פתח בחלון מותאם</button>`;
+    }
+
+    function renderWindowedAssist(state, copy) {
+        if (state.mode === 'standalone') return '';
+        return `
+            <article class="pnm-side-card pnm-side-card--soft pnm-window-panel">
+                <div class="pnm-stage-head">
+                    <div class="pnm-stage-head__copy">
+                        <span class="pnm-section-label">תצוגה מותאמת</span>
+                        <strong>${escapeHtml(copy)}</strong>
+                    </div>
+                    <div class="pnm-inline-actions">
+                        ${renderWindowedAction(state)}
+                    </div>
+                </div>
+            </article>
+        `;
     }
 
     function renderCategorySessionNavigator(state, category) {
@@ -771,6 +917,7 @@
                         <p class="pnm-copy">במקום להישאר רק ברמת הניסוח, אנחנו בונים כאן שתי עמודות של רמות לוגיות סביב אותו משפט, רואים איפה הקשרים בין A ל-B מחזיקים, ואיפה נפתח סדק שממנו אפשר להניע שינוי.</p>
                         <div class="pnm-welcome-actions">
                             <button type="button" class="pnm-btn pnm-btn--primary" data-action="go-select">בחירת הפרת מטה-מודל</button>
+                            ${renderWindowedAction(state)}
                             ${renderWelcomeOverlayButton('overview')}
                             ${renderWelcomeOverlayButton('method')}
                             ${renderWelcomeOverlayButton('audience')}
@@ -820,6 +967,7 @@
         return `
             <section class="pnm-view pnm-view--select">
                 ${renderStageRail(state)}
+                ${renderWindowedAssist(state, 'אם נוח יותר לעבוד בחלון נפרד, אפשר לפתוח את הכלי בגודל מומלץ לגלילה ותצוגה יציבה.')}
                 <article class="pnm-hero-card pnm-hero-card--compact">
                     <div class="pnm-stage-head">
                         <div class="pnm-stage-head__copy">
@@ -928,6 +1076,7 @@
             <section class="pnm-view pnm-view--towers">
                 ${renderStageRail(state)}
                 ${renderCategorySessionNavigator(state, category)}
+                ${renderWindowedAssist(state, 'אם התצוגה צפופה או שהחלון נמוך, אפשר לפתוח את המפה בחלון נפרד בגודל מומלץ ולהמשיך מאותה נקודה.')}
                 ${renderTowerConsole(state, session, category)}
                 ${renderBuilderMap(session, filledCount, {
                     activeOrderIndex: filledCount < session.questions.length ? filledCount : -1
@@ -1050,6 +1199,13 @@
                     : (callback) => global.setTimeout(callback, 16);
                 schedule(() => {
                     scroller.scrollTop = 0;
+                    if (typeof global.scrollTo === 'function') {
+                        try {
+                            global.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+                        } catch (_error) {
+                            global.scrollTo(0, 0);
+                        }
+                    }
                 });
             }
             state.scrollToTop = false;
@@ -1080,6 +1236,7 @@
                 try {
                     state.payload = await loadPayload();
                     state.loaded = true;
+                    applyInitialRouteState(state);
                 } catch (error) {
                     state.error = error?.message || 'Loading failed';
                 }
@@ -1105,6 +1262,7 @@
             if (action === 'step-back') handled = stepBack(state);
             if (action === 'open-help') handled = openWelcomeOverlay(state, normalizeText(actionNode.getAttribute('data-topic')));
             if (action === 'close-help') handled = closeWelcomeOverlay(state);
+            if (action === 'open-windowed') handled = openWindowedMode(state);
 
             if (handled) renderApp(state);
         };
@@ -1128,6 +1286,7 @@
         try {
             state.payload = await loadPayload();
             state.loaded = true;
+            applyInitialRouteState(state);
         } catch (error) {
             state.error = error?.message || 'Loading failed';
         }
