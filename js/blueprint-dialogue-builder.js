@@ -1,7 +1,7 @@
 ﻿(function () {
     const ROOT_ID = 'blueprint-builder-root';
-    const ROLE_LABELS = Object.freeze({ therapist: '׳׳˜׳₪׳/׳×', patient: '׳׳˜׳•׳₪׳/׳×', system: '׳”׳׳₪׳”' });
-    const STATUS_LABELS = Object.freeze({ locked: '׳ ׳¢׳•׳', available: '׳–׳׳™׳', partial: '׳—׳׳§׳™', complete: '׳׳׳' });
+    const ROLE_LABELS = Object.freeze({ therapist: 'מטפל/ת', patient: 'מטופל/ת', system: 'המפה' });
+    const STATUS_LABELS = Object.freeze({ locked: 'נעול', available: 'זמין', partial: 'חלקי', complete: 'מלא' });
 
     const STAGES = Object.freeze([
         { id: 'test1', label: 'TEST 1 | מה רוצים במקום?', subLabel: 'Clarify outcome', tone: 'cool', defaultOpen: true },
@@ -501,20 +501,20 @@
 
     function shorten(value, max = 100) {
         const text = clean(value);
-        return text.length <= max ? text : `${text.slice(0, max - 1).trim()}ג€¦`;
+        return text.length <= max ? text : `${text.slice(0, max - 1).trim()}…`;
     }
 
     function joinNatural(items) {
         const cleanItems = (items || []).map((item) => clean(item)).filter(Boolean);
         if (!cleanItems.length) return '';
         if (cleanItems.length === 1) return cleanItems[0];
-        if (cleanItems.length === 2) return `${cleanItems[0]} ׳•-${cleanItems[1]}`;
-        return `${cleanItems.slice(0, -1).join(', ')} ׳•-${cleanItems[cleanItems.length - 1]}`;
+        if (cleanItems.length === 2) return `${cleanItems[0]} ו-${cleanItems[1]}`;
+        return `${cleanItems.slice(0, -1).join(', ')} ו-${cleanItems[cleanItems.length - 1]}`;
     }
 
     function timebox(value) {
         const text = clean(value);
-        const match = text.match(/(\d+\s*(?:׳“׳§׳•׳×|׳“׳§׳”|׳©׳¢׳•׳×|׳©׳¢׳”|׳™׳׳™׳|׳™׳•׳))/);
+        const match = text.match(/(\d+\s*(?:דקות|דקה|שעות|שעה|ימים|יום))/);
         return match ? match[1] : text;
     }
 
@@ -591,8 +591,8 @@
             verbSeeds: [],
             seedLoaded: false,
             messages: [
-                msg('therapist', '׳”׳‘׳™׳׳• ׳׳›׳׳ ׳×׳׳•׳ ׳”, ׳׳©׳׳׳”, ׳”׳™׳׳ ׳¢׳•׳× ׳׳• ׳₪׳•׳¢׳ ׳¢׳׳•׳. ׳׳©׳ ׳ ׳‘׳ ׳” ׳׳”׳׳ ׳˜׳™׳₪׳•׳׳™ ׳¦׳¢׳“-׳¦׳¢׳“.', { tone: 'intro' }),
-                msg('system', '׳׳—׳¨׳™ ׳”׳׳©׳₪׳˜ ׳”׳’׳•׳׳׳™ ׳׳•׳—׳¦׳™׳ ׳¢׳ ׳¦׳•׳׳× ׳‘׳׳₪׳”. ׳›׳ ׳׳—׳™׳¦׳” ׳׳™׳™׳¦׳¨׳× ׳©׳׳׳” ׳‘׳¦׳³׳׳˜, ׳•׳›׳ ׳×׳©׳•׳‘׳” ׳ ׳©׳׳¨׳× ׳—׳–׳¨׳” ׳׳׳₪׳”.', { tone: 'info' })
+                msg('therapist', 'הביאו לכאן תלונה, משאלה, הימנעות או פועל עמום. משם נבנה מהלך טיפולי צעד-צעד.', { tone: 'intro' }),
+                msg('system', 'אחרי המשפט הגולמי לוחצים על צומת במפה. כל לחיצה מייצרת שאלה בצ׳אט, וכל תשובה נשמרת חזרה למפה.', { tone: 'info' })
             ]
         };
     }
@@ -660,12 +660,12 @@
     function stageLabel() {
         const raw = clean(state?.rawStatement);
         const completeness = completenessScore();
-        if (!raw) return '׳׳™׳¡׳•׳£ ׳׳©׳₪׳˜ ׳’׳•׳׳׳™';
-        if (completeness < 25) return '׳׳’׳“׳™׳¨׳™׳ ׳™׳¢׳“ ׳•׳₪׳¢׳•׳׳”';
-        if (completeness < 50) return '׳׳•׳¦׳׳™׳ ׳׳ ׳™׳¢ ׳•׳—׳¡׳׳™׳';
-        if (completeness < 75) return '׳‘׳•׳ ׳™׳ ׳—׳׳•׳₪׳•׳× ׳•׳×׳ ׳׳™׳';
-        if (completeness < 100) return '׳¡׳•׳’׳¨׳™׳ ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳•׳‘׳“׳™׳§׳× ׳¡׳™׳•׳';
-        return '׳׳₪׳× ׳₪׳¢׳•׳׳” ׳׳•׳›׳ ׳”';
+        if (!raw) return 'איסוף משפט גולמי';
+        if (completeness < 25) return 'מגדירים יעד ופעולה';
+        if (completeness < 50) return 'מוצאים מניע וחסמים';
+        if (completeness < 75) return 'בונים חלופות ותנאים';
+        if (completeness < 100) return 'סוגרים צעד ראשון ובדיקת סיום';
+        return 'מפת פעולה מוכנה';
     }
 
     function formattedLabels(ids) {
@@ -687,8 +687,8 @@
             penalty,
             wasEarly: penalty > 0,
             note: penalty > 0
-                ? `׳”׳©׳׳׳” "${node.label}" ׳ ׳©׳׳׳” ׳׳₪׳ ׳™ ׳©׳ ׳¡׳’׳¨׳• ${formattedLabels(misses)}. ׳–׳” ׳׳₪׳©׳¨׳™, ׳׳‘׳ ׳׳₪׳—׳™׳× ׳׳× ׳¦׳™׳•׳ ׳”׳¡׳“׳¨.`
-                : `׳‘׳—׳™׳¨׳” ׳˜׳•׳‘׳”: "${node.label}" ׳ ׳©׳׳׳” ׳‘׳–׳׳ ׳©׳׳§׳“׳ ׳׳”׳׳ ׳˜׳™׳₪׳•׳׳™ ׳™׳¦׳™׳‘.`
+                ? `השאלה "${node.label}" נשאלה לפני שנסגרו ${formattedLabels(misses)}. זה אפשרי, אבל מפחית את ציון הסדר.`
+                : `בחירה טובה: "${node.label}" נשאלה בזמן שמקדם מהלך טיפולי יציב.`
         };
         state.askedOrder.push(node.id);
         state.orderEvents[node.id] = event;
@@ -703,8 +703,8 @@
 
     function transformedOutcome(data) {
         if (clean(data.desiredOutcome)) return data.desiredOutcome;
-        if (clean(data.rawStatement)) return `׳‘׳׳§׳•׳ "${data.rawStatement}" ׳¢׳“׳™׳™׳ ׳¦׳¨׳™׳ ׳׳ ׳¡׳— ׳™׳¢׳“ ׳—׳™׳•׳‘׳™ ׳•׳‘׳¨׳•׳¨ ׳™׳•׳×׳¨.`;
-        return '׳”׳™׳¢׳“ ׳”׳—׳™׳•׳‘׳™ ׳¢׳•׳“ ׳׳ ׳ ׳•׳¡׳—.';
+        if (clean(data.rawStatement)) return `במקום "${data.rawStatement}" עדיין צריך לנסח יעד חיובי וברור יותר.`;
+        return 'היעד החיובי עוד לא נוסח.';
     }
 
     function commitment(data) {
@@ -719,23 +719,23 @@
 
     function therapistSummary(data) {
         const lines = [];
-        if (data.rawStatement) lines.push(`׳”׳׳©׳₪׳˜ ׳”׳’׳•׳׳׳™ ׳”׳•׳ "${data.rawStatement}".`);
-        if (data.desiredOutcome) lines.push(`׳”׳™׳¢׳“ ׳©׳ ׳‘׳ ׳” ׳”׳•׳ "${data.desiredOutcome}".`);
-        if (data.successSign) lines.push(`׳¡׳™׳׳ן ׳”׳”׳¦׳׳—׳”: ${data.successSign}.`);
-        if (data.positiveIntention) lines.push(`׳›׳•׳•׳ ׳” ׳—׳™׳•׳‘׳™׳× ׳©׳ ׳ ׳©׳ž׳¢ ׳׳×׳—׳™׳׳: ${data.positiveIntention}.`);
-        if (data.preservePositiveIntention) lines.push(`׳”׳¦׳¢׳ ׳׳©׳׳¨ ׳׳ª ׳”׳›׳•׳•׳ ׳” ׳‘׳×׳•׳¨׳ ׳‚׳׳׳×: ${data.preservePositiveIntention}.`);
-        if (data.visibleAction) lines.push(`׳₪׳¢׳•׳׳” ׳ ׳¨׳׳™׳×: ${data.visibleAction}.`);
-        if (data.emotionalDriver) lines.push(`׳ž׳ ׳™׳¢ ׳¨׳’׳©׳™: ${data.emotionalDriver}.`);
-        if (data.executionConditions) lines.push(`׳×׳ ׳׳™ ׳‘׳™׳¦׳•׳¢: ${data.executionConditions}.`);
-        if (data.obstacle) lines.push(`׳—׳¡׳ ׳’׳“׳•׳: ${data.obstacle}.`);
+        if (data.rawStatement) lines.push(`המשפט הגולמי הוא "${data.rawStatement}".`);
+        if (data.desiredOutcome) lines.push(`היעד שנבנה הוא "${data.desiredOutcome}".`);
+        if (data.successSign) lines.push(`סימן ההצלחה: ${data.successSign}.`);
+        if (data.positiveIntention) lines.push(`הכוונה החיובית של ההתנהגות הישנה: ${data.positiveIntention}.`);
+        if (data.preservePositiveIntention) lines.push(`כך נשמרת הכוונה בצורה בריאה: ${data.preservePositiveIntention}.`);
+        if (data.visibleAction) lines.push(`פעולה נראית: ${data.visibleAction}.`);
+        if (data.emotionalDriver) lines.push(`מניע רגשי: ${data.emotionalDriver}.`);
+        if (data.executionConditions) lines.push(`תנאי ביצוע: ${data.executionConditions}.`);
+        if (data.obstacle) lines.push(`חסם גדול: ${data.obstacle}.`);
         if (data.alternativePlan) lines.push(`Plan B: ${data.alternativePlan}.`);
-        if (data.clearCheck) lines.push(`׳‘׳”׳™׳¨׳•׳×: ${data.clearCheck}.`);
-        if (data.realisticCheck) lines.push(`׳¨׳™׳׳׳™׳•׳ª: ${data.realisticCheck}.`);
-        if (data.measurableCheck) lines.push(`׳ž׳“׳™׳“׳•׳ª: ${data.measurableCheck}.`);
-        if (data.firstStepImagery) lines.push(`׳“׳™׳ž׳•׳™ ׳¦׳¢׳“ ׳¨׳׳©׳•׳: ${data.firstStepImagery}.`);
-        if (data.firstStep) lines.push(`׳¦׳¢׳“ ׳¨׳׳©׳•׳: "${data.firstStep}".`);
-        if (data.finalWording) lines.push(`׳ ׳™׳¡׳•׳— ׳¡׳•׳£׳™: "${data.finalWording}".`);
-        return lines.join(' ') || '׳”׳׳₪׳” ׳¢׳“׳™׳™׳ ׳ ׳‘׳ ׳™׳× ׳׳×׳•׳ ׳”׳©׳™׳—׳”.';
+        if (data.clearCheck) lines.push(`בהירות: ${data.clearCheck}.`);
+        if (data.realisticCheck) lines.push(`ריאליות: ${data.realisticCheck}.`);
+        if (data.measurableCheck) lines.push(`מדידות: ${data.measurableCheck}.`);
+        if (data.firstStepImagery) lines.push(`דימוי צעד ראשון: ${data.firstStepImagery}.`);
+        if (data.firstStep) lines.push(`צעד ראשון: "${data.firstStep}".`);
+        if (data.finalWording) lines.push(`ניסוח סופי: "${data.finalWording}".`);
+        return lines.join(' ') || 'המפה עדיין נבנית מתוך השיחה.';
     }
 
     function guidedImagery(data) {
@@ -792,11 +792,11 @@
         const node = NODE_BY_ID[id];
         if (!node) return;
         if (!clean(state.rawStatement)) {
-            queue('system', '׳§׳•׳“׳ ׳©׳•׳׳¨׳™׳ ׳›׳׳ ׳׳× ׳”׳׳©׳₪׳˜ ׳”׳’׳•׳׳׳™, ׳•׳¨׳§ ׳׳—׳¨ ׳›׳ ׳”׳׳₪׳” ׳ ׳₪׳×׳—׳× ׳׳©׳׳׳•׳×.', { tone: 'warn' });
+            queue('system', 'קודם שומרים כאן את המשפט הגולמי, ורק אחר כך המפה נפתחת לשאלות.', { tone: 'warn' });
             return render();
         }
         if (!unlocked(node)) {
-            queue('system', `׳”׳¦׳•׳׳× "${node.label}" ׳ ׳₪׳×׳— ׳¨׳§ ׳׳—׳¨׳™ ${formattedLabels(node.hardPrerequisites)}.`, { tone: 'warn', nodeId: node.id });
+            queue('system', `הצומת "${node.label}" נפתח רק אחרי ${formattedLabels(node.hardPrerequisites)}.`, { tone: 'warn', nodeId: node.id });
             return render();
         }
         state.activeNodeId = node.id;
@@ -809,18 +809,18 @@
     function submit(text) {
         const value = clean(text);
         if (!value) {
-            queue('system', '׳›׳“׳™ ׳׳©׳׳•׳¨ ׳׳©׳”׳• ׳‘׳׳₪׳” ׳¦׳¨׳™׳ ׳×׳©׳•׳‘׳” ׳׳—׳× ׳‘׳¨׳•׳¨׳” ׳‘׳¦׳³׳׳˜.', { tone: 'warn' });
+            queue('system', 'כדי לשמור משהו במפה צריך תשובה אחת ברורה בצ׳אט.', { tone: 'warn' });
             return render();
         }
         if (!clean(state.rawStatement)) {
             state.rawStatement = value;
             queue('patient', value, { tone: 'statement' });
             const nextId = recommendedNextId();
-            if (nextId) queue('system', `׳”׳׳©׳₪׳˜ ׳ ׳©׳׳¨. ׳¢׳›׳©׳™׳• ׳׳—׳¦׳• ׳¢׳ "${NODE_BY_ID[nextId].label}" ׳›׳“׳™ ׳©׳”׳©׳׳׳” ׳”׳‘׳׳” ׳×׳¦׳ ׳׳”׳׳₪׳” ׳•׳׳ ׳׳˜׳•׳₪׳¡.`, { tone: 'info', nodeId: nextId });
+            if (nextId) queue('system', `המשפט נשמר. עכשיו לחצו על "${NODE_BY_ID[nextId].label}" כדי שהשאלה הבאה תצא מהמפה ולא מהטופס.`, { tone: 'info', nodeId: nextId });
             return render();
         }
         if (!state.activeNodeId) {
-            queue('system', '׳׳™׳ ׳›׳¨׳’׳¢ ׳©׳׳׳” ׳₪׳×׳•׳—׳”. ׳׳—׳¦׳• ׳¢׳ ׳¦׳•׳׳× ׳‘׳׳₪׳” ׳›׳“׳™ ׳׳™׳™׳¦׳¨ ׳׳× ׳”׳©׳׳׳” ׳”׳‘׳׳”.', { tone: 'warn' });
+            queue('system', 'אין כרגע שאלה פתוחה. לחצו על צומת במפה כדי לייצר את השאלה הבאה.', { tone: 'warn' });
             return render();
         }
         const node = NODE_BY_ID[state.activeNodeId];
@@ -839,21 +839,21 @@
         state.activeNodeId = '';
         queue('patient', value, { tone: 'response', nodeId: node.id });
         queue('system', result.status === 'complete'
-            ? `${node.label} ׳ ׳¡׳’׳¨/׳” ׳”׳™׳˜׳‘ ׳•׳ ׳›׳ ׳¡/׳” ׳׳׳₪׳”.`
-            : `׳ ׳׳¡׳£ ׳—׳•׳׳¨ ׳—׳׳§׳™ ׳¢׳ "${node.label}". ׳™׳© ׳›׳‘׳¨ ׳׳—׳™׳–׳”, ׳׳‘׳ ׳©׳•׳•׳” ׳׳—׳–׳•׳¨ ׳•׳׳“׳™׳™׳§.`, { tone: result.status === 'complete' ? 'success' : 'info', nodeId: node.id });
+            ? `${node.label} נסגר/ה היטב ונכנס/ה למפה.`
+            : `נאסף חומר חלקי על "${node.label}". יש כבר אחיזה, אבל שווה לחזור ולדייק.`, { tone: result.status === 'complete' ? 'success' : 'info', nodeId: node.id });
         const nextId = recommendedNextId();
-        if (nextId) queue('system', `׳”׳¦׳•׳׳× ׳”׳׳•׳׳׳¥ ׳”׳‘׳: "${NODE_BY_ID[nextId].label}".`, { tone: 'hint', nodeId: nextId });
+        if (nextId) queue('system', `הצומת המומלץ הבא: "${NODE_BY_ID[nextId].label}".`, { tone: 'hint', nodeId: nextId });
         render();
     }
 
     function lastOrderNote() {
-        if (!clean(state?.rawStatement)) return '׳”׳×׳—׳™׳׳• ׳‘׳׳©׳₪׳˜ ׳’׳•׳׳׳™ ׳׳—׳“. ׳׳—׳¨ ׳›׳ ׳¡׳“׳¨ ׳”׳©׳׳׳•׳× ׳™׳§׳‘׳ ׳׳©׳׳¢׳•׳× ׳˜׳™׳₪׳•׳׳™׳×.';
+        if (!clean(state?.rawStatement)) return 'התחילו במשפט גולמי אחד. אחר כך סדר השאלות יקבל משמעות טיפולית.';
         const lastId = state.askedOrder[state.askedOrder.length - 1];
         if (!lastId) {
             const nextId = recommendedNextId();
-            return nextId ? `׳¢׳“׳™׳™׳ ׳׳ ׳ ׳©׳׳׳” ׳©׳׳׳” ׳׳×׳•׳ ׳”׳׳₪׳”. ׳׳•׳׳׳¥ ׳׳”׳×׳—׳™׳ ׳‘-"${NODE_BY_ID[nextId].label}".` : '׳”׳¦׳׳×׳™׳ ׳₪׳×׳•׳—׳™׳ ׳׳‘׳—׳™׳¨׳”.';
+            return nextId ? `עדיין לא נשאלה שאלה מתוך המפה. מומלץ להתחיל ב-"${NODE_BY_ID[nextId].label}".` : 'הצמתים פתוחים לבחירה.';
         }
-        return state.orderEvents[lastId]?.note || '׳”׳׳₪׳” ׳׳׳©׳™׳›׳” ׳׳”׳×׳¢׳“׳›׳.';
+        return state.orderEvents[lastId]?.note || 'המפה ממשיכה להתעדכן.';
     }
 
     function nodeView(node) {
@@ -875,8 +875,8 @@
             quality: Math.round((current.score || 0) * 100),
             preview: current.text ? shorten(current.text) : (node.help || node.composerPlaceholder || node.label),
             orderLabel: orderEvent
-                ? (orderEvent.wasEarly ? '׳ ׳©׳׳ ׳׳•׳§׳“׳' : '׳ ׳©׳׳ ׳‘׳–׳׳ ׳˜׳•׳‘')
-                : (nextId === node.id ? '׳׳•׳׳׳¥ ׳¢׳›׳©׳™׳•' : `׳¡׳“׳¨ ${node.recommendedOrder}`),
+                ? (orderEvent.wasEarly ? 'נשאל מוקדם' : 'נשאל בזמן טוב')
+                : (nextId === node.id ? 'מומלץ עכשיו' : `סדר ${node.recommendedOrder}`),
             orderTone: orderEvent
                 ? (orderEvent.wasEarly ? 'warn' : 'success')
                 : (nextId === node.id ? 'info' : 'neutral')
@@ -924,12 +924,12 @@
                 ? 'כתבו כאן את המשפט הגולמי של המטופל/ת, או בחרו אחד מהשבבים המוצעים.'
                 : activeNode
                     ? activeNode.composerPlaceholder
-                    : '׳׳—׳¦׳• ׳¢׳ ׳¦׳•׳׳× ׳‘׳׳₪׳” ׳›׳“׳™ ׳׳™׳™׳¦׳¨ ׳׳× ׳”׳©׳׳׳” ׳”׳‘׳׳” ׳‘׳¦׳³׳׳˜.',
+                    : 'לחצו על צומת במפה כדי לייצר את השאלה הבאה בצ׳אט.',
             composerHint: !rawStatement
                 ? 'בחרו משפט גולמי והתחילו משם.'
                 : activeNode
-                    ? `׳”׳×׳©׳•׳‘׳” ׳©׳×׳™׳›׳×׳‘ ׳¢׳›׳©׳™׳• ׳×׳™׳©׳׳¨ ׳‘׳¦׳•׳׳× "${activeNode.label}".`
-                    : '׳›׳¨׳’׳¢ ׳׳™׳ ׳©׳׳׳” ׳₪׳×׳•׳—׳”. ׳”׳׳₪׳” ׳”׳™׳ ׳׳©׳˜׳— ׳”׳©׳׳™׳˜׳” ׳‘׳©׳™׳—׳”.',
+                    ? `התשובה שתיכתב עכשיו תישמר בצומת "${activeNode.label}".`
+                    : 'כרגע אין שאלה פתוחה. המפה היא משטח השליטה בשיחה.',
             lastOrderNote: lastOrderNote()
         };
     }
@@ -950,7 +950,7 @@
             <div class="blueprint-bubble-row is-${esc(entry.role)}">
                 <article class="blueprint-bubble blueprint-bubble--${esc(entry.role)}" data-tone="${esc(entry.tone || 'default')}">
                     <div class="blueprint-bubble-top">
-                        <span class="blueprint-bubble-role">${esc(ROLE_LABELS[entry.role] || '׳”׳׳₪׳”')}</span>
+                        <span class="blueprint-bubble-role">${esc(ROLE_LABELS[entry.role] || 'המפה')}</span>
                         ${nodeLabel ? `<span class="blueprint-bubble-node">${esc(nodeLabel)}</span>` : ''}
                     </div>
                     <p>${esc(entry.text)}</p>
@@ -978,7 +978,7 @@
                 <p class="blueprint-node-help">${esc(node.help)}</p>
                 <div class="blueprint-node-meta">
                     <span class="blueprint-node-chip" data-tone="${esc(node.orderTone)}">${esc(node.orderLabel)}</span>
-                    <span class="blueprint-node-chip" data-tone="${node.status === 'complete' ? 'success' : node.status === 'partial' ? 'info' : 'neutral'}">${esc(String(node.quality))}% ׳׳™׳“׳¢</span>
+                    <span class="blueprint-node-chip" data-tone="${node.status === 'complete' ? 'success' : node.status === 'partial' ? 'info' : 'neutral'}">${esc(String(node.quality))}% מידע</span>
                 </div>
                 <p class="blueprint-node-preview">${esc(node.preview)}</p>
             </button>
@@ -990,7 +990,7 @@
         return `
             <article class="blueprint-summary-card" data-tone="${esc(tone || 'default')}" data-empty="${text ? 'false' : 'true'}">
                 <span class="blueprint-summary-label">${esc(title)}</span>
-                <p class="blueprint-summary-value"${contentId ? ` id="${esc(contentId)}"` : ''}>${esc(text || '׳¢׳“׳™׳™׳ ׳׳ ׳ ׳‘׳ ׳”')}</p>
+                <p class="blueprint-summary-value"${contentId ? ` id="${esc(contentId)}"` : ''}>${esc(text || 'עדיין לא נבנה')}</p>
                 ${note ? `<p class="blueprint-summary-note">${esc(note)}</p>` : ''}
             </article>
         `;
@@ -1246,17 +1246,17 @@
     function startNow() {
         const data = snapshot();
         if (!data.firstStep) {
-            alert('׳›׳“׳™ ׳׳”׳×׳—׳™׳ ׳¢׳›׳©׳™׳• ׳¦׳¨׳™׳ ׳§׳•׳“׳ ׳׳¡׳’׳•׳¨ ׳¦׳¢׳“ ׳¨׳׳©׳•׳ ׳‘׳¨׳•׳¨ ׳‘׳׳₪׳”.');
+            alert('כדי להתחיל עכשיו צריך קודם לסגור צעד ראשון ברור במפה.');
             return false;
         }
-        alert(`׳׳×׳—׳™׳׳™׳ ׳¢׳›׳©׳™׳•.\n\n׳”׳¦׳¢׳“ ׳”׳¨׳׳©׳•׳ ׳©׳׳: ${data.firstStep}\n\n׳”׳—׳–׳™׳§׳• ׳׳× ׳”׳›׳™׳•׳•׳: ${data.desiredOutcome || data.transformedOutcome}`);
+        alert(`מתחילים עכשיו.\n\nהצעד הראשון שלך: ${data.firstStep}\n\nהחזיקו את הכיוון: ${data.desiredOutcome || data.transformedOutcome}`);
         return true;
     }
 
     function exportJson() {
         const data = snapshot();
         if (!data.rawStatement) {
-            alert('׳›׳“׳׳™ ׳׳”׳×׳—׳™׳ ׳׳׳©׳₪׳˜ ׳’׳•׳׳׳™ ׳׳—׳“ ׳׳₪׳ ׳™ ׳™׳™׳¦׳•׳.');
+            alert('כדאי להתחיל ממשפט גולמי אחד לפני ייצוא.');
             return false;
         }
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });

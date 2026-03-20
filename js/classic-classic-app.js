@@ -744,7 +744,7 @@
         } catch (error) {
             state.feedback = {
                 tone: 'danger',
-                text: '����� ���� ����� ������ ������. ��� ���.'
+                text: 'קרתה שגיאה בזמן בדיקת התשובה. נסו שוב.'
             };
             emitAlchemyFx('almost', { text: 'Retry' });
         } finally {

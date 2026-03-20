@@ -466,10 +466,10 @@
         var backBtn = nav.querySelector('[data-nav-action="back"]');
         var hasInternalBack = !!(controller && typeof controller.stepBack === 'function');
         var canRestart = !!(controller && typeof controller.restart === 'function');
-        var restartTitle = '׳”׳×׳—׳׳” ׳׳—׳“׳© ׳©׳ ׳”׳×׳¨׳’׳•׳ ׳”׳ ׳•׳›׳—׳™';
+        var restartTitle = 'התחלה מחדש של התרגול הנוכחי';
         var backTitle = hasInternalBack
-            ? '׳—׳–׳¨׳” ׳׳׳¡׳ ׳”׳§׳•׳“׳ ׳‘׳×׳•׳ ׳”׳×׳¨׳’׳•׳'
-            : '׳—׳–׳¨׳” ׳׳¢׳׳•׳“ ׳”׳§׳•׳“׳';
+            ? 'חזרה למסך הקודם בתוך התרגול'
+            : 'חזרה לעמוד הקודם';
 
         if (canRestart && typeof controller.canRestart === 'function') {
             try {

@@ -237,7 +237,7 @@
 
         const wrappedVariants = [];
         if (shortSelection) {
-            wrappedVariants.push(`כשאת/ה אומר/ת "${shortSelection}" ג€” ${firstBase}`);
+            wrappedVariants.push(`כשאת/ה אומר/ת "${shortSelection}" - ${firstBase}`);
             wrappedVariants.push(`בוא/י נדייק את "${shortSelection}": ${firstBase}`);
             wrappedVariants.push(`כדי להבין את "${shortSelection}" טוב יותר: ${firstBase}`);
         }
@@ -708,7 +708,7 @@
 
         return `
             <div class="prm-breen-5x3-wrap" aria-label="טבלת ברין קלאסית 5x3">
-                <div class="prm-breen-5x3-title">טבלת ברין הקלאסית (5ֳ—3) ג€” מפת עוגן</div>
+                <div class="prm-breen-5x3-title">טבלת ברין הקלאסית (5x3) - מפת עוגן</div>
                 <p class="prm-breen-5x3-note">זוהי מפת הייחוס הקבועה של קטגוריות המטה-מודל לתרגול ולניווט.</p>
                 <div class="prm-breen-5x3-grid">
                     ${rows.map((row) => `

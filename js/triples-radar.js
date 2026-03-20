@@ -1164,7 +1164,7 @@
         const value = normalizeSpaces(text);
         if (!value) return '';
         if (value.length <= maxLen) return value;
-        return `${value.slice(0, Math.max(0, maxLen - 1)).trim()}ג€¦`;
+        return `${value.slice(0, Math.max(0, maxLen - 3)).trim()}...`;
     }
 
     function buildPhoneQuestion(categoryId) {
@@ -1225,7 +1225,7 @@
         const anchorText = clipText(anchor?.text || current?.clientText || '', 80);
         const mirror = `שיקוף: "כש'${anchorText}' פוגש אותך, זה יכול להרגיש סופי וכבד."`;
         const gap = 'תובנת מטפל: "כרגע יש קפיצה מהאירוע למשמעות. נבדוק חלק אחד במקום את כל הסיפור יחד."';
-        const next = 'שאלת העדפה: "מה הכי נכון לך לבדוק עכשיו ג€” עובדה, משמעות, או תנאי?"';
+        const next = 'שאלת העדפה: "מה הכי נכון לך לבדוק עכשיו - עובדה, משמעות, או תנאי?"';
         return {
             bullets,
             mirror,
