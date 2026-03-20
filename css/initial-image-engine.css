@@ -472,6 +472,33 @@
     opacity: 0.8;
 }
 
+/* ─── ASK Button ───────────────────────────────── */
+.iids-ask-btn {
+    display: block;
+    width: 100%;
+    padding: 11px 16px;
+    border: none;
+    border-radius: 10px;
+    background: #1e293b;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s, transform 0.15s;
+    text-align: center;
+}
+
+.iids-ask-btn:hover {
+    background: #0f172a;
+    transform: scale(1.02);
+}
+
+.iids-ask-btn:active {
+    transform: scale(0.98);
+}
+
 /* ─── Completion Card ──────────────────────────── */
 .iids-completion {
     margin-top: 2px;
