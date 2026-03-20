@@ -125,7 +125,7 @@
     function shortenText(value, maxLength = 64) {
         const safe = normalizeText(value);
         if (!safe || safe.length <= maxLength) return safe;
-        return `${safe.slice(0, Math.max(0, maxLength - 1)).trim()}…`;
+        return `${safe.slice(0, Math.max(0, maxLength - 3)).trim()}...`;
     }
 
     function resolveAssetPath(filePath) {
@@ -167,13 +167,13 @@
     }
 
     function getSideDescriptor(side) {
-        return side === 'b' ? 'B · תוצאה / עצמי' : 'A · מקור / טריגר';
+        return side === 'b' ? 'B - תוצאה / עצמי' : 'A - מקור / טריגר';
     }
 
     function getSideTitle(session, side) {
         return side === 'b'
-            ? normalizeText(session?.sideBLabel) || 'צד תוצאה / עצמי'
-            : normalizeText(session?.sideALabel) || 'צד מקור / טריגר';
+            ? normalizeText(session?.sideBLabel) || 'צד B - תוצאה / עצמי'
+            : normalizeText(session?.sideALabel) || 'צד A - מקור / טריגר';
     }
 
     function levelOrderIndex(levelId) {
@@ -266,8 +266,8 @@
             categorySubtitle: categoryMeta.subtitle,
             categoryTag: categoryMeta.tag,
             categoryFocus: categoryMeta.focus,
-            sideALabel: normalizeText(rawSession?.sideA_label) || 'צד מקור / טריגר',
-            sideBLabel: normalizeText(rawSession?.sideB_label) || 'צד תוצאה / עצמי',
+            sideALabel: normalizeText(rawSession?.sideA_label) || 'צד A - מקור / טריגר',
+            sideBLabel: normalizeText(rawSession?.sideB_label) || 'צד B - תוצאה / עצמי',
             questions: orderedQuestions,
             rows: DISPLAY_LEVEL_ORDER.map((levelId) => rowsByLevel[levelId]),
             core: normalizeLevel(rawSession?.core),
@@ -352,6 +352,7 @@
             sessionIndex: 0,
             stepIndex: 0,
             insightOpen: false,
+            welcomeOverlay: '',
             scrollToTop: false
         };
     }
@@ -406,6 +407,7 @@
         state.sessionIndex = 0;
         state.stepIndex = 0;
         state.insightOpen = false;
+        state.welcomeOverlay = '';
         state.stage = 'towers';
         state.scrollToTop = true;
         return true;
@@ -432,6 +434,7 @@
     function goToSelect(state) {
         state.stage = 'select';
         state.insightOpen = false;
+        state.welcomeOverlay = '';
         state.scrollToTop = true;
         return true;
     }
@@ -440,6 +443,18 @@
         if (!state.selectedCategoryId || !getCategorySessions(state).length) return false;
         state.stage = 'towers';
         state.scrollToTop = true;
+        return true;
+    }
+
+    function openWelcomeOverlay(state, topicId) {
+        if (!WELCOME_TOPICS[topicId]) return false;
+        state.welcomeOverlay = topicId;
+        return true;
+    }
+
+    function closeWelcomeOverlay(state) {
+        if (!state.welcomeOverlay) return false;
+        state.welcomeOverlay = '';
         return true;
     }
 
@@ -464,6 +479,7 @@
         state.sessionIndex = 0;
         state.stepIndex = 0;
         state.insightOpen = false;
+        state.welcomeOverlay = '';
         state.scrollToTop = true;
         return true;
     }
@@ -480,8 +496,12 @@
         return true;
     }
 
-    function restartCurrentSession(state) {
-        return restartFeature(state);
+    function fillAll(state) {
+        const session = getSession(state);
+        if (!session) return false;
+        state.stepIndex = session.questions.length;
+        state.insightOpen = true;
+        return true;
     }
 
     function stepBack(state) {
@@ -506,6 +526,11 @@
         if (state.stage === 'select') {
             state.stage = 'welcome';
             state.scrollToTop = true;
+            return true;
+        }
+
+        if (state.stage === 'welcome' && state.welcomeOverlay) {
+            state.welcomeOverlay = '';
             return true;
         }
 
@@ -645,12 +670,12 @@
             <section class="${shellClassName}">
                 <div class="pnm-map-header-row">
                     <div class="pnm-tower-title">
-                        <span class="pnm-tower-title__kicker">A · מקור / טריגר</span>
+                        <span class="pnm-tower-title__kicker">A - מקור / טריגר</span>
                         <strong>${escapeHtml(session.sideALabel)}</strong>
                     </div>
                     <div class="pnm-map-axis">רמה</div>
                     <div class="pnm-tower-title">
-                        <span class="pnm-tower-title__kicker">B · תוצאה / עצמי</span>
+                        <span class="pnm-tower-title__kicker">B - תוצאה / עצמי</span>
                         <strong>${escapeHtml(session.sideBLabel)}</strong>
                     </div>
                 </div>
@@ -661,41 +686,117 @@
         `;
     }
 
+    function renderWelcomePreviewRow(levelId) {
+        const copy = WELCOME_PREVIEW_COPY[levelId] || { a: '', b: '' };
+        const className = [
+            'pnm-preview-row',
+            levelId === 'identity' ? 'is-core' : '',
+            levelId === 'capability' ? 'is-crack' : ''
+        ].filter(Boolean).join(' ');
+
+        return `
+            <div class="${className}">
+                <div class="pnm-preview-cell">${escapeHtml(copy.a)}</div>
+                <div class="pnm-preview-bridge">${escapeHtml(getLevelShortLabel(levelId))}</div>
+                <div class="pnm-preview-cell">${escapeHtml(copy.b)}</div>
+            </div>
+        `;
+    }
+
+    function renderWelcomePreview() {
+        return `
+            <section class="pnm-hero-visual" aria-hidden="true">
+                <div class="pnm-preview-sentence">משפט אחד. שתי עמודות. 12 תאים שמראים איך המבנה מחזיק.</div>
+                <div class="pnm-preview-map">
+                    ${DISPLAY_LEVEL_ORDER.map((levelId) => renderWelcomePreviewRow(levelId)).join('')}
+                </div>
+                <div class="pnm-chip-row pnm-chip-row--preview">
+                    <span class="pnm-chip">הגרעין המהותי</span>
+                    <span class="pnm-chip pnm-chip--teal">הסדק</span>
+                    <span class="pnm-chip pnm-chip--warm">פאנץ' ושינוי</span>
+                </div>
+            </section>
+        `;
+    }
+
+    function renderWelcomeOverlayButton(topicId) {
+        const topic = WELCOME_TOPICS[topicId];
+        if (!topic) return '';
+        return `
+            <button type="button" class="pnm-btn pnm-btn--ghost" data-action="open-help" data-topic="${escapeHtml(topicId)}">
+                ${escapeHtml(topic.button)}
+            </button>
+        `;
+    }
+
+    function renderWelcomeOverlay(state) {
+        if (!state.welcomeOverlay) return '';
+        const topic = WELCOME_TOPICS[state.welcomeOverlay];
+        if (!topic) return '';
+
+        return `
+            <div class="pnm-overlay-backdrop">
+                <div class="pnm-overlay-card" role="dialog" aria-modal="true" aria-label="${escapeHtml(topic.title)}">
+                    <div class="pnm-stage-head">
+                        <div class="pnm-stage-head__copy">
+                            <p class="pnm-kicker">${escapeHtml(topic.kicker)}</p>
+                            <h3 class="pnm-stage-title">${escapeHtml(topic.title)}</h3>
+                            <p class="pnm-copy">${escapeHtml(topic.intro)}</p>
+                        </div>
+                        <div class="pnm-inline-actions">
+                            <button type="button" class="pnm-mini-btn" data-action="close-help">סגור</button>
+                        </div>
+                    </div>
+                    <ul class="pnm-overlay-list">
+                        ${topic.bullets.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}
+                    </ul>
+                    <article class="pnm-summary-banner">
+                        <span class="pnm-section-label">לוקחים מכאן</span>
+                        <strong>${escapeHtml(topic.foot)}</strong>
+                    </article>
+                </div>
+            </div>
+        `;
+    }
+
     function renderWelcomeStage(state) {
         return `
             <section class="pnm-view pnm-view--welcome">
                 ${renderStageRail(state)}
-                <article class="pnm-hero-card">
-                    <div class="pnm-stage-head">
-                        <div class="pnm-stage-head__copy">
-                            <p class="pnm-kicker">רמות לוגיות + מטה מודל</p>
-                            <h1 class="pnm-stage-title">מפה משולבת של רמות לוגיות וקטגוריות מטה־מודל</h1>
-                            <p class="pnm-copy">כאן עובדים עם שני מגדלים של רמות לוגיות ועם הקשרים ביניהם. בוחרים הפרת מטה־מודל, בונים את מגדל A ואת מגדל B, ובסוף פותחים חלון תובנה עם הגרעין המהותי, הסדק והפאנץ'.</p>
+                <article class="pnm-hero-card pnm-hero-card--welcome">
+                    <div class="pnm-stage-head__copy">
+                        <p class="pnm-kicker">רמות לוגיות + מטה-מודל משולב</p>
+                        <h1 class="pnm-stage-title">מפת רמות לוגיות ומטה-מודל לעבודה טיפולית מדויקת</h1>
+                        <p class="pnm-copy">המסך הזה מיועד למטפלים, מנחים ולומדי NLP שרוצים לקחת כלים מוכרים אל מרחב רחב יותר של אינטליגנציה רגשית, הקשבה טיפולית ובחירת התערבות מדויקת.</p>
+                        <p class="pnm-copy">במקום להישאר רק ברמת הניסוח, אנחנו בונים כאן שתי עמודות של רמות לוגיות סביב אותו משפט, רואים איפה הקשרים בין A ל-B מחזיקים, ואיפה נפתח סדק שממנו אפשר להניע שינוי.</p>
+                        <div class="pnm-welcome-actions">
+                            <button type="button" class="pnm-btn pnm-btn--primary" data-action="go-select">בחירת הפרת מטה-מודל</button>
+                            ${renderWelcomeOverlayButton('overview')}
+                            ${renderWelcomeOverlayButton('method')}
+                            ${renderWelcomeOverlayButton('audience')}
                         </div>
                     </div>
-                    <div class="pnm-chip-row">
-                        <span class="pnm-chip">שלב 1 · קבלת פנים</span>
-                        <span class="pnm-chip">שלב 2 · בחירה</span>
-                        <span class="pnm-chip">שלב 3 · מגדלים</span>
-                    </div>
-                    <div class="pnm-action-row">
-                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="go-select">עוברים לבחירה</button>
-                    </div>
+                    ${renderWelcomePreview()}
                 </article>
                 <div class="pnm-welcome-grid">
-                    <article class="pnm-side-card">
-                        <span class="pnm-section-label">מה בוחנים כאן</span>
-                        <strong>איך קטגוריית מטה־מודל פועלת יחד עם הרמות הלוגיות ולא רק ברמת המשפט.</strong>
+                    <article class="pnm-side-card pnm-side-card--accent">
+                        <span class="pnm-section-label">שלושה שלבים</span>
+                        <strong>פתיחה, בחירת הפרת מטה-מודל, ואז בניית מגדלים עם חשיפה הדרגתית של התשובות.</strong>
                     </article>
                     <article class="pnm-side-card">
-                        <span class="pnm-section-label">איך בונים</span>
-                        <strong>שאלה אחת בכל פעם, תא אחד בכל פעם, עד ששני המגדלים שלמים ומחוברים.</strong>
+                        <span class="pnm-section-label">תוך כדי בנייה</span>
+                        <strong>כל תשובה ממלאת תא אחד בלבד, והחיבור בין שני הצדדים נעשה נראה לעין.</strong>
                     </article>
-                    <article class="pnm-side-card">
-                        <span class="pnm-section-label">מה נפתח בסוף</span>
-                        <strong>חלון שיחה עם הגרעין, הסדק, הפאנץ' ואמירת השינוי של המטופל/ת.</strong>
+                    <article class="pnm-side-card pnm-side-card--soft">
+                        <span class="pnm-section-label">בסיום</span>
+                        <strong>נפתח חלון תובנה עם הגרעין המהותי, הסדק, שאלת הפאנץ' ואמירת השינוי של המטופל או המטופלת.</strong>
                     </article>
                 </div>
+                <article class="pnm-panel pnm-panel--soft">
+                    <span class="pnm-section-label">למה זה חשוב</span>
+                    <p class="pnm-copy">כשמשפט נשמע מוחלט, קל לקפוץ ישר לאתגר או לפרשנות. המפה עוזרת קודם לראות את המבנה, להבין באיזו שכבה יושב הקושי, ורק אחר כך לבחור התערבות שמתאימה לרגע.</p>
+                </article>
+                ${renderWelcomeOverlay(state)}
             </section>
         `;
     }
@@ -722,20 +823,23 @@
                 <article class="pnm-hero-card pnm-hero-card--compact">
                     <div class="pnm-stage-head">
                         <div class="pnm-stage-head__copy">
-                            <p class="pnm-kicker">בחירה</p>
-                            <h2 class="pnm-stage-title">בחר מהי הפרת המטה־מודל שאתה רוצה לחקור כיום</h2>
-                            <p class="pnm-copy">פה תוכל לבחור איזה שילוב מרתק אתה רוצה לבחון, לשפר וללמוד טוב יותר: קטגוריית מטה־מודל שפועלת יחד עם הרמות הלוגיות.</p>
+                            <p class="pnm-kicker">בחירת הפרת מטה-מודל</p>
+                            <h2 class="pnm-stage-title">בחרו איזו הפרת מטה-מודל תרצו לחקור היום</h2>
+                            <p class="pnm-copy">כל בחירה פותחת מקרים שבהם אותה הפרה פועלת יחד עם הרמות הלוגיות, מהסביבה ועד למשמעות. מכאן עוברים ישר למגדלים ובונים את המפה צעד אחר צעד.</p>
+                        </div>
+                        <div class="pnm-inline-actions">
+                            <button type="button" class="pnm-mini-btn" data-action="go-welcome">חזרה לפתיחה</button>
                         </div>
                     </div>
                 </article>
                 <div class="pnm-select-intro">
                     <article class="pnm-side-card">
-                        <span class="pnm-section-label">הקשר בין השכבות</span>
-                        <strong>אותה הפרת מטה־מודל נראית אחרת לגמרי כשהיא נשענת על סביבה, התנהגות, זהות או משמעות.</strong>
+                        <span class="pnm-section-label">מה בוחרים כאן</span>
+                        <strong>קטגוריית מטה-מודל אחת שממנה נתחיל לראות איך אותו דפוס נשען על שכבות שונות של החוויה.</strong>
                     </article>
                     <article class="pnm-side-card">
-                        <span class="pnm-section-label">מכאן ממשיכים</span>
-                        <strong>בוחרים קטגוריה, עוברים למגדלים, חושפים תשובות, ובסוף פותחים חלון תובנה.</strong>
+                        <span class="pnm-section-label">מה קורה אחר כך</span>
+                        <strong>המשפט מופיע בראש המסך, השאלות נחשפות אחת-אחת, ושני המגדלים נבנים עד חלון התובנה.</strong>
                     </article>
                 </div>
                 <div class="pnm-category-grid">
@@ -745,63 +849,31 @@
         `;
     }
 
-    function renderActiveQuestionCard(state, session) {
+    function renderTowerConsole(state, session, category) {
         const question = getActiveQuestion(state, session);
-        if (!question) {
-            return `
-                <article class="pnm-active-card pnm-active-card--complete">
-                    <div class="pnm-question-meta">
-                        <span class="pnm-chip">${session.questions.length}/${session.questions.length}</span>
-                    </div>
-                    <h3>המפה הושלמה.</h3>
-                    <p class="pnm-copy">המגדלים הושלמו. עכשיו אפשר לפתוח את חלון התובנה עם הגרעין, הסדק והפאנץ'.</p>
-                    <div class="pnm-action-row">
-                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="open-insight">פתח חלון תובנה</button>
-                        <button type="button" class="pnm-btn pnm-btn--ghost" data-action="step-back">צעד אחורה</button>
-                    </div>
-                </article>
-            `;
-        }
-
-        return `
-            <article class="pnm-active-card">
-                <div class="pnm-question-meta">
-                    <span class="pnm-chip">שאלה ${question.orderIndex + 1}/${session.questions.length}</span>
-                    <span class="pnm-chip">${escapeHtml(getLevelLabel(question.levelId))}</span>
-                    <span class="pnm-chip">${escapeHtml(getSideDescriptor(question.side))}</span>
-                </div>
-                <strong class="pnm-question-side">${escapeHtml(getSideTitle(session, question.side))}</strong>
-                <h3>${escapeHtml(question.question)}</h3>
-                <p class="pnm-copy">בלחיצה חושפים את התשובה, ממלאים תא אחד במגדל, ומחזקים את הקשר בין הצדדים.</p>
-                <div class="pnm-action-row">
-                    <button type="button" class="pnm-btn pnm-btn--primary" data-action="fill-active">חשוף תשובה</button>
-                    ${getFilledCount(state, session) > 0 ? '<button type="button" class="pnm-btn pnm-btn--ghost" data-action="step-back">צעד אחורה</button>' : ''}
-                </div>
-            </article>
-        `;
-    }
-
-    function renderTowersStage(state, session, category) {
         const filledCount = getFilledCount(state, session);
         const progress = session.questions.length
             ? Math.round((filledCount / session.questions.length) * 100)
             : 0;
 
-        return `
-            <section class="pnm-view pnm-view--towers">
-                ${renderStageRail(state)}
-                ${renderCategorySessionNavigator(state, category)}
-                <article class="pnm-hero-card pnm-hero-card--compact">
+        if (!question) {
+            return `
+                <article class="pnm-active-card pnm-active-card--sticky pnm-active-card--complete">
                     <div class="pnm-stage-head">
                         <div class="pnm-stage-head__copy">
-                            <p class="pnm-kicker">${escapeHtml(category?.label || 'מגדלים')}</p>
+                            <p class="pnm-kicker">${escapeHtml(category?.label || session.categoryLabel)}</p>
                             <h2 class="pnm-stage-title">"${escapeHtml(session.sentence)}"</h2>
-                            <p class="pnm-copy">זהו דף המגדלים: חושפים תשובות, ממלאים את שני המגדלים, ורואים איך הקשרים בין הרמות הלוגיות יוצרים את התנועה בין A ל־B.</p>
+                            <p class="pnm-copy">המפה הושלמה. עכשיו אפשר לפתוח את חלון התובנה ולקרוא את הגרעין, הסדק והפאנץ' מתוך המבנה שנבנה.</p>
                         </div>
                         <div class="pnm-inline-actions">
-                            <span class="pnm-chip">${filledCount}/${session.questions.length} תאים</span>
-                            <button type="button" class="pnm-mini-btn" data-action="go-select">חזרה לבחירה</button>
+                            <span class="pnm-chip">${session.questions.length}/${session.questions.length} תאים</span>
+                            <span class="pnm-chip pnm-chip--warm">המפה מלאה</span>
                         </div>
+                    </div>
+                    <div class="pnm-console-actions">
+                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="open-insight">פתח חלון תובנה</button>
+                        <button type="button" class="pnm-btn pnm-btn--ghost" data-action="reset-towers">בנה מחדש</button>
+                        <button type="button" class="pnm-btn pnm-btn--ghost" data-action="go-select">חזרה לבחירה</button>
                     </div>
                     <div class="pnm-progress">
                         <div class="pnm-progress__track">
@@ -809,10 +881,61 @@
                         </div>
                     </div>
                 </article>
+            `;
+        }
+
+        return `
+            <article class="pnm-active-card pnm-active-card--sticky">
+                <div class="pnm-stage-head">
+                    <div class="pnm-stage-head__copy">
+                        <p class="pnm-kicker">${escapeHtml(category?.label || session.categoryLabel)} - בניית המפה</p>
+                        <h2 class="pnm-stage-title">"${escapeHtml(session.sentence)}"</h2>
+                        <p class="pnm-copy">כאן בונים את המפה בהדרגה. בכל רגע מופיעה שאלה אחת בלבד, והתשובה שלה ממלאת תא אחד במגדלים ומחזקת את הקשר בין שני הצדדים.</p>
+                    </div>
+                    <div class="pnm-inline-actions">
+                        <span class="pnm-chip">${filledCount}/${session.questions.length} תאים מולאו</span>
+                        <span class="pnm-chip">${escapeHtml(category?.label || session.categoryLabel)}</span>
+                    </div>
+                </div>
+                <div class="pnm-question-callout">
+                    <div class="pnm-question-meta">
+                        <span class="pnm-chip">שאלה ${question.orderIndex + 1}/${session.questions.length}</span>
+                        <span class="pnm-chip">${escapeHtml(getLevelLabel(question.levelId))}</span>
+                        <span class="pnm-chip">${escapeHtml(getSideDescriptor(question.side))}</span>
+                    </div>
+                    <strong class="pnm-question-side">${escapeHtml(getSideTitle(session, question.side))}</strong>
+                    <h3>${escapeHtml(question.question)}</h3>
+                    <p class="pnm-copy">לחיצה על חשיפת התשובה תמלא את התא הבא. אם צריך לראות את התמונה המלאה בבת אחת, אפשר למלא את כל המפה בלחיצה אחת.</p>
+                </div>
+                <div class="pnm-console-actions">
+                    <button type="button" class="pnm-btn pnm-btn--primary" data-action="fill-active">חשוף תשובה</button>
+                    <button type="button" class="pnm-btn pnm-btn--warm" data-action="fill-all">מלא את כל המפה</button>
+                    ${filledCount > 0 ? '<button type="button" class="pnm-btn pnm-btn--ghost" data-action="step-back">צעד אחורה</button>' : ''}
+                    <button type="button" class="pnm-btn pnm-btn--ghost" data-action="go-select">חזרה לבחירה</button>
+                </div>
+                <div class="pnm-progress">
+                    <div class="pnm-progress__track">
+                        <span style="width:${progress}%"></span>
+                    </div>
+                </div>
+            </article>
+        `;
+    }
+
+    function renderTowersStage(state, session, category) {
+        const filledCount = getFilledCount(state, session);
+        return `
+            <section class="pnm-view pnm-view--towers">
+                ${renderStageRail(state)}
+                ${renderCategorySessionNavigator(state, category)}
+                ${renderTowerConsole(state, session, category)}
                 ${renderBuilderMap(session, filledCount, {
                     activeOrderIndex: filledCount < session.questions.length ? filledCount : -1
                 })}
-                ${renderActiveQuestionCard(state, session)}
+                <article class="pnm-side-card pnm-side-card--soft">
+                    <span class="pnm-section-label">מה רואים כאן</span>
+                    <strong>A מציג את צד המקור או הטריגר, B מציג את צד התוצאה או תחושת העצמי, והחיבור ביניהם מספר איפה המבנה מחזיק חזק ואיפה נפתח פתח לתנועה.</strong>
+                </article>
             </section>
         `;
     }
@@ -821,9 +944,9 @@
         const coreLabel = getLevelLabel(session.core);
         const crackLabel = getLevelLabel(session.crack);
         if (session.core === session.crack) {
-            return `הליבה והסדק יושבים על ${coreLabel}.`;
+            return `הגרעין והסדק יושבים שניהם על רמת ${coreLabel}, ולכן שם כדאי להמשיך להעמיק.`;
         }
-        return `הליבה נשענת על ${coreLabel}, והסדק שדרכו מתחילה התנועה נמצא ב-${crackLabel}.`;
+        return `הגרעין נשען על רמת ${coreLabel}, אבל פתח העבודה נחשף דרך רמת ${crackLabel}. משם אפשר לבחור את הצעד הבא.`;
     }
 
     function renderReflectCard(label, body, modifier = '') {
@@ -843,8 +966,8 @@
                     <div class="pnm-stage-head">
                         <div class="pnm-stage-head__copy">
                             <p class="pnm-kicker">חלון תובנה</p>
-                            <h3 class="pnm-stage-title">הגרעין, הסדק והפאנץ'</h3>
-                            <p class="pnm-copy">אחרי שהמגדלים נבנו, נפתחת כאן שיחה קצרה שמזקקת את מה שנחשף במפה.</p>
+                            <h3 class="pnm-stage-title">הגרעין המהותי, הסדק והפאנץ'</h3>
+                            <p class="pnm-copy">אחרי שהמגדלים הושלמו, אפשר לקרוא את המבנה כולו, לראות היכן נמצא הגרעין, איפה נפתח הסדק, ומה כבר מתחיל להשתנות אצל המטופל או המטופלת.</p>
                         </div>
                         <div class="pnm-inline-actions">
                             <button type="button" class="pnm-mini-btn" data-action="close-insight">סגור</button>
@@ -860,18 +983,19 @@
                             <strong>${escapeHtml(getLevelLabel(session.crack))}</strong>
                         </article>
                     </div>
+                    ${renderBuilderMap(session, session.questions.length, { reflectMode: true })}
                     <div class="pnm-reflect-grid">
-                        ${renderReflectCard('מטפל/ת · הגרעין', session.reflectCore)}
-                        ${renderReflectCard('מטפל/ת · הסדק', session.reflectCrack)}
-                        ${renderReflectCard('הפאנץ׳', session.punchQuestion, 'pnm-reflect-card--question')}
-                        ${renderReflectCard('מטופל/ת · מה השתנה', session.punchAnswer, 'pnm-reflect-card--answer')}
+                        ${renderReflectCard('מטפל/ת - הגרעין המהותי', session.reflectCore)}
+                        ${renderReflectCard('מטפל/ת - הסדק', session.reflectCrack)}
+                        ${renderReflectCard('שאלת הפאנץ\'', session.punchQuestion, 'pnm-reflect-card--question')}
+                        ${renderReflectCard('מטופל/ת - מה השתנה', session.punchAnswer, 'pnm-reflect-card--answer')}
                     </div>
                     <article class="pnm-summary-banner">
                         <span class="pnm-section-label">כיוון להמשך</span>
                         <strong>${escapeHtml(buildFinalSummary(session))}</strong>
                     </article>
                     <div class="pnm-action-row">
-                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="reset-towers">בונים מחדש</button>
+                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="reset-towers">בנה מחדש</button>
                         <button type="button" class="pnm-btn pnm-btn--ghost" data-action="go-select">חזרה לבחירה</button>
                     </div>
                 </div>
@@ -921,7 +1045,10 @@
         if (state.scrollToTop) {
             const scroller = state.root.querySelector('.pnm-view');
             if (scroller) {
-                global.requestAnimationFrame(() => {
+                const schedule = typeof global.requestAnimationFrame === 'function'
+                    ? global.requestAnimationFrame.bind(global)
+                    : (callback) => global.setTimeout(callback, 16);
+                schedule(() => {
                     scroller.scrollTop = 0;
                 });
             }
@@ -931,6 +1058,16 @@
 
     function bindEvents(state) {
         state.root.onclick = async (event) => {
+            if (event.target.classList.contains('pnm-insight-backdrop')) {
+                if (closeInsight(state)) renderApp(state);
+                return;
+            }
+
+            if (event.target.classList.contains('pnm-overlay-backdrop')) {
+                if (closeWelcomeOverlay(state)) renderApp(state);
+                return;
+            }
+
             const actionNode = event.target.closest('[data-action]');
             if (!actionNode) return;
 
@@ -963,9 +1100,11 @@
             if (action === 'open-insight') handled = isSessionComplete(state) ? (state.insightOpen = true, true) : false;
             if (action === 'close-insight') handled = closeInsight(state);
             if (action === 'fill-active') handled = advanceBuild(state);
-            if (action === 'restart-session') handled = restartCurrentSession(state);
+            if (action === 'fill-all') handled = fillAll(state);
             if (action === 'reset-towers') handled = resetCurrentTowers(state);
             if (action === 'step-back') handled = stepBack(state);
+            if (action === 'open-help') handled = openWelcomeOverlay(state, normalizeText(actionNode.getAttribute('data-topic')));
+            if (action === 'close-help') handled = closeWelcomeOverlay(state);
 
             if (handled) renderApp(state);
         };
