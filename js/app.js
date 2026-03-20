@@ -3431,6 +3431,7 @@ function buildFeatureMapOverlayContent() {
     const clone = featureMapBody.cloneNode(true);
     stripIdsFromElementTree(clone);
     clone.classList.add('feature-map-overlay-clone');
+    clone.setAttribute('data-nav-fallback-ignore', 'true');
     clone.querySelector('.feature-map-menu-box')?.remove();
 
     const overlayIntro = clone.querySelector('.feature-map-intro');
@@ -3464,23 +3465,6 @@ function buildFeatureMapOverlayContent() {
         }, 70);
     };
 
-    const findLiveNavNode = (navKey = '') => {
-        const safeNavKey = String(navKey || '').trim();
-        if (!safeNavKey) return null;
-        return Array.from(featureMap.querySelectorAll('[data-nav-key]')).find((node) => {
-            return String(node.getAttribute('data-nav-key') || '').trim() === safeNavKey;
-        }) || null;
-    };
-
-    const findLiveHrefNode = (href = '') => {
-        const safeHref = String(href || '').trim();
-        if (!safeHref) return null;
-        return Array.from(featureMap.querySelectorAll('a[data-versioned-href], a[href]')).find((node) => {
-            const nodeHref = String(node.getAttribute('data-versioned-href') || node.getAttribute('href') || '').trim();
-            return nodeHref === safeHref;
-        }) || null;
-    };
-
     clone.querySelectorAll('[data-global-feature-menu-select]').forEach((selectNode) => {
         selectNode.addEventListener('change', (event) => {
             const sourceKey = String(event?.target?.getAttribute?.('data-global-feature-menu-select') || '').trim();
@@ -3504,13 +3488,14 @@ function buildFeatureMapOverlayContent() {
             if (!navKey) return;
 
             closeOverlayThen(() => {
-                const liveNode = findLiveNavNode(navKey);
+                if (typeof window.navigateByNavKey === 'function') {
+                    if (window.navigateByNavKey(navKey, { versioned: true, featureEntry: 'welcome' }) !== false) return;
+                }
+                const liveNode = Array.from(featureMap.querySelectorAll('[data-nav-key]')).find((node) => {
+                    return String(node.getAttribute('data-nav-key') || '').trim() === navKey;
+                });
                 if (liveNode instanceof HTMLElement) {
                     liveNode.click();
-                    return;
-                }
-                if (typeof window.navigateByNavKey === 'function') {
-                    window.navigateByNavKey(navKey, { versioned: true, featureEntry: 'welcome' });
                 }
             }, 'feature-map-menu-nav');
         });
@@ -3523,12 +3508,6 @@ function buildFeatureMapOverlayContent() {
             if (!targetHref) return;
 
             closeOverlayThen(() => {
-                const liveNode = findLiveHrefNode(targetHref);
-                if (liveNode instanceof HTMLElement) {
-                    liveNode.click();
-                    return;
-                }
-
                 const navKey = typeof window.getMetaModelNavKeyByPath === 'function'
                     ? String(window.getMetaModelNavKeyByPath(targetHref) || '').trim()
                     : '';
@@ -5749,6 +5728,7 @@ function initializeMetaModelApp() {
 
         document.addEventListener('click', (event) => {
             if (!event.target || !(event.target instanceof Element)) return;
+            if (event.target.closest('[data-nav-fallback-ignore="true"]')) return;
             const navEl = event.target.closest('[data-nav-key]');
             if (navEl) {
                 const navKey = String(navEl.getAttribute('data-nav-key') || '').trim();
@@ -23878,7 +23858,6 @@ async function setupConnectedBubblesTrainer() {
     await loadCases();
     startCase(0, 'initial');
 }
-
 
 
 

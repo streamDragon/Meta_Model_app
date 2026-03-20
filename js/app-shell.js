@@ -1325,6 +1325,7 @@
             const clone = featureMapBody.cloneNode(true);
             stripIdsFromCloneTree(clone);
             clone.classList.add('home-shell-menu-clone');
+            clone.setAttribute('data-nav-fallback-ignore', 'true');
             clone.addEventListener('click', (event) => {
                 const trigger = event.target?.closest?.('a, button');
                 if (!trigger) return;

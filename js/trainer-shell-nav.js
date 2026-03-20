@@ -628,6 +628,13 @@
             node.dataset.trainerShellSuppressedHelp = '1';
             node.hidden = true;
         });
+        var helpNodes = scope.querySelectorAll ? scope.querySelectorAll('[data-trainer-help-content]') : [];
+        Array.prototype.forEach.call(helpNodes, function (node) {
+            if (!node || node.dataset.trainerShellSuppressedHelp === '1') return;
+            if (node.closest && node.closest('.trainer-shell-help-overlay')) return;
+            node.dataset.trainerShellSuppressedHelp = '1';
+            node.hidden = true;
+        });
     }
 
     var trainerHelpObserver = null;
@@ -666,6 +673,7 @@
             '[class*="help-box"]',
             '[class*="guide-panel"]',
             '[class*="instruction"]',
+            '[data-trainer-help-content]',
             'details[class*="theory"]',
             'details[class*="help"]',
             'details[class*="guide"]'

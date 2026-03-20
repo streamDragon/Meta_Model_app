@@ -7,7 +7,6 @@
 
     // ── Module-level guards ──────────────────────────────────────────
     var observer = null;
-    var observerDisabled = false; // permanently disable after standalone-only pages insert their block
     var isApplying = false;
     var isScheduled = false;
     var lastApplyReason = '';
@@ -291,6 +290,26 @@
         '/lab/context-radar/': 'context-radar',
         '/lab/context-radar/index.html': 'context-radar'
     });
+    const LEGACY_STANDALONE_LAYOUTS = Object.freeze({
+        'practice-verb-unzip-standalone': Object.freeze({
+            runtimeSelectors: ['main.page', '.map-anchor', '#reviewModal'],
+            startLabel: 'התחל תרגול'
+        }),
+        'sentence-morpher': Object.freeze({
+            runtimeSelectors: ['body > .container'],
+            startLabel: 'התחל תרגול'
+        }),
+        'prism-research': Object.freeze({
+            runtimeSelectors: ['#prism-research-app'],
+            startLabel: 'התחל חקירה'
+        })
+    });
+    const HELP_CONTENT_ATTR = 'data-trainer-help-content';
+    const LEGACY_WELCOME_ATTR = 'data-product-guidance-welcome';
+    const LEGACY_STATE_ATTR = 'data-product-guidance-state-root';
+    const LEGACY_RUNTIME_ATTR = 'data-product-guidance-runtime-root';
+    const ACTION_BOUND_PROP = '__productGuidanceBound';
+    const RENDER_KEY_PROP = '__productGuidanceRenderKey';
 
     function escapeHtml(value) {
         return String(value == null ? '' : value)
@@ -375,11 +394,209 @@
         `;
     }
 
+    function getRenderedHtmlKey(node) {
+        if (!node) return '';
+        try {
+            return String(node[RENDER_KEY_PROP] || '');
+        } catch (_error) {
+            return String(node.getAttribute('data-product-guidance-render-key') || '');
+        }
+    }
+
+    function setRenderedHtmlKey(node, value) {
+        if (!node) return;
+        const next = String(value || '');
+        try {
+            node[RENDER_KEY_PROP] = next;
+        } catch (_error) {
+            node.setAttribute('data-product-guidance-render-key', next);
+        }
+    }
+
+    function setRenderedHtml(node, html) {
+        if (!node) return false;
+        const next = String(html || '');
+        if (getRenderedHtmlKey(node) === next && node.children.length > 0) {
+            return false;
+        }
+        node.innerHTML = next;
+        setRenderedHtmlKey(node, next);
+        return true;
+    }
+
+    function getStandaloneStateRoot(featureKey, createIfMissing) {
+        const liveRoot = document.querySelector('[data-trainer-platform="1"][data-trainer-id]');
+        if (liveRoot) {
+            const trainerId = String(liveRoot.getAttribute('data-trainer-id') || '').trim();
+            if (trainerId && FEATURE_META[trainerId]) return liveRoot;
+        }
+        let stateRoot = document.querySelector(`[${LEGACY_STATE_ATTR}="1"]`);
+        if (!stateRoot && createIfMissing) {
+            stateRoot = document.createElement('div');
+            stateRoot.hidden = true;
+            stateRoot.setAttribute(LEGACY_STATE_ATTR, '1');
+            stateRoot.setAttribute('data-trainer-platform', '1');
+            stateRoot.setAttribute('data-screen', 'home');
+            const nav = document.querySelector('.trainer-shell-nav');
+            if (nav && nav.parentNode) nav.insertAdjacentElement('afterend', stateRoot);
+            else document.body.insertBefore(stateRoot, document.body.firstChild || null);
+        }
+        if (stateRoot && featureKey) {
+            stateRoot.setAttribute('data-trainer-id', featureKey);
+        }
+        return stateRoot;
+    }
+
+    function getStandaloneScreen(featureKey) {
+        const stateRoot = getStandaloneStateRoot(featureKey, false);
+        return stateRoot ? String(stateRoot.getAttribute('data-screen') || '').trim() : '';
+    }
+
+    function setStandaloneScreen(featureKey, nextScreen) {
+        const stateRoot = getStandaloneStateRoot(featureKey, true);
+        if (!stateRoot) return;
+        const safeScreen = String(nextScreen || 'home').trim() || 'home';
+        stateRoot.setAttribute('data-screen', safeScreen);
+        if (document.body) {
+            document.body.setAttribute('data-product-guidance-screen', safeScreen);
+            document.body.classList.toggle('product-guidance-screen-home', safeScreen === 'home');
+            document.body.classList.toggle('product-guidance-screen-play', safeScreen === 'play');
+        }
+        applyLegacyStandaloneVisibility(featureKey);
+        applyEnhancements('legacy-screen');
+    }
+
+    function getLegacyRuntimeNodes(featureKey) {
+        const layout = LEGACY_STANDALONE_LAYOUTS[featureKey];
+        if (!layout) return [];
+        const seen = new Set();
+        return (layout.runtimeSelectors || []).reduce((nodes, selector) => {
+            document.querySelectorAll(selector).forEach((node) => {
+                if (!(node instanceof HTMLElement) || seen.has(node)) return;
+                if (node.matches(`[${LEGACY_WELCOME_ATTR}]`)) return;
+                seen.add(node);
+                node.setAttribute(LEGACY_RUNTIME_ATTR, '1');
+                nodes.push(node);
+            });
+            return nodes;
+        }, []);
+    }
+
+    function openStandaloneHelpOverlay() {
+        const helpBtn = document.querySelector('.trainer-shell-nav [data-nav-action="help-overlay"]');
+        if (helpBtn instanceof HTMLElement) {
+            helpBtn.click();
+        }
+    }
+
+    function bindStandaloneAction(button, handler) {
+        if (!button || typeof handler !== 'function') return;
+        if (button[ACTION_BOUND_PROP] === true) return;
+        button[ACTION_BOUND_PROP] = true;
+        button.addEventListener('click', handler);
+    }
+
+    function ensureLegacyStandaloneController(featureKey) {
+        if (!LEGACY_STANDALONE_LAYOUTS[featureKey]) return;
+        global.__metaFeatureControllers = global.__metaFeatureControllers || {};
+        if (global.__metaFeatureControllers[featureKey]) return;
+        global.__metaFeatureControllers[featureKey] = {
+            stepBack() {
+                if (getStandaloneScreen(featureKey) === 'play') {
+                    setStandaloneScreen(featureKey, 'home');
+                    return true;
+                }
+                return false;
+            },
+            restart() {
+                setStandaloneScreen(featureKey, 'home');
+                return true;
+            },
+            canRestart() {
+                return getStandaloneScreen(featureKey) === 'play';
+            }
+        };
+    }
+
+    function renderLegacyWelcome(featureKey, meta) {
+        const layout = LEGACY_STANDALONE_LAYOUTS[featureKey] || {};
+        const startLabel = escapeHtml(layout.startLabel || 'התחל תרגול');
+        return `
+            <div class="product-orientation">
+                <div class="product-orientation__copy">
+                    <span class="product-orientation__kicker">${escapeHtml(meta.familyLabel || meta.familyName || '')}</span>
+                    <div class="product-orientation__trail">${(Array.isArray(meta.trail) ? meta.trail : ['בית', meta.familyName || '', meta.title || '']).map((item) => `<span>${escapeHtml(item)}</span>`).join('')}</div>
+                </div>
+            </div>
+            ${renderIntro(meta)}
+            <div class="product-legacy-welcome-actions">
+                <button type="button" class="btn btn-primary" data-product-guidance-start="${escapeHtml(featureKey)}">${startLabel}</button>
+                <button type="button" class="btn btn-secondary" data-product-guidance-open-help="1">עזרה למסך</button>
+            </div>
+            <p class="product-surface-muted">במסך התרגול עצמו נשארים רק ההקשר, הצעד הבא והעבודה בפועל. ההסבר המלא נשאר כאן או בעזרה.</p>
+        `;
+    }
+
+    function ensureLegacyWelcomeShell(featureKey, meta) {
+        if (!LEGACY_STANDALONE_LAYOUTS[featureKey]) return null;
+        const nav = document.querySelector('.trainer-shell-nav');
+        if (!nav || !nav.parentNode) return null;
+        let shell = document.querySelector(`[${LEGACY_WELCOME_ATTR}="${featureKey}"]`);
+        if (!shell) {
+            shell = document.createElement('section');
+            shell.setAttribute(LEGACY_WELCOME_ATTR, featureKey);
+            shell.className = 'product-feature-guidance product-feature-guidance--standalone product-feature-guidance--welcome';
+            nav.insertAdjacentElement('afterend', shell);
+        }
+        setRenderedHtml(shell, renderLegacyWelcome(featureKey, meta));
+        shell.querySelectorAll('[data-product-guidance-start]').forEach((button) => {
+            bindStandaloneAction(button, () => {
+                setStandaloneScreen(featureKey, 'play');
+                global.requestAnimationFrame(() => {
+                    try { global.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_error) {}
+                });
+            });
+        });
+        shell.querySelectorAll('[data-product-guidance-open-help]').forEach((button) => {
+            bindStandaloneAction(button, () => openStandaloneHelpOverlay());
+        });
+        return shell;
+    }
+
+    function applyLegacyStandaloneVisibility(featureKey) {
+        const layout = LEGACY_STANDALONE_LAYOUTS[featureKey];
+        if (!layout) return;
+        const isPlay = getStandaloneScreen(featureKey) === 'play';
+        const shell = document.querySelector(`[${LEGACY_WELCOME_ATTR}="${featureKey}"]`);
+        if (shell) shell.hidden = isPlay;
+        getLegacyRuntimeNodes(featureKey).forEach((node) => {
+            node.hidden = !isPlay;
+            node.setAttribute('aria-hidden', isPlay ? 'false' : 'true');
+        });
+    }
+
+    function ensureStandaloneHelpBlock(featureKey, meta, html) {
+        const nav = document.querySelector('.trainer-shell-nav');
+        if (!nav || !nav.parentNode) return null;
+        let block = document.querySelector(`[data-product-guidance="${featureKey}"]`);
+        if (!block) {
+            block = document.createElement('section');
+            block.setAttribute('data-product-guidance', featureKey);
+            block.className = 'product-feature-guidance product-feature-guidance--standalone product-feature-guidance--help-only';
+            nav.insertAdjacentElement('afterend', block);
+        }
+        block.setAttribute(HELP_CONTENT_ATTR, '1');
+        block.dataset.trainerShellSuppressedHelp = '1';
+        block.hidden = true;
+        setRenderedHtml(block, html);
+        return block;
+    }
+
     function bindInlineActions(scope) {
         if (!scope) return;
         scope.querySelectorAll('[data-product-guidance-action]').forEach((button) => {
-            if (button.dataset.productGuidanceBound === '1') return;
-            button.dataset.productGuidanceBound = '1';
+            if (button[ACTION_BOUND_PROP] === true) return;
+            button[ACTION_BOUND_PROP] = true;
             button.addEventListener('click', () => {
                 const action = String(button.getAttribute('data-product-guidance-action') || '').trim();
                 if (action === 'home') {
@@ -431,16 +648,13 @@
                     container.insertBefore(block, container.firstChild || null);
                 }
             }
-            block.innerHTML = html;
+            setRenderedHtml(block, html);
             return block;
         }
         if (block.className !== className) {
             block.className = className;
         }
-        // Only write innerHTML if content actually changed
-        if (block.innerHTML !== html) {
-            block.innerHTML = html;
-        }
+        setRenderedHtml(block, html);
         return block;
     }
 
@@ -466,26 +680,18 @@
     function enhanceStandaloneFeature() {
         const featureKey = getStandaloneKey();
         const meta = FEATURE_META[featureKey];
-        const nav = document.querySelector('.trainer-shell-nav');
-        if (!meta || !nav || !nav.parentNode) return;
-        let block = document.querySelector(`[data-product-guidance="${featureKey}"]`);
-        if (!block) {
-            block = document.createElement('section');
-            block.setAttribute('data-product-guidance', featureKey);
-            block.className = 'product-feature-guidance product-feature-guidance--standalone';
-            nav.insertAdjacentElement('afterend', block);
-        }
+        if (!meta) return;
         const stateLabel = getStandaloneStateLabel(meta);
         const html = `${renderOrientation(meta, stateLabel, false)}${renderIntro(meta)}`;
-        if (block.innerHTML !== html) {
-            block.innerHTML = html;
-        }
+        ensureStandaloneHelpBlock(featureKey, meta, html);
         // On standalone pages without dynamic state labels, stop observing after
         // the block is inserted — the orientation content never changes, so
         // continued observation only causes a mutation-storm loop.
-        if (!meta.stateLabels) {
-            if (observer) { observer.disconnect(); observer = null; }
-            observerDisabled = true;
+        if (LEGACY_STANDALONE_LAYOUTS[featureKey]) {
+            getStandaloneStateRoot(featureKey, true);
+            ensureLegacyStandaloneController(featureKey);
+            ensureLegacyWelcomeShell(featureKey, meta);
+            applyLegacyStandaloneVisibility(featureKey);
         }
     }
 
@@ -537,8 +743,7 @@
         // Initial synchronous apply (no observer yet, safe)
         applyEnhancements('boot');
 
-        // Set up observer with storm protection (skip on standalone-only pages)
-        if (observerDisabled) return;
+        // Set up observer with storm protection
         observer = new MutationObserver(function (mutations) {
             // Mutation storm detection
             var now = Date.now();
