@@ -3428,17 +3428,22 @@ function buildFeatureMapOverlayContent() {
     const featureMapBody = featureMap?.querySelector('.feature-map-body');
     if (!featureMapBody) return null;
 
-    const source = featureMapBody.querySelector('.feature-map-menu-box') || featureMapBody;
-    const clone = source.cloneNode(true);
+    const clone = featureMapBody.cloneNode(true);
     stripIdsFromElementTree(clone);
     clone.classList.add('feature-map-overlay-clone');
+    clone.querySelector('.feature-map-menu-box')?.remove();
+
+    const overlayIntro = clone.querySelector('.feature-map-intro');
+    if (overlayIntro) {
+        overlayIntro.textContent = 'כל הכלים מסודרים כאן לפי משפחות עבודה. בחרו משפחה אחת, או היכנסו ישר לכלי שמתאים עכשיו.';
+    }
 
     const wrapper = document.createElement('article');
     wrapper.className = 'shell-overlay-content feature-map-overlay-content';
     wrapper.innerHTML = `
-        <p class="shell-overlay-kicker">תפריט</p>
-        <h4>מסלולים וכלים</h4>
-        <p class="shell-overlay-note">בחר/י מסך או כלי, והמעבר נפתח מיד.</p>
+        <p class="shell-overlay-kicker">דף הבית · ספריית כלים</p>
+        <h4>כל המסלולים והכלים במקום אחד</h4>
+        <p class="shell-overlay-note">בחרו משפחת עבודה, ואז כלי אחד להיכנס אליו. המעבר נפתח מיד והחלון נסגר.</p>
     `;
     wrapper.appendChild(clone);
 
@@ -3459,6 +3464,23 @@ function buildFeatureMapOverlayContent() {
         }, 70);
     };
 
+    const findLiveNavNode = (navKey = '') => {
+        const safeNavKey = String(navKey || '').trim();
+        if (!safeNavKey) return null;
+        return Array.from(featureMap.querySelectorAll('[data-nav-key]')).find((node) => {
+            return String(node.getAttribute('data-nav-key') || '').trim() === safeNavKey;
+        }) || null;
+    };
+
+    const findLiveHrefNode = (href = '') => {
+        const safeHref = String(href || '').trim();
+        if (!safeHref) return null;
+        return Array.from(featureMap.querySelectorAll('a[data-versioned-href], a[href]')).find((node) => {
+            const nodeHref = String(node.getAttribute('data-versioned-href') || node.getAttribute('href') || '').trim();
+            return nodeHref === safeHref;
+        }) || null;
+    };
+
     clone.querySelectorAll('[data-global-feature-menu-select]').forEach((selectNode) => {
         selectNode.addEventListener('change', (event) => {
             const sourceKey = String(event?.target?.getAttribute?.('data-global-feature-menu-select') || '').trim();
@@ -3472,6 +3494,52 @@ function buildFeatureMapOverlayContent() {
                 liveSelect.value = selectedKey;
                 liveSelect.dispatchEvent(new Event('change', { bubbles: true }));
             }, 'feature-map-menu-select');
+        });
+    });
+
+    clone.querySelectorAll('[data-nav-key]').forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            const navKey = String(button.getAttribute('data-nav-key') || '').trim();
+            if (!navKey) return;
+
+            closeOverlayThen(() => {
+                const liveNode = findLiveNavNode(navKey);
+                if (liveNode instanceof HTMLElement) {
+                    liveNode.click();
+                    return;
+                }
+                if (typeof window.navigateByNavKey === 'function') {
+                    window.navigateByNavKey(navKey, { versioned: true, featureEntry: 'welcome' });
+                }
+            }, 'feature-map-menu-nav');
+        });
+    });
+
+    clone.querySelectorAll('a[data-versioned-href], a[href]').forEach((link) => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const targetHref = String(link.getAttribute('data-versioned-href') || link.getAttribute('href') || '').trim();
+            if (!targetHref) return;
+
+            closeOverlayThen(() => {
+                const liveNode = findLiveHrefNode(targetHref);
+                if (liveNode instanceof HTMLElement) {
+                    liveNode.click();
+                    return;
+                }
+
+                const navKey = typeof window.getMetaModelNavKeyByPath === 'function'
+                    ? String(window.getMetaModelNavKeyByPath(targetHref) || '').trim()
+                    : '';
+
+                if (navKey && typeof window.navigateByNavKey === 'function') {
+                    const navigated = window.navigateByNavKey(navKey, { versioned: true, featureEntry: 'welcome' });
+                    if (navigated !== false) return;
+                }
+
+                window.location.href = targetHref;
+            }, 'feature-map-menu-link');
         });
     });
 
@@ -3489,8 +3557,8 @@ function openFeatureMapMenu() {
         }
         window.MetaOverlayProvider.openOverlay({
             type: 'feature-map-menu',
-            title: 'תפריט',
-            size: 'md',
+            title: 'כל הכלים',
+            size: 'xl',
             closeOnBackdrop: true,
             content: overlayContent
         });
@@ -3500,6 +3568,10 @@ function openFeatureMapMenu() {
     const featureMap = document.getElementById('feature-map-toggle');
     if (!featureMap) return;
     setFeatureMapToggleOpen(true);
+}
+
+if (typeof window !== 'undefined') {
+    window.openFeatureMapMenu = openFeatureMapMenu;
 }
 
 function setupFeatureMapOverlayControls() {
@@ -11992,588 +12064,7 @@ function getRapidPatternLabel(patternId) {
     return found?.label || resolved || patternId;
 }
 
-const WRINKLE_GAME_STORAGE_KEY = 'wrinkle_game_v1';
-const WRINKLE_GAME_RETRY_MINUTES = 25;
-const WRINKLE_GAME_INTERVAL_HOURS = [0, 24, 72, 168, 336, 720];
-
-const WRINKLE_FOLD_LIBRARY = Object.freeze([
-    {
-        key: 'ABSOLUTE_IMPOSSIBLE',
-        label: 'אי-יכולת מוחלטת',
-        emoji: '🚫',
-        hiddenAssumption: 'יש פה הנחה ש״אין יכולת בשום מצב״.',
-        challengeQuestion: 'באמת בשום מצב? מה כן אפשר לעשות כבר עכשיו ב-10 דקות?'
-    },
-    {
-        key: 'NO_CHOICE',
-        label: 'אין ברירה / חייב',
-        emoji: '🔒',
-        hiddenAssumption: 'יש פה הנחה שאין בחירה פנימית.',
-        challengeQuestion: 'מה יקרה אם לא? איזו בחירה קטנה כן קיימת פה?'
-    },
-    {
-        key: 'IDENTITY_LOCK',
-        label: 'זהות מקובעת',
-        emoji: '🧱',
-        hiddenAssumption: 'התנהגות רגעית הוגדרה כ״מי שאני/מי שהוא״.',
-        challengeQuestion: 'מה הוא/אתה עושה בפועל שמוביל לזה, במקום מי הוא?'
-    },
-    {
-        key: 'GLOBAL_RULE',
-        label: 'הכללה גורפת',
-        emoji: '🌐',
-        hiddenAssumption: 'המשפט הופך אירוע מסוים לחוק גורף.',
-        challengeQuestion: 'תמיד? אף פעם? תן מקרה אחד שסותר את זה.'
-    }
-]);
-
-const WRINKLE_BASE_CARDS = Object.freeze([
-    { id: 'wr_001', statement: 'אני לא יכול להוביל פגישה צוות.', foldKey: 'ABSOLUTE_IMPOSSIBLE' },
-    { id: 'wr_002', statement: 'הוא בעייתי, אי אפשר לעבוד איתו.', foldKey: 'IDENTITY_LOCK' },
-    { id: 'wr_003', statement: 'אני חייב להסכים, אחרת הכול יתפרק.', foldKey: 'NO_CHOICE' },
-    { id: 'wr_004', statement: 'אני תמיד הורס שיחות חשובות.', foldKey: 'GLOBAL_RULE' },
-    { id: 'wr_005', statement: 'אין לי ברירה, אני חייב לענות לכל הודעה מייד.', foldKey: 'NO_CHOICE' },
-    { id: 'wr_006', statement: 'אני לא יכול להשתנות בכלל.', foldKey: 'ABSOLUTE_IMPOSSIBLE' },
-    { id: 'wr_007', statement: 'היא פשוט אגואיסטית, זה מה שהיא.', foldKey: 'IDENTITY_LOCK' },
-    { id: 'wr_008', statement: 'כולם מזלזלים בי כל הזמן.', foldKey: 'GLOBAL_RULE' },
-    { id: 'wr_009', statement: 'אי אפשר להירגע לפני שמסיימים הכול.', foldKey: 'ABSOLUTE_IMPOSSIBLE' },
-    { id: 'wr_010', statement: 'אני מוכרח להיות מושלם בכל משימה.', foldKey: 'NO_CHOICE' },
-    { id: 'wr_011', statement: 'אני כישלון כשאני מתבלבל מול אנשים.', foldKey: 'IDENTITY_LOCK' },
-    { id: 'wr_012', statement: 'אף פעם לא מצליח לי בזמן.', foldKey: 'GLOBAL_RULE' }
-]);
-
-const DEFAULT_WRINKLE_GAME_STATS = Object.freeze({
-    rounds: 0,
-    perfect: 0,
-    streak: 0,
-    points: 0
-});
-
-let wrinkleGameState = {
-    cards: [],
-    currentCard: null,
-    phase: 'expose',
-    exposeOptions: [],
-    challengeOptions: [],
-    exposeFirstTry: true,
-    challengeFirstTry: true,
-    reviewAhead: false,
-    stats: { ...DEFAULT_WRINKLE_GAME_STATS },
-    elements: {}
-};
-
-function setupWrinkleGame() {
-    const root = document.getElementById('wrinkle-game');
-    if (!root) return;
-
-    wrinkleGameState.elements = {
-        root,
-        stepLabel: document.getElementById('wrinkle-step-label'),
-        statement: document.getElementById('wrinkle-statement'),
-        options: document.getElementById('wrinkle-options'),
-        feedback: document.getElementById('wrinkle-feedback'),
-        nextBtn: document.getElementById('wrinkle-next-btn'),
-        streak: document.getElementById('wrinkle-streak'),
-        points: document.getElementById('wrinkle-points'),
-        dueCount: document.getElementById('wrinkle-due-count'),
-        fxLayer: document.getElementById('wrinkle-fx-layer'),
-        selfInput: document.getElementById('wrinkle-self-input'),
-        addSelfBtn: document.getElementById('wrinkle-add-self-btn'),
-        selfList: document.getElementById('wrinkle-self-list')
-    };
-
-    loadWrinkleGameState();
-    renderWrinkleSelfList();
-    updateWrinkleScoreboard();
-
-    wrinkleGameState.elements.options?.addEventListener('click', handleWrinkleOptionClick);
-    wrinkleGameState.elements.nextBtn?.addEventListener('click', startWrinkleRound);
-    wrinkleGameState.elements.addSelfBtn?.addEventListener('click', addSelfStatementToWrinkleGame);
-
-    startWrinkleRound();
-}
-
-function loadWrinkleGameState() {
-    let parsed = null;
-    try {
-        parsed = JSON.parse(localStorage.getItem(WRINKLE_GAME_STORAGE_KEY) || 'null');
-    } catch (error) {
-        parsed = null;
-    }
-
-    const savedCards = Array.isArray(parsed?.cards)
-        ? parsed.cards.map(item => normalizeWrinkleCard(item)).filter(Boolean)
-        : [];
-
-    wrinkleGameState.cards = mergeWrinkleCards(savedCards);
-    wrinkleGameState.stats = normalizeWrinkleStats(parsed?.stats);
-}
-
-function saveWrinkleGameState() {
-    const payload = {
-        cards: wrinkleGameState.cards,
-        stats: wrinkleGameState.stats
-    };
-    localStorage.setItem(WRINKLE_GAME_STORAGE_KEY, JSON.stringify(payload));
-}
-
-function normalizeWrinkleStats(raw) {
-    const merged = { ...DEFAULT_WRINKLE_GAME_STATS, ...(raw || {}) };
-    merged.rounds = Math.max(0, Math.floor(Number(merged.rounds) || 0));
-    merged.perfect = Math.max(0, Math.floor(Number(merged.perfect) || 0));
-    merged.streak = Math.max(0, Math.floor(Number(merged.streak) || 0));
-    merged.points = Math.max(0, Math.floor(Number(merged.points) || 0));
-    return merged;
-}
-
-function normalizeWrinkleCard(raw) {
-    if (!raw || typeof raw !== 'object') return null;
-    const statement = String(raw.statement || '').trim();
-    if (!statement) return null;
-
-    const safeFold = getWrinkleFoldByKey(raw.foldKey) ? raw.foldKey : 'NO_CHOICE';
-    const sr = raw.sr || {};
-
-    return {
-        id: String(raw.id || `wr_${Date.now()}_${Math.random().toString(16).slice(2, 7)}`),
-        statement,
-        foldKey: safeFold,
-        source: raw.source === 'self' ? 'self' : 'seed',
-        createdAt: Number(raw.createdAt) || Date.now(),
-        sr: {
-            box: clampWrinkleNumber(sr.box, 0, WRINKLE_GAME_INTERVAL_HOURS.length - 1, 0),
-            dueAt: Number(sr.dueAt) || Date.now(),
-            seen: Math.max(0, Math.floor(Number(sr.seen) || 0)),
-            wins: Math.max(0, Math.floor(Number(sr.wins) || 0)),
-            misses: Math.max(0, Math.floor(Number(sr.misses) || 0))
-        }
-    };
-}
-
-function mergeWrinkleCards(savedCards) {
-    const byId = new Map();
-
-    savedCards.forEach(card => {
-        byId.set(card.id, card);
-    });
-
-    WRINKLE_BASE_CARDS.forEach(seed => {
-        const existing = byId.get(seed.id);
-        if (existing) {
-            existing.statement = seed.statement;
-            existing.foldKey = seed.foldKey;
-            existing.source = 'seed';
-            return;
-        }
-
-        const normalized = normalizeWrinkleCard({
-            ...seed,
-            source: 'seed',
-            createdAt: Date.now(),
-            sr: { box: 0, dueAt: Date.now(), seen: 0, wins: 0, misses: 0 }
-        });
-        if (normalized) byId.set(normalized.id, normalized);
-    });
-
-    return Array.from(byId.values());
-}
-
-function clampWrinkleNumber(value, min, max, fallback = min) {
-    const parsed = Number(value);
-    if (!Number.isFinite(parsed)) return fallback;
-    return Math.min(max, Math.max(min, Math.floor(parsed)));
-}
-
-function getWrinkleFoldByKey(key) {
-    return WRINKLE_FOLD_LIBRARY.find(item => item.key === key) || null;
-}
-
-function pickNextWrinkleCard() {
-    if (!wrinkleGameState.cards.length) return null;
-
-    const now = Date.now();
-    const sorted = [...wrinkleGameState.cards].sort((a, b) => {
-        const dueA = Number(a?.sr?.dueAt) || 0;
-        const dueB = Number(b?.sr?.dueAt) || 0;
-        if (dueA !== dueB) return dueA - dueB;
-        const boxA = Number(a?.sr?.box) || 0;
-        const boxB = Number(b?.sr?.box) || 0;
-        return boxA - boxB;
-    });
-
-    const dueNow = sorted.filter(card => (Number(card?.sr?.dueAt) || 0) <= now);
-    if (dueNow.length) {
-        const pool = dueNow.slice(0, Math.min(4, dueNow.length));
-        return {
-            card: pool[Math.floor(Math.random() * pool.length)],
-            isDueNow: true
-        };
-    }
-
-    return {
-        card: sorted[0],
-        isDueNow: false
-    };
-}
-
-function buildWrinkleExposeOptions(correctFoldKey) {
-    const fold = getWrinkleFoldByKey(correctFoldKey);
-    if (!fold) return [];
-    const distractors = shuffleArray(WRINKLE_FOLD_LIBRARY.filter(item => item.key !== correctFoldKey)).slice(0, 3);
-    return shuffleArray([fold, ...distractors]).map(item => ({
-        key: item.key,
-        label: `${item.emoji} ${item.label}`
-    }));
-}
-
-function buildWrinkleChallengeOptions(correctFoldKey) {
-    const fold = getWrinkleFoldByKey(correctFoldKey);
-    if (!fold) return [];
-    const distractors = shuffleArray(WRINKLE_FOLD_LIBRARY.filter(item => item.key !== correctFoldKey)).slice(0, 3);
-    return shuffleArray([fold, ...distractors]).map(item => ({
-        key: item.key,
-        label: item.challengeQuestion
-    }));
-}
-
-function startWrinkleRound() {
-    const picked = pickNextWrinkleCard();
-    if (!picked || !picked.card) {
-        setWrinkleFeedback('אין כרגע כרטיסים זמינים לתרגול.', 'warn');
-        return;
-    }
-
-    wrinkleGameState.currentCard = picked.card;
-    wrinkleGameState.reviewAhead = !picked.isDueNow;
-    wrinkleGameState.phase = 'expose';
-    wrinkleGameState.exposeFirstTry = true;
-    wrinkleGameState.challengeFirstTry = true;
-    wrinkleGameState.exposeOptions = buildWrinkleExposeOptions(picked.card.foldKey);
-    wrinkleGameState.challengeOptions = buildWrinkleChallengeOptions(picked.card.foldKey);
-
-    if (wrinkleGameState.elements.nextBtn) {
-        wrinkleGameState.elements.nextBtn.classList.add('hidden');
-    }
-
-    if (picked.isDueNow) {
-        setWrinkleFeedback('שלב 1: חשפו את ההנחה הסמויה, ורק אחר כך עברו לשאלת אתגור.', 'info');
-    } else {
-        setWrinkleFeedback('הכרטיסים הבאים מתוזמנים לעתיד. מבצעים חיזוק יזום.', 'warn');
-    }
-
-    renderWrinkleRound();
-}
-
-function renderWrinkleRound() {
-    const card = wrinkleGameState.currentCard;
-    if (!card) return;
-
-    if (wrinkleGameState.elements.statement) {
-        wrinkleGameState.elements.statement.textContent = card.statement;
-    }
-
-    if (wrinkleGameState.elements.stepLabel) {
-        wrinkleGameState.elements.stepLabel.textContent = wrinkleGameState.phase === 'expose'
-            ? 'שלב 1/2: חשיפת הכמת'
-            : 'שלב 2/2: בחירת שאלת האתגור';
-    }
-
-    const options = wrinkleGameState.phase === 'expose'
-        ? wrinkleGameState.exposeOptions
-        : wrinkleGameState.challengeOptions;
-
-    renderWrinkleOptions(options);
-    updateWrinkleScoreboard();
-}
-
-function renderWrinkleOptions(options) {
-    const container = wrinkleGameState.elements.options;
-    if (!container) return;
-    container.innerHTML = '';
-
-    options.forEach(option => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'btn wrinkle-option-btn';
-        button.dataset.value = option.key;
-        button.textContent = option.label;
-        container.appendChild(button);
-    });
-}
-
-function handleWrinkleOptionClick(event) {
-    const button = event.target.closest('.wrinkle-option-btn');
-    if (!button || button.disabled || !wrinkleGameState.currentCard) return;
-
-    const selectedKey = button.dataset.value;
-    if (!selectedKey) return;
-
-    if (wrinkleGameState.phase === 'expose') {
-        handleWrinkleExposeChoice(selectedKey, button);
-        return;
-    }
-
-    handleWrinkleChallengeChoice(selectedKey, button);
-}
-
-function handleWrinkleExposeChoice(selectedKey, button) {
-    const card = wrinkleGameState.currentCard;
-    if (!card) return;
-
-    if (selectedKey === card.foldKey) {
-        button.classList.add('is-correct');
-        const fold = getWrinkleFoldByKey(card.foldKey);
-        setWrinkleFeedback(`מעולה. נחשף הכמת: ${fold?.hiddenAssumption || ''} עכשיו בחר/י שאלת אתגור.`, 'success');
-        playUISound('correct');
-        wrinkleGameState.phase = 'challenge';
-        renderWrinkleRound();
-        return;
-    }
-
-    wrinkleGameState.exposeFirstTry = false;
-    button.disabled = true;
-    button.classList.add('is-wrong');
-    const fold = getWrinkleFoldByKey(card.foldKey);
-    setWrinkleFeedback(`עדיין לא. רמז: ${fold?.hiddenAssumption || 'חפש/י את ההנחה שלא נאמרה במפורש.'}`, 'warn');
-    playUISound('wrong');
-}
-
-function handleWrinkleChallengeChoice(selectedKey, button) {
-    const card = wrinkleGameState.currentCard;
-    if (!card) return;
-
-    if (selectedKey === card.foldKey) {
-        button.classList.add('is-correct');
-        completeWrinkleRound();
-        return;
-    }
-
-    wrinkleGameState.challengeFirstTry = false;
-    button.disabled = true;
-    button.classList.add('is-wrong');
-    const fold = getWrinkleFoldByKey(card.foldKey);
-    setWrinkleFeedback(`כמעט. שאלת העוגן המדויקת כאן: "${fold?.challengeQuestion || ''}"`, 'warn');
-    playUISound('wrong');
-}
-
-function completeWrinkleRound() {
-    const card = wrinkleGameState.currentCard;
-    if (!card) return;
-
-    const fold = getWrinkleFoldByKey(card.foldKey);
-    const hadMistake = !wrinkleGameState.exposeFirstTry || !wrinkleGameState.challengeFirstTry;
-    const now = Date.now();
-
-    card.sr.seen += 1;
-    wrinkleGameState.stats.rounds += 1;
-
-    if (hadMistake) {
-        card.sr.misses += 1;
-        card.sr.box = Math.max(0, card.sr.box - 1);
-        card.sr.dueAt = now + WRINKLE_GAME_RETRY_MINUTES * 60 * 1000;
-        wrinkleGameState.stats.streak = 0;
-        wrinkleGameState.stats.points += card.source === 'self' ? 6 : 5;
-
-        addXP(4);
-        playUISound('hint');
-        setWrinkleFeedback(
-            `נחשף הכמת אחרי תיקון. השאלה הנכונה: "${fold?.challengeQuestion || ''}". נחזור לזה בעוד ${WRINKLE_GAME_RETRY_MINUTES} דקות.`,
-            'success'
-        );
-    } else {
-        card.sr.wins += 1;
-        card.sr.box = Math.min(card.sr.box + 1, WRINKLE_GAME_INTERVAL_HOURS.length - 1);
-        const nextHours = WRINKLE_GAME_INTERVAL_HOURS[card.sr.box] || 24;
-        card.sr.dueAt = now + nextHours * 60 * 60 * 1000;
-        wrinkleGameState.stats.streak += 1;
-        wrinkleGameState.stats.perfect += 1;
-        wrinkleGameState.stats.points += card.source === 'self' ? 14 : 12;
-
-        addXP(8);
-        if (wrinkleGameState.stats.streak > 0 && wrinkleGameState.stats.streak % 4 === 0) {
-            addStars(1);
-            playUISound('stars_big');
-        } else {
-            playUISound('correct');
-        }
-
-        const waitLabel = nextHours >= 24
-            ? `${Math.round(nextHours / 24)} ימים`
-            : `${nextHours} שעות`;
-
-        setWrinkleFeedback(
-            `קרעת את הכמת! "${fold?.challengeQuestion || ''}" נשמר להרגל אוטומטי. חזרה הבאה בעוד ${waitLabel}.`,
-            'success'
-        );
-    }
-
-    triggerWrinkleBreakFx();
-    saveWrinkleGameState();
-    updateWrinkleScoreboard();
-    renderWrinkleSelfList();
-
-    if (wrinkleGameState.elements.nextBtn) {
-        wrinkleGameState.elements.nextBtn.classList.remove('hidden');
-    }
-}
-
-function updateWrinkleScoreboard() {
-    const dueCount = wrinkleGameState.cards.filter(card => (Number(card?.sr?.dueAt) || 0) <= Date.now()).length;
-
-    if (wrinkleGameState.elements.streak) {
-        wrinkleGameState.elements.streak.textContent = String(wrinkleGameState.stats.streak);
-    }
-
-    if (wrinkleGameState.elements.points) {
-        wrinkleGameState.elements.points.textContent = String(wrinkleGameState.stats.points);
-    }
-
-    if (wrinkleGameState.elements.dueCount) {
-        wrinkleGameState.elements.dueCount.textContent = String(dueCount);
-    }
-}
-
-function setWrinkleFeedback(message, tone = 'info') {
-    const feedback = wrinkleGameState.elements.feedback;
-    if (!feedback) return;
-    feedback.textContent = message;
-    feedback.dataset.tone = tone;
-    triggerPlayfulFeedbackFx(feedback, tone);
-}
-
-function triggerWrinkleBreakFx() {
-    const layer = wrinkleGameState.elements.fxLayer;
-    if (!layer) return;
-
-    layer.innerHTML = '';
-    const brickChars = ['🧱', '🧩'];
-    const confettiChars = ['✨', '🎉', '💥', '🟨', '🟦'];
-
-    for (let i = 0; i < 9; i += 1) {
-        const brick = document.createElement('span');
-        brick.className = 'wrinkle-brick';
-        brick.textContent = brickChars[i % brickChars.length];
-        brick.style.left = `${24 + Math.random() * 52}%`;
-        brick.style.top = `${48 + Math.random() * 10}%`;
-        brick.style.setProperty('--x', `${Math.round((Math.random() - 0.5) * 190)}px`);
-        brick.style.setProperty('--r', `${Math.round((Math.random() - 0.5) * 220)}deg`);
-        layer.appendChild(brick);
-    }
-
-    for (let i = 0; i < 18; i += 1) {
-        const confetti = document.createElement('span');
-        confetti.className = 'wrinkle-confetti';
-        confetti.textContent = confettiChars[i % confettiChars.length];
-        confetti.style.left = `${8 + Math.random() * 84}%`;
-        confetti.style.top = `${10 + Math.random() * 16}%`;
-        confetti.style.setProperty('--x', `${Math.round((Math.random() - 0.5) * 120)}px`);
-        confetti.style.setProperty('--r', `${Math.round((Math.random() - 0.5) * 400)}deg`);
-        layer.appendChild(confetti);
-    }
-
-    layer.classList.remove('is-active');
-    void layer.offsetWidth;
-    layer.classList.add('is-active');
-
-    setTimeout(() => {
-        if (!layer) return;
-        layer.classList.remove('is-active');
-        layer.innerHTML = '';
-    }, 1200);
-}
-
-function addSelfStatementToWrinkleGame() {
-    const input = wrinkleGameState.elements.selfInput;
-    if (!input) return;
-
-    const raw = input.value.trim();
-    if (raw.length < 6) {
-        setWrinkleFeedback('כתבו משפט אישי קצר כדי להוסיף אותו למשחק.', 'warn');
-        return;
-    }
-
-    const normalizedInput = normalizeText(raw).replace(/\s+/g, ' ').trim();
-    const alreadyExists = wrinkleGameState.cards.some(card => normalizeText(card.statement).replace(/\s+/g, ' ').trim() === normalizedInput);
-
-    if (alreadyExists) {
-        setWrinkleFeedback('המשפט הזה כבר קיים בתרגול. נסו ניסוח אחר.', 'warn');
-        return;
-    }
-
-    const foldKey = detectWrinkleFoldFromText(raw);
-    const newCard = normalizeWrinkleCard({
-        id: `wr_self_${Date.now()}_${Math.random().toString(16).slice(2, 6)}`,
-        statement: raw,
-        foldKey,
-        source: 'self',
-        createdAt: Date.now(),
-        sr: { box: 0, dueAt: Date.now(), seen: 0, wins: 0, misses: 0 }
-    });
-
-    if (!newCard) return;
-
-    wrinkleGameState.cards.unshift(newCard);
-    if (wrinkleGameState.cards.length > 240) {
-        wrinkleGameState.cards = wrinkleGameState.cards.slice(0, 240);
-    }
-
-    input.value = '';
-    const fold = getWrinkleFoldByKey(foldKey);
-    setWrinkleFeedback(`נוסף משפט אישי עם כמת משוער: ${fold?.label || 'כללי'}.`, 'success');
-    playUISound('next');
-
-    saveWrinkleGameState();
-    renderWrinkleSelfList();
-    updateWrinkleScoreboard();
-}
-
-function detectWrinkleFoldFromText(text) {
-    const normalized = normalizeText(text);
-
-    if (/(לא יכול|אי אפשר|אין מצב|בלתי אפשרי|בחיים לא)/.test(normalized)) {
-        return 'ABSOLUTE_IMPOSSIBLE';
-    }
-
-    if (/(חייב|צריך|מוכרח|אין ברירה|אסור לי לא)/.test(normalized)) {
-        return 'NO_CHOICE';
-    }
-
-    if (/(תמיד|אף פעם|כולם|כל הזמן|אף אחד)/.test(normalized)) {
-        return 'GLOBAL_RULE';
-    }
-
-    if (/(אני .*כישלון|אני .*דפוק|הוא .*בעייתי|היא .*בעייתית|הוא .*עצלן|היא .*עצלנית|אני .*לא יוצלח)/.test(normalized)) {
-        return 'IDENTITY_LOCK';
-    }
-
-    return 'NO_CHOICE';
-}
-
-function renderWrinkleSelfList() {
-    const list = wrinkleGameState.elements.selfList;
-    if (!list) return;
-    list.innerHTML = '';
-
-    const selfCards = wrinkleGameState.cards
-        .filter(card => card.source === 'self')
-        .sort((a, b) => (Number(b.createdAt) || 0) - (Number(a.createdAt) || 0))
-        .slice(0, 5);
-
-    if (!selfCards.length) {
-        const empty = document.createElement('li');
-        empty.className = 'muted';
-        empty.textContent = 'עדיין לא הוזן משפט אישי.';
-        list.appendChild(empty);
-        return;
-    }
-
-    selfCards.forEach(card => {
-        const fold = getWrinkleFoldByKey(card.foldKey);
-        const row = document.createElement('li');
-        row.textContent = `“${card.statement}” → ${fold?.label || 'כמת כללי'}`;
-        list.appendChild(row);
-    });
-}
+// V1 wrinkle game removed — replaced by WR2/WR2W versions below.
 
 // Get Next Practice Statement
 async function getNextStatement() {
@@ -21758,42 +21249,6 @@ async function setupComicEngine2({ force = false } = {}) {
 
 // ==================== WRINKLE REVEAL FLOW (OVERRIDE) ===================
 
-const WR2_STORAGE_KEY = 'wrinkle_reveal_v2';
-
-const WR2_SEED_SCENES = Object.freeze([
-    Object.freeze({
-        id: 'wr2_seed_1',
-        anchor: 'אני לא יכול',
-        visibleSentence: 'אני לא יכול להסביר לה מה אני רוצה',
-        template: 'אני לא יכול {Q} להסביר לה מה אני רוצה',
-        quantifiers: Object.freeze(['אף פעם', 'בשום מצב רגשי', 'בשום סיטואציה', 'בשום צורה']),
-        transformedSentence: 'לפעמים קשה לי להסביר לה מה אני רוצה.'
-    }),
-    Object.freeze({
-        id: 'wr2_seed_2',
-        anchor: 'אני חייב',
-        visibleSentence: 'אני חייב להספיק הכל היום',
-        template: 'אני חייב {Q} להספיק הכל היום',
-        quantifiers: Object.freeze(['בכל תנאי', 'בלי לנשום', 'גם כשאני מותש', 'לא משנה מה המחיר']),
-        transformedSentence: 'אני בוחר להתמקד במה שחשוב היום, צעד אחד בכל פעם.'
-    }),
-    Object.freeze({
-        id: 'wr2_seed_3',
-        anchor: 'אי אפשר',
-        visibleSentence: 'אי אפשר לדבר איתו',
-        template: 'אי אפשר {Q} לדבר איתו',
-        quantifiers: Object.freeze(['בשום מצב', 'עם אף אחד', 'בשום צורה', 'בכל סיטואציה']),
-        transformedSentence: 'כרגע קשה לדבר איתו, ואפשר לחפש דרך מדויקת לשיחה.'
-    }),
-    Object.freeze({
-        id: 'wr2_seed_4',
-        anchor: 'תמיד',
-        visibleSentence: 'תמיד אני נתקע כשצריך לדבר מול אנשים',
-        template: 'תמיד {Q} אני נתקע כשצריך לדבר מול אנשים',
-        quantifiers: Object.freeze(['ללא יוצא דופן', 'בכל מקום', 'עם כולם', 'בכל רמת לחץ']),
-        transformedSentence: 'לפעמים אני נתקע מול אנשים, ואפשר להתאמן כדי להשתפר.'
-    })
-]);
 
 function wr2TrimText(value, maxLen = 180) {
     const clean = String(value || '').replace(/\s+/g, ' ').trim();
@@ -21870,326 +21325,6 @@ function wr2NormalizeScene(raw, idxPrefix = 'wr2_custom') {
         transformedSentence: wr2TrimText(raw.transformedSentence || wr2SoftenSentence(visibleSentence), 190),
         createdAt: Number(raw.createdAt) || Date.now()
     };
-}
-
-function wr2OverlayHtml(template, activeQuantifier) {
-    const parts = String(template || '').split('{Q}');
-    const q = activeQuantifier ? `[${activeQuantifier}]` : '[בחר/י כמת]';
-    const qHtml = `<span class="wr2-q-inline">${escapeHtml(q)}</span>`;
-    if (parts.length < 2) return `${escapeHtml(template || '')} ${qHtml}`.trim();
-    return `${escapeHtml(parts[0])}${qHtml}${escapeHtml(parts.slice(1).join('{Q}'))}`;
-}
-
-function wr2TriggerFx(layer, strong = false) {
-    if (!layer) return;
-    layer.innerHTML = '';
-    const glyphs = strong ? ['✨', '🎉', '💥', '🌟'] : ['✨', '🔍', '🧩'];
-    const count = strong ? 14 : 7;
-    for (let i = 0; i < count; i += 1) {
-        const star = document.createElement('span');
-        star.className = 'wr2-fx-star';
-        star.textContent = glyphs[i % glyphs.length];
-        star.style.left = `${12 + Math.random() * 76}%`;
-        star.style.top = `${30 + Math.random() * 42}%`;
-        star.style.setProperty('--x', `${Math.round((Math.random() - 0.5) * 120)}px`);
-        layer.appendChild(star);
-    }
-    setTimeout(() => {
-        if (!layer) return;
-        layer.innerHTML = '';
-    }, strong ? 820 : 620);
-}
-
-function setupWrinkleGame() {
-    const root = document.getElementById('wrinkle-game');
-    if (!root) return;
-
-    if (!document.getElementById('wr2-quantifiers')) {
-        root.className = 'card wrinkle-reveal-card';
-        root.innerHTML = `
-            <div class="wr2-topbar">
-                <span class="wr2-top-icon">🕵️‍♂️</span>
-                <h3>חשוף את הכמת!</h3>
-                <div class="wr2-score">
-                    <span>🔥 <strong id="wr2-streak">0</strong></span>
-                    <span>⭐ <strong id="wr2-points">0</strong></span>
-                </div>
-            </div>
-            <div class="wr2-headline">
-                <h4>המשפט נשמע תמים...</h4>
-                <p>אבל הבעיה האמיתית מסתתרת כאן 👇</p>
-            </div>
-            <section class="wr2-plain-box">
-                <p id="wr2-visible-sentence" class="wr2-visible-sentence"></p>
-                <small>כך זה נשמע</small>
-            </section>
-            <section class="wr2-detect-zone">
-                <p class="wr2-zone-title">כמתים סמויים</p>
-                <div id="wr2-quantifiers" class="wr2-quantifiers" role="group" aria-label="כמתים סמויים"></div>
-                <div class="wr2-overlay-box">
-                    <p id="wr2-overlay-sentence" class="wr2-overlay-sentence"></p>
-                    <p id="wr2-explain-line" class="wr2-explain-line">לחץ/י על כמת אדום כדי לחשוף טוטאליות סמויה.</p>
-                </div>
-                <p id="wr2-progress" class="wr2-progress">0 מתוך 0 כמתים חשופים</p>
-            </section>
-            <section id="wr2-release" class="wr2-release hidden">
-                <p>הבעיה אינה במילים "אני לא יכול". הבעיה היא בהכללות נסתרות שיוצרות תחושת "אין מוצא".</p>
-                <button id="wr2-unlock-btn" class="btn btn-primary wr2-unlock-btn" type="button">חשפתי את כל הכמתים! 🎉</button>
-            </section>
-            <section id="wr2-transform-zone" class="wr2-transform-zone hidden">
-                <button id="wr2-transform-btn" class="btn btn-primary wr2-transform-btn" type="button">הסר הכללה טוטאלית</button>
-                <div id="wr2-transformed" class="wr2-transformed hidden" aria-live="polite">
-                    <p class="wr2-transformed-label">ניסוח משוחרר:</p>
-                    <p id="wr2-transformed-text" class="wr2-transformed-text"></p>
-                </div>
-            </section>
-            <div class="wr2-actions">
-                <button id="wr2-next-btn" class="btn btn-secondary" type="button">משפט הבא</button>
-                <button id="wr2-self-toggle" class="btn btn-secondary" type="button">+ משפט אישי</button>
-            </div>
-            <section id="wr2-self-panel" class="wr2-self-panel hidden">
-                <label for="wr2-self-input">Self-Reference (אופציונלי)</label>
-                <textarea id="wr2-self-input" rows="2" placeholder="לדוגמה: אני לא יכול להסביר לה מה אני רוצה."></textarea>
-                <button id="wr2-self-add" class="btn btn-secondary" type="button">הוסף לתרגול</button>
-                <ul id="wr2-self-list" class="wr2-self-list"></ul>
-            </section>
-            <div id="wr2-fx-layer" class="wr2-fx-layer" aria-hidden="true"></div>
-        `;
-    }
-
-    const els = {
-        streak: document.getElementById('wr2-streak'),
-        points: document.getElementById('wr2-points'),
-        visibleSentence: document.getElementById('wr2-visible-sentence'),
-        quantifiers: document.getElementById('wr2-quantifiers'),
-        overlaySentence: document.getElementById('wr2-overlay-sentence'),
-        explainLine: document.getElementById('wr2-explain-line'),
-        progress: document.getElementById('wr2-progress'),
-        release: document.getElementById('wr2-release'),
-        unlockBtn: document.getElementById('wr2-unlock-btn'),
-        transformZone: document.getElementById('wr2-transform-zone'),
-        transformBtn: document.getElementById('wr2-transform-btn'),
-        transformed: document.getElementById('wr2-transformed'),
-        transformedText: document.getElementById('wr2-transformed-text'),
-        nextBtn: document.getElementById('wr2-next-btn'),
-        selfToggle: document.getElementById('wr2-self-toggle'),
-        selfPanel: document.getElementById('wr2-self-panel'),
-        selfInput: document.getElementById('wr2-self-input'),
-        selfAdd: document.getElementById('wr2-self-add'),
-        selfList: document.getElementById('wr2-self-list'),
-        fxLayer: document.getElementById('wr2-fx-layer')
-    };
-
-    if (!els.quantifiers || !els.visibleSentence || !els.overlaySentence) return;
-
-    let saved = {};
-    try {
-        saved = JSON.parse(localStorage.getItem(WR2_STORAGE_KEY) || '{}') || {};
-    } catch (error) {
-        saved = {};
-    }
-
-    const customScenes = (Array.isArray(saved.customScenes) ? saved.customScenes : [])
-        .map((item, i) => wr2NormalizeScene(item, `wr2_saved_${i}`))
-        .filter(Boolean)
-        .slice(0, 12);
-
-    const state = {
-        seedScenes: WR2_SEED_SCENES.map((item, i) => wr2NormalizeScene(item, `wr2_seed_${i}`)).filter(Boolean),
-        customScenes,
-        index: Math.max(0, Math.floor(Number(saved.index) || 0)),
-        streak: Math.max(0, Math.floor(Number(saved.streak) || 0)),
-        points: Math.max(0, Math.floor(Number(saved.points) || 0)),
-        revealed: [],
-        activeQuantifier: '',
-        unlocked: false,
-        transformed: false
-    };
-
-    const allScenes = () => [...state.seedScenes, ...state.customScenes];
-    const currentScene = () => {
-        const scenes = allScenes();
-        if (!scenes.length) return null;
-        if (state.index >= scenes.length) state.index = 0;
-        return scenes[state.index];
-    };
-    const allRevealed = () => {
-        const scene = currentScene();
-        if (!scene) return false;
-        return state.revealed.length >= scene.quantifiers.length;
-    };
-    const persist = () => {
-        localStorage.setItem(WR2_STORAGE_KEY, JSON.stringify({
-            index: state.index,
-            streak: state.streak,
-            points: state.points,
-            customScenes: state.customScenes
-        }));
-    };
-    const resetRound = () => {
-        state.revealed = [];
-        state.activeQuantifier = '';
-        state.unlocked = false;
-        state.transformed = false;
-    };
-    const renderSelfList = () => {
-        if (!els.selfList) return;
-        els.selfList.innerHTML = '';
-        const rows = [...state.customScenes]
-            .sort((a, b) => (Number(b.createdAt) || 0) - (Number(a.createdAt) || 0))
-            .slice(0, 5);
-        if (!rows.length) return;
-        rows.forEach((scene) => {
-            const item = document.createElement('li');
-            item.textContent = `“${scene.visibleSentence}”`;
-            els.selfList.appendChild(item);
-        });
-    };
-    const render = () => {
-        const scene = currentScene();
-        if (!scene) {
-            root.innerHTML = '<p>אין כרגע משפטים לתרגול.</p>';
-            return;
-        }
-
-        if (els.streak) els.streak.textContent = String(state.streak);
-        if (els.points) els.points.textContent = String(state.points);
-        if (els.visibleSentence) els.visibleSentence.textContent = scene.visibleSentence;
-        if (els.overlaySentence) {
-            els.overlaySentence.innerHTML = wr2OverlayHtml(scene.template, state.activeQuantifier);
-            els.overlaySentence.classList.toggle('is-active', Boolean(state.activeQuantifier));
-        }
-        if (els.explainLine) {
-            els.explainLine.textContent = state.activeQuantifier
-                ? `זה לא בהכרח "${scene.anchor}". זה "${state.activeQuantifier}".`
-                : 'לחץ/י על כמת אדום כדי לחשוף טוטאליות סמויה.';
-        }
-
-        const qSet = new Set(state.revealed);
-        if (els.quantifiers) {
-            els.quantifiers.innerHTML = scene.quantifiers.map((q) => {
-                const active = state.activeQuantifier === q;
-                const seen = qSet.has(q);
-                return `<button type="button" class="wr2-quantifier${active ? ' is-active' : ''}${seen ? ' is-revealed' : ''}" data-q="${escapeHtml(q)}" aria-label="חשוף ${escapeHtml(q)}">[${escapeHtml(q)}]</button>`;
-            }).join('');
-        }
-
-        if (els.progress) {
-            els.progress.textContent = `${state.revealed.length} מתוך ${scene.quantifiers.length} כמתים חשופים`;
-        }
-
-        const revealedAll = allRevealed();
-        els.release?.classList.toggle('hidden', !revealedAll);
-        if (els.unlockBtn) {
-            els.unlockBtn.disabled = !revealedAll || state.unlocked;
-            els.unlockBtn.textContent = state.unlocked
-                ? 'מעולה, נעבור לטרנספורמציה ✅'
-                : 'חשפתי את כל הכמתים! 🎉';
-        }
-
-        const showTransform = state.unlocked || state.transformed;
-        els.transformZone?.classList.toggle('hidden', !showTransform);
-        els.transformed?.classList.toggle('hidden', !state.transformed);
-        if (els.transformedText) {
-            els.transformedText.textContent = state.transformed ? scene.transformedSentence : '';
-        }
-    };
-    const revealQuantifier = (value) => {
-        const scene = currentScene();
-        if (!scene || !scene.quantifiers.includes(value)) return;
-        state.activeQuantifier = value;
-        if (!state.revealed.includes(value)) {
-            state.revealed.push(value);
-            state.points += 2;
-            playUISound('next');
-            wr2TriggerFx(els.fxLayer, false);
-            persist();
-        }
-        if (allRevealed()) playUISound('correct');
-        render();
-    };
-    const unlock = () => {
-        if (!allRevealed()) return;
-        if (!state.unlocked) {
-            state.unlocked = true;
-            playUISound('finish');
-            wr2TriggerFx(els.fxLayer, true);
-            persist();
-        }
-        render();
-    };
-    const transform = () => {
-        const scene = currentScene();
-        if (!scene || !state.unlocked || state.transformed) return;
-        state.transformed = true;
-        state.streak += 1;
-        state.points += scene.source === 'self' ? 14 : 10;
-        addXP(scene.source === 'self' ? 12 : 10);
-        if (state.streak > 0 && state.streak % 3 === 0) addStars(1);
-        playUISound('correct');
-        wr2TriggerFx(els.fxLayer, true);
-        persist();
-        render();
-    };
-    const nextScene = () => {
-        const scenes = allScenes();
-        if (!scenes.length) return;
-        state.index = (state.index + 1) % scenes.length;
-        resetRound();
-        persist();
-        render();
-    };
-    const addSelfSentence = () => {
-        const input = String(els.selfInput?.value || '').trim();
-        if (input.length < 8) {
-            if (els.explainLine) els.explainLine.textContent = 'כתבו משפט אישי קצר (לפחות 8 תווים).';
-            return;
-        }
-        const normalized = normalizeText(input).replace(/\s+/g, ' ').trim();
-        const exists = state.customScenes.some(scene => normalizeText(scene.visibleSentence).replace(/\s+/g, ' ').trim() === normalized);
-        if (exists) {
-            if (els.explainLine) els.explainLine.textContent = 'המשפט הזה כבר קיים בתרגול.';
-            return;
-        }
-        const scene = wr2NormalizeScene({
-            id: `wr2_self_${Date.now()}`,
-            source: 'self',
-            visibleSentence: input,
-            anchor: wr2DetectAnchor(input),
-            template: wr2BuildTemplate(input),
-            quantifiers: wr2InferQuantifiers(input),
-            transformedSentence: wr2SoftenSentence(input),
-            createdAt: Date.now()
-        });
-        if (!scene) return;
-        state.customScenes.unshift(scene);
-        if (state.customScenes.length > 12) state.customScenes = state.customScenes.slice(0, 12);
-        state.index = allScenes().findIndex(item => item.id === scene.id);
-        if (state.index < 0) state.index = 0;
-        if (els.selfInput) els.selfInput.value = '';
-        resetRound();
-        persist();
-        renderSelfList();
-        render();
-        playUISound('start');
-    };
-
-    els.quantifiers.addEventListener('click', (event) => {
-        const button = event.target.closest('button[data-q]');
-        if (!button) return;
-        revealQuantifier(button.getAttribute('data-q') || '');
-    });
-    els.unlockBtn?.addEventListener('click', unlock);
-    els.transformBtn?.addEventListener('click', transform);
-    els.nextBtn?.addEventListener('click', nextScene);
-    els.selfToggle?.addEventListener('click', () => {
-        els.selfPanel?.classList.toggle('hidden');
-    });
-    els.selfAdd?.addEventListener('click', addSelfSentence);
-
-    renderSelfList();
-    resetRound();
-    render();
 }
 
 // ==================== WR2 SQHCEL WIZARD (FINAL OVERRIDE) ===================
@@ -24744,7 +23879,6 @@ async function setupConnectedBubblesTrainer() {
     await loadCases();
     startCase(0, 'initial');
 }
-
 
 
 

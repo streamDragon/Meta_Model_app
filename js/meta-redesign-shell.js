@@ -1324,6 +1324,34 @@ function featureActionButtonsHtml(meta) {
         section.dataset.metaFeatureStage = 'feature';
         renderFeatureChrome(safeTab);
     }
+    function ensureHomeToolsButton(root) {
+        if (!root) return;
+        var topbar = root.querySelector('.meta-home-shell__topbar');
+        if (!topbar) return;
+
+        var menuBtn = topbar.querySelector('[data-home-menu]');
+        if (!menuBtn) return;
+
+        var actions = topbar.querySelector('.meta-home-shell__topbar-actions');
+        if (!actions) {
+            actions = document.createElement('div');
+            actions.className = 'meta-home-shell__topbar-actions';
+            topbar.insertBefore(actions, topbar.firstChild);
+        }
+
+        if (menuBtn.parentNode !== actions) {
+            actions.appendChild(menuBtn);
+        }
+
+        if (!actions.querySelector('[data-home-tools]')) {
+            var toolsBtn = document.createElement('button');
+            toolsBtn.type = 'button';
+            toolsBtn.className = 'meta-home-shell__tools btn btn-primary';
+            toolsBtn.setAttribute('data-home-tools', '');
+            toolsBtn.textContent = 'כל הכלים';
+            actions.insertBefore(toolsBtn, menuBtn);
+        }
+    }
     function bindHome(root) {
         if (!root) return;
         root.onclick = function (event) {
@@ -1333,6 +1361,17 @@ function featureActionButtonsHtml(meta) {
             if (openNav) { navigateFromHome(openNav.getAttribute('data-home-nav') || ''); return; }
             var openHref = event.target.closest('[data-home-href]');
             if (openHref) { navigateExternalFromHome(openHref.getAttribute('data-home-href') || ''); return; }
+            if (event.target.closest('[data-home-tools]')) {
+                if (typeof window.openFeatureMapMenu === 'function') {
+                    window.openFeatureMapMenu();
+                    return;
+                }
+                var fallbackToolsBtn = document.getElementById('home-open-feature-map');
+                if (fallbackToolsBtn) {
+                    fallbackToolsBtn.click();
+                    return;
+                }
+            }
             if (event.target.closest('[data-home-menu]')) { drawerOpen = true; renderHome('forward'); return; }
             if (event.target.closest('[data-home-drawer-close]')) { drawerOpen = false; renderHome('back'); return; }
             var viewBtn = event.target.closest('[data-home-view]');
@@ -1365,6 +1404,7 @@ function featureActionButtonsHtml(meta) {
         }
         root.innerHTML = '<div class="meta-home-shell__surface" data-home-surface>' + homeViewHtml() + '</div>' + drawerHtml();
         root.setAttribute('data-view', homeUi.view);
+        ensureHomeToolsButton(root);
         bindHome(root);
         applyEntry(root.querySelector('[data-home-surface]') || root, direction || 'forward');
         syncFeatureModalState();
