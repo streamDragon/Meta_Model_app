@@ -18,6 +18,7 @@
     const FEATURE_META = Object.freeze({
         'practice-question': Object.freeze({
             containerSelector: '#practice-question .practice-intro-card',
+            inlineMode: 'help-only',
             familyLabel: 'Practice',
             familyName: 'תרגול',
             title: 'תרגול זיהוי',
@@ -714,6 +715,10 @@
             if (!meta || !meta.containerSelector) return;
             const container = document.querySelector(meta.containerSelector);
             if (!container) return;
+            if (meta.inlineMode === 'help-only') {
+                removeInlineGuidanceBlock(container, featureKey);
+                return;
+            }
             if (isManagedInlineContainer(container)) {
                 removeInlineGuidanceBlock(container, featureKey);
                 return;
