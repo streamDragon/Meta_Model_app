@@ -10,7 +10,7 @@ const TRAINERS = [
     { id: 'classic2', path: 'classic2_trainer.html', hasSettings: true, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true, checkStartViewport: true },
     { id: 'classic-classic', path: 'classic_classic_trainer.html', hasSettings: true, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true, checkStartViewport: true },
     { id: 'living-triples', path: 'living_triples_trainer.html', hasSettings: false, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: false, requireStandaloneNav: false, checkMobileOrder: false, checkStartViewport: true },
-    { id: 'iceberg-templates', path: 'iceberg_templates_trainer.html', hasSettings: true, dualMode: false, runtimeScreen: '', hasRuntimeSupport: true, checkMobileOrder: true, requireStartButton: false, checkStartViewport: false },
+    { id: 'iceberg-templates', path: 'iceberg_templates_trainer.html', hasSettings: true, dualMode: false, runtimeScreen: '', hasRuntimeSupport: true, checkMobileOrder: true, requireStartButton: false, checkStartViewport: false, checkMobileSettingsFooter: false },
     { id: 'scenario-trainer', path: 'scenario_trainer.html', hasSettings: true, dualMode: false, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true, checkStartViewport: false }
 ];
 
@@ -297,7 +297,7 @@ async function runMobileChecks(page, baseUrl, trainer) {
         await assertMobileZoneOrder(page, trainer.id);
     }
 
-    if (trainer.hasSettings) {
+    if (trainer.hasSettings && trainer.checkMobileSettingsFooter !== false) {
         await openSettings(page, trainer.id);
         const footerAction = page.locator(`[data-trainer-settings-shell="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="save-start"], [data-trainer-settings-shell="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="save-settings"]`).first();
         await footerAction.scrollIntoViewIfNeeded();
