@@ -48,6 +48,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
+  box-sizing: border-box;
   border: 1px solid ${border};
   background: #ffffff;
   color: ${primary};

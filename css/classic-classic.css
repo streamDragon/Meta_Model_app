@@ -2437,6 +2437,18 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .cc-entry-card > .cc-entry-clarity-strip {
+    order: 4;
+  }
+
+  .cc-entry-card > .cc-primary-actions {
+    order: 5;
+  }
+
+  .cc-entry-card > .cc-entry-mini {
+    order: 6;
+  }
+
   .cc-phase-rail {
     grid-template-columns: 1fr 1fr;
   }

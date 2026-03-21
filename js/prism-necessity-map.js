@@ -122,6 +122,23 @@
         Object.freeze({ id: 'presupposition', family: 'distortion', title: 'הנחות מוקדמות', difficulty: 'advanced', concept: 'בתוך המשפט כבר מתחבאת הנחה סמויה שמארגנת את הסיפור.', keyQuestion: 'מה ההנחה הסמויה?' })
     ]);
 
+    const PATTERN_IMAGE_BASE = '/feature/assets/prismlab/';
+
+    const PATTERN_IMAGE_MAP = Object.freeze({
+        simple_deletion: 'book-simple-deletion.webp',
+        unspecified_verb: 'book-unspecified-verb.webp',
+        comparative_deletion: 'book-comparison-deletion.webp',
+        lost_referential_index: 'book-lack-referential.webp',
+        universal_quantifier: 'book-universal-quantifier.webp',
+        modal_operator: 'book-modal-operator.webp',
+        lost_performative: 'book-lost-performative.webp',
+        nominalization: 'book-nominalization.webp',
+        cause_effect: 'book-cause-effect.webp',
+        mind_reading: 'book-mind-reading.webp',
+        complex_equivalence: 'book-complex-equivalence.webp',
+        presupposition: 'book-presupposition.webp'
+    });
+
     const PATTERN_ID_ALIASES = Object.freeze({
         simple_deletion: 'simple_deletion',
         unspecified_verb: 'unspecified_verb',
@@ -1012,6 +1029,29 @@
         `;
     }
 
+    // ─── Library: context story hero section ──────────────────────────────────
+    function renderContextStory() {
+        return `
+            <div class="pnm-lib-context">
+                <img class="pnm-lib-context__img"
+                     src="${PATTERN_IMAGE_BASE}context-therapy-room.webp"
+                     alt="חדר טיפולי"
+                     onerror="this.style.display='none'">
+                <div class="pnm-lib-context__body">
+                    <p class="pnm-lib-context__text">
+                        דן, בן 42, מגיע לפגישה השלישית. משהו בין הזוג לא זז. בסיום הפגישה, כשהוא כבר בדלת, הוא מסתובב ואומר:
+                    </p>
+                    <blockquote class="pnm-lib-context__quote">
+                        "${escapeHtml(INTRO_DIALOG.clientLine)}"
+                    </blockquote>
+                    <p class="pnm-lib-context__subtext">
+                        משפט אחד, שלוש מילים. נשמע סגור, סופי. אבל הוא מסתיר בתוכו משהו – דרכו אפשר לפתוח את מה שנראה כמחסום.
+                    </p>
+                </div>
+            </div>
+        `;
+    }
+
     // ─── Library: expanded dialog content ─────────────────────────────────────
     function renderLibraryDialogExpanded() {
         return `
@@ -1064,12 +1104,17 @@
     function renderBookCard(pattern, bookIndex) {
         const family = FAMILY_META[pattern.family];
         const isBasic = pattern.difficulty === 'basic';
+        const imgFile = PATTERN_IMAGE_MAP[pattern.id];
+        const imgSrc = imgFile ? PATTERN_IMAGE_BASE + imgFile : '';
         return `
             <button type="button"
                     class="pnm-lib-book"
                     style="border-right:4px solid ${escapeHtml(family.color)};animation-delay:${bookIndex * 0.05}s"
                     data-action="open-book"
                     data-book-id="${escapeHtml(pattern.id)}">
+                <div class="pnm-lib-book__img-wrap" style="--pnm-book-color:${escapeHtml(family.color)}">
+                    ${imgSrc ? `<img class="pnm-lib-book__img" src="${escapeHtml(imgSrc)}" alt="" aria-hidden="true" onerror="this.style.display='none'">` : ''}
+                </div>
                 <h3 class="pnm-lib-book__title">${escapeHtml(pattern.title)}</h3>
                 <span class="pnm-lib-book__level pnm-lib-book__level--${isBasic ? 'basic' : 'advanced'}">${isBasic ? 'בסיסי' : 'מתקדם'}</span>
                 <p class="pnm-lib-book__concept">${escapeHtml(pattern.concept)}</p>
@@ -1123,18 +1168,20 @@
 
         return `
             <section class="pnm-view pnm-view--library">
-                <header class="pnm-lib-header">
-                    <h1 class="pnm-lib-title">📚 ספריית התבניות</h1>
-                    <p class="pnm-lib-subtitle">בחרו תבנית ממשרף – ופתחו דרך חדשה לרמות לוגיות</p>
-                </header>
+                ${renderContextStory()}
 
                 <div class="pnm-lib-dialog-wrap">
                     <button type="button" class="pnm-lib-dialog-toggle" data-action="toggle-dialog" aria-expanded="${state.dialogOpen ? 'true' : 'false'}">
-                        <span>${escapeHtml(INTRO_DIALOG.teaser)}</span>
+                        <span>מה עושים עם המשפט הזה? לחצו לראות את הכוח בפעולה</span>
                         <strong class="pnm-lib-dialog-indicator">${state.dialogOpen ? '▴' : '▾'}</strong>
                     </button>
                     ${state.dialogOpen ? renderLibraryDialogExpanded() : ''}
                 </div>
+
+                <header class="pnm-lib-header">
+                    <h1 class="pnm-lib-title">📚 ספריית התבניות</h1>
+                    <p class="pnm-lib-subtitle">בחרו תבנית ממשרף – ופתחו דרך חדשה לרמות לוגיות</p>
+                </header>
 
                 <div class="pnm-lib-filters" role="tablist" aria-label="סינון לפי משפחה">
                     ${chips.map((chip) => {
