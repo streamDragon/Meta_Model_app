@@ -776,6 +776,13 @@
         render();
     }
 
+    function startSessionWithMode(mode, seedSuffix) {
+        const normalized = mode === 'exam' ? 'exam' : 'learning';
+        patchSettings({ mode: normalized }, { render: false });
+        state.mode = normalized;
+        createSession(seedSuffix || `intro:${normalized}`);
+    }
+
     function setFamilyFocus(family) {
         const normalized = normalizeFamilyFocus(family);
         const nextFocus = normalized === state.familyFocus ? 'all' : normalized;
@@ -816,6 +823,8 @@
         if (
             action === 'continue-last-settings' ||
             action === 'start-session' ||
+            action === 'start-learning' ||
+            action === 'start-exam' ||
             action === 'random-start' ||
             action === 'apply-settings-and-restart' ||
             action === 'restart-session' ||
@@ -864,6 +873,14 @@
         if (action === 'start-session') {
             createSession('setup-start');
             render();
+            return;
+        }
+        if (action === 'start-learning') {
+            startSessionWithMode('learning', 'intro-learning');
+            return;
+        }
+        if (action === 'start-exam') {
+            startSessionWithMode('exam', 'intro-exam');
             return;
         }
         if (action === 'random-start') {
@@ -1868,11 +1885,28 @@
         `;
     }
 
+    function renderHiddenHelpContent(screenId) {
+        const settings = normalizePracticeSettings(state.settings || defaultPracticeSettings());
+        const screenLabel = screenId === 'play' ? 'המסך הפעיל' : screenId === 'summary' ? 'סיכום' : 'פתיחה';
+        return `
+          <section data-trainer-help-content="1" hidden aria-hidden="true">
+            <div class="cc-hidden-help">
+              <span class="cc-modal-kicker">Classic Classic · ${escapeHtml(screenLabel)}</span>
+              <h2>איך משתמשים ב-Classic Classic</h2>
+              <p>Classic Classic מאמן מעבר שיטתי בין שאלה, מבנה, ויעד בירור. המטרה היא לא רק לבחור תשובה נכונה אלא להבין למה היא נכונה בתוך רצף העבודה.</p>
+              <p>מה זה נותן: כשמפרידים בין פתיחה, תרגול, וסיכום, אפשר להיכנס ישר לשאלה הפעילה בלי לגלול דרך תיאוריה ארוכה.</p>
+              <p>מצב לימוד משאיר רמזים, עצירה ומשוב מלא. מצב מבחן שומר על אותו מנוע אבל מפחית תמיכה בזמן הריצה.</p>
+              <p>ההגדרות הנוכחיות: ${escapeHtml(currentSettingsSummaryText())}.</p>
+            </div>
+          </section>
+        `;
+    }
+
     function renderPracticeScreen() {
         const session = state.session;
         const round = currentRound();
         return `
-          <div class="cc-practice-shell" aria-label="תרגול מטה מודל" data-trainer-platform="1" data-trainer-id="classic-classic" data-trainer-mobile-order="${getMobileOrderAttr()}">
+          <div class="cc-practice-shell" aria-label="תרגול מטה מודל" data-trainer-platform="1" data-trainer-id="classic-classic" data-screen="play" data-trainer-mobile-order="${getMobileOrderAttr()}">
             ${renderPracticeTopBar(session, round)}
             <div class="cc-practice-meta-row">
               <button type="button" class="cc-link-btn" data-cc-action="show-before-start">יועץ NLP</button>
@@ -1883,9 +1917,11 @@
                 ${round ? renderStageProgressPills(round) : ''}
                 ${renderPracticeCard(round)}
               </div>
+              ${renderPracticeSupportRail(round)}
             </div>
             ${renderSettingsDrawer()}
             ${renderPhilosopherOverlay(round)}
+            ${renderHiddenHelpContent('play')}
           </div>
         `;
     }
@@ -1922,7 +1958,7 @@
         const suggestions = buildSummarySuggestions(report);
 
         return `
-          <div class="cc-summary-shell" aria-label="סיכום תרגול" data-trainer-platform="1" data-trainer-id="classic-classic">
+          <div class="cc-summary-shell" aria-label="סיכום תרגול" data-trainer-platform="1" data-trainer-id="classic-classic" data-screen="summary">
             <section class="cc-summary-hero">
               <div class="cc-modal-kicker">סיכום</div>
               <h1>סיכום תרגול Meta Model</h1>
@@ -1973,6 +2009,7 @@
 
             ${renderSetupModal()}
             ${renderPhilosopherOverlay(currentRound())}
+            ${renderHiddenHelpContent('summary')}
           </div>
         `;
     }
@@ -1980,7 +2017,7 @@
     function renderIntroScreen() {
         const settings = normalizePracticeSettings(state.settings || defaultPracticeSettings());
         return `
-          <div class="cc-entry-shell" aria-label="פתיחת תרגול" data-trainer-platform="1" data-trainer-id="classic-classic" data-trainer-mobile-order="${getMobileOrderAttr()}">
+          <div class="cc-entry-shell" aria-label="פתיחת תרגול" data-trainer-platform="1" data-trainer-id="classic-classic" data-screen="home" data-trainer-mobile-order="${getMobileOrderAttr()}">
             <section class="cc-entry-card">
               <section class="cc-entry-purpose" data-trainer-zone="purpose" ${getMobileZoneStyle('purpose')}>
                 <div class="cc-modal-kicker">${escapeHtml(trainerContract?.familyLabel || 'משפחת קלאסיק')}</div>
@@ -1995,7 +2032,8 @@
                   <span>אפשר להתחיל מיד עם ברירת המחדל, או לפתוח הגדרות כדי לדייק עומס, קושי ומשפחת תרגול.</span>
                 </div>
                 <div class="cc-primary-actions">
-                  <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="start-session" data-trainer-action="start-session">${escapeHtml(trainerContract?.startActionLabel || 'התחל תרגול')}</button>
+                  <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="start-learning" data-trainer-action="start-session">מצב לימוד</button>
+                  <button type="button" class="cc-btn cc-btn-secondary cc-btn-big" data-cc-action="start-exam" data-trainer-action="start-test">מצב מבחן</button>
                   <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="open-setup" data-trainer-action="open-settings">הגדרות</button>
                   ${state.hasSavedSettings ? `<button type="button" class="cc-btn cc-btn-secondary" data-cc-action="continue-last-settings">המשך עם ההגדרות האחרונות</button>` : ''}
                   <span class="cc-settings-preview-pill" data-trainer-summary="current">${escapeHtml(currentSettingsSummaryText())}</span>
@@ -2007,13 +2045,16 @@
               <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="show-before-start">יועץ NLP</button>
               </div>
               <div class="cc-entry-mini">
-                <span>מצב: ${settings.mode === 'exam' ? 'מבחן' : 'לימוד'}</span>
+                <span>לימוד: רמזים, עצירה ומשוב מלא</span>
+                <span>מבחן: פחות תמיכה בזמן הריצה</span>
+                <span>ברירת מחדל: ${settings.mode === 'exam' ? 'מבחן' : 'לימוד'}</span>
                 <span>קושי: ${settings.difficulty}</span>
                 <span>קטגוריה: ${familyLabelSimple(settings.familyFocus)}</span>
               </div>
             </section>
             ${renderSetupModal()}
             ${renderPhilosopherOverlay(currentRound())}
+            ${renderHiddenHelpContent('home')}
           </div>
         `;
     }

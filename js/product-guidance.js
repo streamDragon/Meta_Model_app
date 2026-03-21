@@ -191,7 +191,12 @@
             trains: 'שפה מבנית, זיהוי משפחות דפוס, וניסוח יעד מידע מדויק.',
             when: 'כשרוצים לחזק שלד קליני ברור, שאלה אחרי שאלה.',
             why: 'זה בונה יסודות יציבים לסטודנט/ית ומחדד חשיבה של "מה חסר כאן" למטפל/ת.',
-            example: 'משפט כמו ״אני חייב״ עובר דרך שם המבנה, ואז ליעד המידע שחסר כדי לפתוח אותו.'
+            example: 'משפט כמו ״אני חייב״ עובר דרך שם המבנה, ואז ליעד המידע שחסר כדי לפתוח אותו.',
+            stateLabels: Object.freeze({
+                home: 'פתיחה',
+                play: 'תרגול',
+                summary: 'סיכום'
+            })
         }),
         classic2: Object.freeze({
             familyLabel: 'Practice',
@@ -203,7 +208,12 @@
             trains: 'מעבר מהיר בין זיהוי, בחירה ושמירה על כיוון שיחה.',
             when: 'כשכבר יש בסיס ורוצים להגביר קצב ומורכבות.',
             why: 'עוזר לעבור מלמידה מושגית ליכולת עבודה רציפה יותר.',
-            example: 'אותו משפט יכול לדרוש כאן לא רק זיהוי, אלא בחירה בין כמה פתיחות אפשריות.'
+            example: 'אותו משפט יכול לדרוש כאן לא רק זיהוי, אלא בחירה בין כמה פתיחות אפשריות.',
+            stateLabels: Object.freeze({
+                home: 'פתיחה',
+                play: 'סבב',
+                summary: 'סיכום'
+            })
         }),
         'iceberg-templates': Object.freeze({
             familyLabel: 'Analysis',
@@ -239,7 +249,12 @@
             trains: 'הבחנה בתוך משפחות קרובות ושאלת המשך מותאמת.',
             when: 'כשרוצים להעמיק בעבודה עם טבלאות ברין בלי להישאר ברמת זיכרון.',
             why: 'המעבר ממשפחה לשאלה הוא לב העבודה הקלינית.',
-            example: 'אותה אמירה יכולה לדרוש קודם בירור על השמטה, ורק אחר כך את שם התבנית המדויק.'
+            example: 'אותה אמירה יכולה לדרוש קודם בירור על השמטה, ורק אחר כך את שם התבנית המדויק.',
+            stateLabels: Object.freeze({
+                home: 'פתיחה',
+                play: 'תרגול',
+                summary: 'סיכום'
+            })
         }),
         'practice-verb-unzip-standalone': Object.freeze({
             familyLabel: 'Analysis',
@@ -588,7 +603,13 @@
     function ensureStandaloneHelpBlock(featureKey, meta, html) {
         const nav = document.querySelector('.trainer-shell-nav');
         if (!nav || !nav.parentNode) return null;
+        const liveRoot = document.querySelector(`[data-trainer-platform="1"][data-trainer-id="${featureKey}"]`);
+        const hasLocalHelp = !!(liveRoot && liveRoot.querySelector(`[${HELP_CONTENT_ATTR}]`));
         let block = document.querySelector(`[data-product-guidance="${featureKey}"]`);
+        if (hasLocalHelp) {
+            if (block && typeof block.remove === 'function') block.remove();
+            return null;
+        }
         if (!block) {
             block = document.createElement('section');
             block.setAttribute('data-product-guidance', featureKey);

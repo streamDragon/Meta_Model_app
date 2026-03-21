@@ -7,10 +7,11 @@ import { chromium } from 'playwright';
 const ROOT = process.cwd();
 const VITE_BIN = path.join(ROOT, 'node_modules', 'vite', 'bin', 'vite.js');
 const TRAINERS = [
-    { id: 'classic2', path: 'classic2_trainer.html' },
-    { id: 'classic-classic', path: 'classic_classic_trainer.html' },
-    { id: 'iceberg-templates', path: 'iceberg_templates_trainer.html' },
-    { id: 'scenario-trainer', path: 'scenario_trainer.html' }
+    { id: 'classic2', path: 'classic2_trainer.html', hasSettings: true, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true },
+    { id: 'classic-classic', path: 'classic_classic_trainer.html', hasSettings: true, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true },
+    { id: 'living-triples', path: 'living_triples_trainer.html', hasSettings: false, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: false, requireStandaloneNav: false, checkMobileOrder: false },
+    { id: 'iceberg-templates', path: 'iceberg_templates_trainer.html', hasSettings: true, dualMode: false, runtimeScreen: '', hasRuntimeSupport: true, checkMobileOrder: true },
+    { id: 'scenario-trainer', path: 'scenario_trainer.html', hasSettings: true, dualMode: false, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true }
 ];
 
 function wait(ms) {
@@ -172,6 +173,7 @@ async function mutateSessionSummary(page, trainerId) {
 
     const saveStart = shell.locator('[data-trainer-action="save-start"]').first();
     const saveSettings = shell.locator('[data-trainer-action="save-settings"]').first();
+    const startedSession = await saveStart.count() > 0;
     if (await saveStart.count()) {
         await saveStart.click();
     } else if (await saveSettings.count()) {
@@ -186,7 +188,7 @@ async function mutateSessionSummary(page, trainerId) {
     const summaryAfter = await textContent(page.locator(`[data-trainer-platform="1"][data-trainer-id="${trainerId}"] [data-trainer-summary="current"]`));
     await assert(summaryAfter !== summaryBefore, `${trainerId} current summary changed`, `${summaryBefore} -> ${summaryAfter}`);
 
-    return { summaryBefore, summaryAfter };
+    return { summaryBefore, summaryAfter, startedSession };
 }
 
 async function visibleGlobalBlockers(page) {
@@ -199,6 +201,19 @@ async function visibleGlobalBlockers(page) {
     );
 }
 
+async function startTrainer(page, trainer) {
+    const startButton = page.locator(`[data-trainer-platform="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="start-session"]`).first();
+    await startButton.click();
+    if (trainer.runtimeScreen) {
+        await page.waitForFunction(
+            ({ id, screen }) => document.querySelector(`[data-trainer-platform="1"][data-trainer-id="${id}"]`)?.getAttribute('data-screen') === screen,
+            { id: trainer.id, screen: trainer.runtimeScreen }
+        );
+    } else {
+        await page.waitForTimeout(250);
+    }
+}
+
 async function runDesktopChecks(page, baseUrl, trainer) {
     await page.goto(`${baseUrl}/${trainer.path}`, { waitUntil: 'networkidle' });
     await dismissOnboardingIfPresent(page);
@@ -208,25 +223,55 @@ async function runDesktopChecks(page, baseUrl, trainer) {
     await assert(await startButton.count(), `${trainer.id} start button exists`);
     const startBox = await startButton.boundingBox();
     await assert(!!startBox && startBox.y < 660, `${trainer.id} start visible in first viewport`, JSON.stringify(startBox));
-    await assert((await page.locator('.mtp-nav').count()) > 0, `${trainer.id} wrapper nav mounted`);
+    if (trainer.dualMode) {
+        await assert(
+            (await page.locator(`[data-trainer-platform="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="start-test"]`).count()) > 0,
+            `${trainer.id} test mode CTA exists`
+        );
+    }
+    if (trainer.requireStandaloneNav !== false) {
+        await assert((await page.locator('.trainer-shell-nav').count()) > 0, `${trainer.id} standalone help nav mounted`);
+    }
     await assert(await visibleGlobalBlockers(page) === 0, `${trainer.id} no visible global blockers`);
 
-    await openSettings(page, trainer.id);
-    const { summaryBefore, summaryAfter } = await mutateSessionSummary(page, trainer.id);
+    let summaryBefore = '';
+    let summaryAfter = '';
+    let startedSession = false;
+    if (trainer.hasSettings) {
+        await openSettings(page, trainer.id);
+        ({ summaryBefore, summaryAfter, startedSession } = await mutateSessionSummary(page, trainer.id));
+    }
 
-    const zones = await page.evaluate(() => {
-        const main = document.querySelector('[data-trainer-zone="main"]');
-        const support = document.querySelector('[data-trainer-zone="support"]');
-        if (!main || !support) return null;
-        return {
-            mainWidth: Math.round(main.getBoundingClientRect().width),
-            supportWidth: Math.round(support.getBoundingClientRect().width)
-        };
-    });
-    await assert(!!zones, `${trainer.id} main/support zones exist`);
-    await assert(zones.supportWidth < zones.mainWidth, `${trainer.id} support rail secondary`, `${zones.supportWidth}/${zones.mainWidth}`);
+    if (!startedSession) {
+        await startTrainer(page, trainer);
+    } else if (trainer.runtimeScreen) {
+        await page.waitForFunction(
+            ({ id, screen }) => document.querySelector(`[data-trainer-platform="1"][data-trainer-id="${id}"]`)?.getAttribute('data-screen') === screen,
+            { id: trainer.id, screen: trainer.runtimeScreen }
+        );
+    }
 
-    console.log(`desktop ${trainer.id}: ${summaryBefore} -> ${summaryAfter}`);
+    if (trainer.hasRuntimeSupport) {
+        const zones = await page.evaluate((id) => {
+            const root = document.querySelector(`[data-trainer-platform="1"][data-trainer-id="${id}"]`);
+            const main = root?.querySelector('[data-trainer-zone="main"]');
+            const support = root?.querySelector('[data-trainer-zone="support"]');
+            if (!main || !support) return null;
+            return {
+                mainWidth: Math.round(main.getBoundingClientRect().width),
+                supportWidth: Math.round(support.getBoundingClientRect().width)
+            };
+        }, trainer.id);
+        await assert(!!zones, `${trainer.id} runtime main/support zones exist`);
+        await assert(zones.supportWidth < zones.mainWidth, `${trainer.id} support rail secondary`, `${zones.supportWidth}/${zones.mainWidth}`);
+    }
+
+    if (trainer.hasSettings) {
+        console.log(`desktop ${trainer.id}: ${summaryBefore} -> ${summaryAfter}`);
+    } else {
+        const currentScreen = await page.locator(`[data-trainer-platform="1"][data-trainer-id="${trainer.id}"]`).getAttribute('data-screen');
+        console.log(`desktop ${trainer.id}: screen=${currentScreen}`);
+    }
 }
 
 async function runMobileChecks(page, baseUrl, trainer) {
@@ -240,14 +285,19 @@ async function runMobileChecks(page, baseUrl, trainer) {
         scrollWidth: document.documentElement.scrollWidth
     }));
     await assert(overflow.scrollWidth <= overflow.innerWidth + 1, `${trainer.id} mobile no horizontal overflow`, `${overflow.scrollWidth}/${overflow.innerWidth}`);
-    await assertMobileZoneOrder(page, trainer.id);
+    await startTrainer(page, trainer);
+    if (trainer.checkMobileOrder) {
+        await assertMobileZoneOrder(page, trainer.id);
+    }
 
-    await openSettings(page, trainer.id);
-    const footerAction = page.locator(`[data-trainer-settings-shell="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="save-start"], [data-trainer-settings-shell="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="save-settings"]`).first();
-    await footerAction.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(150);
-    const box = await footerAction.boundingBox();
-    await assert(!!box && box.x >= 0 && box.y >= 0 && box.x + box.width <= 390 && box.y + box.height <= 844, `${trainer.id} mobile footer reachable`, JSON.stringify(box));
+    if (trainer.hasSettings) {
+        await openSettings(page, trainer.id);
+        const footerAction = page.locator(`[data-trainer-settings-shell="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="save-start"], [data-trainer-settings-shell="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="save-settings"]`).first();
+        await footerAction.scrollIntoViewIfNeeded();
+        await page.waitForTimeout(150);
+        const box = await footerAction.boundingBox();
+        await assert(!!box && box.x >= 0 && box.y >= 0 && box.x + box.width <= 390 && box.y + box.height <= 844, `${trainer.id} mobile footer reachable`, JSON.stringify(box));
+    }
     console.log(`mobile ${trainer.id}: ${overflow.scrollWidth}/${overflow.innerWidth}`);
 }
 

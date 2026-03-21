@@ -2482,7 +2482,7 @@ body {
 .cc-platform-support {
   position: static;
   top: auto;
-  order: 2;
+  order: var(--cc-mobile-order, 2);
   max-width: 920px;
   margin-inline: auto;
 }

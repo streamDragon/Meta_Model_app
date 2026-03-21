@@ -490,6 +490,63 @@ async function runShellSmoke(baseUrl) {
         }
     };
 
+    const checkMigratedStandaloneTrainer = async ({ relativePath, trainerId, welcomeNeedles, hiddenNeedles, helpNeedle, runtimePrimarySelector }) => {
+        const rootSelector = `[data-trainer-platform="1"][data-trainer-id="${trainerId}"]`;
+        const targetPage = await openStandalonePage(relativePath);
+        try {
+            await targetPage.waitForSelector(rootSelector);
+            const startButton = targetPage.locator(`${rootSelector} [data-trainer-action="start-session"]`).first();
+            const testButton = targetPage.locator(`${rootSelector} [data-trainer-action="start-test"]`).first();
+            await assert((await startButton.count()) > 0, `${trainerId} learning CTA visible`);
+            await assert((await testButton.count()) > 0, `${trainerId} test CTA visible`);
+            const welcomeText = ((await targetPage.locator(rootSelector).innerText()) || '').trim();
+            for (const needle of welcomeNeedles) {
+                await assert(welcomeText.includes(needle), `${trainerId} welcome keeps ${needle}`);
+            }
+            const startBox = await startButton.boundingBox();
+            await assert(!!startBox && startBox.y < 660, `${trainerId} welcome CTA visible in first viewport`, JSON.stringify(startBox));
+            await startButton.click();
+            await targetPage.waitForFunction((id) => document.querySelector(`[data-trainer-platform="1"][data-trainer-id="${id}"]`)?.getAttribute('data-screen') === 'play', trainerId);
+            const runtimeText = ((await targetPage.locator(rootSelector).innerText()) || '').trim();
+            for (const needle of hiddenNeedles) {
+                await assert(!runtimeText.includes(needle), `${trainerId} runtime hides ${needle}`);
+            }
+            const helpText = await openTrainerHelpOverlay(targetPage);
+            await assert(helpText.includes(helpNeedle), `${trainerId} help overlay keeps long-form guidance`);
+            await closeTrainerHelpOverlay(targetPage);
+            const currentScreen = await targetPage.locator(rootSelector).getAttribute('data-screen');
+            await assert(currentScreen === 'play', `${trainerId} help close preserves play screen`, String(currentScreen || ''));
+        } finally {
+            await targetPage.close();
+        }
+
+        const mobilePage = await openStandalonePage(relativePath, { width: 390, height: 844 });
+        try {
+            await mobilePage.waitForSelector(rootSelector);
+            const homeOverflow = await mobilePage.evaluate(() => ({
+                innerWidth: window.innerWidth,
+                scrollWidth: document.documentElement.scrollWidth
+            }));
+            await assert(homeOverflow.scrollWidth <= homeOverflow.innerWidth + 1, `${trainerId} mobile home no horizontal overflow`, `${homeOverflow.scrollWidth}/${homeOverflow.innerWidth}`);
+            const mobileStart = mobilePage.locator(`${rootSelector} [data-trainer-action="start-session"]`).first();
+            const mobileStartBox = await mobileStart.boundingBox();
+            await assert(!!mobileStartBox && mobileStartBox.x >= 0 && mobileStartBox.y >= 0 && mobileStartBox.x + mobileStartBox.width <= 390 && mobileStartBox.y + mobileStartBox.height <= 844, `${trainerId} mobile welcome CTA reachable`, JSON.stringify(mobileStartBox));
+            await mobileStart.click();
+            await mobilePage.waitForFunction((id) => document.querySelector(`[data-trainer-platform="1"][data-trainer-id="${id}"]`)?.getAttribute('data-screen') === 'play', trainerId);
+            const runtimeOverflow = await mobilePage.evaluate(() => ({
+                innerWidth: window.innerWidth,
+                scrollWidth: document.documentElement.scrollWidth
+            }));
+            await assert(runtimeOverflow.scrollWidth <= runtimeOverflow.innerWidth + 1, `${trainerId} mobile play no horizontal overflow`, `${runtimeOverflow.scrollWidth}/${runtimeOverflow.innerWidth}`);
+            const runtimePrimary = mobilePage.locator(runtimePrimarySelector).first();
+            await runtimePrimary.scrollIntoViewIfNeeded();
+            const runtimePrimaryBox = await runtimePrimary.boundingBox();
+            await assert(!!runtimePrimaryBox && runtimePrimaryBox.x >= 0 && runtimePrimaryBox.y >= 0 && runtimePrimaryBox.x + runtimePrimaryBox.width <= 390 && runtimePrimaryBox.y + runtimePrimaryBox.height <= 844, `${trainerId} mobile primary action reachable`, JSON.stringify(runtimePrimaryBox));
+        } finally {
+            await mobilePage.close();
+        }
+    };
+
     const checkLegacyStandaloneWelcomeMount = async (relativePath, featureKey) => {
         const targetPage = await openStandalonePage(relativePath);
         try {
@@ -977,6 +1034,30 @@ async function runShellSmoke(baseUrl) {
             'scenario launcher visible from home'
         );
         await checkStandaloneScenarioGuidance();
+        await checkMigratedStandaloneTrainer({
+            relativePath: 'classic2_trainer.html',
+            trainerId: 'classic2',
+            welcomeNeedles: ['למה הכלי הזה חשוב', 'דוגמה קצרה מהשדה', 'מה תתרגל/י כאן'],
+            hiddenNeedles: ['למה הכלי הזה חשוב', 'דוגמה קצרה מהשדה', 'מה תתרגל/י כאן'],
+            helpNeedle: 'מה חשוב לזכור לפני הסבב',
+            runtimePrimarySelector: '[data-trainer-platform="1"][data-trainer-id="classic2"] .c2n-row-actions .c2n-btn.p'
+        });
+        await checkMigratedStandaloneTrainer({
+            relativePath: 'classic_classic_trainer.html',
+            trainerId: 'classic-classic',
+            welcomeNeedles: ['מצב לימוד', 'מצב מבחן', 'כששומעים רק את התוכן של המשפט'],
+            hiddenNeedles: ['כששומעים רק את התוכן של המשפט', 'לימוד: רמזים, עצירה ומשוב מלא'],
+            helpNeedle: 'איך משתמשים ב-Classic Classic',
+            runtimePrimarySelector: '[data-trainer-platform="1"][data-trainer-id="classic-classic"] [data-cc-option-id]'
+        });
+        await checkMigratedStandaloneTrainer({
+            relativePath: 'living_triples_trainer.html',
+            trainerId: 'living-triples',
+            welcomeNeedles: ['מצב לימוד', 'מצב מבחן', 'איך זה נראה בפועל'],
+            hiddenNeedles: ['Meta Model Gym', 'ברירת המחדל כרגע', 'איך זה נראה בפועל'],
+            helpNeedle: 'שלשות חיות',
+            runtimePrimarySelector: '[data-trainer-platform="1"][data-trainer-id="living-triples"] [data-action="go-identify"]'
+        });
         await checkStandaloneVerbUnzipGuidance();
         await checkLegacyStandaloneWelcomeMount('sentence_morpher_trainer.html', 'sentence-morpher');
         await checkLegacyStandaloneWelcomeMount('prism_research_trainer.html', 'prism-research');

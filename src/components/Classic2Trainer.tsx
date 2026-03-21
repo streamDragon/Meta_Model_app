@@ -731,29 +731,6 @@ export default function Classic2Trainer(): React.ReactElement {
               <p className="c2n-sub" style={{ marginTop: 8 }}>
                 כאן מאמנים עין יציבה על קטגוריה אחת בתוך טקסט קצר: בוחרים קטגוריה, מסמנים את כל המופעים שלה, ובודקים אם הקריאה באמת מדויקת.
               </p>
-              <div className="c2n-home-grid" style={{ marginTop: 14 }}>
-                <article className="c2n-group">
-                  <div className="c2n-group-head">
-                    <h3>למה הכלי הזה חשוב</h3>
-                    <p className="c2n-sub">בלי הפרדה ברורה בין פתיחה לאימון, קל להישאר בתוך הסבר ולא להיכנס לעבודה עצמה.</p>
-                  </div>
-                  <p className="c2n-sub">הערך כאן הוא לעבור מקריאה אינטואיטיבית לקריאה בודקת: לדעת מה מחפשים, איפה מחפשים, ומה נחשב תשובה מלאה.</p>
-                </article>
-                <article className="c2n-group">
-                  <div className="c2n-group-head">
-                    <h3>דוגמה קצרה מהשדה</h3>
-                    <p className="c2n-sub">משפט אחד יכול להרגיש כמו כמה קטגוריות יחד. העבודה כאן היא לייצב את ההבחנה.</p>
-                  </div>
-                  <div className="c2n-example-lines">
-                    {exampleLines.map((sentence, index) => (
-                      <div key={sentence.id} className="c2n-example-line">
-                        <strong>שורה {index + 1}</strong>
-                        <div>{sentence.text}</div>
-                      </div>
-                    ))}
-                  </div>
-                </article>
-              </div>
             </section>
 
             <section className="c2n-start-strip" data-trainer-zone="start">
@@ -783,6 +760,27 @@ export default function Classic2Trainer(): React.ReactElement {
 
             <section className="c2n-card">
               <div className="c2n-home-grid">
+                <article className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>למה הכלי הזה חשוב</h3>
+                    <p className="c2n-sub">בלי הפרדה ברורה בין פתיחה לאימון, קל להישאר בתוך הסבר ולא להיכנס לעבודה עצמה.</p>
+                  </div>
+                  <p className="c2n-sub">הערך כאן הוא לעבור מקריאה אינטואיטיבית לקריאה בודקת: לדעת מה מחפשים, איפה מחפשים, ומה נחשב תשובה מלאה.</p>
+                </article>
+                <article className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>דוגמה קצרה מהשדה</h3>
+                    <p className="c2n-sub">משפט אחד יכול להרגיש כמו כמה קטגוריות יחד. העבודה כאן היא לייצב את ההבחנה.</p>
+                  </div>
+                  <div className="c2n-example-lines">
+                    {exampleLines.map((sentence, index) => (
+                      <div key={sentence.id} className="c2n-example-line">
+                        <strong>שורה {index + 1}</strong>
+                        <div>{sentence.text}</div>
+                      </div>
+                    ))}
+                  </div>
+                </article>
                 <article className="c2n-group">
                   <div className="c2n-group-head">
                     <h3>מה תתרגל/י כאן</h3>

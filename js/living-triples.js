@@ -143,7 +143,8 @@ const state = {
   queue: [],
   index: 0,
   current: null,
-  screen: 'onboarding',
+  screen: 'home',
+  mode: 'learning',
   overlay: '',
   step: 'context',
   selectedRow: 0,
@@ -155,6 +156,7 @@ const state = {
   landingCursor: 0,
   landingVisible: [],
   debriefOpen: false,
+  sceneComplete: false,
   roundScore: 0,
   progress: null,
   prefs: null,
@@ -689,6 +691,7 @@ function resetRoundState() {
   state.landingCursor = 0;
   state.landingVisible = [];
   state.debriefOpen = false;
+  state.sceneComplete = false;
   state.roundScore = 0;
 }
 
@@ -701,7 +704,8 @@ function loadCurrentScenario() {
   resetRoundState();
 }
 
-function beginPractice() {
+function beginPractice(mode = state.mode) {
+  state.mode = mode === 'test' ? 'test' : 'learning';
   state.screen = 'practice';
   state.overlay = '';
   state.prefs.onboardingDone = true;
@@ -711,7 +715,7 @@ function beginPractice() {
 }
 
 function showOnboarding() {
-  state.screen = 'onboarding';
+  state.screen = 'home';
   state.overlay = '';
   render();
 }
@@ -859,25 +863,37 @@ function openDebrief() {
   render();
 }
 
-function retryScene() {
-  if (!state.current) return;
-  resetRoundState();
-  render();
-}
-
-function nextScenario() {
+function completeScene() {
+  if (!state.current || state.sceneComplete) return;
+  state.sceneComplete = true;
   state.progress.played += 1;
   state.progress.totalScore += Number(state.roundScore || 0);
   state.progress.bestRound = Math.max(Number(state.progress.bestRound || 0), Number(state.roundScore || 0));
   state.progress.lastPlayedAt = new Date().toISOString();
   saveProgress();
+  state.screen = 'summary';
+  render();
+}
 
+function retryScene() {
+  if (!state.current) return;
+  resetRoundState();
+  state.screen = 'practice';
+  render();
+}
+
+function nextScenario() {
+  if (state.screen !== 'summary') {
+    completeScene();
+    return;
+  }
   state.index += 1;
   if (state.index >= state.queue.length) {
     state.queue = shuffle([...(state.data?.scenarios || [])]);
     state.index = 0;
   }
   loadCurrentScenario();
+  state.screen = 'practice';
   render();
 }
 
@@ -943,7 +959,7 @@ function buildIdentifyStage() {
   const feedbackText = state.identifySolved
     ? 'נכון! זו המשפחה הפעילה במשפט. עכשיו פותחים את שלוש השאלות.'
     : state.wrongRow
-      ? state.current.wrongHint
+      ? (state.mode === 'test' ? 'עדיין לא. נסה/י שוב לבחור את המשפחה המדויקת.' : state.current.wrongHint)
       : 'בחר/י את המשפחה המתאימה למשפט המסומן.';
   return `
     <section class="ltv3-stage-card">
@@ -1087,7 +1103,7 @@ function buildLandingStage() {
           </div>
           <div class="ltv3-inline-actions">
             <button type="button" class="btn btn-secondary" data-action="retry-scene">נסה שוב</button>
-            <button type="button" class="btn btn-primary" data-action="next-scene">משפט הבא ←</button>
+            <button type="button" class="btn btn-primary" data-action="finish-scene">לסיכום הסבב ←</button>
           </div>
         </section>
       ` : ''}
@@ -1283,7 +1299,7 @@ function buildOverlayMarkup() {
 function buildOnboardingMarkup() {
   const completed = Number(state.progress?.played || 0);
   const bestRound = Number(state.progress?.bestRound || 0);
-  const ctaLabel = welcomeCtaLabel();
+  const currentModeLabel = state.mode === 'test' ? 'מבחן' : 'לימוד';
   const returningLead = isReturningUser()
     ? `חוזרים לפתיחה אחידה ואז נכנסים בלחיצה אחת. עד עכשיו הושלמו ${completed} תרחישים, ושיא הניקוד הוא ${bestRound}.`
     : 'כמו בשאר הפיצ׳רים, מתחילים במסך פתיחה אחיד עם כל המידע הרלוונטי, ואז לוחצים על כפתור אחד ונכנסים לטריינר.';
@@ -1303,6 +1319,11 @@ function buildOnboardingMarkup() {
               <p class="ltv3-welcome-note">${esc(returningLead)}</p>
             </div>
           </section>
+          <div class="ltv3-inline-actions">
+            <button type="button" class="btn btn-primary meta-feature-shell__cta" data-action="start-learning" data-trainer-action="start-session">מצב לימוד</button>
+            <button type="button" class="btn btn-secondary meta-feature-shell__cta" data-action="start-test" data-trainer-action="start-test">מצב מבחן</button>
+          </div>
+          <p class="meta-feature-shell__success-note">ברירת המחדל כרגע: ${esc(currentModeLabel)}.</p>
           ${LIVING_TRIPLES_WELCOME_META.problem ? `<section class="meta-feature-shell__problem-note"><span class="meta-feature-shell__problem-kicker">מה הבעיה שמנסים לפתור?</span><p>${esc(LIVING_TRIPLES_WELCOME_META.problem)}</p></section>` : ''}
           ${buildWelcomeEntryCardsMarkup()}
           ${buildWelcomeExampleMarkup()}
@@ -1312,11 +1333,89 @@ function buildOnboardingMarkup() {
             <cite>${esc(LIVING_TRIPLES_WELCOME_META.quote.author)}</cite>
           </blockquote>
           <p class="meta-feature-shell__success-note">${esc(LIVING_TRIPLES_WELCOME_META.successNote)}</p>
-          <button type="button" class="btn btn-primary meta-feature-shell__cta" data-action="start-practice">${esc(ctaLabel)}</button>
         </div>
       </section>
       ${buildWelcomeChromeBottomMarkup()}
     </div>
+  `;
+}
+
+function buildHiddenHelpMarkup() {
+  return `
+    <section data-trainer-help-content="1" hidden aria-hidden="true">
+      <div class="ltv3-help-copy">
+        <strong>שלשות חיות</strong>
+        <p>המסלול הזה מאמן עבודה משפחתית: קודם מזהים את השורה, אחר כך פותחים את כל שלוש השאלות, ורק אז עוברים ל-insight ולשאלת המשך.</p>
+        <p>מצב לימוד שומר רמזים ומשוב עשיר יותר. מצב מבחן מחזיק את אותו רצף עבודה עם פחות תמיכה בזמן הריצה.</p>
+        <p>ההסבר הארוך נשאר כאן או בעזרה, כדי שבמסך הפעיל יישאר רק הצעד הנוכחי.</p>
+      </div>
+    </section>
+  `;
+}
+
+function buildSummaryMarkup() {
+  const rowMeta = getRowMeta(state.current?.targetRow || 1);
+  const trafficTone = state.identifyAttempts === 0 ? 'ירוק · זיהוי נקי' : state.identifyAttempts === 1 ? 'צהוב · דיוק חלקי' : 'אדום · צריך עוד חזרה';
+  const whatWorked = state.identifyAttempts === 0
+    ? `זיהית את ${extractThemeName(rowMeta.title)} בלי עצירת ביניים, ואז פתחת את כל שלוש השאלות עד הסוף.`
+    : `הגעת למשפחה הנכונה אחרי ${state.identifyAttempts} ניסיון/ות, ולא נשארת רק עם תיוג ראשוני.`;
+  const improveText = state.identifyAttempts > 0
+    ? (state.mode === 'test' ? 'במבחן שווה לבדוק שוב את ההבדל בין שלשות קרובות לפני הבחירה.' : state.current.wrongHint)
+    : 'אפשר לחדד עוד יותר את המעבר מהזיהוי לשאלות, כך שכל שאלה תישמע כמו המשך טבעי של אותה משפחה.';
+  const nextText = safeText(state.current?.insight, rowMeta.insight || 'בסבב הבא חפש/י שוב את השאלה שמחזירה את השכבה הבאה של המידע, לא רק את שם הדפוס.');
+  return `
+    <section class="ltv3-practice-shell">
+      <div class="ltv3-topbar">
+        <div class="ltv3-pill-row">
+          <span class="ltv3-pill">${esc(trafficTone)}</span>
+          <span class="ltv3-pill">מצב <strong>${state.mode === 'test' ? 'מבחן' : 'לימוד'}</strong></span>
+          <span class="ltv3-pill">ניקוד <strong>${state.roundScore}</strong></span>
+        </div>
+        <div class="ltv3-pill-row">
+          <button type="button" class="btn btn-secondary" data-action="show-onboarding">פתיחה</button>
+          <button type="button" class="btn btn-secondary" data-action="open-guide">עזרה</button>
+          <button type="button" class="btn btn-secondary" data-action="open-progress">התקדמות</button>
+        </div>
+      </div>
+      <section class="ltv3-stage-card">
+        <div class="ltv3-stage-head">
+          <p class="ltv3-kicker">סיכום הסבב</p>
+          <h3>${esc(extractThemeName(rowMeta.title))}</h3>
+          <p>השלשה הושלמה. עכשיו אפשר לראות מה עבד, מה כדאי לדייק, ומה לקחת לשיחה הבאה.</p>
+        </div>
+        <section class="ltv3-target-card is-compact">
+          <span class="ltv3-target-kicker">המשפט שנפתח</span>
+          <p>${esc(state.current?.target || '')}</p>
+        </section>
+        <div class="ltv3-debrief-items">
+          <article class="ltv3-debrief-item">
+            <span class="ltv3-debrief-icon">✓</span>
+            <div>
+              <strong>מה עבד</strong>
+              <p>${esc(whatWorked)}</p>
+            </div>
+          </article>
+          <article class="ltv3-debrief-item">
+            <span class="ltv3-debrief-icon">!</span>
+            <div>
+              <strong>מה לשפר</strong>
+              <p>${esc(improveText)}</p>
+            </div>
+          </article>
+          <article class="ltv3-debrief-item">
+            <span class="ltv3-debrief-icon">→</span>
+            <div>
+              <strong>מה הלאה</strong>
+              <p>${esc(nextText)}</p>
+            </div>
+          </article>
+        </div>
+        <div class="ltv3-inline-actions">
+          <button type="button" class="btn btn-primary" data-action="next-scene">משפט הבא ←</button>
+          <button type="button" class="btn btn-secondary" data-action="retry-scene">נסה שוב</button>
+        </div>
+      </section>
+    </section>
   `;
 }
 
@@ -1349,7 +1448,46 @@ function buildPracticeMarkup() {
 function buildShellMarkup() {
   return `
     <div class="ltv3-shell">
-      ${state.screen === 'onboarding' ? buildOnboardingMarkup() : buildPracticeMarkup()}
+      ${state.screen === 'home' ? buildOnboardingMarkup() : buildPracticeMarkup()}
+      ${buildOverlayMarkup()}
+    </div>
+  `;
+}
+
+function buildPracticeMarkupV2() {
+  const completed = Number(state.progress?.played || 0);
+  return `
+    <section class="ltv3-practice-shell">
+      <div class="ltv3-topbar">
+        <div class="ltv3-pill-row">
+          <span class="ltv3-pill">תרחיש <strong>${state.index + 1}</strong>/<strong>${state.queue.length || state.data.scenarios.length}</strong></span>
+          <span class="ltv3-pill">נקודות <strong>${state.roundScore}</strong></span>
+          <span class="ltv3-pill">הושלמו <strong>${completed}</strong></span>
+          <span class="ltv3-pill" data-trainer-summary="current">מצב <strong>${state.mode === 'test' ? 'מבחן' : 'לימוד'}</strong></span>
+        </div>
+        <div class="ltv3-pill-row">
+          <button type="button" class="btn btn-secondary" data-action="show-onboarding">פתיחה</button>
+          <button type="button" class="btn btn-secondary" data-action="open-guide">עזרה</button>
+          <button type="button" class="btn btn-secondary" data-action="open-map">מפת השלשות</button>
+          <button type="button" class="btn btn-secondary" data-action="open-progress">התקדמות</button>
+          <button type="button" class="btn btn-secondary" data-action="retry-scene">נסה שוב</button>
+        </div>
+      </div>
+      ${buildProgressMarkup()}
+      ${state.step === 'context' ? buildContextStage() : ''}
+      ${state.step === 'identify' ? buildIdentifyStage() : ''}
+      ${state.step === 'questions' ? buildQuestionStage() : ''}
+      ${state.step === 'landing' ? buildLandingStage() : ''}
+    </section>
+  `;
+}
+
+function buildStandaloneShellMarkup() {
+  const screenId = state.screen === 'practice' ? 'play' : state.screen === 'summary' ? 'summary' : 'home';
+  return `
+    <div class="ltv3-shell" data-trainer-platform="1" data-trainer-id="living-triples" data-screen="${esc(screenId)}" data-trainer-mobile-order="main">
+      ${buildHiddenHelpMarkup()}
+      ${state.screen === 'summary' ? buildSummaryMarkup() : state.screen === 'practice' ? buildPracticeMarkupV2() : buildOnboardingMarkup()}
       ${buildOverlayMarkup()}
     </div>
   `;
@@ -1357,7 +1495,7 @@ function buildShellMarkup() {
 
 function render() {
   if (!state.els.root) return;
-  state.els.root.innerHTML = buildShellMarkup();
+  state.els.root.innerHTML = buildStandaloneShellMarkup();
 }
 
 function queueChatScroll(selector) {
@@ -1381,7 +1519,9 @@ function handleRootClick(event) {
     window.location.href = 'index.html';
     return;
   }
-  if (action === 'start-practice') return void beginPractice();
+  if (action === 'start-practice') return void beginPractice('learning');
+  if (action === 'start-learning') return void beginPractice('learning');
+  if (action === 'start-test') return void beginPractice('test');
   if (action === 'show-onboarding') return void showOnboarding();
   if (action === 'open-guide') {
     setOverlay('guide');
@@ -1406,6 +1546,7 @@ function handleRootClick(event) {
   if (action === 'go-landing') return void beginLanding();
   if (action === 'next-landing-line') return void revealNextLandingLine();
   if (action === 'open-debrief') return void openDebrief();
+  if (action === 'finish-scene') return void completeScene();
   if (action === 'retry-scene') return void retryScene();
   if (action === 'next-scene') return void nextScenario();
 }
@@ -1437,7 +1578,7 @@ async function setupLivingTriplesModule() {
   }
 
   loadCurrentScenario();
-  state.screen = 'onboarding';
+  state.screen = 'home';
   setOverlay('');
   bindEvents();
   render();
