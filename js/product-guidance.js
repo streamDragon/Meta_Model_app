@@ -136,6 +136,7 @@
         }),
         prismlab: Object.freeze({
             containerSelector: '#prismlab',
+            inlineMode: 'help-only',
             familyLabel: 'Therapist Tools',
             familyName: 'כלי מטפל',
             title: 'מפת רמות ומטה-מודל',

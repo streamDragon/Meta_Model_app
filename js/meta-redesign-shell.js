@@ -9,7 +9,7 @@
     var PREFS_KEY = 'meta_shell_preferences_v1';
     var MANAGED_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'initial-image-vs-deep-structure', 'about'];
     var FEATURE_CHROME_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'initial-image-vs-deep-structure', 'about'];
-    var FAST_FEATURE_ENTRY_TABS = ['prismlab'];
+    var FAST_FEATURE_ENTRY_TABS = [];
     var DIRECT_FEATURE_STAGE_TABS = [];
     var HOME_VIEWS = ['home', 'stats', 'theory', 'settings', 'help'];
     var CTA_LABELS = ['יאללה, בואו נתחיל', 'אני מוכן — קדימה', 'בואו נצלול פנימה'];
@@ -651,7 +651,9 @@
         Object.keys(defaults).forEach(function (tab) {
             var meta = getMeta(tab);
             var raw = source[tab] && typeof source[tab] === 'object' ? source[tab] : {};
-            var stage = raw.stage === 'feature' || preferredFeatureStage(tab) === 'feature' ? 'feature' : 'welcome';
+            var stage = normalizeTab(tab) === 'prismlab'
+                ? preferredFeatureStage(tab)
+                : (raw.stage === 'feature' || preferredFeatureStage(tab) === 'feature' ? 'feature' : 'welcome');
             defaults[tab] = { stage: stage, settings: normalizeFeatureSettings(meta, raw.settings) };
         });
         return defaults;
