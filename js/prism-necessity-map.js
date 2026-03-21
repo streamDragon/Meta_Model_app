@@ -122,7 +122,7 @@
         Object.freeze({ id: 'presupposition', family: 'distortion', title: 'הנחות מוקדמות', difficulty: 'advanced', concept: 'בתוך המשפט כבר מתחבאת הנחה סמויה שמארגנת את הסיפור.', keyQuestion: 'מה ההנחה הסמויה?' })
     ]);
 
-    const PATTERN_IMAGE_BASE = '/assets/prismlab/';
+    const PATTERN_IMAGE_BASE = '/assets/images/prismlab/';
 
     const PATTERN_IMAGE_MAP = Object.freeze({
         simple_deletion: 'book-simple-deletion.webp',
