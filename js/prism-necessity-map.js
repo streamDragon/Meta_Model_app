@@ -31,8 +31,8 @@
     const FAMILY_META = Object.freeze({
         deletion: Object.freeze({
             id: 'deletion',
-            label: 'מחיקות',
-            shortLabel: 'מחיקות',
+            label: 'השמטות',
+            shortLabel: 'השמטות',
             description: 'מידע שנעלם מהמשפט',
             color: '#B85C38',
             soft: 'rgba(184, 92, 56, 0.11)'
@@ -108,7 +108,7 @@
     );
 
     const PATTERN_CATALOG = Object.freeze([
-        Object.freeze({ id: 'simple_deletion', family: 'deletion', title: 'מחיקה פשוטה', difficulty: 'basic', concept: 'חלק מהמשפט חסר, כך שמידע קריטי נשמט מן התמונה.', keyQuestion: 'מה בדיוק?' }),
+        Object.freeze({ id: 'simple_deletion', family: 'deletion', title: 'השמטה פשוטה', difficulty: 'basic', concept: 'חלק מהמשפט חסר, כך שמידע קריטי נשמט מן התמונה.', keyQuestion: 'מה בדיוק?' }),
         Object.freeze({ id: 'unspecified_verb', family: 'deletion', title: 'פועל לא מפורט', difficulty: 'basic', concept: 'הפעולה מתוארת באופן כללי, בלי לגלות איך היא קורית בפועל.', keyQuestion: 'איך בדיוק?' }),
         Object.freeze({ id: 'comparative_deletion', family: 'deletion', title: 'השוואה חסרה', difficulty: 'advanced', concept: 'יש שיפוט או מדידה, אבל ציר ההשוואה עצמו נשאר חסר.', keyQuestion: 'בהשוואה למה?' }),
         Object.freeze({ id: 'lost_referential_index', family: 'deletion', title: 'חוסר ייחוס', difficulty: 'advanced', concept: 'מישהו, אנשים, הם, זה. הסיפור מדבר על גורם לא מוגדר.', keyQuestion: 'מי בדיוק?' }),
