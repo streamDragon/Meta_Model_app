@@ -1708,6 +1708,10 @@ body {
   align-items: start;
 }
 
+.cc-platform-practice-layout--solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .cc-platform-practice-main,
 .cc-platform-support {
   display: grid;

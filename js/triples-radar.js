@@ -1444,7 +1444,7 @@
                     <span class="tr-phone-card-letter">${escapeHtml(getPhoneCardLetter(idx))}</span>
                     <span class="tr-phone-card-chip">${escapeHtml(getShortCategoryChip(normalized))}</span>
                     <small class="tr-phone-card-label">${escapeHtml(getCategoryLabelHe(normalized))}</small>
-                    ${used ? '<span class="tr-phone-card-used">נשאל ג“</span>' : ''}
+                    ${used ? '<span class="tr-phone-card-used">נשאל כבר</span>' : ''}
                 </button>
             `;
         }).join('');

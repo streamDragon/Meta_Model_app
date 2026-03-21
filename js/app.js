@@ -14091,7 +14091,7 @@ function evaluateCommunityMessage(text) {
     const tips = [];
     const strengths = [];
 
-    const hasQuestionMark = /[?״]/.test(message);
+    const hasQuestionMark = /[?؟？]/.test(message);
     if (hasQuestionMark) {
         score += 15;
         strengths.push('נוסח כשאלה ברורה');

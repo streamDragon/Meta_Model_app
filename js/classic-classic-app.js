@@ -1390,7 +1390,7 @@
                   <h2>${escapeHtml(trainerContract?.title || 'Classic Classic — זיהוי תבניות')}</h2>
                   <p>${escapeHtml(trainerContract?.settingsSubtitle || 'מכווננים מצב, קושי, עומס וסוגי קטגוריות לפני הסשן או במהלכו.')}</p>
                 </div>
-                <button type="button" class="cc-icon-btn" data-cc-action="close-setup" aria-label="סגור">ֳ—</button>
+                <button type="button" class="cc-icon-btn" data-cc-action="close-setup" aria-label="סגור">×</button>
               </div>
               ${renderSettingsControls('setup')}
               <div class="cc-modal-actions">
@@ -1410,16 +1410,20 @@
         const copy = state.copy || {};
         const operation = operationProfileForFamily(round?.pattern?.family);
         const examples = Array.isArray(round?.pattern?.examples) ? round.pattern.examples.slice(0, 2) : [];
+        const phase = getPhaseMeta(round?.stage || 'context');
+        const session = state.session;
+        const progress = currentQuestionPosition();
+        const steps = Array.isArray(trainerContract?.helperSteps) ? trainerContract.helperSteps : [];
         return `
-          <div class="cc-layer cc-layer-center" role="dialog" aria-modal="true" aria-label="לפני שמתחילים">
+          <div class="cc-layer cc-layer-center" role="dialog" aria-modal="true" aria-label="יועץ NLP">
             <div class="cc-modal-card cc-modal-card-wide">
               <div class="cc-modal-head">
                 <div>
-                  <div class="cc-modal-kicker">לפני שמתחילים (30 שניות)</div>
-                  <h2>מה המטרה כאן?</h2>
-                  <p>המטרה היא לפתח עין למבנה השפה: לזהות הכללה, מחיקה או עיוות לפני שנכנסים לפרשנות.</p>
+                  <div class="cc-modal-kicker">יועץ NLP</div>
+                  <h2>עזרה למסך הקלאסי</h2>
+                  <p>כאן שומרים את ההסבר סגור עד שצריך אותו: מה לזהות עכשיו, מה מחזיק את השלב הנוכחי, ואיך להתקדם בלי להעמיס את המסך הראשי.</p>
                 </div>
-                <button type="button" class="cc-icon-btn" data-cc-action="close-philosopher" aria-label="סגור">ֳ—</button>
+                <button type="button" class="cc-icon-btn" data-cc-action="close-philosopher" aria-label="סגור">×</button>
               </div>
               <div class="cc-summary-grid">
                 <div class="cc-summary-block">
@@ -1439,8 +1443,33 @@
                   <p><strong>${escapeHtml(operation.code)}</strong> ֲ· ${escapeHtml(operation.title)}</p>
                   <p>${escapeHtml(operation.desc)}</p>
                 </div>
+                ${round ? `
+                  <div class="cc-summary-block">
+                    <h4>מה קורה עכשיו</h4>
+                    <p><strong>${escapeHtml(phase.label || '')}</strong></p>
+                    <p>${escapeHtml(phase.goal || '')}</p>
+                    <p>שאלה ${progress.current}/${progress.total} · ניקוד ${session?.score ?? 0} · ${escapeHtml(familyLabelSimple(round?.pattern?.family || state.familyFocus))}</p>
+                  </div>
+                  <div class="cc-summary-block">
+                    <h4>כך בנוי הסשן</h4>
+                    ${renderSettingsSummaryLine()}
+                  </div>
+                ` : ''}
                 ${examples.length ? `<div class="cc-summary-block"><h4>דוגמה מהתרגול</h4><ul>${examples.map((x) => `<li>${escapeHtml(x)}</li>`).join('')}</ul></div>` : ''}
               </div>
+              ${steps.length ? `
+                <div class="cc-summary-block">
+                  <h4>איך מתקדמים מכאן</h4>
+                  <div class="cc-platform-helper-list">
+                    ${steps.map((step) => `
+                      <div class="cc-platform-helper-list-item">
+                        <strong>${escapeHtml(step.title || '')}</strong>
+                        <span>${escapeHtml(step.description || '')}</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
             </div>
           </div>
         `;
@@ -1767,8 +1796,8 @@
               ${livesChip}
             </div>
             <div class="cc-practice-bar-actions">
-              <button type="button" class="cc-icon-btn" data-cc-action="show-before-start" aria-label="לפני שמתחילים">?</button>
-              <button type="button" class="cc-icon-btn" data-cc-action="open-settings-drawer" data-trainer-action="open-settings" aria-label="הגדרות">ג™</button>
+              <button type="button" class="cc-icon-btn" data-cc-action="show-before-start" aria-label="יועץ NLP" title="יועץ NLP">?</button>
+              <button type="button" class="cc-icon-btn" data-cc-action="open-settings-drawer" data-trainer-action="open-settings" aria-label="הגדרות">⚙️</button>
             </div>
           </header>
         `;
@@ -1785,7 +1814,7 @@
                   <h2>${escapeHtml(trainerContract?.title || 'Classic Classic')}</h2>
                   <p>${escapeHtml(trainerContract?.settingsSubtitle || 'הגדרות נשמרות אוטומטית. כדי להחיל על הסשן הנוכחי, הפעילו מחדש.')}</p>
                 </div>
-                <button type="button" class="cc-icon-btn" data-cc-action="close-settings-drawer" aria-label="סגור">ֳ—</button>
+                <button type="button" class="cc-icon-btn" data-cc-action="close-settings-drawer" aria-label="סגור">×</button>
               </div>
               ${renderSettingsControls('drawer')}
               <div class="cc-modal-actions">
@@ -1846,15 +1875,14 @@
           <div class="cc-practice-shell" aria-label="תרגול מטה מודל" data-trainer-platform="1" data-trainer-id="classic-classic" data-trainer-mobile-order="${getMobileOrderAttr()}">
             ${renderPracticeTopBar(session, round)}
             <div class="cc-practice-meta-row">
-              <button type="button" class="cc-link-btn" data-cc-action="show-before-start">לפני שמתחילים (30 שניות)</button>
+              <button type="button" class="cc-link-btn" data-cc-action="show-before-start">יועץ NLP</button>
               <span class="cc-settings-preview-pill" data-trainer-summary="current">${escapeHtml(currentSettingsSummaryText())}</span>
             </div>
-            <div class="cc-platform-practice-layout">
+            <div class="cc-platform-practice-layout cc-platform-practice-layout--solo">
               <div class="cc-platform-practice-main" data-trainer-zone="main" ${getMobileZoneStyle('main')}>
                 ${round ? renderStageProgressPills(round) : ''}
                 ${renderPracticeCard(round)}
               </div>
-              ${renderPracticeSupportRail(round)}
             </div>
             ${renderSettingsDrawer()}
             ${renderPhilosopherOverlay(round)}
@@ -1976,7 +2004,7 @@
               ${renderIntroClarityStrip()}
               ${renderHelperStepsStrip()}
               <div class="cc-primary-actions">
-                <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="show-before-start">לפני שמתחילים (30 שניות)</button>
+              <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="show-before-start">יועץ NLP</button>
               </div>
               <div class="cc-entry-mini">
                 <span>מצב: ${settings.mode === 'exam' ? 'מבחן' : 'לימוד'}</span>

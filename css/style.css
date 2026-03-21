@@ -21423,7 +21423,7 @@ body.mobile-sticky-cta-visible {
 }
 
 .ceflow-choice-affordance::before {
-    content: "נ‘† ";
+    content: "↳ ";
 }
 
 .ceflow-choice-affordance[data-state="ready"] {

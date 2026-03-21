@@ -202,7 +202,7 @@
         let value = String(text || '').trim().replace(/\s+/g, ' ');
         if (!value) return '';
         value = value.replace(/[.:]+$/, '').trim();
-        if (!/[?ן¼]$/.test(value)) value = `${value}?`;
+        if (!/[?؟？]$/.test(value)) value = `${value}?`;
         return value;
     }
 
