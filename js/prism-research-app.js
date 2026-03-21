@@ -896,11 +896,11 @@
 
                 <div class="prm-recursive-flow" aria-hidden="true">
                     <span>משפט/קטע</span>
-                    <span class="prm-recursive-flow-arrow">ג†</span>
+                    <span class="prm-recursive-flow-arrow">→</span>
                     <span>שאלה מדויקת</span>
-                    <span class="prm-recursive-flow-arrow">ג†</span>
+                    <span class="prm-recursive-flow-arrow">→</span>
                     <span>תשובה חדשה</span>
-                    <span class="prm-recursive-flow-arrow">ג†</span>
+                    <span class="prm-recursive-flow-arrow">→</span>
                     <span>בחירת צעד הבא</span>
                 </div>
 
@@ -1122,7 +1122,7 @@
                     <div>
                         <p class="prm-eyebrow">Prism Research Mode</p>
                         <h1>מודל הפריזמה: חקירת טקסט דרך קטגוריות לשוניות-לוגיות</h1>
-                        <p class="prm-subtitle">לולאה קבועה: סימון ג†’ קטגוריה ג†’ שאלה ג†’ תשובה ג†’ חזור לבסיס / המשך מהתשובה.</p>
+                        <p class="prm-subtitle">לולאה קבועה: סימון → קטגוריה → שאלה → תשובה → חזור לבסיס / המשך מהתשובה.</p>
                         <div class="prm-hero-help-row">
                             <button
                                 type="button"

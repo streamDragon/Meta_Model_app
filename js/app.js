@@ -17959,7 +17959,7 @@ function legacyUpdateProgressHub() {
     }
 }
 
-// ״§‡ˆƒ XP acquisition ״¹„‰ actions
+// XP acquisition actions
 function onPracticeComplete() {
     addXP(5);
     recordSession();
