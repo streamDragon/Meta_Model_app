@@ -147,7 +147,7 @@
     const PATTERN_IDS = Object.freeze(PATTERN_CATALOG.map((pattern) => pattern.id));
 
     const INTRO_DIALOG = Object.freeze({
-        teaser: 'רוצים לראות למה כדאי ללמוד את זה?',
+        teaser: 'הייתם רוצים את הכוח הזה בחדר הטיפולי? לחצו לדוגמה קצרה',
         title: 'דוגמה קצרה: איך מיפוי רמות לוגיות פותח כיוון טיפולי חדש',
         clientLine: 'אין בינינו תקשורת. פשוט אין. זה מת.',
         classicLine: 'בגישה הרגילה היינו עוצרים ב: "מה בדיוק חסר בתקשורת?"',
@@ -860,7 +860,7 @@
         const selectedPattern = !!state.selectedPatternId;
         const steps = [
             { id: 'landing', index: 1, label: 'החידוש', enabled: true },
-            { id: 'categories', index: 2, label: 'תבנית', enabled: currentIndex >= 1 },
+            { id: 'categories', index: 2, label: 'בחירת תבנית', enabled: currentIndex >= 1 },
             { id: 'preview', index: 3, label: 'תצוגה מקדימה', enabled: selectedPattern && currentIndex >= 2 },
             { id: 'exercise', index: 4, label: 'מעבדה', enabled: selectedPattern && currentIndex >= 3 }
         ];
@@ -985,15 +985,15 @@
             <div class="pnm-discovery-grid">
                 <article class="pnm-card pnm-card--discovery pnm-card--core">
                     <span class="pnm-eyebrow">הגרעין</span>
-                    <p>ברמה מסוימת נמצא מה שמחזיק את הסיפור במקום ונשמע הכרחי.</p>
+                    <p>ברמה מסוימת נמצא מה שמחזיק את הסיפור ומרגיש הכרחי – שם הסיפור אחוז חזק.</p>
                 </article>
                 <article class="pnm-card pnm-card--discovery pnm-card--crack">
                     <span class="pnm-eyebrow">הסדק</span>
-                    <p>ברמה אחרת נפתח פתח קטן לתנועה, גם אם הכול עדיין מרגיש תקוע.</p>
+                    <p>ברמה אחרת נפתח פתח קטן – גם אם הכול מרגיש תקוע, שם כבר יש תנועה אפשרית.</p>
                 </article>
                 <article class="pnm-card pnm-card--discovery pnm-card--punch">
                     <span class="pnm-eyebrow">הפאנץ׳</span>
-                    <p>שאלה אחת שמרחיבה את התמונה ומולידה כיוון טיפולי חדש.</p>
+                    <p>שאלה שמרחיבה מעבר למשפט המקורי ומולידה כיוון טיפולי חדש שנולד מהמטופל/ת עצמם.</p>
                 </article>
             </div>
         `;
@@ -1023,7 +1023,7 @@
                 <section class="pnm-dialog-section">
                     <button type="button" class="pnm-dialog-toggle" data-action="toggle-dialog" aria-expanded="${state.dialogOpen ? 'true' : 'false'}">
                         <span>${escapeHtml(INTRO_DIALOG.teaser)}</span>
-                        <strong>${state.dialogOpen ? 'סגור דוגמה' : 'פתח דוגמה'}</strong>
+                        <strong>${state.dialogOpen ? '▴ סגור' : '▾ פתח'}</strong>
                     </button>
                     ${state.dialogOpen ? renderIntroDialog() : ''}
                 </section>
@@ -1047,8 +1047,8 @@
                 ${renderDiscoveryCards()}
 
                 <article class="pnm-card pnm-card--aside">
-                    <span class="pnm-eyebrow">Pacing & Leading</span>
-                    <p>המיפוי מאשר את החוויה של המטופל/ת כפי שהיא, ובו בזמן מראה איפה כבר יש אפשרות לתנועה. לא "זה לא נכון", אלא "זה נכון כרגע, ויכול להיות שגם אחרת".</p>
+                    <span class="pnm-eyebrow">הצפרני ומוליך (Pacing & Leading)</span>
+                    <p>המיפוי מאשר את החוויה של המטופל/ת כפי שהיא (הצפרני) ובמקביל מגלה שיש אפשרות לתנועה (מוליך) – חיזוק של "זה נכון כרגע, ויכול להיות שגם אחרת".</p>
                 </article>
 
                 <div class="pnm-cta-row">
@@ -1117,7 +1117,7 @@
         return `
             <button type="button" class="pnm-card pnm-pattern-card" style="--pnm-family:${escapeHtml(family.color)};--pnm-family-soft:${escapeHtml(family.soft)}" data-action="open-category" data-category-id="${escapeHtml(pattern.id)}">
                 <div class="pnm-pattern-card__meta">
-                    <span class="pnm-pattern-pill">${escapeHtml(difficultyLabel(pattern.difficulty))}</span>
+                    <span class="pnm-pattern-pill pnm-pattern-pill--${escapeHtml(normalizeDifficulty(pattern.difficulty))}">${escapeHtml(difficultyLabel(pattern.difficulty))}</span>
                     <span class="pnm-pattern-pill pnm-pattern-pill--ghost">${escapeHtml(examplesLabel)}</span>
                 </div>
                 <h3>${escapeHtml(pattern.title)}</h3>
@@ -1209,12 +1209,13 @@
     }
 
     function renderPreviewTimeline() {
+        // Items are trusted hardcoded strings – no user input, safe to use as HTML
         const items = [
-            'זיהוי ההפרה במשפט של מטופל/ת',
-            'מיפוי המשפט דרך כל רמה לוגית',
-            'איתור הגרעין שמחזיק את הסיפור',
-            'חיפוש הסדק שבו יש תנועה אפשרית',
-            'יצירת שאלת פאנץ׳ שמרחיבה את הכיוון הטיפולי'
+            '<strong>זיהוי הפרה</strong> – ניתן למשפט את ניסוח המטופל/ת לזהות את התבנית',
+            '<strong>מיפוי ברמות</strong> – המשפט מוצג דרך כל אחת משש הרמות הלוגיות',
+            '<strong>הגרעין</strong> – נאתר את הרמה שמחזיקה את הסיפור ומרגישה הכרחית',
+            '<strong>הסדק</strong> – נחפש את הרמה שבה כבר יש תנועה אפשרית',
+            '<strong>הפאנץ׳</strong> – שאלה טיפולית שמרחיבה את המרחב ומולידה כיוון חדש'
         ];
 
         return `
@@ -1222,7 +1223,7 @@
                 ${items.map((item, index) => `
                     <li class="pnm-timeline__item">
                         <span class="pnm-timeline__index">${index + 1}</span>
-                        <span>${escapeHtml(item)}</span>
+                        <span>${item}</span>
                     </li>
                 `).join('')}
             </ol>

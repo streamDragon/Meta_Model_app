@@ -772,3 +772,134 @@ body.shell-feature-active[data-active-tab="prismlab"] {
     border-radius: 22px;
   }
 }
+
+/* ─── Overflow fix for pattern grid ────────────────────────────────────────── */
+.pnm-view--categories {
+  overflow-x: hidden;
+}
+
+.pnm-family-section {
+  overflow: hidden;
+}
+
+.pnm-pattern-grid {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.pnm-pattern-card {
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+/* ─── Progress step: active = filled brown + white text ─────────────────────── */
+.pnm-progress-step.is-current {
+  background: var(--pnm-primary);
+  color: #fff;
+  border-color: var(--pnm-primary);
+}
+
+.pnm-progress-step.is-current .pnm-progress-step__index {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+/* ─── Color-coded difficulty pills ──────────────────────────────────────────── */
+.pnm-pattern-pill--basic {
+  background: #E8F5E9;
+  color: #2E7D32;
+  border-color: #C8E6C9;
+}
+
+.pnm-pattern-pill--advanced {
+  background: #FFF3E0;
+  color: #E65100;
+  border-color: #FFE0B2;
+}
+
+/* ─── Discovery cards: left-border accent per category ──────────────────────── */
+.pnm-card--discovery.pnm-card--core {
+  border-inline-start: 3px solid #B85C38;
+}
+
+.pnm-card--discovery.pnm-card--crack {
+  border-inline-start: 3px solid #5C4B99;
+}
+
+.pnm-card--discovery.pnm-card--punch {
+  border-inline-start: 3px solid #2D6A4F;
+}
+
+.pnm-card--discovery .pnm-eyebrow {
+  font-size: 0.84rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.pnm-card--discovery.pnm-card--core .pnm-eyebrow { color: #B85C38; }
+.pnm-card--discovery.pnm-card--crack .pnm-eyebrow { color: #5C4B99; }
+.pnm-card--discovery.pnm-card--punch .pnm-eyebrow { color: #2D6A4F; }
+
+/* ─── Key question pill in pattern cards uses family color ──────────────────── */
+.pnm-pattern-card .pnm-key-question {
+  display: inline-block;
+  color: var(--pnm-family);
+  background: var(--pnm-family-soft);
+  border: 1px solid color-mix(in srgb, var(--pnm-family) 22%, transparent);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+/* ─── Flow grid: stack vertically (before/after comparison) ─────────────────── */
+.pnm-flow-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* ─── Timeline items: bold step name + description ──────────────────────────── */
+.pnm-timeline__item {
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.pnm-timeline__item strong {
+  color: var(--pnm-ink);
+}
+
+/* ─── Intro dialog: level-row improvements ──────────────────────────────────── */
+.pnm-level-dialog-row__question {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--pnm-ink);
+  margin: 0;
+}
+
+.pnm-level-dialog-row__answer {
+  font-size: 0.85rem;
+  color: var(--pnm-muted);
+  margin: 0;
+  padding-inline-start: 10px;
+  border-inline-start: 2px solid var(--pnm-border);
+}
+
+/* ─── Family section head: improved visual separation ───────────────────────── */
+.pnm-family-section {
+  display: grid;
+  gap: 12px;
+}
+
+.pnm-family-section__head {
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* ─── Pattern card hover: subtle translateX in RTL ──────────────────────────── */
+@media (hover: hover) {
+  .pnm-pattern-card:hover {
+    transform: translateX(3px);
+  }
+}
