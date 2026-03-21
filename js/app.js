@@ -10820,8 +10820,14 @@ function syncRapidPatternFeedbackOverlayClosed() {
 }
 
 function closeRapidPatternFeedbackOverlay() {
+    const wasOpen = rapidPatternArenaState.feedbackOverlayOpen;
     syncRapidPatternFeedbackOverlayClosed();
-    if (window.MetaOverlayProvider?.isOpen()) {
+    const overlayRoot = document.getElementById('app-overlay-root');
+    if (
+        wasOpen &&
+        window.MetaOverlayProvider?.isOpen() &&
+        overlayRoot?.getAttribute('data-overlay-type') === 'rapid-pattern-feedback'
+    ) {
         window.MetaOverlayProvider.closeOverlay('rapid-pattern-feedback');
     }
 }
@@ -12026,16 +12032,17 @@ function handleRapidPatternCorrectAnswer(button, cue, resolvedPatternId = '') {
     });
     updateRapidPatternScoreboard();
     if (finishRapidPatternRoundIfNeeded()) return;
-    completeRapidPatternRound(
-        coach && typeof coach.buildRapidRound === 'function'
-            ? coach.buildRapidRound({ success: true, label: getRapidPatternLabel(normalizedPatternId) })
-            : {
-                title: 'נכון',
-                body: `${getRapidPatternLabel(normalizedPatternId)}. מעולה, ממשיכים.`,
-                tone: 'success',
-                success: true
-            }
-    );
+    const roundFeedback = coach && typeof coach.buildRapidRound === 'function'
+        ? coach.buildRapidRound({ success: true, label: getRapidPatternLabel(normalizedPatternId) })
+        : {
+            title: 'נכון',
+            body: `${getRapidPatternLabel(normalizedPatternId)}. מעולה, ממשיכים.`,
+            tone: 'success'
+        };
+    completeRapidPatternRound({
+        success: true,
+        ...(roundFeedback || {})
+    });
 }
 
 function handleRapidPatternWrongAnswer(button, cue, chosenPattern = '') {
@@ -12341,6 +12348,15 @@ function finishRapidPatternRoundIfNeeded() {
             ? window.MetaRedesignCoach.buildRapidSessionDone(correctCount, Math.max(1, rapidPatternArenaState.history.length))
             : `${correctCount}/${Math.max(1, rapidPatternArenaState.history.length)} נכונות. אפשר לפתוח נתונים או להתחיל שוב.`,
         tone: 'info'
+    });
+    openRapidPatternFeedbackOverlay({
+        tone: correctCount >= Math.max(1, Math.ceil(rapidPatternArenaState.history.length * 0.6)) ? 'success' : 'info',
+        title: 'הסבב הושלם',
+        body: window.MetaRedesignCoach && typeof window.MetaRedesignCoach.buildRapidSessionDone === 'function'
+            ? window.MetaRedesignCoach.buildRapidSessionDone(correctCount, Math.max(1, rapidPatternArenaState.history.length))
+            : `${correctCount}/${Math.max(1, rapidPatternArenaState.history.length)} נכונות. אפשר לפתוח נתונים או להתחיל שוב.`,
+        success: correctCount >= Math.max(1, Math.ceil(rapidPatternArenaState.history.length * 0.6)),
+        sessionCompleted: true
     });
     return true;
 }
