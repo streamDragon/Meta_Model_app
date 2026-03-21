@@ -8283,7 +8283,7 @@ const QUESTION_DRILL_SUCCESS_PLANS = Object.freeze([
     })
 ]);
 
-const QUESTION_DRILL_FEEDBACK_MODAL_IMAGE_SRC = 'assets/images/bandler_grinder_icon.jpg';
+const QUESTION_DRILL_FEEDBACK_MODAL_IMAGE_SRC = '/assets/images/bandler_grinder_icon.jpg';
 const QUESTION_DRILL_GROWTH_QUOTES = Object.freeze([
     'אין כישלון, יש משוב לצמיחה.',
     'אם משהו לא עובד, משנים את הדרך ולא את הערך שלך.',
