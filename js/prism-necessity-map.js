@@ -574,14 +574,37 @@
         return false;
     }
 
+    function usesStandaloneLanding(state) {
+        return !!state && state.mode === 'standalone';
+    }
+
+    function getDefaultStageForMode(mode) {
+        return mode === 'standalone' ? 'landing' : 'categories';
+    }
+
+    function getEffectiveStage(state) {
+        const fallbackStage = getDefaultStageForMode(state?.mode || 'embedded');
+        const stage = state?.stage || fallbackStage;
+        if (!usesStandaloneLanding(state) && stage === 'landing') return 'categories';
+        return stage;
+    }
+
+    function getStageEyebrow(state, stepId) {
+        const labels = usesStandaloneLanding(state)
+            ? { categories: 'שלב 2', preview: 'שלב 3', exercise: 'שלב 4' }
+            : { categories: 'שלב 1', preview: 'שלב 2', exercise: 'שלב 3' };
+        return labels[stepId] || '';
+    }
+
     function createState(root) {
+        const mode = root.getAttribute('data-prism-necessity-mode') || 'embedded';
         return {
             root,
-            mode: root.getAttribute('data-prism-necessity-mode') || 'embedded',
+            mode,
             loaded: false,
             error: '',
             payload: null,
-            stage: 'landing',
+            stage: getDefaultStageForMode(mode),
             workspaceMode: 'preview',
             selectedPatternId: '',
             sessionIndex: 0,
@@ -632,10 +655,11 @@
     }
 
     function getCurrentProgressStep(state) {
-        if (state.stage === 'landing') return 'landing';
-        if (state.stage === 'categories') return 'categories';
-        if (state.stage === 'workspace') return state.workspaceMode === 'exercise' ? 'exercise' : 'preview';
-        return 'landing';
+        const stage = getEffectiveStage(state);
+        if (stage === 'landing') return 'landing';
+        if (stage === 'categories') return 'categories';
+        if (stage === 'workspace') return state.workspaceMode === 'exercise' ? 'exercise' : 'preview';
+        return getDefaultStageForMode(state?.mode || 'embedded');
     }
 
     function getCurrentLevelLabel(levelId) {
@@ -658,6 +682,7 @@
     }
 
     function goLanding(state) {
+        if (!usesStandaloneLanding(state)) return goCategories(state);
         state.stage = 'landing';
         state.workspaceMode = 'preview';
         state.insightOpen = false;
@@ -819,7 +844,7 @@
     }
 
     function restartFeature(state) {
-        state.stage = 'landing';
+        state.stage = getDefaultStageForMode(state.mode);
         state.workspaceMode = 'preview';
         state.selectedPatternId = '';
         state.sessionIndex = 0;
@@ -833,12 +858,14 @@
     }
 
     function stepBack(state) {
+        const stage = getEffectiveStage(state);
+
         if (state.insightOpen) {
             state.insightOpen = false;
             return true;
         }
 
-        if (state.stage === 'workspace') {
+        if (stage === 'workspace') {
             if (state.workspaceMode === 'exercise') {
                 if (state.revealedCount > 0) {
                     state.revealedCount -= 1;
@@ -853,7 +880,8 @@
             return true;
         }
 
-        if (state.stage === 'categories') {
+        if (stage === 'categories') {
+            if (!usesStandaloneLanding(state)) return false;
             state.stage = 'landing';
             state.scrollToTop = true;
             return true;
@@ -871,9 +899,9 @@
                 return handled;
             },
             restart() {
-                const handled = restartFeature(state);
-                if (handled) renderApp(state);
-                return handled;
+                restartFeature(state);
+                renderApp(state);
+                return usesStandaloneLanding(state);
             }
         };
     }
@@ -885,7 +913,9 @@
 
     function renderProgressRail(state) {
         const currentStep = getCurrentProgressStep(state);
-        const stepOrder = ['landing', 'categories', 'preview', 'exercise'];
+        const stepOrder = usesStandaloneLanding(state)
+            ? ['landing', 'categories', 'preview', 'exercise']
+            : ['categories', 'preview', 'exercise'];
         const currentIndex = stepOrder.indexOf(currentStep);
         const selectedPattern = !!state.selectedPatternId;
         const steps = [
@@ -894,6 +924,19 @@
             { id: 'preview', index: 3, label: 'תצוגה מקדימה', enabled: selectedPattern && currentIndex >= 2 },
             { id: 'exercise', index: 4, label: 'מעבדה', enabled: selectedPattern && currentIndex >= 3 }
         ];
+
+        if (!usesStandaloneLanding(state)) {
+            steps.shift();
+            steps[0].index = 1;
+            steps[0].label = 'בחירת תבנית';
+            steps[0].enabled = true;
+            steps[1].index = 2;
+            steps[1].label = 'תצוגה מקדימה';
+            steps[1].enabled = selectedPattern && currentIndex >= 1;
+            steps[2].index = 3;
+            steps[2].label = 'מעבדה';
+            steps[2].enabled = selectedPattern && currentIndex >= 2;
+        }
 
         return `
             <nav class="pnm-progress-rail" aria-label="שלבי התרגול">
@@ -1342,20 +1385,23 @@
     }
 
     function renderCategories(state) {
+        const introCopy = usesStandaloneLanding(state)
+            ? 'בחרו תבנית אחת, עברו רגע על שאלת המפתח, ואז היכנסו לעבודה דרך הרמות הלוגיות.'
+            : 'כאן בוחרים תבנית אחת ונכנסים ישר לעבודה. ההסבר הרחב נשאר בדף הפתיחה, וכאן נשאר רק מה שצריך כדי לתרגל.';
         return `
             <section class="pnm-view pnm-view--categories">
                 ${renderProgressRail(state)}
                 <article class="pnm-card">
                     <div class="pnm-section-head">
                         <div>
-                            <span class="pnm-eyebrow">שלב 2</span>
-                            <h1>בחרו תבנית להעמקה</h1>
-                            <p>כל תבנית תיחקר דרך הרמות הלוגיות, מהסביבה ועד הזהות והמעבר לעצמי.</p>
+                            <span class="pnm-eyebrow">${escapeHtml(getStageEyebrow(state, 'categories'))}</span>
+                            <h1>בחרו תבנית לתרגול</h1>
+                            <p>${escapeHtml(introCopy)}</p>
                         </div>
                         ${renderWindowedAction(state)}
                     </div>
                 </article>
-                ${renderReminderPanel(state)}
+                ${usesStandaloneLanding(state) ? renderReminderPanel(state) : ''}
                 ${renderFilterRow(state)}
                 ${renderFamilySections(state)}
             </section>
