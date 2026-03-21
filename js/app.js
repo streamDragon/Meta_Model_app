@@ -11898,7 +11898,7 @@ function resumeRapidPatternSession() {
     updateRapidPatternLayoutState();
 }
 
-function completeRapidPatternRound({ title = '', body = '', tone = 'info' } = {}) {
+function completeRapidPatternRound({ title = '', body = '', tone = 'info', success = false } = {}) {
     stopRapidPatternTimer();
     clearRapidPatternNextTimer();
     rapidPatternArenaState.active = false;
@@ -11912,6 +11912,13 @@ function completeRapidPatternRound({ title = '', body = '', tone = 'info' } = {}
     updateRapidPatternExplainButtonState();
     setRapidPatternRoundFeedback({ title, body, tone });
     updateRapidPatternLayoutState({ focusLiveSurface: true });
+    openRapidPatternFeedbackOverlay({
+        tone,
+        title,
+        body,
+        success,
+        sessionCompleted: false
+    });
 }
 
 function handleRapidPatternNextAction() {
@@ -11925,6 +11932,7 @@ function handleRapidPatternNextAction() {
 
 function skipRapidPatternCue() {
     const cue = rapidPatternArenaState.currentCue;
+    if (rapidPatternArenaState.feedbackOverlayOpen) return;
     if (!rapidPatternArenaState.active || !cue) return;
 
     rapidPatternArenaState.errors = 2;
@@ -11946,7 +11954,8 @@ function skipRapidPatternCue() {
     completeRapidPatternRound({
         title: 'דילוג',
         body: `התשובה הנכונה היא ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`,
-        tone: 'warn'
+        tone: 'warn',
+        success: false
     });
 }
 
@@ -12023,7 +12032,8 @@ function handleRapidPatternCorrectAnswer(button, cue, resolvedPatternId = '') {
             : {
                 title: 'נכון',
                 body: `${getRapidPatternLabel(normalizedPatternId)}. מעולה, ממשיכים.`,
-                tone: 'success'
+                tone: 'success',
+                success: true
             }
     );
 }
@@ -12062,11 +12072,12 @@ function handleRapidPatternWrongAnswer(button, cue, chosenPattern = '') {
         completeRapidPatternRound(
             coach && typeof coach.buildRapidRound === 'function'
                 ? coach.buildRapidRound({ label: getRapidPatternLabel(normalizeRapidPatternId(cue.patternId)) })
-                : {
-                    title: 'לא מדויק',
-                    body: `התשובה הנכונה היא ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`,
-                    tone: 'danger'
-                }
+            : {
+                title: 'לא מדויק',
+                body: `התשובה הנכונה היא ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`,
+                tone: 'danger',
+                success: false
+            }
         );
         return;
     }
@@ -12121,7 +12132,8 @@ function handleRapidPatternTimeout() {
             : {
                 title: 'נגמר הזמן',
                 body: `התשובה הנכונה היא ${getRapidPatternLabel(normalizeRapidPatternId(cue.patternId))}.`,
-                tone: 'danger'
+                tone: 'danger',
+                success: false
             }
     );
 }
@@ -12516,6 +12528,7 @@ function updateRapidPatternScoreboard() {
     const roundEl = rapidPatternArenaState.elements.round;
     const compactRoundEl = rapidPatternArenaState.elements.compactRound;
     const compactCorrectEl = rapidPatternArenaState.elements.compactCorrect;
+    const compactModeEl = rapidPatternArenaState.elements.compactMode;
     const compactStreakEl = rapidPatternArenaState.elements.compactStreak;
     const correctCount = getRapidPatternCorrectCount();
     if (scoreEl) scoreEl.textContent = String(rapidPatternArenaState.score);
@@ -12527,6 +12540,9 @@ function updateRapidPatternScoreboard() {
     }
     if (compactCorrectEl) {
         compactCorrectEl.textContent = `נכון ${correctCount}`;
+    }
+    if (compactModeEl) {
+        compactModeEl.textContent = rapidPatternArenaState.mode === 'exam' ? 'מצב מבחן' : 'מצב לימוד';
     }
     if (compactStreakEl) {
         compactStreakEl.textContent = rapidPatternArenaState.mode === 'exam'
