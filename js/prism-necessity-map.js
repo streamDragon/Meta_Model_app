@@ -1072,6 +1072,109 @@
         `;
     }
 
+    // ─── Selection: centered header ────────────────────────────────────────────
+    function renderSelectionHeader() {
+        return `
+            <header class="pnm-sel-header">
+                <h1 class="pnm-sel-title">מפת רמות ומטה-מודל</h1>
+                <p class="pnm-sel-subtitle">כלי שמרחיב את העבודה על הפרות מטה-מודל – ממצביע עליהן, ומוצא דרך חדשה לרמות לוגיות.</p>
+            </header>
+        `;
+    }
+
+    // ─── Selection: before/after visual explainer ──────────────────────────────
+    function renderBeforeAfterExplainer() {
+        return `
+            <div class="pnm-explainer">
+                <div class="pnm-flow-row pnm-flow-row--usual">
+                    <span class="pnm-flow-label">דרך רגילה:</span>
+                    <div class="pnm-flow-pills">
+                        <span class="pnm-flow-pill">משפט של מטופל</span>
+                        <span class="pnm-flow-arrow">←</span>
+                        <span class="pnm-flow-pill">זיהוי תבנית</span>
+                        <span class="pnm-flow-arrow">←</span>
+                        <span class="pnm-flow-pill">שיקוף למטופל</span>
+                        <span class="pnm-flow-pill pnm-flow-pill--end">← עוצרים שם.</span>
+                    </div>
+                </div>
+                <div class="pnm-flow-row pnm-flow-row--innovation">
+                    <span class="pnm-flow-badge">חידוש</span>
+                    <span class="pnm-flow-label">גישה חדשה:</span>
+                    <div class="pnm-flow-pills">
+                        <span class="pnm-flow-pill">משפט</span>
+                        <span class="pnm-flow-arrow">←</span>
+                        <span class="pnm-flow-pill">זיהוי</span>
+                        <span class="pnm-flow-arrow">←</span>
+                        <span class="pnm-flow-pill pnm-flow-pill--key">מיפוי רמות לוגיות</span>
+                        <span class="pnm-flow-arrow">←</span>
+                        <span class="pnm-flow-pill pnm-flow-pill--key">גרעין + סדק</span>
+                        <span class="pnm-flow-arrow">←</span>
+                        <span class="pnm-flow-pill pnm-flow-pill--key">פאנץ׳ לטיפול</span>
+                    </div>
+                </div>
+                <p class="pnm-explainer-note">בסוף המיפוי – מגלים שלושה ממצאים שמקדמים את הטיפול:</p>
+                <div class="pnm-discovery-pills">
+                    <span class="pnm-discovery-pill" style="border-right:3px solid #B85C38"><strong>הגרעין</strong> – מה מחזיק את הסיפור במקום</span>
+                    <span class="pnm-discovery-pill" style="border-right:3px solid #5C4B99"><strong>הסדק</strong> – איפה אפשר לפתוח שינוי</span>
+                    <span class="pnm-discovery-pill" style="border-right:3px solid #2D6A4F"><strong>הפאנץ׳</strong> – שאלה שפותחת כיוון חדש</span>
+                </div>
+            </div>
+        `;
+    }
+
+    // ─── Selection: full example dialog (always visible) ──────────────────────
+    function renderExampleDialog() {
+        return `
+            <div class="pnm-example-dialog">
+                <div class="pnm-example-dialog__head">
+                    <span class="pnm-example-dialog__icon">🔍</span>
+                    <h2 class="pnm-example-dialog__title">רואים איך זה עובד – דוגמה אחת מספרת הכול</h2>
+                </div>
+                <div class="pnm-speech-bubble">
+                    "${escapeHtml(INTRO_DIALOG.clientLine)}"
+                </div>
+                <div class="pnm-example-id">
+                    <span class="pnm-example-id__pill" style="background:#5C4B99;color:#fff">שם עצם מופשט</span>
+                    <span class="pnm-example-id__desc">"תקשורת" – תהליך חי שקופא למילה</span>
+                </div>
+                <div class="pnm-example-sep">
+                    <div class="pnm-example-sep__line"></div>
+                    <span class="pnm-example-sep__text">הגישה הרגילה: "${escapeHtml(INTRO_DIALOG.classicLine)}" – ועוצרים שם.<br>במקום, ממפים את המשפט דרך כל הרמות הלוגיות:</span>
+                    <div class="pnm-example-sep__line"></div>
+                </div>
+                <div class="pnm-level-map">
+                    ${INTRO_DIALOG.levels.map((entry) => {
+                        const lm = LEVEL_META[entry.levelId];
+                        return `
+                            <div class="pnm-level-map__row">
+                                <div class="pnm-level-map__head">
+                                    <span class="pnm-level-map__pill" style="background:${lm.color}22;color:${lm.color};border:1px solid ${lm.color}44">${escapeHtml(lm.label)}</span>
+                                    <span class="pnm-level-map__q">"${escapeHtml(entry.question)}"</span>
+                                </div>
+                                <p class="pnm-level-map__a">← ${escapeHtml(entry.answer)}</p>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="pnm-result-cards">
+                    <div class="pnm-result-card pnm-result-card--core">
+                        <span class="pnm-result-card__label">גרעין – ברמת הזהות</span>
+                        <p>${escapeHtml(INTRO_DIALOG.core)}</p>
+                    </div>
+                    <div class="pnm-result-card pnm-result-card--crack">
+                        <span class="pnm-result-card__label">סדק – ברמת היכולות</span>
+                        <p>${escapeHtml(INTRO_DIALOG.crack)}</p>
+                    </div>
+                    <div class="pnm-result-card pnm-result-card--punch">
+                        <span class="pnm-result-card__label">הפאנץ׳</span>
+                        <p>${escapeHtml(INTRO_DIALOG.punch)}</p>
+                    </div>
+                </div>
+                <p class="pnm-example-closing">${escapeHtml(INTRO_DIALOG.closing)}</p>
+            </div>
+        `;
+    }
+
     // ─── Library: hero image (with warm gradient fallback) ────────────────────
     function renderHeroImage() {
         return `
@@ -1495,7 +1598,7 @@
                 <article class="pnm-card pnm-question-card">
                     <div class="pnm-section-head pnm-section-head--compact">
                         <div>
-                            <span class="pnm-eyebrow">שלב 3</span>
+                            <span class="pnm-eyebrow">${escapeHtml(getStageEyebrow(state, 'preview'))}</span>
                             <h3>מוכנים להיכנס לתרגיל?</h3>
                         </div>
                     </div>
@@ -1591,7 +1694,7 @@
                 <article class="pnm-card pnm-instruction-card">
                     <div class="pnm-section-head pnm-section-head--compact">
                         <div>
-                            <span class="pnm-eyebrow">שלב 4</span>
+                            <span class="pnm-eyebrow">${escapeHtml(getStageEyebrow(state, 'exercise'))}</span>
                             <h3>${complete ? 'המפה הושלמה' : 'ממלאים את המפה צעד אחר צעד'}</h3>
                         </div>
                         <span class="pnm-chip" style="--pnm-chip-accent:${escapeHtml(family.color)}">${filledCount}/${session.questions.length}</span>
@@ -1638,6 +1741,38 @@
                     `}
                 </article>
                 ${renderMap(session, filledCount)}
+            </section>
+        `;
+    }
+
+    function renderHiddenHelpContent(state) {
+        if (!state.loaded || !state.payload) return '';
+
+        const stage = getEffectiveStage(state);
+        const pattern = getPatternById(state);
+        let stageCopy = 'בוחרים תבנית אחת, רואים את שאלת המפתח, ואז נכנסים למעבדה וממלאים את המפה צעד אחר צעד.';
+        if (stage === 'categories') {
+            stageCopy = 'במסך הזה פשוט בוחרים תבנית אחת לפי המשפחה או רמת הקושי, בלי עוד שכבות הסבר מעל התרגול.';
+        } else if (stage === 'workspace' && state.workspaceMode === 'preview') {
+            stageCopy = 'בתצוגה המקדימה רואים מהי שאלת המפתח, מה עומד לקרות בתרגיל, ואיך בנויה ההתקדמות.';
+        } else if (stage === 'workspace' && state.workspaceMode === 'exercise') {
+            stageCopy = 'במעבדה חושפים תשובה אחת בכל לחיצה, בונים את המפה בהדרגה, ואז פותחים את חלון התובנה.';
+        }
+
+        return `
+            <section class="pnm-help-sheet" data-trainer-help-content="1" hidden aria-hidden="true">
+                <div class="pnm-section-head pnm-section-head--compact">
+                    <div>
+                        <span class="pnm-eyebrow">עזרה קצרה</span>
+                        <h3>איך עובדים עם Prism Lab</h3>
+                    </div>
+                </div>
+                <p>${escapeHtml(usesStandaloneLanding(state)
+                    ? 'כאן אפשר לעבור מהספרייה אל התבנית, לראות רגע את המבנה, ואז להתחיל לעבוד.'
+                    : 'את ההסבר הרחב קיבלתם כבר בדף הפתיחה. כאן נשאר רק מה שצריך כדי לעבוד עם הטריינר.')}</p>
+                <p>${escapeHtml(stageCopy)}</p>
+                <p>רצף העבודה הוא: בחירת תבנית, תצוגה מקדימה, מעבדה, ואז חלון תובנה עם הגרעין, הסדק והפאנץ׳.</p>
+                ${pattern ? `<p><strong>כרגע פתוחה התבנית:</strong> ${escapeHtml(pattern.title)}</p>` : ''}
             </section>
         `;
     }
@@ -1716,14 +1851,16 @@
 
     function renderApp(state) {
         const shellClass = state.mode === 'standalone' ? 'pnm-app pnm-app--standalone' : 'pnm-app pnm-app--embedded';
+        const stage = getEffectiveStage(state);
         let body = '';
 
         if (state.error) body = renderError(state);
         else if (!state.loaded || !state.payload) body = renderLoading();
-        else if (state.stage === 'landing' || state.stage === 'categories') body = renderLibrary(state);
+        else if (stage === 'landing') body = renderLanding(state);
+        else if (stage === 'categories') body = renderCategories(state);
         else body = renderWorkspace(state);
 
-        state.root.innerHTML = `<div class="${shellClass}" dir="rtl">${body}${renderInsightModal(state)}</div>`;
+        state.root.innerHTML = `<div class="${shellClass}" dir="rtl">${body}${renderHiddenHelpContent(state)}${renderInsightModal(state)}</div>`;
         registerController(state);
 
         if (state.scrollToTop) {

@@ -714,31 +714,43 @@ async function runShellSmoke(baseUrl) {
         await navigate(screenId);
         await closeOverlayIfOpen();
         if (screenId === 'prismlab') {
+            const welcomeState = await page.evaluate((id) => {
+                const section = document.getElementById(id);
+                const welcomeShell = section?.querySelector('.meta-feature-welcome-shell');
+                const cta = section?.querySelector('[data-feature-enter]');
+                return {
+                    stage: section?.dataset?.metaFeatureStage || '',
+                    hasWelcomeShell: !!welcomeShell && getComputedStyle(welcomeShell).display !== 'none',
+                    ctaVisible: !!cta && getComputedStyle(cta).display !== 'none'
+                };
+            }, screenId);
+            await assert(welcomeState.stage === 'welcome', 'prismlab welcome stage before entry', welcomeState.stage);
+            await assert(welcomeState.hasWelcomeShell, 'prismlab welcome shell visible');
+            await assert(welcomeState.ctaVisible, 'prismlab welcome CTA visible');
+
             await enterManagedFeatureStage(screenId);
-            const landingState = await page.evaluate((id) => {
+            await page.waitForSelector('#prismlab .pnm-view--categories');
+            const featureState = await page.evaluate((id) => {
                 const section = document.getElementById(id);
                 return {
                     stage: section?.dataset?.metaFeatureStage || '',
-                    landingVisible: !!section?.querySelector('.pnm-view--landing'),
-                    startVisible: !!section?.querySelector('[data-action="start-lab"]'),
-                    homeVisible: !!section?.querySelector('[data-shell-chrome-home]'),
-                    restartVisible: !!section?.querySelector('[data-shell-chrome-restart]')
+                    categoriesVisible: !!section?.querySelector('.pnm-view--categories'),
+                    libraryVisible: !!section?.querySelector('.pnm-view--library'),
+                    landingCtaVisible: !!section?.querySelector('[data-action="start-lab"]'),
+                    helpContentPresent: !!section?.querySelector('[data-trainer-help-content]')
                 };
             }, screenId);
-            await assert(landingState.stage === 'feature', 'prismlab feature stage active from entry', landingState.stage);
-            await assert(landingState.landingVisible, 'prismlab landing visible');
-            await assert(landingState.startVisible, 'prismlab landing CTA visible');
-            await assert(landingState.homeVisible, 'prismlab home shortcut visible');
-            await assert(landingState.restartVisible, 'prismlab restart shortcut visible');
-
-            await page.locator('#prismlab [data-action="start-lab"]').click();
-            await page.waitForSelector('#prismlab .pnm-view--categories');
+            await assert(featureState.stage === 'feature', 'prismlab feature stage active from welcome', featureState.stage);
+            await assert(featureState.categoriesVisible, 'prismlab categories visible in feature stage');
+            await assert(!featureState.libraryVisible, 'prismlab does not render duplicate internal landing');
+            await assert(!featureState.landingCtaVisible, 'prismlab internal landing CTA removed from feature stage');
+            await assert(featureState.helpContentPresent, 'prismlab help content available for trainer overlay');
             await page.locator('#prismlab [data-action="open-category"]').first().click();
             await page.waitForSelector('#prismlab .pnm-view--workspace');
             await page.locator('#prismlab [data-shell-chrome-back]').click();
             await page.waitForSelector('#prismlab .pnm-view--categories');
             await page.locator('#prismlab [data-shell-chrome-back]').click();
-            await page.waitForSelector('#prismlab .pnm-view--landing');
+            await page.waitForFunction((id) => document.getElementById(id)?.dataset?.metaFeatureStage === 'welcome', screenId);
             trace('managed:done', screenId);
             return;
         }
@@ -1077,7 +1089,6 @@ async function runShellSmoke(baseUrl) {
                 await waitForActiveScreen(screenId, mobile);
                 await enterManagedFeatureStage(screenId, mobile);
                 if (screenId === 'prismlab') {
-                    await mobile.locator('#prismlab [data-action="start-lab"]').click();
                     await mobile.waitForSelector('#prismlab .pnm-view--categories');
                     await mobile.locator('#prismlab [data-action="open-category"]').first().click();
                     await mobile.waitForSelector('#prismlab .pnm-view--workspace');
