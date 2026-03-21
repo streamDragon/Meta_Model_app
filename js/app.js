@@ -8283,6 +8283,46 @@ const QUESTION_DRILL_SUCCESS_PLANS = Object.freeze([
     })
 ]);
 
+const QUESTION_DRILL_FEEDBACK_MODAL_IMAGE_SRC = 'assets/images/bandler_grinder_icon.jpg';
+const QUESTION_DRILL_GROWTH_QUOTES = Object.freeze([
+    'אין כישלון, יש משוב לצמיחה.',
+    'אם משהו לא עובד, משנים את הדרך ולא את הערך שלך.',
+    'המפה היא לא השטח, והפספוס הוא רק עוד מידע על המפה.',
+    'כל טעות קטנה מחדדת את האוזן לשאלה הבאה.',
+    'דיוק נבנה מסבב לסבב, לא ממכה אחת.',
+    'גם פספוס הוא חומר גלם מצוין ללמידה.',
+    'ברגע שרואים מה לא התאים, כבר מתקרבים למה שכן יעבוד.',
+    'משוב טוב לא סוגר אותך, הוא פותח אפשרות חדשה.',
+    'התגובה שקיבלת עכשיו היא רמז, לא פסק דין.',
+    'צמיחה מתחילה כשמסכימים להסתכל על המשוב בלי דרמה.'
+]);
+const QUESTION_DRILL_SUCCESS_QUOTES = Object.freeze([
+    'יפה. זו כבר אוזן ששומעת מבנה, לא רק תוכן.',
+    'בול. שאלת על מה שחסר, לא על מה שנוח.',
+    'כן. ככה נראה דיוק קטן שמייצר שינוי גדול.',
+    'מעולה. שמת את האצבע בדיוק במקום הלשוני הנכון.',
+    'חד. זאת כבר בחירה של מטפל/ת שמקשיב/ה למבנה.',
+    'יפה מאוד. נשארת עם מה שפותח בדיקה.',
+    'כל הכבוד. הזיהוי הזה מראה שהעין שלך מתחדדת.',
+    'ממש טוב. בחרת שאלה שעובדת עם המשפט, לא נגדו.',
+    'כן כן כן. זה סוג הדיוק שבונה רצף.',
+    'נהדר. ככה מרוויחים גם הבנה וגם קצב.'
+]);
+const QUESTION_DRILL_SUCCESS_HUMOR_LINES = Object.freeze([
+    'בנדלר וגרינדר מהצד: "כשזה יושב, גם המשפט נרגע."',
+    'הם מחייכים: "יפה, אף אחד לא היה צריך לנחש כאן."',
+    'הם קורצים: "זו לא טלפתיה, זו הקשבה טובה."',
+    'בנדלר וגרינדר אומרים: "יש פה מבנה, וסוף סוף מישהו פגש אותו בזמן."',
+    'הם צוחקים בשקט: "נחמד. אפילו הטריגר נראה פחות דרמטי עכשיו."'
+]);
+const QUESTION_DRILL_GROWTH_HUMOR_LINES = Object.freeze([
+    'בנדלר וגרינדר מגחכים: "מעולה, עכשיו יש לנו מה לדייק."',
+    'הם אומרים: "אם פספסת, הרווחת חומר גלם."',
+    'הם קורצים: "המשפט עוד לא נגמר, רק המשוב התחיל."',
+    'בנדלר וגרינדר מחייכים: "עוד לא בינגו, אבל בהחלט רמז טוב לסיבוב הבא."',
+    'הם מזכירים: "לא נבהלים מפספוס. פשוט שואלים טוב יותר בפעם הבאה."'
+]);
+
 const questionDrillState = {
     current: null,
     deck: [],
@@ -8324,6 +8364,8 @@ const questionDrillState = {
     feedbackHeading: '',
     feedbackTone: 'info',
     trafficState: 'green',
+    feedbackModalOpen: false,
+    pendingRoundOutcome: null,
     elements: {}
 };
 
@@ -8445,6 +8487,103 @@ function getQuestionDrillFeedbackHeading(tone = 'info') {
     if (tone === 'danger') return 'עוד רגע מנסים שוב';
     if (tone === 'warn') return 'בואו נדייק';
     return 'מה עושים עכשיו';
+}
+
+function pickQuestionDrillFeedbackLine(lines = [], offset = 0) {
+    if (!Array.isArray(lines) || !lines.length) return '';
+    const base = questionDrillState.attempts + questionDrillState.roundsDone + questionDrillState.roundChecks + offset;
+    const index = Math.abs(base) % lines.length;
+    return String(lines[index] || '').trim();
+}
+
+function getQuestionDrillFeedbackModalButtonLabel({ willComplete = false } = {}) {
+    return willComplete ? 'לסיכום הסשן' : 'הבנתי, לשאלה הבאה';
+}
+
+function closeQuestionDrillFeedbackModal({ clearPending = false } = {}) {
+    const elements = questionDrillState.elements || {};
+    questionDrillState.feedbackModalOpen = false;
+    if (clearPending) {
+        questionDrillState.pendingRoundOutcome = null;
+    }
+    if (elements.feedbackModal) {
+        elements.feedbackModal.classList.add('hidden');
+        elements.feedbackModal.setAttribute('aria-hidden', 'true');
+        delete elements.feedbackModal.dataset.tone;
+    }
+    updateQuestionDrillControlsState();
+}
+
+async function continueQuestionDrillFeedbackFlow() {
+    const pending = questionDrillState.pendingRoundOutcome;
+    closeQuestionDrillFeedbackModal({ clearPending: true });
+    if (!pending || !questionDrillState.current) return;
+
+    finalizeQuestionDrillRound(pending.finalizeReason || 'next');
+    if (!questionDrillState.sessionCompleted) {
+        await loadNextQuestionDrill({ playSound: true });
+        return;
+    }
+    updateQuestionDrillLayoutState({ focusLiveSurface: true });
+}
+
+function openQuestionDrillFeedbackModal({
+    tone = 'info',
+    title = '',
+    body = '',
+    success = false,
+    willComplete = false
+} = {}) {
+    const elements = questionDrillState.elements || {};
+    if (!elements.feedbackModal) return;
+
+    const normalizedTone = tone === 'success'
+        ? 'success'
+        : (tone === 'danger' ? 'danger' : (tone === 'warn' ? 'warn' : 'info'));
+    const quote = success
+        ? pickQuestionDrillFeedbackLine(QUESTION_DRILL_SUCCESS_QUOTES, 1)
+        : pickQuestionDrillFeedbackLine(QUESTION_DRILL_GROWTH_QUOTES, 2);
+    const humor = success
+        ? pickQuestionDrillFeedbackLine(QUESTION_DRILL_SUCCESS_HUMOR_LINES, 3)
+        : pickQuestionDrillFeedbackLine(QUESTION_DRILL_GROWTH_HUMOR_LINES, 4);
+
+    questionDrillState.feedbackModalOpen = true;
+    elements.feedbackModal.dataset.tone = normalizedTone;
+    elements.feedbackModal.classList.remove('hidden');
+    elements.feedbackModal.setAttribute('aria-hidden', 'false');
+
+    if (elements.feedbackModalImage && !elements.feedbackModalImage.getAttribute('src')) {
+        elements.feedbackModalImage.setAttribute('src', QUESTION_DRILL_FEEDBACK_MODAL_IMAGE_SRC);
+    }
+    if (elements.feedbackModalKicker) {
+        elements.feedbackModalKicker.textContent = success ? 'בנדלר וגרינדר אומרים' : 'בנדלר וגרינדר מחזירים משוב';
+    }
+    if (elements.feedbackModalTone) {
+        elements.feedbackModalTone.textContent = success ? 'פידבק על הצלחה' : 'משוב לצמיחה';
+    }
+    if (elements.feedbackModalTitle) {
+        elements.feedbackModalTitle.textContent = String(title || '').trim();
+    }
+    if (elements.feedbackModalBody) {
+        elements.feedbackModalBody.textContent = String(body || '').trim();
+    }
+    if (elements.feedbackModalQuote) {
+        elements.feedbackModalQuote.textContent = quote;
+    }
+    if (elements.feedbackModalHumor) {
+        elements.feedbackModalHumor.textContent = humor;
+    }
+    if (elements.feedbackModalContinue) {
+        elements.feedbackModalContinue.textContent = getQuestionDrillFeedbackModalButtonLabel({ willComplete });
+    }
+
+    updateQuestionDrillControlsState();
+    if (typeof playOpeningMusic === 'function') {
+        playOpeningMusic({ force: true, markFirstEntry: false });
+    }
+    requestAnimationFrame(() => {
+        try { elements.feedbackModalContinue?.focus(); } catch (_error) {}
+    });
 }
 
 function getQuestionDrillContextText(question) {
@@ -9248,6 +9387,8 @@ function resetQuestionDrillSessionState({ preservePrefs = true } = {}) {
     questionDrillState.feedbackHeading = '';
     questionDrillState.feedbackTone = 'info';
     questionDrillState.trafficState = 'green';
+    questionDrillState.feedbackModalOpen = false;
+    questionDrillState.pendingRoundOutcome = null;
     questionDrillState.testScore = 0;
     questionDrillState.testTimerMs = 0;
     questionDrillState.currentRoundReactionMs = 0;
@@ -9284,7 +9425,10 @@ function buildQuestionDrillOptions(question) {
 function updateQuestionDrillOptionButtonsState() {
     const optionsRoot = questionDrillState.elements.options;
     if (!optionsRoot) return;
-    const locked = questionDrillState.sessionCompleted || questionDrillState.roundFinalized || !questionDrillState.current;
+    const locked = questionDrillState.sessionCompleted
+        || questionDrillState.roundFinalized
+        || questionDrillState.feedbackModalOpen
+        || !questionDrillState.current;
 
     Array.from(optionsRoot.querySelectorAll('.question-drill-option')).forEach((button) => {
         const optionId = button.dataset.optionId || '';
@@ -9330,7 +9474,12 @@ function renderQuestionDrillOptions() {
 }
 
 function setQuestionDrillSelectedOption(optionId = '', { playSound = true } = {}) {
-    if (!questionDrillState.current || questionDrillState.roundFinalized || questionDrillState.sessionCompleted) return;
+    if (
+        !questionDrillState.current
+        || questionDrillState.roundFinalized
+        || questionDrillState.sessionCompleted
+        || questionDrillState.feedbackModalOpen
+    ) return;
     const selected = questionDrillState.options.find(option => option.id === optionId);
     if (!selected) return;
 
@@ -9370,7 +9519,10 @@ function updateQuestionDrillMobileCategoryButtonsState() {
 
     const selected = questionDrillState.options.find((option) => option.id === questionDrillState.selectedOptionId) || null;
     const selectedCategory = String(selected?.category || '').trim().toUpperCase();
-    const disable = !questionDrillState.current || questionDrillState.roundFinalized || questionDrillState.sessionCompleted;
+    const disable = !questionDrillState.current
+        || questionDrillState.roundFinalized
+        || questionDrillState.sessionCompleted
+        || questionDrillState.feedbackModalOpen;
     const show = questionDrillState.mode !== 'test';
     if (container) {
         container.classList.toggle('question-drill-control-hidden', !show);
@@ -9451,6 +9603,8 @@ function beginQuestionDrillRound(question) {
     questionDrillState.roundFinalized = false;
     questionDrillState.currentRoundAward = null;
     questionDrillState.currentRoundReactionMs = 0;
+    questionDrillState.pendingRoundOutcome = null;
+    closeQuestionDrillFeedbackModal({ clearPending: true });
 
     syncQuestionDrillContext(question);
     if (elements.statement) elements.statement.textContent = question?.statement || '';
@@ -9600,7 +9754,8 @@ function updateQuestionDrillControlsState() {
     const hasQuestion = !!questionDrillState.current;
     const hasSelection = !!questionDrillState.selectedOptionId;
     const isTestMode = questionDrillState.mode === 'test';
-    const canCheck = !isTestMode && hasQuestion && hasSelection && !sessionLocked && !questionDrillState.roundFinalized;
+    const modalLocked = questionDrillState.feedbackModalOpen;
+    const canCheck = !isTestMode && hasQuestion && hasSelection && !sessionLocked && !questionDrillState.roundFinalized && !modalLocked;
 
     if (elements.checkBtn) {
         elements.checkBtn.disabled = !canCheck;
@@ -9608,7 +9763,7 @@ function updateQuestionDrillControlsState() {
         elements.checkBtn.classList.toggle('question-drill-control-hidden', isTestMode);
     }
     if (elements.nextBtn) {
-        elements.nextBtn.disabled = questionDrillState.sessionCompleted ? false : !hasQuestion;
+        elements.nextBtn.disabled = modalLocked || (questionDrillState.sessionCompleted ? false : !hasQuestion);
         elements.nextBtn.textContent = questionDrillState.sessionCompleted
             ? 'תרגול חדש'
             : (questionDrillState.roundFinalized ? 'המשפט הבא' : 'דלג');
@@ -9630,7 +9785,7 @@ function updateQuestionDrillControlsState() {
     }
     [elements.hintBtn, elements.liveHintBtn].forEach((button) => {
         if (!button) return;
-        button.disabled = isTestMode || sessionLocked || questionDrillState.roundFinalized || !hasQuestion;
+        button.disabled = isTestMode || sessionLocked || questionDrillState.roundFinalized || modalLocked || !hasQuestion;
         button.classList.toggle('question-drill-control-hidden', isTestMode);
     });
     if (elements.difficultySelect) {
@@ -9642,6 +9797,7 @@ function updateQuestionDrillControlsState() {
 
 function resetQuestionDrillToSetup({ preservePrefs = true } = {}) {
     resetQuestionDrillSessionState({ preservePrefs });
+    closeQuestionDrillFeedbackModal({ clearPending: true });
     syncQuestionDrillContext(null);
     updateQuestionDrillStats();
     if (questionDrillState.elements.statement) questionDrillState.elements.statement.textContent = '';
@@ -9684,7 +9840,9 @@ function restoreQuestionDrillSetupState(message = '', tone = 'warn') {
     questionDrillState.roundCorrect = false;
     questionDrillState.roundFinalized = false;
     questionDrillState.currentRoundAward = null;
+    questionDrillState.pendingRoundOutcome = null;
 
+    closeQuestionDrillFeedbackModal({ clearPending: true });
     syncQuestionDrillContext(null);
     renderQuestionDrillOptions();
     updateQuestionDrillTestBanner();
@@ -9934,6 +10092,7 @@ async function loadNextQuestionDrill(options = {}) {
 
 function showQuestionDrillHint() {
     const coach = window.MetaRedesignCoach;
+    if (questionDrillState.feedbackModalOpen) return;
     if (questionDrillState.mode === 'test') {
         setQuestionDrillFeedback(
             coach && typeof coach.getQuestionHintLocked === 'function'
@@ -9959,6 +10118,7 @@ function evaluateQuestionDrill() {
     const feedbackEl = questionDrillState.elements.feedback;
     if (!feedbackEl || !questionDrillState.current) return;
     if (questionDrillState.sessionCompleted) return;
+    if (questionDrillState.feedbackModalOpen) return;
     const coach = window.MetaRedesignCoach;
     if (questionDrillState.roundFinalized) {
         setQuestionDrillFeedback(
@@ -10001,8 +10161,11 @@ function evaluateQuestionDrill() {
         selectedOptionId: selectedOption.id,
         success,
         expectedCategory,
-        revealExpected: isTestMode || success
+        revealExpected: !success || isTestMode
     });
+
+    const plan = getQuestionDrillPlan(questionDrillState.planId);
+    const willComplete = (questionDrillState.roundsDone + 1) >= plan.rounds;
 
     if (isTestMode) {
         const rtMs = stopQuestionDrillTimer({ freeze: true });
@@ -10042,7 +10205,14 @@ function evaluateQuestionDrill() {
                 { title: 'בול. ממשיכים.' }
             );
             playUISound('correct');
-            finalizeQuestionDrillRound('correct');
+            questionDrillState.pendingRoundOutcome = { finalizeReason: 'correct' };
+            openQuestionDrillFeedbackModal({
+                tone: 'success',
+                title: 'בול. ממשיכים.',
+                body: questionDrillState.feedbackText,
+                success: true,
+                willComplete
+            });
         } else {
             setQuestionDrillFeedback(
                 `כאן חיפשנו שאלה שבודקת: ${expectedCue} עוד רגע עוברים לשאלה הבאה.`,
@@ -10051,12 +10221,16 @@ function evaluateQuestionDrill() {
             );
             playUISound('wrong');
             setQuestionDrillTrafficState('red', 'פספוס');
-            finalizeQuestionDrillRound('test_fail');
+            questionDrillState.pendingRoundOutcome = { finalizeReason: 'test_fail' };
+            openQuestionDrillFeedbackModal({
+                tone: 'danger',
+                title: 'לא מדויק.',
+                body: questionDrillState.feedbackText,
+                success: false,
+                willComplete
+            });
         }
         updateQuestionDrillSessionUI();
-        if (!questionDrillState.sessionCompleted) {
-            scheduleQuestionDrillTestAutoAdvance(success ? QUESTION_DRILL_TEST_AUTO_ADVANCE_MS : QUESTION_DRILL_TEST_FAIL_AUTO_ADVANCE_MS);
-        }
         return;
     }
 
@@ -10071,7 +10245,14 @@ function evaluateQuestionDrill() {
         const takeaway = buildQuestionDrillLearningTakeaway(questionDrillState.current, expectedCategory);
         setQuestionDrillFeedback(takeaway, 'success', { title: 'בול. כל הכבוד.' });
         playUISound('correct');
-        finalizeQuestionDrillRound('correct');
+        questionDrillState.pendingRoundOutcome = { finalizeReason: 'correct' };
+        openQuestionDrillFeedbackModal({
+            tone: 'success',
+            title: 'בול. כל הכבוד.',
+            body: questionDrillState.feedbackText,
+            success: true,
+            willComplete
+        });
         return;
     }
 
@@ -10079,10 +10260,17 @@ function evaluateQuestionDrill() {
     setQuestionDrillFeedback(
         `בחרת כיוון של "${selectedCue}", אבל כאן צריך שאלה שבודקת: ${expectedCue}. ${reasonLine}`,
         'warn',
-        { title: 'לא בדיוק. נסו שוב.' }
+        { title: 'לא בדיוק.' }
     );
-    setQuestionDrillTrafficState('yellow', 'נסו עוד פעם');
-    updateQuestionDrillControlsState();
+    setQuestionDrillTrafficState('yellow', 'משוב לצמיחה');
+    questionDrillState.pendingRoundOutcome = { finalizeReason: 'wrong' };
+    openQuestionDrillFeedbackModal({
+        tone: 'warn',
+        title: 'לא בדיוק.',
+        body: questionDrillState.feedbackText,
+        success: false,
+        willComplete
+    });
 }
 
 function setupQuestionDrill() {
@@ -10159,8 +10347,21 @@ function setupQuestionDrill() {
         liveHintBtn: document.getElementById('question-drill-live-hint'),
         prestartMenuBtn: document.getElementById('question-drill-prestart-menu'),
         openMenuBtn: document.getElementById('question-drill-open-menu'),
-        openExplanationBtn: document.getElementById('question-drill-open-explanation')
+        openExplanationBtn: document.getElementById('question-drill-open-explanation'),
+        feedbackModal: document.getElementById('question-drill-feedback-modal'),
+        feedbackModalImage: document.getElementById('question-drill-feedback-modal-image'),
+        feedbackModalKicker: document.getElementById('question-drill-feedback-modal-kicker'),
+        feedbackModalTone: document.getElementById('question-drill-feedback-modal-tone'),
+        feedbackModalTitle: document.getElementById('question-drill-feedback-modal-title'),
+        feedbackModalBody: document.getElementById('question-drill-feedback-modal-body'),
+        feedbackModalQuote: document.getElementById('question-drill-feedback-modal-quote'),
+        feedbackModalHumor: document.getElementById('question-drill-feedback-modal-humor'),
+        feedbackModalContinue: document.getElementById('question-drill-feedback-modal-continue')
     };
+
+    if (questionDrillState.elements.feedbackModalImage) {
+        questionDrillState.elements.feedbackModalImage.setAttribute('src', QUESTION_DRILL_FEEDBACK_MODAL_IMAGE_SRC);
+    }
 
     loadQuestionDrillPrefs();
     loadQuestionDrillTestStats();
@@ -10238,6 +10439,7 @@ function setupQuestionDrill() {
     questionDrillState.elements.openMenuBtn?.addEventListener('click', openQuestionDrillMenuOverlay);
     questionDrillState.elements.openExplanationBtn?.addEventListener('click', openQuestionDrillExplanationOverlay);
     questionDrillState.elements.liveHintBtn?.addEventListener('click', showQuestionDrillHint);
+    questionDrillState.elements.feedbackModalContinue?.addEventListener('click', continueQuestionDrillFeedbackFlow);
 
     setupAudioMuteButtons();
     updateQuestionDrillStats();

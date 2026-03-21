@@ -77,6 +77,39 @@ function extractState(page) {
     }));
 }
 
+function extractFeedbackModalState(page) {
+    return page.evaluate(() => {
+        const modal = document.getElementById('question-drill-feedback-modal');
+        const title = document.getElementById('question-drill-feedback-modal-title');
+        const body = document.getElementById('question-drill-feedback-modal-body');
+        const quote = document.getElementById('question-drill-feedback-modal-quote');
+        const humor = document.getElementById('question-drill-feedback-modal-humor');
+        const image = document.getElementById('question-drill-feedback-modal-image');
+        const button = document.getElementById('question-drill-feedback-modal-continue');
+        return {
+            exists: !!modal,
+            visible: !!modal && !modal.classList.contains('hidden') && modal.getAttribute('aria-hidden') !== 'true',
+            tone: modal?.dataset?.tone || '',
+            title: title?.textContent?.trim() || '',
+            body: body?.textContent?.trim() || '',
+            quote: quote?.textContent?.trim() || '',
+            humor: humor?.textContent?.trim() || '',
+            imageSrc: image?.getAttribute('src') || '',
+            continueLabel: button?.textContent?.trim() || ''
+        };
+    });
+}
+
+function extractRoundState(page) {
+    return page.evaluate(() => ({
+        statement: document.getElementById('question-drill-statement')?.textContent?.trim() || '',
+        expectedCategory: document.getElementById('question-drill-category')?.value || '',
+        optionCategories: Array.from(document.querySelectorAll('#question-drill-options .question-drill-option'))
+            .map((button) => String(button.getAttribute('data-category') || '').trim().toUpperCase())
+            .filter(Boolean)
+    }));
+}
+
 function extractSplashState(page) {
     return page.evaluate(() => {
         const splash = document.getElementById('splash-screen');
@@ -103,6 +136,13 @@ try {
 
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
     page.setDefaultTimeout(5000);
+    await page.addInitScript(() => {
+        try {
+            localStorage.setItem('mm_onboarding_dismissed_v2', '1');
+        } catch (_error) {
+            // ignore
+        }
+    });
 
     page.on('console', (msg) => {
         process.stdout.write(`[browser:${msg.type()}] ${msg.text()}\n`);
@@ -171,7 +211,61 @@ try {
         throw new Error(`Question drill did not progress into live round.\n${JSON.stringify(afterStart, null, 2)}`);
     }
 
-    process.stdout.write('PASS: practice-question home -> welcome -> live flow verified.\n');
+    const firstRound = await extractRoundState(page);
+    const wrongCategory = firstRound.optionCategories.find((category) => category && category !== firstRound.expectedCategory);
+    if (!firstRound.expectedCategory || !wrongCategory) {
+        throw new Error(`Could not derive answer categories for the first round.\n${JSON.stringify(firstRound, null, 2)}`);
+    }
+
+    const firstStatement = firstRound.statement;
+    await page.locator(`#question-drill-options .question-drill-option[data-category="${wrongCategory}"]`).first().click();
+    await page.locator('#question-drill-feedback-modal:not(.hidden)').waitFor({ state: 'visible', timeout: 5000 });
+    const wrongModal = await extractFeedbackModalState(page);
+    process.stdout.write(`WRONG_MODAL ${JSON.stringify(wrongModal)}\n`);
+    if (!wrongModal.visible || !['warn', 'danger'].includes(wrongModal.tone)) {
+        throw new Error(`Wrong answer did not open a growth-feedback modal.\n${JSON.stringify(wrongModal, null, 2)}`);
+    }
+    if (!wrongModal.quote || !wrongModal.humor || !wrongModal.imageSrc.includes('bandler_grinder_icon.jpg')) {
+        throw new Error(`Wrong answer modal is missing quote/humor/image.\n${JSON.stringify(wrongModal, null, 2)}`);
+    }
+    await page.locator('#question-drill-feedback-modal-continue').click();
+    await page.locator('#question-drill-feedback-modal').waitFor({ state: 'hidden', timeout: 5000 });
+    await page.waitForFunction(
+        (previousStatement) => {
+            const text = document.getElementById('question-drill-statement')?.textContent?.trim() || '';
+            return text && text !== previousStatement;
+        },
+        firstStatement,
+        { timeout: 5000 }
+    );
+
+    const secondRound = await extractRoundState(page);
+    if (!secondRound.expectedCategory) {
+        throw new Error(`Second round did not load correctly.\n${JSON.stringify(secondRound, null, 2)}`);
+    }
+    const secondStatement = secondRound.statement;
+    await page.locator(`#question-drill-options .question-drill-option[data-category="${secondRound.expectedCategory}"]`).first().click();
+    await page.locator('#question-drill-feedback-modal:not(.hidden)').waitFor({ state: 'visible', timeout: 5000 });
+    const successModal = await extractFeedbackModalState(page);
+    process.stdout.write(`SUCCESS_MODAL ${JSON.stringify(successModal)}\n`);
+    if (!successModal.visible || successModal.tone !== 'success') {
+        throw new Error(`Correct answer did not open a success-feedback modal.\n${JSON.stringify(successModal, null, 2)}`);
+    }
+    if (!successModal.quote || !successModal.humor || !successModal.body) {
+        throw new Error(`Success modal is missing feedback copy.\n${JSON.stringify(successModal, null, 2)}`);
+    }
+    await page.locator('#question-drill-feedback-modal-continue').click();
+    await page.locator('#question-drill-feedback-modal').waitFor({ state: 'hidden', timeout: 5000 });
+    await page.waitForFunction(
+        (previousStatement) => {
+            const text = document.getElementById('question-drill-statement')?.textContent?.trim() || '';
+            return text && text !== previousStatement;
+        },
+        secondStatement,
+        { timeout: 5000 }
+    );
+
+    process.stdout.write('PASS: practice-question home -> welcome -> live feedback modal flow verified.\n');
 } catch (error) {
     process.stderr.write(`${error.stack || error.message}\n`);
     process.exitCode = 1;
