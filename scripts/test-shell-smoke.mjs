@@ -495,8 +495,8 @@ async function runShellSmoke(baseUrl) {
         const targetPage = await openStandalonePage(relativePath);
         try {
             await targetPage.waitForSelector(rootSelector);
-            const startButton = targetPage.locator(`${rootSelector} [data-trainer-action="start-session"]`).first();
-            const testButton = targetPage.locator(`${rootSelector} [data-trainer-action="start-test"]`).first();
+            const startButton = targetPage.locator(`${rootSelector} [data-trainer-action="start-session"]:visible`).first();
+            const testButton = targetPage.locator(`${rootSelector} [data-trainer-action="start-test"]:visible`).first();
             await assert((await startButton.count()) > 0, `${trainerId} learning CTA visible`);
             await assert((await testButton.count()) > 0, `${trainerId} test CTA visible`);
             const welcomeText = ((await targetPage.locator(rootSelector).innerText()) || '').trim();
@@ -528,7 +528,7 @@ async function runShellSmoke(baseUrl) {
                 scrollWidth: document.documentElement.scrollWidth
             }));
             await assert(homeOverflow.scrollWidth <= homeOverflow.innerWidth + 1, `${trainerId} mobile home no horizontal overflow`, `${homeOverflow.scrollWidth}/${homeOverflow.innerWidth}`);
-            const mobileStart = mobilePage.locator(`${rootSelector} [data-trainer-action="start-session"]`).first();
+            const mobileStart = mobilePage.locator(`${rootSelector} [data-trainer-action="start-session"]:visible`).first();
             const mobileStartBox = await mobileStart.boundingBox();
             await assert(!!mobileStartBox && mobileStartBox.x >= 0 && mobileStartBox.y >= 0 && mobileStartBox.x + mobileStartBox.width <= 390 && mobileStartBox.y + mobileStartBox.height <= 844, `${trainerId} mobile welcome CTA reachable`, JSON.stringify(mobileStartBox));
             await mobileStart.click();

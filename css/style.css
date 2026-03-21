@@ -18997,6 +18997,7 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
     border-radius: 999px;
     font-size: 0.96rem;
     width: 100%;
+    animation: none;
 }
 
 .ltv3-onboarding-card,

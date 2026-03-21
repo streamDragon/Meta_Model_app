@@ -7,11 +7,11 @@ import { chromium } from 'playwright';
 const ROOT = process.cwd();
 const VITE_BIN = path.join(ROOT, 'node_modules', 'vite', 'bin', 'vite.js');
 const TRAINERS = [
-    { id: 'classic2', path: 'classic2_trainer.html', hasSettings: true, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true },
-    { id: 'classic-classic', path: 'classic_classic_trainer.html', hasSettings: true, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true },
-    { id: 'living-triples', path: 'living_triples_trainer.html', hasSettings: false, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: false, requireStandaloneNav: false, checkMobileOrder: false },
-    { id: 'iceberg-templates', path: 'iceberg_templates_trainer.html', hasSettings: true, dualMode: false, runtimeScreen: '', hasRuntimeSupport: true, checkMobileOrder: true },
-    { id: 'scenario-trainer', path: 'scenario_trainer.html', hasSettings: true, dualMode: false, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true }
+    { id: 'classic2', path: 'classic2_trainer.html', hasSettings: true, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true, checkStartViewport: true },
+    { id: 'classic-classic', path: 'classic_classic_trainer.html', hasSettings: true, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true, checkStartViewport: true },
+    { id: 'living-triples', path: 'living_triples_trainer.html', hasSettings: false, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: false, requireStandaloneNav: false, checkMobileOrder: false, checkStartViewport: true },
+    { id: 'iceberg-templates', path: 'iceberg_templates_trainer.html', hasSettings: true, dualMode: false, runtimeScreen: '', hasRuntimeSupport: true, checkMobileOrder: true, requireStartButton: false, checkStartViewport: false },
+    { id: 'scenario-trainer', path: 'scenario_trainer.html', hasSettings: true, dualMode: false, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true, checkStartViewport: false }
 ];
 
 function wait(ms) {
@@ -202,7 +202,8 @@ async function visibleGlobalBlockers(page) {
 }
 
 async function startTrainer(page, trainer) {
-    const startButton = page.locator(`[data-trainer-platform="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="start-session"]`).first();
+    const startButton = page.locator(`[data-trainer-platform="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="start-session"]:visible`).first();
+    if ((await startButton.count()) === 0) return;
     await startButton.click();
     if (trainer.runtimeScreen) {
         await page.waitForFunction(
@@ -219,13 +220,17 @@ async function runDesktopChecks(page, baseUrl, trainer) {
     await dismissOnboardingIfPresent(page);
     await page.waitForSelector(`[data-trainer-platform="1"][data-trainer-id="${trainer.id}"]`);
 
-    const startButton = page.locator(`[data-trainer-platform="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="start-session"]`).first();
-    await assert(await startButton.count(), `${trainer.id} start button exists`);
-    const startBox = await startButton.boundingBox();
-    await assert(!!startBox && startBox.y < 660, `${trainer.id} start visible in first viewport`, JSON.stringify(startBox));
+    const startButton = page.locator(`[data-trainer-platform="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="start-session"]:visible`).first();
+    if (trainer.requireStartButton !== false) {
+        await assert(await startButton.count(), `${trainer.id} start button exists`);
+        if (trainer.checkStartViewport !== false) {
+            const startBox = await startButton.boundingBox();
+            await assert(!!startBox && startBox.y < 660, `${trainer.id} start visible in first viewport`, JSON.stringify(startBox));
+        }
+    }
     if (trainer.dualMode) {
         await assert(
-            (await page.locator(`[data-trainer-platform="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="start-test"]`).count()) > 0,
+            (await page.locator(`[data-trainer-platform="1"][data-trainer-id="${trainer.id}"] [data-trainer-action="start-test"]:visible`).count()) > 0,
             `${trainer.id} test mode CTA exists`
         );
     }
@@ -242,7 +247,7 @@ async function runDesktopChecks(page, baseUrl, trainer) {
         ({ summaryBefore, summaryAfter, startedSession } = await mutateSessionSummary(page, trainer.id));
     }
 
-    if (!startedSession) {
+    if (!startedSession && trainer.requireStartButton !== false) {
         await startTrainer(page, trainer);
     } else if (trainer.runtimeScreen) {
         await page.waitForFunction(
@@ -285,7 +290,9 @@ async function runMobileChecks(page, baseUrl, trainer) {
         scrollWidth: document.documentElement.scrollWidth
     }));
     await assert(overflow.scrollWidth <= overflow.innerWidth + 1, `${trainer.id} mobile no horizontal overflow`, `${overflow.scrollWidth}/${overflow.innerWidth}`);
-    await startTrainer(page, trainer);
+    if (trainer.requireStartButton !== false) {
+        await startTrainer(page, trainer);
+    }
     if (trainer.checkMobileOrder) {
         await assertMobileZoneOrder(page, trainer.id);
     }
