@@ -1133,54 +1133,6 @@
         `;
     }
 
-    // ─── Library: expanded dialog content ─────────────────────────────────────
-    function renderLibraryDialogExpanded() {
-        return `
-            <div class="pnm-lib-dialog-body">
-                <div class="pnm-lib-bubble">
-                    <span class="pnm-lib-bubble__speaker">מטופל/ת</span>
-                    <p>"${escapeHtml(INTRO_DIALOG.clientLine)}"</p>
-                </div>
-                <div class="pnm-lib-id-pill">
-                    זוהתה: שם עצם מופשט (Nominalization) – "תקשורת" מקפיאה תהליך חי לדבר
-                </div>
-                <div class="pnm-lib-sep-note">
-                    <span>${escapeHtml(INTRO_DIALOG.classicLine)} – ועוצרים שם.</span>
-                    <span class="pnm-lib-sep-note__arrow">↙</span>
-                    <span>עם מיפוי רמות לוגיות – ממשיכים:</span>
-                </div>
-                <div class="pnm-lib-level-rows">
-                    ${INTRO_DIALOG.levels.map((entry) => {
-                        const lm = LEVEL_META[entry.levelId];
-                        return `
-                            <div class="pnm-lib-level-row">
-                                <span class="pnm-lib-level-pill" style="background:${lm.color}22;color:${lm.color};border:1px solid ${lm.color}55">${escapeHtml(lm.shortLabel)}</span>
-                                <span class="pnm-lib-level-row__q">"${escapeHtml(entry.question)}"</span>
-                                <span class="pnm-lib-level-row__a">${escapeHtml(entry.answer)}</span>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-                <div class="pnm-lib-discovery-row">
-                    <div class="pnm-lib-discovery-card" style="border-right:3px solid #B85C38">
-                        <span class="pnm-lib-discovery-card__label" style="color:#B85C38">הגרעין</span>
-                        <p>${escapeHtml(INTRO_DIALOG.core)}</p>
-                    </div>
-                    <div class="pnm-lib-discovery-card" style="border-right:3px solid #5C4B99">
-                        <span class="pnm-lib-discovery-card__label" style="color:#5C4B99">הסדק</span>
-                        <p>${escapeHtml(INTRO_DIALOG.crack)}</p>
-                    </div>
-                    <div class="pnm-lib-discovery-card" style="border-right:3px solid #2D6A4F">
-                        <span class="pnm-lib-discovery-card__label" style="color:#2D6A4F">הפאנץ׳</span>
-                        <p>${escapeHtml(INTRO_DIALOG.punch)}</p>
-                    </div>
-                </div>
-                <p class="pnm-lib-dialog-closing"><em>${escapeHtml(INTRO_DIALOG.closing)}</em></p>
-                <button type="button" class="pnm-lib-dialog-close" data-action="toggle-dialog">▴ סגור</button>
-            </div>
-        `;
-    }
-
     // ─── Library: single book card ─────────────────────────────────────────────
     function renderBookCard(pattern, bookIndex) {
         const family = FAMILY_META[pattern.family];
