@@ -8,6 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>שלשות חיות - Meta Model App</title>
   <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/css/feature-welcome.css">
   <script>
     (function () {
       var v = String(Date.now());
@@ -49,6 +50,32 @@
   </script>
 </head>
 <body>
+<div class="fw-overlay" id="fw-triples">
+  <span class="fw-badge">תרגול</span>
+  <h1 class="fw-title">שלישות חיות</h1>
+  <p class="fw-hook">שלישות שכבות נוספות – ממצאים את השפה, שוברים אותן, מחשיבים.</p>
+  <div class="fw-cards">
+    <div class="fw-card">
+      <span class="fw-card__kicker">מה עושים</span>
+      <h3 class="fw-card__title">עובדים על שלישות חיות</h3>
+      <p class="fw-card__body">כל משפט מוצג רק 5 שניות קצועות של שלישות קצרות.</p>
+    </div>
+    <div class="fw-card">
+      <span class="fw-card__kicker">מה משנה</span>
+      <h3 class="fw-card__title">לא רק שינוי קווים</h3>
+      <p class="fw-card__body">מסירים את המשפט הדה-שפה ובשפה שבאופן שבאפוסים שנהיה הפך.</p>
+    </div>
+  </div>
+  <div class="fw-example">
+    <span class="fw-example__label">דוגמה קצרה</span>
+    <p class="fw-example__sentence">"לא תמיד עושים את כל מה שצריך"</p>
+    <p class="fw-example__note">→ כולל, קריאת מחשבות, ועוד. מה האפסים שנית שנית.</p>
+  </div>
+  <button class="fw-cta" onclick="document.getElementById('fw-triples').style.display='none';document.getElementById('trainerContent').style.display='block';">
+    פתחו את התרגיל ←
+  </button>
+</div>
+<div id="trainerContent" style="display:none">
   <div class="container ltv2-page">
     <section id="living-triples" class="tab-content active practice-tab-content">
       <div class="practice-container">
@@ -64,5 +91,6 @@
 
   <div id="ltv2-toast" class="ltv2-toast hidden" aria-live="assertive"></div>
   <script src="js/trainer-shell-nav.js"></script>
+</div>
 </body>
 </html>
