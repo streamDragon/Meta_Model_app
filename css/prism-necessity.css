@@ -1263,6 +1263,7 @@ body.shell-feature-active[data-active-tab="prismlab"] {
   height: 78px;
   border-radius: 7px;
   overflow: hidden;
+  background: #EDE5DA; /* fallback */
   background: color-mix(in srgb, var(--pnm-book-color, #6B5B45) 14%, #F3EDE4);
   margin-bottom: 2px;
   flex-shrink: 0;
