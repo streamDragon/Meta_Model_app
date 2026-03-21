@@ -656,6 +656,19 @@
         return true;
     }
 
+    function openBook(state, patternId) {
+        const pattern = getPatternById(state, patternId);
+        if (!pattern) return false;
+        state.selectedPatternId = pattern.id;
+        state.sessionIndex = 0;
+        state.revealedCount = 0;
+        state.workspaceMode = 'exercise';
+        state.insightOpen = false;
+        state.stage = 'workspace';
+        state.scrollToTop = true;
+        return true;
+    }
+
     function openPattern(state, patternId) {
         const pattern = getPatternById(state, patternId);
         if (!pattern) return false;
@@ -999,63 +1012,157 @@
         `;
     }
 
-    function renderLanding(state) {
+    // ─── Library: expanded dialog content ─────────────────────────────────────
+    function renderLibraryDialogExpanded() {
         return `
-            <section class="pnm-view pnm-view--landing">
-                ${renderProgressRail(state)}
-                <article class="pnm-card pnm-card--hero">
-                    <div class="pnm-section-head">
-                        <div>
-                            <span class="pnm-eyebrow">Logical Levels × Meta-Model</span>
-                            <h1>מה מיוחד בעבודה הזו?</h1>
-                            <p>כאן לא עוצרים בזיהוי ובהחזרת דיוק למשפט. אנחנו ממפים את ההפרה דרך כל הרמות הלוגיות, עד שרואים איפה הסיפור מחזיק, איפה כבר יש פתח, ואיזו שאלה יכולה להזיז תהליך.</p>
-                        </div>
-                        ${renderWindowedAction(state)}
+            <div class="pnm-lib-dialog-body">
+                <div class="pnm-lib-bubble">
+                    <span class="pnm-lib-bubble__speaker">מטופל/ת</span>
+                    <p>"${escapeHtml(INTRO_DIALOG.clientLine)}"</p>
+                </div>
+                <div class="pnm-lib-id-pill">
+                    זוהתה: שם עצם מופשט (Nominalization) – "תקשורת" מקפיאה תהליך חי לדבר
+                </div>
+                <div class="pnm-lib-sep-note">
+                    <span>${escapeHtml(INTRO_DIALOG.classicLine)} – ועוצרים שם.</span>
+                    <span class="pnm-lib-sep-note__arrow">↙</span>
+                    <span>עם מיפוי רמות לוגיות – ממשיכים:</span>
+                </div>
+                <div class="pnm-lib-level-rows">
+                    ${INTRO_DIALOG.levels.map((entry) => {
+                        const lm = LEVEL_META[entry.levelId];
+                        return `
+                            <div class="pnm-lib-level-row">
+                                <span class="pnm-lib-level-pill" style="background:${lm.color}22;color:${lm.color};border:1px solid ${lm.color}55">${escapeHtml(lm.shortLabel)}</span>
+                                <span class="pnm-lib-level-row__q">"${escapeHtml(entry.question)}"</span>
+                                <span class="pnm-lib-level-row__a">${escapeHtml(entry.answer)}</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="pnm-lib-discovery-row">
+                    <div class="pnm-lib-discovery-card" style="border-right:3px solid #B85C38">
+                        <span class="pnm-lib-discovery-card__label" style="color:#B85C38">הגרעין</span>
+                        <p>${escapeHtml(INTRO_DIALOG.core)}</p>
                     </div>
-                    <div class="pnm-chip-row">
-                        <span class="pnm-chip">מיפוי בכל הרמות</span>
-                        <span class="pnm-chip pnm-chip--core">הגרעין</span>
-                        <span class="pnm-chip pnm-chip--crack">הסדק</span>
-                        <span class="pnm-chip pnm-chip--punch">הפאנץ׳</span>
+                    <div class="pnm-lib-discovery-card" style="border-right:3px solid #5C4B99">
+                        <span class="pnm-lib-discovery-card__label" style="color:#5C4B99">הסדק</span>
+                        <p>${escapeHtml(INTRO_DIALOG.crack)}</p>
                     </div>
-                </article>
+                    <div class="pnm-lib-discovery-card" style="border-right:3px solid #2D6A4F">
+                        <span class="pnm-lib-discovery-card__label" style="color:#2D6A4F">הפאנץ׳</span>
+                        <p>${escapeHtml(INTRO_DIALOG.punch)}</p>
+                    </div>
+                </div>
+                <p class="pnm-lib-dialog-closing"><em>${escapeHtml(INTRO_DIALOG.closing)}</em></p>
+                <button type="button" class="pnm-lib-dialog-close" data-action="toggle-dialog">▴ סגור</button>
+            </div>
+        `;
+    }
 
-                <section class="pnm-dialog-section">
-                    <button type="button" class="pnm-dialog-toggle" data-action="toggle-dialog" aria-expanded="${state.dialogOpen ? 'true' : 'false'}">
+    // ─── Library: single book card ─────────────────────────────────────────────
+    function renderBookCard(pattern, bookIndex) {
+        const family = FAMILY_META[pattern.family];
+        const isBasic = pattern.difficulty === 'basic';
+        return `
+            <button type="button"
+                    class="pnm-lib-book"
+                    style="border-right:4px solid ${escapeHtml(family.color)};animation-delay:${bookIndex * 0.05}s"
+                    data-action="open-book"
+                    data-book-id="${escapeHtml(pattern.id)}">
+                <h3 class="pnm-lib-book__title">${escapeHtml(pattern.title)}</h3>
+                <span class="pnm-lib-book__level pnm-lib-book__level--${isBasic ? 'basic' : 'advanced'}">${isBasic ? 'בסיסי' : 'מתקדם'}</span>
+                <p class="pnm-lib-book__concept">${escapeHtml(pattern.concept)}</p>
+                <div class="pnm-lib-book__sep"></div>
+                <span class="pnm-lib-book__question" style="color:${escapeHtml(family.color)}">${escapeHtml(pattern.keyQuestion)}</span>
+            </button>
+        `;
+    }
+
+    // ─── Library: one shelf (label + books row + wooden edge) ─────────────────
+    function renderShelf(familyId, bookOffset) {
+        const family = FAMILY_META[familyId];
+        const patterns = PATTERN_CATALOG.filter((p) => p.family === familyId);
+        return `
+            <section class="pnm-lib-shelf">
+                <div class="pnm-lib-shelf-label">
+                    <div class="pnm-lib-shelf-accent" style="background:${escapeHtml(family.color)}"></div>
+                    <span class="pnm-lib-shelf-name" style="color:${escapeHtml(family.color)}">${escapeHtml(family.label)}</span>
+                    <span class="pnm-lib-shelf-tagline">${escapeHtml(family.description)}</span>
+                </div>
+                <div class="pnm-lib-books">
+                    ${patterns.map((p, i) => renderBookCard(p, bookOffset + i)).join('')}
+                </div>
+                <div class="pnm-lib-shelf-edge"></div>
+            </section>
+        `;
+    }
+
+    // ─── Library: full page (replaces landing + categories) ───────────────────
+    function renderLibrary(state) {
+        let bookOffset = 0;
+        const totalCount = PATTERN_CATALOG.length;
+
+        const shelvesHtml = FAMILY_ORDER.map((familyId) => {
+            if (state.filter !== 'all' && state.filter !== familyId) return '';
+            const count = PATTERN_CATALOG.filter((p) => p.family === familyId).length;
+            const html = renderShelf(familyId, bookOffset);
+            bookOffset += count;
+            return html;
+        }).join('');
+
+        const chips = [
+            { id: 'all', label: `הכול ${totalCount}`, color: '#6B5B45', dot: false },
+            ...FAMILY_ORDER.map((fid) => ({
+                id: fid,
+                label: `${FAMILY_META[fid].label} ${PATTERN_CATALOG.filter((p) => p.family === fid).length}`,
+                color: FAMILY_META[fid].color,
+                dot: true
+            }))
+        ];
+
+        return `
+            <section class="pnm-view pnm-view--library">
+                <header class="pnm-lib-header">
+                    <h1 class="pnm-lib-title">📚 ספריית התבניות</h1>
+                    <p class="pnm-lib-subtitle">בחרו תבנית ממשרף – ופתחו דרך חדשה לרמות לוגיות</p>
+                </header>
+
+                <div class="pnm-lib-dialog-wrap">
+                    <button type="button" class="pnm-lib-dialog-toggle" data-action="toggle-dialog" aria-expanded="${state.dialogOpen ? 'true' : 'false'}">
                         <span>${escapeHtml(INTRO_DIALOG.teaser)}</span>
-                        <strong>${state.dialogOpen ? '▴ סגור' : '▾ פתח'}</strong>
+                        <strong class="pnm-lib-dialog-indicator">${state.dialogOpen ? '▴' : '▾'}</strong>
                     </button>
-                    ${state.dialogOpen ? renderIntroDialog() : ''}
-                </section>
-
-                <div class="pnm-flow-grid">
-                    ${renderFlowCard('הדרך הרגילה', 'pnm-card--flow-muted', [
-                        { label: 'משפט של מטופל/ת' },
-                        { label: 'זיהוי הפרה' },
-                        { label: 'שיקוף ואתגור' }
-                    ], 'כך העבודה נשארת צמודה לניסוח, אבל לא תמיד פותחת מבנה עמוק יותר.')}
-                    ${renderFlowCard('החידוש כאן', 'pnm-card--flow-innovation', [
-                        { label: 'משפט של מטופל/ת' },
-                        { label: 'זיהוי הפרה' },
-                        { label: 'מיפוי ברמות', emphasis: true },
-                        { label: 'גרעין + סדק', emphasis: true },
-                        { label: 'פאנץ׳ טיפולי', emphasis: true }
-                    ], 'השלבים החדשים מדייקים איפה מצטרפים, איפה מובילים, ומה אפשר לפתוח בלי לריב עם החוויה.')}
+                    ${state.dialogOpen ? renderLibraryDialogExpanded() : ''}
                 </div>
 
-                ${renderPyramid()}
-                ${renderDiscoveryCards()}
+                <div class="pnm-lib-filters" role="tablist" aria-label="סינון לפי משפחה">
+                    ${chips.map((chip) => {
+                        const isActive = state.filter === chip.id;
+                        const activeStyle = isActive ? `background:${chip.color};color:#fff;border-color:transparent;` : '';
+                        const dotStyle = isActive ? 'background:#fff;opacity:0.8' : `background:${chip.color}`;
+                        return `
+                            <button type="button"
+                                    class="pnm-lib-filter-chip${isActive ? ' is-active' : ''}"
+                                    style="${activeStyle}"
+                                    data-action="set-filter"
+                                    data-filter="${escapeHtml(chip.id)}">
+                                ${chip.dot ? `<span class="pnm-lib-filter-dot" style="${dotStyle}"></span>` : ''}
+                                ${escapeHtml(chip.label)}
+                            </button>
+                        `;
+                    }).join('')}
+                </div>
 
-                <article class="pnm-card pnm-card--aside">
-                    <span class="pnm-eyebrow">הצפרני ומוליך (Pacing & Leading)</span>
-                    <p>המיפוי מאשר את החוויה של המטופל/ת כפי שהיא (הצפרני) ובמקביל מגלה שיש אפשרות לתנועה (מוליך) – חיזוק של "זה נכון כרגע, ויכול להיות שגם אחרת".</p>
-                </article>
-
-                <div class="pnm-cta-row">
-                    <button type="button" class="pnm-btn pnm-btn--primary" data-action="start-lab">הבנתי, בואו נבחר תבנית</button>
+                <div class="pnm-lib-shelves">
+                    ${shelvesHtml}
                 </div>
             </section>
         `;
+    }
+
+    function renderLanding(state) {
+        return renderLibrary(state);
     }
 
     function countPatternsByFamily(familyId) {
@@ -1485,8 +1592,7 @@
 
         if (state.error) body = renderError(state);
         else if (!state.loaded || !state.payload) body = renderLoading();
-        else if (state.stage === 'landing') body = renderLanding(state);
-        else if (state.stage === 'categories') body = renderCategories(state);
+        else if (state.stage === 'landing' || state.stage === 'categories') body = renderLibrary(state);
         else body = renderWorkspace(state);
 
         state.root.innerHTML = `<div class="${shellClass}" dir="rtl">${body}${renderInsightModal(state)}</div>`;
@@ -1545,6 +1651,7 @@
             if (action === 'start-lab') handled = startLab(state);
             if (action === 'toggle-reminder') handled = toggleReminder(state);
             if (action === 'set-filter') handled = setFilter(state, actionNode.getAttribute('data-filter'));
+            if (action === 'open-book') handled = openBook(state, actionNode.getAttribute('data-book-id'));
             if (action === 'open-category') handled = openPattern(state, actionNode.getAttribute('data-category-id'));
             if (action === 'go-categories') handled = goCategories(state);
             if (action === 'start-exercise') handled = startExercise(state);

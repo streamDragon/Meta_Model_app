@@ -2,7 +2,6 @@
 
 import { CANONICAL_BREEN_GRID_RTL, CANONICAL_BREEN_ORDER, orderBreenCategories, type CanonicalBreenCode } from '../config/canonicalBreenOrder';
 import { getTrainerContract } from '../config/trainerContract';
-import { TrainerEmptyState, TrainerPlatformShell, TrainerSupportCard } from './trainer-shell/TrainerPlatformShell';
 import { TrainerSettingsShell, type TrainerSettingsSection } from './trainer-shell/TrainerSettingsShell';
 import { TRAINER_PLATFORM_CSS } from './trainer-shell/trainerPlatformStyles';
 
@@ -14,6 +13,7 @@ type FieldCtx = 'general' | 'work' | 'relationship' | 'family' | 'anxiety' | 'be
 type RoundsChoice = 5 | 10 | 'infinite';
 type CategoryDisplay = 'all' | 'group';
 type Tone = 'info' | 'success' | 'error';
+type RunMode = 'learning' | 'test';
 
 type Feedback = { tone: Tone; message: string };
 type Sentence = { id: string; text: string; tags: CategoryCode[] };
@@ -206,6 +206,9 @@ const CSS = `
 .c2n-step-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.c2n-step{border:1px dashed #cfdceb;border-radius:16px;background:#fcfdff;padding:12px}.c2n-step strong{display:block;margin-bottom:4px;font-size:.84rem}
 .c2n-help{border:1px dashed #d3deec;background:#fbfdff;border-radius:16px;padding:12px;line-height:1.55;color:#334155}
 .c2n-layout{margin-top:14px;display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.85fr);gap:14px;align-items:start}.c2n-main,.c2n-sidebar{display:grid;gap:12px}
+.c2n-home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.c2n-home-grid.single{grid-template-columns:1fr}.c2n-mode-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.c2n-mode-card{display:grid;gap:8px;align-content:start;border:1px solid #d8e5f5;background:#fff;border-radius:18px;padding:14px}
+.c2n-mode-card strong{font-size:1rem}.c2n-mode-card p,.c2n-mode-card small{color:#516375;line-height:1.5}.c2n-mode-card small{font-weight:700}.c2n-tone-pill{display:inline-flex;align-items:center;gap:8px;width:max-content;border-radius:999px;padding:7px 12px;font-size:.78rem;font-weight:900;border:1px solid}
+.c2n-tone-pill.green{background:#ecfdf5;color:#166534;border-color:#86efac}.c2n-tone-pill.amber{background:#fffbeb;color:#b45309;border-color:#fcd34d}.c2n-tone-pill.red{background:#fef2f2;color:#b91c1c;border-color:#fca5a5}
 .c2n-text-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:flex-start}.c2n-target{border:1px solid #d7e4f2;background:#f9fbff;border-radius:16px;padding:12px}.c2n-target p{margin-top:6px;color:#45596f;font-size:.86rem;line-height:1.45}
 .c2n-grid{display:grid;gap:8px;margin-top:10px}.c2n-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;direction:rtl}.c2n-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
 .c2n-cat{width:100%;text-align:right;border:1px solid #dbe5f2;background:#fff;border-radius:16px;padding:10px;display:grid;gap:6px;cursor:pointer;min-height:96px;transition:.18s ease}.c2n-cat:hover:not(:disabled){border-color:#93b8ff;background:#f9fbff}.c2n-cat:disabled{opacity:.58;cursor:not-allowed}.c2n-cat.sel{border-color:#1358d3;background:#eaf1ff;box-shadow:0 0 0 2px rgba(19,88,211,.11)}
@@ -222,8 +225,9 @@ const CSS = `
 .c2n-radio{display:flex;gap:8px;align-items:flex-start;border:1px solid #e3eaf5;background:#fff;border-radius:12px;padding:9px}.c2n-radio input{margin-top:3px}.c2n-radio strong{display:block;font-size:.84rem}.c2n-radio span{display:block;color:#64748b;font-size:.76rem;line-height:1.35}.c2n-radio.dim{opacity:.55}
 .c2n-toggle{display:flex;gap:8px;align-items:center;font-weight:700;font-size:.84rem}.c2n-range{width:100%}.c2n-adv{border:1px dashed #c6d4e6;background:#fbfdff;border-radius:16px;padding:12px}.c2n-adv summary{cursor:pointer;font-weight:900;color:#0f4c81}
 .c2n-preview{border:1px solid #cce0f0;background:linear-gradient(180deg,#f0f8ff 0%,#ffffff 100%);border-radius:18px;padding:14px;display:grid;gap:10px}.c2n-preview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.c2n-example-lines{display:grid;gap:8px}.c2n-example-line{border:1px solid #e2e8f0;background:#fff;border-radius:14px;padding:10px 12px;line-height:1.55}.c2n-summary-copy{display:grid;gap:10px}
 .c2n-modal-actions{justify-content:space-between}.c2n-modal-actions .c2n-btn{min-width:120px}
-@media (max-width:980px){.c2n-hero,.c2n-layout,.c2n-settings-grid{grid-template-columns:1fr}.c2n-row{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:980px){.c2n-hero,.c2n-layout,.c2n-settings-grid,.c2n-home-grid,.c2n-mode-grid{grid-template-columns:1fr}.c2n-row{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:640px){.c2n-shell{padding:12px}.c2n-overlay{padding:10px}.c2n-list,.c2n-step-strip,.c2n-preview-grid{grid-template-columns:1fr}.c2n-actions,.c2n-row-actions,.c2n-main-acts,.c2n-modal-actions,.c2n-seg,.c2n-start-actions{display:grid;grid-template-columns:1fr}.c2n-btn,.c2n-start-summary{width:100%}.c2n-cat{min-height:72px;padding:7px}.c2n-name{font-size:.75rem}.c2n-code{font-size:.68rem}}
 `;
 
@@ -262,7 +266,11 @@ function makeRound(settings: Settings, roundNo: number, prevScenarioId: string |
 
 const progressText = (n: number, rounds: RoundsChoice) => (rounds === 'infinite' ? `סבב ${n}/∞` : `סבב ${Math.min(n, rounds)}/${rounds}`);
 const roundsText = (r: RoundsChoice) => (r === 'infinite' ? 'אינסופי' : String(r));
-const rules = (s: Settings) => ({ showPresence: s.difficulty <= 2, exact: s.difficulty >= 4, autoHint: s.difficulty <= 2 });
+const rules = (s: Settings, mode: RunMode) => ({
+  showPresence: mode === 'learning' && s.difficulty <= 2,
+  exact: mode === 'test' || s.difficulty >= 4,
+  autoHint: mode === 'learning' && s.difficulty <= 2
+});
 
 export default function Classic2Trainer(): React.ReactElement {
   const trainerContract = getTrainerContract('classic2');
@@ -283,6 +291,10 @@ export default function Classic2Trainer(): React.ReactElement {
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
   const [result, setResult] = useState<'pending' | 'correct' | 'wrong'>('pending');
+  const [mode, setMode] = useState<RunMode>('learning');
+  const [mistakes, setMistakes] = useState(0);
+  const [hintsUsed, setHintsUsed] = useState(0);
+  const [solutionsUsed, setSolutionsUsed] = useState(0);
   const scrollYRef = useRef(0);
 
   useEffect(() => {
@@ -307,7 +319,7 @@ export default function Classic2Trainer(): React.ReactElement {
     saveClassic2Settings(settings);
   }, [settings]);
 
-  const rr = rules(settings);
+  const rr = rules(settings, mode);
   const matches = round && selectedCat ? round.sentences.filter((s) => s.tags.includes(selectedCat)).map((s) => s.id) : [];
 
   const resetInteraction = (nextRound?: Round, nextSettings?: Settings) => {
@@ -328,9 +340,10 @@ export default function Classic2Trainer(): React.ReactElement {
       : { tone: 'info', message: 'בחר/י קטגוריה לאימון ואז סמן/י משפט מתאים בטקסט.' });
   };
 
-  const startPractice = (cfg: Settings) => {
+  const startPractice = (cfg: Settings, nextMode: RunMode = mode) => {
     const normalized: Settings = { ...cfg, difficulty: clamp(cfg.difficulty, 1, 5), sentenceCount: clamp(cfg.sentenceCount, 3, 8) };
     const r1 = makeRound(normalized, 1, null);
+    setMode(nextMode);
     setSettings(normalized);
     setStarted(true);
     setFinished(false);
@@ -338,6 +351,9 @@ export default function Classic2Trainer(): React.ReactElement {
     setRoundNo(1);
     setDone(0);
     setCorrect(0);
+    setMistakes(0);
+    setHintsUsed(0);
+    setSolutionsUsed(0);
     setRound(r1);
     setWizardOpen(false);
     resetInteraction(r1, normalized);
@@ -389,6 +405,7 @@ export default function Classic2Trainer(): React.ReactElement {
       setFeedback({ tone: 'success', message: 'זיהוי נכון. אפשר לעבור לסבב הבא.' });
       return;
     }
+    setMistakes((prev) => prev + 1);
     setResult('wrong');
     setFeedback({
       tone: 'error',
@@ -411,6 +428,7 @@ export default function Classic2Trainer(): React.ReactElement {
       setFeedback({ tone: 'success', message: 'נכון. אין מופע של הקטגוריה המבוקשת בתוך הטקסט. אפשר לעבור לסבב הבא.' });
       return;
     }
+    setMistakes((prev) => prev + 1);
     setResult('wrong');
     setFeedback({ tone: 'error', message: "יש לפחות מופע אחד בטקסט. נסה/י שוב או לחץ/י 'רמז'." });
     if (rr.autoHint) setShowHint(true);
@@ -437,6 +455,38 @@ export default function Classic2Trainer(): React.ReactElement {
     setRoundNo(nextNo);
     setRound(nr);
     resetInteraction(nr, settings);
+  };
+
+  const openHint = () => {
+    if (!selectedCat) return;
+    if (mode === 'test' && result === 'pending') return;
+    setShowHint((prev) => {
+      if (!prev) setHintsUsed((count) => count + 1);
+      return true;
+    });
+  };
+
+  const openSolution = () => {
+    if (!selectedCat) return;
+    if (mode === 'test' && result === 'pending') return;
+    setShowSolution((prev) => {
+      if (!prev) setSolutionsUsed((count) => count + 1);
+      return true;
+    });
+  };
+
+  const backToWelcome = () => {
+    setStarted(false);
+    setFinished(false);
+    setHelpOpen(false);
+    setRoundNo(1);
+    setRound(null);
+    setSelectedCat(null);
+    setSelectedIds([]);
+    setFeedback(null);
+    setShowHint(false);
+    setShowSolution(false);
+    setResult('pending');
   };
 
   const hintIdx = round && selectedCat
@@ -496,48 +546,14 @@ export default function Classic2Trainer(): React.ReactElement {
   const draftVisibleCount = visibleCategories(draft).length;
   const displayLabel = settings.categoryDisplay === 'all' ? 'טבלת ברין מלאה' : `קבוצת ${settings.categoryGroup}`;
   const draftDisplayLabel = draft.categoryDisplay === 'all' ? 'טבלת ברין מלאה' : `קבוצת ${draft.categoryGroup}`;
-  const startSummary = `${settings.sentenceCount} פריטים · ${visibleCount} קטגוריות · ${displayLabel}`;
-  const previewSummary = `${draft.sentenceCount} פריטים · ${draftVisibleCount} קטגוריות · ${draftDisplayLabel}`;
-  const headerModeLabel = started ? progressText(roundNo, settings.rounds) : 'מוכן להתחלה מיידית';
-  const primaryStartLabel = started ? 'התחל סשן חדש' : trainerContract.startActionLabel;
+  const screen = !started ? 'home' : finished ? 'summary' : 'play';
+  const modeLabel = mode === 'test' ? 'מבחן' : 'לימוד';
+  const modeSummary = mode === 'test' ? 'בדיקה מלאה בלי רמזים מוקדמים.' : 'לומדים תוך כדי סימון, רמז ומשוב.';
   const helperSteps = trainerContract.helperSteps?.length ? [...trainerContract.helperSteps] : [
-    { title: '1. בחר/י או השאר/י ברירת מחדל', description: 'אפשר להתחיל ישר או לכוונן עומס, תצוגה וקטגוריות.' },
-    { title: '2. קרא/י ועבוד/י בתוך הטקסט', description: 'בחר/י קטגוריה אחת ונסה/י לזהות איפה היא באמת מופיעה.' },
-    { title: '3. בדוק/י, למד/י והמשך/י', description: 'קבל/י משוב, פתח/י רמז או פתרון, ואז עבור/י לסבב הבא.' },
+    { title: '1. בוחרים מצב כניסה', description: 'לימוד לתמיכה תוך כדי, או מבחן לזיהוי נקי יותר.' },
+    { title: '2. עובדים על קטגוריה אחת', description: 'בוחרים קטגוריה, מסמנים רק את המשפטים שבאמת שייכים לה.' },
+    { title: '3. בודקים וממשיכים', description: 'מקבלים משוב, מתקנים אם צריך, ועוברים לסבב הבא.' },
   ];
-  const processSteps = trainerContract.processSteps?.length ? [...trainerContract.processSteps] : [];
-  const clarityCards = [
-    {
-      kicker: 'מה קורה בפועל',
-      title: 'בוחרים קטגוריה אחת ומחפשים אותה בטקסט אמיתי',
-      body: <p>המטרה איננה תחושה כללית של "נדמה לי שזה שם", אלא סימון מדויק של כל המקומות שבהם הקטגוריה באמת מופיעה.</p>
-    },
-    {
-      kicker: 'למה לשים לב',
-      title: 'עובדים מול טבלת ברין יציבה',
-      body: <p>הסדר לא קופץ בין סשנים, ולכן לומדים לבנות זיכרון עבודה ברור: קטגוריה, טקסט, בדיקה, והמשך.</p>
-    },
-    {
-      kicker: 'מה מרוויחים',
-      title: 'דיוק שאפשר לקחת לטקסט הבא',
-      body: <p>אחרי כל סבב רואים מיד אם הזיהוי היה מלא, חלקי או שגוי, ולומדים למה. זה הופך קריאה אינטואיטיבית לקריאה בדיקה.</p>
-    }
-  ];
-  const currentActionTitle = !started
-    ? 'מתחילים מהכפתור הראשי'
-    : finished
-      ? 'הסשן הסתיים'
-      : selectedCat
-        ? `עובדים עכשיו על ${selectedCat} / ${CAT[selectedCat].he}`
-        : 'השלב הבא: לבחור קטגוריה';
-  const currentActionBody = !started
-    ? 'הברירות כבר מוכנות. אפשר להתחיל מיד, או לפתוח הגדרות אם רוצים למקד תחום, עומס או מצב תצוגה.'
-    : finished
-      ? 'אפשר להפעיל שוב את אותו סט, או לעדכן הגדרות לפני הסשן הבא.'
-      : selectedCat
-        ? `${CAT[selectedCat].hint} ${CAT[selectedCat].note ?? ''}`.trim()
-        : 'בחר/י קטגוריה אחת מתוך טבלת ברין הקנונית, ואז סמן/י את כל המשפטים שבהם היא באמת מופיעה.';
-  const supportStatus = !started ? 'הדף מוכן להתחלה' : finished ? 'סשן הושלם' : progressText(roundNo, settings.rounds);
   const summaryGrid = (
     <div className="c2n-preview-grid">
       <div className="c2n-kv"><b>תחום</b><span>{CTX_LABEL[settings.fieldContext]}</span></div>
@@ -664,198 +680,315 @@ export default function Classic2Trainer(): React.ReactElement {
     ...orderedSettingsIds.map((id) => settingsSectionMap[id]).filter(Boolean),
     ...Object.values(settingsSectionMap).filter((section) => !orderedSettingsIds.includes(section.id))
   ];
-  const mainContent = !started ? (
-    <TrainerEmptyState
-      title="הסשן עוד לא התחיל"
-      body={<p>לחץ/י על &quot;התחל סבב&quot; כדי להיכנס ישר לתרגול עם ההגדרות הנוכחיות, או פתח/י הגדרות כדי לשנות תחום, עומס או תצוגת קטגוריות.</p>}
-    />
-  ) : started && finished ? (
-    <section className="c2n-card">
-      <h3 style={{ fontSize: '1rem', fontWeight: 900 }}>סיכום תרגול</h3>
-      <div className="c2n-sub" style={{ marginTop: 4 }}>הושלמו {done} סבבים ({correct} נכונים) · הקשר: {CTX_LABEL[settings.fieldContext]} · רמה: {settings.difficulty}/5</div>
-      <div className="c2n-row-actions">
-        <button type="button" className="c2n-btn p" onClick={() => startPractice(settings)}>הפעל שוב עם אותן הגדרות</button>
-        <button type="button" className="c2n-btn g" onClick={openSettings}>עדכן הגדרות</button>
-      </div>
-    </section>
-  ) : started && round ? (
-    <section className="c2n-card">
-      <div className="c2n-text-top">
-        <div>
-          <h3 style={{ fontSize: '1.02rem', fontWeight: 900 }}>{round.title}</h3>
-          <div className="c2n-sub">סבב {roundNo} · {round.contextLabel} · {round.sentences.length} משפטים</div>
-        </div>
-        <div className="c2n-meta">
-          <span className="c2n-chip">רמה {settings.difficulty}/5</span>
-          <span className="c2n-chip">{displayLabel}</span>
-          {rr.exact && <span className="c2n-chip">בדיקה מלאה</span>}
-        </div>
-      </div>
-
-      <div className="c2n-target" style={{ marginTop: 12 }}>
-        <strong>{selectedCat ? `הקטגוריה הפעילה: ${selectedCat} / ${CAT[selectedCat].he}` : 'הצעד הראשון: בחר/י קטגוריה ממפת ברין שבצד'}</strong>
-        <p>{selectedCat ? CAT[selectedCat].hint : 'לאחר הבחירה אפשר לסמן משפט אחד או יותר, או לדווח שאין מופע כזה בטקסט.'}</p>
-        {selectedCat && CAT[selectedCat].note && <p style={{ fontWeight: 800, color: '#0d3fae' }}>{CAT[selectedCat].note}</p>}
-      </div>
-
-      <div className="c2n-sents" style={{ marginTop: 12 }}>
-        {round.sentences.map((s, i) => {
-          const sel = selectedIds.includes(s.id);
-          const isMatch = !!selectedCat && s.tags.includes(selectedCat);
-          const showGood = !!selectedCat && (showSolution || result === 'correct') && isMatch;
-          const showBad = result === 'wrong' && sel && !isMatch;
-          return (
-            <button key={s.id} type="button" className={`c2n-sent${sel ? ' sel' : ''}${showGood ? ' good' : ''}${showBad ? ' bad' : ''}`} onClick={() => toggleSentence(s.id)} disabled={!selectedCat || result !== 'pending'} aria-pressed={sel}>
-              <div className="c2n-sent-top">
-                <span>משפט {i + 1}</span>
-                <span>{showGood ? 'נכון' : showBad ? 'לא מתאים' : sel ? 'מסומן' : 'לחיץ'}</span>
-              </div>
-              <span className="c2n-sent-text">{s.text}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="c2n-row-actions">
-        <button type="button" className="c2n-btn p" onClick={evaluate} disabled={!selectedCat || result !== 'pending'}>בדוק תשובה</button>
-        <button type="button" className="c2n-btn w" onClick={declareNoCategory} disabled={!selectedCat || result !== 'pending'}>אין את הקטגוריה בטקסט</button>
-        <button type="button" className="c2n-btn s" onClick={() => { setSelectedIds([]); setResult('pending'); setShowHint(false); setShowSolution(false); setFeedback(selectedCat ? { tone: 'info', message: 'נוקה הסימון. אפשר לנסות שוב.' } : { tone: 'info', message: 'בחר/י קטגוריה כדי להתחיל.' }); }}>נקה סימון</button>
-        <button type="button" className="c2n-btn g" onClick={() => setShowHint(true)} disabled={!selectedCat}>רמז</button>
-        <button type="button" className="c2n-btn g" onClick={() => setShowSolution(true)} disabled={!selectedCat}>פתרון</button>
-      </div>
-
-      {feedback && <div className={`c2n-fb ${feedback.tone}`}>{feedback.message}</div>}
-
-      {showHint && selectedCat && (
-        <div className="c2n-hint">
-          <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>רמז</h4>
-          <p>{CAT[selectedCat].hint}</p>
-          {hintIdx.length ? <p>בדוק/י במיוחד את משפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p> : <p>ייתכן שאין מופע של הקטגוריה הזו בטקסט.</p>}
-        </div>
-      )}
-
-      {showSolution && selectedCat && (
-        <div className="c2n-hint">
-          <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>פתרון</h4>
-          {hintIdx.length
-            ? <p>המופעים של {selectedCat} / {CAT[selectedCat].he} נמצאים במשפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p>
-            : <p>אין מופע של {selectedCat} / {CAT[selectedCat].he} בטקסט הזה.</p>}
-        </div>
-      )}
-
-      <div className="c2n-foot">
-        <div className="c2n-score">
-          <span className="c2n-chip">הושלמו: {done}</span>
-          <span className="c2n-chip">נכונים: {correct + (result === 'correct' ? 1 : 0)}</span>
-          <span className="c2n-chip">סבבים: {roundsText(settings.rounds)}</span>
-        </div>
-        <button type="button" className="c2n-btn p" onClick={nextRound} disabled={result !== 'correct'}>{settings.rounds === 'infinite' ? 'סבב הבא (∞)' : 'סבב הבא'}</button>
-      </div>
-    </section>
-  ) : (
-    <TrainerEmptyState title="אין כרגע סבב פעיל" body={<p>פתח/י סשן חדש או עדכן/י הגדרות כדי להמשיך.</p>} />
-  );
-  const supportContent = (
-    <>
-      <TrainerSupportCard title="מה קורה עכשיו" subtitle={supportStatus}>
-        <p>{currentActionTitle}</p>
-        <p>{currentActionBody}</p>
-        <button type="button" className="trp-btn is-ghost" onClick={() => setHelpOpen((v) => !v)} aria-expanded={helpOpen}>
-          {helpOpen ? 'הסתר הסבר קצר' : 'פתח הסבר קצר'}
-        </button>
-        {helpOpen ? <div className="c2n-help">1. בחר/י או השאר/י ברירת מחדל. 2. קרא/י את הטקסט וסמן/י רק את מה שמתאים לקטגוריה. 3. בדוק/י, קבל/י משוב, ועבור/י לסבב הבא.</div> : null}
-      </TrainerSupportCard>
-
-      {processSteps.length ? (
-        <TrainerSupportCard title="תהליך העבודה" subtitle="אותו מהלך חוצה סשנים, כדי שהעין תלמד איפה היא נמצאת עכשיו.">
-          <div className="c2n-kv" style={{ gap: 10 }}>
-            {processSteps.map((step) => (
-              <div key={step.id}>
-                <b>{step.label}</b>
-                <span>{step.description}</span>
-              </div>
-            ))}
-          </div>
-        </TrainerSupportCard>
-      ) : null}
-
-      <TrainerSupportCard
-        title="מפת הקטגוריות"
-        subtitle={trainerContract.supportRailMode === 'breen-map' && settings.categoryDisplay === 'all'
-          ? 'כל הקטגוריות נשמרות תמיד באותו סדר RTL. המיקום לא קופץ בין סשנים.'
-          : `מצב ממוקד: ${settings.categoryGroup}${settings.includeCtxVak ? ' + CTX/VAK' : ''}.`}
-      >
-        {started && !finished ? renderCatPicker(settings, result === 'pending') : renderCatPicker(settings, false, true)}
-      </TrainerSupportCard>
-
-      <TrainerSupportCard title="הסשן הנוכחי יהיה…" subtitle="הסיכום מתעדכן מיד אחרי כל שמירה בהגדרות.">
-        {summaryGrid}
-      </TrainerSupportCard>
-    </>
-  );
+  const exampleScenario = scenarioPool(settings.fieldContext)[0] || SCENARIOS[0];
+  const exampleLines = exampleScenario?.sentences.slice(0, 2) || [];
+  const startSummary = `${modeLabel} · ${settings.sentenceCount} פריטים · ${visibleCount} קטגוריות · ${displayLabel}`;
+  const previewSummary = `${modeLabel} · ${draft.sentenceCount} פריטים · ${draftVisibleCount} קטגוריות · ${draftDisplayLabel}`;
+  const totalRounds = settings.rounds === 'infinite' ? done : Number(settings.rounds || 0);
+  const trafficTone = mistakes === 0 && solutionsUsed === 0 ? 'green' : mistakes <= Math.max(1, totalRounds / 2 || 1) && solutionsUsed <= 1 ? 'amber' : 'red';
+  const trafficLabel = trafficTone === 'green' ? 'ירוק · שליטה יציבה' : trafficTone === 'amber' ? 'צהוב · יש דיוק חלקי' : 'אדום · צריך עוד סיבוב לימוד';
+  const workedText = mistakes === 0
+    ? 'הזיהוי נשאר ממוקד: בחרת קטגוריה אחת ועבדת מולה בלי לערבב בין משפחות.'
+    : `גם אחרי ${mistakes} עצירות חזרת לטקסט עצמו ולא נשארת ברמת תחושה כללית.`;
+  const improveText = mode === 'test'
+    ? 'במצב מבחן שווה לעצור רגע לפני הבדיקה ולשאול: סימנתי את כל המופעים, או רק את הראשונים שקפצו לעין?'
+    : solutionsUsed > 0
+      ? 'אם נפתח פתרון, נסה/י בסשן הבא להישען קודם על הרמז ועל סימון חוזר לפני החשיפה המלאה.'
+      : 'כדאי לבדוק בעיקר מתי סימון חלקי נראה "כמעט נכון" אבל מפספס עוד מופע בטקסט.';
+  const nextText = mode === 'test'
+    ? 'אם הסשן הרגיש צפוף, חזר/י לעוד סשן לימוד קצר באותו תחום ואז נסה/י שוב מבחן.'
+    : 'כשהסימון מתחיל להיות יציב, עבר/י למצב מבחן כדי לבדוק אם הדיוק מחזיק בלי תמיכה מוקדמת.';
+  const helpText = selectedCat
+    ? `${CAT[selectedCat].hint}${CAT[selectedCat].note ? ` ${CAT[selectedCat].note}` : ''}`
+    : 'בחר/י קטגוריה אחת מהמפה, ואז סמן/י רק את המשפטים שמתאימים לה באמת.';
 
   return (
     <div className="c2n" dir="rtl" lang="he">
       <style>{`${TRAINER_PLATFORM_CSS}\n${CSS}`}</style>
-      <TrainerPlatformShell
-        trainerId="classic2"
-        title={trainerContract.title}
-        subtitle={trainerContract.subtitle}
-        headerKicker={trainerContract.familyLabel}
-        modePill={<span className="trp-mode-pill">{headerModeLabel}</span>}
-        headerActions={
-          <button type="button" className="trp-btn is-secondary" onClick={() => setHelpOpen((v) => !v)} aria-expanded={helpOpen}>
-            {helpOpen ? 'הסתר הסבר' : 'איך זה עובד'}
-          </button>
-        }
-        purposeKicker="מה עושים כאן?"
-        purposeTitle="מאמנים עין יציבה על קטגוריה אחת בתוך טקסט אמיתי"
-        purposeBody={
-          <p>
-            בכל סבב בוחרים קטגוריה מתוך טבלת ברין, קוראים טקסט קצר, ומסמנים את כל המשפטים שבהם הקטגוריה באמת מופיעה.
-            הצלחה בסבב היא לא רק &quot;להרגיש שזה שם&quot;, אלא לזהות נכון או לדעת לומר בביטחון שאין מופע כזה בטקסט.
-          </p>
-        }
-        purposeTags={
-          <>
-            <span className="c2n-chip">סדר קנוני קבוע</span>
-            <span className="c2n-chip">ברירות מחדל מוכנות</span>
-            <span className="c2n-chip">מתאים לדסקטופ ולמובייל</span>
-          </>
-        }
-        problemKicker="מה הבעיה שמנסים לפתור?"
-        problemTitle="בלי עין יציבה, הטקסט נשאר תחושה כללית"
-        problemBody={
-          <p>
-            כשקוראים טקסט דרך תחושה בלבד, קל לפספס איפה הקטגוריה באמת מופיעה, או לסמן משפטים שלא שייכים לה בכלל.
-            המסך הזה נועד להפוך זיהוי אינטואיטיבי לבדיקה מדויקת שאפשר לחזור עליה גם בטקסט הבא.
-          </p>
-        }
-        startKicker={trainerContract.quickStartLabel}
-        startTitle="אפשר להתחיל מיד"
-        startBody={<p>Classic 2 נטען עם ברירות מחדל שמישות. ההגדרות הן התאמה אישית, לא שער כניסה.</p>}
-        startActions={
-          <>
-            <button type="button" className="trp-btn is-primary" data-trainer-action="start-session" onClick={() => startPractice(settings)}>{primaryStartLabel}</button>
-            <button type="button" className="trp-btn is-secondary" data-trainer-action="open-settings" onClick={openSettings}>הגדרות</button>
-            <span className="trp-summary-pill" data-trainer-summary="current">{startSummary}</span>
-          </>
-        }
-        startMeta={
-          <>
-            <span className="c2n-chip">תחום: {CTX_LABEL[settings.fieldContext]}</span>
-            <span className="c2n-chip">רמה: {settings.difficulty}/5</span>
-            <span className="c2n-chip">סבבים: {roundsText(settings.rounds)}</span>
-          </>
-        }
-        clarityCards={clarityCards}
-        closingNote={<p>הצלחה במסך הזה נראית כמו ידיעה ברורה מה מחפשים, איפה בודקים, ומה ייחשב תשובה מדויקת עוד לפני הלחיצה על תחילת הסשן.</p>}
-        helperSteps={helperSteps}
-        supportRailMode={trainerContract.supportRailMode}
-        mobilePriorityOrder={trainerContract.mobilePriorityOrder}
-        main={mainContent}
-        support={supportContent}
-      />
+      <section
+        className="c2n-shell"
+        data-trainer-platform="1"
+        data-trainer-id="classic2"
+        data-screen={screen}
+        data-trainer-mobile-order="purpose,start,main,support"
+      >
+        <section data-trainer-help-content="1" hidden>
+          <div className="c2n-summary-copy">
+            <span className="c2n-kicker">Classic 2 · Structure of Magic</span>
+            <h2>מה חשוב לזכור לפני הסבב</h2>
+            <p>Classic 2 מאמן זיהוי יציב של קטגוריה אחת בתוך טקסט אמיתי. לא מחפשים תחושה כללית אלא מופעים מדויקים, או את היכולת לומר בביטחון שאין מופע כזה.</p>
+            <p>למה זה חשוב: כשעובדים רק מתוך אינטואיציה, קל לסמן משפטים שלא באמת שייכים לקטגוריה. כאן מתרגלים מעבר מקריאה מהירה לקריאת בדיקה.</p>
+            <p>דוגמה קצרה: &quot;אם עולות לי שאלות זה אומר שהאמונה שלי חלשה&quot; מזמין בדיקה אם זו שקילות מורכבת, סיבה-תוצאה, או משהו אחר שמרגיש דומה אבל לא זהה.</p>
+            <p>במצב לימוד יש רמזים ותמיכה. במצב מבחן הבדיקה תמיד מלאה, ואין רמזים או פתרון לפני שננעלת תוצאה.</p>
+          </div>
+        </section>
+
+        {screen === 'home' ? (
+          <div className="c2n-main" data-trainer-zone="main">
+            <section className="c2n-card" data-trainer-zone="purpose">
+              <span className="c2n-kicker">{trainerContract.familyLabel}</span>
+              <h1 style={{ fontSize: '1.28rem', fontWeight: 900 }}>{trainerContract.title}</h1>
+              <p className="c2n-sub" style={{ marginTop: 8 }}>
+                כאן מאמנים עין יציבה על קטגוריה אחת בתוך טקסט קצר: בוחרים קטגוריה, מסמנים את כל המופעים שלה, ובודקים אם הקריאה באמת מדויקת.
+              </p>
+              <div className="c2n-home-grid" style={{ marginTop: 14 }}>
+                <article className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>למה הכלי הזה חשוב</h3>
+                    <p className="c2n-sub">בלי הפרדה ברורה בין פתיחה לאימון, קל להישאר בתוך הסבר ולא להיכנס לעבודה עצמה.</p>
+                  </div>
+                  <p className="c2n-sub">הערך כאן הוא לעבור מקריאה אינטואיטיבית לקריאה בודקת: לדעת מה מחפשים, איפה מחפשים, ומה נחשב תשובה מלאה.</p>
+                </article>
+                <article className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>דוגמה קצרה מהשדה</h3>
+                    <p className="c2n-sub">משפט אחד יכול להרגיש כמו כמה קטגוריות יחד. העבודה כאן היא לייצב את ההבחנה.</p>
+                  </div>
+                  <div className="c2n-example-lines">
+                    {exampleLines.map((sentence, index) => (
+                      <div key={sentence.id} className="c2n-example-line">
+                        <strong>שורה {index + 1}</strong>
+                        <div>{sentence.text}</div>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section className="c2n-start-strip" data-trainer-zone="start">
+              <div>
+                <strong>{trainerContract.quickStartLabel}</strong>
+                <p className="c2n-sub" style={{ marginTop: 6 }}>בוחרים דרך כניסה ואז נכנסים ישר לסשן. ההסברים הארוכים נשארים כאן או בעזרה, לא מעל הסבב עצמו.</p>
+              </div>
+              <div className="c2n-mode-grid">
+                <article className="c2n-mode-card">
+                  <strong>מצב לימוד</strong>
+                  <p>עובדים עם רמזים, משוב מלא, ויכולת לפתוח פתרון כשצריך.</p>
+                  <small>טוב להתחלה, לחזרה ממוקדת, או כשבודקים איך הקטגוריה יושבת בתוך הטקסט.</small>
+                  <button type="button" className="c2n-btn p" data-trainer-action="start-session" onClick={() => startPractice(settings, 'learning')}>התחל לימוד</button>
+                </article>
+                <article className="c2n-mode-card">
+                  <strong>מצב מבחן</strong>
+                  <p>אותו מנוע תרגול, אבל בלי רמזים או פתרון לפני שננעלת תשובה.</p>
+                  <small>הבדיקה תמיד מלאה, כדי לראות אם הזיהוי מחזיק גם בלי תמיכה מוקדמת.</small>
+                  <button type="button" className="c2n-btn s" data-trainer-action="start-test" onClick={() => startPractice(settings, 'test')}>התחל מבחן</button>
+                </article>
+              </div>
+              <div className="c2n-start-actions">
+                <button type="button" className="c2n-btn g" data-trainer-action="open-settings" onClick={openSettings}>הגדרות</button>
+                <span className="c2n-start-summary" data-trainer-summary="current">{startSummary}</span>
+              </div>
+            </section>
+
+            <section className="c2n-card">
+              <div className="c2n-home-grid">
+                <article className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>מה תתרגל/י כאן</h3>
+                    <p className="c2n-sub">תרגול אחד, משימה אחת, וטקסט אחד בכל רגע.</p>
+                  </div>
+                  <div className="c2n-kv">
+                    <div><b>קטגוריה בפוקוס</b><span>בוחרים רק קטגוריה אחת מתוך מפת ברין הקנונית.</span></div>
+                    <div><b>טקסט קצר</b><span>{settings.sentenceCount} משפטים בכל סבב, בלי גלילה דרך דפי הסבר.</span></div>
+                    <div><b>בדיקה ברורה</b><span>{modeSummary}</span></div>
+                  </div>
+                </article>
+                <article className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>איך הסשן בנוי</h3>
+                    <p className="c2n-sub">אותו רצף בכל פעם, כדי שהעין תלמד איפה היא נמצאת עכשיו.</p>
+                  </div>
+                  <div className="c2n-step-strip">
+                    {helperSteps.map((step) => (
+                      <div key={step.title} className="c2n-step">
+                        <strong>{step.title}</strong>
+                        <span className="c2n-sub">{step.description}</span>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              </div>
+            </section>
+          </div>
+        ) : null}
+
+        {screen === 'play' && round ? (
+          <div className="c2n-layout">
+            <section className="c2n-main" data-trainer-zone="main">
+              <section className="c2n-card">
+                <div className="c2n-text-top">
+                  <div>
+                    <span className="c2n-kicker">{modeLabel}</span>
+                    <h2 style={{ fontSize: '1.05rem', fontWeight: 900 }}>{round.title}</h2>
+                    <div className="c2n-sub">{progressText(roundNo, settings.rounds)} · {round.contextLabel} · {round.sentences.length} משפטים</div>
+                  </div>
+                  <div className="c2n-meta">
+                    <span className="c2n-chip">{displayLabel}</span>
+                    <span className="c2n-chip">רמה {settings.difficulty}/5</span>
+                    <span className="c2n-chip">{rr.exact ? 'בדיקה מלאה' : 'בדיקה גמישה'}</span>
+                    <span className={`c2n-tone-pill ${trafficTone}`}>{trafficLabel}</span>
+                  </div>
+                </div>
+
+                <div className="c2n-target" style={{ marginTop: 12 }}>
+                  <strong>{selectedCat ? `עובדים עכשיו על ${selectedCat} / ${CAT[selectedCat].he}` : 'הצעד הראשון: לבחור קטגוריה אחת מהמפה'}</strong>
+                  <p>{helpText}</p>
+                  {selectedCat && CAT[selectedCat].note && <p style={{ fontWeight: 800, color: '#0d3fae' }}>{CAT[selectedCat].note}</p>}
+                </div>
+
+                <div className="c2n-sents" style={{ marginTop: 12 }}>
+                  {round.sentences.map((s, i) => {
+                    const sel = selectedIds.includes(s.id);
+                    const isMatch = !!selectedCat && s.tags.includes(selectedCat);
+                    const showGood = !!selectedCat && (showSolution || result === 'correct') && isMatch;
+                    const showBad = result === 'wrong' && sel && !isMatch;
+                    return (
+                      <button key={s.id} type="button" className={`c2n-sent${sel ? ' sel' : ''}${showGood ? ' good' : ''}${showBad ? ' bad' : ''}`} onClick={() => toggleSentence(s.id)} disabled={!selectedCat || result !== 'pending'} aria-pressed={sel}>
+                        <div className="c2n-sent-top">
+                          <span>משפט {i + 1}</span>
+                          <span>{showGood ? 'נכון' : showBad ? 'לא מתאים' : sel ? 'מסומן' : 'לחיץ'}</span>
+                        </div>
+                        <span className="c2n-sent-text">{s.text}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="c2n-row-actions">
+                  <button type="button" className="c2n-btn p" onClick={evaluate} disabled={!selectedCat || result !== 'pending'}>בדוק תשובה</button>
+                  <button type="button" className="c2n-btn w" onClick={declareNoCategory} disabled={!selectedCat || result !== 'pending'}>אין את הקטגוריה בטקסט</button>
+                  <button
+                    type="button"
+                    className="c2n-btn s"
+                    onClick={() => {
+                      setSelectedIds([]);
+                      setResult('pending');
+                      setShowHint(false);
+                      setShowSolution(false);
+                      setFeedback(selectedCat ? { tone: 'info', message: 'נוקה הסימון. אפשר לנסות שוב.' } : { tone: 'info', message: 'בחר/י קטגוריה כדי להתחיל.' });
+                    }}
+                  >
+                    נסה/י שוב
+                  </button>
+                  <button type="button" className="c2n-btn g" onClick={openHint} disabled={!selectedCat || (mode === 'test' && result === 'pending')}>{mode === 'test' ? 'רמז אחרי בדיקה' : 'רמז'}</button>
+                  <button type="button" className="c2n-btn g" onClick={openSolution} disabled={!selectedCat || (mode === 'test' && result === 'pending')}>{mode === 'test' ? 'פתרון אחרי בדיקה' : 'פתרון'}</button>
+                </div>
+
+                {feedback && <div className={`c2n-fb ${feedback.tone}`}>{feedback.message}</div>}
+
+                {showHint && selectedCat && (
+                  <div className="c2n-hint">
+                    <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>רמז</h4>
+                    <p>{CAT[selectedCat].hint}</p>
+                    {hintIdx.length ? <p>בדוק/י במיוחד את משפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p> : <p>ייתכן שאין מופע של הקטגוריה הזו בטקסט.</p>}
+                  </div>
+                )}
+
+                {showSolution && selectedCat && (
+                  <div className="c2n-hint">
+                    <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>פתרון</h4>
+                    {hintIdx.length
+                      ? <p>המופעים של {selectedCat} / {CAT[selectedCat].he} נמצאים במשפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p>
+                      : <p>אין מופע של {selectedCat} / {CAT[selectedCat].he} בטקסט הזה.</p>}
+                  </div>
+                )}
+
+                <div className="c2n-foot">
+                  <div className="c2n-score">
+                    <span className="c2n-chip">הושלמו: {done}</span>
+                    <span className="c2n-chip">נכונים: {correct + (result === 'correct' ? 1 : 0)}</span>
+                    <span className="c2n-chip">טעויות: {mistakes}</span>
+                    <span className="c2n-chip" data-trainer-summary="current">{startSummary}</span>
+                  </div>
+                  <div className="c2n-row-actions">
+                    <button type="button" className="c2n-btn s" onClick={backToWelcome}>חזרה לפתיחה</button>
+                    <button type="button" className="c2n-btn p" onClick={nextRound} disabled={result !== 'correct'}>{settings.rounds === 'infinite' ? 'סבב הבא (∞)' : 'סבב הבא'}</button>
+                  </div>
+                </div>
+              </section>
+            </section>
+
+            <aside className="c2n-sidebar" data-trainer-zone="support">
+              <section className="c2n-card">
+                <div className="c2n-group-head">
+                  <h3>מפת הקטגוריות</h3>
+                  <p className="c2n-sub">{settings.categoryDisplay === 'all' ? 'אותו סדר קנוני RTL בכל סשן.' : `מיקוד על ${settings.categoryGroup}${settings.includeCtxVak ? ' + CTX/VAK' : ''}.`}</p>
+                </div>
+                {renderCatPicker(settings, result === 'pending')}
+              </section>
+
+              <section className="c2n-card">
+                <div className="c2n-group-head">
+                  <h3>{selectedCat ? `מה לחפש בתוך ${selectedCat}` : 'מה הצעד הבא'}</h3>
+                  <p className="c2n-sub">הסבר משני נפתח רק כשצריך, בלי להכביד על אזור העבודה.</p>
+                </div>
+                <div className="c2n-row-actions">
+                  <button type="button" className="c2n-btn g" onClick={() => setHelpOpen((value) => !value)} aria-expanded={helpOpen}>
+                    {helpOpen ? 'סגור עזרה' : 'פתח עזרה'}
+                  </button>
+                  <button type="button" className="c2n-btn s" data-trainer-action="open-settings" onClick={openSettings}>הגדרות</button>
+                </div>
+                {helpOpen ? (
+                  <div className="c2n-help">
+                    <p>{helpText}</p>
+                    <p>{mode === 'test' ? 'במבחן עובדים קודם לבד, ורק אחרי תוצאה אפשר לפתוח רמז או פתרון.' : 'בלימוד אפשר לפתוח רמז בזמן העבודה כדי לחדד מה בדיוק מחפשים.'}</p>
+                  </div>
+                ) : null}
+              </section>
+
+              <section className="c2n-card" data-trainer-zone="support">
+                <div className="c2n-group-head">
+                  <h3>מצב הסשן</h3>
+                  <p className="c2n-sub">הסיכום מתעדכן בזמן אמת בלי להוציא אותך מאזור העבודה.</p>
+                </div>
+                {summaryGrid}
+              </section>
+            </aside>
+          </div>
+        ) : null}
+
+        {screen === 'summary' ? (
+          <section className="c2n-main" data-trainer-zone="main">
+            <section className="c2n-card c2n-summary-card">
+              <span className={`c2n-tone-pill ${trafficTone}`}>{trafficLabel}</span>
+              <h2 style={{ fontSize: '1.08rem', fontWeight: 900 }}>סיכום Classic 2</h2>
+              <p className="c2n-sub">הושלמו {done} סבבים במצב {modeLabel}. עכשיו כבר ברור יותר אם הזיהוי מחזיק בלי להיטמע בתוך טקסט ההסבר.</p>
+              <div className="c2n-preview-grid" style={{ marginTop: 6 }}>
+                <div className="c2n-kv"><b>דיוק</b><span>{correct}/{done || correct || 0} סבבים הושלמו</span></div>
+                <div className="c2n-kv"><b>תחום</b><span>{CTX_LABEL[settings.fieldContext]}</span></div>
+                <div className="c2n-kv"><b>טעויות בדרך</b><span>{mistakes}</span></div>
+                <div className="c2n-kv"><b>עזרה שנפתחה</b><span>{hintsUsed} רמזים · {solutionsUsed} פתרונות</span></div>
+              </div>
+              <div className="c2n-home-grid single" style={{ marginTop: 12 }}>
+                <article className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>מה עבד</h3>
+                    <p className="c2n-sub">{workedText}</p>
+                  </div>
+                </article>
+                <article className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>מה לשפר</h3>
+                    <p className="c2n-sub">{improveText}</p>
+                  </div>
+                </article>
+                <article className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>מה הלאה</h3>
+                    <p className="c2n-sub">{nextText}</p>
+                  </div>
+                </article>
+              </div>
+              <div className="c2n-row-actions" style={{ marginTop: 12 }}>
+                <button type="button" className="c2n-btn p" onClick={() => startPractice(settings, mode)}>עוד סשן באותו מצב</button>
+                <button type="button" className="c2n-btn g" data-trainer-action="open-settings" onClick={openSettings}>עדכן הגדרות</button>
+                <button type="button" className="c2n-btn s" onClick={backToWelcome}>חזרה לפתיחה</button>
+              </div>
+            </section>
+          </section>
+        ) : null}
+      </section>
 
       <TrainerSettingsShell
         trainerId="classic2"
