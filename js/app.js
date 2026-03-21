@@ -11953,6 +11953,7 @@ function skipRapidPatternCue() {
 function handleRapidPatternButtonClick(event) {
     const button = event.target.closest('button[data-rapid-pattern-id]');
     if (!button || button.disabled) return;
+    if (rapidPatternArenaState.feedbackOverlayOpen) return;
     if (!rapidPatternArenaState.active || !rapidPatternArenaState.currentCue) return;
 
     const chosenPattern = normalizeRapidPatternId(button.getAttribute('data-rapid-pattern-id') || '');
@@ -12488,7 +12489,7 @@ function setRapidPatternButtonsDisabled(disabled) {
     const container = rapidPatternArenaState.elements.buttons;
     if (!container) return;
     container.querySelectorAll('button[data-rapid-pattern-id]').forEach((btn) => {
-        btn.disabled = !!disabled;
+        btn.disabled = !!disabled || rapidPatternArenaState.feedbackOverlayOpen;
     });
 }
 
@@ -12498,6 +12499,7 @@ function clearRapidPatternButtonStates() {
     container.querySelectorAll('button[data-rapid-pattern-id]').forEach((btn) => {
         btn.classList.remove('is-correct', 'is-wrong');
     });
+    setRapidPatternActiveRow('');
 }
 
 function revealRapidPatternCorrectButton(patternId) {
