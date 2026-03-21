@@ -10936,7 +10936,7 @@ function openRapidPatternFeedbackOverlay({
 } = {}) {
     rapidPatternArenaState.feedbackOverlayOpen = true;
     updateRapidPatternLayoutState();
-    openRapidPatternOverlay({
+    const opened = openRapidPatternOverlay({
         type: 'rapid-pattern-feedback',
         title: success ? 'פידבק' : 'משוב',
         size: 'md',
@@ -10951,6 +10951,10 @@ function openRapidPatternFeedbackOverlay({
             syncRapidPatternFeedbackOverlayClosed();
         }
     });
+    if (!opened) {
+        syncRapidPatternFeedbackOverlayClosed();
+        return;
+    }
     if (typeof playOpeningMusic === 'function') {
         playOpeningMusic({ force: true, markFirstEntry: false });
     }
