@@ -102,7 +102,7 @@
         }),
         Object.freeze({
             id: 'prismlab',
-            titleHe: 'מפת רמות ומטה-מודל',
+            titleHe: 'מעבדת רמות לוגיות',
             descHe: 'חקירה שכבתית ברמות לוגיות ובחירת צעד המשך פרקטי.',
             route: '/feature/prismlab',
             tab: 'prismlab',

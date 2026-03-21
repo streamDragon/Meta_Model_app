@@ -1073,49 +1073,36 @@
         `;
     }
 
-    // ─── Selection: hero image ─────────────────────────────────────────────────
+    // ─── Library: hero image ────────────────────────────────────────────────────
     function renderHeroImage() {
         return `
             <div class="pnm-lib-hero">
                 <img class="pnm-lib-hero__img"
                      src="${PATTERN_IMAGE_BASE}context-therapy-room.webp"
-                     alt="חדר טיפול"
-                     onerror="this.parentElement.style.display='none'">
+                     alt="חדר טיפולים"
+                     onerror="this.style.display='none'">
+                <span class="pnm-lib-hero__label">חדר הטיפולים שלכם</span>
             </div>
         `;
     }
 
-    // ─── Selection: therapeutic context ─────────────────────────────────────────
-    function renderTherapyContext() {
+    // ─── Library: greeting (2-3 lines) ──────────────────────────────────────────
+    function renderGreeting() {
         return `
-            <div class="pnm-context">
-                <h2 class="pnm-context__title">אתה/ת המטפל/ת. המטופל/ת יושב/ת מולך.</h2>
-                <p class="pnm-context__text">אחרי כמה דקות של שיחה, בין סיפורים, השפה שלהם מדברת. אחד המשפטים חופס את תשומת לבך – הוא מסתיר בתוכו משהו. זהה מה שאתה/ת שומע/ת.</p>
+            <div class="pnm-lib-greeting">
+                <h2 class="pnm-lib-greeting__title">אתה/ת המטפל/ת. המטופל/ת יושב/ת מולך.</h2>
+                <p class="pnm-lib-greeting__text">בחרו תבנית מהספרייה – כל אחת נפתחת לתרגיל שמלפה את השפה דרך רמות לוגיות, ומוביל לגרעין, סדק ופאנץ׳.</p>
             </div>
         `;
     }
 
-    // ─── Selection: TV window with client speech ────────────────────────────────
-    function renderTvWindow() {
-        return `
-            <div class="pnm-tv-window">
-                <span class="pnm-tv-label">חדר המשפטים</span>
-                <p class="pnm-client-speech">"אין בינינו <span class="pnm-highlight">תקשורת</span>. פשוט אין. זה מת."</p>
-                <div class="pnm-identification">
-                    <span class="pnm-id-pill">שם עצם מופשט</span>
-                    <span class="pnm-id-desc">למטפל/ת המאזין/ה באמון כלי – מה בדיוק "תקשורת" אצלך?</span>
-                </div>
-            </div>
-        `;
-    }
-
-    // ─── Selection: collapsible NLP advisor ─────────────────────────────────────
-    function renderNlpAdvisor(state) {
+    // ─── Library: collapsible example ───────────────────────────────────────────
+    function renderCollapsibleExample(state) {
         const isOpen = state.advisorOpen;
         return `
             <div class="pnm-lib-dialog-wrap">
                 <button type="button" class="pnm-lib-dialog-toggle" data-action="toggle-advisor">
-                    <span>💡 יועץ NLP – רוצים להבין את הרקע התיאורטי?</span>
+                    <span>💡 רוצים לראות איך דוגמה עובד? דוגמה אחת מספרת הכל</span>
                     <span class="pnm-lib-dialog-indicator">${isOpen ? '▾' : '◂'}</span>
                 </button>
                 ${isOpen ? `
@@ -1124,20 +1111,20 @@
                         <span class="pnm-lib-bubble__speaker">מטופל/ת</span>
                         <p>"${escapeHtml(INTRO_DIALOG.clientLine)}"</p>
                     </div>
-                    <span class="pnm-lib-id-pill">זוהתה הפרה: נומינליזציה</span>
-                    <div class="pnm-lib-sep-note">
-                        <span>הגישה הרגילה:</span>
-                        <span>"${escapeHtml(INTRO_DIALOG.classicLine)}"</span>
-                        <span class="pnm-lib-sep-note__arrow">←</span>
-                        <span>ועוצרים שם.</span>
+                    <div class="pnm-lib-example-id">
+                        <span class="pnm-lib-id-pill" style="background:#5C4B99;color:#fff">שם עצם מופשט</span>
+                        <span class="pnm-lib-example-id__desc">"תקשורת" – תהליך חי שקופא למילה</span>
                     </div>
-                    <div class="pnm-advisor-divider">במקום, ממפים את המשפט דרך כל הרמות הלוגיות:</div>
+                    <div class="pnm-lib-sep-note">
+                        <span>הגישה הרגילה: "${escapeHtml(INTRO_DIALOG.classicLine)}" – ועוצרים שם.</span>
+                        <span>במקום, ממפים דרך כל הרמות:</span>
+                    </div>
                     <div class="pnm-lib-level-rows">
                         ${INTRO_DIALOG.levels.map((entry) => {
                             const lm = LEVEL_META[entry.levelId];
                             return `
                                 <div class="pnm-lib-level-row">
-                                    <span class="pnm-lib-level-pill" style="background:${lm.color}22;color:${lm.color};border:1px solid ${lm.color}44">${escapeHtml(lm.label)}</span>
+                                    <span class="pnm-lib-level-pill" style="background:${lm.color}18;color:${lm.color};border:1px solid ${lm.color}35">${escapeHtml(lm.label)}</span>
                                     <span class="pnm-lib-level-row__q">"${escapeHtml(entry.question)}"</span>
                                     <span class="pnm-lib-level-row__a">← ${escapeHtml(entry.answer)}</span>
                                 </div>
@@ -1145,20 +1132,21 @@
                         }).join('')}
                     </div>
                     <div class="pnm-lib-discovery-row">
-                        <div class="pnm-lib-discovery-card" style="border-right:3px solid #B85C38">
-                            <span class="pnm-lib-discovery-card__label" style="color:#B85C38">גרעין</span>
+                        <div class="pnm-lib-discovery-card" style="border-right:4px solid #B85C38;background:#FFF8F5">
+                            <span class="pnm-lib-discovery-card__label" style="color:#B85C38">הגרעין</span>
                             <p>${escapeHtml(INTRO_DIALOG.core)}</p>
                         </div>
-                        <div class="pnm-lib-discovery-card" style="border-right:3px solid #5C4B99">
-                            <span class="pnm-lib-discovery-card__label" style="color:#5C4B99">סדק</span>
+                        <div class="pnm-lib-discovery-card" style="border-right:4px solid #5C4B99;background:#F6F4FC">
+                            <span class="pnm-lib-discovery-card__label" style="color:#5C4B99">הסדק</span>
                             <p>${escapeHtml(INTRO_DIALOG.crack)}</p>
                         </div>
-                        <div class="pnm-lib-discovery-card" style="border-right:3px solid #2D6A4F">
-                            <span class="pnm-lib-discovery-card__label" style="color:#2D6A4F">פאנץ׳</span>
+                        <div class="pnm-lib-discovery-card" style="border-right:4px solid #2D6A4F;background:#F2FAF6">
+                            <span class="pnm-lib-discovery-card__label" style="color:#2D6A4F">הפאנץ׳</span>
                             <p>${escapeHtml(INTRO_DIALOG.punch)}</p>
                         </div>
                     </div>
-                    <p class="pnm-lib-dialog-closing">${escapeHtml(INTRO_DIALOG.closing)}</p>
+                    <p class="pnm-lib-dialog-closing">הצפירה מהדהד – מוצאים את הגרעין, משפצים את הפתח, לא מודדים משהו.</p>
+                    <button type="button" class="pnm-lib-dialog-close" data-action="toggle-advisor">▴ סגור</button>
                 </div>
                 ` : ''}
             </div>
@@ -1234,9 +1222,8 @@
         return `
             <section class="pnm-view pnm-view--library">
                 ${renderHeroImage()}
-                ${renderTherapyContext()}
-                ${renderTvWindow()}
-                ${renderNlpAdvisor(state)}
+                ${renderGreeting()}
+                ${renderCollapsibleExample(state)}
 
                 <header class="pnm-lib-header">
                     <h1 class="pnm-lib-title">📚 ספריית התבניות</h1>

@@ -50,7 +50,7 @@
             unlockLevel: 1
         }),
         prismLab: Object.freeze({
-            label: 'מפת רמות ומטה-מודל',
+            label: 'מעבדת רמות לוגיות',
             icon: '🔬',
             unlockLevel: 1
         }),

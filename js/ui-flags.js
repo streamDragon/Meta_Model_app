@@ -88,7 +88,7 @@
         prismlab: Object.freeze({
             id: 'prismlab',
             path: '?tab=prismlab',
-            title: 'מפת רמות ומטה-מודל',
+            title: 'מעבדת רמות לוגיות',
             defaultUiMode: 'shell',
             aliases: Object.freeze(['prism-research']),
             overlayPanels: Object.freeze(['guide', 'deep-guide', 'export'])

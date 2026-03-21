@@ -37,7 +37,7 @@
         },
         advanced_other: {
             emoji: '🔬',
-            name: 'מפת רמות ומטה-מודל',
+            name: 'מעבדת רמות לוגיות',
             desc: 'חקירה שכבתית דרך רמות לוגיות, גרעין, סדק וכיוון פרקטי',
             navKey: 'prismLab',
             href: null

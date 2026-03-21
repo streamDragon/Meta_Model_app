@@ -911,10 +911,11 @@ body.shell-feature-active[data-active-tab="prismlab"] {
 /* ─── Hero image ─────────────────────────────────────────────────────────────── */
 .pnm-lib-hero {
   width: 100%;
-  height: 180px;
+  max-height: 220px;
   border-radius: 16px;
   overflow: hidden;
-  background: linear-gradient(135deg, #F3EDE4, #E8DFD3);
+  background: linear-gradient(135deg, #E8DFD3 0%, #D4C8B8 30%, #C4B8A8 60%, #B5A898 100%);
+  position: relative;
 }
 
 .pnm-lib-hero__img {
@@ -924,27 +925,56 @@ body.shell-feature-active[data-active-tab="prismlab"] {
   display: block;
 }
 
-/* ─── Therapeutic context ────────────────────────────────────────────────────── */
-.pnm-context {
-  display: grid;
-  gap: 8px;
+.pnm-lib-hero__label {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: "Frank Ruhl Libre", serif;
+  font-size: 0.82rem;
+  color: #8B7355;
+  background: rgba(248, 245, 240, 0.82);
+  padding: 4px 16px;
+  border-radius: 20px;
+  width: fit-content;
+  margin: 0 auto;
 }
 
-.pnm-context__title {
+/* ─── Greeting (2-3 lines) ───────────────────────────────────────────────────── */
+.pnm-lib-greeting {
+  text-align: center;
+}
+
+.pnm-lib-greeting__title {
   font-family: "Frank Ruhl Libre", serif;
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: #2C2418;
-  margin: 0;
+  margin: 0 0 8px;
   line-height: 1.3;
 }
 
-.pnm-context__text {
-  font-size: 0.9rem;
+.pnm-lib-greeting__text {
+  font-size: 0.94rem;
   color: #5A5045;
-  line-height: 1.75;
-  margin: 0;
-  max-width: 600px;
+  line-height: 1.7;
+  margin: 0 auto;
+  max-width: 520px;
+}
+
+/* ─── Example ID row (inside collapsible) ────────────────────────────────────── */
+.pnm-lib-example-id {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pnm-lib-example-id__desc {
+  font-size: 0.82rem;
+  color: #7A6E5E;
+  font-style: italic;
 }
 
 /* ─── TV Window ──────────────────────────────────────────────────────────────── */
