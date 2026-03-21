@@ -915,28 +915,24 @@
     function renderProgressRail(state) {
         const currentStep = getCurrentProgressStep(state);
         const stepOrder = usesStandaloneLanding(state)
-            ? ['landing', 'categories', 'preview', 'exercise']
-            : ['categories', 'preview', 'exercise'];
+            ? ['landing', 'categories', 'exercise']
+            : ['categories', 'exercise'];
         const currentIndex = stepOrder.indexOf(currentStep);
         const selectedPattern = !!state.selectedPatternId;
         const steps = [
             { id: 'landing', index: 1, label: 'החידוש', enabled: true },
-            { id: 'categories', index: 2, label: 'בחירת תבנית', enabled: currentIndex >= 1 },
-            { id: 'preview', index: 3, label: 'תצוגה מקדימה', enabled: selectedPattern && currentIndex >= 2 },
-            { id: 'exercise', index: 4, label: 'מעבדה', enabled: selectedPattern && currentIndex >= 3 }
+            { id: 'categories', index: 2, label: 'ספריית תבניות', enabled: currentIndex >= 0 },
+            { id: 'exercise', index: 3, label: 'מעבדה', enabled: selectedPattern && currentIndex >= 1 }
         ];
 
         if (!usesStandaloneLanding(state)) {
             steps.shift();
             steps[0].index = 1;
-            steps[0].label = 'בחירת תבנית';
+            steps[0].label = 'ספריית תבניות';
             steps[0].enabled = true;
             steps[1].index = 2;
-            steps[1].label = 'תצוגה מקדימה';
-            steps[1].enabled = selectedPattern && currentIndex >= 1;
-            steps[2].index = 3;
-            steps[2].label = 'מעבדה';
-            steps[2].enabled = selectedPattern && currentIndex >= 2;
+            steps[1].label = 'מעבדה';
+            steps[1].enabled = selectedPattern && currentIndex >= 0;
         }
 
         return `
@@ -1630,7 +1626,7 @@
                 <div class="pnm-section-head pnm-section-head--compact">
                     <div>
                         <span class="pnm-eyebrow">עזרה קצרה</span>
-                        <h3>איך עובדים עם Prism Lab</h3>
+                        <h3>איך עובדים עם מעבדת הרמות</h3>
                     </div>
                 </div>
                 <p>${escapeHtml(usesStandaloneLanding(state)
@@ -1691,7 +1687,7 @@
         return `
             <section class="pnm-view">
                 <article class="pnm-card pnm-card--status">
-                    <h2>טוענים את מפת הרמות והמטה-מודל...</h2>
+                    <h2>טוענים את מעבדת הרמות הלוגיות...</h2>
                 </article>
             </section>
         `;
@@ -1723,7 +1719,7 @@
         if (state.error) body = renderError(state);
         else if (!state.loaded || !state.payload) body = renderLoading();
         else if (stage === 'landing') body = renderLanding(state);
-        else if (stage === 'categories') body = renderCategories(state);
+        else if (stage === 'categories') body = renderLibrary(state);
         else body = renderWorkspace(state);
 
         state.root.innerHTML = `<div class="${shellClass}" dir="rtl">${body}${renderHiddenHelpContent(state)}${renderInsightModal(state)}</div>`;
