@@ -1,4 +1,4 @@
-(function attachPrismNecessityMap(global, document) {
+(function attachPrismLogicalLevelsMap(global, document) {
     'use strict';
 
     if (!global || !document) return;
@@ -6,95 +6,247 @@
     const ROOT_SELECTOR = '[data-prism-necessity-app]';
     const STYLE_PATH = 'css/prism-necessity.css';
     const DATA_SOURCE = 'data/prism-necessity.json';
-    const CATEGORY_SOURCE = 'data/prism-lab-categories.he.json';
     const STANDALONE_PAGE = '/prism_lab_trainer.html';
+    const FONT_STYLESHEET =
+        'https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Noto+Sans+Hebrew:wght@300;400;500;700;800&display=swap';
 
-    const CATEGORY_ID_MAP = Object.freeze({
-        comparison: 'comparative_deletion',
-        time_place: 'time_space_predicate',
-        modal_operator: 'modal_operators_action',
-        cause_effect: 'cause_effect',
-        complex_equivalence: 'complex_equivalence',
-        mind_reading: 'mind_reading',
-        universal_quantifier: 'universal_quantifier',
-        nominalization: 'nominalization',
-        unspecified_verb: 'unspecified_verb',
-        lost_performative: 'lost_performative'
-    });
-
-    const LEVEL_ORDER = Object.freeze([
-        'environment',
-        'behavior',
-        'capability',
-        'values_beliefs',
+    const FAMILY_ORDER = Object.freeze(['deletion', 'generalization', 'distortion']);
+    const DISPLAY_LEVEL_ORDER = Object.freeze([
+        'beyond_self',
         'identity',
-        'purpose_meaning'
+        'beliefs',
+        'capabilities',
+        'behavior',
+        'environment'
     ]);
-
-    const DISPLAY_LEVEL_ORDER = Object.freeze([...LEVEL_ORDER].reverse());
-
-    const LEVEL_META = Object.freeze({
-        environment: { label: 'סביבה', shortLabel: 'סביבה' },
-        behavior: { label: 'התנהגות', shortLabel: 'התנהגות' },
-        capability: { label: 'יכולת', shortLabel: 'יכולת' },
-        values_beliefs: { label: 'אמונות / ערכים', shortLabel: 'אמונות' },
-        identity: { label: 'זהות', shortLabel: 'זהות' },
-        purpose_meaning: { label: 'משמעות / שייכות', shortLabel: 'משמעות' }
+    const LEVEL_WIDTHS = Object.freeze({
+        beyond_self: '46%',
+        identity: '58%',
+        beliefs: '70%',
+        capabilities: '82%',
+        behavior: '92%',
+        environment: '100%'
     });
 
-    const WELCOME_TOPICS = Object.freeze({
-        overview: Object.freeze({
-            button: 'מה רואים כאן',
-            kicker: 'תצוגה מקדימה',
-            title: 'מה רואים במסך הזה',
-            intro: 'הכלי בונה מפת עומק סביב משפט אחד. בכל שורה רואים את אותו נושא בשתי עמודות של רמות לוגיות.',
-            bullets: Object.freeze([
-                'עמודה A עוסקת במקור, בטריגר או במה שמפעיל את המערכת.',
-                'עמודה B עוסקת בתוצאה, בתחושת העצמי או במה שנבנה מבפנים.',
-                'הקווים בין העמודות מתחזקים לפי עוצמת הקשר שנחשפת בתוך הנתונים.',
-                'בסיום המפה נפתח חלון תובנה שמדגיש את הגרעין המהותי, את הסדק ואת שאלת הפאנץ\'.'
-            ]),
-            foot: 'כך אפשר לעבור ממשפט שנשמע מוחלט אל מבנה שאפשר לקרוא, להבין ולעבוד איתו.'
+    const FAMILY_META = Object.freeze({
+        deletion: Object.freeze({
+            id: 'deletion',
+            label: 'מחיקות',
+            shortLabel: 'מחיקות',
+            description: 'מידע שנעלם מהמשפט',
+            color: '#B85C38',
+            soft: 'rgba(184, 92, 56, 0.11)'
         }),
-        method: Object.freeze({
-            button: 'איך עובדים',
-            kicker: 'שיטת עבודה',
-            title: 'איך עובדים עם המפה',
-            intro: 'העבודה בנויה בשלושה שלבים קצרים וברורים: פתיחה, בחירת הפרת מטה-מודל ובניית המגדלים.',
-            bullets: Object.freeze([
-                'בכל רגע מופיעה שאלה אחת בלבד, כדי לשמור על מיקוד ולא להציף.',
-                'לחיצה על חשיפת התשובה ממלאת תא אחד בלבד במפה.',
-                'אפשר להתקדם צעד-צעד או למלא את כל המפה בבת אחת כשצריך לראות את המבנה השלם.',
-                'אחרי שכל התאים מלאים, חלון התובנה מרכז את השיחה הטיפולית סביב הגרעין, הסדק ומה שהשתנה.'
-            ]),
-            foot: 'המטרה אינה רק להבין את המשפט, אלא לזהות איפה נכון להצטרף, לערער בעדינות או להמשיך לחקירה.'
+        generalization: Object.freeze({
+            id: 'generalization',
+            label: 'הכללות',
+            shortLabel: 'הכללות',
+            description: 'מקרה אחד שהפך לחוק',
+            color: '#2D6A4F',
+            soft: 'rgba(45, 106, 79, 0.11)'
         }),
-        audience: Object.freeze({
-            button: 'למי זה מתאים',
-            kicker: 'קהל יעד',
-            title: 'למי המסך הזה מתאים',
-            intro: 'הכלי נכתב בעיקר למטפלים, מנחים ולומדי NLP מתקדמים, אבל הוא נגיש גם למי שרק מתחיל להבין מה הוא רואה.',
-            bullets: Object.freeze([
-                'למטפלים שרוצים לשלב מטה-מודל עם רמות לוגיות בתוך שיחה חיה.',
-                'למנחים שרוצים להראות לסטודנטים איך משפט אחד פועל בכמה שכבות בו-זמנית.',
-                'ללומדים שרוצים לעבור מזיהוי קטגוריה לעבודה קלינית, רגשית ומדויקת יותר.',
-                'לכל מי שמחפש גשר בין שפה, אינטליגנציה רגשית ובחירת התערבות.'
-            ]),
-            foot: 'גם אם לא כל המונחים מוכרים עדיין, המבנה הוויזואלי עוזר להבין מהר מה קורה ומה כדאי לעשות עכשיו.'
+        distortion: Object.freeze({
+            id: 'distortion',
+            label: 'עיוותים',
+            shortLabel: 'עיוותים',
+            description: 'המציאות עברה סידור מחדש',
+            color: '#5C4B99',
+            soft: 'rgba(92, 75, 153, 0.11)'
         })
     });
 
-    const WELCOME_PREVIEW_COPY = Object.freeze({
-        purpose_meaning: Object.freeze({ a: 'מה מונח על הכף', b: 'מה זה אומר עליי' }),
-        identity: Object.freeze({ a: 'מי הדמות שמולי', b: 'מי אני מול זה' }),
-        values_beliefs: Object.freeze({ a: 'איזה כלל הופעל', b: 'במה אני מאמין שם' }),
-        capability: Object.freeze({ a: 'מה יש לו', b: 'מה אובד לי' }),
-        behavior: Object.freeze({ a: 'מה קורה בפועל', b: 'מה אני עושה' }),
-        environment: Object.freeze({ a: 'איפה ומתי זה קורה', b: 'מה מקיף את הרגע' })
+    const LEVEL_META = Object.freeze({
+        environment: Object.freeze({
+            id: 'environment',
+            label: 'סביבה',
+            shortLabel: 'סביבה',
+            question: 'איפה, מתי ועם מי זה קורה?',
+            color: '#9C8269'
+        }),
+        behavior: Object.freeze({
+            id: 'behavior',
+            label: 'התנהגויות',
+            shortLabel: 'התנהגויות',
+            question: 'מה קורה בפועל?',
+            color: '#8D9C70'
+        }),
+        capabilities: Object.freeze({
+            id: 'capabilities',
+            label: 'יכולות ומיומנויות',
+            shortLabel: 'יכולות',
+            question: 'מה אפשר לעשות או ללמוד כאן?',
+            color: '#6F968B'
+        }),
+        beliefs: Object.freeze({
+            id: 'beliefs',
+            label: 'ערכים ואמונות',
+            shortLabel: 'אמונות',
+            question: 'למה זה מרגיש נכון, הכרחי או מחייב?',
+            color: '#7C7598'
+        }),
+        identity: Object.freeze({
+            id: 'identity',
+            label: 'זהות',
+            shortLabel: 'זהות',
+            question: 'מי אני בתוך הסיפור הזה?',
+            color: '#9B6F78'
+        }),
+        beyond_self: Object.freeze({
+            id: 'beyond_self',
+            label: 'למען מי?',
+            shortLabel: 'מעבר לעצמי',
+            question: 'לשם מה זה שייך למשהו רחב יותר?',
+            color: '#B68B64'
+        })
     });
 
-    let payloadPromise = null;
-    let payloadCache = null;
+    const LEVEL_ORDER_INDEX = Object.freeze(
+        DISPLAY_LEVEL_ORDER.reduce((acc, levelId, index) => {
+            acc[levelId] = DISPLAY_LEVEL_ORDER.length - index;
+            return acc;
+        }, {})
+    );
+
+    const PATTERN_CATALOG = Object.freeze([
+        Object.freeze({ id: 'simple_deletion', family: 'deletion', title: 'מחיקה פשוטה', difficulty: 'basic', concept: 'חלק מהמשפט חסר, כך שמידע קריטי נשמט מן התמונה.', keyQuestion: 'מה בדיוק?' }),
+        Object.freeze({ id: 'unspecified_verb', family: 'deletion', title: 'פועל לא מפורט', difficulty: 'basic', concept: 'הפעולה מתוארת באופן כללי, בלי לגלות איך היא קורית בפועל.', keyQuestion: 'איך בדיוק?' }),
+        Object.freeze({ id: 'comparative_deletion', family: 'deletion', title: 'השוואה חסרה', difficulty: 'advanced', concept: 'יש שיפוט או מדידה, אבל ציר ההשוואה עצמו נשאר חסר.', keyQuestion: 'בהשוואה למה?' }),
+        Object.freeze({ id: 'lost_referential_index', family: 'deletion', title: 'חוסר ייחוס', difficulty: 'advanced', concept: 'מישהו, אנשים, הם, זה. הסיפור מדבר על גורם לא מוגדר.', keyQuestion: 'מי בדיוק?' }),
+        Object.freeze({ id: 'universal_quantifier', family: 'generalization', title: 'כמת כולל', difficulty: 'basic', concept: 'תמיד, אף פעם, כולם. חריגים נעלמים והמשפט נשמע כמו חוק.', keyQuestion: 'באמת תמיד?' }),
+        Object.freeze({ id: 'modal_operator', family: 'generalization', title: 'אופרטור מודלי', difficulty: 'basic', concept: 'חייב, אסור, אי אפשר. גבולות פנימיים מוצגים כאילו היו טבע.', keyQuestion: 'מה יקרה אם כן?' }),
+        Object.freeze({ id: 'lost_performative', family: 'generalization', title: 'שיפוט מרוחק', difficulty: 'advanced', concept: 'שיפוט נשמע כמו אמת כללית, בלי מקור, קריטריון או בעל קול.', keyQuestion: 'מי אמר?' }),
+        Object.freeze({ id: 'nominalization', family: 'distortion', title: 'שם עצם מופשט', difficulty: 'basic', concept: 'תהליך חי קופא למילה, כאילו אין בו תנועה, זמן או בחירה.', keyQuestion: 'איך זה נראה כשזה עובד?' }),
+        Object.freeze({ id: 'cause_effect', family: 'distortion', title: 'סיבה ותוצאה', difficulty: 'basic', concept: 'X גורם ל-Y, בלי לראות את השרשרת, התנאים או התרגום שבאמצע.', keyQuestion: 'איך X גורם ל-Y?' }),
+        Object.freeze({ id: 'mind_reading', family: 'distortion', title: 'קריאת מחשבות', difficulty: 'advanced', concept: 'המשפט מציג ידיעה על מחשבה, כוונה או עמדה של האחר.', keyQuestion: 'איך אתה יודע?' }),
+        Object.freeze({ id: 'complex_equivalence', family: 'distortion', title: 'שקילות מורכבת', difficulty: 'advanced', concept: 'דבר אחד מתורגם למשמעות אחרת כאילו אלה אותו הדבר.', keyQuestion: 'האם X באמת אומר Y?' }),
+        Object.freeze({ id: 'presupposition', family: 'distortion', title: 'הנחות מוקדמות', difficulty: 'advanced', concept: 'בתוך המשפט כבר מתחבאת הנחה סמויה שמארגנת את הסיפור.', keyQuestion: 'מה ההנחה הסמויה?' })
+    ]);
+
+    const PATTERN_ID_ALIASES = Object.freeze({
+        simple_deletion: 'simple_deletion',
+        unspecified_verb: 'unspecified_verb',
+        unspecified_verbs: 'unspecified_verb',
+        comparison: 'comparative_deletion',
+        comparative_deletion: 'comparative_deletion',
+        comparisons: 'comparative_deletion',
+        lost_referential_index: 'lost_referential_index',
+        lack_referential_index: 'lost_referential_index',
+        universal_quantifier: 'universal_quantifier',
+        universal_quantifiers: 'universal_quantifier',
+        modal_operator: 'modal_operator',
+        modal_operators_action: 'modal_operator',
+        lost_performative: 'lost_performative',
+        nominalization: 'nominalization',
+        cause_effect: 'cause_effect',
+        mind_reading: 'mind_reading',
+        complex_equivalence: 'complex_equivalence',
+        presupposition: 'presupposition',
+        presuppositions: 'presupposition'
+    });
+
+    const PATTERN_IDS = Object.freeze(PATTERN_CATALOG.map((pattern) => pattern.id));
+
+    const INTRO_DIALOG = Object.freeze({
+        teaser: 'רוצים לראות למה כדאי ללמוד את זה?',
+        title: 'דוגמה קצרה: איך מיפוי רמות לוגיות פותח כיוון טיפולי חדש',
+        clientLine: 'אין בינינו תקשורת. פשוט אין. זה מת.',
+        classicLine: 'בגישה הרגילה היינו עוצרים ב: "מה בדיוק חסר בתקשורת?"',
+        levels: Object.freeze([
+            Object.freeze({ levelId: 'environment', question: 'איפה ה"אין תקשורת" הזה קורה הכי חזק? האם יש מקומות שבהם זה אחרת?', answer: 'בעיקר בבית, בערבים. בעבודה דווקא אנחנו מדברים רגיל.' }),
+            Object.freeze({ levelId: 'behavior', question: 'מה כל אחד מכם עושה בפועל כשמנסים לדבר?', answer: 'אני מתחיל לדבר והיא ישר בטלפון או עוברת לדבר על משהו אחר.' }),
+            Object.freeze({ levelId: 'capabilities', question: 'היה פעם זמן שכן ידעתם לדבר? מה היה שם אחרת?', answer: 'בהתחלה ישבנו שעות. ידענו להקשיב.' }),
+            Object.freeze({ levelId: 'beliefs', question: 'מה צריך לקרות כדי שתרגיש שיש ביניכם תקשורת?', answer: 'שמישהו באמת ירצה לשמוע, בלי שזה ירגיש כמו חובה.' }),
+            Object.freeze({ levelId: 'identity', question: 'כשאתה אומר "אין תקשורת" - מי אתה בתוך הסיפור הזה?', answer: 'מישהו שלא שווה להקשיב לו.' })
+        ]),
+        core: 'הגרעין: ברמת הזהות הסיפור מחזיק על "אני מישהו שלא שווה להקשיב לו".',
+        crack: 'הסדק: ברמת היכולות יש עדות לכך שהיכולת לדבר ולהקשיב קיימת, רק לא נגישה כרגע.',
+        punch: 'הפאנץ׳: אם ידעתם פעם להקשיב - והיכולת עדיין קיימת - מה צריך להשתנות כדי שהיא תחזור?',
+        closing: 'זה הכוח שתרכשו כאן: היכולת לראות מעבר למשפט, אל המבנה השלם.'
+    });
+
+    const FALLBACK_SESSIONS = Object.freeze([
+        Object.freeze({
+            id: 'fallback-simple-deletion',
+            category: 'simple_deletion',
+            sentence: 'אני כבר לא מקבל את מה שאני צריך',
+            sideA_label: 'מה קורה בחוץ',
+            sideB_label: 'מה נהיה בפנים',
+            questions: Object.freeze([
+                Object.freeze({ level: 'environment', side: 'a', question: 'מתי המשפט הזה עולה הכי חזק?', answer: 'אחרי שיחות בערב, כשאני מבקש עזרה והנושא מיד זז ללוגיסטיקה.', score: 3 }),
+                Object.freeze({ level: 'environment', side: 'b', question: 'איפה את/ה מרגיש/ה את ה"לא מקבל"?', answer: 'בבית, ליד השולחן, בדיוק כשאני צריך להרגיש שמישהו עוצר איתי רגע.', score: 3 }),
+                Object.freeze({ level: 'behavior', side: 'a', question: 'מה קורה בפועל במקום לקבל את מה שצריך?', answer: 'אני אומר שאני מותש, ומיד מקבלים תשובה מהירה או פתרון, בלי להישאר איתי.', score: 4 }),
+                Object.freeze({ level: 'behavior', side: 'b', question: 'ומה את/ה עושה אז?', answer: 'מהנהן כאילו זה בסדר, ואז נסגר ונשאר עם טינה בפנים.', score: 4 }),
+                Object.freeze({ level: 'capability_strategy', side: 'a', question: 'מה לא נבנה שם ברמת היכולת?', answer: 'היכולת לעצור, לדייק ולשאול מה בעצם אני מבקש ברגע הזה.', score: 2 }),
+                Object.freeze({ level: 'capability_strategy', side: 'b', question: 'איזו יכולת נעלמת ממך שם?', answer: 'היכולת להגיד את הצורך שלי בלי להתנצל עליו או להקטין אותו.', score: 2 }),
+                Object.freeze({ level: 'beliefs_values', side: 'a', question: 'מה חייב לקרות כדי שתרגיש/י שאת/ה "מקבל/ת"?', answer: 'שמישהו יקשיב עד הסוף, בלי למהר לפתור או לעבור הלאה.', score: 4 }),
+                Object.freeze({ level: 'beliefs_values', side: 'b', question: 'איזו אמונה הופכת את החסר הזה לכל כך צורב?', answer: 'שאם אני צריך לבקש פעמיים, כנראה שאני לא באמת חשוב.', score: 5 }),
+                Object.freeze({ level: 'identity', side: 'a', question: 'מי האחר נהיה בסיפור הזה?', answer: 'מישהו שמחליט אם יש לי מקום לצרכים שלי או לא.', score: 4 }),
+                Object.freeze({ level: 'identity', side: 'b', question: 'ומי את/ה נהיה/ית מולו?', answer: 'מישהו שצריך להוכיח שהצורך שלו מוצדק.', score: 5 }),
+                Object.freeze({ level: 'belonging_mission', side: 'a', question: 'למה הסצנה הזו שייכת לרמה עמוקה יותר?', answer: 'לשאלה האם בקשר הזה יש בכלל מקום לצרכים אנושיים ופשוטים.', score: 3 }),
+                Object.freeze({ level: 'belonging_mission', side: 'b', question: 'מה מונח על הכף אם זה באמת כך?', answer: 'שאני אתחיל להאמין שאין טעם לבקש קרבה, כי ממילא לא יישארו איתי שם.', score: 4 })
+            ]),
+            core: 'identity',
+            crack: 'capability_strategy',
+            reflectCore: 'כשהדבר החסר נשאר מחוק, זה כבר לא נשמע כמו צורך רגעי אלא כמו עדות לזה שאין לך באמת מקום לבקש. שם הסיפור מחזיק.',
+            reflectCrack: 'ובכל זאת, ברמת היכולת יש פתח: אתה כבר מרגיש שיש משהו מדויק שחסר, ורק עוד לא ניתנה לו שפה רגועה וברורה.',
+            punchQ: 'אם היה מותר לך לדייק בלי להתנצל, מה היית מבקש עכשיו במילים פשוטות?',
+            punchA: '[נשימה] ...שיישבו איתי שתי דקות לפני שקופצים לפתור. רק שישמעו.'
+        }),
+        Object.freeze({
+            id: 'fallback-lost-referential-index',
+            category: 'lost_referential_index',
+            sentence: 'הם פשוט נגדי כאן',
+            sideA_label: 'ה"הם" המעורפל',
+            sideB_label: 'אני מול ה"הם"',
+            questions: Object.freeze([
+                Object.freeze({ level: 'environment', side: 'a', question: 'איפה בדיוק עולה ה"הם" הזה?', answer: 'בעבודה, בעיקר בישיבות שבועיות כשכמה אנשים בחדר נראים קרים.', score: 3 }),
+                Object.freeze({ level: 'environment', side: 'b', question: 'מה קורה סביבך כשאתה אומר "הם נגדי"?', answer: 'אני נכנס דרוך, וכל מבט נראה לי כמו סימן אזהרה.', score: 3 }),
+                Object.freeze({ level: 'behavior', side: 'a', question: 'מי עשה מה בפועל לפני שנהיה "הם"?', answer: 'שני מנהלים העירו על הדוח, ועוד קולגה אחת פשוט שתקה.', score: 4 }),
+                Object.freeze({ level: 'behavior', side: 'b', question: 'ומה אתה עושה אז?', answer: 'מדבר פחות, מתכווץ, ואוסף בשקט הוכחות לזה שיש נגדי מחנה.', score: 4 }),
+                Object.freeze({ level: 'capability_strategy', side: 'a', question: 'מה נאבד כשהכול נהיה "הם" אחד גדול?', answer: 'אי אפשר לראות מי באמת ביקורתי, מי ניטרלי ומי בכלל לא קשור לסיפור.', score: 2 }),
+                Object.freeze({ level: 'capability_strategy', side: 'b', question: 'איזו יכולת נעלמת ממך שם?', answer: 'היכולת לבדוק מול אדם אחד, במקום להילחם בקבוצה דמיונית.', score: 2 }),
+                Object.freeze({ level: 'beliefs_values', side: 'a', question: 'איזה כלל מופעל כשכמה פרצופים נהיים "הם"?', answer: 'שאם כמה אנשים נראים לא נוחים, כנראה יש כאן מחנה נגדי.', score: 4 }),
+                Object.freeze({ level: 'beliefs_values', side: 'b', question: 'איזו אמונה הופכת את זה לכל כך ודאי?', answer: 'שאני חייב לזהות מהר סכנה חברתית כדי לא להיות מושפל שוב.', score: 5 }),
+                Object.freeze({ level: 'identity', side: 'a', question: 'מי "הם" נהיים בסיפור הזה?', answer: 'מערכת אחת שסוגרת עליי ולא באמת רוצה אותי בפנים.', score: 4 }),
+                Object.freeze({ level: 'identity', side: 'b', question: 'ומי אתה נהיה מולה?', answer: 'הבחור שתמיד צריך להתגונן לפני שקורה משהו רע.', score: 5 }),
+                Object.freeze({ level: 'belonging_mission', side: 'a', question: 'למה ה"הם" הזה שייך לרמה עמוקה יותר?', answer: 'לשאלה אם העולם החברתי הוא מקום שאפשר לסמוך עליו או רק להיזהר ממנו.', score: 4 }),
+                Object.freeze({ level: 'belonging_mission', side: 'b', question: 'מה מונח על הכף אם זה נכון?', answer: 'שאין לי באמת מקום בטוח באף צוות ושאני תמיד בחוץ.', score: 4 })
+            ]),
+            core: 'identity',
+            crack: 'capability_strategy',
+            reflectCore: 'ברגע שהסיפור עובר מ"אנשים מסוימים אמרו משהו" ל"הם נגדי", אתה כבר לא מול אירועים אלא מול מערכת שלמה שסוגרת עליך. שם האחיזה חזקה.',
+            reflectCrack: 'ועדיין, ברמת היכולת יש פתח: אתה כבר יכול לראות שהכול התערבב לגוש אחד. עצם הזיהוי הזה אומר שאפשר לפרק מחדש לאנשים, ראיות והקשרים.',
+            punchQ: 'אם נפריד עכשיו בין מי שבאמת אמר משהו, מי ששתק ומי בכלל לא היה שם - מה ישתנה בתמונה?',
+            punchA: 'זה כבר פחות "הם". יש שם שני אנשים, לא מחנה שלם.'
+        }),
+        Object.freeze({
+            id: 'fallback-presupposition',
+            category: 'presupposition',
+            sentence: 'איך אני מפסיק לאכזב את כולם?',
+            sideA_label: 'ההנחה בתוך השאלה',
+            sideB_label: 'אני שנושא את ההנחה',
+            questions: Object.freeze([
+                Object.freeze({ level: 'environment', side: 'a', question: 'מתי השאלה הזו עולה הכי חזק?', answer: 'אחרי ארוחות משפחתיות, כשאני יוצא משם מותש ומלא אשמה.', score: 3 }),
+                Object.freeze({ level: 'environment', side: 'b', question: 'מה קורה סביבך כשאתה שומע "אני מאכזב את כולם"?', answer: 'אני עובר בראש אחד אחד ומרגיש שכבר הפסדתי עוד לפני שבדקתי.', score: 3 }),
+                Object.freeze({ level: 'behavior', side: 'a', question: 'מה קרה בפועל לפני שהשאלה הופיעה?', answer: 'אמא אמרה שחבל שלא באתי מוקדם, ואחותי זרקה הערה קטנה על זה שנעלמתי.', score: 4 }),
+                Object.freeze({ level: 'behavior', side: 'b', question: 'ומה אתה עושה אז?', answer: 'מתנצל, מבטיח יותר, ואז שוב לא עומד במה שהבטחתי.', score: 4 }),
+                Object.freeze({ level: 'capability_strategy', side: 'a', question: 'מה ההנחה הסמויה עושה לקריאת המצב?', answer: 'היא מדלגת ישר למסקנה שכבר אכזבתי, בלי לבדוק מי התאכזב, ממה ובאיזה היקף.', score: 2 }),
+                Object.freeze({ level: 'capability_strategy', side: 'b', question: 'איזו יכולת נעלמת ממך שם?', answer: 'להבחין בין מישהו אחד שמתאכזב ברגע מסוים לבין "כולם" שאני אחראי עליהם.', score: 2 }),
+                Object.freeze({ level: 'beliefs_values', side: 'a', question: 'איזה כלל עומד מאחורי השאלה?', answer: 'שאם מישהו מעיר או נפגע, כנראה נכשלתי בו.', score: 4 }),
+                Object.freeze({ level: 'beliefs_values', side: 'b', question: 'איזו אמונה גורמת לזה להרגיש מובן מאליו?', answer: 'שאני אחראי להחזיק את כולם מרוצים כדי להישאר שייך.', score: 5 }),
+                Object.freeze({ level: 'identity', side: 'a', question: 'מי האחרים נהיים בסיפור הזה?', answer: 'ועדת בדיקה שמודדת כל הזמן אם אני מספיק או שוב מאכזב.', score: 4 }),
+                Object.freeze({ level: 'identity', side: 'b', question: 'ומי אתה נהיה מול ההנחה הזו?', answer: 'האדם שמאכזב מעצם זה שהוא לא מצליח להחזיק את כולם.', score: 5 }),
+                Object.freeze({ level: 'belonging_mission', side: 'a', question: 'למה השאלה הזו שייכת לרמה עמוקה יותר?', answer: 'לשייכות המשפחתית ולשאלה אם מותר לי להיות אני בלי לרצות את כולם.', score: 4 }),
+                Object.freeze({ level: 'belonging_mission', side: 'b', question: 'מה מונח על הכף אם זה נכון?', answer: 'שאם אני לא מרצה מספיק - אני פחות שייך, פחות טוב ופחות אהוב.', score: 4 })
+            ]),
+            core: 'beliefs_values',
+            crack: 'capability_strategy',
+            reflectCore: 'ההנחה לא רק אומרת שמישהו התאכזב; היא בונה חוק פנימי שלפיו האחריות שלך היא לא לאכזב אף אחד. בתוך החוק הזה, כל הערה נהיית הוכחה.',
+            reflectCrack: 'ובכל זאת, ברמת היכולת יש פתח: אתה כבר מסוגל לשמוע שיש הנחה בתוך השאלה. זה אומר שאפשר להתחיל להפריד בין הנחה לעובדה.',
+            punchQ: 'אם נחליף לרגע את "איך אני מפסיק לאכזב את כולם?" ב"מי התאכזב ממה, ובאיזה היקף?" - מה יקרה?',
+            punchA: 'זה מצטמצם. זה לא כולם, וזה לא על הכול.'
+        })
+    ]);
 
     function escapeHtml(value) {
         return String(value ?? '')
@@ -109,24 +261,44 @@
         return String(value ?? '').replace(/\s+/g, ' ').trim();
     }
 
-    function normalizeLevel(level) {
-        const normalized = normalizeText(level).toLowerCase();
-        if (normalized === 'capability_strategy') return 'capability';
-        if (normalized === 'beliefs_values') return 'values_beliefs';
-        if (normalized === 'belonging_mission') return 'purpose_meaning';
-        return LEVEL_META[normalized] ? normalized : 'behavior';
+    function normalizeDifficulty(value) {
+        return String(value || '').toLowerCase() === 'advanced' ? 'advanced' : 'basic';
     }
 
-    function normalizeScore(score) {
-        const numeric = Number(score);
-        if (!Number.isFinite(numeric)) return 0;
-        return Math.max(0, Math.min(5, Math.round(numeric)));
+    function difficultyLabel(value) {
+        return normalizeDifficulty(value) === 'advanced' ? 'מתקדם' : 'בסיסי';
     }
 
-    function shortenText(value, maxLength = 64) {
-        const safe = normalizeText(value);
-        if (!safe || safe.length <= maxLength) return safe;
-        return `${safe.slice(0, Math.max(0, maxLength - 3)).trim()}...`;
+    function normalizeScore(value) {
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) return 3;
+        return Math.max(1, Math.min(5, Math.round(numeric)));
+    }
+
+    function normalizePatternId(value) {
+        const normalized = normalizeText(value).toLowerCase();
+        if (!normalized) return '';
+        return PATTERN_ID_ALIASES[normalized] || (PATTERN_IDS.includes(normalized) ? normalized : '');
+    }
+
+    function normalizeLevel(value) {
+        const normalized = normalizeText(value).toLowerCase();
+        if (normalized === 'beliefs_values' || normalized === 'values_beliefs') return 'beliefs';
+        if (normalized === 'capability_strategy' || normalized === 'capability' || normalized === 'capabilities') return 'capabilities';
+        if (normalized === 'belonging_mission' || normalized === 'purpose_meaning' || normalized === 'beyond_self') return 'beyond_self';
+        if (normalized === 'environment' || normalized === 'behavior' || normalized === 'identity') return normalized;
+        return 'behavior';
+    }
+
+    function levelSortIndex(levelId) {
+        const normalized = normalizeLevel(levelId);
+        return LEVEL_ORDER_INDEX[normalized] || 0;
+    }
+
+    function sortQuestions(left, right) {
+        const levelDiff = levelSortIndex(left.levelId) - levelSortIndex(right.levelId);
+        if (levelDiff !== 0) return levelDiff;
+        return (left.side === 'a' ? 0 : 1) - (right.side === 'a' ? 0 : 1);
     }
 
     function resolveAssetPath(filePath) {
@@ -142,6 +314,152 @@
         return `${filePath}${filePath.includes('?') ? '&' : '?'}v=${encodeURIComponent(version)}`;
     }
 
+    function ensureFonts() {
+        if (document.querySelector('link[data-prism-logical-fonts="true"]')) return;
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = FONT_STYLESHEET;
+        link.setAttribute('data-prism-logical-fonts', 'true');
+        document.head.appendChild(link);
+    }
+
+    function ensureStylesheet() {
+        if (document.querySelector('link[data-prism-necessity-style="true"]')) return;
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = resolveAssetPath(STYLE_PATH);
+        link.setAttribute('data-prism-necessity-style', 'true');
+        document.head.appendChild(link);
+    }
+
+    async function fetchJson(sourcePath) {
+        const response = await fetch(resolveAssetPath(sourcePath), { cache: 'force-cache' });
+        if (!response.ok) {
+            throw new Error(`Failed to load ${sourcePath}: HTTP ${response.status}`);
+        }
+        return response.json();
+    }
+
+    function buildRows(questions) {
+        const rowsByLevel = DISPLAY_LEVEL_ORDER.reduce((acc, levelId) => {
+            acc[levelId] = { levelId, a: null, b: null };
+            return acc;
+        }, {});
+
+        questions.forEach((question) => {
+            if (!rowsByLevel[question.levelId]) return;
+            rowsByLevel[question.levelId][question.side] = question;
+        });
+
+        return DISPLAY_LEVEL_ORDER.map((levelId) => rowsByLevel[levelId]);
+    }
+
+    function mapQuestion(rawQuestion, fallbackIndex) {
+        const question = normalizeText(rawQuestion?.question);
+        const answer = normalizeText(rawQuestion?.answer);
+        if (!question || !answer) return null;
+        return {
+            id: `${normalizeLevel(rawQuestion?.level)}-${String(rawQuestion?.side || 'a').toLowerCase()}-${fallbackIndex + 1}`,
+            side: String(rawQuestion?.side || '').toLowerCase() === 'b' ? 'b' : 'a',
+            levelId: normalizeLevel(rawQuestion?.level),
+            question,
+            answer,
+            score: normalizeScore(rawQuestion?.score),
+            orderIndex: fallbackIndex
+        };
+    }
+
+    function mapSession(rawSession, fallbackIndex) {
+        const patternId = normalizePatternId(rawSession?.patternId || rawSession?.category);
+        if (!patternId) return null;
+
+        const questions = (Array.isArray(rawSession?.questions) ? rawSession.questions : [])
+            .map((entry, questionIndex) => mapQuestion(entry, questionIndex))
+            .filter(Boolean)
+            .sort(sortQuestions)
+            .map((question, orderIndex) => ({ ...question, orderIndex }));
+
+        if (!questions.length) return null;
+
+        return {
+            id: normalizeText(rawSession?.id) || `${patternId}-${fallbackIndex + 1}`,
+            patternId,
+            sentence: normalizeText(rawSession?.sentence) || normalizeText(rawSession?.keyPhrase) || 'משפט לדוגמה',
+            sideALabel: normalizeText(rawSession?.sideA_label) || 'מה קורה בחוץ',
+            sideBLabel: normalizeText(rawSession?.sideB_label) || 'מה נהיה בפנים',
+            questions,
+            rows: buildRows(questions),
+            core: normalizeLevel(rawSession?.core),
+            crack: normalizeLevel(rawSession?.crack),
+            reflectCore: normalizeText(rawSession?.reflectCore),
+            reflectCrack: normalizeText(rawSession?.reflectCrack),
+            punchQuestion: normalizeText(rawSession?.punchQ),
+            punchAnswer: normalizeText(rawSession?.punchA)
+        };
+    }
+
+    let payloadPromise = null;
+    let payloadCache = null;
+
+    async function loadPayload() {
+        if (payloadCache) return payloadCache;
+        if (payloadPromise) return payloadPromise;
+
+        payloadPromise = fetchJson(DATA_SOURCE)
+            .then((rawPayload) => {
+                const sessionsByPattern = Object.create(null);
+                PATTERN_CATALOG.forEach((pattern) => {
+                    sessionsByPattern[pattern.id] = [];
+                });
+
+                (Array.isArray(rawPayload) ? rawPayload : [])
+                    .map((rawSession, index) => mapSession(rawSession, index))
+                    .filter(Boolean)
+                    .forEach((session) => {
+                        sessionsByPattern[session.patternId].push(session);
+                    });
+
+                FALLBACK_SESSIONS
+                    .map((rawSession, index) => mapSession(rawSession, index))
+                    .filter(Boolean)
+                    .forEach((session) => {
+                        if (!sessionsByPattern[session.patternId].length) {
+                            sessionsByPattern[session.patternId].push(session);
+                        }
+                    });
+
+                const patterns = PATTERN_CATALOG.map((pattern) => Object.freeze({
+                    ...pattern,
+                    difficulty: normalizeDifficulty(pattern.difficulty),
+                    sessionCount: (sessionsByPattern[pattern.id] || []).length,
+                    sampleSentence: sessionsByPattern[pattern.id]?.[0]?.sentence || ''
+                }));
+
+                const patternsById = patterns.reduce((acc, pattern) => {
+                    acc[pattern.id] = pattern;
+                    return acc;
+                }, Object.create(null));
+
+                payloadCache = Object.freeze({
+                    patterns,
+                    patternsById,
+                    sessionsByPattern
+                });
+                return payloadCache;
+            })
+            .finally(() => {
+                payloadPromise = null;
+            });
+
+        return payloadPromise;
+    }
+
+    function wrapIndex(index, total) {
+        if (!total) return 0;
+        const numeric = Number(index) || 0;
+        return ((numeric % total) + total) % total;
+    }
+
     function readInitialRouteState() {
         try {
             const url = new URL(global.location.href);
@@ -149,11 +467,23 @@
                 const numeric = Number(url.searchParams.get(key));
                 return Number.isInteger(numeric) ? numeric : null;
             };
+
+            const rawStage = normalizeText(url.searchParams.get('pnmStage')).toLowerCase();
+            const rawMode = normalizeText(url.searchParams.get('pnmMode')).toLowerCase();
+
+            let stage = 'landing';
+            if (rawStage === 'select' || rawStage === 'categories') stage = 'categories';
+            if (rawStage === 'towers' || rawStage === 'workspace' || rawStage === 'preview' || rawStage === 'exercise') stage = 'workspace';
+
+            let workspaceMode = rawMode === 'exercise' ? 'exercise' : 'preview';
+            if (rawStage === 'towers' || rawStage === 'exercise') workspaceMode = 'exercise';
+
             return {
-                stage: normalizeText(url.searchParams.get('pnmStage')).toLowerCase(),
-                categoryId: normalizeText(url.searchParams.get('pnmCategory')),
+                stage,
+                workspaceMode,
+                patternId: normalizePatternId(url.searchParams.get('pnmPattern') || url.searchParams.get('pnmCategory')),
                 sessionIndex: parseInteger('pnmSession'),
-                stepIndex: parseInteger('pnmStep'),
+                revealedCount: parseInteger('pnmStep'),
                 insightOpen: url.searchParams.get('pnmInsight') === '1'
             };
         } catch (_error) {
@@ -174,20 +504,16 @@
             const targetUrl = new URL(STANDALONE_PAGE, currentUrl.origin);
             copyBuildQueryParams(currentUrl, targetUrl);
 
-            const stage = state?.stage === 'towers' || state?.stage === 'select'
-                ? state.stage
-                : 'welcome';
-
-            if (stage !== 'welcome') targetUrl.searchParams.set('pnmStage', stage);
-            if (state?.selectedCategoryId) targetUrl.searchParams.set('pnmCategory', state.selectedCategoryId);
-            if (Number.isInteger(state?.sessionIndex) && state.sessionIndex > 0) {
+            targetUrl.searchParams.set('pnmStage', state.stage);
+            if (state.selectedPatternId) targetUrl.searchParams.set('pnmCategory', state.selectedPatternId);
+            if (state.stage === 'workspace') targetUrl.searchParams.set('pnmMode', state.workspaceMode);
+            if (Number.isInteger(state.sessionIndex) && state.sessionIndex > 0) {
                 targetUrl.searchParams.set('pnmSession', String(state.sessionIndex));
             }
-            if (Number.isInteger(state?.stepIndex) && state.stepIndex > 0) {
-                targetUrl.searchParams.set('pnmStep', String(state.stepIndex));
+            if (Number.isInteger(state.revealedCount) && state.revealedCount > 0) {
+                targetUrl.searchParams.set('pnmStep', String(state.revealedCount));
             }
-            if (state?.insightOpen) targetUrl.searchParams.set('pnmInsight', '1');
-
+            if (state.insightOpen) targetUrl.searchParams.set('pnmInsight', '1');
             return targetUrl.toString();
         } catch (_error) {
             return STANDALONE_PAGE;
@@ -231,205 +557,6 @@
         return false;
     }
 
-    function ensureStylesheet() {
-        if (document.querySelector('link[data-prism-necessity-style="true"]')) return;
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = resolveAssetPath(STYLE_PATH);
-        link.setAttribute('data-prism-necessity-style', 'true');
-        document.head.appendChild(link);
-    }
-
-    async function fetchJson(sourcePath) {
-        const response = await fetch(resolveAssetPath(sourcePath), { cache: 'force-cache' });
-        if (!response.ok) {
-            throw new Error(`Failed to load ${sourcePath}: HTTP ${response.status}`);
-        }
-        return response.json();
-    }
-
-    function getLevelLabel(levelId) {
-        return LEVEL_META[levelId]?.label || 'רמה';
-    }
-
-    function getLevelShortLabel(levelId) {
-        return LEVEL_META[levelId]?.shortLabel || getLevelLabel(levelId);
-    }
-
-    function getSideDescriptor(side) {
-        return side === 'b' ? 'B - תוצאה / עצמי' : 'A - מקור / טריגר';
-    }
-
-    function getSideTitle(session, side) {
-        return side === 'b'
-            ? normalizeText(session?.sideBLabel) || 'צד B - תוצאה / עצמי'
-            : normalizeText(session?.sideALabel) || 'צד A - מקור / טריגר';
-    }
-
-    function levelOrderIndex(levelId) {
-        const index = LEVEL_ORDER.indexOf(levelId);
-        return index === -1 ? LEVEL_ORDER.length : index;
-    }
-
-    function sortQuestions(left, right) {
-        const levelDiff = levelOrderIndex(left.levelId) - levelOrderIndex(right.levelId);
-        if (levelDiff !== 0) return levelDiff;
-        return (left.side === 'a' ? 0 : 1) - (right.side === 'a' ? 0 : 1);
-    }
-
-    function mapQuestion(rawQuestion, fallbackIndex) {
-        const question = normalizeText(rawQuestion?.question);
-        const answer = normalizeText(rawQuestion?.answer);
-        if (!question || !answer) return null;
-        return {
-            id: `${fallbackIndex + 1}`,
-            side: rawQuestion?.side === 'b' ? 'b' : 'a',
-            levelId: normalizeLevel(rawQuestion?.level),
-            question,
-            answer,
-            score: normalizeScore(rawQuestion?.score),
-            orderIndex: fallbackIndex
-        };
-    }
-
-    function humanizeCategoryId(categoryId) {
-        return normalizeText(categoryId)
-            .split(/[_-]+/)
-            .filter(Boolean)
-            .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-            .join(' ');
-    }
-
-    function buildCategoryMeta(rawCategory) {
-        return {
-            id: normalizeText(rawCategory?.id),
-            label: normalizeText(rawCategory?.label_he) || humanizeCategoryId(rawCategory?.id),
-            subtitle: normalizeText(rawCategory?.short_subtitle_he),
-            tag: normalizeText(rawCategory?.category_tag_he),
-            focus: normalizeText(rawCategory?.conceptual_focus_he)
-        };
-    }
-
-    function mapSession(rawSession, index, categoriesById) {
-        const orderedQuestions = (Array.isArray(rawSession?.questions) ? rawSession.questions : [])
-            .map((entry, questionIndex) => mapQuestion(entry, questionIndex))
-            .filter(Boolean)
-            .sort(sortQuestions)
-            .map((question, orderIndex) => ({
-                ...question,
-                orderIndex
-            }));
-
-        if (!orderedQuestions.length) return null;
-
-        const rowsByLevel = LEVEL_ORDER.reduce((acc, levelId) => {
-            acc[levelId] = {
-                levelId,
-                label: getLevelLabel(levelId),
-                shortLabel: getLevelShortLabel(levelId),
-                a: null,
-                b: null
-            };
-            return acc;
-        }, {});
-
-        orderedQuestions.forEach((question) => {
-            rowsByLevel[question.levelId][question.side] = question;
-        });
-
-        const rawCategoryId = normalizeText(rawSession?.category);
-        const categoryId = CATEGORY_ID_MAP[rawCategoryId] || rawCategoryId;
-        const categoryMeta = categoriesById?.[categoryId] || {
-            id: categoryId,
-            label: humanizeCategoryId(categoryId),
-            subtitle: '',
-            tag: 'קטגוריה',
-            focus: ''
-        };
-
-        return {
-            id: String(rawSession?.id ?? index + 1),
-            sentence: normalizeText(rawSession?.sentence),
-            category: rawCategoryId,
-            categoryId,
-            categoryLabel: categoryMeta.label,
-            categorySubtitle: categoryMeta.subtitle,
-            categoryTag: categoryMeta.tag,
-            categoryFocus: categoryMeta.focus,
-            sideALabel: normalizeText(rawSession?.sideA_label) || 'צד A - מקור / טריגר',
-            sideBLabel: normalizeText(rawSession?.sideB_label) || 'צד B - תוצאה / עצמי',
-            questions: orderedQuestions,
-            rows: DISPLAY_LEVEL_ORDER.map((levelId) => rowsByLevel[levelId]),
-            core: normalizeLevel(rawSession?.core),
-            crack: normalizeLevel(rawSession?.crack),
-            reflectCore: normalizeText(rawSession?.reflectCore),
-            reflectCrack: normalizeText(rawSession?.reflectCrack),
-            punchQuestion: normalizeText(rawSession?.punchQ),
-            punchAnswer: normalizeText(rawSession?.punchA)
-        };
-    }
-
-    async function loadPayload() {
-        if (payloadCache) return payloadCache;
-        if (payloadPromise) return payloadPromise;
-
-        payloadPromise = Promise.all([
-            fetchJson(DATA_SOURCE),
-            fetchJson(CATEGORY_SOURCE)
-        ])
-            .then(([rawPayload, rawCategoriesPayload]) => {
-                const rawCategories = Array.isArray(rawCategoriesPayload?.categories) ? rawCategoriesPayload.categories : [];
-                const categoriesById = rawCategories.reduce((acc, entry) => {
-                    const category = buildCategoryMeta(entry);
-                    if (category.id) acc[category.id] = category;
-                    return acc;
-                }, {});
-
-                const sessions = (Array.isArray(rawPayload) ? rawPayload : [])
-                    .map((entry, index) => mapSession(entry, index, categoriesById))
-                    .filter(Boolean);
-
-                if (!sessions.length) {
-                    throw new Error('No Necessity Map sessions were found in the dataset.');
-                }
-
-                const sessionsByCategory = sessions.reduce((acc, session) => {
-                    (acc[session.categoryId] = acc[session.categoryId] || []).push(session);
-                    return acc;
-                }, {});
-
-                const categories = rawCategories
-                    .map((entry) => buildCategoryMeta(entry))
-                    .filter((category) => category.id && Array.isArray(sessionsByCategory[category.id]) && sessionsByCategory[category.id].length);
-
-                Object.keys(sessionsByCategory).forEach((categoryId) => {
-                    if (categoriesById[categoryId]) return;
-                    const fallback = {
-                        id: categoryId,
-                        label: sessionsByCategory[categoryId][0]?.categoryLabel || humanizeCategoryId(categoryId),
-                        subtitle: sessionsByCategory[categoryId][0]?.categorySubtitle || '',
-                        tag: sessionsByCategory[categoryId][0]?.categoryTag || 'קטגוריה',
-                        focus: sessionsByCategory[categoryId][0]?.categoryFocus || ''
-                    };
-                    categories.push(fallback);
-                    categoriesById[categoryId] = fallback;
-                });
-
-                payloadCache = {
-                    sessions,
-                    categories,
-                    categoriesById,
-                    sessionsByCategory
-                };
-                return payloadCache;
-            })
-            .finally(() => {
-                payloadPromise = null;
-            });
-
-        return payloadPromise;
-    }
-
     function createState(root) {
         return {
             root,
@@ -437,115 +564,160 @@
             loaded: false,
             error: '',
             payload: null,
-            stage: 'welcome',
-            selectedCategoryId: '',
+            stage: 'landing',
+            workspaceMode: 'preview',
+            selectedPatternId: '',
             sessionIndex: 0,
-            stepIndex: 0,
+            revealedCount: 0,
+            dialogOpen: false,
+            reminderOpen: false,
+            filter: 'all',
             insightOpen: false,
-            welcomeOverlay: '',
             scrollToTop: false,
             initialRouteState: readInitialRouteState()
         };
     }
 
-    function getCategories(state) {
-        return Array.isArray(state.payload?.categories) ? state.payload.categories : [];
+    function getPatterns(state) {
+        return Array.isArray(state.payload?.patterns) ? state.payload.patterns : [];
     }
 
-    function wrapIndex(index, total) {
-        if (!total) return 0;
-        return ((index % total) + total) % total;
+    function getPatternById(state, patternId = state.selectedPatternId) {
+        return state.payload?.patternsById?.[patternId] || null;
     }
 
-    function getCategory(state) {
-        return state.payload?.categoriesById?.[state.selectedCategoryId] || null;
+    function getPatternSessions(state, patternId = state.selectedPatternId) {
+        return Array.isArray(state.payload?.sessionsByPattern?.[patternId]) ? state.payload.sessionsByPattern[patternId] : [];
     }
 
-    function getCategorySessions(state) {
-        return state.payload?.sessionsByCategory?.[state.selectedCategoryId] || [];
-    }
-
-    function getSession(state) {
-        const sessions = getCategorySessions(state);
+    function getCurrentSession(state) {
+        const sessions = getPatternSessions(state);
         if (!sessions.length) return null;
         return sessions[wrapIndex(state.sessionIndex, sessions.length)] || null;
     }
 
-    function getFilledCount(state, session = getSession(state)) {
-        const totalQuestions = session?.questions?.length || 0;
-        return Math.max(0, Math.min(totalQuestions, state.stepIndex || 0));
+    function getFilledCount(state) {
+        const session = getCurrentSession(state);
+        if (!session) return 0;
+        return Math.max(0, Math.min(session.questions.length, state.revealedCount));
     }
 
-    function isSessionComplete(state, session = getSession(state)) {
-        const totalQuestions = session?.questions?.length || 0;
-        return totalQuestions > 0 && getFilledCount(state, session) >= totalQuestions;
-    }
-
-    function getActiveQuestion(state, session = getSession(state)) {
-        const filledCount = getFilledCount(state, session);
+    function getActiveQuestion(state) {
+        const session = getCurrentSession(state);
+        const filledCount = getFilledCount(state);
         if (!session || filledCount >= session.questions.length) return null;
         return session.questions[filledCount] || null;
     }
 
-    function strengthToPx(score) {
-        return (1.5 + (normalizeScore(score) * 0.85)).toFixed(2);
+    function isSessionComplete(state) {
+        const session = getCurrentSession(state);
+        return !!session && getFilledCount(state) >= session.questions.length;
     }
 
-    function openCategory(state, categoryId) {
-        const category = state.payload?.categoriesById?.[categoryId];
-        if (!category) return false;
-        state.selectedCategoryId = categoryId;
+    function getCurrentProgressStep(state) {
+        if (state.stage === 'landing') return 'landing';
+        if (state.stage === 'categories') return 'categories';
+        if (state.stage === 'workspace') return state.workspaceMode === 'exercise' ? 'exercise' : 'preview';
+        return 'landing';
+    }
+
+    function getCurrentLevelLabel(levelId) {
+        return LEVEL_META[normalizeLevel(levelId)]?.label || 'רמה';
+    }
+
+    function getCurrentLevelShortLabel(levelId) {
+        return LEVEL_META[normalizeLevel(levelId)]?.shortLabel || getCurrentLevelLabel(levelId);
+    }
+
+    function getSideTitle(session, side) {
+        return side === 'b' ? session.sideBLabel : session.sideALabel;
+    }
+
+    function startLab(state) {
+        state.stage = 'categories';
+        state.insightOpen = false;
+        state.scrollToTop = true;
+        return true;
+    }
+
+    function goLanding(state) {
+        state.stage = 'landing';
+        state.workspaceMode = 'preview';
+        state.insightOpen = false;
+        state.scrollToTop = true;
+        return true;
+    }
+
+    function goCategories(state) {
+        state.stage = 'categories';
+        state.workspaceMode = 'preview';
+        state.insightOpen = false;
+        state.scrollToTop = true;
+        return true;
+    }
+
+    function openPattern(state, patternId) {
+        const pattern = getPatternById(state, patternId);
+        if (!pattern) return false;
+        state.selectedPatternId = pattern.id;
         state.sessionIndex = 0;
-        state.stepIndex = 0;
+        state.revealedCount = 0;
+        state.workspaceMode = 'preview';
         state.insightOpen = false;
-        state.welcomeOverlay = '';
-        state.stage = 'towers';
+        state.stage = 'workspace';
         state.scrollToTop = true;
         return true;
     }
 
-    function openCategorySession(state, index) {
-        const sessions = getCategorySessions(state);
-        if (!sessions.length) return false;
-        state.sessionIndex = wrapIndex(index, sessions.length);
-        state.stepIndex = 0;
+    function openPreview(state) {
+        if (!state.selectedPatternId) return false;
+        state.workspaceMode = 'preview';
         state.insightOpen = false;
-        state.stage = 'towers';
+        state.stage = 'workspace';
         state.scrollToTop = true;
         return true;
     }
 
-    function goToWelcome(state) {
-        state.stage = 'welcome';
+    function startExercise(state) {
+        if (!state.selectedPatternId) return false;
+        state.workspaceMode = 'exercise';
+        state.insightOpen = false;
+        state.stage = 'workspace';
+        state.scrollToTop = true;
+        return true;
+    }
+
+    function revealAnswer(state) {
+        const session = getCurrentSession(state);
+        if (!session) return false;
+        state.workspaceMode = 'exercise';
+        if (state.revealedCount >= session.questions.length) return false;
+        state.revealedCount += 1;
+        state.insightOpen = false;
+        return true;
+    }
+
+    function fillAll(state) {
+        const session = getCurrentSession(state);
+        if (!session) return false;
+        state.workspaceMode = 'exercise';
+        state.revealedCount = session.questions.length;
+        state.insightOpen = false;
+        return true;
+    }
+
+    function resetExercise(state) {
+        if (!state.selectedPatternId) return false;
+        state.workspaceMode = 'exercise';
+        state.revealedCount = 0;
         state.insightOpen = false;
         state.scrollToTop = true;
         return true;
     }
 
-    function goToSelect(state) {
-        state.stage = 'select';
-        state.insightOpen = false;
-        state.welcomeOverlay = '';
-        state.scrollToTop = true;
-        return true;
-    }
-
-    function goToTowers(state) {
-        if (!state.selectedCategoryId || !getCategorySessions(state).length) return false;
-        state.stage = 'towers';
-        state.scrollToTop = true;
-        return true;
-    }
-
-    function openWelcomeOverlay(state, topicId) {
-        if (!WELCOME_TOPICS[topicId]) return false;
-        state.welcomeOverlay = topicId;
-        return true;
-    }
-
-    function closeWelcomeOverlay(state) {
-        if (!state.welcomeOverlay) return false;
-        state.welcomeOverlay = '';
+    function openInsight(state) {
+        if (!isSessionComplete(state)) return false;
+        state.insightOpen = true;
         return true;
     }
 
@@ -555,77 +727,31 @@
         return true;
     }
 
-    function resetCurrentTowers(state) {
-        if (!getSession(state)) return false;
-        state.stage = 'towers';
-        state.stepIndex = 0;
+    function toggleDialog(state) {
+        state.dialogOpen = !state.dialogOpen;
+        return true;
+    }
+
+    function toggleReminder(state) {
+        state.reminderOpen = !state.reminderOpen;
+        return true;
+    }
+
+    function setFilter(state, filterId) {
+        const normalized = normalizeText(filterId).toLowerCase();
+        state.filter = normalized && normalized !== 'all' ? normalized : 'all';
+        return true;
+    }
+
+    function openRelativeSession(state, direction) {
+        const sessions = getPatternSessions(state);
+        if (sessions.length < 2) return false;
+        state.sessionIndex = wrapIndex(state.sessionIndex + direction, sessions.length);
+        state.revealedCount = 0;
+        state.workspaceMode = 'preview';
         state.insightOpen = false;
         state.scrollToTop = true;
         return true;
-    }
-
-    function restartFeature(state) {
-        state.stage = 'welcome';
-        state.selectedCategoryId = '';
-        state.sessionIndex = 0;
-        state.stepIndex = 0;
-        state.insightOpen = false;
-        state.welcomeOverlay = '';
-        state.scrollToTop = true;
-        return true;
-    }
-
-    function advanceBuild(state) {
-        const session = getSession(state);
-        if (!session) return false;
-        const filledCount = getFilledCount(state, session);
-        if (filledCount >= session.questions.length) return false;
-        state.stepIndex = filledCount + 1;
-        if (state.stepIndex >= session.questions.length) {
-            state.insightOpen = true;
-        }
-        return true;
-    }
-
-    function fillAll(state) {
-        const session = getSession(state);
-        if (!session) return false;
-        state.stepIndex = session.questions.length;
-        state.insightOpen = true;
-        return true;
-    }
-
-    function stepBack(state) {
-        if (state.stage === 'towers') {
-            if (state.insightOpen) {
-                state.insightOpen = false;
-                return true;
-            }
-            const session = getSession(state);
-            if (session) {
-                const filledCount = getFilledCount(state, session);
-                if (filledCount > 0) {
-                    state.stepIndex = filledCount - 1;
-                    return true;
-                }
-            }
-            state.stage = 'select';
-            state.scrollToTop = true;
-            return true;
-        }
-
-        if (state.stage === 'select') {
-            state.stage = 'welcome';
-            state.scrollToTop = true;
-            return true;
-        }
-
-        if (state.stage === 'welcome' && state.welcomeOverlay) {
-            state.welcomeOverlay = '';
-            return true;
-        }
-
-        return false;
     }
 
     function applyInitialRouteState(state) {
@@ -634,31 +760,76 @@
 
         state.initialRouteState = null;
 
-        const requestedCategoryId = routeState.categoryId;
-        const hasRequestedCategory = !!requestedCategoryId && !!state.payload?.categoriesById?.[requestedCategoryId];
-
-        if (hasRequestedCategory) {
-            state.selectedCategoryId = requestedCategoryId;
-            const sessions = state.payload?.sessionsByCategory?.[requestedCategoryId] || [];
+        if (routeState.patternId && getPatternById(state, routeState.patternId)) {
+            state.selectedPatternId = routeState.patternId;
+            const sessions = getPatternSessions(state, routeState.patternId);
             if (sessions.length && Number.isInteger(routeState.sessionIndex)) {
                 state.sessionIndex = wrapIndex(routeState.sessionIndex, sessions.length);
             }
-            const activeSession = sessions[wrapIndex(state.sessionIndex, sessions.length)] || null;
-            const totalQuestions = activeSession?.questions?.length || 0;
-            if (Number.isInteger(routeState.stepIndex)) {
-                state.stepIndex = Math.max(0, Math.min(totalQuestions, routeState.stepIndex));
+        }
+
+        if (routeState.stage === 'categories') {
+            state.stage = 'categories';
+        } else if (routeState.stage === 'workspace' && state.selectedPatternId) {
+            state.stage = 'workspace';
+            state.workspaceMode = routeState.workspaceMode === 'exercise' ? 'exercise' : 'preview';
+        }
+
+        if (Number.isInteger(routeState.revealedCount) && state.selectedPatternId) {
+            const session = getCurrentSession(state);
+            if (session) {
+                state.revealedCount = Math.max(0, Math.min(session.questions.length, routeState.revealedCount));
+                if (state.revealedCount > 0) state.workspaceMode = 'exercise';
             }
         }
 
-        if (routeState.stage === 'select') {
-            state.stage = 'select';
-        } else if (routeState.stage === 'towers' && hasRequestedCategory) {
-            state.stage = 'towers';
-        }
-
-        if (routeState.insightOpen && hasRequestedCategory && isSessionComplete(state)) {
+        if (routeState.insightOpen && isSessionComplete(state)) {
             state.insightOpen = true;
         }
+    }
+
+    function restartFeature(state) {
+        state.stage = 'landing';
+        state.workspaceMode = 'preview';
+        state.selectedPatternId = '';
+        state.sessionIndex = 0;
+        state.revealedCount = 0;
+        state.dialogOpen = false;
+        state.reminderOpen = false;
+        state.filter = 'all';
+        state.insightOpen = false;
+        state.scrollToTop = true;
+        return true;
+    }
+
+    function stepBack(state) {
+        if (state.insightOpen) {
+            state.insightOpen = false;
+            return true;
+        }
+
+        if (state.stage === 'workspace') {
+            if (state.workspaceMode === 'exercise') {
+                if (state.revealedCount > 0) {
+                    state.revealedCount -= 1;
+                    return true;
+                }
+                state.workspaceMode = 'preview';
+                state.scrollToTop = true;
+                return true;
+            }
+            state.stage = 'categories';
+            state.scrollToTop = true;
+            return true;
+        }
+
+        if (state.stage === 'categories') {
+            state.stage = 'landing';
+            state.scrollToTop = true;
+            return true;
+        }
+
+        return false;
     }
 
     function registerController(state) {
@@ -677,475 +848,602 @@
         };
     }
 
-    function renderWindowedAction(state, className = 'pnm-btn pnm-btn--ghost') {
+    function renderWindowedAction(state) {
         if (state.mode === 'standalone') return '';
-        return `<button type="button" class="${escapeHtml(className)}" data-action="open-windowed">פתח בחלון מותאם</button>`;
+        return '<button type="button" class="pnm-btn pnm-btn--ghost pnm-btn--compact" data-action="open-windowed">פתח בחלון מותאם</button>';
     }
 
-    function renderWindowedAssist(state, copy) {
-        if (state.mode === 'standalone') return '';
-        return `
-            <article class="pnm-side-card pnm-side-card--soft pnm-window-panel">
-                <div class="pnm-stage-head">
-                    <div class="pnm-stage-head__copy">
-                        <span class="pnm-section-label">תצוגה מותאמת</span>
-                        <strong>${escapeHtml(copy)}</strong>
-                    </div>
-                    <div class="pnm-inline-actions">
-                        ${renderWindowedAction(state)}
-                    </div>
-                </div>
-            </article>
-        `;
-    }
-
-    function renderCategorySessionNavigator(state, category) {
-        const sessions = getCategorySessions(state);
-        if (!sessions.length) return '';
-
-        return `
-            <div class="pnm-case-nav">
-                <button type="button" class="pnm-mini-btn" data-action="prev-session">הקודם</button>
-                <label class="pnm-case-select">
-                    <span class="pnm-section-label">${escapeHtml(category?.label || 'מקרה')}</span>
-                    <select data-role="session-picker" aria-label="בחירת מקרה בתוך הקטגוריה">
-                        ${sessions.map((session, index) => `
-                            <option value="${index}"${index === state.sessionIndex ? ' selected' : ''}>
-                                ${escapeHtml(`${index + 1}. ${shortenText(session.sentence, 72)}`)}
-                            </option>
-                        `).join('')}
-                    </select>
-                </label>
-                <button type="button" class="pnm-mini-btn" data-action="next-session">הבא</button>
-            </div>
-        `;
-    }
-
-    function renderStageRail(state) {
-        const towersAvailable = !!state.selectedCategoryId && getCategorySessions(state).length > 0;
-        const stages = [
-            { id: 'welcome', label: 'קבלת פנים', index: '1', action: 'go-welcome', available: true },
-            { id: 'select', label: 'בחירה', index: '2', action: 'go-select', available: true },
-            { id: 'towers', label: 'מגדלים', index: '3', action: 'go-towers', available: towersAvailable }
+    function renderProgressRail(state) {
+        const currentStep = getCurrentProgressStep(state);
+        const stepOrder = ['landing', 'categories', 'preview', 'exercise'];
+        const currentIndex = stepOrder.indexOf(currentStep);
+        const selectedPattern = !!state.selectedPatternId;
+        const steps = [
+            { id: 'landing', index: 1, label: 'החידוש', enabled: true },
+            { id: 'categories', index: 2, label: 'תבנית', enabled: currentIndex >= 1 },
+            { id: 'preview', index: 3, label: 'תצוגה מקדימה', enabled: selectedPattern && currentIndex >= 2 },
+            { id: 'exercise', index: 4, label: 'מעבדה', enabled: selectedPattern && currentIndex >= 3 }
         ];
 
         return `
-            <div class="pnm-stage-rail" aria-label="שלבי התרגול">
-                ${stages.map((stageEntry) => {
-                    const isCurrent = stageEntry.id === state.stage;
-                    const className = [
-                        'pnm-stage-pill',
-                        stageEntry.available ? 'is-available' : '',
-                        isCurrent ? 'is-current' : ''
-                    ].filter(Boolean).join(' ');
-                    const actionAttr = stageEntry.available ? `data-action="${stageEntry.action}"` : 'disabled';
-                    const currentAttr = isCurrent ? ' aria-current="step"' : '';
-                    return `
-                        <button type="button" class="${className}" ${actionAttr}${currentAttr}>
-                            <span class="pnm-stage-pill__index">${stageEntry.index}</span>
-                            <span>${escapeHtml(stageEntry.label)}</span>
-                        </button>
-                    `;
-                }).join('')}
+            <nav class="pnm-progress-rail" aria-label="שלבי התרגול">
+                ${steps.map((step) => `
+                    <button type="button" class="pnm-progress-step${currentStep === step.id ? ' is-current' : ''}${step.enabled ? ' is-enabled' : ''}" data-action="go-step" data-step="${escapeHtml(step.id)}" ${step.enabled ? '' : 'disabled'} aria-current="${currentStep === step.id ? 'step' : 'false'}">
+                        <span class="pnm-progress-step__index">${step.index}</span>
+                        <span class="pnm-progress-step__label">${escapeHtml(step.label)}</span>
+                    </button>
+                `).join('')}
+            </nav>
+        `;
+    }
+
+    function renderLevelPills() {
+        return `
+            <div class="pnm-level-pill-row">
+                ${DISPLAY_LEVEL_ORDER.map((levelId) => `
+                    <span class="pnm-level-pill" style="--pnm-level:${escapeHtml(LEVEL_META[levelId].color)}">
+                        ${escapeHtml(LEVEL_META[levelId].label)}
+                    </span>
+                `).join('')}
             </div>
         `;
     }
 
-    function renderMapCell(question, filledCount, activeOrderIndex) {
-        const isFilled = !!question && question.orderIndex < filledCount;
-        const isActive = !!question && question.orderIndex === activeOrderIndex;
-        const className = [
-            'pnm-map-cell',
-            isFilled ? 'is-filled' : 'is-empty',
-            isActive ? 'is-active-target' : ''
-        ].filter(Boolean).join(' ');
-
-        if (!question) {
-            return `<div class="${className}" aria-hidden="true"></div>`;
-        }
-
-        if (isFilled) {
-            return `
-                <div class="${className}" title="${escapeHtml(question.answer)}">
-                    <p>${escapeHtml(question.answer)}</p>
-                </div>
-            `;
-        }
-
+    function renderIntroDialog() {
         return `
-            <div class="${className}">
-                <span class="pnm-cell-placeholder">${isActive ? 'התא הבא' : 'ממתין'}</span>
-            </div>
-        `;
-    }
-
-    function renderMapRow(session, row, filledCount, activeOrderIndex) {
-        const filledA = !!row.a && row.a.orderIndex < filledCount;
-        const filledB = !!row.b && row.b.orderIndex < filledCount;
-        const activeA = !!row.a && row.a.orderIndex === activeOrderIndex;
-        const activeB = !!row.b && row.b.orderIndex === activeOrderIndex;
-        const rowClassName = [
-            'pnm-map-row',
-            session.core === row.levelId ? 'is-core' : '',
-            session.crack === row.levelId ? 'is-crack' : '',
-            activeA || activeB ? 'is-active-row' : '',
-            filledA && filledB ? 'is-complete-row' : ''
-        ].filter(Boolean).join(' ');
-
-        return `
-            <article class="${rowClassName}">
-                ${renderMapCell(row.a, filledCount, activeOrderIndex)}
-                <div class="pnm-bridge">
-                    <span class="pnm-bridge-half${filledA ? ' is-filled' : ''}" style="--pnm-bridge-weight:${strengthToPx(filledA ? row.a.score : 0)}px"></span>
-                    <span class="pnm-bridge-label${filledA || filledB ? ' is-linked' : ''}">${escapeHtml(row.shortLabel)}</span>
-                    <span class="pnm-bridge-half${filledB ? ' is-filled' : ''}" style="--pnm-bridge-weight:${strengthToPx(filledB ? row.b.score : 0)}px"></span>
+            <article class="pnm-card pnm-card--dialog">
+                <div class="pnm-section-head">
+                    <div>
+                        <span class="pnm-eyebrow">דיאלוג לדוגמה</span>
+                        <h2>${escapeHtml(INTRO_DIALOG.title)}</h2>
+                    </div>
+                    <button type="button" class="pnm-mini-link" data-action="toggle-dialog">סגור</button>
                 </div>
-                ${renderMapCell(row.b, filledCount, activeOrderIndex)}
+                <div class="pnm-chat-thread">
+                    <div class="pnm-bubble pnm-bubble--client">
+                        <span class="pnm-bubble__speaker">מטופל/ת</span>
+                        <p>${escapeHtml(INTRO_DIALOG.clientLine)}</p>
+                    </div>
+                    <div class="pnm-violation-chip">זוהתה הפרה: נומינליזציה</div>
+                    <div class="pnm-bubble pnm-bubble--therapist">
+                        <span class="pnm-bubble__speaker">הדרך הרגילה</span>
+                        <p>${escapeHtml(INTRO_DIALOG.classicLine)}</p>
+                    </div>
+                </div>
+                <div class="pnm-level-dialog-list">
+                    ${INTRO_DIALOG.levels.map((entry) => `
+                        <article class="pnm-level-dialog-row" style="--pnm-level:${escapeHtml(LEVEL_META[entry.levelId].color)}">
+                            <div class="pnm-level-dialog-row__head">
+                                <strong>${escapeHtml(LEVEL_META[entry.levelId].label)}</strong>
+                                <span>${escapeHtml(LEVEL_META[entry.levelId].question)}</span>
+                            </div>
+                            <p class="pnm-level-dialog-row__question">${escapeHtml(entry.question)}</p>
+                            <p class="pnm-level-dialog-row__answer">${escapeHtml(entry.answer)}</p>
+                        </article>
+                    `).join('')}
+                </div>
+                <div class="pnm-callout-grid">
+                    <article class="pnm-callout-card pnm-callout-card--core">
+                        <span class="pnm-eyebrow">הגרעין</span>
+                        <p>${escapeHtml(INTRO_DIALOG.core)}</p>
+                    </article>
+                    <article class="pnm-callout-card pnm-callout-card--crack">
+                        <span class="pnm-eyebrow">הסדק</span>
+                        <p>${escapeHtml(INTRO_DIALOG.crack)}</p>
+                    </article>
+                    <article class="pnm-callout-card pnm-callout-card--punch">
+                        <span class="pnm-eyebrow">הפאנץ׳</span>
+                        <p>${escapeHtml(INTRO_DIALOG.punch)}</p>
+                    </article>
+                </div>
+                <p class="pnm-dialog-closing">${escapeHtml(INTRO_DIALOG.closing)}</p>
             </article>
         `;
     }
 
-    function renderBuilderMap(session, filledCount, options = {}) {
-        const activeOrderIndex = Number.isInteger(options.activeOrderIndex) ? options.activeOrderIndex : -1;
-        const shellClassName = [
-            'pnm-map-shell',
-            options.reflectMode ? 'pnm-map-shell--reflect' : ''
-        ].filter(Boolean).join(' ');
+    function renderFlowCard(title, modifier, items, note) {
+        return `
+            <article class="pnm-card pnm-card--flow ${modifier}">
+                <div class="pnm-section-head">
+                    <div><span class="pnm-eyebrow">${escapeHtml(title)}</span></div>
+                    ${modifier.includes('innovation') ? '<span class="pnm-badge">חידוש</span>' : ''}
+                </div>
+                <div class="pnm-flow-line">
+                    ${items.map((item, index) => `
+                        ${index > 0 ? '<span class="pnm-flow-arrow">←</span>' : ''}
+                        <span class="pnm-flow-chip${item.emphasis ? ' is-emphasis' : ''}">${escapeHtml(item.label)}</span>
+                    `).join('')}
+                </div>
+                <p class="pnm-muted">${escapeHtml(note)}</p>
+            </article>
+        `;
+    }
+
+    function renderPyramid() {
+        return `
+            <article class="pnm-card">
+                <div class="pnm-section-head">
+                    <div>
+                        <span class="pnm-eyebrow">פירמידת הרמות</span>
+                        <h2>אותו משפט, שש שכבות הסתכלות</h2>
+                    </div>
+                </div>
+                <div class="pnm-pyramid" aria-label="פירמידת הרמות הלוגיות">
+                    ${DISPLAY_LEVEL_ORDER.map((levelId) => `
+                        <div class="pnm-pyramid-row" style="--pnm-width:${escapeHtml(LEVEL_WIDTHS[levelId])};--pnm-level:${escapeHtml(LEVEL_META[levelId].color)}">
+                            <strong>${escapeHtml(LEVEL_META[levelId].label)}</strong>
+                            <span>${escapeHtml(LEVEL_META[levelId].question)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </article>
+        `;
+    }
+
+    function renderDiscoveryCards() {
+        return `
+            <div class="pnm-discovery-grid">
+                <article class="pnm-card pnm-card--discovery pnm-card--core">
+                    <span class="pnm-eyebrow">הגרעין</span>
+                    <p>ברמה מסוימת נמצא מה שמחזיק את הסיפור במקום ונשמע הכרחי.</p>
+                </article>
+                <article class="pnm-card pnm-card--discovery pnm-card--crack">
+                    <span class="pnm-eyebrow">הסדק</span>
+                    <p>ברמה אחרת נפתח פתח קטן לתנועה, גם אם הכול עדיין מרגיש תקוע.</p>
+                </article>
+                <article class="pnm-card pnm-card--discovery pnm-card--punch">
+                    <span class="pnm-eyebrow">הפאנץ׳</span>
+                    <p>שאלה אחת שמרחיבה את התמונה ומולידה כיוון טיפולי חדש.</p>
+                </article>
+            </div>
+        `;
+    }
+
+    function renderLanding(state) {
+        return `
+            <section class="pnm-view pnm-view--landing">
+                ${renderProgressRail(state)}
+                <article class="pnm-card pnm-card--hero">
+                    <div class="pnm-section-head">
+                        <div>
+                            <span class="pnm-eyebrow">Logical Levels × Meta-Model</span>
+                            <h1>מה מיוחד בעבודה הזו?</h1>
+                            <p>כאן לא עוצרים בזיהוי ובהחזרת דיוק למשפט. אנחנו ממפים את ההפרה דרך כל הרמות הלוגיות, עד שרואים איפה הסיפור מחזיק, איפה כבר יש פתח, ואיזו שאלה יכולה להזיז תהליך.</p>
+                        </div>
+                        ${renderWindowedAction(state)}
+                    </div>
+                    <div class="pnm-chip-row">
+                        <span class="pnm-chip">מיפוי בכל הרמות</span>
+                        <span class="pnm-chip pnm-chip--core">הגרעין</span>
+                        <span class="pnm-chip pnm-chip--crack">הסדק</span>
+                        <span class="pnm-chip pnm-chip--punch">הפאנץ׳</span>
+                    </div>
+                </article>
+
+                <section class="pnm-dialog-section">
+                    <button type="button" class="pnm-dialog-toggle" data-action="toggle-dialog" aria-expanded="${state.dialogOpen ? 'true' : 'false'}">
+                        <span>${escapeHtml(INTRO_DIALOG.teaser)}</span>
+                        <strong>${state.dialogOpen ? 'סגור דוגמה' : 'פתח דוגמה'}</strong>
+                    </button>
+                    ${state.dialogOpen ? renderIntroDialog() : ''}
+                </section>
+
+                <div class="pnm-flow-grid">
+                    ${renderFlowCard('הדרך הרגילה', 'pnm-card--flow-muted', [
+                        { label: 'משפט של מטופל/ת' },
+                        { label: 'זיהוי הפרה' },
+                        { label: 'שיקוף ואתגור' }
+                    ], 'כך העבודה נשארת צמודה לניסוח, אבל לא תמיד פותחת מבנה עמוק יותר.')}
+                    ${renderFlowCard('החידוש כאן', 'pnm-card--flow-innovation', [
+                        { label: 'משפט של מטופל/ת' },
+                        { label: 'זיהוי הפרה' },
+                        { label: 'מיפוי ברמות', emphasis: true },
+                        { label: 'גרעין + סדק', emphasis: true },
+                        { label: 'פאנץ׳ טיפולי', emphasis: true }
+                    ], 'השלבים החדשים מדייקים איפה מצטרפים, איפה מובילים, ומה אפשר לפתוח בלי לריב עם החוויה.')}
+                </div>
+
+                ${renderPyramid()}
+                ${renderDiscoveryCards()}
+
+                <article class="pnm-card pnm-card--aside">
+                    <span class="pnm-eyebrow">Pacing & Leading</span>
+                    <p>המיפוי מאשר את החוויה של המטופל/ת כפי שהיא, ובו בזמן מראה איפה כבר יש אפשרות לתנועה. לא "זה לא נכון", אלא "זה נכון כרגע, ויכול להיות שגם אחרת".</p>
+                </article>
+
+                <div class="pnm-cta-row">
+                    <button type="button" class="pnm-btn pnm-btn--primary" data-action="start-lab">הבנתי, בואו נבחר תבנית</button>
+                </div>
+            </section>
+        `;
+    }
+
+    function countPatternsByFamily(familyId) {
+        return PATTERN_CATALOG.filter((pattern) => pattern.family === familyId).length;
+    }
+
+    function renderReminderPanel(state) {
+        return `
+            <article class="pnm-card pnm-card--toggle">
+                <button type="button" class="pnm-toggle-line" data-action="toggle-reminder" aria-expanded="${state.reminderOpen ? 'true' : 'false'}">
+                    <span>תזכורת: איך זה עובד?</span>
+                    <strong>${state.reminderOpen ? 'סגור' : 'פתח'}</strong>
+                </button>
+                ${state.reminderOpen ? `
+                    <div class="pnm-toggle-body">
+                        <div class="pnm-flow-line pnm-flow-line--small">
+                            <span class="pnm-flow-chip">זיהוי</span>
+                            <span class="pnm-flow-arrow">←</span>
+                            <span class="pnm-flow-chip">מיפוי ברמות</span>
+                            <span class="pnm-flow-arrow">←</span>
+                            <span class="pnm-flow-chip">גרעין</span>
+                            <span class="pnm-flow-arrow">←</span>
+                            <span class="pnm-flow-chip">סדק</span>
+                            <span class="pnm-flow-arrow">←</span>
+                            <span class="pnm-flow-chip">פאנץ׳</span>
+                        </div>
+                    </div>
+                ` : ''}
+            </article>
+        `;
+    }
+
+    function renderFilterRow(state) {
+        const chips = [
+            { id: 'all', label: 'הכול', count: PATTERN_CATALOG.length, color: '#6B5B45' },
+            ...FAMILY_ORDER.map((familyId) => ({
+                id: familyId,
+                label: FAMILY_META[familyId].label,
+                count: countPatternsByFamily(familyId),
+                color: FAMILY_META[familyId].color
+            }))
+        ];
 
         return `
-            <section class="${shellClassName}">
-                <div class="pnm-map-header-row">
-                    <div class="pnm-tower-title">
-                        <span class="pnm-tower-title__kicker">A - מקור / טריגר</span>
-                        <strong>${escapeHtml(session.sideALabel)}</strong>
+            <div class="pnm-filter-row" role="tablist" aria-label="סינון לפי משפחה">
+                ${chips.map((chip) => `
+                    <button type="button" class="pnm-filter-chip${state.filter === chip.id ? ' is-active' : ''}" style="--pnm-chip-color:${escapeHtml(chip.color)}" data-action="set-filter" data-filter="${escapeHtml(chip.id)}">
+                        <span>${escapeHtml(chip.label)}</span>
+                        <strong>${chip.count}</strong>
+                    </button>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    function renderPatternCard(pattern) {
+        const family = FAMILY_META[pattern.family];
+        const examplesLabel = `${pattern.sessionCount} ${pattern.sessionCount === 1 ? 'דוגמה' : 'דוגמאות'}`;
+        return `
+            <button type="button" class="pnm-card pnm-pattern-card" style="--pnm-family:${escapeHtml(family.color)};--pnm-family-soft:${escapeHtml(family.soft)}" data-action="open-category" data-category-id="${escapeHtml(pattern.id)}">
+                <div class="pnm-pattern-card__meta">
+                    <span class="pnm-pattern-pill">${escapeHtml(difficultyLabel(pattern.difficulty))}</span>
+                    <span class="pnm-pattern-pill pnm-pattern-pill--ghost">${escapeHtml(examplesLabel)}</span>
+                </div>
+                <h3>${escapeHtml(pattern.title)}</h3>
+                <p>${escapeHtml(pattern.concept)}</p>
+                <div class="pnm-pattern-card__footer">
+                    <span class="pnm-key-question">שאלת מפתח: ${escapeHtml(pattern.keyQuestion)}</span>
+                    <span class="pnm-pattern-arrow" aria-hidden="true">←</span>
+                </div>
+            </button>
+        `;
+    }
+
+    function renderFamilySections(state) {
+        return FAMILY_ORDER.map((familyId) => {
+            if (state.filter !== 'all' && state.filter !== familyId) return '';
+            const family = FAMILY_META[familyId];
+            const patterns = getPatterns(state).filter((pattern) => pattern.family === familyId);
+            return `
+                <section class="pnm-family-section">
+                    <header class="pnm-family-section__head" style="--pnm-family:${escapeHtml(family.color)}">
+                        <div>
+                            <span class="pnm-eyebrow">${escapeHtml(family.label)}</span>
+                            <h3>${escapeHtml(family.description)}</h3>
+                        </div>
+                        <span class="pnm-chip" style="--pnm-chip-accent:${escapeHtml(family.color)}">${patterns.length} תבניות</span>
+                    </header>
+                    <div class="pnm-pattern-grid">
+                        ${patterns.map(renderPatternCard).join('')}
                     </div>
-                    <div class="pnm-map-axis">רמה</div>
-                    <div class="pnm-tower-title">
-                        <span class="pnm-tower-title__kicker">B - תוצאה / עצמי</span>
-                        <strong>${escapeHtml(session.sideBLabel)}</strong>
+                </section>
+            `;
+        }).join('');
+    }
+
+    function renderCategories(state) {
+        return `
+            <section class="pnm-view pnm-view--categories">
+                ${renderProgressRail(state)}
+                <article class="pnm-card">
+                    <div class="pnm-section-head">
+                        <div>
+                            <span class="pnm-eyebrow">שלב 2</span>
+                            <h1>בחרו תבנית להעמקה</h1>
+                            <p>כל תבנית תיחקר דרך הרמות הלוגיות, מהסביבה ועד הזהות והמעבר לעצמי.</p>
+                        </div>
+                        ${renderWindowedAction(state)}
+                    </div>
+                </article>
+                ${renderReminderPanel(state)}
+                ${renderFilterRow(state)}
+                ${renderFamilySections(state)}
+            </section>
+        `;
+    }
+
+    function renderSessionNavigator(state) {
+        const sessions = getPatternSessions(state);
+        if (sessions.length < 2) return '';
+        const index = wrapIndex(state.sessionIndex, sessions.length);
+        return `
+            <div class="pnm-session-nav">
+                <button type="button" class="pnm-mini-link" data-action="prev-session">הקודם</button>
+                <span>דוגמה ${index + 1} מתוך ${sessions.length}</span>
+                <button type="button" class="pnm-mini-link" data-action="next-session">הבא</button>
+            </div>
+        `;
+    }
+
+    function renderPatternHeaderCard(state, pattern, session) {
+        const family = FAMILY_META[pattern.family];
+        return `
+            <article class="pnm-card pnm-context-card" style="--pnm-family:${escapeHtml(family.color)};--pnm-family-soft:${escapeHtml(family.soft)}">
+                <div class="pnm-pattern-header-bar"></div>
+                <div class="pnm-section-head">
+                    <div>
+                        <div class="pnm-chip-row">
+                            <span class="pnm-chip" style="--pnm-chip-accent:${escapeHtml(family.color)}">${escapeHtml(family.label)}</span>
+                            <span class="pnm-chip">${escapeHtml(difficultyLabel(pattern.difficulty))}</span>
+                        </div>
+                        <h2>${escapeHtml(pattern.title)}</h2>
+                        <p>${escapeHtml(pattern.concept)}</p>
+                    </div>
+                    ${renderWindowedAction(state)}
+                </div>
+                ${session ? `<blockquote class="pnm-example-sentence">"${escapeHtml(session.sentence)}"</blockquote>` : ''}
+                ${renderSessionNavigator(state)}
+            </article>
+        `;
+    }
+
+    function renderPreviewTimeline() {
+        const items = [
+            'זיהוי ההפרה במשפט של מטופל/ת',
+            'מיפוי המשפט דרך כל רמה לוגית',
+            'איתור הגרעין שמחזיק את הסיפור',
+            'חיפוש הסדק שבו יש תנועה אפשרית',
+            'יצירת שאלת פאנץ׳ שמרחיבה את הכיוון הטיפולי'
+        ];
+
+        return `
+            <ol class="pnm-timeline">
+                ${items.map((item, index) => `
+                    <li class="pnm-timeline__item">
+                        <span class="pnm-timeline__index">${index + 1}</span>
+                        <span>${escapeHtml(item)}</span>
+                    </li>
+                `).join('')}
+            </ol>
+        `;
+    }
+
+    function renderPreview(state) {
+        const pattern = getPatternById(state);
+        const session = getCurrentSession(state);
+        if (!pattern) return renderError({ error: 'לא נבחרה תבנית.' });
+        const family = FAMILY_META[pattern.family];
+
+        return `
+            <section class="pnm-view pnm-view--workspace pnm-view--workspace-preview">
+                ${renderProgressRail(state)}
+                ${renderPatternHeaderCard(state, pattern, session)}
+                <article class="pnm-card pnm-instruction-card">
+                    <div class="pnm-key-callout" style="--pnm-family:${escapeHtml(family.color)};--pnm-family-soft:${escapeHtml(family.soft)}">
+                        <span class="pnm-key-callout__icon">?</span>
+                        <div>
+                            <span class="pnm-eyebrow">שאלת מפתח</span>
+                            <strong>${escapeHtml(pattern.keyQuestion)}</strong>
+                        </div>
+                    </div>
+                    <div class="pnm-section-head pnm-section-head--compact">
+                        <div>
+                            <span class="pnm-eyebrow">מה יקרה?</span>
+                            <h3>לפני שנכנסים למעבדה</h3>
+                        </div>
+                    </div>
+                    ${renderPreviewTimeline()}
+                    ${renderLevelPills()}
+                </article>
+                <article class="pnm-card pnm-question-card">
+                    <div class="pnm-section-head pnm-section-head--compact">
+                        <div>
+                            <span class="pnm-eyebrow">שלב 3</span>
+                            <h3>מוכנים להיכנס לתרגיל?</h3>
+                        </div>
+                    </div>
+                    <p>השלב הבא יציג משפט אחד, ימפה אותו דרך שש הרמות, ויוציא מתוכו גרעין, סדק ופאנץ׳ טיפולי.</p>
+                    <div class="pnm-button-row">
+                        <button type="button" class="pnm-btn pnm-btn--primary" style="--pnm-btn-accent:${escapeHtml(family.color)}" data-action="start-exercise">התחילו את התרגיל</button>
+                        <button type="button" class="pnm-btn pnm-btn--ghost" data-action="go-categories">תבנית אחרת</button>
+                    </div>
+                </article>
+            </section>
+        `;
+    }
+
+    function buildSummaryLine(session) {
+        const core = getCurrentLevelLabel(session.core);
+        const crack = getCurrentLevelLabel(session.crack);
+        if (session.core === session.crack) {
+            return `גם הגרעין וגם הסדק יושבים סביב ${core}, ולכן כדאי להישאר באותה רמה ולדייק מה מחזיק ומה כבר זז.`;
+        }
+        return `הגרעין מחזיק סביב ${core}, אבל פתח העבודה נחשף דרך ${crack}. זה המקום שבו אפשר להצטרף ולהוביל בעדינות.`;
+    }
+
+    function renderMapCell(question, filledCount, reflectMode) {
+        const filled = reflectMode || (question && question.orderIndex < filledCount);
+        const active = !reflectMode && question && question.orderIndex === filledCount;
+
+        if (!question) {
+            return '<div class="pnm-map-cell pnm-map-cell--empty"><span>—</span></div>';
+        }
+
+        return `
+            <div class="pnm-map-cell${filled ? ' is-filled' : ''}${active ? ' is-active' : ''}">
+                <span class="pnm-map-cell__question">${escapeHtml(question.question)}</span>
+                ${filled ? `<p>${escapeHtml(question.answer)}</p>` : `<small>${active ? 'התא הבא' : 'ממתין'}</small>`}
+            </div>
+        `;
+    }
+
+    function renderMap(session, filledCount, reflectMode = false) {
+        return `
+            <article class="pnm-card pnm-map-card${reflectMode ? ' pnm-map-card--reflect' : ''}">
+                <div class="pnm-section-head pnm-section-head--compact">
+                    <div>
+                        <span class="pnm-eyebrow">מפת הרמות</span>
+                        <h3>מה קורה בחוץ, ומה נהיה בפנים</h3>
                     </div>
                 </div>
                 <div class="pnm-map-grid">
-                    ${session.rows.map((row) => renderMapRow(session, row, filledCount, activeOrderIndex)).join('')}
+                    <div class="pnm-map-grid__head">
+                        <strong>${escapeHtml(session.sideALabel)}</strong>
+                        <span>רמה לוגית</span>
+                        <strong>${escapeHtml(session.sideBLabel)}</strong>
+                    </div>
+                    ${session.rows.map((row) => {
+                        const level = LEVEL_META[row.levelId];
+                        const rowClass = ['pnm-map-row', session.core === row.levelId ? 'is-core' : '', session.crack === row.levelId ? 'is-crack' : '']
+                            .filter(Boolean)
+                            .join(' ');
+
+                        return `
+                            <div class="${rowClass}" style="--pnm-level:${escapeHtml(level.color)}">
+                                ${renderMapCell(row.a, filledCount, reflectMode)}
+                                <div class="pnm-map-row__level">
+                                    <strong>${escapeHtml(level.label)}</strong>
+                                    <small>${escapeHtml(level.question)}</small>
+                                    ${session.core === row.levelId ? '<span class="pnm-row-marker pnm-row-marker--core">הגרעין</span>' : ''}
+                                    ${session.crack === row.levelId ? '<span class="pnm-row-marker pnm-row-marker--crack">הסדק</span>' : ''}
+                                </div>
+                                ${renderMapCell(row.b, filledCount, reflectMode)}
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
-            </section>
+            </article>
         `;
     }
 
-    function renderWelcomePreviewRow(levelId) {
-        const copy = WELCOME_PREVIEW_COPY[levelId] || { a: '', b: '' };
-        const className = [
-            'pnm-preview-row',
-            levelId === 'identity' ? 'is-core' : '',
-            levelId === 'capability' ? 'is-crack' : ''
-        ].filter(Boolean).join(' ');
+    function renderExercise(state) {
+        const pattern = getPatternById(state);
+        const session = getCurrentSession(state);
+        if (!pattern || !session) return renderError({ error: 'לא נמצא תרגיל להצגה.' });
+
+        const family = FAMILY_META[pattern.family];
+        const activeQuestion = getActiveQuestion(state);
+        const filledCount = getFilledCount(state);
+        const progress = session.questions.length ? Math.round((filledCount / session.questions.length) * 100) : 0;
+        const complete = isSessionComplete(state);
 
         return `
-            <div class="${className}">
-                <div class="pnm-preview-cell">${escapeHtml(copy.a)}</div>
-                <div class="pnm-preview-bridge">${escapeHtml(getLevelShortLabel(levelId))}</div>
-                <div class="pnm-preview-cell">${escapeHtml(copy.b)}</div>
-            </div>
-        `;
-    }
-
-    function renderWelcomePreview() {
-        return `
-            <section class="pnm-hero-visual" aria-hidden="true">
-                <div class="pnm-preview-sentence">משפט אחד. שתי עמודות. 12 תאים שמראים איך המבנה מחזיק.</div>
-                <div class="pnm-preview-map">
-                    ${DISPLAY_LEVEL_ORDER.map((levelId) => renderWelcomePreviewRow(levelId)).join('')}
-                </div>
-                <div class="pnm-chip-row pnm-chip-row--preview">
-                    <span class="pnm-chip">הגרעין המהותי</span>
-                    <span class="pnm-chip pnm-chip--teal">הסדק</span>
-                    <span class="pnm-chip pnm-chip--warm">פאנץ' ושינוי</span>
-                </div>
-            </section>
-        `;
-    }
-
-    function renderWelcomeOverlayButton(topicId) {
-        const topic = WELCOME_TOPICS[topicId];
-        if (!topic) return '';
-        return `
-            <button type="button" class="pnm-btn pnm-btn--ghost" data-action="open-help" data-topic="${escapeHtml(topicId)}">
-                ${escapeHtml(topic.button)}
-            </button>
-        `;
-    }
-
-    function renderWelcomeOverlay(state) {
-        if (!state.welcomeOverlay) return '';
-        const topic = WELCOME_TOPICS[state.welcomeOverlay];
-        if (!topic) return '';
-
-        return `
-            <div class="pnm-overlay-backdrop">
-                <div class="pnm-overlay-card" role="dialog" aria-modal="true" aria-label="${escapeHtml(topic.title)}">
-                    <div class="pnm-stage-head">
-                        <div class="pnm-stage-head__copy">
-                            <p class="pnm-kicker">${escapeHtml(topic.kicker)}</p>
-                            <h3 class="pnm-stage-title">${escapeHtml(topic.title)}</h3>
-                            <p class="pnm-copy">${escapeHtml(topic.intro)}</p>
+            <section class="pnm-view pnm-view--workspace pnm-view--workspace-live">
+                ${renderProgressRail(state)}
+                ${renderPatternHeaderCard(state, pattern, session)}
+                <article class="pnm-card pnm-instruction-card">
+                    <div class="pnm-section-head pnm-section-head--compact">
+                        <div>
+                            <span class="pnm-eyebrow">שלב 4</span>
+                            <h3>${complete ? 'המפה הושלמה' : 'ממלאים את המפה צעד אחר צעד'}</h3>
                         </div>
-                        <div class="pnm-inline-actions">
-                            <button type="button" class="pnm-mini-btn" data-action="close-help">סגור</button>
-                        </div>
+                        <span class="pnm-chip" style="--pnm-chip-accent:${escapeHtml(family.color)}">${filledCount}/${session.questions.length}</span>
                     </div>
-                    <ul class="pnm-overlay-list">
-                        ${topic.bullets.map((entry) => `<li>${escapeHtml(entry)}</li>`).join('')}
-                    </ul>
-                    <article class="pnm-summary-banner">
-                        <span class="pnm-section-label">לוקחים מכאן</span>
-                        <strong>${escapeHtml(topic.foot)}</strong>
-                    </article>
-                </div>
-            </div>
-        `;
-    }
-
-    function renderWelcomeStage(state) {
-        return `
-            <section class="pnm-view pnm-view--welcome">
-                ${renderStageRail(state)}
-                <article class="pnm-hero-card pnm-hero-card--welcome">
-                    <div class="pnm-stage-head__copy">
-                        <p class="pnm-kicker">רמות לוגיות + מטה-מודל משולב</p>
-                        <h1 class="pnm-stage-title">מפת רמות לוגיות ומטה-מודל לעבודה טיפולית מדויקת</h1>
-                        <p class="pnm-copy">המסך הזה מיועד למטפלים, מנחים ולומדי NLP שרוצים לקחת כלים מוכרים אל מרחב רחב יותר של אינטליגנציה רגשית, הקשבה טיפולית ובחירת התערבות מדויקת.</p>
-                        <p class="pnm-copy">במקום להישאר רק ברמת הניסוח, אנחנו בונים כאן שתי עמודות של רמות לוגיות סביב אותו משפט, רואים איפה הקשרים בין A ל-B מחזיקים, ואיפה נפתח סדק שממנו אפשר להניע שינוי.</p>
-                        <div class="pnm-welcome-actions">
-                            <button type="button" class="pnm-btn pnm-btn--primary" data-action="go-select">בחירת הפרת מטה-מודל</button>
-                            ${renderWindowedAction(state)}
-                            ${renderWelcomeOverlayButton('overview')}
-                            ${renderWelcomeOverlayButton('method')}
-                            ${renderWelcomeOverlayButton('audience')}
-                        </div>
-                    </div>
-                    ${renderWelcomePreview()}
-                </article>
-                <div class="pnm-welcome-grid">
-                    <article class="pnm-side-card pnm-side-card--accent">
-                        <span class="pnm-section-label">שלושה שלבים</span>
-                        <strong>פתיחה, בחירת הפרת מטה-מודל, ואז בניית מגדלים עם חשיפה הדרגתית של התשובות.</strong>
-                    </article>
-                    <article class="pnm-side-card">
-                        <span class="pnm-section-label">תוך כדי בנייה</span>
-                        <strong>כל תשובה ממלאת תא אחד בלבד, והחיבור בין שני הצדדים נעשה נראה לעין.</strong>
-                    </article>
-                    <article class="pnm-side-card pnm-side-card--soft">
-                        <span class="pnm-section-label">בסיום</span>
-                        <strong>נפתח חלון תובנה עם הגרעין המהותי, הסדק, שאלת הפאנץ' ואמירת השינוי של המטופל או המטופלת.</strong>
-                    </article>
-                </div>
-                <article class="pnm-panel pnm-panel--soft">
-                    <span class="pnm-section-label">למה זה חשוב</span>
-                    <p class="pnm-copy">כשמשפט נשמע מוחלט, קל לקפוץ ישר לאתגר או לפרשנות. המפה עוזרת קודם לראות את המבנה, להבין באיזו שכבה יושב הקושי, ורק אחר כך לבחור התערבות שמתאימה לרגע.</p>
-                </article>
-                ${renderWelcomeOverlay(state)}
-            </section>
-        `;
-    }
-
-    function renderCategoryCard(category, count) {
-        return `
-            <button type="button" class="pnm-category-card" data-action="open-category" data-category-id="${escapeHtml(category.id)}">
-                <div class="pnm-question-meta">
-                    ${category.tag ? `<span class="pnm-chip">${escapeHtml(category.tag)}</span>` : ''}
-                    <span class="pnm-chip">${count} מקרים</span>
-                </div>
-                <strong>${escapeHtml(category.label)}</strong>
-                ${category.subtitle ? `<p>${escapeHtml(category.subtitle)}</p>` : ''}
-                ${category.focus ? `<small>${escapeHtml(category.focus)}</small>` : ''}
-            </button>
-        `;
-    }
-
-    function renderSelectStage(state) {
-        const categories = getCategories(state);
-        return `
-            <section class="pnm-view pnm-view--select">
-                ${renderStageRail(state)}
-                ${renderWindowedAssist(state, 'אם נוח יותר לעבוד בחלון נפרד, אפשר לפתוח את הכלי בגודל מומלץ לגלילה ותצוגה יציבה.')}
-                <article class="pnm-hero-card pnm-hero-card--compact">
-                    <div class="pnm-stage-head">
-                        <div class="pnm-stage-head__copy">
-                            <p class="pnm-kicker">בחירת הפרת מטה-מודל</p>
-                            <h2 class="pnm-stage-title">בחרו איזו הפרת מטה-מודל תרצו לחקור היום</h2>
-                            <p class="pnm-copy">כל בחירה פותחת מקרים שבהם אותה הפרה פועלת יחד עם הרמות הלוגיות, מהסביבה ועד למשמעות. מכאן עוברים ישר למגדלים ובונים את המפה צעד אחר צעד.</p>
-                        </div>
-                        <div class="pnm-inline-actions">
-                            <button type="button" class="pnm-mini-btn" data-action="go-welcome">חזרה לפתיחה</button>
-                        </div>
-                    </div>
-                </article>
-                <div class="pnm-select-intro">
-                    <article class="pnm-side-card">
-                        <span class="pnm-section-label">מה בוחרים כאן</span>
-                        <strong>קטגוריית מטה-מודל אחת שממנה נתחיל לראות איך אותו דפוס נשען על שכבות שונות של החוויה.</strong>
-                    </article>
-                    <article class="pnm-side-card">
-                        <span class="pnm-section-label">מה קורה אחר כך</span>
-                        <strong>המשפט מופיע בראש המסך, השאלות נחשפות אחת-אחת, ושני המגדלים נבנים עד חלון התובנה.</strong>
-                    </article>
-                </div>
-                <div class="pnm-category-grid">
-                    ${categories.map((category) => renderCategoryCard(category, (state.payload?.sessionsByCategory?.[category.id] || []).length)).join('')}
-                </div>
-            </section>
-        `;
-    }
-
-    function renderTowerConsole(state, session, category) {
-        const question = getActiveQuestion(state, session);
-        const filledCount = getFilledCount(state, session);
-        const progress = session.questions.length
-            ? Math.round((filledCount / session.questions.length) * 100)
-            : 0;
-
-        if (!question) {
-            return `
-                <article class="pnm-active-card pnm-active-card--sticky pnm-active-card--complete">
-                    <div class="pnm-stage-head">
-                        <div class="pnm-stage-head__copy">
-                            <p class="pnm-kicker">${escapeHtml(category?.label || session.categoryLabel)}</p>
-                            <h2 class="pnm-stage-title">"${escapeHtml(session.sentence)}"</h2>
-                            <p class="pnm-copy">המפה הושלמה. עכשיו אפשר לפתוח את חלון התובנה ולקרוא את הגרעין, הסדק והפאנץ' מתוך המבנה שנבנה.</p>
-                        </div>
-                        <div class="pnm-inline-actions">
-                            <span class="pnm-chip">${session.questions.length}/${session.questions.length} תאים</span>
-                            <span class="pnm-chip pnm-chip--warm">המפה מלאה</span>
-                        </div>
-                    </div>
-                    <div class="pnm-console-actions">
-                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="open-insight">פתח חלון תובנה</button>
-                        <button type="button" class="pnm-btn pnm-btn--ghost" data-action="reset-towers">בנה מחדש</button>
-                        <button type="button" class="pnm-btn pnm-btn--ghost" data-action="go-select">חזרה לבחירה</button>
-                    </div>
-                    <div class="pnm-progress">
-                        <div class="pnm-progress__track">
-                            <span style="width:${progress}%"></span>
-                        </div>
-                    </div>
-                </article>
-            `;
-        }
-
-        return `
-            <article class="pnm-active-card pnm-active-card--sticky">
-                <div class="pnm-stage-head">
-                    <div class="pnm-stage-head__copy">
-                        <p class="pnm-kicker">${escapeHtml(category?.label || session.categoryLabel)} - בניית המפה</p>
-                        <h2 class="pnm-stage-title">"${escapeHtml(session.sentence)}"</h2>
-                        <p class="pnm-copy">כאן בונים את המפה בהדרגה. בכל רגע מופיעה שאלה אחת בלבד, והתשובה שלה ממלאת תא אחד במגדלים ומחזקת את הקשר בין שני הצדדים.</p>
-                    </div>
-                    <div class="pnm-inline-actions">
-                        <span class="pnm-chip">${filledCount}/${session.questions.length} תאים מולאו</span>
-                        <span class="pnm-chip">${escapeHtml(category?.label || session.categoryLabel)}</span>
-                    </div>
-                </div>
-                <div class="pnm-question-callout">
-                    <div class="pnm-question-meta">
-                        <span class="pnm-chip">שאלה ${question.orderIndex + 1}/${session.questions.length}</span>
-                        <span class="pnm-chip">${escapeHtml(getLevelLabel(question.levelId))}</span>
-                        <span class="pnm-chip">${escapeHtml(getSideDescriptor(question.side))}</span>
-                    </div>
-                    <strong class="pnm-question-side">${escapeHtml(getSideTitle(session, question.side))}</strong>
-                    <h3>${escapeHtml(question.question)}</h3>
-                    <p class="pnm-copy">לחיצה על חשיפת התשובה תמלא את התא הבא. אם צריך לראות את התמונה המלאה בבת אחת, אפשר למלא את כל המפה בלחיצה אחת.</p>
-                </div>
-                <div class="pnm-console-actions">
-                    <button type="button" class="pnm-btn pnm-btn--primary" data-action="fill-active">חשוף תשובה</button>
-                    <button type="button" class="pnm-btn pnm-btn--warm" data-action="fill-all">מלא את כל המפה</button>
-                    ${filledCount > 0 ? '<button type="button" class="pnm-btn pnm-btn--ghost" data-action="step-back">צעד אחורה</button>' : ''}
-                    <button type="button" class="pnm-btn pnm-btn--ghost" data-action="go-select">חזרה לבחירה</button>
-                </div>
-                <div class="pnm-progress">
-                    <div class="pnm-progress__track">
+                    <div class="pnm-stage-progress" aria-hidden="true">
                         <span style="width:${progress}%"></span>
                     </div>
-                </div>
-            </article>
-        `;
-    }
-
-    function renderTowersStage(state, session, category) {
-        const filledCount = getFilledCount(state, session);
-        return `
-            <section class="pnm-view pnm-view--towers">
-                ${renderStageRail(state)}
-                ${renderCategorySessionNavigator(state, category)}
-                ${renderWindowedAssist(state, 'אם התצוגה צפופה או שהחלון נמוך, אפשר לפתוח את המפה בחלון נפרד בגודל מומלץ ולהמשיך מאותה נקודה.')}
-                ${renderTowerConsole(state, session, category)}
-                ${renderBuilderMap(session, filledCount, {
-                    activeOrderIndex: filledCount < session.questions.length ? filledCount : -1
-                })}
-                <article class="pnm-side-card pnm-side-card--soft">
-                    <span class="pnm-section-label">מה רואים כאן</span>
-                    <strong>A מציג את צד המקור או הטריגר, B מציג את צד התוצאה או תחושת העצמי, והחיבור ביניהם מספר איפה המבנה מחזיק חזק ואיפה נפתח פתח לתנועה.</strong>
+                    ${complete ? `
+                        <p>כעת כבר רואים את כל המבנה. אפשר לפתוח את חלון התובנה ולקרוא את הגרעין, את הסדק ואת שאלת הפאנץ׳.</p>
+                    ` : `
+                        <div class="pnm-chip-row">
+                            <span class="pnm-chip">שאלה ${filledCount + 1}/${session.questions.length}</span>
+                            ${activeQuestion ? `<span class="pnm-chip">${escapeHtml(getCurrentLevelLabel(activeQuestion.levelId))}</span>` : ''}
+                            ${activeQuestion ? `<span class="pnm-chip">${escapeHtml(getSideTitle(session, activeQuestion.side))}</span>` : ''}
+                        </div>
+                        <p>בכל לחיצה נחשפת תשובה אחת, והיא מתיישבת בתא הבא במפה. כך רואים איך אותו משפט נפרש על פני כל הרמות.</p>
+                    `}
                 </article>
+                <article class="pnm-card pnm-question-card">
+                    ${complete ? `
+                        <div class="pnm-section-head pnm-section-head--compact">
+                            <div>
+                                <span class="pnm-eyebrow">גרעין, סדק, פאנץ׳</span>
+                                <h3>מוכנים לקרוא את המבנה</h3>
+                            </div>
+                        </div>
+                        <p>${escapeHtml(buildSummaryLine(session))}</p>
+                        <div class="pnm-button-row">
+                            <button type="button" class="pnm-btn pnm-btn--primary" style="--pnm-btn-accent:${escapeHtml(family.color)}" data-action="go-reflect">פתח תובנה</button>
+                            <button type="button" class="pnm-btn pnm-btn--ghost" data-action="reset-exercise">בנה מחדש</button>
+                        </div>
+                    ` : `
+                        <div class="pnm-section-head pnm-section-head--compact">
+                            <div>
+                                <span class="pnm-eyebrow">${activeQuestion ? escapeHtml(getCurrentLevelShortLabel(activeQuestion.levelId)) : 'שאלה פעילה'}</span>
+                                <h3>${activeQuestion ? escapeHtml(getSideTitle(session, activeQuestion.side)) : 'שאלה פעילה'}</h3>
+                            </div>
+                        </div>
+                        <p class="pnm-question-card__text">${activeQuestion ? escapeHtml(activeQuestion.question) : 'אין שאלה להצגה.'}</p>
+                        <div class="pnm-button-row">
+                            <button type="button" class="pnm-btn pnm-btn--primary" style="--pnm-btn-accent:${escapeHtml(family.color)}" data-action="reveal-answer">חשוף תשובה</button>
+                            <button type="button" class="pnm-btn pnm-btn--ghost" data-action="fill-all">מלא הכול</button>
+                        </div>
+                    `}
+                </article>
+                ${renderMap(session, filledCount)}
             </section>
         `;
     }
 
-    function buildFinalSummary(session) {
-        const coreLabel = getLevelLabel(session.core);
-        const crackLabel = getLevelLabel(session.crack);
-        if (session.core === session.crack) {
-            return `הגרעין והסדק יושבים שניהם על רמת ${coreLabel}, ולכן שם כדאי להמשיך להעמיק.`;
-        }
-        return `הגרעין נשען על רמת ${coreLabel}, אבל פתח העבודה נחשף דרך רמת ${crackLabel}. משם אפשר לבחור את הצעד הבא.`;
-    }
-
-    function renderReflectCard(label, body, modifier = '') {
-        return `
-            <article class="pnm-reflect-card${modifier ? ` ${modifier}` : ''}">
-                <span class="pnm-section-label">${escapeHtml(label)}</span>
-                <p>${escapeHtml(body)}</p>
-            </article>
-        `;
-    }
-
-    function renderInsightModal(state, session) {
+    function renderInsightModal(state) {
         if (!state.insightOpen) return '';
+        const session = getCurrentSession(state);
+        if (!session) return '';
+
         return `
             <div class="pnm-insight-backdrop">
-                <div class="pnm-insight-modal" role="dialog" aria-modal="true" aria-label="חלון תובנה">
-                    <div class="pnm-stage-head">
-                        <div class="pnm-stage-head__copy">
-                            <p class="pnm-kicker">חלון תובנה</p>
-                            <h3 class="pnm-stage-title">הגרעין המהותי, הסדק והפאנץ'</h3>
-                            <p class="pnm-copy">אחרי שהמגדלים הושלמו, אפשר לקרוא את המבנה כולו, לראות היכן נמצא הגרעין, איפה נפתח הסדק, ומה כבר מתחיל להשתנות אצל המטופל או המטופלת.</p>
+                <div class="pnm-insight-modal" role="dialog" aria-modal="true" aria-label="הגרעין, הסדק והפאנץ׳">
+                    <div class="pnm-section-head">
+                        <div>
+                            <span class="pnm-eyebrow">חלון תובנה</span>
+                            <h2>הגרעין, הסדק והפאנץ׳</h2>
+                            <p>${escapeHtml(buildSummaryLine(session))}</p>
                         </div>
-                        <div class="pnm-inline-actions">
-                            <button type="button" class="pnm-mini-btn" data-action="close-insight">סגור</button>
-                        </div>
+                        <button type="button" class="pnm-mini-link" data-action="close-insight">סגור</button>
                     </div>
-                    <div class="pnm-reflect-stats">
-                        <article class="pnm-reflect-stat pnm-reflect-stat--core">
-                            <span class="pnm-section-label">הגרעין המהותי</span>
-                            <strong>${escapeHtml(getLevelLabel(session.core))}</strong>
+                    <div class="pnm-callout-grid">
+                        <article class="pnm-callout-card pnm-callout-card--core">
+                            <span class="pnm-eyebrow">הגרעין · ${escapeHtml(getCurrentLevelLabel(session.core))}</span>
+                            <p>${escapeHtml(session.reflectCore)}</p>
                         </article>
-                        <article class="pnm-reflect-stat pnm-reflect-stat--crack">
-                            <span class="pnm-section-label">הסדק</span>
-                            <strong>${escapeHtml(getLevelLabel(session.crack))}</strong>
+                        <article class="pnm-callout-card pnm-callout-card--crack">
+                            <span class="pnm-eyebrow">הסדק · ${escapeHtml(getCurrentLevelLabel(session.crack))}</span>
+                            <p>${escapeHtml(session.reflectCrack)}</p>
+                        </article>
+                        <article class="pnm-callout-card pnm-callout-card--punch">
+                            <span class="pnm-eyebrow">הפאנץ׳</span>
+                            <p>${escapeHtml(session.punchQuestion)}</p>
+                        </article>
+                        <article class="pnm-callout-card pnm-callout-card--answer">
+                            <span class="pnm-eyebrow">מה נפתח</span>
+                            <p>${escapeHtml(session.punchAnswer)}</p>
                         </article>
                     </div>
-                    ${renderBuilderMap(session, session.questions.length, { reflectMode: true })}
-                    <div class="pnm-reflect-grid">
-                        ${renderReflectCard('מטפל/ת - הגרעין המהותי', session.reflectCore)}
-                        ${renderReflectCard('מטפל/ת - הסדק', session.reflectCrack)}
-                        ${renderReflectCard('שאלת הפאנץ\'', session.punchQuestion, 'pnm-reflect-card--question')}
-                        ${renderReflectCard('מטופל/ת - מה השתנה', session.punchAnswer, 'pnm-reflect-card--answer')}
-                    </div>
-                    <article class="pnm-summary-banner">
-                        <span class="pnm-section-label">כיוון להמשך</span>
-                        <strong>${escapeHtml(buildFinalSummary(session))}</strong>
-                    </article>
-                    <div class="pnm-action-row">
-                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="reset-towers">בנה מחדש</button>
-                        <button type="button" class="pnm-btn pnm-btn--ghost" data-action="go-select">חזרה לבחירה</button>
+                    ${renderMap(session, session.questions.length, true)}
+                    <div class="pnm-button-row pnm-button-row--modal">
+                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="reset-exercise">בנה מחדש</button>
+                        <button type="button" class="pnm-btn pnm-btn--ghost" data-action="go-categories">תבנית אחרת</button>
                     </div>
                 </div>
             </div>
@@ -1153,61 +1451,61 @@
     }
 
     function renderLoading() {
-        return '<section class="pnm-view"><div class="pnm-panel pnm-panel--loading">טוענים את המפה המשולבת...</div></section>';
+        return `
+            <section class="pnm-view">
+                <article class="pnm-card pnm-card--status">
+                    <h2>טוענים את מפת הרמות והמטה-מודל...</h2>
+                </article>
+            </section>
+        `;
     }
 
     function renderError(state) {
         return `
             <section class="pnm-view">
-                <div class="pnm-panel pnm-panel--error">
-                    <strong>המפה לא נטענה.</strong>
+                <article class="pnm-card pnm-card--status pnm-card--error">
+                    <h2>לא הצלחנו לטעון את המסך</h2>
                     <p>${escapeHtml(state.error || 'תקלה לא ידועה')}</p>
-                    <button type="button" class="pnm-btn pnm-btn--primary" data-action="retry-load">נסה שוב</button>
-                </div>
+                    <div class="pnm-button-row">
+                        <button type="button" class="pnm-btn pnm-btn--primary" data-action="retry-load">נסה שוב</button>
+                    </div>
+                </article>
             </section>
         `;
     }
 
+    function renderWorkspace(state) {
+        return state.workspaceMode === 'exercise' ? renderExercise(state) : renderPreview(state);
+    }
+
     function renderApp(state) {
         const shellClass = state.mode === 'standalone' ? 'pnm-app pnm-app--standalone' : 'pnm-app pnm-app--embedded';
-        const category = getCategory(state);
-        const session = getSession(state);
         let body = '';
 
-        if (state.error) {
-            body = renderError(state);
-        } else if (!state.loaded || !state.payload) {
-            body = renderLoading();
-        } else if (state.stage === 'welcome') {
-            body = renderWelcomeStage(state);
-        } else if (state.stage === 'select') {
-            body = renderSelectStage(state);
-        } else if (!session || !category) {
-            body = renderError({ error: 'No session available.' });
-        } else {
-            body = `${renderTowersStage(state, session, category)}${renderInsightModal(state, session)}`;
-        }
+        if (state.error) body = renderError(state);
+        else if (!state.loaded || !state.payload) body = renderLoading();
+        else if (state.stage === 'landing') body = renderLanding(state);
+        else if (state.stage === 'categories') body = renderCategories(state);
+        else body = renderWorkspace(state);
 
-        state.root.innerHTML = `<div class="${shellClass}" data-stage="${escapeHtml(state.stage)}">${body}</div>`;
+        state.root.innerHTML = `<div class="${shellClass}" dir="rtl">${body}${renderInsightModal(state)}</div>`;
         registerController(state);
 
         if (state.scrollToTop) {
             const scroller = state.root.querySelector('.pnm-view');
-            if (scroller) {
-                const schedule = typeof global.requestAnimationFrame === 'function'
-                    ? global.requestAnimationFrame.bind(global)
-                    : (callback) => global.setTimeout(callback, 16);
-                schedule(() => {
-                    scroller.scrollTop = 0;
-                    if (typeof global.scrollTo === 'function') {
-                        try {
-                            global.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-                        } catch (_error) {
-                            global.scrollTo(0, 0);
-                        }
+            const schedule = typeof global.requestAnimationFrame === 'function'
+                ? global.requestAnimationFrame.bind(global)
+                : (callback) => global.setTimeout(callback, 16);
+            schedule(() => {
+                if (scroller) scroller.scrollTop = 0;
+                if (typeof global.scrollTo === 'function') {
+                    try {
+                        global.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+                    } catch (_error) {
+                        global.scrollTo(0, 0);
                     }
-                });
-            }
+                }
+            });
             state.scrollToTop = false;
         }
     }
@@ -1219,15 +1517,11 @@
                 return;
             }
 
-            if (event.target.classList.contains('pnm-overlay-backdrop')) {
-                if (closeWelcomeOverlay(state)) renderApp(state);
-                return;
-            }
-
             const actionNode = event.target.closest('[data-action]');
             if (!actionNode) return;
 
             const action = normalizeText(actionNode.getAttribute('data-action'));
+            let handled = false;
 
             if (action === 'retry-load') {
                 state.error = '';
@@ -1246,39 +1540,37 @@
 
             if (!state.loaded || !state.payload) return;
 
-            let handled = false;
-
-            if (action === 'prev-session') handled = openCategorySession(state, state.sessionIndex - 1);
-            if (action === 'next-session') handled = openCategorySession(state, state.sessionIndex + 1);
-            if (action === 'go-welcome') handled = goToWelcome(state);
-            if (action === 'go-select') handled = goToSelect(state);
-            if (action === 'go-towers') handled = goToTowers(state);
-            if (action === 'open-category') handled = openCategory(state, normalizeText(actionNode.getAttribute('data-category-id')));
-            if (action === 'open-insight') handled = isSessionComplete(state) ? (state.insightOpen = true, true) : false;
-            if (action === 'close-insight') handled = closeInsight(state);
-            if (action === 'fill-active') handled = advanceBuild(state);
+            if (action === 'toggle-dialog') handled = toggleDialog(state);
+            if (action === 'start-lab') handled = startLab(state);
+            if (action === 'toggle-reminder') handled = toggleReminder(state);
+            if (action === 'set-filter') handled = setFilter(state, actionNode.getAttribute('data-filter'));
+            if (action === 'open-category') handled = openPattern(state, actionNode.getAttribute('data-category-id'));
+            if (action === 'go-categories') handled = goCategories(state);
+            if (action === 'start-exercise') handled = startExercise(state);
+            if (action === 'reveal-answer') handled = revealAnswer(state);
             if (action === 'fill-all') handled = fillAll(state);
-            if (action === 'reset-towers') handled = resetCurrentTowers(state);
-            if (action === 'step-back') handled = stepBack(state);
-            if (action === 'open-help') handled = openWelcomeOverlay(state, normalizeText(actionNode.getAttribute('data-topic')));
-            if (action === 'close-help') handled = closeWelcomeOverlay(state);
+            if (action === 'go-reflect') handled = openInsight(state);
+            if (action === 'close-insight') handled = closeInsight(state);
+            if (action === 'reset-exercise') handled = resetExercise(state);
+            if (action === 'prev-session') handled = openRelativeSession(state, -1);
+            if (action === 'next-session') handled = openRelativeSession(state, 1);
             if (action === 'open-windowed') handled = openWindowedMode(state);
 
-            if (handled) renderApp(state);
-        };
+            if (action === 'go-step') {
+                const stepId = normalizeText(actionNode.getAttribute('data-step')).toLowerCase();
+                if (stepId === 'landing') handled = goLanding(state);
+                if (stepId === 'categories' && getCurrentProgressStep(state) !== 'landing') handled = goCategories(state);
+                if (stepId === 'preview' && state.selectedPatternId) handled = openPreview(state);
+                if (stepId === 'exercise' && state.selectedPatternId && getCurrentProgressStep(state) === 'exercise') handled = startExercise(state);
+            }
 
-        state.root.onchange = (event) => {
-            if (!state.loaded || !state.payload) return;
-            const picker = event.target.closest('[data-role="session-picker"]');
-            if (!picker) return;
-            const nextIndex = Number(picker.value);
-            if (!Number.isInteger(nextIndex)) return;
-            if (openCategorySession(state, nextIndex)) renderApp(state);
+            if (handled) renderApp(state);
         };
     }
 
     async function mount(root) {
         const state = createState(root);
+        ensureFonts();
         ensureStylesheet();
         bindEvents(state);
         renderApp(state);
@@ -1296,8 +1588,8 @@
 
     function boot() {
         Array.from(document.querySelectorAll(ROOT_SELECTOR)).forEach((root) => {
-            if (root.__prismNecessityMounted) return;
-            root.__prismNecessityMounted = true;
+            if (root.__prismLogicalLevelsMounted) return;
+            root.__prismLogicalLevelsMounted = true;
             mount(root);
         });
     }
