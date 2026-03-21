@@ -9,9 +9,7 @@ const VITE_BIN = path.join(ROOT, 'node_modules', 'vite', 'bin', 'vite.js');
 const TRAINERS = [
     { id: 'classic2', path: 'classic2_trainer.html', hasSettings: true, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true, checkStartViewport: true },
     { id: 'classic-classic', path: 'classic_classic_trainer.html', hasSettings: true, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true, checkStartViewport: true },
-    { id: 'living-triples', path: 'living_triples_trainer.html', hasSettings: false, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: false, requireStandaloneNav: false, checkMobileOrder: false, checkStartViewport: true },
-    { id: 'iceberg-templates', path: 'iceberg_templates_trainer.html', hasSettings: true, dualMode: false, runtimeScreen: '', hasRuntimeSupport: true, checkMobileOrder: true, requireStartButton: false, checkStartViewport: false, checkMobileSettingsFooter: false },
-    { id: 'scenario-trainer', path: 'scenario_trainer.html', hasSettings: true, dualMode: false, runtimeScreen: 'play', hasRuntimeSupport: true, checkMobileOrder: true, checkStartViewport: false }
+    { id: 'living-triples', path: 'living_triples_trainer.html', hasSettings: false, dualMode: true, runtimeScreen: 'play', hasRuntimeSupport: false, requireStandaloneNav: false, checkMobileOrder: false, checkStartViewport: true }
 ];
 
 function wait(ms) {
