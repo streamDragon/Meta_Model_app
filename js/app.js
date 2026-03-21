@@ -11127,6 +11127,23 @@ function openRapidPatternOverlay({
     return true;
 }
 
+function closeRapidPatternOverlayThen(callback, reason = 'rapid-pattern-overlay-action') {
+    if (typeof callback !== 'function') return;
+    const provider = window.MetaOverlayProvider;
+    const canCloseFirst = provider
+        && typeof provider.isOpen === 'function'
+        && typeof provider.closeOverlay === 'function'
+        && provider.isOpen();
+    if (!canCloseFirst) {
+        callback();
+        return;
+    }
+    provider.closeOverlay(reason);
+    window.setTimeout(() => {
+        callback();
+    }, 70);
+}
+
 function buildRapidPatternHelpOverlayContent() {
     const wrapper = document.createElement('article');
     wrapper.className = 'shell-overlay-content rapid-radar-overlay-content';
@@ -11292,18 +11309,21 @@ function openRapidPatternMenuOverlay() {
     };
 
     addAction('עזרה', 'btn btn-secondary', () => {
-        window.MetaOverlayProvider?.closeOverlay('rapid-pattern-menu');
-        openRapidPatternHelpOverlay();
+        closeRapidPatternOverlayThen(() => {
+            openRapidPatternHelpOverlay();
+        }, 'rapid-pattern-menu-help');
     });
     addAction('נתונים', 'btn btn-secondary', () => {
-        window.MetaOverlayProvider?.closeOverlay('rapid-pattern-menu');
-        openRapidPatternStatsOverlay();
+        closeRapidPatternOverlayThen(() => {
+            openRapidPatternStatsOverlay();
+        }, 'rapid-pattern-menu-stats');
     });
 
     if (rapidPatternArenaState.currentCue && (rapidPatternArenaState.roundResolved || rapidPatternArenaState.sessionCompleted)) {
         addAction('הסבר', 'btn btn-secondary', () => {
-            window.MetaOverlayProvider?.closeOverlay('rapid-pattern-menu');
-            openRapidPatternExplanationOverlay();
+            closeRapidPatternOverlayThen(() => {
+                openRapidPatternExplanationOverlay();
+            }, 'rapid-pattern-menu-explanation');
         });
     }
 

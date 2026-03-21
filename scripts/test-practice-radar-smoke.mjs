@@ -155,28 +155,38 @@ try {
     if (state.liveHidden || !state.monologue || state.rowCount !== 5 || state.buttonsPerRow.some((count) => count !== 3)) {
         throw new Error(`Rapid radar learning view did not hydrate into 5x3 board.\n${JSON.stringify(state, null, 2)}`);
     }
-    if (!/לימוד/.test(state.modeChip)) {
+    if (!state.modeChip.includes('לימוד')) {
         throw new Error(`Learning mode chip missing.\n${JSON.stringify(state, null, 2)}`);
     }
 
     await page.locator('#rapid-open-menu').click();
-    await page.locator('#app-overlay-root .overlay-body .btn', { hasText: 'עזרה' }).click();
-    await page.waitForTimeout(250);
-    const correctLabel = await page.evaluate(() => {
-        const helpText = document.querySelector('#app-overlay-root .overlay-body')?.textContent || '';
+    await page.locator('#app-overlay-root .overlay-body .btn').first().click();
+    await page.waitForFunction(() => {
+        const root = document.getElementById('app-overlay-root');
+        return !!root && !root.classList.contains('hidden') && root.getAttribute('data-overlay-type') === 'rapid-pattern-help';
+    }, { timeout: 5000 });
+    const helpState = await page.evaluate(() => {
+        const helpText = document.querySelector('#app-overlay-root .overlay-body')?.textContent?.replace(/\s+/g, ' ').trim() || '';
         const labels = Array.from(document.querySelectorAll('#rapid-pattern-buttons .rapid-pattern-btn'))
             .map((button) => button.textContent?.trim() || '')
             .filter(Boolean);
-        return labels.find((label) => helpText.includes(label)) || '';
+        return {
+            helpText,
+            correctLabel: labels.find((label) => helpText.includes(label)) || ''
+        };
     });
-    if (!correctLabel) {
+    process.stdout.write(`HELP_OVERLAY ${JSON.stringify(helpState)}\n`);
+    if (!helpState.helpText || !helpState.helpText.includes('רמז מהיר')) {
+        throw new Error(`Learning help overlay did not render expected guidance.\n${JSON.stringify(helpState, null, 2)}`);
+    }
+    if (!helpState.correctLabel) {
         throw new Error('Could not derive the correct pattern label from the learning help overlay.');
     }
     await page.locator('#app-overlay-root [data-overlay-close]').click();
     await page.waitForTimeout(250);
 
     const firstMonologue = state.monologue;
-    await page.locator('#rapid-pattern-buttons .rapid-pattern-btn', { hasText: correctLabel }).first().click();
+    await page.locator('#rapid-pattern-buttons .rapid-pattern-btn', { hasText: helpState.correctLabel }).first().click();
     await page.waitForFunction(() => {
         const root = document.getElementById('app-overlay-root');
         return !!root && !root.classList.contains('hidden') && root.getAttribute('data-overlay-type') === 'rapid-pattern-feedback';
@@ -199,13 +209,13 @@ try {
     );
 
     await page.locator('#rapid-open-menu').click();
-    await page.locator('#app-overlay-root .overlay-body .btn', { hasText: 'התחל מחדש' }).click();
+    await page.locator('#app-overlay-root .overlay-body .btn.btn-primary').click();
     await page.waitForTimeout(700);
     await page.locator('#rapid-mode-exam-btn').click();
     await page.waitForTimeout(200);
     state = await extractRadarState(page);
     process.stdout.write(`EXAM_SETUP ${JSON.stringify(state)}\n`);
-    if (!/מבחן/.test(state.modeNote)) {
+    if (!state.modeNote.includes('מבחן')) {
         throw new Error(`Exam mode note did not update.\n${JSON.stringify(state, null, 2)}`);
     }
 
@@ -213,7 +223,7 @@ try {
     await page.waitForTimeout(1000);
     state = await extractRadarState(page);
     process.stdout.write(`EXAM_START ${JSON.stringify(state)}\n`);
-    if (state.liveHidden || !/מבחן/.test(state.modeChip)) {
+    if (state.liveHidden || !state.modeChip.includes('מבחן')) {
         throw new Error(`Exam mode did not propagate into the live HUD.\n${JSON.stringify(state, null, 2)}`);
     }
 
