@@ -1175,110 +1175,6 @@
         `;
     }
 
-    // ─── Library: hero image (with warm gradient fallback) ────────────────────
-    function renderHeroImage() {
-        return `
-            <div class="pnm-lib-hero">
-                <img class="pnm-lib-hero__img"
-                     src="${PATTERN_IMAGE_BASE}context-therapy-room.webp"
-                     alt=""
-                     aria-hidden="true"
-                     onerror="this.style.display='none'">
-            </div>
-        `;
-    }
-
-    // ─── Library: therapeutic context text ────────────────────────────────────
-    function renderTherapyContext() {
-        return `
-            <div class="pnm-context">
-                <h2 class="pnm-context__title">אתה/ת המטפל/ת. המטופל/ת יושב/ת מולך.</h2>
-                <p class="pnm-context__text">
-                    אחרי כמה קפיצות של שיחה, בין סיפורים, השפה שלהם מדברת.
-                    אחד המשפטים תופס את תשומת לבך – הוא מסתיר בתוכו משהו.
-                    הנה מה שאתה/ת שומע/ת:
-                </p>
-            </div>
-        `;
-    }
-
-    // ─── Library: TV window with highlighted therapy sentence ─────────────────
-    function renderTvWindow() {
-        return `
-            <div class="pnm-tv-window">
-                <span class="pnm-tv-label">חדר הטיפולים</span>
-                <div class="pnm-tv-content">
-                    <p class="pnm-client-speech">
-                        "…אנחנו לא מסתדרים בבית. כל אחד עסוק בעצמו,
-                        והמשפחה פשוט
-                        <mark class="pnm-highlight">לא עובדת</mark>
-                        בשבילי. ניסיתי לדבר איתו על זה פעמים רבות,
-                        אבל הוא לא שומע. זה ככה כבר שנים…"
-                    </p>
-                </div>
-                <div class="pnm-identification">
-                    <span class="pnm-id-pill">פועל לא מפורט</span>
-                    <span class="pnm-id-desc">הפעולה מתוארת באופן כללי – מה בדיוק "לא עובד"? איך?</span>
-                </div>
-            </div>
-        `;
-    }
-
-    // ─── Library: NLP advisor body (compact theory + example dialog) ───────────
-    function renderNlpAdvisorBody() {
-        return `
-            <div class="pnm-lib-dialog-body">
-                <div class="pnm-advisor-intro">
-                    <p><strong>מטה-מודל (בנדלר וגריינדר)</strong> – זיהוי תבניות שפה: השמטות, הכללות ועיוותים, ושאלות ממוקדות לשחזור מה שנעלם.</p>
-                    <p><strong>רמות לוגיות (רוברט דילטס)</strong> – שש שכבות ניסיון: מסביבה ← התנהגות ← יכולות ← ערכים ← זהות ← למען מי.</p>
-                    <p><strong>החידוש כאן:</strong> במקום לעצור בזיהוי ושאלה, ממפים את אותה הפרה דרך כל שש הרמות. מכאן עולים שלושה ממצאים: <strong>הגרעין</strong> (מה מחזיק את הסיפור), <strong>הסדק</strong> (איפה יש תנועה), <strong>הפאנץ׳</strong> (שאלה שפותחת כיוון חדש).</p>
-                    <p><em>עיקרון Pacing &amp; Leading: המיפוי מאמת את החוויה ומגלה יחד איפה אפשר לנוע.</em></p>
-                </div>
-                <div class="pnm-advisor-divider">דוגמה מלאה ↓</div>
-                <div class="pnm-lib-bubble">
-                    <span class="pnm-lib-bubble__speaker">מטופל/ת</span>
-                    <p>"${escapeHtml(INTRO_DIALOG.clientLine)}"</p>
-                </div>
-                <div class="pnm-lib-id-pill">
-                    זוהתה: שם עצם מופשט (Nominalization) – "תקשורת" מקפיאה תהליך חי לדבר
-                </div>
-                <div class="pnm-lib-sep-note">
-                    <span>${escapeHtml(INTRO_DIALOG.classicLine)} – ועוצרים שם.</span>
-                    <span class="pnm-lib-sep-note__arrow">↙</span>
-                    <span>עם מיפוי רמות לוגיות – ממשיכים:</span>
-                </div>
-                <div class="pnm-lib-level-rows">
-                    ${INTRO_DIALOG.levels.map((entry) => {
-                        const lm = LEVEL_META[entry.levelId];
-                        return `
-                            <div class="pnm-lib-level-row">
-                                <span class="pnm-lib-level-pill" style="background:${lm.color}22;color:${lm.color};border:1px solid ${lm.color}55">${escapeHtml(lm.shortLabel)}</span>
-                                <span class="pnm-lib-level-row__q">"${escapeHtml(entry.question)}"</span>
-                                <span class="pnm-lib-level-row__a">${escapeHtml(entry.answer)}</span>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-                <div class="pnm-lib-discovery-row">
-                    <div class="pnm-lib-discovery-card" style="border-right:3px solid #B85C38">
-                        <span class="pnm-lib-discovery-card__label" style="color:#B85C38">הגרעין</span>
-                        <p>${escapeHtml(INTRO_DIALOG.core)}</p>
-                    </div>
-                    <div class="pnm-lib-discovery-card" style="border-right:3px solid #5C4B99">
-                        <span class="pnm-lib-discovery-card__label" style="color:#5C4B99">הסדק</span>
-                        <p>${escapeHtml(INTRO_DIALOG.crack)}</p>
-                    </div>
-                    <div class="pnm-lib-discovery-card" style="border-right:3px solid #2D6A4F">
-                        <span class="pnm-lib-discovery-card__label" style="color:#2D6A4F">הפאנץ׳</span>
-                        <p>${escapeHtml(INTRO_DIALOG.punch)}</p>
-                    </div>
-                </div>
-                <p class="pnm-lib-dialog-closing"><em>${escapeHtml(INTRO_DIALOG.closing)}</em></p>
-                <button type="button" class="pnm-lib-dialog-close" data-action="toggle-dialog">▴ סגור</button>
-            </div>
-        `;
-    }
-
     // ─── Library: single book card ─────────────────────────────────────────────
     function renderBookCard(pattern, bookIndex) {
         const family = FAMILY_META[pattern.family];
@@ -1347,21 +1243,13 @@
 
         return `
             <section class="pnm-view pnm-view--library">
-                ${renderHeroImage()}
-                ${renderTherapyContext()}
-                ${renderTvWindow()}
-
-                <div class="pnm-lib-dialog-wrap">
-                    <button type="button" class="pnm-lib-dialog-toggle" data-action="toggle-dialog" aria-expanded="${state.dialogOpen ? 'true' : 'false'}">
-                        <span>💡 יועץ NLP – רוצים להבין את הרקע התיאורטי?</span>
-                        <strong class="pnm-lib-dialog-indicator">${state.dialogOpen ? '▴' : '▾'}</strong>
-                    </button>
-                    ${state.dialogOpen ? renderNlpAdvisorBody() : ''}
-                </div>
+                ${renderSelectionHeader()}
+                ${renderBeforeAfterExplainer()}
+                ${renderExampleDialog()}
 
                 <header class="pnm-lib-header">
                     <h1 class="pnm-lib-title">📚 ספריית התבניות</h1>
-                    <p class="pnm-lib-subtitle">בחרו תבנית ממשרף – ופתחו דרך חדשה לרמות לוגיות</p>
+                    <p class="pnm-lib-subtitle">בחרו תבנית מהרשימה – לחיצה פותחת ישירות את התרגיל</p>
                 </header>
 
                 <div class="pnm-lib-filters" role="tablist" aria-label="סינון לפי משפחה">
