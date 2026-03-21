@@ -8,8 +8,35 @@
   <meta http-equiv="Expires" content="0">
   <title>Context Radar - Meta Model Lab</title>
   <link rel="stylesheet" href="../../css/context-radar.css">
+  <link rel="stylesheet" href="/css/feature-welcome.css">
 </head>
 <body>
+<div class="fw-overlay" id="fw-radar">
+  <span class="fw-badge">כלי מטפל</span>
+  <h1 class="fw-title">ר"ן בהקשר</h1>
+  <p class="fw-hook">ממפים את ההקשר של השיחה – לפני שמגיבים ויודעים על מה לשים.</p>
+  <div class="fw-cards">
+    <div class="fw-card">
+      <span class="fw-card__kicker">מה עושים</span>
+      <h3 class="fw-card__title">מפת הקשר</h3>
+      <p class="fw-card__body">לא רק מה נאמר – מאיפה, מתוך, עם מה? בפני שהמפה מציגה.</p>
+    </div>
+    <div class="fw-card">
+      <span class="fw-card__kicker">מה ישנה</span>
+      <h3 class="fw-card__title">הקשר משנה הכל</h3>
+      <p class="fw-card__body">כותבים משפט בהקשר שונה שונה מסוים ממסוים ממסוים מסוים.</p>
+    </div>
+  </div>
+  <div class="fw-example">
+    <span class="fw-example__label">דוגמה קצרה</span>
+    <p class="fw-example__sentence">"לא יכול"</p>
+    <p class="fw-example__note">→ הפנייה עצמית? השאלה על? הפן בהקשר? הקשר קובע.</p>
+  </div>
+  <button class="fw-cta" onclick="document.getElementById('fw-radar').style.display='none';document.getElementById('trainerContent').style.display='block';">
+    פתחו את התרגיל ←
+  </button>
+</div>
+<div id="trainerContent" style="display:none">
   <main class="cr-page">
     <section class="cr-shell">
       <div class="cr-top">
@@ -28,5 +55,6 @@
 
   <script type="module" src="../../js/context-radar/context-radar-app.js"></script>
   <script src="../../js/trainer-shell-nav.js"></script>
+</div>
 </body>
 </html>

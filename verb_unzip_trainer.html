@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>פועל לא מפורט (Unzip) - אימון אינליין</title>
   <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/css/feature-welcome.css">
   <style>
     :root {
       --bg: #eef4fb;
@@ -321,6 +322,32 @@
   </style>
 </head>
 <body data-product-guidance-screen="home" class="product-guidance-screen-home">
+<div class="fw-overlay" id="fw-verb">
+  <span class="fw-badge">ניתוח</span>
+  <h1 class="fw-title">פרוק פועל לא מפורט</h1>
+  <p class="fw-hook">מתקדמים לפועל בעמוק – מגלים מה שנסתר מאחוריו.</p>
+  <div class="fw-cards">
+    <div class="fw-card">
+      <span class="fw-card__kicker">מה עושים כאן</span>
+      <h3 class="fw-card__title">פועל ללא פרט</h3>
+      <p class="fw-card__body">שומעים משפט עם פועל לא מפורט, מתרגלים לשאול: מה בדיוק קרה?</p>
+    </div>
+    <div class="fw-card">
+      <span class="fw-card__kicker">מה מלמדים</span>
+      <h3 class="fw-card__title">הפועל מסתיר את הפעולה</h3>
+      <p class="fw-card__body">כשהפועל עמום, לא אפשר לדעת מה קרה ובאיזה תנאים.</p>
+    </div>
+  </div>
+  <div class="fw-example">
+    <span class="fw-example__label">דוגמה קצרה</span>
+    <p class="fw-example__sentence">"הוא פעל עלי"</p>
+    <p class="fw-example__note">→ מה בדיוק? פעולית? ראשונית? הכוונה?</p>
+  </div>
+  <button class="fw-cta" onclick="document.getElementById('fw-verb').style.display='none';document.getElementById('trainerContent').style.display='block';">
+    פתחו את התרגיל ←
+  </button>
+</div>
+<div id="trainerContent" style="display:none">
   <main class="page">
     <header class="card topbar">
       <div class="topbar-head">
@@ -1021,5 +1048,6 @@
     init();
   </script>
   <script src="js/trainer-shell-nav.js"></script>
+</div>
 </body>
 </html>

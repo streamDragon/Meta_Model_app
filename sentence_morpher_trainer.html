@@ -8,6 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Sentence Morpher - Meta Model Trainer</title>
   <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/css/feature-welcome.css">
   <script>
     (function () {
       var v = String(Date.now());
@@ -53,6 +54,32 @@
   </style>
 </head>
 <body data-product-guidance-screen="home" class="product-guidance-screen-home">
+<div class="fw-overlay" id="fw-morpher">
+  <span class="fw-badge">ניתוח</span>
+  <h1 class="fw-title">מעבדת שינוי משפט</h1>
+  <p class="fw-hook">משנים את המשפט בכמה צורות – ליצור הקשרים נוספים לתרגול.</p>
+  <div class="fw-cards">
+    <div class="fw-card">
+      <span class="fw-card__kicker">מה עושים</span>
+      <h3 class="fw-card__title">משפט חדש</h3>
+      <p class="fw-card__body">לא רק לזהות דפוס – מציעים משפט חדש ממש שמסביר שבאיזה הבדל.</p>
+    </div>
+    <div class="fw-card">
+      <span class="fw-card__kicker">מה מלמדים</span>
+      <h3 class="fw-card__title">הקשר ולא ניתוח</h3>
+      <p class="fw-card__body">שינוי משפט משנה את ההקשרים. כשמתרגלים, מבינים את ההסברים.</p>
+    </div>
+  </div>
+  <div class="fw-example">
+    <span class="fw-example__label">דוגמה קצרה</span>
+    <p class="fw-example__sentence">"לא יכולתי לנסות"</p>
+    <p class="fw-example__note">"עדיף לא ניסיתי..." → ראש, משפט, תחושה.</p>
+  </div>
+  <button class="fw-cta" onclick="document.getElementById('fw-morpher').style.display='none';document.getElementById('trainerContent').style.display='block';">
+    פתחו את התרגיל ←
+  </button>
+</div>
+<div id="trainerContent" style="display:none">
   <div class="container">
     <header>
       <h1>Sentence Morpher</h1>
@@ -82,5 +109,6 @@
     </section>
   </div>
   <script src="js/trainer-shell-nav.js"></script>
+</div>
 </body>
 </html>

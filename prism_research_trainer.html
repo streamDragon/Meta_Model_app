@@ -8,6 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Prism Research Mode - Meta Model Trainer</title>
   <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/css/feature-welcome.css">
   <link rel="stylesheet" href="css/prism-research.css">
   <script>window.__PRISM_RESEARCH_ASSET_V__ = String(Date.now());</script>
   <style>
@@ -17,6 +18,32 @@
   </style>
 </head>
 <body data-product-guidance-screen="home" class="product-guidance-screen-home">
+<div class="fw-overlay" id="fw-prism-research">
+  <span class="fw-badge">ניתוח</span>
+  <h1 class="fw-title">מחקר פריזמות</h1>
+  <p class="fw-hook">מסתכלים על דפוסי שפה מרובים שמופיעים – עם עניין סמוי שעבור בניהול שיחה.</p>
+  <div class="fw-cards">
+    <div class="fw-card">
+      <span class="fw-card__kicker">מה עושים</span>
+      <h3 class="fw-card__title">ניתוח רב-ממדי</h3>
+      <p class="fw-card__body">כותבים משפט נבדק דרך כמה מסגרות קבועות – לא מסקנה אחת אלא כמה.</p>
+    </div>
+    <div class="fw-card">
+      <span class="fw-card__kicker">מה מתקדמים</span>
+      <h3 class="fw-card__title">תרגול מתקדם</h3>
+      <p class="fw-card__body">כשרוצים להרחיב את תרגול ולהבין את דפוסים לפני שמגיבים שיקפו לך.</p>
+    </div>
+  </div>
+  <div class="fw-example">
+    <span class="fw-example__label">דוגמה קצרה</span>
+    <p class="fw-example__sentence">"הוא כבוד כבד עלי קסת"</p>
+    <p class="fw-example__note">→ פיצול? ניחוש? ניתוח? עמוק מסוים מסתכל.</p>
+  </div>
+  <button class="fw-cta" onclick="document.getElementById('fw-prism-research').style.display='none';document.getElementById('trainerContent').style.display='block';">
+    פתחו את התרגיל ←
+  </button>
+</div>
+<div id="trainerContent" style="display:none">
   <div id="prism-research-app" aria-live="polite">
     <div style="max-width:960px;margin:32px auto;padding:16px;border:1px solid #ddd;border-radius:12px;background:#fff;">
       Loading Prism Research Mode...
@@ -26,5 +53,6 @@
   <script src="js/prism-research-philosophy.js"></script>
   <script src="js/prism-research-app.js"></script>
   <script src="js/trainer-shell-nav.js"></script>
+</div>
 </body>
 </html>
