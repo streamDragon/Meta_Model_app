@@ -523,22 +523,56 @@ body {
 }
 
 /* ====== HOME HERO — entrance + polish ====== */
+.home-route-hero,
+.home-route-primary-cta,
+.home-route-feature-card,
+.mobile-feed-launchpad,
+.mobile-feed-launch-card,
+.hhc-hero,
+.hhc-paths {
+    font-family: "Heebo", "Segoe UI", "Noto Sans Hebrew", "Arial Hebrew", Tahoma, Geneva, Verdana, sans-serif;
+}
+
 .home-route-hero {
     border-width: 1.5px;
     border-color: rgba(99, 102, 241, 0.2);
 }
 
 .home-route-title {
-    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 48%, #0f766e 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    -webkit-text-fill-color: currentColor;
+    color: #0f172a;
+    font-weight: 900;
+    letter-spacing: -0.02em;
 }
 
 .home-route-eyebrow {
     color: #3730a3;
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(45, 212, 191, 0.16));
     border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.home-route-subtitle,
+.home-route-feature-card p,
+.home-route-primary-cta p,
+.mobile-feed-launchpad-copy,
+.mobile-feed-launch-card p,
+.mobile-feed-launchpad-support-head span {
+    color: #111827;
+    font-weight: 500;
+}
+
+.home-route-subtitle,
+.home-route-primary-cta p {
+    font-size: 1.02rem;
+}
+
+.home-route-feature-card h3,
+.home-route-primary-cta h3,
+.mobile-feed-launch-card h3 {
+    font-weight: 800;
 }
 
 /* ====== FEATURE CARDS — lift + color glow on hover ====== */
@@ -897,9 +931,10 @@ body {
 
 .hhc-subtitle {
     margin: 0;
-    color: rgba(186,230,253,0.88);
-    font-size: 1rem;
-    line-height: 1.72;
+    color: rgba(255,255,255,0.96);
+    font-size: 1.04rem;
+    font-weight: 500;
+    line-height: 1.76;
     max-width: 42ch;
     animation: uiEnter 0.45s ease-out 0.22s backwards;
 }
@@ -947,9 +982,10 @@ body {
 }
 
 .hhc-daily-text span {
-    color: rgba(255,255,255,0.88);
-    font-size: 0.86rem;
+    color: rgba(255,255,255,0.94);
+    font-size: 0.9rem;
     line-height: 1.4;
+    font-weight: 500;
 }
 
 /* CTA group */
@@ -1114,9 +1150,9 @@ body {
 }
 
 .hhc-pattern-sentence {
-    color: rgba(255,255,255,0.95);
-    font-size: 0.92rem;
-    font-weight: 700;
+    color: rgba(255,255,255,0.98);
+    font-size: 0.95rem;
+    font-weight: 800;
     line-height: 1.3;
 }
 

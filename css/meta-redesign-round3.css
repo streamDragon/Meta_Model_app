@@ -64,6 +64,12 @@ body.shell-home-active .meta-shell-root {
     scrollbar-gutter: stable both-edges;
 }
 
+body.shell-home-active .meta-home-shell {
+    font-family: "Heebo", "Segoe UI", "Noto Sans Hebrew", "Arial Hebrew", Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 500;
+    color: #0f172a;
+}
+
 body.shell-home-active #home {
     display: none !important;
 }
@@ -100,6 +106,8 @@ body.shell-feature-active .tab-content.active {
 
 .meta-home-shell__section-head strong {
     color: #0f172a;
+    font-size: 1.03rem;
+    font-weight: 700;
     line-height: 1.35;
 }
 
@@ -160,7 +168,8 @@ body.shell-feature-active .tab-content.active {
 .meta-home-bonus-card p,
 .meta-home-drawer__footer span {
     margin: 0;
-    color: #475569;
+    color: #111827;
+    font-weight: 500;
     line-height: 1.6;
 }
 
@@ -1546,6 +1555,12 @@ body.shell-feature-active .tab-content.active {
     box-shadow: 0 12px 32px rgba(15, 23, 42, 0.07);
 }
 
+.meta-home-entry-card--knowledge {
+    padding: 24px;
+    border-width: 2px;
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.12);
+}
+
 .meta-home-entry-card__head {
     display: flex;
     align-items: center;
@@ -1567,11 +1582,12 @@ body.shell-feature-active .tab-content.active {
 
 .meta-home-entry-card__badge[data-tone="advanced"] { background: #EEEDFE; color: #3C3489; }
 .meta-home-entry-card__badge[data-tone="intermediate"] { background: #E6F1FB; color: #0C447C; }
+.meta-home-entry-card__badge[data-tone="knowledge"] { background: #E1F5EE; color: #085041; }
 
 .meta-home-entry-card__step {
     font-size: 0.72rem;
     font-weight: 700;
-    color: #94a3b8;
+    color: #0f766e;
     letter-spacing: 0.04em;
 }
 
@@ -1579,25 +1595,50 @@ body.shell-feature-active .tab-content.active {
     margin: 0;
     color: #0f172a;
     font-size: 1.2rem;
+    font-weight: 800;
+    line-height: 1.18;
 }
 
 .meta-home-entry-card__subtitle {
     margin: 0;
-    color: var(--meta-feature-accent, #6d28d9);
-    font-size: 0.85rem;
-    font-weight: 600;
+    color: #0f172a;
+    font-size: 0.96rem;
+    font-weight: 700;
+    line-height: 1.45;
 }
 
 .meta-home-entry-card > p {
     margin: 0;
-    color: #475569;
-    line-height: 1.6;
-    font-size: 0.9rem;
+    color: #111827;
+    line-height: 1.72;
+    font-size: 0.96rem;
+    font-weight: 500;
 }
 
 .meta-home-entry-card__cta {
     justify-self: start;
     margin-top: 4px;
+}
+
+.meta-home-entry-card--knowledge .meta-home-entry-card__cta {
+    min-width: 180px;
+}
+
+.meta-home-entry-card--knowledge h3 {
+    font-size: clamp(1.32rem, 2.8vw, 1.72rem);
+}
+
+.meta-home-shell__hero p,
+.meta-home-shell__resume p {
+    color: #111827;
+    font-size: 0.98rem;
+    font-weight: 500;
+    line-height: 1.72;
+}
+
+.meta-home-shell__stat small {
+    color: #334155;
+    font-weight: 500;
 }
 
 .meta-home-entry-card--resume {

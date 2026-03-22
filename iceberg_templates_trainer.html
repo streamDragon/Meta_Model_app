@@ -8,7 +8,6 @@
   <meta http-equiv="Expires" content="0">
   <title>Iceberg Templates - Iceberg / Branch Trees</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="/css/feature-welcome.css">
   <script src="js/trainer-platform-contracts.js"></script>
   <script src="js/trainer-standalone.js"></script>
   <script>
@@ -23,62 +22,6 @@
             "css/ui-enhancements.css"
       ]
 });
-  </script>
-  <script>
-    (function () {
-      var FEATURE_ID = 'fw-iceberg';
-      var welcomeHTML = '<div class="fw-overlay" id="' + FEATURE_ID + '">' +
-        '<span class="fw-badge">ניתוח</span>' +
-        '<h1 class="fw-title">קצה הקרחון · עצם גדול</h1>' +
-        '<p class="fw-hook">מה מסתתר מתחת למשפט? עצם גדול שמשפיע את מה שרואים בחוץ.</p>' +
-        '<div class="fw-cards">' +
-          '<div class="fw-card">' +
-            '<span class="fw-card__kicker">מה עושים</span>' +
-            '<h3 class="fw-card__title">מגלים הקרחון בשורש</h3>' +
-            '<p class="fw-card__body">כל משפט יש קצה קרחון. מגלים מה עומד מאחורי הפני השטח.</p>' +
-          '</div>' +
-          '<div class="fw-card">' +
-            '<span class="fw-card__kicker">מה עמוקים</span>' +
-            '<h3 class="fw-card__title">עצם על עצם</h3>' +
-            '<p class="fw-card__body">פורסים את המשפט בשכבות – פן נטית, פן עקיפה, פן תחום.</p>' +
-          '</div>' +
-        '</div>' +
-        '<div class="fw-example">' +
-          '<span class="fw-example__label">דוגמה קצרה</span>' +
-          '<p class="fw-example__sentence">"הוא ניצח"</p>' +
-          '<p class="fw-example__note">→ מה בדיוק? מתי? מצד מי? – שלושה שאלות תחת.</p>' +
-        '</div>' +
-        '<button class="fw-cta" onclick="document.getElementById(\'' + FEATURE_ID + '\').style.display=\'none\';document.getElementById(\'trainerContent\').style.display=\'block\';">' +
-          'פתחו את התרגיל ←' +
-        '</button>' +
-      '</div>';
-      function injectWelcome() {
-        if (document.getElementById(FEATURE_ID)) return;
-        var wrapper = document.createElement('div');
-        wrapper.id = 'trainerContent';
-        wrapper.style.display = 'none';
-        while (document.body.firstChild) {
-          wrapper.appendChild(document.body.firstChild);
-        }
-        document.body.insertAdjacentHTML('afterbegin', welcomeHTML);
-        document.body.appendChild(wrapper);
-      }
-      var obs = new MutationObserver(function (mutations) {
-        for (var i = 0; i < mutations.length; i++) {
-          if (mutations[i].addedNodes.length) {
-            injectWelcome();
-            break;
-          }
-        }
-      });
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function () {
-          obs.observe(document.body, { childList: true });
-        });
-      } else {
-        obs.observe(document.body, { childList: true });
-      }
-    })();
   </script>
 </head>
 <body></body>
