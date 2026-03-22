@@ -29965,6 +29965,28 @@ body.triples-radar-overlay-open {
     cursor: not-allowed;
 }
 
+#comic-engine .ceflow-chip--layer {
+    transition: color 180ms ease, border-color 180ms ease;
+}
+
+#comic-engine .ceflow-staged[data-ceflow-layer-color="green"] .ceflow-chip--layer {
+    color: #15803d;
+    border-color: rgba(34,197,94,0.4);
+    background: rgba(220,252,231,0.5);
+}
+
+#comic-engine .ceflow-staged[data-ceflow-layer-color="orange"] .ceflow-chip--layer {
+    color: #c2410c;
+    border-color: rgba(245,158,11,0.4);
+    background: rgba(254,243,199,0.5);
+}
+
+#comic-engine .ceflow-staged[data-ceflow-layer-color="red"] .ceflow-chip--layer {
+    color: #b91c1c;
+    border-color: rgba(239,68,68,0.4);
+    background: rgba(254,226,226,0.5);
+}
+
 /* --- Comic Stage: the visual hero center --- */
 #comic-engine .ceflow-comic-stage {
     position: relative;
@@ -30459,6 +30481,23 @@ body.triples-radar-overlay-open {
     left: -9999px;
     opacity: 0;
     pointer-events: none;
+}
+
+/* analysis phase: hide action zone choices, show result state */
+#comic-engine .ceflow-staged[data-ceflow-phase="analysis"] .ceflow-action-zone .ceflow-choice-deck,
+#comic-engine .ceflow-staged[data-ceflow-phase="analysis"] .ceflow-action-zone .ceflow-scene-rail {
+    display: none;
+}
+
+#comic-engine .ceflow-staged[data-ceflow-phase="analysis"] .ceflow-action-title::after {
+    content: " — ניתוח פתוח";
+    font-weight: 600;
+    color: #64748b;
+    font-size: 0.82rem;
+}
+
+#comic-engine .ceflow-staged .ceflow-controls {
+    display: none;
 }
 
 /* --- Animations --- */
