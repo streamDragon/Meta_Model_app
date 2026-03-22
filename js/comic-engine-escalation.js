@@ -719,110 +719,164 @@
         const childAvatar = assetMarkup(scenario.childSprite, scenario.childName, scenario.childName);
         const parentAvatar = assetMarkup(scenario.parentSprite, scenario.parentName, scenario.parentName);
         return `
-            <div class="ceflow-v3" dir="rtl">
+            <div class="ceflow-v3 ceflow-staged" dir="rtl">
                 <div class="ceflow-floating-note hidden" id="ceflow-floating-note" aria-live="polite"></div>
                 <div class="ceflow-distractor hidden" id="ceflow-distractor" aria-live="polite"></div>
-                <header class="ceflow-v3-top">
-                    <div class="ceflow-v3-shotclock-wrap" id="ceflow-shotclock-shell" aria-live="polite">
+
+                <!-- ═══ A. SCENE HEADER — compact, elegant ═══ -->
+                <header class="ceflow-scene-header">
+                    <div class="ceflow-scene-header-right">
+                        <h3 id="ceflow-title" class="ceflow-scene-title">${escapeHtml(scenario.title)}</h3>
+                        <p id="ceflow-scene-subtitle" class="ceflow-scene-subtitle">${escapeHtml(scenario.contextIntro)}</p>
+                    </div>
+                    <div class="ceflow-scene-header-left">
+                        <div class="ceflow-chip-row">
+                            <span id="ceflow-domain" class="ceflow-chip">${escapeHtml(scenario.domainLabel)}</span>
+                            <span id="ceflow-progress" class="ceflow-chip">1 / 3</span>
+                            <span id="ceflow-level" class="ceflow-chip ceflow-chip--layer">שכבה 1</span>
+                        </div>
+                        <div id="ceflow-progress-dots" class="ceflow-progress-dots" aria-label="התקדמות שכבות"></div>
+                    </div>
+                    <div class="ceflow-scene-header-actions">
+                        <button id="ceflow-step-back" class="ceflow-icon-btn" type="button" disabled title="חזרה צעד">↩</button>
+                        <button id="ceflow-info-btn" class="ceflow-icon-btn" type="button" title="למה זה עובד?">?</button>
+                        <button id="ceflow-retry" class="ceflow-icon-btn" type="button" title="התחל מחדש">↻</button>
+                    </div>
+                </header>
+
+                <!-- ═══ B. MAIN COMIC STAGE — the visual center ═══ -->
+                <section class="ceflow-comic-stage">
+                    <!-- subtle scene illustration background -->
+                    <div class="ceflow-stage-bg" aria-hidden="true">
+                        <svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <radialGradient id="ceflow-bg-glow1" cx="20%" cy="70%" r="45%">
+                                    <stop offset="0%" stop-color="rgba(59,130,246,0.07)" />
+                                    <stop offset="100%" stop-color="transparent" />
+                                </radialGradient>
+                                <radialGradient id="ceflow-bg-glow2" cx="80%" cy="30%" r="40%">
+                                    <stop offset="0%" stop-color="rgba(34,197,94,0.06)" />
+                                    <stop offset="100%" stop-color="transparent" />
+                                </radialGradient>
+                            </defs>
+                            <rect width="800" height="400" fill="url(#ceflow-bg-glow1)" />
+                            <rect width="800" height="400" fill="url(#ceflow-bg-glow2)" />
+                            <!-- subtle furniture outlines -->
+                            <path d="M60 340 Q60 310 90 310 L200 310 Q230 310 230 340 L230 380 L60 380Z" fill="none" stroke="rgba(148,163,184,0.08)" stroke-width="2"/>
+                            <ellipse cx="650" cy="350" rx="90" ry="30" fill="none" stroke="rgba(148,163,184,0.06)" stroke-width="1.5"/>
+                            <rect x="620" y="280" width="60" height="70" rx="6" fill="none" stroke="rgba(148,163,184,0.06)" stroke-width="1.5"/>
+                            <path d="M350 380 Q350 360 380 355 Q420 348 460 355 Q490 360 490 380" fill="none" stroke="rgba(148,163,184,0.05)" stroke-width="1.5"/>
+                            <!-- window -->
+                            <rect x="340" y="40" width="120" height="90" rx="8" fill="none" stroke="rgba(148,163,184,0.07)" stroke-width="1.5"/>
+                            <line x1="400" y1="40" x2="400" y2="130" stroke="rgba(148,163,184,0.05)" stroke-width="1"/>
+                            <line x1="340" y1="85" x2="460" y2="85" stroke="rgba(148,163,184,0.05)" stroke-width="1"/>
+                        </svg>
+                    </div>
+
+                    <!-- shotclock floating badge -->
+                    <div class="ceflow-shotclock-float" id="ceflow-shotclock-shell" aria-live="polite">
                         <div id="ceflow-shotclock" class="ceflow-shotclock" role="timer" aria-label="שעון בחירה">
                             <div id="ceflow-shotclock-ring" class="ceflow-shotclock-ring">
                                 <span id="ceflow-shotclock-seconds">16</span>
                             </div>
-                            <div class="ceflow-shotclock-copy">
-                                <strong>לחץ זמן</strong>
-                                <small id="ceflow-shotclock-label">זמן לבחירה</small>
-                            </div>
+                            <small id="ceflow-shotclock-label">זמן לבחירה</small>
                         </div>
                     </div>
-                    <div class="ceflow-v3-headline">
-                        <div class="ceflow-v3-headline-top">
-                            <button id="ceflow-step-back" class="btn btn-secondary ceflow-small-btn" type="button" disabled>↩ חזרה צעד</button>
-                            <button id="ceflow-info-btn" class="btn btn-secondary ceflow-small-btn" type="button">למה זה עובד?</button>
-                        </div>
-                        <div class="ceflow-chip-row">
-                            <span id="ceflow-domain" class="ceflow-chip">${escapeHtml(scenario.domainLabel)}</span>
-                            <span id="ceflow-progress" class="ceflow-chip">1 / 3</span>
-                            <span id="ceflow-level" class="ceflow-chip">שכבה 1</span>
-                        </div>
-                        <div id="ceflow-progress-dots" class="ceflow-progress-dots" aria-label="התקדמות שכבות"></div>
-                        <h3 id="ceflow-title" class="ceflow-title">${escapeHtml(scenario.title)}</h3>
-                        <p id="ceflow-scene-subtitle" class="ceflow-scene-subtitle">${escapeHtml(scenario.contextIntro)}</p>
-                    </div>
-                </header>
 
-                <button id="ceflow-overlay" class="ceflow-overlay ceflow-metrics-banner" type="button" aria-expanded="false">
-                    <div class="ceflow-hud-head">
-                        <span class="ceflow-hud-kicker">מדדים חיים</span>
-                        <strong id="ceflow-banner-title">חום נמוך, חלון תיקון פתוח</strong>
-                    </div>
-                    <div class="ceflow-metrics-chips">
-                        <span id="ceflow-banner-heat" class="ceflow-chip">חום 0</span>
-                        <span id="ceflow-banner-friction" class="ceflow-chip">חיכוך 0</span>
-                        <span id="ceflow-banner-state" class="ceflow-chip">פתיחה</span>
-                    </div>
-                    <span class="ceflow-hud-link">לחץ/י לפירוט המדדים</span>
-                </button>
-
-                <section id="ceflow-metrics-panel" class="ceflow-metrics-panel hidden" aria-live="polite"></section>
-
-                <section class="ceflow-v3-stage-shell">
-                    <div class="ceflow-v3-character-strip">
-                        <article class="ceflow-v3-character-card is-child">
-                            <div class="ceflow-v3-avatar">${childAvatar}</div>
-                            <div>
-                                <strong>${escapeHtml(scenario.childName)}</strong>
-                                <small>הילד/ה</small>
-                            </div>
+                    <!-- character anchors -->
+                    <div class="ceflow-characters">
+                        <article class="ceflow-char ceflow-char--child">
+                            <div class="ceflow-char-avatar">${childAvatar}</div>
+                            <span class="ceflow-char-name">${escapeHtml(scenario.childName)}</span>
                         </article>
-                        <article class="ceflow-v3-character-card is-parent">
-                            <div class="ceflow-v3-avatar">${parentAvatar}</div>
-                            <div>
-                                <strong>${escapeHtml(scenario.parentName)}</strong>
-                                <small>הורה</small>
-                            </div>
+                        <article class="ceflow-char ceflow-char--parent">
+                            <div class="ceflow-char-avatar">${parentAvatar}</div>
+                            <span class="ceflow-char-name">${escapeHtml(scenario.parentName)}</span>
                         </article>
                     </div>
 
-                    <section id="ceflow-consequence-banner" class="ceflow-consequence-banner" aria-live="polite"></section>
-                    <section class="ceflow-stage ceflow-stage--chat">
-                        <header id="ceflow-stage-status" class="ceflow-stage-status" aria-live="polite"></header>
-                        <div id="ceflow-turn-transition-layer" class="ceflow-turn-transition-layer" aria-live="polite"></div>
-                        <div id="ceflow-dialog" class="ceflow-dialog ceflow-dialog--chat"></div>
-                    </section>
+                    <!-- stage status pill -->
+                    <header id="ceflow-stage-status" class="ceflow-stage-status-pill" aria-live="polite"></header>
+
+                    <!-- consequence strip -->
+                    <section id="ceflow-consequence-banner" class="ceflow-consequence-strip" aria-live="polite"></section>
+
+                    <!-- dialog bubbles area -->
+                    <div id="ceflow-turn-transition-layer" class="ceflow-turn-transition-layer" aria-live="polite"></div>
+                    <div id="ceflow-dialog" class="ceflow-dialog ceflow-dialog--comic"></div>
+
+                    <!-- metrics mini-strip -->
+                    <button id="ceflow-overlay" class="ceflow-metrics-strip" type="button" aria-expanded="false">
+                        <span id="ceflow-banner-heat" class="ceflow-metrics-pill">חום 0</span>
+                        <span id="ceflow-banner-friction" class="ceflow-metrics-pill">חיכוך 0</span>
+                        <span id="ceflow-banner-state" class="ceflow-metrics-pill">פתיחה</span>
+                        <strong id="ceflow-banner-title" class="ceflow-metrics-label">חלון תיקון פתוח</strong>
+                    </button>
                 </section>
 
-                <section id="ceflow-timeout" class="ceflow-timeout hidden" aria-live="polite"></section>
+                <!-- ═══ C. ACTION ZONE — one clear action at a time ═══ -->
+                <section class="ceflow-action-zone">
+                    <section id="ceflow-timeout" class="ceflow-timeout hidden" aria-live="polite"></section>
 
-                <section class="ceflow-choice-panel ceflow-choice-panel--arc">
-                    <div class="ceflow-choice-panel-head">
-                        <h4 id="ceflow-choice-title" class="ceflow-block-title">בחר/י תגובה עם כיוון</h4>
-                        <p id="ceflow-choice-copy" class="ceflow-choice-copy">כל בחירה כאן לא רק נשמעת אחרת, אלא דוחפת את הילד לשיתוף, הגנה או קיפאון.</p>
-                        <p id="ceflow-choice-affordance" class="ceflow-choice-affordance" data-state="ready">בחר/י אחת מארבע התגובות בקשת כדי לכוון את הרגע הבא.</p>
+                    <div class="ceflow-action-prompt">
+                        <h4 id="ceflow-choice-title" class="ceflow-action-title">בחר/י תגובה</h4>
+                        <p id="ceflow-choice-affordance" class="ceflow-action-hint" data-state="ready">בחר/י אחת מארבע התגובות</p>
                     </div>
+
+                    <p id="ceflow-choice-copy" class="ceflow-action-copy">כל בחירה דוחפת את הילד לשיתוף, הגנה או קיפאון.</p>
+
                     <section id="ceflow-scene-rail" class="ceflow-scene-rail" aria-live="polite"></section>
                     <div id="ceflow-choice-deck" class="ceflow-choice-deck ceflow-choice-deck--arc" role="group" aria-label="אפשרויות תגובה"></div>
+
                     <section id="ceflow-reply-box" class="ceflow-reply-box hidden" aria-live="polite">
-                        <div class="ceflow-section-head">
-                            <p class="ceflow-section-kicker">תצוגה מקדימה</p>
-                            <h4 id="ceflow-reply-title" class="ceflow-block-title">כך תישמע/י לפני שליחה</h4>
-                        </div>
                         <div id="ceflow-reply-quick" class="ceflow-reply-quick"></div>
                         <label for="ceflow-reply-input" class="ceflow-input-label">התגובה שבחרת</label>
                         <textarea id="ceflow-reply-input" rows="2" readonly></textarea>
                         <div class="ceflow-inline-actions">
                             <button id="ceflow-reply-step-back" class="btn btn-secondary" type="button" disabled>↩ חזרה</button>
-                            <button id="ceflow-reply-confirm" class="btn btn-primary" type="button">שלח</button>
+                            <button id="ceflow-reply-confirm" class="btn btn-primary ceflow-send-btn" type="button">שלח תגובה</button>
                             <small id="ceflow-reply-status" aria-live="polite"></small>
                         </div>
                     </section>
                 </section>
 
+                <!-- ═══ D. DEPTH TRIGGERS — open drawers for analysis ═══ -->
+                <nav class="ceflow-depth-triggers" id="ceflow-depth-triggers" aria-label="כלי העמקה">
+                    <button class="ceflow-depth-btn" type="button" data-ceflow-drawer="feedback" id="ceflow-trigger-feedback">
+                        <span class="ceflow-depth-btn-icon">💬</span>
+                        <span>מה קרה כאן?</span>
+                    </button>
+                    <button class="ceflow-depth-btn" type="button" data-ceflow-drawer="snapshot" id="ceflow-trigger-snapshot">
+                        <span class="ceflow-depth-btn-icon">📊</span>
+                        <span>מדדים ומצב</span>
+                    </button>
+                    <button class="ceflow-depth-btn" type="button" data-ceflow-drawer="analysis" id="ceflow-trigger-analysis">
+                        <span class="ceflow-depth-btn-icon">🔍</span>
+                        <span>ניתוח מסלול</span>
+                    </button>
+                    <button class="ceflow-depth-btn" type="button" data-ceflow-drawer="metrics" id="ceflow-trigger-metrics">
+                        <span class="ceflow-depth-btn-icon">📈</span>
+                        <span>פירוט מדדים</span>
+                    </button>
+                </nav>
+
+                <!-- ═══ DRAWER OVERLAY — slides up for depth content ═══ -->
+                <div class="ceflow-drawer-backdrop hidden" id="ceflow-drawer-backdrop"></div>
+                <aside class="ceflow-drawer hidden" id="ceflow-drawer" role="dialog" aria-modal="true" aria-label="תוכן העמקה">
+                    <header class="ceflow-drawer-head">
+                        <h4 id="ceflow-drawer-title" class="ceflow-drawer-title"></h4>
+                        <button class="ceflow-drawer-close" type="button" id="ceflow-drawer-close" aria-label="סגירה">✕</button>
+                    </header>
+                    <div class="ceflow-drawer-body" id="ceflow-drawer-body"></div>
+                </aside>
+
+                <!-- hidden containers for render targets -->
                 <section id="ceflow-feedback" class="ceflow-feedback hidden" aria-live="polite"></section>
                 <section id="ceflow-turn-snapshot" class="ceflow-turn-snapshot hidden" aria-live="polite"></section>
                 <section id="ceflow-analysis" class="ceflow-analysis hidden" aria-live="polite"></section>
+                <section id="ceflow-metrics-panel" class="ceflow-metrics-panel hidden" aria-live="polite"></section>
 
-                <footer class="ceflow-controls">
-                    <button id="ceflow-retry" class="btn btn-secondary" type="button">↻ התחל מחדש</button>
+                <footer class="ceflow-controls hidden">
                     <button id="ceflow-next-scene" class="btn btn-primary hidden" type="button">לניתוח</button>
                 </footer>
             </div>
