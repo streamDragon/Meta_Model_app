@@ -1235,6 +1235,7 @@
             `).join('');
         }
         runtime.els.root.dataset.ceflowLayerColor = meta.color;
+        runtime.els.root.dataset.ceflowPhase = state.phase;
     }
 
     function renderBanner(runtime) {
@@ -1318,6 +1319,11 @@
                 <p class="ceflow-bubble-text">${escapeHtml(line.text)}</p>
             </article>
         `).join('');
+        // auto-scroll to latest bubble
+        const lastBubble = runtime.els.dialog.lastElementChild;
+        if (lastBubble) {
+            lastBubble.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
+        }
     }
 
     function renderChoiceAffordance(runtime) {
@@ -1686,7 +1692,6 @@
         runtime.state.selectedChoiceId = '';
         stopTimer(runtime);
         render(runtime);
-        runtime.els.analysis?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
     }
 
     function makePathEntry(choice) {
@@ -1802,9 +1807,11 @@
     }
 
     function toggleMetrics(runtime) {
-        runtime.state.metricsOpen = !runtime.state.metricsOpen;
-        renderMetricsPanel(runtime);
-        renderBanner(runtime);
+        if (runtime.state.drawerOpen === 'metrics') {
+            closeDrawer(runtime);
+        } else {
+            openDrawer(runtime, 'metrics');
+        }
     }
 
     function openDrawer(runtime, drawerType) {
