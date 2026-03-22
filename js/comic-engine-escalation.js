@@ -926,7 +926,17 @@
             analysis: root.querySelector('#ceflow-analysis'),
             retry: root.querySelector('#ceflow-retry'),
             next: root.querySelector('#ceflow-next-scene'),
-            floatingNote: root.querySelector('#ceflow-floating-note')
+            floatingNote: root.querySelector('#ceflow-floating-note'),
+            depthTriggers: root.querySelector('#ceflow-depth-triggers'),
+            drawerBackdrop: root.querySelector('#ceflow-drawer-backdrop'),
+            drawer: root.querySelector('#ceflow-drawer'),
+            drawerTitle: root.querySelector('#ceflow-drawer-title'),
+            drawerBody: root.querySelector('#ceflow-drawer-body'),
+            drawerClose: root.querySelector('#ceflow-drawer-close'),
+            triggerFeedback: root.querySelector('#ceflow-trigger-feedback'),
+            triggerSnapshot: root.querySelector('#ceflow-trigger-snapshot'),
+            triggerAnalysis: root.querySelector('#ceflow-trigger-analysis'),
+            triggerMetrics: root.querySelector('#ceflow-trigger-metrics')
         };
     }
 
