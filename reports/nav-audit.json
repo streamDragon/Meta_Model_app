@@ -1046,7 +1046,7 @@
       }
     },
     {
-      "text": "סימולטור סצנות",
+      "text": "$1תמונות מחיי היום",
       "selector": "a[href=\"http://127.0.0.1:4176/scenario_trainer.html?v=1.0.256&t=1773302128137\"]",
       "kind": "anchor",
       "intended": "http://127.0.0.1:4176/scenario_trainer.html?v=1.0.256&t=1773302128137",

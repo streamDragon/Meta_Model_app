@@ -2019,7 +2019,7 @@ function normalizeRequestedTab(tabName = '') {
 const APP_STICKY_TAB_TITLE_OVERRIDES = Object.freeze({
     home: 'בית · התחלה והכוונה',
     'sentence-map': 'מפת המשפט',
-    'scenario-trainer': 'סימולטור סצנות',
+    'scenario-trainer': '$1תמונות מחיי היום',
     'comic-engine': 'במת קומיקס רגשי',
     categories: 'מילון קטגוריות המטה-מודל',
     'practice-question': 'תרגול זיהוי מטה-מודל',
@@ -4044,7 +4044,7 @@ function setupGlobalFeatureMenuDropdown() {
     const labelOverrides = Object.freeze({
         'tab:home': 'בית · התחלה והכוונה',
         'tab:sentence-map': 'מפת המשפט · לפני שמאתגרים — ממפים',
-        'tab:scenario-trainer': 'סימולטור סצנות · משגר',
+        'tab:scenario-trainer': '$1תמונות מחיי היום · משגר',
         'tab:comic-engine': 'במת קומיקס רגשי · תגובות ומהלכים',
         'tab:categories': 'מילון קטגוריות המטה-מודל',
         'tab:practice-question': 'תרגול זיהוי מטה-מודל',
@@ -4666,7 +4666,7 @@ function setupFeatureLauncherTabs() {
         "nav:practice-triples-radar": "מכ״ם שלשות (ברין)",
         "nav:categories": "מילון קטגוריות המטה-מודל",
         "nav:comic-engine": "במת קומיקס רגשי",
-        "nav:scenario-trainer": "סימולטור סצנות · משגר",
+        "nav:scenario-trainer": "$1תמונות מחיי היום · משגר",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipStandalone, 'verb_unzip_trainer.html')]: "כלי פירוק פועל · חלון נפרד",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.verbUnzipWorksheet, 'worksheets/verb-unzip/')]: "דף עבודה מעוגל · פירוק פועל",
         [getNavHrefFeatureKey(STANDALONE_NAV_KEYS.sentenceMorpher, 'sentence_morpher_trainer.html')]: "מעבדת שינוי ניסוח",
@@ -17783,7 +17783,7 @@ const HOME_TRAINING_PROGRAMS = Object.freeze([
         steps: Object.freeze([
             Object.freeze({ tab: 'practice-question', title: 'תרגול זיהוי מטה-מודל', note: 'זיהוי סוג ההפרה במשפט אחד' }),
             Object.freeze({ tab: 'practice-radar', title: 'מכ"ם מטה-מודל', note: 'סבב זיהוי מהיר בזמן' }),
-            Object.freeze({ tab: 'scenario-trainer', title: 'סימולטור סצנות', note: 'להפוך דפוס לצעד ביצועי' })
+            Object.freeze({ tab: 'scenario-trainer', title: '$1תמונות מחיי היום', note: 'להפוך דפוס לצעד ביצועי' })
         ])
     }),
     Object.freeze({

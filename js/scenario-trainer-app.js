@@ -1711,7 +1711,7 @@
           <section class="scenario-workspace-card scenario-home-card">
 
             <div class="scenario-home-hero">
-              <h2>סימולטור סצנות</h2>
+              <h2>$1תמונות מחיי היום</h2>
               <p>נכנסים לסצנה, בוחרים תגובה אחת, רואים איך היא נוחתת.</p>
             </div>
 

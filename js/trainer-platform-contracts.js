@@ -102,7 +102,7 @@
         },
         {
           "href": "scenario_trainer.html",
-          "label": "סימולטור סצנות"
+          "label": "$1תמונות מחיי היום"
         }
       ],
       "accent": {
@@ -209,7 +209,7 @@
         },
         {
           "href": "scenario_trainer.html",
-          "label": "סימולטור סצנות"
+          "label": "$1תמונות מחיי היום"
         }
       ],
       "accent": {
@@ -327,7 +327,7 @@
         },
         {
           "href": "scenario_trainer.html",
-          "label": "סימולטור סצנות"
+          "label": "$1תמונות מחיי היום"
         }
       ],
       "accent": {
@@ -351,12 +351,12 @@
   },
   "scenario-trainer": {
     "id": "scenario-trainer",
-    "title": "סימולטור סצנות",
+    "title": "$1תמונות מחיי היום",
     "subtitle": "נכנסים לסצנה אנושית, בוחרים תגובה אחת, ורואים איך היא נוחתת רגשית ומה נפתח במודל המטה-מודלי.",
     "familyLabel": "משפחת הסימולטורים",
     "quickStartLabel": "מתחילים שיחה",
     "startActionLabel": "התחל סשן",
-    "settingsTitle": "הגדרות סימולטור סצנות",
+    "settingsTitle": "הגדרות $1תמונות מחיי היום",
     "settingsSubtitle": "מכווננים תחום, רמה, אורך סשן וכלי עזר, בלי לפרק את הדיאלוג לפני שהוא מתחיל.",
     "helperSteps": [
       {
@@ -423,7 +423,7 @@
       "mountId": "scenario-trainer-root",
       "loadingTitle": "טוען את סימולטור הסצנות...",
       "loadingText": "מכין את סביבת הדיאלוג עם בחירות, משוב ופירוק עומק במקום אחד.",
-      "errorTitle": "שגיאה בטעינת סימולטור סצנות",
+      "errorTitle": "שגיאה בטעינת $1תמונות מחיי היום",
       "navLinks": [
         {
           "href": "index.html",

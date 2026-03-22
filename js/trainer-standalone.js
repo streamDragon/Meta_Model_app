@@ -173,7 +173,7 @@ body {
         const mountId = wrapper.mountId || 'trainer-root';
         const accent = wrapper.accent || {};
         const pageTitle = contract?.id === 'scenario-trainer'
-            ? 'סימולטור סצנות - אימון שיחה חי'
+            ? '$1תמונות מחיי היום - אימון שיחה חי'
             : (wrapper.pageTitle || contract?.title || document.title);
         const navLinks = Array.isArray(wrapper.navLinks)
             ? wrapper.navLinks.filter((link) => {
