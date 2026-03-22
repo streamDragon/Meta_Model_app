@@ -1030,7 +1030,8 @@
             timerStartedAt: 0,
             timerRemainingMs: currentLayerMeta(0).timerSeconds * 1000,
             analysisFocus: null,
-            floatingMessage: ''
+            floatingMessage: '',
+            drawerOpen: ''
         };
     }
 
@@ -1241,10 +1242,10 @@
         const derived = deriveMetrics(state.metrics, state.layerIndex, state.outcome);
         if (els.bannerTitle) {
             els.bannerTitle.textContent = state.outcome === 'repair'
-                ? 'הצלחת לעצור את ההסלמה בזמן'
+                ? 'תיקון הצליח'
                 : state.outcome === 'explosion' || state.outcome === 'late_repair'
-                    ? 'הקשר כבר עבר את סף השבר'
-                    : `חום ${derived.heat} · חלון התיקון עדיין פתוח`;
+                    ? 'סף שבר'
+                    : 'חלון תיקון פתוח';
         }
         if (els.bannerHeat) els.bannerHeat.textContent = `חום ${derived.heat}`;
         if (els.bannerFriction) els.bannerFriction.textContent = `חיכוך ${derived.friction}`;
@@ -1255,8 +1256,6 @@
     function renderMetricsPanel(runtime) {
         const { els, state } = runtime;
         if (!els.metricsPanel) return;
-        els.metricsPanel.classList.toggle('hidden', !state.metricsOpen);
-        if (!state.metricsOpen) return;
         const derived = deriveMetrics(state.metrics, state.layerIndex, state.outcome);
         const cards = METRIC_META.map((metric) => `
             <article class="ceflow-metric-card">
@@ -1626,11 +1625,19 @@
         if (runtime.els.next) runtime.els.next.classList.toggle('hidden', true);
     }
 
+    function renderDepthTriggers(runtime) {
+        if (!runtime.els.depthTriggers) return;
+        const hasPath = runtime.state.path.length > 0;
+        const isAnalysis = runtime.state.phase === PHASES.ANALYSIS;
+        runtime.els.depthTriggers.classList.toggle('hidden', !hasPath);
+        if (runtime.els.triggerFeedback) runtime.els.triggerFeedback.classList.toggle('is-highlight', hasPath && !isAnalysis);
+        if (runtime.els.triggerAnalysis) runtime.els.triggerAnalysis.classList.toggle('is-highlight', isAnalysis);
+    }
+
     function render(runtime) {
         renderProgress(runtime);
         renderShotClock(runtime);
         renderBanner(runtime);
-        renderMetricsPanel(runtime);
         renderConsequence(runtime);
         renderStageStatus(runtime);
         renderTurnLayer(runtime);
@@ -1640,11 +1647,16 @@
         renderChoiceDeck(runtime);
         renderReply(runtime);
         renderTimeout(runtime);
-        renderFeedback(runtime);
-        renderSnapshot(runtime);
-        renderAnalysis(runtime);
+        renderDepthTriggers(runtime);
         renderControls(runtime);
         writeProgress(runtime.state);
+        // auto-open analysis drawer on analysis phase
+        if (runtime.state.phase === PHASES.ANALYSIS && runtime.state.drawerOpen !== 'analysis') {
+            renderFeedback(runtime);
+            renderAnalysis(runtime);
+            renderSnapshot(runtime);
+            openDrawer(runtime, 'analysis');
+        }
     }
 
     function choose(runtime, choiceId) {
@@ -1795,6 +1807,45 @@
         renderBanner(runtime);
     }
 
+    function openDrawer(runtime, drawerType) {
+        if (!runtime.els.drawer || !runtime.els.drawerBody || !runtime.els.drawerBackdrop) return;
+        const titles = {
+            feedback: 'מה קרה כאן?',
+            snapshot: 'מדדים ומצב נוכחי',
+            analysis: 'ניתוח מסלול ההסלמה',
+            metrics: 'פירוט מדדים'
+        };
+        runtime.els.drawerTitle.textContent = titles[drawerType] || '';
+        runtime.state.metricsOpen = drawerType === 'metrics';
+        renderMetricsPanel(runtime);
+        renderFeedback(runtime);
+        renderSnapshot(runtime);
+        renderAnalysis(runtime);
+        const sources = {
+            feedback: runtime.els.feedback,
+            snapshot: runtime.els.turnSnapshot,
+            analysis: runtime.els.analysis,
+            metrics: runtime.els.metricsPanel
+        };
+        const source = sources[drawerType];
+        if (source) {
+            runtime.els.drawerBody.innerHTML = source.innerHTML || '<p style="color:#64748b;text-align:center;padding:24px;">אין מידע עדיין. בחרו תגובה כדי לקבל ניתוח.</p>';
+        }
+        runtime.els.drawer.classList.remove('hidden');
+        runtime.els.drawerBackdrop.classList.remove('hidden');
+        runtime.els.drawer.setAttribute('aria-hidden', 'false');
+        runtime.state.drawerOpen = drawerType;
+    }
+
+    function closeDrawer(runtime) {
+        if (!runtime.els.drawer) return;
+        runtime.els.drawer.classList.add('hidden');
+        runtime.els.drawerBackdrop?.classList.add('hidden');
+        runtime.els.drawer.setAttribute('aria-hidden', 'true');
+        runtime.state.drawerOpen = '';
+        runtime.state.metricsOpen = false;
+    }
+
     function bindEvents(runtime) {
         runtime.els.deck?.addEventListener('click', (event) => {
             const button = event.target.closest('button[data-choice-id]');
@@ -1805,13 +1856,24 @@
         runtime.els.replyStepBack?.addEventListener('click', () => stepBack(runtime));
         runtime.els.replyConfirm?.addEventListener('click', () => confirmSelection(runtime));
         runtime.els.retry?.addEventListener('click', () => retry(runtime));
-        runtime.els.banner?.addEventListener('click', () => toggleMetrics(runtime));
+        runtime.els.banner?.addEventListener('click', () => openDrawer(runtime, 'metrics'));
         runtime.els.infoBtn?.addEventListener('click', () => {
             if (runtime.state.floatingMessage) {
                 clearFloatingMessage(runtime);
                 return;
             }
             showFloatingMessage(runtime, runtime.scenario.learningFocus || runtime.scenario.supportPrompt || 'התרגול כאן הוא לזהות טון, לחץ ומבנה שפה לפני שמאוחר מדי.');
+        });
+        // drawer triggers
+        runtime.els.triggerFeedback?.addEventListener('click', () => openDrawer(runtime, 'feedback'));
+        runtime.els.triggerSnapshot?.addEventListener('click', () => openDrawer(runtime, 'snapshot'));
+        runtime.els.triggerAnalysis?.addEventListener('click', () => openDrawer(runtime, 'analysis'));
+        runtime.els.triggerMetrics?.addEventListener('click', () => openDrawer(runtime, 'metrics'));
+        runtime.els.drawerClose?.addEventListener('click', () => closeDrawer(runtime));
+        runtime.els.drawerBackdrop?.addEventListener('click', () => closeDrawer(runtime));
+        // keyboard close
+        runtime.els.drawer?.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') closeDrawer(runtime);
         });
         runtime.onVisibilityChange = () => {
             if (global.document.hidden || !isTabActive()) {

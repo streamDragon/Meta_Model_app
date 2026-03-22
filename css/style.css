@@ -29894,6 +29894,708 @@ body.triples-radar-overlay-open {
     border-radius: 22px;
 }
 
+/* ═══════════════════════════════════════════════════════
+   COMIC-ENGINE STAGED REDESIGN (ceflow-staged)
+   Scene → Choice → Reveal → Analysis → Therapeutic
+   ═══════════════════════════════════════════════════════ */
+
+/* --- Scene Header: compact, elegant --- */
+#comic-engine .ceflow-scene-header {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(248,250,252,0.97));
+    box-shadow: 0 4px 16px rgba(15,23,42,0.05);
+    border: 1px solid rgba(226,232,240,0.6);
+}
+
+#comic-engine .ceflow-scene-title {
+    margin: 0;
+    font-size: 1.08rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.3;
+}
+
+#comic-engine .ceflow-scene-subtitle {
+    margin: 2px 0 0;
+    font-size: 0.78rem;
+    color: #64748b;
+    line-height: 1.35;
+    font-weight: 600;
+}
+
+#comic-engine .ceflow-scene-header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+#comic-engine .ceflow-scene-header-actions {
+    display: flex;
+    gap: 6px;
+}
+
+#comic-engine .ceflow-icon-btn {
+    width: 34px;
+    height: 34px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-grid;
+    place-items: center;
+    transition: background 120ms, border-color 120ms;
+}
+
+#comic-engine .ceflow-icon-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+#comic-engine .ceflow-icon-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* --- Comic Stage: the visual hero center --- */
+#comic-engine .ceflow-comic-stage {
+    position: relative;
+    border-radius: 28px;
+    background:
+        linear-gradient(180deg, rgba(250,252,255,0.98) 0%, rgba(248,250,252,0.96) 50%, rgba(245,248,252,0.98) 100%);
+    border: 1.5px solid rgba(186,210,240,0.35);
+    box-shadow:
+        0 24px 60px rgba(15,23,42,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.8);
+    padding: 18px 20px 14px;
+    min-height: 340px;
+    display: grid;
+    grid-template-rows: auto auto auto 1fr auto;
+    gap: 10px;
+    overflow: hidden;
+}
+
+/* subtle scene illustration background */
+#comic-engine .ceflow-stage-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: inherit;
+}
+
+#comic-engine .ceflow-stage-bg svg {
+    width: 100%;
+    height: 100%;
+    opacity: 0.7;
+}
+
+/* shotclock floating in stage corner */
+#comic-engine .ceflow-shotclock-float {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 5;
+}
+
+#comic-engine .ceflow-staged .ceflow-shotclock {
+    gap: 6px;
+    padding: 4px 10px 4px 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(203,213,225,0.5);
+    box-shadow: 0 6px 18px rgba(15,23,42,0.1);
+}
+
+#comic-engine .ceflow-staged .ceflow-shotclock-ring {
+    width: 36px;
+    height: 36px;
+}
+
+#comic-engine .ceflow-staged .ceflow-shotclock-ring > span {
+    font-size: 0.82rem;
+}
+
+#comic-engine .ceflow-staged .ceflow-shotclock small {
+    font-size: 0.68rem;
+    color: #475569;
+    font-weight: 700;
+}
+
+/* character anchors — positioned at edges of stage */
+#comic-engine .ceflow-characters {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 2;
+}
+
+#comic-engine .ceflow-char {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+#comic-engine .ceflow-char-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(241,245,249,0.9));
+    box-shadow: 0 8px 20px rgba(15,23,42,0.1);
+    border: 2px solid rgba(255,255,255,0.8);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#comic-engine .ceflow-char-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#comic-engine .ceflow-char-name {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #475569;
+}
+
+#comic-engine .ceflow-char--child .ceflow-char-avatar {
+    border-color: rgba(59,130,246,0.3);
+}
+
+#comic-engine .ceflow-char--parent .ceflow-char-avatar {
+    border-color: rgba(34,197,94,0.3);
+}
+
+/* stage status pill */
+#comic-engine .ceflow-stage-status-pill {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+#comic-engine .ceflow-stage-status-pill .ceflow-stage-status-copy {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(6px);
+    font-size: 0.76rem;
+    color: #475569;
+    border: 1px solid rgba(226,232,240,0.5);
+}
+
+#comic-engine .ceflow-stage-status-pill .ceflow-stage-status-copy strong {
+    color: #0f172a;
+}
+
+/* consequence strip */
+#comic-engine .ceflow-consequence-strip {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+#comic-engine .ceflow-consequence-strip:empty {
+    display: none;
+}
+
+#comic-engine .ceflow-consequence-strip p {
+    margin: 0;
+}
+
+#comic-engine .ceflow-consequence-strip strong {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: rgba(255,247,237,0.9);
+    border: 1px solid rgba(251,191,36,0.2);
+    font-size: 0.78rem;
+    color: #92400e;
+}
+
+/* dialog area in comic style */
+#comic-engine .ceflow-dialog--comic {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    gap: 10px;
+    overflow-y: auto;
+    max-height: 320px;
+    padding: 8px 4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148,163,184,0.3) transparent;
+}
+
+/* comic speech bubbles with tails */
+#comic-engine .ceflow-staged .ceflow-bubble {
+    position: relative;
+    border-radius: 18px;
+    padding: 10px 14px;
+    max-width: 82%;
+    animation: ceflowBubblePop 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 14px rgba(15,23,42,0.06);
+    border: none;
+}
+
+/* child bubble (left) — blue tones */
+#comic-engine .ceflow-staged .ceflow-bubble.is-left {
+    justify-self: start;
+    background: linear-gradient(145deg, #e0edff, #d4e5fc);
+    color: #1e3a5f;
+    border-bottom-right-radius: 6px;
+}
+
+#comic-engine .ceflow-staged .ceflow-bubble.is-left::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    right: -8px;
+    width: 16px;
+    height: 16px;
+    background: inherit;
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+/* parent bubble (right) — green tones */
+#comic-engine .ceflow-staged .ceflow-bubble.is-right {
+    justify-self: end;
+    background: linear-gradient(145deg, #dcfce7, #d1fae5);
+    color: #14532d;
+    border-bottom-left-radius: 6px;
+}
+
+#comic-engine .ceflow-staged .ceflow-bubble.is-right::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    left: -8px;
+    width: 16px;
+    height: 16px;
+    background: inherit;
+    clip-path: polygon(100% 0, 0 50%, 100% 100%);
+}
+
+/* narrator/system bubble */
+#comic-engine .ceflow-staged .ceflow-bubble.is-counter {
+    justify-self: center;
+    max-width: 90%;
+    background: rgba(248,250,252,0.92);
+    border: 1px dashed rgba(148,163,184,0.35);
+    color: #475569;
+    font-style: italic;
+    border-radius: 14px;
+    box-shadow: none;
+}
+
+#comic-engine .ceflow-staged .ceflow-bubble.is-counter::after {
+    display: none;
+}
+
+#comic-engine .ceflow-staged .ceflow-bubble-speaker {
+    font-size: 0.72rem;
+    font-weight: 800;
+    margin: 0 0 3px;
+    opacity: 0.7;
+}
+
+#comic-engine .ceflow-staged .ceflow-bubble-text {
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+/* hot tone bubbles glow */
+#comic-engine .ceflow-staged .ceflow-bubble.is-tone-hot {
+    box-shadow: 0 4px 18px rgba(239,68,68,0.12);
+}
+
+#comic-engine .ceflow-staged .ceflow-bubble.is-right.is-tone-hot {
+    background: linear-gradient(145deg, #fef2f2, #fee2e2);
+    color: #7f1d1d;
+}
+
+/* metrics mini-strip inside stage */
+#comic-engine .ceflow-metrics-strip {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(226,232,240,0.5);
+    cursor: pointer;
+    transition: background 120ms, box-shadow 120ms;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+#comic-engine .ceflow-metrics-strip:hover {
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 6px 20px rgba(15,23,42,0.1);
+}
+
+#comic-engine .ceflow-metrics-pill {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #475569;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(241,245,249,0.8);
+}
+
+#comic-engine .ceflow-metrics-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+}
+
+/* --- Action Zone: clean, one action --- */
+#comic-engine .ceflow-action-zone {
+    padding: 14px 16px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96));
+    border: 1px solid rgba(226,232,240,0.5);
+    box-shadow: 0 12px 30px rgba(15,23,42,0.05);
+    display: grid;
+    gap: 12px;
+}
+
+#comic-engine .ceflow-action-prompt {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+#comic-engine .ceflow-action-title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+#comic-engine .ceflow-action-hint {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+#comic-engine .ceflow-action-copy {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #475569;
+    line-height: 1.4;
+}
+
+/* --- Depth Triggers: clean horizontal bar --- */
+#comic-engine .ceflow-depth-triggers {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    padding: 4px 0;
+}
+
+#comic-engine .ceflow-depth-triggers.hidden {
+    display: none;
+}
+
+#comic-engine .ceflow-depth-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 120ms, border-color 120ms, transform 120ms;
+}
+
+#comic-engine .ceflow-depth-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+}
+
+#comic-engine .ceflow-depth-btn.is-highlight {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1e40af;
+    animation: ceflowPulseGlow 2s ease-in-out infinite;
+}
+
+#comic-engine .ceflow-depth-btn-icon {
+    font-size: 0.9rem;
+}
+
+/* --- Drawer Overlay --- */
+#comic-engine .ceflow-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.4);
+    backdrop-filter: blur(4px);
+    z-index: 900;
+    animation: ceflowFadeIn 180ms ease-out;
+}
+
+#comic-engine .ceflow-drawer-backdrop.hidden {
+    display: none;
+}
+
+#comic-engine .ceflow-drawer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 80vh;
+    z-index: 910;
+    border-radius: 24px 24px 0 0;
+    background: #ffffff;
+    box-shadow: 0 -20px 60px rgba(15,23,42,0.15);
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+    animation: ceflowDrawerUp 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#comic-engine .ceflow-drawer.hidden {
+    display: none;
+}
+
+#comic-engine .ceflow-drawer-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+#comic-engine .ceflow-drawer-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+#comic-engine .ceflow-drawer-close {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-grid;
+    place-items: center;
+    transition: background 120ms;
+}
+
+#comic-engine .ceflow-drawer-close:hover {
+    background: #f1f5f9;
+}
+
+#comic-engine .ceflow-drawer-body {
+    padding: 16px 20px 28px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+/* therapeutic card inside drawer */
+#comic-engine .ceflow-drawer-body .product-coach-card {
+    border-radius: 20px;
+    margin-top: 16px;
+}
+
+/* reply box redesign */
+#comic-engine .ceflow-staged .ceflow-reply-box {
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(240,253,244,0.96), rgba(255,255,255,0.98));
+    border: 1px solid rgba(34,197,94,0.2);
+    padding: 14px;
+}
+
+#comic-engine .ceflow-staged .ceflow-reply-box .ceflow-input-label,
+#comic-engine .ceflow-staged .ceflow-reply-box #ceflow-reply-input {
+    display: none;
+}
+
+#comic-engine .ceflow-send-btn {
+    min-width: 120px;
+    border-radius: 999px;
+    font-weight: 800;
+}
+
+/* hidden render targets */
+#comic-engine .ceflow-staged .ceflow-feedback,
+#comic-engine .ceflow-staged .ceflow-turn-snapshot,
+#comic-engine .ceflow-staged .ceflow-analysis,
+#comic-engine .ceflow-staged .ceflow-metrics-panel {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* --- Animations --- */
+@keyframes ceflowDrawerUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+@keyframes ceflowFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes ceflowPulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+    50% { box-shadow: 0 0 0 4px rgba(59,130,246,0.15); }
+}
+
+/* --- Desktop: centered stage --- */
+@media (min-width: 760px) {
+    #comic-engine .ceflow-staged {
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+    #comic-engine .ceflow-comic-stage {
+        min-height: 380px;
+    }
+
+    #comic-engine .ceflow-dialog--comic {
+        max-height: 360px;
+    }
+
+    #comic-engine .ceflow-drawer {
+        max-width: 640px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        border-radius: 24px;
+        bottom: 24px;
+        max-height: 70vh;
+    }
+
+    #comic-engine .ceflow-drawer.hidden {
+        display: none;
+    }
+
+    @keyframes ceflowDrawerUp {
+        from { transform: translateX(-50%) translateY(40px); opacity: 0; }
+        to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+}
+
+/* --- Mobile: compact and focused --- */
+@media (max-width: 620px) {
+    #comic-engine .ceflow-scene-header {
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        padding: 8px 12px;
+    }
+
+    #comic-engine .ceflow-scene-header-left {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    #comic-engine .ceflow-scene-title {
+        font-size: 0.92rem;
+    }
+
+    #comic-engine .ceflow-comic-stage {
+        border-radius: 22px;
+        padding: 14px 14px 10px;
+        min-height: 280px;
+    }
+
+    #comic-engine .ceflow-char-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+    }
+
+    #comic-engine .ceflow-dialog--comic {
+        max-height: 220px;
+    }
+
+    #comic-engine .ceflow-staged .ceflow-bubble {
+        max-width: 88%;
+        padding: 8px 12px;
+    }
+
+    #comic-engine .ceflow-staged .ceflow-bubble-text {
+        font-size: 0.82rem;
+    }
+
+    #comic-engine .ceflow-action-zone {
+        padding: 12px;
+        border-radius: 18px;
+    }
+
+    #comic-engine .ceflow-depth-triggers {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    #comic-engine .ceflow-depth-btn {
+        padding: 6px 10px;
+        font-size: 0.72rem;
+    }
+
+    #comic-engine .ceflow-choice-deck--arc {
+        width: min(100%, 300px);
+        height: 210px;
+    }
+
+    #comic-engine .ceflow-choice-deck--arc .ceflow-choice {
+        width: 88px;
+        min-height: 72px;
+        padding: 7px 9px;
+    }
+
+    #comic-engine .ceflow-drawer {
+        max-height: 85vh;
+        border-radius: 20px 20px 0 0;
+    }
+
+    #comic-engine .ceflow-drawer-body {
+        padding: 14px 16px 24px;
+    }
+
+    #comic-engine .ceflow-shotclock-float {
+        top: 10px;
+        left: 10px;
+    }
+}
+
 @media (max-width: 767px) {
     #meta-gamification-root {
         left: 12px;
