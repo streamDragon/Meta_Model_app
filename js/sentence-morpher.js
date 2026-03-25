@@ -97,7 +97,7 @@
                 <div class="sentence-morpher-card">
                     <div class="sentence-morpher-title-row">
                         <h3>משפט לעבודה</h3>
-                        <p>בחר/י ציר אחד בכל פעם כדי לראות איך הניסוח משתנה, ואיזה סוג של הכללה או כיווץ נכנסים לתוך אותו משפט.</p>
+                        <p>בחר/י ציר אחד בכל פעם ובדוק/י איך הוא משנה את הניסוח של אותו משפט.</p>
                     </div>
 
                     <div class="sentence-morpher-sentence-wrap">
@@ -107,7 +107,7 @@
 
                     <div class="sentence-morpher-toolbar">
                         <button type="button" class="btn btn-secondary sentence-mini-btn" data-action="undo">חזור/י צעד</button>
-                        <button type="button" class="btn btn-secondary sentence-mini-btn" data-action="reset">אפס/י</button>
+                        <button type="button" class="btn btn-secondary sentence-mini-btn" data-action="reset">נקה/י</button>
                         <span class="sentence-morpher-progress" id="sentence-morpher-progress">0/0</span>
                     </div>
 
@@ -218,7 +218,7 @@
             const totalAxes = this.axes.length;
 
             if (this.elements.progress) {
-                this.elements.progress.textContent = `${selectedCount}/${totalAxes} צירים פעילים`;
+                this.elements.progress.textContent = `${selectedCount}/${totalAxes} צירים נבחרו`;
             }
             if (this.elements.undoBtn) {
                 this.elements.undoBtn.disabled = this.history.length === 0;
@@ -342,7 +342,7 @@
                 ctaBtn.dataset.bound = 'true';
                 ctaBtn.addEventListener('click', () => {
                     const state = morpher.getState();
-                    setDemoFeedback(`זה הניסוח שבחרת כרגע: "${state.currentComposedSentence}"`, 'success');
+                    setDemoFeedback(`זה הניסוח שנבנה כרגע: "${state.currentComposedSentence}"`, 'success');
                     if (typeof root.playUISound === 'function') root.playUISound('success');
                 });
             }
