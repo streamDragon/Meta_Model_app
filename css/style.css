@@ -4969,6 +4969,99 @@ body.screen-guide-open {
     cursor: not-allowed;
 }
 
+/* ── Client / Patient Response Bubble ── */
+.question-drill-client-response {
+    display: grid;
+    gap: 10px;
+    margin-top: 10px;
+    animation: qd-client-fade-in 0.45s ease-out;
+}
+
+.question-drill-client-response.hidden {
+    display: none !important;
+}
+
+@keyframes qd-client-fade-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.question-drill-client-response-bubble {
+    position: relative;
+    padding: 16px 18px 14px;
+    border-radius: 20px 20px 4px 20px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1.5px solid #7dd3fc;
+    color: #0c4a6e;
+    line-height: 1.65;
+    font-size: 0.97rem;
+}
+
+.question-drill-client-response-bubble[data-tone="success"] {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-color: #86efac;
+    color: #14532d;
+}
+
+.question-drill-client-response-bubble[data-tone="fail"] {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    border-color: #fdba74;
+    color: #7c2d12;
+}
+
+.question-drill-client-response-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    opacity: 0.72;
+    margin-bottom: 4px;
+}
+
+.question-drill-client-response-label::before {
+    content: '\01F4AC';
+    font-size: 0.95rem;
+}
+
+.question-drill-client-response-text {
+    margin: 0;
+    font-size: 1.02rem;
+    line-height: 1.7;
+    font-weight: 500;
+}
+
+.question-drill-client-response-insight {
+    margin: 8px 0 0;
+    font-size: 0.88rem;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.question-drill-client-response-insight:empty {
+    display: none;
+}
+
+.question-drill-client-response-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.question-drill-client-response-actions .btn {
+    min-width: 220px;
+    font-size: 0.92rem;
+}
+
+@media (max-width: 640px) {
+    .question-drill-client-response-actions .btn {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
 .question-drill-feedback-shell {
     display: grid;
     gap: 8px;

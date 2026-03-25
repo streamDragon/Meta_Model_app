@@ -8542,6 +8542,8 @@ const questionDrillState = {
     feedbackTone: 'info',
     trafficState: 'green',
     feedbackModalOpen: false,
+    clientResponseOpen: false,
+    pendingClientResponseData: null,
     pendingRoundOutcome: null,
     elements: {}
 };
@@ -8675,6 +8677,62 @@ function pickQuestionDrillFeedbackLine(lines = [], offset = 0) {
 
 function getQuestionDrillFeedbackModalButtonLabel({ willComplete = false } = {}) {
     return willComplete ? 'לסיכום הסשן' : 'הבנתי, לשאלה הבאה';
+}
+
+/* ── Client response bubble helpers ── */
+function getQuestionDrillClientResponse(questionId, success) {
+    const entry = QUESTION_DRILL_CLIENT_RESPONSES[questionId];
+    if (!entry) return null;
+    return {
+        text: success ? entry.success : entry.fail,
+        insight: success ? entry.successInsight : entry.failImpact,
+        tone: success ? 'success' : 'fail'
+    };
+}
+
+function getQuestionDrillAdvisorImpact(questionId, success) {
+    const entry = QUESTION_DRILL_ADVISOR_IMPACT[questionId];
+    if (!entry) return '';
+    return success ? entry.successFeedback : entry.failFeedback;
+}
+
+function showQuestionDrillClientResponse({ text, insight, tone, pendingModalData }) {
+    const elements = questionDrillState.elements || {};
+    const root = elements.clientResponse;
+    if (!root) {
+        // Fallback: skip client response, go straight to modal
+        if (pendingModalData) openQuestionDrillFeedbackModal(pendingModalData);
+        return;
+    }
+    questionDrillState.clientResponseOpen = true;
+    questionDrillState.pendingClientResponseData = pendingModalData || null;
+
+    const bubble = root.querySelector('.question-drill-client-response-bubble');
+    if (bubble) bubble.dataset.tone = tone || 'neutral';
+    if (elements.clientResponseText) elements.clientResponseText.textContent = text || '';
+    if (elements.clientResponseInsight) elements.clientResponseInsight.textContent = insight || '';
+
+    root.classList.remove('hidden');
+    updateQuestionDrillControlsState();
+    requestAnimationFrame(() => {
+        root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+}
+
+function hideQuestionDrillClientResponse() {
+    const elements = questionDrillState.elements || {};
+    questionDrillState.clientResponseOpen = false;
+    const root = elements.clientResponse;
+    if (root) root.classList.add('hidden');
+}
+
+function continueFromClientResponse() {
+    const modalData = questionDrillState.pendingClientResponseData;
+    questionDrillState.pendingClientResponseData = null;
+    hideQuestionDrillClientResponse();
+    if (modalData) {
+        openQuestionDrillFeedbackModal(modalData);
+    }
 }
 
 function closeQuestionDrillFeedbackModal({ clearPending = false } = {}) {
