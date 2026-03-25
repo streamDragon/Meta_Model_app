@@ -675,33 +675,33 @@ function currentStageMeta() {
     context: {
       badge: 'שלב 1',
       title: 'הקשר',
-      description: 'קוראים את השיחה, מחזיקים את המשפט החי מול העיניים, ורק אז עוברים לזיהוי.'
+      description: 'קוראים את הרגע ורק אז בוחרים משפחה.'
     },
     identify: {
       badge: 'שלב 2',
       title: 'זיהוי',
       description: state.identifySolved
-        ? 'המשפחה כבר זוהתה. עכשיו פותחים את שלוש השאלות של אותה שלשה.'
+        ? 'המשפחה זוהתה. עוברים לשלוש השאלות.'
         : state.identifyAttempts > 0
-          ? `כבר היו ${state.identifyAttempts} ניסיונות. בוחרים עכשיו את השורה המדויקת.`
-          : 'בוחרים את המשפחה המדויקת מתוך חמש האפשרויות, בלי למהר.'
+          ? `כבר היו ${state.identifyAttempts} ניסיונות. עוד בחירה אחת מדויקת.`
+          : 'בוחרים עכשיו את השורה המדויקת מתוך חמש האפשרויות.'
     },
     questions: {
       badge: 'שלב 3',
       title: '3 שאלות',
-      description: `${askedCount}/3 שאלות כבר נשאלו. שומרים את כל השלשה פתוחה ונעה ברצף אחד.`
+      description: `${askedCount}/3 נשאלו. שומרים על רצף של שלוש השאלות.`
     },
     landing: {
       badge: 'שלב 4',
       title: 'שיקוף ונחיתה',
       description: landingTotal
-        ? `${Math.min(state.landingCursor, landingTotal)}/${landingTotal} הודעות נחשפו. נותנים לשיחה לנחות ואז פותחים את ה-insight.`
-        : 'נותנים לשיחה לנחות ואז רואים מה השתנה במבנה של המשפט.'
+        ? `${Math.min(state.landingCursor, landingTotal)}/${landingTotal} נחשפו. נותנים לשיחה לנחות.`
+        : 'נותנים לשיחה לנחות ולראות מה נפתח.'
     },
     summary: {
       badge: 'סיכום',
       title: 'סיכום הסבב',
-      description: 'רואים מה עבד, מה לחדד, ואיזה צעד לקחת לתרחיש הבא.'
+      description: 'רואים מה עבד, מה לדייק, ומה לקחת הלאה.'
     }
   };
   if (state.screen === 'summary') return meta.summary;
