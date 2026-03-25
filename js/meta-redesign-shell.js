@@ -148,6 +148,7 @@
         'practice-radar': {
             tab: 'practice-radar', navKey: 'practiceRadar', progressKey: 'practiceRadar', progressTotal: 15, unlockLevel: 5,
             icon: '🎯', title: 'מכ״ם מטה-מודל', badge: 'למתקדמים', tone: 'challenge', color: '#D85A30', soft: '#FFF0E8',
+            showCtaNearTop: true,
             homeDescription: 'המסלול המהיר — זיהוי ושאילת שאלות מפרקות תחת לחץ זמן. למי שמוכן לאתגר האמיתי.',
             description: 'המסלול המתקדם ביותר: זיהוי מהיר ושאילת שאלות מפרקות תחת לחץ זמן. כאן הכל מתחבר.',
             problem: 'הבעיה היא שבזמן אמת הדפוס חולף מהר, והתגובה האוטומטית קודמת לזיהוי מדויק של מה באמת סגור במשפט.',
@@ -1204,16 +1205,19 @@ function featureActionButtonsHtml(meta) {
         var state = getTabState(meta.tab);
         var locked = featureLocked(meta);
         var cta = locked ? ('נפתח ברמה ' + meta.unlockLevel) : String(meta.ctaLabel || pick(CTA_LABELS, meta.tab + '-cta'));
+        var ctaHtml = '<button type="button" class="btn btn-primary meta-feature-shell__cta" data-feature-enter="' + escapeHtml(meta.tab) + '"' + (locked ? ' disabled' : '') + '>' + escapeHtml(cta) + '</button>';
+        var ctaNearTop = !!(meta && meta.showCtaNearTop);
         return [
             '<div class="meta-feature-shell__frame" style="--meta-feature-accent:' + escapeHtml(meta.color) + ';--meta-feature-soft:' + escapeHtml(meta.soft) + ';">',
             '<section class="meta-feature-shell__hero"><div class="meta-feature-shell__icon-wrap"><span class="meta-feature-shell__icon">' + meta.icon + '</span></div><div class="meta-feature-shell__hero-copy"><span class="meta-feature-shell__badge" data-tone="' + escapeHtml(meta.tone) + '">' + escapeHtml(meta.badge) + '</span><h2>' + escapeHtml(meta.title) + '</h2><p class="meta-feature-shell__hero-desc">' + escapeHtml(meta.description) + '</p></div></section>',
             featureProblemHtml(meta),
+            (ctaNearTop ? ctaHtml : ''),
             featureEntryCardsHtml(meta),
             featureExampleHtml(meta),
             featureActionButtonsHtml(meta),
             featureQuoteHtml(meta),
             (meta.successNote ? '<p class="meta-feature-shell__success-note">' + escapeHtml(meta.successNote || '') + '</p>' : ''),
-            '<button type="button" class="btn btn-primary meta-feature-shell__cta" data-feature-enter="' + escapeHtml(meta.tab) + '"' + (locked ? ' disabled' : '') + '>' + escapeHtml(cta) + '</button>',
+            (ctaNearTop ? '' : ctaHtml),
             featureModalSheetsHtml(meta, state),
             '</div>'
         ].join('');
