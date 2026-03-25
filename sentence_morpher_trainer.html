@@ -202,6 +202,44 @@
       gap: 14px;
     }
 
+    .sentence-morpher-positioning {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+      border-radius: 24px;
+      border: 1px solid rgba(180, 83, 9, 0.18);
+      background: linear-gradient(145deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
+      box-shadow: var(--sm-shadow);
+    }
+
+    .sentence-morpher-positioning__grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .sentence-morpher-positioning__item {
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(255, 255, 255, 0.92);
+      display: grid;
+      gap: 6px;
+    }
+
+    .sentence-morpher-positioning__item[data-tone="no"] strong {
+      color: #9a3412;
+    }
+
+    .sentence-morpher-positioning__item[data-tone="yes"] {
+      background: rgba(236, 253, 245, 0.94);
+      border-color: rgba(15, 118, 110, 0.18);
+    }
+
+    .sentence-morpher-positioning__item[data-tone="yes"] strong {
+      color: #065f46;
+    }
+
     .sentence-morpher-summary-card {
       padding: 18px;
       display: grid;
@@ -387,6 +425,7 @@
 
     @media (max-width: 920px) {
       .sentence-morpher-summary-grid,
+      .sentence-morpher-positioning__grid,
       .sentence-morpher-note-grid,
       .sentence-morpher-example-grid,
       .sentence-morpher-help-shell {
@@ -432,8 +471,8 @@
           <span class="sentence-morpher-hero__badge">למידה · ניסוח · תרגול ממוקד</span>
           <h1>Sentence Morpher</h1>
           <p class="sentence-morpher-hero__lead">
-            זהו מרחב תרגול לשינוי ניסוח. לוקחים משפט אחד, מזיזים אותו לאורך צירים של זמן, מאמץ, אנשים והקשר,
-            ובודקים איך שפה נעשית סגורה יותר, פתוחה יותר, מדויקת יותר, או נוקשה יותר.
+            זהו מרחב תרגול לשינוי ניסוח. לוקחים משפט מצמצם, מזיזים אותו לאורך צירים של זמן, מאמץ, אנשים והקשר,
+            ובודקים איך להפוך אותו לניסוח פתוח יותר, מדויק יותר, ועובד יותר בלי למחוק את האמת הרגשית שבתוכו.
           </p>
           <div class="sentence-morpher-hero__stats" aria-label="מה מקבלים כאן">
             <span class="sentence-morpher-chip">משפט אחד בפוקוס</span>
@@ -442,9 +481,31 @@
           </div>
           <div class="sentence-morpher-hero__actions">
             <button type="button" class="btn btn-primary" data-sentence-morpher-action="start">התחל תרגול</button>
-            <a class="btn btn-secondary" href="#sentenceMorpherDisclosures">קרא/י לפני שמתחילים</a>
+            <a class="btn btn-secondary" href="#sentenceMorpherHowItWorks">איך זה עובד</a>
           </div>
         </header>
+
+        <section class="sentence-morpher-positioning" aria-label="מה זה לא ומה כן">
+          <span class="sentence-morpher-section-label">מה זה לא, ומה כן</span>
+          <div class="sentence-morpher-positioning__grid">
+            <article class="sentence-morpher-positioning__item" data-tone="no">
+              <strong>זה לא חיוביות מזויפת</strong>
+              <p>המטרה איננה להפוך כל משפט ל"ורוד", אלא לבדוק אם הוא נשאר נאמן לחוויה ועדיין פותח אפשרות תנועה.</p>
+            </article>
+            <article class="sentence-morpher-positioning__item" data-tone="no">
+              <strong>זה לא הכחשה</strong>
+              <p>לא מוחקים כאב, קושי או תקיעות. משנים את הצורה שבה הם מנוסחים כדי להבין טוב יותר מה בדיוק קורה.</p>
+            </article>
+            <article class="sentence-morpher-positioning__item" data-tone="no">
+              <strong>זה לא רפריימינג ריק</strong>
+              <p>לא מחליפים משפט קשה בסיסמה יפה. מחפשים ניסוח מדויק, מוגבל יותר בזמן ובהקשר, שאפשר באמת לעבוד איתו.</p>
+            </article>
+            <article class="sentence-morpher-positioning__item" data-tone="yes">
+              <strong>זה כן תרגול בניסוח מחדש</strong>
+              <p>לומדים להעביר משפט מצמצם לניסוח פתוח, מדויק ובר-עבודה, כך שהמרחב הטיפולי נהיה בהיר יותר ולא רק נעים יותר.</p>
+            </article>
+          </div>
+        </section>
 
         <section class="sentence-morpher-summary-grid" aria-label="הסבר מהיר">
           <article class="sentence-morpher-summary-card">
@@ -477,6 +538,10 @@
               <p>
                 Sentence Morpher מלמד להקשיב לא רק למה שנאמר, אלא גם לאופן שבו המשפט בנוי.
                 באותה חוויה אפשר לדבר בשפה שמקפיאה, ובשפה אחרת שמאפשרת בירור, הבחנה והמשך תנועה.
+              </p>
+              <p>
+                זהו לא תרגיל של "לנסח יפה יותר", אלא של לראות איך שפה כללית, מוחלטת או חסרת הקשר מצמצמת את מרחב הבחירה,
+                ואיך ניסוח מדויק יותר משנה את איכות השיחה עצמה.
               </p>
               <div class="sentence-morpher-note-grid">
                 <article class="sentence-morpher-note-card">
@@ -529,7 +594,7 @@
             </div>
           </details>
 
-          <details class="sentence-morpher-disclosure">
+          <details id="sentenceMorpherHowItWorks" class="sentence-morpher-disclosure">
             <summary>מאחורי התרגיל</summary>
             <div class="sentence-morpher-disclosure__body">
               <p>
@@ -649,7 +714,7 @@
           <header class="sentence-morpher-runtime__head">
             <span class="sentence-morpher-runtime__badge">תרגול פעיל</span>
             <h2 id="sentenceMorpherTrainerTitle">משנים ניסוח סביב משפט אחד</h2>
-            <p>כאן עובדים רק עם המשפט, הצירים והגרסה שנבנית. כל ההסבר הרחב נשאר בדף הפתיחה או בעזרת המסך.</p>
+            <p>התרגול כאן נשאר קצר: משפט אחד, צירים לבחירה, וניסוח שנבנה בזמן אמת.</p>
             <div class="sentence-morpher-runtime__meta">
               <span class="sentence-morpher-chip">בחר/י ציר</span>
               <span class="sentence-morpher-chip">בדוק/י את ההשפעה</span>
@@ -659,7 +724,7 @@
 
           <section class="sentence-morpher-practice-card">
             <div class="sentence-morpher-runtime__microcopy">
-              בחר/י ציר אחד בכל פעם כדי לראות איך המילים משנות את אותו משפט. אם צריך, אפשר לפתוח את עזרת המסך להסבר קצר, בלי לעצור את התרגול.
+              בחר/י ציר, הסתכל/י איך המשפט משתנה, והיעזר/י בעזרת המסך רק אם צריך תזכורת קצרה.
             </div>
 
             <section class="practice-section practice-section-sentence-morpher" aria-label="Sentence Morpher">
