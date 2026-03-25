@@ -2519,3 +2519,7 @@
         padding: 14px;
     }
 }
+[data-product-guidance="scenario-trainer"],
+[data-product-guidance-welcome="scenario-trainer"] {
+    display: none !important;
+}
