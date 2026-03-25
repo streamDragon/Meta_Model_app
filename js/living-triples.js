@@ -640,6 +640,216 @@ function readGamificationSummary() {
   };
 }
 
+function scenarioCount() {
+  return Number(state.queue?.length || state.data?.scenarios?.length || 0);
+}
+
+function askedQuestionCount() {
+  return Array.isArray(state.current?.triple)
+    ? state.current.triple.filter((item) => state.asked[item.slot]).length
+    : 0;
+}
+
+function readDesktopSoundLabel() {
+  try {
+    const consent = localStorage.getItem('alchemy_audio_consent_v1');
+    const muted = localStorage.getItem('alchemy_audio_muted_v1') === '1';
+    if (consent !== 'yes') return 'צליל: שאל';
+    return muted ? 'צליל: כבוי' : 'צליל: פעיל';
+  } catch (_) {
+    return 'צליל';
+  }
+}
+
+function toggleStandaloneSound() {
+  const button = document.querySelector('.alchemy-mute') || document.getElementById('audio-master-mute-btn');
+  if (!button || typeof button.click !== 'function') return false;
+  button.click();
+  return true;
+}
+
+function currentStageMeta() {
+  const landingTotal = Array.isArray(state.current?.landing) ? state.current.landing.length : 0;
+  const askedCount = askedQuestionCount();
+  const meta = {
+    context: {
+      badge: 'שלב 1',
+      title: 'הקשר',
+      description: 'קוראים את השיחה, מחזיקים את המשפט החי מול העיניים, ורק אז עוברים לזיהוי.'
+    },
+    identify: {
+      badge: 'שלב 2',
+      title: 'זיהוי',
+      description: state.identifySolved
+        ? 'המשפחה כבר זוהתה. עכשיו פותחים את שלוש השאלות של אותה שלשה.'
+        : state.identifyAttempts > 0
+          ? `כבר היו ${state.identifyAttempts} ניסיונות. בוחרים עכשיו את השורה המדויקת.`
+          : 'בוחרים את המשפחה המדויקת מתוך חמש האפשרויות, בלי למהר.'
+    },
+    questions: {
+      badge: 'שלב 3',
+      title: '3 שאלות',
+      description: `${askedCount}/3 שאלות כבר נשאלו. שומרים את כל השלשה פתוחה ונעה ברצף אחד.`
+    },
+    landing: {
+      badge: 'שלב 4',
+      title: 'שיקוף ונחיתה',
+      description: landingTotal
+        ? `${Math.min(state.landingCursor, landingTotal)}/${landingTotal} הודעות נחשפו. נותנים לשיחה לנחות ואז פותחים את ה-insight.`
+        : 'נותנים לשיחה לנחות ואז רואים מה השתנה במבנה של המשפט.'
+    },
+    summary: {
+      badge: 'סיכום',
+      title: 'סיכום הסבב',
+      description: 'רואים מה עבד, מה לחדד, ואיזה צעד לקחת לתרחיש הבא.'
+    }
+  };
+  if (state.screen === 'summary') return meta.summary;
+  return meta[state.step] || meta.context;
+}
+
+function buildSidebarProgressMarkup() {
+  const activeIndex = state.screen === 'summary' ? STEP_META.length - 1 : currentStepIndex();
+  return `
+    <div class="ltv3-side-progress" aria-label="התקדמות במסלול">
+      ${STEP_META.map((step, index) => {
+        const classes = [
+          'ltv3-side-progress-item',
+          index < activeIndex || state.screen === 'summary' ? 'is-done' : '',
+          index === activeIndex && state.screen !== 'summary' ? 'is-current' : ''
+        ].filter(Boolean).join(' ');
+        return `
+          <div class="${classes}">
+            <span class="ltv3-side-progress-dot" aria-hidden="true"></span>
+            <div>
+              <strong>${esc(step.label)}</strong>
+              <small>${index === activeIndex && state.screen !== 'summary' ? 'הצעד הפעיל' : index < activeIndex || state.screen === 'summary' ? 'הושלם' : 'בהמשך'}</small>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function buildSidebarContextMarkup() {
+  const context = Array.isArray(state.current?.context) ? state.current.context : [];
+  if (!context.length) {
+    return '<p class="ltv3-side-copy">ההקשר יופיע כאן ברגע שנטען תרחיש פעיל.</p>';
+  }
+  return `
+    <div class="ltv3-side-transcript">
+      ${context.map((item) => {
+        const from = normKey(item?.from);
+        const role = from === 'therapist'
+          ? 'מטפל/ת'
+          : from === 'client'
+            ? 'מטופל/ת'
+            : 'הקשר';
+        return `
+          <article class="ltv3-side-line${item?.highlight ? ' is-target' : ''}">
+            <span>${esc(role)}</span>
+            <p>${esc(item?.text || '')}</p>
+          </article>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function buildDesktopHeaderMarkup() {
+  const stageMeta = currentStageMeta();
+  const total = Math.max(1, scenarioCount());
+  const completed = Number(state.progress?.played || 0);
+  const modeLabel = state.mode === 'test' ? 'מבחן' : 'לימוד';
+  return `
+    <header class="ltv3-desktop-header" aria-label="כותרת התרגיל">
+      <div class="ltv3-desktop-header__title-block">
+        <span class="ltv3-desktop-header__eyebrow">${esc(stageMeta.badge)} · ${esc(stageMeta.title)}</span>
+        <strong class="ltv3-desktop-header__title">שלישות חיות</strong>
+        <p class="ltv3-desktop-header__desc">${esc(stageMeta.description)}</p>
+      </div>
+      <div class="ltv3-desktop-header__status">
+        <span class="ltv3-header-pill">תרחיש <strong>${state.index + 1}</strong>/<strong>${total}</strong></span>
+        <span class="ltv3-header-pill">מצב <strong>${esc(modeLabel)}</strong></span>
+        <span class="ltv3-header-pill">ניקוד <strong>${state.roundScore}</strong></span>
+        <span class="ltv3-header-pill">הושלמו <strong>${completed}</strong></span>
+      </div>
+      <div class="ltv3-desktop-header__actions">
+        <button type="button" class="btn btn-secondary" data-action="show-onboarding">פתיחה</button>
+        <button type="button" class="btn btn-secondary" data-action="toggle-sound"><span data-ltv3-sound-label>${esc(readDesktopSoundLabel())}</span></button>
+        <button type="button" class="btn btn-secondary" data-action="open-guide">עזרה</button>
+        <button type="button" class="btn btn-secondary" data-action="go-home">בית</button>
+      </div>
+    </header>
+  `;
+}
+
+function buildDesktopSidebarMarkup() {
+  const rowMeta = getRowMeta(state.current?.targetRow || 1);
+  const stageMeta = currentStageMeta();
+  const summary = readGamificationSummary();
+  return `
+    <aside class="ltv3-sidebar" aria-label="הקשר וכלי עזר">
+      <section class="ltv3-side-card ltv3-side-card--focus">
+        <span class="ltv3-side-kicker">המשפט לעבודה</span>
+        <blockquote class="ltv3-side-quote">${esc(state.current?.target || '')}</blockquote>
+        <p class="ltv3-side-copy">${esc(state.current?.rowInsight || rowMeta.insight || 'המשפט נשאר גלוי כאן כדי שהעבודה תישאר מחוברת למקור.')}</p>
+        <div class="ltv3-side-tag-row">
+          ${rowMeta.categories.map((cat) => `
+            <span class="ltv3-side-tag" style="--ltv3-tag:${esc(cat.color)};">${esc(cat.labelHe)}</span>
+          `).join('')}
+        </div>
+      </section>
+      <section class="ltv3-side-card">
+        <div class="ltv3-side-card__head">
+          <h3>הקשר קצר</h3>
+          <span>${esc(state.current?.theme || extractThemeName(rowMeta.title))}</span>
+        </div>
+        ${buildSidebarContextMarkup()}
+      </section>
+      <section class="ltv3-side-card">
+        <div class="ltv3-side-card__head">
+          <h3>מה קורה עכשיו</h3>
+          <span>${esc(stageMeta.badge)}</span>
+        </div>
+        <p class="ltv3-side-copy">${esc(stageMeta.description)}</p>
+        ${buildSidebarProgressMarkup()}
+      </section>
+      <section class="ltv3-side-card ltv3-side-card--stats">
+        <div class="ltv3-side-card__head">
+          <h3>מדדים וכלים</h3>
+          <span>${esc(state.mode === 'test' ? 'מבחן' : 'לימוד')}</span>
+        </div>
+        <div class="ltv3-side-stats">
+          <article class="ltv3-side-stat">
+            <span>ניקוד</span>
+            <strong>${state.roundScore}</strong>
+          </article>
+          <article class="ltv3-side-stat">
+            <span>כוכבים</span>
+            <strong>${esc(summary.totalStars)}</strong>
+          </article>
+          <article class="ltv3-side-stat">
+            <span>רצף</span>
+            <strong>${esc(summary.streak)}</strong>
+          </article>
+          <article class="ltv3-side-stat">
+            <span>רמה</span>
+            <strong>${esc(summary.level)}</strong>
+          </article>
+        </div>
+        <div class="ltv3-side-tools">
+          <button type="button" class="btn btn-secondary" data-action="open-map">מפה</button>
+          <button type="button" class="btn btn-secondary" data-action="open-progress">התקדמות</button>
+          <button type="button" class="btn btn-secondary" data-action="toggle-sound"><span data-ltv3-sound-label>${esc(readDesktopSoundLabel())}</span></button>
+          <button type="button" class="btn btn-secondary" data-action="retry-scene">נסה שוב</button>
+        </div>
+      </section>
+    </aside>
+  `;
+}
+
 function isReturningUser() {
   return !!state.prefs?.onboardingDone || Number(state.progress?.played || 0) > 0;
 }
@@ -937,7 +1147,7 @@ function buildChatMarkup(items, { allowHighlight = false } = {}) {
 function buildContextStage() {
 
   return `
-    <section class="ltv3-stage-card">
+    <section class="ltv3-stage-card ltv3-stage-card--context">
       <div class="ltv3-stage-head">
         <p class="ltv3-kicker">שלב 1</p>
         <h3>הקשר</h3>
@@ -962,7 +1172,7 @@ function buildIdentifyStage() {
       ? (state.mode === 'test' ? 'עדיין לא. נסה/י שוב לבחור את המשפחה המדויקת.' : state.current.wrongHint)
       : 'בחר/י את המשפחה המתאימה למשפט המסומן.';
   return `
-    <section class="ltv3-stage-card">
+    <section class="ltv3-stage-card ltv3-stage-card--identify">
       <div class="ltv3-stage-head">
         <p class="ltv3-kicker">שלב 2</p>
         <h3>זיהוי</h3>
@@ -1021,9 +1231,9 @@ function buildTripleGrid() {
 }
 
 function buildQuestionStage() {
-  const askedCount = state.current.triple.filter((item) => state.asked[item.slot]).length;
+  const askedCount = askedQuestionCount();
   return `
-    <section class="ltv3-stage-card">
+    <section class="ltv3-stage-card ltv3-stage-card--questions">
       <div class="ltv3-stage-head">
         <p class="ltv3-kicker">שלב 3</p>
         <h3>3 שאלות</h3>
@@ -1034,9 +1244,6 @@ function buildQuestionStage() {
         <p>${esc(state.current.target)}</p>
       </section>
       ${buildTripleGrid()}
-      <div id="ltv3-questions-chat" class="ltv3-chat chat-bg">
-        ${state.questionChat.length ? buildChatMarkup(state.questionChat) : '<div class="ltv3-empty-chat">הצ\'אט עוד ריק. בחר/י את השאלה הראשונה.</div>'}
-      </div>
       <div class="ltv3-question-list">
         ${state.current.triple.map((item) => {
           const done = !!state.asked[item.slot];
@@ -1057,6 +1264,9 @@ function buildQuestionStage() {
         }).join('')}
       </div>
       <p class="ltv3-feedback">${askedCount}/3 שאלות נשאלו</p>
+      <div id="ltv3-questions-chat" class="ltv3-chat chat-bg">
+        ${state.questionChat.length ? buildChatMarkup(state.questionChat) : '<div class="ltv3-empty-chat">הצ\'אט עוד ריק. בחר/י את השאלה הראשונה.</div>'}
+      </div>
       ${allQuestionsAsked() ? `
         <div class="ltv3-inline-actions">
           <button type="button" class="btn btn-primary" data-action="go-landing">שיקוף + סיום ←</button>
@@ -1070,7 +1280,7 @@ function buildLandingStage() {
   const allLandingShown = state.landingCursor >= state.current.landing.length;
   const allChat = [...state.questionChat, ...state.landingVisible];
   return `
-    <section class="ltv3-stage-card">
+    <section class="ltv3-stage-card ltv3-stage-card--landing">
       <div class="ltv3-stage-head">
         <p class="ltv3-kicker">שלב 4</p>
         <h3>שיקוף + נחיתה</h3>
@@ -1365,6 +1575,7 @@ function buildSummaryMarkup() {
   const nextText = safeText(state.current?.insight, rowMeta.insight || 'בסבב הבא חפש/י שוב את השאלה שמחזירה את השכבה הבאה של המידע, לא רק את שם הדפוס.');
   return `
     <section class="ltv3-practice-shell">
+      ${buildDesktopHeaderMarkup()}
       <div class="ltv3-topbar">
         <div class="ltv3-pill-row">
           <span class="ltv3-pill">${esc(trafficTone)}</span>
@@ -1377,7 +1588,9 @@ function buildSummaryMarkup() {
           <button type="button" class="btn btn-secondary" data-action="open-progress">התקדמות</button>
         </div>
       </div>
-      <section class="ltv3-stage-card">
+      <div class="ltv3-desktop-board">
+        <div class="ltv3-desktop-main">
+          <section class="ltv3-stage-card ltv3-stage-card--summary">
         <div class="ltv3-stage-head">
           <p class="ltv3-kicker">סיכום הסבב</p>
           <h3>${esc(extractThemeName(rowMeta.title))}</h3>
@@ -1414,7 +1627,10 @@ function buildSummaryMarkup() {
           <button type="button" class="btn btn-primary" data-action="next-scene">משפט הבא ←</button>
           <button type="button" class="btn btn-secondary" data-action="retry-scene">נסה שוב</button>
         </div>
-      </section>
+          </section>
+        </div>
+        ${buildDesktopSidebarMarkup()}
+      </div>
     </section>
   `;
 }
@@ -1458,6 +1674,7 @@ function buildPracticeMarkupV2() {
   const completed = Number(state.progress?.played || 0);
   return `
     <section class="ltv3-practice-shell">
+      ${buildDesktopHeaderMarkup()}
       <div class="ltv3-topbar">
         <div class="ltv3-pill-row">
           <span class="ltv3-pill">תרחיש <strong>${state.index + 1}</strong>/<strong>${state.queue.length || state.data.scenarios.length}</strong></span>
@@ -1474,10 +1691,15 @@ function buildPracticeMarkupV2() {
         </div>
       </div>
       ${buildProgressMarkup()}
-      ${state.step === 'context' ? buildContextStage() : ''}
-      ${state.step === 'identify' ? buildIdentifyStage() : ''}
-      ${state.step === 'questions' ? buildQuestionStage() : ''}
-      ${state.step === 'landing' ? buildLandingStage() : ''}
+      <div class="ltv3-desktop-board">
+        <div class="ltv3-desktop-main">
+          ${state.step === 'context' ? buildContextStage() : ''}
+          ${state.step === 'identify' ? buildIdentifyStage() : ''}
+          ${state.step === 'questions' ? buildQuestionStage() : ''}
+          ${state.step === 'landing' ? buildLandingStage() : ''}
+        </div>
+        ${buildDesktopSidebarMarkup()}
+      </div>
     </section>
   `;
 }
