@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>שלשות חיות - Meta Model App</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/css/feature-welcome.css">
+  <script>
+    (function () {
+      var v = String(Date.now());
+      function withV(path) {
+        try {
+          var u = new URL(path, location.href);
+          u.searchParams.set('v', v);
+          return u.toString();
+        } catch (e) {
+          return path + (path.indexOf('?') === -1 ? '?' : '&') + 'v=' + encodeURIComponent(v);
+        }
+      }
+      function addCss(path) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = withV(path);
+        document.head.appendChild(link);
+      }
+      function addScript(path, cb) {
+        var s = document.createElement('script');
+        s.src = withV(path);
+        s.onload = function () { if (cb) cb(); };
+        document.head.appendChild(s);
+      }
+      function boot() {
+        if (window.__livingTriplesBooted) return;
+        if (!document.getElementById('living-triples')) return;
+        if (typeof window.setupLivingTriplesModule !== 'function') return;
+        window.__livingTriplesBooted = true;
+        window.setupLivingTriplesModule();
+      }
+      document.addEventListener('DOMContentLoaded', boot);
+      addCss('css/style.css');
+      addCss('css/ui-enhancements.css');
+      addCss('css/meta-redesign-round3.css');
+      addScript('js/gamification.js');
+      addScript('js/living-triples.js', boot);
+    })();
+  </script>
+</head>
+<body class="living-triples-standalone">
+<div id="trainerContent">
+  <div class="container ltv2-page">
+    <section id="living-triples" class="tab-content active practice-tab-content" aria-label="תרגול שלשות חיות">
+      <div class="practice-container">
+        <div id="ltv2-root" class="ltv3-root living-triples-card">
+          <div class="ltv2-onboarding" role="status" aria-live="polite">
+            <h2>מכינים את סביבת התרגול…</h2>
+            <p>עוד רגע יופיע כאן מסך הפתיחה של שלשות חיות או הסשן הפעיל, בלי שכבת פתיחה חיצונית שמסתירה את הטריינר.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="ltv2-toast" class="ltv2-toast hidden" aria-live="assertive"></div>
+  <script src="js/trainer-shell-nav.js"></script>
+</div>
+</body>
+</html>
