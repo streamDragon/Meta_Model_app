@@ -25380,6 +25380,12 @@ body.mobile-sticky-cta-visible {
     display: none !important;
 }
 
+body[data-active-tab="practice-radar"] #mm-onboarding {
+    display: none !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+}
+
 /* Compact practice-intro-card on mobile */
 @media (max-width: 900px) {
     #practice-question .practice-container,
