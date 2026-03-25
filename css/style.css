@@ -20102,6 +20102,126 @@ body.living-triples-standalone .ltv3-side-tools .btn {
     }
 }
 
+@media (min-width: 1180px) {
+    body.living-triples-standalone .trainer-shell-nav {
+        width: min(1460px, calc(100% - 20px));
+        margin: 6px auto 8px;
+        padding: 8px 12px;
+        border-radius: 14px;
+    }
+
+    body.living-triples-standalone .trainer-shell-nav__meta {
+        font-size: 0.92rem;
+    }
+
+    body.living-triples-standalone .trainer-shell-nav__btn {
+        min-height: 36px;
+        padding: 7px 12px;
+    }
+
+    body.living-triples-standalone .trainer-shell-nav__btn--icon {
+        width: 36px;
+        min-width: 36px;
+        min-height: 36px;
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page {
+        gap: 18px;
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-welcome-shell {
+        width: min(1460px, 94vw);
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__frame {
+        grid-template-columns: minmax(340px, 0.92fr) minmax(0, 1.18fr);
+        gap: 18px;
+        align-items: start;
+        padding: 10px 0 18px;
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__hero {
+        grid-column: 1;
+        padding: 24px 26px 22px;
+        grid-template-columns: auto minmax(0, 1fr);
+        justify-items: start;
+        text-align: right;
+        gap: 16px;
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__hero-copy {
+        justify-items: start;
+        gap: 8px;
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__hero-copy h2 {
+        font-size: clamp(1.7rem, 2.4vw, 2.3rem);
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__hero-desc,
+    body.living-triples-standalone .ltv3-welcome-page .ltv3-welcome-note {
+        max-width: 64ch;
+        font-size: 0.96rem;
+        line-height: 1.75;
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .ltv3-inline-actions,
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__success-note,
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__quote {
+        grid-column: 1 / -1;
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__problem-note {
+        grid-column: 1;
+        padding: 18px 20px;
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__entry-grid,
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__example-card {
+        grid-column: 2;
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__entry-grid {
+        gap: 14px;
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__entry-card {
+        min-height: 168px;
+        padding: 18px;
+        align-content: start;
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__example-card {
+        padding: 18px 20px;
+        gap: 12px;
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__actions--welcome {
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+        gap: 12px;
+        align-items: start;
+    }
+
+    body.living-triples-standalone .ltv3-welcome-page .meta-feature-shell__cta,
+    body.living-triples-standalone .ltv3-welcome-page .ltv3-inline-actions .btn {
+        width: auto;
+        min-width: 190px;
+    }
+
+    body.living-triples-standalone .ltv3-desktop-header {
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr) auto;
+        gap: 12px;
+        min-height: 78px;
+        padding: 10px 16px;
+    }
+
+    body.living-triples-standalone .ltv3-desktop-header__desc {
+        font-size: 0.82rem;
+        line-height: 1.38;
+    }
+}
+
 .home-route {
     display: none;
     gap: 14px;
@@ -32128,6 +32248,201 @@ body[dir="rtl"] .practice-section-header {
 #practice-triples-radar .triples-radar-row-inline-hint,
 #practice-triples-radar .triples-radar-row-accordion {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+#practice-triples-radar .triples-radar-row-status {
+    display: grid;
+    gap: 4px;
+    padding: 10px 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(191, 209, 234, 0.72);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+}
+
+#practice-triples-radar .triples-radar-row-status strong {
+    color: #123f7b;
+    font-size: 0.8rem;
+}
+
+#practice-triples-radar .triples-radar-row-status p {
+    margin: 0;
+    color: #294d78;
+    font-size: 0.84rem;
+    line-height: 1.58;
+}
+
+#practice-triples-radar .triples-radar-row-status[data-tone="success"] {
+    border-color: rgba(34, 197, 94, 0.28);
+    background: linear-gradient(180deg, rgba(240, 253, 244, 0.98), rgba(255, 255, 255, 0.98));
+}
+
+#practice-triples-radar .triples-radar-row-status[data-tone="success"] strong,
+#practice-triples-radar .triples-radar-row-status[data-tone="success"] p {
+    color: #166534;
+}
+
+#practice-triples-radar .triples-radar-row-status[data-tone="danger"],
+#practice-triples-radar .triples-radar-row-status[data-tone="warn"] {
+    border-color: rgba(248, 113, 113, 0.28);
+    background: linear-gradient(180deg, rgba(254, 242, 242, 0.98), rgba(255, 255, 255, 0.98));
+}
+
+#practice-triples-radar .triples-radar-row-status[data-tone="danger"] strong,
+#practice-triples-radar .triples-radar-row-status[data-tone="danger"] p,
+#practice-triples-radar .triples-radar-row-status[data-tone="warn"] strong,
+#practice-triples-radar .triples-radar-row-status[data-tone="warn"] p {
+    color: #9f1239;
+}
+
+@media (min-width: 1200px) {
+    #practice-triples-radar .practice-container {
+        max-width: min(1540px, 96vw);
+    }
+
+    #practice-triples-radar:has(#triples-radar-rows .triples-radar-row) .practice-intro-card {
+        margin-bottom: 10px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    #practice-triples-radar:has(#triples-radar-rows .triples-radar-row) .practice-intro-card > h2,
+    #practice-triples-radar:has(#triples-radar-rows .triples-radar-row) .practice-intro-card > .subtitle {
+        display: none !important;
+    }
+
+    #practice-triples-radar:has(#triples-radar-rows .triples-radar-row) .triples-kids-hero {
+        display: none !important;
+    }
+
+    #practice-triples-radar .triples-radar-mode-bar {
+        margin-bottom: 12px;
+        padding: 12px 16px;
+    }
+
+    #practice-triples-radar .triples-radar-card {
+        padding: 14px;
+        border-radius: 30px;
+    }
+
+    #practice-triples-radar .triples-radar-shell {
+        grid-template-columns: minmax(360px, 0.9fr) minmax(0, 1.34fr);
+        gap: 18px;
+    }
+
+    #practice-triples-radar .triples-radar-main-panel,
+    #practice-triples-radar .triples-radar-board-panel {
+        gap: 14px;
+        padding: 18px 20px;
+        border-radius: 24px;
+    }
+
+    #practice-triples-radar .triples-radar-main-panel {
+        position: sticky;
+        top: calc(var(--app-sticky-banner-offset, 0px) + 10px);
+        align-self: start;
+    }
+
+    #practice-triples-radar .triples-radar-topbar {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    #practice-triples-radar .triples-radar-topbar > span {
+        min-height: 56px;
+        align-content: center;
+    }
+
+    #practice-triples-radar .triples-radar-statement-wrap,
+    #practice-triples-radar .triples-radar-support-strip,
+    #practice-triples-radar .triples-radar-utility-row,
+    #practice-triples-radar .triples-radar-game-strip,
+    #practice-triples-radar .triples-radar-board-top,
+    #practice-triples-radar .triples-radar-rows,
+    #practice-triples-radar .triples-radar-actions {
+        max-width: none;
+    }
+
+    #practice-triples-radar .triples-radar-statement-wrap,
+    #practice-triples-radar .triples-radar-support-strip,
+    #practice-triples-radar .triples-radar-game-strip {
+        margin-inline: 0;
+    }
+
+    #practice-triples-radar .triples-radar-support-strip {
+        justify-content: stretch;
+        text-align: right;
+    }
+
+    #practice-triples-radar .triples-radar-utility-row,
+    #practice-triples-radar .triples-radar-actions {
+        justify-content: flex-start;
+        margin-inline: 0;
+    }
+
+    #practice-triples-radar .triples-radar-feedback {
+        display: none;
+    }
+
+    #practice-triples-radar .triples-radar-board-top h4 {
+        font-size: 1.08rem;
+    }
+
+    #practice-triples-radar .triples-radar-rows {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        align-items: start;
+    }
+
+    #practice-triples-radar .triples-radar-row {
+        min-height: 210px;
+        padding: 16px;
+        gap: 12px;
+        align-content: start;
+    }
+
+    #practice-triples-radar .triples-radar-row.is-active {
+        grid-column: 1 / -1;
+        min-height: auto;
+    }
+
+    #practice-triples-radar .triples-radar-row-head {
+        gap: 6px;
+    }
+
+    #practice-triples-radar .triples-radar-row-head strong {
+        font-size: 1rem;
+        line-height: 1.4;
+    }
+
+    #practice-triples-radar .triples-radar-row-cats {
+        gap: 8px;
+    }
+
+    #practice-triples-radar .triples-radar-cat-btn {
+        min-height: 56px;
+        padding: 10px 8px;
+    }
+
+    #practice-triples-radar .triples-radar-row-actions {
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+    }
+
+    #practice-triples-radar .triples-radar-row-inline-hint,
+    #practice-triples-radar .triples-radar-row-status {
+        padding: 12px 14px;
+    }
+
+    #practice-triples-radar .triples-radar-row-accordion {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    #practice-triples-radar .triples-radar-row-accordion-item:last-child {
+        grid-column: 1 / -1;
+    }
 }
 
 #comic-engine .ceflow-top-actions {

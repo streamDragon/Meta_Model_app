@@ -1699,6 +1699,8 @@
         const showSolvedDetails = state.solved || state.examExpired;
         const activeRowId = getActiveRowId(currentEvaluation);
         const highlightEntries = getScenarioHighlightEntries(current);
+        const boardFeedbackText = normalizeSpaces(state.elements?.feedback?.textContent || '');
+        const boardFeedbackTone = String(state.elements?.feedback?.dataset?.tone || 'info').trim() || 'info';
 
         if (state.elements.contextLine) state.elements.contextLine.textContent = getScenarioContext(current);
         state.elements.statement.innerHTML = renderHighlightedSentence(current.clientText || '', highlightEntries, activeRowId);
@@ -1721,10 +1723,15 @@
             const isStrongestRow = (state.rowHintUsed || showSolvedDetails) && isCorrectRow;
             const isExpanded = state.expandedRowId === row.id;
             const showInlineHint = state.inlineHintRowId === row.id;
+            const isActiveRow = activeRowId === row.id;
+            const showRowStatus = isActiveRow
+                && boardFeedbackText
+                && (state.selectedCategory || state.rowHintUsed || state.categoryHintUsed || state.solved || state.examExpired || isExpanded || showInlineHint);
             const detail = getRowDetailContent(row, current);
             const rowClass = [
                 'triples-radar-row',
                 rowMeta.colorClass,
+                isActiveRow ? 'is-active' : '',
                 isStrongestRow ? 'is-strongest' : '',
                 isHintRow ? 'is-hint' : '',
                 isSolvedRow ? 'is-solved' : '',
@@ -1779,6 +1786,12 @@
                         <button type="button" class="triples-radar-row-detail-btn" data-tr-action="row-detail" data-row-id="${escapeHtml(row.id)}" aria-expanded="${isExpanded ? 'true' : 'false'}">העמקה</button>
                         ${state.sessionMode === 'learn' ? `<button type="button" class="triples-radar-row-hint-btn" data-tr-action="row-hint" data-row-id="${escapeHtml(row.id)}" aria-expanded="${showInlineHint ? 'true' : 'false'}">רמז</button>` : ''}
                     </div>
+                    ${showRowStatus ? `
+                        <div class="triples-radar-row-status" data-tone="${escapeHtml(boardFeedbackTone)}" aria-live="polite">
+                            <strong>פידבק</strong>
+                            <p>${escapeHtml(boardFeedbackText)}</p>
+                        </div>
+                    ` : ''}
                     ${showInlineHint ? `
                         <div class="triples-radar-row-inline-hint">
                             <strong>רמז קצר</strong>
@@ -1968,9 +1981,7 @@
     function toggleRowDetail(rowId) {
         const nextRowId = String(rowId || '').trim();
         state.expandedRowId = state.expandedRowId === nextRowId ? '' : nextRowId;
-        if (state.expandedRowId && state.inlineHintRowId === state.expandedRowId) {
-            state.inlineHintRowId = '';
-        }
+        state.inlineHintRowId = '';
         closeOverlay();
         renderBoard();
     }
@@ -1978,6 +1989,9 @@
     function toggleRowHint(rowId) {
         const nextRowId = String(rowId || '').trim();
         state.inlineHintRowId = state.inlineHintRowId === nextRowId ? '' : nextRowId;
+        if (state.inlineHintRowId) {
+            state.expandedRowId = '';
+        }
         renderBoard();
     }
 
@@ -2306,4 +2320,3 @@
         setupTriplesRadarModule
     });
 });
-
