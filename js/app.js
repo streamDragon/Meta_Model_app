@@ -10623,6 +10623,10 @@ function setupQuestionDrill() {
         prestartMenuBtn: document.getElementById('question-drill-prestart-menu'),
         openMenuBtn: document.getElementById('question-drill-open-menu'),
         openExplanationBtn: document.getElementById('question-drill-open-explanation'),
+        clientResponse: document.getElementById('question-drill-client-response'),
+        clientResponseText: document.getElementById('question-drill-client-response-text'),
+        clientResponseInsight: document.getElementById('question-drill-client-response-insight'),
+        clientResponseContinue: document.getElementById('question-drill-client-response-continue'),
         feedbackModal: document.getElementById('question-drill-feedback-modal'),
         feedbackModalImage: document.getElementById('question-drill-feedback-modal-image'),
         feedbackModalKicker: document.getElementById('question-drill-feedback-modal-kicker'),
@@ -10714,6 +10718,7 @@ function setupQuestionDrill() {
     questionDrillState.elements.openMenuBtn?.addEventListener('click', openQuestionDrillMenuOverlay);
     questionDrillState.elements.openExplanationBtn?.addEventListener('click', openQuestionDrillExplanationOverlay);
     questionDrillState.elements.liveHintBtn?.addEventListener('click', showQuestionDrillHint);
+    questionDrillState.elements.clientResponseContinue?.addEventListener('click', continueFromClientResponse);
     questionDrillState.elements.feedbackModalContinue?.addEventListener('click', continueQuestionDrillFeedbackFlow);
 
     setupAudioMuteButtons();
