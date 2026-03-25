@@ -617,8 +617,31 @@ const css = `
 .it-onboarding-note,.it-schema-card{border:1px solid #ecd9a4;border-radius:16px;background:#fff;padding:12px;display:grid;gap:6px}.it-onboarding-note strong,.it-schema-card strong{font-size:.88rem;color:#8a4b07}.it-onboarding-note p,.it-schema-card p{margin:0;color:#4b5563;line-height:1.5}
 .it-schema-card.is-part{border-color:#d7e5fb}.it-schema-tree{display:grid;gap:8px}.it-schema-node,.it-schema-child{border:1px solid #e2e8f0;border-radius:999px;background:#f8fafc;padding:6px 10px;text-align:center;font-weight:800;color:#1f2937}.it-schema-node.root{background:#eff6ff;border-color:#bfdbfe;color:#1e3a8a}.it-schema-branches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.it-schema-child{background:#fffbeb;border-color:#f7d08b;color:#92400e}
 .it-onboarding-actions{display:flex;justify-content:flex-start}
+.it-home-main{display:grid;gap:14px}
+.it-home-hero{padding:18px 20px;border:1px solid #e2eaf4;border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,251,255,.95));display:grid;gap:12px}
+.it-home-hero h2{margin:0;font-size:1.5rem;color:#10233f}
+.it-home-hero p{margin:0;color:#556577;line-height:1.75}
+.it-home-actions,.it-home-tags{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.it-home-summary-grid,.it-home-example-grid,.it-inline-help{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.it-home-summary-card,.it-home-example-card,.it-inline-help-card{padding:14px;border:1px solid #e2eaf4;border-radius:18px;background:#fff;display:grid;gap:8px}
+.it-home-summary-card strong,.it-home-example-card strong,.it-inline-help-card strong{color:#10233f}
+.it-home-summary-card p,.it-home-example-card p,.it-inline-help-card p{margin:0;color:#556577;line-height:1.65}
+.it-home-details{display:grid;gap:12px}
+.it-home-details details{border:1px solid #e2eaf4;border-radius:18px;background:#fff;overflow:hidden}
+.it-home-details summary{cursor:pointer;list-style:none;padding:16px 18px;font-weight:900;color:#23436f;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.it-home-details summary::-webkit-details-marker{display:none}
+.it-home-details summary::before{content:"▾";color:#1d4ed8;font-size:1rem;transition:transform 180ms ease}
+.it-home-details details[open] summary::before{transform:rotate(180deg)}
+.it-home-detail-body{padding:0 18px 18px;display:grid;gap:12px}
+.it-home-dialogue{display:grid;gap:10px}
+.it-home-dialogue-line{display:grid;gap:4px;padding-inline-start:12px;border-inline-start:3px solid rgba(29,78,216,.18)}
+.it-home-dialogue-line span{font-size:.8rem;font-weight:900;color:#1d4ed8}
+.it-home-example-card.is-open{background:#f0fdf4;border-color:#bbf7d0}
+.it-home-video{padding:16px;border-radius:18px;border:1px dashed #bfd7ff;background:#f8fbff;text-align:center;color:#1e3a8a;font-weight:800;min-height:150px;display:grid;place-items:center}
+.it-inline-help[hidden]{display:none!important}
+[data-product-guidance="iceberg-templates"],[data-product-guidance-welcome="iceberg-templates"]{display:none!important}
 @media (max-width:1180px){.it-template-grid-refined{grid-template-columns:1fr 1fr}.it-main-layout{grid-template-columns:1fr}.it-support-summary{position:static}.it-branch-grid,.it-coach-grid,.it-source-foot,.it-onboarding-grid,.it-schema-compare{grid-template-columns:1fr}}
-@media (max-width:720px){.it-wrap-refined{padding:10px}.it-hero-panel{padding:12px}.it-textbox-prominent{padding:12px}.it-template-grid-refined{grid-template-columns:1fr}.it-start-strip,.it-onboarding-card{padding:14px}.it-onboarding-head h2{font-size:1.25rem}}
+@media (max-width:720px){.it-wrap-refined{padding:10px}.it-hero-panel{padding:12px}.it-textbox-prominent{padding:12px}.it-template-grid-refined{grid-template-columns:1fr}.it-start-strip,.it-onboarding-card{padding:14px}.it-onboarding-head h2{font-size:1.25rem}.it-home-summary-grid,.it-home-example-grid,.it-inline-help{grid-template-columns:1fr}.it-home-actions .it-btn{width:100%;justify-content:center}}
 /* Restrained first-pass workspace cleanup */
 .mtp-page,.mtp-nav{max-width:min(1520px,calc(100vw - 24px))}
 .trp-page{width:100%;max-width:none;padding:0 0 28px}
@@ -1864,6 +1887,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
   const [showFocusGuide, setShowFocusGuide] = useState(settings.showFocusGuide);
   const [showFocusSketch, setShowFocusSketch] = useState(settings.showFocusSketch);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [screen, setScreen] = useState<'home' | 'play'>('home');
   const [state, setState] = useState<TrainerState>(INITIAL_STATE);
 
   useEffect(() => {
@@ -1883,6 +1907,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
           setShowFocusGuide(savedSettings.showFocusGuide);
           setShowFocusSketch(savedSettings.showFocusSketch);
           setShowOnboarding(false);
+          setScreen('home');
           setState({ ...INITIAL_STATE, currentScenarioIndex: normalizeScenarioIndex(savedSettings.defaultScenarioIndex, json.scenarios.length) });
           setLoading(false);
         }
@@ -2185,6 +2210,13 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     setSelectorOpen(true);
   }
 
+  function returnToWelcome() {
+    setShowOnboarding(false);
+    setSettingsOpen(false);
+    setAdvancedOpen(false);
+    setScreen('home');
+  }
+
   function startIcebergSession(nextSettings?: IcebergSettings) {
     const resolved = normalizeIcebergSettings(nextSettings ?? settings, scenarioCount);
     const nextScenarioIndex = normalizeScenarioIndex(resolved.defaultScenarioIndex, scenarioCount);
@@ -2197,6 +2229,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     setShowFocusGuide(resolved.showFocusGuide);
     setShowFocusSketch(resolved.showFocusSketch);
     setShowOnboarding(false);
+    setScreen('play');
     setFocusStage('build');
     setSelectorOpen(false);
     setSelectedTemplateType(null);
@@ -2358,6 +2391,127 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
       body: <p>בסוף הסשן לא נשארים עם "נראה לי שזה זה", אלא עם עץ שמראה חלופות, שאלות המשך, וכיוון ברור יותר לשיחה אמיתית.</p>
     }
   ];
+
+  const homeContent = (
+    <div className="it-home-main">
+      <section className="it-panel it-home-hero" aria-label="דף פתיחה לקצה הקרחון">
+        <div className="it-kicker">קצה הקרחון · פתיחה לתרגול</div>
+        <h2>לומדים לראות מה מסתתר מתחת למילה אחת גדולה</h2>
+        <p>
+          הכלי הזה מלמד לעבוד עם מטאפורת הקרחון: מה נשמע גלוי במשפט, ומה בעצם מחזיק מתחתיו
+          עץ של קריטריונים, תנאים, סיבתיות או הנחות. לא קופצים מיד לפירוש אחד, אלא בודקים
+          איזה מבנה מחשבתי באמת נפתח.
+        </p>
+        <div className="it-home-tags">
+          <span className="it-chip">תרחישים: {scenarioCount}</span>
+          <span className="it-chip">משפט פתיחה: {liveScenario.scenario_id}</span>
+          <span className="it-chip">גישה: {launchModeLabel}</span>
+        </div>
+        <div className="it-home-actions">
+          <button type="button" className="it-btn primary" data-trainer-action="start-session" onClick={() => startIcebergSession(settings)}>
+            {trainerContract.startActionLabel}
+          </button>
+          <button type="button" className="it-btn secondary" onClick={() => setShowOnboarding(true)}>
+            יועץ NLP
+          </button>
+        </div>
+      </section>
+
+      <section className="it-home-summary-grid" aria-label="הסבר מהיר">
+        <article className="it-home-summary-card">
+          <span className="it-kicker">מה זה</span>
+          <strong>כלי שמארגן משפט לתוך מבנה חשיבה, לא רק מסמן מילה.</strong>
+          <p>בוחרים עוגן אחד מתוך המשפט ובודקים האם הוא יושב על עץ של הכללה, ענף סיבתי, או הנחה סמויה.</p>
+        </article>
+        <article className="it-home-summary-card">
+          <span className="it-kicker">מה לומדים</span>
+          <strong>להבדיל בין פירוש מהיר לבין מבנה שאפשר לבדוק.</strong>
+          <p>המשתמש לומד לשאול מה באמת שייך מתחת למילה, ואילו ענפים חלופיים עדיין חיים מול העיניים.</p>
+        </article>
+        <article className="it-home-summary-card">
+          <span className="it-kicker">למה זה חשוב</span>
+          <strong>כי מבנה מדויק פותח שיחה טיפולית מדויקת יותר.</strong>
+          <p>כשברור האם האדם מדבר בקריטריונים, בתנאים או בהנחות, קל יותר לבחור שאלת המשך והתערבות מתאימה.</p>
+        </article>
+      </section>
+
+      <section className="it-home-details" aria-label="העמקה לפני התרגול">
+        <details open>
+          <summary>דיאלוג טיפולי לדוגמה</summary>
+          <div className="it-home-detail-body">
+            <div className="it-home-dialogue">
+              <div className="it-home-dialogue-line">
+                <span>מטופלת</span>
+                <p>"אני צריכה מנוחה, אבל אני לא יודעת מה זה אומר בשבילי."</p>
+              </div>
+              <div className="it-home-dialogue-line">
+                <span>מטפל</span>
+                <p>"כשאת אומרת 'מנוחה', האם את מתארת תנאי שצריך להתקיים, קריטריון, או משהו שאסור שיקרה?"</p>
+              </div>
+              <div className="it-home-dialogue-line">
+                <span>מטופלת</span>
+                <p>"בעיקר תנאים. אני מרגישה שאני לא באמת נחה אם הראש שלי עדיין במיילים."</p>
+              </div>
+              <div className="it-home-dialogue-line">
+                <span>מטפל</span>
+                <p>"אז אולי כרגע 'מנוחה' יושבת על עץ של תנאים, ולא רק על תחושה כללית. זה כבר נותן כיוון ברור יותר לעבודה."</p>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details>
+          <summary>מאחורי התרגיל</summary>
+          <div className="it-home-detail-body">
+            <p>
+              הקרחון הוא מטאפורה למה שנשמע גלוי מעל פני השטח, ומה מחזיק את המשפט מתחת לפני המים.
+              עוגן אחד יכול להיראות פשוט, אבל לשבת בפועל על קריטריונים, תנאים, הסתעפות סיבתית או הנחות מוקדמות.
+            </p>
+            <p>
+              התרגיל לא מחפש "תשובה נכונה אחת", אלא מבנה שמארגן את החשיבה בצורה שימושית יותר ומראה אילו חלופות עדיין אפשריות.
+            </p>
+          </div>
+        </details>
+
+        <details>
+          <summary>דוגמה מלאה</summary>
+          <div className="it-home-detail-body">
+            <div className="it-home-example-grid">
+              <article className="it-home-example-card">
+                <strong>משפט פתיחה</strong>
+                <p>"אני צריכה מנוחה."</p>
+              </article>
+              <article className="it-home-example-card">
+                <strong>מה בודקים</strong>
+                <p>האם "מנוחה" היא מצב, תנאי, קריטריון, או הנחה לגבי מה מותר ומה אסור שיקרה?</p>
+              </article>
+              <article className="it-home-example-card is-open">
+                <strong>מה נפתח</strong>
+                <p>אם זו רשימת תנאים, אפשר לשאול אילו תנאים הכרחיים, מה גמיש, ואיפה נוצרת הקשחה מיותרת.</p>
+              </article>
+            </div>
+          </div>
+        </details>
+
+        <details>
+          <summary>היסטוריה / רקע</summary>
+          <div className="it-home-detail-body">
+            <p>
+              הכלי נשען על רוח ה-Meta Model: לא להסתפק בתוכן המילולי, אלא לבדוק את המבנה שמחזיק אותו.
+              במקום להניח שמשפט אחד כבר "ברור", מפרקים אותו למבני עומק שעוזרים להבין איך החשיבה מאורגנת.
+            </p>
+          </div>
+        </details>
+
+        <details>
+          <summary>וידאו / הדגמה</summary>
+          <div className="it-home-detail-body">
+            <div className="it-home-video">אזור וידאו / הדגמה עתידית</div>
+          </div>
+        </details>
+      </section>
+    </div>
+  );
   const settingsSectionMap: Record<string, TrainerSettingsSection> = {
     scenario: {
       id: 'scenario',
@@ -2877,10 +3031,30 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     </div>
   );
 
+  const playContent = (
+    <>
+      <section className="it-inline-help" data-trainer-help-content="1" hidden>
+        <article className="it-inline-help-card">
+          <strong>איך עובדים כאן</strong>
+          <p>קוראים את המשפט, בוחרים עוגן אחד, ואז פותחים מבנה אחד בכל פעם כדי לראות מה הוא חושף.</p>
+        </article>
+        <article className="it-inline-help-card">
+          <strong>מה לחפש בזמן העבודה</strong>
+          <p>לא "מה נכון", אלא איזה עץ מארגן כרגע את האמירה בצורה הכי בהירה, ואיזו חלופה עדיין אפשר לבדוק.</p>
+        </article>
+        <article className="it-inline-help-card">
+          <strong>מתי זה נחשב תרגול טוב</strong>
+          <p>כשמתבהר גם מהו המבנה הפעיל וגם איזו שאלת המשך טיפולית נולדת ממנו.</p>
+        </article>
+      </section>
+      {mainContent}
+    </>
+  );
+
   const supportContent = <></>;
 
   return (
-    <div className="it-wrap it-wrap-refined" dir="rtl" lang="he">
+    <div className="it-wrap it-wrap-refined" dir="rtl" lang="he" data-screen={screen}>
       <style>{`${TRAINER_PLATFORM_CSS}\n${ACTIVE_STEP_FLOW_CSS}\n${css}`}</style>
 
       {showOnboarding ? (
@@ -2916,9 +3090,12 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         title={trainerContract.title}
         subtitle={trainerContract.subtitle}
         headerKicker={trainerContract.familyLabel}
-        modePill={<span className="trp-mode-pill">{currentProcessMeta.label}</span>}
+        modePill={<span className="trp-mode-pill">{screen === 'home' ? 'דף פתיחה' : currentProcessMeta.label}</span>}
         headerActions={
           <>
+            {screen === 'play' ? (
+              <button type="button" className="trp-btn is-ghost" onClick={returnToWelcome}>חזרה לפתיחה</button>
+            ) : null}
             <button type="button" className="trp-btn is-secondary" data-trainer-action="open-settings" onClick={openSettings}>הגדרות</button>
             <button type="button" className="trp-btn is-ghost" onClick={() => setShowOnboarding(true)}>יועץ NLP</button>
           </>
@@ -2963,7 +3140,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
         helperSteps={helperSteps}
         supportRailMode={trainerContract.supportRailMode}
         mobilePriorityOrder={trainerContract.mobilePriorityOrder}
-        main={mainContent}
+        main={screen === 'home' ? homeContent : playContent}
         support={supportContent}
       />
 
