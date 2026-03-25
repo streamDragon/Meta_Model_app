@@ -5022,7 +5022,7 @@ body.screen-guide-open {
 }
 
 .question-drill-client-response-label::before {
-    content: '\01F4AC';
+    content: '\1F4AC';
     font-size: 0.95rem;
 }
 

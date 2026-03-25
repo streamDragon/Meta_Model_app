@@ -9623,6 +9623,8 @@ function resetQuestionDrillSessionState({ preservePrefs = true } = {}) {
     questionDrillState.feedbackTone = 'info';
     questionDrillState.trafficState = 'green';
     questionDrillState.feedbackModalOpen = false;
+    questionDrillState.clientResponseOpen = false;
+    questionDrillState.pendingClientResponseData = null;
     questionDrillState.pendingRoundOutcome = null;
     questionDrillState.testScore = 0;
     questionDrillState.testTimerMs = 0;
@@ -9663,6 +9665,7 @@ function updateQuestionDrillOptionButtonsState() {
     const locked = questionDrillState.sessionCompleted
         || questionDrillState.roundFinalized
         || questionDrillState.feedbackModalOpen
+        || questionDrillState.clientResponseOpen
         || !questionDrillState.current;
 
     Array.from(optionsRoot.querySelectorAll('.question-drill-option')).forEach((button) => {
@@ -9714,6 +9717,7 @@ function setQuestionDrillSelectedOption(optionId = '', { playSound = true } = {}
         || questionDrillState.roundFinalized
         || questionDrillState.sessionCompleted
         || questionDrillState.feedbackModalOpen
+        || questionDrillState.clientResponseOpen
     ) return;
     const selected = questionDrillState.options.find(option => option.id === optionId);
     if (!selected) return;
@@ -9757,7 +9761,8 @@ function updateQuestionDrillMobileCategoryButtonsState() {
     const disable = !questionDrillState.current
         || questionDrillState.roundFinalized
         || questionDrillState.sessionCompleted
-        || questionDrillState.feedbackModalOpen;
+        || questionDrillState.feedbackModalOpen
+        || questionDrillState.clientResponseOpen;
     const show = questionDrillState.mode !== 'test';
     if (container) {
         container.classList.toggle('question-drill-control-hidden', !show);
@@ -9839,7 +9844,9 @@ function beginQuestionDrillRound(question) {
     questionDrillState.currentRoundAward = null;
     questionDrillState.currentRoundReactionMs = 0;
     questionDrillState.pendingRoundOutcome = null;
+    questionDrillState.pendingClientResponseData = null;
     closeQuestionDrillFeedbackModal({ clearPending: true });
+    hideQuestionDrillClientResponse();
 
     syncQuestionDrillContext(question);
     if (elements.statement) elements.statement.textContent = question?.statement || '';
@@ -9989,7 +9996,7 @@ function updateQuestionDrillControlsState() {
     const hasQuestion = !!questionDrillState.current;
     const hasSelection = !!questionDrillState.selectedOptionId;
     const isTestMode = questionDrillState.mode === 'test';
-    const modalLocked = questionDrillState.feedbackModalOpen;
+    const modalLocked = questionDrillState.feedbackModalOpen || questionDrillState.clientResponseOpen;
     const canCheck = !isTestMode && hasQuestion && hasSelection && !sessionLocked && !questionDrillState.roundFinalized && !modalLocked;
 
     if (elements.checkBtn) {
@@ -10033,6 +10040,7 @@ function updateQuestionDrillControlsState() {
 function resetQuestionDrillToSetup({ preservePrefs = true } = {}) {
     resetQuestionDrillSessionState({ preservePrefs });
     closeQuestionDrillFeedbackModal({ clearPending: true });
+    hideQuestionDrillClientResponse();
     syncQuestionDrillContext(null);
     updateQuestionDrillStats();
     if (questionDrillState.elements.statement) questionDrillState.elements.statement.textContent = '';
@@ -10328,6 +10336,7 @@ async function loadNextQuestionDrill(options = {}) {
 function showQuestionDrillHint() {
     const coach = window.MetaRedesignCoach;
     if (questionDrillState.feedbackModalOpen) return;
+    if (questionDrillState.clientResponseOpen) return;
     if (questionDrillState.mode === 'test') {
         setQuestionDrillFeedback(
             coach && typeof coach.getQuestionHintLocked === 'function'
