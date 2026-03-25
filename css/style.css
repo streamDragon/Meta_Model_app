@@ -25402,6 +25402,10 @@ body.mobile-sticky-cta-visible {
     display: none !important;
 }
 
+body[data-active-tab="practice-radar"] #practice-radar {
+    scroll-margin-top: calc(var(--app-sticky-banner-offset) + 12px);
+}
+
 body[data-active-tab="practice-radar"] #mm-onboarding {
     display: none !important;
     pointer-events: none !important;

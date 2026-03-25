@@ -2481,6 +2481,15 @@
         gap: 12px;
     }
 
+    .scenario-home-setup-head,
+    .scenario-home-cta-row {
+        gap: 8px;
+    }
+
+    #scenario-start-run-btn {
+        min-height: 50px;
+    }
+
     .scenario-home-quick-note {
         font-size: 0.86rem;
     }
