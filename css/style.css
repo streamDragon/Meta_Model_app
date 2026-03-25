@@ -19586,6 +19586,28 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
         max-height: 360px;
         padding: 10px;
     }
+
+    body.living-triples-standalone .ltv3-practice-shell {
+        gap: 10px;
+    }
+
+    body.living-triples-standalone .ltv3-topbar,
+    body.living-triples-standalone .ltv3-pill-row {
+        gap: 6px;
+    }
+
+    body.living-triples-standalone .ltv3-pill {
+        padding: 4px 8px;
+        font-size: 0.78rem;
+    }
+
+    body.living-triples-standalone .ltv3-progress-shell {
+        padding: 7px 8px;
+    }
+
+    body.living-triples-standalone .ltv3-stage-card {
+        padding: 14px;
+    }
 }
 
 body.living-triples-standalone #trainerContent {
@@ -25384,6 +25406,10 @@ body[data-active-tab="practice-radar"] #mm-onboarding {
     display: none !important;
     pointer-events: none !important;
     opacity: 0 !important;
+}
+
+body[data-active-tab="practice-radar"] #meta-gamification-root {
+    display: none !important;
 }
 
 /* Compact practice-intro-card on mobile */
