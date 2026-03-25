@@ -19582,6 +19582,498 @@ body.force-mobile-view #triples-radar-root.triples-radar-card {
     }
 }
 
+body.living-triples-standalone #trainerContent {
+    padding: 18px 0 48px;
+}
+
+body.living-triples-standalone .container.ltv2-page,
+body.living-triples-standalone .practice-container,
+body.living-triples-standalone #living-triples,
+body.living-triples-standalone #ltv2-root {
+    width: 100%;
+    max-width: none;
+}
+
+body.living-triples-standalone .container.ltv2-page {
+    width: min(1500px, 92vw);
+    margin: 0 auto;
+    padding: 0;
+}
+
+body.living-triples-standalone .ltv3-shell,
+body.living-triples-standalone .ltv3-root,
+body.living-triples-standalone .ltv3-practice-shell {
+    gap: 14px;
+}
+
+body.living-triples-standalone .ltv3-desktop-header,
+body.living-triples-standalone .ltv3-sidebar {
+    display: none;
+}
+
+body.living-triples-standalone .ltv3-desktop-board {
+    display: grid;
+    gap: 14px;
+}
+
+body.living-triples-standalone .ltv3-desktop-main,
+body.living-triples-standalone .ltv3-sidebar {
+    min-width: 0;
+}
+
+body.living-triples-standalone .ltv3-side-card {
+    display: grid;
+    gap: 12px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.07);
+    padding: 18px;
+}
+
+body.living-triples-standalone .ltv3-side-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+body.living-triples-standalone .ltv3-side-card__head h3 {
+    margin: 0;
+    color: #16324f;
+    font-size: 1rem;
+}
+
+body.living-triples-standalone .ltv3-side-card__head span,
+body.living-triples-standalone .ltv3-side-kicker,
+body.living-triples-standalone .ltv3-side-line span,
+body.living-triples-standalone .ltv3-side-stat span {
+    color: #5f7890;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+}
+
+body.living-triples-standalone .ltv3-side-quote {
+    margin: 0;
+    color: #16324f;
+    line-height: 1.85;
+}
+
+body.living-triples-standalone .ltv3-side-copy {
+    margin: 0;
+    color: #49637d;
+    line-height: 1.7;
+}
+
+body.living-triples-standalone .ltv3-side-tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+body.living-triples-standalone .ltv3-side-tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ltv3-tag) 12%, white);
+    border: 1px solid color-mix(in srgb, var(--ltv3-tag) 55%, white);
+    color: #16324f;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+body.living-triples-standalone .ltv3-side-transcript {
+    display: grid;
+    gap: 8px;
+    max-height: 240px;
+    overflow: auto;
+    padding-inline-end: 4px;
+}
+
+body.living-triples-standalone .ltv3-side-line {
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(248, 251, 255, 0.98), rgba(255, 255, 255, 0.96));
+    border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+body.living-triples-standalone .ltv3-side-line p {
+    margin: 4px 0 0;
+    color: #243b53;
+    line-height: 1.7;
+}
+
+body.living-triples-standalone .ltv3-side-line.is-target {
+    border-color: rgba(127, 119, 221, 0.45);
+    box-shadow: 0 0 0 3px rgba(127, 119, 221, 0.1);
+}
+
+body.living-triples-standalone .ltv3-side-progress {
+    display: grid;
+    gap: 10px;
+}
+
+body.living-triples-standalone .ltv3-side-progress-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: start;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: #f8fbff;
+    border: 1px solid #d9e6f3;
+}
+
+body.living-triples-standalone .ltv3-side-progress-item strong {
+    display: block;
+    color: #16324f;
+}
+
+body.living-triples-standalone .ltv3-side-progress-item small {
+    color: #64748b;
+}
+
+body.living-triples-standalone .ltv3-side-progress-dot {
+    width: 12px;
+    height: 12px;
+    margin-top: 6px;
+    border-radius: 999px;
+    background: #cbd5e1;
+}
+
+body.living-triples-standalone .ltv3-side-progress-item.is-done .ltv3-side-progress-dot {
+    background: #0f766e;
+}
+
+body.living-triples-standalone .ltv3-side-progress-item.is-current {
+    border-color: rgba(15, 118, 110, 0.35);
+    background: linear-gradient(180deg, rgba(221, 246, 241, 0.85), rgba(255, 255, 255, 0.98));
+}
+
+body.living-triples-standalone .ltv3-side-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+body.living-triples-standalone .ltv3-side-stat {
+    display: grid;
+    gap: 4px;
+    padding: 14px 12px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #f8fbff, #ffffff);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+body.living-triples-standalone .ltv3-side-stat strong {
+    color: #16324f;
+    font-size: 1.12rem;
+}
+
+body.living-triples-standalone .ltv3-side-tools {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+body.living-triples-standalone .ltv3-side-tools .btn {
+    width: 100%;
+    justify-content: center;
+}
+
+@media (min-width: 1180px) {
+    body.living-triples-standalone .trainer-shell-nav,
+    body.living-triples-standalone .alchemy-mute,
+    body.living-triples-standalone .audio-floating-control,
+    body.living-triples-standalone .audio-master-mute-btn,
+    body.living-triples-standalone .music-toggle-btn,
+    body.living-triples-standalone #meta-gamification-root,
+    body.living-triples-standalone .alchemy-companion,
+    body.living-triples-standalone .alchemy-companion-toggle {
+        display: none !important;
+    }
+
+    body.living-triples-standalone .fw-overlay {
+        max-width: min(1240px, 92vw);
+        padding: 48px 42px 40px;
+        text-align: right;
+    }
+
+    body.living-triples-standalone .fw-title {
+        font-size: 2.35rem;
+    }
+
+    body.living-triples-standalone .fw-hook {
+        max-width: 68ch;
+        margin-inline: 0 auto;
+        font-size: 1.05rem;
+    }
+
+    body.living-triples-standalone .fw-cards {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        justify-content: stretch;
+    }
+
+    body.living-triples-standalone .fw-card {
+        max-width: none;
+        min-width: 0;
+        padding: 22px 24px;
+    }
+
+    body.living-triples-standalone .fw-example {
+        padding: 22px 24px;
+    }
+
+    body.living-triples-standalone .fw-cta {
+        margin-inline: auto 0;
+        min-height: 52px;
+        padding-inline: 30px;
+    }
+
+    body.living-triples-standalone .ltv3-topbar,
+    body.living-triples-standalone .ltv3-progress-shell {
+        display: none;
+    }
+
+    body.living-triples-standalone .ltv3-shell,
+    body.living-triples-standalone .ltv3-root,
+    body.living-triples-standalone .ltv3-practice-shell {
+        gap: 20px;
+    }
+
+    body.living-triples-standalone .ltv3-desktop-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 20px;
+        padding: 16px 22px;
+        min-height: 78px;
+        border-radius: 24px;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        background:
+            radial-gradient(circle at 92% 14%, rgba(20, 184, 166, 0.12), transparent 32%),
+            radial-gradient(circle at 14% 28%, rgba(59, 130, 246, 0.12), transparent 30%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 250, 255, 0.96));
+        box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
+    }
+
+    body.living-triples-standalone .ltv3-desktop-header__title-block {
+        display: grid;
+        gap: 4px;
+        min-width: 0;
+    }
+
+    body.living-triples-standalone .ltv3-desktop-header__eyebrow,
+    body.living-triples-standalone .ltv3-header-pill,
+    body.living-triples-standalone .ltv3-kicker,
+    body.living-triples-standalone .ltv3-target-kicker,
+    body.living-triples-standalone .ltv3-question-cat,
+    body.living-triples-standalone .ltv3-row-copy small,
+    body.living-triples-standalone .ltv3-bubble-sender,
+    body.living-triples-standalone .ltv3-target-tag {
+        font-size: 0.86rem;
+    }
+
+    body.living-triples-standalone .ltv3-desktop-header__eyebrow {
+        color: #0f766e;
+        font-weight: 900;
+        letter-spacing: 0.05em;
+    }
+
+    body.living-triples-standalone .ltv3-desktop-header__title {
+        color: #16324f;
+        font-size: 1.45rem;
+        line-height: 1.15;
+    }
+
+    body.living-triples-standalone .ltv3-desktop-header__desc {
+        margin: 0;
+        color: #516b84;
+        font-size: 0.92rem;
+        line-height: 1.55;
+    }
+
+    body.living-triples-standalone .ltv3-desktop-header__status,
+    body.living-triples-standalone .ltv3-desktop-header__actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    body.living-triples-standalone .ltv3-header-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 36px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #f4f8ff;
+        border: 1px solid #d8e4f2;
+        color: #31526f;
+        font-weight: 700;
+    }
+
+    body.living-triples-standalone .ltv3-desktop-header .btn,
+    body.living-triples-standalone .ltv3-side-tools .btn,
+    body.living-triples-standalone .ltv3-inline-actions .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        padding-inline: 18px;
+        border-radius: 999px;
+        font-size: 0.98rem;
+    }
+
+    body.living-triples-standalone .ltv3-desktop-board {
+        direction: ltr;
+        grid-template-columns: minmax(320px, 0.92fr) minmax(0, 1.78fr);
+        grid-template-areas: "sidebar main";
+        align-items: start;
+        gap: 24px;
+    }
+
+    body.living-triples-standalone .ltv3-sidebar {
+        display: grid;
+        grid-area: sidebar;
+        gap: 16px;
+        direction: rtl;
+        position: sticky;
+        top: 24px;
+    }
+
+    body.living-triples-standalone .ltv3-desktop-main {
+        grid-area: main;
+        direction: rtl;
+    }
+
+    body.living-triples-standalone .ltv3-stage-card {
+        display: grid;
+        gap: 20px;
+        padding: 30px 32px;
+        border-radius: 28px;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    body.living-triples-standalone .ltv3-stage-head {
+        gap: 8px;
+        margin-bottom: 0;
+    }
+
+    body.living-triples-standalone .ltv3-stage-head h3 {
+        font-size: 1.6rem;
+        line-height: 1.2;
+    }
+
+    body.living-triples-standalone .ltv3-stage-head p,
+    body.living-triples-standalone .ltv3-feedback,
+    body.living-triples-standalone .ltv3-empty-chat,
+    body.living-triples-standalone .ltv3-debrief-item p,
+    body.living-triples-standalone .ltv3-side-copy,
+    body.living-triples-standalone .ltv3-side-line p {
+        font-size: 1.05rem;
+        line-height: 1.8;
+    }
+
+    body.living-triples-standalone .ltv3-target-card {
+        padding: 20px 24px;
+        border-radius: 22px;
+        margin-bottom: 0;
+    }
+
+    body.living-triples-standalone .ltv3-target-card p,
+    body.living-triples-standalone .ltv3-side-quote {
+        font-size: 1.18rem;
+        line-height: 1.9;
+    }
+
+    body.living-triples-standalone .ltv3-chat {
+        min-height: 280px;
+        max-height: 520px;
+        padding: 18px 20px;
+        border-radius: 22px;
+    }
+
+    body.living-triples-standalone .ltv3-bubble {
+        max-width: 78%;
+        padding: 14px 16px;
+        border-radius: 16px;
+    }
+
+    body.living-triples-standalone .ltv3-bubble--therapist {
+        border-radius: 6px 18px 18px 18px;
+    }
+
+    body.living-triples-standalone .ltv3-bubble--client {
+        border-radius: 18px 6px 18px 18px;
+    }
+
+    body.living-triples-standalone .ltv3-bubble-text {
+        font-size: 1.08rem;
+        line-height: 1.8;
+    }
+
+    body.living-triples-standalone .ltv3-row-list,
+    body.living-triples-standalone .ltv3-question-list {
+        gap: 14px;
+    }
+
+    body.living-triples-standalone .ltv3-row-button {
+        gap: 14px;
+        padding: 16px 18px;
+        border-radius: 18px;
+    }
+
+    body.living-triples-standalone .ltv3-row-number,
+    body.living-triples-standalone .ltv3-map-row-index {
+        width: 42px;
+        height: 42px;
+        font-size: 1rem;
+    }
+
+    body.living-triples-standalone .ltv3-row-copy strong,
+    body.living-triples-standalone .ltv3-question-btn strong {
+        font-size: 1.08rem;
+        line-height: 1.75;
+    }
+
+    body.living-triples-standalone .ltv3-question-btn {
+        gap: 8px;
+        padding: 18px 20px;
+        border-radius: 18px;
+    }
+
+    body.living-triples-standalone .ltv3-question-btn small,
+    body.living-triples-standalone .ltv3-row-copy small {
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    body.living-triples-standalone .ltv3-triple-grid {
+        gap: 12px;
+        margin-bottom: 0;
+    }
+
+    body.living-triples-standalone .ltv3-triple-cell {
+        gap: 6px;
+        padding: 16px 14px;
+        border-radius: 18px;
+        font-size: 0.94rem;
+    }
+
+    body.living-triples-standalone .ltv3-inline-actions {
+        gap: 12px;
+        justify-content: flex-start;
+    }
+}
+
 .home-route {
     display: none;
     gap: 14px;
