@@ -2401,6 +2401,7 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
           הכלי הזה מלמד לעבוד עם מטאפורת הקרחון: מה נשמע גלוי במשפט, ומה בעצם מחזיק מתחתיו
           עץ של קריטריונים, תנאים, סיבתיות או הנחות. לא קופצים מיד לפירוש אחד, אלא בודקים
           איזה מבנה מחשבתי באמת נפתח.
+          המטרה היא לא "לנצח" את המשפט, אלא לבחור מבנה שעוזר לראות יותר ממה שהיה גלוי בהתחלה.
         </p>
         <div className="it-home-tags">
           <span className="it-chip">תרחישים: {scenarioCount}</span>
