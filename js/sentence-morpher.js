@@ -96,8 +96,8 @@
             this.container.innerHTML = `
                 <div class="sentence-morpher-card">
                     <div class="sentence-morpher-title-row">
-                        <h3>משפט גדול</h3>
-                        <p>לחץ/י על צ׳יפים כדי לחשוף את הכמתים הנסתרים בתוך המשפט.</p>
+                        <h3>משפט לעבודה</h3>
+                        <p>בחר/י ציר אחד בכל פעם כדי לראות איך הניסוח משתנה, ואיזה סוג של הכללה או כיווץ נכנסים לתוך אותו משפט.</p>
                     </div>
 
                     <div class="sentence-morpher-sentence-wrap">
@@ -106,8 +106,8 @@
                     </div>
 
                     <div class="sentence-morpher-toolbar">
-                        <button type="button" class="btn btn-secondary sentence-mini-btn" data-action="undo">חזרה צעד</button>
-                        <button type="button" class="btn btn-secondary sentence-mini-btn" data-action="reset">איפוס</button>
+                        <button type="button" class="btn btn-secondary sentence-mini-btn" data-action="undo">חזור/י צעד</button>
+                        <button type="button" class="btn btn-secondary sentence-mini-btn" data-action="reset">אפס/י</button>
                         <span class="sentence-morpher-progress" id="sentence-morpher-progress">0/0</span>
                     </div>
 
@@ -318,7 +318,7 @@
         rootEl.dataset.sentenceMorpherBound = 'true';
 
         if (!root.sentenceMorpherCore) {
-            rootEl.innerHTML = '<p class="sentence-morpher-error">שגיאה: מנוע SentenceMorpher לא נטען.</p>';
+            rootEl.innerHTML = '<p class="sentence-morpher-error">שגיאה: מנוע Sentence Morpher לא נטען.</p>';
             return;
         }
 
@@ -342,7 +342,7 @@
                 ctaBtn.dataset.bound = 'true';
                 ctaBtn.addEventListener('click', () => {
                     const state = morpher.getState();
-                    setDemoFeedback(`יפה. הניסוח עכשיו: "${state.currentComposedSentence}"`, 'success');
+                    setDemoFeedback(`זה הניסוח שבחרת כרגע: "${state.currentComposedSentence}"`, 'success');
                     if (typeof root.playUISound === 'function') root.playUISound('success');
                 });
             }
