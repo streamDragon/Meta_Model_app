@@ -19850,9 +19850,9 @@ body.living-triples-standalone .ltv3-side-tools .btn {
         display: grid;
         grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) auto;
         align-items: center;
-        gap: 20px;
-        padding: 16px 22px;
-        min-height: 78px;
+        gap: 16px;
+        padding: 12px 18px;
+        min-height: 72px;
         border-radius: 24px;
         border: 1px solid rgba(15, 23, 42, 0.08);
         background:
@@ -19864,7 +19864,7 @@ body.living-triples-standalone .ltv3-side-tools .btn {
 
     body.living-triples-standalone .ltv3-desktop-header__title-block {
         display: grid;
-        gap: 4px;
+        gap: 2px;
         min-width: 0;
     }
 
@@ -19887,15 +19887,15 @@ body.living-triples-standalone .ltv3-side-tools .btn {
 
     body.living-triples-standalone .ltv3-desktop-header__title {
         color: #16324f;
-        font-size: 1.45rem;
+        font-size: 1.36rem;
         line-height: 1.15;
     }
 
     body.living-triples-standalone .ltv3-desktop-header__desc {
         margin: 0;
         color: #516b84;
-        font-size: 0.92rem;
-        line-height: 1.55;
+        font-size: 0.86rem;
+        line-height: 1.45;
     }
 
     body.living-triples-standalone .ltv3-desktop-header__status,
@@ -19911,8 +19911,8 @@ body.living-triples-standalone .ltv3-side-tools .btn {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        min-height: 36px;
-        padding: 6px 12px;
+        min-height: 32px;
+        padding: 5px 10px;
         border-radius: 999px;
         background: #f4f8ff;
         border: 1px solid #d8e4f2;
@@ -19926,10 +19926,10 @@ body.living-triples-standalone .ltv3-side-tools .btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-height: 46px;
-        padding-inline: 18px;
+        min-height: 42px;
+        padding-inline: 16px;
         border-radius: 999px;
-        font-size: 0.98rem;
+        font-size: 0.94rem;
     }
 
     body.living-triples-standalone .ltv3-desktop-board {
