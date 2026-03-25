@@ -2467,7 +2467,198 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
     ...Object.values(settingsSectionMap).filter((section) => !orderedSettingsIds.includes(section.id))
   ];
 
-  const mainContent = (
+  const compactFlowStepId: 'read' | 'choose' | 'reveal' = revealReady ? 'reveal' : selectedToken ? 'choose' : 'read';
+  const selectedTemplateLabel = selectedTemplateType ? formatTemplateLabel(selectedTemplateType) : 'טרם נבחר היגיון';
+  const currentFeedbackNode = state.feedback ? <div className={`it-feedback ${state.feedback.tone}`}>{state.feedback.text}</div> : null;
+
+  const selectorPanel = selectorOpen ? (
+    <section className="it-panel it-guided-stage it-selector-panel" aria-label="בחירת עץ לוגי">
+      <div className="it-guided-stage-head">
+        <div>
+          <div className="it-kicker">שלב 2</div>
+          <h2 className="it-title" style={{ fontSize: '1.06rem', marginTop: 4 }}>בוחרים היגיון חזותי אחד</h2>
+          <p className="it-sub">לא רואים ספריית עצים שלמה. מתקדמים היגיון אחד בכל פעם עד שמרגיש שזה המבנה הנכון.</p>
+        </div>
+        <span className="it-panel-badge">עץ {selectorIndex + 1} מתוך {TEMPLATE_TYPES.length}</span>
+      </div>
+
+      <div
+        className="it-selector-shell"
+        onTouchStart={(event) => setSelectorTouchStartX(event.changedTouches[0]?.clientX ?? null)}
+        onTouchEnd={(event) => {
+          if (selectorTouchStartX === null) return;
+          const delta = (event.changedTouches[0]?.clientX ?? selectorTouchStartX) - selectorTouchStartX;
+          if (Math.abs(delta) > 40) moveSelector(delta > 0 ? -1 : 1);
+          setSelectorTouchStartX(null);
+        }}
+      >
+        <div className="it-selector-nav" aria-label="ניווט בין עצים">
+          <button type="button" className="it-selector-arrow" onClick={() => moveSelector(-1)} aria-label="העץ הקודם">
+            {'<'}
+          </button>
+          <div className="it-selector-count">היגיון {selectorIndex + 1} / {TEMPLATE_TYPES.length}</div>
+          <button type="button" className="it-selector-arrow" onClick={() => moveSelector(1)} aria-label="העץ הבא">
+            {'>'}
+          </button>
+        </div>
+
+        <div className={`it-selector-card${selectedTemplateType === selectorTemplateType ? ' is-chosen' : ''}`}>
+          <div className="it-selector-sketch">
+            <TemplateSketch meta={selectorMeta} tokenText={selectedToken?.text} causeMode={selectorCauseMode} active={selectedTemplateType === selectorTemplateType} />
+          </div>
+          <h3 className="it-selector-title">{selectorMeta.titleHe}</h3>
+          <p className="it-selector-note">{selectorMeta.shortHelp}</p>
+          {selectedToken && !selectorAllowsToken ? (
+            <div className="it-selector-warning">העוגן "{selectedToken.text}" לא משויך כרגע להיגיון הזה בתרחיש הזה. אפשר לעבור לעץ הבא או לבחור עוגן אחר.</div>
+          ) : null}
+          <div className="it-actions">
+            <button
+              type="button"
+              className="it-btn primary it-selector-select-btn"
+              onClick={() => chooseTemplate(selectorTemplateType)}
+              disabled={!selectedToken || !selectorAllowsToken}
+            >
+              בחר את ההיגיון הזה
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : null;
+
+  const workspacePanel = workspaceMeta ? (
+    <section className="it-panel it-guided-stage it-guided-workspace-panel" aria-label="אזור העבודה עם העץ שנבחר">
+      <div className="it-guided-stage-head">
+        <div>
+          <div className="it-kicker">שלב 3</div>
+          <h2 className="it-title" style={{ fontSize: '1.08rem', marginTop: 4 }}>{workspaceMeta.titleHe}</h2>
+          <p className="it-sub">גרור את המושג שאתה רוצה לתוך המקום הרצוי בעץ וגלה איזו אינפורמציה נוספת מופיעה כשחושבים כך.</p>
+        </div>
+        <span className="it-panel-badge">{workspaceMeta.code}</span>
+      </div>
+
+      {showFocusGuide ? (
+        <div className="it-guided-focus-note">כאן אנחנו לא מחפשים תשובה אחת "נכונה", אלא בודקים איזה מבנה מחשבתי גורם למשפט להיראות אחרת.</div>
+      ) : null}
+
+      {showFocusSketch ? (
+        <div className="it-guided-focus-sketch">
+          <TemplateSketch meta={workspaceMeta} tokenText={selectedToken?.text} causeMode={workspacePreviewCauseMode} active />
+        </div>
+      ) : null}
+
+      <div className="it-workspace-anchors" aria-label="עוגנים לגרירה">
+        {scenario.draggables.map((candidate) => {
+          const isSelected = state.selectedTokenId === candidate.id;
+          const isActive = state.active?.tokenId === candidate.id;
+          return (
+            <button
+              key={`workspace-${candidate.id}`}
+              type="button"
+              draggable
+              className={['it-token', 'it-guided-anchor', isSelected ? 'sel' : '', isActive ? 'active' : ''].filter(Boolean).join(' ')}
+              onDragStart={(e) => onDragStart(e, candidate.id)}
+              onDragEnd={onDragEnd}
+              onClick={() => onTokenTap(candidate.id)}
+              aria-pressed={isSelected}
+            >
+              {candidate.text}
+            </button>
+          );
+        })}
+      </div>
+
+      {!activeMatchesWorkspace || !state.active || !activeToken ? (
+        <div className="it-guided-tree-drop" data-template={workspaceTemplateType}>
+          <button
+            type="button"
+            className="it-guided-drop-node is-root"
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => handleWorkspaceTreeDrop(event, workspaceTemplateType)}
+            onClick={() => handleWorkspaceTreeClick(workspaceTemplateType)}
+          >
+            <strong>{selectedToken ? selectedToken.text : 'גרור/י עוגן לכאן'}</strong>
+            <span>{selectedToken ? 'אפשר לשחרר את העוגן במרכז העץ או באחד הענפים.' : 'בחר/י עוגן אחד ואז שחרר/י אותו כאן.'}</span>
+          </button>
+
+          <div className={`it-guided-drop-branches cols-${workspaceSlotLabels.length || 1}`}>
+            {workspaceSlotLabels.map((label) => (
+              <button
+                key={`${workspaceTemplateType}-${label}`}
+                type="button"
+                className="it-guided-drop-node"
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => handleWorkspaceTreeDrop(event, workspaceTemplateType)}
+                onClick={() => handleWorkspaceTreeClick(workspaceTemplateType)}
+              >
+                <strong>{label}</strong>
+                <span>{selectedToken ? `שחרר/י כאן את "${selectedToken.text}"` : 'בחר/י עוגן כדי להתקדם'}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="it-guided-result-stack">
+          <section className="it-reveal-visual it-guided-reveal-visual" aria-label="העץ שנפתח">
+            <div className="it-reveal-visual-head">
+              <div>
+                <h4>כך ההיגיון שנבחר מסדר כרגע את המשפט</h4>
+                <p>המערכת ממלאת את ההסתעפות לפי המבנה שבחרת, כדי שאפשר יהיה לראות מה הופך גלוי.</p>
+              </div>
+              <span className="it-mini-tag code">{workspaceMeta.code}</span>
+            </div>
+            <RevealTemplateFigure
+              templateType={state.active.templateType}
+              tokenText={activeToken.text}
+              slots={activeSet}
+              causeMode={'mode' in activePayload ? activePayload.mode ?? null : null}
+            />
+          </section>
+
+          <div className="it-guide-bubble">שים לב — מה אנו יכולים ללמוד כעת מצורת החשיבה הזאת?</div>
+
+          <div className="it-guided-insight-grid">
+            <article className="it-guided-insight-card">
+              <strong>מה נהיה ברור יותר</strong>
+              <p>{activeReflection}</p>
+            </article>
+
+            <article className="it-guided-insight-card is-secondary">
+              <strong>מה ההיגיון הזה בודק</strong>
+              <p>{activeDirectionLabel || workspaceMeta.shortHelp}</p>
+            </article>
+
+            <article className="it-guided-insight-card is-secondary">
+              <strong>שאלת המשך אפשרית</strong>
+              <p>{activePayload?.question || 'איך היית בודק/ת את הייצוג הזה מול מה שנאמר בפועל?'}</p>
+            </article>
+          </div>
+
+          <div className="it-next-actions">
+            <button type="button" className="it-btn secondary" onClick={clearActive}>נסה עוגן אחר</button>
+            <button type="button" className="it-btn ghost" onClick={chooseAnotherTree}>בחר עץ אחר</button>
+            <button type="button" className="it-btn primary" onClick={nextScenario}>לתרגיל הבא</button>
+          </div>
+
+          <details className="it-guided-details">
+            <summary>העמקה נוספת לפי בקשה</summary>
+            <div className="it-guided-details-body">
+              <BranchExplorer templateType={state.active.templateType} tokenText={activeToken.text} payload={activePayload} activeSet={activeSet} />
+              <SentenceBoard
+                scenario={scenario}
+                selectedToken={selectedToken}
+                activeTemplateType={state.active.templateType}
+                activeQuestion={activePayload?.question ?? ''}
+                activeReflection={activeReflection}
+              />
+            </div>
+          </details>
+        </div>
+      )}
+    </section>
+  ) : null;
+
+  const readStepExpanded = (
     <>
       <section className="it-panel it-guided-stage" aria-label="הקשר ומשפט העבודה">
         <div className="it-guided-stage-head">
@@ -2513,216 +2704,183 @@ export default function IcebergTemplatesTrainer(): React.ReactElement {
           <span>{selectedTokenLabel || 'עדיין לא נבחר עוגן'}</span>
           <small>{selectedTokenLabel ? `מבנים אפשריים: ${selectedTokenTemplateLabels}` : 'בחר/י מילה או ביטוי אחד כדי לפתוח את ההמשך.'}</small>
         </div>
-      </section>
 
-      <section className="it-guided-cta-stage" aria-label="מעבר לבחירת היגיון חזותי">
-        <button type="button" className="it-guided-cta" onClick={openTreeSelector} disabled={!selectedToken}>
-          היגיון ויזואלי לפעולה!
-        </button>
-        <p className="it-guided-cta-note">
-          {selectedToken
-            ? `נבחר העוגן "${selectedToken.text}". עכשיו עוברים לעץ אחד בכל פעם.`
-            : 'בחר/י קודם עוגן אחד מתוך המשפט כדי לפתוח את בוחר ההיגיונות.'}
-        </p>
+        <section className="it-guided-cta-stage" aria-label="מעבר לבחירת היגיון חזותי">
+          <button type="button" className="it-guided-cta" onClick={openTreeSelector} disabled={!selectedToken}>
+            היגיון ויזואלי לפעולה!
+          </button>
+          <p className="it-guided-cta-note">
+            {selectedToken
+              ? `נבחר העוגן "${selectedToken.text}". עכשיו עוברים לעץ אחד בכל פעם.`
+              : 'בחר/י קודם עוגן אחד מתוך המשפט כדי לפתוח את בוחר ההיגיונות.'}
+          </p>
+        </section>
       </section>
+      {compactFlowStepId === 'read' ? currentFeedbackNode : null}
+    </>
+  );
 
-      {selectorOpen ? (
-        <section className="it-panel it-guided-stage it-selector-panel" aria-label="בחירת עץ לוגי">
+  const chooseStepExpanded = (
+    <>
+      {!selectorOpen && !selectedTemplateType ? (
+        <section className="it-panel it-guided-stage" aria-label="בחירת היגיון חזותי">
           <div className="it-guided-stage-head">
             <div>
               <div className="it-kicker">שלב 2</div>
               <h2 className="it-title" style={{ fontSize: '1.06rem', marginTop: 4 }}>בוחרים היגיון חזותי אחד</h2>
-              <p className="it-sub">לא רואים ספריית עצים שלמה. מתקדמים היגיון אחד בכל פעם עד שמרגיש שזה המבנה הנכון.</p>
+              <p className="it-sub">אחרי שבוחרים עוגן, פותחים עץ אחד בכל פעם ובודקים איזה מבנה מסדר אותו בצורה הכי בהירה.</p>
             </div>
-            <span className="it-panel-badge">עץ {selectorIndex + 1} מתוך {TEMPLATE_TYPES.length}</span>
+            <span className="it-panel-badge">בחירת עץ</span>
           </div>
-
-          <div
-            className="it-selector-shell"
-            onTouchStart={(event) => setSelectorTouchStartX(event.changedTouches[0]?.clientX ?? null)}
-            onTouchEnd={(event) => {
-              if (selectorTouchStartX === null) return;
-              const delta = (event.changedTouches[0]?.clientX ?? selectorTouchStartX) - selectorTouchStartX;
-              if (Math.abs(delta) > 40) moveSelector(delta > 0 ? -1 : 1);
-              setSelectorTouchStartX(null);
-            }}
-          >
-            <div className="it-selector-nav" aria-label="ניווט בין עצים">
-              <button type="button" className="it-selector-arrow" onClick={() => moveSelector(-1)} aria-label="העץ הקודם">
-                {'<'}
+          <div className="it-step-compact">
+            <p>{selectedToken ? `העוגן "${selectedToken.text}" מוכן לעבודה. עכשיו אפשר לפתוח את בוחר העצים ולעבור על המבנים בקצב רגוע.` : 'בחר/י קודם עוגן אחד מתוך המשפט.'}</p>
+            <section className="it-guided-cta-stage" aria-label="פתיחת בוחר העצים">
+              <button type="button" className="it-guided-cta" onClick={openTreeSelector} disabled={!selectedToken}>
+                פתח/י את בוחר העצים
               </button>
-              <div className="it-selector-count">היגיון {selectorIndex + 1} / {TEMPLATE_TYPES.length}</div>
-              <button type="button" className="it-selector-arrow" onClick={() => moveSelector(1)} aria-label="העץ הבא">
-                {'>'}
-              </button>
-            </div>
-
-            <div className={`it-selector-card${selectedTemplateType === selectorTemplateType ? ' is-chosen' : ''}`}>
-              <div className="it-selector-sketch">
-                <TemplateSketch meta={selectorMeta} tokenText={selectedToken?.text} causeMode={selectorCauseMode} active={selectedTemplateType === selectorTemplateType} />
-              </div>
-              <h3 className="it-selector-title">{selectorMeta.titleHe}</h3>
-              <p className="it-selector-note">{selectorMeta.shortHelp}</p>
-              {selectedToken && !selectorAllowsToken ? (
-                <div className="it-selector-warning">העוגן "{selectedToken.text}" לא משויך כרגע להיגיון הזה בתרחיש הזה. אפשר לעבור לעץ הבא או לבחור עוגן אחר.</div>
-              ) : null}
-              <div className="it-actions">
-                <button
-                  type="button"
-                  className="it-btn primary it-selector-select-btn"
-                  onClick={() => chooseTemplate(selectorTemplateType)}
-                  disabled={!selectedToken || !selectorAllowsToken}
-                >
-                  בחר את ההיגיון הזה
-                </button>
-              </div>
-            </div>
+              <p className="it-guided-cta-note">הבחירה כאן לא מוחלטת. אפשר לפתוח, לבדוק, ולחזור לעץ אחר בלי לאבד את ההקשר.</p>
+            </section>
           </div>
         </section>
       ) : null}
 
-      {workspaceMeta ? (
-        <section className="it-panel it-guided-stage it-guided-workspace-panel" aria-label="אזור העבודה עם העץ שנבחר">
+      {selectorPanel}
+
+      {selectedTemplateType && !selectorOpen ? (
+        <section className="it-panel it-guided-stage" aria-label="העץ שנבחר">
           <div className="it-guided-stage-head">
             <div>
-              <div className="it-kicker">שלב 3</div>
-              <h2 className="it-title" style={{ fontSize: '1.08rem', marginTop: 4 }}>{workspaceMeta.titleHe}</h2>
-              <p className="it-sub">גרור את המושג שאתה רוצה לתוך המקום הרצוי בעץ וגלה איזו אינפורמציה נוספת מופיעה כשחושבים כך.</p>
+              <div className="it-kicker">שלב 2</div>
+              <h2 className="it-title" style={{ fontSize: '1.06rem', marginTop: 4 }}>המבנה נבחר, עכשיו משבצים את העוגן</h2>
+              <p className="it-sub">ההיגיון כבר נבחר. נשאר למקם את העוגן בתוך העץ ולראות מה נפתח ממנו.</p>
             </div>
-            <span className="it-panel-badge">{workspaceMeta.code}</span>
+            <span className="it-panel-badge">{workspaceMeta?.code || 'TREE'}</span>
           </div>
-
-          {showFocusGuide ? (
-            <div className="it-guided-focus-note">כאן אנחנו לא מחפשים תשובה אחת "נכונה", אלא בודקים איזה מבנה מחשבתי גורם למשפט להיראות אחרת.</div>
-          ) : null}
-
-          {showFocusSketch ? (
-            <div className="it-guided-focus-sketch">
-              <TemplateSketch meta={workspaceMeta} tokenText={selectedToken?.text} causeMode={workspacePreviewCauseMode} active />
+          <div className="it-step-compact">
+            <div className="it-step-preview-row">
+              <strong>העץ שנבחר</strong>
+              <span>{selectedTemplateLabel}</span>
             </div>
-          ) : null}
-
-          <div className="it-workspace-anchors" aria-label="עוגנים לגרירה">
-            {scenario.draggables.map((candidate) => {
-              const isSelected = state.selectedTokenId === candidate.id;
-              const isActive = state.active?.tokenId === candidate.id;
-              return (
-                <button
-                  key={`workspace-${candidate.id}`}
-                  type="button"
-                  draggable
-                  className={['it-token', 'it-guided-anchor', isSelected ? 'sel' : '', isActive ? 'active' : ''].filter(Boolean).join(' ')}
-                  onDragStart={(e) => onDragStart(e, candidate.id)}
-                  onDragEnd={onDragEnd}
-                  onClick={() => onTokenTap(candidate.id)}
-                  aria-pressed={isSelected}
-                >
-                  {candidate.text}
-                </button>
-              );
-            })}
+            <p>{workspaceMeta?.shortHelp || 'ממשיכים ישירות לשיבוץ העוגן בתוך המבנה שנבחר.'}</p>
+            <div className="it-actions">
+              <button type="button" className="it-btn ghost" onClick={() => setSelectorOpen(true)}>פתח שוב את בוחר העצים</button>
+            </div>
           </div>
-
-          {!activeMatchesWorkspace || !state.active || !activeToken ? (
-            <div className="it-guided-tree-drop" data-template={workspaceTemplateType}>
-              <button
-                type="button"
-                className="it-guided-drop-node is-root"
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={(event) => handleWorkspaceTreeDrop(event, workspaceTemplateType)}
-                onClick={() => handleWorkspaceTreeClick(workspaceTemplateType)}
-              >
-                <strong>{selectedToken ? selectedToken.text : 'גרור/י עוגן לכאן'}</strong>
-                <span>{selectedToken ? 'אפשר לשחרר את העוגן במרכז העץ או באחד הענפים.' : 'בחר/י עוגן אחד ואז שחרר/י אותו כאן.'}</span>
-              </button>
-
-              <div className={`it-guided-drop-branches cols-${workspaceSlotLabels.length || 1}`}>
-                {workspaceSlotLabels.map((label) => (
-                  <button
-                    key={`${workspaceTemplateType}-${label}`}
-                    type="button"
-                    className="it-guided-drop-node"
-                    onDragOver={(event) => event.preventDefault()}
-                    onDrop={(event) => handleWorkspaceTreeDrop(event, workspaceTemplateType)}
-                    onClick={() => handleWorkspaceTreeClick(workspaceTemplateType)}
-                  >
-                    <strong>{label}</strong>
-                    <span>{selectedToken ? `שחרר/י כאן את "${selectedToken.text}"` : 'בחר/י עוגן כדי להתקדם'}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="it-guided-result-stack">
-              <section className="it-reveal-visual it-guided-reveal-visual" aria-label="העץ שנפתח">
-                <div className="it-reveal-visual-head">
-                  <div>
-                    <h4>כך ההיגיון שנבחר מסדר כרגע את המשפט</h4>
-                    <p>המערכת ממלאת את ההסתעפות לפי המבנה שבחרת, כדי שאפשר יהיה לראות מה הופך גלוי.</p>
-                  </div>
-                  <span className="it-mini-tag code">{workspaceMeta.code}</span>
-                </div>
-                <RevealTemplateFigure
-                  templateType={state.active.templateType}
-                  tokenText={activeToken.text}
-                  slots={activeSet}
-                  causeMode={'mode' in activePayload ? activePayload.mode ?? null : null}
-                />
-              </section>
-
-              <div className="it-guide-bubble">שים לב — מה אנו יכולים ללמוד כעת מצורת החשיבה הזאת?</div>
-
-              <div className="it-guided-insight-grid">
-                <article className="it-guided-insight-card">
-                  <strong>מה נהיה ברור יותר</strong>
-                  <p>{activeReflection}</p>
-                </article>
-
-                <article className="it-guided-insight-card is-secondary">
-                  <strong>מה ההיגיון הזה בודק</strong>
-                  <p>{activeDirectionLabel || workspaceMeta.shortHelp}</p>
-                </article>
-
-                <article className="it-guided-insight-card is-secondary">
-                  <strong>שאלת המשך אפשרית</strong>
-                  <p>{activePayload?.question || 'איך היית בודק/ת את הייצוג הזה מול מה שנאמר בפועל?'}</p>
-                </article>
-              </div>
-
-              <div className="it-next-actions">
-                <button type="button" className="it-btn secondary" onClick={clearActive}>נסה עוגן אחר</button>
-                <button type="button" className="it-btn ghost" onClick={chooseAnotherTree}>בחר עץ אחר</button>
-                <button type="button" className="it-btn primary" onClick={nextScenario}>לתרגיל הבא</button>
-              </div>
-
-              <details className="it-guided-details">
-                <summary>העמקה נוספת לפי בקשה</summary>
-                <div className="it-guided-details-body">
-                  <BranchExplorer templateType={state.active.templateType} tokenText={activeToken.text} payload={activePayload} activeSet={activeSet} />
-                  <SentenceBoard
-                    scenario={scenario}
-                    selectedToken={selectedToken}
-                    activeTemplateType={state.active.templateType}
-                    activeQuestion={activePayload?.question ?? ''}
-                    activeReflection={activeReflection}
-                  />
-                </div>
-              </details>
-            </div>
-          )}
         </section>
       ) : null}
 
-      {state.feedback ? <div className={`it-feedback ${state.feedback.tone}`}>{state.feedback.text}</div> : null}
-      {state.lastCompletedRecap ? <div className="it-recap">{state.lastCompletedRecap}</div> : null}
+      {workspaceMeta ? workspacePanel : null}
+      {compactFlowStepId === 'choose' ? currentFeedbackNode : null}
     </>
+  );
+
+  const revealStepExpanded = (
+    <>
+      {workspacePanel || (
+        <section className="it-panel it-guided-stage" aria-label="תובנה פעילה">
+          <div className="it-step-compact">
+            <p>כדי להגיע לתובנה פעילה צריך קודם לבחור עוגן, לבחור עץ, ואז לשבץ את העוגן במבנה.</p>
+          </div>
+        </section>
+      )}
+      {compactFlowStepId === 'reveal' ? currentFeedbackNode : null}
+    </>
+  );
+
+  const flowSteps: ActiveStepFlowStep[] = [
+    {
+      id: 'read',
+      title: 'קוראים את המשפט ובוחרים עוגן',
+      shortLabel: 'עוגן',
+      summary: selectedTokenLabel ? `נבחר העוגן "${selectedTokenLabel}".` : 'עדיין לא נבחר עוגן.',
+      feedbackSnippet: selectedTokenTemplateLabels ? `מבנים אפשריים: ${selectedTokenTemplateLabels}` : undefined,
+      status: compactFlowStepId === 'read' ? 'active' : selectedToken ? 'completed' : 'upcoming',
+      expandedContent: readStepExpanded,
+      collapsedContent: (
+        <div className="it-step-preview">
+          <div className="it-step-preview-row">
+            <strong>משפט העבודה</strong>
+            <span>{cleanSnippet(scenario.client_text, 140)}</span>
+          </div>
+          <div className="it-step-preview-row">
+            <strong>עוגן שנבחר</strong>
+            <span>{selectedTokenLabel || 'טרם נבחר'}</span>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'choose',
+      title: 'בוחרים עץ ומשבצים את העוגן',
+      shortLabel: 'עץ',
+      summary: revealReady ? `נבחר ${selectedTemplateLabel} עבור "${selectedTokenLabel || 'העוגן שנבחר'}".` : 'העץ עוד לא נסגר.',
+      feedbackSnippet: workspaceMeta?.shortHelp || (selectedTokenLabel ? `עוגן פעיל: ${selectedTokenLabel}` : undefined),
+      status: compactFlowStepId === 'choose' ? 'active' : revealReady ? 'completed' : 'upcoming',
+      expandedContent: chooseStepExpanded,
+      collapsedContent: (
+        <div className="it-step-preview">
+          <div className="it-step-preview-row">
+            <strong>מבנה שנבחר</strong>
+            <span>{selectedTemplateLabel}</span>
+          </div>
+          <div className="it-step-preview-row">
+            <strong>עוגן</strong>
+            <span>{selectedTokenLabel || 'טרם נבחר'}</span>
+          </div>
+          {selectedToken && workspaceMeta ? (
+            <div className="it-step-preview-sketch">
+              <TemplateSketch meta={workspaceMeta} tokenText={selectedToken.text} causeMode={workspacePreviewCauseMode} active />
+            </div>
+          ) : null}
+        </div>
+      )
+    },
+    {
+      id: 'reveal',
+      title: 'רואים מה נפתח ולוקחים הלאה',
+      shortLabel: 'תובנה',
+      summary: activeToken ? `כרגע עובדים מתוך "${activeToken.text}".` : 'התובנה תופיע כאן אחרי שיבוץ.',
+      feedbackSnippet: activePayload?.question || undefined,
+      status: compactFlowStepId === 'reveal' ? 'active' : 'upcoming',
+      expandedContent: revealStepExpanded
+    }
+  ];
+
+  const mainContent = (
+    <div className="it-flow-stack">
+      <section className="it-context-rail" aria-label="הקשר שצריך להישאר מול העיניים">
+        <div className="it-context-rail-head">
+          <div>
+            <div className="it-kicker">תרחיש <code>{scenario.scenario_id}</code></div>
+            <strong>ההקשר נשאר פתוח גם כשהשלבים נסגרים</strong>
+          </div>
+          <p>כך לא צריך לגלול למעלה כדי לזכור מה נאמר, איזה עוגן כבר נבחר, ובאיזה היגיון עובדים עכשיו.</p>
+        </div>
+        <p className="it-context-quote">"{scenario.client_text}"</p>
+        <div className="it-context-meta">
+          <span className="it-chip">עוגן: {selectedTokenLabel || 'טרם נבחר'}</span>
+          <span className="it-chip">היגיון: {selectedTemplateType ? selectedTemplateLabel : 'טרם נבחר'}</span>
+          <span className="it-chip">מיקוד: {currentProcessMeta.label}</span>
+        </div>
+      </section>
+
+      {state.lastCompletedRecap ? <div className="it-flow-recap">{state.lastCompletedRecap}</div> : null}
+
+      <ActiveStepFlow
+        steps={flowSteps}
+        activeStepId={compactFlowStepId}
+        historyTitle="מה כבר נסגר בדרך"
+        emptyHistoryText="עוד לא נסגרו שלבים. מתחילים מהמשפט ומהעוגן."
+        activeKicker="השלב הפעיל"
+      />
+    </div>
   );
 
   const supportContent = <></>;
 
   return (
     <div className="it-wrap it-wrap-refined" dir="rtl" lang="he">
-      <style>{`${TRAINER_PLATFORM_CSS}\n${css}`}</style>
+      <style>{`${TRAINER_PLATFORM_CSS}\n${ACTIVE_STEP_FLOW_CSS}\n${css}`}</style>
 
       {showOnboarding ? (
         <div className="it-onboarding-layer" role="dialog" aria-modal="true" aria-label="יועץ NLP למסך קצה קרחון" data-trainer-onboarding="1">
