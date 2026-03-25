@@ -10354,6 +10354,7 @@ function evaluateQuestionDrill() {
     if (!feedbackEl || !questionDrillState.current) return;
     if (questionDrillState.sessionCompleted) return;
     if (questionDrillState.feedbackModalOpen) return;
+    if (questionDrillState.clientResponseOpen) return;
     const coach = window.MetaRedesignCoach;
     if (questionDrillState.roundFinalized) {
         setQuestionDrillFeedback(
@@ -10428,6 +10429,10 @@ function evaluateQuestionDrill() {
         }
         saveQuestionDrillTestStats();
 
+        const questionId = String(questionDrillState.current?.id || '');
+        const clientResp = getQuestionDrillClientResponse(questionId, success);
+        const advisorImpact = getQuestionDrillAdvisorImpact(questionId, success);
+
         if (success) {
             const nextStreak = questionDrillState.streak + 1;
             awardMetaGamificationXp(nextStreak >= 3 ? 15 : 5, 'practiceQuestion');
@@ -10441,12 +10446,20 @@ function evaluateQuestionDrill() {
             );
             playUISound('correct');
             questionDrillState.pendingRoundOutcome = { finalizeReason: 'correct' };
-            openQuestionDrillFeedbackModal({
-                tone: 'success',
-                title: 'בול. ממשיכים.',
-                body: questionDrillState.feedbackText,
-                success: true,
-                willComplete
+            const modalBody = advisorImpact
+                ? `${questionDrillState.feedbackText}\n\n${advisorImpact}`
+                : questionDrillState.feedbackText;
+            showQuestionDrillClientResponse({
+                text: clientResp?.text || '',
+                insight: clientResp?.insight || '',
+                tone: clientResp?.tone || 'success',
+                pendingModalData: {
+                    tone: 'success',
+                    title: 'בול. ממשיכים.',
+                    body: modalBody,
+                    success: true,
+                    willComplete
+                }
             });
         } else {
             setQuestionDrillFeedback(
@@ -10457,12 +10470,20 @@ function evaluateQuestionDrill() {
             playUISound('wrong');
             setQuestionDrillTrafficState('red', 'פספוס');
             questionDrillState.pendingRoundOutcome = { finalizeReason: 'test_fail' };
-            openQuestionDrillFeedbackModal({
-                tone: 'danger',
-                title: 'לא מדויק.',
-                body: questionDrillState.feedbackText,
-                success: false,
-                willComplete
+            const modalBody = advisorImpact
+                ? `${questionDrillState.feedbackText}\n\n${advisorImpact}`
+                : questionDrillState.feedbackText;
+            showQuestionDrillClientResponse({
+                text: clientResp?.text || '',
+                insight: clientResp?.insight || '',
+                tone: clientResp?.tone || 'fail',
+                pendingModalData: {
+                    tone: 'danger',
+                    title: 'לא מדויק.',
+                    body: modalBody,
+                    success: false,
+                    willComplete
+                }
             });
         }
         updateQuestionDrillSessionUI();
@@ -10470,6 +10491,9 @@ function evaluateQuestionDrill() {
     }
 
     const reasonLine = buildQuestionDrillReasonLine(questionDrillState.current, expectedCategory);
+    const questionId = String(questionDrillState.current?.id || '');
+    const clientResp = getQuestionDrillClientResponse(questionId, success);
+    const advisorImpact = getQuestionDrillAdvisorImpact(questionId, success);
 
     if (success) {
         const nextStreak = questionDrillState.streak + 1;
@@ -10481,12 +10505,20 @@ function evaluateQuestionDrill() {
         setQuestionDrillFeedback(takeaway, 'success', { title: 'בול. כל הכבוד.' });
         playUISound('correct');
         questionDrillState.pendingRoundOutcome = { finalizeReason: 'correct' };
-        openQuestionDrillFeedbackModal({
-            tone: 'success',
-            title: 'בול. כל הכבוד.',
-            body: questionDrillState.feedbackText,
-            success: true,
-            willComplete
+        const modalBody = advisorImpact
+            ? `${questionDrillState.feedbackText}\n\n${advisorImpact}`
+            : questionDrillState.feedbackText;
+        showQuestionDrillClientResponse({
+            text: clientResp?.text || '',
+            insight: clientResp?.insight || '',
+            tone: clientResp?.tone || 'success',
+            pendingModalData: {
+                tone: 'success',
+                title: 'בול. כל הכבוד.',
+                body: modalBody,
+                success: true,
+                willComplete
+            }
         });
         return;
     }
@@ -10499,12 +10531,20 @@ function evaluateQuestionDrill() {
     );
     setQuestionDrillTrafficState('yellow', 'משוב לצמיחה');
     questionDrillState.pendingRoundOutcome = { finalizeReason: 'wrong' };
-    openQuestionDrillFeedbackModal({
-        tone: 'warn',
-        title: 'לא בדיוק.',
-        body: questionDrillState.feedbackText,
-        success: false,
-        willComplete
+    const modalBody = advisorImpact
+        ? `${questionDrillState.feedbackText}\n\n${advisorImpact}`
+        : questionDrillState.feedbackText;
+    showQuestionDrillClientResponse({
+        text: clientResp?.text || '',
+        insight: clientResp?.insight || '',
+        tone: clientResp?.tone || 'fail',
+        pendingModalData: {
+            tone: 'warn',
+            title: 'לא בדיוק.',
+            body: modalBody,
+            success: false,
+            willComplete
+        }
     });
 }
 
