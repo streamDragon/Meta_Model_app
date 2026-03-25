@@ -1,6 +1,6 @@
 {
   "name": "meta_model_app",
-  "version": "1.0.635",
+  "version": "1.0.636",
   "description": "כלי אינטרנט אינטראקטיבי לתרגול טכניקות **Meta Model** של NLP (Neuro-Linguistic Programming) על פי Richard Bandler ו-John Grinder.",
   "main": "index.js",
   "directories": {
