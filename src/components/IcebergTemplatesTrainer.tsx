@@ -2,6 +2,7 @@
 import { getTrainerContract } from '../config/trainerContract';
 import { TrainerPlatformShell } from './trainer-shell/TrainerPlatformShell';
 import { TrainerSettingsShell, type TrainerSettingsSection } from './trainer-shell/TrainerSettingsShell';
+import { ActiveStepFlow, ACTIVE_STEP_FLOW_CSS, type ActiveStepFlowStep } from './trainer-shell/ActiveStepFlow';
 import { TRAINER_PLATFORM_CSS } from './trainer-shell/trainerPlatformStyles';
 
 type TemplateType = 'CEQ' | 'CAUSE' | 'ASSUMPTIONS1';
