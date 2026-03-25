@@ -874,6 +874,13 @@
     flex-wrap: wrap;
 }
 
+.scenario-home-quick-note {
+    margin: -2px 0 0;
+    color: var(--scenario-soft-ink);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
 #scenario-start-run-btn {
     font-size: 1rem;
     font-weight: 700;
@@ -2460,6 +2467,22 @@
 
     .scenario-home-details-grid {
         grid-template-columns: 1fr;
+    }
+
+    .scenario-home-card--landing {
+        gap: 12px;
+    }
+
+    .scenario-home-hero--landing {
+        padding-top: 0;
+    }
+
+    .scenario-home-setup-card {
+        gap: 12px;
+    }
+
+    .scenario-home-quick-note {
+        font-size: 0.86rem;
     }
 
     .scenario-story-stage {

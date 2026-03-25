@@ -13833,6 +13833,12 @@ a:hover {
         padding-inline: 10px;
     }
 
+    body[data-active-tab="practice-radar"] #mm-onboarding {
+        display: none !important;
+        pointer-events: none !important;
+        opacity: 0 !important;
+    }
+
     body[data-active-tab="practice-radar"] #practice-radar .feature-home-back-bar,
     body[data-active-tab="practice-radar"] #practice-radar .feature-onboarding-card,
     body[data-active-tab="practice-radar"] #practice-radar .app-shell-header,
@@ -31221,6 +31227,10 @@ body.triples-radar-overlay-open {
 }
 
 @media (max-width: 767px) {
+    body[data-active-tab="practice-radar"] #meta-gamification-root {
+        display: none !important;
+    }
+
     #meta-gamification-root {
         left: 12px;
         right: 12px;

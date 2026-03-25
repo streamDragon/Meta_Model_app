@@ -2433,6 +2433,11 @@
                 </div>
                 ${hasHistory ? `<button type="button" class="btn btn-secondary" data-scenario-action="open-history">היסטוריה (${escapeHtml(state.progress.completed)})</button>` : ''}
               </div>
+              <div class="scenario-home-cta-row">
+                <button id="scenario-start-run-btn" type="button" class="btn btn-primary" data-trainer-action="start-session">התחל סשן</button>
+                <button type="button" class="btn btn-secondary" data-trainer-action="open-settings">הגדרות</button>
+              </div>
+              <p class="scenario-home-quick-note">אפשר להתחיל מיד עם המסלול שמסומן כאן, או לשנות תחום, רמה ואורך סשן לפני הכניסה.</p>
               <div class="scenario-home-scenario-grid">
                 ${featuredScenarios.map((scenario) => `
                   <button
@@ -2456,10 +2461,6 @@
                 <label for="scenario-run-size">אורך סשן</label>
                 <input type="range" id="scenario-run-size" min="3" max="10" value="${escapeHtml(state.homeFilters.runSize)}" />
                 <span class="scenario-home-range-value">${escapeHtml(state.homeFilters.runSize)} סצנות</span>
-              </div>
-              <div class="scenario-home-cta-row">
-                <button id="scenario-start-run-btn" type="button" class="btn btn-primary" data-trainer-action="start-session">התחל סשן</button>
-                <button type="button" class="btn btn-secondary" data-trainer-action="open-settings">הגדרות</button>
               </div>
               ${hasHistory ? `
               <div class="scenario-home-stats-row">

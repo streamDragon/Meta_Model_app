@@ -1803,6 +1803,9 @@ function featureActionButtonsHtml(meta) {
             renderFeatureChrome(next);
             syncActiveShellState();
             refreshPracticeCopy();
+            if (next === 'practice-radar') {
+                scrollViewportToSection(document.getElementById(next), { instant: useInstantFeatureEntry(next) });
+            }
         });
         activeTabObserver.observe(document.body, { attributes: true, attributeFilter: ['data-active-tab'] });
     }
