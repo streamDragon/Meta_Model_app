@@ -975,13 +975,21 @@ async function runShellSmoke(baseUrl) {
         await assert((await page.evaluate(() => document.querySelector('.tab-btn.active')?.getAttribute('data-tab'))) === 'about', 'home drawer nav opens about');
         await navigate('home');
 
-        await assertOverlayComicLaunch({
-            label: 'feature-map overlay comic launch',
-            openOverlay: async () => {
-                await page.evaluate(() => window.openFeatureMapMenu?.());
-                await page.waitForSelector('.overlay-root:not(.hidden) .feature-map-overlay-clone');
-            }
-        });
+        await navigate('home');
+        await closeOverlayIfOpen();
+        await resetNavigationTrace();
+        await page.evaluate(() => window.openFeatureMapMenu?.());
+        await waitForActiveScreen('practice-verb-unzip');
+        await page.waitForTimeout(450);
+        await assert(
+            (await page.locator('.overlay-root:not(.hidden)').count()) === 0,
+            'tools launcher no longer opens old feature-map overlay'
+        );
+        const toolsLauncherTrace = await readNavigationTrace();
+        const toolsCenterCalls = toolsLauncherTrace.filter((entry) => (
+            entry.type === 'navigateTo' && (entry.value === 'practice-verb-unzip' || entry.value === 'practiceVerbUnzip')
+        ));
+        await assert(toolsCenterCalls.length >= 1, 'tools launcher opens the new tools center', JSON.stringify(toolsLauncherTrace));
 
         await assertOverlayComicLaunch({
             label: 'home menu overlay comic launch',

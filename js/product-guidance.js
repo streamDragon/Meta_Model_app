@@ -641,21 +641,15 @@
                 }
 
                 if (action === 'menu') {
-                    const featureMap = document.getElementById('feature-map-toggle');
-                    if (featureMap) {
-                        featureMap.setAttribute('open', '');
-                        featureMap.scrollIntoView({ block: 'start', behavior: 'smooth' });
+                    if (typeof global.navigateTo === 'function') {
+                        global.navigateTo('practice-verb-unzip', {
+                            playSound: true,
+                            scrollToTop: true,
+                            featureEntry: 'feature'
+                        });
                         return;
                     }
-                    if (typeof global.navigateTo === 'function') {
-                        global.navigateTo('home');
-                        global.setTimeout(() => {
-                            const nextFeatureMap = document.getElementById('feature-map-toggle');
-                            if (!nextFeatureMap) return;
-                            nextFeatureMap.setAttribute('open', '');
-                            nextFeatureMap.scrollIntoView({ block: 'start', behavior: 'smooth' });
-                        }, 60);
-                    }
+                    global.location.href = 'index.html?tab=practice-verb-unzip';
                 }
             });
         });

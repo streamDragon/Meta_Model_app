@@ -137,10 +137,9 @@
             containerSelector: '#categories',
             workspaceSelector: '#categories-container',
             sectionHideSelectors: ['.screen-read-guide'],
-            hideSelectors: ['.categories-theory-intro'],
+            hideSelectors: [],
             panels: [
-                { id: 'guide', type: 'guide', action: 'היגיון', title: 'איך עובדים במסך הזה', size: 'lg', sourceRoot: 'section' },
-                { id: 'intro', type: 'selectors', action: 'מבוא', title: 'מבוא למילון', size: 'md', selectors: ['.categories-theory-intro'] }
+                { id: 'guide', type: 'guide', action: 'היגיון', title: 'איך עובדים במסך הזה', size: 'lg', sourceRoot: 'section' }
             ]
         },
         blueprint: {

@@ -3526,27 +3526,14 @@ function buildFeatureMapOverlayContent() {
 }
 
 function openFeatureMapMenu() {
-    if (typeof setupGlobalFeatureMenuDropdown === 'function') {
-        setupGlobalFeatureMenuDropdown();
-    }
-    const overlayContent = buildFeatureMapOverlayContent();
-    if (overlayContent && window.MetaOverlayProvider && typeof window.MetaOverlayProvider.openOverlay === 'function') {
-        if (typeof window.MetaOverlayProvider.ensureRoot === 'function') {
-            window.MetaOverlayProvider.ensureRoot();
-        }
-        window.MetaOverlayProvider.openOverlay({
-            type: 'feature-map-menu',
-            title: 'כל הכלים',
-            size: 'xl',
-            closeOnBackdrop: true,
-            content: overlayContent
-        });
+    if (typeof navigateTo === 'function' && document.getElementById('practice-verb-unzip')) {
+        navigateTo('practice-verb-unzip', { playSound: true, scrollToTop: true, featureEntry: 'feature' });
         return;
     }
-
-    const featureMap = document.getElementById('feature-map-toggle');
-    if (!featureMap) return;
-    setFeatureMapToggleOpen(true);
+    if (typeof window.navigateByNavKey === 'function') {
+        window.navigateByNavKey('practiceVerbUnzip', { versioned: true, featureEntry: 'feature' });
+        return;
+    }
 }
 
 if (typeof window !== 'undefined') {

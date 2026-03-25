@@ -1295,13 +1295,14 @@
         closeInlineFeatureMapIfNeeded();
 
         const featureMap = document.getElementById('feature-map-toggle');
-        const featureMapBody = featureMap?.querySelector('.feature-map-body');
+        const menuSource = document.querySelector('#practice-verb-unzip .product-tools-shell')
+            || featureMap?.querySelector('.feature-map-body');
         const panel = document.createElement('article');
         panel.className = 'shell-overlay-content';
         panel.innerHTML = `
             <p class="shell-overlay-kicker">תפריט</p>
-            <h4>תפריט מלא</h4>
-            <p>כל מסלולי האימון מרוכזים כאן, בלי להאריך את דף הבית.</p>
+            <h4>כל הכלים</h4>
+            <p>כל מסלולי האימון מרוכזים כאן בגרסה החדשה עם התמונות, בלי לחזור למסך הישן.</p>
         `;
 
         const closeOverlayThen = (callback, reason = 'home-menu-action') => {
@@ -1321,11 +1322,12 @@
             }, 70);
         };
 
-        if (featureMapBody) {
-            const clone = featureMapBody.cloneNode(true);
+        if (menuSource) {
+            const clone = menuSource.cloneNode(true);
             stripIdsFromCloneTree(clone);
             clone.classList.add('home-shell-menu-clone');
             clone.setAttribute('data-nav-fallback-ignore', 'true');
+            clone.querySelectorAll('[onclick]').forEach((node) => node.removeAttribute('onclick'));
             clone.addEventListener('click', (event) => {
                 const trigger = event.target?.closest?.('a, button');
                 if (!trigger) return;
@@ -1378,7 +1380,7 @@
             panel.appendChild(clone);
         } else {
             const fallback = document.createElement('p');
-            fallback.textContent = 'תוכן התפריט לא זמין כרגע.';
+            fallback.textContent = 'מרכז הכלים לא זמין כרגע.';
             panel.appendChild(fallback);
         }
 

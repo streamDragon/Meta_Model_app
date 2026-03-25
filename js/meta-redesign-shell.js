@@ -10,7 +10,7 @@
     var MANAGED_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'initial-image-vs-deep-structure', 'about'];
     var FEATURE_CHROME_TABS = ['sentence-map', 'practice-question', 'practice-triples-radar', 'practice-radar', 'practice-wizard', 'practice-verb-unzip', 'blueprint', 'prismlab', 'categories', 'comic-engine', 'initial-image-vs-deep-structure', 'about'];
     var FAST_FEATURE_ENTRY_TABS = [];
-    var DIRECT_FEATURE_STAGE_TABS = [];
+    var DIRECT_FEATURE_STAGE_TABS = ['practice-verb-unzip', 'categories'];
     var HOME_VIEWS = ['home', 'stats', 'theory', 'settings', 'help'];
     var CTA_LABELS = ['יאללה, בואו נתחיל', 'אני מוכן — קדימה', 'בואו נצלול פנימה'];
     var QUESTION_PROMPTS = [
@@ -1421,15 +1421,8 @@ function featureActionButtonsHtml(meta) {
             var openHref = event.target.closest('[data-home-href]');
             if (openHref) { navigateExternalFromHome(openHref.getAttribute('data-home-href') || ''); return; }
             if (event.target.closest('[data-home-tools]')) {
-                if (typeof window.openFeatureMapMenu === 'function') {
-                    window.openFeatureMapMenu();
-                    return;
-                }
-                var fallbackToolsBtn = document.getElementById('home-open-feature-map');
-                if (fallbackToolsBtn) {
-                    fallbackToolsBtn.click();
-                    return;
-                }
+                navigateFromHome('practice-verb-unzip');
+                return;
             }
             if (event.target.closest('[data-home-menu]')) { drawerOpen = true; renderHome('forward'); return; }
             if (event.target.closest('[data-home-drawer-close]')) { drawerOpen = false; renderHome('back'); return; }
