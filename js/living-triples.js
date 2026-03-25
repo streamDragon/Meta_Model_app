@@ -1718,6 +1718,14 @@ function buildStandaloneShellMarkup() {
 function render() {
   if (!state.els.root) return;
   state.els.root.innerHTML = buildStandaloneShellMarkup();
+  syncStandaloneUi();
+}
+
+function syncStandaloneUi() {
+  const soundLabel = readDesktopSoundLabel();
+  document.querySelectorAll('[data-ltv3-sound-label]').forEach((node) => {
+    node.textContent = soundLabel;
+  });
 }
 
 function queueChatScroll(selector) {
@@ -1745,6 +1753,11 @@ function handleRootClick(event) {
   if (action === 'start-learning') return void beginPractice('learning');
   if (action === 'start-test') return void beginPractice('test');
   if (action === 'show-onboarding') return void showOnboarding();
+  if (action === 'toggle-sound') {
+    toggleStandaloneSound();
+    window.requestAnimationFrame(syncStandaloneUi);
+    return;
+  }
   if (action === 'open-guide') {
     setOverlay('guide');
     render();
