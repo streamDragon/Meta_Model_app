@@ -1,0 +1,341 @@
+[
+  {
+    "id": "sentence-map",
+    "welcome": {
+      "stage": "welcome",
+      "activeTab": "sentence-map",
+      "welcomeVisible": true,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "מפת המשפט"
+      ]
+    },
+    "feature": {
+      "stage": "feature",
+      "activeTab": "sentence-map",
+      "welcomeVisible": false,
+      "bgCoinVisible": true,
+      "helpButtons": [
+        {
+          "text": "",
+          "id": "",
+          "cls": "bg-coin-btn action-button",
+          "aria": "עזרה ממנטורים"
+        }
+      ],
+      "visibleHeadings": [
+        "בחרו משפט אחד ונתחיל"
+      ],
+      "visibleParagraphs": [
+        "לפני שמאתגרים, ממפים: מה קרה בחוץ, מה נהיה בפנים, ומה המשפט מנסה לעשות ביחסים.",
+        "מפריד בין עובדה, חוויה, ותפקיד היחסים של המשפט כדי שלא נתערב מוקדם מדי.",
+        "חשיבה רב-שכבתית והשהיית תגובתיות טיפולית.",
+        "כשמשפט נשמע טעון, גדול או דרמטי מדי, ועדיין לא ברור איפה באמת הלב של המקרה.",
+        "למטפל/ת זה מונע קפיצה לפרשנות. לסטודנט/ית זה בונה עין קלינית לפני שאלה או תיקוף.",
+        "ששת השלבים נשארים גלויים לאורך כל העבודה.",
+        "שלב 1",
+        "משפט אחד מספיק כדי לפתוח את המפה.",
+        "\"אני פשוט לא מצליח להתחיל כלום. אני עצלן.\""
+      ],
+      "sentenceMapAppPreview": "ששת השלביםפתיחה · 1/61פתיחה2המשפט3כיוונים4מוקד5כיוון טיפולי6שיקוף וניסוחבחרו מקרהשלושה מקרים קצרים לסבב ראשון.ליוויתרגולששת השלבים נשארים גלויים לאורך כל העבודה.דחיינותאני פשוט לא מצליח להתחיל כלום. אני עצלן.חרדה חברתיתכולם שופטים אותי כל הזמן.זוגיותהוא אף פעם"
+    }
+  },
+  {
+    "id": "practice-question",
+    "welcome": {
+      "stage": "welcome",
+      "activeTab": "practice-question",
+      "welcomeVisible": true,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "תרגול זיהוי"
+      ]
+    },
+    "feature": {
+      "stage": "feature",
+      "activeTab": "practice-question",
+      "welcomeVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [
+        {
+          "text": "יועץ NLP",
+          "id": "question-drill-open-help",
+          "cls": "btn btn-secondary action-button",
+          "aria": ""
+        }
+      ],
+      "visibleHeadings": [
+        "זיהוי מטה-מודל עם אוזן חדה"
+      ],
+      "visibleParagraphs": [
+        "קוראים משפט קטן, מקשיבים למה שחסר בו, ובוחרים את השאלה שמחזירה בהירות.",
+        "לימוד: קוראים כאילו מישהו אומר לכם את המשפט ובוחרים את השאלה שתפתח אותו."
+      ],
+      "sentenceMapAppPreview": ""
+    }
+  },
+  {
+    "id": "practice-radar",
+    "welcome": {
+      "stage": "welcome",
+      "activeTab": "practice-radar",
+      "welcomeVisible": true,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "מכ״ם מטה-מודל"
+      ]
+    },
+    "feature": {
+      "stage": "feature",
+      "activeTab": "practice-radar",
+      "welcomeVisible": false,
+      "bgCoinVisible": true,
+      "helpButtons": [
+        {
+          "text": "",
+          "id": "",
+          "cls": "bg-coin-btn action-button",
+          "aria": "עזרה ממנטורים"
+        }
+      ],
+      "visibleHeadings": [
+        "מכ״ם מטה-מודל"
+      ],
+      "visibleParagraphs": [
+        "קראו את המשפט, שימו לב לביטוי המודגש, ואז בחרו תבנית אחת מדויקת.",
+        "למידה: אפשר לעצור ולקבל עזרה.",
+        "מה עושים עכשיו: בחרו מצב ותחום, ואז התחילו סבב קצר וברור."
+      ],
+      "sentenceMapAppPreview": ""
+    }
+  },
+  {
+    "id": "practice-wizard",
+    "welcome": {
+      "stage": "welcome",
+      "activeTab": "practice-wizard",
+      "welcomeVisible": true,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "גשר תחושה-שפה"
+      ]
+    },
+    "feature": {
+      "stage": "feature",
+      "activeTab": "practice-wizard",
+      "welcomeVisible": false,
+      "bgCoinVisible": true,
+      "helpButtons": [
+        {
+          "text": "",
+          "id": "",
+          "cls": "bg-coin-btn action-button",
+          "aria": "עזרה ממנטורים"
+        }
+      ],
+      "visibleHeadings": [
+        "על איזו מילה כדאי לעצור?"
+      ],
+      "visibleParagraphs": [
+        "הוא לא רואה אותי",
+        "הביטוי החי כרגע: לא רואה אותי",
+        "בחזה נהיה שקיפות, כאילו אני נעלמת.",
+        "אזור נוכחי: בחזה",
+        "עוד לא אספנו ניסוח חיצוני.",
+        "המטרה כאן: לתפוס רגע, התנהגות, או הקשר שאפשר לראות.",
+        "כאן נבנה את המשפט המשולב.",
+        "עוד לא. יש כאן משהו חי, אבל זה עדיין לא נשמע כמו מה שהתכוונתי.",
+        "שלב 1",
+        "שומרים את המשפט המקורי, לא מתקנים אותו, ורק בוחרים את החלק שהכי חי עכשיו.",
+        "מה במשפט הזה הכי חי כרגע?",
+        "כרגע עצרנו על: לא רואה אותי"
+      ],
+      "sentenceMapAppPreview": ""
+    }
+  },
+  {
+    "id": "blueprint",
+    "welcome": {
+      "stage": "welcome",
+      "activeTab": "blueprint",
+      "welcomeVisible": true,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "בונה מהלך"
+      ]
+    },
+    "feature": {
+      "stage": "feature",
+      "activeTab": "blueprint",
+      "welcomeVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "מה המשפט הגולמי?",
+        "מטפל/ת ⇄ מטופל/ת",
+        "איפה להתמקד עכשיו",
+        "מפת שלבים מתכווצת",
+        "TEST 1 | מה רוצים במקום?",
+        "OPERATE | Build the action",
+        "OPERATE | Protection & flexibility",
+        "TEST 2 | Is the plan good?",
+        "EXIT | Commit & close",
+        "Therapeutic Action Map"
+      ],
+      "visibleParagraphs": [
+        "מסלול TOTE עם כוונה חיובית ושאלות מדודות.",
+        "בחרו פועל וקליק על שבב כדי להתחיל",
+        "הביאו לכאן תלונה, משאלה, הימנעות או פועל עמום. משם נבנה מהלך טיפולי צעד-צעד.",
+        "אחרי המשפט הגולמי לוחצים על צומת במפה. כל לחיצה מייצרת שאלה בצ׳אט, וכל תשובה נשמרת חזרה למפה.",
+        "התחילו במשפט גולמי אחד. אחר כך סדר השאלות יקבל משמעות טיפולית.",
+        "המסלול מתקדם לפי שלבים פתוחים. לחצו על שלב כדי לפתוח תתי-שאלות.",
+        "כתבו יעד חיובי, ברור ומציאותי.",
+        "כתבו סימן זיהוי קטן שמראה שזה מתקדם.",
+        "כתבו את הכוונה הטובה של ההתנהגות הישנה.",
+        "תארו תמונה או תחושה של היעד.",
+        "תארו תמונה או תחושה של הדרך, לא רק היעד.",
+        "עדיין לא נבנה"
+      ],
+      "sentenceMapAppPreview": ""
+    }
+  },
+  {
+    "id": "categories",
+    "welcome": {
+      "stage": "feature",
+      "activeTab": "categories",
+      "welcomeVisible": false,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "מילון קטגוריות המטה-מודל",
+        "מה יש כאן",
+        "איך מתחילים",
+        "🔀 קריאת מחשבות — Mind Reading",
+        "🔀 הנחות מוקדמות — Presuppositions",
+        "🔀 חסרון הדובר — Lost Performative",
+        "🔀 סיבה ותוצאה — Cause-Effect",
+        "📈 מודל פעולה — Modal Operators"
+      ]
+    },
+    "feature": {
+      "stage": "feature",
+      "activeTab": "categories",
+      "welcomeVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "מילון קטגוריות המטה-מודל",
+        "מה יש כאן",
+        "איך מתחילים",
+        "🔀 קריאת מחשבות — Mind Reading",
+        "🔀 הנחות מוקדמות — Presuppositions",
+        "🔀 חסרון הדובר — Lost Performative",
+        "🔀 סיבה ותוצאה — Cause-Effect",
+        "📈 מודל פעולה — Modal Operators",
+        "📈 הכללה — Generalization",
+        "🔀 הקבלה מורכבת — Complex Equivalence"
+      ],
+      "visibleParagraphs": [
+        "זהו מילון העבודה של קטגוריות המטה-מודל: פותחים כאן כרטיס, רואים מה בדיוק הוא מזהה בשפה, ולוקחים ממנו שאלה מדויקת חזרה לתרגול או לשיחה.",
+        "כל כרטיס מרכז הגדרה קצרה, דוגמאות ושאלות עבודה. המונחים באנגלית נשארים לצד העברית כדי לחבר את המילון לספרות המקצועית, לקורסים ולמונחים המקוריים של ה-Meta Model.",
+        "אפשר להיכנס מכל מקום: דרך משפחת־העל, דרך שם של קטגוריה, או דרך משפט אמיתי שאתו עובדים עכשיו.",
+        "לא צריך לקרוא הכול מההתחלה. קודם מזהים אם יש כאן מחיקה, עיוות או הכללה, ואז פותחים את הכרטיס שהכי קרוב למשפט שמולך.",
+        "טבלת ברין עוזרת להתמצא בסידור של הקטגוריות. כמו בתזכורת ה-NLP הקלאסית ש\"המפה אינה השטח\", זו מסגרת עבודה שימושית ולא תחליף למה שקורה בפועל בשיחה.",
+        "איך עובדים כאן: בוחרים כרטיס, קוראים הגדרה קצרה, יורדים לדוגמאות ולשאלות, וחוזרים איתן למשפט שעליו עובדים.",
+        "לחיצה על תא פותחת את הכרטיס הרלוונטי במילון.",
+        "בודקים מי מקור הסמכות, איזו הנחה עובדת מתחת לפני השטח, ואיזו כוונה מיוחסת בלי ראיה ישירה.",
+        "חסרון הדובר",
+        "הנחות מוקדמות",
+        "קריאת מחשבות",
+        "כאן חוקרים את חוקי המשחק: חייב/צריך/יכול, גבולות הנכונות, והנגזרת התפקודית של החוקים האלה על האדם."
+      ],
+      "sentenceMapAppPreview": ""
+    }
+  },
+  {
+    "id": "comic-engine",
+    "welcome": {
+      "stage": "welcome",
+      "activeTab": "comic-engine",
+      "welcomeVisible": true,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "במת קומיקס רגשי"
+      ]
+    },
+    "feature": {
+      "stage": "feature",
+      "activeTab": "comic-engine",
+      "welcomeVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "שיעורים למחר",
+        "בחר/י תגובה לשלב שכבה 1"
+      ],
+      "visibleParagraphs": [
+        "הילד פותח בקושי. עכשיו הכיוון שלך יקבע אם הוא יסביר, יתגונן או יקפא.",
+        "זמן לבחירה",
+        "מצב הילד כרגע: עדיין זמין לשיחה",
+        "תוצאה נראית לעין",
+        "ילד",
+        "הילד אומר: \"אני מסתכל על זה ופשוט לא יודע מאיפה להתחיל. זה גדול עליי.\"",
+        "בחר/י אחת מארבע התגובות בקשת כדי לכוון את הרגע הבא.",
+        "הילד פותח בקושי. עכשיו הכיוון שלך יקבע אם הוא יסביר, יתגונן או יקפא.",
+        "המערכת",
+        "הילד פותח בקושי. עכשיו הכיוון שלך יקבע אם הוא יסביר, יתגונן או יקפא.",
+        "ילד",
+        "הילד אומר: \"אני מסתכל על זה ופשוט לא יודע מאיפה להתחיל. זה גדול עליי.\""
+      ],
+      "sentenceMapAppPreview": ""
+    }
+  },
+  {
+    "id": "initial-image-vs-deep-structure",
+    "welcome": {
+      "stage": "welcome",
+      "activeTab": "initial-image-vs-deep-structure",
+      "welcomeVisible": true,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "מתמונת שטח למבנה עומק"
+      ]
+    },
+    "feature": {
+      "stage": "feature",
+      "activeTab": "initial-image-vs-deep-structure",
+      "welcomeVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [],
+      "visibleParagraphs": [
+        "כשהיא אמרה את זה ככה, הרגשתי מושפל ופשוט נאטמתי."
+      ],
+      "sentenceMapAppPreview": ""
+    }
+  }
+]

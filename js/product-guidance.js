@@ -58,6 +58,7 @@
         }),
         'sentence-map': Object.freeze({
             containerSelector: '#sentence-map .practice-intro-card',
+            inlineMode: 'help-only',
             familyLabel: 'Analysis',
             familyName: 'ניתוח',
             title: 'מפת המשפט',
