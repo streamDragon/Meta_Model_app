@@ -2107,7 +2107,7 @@
             : 'בחר/י תגובה רגשית קצרה וראה/י לאן השיחה הולכת.';
         return `
           <section class="scenario-runtime-shell" data-scenario-runtime="1" data-runtime-mode="${escapeHtml(mode)}" style="--scenario-progress:${escapeHtml(progress)}%">
-            <article class="scenario-runtime-stage-panel" data-domain="${escapeHtml(scenario.domain)}">
+            <article class="scenario-runtime-stage-panel scenario-story-stage" data-domain="${escapeHtml(scenario.domain)}">
               <div class="scenario-runtime-context-card">
                 <p class="scenario-play-scene-kicker">${escapeHtml(`${scenario.domainLabel} · ${scenario.role.player} מול ${scenario.role.other}`)}</p>
                 <h2>${escapeHtml(scenario.sceneTitle)}</h2>
@@ -2229,7 +2229,7 @@
             : 'בחר/י תגובה רגשית קצרה וראה/י איך השיחה מתחילה לזוז.';
         return `
           <section class="scenario-runtime-shell" data-scenario-runtime="1" data-runtime-mode="${escapeHtml(mode)}" style="--scenario-progress:${escapeHtml(progress)}%">
-            <article class="scenario-runtime-stage-panel" data-domain="${escapeHtml(scenario.domain)}">
+            <article class="scenario-runtime-stage-panel scenario-story-stage" data-domain="${escapeHtml(scenario.domain)}">
               <div class="scenario-runtime-context-card">
                 <p class="scenario-play-scene-kicker">${escapeHtml(`${scenario.domainLabel} · ${scenario.role.player} מול ${scenario.role.other}`)}</p>
                 <h2>${escapeHtml(scenario.sceneTitle)}</h2>
@@ -2815,6 +2815,10 @@
           <section class="scenario-overlay-card scenario-workspace-card">
             <p class="scenario-panel-kicker">עזרה</p>
             <h3>איך עובדים כאן?</h3>
+            <div class="scenario-help-note">
+              <strong>מה הכלי הזה עושה</strong>
+              <p>העזרה כאן נשארת קצרה: בוחרים תגובה אחת, רואים מיד לאן היא מזיזה את השיחה, ורק אם צריך פותחים ניתוח עמוק יותר.</p>
+            </div>
             <ol class="scenario-help-list">
               <li>קוראים את הסצנה הקצרה ושומעים את המשפט הפותח.</li>
               <li>בוחרים תגובה אחת שהכי מקדמת קשר, בהירות וצעד בדיקה.</li>
