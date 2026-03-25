@@ -8,11 +8,16 @@
 
     var SEEN_KEY = 'mm_feature_seen_v1';
     var MANAGED_WELCOME_FEATURE_IDS = ['sentence-map', 'practice-question', 'practice-radar', 'practice-triples-radar', 'practice-wizard'];
+    var FLOATING_HELP_OPT_OUT_FEATURE_IDS = ['practice-question'];
     var seen = {};
     try { seen = JSON.parse(localStorage.getItem(SEEN_KEY) || '{}'); } catch (_) {}
 
     function saveSeen() {
         try { localStorage.setItem(SEEN_KEY, JSON.stringify(seen)); } catch (_) {}
+    }
+
+    function shouldAddFloatingHelp(featureId) {
+        return FLOATING_HELP_OPT_OUT_FEATURE_IDS.indexOf(String(featureId || '').trim()) === -1;
     }
 
     var HELP = {
@@ -184,8 +189,9 @@
         var introCard = section.querySelector('.practice-intro-card');
         if (!introCard) return;
 
-        // Always add B&G coin button
-        addCoinBtn(id, introCard);
+        if (shouldAddFloatingHelp(id)) {
+            addCoinBtn(id, introCard);
+        }
 
         if (usesManagedWelcomeShell(id)) {
             if (!seen[id]) {

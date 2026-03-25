@@ -382,6 +382,29 @@ body {
     min-width: 180px;
 }
 
+.sentence-map-shell--intro-compact {
+    gap: 10px;
+    padding-top: 8px;
+}
+
+.sentence-map-shell--intro-compact .sentence-map-stepper-block,
+.sentence-map-shell--intro-compact .sentence-map-case-selector,
+.sentence-map-shell--intro-compact .sentence-map-stage-card--intro {
+    padding: 14px 16px;
+}
+
+.sentence-map-case-selector--compact .sentence-map-section-heading strong {
+    max-width: 36rem;
+}
+
+.sentence-map-stage-card--intro {
+    gap: 8px;
+}
+
+.sentence-map-stage-card--intro .sentence-map-stage-note {
+    max-width: 34rem;
+}
+
 .sentence-map-branch-map,
 .sentence-map-branch-map__sentence,
 .sentence-map-branch-map__sentence-head,

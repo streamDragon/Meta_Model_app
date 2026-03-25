@@ -343,10 +343,6 @@
             return `<div class="sentence-map-mode-toggle" aria-label="מצב עבודה"><div class="sentence-map-mode-toggle__buttons">${Object.entries(MODE_COPY).map(([modeId, copy]) => `<button type="button" class="sentence-map-segment${state.mode === modeId ? ' is-active' : ''}" data-action="set-mode" data-mode="${escapeHtml(modeId)}" aria-pressed="${state.mode === modeId ? 'true' : 'false'}">${escapeHtml(copy.label)}</button>`).join('')}</div><p class="sentence-map-toolbar-note">${escapeHtml(MODE_COPY[state.mode].hint)}</p></div>`;
         }
 
-        function renderHeader(caseUi) {
-            return `<section class="sentence-map-header"><div class="sentence-map-header__copy"><p class="sentence-map-header__eyebrow">${escapeHtml(HEADER_COPY.title)}</p><h3 data-feature-title="${escapeHtml(HEADER_COPY.title)}">${escapeHtml(HEADER_COPY.leadTitle)}</h3><p class="sentence-map-header__subtitle" data-feature-subtitle="${escapeHtml(HEADER_COPY.concept)}">${escapeHtml(HEADER_COPY.concept)}</p></div></section>`;
-        }
-
         function renderExerciseHeader() {
             const caseData = getCurrentCase();
             const caseUi = getCurrentCaseUi();
@@ -365,9 +361,13 @@
             }).join('')}</nav></section>`;
         }
 
-        function renderCaseSelector() {
+        function renderCaseSelector(options = {}) {
             const currentCase = getCurrentCase();
-            return `<section class="sentence-map-case-selector" aria-label="בחירת מקרה"><div class="sentence-map-section-heading"><div><span>${escapeHtml(HEADER_COPY.casesTitle)}</span><strong>${escapeHtml(HEADER_COPY.casesSubtitle)}</strong></div>${renderModeToggle()}</div><div class="sentence-map-case-grid">${cases.map((item) => `<button type="button" class="sentence-map-case-card${item.id === currentCase.id ? ' is-active' : ''}" data-action="select-case" data-case="${escapeHtml(item.id)}" aria-pressed="${item.id === currentCase.id ? 'true' : 'false'}"><span class="sentence-map-case-card__tag">${escapeHtml(item.title)}</span><strong>${escapeHtml(item.sentence)}</strong></button>`).join('')}</div></section>`;
+            const compact = options && options.compact === true;
+            const title = compact ? 'בחרו מקרה' : HEADER_COPY.casesTitle;
+            const subtitle = compact ? 'שלושה מקרים קצרים לסבב ראשון.' : HEADER_COPY.casesSubtitle;
+            const shellClass = compact ? 'sentence-map-case-selector sentence-map-case-selector--compact' : 'sentence-map-case-selector';
+            return `<section class="${shellClass}" aria-label="בחירת מקרה"><div class="sentence-map-section-heading"><div><span>${escapeHtml(title)}</span><strong>${escapeHtml(subtitle)}</strong></div>${renderModeToggle()}</div><div class="sentence-map-case-grid">${cases.map((item) => `<button type="button" class="sentence-map-case-card${item.id === currentCase.id ? ' is-active' : ''}" data-action="select-case" data-case="${escapeHtml(item.id)}" aria-pressed="${item.id === currentCase.id ? 'true' : 'false'}"><span class="sentence-map-case-card__tag">${escapeHtml(item.title)}</span><strong>${escapeHtml(item.sentence)}</strong></button>`).join('')}</div></section>`;
         }
 
         function renderMethodNote(options = {}) {
@@ -384,7 +384,7 @@
         }
 
         function renderCurrentStep(caseData, caseUi) {
-            if (caseUi.stepIndex === 0) return `<section class="sentence-map-stage-card sentence-map-stage-card--intro">${renderStageHeader(0, 'בוחרים משפט אחד לעבוד איתו', 'בחרו מקרה אחד והתחילו את המיפוי.')}${renderSentenceBubble(caseData.sentence, caseData.title)}<div class="sentence-map-stage-actions"><button type="button" class="btn btn-primary sentence-map-btn-main" data-action="start">התחל/י</button></div></section>`;
+            if (caseUi.stepIndex === 0) return `<section class="sentence-map-stage-card sentence-map-stage-card--intro">${renderStageHeader(0, 'בחרו משפט אחד ונתחיל', 'משפט אחד מספיק כדי לפתוח את המפה.')}${renderSentenceBubble(caseData.sentence, caseData.title)}<div class="sentence-map-stage-actions"><button type="button" class="btn btn-primary sentence-map-btn-main" data-action="start">התחל/י</button></div></section>`;
             if (caseUi.stepIndex === 1) return `<section class="sentence-map-stage-card">${renderStageHeader(1, 'המשפט כמו שהוא', 'משאירים את המשפט מול העיניים ועובדים ממנו.')}${renderWorkbench('לוח המשפט', renderSentenceBubble(caseData.sentence, caseData.title))}</section>`;
             if (caseUi.stepIndex === 2) return `<section class="sentence-map-stage-card">${renderStageHeader(2, 'פותחים שכבה אחרי שכבה', 'המשפט ושלוש השכבות נשארים בתוך אותו לוח עבודה.')}${renderWorkbench('לוח העבודה', `${renderSentenceBubble(caseData.sentence, caseData.title)}<div class="sentence-map-layer-stack">${LAYER_ORDER.map((layerId) => renderLayerExplorerCard(layerId, caseData, caseUi)).join('')}</div>`)}</section>`;
             if (caseUi.stepIndex === 3) {
@@ -427,7 +427,7 @@
             const isIntro = caseUi.stepIndex === 0;
             root.className = `sentence-map-root sentence-map-root--${escapeHtml(state.mode)}${isIntro ? ' is-intro' : ' is-exercise'}`;
             if (isIntro) {
-                root.innerHTML = `<div class="sentence-map-shell">${renderHeader(caseUi)}${renderStepper(caseUi)}${renderCaseSelector()}${renderCurrentStep(caseData, caseUi)}</div>`;
+                root.innerHTML = `<div class="sentence-map-shell sentence-map-shell--intro-compact">${renderStepper(caseUi)}${renderCaseSelector({ compact: true })}${renderCurrentStep(caseData, caseUi)}</div>`;
             } else {
                 root.innerHTML = `<div class="sentence-map-shell">${renderExerciseHeader()}${renderStepper(caseUi)}${renderCurrentStep(caseData, caseUi)}${renderFooter(caseUi)}</div>`;
             }
