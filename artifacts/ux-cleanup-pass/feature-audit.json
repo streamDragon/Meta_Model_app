@@ -1,0 +1,457 @@
+[
+  {
+    "feature": {
+      "missing": false,
+      "activeTab": "sentence-map",
+      "featureStage": "feature",
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": true,
+      "helpButtons": [
+        {
+          "text": "",
+          "id": "",
+          "cls": "bg-coin-btn action-button",
+          "aria": "עזרה ממנטורים"
+        }
+      ],
+      "visibleHeadings": [
+        "מפת העבודה",
+        "בוחרים משפט אחד לעבוד איתו"
+      ],
+      "visibleParagraphs": [
+        "לפני שמאתגרים, ממפים: מה קרה בחוץ, מה נהיה בפנים, ומה המשפט מנסה לעשות ביחסים.",
+        "מפריד בין עובדה, חוויה, ותפקיד היחסים של המשפט כדי שלא נתערב מוקדם מדי.",
+        "חשיבה רב-שכבתית והשהיית תגובתיות טיפולית.",
+        "כשמשפט נשמע טעון, גדול או דרמטי מדי, ועדיין לא ברור איפה באמת הלב של המקרה.",
+        "למטפל/ת זה מונע קפיצה לפרשנות. לסטודנט/ית זה בונה עין קלינית לפני שאלה או תיקוף.",
+        "מפת המשפט",
+        "בחרו מקרה אחד והתקדמו דרך ששת השלבים: משפט, שכבות, מוקד, המלצה וניסוח חדש.",
+        "ששת השלבים נשארים גלויים לאורך כל העבודה.",
+        "שלב 1",
+        "בחרו מקרה אחד והתחילו את המיפוי.",
+        "\"אני פשוט לא מצליח להתחיל כלום. אני עצלן.\""
+      ],
+      "bodyHelpTexts": [
+        "Analysis ביתניתוחמפת המשפט חזרה לבית תפריט מלא לפני שמתחילים לפני שמאתגרים, ממפים: מה קרה בחוץ, מה נהיה בפנים, ומה המשפט מנסה לעשות ביחסים. מה הכלי הזה עושה מפריד בין עובדה, חוויה, ותפקיד היחסים של המשפט כדי שלא נתערב מוקדם מדי. מה הוא מאמן חשיבה רב-שכבתית והשהיית תגובתיות טיפולית. מתי משתמשים בו כשמשפט נשמע טעון, גדול או דרמטי מדי, ועדיין לא ברור איפה באמת הלב של המקרה. למה זה חשוב למטפל/ת או לסטודנט/ית ל-NLP למטפל/ת זה מונע קפיצה לפרשנות. לסטודנט/ית זה בונה עין קלינית לפני שאלה או תיקוף. דוגמה קצרה ״הוא לא רואה אותי״ → מפרידים בין מה הוא עשה בפועל, מה נחווה בפנים, ומה זה עושה לקשר."
+      ]
+    },
+    "welcome": {
+      "missing": false,
+      "activeTab": "sentence-map",
+      "featureStage": "welcome",
+      "hasWelcomeShell": true,
+      "hasGuidanceBlock": true,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "welcomeIntroItems": 4,
+      "welcomeHasExample": true,
+      "welcomeHasCTA": true,
+      "topChromeText": "מפת המשפט",
+      "introHeadingText": "מפת המשפט",
+      "introSubtitleText": "לפני שמדייקים או מערערים, ממפים איך אותו משפט מחזיק יחד את מה שקרה בחוץ, את מה שנהיה בפנים, ולפעמים גם את מה שהוא מבקש בקשר.",
+      "runtimeTextSample": "מפת המשפטמפת העבודהבחרו מקרה אחד והתקדמו דרך ששת השלבים: משפט, שכבות, מוקד, המלצה וניסוח חדש.ששת השלביםפתיחה · 1/61פתיחה2המשפט3כיוונים4מוקד5כיוון טיפולי6שיקוף וניסוחמקרי תרגולשלושה מקרים קבועים, אותה מפה.ליוויתרגולששת השלבים נשארים גלויים לאורך כל העבודה.דחיינ",
+      "welcomeTextSample": "🗺️למתחיליםמפת המשפטמפת המשפט מלמדת להחזיק יחד שלוש שכבות של אותה אמירה: מה ניתן לראות בפועל, מה נחשף על עולמו הפנימי של הדובר, ואיזה מהלך המשפט מנסה לייצר מול מי ששומע אותו. רק אחרי שיש מפה ברורה בוחרים מוקד, שאלה והתערבות.מה הבעיה שמנסים לפתור?הבעיה היא שקופ"
+    }
+  },
+  {
+    "feature": {
+      "missing": false,
+      "activeTab": "practice-question",
+      "featureStage": "feature",
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": true,
+      "helpButtons": [
+        {
+          "text": "יועץ NLP",
+          "id": "question-drill-open-help",
+          "cls": "btn btn-secondary action-button",
+          "aria": ""
+        },
+        {
+          "text": "",
+          "id": "",
+          "cls": "bg-coin-btn action-button",
+          "aria": "עזרה ממנטורים"
+        }
+      ],
+      "visibleHeadings": [
+        "זיהוי מטה-מודל עם אוזן חדה"
+      ],
+      "visibleParagraphs": [
+        "קוראים משפט קטן, מקשיבים למה שחסר בו, ובוחרים את השאלה שמחזירה בהירות.",
+        "לימוד: קוראים כאילו מישהו אומר לכם את המשפט ובוחרים את השאלה שתפתח אותו."
+      ],
+      "bodyHelpTexts": []
+    },
+    "welcome": {
+      "missing": false,
+      "activeTab": "practice-question",
+      "featureStage": "welcome",
+      "hasWelcomeShell": true,
+      "hasGuidanceBlock": false,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "welcomeIntroItems": 0,
+      "welcomeHasExample": false,
+      "welcomeHasCTA": true,
+      "topChromeText": "תרגול זיהוי",
+      "introHeadingText": "תרגול זיהוי מטה-מודל 🎮",
+      "introSubtitleText": "קראו משפט → בחרו שאלת עומק → ראו אם צדקתם. כוכבים ורצפים במצב למידה, ניקוד מהיר במצב מבחן.",
+      "runtimeTextSample": "זיהוי מטה-מודל עם אוזן חדה קוראים משפט קטן, מקשיבים למה שחסר בו, ובוחרים את השאלה שמחזירה בהירות. מצב לימוד זמן אמת לימוד: קוראים כאילו מישהו אומר לכם את המשפט ובוחרים את השאלה שתפתח אותו. חבילה קצרה · 5 שאלותרגילה · 8 שאלותארוכה · 12 שאלות קושי קל בינוני יאלל",
+      "welcomeTextSample": "🧩לבינייםתרגול זיהוישמעתם משפט? מצוין. עכשיו תגידו לנו — מה הדפוס שמסתתר בפנים? תרגול מהיר וממוקד.מה הבעיה שמנסים לפתור?הבעיה היא שמשפט נשמע \"לא מדויק\", אבל בלי שם לדפוס קשה לדעת מה בדיוק חסר, מה הוכלל, או איזה פירוש הודבק לעובדה.מה עושים כאןמזהים את הדפוס לפנ"
+    }
+  },
+  {
+    "feature": {
+      "missing": false,
+      "activeTab": "practice-radar",
+      "featureStage": "feature",
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": true,
+      "helpButtons": [
+        {
+          "text": "",
+          "id": "",
+          "cls": "bg-coin-btn action-button",
+          "aria": "עזרה ממנטורים"
+        }
+      ],
+      "visibleHeadings": [
+        "מכ״ם מטה-מודל"
+      ],
+      "visibleParagraphs": [
+        "קראו את המשפט, שימו לב לביטוי המודגש, ואז בחרו תבנית אחת מדויקת.",
+        "למידה: אפשר לעצור ולקבל עזרה.",
+        "מה עושים עכשיו: בחרו מצב ותחום, ואז התחילו סבב קצר וברור."
+      ],
+      "bodyHelpTexts": []
+    },
+    "welcome": {
+      "missing": false,
+      "activeTab": "practice-radar",
+      "featureStage": "welcome",
+      "hasWelcomeShell": true,
+      "hasGuidanceBlock": false,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "welcomeIntroItems": 0,
+      "welcomeHasExample": false,
+      "welcomeHasCTA": true,
+      "topChromeText": "מכ״ם מטה-מודל",
+      "introHeadingText": "מכ״ם מטה-מודל ⚡",
+      "introSubtitleText": "ראו ביטוי מודגש במשפט → זהו את הקטגוריה תוך הזמן שנקבע. ככל שמהר יותר — ניקוד גבוה יותר.",
+      "runtimeTextSample": "2. מכ״ם מטה-מודל זיהוי מהיר של תבניות בזמן, עם ניקוד ורמזור טעויות. מכ״ם מטה-מודל קראו את המשפט, שימו לב לביטוי המודגש, ואז בחרו תבנית אחת מדויקת. מצב למידה מבחן למידה: אפשר לעצור ולקבל עזרה. תחום אקראיביטחון עצמיבריאותהורותזוגיותכלליכסףעבודה זמן לשאלה: 12 שנ׳",
+      "welcomeTextSample": "🎯למתקדמיםמכ״ם מטה-מודלהמסלול המתקדם ביותר: זיהוי מהיר ושאילת שאלות מפרקות תחת לחץ זמן. כאן הכל מתחבר.מה הבעיה שמנסים לפתור?הבעיה היא שבזמן אמת הדפוס חולף מהר, והתגובה האוטומטית קודמת לזיהוי מדויק של מה באמת סגור במשפט.אני מוכן — קדימהמה עושים כאןמתרגלים דיוק "
+    }
+  },
+  {
+    "feature": {
+      "missing": false,
+      "activeTab": "practice-wizard",
+      "featureStage": "feature",
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": true,
+      "helpButtons": [
+        {
+          "text": "",
+          "id": "",
+          "cls": "bg-coin-btn action-button",
+          "aria": "עזרה ממנטורים"
+        }
+      ],
+      "visibleHeadings": [
+        "על איזו מילה כדאי לעצור?"
+      ],
+      "visibleParagraphs": [
+        "הוא לא רואה אותי",
+        "הביטוי החי כרגע: לא רואה אותי",
+        "בחזה נהיה שקיפות, כאילו אני נעלמת.",
+        "אזור נוכחי: בחזה",
+        "עוד לא אספנו ניסוח חיצוני.",
+        "המטרה כאן: לתפוס רגע, התנהגות, או הקשר שאפשר לראות.",
+        "כאן נבנה את המשפט המשולב.",
+        "עוד לא. יש כאן משהו חי, אבל זה עדיין לא נשמע כמו מה שהתכוונתי.",
+        "שלב 1",
+        "שומרים את המשפט המקורי, לא מתקנים אותו, ורק בוחרים את החלק שהכי חי עכשיו.",
+        "מה במשפט הזה הכי חי כרגע?",
+        "כרגע עצרנו על: לא רואה אותי"
+      ],
+      "bodyHelpTexts": []
+    },
+    "welcome": {
+      "missing": false,
+      "activeTab": "practice-wizard",
+      "featureStage": "welcome",
+      "hasWelcomeShell": true,
+      "hasGuidanceBlock": false,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "welcomeIntroItems": 0,
+      "welcomeHasExample": false,
+      "welcomeHasCTA": true,
+      "topChromeText": "גשר תחושה-שפה",
+      "introHeadingText": "גשר תחושה-שפה",
+      "introSubtitleText": "מתחילים בהלימה בין המשפט, החוויה והמציאות. רק אחר כך אפשר לראות מה היה חסר במשפט המקורי.",
+      "runtimeTextSample": "גשר תחושה-שפה מעבדה עדינה בין שלושה עולמות: המשפט הדחוס, מה שקורה בחוץ, ומה שנהיה בפנים. רק אחרי שיש הלימה בודקים מה התבהר על המשפט. נוכחות מלווה יש כאן משהו דחוס. בוא נגלה מה חסר כדי שזה יתאים למה שקורה. שלב 1 משפט שלב 2 חוץ שלב 3 פנים שלב 4 גשר שלב 5 הלימה א",
+      "welcomeTextSample": "🌉ליישוםגשר תחושה-שפהכאן מחברים בין מה שקרה בחוץ, מה שנהיה בפנים, ומה שאפשר לומר באופן שגם נשמע אנושי וגם נשאר מחובר למציאות.מה הבעיה שמנסים לפתור?הבעיה היא שיש פער בין מה שנאמר, מה שקרה בפועל, ומה שנחווה בפנים, ואז המשפט שנשאר ביד מרגיש לא מדויק ולא מחזיק.מה "
+    }
+  },
+  {
+    "feature": {
+      "missing": false,
+      "activeTab": "blueprint",
+      "featureStage": "feature",
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "מה המשפט הגולמי?",
+        "מטפל/ת ⇄ מטופל/ת",
+        "איפה להתמקד עכשיו",
+        "מפת שלבים מתכווצת",
+        "TEST 1 | מה רוצים במקום?",
+        "OPERATE | Build the action",
+        "OPERATE | Protection & flexibility",
+        "TEST 2 | Is the plan good?",
+        "EXIT | Commit & close",
+        "Therapeutic Action Map"
+      ],
+      "visibleParagraphs": [
+        "מסלול TOTE עם כוונה חיובית ושאלות מדודות.",
+        "בחרו פועל וקליק על שבב כדי להתחיל",
+        "הביאו לכאן תלונה, משאלה, הימנעות או פועל עמום. משם נבנה מהלך טיפולי צעד-צעד.",
+        "אחרי המשפט הגולמי לוחצים על צומת במפה. כל לחיצה מייצרת שאלה בצ׳אט, וכל תשובה נשמרת חזרה למפה.",
+        "התחילו במשפט גולמי אחד. אחר כך סדר השאלות יקבל משמעות טיפולית.",
+        "המסלול מתקדם לפי שלבים פתוחים. לחצו על שלב כדי לפתוח תתי-שאלות.",
+        "כתבו יעד חיובי, ברור ומציאותי.",
+        "כתבו סימן זיהוי קטן שמראה שזה מתקדם.",
+        "כתבו את הכוונה הטובה של ההתנהגות הישנה.",
+        "תארו תמונה או תחושה של היעד.",
+        "תארו תמונה או תחושה של הדרך, לא רק היעד.",
+        "עדיין לא נבנה"
+      ],
+      "bodyHelpTexts": []
+    },
+    "welcome": {
+      "missing": false,
+      "activeTab": "blueprint",
+      "featureStage": "welcome",
+      "hasWelcomeShell": true,
+      "hasGuidanceBlock": false,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "welcomeIntroItems": 0,
+      "welcomeHasExample": false,
+      "welcomeHasCTA": true,
+      "topChromeText": "בונה מהלך",
+      "introHeadingText": "",
+      "introSubtitleText": "",
+      "runtimeTextSample": "שלב נוכחי איסוף משפט גולמי מסלול TOTE עם כוונה חיובית ושאלות מדודות. שלמות מידע 0% 0/17 צמתים מלאים סדר שאלות 100% מהלך יציב ציון משולב 50% מאמן, לא משחק צומת מומלץ קודם משפט שומרים על סדר טיפולי בחירת פועל / משפט מה המשפט הגולמי? להירגע לסמוך על עצמי להתמודד ",
+      "welcomeTextSample": "🧭ביצועבונה מהלךכאן הופכים פעולה עמומה לתוכנית שאפשר באמת לבצע: מנסחים יעד, מפרקים צעדים, בודקים פער, ויוצאים עם מהלך עבודה.מה הבעיה שמנסים לפתור?הבעיה היא שנשארים עם כוונה כללית או \"צריך לעשות משהו\", אבל בלי צעד ראשון ברור, תנאי התחלה וחלופה כשנתקעים.מה עושים"
+    }
+  },
+  {
+    "feature": {
+      "missing": false,
+      "activeTab": "categories",
+      "featureStage": "feature",
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "מילון קטגוריות המטה-מודל",
+        "מה יש כאן",
+        "איך מתחילים",
+        "🔀 קריאת מחשבות — Mind Reading",
+        "🔀 הנחות מוקדמות — Presuppositions",
+        "🔀 חסרון הדובר — Lost Performative",
+        "🔀 סיבה ותוצאה — Cause-Effect",
+        "📈 מודל פעולה — Modal Operators",
+        "📈 הכללה — Generalization",
+        "🔀 הקבלה מורכבת — Complex Equivalence",
+        "🆔 פרדיקטים של זהות — Identity Predicates",
+        "🔀 נומינליזציה — Nominalization"
+      ],
+      "visibleParagraphs": [
+        "זהו מילון העבודה של קטגוריות המטה-מודל: פותחים כאן כרטיס, רואים מה בדיוק הוא מזהה בשפה, ולוקחים ממנו שאלה מדויקת חזרה לתרגול או לשיחה.",
+        "כל כרטיס מרכז הגדרה קצרה, דוגמאות ושאלות עבודה. המונחים באנגלית נשארים לצד העברית כדי לחבר את המילון לספרות המקצועית, לקורסים ולמונחים המקוריים של ה-Meta Model.",
+        "אפשר להיכנס מכל מקום: דרך משפחת־העל, דרך שם של קטגוריה, או דרך משפט אמיתי שאתו עובדים עכשיו.",
+        "לא צריך לקרוא הכול מההתחלה. קודם מזהים אם יש כאן מחיקה, עיוות או הכללה, ואז פותחים את הכרטיס שהכי קרוב למשפט שמולך.",
+        "טבלת ברין עוזרת להתמצא בסידור של הקטגוריות. כמו בתזכורת ה-NLP הקלאסית ש\"המפה אינה השטח\", זו מסגרת עבודה שימושית ולא תחליף למה שקורה בפועל בשיחה.",
+        "איך עובדים כאן: בוחרים כרטיס, קוראים הגדרה קצרה, יורדים לדוגמאות ולשאלות, וחוזרים איתן למשפט שעליו עובדים.",
+        "לחיצה על תא פותחת את הכרטיס הרלוונטי במילון.",
+        "בודקים מי מקור הסמכות, איזו הנחה עובדת מתחת לפני השטח, ואיזו כוונה מיוחסת בלי ראיה ישירה.",
+        "חסרון הדובר",
+        "הנחות מוקדמות",
+        "קריאת מחשבות",
+        "כאן חוקרים את חוקי המשחק: חייב/צריך/יכול, גבולות הנכונות, והנגזרת התפקודית של החוקים האלה על האדם."
+      ],
+      "bodyHelpTexts": []
+    },
+    "welcome": {
+      "missing": false,
+      "activeTab": "categories",
+      "featureStage": "feature",
+      "hasWelcomeShell": true,
+      "hasGuidanceBlock": false,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "welcomeIntroItems": 0,
+      "welcomeHasExample": false,
+      "welcomeHasCTA": true,
+      "topChromeText": "מילון הקטגוריות",
+      "introHeadingText": "",
+      "introSubtitleText": "",
+      "runtimeTextSample": "מילון קטגוריות המטה-מודל זהו מילון העבודה של קטגוריות המטה-מודל: פותחים כאן כרטיס, רואים מה בדיוק הוא מזהה בשפה, ולוקחים ממנו שאלה מדויקת חזרה לתרגול או לשיחה. מה יש כאן כל כרטיס מרכז הגדרה קצרה, דוגמאות ושאלות עבודה. המונחים באנגלית נשארים לצד העברית כדי לחבר",
+      "welcomeTextSample": "📚ידעמילון הקטגוריותכאן פותחים את משפחות המטה-מודל, רואים מה מבדיל בין מחיקה, עיוות והכללה, ומקבלים עוגן לעבודה בתוך שיחה חיה.מה הבעיה שמנסים לפתור?הבעיה היא שכאשר לא זוכרים מה כל קטגוריה בודקת, קל להתבלבל בין מחיקה, עיוות והכללה ולשאול שאלה לא מדויקת.מה עושים"
+    }
+  },
+  {
+    "feature": {
+      "missing": false,
+      "activeTab": "comic-engine",
+      "featureStage": "feature",
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [
+        "שיעורים למחר",
+        "בחר/י תגובה לשלב שכבה 1"
+      ],
+      "visibleParagraphs": [
+        "הילד פותח בקושי. עכשיו הכיוון שלך יקבע אם הוא יסביר, יתגונן או יקפא.",
+        "זמן לבחירה",
+        "מצב הילד כרגע: עדיין זמין לשיחה",
+        "תוצאה נראית לעין",
+        "ילד",
+        "הילד אומר: \"אני מסתכל על זה ופשוט לא יודע מאיפה להתחיל. זה גדול עליי.\"",
+        "בחר/י אחת מארבע התגובות בקשת כדי לכוון את הרגע הבא.",
+        "הילד פותח בקושי. עכשיו הכיוון שלך יקבע אם הוא יסביר, יתגונן או יקפא.",
+        "המערכת",
+        "הילד פותח בקושי. עכשיו הכיוון שלך יקבע אם הוא יסביר, יתגונן או יקפא.",
+        "ילד",
+        "הילד אומר: \"אני מסתכל על זה ופשוט לא יודע מאיפה להתחיל. זה גדול עליי.\""
+      ],
+      "bodyHelpTexts": []
+    },
+    "welcome": {
+      "missing": false,
+      "activeTab": "comic-engine",
+      "featureStage": "welcome",
+      "hasWelcomeShell": true,
+      "hasGuidanceBlock": false,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "welcomeIntroItems": 0,
+      "welcomeHasExample": false,
+      "welcomeHasCTA": true,
+      "topChromeText": "במת קומיקס רגשי",
+      "introHeadingText": "",
+      "introSubtitleText": "",
+      "runtimeTextSample": "במת קומיקס רגשי סימולטור דיאלוג רגשי חי בחר/י תגובה תחת לחץ זמן, וראה/י איך המילים שלך משנות זרימה, סוכנות, בושה ותגובתיות בזמן אמת. שיעורים למחר הילד פותח בקושי. עכשיו הכיוון שלך יקבע אם הוא יסביר, יתגונן או יקפא. הורות 1 / 3 שכבה 1 · פתיחה ↩ ? ↻ 14 זמן לבחיר",
+      "welcomeTextSample": "🎭סצנהבמת קומיקס רגשיכאן מתרגלים תגובה בתוך רגע חי: בוחרים טון, רואים איך הוא נוחת על הזרימה, הסוכנות והבושה, וממשיכים את הסצנה מתוך התוצאה.מה הבעיה שמנסים לפתור?הבעיה היא שברגע טעון בוחרים תגובה אוטומטית מתוך לחץ, ואז השיחה מסלימה או נסגרת לפני שנוצרה בהירות."
+    }
+  },
+  {
+    "feature": {
+      "missing": false,
+      "activeTab": "",
+      "featureStage": "",
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "visibleHeadings": [],
+      "visibleParagraphs": [],
+      "bodyHelpTexts": []
+    },
+    "welcome": {
+      "missing": false,
+      "activeTab": "initial-image-vs-deep-structure",
+      "featureStage": "welcome",
+      "hasWelcomeShell": true,
+      "hasGuidanceBlock": false,
+      "practiceIntroHeadingVisible": false,
+      "practiceIntroSubtitleVisible": false,
+      "practiceSectionHeaderVisible": false,
+      "sentenceMapMethodVisible": false,
+      "comicShellCopyVisible": false,
+      "bgCoinVisible": false,
+      "helpButtons": [],
+      "welcomeIntroItems": 0,
+      "welcomeHasExample": false,
+      "welcomeHasCTA": true,
+      "topChromeText": "מתמונת שטח למבנה עומק",
+      "introHeadingText": "",
+      "introSubtitleText": "",
+      "runtimeTextSample": "",
+      "welcomeTextSample": "🖼️למטפליםמתמונת שטח למבנה עומקמשפט אחד מספיק כדי לבנות תמונה שלמה בראש. כאן מתאמנים לעצור לפני שהתמונה נסגרת — ולחשוף את מבנה העומק שמאחוריה.מה הבעיה שמנסים לפתור?כשאדם אומר משפט, המקשיב בונה מיד תמונת שטח של מה שקרה. היא נראית ברורה, אבל היא מבוססת על מה שנש"
+    }
+  }
+]
