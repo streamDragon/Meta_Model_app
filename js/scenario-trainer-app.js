@@ -1,4 +1,4 @@
-(function attachScenarioTrainerApp() {
+﻿(function attachScenarioTrainerApp() {
     const root = typeof globalThis !== 'undefined' ? globalThis : window;
     const trainerContract = typeof root.getMetaTrainerPlatformContract === 'function'
         ? root.getMetaTrainerPlatformContract('scenario-trainer')
@@ -2338,20 +2338,7 @@
         return `
           <section class="scenario-play-view scenario-play-view--story" data-scenario-stage="1" data-domain="${escapeHtml(scenario.domain)}">
             ${renderRuntimeWorkspaceV2(scenario, options, activeSlide, progress, 'play')}
-            <section class="scenario-play-options-card scenario-play-options-card--supporting">
-              <div class="scenario-play-options-head">
-                <p class="scenario-panel-kicker">מה בודקים כאן</p>
-                <h3>${escapeHtml(scenario.surfaceConflict)}</h3>
-                <p>${escapeHtml(scenario.learningFocus)}</p>
-              </div>
-              <details class="scenario-meta-accordion scenario-meta-accordion--inline">
-                <summary>שאלת העמקה לסצנה הזאת</summary>
-                <div class="scenario-meta-accordion-body">
-                  <p><strong>השאלה:</strong> ${escapeHtml(scenario.deepeningQuestion)}</p>
-                  <p><strong>מה חסר כרגע:</strong> ${escapeHtml(scenario.metaModelCore.hiddenGap)}</p>
-                </div>
-              </details>
-            </section>
+
           </section>
         `;
     }
@@ -2488,6 +2475,8 @@
                 <p class="scenario-panel-kicker">הצצה לסשן</p>
                 <h3>${escapeHtml(previewScenario.sceneTitle)}</h3>
                 <p>${escapeHtml(previewScenario.contextIntro)}</p>
+                <p><strong>מה בודקים כאן:</strong> ${escapeHtml(previewScenario.learningFocus)}</p>
+                <p><strong>שאלת דיוק:</strong> ${escapeHtml(previewScenario.deepeningQuestion)}</p>
                 ${previewScenario.openingLine ? `<blockquote class="scenario-home-example-quote">"${escapeHtml(previewScenario.openingLine)}"</blockquote>` : ''}
               </div>
               <div class="scenario-home-preview-media">
@@ -2820,6 +2809,7 @@
     }
 
     function renderHelpScreen() {
+        const scenario = state.activeScenario || state.session?.queue?.[state.session.index] || null;
         return `
           <section class="scenario-overlay-card scenario-workspace-card">
             <p class="scenario-panel-kicker">עזרה</p>
@@ -2829,6 +2819,10 @@
               <li>בוחרים תגובה אחת שהכי מקדמת קשר, בהירות וצעד בדיקה.</li>
               <li>רואים קודם איך זה נחת, ורק אחר כך פותחים את הניתוח העמוק.</li>
             </ol>
+            ${scenario ? `
+            <p class="scenario-help-note"><strong>הפוקוס בסצנה הפעילה:</strong> ${escapeHtml(scenario.learningFocus)}</p>
+            <p class="scenario-help-note"><strong>שאלת הדיוק שמובילה את העבודה:</strong> ${escapeHtml(scenario.deepeningQuestion)}</p>
+            ` : ''}
             <p class="scenario-help-note">המשימה כאן היא לא “להישמע טוב”, אלא לזהות איזו תגובה באמת מזיזה את השיחה מהמופשט אל מה שאפשר לבדוק.</p>
             <div class="scenario-feedback-actions">
               <button type="button" class="btn btn-primary" data-scenario-action="go-home">חזרה</button>
@@ -2956,3 +2950,4 @@
         handleChange(event);
     }
 })();
+
