@@ -564,13 +564,14 @@
         state.setupOpen = false;
         state.settingsDrawerOpen = false;
         state.showRoundGuide = false;
+        state.showPhilosopher = false;
         state.paused = false;
         resetRoundUiState();
         state.feedback = {
             tone: 'info',
             text: state.mode === 'exam'
-                ? 'מצב מבחן פעיל: בלי רמזים/הסברים במהלך הריצה.'
-                : 'מצב למידה פעיל: אפשר לעצור, לקבל רמז ולנסות שוב.'
+                ? 'הסשן התחיל. נשארים חדים, שקטים, וקרובים למילים עצמן.'
+                : 'מתחילים ברוגע. שומעים את הסיטואציה ובוחרים את השאלה שהכי פותחת אותה.'
         };
         ensureTimer();
         render();
@@ -628,7 +629,9 @@
         }
         state.appStage = SESSION_STATE_SUMMARY;
         state.settingsDrawerOpen = false;
+        state.showPhilosopher = false;
         state.paused = false;
+        resetExplanationPanel();
         emitAlchemyFx('whoosh', { text: 'Session complete' });
         render();
     }
@@ -947,6 +950,7 @@
             state.appStage = SESSION_STATE_INTRO;
             state.setupOpen = false;
             state.settingsDrawerOpen = false;
+            state.showPhilosopher = false;
             state.paused = false;
             state.feedback = null;
             resetRoundUiState();
@@ -2326,6 +2330,10 @@
             state.appStage = SESSION_STATE_INTRO;
         }
 
+        if (typeof document !== 'undefined' && document.body) {
+            document.body.setAttribute('data-cc-app-stage', state.appStage);
+        }
+
         if (!state.session || state.appStage === SESSION_STATE_INTRO) {
             appEl.innerHTML = renderIntroScreen();
             return;
@@ -2340,6 +2348,9 @@
     function render() {
         state.renderNonce += 1;
         if (!state.loaded) {
+            if (typeof document !== 'undefined' && document.body) {
+                document.body.setAttribute('data-cc-app-stage', 'loading');
+            }
             appEl.innerHTML = `<div class="cc-loading">${escapeHtml(state.loadError || 'טוען נתונים...')}</div>`;
             return;
         }
