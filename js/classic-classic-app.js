@@ -636,13 +636,13 @@
     function buildHintForStage(stage, round) {
         if (!round) return '';
         if (stage === 'question') {
-            return 'חפש/י שאלה שמחזירה מידע חסר / קריטריון / תנאים, ולא שאלה שיפוטית או פתרון מוקדם.';
+            return 'חפשו שאלה שמחזירה פירוט קונקרטי: מה בדיוק, איך, מתי, לפי מה, או מול מי.';
         }
         if (stage === 'problem') {
-            return `“בעיה” = מה המבנה הלשוני יוצר במפה. רמז: ${round.pattern.problem?.oneLiner || ''}`;
+            return `לא מגיבים לתוכן עצמו אלא נותנים שם לסוג הערפל שנוצר בשפה. רמז: ${round.pattern.problem?.oneLiner || ''}`;
         }
         if (stage === 'goal') {
-            return `“מטרה” = איזה מידע חסר נחפש. רמז: ${round.pattern.goal?.oneLiner || ''}`;
+            return `חפשו את שם המידע החסר שיכול לחזור לשיחה. רמז: ${round.pattern.goal?.oneLiner || ''}`;
         }
         return '';
     }
@@ -655,8 +655,48 @@
         state.hintUsedByStage[round.stage] = true;
         state.hintMessage = buildHintForStage(round.stage, round);
         emitAlchemyFx('whoosh', { text: 'Hint' });
-        state.feedback = { tone: 'info', text: 'רמז מוצג (פעם אחת לשלב).' };
+        state.feedback = { tone: 'info', text: 'רמז קטן נפתח. נשארים עם המילים עצמן, לא עם הפרשנות.' };
         render();
+    }
+
+    function buildWarmSuccessFeedback(stage, options) {
+        const cfg = options || {};
+        if (cfg.completedRound) {
+            return 'מעולה. סגרנו את המשפט הזה ואפשר לאסוף ממנו את מה שחשוב.';
+        }
+        if (stage === 'question') {
+            return '🎯 בול. זו שאלה שמחזירה את השיחה למשהו מדויק יותר.';
+        }
+        if (stage === 'problem') {
+            return '🎯 בול. זה השם המדויק של מה שמסתבך כאן בשפה.';
+        }
+        if (stage === 'goal') {
+            return '🎯 בול. זה יעד המידע שיעזור לפתוח את המשפט.';
+        }
+        return 'מעולה. אפשר להמשיך לצעד הבא.';
+    }
+
+    function buildWarmRetryFeedback(stage) {
+        if (stage === 'question') {
+            return '👍 קרוב. כאן כדאי לחפש שאלה שמחזירה מידע חסר, לא פרשנות.';
+        }
+        if (stage === 'problem') {
+            return '↩ לא בדיוק. כאן אנחנו נותנים שם למבנה, לא מגיבים לתוכן.';
+        }
+        if (stage === 'goal') {
+            return '↩ לא בדיוק. חפשו איזה מידע חסר, לא איזה פתרון נשמע טוב.';
+        }
+        return '👍 עוד רגע של דיוק, ואז זה יישב במקום.';
+    }
+
+    function buildWarmExamMissFeedback(livesLeft) {
+        if (Number.isFinite(livesLeft) && livesLeft <= 0) {
+            return '↩ לא בדיוק. הסשן נעצר כאן, אבל אפשר לחזור לעוד סבב חדש.';
+        }
+        if (Number.isFinite(livesLeft)) {
+            return `↩ לא בדיוק. נשארו ${livesLeft} חיים, אז נשימה אחת וממשיכים.`;
+        }
+        return '↩ לא בדיוק. נשימה אחת וממשיכים.';
     }
 
     function submitOption(optionId) {
@@ -682,7 +722,7 @@
                 if (result.completedRound) {
                     state.feedback = {
                         tone: 'success',
-                        text: 'סבב הושלם. עברו על הסיכום ואז המשיכו לתבנית הבאה.'
+                        text: buildWarmSuccessFeedback(stageBeforeSubmit, { completedRound: true })
                     };
                     emitAlchemyFx('success', { text: 'Round complete' });
                     setExplanationEntry(buildExplanationEntry({
@@ -695,10 +735,9 @@
                 } else {
                     const nextRound = currentRound();
                     const nextStage = String(result.nextStage || '');
-                    const optionCount = Math.max(0, Number((nextRound?.options?.[nextStage] || []).length));
                     state.feedback = {
                         tone: 'success',
-                        text: '\u05e0\u05db\u05d5\u05df! \u05de\u05d4 \u05e7\u05e8\u05d4 \u05e2\u05db\u05e9\u05d9\u05d5: \u05e2\u05d1\u05e8\u05ea \u05dc' + stageTransitionTitle(nextStage) + '. \u05de\u05d4 \u05e2\u05d5\u05e9\u05d9\u05dd \u05e2\u05db\u05e9\u05d9\u05d5: ' + stageTransitionActionHint(nextStage) + ' \u05d4\u05d5\u05e6\u05d2\u05d5 ' + optionCount + ' \u05d0\u05e4\u05e9\u05e8\u05d5\u05d9\u05d5\u05ea \u05d7\u05d3\u05e9\u05d5\u05ea.'
+                        text: buildWarmSuccessFeedback(stageBeforeSubmit)
                     };
                     if (stageBeforeSubmit !== nextStage) {
                         activateStageTransition(nextRound, nextStage);
@@ -715,7 +754,7 @@
             } else if (state.mode === 'learning') {
                 state.feedback = {
                     tone: 'warn',
-                    text: result.explanation || 'לא מדויק. נסו שוב.'
+                    text: buildWarmRetryFeedback(stageBeforeSubmit)
                 };
                 setExplanationEntry(buildExplanationEntry({
                     round,
@@ -725,10 +764,9 @@
                     tone: 'warn'
                 }), { autoOpen: true });
             } else {
-                const livesText = Number.isFinite(result.livesLeft) ? ` | חיים: ${result.livesLeft}` : '';
                 state.feedback = {
                     tone: result.livesLeft <= 0 ? 'danger' : 'warn',
-                    text: `לא נכון.${livesText}`
+                    text: buildWarmExamMissFeedback(result.livesLeft)
                 };
             }
 
@@ -1029,6 +1067,55 @@
         rules_generalization: ['אם אני נפתח', 'בכל ריב', 'תמיד מסתבך']
     });
 
+    function stablePatternNumber(seed, modulo) {
+        const text = String(seed || '');
+        const size = Math.max(1, Number(modulo) || 1);
+        let hash = 0;
+        for (let index = 0; index < text.length; index += 1) {
+            hash = ((hash << 5) - hash) + text.charCodeAt(index);
+            hash |= 0;
+        }
+        return Math.abs(hash) % size;
+    }
+
+    function getSceneLibrary() {
+        const library = configApi?.SCENE_LIBRARY;
+        if (!library || typeof library !== 'object') {
+            return { patterns: {}, familyFallbacks: {} };
+        }
+        return library;
+    }
+
+    function resolveSceneImage(sceneMeta, fallbackMeta, patternId) {
+        const explicitImage = String(sceneMeta?.sceneImage || '').trim();
+        if (explicitImage) return explicitImage;
+        const fallbackImage = String(fallbackMeta?.sceneImage || '').trim();
+        if (fallbackImage) return fallbackImage;
+        const pool = Array.isArray(sceneMeta?.sceneImagePool) && sceneMeta.sceneImagePool.length
+            ? sceneMeta.sceneImagePool
+            : (Array.isArray(fallbackMeta?.sceneImagePool) ? fallbackMeta.sceneImagePool : []);
+        if (!pool.length) return '';
+        return String(pool[stablePatternNumber(patternId, pool.length)] || '').trim();
+    }
+
+    function getSceneMetaForRound(round) {
+        const patternId = String(round?.pattern?.id || '').trim();
+        const familyKey = String(round?.pattern?.family || '').trim().toLowerCase();
+        const library = getSceneLibrary();
+        const patternMeta = library?.patterns?.[patternId] || {};
+        const familyMeta = library?.familyFallbacks?.[familyKey] || {};
+        const contextLead = String(patternMeta.contextLead || familyMeta.contextLead || '').trim();
+        const contextAfter = String(patternMeta.contextAfter || familyMeta.contextAfter || '').trim();
+        return {
+            sceneImage: resolveSceneImage(patternMeta, familyMeta, patternId),
+            sceneAlt: String(patternMeta.sceneAlt || familyMeta.sceneAlt || round?.pattern?.name || 'הקשר רגשי לתרגול').trim(),
+            sceneLabel: String(patternMeta.sceneLabel || familyMeta.sceneLabel || familyLabelSimple(familyKey)).trim(),
+            contextLead,
+            contextAfter,
+            highlightedQuote: String(patternMeta.highlightedQuote || '').trim()
+        };
+    }
+
     function familyLabelSimple(family) {
         const key = normalizeFamilyFocus(family);
         if (key === 'deletion') return 'מחיקות';
@@ -1055,11 +1142,11 @@
     }
 
     function stageTransitionActionHint(stage) {
-        if (stage === 'question') return 'קודם שומעים את המשפט המלא, ואז מחפשים שאלה שמחזירה מידע חסר.';
-        if (stage === 'problem') return 'עכשיו כבר לא בוחרים שאלה אלא את שם המבנה שיוצר את הבלבול.';
-        if (stage === 'goal') return 'כאן מחדדים איזה מידע בדיוק חסר כדי לפתוח את המשפט.';
-        if (stage === 'summary') return 'כאן מחברים את כל הסיפור: מה נאמר, מה זוהה, ומה לוקחים לסבב הבא.';
-        return 'המשיכו לשלב הבא.';
+        if (stage === 'question') return 'נשארים רגע עם המשפט כמו שהוא נשמע.';
+        if (stage === 'problem') return 'מעולה, עכשיו מזהים מה בדיוק מסתבך בשפה.';
+        if (stage === 'goal') return 'עוד דיוק קטן: איזה מידע חסר כאן?';
+        if (stage === 'summary') return 'יפה, אפשר לאסוף את מה שנפתח כאן ולהמשיך הלאה.';
+        return 'ממשיכים צעד אחד קדימה.';
     }
 
     function getPromptTextForRound(round) {
@@ -1072,18 +1159,32 @@
     }
 
     function feedbackTitleForTone(tone) {
-        if (tone === 'success') return 'נכון';
-        if (tone === 'warn') return 'כמעט';
-        if (tone === 'danger') return 'נעצר';
-        return 'המשך';
+        if (tone === 'success') return '🎯 בול';
+        if (tone === 'warn') return '👍 קרוב';
+        if (tone === 'danger') return '↩ לא בדיוק';
+        return 'רמז קטן';
     }
 
     function stageQuestionPrompt(round) {
         const stage = round?.stage || '';
-        if (stage === 'question') return 'מה השאלה הכי מדויקת כדי להחזיר מידע חסר?';
-        if (stage === 'problem') return 'מה הבעיה הלשונית המרכזית כאן?';
-        if (stage === 'goal') return 'מה יעד המידע שכדאי לברר עכשיו?';
-        return 'מה התבנית המרכזית?';
+        if (stage === 'question') return 'איזו שאלה תעזור להבין למה בדיוק הכוונה?';
+        if (stage === 'problem') return 'מה בדיוק יוצר כאן ערפל בשפה?';
+        if (stage === 'goal') return 'איזה מידע חסר כאן כדי לדייק?';
+        return 'מה חשוב לקחת מהמשפט הזה הלאה?';
+    }
+
+    function stageTaskMicrocopy(round) {
+        const stage = String(round?.stage || '').trim();
+        if (stage === 'question') {
+            return 'מחפשים שאלה שמחזירה למילים עצמן משהו קונקרטי שחסר בהן.';
+        }
+        if (stage === 'problem') {
+            return 'עכשיו לא מגיבים לסיפור אלא מזהים את סוג הפער שיושב בתוך המשפט.';
+        }
+        if (stage === 'goal') {
+            return 'עוד צעד קטן: מנסחים איזה מידע צריך לחזור לשיחה כדי לפתוח אותה.';
+        }
+        return 'נאסוף בקצרה מה שמענו, מה זיהינו, ומה יעזור להמשיך הלאה.';
     }
 
     function getStageOptionCopy(round, stage, optionId) {
@@ -1091,9 +1192,20 @@
         return options.find((item) => String(item?.id || '') === String(optionId || '')) || null;
     }
 
-    function findPromptFocus(patternId, promptText) {
+    function findPromptFocus(patternId, promptText, explicitQuote) {
         const safeText = String(promptText || '').trim();
         if (!safeText) return { snippet: '', start: -1, end: -1 };
+        const preferred = String(explicitQuote || '').trim();
+        if (preferred) {
+            const preferredIndex = safeText.indexOf(preferred);
+            if (preferredIndex >= 0) {
+                return {
+                    snippet: preferred,
+                    start: preferredIndex,
+                    end: preferredIndex + preferred.length
+                };
+            }
+        }
         const rules = Array.isArray(PROMPT_HIGHLIGHT_RULES[patternId]) ? PROMPT_HIGHLIGHT_RULES[patternId] : [];
         for (const rawRule of rules) {
             const rule = String(rawRule || '').trim();
@@ -1130,13 +1242,19 @@
     }
 
     function getPromptDisplayData(round) {
+        const sceneMeta = getSceneMetaForRound(round);
         const promptText = getPromptTextForRound(round);
-        const focus = findPromptFocus(String(round?.pattern?.id || ''), promptText);
+        const focus = findPromptFocus(String(round?.pattern?.id || ''), promptText, sceneMeta.highlightedQuote);
         return {
             promptText,
             focusSnippet: focus.snippet || promptText,
             highlightedHtml: renderHighlightedPrompt(promptText, focus),
-            contextLead: 'שומעים קודם את המשפט כמו שהוא נאמר, ואז מסתכלים על החלק שמבקש בירור.'
+            contextLead: sceneMeta.contextLead || 'עוצרים לרגע בתוך הסיטואציה, שומעים את המילים כפי שנאמרו, ורק אז בודקים מה חסר בהן.',
+            contextAfter: sceneMeta.contextAfter || 'המטרה עכשיו היא לא לפתור את כל הסיפור, אלא לדייק את הנקודה שבתוך המשפט.',
+            sceneImage: sceneMeta.sceneImage || '',
+            sceneAlt: sceneMeta.sceneAlt || '',
+            sceneLabel: sceneMeta.sceneLabel || '',
+            highlightedQuote: sceneMeta.highlightedQuote || focus.snippet || promptText
         };
     }
 
@@ -1157,28 +1275,28 @@
         let takeForward = '';
         if (stage === 'question') {
             whyChoice = isCorrect
-                ? 'הבחירה הזאת מחזירה את השיחה אל מידע חסר בתוך המשפט, ולכן היא מקדמת בירור במקום לקפוץ לפרשנות או פתרון.'
-                : (String(result.explanation || '').trim() || 'הבחירה הזאת נשמעת קשורה, אבל היא לא מחזירה קודם את המידע הלשוני שחסר בתוך המשפט.');
+                ? 'זו שאלה שעוזרת להישאר קרוב למה שנאמר באמת, ולהחזיר פרט שחסר בתוך המשפט לפני שקופצים לפרשנות.'
+                : (String(result.explanation || '').trim() || 'הבחירה הזאת נוגעת בסיפור, אבל עדיין לא מחזירה את פיסת המידע שחסרה בתוך המילים עצמן.');
             takeForward = isCorrect
-                ? 'בשלב הבא כבר לא מחפשים שאלה טובה, אלא את שם המבנה שיוצר את העמימות או ההטיה.'
-                : 'חזרו לאפשרויות ובדקו איזו שאלה באמת מבקשת עובדה, תנאי, קריטריון, או פירוט קונקרטי.';
+                ? 'מכאן אפשר לעבור לזהות איזה מבנה לשוני יצר את הערפל או ההטיה.'
+                : 'נסו שוב ובדקו איזו שאלה מבקשת עובדה, תנאי, קריטריון או פירוט קונקרטי.';
         } else if (stage === 'problem') {
             whyChoice = isCorrect
-                ? 'כאן המעבר החשוב הוא מתוכן השיחה אל המבנה שלה. במקום להגיב למה שנאמר, מזהים איזה סוג פער לשוני מנהל את המפה.'
-                : (String(result.explanation || '').trim() || 'הבחירה הזאת נוגעת בתוכן, אבל לא מגדירה את המבנה הלשוני המרכזי שיוצר את הבעיה במפה.');
+                ? 'כאן המעבר החשוב הוא מתוכן השיחה אל הצורה שלה. במקום להגיב לכאב עצמו, מזהים איזה סוג פער לשוני מנהל את המפה.'
+                : (String(result.explanation || '').trim() || 'הבחירה הזאת קשורה לתוכן, אבל עדיין לא נותנת שם למבנה הלשוני שמייצר את הבלבול.');
             takeForward = isCorrect
-                ? 'אחרי ששם המבנה ברור, אפשר לדייק מהו יעד המידע שחסר כדי לפתוח אותו.'
-                : 'נסו שוב ובחרו ניסוח שמתאר את הפער עצמו, לא עצה, לא פתרון ולא תגובה רגשית כללית.';
+                ? 'אחרי ששם המבנה ברור, אפשר לדייק איזה מידע חסר כדי לפתוח אותו.'
+                : 'נסו שוב ובחרו ניסוח שמתאר את הפער עצמו, לא עצה, לא פתרון ולא תגובה כללית.';
         } else if (stage === 'goal') {
             whyChoice = isCorrect
-                ? 'כאן מגדירים מה בדיוק חסר: מי, מה, איך, מתי, לפי מה, או באיזה קריטריון. זאת הנקודה שהופכת את העבודה לפרקטית.'
-                : (String(result.explanation || '').trim() || 'הבחירה הזאת עדיין לא מנסחת איזה מידע חסר צריך להחזיר כדי להפוך את המפה לברת בדיקה.');
+                ? 'כאן מגדירים איזה מידע חסר באמת: מי, מה בדיוק, איך, מתי, לפי מה או מול מי. זה מה שהופך את השיחה למעשית וברורה יותר.'
+                : (String(result.explanation || '').trim() || 'הבחירה הזאת עדיין לא מנסחת איזה מידע חסר צריך לחזור לשיחה כדי שהיא תהיה ברורה יותר.');
             takeForward = isCorrect
-                ? 'עברו לסיכום ונסחו לעצמכם מה נאמר, איזה מבנה זיהיתם, ואיזה מידע היה חסר.'
+                ? 'עוד רגע נסגור את המשפט הזה ונראה מה נרצה לקחת ממנו הלאה.'
                 : 'בדקו איזו תשובה מנסחת יעד מידע ברור שאפשר לשאול עליו שאלה אחת פשוטה ומדויקת.';
         } else {
-            whyChoice = 'הסיכום מחבר בין המשפט, המבנה שזוהה, והשאלה שהייתה הכי מועילה כדי להמשיך מכאן הלאה.';
-            takeForward = 'לפני הסבב הבא, ודאו שאתם יודעים מה שמעתם, מה היה הבלבול, ומה הייתה שאלת הבירור הנכונה.';
+            whyChoice = 'הסיכום מחבר בין המשפט, המבנה שזוהה, והשאלה שהכי עזרה להחזיר קרקע מתחת לרגליים.';
+            takeForward = 'רגע לפני הסבב הבא, שווה להרגיש מה נפתח כאן ומה בדיוק עזר לפתוח אותו.';
         }
 
         return {
@@ -1520,43 +1638,116 @@
     }
 
     function renderStageProgressPills(round) {
-        const stage = round?.stage || '';
-        const activeId = stage || 'context';
-        const currentIndex = PHASE_STEPS.findIndex((step) => step.id === activeId);
+        const hasResult = !!(state.feedback || state.hintMessage || state.explanationPanel?.entry);
+        const pills = [
+            { label: 'שומעים', state: 'is-done' },
+            { label: 'בוחרים', state: hasResult || round?.stage === 'summary' ? 'is-done' : 'is-current' },
+            { label: 'רואים תוצאה', state: hasResult || round?.stage === 'summary' ? 'is-current' : 'is-upcoming' }
+        ];
         return `
-          <section class="cc-phase-rail" aria-label="מפת שלבים">
-            ${PHASE_STEPS.map((step, index) => {
-                const isCurrent = step.id === activeId;
-                const isDone = currentIndex > index;
-                const classes = ['cc-phase-step', isCurrent ? 'is-current' : '', isDone ? 'is-done' : '', !isCurrent && !isDone ? 'is-upcoming' : ''].filter(Boolean).join(' ');
+          <section class="cc-phase-pills" aria-label="רצף התרגול">
+            ${pills.map((pill, index) => {
+                const classes = ['cc-phase-pill', pill.state].filter(Boolean).join(' ');
                 return `
-                  <article class="${classes}">
-                    <div class="cc-phase-step-top">
-                      <span class="cc-phase-step-index">${isDone ? '✓' : (index + 1)}</span>
-                      <strong>${escapeHtml(step.shortLabel)}</strong>
-                    </div>
-                    <p>${escapeHtml(step.goal)}</p>
-                  </article>
+                  <div class="${classes}">
+                    <span class="cc-phase-pill-index">${index + 1}</span>
+                    <span>${escapeHtml(pill.label)}</span>
+                  </div>
                 `;
             }).join('')}
           </section>
         `;
     }
 
-    function renderFeedbackBox(round) {
+    function renderSceneContext(round, options) {
+        if (!round) return '';
+        const cfg = options || {};
+        const promptData = getPromptDisplayData(round);
+        const family = familyLabelSimple(round?.pattern?.family || '');
+        const mediaInner = promptData.sceneImage
+            ? `<img class="cc-scene-image" src="${escapeHtml(assetUrl(promptData.sceneImage))}" alt="${escapeHtml(promptData.sceneAlt || 'הקשר לתרגול')}" loading="eager" decoding="async">`
+            : `
+              <div class="cc-scene-fallback" data-family="${escapeHtml(round?.pattern?.family || '')}">
+                <span class="cc-scene-fallback-icon">◌</span>
+                <strong>${escapeHtml(promptData.sceneLabel || 'רגע מתוך שיחה')}</strong>
+                <p>גם בלי תמונה, אפשר להישאר עם ההקשר האנושי של המשפט ולחפש מה חסר בו.</p>
+              </div>
+            `;
+        return `
+          <section class="cc-scene-card${cfg.compact ? ' is-compact' : ''}" aria-label="הקשר אנושי למשפט">
+            <div class="cc-scene-media${promptData.sceneImage ? '' : ' is-fallback'}">
+              ${mediaInner}
+              <div class="cc-scene-media-overlay">
+                <span>${escapeHtml(promptData.sceneLabel || 'רגע מתוך שיחה')}</span>
+                <strong>${escapeHtml(round?.pattern?.name || '')}</strong>
+              </div>
+            </div>
+            <div class="cc-scene-body">
+              <div class="cc-scene-tags">
+                <span class="cc-scene-tag">${escapeHtml(family)}</span>
+                <span class="cc-scene-tag">${escapeHtml(stageStepLabel(round?.stage || 'question'))}</span>
+              </div>
+              <p class="cc-scene-copy">
+                ${escapeHtml(promptData.contextLead)}
+                <span class="cc-scene-inline-quote">${promptData.highlightedHtml}</span>
+                ${escapeHtml(promptData.contextAfter || '')}
+              </p>
+              <div class="cc-scene-focus-callout">
+                <strong>המילים שכדאי להחזיק רגע</strong>
+                <span>${escapeHtml(promptData.focusSnippet || promptData.highlightedQuote || promptData.promptText || '')}</span>
+              </div>
+            </div>
+          </section>
+        `;
+    }
+
+    function getResultToggleLabel(entry, tone) {
+        if (state.explanationPanel?.open) return 'לסגור את הפירוט';
+        if (tone === 'success' && entry?.stage === 'question') return 'למה זו השאלה המדויקת?';
+        if (tone === 'success') return 'למה זה חשוב כאן?';
+        if (tone === 'warn' || tone === 'danger') return 'מה כדאי לדייק כאן?';
+        return 'עוד הבהרה קטנה';
+    }
+
+    function renderResultCard(round) {
         if (!state.feedback && !state.hintMessage && !state.explanationPanel?.entry) return '';
         const tone = state.feedback?.tone || 'info';
-        const headline = feedbackTitleForTone(tone);
+        const entry = state.explanationPanel?.entry || null;
         const message = state.feedback?.text || state.hintMessage || '';
         return `
-          <section class="cc-feedback-panel" data-tone="${escapeHtml(tone)}" data-alchemy-skip="1" aria-live="polite">
-            <div class="cc-feedback-main"><strong>${escapeHtml(headline)}</strong><span>${escapeHtml(message)}</span></div>
-            ${state.explanationPanel?.entry ? `
-              <div class="cc-feedback-actions">
-                <button type="button" class="cc-btn cc-btn-ghost cc-btn-inline" data-cc-action="toggle-explanation">
-                  ${state.explanationPanel.open ? 'סגור הסבר' : 'פתח הסבר מלא'}
+          <section class="cc-result-card" data-tone="${escapeHtml(tone)}" data-alchemy-skip="1" aria-live="polite">
+            <div class="cc-result-main">
+              <div class="cc-result-copy">
+                <strong>${escapeHtml(feedbackTitleForTone(tone))}</strong>
+                <p>${escapeHtml(message)}</p>
+              </div>
+              ${tone === 'success' && entry?.takeForward ? `<span class="cc-result-next">${escapeHtml(entry.takeForward)}</span>` : ''}
+            </div>
+            ${entry ? `
+              <div class="cc-result-extra">
+                <button type="button" class="cc-result-toggle" data-cc-action="toggle-explanation" aria-expanded="${state.explanationPanel.open ? 'true' : 'false'}">
+                  ${escapeHtml(getResultToggleLabel(entry, tone))}
                 </button>
-                <span>ההסבר נשאר פתוח עד שתסגור/י אותו.</span>
+                ${state.explanationPanel.open ? `
+                  <div class="cc-result-details">
+                    <div class="cc-result-details-grid">
+                      <article class="cc-result-detail-card">
+                        <strong>מה נשמע בתוך המשפט</strong>
+                        <p>${escapeHtml(entry.focusSnippet || entry.whatWasSaid || '')}</p>
+                      </article>
+                      <article class="cc-result-detail-card">
+                        <strong>${escapeHtml(tone === 'success' ? 'למה זה עבד כאן' : 'מה לא ישב עד הסוף')}</strong>
+                        <p>${escapeHtml(entry.whyChoice || '')}</p>
+                      </article>
+                      ${entry.goalText ? `
+                        <article class="cc-result-detail-card">
+                          <strong>מה כדאי לברר מכאן</strong>
+                          <p>${escapeHtml(entry.goalText)}</p>
+                        </article>
+                      ` : ''}
+                    </div>
+                  </div>
+                ` : ''}
               </div>
             ` : ''}
           </section>
@@ -1712,28 +1903,37 @@
     function renderRoundSummaryCard(round) {
         const reachedTarget = hasReachedQuestionTarget();
         const primaryAction = reachedTarget ? 'end-session' : 'next-round';
-        const primaryLabel = reachedTarget ? 'לסיכום' : 'לשאלה הבאה';
-        const operation = operationProfileForFamily(round?.pattern?.family);
+        const primaryLabel = reachedTarget ? 'לסיכום הסשן' : 'למשפט הבא ←';
         const promptData = getPromptDisplayData(round);
+        const anchorQuestion = getCoachFollowUpQuestion(round);
         return `
-          <section class="cc-practice-card cc-round-summary-card" data-alchemy-skip="1">
-            <div class="cc-practice-card-head">
-              <div class="cc-card-kicker">סיום שאלה</div>
-              <h2>${escapeHtml(round?.pattern?.name || 'סיכום')}</h2>
-              <p>${escapeHtml(round?.pattern?.definition || '')}</p>
+          <section class="cc-practice-card cc-practice-card--summary cc-round-summary-card" data-alchemy-skip="1">
+            <div class="cc-round-finish-head">
+              <div class="cc-card-kicker">סיום המשפט</div>
+              <h2>מעולה. המשפט הזה כבר נראה הרבה יותר ברור.</h2>
+              <p>שמענו את הסיטואציה, זיהינו את המבנה, ודייקנו מה צריך לחזור לשיחה כדי לפתוח אותה.</p>
             </div>
-            <div class="cc-summary-grid">
-              <div class="cc-summary-block">
-                <h4>מה נאמר?</h4>
+            ${renderSceneContext(round, { compact: true })}
+            ${renderResultCard(round)}
+            <div class="cc-summary-recap-grid">
+              <article class="cc-summary-recap-card">
+                <strong>מה שמענו</strong>
                 <p class="cc-summary-quote">${promptData.highlightedHtml}</p>
-              </div>
-              <div class="cc-summary-block"><h4>מה זיהינו במבנה?</h4><p>${escapeHtml(round?.pattern?.problem?.oneLiner || '')}</p></div>
-              <div class="cc-summary-block"><h4>מה רצינו לברר?</h4><p>${escapeHtml(round?.pattern?.goal?.oneLiner || '')}</p></div>
-              <div class="cc-summary-block"><h4>כיוון העבודה</h4><p>${escapeHtml(operation.title)}</p><p>${escapeHtml(operation.desc)}</p></div>
+              </article>
+              <article class="cc-summary-recap-card">
+                <strong>מה זיהינו</strong>
+                <p>${escapeHtml(round?.pattern?.problem?.oneLiner || '')}</p>
+              </article>
+              <article class="cc-summary-recap-card">
+                <strong>השאלה שעזרה</strong>
+                <p>${escapeHtml(anchorQuestion)}</p>
+              </article>
+              <article class="cc-summary-recap-card">
+                <strong>מה היה חסר</strong>
+                <p>${escapeHtml(round?.pattern?.goal?.oneLiner || '')}</p>
+              </article>
             </div>
-            ${renderFeedbackBox(round)}
-            ${renderTherapeuticCoachCard(round)}
-            ${renderPersistentExplanation()}
+            <p class="cc-summary-next-copy">${reachedTarget ? 'עוד רגע רואים את תמונת הסשן כולה.' : 'מעולה. נמשיך למשפט הבא.'}</p>
             <div class="cc-primary-actions">
               <button type="button" class="cc-btn cc-btn-primary cc-btn-big" data-cc-action="${primaryAction}">${primaryLabel}</button>
               <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="end-session">סיום עכשיו</button>
@@ -1746,11 +1946,10 @@
         const transition = getStageTransitionForRound(round);
         if (!transition) return '';
         const stageText = stageTransitionTitle(transition.stage);
-        const optionCount = Math.max(0, Number(transition.optionCount || 0));
         return `
           <div class="cc-stage-transition-banner" data-cc-stage="${escapeHtml(transition.stage)}" role="status" aria-live="polite">
-            <strong>\u05de\u05e2\u05d1\u05e8 \u05d1\u05e8\u05d5\u05e8: ${escapeHtml(stageText)}</strong>
-            <span>\u05d4\u05d5\u05d8\u05e2\u05e0\u05d5 ${optionCount} \u05d0\u05e4\u05e9\u05e8\u05d5\u05d9\u05d5\u05ea \u05d7\u05d3\u05e9\u05d5\u05ea. ${escapeHtml(stageTransitionActionHint(transition.stage))}</span>
+            <strong>${escapeHtml(stageText)}</strong>
+            <span>${escapeHtml(stageTransitionActionHint(transition.stage))}</span>
           </div>
         `;
     }
@@ -1761,37 +1960,33 @@
         }
         if (round.stage === 'summary') return renderRoundSummaryCard(round);
 
-        const stageCopy = getStageCopy(round);
-        const promptData = getPromptDisplayData(round);
-        const operation = operationProfileForFamily(round.pattern?.family);
         const canUseHint = state.mode === 'learning' && !state.session?.ended && !state.hintUsedByStage[round.stage];
 
         return `
-          <section class="cc-practice-card" data-cc-stage="${escapeHtml(round.stage || '')}">
-            <div class="cc-practice-card-head">
-              <div class="cc-card-kicker">${escapeHtml(stageCopy.kicker || '')}</div>
-              <h2>${escapeHtml(stageQuestionPrompt(round))}</h2>
-              <p>${escapeHtml(stageCopy.desc || '')}</p>
-            </div>
-            <div class="cc-client-card" data-cc-stage="${escapeHtml(round.stage || '')}" aria-label="\u05e7\u05d8\u05e2 \u05d3\u05d9\u05d1\u05d5\u05e8">
-              <div class="cc-client-card-head"><span>מה נאמר כאן בפועל</span><small>${escapeHtml(familyLabelSimple(round.pattern?.family))}</small></div>
-              <p class="cc-client-lead">${escapeHtml(promptData.contextLead)}</p>
-              <div class="cc-client-text">${promptData.highlightedHtml}</div>
-              <div class="cc-client-focus-callout">
-                <strong>כדאי לעצור על:</strong>
-                <span>${escapeHtml(promptData.focusSnippet || promptData.promptText || '')}</span>
+          <section class="cc-practice-card cc-practice-card--immersive" data-cc-stage="${escapeHtml(round.stage || '')}">
+            <div class="cc-practice-card-head cc-practice-card-head--warm">
+              <div class="cc-practice-head-meta">
+                <span class="cc-card-kicker">${escapeHtml(stageLabel(round.stage || ''))}</span>
+                <span class="cc-pattern-pill">${escapeHtml(round?.pattern?.name || '')}</span>
               </div>
             </div>
-            <div class="cc-question-line" data-cc-stage="${escapeHtml(round.stage || '')}"><strong>${escapeHtml(stageQuestionPrompt(round))}</strong><span>${escapeHtml(operation.title)}</span></div>
             ${renderStageTransitionBanner(round)}
-            ${renderFeedbackBox(round)}
-            ${renderTherapeuticCoachCard(round)}
-            ${renderPersistentExplanation()}
-            ${renderOptions(round)}
-            <div class="cc-practice-actions">
-              <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="use-hint" ${canUseHint ? '' : 'disabled'}>רמז</button>
-              <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="toggle-pause" ${state.mode !== 'learning' || state.session?.ended ? 'disabled' : ''}>${state.paused ? 'המשך' : 'השהיה'}</button>
-              <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="restart-session">התחל מחדש</button>
+            <div class="cc-practice-stage-grid">
+              ${renderSceneContext(round)}
+              <section class="cc-answer-panel" aria-label="אזור בחירה">
+                <div class="cc-answer-head">
+                  <span class="cc-answer-kicker">${escapeHtml(stageStepLabel(round.stage || ''))}</span>
+                  <h2>${escapeHtml(stageQuestionPrompt(round))}</h2>
+                  <p>${escapeHtml(stageTaskMicrocopy(round))}</p>
+                </div>
+                ${renderResultCard(round)}
+                ${renderOptions(round)}
+                <div class="cc-practice-actions">
+                  <button type="button" class="cc-btn cc-btn-secondary" data-cc-action="use-hint" ${canUseHint ? '' : 'disabled'}>רמז קטן</button>
+                  <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="toggle-pause" ${state.mode !== 'learning' || state.session?.ended ? 'disabled' : ''}>${state.paused ? 'להמשיך' : 'השהיה'}</button>
+                  <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="restart-session">להתחיל מחדש</button>
+                </div>
+              </section>
             </div>
           </section>
         `;
@@ -1801,22 +1996,74 @@
         const progress = currentQuestionPosition();
         const timerTone = timerEnabledForSession() && session?.timeLeftSeconds <= 30 ? 'warn' : '';
         const timerText = timerEnabledForSession() ? formatTime(session?.timeLeftSeconds || 0) : 'ללא טיימר';
+        const streakValue = Math.max(0, Number(session?.streak || 0));
         const livesChip = state.mode === 'exam'
             ? `<div class="cc-top-chip" data-tone="${session?.livesLeft <= 1 ? 'warn' : ''}"><span>חיים</span><strong>${Number.isFinite(session?.livesLeft) ? session.livesLeft : '-'}</strong></div>`
             : '';
         return `
           <header class="cc-practice-bar">
+            <div class="cc-practice-bar-brand">
+              <span class="cc-practice-bar-kicker">Classic Classic</span>
+              <strong>תרגול קלאסי</strong>
+              <small>${escapeHtml(stageLabel(round?.stage || 'question'))}</small>
+            </div>
             <div class="cc-practice-bar-main">
               <div class="cc-top-chip"><span>שאלה</span><strong>${progress.current}/${progress.total}</strong></div>
               <div class="cc-top-chip"><span>ניקוד</span><strong>${session?.score ?? 0}</strong></div>
+              <div class="cc-top-chip"><span>רצף</span><strong>${streakValue}</strong></div>
               <div class="cc-top-chip" data-tone="${timerTone}"><span>זמן</span><strong>${escapeHtml(timerText)}</strong></div>
               ${livesChip}
             </div>
             <div class="cc-practice-bar-actions">
-              <button type="button" class="cc-icon-btn" data-cc-action="show-before-start" aria-label="יועץ NLP" title="יועץ NLP">?</button>
               <button type="button" class="cc-icon-btn" data-cc-action="open-settings-drawer" data-trainer-action="open-settings" aria-label="הגדרות">⚙️</button>
             </div>
           </header>
+        `;
+    }
+
+    function renderNlpAdvisor(round) {
+        const stage = String(round?.stage || '').trim();
+        const intro = stage === 'question'
+            ? 'כרגע אנחנו לא מפרשים את כל הסיפור. רק מחפשים שאלה שמחזירה משהו חסר אל המילים עצמן.'
+            : stage === 'problem'
+                ? 'כרגע לא בודקים מי צודק, אלא איזה מבנה לשוני יוצר את הערפל בתוך המשפט.'
+                : stage === 'goal'
+                    ? 'כרגע מחדדים איזה מידע חסר כדי שאפשר יהיה לשאול שאלה פשוטה ומדויקת.'
+                    : 'אוספים בקצרה מה עבד כאן, ומה אפשר לקחת למשפט הבא.';
+        const tip = buildHintForStage(stage, round) || 'אם צריך את התמונה הרחבה יותר, היא מחכה במסך הפתיחה.';
+        return `
+          <div class="cc-practice-advisor" data-alchemy-skip="1">
+            <button
+              type="button"
+              class="cc-practice-advisor-btn${state.showPhilosopher ? ' is-open' : ''}"
+              data-cc-action="${state.showPhilosopher ? 'close-philosopher' : 'show-before-start'}"
+              aria-expanded="${state.showPhilosopher ? 'true' : 'false'}"
+              aria-label="יועץ NLP">
+              <span class="cc-practice-advisor-btn-mark">NLP</span>
+              <span class="cc-practice-advisor-btn-text">יועץ</span>
+            </button>
+            ${state.showPhilosopher ? `
+              <section class="cc-practice-advisor-panel" role="dialog" aria-modal="false" aria-label="יועץ NLP">
+                <div class="cc-practice-advisor-head">
+                  <div>
+                    <span class="cc-card-kicker">יועץ NLP</span>
+                    <h3>רק תזכורת קצרה</h3>
+                  </div>
+                  <button type="button" class="cc-icon-btn" data-cc-action="close-philosopher" aria-label="סגור">×</button>
+                </div>
+                <p class="cc-practice-advisor-copy">${escapeHtml(intro)}</p>
+                <div class="cc-practice-advisor-tip">
+                  <strong>טיפ קטן</strong>
+                  <p>${escapeHtml(tip)}</p>
+                </div>
+                <p class="cc-practice-advisor-note">את ההסבר המלא של השיטה אפשר לראות שוב במסך הפתיחה.</p>
+                <div class="cc-practice-advisor-actions">
+                  <button type="button" class="cc-btn cc-btn-ghost" data-cc-action="back-to-intro">לפתיחה</button>
+                  <button type="button" class="cc-btn cc-btn-primary" data-cc-action="close-philosopher">חזרה לתרגול</button>
+                </div>
+              </section>
+            ` : ''}
+          </div>
         `;
     }
 
@@ -1906,21 +2153,14 @@
         const session = state.session;
         const round = currentRound();
         return `
-          <div class="cc-practice-shell" aria-label="תרגול מטה מודל" data-trainer-platform="1" data-trainer-id="classic-classic" data-screen="play" data-trainer-mobile-order="${getMobileOrderAttr()}">
+          <div class="cc-practice-shell cc-practice-shell--immersive" aria-label="תרגול מטה מודל" data-trainer-platform="1" data-trainer-id="classic-classic" data-screen="play" data-trainer-mobile-order="${getMobileOrderAttr()}">
             ${renderPracticeTopBar(session, round)}
-            <div class="cc-practice-meta-row">
-              <button type="button" class="cc-link-btn" data-cc-action="show-before-start">יועץ NLP</button>
-              <span class="cc-settings-preview-pill" data-trainer-summary="current">${escapeHtml(currentSettingsSummaryText())}</span>
+            <div class="cc-practice-workspace" data-trainer-zone="main" ${getMobileZoneStyle('main')}>
+              ${round ? renderStageProgressPills(round) : ''}
+              ${renderPracticeCard(round)}
             </div>
-            <div class="cc-platform-practice-layout cc-platform-practice-layout--solo">
-              <div class="cc-platform-practice-main" data-trainer-zone="main" ${getMobileZoneStyle('main')}>
-                ${round ? renderStageProgressPills(round) : ''}
-                ${renderPracticeCard(round)}
-              </div>
-              ${renderPracticeSupportRail(round)}
-            </div>
+            ${renderNlpAdvisor(round)}
             ${renderSettingsDrawer()}
-            ${renderPhilosopherOverlay(round)}
             ${renderHiddenHelpContent('play')}
           </div>
         `;
