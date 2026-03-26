@@ -14,6 +14,7 @@ type RoundsChoice = 5 | 10 | 'infinite';
 type CategoryDisplay = 'all' | 'group';
 type Tone = 'info' | 'success' | 'error';
 type RunMode = 'learning' | 'test';
+type PlayOverlay = 'map' | 'help' | 'status';
 
 type Feedback = { tone: Tone; message: string };
 type Sentence = { id: string; text: string; tags: CategoryCode[] };
@@ -48,6 +49,19 @@ const CAT: Record<CategoryCode, { he: string; family: FamilyCell; familyHe: stri
   DEL: { he: 'מחיקה / חסר מידע', family: 'DEL', familyHe: 'מחיקה', hint: 'טענה שחסר בה מידע בסיסי (מי/מה/איך/לפי מה).' },
   CTX: { he: 'הקשר (זמן/מקום/מצב)', family: 'CTX', familyHe: 'הקשר', hint: "אתמול/בבית/לפני ישיבה/במסדרון..." },
   VAK: { he: 'ערוצי חישה', family: 'VAK', familyHe: 'חושי', hint: 'ראייה/שמיעה/תחושה גופנית.' }
+};
+
+const GROUP_ORDER: GroupCode[] = ['DIS', 'GEN', 'DEL'];
+
+const GROUP_META: Record<GroupCode, { he: string; subtitle: string; tone: 'distortion' | 'generalization' | 'deletion' }> = {
+  DIS: { he: 'עיוות', subtitle: 'מחפשים משמעות שנוספה מעבר למה שנאמר בפועל.', tone: 'distortion' },
+  GEN: { he: 'הכללה', subtitle: 'מחפשים כללים, חובה, תמיד, או שיפוט בלי מקור ברור.', tone: 'generalization' },
+  DEL: { he: 'מחיקה', subtitle: 'מחזירים שחקנים, פעולה או מידע שחסר בתוך המשפט.', tone: 'deletion' }
+};
+
+const AUX_META: Record<'CTX' | 'VAK', { he: string; subtitle: string; tone: 'context' }> = {
+  CTX: { he: 'הקשר', subtitle: 'זמן, מקום או מצב שממקמים את הטקסט.', tone: 'context' },
+  VAK: { he: 'חושי', subtitle: 'ערוצי ראייה, שמיעה ותחושה בתוך המשפט.', tone: 'context' }
 };
 
 const CTX_LABEL: Record<FieldCtx, string> = {
@@ -194,9 +208,9 @@ const SCENARIOS: Scenario[] = [
 ];
 
 const CSS = `
-.c2n{direction:rtl;font-family:"Assistant","Rubik","Segoe UI",sans-serif;color:#10233e;max-width:1200px;margin:0 auto}
-.c2n *{box-sizing:border-box}.c2n-shell{background:radial-gradient(circle at top right,rgba(245,158,11,.18),transparent 28%),radial-gradient(circle at left top,rgba(59,130,246,.14),transparent 34%),linear-gradient(180deg,#f6f8fc 0%,#fcfdff 100%);border:1px solid #dbe4f0;border-radius:28px;padding:16px;box-shadow:0 28px 60px rgba(15,23,42,.08)}
-.c2n h1,.c2n h2,.c2n h3,.c2n h4,.c2n p{margin:0}.c2n-card{background:rgba(255,255,255,.92);border:1px solid #dde6f2;border-radius:20px;padding:14px;box-shadow:0 16px 36px rgba(15,23,42,.05)}
+.c2n{direction:rtl;font-family:"Assistant","Rubik","Segoe UI",sans-serif;color:#10233e;max-width:1280px;margin:0 auto}
+.c2n *{box-sizing:border-box}.c2n-shell{background:radial-gradient(circle at top right,rgba(245,158,11,.18),transparent 28%),radial-gradient(circle at left top,rgba(59,130,246,.14),transparent 34%),linear-gradient(180deg,#f6f8fc 0%,#fcfdff 100%);border:1px solid #dbe4f0;border-radius:30px;padding:18px;box-shadow:0 28px 60px rgba(15,23,42,.08)}
+.c2n h1,.c2n h2,.c2n h3,.c2n h4,.c2n p{margin:0}.c2n-card{background:rgba(255,255,255,.92);border:1px solid #dde6f2;border-radius:22px;padding:16px;box-shadow:0 16px 36px rgba(15,23,42,.05)}
 .c2n-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px}.c2n-title h1{font-size:1.18rem;font-weight:900}.c2n-title p{font-size:.84rem;color:#526173}
 .c2n-actions,.c2n-row-actions,.c2n-main-acts,.c2n-modal-actions,.c2n-seg,.c2n-score,.c2n-meta,.c2n-pillbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.c2n-btn{border:1px solid transparent;border-radius:14px;padding:11px 14px;font-weight:900;cursor:pointer;font-family:inherit;transition:.18s ease}.c2n-btn:hover:not(:disabled){transform:translateY(-1px)}.c2n-btn:disabled{opacity:.55;cursor:not-allowed}
 .c2n-btn.p{background:#1358d3;color:#fff;box-shadow:0 12px 24px rgba(19,88,211,.22)}.c2n-btn.s{background:#eef2f8;color:#0f172a;border-color:#d8e0eb}.c2n-btn.g{background:#ffffff;color:#0f4c81;border-color:#bad4ea}.c2n-btn.w{background:#fff8eb;color:#9a3412;border-color:#fed7aa}
@@ -211,13 +225,38 @@ const CSS = `
 .c2n-tone-pill.green{background:#ecfdf5;color:#166534;border-color:#86efac}.c2n-tone-pill.amber{background:#fffbeb;color:#b45309;border-color:#fcd34d}.c2n-tone-pill.red{background:#fef2f2;color:#b91c1c;border-color:#fca5a5}
 .c2n-text-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:flex-start}.c2n-target{border:1px solid #d7e4f2;background:#f9fbff;border-radius:16px;padding:12px}.c2n-target p{margin-top:6px;color:#45596f;font-size:.86rem;line-height:1.45}
 .c2n-grid{display:grid;gap:8px;margin-top:10px}.c2n-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;direction:rtl}.c2n-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
-.c2n-cat{width:100%;text-align:right;border:1px solid #dbe5f2;background:#fff;border-radius:16px;padding:10px;display:grid;gap:6px;cursor:pointer;min-height:96px;transition:.18s ease}.c2n-cat:hover:not(:disabled){border-color:#93b8ff;background:#f9fbff}.c2n-cat:disabled{opacity:.58;cursor:not-allowed}.c2n-cat.sel{border-color:#1358d3;background:#eaf1ff;box-shadow:0 0 0 2px rgba(19,88,211,.11)}
-.c2n-cat-top{display:flex;justify-content:space-between;gap:8px}.c2n-code{background:#eef3ff;color:#1d4ed8;border-radius:999px;padding:2px 8px;font-weight:900;font-size:.74rem}.c2n-fam{color:#64748b;font-size:.73rem;font-weight:700}.c2n-name{font-size:.82rem;font-weight:800;line-height:1.25}.c2n-badge{width:max-content;border-radius:999px;padding:2px 8px;font-weight:800;font-size:.68rem}.c2n-badge.ok{background:#ecfdf5;color:#0f766e}.c2n-badge.off{background:#f4f6fb;color:#64748b}
-.c2n-sents{display:grid;gap:10px}.c2n-sent{width:100%;text-align:right;border:1px solid #dce5f2;background:#fff;border-radius:18px;padding:12px 13px;display:grid;gap:8px;cursor:pointer;transition:.18s ease}.c2n-sent:hover:not(:disabled){border-color:#9bbcff;background:#f9fbff}.c2n-sent:disabled{opacity:.75;cursor:not-allowed}
-.c2n-sent-top{display:flex;justify-content:space-between;gap:8px;font-size:.75rem;font-weight:900;color:#4e647c}.c2n-sent-text{font-weight:700;line-height:1.55}.c2n-sent.sel{border-color:#1358d3;background:#eaf1ff}.c2n-sent.good{border-color:#86efac;background:#f0fdf4}.c2n-sent.bad{border-color:#fca5a5;background:#fff5f5}
-.c2n-fb{border-radius:16px;padding:12px 13px;border:1px solid;font-weight:800;line-height:1.5}.c2n-fb.info{background:#eef4ff;border-color:#c8d8fb;color:#1e3a8a}.c2n-fb.success{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}.c2n-fb.error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
-.c2n-hint,.c2n-summary-card{border:1px dashed #c9d8ef;background:#fbfdff;border-radius:16px;padding:12px;display:grid;gap:6px}.c2n-hint p{font-size:.84rem;line-height:1.45;color:#334155}
+.c2n-cat{width:100%;text-align:right;border:1px solid #dbe5f2;background:rgba(255,255,255,.92);border-radius:18px;padding:12px;display:grid;gap:8px;cursor:pointer;min-height:90px;transition:.18s ease}.c2n-cat:hover:not(:disabled){border-color:#a7c1f9;background:#fbfdff;transform:translateY(-1px)}.c2n-cat:disabled{opacity:.58;cursor:not-allowed}.c2n-cat.sel{border-color:#1358d3;background:#edf3ff;box-shadow:0 0 0 2px rgba(19,88,211,.09)}
+.c2n-cat-top{display:grid;gap:6px}.c2n-cat-meta{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.c2n-code{background:rgba(239,244,255,.9);color:#6b7a90;border:1px solid #d6e0ef;border-radius:999px;padding:1px 7px;font-weight:800;font-size:.63rem;letter-spacing:.02em}.c2n-fam{color:#64748b;font-size:.72rem;font-weight:800}.c2n-name{font-size:.9rem;font-weight:900;line-height:1.28;color:#13253f}.c2n-badge{width:max-content;border-radius:999px;padding:3px 8px;font-weight:800;font-size:.68rem}.c2n-badge.ok{background:#ecfdf5;color:#0f766e}.c2n-badge.off{background:#f4f6fb;color:#64748b}
+.c2n-sents{display:grid;gap:10px}.c2n-sent{width:100%;text-align:right;border:1px solid #dce5f2;background:rgba(255,255,255,.88);border-radius:18px;padding:13px 14px;display:grid;gap:10px;cursor:pointer;transition:.18s ease;box-shadow:0 10px 24px rgba(15,23,42,.03)}.c2n-sent:hover:not(:disabled){border-color:#9bbcff;background:#fbfdff;transform:translateY(-1px)}.c2n-sent:disabled{opacity:.84;cursor:not-allowed}
+.c2n-sent-top{display:flex;justify-content:space-between;gap:8px;font-size:.76rem;font-weight:900;color:#4e647c;align-items:center}.c2n-sent-index{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;border-radius:999px;background:#eef4ff;color:#1d4ed8;font-size:.8rem}.c2n-sent-state{color:#667892;font-size:.74rem}.c2n-sent-text{font-weight:700;line-height:1.62;font-size:.95rem}.c2n-sent.sel{border-color:#1358d3;background:#edf3ff;box-shadow:0 0 0 2px rgba(19,88,211,.08)}.c2n-sent.good{border-color:#86efac;background:#f0fdf4}.c2n-sent.bad{border-color:#fca5a5;background:#fff5f5}
+.c2n-fb{border-radius:18px;padding:14px;border:1px solid;font-weight:800;line-height:1.6}.c2n-fb.info{background:#eef4ff;border-color:#c8d8fb;color:#1e3a8a}.c2n-fb.success{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}.c2n-fb.error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+.c2n-hint,.c2n-summary-card{border:1px dashed #c9d8ef;background:#fbfdff;border-radius:18px;padding:13px;display:grid;gap:6px}.c2n-hint p{font-size:.84rem;line-height:1.5;color:#334155}
 .c2n-foot{border:1px dashed #cad8ec;background:#fbfdff;border-radius:18px;padding:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;align-items:center}.c2n-kv{display:grid;gap:6px}.c2n-kv b{font-size:.8rem;color:#64748b}
+.c2n-play-screen{display:grid}.c2n-play-shell{display:grid;gap:18px;background:linear-gradient(180deg,rgba(255,255,255,.94) 0%,rgba(246,249,255,.98) 100%);padding:20px;border-radius:28px}
+.c2n-play-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}.c2n-play-title{display:grid;gap:6px}.c2n-play-title h2{font-size:1.28rem;font-weight:900}.c2n-play-toolbar{display:grid;justify-items:end;gap:10px;min-width:min(100%,420px)}
+.c2n-play-stats,.c2n-play-tools,.c2n-family-tabs,.c2n-category-strip,.c2n-extra-strip,.c2n-action-strip{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.c2n-play-stat{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.8);border:1px solid #d9e5f3;font-weight:800;color:#334155}.c2n-play-stat strong{color:#10233e}
+.c2n-tool-btn{border:1px solid #d8e2f0;background:rgba(255,255,255,.76);border-radius:999px;padding:8px 12px;font-weight:800;color:#35506d;cursor:pointer;font-family:inherit;transition:.18s ease}.c2n-tool-btn:hover{border-color:#9bbcff;background:#fff;color:#123761}
+.c2n-play-chooser{display:grid;gap:12px;padding:16px 18px;border-radius:24px;background:rgba(255,255,255,.72);border:1px solid rgba(208,220,235,.92)}
+.c2n-play-chooser-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}.c2n-play-chooser-head strong{font-size:1rem}
+.c2n-family-tab{display:grid;gap:4px;min-width:146px;padding:11px 14px;border-radius:18px;border:1px solid #dbe5f2;background:rgba(250,252,255,.94);cursor:pointer;text-align:right;font-family:inherit;transition:.18s ease}.c2n-family-tab:hover:not(:disabled){transform:translateY(-1px);border-color:#adc3ff}.c2n-family-tab:disabled{opacity:.45;cursor:not-allowed}.c2n-family-tab span{font-size:.96rem;font-weight:900}.c2n-family-tab small{font-size:.74rem;color:#617388;font-weight:700}
+.c2n-family-tab.is-active{color:#10233e;box-shadow:0 10px 24px rgba(15,23,42,.05)}.c2n-family-tab.is-distortion{border-color:#d7cdfd;background:linear-gradient(180deg,#f7f3ff 0%,#ffffff 100%)}.c2n-family-tab.is-generalization{border-color:#cde7f5;background:linear-gradient(180deg,#f1fbff 0%,#ffffff 100%)}.c2n-family-tab.is-deletion{border-color:#d4ecd9;background:linear-gradient(180deg,#f4fbf5 0%,#ffffff 100%)}
+.c2n-family-tab.is-active.is-distortion{box-shadow:0 0 0 2px rgba(109,40,217,.10)}.c2n-family-tab.is-active.is-generalization{box-shadow:0 0 0 2px rgba(14,116,144,.10)}.c2n-family-tab.is-active.is-deletion{box-shadow:0 0 0 2px rgba(22,101,52,.10)}
+.c2n-category-pill{display:grid;gap:6px;min-width:162px;padding:12px 14px;border-radius:18px;border:1px solid #d8e3ef;background:rgba(255,255,255,.86);cursor:pointer;text-align:right;font-family:inherit;transition:.18s ease}.c2n-category-pill:hover:not(:disabled){transform:translateY(-1px);border-color:#a7c1f9;background:#fff}.c2n-category-pill:disabled{opacity:.58;cursor:not-allowed}
+.c2n-category-pill.is-active{border-color:#123c8f;background:#f1f5ff;box-shadow:0 0 0 2px rgba(18,60,143,.08)}.c2n-category-pill.is-dim{opacity:.56}.c2n-category-pill strong{font-size:.95rem;font-weight:900;color:#10233e;line-height:1.25}.c2n-category-pill span{font-size:.76rem;color:#5e7085;line-height:1.4}.c2n-category-pill small{font-size:.66rem;color:#7b8aa0;font-weight:800}
+.c2n-category-pill.is-distortion{border-right:4px solid #7c3aed}.c2n-category-pill.is-generalization{border-right:4px solid #0f766e}.c2n-category-pill.is-deletion{border-right:4px solid #4d7c0f}.c2n-category-pill.is-context{border-right:4px solid #c2410c}
+.c2n-extra-strip{padding-top:6px;border-top:1px solid #e3eaf4}.c2n-strip-label{font-size:.74rem;font-weight:900;color:#68798e}
+.c2n-active-category{display:grid;gap:4px;padding:11px 14px;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid #d7e3ef;min-width:min(100%,320px)}.c2n-active-category b{font-size:.94rem}.c2n-active-category span{font-size:.77rem;color:#5e7085}.c2n-active-category small{font-size:.66rem;color:#7b8aa0;font-weight:800}
+.c2n-play-board{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(310px,.8fr);gap:18px;align-items:start}
+.c2n-sentence-surface{display:grid;gap:14px;padding:16px 18px;border-radius:26px;background:rgba(255,255,255,.78);border:1px solid rgba(214,225,239,.9)}
+.c2n-surface-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.c2n-surface-head h3{font-size:1rem;font-weight:900}.c2n-surface-target{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#eef4ff;border:1px solid #d4def1;font-weight:900;color:#163a7b}
+.c2n-sents-board{grid-template-columns:repeat(2,minmax(0,1fr))}
+.c2n-feedback-surface{display:grid;gap:12px;align-content:start}.c2n-focus-card,.c2n-support-card{display:grid;gap:8px;padding:15px;border-radius:22px;border:1px solid #dbe5f2;background:rgba(255,255,255,.84)}.c2n-focus-card h3,.c2n-support-card h3{font-size:.98rem;font-weight:900}.c2n-focus-card p,.c2n-support-card p{color:#43556c;line-height:1.56;font-size:.86rem}
+.c2n-focus-card.is-distortion{background:linear-gradient(180deg,#f8f4ff 0%,#ffffff 100%);border-color:#ddd2fb}.c2n-focus-card.is-generalization{background:linear-gradient(180deg,#f1fbff 0%,#ffffff 100%);border-color:#cde9ee}.c2n-focus-card.is-deletion{background:linear-gradient(180deg,#f4fbf5 0%,#ffffff 100%);border-color:#d6ecd5}.c2n-focus-card.is-context{background:linear-gradient(180deg,#fff8ef 0%,#ffffff 100%);border-color:#f1d5b5}
+.c2n-support-stack{display:grid;gap:10px}.c2n-detail-title{font-size:.82rem;font-weight:900;color:#0f3f81}
+.c2n-action-panel{display:grid;gap:10px;padding:15px;border-radius:22px;border:1px solid #dbe5f2;background:rgba(255,255,255,.84)}.c2n-btn-main{width:100%;justify-content:center;font-size:.95rem;padding:13px 15px}
+.c2n-action-strip .c2n-btn{flex:1 1 140px}.c2n-quiet-note{font-size:.78rem;color:#6a7a8f;line-height:1.5}
+.c2n-overlay-grid{display:grid;gap:12px}.c2n-status-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.c2n-status-card{display:grid;gap:4px;padding:12px;border-radius:16px;background:#fff;border:1px solid #dde7f2}.c2n-status-card b{font-size:.76rem;color:#667892}.c2n-status-card span{font-size:.94rem;font-weight:900;color:#10233e}
 .c2n-empty{margin-top:14px;border:1px dashed #cad8ec;background:#fbfdff;border-radius:20px;padding:18px;display:grid;gap:10px;text-align:center}.c2n-empty p{color:#4d5e73;line-height:1.55}
 .c2n-overlay{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.45);backdrop-filter:blur(4px);display:flex;justify-content:center;align-items:flex-start;padding:16px;overflow:auto}.c2n-modal{width:min(960px,100%);background:#f8fbff;border:1px solid #d9e5f3;border-radius:26px;padding:16px;display:grid;gap:14px;box-shadow:0 28px 70px rgba(15,23,42,.22)}
 .c2n-modal-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}.c2n-modal-head h2{font-size:1.1rem;font-weight:900}.c2n-modal-head p{margin-top:5px;font-size:.86rem;color:#536579;line-height:1.45}
@@ -227,12 +266,20 @@ const CSS = `
 .c2n-preview{border:1px solid #cce0f0;background:linear-gradient(180deg,#f0f8ff 0%,#ffffff 100%);border-radius:18px;padding:14px;display:grid;gap:10px}.c2n-preview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .c2n-example-lines{display:grid;gap:8px}.c2n-example-line{border:1px solid #e2e8f0;background:#fff;border-radius:14px;padding:10px 12px;line-height:1.55}.c2n-summary-copy{display:grid;gap:10px}
 .c2n-modal-actions{justify-content:space-between}.c2n-modal-actions .c2n-btn{min-width:120px}
-@media (max-width:980px){.c2n-hero,.c2n-layout,.c2n-settings-grid,.c2n-home-grid,.c2n-mode-grid{grid-template-columns:1fr}.c2n-row{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:640px){.c2n-shell{padding:12px}.c2n-overlay{padding:10px}.c2n-list,.c2n-step-strip,.c2n-preview-grid{grid-template-columns:1fr}.c2n-actions,.c2n-row-actions,.c2n-main-acts,.c2n-modal-actions,.c2n-seg,.c2n-start-actions{display:grid;grid-template-columns:1fr}.c2n-btn,.c2n-start-summary{width:100%}.c2n-cat{min-height:72px;padding:7px}.c2n-name{font-size:.75rem}.c2n-code{font-size:.68rem}}
+@media (max-width:980px){.c2n-hero,.c2n-layout,.c2n-settings-grid,.c2n-home-grid,.c2n-mode-grid,.c2n-play-board,.c2n-status-grid{grid-template-columns:1fr}.c2n-row{grid-template-columns:repeat(3,minmax(0,1fr))}.c2n-play-toolbar{justify-items:start}.c2n-sents-board{grid-template-columns:1fr}.c2n-play-stat,.c2n-tool-btn{width:auto}}
+@media (max-width:640px){.c2n-shell{padding:12px}.c2n-overlay{padding:10px}.c2n-list,.c2n-step-strip,.c2n-preview-grid,.c2n-status-grid{grid-template-columns:1fr}.c2n-actions,.c2n-row-actions,.c2n-main-acts,.c2n-modal-actions,.c2n-seg,.c2n-start-actions,.c2n-action-strip{display:grid;grid-template-columns:1fr}.c2n-btn,.c2n-start-summary,.c2n-family-tab,.c2n-category-pill,.c2n-tool-btn{width:100%}.c2n-cat{min-height:72px;padding:9px}.c2n-name{font-size:.84rem}.c2n-code{font-size:.63rem}.c2n-play-shell{padding:14px}.c2n-play-chooser,.c2n-sentence-surface,.c2n-focus-card,.c2n-support-card,.c2n-action-panel{padding:13px}}
 `;
 
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
 const rand = (n: number) => Math.floor(Math.random() * n);
+const isPrimaryFamily = (family: FamilyCell): family is GroupCode => family === 'DIS' || family === 'GEN' || family === 'DEL';
+
+function displayModeLabelFor(settings: Settings): string {
+  if (settings.categoryDisplay === 'all') return 'מפת ברין מלאה';
+  return settings.includeCtxVak
+    ? `קבוצת ${GROUP_META[settings.categoryGroup].he} + עוד קטגוריות`
+    : `קבוצת ${GROUP_META[settings.categoryGroup].he}`;
+}
 
 function visibleCategories(s: Settings): CategoryCode[] {
   if (s.categoryDisplay === 'all') return [...CANONICAL_BREEN_ORDER];
@@ -278,9 +325,10 @@ export default function Classic2Trainer(): React.ReactElement {
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [draft, setDraft] = useState<Settings>(() => loadClassic2Settings());
   const [settings, setSettings] = useState<Settings>(() => loadClassic2Settings());
+  const [activeFamily, setActiveFamily] = useState<GroupCode>(() => loadClassic2Settings().categoryGroup);
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
+  const [playOverlay, setPlayOverlay] = useState<PlayOverlay | null>(null);
   const [roundNo, setRoundNo] = useState(1);
   const [done, setDone] = useState(0);
   const [correct, setCorrect] = useState(0);
@@ -319,6 +367,15 @@ export default function Classic2Trainer(): React.ReactElement {
     saveClassic2Settings(settings);
   }, [settings]);
 
+  useEffect(() => {
+    if (!playOverlay) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setPlayOverlay(null);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [playOverlay]);
+
   const rr = rules(settings, mode);
   const matches = round && selectedCat ? round.sentences.filter((s) => s.tags.includes(selectedCat)).map((s) => s.id) : [];
 
@@ -336,8 +393,8 @@ export default function Classic2Trainer(): React.ReactElement {
     const auto = nextVisible.length === 1 ? nextVisible[0] : null;
     setSelectedCat(auto);
     setFeedback(auto
-      ? { tone: 'info', message: `נבחרה קטגוריה אוטומטית: ${auto} / ${CAT[auto].he}. סמן/י משפט או דווח/י שאין מופע.` }
-      : { tone: 'info', message: 'בחר/י קטגוריה לאימון ואז סמן/י משפט מתאים בטקסט.' });
+      ? { tone: 'info', message: `הקטגוריה ${CAT[auto].he} נבחרה אוטומטית. עכשיו מסמנים רק את המשפטים ששייכים לה.` }
+      : { tone: 'info', message: 'בחר/י קטגוריה אחת, ואז סמן/י רק את המשפטים שמתאימים לה באמת.' });
   };
 
   const startPractice = (cfg: Settings, nextMode: RunMode = mode) => {
@@ -345,9 +402,10 @@ export default function Classic2Trainer(): React.ReactElement {
     const r1 = makeRound(normalized, 1, null);
     setMode(nextMode);
     setSettings(normalized);
+    setActiveFamily(normalized.categoryGroup);
     setStarted(true);
     setFinished(false);
-    setHelpOpen(false);
+    setPlayOverlay(null);
     setRoundNo(1);
     setDone(0);
     setCorrect(0);
@@ -370,17 +428,19 @@ export default function Classic2Trainer(): React.ReactElement {
   const openSettings = () => {
     setDraft({ ...settings });
     setAdvancedOpen(false);
+    setPlayOverlay(null);
     setWizardOpen(true);
   };
 
   const selectCat = (code: CategoryCode) => {
     if (result !== 'pending') return;
     if (!visibleCategories(settings).includes(code)) return;
+    if (isPrimaryFamily(CAT[code].family)) setActiveFamily(CAT[code].family);
     setSelectedCat(code);
     setSelectedIds([]);
     setShowHint(false);
     setShowSolution(false);
-    setFeedback({ tone: 'info', message: `קטגוריה נבחרה: ${CAT[code].he} (${code}). סמן/י משפט או דווח/י שאין מופע.` });
+    setFeedback({ tone: 'info', message: `בפוקוס עכשיו: ${CAT[code].he}. סמן/י רק את המשפטים שבאמת שייכים אליה.` });
   };
 
   const toggleSentence = (id: string) => {
@@ -436,6 +496,7 @@ export default function Classic2Trainer(): React.ReactElement {
 
   const nextRound = () => {
     if (!round || result !== 'correct') return;
+    setPlayOverlay(null);
     const nextDone = done + 1;
     setDone(nextDone);
     setCorrect((p) => p + 1);
@@ -478,7 +539,7 @@ export default function Classic2Trainer(): React.ReactElement {
   const backToWelcome = () => {
     setStarted(false);
     setFinished(false);
-    setHelpOpen(false);
+    setPlayOverlay(null);
     setRoundNo(1);
     setRound(null);
     setSelectedCat(null);
@@ -493,7 +554,7 @@ export default function Classic2Trainer(): React.ReactElement {
     ? round.sentences.map((s, i) => (s.tags.includes(selectedCat) ? i + 1 : null)).filter((n): n is number => n !== null)
     : [];
 
-  const renderCatPicker = (cfg: Settings, interactive: boolean, compact = false) => {
+  const renderCatPicker = (cfg: Settings, interactive: boolean, compact = false, closeOnPick = false) => {
     const vis = visibleCategories(cfg);
     const showPresence = rr.showPresence && !!round && cfg === settings;
     if (cfg.categoryDisplay === 'group') {
@@ -506,12 +567,18 @@ export default function Classic2Trainer(): React.ReactElement {
                 key={c}
                 type="button"
                 className={`c2n-cat${selectedCat === c && cfg === settings ? ' sel' : ''}`}
-                onClick={() => (cfg === settings ? selectCat(c) : undefined)}
+                onClick={() => {
+                  if (cfg !== settings) return;
+                  selectCat(c);
+                  if (closeOnPick) setPlayOverlay(null);
+                }}
                 disabled={compact ? true : !interactive}
                 aria-pressed={selectedCat === c && cfg === settings}
               >
-                <div className="c2n-cat-top"><span className="c2n-code">{c}</span><span className="c2n-fam">{CAT[c].familyHe}</span></div>
-                <div className="c2n-name">{CAT[c].he}</div>
+                <div className="c2n-cat-top">
+                  <div className="c2n-name">{CAT[c].he}</div>
+                  <div className="c2n-cat-meta"><span className="c2n-fam">{CAT[c].familyHe}</span><span className="c2n-code">{c}</span></div>
+                </div>
                 {!compact && showPresence && <span className={`c2n-badge ${present ? 'ok' : 'off'}`}>{present ? 'יש בטקסט' : 'לא בטקסט'}</span>}
               </button>
             );
@@ -528,9 +595,22 @@ export default function Classic2Trainer(): React.ReactElement {
               const present = !!round && round.sentences.some((s) => s.tags.includes(c));
               const sel = selectedCat === c && cfg === settings;
               return (
-                <button key={c} type="button" className={`c2n-cat${sel ? ' sel' : ''}`} onClick={() => (cfg === settings ? selectCat(c) : undefined)} disabled={compact ? true : !interactive || !enabled} aria-pressed={sel}>
-                  <div className="c2n-cat-top"><span className="c2n-code">{c}</span><span className="c2n-fam">{CAT[c].familyHe}</span></div>
-                  <div className="c2n-name">{CAT[c].he}</div>
+                <button
+                  key={c}
+                  type="button"
+                  className={`c2n-cat${sel ? ' sel' : ''}`}
+                  onClick={() => {
+                    if (cfg !== settings) return;
+                    selectCat(c);
+                    if (closeOnPick) setPlayOverlay(null);
+                  }}
+                  disabled={compact ? true : !interactive || !enabled}
+                  aria-pressed={sel}
+                >
+                  <div className="c2n-cat-top">
+                    <div className="c2n-name">{CAT[c].he}</div>
+                    <div className="c2n-cat-meta"><span className="c2n-fam">{CAT[c].familyHe}</span><span className="c2n-code">{c}</span></div>
+                  </div>
                   {!compact && showPresence && enabled && <span className={`c2n-badge ${present ? 'ok' : 'off'}`}>{present ? 'יש בטקסט' : 'לא בטקסט'}</span>}
                   {!compact && !enabled && <span className="c2n-badge off">מוסתר</span>}
                 </button>
@@ -542,10 +622,26 @@ export default function Classic2Trainer(): React.ReactElement {
     );
   };
 
-  const visibleCount = visibleCategories(settings).length;
+  const visibleNow = visibleCategories(settings);
+  const visibleCount = visibleNow.length;
   const draftVisibleCount = visibleCategories(draft).length;
-  const displayLabel = settings.categoryDisplay === 'all' ? 'טבלת ברין מלאה' : `קבוצת ${settings.categoryGroup}`;
-  const draftDisplayLabel = draft.categoryDisplay === 'all' ? 'טבלת ברין מלאה' : `קבוצת ${draft.categoryGroup}`;
+  const displayLabel = displayModeLabelFor(settings);
+  const draftDisplayLabel = displayModeLabelFor(draft);
+  const availableFamilies = GROUP_ORDER.filter((family) => visibleNow.some((code) => CAT[code].family === family));
+  const primaryFamilyCategories = orderBreenCategories(visibleNow.filter((code) => CAT[code].family === activeFamily));
+  const extraCategories = orderBreenCategories(visibleNow.filter((code) => CAT[code].family === 'CTX' || CAT[code].family === 'VAK'));
+  const selectedPrimaryFamily = selectedCat && isPrimaryFamily(CAT[selectedCat].family) ? CAT[selectedCat].family : null;
+
+  useEffect(() => {
+    if (selectedPrimaryFamily && selectedPrimaryFamily !== activeFamily) setActiveFamily(selectedPrimaryFamily);
+  }, [selectedPrimaryFamily, activeFamily]);
+
+  useEffect(() => {
+    if (!availableFamilies.length) return;
+    if (availableFamilies.includes(activeFamily)) return;
+    setActiveFamily(selectedPrimaryFamily && availableFamilies.includes(selectedPrimaryFamily) ? selectedPrimaryFamily : availableFamilies[0]);
+  }, [activeFamily, selectedPrimaryFamily, availableFamilies]);
+
   const screen = !started ? 'home' : finished ? 'summary' : 'play';
   const modeLabel = mode === 'test' ? 'מבחן' : 'לימוד';
   const modeSummary = mode === 'test' ? 'בדיקה מלאה בלי רמזים מוקדמים.' : 'לומדים תוך כדי סימון, רמז ומשוב.';
@@ -615,7 +711,7 @@ export default function Classic2Trainer(): React.ReactElement {
           </label>
           <label className="c2n-radio">
             <input type="radio" name="disp" checked={draft.categoryDisplay === 'group'} onChange={() => setDraft((p) => ({ ...p, categoryDisplay: 'group' }))} />
-            <div><strong>קבוצה אחת</strong><span>מיקוד ב- DIS / GEN / DEL.</span></div>
+            <div><strong>קבוצה אחת</strong><span>מיקוד במשפחת עיוות, הכללה או מחיקה.</span></div>
           </label>
         </>
       )
@@ -623,19 +719,19 @@ export default function Classic2Trainer(): React.ReactElement {
     categories: {
       id: 'categories',
       title: 'קטגוריות',
-      help: 'במצב קבוצתי בוחרים קבוצה פעילה. אפשר לצרף גם CTX + VAK.',
+      help: 'במצב קבוצתי בוחרים קבוצה פעילה. אפשר לצרף גם את קטגוריות ההקשר והחושי.',
       content: (
         <>
           <div className="c2n-seg">
             {(['GEN', 'DIS', 'DEL'] as GroupCode[]).map((g) => (
               <button key={g} type="button" className={`c2n-btn ${draft.categoryGroup === g ? 'p' : 's'}`} onClick={() => setDraft((p) => ({ ...p, categoryGroup: g }))}>
-                {g}
+                {GROUP_META[g].he}
               </button>
             ))}
           </div>
           <label className="c2n-toggle">
             <input type="checkbox" checked={draft.includeCtxVak} onChange={(e) => setDraft((p) => ({ ...p, includeCtxVak: e.target.checked }))} />
-            כולל CTX + VAK
+            כולל הקשר + חושי
           </label>
         </>
       )
@@ -701,6 +797,48 @@ export default function Classic2Trainer(): React.ReactElement {
   const helpText = selectedCat
     ? `${CAT[selectedCat].hint}${CAT[selectedCat].note ? ` ${CAT[selectedCat].note}` : ''}`
     : 'בחר/י קטגוריה אחת מהמפה, ואז סמן/י רק את המשפטים שמתאימים לה באמת.';
+  const toneClassForCategory = (code: CategoryCode) => {
+    const family = CAT[code].family;
+    if (family === 'DIS') return 'is-distortion';
+    if (family === 'GEN') return 'is-generalization';
+    if (family === 'DEL') return 'is-deletion';
+    return 'is-context';
+  };
+  const toneClassForFamily = (family: GroupCode) => {
+    if (family === 'DIS') return 'is-distortion';
+    if (family === 'GEN') return 'is-generalization';
+    return 'is-deletion';
+  };
+  const selectedCatMeta = selectedCat ? CAT[selectedCat] : null;
+  const selectedFamilyTone = selectedCatMeta
+    ? (isPrimaryFamily(selectedCatMeta.family) ? GROUP_META[selectedCatMeta.family].tone : AUX_META[selectedCatMeta.family].tone)
+    : GROUP_META[activeFamily].tone;
+  const focusTitle = selectedCatMeta ? selectedCatMeta.he : `בוחרים קטגוריה מתוך ${GROUP_META[activeFamily].he}`;
+  const focusDescription = selectedCatMeta
+    ? `${selectedCatMeta.hint}${selectedCatMeta.note ? ` ${selectedCatMeta.note}` : ''}`
+    : GROUP_META[activeFamily].subtitle;
+  const activeSummaryLabel = selectedCatMeta
+    ? `${selectedCatMeta.familyHe} · ${selectedCatMeta.he}`
+    : `כדאי להתחיל ממשפחת ${GROUP_META[activeFamily].he}`;
+  const defaultFeedback = selectedCatMeta
+    ? `בחרת ב-${selectedCatMeta.he}. עכשיו מסמנים רק את המשפטים ששייכים אליה, בלי לערבב עם קטגוריות אחרות.`
+    : 'בחר/י קודם משפחה ואז קטגוריה אחת. כשהפוקוס ברור, גם סימון המשפטים נהיה פשוט יותר.';
+  const primaryActionLabel = result === 'correct' ? 'לסבב הבא' : result === 'wrong' ? 'נקה וננסה שוב' : 'בדוק תשובה';
+  const primaryActionHandler = () => {
+    if (result === 'correct') {
+      nextRound();
+      return;
+    }
+    if (result === 'wrong') {
+      setSelectedIds([]);
+      setResult('pending');
+      setShowHint(false);
+      setShowSolution(false);
+      setFeedback(selectedCat ? { tone: 'info', message: `ניקינו את הסימון. נשארים עם ${selectedCatMeta?.he ?? 'הקטגוריה שנבחרה'} ומנסים שוב.` } : { tone: 'info', message: 'בחר/י קטגוריה כדי להתחיל.' });
+      return;
+    }
+    evaluate();
+  };
 
   return (
     <div className="c2n" dir="rtl" lang="he">
@@ -812,137 +950,213 @@ export default function Classic2Trainer(): React.ReactElement {
         ) : null}
 
         {screen === 'play' && round ? (
-          <div className="c2n-layout">
-            <section className="c2n-main" data-trainer-zone="main">
-              <section className="c2n-card">
-                <div className="c2n-text-top">
+          <div className="c2n-play-screen" data-trainer-zone="main">
+            <section className="c2n-card c2n-play-shell">
+              <header className="c2n-play-top">
+                <div className="c2n-play-title">
+                  <span className="c2n-kicker">{trainerContract.title}</span>
+                  <h2>{round.title}</h2>
+                  <p className="c2n-sub">{progressText(roundNo, settings.rounds)} · {round.contextLabel} · {modeLabel}</p>
+                </div>
+                <div className="c2n-play-toolbar">
+                  <div className="c2n-play-stats">
+                    <span className="c2n-play-stat"><strong>{round.sentences.length}</strong> משפטים</span>
+                    <span className="c2n-play-stat"><strong>{correct + (result === 'correct' ? 1 : 0)}</strong> סבבים מדויקים</span>
+                    <span className="c2n-play-stat">{rr.exact ? 'בדיקה מלאה' : 'בדיקה גמישה'}</span>
+                  </div>
+                  <div className="c2n-play-tools">
+                    <button type="button" className="c2n-tool-btn" onClick={() => setPlayOverlay('map')}>מפת ברין</button>
+                    <button type="button" className="c2n-tool-btn" onClick={() => setPlayOverlay('status')}>סטטוס</button>
+                    <button type="button" className="c2n-tool-btn" onClick={() => setPlayOverlay('help')}>עזרה</button>
+                    <button type="button" className="c2n-tool-btn" data-trainer-action="open-settings" onClick={openSettings}>הגדרות</button>
+                    <button type="button" className="c2n-tool-btn" onClick={backToWelcome}>פתיחה</button>
+                  </div>
+                </div>
+              </header>
+
+              <section className="c2n-play-chooser">
+                <div className="c2n-play-chooser-head">
                   <div>
-                    <span className="c2n-kicker">{modeLabel}</span>
-                    <h2 style={{ fontSize: '1.05rem', fontWeight: 900 }}>{round.title}</h2>
-                    <div className="c2n-sub">{progressText(roundNo, settings.rounds)} · {round.contextLabel} · {round.sentences.length} משפטים</div>
+                    <strong>בחירת קטגוריה</strong>
+                    <p className="c2n-sub" style={{ marginTop: 6 }}>
+                      מתחילים ממשפחה אחת, ואז בוחרים רק את הקטגוריה שעובדים מולה עכשיו. מפת ברין המלאה נשארת זמינה בלחיצה כשצריך.
+                    </p>
                   </div>
-                  <div className="c2n-meta">
-                    <span className="c2n-chip">{displayLabel}</span>
-                    <span className="c2n-chip">רמה {settings.difficulty}/5</span>
-                    <span className="c2n-chip">{rr.exact ? 'בדיקה מלאה' : 'בדיקה גמישה'}</span>
-                    <span className={`c2n-tone-pill ${trafficTone}`}>{trafficLabel}</span>
+                  <div className="c2n-active-category">
+                    <b>{focusTitle}</b>
+                    <span>{activeSummaryLabel}</span>
+                    {selectedCat ? <small>קוד מתקדם: {selectedCat}</small> : null}
                   </div>
                 </div>
 
-                <div className="c2n-target" style={{ marginTop: 12 }}>
-                  <strong>{selectedCat ? `עובדים עכשיו על ${selectedCat} / ${CAT[selectedCat].he}` : 'הצעד הראשון: לבחור קטגוריה אחת מהמפה'}</strong>
-                  <p>{helpText}</p>
-                  {selectedCat && CAT[selectedCat].note && <p style={{ fontWeight: 800, color: '#0d3fae' }}>{CAT[selectedCat].note}</p>}
-                </div>
-
-                <div className="c2n-sents" style={{ marginTop: 12 }}>
-                  {round.sentences.map((s, i) => {
-                    const sel = selectedIds.includes(s.id);
-                    const isMatch = !!selectedCat && s.tags.includes(selectedCat);
-                    const showGood = !!selectedCat && (showSolution || result === 'correct') && isMatch;
-                    const showBad = result === 'wrong' && sel && !isMatch;
+                <div className="c2n-family-tabs" role="tablist" aria-label="משפחות קטגוריה">
+                  {GROUP_ORDER.map((family) => {
+                    const count = visibleNow.filter((code) => CAT[code].family === family).length;
                     return (
-                      <button key={s.id} type="button" className={`c2n-sent${sel ? ' sel' : ''}${showGood ? ' good' : ''}${showBad ? ' bad' : ''}`} onClick={() => toggleSentence(s.id)} disabled={!selectedCat || result !== 'pending'} aria-pressed={sel}>
-                        <div className="c2n-sent-top">
-                          <span>משפט {i + 1}</span>
-                          <span>{showGood ? 'נכון' : showBad ? 'לא מתאים' : sel ? 'מסומן' : 'לחיץ'}</span>
-                        </div>
-                        <span className="c2n-sent-text">{s.text}</span>
+                      <button
+                        key={family}
+                        type="button"
+                        className={`c2n-family-tab ${toneClassForFamily(family)}${activeFamily === family ? ' is-active' : ''}`}
+                        onClick={() => setActiveFamily(family)}
+                        disabled={count === 0}
+                        role="tab"
+                        aria-selected={activeFamily === family}
+                      >
+                        <span>{GROUP_META[family].he}</span>
+                        <small>{count ? `${count} קטגוריות זמינות` : 'לא זמין בהגדרות הנוכחיות'}</small>
                       </button>
                     );
                   })}
                 </div>
 
-                <div className="c2n-row-actions">
-                  <button type="button" className="c2n-btn p" onClick={evaluate} disabled={!selectedCat || result !== 'pending'}>בדוק תשובה</button>
-                  <button type="button" className="c2n-btn w" onClick={declareNoCategory} disabled={!selectedCat || result !== 'pending'}>אין את הקטגוריה בטקסט</button>
-                  <button
-                    type="button"
-                    className="c2n-btn s"
-                    onClick={() => {
-                      setSelectedIds([]);
-                      setResult('pending');
-                      setShowHint(false);
-                      setShowSolution(false);
-                      setFeedback(selectedCat ? { tone: 'info', message: 'נוקה הסימון. אפשר לנסות שוב.' } : { tone: 'info', message: 'בחר/י קטגוריה כדי להתחיל.' });
-                    }}
-                  >
-                    נסה/י שוב
-                  </button>
-                  <button type="button" className="c2n-btn g" onClick={openHint} disabled={!selectedCat || (mode === 'test' && result === 'pending')}>{mode === 'test' ? 'רמז אחרי בדיקה' : 'רמז'}</button>
-                  <button type="button" className="c2n-btn g" onClick={openSolution} disabled={!selectedCat || (mode === 'test' && result === 'pending')}>{mode === 'test' ? 'פתרון אחרי בדיקה' : 'פתרון'}</button>
+                <div className="c2n-category-strip">
+                  {primaryFamilyCategories.map((code) => (
+                    <button
+                      key={code}
+                      type="button"
+                      className={`c2n-category-pill ${toneClassForCategory(code)}${selectedCat === code ? ' is-active' : ''}${selectedCat && selectedCat !== code ? ' is-dim' : ''}`}
+                      onClick={() => selectCat(code)}
+                      disabled={result !== 'pending'}
+                      aria-pressed={selectedCat === code}
+                    >
+                      <strong>{CAT[code].he}</strong>
+                      <span>{CAT[code].hint}</span>
+                      <small>{CAT[code].familyHe}</small>
+                    </button>
+                  ))}
                 </div>
 
-                {feedback && <div className={`c2n-fb ${feedback.tone}`}>{feedback.message}</div>}
-
-                {showHint && selectedCat && (
-                  <div className="c2n-hint">
-                    <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>רמז</h4>
-                    <p>{CAT[selectedCat].hint}</p>
-                    {hintIdx.length ? <p>בדוק/י במיוחד את משפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p> : <p>ייתכן שאין מופע של הקטגוריה הזו בטקסט.</p>}
-                  </div>
-                )}
-
-                {showSolution && selectedCat && (
-                  <div className="c2n-hint">
-                    <h4 style={{ fontSize: '.88rem', fontWeight: 900 }}>פתרון</h4>
-                    {hintIdx.length
-                      ? <p>המופעים של {selectedCat} / {CAT[selectedCat].he} נמצאים במשפט{hintIdx.length > 1 ? 'ים' : ''}: {hintIdx.join(', ')}.</p>
-                      : <p>אין מופע של {selectedCat} / {CAT[selectedCat].he} בטקסט הזה.</p>}
-                  </div>
-                )}
-
-                <div className="c2n-foot">
-                  <div className="c2n-score">
-                    <span className="c2n-chip">הושלמו: {done}</span>
-                    <span className="c2n-chip">נכונים: {correct + (result === 'correct' ? 1 : 0)}</span>
-                    <span className="c2n-chip">טעויות: {mistakes}</span>
-                    <span className="c2n-chip" data-trainer-summary="current">{startSummary}</span>
-                  </div>
-                  <div className="c2n-row-actions">
-                    <button type="button" className="c2n-btn s" onClick={backToWelcome}>חזרה לפתיחה</button>
-                    <button type="button" className="c2n-btn p" onClick={nextRound} disabled={result !== 'correct'}>{settings.rounds === 'infinite' ? 'סבב הבא (∞)' : 'סבב הבא'}</button>
-                  </div>
-                </div>
-              </section>
-            </section>
-
-            <aside className="c2n-sidebar" data-trainer-zone="support">
-              <section className="c2n-card">
-                <div className="c2n-group-head">
-                  <h3>מפת הקטגוריות</h3>
-                  <p className="c2n-sub">{settings.categoryDisplay === 'all' ? 'אותו סדר קנוני RTL בכל סשן.' : `מיקוד על ${settings.categoryGroup}${settings.includeCtxVak ? ' + CTX/VAK' : ''}.`}</p>
-                </div>
-                {renderCatPicker(settings, result === 'pending')}
-              </section>
-
-              <section className="c2n-card">
-                <div className="c2n-group-head">
-                  <h3>{selectedCat ? `מה לחפש בתוך ${selectedCat}` : 'מה הצעד הבא'}</h3>
-                  <p className="c2n-sub">הסבר משני נפתח רק כשצריך, בלי להכביד על אזור העבודה.</p>
-                </div>
-                <div className="c2n-row-actions">
-                  <button type="button" className="c2n-btn g" onClick={() => setHelpOpen((value) => !value)} aria-expanded={helpOpen}>
-                    {helpOpen ? 'סגור עזרה' : 'פתח עזרה'}
-                  </button>
-                  <button type="button" className="c2n-btn s" data-trainer-action="open-settings" onClick={openSettings}>הגדרות</button>
-                </div>
-                {helpOpen ? (
-                  <div className="c2n-help">
-                    <p>{helpText}</p>
-                    <p>{mode === 'test' ? 'במבחן עובדים קודם לבד, ורק אחרי תוצאה אפשר לפתוח רמז או פתרון.' : 'בלימוד אפשר לפתוח רמז בזמן העבודה כדי לחדד מה בדיוק מחפשים.'}</p>
+                {extraCategories.length ? (
+                  <div className="c2n-extra-strip">
+                    <span className="c2n-strip-label">עוד קטגוריות</span>
+                    {extraCategories.map((code) => (
+                      <button
+                        key={code}
+                        type="button"
+                        className={`c2n-category-pill ${toneClassForCategory(code)}${selectedCat === code ? ' is-active' : ''}${selectedCat && selectedCat !== code ? ' is-dim' : ''}`}
+                        onClick={() => selectCat(code)}
+                        disabled={result !== 'pending'}
+                        aria-pressed={selectedCat === code}
+                      >
+                        <strong>{CAT[code].he}</strong>
+                        <span>{CAT[code].hint}</span>
+                        <small>{AUX_META[code].he}</small>
+                      </button>
+                    ))}
                   </div>
                 ) : null}
               </section>
 
-              <section className="c2n-card" data-trainer-zone="support">
-                <div className="c2n-group-head">
-                  <h3>מצב הסשן</h3>
-                  <p className="c2n-sub">הסיכום מתעדכן בזמן אמת בלי להוציא אותך מאזור העבודה.</p>
-                </div>
-                {summaryGrid}
+              <section className="c2n-play-board">
+                <section className="c2n-sentence-surface">
+                  <div className="c2n-surface-head">
+                    <div>
+                      <h3>טקסט הסבב</h3>
+                      <p className="c2n-sub" style={{ marginTop: 6 }}>
+                        {selectedCatMeta
+                          ? `סמן/י רק את המשפטים ששייכים ל-${selectedCatMeta.he}.`
+                          : 'בחר/י קטגוריה אחת, ואז סמן/י רק את המשפטים שבאמת מתאימים לה.'}
+                      </p>
+                    </div>
+                    {selectedCatMeta ? <span className="c2n-surface-target">{selectedCatMeta.he}</span> : null}
+                  </div>
+
+                  <div className="c2n-sents c2n-sents-board">
+                    {round.sentences.map((s, i) => {
+                      const sel = selectedIds.includes(s.id);
+                      const isMatch = !!selectedCat && s.tags.includes(selectedCat);
+                      const showGood = !!selectedCat && (showSolution || result === 'correct') && isMatch;
+                      const showBad = result === 'wrong' && sel && !isMatch;
+                      return (
+                        <button
+                          key={s.id}
+                          type="button"
+                          className={`c2n-sent${sel ? ' sel' : ''}${showGood ? ' good' : ''}${showBad ? ' bad' : ''}`}
+                          onClick={() => toggleSentence(s.id)}
+                          disabled={!selectedCat || result !== 'pending'}
+                          aria-pressed={sel}
+                        >
+                          <div className="c2n-sent-top">
+                            <span className="c2n-sent-index">{i + 1}</span>
+                            <span className="c2n-sent-state">{showGood ? 'שייך לקטגוריה' : showBad ? 'לא שייך' : sel ? 'מסומן' : 'זמין לסימון'}</span>
+                          </div>
+                          <span className="c2n-sent-text">{s.text}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+
+                <aside className="c2n-feedback-surface">
+                  <section className={`c2n-focus-card ${selectedFamilyTone === 'distortion' ? 'is-distortion' : selectedFamilyTone === 'generalization' ? 'is-generalization' : selectedFamilyTone === 'deletion' ? 'is-deletion' : 'is-context'}`}>
+                    <h3>בפוקוס עכשיו</h3>
+                    <p>{focusDescription}</p>
+                    {selectedCat ? <span className="c2n-code" style={{ width: 'max-content' }}>{selectedCat}</span> : null}
+                  </section>
+
+                  <div className={`c2n-fb ${(feedback || { tone: 'info' as Tone }).tone}`}>
+                    {feedback?.message || defaultFeedback}
+                  </div>
+
+                  {(showHint || showSolution) && selectedCat ? (
+                    <div className="c2n-support-stack">
+                      {showHint ? (
+                        <section className="c2n-support-card">
+                          <span className="c2n-detail-title">רמז</span>
+                          <p>{CAT[selectedCat].hint}</p>
+                          {hintIdx.length ? <p>שווה לבדוק במיוחד את משפט{hintIdx.length > 1 ? 'ים' : ''} {hintIdx.join(', ')}.</p> : <p>ייתכן שאין כאן מופע של הקטגוריה הזו.</p>}
+                        </section>
+                      ) : null}
+                      {showSolution ? (
+                        <section className="c2n-support-card">
+                          <span className="c2n-detail-title">פתרון</span>
+                          {hintIdx.length
+                            ? <p>המופעים של {CAT[selectedCat].he} נמצאים במשפט{hintIdx.length > 1 ? 'ים' : ''} {hintIdx.join(', ')}.</p>
+                            : <p>בטקסט הזה אין מופע של {CAT[selectedCat].he}.</p>}
+                        </section>
+                      ) : null}
+                    </div>
+                  ) : null}
+
+                  <section className="c2n-action-panel">
+                    <button
+                      type="button"
+                      className="c2n-btn p c2n-btn-main"
+                      onClick={primaryActionHandler}
+                      disabled={result === 'pending' ? !selectedCat : result === 'correct' ? false : !selectedCat}
+                    >
+                      {primaryActionLabel}
+                    </button>
+
+                    <div className="c2n-action-strip">
+                      <button type="button" className="c2n-btn w" onClick={declareNoCategory} disabled={!selectedCat || result !== 'pending'}>אין את הקטגוריה בטקסט</button>
+                      <button
+                        type="button"
+                        className="c2n-btn s"
+                        onClick={() => {
+                          setSelectedIds([]);
+                          setResult('pending');
+                          setShowHint(false);
+                          setShowSolution(false);
+                          setFeedback(selectedCat ? { tone: 'info', message: 'הסימון נוקה. אפשר לנסות שוב באותה קטגוריה.' } : { tone: 'info', message: 'בחר/י קטגוריה כדי להתחיל.' });
+                        }}
+                        disabled={!selectedIds.length && result === 'pending'}
+                      >
+                        נקה סימון
+                      </button>
+                      <button type="button" className="c2n-btn g" onClick={openHint} disabled={!selectedCat || (mode === 'test' && result === 'pending')}>{mode === 'test' ? 'רמז אחרי בדיקה' : 'רמז'}</button>
+                      <button type="button" className="c2n-btn g" onClick={openSolution} disabled={!selectedCat || (mode === 'test' && result === 'pending')}>{mode === 'test' ? 'פתרון אחרי בדיקה' : 'פתרון'}</button>
+                    </div>
+
+                    <p className="c2n-quiet-note">
+                      {mode === 'test'
+                        ? 'במבחן עובדים קודם לבד. רמז ופתרון נפתחים רק אחרי תוצאה.'
+                        : 'בלימוד אפשר לפתוח רמז או פתרון רק כשצריך, בלי להעמיס על מרכז העבודה.'}
+                    </p>
+                  </section>
+                </aside>
               </section>
-            </aside>
+            </section>
           </div>
         ) : null}
 
@@ -987,6 +1201,81 @@ export default function Classic2Trainer(): React.ReactElement {
           </section>
         ) : null}
       </section>
+
+      {playOverlay ? (
+        <div className="c2n-overlay" role="dialog" aria-modal="true" aria-labelledby="classic2-play-overlay-title" onClick={() => setPlayOverlay(null)}>
+          <section className="c2n-modal" onClick={(event) => event.stopPropagation()}>
+            <header className="c2n-modal-head">
+              <div>
+                <h2 id="classic2-play-overlay-title">
+                  {playOverlay === 'map' ? 'מפת ברין' : playOverlay === 'status' ? 'סטטוס הסשן' : 'עזרה ממוקדת'}
+                </h2>
+                <p>
+                  {playOverlay === 'map'
+                    ? 'כאן נשמר הסדר הקנוני המלא. במסך הראשי עובדים עם בחירה פשוטה יותר, ובוחרים מהטבלה רק כשצריך דיוק נוסף.'
+                    : playOverlay === 'status'
+                      ? 'הפרטים המלאים של הסשן נשמרים כאן כדי שהמסך הראשי יישאר קל וממוקד.'
+                      : 'תזכורת קצרה למה מחפשים עכשיו. את ההסבר הרחב יותר משאירים למסך הפתיחה.'}
+                </p>
+              </div>
+              <button type="button" className="c2n-btn s" onClick={() => setPlayOverlay(null)}>סגור</button>
+            </header>
+
+            {playOverlay === 'map' ? (
+              <div className="c2n-overlay-grid">
+                <div className="c2n-help">
+                  <p>העברית היא הכותרת הראשית של כל קטגוריה. הקוד האנגלי נשאר כאן רק כמטא־דאטה למי שעובד עם מפת ברין הקנונית.</p>
+                </div>
+                {renderCatPicker(settings, result === 'pending', false, true)}
+              </div>
+            ) : null}
+
+            {playOverlay === 'help' ? (
+              <div className="c2n-overlay-grid">
+                <section className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>מה עושים כאן עכשיו</h3>
+                  </div>
+                  <p className="c2n-sub">{defaultFeedback}</p>
+                </section>
+                <section className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>מה כדאי לחפש</h3>
+                  </div>
+                  <p className="c2n-sub">{helpText}</p>
+                </section>
+                <section className="c2n-group">
+                  <div className="c2n-group-head">
+                    <h3>איך להשתמש בתמיכה</h3>
+                  </div>
+                  <p className="c2n-sub">
+                    {mode === 'test'
+                      ? 'במבחן עובדים קודם לבד, ורק אחרי תוצאה אפשר לפתוח רמז או פתרון.'
+                      : 'בלימוד אפשר לפתוח רמז או פתרון לפי צורך, אבל עדיף לתת קודם קריאה עצמאית אחת לטקסט.'}
+                  </p>
+                </section>
+              </div>
+            ) : null}
+
+            {playOverlay === 'status' ? (
+              <div className="c2n-overlay-grid">
+                {summaryGrid}
+                <div className="c2n-status-grid">
+                  <div className="c2n-status-card"><b>מצב</b><span>{modeLabel}</span></div>
+                  <div className="c2n-status-card"><b>קושי</b><span>{settings.difficulty}/5</span></div>
+                  <div className="c2n-status-card"><b>טעויות</b><span>{mistakes}</span></div>
+                  <div className="c2n-status-card"><b>רמזים</b><span>{hintsUsed}</span></div>
+                  <div className="c2n-status-card"><b>פתרונות</b><span>{solutionsUsed}</span></div>
+                  <div className="c2n-status-card"><b>תצוגת עבודה</b><span>{displayLabel}</span></div>
+                </div>
+                <div className="c2n-help">
+                  <p>{trafficLabel}</p>
+                </div>
+              </div>
+            ) : null}
+          </section>
+        </div>
+      ) : null}
 
       <TrainerSettingsShell
         trainerId="classic2"
