@@ -349,6 +349,102 @@
       }
     }
   },
+  "breen-table-lab": {
+    "id": "breen-table-lab",
+    "title": "מעבדת טבלת ברין",
+    "subtitle": "בנייה, השלמה ושליפה בזמן אמת",
+    "familyLabel": "משפחת הקלאסיק",
+    "quickStartLabel": "מתחילים למפות",
+    "startActionLabel": "התחל תרגול",
+    "settingsTitle": "הגדרות מעבדת טבלת ברין",
+    "settingsSubtitle": "בוחרים מצב, קושי, גודל סבב וטיימר, ואז נכנסים ישר לעבודה עם המפה עצמה.",
+    "helperSteps": [
+      {
+        "title": "1. בוחרים מצב עבודה",
+        "description": "בנייה, השלמה או איתור מהיר, לפי סוג הזיכרון המרחבי שרוצים לחזק עכשיו."
+      },
+      {
+        "title": "2. עובדים מול הטבלה עצמה",
+        "description": "המפה נשארת במרכז כל הזמן כדי לבנות זיכרון של שכנים, אזורים ומשפחות."
+      },
+      {
+        "title": "3. מסיימים עם מפת חוזקות",
+        "description": "בסוף כל סבב הטבלה חוזרת בתור heatmap שמראה איפה המפה כבר יציבה ואיפה עוד לא."
+      }
+    ],
+    "processSteps": [
+      {
+        "id": "see-map",
+        "label": "1. רואים את המפה",
+        "shortLabel": "מפה",
+        "description": "שומרים את טבלת ברין מול העיניים בתור אובייקט הלמידה הראשי."
+      },
+      {
+        "id": "act",
+        "label": "2. פועלים בתוך המפה",
+        "shortLabel": "פעולה",
+        "description": "מניחים שם, משלימים חור, או לוחצים על יעד בזמן אמת."
+      },
+      {
+        "id": "feedback",
+        "label": "3. רואים מה כבר יושב",
+        "shortLabel": "משוב",
+        "description": "מקבלים חיווי קצר ואז רואים בסוף איך המפה עצמה משקפת חוזקות וחולשות."
+      }
+    ],
+    "supportRailMode": "spatial-map",
+    "settingsGroups": [
+      "mode",
+      "session-mode",
+      "difficulty",
+      "round-size",
+      "timer"
+    ],
+    "mobilePriorityOrder": [
+      "start",
+      "purpose",
+      "main",
+      "support",
+      "helper-steps"
+    ],
+    "wrapper": {
+      "pageTitle": "Breen Table Lab - Meta Model Spatial Trainer",
+      "mountId": "breen-table-lab-root",
+      "loadingTitle": "טוען את מעבדת טבלת ברין...",
+      "loadingText": "מכין את סביבת האימון המרחבית של טבלת ברין עם בנייה, השלמה ושליפה מהירה.",
+      "errorTitle": "שגיאה בטעינת מעבדת טבלת ברין",
+      "navLinks": [
+        {
+          "href": "index.html",
+          "label": "חזרה לדף הראשי"
+        },
+        {
+          "href": "classic2_trainer.html",
+          "label": "Classic 2"
+        },
+        {
+          "href": "classic_classic_trainer.html",
+          "label": "Classic Classic"
+        },
+        {
+          "href": "iceberg_templates_trainer.html",
+          "label": "Iceberg Templates"
+        }
+      ],
+      "accent": {
+        "primary": "#4338ca",
+        "border": "#c7d2fe",
+        "glow": "rgba(99,102,241,0.18)",
+        "background": "radial-gradient(circle at 12% 10%, #e0e7ff, transparent 34%), radial-gradient(circle at 88% 18%, #cffafe, transparent 30%), linear-gradient(165deg, #f8fafc 0%, #eef2ff 58%, #fff7ed 100%)"
+      },
+      "standalone": {
+        "htmlFile": "breen_table_lab.html",
+        "manifestKey": "_breen_table_lab",
+        "bundlePath": "js/breen-table-lab.bundle.js",
+        "buildMetaGlobalKey": "__BREEN_TABLE_LAB_BUILD_META__"
+      }
+    }
+  },
   "scenario-trainer": {
     "id": "scenario-trainer",
     "title": "$1תמונות מחיי היום",

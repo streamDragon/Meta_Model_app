@@ -10,6 +10,7 @@ const STATIC_FILES = [
   'src/data/connectedBubblesCases.he.json',
   'index2.html',
   'verb_unzip_trainer.html',
+  'breen_table_lab.html',
   'classic_classic_trainer.html',
   'classic2_trainer.html',
   'scenario_trainer.html',
