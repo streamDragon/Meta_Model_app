@@ -1710,47 +1710,64 @@
     }
 
     function renderResultCard(round) {
-        if (!state.feedback && !state.hintMessage && !state.explanationPanel?.entry) return '';
         const tone = state.feedback?.tone || 'info';
         const entry = state.explanationPanel?.entry || null;
         const message = state.feedback?.text || state.hintMessage || '';
         return `
-          <section class="cc-result-card" data-tone="${escapeHtml(tone)}" data-alchemy-skip="1" aria-live="polite">
+          <section class="cc-result-card${message ? '' : ' is-empty'}" data-tone="${escapeHtml(message ? tone : 'info')}" data-alchemy-skip="1" aria-live="polite">
             <div class="cc-result-main">
               <div class="cc-result-copy">
-                <strong>${escapeHtml(feedbackTitleForTone(tone))}</strong>
-                <p>${escapeHtml(message)}</p>
+                <strong>${escapeHtml(message ? feedbackTitleForTone(tone) : 'כאן תופיע התוצאה')}</strong>
+                <p>${escapeHtml(message || 'בחרו את האפשרות שנשמעת הכי מדויקת כאן, והמשוב יופיע בלי להזיז את המסך.')}</p>
               </div>
-              ${tone === 'success' && entry?.takeForward ? `<span class="cc-result-next">${escapeHtml(entry.takeForward)}</span>` : ''}
+              ${message && tone === 'success' && entry?.takeForward ? `<span class="cc-result-next">${escapeHtml(entry.takeForward)}</span>` : ''}
             </div>
             ${entry ? `
               <div class="cc-result-extra">
                 <button type="button" class="cc-result-toggle" data-cc-action="toggle-explanation" aria-expanded="${state.explanationPanel.open ? 'true' : 'false'}">
                   ${escapeHtml(getResultToggleLabel(entry, tone))}
                 </button>
-                ${state.explanationPanel.open ? `
-                  <div class="cc-result-details">
-                    <div class="cc-result-details-grid">
-                      <article class="cc-result-detail-card">
-                        <strong>מה נשמע בתוך המשפט</strong>
-                        <p>${escapeHtml(entry.focusSnippet || entry.whatWasSaid || '')}</p>
-                      </article>
-                      <article class="cc-result-detail-card">
-                        <strong>${escapeHtml(tone === 'success' ? 'למה זה עבד כאן' : 'מה לא ישב עד הסוף')}</strong>
-                        <p>${escapeHtml(entry.whyChoice || '')}</p>
-                      </article>
-                      ${entry.goalText ? `
-                        <article class="cc-result-detail-card">
-                          <strong>מה כדאי לברר מכאן</strong>
-                          <p>${escapeHtml(entry.goalText)}</p>
-                        </article>
-                      ` : ''}
-                    </div>
-                  </div>
-                ` : ''}
               </div>
             ` : ''}
           </section>
+        `;
+    }
+
+    function renderOverlayPanel() {
+        const entry = state.explanationPanel?.entry;
+        if (!entry || !state.explanationPanel?.open) return '';
+        const tone = entry.tone || state.feedback?.tone || 'info';
+        return `
+          <div class="cc-layer cc-layer-center cc-overlay-layer" role="dialog" aria-modal="true" aria-label="פירוט קצר">
+            <div class="cc-overlay-card" data-tone="${escapeHtml(tone)}">
+              <div class="cc-overlay-head">
+                <div>
+                  <span class="cc-card-kicker">${escapeHtml(entry.stageLabel || 'פירוט')}</span>
+                  <h3>${escapeHtml(entry.title || 'פירוט קצר')}</h3>
+                </div>
+                <button type="button" class="cc-icon-btn" data-cc-action="close-explanation" aria-label="סגור">×</button>
+              </div>
+              <div class="cc-overlay-body">
+                <article class="cc-overlay-block">
+                  <strong>מה נשמע בתוך המשפט</strong>
+                  <p>${escapeHtml(entry.focusSnippet || entry.whatWasSaid || '')}</p>
+                </article>
+                <article class="cc-overlay-block">
+                  <strong>${escapeHtml(tone === 'success' ? 'למה זה עבד כאן' : 'מה כדאי לדייק כאן')}</strong>
+                  <p>${escapeHtml(entry.whyChoice || '')}</p>
+                </article>
+                ${entry.goalText ? `
+                  <article class="cc-overlay-block">
+                    <strong>מה כדאי לברר מכאן</strong>
+                    <p>${escapeHtml(entry.goalText)}</p>
+                  </article>
+                ` : ''}
+              </div>
+              <div class="cc-overlay-actions">
+                <button type="button" class="cc-btn cc-btn-primary" data-cc-action="close-explanation">חזרה לתרגול</button>
+              </div>
+            </div>
+          </div>
         `;
     }
 
@@ -2160,6 +2177,7 @@
               ${renderPracticeCard(round)}
             </div>
             ${renderNlpAdvisor(round)}
+            ${renderOverlayPanel()}
             ${renderSettingsDrawer()}
             ${renderHiddenHelpContent('play')}
           </div>
