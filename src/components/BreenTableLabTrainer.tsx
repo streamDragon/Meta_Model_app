@@ -1029,6 +1029,22 @@ function PlayScreen({
       </div>
 
       <div className="btl-workbench">
+        <article className="btl-board-panel">
+          <BreenTableBoard
+            title="טבלת ברין"
+            showHeader={false}
+            showLegend={false}
+            cellStates={boardStates}
+            onCellClick={
+              session.kind === 'build'
+                ? onBuildCellClick
+                : session.kind === 'complete'
+                  ? onCompleteCellClick
+                : onQuickCellClick
+            }
+          />
+        </article>
+
         <aside className="btl-focus-panel">
           <div className="btl-focus-head">
             <span className="btl-kicker">המשימה עכשיו</span>
@@ -1058,22 +1074,6 @@ function PlayScreen({
             </div>
           </div>
         </aside>
-
-        <article className="btl-board-panel">
-          <BreenTableBoard
-            title="טבלת ברין"
-            showHeader={false}
-            showLegend={false}
-            cellStates={boardStates}
-            onCellClick={
-              session.kind === 'build'
-                ? onBuildCellClick
-                : session.kind === 'complete'
-                  ? onCompleteCellClick
-                  : onQuickCellClick
-            }
-          />
-        </article>
       </div>
     </section>
   );
