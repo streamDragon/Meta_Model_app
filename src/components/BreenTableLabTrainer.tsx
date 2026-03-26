@@ -882,7 +882,7 @@ function PlayScreen({
   onSelectPattern: (code: CanonicalBreenCode) => void;
   onResetBuild: () => void;
 }): React.ReactElement {
-  const progressLabel = session.kind === 'quick' ? `${session.currentIndex + 1}/${session.prompts.length}` : '1/1';
+  const progressLabel = playProgressLabel(session);
   const phaseIndex = session.kind === 'quick'
     ? (session.answered ? 3 : 2)
     : session.kind === 'build'
@@ -892,30 +892,127 @@ function PlayScreen({
         : session.activeMissingCell
           ? 2
           : 1;
+  const placedCount = session.kind === 'build' ? Object.keys(session.placements).length : 0;
+  const answeredCount = session.kind === 'complete' ? Object.keys(session.answers).length : 0;
+  const activeQuickPrompt = session.kind === 'quick' ? session.prompts[session.currentIndex] : null;
 
   const primaryAction = (() => {
     if (session.kind === 'build') {
-      if (session.checked) return <button type="button" className="btl-btn is-primary" onClick={onFinish}>למסך התוצאות</button>;
-      return <button type="button" className="btl-btn is-primary" onClick={onBuildCheck}>בדוק מיקום</button>;
+      if (session.checked) return <button type="button" className="btl-btn is-primary" onClick={onFinish}>לסיכום</button>;
+      return <button type="button" className="btl-btn is-primary" onClick={onBuildCheck}>בדוק</button>;
     }
     if (session.kind === 'complete') {
       const canFinish = session.settings.sessionMode === 'learning' ? session.correctCount >= session.totalTargets : session.checked;
-      if (canFinish) return <button type="button" className="btl-btn is-primary" onClick={onFinish}>למסך התוצאות</button>;
-      return <button type="button" className="btl-btn is-primary" onClick={onCompleteCheck}>בדוק השלמה</button>;
+      if (canFinish) return <button type="button" className="btl-btn is-primary" onClick={onFinish}>לסיכום</button>;
+      return <button type="button" className="btl-btn is-primary" onClick={onCompleteCheck}>בדוק</button>;
     }
     if (session.answered && session.currentIndex >= session.prompts.length - 1) {
-      return <button type="button" className="btl-btn is-primary" onClick={onFinish}>למסך התוצאות</button>;
+      return <button type="button" className="btl-btn is-primary" onClick={onFinish}>לסיכום</button>;
     }
-    return <button type="button" className="btl-btn is-primary" onClick={onQuickNext} disabled={!session.answered}>המשך</button>;
+    return <button type="button" className="btl-btn is-primary" onClick={onQuickNext} disabled={!session.answered}>הלאה</button>;
+  })();
+
+  const focusPanel = (() => {
+    if (session.kind === 'build') {
+      return (
+        <div className="btl-focus-card">
+          <div className="btl-pill-row">
+            <span className="btl-pill" data-tone={toneForMode(session.kind)}>מגש תבניות</span>
+            <span className="btl-pill">{placedCount}/{session.trayCodes.length} שובצו</span>
+          </div>
+          <div className="btl-focus-selection" data-empty={session.selectedPattern ? '0' : '1'}>
+            <span className="btl-focus-label">נבחר עכשיו</span>
+            <strong>{session.selectedPattern ? BREEN_TABLE_CELL_MAP[session.selectedPattern].heTitle : 'עדיין לא נבחרה תבנית'}</strong>
+            <p>{session.selectedPattern ? 'יופי. עכשיו לוחצים על המקום שלה בטבלה.' : 'הבחירה מתחילה כאן, והדיוק קורה על הלוח.'}</p>
+          </div>
+          <div className="btl-tray">
+            {session.trayCodes.map((code) => {
+              const placed = Object.values(session.placements).includes(code);
+              return (
+                <button
+                  key={code}
+                  type="button"
+                  className="btl-tray-item"
+                  data-selected={session.selectedPattern === code ? '1' : '0'}
+                  data-placed={placed ? '1' : '0'}
+                  disabled={session.checked}
+                  onClick={() => onSelectPattern(code)}
+                >
+                  {BREEN_TABLE_CELL_MAP[code].heTitle}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    if (session.kind === 'complete') {
+      return (
+        <div className="btl-focus-card">
+          <div className="btl-pill-row">
+            <span className="btl-pill" data-tone={toneForMode(session.kind)}>חורים פתוחים</span>
+            <span className="btl-pill">{answeredCount}/{session.totalTargets} נענו</span>
+          </div>
+          <div className="btl-focus-selection" data-empty={session.activeMissingCell ? '0' : '1'}>
+            <span className="btl-focus-label">החור הפעיל</span>
+            <strong>{session.activeMissingCell ? BREEN_TABLE_CELL_MAP[session.activeMissingCell].rowLabelHe : 'לחץ/י על חור בטבלה'}</strong>
+            <p>{session.activeMissingCell ? 'בחר/י את השם שמתאים לתא הזה.' : 'המפה תוביל אותך. לחיצה על חור פותחת את האפשרויות כאן.'}</p>
+          </div>
+          {session.activeMissingCell && !session.checked ? (
+            <div className="btl-choice-inline">
+              <strong>מה נכנס לכאן?</strong>
+              <div className="btl-choice-inline-grid">
+                {(session.optionsByCell[session.activeMissingCell] || []).map((code) => (
+                  <button key={code} type="button" onClick={() => onCompleteChoose(code)}>
+                    {BREEN_TABLE_CELL_MAP[code].heTitle}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="btl-focus-hint">
+              {session.checked ? 'הבדיקה הסתיימה. אפשר לעבור לסיכום.' : 'אין צורך לגלול. כל הבחירה תופיע כאן בצד הימני.'}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="btl-focus-card">
+        <div className="btl-pill-row">
+          <span className="btl-pill" data-tone={toneForPromptType(activeQuickPrompt?.promptType || 'name')}>
+            {activeQuickPrompt?.promptType === 'example' ? 'דוגמת משפט' : 'שם תבנית'}
+          </span>
+          <span className="btl-pill">{session.currentIndex + 1}/{session.prompts.length}</span>
+        </div>
+        <div className="btl-focus-selection" data-empty="0">
+          <span className="btl-focus-label">מוצאים עכשיו</span>
+          <strong>{activeQuickPrompt?.promptType === 'name' ? activeQuickPrompt.promptText : 'לאן המשפט הזה שייך?'}</strong>
+          <p>{activeQuickPrompt?.promptText}</p>
+        </div>
+        <div className="btl-focus-hint">
+          {session.answered ? 'היעד נבדק. עוד רגע ממשיכים ליעד הבא.' : 'הטבלה פתוחה מולך. רואים, מזהים, ולוחצים ישר על התא.'}
+        </div>
+      </div>
+    );
   })();
 
   return (
     <section className="btl-play-shell">
-      <div className="btl-topbar">
-        <div>
+      <div className="btl-topbar btl-topbar--play">
+        <div className="btl-topbar-main">
           <span className="btl-kicker">מעבדת טבלת ברין · {formatModeLabel(session.kind)}</span>
-          <h2>{playHeadline(session)}</h2>
-          <p className="btl-body">{playSubheadline(session)}</p>
+          <div className="btl-topbar-copy">
+            <h2>{playHeadline(session)}</h2>
+            <p className="btl-topbar-note">{playSubheadline(session)}</p>
+          </div>
+          <div className="btl-phase-strip" aria-label="שלבי התרגול">
+            {phasePillsForSession(session).map((label, index) => (
+              <span key={label} className="btl-phase" data-active={phaseIndex === index + 1 ? '1' : '0'}>{label}</span>
+            ))}
+          </div>
         </div>
         <div className="btl-status-grid">
           <div className="btl-stat-row">
@@ -931,113 +1028,52 @@ function PlayScreen({
         </div>
       </div>
 
-      <div className="btl-phase-strip">
-        {phasePillsForSession(session).map((label, index) => (
-          <span key={label} className="btl-phase" data-active={phaseIndex === index + 1 ? '1' : '0'}>{label}</span>
-        ))}
-      </div>
+      <div className="btl-workbench">
+        <aside className="btl-focus-panel">
+          <div className="btl-focus-head">
+            <span className="btl-kicker">המשימה עכשיו</span>
+            <h3>{focusHeadline(session)}</h3>
+            <p className="btl-copy">{focusSubline(session)}</p>
+          </div>
 
-      <div className="btl-play-main">
-        <article className="btl-main-surface">
-          {session.kind === 'build' ? (
-            <>
-              <div className="btl-prompt">
-                <strong>{session.selectedPattern ? `תבנית נבחרת: ${BREEN_TABLE_CELL_MAP[session.selectedPattern].heTitle}` : 'בחר/י תבנית מהמגש, ואז לחץ/י על התא שלה בטבלה.'}</strong>
-                <p>במצב בנייה המפה נשארת מרכזית, והמגש רק מזמין אותך לשייך שם למקום. לא צריך לגרור. בוחרים, מניחים, ומקבלים תמונת דיוק.</p>
-                <div className="btl-tray">
-                  {session.trayCodes.map((code) => {
-                    const placed = Object.values(session.placements).includes(code);
-                    return (
-                      <button
-                        key={code}
-                        type="button"
-                        className="btl-tray-item"
-                        data-selected={session.selectedPattern === code ? '1' : '0'}
-                        data-placed={placed ? '1' : '0'}
-                        disabled={session.checked}
-                        onClick={() => onSelectPattern(code)}
-                      >
-                        {BREEN_TABLE_CELL_MAP[code].heTitle}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <BreenTableBoard
-                title="טבלת ברין"
-                subtitle="בחר/י תבנית מהמגש, ואז הנח/י אותה במקום שלה על המפה."
-                cellStates={boardStates}
-                onCellClick={onBuildCellClick}
-              />
-            </>
-          ) : null}
+          {focusPanel}
 
-          {session.kind === 'complete' ? (
-            <>
-              <div className="btl-prompt">
-                <strong>לחץ/י על אחד החורים החסרים, ובחר/י את השם המדויק מתוך האפשרויות.</strong>
-                <p>הטבלה כמעט מלאה. העבודה כאן היא לראות מה חסר, ולהרגיש איך השכנים והמשפחה עוזרים להחזיר את השם הנכון.</p>
+          <div className="btl-focus-footer">
+            <div className="btl-feedback-copy">
+              <div className="btl-pill-row">
+                <span className="btl-pill" data-tone={toneForMode(session.kind)}>{formatModeLabel(session.kind)}</span>
+                <span className="btl-pill">{formatSessionModeLabel(session.settings.sessionMode)}</span>
+                {session.kind === 'quick' ? <span className="btl-pill">{formatPromptTypeLabel(session.settings.quickPromptType)}</span> : null}
               </div>
-              <BreenTableBoard
-                title="טבלת ברין"
-                subtitle="החורים החסרים מסומנים. לחיצה על חור פותחת בחירה קצרה."
-                cellStates={boardStates}
-                onCellClick={onCompleteCellClick}
-              />
-              {session.activeMissingCell && !session.checked ? (
-                <div className="btl-choice-inline">
-                  <strong>אפשרויות עבור: {BREEN_TABLE_CELL_MAP[session.activeMissingCell].rowLabelHe}</strong>
-                  <div className="btl-choice-inline-grid">
-                    {(session.optionsByCell[session.activeMissingCell] || []).map((code) => (
-                      <button key={code} type="button" onClick={() => onCompleteChoose(code)}>
-                        {BREEN_TABLE_CELL_MAP[code].heTitle}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+              <div className="btl-feedback" data-tone={session.feedback?.tone || 'info'}>
+                {session.feedback?.text || defaultFeedback(session)}
+                {session.feedback?.detail ? <small>{session.feedback.detail}</small> : null}
+              </div>
+            </div>
+            <div className="btl-inline-actions">
+              {primaryAction}
+              {session.kind === 'build' && !session.checked ? (
+                <button type="button" className="btl-btn is-secondary" onClick={onResetBuild}>נקה</button>
               ) : null}
-            </>
-          ) : null}
+            </div>
+          </div>
+        </aside>
 
-          {session.kind === 'quick' ? (
-            <>
-              <div className="btl-prompt">
-                <span className="btl-pill" data-tone={toneForPromptType(session.prompts[session.currentIndex].promptType)}>
-                  {session.prompts[session.currentIndex].promptType === 'name' ? 'שם תבנית' : 'דוגמת משפט'}
-                </span>
-                <strong>{session.prompts[session.currentIndex].promptType === 'name' ? `מצא/י עכשיו: ${session.prompts[session.currentIndex].promptText}` : 'מצא/י את המיקום של המשפט הבא:'}</strong>
-                <p>{session.prompts[session.currentIndex].promptText}</p>
-              </div>
-              <BreenTableBoard
-                title="טבלת ברין"
-                subtitle="ראה/י. זהה/י. לחץ/י."
-                cellStates={boardStates}
-                onCellClick={onQuickCellClick}
-              />
-            </>
-          ) : null}
+        <article className="btl-board-panel">
+          <BreenTableBoard
+            title="טבלת ברין"
+            showHeader={false}
+            showLegend={false}
+            cellStates={boardStates}
+            onCellClick={
+              session.kind === 'build'
+                ? onBuildCellClick
+                : session.kind === 'complete'
+                  ? onCompleteCellClick
+                  : onQuickCellClick
+            }
+          />
         </article>
-
-        <div className="btl-feedback-bar">
-          <div className="btl-feedback-copy">
-            <div className="btl-pill-row">
-              <span className="btl-pill" data-tone={toneForMode(session.kind)}>{formatModeLabel(session.kind)}</span>
-              <span className="btl-pill">{formatSessionModeLabel(session.settings.sessionMode)}</span>
-              {session.kind === 'quick' ? <span className="btl-pill">{formatPromptTypeLabel(session.settings.quickPromptType)}</span> : null}
-            </div>
-            <div className="btl-feedback" data-tone={session.feedback?.tone || 'info'}>
-              {session.feedback?.text || defaultFeedback(session)}
-              {session.feedback?.detail ? <small>{session.feedback.detail}</small> : null}
-            </div>
-          </div>
-          <div className="btl-inline-actions">
-            {primaryAction}
-            {session.kind === 'build' && !session.checked ? (
-              <button type="button" className="btl-btn is-secondary" onClick={onResetBuild}>נקה מגש</button>
-            ) : null}
-            <button type="button" className="btl-btn is-ghost" onClick={onHelp}>עזרה</button>
-          </div>
-        </div>
       </div>
     </section>
   );
@@ -1318,7 +1354,6 @@ function buildBoardState(session: BuildSession): Partial<Record<CanonicalBreenCo
     if (session.prefilledCodes.includes(cellCode)) {
       acc[cellCode] = {
         title: BREEN_TABLE_CELL_MAP[cellCode].heTitle,
-        subtitle: 'עוגן קבוע',
         tone: 'prefilled'
       };
       return acc;
@@ -1327,7 +1362,7 @@ function buildBoardState(session: BuildSession): Partial<Record<CanonicalBreenCo
       const result = session.results[placedPattern];
       acc[cellCode] = {
         title: BREEN_TABLE_CELL_MAP[placedPattern].heTitle,
-        subtitle: session.checked ? (result?.exactMatch ? 'בדיוק במקום' : result?.score ? 'הכיוון כמעט יושב' : 'שייך למקום אחר') : 'מונח כאן',
+        subtitle: session.checked ? (result?.exactMatch ? 'בדיוק' : result?.score ? 'כמעט' : 'לא כאן') : undefined,
         tone: session.checked ? (result?.exactMatch ? 'correct' : result?.score ? 'partial' : 'incorrect') : 'placed',
         active: session.selectedPattern === placedPattern
       };
@@ -1335,7 +1370,7 @@ function buildBoardState(session: BuildSession): Partial<Record<CanonicalBreenCo
     }
     acc[cellCode] = {
       title: null,
-      subtitle: 'תא פנוי',
+      subtitle: session.selectedPattern ? 'לחץ/י למיקום' : undefined,
       tone: 'ghost',
       active: session.selectedPattern != null,
       showDefaultTitle: false
@@ -1350,7 +1385,6 @@ function completeBoardState(session: CompleteSession): Partial<Record<CanonicalB
     if (!isMissing) {
       acc[cellCode] = {
         title: BREEN_TABLE_CELL_MAP[cellCode].heTitle,
-        subtitle: 'כבר ממופה',
         tone: 'prefilled'
       };
       return acc;
@@ -1361,7 +1395,7 @@ function completeBoardState(session: CompleteSession): Partial<Record<CanonicalB
     if (session.checked) {
       acc[cellCode] = {
         title: BREEN_TABLE_CELL_MAP[cellCode].heTitle,
-        subtitle: answer === cellCode ? 'הושלם נכון' : answer ? `נבחר: ${BREEN_TABLE_CELL_MAP[answer].heTitle}` : 'נשאר חסר',
+        subtitle: answer === cellCode ? 'הושלם' : answer ? `נבחר: ${BREEN_TABLE_CELL_MAP[answer].heTitle}` : 'חסר',
         tone: answer === cellCode ? 'correct' : 'incorrect'
       };
       return acc;
@@ -1369,7 +1403,6 @@ function completeBoardState(session: CompleteSession): Partial<Record<CanonicalB
     if (resolved) {
       acc[cellCode] = {
         title: BREEN_TABLE_CELL_MAP[cellCode].heTitle,
-        subtitle: 'נסגר',
         tone: 'correct'
       };
       return acc;
@@ -1377,14 +1410,14 @@ function completeBoardState(session: CompleteSession): Partial<Record<CanonicalB
     if (answer && session.settings.sessionMode === 'test') {
       acc[cellCode] = {
         title: BREEN_TABLE_CELL_MAP[answer].heTitle,
-        subtitle: 'תשובה שנבחרה',
+        subtitle: 'נבחר',
         tone: 'placed'
       };
       return acc;
     }
     acc[cellCode] = {
-      title: '?',
-      subtitle: 'חסר',
+      title: '…',
+      subtitle: session.activeMissingCell === cellCode ? 'פתוח עכשיו' : undefined,
       tone: session.activeMissingCell === cellCode ? 'active' : 'missing',
       active: session.activeMissingCell === cellCode,
       showDefaultTitle: false
@@ -1397,14 +1430,14 @@ function quickBoardState(session: QuickSession): Partial<Record<CanonicalBreenCo
   const prompt = session.prompts[session.currentIndex];
   return CANONICAL_BREEN_ORDER.reduce<Partial<Record<CanonicalBreenCode, BreenBoardCellState>>>((acc, cellCode) => {
     let tone: BreenBoardCellState['tone'] = 'prompt';
-    let subtitle: React.ReactNode = 'לחיץ';
+    let subtitle: React.ReactNode;
     if (session.answered) {
       if (cellCode === prompt.targetCode) {
         tone = 'correct';
-        subtitle = 'זה היעד';
+        subtitle = 'כאן';
       } else if (cellCode === session.selectedCode) {
         tone = 'incorrect';
-        subtitle = 'הבחירה שלך';
+        subtitle = 'נבחר';
       }
     }
     acc[cellCode] = {
@@ -1439,6 +1472,24 @@ function buildPlacementFeedback(result: BuildPlacementScore): FeedbackState {
   };
 }
 
+function playProgressLabel(session: ActiveSession): string {
+  if (session.kind === 'build') return `${Object.keys(session.placements).length}/${session.trayCodes.length}`;
+  if (session.kind === 'complete') return `${Object.keys(session.answers).length}/${session.totalTargets}`;
+  return `${session.currentIndex + 1}/${session.prompts.length}`;
+}
+
+function focusHeadline(session: ActiveSession): string {
+  if (session.kind === 'build') return 'בוחרים שם ומניחים אותו במקום המדויק על המפה';
+  if (session.kind === 'complete') return 'מזהים מה חסר וסוגרים את הפער מתוך האפשרויות';
+  return 'רואים יעד אחד ומחזירים אותו מיד למיקום שלו בטבלה';
+}
+
+function focusSubline(session: ActiveSession): string {
+  if (session.kind === 'build') return 'נקודת ההתחלה יושבת כאן מימין, אבל המפה נשארת המרכז שמחזיר את המיקום.';
+  if (session.kind === 'complete') return 'השכנים, השורה והמשפחה עובדים יחד. לא צריך יותר ממבט אחד כדי לבחור.';
+  return 'העין נוחתת על היעד, ואז זזה ישר אל התא המתאים בלי רעש מיותר מסביב.';
+}
+
 function playHeadline(session: ActiveSession): string {
   if (session.kind === 'build') return 'מציבים שמות במקומות שלהם';
   if (session.kind === 'complete') return 'סוגרים את החורים החסרים';
@@ -1452,9 +1503,9 @@ function playSubheadline(session: ActiveSession): string {
 }
 
 function phasePillsForSession(session: ActiveSession): string[] {
-  if (session.kind === 'build') return ['בוחרים תבנית', 'מניחים במפה', 'רואים תוצאה'];
-  if (session.kind === 'complete') return ['מזהים חור', 'בוחרים תשובה', 'רואים תוצאה'];
-  return ['רואים יעד', 'לוחצים במפה', 'רואים תוצאה'];
+  if (session.kind === 'build') return ['בוחרים', 'ממקמים', 'רואים'];
+  if (session.kind === 'complete') return ['מזהים', 'משלימים', 'רואים'];
+  return ['רואים', 'לוחצים', 'רואים'];
 }
 
 function defaultFeedback(session: ActiveSession): string {

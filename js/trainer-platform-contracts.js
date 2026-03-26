@@ -417,18 +417,6 @@
         {
           "href": "index.html",
           "label": "חזרה לדף הראשי"
-        },
-        {
-          "href": "classic2_trainer.html",
-          "label": "Classic 2"
-        },
-        {
-          "href": "classic_classic_trainer.html",
-          "label": "Classic Classic"
-        },
-        {
-          "href": "iceberg_templates_trainer.html",
-          "label": "Iceberg Templates"
         }
       ],
       "accent": {
