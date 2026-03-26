@@ -14,7 +14,8 @@ type RoundsChoice = 5 | 10 | 'infinite';
 type CategoryDisplay = 'all' | 'group';
 type Tone = 'info' | 'success' | 'error';
 type RunMode = 'learning' | 'test';
-type PlayOverlay = 'map' | 'help' | 'status';
+type PlayOverlay = 'map' | 'help';
+type PlayFamily = GroupCode | 'EXTRA';
 
 type Feedback = { tone: Tone; message: string };
 type Sentence = { id: string; text: string; tags: CategoryCode[] };
@@ -59,9 +60,17 @@ const GROUP_META: Record<GroupCode, { he: string; subtitle: string; tone: 'disto
   DEL: { he: 'מחיקה', subtitle: 'מחזירים שחקנים, פעולה או מידע שחסר בתוך המשפט.', tone: 'deletion' }
 };
 
+const PLAY_FAMILY_ORDER: PlayFamily[] = ['DIS', 'GEN', 'DEL', 'EXTRA'];
+
 const AUX_META: Record<'CTX' | 'VAK', { he: string; subtitle: string; tone: 'context' }> = {
   CTX: { he: 'הקשר', subtitle: 'זמן, מקום או מצב שממקמים את הטקסט.', tone: 'context' },
   VAK: { he: 'חושי', subtitle: 'ערוצי ראייה, שמיעה ותחושה בתוך המשפט.', tone: 'context' }
+};
+
+const EXTRA_META = {
+  he: 'עוד קטגוריות',
+  subtitle: 'הקשר וערוצי חישה שנעים מעט מחוץ לשלוש המשפחות הראשיות.',
+  tone: 'extra' as const
 };
 
 const CTX_LABEL: Record<FieldCtx, string> = {
@@ -232,31 +241,78 @@ const CSS = `
 .c2n-fb{border-radius:18px;padding:14px;border:1px solid;font-weight:800;line-height:1.6}.c2n-fb.info{background:#eef4ff;border-color:#c8d8fb;color:#1e3a8a}.c2n-fb.success{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}.c2n-fb.error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
 .c2n-hint,.c2n-summary-card{border:1px dashed #c9d8ef;background:#fbfdff;border-radius:18px;padding:13px;display:grid;gap:6px}.c2n-hint p{font-size:.84rem;line-height:1.5;color:#334155}
 .c2n-foot{border:1px dashed #cad8ec;background:#fbfdff;border-radius:18px;padding:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;align-items:center}.c2n-kv{display:grid;gap:6px}.c2n-kv b{font-size:.8rem;color:#64748b}
-.c2n-play-screen{display:grid}.c2n-play-shell{display:grid;gap:18px;background:linear-gradient(180deg,rgba(255,255,255,.94) 0%,rgba(246,249,255,.98) 100%);padding:20px;border-radius:28px}
-.c2n-play-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}.c2n-play-title{display:grid;gap:6px}.c2n-play-title h2{font-size:1.28rem;font-weight:900}.c2n-play-toolbar{display:grid;justify-items:end;gap:10px;min-width:min(100%,420px)}
-.c2n-play-stats,.c2n-play-tools,.c2n-family-tabs,.c2n-category-strip,.c2n-extra-strip,.c2n-action-strip{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.c2n-play-stat{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.8);border:1px solid #d9e5f3;font-weight:800;color:#334155}.c2n-play-stat strong{color:#10233e}
-.c2n-tool-btn{border:1px solid #d8e2f0;background:rgba(255,255,255,.76);border-radius:999px;padding:8px 12px;font-weight:800;color:#35506d;cursor:pointer;font-family:inherit;transition:.18s ease}.c2n-tool-btn:hover{border-color:#9bbcff;background:#fff;color:#123761}
-.c2n-play-chooser{display:grid;gap:12px;padding:16px 18px;border-radius:24px;background:rgba(255,255,255,.72);border:1px solid rgba(208,220,235,.92)}
-.c2n-play-chooser-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}.c2n-play-chooser-head strong{font-size:1rem}
-.c2n-family-tab{display:grid;gap:4px;min-width:146px;padding:11px 14px;border-radius:18px;border:1px solid #dbe5f2;background:rgba(250,252,255,.94);cursor:pointer;text-align:right;font-family:inherit;transition:.18s ease}.c2n-family-tab:hover:not(:disabled){transform:translateY(-1px);border-color:#adc3ff}.c2n-family-tab:disabled{opacity:.45;cursor:not-allowed}.c2n-family-tab span{font-size:.96rem;font-weight:900}.c2n-family-tab small{font-size:.74rem;color:#617388;font-weight:700}
-.c2n-family-tab.is-active{color:#10233e;box-shadow:0 10px 24px rgba(15,23,42,.05)}.c2n-family-tab.is-distortion{border-color:#d7cdfd;background:linear-gradient(180deg,#f7f3ff 0%,#ffffff 100%)}.c2n-family-tab.is-generalization{border-color:#cde7f5;background:linear-gradient(180deg,#f1fbff 0%,#ffffff 100%)}.c2n-family-tab.is-deletion{border-color:#d4ecd9;background:linear-gradient(180deg,#f4fbf5 0%,#ffffff 100%)}
-.c2n-family-tab.is-active.is-distortion{box-shadow:0 0 0 2px rgba(109,40,217,.10)}.c2n-family-tab.is-active.is-generalization{box-shadow:0 0 0 2px rgba(14,116,144,.10)}.c2n-family-tab.is-active.is-deletion{box-shadow:0 0 0 2px rgba(22,101,52,.10)}
-.c2n-category-pill{display:grid;gap:6px;min-width:162px;padding:12px 14px;border-radius:18px;border:1px solid #d8e3ef;background:rgba(255,255,255,.86);cursor:pointer;text-align:right;font-family:inherit;transition:.18s ease}.c2n-category-pill:hover:not(:disabled){transform:translateY(-1px);border-color:#a7c1f9;background:#fff}.c2n-category-pill:disabled{opacity:.58;cursor:not-allowed}
-.c2n-category-pill.is-active{border-color:#123c8f;background:#f1f5ff;box-shadow:0 0 0 2px rgba(18,60,143,.08)}.c2n-category-pill.is-dim{opacity:.56}.c2n-category-pill strong{font-size:.95rem;font-weight:900;color:#10233e;line-height:1.25}.c2n-category-pill span{font-size:.76rem;color:#5e7085;line-height:1.4}.c2n-category-pill small{font-size:.66rem;color:#7b8aa0;font-weight:800}
-.c2n-category-pill.is-distortion{border-right:4px solid #7c3aed}.c2n-category-pill.is-generalization{border-right:4px solid #0f766e}.c2n-category-pill.is-deletion{border-right:4px solid #4d7c0f}.c2n-category-pill.is-context{border-right:4px solid #c2410c}
-.c2n-extra-strip{padding-top:6px;border-top:1px solid #e3eaf4}.c2n-strip-label{font-size:.74rem;font-weight:900;color:#68798e}
-.c2n-active-category{display:grid;gap:4px;padding:11px 14px;border-radius:18px;background:rgba(255,255,255,.92);border:1px solid #d7e3ef;min-width:min(100%,320px)}.c2n-active-category b{font-size:.94rem}.c2n-active-category span{font-size:.77rem;color:#5e7085}.c2n-active-category small{font-size:.66rem;color:#7b8aa0;font-weight:800}
-.c2n-play-board{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(310px,.8fr);gap:18px;align-items:start}
-.c2n-sentence-surface{display:grid;gap:14px;padding:16px 18px;border-radius:26px;background:rgba(255,255,255,.78);border:1px solid rgba(214,225,239,.9)}
-.c2n-surface-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.c2n-surface-head h3{font-size:1rem;font-weight:900}.c2n-surface-target{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#eef4ff;border:1px solid #d4def1;font-weight:900;color:#163a7b}
+.c2n-play-screen{display:grid}
+.c2n-play-shell{display:grid;gap:18px;background:linear-gradient(180deg,rgba(255,255,255,.96) 0%,rgba(248,250,255,.98) 100%);padding:22px;border-radius:30px;box-shadow:0 24px 48px rgba(15,23,42,.06)}
+.c2n-play-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start}
+.c2n-play-title{display:grid;gap:6px}
+.c2n-play-title h2{font-size:1.26rem;font-weight:900;line-height:1.2}
+.c2n-play-toolbar{display:grid;justify-items:end;gap:12px}
+.c2n-play-stats,.c2n-play-tools,.c2n-family-tabs,.c2n-category-strip,.c2n-action-strip,.c2n-dock-summary{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.c2n-play-stat{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 12px;background:rgba(247,250,255,.96);border:1px solid #dce5f1;font-weight:800;color:#44556d}
+.c2n-play-stat strong{color:#10233e}
+.c2n-tool-btn{border:1px solid #dbe4f0;background:rgba(255,255,255,.78);border-radius:999px;padding:8px 12px;font-weight:800;color:#3b526f;cursor:pointer;font-family:inherit;transition:.18s ease}
+.c2n-tool-btn:hover{border-color:#9fb8ef;background:#fff;color:#123761}
+.c2n-family-rail{display:grid;gap:12px}
+.c2n-family-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-end;flex-wrap:wrap}
+.c2n-family-head strong{font-size:.98rem}
+.c2n-family-tabs{gap:12px}
+.c2n-family-tab{display:grid;gap:4px;min-width:154px;padding:12px 14px;border-radius:20px;border:1px solid transparent;background:rgba(248,250,255,.9);cursor:pointer;text-align:right;font-family:inherit;transition:.18s ease}
+.c2n-family-tab:hover:not(:disabled){transform:translateY(-1px)}
+.c2n-family-tab:disabled{opacity:.42;cursor:not-allowed}
+.c2n-family-tab span{font-size:.98rem;font-weight:900;line-height:1.2}
+.c2n-family-tab small{font-size:.73rem;color:#64748b;font-weight:700}
+.c2n-family-tab.is-distortion{background:linear-gradient(180deg,#f6f2ff 0%,#ffffff 100%);border-color:#ddd2fb}
+.c2n-family-tab.is-generalization{background:linear-gradient(180deg,#effbff 0%,#ffffff 100%);border-color:#cde7f5}
+.c2n-family-tab.is-deletion{background:linear-gradient(180deg,#f4fbf3 0%,#ffffff 100%);border-color:#d7ecd8}
+.c2n-family-tab.is-extra{background:linear-gradient(180deg,#fff8ef 0%,#ffffff 100%);border-color:#f4dcb4}
+.c2n-family-tab.is-active{box-shadow:0 0 0 2px rgba(15,23,42,.06),0 12px 24px rgba(15,23,42,.05)}
+.c2n-family-tab.is-active.is-distortion{box-shadow:0 0 0 2px rgba(109,40,217,.10),0 14px 26px rgba(109,40,217,.08)}
+.c2n-family-tab.is-active.is-generalization{box-shadow:0 0 0 2px rgba(13,148,136,.10),0 14px 26px rgba(13,148,136,.08)}
+.c2n-family-tab.is-active.is-deletion{box-shadow:0 0 0 2px rgba(22,101,52,.10),0 14px 26px rgba(22,101,52,.08)}
+.c2n-family-tab.is-active.is-extra{box-shadow:0 0 0 2px rgba(194,120,3,.10),0 14px 26px rgba(194,120,3,.08)}
+.c2n-category-rail{display:grid;gap:12px;padding:14px 16px;border-radius:24px;background:rgba(247,250,255,.82);border:1px solid #e0e8f4}
+.c2n-category-pill{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 16px;border-radius:999px;border:1px solid #dbe4f0;background:rgba(255,255,255,.9);cursor:pointer;text-align:center;font-family:inherit;font-weight:900;font-size:.93rem;color:#17304f;transition:.18s ease}
+.c2n-category-pill:hover:not(:disabled){transform:translateY(-1px);background:#fff}
+.c2n-category-pill:disabled{opacity:.56;cursor:not-allowed}
+.c2n-category-pill.is-active{color:#10233e;box-shadow:0 0 0 2px rgba(15,23,42,.04),0 10px 20px rgba(15,23,42,.06)}
+.c2n-category-pill.is-dim{opacity:.48}
+.c2n-category-pill.is-distortion{border-color:#dacffc}
+.c2n-category-pill.is-generalization{border-color:#cce7ef}
+.c2n-category-pill.is-deletion{border-color:#d6ecd8}
+.c2n-category-pill.is-extra{border-color:#f3d9ac}
+.c2n-category-pill.is-active.is-distortion{background:#f6f1ff;box-shadow:0 0 0 2px rgba(109,40,217,.10),0 12px 24px rgba(109,40,217,.08)}
+.c2n-category-pill.is-active.is-generalization{background:#eefcff;box-shadow:0 0 0 2px rgba(13,148,136,.10),0 12px 24px rgba(13,148,136,.08)}
+.c2n-category-pill.is-active.is-deletion{background:#f3fbf4;box-shadow:0 0 0 2px rgba(22,101,52,.10),0 12px 24px rgba(22,101,52,.08)}
+.c2n-category-pill.is-active.is-extra{background:#fff8ef;box-shadow:0 0 0 2px rgba(194,120,3,.10),0 12px 24px rgba(194,120,3,.08)}
+.c2n-selection-lens{display:grid;gap:4px;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.92)}
+.c2n-selection-lens strong{font-size:1rem}
+.c2n-selection-lens p{font-size:.84rem;color:#586b80;line-height:1.5}
+.c2n-selection-lens small{font-size:.72rem;color:#7b8aa0;font-weight:800}
+.c2n-workstation{display:grid;gap:14px}
+.c2n-sentence-surface{display:grid;gap:14px;padding:18px;border-radius:28px;background:linear-gradient(180deg,rgba(255,255,255,.94) 0%,rgba(249,251,255,.98) 100%);border:1px solid #dfe8f3;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.c2n-surface-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.c2n-surface-head h3{font-size:1rem;font-weight:900}
+.c2n-surface-target{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#eef4ff;border:1px solid #d4def1;font-weight:900;color:#163a7b}
 .c2n-sents-board{grid-template-columns:repeat(2,minmax(0,1fr))}
-.c2n-feedback-surface{display:grid;gap:12px;align-content:start}.c2n-focus-card,.c2n-support-card{display:grid;gap:8px;padding:15px;border-radius:22px;border:1px solid #dbe5f2;background:rgba(255,255,255,.84)}.c2n-focus-card h3,.c2n-support-card h3{font-size:.98rem;font-weight:900}.c2n-focus-card p,.c2n-support-card p{color:#43556c;line-height:1.56;font-size:.86rem}
-.c2n-focus-card.is-distortion{background:linear-gradient(180deg,#f8f4ff 0%,#ffffff 100%);border-color:#ddd2fb}.c2n-focus-card.is-generalization{background:linear-gradient(180deg,#f1fbff 0%,#ffffff 100%);border-color:#cde9ee}.c2n-focus-card.is-deletion{background:linear-gradient(180deg,#f4fbf5 0%,#ffffff 100%);border-color:#d6ecd5}.c2n-focus-card.is-context{background:linear-gradient(180deg,#fff8ef 0%,#ffffff 100%);border-color:#f1d5b5}
-.c2n-support-stack{display:grid;gap:10px}.c2n-detail-title{font-size:.82rem;font-weight:900;color:#0f3f81}
-.c2n-action-panel{display:grid;gap:10px;padding:15px;border-radius:22px;border:1px solid #dbe5f2;background:rgba(255,255,255,.84)}.c2n-btn-main{width:100%;justify-content:center;font-size:.95rem;padding:13px 15px}
-.c2n-action-strip .c2n-btn{flex:1 1 140px}.c2n-quiet-note{font-size:.78rem;color:#6a7a8f;line-height:1.5}
-.c2n-overlay-grid{display:grid;gap:12px}.c2n-status-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.c2n-status-card{display:grid;gap:4px;padding:12px;border-radius:16px;background:#fff;border:1px solid #dde7f2}.c2n-status-card b{font-size:.76rem;color:#667892}.c2n-status-card span{font-size:.94rem;font-weight:900;color:#10233e}
+.c2n-sent{background:rgba(255,255,255,.92);border-color:#e2e9f3;box-shadow:none}
+.c2n-sent:hover:not(:disabled){box-shadow:0 14px 28px rgba(15,23,42,.06)}
+.c2n-action-dock{display:grid;gap:12px;padding:14px 16px;border-radius:24px;background:rgba(245,248,253,.96);border:1px solid #dbe5f2}
+.c2n-dock-summary{justify-content:space-between}
+.c2n-dock-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#fff;border:1px solid #d9e3ef;font-weight:800;color:#334155}
+.c2n-dock-chip strong{color:#10233e}
+.c2n-feedback-line{padding:12px 14px;border-radius:18px;font-weight:800;line-height:1.55;border:1px solid transparent}
+.c2n-feedback-line.info{background:#eef4ff;border-color:#c8d8fb;color:#1e3a8a}
+.c2n-feedback-line.success{background:#ecfdf5;border-color:#bbf7d0;color:#065f46}
+.c2n-feedback-line.error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+.c2n-dock-detail{display:grid;gap:8px}
+.c2n-dock-note{padding:10px 12px;border-radius:16px;background:#fff;border:1px dashed #cfdaea}
+.c2n-dock-note strong{display:block;font-size:.79rem;margin-bottom:4px;color:#0f3f81}
+.c2n-dock-note span{font-size:.82rem;line-height:1.5;color:#42556b}
+.c2n-action-strip{gap:8px}
+.c2n-btn-main{min-width:180px;justify-content:center;font-size:.95rem;padding:12px 18px}
+.c2n-btn.is-subtle{background:#ffffff;color:#42556b;border:1px solid #d8e2f0}
+.c2n-quiet-note{font-size:.78rem;color:#6a7a8f;line-height:1.5}
+.c2n-overlay-grid{display:grid;gap:12px}
 .c2n-empty{margin-top:14px;border:1px dashed #cad8ec;background:#fbfdff;border-radius:20px;padding:18px;display:grid;gap:10px;text-align:center}.c2n-empty p{color:#4d5e73;line-height:1.55}
 .c2n-overlay{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.45);backdrop-filter:blur(4px);display:flex;justify-content:center;align-items:flex-start;padding:16px;overflow:auto}.c2n-modal{width:min(960px,100%);background:#f8fbff;border:1px solid #d9e5f3;border-radius:26px;padding:16px;display:grid;gap:14px;box-shadow:0 28px 70px rgba(15,23,42,.22)}
 .c2n-modal-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}.c2n-modal-head h2{font-size:1.1rem;font-weight:900}.c2n-modal-head p{margin-top:5px;font-size:.86rem;color:#536579;line-height:1.45}
@@ -266,8 +322,8 @@ const CSS = `
 .c2n-preview{border:1px solid #cce0f0;background:linear-gradient(180deg,#f0f8ff 0%,#ffffff 100%);border-radius:18px;padding:14px;display:grid;gap:10px}.c2n-preview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .c2n-example-lines{display:grid;gap:8px}.c2n-example-line{border:1px solid #e2e8f0;background:#fff;border-radius:14px;padding:10px 12px;line-height:1.55}.c2n-summary-copy{display:grid;gap:10px}
 .c2n-modal-actions{justify-content:space-between}.c2n-modal-actions .c2n-btn{min-width:120px}
-@media (max-width:980px){.c2n-hero,.c2n-layout,.c2n-settings-grid,.c2n-home-grid,.c2n-mode-grid,.c2n-play-board,.c2n-status-grid{grid-template-columns:1fr}.c2n-row{grid-template-columns:repeat(3,minmax(0,1fr))}.c2n-play-toolbar{justify-items:start}.c2n-sents-board{grid-template-columns:1fr}.c2n-play-stat,.c2n-tool-btn{width:auto}}
-@media (max-width:640px){.c2n-shell{padding:12px}.c2n-overlay{padding:10px}.c2n-list,.c2n-step-strip,.c2n-preview-grid,.c2n-status-grid{grid-template-columns:1fr}.c2n-actions,.c2n-row-actions,.c2n-main-acts,.c2n-modal-actions,.c2n-seg,.c2n-start-actions,.c2n-action-strip{display:grid;grid-template-columns:1fr}.c2n-btn,.c2n-start-summary,.c2n-family-tab,.c2n-category-pill,.c2n-tool-btn{width:100%}.c2n-cat{min-height:72px;padding:9px}.c2n-name{font-size:.84rem}.c2n-code{font-size:.63rem}.c2n-play-shell{padding:14px}.c2n-play-chooser,.c2n-sentence-surface,.c2n-focus-card,.c2n-support-card,.c2n-action-panel{padding:13px}}
+@media (max-width:980px){.c2n-hero,.c2n-layout,.c2n-settings-grid,.c2n-home-grid,.c2n-mode-grid,.c2n-play-top{grid-template-columns:1fr}.c2n-row{grid-template-columns:repeat(3,minmax(0,1fr))}.c2n-play-toolbar{justify-items:start}.c2n-sents-board{grid-template-columns:1fr}.c2n-play-stat,.c2n-tool-btn{width:auto}.c2n-dock-summary{justify-content:flex-start}}
+@media (max-width:640px){.c2n-shell{padding:12px}.c2n-overlay{padding:10px}.c2n-list,.c2n-step-strip,.c2n-preview-grid{grid-template-columns:1fr}.c2n-actions,.c2n-row-actions,.c2n-main-acts,.c2n-modal-actions,.c2n-seg,.c2n-start-actions,.c2n-action-strip,.c2n-dock-summary{display:grid;grid-template-columns:1fr}.c2n-btn,.c2n-start-summary,.c2n-family-tab,.c2n-tool-btn{width:100%}.c2n-cat{min-height:72px;padding:9px}.c2n-name{font-size:.84rem}.c2n-code{font-size:.63rem}.c2n-play-shell{padding:14px}.c2n-category-pill{width:100%;justify-content:flex-start;padding:13px 16px}.c2n-category-rail,.c2n-sentence-surface,.c2n-action-dock{padding:13px}}
 `;
 
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
@@ -325,7 +381,7 @@ export default function Classic2Trainer(): React.ReactElement {
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [draft, setDraft] = useState<Settings>(() => loadClassic2Settings());
   const [settings, setSettings] = useState<Settings>(() => loadClassic2Settings());
-  const [activeFamily, setActiveFamily] = useState<GroupCode>(() => loadClassic2Settings().categoryGroup);
+  const [activeFamily, setActiveFamily] = useState<PlayFamily>(() => loadClassic2Settings().categoryGroup);
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
   const [playOverlay, setPlayOverlay] = useState<PlayOverlay | null>(null);
@@ -627,10 +683,18 @@ export default function Classic2Trainer(): React.ReactElement {
   const draftVisibleCount = visibleCategories(draft).length;
   const displayLabel = displayModeLabelFor(settings);
   const draftDisplayLabel = displayModeLabelFor(draft);
-  const availableFamilies = GROUP_ORDER.filter((family) => visibleNow.some((code) => CAT[code].family === family));
-  const primaryFamilyCategories = orderBreenCategories(visibleNow.filter((code) => CAT[code].family === activeFamily));
   const extraCategories = orderBreenCategories(visibleNow.filter((code) => CAT[code].family === 'CTX' || CAT[code].family === 'VAK'));
-  const selectedPrimaryFamily = selectedCat && isPrimaryFamily(CAT[selectedCat].family) ? CAT[selectedCat].family : null;
+  const availableFamilies = PLAY_FAMILY_ORDER.filter((family) => (
+    family === 'EXTRA'
+      ? extraCategories.length > 0
+      : visibleNow.some((code) => CAT[code].family === family)
+  ));
+  const familyCategories = activeFamily === 'EXTRA'
+    ? extraCategories
+    : orderBreenCategories(visibleNow.filter((code) => CAT[code].family === activeFamily));
+  const selectedPrimaryFamily = selectedCat
+    ? (isPrimaryFamily(CAT[selectedCat].family) ? CAT[selectedCat].family : 'EXTRA')
+    : null;
 
   useEffect(() => {
     if (selectedPrimaryFamily && selectedPrimaryFamily !== activeFamily) setActiveFamily(selectedPrimaryFamily);
@@ -797,29 +861,30 @@ export default function Classic2Trainer(): React.ReactElement {
   const helpText = selectedCat
     ? `${CAT[selectedCat].hint}${CAT[selectedCat].note ? ` ${CAT[selectedCat].note}` : ''}`
     : 'בחר/י קטגוריה אחת מהמפה, ואז סמן/י רק את המשפטים שמתאימים לה באמת.';
+  const selectedCount = selectedIds.length;
+  const totalMatches = matches.length;
   const toneClassForCategory = (code: CategoryCode) => {
     const family = CAT[code].family;
     if (family === 'DIS') return 'is-distortion';
     if (family === 'GEN') return 'is-generalization';
     if (family === 'DEL') return 'is-deletion';
-    return 'is-context';
+    return 'is-extra';
   };
-  const toneClassForFamily = (family: GroupCode) => {
+  const toneClassForFamily = (family: PlayFamily) => {
     if (family === 'DIS') return 'is-distortion';
     if (family === 'GEN') return 'is-generalization';
-    return 'is-deletion';
+    if (family === 'DEL') return 'is-deletion';
+    return 'is-extra';
   };
   const selectedCatMeta = selectedCat ? CAT[selectedCat] : null;
-  const selectedFamilyTone = selectedCatMeta
-    ? (isPrimaryFamily(selectedCatMeta.family) ? GROUP_META[selectedCatMeta.family].tone : AUX_META[selectedCatMeta.family].tone)
-    : GROUP_META[activeFamily].tone;
-  const focusTitle = selectedCatMeta ? selectedCatMeta.he : `בוחרים קטגוריה מתוך ${GROUP_META[activeFamily].he}`;
+  const activeFamilyMeta = activeFamily === 'EXTRA' ? EXTRA_META : GROUP_META[activeFamily];
+  const focusTitle = selectedCatMeta ? selectedCatMeta.he : `בוחרים קטגוריה מתוך ${activeFamilyMeta.he}`;
   const focusDescription = selectedCatMeta
     ? `${selectedCatMeta.hint}${selectedCatMeta.note ? ` ${selectedCatMeta.note}` : ''}`
-    : GROUP_META[activeFamily].subtitle;
+    : activeFamilyMeta.subtitle;
   const activeSummaryLabel = selectedCatMeta
     ? `${selectedCatMeta.familyHe} · ${selectedCatMeta.he}`
-    : `כדאי להתחיל ממשפחת ${GROUP_META[activeFamily].he}`;
+    : `כדאי להתחיל ממשפחת ${activeFamilyMeta.he}`;
   const defaultFeedback = selectedCatMeta
     ? `בחרת ב-${selectedCatMeta.he}. עכשיו מסמנים רק את המשפטים ששייכים אליה, בלי לערבב עם קטגוריות אחרות.`
     : 'בחר/י קודם משפחה ואז קטגוריה אחת. כשהפוקוס ברור, גם סימון המשפטים נהיה פשוט יותר.';
