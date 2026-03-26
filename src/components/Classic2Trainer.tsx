@@ -879,12 +879,6 @@ export default function Classic2Trainer(): React.ReactElement {
   const selectedCatMeta = selectedCat ? CAT[selectedCat] : null;
   const activeFamilyMeta = activeFamily === 'EXTRA' ? EXTRA_META : GROUP_META[activeFamily];
   const focusTitle = selectedCatMeta ? selectedCatMeta.he : `בוחרים קטגוריה מתוך ${activeFamilyMeta.he}`;
-  const focusDescription = selectedCatMeta
-    ? `${selectedCatMeta.hint}${selectedCatMeta.note ? ` ${selectedCatMeta.note}` : ''}`
-    : activeFamilyMeta.subtitle;
-  const activeSummaryLabel = selectedCatMeta
-    ? `${selectedCatMeta.familyHe} · ${selectedCatMeta.he}`
-    : `כדאי להתחיל ממשפחת ${activeFamilyMeta.he}`;
   const defaultFeedback = selectedCatMeta
     ? `בחרת ב-${selectedCatMeta.he}. עכשיו מסמנים רק את המשפטים ששייכים אליה, בלי לערבב עם קטגוריות אחרות.`
     : 'בחר/י קודם משפחה ואז קטגוריה אחת. כשהפוקוס ברור, גם סימון המשפטים נהיה פשוט יותר.';
@@ -1025,38 +1019,32 @@ export default function Classic2Trainer(): React.ReactElement {
                 </div>
                 <div className="c2n-play-toolbar">
                   <div className="c2n-play-stats">
-                    <span className="c2n-play-stat"><strong>{round.sentences.length}</strong> משפטים</span>
-                    <span className="c2n-play-stat"><strong>{correct + (result === 'correct' ? 1 : 0)}</strong> סבבים מדויקים</span>
+                    <span className="c2n-play-stat"><strong>{correct + (result === 'correct' ? 1 : 0)}</strong> דיוקים</span>
+                    <span className="c2n-play-stat"><strong>{mistakes}</strong> טעויות</span>
                     <span className="c2n-play-stat">{rr.exact ? 'בדיקה מלאה' : 'בדיקה גמישה'}</span>
                   </div>
                   <div className="c2n-play-tools">
                     <button type="button" className="c2n-tool-btn" onClick={() => setPlayOverlay('map')}>מפת ברין</button>
-                    <button type="button" className="c2n-tool-btn" onClick={() => setPlayOverlay('status')}>סטטוס</button>
                     <button type="button" className="c2n-tool-btn" onClick={() => setPlayOverlay('help')}>עזרה</button>
                     <button type="button" className="c2n-tool-btn" data-trainer-action="open-settings" onClick={openSettings}>הגדרות</button>
-                    <button type="button" className="c2n-tool-btn" onClick={backToWelcome}>פתיחה</button>
                   </div>
                 </div>
               </header>
 
-              <section className="c2n-play-chooser">
-                <div className="c2n-play-chooser-head">
+              <section className="c2n-family-rail">
+                <div className="c2n-family-head">
                   <div>
-                    <strong>בחירת קטגוריה</strong>
-                    <p className="c2n-sub" style={{ marginTop: 6 }}>
-                      מתחילים ממשפחה אחת, ואז בוחרים רק את הקטגוריה שעובדים מולה עכשיו. מפת ברין המלאה נשארת זמינה בלחיצה כשצריך.
-                    </p>
+                    <strong>בחירת משפחה</strong>
+                    <p className="c2n-sub" style={{ marginTop: 6 }}>{activeFamilyMeta.subtitle}</p>
                   </div>
-                  <div className="c2n-active-category">
-                    <b>{focusTitle}</b>
-                    <span>{activeSummaryLabel}</span>
-                    {selectedCat ? <small>קוד מתקדם: {selectedCat}</small> : null}
-                  </div>
+                  <span className="c2n-chip">{selectedCatMeta ? `נבחרה: ${selectedCatMeta.he}` : `פתוח עכשיו: ${activeFamilyMeta.he}`}</span>
                 </div>
 
                 <div className="c2n-family-tabs" role="tablist" aria-label="משפחות קטגוריה">
-                  {GROUP_ORDER.map((family) => {
-                    const count = visibleNow.filter((code) => CAT[code].family === family).length;
+                  {availableFamilies.map((family) => {
+                    const count = family === 'EXTRA'
+                      ? extraCategories.length
+                      : visibleNow.filter((code) => CAT[code].family === family).length;
                     return (
                       <button
                         key={family}
@@ -1067,15 +1055,17 @@ export default function Classic2Trainer(): React.ReactElement {
                         role="tab"
                         aria-selected={activeFamily === family}
                       >
-                        <span>{GROUP_META[family].he}</span>
-                        <small>{count ? `${count} קטגוריות זמינות` : 'לא זמין בהגדרות הנוכחיות'}</small>
+                        <span>{family === 'EXTRA' ? EXTRA_META.he : GROUP_META[family].he}</span>
+                        <small>{count ? `${count} אפשרויות` : 'לא זמין בהגדרות הנוכחיות'}</small>
                       </button>
                     );
                   })}
                 </div>
+              </section>
 
+              <section className="c2n-category-rail">
                 <div className="c2n-category-strip">
-                  {primaryFamilyCategories.map((code) => (
+                  {familyCategories.map((code) => (
                     <button
                       key={code}
                       type="button"
@@ -1084,46 +1074,29 @@ export default function Classic2Trainer(): React.ReactElement {
                       disabled={result !== 'pending'}
                       aria-pressed={selectedCat === code}
                     >
-                      <strong>{CAT[code].he}</strong>
-                      <span>{CAT[code].hint}</span>
-                      <small>{CAT[code].familyHe}</small>
+                      {CAT[code].he}
                     </button>
                   ))}
                 </div>
-
-                {extraCategories.length ? (
-                  <div className="c2n-extra-strip">
-                    <span className="c2n-strip-label">עוד קטגוריות</span>
-                    {extraCategories.map((code) => (
-                      <button
-                        key={code}
-                        type="button"
-                        className={`c2n-category-pill ${toneClassForCategory(code)}${selectedCat === code ? ' is-active' : ''}${selectedCat && selectedCat !== code ? ' is-dim' : ''}`}
-                        onClick={() => selectCat(code)}
-                        disabled={result !== 'pending'}
-                        aria-pressed={selectedCat === code}
-                      >
-                        <strong>{CAT[code].he}</strong>
-                        <span>{CAT[code].hint}</span>
-                        <small>{AUX_META[code].he}</small>
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
+                <div className="c2n-selection-lens">
+                  <strong>{focusTitle}</strong>
+                  <p>{selectedCatMeta ? selectedCatMeta.hint : activeFamilyMeta.subtitle}</p>
+                  {selectedCatMeta?.note ? <small>{selectedCatMeta.note}</small> : null}
+                </div>
               </section>
 
-              <section className="c2n-play-board">
+              <section className="c2n-workstation">
                 <section className="c2n-sentence-surface">
                   <div className="c2n-surface-head">
                     <div>
-                      <h3>טקסט הסבב</h3>
+                      <h3>משפטי הסבב</h3>
                       <p className="c2n-sub" style={{ marginTop: 6 }}>
                         {selectedCatMeta
                           ? `סמן/י רק את המשפטים ששייכים ל-${selectedCatMeta.he}.`
-                          : 'בחר/י קטגוריה אחת, ואז סמן/י רק את המשפטים שבאמת מתאימים לה.'}
+                          : 'בחר/י קטגוריה אחת כדי להתחיל לעבוד על הטקסט.'}
                       </p>
                     </div>
-                    {selectedCatMeta ? <span className="c2n-surface-target">{selectedCatMeta.he}</span> : null}
+                    {selectedCatMeta ? <span className="c2n-surface-target">{selectedCatMeta.he}</span> : <span className="c2n-surface-target">ממתין לבחירה</span>}
                   </div>
 
                   <div className="c2n-sents c2n-sents-board">
@@ -1152,38 +1125,35 @@ export default function Classic2Trainer(): React.ReactElement {
                   </div>
                 </section>
 
-                <aside className="c2n-feedback-surface">
-                  <section className={`c2n-focus-card ${selectedFamilyTone === 'distortion' ? 'is-distortion' : selectedFamilyTone === 'generalization' ? 'is-generalization' : selectedFamilyTone === 'deletion' ? 'is-deletion' : 'is-context'}`}>
-                    <h3>בפוקוס עכשיו</h3>
-                    <p>{focusDescription}</p>
-                    {selectedCat ? <span className="c2n-code" style={{ width: 'max-content' }}>{selectedCat}</span> : null}
-                  </section>
+                <section className="c2n-action-dock">
+                  <div className="c2n-dock-summary">
+                    <span className="c2n-dock-chip"><strong>בחרת:</strong> {selectedCatMeta?.he || 'עדיין לא נבחרה קטגוריה'}</span>
+                    <span className="c2n-dock-chip"><strong>נבחרו:</strong> {selectedCount}</span>
+                    <span className="c2n-dock-chip"><strong>משפטים בסבב:</strong> {round.sentences.length}</span>
+                  </div>
 
-                  <div className={`c2n-fb ${(feedback || { tone: 'info' as Tone }).tone}`}>
+                  <div className={`c2n-feedback-line ${(feedback || { tone: 'info' as Tone }).tone}`}>
                     {feedback?.message || defaultFeedback}
                   </div>
 
                   {(showHint || showSolution) && selectedCat ? (
-                    <div className="c2n-support-stack">
+                    <div className="c2n-dock-detail">
                       {showHint ? (
-                        <section className="c2n-support-card">
-                          <span className="c2n-detail-title">רמז</span>
-                          <p>{CAT[selectedCat].hint}</p>
-                          {hintIdx.length ? <p>שווה לבדוק במיוחד את משפט{hintIdx.length > 1 ? 'ים' : ''} {hintIdx.join(', ')}.</p> : <p>ייתכן שאין כאן מופע של הקטגוריה הזו.</p>}
-                        </section>
+                        <div className="c2n-dock-note">
+                          <strong>רמז</strong>
+                          <span>{hintIdx.length ? `בדוק/י במיוחד את משפט${hintIdx.length > 1 ? 'ים' : ''} ${hintIdx.join(', ')}.` : 'ייתכן שאין כאן מופע של הקטגוריה הזו.'}</span>
+                        </div>
                       ) : null}
                       {showSolution ? (
-                        <section className="c2n-support-card">
-                          <span className="c2n-detail-title">פתרון</span>
-                          {hintIdx.length
-                            ? <p>המופעים של {CAT[selectedCat].he} נמצאים במשפט{hintIdx.length > 1 ? 'ים' : ''} {hintIdx.join(', ')}.</p>
-                            : <p>בטקסט הזה אין מופע של {CAT[selectedCat].he}.</p>}
-                        </section>
+                        <div className="c2n-dock-note">
+                          <strong>פתרון</strong>
+                          <span>{totalMatches ? `המופעים של ${CAT[selectedCat].he} נמצאים במשפט${totalMatches > 1 ? 'ים' : ''} ${hintIdx.join(', ')}.` : `בטקסט הזה אין מופע של ${CAT[selectedCat].he}.`}</span>
+                        </div>
                       ) : null}
                     </div>
                   ) : null}
 
-                  <section className="c2n-action-panel">
+                  <div className="c2n-action-strip">
                     <button
                       type="button"
                       className="c2n-btn p c2n-btn-main"
@@ -1192,34 +1162,32 @@ export default function Classic2Trainer(): React.ReactElement {
                     >
                       {primaryActionLabel}
                     </button>
+                    <button
+                      type="button"
+                      className="c2n-btn is-subtle"
+                      onClick={() => {
+                        setSelectedIds([]);
+                        setResult('pending');
+                        setShowHint(false);
+                        setShowSolution(false);
+                        setFeedback(selectedCat ? { tone: 'info', message: 'הסימון נוקה. אפשר לנסות שוב באותה קטגוריה.' } : { tone: 'info', message: 'בחר/י קטגוריה כדי להתחיל.' });
+                      }}
+                      disabled={!selectedIds.length && result === 'pending'}
+                    >
+                      נקה
+                    </button>
+                    <button type="button" className="c2n-btn w" onClick={declareNoCategory} disabled={!selectedCat || result !== 'pending'}>אין קטגוריה</button>
+                    <button type="button" className="c2n-btn is-subtle" onClick={openHint} disabled={!selectedCat || (mode === 'test' && result === 'pending')}>{mode === 'test' ? 'רמז אחרי בדיקה' : 'רמז'}</button>
+                    <button type="button" className="c2n-btn is-subtle" onClick={openSolution} disabled={!selectedCat || (mode === 'test' && result === 'pending')}>{mode === 'test' ? 'פתרון אחרי בדיקה' : 'פתרון'}</button>
+                    <button type="button" className="c2n-btn is-subtle" onClick={backToWelcome}>לפתיחה</button>
+                  </div>
 
-                    <div className="c2n-action-strip">
-                      <button type="button" className="c2n-btn w" onClick={declareNoCategory} disabled={!selectedCat || result !== 'pending'}>אין את הקטגוריה בטקסט</button>
-                      <button
-                        type="button"
-                        className="c2n-btn s"
-                        onClick={() => {
-                          setSelectedIds([]);
-                          setResult('pending');
-                          setShowHint(false);
-                          setShowSolution(false);
-                          setFeedback(selectedCat ? { tone: 'info', message: 'הסימון נוקה. אפשר לנסות שוב באותה קטגוריה.' } : { tone: 'info', message: 'בחר/י קטגוריה כדי להתחיל.' });
-                        }}
-                        disabled={!selectedIds.length && result === 'pending'}
-                      >
-                        נקה סימון
-                      </button>
-                      <button type="button" className="c2n-btn g" onClick={openHint} disabled={!selectedCat || (mode === 'test' && result === 'pending')}>{mode === 'test' ? 'רמז אחרי בדיקה' : 'רמז'}</button>
-                      <button type="button" className="c2n-btn g" onClick={openSolution} disabled={!selectedCat || (mode === 'test' && result === 'pending')}>{mode === 'test' ? 'פתרון אחרי בדיקה' : 'פתרון'}</button>
-                    </div>
-
-                    <p className="c2n-quiet-note">
-                      {mode === 'test'
-                        ? 'במבחן עובדים קודם לבד. רמז ופתרון נפתחים רק אחרי תוצאה.'
-                        : 'בלימוד אפשר לפתוח רמז או פתרון רק כשצריך, בלי להעמיס על מרכז העבודה.'}
-                    </p>
-                  </section>
-                </aside>
+                  <p className="c2n-quiet-note">
+                    {mode === 'test'
+                      ? 'במבחן עובדים קודם לבד. רמז ופתרון נפתחים רק אחרי תוצאה.'
+                      : 'בלימוד אפשר לפתוח רמז או פתרון רק כשצריך, בלי להעמיס על אזור המשפטים.'}
+                  </p>
+                </section>
               </section>
             </section>
           </div>
@@ -1273,14 +1241,12 @@ export default function Classic2Trainer(): React.ReactElement {
             <header className="c2n-modal-head">
               <div>
                 <h2 id="classic2-play-overlay-title">
-                  {playOverlay === 'map' ? 'מפת ברין' : playOverlay === 'status' ? 'סטטוס הסשן' : 'עזרה ממוקדת'}
+                  {playOverlay === 'map' ? 'מפת ברין' : 'עזרה ממוקדת'}
                 </h2>
                 <p>
                   {playOverlay === 'map'
                     ? 'כאן נשמר הסדר הקנוני המלא. במסך הראשי עובדים עם בחירה פשוטה יותר, ובוחרים מהטבלה רק כשצריך דיוק נוסף.'
-                    : playOverlay === 'status'
-                      ? 'הפרטים המלאים של הסשן נשמרים כאן כדי שהמסך הראשי יישאר קל וממוקד.'
-                      : 'תזכורת קצרה למה מחפשים עכשיו. את ההסבר הרחב יותר משאירים למסך הפתיחה.'}
+                    : 'תזכורת קצרה למה מחפשים עכשיו. את ההסבר הרחב יותר משאירים למסך הפתיחה.'}
                 </p>
               </div>
               <button type="button" className="c2n-btn s" onClick={() => setPlayOverlay(null)}>סגור</button>
@@ -1297,44 +1263,10 @@ export default function Classic2Trainer(): React.ReactElement {
 
             {playOverlay === 'help' ? (
               <div className="c2n-overlay-grid">
-                <section className="c2n-group">
-                  <div className="c2n-group-head">
-                    <h3>מה עושים כאן עכשיו</h3>
-                  </div>
-                  <p className="c2n-sub">{defaultFeedback}</p>
-                </section>
-                <section className="c2n-group">
-                  <div className="c2n-group-head">
-                    <h3>מה כדאי לחפש</h3>
-                  </div>
-                  <p className="c2n-sub">{helpText}</p>
-                </section>
-                <section className="c2n-group">
-                  <div className="c2n-group-head">
-                    <h3>איך להשתמש בתמיכה</h3>
-                  </div>
-                  <p className="c2n-sub">
-                    {mode === 'test'
-                      ? 'במבחן עובדים קודם לבד, ורק אחרי תוצאה אפשר לפתוח רמז או פתרון.'
-                      : 'בלימוד אפשר לפתוח רמז או פתרון לפי צורך, אבל עדיף לתת קודם קריאה עצמאית אחת לטקסט.'}
-                  </p>
-                </section>
-              </div>
-            ) : null}
-
-            {playOverlay === 'status' ? (
-              <div className="c2n-overlay-grid">
-                {summaryGrid}
-                <div className="c2n-status-grid">
-                  <div className="c2n-status-card"><b>מצב</b><span>{modeLabel}</span></div>
-                  <div className="c2n-status-card"><b>קושי</b><span>{settings.difficulty}/5</span></div>
-                  <div className="c2n-status-card"><b>טעויות</b><span>{mistakes}</span></div>
-                  <div className="c2n-status-card"><b>רמזים</b><span>{hintsUsed}</span></div>
-                  <div className="c2n-status-card"><b>פתרונות</b><span>{solutionsUsed}</span></div>
-                  <div className="c2n-status-card"><b>תצוגת עבודה</b><span>{displayLabel}</span></div>
-                </div>
                 <div className="c2n-help">
-                  <p>{trafficLabel}</p>
+                  <p>{defaultFeedback}</p>
+                  <p>{selectedCatMeta ? `טיפ קצר: ${selectedCatMeta.hint}` : 'טיפ קצר: בחר/י קודם קטגוריה אחת, ורק אז עבר/י לסמן משפטים.'}</p>
+                  <p>{mode === 'test' ? 'במבחן רמז ופתרון נפתחים רק אחרי תוצאה.' : 'בלימוד אפשר לפתוח רמז או פתרון רק כשצריך.'}</p>
                 </div>
               </div>
             ) : null}
