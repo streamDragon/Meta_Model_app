@@ -1,0 +1,295 @@
+[
+  {
+    "device": "iphone13",
+    "route": "home",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-latest\\iphone13-home.png",
+    "heading": "",
+    "primaryAction": "כל הכלים",
+    "mainVisible": true,
+    "stickyCtaVisible": false,
+    "inlineCtaVisible": false,
+    "fixedEls": [
+      {
+        "cls": "meta-home-drawer",
+        "id": "",
+        "text": "תפריט\n×\n🏠\nדף הבית\n📊\nהסטטיסטיקות שלי\n⚙️\nהגדרות כלליות\n❓\nעזרה\n🧠\nעל המוצר\n📚\nמיל",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 664,
+          "top": 0,
+          "right": 390,
+          "bottom": 664,
+          "left": 0
+        }
+      },
+      {
+        "cls": "meta-gamification-pill",
+        "id": "",
+        "text": "🔥\n10\nרצף\n⭐\n48\nכוכבים\nרמה\n6",
+        "rect": {
+          "x": 0,
+          "y": 568,
+          "width": 366,
+          "height": 90,
+          "top": 568,
+          "right": 366,
+          "bottom": 658,
+          "left": 0
+        }
+      }
+    ],
+    "scrollY": 0,
+    "viewportHeight": 664,
+    "scrollHeight": 664,
+    "activeTab": "home"
+  },
+  {
+    "device": "iphone13",
+    "route": "categories",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-latest\\iphone13-categories.png",
+    "heading": "",
+    "primaryAction": "←",
+    "mainVisible": true,
+    "stickyCtaVisible": false,
+    "inlineCtaVisible": false,
+    "fixedEls": [
+      {
+        "cls": "meta-gamification-pill",
+        "id": "",
+        "text": "🔥\n10\nרצף\n⭐\n48\nכוכבים\nרמה\n6",
+        "rect": {
+          "x": 0,
+          "y": 568,
+          "width": 366,
+          "height": 90,
+          "top": 568,
+          "right": 366,
+          "bottom": 658,
+          "left": 0
+        }
+      }
+    ],
+    "scrollY": 0,
+    "viewportHeight": 664,
+    "scrollHeight": 5289,
+    "activeTab": "categories"
+  },
+  {
+    "device": "iphone13",
+    "route": "sentence-map",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-latest\\iphone13-sentence-map.png",
+    "heading": "",
+    "primaryAction": "יאללה, בואו נתחיל",
+    "mainVisible": true,
+    "stickyCtaVisible": false,
+    "inlineCtaVisible": false,
+    "fixedEls": [
+      {
+        "cls": "meta-gamification-pill",
+        "id": "",
+        "text": "🔥\n10\nרצף\n⭐\n48\nכוכבים\nרמה\n6",
+        "rect": {
+          "x": 0,
+          "y": 568,
+          "width": 366,
+          "height": 90,
+          "top": 568,
+          "right": 366,
+          "bottom": 658,
+          "left": 0
+        }
+      }
+    ],
+    "scrollY": 506,
+    "viewportHeight": 664,
+    "scrollHeight": 1450,
+    "activeTab": "sentence-map"
+  },
+  {
+    "device": "iphone13",
+    "route": "practice-question",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-latest\\iphone13-practice-question.png",
+    "heading": "",
+    "primaryAction": "יאללה, בואו נתחיל",
+    "mainVisible": true,
+    "stickyCtaVisible": false,
+    "inlineCtaVisible": false,
+    "fixedEls": [
+      {
+        "cls": "meta-gamification-pill",
+        "id": "",
+        "text": "🔥\n10\nרצף\n⭐\n48\nכוכבים\nרמה\n6",
+        "rect": {
+          "x": 0,
+          "y": 568,
+          "width": 366,
+          "height": 90,
+          "top": 568,
+          "right": 366,
+          "bottom": 658,
+          "left": 0
+        }
+      }
+    ],
+    "scrollY": 0,
+    "viewportHeight": 664,
+    "scrollHeight": 762,
+    "activeTab": "practice-question"
+  },
+  {
+    "device": "pixel7",
+    "route": "home",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-latest\\pixel7-home.png",
+    "heading": "",
+    "primaryAction": "כל הכלים",
+    "mainVisible": true,
+    "stickyCtaVisible": false,
+    "inlineCtaVisible": false,
+    "fixedEls": [
+      {
+        "cls": "meta-home-drawer",
+        "id": "",
+        "text": "תפריט\n×\n🏠\nדף הבית\n📊\nהסטטיסטיקות שלי\n⚙️\nהגדרות כלליות\n❓\nעזרה\n🧠\nעל המוצר\n📚\nמיל",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 839,
+          "top": 0,
+          "right": 412,
+          "bottom": 839,
+          "left": 0
+        }
+      },
+      {
+        "cls": "meta-gamification-pill",
+        "id": "",
+        "text": "🔥\n10\nרצף\n⭐\n48\nכוכבים\nרמה\n6",
+        "rect": {
+          "x": 0,
+          "y": 743,
+          "width": 388,
+          "height": 90,
+          "top": 743,
+          "right": 388,
+          "bottom": 833,
+          "left": 0
+        }
+      }
+    ],
+    "scrollY": 0,
+    "viewportHeight": 839,
+    "scrollHeight": 839,
+    "activeTab": "home"
+  },
+  {
+    "device": "pixel7",
+    "route": "categories",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-latest\\pixel7-categories.png",
+    "heading": "",
+    "primaryAction": "←",
+    "mainVisible": true,
+    "stickyCtaVisible": false,
+    "inlineCtaVisible": false,
+    "fixedEls": [
+      {
+        "cls": "meta-gamification-pill",
+        "id": "",
+        "text": "🔥\n10\nרצף\n⭐\n48\nכוכבים\nרמה\n6",
+        "rect": {
+          "x": 0,
+          "y": 743,
+          "width": 388,
+          "height": 90,
+          "top": 743,
+          "right": 388,
+          "bottom": 833,
+          "left": 0
+        }
+      }
+    ],
+    "scrollY": 0,
+    "viewportHeight": 839,
+    "scrollHeight": 5156,
+    "activeTab": "categories"
+  },
+  {
+    "device": "pixel7",
+    "route": "sentence-map",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-latest\\pixel7-sentence-map.png",
+    "heading": "",
+    "primaryAction": "יאללה, בואו נתחיל",
+    "mainVisible": true,
+    "stickyCtaVisible": false,
+    "inlineCtaVisible": false,
+    "fixedEls": [
+      {
+        "cls": "meta-gamification-pill",
+        "id": "",
+        "text": "🔥\n10\nרצף\n⭐\n48\nכוכבים\nרמה\n6",
+        "rect": {
+          "x": 0,
+          "y": 743,
+          "width": 388,
+          "height": 90,
+          "top": 743,
+          "right": 388,
+          "bottom": 833,
+          "left": 0
+        }
+      }
+    ],
+    "scrollY": 681,
+    "viewportHeight": 839,
+    "scrollHeight": 1647,
+    "activeTab": "sentence-map"
+  },
+  {
+    "device": "pixel7",
+    "route": "practice-question",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-latest\\pixel7-practice-question.png",
+    "heading": "",
+    "primaryAction": "התחל",
+    "mainVisible": true,
+    "stickyCtaVisible": true,
+    "inlineCtaVisible": false,
+    "fixedEls": [
+      {
+        "cls": "meta-gamification-pill",
+        "id": "",
+        "text": "🔥\n10\nרצף\n⭐\n48\nכוכבים\nרמה\n6",
+        "rect": {
+          "x": 0,
+          "y": 743,
+          "width": 388,
+          "height": 90,
+          "top": 743,
+          "right": 388,
+          "bottom": 833,
+          "left": 0
+        }
+      },
+      {
+        "cls": "mobile-sticky-cta",
+        "id": "mobile-sticky-cta",
+        "text": "התחל\nתפריט",
+        "rect": {
+          "x": 10,
+          "y": 757,
+          "width": 392,
+          "height": 72,
+          "top": 757,
+          "right": 402,
+          "bottom": 829,
+          "left": 10
+        }
+      }
+    ],
+    "scrollY": 0,
+    "viewportHeight": 839,
+    "scrollHeight": 927,
+    "activeTab": "practice-question"
+  }
+]

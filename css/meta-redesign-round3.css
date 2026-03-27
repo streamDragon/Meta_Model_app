@@ -1008,6 +1008,10 @@ body.shell-feature-active .tab-content.active {
         order: 2;
     }
 
+    body.mobile-sticky-cta-visible .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__cta {
+        display: none !important;
+    }
+
     .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__problem-note {
         order: 3;
     }

@@ -1,0 +1,1161 @@
+[
+  {
+    "device": "iphone13",
+    "route": "home",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-final\\iphone13-home.png",
+    "url": "http://127.0.0.1:4274/?v=1.0.717&t=1774654463172",
+    "headings": [
+      "לשמוע משפט —ולראות מה מסתתר בתוכו",
+      "האניפקפלופדיה של המטה מודל"
+    ],
+    "buttons": [
+      {
+        "text": "כל הכלים",
+        "id": "",
+        "classes": "meta-home-shell__tools btn btn-primary",
+        "rect": {
+          "top": 51,
+          "left": 125.28125,
+          "right": 353,
+          "bottom": 93,
+          "width": 227.71875,
+          "height": 42
+        }
+      },
+      {
+        "text": "☰ תפריט",
+        "id": "",
+        "classes": "meta-home-shell__menu btn btn-secondary",
+        "rect": {
+          "top": 111,
+          "left": 125.28125,
+          "right": 353,
+          "bottom": 158,
+          "width": 227.71875,
+          "height": 47
+        }
+      },
+      {
+        "text": "×",
+        "id": "",
+        "classes": "meta-home-drawer__close",
+        "rect": {
+          "top": 24,
+          "left": 408,
+          "right": 421.09375,
+          "bottom": 50,
+          "width": 13.09375,
+          "height": 26
+        }
+      },
+      {
+        "text": "🏠דף הבית",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 62,
+          "left": 408,
+          "right": 712,
+          "bottom": 114,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "📊הסטטיסטיקות שלי",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 122,
+          "left": 408,
+          "right": 712,
+          "bottom": 174,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "⚙️הגדרות כלליות",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 182,
+          "left": 408,
+          "right": 712,
+          "bottom": 234,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "❓עזרה",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 242,
+          "left": 408,
+          "right": 712,
+          "bottom": 294,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "🧠על המוצר",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 327,
+          "left": 408,
+          "right": 712,
+          "bottom": 379,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "📚מילון הקטגוריות",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 387,
+          "left": 408,
+          "right": 712,
+          "bottom": 439,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "🧰מרכז כלים",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 447,
+          "left": 408,
+          "right": 712,
+          "bottom": 499,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "🔥10רצף ⭐48כוכבים רמה6",
+        "id": "",
+        "classes": "meta-gamification-pill__button action-button",
+        "rect": {
+          "top": 577,
+          "left": 11,
+          "right": 355,
+          "bottom": 649,
+          "width": 344,
+          "height": 72
+        }
+      }
+    ],
+    "fixedElements": [
+      {
+        "tag": "div",
+        "id": "",
+        "classes": "meta-home-drawer",
+        "text": "תפריט×🏠דף הבית📊הסטטיסטיקות שלי⚙️הגדרות כלליות❓עזרה🧠על המוצר📚מילון הקטגוריות🧰מרכז כליםגרסה1.0.717",
+        "rect": {
+          "top": 0,
+          "left": 0,
+          "right": 390,
+          "bottom": 664,
+          "width": 390,
+          "height": 664
+        }
+      },
+      {
+        "tag": "section",
+        "id": "",
+        "classes": "meta-gamification-pill",
+        "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+        "rect": {
+          "top": 568,
+          "left": 0,
+          "right": 366,
+          "bottom": 658,
+          "width": 366,
+          "height": 90
+        }
+      }
+    ],
+    "scrollHeight": 664,
+    "viewportHeight": 664,
+    "activeTab": "home",
+    "stickyCtaVisible": false
+  },
+  {
+    "device": "iphone13",
+    "route": "categories",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-final\\iphone13-categories.png",
+    "url": "http://127.0.0.1:4274/feature/categories?v=1.0.717&t=1774654463172",
+    "headings": [
+      "מילון קטגוריות המטה-מודל",
+      "מה יש כאן",
+      "איך מתחילים"
+    ],
+    "buttons": [
+      {
+        "text": "←",
+        "id": "",
+        "classes": "btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon",
+        "rect": {
+          "top": 17,
+          "left": 341,
+          "right": 373,
+          "bottom": 61,
+          "width": 32,
+          "height": 44
+        }
+      },
+      {
+        "text": "⌂",
+        "id": "",
+        "classes": "btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon",
+        "rect": {
+          "top": 17,
+          "left": 89,
+          "right": 121,
+          "bottom": 61,
+          "width": 32,
+          "height": 44
+        }
+      },
+      {
+        "text": "↺",
+        "id": "",
+        "classes": "btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon",
+        "rect": {
+          "top": 17,
+          "left": 53,
+          "right": 85,
+          "bottom": 61,
+          "width": 32,
+          "height": 44
+        }
+      },
+      {
+        "text": "⋯",
+        "id": "",
+        "classes": "btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon",
+        "rect": {
+          "top": 17,
+          "left": 17,
+          "right": 49,
+          "bottom": 61,
+          "width": 32,
+          "height": 44
+        }
+      },
+      {
+        "text": "🔥10רצף ⭐48כוכבים רמה6",
+        "id": "",
+        "classes": "meta-gamification-pill__button action-button",
+        "rect": {
+          "top": 577,
+          "left": 11,
+          "right": 355,
+          "bottom": 649,
+          "width": 344,
+          "height": 72
+        }
+      }
+    ],
+    "fixedElements": [
+      {
+        "tag": "div",
+        "id": "",
+        "classes": "meta-feature-chrome meta-feature-chrome--top",
+        "text": "←מסלול פעילמילון הקטגוריות⌂↺⋯",
+        "rect": {
+          "top": 10,
+          "left": 8,
+          "right": 382,
+          "bottom": 78,
+          "width": 374,
+          "height": 68
+        }
+      },
+      {
+        "tag": "section",
+        "id": "",
+        "classes": "meta-gamification-pill",
+        "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+        "rect": {
+          "top": 568,
+          "left": 0,
+          "right": 366,
+          "bottom": 658,
+          "width": 366,
+          "height": 90
+        }
+      }
+    ],
+    "scrollHeight": 5289,
+    "viewportHeight": 664,
+    "activeTab": "categories",
+    "stickyCtaVisible": false
+  },
+  {
+    "device": "iphone13",
+    "route": "sentence-map",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-final\\iphone13-sentence-map.png",
+    "url": "http://127.0.0.1:4274/feature/sentence-map?v=1.0.717&t=1774654463172",
+    "headings": [],
+    "buttons": [
+      {
+        "text": "🔥10רצף ⭐48כוכבים רמה6",
+        "id": "",
+        "classes": "meta-gamification-pill__button action-button",
+        "rect": {
+          "top": 577,
+          "left": 11,
+          "right": 355,
+          "bottom": 649,
+          "width": 344,
+          "height": 72
+        }
+      },
+      {
+        "text": "יאללה, בואו נתחיל",
+        "id": "",
+        "classes": "btn btn-primary action-button",
+        "rect": {
+          "top": 591,
+          "left": 119.90625,
+          "right": 371,
+          "bottom": 635,
+          "width": 251.09375,
+          "height": 44
+        }
+      },
+      {
+        "text": "תפריט",
+        "id": "",
+        "classes": "btn btn-secondary action-button",
+        "rect": {
+          "top": 591,
+          "left": 19,
+          "right": 111.90625,
+          "bottom": 635,
+          "width": 92.90625,
+          "height": 44
+        }
+      }
+    ],
+    "fixedElements": [
+      {
+        "tag": "section",
+        "id": "",
+        "classes": "meta-gamification-pill",
+        "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+        "rect": {
+          "top": 568,
+          "left": 0,
+          "right": 366,
+          "bottom": 658,
+          "width": 366,
+          "height": 90
+        }
+      },
+      {
+        "tag": "div",
+        "id": "mobile-sticky-cta",
+        "classes": "mobile-sticky-cta",
+        "text": "יאללה, בואו נתחיל תפריט",
+        "rect": {
+          "top": 582,
+          "left": 10,
+          "right": 380,
+          "bottom": 654,
+          "width": 370,
+          "height": 72
+        }
+      }
+    ],
+    "scrollHeight": 1538,
+    "viewportHeight": 664,
+    "activeTab": "sentence-map",
+    "stickyCtaVisible": true
+  },
+  {
+    "device": "iphone13",
+    "route": "practice-question",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-final\\iphone13-practice-question.png",
+    "url": "http://127.0.0.1:4274/feature/practice-question?v=1.0.717&t=1774654463172",
+    "headings": [
+      "תרגול זיהוי"
+    ],
+    "buttons": [
+      {
+        "text": "←",
+        "id": "",
+        "classes": "btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon",
+        "rect": {
+          "top": 21,
+          "left": 341,
+          "right": 373,
+          "bottom": 57,
+          "width": 32,
+          "height": 36
+        }
+      },
+      {
+        "text": "⌂",
+        "id": "",
+        "classes": "btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon",
+        "rect": {
+          "top": 21,
+          "left": 17,
+          "right": 49,
+          "bottom": 57,
+          "width": 32,
+          "height": 36
+        }
+      },
+      {
+        "text": "🧠רקע תיאורטי",
+        "id": "",
+        "classes": "meta-feature-shell__action-btn",
+        "rect": {
+          "top": 458.859375,
+          "left": 264,
+          "right": 382,
+          "bottom": 511.265625,
+          "width": 118,
+          "height": 52.40625
+        }
+      },
+      {
+        "text": "💬דיאלוג טיפולי",
+        "id": "",
+        "classes": "meta-feature-shell__action-btn",
+        "rect": {
+          "top": 458.859375,
+          "left": 136,
+          "right": 254,
+          "bottom": 511.265625,
+          "width": 118,
+          "height": 52.40625
+        }
+      },
+      {
+        "text": "⚙הגדרות",
+        "id": "",
+        "classes": "meta-feature-shell__action-btn",
+        "rect": {
+          "top": 458.859375,
+          "left": 8,
+          "right": 126,
+          "bottom": 511.265625,
+          "width": 118,
+          "height": 52.40625
+        }
+      },
+      {
+        "text": "יאללה, בואו נתחיל",
+        "id": "",
+        "classes": "btn btn-primary meta-feature-shell__cta",
+        "rect": {
+          "top": 256.71875,
+          "left": 8,
+          "right": 382,
+          "bottom": 304.71875,
+          "width": 374,
+          "height": 48
+        }
+      },
+      {
+        "text": "🔥10רצף ⭐48כוכבים רמה6",
+        "id": "",
+        "classes": "meta-gamification-pill__button action-button",
+        "rect": {
+          "top": 577,
+          "left": 11,
+          "right": 355,
+          "bottom": 649,
+          "width": 344,
+          "height": 72
+        }
+      },
+      {
+        "text": "יאללה, בואו נתחיל",
+        "id": "",
+        "classes": "btn btn-primary action-button",
+        "rect": {
+          "top": 591,
+          "left": 119.90625,
+          "right": 371,
+          "bottom": 635,
+          "width": 251.09375,
+          "height": 44
+        }
+      },
+      {
+        "text": "תפריט",
+        "id": "",
+        "classes": "btn btn-secondary action-button",
+        "rect": {
+          "top": 591,
+          "left": 19,
+          "right": 111.90625,
+          "bottom": 635,
+          "width": 92.90625,
+          "height": 44
+        }
+      }
+    ],
+    "fixedElements": [
+      {
+        "tag": "div",
+        "id": "",
+        "classes": "meta-feature-chrome meta-feature-chrome--top",
+        "text": "←תרגול זיהוי⌂",
+        "rect": {
+          "top": 14,
+          "left": 8,
+          "right": 382,
+          "bottom": 74,
+          "width": 374,
+          "height": 60
+        }
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "classes": "meta-feature-chrome meta-feature-chrome--bottom",
+        "text": "רמה 6⭐ 48🔥 10",
+        "rect": {
+          "top": 660.40625,
+          "left": 8,
+          "right": 382,
+          "bottom": 704.40625,
+          "width": 374,
+          "height": 44
+        }
+      },
+      {
+        "tag": "section",
+        "id": "",
+        "classes": "meta-gamification-pill",
+        "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+        "rect": {
+          "top": 568,
+          "left": 0,
+          "right": 366,
+          "bottom": 658,
+          "width": 366,
+          "height": 90
+        }
+      },
+      {
+        "tag": "div",
+        "id": "mobile-sticky-cta",
+        "classes": "mobile-sticky-cta",
+        "text": "יאללה, בואו נתחיל תפריט",
+        "rect": {
+          "top": 582,
+          "left": 10,
+          "right": 380,
+          "bottom": 654,
+          "width": 370,
+          "height": 72
+        }
+      }
+    ],
+    "scrollHeight": 850,
+    "viewportHeight": 664,
+    "activeTab": "practice-question",
+    "stickyCtaVisible": true
+  },
+  {
+    "device": "pixel7",
+    "route": "home",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-final\\pixel7-home.png",
+    "url": "http://127.0.0.1:4274/?v=1.0.717&t=1774654463172",
+    "headings": [
+      "לשמוע משפט —ולראות מה מסתתר בתוכו",
+      "האניפקפלופדיה של המטה מודל"
+    ],
+    "buttons": [
+      {
+        "text": "כל הכלים",
+        "id": "",
+        "classes": "meta-home-shell__tools btn btn-primary",
+        "rect": {
+          "top": 51,
+          "left": 147.28125,
+          "right": 375,
+          "bottom": 93,
+          "width": 227.71875,
+          "height": 42
+        }
+      },
+      {
+        "text": "☰ תפריט",
+        "id": "",
+        "classes": "meta-home-shell__menu btn btn-secondary",
+        "rect": {
+          "top": 111,
+          "left": 147.28125,
+          "right": 375,
+          "bottom": 158,
+          "width": 227.71875,
+          "height": 47
+        }
+      },
+      {
+        "text": "פתחו אנציקלופדיה",
+        "id": "",
+        "classes": "btn btn-primary meta-home-entry-card__cta",
+        "rect": {
+          "top": 704.53125,
+          "left": 64,
+          "right": 348,
+          "bottom": 748.53125,
+          "width": 284,
+          "height": 44
+        }
+      },
+      {
+        "text": "×",
+        "id": "",
+        "classes": "meta-home-drawer__close",
+        "rect": {
+          "top": 24,
+          "left": 430,
+          "right": 443.09375,
+          "bottom": 50,
+          "width": 13.09375,
+          "height": 26
+        }
+      },
+      {
+        "text": "🏠דף הבית",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 62,
+          "left": 430,
+          "right": 734,
+          "bottom": 114,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "📊הסטטיסטיקות שלי",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 122,
+          "left": 430,
+          "right": 734,
+          "bottom": 174,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "⚙️הגדרות כלליות",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 182,
+          "left": 430,
+          "right": 734,
+          "bottom": 234,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "❓עזרה",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 242,
+          "left": 430,
+          "right": 734,
+          "bottom": 294,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "🧠על המוצר",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 327,
+          "left": 430,
+          "right": 734,
+          "bottom": 379,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "📚מילון הקטגוריות",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 387,
+          "left": 430,
+          "right": 734,
+          "bottom": 439,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "🧰מרכז כלים",
+        "id": "",
+        "classes": "meta-home-drawer__item",
+        "rect": {
+          "top": 447,
+          "left": 430,
+          "right": 734,
+          "bottom": 499,
+          "width": 304,
+          "height": 52
+        }
+      },
+      {
+        "text": "🔥10רצף ⭐48כוכבים רמה6",
+        "id": "",
+        "classes": "meta-gamification-pill__button action-button",
+        "rect": {
+          "top": 752,
+          "left": 11,
+          "right": 377,
+          "bottom": 824,
+          "width": 366,
+          "height": 72
+        }
+      }
+    ],
+    "fixedElements": [
+      {
+        "tag": "div",
+        "id": "",
+        "classes": "meta-home-drawer",
+        "text": "תפריט×🏠דף הבית📊הסטטיסטיקות שלי⚙️הגדרות כלליות❓עזרה🧠על המוצר📚מילון הקטגוריות🧰מרכז כליםגרסה1.0.717",
+        "rect": {
+          "top": 0,
+          "left": 0,
+          "right": 412,
+          "bottom": 839,
+          "width": 412,
+          "height": 839
+        }
+      },
+      {
+        "tag": "section",
+        "id": "",
+        "classes": "meta-gamification-pill",
+        "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+        "rect": {
+          "top": 743,
+          "left": 0,
+          "right": 388,
+          "bottom": 833,
+          "width": 388,
+          "height": 90
+        }
+      }
+    ],
+    "scrollHeight": 839,
+    "viewportHeight": 839,
+    "activeTab": "home",
+    "stickyCtaVisible": false
+  },
+  {
+    "device": "pixel7",
+    "route": "categories",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-final\\pixel7-categories.png",
+    "url": "http://127.0.0.1:4274/feature/categories?v=1.0.717&t=1774654463172",
+    "headings": [
+      "מילון קטגוריות המטה-מודל",
+      "מה יש כאן",
+      "איך מתחילים"
+    ],
+    "buttons": [
+      {
+        "text": "←",
+        "id": "",
+        "classes": "btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon",
+        "rect": {
+          "top": 17,
+          "left": 363,
+          "right": 395,
+          "bottom": 61,
+          "width": 32,
+          "height": 44
+        }
+      },
+      {
+        "text": "⌂",
+        "id": "",
+        "classes": "btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon",
+        "rect": {
+          "top": 17,
+          "left": 89,
+          "right": 121,
+          "bottom": 61,
+          "width": 32,
+          "height": 44
+        }
+      },
+      {
+        "text": "↺",
+        "id": "",
+        "classes": "btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon",
+        "rect": {
+          "top": 17,
+          "left": 53,
+          "right": 85,
+          "bottom": 61,
+          "width": 32,
+          "height": 44
+        }
+      },
+      {
+        "text": "⋯",
+        "id": "",
+        "classes": "btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon",
+        "rect": {
+          "top": 17,
+          "left": 17,
+          "right": 49,
+          "bottom": 61,
+          "width": 32,
+          "height": 44
+        }
+      },
+      {
+        "text": "🔥10רצף ⭐48כוכבים רמה6",
+        "id": "",
+        "classes": "meta-gamification-pill__button action-button",
+        "rect": {
+          "top": 752,
+          "left": 11,
+          "right": 377,
+          "bottom": 824,
+          "width": 366,
+          "height": 72
+        }
+      }
+    ],
+    "fixedElements": [
+      {
+        "tag": "div",
+        "id": "",
+        "classes": "meta-feature-chrome meta-feature-chrome--top",
+        "text": "←מסלול פעילמילון הקטגוריות⌂↺⋯",
+        "rect": {
+          "top": 10,
+          "left": 8,
+          "right": 404,
+          "bottom": 78,
+          "width": 396,
+          "height": 68
+        }
+      },
+      {
+        "tag": "section",
+        "id": "",
+        "classes": "meta-gamification-pill",
+        "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+        "rect": {
+          "top": 743,
+          "left": 0,
+          "right": 388,
+          "bottom": 833,
+          "width": 388,
+          "height": 90
+        }
+      }
+    ],
+    "scrollHeight": 5156,
+    "viewportHeight": 839,
+    "activeTab": "categories",
+    "stickyCtaVisible": false
+  },
+  {
+    "device": "pixel7",
+    "route": "sentence-map",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-final\\pixel7-sentence-map.png",
+    "url": "http://127.0.0.1:4274/feature/sentence-map?v=1.0.717&t=1774654463172",
+    "headings": [],
+    "buttons": [
+      {
+        "text": "🔥10רצף ⭐48כוכבים רמה6",
+        "id": "",
+        "classes": "meta-gamification-pill__button action-button",
+        "rect": {
+          "top": 752,
+          "left": 11,
+          "right": 377,
+          "bottom": 824,
+          "width": 366,
+          "height": 72
+        }
+      },
+      {
+        "text": "יאללה, בואו נתחיל",
+        "id": "",
+        "classes": "btn btn-primary action-button",
+        "rect": {
+          "top": 766,
+          "left": 119.90625,
+          "right": 393,
+          "bottom": 810,
+          "width": 273.09375,
+          "height": 44
+        }
+      },
+      {
+        "text": "תפריט",
+        "id": "",
+        "classes": "btn btn-secondary action-button",
+        "rect": {
+          "top": 766,
+          "left": 19,
+          "right": 111.90625,
+          "bottom": 810,
+          "width": 92.90625,
+          "height": 44
+        }
+      }
+    ],
+    "fixedElements": [
+      {
+        "tag": "section",
+        "id": "",
+        "classes": "meta-gamification-pill",
+        "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+        "rect": {
+          "top": 743,
+          "left": 0,
+          "right": 388,
+          "bottom": 833,
+          "width": 388,
+          "height": 90
+        }
+      },
+      {
+        "tag": "div",
+        "id": "mobile-sticky-cta",
+        "classes": "mobile-sticky-cta",
+        "text": "יאללה, בואו נתחיל תפריט",
+        "rect": {
+          "top": 757,
+          "left": 10,
+          "right": 402,
+          "bottom": 829,
+          "width": 392,
+          "height": 72
+        }
+      }
+    ],
+    "scrollHeight": 1735,
+    "viewportHeight": 839,
+    "activeTab": "sentence-map",
+    "stickyCtaVisible": true
+  },
+  {
+    "device": "pixel7",
+    "route": "practice-question",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-final\\pixel7-practice-question.png",
+    "url": "http://127.0.0.1:4274/feature/practice-question?v=1.0.717&t=1774654463172",
+    "headings": [
+      "תרגול זיהוי"
+    ],
+    "buttons": [
+      {
+        "text": "←",
+        "id": "",
+        "classes": "btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon",
+        "rect": {
+          "top": 21,
+          "left": 363,
+          "right": 395,
+          "bottom": 57,
+          "width": 32,
+          "height": 36
+        }
+      },
+      {
+        "text": "⌂",
+        "id": "",
+        "classes": "btn btn-secondary meta-feature-chrome__btn meta-feature-chrome__btn--icon",
+        "rect": {
+          "top": 21,
+          "left": 17,
+          "right": 49,
+          "bottom": 57,
+          "width": 32,
+          "height": 36
+        }
+      },
+      {
+        "text": "🧠רקע תיאורטי",
+        "id": "",
+        "classes": "meta-feature-shell__action-btn",
+        "rect": {
+          "top": 470.859375,
+          "left": 278.671875,
+          "right": 404,
+          "bottom": 527.265625,
+          "width": 125.328125,
+          "height": 56.40625
+        }
+      },
+      {
+        "text": "💬דיאלוג טיפולי",
+        "id": "",
+        "classes": "meta-feature-shell__action-btn",
+        "rect": {
+          "top": 470.859375,
+          "left": 143.34375,
+          "right": 268.671875,
+          "bottom": 527.265625,
+          "width": 125.328125,
+          "height": 56.40625
+        }
+      },
+      {
+        "text": "⚙הגדרות",
+        "id": "",
+        "classes": "meta-feature-shell__action-btn",
+        "rect": {
+          "top": 470.859375,
+          "left": 8,
+          "right": 133.34375,
+          "bottom": 527.265625,
+          "width": 125.34375,
+          "height": 56.40625
+        }
+      },
+      {
+        "text": "יאללה, בואו נתחיל",
+        "id": "",
+        "classes": "btn btn-primary meta-feature-shell__cta",
+        "rect": {
+          "top": 264.71875,
+          "left": 8,
+          "right": 404,
+          "bottom": 316.71875,
+          "width": 396,
+          "height": 52
+        }
+      },
+      {
+        "text": "🔥10רצף ⭐48כוכבים רמה6",
+        "id": "",
+        "classes": "meta-gamification-pill__button action-button",
+        "rect": {
+          "top": 752,
+          "left": 11,
+          "right": 377,
+          "bottom": 824,
+          "width": 366,
+          "height": 72
+        }
+      },
+      {
+        "text": "יאללה, בואו נתחיל",
+        "id": "",
+        "classes": "btn btn-primary action-button",
+        "rect": {
+          "top": 766,
+          "left": 119.90625,
+          "right": 393,
+          "bottom": 810,
+          "width": 273.09375,
+          "height": 44
+        }
+      },
+      {
+        "text": "תפריט",
+        "id": "",
+        "classes": "btn btn-secondary action-button",
+        "rect": {
+          "top": 766,
+          "left": 19,
+          "right": 111.90625,
+          "bottom": 810,
+          "width": 92.90625,
+          "height": 44
+        }
+      }
+    ],
+    "fixedElements": [
+      {
+        "tag": "div",
+        "id": "",
+        "classes": "meta-feature-chrome meta-feature-chrome--top",
+        "text": "←תרגול זיהוי⌂",
+        "rect": {
+          "top": 14,
+          "left": 8,
+          "right": 404,
+          "bottom": 74,
+          "width": 396,
+          "height": 60
+        }
+      },
+      {
+        "tag": "div",
+        "id": "",
+        "classes": "meta-feature-chrome meta-feature-chrome--bottom",
+        "text": "רמה 6⭐ 48🔥 10",
+        "rect": {
+          "top": 678.40625,
+          "left": 8,
+          "right": 404,
+          "bottom": 722.40625,
+          "width": 396,
+          "height": 44
+        }
+      },
+      {
+        "tag": "section",
+        "id": "",
+        "classes": "meta-gamification-pill",
+        "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+        "rect": {
+          "top": 743,
+          "left": 0,
+          "right": 388,
+          "bottom": 833,
+          "width": 388,
+          "height": 90
+        }
+      },
+      {
+        "tag": "div",
+        "id": "mobile-sticky-cta",
+        "classes": "mobile-sticky-cta",
+        "text": "יאללה, בואו נתחיל תפריט",
+        "rect": {
+          "top": 757,
+          "left": 10,
+          "right": 402,
+          "bottom": 829,
+          "width": 392,
+          "height": 72
+        }
+      }
+    ],
+    "scrollHeight": 927,
+    "viewportHeight": 839,
+    "activeTab": "practice-question",
+    "stickyCtaVisible": true
+  }
+]

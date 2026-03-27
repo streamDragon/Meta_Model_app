@@ -1,0 +1,38 @@
+[
+  {
+    "device": "iphone13",
+    "route": "sentence-map",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-final-cta\\iphone13-sentence-map.png",
+    "scrollY": 506,
+    "activeTab": "sentence-map",
+    "stickyCtaVisible": false,
+    "inlineCtaVisible": true
+  },
+  {
+    "device": "iphone13",
+    "route": "practice-question",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-final-cta\\iphone13-practice-question.png",
+    "scrollY": 0,
+    "activeTab": "practice-question",
+    "stickyCtaVisible": false,
+    "inlineCtaVisible": true
+  },
+  {
+    "device": "pixel7",
+    "route": "sentence-map",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-final-cta\\pixel7-sentence-map.png",
+    "scrollY": 681,
+    "activeTab": "sentence-map",
+    "stickyCtaVisible": true,
+    "inlineCtaVisible": false
+  },
+  {
+    "device": "pixel7",
+    "route": "practice-question",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-final-cta\\pixel7-practice-question.png",
+    "scrollY": 0,
+    "activeTab": "practice-question",
+    "stickyCtaVisible": false,
+    "inlineCtaVisible": true
+  }
+]
