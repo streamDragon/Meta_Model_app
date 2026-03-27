@@ -1,15 +1,15 @@
-const { test } = require('playwright/test');
-const { runMobileReview, seedMobileReviewState } = require('./helpers/mobile-review');
+import { test } from 'playwright/test';
+import { runMobileReview, seedMobileReviewState, type MobileReviewRoute } from './helpers/mobile-review';
 
-const reviewRoutes = [
+const reviewRoutes: MobileReviewRoute[] = [
   {
     id: 'home',
     name: 'home stays usable on mobile',
     path: '/',
     tab: 'home',
-    headingSelectors: ['header h1', '#home .mobile-feed-launchpad-title'],
-    mainSelectors: ['#home .product-family-card', '#home .product-tool-entry', '#mobile-feed-home:not([hidden])'],
-    primarySelectors: ['#home [data-nav-key="sentenceMap"]', '#home [data-nav-key="categories"]', '#home .product-tool-entry'],
+    headingSelectors: ['article h2', '#app-sticky-current-title', 'header h1', '#home .mobile-feed-launchpad-title'],
+    mainSelectors: ['article[aria-label]', '#home article', '#home .product-family-card', '#mobile-feed-home:not([hidden])'],
+    primarySelectors: ['article button', '#home .product-tool-entry', '#home button'],
   },
   {
     id: 'categories',
@@ -31,15 +31,20 @@ const reviewRoutes = [
     tab: 'sentence-map',
     headingSelectors: ['#sentence-map h2'],
     mainSelectors: [
+      '#sentence-map .meta-feature-shell__frame',
+      '#sentence-map [data-feature-enter="sentence-map"]',
+      '#sentence-map .practice-intro-card',
       '#sentence-map-app .sentence-map-overview-grid',
       '#sentence-map-app .sentence-map-case-selector',
       '#sentence-map-app .sentence-map-stepper-block',
       '#sentence-map-app .sentence-map-empty',
     ],
     primarySelectors: [
+      '#sentence-map [data-feature-enter="sentence-map"]',
       '#sentence-map-app .sentence-map-case-card',
       '#sentence-map-app [data-action="next-case"]',
       '#sentence-map-app button',
+      '#sentence-map button',
     ],
   },
 ];

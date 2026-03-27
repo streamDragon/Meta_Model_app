@@ -45,6 +45,13 @@ body.meta-shell-modal-open #meta-gamification-root {
     transform: translateY(18px);
 }
 
+body.meta-shell-modal-open .audio-master-mute-btn,
+body.meta-shell-modal-open .music-toggle-btn {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(18px);
+}
+
 body.shell-home-active {
     overflow: hidden;
 }
@@ -969,6 +976,56 @@ body.shell-feature-active .tab-content.active {
 
     .meta-feature-shell__action-label {
         font-size: 0.68rem;
+    }
+}
+
+@media (max-width: 900px) {
+    body.mobile-sticky-cta-visible #meta-gamification-root,
+    body.mobile-sticky-cta-visible .audio-master-mute-btn,
+    body.mobile-sticky-cta-visible .music-toggle-btn,
+    body[data-active-tab="home"] #meta-gamification-root,
+    body[data-active-tab="home"] .audio-master-mute-btn,
+    body[data-active-tab="home"] .music-toggle-btn,
+    body[data-active-tab="categories"] #meta-gamification-root,
+    body[data-active-tab="categories"] .audio-master-mute-btn,
+    body[data-active-tab="categories"] .music-toggle-btn,
+    body:has(.tab-content.active[data-meta-feature-stage="welcome"]) #meta-gamification-root,
+    body:has(.tab-content.active[data-meta-feature-stage="welcome"]) .audio-master-mute-btn,
+    body:has(.tab-content.active[data-meta-feature-stage="welcome"]) .music-toggle-btn,
+    body:has(#practice-question.active #question-drill[data-stage="setup"]) #meta-gamification-root,
+    body:has(#practice-question.active #question-drill[data-stage="setup"]) .audio-master-mute-btn,
+    body:has(#practice-question.active #question-drill[data-stage="setup"]) .music-toggle-btn {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(18px);
+    }
+
+    .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__frame {
+        gap: 8px;
+    }
+
+    .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__cta {
+        order: 2;
+    }
+
+    .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__problem-note {
+        order: 3;
+    }
+
+    .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__actions--welcome {
+        order: 4;
+    }
+
+    .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__entry-grid {
+        order: 5;
+        grid-template-columns: 1fr;
+    }
+
+    .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__entry-card:nth-child(n + 2),
+    .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__example-card,
+    .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__quote--compact,
+    .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__success-note {
+        display: none !important;
     }
 }
 

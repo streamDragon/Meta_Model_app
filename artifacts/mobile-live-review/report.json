@@ -1,0 +1,642 @@
+[
+  {
+    "device": "iphone13",
+    "route": "home",
+    "screenshotPath": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review\\iphone13-home.png",
+    "viewport": {
+      "title": "Meta Model - כלי תרגול שאול מטה מודל [v1.0.714]",
+      "activeTab": "home",
+      "scrollHeight": 844,
+      "viewportHeight": 844,
+      "headings": [
+        {
+          "text": "לשמוע משפט —ולראות מה מסתתר בתוכו",
+          "top": 362
+        },
+        {
+          "text": "האניפקפלופדיה של המטה מודל",
+          "top": 507
+        }
+      ],
+      "buttons": [
+        {
+          "text": "כל הכלים",
+          "top": 51
+        },
+        {
+          "text": "☰ תפריט",
+          "top": 111
+        },
+        {
+          "text": "פתחו אנציקלופדיה",
+          "top": 723
+        },
+        {
+          "text": "×",
+          "top": 24
+        },
+        {
+          "text": "🏠דף הבית",
+          "top": 62
+        },
+        {
+          "text": "📊הסטטיסטיקות שלי",
+          "top": 122
+        },
+        {
+          "text": "⚙️הגדרות כלליות",
+          "top": 182
+        },
+        {
+          "text": "❓עזרה",
+          "top": 242
+        },
+        {
+          "text": "🧠על המוצר",
+          "top": 327
+        },
+        {
+          "text": "📚מילון הקטגוריות",
+          "top": 387
+        },
+        {
+          "text": "🧰מרכז כלים",
+          "top": 447
+        },
+        {
+          "text": "🔥10רצף ⭐48כוכבים רמה6",
+          "top": 751
+        },
+        {
+          "text": "🔊צלילפעיל",
+          "top": 782
+        }
+      ],
+      "fixed": [
+        {
+          "tag": "section",
+          "id": "",
+          "className": "meta-gamification-pill",
+          "position": "fixed",
+          "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+          "rect": {
+            "top": 742,
+            "left": 12,
+            "width": 366,
+            "height": 90
+          },
+          "visible": true
+        },
+        {
+          "tag": "button",
+          "id": "audio-master-mute-btn",
+          "className": "audio-mute-btn audio-master-mute-btn audio-fab audio-floating-control is-active",
+          "position": "fixed",
+          "text": "🔊צלילפעיל",
+          "rect": {
+            "top": 782,
+            "left": 268,
+            "width": 110,
+            "height": 50
+          },
+          "visible": true
+        }
+      ]
+    }
+  },
+  {
+    "device": "iphone13",
+    "route": "categories",
+    "screenshotPath": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review\\iphone13-categories.png",
+    "viewport": {
+      "title": "Meta Model - כלי תרגול שאול מטה מודל [v1.0.714]",
+      "activeTab": "categories",
+      "scrollHeight": 5289,
+      "viewportHeight": 844,
+      "headings": [
+        {
+          "text": "מילון קטגוריות המטה-מודל",
+          "top": 101
+        },
+        {
+          "text": "מה יש כאן",
+          "top": 279
+        },
+        {
+          "text": "איך מתחילים",
+          "top": 566
+        }
+      ],
+      "buttons": [
+        {
+          "text": "←",
+          "top": 17
+        },
+        {
+          "text": "⌂",
+          "top": 17
+        },
+        {
+          "text": "↺",
+          "top": 17
+        },
+        {
+          "text": "⋯",
+          "top": 17
+        },
+        {
+          "text": "🔥10רצף ⭐48כוכבים רמה6",
+          "top": 751
+        },
+        {
+          "text": "🔊צלילפעיל",
+          "top": 782
+        }
+      ],
+      "fixed": [
+        {
+          "tag": "section",
+          "id": "",
+          "className": "meta-gamification-pill",
+          "position": "fixed",
+          "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+          "rect": {
+            "top": 742,
+            "left": 12,
+            "width": 366,
+            "height": 90
+          },
+          "visible": true
+        },
+        {
+          "tag": "button",
+          "id": "audio-master-mute-btn",
+          "className": "audio-mute-btn audio-master-mute-btn audio-fab audio-floating-control is-active",
+          "position": "fixed",
+          "text": "🔊צלילפעיל",
+          "rect": {
+            "top": 782,
+            "left": 268,
+            "width": 110,
+            "height": 50
+          },
+          "visible": true
+        }
+      ]
+    }
+  },
+  {
+    "device": "iphone13",
+    "route": "sentence-map",
+    "screenshotPath": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review\\iphone13-sentence-map.png",
+    "viewport": {
+      "title": "Meta Model - כלי תרגול שאול מטה מודל [v1.0.714]",
+      "activeTab": "sentence-map",
+      "scrollHeight": 2641,
+      "viewportHeight": 844,
+      "headings": [
+        {
+          "text": "מפת המשפט",
+          "top": 333
+        }
+      ],
+      "buttons": [
+        {
+          "text": "←",
+          "top": 175
+        },
+        {
+          "text": "⌂",
+          "top": 175
+        },
+        {
+          "text": "🔥10רצף ⭐48כוכבים רמה6",
+          "top": 751
+        },
+        {
+          "text": "🔊צלילפעיל",
+          "top": 700
+        },
+        {
+          "text": "יאללה, בואו נתחיל",
+          "top": 771
+        },
+        {
+          "text": "תפריט",
+          "top": 771
+        }
+      ],
+      "fixed": [
+        {
+          "tag": "section",
+          "id": "",
+          "className": "meta-gamification-pill",
+          "position": "fixed",
+          "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+          "rect": {
+            "top": 742,
+            "left": 12,
+            "width": 366,
+            "height": 90
+          },
+          "visible": true
+        },
+        {
+          "tag": "button",
+          "id": "audio-master-mute-btn",
+          "className": "audio-mute-btn audio-master-mute-btn audio-fab audio-floating-control is-active",
+          "position": "fixed",
+          "text": "🔊צלילפעיל",
+          "rect": {
+            "top": 700,
+            "left": 268,
+            "width": 110,
+            "height": 50
+          },
+          "visible": true
+        },
+        {
+          "tag": "div",
+          "id": "mobile-sticky-cta",
+          "className": "mobile-sticky-cta",
+          "position": "fixed",
+          "text": "יאללה, בואו נתחיל תפריט",
+          "rect": {
+            "top": 762,
+            "left": 10,
+            "width": 370,
+            "height": 72
+          },
+          "visible": true
+        }
+      ]
+    }
+  },
+  {
+    "device": "iphone13",
+    "route": "practice-question",
+    "screenshotPath": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review\\iphone13-practice-question.png",
+    "viewport": {
+      "title": "Meta Model - כלי תרגול שאול מטה מודל [v1.0.714]",
+      "activeTab": "practice-question",
+      "scrollHeight": 1438,
+      "viewportHeight": 844,
+      "headings": [
+        {
+          "text": "תרגול זיהוי",
+          "top": 175
+        }
+      ],
+      "buttons": [
+        {
+          "text": "←",
+          "top": 21
+        },
+        {
+          "text": "⌂",
+          "top": 21
+        },
+        {
+          "text": "🔥10רצף ⭐48כוכבים רמה6",
+          "top": 751
+        }
+      ],
+      "fixed": [
+        {
+          "tag": "section",
+          "id": "",
+          "className": "meta-gamification-pill",
+          "position": "fixed",
+          "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+          "rect": {
+            "top": 742,
+            "left": 12,
+            "width": 366,
+            "height": 90
+          },
+          "visible": true
+        }
+      ]
+    }
+  },
+  {
+    "device": "pixel7",
+    "route": "home",
+    "screenshotPath": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review\\pixel7-home.png",
+    "viewport": {
+      "title": "Meta Model - כלי תרגול שאול מטה מודל [v1.0.714]",
+      "activeTab": "home",
+      "scrollHeight": 915,
+      "viewportHeight": 915,
+      "headings": [
+        {
+          "text": "לשמוע משפט —ולראות מה מסתתר בתוכו",
+          "top": 344
+        },
+        {
+          "text": "האניפקפלופדיה של המטה מודל",
+          "top": 489
+        }
+      ],
+      "buttons": [
+        {
+          "text": "כל הכלים",
+          "top": 51
+        },
+        {
+          "text": "☰ תפריט",
+          "top": 111
+        },
+        {
+          "text": "פתחו אנציקלופדיה",
+          "top": 705
+        },
+        {
+          "text": "×",
+          "top": 24
+        },
+        {
+          "text": "🏠דף הבית",
+          "top": 62
+        },
+        {
+          "text": "📊הסטטיסטיקות שלי",
+          "top": 122
+        },
+        {
+          "text": "⚙️הגדרות כלליות",
+          "top": 182
+        },
+        {
+          "text": "❓עזרה",
+          "top": 242
+        },
+        {
+          "text": "🧠על המוצר",
+          "top": 327
+        },
+        {
+          "text": "📚מילון הקטגוריות",
+          "top": 387
+        },
+        {
+          "text": "🧰מרכז כלים",
+          "top": 447
+        },
+        {
+          "text": "🔥10רצף ⭐48כוכבים רמה6",
+          "top": 822
+        },
+        {
+          "text": "🔊צלילפעיל",
+          "top": 853
+        }
+      ],
+      "fixed": [
+        {
+          "tag": "section",
+          "id": "",
+          "className": "meta-gamification-pill",
+          "position": "fixed",
+          "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+          "rect": {
+            "top": 813,
+            "left": 12,
+            "width": 388,
+            "height": 90
+          },
+          "visible": true
+        },
+        {
+          "tag": "button",
+          "id": "audio-master-mute-btn",
+          "className": "audio-mute-btn audio-master-mute-btn audio-fab audio-floating-control is-active",
+          "position": "fixed",
+          "text": "🔊צלילפעיל",
+          "rect": {
+            "top": 853,
+            "left": 290,
+            "width": 110,
+            "height": 50
+          },
+          "visible": true
+        }
+      ]
+    }
+  },
+  {
+    "device": "pixel7",
+    "route": "categories",
+    "screenshotPath": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review\\pixel7-categories.png",
+    "viewport": {
+      "title": "Meta Model - כלי תרגול שאול מטה מודל [v1.0.714]",
+      "activeTab": "categories",
+      "scrollHeight": 5156,
+      "viewportHeight": 915,
+      "headings": [
+        {
+          "text": "מילון קטגוריות המטה-מודל",
+          "top": 101
+        },
+        {
+          "text": "מה יש כאן",
+          "top": 254
+        },
+        {
+          "text": "איך מתחילים",
+          "top": 516
+        }
+      ],
+      "buttons": [
+        {
+          "text": "←",
+          "top": 17
+        },
+        {
+          "text": "⌂",
+          "top": 17
+        },
+        {
+          "text": "↺",
+          "top": 17
+        },
+        {
+          "text": "⋯",
+          "top": 17
+        },
+        {
+          "text": "🔥10רצף ⭐48כוכבים רמה6",
+          "top": 822
+        },
+        {
+          "text": "🔊צלילפעיל",
+          "top": 853
+        }
+      ],
+      "fixed": [
+        {
+          "tag": "section",
+          "id": "",
+          "className": "meta-gamification-pill",
+          "position": "fixed",
+          "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+          "rect": {
+            "top": 813,
+            "left": 12,
+            "width": 388,
+            "height": 90
+          },
+          "visible": true
+        },
+        {
+          "tag": "button",
+          "id": "audio-master-mute-btn",
+          "className": "audio-mute-btn audio-master-mute-btn audio-fab audio-floating-control is-active",
+          "position": "fixed",
+          "text": "🔊צלילפעיל",
+          "rect": {
+            "top": 853,
+            "left": 290,
+            "width": 110,
+            "height": 50
+          },
+          "visible": true
+        }
+      ]
+    }
+  },
+  {
+    "device": "pixel7",
+    "route": "sentence-map",
+    "screenshotPath": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review\\pixel7-sentence-map.png",
+    "viewport": {
+      "title": "Meta Model - כלי תרגול שאול מטה מודל [v1.0.714]",
+      "activeTab": "sentence-map",
+      "scrollHeight": 2725,
+      "viewportHeight": 915,
+      "headings": [
+        {
+          "text": "מפת המשפט",
+          "top": 339
+        }
+      ],
+      "buttons": [
+        {
+          "text": "←",
+          "top": 175
+        },
+        {
+          "text": "⌂",
+          "top": 175
+        },
+        {
+          "text": "🔥10רצף ⭐48כוכבים רמה6",
+          "top": 822
+        },
+        {
+          "text": "🔊צלילפעיל",
+          "top": 771
+        },
+        {
+          "text": "יאללה, בואו נתחיל",
+          "top": 842
+        },
+        {
+          "text": "תפריט",
+          "top": 842
+        }
+      ],
+      "fixed": [
+        {
+          "tag": "section",
+          "id": "",
+          "className": "meta-gamification-pill",
+          "position": "fixed",
+          "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+          "rect": {
+            "top": 813,
+            "left": 12,
+            "width": 388,
+            "height": 90
+          },
+          "visible": true
+        },
+        {
+          "tag": "button",
+          "id": "audio-master-mute-btn",
+          "className": "audio-mute-btn audio-master-mute-btn audio-fab audio-floating-control is-active",
+          "position": "fixed",
+          "text": "🔊צלילפעיל",
+          "rect": {
+            "top": 771,
+            "left": 290,
+            "width": 110,
+            "height": 50
+          },
+          "visible": true
+        },
+        {
+          "tag": "div",
+          "id": "mobile-sticky-cta",
+          "className": "mobile-sticky-cta",
+          "position": "fixed",
+          "text": "יאללה, בואו נתחיל תפריט",
+          "rect": {
+            "top": 833,
+            "left": 10,
+            "width": 392,
+            "height": 72
+          },
+          "visible": true
+        }
+      ]
+    }
+  },
+  {
+    "device": "pixel7",
+    "route": "practice-question",
+    "screenshotPath": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review\\pixel7-practice-question.png",
+    "viewport": {
+      "title": "Meta Model - כלי תרגול שאול מטה מודל [v1.0.714]",
+      "activeTab": "practice-question",
+      "scrollHeight": 1403,
+      "viewportHeight": 915,
+      "headings": [
+        {
+          "text": "תרגול זיהוי",
+          "top": 181
+        }
+      ],
+      "buttons": [
+        {
+          "text": "←",
+          "top": 21
+        },
+        {
+          "text": "⌂",
+          "top": 21
+        },
+        {
+          "text": "🔥10רצף ⭐48כוכבים רמה6",
+          "top": 822
+        }
+      ],
+      "fixed": [
+        {
+          "tag": "section",
+          "id": "",
+          "className": "meta-gamification-pill",
+          "position": "fixed",
+          "text": "🔥10רצף ⭐48כוכבים רמה6 רמה 6 פורץ גבולות · 900 ני״ק · 48 כוכבים 🗺️ מפת המשפט ⭐ 8 🧩 תרגול זיהוי ⭐ 10 📡 מכ״ם שלשות ⭐ 7 ",
+          "rect": {
+            "top": 813,
+            "left": 12,
+            "width": 388,
+            "height": 90
+          },
+          "visible": true
+        }
+      ]
+    }
+  }
+]

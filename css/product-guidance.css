@@ -491,6 +491,28 @@ body[data-product-guidance-screen="play"] [data-product-guidance-welcome] {
         margin-bottom: 10px;
     }
 
+    .tab-content [data-product-guidance].product-feature-guidance {
+        gap: 10px;
+        margin-bottom: 12px;
+        padding: 12px 14px;
+        border-radius: 18px;
+    }
+
+    .tab-content [data-product-guidance].product-feature-guidance .product-orientation__actions,
+    .tab-content [data-product-guidance].product-feature-guidance .product-intro__grid,
+    .tab-content [data-product-guidance].product-feature-guidance .product-intro__example {
+        display: none;
+    }
+
+    .tab-content [data-product-guidance].product-feature-guidance .product-intro {
+        gap: 8px;
+    }
+
+    .tab-content [data-product-guidance].product-feature-guidance .product-intro__head p {
+        font-size: 0.88rem;
+        line-height: 1.55;
+    }
+
     .product-orientation {
         align-items: stretch;
     }

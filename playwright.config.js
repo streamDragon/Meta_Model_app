@@ -1,7 +1,7 @@
 const { defineConfig, devices } = require('playwright/test');
 
 const HOST = process.env.PLAYWRIGHT_BASE_HOST || '127.0.0.1';
-const PORT = process.env.PLAYWRIGHT_BASE_PORT || '4173';
+const PORT = process.env.PLAYWRIGHT_BASE_PORT || '4273';
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || `http://${HOST}:${PORT}`;
 
 module.exports = defineConfig({
@@ -20,7 +20,7 @@ module.exports = defineConfig({
     : {
         command: `npm run dev -- --host ${HOST} --port ${PORT} --strictPort`,
         url: baseURL,
-        reuseExistingServer: !process.env.CI,
+        reuseExistingServer: false,
         timeout: 120_000,
       },
   projects: [
