@@ -108,6 +108,92 @@
         return RECOMMENDATIONS.advanced_other;
     }
 
+    function navigateToRecommendation(rec) {
+        if (!rec) return;
+
+        if (rec.href) {
+            var targetHref = (typeof window.__withAssetVersion === 'function')
+                ? window.__withAssetVersion(rec.href)
+                : rec.href;
+            window.location.href = targetHref;
+            return;
+        }
+
+        if (rec.navKey && typeof window.navigateByNavKey === 'function') {
+            if (window.navigateByNavKey(rec.navKey, { versioned: true, featureEntry: 'welcome' }) !== false) {
+                return;
+            }
+        }
+
+        if (rec.navKey && typeof window.navigateTo === 'function') {
+            var navKeyToTab = {
+                practiceWizard:       'practice-wizard',
+                practiceQuestion:     'practice-question',
+                practiceTriplesRadar: 'practice-triples-radar',
+                prismLab:             'prismlab',
+                categories:           'categories'
+            };
+            var tabId = navKeyToTab[rec.navKey];
+            if (tabId) window.navigateTo(tabId, { featureEntry: 'welcome' });
+        }
+    }
+
+    function syncChoiceSelections() {
+        if (!overlay) return;
+
+        overlay.querySelectorAll('[data-ob-step="1"] .mm-ob-choice').forEach(function (btn) {
+            btn.classList.toggle('is-selected', btn.getAttribute('data-role') === selectedRole);
+        });
+
+        overlay.querySelectorAll('[data-ob-step="2"] .mm-ob-choice').forEach(function (btn) {
+            btn.classList.toggle('is-selected', btn.getAttribute('data-level') === selectedLevel);
+        });
+    }
+
+    function resetToStep(step) {
+        if (!overlay) return;
+
+        currentStep = step;
+        overlay.querySelectorAll('.mm-ob-step').forEach(function (stepNode) {
+            var nodeStep = Number(stepNode.getAttribute('data-ob-step') || '0');
+            stepNode.hidden = nodeStep !== step;
+            stepNode.classList.remove('is-leaving');
+        });
+        updateDots(step);
+    }
+
+    function showOverlay(startStep) {
+        if (!overlay) return;
+
+        var step = startStep || 1;
+        resetToStep(step);
+        syncChoiceSelections();
+        overlay.hidden = false;
+        overlay.setAttribute('aria-hidden', 'false');
+        overlay.classList.remove('is-exiting');
+        void overlay.offsetHeight;
+        overlay.classList.add('is-visible');
+    }
+
+    function closeOverlay(onClosed) {
+        if (!overlay) return;
+
+        overlay.classList.add('is-exiting');
+        setTimeout(function () {
+            overlay.hidden = true;
+            overlay.setAttribute('aria-hidden', 'true');
+            overlay.classList.remove('is-exiting', 'is-visible');
+            if (typeof onClosed === 'function') onClosed();
+        }, 480);
+    }
+
+    function reopenOnboarding(profile) {
+        var safeProfile = profile && typeof profile === 'object' ? profile : getProfile() || {};
+        selectedRole = safeProfile.role || null;
+        selectedLevel = safeProfile.level || null;
+        showOverlay(1);
+    }
+
     /* ── Progress dots ── */
     function updateDots(step) {
         var dots = overlay.querySelectorAll('.mm-ob-dot');
@@ -155,51 +241,32 @@
     function launchAndClose(role, level) {
         var rec = getRecommendation(role, level);
         setDismissed();
-        overlay.classList.add('is-exiting');
-        setTimeout(function () {
-            overlay.hidden = true;
-            overlay.setAttribute('aria-hidden', 'true');
-            overlay.classList.remove('is-exiting', 'is-visible');
+        closeOverlay(function () {
             injectGreetingBar(role, level);
-            // Navigate to recommended tool
-            if (rec.href) {
-                // Use versioned asset URL helper if available to avoid relative-path 404s
-                var targetHref = (typeof window.__withAssetVersion === 'function')
-                    ? window.__withAssetVersion(rec.href)
-                    : rec.href;
-                window.location.href = targetHref;
-            } else if (rec.navKey && typeof window.navigateByNavKey === 'function') {
-                window.navigateByNavKey(rec.navKey);
-            } else if (rec.navKey && typeof window.navigateTo === 'function') {
-                // navKey to tabId mapping
-                var navKeyToTab = {
-                    practiceWizard:       'practice-wizard',
-                    practiceQuestion:     'practice-question',
-                    practiceTriplesRadar: 'practice-triples-radar',
-                    prismLab:             'prismlab',
-                    categories:           'categories'
-                };
-                var tabId = navKeyToTab[rec.navKey];
-                if (tabId) window.navigateTo(tabId);
-            }
-        }, 480);
+            navigateToRecommendation(rec);
+        });
     }
 
     function exploreAndClose() {
         setDismissed();
-        overlay.classList.add('is-exiting');
-        setTimeout(function () {
-            overlay.hidden = true;
-            overlay.setAttribute('aria-hidden', 'true');
-            overlay.classList.remove('is-exiting', 'is-visible');
+        closeOverlay(function () {
+            var profile = getProfile();
+            if (profile && profile.role && profile.level && currentStep < 3) {
+                injectGreetingBar(profile.role, profile.level);
+                return;
+            }
             if (selectedRole && selectedLevel) {
                 injectGreetingBar(selectedRole, selectedLevel);
+                return;
             }
-        }, 480);
+            if (profile && profile.role && profile.level) {
+                injectGreetingBar(profile.role, profile.level);
+            }
+        });
     }
 
     /* ── Greeting bar ── */
-    function injectGreetingBar(role, level) {
+    function legacyInjectGreetingBar(role, level) {
         var roleMeta  = ROLE_LABELS[role]  || { label: role,   emoji: '✨' };
         var levelMeta = LEVEL_LABELS[level] || level;
         var homeSection = document.getElementById('home');
@@ -226,6 +293,42 @@
             try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
             clearDismissed();
             bar.remove();
+        });
+    }
+
+    function injectGreetingBar(role, level) {
+        var roleMeta = ROLE_LABELS[role] || { label: role, emoji: '✨' };
+        var levelMeta = LEVEL_LABELS[level] || level;
+        var rec = getRecommendation(role, level);
+        var homeSection = document.getElementById('home');
+        if (!homeSection) return;
+
+        var existing = document.getElementById('mm-home-greeting');
+        if (existing) existing.remove();
+
+        var bar = document.createElement('div');
+        bar.id = 'mm-home-greeting';
+        bar.className = 'mm-home-greeting is-visible';
+        bar.setAttribute('aria-label', 'ברכת כניסה');
+        bar.innerHTML =
+            '<span class="mm-home-greeting-emoji">' + roleMeta.emoji + '</span>' +
+            '<div class="mm-home-greeting-text">' +
+                '<strong>המשך/י כ' + roleMeta.label + '</strong>' +
+                '<small>' + levelMeta + ' | ' + rec.name + '</small>' +
+            '</div>' +
+            '<div class="mm-home-greeting-actions">' +
+                '<button class="mm-home-greeting-continue" type="button" aria-label="המשך למסלול המומלץ">המשך/י עכשיו</button>' +
+                '<button class="mm-home-greeting-reset" type="button" aria-label="שינוי בחירה">שינוי</button>' +
+            '</div>';
+
+        homeSection.insertAdjacentElement('afterbegin', bar);
+
+        bar.querySelector('.mm-home-greeting-continue').addEventListener('click', function () {
+            navigateToRecommendation(rec);
+        });
+
+        bar.querySelector('.mm-home-greeting-reset').addEventListener('click', function () {
+            reopenOnboarding({ role: role, level: level });
         });
     }
 
@@ -305,7 +408,7 @@
     }
 
     /* ── Init ── */
-    function init() {
+    function legacyInitUnused() {
         overlay = document.getElementById('mm-onboarding');
         if (!overlay) return;
         overlay.hidden = true;
@@ -335,6 +438,33 @@
             // Force reflow before adding is-visible for CSS transition
             void overlay.offsetHeight;
             overlay.classList.add('is-visible');
+        }, SPLASH_DURATION_MS);
+    }
+
+    function init() {
+        overlay = document.getElementById('mm-onboarding');
+        if (!overlay) return;
+        overlay.hidden = true;
+        overlay.setAttribute('aria-hidden', 'true');
+
+        wireStep1();
+        wireStep2();
+        wireStep3();
+        wireDismissActions();
+        updateDots(1);
+
+        var profile = getProfile();
+        if (profile && profile.role && profile.level) {
+            showReturningGreeting(profile);
+            return;
+        }
+
+        if (isDismissed()) {
+            return;
+        }
+
+        setTimeout(function () {
+            showOverlay(1);
         }, SPLASH_DURATION_MS);
     }
 

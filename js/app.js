@@ -718,31 +718,62 @@ function isOpeningTrackPlaying() {
     return !!(track && !track.paused && !track.ended);
 }
 
+function setAudioFabContent(btn, options = {}) {
+    if (!btn) return;
+
+    const icon = String(options.icon || '');
+    const label = String(options.label || '');
+    const stateText = String(options.stateText || '').trim();
+    btn.innerHTML = `<span class="audio-fab-icon" aria-hidden="true">${icon}</span><span class="audio-fab-copy"><span class="audio-fab-label">${label}</span>${stateText ? `<span class="audio-fab-state">${stateText}</span>` : ''}</span>`;
+    btn.setAttribute('aria-label', String(options.ariaLabel || label || stateText));
+    btn.setAttribute('title', String(options.title || options.ariaLabel || stateText || label));
+    btn.setAttribute('aria-pressed', options.pressed ? 'true' : 'false');
+    btn.setAttribute('data-audio-state', String(options.state || 'idle'));
+}
+
 function updateMusicToggleButtonUI() {
     const btn = document.getElementById('music-toggle-btn');
     if (!btn) return;
 
     if (audioState.muted) {
-        btn.innerHTML = '<span class="audio-fab-icon">🔇</span><span class="audio-fab-label">מיוט</span>';
-        btn.setAttribute('aria-label', 'בטל מיוט ונגן שיר אקראי ל-30 שניות');
-        btn.setAttribute('title', 'בטל מיוט ונגן שיר אקראי ל-30 שניות');
+        setAudioFabContent(btn, {
+            icon: '🔇',
+            label: 'מוזיקה',
+            stateText: 'צליל כבוי',
+            ariaLabel: 'צליל כבוי. לחצו להפעלת צליל ומוזיקת פתיחה',
+            title: 'צליל כבוי',
+            pressed: false,
+            state: 'muted'
+        });
         btn.classList.add('is-muted');
         btn.classList.remove('is-playing');
         return;
     }
 
     if (isOpeningTrackPlaying()) {
-        btn.innerHTML = '<span class="audio-fab-icon">⏹</span><span class="audio-fab-label">עצור</span>';
-        btn.setAttribute('aria-label', 'עצור שיר');
-        btn.setAttribute('title', 'עצור שיר');
+        setAudioFabContent(btn, {
+            icon: '🎵',
+            label: 'מוזיקה',
+            stateText: 'פועלת',
+            ariaLabel: 'מוזיקה פועלת. לחצו לעצירה',
+            title: 'מוזיקה פועלת',
+            pressed: true,
+            state: 'playing'
+        });
         btn.classList.add('is-playing');
         btn.classList.remove('is-muted');
         return;
     }
 
-    btn.innerHTML = '<span class="audio-fab-icon">🎵</span><span class="audio-fab-label">רנדום</span>';
-    btn.setAttribute('aria-label', 'נגן שיר אקראי ל-30 שניות');
-    btn.setAttribute('title', 'נגן שיר אקראי ל-30 שניות');
+    setAudioFabContent(btn, {
+        icon: '🎵',
+        label: 'מוזיקה',
+        stateText: 'הפעל',
+        ariaLabel: 'הפעלת מוזיקת פתיחה',
+        title: 'הפעלת מוזיקת פתיחה',
+        pressed: false,
+        state: 'idle'
+    });
     btn.classList.remove('is-playing', 'is-muted');
 }
 
@@ -750,17 +781,29 @@ function updateFloatingMuteButtonUI() {
     const btn = document.getElementById('audio-master-mute-btn');
     if (!btn) return;
     if (audioState.muted) {
-        btn.innerHTML = '<span class="audio-fab-icon">🔇</span><span class="audio-fab-label">שקט</span>';
-        btn.setAttribute('aria-label', 'הפעל סאונד');
-        btn.setAttribute('title', 'הפעל סאונד');
+        setAudioFabContent(btn, {
+            icon: '🔇',
+            label: 'צליל',
+            stateText: 'כבוי',
+            ariaLabel: 'צליל כבוי. לחצו להפעלה',
+            title: 'צליל כבוי',
+            pressed: true,
+            state: 'muted'
+        });
         btn.classList.add('is-muted');
         btn.classList.remove('is-active');
         return;
     }
 
-    btn.innerHTML = '<span class="audio-fab-icon">🔊</span><span class="audio-fab-label">צליל</span>';
-    btn.setAttribute('aria-label', 'השתק סאונד');
-    btn.setAttribute('title', 'השתק סאונד');
+    setAudioFabContent(btn, {
+        icon: '🔊',
+        label: 'צליל',
+        stateText: 'פעיל',
+        ariaLabel: 'צליל פעיל. לחצו לכיבוי',
+        title: 'צליל פעיל',
+        pressed: false,
+        state: 'active'
+    });
     btn.classList.add('is-active');
     btn.classList.remove('is-muted');
 }
@@ -3628,7 +3671,9 @@ function updateHomeLobbyMuteToggleLabel() {
     if (!toggle) return;
     const muted = Boolean(audioState.muted);
     toggle.setAttribute('aria-pressed', muted ? 'true' : 'false');
-    toggle.textContent = muted ? 'צלילים: כבוי' : 'צלילים: פעיל';
+    toggle.setAttribute('aria-label', muted ? 'צליל כבוי. לחצו להפעלה' : 'צליל פעיל. לחצו לכיבוי');
+    toggle.setAttribute('title', muted ? 'צליל כבוי' : 'צליל פעיל');
+    toggle.textContent = muted ? 'צליל כבוי' : 'צליל פעיל';
 }
 
 function triggerHomeLobbyDemoConfetti(confettiRoot) {

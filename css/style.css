@@ -11113,15 +11113,15 @@ a:hover {
 
 .audio-fab {
     position: fixed;
-    width: 92px;
+    min-width: 92px;
     height: 56px;
-    padding: 0 10px;
+    padding: 0 14px;
     border: 0;
     border-radius: 999px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 10px;
     font-weight: 700;
     letter-spacing: 0.02em;
     touch-action: manipulation;
@@ -11143,6 +11143,24 @@ a:hover {
     white-space: nowrap;
 }
 
+.audio-fab-copy {
+    display: grid;
+    gap: 2px;
+    text-align: right;
+}
+
+.audio-fab-state {
+    font-size: 0.68rem;
+    line-height: 1;
+    white-space: nowrap;
+    opacity: 0.88;
+}
+
+.audio-fab:focus-visible {
+    outline: 3px solid rgba(219, 234, 254, 0.7);
+    outline-offset: 3px;
+}
+
 .audio-fab.is-dragging {
     cursor: grabbing;
     transform: scale(1.04);
@@ -11156,9 +11174,9 @@ a:hover {
 .music-toggle-btn {
     right: calc(16px + var(--safe-right));
     bottom: calc(16px + var(--safe-bottom) + var(--audio-floating-bottom-offset, 0px));
-    background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+    background: linear-gradient(135deg, #0f3d64, #0ea5e9);
     color: #fff;
-    box-shadow: 0 11px 26px rgba(14, 116, 144, 0.34);
+    box-shadow: 0 11px 24px rgba(14, 116, 144, 0.26);
 }
 
 .music-toggle-btn:hover {
@@ -11167,18 +11185,19 @@ a:hover {
 }
 
 .music-toggle-btn.is-playing {
-    background: linear-gradient(135deg, #dc2626, #ef4444);
-    box-shadow: 0 12px 28px rgba(239, 68, 68, 0.34);
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
+    box-shadow: 0 12px 28px rgba(20, 184, 166, 0.28);
 }
 
 .music-toggle-btn.is-muted {
-    background: linear-gradient(135deg, #334155, #64748b);
-    box-shadow: 0 10px 24px rgba(100, 116, 139, 0.35);
+    background: linear-gradient(135deg, #475569, #64748b);
+    box-shadow: 0 10px 22px rgba(100, 116, 139, 0.24);
 }
 
 .audio-master-mute-btn {
     right: calc(116px + var(--safe-right));
     bottom: calc(16px + var(--safe-bottom) + var(--audio-floating-bottom-offset, 0px));
+    min-width: 108px;
     background: linear-gradient(135deg, #0f766e, #14b8a6);
     color: #ffffff;
     box-shadow: 0 11px 26px rgba(13, 148, 136, 0.34);
@@ -11200,9 +11219,9 @@ a:hover {
 
 @media (max-width: 768px) {
     .audio-fab {
-        width: 56px;
+        min-width: 56px;
         height: 50px;
-        padding: 0 6px;
+        padding: 0 10px;
         border-radius: 16px;
         touch-action: manipulation;
     }
@@ -11211,7 +11230,8 @@ a:hover {
         font-size: 1rem;
     }
 
-    .audio-fab-label {
+    .audio-fab-label,
+    .audio-fab-state {
         display: none;
     }
 
@@ -11220,8 +11240,14 @@ a:hover {
     }
 
     .audio-master-mute-btn {
+        min-width: 110px;
         right: calc(12px + var(--safe-right));
         bottom: calc(12px + var(--safe-bottom) + var(--audio-floating-bottom-offset, 0px));
+    }
+
+    .audio-master-mute-btn .audio-fab-label,
+    .audio-master-mute-btn .audio-fab-state {
+        display: block;
     }
 }
 
