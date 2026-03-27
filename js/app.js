@@ -2764,14 +2764,20 @@ function applyInitialTabPreference() {
     const routeTab = getCurrentRouteTabFromPathname(window.location.pathname || '/');
     const blockedDebugRoute = routeTab === 'debug' && !isDebugRouteEnabled();
 
-    // On a fresh browser session (tab just opened or browser restarted), always start at
-    // the home screen. On a page refresh within the same session, honour the current URL.
-    // sessionStorage is cleared when the tab/window is closed, so it distinguishes
-    // "re-open app" (fresh session → home) from "F5 refresh" (same session → keep tab).
+    // Keep explicit feature/debug entry routes even on a fresh session so direct links
+    // and saved continuation URLs can open into the intended feature. Bare app opens
+    // still default to home on a fresh session.
     const isPageRefresh = sessionStorage.getItem(META_SESSION_KEY) === 'true';
     sessionStorage.setItem(META_SESSION_KEY, 'true');
 
-    const targetTab = (!isPageRefresh || blockedDebugRoute) ? 'home' : resolveInitialRouteTab();
+    const params = new URLSearchParams(window.location.search);
+    const legacyTab = normalizeRequestedTab(params.get('tab') || '');
+    const hasExplicitEntry =
+        (!!routeTab && routeTab !== 'home' && !!document.getElementById(routeTab)) ||
+        (!!legacyTab && legacyTab !== 'home' && !!document.getElementById(legacyTab));
+    const targetTab = blockedDebugRoute
+        ? 'home'
+        : (isPageRefresh || hasExplicitEntry ? resolveInitialRouteTab() : 'home');
 
     persistPracticeTabPreference(targetTab);
     navigateTo(targetTab, {

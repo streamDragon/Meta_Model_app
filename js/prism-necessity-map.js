@@ -614,6 +614,8 @@
             reminderOpen: false,
             filter: 'all',
             insightOpen: false,
+            mapExpanded: false,
+            insightMapExpanded: false,
             scrollToTop: false,
             initialRouteState: readInitialRouteState()
         };
@@ -678,6 +680,8 @@
     function startLab(state) {
         state.stage = 'categories';
         state.insightOpen = false;
+        state.mapExpanded = false;
+        state.insightMapExpanded = false;
         state.scrollToTop = true;
         return true;
     }
@@ -687,6 +691,8 @@
         state.stage = 'landing';
         state.workspaceMode = 'preview';
         state.insightOpen = false;
+        state.mapExpanded = false;
+        state.insightMapExpanded = false;
         state.scrollToTop = true;
         return true;
     }
@@ -695,6 +701,8 @@
         state.stage = 'categories';
         state.workspaceMode = 'preview';
         state.insightOpen = false;
+        state.mapExpanded = false;
+        state.insightMapExpanded = false;
         state.scrollToTop = true;
         return true;
     }
@@ -705,8 +713,10 @@
         state.selectedPatternId = pattern.id;
         state.sessionIndex = 0;
         state.revealedCount = 0;
-        state.workspaceMode = 'exercise';
+        state.workspaceMode = 'preview';
         state.insightOpen = false;
+        state.mapExpanded = false;
+        state.insightMapExpanded = false;
         state.stage = 'workspace';
         state.scrollToTop = true;
         return true;
@@ -720,6 +730,8 @@
         state.revealedCount = 0;
         state.workspaceMode = 'preview';
         state.insightOpen = false;
+        state.mapExpanded = false;
+        state.insightMapExpanded = false;
         state.stage = 'workspace';
         state.scrollToTop = true;
         return true;
@@ -729,6 +741,8 @@
         if (!state.selectedPatternId) return false;
         state.workspaceMode = 'preview';
         state.insightOpen = false;
+        state.mapExpanded = false;
+        state.insightMapExpanded = false;
         state.stage = 'workspace';
         state.scrollToTop = true;
         return true;
@@ -738,6 +752,8 @@
         if (!state.selectedPatternId) return false;
         state.workspaceMode = 'exercise';
         state.insightOpen = false;
+        state.mapExpanded = false;
+        state.insightMapExpanded = false;
         state.stage = 'workspace';
         state.scrollToTop = true;
         return true;
@@ -767,6 +783,8 @@
         state.workspaceMode = 'exercise';
         state.revealedCount = 0;
         state.insightOpen = false;
+        state.mapExpanded = false;
+        state.insightMapExpanded = false;
         state.scrollToTop = true;
         return true;
     }
@@ -774,12 +792,24 @@
     function openInsight(state) {
         if (!isSessionComplete(state)) return false;
         state.insightOpen = true;
+        state.insightMapExpanded = false;
         return true;
     }
 
     function closeInsight(state) {
         if (!state.insightOpen) return false;
         state.insightOpen = false;
+        state.insightMapExpanded = false;
+        return true;
+    }
+
+    function toggleMapExpanded(state) {
+        state.mapExpanded = !state.mapExpanded;
+        return true;
+    }
+
+    function toggleInsightMapExpanded(state) {
+        state.insightMapExpanded = !state.insightMapExpanded;
         return true;
     }
 
@@ -806,6 +836,8 @@
         state.revealedCount = 0;
         state.workspaceMode = 'preview';
         state.insightOpen = false;
+        state.mapExpanded = false;
+        state.insightMapExpanded = false;
         state.scrollToTop = true;
         return true;
     }
@@ -854,6 +886,8 @@
         state.reminderOpen = false;
         state.filter = 'all';
         state.insightOpen = false;
+        state.mapExpanded = false;
+        state.insightMapExpanded = false;
         state.scrollToTop = true;
         return true;
     }
@@ -934,6 +968,38 @@
             steps[1].label = 'מעבדה';
             steps[1].enabled = selectedPattern && currentIndex >= 0;
         }
+
+        return `
+            <nav class="pnm-progress-rail" aria-label="שלבי התרגול">
+                ${steps.map((step) => `
+                    <button type="button" class="pnm-progress-step${currentStep === step.id ? ' is-current' : ''}${step.enabled ? ' is-enabled' : ''}" data-action="go-step" data-step="${escapeHtml(step.id)}" ${step.enabled ? '' : 'disabled'} aria-current="${currentStep === step.id ? 'step' : 'false'}">
+                        <span class="pnm-progress-step__index">${step.index}</span>
+                        <span class="pnm-progress-step__label">${escapeHtml(step.label)}</span>
+                    </button>
+                `).join('')}
+            </nav>
+        `;
+    }
+
+    function renderProgressRail(state) {
+        const currentStep = getCurrentProgressStep(state);
+        const stepOrder = usesStandaloneLanding(state)
+            ? ['landing', 'categories', 'preview', 'exercise']
+            : ['categories', 'preview', 'exercise'];
+        const currentIndex = Math.max(0, stepOrder.indexOf(currentStep));
+        const selectedPattern = !!state.selectedPatternId;
+        const steps = usesStandaloneLanding(state)
+            ? [
+                { id: 'landing', index: 1, label: 'כניסה', enabled: true },
+                { id: 'categories', index: 2, label: 'ספרייה', enabled: true },
+                { id: 'preview', index: 3, label: 'פתיח', enabled: selectedPattern && currentIndex >= 1 },
+                { id: 'exercise', index: 4, label: 'מעבדה', enabled: selectedPattern && currentIndex >= 2 }
+            ]
+            : [
+                { id: 'categories', index: 1, label: 'ספרייה', enabled: true },
+                { id: 'preview', index: 2, label: 'פתיח', enabled: selectedPattern },
+                { id: 'exercise', index: 3, label: 'מעבדה', enabled: selectedPattern && currentIndex >= 1 }
+            ];
 
         return `
             <nav class="pnm-progress-rail" aria-label="שלבי התרגול">
@@ -1683,6 +1749,366 @@
         `;
     }
 
+    function renderLibraryLead() {
+        return `
+            <article class="pnm-card pnm-library-lead">
+                <div class="pnm-library-lead__copy">
+                    <span class="pnm-eyebrow">Prism Lab</span>
+                    <h1>בחרו תבנית, עברו פתיח קצר, ואז היכנסו למעבדה</h1>
+                    <p>הספרייה כאן כדי להכניס אתכם מהר אל התבנית הנכונה. כל בחירה נפתחת קודם למסך פתיחה קצר עם שאלת המפתח, משפט הדוגמה, ומה בדיוק תעשו שם.</p>
+                    <div class="pnm-chip-row">
+                        <span class="pnm-chip">${PATTERN_CATALOG.length} תבניות</span>
+                        <span class="pnm-chip">${FAMILY_ORDER.length} משפחות</span>
+                        <span class="pnm-chip">פתיח לפני המעבדה</span>
+                    </div>
+                </div>
+                <div class="pnm-library-lead__visual">
+                    ${renderHeroImage()}
+                    <div class="pnm-library-lead__signal">
+                        <span class="pnm-eyebrow">מה יוצא מהעבודה</span>
+                        <strong>גרעין • סדק • פאנץ׳</strong>
+                        <p>תבנית אחת, שאלה חיה אחת, ותנועה ברורה עד רגע התובנה.</p>
+                    </div>
+                </div>
+            </article>
+        `;
+    }
+
+    function renderOutcomeChipRow(session, detailed = true) {
+        const coreLabel = detailed && session ? `גרעין · ${getCurrentLevelLabel(session.core)}` : 'גרעין';
+        const crackLabel = detailed && session ? `סדק · ${getCurrentLevelLabel(session.crack)}` : 'סדק';
+        return `
+            <div class="pnm-chip-row pnm-chip-row--outcome">
+                <span class="pnm-chip pnm-chip--core">${escapeHtml(coreLabel)}</span>
+                <span class="pnm-chip pnm-chip--crack">${escapeHtml(crackLabel)}</span>
+                <span class="pnm-chip pnm-chip--punch">פאנץ׳</span>
+            </div>
+        `;
+    }
+
+    function renderPreviewChecklist() {
+        const items = [
+            'תזהו את התבנית במשפט שבמוקד.',
+            'תעברו שאלה אחת בכל פעם דרך הרמות.',
+            'תסיימו ברגע תובנה עם גרעין, סדק ופאנץ׳.'
+        ];
+
+        return `
+            <div class="pnm-preview-list" aria-label="מה עושים כאן">
+                ${items.map((item, index) => `
+                    <div class="pnm-preview-list__item">
+                        <span class="pnm-preview-list__index">${index + 1}</span>
+                        <p>${escapeHtml(item)}</p>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    function renderMapContent(session, filledCount, reflectMode = false) {
+        return `
+            <div class="pnm-section-head pnm-section-head--compact">
+                <div>
+                    <span class="pnm-eyebrow">מפת הרמות</span>
+                    <h3>מה קורה בחוץ, ומה נהיה בפנים</h3>
+                </div>
+            </div>
+            <div class="pnm-map-grid">
+                <div class="pnm-map-grid__head">
+                    <strong>${escapeHtml(session.sideALabel)}</strong>
+                    <span>רמה לוגית</span>
+                    <strong>${escapeHtml(session.sideBLabel)}</strong>
+                </div>
+                ${session.rows.map((row) => {
+                    const level = LEVEL_META[row.levelId];
+                    const rowClass = ['pnm-map-row', session.core === row.levelId ? 'is-core' : '', session.crack === row.levelId ? 'is-crack' : '']
+                        .filter(Boolean)
+                        .join(' ');
+
+                    return `
+                        <div class="${rowClass}" style="--pnm-level:${escapeHtml(level.color)}">
+                            ${renderMapCell(row.a, filledCount, reflectMode)}
+                            <div class="pnm-map-row__level">
+                                <strong>${escapeHtml(level.label)}</strong>
+                                <small>${escapeHtml(level.question)}</small>
+                                ${session.core === row.levelId ? '<span class="pnm-row-marker pnm-row-marker--core">הגרעין</span>' : ''}
+                                ${session.crack === row.levelId ? '<span class="pnm-row-marker pnm-row-marker--crack">הסדק</span>' : ''}
+                            </div>
+                            ${renderMapCell(row.b, filledCount, reflectMode)}
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    function renderMapPeek(session, filledCount) {
+        const activeQuestion = session.questions[filledCount] || null;
+        const summary = activeQuestion
+            ? `נחשפו ${filledCount} מתוך ${session.questions.length} תאים. התא הבא: ${getCurrentLevelShortLabel(activeQuestion.levelId)} · ${getSideTitle(session, activeQuestion.side)}.`
+            : 'כל התאים פתוחים. אפשר לפתוח את המפה המלאה או לעבור לתובנה.';
+
+        return `
+            <div class="pnm-map-panel__summary">
+                <p>${escapeHtml(summary)}</p>
+            </div>
+        `;
+    }
+
+    function renderExerciseMapPanel(state, session, filledCount) {
+        return `
+            <article class="pnm-card pnm-map-panel">
+                <button type="button" class="pnm-toggle-line" data-action="toggle-map" aria-expanded="${state.mapExpanded ? 'true' : 'false'}">
+                    <span>מפה מלאה</span>
+                    <strong>${state.mapExpanded ? 'סגור' : 'פתח'}</strong>
+                </button>
+                ${state.mapExpanded
+                    ? `<div class="pnm-map-panel__body">${renderMapContent(session, filledCount)}</div>`
+                    : renderMapPeek(session, filledCount)}
+            </article>
+        `;
+    }
+
+    function renderLibrary(state) {
+        let bookOffset = 0;
+        const totalCount = PATTERN_CATALOG.length;
+
+        const shelvesHtml = FAMILY_ORDER.map((familyId) => {
+            if (state.filter !== 'all' && state.filter !== familyId) return '';
+            const count = PATTERN_CATALOG.filter((pattern) => pattern.family === familyId).length;
+            const html = renderShelf(familyId, bookOffset);
+            bookOffset += count;
+            return html;
+        }).join('');
+
+        const chips = [
+            { id: 'all', label: `הכול ${totalCount}`, color: '#6B5B45', dot: false },
+            ...FAMILY_ORDER.map((familyId) => ({
+                id: familyId,
+                label: `${FAMILY_META[familyId].label} ${PATTERN_CATALOG.filter((pattern) => pattern.family === familyId).length}`,
+                color: FAMILY_META[familyId].color,
+                dot: true
+            }))
+        ];
+
+        return `
+            <section class="pnm-view pnm-view--library">
+                ${renderLibraryLead()}
+                <div class="pnm-lib-filters" role="tablist" aria-label="סינון לפי משפחה">
+                    ${chips.map((chip) => {
+                        const isActive = state.filter === chip.id;
+                        const activeStyle = isActive ? `background:${chip.color};color:#fff;border-color:transparent;` : '';
+                        const dotStyle = isActive ? 'background:#fff;opacity:0.8' : `background:${chip.color}`;
+                        return `
+                            <button type="button"
+                                    class="pnm-lib-filter-chip${isActive ? ' is-active' : ''}"
+                                    style="${activeStyle}"
+                                    data-action="set-filter"
+                                    data-filter="${escapeHtml(chip.id)}">
+                                ${chip.dot ? `<span class="pnm-lib-filter-dot" style="${dotStyle}"></span>` : ''}
+                                ${escapeHtml(chip.label)}
+                            </button>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="pnm-lib-shelves">
+                    ${shelvesHtml}
+                </div>
+                ${renderCollapsibleExample(state)}
+            </section>
+        `;
+    }
+
+    function renderPreview(state) {
+        const pattern = getPatternById(state);
+        const session = getCurrentSession(state);
+        if (!pattern) return renderError({ error: 'לא נבחרה תבנית.' });
+        const family = FAMILY_META[pattern.family];
+
+        return `
+            <section class="pnm-view pnm-view--workspace pnm-view--workspace-preview">
+                ${renderProgressRail(state)}
+                <article class="pnm-card pnm-stage-board pnm-stage-board--preview" style="--pnm-family:${escapeHtml(family.color)};--pnm-family-soft:${escapeHtml(family.soft)}">
+                    <div class="pnm-pattern-header-bar"></div>
+                    <div class="pnm-stage-board__head">
+                        <div>
+                            <div class="pnm-chip-row">
+                                <span class="pnm-chip" style="--pnm-chip-accent:${escapeHtml(family.color)}">${escapeHtml(family.label)}</span>
+                                <span class="pnm-chip">${escapeHtml(difficultyLabel(pattern.difficulty))}</span>
+                            </div>
+                            <span class="pnm-eyebrow">${escapeHtml(getStageEyebrow(state, 'preview'))}</span>
+                            <h2>${escapeHtml(pattern.title)}</h2>
+                            <p>${escapeHtml(pattern.concept)}</p>
+                        </div>
+                        ${renderWindowedAction(state)}
+                    </div>
+                    <div class="pnm-stage-board__layout">
+                        <div class="pnm-stage-board__main">
+                            ${session ? `<blockquote class="pnm-example-sentence">"${escapeHtml(session.sentence)}"</blockquote>` : ''}
+                            <div class="pnm-key-callout" style="--pnm-family:${escapeHtml(family.color)};--pnm-family-soft:${escapeHtml(family.soft)}">
+                                <span class="pnm-key-callout__icon">?</span>
+                                <div>
+                                    <span class="pnm-eyebrow">שאלת המפתח</span>
+                                    <strong>${escapeHtml(pattern.keyQuestion)}</strong>
+                                </div>
+                            </div>
+                            <div class="pnm-button-row">
+                                <button type="button" class="pnm-btn pnm-btn--primary" style="--pnm-btn-accent:${escapeHtml(family.color)}" data-action="start-exercise">היכנסו למעבדה</button>
+                                <button type="button" class="pnm-btn pnm-btn--ghost" data-action="go-categories">תבנית אחרת</button>
+                            </div>
+                        </div>
+                        <aside class="pnm-stage-board__side">
+                            <div class="pnm-stage-side-card">
+                                <span class="pnm-eyebrow">מה תעשו כאן</span>
+                                ${renderPreviewChecklist()}
+                            </div>
+                            <div class="pnm-stage-side-card">
+                                <span class="pnm-eyebrow">מה תצאו איתו</span>
+                                <p>הפתיח מחזיק את המשפט, את שאלת המפתח, ואת המסלול עד רגע התובנה.</p>
+                                ${renderOutcomeChipRow(session, false)}
+                            </div>
+                            ${renderSessionNavigator(state)}
+                        </aside>
+                    </div>
+                </article>
+            </section>
+        `;
+    }
+
+    function renderMap(session, filledCount, reflectMode = false) {
+        return `
+            <article class="pnm-card pnm-map-card${reflectMode ? ' pnm-map-card--reflect' : ''}">
+                ${renderMapContent(session, filledCount, reflectMode)}
+            </article>
+        `;
+    }
+
+    function renderExercise(state) {
+        const pattern = getPatternById(state);
+        const session = getCurrentSession(state);
+        if (!pattern || !session) return renderError({ error: 'לא נמצא תרגיל להצגה.' });
+
+        const family = FAMILY_META[pattern.family];
+        const activeQuestion = getActiveQuestion(state);
+        const filledCount = getFilledCount(state);
+        const progress = session.questions.length ? Math.round((filledCount / session.questions.length) * 100) : 0;
+        const complete = isSessionComplete(state);
+        const questionMeta = activeQuestion
+            ? `${getCurrentLevelShortLabel(activeQuestion.levelId)} · ${getSideTitle(session, activeQuestion.side)}`
+            : 'שאלה פעילה';
+
+        return `
+            <section class="pnm-view pnm-view--workspace pnm-view--workspace-live">
+                ${renderProgressRail(state)}
+                <article class="pnm-card pnm-stage-board pnm-stage-board--live" style="--pnm-family:${escapeHtml(family.color)};--pnm-family-soft:${escapeHtml(family.soft)}">
+                    <div class="pnm-pattern-header-bar"></div>
+                    <div class="pnm-stage-board__head">
+                        <div>
+                            <div class="pnm-chip-row">
+                                <span class="pnm-chip" style="--pnm-chip-accent:${escapeHtml(family.color)}">${escapeHtml(family.label)}</span>
+                                <span class="pnm-chip">${escapeHtml(difficultyLabel(pattern.difficulty))}</span>
+                                <span class="pnm-chip">${filledCount}/${session.questions.length}</span>
+                            </div>
+                            <span class="pnm-eyebrow">${complete ? 'המפה הושלמה' : escapeHtml(getStageEyebrow(state, 'exercise'))}</span>
+                            <h2>${escapeHtml(pattern.title)}</h2>
+                            <p>${complete ? 'כל המפה מול העיניים. עכשיו אפשר לעבור ישר לרגע התובנה.' : 'שאלה אחת עכשיו, והמפה המלאה נשארת משנית עד שצריך אותה.'}</p>
+                        </div>
+                        ${renderWindowedAction(state)}
+                    </div>
+                    <div class="pnm-stage-progress" aria-hidden="true">
+                        <span style="width:${progress}%"></span>
+                    </div>
+                    <div class="pnm-stage-board__layout">
+                        <div class="pnm-stage-board__main">
+                            <div class="pnm-stage-focus">
+                                <div class="pnm-chip-row">
+                                    <span class="pnm-chip">${complete ? 'מפה מלאה' : `שאלה ${filledCount + 1}/${session.questions.length}`}</span>
+                                    ${!complete && activeQuestion ? `<span class="pnm-chip">${escapeHtml(getCurrentLevelLabel(activeQuestion.levelId))}</span>` : ''}
+                                    ${!complete && activeQuestion ? `<span class="pnm-chip">${escapeHtml(getSideTitle(session, activeQuestion.side))}</span>` : ''}
+                                </div>
+                                <span class="pnm-eyebrow">${complete ? 'גרעין, סדק, פאנץ׳' : escapeHtml(questionMeta)}</span>
+                                <h3>${complete ? 'הרגע המרכזי מוכן' : 'השאלה החיה עכשיו'}</h3>
+                                <p class="pnm-question-card__text">${complete ? escapeHtml(buildSummaryLine(session)) : escapeHtml(activeQuestion ? activeQuestion.question : 'אין שאלה להצגה.')}</p>
+                                <div class="pnm-button-row">
+                                    ${complete
+                                        ? `<button type="button" class="pnm-btn pnm-btn--primary" style="--pnm-btn-accent:${escapeHtml(family.color)}" data-action="go-reflect">פתחו את התובנה</button>
+                                           <button type="button" class="pnm-btn pnm-btn--ghost" data-action="reset-exercise">בנו מחדש</button>`
+                                        : `<button type="button" class="pnm-btn pnm-btn--primary" style="--pnm-btn-accent:${escapeHtml(family.color)}" data-action="reveal-answer">חשפו תשובה</button>
+                                           <button type="button" class="pnm-btn pnm-btn--ghost" data-action="fill-all">מלאו הכול</button>`}
+                                </div>
+                            </div>
+                        </div>
+                        <aside class="pnm-stage-board__side">
+                            <blockquote class="pnm-example-sentence">"${escapeHtml(session.sentence)}"</blockquote>
+                            <div class="pnm-stage-side-card">
+                                <span class="pnm-eyebrow">מה קורה עכשיו</span>
+                                <p>${complete ? 'המפה מלאה. פתחו את התובנה כדי לקרוא את הגרעין, הסדק והפאנץ׳, או פתחו את המפה המלאה אם תרצו לראות את כל המבנה.' : `כל לחיצה ממלאת את התא הבא במפה. כרגע פתוחים ${filledCount} מתוך ${session.questions.length} תאים.`}</p>
+                            </div>
+                            <div class="pnm-stage-side-card">
+                                <span class="pnm-eyebrow">${complete ? 'מה נפתח כאן' : 'שאלת המפתח'}</span>
+                                ${complete
+                                    ? renderOutcomeChipRow(session)
+                                    : `<strong>${escapeHtml(pattern.keyQuestion)}</strong><p>שאלת המפתח מחזיקה את כיוון הקריאה בזמן שהמפה נבנית.</p>`}
+                            </div>
+                            ${renderSessionNavigator(state)}
+                        </aside>
+                    </div>
+                </article>
+                ${renderExerciseMapPanel(state, session, filledCount)}
+            </section>
+        `;
+    }
+
+    function renderInsightModal(state) {
+        if (!state.insightOpen) return '';
+        const session = getCurrentSession(state);
+        if (!session) return '';
+
+        return `
+            <div class="pnm-insight-backdrop">
+                <div class="pnm-insight-modal" role="dialog" aria-modal="true" aria-label="הגרעין, הסדק והפאנץ׳">
+                    <section class="pnm-insight-hero">
+                        <div class="pnm-section-head">
+                            <div>
+                                <span class="pnm-eyebrow">רגע התובנה</span>
+                                <h2>הגרעין, הסדק והפאנץ׳</h2>
+                                <p>${escapeHtml(buildSummaryLine(session))}</p>
+                            </div>
+                            <button type="button" class="pnm-mini-link" data-action="close-insight">סגור</button>
+                        </div>
+                        ${renderOutcomeChipRow(session)}
+                        <div class="pnm-button-row pnm-button-row--insight">
+                            <button type="button" class="pnm-btn pnm-btn--primary" data-action="reset-exercise">בנו מחדש</button>
+                            <button type="button" class="pnm-btn pnm-btn--ghost" data-action="toggle-insight-map">${state.insightMapExpanded ? 'סגרו מפה מלאה' : 'פתחו מפה מלאה'}</button>
+                            <button type="button" class="pnm-mini-link" data-action="go-categories">תבנית אחרת</button>
+                        </div>
+                    </section>
+                    <div class="pnm-callout-grid pnm-callout-grid--insight">
+                        <article class="pnm-callout-card pnm-callout-card--core">
+                            <span class="pnm-eyebrow">הגרעין · ${escapeHtml(getCurrentLevelLabel(session.core))}</span>
+                            <p>${escapeHtml(session.reflectCore)}</p>
+                        </article>
+                        <article class="pnm-callout-card pnm-callout-card--crack">
+                            <span class="pnm-eyebrow">הסדק · ${escapeHtml(getCurrentLevelLabel(session.crack))}</span>
+                            <p>${escapeHtml(session.reflectCrack)}</p>
+                        </article>
+                        <article class="pnm-callout-card pnm-callout-card--punch">
+                            <span class="pnm-eyebrow">הפאנץ׳</span>
+                            <p>${escapeHtml(session.punchQuestion)}</p>
+                        </article>
+                        <article class="pnm-callout-card pnm-callout-card--answer">
+                            <span class="pnm-eyebrow">מה נפתח</span>
+                            <p>${escapeHtml(session.punchAnswer)}</p>
+                        </article>
+                    </div>
+                    ${state.insightMapExpanded
+                        ? `<article class="pnm-card pnm-map-card pnm-map-card--reflect">${renderMapContent(session, session.questions.length, true)}</article>`
+                        : ''}
+                </div>
+            </div>
+        `;
+    }
+
     function renderLoading() {
         return `
             <section class="pnm-view">
@@ -1787,6 +2213,8 @@
             if (action === 'fill-all') handled = fillAll(state);
             if (action === 'go-reflect') handled = openInsight(state);
             if (action === 'close-insight') handled = closeInsight(state);
+            if (action === 'toggle-map') handled = toggleMapExpanded(state);
+            if (action === 'toggle-insight-map') handled = toggleInsightMapExpanded(state);
             if (action === 'reset-exercise') handled = resetExercise(state);
             if (action === 'prev-session') handled = openRelativeSession(state, -1);
             if (action === 'next-session') handled = openRelativeSession(state, 1);
@@ -1797,7 +2225,7 @@
                 if (stepId === 'landing') handled = goLanding(state);
                 if (stepId === 'categories' && getCurrentProgressStep(state) !== 'landing') handled = goCategories(state);
                 if (stepId === 'preview' && state.selectedPatternId) handled = openPreview(state);
-                if (stepId === 'exercise' && state.selectedPatternId && getCurrentProgressStep(state) === 'exercise') handled = startExercise(state);
+                if (stepId === 'exercise' && state.selectedPatternId && getCurrentProgressStep(state) !== 'categories' && getCurrentProgressStep(state) !== 'landing') handled = startExercise(state);
             }
 
             if (handled) renderApp(state);
