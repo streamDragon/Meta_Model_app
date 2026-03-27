@@ -173,9 +173,24 @@
         const renderFocusBadge = (focusId) => LAYER_META[focusId] ? `<span class="sentence-map-focus-pill sentence-map-focus-pill--${escapeHtml(focusId)}">${escapeHtml(LAYER_META[focusId].icon)} ${escapeHtml(LAYER_META[focusId].name)}</span>` : '';
         const renderWorkbench = (label, innerHtml, tone = 'map') => `<div class="sentence-map-workbench sentence-map-workbench--${escapeHtml(tone)}"><div class="sentence-map-workbench__label">${escapeHtml(label)}</div>${innerHtml}</div>`;
         const renderSidePanel = (label, innerHtml, tone = 'feedback') => `<aside class="sentence-map-side-panel sentence-map-side-panel--${escapeHtml(tone)}"><div class="sentence-map-side-panel__label">${escapeHtml(label)}</div>${innerHtml}</aside>`;
+        const renderInlineNote = (title, body) => `<div class="sentence-map-inline-note"><strong>${escapeHtml(title)}</strong><p>${escapeHtml(body)}</p></div>`;
+        const renderIntroOverview = () => `<div class="sentence-map-overview-grid">${LAYER_ORDER.map((layerId) => {
+            const meta = LAYER_META[layerId];
+            return `<article class="sentence-map-overview-layer sentence-map-overview-layer--${escapeHtml(layerId)}"><div class="sentence-map-overview-layer__icon" aria-hidden="true">${escapeHtml(meta.icon)}</div><strong>${escapeHtml(meta.title)}</strong><p>${escapeHtml(meta.description)}</p></article>`;
+        }).join('')}</div>`;
         const cleanDirectiveText = (text, prefix) => String(text || '').replace(prefix, '').replace(/\s+/g, ' ').trim();
         const stripQuestionMark = (text) => String(text || '').replace(/[?؟]+\s*$/u, '').trim();
         const getRecommendedFocus = (caseData) => hasFocusId(caseData?.hotFocus) ? String(caseData.hotFocus).trim() : 'inside';
+        const getFocusFeedbackMeta = (caseData, selectedFocus) => {
+            const recommendedFocusId = getRecommendedFocus(caseData);
+            const isRight = selectedFocus === recommendedFocusId;
+            return {
+                isRight,
+                recommendedFocusId,
+                statusTitle: isRight ? 'כאן כדאי להתחיל' : 'יש כאן כיוון אפשרי, אבל לא המוקד הראשון',
+                statusBody: isRight ? 'הבחירה הזו תוביל לשאלה או להתערבות שהכי מחזיקות את המקרה בתחילת הסבב.' : 'כדי להיכנס מהר ללב המקרה, עדיף להתחיל קודם באזור המומלץ ואז לחזור לכאן אם צריך.'
+            };
+        };
         const getFocusSummary = (focusId) => {
             if (focusId === 'outside') return 'זוהה כאן קודם כל צורך בדיוק וברצף נצפה, לפני פרשנות או הכללה.';
             if (focusId === 'relational') return 'זוהתה כאן קודם כל פונקציה יחסית: המשפט מנסה להשיג נראות, הכרה או תגובה אחרת בקשר.';
@@ -383,7 +398,39 @@
             return `<article class="sentence-map-layer-card sentence-map-layer-card--${escapeHtml(layerId)}${isOpen ? ' is-open' : ''}" aria-label="${escapeHtml(meta.title)}"><div class="sentence-map-layer-card__tag">${escapeHtml(meta.tag)}</div><button type="button" class="sentence-map-layer-card__toggle" data-action="toggle-layer" data-layer="${escapeHtml(layerId)}" aria-expanded="${isOpen ? 'true' : 'false'}"><div class="sentence-map-layer-card__head"><strong>${escapeHtml(meta.title)}</strong><p class="sentence-map-layer-card__summary">${escapeHtml(meta.description)}</p></div><span class="sentence-map-layer-card__chevron" aria-hidden="true">${isOpen ? '−' : '+'}</span></button>${isOpen ? `<div class="sentence-map-layer-card__details"><div class="sentence-map-layer-card__detail-block"><span>שאלה</span><strong>${escapeHtml(layer.question || meta.title)}</strong></div><div class="sentence-map-layer-card__detail-block"><span>דוגמה</span><strong>${escapeHtml(layer.sampleAnswer || '')}</strong></div></div>` : ''}</article>`;
         }
 
+        function renderFocusCard(focusId, caseData, selectedFocus) {
+            const meta = LAYER_META[focusId];
+            const isSelected = selectedFocus === focusId;
+            const isRecommended = caseData.hotFocus === focusId;
+            const actionText = isSelected ? 'נבחר כרגע' : (isRecommended ? 'מומלץ להתחיל כאן' : 'אפשר לבדוק גם מכאן');
+            return `<button type="button" class="sentence-map-focus-card sentence-map-focus-card--${escapeHtml(focusId)}${isSelected ? ' is-selected' : ''}${isRecommended ? ' is-recommended' : ''}" data-action="select-focus" data-focus="${escapeHtml(focusId)}" aria-pressed="${isSelected ? 'true' : 'false'}"><span>${escapeHtml(meta.icon)} ${escapeHtml(meta.name)}</span>${isRecommended ? '<small class="sentence-map-focus-card__badge">מומלץ להתחלה</small>' : ''}<strong>${escapeHtml(meta.title)}</strong><p>${escapeHtml(meta.description)}</p><small class="sentence-map-focus-card__action">${escapeHtml(actionText)}</small></button>`;
+        }
+
+        function renderFocusFeedbackPanel(caseData, selectedFocus) {
+            const feedbackText = String(caseData.hotFocusFeedback?.[selectedFocus] || '').trim();
+            const meta = getFocusFeedbackMeta(caseData, selectedFocus);
+            const recommendedBadge = meta.isRight ? '' : `<div class="sentence-map-feedback-card__recommendation"><span>עדיף להתחיל ב</span>${renderFocusBadge(meta.recommendedFocusId)}</div>`;
+            const correctionAction = meta.isRight ? '' : `<div class="sentence-map-feedback-card__actions"><button type="button" class="btn btn-secondary sentence-map-inline-btn" data-action="select-focus" data-focus="${escapeHtml(meta.recommendedFocusId)}">עבור/י למוקד המומלץ</button></div>`;
+            return renderSidePanel(
+                'פידבק על הבחירה',
+                `<div class="sentence-map-feedback-card${meta.isRight ? ' is-right' : ' is-soft-correction'}" role="status" aria-live="polite"><span class="sentence-map-feedback-card__status">${escapeHtml(meta.statusTitle)}</span><strong>${renderFocusBadge(selectedFocus)}</strong>${recommendedBadge}${renderParagraphs(feedbackText)}<p class="sentence-map-soft-note">${escapeHtml(meta.statusBody)}</p>${correctionAction}</div>`
+            );
+        }
+
         function renderCurrentStep(caseData, caseUi) {
+            if (caseUi.stepIndex === 0) {
+                return `<section class="sentence-map-stage-card sentence-map-stage-card--intro">${renderStageHeader(0, 'בחרו משפט אחד ונתחיל', 'מתחילים ממשפט אחד. אחר כך בוחרים איפה נמצא מוקד העבודה הראשון.')}${renderSentenceBubble(caseData.sentence, caseData.title)}${renderIntroOverview()}<div class="sentence-map-bridge"><div class="sentence-map-bridge__icon" aria-hidden="true">↺</div><p class="sentence-map-bridge__text">בכל סבב רואים את המשפט, ממפים שלוש שכבות, ואז בוחרים בלחיצה מאיפה נכון לפתוח את העבודה.</p></div><div class="sentence-map-stage-actions"><button type="button" class="btn btn-primary sentence-map-btn-main" data-action="start">התחל/י</button></div></section>`;
+            }
+            if (caseUi.stepIndex === 1) {
+                return `<section class="sentence-map-stage-card">${renderStageHeader(1, 'המשפט כמו שהוא', 'משאירים את המשפט מול העיניים ועובדים ממנו.')}${renderWorkbench('לוח המשפט', `${renderSentenceBubble(caseData.sentence, caseData.title)}${renderInlineNote('מה עושים כאן', 'קוראים את המשפט כמו שהוא, בלי לתקן ובלי למהר להסיק. בשלב הבא נפתח את שלוש השכבות שלו.')}`)}</section>`;
+            }
+            if (caseUi.stepIndex === 2) {
+                return `<section class="sentence-map-stage-card">${renderStageHeader(2, 'פותחים שכבה אחרי שכבה', 'המשפט ושלוש השכבות נשארים בתוך אותו לוח עבודה.')}${renderWorkbench('לוח העבודה', `${renderSentenceBubble(caseData.sentence, caseData.title)}${renderInlineNote('פתחו כרטיס אחד בכל פעם', 'כל לחיצה חושפת את השאלה, הדוגמה והפירוש של אותה שכבה. כך רואים מהר מה חסר בחוץ, מה נהיה בפנים, ומה המשפט מבקש בקשר.')}<div class="sentence-map-layer-stack">${LAYER_ORDER.map((layerId) => renderLayerExplorerCard(layerId, caseData, caseUi)).join('')}</div>`)}</section>`;
+            }
+            if (caseUi.stepIndex === 3) {
+                const selectedFocus = caseUi.selectedFocus;
+                return `<section class="sentence-map-stage-card">${renderStageHeader(3, 'איפה הלב של המקרה?', 'בוחרים בלחיצה אזור אחד ומקבלים מיד פידבק אם נכון להתחיל ממנו עכשיו.')}<div class="sentence-map-stage-split">${renderWorkbench('מפת המשפט והשכבות', `${renderSentenceBubble(caseData.sentence, caseData.title)}${renderInlineNote('בחרו מוקד אחד בלחיצה', 'המטרה כאן היא לא למצוא “תשובה מושלמת”, אלא לזהות מאיפה הכי נכון לפתוח את הסבב הראשון: בחוץ, בפנים, או בקשר.')}<div class="sentence-map-focus-grid" role="list">${LAYER_ORDER.map((focusId) => renderFocusCard(focusId, caseData, selectedFocus)).join('')}</div>`)}${selectedFocus ? renderFocusFeedbackPanel(caseData, selectedFocus) : renderSidePanel('פידבק יופיע כאן', '<p class="sentence-map-soft-note">בחרו אזור אחד כדי לראות מיד האם זה המוקד הנכון להתחלה, או מאיפה עדיף להתחיל.</p>', 'placeholder')}</div></section>`;
+            }
             if (caseUi.stepIndex === 0) return `<section class="sentence-map-stage-card sentence-map-stage-card--intro">${renderStageHeader(0, 'בחרו משפט אחד ונתחיל', 'משפט אחד מספיק כדי לפתוח את המפה.')}${renderSentenceBubble(caseData.sentence, caseData.title)}<div class="sentence-map-stage-actions"><button type="button" class="btn btn-primary sentence-map-btn-main" data-action="start">התחל/י</button></div></section>`;
             if (caseUi.stepIndex === 1) return `<section class="sentence-map-stage-card">${renderStageHeader(1, 'המשפט כמו שהוא', 'משאירים את המשפט מול העיניים ועובדים ממנו.')}${renderWorkbench('לוח המשפט', renderSentenceBubble(caseData.sentence, caseData.title))}</section>`;
             if (caseUi.stepIndex === 2) return `<section class="sentence-map-stage-card">${renderStageHeader(2, 'פותחים שכבה אחרי שכבה', 'המשפט ושלוש השכבות נשארים בתוך אותו לוח עבודה.')}${renderWorkbench('לוח העבודה', `${renderSentenceBubble(caseData.sentence, caseData.title)}<div class="sentence-map-layer-stack">${LAYER_ORDER.map((layerId) => renderLayerExplorerCard(layerId, caseData, caseUi)).join('')}</div>`)}</section>`;

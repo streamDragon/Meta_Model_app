@@ -26069,6 +26069,27 @@ button.sentence-map-stepper__item {
     transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
 }
 
+.sentence-map-focus-card__badge,
+.sentence-map-focus-card__action {
+    display: block;
+}
+
+.sentence-map-focus-card__badge {
+    width: fit-content;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(244, 114, 182, 0.12);
+    color: #fbcfe8;
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.sentence-map-focus-card__action {
+    color: rgba(191, 219, 254, 0.82);
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
 .sentence-map-case-card.is-active {
     border-color: rgba(125, 211, 252, 0.4);
     background: linear-gradient(160deg, rgba(14, 165, 233, 0.2), rgba(15, 23, 42, 0.94));
@@ -26122,6 +26143,12 @@ button.sentence-map-stepper__item {
     gap: 10px;
     height: auto;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.sentence-map-layer-card.is-open {
+    border-color: rgba(125, 211, 252, 0.34);
+    background: linear-gradient(160deg, rgba(14, 165, 233, 0.12), rgba(15, 23, 42, 0.94));
+    box-shadow: 0 14px 28px rgba(14, 165, 233, 0.12), inset 0 0 0 1px rgba(125, 211, 252, 0.14);
 }
 
 .sentence-map-layer-card--outside,
@@ -26178,6 +26205,38 @@ button.sentence-map-stepper__item {
 .sentence-map-feedback-card.is-right {
     border-color: rgba(34, 197, 94, 0.32);
     background: linear-gradient(160deg, rgba(21, 128, 61, 0.18), rgba(15, 23, 42, 0.82));
+}
+
+.sentence-map-feedback-card.is-soft-correction {
+    border-color: rgba(251, 191, 36, 0.32);
+    background: linear-gradient(160deg, rgba(120, 53, 15, 0.18), rgba(15, 23, 42, 0.84));
+}
+
+.sentence-map-feedback-card__status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: rgba(125, 211, 252, 0.14);
+    color: #dbeafe;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.03em;
+}
+
+.sentence-map-feedback-card__recommendation,
+.sentence-map-feedback-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.sentence-map-feedback-card__recommendation {
+    color: rgba(248, 250, 252, 0.86);
 }
 
 .sentence-map-stage-card {
