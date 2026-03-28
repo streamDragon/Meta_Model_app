@@ -1,0 +1,110 @@
+[
+  {
+    "device": "iphone13",
+    "route": "home",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-visual-check\\iphone13-home.png",
+    "activeTab": "home",
+    "scrollY": 0,
+    "viewportHeight": 664,
+    "scrollHeight": 664,
+    "primaryAction": "פתחו את השער למבנה העומק",
+    "firstHeading": "מתמונת שטח למבנה עומק",
+    "fixed": [
+      {
+        "className": "meta-home-drawer",
+        "id": "",
+        "text": "תפריט × 🏠 דף הבית 📊 הסטטיסטיקות שלי ⚙️ הגדרות כלליות ❓ עזרה 🧠 על המוצר 📚 מיל"
+      }
+    ]
+  },
+  {
+    "device": "iphone13",
+    "route": "categories",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-visual-check\\iphone13-categories.png",
+    "activeTab": "categories",
+    "scrollY": 0,
+    "viewportHeight": 664,
+    "scrollHeight": 2665,
+    "primaryAction": "קריאת מחשבות",
+    "firstHeading": "מילון קטגוריות המטה-מודל",
+    "fixed": []
+  },
+  {
+    "device": "iphone13",
+    "route": "sentence-map",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-visual-check\\iphone13-sentence-map.png",
+    "activeTab": "sentence-map",
+    "scrollY": 506,
+    "viewportHeight": 664,
+    "scrollHeight": 1450,
+    "primaryAction": "יאללה, בואו נתחיל",
+    "firstHeading": "מפת המשפט",
+    "fixed": []
+  },
+  {
+    "device": "iphone13",
+    "route": "practice-question",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-visual-check\\iphone13-practice-question.png",
+    "activeTab": "practice-question",
+    "scrollY": 0,
+    "viewportHeight": 664,
+    "scrollHeight": 762,
+    "primaryAction": "יאללה, בואו נתחיל",
+    "firstHeading": "תרגול זיהוי",
+    "fixed": []
+  },
+  {
+    "device": "pixel7",
+    "route": "home",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-visual-check\\pixel7-home.png",
+    "activeTab": "home",
+    "scrollY": 0,
+    "viewportHeight": 839,
+    "scrollHeight": 839,
+    "primaryAction": "פתחו את השער למבנה העומק",
+    "firstHeading": "מתמונת שטח למבנה עומק",
+    "fixed": [
+      {
+        "className": "meta-home-drawer",
+        "id": "",
+        "text": "תפריט × 🏠 דף הבית 📊 הסטטיסטיקות שלי ⚙️ הגדרות כלליות ❓ עזרה 🧠 על המוצר 📚 מיל"
+      }
+    ]
+  },
+  {
+    "device": "pixel7",
+    "route": "categories",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-visual-check\\pixel7-categories.png",
+    "activeTab": "categories",
+    "scrollY": 0,
+    "viewportHeight": 839,
+    "scrollHeight": 2617,
+    "primaryAction": "קריאת מחשבות",
+    "firstHeading": "מילון קטגוריות המטה-מודל",
+    "fixed": []
+  },
+  {
+    "device": "pixel7",
+    "route": "sentence-map",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-visual-check\\pixel7-sentence-map.png",
+    "activeTab": "sentence-map",
+    "scrollY": 681,
+    "viewportHeight": 839,
+    "scrollHeight": 1647,
+    "primaryAction": "יאללה, בואו נתחיל",
+    "firstHeading": "מפת המשפט",
+    "fixed": []
+  },
+  {
+    "device": "pixel7",
+    "route": "practice-question",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-visual-check\\pixel7-practice-question.png",
+    "activeTab": "practice-question",
+    "scrollY": 0,
+    "viewportHeight": 839,
+    "scrollHeight": 839,
+    "primaryAction": "יאללה, בואו נתחיל",
+    "firstHeading": "תרגול זיהוי",
+    "fixed": []
+  }
+]

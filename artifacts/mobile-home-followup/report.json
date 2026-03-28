@@ -1,0 +1,116 @@
+[
+  {
+    "device": "iphone13",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-home-followup\\iphone13-home.png",
+    "activeTab": "home",
+    "viewportHeight": 664,
+    "scrollHeight": 664,
+    "ctas": [
+      {
+        "text": "פתחו אנציקלופדיה",
+        "visible": false,
+        "top": 0,
+        "bottom": 0,
+        "width": 0,
+        "height": 0
+      },
+      {
+        "text": "פתחו את השער למבנה העומק",
+        "visible": true,
+        "top": 299,
+        "bottom": 343,
+        "width": 324,
+        "height": 44
+      },
+      {
+        "text": "תרגול זיהוי",
+        "visible": true,
+        "top": 380,
+        "bottom": 424,
+        "width": 175,
+        "height": 44
+      },
+      {
+        "text": "אנציקלופדיה",
+        "visible": true,
+        "top": 380,
+        "bottom": 424,
+        "width": 175,
+        "height": 44
+      },
+      {
+        "text": "עברו לתרגול זיהוי",
+        "visible": false,
+        "top": 0,
+        "bottom": 0,
+        "width": 0,
+        "height": 0
+      },
+      {
+        "text": "המשך מאיפה שעצרת",
+        "visible": false,
+        "top": 0,
+        "bottom": 0,
+        "width": 0,
+        "height": 0
+      }
+    ]
+  },
+  {
+    "device": "pixel7",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-home-followup\\pixel7-home.png",
+    "activeTab": "home",
+    "viewportHeight": 839,
+    "scrollHeight": 839,
+    "ctas": [
+      {
+        "text": "פתחו אנציקלופדיה",
+        "visible": false,
+        "top": 0,
+        "bottom": 0,
+        "width": 0,
+        "height": 0
+      },
+      {
+        "text": "פתחו את השער למבנה העומק",
+        "visible": true,
+        "top": 299,
+        "bottom": 343,
+        "width": 346,
+        "height": 44
+      },
+      {
+        "text": "תרגול זיהוי",
+        "visible": true,
+        "top": 380,
+        "bottom": 424,
+        "width": 186,
+        "height": 44
+      },
+      {
+        "text": "אנציקלופדיה",
+        "visible": true,
+        "top": 380,
+        "bottom": 424,
+        "width": 186,
+        "height": 44
+      },
+      {
+        "text": "עברו לתרגול זיהוי",
+        "visible": false,
+        "top": 0,
+        "bottom": 0,
+        "width": 0,
+        "height": 0
+      },
+      {
+        "text": "המשך מאיפה שעצרת",
+        "visible": false,
+        "top": 0,
+        "bottom": 0,
+        "width": 0,
+        "height": 0
+      }
+    ]
+  }
+]

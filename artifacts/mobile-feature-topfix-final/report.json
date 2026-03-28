@@ -1,0 +1,89 @@
+[
+  {
+    "target": "sentence-map-iphone13",
+    "route": "/feature/sentence-map",
+    "data": {
+      "scrollY": 0,
+      "top": 0,
+      "activeId": "sentence-map",
+      "stage": "welcome",
+      "heading": "מפת המשפט",
+      "buttons": [
+        "←",
+        "⌂",
+        "🧠הבסיס התיאורטי",
+        "💬דיאלוג טיפולי"
+      ],
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready compact-header mobile-sticky-cta-visible meta-shell-mode shell-feature-active shell-managed-feature-active"
+    }
+  },
+  {
+    "target": "sentence-map-pixel7",
+    "route": "/feature/sentence-map",
+    "data": {
+      "scrollY": 0,
+      "top": 0,
+      "activeId": "sentence-map",
+      "stage": "welcome",
+      "heading": "ברוך/ה הבא/ה!",
+      "buttons": [
+        "🌿 מטפל/ת לעבודה עם מטופלים בשיחה",
+        "🎯 מאמן/ת לתהליכי אימון, שינוי וקידום",
+        "📚 סטודנט/ית ללמידה, תרגול וחידוד מושגים",
+        "✨ צמיחה אישית לשיפור תקשורת והקשבה ביומיום"
+      ],
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready compact-header meta-shell-mode shell-feature-active shell-managed-feature-active"
+    }
+  },
+  {
+    "target": "practice-question-iphone13",
+    "route": "/feature/practice-question",
+    "data": {
+      "scrollY": 0,
+      "top": 0,
+      "activeId": "practice-question",
+      "stage": "welcome",
+      "heading": "",
+      "buttons": [
+        "🔥10רצף ⭐48כוכבים רמה6",
+        "התחל",
+        "תפריט"
+      ],
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready compact-header mobile-sticky-cta-visible meta-shell-mode shell-feature-active shell-managed-feature-active"
+    }
+  },
+  {
+    "target": "categories-iphone13",
+    "route": "/feature/categories",
+    "data": {
+      "scrollY": 0,
+      "top": 0,
+      "activeId": "categories",
+      "stage": "feature",
+      "heading": "",
+      "buttons": [
+        "🔥10רצף ⭐48כוכבים רמה6",
+        "🔊צלילפעיל"
+      ],
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready compact-header meta-shell-mode shell-feature-active shell-managed-feature-active"
+    }
+  },
+  {
+    "target": "home-iphone13",
+    "route": "/",
+    "data": {
+      "scrollY": 0,
+      "top": 0,
+      "activeId": "home",
+      "stage": null,
+      "heading": "מתמונת שטח למבנה עומק",
+      "buttons": [
+        "כל הכלים",
+        "☰ תפריט",
+        "פתחו את השער למבנה העומק",
+        "תרגול זיהוי"
+      ],
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready app-sticky-home-active compact-header meta-shell-mode shell-home-active"
+    }
+  }
+]

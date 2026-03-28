@@ -1,0 +1,58 @@
+[
+  {
+    "target": "sentence-map-iphone13",
+    "route": "/feature/sentence-map",
+    "data": {
+      "scrollY": 106,
+      "top": -106,
+      "height": 719.953125,
+      "activeId": "sentence-map",
+      "stage": "welcome",
+      "heading": "Meta Model",
+      "button": "🌿\n                        מטפל/ת\n                        לעבודה עם מטופלים בשיח",
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready compact-header mobile-sticky-cta-visible meta-shell-mode shell-feature-active shell-managed-feature-active"
+    }
+  },
+  {
+    "target": "sentence-map-pixel7",
+    "route": "/feature/sentence-map",
+    "data": {
+      "scrollY": 0,
+      "top": 0,
+      "height": 737.953125,
+      "activeId": "sentence-map",
+      "stage": "welcome",
+      "heading": "Meta Model",
+      "button": "🌿\n                        מטפל/ת\n                        לעבודה עם מטופלים בשיח",
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready compact-header mobile-sticky-cta-visible meta-shell-mode shell-feature-active shell-managed-feature-active"
+    }
+  },
+  {
+    "target": "practice-question-iphone13",
+    "route": "/feature/practice-question",
+    "data": {
+      "scrollY": 0,
+      "top": 0,
+      "height": 0,
+      "activeId": "practice-question",
+      "stage": "welcome",
+      "heading": "Meta Model",
+      "button": "🌿\n                        מטפל/ת\n                        לעבודה עם מטופלים בשיח",
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready compact-header mobile-sticky-cta-visible meta-shell-mode shell-feature-active shell-managed-feature-active"
+    }
+  },
+  {
+    "target": "categories-iphone13",
+    "route": "/feature/categories",
+    "data": {
+      "scrollY": 0,
+      "top": 0,
+      "height": 0,
+      "activeId": "categories",
+      "stage": "feature",
+      "heading": "Meta Model",
+      "button": "🌿\n                        מטפל/ת\n                        לעבודה עם מטופלים בשיח",
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready compact-header meta-shell-mode shell-feature-active shell-managed-feature-active"
+    }
+  }
+]

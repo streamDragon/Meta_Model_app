@@ -2714,6 +2714,17 @@ function scrollPageToTop() {
 function scrollToActivatedTabStart(tabName = '') {
     const resolvedTab = normalizeRequestedTab(tabName);
     const section = resolvedTab ? document.getElementById(resolvedTab) : null;
+    const mobileFeatureStart = Boolean(
+        section
+        && resolvedTab
+        && resolvedTab !== 'home'
+        && typeof window.matchMedia === 'function'
+        && window.matchMedia('(max-width: 900px)').matches
+    );
+    if (mobileFeatureStart) {
+        scrollPageToTop();
+        return;
+    }
     const metaWelcomeStage = section && section.classList.contains('is-meta-feature-shell-ready') && section.dataset.metaFeatureStage === 'welcome';
     if (metaWelcomeStage) return;
     if (section && section.hasAttribute('data-scroll-to-feature-start') && typeof section.scrollIntoView === 'function') {

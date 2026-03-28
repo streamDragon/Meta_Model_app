@@ -1,0 +1,29 @@
+[
+  {
+    "target": "sentence-map-iphone13",
+    "route": "/feature/sentence-map",
+    "data": {
+      "scrollY": 144,
+      "top": -144,
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready compact-header mobile-sticky-cta-visible meta-shell-mode shell-feature-active shell-managed-feature-active"
+    }
+  },
+  {
+    "target": "sentence-map-pixel7",
+    "route": "/feature/sentence-map",
+    "data": {
+      "scrollY": 0,
+      "top": 0,
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready compact-header mobile-sticky-cta-visible meta-shell-mode shell-feature-active shell-managed-feature-active"
+    }
+  },
+  {
+    "target": "practice-question-iphone13",
+    "route": "/feature/practice-question",
+    "data": {
+      "scrollY": 0,
+      "top": 0,
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready compact-header mobile-sticky-cta-visible meta-shell-mode shell-feature-active shell-managed-feature-active"
+    }
+  }
+]

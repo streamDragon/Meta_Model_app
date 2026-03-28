@@ -980,6 +980,10 @@ body.shell-feature-active .tab-content.active {
 }
 
 @media (max-width: 900px) {
+    body.shell-feature-active .container {
+        display: none !important;
+    }
+
     body.mobile-sticky-cta-visible #meta-gamification-root,
     body.mobile-sticky-cta-visible .meta-gamification-pill,
     body.mobile-sticky-cta-visible .audio-master-mute-btn,
@@ -1078,6 +1082,18 @@ body.shell-feature-active .tab-content.active {
     body[data-active-tab="home"] .meta-home-shell__entry-gate .meta-home-shell__section-head,
     body[data-active-tab="home"] .meta-home-shell__entry-gate article.meta-home-entry-card:nth-of-type(n + 2) {
         display: none !important;
+    }
+
+    body[data-active-tab="home"] .meta-home-shell__quick-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    body[data-active-tab="home"] .meta-home-shell__quick-action {
+        min-height: 44px;
+        padding-inline: 12px;
+        justify-content: center;
     }
 
     body[data-active-tab="home"] .meta-home-entry-card {
@@ -1674,6 +1690,10 @@ body.shell-feature-active .tab-content.active {
 .meta-home-shell__entry-gate {
     display: grid;
     gap: 14px;
+}
+
+.meta-home-shell__quick-actions {
+    display: none;
 }
 
 .meta-home-entry-card {

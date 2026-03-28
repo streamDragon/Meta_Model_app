@@ -1,0 +1,12 @@
+
+> meta_model_app@1.0.726 dev
+> vite --host 127.0.0.1 --port 4273 --strictPort
+
+
+  [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m638[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m4273[22m/[39m
+[2m3:55:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/css/meta-redesign-round3.css?direct&v=1.0.726[22m
+[2m3:57:29[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mjs/app.js[22m
+[2m3:59:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mjs/app.js[22m
+[2m4:01:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2mjs/sentence-map.js[22m

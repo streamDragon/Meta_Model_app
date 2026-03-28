@@ -1,0 +1,1062 @@
+[
+  {
+    "device": "iphone13",
+    "route": "home",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-home-categories-final\\iphone13-home.png",
+    "activeTab": "home",
+    "scrollY": 0,
+    "viewportHeight": 664,
+    "homeCtas": [
+      {
+        "text": "פתחו אנציקלופדיה",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "פתחו את השער למבנה העומק",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 299,
+          "bottom": 343,
+          "height": 44,
+          "width": 324
+        },
+        "inViewport": true
+      },
+      {
+        "text": "עברו לתרגול זיהוי",
+        "display": "inline-block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "המשך מאיפה שעצרת",
+        "display": "inline-block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      }
+    ],
+    "homeCards": [
+      {
+        "text": "ידע בסיסילמי שצריך רקעהאניפקפלופדיה של המטה מודלכל הקטגוריות, המונחים והדוגמאות במקום אחדאם חסר לכם בסיס, מתחילים כאן. פותחים את האנציקלופדיה, בוחרים קטגוריה, ורק אחר כך חוזרים לתרגול.פתחו אנציקלופדיה",
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "שער ראשי שלב 1 מתמונת שטח למבנה עומק פתחו את השער למבנה העומק",
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 214.1875,
+          "bottom": 370,
+          "height": 155.8125,
+          "width": 358
+        },
+        "inViewport": true
+      },
+      {
+        "text": "שער שנישלב 2תרגול זיהוישמעתם משפט? עכשיו תגידו — איזה דפוס מסתתר בפנים?אחרי שהבנתם למה בכלל צריך מטה‑מודל, כאן לומדים לזהות את שלושת הדפוסים הבסיסיים: השמטה, עיוות והכללה. זהו שער הכניסה המעשי לעבודה עם השפה של המטופל.עברו לתרגול זיהוי",
+        "display": "none",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "המשךחזרה למקום שבו עצרתלהמשיך בדיוק מאיפה שהפסקתכבר התחלתם מסלול? חזרו ישר לתרגיל, לפיצ'ר, או לשלב שבו הייתם, בלי לחפש מחדש.המשך מאיפה שעצרת",
+        "display": "none",
+        "visibility": "visible",
+        "opacity": "0.85",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      }
+    ],
+    "homeHero": {
+      "text": "למה בכלל ללמוד מטה‑מודל?",
+      "display": "grid",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 380,
+        "bottom": 428.09375,
+        "height": 48.09375,
+        "width": 358
+      },
+      "inViewport": true
+    },
+    "categoriesHeader": {
+      "text": "מילון קטגוריות המטה-מודל",
+      "display": "block",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "categoriesOrientation": {
+      "text": "זהו מילון העבודה של קטגוריות המטה-מודל: פותחים כאן כרטיס, רואים מה בדיוק הוא מזהה בשפה, ולוקחים ממנו שאלה מדויקת חזרה לתרגול או לשיחה.",
+      "display": "block",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "categoriesChips": [
+      {
+        "text": "קריאת מחשבות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "כמתים כוללים",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "אי-ספציפיות התייחסות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "קפיצה למסקנות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "פרדיקטים חושיים",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "בלבול ברמות לוגיות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      }
+    ],
+    "categoriesIntroGrid": {
+      "text": "מה יש כאן כל כרטיס מרכז הגדרה קצרה, דוגמאות ושאלות עבודה. המונחים באנגלית נשארים לצד העברית כדי לחבר את המילון לספרות המקצועית, לקורסים ולמונחים המקוריים של ה-Meta Model. אפשר להיכנס מכל מקום: דרך משפחת־העל, דרך שם של קטגוריה, או דרך משפט אמיתי שאתו עובדים עכשיו. איך מתחילים לא צריך לקרוא הכול מההתחלה. קודם מזהים אם יש כאן מחיקה, עיוות או הכללה, ואז פותחים את הכרטיס שהכי קרוב למשפט שמולך. טבלת ברין עוזרת להתמצא בסידור של הקטגוריות. כמו בתזכורת ה-NLP הקלאסית ש\"המפה אינה השטח\", זו מסגרת עבודה שימושית ולא תחליף למה שקורה בפועל בשיחה.",
+      "display": "none",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "categoriesHero": {
+      "text": "התחלה מהירה: קודם מזהים אם המשפט מוחק מידע, מעוות משמעות או מכליל יתר על המידה. אחר כך פותחים את הכרטיס המדויק.",
+      "display": "none",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "fixedEls": [
+      {
+        "text": "תפריט × 🏠 דף הבית 📊 הסטטיסטיקות שלי ⚙️ הגדרות כלליות ❓ עזרה 🧠 על המוצר 📚 מיל",
+        "className": "meta-home-drawer",
+        "id": ""
+      }
+    ]
+  },
+  {
+    "device": "iphone13",
+    "route": "categories",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-home-categories-final\\iphone13-categories.png",
+    "activeTab": "categories",
+    "scrollY": 0,
+    "viewportHeight": 664,
+    "homeCtas": [
+      {
+        "text": "פתחו אנציקלופדיה",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "פתחו את השער למבנה העומק",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "עברו לתרגול זיהוי",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "המשך מאיפה שעצרת",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      }
+    ],
+    "homeCards": [
+      {
+        "text": "ידע בסיסילמי שצריך רקעהאניפקפלופדיה של המטה מודלכל הקטגוריות, המונחים והדוגמאות במקום אחדאם חסר לכם בסיס, מתחילים כאן. פותחים את האנציקלופדיה, בוחרים קטגוריה, ורק אחר כך חוזרים לתרגול.פתחו אנציקלופדיה",
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "שער ראשישלב 1מתמונת שטח למבנה עומקהמשפט הגלוי, הפירוש החיצוני, ומה שמופעל בפניםכאן מתחילים מן הסיפור שעל פני השטח: מי נראה אשם, מי פגע, ומה נדמה שקרה. דרך השמטה, עיוות והכללה נחשף בהדרגה מה חסר, איזה פירוש נכנס, ואיזה חוק פנימי מפעיל את התגובה. זהו השער הראשי להבנת המטה‑מודל.פתחו את השער למבנה העומק",
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "שער שנישלב 2תרגול זיהוישמעתם משפט? עכשיו תגידו — איזה דפוס מסתתר בפנים?אחרי שהבנתם למה בכלל צריך מטה‑מודל, כאן לומדים לזהות את שלושת הדפוסים הבסיסיים: השמטה, עיוות והכללה. זהו שער הכניסה המעשי לעבודה עם השפה של המטופל.עברו לתרגול זיהוי",
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "המשךחזרה למקום שבו עצרתלהמשיך בדיוק מאיפה שהפסקתכבר התחלתם מסלול? חזרו ישר לתרגיל, לפיצ'ר, או לשלב שבו הייתם, בלי לחפש מחדש.המשך מאיפה שעצרת",
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "0.85",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      }
+    ],
+    "homeHero": {
+      "text": "למה בכלל ללמוד מטה‑מודל?כי כל משפט הוא מצומצם יחסית. הוא לא מכיל את כל ההקשר, את כל החוויה, או את כל החוק הפנימי שפועל מאחוריו. לכן אנחנו נוטים למלא את החסר לבד. המטה‑מודל עוזר לזהות מה הושמט, איזה פירוש נכנס, ואיזה כלל רחב התחיל לעבוד — כדי שנוכל לראות את האדם ואת עולמו בבהירות גדולה יותר.מה אנחנו מנסים לעשות כאן?לא למהר לסגור סיפור. לא להחליף את האדם שמולנו בפרשנות שלנו. אלא לשמוע את המשפט, לזהות איך הוא נבנה, ולתת לסיפור של האדם להתגלות סביבו — לא סביבנו.רקע קצר: מבנה שטח ומבנה עומקכשאנחנו שומעים משפט, אנחנו פוגשים בדרך כלל את מבנה השטח שלו — מה שנאמר בגלוי. אבל מתחת לפני השטח יש לעיתים מידע שנמחק, פירוש שנכנס, וחוק פנימי שכבר התחיל לעבוד. בהשראת ההבחנה של חומסקי בין מבנה שטח למבנה עומק, ובאופן שבו בנדלר וגריינדר הפכו אותה ב‑NLP לכלי עבודה, המטה‑מודל עוזר לנו לעבור מן המשפט הגלוי אל המבנה העמוק יותר שמארגן את החוויה.",
+      "display": "grid",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "categoriesHeader": {
+      "text": "מילון קטגוריות המטה-מודל",
+      "display": "block",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 105,
+        "bottom": 132.84375,
+        "height": 27.84375,
+        "width": 344
+      },
+      "inViewport": true
+    },
+    "categoriesOrientation": {
+      "text": "זהו מילון העבודה של קטגוריות המטה-מודל: פותחים כאן כרטיס, רואים מה בדיוק הוא מזהה בשפה, ולוקחים ממנו שאלה מדויקת חזרה לתרגול או לשיחה.",
+      "display": "block",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 142.84375,
+        "bottom": 209.078125,
+        "height": 66.234375,
+        "width": 344
+      },
+      "inViewport": true
+    },
+    "categoriesChips": [
+      {
+        "text": "קריאת מחשבות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 244.5625,
+          "bottom": 288.5625,
+          "height": 44,
+          "width": 344
+        },
+        "inViewport": true
+      },
+      {
+        "text": "כמתים כוללים",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 296.5625,
+          "bottom": 340.5625,
+          "height": 44,
+          "width": 344
+        },
+        "inViewport": true
+      },
+      {
+        "text": "אי-ספציפיות התייחסות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 348.5625,
+          "bottom": 392.5625,
+          "height": 44,
+          "width": 344
+        },
+        "inViewport": true
+      },
+      {
+        "text": "קפיצה למסקנות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 428.046875,
+          "bottom": 472.046875,
+          "height": 44,
+          "width": 344
+        },
+        "inViewport": true
+      },
+      {
+        "text": "פרדיקטים חושיים",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 480.046875,
+          "bottom": 524.046875,
+          "height": 44,
+          "width": 344
+        },
+        "inViewport": true
+      },
+      {
+        "text": "בלבול ברמות לוגיות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 532.046875,
+          "bottom": 576.046875,
+          "height": 44,
+          "width": 344
+        },
+        "inViewport": true
+      }
+    ],
+    "categoriesIntroGrid": {
+      "text": "מה יש כאן כל כרטיס מרכז הגדרה קצרה, דוגמאות ושאלות עבודה. המונחים באנגלית נשארים לצד העברית כדי לחבר את המילון לספרות המקצועית, לקורסים ולמונחים המקוריים של ה-Meta Model. אפשר להיכנס מכל מקום: דרך משפחת־העל, דרך שם של קטגוריה, או דרך משפט אמיתי שאתו עובדים עכשיו. איך מתחילים לא צריך לקרוא הכול מההתחלה. קודם מזהים אם יש כאן מחיקה, עיוות או הכללה, ואז פותחים את הכרטיס שהכי קרוב למשפט שמולך. טבלת ברין עוזרת להתמצא בסידור של הקטגוריות. כמו בתזכורת ה-NLP הקלאסית ש\"המפה אינה השטח\", זו מסגרת עבודה שימושית ולא תחליף למה שקורה בפועל בשיחה.",
+      "display": "none",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "categoriesHero": {
+      "text": "התחלה מהירה: קודם מזהים אם המשפט מוחק מידע, מעוות משמעות או מכליל יתר על המידה. אחר כך פותחים את הכרטיס המדויק.",
+      "display": "none",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "fixedEls": []
+  },
+  {
+    "device": "pixel7",
+    "route": "home",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-home-categories-final\\pixel7-home.png",
+    "activeTab": "home",
+    "scrollY": 0,
+    "viewportHeight": 839,
+    "homeCtas": [
+      {
+        "text": "פתחו אנציקלופדיה",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "פתחו את השער למבנה העומק",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 299,
+          "bottom": 343,
+          "height": 44,
+          "width": 346
+        },
+        "inViewport": true
+      },
+      {
+        "text": "עברו לתרגול זיהוי",
+        "display": "inline-block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "המשך מאיפה שעצרת",
+        "display": "inline-block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      }
+    ],
+    "homeCards": [
+      {
+        "text": "ידע בסיסילמי שצריך רקעהאניפקפלופדיה של המטה מודלכל הקטגוריות, המונחים והדוגמאות במקום אחדאם חסר לכם בסיס, מתחילים כאן. פותחים את האנציקלופדיה, בוחרים קטגוריה, ורק אחר כך חוזרים לתרגול.פתחו אנציקלופדיה",
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "שער ראשי שלב 1 מתמונת שטח למבנה עומק פתחו את השער למבנה העומק",
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 214.1875,
+          "bottom": 370,
+          "height": 155.8125,
+          "width": 380
+        },
+        "inViewport": true
+      },
+      {
+        "text": "שער שנישלב 2תרגול זיהוישמעתם משפט? עכשיו תגידו — איזה דפוס מסתתר בפנים?אחרי שהבנתם למה בכלל צריך מטה‑מודל, כאן לומדים לזהות את שלושת הדפוסים הבסיסיים: השמטה, עיוות והכללה. זהו שער הכניסה המעשי לעבודה עם השפה של המטופל.עברו לתרגול זיהוי",
+        "display": "none",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "המשךחזרה למקום שבו עצרתלהמשיך בדיוק מאיפה שהפסקתכבר התחלתם מסלול? חזרו ישר לתרגיל, לפיצ'ר, או לשלב שבו הייתם, בלי לחפש מחדש.המשך מאיפה שעצרת",
+        "display": "none",
+        "visibility": "visible",
+        "opacity": "0.85",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      }
+    ],
+    "homeHero": {
+      "text": "למה בכלל ללמוד מטה‑מודל?",
+      "display": "grid",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 380,
+        "bottom": 428.09375,
+        "height": 48.09375,
+        "width": 380
+      },
+      "inViewport": true
+    },
+    "categoriesHeader": {
+      "text": "מילון קטגוריות המטה-מודל",
+      "display": "block",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "categoriesOrientation": {
+      "text": "זהו מילון העבודה של קטגוריות המטה-מודל: פותחים כאן כרטיס, רואים מה בדיוק הוא מזהה בשפה, ולוקחים ממנו שאלה מדויקת חזרה לתרגול או לשיחה.",
+      "display": "block",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "categoriesChips": [
+      {
+        "text": "קריאת מחשבות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "כמתים כוללים",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "אי-ספציפיות התייחסות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "קפיצה למסקנות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "פרדיקטים חושיים",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "בלבול ברמות לוגיות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      }
+    ],
+    "categoriesIntroGrid": {
+      "text": "מה יש כאן כל כרטיס מרכז הגדרה קצרה, דוגמאות ושאלות עבודה. המונחים באנגלית נשארים לצד העברית כדי לחבר את המילון לספרות המקצועית, לקורסים ולמונחים המקוריים של ה-Meta Model. אפשר להיכנס מכל מקום: דרך משפחת־העל, דרך שם של קטגוריה, או דרך משפט אמיתי שאתו עובדים עכשיו. איך מתחילים לא צריך לקרוא הכול מההתחלה. קודם מזהים אם יש כאן מחיקה, עיוות או הכללה, ואז פותחים את הכרטיס שהכי קרוב למשפט שמולך. טבלת ברין עוזרת להתמצא בסידור של הקטגוריות. כמו בתזכורת ה-NLP הקלאסית ש\"המפה אינה השטח\", זו מסגרת עבודה שימושית ולא תחליף למה שקורה בפועל בשיחה.",
+      "display": "none",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "categoriesHero": {
+      "text": "התחלה מהירה: קודם מזהים אם המשפט מוחק מידע, מעוות משמעות או מכליל יתר על המידה. אחר כך פותחים את הכרטיס המדויק.",
+      "display": "none",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "fixedEls": [
+      {
+        "text": "תפריט × 🏠 דף הבית 📊 הסטטיסטיקות שלי ⚙️ הגדרות כלליות ❓ עזרה 🧠 על המוצר 📚 מיל",
+        "className": "meta-home-drawer",
+        "id": ""
+      }
+    ]
+  },
+  {
+    "device": "pixel7",
+    "route": "categories",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-home-categories-final\\pixel7-categories.png",
+    "activeTab": "categories",
+    "scrollY": 0,
+    "viewportHeight": 839,
+    "homeCtas": [
+      {
+        "text": "פתחו אנציקלופדיה",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "פתחו את השער למבנה העומק",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "עברו לתרגול זיהוי",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "המשך מאיפה שעצרת",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      }
+    ],
+    "homeCards": [
+      {
+        "text": "ידע בסיסילמי שצריך רקעהאניפקפלופדיה של המטה מודלכל הקטגוריות, המונחים והדוגמאות במקום אחדאם חסר לכם בסיס, מתחילים כאן. פותחים את האנציקלופדיה, בוחרים קטגוריה, ורק אחר כך חוזרים לתרגול.פתחו אנציקלופדיה",
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "שער ראשישלב 1מתמונת שטח למבנה עומקהמשפט הגלוי, הפירוש החיצוני, ומה שמופעל בפניםכאן מתחילים מן הסיפור שעל פני השטח: מי נראה אשם, מי פגע, ומה נדמה שקרה. דרך השמטה, עיוות והכללה נחשף בהדרגה מה חסר, איזה פירוש נכנס, ואיזה חוק פנימי מפעיל את התגובה. זהו השער הראשי להבנת המטה‑מודל.פתחו את השער למבנה העומק",
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "שער שנישלב 2תרגול זיהוישמעתם משפט? עכשיו תגידו — איזה דפוס מסתתר בפנים?אחרי שהבנתם למה בכלל צריך מטה‑מודל, כאן לומדים לזהות את שלושת הדפוסים הבסיסיים: השמטה, עיוות והכללה. זהו שער הכניסה המעשי לעבודה עם השפה של המטופל.עברו לתרגול זיהוי",
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      },
+      {
+        "text": "המשךחזרה למקום שבו עצרתלהמשיך בדיוק מאיפה שהפסקתכבר התחלתם מסלול? חזרו ישר לתרגיל, לפיצ'ר, או לשלב שבו הייתם, בלי לחפש מחדש.המשך מאיפה שעצרת",
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "0.85",
+        "rect": {
+          "top": 0,
+          "bottom": 0,
+          "height": 0,
+          "width": 0
+        },
+        "inViewport": false
+      }
+    ],
+    "homeHero": {
+      "text": "למה בכלל ללמוד מטה‑מודל?כי כל משפט הוא מצומצם יחסית. הוא לא מכיל את כל ההקשר, את כל החוויה, או את כל החוק הפנימי שפועל מאחוריו. לכן אנחנו נוטים למלא את החסר לבד. המטה‑מודל עוזר לזהות מה הושמט, איזה פירוש נכנס, ואיזה כלל רחב התחיל לעבוד — כדי שנוכל לראות את האדם ואת עולמו בבהירות גדולה יותר.מה אנחנו מנסים לעשות כאן?לא למהר לסגור סיפור. לא להחליף את האדם שמולנו בפרשנות שלנו. אלא לשמוע את המשפט, לזהות איך הוא נבנה, ולתת לסיפור של האדם להתגלות סביבו — לא סביבנו.רקע קצר: מבנה שטח ומבנה עומקכשאנחנו שומעים משפט, אנחנו פוגשים בדרך כלל את מבנה השטח שלו — מה שנאמר בגלוי. אבל מתחת לפני השטח יש לעיתים מידע שנמחק, פירוש שנכנס, וחוק פנימי שכבר התחיל לעבוד. בהשראת ההבחנה של חומסקי בין מבנה שטח למבנה עומק, ובאופן שבו בנדלר וגריינדר הפכו אותה ב‑NLP לכלי עבודה, המטה‑מודל עוזר לנו לעבור מן המשפט הגלוי אל המבנה העמוק יותר שמארגן את החוויה.",
+      "display": "grid",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "categoriesHeader": {
+      "text": "מילון קטגוריות המטה-מודל",
+      "display": "block",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 105,
+        "bottom": 132.84375,
+        "height": 27.84375,
+        "width": 366
+      },
+      "inViewport": true
+    },
+    "categoriesOrientation": {
+      "text": "זהו מילון העבודה של קטגוריות המטה-מודל: פותחים כאן כרטיס, רואים מה בדיוק הוא מזהה בשפה, ולוקחים ממנו שאלה מדויקת חזרה לתרגול או לשיחה.",
+      "display": "block",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 142.84375,
+        "bottom": 209.078125,
+        "height": 66.234375,
+        "width": 366
+      },
+      "inViewport": true
+    },
+    "categoriesChips": [
+      {
+        "text": "קריאת מחשבות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 244.5625,
+          "bottom": 288.5625,
+          "height": 44,
+          "width": 366
+        },
+        "inViewport": true
+      },
+      {
+        "text": "כמתים כוללים",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 296.5625,
+          "bottom": 340.5625,
+          "height": 44,
+          "width": 366
+        },
+        "inViewport": true
+      },
+      {
+        "text": "אי-ספציפיות התייחסות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 348.5625,
+          "bottom": 392.5625,
+          "height": 44,
+          "width": 366
+        },
+        "inViewport": true
+      },
+      {
+        "text": "קפיצה למסקנות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 428.046875,
+          "bottom": 472.046875,
+          "height": 44,
+          "width": 366
+        },
+        "inViewport": true
+      },
+      {
+        "text": "פרדיקטים חושיים",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 480.046875,
+          "bottom": 524.046875,
+          "height": 44,
+          "width": 366
+        },
+        "inViewport": true
+      },
+      {
+        "text": "בלבול ברמות לוגיות",
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "rect": {
+          "top": 532.046875,
+          "bottom": 576.046875,
+          "height": 44,
+          "width": 366
+        },
+        "inViewport": true
+      }
+    ],
+    "categoriesIntroGrid": {
+      "text": "מה יש כאן כל כרטיס מרכז הגדרה קצרה, דוגמאות ושאלות עבודה. המונחים באנגלית נשארים לצד העברית כדי לחבר את המילון לספרות המקצועית, לקורסים ולמונחים המקוריים של ה-Meta Model. אפשר להיכנס מכל מקום: דרך משפחת־העל, דרך שם של קטגוריה, או דרך משפט אמיתי שאתו עובדים עכשיו. איך מתחילים לא צריך לקרוא הכול מההתחלה. קודם מזהים אם יש כאן מחיקה, עיוות או הכללה, ואז פותחים את הכרטיס שהכי קרוב למשפט שמולך. טבלת ברין עוזרת להתמצא בסידור של הקטגוריות. כמו בתזכורת ה-NLP הקלאסית ש\"המפה אינה השטח\", זו מסגרת עבודה שימושית ולא תחליף למה שקורה בפועל בשיחה.",
+      "display": "none",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "categoriesHero": {
+      "text": "התחלה מהירה: קודם מזהים אם המשפט מוחק מידע, מעוות משמעות או מכליל יתר על המידה. אחר כך פותחים את הכרטיס המדויק.",
+      "display": "none",
+      "visibility": "visible",
+      "opacity": "1",
+      "rect": {
+        "top": 0,
+        "bottom": 0,
+        "height": 0,
+        "width": 0
+      },
+      "inViewport": false
+    },
+    "fixedEls": []
+  }
+]

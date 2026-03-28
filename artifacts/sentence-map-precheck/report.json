@@ -1,0 +1,40 @@
+[
+  {
+    "device": "iphone13",
+    "data": {
+      "scrollY": 506,
+      "viewport": {
+        "width": 413,
+        "height": 702
+      },
+      "sectionTop": 158,
+      "rootTop": 0,
+      "shellTop": 0,
+      "topbarTop": 0,
+      "stageTop": 0,
+      "ctaTop": 0,
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready compact-header mobile-sticky-cta-visible meta-shell-mode shell-feature-active shell-managed-feature-active",
+      "sectionClasses": "tab-content practice-tab-content active shell-screen-active is-meta-feature-shell-ready is-meta-shell-chrome-ready",
+      "stage": "welcome"
+    }
+  },
+  {
+    "device": "pixel7",
+    "data": {
+      "scrollY": 681,
+      "viewport": {
+        "width": 431,
+        "height": 878
+      },
+      "sectionTop": 158,
+      "rootTop": 0,
+      "shellTop": 0,
+      "topbarTop": 0,
+      "stageTop": 0,
+      "ctaTop": 0,
+      "bodyClasses": "hide-top-tabbar freemium-test-bypass freemium-ready compact-header mobile-sticky-cta-visible meta-shell-mode shell-feature-active shell-managed-feature-active",
+      "sectionClasses": "tab-content practice-tab-content active shell-screen-active is-meta-feature-shell-ready is-meta-shell-chrome-ready",
+      "stage": "welcome"
+    }
+  }
+]

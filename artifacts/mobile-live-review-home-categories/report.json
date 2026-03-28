@@ -1,0 +1,94 @@
+[
+  {
+    "device": "iphone13",
+    "route": "home",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-home-categories\\iphone13-home.png",
+    "activeTab": "home",
+    "primaryAction": "פתחו את השער למבנה העומק",
+    "homePrimaryCtaVisible": false,
+    "categoryChipVisible": false,
+    "introGridVisible": false,
+    "heroVisible": false,
+    "fixedEls": [
+      {
+        "cls": "meta-home-drawer",
+        "id": "",
+        "text": "תפריט × 🏠 דף הבית 📊 הסטטיסטיקות שלי ⚙️ הגדרות כלליות ❓ עזרה 🧠 על המוצר 📚 מיל",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 664,
+          "top": 0,
+          "right": 390,
+          "bottom": 664,
+          "left": 0
+        }
+      }
+    ],
+    "scrollY": 0,
+    "viewportHeight": 664,
+    "scrollHeight": 664
+  },
+  {
+    "device": "iphone13",
+    "route": "categories",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-home-categories\\iphone13-categories.png",
+    "activeTab": "categories",
+    "primaryAction": "קריאת מחשבות",
+    "homePrimaryCtaVisible": false,
+    "categoryChipVisible": true,
+    "introGridVisible": false,
+    "heroVisible": false,
+    "fixedEls": [],
+    "scrollY": 0,
+    "viewportHeight": 664,
+    "scrollHeight": 2665
+  },
+  {
+    "device": "pixel7",
+    "route": "home",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-home-categories\\pixel7-home.png",
+    "activeTab": "home",
+    "primaryAction": "פתחו את השער למבנה העומק",
+    "homePrimaryCtaVisible": false,
+    "categoryChipVisible": false,
+    "introGridVisible": false,
+    "heroVisible": false,
+    "fixedEls": [
+      {
+        "cls": "meta-home-drawer",
+        "id": "",
+        "text": "תפריט × 🏠 דף הבית 📊 הסטטיסטיקות שלי ⚙️ הגדרות כלליות ❓ עזרה 🧠 על המוצר 📚 מיל",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 839,
+          "top": 0,
+          "right": 412,
+          "bottom": 839,
+          "left": 0
+        }
+      }
+    ],
+    "scrollY": 0,
+    "viewportHeight": 839,
+    "scrollHeight": 839
+  },
+  {
+    "device": "pixel7",
+    "route": "categories",
+    "screenshot": "C:\\Users\\nlpis\\vscode\\Meta_Model_app\\artifacts\\mobile-live-review-home-categories\\pixel7-categories.png",
+    "activeTab": "categories",
+    "primaryAction": "קריאת מחשבות",
+    "homePrimaryCtaVisible": false,
+    "categoryChipVisible": true,
+    "introGridVisible": false,
+    "heroVisible": false,
+    "fixedEls": [],
+    "scrollY": 0,
+    "viewportHeight": 839,
+    "scrollHeight": 2617
+  }
+]

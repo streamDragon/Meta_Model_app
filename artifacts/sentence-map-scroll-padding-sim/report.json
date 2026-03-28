@@ -1,0 +1,18 @@
+[
+  {
+    "device": "iphone13",
+    "data": {
+      "scrollY": 506,
+      "top": 158,
+      "stage": "welcome"
+    }
+  },
+  {
+    "device": "pixel7",
+    "data": {
+      "scrollY": 681,
+      "top": 158,
+      "stage": "welcome"
+    }
+  }
+]
