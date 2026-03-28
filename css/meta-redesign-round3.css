@@ -981,18 +981,23 @@ body.shell-feature-active .tab-content.active {
 
 @media (max-width: 900px) {
     body.mobile-sticky-cta-visible #meta-gamification-root,
+    body.mobile-sticky-cta-visible .meta-gamification-pill,
     body.mobile-sticky-cta-visible .audio-master-mute-btn,
     body.mobile-sticky-cta-visible .music-toggle-btn,
     body[data-active-tab="home"] #meta-gamification-root,
+    body[data-active-tab="home"] .meta-gamification-pill,
     body[data-active-tab="home"] .audio-master-mute-btn,
     body[data-active-tab="home"] .music-toggle-btn,
     body[data-active-tab="categories"] #meta-gamification-root,
+    body[data-active-tab="categories"] .meta-gamification-pill,
     body[data-active-tab="categories"] .audio-master-mute-btn,
     body[data-active-tab="categories"] .music-toggle-btn,
     body:has(.tab-content.active[data-meta-feature-stage="welcome"]) #meta-gamification-root,
+    body:has(.tab-content.active[data-meta-feature-stage="welcome"]) .meta-gamification-pill,
     body:has(.tab-content.active[data-meta-feature-stage="welcome"]) .audio-master-mute-btn,
     body:has(.tab-content.active[data-meta-feature-stage="welcome"]) .music-toggle-btn,
     body:has(#practice-question.active #question-drill[data-stage="setup"]) #meta-gamification-root,
+    body:has(#practice-question.active #question-drill[data-stage="setup"]) .meta-gamification-pill,
     body:has(#practice-question.active #question-drill[data-stage="setup"]) .audio-master-mute-btn,
     body:has(#practice-question.active #question-drill[data-stage="setup"]) .music-toggle-btn {
         opacity: 0;
@@ -1030,6 +1035,73 @@ body.shell-feature-active .tab-content.active {
     .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__quote--compact,
     .tab-content.is-meta-feature-shell-ready[data-meta-feature-stage="welcome"] .meta-feature-shell__success-note {
         display: none !important;
+    }
+
+    body[data-active-tab="home"] .meta-home-shell__frame {
+        gap: 10px;
+    }
+
+    body[data-active-tab="home"] .meta-home-shell__topbar {
+        padding: 10px 12px;
+    }
+
+    body[data-active-tab="home"] .meta-home-shell__brand .meta-home-shell__eyebrow {
+        display: none;
+    }
+
+    body[data-active-tab="home"] .hhc-hero--embedded {
+        order: 3;
+        display: none;
+    }
+
+    body[data-active-tab="home"] .meta-home-shell__hero {
+        order: 4;
+        display: grid;
+        gap: 6px;
+        padding: 14px 16px;
+    }
+
+    body[data-active-tab="home"] .meta-home-shell__hero > p,
+    body[data-active-tab="home"] .meta-home-shell__hero-note,
+    body[data-active-tab="home"] .meta-home-theory-note,
+    body[data-active-tab="home"] .meta-home-shell__stats,
+    body[data-active-tab="home"] .meta-home-shell__divider,
+    body[data-active-tab="home"] .meta-home-shell__bonus {
+        display: none !important;
+    }
+
+    body[data-active-tab="home"] .meta-home-shell__entry-gate {
+        order: 2;
+        gap: 10px;
+    }
+
+    body[data-active-tab="home"] .meta-home-shell__entry-gate .meta-home-shell__section-head,
+    body[data-active-tab="home"] .meta-home-shell__entry-gate article.meta-home-entry-card:nth-of-type(n + 2) {
+        display: none !important;
+    }
+
+    body[data-active-tab="home"] .meta-home-entry-card {
+        gap: 8px;
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    body[data-active-tab="home"] .meta-home-entry-card > p {
+        display: none;
+    }
+
+    body[data-active-tab="home"] .meta-home-entry-card h3 {
+        font-size: 1.05rem;
+    }
+
+    body[data-active-tab="home"] .meta-home-entry-card__subtitle {
+        font-size: 0.88rem;
+        line-height: 1.45;
+    }
+
+    body[data-active-tab="home"] .meta-home-entry-card__cta {
+        width: 100%;
+        justify-content: center;
     }
 }
 
