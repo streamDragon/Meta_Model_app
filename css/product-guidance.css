@@ -513,6 +513,73 @@ body[data-product-guidance-screen="play"] [data-product-guidance-welcome] {
         line-height: 1.55;
     }
 
+    #categories .categories-theory-intro {
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+    }
+
+    #categories .categories-theory-intro > h2 {
+        margin-bottom: 0;
+        font-size: 1.2rem;
+    }
+
+    #categories .categories-glossary-orientation {
+        order: 1;
+        margin: 0;
+        font-size: 0.92rem;
+        line-height: 1.5;
+    }
+
+    #categories .categories-glossary-entry-points {
+        order: 2;
+        gap: 10px;
+        margin-top: 0;
+    }
+
+    #categories .categories-glossary-entry-group {
+        gap: 6px;
+    }
+
+    #categories .categories-glossary-entry-group strong {
+        font-size: 0.84rem;
+    }
+
+    #categories .categories-glossary-chip-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    #categories .categories-glossary-chip {
+        width: 100%;
+        justify-content: flex-start;
+        min-height: 44px;
+    }
+
+    #categories .categories-glossary-intro-grid,
+    #categories .categories-glossary-hero,
+    #categories .categories-theory-note,
+    #categories .categories-glossary-intro .breen-reference-panel {
+        display: none;
+    }
+
+    #categories .categories-glossary-columns {
+        gap: 10px;
+    }
+
+    #categories details.glossary-category {
+        border-radius: 16px;
+    }
+
+    #categories .glossary-category-summary {
+        padding: 14px 14px 12px;
+    }
+
+    #categories .glossary-card-preview {
+        display: none;
+    }
+
     .product-orientation {
         align-items: stretch;
     }
