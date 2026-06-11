@@ -1,0 +1,478 @@
+{
+  "schemaVersion": 1,
+  "id": "meta-model-core-he",
+  "name": "Meta Model — ליבה (עברית)",
+  "locale": "he",
+  "source": "עיבוד לימודי על פי עקרונות Meta Model — Bandler & Grinder, The Structure of Magic",
+  "sourceValidation": "verified",
+  "categories": [
+    {
+      "id": "deletion",
+      "name": "DELETION - מחיקה",
+      "hebrew_name": "מחיקה",
+      "description": "השמטת פרטים חיוניים מהתקשורת",
+      "icon": "❌",
+      "subcategories": [
+        {
+          "id": "simple_deletion",
+          "name": "Simple Deletion",
+          "hebrew": "מחיקה פשוטה",
+          "description": "מחיקת פרטים חיוניים",
+          "example": "זה לא טוב",
+          "question": "מה בדיוק לא טוב? לפי מי?",
+          "category": "DELETION"
+        },
+        {
+          "id": "comparative_deletion",
+          "name": "Comparative Deletion",
+          "hebrew": "מחיקת השוואה",
+          "description": "השמטת בסיס ההשוואה",
+          "example": "היא טובה יותר",
+          "question": "טובה יותר לעומת מי? לפי איזה מדד?",
+          "category": "DELETION"
+        },
+        {
+          "id": "lack_referential_index",
+          "name": "Lack of Referential Index",
+          "hebrew": "אי-ספציפיות התייחסות",
+          "description": "אי-בהירות מי או מה מתוכננים",
+          "example": "כולם אומרים שאני טועה",
+          "question": "מי בדיוק אומר? כולם? איזה אנשים?",
+          "category": "DELETION"
+        }
+      ]
+    },
+    {
+      "id": "distortion",
+      "name": "DISTORTION - עיוות",
+      "hebrew_name": "עיוות",
+      "description": "שינוי או עיוות המציאות",
+      "icon": "🔀",
+      "subcategories": [
+        {
+          "id": "nominalization",
+          "name": "Nominalization",
+          "hebrew": "נומינליזציה",
+          "description": "הפיכת פועל דינאמי לשם סטטי",
+          "example": "ההפרדה שלנו הייתה קשה",
+          "question": "כיצד בדיוק נפרדתם? מה עשיתם?",
+          "category": "DISTORTION"
+        },
+        {
+          "id": "cause_effect",
+          "name": "Cause-Effect",
+          "hebrew": "סיבה-תוצאה",
+          "description": "הנחה שיש סיבה-תוצאה ישירה",
+          "example": "אתה הרגזת אותי",
+          "question": "כיצד בדיוק עשיתי זאת? מה עשיתי שגרם לך לכעס?",
+          "category": "DISTORTION"
+        },
+        {
+          "id": "mind_reading",
+          "name": "Mind Reading",
+          "hebrew": "קריאת מחשבות",
+          "description": "הנחה על מה מישהו חושב או מרגיש",
+          "example": "אני יודע שאתה לא אוהב אותי",
+          "question": "כיצד אתה יודע זאת? מה גרם לך להחלטה זו?",
+          "category": "DISTORTION"
+        },
+        {
+          "id": "lost_performative",
+          "name": "Lost Performative",
+          "hebrew": "פעולה אבודה",
+          "description": "הצהרה ללא ציון מי אומר או על פי מה",
+          "example": "זה לא נכון",
+          "question": "על פי מי זה לא נכון? מי קובע?",
+          "category": "DISTORTION"
+        },
+        {
+          "id": "presupposition",
+          "name": "Presupposition",
+          "hebrew": "הנחה מוטבעת",
+          "description": "הנחות מוטבעות בשאלה או הצהרה",
+          "example": "מתי תפסיק להאשים את עצמך?",
+          "question": "מה ההנחה כאן? האם כבר קיימת האשמה עצמית?",
+          "category": "DISTORTION"
+        },
+        {
+          "id": "complex_equivalence",
+          "name": "Complex Equivalence",
+          "hebrew": "שקילות מורכבת",
+          "description": "קישור שני מושגים שונים כאילו הם אותו דבר",
+          "example": "אם לא הסכמת, זה אומר שאתה לא אוהב אותי",
+          "question": "מדוע הסכמה היא בהכרח סימן לאהבה? יכול להיות קשר אחר?",
+          "category": "DISTORTION"
+        }
+      ]
+    },
+    {
+      "id": "generalization",
+      "name": "GENERALIZATION - הכללה",
+      "hebrew_name": "הכללה",
+      "description": "הרחבה של ניסיון אחד לכל הקשרים",
+      "icon": "📈",
+      "subcategories": [
+        {
+          "id": "universal_quantifier",
+          "name": "Universal Quantifiers",
+          "hebrew": "כמתים כוללים",
+          "description": "שימוש ב'תמיד', 'אף פעם', 'הכל', 'אף אחד'",
+          "example": "אני לעולם לא יכול להצליח",
+          "question": "באמת לעולם? אין אפילו פעם אחת שהצלחת?",
+          "category": "GENERALIZATION"
+        },
+        {
+          "id": "modal_operator",
+          "name": "Modal Operators",
+          "hebrew": "אופרטורים מודאליים",
+          "description": "שימוש ב'חייב', 'צריך', 'לא יכול', 'אי אפשר'",
+          "example": "אני לא יכול לשנות את זה",
+          "question": "מה היה קורה אם הייתה לך את היכולת? מי או מה עוצר אותך?",
+          "category": "GENERALIZATION"
+        }
+      ]
+    }
+  ],
+  "practice_statements": [
+    {
+      "id": 1,
+      "statement": "כל הגברים הם אותו דבר",
+      "category": "GENERALIZATION",
+      "subcategory": "universal_quantifier",
+      "violation": "Universal Quantifier",
+      "suggested_question": "באמת כל הגברים? אין אפילו גבר אחד שונה?",
+      "explanation": "המשפט מרחיב חוויה פרטית לכלל רחב מדי",
+      "difficulty": "easy"
+    },
+    {
+      "id": 2,
+      "statement": "הוא גרם לי להיות עצוב",
+      "category": "DISTORTION",
+      "subcategory": "cause_effect",
+      "violation": "Cause-Effect",
+      "suggested_question": "כיצד בדיוק הוא גרם לך להיות עצוב? מה עשה?",
+      "explanation": "הנחה שמישהו אחר יכול 'לגרום' לך לחוש",
+      "difficulty": "easy"
+    },
+    {
+      "id": 3,
+      "statement": "זה חייב להיות ככה",
+      "category": "GENERALIZATION",
+      "subcategory": "modal_operator",
+      "violation": "Modal Operator",
+      "suggested_question": "מדוע חייב להיות ככה? מה היה קורה אם היה אחרת?",
+      "explanation": "מגביל את האפשרויות לאלטרנטיבה אחת",
+      "difficulty": "easy"
+    },
+    {
+      "id": 4,
+      "statement": "הוא קרא בדעותיי",
+      "category": "DISTORTION",
+      "subcategory": "mind_reading",
+      "violation": "Mind Reading",
+      "suggested_question": "כיצד אתה יודע מה הוא קרא? מה בדיוק אמר או עשה?",
+      "explanation": "הנחה לא מבוססת על מה שמישהו חושב",
+      "difficulty": "easy"
+    },
+    {
+      "id": 5,
+      "statement": "כשהם לא השיבו, הבנתי שהם לא אוהבים אותי",
+      "category": "DISTORTION",
+      "subcategory": "complex_equivalence",
+      "violation": "Complex Equivalence",
+      "suggested_question": "מדוע אי-תגובה שווה לאי-אהבה? יכול להיות סיבה אחרת?",
+      "explanation": "קישור של שתי פעולות שונות כאילו הן שוות זו לזו",
+      "difficulty": "medium"
+    },
+    {
+      "id": 6,
+      "statement": "לא טוב לי",
+      "category": "DELETION",
+      "subcategory": "simple_deletion",
+      "violation": "Simple Deletion",
+      "suggested_question": "מה בדיוק לא טוב? לפי מי? באיזה מובן?",
+      "explanation": "מחקו את הפרטים החשובים - מה? למי? לפי מה?",
+      "difficulty": "easy"
+    },
+    {
+      "id": 7,
+      "statement": "היא יותר חכמה ממני",
+      "category": "DELETION",
+      "subcategory": "comparative_deletion",
+      "violation": "Comparative Deletion",
+      "suggested_question": "חכמה יותר בתחום מה? לעומת מי? באיזו מידה?",
+      "explanation": "השמטת בסיס ההשוואה - חכמה במה? בדיוק איך?",
+      "difficulty": "medium"
+    },
+    {
+      "id": 8,
+      "statement": "הדחיינות שלי היא בעיה",
+      "category": "DISTORTION",
+      "subcategory": "nominalization",
+      "violation": "Nominalization",
+      "suggested_question": "כיצד אתה דוחה? מה אתה עושה או לא עושה שיוצר בעיה?",
+      "explanation": "הפכו פעולה מתמשכת (דחייה) לשם סטטי בלבד",
+      "difficulty": "medium"
+    },
+    {
+      "id": 9,
+      "statement": "ידוע שההגבלות הן טבעיות",
+      "category": "DELETION",
+      "subcategory": "lack_referential_index",
+      "violation": "Lack of Referential Index",
+      "suggested_question": "ידוע למי? איזה הגבלות? איך אתה יודע שהן טבעיות?",
+      "explanation": "לא ברור מי או מה הם מדברים עליו",
+      "difficulty": "medium"
+    },
+    {
+      "id": 10,
+      "statement": "זה בלתי אפשרי",
+      "category": "GENERALIZATION",
+      "subcategory": "modal_operator",
+      "violation": "Modal Operator",
+      "suggested_question": "בלתי אפשרי לחלוטין? או שזה קשה? מה היה צריך להיות שונה?",
+      "explanation": "מוגבל לאפשרות אחת בלבד",
+      "difficulty": "easy"
+    },
+    {
+      "id": 11,
+      "statement": "אני צריך עזרה",
+      "category": "DELETION",
+      "subcategory": "simple_deletion",
+      "violation": "Simple Deletion",
+      "suggested_question": "עזרה במה בדיוק? ממי? איך תיראה עזרה טובה?",
+      "explanation": "פרטי העזרה נמחקו - מה, ממי ובאיזו צורה",
+      "difficulty": "easy"
+    },
+    {
+      "id": 12,
+      "statement": "זה פשוט לא עובד",
+      "category": "DELETION",
+      "subcategory": "simple_deletion",
+      "violation": "Simple Deletion",
+      "suggested_question": "מה בדיוק לא עובד? באיזה מצב? מה כן קורה בפועל?",
+      "explanation": "המשפט מוחק את הנושא, ההקשר ואופן הכישלון",
+      "difficulty": "easy"
+    },
+    {
+      "id": 13,
+      "statement": "עדיף כבר לוותר",
+      "category": "DELETION",
+      "subcategory": "comparative_deletion",
+      "violation": "Comparative Deletion",
+      "suggested_question": "עדיף ממה? לעומת איזו אפשרות אחרת בדקת?",
+      "explanation": "ההשוואה נשארה בלי בסיס - עדיף ביחס למה?",
+      "difficulty": "medium"
+    },
+    {
+      "id": 14,
+      "statement": "אני במצב הכי גרוע בצוות",
+      "category": "DELETION",
+      "subcategory": "comparative_deletion",
+      "violation": "Comparative Deletion",
+      "suggested_question": "הכי גרוע לפי איזה מדד? בהשוואה למי בדיוק?",
+      "explanation": "סופרלטיב בלי קריטריון ובלי קבוצת השוואה מוגדרת",
+      "difficulty": "medium"
+    },
+    {
+      "id": 15,
+      "statement": "אנשים לא מעריכים את מה שאני עושה",
+      "category": "DELETION",
+      "subcategory": "lack_referential_index",
+      "violation": "Lack of Referential Index",
+      "suggested_question": "אילו אנשים בדיוק? מי ספציפית לא העריך, ומתי?",
+      "explanation": "'אנשים' עמום - אין התייחסות למי בדיוק מדובר",
+      "difficulty": "easy"
+    },
+    {
+      "id": 16,
+      "statement": "אומרים שאי אפשר לשנות אנשים",
+      "category": "DELETION",
+      "subcategory": "lack_referential_index",
+      "violation": "Lack of Referential Index",
+      "suggested_question": "מי בדיוק אומר? על סמך איזה ניסיון?",
+      "explanation": "'אומרים' מסתיר את מקור הטענה ואת תוקפה",
+      "difficulty": "medium"
+    },
+    {
+      "id": 17,
+      "statement": "אין בינינו תקשורת",
+      "category": "DISTORTION",
+      "subcategory": "nominalization",
+      "violation": "Nominalization",
+      "suggested_question": "מה בדיוק קורה כשאתם מנסים לדבר? מי אומר מה למי?",
+      "explanation": "'תקשורת' היא תהליך חי שקפא לשם עצם סטטי",
+      "difficulty": "medium"
+    },
+    {
+      "id": 18,
+      "statement": "הביטחון העצמי שלי נעלם",
+      "category": "DISTORTION",
+      "subcategory": "nominalization",
+      "violation": "Nominalization",
+      "suggested_question": "באילו רגעים אתה מרגיש בטוח פחות? מה אתה עושה אז?",
+      "explanation": "'ביטחון' הוא דרך פעולה משתנה, לא חפץ שיכול להיעלם",
+      "difficulty": "hard"
+    },
+    {
+      "id": 19,
+      "statement": "ההערות שלה הורסות לי את היום",
+      "category": "DISTORTION",
+      "subcategory": "cause_effect",
+      "violation": "Cause-Effect",
+      "suggested_question": "איך בדיוק הערה אחת הופכת ליום שלם הרוס? מה קורה בדרך?",
+      "explanation": "קישור סיבתי ישיר בין מילים של אחר לבין מצב פנימי שלם",
+      "difficulty": "medium"
+    },
+    {
+      "id": 20,
+      "statement": "מזג האוויר עושה אותי עצוב",
+      "category": "DISTORTION",
+      "subcategory": "cause_effect",
+      "violation": "Cause-Effect",
+      "suggested_question": "איך בדיוק גשם הופך לעצב? האם זה קורה תמיד?",
+      "explanation": "מיקום הסיבה לרגש מחוץ לאדם, כאילו אין תיווך פנימי",
+      "difficulty": "easy"
+    },
+    {
+      "id": 21,
+      "statement": "הבוס בטוח חושב שאני לא מתאים לתפקיד",
+      "category": "DISTORTION",
+      "subcategory": "mind_reading",
+      "violation": "Mind Reading",
+      "suggested_question": "איך אתה יודע מה הבוס חושב? מה ראית או שמעת בפועל?",
+      "explanation": "טענה על תוכן מחשבותיו של אחר ללא ראיות",
+      "difficulty": "easy"
+    },
+    {
+      "id": 22,
+      "statement": "לא מנומס לבקש העלאה",
+      "category": "DISTORTION",
+      "subcategory": "lost_performative",
+      "violation": "Lost Performative",
+      "suggested_question": "לפי מי לא מנומס? מי קבע את הכלל הזה ומתי הוא נכון?",
+      "explanation": "כלל חברתי מוצג כעובדה בלי לציין מי עומד מאחוריו",
+      "difficulty": "medium"
+    },
+    {
+      "id": 23,
+      "statement": "ככה לא מתנהגים",
+      "category": "DISTORTION",
+      "subcategory": "lost_performative",
+      "violation": "Lost Performative",
+      "suggested_question": "מי אומר? לפי איזה סטנדרט? באילו מצבים זה בכל זאת מתאים?",
+      "explanation": "שיפוט ללא שופט - הדובר והקריטריון נמחקו",
+      "difficulty": "easy"
+    },
+    {
+      "id": 24,
+      "statement": "זה לא מקצועי להראות רגשות",
+      "category": "DISTORTION",
+      "subcategory": "lost_performative",
+      "violation": "Lost Performative",
+      "suggested_question": "לפי מי? איפה כתוב הכלל הזה? מקצועי לפי איזו הגדרה?",
+      "explanation": "ערך מוצג כאמת כללית בלי מקור ובלי הקשר",
+      "difficulty": "medium"
+    },
+    {
+      "id": 25,
+      "statement": "למה אני תמיד הורס הכל?",
+      "category": "DISTORTION",
+      "subcategory": "presupposition",
+      "violation": "Presupposition",
+      "suggested_question": "מה השאלה מניחה מראש? האם באמת 'הורס' ובאמת 'הכל'?",
+      "explanation": "השאלה מטמיעה כעובדה את ההנחה שהוא הורס הכל",
+      "difficulty": "medium"
+    },
+    {
+      "id": 26,
+      "statement": "מתי כבר תתחיל להתייחס אליי ברצינות?",
+      "category": "DISTORTION",
+      "subcategory": "presupposition",
+      "violation": "Presupposition",
+      "suggested_question": "מה מונח כאן מראש? איך נדע שמתייחסים ברצינות?",
+      "explanation": "מובלעת ההנחה שכרגע אין התייחסות רצינית בכלל",
+      "difficulty": "medium"
+    },
+    {
+      "id": 27,
+      "statement": "כמה זמן עוד אסבול מהעבודה הזאת?",
+      "category": "DISTORTION",
+      "subcategory": "presupposition",
+      "violation": "Presupposition",
+      "suggested_question": "מה השאלה מניחה? האם כל רגע בעבודה הוא סבל?",
+      "explanation": "מובלע שהמצב הוא סבל מתמשך ושאין בו רגעים אחרים",
+      "difficulty": "hard"
+    },
+    {
+      "id": 28,
+      "statement": "הוא איחר, סימן שלא אכפת לו ממני",
+      "category": "DISTORTION",
+      "subcategory": "complex_equivalence",
+      "violation": "Complex Equivalence",
+      "suggested_question": "האם איחור תמיד שווה חוסר אכפתיות? אילו עוד הסברים ייתכנו?",
+      "explanation": "התנהגות אחת מתורגמת אוטומטית למשמעות רגשית אחת",
+      "difficulty": "easy"
+    },
+    {
+      "id": 29,
+      "statement": "אם אני מבקש עזרה, אני חלש",
+      "category": "DISTORTION",
+      "subcategory": "complex_equivalence",
+      "violation": "Complex Equivalence",
+      "suggested_question": "איך בקשת עזרה הפכה שווה לחולשה? לפי איזה כלל?",
+      "explanation": "שני דברים שונים - בקשה וחולשה - הפכו לאותו דבר",
+      "difficulty": "medium"
+    },
+    {
+      "id": 30,
+      "statement": "אף אחד אף פעם לא מקשיב לי",
+      "category": "GENERALIZATION",
+      "subcategory": "universal_quantifier",
+      "violation": "Universal Quantifier",
+      "suggested_question": "אף אחד? אף פעם? היה רגע אחד שמישהו כן הקשיב?",
+      "explanation": "כמת כפול שמוחק כל יוצא דופן מהזיכרון",
+      "difficulty": "easy"
+    },
+    {
+      "id": 31,
+      "statement": "כולם תמיד מנצלים אותי",
+      "category": "GENERALIZATION",
+      "subcategory": "universal_quantifier",
+      "violation": "Universal Quantifier",
+      "suggested_question": "כולם? תמיד? מי ספציפית, ובאיזה מקרה?",
+      "explanation": "הכללה גורפת שהופכת מקרים בודדים לחוק קבוע",
+      "difficulty": "easy"
+    },
+    {
+      "id": 32,
+      "statement": "אני חייב להספיק הכל לבד",
+      "category": "GENERALIZATION",
+      "subcategory": "modal_operator",
+      "violation": "Modal Operator",
+      "suggested_question": "מה יקרה אם לא תספיק? מי קבע שדווקא לבד?",
+      "explanation": "'חייב' מסתיר כלל פנימי שלא נבדק מעולם",
+      "difficulty": "medium"
+    },
+    {
+      "id": 33,
+      "statement": "אי אפשר לדבר איתו",
+      "category": "GENERALIZATION",
+      "subcategory": "modal_operator",
+      "violation": "Modal Operator",
+      "suggested_question": "מה עוצר את השיחה? מה ניסית? מה היה קורה אם כן?",
+      "explanation": "'אי אפשר' סוגר אפשרויות שלא נוסו בפועל",
+      "difficulty": "medium"
+    },
+    {
+      "id": 34,
+      "statement": "היא שותקת, ברור שהיא כועסת עליי",
+      "category": "DISTORTION",
+      "subcategory": "mind_reading",
+      "violation": "Mind Reading",
+      "suggested_question": "איך אתה יודע ששתיקה פירושה כעס? מה עוד היא יכולה להרגיש?",
+      "explanation": "פירוש מצב פנימי של אחר מתוך סימן חיצוני עמום",
+      "difficulty": "medium"
+    }
+  ]
+}

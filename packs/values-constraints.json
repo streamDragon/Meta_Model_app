@@ -1,0 +1,646 @@
+{
+  "schemaVersion": 1,
+  "id": "values-constraints-he",
+  "name": "Value Constraints Lab - חבילת בסיס",
+  "locale": "he",
+  "source": "תוכן מקורי של האפליקציה — מודל שתי הקומות, חוקי אבחון ומהלכים. שאלות בהשראת Meta Model.",
+  "sourceValidation": "verified",
+  "card_types": [
+    {
+      "id": "value",
+      "label": "ערך",
+      "icon": "💎",
+      "hint": "מה חשוב לי כאן באמת"
+    },
+    {
+      "id": "need",
+      "label": "צורך",
+      "icon": "🫶",
+      "hint": "מה חייב להתקיים כדי שיהיה לי טוב"
+    },
+    {
+      "id": "fear",
+      "label": "פחד",
+      "icon": "😨",
+      "hint": "מה אסור שיקרה"
+    },
+    {
+      "id": "cost",
+      "label": "מחיר",
+      "icon": "💸",
+      "hint": "מה אני מוכן או לא מוכן לשלם"
+    },
+    {
+      "id": "identity",
+      "label": "זהות",
+      "icon": "🪞",
+      "hint": "מי אני חייב להישאר"
+    },
+    {
+      "id": "external",
+      "label": "אילוץ חיצוני",
+      "icon": "🧱",
+      "hint": "מגבלה שלא תלויה בי"
+    },
+    {
+      "id": "moral",
+      "label": "אילוץ מוסרי",
+      "icon": "⚖️",
+      "hint": "מה לא מוסרי לוותר עליו"
+    },
+    {
+      "id": "resource",
+      "label": "משאב",
+      "icon": "🧰",
+      "hint": "מה יש או חסר לי (זמן, כסף, ידע, אנשים)"
+    },
+    {
+      "id": "strategy",
+      "label": "אסטרטגיה",
+      "icon": "🧭",
+      "hint": "דרך פעולה שיכולה לפתור את המתח"
+    },
+    {
+      "id": "social",
+      "label": "ציפייה חברתית",
+      "icon": "👥",
+      "hint": "מי עוד צריך להיות מרוצה"
+    }
+  ],
+  "logical_levels": [
+    {
+      "id": "environment",
+      "label": "סביבה",
+      "hint": "איפה, מתי, עם מי"
+    },
+    {
+      "id": "behavior",
+      "label": "התנהגות",
+      "hint": "מה עושים בפועל"
+    },
+    {
+      "id": "capability",
+      "label": "יכולת",
+      "hint": "מיומנות או אסטרטגיה"
+    },
+    {
+      "id": "belief-value",
+      "label": "אמונה / ערך",
+      "hint": "כלל פנימי או משמעות"
+    },
+    {
+      "id": "identity",
+      "label": "זהות",
+      "hint": "מי אני ביחס לזה"
+    },
+    {
+      "id": "purpose",
+      "label": "ייעוד",
+      "hint": "בשביל מה גדול יותר"
+    }
+  ],
+  "value_domains": [
+    "נוחות",
+    "ביטחון",
+    "חופש",
+    "זהות",
+    "סטטוס",
+    "אהבה",
+    "מוסר",
+    "שליטה",
+    "בריאות",
+    "שייכות",
+    "משמעות"
+  ],
+  "negotiability_options": [
+    {
+      "id": "fixed",
+      "label": "קשיח - לא מתפשר"
+    },
+    {
+      "id": "flexible",
+      "label": "גמיש - אפשר לשחק עם זה"
+    },
+    {
+      "id": "unknown",
+      "label": "לא יודע עדיין"
+    }
+  ],
+  "floor1_questions": [
+    "מה אתה רוצה?",
+    "מה זה ייתן לך?",
+    "למה זה חשוב?",
+    "מה עוד חייב להיות נכון?",
+    "מה אסור שיקרה?",
+    "איזה מחיר אתה מוכן לשלם?",
+    "איזה מחיר אתה לא מוכן לשלם?",
+    "מי עוד צריך להיות מרוצה?",
+    "איזה ערך נמצא מתחת לזה?",
+    "האם זה על נוחות, ביטחון, חופש, זהות, סטטוס, אהבה, מוסר, שליטה, בריאות, שייכות או משמעות?",
+    "מה התנאי הסמוי כאן?"
+  ],
+  "floor2_questions": [
+    "כמה זה חשוב מ-1 עד 10?",
+    "מהי הגרסה המינימלית המקובלת?",
+    "מהי הגרסה האידיאלית?",
+    "מה לא נתון למשא ומתן?",
+    "מה אפשר לצמצם ל-70% ועדיין להיות בסדר?",
+    "מה אפשר לדחות?",
+    "מה אפשר לפתור באסטרטגיה אחרת?",
+    "איזה ערך מנצח אם שני ערכים מתנגשים?",
+    "מה אתה מתייחס אליו כאל הכל-או-כלום?",
+    "מה יהיה \"מספיק טוב לעכשיו\"?",
+    "מה יהיה \"יותר מדי פשרה\"?"
+  ],
+  "meta_model_questions": [
+    {
+      "id": "what_specifically",
+      "template": "מה ספציפית אתה רוצה כשאתה אומר \"{desire}\"?"
+    },
+    {
+      "id": "what_enough",
+      "template": "מה ספציפית ייחשב כמספיק עבור \"{card}\"?"
+    },
+    {
+      "id": "compared_to_what",
+      "template": "\"{card}\" - בהשוואה למה?"
+    },
+    {
+      "id": "partly_met",
+      "template": "מה יקרה אם \"{card}\" יתקיים רק באופן חלקי?"
+    },
+    {
+      "id": "who_says_100",
+      "template": "מי קובע ש\"{card}\" חייב להיות 100%?"
+    },
+    {
+      "id": "what_stops",
+      "template": "מה עוצר אותך מ\"{desire}\"?"
+    },
+    {
+      "id": "what_resource",
+      "template": "איזה משאב יאפשר גם את \"{cardA}\" וגם את \"{cardB}\"?"
+    },
+    {
+      "id": "which_value_wins",
+      "template": "איזה ערך חשוב יותר כאן - \"{cardA}\" או \"{cardB}\"?"
+    }
+  ],
+  "diagnosis_rules": [
+    {
+      "id": "too_many_hard",
+      "label": "יותר מדי אילוצים קשיחים בו-זמנית",
+      "description": "כשיותר משלושה תנאים מוגדרים כקשיחים וחשובים מאוד, אף פתרון לא יכול לעמוד בכולם יחד.",
+      "advice": "בחר 1-2 תנאים שהם באמת לא נתונים למשא ומתן, ושחרר את השאר לגמישות חלקית."
+    },
+    {
+      "id": "unclear_hierarchy",
+      "label": "היררכיית ערכים לא ברורה",
+      "description": "הרבה תנאים מקבלים חשיבות גבוהה זהה, ואין הכרעה מי מנצח בהתנגשות.",
+      "advice": "דרג: אם היו מתנגשים שניים מהם מחר בבוקר - מי מנצח? קבע מנצח לכל זוג מתנגש."
+    },
+    {
+      "id": "hidden_identity",
+      "label": "סוגיית זהות סמויה",
+      "description": "תנאי שממוקם ברמת זהות או ייעוד ומוגדר קשיח - כנראה הדיון אינו על התוצאה אלא על מי אתה.",
+      "advice": "הפרד בין \"מי אני\" לבין \"מה אני עושה הפעם\". נסה ניסוי ברמת התנהגות בלי לאיים על הזהות."
+    },
+    {
+      "id": "missing_resource",
+      "label": "חסרה אסטרטגיה או משאב",
+      "description": "יש פחדים, מחירים או אילוצים - אבל אין אף כרטיס של משאב או אסטרטגיה שפותר אותם.",
+      "advice": "הוסף כרטיס משאב: איזה ידע, זמן, כסף, אדם או דרך פעולה היו ממוססים את ההתנגשות?"
+    },
+    {
+      "id": "value_conflict",
+      "label": "קונפליקט ערכים לא פתור",
+      "description": "שני ערכים חשובים מאוד מושכים לכיוונים מנוגדים ואף אחד לא הוכרע כמנצח.",
+      "advice": "אל תבחר ביניהם - חפש קודם אסטרטגיית שילוב. אם אין, הכרע מי מנצח בשלב הנוכחי בלבד."
+    },
+    {
+      "id": "all_or_nothing",
+      "label": "חשיבת הכל-או-כלום",
+      "description": "המינימום והאידיאל זהים - אין מרחב בין \"מושלם\" ל\"כישלון\".",
+      "advice": "הגדר גרסת 70%: מה יהיה מספיק טוב לעכשיו גם אם זה לא האידיאל?"
+    },
+    {
+      "id": "over_compromise",
+      "label": "ויתור יתר / דרישת חסר",
+      "description": "תנאים שחשובים לך מאוד מסומנים כגמישים בלי מינימום מוגדר - אתה עלול להסתפק בפחות מדי.",
+      "advice": "לתנאי חשוב חייב להיות רף מינימום מוגדר. כתוב מהו הקו האדום שמתחתיו זו כבר פשרה מוגזמת."
+    }
+  ],
+  "moves": [
+    {
+      "id": "add_missing_value",
+      "label": "הוסף ערך חסר",
+      "description": "יש ערך שפועל מאחורי הקלעים ולא קיבל כרטיס - תן לו שם ומקום במפה.",
+      "for_diagnosis": [
+        "missing_resource",
+        "value_conflict"
+      ]
+    },
+    {
+      "id": "relax_constraint",
+      "label": "רכך אילוץ אחד",
+      "description": "בחר אילוץ קשיח אחד והגדר לו גרסת 70% או דחייה בזמן.",
+      "for_diagnosis": [
+        "too_many_hard",
+        "all_or_nothing"
+      ]
+    },
+    {
+      "id": "split_phases",
+      "label": "פצל לשלבים",
+      "description": "אי אפשר הכל בבת אחת - מה מתקיים בשלב א' ומה מצטרף בשלב ב'?",
+      "for_diagnosis": [
+        "too_many_hard",
+        "unclear_hierarchy"
+      ]
+    },
+    {
+      "id": "integration_strategy",
+      "label": "מצא אסטרטגיית שילוב",
+      "description": "חפש דרך פעולה שלישית שמכבדת את שני הערכים המתנגשים בו-זמנית.",
+      "for_diagnosis": [
+        "value_conflict",
+        "missing_resource"
+      ]
+    },
+    {
+      "id": "minimum_viable",
+      "label": "הגדר גרסת מינימום",
+      "description": "החלט מהי הגרסה הקטנה ביותר שעדיין שווה לקרוא לה הצלחה.",
+      "for_diagnosis": [
+        "all_or_nothing",
+        "over_compromise"
+      ]
+    },
+    {
+      "id": "identity_to_behavior",
+      "label": "מזהות לניסוי התנהגותי",
+      "description": "הפוך דרישה ברמת \"מי אני\" לניסוי קטן ברמת \"מה אני עושה השבוע\".",
+      "for_diagnosis": [
+        "hidden_identity"
+      ]
+    },
+    {
+      "id": "mark_non_negotiable",
+      "label": "סמן כקשיח אמיתי",
+      "description": "אם אחרי הבדיקה זה באמת לא נתון למשא ומתן - סמן זאת במפורש ותכנן סביבו.",
+      "for_diagnosis": [
+        "unclear_hierarchy",
+        "over_compromise"
+      ]
+    }
+  ],
+  "starter_examples": [
+    {
+      "sessionId": "example-food",
+      "title": "אוכל: טעים, בריא, זול ומהיר",
+      "initialStatement": "אני רעב, אבל אני רוצה שזה יהיה טעים, בריא, זול, מהיר ולא משמין.",
+      "mainDesire": "לאכול עכשיו משהו שיספק אותי",
+      "constraints": [
+        {
+          "id": "food-tasty",
+          "label": "טעים",
+          "type": "value",
+          "importance": 8,
+          "minimum": "אוכל שאני נהנה ממנו",
+          "ideal": "מנה שהייתי מזמין במסעדה",
+          "negotiability": "flexible",
+          "logicalLevel": "behavior",
+          "notes": "",
+          "linkedTo": [
+            "food-healthy"
+          ]
+        },
+        {
+          "id": "food-healthy",
+          "label": "בריא",
+          "type": "value",
+          "importance": 7,
+          "minimum": "לא ג'אנק מטוגן",
+          "ideal": "ארוחה מאוזנת עם ירקות",
+          "negotiability": "flexible",
+          "logicalLevel": "belief-value",
+          "notes": "",
+          "linkedTo": [
+            "food-tasty"
+          ]
+        },
+        {
+          "id": "food-cheap",
+          "label": "זול",
+          "type": "cost",
+          "importance": 6,
+          "minimum": "עד 50 שקל",
+          "ideal": "עד 25 שקל",
+          "negotiability": "flexible",
+          "logicalLevel": "environment",
+          "notes": "",
+          "linkedTo": []
+        },
+        {
+          "id": "food-fast",
+          "label": "מהיר",
+          "type": "need",
+          "importance": 9,
+          "minimum": "תוך 20 דקות",
+          "ideal": "תוך 5 דקות",
+          "negotiability": "fixed",
+          "logicalLevel": "environment",
+          "notes": "אני באמת רעב עכשיו",
+          "linkedTo": []
+        },
+        {
+          "id": "food-diet",
+          "label": "לא משמין",
+          "type": "fear",
+          "importance": 7,
+          "minimum": "לא לחרוג בהרבה מהיעד היומי",
+          "ideal": "מתאים בדיוק לתפריט",
+          "negotiability": "unknown",
+          "logicalLevel": "belief-value",
+          "notes": "",
+          "linkedTo": [
+            "food-tasty"
+          ]
+        }
+      ],
+      "values": [
+        "בריאות",
+        "נוחות"
+      ],
+      "tradeoffs": [
+        {
+          "id": "food-t1",
+          "between": [
+            "food-tasty",
+            "food-healthy"
+          ],
+          "winner": "",
+          "note": "טעים מול בריא - הקלאסיקה"
+        }
+      ],
+      "diagnosis": [],
+      "questionsGenerated": [],
+      "insights": [
+        "אולי \"טעים\" ברמת 70% זה עדיין טעים"
+      ],
+      "createdAt": "2026-06-01T08:00:00.000Z",
+      "updatedAt": "2026-06-01T08:00:00.000Z"
+    },
+    {
+      "sessionId": "example-peace",
+      "title": "שלום וגם ביטחון",
+      "initialStatement": "אני רוצה שלום, אבל אני רוצה גם הגנה, כבוד, שליטה ושלא תהיה סכנה עתידית.",
+      "mainDesire": "לחיות בשקט בלי איום",
+      "constraints": [
+        {
+          "id": "peace-peace",
+          "label": "שלום ושקט",
+          "type": "value",
+          "importance": 9,
+          "minimum": "הפסקת עימות פעיל",
+          "ideal": "שכנות טובה ויציבה",
+          "negotiability": "fixed",
+          "logicalLevel": "purpose",
+          "notes": "",
+          "linkedTo": [
+            "peace-security"
+          ]
+        },
+        {
+          "id": "peace-security",
+          "label": "הגנה וביטחון",
+          "type": "need",
+          "importance": 10,
+          "minimum": "יכולת הגנה אמינה",
+          "ideal": "אפס איום",
+          "negotiability": "fixed",
+          "logicalLevel": "identity",
+          "notes": "",
+          "linkedTo": [
+            "peace-peace"
+          ]
+        },
+        {
+          "id": "peace-dignity",
+          "label": "כבוד",
+          "type": "identity",
+          "importance": 8,
+          "minimum": "לא להיראות כנכנע",
+          "ideal": "הכרה מלאה",
+          "negotiability": "unknown",
+          "logicalLevel": "identity",
+          "notes": "",
+          "linkedTo": []
+        },
+        {
+          "id": "peace-control",
+          "label": "שליטה",
+          "type": "value",
+          "importance": 8,
+          "minimum": "שליטה על ההחלטות הקריטיות",
+          "ideal": "שליטה מלאה בתהליך",
+          "negotiability": "fixed",
+          "logicalLevel": "belief-value",
+          "notes": "",
+          "linkedTo": [
+            "peace-peace"
+          ]
+        },
+        {
+          "id": "peace-future",
+          "label": "אפס סכנה עתידית",
+          "type": "fear",
+          "importance": 9,
+          "minimum": "סיכון נמוך ומנוהל",
+          "ideal": "ערובה מוחלטת",
+          "negotiability": "fixed",
+          "logicalLevel": "belief-value",
+          "notes": "האם ערובה מוחלטת קיימת בכלל?",
+          "linkedTo": [
+            "peace-security"
+          ]
+        }
+      ],
+      "values": [
+        "ביטחון",
+        "שליטה",
+        "זהות",
+        "משמעות"
+      ],
+      "tradeoffs": [
+        {
+          "id": "peace-t1",
+          "between": [
+            "peace-peace",
+            "peace-control"
+          ],
+          "winner": "",
+          "note": "שלום דורש ויתור על חלק מהשליטה"
+        }
+      ],
+      "diagnosis": [],
+      "questionsGenerated": [],
+      "insights": [],
+      "createdAt": "2026-06-01T08:00:00.000Z",
+      "updatedAt": "2026-06-01T08:00:00.000Z"
+    },
+    {
+      "sessionId": "example-app",
+      "title": "אפליקציה למובייל ולדסקטופ",
+      "initialStatement": "אני רוצה שהאפליקציה תעבוד במובייל ובדסקטופ, אבל חלק מהפיצ'רים דורשים מסך גדול.",
+      "mainDesire": "אפליקציה אחת שמשרתת את כל המשתמשים",
+      "constraints": [
+        {
+          "id": "app-mobile",
+          "label": "עובד מצוין במובייל",
+          "type": "need",
+          "importance": 9,
+          "minimum": "הזרימות המרכזיות שמישות בנייד",
+          "ideal": "חוויית נייד מלאה אחד-לאחד",
+          "negotiability": "fixed",
+          "logicalLevel": "capability",
+          "notes": "",
+          "linkedTo": [
+            "app-bigscreen"
+          ]
+        },
+        {
+          "id": "app-desktop",
+          "label": "עובד מצוין בדסקטופ",
+          "type": "need",
+          "importance": 8,
+          "minimum": "כל הפיצ'רים זמינים",
+          "ideal": "ניצול מלא של המסך הגדול",
+          "negotiability": "flexible",
+          "logicalLevel": "capability",
+          "notes": "",
+          "linkedTo": []
+        },
+        {
+          "id": "app-bigscreen",
+          "label": "פיצ'רים שדורשים מסך גדול",
+          "type": "external",
+          "importance": 7,
+          "minimum": "גרסה מפושטת או הפניה לדסקטופ",
+          "ideal": "פתרון ויזואלי מלא גם בנייד",
+          "negotiability": "unknown",
+          "logicalLevel": "environment",
+          "notes": "מפה ויזואלית מלאה לא נכנסת במסך קטן",
+          "linkedTo": [
+            "app-mobile"
+          ]
+        },
+        {
+          "id": "app-budget",
+          "label": "זמן פיתוח מוגבל",
+          "type": "resource",
+          "importance": 8,
+          "minimum": "גרסה ראשונה בחודש",
+          "ideal": "ספרינט אחד",
+          "negotiability": "fixed",
+          "logicalLevel": "environment",
+          "notes": "",
+          "linkedTo": []
+        }
+      ],
+      "values": [
+        "שליטה",
+        "משמעות"
+      ],
+      "tradeoffs": [
+        {
+          "id": "app-t1",
+          "between": [
+            "app-mobile",
+            "app-bigscreen"
+          ],
+          "winner": "app-mobile",
+          "note": "במובייל מציגים אשף מפושט במקום המפה המלאה"
+        }
+      ],
+      "diagnosis": [],
+      "questionsGenerated": [],
+      "insights": [
+        "לא חייבים שוויון מוחלט בין הפלטפורמות - חייבים ערך מלא בכל אחת"
+      ],
+      "createdAt": "2026-06-01T08:00:00.000Z",
+      "updatedAt": "2026-06-01T08:00:00.000Z"
+    },
+    {
+      "sessionId": "example-therapy",
+      "title": "להשתנות בלי לאבד את עצמי",
+      "initialStatement": "אני רוצה להשתנות, אבל אני לא רוצה לאבד את מי שאני.",
+      "mainDesire": "לצמוח ולהשתנות באמת",
+      "constraints": [
+        {
+          "id": "th-change",
+          "label": "שינוי אמיתי",
+          "type": "value",
+          "importance": 9,
+          "minimum": "הרגל אחד חדש שמחזיק חודש",
+          "ideal": "טרנספורמציה מלאה",
+          "negotiability": "flexible",
+          "logicalLevel": "behavior",
+          "notes": "",
+          "linkedTo": [
+            "th-identity"
+          ]
+        },
+        {
+          "id": "th-identity",
+          "label": "להישאר אני",
+          "type": "identity",
+          "importance": 10,
+          "minimum": "לשמור על הערכים המרכזיים שלי",
+          "ideal": "להרגיש אני לגמרי גם אחרי השינוי",
+          "negotiability": "fixed",
+          "logicalLevel": "identity",
+          "notes": "מה בדיוק מ\"מי שאני\" באמת בסכנה?",
+          "linkedTo": [
+            "th-change"
+          ]
+        },
+        {
+          "id": "th-safety",
+          "label": "ביטחון רגשי בתהליך",
+          "type": "need",
+          "importance": 8,
+          "minimum": "קצב שאני שולט בו",
+          "ideal": "ליווי תומך לאורך הדרך",
+          "negotiability": "flexible",
+          "logicalLevel": "environment",
+          "notes": "",
+          "linkedTo": []
+        }
+      ],
+      "values": [
+        "זהות",
+        "משמעות",
+        "ביטחון"
+      ],
+      "tradeoffs": [
+        {
+          "id": "th-t1",
+          "between": [
+            "th-change",
+            "th-identity"
+          ],
+          "winner": "",
+          "note": "האם שינוי באמת מאיים על הזהות, או רק על ההרגלים?"
+        }
+      ],
+      "diagnosis": [],
+      "questionsGenerated": [],
+      "insights": [
+        "אולי השינוי הוא ברמת התנהגות והפחד הוא ברמת זהות - אלו שתי קומות שונות"
+      ],
+      "createdAt": "2026-06-01T08:00:00.000Z",
+      "updatedAt": "2026-06-01T08:00:00.000Z"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "logical-levels-scan-he",
+  "name": "סריקת רמות לוגיות (E/B/C/V/I)",
+  "locale": "he",
+  "source": "placeholder — needs source validation. המבנה תואם רמות לוגיות בהשראת Robert Dilts; בנתוני המורשת סומן בטעות כ'Michael Breen'. אין בריפו חומר מקור של Breen (ראו docs/AUDIT.md §4.2).",
+  "sourceValidation": "placeholder",
+  "pack": {
+    "id": "mvp-prism-breen-he",
+    "name": "חבילת JSON בסיסית - סריקת שכבות",
+    "mode": "no_ai_predefined_choices",
+    "description": "כל הבחירות והשאלות מוגדרות מראש. אין AI ואין ניתוח טקסט חופשי.",
+    "levels": {
+      "E": [
+        { "id": "context_work", "label": "הקשר עבודה / ישיבה", "question": "מה בדיוק בהקשר העבודה מפעיל את הדפוס?" },
+        { "id": "context_family", "label": "הקשר משפחתי / זוגי", "question": "איפה ובאיזה רגע בבית זה בדרך כלל קורה?" },
+        { "id": "context_time_pressure", "label": "לחץ זמן / דדליין", "question": "מה בלוח הזמנים יוצר את הלחץ?" }
+      ],
+      "B": [
+        { "id": "behavior_avoid", "label": "הימנעות או דחייה", "question": "איזו פעולה קטנה נדחית בפועל?" },
+        { "id": "behavior_silence", "label": "שתיקה / לא שואל", "question": "מה האדם עושה או לא עושה שאפשר לראות מבחוץ?" },
+        { "id": "behavior_overdoing", "label": "מאמץ יתר / ניסיון לכסות הכל", "question": "איזו פעולה חוזרת יותר מדי?" }
+      ],
+      "C": [
+        { "id": "capability_clarify", "label": "חסרה מיומנות בירור", "question": "איזו שאלת בירור קצרה אפשר לתרגל?" },
+        { "id": "capability_plan", "label": "חסרה דרך פעולה מסודרת", "question": "איזה רצף פשוט יעזור להתחיל?" },
+        { "id": "capability_feedback", "label": "חסר משוב או תיקון בזמן אמת", "question": "מי או מה יכול לתת סימן התקדמות קטן?" }
+      ],
+      "V": [
+        { "id": "value_should", "label": "כלל פנימי של צריך / חייב", "question": "לפי איזה כלל זה חייב להיות כך?" },
+        { "id": "value_worth", "label": "ערך עצמי תלוי בתוצאה", "question": "מה התוצאה הזו אמורה להוכיח עליך?" },
+        { "id": "value_fairness", "label": "ציפייה לצדק או הכרה", "question": "מה חשוב כאן שלא מקבל הכרה?" }
+      ],
+      "I": [
+        { "id": "identity_not_enough", "label": "אני לא מספיק", "question": "מי אתה כשזה רק אתגר נקודתי ולא זהות?" },
+        { "id": "identity_outsider", "label": "אני לא שייך / לא במקום", "question": "איזה סימן קטן יראה שיש לך מקום כאן?" },
+        { "id": "identity_responsible", "label": "אני חייב להחזיק הכל", "question": "מה באמת שלך ומה אפשר להחזיר לאחרים?" }
+      ]
+    }
+  }
+}

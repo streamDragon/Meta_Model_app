@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "id": "blueprint-he",
+  "name": "Blueprint Builder — חבילת תוכן (עברית)",
+  "locale": "he",
+  "source": "תוכן מקורי של האפליקציה",
+  "sourceValidation": "verified",
+  "blueprint_builder": {
+    "framing": "הפעולה שלך לא עמומה בגלל שאתה 'לא מסוגל' - הצעד הראשון הוא פשוט להגדיר אותה בבירור",
+    "state_machine": [
+      { "state": "CAPTURE", "description": "המשתמש בוחר פעולה מובנית מתוך חבילת JSON", "next": "EXTRACT" },
+      { "state": "EXTRACT", "description": "חילוץ הפעולה המרכזית ופירוק Blueprint", "next": "EXPECTATION_GAP" },
+      { "state": "EXPECTATION_GAP", "description": "בדיקת פער בין ציפיה ליכולת", "next": "FINAL_PLAN" },
+      { "state": "FINAL_PLAN", "description": "יצירת תוכנית סופית עם צעד הבא ו-Plan B", "next": "DONE" },
+      { "state": "DONE", "description": "האפשרות לייצוא ו-Blueprint חדש", "next": "CAPTURE" }
+    ],
+    "reframe_templates": [
+      {
+        "gap_hint": "יכולת נמוכה",
+        "reframe": "זה לא שאתה לא יכול - זה שהמשימה עדיין לא הוגדרה כך שתוכל להצליח בה כרגע. בואו נפרק אותה."
+      },
+      {
+        "gap_hint": "חסר ידע",
+        "reframe": "זה לא אופי - זו הגדרה לא שלמה. אתה צריך 15 דקות של מידע מסוים, לא האשמה עצמית."
+      },
+      {
+        "gap_hint": "חסר כלים",
+        "reframe": "אתה יכול לעשות את זה, פשוט האמצעים שלך לא מותאמים. בואו נמצא כלי או דרך חלופית."
+      },
+      {
+        "gap_hint": "חסר אישור / הסכמה",
+        "reframe": "זה לא בגלל שאתה לא מוכן - זה בגלל שעדיין לא ברור למישהו אחר למה זה אמור לקרות. בואו נעבוד על התקשורת."
+      },
+      {
+        "gap_hint": "פעולה גדולה מדי",
+        "reframe": "הפער בין הציפייה ליכולת מראה שהמשימה, כפי שהוגדרה, גדולה מדי. בואו נחלק אותה לחלקים של 10 דקות."
+      }
+    ]
+  },
+  "choice_pack": {
+    "id": "mvp-blueprint-he",
+    "name": "חבילת JSON בסיסית - Blueprint",
+    "mode": "no_ai_predefined_choices",
+    "fields": {
+      "action-input": [
+        { "id": "practice_question", "label": "לבחור משפט אחד ולתרגל עליו שאלת מטה מודל" },
+        { "id": "prepare_session", "label": "להכין תרגול קצר למשתתף אחד" },
+        { "id": "review_category", "label": "לעבור על קטגוריה אחת ולזהות דוגמאות" }
+      ],
+      "q-success": [
+        { "id": "success_one_question", "label": "יש שאלה אחת טובה יותר מהמשפט המקורי" },
+        { "id": "success_category_clear", "label": "ברור איזו קטגוריית מטה מודל מופיעה" },
+        { "id": "success_next_step", "label": "יש צעד פעולה קטן שאפשר לבצע היום" }
+      ],
+      "q-first-step": [
+        { "id": "first_pick_sentence", "label": "לבחור משפט תרגול אחד מתוך המאגר" },
+        { "id": "first_pick_category", "label": "לבחור קטגוריה אחת בלבד" },
+        { "id": "first_pick_question", "label": "לבחור שאלת ניקוי מוכנה אחת" }
+      ],
+      "q-last-step": [
+        { "id": "last_export", "label": "לייצא JSON של הסשן" },
+        { "id": "last_explain", "label": "להסביר בקול את השאלה שנבחרה" },
+        { "id": "last_save", "label": "לשמור תוצאה קצרה להמשך תרגול" }
+      ],
+      "q-middle-steps": [
+        { "id": "middle_basic", "label": "בחר קטגוריה | בחר דוגמה | בחר שאלה | בדוק Pivot" },
+        { "id": "middle_prism", "label": "בחר פריזמה | מלא שכבות בבחירות | קרא המלצת Pivot" },
+        { "id": "middle_trainer", "label": "בחר קטגוריה | ענה על 3 שאלות | בדוק משוב" }
+      ],
+      "q-prerequisites": [
+        { "id": "pre_10_minutes", "label": "10 דקות פנויות ומשפט תרגול אחד" },
+        { "id": "pre_group", "label": "משתתף אחד ודוגמה מוסכמת" },
+        { "id": "pre_quiet", "label": "מסך פתוח וסביבה שקטה" }
+      ],
+      "q-friction": [
+        { "id": "friction_too_many", "label": "יש יותר מדי קטגוריות בבת אחת" },
+        { "id": "friction_unclear_sentence", "label": "המשפט המקורי לא מספיק ברור" },
+        { "id": "friction_perfect", "label": "ניסיון למצוא שאלה מושלמת במקום לבחור אחת טובה" }
+      ],
+      "q-alternatives": [
+        { "id": "alt_smaller", "label": "להקטין למשפט אחד ושאלה אחת" },
+        { "id": "alt_category", "label": "לעבור רק על קטגוריה אחת" },
+        { "id": "alt_pack", "label": "לטעון חבילת JSON פשוטה יותר" }
+      ],
+      "q-time": [
+        { "id": "time_10", "label": "10 דקות" },
+        { "id": "time_20", "label": "20 דקות" },
+        { "id": "time_45", "label": "45 דקות" }
+      ],
+      "q-expectation": [
+        { "id": "expect_fast", "label": "זה אמור להיות ברור מהר" },
+        { "id": "expect_perfect", "label": "צריך לבחור את השאלה המדויקת ביותר" },
+        { "id": "expect_teach", "label": "אני אמור להסביר את זה בצורה חלקה" }
+      ],
+      "q-assumption": [
+        { "id": "assume_easy", "label": "אם זה נכון זה אמור להיות קל" },
+        { "id": "assume_everyone", "label": "כולם כבר אמורים להבין את זה" },
+        { "id": "assume_no_mistakes", "label": "אסור לטעות בשאלה הראשונה" }
+      ],
+      "q-gap": [
+        { "id": "gap_knowledge", "label": "חסר ידע קצר או דוגמה אחת" },
+        { "id": "gap_tool", "label": "חסר כלי או תבנית עבודה" },
+        { "id": "gap_agreement", "label": "חסר אישור / הסכמה / הקשר ברור" }
+      ]
+    }
+  }
+}

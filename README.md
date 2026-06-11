@@ -1,114 +1,63 @@
-# 🧠 Meta Model - כלי תרגול מטה מודל
+# 🧠 Meta Model Gym — מעבדת שפה לאימון קוגניטיבי-לשוני
 
-כלי אינטרנט אינטראקטיבי לתרגול טכניקות **Meta Model** של NLP (Neuro-Linguistic Programming) על פי Richard Bandler ו-John Grinder.
+אפליקציית אימון לתרגול **Meta Model** של NLP (Bandler & Grinder): לזהות מחיקה,
+עיוות והכללה, לשאול שאלות מדויקות יותר, ולהפוך כוונות עמומות לתוכניות פעולה.
 
-## 📚 מה זה Meta Model?
+> כלי אימון ורפלקציה עצמית — לא כלי אבחון קליני ולא תחליף לטיפול.
 
-Meta Model היא קבוצת כלים שפוניים המזהים ותוקנים **הפרות שפה** שמגבילות אותנו. הוא מאפשר לנו להבין ולשנות דפוסי חשיבה מגבילים.
+## ✨ מה יש באפליקציה
 
-### שלוש קטגוריות עיקריות:
+| פיצ'ר | מה מתרגלים | סטטוס |
+| --- | --- | --- |
+| **קטגוריות** | שלוש משפחות ההפרה (מחיקה, עיוות, הכללה) עם 11 תתי-דפוסים | production |
+| **תרגול (Trainer)** | זיהוי מהיר של סוג ההפרה — MCQ עם משוב, רמזים ו-XP | production |
+| **Blueprint Builder** | הפיכת פעולה עמומה לתוכנית: צעד ראשון, תנאים, Plan B | production |
+| **מעבדת פריזמות** | סריקת משפט דרך פריזמה בחמש שכבות + המלצת Pivot | beta |
+| **מעבדת ערכים ואילוצים** | `אני רוצה ___ אבל ___` — מפת שתי קומות, התנגשויות ואבחון | beta |
+| **בית / התקדמות** | Streak, XP, תגים, סשנים ומשימה הבאה | production |
 
-#### 1. **DELETION - מחיקה** ❌
-- Simple Deletion - מחיקת פרטים חיוניים
-- Comparative Deletion - השמטת בסיס ההשוואה
-- Lack of Referential Index - אי-ספציפיות התייחסות
+הכל **ללא AI**: התוכן מגיע מחבילות JSON מובנות (`data/`) שאפשר להחליף ולהרחיב.
 
-#### 2. **DISTORTION - עיוות** 🔀
-- Nominalization - הפיכת פעל לשם
-- Cause-Effect - הנחה שיש סיבה-תוצאה ישירה
-- Mind Reading - הנחה על מה מישהו חושב
-- Lost Performative - הסרת הדובר מהטענה
-- Presupposition - הנחות מוטבעות
-- Complex Equivalence - ערך שווה מסובך
+## 🛠️ פיתוח
 
-#### 3. **GENERALIZATION - הכללה** 📈
-- Universal Quantifiers - "תמיד", "אף פעם", "הכל"
-- Modal Operators - "חייב", "לא יכול", "צריך"
-
-## 🚀 תכונות
-
-- ✅ ממשק אינטרנט מודרני
-- ✅ תרגול דינאמי עם משפטים רבים
-- ✅ סינון לפי קטגוריה
-- ✅ טיפים והסברים
-- ✅ תמיכה מלאה בעברית
-
-## 🎯 גלוש ישירות
-
-[GitHub Pages](https://streamDragon.github.io/Meta_Model_app)
+```bash
+npm install
+npm run dev       # שרת פיתוח (Vite)
+npm test          # בדיקות (Vitest)
+npm run build     # בנייה ל-dist/ (סטטי, מתאים ל-GitHub Pages)
+npm run preview   # תצוגה מקדימה של הבנייה
+```
 
 ## 📁 מבנה הפרויקט
 
-```
+```text
 Meta_Model_app/
-├── index.html
-├── css/style.css
-├── js/app.js
-├── data/meta-model-violations.json
-└── README.md
+├── index.html              # נקודת כניסה של Vite
+├── src/
+│   ├── main.tsx            # bootstrap
+│   ├── App.tsx             # מעטפת האפליקציה: ניווט, splash, providers
+│   ├── registry.ts         # רישום הפיצ'רים — מקור אמת יחיד לניווט ולסטטוסים
+│   ├── types.ts            # טיפוסי חבילות התוכן
+│   ├── features/           # עמוד לכל פיצ'ר (home, categories, trainer, ...)
+│   ├── lib/                # לוגיקה טהורה: trainer, pivot, blueprint, valuesLab
+│   ├── store/              # progress (XP/streak/badges), hint toast, bridges
+│   ├── styles/             # מערכת עיצוב מבוססת tokens (RTL-first, Heebo)
+│   └── data/content.ts     # מיזוג חבילות התוכן
+├── packs/                  # חבילות תוכן JSON מגורסאות (schemaVersion, source)
+└── docs/AUDIT.md           # דוח ביקורת מוצר וארכיטקטורה + תוכנית שלבים
 ```
 
-## 💻 טכנולוגיה
+## 🗺️ מפת דרכים
 
-- HTML5
-- CSS3
-- JavaScript Vanilla
-- JSON
+ראו [docs/AUDIT.md](docs/AUDIT.md) — דוח ביקורת מלא ותוכנית בשישה שלבים:
+ארכיטקטורה ✅ → עיצוב דסקטופ ✅ → מובייל ומסכי fallback ✅ → ניקוי מודל תוכן ✅ →
+מעבדת ערכים/אילוצים ✅ → QA וליטוש (בתהליך).
 
-## 👨‍💻 מפתח
+## 📚 מקורות תיאורטיים
 
-streamDragon - [GitHub](https://github.com/streamDragon)
+Bandler & Grinder — *The Structure of Magic*; Robert Dilts — רמות לוגיות;
+עקרונות Reframing. חלקים המסומנים `placeholder` ב-registry ממתינים לאימות מקור.
 
-Happy Learning! 🚀✨
-## Dev note: build version source of truth
+---
 
-- The app version badge is loaded at runtime from `/version.json` using `cache: "no-store"` with a cache-busting query.
-- `/version.json` is generated on every build/deploy by `npm run generate:version` (which runs `scripts/sync-entry.mjs`).
-- Manifest fields include both new and legacy keys:
-  - `appVersion`, `commitSha`, `builtAt`
-  - `version`, `gitCommit`, `buildIso`, `buildTime`
-- The UI displays: `���� ������: <version> (<short-commit>)`.
-
-How to bump `appVersion`:
-
-1. Update `package.json` `version` (or use your release workflow).
-2. Run `npm run generate:version`.
-3. Commit `package.json`, `version.json`, and `index.html` metadata changes.
-
-## Freemium Stack (Supabase + Stripe)
-
-This repo now includes a freemium implementation:
-
-- `Guest` (anonymous): 10 sentences/day, ads enabled
-- `Free` (registered): 80 total sentences, ads enabled
-- `Pro` (subscription): unlimited, ads disabled
-
-### Supabase setup
-
-1. Enable `Anonymous Sign-Ins`.
-2. Enable `Manual Linking` (required for anonymous -> permanent account linking).
-3. Run SQL files in this order:
-   1. `docs/sql/001_schema.sql`
-   2. `docs/sql/002_rls.sql`
-   3. `docs/sql/003_rpc.sql`
-   4. `docs/sql/004_stripe_billing.sql`
-
-### Environment variables
-
-Client/build (`VITE_*`):
-
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
-- `VITE_PUBLIC_SITE_URL`
-- `VITE_ADSENSE_CLIENT_ID` (optional)
-
-Server (Vercel):
-
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `SUPABASE_ANON_KEY`
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-- `STRIPE_PRICE_MONTHLY`
-- `STRIPE_PRICE_YEARLY`
-- `PUBLIC_SITE_URL`
+פיתוח: streamDragon · [GitHub](https://github.com/streamDragon/Meta_Model_app)
