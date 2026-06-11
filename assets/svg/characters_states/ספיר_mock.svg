@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <image href="../characters/ספיר.svg" x="0" y="0" width="256" height="256"/>
+  <g>
+    <circle cx="214" cy="44" r="30" fill="#f59e0b" stroke="#0B1220" stroke-width="5"/>
+    <text x="214" y="55" text-anchor="middle" font-size="24" font-family="Segoe UI Emoji, Arial">🙄</text>
+  </g>
+  <rect x="20" y="210" width="216" height="30" rx="12" fill="#fef3c7" stroke="#0B1220" stroke-width="3"/>
+  <text x="128" y="231" text-anchor="middle" font-size="14" font-weight="700" fill="#92400e" font-family="Segoe UI, Arial">mock</text>
+</svg>

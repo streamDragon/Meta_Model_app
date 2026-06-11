@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 940" role="img" aria-labelledby="title desc">
+  <title id="title">Michael Breen - Meta Model structural table</title>
+  <desc id="desc">Five rows of three related Meta Model distinctions used to train cluster detection.</desc>
+  <defs>
+    <linearGradient id="pageBg" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#edf4ff"/>
+    </linearGradient>
+    <style>
+      .title { font: 700 36px "Segoe UI", Arial, sans-serif; fill: #123f7b; }
+      .subtitle { font: 600 18px "Segoe UI", Arial, sans-serif; fill: #3a5f89; }
+      .head { font: 700 20px "Segoe UI", Arial, sans-serif; fill: #153e72; }
+      .theme { font: 600 16px "Segoe UI", Arial, sans-serif; fill: #2f5b94; }
+      .cell { font: 700 21px "Segoe UI", Arial, sans-serif; fill: #173659; }
+      .hint { font: 500 16px "Segoe UI", Arial, sans-serif; fill: #4f7198; }
+      .foot { font: 600 16px "Segoe UI", Arial, sans-serif; fill: #335780; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="940" fill="url(#pageBg)"/>
+  <rect x="28" y="24" width="1344" height="892" rx="22" fill="#ffffff" stroke="#d2e2fb" stroke-width="2"/>
+
+  <text x="700" y="86" text-anchor="middle" class="title">Michael Breen - Meta Model Structural Table (5x3)</text>
+  <text x="700" y="118" text-anchor="middle" class="subtitle">Triples Radar trains recognition of pattern clusters rather than isolated questions.</text>
+
+  <rect x="60" y="156" width="260" height="54" rx="12" fill="#eaf2ff" stroke="#c9dbf8"/>
+  <text x="190" y="191" text-anchor="middle" class="head">Row Theme</text>
+  <rect x="340" y="156" width="300" height="54" rx="12" fill="#eaf2ff" stroke="#c9dbf8"/>
+  <text x="490" y="191" text-anchor="middle" class="head">Pattern A</text>
+  <rect x="690" y="156" width="300" height="54" rx="12" fill="#eaf2ff" stroke="#c9dbf8"/>
+  <text x="840" y="191" text-anchor="middle" class="head">Pattern B</text>
+  <rect x="1040" y="156" width="300" height="54" rx="12" fill="#eaf2ff" stroke="#c9dbf8"/>
+  <text x="1190" y="191" text-anchor="middle" class="head">Pattern C</text>
+
+  <rect x="60" y="228" width="1280" height="124" rx="16" fill="#f7fbff" stroke="#d8e6fb"/>
+  <rect x="60" y="228" width="10" height="124" rx="6" fill="#5b9dff"/>
+  <text x="82" y="270" class="theme">Row 1 - Source, Assumption, Intention</text>
+  <text x="82" y="296" class="hint">How meaning gets assigned without direct evidence.</text>
+  <text x="490" y="276" text-anchor="middle" class="cell">Mind Reading</text>
+  <text x="840" y="268" text-anchor="middle" class="cell">Assumptions</text>
+  <text x="840" y="293" text-anchor="middle" class="hint">(Presuppositions)</text>
+  <text x="1190" y="276" text-anchor="middle" class="cell">Lost Performative</text>
+
+  <rect x="60" y="366" width="1280" height="124" rx="16" fill="#f7fbff" stroke="#d8e6fb"/>
+  <rect x="60" y="366" width="10" height="124" rx="6" fill="#06b6d4"/>
+  <text x="82" y="408" class="theme">Row 2 - Rules, Limits, Consequences</text>
+  <text x="82" y="434" class="hint">Language of necessity, scope, and causal links.</text>
+  <text x="490" y="414" text-anchor="middle" class="cell">Universal Quantifier</text>
+  <text x="840" y="414" text-anchor="middle" class="cell">Modal Operator</text>
+  <text x="1190" y="414" text-anchor="middle" class="cell">Cause-Effect</text>
+
+  <rect x="60" y="504" width="1280" height="124" rx="16" fill="#f7fbff" stroke="#d8e6fb"/>
+  <rect x="60" y="504" width="10" height="124" rx="6" fill="#f59e0b"/>
+  <text x="82" y="546" class="theme">Row 3 - Meaning, Identity, Inference</text>
+  <text x="82" y="572" class="hint">Separating process, identity claims, and conclusions.</text>
+  <text x="490" y="552" text-anchor="middle" class="cell">Nominalisations</text>
+  <text x="840" y="552" text-anchor="middle" class="cell">Identity Predicates</text>
+  <text x="1190" y="552" text-anchor="middle" class="cell">Complex Equivalence</text>
+
+  <rect x="60" y="642" width="1280" height="124" rx="16" fill="#f7fbff" stroke="#d8e6fb"/>
+  <rect x="60" y="642" width="10" height="124" rx="6" fill="#8b5cf6"/>
+  <text x="82" y="684" class="theme">Row 4 - Context, Time, Reference</text>
+  <text x="82" y="710" class="hint">Clarifying comparison, frame, and who is being referenced.</text>
+  <text x="490" y="690" text-anchor="middle" class="cell">Comparative Deletion</text>
+  <text x="840" y="682" text-anchor="middle" class="cell">Time-Space</text>
+  <text x="840" y="707" text-anchor="middle" class="cell">Predicates</text>
+  <text x="1190" y="682" text-anchor="middle" class="cell">Lack Referential</text>
+  <text x="1190" y="707" text-anchor="middle" class="cell">Index</text>
+
+  <rect x="60" y="780" width="1280" height="124" rx="16" fill="#f7fbff" stroke="#d8e6fb"/>
+  <rect x="60" y="780" width="10" height="124" rx="6" fill="#f43f5e"/>
+  <text x="82" y="822" class="theme">Row 5 - Sensory Grounding and Action</text>
+  <text x="82" y="848" class="hint">Returning to observable language and behavioral detail.</text>
+  <text x="490" y="828" text-anchor="middle" class="cell">Non-Referring Nouns</text>
+  <text x="840" y="828" text-anchor="middle" class="cell">Sensory Predicates</text>
+  <text x="1190" y="828" text-anchor="middle" class="cell">Unspecified Verbs</text>
+
+  <text x="700" y="906" text-anchor="middle" class="foot">Use this map during Triples Radar to identify the active cluster before choosing the next intervention.</text>
+</svg>

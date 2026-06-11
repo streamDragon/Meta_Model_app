@@ -1,0 +1,2418 @@
+{
+  "metadata": {
+    "app": "Classic Classic",
+    "version": "0.1.0",
+    "locale": "he-IL",
+    "description": "Meta Model Trainer — Breen-table anchored drill (MVP dataset)"
+  },
+  "breenTable": {
+    "version": "placeholder-v0",
+    "cells": [
+      {
+        "id": "DEL",
+        "label": "DEL",
+        "labelHe": "מחיקות",
+        "family": "deletion"
+      },
+      {
+        "id": "DIS",
+        "label": "DIS",
+        "labelHe": "עיוותים",
+        "family": "distortion"
+      },
+      {
+        "id": "GEN",
+        "label": "GEN",
+        "labelHe": "הכללות",
+        "family": "generalization"
+      }
+    ]
+  },
+  "patterns": [
+    {
+      "id": "unspecified_noun",
+      "name": "שם עצם לא מפורט",
+      "family": "deletion",
+      "difficulty": 1,
+      "breenCellId": "DEL",
+      "definition": "נעשה שימוש בשם עצם כללי/עמום בלי להגדיר למה הכוונה בפועל.",
+      "problem": {
+        "oneLiner": "המפה נשארת עמומה ולכן קשה לדעת על מה באמת מדברים.",
+        "tags": [
+          "ambiguity",
+          "low-specificity",
+          "diffuse-focus"
+        ]
+      },
+      "goal": {
+        "oneLiner": "להחזיר שם/מושג מדויק והגדרה תפעולית.",
+        "dataTargets": [
+          "meaning",
+          "scope",
+          "referent"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "unspecified_noun_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-השם/המושג?"
+        },
+        {
+          "id": "unspecified_noun_gq_2",
+          "text": "למה בדיוק אתה קורא כך?"
+        },
+        {
+          "id": "unspecified_noun_gq_3",
+          "text": "מה זה אומר אצלך בפועל?"
+        },
+        {
+          "id": "unspecified_noun_gq_4",
+          "text": "איזה דבר ספציפי זה?"
+        },
+        {
+          "id": "unspecified_noun_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "unspecified_noun_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "unspecified_noun_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "unspecified_noun_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "unspecified_noun_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "unspecified_noun_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "unspecified_noun_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "unspecified_noun_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "unspecified_noun_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "unspecified_noun_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "unspecified_noun_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "unspecified_noun_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "unspecified_noun_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "unspecified_noun_problem_2",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "unspecified_noun_problem_3",
+          "text": "המפה נשארת עמומה ולכן קשה לדעת על מה באמת מדברים.",
+          "correct": true
+        },
+        {
+          "id": "unspecified_noun_problem_4",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "unspecified_noun_problem_5",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "unspecified_noun_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "unspecified_noun_goal_2",
+          "text": "להחזיר שם/מושג מדויק והגדרה תפעולית.",
+          "correct": true
+        },
+        {
+          "id": "unspecified_noun_goal_3",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "unspecified_noun_goal_4",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "unspecified_noun_goal_5",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        }
+      ],
+      "examples": [
+        "יש שם בעיה בתקשורת.",
+        "המצב הזה בלתי נסבל.",
+        "אני מרגיש התנגדות כל הזמן."
+      ]
+    },
+    {
+      "id": "unspecified_verb",
+      "name": "פועל לא מפורט",
+      "family": "deletion",
+      "difficulty": 1,
+      "breenCellId": "DEL",
+      "definition": "הפעולה נאמרת באופן כללי בלי ציון איך הפעולה מתבצעת.",
+      "problem": {
+        "oneLiner": "אין תיאור תהליכי ולכן אי אפשר להתערב או לבדוק מה קורה.",
+        "tags": [
+          "process-hidden",
+          "missing-steps",
+          "unclear-action"
+        ]
+      },
+      "goal": {
+        "oneLiner": "להחזיר תיאור פעולה מפורט: מה בדיוק נעשה, צעד אחר צעד.",
+        "dataTargets": [
+          "steps",
+          "behavior",
+          "sequence"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "unspecified_verb_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-הפעולה?"
+        },
+        {
+          "id": "unspecified_verb_gq_2",
+          "text": "מה הוא עושה בדיוק?"
+        },
+        {
+          "id": "unspecified_verb_gq_3",
+          "text": "איך זה נראה בפועל?"
+        },
+        {
+          "id": "unspecified_verb_gq_4",
+          "text": "מה קורה צעד-צעד?"
+        },
+        {
+          "id": "unspecified_verb_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "unspecified_verb_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "unspecified_verb_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "unspecified_verb_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "unspecified_verb_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "unspecified_verb_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "unspecified_verb_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "unspecified_verb_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "unspecified_verb_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "unspecified_verb_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "unspecified_verb_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "unspecified_verb_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "unspecified_verb_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "unspecified_verb_problem_2",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "unspecified_verb_problem_3",
+          "text": "אין תיאור תהליכי ולכן אי אפשר להתערב או לבדוק מה קורה.",
+          "correct": true
+        },
+        {
+          "id": "unspecified_verb_problem_4",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "unspecified_verb_problem_5",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "unspecified_verb_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "unspecified_verb_goal_2",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "unspecified_verb_goal_3",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "unspecified_verb_goal_4",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        },
+        {
+          "id": "unspecified_verb_goal_5",
+          "text": "להחזיר תיאור פעולה מפורט: מה בדיוק נעשה, צעד אחר צעד.",
+          "correct": true
+        }
+      ],
+      "examples": [
+        "ואז הוא פשוט פוגע בי.",
+        "אני מתפרק.",
+        "הם סוגרים אותי."
+      ]
+    },
+    {
+      "id": "simple_deletion",
+      "name": "מחיקה פשוטה",
+      "family": "deletion",
+      "difficulty": 1,
+      "breenCellId": "DEL",
+      "definition": "חלק מרכזי מהמשפט חסר (מי/מה/איפה/מתי/איך) ונדרש להשלים אותו.",
+      "problem": {
+        "oneLiner": "חסר מידע בסיסי ולכן המשמעות חלקית ולא ניתנת לבדיקה.",
+        "tags": [
+          "missing-info",
+          "gap",
+          "incomplete-map"
+        ]
+      },
+      "goal": {
+        "oneLiner": "להשלים את הפרטים שנמחקו כדי לקבל תמונה שמישה.",
+        "dataTargets": [
+          "who",
+          "what",
+          "when"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "simple_deletion_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-החלק שנמחק?"
+        },
+        {
+          "id": "simple_deletion_gq_2",
+          "text": "מה בדיוק קשה?"
+        },
+        {
+          "id": "simple_deletion_gq_3",
+          "text": "מה לא עובד בדיוק?"
+        },
+        {
+          "id": "simple_deletion_gq_4",
+          "text": "מה פוגע במה?"
+        },
+        {
+          "id": "simple_deletion_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "simple_deletion_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "simple_deletion_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "simple_deletion_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "simple_deletion_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "simple_deletion_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "simple_deletion_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "simple_deletion_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "simple_deletion_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "simple_deletion_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "simple_deletion_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "simple_deletion_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "simple_deletion_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "simple_deletion_problem_2",
+          "text": "חסר מידע בסיסי ולכן המשמעות חלקית ולא ניתנת לבדיקה.",
+          "correct": true
+        },
+        {
+          "id": "simple_deletion_problem_3",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "simple_deletion_problem_4",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "simple_deletion_problem_5",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "simple_deletion_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "simple_deletion_goal_2",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "simple_deletion_goal_3",
+          "text": "להשלים את הפרטים שנמחקו כדי לקבל תמונה שמישה.",
+          "correct": true
+        },
+        {
+          "id": "simple_deletion_goal_4",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "simple_deletion_goal_5",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        }
+      ],
+      "examples": [
+        "זה קשה.",
+        "זה לא עובד.",
+        "זה פוגע."
+      ]
+    },
+    {
+      "id": "comparative_deletion",
+      "name": "השוואה חסרה",
+      "family": "deletion",
+      "difficulty": 2,
+      "breenCellId": "DEL",
+      "definition": "מופיעה השוואה בלי סטנדרט השוואה ברור (למי/למה/באיזה מדד).",
+      "problem": {
+        "oneLiner": "נוצרת הערכה יחסית בלי קריטריון ולכן אי אפשר לבחון אותה.",
+        "tags": [
+          "comparison",
+          "missing-standard",
+          "vague-judgment"
+        ]
+      },
+      "goal": {
+        "oneLiner": "להחזיר את מדד ההשוואה והייחוס המדויק.",
+        "dataTargets": [
+          "compare-to",
+          "criterion",
+          "metric"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "comparative_deletion_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-ההשוואה?"
+        },
+        {
+          "id": "comparative_deletion_gq_2",
+          "text": "פחות טוב ביחס למה?"
+        },
+        {
+          "id": "comparative_deletion_gq_3",
+          "text": "יותר גרוע לפי איזה מדד?"
+        },
+        {
+          "id": "comparative_deletion_gq_4",
+          "text": "לעומת מי בדיוק?"
+        },
+        {
+          "id": "comparative_deletion_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "comparative_deletion_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "comparative_deletion_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "comparative_deletion_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "comparative_deletion_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "comparative_deletion_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "comparative_deletion_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "comparative_deletion_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "comparative_deletion_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "comparative_deletion_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "comparative_deletion_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "comparative_deletion_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "comparative_deletion_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "comparative_deletion_problem_2",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "comparative_deletion_problem_3",
+          "text": "נוצרת הערכה יחסית בלי קריטריון ולכן אי אפשר לבחון אותה.",
+          "correct": true
+        },
+        {
+          "id": "comparative_deletion_problem_4",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "comparative_deletion_problem_5",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "comparative_deletion_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "comparative_deletion_goal_2",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "comparative_deletion_goal_3",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "comparative_deletion_goal_4",
+          "text": "להחזיר את מדד ההשוואה והייחוס המדויק.",
+          "correct": true
+        },
+        {
+          "id": "comparative_deletion_goal_5",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        }
+      ],
+      "examples": [
+        "אני פחות טוב מהם.",
+        "זה גרוע יותר.",
+        "היא יותר חזקה ממני בשיחות."
+      ]
+    },
+    {
+      "id": "lack_ref_index",
+      "name": "חוסר אינדקס ייחוס",
+      "family": "deletion",
+      "difficulty": 2,
+      "breenCellId": "DEL",
+      "definition": "נעשה שימוש בגורם לא מזוהה (\"הם\", \"אנשים\") בלי לציין מי בדיוק.",
+      "problem": {
+        "oneLiner": "הייחוס נשאר עמום ולכן קשה להגיב למקור הרלוונטי.",
+        "tags": [
+          "who-unknown",
+          "vague-agent",
+          "diffuse-blame"
+        ]
+      },
+      "goal": {
+        "oneLiner": "לזהות מי/איזו קבוצה/אדם ספציפי נמצאים בהצהרה.",
+        "dataTargets": [
+          "who",
+          "group",
+          "specific-person"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "lack_ref_index_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-הגורם?"
+        },
+        {
+          "id": "lack_ref_index_gq_2",
+          "text": "מי בדיוק הם?"
+        },
+        {
+          "id": "lack_ref_index_gq_3",
+          "text": "איזה אנשים ספציפית?"
+        },
+        {
+          "id": "lack_ref_index_gq_4",
+          "text": "מי בעבודה אמר את זה?"
+        },
+        {
+          "id": "lack_ref_index_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "lack_ref_index_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "lack_ref_index_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "lack_ref_index_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "lack_ref_index_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "lack_ref_index_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "lack_ref_index_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "lack_ref_index_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "lack_ref_index_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "lack_ref_index_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "lack_ref_index_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "lack_ref_index_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "lack_ref_index_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "lack_ref_index_problem_2",
+          "text": "הייחוס נשאר עמום ולכן קשה להגיב למקור הרלוונטי.",
+          "correct": true
+        },
+        {
+          "id": "lack_ref_index_problem_3",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "lack_ref_index_problem_4",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "lack_ref_index_problem_5",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "lack_ref_index_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "lack_ref_index_goal_2",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "lack_ref_index_goal_3",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "lack_ref_index_goal_4",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        },
+        {
+          "id": "lack_ref_index_goal_5",
+          "text": "לזהות מי/איזו קבוצה/אדם ספציפי נמצאים בהצהרה.",
+          "correct": true
+        }
+      ],
+      "examples": [
+        "הם לא נותנים לי מקום.",
+        "אנשים שופטים אותי.",
+        "כולם בעבודה נגד זה."
+      ]
+    },
+    {
+      "id": "mind_reading",
+      "name": "קריאת מחשבות",
+      "family": "distortion",
+      "difficulty": 2,
+      "breenCellId": "DIS",
+      "definition": "אדם מציג ידיעה על מחשבות/כוונות של אחר בלי עדות ברורה.",
+      "problem": {
+        "oneLiner": "מסקנה פנימית מוצגת כעובדה ויוצרת תגובה לא נבדקת.",
+        "tags": [
+          "assumption-about-other",
+          "inference",
+          "certainty"
+        ]
+      },
+      "goal": {
+        "oneLiner": "להבחין בין פרשנות לעדות ולבדוק על מה מבוססת הידיעה.",
+        "dataTargets": [
+          "evidence",
+          "observable-cues",
+          "alternative-meaning"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "mind_reading_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-הידיעה על האחר?"
+        },
+        {
+          "id": "mind_reading_gq_2",
+          "text": "איך אתה יודע?"
+        },
+        {
+          "id": "mind_reading_gq_3",
+          "text": "על מה אתה מבסס את זה?"
+        },
+        {
+          "id": "mind_reading_gq_4",
+          "text": "מה ראית/שמעת בפועל?"
+        },
+        {
+          "id": "mind_reading_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "mind_reading_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "mind_reading_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "mind_reading_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "mind_reading_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "mind_reading_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "mind_reading_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "mind_reading_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "mind_reading_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "mind_reading_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "mind_reading_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "mind_reading_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "mind_reading_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "mind_reading_problem_2",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "mind_reading_problem_3",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "mind_reading_problem_4",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        },
+        {
+          "id": "mind_reading_problem_5",
+          "text": "מסקנה פנימית מוצגת כעובדה ויוצרת תגובה לא נבדקת.",
+          "correct": true
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "mind_reading_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "mind_reading_goal_2",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "mind_reading_goal_3",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "mind_reading_goal_4",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        },
+        {
+          "id": "mind_reading_goal_5",
+          "text": "להבחין בין פרשנות לעדות ולבדוק על מה מבוססת הידיעה.",
+          "correct": true
+        }
+      ],
+      "examples": [
+        "אני יודע שהיא חושבת שאני חלש.",
+        "הוא בטוח מזלזל בי.",
+        "הם חושבים שאני לא רציני."
+      ]
+    },
+    {
+      "id": "cause_effect",
+      "name": "סיבה ותוצאה",
+      "family": "distortion",
+      "difficulty": 2,
+      "breenCellId": "DIS",
+      "definition": "מוצג קשר סיבתי קשיח בין אירוע אחד לבין תוצאה פנימית/חיצונית.",
+      "problem": {
+        "oneLiner": "נוצר רצף סיבתי חד-כיווני שמקטין בחירה ואפשרויות.",
+        "tags": [
+          "causal-chain",
+          "loss-of-choice",
+          "oversimplification"
+        ]
+      },
+      "goal": {
+        "oneLiner": "לפרק את השרשרת ולברר את הצעדים המתווכים בקשר.",
+        "dataTargets": [
+          "mechanism",
+          "sequence",
+          "mediation"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "cause_effect_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-הקשר הסיבתי?"
+        },
+        {
+          "id": "cause_effect_gq_2",
+          "text": "איך בדיוק X גורם ל-Y?"
+        },
+        {
+          "id": "cause_effect_gq_3",
+          "text": "מה קורה באמצע?"
+        },
+        {
+          "id": "cause_effect_gq_4",
+          "text": "אילו שלבים מחברים בין זה לזה?"
+        },
+        {
+          "id": "cause_effect_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "cause_effect_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "cause_effect_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "cause_effect_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "cause_effect_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "cause_effect_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "cause_effect_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "cause_effect_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "cause_effect_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "cause_effect_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "cause_effect_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "cause_effect_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "cause_effect_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "cause_effect_problem_2",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "cause_effect_problem_3",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "cause_effect_problem_4",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        },
+        {
+          "id": "cause_effect_problem_5",
+          "text": "נוצר רצף סיבתי חד-כיווני שמקטין בחירה ואפשרויות.",
+          "correct": true
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "cause_effect_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "cause_effect_goal_2",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "cause_effect_goal_3",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "cause_effect_goal_4",
+          "text": "לפרק את השרשרת ולברר את הצעדים המתווכים בקשר.",
+          "correct": true
+        },
+        {
+          "id": "cause_effect_goal_5",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        }
+      ],
+      "examples": [
+        "כשshe שותקת זה הורס את הקשר.",
+        "ההודעה שלו מורידה אותי.",
+        "הלחץ הזה משתק אותי."
+      ]
+    },
+    {
+      "id": "complex_equivalence",
+      "name": "שקילות מורכבת",
+      "family": "distortion",
+      "difficulty": 3,
+      "breenCellId": "DIS",
+      "definition": "שני דברים שונים מוצגים כשווי-משמעות (\"אם X אז זה אומר Y\").",
+      "problem": {
+        "oneLiner": "אירוע יחיד מקבל משמעות מוחלטת שלא בהכרח נובעת ממנו.",
+        "tags": [
+          "meaning-assignment",
+          "interpretation",
+          "fusion"
+        ]
+      },
+      "goal": {
+        "oneLiner": "לבדוק לפי איזה כלל X מקבל את המשמעות Y ואילו פירושים נוספים קיימים.",
+        "dataTargets": [
+          "meaning-rule",
+          "criteria",
+          "alternatives"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "complex_equivalence_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-המשמעות המיוחסת?"
+        },
+        {
+          "id": "complex_equivalence_gq_2",
+          "text": "איך זה אומר את זה?"
+        },
+        {
+          "id": "complex_equivalence_gq_3",
+          "text": "לפי איזה כלל?"
+        },
+        {
+          "id": "complex_equivalence_gq_4",
+          "text": "מה עוד זה יכול לומר?"
+        },
+        {
+          "id": "complex_equivalence_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "complex_equivalence_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "complex_equivalence_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "complex_equivalence_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "complex_equivalence_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "complex_equivalence_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "complex_equivalence_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "complex_equivalence_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "complex_equivalence_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "complex_equivalence_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "complex_equivalence_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "complex_equivalence_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "complex_equivalence_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "complex_equivalence_problem_2",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "complex_equivalence_problem_3",
+          "text": "אירוע יחיד מקבל משמעות מוחלטת שלא בהכרח נובעת ממנו.",
+          "correct": true
+        },
+        {
+          "id": "complex_equivalence_problem_4",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "complex_equivalence_problem_5",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "complex_equivalence_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "complex_equivalence_goal_2",
+          "text": "לבדוק לפי איזה כלל X מקבל את המשמעות Y ואילו פירושים נוספים קיימים.",
+          "correct": true
+        },
+        {
+          "id": "complex_equivalence_goal_3",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "complex_equivalence_goal_4",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "complex_equivalence_goal_5",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        }
+      ],
+      "examples": [
+        "אם היא איחרה זה אומר שלא אכפת לה.",
+        "אם הוא לא ענה מיד אז הוא כועס.",
+        "הוא שתק, כלומר הוא מסכים."
+      ]
+    },
+    {
+      "id": "presuppositions",
+      "name": "הנחות מוקדמות",
+      "family": "distortion",
+      "difficulty": 3,
+      "breenCellId": "DIS",
+      "definition": "השאלה/הטענה מניחה מראש עובדה או מסגרת שלא נבדקה.",
+      "problem": {
+        "oneLiner": "הנחת יסוד סמויה מנהלת את השיח בלי בחינה מפורשת.",
+        "tags": [
+          "hidden-assumption",
+          "framing",
+          "implicit-premise"
+        ]
+      },
+      "goal": {
+        "oneLiner": "לחשוף את מה שמונח מראש ולבדוק אם הוא בהכרח נכון.",
+        "dataTargets": [
+          "premise",
+          "assumption",
+          "frame"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "presuppositions_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-ההנחה הסמויה?"
+        },
+        {
+          "id": "presuppositions_gq_2",
+          "text": "מה מונח כאן מראש?"
+        },
+        {
+          "id": "presuppositions_gq_3",
+          "text": "מי אמר שזה נכון?"
+        },
+        {
+          "id": "presuppositions_gq_4",
+          "text": "האם המסגרת הזו מחייבת?"
+        },
+        {
+          "id": "presuppositions_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "presuppositions_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "presuppositions_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "presuppositions_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "presuppositions_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "presuppositions_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "presuppositions_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "presuppositions_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "presuppositions_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "presuppositions_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "presuppositions_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "presuppositions_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "presuppositions_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "presuppositions_problem_2",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "presuppositions_problem_3",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "presuppositions_problem_4",
+          "text": "הנחת יסוד סמויה מנהלת את השיח בלי בחינה מפורשת.",
+          "correct": true
+        },
+        {
+          "id": "presuppositions_problem_5",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "presuppositions_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "presuppositions_goal_2",
+          "text": "לחשוף את מה שמונח מראש ולבדוק אם הוא בהכרח נכון.",
+          "correct": true
+        },
+        {
+          "id": "presuppositions_goal_3",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "presuppositions_goal_4",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "presuppositions_goal_5",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        }
+      ],
+      "examples": [
+        "מתי תפסיק להרוס את זה?",
+        "איך אתקדם אם כבר מאוחר מדי?",
+        "מי יכעס כשאגיד לא?"
+      ]
+    },
+    {
+      "id": "nominalization",
+      "name": "נומינליזציה",
+      "family": "distortion",
+      "difficulty": 2,
+      "breenCellId": "DIS",
+      "definition": "תהליך/פעולה מוצגים כשם עצם סטטי, כאילו זו ישות קבועה.",
+      "problem": {
+        "oneLiner": "התהליך קופא לשם מופשט ולכן קשה לשנותו או למדוד אותו.",
+        "tags": [
+          "frozen-process",
+          "abstract-noun",
+          "reification"
+        ]
+      },
+      "goal": {
+        "oneLiner": "להחזיר את השם לפועל/התנהגות שניתן לצפות ולשנות.",
+        "dataTargets": [
+          "process",
+          "behavior",
+          "actors"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "nominalization_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-התהליך שקפא?"
+        },
+        {
+          "id": "nominalization_gq_2",
+          "text": "מה קורה בפועל?"
+        },
+        {
+          "id": "nominalization_gq_3",
+          "text": "מי עושה מה?"
+        },
+        {
+          "id": "nominalization_gq_4",
+          "text": "איך נראה התהליך הזה ביום-יום?"
+        },
+        {
+          "id": "nominalization_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "nominalization_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "nominalization_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "nominalization_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "nominalization_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "nominalization_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "nominalization_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "nominalization_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "nominalization_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "nominalization_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "nominalization_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "nominalization_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "nominalization_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "nominalization_problem_2",
+          "text": "התהליך קופא לשם מופשט ולכן קשה לשנותו או למדוד אותו.",
+          "correct": true
+        },
+        {
+          "id": "nominalization_problem_3",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "nominalization_problem_4",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "nominalization_problem_5",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "nominalization_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "nominalization_goal_2",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "nominalization_goal_3",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "nominalization_goal_4",
+          "text": "להחזיר את השם לפועל/התנהגות שניתן לצפות ולשנות.",
+          "correct": true
+        },
+        {
+          "id": "nominalization_goal_5",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        }
+      ],
+      "examples": [
+        "יש בינינו ניתוק.",
+        "התקשורת נהרסה.",
+        "יש חוסר אמון מוחלט."
+      ]
+    },
+    {
+      "id": "universal_quantifiers",
+      "name": "כמתים כוללניים",
+      "family": "generalization",
+      "difficulty": 1,
+      "breenCellId": "GEN",
+      "definition": "שימוש במילים כוללניות כמו תמיד/אף פעם/כולם/כלום.",
+      "problem": {
+        "oneLiner": "יוצרת הכללה קשיחה שמוחקת יוצאי דופן ואפשרויות שינוי.",
+        "tags": [
+          "always-never",
+          "rigidity",
+          "exceptions-missing"
+        ]
+      },
+      "goal": {
+        "oneLiner": "למצוא יוצאי דופן ותנאים שבהם ההצהרה לא מתקיימת.",
+        "dataTargets": [
+          "exceptions",
+          "frequency",
+          "conditions"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "universal_quantifiers_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-ההכללה?"
+        },
+        {
+          "id": "universal_quantifiers_gq_2",
+          "text": "תמיד?"
+        },
+        {
+          "id": "universal_quantifiers_gq_3",
+          "text": "אף פעם אין יוצא דופן?"
+        },
+        {
+          "id": "universal_quantifiers_gq_4",
+          "text": "מתי זה כן שונה?"
+        },
+        {
+          "id": "universal_quantifiers_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "universal_quantifiers_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "universal_quantifiers_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "universal_quantifiers_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "universal_quantifiers_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "universal_quantifiers_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "universal_quantifiers_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "universal_quantifiers_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "universal_quantifiers_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "universal_quantifiers_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "universal_quantifiers_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "universal_quantifiers_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "universal_quantifiers_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "universal_quantifiers_problem_2",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "universal_quantifiers_problem_3",
+          "text": "יוצרת הכללה קשיחה שמוחקת יוצאי דופן ואפשרויות שינוי.",
+          "correct": true
+        },
+        {
+          "id": "universal_quantifiers_problem_4",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "universal_quantifiers_problem_5",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "universal_quantifiers_goal_1",
+          "text": "למצוא יוצאי דופן ותנאים שבהם ההצהרה לא מתקיימת.",
+          "correct": true
+        },
+        {
+          "id": "universal_quantifiers_goal_2",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "universal_quantifiers_goal_3",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "universal_quantifiers_goal_4",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "universal_quantifiers_goal_5",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        }
+      ],
+      "examples": [
+        "זה תמיד קורה לי.",
+        "אף אחד לא מקשיב.",
+        "כולם נגדי."
+      ]
+    },
+    {
+      "id": "modal_necessity",
+      "name": "מודל הכרח",
+      "family": "generalization",
+      "difficulty": 2,
+      "breenCellId": "GEN",
+      "definition": "שפה של חובה/הכרח (\"חייב\", \"אסור\", \"מוכרח\") שמציגה כלל קשיח.",
+      "problem": {
+        "oneLiner": "נוצרת תחושת כפייה שמסתירה בחירה, מחיר ואפשרויות חלופיות.",
+        "tags": [
+          "must",
+          "rules",
+          "constraint"
+        ]
+      },
+      "goal": {
+        "oneLiner": "לברר מי קבע את הכלל, מה יקרה אם לא, ומה המחיר/הרווח.",
+        "dataTargets": [
+          "rule-source",
+          "consequence",
+          "choice"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "modal_necessity_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-כלל ההכרח?"
+        },
+        {
+          "id": "modal_necessity_gq_2",
+          "text": "מה יקרה אם לא?"
+        },
+        {
+          "id": "modal_necessity_gq_3",
+          "text": "מי קבע שחייב?"
+        },
+        {
+          "id": "modal_necessity_gq_4",
+          "text": "מה מונע ממך לבחור אחרת?"
+        },
+        {
+          "id": "modal_necessity_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "modal_necessity_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "modal_necessity_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "modal_necessity_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "modal_necessity_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "modal_necessity_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "modal_necessity_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "modal_necessity_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "modal_necessity_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "modal_necessity_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "modal_necessity_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "modal_necessity_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "modal_necessity_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "modal_necessity_problem_2",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "modal_necessity_problem_3",
+          "text": "נוצרת תחושת כפייה שמסתירה בחירה, מחיר ואפשרויות חלופיות.",
+          "correct": true
+        },
+        {
+          "id": "modal_necessity_problem_4",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "modal_necessity_problem_5",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "modal_necessity_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "modal_necessity_goal_2",
+          "text": "לברר מי קבע את הכלל, מה יקרה אם לא, ומה המחיר/הרווח.",
+          "correct": true
+        },
+        {
+          "id": "modal_necessity_goal_3",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "modal_necessity_goal_4",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "modal_necessity_goal_5",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        }
+      ],
+      "examples": [
+        "אני חייב להסכים.",
+        "אסור לי לטעות.",
+        "אני מוכרח לרצות את כולם."
+      ]
+    },
+    {
+      "id": "modal_possibility",
+      "name": "מודל אפשרות/אי-יכולת",
+      "family": "generalization",
+      "difficulty": 2,
+      "breenCellId": "GEN",
+      "definition": "הצהרה על יכולת/אי-יכולת/אפשרות כאילו היא קבועה וכוללת.",
+      "problem": {
+        "oneLiner": "מייצרת זהות של יכולת מוגבלת במקום מצב תלוי הקשר.",
+        "tags": [
+          "can-cannot",
+          "capability",
+          "learned-limit"
+        ]
+      },
+      "goal": {
+        "oneLiner": "לבדוק באילו תנאים זה אפשרי/לא אפשרי ומה חסר כרגע.",
+        "dataTargets": [
+          "conditions",
+          "resources",
+          "exceptions"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "modal_possibility_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-גבול היכולת?"
+        },
+        {
+          "id": "modal_possibility_gq_2",
+          "text": "לא יכול בכלל או כרגע?"
+        },
+        {
+          "id": "modal_possibility_gq_3",
+          "text": "מתי זה כן אפשרי?"
+        },
+        {
+          "id": "modal_possibility_gq_4",
+          "text": "מה חסר כדי שתוכל?"
+        },
+        {
+          "id": "modal_possibility_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "modal_possibility_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "modal_possibility_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "modal_possibility_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "modal_possibility_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "modal_possibility_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "modal_possibility_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "modal_possibility_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "modal_possibility_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "modal_possibility_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "modal_possibility_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "modal_possibility_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "modal_possibility_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "modal_possibility_problem_2",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "modal_possibility_problem_3",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "modal_possibility_problem_4",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        },
+        {
+          "id": "modal_possibility_problem_5",
+          "text": "מייצרת זהות של יכולת מוגבלת במקום מצב תלוי הקשר.",
+          "correct": true
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "modal_possibility_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "modal_possibility_goal_2",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "modal_possibility_goal_3",
+          "text": "לבדוק באילו תנאים זה אפשרי/לא אפשרי ומה חסר כרגע.",
+          "correct": true
+        },
+        {
+          "id": "modal_possibility_goal_4",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "modal_possibility_goal_5",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        }
+      ],
+      "examples": [
+        "אני לא יכול לדבר מול קהל.",
+        "אי אפשר לבקש את זה.",
+        "אני לא מסוגל להירגע."
+      ]
+    },
+    {
+      "id": "lost_performative",
+      "name": "שיפוט חסר מקור",
+      "family": "generalization",
+      "difficulty": 2,
+      "breenCellId": "GEN",
+      "definition": "שיפוט ערכי מוצג כאמת כללית בלי לציין מי שופט ולפי מה.",
+      "problem": {
+        "oneLiner": "שיפוט נשמע אובייקטיבי למרות שהוא תלוי קריטריון/מקור.",
+        "tags": [
+          "judgment",
+          "missing-source",
+          "criteria-hidden"
+        ]
+      },
+      "goal": {
+        "oneLiner": "להחזיר מקור לשיפוט ואת הקריטריון שעל פיו הוא נקבע.",
+        "dataTargets": [
+          "judge",
+          "criterion",
+          "standard"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "lost_performative_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-השיפוט?"
+        },
+        {
+          "id": "lost_performative_gq_2",
+          "text": "לפי מי זה לא הוגן?"
+        },
+        {
+          "id": "lost_performative_gq_3",
+          "text": "לפי איזה קריטריון?"
+        },
+        {
+          "id": "lost_performative_gq_4",
+          "text": "מי קובע מה ראוי?"
+        },
+        {
+          "id": "lost_performative_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "lost_performative_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "lost_performative_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "lost_performative_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "lost_performative_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "lost_performative_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "lost_performative_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "lost_performative_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "lost_performative_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "lost_performative_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "lost_performative_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "lost_performative_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "lost_performative_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "lost_performative_problem_2",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "lost_performative_problem_3",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "lost_performative_problem_4",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        },
+        {
+          "id": "lost_performative_problem_5",
+          "text": "שיפוט נשמע אובייקטיבי למרות שהוא תלוי קריטריון/מקור.",
+          "correct": true
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "lost_performative_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "lost_performative_goal_2",
+          "text": "להחזיר מקור לשיפוט ואת הקריטריון שעל פיו הוא נקבע.",
+          "correct": true
+        },
+        {
+          "id": "lost_performative_goal_3",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "lost_performative_goal_4",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "lost_performative_goal_5",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        }
+      ],
+      "examples": [
+        "זה לא הוגן.",
+        "זה לא ראוי.",
+        "זה פשוט לא בסדר."
+      ]
+    },
+    {
+      "id": "rules_generalization",
+      "name": "הכללת כללים",
+      "family": "generalization",
+      "difficulty": 3,
+      "breenCellId": "GEN",
+      "definition": "הסקת כלל רחב מניסיון חלקי (\"במערכת הזו תמיד...\").",
+      "problem": {
+        "oneLiner": "כלל נבנה על מעט דוגמאות ומגביל תגובה עתידית.",
+        "tags": [
+          "rule-formation",
+          "overlearning",
+          "prediction"
+        ]
+      },
+      "goal": {
+        "oneLiner": "לבדוק את בסיס הכלל, ההקשר, והאם יש נתונים שסותרים אותו.",
+        "dataTargets": [
+          "evidence-base",
+          "scope",
+          "counterexamples"
+        ]
+      },
+      "goodQuestions": [
+        {
+          "id": "rules_generalization_gq_1",
+          "text": "מה בדיוק אתה מתכוון ב-הכלל?"
+        },
+        {
+          "id": "rules_generalization_gq_2",
+          "text": "על סמך אילו מקרים?"
+        },
+        {
+          "id": "rules_generalization_gq_3",
+          "text": "האם יש מקרים הפוכים?"
+        },
+        {
+          "id": "rules_generalization_gq_4",
+          "text": "באיזה הקשר זה כן/לא נכון?"
+        },
+        {
+          "id": "rules_generalization_gq_5",
+          "text": "באיזה הקשר זה קורה?"
+        },
+        {
+          "id": "rules_generalization_gq_6",
+          "text": "מתי זה לא קורה כך?"
+        },
+        {
+          "id": "rules_generalization_gq_7",
+          "text": "מי/מה מעורב בזה בדיוק?"
+        },
+        {
+          "id": "rules_generalization_gq_8",
+          "text": "איך זה נראה/נשמע/מתבצע בפועל?"
+        }
+      ],
+      "trapQuestions": [
+        {
+          "id": "rules_generalization_tq_1",
+          "text": "ומה זה אומר עליך כאדם?",
+          "reason": "זו העמקה לזהות/משמעות רחבה מדי, ולא מחזירה קודם את המידע החסר של התבנית."
+        },
+        {
+          "id": "rules_generalization_tq_2",
+          "text": "מי אשם בזה לדעתך?",
+          "reason": "השאלה מזיזה להאשמה במקום לברר את מבנה ההפרה הספציפית."
+        },
+        {
+          "id": "rules_generalization_tq_3",
+          "text": "למה אתה לא פשוט מפסיק עם זה?",
+          "reason": "זו שאלה שיפוטית/פתרונית מוקדמת שלא מדייקת את המפה."
+        },
+        {
+          "id": "rules_generalization_tq_4",
+          "text": "איך הילדות שלך קשורה לזה?",
+          "reason": "ייתכן שרלוונטי בהמשך, אבל לא זו שאלת מטה-מודל ראשונה להפרה הנוכחית."
+        },
+        {
+          "id": "rules_generalization_tq_5",
+          "text": "מה הדבר הכי גרוע שיכול לקרות?",
+          "reason": "זו שאלה של תרחיש/חרדה, לא בהכרח מחזירה את המידע הלשוני החסר."
+        },
+        {
+          "id": "rules_generalization_tq_6",
+          "text": "אז אתה בעצם אומר שאין תקווה?",
+          "reason": "זו הקצנה/פרפרזה רגשית ולא דיוק של התבנית עצמה."
+        },
+        {
+          "id": "rules_generalization_tq_7",
+          "text": "מה לדעתך הצד השני צריך לעשות?",
+          "reason": "הפניית מוקד לפתרון חיצוני לפני שהוגדר המידע החסר בתבנית."
+        },
+        {
+          "id": "rules_generalization_tq_8",
+          "text": "האם אתה מוכן להתחייב לשינוי עכשיו?",
+          "reason": "זו שאלה חוזית/מוטיבציונית; בשלב זה המטרה היא בירור לשוני-מיפוי."
+        }
+      ],
+      "problemOptions": [
+        {
+          "id": "rules_generalization_problem_1",
+          "text": "נוצר תיאור עשיר ומדויק שמאפשר פעולה מיידית.",
+          "correct": false
+        },
+        {
+          "id": "rules_generalization_problem_2",
+          "text": "השפה מגדילה מגוון בחירה ומצמצמת הכללה.",
+          "correct": false
+        },
+        {
+          "id": "rules_generalization_problem_3",
+          "text": "נוצרת בהירות מלאה לגבי מי/מה/איך ולכן אין צורך בשאלה נוספת.",
+          "correct": false
+        },
+        {
+          "id": "rules_generalization_problem_4",
+          "text": "כלל נבנה על מעט דוגמאות ומגביל תגובה עתידית.",
+          "correct": true
+        },
+        {
+          "id": "rules_generalization_problem_5",
+          "text": "הבעיה המרכזית כאן היא רק רגש חזק, לא מבנה המפה.",
+          "correct": false
+        }
+      ],
+      "goalOptions": [
+        {
+          "id": "rules_generalization_goal_1",
+          "text": "לשכנע את המטופל מיד שהפרשנות שלו שגויה.",
+          "correct": false
+        },
+        {
+          "id": "rules_generalization_goal_2",
+          "text": "לתת פתרון מהיר לפני שיש פרטים ברורים.",
+          "correct": false
+        },
+        {
+          "id": "rules_generalization_goal_3",
+          "text": "להוכיח מי צודק בדיון במקום לברר מידע.",
+          "correct": false
+        },
+        {
+          "id": "rules_generalization_goal_4",
+          "text": "להרגיע רגש בלבד בלי לגעת במבנה השפה.",
+          "correct": false
+        },
+        {
+          "id": "rules_generalization_goal_5",
+          "text": "לבדוק את בסיס הכלל, ההקשר, והאם יש נתונים שסותרים אותו.",
+          "correct": true
+        }
+      ],
+      "examples": [
+        "אם אני נפתח אנשים מנצלים.",
+        "בכל ריב עדיף לשתוק.",
+        "כשאני מבקש עזרה זה תמיד מסתבך."
+      ]
+    }
+  ]
+}

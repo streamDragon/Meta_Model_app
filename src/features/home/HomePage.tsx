@@ -6,7 +6,15 @@ function navigateTo(tab: string) {
   window.location.hash = tab;
 }
 
-const LAB_IDS = ['categories', 'practice', 'blueprint', 'prismlab', 'valueslab'];
+const LAB_IDS = [
+  'categories',
+  'practice',
+  'michael-hall-daily-gym',
+  'blueprint',
+  'prismlab',
+  'valueslab',
+  'legacy-tools',
+];
 
 export function HomePage() {
   const { progress } = useProgress();

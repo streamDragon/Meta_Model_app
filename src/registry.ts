@@ -6,6 +6,8 @@ import { BlueprintPage } from './features/blueprint/BlueprintPage';
 import { PrismLabPage } from './features/prismlab/PrismLabPage';
 import { ValuesLabPage } from './features/valueslab/ValuesLabPage';
 import { AboutPage } from './features/about/AboutPage';
+import { MichaelHallDailyGym } from './components/MichaelHallDailyGym';
+import { LegacyToolsPage } from './features/legacy/LegacyToolsPage';
 
 export type Support = 'full' | 'partial' | 'none';
 export type FeatureStatus = 'production' | 'beta' | 'prototype' | 'broken';
@@ -102,6 +104,25 @@ export const FEATURES: FeatureDef[] = [
     inBottomNav: true,
   },
   {
+    id: 'michael-hall-daily-gym',
+    title: 'חדר אימון יומי - מייקל הול',
+    shortDescription:
+      'כרטיס יומי קצר של Neuro-Semantics: תמצית, שאלה, תרגילים, יישום והערות אישיות',
+    theoryFamily: 'systemic-matrix',
+    skillTrained: 'אימון יומי בחשיבה, משמעות ופתרון בעיות',
+    difficulty: 2,
+    desktopSupport: 'full',
+    mobileSupport: 'full',
+    dataSource: 'src/data/michaelHallDailyCards.ts',
+    route: '#michael-hall-daily-gym',
+    component: MichaelHallDailyGym,
+    status: 'beta',
+    sourceValidation: 'placeholder',
+    navLabel: 'Michael Hall',
+    icon: 'NS',
+    inBottomNav: false,
+  },
+  {
     id: 'blueprint',
     title: 'Blueprint Builder',
     shortDescription: 'הפיכת כוונה עמומה לתוכנית ביצוע עם צעד ראשון ו-Plan B',
@@ -177,6 +198,24 @@ export const FEATURES: FeatureDef[] = [
     sourceValidation: 'verified',
     navLabel: 'על הפרויקט',
     icon: 'ℹ️',
+    inBottomNav: false,
+  },
+  {
+    id: 'legacy-tools',
+    title: 'כלים שמורים',
+    shortDescription: 'גישה לכלים הסטטיים הטובים שנשמרו מהגרסה הפרודקשנית בזמן המעבר ל-React',
+    theoryFamily: 'dashboard',
+    skillTrained: 'שימור תרגילים קיימים ובדיקת כלים שלא הוטמעו עדיין במעטפת החדשה',
+    difficulty: 1,
+    desktopSupport: 'full',
+    mobileSupport: 'full',
+    dataSource: 'legacy static html/js/data/assets restored from origin/main',
+    route: '#legacy-tools',
+    component: LegacyToolsPage,
+    status: 'production',
+    sourceValidation: 'verified',
+    navLabel: 'כלים שמורים',
+    icon: '🧰',
     inBottomNav: false,
   },
 ];

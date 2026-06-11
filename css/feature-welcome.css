@@ -1,0 +1,137 @@
+/* feature-welcome.css — Welcome page overlay for standalone trainer files */
+/* RTL Hebrew, warm palette matching Meta Model app */
+
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700&family=Noto+Sans+Hebrew:wght@400;600;700&display=swap');
+
+.fw-overlay {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  direction: rtl;
+  font-family: 'Noto Sans Hebrew', 'Arial Hebrew', Arial, sans-serif;
+  text-align: center;
+}
+
+.fw-badge {
+  background: #E8F5EE;
+  color: #2D6A4F;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-bottom: 16px;
+  letter-spacing: 0.04em;
+}
+
+.fw-title {
+  font-family: 'Frank Ruhl Libre', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2C2418;
+  margin: 0 0 10px;
+  line-height: 1.25;
+}
+
+.fw-hook {
+  font-size: 0.97rem;
+  color: #5A5045;
+  line-height: 1.7;
+  max-width: 520px;
+  margin: 0 auto 24px;
+}
+
+.fw-cards {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.fw-card {
+  background: #FFFDF9;
+  border: 1px solid #DDD5C8;
+  border-radius: 14px;
+  padding: 16px 18px;
+  flex: 1;
+  min-width: 180px;
+  max-width: 220px;
+  text-align: right;
+}
+
+.fw-card__kicker {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #7A6E5E;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.fw-card__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2C2418;
+  margin: 0 0 6px;
+}
+
+.fw-card__body {
+  font-size: 0.82rem;
+  color: #5A5045;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.fw-example {
+  background: #F5F1EB;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  text-align: right;
+}
+
+.fw-example__label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #A69580;
+  display: block;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fw-example__sentence {
+  font-family: 'Frank Ruhl Libre', Georgia, serif;
+  font-size: 1.1rem;
+  color: #2C2418;
+  margin: 0 0 6px;
+  line-height: 1.5;
+}
+
+.fw-example__note {
+  font-size: 0.8rem;
+  color: #7A6E5E;
+  margin: 0;
+  font-style: italic;
+}
+
+.fw-cta {
+  background: #2D6A4F;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 36px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  transition: background 0.18s;
+}
+
+.fw-cta:hover {
+  background: #245C42;
+}

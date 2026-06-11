@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meta Model Comic Kit - Demo</title>
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif; background: #f6f7fb; color: #111827; }
+    header { max-width: 1200px; margin: 0 auto; padding: 22px 18px; }
+    h1 { margin: 0 0 6px; font-size: 26px; }
+    p { margin: 0; color: #6b7280; }
+    .grid { max-width: 1200px; margin: 0 auto; padding: 0 18px 26px; display: grid; gap: 14px; }
+    .card { background: #fff; border-radius: 18px; padding: 12px; box-shadow: 0 8px 24px rgba(17,24,39,.12); }
+    .card h2 { margin: 0 0 10px; font-size: 18px; }
+    .imgs { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .imgs img { width: 100%; height: auto; border-radius: 14px; background: #fff; }
+    .small { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+    .tip { max-width: 1200px; margin: 0 auto 16px auto; padding: 0 18px; color: #1e3a8a; font-weight: 600; }
+    code { background: #eef2ff; padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Meta Model Comic Kit - דמו</h1>
+  <p>תצוגה מהירה של סצנות, פאנלים, בועות, סטיקרים ודמויות.</p>
+</header>
+<p class="tip">ליצירת סצנה חדשה: <code>scripts/new-comic-scene.ps1</code></p>
+
+<section class="grid">
+  <div class="card">
+    <h2>סצנות (Scenes)</h2>
+    <div class="imgs">
+      <img src="../comics/scenes/הורות_שיעורים.svg" alt="">
+      <img src="../comics/scenes/זוגיות_סליחה.svg" alt="">
+      <img src="../comics/scenes/עבודה_מצגת.svg" alt="">
+      <img src="../comics/scenes/ביורוקרטיה_טופס.svg" alt="">
+      <img src="../comics/scenes/טכני_ניקוי_קבצים.svg" alt="">
+      <img src="../comics/scenes/בישול_לזניה.svg" alt="">
+      <img src="../comics/scenes/כסף_ארנונה.svg" alt="">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>פאנלים להרכבה</h2>
+    <div class="imgs">
+      <img src="../comics/panels/panel_1x1.svg" alt="">
+      <img src="../comics/panels/panel_2x1.svg" alt="">
+      <img src="../comics/panels/panel_1x2.svg" alt="">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>בועות דיבור</h2>
+    <div class="imgs small">
+      <img src="../stickers/bubbles/speech_left.svg" alt="">
+      <img src="../stickers/bubbles/speech_right.svg" alt="">
+      <img src="../stickers/bubbles/speech_bottom.svg" alt="">
+      <img src="../stickers/bubbles/thought_left.svg" alt="">
+      <img src="../stickers/bubbles/shout_left.svg" alt="">
+      <img src="../stickers/bubbles/shout_right.svg" alt="">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>סטיקרים (SFX + Badges)</h2>
+    <div class="imgs small">
+      <img src="../stickers/sfx/וואו.svg" alt="">
+      <img src="../stickers/sfx/בום.svg" alt="">
+      <img src="../stickers/sfx/אופס.svg" alt="">
+      <img src="../stickers/sfx/יש.svg" alt="">
+      <img src="../stickers/sfx/אוף.svg" alt="">
+      <img src="../stickers/sfx/רגע.svg" alt="">
+      <img src="../stickers/sfx/טינג.svg" alt="">
+      <img src="../stickers/sfx/ששש.svg" alt="">
+    </div>
+    <div class="imgs small" style="margin-top: 12px">
+      <img src="../stickers/badges/תגובה_נאיבית.svg" alt="">
+      <img src="../stickers/badges/לעג_והשוואה.svg" alt="">
+      <img src="../stickers/badges/הצלה_במקום.svg" alt="">
+      <img src="../stickers/badges/סקרנות_מטה_מודל.svg" alt="">
+      <img src="../stickers/badges/פירוק_לפרוצדורה.svg" alt="">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>דמויות + פרופים</h2>
+    <div class="imgs small">
+      <img src="../characters/נועם.svg" alt="">
+      <img src="../characters/מאיה.svg" alt="">
+      <img src="../characters/יוסף.svg" alt="">
+      <img src="../characters/ספיר.svg" alt="">
+      <img src="../characters/דניאל.svg" alt="">
+      <img src="../characters/לירון.svg" alt="">
+    </div>
+    <div class="imgs small" style="margin-top: 12px">
+      <img src="../props/מחשב.svg" alt="">
+      <img src="../props/טלפון.svg" alt="">
+      <img src="../props/טופס.svg" alt="">
+      <img src="../props/צ׳ק-ליסט.svg" alt="">
+    </div>
+  </div>
+</section>
+</body>
+</html>

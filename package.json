@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "prebuild": "node scripts/write-version.mjs",
+    "build": "tsc && vite build && node scripts/prepare-dist.mjs",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:all": "vitest run",
+    "validate:michael-hall": "node scripts/validate-michael-hall-daily-cards.mjs"
   },
   "dependencies": {
     "react": "^19.0.0",

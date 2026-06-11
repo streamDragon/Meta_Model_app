@@ -1,0 +1,683 @@
+.scenario-platform-root {
+    --scenario-bg: #07111f;
+    --scenario-border: rgba(148, 163, 184, 0.22);
+    --scenario-ink: #eff6ff;
+    --scenario-muted: #b8c7dd;
+    --scenario-blue: #38bdf8;
+    --scenario-green: #34d399;
+    --scenario-red: #f87171;
+    --scenario-amber: #fbbf24;
+    position: relative;
+    display: block;
+    height: var(--scenario-app-height, 560px);
+    min-height: 420px;
+    isolation: isolate;
+}
+
+.scenario-simulator-shell {
+    position: relative;
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 28px;
+    border: 1px solid var(--scenario-border);
+    background:
+        radial-gradient(circle at 12% 10%, rgba(56, 189, 248, 0.14), transparent 28%),
+        radial-gradient(circle at 88% 88%, rgba(167, 139, 250, 0.16), transparent 24%),
+        linear-gradient(180deg, #0a1628 0%, #08101d 100%);
+    box-shadow: 0 28px 60px rgba(2, 8, 23, 0.42);
+    overflow: hidden;
+}
+
+.scenario-platform-root.is-locked .scenario-simulator-shell {
+    filter: blur(14px);
+    opacity: 0.28;
+    transform: scale(0.985);
+    pointer-events: none;
+}
+
+.scenario-sim-topbar,
+.scenario-scene-strip,
+.scenario-options-dock {
+    backdrop-filter: blur(10px);
+}
+
+.scenario-sim-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    background: rgba(8, 15, 29, 0.78);
+}
+
+.scenario-sim-title {
+    margin: 0;
+    color: var(--scenario-ink);
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.scenario-progress-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.scenario-progress-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.38);
+    background: transparent;
+    box-shadow: inset 0 0 0 1px rgba(8, 15, 29, 0.18);
+}
+
+.scenario-progress-dot.is-active,
+.scenario-progress-dot.is-done {
+    border-color: rgba(56, 189, 248, 0.9);
+    background: linear-gradient(180deg, #67e8f9 0%, #38bdf8 100%);
+    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.16);
+}
+
+.scenario-scene-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    background: rgba(12, 27, 49, 0.86);
+    color: var(--scenario-ink);
+}
+
+.scenario-scene-label {
+    color: var(--scenario-blue);
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.scenario-chat-area {
+    min-height: 0;
+    border-radius: 24px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    background: linear-gradient(180deg, rgba(9, 17, 31, 0.88) 0%, rgba(10, 22, 40, 0.98) 100%);
+    padding: 12px;
+    overflow: hidden;
+}
+
+.scenario-chat-scene {
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 10px;
+    min-height: 0;
+}
+
+.scenario-avatars-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.scenario-avatar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    color: var(--scenario-ink);
+}
+
+.scenario-avatar-emoji {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    font-size: 1rem;
+}
+
+.scenario-avatar-name {
+    color: var(--scenario-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.scenario-chat-stack {
+    min-height: 0;
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    overflow: hidden;
+}
+
+.scenario-bubble-row {
+    display: flex;
+}
+
+.scenario-bubble-row.is-other {
+    justify-content: flex-end;
+}
+
+.scenario-bubble-row.is-player {
+    justify-content: flex-start;
+}
+
+.scenario-bubble {
+    max-width: min(88%, 520px);
+    display: grid;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    box-shadow: 0 10px 24px rgba(2, 8, 23, 0.18);
+}
+
+.scenario-bubble-row.is-pop .scenario-bubble {
+    animation: scenarioBubblePop 200ms ease-out;
+}
+
+.scenario-bubble p {
+    margin: 0;
+    color: var(--scenario-ink);
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
+.scenario-bubble-speaker {
+    color: rgba(191, 219, 254, 0.82);
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+.scenario-bubble.is-opening,
+.scenario-bubble.is-reply {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.92) 0%, rgba(10, 22, 40, 0.96) 100%);
+}
+
+.scenario-bubble.is-choice {
+    background: linear-gradient(180deg, rgba(6, 95, 70, 0.34) 0%, rgba(6, 78, 59, 0.5) 100%);
+    border-color: rgba(52, 211, 153, 0.34);
+}
+
+.scenario-bubble.is-thought {
+    background: rgba(15, 23, 42, 0.72);
+    border-style: dashed;
+    border-color: rgba(251, 191, 36, 0.4);
+}
+
+.scenario-bubble.is-thought p {
+    color: #fef3c7;
+    font-size: 0.82rem;
+    font-style: italic;
+}
+
+.scenario-thought-prefix {
+    margin-left: 6px;
+}
+
+.scenario-result-bar {
+    padding: 11px 12px;
+    border-radius: 16px;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    font-weight: 700;
+}
+
+.scenario-result-bar.is-green {
+    background: rgba(6, 78, 59, 0.62);
+    border: 1px solid rgba(52, 211, 153, 0.34);
+    color: #d1fae5;
+}
+
+.scenario-result-bar.is-red {
+    background: rgba(127, 29, 29, 0.62);
+    border: 1px solid rgba(248, 113, 113, 0.32);
+    color: #fee2e2;
+}
+
+.scenario-result-bar.is-amber {
+    background: rgba(120, 53, 15, 0.62);
+    border: 1px solid rgba(251, 191, 36, 0.32);
+    color: #fef3c7;
+}
+
+.scenario-status-card,
+.scenario-score-card {
+    height: 100%;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 10px;
+    text-align: center;
+    border-radius: 20px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: linear-gradient(180deg, rgba(11, 20, 38, 0.9) 0%, rgba(8, 15, 29, 0.98) 100%);
+    padding: 20px;
+}
+
+.scenario-status-kicker,
+.scenario-score-kicker {
+    margin: 0;
+    color: var(--scenario-blue);
+    font-size: 0.75rem;
+    font-weight: 800;
+}
+
+.scenario-status-body,
+.scenario-score-label {
+    margin: 0;
+    color: var(--scenario-muted);
+    line-height: 1.6;
+}
+
+.scenario-score-value {
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(2.1rem, 8vw, 3.4rem);
+    font-weight: 900;
+    line-height: 1;
+}
+
+.scenario-options-dock {
+    border-radius: 22px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    background: rgba(8, 15, 29, 0.88);
+    padding: 12px;
+}
+
+.scenario-options-panel,
+.scenario-next-actions,
+.scenario-complete-actions {
+    display: grid;
+    gap: 10px;
+}
+
+.scenario-options-label,
+.scenario-dock-placeholder {
+    margin: 0;
+    color: var(--scenario-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.scenario-option-list {
+    display: grid;
+    gap: 10px;
+}
+
+.scenario-option-btn,
+.scenario-entry-cta,
+.scenario-primary-btn,
+.scenario-restart-btn,
+.scenario-inline-btn {
+    appearance: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    min-height: 44px;
+    transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+}
+
+.scenario-option-btn {
+    display: grid;
+    gap: 8px;
+    justify-items: start;
+    text-align: right;
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: 18px;
+    background: rgba(12, 27, 49, 0.76);
+    border-color: rgba(148, 163, 184, 0.16);
+    color: var(--scenario-ink);
+}
+
+.scenario-option-btn:hover:not(:disabled),
+.scenario-entry-cta:hover:not(:disabled),
+.scenario-primary-btn:hover:not(:disabled),
+.scenario-restart-btn:hover:not(:disabled),
+.scenario-inline-btn:hover:not(:disabled) {
+    transform: translateY(-1px) scale(1.01);
+}
+
+.scenario-option-btn:active:not(:disabled),
+.scenario-entry-cta:active:not(:disabled),
+.scenario-primary-btn:active:not(:disabled),
+.scenario-restart-btn:active:not(:disabled),
+.scenario-inline-btn:active:not(:disabled) {
+    transform: scale(0.985);
+}
+
+.scenario-option-btn.is-green:hover:not(:disabled),
+.scenario-option-btn.is-green.is-selected {
+    border-color: rgba(52, 211, 153, 0.54);
+    box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.14);
+}
+
+.scenario-option-btn.is-red:hover:not(:disabled),
+.scenario-option-btn.is-red.is-selected {
+    border-color: rgba(248, 113, 113, 0.52);
+    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.12);
+}
+
+.scenario-option-btn.is-amber:hover:not(:disabled),
+.scenario-option-btn.is-amber.is-selected {
+    border-color: rgba(251, 191, 36, 0.54);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.12);
+}
+
+.scenario-option-btn:disabled {
+    cursor: default;
+}
+
+.scenario-option-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+.scenario-option-tag.is-green {
+    background: rgba(52, 211, 153, 0.18);
+    color: #d1fae5;
+}
+
+.scenario-option-tag.is-red {
+    background: rgba(248, 113, 113, 0.18);
+    color: #fee2e2;
+}
+
+.scenario-option-tag.is-amber {
+    background: rgba(251, 191, 36, 0.18);
+    color: #fef3c7;
+}
+
+.scenario-option-text {
+    color: var(--scenario-ink);
+    line-height: 1.5;
+    font-size: 0.86rem;
+}
+
+.scenario-primary-btn,
+.scenario-restart-btn,
+.scenario-inline-btn,
+.scenario-entry-cta {
+    border-radius: 16px;
+    font-weight: 800;
+}
+
+.scenario-primary-btn,
+.scenario-restart-btn,
+.scenario-entry-cta {
+    width: 100%;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+    color: #eff6ff;
+    box-shadow: 0 14px 28px rgba(37, 99, 235, 0.2);
+}
+
+.scenario-inline-btn {
+    padding: 10px 14px;
+    background: rgba(12, 27, 49, 0.9);
+    border-color: rgba(56, 189, 248, 0.36);
+    color: #e0f2fe;
+}
+
+.scenario-entry-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(7, 17, 31, 0.88);
+    backdrop-filter: blur(12px);
+    opacity: 1;
+    transition: opacity 0.4s ease;
+}
+
+.scenario-entry-overlay.is-closing {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.scenario-entry-panel {
+    width: min(100%, 760px);
+    display: grid;
+    gap: 14px;
+    justify-items: center;
+    text-align: center;
+    padding: 24px 18px;
+    border-radius: 28px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background:
+        radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.16), transparent 28%),
+        radial-gradient(circle at 90% 85%, rgba(167, 139, 250, 0.18), transparent 26%),
+        linear-gradient(180deg, #0a1628 0%, #07111f 100%);
+    box-shadow: 0 30px 80px rgba(2, 8, 23, 0.5);
+}
+
+.scenario-entry-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: rgba(12, 27, 49, 0.88);
+    color: #dbeafe;
+    font-size: 0.74rem;
+    font-weight: 800;
+}
+
+.scenario-entry-title {
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(1.8rem, 7vw, 3rem);
+    line-height: 1.05;
+}
+
+.scenario-entry-subtitle,
+.scenario-entry-helper {
+    margin: 0;
+    max-width: 34rem;
+    color: var(--scenario-muted);
+    line-height: 1.6;
+    font-size: 0.92rem;
+}
+
+.scenario-entry-pillars {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.scenario-entry-pillar {
+    display: grid;
+    gap: 6px;
+    justify-items: center;
+    padding: 12px 8px;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: rgba(12, 27, 49, 0.76);
+    color: var(--scenario-ink);
+}
+
+.scenario-entry-pillar strong {
+    font-size: 0.92rem;
+}
+
+.scenario-entry-pillar span:last-child {
+    font-size: 0.76rem;
+    color: var(--scenario-muted);
+}
+
+.scenario-entry-pillar-icon {
+    font-size: 1.2rem;
+}
+
+.scenario-entry-flow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    color: #dbeafe;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.scenario-entry-flow span:not(.scenario-entry-arrow) {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(8, 15, 29, 0.84);
+}
+
+.scenario-entry-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--scenario-blue);
+}
+
+.scenario-entry-cta:disabled {
+    opacity: 0.56;
+    cursor: wait;
+}
+
+.scenario-option-btn:focus-visible,
+.scenario-entry-cta:focus-visible,
+.scenario-primary-btn:focus-visible,
+.scenario-restart-btn:focus-visible,
+.scenario-inline-btn:focus-visible {
+    outline: 2px solid rgba(125, 211, 252, 0.95);
+    outline-offset: 2px;
+}
+
+@keyframes scenarioBubblePop {
+    from {
+        opacity: 0;
+        transform: scale(0.93) translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@media (max-width: 720px) {
+    .scenario-platform-root {
+        min-height: 0;
+    }
+
+    .scenario-simulator-shell {
+        border-radius: 24px;
+        padding: 10px;
+    }
+
+    .scenario-sim-topbar,
+    .scenario-scene-strip,
+    .scenario-chat-area,
+    .scenario-options-dock {
+        border-radius: 18px;
+    }
+
+    .scenario-bubble {
+        max-width: 92%;
+        padding: 10px;
+    }
+
+    .scenario-bubble p {
+        font-size: 0.84rem;
+    }
+
+    .scenario-entry-panel {
+        padding: 22px 14px;
+    }
+
+    .scenario-entry-pillars {
+        gap: 8px;
+    }
+
+    .scenario-entry-pillar {
+        padding: 11px 6px;
+    }
+}
+
+@media (max-width: 420px) {
+    .scenario-simulator-shell {
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .scenario-sim-topbar {
+        padding: 9px 10px;
+    }
+
+    .scenario-progress-dots {
+        gap: 6px;
+    }
+
+    .scenario-progress-dot {
+        width: 9px;
+        height: 9px;
+    }
+
+    .scenario-scene-strip {
+        padding: 8px 10px;
+    }
+
+    .scenario-chat-area,
+    .scenario-options-dock {
+        padding: 10px;
+    }
+
+    .scenario-option-btn {
+        gap: 7px;
+        padding: 10px;
+    }
+
+    .scenario-option-text {
+        font-size: 0.82rem;
+    }
+
+    .scenario-entry-subtitle,
+    .scenario-entry-helper {
+        font-size: 0.86rem;
+    }
+}
+
+@media (min-width: 960px) {
+    .scenario-simulator-shell {
+        padding: 16px;
+    }
+
+    .scenario-chat-area {
+        padding: 16px;
+    }
+
+    .scenario-options-dock {
+        padding: 14px;
+    }
+
+    .scenario-entry-panel {
+        padding: 28px 24px;
+    }
+}

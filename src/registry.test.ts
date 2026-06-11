@@ -41,4 +41,12 @@ describe('feature registry', () => {
     const prismLab = FEATURES.find((f) => f.id === 'prismlab');
     expect(prismLab?.sourceValidation).toBe('placeholder');
   });
+
+  it('registers the Michael Hall daily gym as a safe internal hash feature', () => {
+    const dailyGym = FEATURES.find((f) => f.id === 'michael-hall-daily-gym');
+    expect(dailyGym?.route).toBe('#michael-hall-daily-gym');
+    expect(dailyGym?.dataSource).toContain('src/data/michaelHallDailyCards.ts');
+    expect(dailyGym?.sourceValidation).toBe('placeholder');
+    expect(dailyGym?.mobileSupport).toBe('full');
+  });
 });

@@ -1,0 +1,290 @@
+/* ============================================================
+   META MODEL APP — GLOBAL REDESIGN
+   Applies to trainer pages. Loaded before bundle CSS.
+   ============================================================ */
+
+:root {
+  --mm-bg:         #F7F6F3;
+  --mm-surface:    #FFFFFF;
+  --mm-surface2:   #F0EEE9;
+  --mm-border:     #E2DED7;
+  --mm-border2:    #C9C4BA;
+  --mm-text:       #1A1917;
+  --mm-text2:      #6B6860;
+  --mm-text3:      #9C998F;
+  --mm-accent:     #2F6B4E;
+  --mm-accent-bg:  #EBF4EF;
+  --mm-accent2:    #7B4F2E;
+  --mm-accent2-bg: #F5EDE5;
+  --mm-warning:    #B5500B;
+  --mm-warning-bg: #FEF0E6;
+  --mm-info:       #1A5276;
+  --mm-info-bg:    #EAF2FB;
+  --mm-radius-sm:  6px;
+  --mm-radius:     10px;
+  --mm-radius-lg:  16px;
+  --mm-shadow:     0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  --mm-shadow-lg:  0 4px 24px rgba(0,0,0,0.10);
+  --mm-transition: 180ms ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ─── LOADING DOTS ─── */
+.loading-dots {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+}
+.loading-dots span {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--mm-accent);
+  animation: mmLoadBounce 1.2s ease-in-out infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes mmLoadBounce {
+  0%,80%,100% { opacity:0.25; transform:scale(0.7); }
+  40%         { opacity:1;    transform:scale(1); }
+}
+
+/* ─── STEP INDICATOR ─── */
+.step-indicator {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 36px;
+  padding: 0 4px;
+}
+.step-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  min-width: 52px;
+}
+.dot-num {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--mm-surface2);
+  border: 2px solid var(--mm-border);
+  color: var(--mm-text3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  transition: var(--mm-transition);
+}
+.step-dot.active .dot-num {
+  background: var(--mm-accent);
+  border-color: var(--mm-accent);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(47,107,78,0.35);
+}
+.step-dot.done .dot-num {
+  background: var(--mm-accent-bg);
+  border-color: var(--mm-accent);
+  color: var(--mm-accent);
+}
+.dot-label {
+  font-size: 11px;
+  color: var(--mm-text3);
+  white-space: nowrap;
+  text-align: center;
+}
+.step-dot.active .dot-label { color: var(--mm-accent); font-weight: 700; }
+.step-dot.done   .dot-label { color: var(--mm-accent); }
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--mm-border);
+  margin: 0 4px;
+  margin-bottom: 20px;
+  border-radius: 2px;
+  transition: background var(--mm-transition);
+}
+.step-line.done { background: var(--mm-accent); }
+
+/* ─── STEP PANELS ─── */
+.step-panel { animation: mmStepIn 220ms ease both; }
+.step-panel.hidden { display: none !important; }
+@keyframes mmStepIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.step-title    { font-size: clamp(1.25rem, 3vw, 1.6rem); font-weight: 900; color: var(--mm-text); margin: 0 0 8px; }
+.step-subtitle { font-size: 0.95rem; color: var(--mm-text2); margin: 0 0 24px; line-height: 1.6; }
+
+/* ─── WORD INPUT ─── */
+.word-input-wrap { display: flex; gap: 10px; margin-bottom: 16px; }
+.word-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid var(--mm-border);
+  border-radius: var(--mm-radius);
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--mm-text);
+  background: var(--mm-surface);
+  transition: var(--mm-transition);
+  direction: rtl;
+}
+.word-input:focus {
+  outline: none;
+  border-color: var(--mm-accent);
+  box-shadow: 0 0 0 3px var(--mm-accent-bg);
+}
+.word-input::placeholder { color: var(--mm-text3); }
+
+/* ─── EXAMPLE TAGS ─── */
+.examples-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.example-tag {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--mm-surface2);
+  border: 1px solid var(--mm-border);
+  color: var(--mm-text2);
+  font-size: 13px;
+  cursor: pointer;
+  transition: var(--mm-transition);
+  font-family: inherit;
+}
+.example-tag:hover {
+  background: var(--mm-accent-bg);
+  border-color: var(--mm-accent);
+  color: var(--mm-accent);
+  transform: translateY(-1px);
+}
+
+/* ─── TEMPLATE CARDS ─── */
+.template-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.template-card {
+  background: var(--mm-surface);
+  border: 2px solid var(--mm-border);
+  border-radius: var(--mm-radius-lg);
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: var(--mm-transition);
+  position: relative;
+}
+.template-card:hover {
+  border-color: var(--mm-accent);
+  box-shadow: var(--mm-shadow);
+  transform: translateY(-2px);
+}
+.template-card.selected {
+  border-color: var(--mm-accent);
+  background: var(--mm-accent-bg);
+}
+.template-ai-badge {
+  position: absolute; top: 10px; left: 10px;
+  background: var(--mm-accent); color: #fff;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 10px;
+}
+.template-card-icon  { font-size: 26px; margin-bottom: 8px; display: block; }
+.template-card-name  { font-size: 15px; font-weight: 800; color: var(--mm-text); margin-bottom: 5px; }
+.template-card-desc  { font-size: 13px; color: var(--mm-text2); line-height: 1.5; }
+
+/* ─── TREE CONTAINER ─── */
+.tree-container {
+  background: var(--mm-surface);
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius-lg);
+  padding: 24px;
+  margin-bottom: 16px;
+  min-height: 220px;
+  overflow-x: auto;
+}
+.tree-container svg { width: 100%; height: auto; }
+.tree-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.legend-item { font-size: 12px; color: var(--mm-text2); display: flex; align-items: center; gap: 5px; }
+.legend-item::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
+.legend-root::before   { background: var(--mm-accent); }
+.legend-branch::before { background: var(--mm-accent2); }
+.legend-leaf::before   { background: var(--mm-border2); }
+
+/* ─── QUESTION CARD ─── */
+.question-card {
+  background: var(--mm-surface);
+  border: 2px solid var(--mm-accent);
+  border-radius: var(--mm-radius-lg);
+  padding: 22px 26px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(47,107,78,0.1);
+}
+.q-label {
+  font-size: 11px; font-weight: 800;
+  color: var(--mm-accent);
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin-bottom: 8px;
+}
+.q-text   { font-size: clamp(1rem, 2.5vw, 1.3rem); font-weight: 700; color: var(--mm-text); line-height: 1.5; }
+.q-explain { font-size: 13px; color: var(--mm-text2); margin-top: 10px; line-height: 1.6; }
+.alt-questions { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
+.alt-q-item {
+  background: var(--mm-surface2);
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius);
+  padding: 12px 16px;
+  font-size: 14px; color: var(--mm-text2);
+  cursor: pointer;
+  transition: var(--mm-transition);
+}
+.alt-q-item:hover {
+  background: var(--mm-accent-bg);
+  border-color: var(--mm-accent);
+  color: var(--mm-text);
+}
+
+/* ─── AI INSIGHT ─── */
+.ai-insight {
+  font-size: 13px;
+  color: var(--mm-text2);
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: var(--mm-accent-bg);
+  border-radius: var(--mm-radius);
+  border-right: 3px solid var(--mm-accent);
+  line-height: 1.55;
+}
+
+/* ─── STEP ACTIONS ─── */
+.step3-actions, .step4-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ─── ICEBERG HERO ─── */
+.iceberg-hero {
+  width: 100%;
+  border-radius: var(--mm-radius-lg);
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: var(--mm-shadow);
+}
+.iceberg-hero img { width: 100%; height: auto; display: block; }
+
+/* ─── STEPPER WRAPPER ─── */
+.stepper {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 640px) {
+  .template-cards-grid { grid-template-columns: 1fr; }
+  .word-input-wrap { flex-direction: column; }
+  .step3-actions, .step4-actions { flex-direction: column; width: 100%; }
+  .stepper { padding: 16px 12px 60px; }
+  .step-title { font-size: 1.2rem; }
+}

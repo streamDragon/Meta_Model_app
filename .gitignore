@@ -2,5 +2,15 @@ node_modules/
 dist/
 .playwright-mcp/
 docs/screenshots/
+playwright-report/
+test-results/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+.idea/
+*.iml
+*.jks
+*.keystore
 *.log
 .DS_Store

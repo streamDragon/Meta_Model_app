@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="420" viewBox="0 0 560 420">
+
+<defs>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0B1220" flood-opacity="0.18"/>
+  </filter>
+  <pattern id="halftone" width="16" height="16" patternUnits="userSpaceOnUse">
+    <circle cx="3" cy="3" r="1.2" fill="#0B1220" opacity="0.10"/>
+    <circle cx="11" cy="9" r="1.2" fill="#0B1220" opacity="0.10"/>
+  </pattern>
+</defs>
+<rect width="560" height="420" fill="none"/>
+<g filter="url(#shadow)">
+  <rect x="14" y="14" width="532" height="392" rx="26" fill="#FFFFFF" stroke="#0B1220" stroke-width="6"/>
+</g>
+<rect x="26" y="26" width="508" height="310" rx="20" fill="url(#halftone)" opacity="0.9"/><text x="526" y="70" font-family="Rubik, Arial, sans-serif" font-size="26" font-weight="900" fill="#111827" text-anchor="end" direction="rtl" unicode-bidi="plaintext">פאנל קומיקס</text><text x="526" y="104" font-family="Rubik, Arial, sans-serif" font-size="18" font-weight="700" fill="#6B7280" text-anchor="end" direction="rtl" unicode-bidi="plaintext">גרור/י סצנה או החלף/י טקסט</text><g filter="url(#shadow)"><rect x="40" y="260" width="440" height="110" rx="24" fill="#FFF7ED" stroke="#0B1220" stroke-width="6"/><path d="M230.0 364 L260.0 408 L290.0 364 Z" fill="#FFF7ED" stroke="#0B1220" stroke-width="6" stroke-linejoin="round"/></g><text x="440" y="312" font-family="Rubik, Arial, sans-serif" font-size="20" font-weight="700" fill="#111827" text-anchor="end" direction="rtl" unicode-bidi="plaintext">כאן בועת דיבור קצרה</text>
+</svg>

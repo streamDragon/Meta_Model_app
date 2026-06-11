@@ -604,6 +604,14 @@ input[type='range'] {
   border-top-color: var(--warm);
 }
 
+.lab-card[data-family='systemic-matrix'] {
+  border-top-color: var(--success);
+}
+
+.lab-card[data-family='dashboard'] {
+  border-top-color: var(--primary-deep);
+}
+
 .lab-card-head {
   display: flex;
   align-items: center;
@@ -651,7 +659,8 @@ input[type='range'] {
 
 .lab-card .btn {
   align-self: flex-start;
-  padding: 7px 16px;
+  min-height: 44px;
+  padding: 9px 18px;
   font-size: var(--fs-sm);
 }
 
@@ -1168,6 +1177,165 @@ input[type='range'] {
   display: flex;
   gap: var(--sp-3);
   flex-wrap: wrap;
+}
+
+/* ============================================================
+   MICHAEL HALL DAILY GYM
+   ============================================================ */
+
+.michael-hall-gym .daily-gym-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.daily-gym-heading {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.daily-gym-kicker {
+  color: var(--primary);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.daily-gym-progress {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.daily-gym-progress > div {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--sp-3);
+}
+
+.daily-gym-progress strong,
+.daily-gym-progress span {
+  display: block;
+}
+
+.daily-gym-progress span {
+  color: var(--ink-soft);
+  font-size: var(--fs-xs);
+}
+
+.daily-training-card {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.daily-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+}
+
+.daily-training-card h3 {
+  font-size: var(--fs-xl);
+}
+
+.daily-card-title-en {
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+  margin-top: calc(-1 * var(--sp-3));
+}
+
+.daily-card-section {
+  border-top: 1px solid var(--line);
+  padding-top: var(--sp-3);
+}
+
+.daily-card-section h4,
+.daily-notes-label {
+  display: block;
+  color: var(--ink-soft);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  margin-bottom: var(--sp-2);
+  text-transform: uppercase;
+}
+
+.daily-distinction,
+.daily-apply {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+
+.daily-question {
+  color: var(--primary-deep);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+}
+
+.daily-exercise-list {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.daily-exercise-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--sp-2);
+  min-height: 44px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  padding: 10px 12px;
+}
+
+.daily-exercise-row input {
+  width: 18px;
+  height: 18px;
+  margin-top: 5px;
+  accent-color: var(--primary);
+}
+
+.daily-notes {
+  width: 100%;
+  max-width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-md);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: var(--fs-md);
+  line-height: 1.6;
+  padding: var(--sp-3);
+}
+
+.daily-notes:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+  outline: none;
+}
+
+.daily-source-note {
+  color: var(--ink-soft);
+  font-size: var(--fs-xs);
+}
+
+.daily-gym-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.daily-gym-actions .btn {
+  min-height: 44px;
 }
 
 /* ============================================================
@@ -1866,6 +2034,91 @@ input[type='range'] {
 }
 
 /* ============================================================
+   LEGACY TOOLS
+   ============================================================ */
+
+.legacy-tools-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.legacy-hero {
+  display: flex;
+  gap: var(--sp-4);
+  align-items: flex-start;
+}
+
+.legacy-hero > span {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--r-md);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-size: 2rem;
+  background: var(--accent-soft);
+}
+
+.legacy-hero p {
+  color: var(--ink-soft);
+  max-width: 760px;
+}
+
+.legacy-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--sp-3);
+}
+
+.legacy-tool-card {
+  min-height: 170px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  color: inherit;
+  text-decoration: none;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.legacy-tool-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+
+.legacy-tool-card strong {
+  font-size: var(--fs-md);
+}
+
+.legacy-tool-card p {
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+  flex: 1;
+}
+
+.legacy-tool-tag {
+  align-self: flex-start;
+  background: var(--primary-soft);
+  color: var(--primary-deep);
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.legacy-tool-action {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* ============================================================
    Mobile (<= 1023px): stacked cards, bottom nav, no rail
    ============================================================ */
 
@@ -1964,6 +2217,7 @@ input[type='range'] {
 
   .blueprint-summary-grid,
   .blueprint-timeline,
+  .daily-gym-progress,
   .trainer-complete-stats {
     grid-template-columns: 1fr;
   }

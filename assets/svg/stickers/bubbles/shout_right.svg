@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="220" viewBox="0 0 420 220">
+
+<defs>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0B1220" flood-opacity="0.18"/>
+  </filter>
+  <pattern id="halftone" width="16" height="16" patternUnits="userSpaceOnUse">
+    <circle cx="3" cy="3" r="1.2" fill="#0B1220" opacity="0.10"/>
+    <circle cx="11" cy="9" r="1.2" fill="#0B1220" opacity="0.10"/>
+  </pattern>
+</defs>
+<rect width="420" height="220" fill="none"/><g filter="url(#shadow)"><polygon points="280.0,100.0 263.9,119.6 263.6,145.0 238.7,149.7 222.2,168.9 200.0,156.5 175.0,160.6 166.0,136.9 144.2,123.9 152.6,100.0 144.2,76.1 166.0,63.1 175.0,39.4 200.0,43.5 222.2,31.1 238.7,50.3 263.6,55.0 263.9,80.4" fill="#FFF7ED" stroke="#0B1220" stroke-width="6" stroke-linejoin="round"/><path d="M340 140 L398 180 L316 160 Z" fill="#FFF7ED" stroke="#0B1220" stroke-width="6" stroke-linejoin="round"/></g><text x="370" y="90" font-family="Rubik, Arial, sans-serif" font-size="22" font-weight="900" fill="#111827" text-anchor="end" direction="rtl" unicode-bidi="plaintext">כאן טקסט</text><text x="370" y="125" font-family="Rubik, Arial, sans-serif" font-size="18" font-weight="700" fill="#6B7280" text-anchor="end" direction="rtl" unicode-bidi="plaintext">בועת דיבור לעריכה</text>
+</svg>

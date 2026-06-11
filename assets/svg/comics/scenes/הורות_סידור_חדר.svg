@@ -1,0 +1,31 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#f0fff4"/>
+  <rect y="450" width="800" height="150" fill="#c6f6d5"/>
+  
+  <rect x="300" y="500" width="40" height="20" fill="#e53e3e" transform="rotate(10)"/>
+  <rect x="350" y="520" width="30" height="30" fill="#3182ce" transform="rotate(-15)"/>
+  <circle cx="450" cy="510" r="15" fill="#d69e2e"/>
+
+  <g transform="translate(550, 250)">
+    <rect x="20" y="60" width="70" height="200" rx="10" fill="#805ad5"/>
+    <circle cx="55" cy="30" r="40" fill="#e9d8fd"/>
+  </g>
+
+  <g transform="translate(150, 320)">
+    <rect x="20" y="50" width="50" height="130" rx="10" fill="#38a169"/>
+    <circle cx="45" cy="30" r="30" fill="#c6f6d5"/>
+  </g>
+
+  <g transform="translate(400, 100)">
+    <path d="M0,0 h250 a10,10 0 0 1 10,10 v60 a10,10 0 0 1 -10,10 h-50 l-20,20 l-20,-20 h-180 a10,10 0 0 1 -10,-10 v-60 a10,10 0 0 1 10,-10 z" fill="white" stroke="#cbd5e0" stroke-width="2"/>
+    <text x="125" y="40" text-anchor="middle" font-family="Arial" font-size="18" fill="#2d3748" direction="rtl">אמרת שסידרת, אבל הכל על הרצפה.</text>
+  </g>
+
+  <g transform="translate(100, 200)">
+    <path d="M0,0 h200 a10,10 0 0 1 10,10 v60 a10,10 0 0 1 -10,10 h-100 l-20,20 l-20,-20 h-80 a10,10 0 0 1 -10,-10 v-60 a10,10 0 0 1 10,-10 z" fill="white" stroke="#cbd5e0" stroke-width="2"/>
+    <text x="100" y="40" text-anchor="middle" font-family="Arial" font-size="18" fill="#2d3748" direction="rtl">אבל סידרתי את המיטה!</text>
+  </g>
+
+  <rect y="540" width="800" height="60" fill="#48bb78"/>
+  <text x="400" y="580" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="white" direction="rtl">תיאום ציפיות: מה נחשב "מסודר"?</text>
+</svg>
