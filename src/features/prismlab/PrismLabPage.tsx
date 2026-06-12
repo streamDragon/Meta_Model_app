@@ -9,6 +9,8 @@ import {
 import { computePivotRecommendation } from '../../lib/pivot';
 import { useProgress } from '../../store/useProgress';
 import { XP_REWARDS } from '../../store/progress';
+import { PRISM_ART } from '../../lib/patternArt';
+import { HowItWorks } from '../../components/HowItWorks';
 
 const SESSIONS_KEY = 'prism_sessions';
 const MAX_SAVED_SESSIONS = 10;
@@ -145,9 +147,25 @@ export function PrismLabPage() {
           </span>
         </div>
 
+        <HowItWorks
+          steps={[
+            { icon: '🔍', title: 'בוחרים עדשה', detail: 'פריזמה אחת = דפוס לשוני אחד לסרוק דרכו' },
+            { icon: '🗺️', title: 'מפה 5 שכבות', detail: 'בחר אפשרות מוכנה בכל שכבה — הקשר עד זהות' },
+            { icon: '🎯', title: 'קבל Pivot', detail: 'המלצה איפה הכי קל להתחיל לזוז' },
+          ]}
+        />
+
         <div className="prism-grid" id="prism-library">
           {content.prisms.map((p) => (
             <div className="prism-card" key={p.id}>
+              {PRISM_ART[p.id] && (
+                <img
+                  className="prism-card-art"
+                  src={PRISM_ART[p.id]}
+                  alt={`איור: ${p.name_he}`}
+                  loading="lazy"
+                />
+              )}
               <h4>{p.name_he}</h4>
               <p>{p.philosophy_core}</p>
               <p>

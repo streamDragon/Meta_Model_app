@@ -16,6 +16,8 @@ import {
 import { useProgress } from '../../store/useProgress';
 import { usePracticeLaunch } from '../../store/practiceLaunch';
 import { useHint } from '../../store/hint';
+import { HowItWorks } from '../../components/HowItWorks';
+import teacherImg from '../../assets/teacher.png';
 
 type Phase = 'idle' | 'active' | 'complete';
 
@@ -328,6 +330,13 @@ export function TrainerPage() {
 
         {phase === 'idle' && (
           <div id="trainer-start" className="start-section">
+            <HowItWorks
+              steps={[
+                { icon: '📖', title: 'קרא את המשפט', detail: 'משפט יומיומי עם דפוס מוסתר' },
+                { icon: '🤔', title: 'זהה את המשפחה', detail: 'מחיקה, עיוות או הכללה?' },
+                { icon: '⚡', title: 'קבל משוב מיד', detail: 'הסבר + שאלת ניקוי מומלצת + XP' },
+              ]}
+            />
             <p className="instruction">בחר קטגוריה ולחץ כדי להתחיל</p>
             <button
               id="start-trainer-btn"
@@ -377,9 +386,15 @@ export function TrainerPage() {
           )}
         </div>
 
-        <div className="side-card">
-          <h4>💡 איך מזהים?</h4>
-          <p className="muted">מחיקה — מידע חסר. עיוות — הנחה בלי ראיות. הכללה — "תמיד / אף פעם / חייב".</p>
+        <div className="side-card teacher-card">
+          <img className="teacher-figure" src={teacherImg} alt="" aria-hidden="true" loading="lazy" />
+          <div className="teacher-bubble">
+            <strong>💡 איך מזהים?</strong>
+            <p>
+              מחיקה — מידע חסר. עיוות — הנחה בלי ראיות. הכללה — "תמיד / אף פעם /
+              חייב". כשמתלבטים: שאלו "מה חסר לי כדי להבין את זה באמת?"
+            </p>
+          </div>
         </div>
       </aside>
     </div>

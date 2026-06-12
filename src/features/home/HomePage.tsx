@@ -1,10 +1,18 @@
 import { FEATURES } from '../../registry';
 import { useProgress } from '../../store/useProgress';
 import { nextMission } from '../../store/progress';
+import { HowItWorks } from '../../components/HowItWorks';
+import teacherImg from '../../assets/teacher.png';
 
 function navigateTo(tab: string) {
   window.location.hash = tab;
 }
+
+const HERO_BUBBLES = [
+  { text: '"הוא לא רואה אותי"', tag: 'השמטה', family: 'deletion' },
+  { text: '"תמיד קורה לי ככה"', tag: 'הכללה', family: 'generalization' },
+  { text: '"כולם חושבים שאני..."', tag: 'עיוות', family: 'distortion' },
+];
 
 const LAB_IDS = [
   'categories',
@@ -24,22 +32,46 @@ export function HomePage() {
 
   return (
     <>
-      <section className="home-hero">
-        <h2>ברוכים הבאים! 👋</h2>
-        <p>
-          Meta Model Gym הוא חדר כושר לשפה: מתאמנים לזהות מחיקה, עיוות והכללה,
-          לשאול שאלות מדויקות יותר, ולהפוך כוונות עמומות לצעדים. הכל בבחירות
-          מובנות מתוך חבילות תוכן — ללא AI וללא ניתוח חופשי.
-        </p>
-        <div className="hero-actions">
-          <button type="button" className="btn btn-secondary" onClick={() => navigateTo('practice')}>
-            🎮 התחל תרגול יומי
-          </button>
-          <button type="button" className="btn btn-secondary" onClick={() => navigateTo('categories')}>
-            📚 למד את הקטגוריות
-          </button>
+      <section className="home-hero home-hero-rich">
+        <div className="home-hero-content">
+          <h2>ברוכים הבאים! 👋</h2>
+          <p className="hero-tagline">
+            לשמוע משפט — <strong>ולראות מה מסתתר בתוכו.</strong>
+          </p>
+          <p>
+            Meta Model Gym הוא חדר כושר לשפה: מתאמנים לזהות מחיקה, עיוות והכללה,
+            לשאול שאלות מדויקות יותר, ולהפוך כוונות עמומות לצעדים.
+          </p>
+          <div className="hero-bubbles" aria-hidden="true">
+            {HERO_BUBBLES.map((b) => (
+              <span className="hero-bubble" data-family={b.family} key={b.tag}>
+                {b.text}
+                <em>{b.tag}</em>
+              </span>
+            ))}
+          </div>
+          <div className="hero-actions">
+            <button type="button" className="btn btn-secondary" onClick={() => navigateTo('practice')}>
+              🎮 התחל תרגול יומי
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={() => navigateTo('categories')}>
+              📚 למד את הקטגוריות
+            </button>
+          </div>
+        </div>
+        <div className="home-hero-figure" aria-hidden="true">
+          <img src={teacherImg} alt="" loading="lazy" />
         </div>
       </section>
+
+      <HowItWorks
+        steps={[
+          { icon: '📚', title: 'לומדים דפוס', detail: 'פותחים את הקטגוריות ומכירים את 11 הדפוסים' },
+          { icon: '🎯', title: 'מזהים במהירות', detail: 'תרגול קצר עם משוב מיידי ו-XP' },
+          { icon: '🔍', title: 'מעמיקים במעבדה', detail: 'פריזמות, ערכים ו-Blueprint לעבודה אמיתית' },
+        ]}
+        title="המסלול המומלץ"
+      />
 
       <h3 className="section-title">🏋️ המעבדות</h3>
       <div className="lab-grid">
