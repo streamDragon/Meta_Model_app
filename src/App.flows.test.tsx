@@ -4,6 +4,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi, beforeAll } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import App from './App';
+import { content } from './data/content';
+import { CATEGORY_LABELS } from './lib/trainer';
+import { hiddenFamilies } from './lib/violationLayers';
+import type { ViolationFamily } from './types';
 
 beforeAll(() => {
   window.scrollTo = vi.fn();
@@ -12,6 +16,7 @@ beforeAll(() => {
 beforeEach(() => {
   window.localStorage.clear();
   window.location.hash = '';
+  setMobileViewport(false);
 });
 
 afterEach(cleanup);
@@ -149,5 +154,57 @@ describe('Categories → Trainer bridge', () => {
     });
     const questionText = document.querySelector('#practice .question-text');
     expect(questionText?.textContent?.length).toBeGreaterThan(0);
+  });
+});
+
+describe('Layered Trainer flow', () => {
+  it('asks for the surface layer, then the hidden layer, and awards partial XP', () => {
+    window.location.hash = 'practice';
+    render(<App />);
+    const section = document.getElementById('practice')!;
+
+    fireEvent.click(section.querySelector('#start-trainer-btn') as HTMLButtonElement);
+
+    expect(within(section.querySelector('.layer-step-card') as HTMLElement).getByText('מצא את ההפרה העיקרית')).toBeTruthy();
+    const questionText = section.querySelector('.question-text')?.textContent?.trim();
+    const statement = content.practice_statements.find((s) => s.statement === questionText);
+    expect(statement).toBeTruthy();
+
+    fireEvent.click(within(section).getByLabelText(CATEGORY_LABELS[statement!.category]));
+
+    expect(within(section.querySelector('.layer-step-card') as HTMLElement).getByText('מצא את ההפרה המסתתרת')).toBeTruthy();
+    const wrongHidden = (['DELETION', 'DISTORTION', 'GENERALIZATION'] as ViolationFamily[]).find(
+      (family) => !hiddenFamilies(statement!).includes(family),
+    );
+    expect(wrongHidden).toBeTruthy();
+
+    fireEvent.click(within(section).getByLabelText(CATEGORY_LABELS[wrongHidden!]));
+
+    expect(within(section).getByText(/חצי תשובה/)).toBeTruthy();
+    expect(storedProgress().xp).toBe(5);
+  });
+});
+
+describe('Beliefs & Reality Lab flow', () => {
+  it('opens the CBT lab, analyzes a thought map, saves it, and awards XP', () => {
+    window.location.hash = 'beliefs-reality-lab';
+    render(<App />);
+    const section = document.getElementById('beliefs-reality-lab')!;
+
+    expect(section).toBeTruthy();
+    expect(within(section).getByText('מעבדת אמונות ומציאות')).toBeTruthy();
+
+    const thoughtInput = within(section).getByLabelText('משפט שתפס אותך') as HTMLTextAreaElement;
+    fireEvent.change(thoughtInput, {
+      target: { value: 'אני חייב לעשות מה שכולם אומרים.' },
+    });
+    fireEvent.click(within(section).getByText('פתח למפת מחשבה'));
+
+    expect(within(section).getByText(/modal operator/i)).toBeTruthy();
+    expect(within(section).getByText(/מי זה "כולם"/)).toBeTruthy();
+
+    fireEvent.click(within(section).getByText('שמור מפת מחשבה'));
+    expect(storedProgress().xp).toBeGreaterThanOrEqual(12);
+    expect(JSON.parse(window.localStorage.getItem('cbtSessions') ?? '[]')).toHaveLength(1);
   });
 });

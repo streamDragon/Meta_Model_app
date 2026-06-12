@@ -5,6 +5,7 @@ import { useProgress } from '../../store/useProgress';
 import { XP_REWARDS } from '../../store/progress';
 import { useHint } from '../../store/hint';
 import { HowItWorks } from '../../components/HowItWorks';
+import { SurfaceHiddenPrinciple } from '../../components/SurfaceHiddenPrinciple';
 
 interface WizardField {
   id: string; // matches choice_packs.blueprint.fields key
@@ -178,6 +179,8 @@ export function BlueprintPage() {
             <strong>תוצר:</strong> תוכנית קצרה, תנאים ו-Plan B.
           </span>
         </div>
+
+        <SurfaceHiddenPrinciple compact />
 
         {step === 1 && (
           <HowItWorks

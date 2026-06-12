@@ -142,7 +142,27 @@
       "violation": "Universal Quantifier",
       "suggested_question": "באמת כל הגברים? אין אפילו גבר אחד שונה?",
       "explanation": "המשפט מרחיב חוויה פרטית לכלל רחב מדי",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "GENERALIZATION",
+        "subcategory": "universal_quantifier",
+        "violation": "Universal Quantifier",
+        "evidenceHe": "כל הגברים הם אותו דבר",
+        "questionHe": "באמת כל הגברים? אין אפילו גבר אחד שונה?",
+        "explanationHe": "המשפט מרחיב חוויה פרטית לכלל רחב מדי"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "complex_equivalence",
+          "violation": "Complex Equivalence",
+          "impliedTextHe": "כמה דוגמאות הופכות לחוק על האדם, הקבוצה או העולם.",
+          "questionHe": "איך מקרה או כמה מקרים הפכו כאן לחוק קבוע?",
+          "explanationHe": "מאחורי הכללה גורפת יש לעיתים הדבקה: מקרה אחד שווה אמת כללית."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"כל הגברים הם אותו דבר\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 2,
@@ -152,7 +172,27 @@
       "violation": "Cause-Effect",
       "suggested_question": "כיצד בדיוק הוא גרם לך להיות עצוב? מה עשה?",
       "explanation": "הנחה שמישהו אחר יכול 'לגרום' לך לחוש",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "cause_effect",
+        "violation": "Cause-Effect",
+        "evidenceHe": "הוא גרם לי להיות עצוב",
+        "questionHe": "כיצד בדיוק הוא גרם לך להיות עצוב? מה עשה?",
+        "explanationHe": "הנחה שמישהו אחר יכול 'לגרום' לך לחוש"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "השלבים שבין הסיבה לתוצאה נמחקו.",
+          "questionHe": "מה קרה צעד אחרי צעד בין הדבר הראשון לתוצאה?",
+          "explanationHe": "סיבתיות נשמעת ישירה, אבל בדרך כלל יש רצף פעולות, פירושים ותנאים שנעלמו."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"הוא גרם לי להיות עצוב\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 3,
@@ -162,7 +202,35 @@
       "violation": "Modal Operator",
       "suggested_question": "מדוע חייב להיות ככה? מה היה קורה אם היה אחרת?",
       "explanation": "מגביל את האפשרויות לאלטרנטיבה אחת",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "GENERALIZATION",
+        "subcategory": "modal_operator",
+        "violation": "Modal Operator",
+        "evidenceHe": "זה חייב להיות ככה",
+        "questionHe": "מדוע חייב להיות ככה? מה היה קורה אם היה אחרת?",
+        "explanationHe": "מגביל את האפשרויות לאלטרנטיבה אחת"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "cause_effect",
+          "violation": "Cause-Effect",
+          "impliedTextHe": "משהו גורם לכך שאין אפשרות, גם אם הסיבה לא נאמרה.",
+          "questionHe": "מה בדיוק גורם לזה להיראות בלתי אפשרי?",
+          "explanationHe": "מאחורי אי אפשר או חייב מסתתרת לעיתים סיבתיות לא בדוקה."
+        },
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "universal_quantifier",
+          "violation": "Universal Quantifier",
+          "impliedTextHe": "זה נכון בכל מצב, בלי יוצאים מן הכלל ובלי ניסיון אחר.",
+          "questionHe": "האם זה באמת בשום מצב, או רק בתנאים מסוימים?",
+          "explanationHe": "אופרטור מודאלי יכול להסתיר הכללה של אין חריגים ואין אפשרויות אחרות."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"זה חייב להיות ככה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 4,
@@ -172,7 +240,27 @@
       "violation": "Mind Reading",
       "suggested_question": "כיצד אתה יודע מה הוא קרא? מה בדיוק אמר או עשה?",
       "explanation": "הנחה לא מבוססת על מה שמישהו חושב",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "mind_reading",
+        "violation": "Mind Reading",
+        "evidenceHe": "הוא קרא בדעותיי",
+        "questionHe": "כיצד אתה יודע מה הוא קרא? מה בדיוק אמר או עשה?",
+        "explanationHe": "הנחה לא מבוססת על מה שמישהו חושב"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "lack_referential_index",
+          "violation": "Lack of Referential Index",
+          "impliedTextHe": "יש מקור ידע פנימי על אדם אחר, אבל המקור לא נאמר.",
+          "questionHe": "מה מקור הידיעה שלי לגבי מה שקורה אצלו או אצלה?",
+          "explanationHe": "קריאת מחשבות מסתירה את הראיות שעליהן הפרשנות נשענת."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"הוא קרא בדעותיי\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 5,
@@ -182,7 +270,27 @@
       "violation": "Complex Equivalence",
       "suggested_question": "מדוע אי-תגובה שווה לאי-אהבה? יכול להיות סיבה אחרת?",
       "explanation": "קישור של שתי פעולות שונות כאילו הן שוות זו לזו",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "complex_equivalence",
+        "violation": "Complex Equivalence",
+        "evidenceHe": "כשהם לא השיבו, הבנתי שהם לא אוהבים אותי",
+        "questionHe": "מדוע אי-תגובה שווה לאי-אהבה? יכול להיות סיבה אחרת?",
+        "explanationHe": "קישור של שתי פעולות שונות כאילו הן שוות זו לזו"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "הגשר שמחבר בין שני הדברים נמחק.",
+          "questionHe": "מה בדיוק מחבר בין שני הדברים האלה, ומה עוד יכול להסביר את זה?",
+          "explanationHe": "שקילות מורכבת מצמידה שני דברים כאילו הם אותו דבר, בלי להראות את הדרך ביניהם."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"כשהם לא השיבו, הבנתי שהם לא אוהבים אותי\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 6,
@@ -192,7 +300,27 @@
       "violation": "Simple Deletion",
       "suggested_question": "מה בדיוק לא טוב? לפי מי? באיזה מובן?",
       "explanation": "מחקו את הפרטים החשובים - מה? למי? לפי מה?",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "simple_deletion",
+        "violation": "Simple Deletion",
+        "evidenceHe": "לא טוב לי",
+        "questionHe": "מה בדיוק לא טוב? לפי מי? באיזה מובן?",
+        "explanationHe": "מחקו את הפרטים החשובים - מה? למי? לפי מה?"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "mind_reading",
+          "violation": "Mind Reading",
+          "impliedTextHe": "המקשיב עלול למלא לבד מה בדיוק חסר או מה זה אומר.",
+          "questionHe": "איזו השלמה אני מוסיף כאן שלא נאמרה במפורש?",
+          "explanationHe": "כשפרט נמחק, המוח משלים אותו במהירות - וזאת כבר פרשנות ולא המילים עצמן."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"לא טוב לי\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 7,
@@ -202,7 +330,27 @@
       "violation": "Comparative Deletion",
       "suggested_question": "חכמה יותר בתחום מה? לעומת מי? באיזו מידה?",
       "explanation": "השמטת בסיס ההשוואה - חכמה במה? בדיוק איך?",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "comparative_deletion",
+        "violation": "Comparative Deletion",
+        "evidenceHe": "היא יותר חכמה ממני",
+        "questionHe": "חכמה יותר בתחום מה? לעומת מי? באיזו מידה?",
+        "explanationHe": "השמטת בסיס ההשוואה - חכמה במה? בדיוק איך?"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "lack_referential_index",
+          "violation": "Lack of Referential Index",
+          "impliedTextHe": "יש מדד או קבוצת השוואה ברורה, אף שהם לא נאמרו.",
+          "questionHe": "לעומת מי או מה אני מניח שההשוואה נעשית?",
+          "explanationHe": "ההשוואה נשמעת שלמה, אבל בסיס ההשוואה מסתתר מאחורי המילים."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"היא יותר חכמה ממני\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 8,
@@ -212,7 +360,27 @@
       "violation": "Nominalization",
       "suggested_question": "כיצד אתה דוחה? מה אתה עושה או לא עושה שיוצר בעיה?",
       "explanation": "הפכו פעולה מתמשכת (דחייה) לשם סטטי בלבד",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "nominalization",
+        "violation": "Nominalization",
+        "evidenceHe": "הדחיינות שלי היא בעיה",
+        "questionHe": "כיצד אתה דוחה? מה אתה עושה או לא עושה שיוצר בעיה?",
+        "explanationHe": "הפכו פעולה מתמשכת (דחייה) לשם סטטי בלבד"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "פעולות ותהליכים חיים נמחקו והפכו לשם עצם קפוא.",
+          "questionHe": "אילו פעולות אמיתיות מסתתרות מאחורי שם העצם הזה?",
+          "explanationHe": "נומינליזציה מסתירה מי עשה מה, מתי, ואיך אפשר לשנות את התהליך."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"הדחיינות שלי היא בעיה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 9,
@@ -222,7 +390,27 @@
       "violation": "Lack of Referential Index",
       "suggested_question": "ידוע למי? איזה הגבלות? איך אתה יודע שהן טבעיות?",
       "explanation": "לא ברור מי או מה הם מדברים עליו",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "lack_referential_index",
+        "violation": "Lack of Referential Index",
+        "evidenceHe": "ידוע שההגבלות הן טבעיות",
+        "questionHe": "ידוע למי? איזה הגבלות? איך אתה יודע שהן טבעיות?",
+        "explanationHe": "לא ברור מי או מה הם מדברים עליו"
+      },
+      "hiddenViolations": [
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "universal_quantifier",
+          "violation": "Universal Quantifier",
+          "impliedTextHe": "המקור הלא ברור מתרחב לכולם, תמיד או כל המערכת.",
+          "questionHe": "האם אני הופך מקור עמום לקבוצה שלמה?",
+          "explanationHe": "כאשר לא ברור מי אמר או מי פעל, קל להפוך אדם או שניים לכולם."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"ידוע שההגבלות הן טבעיות\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 10,
@@ -232,7 +420,35 @@
       "violation": "Modal Operator",
       "suggested_question": "בלתי אפשרי לחלוטין? או שזה קשה? מה היה צריך להיות שונה?",
       "explanation": "מוגבל לאפשרות אחת בלבד",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "GENERALIZATION",
+        "subcategory": "modal_operator",
+        "violation": "Modal Operator",
+        "evidenceHe": "זה בלתי אפשרי",
+        "questionHe": "בלתי אפשרי לחלוטין? או שזה קשה? מה היה צריך להיות שונה?",
+        "explanationHe": "מוגבל לאפשרות אחת בלבד"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "cause_effect",
+          "violation": "Cause-Effect",
+          "impliedTextHe": "משהו גורם לכך שאין אפשרות, גם אם הסיבה לא נאמרה.",
+          "questionHe": "מה בדיוק גורם לזה להיראות בלתי אפשרי?",
+          "explanationHe": "מאחורי אי אפשר או חייב מסתתרת לעיתים סיבתיות לא בדוקה."
+        },
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "universal_quantifier",
+          "violation": "Universal Quantifier",
+          "impliedTextHe": "זה נכון בכל מצב, בלי יוצאים מן הכלל ובלי ניסיון אחר.",
+          "questionHe": "האם זה באמת בשום מצב, או רק בתנאים מסוימים?",
+          "explanationHe": "אופרטור מודאלי יכול להסתיר הכללה של אין חריגים ואין אפשרויות אחרות."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"זה בלתי אפשרי\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 11,
@@ -242,7 +458,27 @@
       "violation": "Simple Deletion",
       "suggested_question": "עזרה במה בדיוק? ממי? איך תיראה עזרה טובה?",
       "explanation": "פרטי העזרה נמחקו - מה, ממי ובאיזו צורה",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "simple_deletion",
+        "violation": "Simple Deletion",
+        "evidenceHe": "אני צריך עזרה",
+        "questionHe": "עזרה במה בדיוק? ממי? איך תיראה עזרה טובה?",
+        "explanationHe": "פרטי העזרה נמחקו - מה, ממי ובאיזו צורה"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "mind_reading",
+          "violation": "Mind Reading",
+          "impliedTextHe": "המקשיב עלול למלא לבד מה בדיוק חסר או מה זה אומר.",
+          "questionHe": "איזו השלמה אני מוסיף כאן שלא נאמרה במפורש?",
+          "explanationHe": "כשפרט נמחק, המוח משלים אותו במהירות - וזאת כבר פרשנות ולא המילים עצמן."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אני צריך עזרה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 12,
@@ -252,7 +488,27 @@
       "violation": "Simple Deletion",
       "suggested_question": "מה בדיוק לא עובד? באיזה מצב? מה כן קורה בפועל?",
       "explanation": "המשפט מוחק את הנושא, ההקשר ואופן הכישלון",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "simple_deletion",
+        "violation": "Simple Deletion",
+        "evidenceHe": "זה פשוט לא עובד",
+        "questionHe": "מה בדיוק לא עובד? באיזה מצב? מה כן קורה בפועל?",
+        "explanationHe": "המשפט מוחק את הנושא, ההקשר ואופן הכישלון"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "mind_reading",
+          "violation": "Mind Reading",
+          "impliedTextHe": "המקשיב עלול למלא לבד מה בדיוק חסר או מה זה אומר.",
+          "questionHe": "איזו השלמה אני מוסיף כאן שלא נאמרה במפורש?",
+          "explanationHe": "כשפרט נמחק, המוח משלים אותו במהירות - וזאת כבר פרשנות ולא המילים עצמן."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"זה פשוט לא עובד\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 13,
@@ -262,7 +518,27 @@
       "violation": "Comparative Deletion",
       "suggested_question": "עדיף ממה? לעומת איזו אפשרות אחרת בדקת?",
       "explanation": "ההשוואה נשארה בלי בסיס - עדיף ביחס למה?",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "comparative_deletion",
+        "violation": "Comparative Deletion",
+        "evidenceHe": "עדיף כבר לוותר",
+        "questionHe": "עדיף ממה? לעומת איזו אפשרות אחרת בדקת?",
+        "explanationHe": "ההשוואה נשארה בלי בסיס - עדיף ביחס למה?"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "lack_referential_index",
+          "violation": "Lack of Referential Index",
+          "impliedTextHe": "יש מדד או קבוצת השוואה ברורה, אף שהם לא נאמרו.",
+          "questionHe": "לעומת מי או מה אני מניח שההשוואה נעשית?",
+          "explanationHe": "ההשוואה נשמעת שלמה, אבל בסיס ההשוואה מסתתר מאחורי המילים."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"עדיף כבר לוותר\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 14,
@@ -272,7 +548,27 @@
       "violation": "Comparative Deletion",
       "suggested_question": "הכי גרוע לפי איזה מדד? בהשוואה למי בדיוק?",
       "explanation": "סופרלטיב בלי קריטריון ובלי קבוצת השוואה מוגדרת",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "comparative_deletion",
+        "violation": "Comparative Deletion",
+        "evidenceHe": "אני במצב הכי גרוע בצוות",
+        "questionHe": "הכי גרוע לפי איזה מדד? בהשוואה למי בדיוק?",
+        "explanationHe": "סופרלטיב בלי קריטריון ובלי קבוצת השוואה מוגדרת"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "lack_referential_index",
+          "violation": "Lack of Referential Index",
+          "impliedTextHe": "יש מדד או קבוצת השוואה ברורה, אף שהם לא נאמרו.",
+          "questionHe": "לעומת מי או מה אני מניח שההשוואה נעשית?",
+          "explanationHe": "ההשוואה נשמעת שלמה, אבל בסיס ההשוואה מסתתר מאחורי המילים."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אני במצב הכי גרוע בצוות\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 15,
@@ -282,7 +578,27 @@
       "violation": "Lack of Referential Index",
       "suggested_question": "אילו אנשים בדיוק? מי ספציפית לא העריך, ומתי?",
       "explanation": "'אנשים' עמום - אין התייחסות למי בדיוק מדובר",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "lack_referential_index",
+        "violation": "Lack of Referential Index",
+        "evidenceHe": "אנשים לא מעריכים את מה שאני עושה",
+        "questionHe": "אילו אנשים בדיוק? מי ספציפית לא העריך, ומתי?",
+        "explanationHe": "'אנשים' עמום - אין התייחסות למי בדיוק מדובר"
+      },
+      "hiddenViolations": [
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "universal_quantifier",
+          "violation": "Universal Quantifier",
+          "impliedTextHe": "המקור הלא ברור מתרחב לכולם, תמיד או כל המערכת.",
+          "questionHe": "האם אני הופך מקור עמום לקבוצה שלמה?",
+          "explanationHe": "כאשר לא ברור מי אמר או מי פעל, קל להפוך אדם או שניים לכולם."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אנשים לא מעריכים את מה שאני עושה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 16,
@@ -292,7 +608,27 @@
       "violation": "Lack of Referential Index",
       "suggested_question": "מי בדיוק אומר? על סמך איזה ניסיון?",
       "explanation": "'אומרים' מסתיר את מקור הטענה ואת תוקפה",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "lack_referential_index",
+        "violation": "Lack of Referential Index",
+        "evidenceHe": "אומרים שאי אפשר לשנות אנשים",
+        "questionHe": "מי בדיוק אומר? על סמך איזה ניסיון?",
+        "explanationHe": "'אומרים' מסתיר את מקור הטענה ואת תוקפה"
+      },
+      "hiddenViolations": [
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "universal_quantifier",
+          "violation": "Universal Quantifier",
+          "impliedTextHe": "המקור הלא ברור מתרחב לכולם, תמיד או כל המערכת.",
+          "questionHe": "האם אני הופך מקור עמום לקבוצה שלמה?",
+          "explanationHe": "כאשר לא ברור מי אמר או מי פעל, קל להפוך אדם או שניים לכולם."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אומרים שאי אפשר לשנות אנשים\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 17,
@@ -302,7 +638,27 @@
       "violation": "Nominalization",
       "suggested_question": "מה בדיוק קורה כשאתם מנסים לדבר? מי אומר מה למי?",
       "explanation": "'תקשורת' היא תהליך חי שקפא לשם עצם סטטי",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "nominalization",
+        "violation": "Nominalization",
+        "evidenceHe": "אין בינינו תקשורת",
+        "questionHe": "מה בדיוק קורה כשאתם מנסים לדבר? מי אומר מה למי?",
+        "explanationHe": "'תקשורת' היא תהליך חי שקפא לשם עצם סטטי"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "פעולות ותהליכים חיים נמחקו והפכו לשם עצם קפוא.",
+          "questionHe": "אילו פעולות אמיתיות מסתתרות מאחורי שם העצם הזה?",
+          "explanationHe": "נומינליזציה מסתירה מי עשה מה, מתי, ואיך אפשר לשנות את התהליך."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אין בינינו תקשורת\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 18,
@@ -312,7 +668,27 @@
       "violation": "Nominalization",
       "suggested_question": "באילו רגעים אתה מרגיש בטוח פחות? מה אתה עושה אז?",
       "explanation": "'ביטחון' הוא דרך פעולה משתנה, לא חפץ שיכול להיעלם",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "nominalization",
+        "violation": "Nominalization",
+        "evidenceHe": "הביטחון העצמי שלי נעלם",
+        "questionHe": "באילו רגעים אתה מרגיש בטוח פחות? מה אתה עושה אז?",
+        "explanationHe": "'ביטחון' הוא דרך פעולה משתנה, לא חפץ שיכול להיעלם"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "פעולות ותהליכים חיים נמחקו והפכו לשם עצם קפוא.",
+          "questionHe": "אילו פעולות אמיתיות מסתתרות מאחורי שם העצם הזה?",
+          "explanationHe": "נומינליזציה מסתירה מי עשה מה, מתי, ואיך אפשר לשנות את התהליך."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"הביטחון העצמי שלי נעלם\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 19,
@@ -322,7 +698,27 @@
       "violation": "Cause-Effect",
       "suggested_question": "איך בדיוק הערה אחת הופכת ליום שלם הרוס? מה קורה בדרך?",
       "explanation": "קישור סיבתי ישיר בין מילים של אחר לבין מצב פנימי שלם",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "cause_effect",
+        "violation": "Cause-Effect",
+        "evidenceHe": "ההערות שלה הורסות לי את היום",
+        "questionHe": "איך בדיוק הערה אחת הופכת ליום שלם הרוס? מה קורה בדרך?",
+        "explanationHe": "קישור סיבתי ישיר בין מילים של אחר לבין מצב פנימי שלם"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "השלבים שבין הסיבה לתוצאה נמחקו.",
+          "questionHe": "מה קרה צעד אחרי צעד בין הדבר הראשון לתוצאה?",
+          "explanationHe": "סיבתיות נשמעת ישירה, אבל בדרך כלל יש רצף פעולות, פירושים ותנאים שנעלמו."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"ההערות שלה הורסות לי את היום\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 20,
@@ -332,7 +728,27 @@
       "violation": "Cause-Effect",
       "suggested_question": "איך בדיוק גשם הופך לעצב? האם זה קורה תמיד?",
       "explanation": "מיקום הסיבה לרגש מחוץ לאדם, כאילו אין תיווך פנימי",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "cause_effect",
+        "violation": "Cause-Effect",
+        "evidenceHe": "מזג האוויר עושה אותי עצוב",
+        "questionHe": "איך בדיוק גשם הופך לעצב? האם זה קורה תמיד?",
+        "explanationHe": "מיקום הסיבה לרגש מחוץ לאדם, כאילו אין תיווך פנימי"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "השלבים שבין הסיבה לתוצאה נמחקו.",
+          "questionHe": "מה קרה צעד אחרי צעד בין הדבר הראשון לתוצאה?",
+          "explanationHe": "סיבתיות נשמעת ישירה, אבל בדרך כלל יש רצף פעולות, פירושים ותנאים שנעלמו."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"מזג האוויר עושה אותי עצוב\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 21,
@@ -342,7 +758,27 @@
       "violation": "Mind Reading",
       "suggested_question": "איך אתה יודע מה הבוס חושב? מה ראית או שמעת בפועל?",
       "explanation": "טענה על תוכן מחשבותיו של אחר ללא ראיות",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "mind_reading",
+        "violation": "Mind Reading",
+        "evidenceHe": "הבוס בטוח חושב שאני לא מתאים לתפקיד",
+        "questionHe": "איך אתה יודע מה הבוס חושב? מה ראית או שמעת בפועל?",
+        "explanationHe": "טענה על תוכן מחשבותיו של אחר ללא ראיות"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "lack_referential_index",
+          "violation": "Lack of Referential Index",
+          "impliedTextHe": "יש מקור ידע פנימי על אדם אחר, אבל המקור לא נאמר.",
+          "questionHe": "מה מקור הידיעה שלי לגבי מה שקורה אצלו או אצלה?",
+          "explanationHe": "קריאת מחשבות מסתירה את הראיות שעליהן הפרשנות נשענת."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"הבוס בטוח חושב שאני לא מתאים לתפקיד\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 22,
@@ -352,7 +788,27 @@
       "violation": "Lost Performative",
       "suggested_question": "לפי מי לא מנומס? מי קבע את הכלל הזה ומתי הוא נכון?",
       "explanation": "כלל חברתי מוצג כעובדה בלי לציין מי עומד מאחוריו",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "lost_performative",
+        "violation": "Lost Performative",
+        "evidenceHe": "לא מנומס לבקש העלאה",
+        "questionHe": "לפי מי לא מנומס? מי קבע את הכלל הזה ומתי הוא נכון?",
+        "explanationHe": "כלל חברתי מוצג כעובדה בלי לציין מי עומד מאחוריו"
+      },
+      "hiddenViolations": [
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "modal_operator",
+          "violation": "Modal Operator",
+          "impliedTextHe": "הכלל האנונימי הופך לחייב, אסור או אי אפשר.",
+          "questionHe": "מי הפך את זה לחוק, ומה יקרה אם לא נפעל כך?",
+          "explanationHe": "כשאין דובר לכלל, הוא נשמע כמו חובה כללית שאי אפשר לבדוק."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"לא מנומס לבקש העלאה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 23,
@@ -362,7 +818,27 @@
       "violation": "Lost Performative",
       "suggested_question": "מי אומר? לפי איזה סטנדרט? באילו מצבים זה בכל זאת מתאים?",
       "explanation": "שיפוט ללא שופט - הדובר והקריטריון נמחקו",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "lost_performative",
+        "violation": "Lost Performative",
+        "evidenceHe": "ככה לא מתנהגים",
+        "questionHe": "מי אומר? לפי איזה סטנדרט? באילו מצבים זה בכל זאת מתאים?",
+        "explanationHe": "שיפוט ללא שופט - הדובר והקריטריון נמחקו"
+      },
+      "hiddenViolations": [
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "modal_operator",
+          "violation": "Modal Operator",
+          "impliedTextHe": "הכלל האנונימי הופך לחייב, אסור או אי אפשר.",
+          "questionHe": "מי הפך את זה לחוק, ומה יקרה אם לא נפעל כך?",
+          "explanationHe": "כשאין דובר לכלל, הוא נשמע כמו חובה כללית שאי אפשר לבדוק."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"ככה לא מתנהגים\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 24,
@@ -372,7 +848,27 @@
       "violation": "Lost Performative",
       "suggested_question": "לפי מי? איפה כתוב הכלל הזה? מקצועי לפי איזו הגדרה?",
       "explanation": "ערך מוצג כאמת כללית בלי מקור ובלי הקשר",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "lost_performative",
+        "violation": "Lost Performative",
+        "evidenceHe": "זה לא מקצועי להראות רגשות",
+        "questionHe": "לפי מי? איפה כתוב הכלל הזה? מקצועי לפי איזו הגדרה?",
+        "explanationHe": "ערך מוצג כאמת כללית בלי מקור ובלי הקשר"
+      },
+      "hiddenViolations": [
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "modal_operator",
+          "violation": "Modal Operator",
+          "impliedTextHe": "הכלל האנונימי הופך לחייב, אסור או אי אפשר.",
+          "questionHe": "מי הפך את זה לחוק, ומה יקרה אם לא נפעל כך?",
+          "explanationHe": "כשאין דובר לכלל, הוא נשמע כמו חובה כללית שאי אפשר לבדוק."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"זה לא מקצועי להראות רגשות\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 25,
@@ -382,7 +878,27 @@
       "violation": "Presupposition",
       "suggested_question": "מה השאלה מניחה מראש? האם באמת 'הורס' ובאמת 'הכל'?",
       "explanation": "השאלה מטמיעה כעובדה את ההנחה שהוא הורס הכל",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "presupposition",
+        "violation": "Presupposition",
+        "evidenceHe": "למה אני תמיד הורס הכל?",
+        "questionHe": "מה השאלה מניחה מראש? האם באמת 'הורס' ובאמת 'הכל'?",
+        "explanationHe": "השאלה מטמיעה כעובדה את ההנחה שהוא הורס הכל"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "complex_equivalence",
+          "violation": "Complex Equivalence",
+          "impliedTextHe": "קבלת השאלה כאילו מוכיחה שההנחה שבתוכה נכונה.",
+          "questionHe": "איזו משמעות נוספת נדבקת להנחה הזאת אם אני עונה עליה?",
+          "explanationHe": "הנחה מוטבעת גוררת איתה פירוש נוסף עוד לפני שהשיחה התחילה."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"למה אני תמיד הורס הכל?\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 26,
@@ -392,7 +908,27 @@
       "violation": "Presupposition",
       "suggested_question": "מה מונח כאן מראש? איך נדע שמתייחסים ברצינות?",
       "explanation": "מובלעת ההנחה שכרגע אין התייחסות רצינית בכלל",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "presupposition",
+        "violation": "Presupposition",
+        "evidenceHe": "מתי כבר תתחיל להתייחס אליי ברצינות?",
+        "questionHe": "מה מונח כאן מראש? איך נדע שמתייחסים ברצינות?",
+        "explanationHe": "מובלעת ההנחה שכרגע אין התייחסות רצינית בכלל"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "complex_equivalence",
+          "violation": "Complex Equivalence",
+          "impliedTextHe": "קבלת השאלה כאילו מוכיחה שההנחה שבתוכה נכונה.",
+          "questionHe": "איזו משמעות נוספת נדבקת להנחה הזאת אם אני עונה עליה?",
+          "explanationHe": "הנחה מוטבעת גוררת איתה פירוש נוסף עוד לפני שהשיחה התחילה."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"מתי כבר תתחיל להתייחס אליי ברצינות?\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 27,
@@ -402,7 +938,27 @@
       "violation": "Presupposition",
       "suggested_question": "מה השאלה מניחה? האם כל רגע בעבודה הוא סבל?",
       "explanation": "מובלע שהמצב הוא סבל מתמשך ושאין בו רגעים אחרים",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "presupposition",
+        "violation": "Presupposition",
+        "evidenceHe": "כמה זמן עוד אסבול מהעבודה הזאת?",
+        "questionHe": "מה השאלה מניחה? האם כל רגע בעבודה הוא סבל?",
+        "explanationHe": "מובלע שהמצב הוא סבל מתמשך ושאין בו רגעים אחרים"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "complex_equivalence",
+          "violation": "Complex Equivalence",
+          "impliedTextHe": "קבלת השאלה כאילו מוכיחה שההנחה שבתוכה נכונה.",
+          "questionHe": "איזו משמעות נוספת נדבקת להנחה הזאת אם אני עונה עליה?",
+          "explanationHe": "הנחה מוטבעת גוררת איתה פירוש נוסף עוד לפני שהשיחה התחילה."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"כמה זמן עוד אסבול מהעבודה הזאת?\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 28,
@@ -412,7 +968,27 @@
       "violation": "Complex Equivalence",
       "suggested_question": "האם איחור תמיד שווה חוסר אכפתיות? אילו עוד הסברים ייתכנו?",
       "explanation": "התנהגות אחת מתורגמת אוטומטית למשמעות רגשית אחת",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "complex_equivalence",
+        "violation": "Complex Equivalence",
+        "evidenceHe": "הוא איחר, סימן שלא אכפת לו ממני",
+        "questionHe": "האם איחור תמיד שווה חוסר אכפתיות? אילו עוד הסברים ייתכנו?",
+        "explanationHe": "התנהגות אחת מתורגמת אוטומטית למשמעות רגשית אחת"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "הגשר שמחבר בין שני הדברים נמחק.",
+          "questionHe": "מה בדיוק מחבר בין שני הדברים האלה, ומה עוד יכול להסביר את זה?",
+          "explanationHe": "שקילות מורכבת מצמידה שני דברים כאילו הם אותו דבר, בלי להראות את הדרך ביניהם."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"הוא איחר, סימן שלא אכפת לו ממני\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 29,
@@ -422,7 +998,27 @@
       "violation": "Complex Equivalence",
       "suggested_question": "איך בקשת עזרה הפכה שווה לחולשה? לפי איזה כלל?",
       "explanation": "שני דברים שונים - בקשה וחולשה - הפכו לאותו דבר",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "complex_equivalence",
+        "violation": "Complex Equivalence",
+        "evidenceHe": "אם אני מבקש עזרה, אני חלש",
+        "questionHe": "איך בקשת עזרה הפכה שווה לחולשה? לפי איזה כלל?",
+        "explanationHe": "שני דברים שונים - בקשה וחולשה - הפכו לאותו דבר"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "הגשר שמחבר בין שני הדברים נמחק.",
+          "questionHe": "מה בדיוק מחבר בין שני הדברים האלה, ומה עוד יכול להסביר את זה?",
+          "explanationHe": "שקילות מורכבת מצמידה שני דברים כאילו הם אותו דבר, בלי להראות את הדרך ביניהם."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אם אני מבקש עזרה, אני חלש\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 30,
@@ -432,7 +1028,27 @@
       "violation": "Universal Quantifier",
       "suggested_question": "אף אחד? אף פעם? היה רגע אחד שמישהו כן הקשיב?",
       "explanation": "כמת כפול שמוחק כל יוצא דופן מהזיכרון",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "GENERALIZATION",
+        "subcategory": "universal_quantifier",
+        "violation": "Universal Quantifier",
+        "evidenceHe": "אף אחד אף פעם לא מקשיב לי",
+        "questionHe": "אף אחד? אף פעם? היה רגע אחד שמישהו כן הקשיב?",
+        "explanationHe": "כמת כפול שמוחק כל יוצא דופן מהזיכרון"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "complex_equivalence",
+          "violation": "Complex Equivalence",
+          "impliedTextHe": "כמה דוגמאות הופכות לחוק על האדם, הקבוצה או העולם.",
+          "questionHe": "איך מקרה או כמה מקרים הפכו כאן לחוק קבוע?",
+          "explanationHe": "מאחורי הכללה גורפת יש לעיתים הדבקה: מקרה אחד שווה אמת כללית."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אף אחד אף פעם לא מקשיב לי\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 31,
@@ -442,7 +1058,27 @@
       "violation": "Universal Quantifier",
       "suggested_question": "כולם? תמיד? מי ספציפית, ובאיזה מקרה?",
       "explanation": "הכללה גורפת שהופכת מקרים בודדים לחוק קבוע",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "GENERALIZATION",
+        "subcategory": "universal_quantifier",
+        "violation": "Universal Quantifier",
+        "evidenceHe": "כולם תמיד מנצלים אותי",
+        "questionHe": "כולם? תמיד? מי ספציפית, ובאיזה מקרה?",
+        "explanationHe": "הכללה גורפת שהופכת מקרים בודדים לחוק קבוע"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "complex_equivalence",
+          "violation": "Complex Equivalence",
+          "impliedTextHe": "כמה דוגמאות הופכות לחוק על האדם, הקבוצה או העולם.",
+          "questionHe": "איך מקרה או כמה מקרים הפכו כאן לחוק קבוע?",
+          "explanationHe": "מאחורי הכללה גורפת יש לעיתים הדבקה: מקרה אחד שווה אמת כללית."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"כולם תמיד מנצלים אותי\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 32,
@@ -452,7 +1088,35 @@
       "violation": "Modal Operator",
       "suggested_question": "מה יקרה אם לא תספיק? מי קבע שדווקא לבד?",
       "explanation": "'חייב' מסתיר כלל פנימי שלא נבדק מעולם",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "GENERALIZATION",
+        "subcategory": "modal_operator",
+        "violation": "Modal Operator",
+        "evidenceHe": "אני חייב להספיק הכל לבד",
+        "questionHe": "מה יקרה אם לא תספיק? מי קבע שדווקא לבד?",
+        "explanationHe": "'חייב' מסתיר כלל פנימי שלא נבדק מעולם"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "cause_effect",
+          "violation": "Cause-Effect",
+          "impliedTextHe": "משהו גורם לכך שאין אפשרות, גם אם הסיבה לא נאמרה.",
+          "questionHe": "מה בדיוק גורם לזה להיראות בלתי אפשרי?",
+          "explanationHe": "מאחורי אי אפשר או חייב מסתתרת לעיתים סיבתיות לא בדוקה."
+        },
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "universal_quantifier",
+          "violation": "Universal Quantifier",
+          "impliedTextHe": "זה נכון בכל מצב, בלי יוצאים מן הכלל ובלי ניסיון אחר.",
+          "questionHe": "האם זה באמת בשום מצב, או רק בתנאים מסוימים?",
+          "explanationHe": "אופרטור מודאלי יכול להסתיר הכללה של אין חריגים ואין אפשרויות אחרות."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אני חייב להספיק הכל לבד\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
       "id": 33,
@@ -462,7 +1126,35 @@
       "violation": "Modal Operator",
       "suggested_question": "מה עוצר את השיחה? מה ניסית? מה היה קורה אם כן?",
       "explanation": "'אי אפשר' סוגר אפשרויות שלא נוסו בפועל",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "GENERALIZATION",
+        "subcategory": "modal_operator",
+        "violation": "Modal Operator",
+        "evidenceHe": "אי אפשר לדבר איתו",
+        "questionHe": "מה עוצר את השיחה? מה ניסית? מה היה קורה אם כן?",
+        "explanationHe": "'אי אפשר' סוגר אפשרויות שלא נוסו בפועל"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "cause_effect",
+          "violation": "Cause-Effect",
+          "impliedTextHe": "משהו גורם לכך שאין אפשרות, גם אם הסיבה לא נאמרה.",
+          "questionHe": "מה בדיוק גורם לזה להיראות בלתי אפשרי?",
+          "explanationHe": "מאחורי אי אפשר או חייב מסתתרת לעיתים סיבתיות לא בדוקה."
+        },
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "universal_quantifier",
+          "violation": "Universal Quantifier",
+          "impliedTextHe": "זה נכון בכל מצב, בלי יוצאים מן הכלל ובלי ניסיון אחר.",
+          "questionHe": "האם זה באמת בשום מצב, או רק בתנאים מסוימים?",
+          "explanationHe": "אופרטור מודאלי יכול להסתיר הכללה של אין חריגים ואין אפשרויות אחרות."
+        }
+      ],
+      "impliedFullTextHe": "אי אפשר לדבר איתו בשום מצב ולא משנה מה אני אעשה.",
+      "layeringNoteHe": "המילים אומרות אי-יכולת; השכבה המסתתרת יכולה להוסיף גם \"בשום מצב\" וגם סיבתיות לא בדוקה לגבי מה שיקרה אם אנסה."
     },
     {
       "id": 34,
@@ -472,7 +1164,891 @@
       "violation": "Mind Reading",
       "suggested_question": "איך אתה יודע ששתיקה פירושה כעס? מה עוד היא יכולה להרגיש?",
       "explanation": "פירוש מצב פנימי של אחר מתוך סימן חיצוני עמום",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "mind_reading",
+        "violation": "Mind Reading",
+        "evidenceHe": "היא שותקת, ברור שהיא כועסת עליי",
+        "questionHe": "איך אתה יודע ששתיקה פירושה כעס? מה עוד היא יכולה להרגיש?",
+        "explanationHe": "פירוש מצב פנימי של אחר מתוך סימן חיצוני עמום"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "lack_referential_index",
+          "violation": "Lack of Referential Index",
+          "impliedTextHe": "יש מקור ידע פנימי על אדם אחר, אבל המקור לא נאמר.",
+          "questionHe": "מה מקור הידיעה שלי לגבי מה שקורה אצלו או אצלה?",
+          "explanationHe": "קריאת מחשבות מסתירה את הראיות שעליהן הפרשנות נשענת."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"היא שותקת, ברור שהיא כועסת עליי\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 35,
+      "statement": "השופט תמיד נגד הקבוצה שלנו",
+      "category": "GENERALIZATION",
+      "subcategory": "universal_quantifier",
+      "violation": "Universal Quantifier",
+      "suggested_question": "תמיד? גם במשחקים שניצחתם? אילו שריקות היו דווקא לטובתכם?",
+      "explanation": "הכללה גורפת שגם אוהדים שורקים אותה - 'תמיד' מוחק את המשחקים שלא מתאימים לסיפור",
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "GENERALIZATION",
+        "subcategory": "universal_quantifier",
+        "violation": "Universal Quantifier",
+        "evidenceHe": "השופט תמיד נגד הקבוצה שלנו",
+        "questionHe": "תמיד? גם במשחקים שניצחתם? אילו שריקות היו דווקא לטובתכם?",
+        "explanationHe": "הכללה גורפת שגם אוהדים שורקים אותה - 'תמיד' מוחק את המשחקים שלא מתאימים לסיפור"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "complex_equivalence",
+          "violation": "Complex Equivalence",
+          "impliedTextHe": "כמה דוגמאות הופכות לחוק על האדם, הקבוצה או העולם.",
+          "questionHe": "איך מקרה או כמה מקרים הפכו כאן לחוק קבוע?",
+          "explanationHe": "מאחורי הכללה גורפת יש לעיתים הדבקה: מקרה אחד שווה אמת כללית."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"השופט תמיד נגד הקבוצה שלנו\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 36,
+      "statement": "אצלי הכול תמיד מסתדר בסוף, אז אין מה לתכנן",
+      "category": "GENERALIZATION",
+      "subcategory": "universal_quantifier",
+      "violation": "Universal Quantifier",
+      "suggested_question": "תמיד? והאם זה הסתדר מעצמו, או שמישהו עשה שם משהו?",
+      "explanation": "גם הכללה חיובית היא הכללה - היא מוחקת את המאמץ ואת המקרים שבהם לא הסתדר",
+      "difficulty": "hard",
+      "surfaceViolation": {
+        "family": "GENERALIZATION",
+        "subcategory": "universal_quantifier",
+        "violation": "Universal Quantifier",
+        "evidenceHe": "אצלי הכול תמיד מסתדר בסוף, אז אין מה לתכנן",
+        "questionHe": "תמיד? והאם זה הסתדר מעצמו, או שמישהו עשה שם משהו?",
+        "explanationHe": "גם הכללה חיובית היא הכללה - היא מוחקת את המאמץ ואת המקרים שבהם לא הסתדר"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "complex_equivalence",
+          "violation": "Complex Equivalence",
+          "impliedTextHe": "כמה דוגמאות הופכות לחוק על האדם, הקבוצה או העולם.",
+          "questionHe": "איך מקרה או כמה מקרים הפכו כאן לחוק קבוע?",
+          "explanationHe": "מאחורי הכללה גורפת יש לעיתים הדבקה: מקרה אחד שווה אמת כללית."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אצלי הכול תמיד מסתדר בסוף, אז אין מה לתכנן\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 37,
+      "statement": "כולן העלו סטורי מהמסיבה, רק אני נשארתי בחוץ",
+      "category": "GENERALIZATION",
+      "subcategory": "universal_quantifier",
+      "violation": "Universal Quantifier",
+      "suggested_question": "כולן? כמה בנות ראית בפועל בסטורי? ומי עוד לא הייתה שם?",
+      "explanation": "הפיד מציג מדגם קטן, ו'כולן' הופך אותו לעולם שלם שממנו הודרתי",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "GENERALIZATION",
+        "subcategory": "universal_quantifier",
+        "violation": "Universal Quantifier",
+        "evidenceHe": "כולן העלו סטורי מהמסיבה, רק אני נשארתי בחוץ",
+        "questionHe": "כולן? כמה בנות ראית בפועל בסטורי? ומי עוד לא הייתה שם?",
+        "explanationHe": "הפיד מציג מדגם קטן, ו'כולן' הופך אותו לעולם שלם שממנו הודרתי"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "complex_equivalence",
+          "violation": "Complex Equivalence",
+          "impliedTextHe": "כמה דוגמאות הופכות לחוק על האדם, הקבוצה או העולם.",
+          "questionHe": "איך מקרה או כמה מקרים הפכו כאן לחוק קבוע?",
+          "explanationHe": "מאחורי הכללה גורפת יש לעיתים הדבקה: מקרה אחד שווה אמת כללית."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"כולן העלו סטורי מהמסיבה, רק אני נשארתי בחוץ\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 38,
+      "statement": "אני כבר לא יכול להתחיל להתאמן בגיל שלי",
+      "category": "GENERALIZATION",
+      "subcategory": "modal_operator",
+      "violation": "Modal Operator",
+      "suggested_question": "מה בדיוק עוצר אותך? מה היה קורה אם היית מתחיל בעשר דקות הליכה?",
+      "explanation": "'לא יכול' מציג החלטה או חשש כחוק טבע של גיל",
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "GENERALIZATION",
+        "subcategory": "modal_operator",
+        "violation": "Modal Operator",
+        "evidenceHe": "אני כבר לא יכול להתחיל להתאמן בגיל שלי",
+        "questionHe": "מה בדיוק עוצר אותך? מה היה קורה אם היית מתחיל בעשר דקות הליכה?",
+        "explanationHe": "'לא יכול' מציג החלטה או חשש כחוק טבע של גיל"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "cause_effect",
+          "violation": "Cause-Effect",
+          "impliedTextHe": "משהו גורם לכך שאין אפשרות, גם אם הסיבה לא נאמרה.",
+          "questionHe": "מה בדיוק גורם לזה להיראות בלתי אפשרי?",
+          "explanationHe": "מאחורי אי אפשר או חייב מסתתרת לעיתים סיבתיות לא בדוקה."
+        },
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "universal_quantifier",
+          "violation": "Universal Quantifier",
+          "impliedTextHe": "זה נכון בכל מצב, בלי יוצאים מן הכלל ובלי ניסיון אחר.",
+          "questionHe": "האם זה באמת בשום מצב, או רק בתנאים מסוימים?",
+          "explanationHe": "אופרטור מודאלי יכול להסתיר הכללה של אין חריגים ואין אפשרויות אחרות."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אני כבר לא יכול להתחיל להתאמן בגיל שלי\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 39,
+      "statement": "אי אפשר לחסוך עם המשכורת הזאת",
+      "category": "GENERALIZATION",
+      "subcategory": "modal_operator",
+      "violation": "Modal Operator",
+      "suggested_question": "אי אפשר בכלל, או אי אפשר בסכום מסוים? מה כן אפשרי, גם אם קטן?",
+      "explanation": "'אי אפשר' סוגר את השאלה לפני שנבדק איזה טווח כן קיים",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "GENERALIZATION",
+        "subcategory": "modal_operator",
+        "violation": "Modal Operator",
+        "evidenceHe": "אי אפשר לחסוך עם המשכורת הזאת",
+        "questionHe": "אי אפשר בכלל, או אי אפשר בסכום מסוים? מה כן אפשרי, גם אם קטן?",
+        "explanationHe": "'אי אפשר' סוגר את השאלה לפני שנבדק איזה טווח כן קיים"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "cause_effect",
+          "violation": "Cause-Effect",
+          "impliedTextHe": "משהו גורם לכך שאין אפשרות, גם אם הסיבה לא נאמרה.",
+          "questionHe": "מה בדיוק גורם לזה להיראות בלתי אפשרי?",
+          "explanationHe": "מאחורי אי אפשר או חייב מסתתרת לעיתים סיבתיות לא בדוקה."
+        },
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "universal_quantifier",
+          "violation": "Universal Quantifier",
+          "impliedTextHe": "זה נכון בכל מצב, בלי יוצאים מן הכלל ובלי ניסיון אחר.",
+          "questionHe": "האם זה באמת בשום מצב, או רק בתנאים מסוימים?",
+          "explanationHe": "אופרטור מודאלי יכול להסתיר הכללה של אין חריגים ואין אפשרויות אחרות."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אי אפשר לחסוך עם המשכורת הזאת\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 40,
+      "statement": "אני חייב ציון מושלם במבחן, אחרת אין לזה טעם",
+      "category": "GENERALIZATION",
+      "subcategory": "modal_operator",
+      "violation": "Modal Operator",
+      "suggested_question": "חייב לפי מי? מה באמת יקרה עם 85? למה דווקא מושלם או כלום?",
+      "explanation": "'חייב' מחבר בין הצלחה לשלמות ומוחק את כל הטווח שביניהן",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "GENERALIZATION",
+        "subcategory": "modal_operator",
+        "violation": "Modal Operator",
+        "evidenceHe": "אני חייב ציון מושלם במבחן, אחרת אין לזה טעם",
+        "questionHe": "חייב לפי מי? מה באמת יקרה עם 85? למה דווקא מושלם או כלום?",
+        "explanationHe": "'חייב' מחבר בין הצלחה לשלמות ומוחק את כל הטווח שביניהן"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "cause_effect",
+          "violation": "Cause-Effect",
+          "impliedTextHe": "משהו גורם לכך שאין אפשרות, גם אם הסיבה לא נאמרה.",
+          "questionHe": "מה בדיוק גורם לזה להיראות בלתי אפשרי?",
+          "explanationHe": "מאחורי אי אפשר או חייב מסתתרת לעיתים סיבתיות לא בדוקה."
+        },
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "universal_quantifier",
+          "violation": "Universal Quantifier",
+          "impliedTextHe": "זה נכון בכל מצב, בלי יוצאים מן הכלל ובלי ניסיון אחר.",
+          "questionHe": "האם זה באמת בשום מצב, או רק בתנאים מסוימים?",
+          "explanationHe": "אופרטור מודאלי יכול להסתיר הכללה של אין חריגים ואין אפשרויות אחרות."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אני חייב ציון מושלם במבחן, אחרת אין לזה טעם\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 41,
+      "statement": "משהו לא בסדר אצלי בבריאות",
+      "category": "DELETION",
+      "subcategory": "simple_deletion",
+      "violation": "Simple Deletion",
+      "suggested_question": "מה בדיוק מרגיש לא בסדר? איפה בגוף? מתי שמת לב לזה לראשונה?",
+      "explanation": "'משהו' עמום מגדיל חרדה - פירוט הופך דאגה כללית למידע שאפשר לבדוק",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "simple_deletion",
+        "violation": "Simple Deletion",
+        "evidenceHe": "משהו לא בסדר אצלי בבריאות",
+        "questionHe": "מה בדיוק מרגיש לא בסדר? איפה בגוף? מתי שמת לב לזה לראשונה?",
+        "explanationHe": "'משהו' עמום מגדיל חרדה - פירוט הופך דאגה כללית למידע שאפשר לבדוק"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "mind_reading",
+          "violation": "Mind Reading",
+          "impliedTextHe": "המקשיב עלול למלא לבד מה בדיוק חסר או מה זה אומר.",
+          "questionHe": "איזו השלמה אני מוסיף כאן שלא נאמרה במפורש?",
+          "explanationHe": "כשפרט נמחק, המוח משלים אותו במהירות - וזאת כבר פרשנות ולא המילים עצמן."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"משהו לא בסדר אצלי בבריאות\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 42,
+      "statement": "הטיול היה מאכזב",
+      "category": "DELETION",
+      "subcategory": "simple_deletion",
+      "violation": "Simple Deletion",
+      "suggested_question": "מה בדיוק אכזב? איזה חלק? ומה דווקא כן היה בסדר?",
+      "explanation": "חוויה שלמה נצבעת בצבע אחד כשהפרטים נמחקים",
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "simple_deletion",
+        "violation": "Simple Deletion",
+        "evidenceHe": "הטיול היה מאכזב",
+        "questionHe": "מה בדיוק אכזב? איזה חלק? ומה דווקא כן היה בסדר?",
+        "explanationHe": "חוויה שלמה נצבעת בצבע אחד כשהפרטים נמחקים"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "mind_reading",
+          "violation": "Mind Reading",
+          "impliedTextHe": "המקשיב עלול למלא לבד מה בדיוק חסר או מה זה אומר.",
+          "questionHe": "איזו השלמה אני מוסיף כאן שלא נאמרה במפורש?",
+          "explanationHe": "כשפרט נמחק, המוח משלים אותו במהירות - וזאת כבר פרשנות ולא המילים עצמן."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"הטיול היה מאכזב\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 43,
+      "statement": "הצוות שלי לא מספיק מחובר",
+      "category": "DELETION",
+      "subcategory": "simple_deletion",
+      "violation": "Simple Deletion",
+      "suggested_question": "מחובר למה? איך נראה 'מחובר' אצלך בפועל? מה חסר ספציפית?",
+      "explanation": "מנהל שמדבר בכותרות לא יכול לתקן - 'מחובר' צריך תרגום להתנהגויות",
+      "difficulty": "hard",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "simple_deletion",
+        "violation": "Simple Deletion",
+        "evidenceHe": "הצוות שלי לא מספיק מחובר",
+        "questionHe": "מחובר למה? איך נראה 'מחובר' אצלך בפועל? מה חסר ספציפית?",
+        "explanationHe": "מנהל שמדבר בכותרות לא יכול לתקן - 'מחובר' צריך תרגום להתנהגויות"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "mind_reading",
+          "violation": "Mind Reading",
+          "impliedTextHe": "המקשיב עלול למלא לבד מה בדיוק חסר או מה זה אומר.",
+          "questionHe": "איזו השלמה אני מוסיף כאן שלא נאמרה במפורש?",
+          "explanationHe": "כשפרט נמחק, המוח משלים אותו במהירות - וזאת כבר פרשנות ולא המילים עצמן."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"הצוות שלי לא מספיק מחובר\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 44,
+      "statement": "ההשקעה הזאת משתלמת יותר",
+      "category": "DELETION",
+      "subcategory": "comparative_deletion",
+      "violation": "Comparative Deletion",
+      "suggested_question": "משתלמת יותר ממה? לפי איזה חישוב? באיזה טווח זמן?",
+      "explanation": "השוואה פיננסית בלי בסיס השוואה היא סיסמת שיווק, לא נתון",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "comparative_deletion",
+        "violation": "Comparative Deletion",
+        "evidenceHe": "ההשקעה הזאת משתלמת יותר",
+        "questionHe": "משתלמת יותר ממה? לפי איזה חישוב? באיזה טווח זמן?",
+        "explanationHe": "השוואה פיננסית בלי בסיס השוואה היא סיסמת שיווק, לא נתון"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "lack_referential_index",
+          "violation": "Lack of Referential Index",
+          "impliedTextHe": "יש מדד או קבוצת השוואה ברורה, אף שהם לא נאמרו.",
+          "questionHe": "לעומת מי או מה אני מניח שההשוואה נעשית?",
+          "explanationHe": "ההשוואה נשמעת שלמה, אבל בסיס ההשוואה מסתתר מאחורי המילים."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"ההשקעה הזאת משתלמת יותר\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 45,
+      "statement": "אצל אחרים בפיד החיים נראים מוצלחים יותר",
+      "category": "DELETION",
+      "subcategory": "comparative_deletion",
+      "violation": "Comparative Deletion",
+      "suggested_question": "מוצלחים יותר ממה - מהיום-יום שלך, או מהרגעים שלך שלא צולמו?",
+      "explanation": "ההשוואה היא בין הבמה שלהם לבין מאחורי הקלעים שלי",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "comparative_deletion",
+        "violation": "Comparative Deletion",
+        "evidenceHe": "אצל אחרים בפיד החיים נראים מוצלחים יותר",
+        "questionHe": "מוצלחים יותר ממה - מהיום-יום שלך, או מהרגעים שלך שלא צולמו?",
+        "explanationHe": "ההשוואה היא בין הבמה שלהם לבין מאחורי הקלעים שלי"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "lack_referential_index",
+          "violation": "Lack of Referential Index",
+          "impliedTextHe": "יש מדד או קבוצת השוואה ברורה, אף שהם לא נאמרו.",
+          "questionHe": "לעומת מי או מה אני מניח שההשוואה נעשית?",
+          "explanationHe": "ההשוואה נשמעת שלמה, אבל בסיס ההשוואה מסתתר מאחורי המילים."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אצל אחרים בפיד החיים נראים מוצלחים יותר\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 46,
+      "statement": "אני הכי איטי בקבוצת הריצה",
+      "category": "DELETION",
+      "subcategory": "comparative_deletion",
+      "violation": "Comparative Deletion",
+      "suggested_question": "הכי איטי לפי מה - קצב, מרחק, ותק? ולעומת מי שרץ כבר חמש שנים?",
+      "explanation": "סופרלטיב בלי מדד ובלי הקשר מוחק את נקודת הפתיחה השונה של כל אחד",
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "comparative_deletion",
+        "violation": "Comparative Deletion",
+        "evidenceHe": "אני הכי איטי בקבוצת הריצה",
+        "questionHe": "הכי איטי לפי מה - קצב, מרחק, ותק? ולעומת מי שרץ כבר חמש שנים?",
+        "explanationHe": "סופרלטיב בלי מדד ובלי הקשר מוחק את נקודת הפתיחה השונה של כל אחד"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "lack_referential_index",
+          "violation": "Lack of Referential Index",
+          "impliedTextHe": "יש מדד או קבוצת השוואה ברורה, אף שהם לא נאמרו.",
+          "questionHe": "לעומת מי או מה אני מניח שההשוואה נעשית?",
+          "explanationHe": "ההשוואה נשמעת שלמה, אבל בסיס ההשוואה מסתתר מאחורי המילים."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אני הכי איטי בקבוצת הריצה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 47,
+      "statement": "אומרים שהתוסף הזה עושה פלאים",
+      "category": "DELETION",
+      "subcategory": "lack_referential_index",
+      "violation": "Lack of Referential Index",
+      "suggested_question": "מי אומר? על סמך מה? איזה 'פלאים' בדיוק, ולמי?",
+      "explanation": "'אומרים' מעניק סמכות למקור שאיש לא בדק",
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "lack_referential_index",
+        "violation": "Lack of Referential Index",
+        "evidenceHe": "אומרים שהתוסף הזה עושה פלאים",
+        "questionHe": "מי אומר? על סמך מה? איזה 'פלאים' בדיוק, ולמי?",
+        "explanationHe": "'אומרים' מעניק סמכות למקור שאיש לא בדק"
+      },
+      "hiddenViolations": [
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "universal_quantifier",
+          "violation": "Universal Quantifier",
+          "impliedTextHe": "המקור הלא ברור מתרחב לכולם, תמיד או כל המערכת.",
+          "questionHe": "האם אני הופך מקור עמום לקבוצה שלמה?",
+          "explanationHe": "כאשר לא ברור מי אמר או מי פעל, קל להפוך אדם או שניים לכולם."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אומרים שהתוסף הזה עושה פלאים\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 48,
+      "statement": "כולם יודעים שעכשיו זה זמן רע לקנות דירה",
+      "category": "DELETION",
+      "subcategory": "lack_referential_index",
+      "violation": "Lack of Referential Index",
+      "suggested_question": "מי בדיוק יודע? אילו נתונים? רע למי - לקונה, למשקיע, למוכר?",
+      "explanation": "'כולם יודעים' הופך דעה מתחלפת לעובדה כלכלית",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "lack_referential_index",
+        "violation": "Lack of Referential Index",
+        "evidenceHe": "כולם יודעים שעכשיו זה זמן רע לקנות דירה",
+        "questionHe": "מי בדיוק יודע? אילו נתונים? רע למי - לקונה, למשקיע, למוכר?",
+        "explanationHe": "'כולם יודעים' הופך דעה מתחלפת לעובדה כלכלית"
+      },
+      "hiddenViolations": [
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "universal_quantifier",
+          "violation": "Universal Quantifier",
+          "impliedTextHe": "המקור הלא ברור מתרחב לכולם, תמיד או כל המערכת.",
+          "questionHe": "האם אני הופך מקור עמום לקבוצה שלמה?",
+          "explanationHe": "כאשר לא ברור מי אמר או מי פעל, קל להפוך אדם או שניים לכולם."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"כולם יודעים שעכשיו זה זמן רע לקנות דירה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 49,
+      "statement": "בכיתה צוחקים עליי",
+      "category": "DELETION",
+      "subcategory": "lack_referential_index",
+      "violation": "Lack of Referential Index",
+      "suggested_question": "מי בדיוק צחק? מתי זה קרה? ומי בכיתה לא היה חלק מזה?",
+      "explanation": "'הכיתה' היא לא אדם - דיוק מחזיר פרופורציה ומראה עם מי באמת יש בעיה",
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DELETION",
+        "subcategory": "lack_referential_index",
+        "violation": "Lack of Referential Index",
+        "evidenceHe": "בכיתה צוחקים עליי",
+        "questionHe": "מי בדיוק צחק? מתי זה קרה? ומי בכיתה לא היה חלק מזה?",
+        "explanationHe": "'הכיתה' היא לא אדם - דיוק מחזיר פרופורציה ומראה עם מי באמת יש בעיה"
+      },
+      "hiddenViolations": [
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "universal_quantifier",
+          "violation": "Universal Quantifier",
+          "impliedTextHe": "המקור הלא ברור מתרחב לכולם, תמיד או כל המערכת.",
+          "questionHe": "האם אני הופך מקור עמום לקבוצה שלמה?",
+          "explanationHe": "כאשר לא ברור מי אמר או מי פעל, קל להפוך אדם או שניים לכולם."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"בכיתה צוחקים עליי\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 50,
+      "statement": "החברות שלנו כבר לא מה שהייתה",
+      "category": "DISTORTION",
+      "subcategory": "nominalization",
+      "violation": "Nominalization",
+      "suggested_question": "מה הפסקתם לעשות יחד שפעם כן עשיתם? מה היה שם שאתה מתגעגע אליו?",
+      "explanation": "'חברות' היא רצף של מעשים - כשהיא קופאת לשם עצם, נעלם מה אפשר להחזיר",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "nominalization",
+        "violation": "Nominalization",
+        "evidenceHe": "החברות שלנו כבר לא מה שהייתה",
+        "questionHe": "מה הפסקתם לעשות יחד שפעם כן עשיתם? מה היה שם שאתה מתגעגע אליו?",
+        "explanationHe": "'חברות' היא רצף של מעשים - כשהיא קופאת לשם עצם, נעלם מה אפשר להחזיר"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "פעולות ותהליכים חיים נמחקו והפכו לשם עצם קפוא.",
+          "questionHe": "אילו פעולות אמיתיות מסתתרות מאחורי שם העצם הזה?",
+          "explanationHe": "נומינליזציה מסתירה מי עשה מה, מתי, ואיך אפשר לשנות את התהליך."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"החברות שלנו כבר לא מה שהייתה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 51,
+      "statement": "המוטיבציה שלי ללמוד נגמרה",
+      "category": "DISTORTION",
+      "subcategory": "nominalization",
+      "violation": "Nominalization",
+      "suggested_question": "מה בדיוק נעצר? באילו רגעים אתה כן מצליח לשבת ללמוד, ומה שונה בהם?",
+      "explanation": "'מוטיבציה' אינה מיכל דלק שנגמר אלא פעולה שמשתנה לפי תנאים",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "nominalization",
+        "violation": "Nominalization",
+        "evidenceHe": "המוטיבציה שלי ללמוד נגמרה",
+        "questionHe": "מה בדיוק נעצר? באילו רגעים אתה כן מצליח לשבת ללמוד, ומה שונה בהם?",
+        "explanationHe": "'מוטיבציה' אינה מיכל דלק שנגמר אלא פעולה שמשתנה לפי תנאים"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "פעולות ותהליכים חיים נמחקו והפכו לשם עצם קפוא.",
+          "questionHe": "אילו פעולות אמיתיות מסתתרות מאחורי שם העצם הזה?",
+          "explanationHe": "נומינליזציה מסתירה מי עשה מה, מתי, ואיך אפשר לשנות את התהליך."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"המוטיבציה שלי ללמוד נגמרה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 52,
+      "statement": "אין מחויבות בצוות הזה",
+      "category": "DISTORTION",
+      "subcategory": "nominalization",
+      "violation": "Nominalization",
+      "suggested_question": "מה אנשים עושים או לא עושים בפועל? איך נראית מחויבות בעיניך, צעד אחר צעד?",
+      "explanation": "מנהל שמחזיק 'מחויבות' כחפץ חסר לא יכול לבקש התנהגות מדויקת",
+      "difficulty": "hard",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "nominalization",
+        "violation": "Nominalization",
+        "evidenceHe": "אין מחויבות בצוות הזה",
+        "questionHe": "מה אנשים עושים או לא עושים בפועל? איך נראית מחויבות בעיניך, צעד אחר צעד?",
+        "explanationHe": "מנהל שמחזיק 'מחויבות' כחפץ חסר לא יכול לבקש התנהגות מדויקת"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "פעולות ותהליכים חיים נמחקו והפכו לשם עצם קפוא.",
+          "questionHe": "אילו פעולות אמיתיות מסתתרות מאחורי שם העצם הזה?",
+          "explanationHe": "נומינליזציה מסתירה מי עשה מה, מתי, ואיך אפשר לשנות את התהליך."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אין מחויבות בצוות הזה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 53,
+      "statement": "הטלפון הורס לי את הריכוז",
+      "category": "DISTORTION",
+      "subcategory": "cause_effect",
+      "violation": "Cause-Effect",
+      "suggested_question": "איך בדיוק? מה קורה צעד אחרי צעד מהרגע שאתה מתיישב ללמוד?",
+      "explanation": "המכשיר לא לוחץ על עצמו - בתוך ה'הורס' מסתתרת שרשרת בחירות קטנות",
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "cause_effect",
+        "violation": "Cause-Effect",
+        "evidenceHe": "הטלפון הורס לי את הריכוז",
+        "questionHe": "איך בדיוק? מה קורה צעד אחרי צעד מהרגע שאתה מתיישב ללמוד?",
+        "explanationHe": "המכשיר לא לוחץ על עצמו - בתוך ה'הורס' מסתתרת שרשרת בחירות קטנות"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "השלבים שבין הסיבה לתוצאה נמחקו.",
+          "questionHe": "מה קרה צעד אחרי צעד בין הדבר הראשון לתוצאה?",
+          "explanationHe": "סיבתיות נשמעת ישירה, אבל בדרך כלל יש רצף פעולות, פירושים ותנאים שנעלמו."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"הטלפון הורס לי את הריכוז\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 54,
+      "statement": "הקפה של הבוקר מציל לי את היום",
+      "category": "DISTORTION",
+      "subcategory": "cause_effect",
+      "violation": "Cause-Effect",
+      "suggested_question": "איך בדיוק כוס אחת מצילה יום שלם? מה עוד קורה באותו רבע שעה של שקט?",
+      "explanation": "גם סיבתיות נעימה שווה בדיקה - אולי הטקס והשקט עושים את העבודה, לא רק הקפאין",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "cause_effect",
+        "violation": "Cause-Effect",
+        "evidenceHe": "הקפה של הבוקר מציל לי את היום",
+        "questionHe": "איך בדיוק כוס אחת מצילה יום שלם? מה עוד קורה באותו רבע שעה של שקט?",
+        "explanationHe": "גם סיבתיות נעימה שווה בדיקה - אולי הטקס והשקט עושים את העבודה, לא רק הקפאין"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "השלבים שבין הסיבה לתוצאה נמחקו.",
+          "questionHe": "מה קרה צעד אחרי צעד בין הדבר הראשון לתוצאה?",
+          "explanationHe": "סיבתיות נשמעת ישירה, אבל בדרך כלל יש רצף פעולות, פירושים ותנאים שנעלמו."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"הקפה של הבוקר מציל לי את היום\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 55,
+      "statement": "היא לא הזמינה אותי, בטוח נמאס לה ממני",
+      "category": "DISTORTION",
+      "subcategory": "mind_reading",
+      "violation": "Mind Reading",
+      "suggested_question": "איך את יודעת מה היא מרגישה? אילו עוד שלושה הסברים אפשריים?",
+      "explanation": "פער מידע אחד התמלא מיד בפרשנות הכי כואבת שיש",
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "mind_reading",
+        "violation": "Mind Reading",
+        "evidenceHe": "היא לא הזמינה אותי, בטוח נמאס לה ממני",
+        "questionHe": "איך את יודעת מה היא מרגישה? אילו עוד שלושה הסברים אפשריים?",
+        "explanationHe": "פער מידע אחד התמלא מיד בפרשנות הכי כואבת שיש"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "lack_referential_index",
+          "violation": "Lack of Referential Index",
+          "impliedTextHe": "יש מקור ידע פנימי על אדם אחר, אבל המקור לא נאמר.",
+          "questionHe": "מה מקור הידיעה שלי לגבי מה שקורה אצלו או אצלה?",
+          "explanationHe": "קריאת מחשבות מסתירה את הראיות שעליהן הפרשנות נשענת."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"היא לא הזמינה אותי, בטוח נמאס לה ממני\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 56,
+      "statement": "הנכדים בטח חושבים שאני כבר לא מבינה כלום",
+      "category": "DISTORTION",
+      "subcategory": "mind_reading",
+      "violation": "Mind Reading",
+      "suggested_question": "מה הם אמרו או עשו בפועל? ומה עוד יכול להסביר שהם פחות מתקשרים?",
+      "explanation": "שתיקה של אחרים מתמלאת בקול הביקורתי שלנו ולא בקול שלהם",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "mind_reading",
+        "violation": "Mind Reading",
+        "evidenceHe": "הנכדים בטח חושבים שאני כבר לא מבינה כלום",
+        "questionHe": "מה הם אמרו או עשו בפועל? ומה עוד יכול להסביר שהם פחות מתקשרים?",
+        "explanationHe": "שתיקה של אחרים מתמלאת בקול הביקורתי שלנו ולא בקול שלהם"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "lack_referential_index",
+          "violation": "Lack of Referential Index",
+          "impliedTextHe": "יש מקור ידע פנימי על אדם אחר, אבל המקור לא נאמר.",
+          "questionHe": "מה מקור הידיעה שלי לגבי מה שקורה אצלו או אצלה?",
+          "explanationHe": "קריאת מחשבות מסתירה את הראיות שעליהן הפרשנות נשענת."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"הנכדים בטח חושבים שאני כבר לא מבינה כלום\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 57,
+      "statement": "לא יפה לאכול חומוס עם מזלג",
+      "category": "DISTORTION",
+      "subcategory": "lost_performative",
+      "violation": "Lost Performative",
+      "suggested_question": "לפי מי? מי קבע את חוקי החומוס? ומה קורה למי שמפר אותם?",
+      "explanation": "דוגמה קלילה לכלל חברתי שמוצג כאמת מוחלטת בלי בעלים - מצחיק עד שעושים את זה על דברים חשובים",
+      "difficulty": "easy",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "lost_performative",
+        "violation": "Lost Performative",
+        "evidenceHe": "לא יפה לאכול חומוס עם מזלג",
+        "questionHe": "לפי מי? מי קבע את חוקי החומוס? ומה קורה למי שמפר אותם?",
+        "explanationHe": "דוגמה קלילה לכלל חברתי שמוצג כאמת מוחלטת בלי בעלים - מצחיק עד שעושים את זה על דברים חשובים"
+      },
+      "hiddenViolations": [
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "modal_operator",
+          "violation": "Modal Operator",
+          "impliedTextHe": "הכלל האנונימי הופך לחייב, אסור או אי אפשר.",
+          "questionHe": "מי הפך את זה לחוק, ומה יקרה אם לא נפעל כך?",
+          "explanationHe": "כשאין דובר לכלל, הוא נשמע כמו חובה כללית שאי אפשר לבדוק."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"לא יפה לאכול חומוס עם מזלג\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 58,
+      "statement": "לא מדברים על כסף עם חברים",
+      "category": "DISTORTION",
+      "subcategory": "lost_performative",
+      "violation": "Lost Performative",
+      "suggested_question": "מי קבע? באילו חברויות ותרבויות זה דווקא מקובל? מה הכלל הזה שומר עליו?",
+      "explanation": "כלל בלי דובר חוסם שיחות שלפעמים דווקא היו עוזרות",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "lost_performative",
+        "violation": "Lost Performative",
+        "evidenceHe": "לא מדברים על כסף עם חברים",
+        "questionHe": "מי קבע? באילו חברויות ותרבויות זה דווקא מקובל? מה הכלל הזה שומר עליו?",
+        "explanationHe": "כלל בלי דובר חוסם שיחות שלפעמים דווקא היו עוזרות"
+      },
+      "hiddenViolations": [
+        {
+          "family": "GENERALIZATION",
+          "subcategory": "modal_operator",
+          "violation": "Modal Operator",
+          "impliedTextHe": "הכלל האנונימי הופך לחייב, אסור או אי אפשר.",
+          "questionHe": "מי הפך את זה לחוק, ומה יקרה אם לא נפעל כך?",
+          "explanationHe": "כשאין דובר לכלל, הוא נשמע כמו חובה כללית שאי אפשר לבדוק."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"לא מדברים על כסף עם חברים\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 59,
+      "statement": "מתי תפסיק לבזבז את הכישרון שלך?",
+      "category": "DISTORTION",
+      "subcategory": "presupposition",
+      "violation": "Presupposition",
+      "suggested_question": "מה מונח כאן מראש? שיש בזבוז, שיש כישרון מוגדר, ושאני אחראי לשניהם?",
+      "explanation": "שאלה אחת מבריחה פנימה שלוש קביעות שאי אפשר לענות עליהן בלי לקבל אותן",
+      "difficulty": "hard",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "presupposition",
+        "violation": "Presupposition",
+        "evidenceHe": "מתי תפסיק לבזבז את הכישרון שלך?",
+        "questionHe": "מה מונח כאן מראש? שיש בזבוז, שיש כישרון מוגדר, ושאני אחראי לשניהם?",
+        "explanationHe": "שאלה אחת מבריחה פנימה שלוש קביעות שאי אפשר לענות עליהן בלי לקבל אותן"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "complex_equivalence",
+          "violation": "Complex Equivalence",
+          "impliedTextHe": "קבלת השאלה כאילו מוכיחה שההנחה שבתוכה נכונה.",
+          "questionHe": "איזו משמעות נוספת נדבקת להנחה הזאת אם אני עונה עליה?",
+          "explanationHe": "הנחה מוטבעת גוררת איתה פירוש נוסף עוד לפני שהשיחה התחילה."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"מתי תפסיק לבזבז את הכישרון שלך?\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 60,
+      "statement": "מתי כבר אחזור להיות מי שהייתי לפני הפציעה?",
+      "category": "DISTORTION",
+      "subcategory": "presupposition",
+      "violation": "Presupposition",
+      "suggested_question": "מה השאלה מניחה? שיש 'אני קודם' קבוע שמחכה, ושכל מה שאני עכשיו הוא רק חוסר?",
+      "explanation": "ההנחה המוטבעת הופכת החלמה לחזרה אחורה במקום לצמיחה קדימה",
+      "difficulty": "hard",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "presupposition",
+        "violation": "Presupposition",
+        "evidenceHe": "מתי כבר אחזור להיות מי שהייתי לפני הפציעה?",
+        "questionHe": "מה השאלה מניחה? שיש 'אני קודם' קבוע שמחכה, ושכל מה שאני עכשיו הוא רק חוסר?",
+        "explanationHe": "ההנחה המוטבעת הופכת החלמה לחזרה אחורה במקום לצמיחה קדימה"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DISTORTION",
+          "subcategory": "complex_equivalence",
+          "violation": "Complex Equivalence",
+          "impliedTextHe": "קבלת השאלה כאילו מוכיחה שההנחה שבתוכה נכונה.",
+          "questionHe": "איזו משמעות נוספת נדבקת להנחה הזאת אם אני עונה עליה?",
+          "explanationHe": "הנחה מוטבעת גוררת איתה פירוש נוסף עוד לפני שהשיחה התחילה."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"מתי כבר אחזור להיות מי שהייתי לפני הפציעה?\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 61,
+      "statement": "רק שני לייקים לפוסט - כנראה שאף אחד לא מעריך אותי",
+      "category": "DISTORTION",
+      "subcategory": "complex_equivalence",
+      "violation": "Complex Equivalence",
+      "suggested_question": "איך מונה לייקים הפך למד-ערך אישי? מה עוד קובע אם פוסט נראה בכלל?",
+      "explanation": "מספר באפליקציה הושווה לערך של אדם - אלגוריתם הפך לשופט",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "complex_equivalence",
+        "violation": "Complex Equivalence",
+        "evidenceHe": "רק שני לייקים לפוסט - כנראה שאף אחד לא מעריך אותי",
+        "questionHe": "איך מונה לייקים הפך למד-ערך אישי? מה עוד קובע אם פוסט נראה בכלל?",
+        "explanationHe": "מספר באפליקציה הושווה לערך של אדם - אלגוריתם הפך לשופט"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "הגשר שמחבר בין שני הדברים נמחק.",
+          "questionHe": "מה בדיוק מחבר בין שני הדברים האלה, ומה עוד יכול להסביר את זה?",
+          "explanationHe": "שקילות מורכבת מצמידה שני דברים כאילו הם אותו דבר, בלי להראות את הדרך ביניהם."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"רק שני לייקים לפוסט - כנראה שאף אחד לא מעריך אותי\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
+    },
+    {
+      "id": 62,
+      "statement": "אם יסרבו לבקשת ההעלאה, סימן שאני לא שווה לחברה",
+      "category": "DISTORTION",
+      "subcategory": "complex_equivalence",
+      "violation": "Complex Equivalence",
+      "suggested_question": "איך תקציב של מחלקה נהיה שווה לערך שלך? מה עוד יכול לעמוד מאחורי סירוב?",
+      "explanation": "החלטה תקציבית והערכת אדם הם שני דברים שונים שהודבקו לאחד",
+      "difficulty": "medium",
+      "surfaceViolation": {
+        "family": "DISTORTION",
+        "subcategory": "complex_equivalence",
+        "violation": "Complex Equivalence",
+        "evidenceHe": "אם יסרבו לבקשת ההעלאה, סימן שאני לא שווה לחברה",
+        "questionHe": "איך תקציב של מחלקה נהיה שווה לערך שלך? מה עוד יכול לעמוד מאחורי סירוב?",
+        "explanationHe": "החלטה תקציבית והערכת אדם הם שני דברים שונים שהודבקו לאחד"
+      },
+      "hiddenViolations": [
+        {
+          "family": "DELETION",
+          "subcategory": "simple_deletion",
+          "violation": "Simple Deletion",
+          "impliedTextHe": "הגשר שמחבר בין שני הדברים נמחק.",
+          "questionHe": "מה בדיוק מחבר בין שני הדברים האלה, ומה עוד יכול להסביר את זה?",
+          "explanationHe": "שקילות מורכבת מצמידה שני דברים כאילו הם אותו דבר, בלי להראות את הדרך ביניהם."
+        }
+      ],
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אם יסרבו לבקשת ההעלאה, סימן שאני לא שווה לחברה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     }
   ]
 }

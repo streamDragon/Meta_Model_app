@@ -169,6 +169,157 @@
   font-size: var(--fs-xs);
 }
 
+/* --- surface / hidden violation principle --- */
+.surface-hidden-principle {
+  margin: var(--sp-4) 0;
+  padding: var(--sp-4);
+  border: 1px solid var(--line);
+  border-inline-start: 4px solid var(--primary);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.surface-hidden-principle.compact {
+  padding: var(--sp-3);
+}
+
+.surface-hidden-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
+
+.surface-hidden-head small {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.surface-hidden-head strong {
+  font-size: var(--fs-md);
+}
+
+.surface-hidden-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.surface-hidden-columns > div {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 2px var(--sp-2);
+  align-items: start;
+  padding: var(--sp-3);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+}
+
+.surface-hidden-columns span {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  color: var(--primary-deep);
+  font-weight: 800;
+  grid-row: span 2;
+}
+
+.surface-hidden-columns p,
+.surface-hidden-note {
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+}
+
+.surface-hidden-note {
+  margin-top: var(--sp-3);
+}
+
+.layer-step-card {
+  margin: var(--sp-4) 0 var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+.layer-step-kicker {
+  display: block;
+  color: var(--primary);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.layer-step-card strong {
+  display: block;
+  font-size: var(--fs-md);
+}
+
+.layer-step-card p,
+.layer-step-card small {
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+}
+
+.feedback-box.partial {
+  border-color: var(--warm);
+  background: var(--warm-soft);
+}
+
+.layer-feedback-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+
+.layer-ok,
+.layer-miss {
+  padding: var(--sp-3);
+  border-radius: var(--r-sm);
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--line);
+}
+
+.layer-ok {
+  border-color: rgba(34, 197, 94, 0.45);
+}
+
+.layer-miss {
+  border-color: rgba(245, 158, 45, 0.65);
+}
+
+.layer-ok small,
+.layer-miss small {
+  display: block;
+  color: var(--ink-soft);
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.hidden-layer-line {
+  display: block;
+}
+
+.hidden-layer-line + .hidden-layer-line {
+  margin-top: var(--sp-2);
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--line);
+}
+
+.layer-implied {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+
 /* --- pattern illustrations --- */
 .pattern-thumb {
   width: 100%;
@@ -264,6 +415,11 @@
   .pattern-thumb,
   .prism-card-art {
     height: 110px;
+  }
+
+  .surface-hidden-columns,
+  .layer-feedback-grid {
+    grid-template-columns: 1fr;
   }
 }
 

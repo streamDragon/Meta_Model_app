@@ -30,6 +30,20 @@ export interface PracticeStatement {
   suggested_question: string;
   explanation: string;
   difficulty: 'easy' | 'medium' | 'hard';
+  surfaceViolation?: ViolationLayer;
+  hiddenViolations?: ViolationLayer[];
+  impliedFullTextHe?: string;
+  layeringNoteHe?: string;
+}
+
+export interface ViolationLayer {
+  family: ViolationFamily;
+  subcategory: string;
+  violation: string;
+  evidenceHe: string;
+  questionHe: string;
+  explanationHe: string;
+  impliedTextHe?: string;
 }
 
 export interface ReframeTemplate {

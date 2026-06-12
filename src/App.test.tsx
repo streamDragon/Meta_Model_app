@@ -2,6 +2,9 @@
 import { describe, expect, it, vi, beforeAll, afterEach } from 'vitest';
 import { render, screen, fireEvent, within, cleanup } from '@testing-library/react';
 import App from './App';
+import { content } from './data/content';
+import { CATEGORY_LABELS } from './lib/trainer';
+import { hiddenFamilies } from './lib/violationLayers';
 import { FEATURES } from './registry';
 
 beforeAll(() => {
@@ -41,7 +44,7 @@ describe('App shell', () => {
     expect(options.length).toBe(3);
   });
 
-  it('awards XP through the progress store when answering correctly', () => {
+  it('awards XP through the progress store after a layered correct answer', () => {
     window.localStorage.clear();
     window.location.hash = 'practice';
     render(<App />);
@@ -49,17 +52,18 @@ describe('App shell', () => {
 
     // Click the correct option (the trainer marks feedback as "נכון" only
     // when the right family is chosen) — try each option until feedback shows.
-    const inputs = Array.from(
-      document.querySelectorAll<HTMLInputElement>('.option-input'),
-    );
-    fireEvent.click(inputs[0]);
+    const section = document.getElementById('practice')!;
+    const questionText = section.querySelector('.question-text')?.textContent?.trim();
+    const statement = content.practice_statements.find((s) => s.statement === questionText);
+    expect(statement).toBeTruthy();
+
+    fireEvent.click(within(section).getByLabelText(CATEGORY_LABELS[statement!.category]));
+    fireEvent.click(within(section).getByLabelText(CATEGORY_LABELS[hiddenFamilies(statement!)[0]]));
     const stored = JSON.parse(window.localStorage.getItem('userProgress') ?? '{}');
     const feedbackShown = document.querySelector('.feedback-box');
     expect(feedbackShown).toBeTruthy();
     // XP is 10 when correct, 0 when wrong — either way progress was persisted
     // by the store the moment a session interaction happened (correct answer).
-    if (document.querySelector('.feedback-box.correct')) {
-      expect(stored.xp).toBe(10);
-    }
+    expect(stored.xp).toBe(10);
   });
 });

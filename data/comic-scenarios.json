@@ -181,6 +181,187 @@
           }
         }
       ]
+    },
+    {
+      "id": "friend_birthday_01",
+      "domain": "חברות",
+      "title": "אף אחד לא בא בשבילי",
+      "characters": {
+        "left": {
+          "name": "חבר",
+          "sprite": "assets/svg/characters/תום.svg"
+        },
+        "right": {
+          "name": "את/ה",
+          "sprite": "assets/svg/characters/ספיר.svg"
+        }
+      },
+      "dialog": [
+        {
+          "speaker": "left",
+          "text": "עזוב את יום ההולדת. אף אחד לא באמת בא בשבילי."
+        },
+        {
+          "speaker": "right",
+          "text": "מה זאת אומרת? הזמנת המון אנשים."
+        }
+      ],
+      "choices": [
+        {
+          "id": "angry",
+          "label": "כעס",
+          "badge": "assets/svg/stickers/badges/תגובה_נאיבית.svg",
+          "sfx": "assets/svg/stickers/sfx/בום.svg",
+          "say": "די עם הקטע הזה! כל שנה אותו סיפור.",
+          "tone": "danger",
+          "rightSpriteOverride": "assets/svg/characters_states/ספיר_angry.svg"
+        },
+        {
+          "id": "mock",
+          "label": "לעג",
+          "badge": "assets/svg/stickers/badges/לעג_והשוואה.svg",
+          "sfx": "assets/svg/stickers/sfx/אופס.svg",
+          "say": "דרמה קווין... תראה כמה לייקים קיבלת.",
+          "tone": "warn",
+          "rightSpriteOverride": "assets/svg/characters_states/ספיר_mock.svg"
+        },
+        {
+          "id": "rescue",
+          "label": "הצלה",
+          "badge": "assets/svg/stickers/badges/הצלה_במקום.svg",
+          "sfx": "assets/svg/stickers/sfx/רגע.svg",
+          "say": "אני אארגן לך מסיבה בעצמי, יהיה מושלם!",
+          "tone": "purple",
+          "rightSpriteOverride": "assets/svg/characters_states/ספיר_neutral.svg"
+        },
+        {
+          "id": "avoid",
+          "label": "התחמקות",
+          "badge": "assets/svg/stickers/badges/תגובה_נאיבית.svg",
+          "sfx": "assets/svg/stickers/sfx/ששש.svg",
+          "say": "נו טוב... אז מה רואים היום?",
+          "tone": "muted",
+          "rightSpriteOverride": "assets/svg/characters_states/ספיר_neutral.svg"
+        },
+        {
+          "id": "meta",
+          "label": "מטה-מודל",
+          "badge": "assets/svg/stickers/badges/סקרנות_מטה_מודל.svg",
+          "sfx": "assets/svg/stickers/sfx/יש.svg",
+          "say": "אף אחד? מי כן הגיע בפעם שעברה? ומה היה חסר לך שם באמת?",
+          "tone": "good",
+          "rightSpriteOverride": "assets/svg/characters_states/ספיר_meta.svg",
+          "blueprint": {
+            "goal": "להבין מה חסר בקשרים במקום לבטל את כולם",
+            "first_step": "לכתוב מי כן הגיע או התקשר בפעם האחרונה",
+            "last_step": "לבחור אדם אחד וליזום איתו מפגש קטן",
+            "middle_steps": [
+              "להפריד בין 'אף אחד' לבין 'לא מי שקיוויתי'",
+              "לזהות מה היה חסר: כמות, קרבה או הכרה",
+              "לנסח מה הייתי רוצה שיקרה אחרת"
+            ],
+            "preconditions": [
+              "רגע שקט בלי טלפון",
+              "נכונות לבדוק במקום להסיק"
+            ],
+            "alternatives": [
+              "אם 'כולם רחוקים': לבחור קשר אחד לחימום מחדש",
+              "אם זה כואב מדי: לדבר על הפעם האחרונה שהרגשת שייך"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "work_deadline_01",
+      "domain": "עבודה",
+      "title": "אין מצב לעמוד בדדליין",
+      "characters": {
+        "left": {
+          "name": "עובד",
+          "sprite": "assets/svg/characters/עידו.svg"
+        },
+        "right": {
+          "name": "מנהלת",
+          "sprite": "assets/svg/characters/מאיה.svg"
+        }
+      },
+      "dialog": [
+        {
+          "speaker": "left",
+          "text": "אין מצב לעמוד בדדליין הזה. זה פשוט בלתי אפשרי."
+        },
+        {
+          "speaker": "right",
+          "text": "הלקוח מחכה לזה ביום חמישי."
+        }
+      ],
+      "choices": [
+        {
+          "id": "angry",
+          "label": "כעס",
+          "badge": "assets/svg/stickers/badges/תגובה_נאיבית.svg",
+          "sfx": "assets/svg/stickers/sfx/בום.svg",
+          "say": "לא מעניין אותי איך - זה יהיה מוכן בחמישי!",
+          "tone": "danger",
+          "rightSpriteOverride": "assets/svg/characters_states/מאיה_angry.svg"
+        },
+        {
+          "id": "mock",
+          "label": "לעג",
+          "badge": "assets/svg/stickers/badges/לעג_והשוואה.svg",
+          "sfx": "assets/svg/stickers/sfx/אוף.svg",
+          "say": "מעניין שלקודמך זה לקח יומיים...",
+          "tone": "warn",
+          "rightSpriteOverride": "assets/svg/characters_states/מאיה_mock.svg"
+        },
+        {
+          "id": "rescue",
+          "label": "הצלה",
+          "badge": "assets/svg/stickers/badges/הצלה_במקום.svg",
+          "sfx": "assets/svg/stickers/sfx/רגע.svg",
+          "say": "טוב, תעביר אליי, אני אסיים את זה בלילה.",
+          "tone": "purple",
+          "rightSpriteOverride": "assets/svg/characters_states/מאיה_neutral.svg"
+        },
+        {
+          "id": "avoid",
+          "label": "התחמקות",
+          "badge": "assets/svg/stickers/badges/תגובה_נאיבית.svg",
+          "sfx": "assets/svg/stickers/sfx/ששש.svg",
+          "say": "נדבר על זה מחר בסטנדאפ...",
+          "tone": "muted",
+          "rightSpriteOverride": "assets/svg/characters_states/מאיה_neutral.svg"
+        },
+        {
+          "id": "meta",
+          "label": "מטה-מודל",
+          "badge": "assets/svg/stickers/badges/סקרנות_מטה_מודל.svg",
+          "sfx": "assets/svg/stickers/sfx/יש.svg",
+          "say": "בלתי אפשרי לגמרי, או חסר משהו? מה החלק שכן מוכן, ומה בדיוק תקוע?",
+          "tone": "good",
+          "rightSpriteOverride": "assets/svg/characters_states/מאיה_meta.svg",
+          "blueprint": {
+            "goal": "להפוך 'בלתי אפשרי' לתמונת מצב שאפשר להחליט עליה",
+            "first_step": "לפרק את המשימה לרשימת חלקים: מוכן / בעבודה / תקוע",
+            "last_step": "לעדכן את הלקוח על היקף מציאותי ולסגור מועד",
+            "middle_steps": [
+              "לזהות מה הופך את זה לבלתי אפשרי: זמן, ידע או תלות במישהו",
+              "לבדוק מה אפשר לצמצם, לדחות או להעביר",
+              "להגדיר מה כן יהיה מוכן בחמישי"
+            ],
+            "preconditions": [
+              "עשר דקות של שיחה בלי האשמות",
+              "רשימת המשימות הפתוחות מול העיניים"
+            ],
+            "alternatives": [
+              "אם התקיעות היא ידע: לצרף מישהו לשעה אחת",
+              "אם הכול דחוף: לבקש מהלקוח תיעדוף של חלק אחד",
+              "אם אין סיכוי: לתאם מועד חדש היום ולא ברגע האחרון"
+            ]
+          }
+        }
+      ]
     }
   ]
 }

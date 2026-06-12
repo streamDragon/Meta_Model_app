@@ -11,6 +11,7 @@ import { useProgress } from '../../store/useProgress';
 import { XP_REWARDS } from '../../store/progress';
 import { PRISM_ART } from '../../lib/patternArt';
 import { HowItWorks } from '../../components/HowItWorks';
+import { SurfaceHiddenPrinciple } from '../../components/SurfaceHiddenPrinciple';
 
 const SESSIONS_KEY = 'prism_sessions';
 const MAX_SAVED_SESSIONS = 10;
@@ -146,6 +147,8 @@ export function PrismLabPage() {
             <strong>ללא AI:</strong> הכל בחירות מובנות מראש מתוך חבילת JSON.
           </span>
         </div>
+
+        <SurfaceHiddenPrinciple compact />
 
         <HowItWorks
           steps={[

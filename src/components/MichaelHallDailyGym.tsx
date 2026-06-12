@@ -3,6 +3,7 @@ import {
   michaelHallDailyCards,
   type MichaelHallDailyCard,
 } from '../data/michaelHallDailyCards';
+import { SurfaceHiddenPrinciple } from './SurfaceHiddenPrinciple';
 
 const STORAGE_KEY = 'michaelHallDailyGym:v1';
 
@@ -256,6 +257,7 @@ export function MichaelHallDailyGym() {
 
           <section className="daily-card-section">
             <h4>תרגילים</h4>
+            <SurfaceHiddenPrinciple compact />
             <div className="daily-exercise-list">
               {card.exercisesHe.map((exercise, index) => (
                 <label className="daily-exercise-row" key={exercise}>

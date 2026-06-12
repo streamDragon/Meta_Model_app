@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { content } from '../../data/content';
 import type { PracticeStatement, ViolationFamily } from '../../types';
 import {
-  buildMcqOptions,
   buildTrainerQuestions,
   CATEGORY_HINTS,
   CATEGORY_ID_TO_NAME,
@@ -13,14 +12,24 @@ import {
   successRate,
   XP_PER_CORRECT,
 } from '../../lib/trainer';
+import {
+  buildHiddenMcqOptions,
+  buildSurfaceMcqOptions,
+  evaluateLayeredAnswer,
+  PARTIAL_LAYERED_XP,
+  toLayeredStatement,
+  type LayeredAnswerResult,
+} from '../../lib/violationLayers';
 import { useProgress } from '../../store/useProgress';
 import { usePracticeLaunch } from '../../store/practiceLaunch';
 import { useHint } from '../../store/hint';
 import { HowItWorks } from '../../components/HowItWorks';
+import { SurfaceHiddenPrinciple } from '../../components/SurfaceHiddenPrinciple';
 import teacherImg from '../../assets/teacher.png';
 import { characterFor } from '../../lib/characters';
 
 type Phase = 'idle' | 'active' | 'complete';
+type AnswerStep = 'surface' | 'hidden';
 
 export function TrainerPage() {
   const { addXP, recordSession } = useProgress();
@@ -32,8 +41,12 @@ export function TrainerPage() {
   const [questions, setQuestions] = useState<PracticeStatement[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [options, setOptions] = useState<ViolationFamily[]>([]);
-  const [selected, setSelected] = useState<ViolationFamily | null>(null);
+  const [answerStep, setAnswerStep] = useState<AnswerStep>('surface');
+  const [selectedSurface, setSelectedSurface] = useState<ViolationFamily | null>(null);
+  const [selectedHidden, setSelectedHidden] = useState<ViolationFamily | null>(null);
+  const [answerResult, setAnswerResult] = useState<LayeredAnswerResult | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
+  const [partialCount, setPartialCount] = useState(0);
   const [answeredCount, setAnsweredCount] = useState(0);
   const [sessionXP, setSessionXP] = useState(0);
   const [hintText, setHintText] = useState<string | null>(null);
@@ -50,9 +63,13 @@ export function TrainerPage() {
       }
       setQuestions(sessionQuestions);
       setCurrentIndex(0);
-      setOptions(buildMcqOptions(sessionQuestions[0].category));
-      setSelected(null);
+      setOptions(buildSurfaceMcqOptions(sessionQuestions[0]));
+      setAnswerStep('surface');
+      setSelectedSurface(null);
+      setSelectedHidden(null);
+      setAnswerResult(null);
       setCorrectCount(0);
+      setPartialCount(0);
       setAnsweredCount(0);
       setSessionXP(0);
       setHintText(null);
@@ -70,15 +87,31 @@ export function TrainerPage() {
   }, [request, startTrainer, consume]);
 
   const question = phase === 'active' ? questions[currentIndex] : null;
+  const layeredQuestion = question ? toLayeredStatement(question) : null;
 
   const handleSelect = (option: ViolationFamily) => {
-    if (!question || selected !== null) return;
-    setSelected(option);
+    if (!question || answerResult) return;
+    if (answerStep === 'surface') {
+      setSelectedSurface(option);
+      setAnswerStep('hidden');
+      setOptions(buildHiddenMcqOptions(question));
+      setHintText(null);
+      return;
+    }
+
+    if (selectedHidden !== null) return;
+    setSelectedHidden(option);
+    const result = evaluateLayeredAnswer(question, selectedSurface, option);
+    setAnswerResult(result);
     setAnsweredCount((n) => n + 1);
-    if (option === question.category) {
+    if (result.status === 'full') {
       setCorrectCount((n) => n + 1);
-      setSessionXP((xp) => xp + XP_PER_CORRECT);
-      addXP(XP_PER_CORRECT);
+    } else if (result.status === 'partial') {
+      setPartialCount((n) => n + 1);
+    }
+    if (result.xp > 0) {
+      setSessionXP((xp) => xp + result.xp);
+      addXP(result.xp);
     }
   };
 
@@ -90,8 +123,11 @@ export function TrainerPage() {
       return;
     }
     setCurrentIndex(nextIndex);
-    setOptions(buildMcqOptions(questions[nextIndex].category));
-    setSelected(null);
+    setOptions(buildSurfaceMcqOptions(questions[nextIndex]));
+    setAnswerStep('surface');
+    setSelectedSurface(null);
+    setSelectedHidden(null);
+    setAnswerResult(null);
     setHintText(null);
   };
 
@@ -99,8 +135,12 @@ export function TrainerPage() {
     setPhase('idle');
     setQuestions([]);
     setCurrentIndex(0);
-    setSelected(null);
+    setAnswerStep('surface');
+    setSelectedSurface(null);
+    setSelectedHidden(null);
+    setAnswerResult(null);
     setCorrectCount(0);
+    setPartialCount(0);
     setAnsweredCount(0);
     setSessionXP(0);
     setHintText(null);
@@ -108,13 +148,26 @@ export function TrainerPage() {
 
   const showTrainerHint = () => {
     if (!question) return;
+    if (answerStep === 'hidden') {
+      const layered = toLayeredStatement(question);
+      setHintText(
+        [
+          'ההפרה המסתתרת אינה חייבת להופיע במילים עצמן.',
+          layered.layeringNoteHe ?? '',
+          `קריאה אפשרית: ${layered.hiddenViolations
+            .map((layer) => CATEGORY_LABELS[layer.family])
+            .join(' / ')}`,
+        ].join('\n'),
+      );
+      return;
+    }
     setHintText(
       `${CATEGORY_HINTS[question.category] ?? ''}\nרמת קשיות: ${DIFFICULTY_HINTS[question.difficulty]}`,
     );
   };
 
-  const rate = successRate(correctCount, answeredCount);
-  const finalRate = successRate(correctCount, questions.length);
+  const rate = successRate(correctCount * 2 + partialCount, answeredCount * 2);
+  const finalRate = successRate(correctCount * 2 + partialCount, questions.length * 2);
 
   const chips = [
     { id: '', label: 'כל הקטגוריות', accent: 'all' },
@@ -141,6 +194,8 @@ export function TrainerPage() {
             <strong>תוצר:</strong> שאלה טובה יותר ומשוב מידי.
           </span>
         </div>
+
+        <SurfaceHiddenPrinciple compact />
 
         <div className="practice-filters">
           <label htmlFor="category-select">בחר קטגוריה:</label>
@@ -181,7 +236,7 @@ export function TrainerPage() {
                   שאלה <span id="current-q">{currentIndex + 1}</span> מתוך{' '}
                   <span id="total-q">{questions.length}</span>
                 </span>
-                <span className="xp-badge">+{XP_PER_CORRECT} XP</span>
+                <span className="xp-badge">+{XP_PER_CORRECT} XP / +{PARTIAL_LAYERED_XP} חצי</span>
               </div>
               <div className="progress-bar">
                 <div
@@ -208,6 +263,25 @@ export function TrainerPage() {
               })()}
             </div>
 
+            <div className="layer-step-card" aria-live="polite">
+              <span className="layer-step-kicker">
+                {answerStep === 'surface' ? 'שלב 1 מתוך 2' : 'שלב 2 מתוך 2'}
+              </span>
+              <strong>
+                {answerStep === 'surface'
+                  ? 'מצא את ההפרה העיקרית'
+                  : 'מצא את ההפרה המסתתרת'}
+              </strong>
+              <p>
+                {answerStep === 'surface'
+                  ? 'מה נמצא במילים עצמן, עוד לפני שאנחנו מוסיפים פרשנות?'
+                  : 'מה יכול להיות מושלם מהטון, ההשלכה או המשפט המלא המשתמע?'}
+              </p>
+              {selectedSurface && answerStep === 'hidden' && (
+                <small>הבחירה הגלויה שלך: {CATEGORY_LABELS[selectedSurface]}</small>
+              )}
+            </div>
+
             <div className="mcq-options" id="mcq-options">
               {options.map((option, index) => (
                 <div className="mcq-option" key={option}>
@@ -215,10 +289,14 @@ export function TrainerPage() {
                     type="radio"
                     id={`option-${index}`}
                     className="option-input"
-                    name="mcq"
+                    name={`mcq-${answerStep}`}
                     value={option}
-                    checked={selected === option}
-                    disabled={selected !== null}
+                    checked={
+                      answerStep === 'surface'
+                        ? selectedSurface === option
+                        : selectedHidden === option
+                    }
+                    disabled={Boolean(answerResult)}
                     onChange={() => handleSelect(option)}
                   />
                   <label htmlFor={`option-${index}`} className="option-label">
@@ -229,42 +307,66 @@ export function TrainerPage() {
               ))}
             </div>
 
-            {selected !== null && (
+            {answerResult && layeredQuestion && selectedSurface && selectedHidden && (
               <div id="feedback-section" className="feedback-section visible">
                 <div
                   id="feedback-content"
-                  className={`feedback-box ${selected === question.category ? 'correct' : 'incorrect'}`}
+                  className={`feedback-box ${answerResult.status === 'full' ? 'correct' : answerResult.status}`}
                 >
-                  {selected === question.category ? (
-                    <div className="correct">
-                      <strong>✅ נכון!</strong>
-                      <p className="explanation">
-                        <strong>קטגוריה:</strong> {CATEGORY_LABELS[question.category]}
-                        <br />
-                        <strong>תבנית:</strong> {question.violation}
-                        <br />
-                        <strong>שאלה מוצעת:</strong> "{question.suggested_question}"
-                        <br />
-                        <strong>הסבר:</strong> {question.explanation}
-                      </p>
-                      <p className="xp-pop">+{XP_PER_CORRECT} XP 🎉</p>
+                  <div className={answerResult.status}>
+                    <strong>
+                      {answerResult.status === 'full'
+                        ? 'נכון - שתי השכבות זוהו'
+                        : answerResult.status === 'partial'
+                          ? 'חצי תשובה - שכבה אחת מדויקת'
+                          : 'עדיין לא מדויק'}
+                    </strong>
+                    <div className="layer-feedback-grid">
+                      <div className={answerResult.surfaceCorrect ? 'layer-ok' : 'layer-miss'}>
+                        <small>הפרה עיקרית / גלויה</small>
+                        <p>
+                          <strong>{CATEGORY_LABELS[layeredQuestion.surfaceViolation.family]}</strong>
+                          <br />
+                          תבנית: {layeredQuestion.surfaceViolation.violation}
+                          <br />
+                          ראיה במילים: "{layeredQuestion.surfaceViolation.evidenceHe}"
+                          <br />
+                          השאלה: "{layeredQuestion.surfaceViolation.questionHe}"
+                        </p>
+                        {!answerResult.surfaceCorrect && (
+                          <p className="muted">בחרת: {CATEGORY_LABELS[selectedSurface]}</p>
+                        )}
+                      </div>
+
+                      <div className={answerResult.hiddenCorrect ? 'layer-ok' : 'layer-miss'}>
+                        <small>הפרה מסתתרת / משתמעת</small>
+                        <p>
+                          {layeredQuestion.hiddenViolations.map((layer) => (
+                            <span
+                              className="hidden-layer-line"
+                              key={`${layer.family}-${layer.subcategory}`}
+                            >
+                              <strong>{CATEGORY_LABELS[layer.family]}</strong> - {layer.violation}
+                              <br />
+                              {layer.impliedTextHe}
+                              <br />
+                              השאלה: "{layer.questionHe}"
+                            </span>
+                          ))}
+                        </p>
+                        {!answerResult.hiddenCorrect && (
+                          <p className="muted">בחרת: {CATEGORY_LABELS[selectedHidden]}</p>
+                        )}
+                      </div>
                     </div>
-                  ) : (
-                    <div className="incorrect">
-                      <strong>❌ לא נכון</strong>
-                      <p className="explanation">
-                        <strong>בחרת:</strong> {CATEGORY_LABELS[selected]}
-                        <br />
-                        <strong>התשובה הנכונה:</strong> {CATEGORY_LABELS[question.category]}
-                        <br />
-                        <strong>תבנית:</strong> {question.violation}
-                        <br />
-                        <strong>שאלה מוצעת:</strong> "{question.suggested_question}"
-                        <br />
-                        <strong>הסבר:</strong> {question.explanation}
+                    {layeredQuestion.impliedFullTextHe && (
+                      <p className="layer-implied">
+                        <strong>המשפט המלא כאילו:</strong> {layeredQuestion.impliedFullTextHe}
                       </p>
-                    </div>
-                  )}
+                    )}
+                    <p className="muted">{layeredQuestion.layeringNoteHe}</p>
+                    {answerResult.xp > 0 && <p className="xp-pop">+{answerResult.xp} XP</p>}
+                  </div>
                 </div>
                 <button type="button" id="next-question-btn" className="btn btn-primary" onClick={handleNext}>
                   השאלה הבאה ←

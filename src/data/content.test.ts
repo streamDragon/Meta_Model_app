@@ -32,6 +32,46 @@ describe('content pack integrity', () => {
     }
   });
 
+  it('adds authored surface and hidden violation layers to every practice statement', () => {
+    for (const s of content.practice_statements) {
+      const layered = s as unknown as Record<string, any>;
+      expect(layered.surfaceViolation?.family, `statement ${s.id} surface family`).toBe(
+        s.category,
+      );
+      expect(
+        layered.surfaceViolation?.subcategory,
+        `statement ${s.id} surface subcategory`,
+      ).toBe(s.subcategory);
+      expect(layered.surfaceViolation?.questionHe, `statement ${s.id} surface question`).toBeTruthy();
+      expect(
+        Array.isArray(layered.hiddenViolations),
+        `statement ${s.id} hidden violations`,
+      ).toBe(true);
+      expect(layered.hiddenViolations.length, `statement ${s.id} hidden count`).toBeGreaterThan(0);
+
+      for (const hidden of layered.hiddenViolations) {
+        expect(['DELETION', 'DISTORTION', 'GENERALIZATION']).toContain(hidden.family);
+        expect(hidden.subcategory, `statement ${s.id} hidden subcategory`).toBeTruthy();
+        expect(hidden.violation, `statement ${s.id} hidden violation`).toBeTruthy();
+        expect(hidden.questionHe, `statement ${s.id} hidden question`).toBeTruthy();
+        expect(hidden.explanationHe, `statement ${s.id} hidden explanation`).toBeTruthy();
+      }
+    }
+  });
+
+  it('treats "אי אפשר לדבר איתו" as a layered modal with hidden distortion and generalization', () => {
+    const statement = content.practice_statements.find((s) => s.id === 33) as unknown as
+      | Record<string, any>
+      | undefined;
+    expect(statement).toBeTruthy();
+    expect(statement?.surfaceViolation.family).toBe('GENERALIZATION');
+    expect(statement?.surfaceViolation.subcategory).toBe('modal_operator');
+    expect(statement?.hiddenViolations.map((layer: any) => layer.family)).toEqual(
+      expect.arrayContaining(['DISTORTION', 'GENERALIZATION']),
+    );
+    expect(statement?.impliedFullTextHe).toContain('בשום מצב');
+  });
+
   it('provides choices with cleanup questions for all five logical levels', () => {
     for (const level of PRISM_LEVELS) {
       const choices = content.choice_packs.prism_breen.levels[level.id] ?? [];

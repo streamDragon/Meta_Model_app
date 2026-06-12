@@ -2,6 +2,7 @@ import { content } from '../../data/content';
 import { usePracticeLaunch } from '../../store/practiceLaunch';
 import { PATTERN_ART } from '../../lib/patternArt';
 import { HowItWorks } from '../../components/HowItWorks';
+import { SurfaceHiddenPrinciple } from '../../components/SurfaceHiddenPrinciple';
 import icebergImg from '../../assets/iceberg.png';
 
 export function CategoriesPage() {
@@ -18,6 +19,7 @@ export function CategoriesPage() {
             מתחת למים מסתתר מבנה העומק: מה נמחק, מה עוות ומה הוכלל. שלוש משפחות
             הדפוסים שלמטה הן המפתח לצלול פנימה.
           </p>
+          <SurfaceHiddenPrinciple compact />
           <HowItWorks
             steps={[
               { icon: '👀', title: 'קרא דוגמה', detail: 'פתח קטגוריה וראה משפט אמיתי' },

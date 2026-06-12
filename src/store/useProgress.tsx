@@ -1,8 +1,10 @@
 import {
   createContext,
+  useEffect,
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -51,27 +53,35 @@ export function ProgressProvider({
   onBadges?: (badges: BadgeAward[]) => void;
 }) {
   const [progress, setProgress] = useState<UserProgress>(loadStoredProgress);
+  const announcedBadgeIds = useRef(new Set(progress.badges.map((badge) => badge.id)));
+
+  useEffect(() => {
+    const nextBadgeIds = new Set(progress.badges.map((badge) => badge.id));
+    const newBadges = progress.badges.filter(
+      (badge) => !announcedBadgeIds.current.has(badge.id),
+    );
+    announcedBadgeIds.current = nextBadgeIds;
+    if (newBadges.length > 0) onBadges?.(newBadges);
+  }, [onBadges, progress.badges]);
 
   const addXP = useCallback(
     (amount: number) => {
       setProgress((current) => {
         const result = applyXP(current, amount);
         storeProgress(result.progress);
-        if (result.newBadges.length > 0) onBadges?.(result.newBadges);
         return result.progress;
       });
     },
-    [onBadges],
+    [],
   );
 
   const recordSession = useCallback(() => {
-    setProgress((current) => {
-      const result = applySession(current);
-      storeProgress(result.progress);
-      if (result.newBadges.length > 0) onBadges?.(result.newBadges);
-      return result.progress;
-    });
-  }, [onBadges]);
+      setProgress((current) => {
+        const result = applySession(current);
+        storeProgress(result.progress);
+        return result.progress;
+      });
+  }, []);
 
   const value = useMemo(
     () => ({ progress, addXP, recordSession }),
