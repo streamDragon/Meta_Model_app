@@ -4,6 +4,7 @@ import { resolveReframe, WHO_EXPECTS_LABELS } from '../../lib/blueprint';
 import { useProgress } from '../../store/useProgress';
 import { XP_REWARDS } from '../../store/progress';
 import { useHint } from '../../store/hint';
+import { HowItWorks } from '../../components/HowItWorks';
 
 interface WizardField {
   id: string; // matches choice_packs.blueprint.fields key
@@ -177,6 +178,17 @@ export function BlueprintPage() {
             <strong>תוצר:</strong> תוכנית קצרה, תנאים ו-Plan B.
           </span>
         </div>
+
+        {step === 1 && (
+          <HowItWorks
+            steps={[
+              { icon: '🎬', title: 'בוחרים פעולה', detail: 'מה אתה אומר לעצמך לעשות?' },
+              { icon: '🧩', title: 'מפרקים לצעדים', detail: '8 שאלות קצרות — צעד ראשון, אמצע וסוף' },
+              { icon: '⚖️', title: 'בודקים פער', detail: 'ציפייה מול יכולת, בלי האשמה עצמית' },
+              { icon: '🚀', title: 'מקבלים תוכנית', detail: 'צעד הבא + Plan B + ייצוא JSON' },
+            ]}
+          />
+        )}
 
         {step === 1 && (
           <div className="blueprint-step active">

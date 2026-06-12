@@ -18,6 +18,7 @@ import { usePracticeLaunch } from '../../store/practiceLaunch';
 import { useHint } from '../../store/hint';
 import { HowItWorks } from '../../components/HowItWorks';
 import teacherImg from '../../assets/teacher.png';
+import { characterFor } from '../../lib/characters';
 
 type Phase = 'idle' | 'active' | 'complete';
 
@@ -189,9 +190,22 @@ export function TrainerPage() {
                   style={{ width: `${(currentIndex / questions.length) * 100}%` }}
                 ></div>
               </div>
-              <p className="question-text" id="question-text">
-                {question.statement}
-              </p>
+              {(() => {
+                const speaker = characterFor(question.id + currentIndex);
+                return (
+                  <div className="question-speaker">
+                    {speaker && (
+                      <span className="speaker-figure">
+                        <img src={speaker.url} alt="" aria-hidden="true" loading="lazy" />
+                        <small>{speaker.name}</small>
+                      </span>
+                    )}
+                    <p className="question-text speech-statement" id="question-text">
+                      {question.statement}
+                    </p>
+                  </div>
+                );
+              })()}
             </div>
 
             <div className="mcq-options" id="mcq-options">
@@ -233,9 +247,7 @@ export function TrainerPage() {
                         <br />
                         <strong>הסבר:</strong> {question.explanation}
                       </p>
-                      <p style={{ marginTop: 15, color: '#28a745', fontWeight: 'bold' }}>
-                        +{XP_PER_CORRECT} XP 🎉
-                      </p>
+                      <p className="xp-pop">+{XP_PER_CORRECT} XP 🎉</p>
                     </div>
                   ) : (
                     <div className="incorrect">

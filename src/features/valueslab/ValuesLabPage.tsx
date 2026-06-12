@@ -14,6 +14,7 @@ import {
 import { useIsMobile } from '../../lib/useIsMobile';
 import { useProgress } from '../../store/useProgress';
 import { useHint } from '../../store/hint';
+import { HowItWorks } from '../../components/HowItWorks';
 
 const data = rawPack as unknown as VclData;
 const STORAGE_KEY = 'vcl_sessions';
@@ -291,6 +292,15 @@ export function ValuesLabPage() {
             <strong>תוצר:</strong> אבחנה למה זה תקוע + שאלות + מהלכים.
           </span>
         </div>
+
+        <HowItWorks
+          steps={[
+            { icon: '✍️', title: 'כותבים משפט', detail: '"אני רוצה ___ אבל ___" — או בוחרים דוגמה' },
+            { icon: '🃏', title: 'ממפים כרטיסים', detail: 'כל ערך, פחד, מחיר ואילוץ מקבל כרטיס' },
+            { icon: '⚔️', title: 'מסמנים התנגשויות', detail: 'אילו שני תנאים מושכים לכיוונים מנוגדים?' },
+            { icon: '🩺', title: 'מאבחנים', detail: 'למה זה תקוע + שאלות מטה-מודל + מהלכים' },
+          ]}
+        />
 
         <div className="vcl-start-row">
           <input

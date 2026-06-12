@@ -46,6 +46,14 @@ export function AboutPage() {
         </div>
       </div>
 
+      <div className="about-video">
+        <h3>🎬 סרטון היכרות קצר</h3>
+        {/* served from the static assets folder (copied to dist by prepare-dist) */}
+        <video controls preload="metadata" src="assets/images/INTRO_720p.mp4">
+          הדפדפן שלך לא תומך בניגון וידאו.
+        </video>
+      </div>
+
       <div className="about-source-panel">
         <h3>מקורות וקוד</h3>
         <p>מבוסס על עקרונות Meta Model מתוך NLP של Richard Bandler ו-John Grinder.</p>
@@ -56,7 +64,7 @@ export function AboutPage() {
         <a
           href="https://github.com/streamDragon/Meta_Model_app"
           target="_blank"
-          rel="noreferrer"
+          rel="noreferrer noopener"
         >
           GitHub Repository
         </a>
