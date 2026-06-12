@@ -2,8 +2,6 @@ import { useState } from 'react';
 import rawPack from '../../../packs/values-constraints.json';
 import {
   createTradeoff,
-  createVclCard,
-  createVclSession,
   diagnoseValuesSession,
   generateVclMoves,
   generateVclQuestions,
@@ -37,9 +35,31 @@ function persistSession(session: VclSession): VclSession[] {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
   } catch {
-    // storage unavailable — keep in-memory only
+    // storage unavailable - keep in-memory only
   }
   return sessions;
+}
+
+function freshSessionId(seed: string): string {
+  const suffix =
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : `${Date.now().toString(36)}-${Math.floor(Math.random() * 1e6).toString(36)}`;
+  return `${seed}-${suffix}`;
+}
+
+function cloneStarterSession(example: VclSession): VclSession {
+  const now = new Date().toISOString();
+  const copy: VclSession = JSON.parse(JSON.stringify(example));
+  return {
+    ...copy,
+    sessionId: freshSessionId(example.sessionId),
+    diagnosis: [],
+    questionsGenerated: [],
+    insights: Array.isArray(copy.insights) ? [...copy.insights] : [],
+    createdAt: now,
+    updatedAt: now,
+  };
 }
 
 const typeInfo = (id: string) =>
@@ -49,125 +69,9 @@ const levelInfo = (id: string) =>
 const negotiabilityLabel = (id: string) =>
   data.negotiability_options.find((n) => n.id === id)?.label ?? id;
 
-function CardForm({
-  initial,
-  onSave,
-  onCancel,
-}: {
-  initial: VclCard;
-  onSave: (fields: Partial<VclCard>) => void;
-  onCancel: () => void;
-}) {
-  const [fields, setFields] = useState({ ...initial });
-  const { showHint } = useHint();
-  const set = <K extends keyof VclCard>(key: K, value: VclCard[K]) =>
-    setFields((f) => ({ ...f, [key]: value }));
-
-  return (
-    <div className="vcl-card-form q-card">
-      <h4>{initial.label ? 'עריכת כרטיס' : 'כרטיס חדש: ערך / אילוץ'}</h4>
-      <label htmlFor="vcl-f-label">שם קצר (מה חייב להתקיים?)</label>
-      <input
-        id="vcl-f-label"
-        type="text"
-        value={fields.label}
-        placeholder="לדוגמה: שזה לא יעלה יותר מדי"
-        onChange={(e) => set('label', e.target.value)}
-      />
-      <label htmlFor="vcl-f-type">סוג</label>
-      <select id="vcl-f-type" value={fields.type} onChange={(e) => set('type', e.target.value)}>
-        {data.card_types.map((t) => (
-          <option key={t.id} value={t.id}>
-            {t.icon} {t.label} {t.hint ? `— ${t.hint}` : ''}
-          </option>
-        ))}
-      </select>
-      <label htmlFor="vcl-f-importance">
-        חשיבות (1-10): <span>{fields.importance}</span>
-      </label>
-      <input
-        id="vcl-f-importance"
-        type="range"
-        min={1}
-        max={10}
-        value={fields.importance}
-        onChange={(e) => set('importance', Number(e.target.value))}
-      />
-      <label htmlFor="vcl-f-minimum">מינימום מקובל ("מספיק טוב לעכשיו")</label>
-      <input
-        id="vcl-f-minimum"
-        type="text"
-        value={fields.minimum}
-        placeholder="מה הגרסה הקטנה ביותר שעדיין בסדר?"
-        onChange={(e) => set('minimum', e.target.value)}
-      />
-      <label htmlFor="vcl-f-ideal">אידיאל</label>
-      <input
-        id="vcl-f-ideal"
-        type="text"
-        value={fields.ideal}
-        placeholder="איך זה נראה במיטבו?"
-        onChange={(e) => set('ideal', e.target.value)}
-      />
-      <label htmlFor="vcl-f-negotiability">משא ומתן</label>
-      <select
-        id="vcl-f-negotiability"
-        value={fields.negotiability}
-        onChange={(e) => set('negotiability', e.target.value as VclCard['negotiability'])}
-      >
-        {data.negotiability_options.map((n) => (
-          <option key={n.id} value={n.id}>
-            {n.label}
-          </option>
-        ))}
-      </select>
-      <label htmlFor="vcl-f-level">רמה לוגית (Dilts)</label>
-      <select
-        id="vcl-f-level"
-        value={fields.logicalLevel}
-        onChange={(e) => set('logicalLevel', e.target.value)}
-      >
-        {data.logical_levels.map((l) => (
-          <option key={l.id} value={l.id}>
-            {l.label} {l.hint ? `— ${l.hint}` : ''}
-          </option>
-        ))}
-      </select>
-      <label htmlFor="vcl-f-notes">הערות</label>
-      <input
-        id="vcl-f-notes"
-        type="text"
-        value={fields.notes}
-        placeholder="תנאי סמוי? מי עוד צריך להיות מרוצה?"
-        onChange={(e) => set('notes', e.target.value)}
-      />
-      <div className="step-buttons">
-        <button type="button" className="btn btn-secondary" onClick={onCancel}>
-          ביטול
-        </button>
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={() => {
-            if (!fields.label.trim()) {
-              showHint('תן שם קצר לערך או לאילוץ');
-              return;
-            }
-            onSave(fields);
-          }}
-        >
-          שמור כרטיס
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export function ValuesLabPage() {
   const [session, setSession] = useState<VclSession | null>(null);
   const [saved, setSaved] = useState<VclSession[]>(loadSessions);
-  const [statement, setStatement] = useState('');
-  const [editingCardId, setEditingCardId] = useState<string | null>(null);
   const [wizardIndex, setWizardIndex] = useState(0);
   const [awarded, setAwarded] = useState(false);
   const isMobile = useIsMobile();
@@ -185,66 +89,67 @@ export function ValuesLabPage() {
 
   const openSession = (s: VclSession) => {
     setSession(s);
-    setEditingCardId(null);
     setWizardIndex(0);
     setAwarded(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const startFromStatement = () => {
-    if (!statement.trim()) {
-      showHint('כתוב משפט אחד: "אני רוצה ___ אבל ___"');
-      return;
-    }
-    openSession(createVclSession(statement.trim()));
-    setStatement('');
-  };
-
   const startFromExample = (example: VclSession) => {
-    const copy: VclSession = JSON.parse(JSON.stringify(example));
-    const fresh = createVclSession('');
-    copy.sessionId = fresh.sessionId;
-    copy.createdAt = new Date().toISOString();
-    openSession(copy);
+    openSession(cloneStarterSession(example));
   };
 
   const closeWorkspace = () => {
     if (session) setSaved(persistSession(session));
     setSession(null);
-    setEditingCardId(null);
     setWizardIndex(0);
   };
 
-  const saveCard = (fields: Partial<VclCard>) => {
-    updateSession((s) => {
-      if (editingCardId && editingCardId !== 'new') {
-        return {
-          ...s,
-          constraints: s.constraints.map((c) =>
-            c.id === editingCardId ? { ...c, ...fields, importance: Number(fields.importance) || c.importance } : c,
-          ),
-        };
-      }
-      const next = { ...s, constraints: [...s.constraints, createVclCard(fields)] };
-      setWizardIndex(next.constraints.length - 1);
-      return next;
-    });
-    setEditingCardId(null);
+  const resetDiagnosis = (s: VclSession): VclSession => ({
+    ...s,
+    diagnosis: [],
+    questionsGenerated: [],
+  });
+
+  const updateCard = (cardId: string, fields: Partial<VclCard>) => {
+    updateSession((s) =>
+      resetDiagnosis({
+        ...s,
+        constraints: s.constraints.map((card) =>
+          card.id === cardId ? { ...card, ...fields } : card,
+        ),
+      }),
+    );
   };
 
-  const deleteCard = (id: string) => {
-    updateSession((s) => ({
-      ...s,
-      constraints: s.constraints.filter((c) => c.id !== id),
-      tradeoffs: s.tradeoffs.filter((t) => !(t.between || []).includes(id)),
-    }));
-    setWizardIndex((i) => Math.max(0, i - 1));
+  const addTradeoff = (a: string, b: string) => {
+    if (!session) return;
+    const normalized = [a, b].sort().join('|');
+    const exists = session.tradeoffs.some((tradeoff) => {
+      const [x, y] = tradeoff.between || [];
+      return [x, y].sort().join('|') === normalized;
+    });
+    if (exists) {
+      showHint('ההתנגשות הזו כבר מסומנת');
+      return;
+    }
+    updateSession((s) => resetDiagnosis({ ...s, tradeoffs: [...s.tradeoffs, createTradeoff(a, b)] }));
+  };
+
+  const setTradeoffWinner = (tradeoffId: string, winner: string) => {
+    updateSession((s) =>
+      resetDiagnosis({
+        ...s,
+        tradeoffs: s.tradeoffs.map((tradeoff) =>
+          tradeoff.id === tradeoffId ? { ...tradeoff, winner } : tradeoff,
+        ),
+      }),
+    );
   };
 
   const diagnose = () => {
     if (!session) return;
     if (session.constraints.length === 0) {
-      showHint('הוסף לפחות כרטיס אחד לפני אבחון');
+      showHint('בחר תרחיש מוכן לפני אבחון');
       return;
     }
     updateSession((s) => {
@@ -252,7 +157,10 @@ export function ValuesLabPage() {
       const questionsGenerated = generateVclQuestions(s, data.meta_model_questions);
       const insights =
         diagnosis.length === 0
-          ? [...s.insights, 'המפה מאוזנת: יש היררכיה, יש מינימום מוגדר ואין עומס אילוצים קשיחים.']
+          ? [
+              ...s.insights,
+              'המפה מאוזנת: יש היררכיה, יש מינימום מוגדר ואין עומס אילוצים קשיחים.',
+            ]
           : s.insights;
       return { ...s, diagnosis, questionsGenerated, insights };
     });
@@ -263,61 +171,33 @@ export function ValuesLabPage() {
     }
   };
 
-  const exportSession = () => {
-    if (!session) return;
-    const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `values_lab_${session.sessionId}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  // ---------- start screen ----------
-
   if (!session) {
     return (
-      <div className="card">
+      <div className="card vcl-start-screen">
         <h2>💎 מעבדת ערכים ואילוצים</h2>
         <p>
-          "אני רוצה ___ אבל ___" — המעבדה ממפה מה באמת חייב להתקיים, איפה ההתנגשויות,
-          ומה אפשר לרכך. הכל מבוסס חוקים, ללא AI.
+          בוחרים תרחיש מוכן, עובדים עם כרטיסים שכבר קיימים, ומכוונים רק החלטות קצרות:
+          חשיבות, קשיחות, התנגשות ומנצח. אין כתיבה חופשית ואין קבצי יבוא/ייצוא.
         </p>
         <div className="feature-brief">
           <span>
-            <strong>מטרה:</strong> לגלות את מפת האילוצים הסמויה מאחורי רצון תקוע.
+            <strong>מטרה:</strong> לראות אילו תנאים סמויים תוקעים רצון.
           </span>
           <span>
-            <strong>תוצר:</strong> אבחנה למה זה תקוע + שאלות + מהלכים.
+            <strong>תוצר:</strong> אבחנה, שאלות מטה-מודל ומהלכים שאפשר לבחור מהם.
           </span>
         </div>
 
         <HowItWorks
           steps={[
-            { icon: '✍️', title: 'כותבים משפט', detail: '"אני רוצה ___ אבל ___" — או בוחרים דוגמה' },
-            { icon: '🃏', title: 'ממפים כרטיסים', detail: 'כל ערך, פחד, מחיר ואילוץ מקבל כרטיס' },
-            { icon: '⚔️', title: 'מסמנים התנגשויות', detail: 'אילו שני תנאים מושכים לכיוונים מנוגדים?' },
-            { icon: '🩺', title: 'מאבחנים', detail: 'למה זה תקוע + שאלות מטה-מודל + מהלכים' },
+            { icon: '📌', title: 'בוחרים תרחיש', detail: 'המשפט והכרטיסים כבר מוכנים מראש' },
+            { icon: '🎚️', title: 'מכוונים כרטיסים', detail: 'חשיבות וקשיחות דרך סליידר ותפריט' },
+            { icon: '⚔️', title: 'מסמנים התנגשויות', detail: 'בוחרים שני תנאים מתוך הרשימה' },
+            { icon: '🩺', title: 'מאבחנים', detail: 'המערכת מחזירה אבחנה ושאלות לפי החוקים' },
           ]}
         />
 
-        <div className="vcl-start-row">
-          <input
-            id="vcl-statement"
-            type="text"
-            value={statement}
-            placeholder='אני רוצה ___ אבל ___'
-            aria-label="משפט פתיחה"
-            onChange={(e) => setStatement(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && startFromStatement()}
-          />
-          <button type="button" className="btn btn-primary" onClick={startFromStatement}>
-            🚀 התחל מיפוי
-          </button>
-        </div>
-
-        <h3 className="section-title">📦 דוגמאות מוכנות</h3>
+        <h3 className="section-title">📦 בחר תרחיש מוכן</h3>
         <div className="vcl-example-grid">
           {data.starter_examples.map((example) => (
             <button
@@ -326,21 +206,22 @@ export function ValuesLabPage() {
               className="vcl-example-chip"
               onClick={() => startFromExample(example)}
             >
+              <span className="vcl-example-action">פתח תרחיש</span>
               <strong>{example.title}</strong>
               <small>{example.initialStatement}</small>
             </button>
           ))}
         </div>
 
-        <h3 className="section-title">🗂️ סשנים שמורים</h3>
+        <h3 className="section-title">🗂️ המשך סשן שמור</h3>
         {saved.length === 0 ? (
-          <p className="muted">אין עדיין סשנים שמורים. ההתקדמות נשמרת אוטומטית בכל שינוי.</p>
+          <p className="muted">עדיין אין סשנים שמורים. בחירות נשמרות אוטומטית בזמן העבודה.</p>
         ) : (
           <div className="vcl-saved-list">
             {saved.map((s) => (
               <div className="vcl-saved-row" key={s.sessionId}>
                 <button type="button" className="vcl-saved-open" onClick={() => openSession(s)}>
-                  <strong>{s.title || s.mainDesire || 'ללא כותרת'}</strong>
+                  <strong>{s.title || s.mainDesire || 'סשן מוכן'}</strong>
                   <small>
                     {s.constraints.length} כרטיסים · עודכן{' '}
                     {new Date(s.updatedAt).toLocaleDateString('he-IL')}
@@ -351,9 +232,7 @@ export function ValuesLabPage() {
                   className="vcl-saved-delete"
                   aria-label="מחק סשן"
                   onClick={() => {
-                    const remaining = loadSessions().filter(
-                      (x) => x.sessionId !== s.sessionId,
-                    );
+                    const remaining = loadSessions().filter((x) => x.sessionId !== s.sessionId);
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(remaining));
                     setSaved(remaining);
                   }}
@@ -368,13 +247,7 @@ export function ValuesLabPage() {
     );
   }
 
-  // ---------- workspace ----------
-
   const cards = session.constraints;
-  const editingCard =
-    editingCardId && editingCardId !== 'new'
-      ? cards.find((c) => c.id === editingCardId) ?? createVclCard()
-      : createVclCard();
   const labelOf = (id: string) => cards.find((c) => c.id === id)?.label || id;
   const questions = generateVclQuestions(session, data.meta_model_questions);
   const rulesById = Object.fromEntries(data.diagnosis_rules.map((r) => [r.id, r]));
@@ -383,7 +256,7 @@ export function ValuesLabPage() {
 
   const constraintCard = (card: VclCard) => (
     <div
-      key={card.id}
+      key={`constraint-${card.id}`}
       className={`vcl-constraint-card ${
         card.negotiability === 'fixed'
           ? 'vcl-fixed'
@@ -403,38 +276,38 @@ export function ValuesLabPage() {
         {levelInfo(card.logicalLevel).label} · {negotiabilityLabel(card.negotiability)}
       </small>
       {card.notes && <p className="vcl-card-notes">{card.notes}</p>}
-      <div className="vcl-card-actions">
-        <button type="button" onClick={() => setEditingCardId(card.id)}>
-          ✏️ ערוך
-        </button>
-        <button type="button" onClick={() => deleteCard(card.id)}>
-          🗑️
-        </button>
-      </div>
     </div>
   );
 
   const thresholdCard = (card: VclCard) => (
-    <div className="vcl-threshold-card" key={card.id}>
+    <div className="vcl-threshold-card" key={`threshold-${card.id}`}>
       <strong>{card.label}</strong>
-      <label>
+      <label htmlFor={`vcl-importance-${card.id}`}>
         חשיבות: <span>{card.importance}</span>/10
       </label>
       <input
+        id={`vcl-importance-${card.id}`}
         type="range"
         min={1}
         max={10}
         value={card.importance}
         aria-label={`חשיבות ${card.label}`}
-        onChange={(e) =>
-          updateSession((s) => ({
-            ...s,
-            constraints: s.constraints.map((c) =>
-              c.id === card.id ? { ...c, importance: Number(e.target.value) } : c,
-            ),
-          }))
-        }
+        onChange={(e) => updateCard(card.id, { importance: Number(e.target.value) })}
       />
+      <label htmlFor={`vcl-negotiability-${card.id}`}>כמה זה קשיח?</label>
+      <select
+        id={`vcl-negotiability-${card.id}`}
+        value={card.negotiability}
+        onChange={(e) =>
+          updateCard(card.id, { negotiability: e.target.value as VclCard['negotiability'] })
+        }
+      >
+        {data.negotiability_options.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.label}
+          </option>
+        ))}
+      </select>
       <div className="vcl-threshold-rows">
         <div>
           <span>מינימום מקובל:</span> <em>{card.minimum || 'לא הוגדר'}</em>
@@ -442,15 +315,12 @@ export function ValuesLabPage() {
         <div>
           <span>אידיאל:</span> <em>{card.ideal || 'לא הוגדר'}</em>
         </div>
-        <div>
-          <span>משא ומתן:</span> <em>{negotiabilityLabel(card.negotiability)}</em>
-        </div>
       </div>
     </div>
   );
 
   return (
-    <div className="workbench">
+    <div className="workbench vcl-workbench">
       <div className="workbench-main card">
         <div className="vcl-session-header">
           <div>
@@ -459,29 +329,35 @@ export function ValuesLabPage() {
             <p className="muted">"{session.initialStatement}"</p>
           </div>
           <button type="button" className="btn btn-secondary" onClick={closeWorkspace}>
-            → סשן חדש
+            בחר תרחיש אחר
           </button>
         </div>
 
-        {isMobile && (
-          <div className="vcl-mobile-note">
-            📱 המפה הוויזואלית המלאה של שתי הקומות זמינה בדסקטופ. במובייל ממשיכים עם
-            כרטיס אחד בכל פעם — ההתקדמות נשמרת.
-          </div>
-        )}
+        <div className="vcl-closed-note">
+          {isMobile
+            ? 'במובייל עובדים עם כרטיס אחד בכל פעם: בוחרים כרטיס, מכוונים אותו, ממשיכים הלאה ומאבחנים.'
+            : 'התרחיש סגור מראש. אפשר לכוון את הכרטיסים הקיימים ולסמן יחסים ביניהם, בלי להמציא טקסט חדש.'}
+        </div>
 
-        {editingCardId !== null ? (
-          <CardForm
-            initial={editingCard}
-            onSave={saveCard}
-            onCancel={() => setEditingCardId(null)}
-          />
-        ) : isMobile ? (
+        {isMobile ? (
           <div className="vcl-wizard">
             <div className="blueprint-wizard-progress">
               {cards.length === 0
-                ? 'אין עדיין כרטיסים'
+                ? 'אין כרטיסים בתרחיש'
                 : `כרטיס ${Math.min(wizardIndex, cards.length - 1) + 1} מתוך ${cards.length}`}
+            </div>
+            <div className="vcl-card-strip" role="tablist" aria-label="כרטיסים בתרחיש">
+              {cards.map((card, index) => (
+                <button
+                  key={card.id}
+                  type="button"
+                  className={`vcl-card-pill ${index === wizardIndex ? 'active' : ''}`}
+                  aria-selected={index === wizardIndex}
+                  onClick={() => setWizardIndex(index)}
+                >
+                  {index + 1}. {card.label}
+                </button>
+              ))}
             </div>
             <div className="vcl-wizard-guide">
               💭{' '}
@@ -515,35 +391,22 @@ export function ValuesLabPage() {
                 </div>
               </>
             ) : (
-              <p className="muted">התחל בהוספת הערך או האילוץ הראשון.</p>
+              <p className="muted">התרחיש הזה ריק. בחר תרחיש אחר ממסך הפתיחה.</p>
             )}
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => setEditingCardId('new')}
-            >
-              ＋ הוסף ערך / אילוץ
-            </button>
           </div>
         ) : (
           <div className="vcl-building">
             <div className="vcl-floor vcl-floor-top">
               <div className="vcl-floor-label">
                 <strong>קומה 2 · מידה, סף ופשרה</strong>
-                <small>כמה מזה אתה באמת חייב?</small>
+                <small>כמה מזה באמת חייב להתקיים, ומה אפשר לרכך?</small>
               </div>
               <div className="vcl-floor-questions">
                 {data.floor2_questions.slice(0, 4).map((q) => (
                   <span key={q}>{q}</span>
                 ))}
               </div>
-              <div className="vcl-threshold-grid">
-                {cards.length === 0 ? (
-                  <p className="muted">הוסף כרטיסים בקומה 1 כדי לכוון ספים.</p>
-                ) : (
-                  cards.map(thresholdCard)
-                )}
-              </div>
+              <div className="vcl-threshold-grid">{cards.map(thresholdCard)}</div>
             </div>
             <div className="vcl-floor vcl-floor-bottom">
               <div className="vcl-floor-label">
@@ -555,81 +418,43 @@ export function ValuesLabPage() {
                   <span key={q}>{q}</span>
                 ))}
               </div>
-              <div className="vcl-card-grid">
-                {cards.map(constraintCard)}
-                <button
-                  type="button"
-                  className="vcl-add-card-tile"
-                  onClick={() => setEditingCardId('new')}
-                >
-                  ＋ הוסף ערך / אילוץ
-                </button>
-              </div>
+              <div className="vcl-card-grid">{cards.map(constraintCard)}</div>
             </div>
           </div>
         )}
 
         <div className="vcl-tradeoffs-section">
-          <h4>⚔️ מפת התנגשויות (Conflict Map)</h4>
+          <h4>⚔️ מפת התנגשויות</h4>
           <p className="muted">
-            סמן אילו שני תנאים מושכים לכיוונים מנוגדים, והכרע מי מנצח בשלב הזה.
+            בוחרים שני תנאים מתוך הכרטיסים המוכנים, ואז מסמנים מי מוביל כרגע.
           </p>
           {session.tradeoffs.length === 0 ? (
             <p className="muted">אין עדיין התנגשויות מסומנות.</p>
           ) : (
-            session.tradeoffs.map((t) => (
-              <div className="vcl-tradeoff-row" key={t.id}>
+            session.tradeoffs.map((tradeoff) => (
+              <div className="vcl-tradeoff-row" key={tradeoff.id}>
                 <span className="vcl-tradeoff-pair">
-                  {labelOf(t.between?.[0])} ⟷ {labelOf(t.between?.[1])}
+                  {labelOf(tradeoff.between?.[0])} ⟷ {labelOf(tradeoff.between?.[1])}
                 </span>
                 <span className="vcl-tradeoff-winner">
-                  {t.winner ? `🏆 מנצח: ${labelOf(t.winner)}` : '⚠️ לא הוכרע'}
+                  {tradeoff.winner ? `מוביל כרגע: ${labelOf(tradeoff.winner)}` : 'עדיין לא הוכרע'}
                 </span>
                 <select
                   aria-label="בחירת מנצח"
-                  value={t.winner}
-                  onChange={(e) =>
-                    updateSession((s) => ({
-                      ...s,
-                      tradeoffs: s.tradeoffs.map((x) =>
-                        x.id === t.id ? { ...x, winner: e.target.value } : x,
-                      ),
-                    }))
-                  }
+                  value={tradeoff.winner}
+                  onChange={(e) => setTradeoffWinner(tradeoff.id, e.target.value)}
                 >
-                  <option value="">מי מנצח?</option>
-                  {(t.between || []).map((id) => (
+                  <option value="">מי מוביל?</option>
+                  {(tradeoff.between || []).map((id) => (
                     <option key={id} value={id}>
                       {labelOf(id)}
                     </option>
                   ))}
                 </select>
-                <button
-                  type="button"
-                  className="vcl-tradeoff-delete"
-                  aria-label="מחק התנגשות"
-                  onClick={() =>
-                    updateSession((s) => ({
-                      ...s,
-                      tradeoffs: s.tradeoffs.filter((x) => x.id !== t.id),
-                    }))
-                  }
-                >
-                  ✕
-                </button>
               </div>
             ))
           )}
-          {cards.length >= 2 ? (
-            <TradeoffForm
-              cards={cards}
-              onAdd={(a, b) =>
-                updateSession((s) => ({ ...s, tradeoffs: [...s.tradeoffs, createTradeoff(a, b)] }))
-              }
-            />
-          ) : (
-            <p className="muted">צריך לפחות שני כרטיסים כדי לסמן התנגשות.</p>
-          )}
+          {cards.length >= 2 && <TradeoffForm cards={cards} onAdd={addTradeoff} />}
         </div>
 
         <div className="vcl-diagnose-bar">
@@ -664,7 +489,7 @@ export function ValuesLabPage() {
             })}
             {session.questionsGenerated.length > 0 && (
               <div className="vcl-generated-questions">
-                <h4>❓ שאלות מטה מודל לעבודה</h4>
+                <h4>❓ שאלות מטה-מודל לעבודה</h4>
                 <ul>
                   {session.questionsGenerated.map((q) => (
                     <li key={q}>{q}</li>
@@ -689,27 +514,24 @@ export function ValuesLabPage() {
         )}
 
         <div className="action-buttons">
-          <button type="button" className="btn btn-secondary" onClick={exportSession}>
-            📥 ייצא JSON
-          </button>
           <button
             type="button"
             className="btn btn-secondary"
             onClick={() => {
               updateSession((s) => s);
-              showHint('💾 הסשן נשמר. אפשר לחזור אליו ממסך הפתיחה.');
+              showHint('הסשן נשמר. אפשר לחזור אליו ממסך הפתיחה.');
             }}
           >
-            💾 שמור סשן
+            שמור סשן
           </button>
         </div>
       </div>
 
       <aside className="workbench-side">
         <div className="side-card">
-          <h4>❓ שאלות מטה מודל</h4>
+          <h4>❓ שאלות מטה-מודל</h4>
           {questions.length === 0 ? (
-            <p className="muted">הוסף כרטיסים כדי לקבל שאלות מותאמות.</p>
+            <p className="muted">בחר תרחיש כדי לקבל שאלות מותאמות.</p>
           ) : (
             <ul className="meta-list">
               {questions.map((q) => (
@@ -719,7 +541,7 @@ export function ValuesLabPage() {
           )}
         </div>
         <div className="side-card">
-          <h4>🗼 מיפוי רמות לוגיות (Dilts)</h4>
+          <h4>🗼 מיפוי רמות לוגיות</h4>
           <div className="vcl-dilts-ladder">
             {[...data.logical_levels].reverse().map((level) => {
               const atLevel = cards.filter((c) => c.logicalLevel === level.id);
@@ -729,9 +551,7 @@ export function ValuesLabPage() {
                   key={level.id}
                 >
                   <strong>{level.label}</strong>
-                  <span>
-                    {atLevel.length ? atLevel.map((c) => c.label).join(' · ') : '—'}
-                  </span>
+                  <span>{atLevel.length ? atLevel.map((c) => c.label).join(' · ') : '—'}</span>
                 </div>
               );
             })}
@@ -766,18 +586,18 @@ function TradeoffForm({
     <div className="vcl-tradeoff-form">
       <select aria-label="תנאי ראשון" value={a} onChange={(e) => setA(e.target.value)}>
         <option value="">תנאי ראשון...</option>
-        {cards.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.label}
+        {cards.map((card) => (
+          <option key={card.id} value={card.id}>
+            {card.label}
           </option>
         ))}
       </select>
       <span>⟷</span>
       <select aria-label="תנאי שני" value={b} onChange={(e) => setB(e.target.value)}>
         <option value="">תנאי שני...</option>
-        {cards.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.label}
+        {cards.map((card) => (
+          <option key={card.id} value={card.id}>
+            {card.label}
           </option>
         ))}
       </select>

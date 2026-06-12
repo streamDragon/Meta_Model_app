@@ -32,7 +32,7 @@ input[type='text']:focus {
 
 .vcl-example-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: var(--sp-3);
 }
 
@@ -46,7 +46,8 @@ input[type='text']:focus {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  min-height: 132px;
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
 
@@ -58,6 +59,16 @@ input[type='text']:focus {
 .vcl-example-chip small {
   color: var(--ink-soft);
   font-size: var(--fs-xs);
+}
+
+.vcl-example-action {
+  align-self: flex-start;
+  background: var(--primary-soft);
+  border-radius: 99px;
+  color: var(--primary-deep);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  padding: 3px 10px;
 }
 
 .vcl-saved-list {
@@ -115,6 +126,15 @@ input[type='text']:focus {
   margin-bottom: var(--sp-4);
 }
 
+.vcl-workbench > *,
+.vcl-workbench .workbench-main {
+  min-width: 0;
+}
+
+.vcl-session-header > div {
+  min-width: 0;
+}
+
 .vcl-session-header small {
   color: var(--ink-soft);
   font-size: var(--fs-xs);
@@ -122,6 +142,15 @@ input[type='text']:focus {
 
 .vcl-session-header h3 {
   font-size: var(--fs-xl);
+  overflow-wrap: anywhere;
+}
+
+.vcl-session-header p,
+.vcl-closed-note,
+.vcl-wizard-guide,
+.vcl-constraint-card,
+.vcl-threshold-card {
+  overflow-wrap: anywhere;
 }
 
 .vcl-mobile-note {
@@ -131,6 +160,48 @@ input[type='text']:focus {
   padding: 10px 14px;
   font-size: var(--fs-sm);
   margin-bottom: var(--sp-4);
+}
+
+.vcl-closed-note {
+  background: var(--accent-soft);
+  border: 1px solid #b8e8e2;
+  border-radius: var(--r-sm);
+  color: #075f59;
+  font-size: var(--fs-sm);
+  margin-bottom: var(--sp-4);
+  padding: 10px 14px;
+}
+
+.vcl-card-strip {
+  display: flex;
+  gap: var(--sp-2);
+  overflow-x: auto;
+  padding: 2px 2px 8px;
+  scrollbar-width: thin;
+}
+
+.vcl-card-pill {
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  border-radius: 99px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  flex: 0 0 auto;
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  min-height: 42px;
+  max-width: min(78vw, 320px);
+  overflow: hidden;
+  padding: 8px 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vcl-card-pill.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 700;
 }
 
 /* two-floor building */
@@ -294,6 +365,10 @@ input[type='text']:focus {
 
 .vcl-threshold-card input[type='range'] {
   width: 100%;
+}
+
+.vcl-threshold-card select {
+  margin: 2px 0 var(--sp-2);
 }
 
 .vcl-threshold-rows {
@@ -493,12 +568,61 @@ input[type='text']:focus {
     flex-direction: column;
   }
 
+  .vcl-example-grid,
+  .vcl-card-grid,
+  .vcl-threshold-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vcl-example-chip {
+    min-height: 120px;
+  }
+
   .vcl-session-header {
     flex-direction: column;
+  }
+
+  .vcl-floor,
+  .vcl-tradeoffs-section,
+  .vcl-diagnosis-result {
+    padding: var(--sp-3);
+  }
+
+  .vcl-floor-questions {
+    display: none;
+  }
+
+  .vcl-tradeoff-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--sp-2);
   }
 
   .vcl-tradeoff-row select {
     max-width: none;
     width: 100%;
+  }
+
+  .vcl-tradeoff-form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .vcl-tradeoff-form > span {
+    align-self: center;
+  }
+
+  .vcl-tradeoff-form select {
+    width: 100%;
+  }
+
+  .vcl-diagnose-bar .btn,
+  .action-buttons .btn {
+    width: 100%;
+  }
+
+  .blueprint-wizard-actions .btn {
+    flex: 1;
+    min-height: 46px;
   }
 }

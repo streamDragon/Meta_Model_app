@@ -20,6 +20,22 @@ function storedProgress() {
   return JSON.parse(window.localStorage.getItem('userProgress') ?? '{}');
 }
 
+function setMobileViewport(matches: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+}
+
 describe('Blueprint flow', () => {
   it('completes all four steps and awards +20 XP exactly once', () => {
     window.location.hash = 'blueprint';
@@ -79,25 +95,17 @@ describe('Prism Lab flow', () => {
 });
 
 describe('Values Lab flow', () => {
-  it('starts a session, adds a card, diagnoses, and awards +15 XP', () => {
+  it('starts from a prepared scenario without typing, card authoring, or JSON export', () => {
     window.location.hash = 'valueslab';
     render(<App />);
     const section = document.getElementById('valueslab')!;
 
-    fireEvent.change(within(section).getByLabelText('משפט פתיחה'), {
-      target: { value: 'אני רוצה לנוח אבל יש לי דדליין' },
-    });
-    fireEvent.click(within(section).getByText('🚀 התחל מיפוי'));
-    expect(within(section).getByRole('heading', { level: 3 }).textContent).toContain('לנוח');
+    expect(within(section).queryByLabelText('משפט פתיחה')).toBeNull();
 
-    // add a card via the form (jsdom has no matchMedia -> desktop two floors)
-    fireEvent.click(within(section).getByText('＋ הוסף ערך / אילוץ'));
-    fireEvent.change(within(section).getByLabelText(/שם קצר/), {
-      target: { value: 'שינה טובה' },
-    });
-    fireEvent.click(within(section).getByText('שמור כרטיס'));
-    // the card shows up in the constraint grid, threshold floor and Dilts ladder
-    expect(within(section).getAllByText('שינה טובה').length).toBeGreaterThanOrEqual(2);
+    fireEvent.click(within(section).getByRole('button', { name: /אוכל/ }));
+    expect(within(section).getByRole('heading', { level: 3 }).textContent).toContain('לאכול');
+    expect(within(section).queryByText('＋ הוסף ערך / אילוץ')).toBeNull();
+    expect(within(section).queryByText(/ייצא JSON/)).toBeNull();
 
     fireEvent.click(within(section).getByText('🩺 אבחן: למה זה תקוע?'));
     expect(storedProgress().xp).toBe(15);
@@ -106,19 +114,22 @@ describe('Values Lab flow', () => {
     // session auto-saved under the legacy key
     const saved = JSON.parse(window.localStorage.getItem('vcl_sessions') ?? '[]');
     expect(saved).toHaveLength(1);
-    expect(saved[0].constraints).toHaveLength(1);
+    expect(saved[0].constraints.length).toBeGreaterThan(1);
   });
 
-  it('blocks diagnosis with no cards via toast', () => {
+  it('uses a closed mobile card stack with no free-form add or edit actions', () => {
+    setMobileViewport(true);
     window.location.hash = 'valueslab';
     render(<App />);
     const section = document.getElementById('valueslab')!;
-    fireEvent.change(within(section).getByLabelText('משפט פתיחה'), {
-      target: { value: 'אני רוצה שקט אבל רועש' },
-    });
-    fireEvent.click(within(section).getByText('🚀 התחל מיפוי'));
-    fireEvent.click(within(section).getByText('🩺 אבחן: למה זה תקוע?'));
-    expect(screen.getByRole('status').textContent).toContain('הוסף לפחות כרטיס אחד');
+
+    fireEvent.click(within(section).getByRole('button', { name: /להשתנות בלי לאבד את עצמי/ }));
+
+    expect(within(section).getByText(/כרטיס 1 מתוך/)).toBeTruthy();
+    expect(within(section).getByText('הבא')).toBeTruthy();
+    expect(within(section).queryByText('＋ הוסף ערך / אילוץ')).toBeNull();
+    expect(within(section).queryByText(/ערוך/)).toBeNull();
+    expect(within(section).queryByLabelText('מחק התנגשות')).toBeNull();
   });
 });
 

@@ -257,6 +257,10 @@ body {
   width: 100%;
 }
 
+.workspace-wrap {
+  min-width: 0;
+}
+
 /* mobile-only chrome */
 .mobile-topbar {
   display: none;
