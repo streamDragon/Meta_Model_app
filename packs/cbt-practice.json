@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "id": "cbt-practice-he",
+  "name": "CBT + Meta Model Practice",
+  "locale": "he",
+  "source": "Author-created starter practice pack for Meta Model Gym",
+  "sourceValidation": "placeholder",
+  "practiceItems": [
+    {
+      "id": "cbt-001",
+      "statementHe": "הם לא ענו לי, בטח לא רוצים אותי.",
+      "cbtPatterns": ["mind_reading", "fortune_telling"],
+      "metaModelPatterns": ["mind_reading", "missing_referential_index"],
+      "metaModelFamily": "distortion",
+      "suggestedMoveTypes": ["missing_information_question", "reality_check", "behavioral_experiment"],
+      "betterQuestionHe": "מי בדיוק לא ענה, ולפי מה אני יודע מה זה אומר?",
+      "experimentHe": "לבדוק עם אדם בטוח אחד או לחכות שעה לפני הסקת מסקנה."
+    },
+    {
+      "id": "cbt-002",
+      "statementHe": "אני תמיד הורס הכל.",
+      "cbtPatterns": ["overgeneralization", "labeling"],
+      "metaModelPatterns": ["universal_quantifier", "identity_compression"],
+      "metaModelFamily": "generalization",
+      "suggestedMoveTypes": ["reality_check", "context_reframe"],
+      "betterQuestionHe": "תמיד? מה בדיוק קרה הפעם, ומה דוגמה אחת שלא מתאימה לכלל?",
+      "experimentHe": "לכתוב שלוש עובדות על האירוע בלי להפוך אותן לזהות."
+    },
+    {
+      "id": "cbt-003",
+      "statementHe": "אם אגיד לא, יכעסו עליי.",
+      "cbtPatterns": ["fortune_telling", "catastrophizing"],
+      "metaModelPatterns": ["cause_effect", "missing_referential_index"],
+      "metaModelFamily": "distortion",
+      "suggestedMoveTypes": ["behavioral_experiment", "ecology_check"],
+      "betterQuestionHe": "מי יכעס, איך אני יודע, ומה עוד יכול לקרות?",
+      "experimentHe": "פעם אחת לומר: אני צריך לבדוק ואחזור אליך."
+    },
+    {
+      "id": "cbt-004",
+      "statementHe": "אני חייב לעשות מה שכולם אומרים.",
+      "cbtPatterns": ["should_must", "approval_belief"],
+      "metaModelPatterns": ["modal_operator", "universal_quantifier", "missing_referential_index"],
+      "metaModelFamily": "generalization",
+      "suggestedMoveTypes": ["values_clarification", "missing_information_question", "behavioral_experiment"],
+      "betterQuestionHe": "מי זה כולם, מה בדיוק הם אומרים, ומה יקרה אם לא אענה מיד?",
+      "experimentHe": "לדחות תשובה אחת ולבדוק מה באמת קורה."
+    },
+    {
+      "id": "cbt-005",
+      "statementHe": "אם אני מרגיש פחד, סימן שיש סכנה.",
+      "cbtPatterns": ["emotional_reasoning"],
+      "metaModelPatterns": ["complex_equivalence"],
+      "metaModelFamily": "distortion",
+      "suggestedMoveTypes": ["reality_check", "meaning_reframe"],
+      "betterQuestionHe": "מה ההבדל בין פחד כאות לבין פחד כהוכחה?",
+      "experimentHe": "לזהות שלוש ראיות חיצוניות לפני החלטה."
+    },
+    {
+      "id": "cbt-006",
+      "statementHe": "אני רוצה להשתנות אבל לא רוצה לאבד את עצמי.",
+      "cbtPatterns": ["fixed_identity"],
+      "metaModelPatterns": ["identity_compression", "parts_ecology"],
+      "metaModelFamily": "distortion",
+      "suggestedMoveTypes": ["ecology_check", "behavioral_experiment"],
+      "betterQuestionHe": "איזה חלק בזהות חשוב לשמור, ואיזו התנהגות קטנה אפשר לבדוק בלי לאבד אותו?",
+      "experimentHe": "לבחור שינוי התנהגותי של 10% ולבדוק אם הזהות נשארת מוגנת."
+    },
+    {
+      "id": "cbt-007",
+      "statementHe": "אין לי כוח אז אין טעם להתחיל.",
+      "cbtPatterns": ["low_mood_loop", "all_or_nothing"],
+      "metaModelPatterns": ["cause_effect", "deletion_of_tiny_steps"],
+      "metaModelFamily": "distortion",
+      "suggestedMoveTypes": ["action_step", "behavioral_experiment"],
+      "betterQuestionHe": "מה הגרסה של חמש דקות שלא דורשת כוח מלא?",
+      "experimentHe": "לפתוח את הקובץ לחמש דקות בלבד."
+    },
+    {
+      "id": "cbt-008",
+      "statementHe": "כולם יראו שאני לא מבין.",
+      "cbtPatterns": ["mind_reading", "fortune_telling"],
+      "metaModelPatterns": ["universal_quantifier", "mind_reading"],
+      "metaModelFamily": "distortion",
+      "suggestedMoveTypes": ["missing_information_question", "behavioral_experiment"],
+      "betterQuestionHe": "מי בדיוק יראה, ומה תהיה ראיה לכך?",
+      "experimentHe": "לשאול שאלה קטנה אחת ולצפות בתגובה בפועל."
+    },
+    {
+      "id": "cbt-009",
+      "statementHe": "אם זה לא מושלם, זה כישלון.",
+      "cbtPatterns": ["all_or_nothing"],
+      "metaModelPatterns": ["complex_equivalence", "lost_performative"],
+      "metaModelFamily": "generalization",
+      "suggestedMoveTypes": ["reality_check", "behavioral_experiment"],
+      "betterQuestionHe": "לפי איזה תקן, ומה הסף של מספיק טוב?",
+      "experimentHe": "להגיש גרסת 80% לאדם בטוח אחד ולבקש משוב ספציפי."
+    },
+    {
+      "id": "cbt-010",
+      "statementHe": "אני כזה. זה האופי שלי.",
+      "cbtPatterns": ["labeling", "fixed_identity"],
+      "metaModelPatterns": ["nominalization", "identity_compression"],
+      "metaModelFamily": "distortion",
+      "suggestedMoveTypes": ["context_reframe", "behavioral_experiment"],
+      "betterQuestionHe": "איזו התנהגות ספציפית מתוארת כאן, ומתי זה לא נכון?",
+      "experimentHe": "לחפש יוצא דופן אחד השבוע ולתעד מה איפשר אותו."
+    }
+  ]
+}

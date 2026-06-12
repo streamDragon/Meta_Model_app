@@ -4,6 +4,7 @@ import {
   applyXP,
   emptyProgress,
   normalizeProgress,
+  XP_REWARDS,
   updateStreak,
 } from './progress';
 
@@ -29,6 +30,16 @@ describe('applyXP', () => {
     const { progress } = applyXP(emptyProgress(), 95, DAY1);
     const { newBadges } = applyXP(progress, 10, DAY1);
     expect(newBadges.map((b) => b.id)).toContain('xp_100');
+  });
+
+  it('defines CBT XP rewards and badges without changing old progress fields', () => {
+    expect(XP_REWARDS.thoughtMapComplete).toBeGreaterThan(0);
+    expect(XP_REWARDS.cbtDrillCorrect).toBeGreaterThan(0);
+
+    const { progress, newBadges } = applyXP(emptyProgress(), XP_REWARDS.thoughtMapComplete, DAY1);
+    expect(progress.xp).toBe(XP_REWARDS.thoughtMapComplete);
+    expect(progress.sessions).toBe(0);
+    expect(newBadges.map((b) => b.id)).toContain('first_thought_map');
   });
 });
 

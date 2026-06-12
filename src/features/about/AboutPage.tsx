@@ -4,10 +4,10 @@ export function AboutPage() {
       <div className="about-hero">
         <span className="about-mark">🧠</span>
         <div>
-          <h2>על Meta Model App</h2>
+          <h2>על Meta Model Gym</h2>
           <p>
-            כלי תרגול קצר, מובנה וללא AI שמלמד לזהות מחיקה, עיוות והכללה דרך בחירות
-            מוכנות ומשוב מיידי.
+            כלי אימון מובנה וללא AI שמלמד לזהות מחיקה, עיוות והכללה, וגם לפתוח
+            מחשבות, אמונות, ניבויים וצעדים קטנים דרך CBT ומטה-מודל.
           </p>
         </div>
       </div>
@@ -15,51 +15,55 @@ export function AboutPage() {
       <div className="about-card-grid">
         <article className="about-card">
           <strong>מה לומדים</strong>
-          <p>להפוך משפט עמום לשאלה מדויקת שמחזירה מידע חסר.</p>
+          <p>להפוך משפט עמום למפה: מה נאמר, מה חסר, מה הוכלל, ומה אפשר לבדוק בעדינות בשטח.</p>
         </article>
         <article className="about-card">
           <strong>איך עובדים</strong>
-          <p>בוחרים קטגוריה, עונים על תרגול, בונים Blueprint או ממפים פריזמה.</p>
+          <p>בוחרים מעבדה, פותחים משפט, מזהים דפוס, שואלים שאלה טובה ובונים פעולה או ניסוי קטן.</p>
         </article>
         <article className="about-card">
           <strong>מה מיוחד</strong>
-          <p>התוכן מגיע מחבילות JSON ניידות, בלי ניתוח חופשי ובלי API חיצוני.</p>
+          <p>התוכן מגיע מחבילות JSON/TS ניידות, בלי ניתוח חופשי ובלי API חיצוני.</p>
         </article>
       </div>
 
       <div className="about-flow">
         <div>
           <span>1</span>
-          <strong>לומדים קטגוריה</strong>
+          <strong>מקשיבים למשפט</strong>
         </div>
         <div>
           <span>2</span>
-          <strong>מתרגלים זיהוי</strong>
+          <strong>פותחים מפה</strong>
         </div>
         <div>
           <span>3</span>
-          <strong>מנסחים שאלה</strong>
+          <strong>שואלים טוב יותר</strong>
         </div>
         <div>
           <span>4</span>
-          <strong>בונים פעולה</strong>
+          <strong>בודקים בשטח</strong>
         </div>
       </div>
 
       <div className="about-video">
         <h3>🎬 סרטון היכרות קצר</h3>
-        {/* served from the static assets folder (copied to dist by prepare-dist) */}
         <video controls preload="metadata" src="assets/images/INTRO_720p.mp4">
           הדפדפן שלך לא תומך בניגון וידאו.
         </video>
       </div>
 
       <div className="about-source-panel">
-        <h3>מקורות וקוד</h3>
-        <p>מבוסס על עקרונות Meta Model מתוך NLP של Richard Bandler ו-John Grinder.</p>
+        <h3>מקורות, גבולות וקוד</h3>
         <p>
-          זהו כלי אימון ורפלקציה עצמית — לא כלי אבחון קליני ולא תחליף לטיפול או לסיוע
-          במצבי חירום.
+          האפליקציה משלבת עקרונות Meta Model מתוך NLP עם תרגול CBT חינוכי:
+          מחשבה כמפה, בדיקת ראיות, הרחבת מסגרת, ניסוי מציאות ופעולה קטנה.
+        </p>
+        <p>
+          זהו כלי אימון ורפלקציה עצמית - לא כלי אבחון קליני, לא תחליף לטיפול ולא
+          שירות חירום. במצוקה חריפה, סכנת פגיעה עצמית, טראומה פעילה, התמכרות
+          פעילה, פסיכוזה, OCD מורכב או חרדה מציפה - יש לפנות לאיש מקצוע או לעזרה
+          דחופה.
         </p>
         <a
           href="https://github.com/streamDragon/Meta_Model_app"

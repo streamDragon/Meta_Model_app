@@ -325,3 +325,67 @@ heuristic + session save/export (localStorage `prism_sessions`) · progress stor
 "no AI / content packs" product stance. **Flagged for owner decision (not silently
 deleted):** legacy free-practice code (dead), opening music, splash screen, custom
 back/forward bar, alert-based 10-minute timer.
+
+---
+
+## 11. CBT/NLP expansion audit (2026-06-12)
+
+### 11.1 Data model
+
+The app already has a registry-first React structure and a pure progress module, so the
+CBT/NLP work should be added as a feature module instead of changing global state shape.
+The expansion needs its own typed sessions for thought maps, belief lenses, reality
+experiments, activation actions, lessons, and practice items.
+
+### 11.2 Content packs
+
+Existing production learning content is pack-based. CBT content should follow the same
+pattern with local JSON packs and explicit `sourceValidation: "placeholder"` until a
+human source review upgrades the material. No clinical or source authority should be
+implied by the copy.
+
+### 11.3 Route registry
+
+The app uses hash routes from `src/registry.ts`. The CBT lab belongs in the registry as
+`beliefs-reality-lab`, with `status: "beta"`, `desktopSupport: "full"`, and
+`mobileSupport: "partial"` because mobile should support short guided work, not force the
+entire desktop workspace into one narrow screen.
+
+### 11.4 Progress and localStorage
+
+Legacy progress uses `userProgress` and must not be reset. CBT-specific saved work should
+use separate keys for sessions, lesson progress, and practice progress, while XP rewards
+can reuse the existing progress API.
+
+### 11.5 Mobile support and fallback patterns
+
+`MobileFallback` currently only appears for `mobileSupport: "none"`, so partial-support
+features still need responsive UI. The CBT thought-map flow should use a one-card-at-a-time
+mobile wizard; lessons, practice drills, activation, and simple experiments can remain
+single-column responsive panels.
+
+### 11.6 Safety and product boundary
+
+The app is an educational training and self-reflection tool. CBT copy must avoid diagnosis,
+treatment claims, or crisis handling promises. High-risk exposure ideas and crisis language
+need a guardrail message and should not produce a behavioral experiment.
+
+### 11.7 Test and build scripts
+
+Available package scripts are `npm run test`, `npm run test:all`, `npm run build`, and
+`npm run validate:michael-hall`. There is no lint script in `package.json`; verification
+must use the available Vitest and production build scripts.
+
+### 11.8 Implementation plan
+
+Add `src/types/cbt.ts`, CBT content packs, a pure `cbtEngine`, `cbtSafety`, and
+`cbtStorage`; then build `src/features/cbt` around small reusable views: Thought Map,
+Thought Record, Belief Lens, Reality Experiment, Activation Builder, Lesson Cards, and
+Practice Drills. Wire the feature into the registry, home page, About copy, progress
+rewards, and tests. Keep mobile one-card-at-a-time for the Thought Map.
+
+### 11.9 Build and test risks
+
+The main risk is accidentally coupling the new beta lab to unrelated trainer changes in
+the dirty working tree. Stage CBT files explicitly and avoid `git add .`. The other risk is
+claiming source validation for CBT/NLP material that is still placeholder content.

@@ -49,4 +49,14 @@ describe('feature registry', () => {
     expect(dailyGym?.sourceValidation).toBe('placeholder');
     expect(dailyGym?.mobileSupport).toBe('full');
   });
+
+  it('registers the Beliefs & Reality Lab as a beta CBT + Meta Model feature', () => {
+    const lab = FEATURES.find((f) => f.id === 'beliefs-reality-lab');
+    expect(lab?.route).toBe('#beliefs-reality-lab');
+    expect(lab?.status).toBe('beta');
+    expect(lab?.desktopSupport).toBe('full');
+    expect(lab?.mobileSupport).toBe('partial');
+    expect(lab?.dataSource).toContain('packs/cbt-core.json');
+    expect(lab?.dataSource).toContain('packs/cbt-practice.json');
+  });
 });

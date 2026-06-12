@@ -4,6 +4,7 @@ import App from './App';
 import './styles/app.css';
 import './styles/visuals.css';
 import './styles/valueslab.css';
+import './styles/cbt.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

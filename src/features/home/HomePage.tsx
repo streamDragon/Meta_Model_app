@@ -21,6 +21,7 @@ const LAB_IDS = [
   'blueprint',
   'prismlab',
   'valueslab',
+  'beliefs-reality-lab',
   'legacy-tools',
 ];
 

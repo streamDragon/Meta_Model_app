@@ -5,6 +5,7 @@ import { TrainerPage } from './features/trainer/TrainerPage';
 import { BlueprintPage } from './features/blueprint/BlueprintPage';
 import { PrismLabPage } from './features/prismlab/PrismLabPage';
 import { ValuesLabPage } from './features/valueslab/ValuesLabPage';
+import { BeliefsRealityLab } from './features/cbt/BeliefsRealityLab';
 import { AboutPage } from './features/about/AboutPage';
 import { MichaelHallDailyGym } from './components/MichaelHallDailyGym';
 import { LegacyToolsPage } from './features/legacy/LegacyToolsPage';
@@ -20,6 +21,7 @@ export type TheoryFamily =
   | 'anchors-habits'
   | 'sensory'
   | 'values-criteria'
+  | 'cbt-beliefs'
   | 'dashboard';
 
 export interface FeatureDef {
@@ -180,6 +182,31 @@ export const FEATURES: FeatureDef[] = [
     mobileFallback: {
       why: 'מפת שתי הקומות המלאה צריכה מסך רחב; בנייד עובדים במצב אשף — כרטיס אחד בכל פעם.',
       stillCanDo: 'להוסיף ולערוך כרטיסים באשף, להריץ אבחון ולסקור סשנים שמורים.',
+    },
+  },
+  {
+    id: 'beliefs-reality-lab',
+    title: 'מעבדת אמונות ומציאות',
+    shortDescription:
+      'קח משפט שתפס אותך, פתח אותו למפה, ובנה ניסוי קטן במקום להילחם במחשבה.',
+    theoryFamily: 'cbt-beliefs',
+    skillTrained: 'זיהוי מחשבות, הרחבת מפות, בדיקת ניבויים וחקירת אמונות',
+    difficulty: 2,
+    desktopSupport: 'full',
+    mobileSupport: 'partial',
+    dataSource: 'packs/cbt-core.json + packs/cbt-practice.json',
+    route: '#beliefs-reality-lab',
+    component: BeliefsRealityLab,
+    status: 'beta',
+    sourceValidation: 'placeholder',
+    navLabel: 'אמונות ומציאות',
+    icon: 'CBT',
+    inBottomNav: false,
+    mobileFallback: {
+      why:
+        'המעבדה המלאה זמינה במחשב כי היא צריכה מרחב עבודה רחב: מפה, שאלות, ניסוי והיסטוריה באותו מסך. בנייד אפשר להמשיך עם שאלות קצרות, תרגול יומי ושמירת תובנות.',
+      stillCanDo:
+        'להמשיך בתרגול קצר, לפתוח יומן מחשבה מקוצר או לשמור משפט לבדיקה מאוחרת במחשב.',
     },
   },
   {
