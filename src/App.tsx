@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { FEATURES, isValidFeatureId } from './registry';
 import { MobileFallback } from './components/MobileFallback';
+import { WhyItMatters } from './components/WhyItMatters';
 import { useIsMobile } from './lib/useIsMobile';
 import { HintProvider, useHint } from './store/hint';
 import { ProgressProvider, useProgress } from './store/useProgress';
@@ -204,6 +205,8 @@ function AppShell() {
             );
           })}
         </main>
+
+        <WhyItMatters featureId={activeTab} />
 
         <nav className="bottom-nav" aria-label="ניווט מהיר במובייל">
           {FEATURES.filter((f) => f.inBottomNav).map((f) => (
