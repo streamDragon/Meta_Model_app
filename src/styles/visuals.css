@@ -679,3 +679,264 @@
     animation: none;
   }
 }
+
+/* ============================================================
+   HOME v2 — big-picture-first layout
+   positioning hero eyebrow · "why it's worth it" band ·
+   big-idea pillars (pacing&leading featured) · easy doors
+   ============================================================ */
+
+.hero-eyebrow {
+  display: inline-block;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 99px;
+  padding: 4px 12px;
+  margin-bottom: var(--sp-2);
+}
+
+/* --- "why it's worth it for you" value band --- */
+.why-band {
+  margin-top: var(--sp-5);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: clamp(18px, 3vw, 28px);
+}
+
+.why-intro {
+  color: var(--ink-soft);
+  max-width: 70ch;
+  margin-bottom: var(--sp-4);
+}
+
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--sp-3);
+}
+
+.why-card {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--accent);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.why-icon {
+  font-size: 1.7rem;
+}
+
+.why-card strong {
+  font-size: var(--fs-md, 1rem);
+}
+
+.why-card p {
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+}
+
+.why-skill-line {
+  margin-top: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--primary-soft);
+  border-inline-start: 4px solid var(--primary);
+  border-radius: var(--r-md);
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+/* --- the big idea: principle pillars --- */
+.bigidea-band {
+  margin-top: var(--sp-5);
+}
+
+.bigidea-intro {
+  color: var(--ink-soft);
+  max-width: 78ch;
+  margin-bottom: var(--sp-4);
+  font-size: var(--fs-lg);
+  line-height: 1.7;
+}
+
+.bigidea-intro strong {
+  color: var(--primary-deep);
+}
+
+.pillar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--sp-4);
+}
+
+.pillar-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.pillar-art {
+  height: 120px;
+  overflow: hidden;
+}
+
+.pillar-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pillar-body {
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pillar-icon {
+  font-size: 1.8rem;
+}
+
+.pillar-card h4 {
+  font-size: var(--fs-lg);
+}
+
+.pillar-card p {
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+}
+
+/* the pacing&leading pillar is the heart of the skill — give it a wide,
+   image-beside-text banner so it reads first. */
+.pillar-card.featured {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  border-inline-start: 4px solid var(--accent);
+}
+
+.pillar-card.featured .pillar-art {
+  height: auto;
+  width: 38%;
+  flex-shrink: 0;
+}
+
+/* --- easy doors: real-life conversation moves --- */
+.doors-intro {
+  color: var(--ink-soft);
+  margin-bottom: var(--sp-4);
+  max-width: 72ch;
+}
+
+.door-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--sp-4);
+}
+
+.door-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.door-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.door-art {
+  position: relative;
+  height: 130px;
+  background: var(--primary-soft);
+  overflow: hidden;
+}
+
+.door-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.door-principle {
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-start: 10px;
+  background: rgba(32, 38, 61, 0.78);
+  color: #fff;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  border-radius: 99px;
+  padding: 3px 11px;
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+.door-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-4) var(--sp-4) 0;
+}
+
+.door-icon {
+  font-size: 1.6rem;
+}
+
+.door-head strong {
+  font-size: var(--fs-lg);
+  line-height: 1.25;
+}
+
+.door-oneliner {
+  flex: 1;
+  padding: var(--sp-2) var(--sp-4) var(--sp-4);
+  color: var(--ink-soft);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+}
+
+.door-card .btn {
+  align-self: flex-start;
+  margin: 0 var(--sp-4) var(--sp-4);
+  min-height: 44px;
+}
+
+.toolbox-intro {
+  color: var(--ink-soft);
+  margin-bottom: var(--sp-3);
+  max-width: 74ch;
+}
+
+@media (max-width: 1023px) {
+  .pillar-card.featured {
+    flex-direction: column;
+  }
+
+  .pillar-card.featured .pillar-art {
+    width: 100%;
+    height: 150px;
+  }
+}

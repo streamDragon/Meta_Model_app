@@ -24,7 +24,7 @@ describe('App shell', () => {
       expect(within(tabs).getByText(f.navLabel)).toBeTruthy();
     }
 
-    expect(screen.getByText('ברוכים הבאים! 👋')).toBeTruthy();
+    expect(screen.getByText('לדעת זה קל. לעשות את זה בזמן אמת — זה אימון.')).toBeTruthy();
   });
 
   it('navigates between tabs via the registry-driven nav', () => {
