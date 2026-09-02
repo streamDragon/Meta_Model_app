@@ -3,7 +3,14 @@ import './course-door.css';
 
 type CourseDoorView = 'entrance' | 'course-select' | 'shfat-hashpaa';
 
-const SHFAT_SECTIONS = [
+type ShfatSection = {
+  number: string;
+  title: string;
+  description: string;
+  verifiedPractice?: boolean;
+};
+
+const SHFAT_SECTIONS: readonly ShfatSection[] = [
   {
     number: '01',
     title: 'היפוך המטה-מודל',
@@ -30,7 +37,7 @@ const SHFAT_SECTIONS = [
     title: 'הנחות יסוד בשפה',
     description: 'מה המשפט אומר במפורש — ומה הוא כבר מניח כרקע.',
   },
-] as const;
+];
 
 function navigateTo(tab: string) {
   window.location.hash = tab;
