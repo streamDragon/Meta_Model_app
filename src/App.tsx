@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { FEATURES, isValidFeatureId } from './registry';
 import { MobileFallback } from './components/MobileFallback';
 import { WhyItMatters } from './components/WhyItMatters';
+import { CourseDoor } from './features/home/CourseDoor';
 import { useIsMobile } from './lib/useIsMobile';
 import { HintProvider, useHint } from './store/hint';
 import { ProgressProvider, useProgress } from './store/useProgress';
@@ -200,6 +201,7 @@ function AppShell() {
                 id={f.id}
                 className={`tab-content ${activeTab === f.id ? 'active' : ''}`}
               >
+                {f.id === 'home' && <CourseDoor />}
                 {showFallback ? <MobileFallback feature={f} /> : <Feature />}
               </section>
             );
