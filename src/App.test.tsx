@@ -27,6 +27,52 @@ describe('App shell', () => {
     expect(screen.getByText('לדעת זה קל. לעשות את זה בזמן אמת — זה אימון.')).toBeTruthy();
   });
 
+  it('shows a two-door entrance and opens course selection', () => {
+    window.location.hash = 'home';
+    render(<App />);
+
+    expect(screen.getByRole('button', { name: /אני חדש/ })).toBeTruthy();
+    const courseDoor = screen.getByRole('button', { name: /אני תלמיד בקורס/ });
+    expect(courseDoor).toBeTruthy();
+
+    fireEvent.click(courseDoor);
+
+    expect(screen.getByText('מטה-מודל')).toBeTruthy();
+    expect(screen.getByText('שפת ההשפעה')).toBeTruthy();
+  });
+
+  it('shows the five Shfat HaHashpaa sections in course order', () => {
+    window.location.hash = 'home';
+    render(<App />);
+
+    fireEvent.click(screen.getByRole('button', { name: /אני תלמיד בקורס/ }));
+    fireEvent.click(screen.getByRole('button', { name: /פתח את מסלול שפת ההשפעה/ }));
+
+    const map = screen.getByTestId('shfat-course-map');
+    const sectionTitles = within(map)
+      .getAllByRole('heading', { level: 4 })
+      .map((node) => node.textContent);
+
+    expect(sectionTitles).toEqual([
+      'היפוך המטה-מודל',
+      'עמימות, קשב ויחסים',
+      'בניית משפטי השפעה',
+      'העמקה ומטאפורות',
+      'הנחות יסוד בשפה',
+    ]);
+  });
+
+  it('reuses the existing categories route from the Meta Model course card', () => {
+    window.location.hash = 'home';
+    render(<App />);
+
+    fireEvent.click(screen.getByRole('button', { name: /אני תלמיד בקורס/ }));
+    const metaCourse = screen.getByTestId('course-card-meta-model');
+    fireEvent.click(within(metaCourse).getByRole('button', { name: 'פתח מילון' }));
+
+    expect(window.location.hash).toBe('#categories');
+  });
+
   it('navigates between tabs via the registry-driven nav', () => {
     window.location.hash = '';
     render(<App />);

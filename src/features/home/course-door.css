@@ -1,0 +1,219 @@
+.course-door {
+  margin: 0 0 2rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border, #d9e2e8);
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fafb 100%);
+}
+
+.course-door-heading {
+  max-width: 760px;
+  margin: 0 auto 1.25rem;
+  text-align: center;
+}
+
+.course-door-heading > span,
+.course-door-panel-head > div > span {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  font-weight: 700;
+  color: var(--primary, #008f87);
+}
+
+.course-door-heading h1,
+.course-door-panel-head h2 {
+  margin: 0 0 0.55rem;
+  line-height: 1.2;
+}
+
+.course-door-heading p,
+.course-door-panel-head p,
+.course-card p,
+.course-section-card p {
+  margin: 0;
+  color: var(--text-muted, #53636f);
+}
+
+.course-door-choice-grid,
+.course-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.course-door-choice {
+  min-height: 220px;
+  padding: 1.4rem;
+  border: 1px solid var(--border, #d9e2e8);
+  border-radius: 20px;
+  background: #fff;
+  color: inherit;
+  text-align: right;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.course-door-choice:hover,
+.course-door-choice:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--primary, #008f87);
+  box-shadow: 0 12px 28px rgba(24, 57, 68, 0.1);
+}
+
+.course-door-choice-course {
+  background: linear-gradient(145deg, #f0fbf9 0%, #ffffff 70%);
+}
+
+.course-door-choice-kicker,
+.course-card-number,
+.course-section-number {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--primary, #008f87);
+}
+
+.course-door-choice strong {
+  font-size: clamp(1.55rem, 2vw, 2rem);
+  line-height: 1.15;
+}
+
+.course-door-choice small {
+  max-width: 34ch;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--text-muted, #53636f);
+}
+
+.course-door-action {
+  margin-top: auto;
+  font-weight: 800;
+}
+
+.course-door-panel {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.course-door-panel-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.course-door-back {
+  border: 1px solid var(--border, #d9e2e8);
+  background: #fff;
+  border-radius: 999px;
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.course-card {
+  padding: 1.3rem;
+  border: 1px solid var(--border, #d9e2e8);
+  border-radius: 18px;
+  background: #fff;
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+}
+
+.course-card-featured {
+  border-color: color-mix(in srgb, var(--primary, #008f87) 45%, #d9e2e8);
+  background: #f5fbfa;
+}
+
+.course-card h3,
+.course-section-card h4 {
+  margin: 0;
+}
+
+.course-card-actions,
+.course-section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.course-section-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.course-section-card {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border, #d9e2e8);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.course-section-number {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #eaf6f4;
+}
+
+.course-section-copy {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.course-section-pending {
+  justify-self: start;
+  margin-top: 0.2rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: #f1f4f6;
+  color: #667681;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .course-door {
+    padding: 0.9rem;
+    border-radius: 18px;
+  }
+
+  .course-door-choice-grid,
+  .course-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .course-door-choice {
+    min-height: 185px;
+  }
+
+  .course-door-panel-head {
+    grid-template-columns: 1fr;
+  }
+
+  .course-door-back {
+    justify-self: start;
+  }
+
+  .course-section-card {
+    grid-template-columns: 44px 1fr;
+    gap: 0.75rem;
+  }
+
+  .course-section-number {
+    width: 40px;
+    height: 40px;
+  }
+}
