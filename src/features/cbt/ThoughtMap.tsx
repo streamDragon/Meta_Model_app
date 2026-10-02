@@ -9,6 +9,7 @@ interface ThoughtMapProps {
   onAward: (amount: number) => void;
   onSaved: () => void;
   mobileMode?: boolean;
+  onPlanExperiment?: (prediction: string) => void;
 }
 
 type MobileThoughtMapStep = 'thought' | 'context' | 'result';
@@ -41,7 +42,7 @@ function analysisCards(analysis: ThoughtAnalysis) {
   ];
 }
 
-export function ThoughtMap({ mobileMode = false, onAward, onSaved }: ThoughtMapProps) {
+export function ThoughtMap({ mobileMode = false, onAward, onSaved, onPlanExperiment }: ThoughtMapProps) {
   const [statement, setStatement] = useState('אני חייב לעשות מה שכולם אומרים.');
   const [situation, setSituation] = useState('');
   const [emotionLabel, setEmotionLabel] = useState('');
@@ -55,7 +56,7 @@ export function ThoughtMap({ mobileMode = false, onAward, onSaved }: ThoughtMapP
   const runAnalysis = (): ThoughtAnalysis => {
     const next = analyzeThought(statement);
     setAnalysis(next);
-    setSavedSessionId(null);
+    if (analysis?.input !== next.input) setSavedSessionId(null);
     return next;
   };
 
@@ -65,7 +66,7 @@ export function ThoughtMap({ mobileMode = false, onAward, onSaved }: ThoughtMapP
   };
 
   const saveMap = () => {
-    if (!analysis) return;
+    if (!analysis || savedSessionId) return;
     const timestamp = nowIso();
     const sessionId = `thought-map-${Date.now()}`;
     const session: CbtStoredSession = {
@@ -122,7 +123,7 @@ export function ThoughtMap({ mobileMode = false, onAward, onSaved }: ThoughtMapP
       <textarea
         id="cbt-thought-input"
         value={statement}
-        onChange={(event) => setStatement(event.target.value)}
+        onChange={(event) => { setStatement(event.target.value); setAnalysis(null); setSavedSessionId(null); }}
         rows={4}
       />
     </>
@@ -167,6 +168,7 @@ export function ThoughtMap({ mobileMode = false, onAward, onSaved }: ThoughtMapP
           {analysis.safetyMessageHe && (
             <div className="cbt-safety-note">{analysis.safetyMessageHe}</div>
           )}
+          <p className="muted">הכיוונים הבאים מבוססים על מילות מפתח. בדוק אם הם מתאימים להקשר שלך; הם אינם קביעה שהמחשבה שגויה.</p>
           <div className="cbt-chip-group">
             {analysis.cbtPatterns.map((pattern) => (
               <span className="chip" key={pattern}>
@@ -207,9 +209,10 @@ export function ThoughtMap({ mobileMode = false, onAward, onSaved }: ThoughtMapP
               <p>{analysis.experimentSuggestion}</p>
             </article>
           )}
-          <button type="button" className="btn btn-primary" onClick={saveMap}>
+          <button type="button" className="btn btn-primary" disabled={!!savedSessionId} onClick={saveMap}>
             שמור מפת מחשבה
           </button>
+          {onPlanExperiment && !analysis.safetyMessageHe && <button className="btn btn-secondary" onClick={() => onPlanExperiment(analysis.input)}>המשך עם המחשבה הזו לניסוי</button>}
           {savedSessionId && <p className="xp-pop">+{XP_REWARDS.thoughtMapComplete} XP</p>}
         </>
       )}
@@ -277,7 +280,7 @@ export function ThoughtMap({ mobileMode = false, onAward, onSaved }: ThoughtMapP
       <section className="cbt-panel cbt-active-panel">
         {statementField}
         {contextFields}
-        <button type="button" className="btn btn-primary" onClick={runAnalysis}>
+        <button type="button" className="btn btn-primary" disabled={!statement.trim()} onClick={runAnalysis}>
           פתח למפת מחשבה
         </button>
       </section>

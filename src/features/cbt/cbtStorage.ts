@@ -36,7 +36,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isSessionArray(value: unknown): value is CbtStoredSession[] {
-  return Array.isArray(value);
+  return Array.isArray(value) && value.every((s) => isRecord(s) && typeof s.sessionId === 'string' && typeof s.title === 'string' && ['thought-map', 'belief-lens', 'reality-experiment', 'activation'].includes(String(s.kind)));
 }
 
 function isPracticeProgress(value: unknown): value is CbtPracticeProgress {

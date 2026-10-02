@@ -51,23 +51,25 @@ describe('Blueprint flow', () => {
     const actionSelect = within(section).getByLabelText('בחירת פעולה') as HTMLSelectElement;
     const actionValue = actionSelect.options[1].value;
     fireEvent.change(actionSelect, { target: { value: actionValue } });
-    fireEvent.click(within(section).getByText('חלץ ובנה Blueprint ←'));
+    fireEvent.click(within(section).getByText('המשך להגדרת הצעד'));
 
     // Step 2: fill the two required wizard fields (all selects are in the DOM)
     const successSelect = within(section).getByLabelText('תוצאה') as HTMLSelectElement;
     fireEvent.change(successSelect, { target: { value: successSelect.options[1].value } });
     const firstStepSelect = within(section).getByLabelText('צעד ראשון') as HTMLSelectElement;
     fireEvent.change(firstStepSelect, { target: { value: firstStepSelect.options[1].value } });
-    fireEvent.click(within(section).getByText('בדיקת פער ציפיות ←'));
+    const timeSelect = within(section).getByLabelText('זמן') as HTMLSelectElement;
+    fireEvent.change(timeSelect, { target: { value: timeSelect.options[1].value } });
+    fireEvent.click(within(section).getByText('המשך לבדיקת חסמים'));
 
     // Step 3: who expects
     fireEvent.change(within(section).getByLabelText(/מי מצפה/), {
       target: { value: 'self' },
     });
-    fireEvent.click(within(section).getByText('צעד הבא ותוכנית ←'));
+    fireEvent.click(within(section).getByText('הצג את התוכנית'));
 
     // Step 4 reached: final plan visible, XP awarded once
-    expect(within(section).getByText('תוכנית הביצוע סופית ✨')).toBeTruthy();
+    expect(within(section).getByText('התוכנית שלי')).toBeTruthy();
     expect(storedProgress().xp).toBe(20);
     expect(storedProgress().sessions).toBe(1);
   });
@@ -76,7 +78,7 @@ describe('Blueprint flow', () => {
     window.location.hash = 'blueprint';
     render(<App />);
     const section = document.getElementById('blueprint')!;
-    fireEvent.click(within(section).getByText('חלץ ובנה Blueprint ←'));
+    fireEvent.click(within(section).getByText('המשך להגדרת הצעד'));
     expect(screen.getByRole('status').textContent).toContain('בחר פעולה');
     expect(storedProgress().xp ?? 0).toBe(0);
   });
@@ -89,9 +91,15 @@ describe('Prism Lab flow', () => {
     const section = document.getElementById('prismlab')!;
 
     fireEvent.click(within(section).getAllByText('בחר פריזמה')[0]);
-    fireEvent.click(within(section).getByText('מפה והמלץ Pivot ←'));
+    expect((within(section).getByText('בחר נקודת התחלה') as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(within(section).getByText('טען דוגמה לתרגול'));
+    const layer = within(section).getAllByRole('combobox')[0] as HTMLSelectElement;
+    fireEvent.change(layer, { target: { value: layer.options[1].value } });
+    fireEvent.click(within(section).getByText('בחר נקודת התחלה'));
+    expect(window.localStorage.getItem('prism_sessions')).toBeNull();
+    fireEvent.click(within(section).getByText('שמור את המפה בדפדפן'));
 
-    expect(within(section).getByText('המלצת Pivot')).toBeTruthy();
+    expect(within(section).getByText('נקודת התחלה לבדיקה')).toBeTruthy();
     expect(storedProgress().xp).toBe(15);
     const sessions = JSON.parse(window.localStorage.getItem('prism_sessions') ?? '[]');
     expect(sessions).toHaveLength(1);
@@ -112,7 +120,7 @@ describe('Values Lab flow', () => {
     expect(within(section).queryByText('＋ הוסף ערך / אילוץ')).toBeNull();
     expect(within(section).queryByText(/ייצא JSON/)).toBeNull();
 
-    fireEvent.click(within(section).getByText('🩺 אבחן: למה זה תקוע?'));
+    fireEvent.click(within(section).getByText('בדוק את המפה'));
     expect(storedProgress().xp).toBe(15);
     expect(storedProgress().sessions).toBe(1);
 

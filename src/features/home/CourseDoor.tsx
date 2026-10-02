@@ -44,7 +44,7 @@ function navigateTo(tab: string) {
 }
 
 function continueAsNewUser() {
-  document.querySelector('.home-hero')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  navigateTo('conversation');
 }
 
 export function CourseDoor() {
@@ -56,8 +56,8 @@ export function CourseDoor() {
         <>
           <div className="course-door-heading">
             <span>מאיפה מתחילים?</span>
-            <h1>אותה אפליקציה. שתי דרכי כניסה.</h1>
-            <p>לא צריך להבין את כל ארגז הכלים. בחרו את הדרך שמתאימה לכם עכשיו.</p>
+            <h1>איך תרצה להתחיל?</h1>
+            <p>אימון שיחה קצר או מסלול לפי הקורס שלך.</p>
           </div>
 
           <div className="course-door-choice-grid">

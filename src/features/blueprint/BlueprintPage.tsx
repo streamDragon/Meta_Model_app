@@ -5,7 +5,6 @@ import { useProgress } from '../../store/useProgress';
 import { XP_REWARDS } from '../../store/progress';
 import { useHint } from '../../store/hint';
 import { HowItWorks } from '../../components/HowItWorks';
-import { SurfaceHiddenPrinciple } from '../../components/SurfaceHiddenPrinciple';
 
 interface WizardField {
   id: string; // matches choice_packs.blueprint.fields key
@@ -33,7 +32,7 @@ const WIZARD_FIELDS: WizardField[] = [
   { id: 'q-prerequisites', key: 'prerequisites', label: 'מה צריך להיות נכון לפני התחלה? (מקום, ציוד, זמן, אישורים)', summaryLabel: 'תנאים' },
   { id: 'q-friction', key: 'friction', label: 'איפה אתה בדרך כלל נתקע?', summaryLabel: 'חיכוך' },
   { id: 'q-alternatives', key: 'alternatives', label: 'מה Plan B כשנתקע? (חלופה, קיצור דרך, עזרה)', summaryLabel: 'Plan B' },
-  { id: 'q-time', key: 'time', label: 'כמה זמן זה אמור לקחת? (מינימום 70% משימה)', summaryLabel: 'זמן' },
+  { id: 'q-time', key: 'time', label: 'מתי תעשה את הצעד הראשון וכמה זמן תקצה לו?', summaryLabel: 'זמן' },
 ];
 
 const EMPTY_FIELDS: BlueprintFields = {
@@ -60,19 +59,22 @@ function ChoiceSelect({
 }) {
   const choices = content.choice_packs.blueprint.fields[packField] ?? [];
   return (
-    <select
+    <div className="guided-choice"><select
       className="blueprint-choice-select"
       value={value}
       aria-label={ariaLabel}
       onChange={(e) => onChange(e.target.value)}
     >
-      <option value="">בחר מתוך חבילת JSON...</option>
+      <option value="">בחר דוגמה (רשות)</option>
+      {value && !choices.some((choice) => choice.label === value) && <option value={value}>{value}</option>}
       {choices.map((choice) => (
         <option key={choice.id} value={choice.label}>
           {choice.label}
         </option>
       ))}
     </select>
+      <label className="learning-muted">או במילים שלך<input aria-label={`ניסוח אישי: ${ariaLabel}`} value={value} onChange={(e) => onChange(e.target.value)} /></label>
+    </div>
   );
 }
 
@@ -83,7 +85,7 @@ export function BlueprintPage() {
   const [step, setStep] = useState(1);
   const [action, setAction] = useState('');
   const [fields, setFields] = useState<BlueprintFields>(EMPTY_FIELDS);
-  const [wizardIndex, setWizardIndex] = useState(0);
+  const [actionTried, setActionTried] = useState(false);
   const [whoExpects, setWhoExpects] = useState('');
   const [expectation, setExpectation] = useState('');
   const [assumption, setAssumption] = useState('');
@@ -101,26 +103,22 @@ export function BlueprintPage() {
 
   const goToStep2 = () => {
     if (!action.trim()) {
-      showHint('בחר פעולה מתוך הרשימה כדי להתחיל 🏗️');
+      showHint('בחר פעולה או כתוב פעולה משלך כדי להתחיל');
       return;
     }
-    setWizardIndex(0);
+    setActionTried(false);
     setStep(2);
   };
 
   const goToStep3 = () => {
-    if (!fields.success || !fields.firstStep) {
-      showHint('מלא לפחות את התוצאה ואת הצעד הראשון כדי להמשיך');
+    if (!fields.success.trim() || !fields.firstStep.trim() || !fields.time.trim()) {
+      showHint('הגדר תוצאה, צעד ראשון וזמן לביצוע כדי להמשיך');
       return;
     }
     setStep(3);
   };
 
   const goToStep4 = () => {
-    if (!whoExpects) {
-      showHint('בחר מי מצפה כדי להשלים את ניתוח הפער');
-      return;
-    }
     setStep(4);
     // Audit bug B1 fix: blueprint completion now actually awards XP + session.
     if (!awarded) {
@@ -134,7 +132,7 @@ export function BlueprintPage() {
     setStep(1);
     setAction('');
     setFields(EMPTY_FIELDS);
-    setWizardIndex(0);
+    setActionTried(false);
     setWhoExpects('');
     setExpectation('');
     setAssumption('');
@@ -163,13 +161,13 @@ export function BlueprintPage() {
     URL.revokeObjectURL(url);
   };
 
-  const timebox = fields.time ? fields.time.split(' ')[0] : '45';
+
 
   return (
     <div className="workbench">
       <div className="workbench-main card">
-        <h2>🏗️ Blueprint Builder - הפוך פעולה עמומה לתוכנית ביצוע</h2>
-        <p>בחר פעולה מתוך חבילת JSON מוכנה, והמערכת תרכיב תוכנית מפורטת עם צעדים, תנאים וחלופות.</p>
+        <h2>🏗️ בונה צעדים</h2>
+        <p>כשיש כוונה אבל לא ברור איך להתחיל, מגדירים תוצאה, צעד ראשון ומועד. שאר הפירוק הוא לפי הצורך.</p>
 
         <div className="feature-brief">
           <span>
@@ -180,15 +178,14 @@ export function BlueprintPage() {
           </span>
         </div>
 
-        <SurfaceHiddenPrinciple compact />
 
         {step === 1 && (
           <HowItWorks
             steps={[
               { icon: '🎬', title: 'בוחרים פעולה', detail: 'מה אתה אומר לעצמך לעשות?' },
-              { icon: '🧩', title: 'מפרקים לצעדים', detail: '8 שאלות קצרות — צעד ראשון, אמצע וסוף' },
+              { icon: '🧩', title: 'מפרקים לצעדים', detail: 'תוצאה, צעד ראשון וזמן; פרטים נוספים לפי הצורך' },
               { icon: '⚖️', title: 'בודקים פער', detail: 'ציפייה מול יכולת, בלי האשמה עצמית' },
-              { icon: '🚀', title: 'מקבלים תוכנית', detail: 'צעד הבא + Plan B + ייצוא JSON' },
+              { icon: '🚀', title: 'מקבלים תוכנית', detail: 'צעד שאפשר לבצע ותוכנית שאפשר לשמור' },
             ]}
           />
         )}
@@ -200,7 +197,7 @@ export function BlueprintPage() {
               <h3>מה אתה אומר לעצמך לעשות?</h3>
             </div>
             <p className="step-desc">
-              בחר פעולה מתוך חבילת JSON מוכנה. זה שומר על זרימה מובנית, בלי AI ובלי כתיבה חופשית.
+              אפשר לבחור דוגמה או לכתוב פעולה מהחיים שלך.
             </p>
             <div className="input-group">
               <ChoiceSelect
@@ -212,7 +209,7 @@ export function BlueprintPage() {
             </div>
             <div className="step-buttons">
               <button type="button" className="btn btn-primary" onClick={goToStep2}>
-                חלץ ובנה Blueprint ←
+                המשך להגדרת הצעד
               </button>
             </div>
           </div>
@@ -225,63 +222,17 @@ export function BlueprintPage() {
               <h3>פירוק הפעולה</h3>
             </div>
 
-            <div className="blueprint-wizard" aria-live="polite">
-              <div className="blueprint-wizard-progress">
-                שאלה {wizardIndex + 1} מתוך {WIZARD_FIELDS.length}
-              </div>
-              <div className="blueprint-wizard-track">
-                <span
-                  id="blueprint-wizard-fill"
-                  style={{ width: `${((wizardIndex + 1) / WIZARD_FIELDS.length) * 100}%` }}
-                ></span>
-              </div>
-            </div>
-
             <div className="blueprint-questions">
-              {WIZARD_FIELDS.map((field, index) => (
-                <div
-                  key={field.id}
-                  className={`q-card ${index === wizardIndex ? 'active' : 'wizard-hidden'}`}
-                >
-                  <label>{field.label}</label>
-                  <ChoiceSelect
-                    packField={field.id}
-                    value={fields[field.key]}
-                    onChange={(v) => setField(field.key, v)}
-                    ariaLabel={field.summaryLabel}
-                  />
-                </div>
-              ))}
+              {WIZARD_FIELDS.filter((field) => ['success', 'firstStep', 'time'].includes(field.key)).map((field) => <div className="q-card" key={field.id}><label>{field.label}</label><ChoiceSelect packField={field.id} value={fields[field.key]} onChange={(v) => setField(field.key, v)} ariaLabel={field.summaryLabel} /></div>)}
             </div>
-
-            <div className="blueprint-wizard-actions">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                disabled={wizardIndex === 0}
-                onClick={() => setWizardIndex((i) => Math.max(0, i - 1))}
-              >
-                הקודמת
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() =>
-                  wizardIndex < WIZARD_FIELDS.length - 1
-                    ? setWizardIndex((i) => i + 1)
-                    : goToStep3()
-                }
-              >
-                {wizardIndex === WIZARD_FIELDS.length - 1 ? 'בדיקת פער ציפיות' : 'השאלה הבאה'}
-              </button>
-            </div>
+            <details className="feature-details"><summary>צריך פירוק נוסף או חלופה?</summary><div className="blueprint-questions">{WIZARD_FIELDS.filter((field) => !['success', 'firstStep', 'time'].includes(field.key)).map((field) => <div className="q-card" key={field.id}><label>{field.label}</label><ChoiceSelect packField={field.id} value={fields[field.key]} onChange={(v) => setField(field.key, v)} ariaLabel={field.summaryLabel} /></div>)}</div></details>
 
             <div className="step-buttons">
               <button type="button" className="btn btn-secondary" onClick={() => setStep(1)}>
                 → חזור
               </button>
               <button type="button" className="btn btn-primary" onClick={goToStep3}>
-                בדיקת פער ציפיות ←
+                המשך לבדיקת חסמים
               </button>
             </div>
           </div>
@@ -291,10 +242,10 @@ export function BlueprintPage() {
           <div className="blueprint-step active">
             <div className="step-header">
               <span className="step-number">3</span>
-              <h3>פער ציפיות vs יכולת</h3>
+              <h3>בדיקת חסמים (רשות)</h3>
             </div>
             <p className="step-desc">
-              בואו נבחן את הפער בין מה שמצפים ממך לבין מה שאתה יכול לעשות כרגע.
+              אם ציפייה או חוסר במשאב עוצרים אותך, אפשר לברר אותם. אפשר גם להמשיך ישירות לתוכנית.
             </p>
 
             <div className="blueprint-questions">
@@ -333,7 +284,7 @@ export function BlueprintPage() {
               </div>
 
               <div className="q-card">
-                <label htmlFor="q-ability">יכולת כרגע (0-10, כש-10 זה מושלם)</label>
+                <label htmlFor="q-ability">עד כמה הצעד הזה אפשרי כרגע? (דיווח עצמי, 0–10)</label>
                 <input
                   id="q-ability"
                   type="range"
@@ -363,7 +314,7 @@ export function BlueprintPage() {
                 → חזור
               </button>
               <button type="button" className="btn btn-primary" onClick={goToStep4}>
-                צעד הבא ותוכנית ←
+                הצג את התוכנית
               </button>
             </div>
           </div>
@@ -373,12 +324,12 @@ export function BlueprintPage() {
           <div className="blueprint-step active">
             <div className="step-header">
               <span className="step-number">4</span>
-              <h3>תוכנית הביצוע סופית ✨</h3>
+              <h3>התוכנית שלי</h3>
             </div>
 
             <div className="final-blueprint-display">
               <div className="blueprint-final-hero">
-                <span>Blueprint</span>
+                <span>הצעד הבא</span>
                 <div>
                   <h4>תוכנית ביצוע קצרה וברורה</h4>
                   <p>"{action}"</p>
@@ -391,11 +342,11 @@ export function BlueprintPage() {
                 </div>
                 <div className="blueprint-summary-card">
                   <strong>מסגרת זמן</strong>
-                  <p>{fields.time || '30 דקות'}</p>
+                  <p>{fields.time}</p>
                 </div>
                 <div className="blueprint-summary-card blueprint-risk-card">
                   <strong>נקודת תקיעה</strong>
-                  <p>{fields.friction || 'לא זוהתה תקיעה מרכזית'}</p>
+                  <p>{fields.friction || 'לא הוגדרה נקודת תקיעה'}</p>
                 </div>
               </div>
               <div className="blueprint-timeline">
@@ -417,14 +368,14 @@ export function BlueprintPage() {
               </div>
               <div className="blueprint-section">
                 <h4>תנאים מקדימים</h4>
-                <p>{fields.prerequisites || 'אין תנאי מקדים מיוחד'}</p>
+                <p>{fields.prerequisites || 'לא הוגדרו תנאים מקדימים'}</p>
               </div>
               <div className="blueprint-section">
                 <h4>Plan B</h4>
                 <p>{fields.alternatives || 'בחר חלופה קטנה יותר או בקש עזרה.'}</p>
               </div>
               <div className="blueprint-section">
-                <h4>ניתוח ציפיות</h4>
+                <h4>בירור ציפיות (אם בחרת למלא)</h4>
                 <ul>
                   <li>
                     <strong>מי מצפה:</strong> {WHO_EXPECTS_LABELS[whoExpects] || whoExpects}
@@ -453,7 +404,7 @@ export function BlueprintPage() {
               <p>
                 <strong>{fields.firstStep}</strong>
                 <br />
-                <small>(צפוי לקחת {timebox} דקות משך)</small>
+                <small>{fields.time}</small>
               </p>
             </div>
 
@@ -477,16 +428,18 @@ export function BlueprintPage() {
                 📥 ייצא JSON
               </button>
               <button type="button" className="btn btn-secondary" onClick={startOver}>
-                🔄 Blueprint חדש
+                תוכנית חדשה
               </button>
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={() => showHint(`🎯 התחלת! ${fields.firstStep} — יש לך 10 דקות. לך!`)}
+                disabled={actionTried} onClick={() => setActionTried(true)}
               >
-                ⏱️ בואו נעשה את זה ב-10 דקות!
+                {actionTried ? 'סומן: ניסיתי את הצעד' : 'ניסיתי את הצעד הראשון'}
               </button>
             </div>
+            {actionTried && <p role="status">מה קרה בפועל? אם הצעד היה גדול מדי, עדכן את התוכנית או בחר חלופה. סימון הניסיון הוא דיווח עצמי ואינו מעניק נקודות נוספות.</p>}
+            <button className="btn btn-secondary" onClick={() => { setStep(2); setActionTried(false); }}>ערוך את הצעד והמועד</button>
           </div>
         )}
       </div>

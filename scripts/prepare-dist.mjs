@@ -1,4 +1,4 @@
-import { access, cp, copyFile, mkdir } from 'node:fs/promises';
+import { access, cp, copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const ROOT = process.cwd();
@@ -56,6 +56,15 @@ async function run() {
   for (const fileName of STATIC_FILES) {
     if (await copyStaticFile(fileName)) copiedFiles.push(fileName);
   }
+
+  // The React app and preserved tools read the same core categories and
+  // examples after deployment. Preserve the legacy blueprint/prism fields.
+  const core = JSON.parse(await readFile(path.join(ROOT, 'packs/meta-model-core.json'), 'utf8'));
+  const legacyPath = path.join(DIST_DIR, 'data/meta-model-violations.json');
+  const legacy = JSON.parse(await readFile(legacyPath, 'utf8'));
+  await writeFile(legacyPath, JSON.stringify({ ...legacy,
+    categories: core.categories, practice_statements: core.practice_statements,
+  }, null, 2) + '\n');
 
   console.log(`Copied legacy static folders to dist: ${copiedDirs.join(', ') || 'none'}`);
   console.log(`Copied legacy static files to dist: ${copiedFiles.join(', ') || 'none'}`);

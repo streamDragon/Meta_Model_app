@@ -7,6 +7,7 @@ export function ActivationBuilder({ onAward }: { onAward: (amount: number) => vo
   const [completed, setCompleted] = useState(false);
 
   const complete = () => {
+    if (completed || !smallestAction.trim()) return;
     setCompleted(true);
     onAward(XP_REWARDS.activationActionCompleted);
   };
@@ -20,10 +21,10 @@ export function ActivationBuilder({ onAward }: { onAward: (amount: number) => vo
         <input id="activation-action" value={smallestAction} onChange={(e) => setSmallestAction(e.target.value)} />
         <label htmlFor="activation-duration">כמה דקות? {durationMinutes}</label>
         <input id="activation-duration" type="range" min={2} max={20} value={durationMinutes} onChange={(e) => setDurationMinutes(Number(e.target.value))} />
-        <button type="button" className="btn btn-primary" onClick={complete}>
-          סימנתי פעולה קטנה
+        <button type="button" className="btn btn-primary" disabled={completed || !smallestAction.trim()} onClick={complete}>
+          ניסיתי את הפעולה
         </button>
-        {completed && <p className="xp-pop">+{XP_REWARDS.activationActionCompleted} XP</p>}
+        {completed && <p className="xp-pop">דיווח עצמי על ניסיון · +{XP_REWARDS.activationActionCompleted} XP</p>}
       </section>
       <section className="cbt-panel">
         <h3>כרטיס פעולה</h3>

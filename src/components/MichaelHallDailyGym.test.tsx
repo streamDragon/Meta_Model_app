@@ -28,7 +28,13 @@ describe('MichaelHallDailyGym', () => {
     fireEvent.change(screen.getByLabelText('הערות אישיות'), {
       target: { value: 'שמתי לב שאני קורא לסימפטום בעיה.' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'היום סיימתי' }));
+    const complete = screen.getByRole('button', { name: 'היום סיימתי' }) as HTMLButtonElement;
+    expect(complete.disabled).toBe(true);
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    expect(complete.disabled).toBe(true);
+    fireEvent.click(screen.getAllByRole('checkbox')[1]);
+    fireEvent.click(complete);
+    expect(complete.disabled).toBe(true);
 
     const stored = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}');
     expect(stored.currentCardId).toBe('mh-day-01');

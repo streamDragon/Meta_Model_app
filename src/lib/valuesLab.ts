@@ -30,6 +30,10 @@ export interface VclFinding {
 }
 
 export interface VclSession {
+  reviewedAt?: string;
+  analysisIsCurrent?: boolean;
+  nextMoveId?: string;
+  nextStep?: string;
   sessionId: string;
   title: string;
   initialStatement: string;

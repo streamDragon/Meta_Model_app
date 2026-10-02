@@ -7,8 +7,8 @@ export interface HowStep {
 
 export function HowItWorks({ steps, title = 'איך זה עובד?' }: { steps: HowStep[]; title?: string }) {
   return (
-    <div className="how-it-works" role="note">
-      <h4>🧭 {title}</h4>
+    <details className="how-it-works">
+      <summary>🧭 {title}</summary>
       <ol className="how-steps">
         {steps.map((step, i) => (
           <li className="how-step" key={step.title}>
@@ -25,6 +25,6 @@ export function HowItWorks({ steps, title = 'איך זה עובד?' }: { steps: 
           </li>
         ))}
       </ol>
-    </div>
+    </details>
   );
 }

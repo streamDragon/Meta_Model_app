@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+import { ConversationGymPage } from './features/trainer/ConversationGymPage';
 import { HomePage } from './features/home/HomePage';
 import { CategoriesPage } from './features/categories/CategoriesPage';
 import { TrainerPage } from './features/trainer/TrainerPage';
@@ -10,6 +11,12 @@ import { AboutPage } from './features/about/AboutPage';
 import { MichaelHallDailyGym } from './components/MichaelHallDailyGym';
 import { LegacyToolsPage } from './features/legacy/LegacyToolsPage';
 
+export const NAV_GROUPS = [
+  { id: 'core', label: 'ללמוד ולתרגל' },
+  { id: 'labs', label: 'מעבדות להעמקה' },
+  { id: 'resources', label: 'מקורות וכלים נוספים' },
+] as const;
+export type NavGroup = typeof NAV_GROUPS[number]['id'];
 export type Support = 'full' | 'partial' | 'none';
 export type FeatureStatus = 'production' | 'beta' | 'prototype' | 'broken';
 export type TheoryFamily =
@@ -26,6 +33,7 @@ export type TheoryFamily =
 
 export interface FeatureDef {
   id: string;
+  navGroup: NavGroup;
   title: string;
   shortDescription: string;
   theoryFamily: TheoryFamily;
@@ -53,8 +61,9 @@ export interface FeatureDef {
 export const FEATURES: FeatureDef[] = [
   {
     id: 'home',
+    navGroup: 'core',
     title: 'בית',
-    shortDescription: 'לוח התקדמות, משימה הבאה וכניסה מהירה לכל הכלים',
+    shortDescription: 'תוכנית תרגול, מעקב לפי מיומנות ויישום בשיחה',
     theoryFamily: 'dashboard',
     skillTrained: 'ניווט והרגלי תרגול',
     difficulty: 1,
@@ -70,7 +79,17 @@ export const FEATURES: FeatureDef[] = [
     inBottomNav: true,
   },
   {
+    id: 'conversation', navGroup: 'core', title: 'אימון שיחה',
+    shortDescription: 'הקשבה, בירור, הסכמה, תזמון וצעד בתוך סיטואציה יומיומית',
+    theoryFamily: 'meta-model', skillTrained: 'בחירת תגובה לפי המטרה וההקשר',
+    difficulty: 2, desktopSupport: 'full', mobileSupport: 'full',
+    dataSource: 'src/data/conversationScenarios.ts', route: '#conversation',
+    component: ConversationGymPage, status: 'beta', sourceValidation: 'placeholder',
+    navLabel: 'אימון שיחה', icon: '💬', inBottomNav: true,
+  },
+  {
     id: 'categories',
+    navGroup: 'core',
     title: 'קטגוריות',
     shortDescription: 'שלוש משפחות ההפרה: מחיקה, עיוות והכללה — עם דוגמאות ושאלות',
     theoryFamily: 'meta-model',
@@ -89,6 +108,7 @@ export const FEATURES: FeatureDef[] = [
   },
   {
     id: 'practice',
+    navGroup: 'core',
     title: 'תרגול',
     shortDescription: 'זיהוי מהיר של סוג ההפרה עם משוב מיידי ו-XP',
     theoryFamily: 'meta-model',
@@ -107,6 +127,7 @@ export const FEATURES: FeatureDef[] = [
   },
   {
     id: 'michael-hall-daily-gym',
+    navGroup: 'labs',
     title: 'חדר אימון יומי - מייקל הול',
     shortDescription:
       'כרטיס יומי קצר של Neuro-Semantics: תמצית, שאלה, תרגילים, יישום והערות אישיות',
@@ -120,13 +141,14 @@ export const FEATURES: FeatureDef[] = [
     component: MichaelHallDailyGym,
     status: 'beta',
     sourceValidation: 'placeholder',
-    navLabel: 'Michael Hall',
+    navLabel: 'אימון משמעות יומי',
     icon: 'NS',
     inBottomNav: false,
   },
   {
     id: 'blueprint',
-    title: 'Blueprint Builder',
+    navGroup: 'core',
+    title: 'בונה צעדים',
     shortDescription: 'הפיכת כוונה עמומה לתוכנית ביצוע עם צעד ראשון ו-Plan B',
     theoryFamily: 'meta-model',
     skillTrained: 'הגדרת תוצאה ופירוק פעולה עמומה',
@@ -138,16 +160,17 @@ export const FEATURES: FeatureDef[] = [
     component: BlueprintPage,
     status: 'production',
     sourceValidation: 'verified',
-    navLabel: 'Blueprint Builder',
+    navLabel: 'בונה צעדים',
     icon: '🏗️',
     inBottomNav: true,
   },
   {
     id: 'prismlab',
+    navGroup: 'labs',
     title: 'מעבדת פריזמות',
-    shortDescription: 'סריקת משפט דרך פריזמה והמלצת Pivot לפי חמש שכבות',
+    shortDescription: 'משפט אחד, עדשה אחת ושאלת בירור לפי שכבה רלוונטית',
     theoryFamily: 'prisms',
-    skillTrained: 'מיפוי דפוס לשכבות והמלצת התערבות',
+    skillTrained: 'בחירת נקודת בירור לפי המקרה',
     difficulty: 3,
     desktopSupport: 'full',
     mobileSupport: 'partial',
@@ -160,12 +183,13 @@ export const FEATURES: FeatureDef[] = [
     sourceValidation: 'placeholder',
     navLabel: 'מעבדת פריזמות',
     icon: '🔍',
-    inBottomNav: true,
+    inBottomNav: false,
   },
   {
     id: 'valueslab',
+    navGroup: 'labs',
     title: 'מעבדת ערכים ואילוצים',
-    shortDescription: '"אני רוצה ___ אבל ___" — מיפוי אילוצים סמויים, התנגשויות ואבחון למה זה תקוע',
+    shortDescription: '"אני רוצה ___ אבל ___" — מיפוי אילוצים סמויים, התנגשויות ובחירת צעד כשיש תנאים מתנגשים',
     theoryFamily: 'values-criteria',
     skillTrained: 'היררכיית קריטריונים וזיהוי קונפליקט ערכים',
     difficulty: 3,
@@ -181,11 +205,12 @@ export const FEATURES: FeatureDef[] = [
     inBottomNav: false,
     mobileFallback: {
       why: 'מפת שתי הקומות המלאה צריכה מסך רחב; בנייד עובדים במצב אשף — כרטיס אחד בכל פעם.',
-      stillCanDo: 'להוסיף ולערוך כרטיסים באשף, להריץ אבחון ולסקור סשנים שמורים.',
+      stillCanDo: 'לדרג כרטיסי תרחיש באשף, לבדוק את המפה ולבחור צעד להמשך.',
     },
   },
   {
     id: 'beliefs-reality-lab',
+    navGroup: 'labs',
     title: 'מעבדת אמונות ומציאות',
     shortDescription:
       'קח משפט שתפס אותך, פתח אותו למפה, ובנה ניסוי קטן במקום להילחם במחשבה.',
@@ -211,6 +236,7 @@ export const FEATURES: FeatureDef[] = [
   },
   {
     id: 'about',
+    navGroup: 'resources',
     title: 'על הפרויקט',
     shortDescription: 'מה לומדים כאן, איך עובדים ומה הגבולות של הכלי',
     theoryFamily: 'dashboard',
@@ -229,10 +255,11 @@ export const FEATURES: FeatureDef[] = [
   },
   {
     id: 'legacy-tools',
+    navGroup: 'resources',
     title: 'כלים שמורים',
-    shortDescription: 'גישה לכלים הסטטיים הטובים שנשמרו מהגרסה הפרודקשנית בזמן המעבר ל-React',
+    shortDescription: 'כלים נוספים וארכיון תרגילים',
     theoryFamily: 'dashboard',
-    skillTrained: 'שימור תרגילים קיימים ובדיקת כלים שלא הוטמעו עדיין במעטפת החדשה',
+    skillTrained: 'תרגול משלים של מבנה, הקשר וניסוח',
     difficulty: 1,
     desktopSupport: 'full',
     mobileSupport: 'full',

@@ -17,7 +17,7 @@ describe('WhyItMatters', () => {
     fireEvent.click(screen.getByRole('button', { name: /למה זה חשוב/ }));
     expect(screen.getByRole('dialog')).toBeTruthy();
     expect(screen.getByText(/התמונה הגדולה/)).toBeTruthy();
-    expect(screen.getByText('בשיחה אמיתית יש לכם שתי שניות')).toBeTruthy();
+    expect(screen.getByText('להבחין בין מילים לבין השלמה')).toBeTruthy();
   });
 
   it('re-rolls to a different reason on "עוד סיבה"', () => {

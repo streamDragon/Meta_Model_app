@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { content } from '../../data/content';
 import {
   PRISM_LEVELS,
@@ -11,7 +11,6 @@ import { useProgress } from '../../store/useProgress';
 import { XP_REWARDS } from '../../store/progress';
 import { PRISM_ART } from '../../lib/patternArt';
 import { HowItWorks } from '../../components/HowItWorks';
-import { SurfaceHiddenPrinciple } from '../../components/SurfaceHiddenPrinciple';
 
 const SESSIONS_KEY = 'prism_sessions';
 const MAX_SAVED_SESSIONS = 10;
@@ -28,8 +27,8 @@ function saveSession(session: PrismSession, recommendation: PivotRecommendation)
   }
 }
 
-function exportSessions() {
-  const raw = localStorage.getItem(SESSIONS_KEY) || '[]';
+function exportSessions(session?: SavedSession) {
+  const raw = JSON.stringify(session ?? loadSavedSessions(), null, 2);
   const blob = new Blob([raw], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -45,7 +44,7 @@ function loadSavedSessions(): SavedSession[] {
   try {
     const raw = localStorage.getItem(SESSIONS_KEY);
     const parsed: unknown = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? (parsed as SavedSession[]) : [];
+    return Array.isArray(parsed) ? parsed.filter((s) => s && typeof s.datetime === 'string' && typeof s.prism_name === 'string' && Array.isArray(s.answers) && s.recommendation) as SavedSession[] : [];
   } catch {
     return [];
   }
@@ -55,6 +54,10 @@ export function PrismLabPage() {
   const { addXP, recordSession } = useProgress();
 
   const [activePrismId, setActivePrismId] = useState<string | null>(null);
+  const [statement, setStatement] = useState('');
+  const [preferredPivot, setPreferredPivot] = useState<PrismAnswer['level'] | ''>('');
+  const [savedResult, setSavedResult] = useState(false);
+  const savedDatetime = useRef('');
   const [choices, setChoices] = useState<Record<string, string>>({});
   const [activeLevel, setActiveLevel] = useState<string>('E');
   const [emotion, setEmotion] = useState(3);
@@ -66,6 +69,8 @@ export function PrismLabPage() {
   const [awarded, setAwarded] = useState(false);
   const [savedSessions, setSavedSessions] = useState<SavedSession[]>(loadSavedSessions);
 
+  useEffect(() => { setResult(null); setSavedResult(false); }, [statement, choices, emotion, resistance, preferredPivot]);
+
   const pack = content.choice_packs.prism_breen;
   const prism = activePrismId
     ? content.prisms.find((p) => p.id === activePrismId)
@@ -73,7 +78,7 @@ export function PrismLabPage() {
 
   const openPrism = (id: string) => {
     setActivePrismId(id);
-    setChoices({});
+    setChoices({}); setStatement(''); setPreferredPivot(''); setSavedResult(false); savedDatetime.current = '';
     setActiveLevel('E');
     setEmotion(3);
     setResistance(2);
@@ -89,9 +94,9 @@ export function PrismLabPage() {
 
   const recoveryQuestion = (levelId: string): string => {
     const choiceId = choices[levelId];
-    if (!choiceId) return 'בחר אפשרות כדי לקבל שאלת ניקוי.';
+    if (!choiceId) return 'בחר מה מתאים למשפט שלך כדי לראות שאלת בירור.';
     const choice = (pack.levels[levelId] ?? []).find((c) => c.id === choiceId);
-    return choice?.question ?? 'בחר אפשרות כדי לקבל שאלת ניקוי.';
+    return choice?.question ?? 'בחר מה מתאים למשפט שלך כדי לראות שאלת בירור.';
   };
 
   const collectAnswers = (): PrismAnswer[] =>
@@ -108,8 +113,10 @@ export function PrismLabPage() {
     }).filter((answer) => answer.text);
 
   const handleSubmit = () => {
-    if (!prism) return;
+    if (!prism || !statement.trim() || collectAnswers().length === 0) return;
     const session: PrismSession = {
+      statement: statement.trim(),
+      preferredPivot: preferredPivot || undefined,
       datetime: new Date().toISOString(),
       prism_id: prism.id,
       prism_name: prism.name_he,
@@ -120,8 +127,7 @@ export function PrismLabPage() {
     };
     const recommendation = computePivotRecommendation(session);
     setResult({ session, recommendation });
-    saveSession(session, recommendation);
-    setSavedSessions(loadSavedSessions());
+    setSavedResult(false);
     // Audit bug B1 fix: prism mapping awards XP + session (once per prism opened).
     if (!awarded) {
       addXP(XP_REWARDS.prismComplete);
@@ -135,26 +141,24 @@ export function PrismLabPage() {
       <div className="card">
         <h2>🔍 מעבדת פריזמות (Prism Lab)</h2>
         <p>
-          בחר פריזמה לסריקה, ואז בחר אפשרויות מוכנות מחבילת JSON. אין כאן AI ואין
-          ניתוח חופשי.
+          כשאותו משפט חוזר בלי לקדם אותך, בחר עדשה, כתוב את המשפט ובדוק איזו שאלה כדאי לשאול. אין צורך למלא את כל השכבות.
         </p>
 
         <div className="feature-brief">
           <span>
-            <strong>מטרה:</strong> לזהות איפה המשפט תקוע.
+            <strong>מטרה:</strong> לבחור נקודת בירור שמתאימה למקרה.
           </span>
           <span>
-            <strong>ללא AI:</strong> הכל בחירות מובנות מראש מתוך חבילת JSON.
+            <strong>תוצר:</strong> שאלה אחת ונקודת התחלה לבחירתך.
           </span>
         </div>
 
-        <SurfaceHiddenPrinciple compact />
 
         <HowItWorks
           steps={[
             { icon: '🔍', title: 'בוחרים עדשה', detail: 'פריזמה אחת = דפוס לשוני אחד לסרוק דרכו' },
-            { icon: '🗺️', title: 'מפה 5 שכבות', detail: 'בחר אפשרות מוכנה בכל שכבה — הקשר עד זהות' },
-            { icon: '🎯', title: 'קבל Pivot', detail: 'המלצה איפה הכי קל להתחיל לזוז' },
+            { icon: '🗺️', title: 'ממקדים מקרה', detail: 'משפט משלך ושכבה אחת או יותר שרלוונטיות לו' },
+            { icon: '🎯', title: 'בוחרים נקודת התחלה', detail: 'שאלת בירור לבדיקת ההבנה לפני שמציעים שינוי' },
           ]}
         />
 
@@ -208,7 +212,7 @@ export function PrismLabPage() {
               </div>
             ))}
             <div className="step-buttons">
-              <button type="button" className="btn btn-secondary" onClick={exportSessions}>
+              <button type="button" className="btn btn-secondary" onClick={() => exportSessions()}>
                 📥 ייצא הכל JSON
               </button>
             </div>
@@ -235,18 +239,17 @@ export function PrismLabPage() {
         </div>
 
         <div className="mapping-form">
-          <p className="choice-pack-note">
-            <strong>חבילת JSON פעילה:</strong> <span id="choice-pack-name">{pack.name}</span>
-          </p>
+          <label htmlFor="prism-statement">על איזה משפט עובדים?</label>
+          <textarea id="prism-statement" value={statement} onChange={(e) => setStatement(e.target.value)} rows={3} placeholder="כתוב משפט והקשר קצר, או טען דוגמה" />
+          <button className="btn btn-secondary" onClick={() => setStatement(prism.examples[0] ?? '')}>טען דוגמה לתרגול</button>
           <p className="muted">
-            בחר אפשרות אחת בכל שכבה. הבחירה מציגה שאלת ניקוי מוכנה ומייצרת מפת עבודה
-            ללא כתיבה חופשית.
+            בחר רק שכבות שרלוונטיות למשפט. אלו רמות הקשר–התנהגות–יכולת–אמונה–זהות; הן אינן טבלת Breen. שאלות מוכנות הן הצעה לבירור, ולא קביעה על האדם.
           </p>
           <div className="prism-accordion" aria-label="סריקת חמש שכבות">
             <div className="prism-accordion-head">
               <div>שכבה</div>
               <div>מה נאמר / מה חסר</div>
-              <div>שאלת ניקוי</div>
+              <div>שאלת בירור</div>
             </div>
             {PRISM_LEVELS.map((level) => (
               <div
@@ -271,7 +274,7 @@ export function PrismLabPage() {
                       setChoices((c) => ({ ...c, [level.id]: e.target.value }))
                     }
                   >
-                    <option value="">בחר מתוך חבילת JSON...</option>
+                    <option value="">בחר אם רלוונטי</option>
                     {(pack.levels[level.id] ?? []).map((choice) => (
                       <option key={choice.id} value={choice.id}>
                         {choice.label}
@@ -286,6 +289,9 @@ export function PrismLabPage() {
             ))}
           </div>
 
+          <label htmlFor="prism-entry">מאיפה תרצה להתחיל?</label>
+          <select id="prism-entry" value={preferredPivot} onChange={(e) => setPreferredPivot(e.target.value as PrismAnswer['level'])}><option value="">הצע נקודת התחלה לפי המפה</option>{PRISM_LEVELS.filter((level) => choices[level.id]).map((level) => <option key={level.id} value={level.id}>{level.label}</option>)}</select>
+          <details className="feature-details"><summary>עד כמה נוח לעבוד עם המשפט? (דיווח עצמי, רשות)</summary>
           <div className="q-card">
             <label htmlFor="prism-emotion">עוצמת רגש (1-5)</label>
             <input
@@ -299,7 +305,7 @@ export function PrismLabPage() {
             <span id="emotion-display">{emotion}</span>
           </div>
           <div className="q-card">
-            <label htmlFor="prism-resistance">התנגדות (1-5)</label>
+            <label htmlFor="prism-resistance">קושי לעבוד עם הנושא כרגע (1–5)</label>
             <input
               id="prism-resistance"
               type="range"
@@ -311,12 +317,13 @@ export function PrismLabPage() {
             <span id="resistance-display">{resistance}</span>
           </div>
 
+          </details>
           <div className="step-buttons">
             <button type="button" className="btn btn-secondary" onClick={backToLibrary}>
               → חזור לספריה
             </button>
-            <button type="button" className="btn btn-primary" onClick={handleSubmit}>
-              מפה והמלץ Pivot ←
+            <button type="button" className="btn btn-primary" disabled={!statement.trim() || collectAnswers().length === 0} onClick={handleSubmit}>
+              בחר נקודת התחלה
             </button>
           </div>
         </div>
@@ -333,12 +340,12 @@ export function PrismLabPage() {
               </div>
             </div>
             <div className="prism-pivot-card">
-              <small>המלצת Pivot</small>
-              <strong>{result.recommendation.pivot}</strong>
+              <small>נקודת התחלה לבדיקה</small>
+              <strong>{PRISM_LEVELS.find((level) => level.id === result.recommendation.pivot)?.label}</strong><blockquote>{result.session.statement}</blockquote><p><strong>השאלה הבאה:</strong> {result.session.answers.find((answer) => answer.level === result.recommendation.pivot)?.recovery_question || result.session.anchor}</p>
               <p>{result.recommendation.reason}</p>
               <div className="prism-signal-row">
                 <span>עוצמת רגש {result.session.emotion}/5</span>
-                <span>התנגדות {result.session.resistance}/5</span>
+                <span>קושי לפי דיווח עצמי {result.session.resistance}/5</span>
               </div>
             </div>
             <div className="blueprint-section prism-result-levels">
@@ -362,9 +369,12 @@ export function PrismLabPage() {
               )}
             </div>
             <div className="prism-export-row">
-              <button type="button" className="btn btn-secondary" onClick={exportSessions}>
-                ייצא סשן JSON
-              </button>
+              <button type="button" className="btn btn-primary" disabled={savedResult} onClick={() => {
+                if (savedDatetime.current === result.session.datetime) return;
+                savedDatetime.current = result.session.datetime;
+                saveSession(result.session, result.recommendation); setSavedSessions(loadSavedSessions()); setSavedResult(true);
+              }}>{savedResult ? 'המפה נשמרה בדפדפן' : 'שמור את המפה בדפדפן'}</button>
+              <button type="button" className="btn btn-secondary" onClick={() => exportSessions({ ...result.session, recommendation: result.recommendation })}>ייצא את המפה הזו</button>
             </div>
           </div>
         )}
@@ -402,7 +412,7 @@ export function PrismLabPage() {
         </div>
 
         <div className="side-card">
-          <h4>🪜 התערבות מומלצת לפי שכבה</h4>
+          <h4>🪜 אפשרויות לבירור לפי שכבה</h4>
           <ul className="intervention-list">
             {Object.entries(prism.recommended_interventions_by_level).map(
               ([level, text]) => (

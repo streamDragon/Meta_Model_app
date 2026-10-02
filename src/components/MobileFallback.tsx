@@ -37,7 +37,7 @@ export function MobileFallback({ feature }: { feature: FeatureDef }) {
           🏠 חזרה לבית
         </button>
       </div>
-      <p className="muted fallback-note">המשך מאוחר יותר במחשב — ההתקדמות שלך נשמרת.</p>
+      <p className="muted fallback-note">ההתקדמות נשמרת בדפדפן שבו תרגלת.</p>
     </div>
   );
 }
