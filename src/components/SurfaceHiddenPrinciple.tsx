@@ -7,7 +7,7 @@ export function SurfaceHiddenPrinciple({
     <section className={`surface-hidden-principle ${compact ? 'compact' : ''}`}>
       <div className="surface-hidden-head">
         <small>עקרון עבודה</small>
-        <strong>גלוי ונסתר בכל הפרה</strong>
+        <strong>מילים, הקשר ופירוש</strong>
       </div>
       <div className="surface-hidden-columns">
         <div>
@@ -18,11 +18,11 @@ export function SurfaceHiddenPrinciple({
         <div>
           <span>2</span>
           <strong>הפרה מסתתרת</strong>
-          <p>מה שאפשר להשלים מהטון, מהשלכה, או מהמשפט המלא שהמקשיב בונה בראש.</p>
+          <p>דפוס אפשרי בהשלמה שניתנה בתרגיל. בשיחה אמיתית מבררים עם הדובר לפני שמניחים מה התכוון.</p>
         </div>
       </div>
       <p className="surface-hidden-note">
-        ההפרה המסתתרת היא קריאה אפשרית, לא עובדה על האדם. לכן שואלים בעדינות:
+        לא לכל משפט יש דפוס נוסף, והשלמה היא קריאה אפשרית, לא עובדה על האדם. לכן שואלים בעדינות:
         מה נאמר בפועל, ומה אני מוסיף או מפרש?
       </p>
     </section>
