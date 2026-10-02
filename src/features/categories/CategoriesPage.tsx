@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { content } from '../../data/content';
 import { usePracticeLaunch } from '../../store/practiceLaunch';
 import { PATTERN_ART } from '../../lib/patternArt';
@@ -6,6 +7,9 @@ import { SurfaceHiddenPrinciple } from '../../components/SurfaceHiddenPrinciple'
 import icebergImg from '../../assets/iceberg.png';
 
 export function CategoriesPage() {
+  const [query, setQuery] = useState('');
+  const term = query.trim().toLocaleLowerCase('he');
+  const categories = content.categories.map((category) => ({ ...category, subcategories: category.subcategories.filter((sub) => !term || [category.name, category.description, sub.hebrew, sub.description, sub.example, sub.question].some((text) => text.toLocaleLowerCase('he').includes(term))) })).filter((category) => category.subcategories.length);
   const { launchPractice } = usePracticeLaunch();
 
   return (
@@ -17,7 +21,7 @@ export function CategoriesPage() {
           <p>
             כל משפט שאנחנו שומעים הוא רק <strong>קצה הקרחון</strong> — מבנה השטח.
             מתחת למים מסתתר מבנה העומק: מה נמחק, מה עוות ומה הוכלל. שלוש משפחות
-            הדפוסים שלמטה הן המפתח לצלול פנימה.
+            הדפוסים שלמטה עוזרות לבחור מה כדאי לברר. דפוס לשוני אינו הוכחה שהדובר טועה.
           </p>
           <SurfaceHiddenPrinciple compact />
           <HowItWorks
@@ -29,12 +33,13 @@ export function CategoriesPage() {
           />
         </div>
       </div>
+      <div className="card"><label htmlFor="pattern-search">חפש דפוס, דוגמה או מילה מהמשפט</label><input id="pattern-search" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="למשל: חייב, כולם, יודע, השוואה" />{categories.length === 0 && <p role="status">לא נמצאה התאמה במילון. נסה מילה אחרת, או פתח אימון שיחה.</p>}</div>
       <div id="categories-container">
-        {content.categories.map((category, index) => (
+        {categories.map((category, index) => (
           <details
             key={category.id}
             className={`category-card category-accordion ${category.id}`}
-            open={index === 0}
+            open={!!term || index === 0}
           >
             <summary className="category-accordion-summary">
               <span className="category-icon">{category.icon}</span>
@@ -61,7 +66,7 @@ export function CategoriesPage() {
                     <q>{sub.example}</q>
                   </div>
                   <div className="subcategory-question">
-                    <span>שאלה מתקנת</span>
+                    <span>שאלת בירור אפשרית</span>
                     {sub.question}
                   </div>
                 </div>

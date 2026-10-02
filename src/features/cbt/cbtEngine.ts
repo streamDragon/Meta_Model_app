@@ -149,7 +149,7 @@ export function generateMetaModelQuestions(analysis: ThoughtAnalysis): string[] 
     questions.push('מי בדיוק?', 'מה בדיוק נאמר או נעשה?');
   }
   if (analysis.metaModelPatterns.includes('mind_reading')) {
-    questions.push('לפי מה אתה יודע שזה אומר שלא רוצים אותך?');
+    questions.push('מה ראית או שמעת שמבסס את ההבנה הזאת?');
   }
   if (analysis.metaModelPatterns.includes('modal_operator')) {
     questions.push('מה יקרה אם לא תעשה את זה?', 'מי קובע שחייבים?');
@@ -161,7 +161,7 @@ export function generateMetaModelQuestions(analysis: ThoughtAnalysis): string[] 
     questions.push('איך בדיוק פעולה אחת גורמת לתוצאה הזו?');
   }
   if (analysis.metaModelPatterns.includes('complex_equivalence')) {
-    questions.push('האם התחושה היא ראיה, או אות שכדאי לבדוק?');
+    questions.push('מה מחבר בין מה שקרה לבין המשמעות שנתת לזה?');
   }
   return unique(questions).slice(0, 8);
 }

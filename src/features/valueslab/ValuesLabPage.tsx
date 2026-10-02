@@ -79,18 +79,16 @@ export function ValuesLabPage() {
   const { showHint } = useHint();
 
   const updateSession = (mutate: (s: VclSession) => VclSession) => {
-    setSession((current) => {
-      if (!current) return current;
-      const next = mutate(current);
-      setSaved(persistSession(next));
-      return next;
-    });
+    if (!session) return;
+    const next = mutate(session);
+    setSession(next);
+    setSaved(persistSession(next));
   };
 
   const openSession = (s: VclSession) => {
     setSession(s);
     setWizardIndex(0);
-    setAwarded(false);
+    setAwarded(!!s.reviewedAt || s.diagnosis.length > 0);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -108,6 +106,7 @@ export function ValuesLabPage() {
     ...s,
     diagnosis: [],
     questionsGenerated: [],
+    analysisIsCurrent: false,
   });
 
   const updateCard = (cardId: string, fields: Partial<VclCard>) => {
@@ -158,11 +157,11 @@ export function ValuesLabPage() {
       const insights =
         diagnosis.length === 0
           ? [
-              ...s.insights,
-              'המפה מאוזנת: יש היררכיה, יש מינימום מוגדר ואין עומס אילוצים קשיחים.',
+              ...s.insights.filter((text) => !text.startsWith('לא עלו סימנים')),
+              'לא עלו סימנים לפי כללי התרגיל. זה אינו מוכיח שהמצב מאוזן; בחר שאלה אחת ובדוק מה עדיין חסר.',
             ]
           : s.insights;
-      return { ...s, diagnosis, questionsGenerated, insights };
+      return { ...s, diagnosis, questionsGenerated, insights, reviewedAt: s.reviewedAt || new Date().toISOString(), analysisIsCurrent: true };
     });
     if (!awarded) {
       addXP(15);
@@ -176,15 +175,14 @@ export function ValuesLabPage() {
       <div className="card vcl-start-screen">
         <h2>💎 מעבדת ערכים ואילוצים</h2>
         <p>
-          בוחרים תרחיש מוכן, עובדים עם כרטיסים שכבר קיימים, ומכוונים רק החלטות קצרות:
-          חשיבות, קשיחות, התנגשות ומנצח. אין כתיבה חופשית ואין קבצי יבוא/ייצוא.
+          כשיש רצון ושני תנאים שמתנגשים, בחר תרחיש למידה: מה חשוב, מה באמת מחייב ומה אפשר לשנות. מסיימים בהחלטה אחת וצעד לבדיקה.
         </p>
         <div className="feature-brief">
           <span>
-            <strong>מטרה:</strong> לראות אילו תנאים סמויים תוקעים רצון.
+            <strong>מטרה:</strong> לזהות תנאים מתנגשים ולהחליט מה לבדוק.
           </span>
           <span>
-            <strong>תוצר:</strong> אבחנה, שאלות מטה-מודל ומהלכים שאפשר לבחור מהם.
+            <strong>תוצר:</strong> שאלה אחת, סדר עדיפויות וצעד אפשרי.
           </span>
         </div>
 
@@ -193,7 +191,7 @@ export function ValuesLabPage() {
             { icon: '📌', title: 'בוחרים תרחיש', detail: 'המשפט והכרטיסים כבר מוכנים מראש' },
             { icon: '🎚️', title: 'מכוונים כרטיסים', detail: 'חשיבות וקשיחות דרך סליידר ותפריט' },
             { icon: '⚔️', title: 'מסמנים התנגשויות', detail: 'בוחרים שני תנאים מתוך הרשימה' },
-            { icon: '🩺', title: 'מאבחנים', detail: 'המערכת מחזירה אבחנה ושאלות לפי החוקים' },
+            { icon: '🔎', title: 'בודקים את המפה', detail: 'כללי התרגיל מציעים נקודות לבירור; אתה בוחר צעד' },
           ]}
         />
 
@@ -335,7 +333,7 @@ export function ValuesLabPage() {
 
         <div className="vcl-closed-note">
           {isMobile
-            ? 'במובייל עובדים עם כרטיס אחד בכל פעם: בוחרים כרטיס, מכוונים אותו, ממשיכים הלאה ומאבחנים.'
+            ? 'במובייל עובדים עם כרטיס אחד בכל פעם: בוחרים כרטיס, מכוונים אותו, ממשיכים הלאה ובודקים את המפה.'
             : 'התרחיש סגור מראש. אפשר לכוון את הכרטיסים הקיימים ולסמן יחסים ביניהם, בלי להמציא טקסט חדש.'}
         </div>
 
@@ -408,7 +406,7 @@ export function ValuesLabPage() {
               </div>
               <div className="vcl-threshold-grid">{cards.map(thresholdCard)}</div>
             </div>
-            <div className="vcl-floor vcl-floor-bottom">
+            <details className="vcl-floor vcl-floor-bottom"><summary>סקירת הכרטיסים וההקשרים (רשות)</summary>
               <div className="vcl-floor-label">
                 <strong>קומה 1 · מפת הערכים והאילוצים הסמויים</strong>
                 <small>מה עוד חייב להיות נכון? מה אסור שיקרה?</small>
@@ -419,7 +417,7 @@ export function ValuesLabPage() {
                 ))}
               </div>
               <div className="vcl-card-grid">{cards.map(constraintCard)}</div>
-            </div>
+            </details>
           </div>
         )}
 
@@ -459,13 +457,13 @@ export function ValuesLabPage() {
 
         <div className="vcl-diagnose-bar">
           <button type="button" className="btn btn-primary btn-large" onClick={diagnose}>
-            🩺 אבחן: למה זה תקוע?
+            בדוק את המפה
           </button>
         </div>
 
-        {session.diagnosis.length > 0 && (
+        {(session.analysisIsCurrent || session.diagnosis.length > 0) && (
           <div className="vcl-diagnosis-result">
-            <h4>🩺 אבחנה: למה זה תקוע?</h4>
+            <h4>כיוונים לבירור לפי כללי התרגיל</h4><p className="muted">הסימנים נובעים מהכרטיסים ומהבחירות שלך. הם אינם אבחון או קביעה מה חשוב יותר לאדם.</p>{session.diagnosis.length === 0 && <p>לא עלו סימנים בכללים האלה. אפשר להתחיל באחת משאלות הבירור.</p>}
             {session.diagnosis.map((finding) => {
               const rule = rulesById[finding.id] ?? {
                 label: finding.id,
@@ -504,7 +502,7 @@ export function ValuesLabPage() {
                   {moves.map((move) => (
                     <div className="vcl-move-card" key={move.id}>
                       <strong>{move.label}</strong>
-                      <p>{move.description}</p>
+                      <p>{move.description}</p><button className="btn btn-secondary" aria-pressed={session.nextMoveId === move.id} onClick={() => updateSession((s) => ({ ...s, nextMoveId: move.id }))}>{session.nextMoveId === move.id ? 'נבחר לצעד הבא' : 'בחר לצעד הבא'}</button>
                     </div>
                   ))}
                 </div>
@@ -513,6 +511,7 @@ export function ValuesLabPage() {
           </div>
         )}
 
+        <section className="card learning-transfer"><h4>מה תבדוק מכאן?</h4><label htmlFor="vcl-next-step">צעד אחד ומועד — על בסיס ההחלטה שלך</label><input id="vcl-next-step" value={session.nextStep ?? ''} onChange={(e) => updateSession((s) => ({ ...s, nextStep: e.target.value }))} placeholder="למשל: לבדוק מחר מה באמת נדרש ומי יכול לאשר זאת" /><p className="learning-muted">זהו תרגיל לבדיקת בחירה. תנאי בטיחות או מגבלה ממשית אינם מתבטלים בגלל דירוג חשיבות.</p></section>
         <div className="action-buttons">
           <button
             type="button"

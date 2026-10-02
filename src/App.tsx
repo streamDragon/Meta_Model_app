@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { FEATURES, isValidFeatureId } from './registry';
+import { FEATURES, NAV_GROUPS } from './registry';
+import { resolveRoute } from './lib/navigation';
+import { ConversationLearningProvider } from './store/conversationLearning';
 import { MobileFallback } from './components/MobileFallback';
 import { WhyItMatters } from './components/WhyItMatters';
 import { CourseDoor } from './features/home/CourseDoor';
@@ -12,8 +14,7 @@ import type { BadgeAward } from './store/progress';
 const SOUND_KEY = 'soundEnabled';
 
 function getTabFromHash(): string {
-  const hashTab = decodeURIComponent(window.location.hash || '').replace('#', '');
-  return hashTab && isValidFeatureId(hashTab) ? hashTab : 'home';
+  return resolveRoute(window.location.hash, window.location.search, FEATURES);
 }
 
 function useHashRoute() {
@@ -138,7 +139,8 @@ function AppShell() {
         </div>
 
         <nav className="rail-nav" aria-label="מסכי האפליקציה">
-          {FEATURES.map((f) => (
+          {NAV_GROUPS.map((group) => {
+            const links = FEATURES.filter((f) => f.navGroup === group.id).map((f) => (
             <button
               key={f.id}
               type="button"
@@ -155,7 +157,15 @@ function AppShell() {
                 <span className="status-chip">{f.status}</span>
               )}
             </button>
-          ))}
+            ));
+            return group.id === 'core' ? (
+              <div key={group.id}><span className="rail-group-label">{group.label}</span>{links}</div>
+            ) : (
+              <details className="rail-more" key={group.id} open={FEATURES.some((f) => f.navGroup === group.id && f.id === activeTab)}>
+                <summary>{group.label}</summary>{links}
+              </details>
+            );
+          })}
         </nav>
 
         <RailProgress />
@@ -200,9 +210,10 @@ function AppShell() {
                 key={f.id}
                 id={f.id}
                 className={`tab-content ${activeTab === f.id ? 'active' : ''}`}
+                hidden={activeTab !== f.id}
               >
-                {f.id === 'home' && <CourseDoor />}
                 {showFallback ? <MobileFallback feature={f} /> : <Feature />}
+                {f.id === 'home' && <CourseDoor />}
               </section>
             );
           })}
@@ -222,7 +233,7 @@ function AppShell() {
               <span aria-hidden="true">{f.icon}</span>
               <strong>
                 {f.id === 'blueprint'
-                  ? 'Blueprint'
+                  ? 'צעדים'
                   : f.id === 'prismlab'
                     ? 'פריזמות'
                     : f.navLabel}
@@ -246,9 +257,11 @@ function AppWithProviders() {
 
   return (
     <ProgressProvider onBadges={onBadges}>
-      <PracticeLaunchProvider>
-        <AppShell />
-      </PracticeLaunchProvider>
+      <ConversationLearningProvider>
+        <PracticeLaunchProvider>
+          <AppShell />
+        </PracticeLaunchProvider>
+      </ConversationLearningProvider>
     </ProgressProvider>
   );
 }

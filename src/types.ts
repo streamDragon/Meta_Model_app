@@ -128,6 +128,8 @@ export interface PrismAnswer {
 }
 
 export interface PrismSession {
+  statement?: string;
+  preferredPivot?: PrismAnswer['level'];
   datetime: string;
   prism_id: string;
   prism_name: string;

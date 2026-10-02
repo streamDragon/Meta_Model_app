@@ -5,6 +5,9 @@ import { PRISM_LEVELS, type PivotRecommendation, type PrismSession } from '../ty
 //   for a "small win" entry point;
 // - otherwise the level with the most answers, ties broken toward lower levels.
 export function computePivotRecommendation(session: PrismSession): PivotRecommendation {
+  if (session.preferredPivot && session.answers.some((a) => a.level === session.preferredPivot)) {
+    return { pivot: session.preferredPivot, reason: 'זו נקודת ההתחלה שבחרת מתוך המפה. בדוק אם השאלה מאפשרת בירור או צעד קטן שמתאים למצב.' };
+  }
   const counts: Record<string, number> = Object.fromEntries(
     PRISM_LEVELS.map((level) => [level.id, 0]),
   );
@@ -37,7 +40,7 @@ export function computePivotRecommendation(session: PrismSession): PivotRecommen
   );
   const reason =
     bestCount > 0
-      ? `הרבה תשובות נופלות ב${levelNames[best]} — זהו מקום הגיוני למקד Small Win`
+      ? `לפי הבחירות המוכנות במפה, אפשר להתחיל ב${levelNames[best]} — זו הצעת עבודה לבדיקה (Small Win), ולא מסקנה על האדם`
       : 'לא נמצאו תשובות — שקול להתחיל ב-B או ב-E עם צעד קטן';
   return { pivot: best, reason };
 }

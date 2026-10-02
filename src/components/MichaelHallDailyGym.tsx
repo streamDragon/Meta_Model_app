@@ -3,7 +3,6 @@ import {
   michaelHallDailyCards,
   type MichaelHallDailyCard,
 } from '../data/michaelHallDailyCards';
-import { SurfaceHiddenPrinciple } from './SurfaceHiddenPrinciple';
 
 const STORAGE_KEY = 'michaelHallDailyGym:v1';
 
@@ -26,8 +25,8 @@ const emptyState: MichaelHallDailyGymState = {
 
 const categoryLabelsHe: Record<MichaelHallDailyCard['category'], string> = {
   'problem-solving': 'פתרון בעיות',
-  epistemology: 'אפיסטמולוגיה',
-  phenomenology: 'פנומנולוגיה',
+  epistemology: 'איך אנחנו יודעים',
+  phenomenology: 'תיאור החוויה',
   beliefs: 'אמונות',
   'meta-programs': 'מטא-פרוגרמים',
   coaching: 'אימון',
@@ -58,7 +57,7 @@ function normalizeStoredState(value: unknown): MichaelHallDailyGymState {
       ? String(stored.currentCardId)
       : emptyState.currentCardId,
     completedCardIds: Array.isArray(stored.completedCardIds)
-      ? stored.completedCardIds.filter((id): id is string => typeof id === 'string')
+      ? [...new Set(stored.completedCardIds.filter((id): id is string => typeof id === 'string' && michaelHallDailyCards.some((card) => card.id === id)))]
       : [],
     notesByCardId:
       stored.notesByCardId && typeof stored.notesByCardId === 'object'
@@ -134,6 +133,7 @@ export function MichaelHallDailyGym() {
   const note = gymState.notesByCardId[card.id] ?? '';
   const exerciseChecks = gymState.exerciseChecksByCardId[card.id] ?? [];
   const completedCount = gymState.completedCardIds.length;
+  const enoughPractice = exerciseChecks.filter(Boolean).length >= Math.min(2, card.exercisesHe.length);
   const isCompleted = gymState.completedCardIds.includes(card.id);
 
   const updateGymState = (
@@ -153,6 +153,7 @@ export function MichaelHallDailyGym() {
   };
 
   const markComplete = () => {
+    if (!enoughPractice || isCompleted) return;
     updateGymState((prev) => {
       const completed = new Set(prev.completedCardIds);
       completed.add(card.id);
@@ -189,14 +190,6 @@ export function MichaelHallDailyGym() {
     });
   };
 
-  const shuffleCard = () => {
-    if (michaelHallDailyCards.length <= 1) return;
-    let nextIndex = currentIndex;
-    while (nextIndex === currentIndex) {
-      nextIndex = Math.floor(Math.random() * michaelHallDailyCards.length);
-    }
-    goToIndex(nextIndex);
-  };
 
   return (
     <div className="workbench michael-hall-gym" dir="rtl">
@@ -212,7 +205,7 @@ export function MichaelHallDailyGym() {
         <div className="daily-gym-progress" aria-label="התקדמות חדר האימון">
           <div>
             <strong>
-              יום {card.dayIndex} מתוך {michaelHallDailyCards.length}
+              כרטיס {card.dayIndex} מתוך {michaelHallDailyCards.length}
             </strong>
             <span>כרטיס נוכחי</span>
           </div>
@@ -257,7 +250,6 @@ export function MichaelHallDailyGym() {
 
           <section className="daily-card-section">
             <h4>תרגילים</h4>
-            <SurfaceHiddenPrinciple compact />
             <div className="daily-exercise-list">
               {card.exercisesHe.map((exercise, index) => (
                 <label className="daily-exercise-row" key={exercise}>
@@ -297,7 +289,7 @@ export function MichaelHallDailyGym() {
             type="button"
             className="btn btn-primary"
             onClick={markComplete}
-            disabled={isCompleted}
+            disabled={isCompleted || !enoughPractice}
           >
             היום סיימתי
           </button>
@@ -322,16 +314,8 @@ export function MichaelHallDailyGym() {
           >
             כרטיס קודם
           </button>
-          <button type="button" className="btn btn-secondary" onClick={shuffleCard}>
-            ערבב כרטיס
-          </button>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => goToIndex(0)}
-          >
-            חזרה להתחלה
-          </button>
+          <label>בחר כרטיס<select aria-label="בחירת כרטיס יומי" value={card.id} onChange={(e) => goToIndex(michaelHallDailyCards.findIndex((item) => item.id === e.target.value))}>{michaelHallDailyCards.map((item) => <option key={item.id} value={item.id}>{item.dayIndex}. {item.titleHe}</option>)}</select></label>
+          <p className="learning-muted">סמן לפחות שתי פעולות שניסית לפני השלמה. ההערות נשמרות בדפדפן; אין צורך לכתוב פרטים מזהים.</p>
         </div>
       </div>
 

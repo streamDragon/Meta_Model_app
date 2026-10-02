@@ -1,11 +1,10 @@
 import type { PracticeStatement, ViolationFamily } from '../types';
 import { shuffle, type Rng } from './random';
+import { content } from '../data/content';
 
-export const CATEGORY_ID_TO_NAME: Record<string, ViolationFamily> = {
-  deletion: 'DELETION',
-  distortion: 'DISTORTION',
-  generalization: 'GENERALIZATION',
-};
+export const CATEGORY_ID_TO_NAME: Record<string, ViolationFamily> = Object.fromEntries(
+  content.categories.map((category) => [category.id, category.subcategories[0].category]),
+);
 
 export const CATEGORY_LABELS: Record<ViolationFamily, string> = {
   DELETION: 'מחיקה (Deletion)',
@@ -68,6 +67,6 @@ export function completionMessage(rate: number): string {
 
 export function completionNextFocus(rate: number): string {
   return rate >= 80
-    ? 'נסה עכשיו Blueprint כדי להפוך זיהוי טוב לתוכנית פעולה.'
+    ? 'נסה עכשיו אימון שיחה כדי לבחור תגובה לפי ההקשר והמטרה.'
     : 'פתח את הקטגוריות וחזק את ההבדל בין מחיקה, עיוות והכללה.';
 }

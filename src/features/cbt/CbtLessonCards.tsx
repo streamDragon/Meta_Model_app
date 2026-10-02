@@ -30,7 +30,7 @@ export function CbtLessonCards({ onAward }: { onAward: (amount: number) => void 
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={() => complete(lesson.id)}
+            disabled={completed.includes(lesson.id)} onClick={() => complete(lesson.id)}
           >
             {completed.includes(lesson.id) ? 'נלמד' : 'סמן כשיעור שנלמד'}
           </button>

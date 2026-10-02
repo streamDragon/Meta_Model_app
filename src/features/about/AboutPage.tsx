@@ -22,8 +22,8 @@ export function AboutPage() {
           <p>בוחרים מעבדה, פותחים משפט, מזהים דפוס, שואלים שאלה טובה ובונים פעולה או ניסוי קטן.</p>
         </article>
         <article className="about-card">
-          <strong>מה מיוחד</strong>
-          <p>התוכן מגיע מחבילות JSON/TS ניידות, בלי ניתוח חופשי ובלי API חיצוני.</p>
+          <strong>איך מתקדמים</strong>
+          <p>מתרגלים תגובה בהקשר, מקבלים משוב וחוזרים למיומנויות שדורשות חיזוק. הנקודות מציינות תרגול.</p>
         </article>
       </div>
 
@@ -55,6 +55,14 @@ export function AboutPage() {
 
       <div className="about-source-panel">
         <h3>מקורות, גבולות וקוד</h3>
+        <p>אימון השיחה משלב בירור במטה־מודל, הקשבה ושיקוף, הגדרת מטרה, הסכמה ובדיקת צעד. אלה רכיבי למידה נפרדים; השילוב באפליקציה עדיין לא נבדק ליעילות טיפולית.</p>
+        <p>סקירה שיטתית של NLP מצאה ראיות מוגבלות להשפעה על תוצאות בריאות. מחקר על שליפה וחזרות מרווחות תומך בעקרונות למידה, אך אינו מוכיח שהאפליקציה מטפלת בקושי נפשי.</p>
+        <ul>
+          <li><a href="https://bjgp.org/content/62/604/e757" target="_blank" rel="noreferrer noopener">Sturt ואחרים, 2012 — סקירת NLP</a></li>
+          <li><a href="https://www.nature.com/articles/s44159-022-00089-1" target="_blank" rel="noreferrer noopener">Carpenter ואחרים, 2022 — שליפה וחזרות מרווחות</a></li>
+          <li><a href="https://library.samhsa.gov/sites/default/files/PEP20-02-02-014.pdf" target="_blank" rel="noreferrer noopener">SAMHSA — הקשבה, שיקוף ושאלות פתוחות בראיון מוטיבציוני</a></li>
+        </ul>
+        <p>פירושים ומשמעויות משתמעות הם אפשרויות לבדיקה עם הדובר, ולא עובדות עליו. שמירה מקומית אינה סנכרון בין מכשירים.</p>
         <p>
           האפליקציה משלבת עקרונות Meta Model מתוך NLP עם תרגול CBT חינוכי:
           מחשבה כמפה, בדיקת ראיות, הרחבת מסגרת, ניסוי מציאות ופעולה קטנה.
@@ -70,7 +78,7 @@ export function AboutPage() {
           target="_blank"
           rel="noreferrer noopener"
         >
-          GitHub Repository
+          קוד המקור של הפרויקט
         </a>
       </div>
 

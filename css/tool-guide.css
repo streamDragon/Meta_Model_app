@@ -1,0 +1,7 @@
+#supplementary-tool-guide { font-family: Heebo, Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #263149; background: #f5f6fc; border-bottom: 1px solid #d7dbe5; padding: 12px 20px; }
+#supplementary-tool-guide nav { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+#supplementary-tool-guide a { color: #342466; min-height: 44px; display: inline-flex; align-items: center; text-decoration: underline; }
+#supplementary-tool-guide details { margin-top: 6px; max-width: 900px; }
+#supplementary-tool-guide summary { cursor: pointer; }
+#supplementary-tool-guide p { margin: 8px 0; }
+@media (max-width: 640px) { #supplementary-tool-guide { padding: 10px 14px; } #supplementary-tool-guide nav { gap: 6px 16px; } select, textarea, input:not([type='range']):not([type='checkbox']):not([type='radio']) { font-size: 16px; max-width: 100%; box-sizing: border-box; } }

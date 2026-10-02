@@ -27,7 +27,7 @@ describe('cbtEngine', () => {
     expect(analysis.cbtPatterns).toEqual(expect.arrayContaining(['mind_reading']));
     expect(analysis.metaModelPatterns).toEqual(expect.arrayContaining(['mind_reading']));
     expect(generateMetaModelQuestions(analysis)).toEqual(
-      expect.arrayContaining(['מי בדיוק לא ענה?', 'לפי מה אתה יודע שזה אומר שלא רוצים אותך?']),
+      expect.arrayContaining(['מי בדיוק לא ענה?', 'מה ראית או שמעת שמבסס את ההבנה הזאת?']),
     );
     expect(generateCbtQuestions(analysis)[0]).toContain('ראיה');
     expect(analysis.suggestedMoves.map((move) => move.type)).toContain('missing_information_question');

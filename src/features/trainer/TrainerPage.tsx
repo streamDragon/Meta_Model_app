@@ -184,7 +184,7 @@ export function TrainerPage() {
     <div className="workbench">
       <div className="workbench-main card">
         <h2>תרגול דינאמי 🎮</h2>
-        <p className="subtitle">בחר קטגוריה וענה על שאלות אינטראקטיביות עם משוב מידי</p>
+        <p className="subtitle">לומדים להבחין בין דפוס במילים לבין פירוש שנוסף בהקשר של התרגיל.</p>
 
         <div className="feature-brief">
           <span>
@@ -197,22 +197,6 @@ export function TrainerPage() {
 
         <SurfaceHiddenPrinciple compact />
 
-        <div className="practice-filters">
-          <label htmlFor="category-select">בחר קטגוריה:</label>
-          <select
-            id="category-select"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <option value="">הכל</option>
-            {content.categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.hebrew_name}
-              </option>
-            ))}
-          </select>
-        </div>
-
         <div id="category-chip-list" className="category-chip-list" aria-label="בחירת קטגוריה מהירה">
           {chips.map((chip) => (
             <button
@@ -221,6 +205,8 @@ export function TrainerPage() {
               className={`category-chip ${chip.id === selectedCategory ? 'active' : ''}`}
               data-category={chip.id}
               data-accent={chip.accent}
+              disabled={phase === 'active'}
+              aria-pressed={chip.id === selectedCategory}
               onClick={() => setSelectedCategory(chip.id)}
             >
               {chip.label}
@@ -275,8 +261,9 @@ export function TrainerPage() {
               <p>
                 {answerStep === 'surface'
                   ? 'מה נמצא במילים עצמן, עוד לפני שאנחנו מוסיפים פרשנות?'
-                  : 'מה יכול להיות מושלם מהטון, ההשלכה או המשפט המלא המשתמע?'}
+                  : 'לפי ההשלמה שניתנה בתרגיל, איזה דפוס מופיע? בשיחה אמיתית שואלים ובודקים לפני שמניחים.'}
               </p>
+              {answerStep === 'hidden' && layeredQuestion?.impliedFullTextHe && <blockquote className="learning-context"><strong>ההשלמה שניתנה בתרגיל:</strong> {layeredQuestion.impliedFullTextHe}</blockquote>}
               {selectedSurface && answerStep === 'hidden' && (
                 <small>הבחירה הגלויה שלך: {CATEGORY_LABELS[selectedSurface]}</small>
               )}

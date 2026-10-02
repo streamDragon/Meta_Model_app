@@ -1,8 +1,11 @@
+import { FEATURES } from '../../registry';
+
 interface LegacyToolLink {
   title: string;
   description: string;
   href: string;
   tag: string;
+  canonicalId?: string;
 }
 
 const LEGACY_TOOLS: LegacyToolLink[] = [
@@ -11,12 +14,14 @@ const LEGACY_TOOLS: LegacyToolLink[] = [
     description: 'תרגול טקסטואלי מתקדם לזיהוי קטגוריות וסימון בתוך הטקסט.',
     href: 'classic2_trainer.html',
     tag: 'trainer',
+    canonicalId: 'practice',
   },
   {
     title: 'Classic Classic',
     description: 'זיהוי תבניות מטה מודל דרך משפט, שאלה, מבנה ומשוב.',
     href: 'classic_classic_trainer.html',
     tag: 'trainer',
+    canonicalId: 'practice',
   },
   {
     title: 'Iceberg Templates',
@@ -41,6 +46,7 @@ const LEGACY_TOOLS: LegacyToolLink[] = [
     description: 'גרסאות הפריזמות המקוריות שנשמרו מהאפליקציה הפרודקשנית.',
     href: 'prism_lab_trainer.html',
     tag: 'prism',
+    canonicalId: 'prismlab',
   },
   {
     title: 'Sentence Morpher',
@@ -74,26 +80,22 @@ export function LegacyToolsPage() {
       <div className="legacy-hero">
         <span aria-hidden="true">🧰</span>
         <div>
-          <h2>כלים שנשמרו מהגרסה הפרודקשנית</h2>
-          <p>
-            הגרסה החדשה של Meta Model Gym היא הבית הראשי. הכלים כאן נשמרו כדי
-            שלא נאבד תרגילים ותוכן טובים מהאפליקציה הקודמת בזמן שמחליטים מה
-            להכניס בהמשך לתוך React.
-          </p>
+          <h2>כלים נוספים</h2>
+          <p>בחר לפי המיומנות. תרגילי עומק ייחודיים זמינים כאן; גרסאות מקבילות נמצאות בארכיון.</p>
         </div>
       </div>
 
       <div className="feature-brief">
         <span>
-          <strong>מטרה:</strong> לשמר ערך קיים בלי לערבב קוד ישן בתוך המעטפת החדשה.
+          <strong>מטרה:</strong> להעמיק במבנה, בניסוח ובהקשר.
         </span>
         <span>
-          <strong>תוצר:</strong> קישורים לכלים סטטיים שעובדים לצד האפליקציה החדשה.
+          <strong>תוצר:</strong> אימון ממוקד במיומנות שבחרת.
         </span>
       </div>
 
       <div className="legacy-tool-grid">
-        {LEGACY_TOOLS.map((tool) => (
+        {LEGACY_TOOLS.filter((tool) => !tool.canonicalId).map((tool) => (
           <a className="legacy-tool-card" href={tool.href} key={tool.href}>
             <span className="legacy-tool-tag">{tool.tag}</span>
             <strong>{tool.title}</strong>
@@ -102,6 +104,17 @@ export function LegacyToolsPage() {
           </a>
         ))}
       </div>
+      <details className="legacy-archive">
+        <summary>ארכיון: גרסאות מקבילות ({LEGACY_TOOLS.filter((tool) => tool.canonicalId).length})</summary>
+        {LEGACY_TOOLS.filter((tool) => tool.canonicalId).map((tool) => {
+          const canonical = FEATURES.find((feature) => feature.id === tool.canonicalId);
+          return <article className="legacy-tool-card" key={tool.href}>
+            <strong>{tool.title}</strong><p>{tool.description}</p>
+            {canonical && <a href={canonical.route}>למסלול הראשי: {canonical.navLabel}</a>}
+            <a href={tool.href}>פתח את הגרסה השמורה</a>
+          </article>;
+        })}
+      </details>
     </div>
   );
 }

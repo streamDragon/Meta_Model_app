@@ -5,6 +5,7 @@ import './styles/app.css';
 import './styles/visuals.css';
 import './styles/valueslab.css';
 import './styles/cbt.css';
+import './styles/learning.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

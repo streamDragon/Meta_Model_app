@@ -2198,7 +2198,9 @@ input[type='range'] {
   }
 
   .bottom-nav-btn strong {
-    font-size: 0.68rem;
+    font-size: 0.875rem;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
     font-weight: 600;
   }
 

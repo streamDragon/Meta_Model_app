@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { shuffle } from '../../lib/random';
 import { XP_REWARDS } from '../../store/progress';
 import { cbtPracticeItems, metaPatternLabel, patternLabel } from './cbtContent';
 import { savePracticeCorrect } from './cbtStorage';
@@ -10,10 +11,11 @@ export function CbtPracticeDrills({ onAward }: { onAward: (amount: number) => vo
   const item = cbtPracticeItems[index % cbtPracticeItems.length];
   const options = useMemo(() => {
     const all = ['mind_reading', 'should_must', 'overgeneralization', 'all_or_nothing'];
-    return Array.from(new Set([item.cbtPatterns[0], ...all])).slice(0, 4);
+    return shuffle(Array.from(new Set([item.cbtPatterns[0], ...all])).slice(0, 4));
   }, [item]);
 
   const choose = (pattern: string) => {
+    if (selected !== null) return;
     const correct = item.cbtPatterns.includes(pattern);
     setSelected(pattern);
     setWasCorrect(correct);
