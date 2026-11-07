@@ -114,6 +114,11 @@ export function GForceActionMapPage() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(map)); } catch { /* local storage may be unavailable */ }
   }, [map]);
 
+  useEffect(() => () => {
+    if (photo.before) URL.revokeObjectURL(photo.before);
+    if (photo.after) URL.revokeObjectURL(photo.after);
+  }, [photo]);
+
   const patch = (values: Partial<CaseMap>) => setMap((old) => ({ ...old, ...values }));
   const updateStep = (id: string, edit: (step: ActionStep) => ActionStep) =>
     setMap((old) => ({ ...old, steps: editStep(old.steps, id, edit) }));
@@ -142,10 +147,7 @@ export function GForceActionMapPage() {
     if (file.size > 5 * 1024 * 1024) { setPhotoError('התמונה גדולה מדי. בחר תמונה עד 5MB.'); return; }
     setPhotoError('');
     const url = URL.createObjectURL(file);
-    setPhoto((current) => {
-      if (current[kind]) URL.revokeObjectURL(current[kind]!);
-      return { ...current, [kind]: url };
-    });
+    setPhoto((current) => ({ ...current, [kind]: url }));
   };
 
   const renderStep = (step: ActionStep, depth = 0): ReactElement => (
