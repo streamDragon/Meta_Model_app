@@ -13,7 +13,7 @@ afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 describe('G-Force visual action map', () => {
   it('starts from a real task with resources and a visible next transition', () => {
     render(<GForceActionMapPage />);
-    expect(screen.getByText('מפת המהלך שלי')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: /מפת המהלך שלי/ })).toBeTruthy();
     expect(screen.getByLabelText('המצב עכשיו')).toBeTruthy();
     expect(screen.getByLabelText('כך אדע שהצלחתי')).toBeTruthy();
     expect(screen.getByRole('checkbox', { name: 'מטאטא' })).toBeTruthy();
