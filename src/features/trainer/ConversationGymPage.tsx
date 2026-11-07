@@ -22,6 +22,7 @@ export function ConversationGymPage() {
   const sessionId = useRef('');
   const advancing = useRef(false);
   const feedbackRef = useRef<HTMLElement | null>(null);
+  const responseRef = useRef<HTMLElement | null>(null);
   const nextScenario = recommendScenario(learning);
 
   const start = (value: ConversationScenario) => {
@@ -35,6 +36,7 @@ export function ConversationGymPage() {
     setDone(false);
     setDraft('');
     setOptions(shuffle(value.turns[0].options));
+    window.scrollTo?.({ top: 0, behavior: 'auto' });
   };
 
   const leave = () => {
@@ -52,6 +54,11 @@ export function ConversationGymPage() {
   useEffect(() => {
     if (selected) feedbackRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
   }, [selected]);
+
+  const retry = () => {
+    setSelected(null);
+    responseRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+  };
 
   const next = () => {
     if (!scenario || !selected || !first || advancing.current) return;
@@ -133,6 +140,7 @@ export function ConversationGymPage() {
   const question = moment?.question ?? turn.prompt;
   const skill = CONVERSATION_SKILLS.find((item) => item.id === turn.skill);
   const step = turnIndex + 1;
+  const completedTurns = done ? scenario.turns.length : results.length + Number(Boolean(selected));
 
   return (
     <div className="learning-page conversation-gym conversation-workout" dir="rtl">
@@ -146,9 +154,10 @@ export function ConversationGymPage() {
         aria-label="התקדמות באימון"
         aria-valuemin={0}
         aria-valuemax={scenario.turns.length}
-        aria-valuenow={step}
+        aria-valuenow={completedTurns}
+        aria-valuetext={`${completedTurns} מתוך ${scenario.turns.length} רגעים הושלמו`}
       >
-        <span style={{ width: ((step / scenario.turns.length) * 100) + '%' }} />
+        <span style={{ width: ((completedTurns / scenario.turns.length) * 100) + '%' }} />
       </div>
       <header className="conversation-scene-head">
         {visual?.image && <img src={visual.image} alt="" className="conversation-scene-image" />}
@@ -170,21 +179,12 @@ export function ConversationGymPage() {
             </div>
           </section>
 
-          {moment && (
-            <aside className="conversation-theory" aria-label="רגע תיאורטי">
-              <div className="conversation-theory-title">
-                <span aria-hidden="true">💡</span>
-                <div><span>רגע תיאורטי</span><strong>{moment.theory.title}</strong></div>
-              </div>
-              <p>{moment.theory.cue}</p>
-              <details>
-                <summary>למה זה חשוב?</summary>
-                <p>{moment.theory.detail}</p>
-              </details>
-            </aside>
-          )}
+          <details className="conversation-prep">
+            <summary>💡 רוצה רמז לפני הבחירה?</summary>
+            <p>מה האדם רוצה שיקרה בשיחה עכשיו? חפש תגובה שמתאימה גם למילים שלו וגם לתזמון.</p>
+          </details>
 
-          <section className="conversation-response-area" aria-label="בחר תגובה">
+          <section ref={responseRef} className="conversation-response-area" aria-label="בחר תגובה">
             <div className="conversation-response-head">
               <h3>איך היית מגיב?</h3>
               <span>{skill?.title}</span>
@@ -216,12 +216,25 @@ export function ConversationGymPage() {
               <span className="conversation-kicker">מה למדנו מהתגובה?</span>
               <h3>{selected.quality === 'helpful' ? 'מתאים להקשר הזה' : selected.quality === 'mixed' ? 'יש כאן כיוון, אבל התזמון חשוב' : 'כדאי לבחור תגובה אחרת'}</h3>
               <p>{selected.feedback}</p>
+              {moment && (
+                <aside className="conversation-theory" aria-label="רגע תיאורטי">
+                  <div className="conversation-theory-title">
+                    <span aria-hidden="true">💡</span>
+                    <div><span>הרגע התיאורטי</span><strong>{moment.theory.title}</strong></div>
+                  </div>
+                  <p>{moment.theory.cue}</p>
+                  <details>
+                    <summary>להסבר המלא</summary>
+                    <p>{moment.theory.detail}</p>
+                  </details>
+                </aside>
+              )}
               <div className="conversation-peer-reply">
                 <strong>תגובה אפשרית של הדובר</strong>
                 <blockquote>{selected.reply}</blockquote>
               </div>
               <div className="learning-actions">
-                {selected.quality !== 'helpful' && <button className="btn btn-secondary" onClick={() => setSelected(null)}>נסה תגובה נוספת</button>}
+                {selected.quality !== 'helpful' && <button className="btn btn-secondary" onClick={retry}>נסה תגובה נוספת</button>}
                 <button className="btn btn-primary" onClick={next}>{step === scenario.turns.length ? 'סכם את האימון' : 'לרגע הבא בשיחה'}</button>
               </div>
               <p className="learning-muted">במעקב נרשמת הבחירה הראשונה. ניסיון נוסף עוזר ללמוד.</p>
