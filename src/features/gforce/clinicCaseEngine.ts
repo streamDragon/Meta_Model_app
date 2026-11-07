@@ -396,6 +396,72 @@ export function ask(s: Session, id: QuestionId): Session {
   };
 }
 
+export type ProbeKind = 'imagine' | 'comfort' | 'micro';
+export type ProbeStatus = 'ready' | 'blocked' | 'uncertain';
+
+/** A targeted interview about ONE revealed picture. Image recognition alone isn't readiness. */
+export interface ProbeResult {
+  session: Session;
+  status: ProbeStatus;
+  answer: string;
+  direction: string;
+}
+
+export function probeScene(s: Session, id: SceneId, kind: ProbeKind): ProbeResult {
+  if (!seen(s, id)) return { session: s, status: 'uncertain', answer: 'התמונה הזו עוד לא עלתה בשיחה.', direction: 'להמשיך לשאול בלי לחשוף תמונה שלא נבנתה' };
+  const existing = s.probes[id]?.[kind];
+  if (existing) return {
+    session: s, status: existing, answer: 'כבר ביררנו את הכיוון הזה. אפשר לנסות שאלה אחרת או לחזור לתמונה מאוחר יותר.',
+    direction: 'לחקור היבט אחר של המפה',
+  };
+  let status: ProbeStatus = 'uncertain';
+  let answer = '';
+  let direction = '';
+  let load = s.load;
+  let energy = s.energy;
+  let focus = s.focus;
+  if (kind === 'imagine') {
+    status = id === 'scope' || id === 'permission' ? 'uncertain' : 'ready';
+    answer = status === 'ready'
+      ? 'אני יכול לראות את המצב הזה די בבירור. אבל זה שאני רואה אותו לא אומר שאני כבר יודע איך להגיע אליו.'
+      : 'יש לי בראש כמה תמונות סותרות, ואני עוד לא יודע איזו מהן מתארת מה שבאמת הייתי רוצה.';
+    direction = status === 'ready' ? 'לבדוק האם הדבר גם נוח וגם אפשרי' : 'להבהיר את התמונה, בלי ללחוץ לקבל החלטה';
+  } else if (kind === 'comfort') {
+    status = ['stuck', 'scope', 'choice', 'permission', 'fatigue'].includes(id) ? 'blocked' : 'ready';
+    if (id === 'goal' && !has(s, 'boundary') && !has(s, 'state')) status = 'uncertain';
+    answer = status === 'blocked'
+      ? 'כשאני מדמיין את זה הגוף שלי מתכווץ. זו לא רק בעיה של לדעת מה עושים, יש כאן תחושה שלא נוח לי להיכנס אליה.'
+      : status === 'uncertain'
+      ? 'אני מרגיש גם הקלה וגם לחץ. עוד לא ברור לי אם אני באמת מרשה לעצמי להסתפק בתוצאה הזאת.'
+      : 'זה יחסית נעים ומאפשר לי לנשום. אני לא חייב להרגיש התלהבות עצומה כדי להתקדם.';
+    direction = status === 'blocked' ? 'בירור החסם, הערך או האמונה שמפעילים את התחושה'
+      : status === 'uncertain' ? 'לברר מה יאפשר תחושת בחירה וביטחון' : 'לבדוק צעד ראשון בר-ביצוע';
+    if (status === 'blocked') { load = clamp(load + 1); focus = 'barrier'; }
+    if (status === 'ready') energy = clamp(energy + 1);
+  } else {
+    status = ['stuck', 'scope', 'choice', 'permission', 'toolgap', 'fatigue'].includes(id) ? 'blocked' : 'ready';
+    if (id === 'goal' && !has(s, 'first')) status = 'uncertain';
+    answer = status === 'blocked'
+      ? id === 'toolgap' ? 'לא, כי בלי היעה אני לא יכול להשלים את האיסוף. אני צריך קודם למצוא אותו או לבחור דרך אחרת לאיסוף.'
+      : id === 'fatigue' ? 'לא ממש עכשיו. אני זקוק להפסקה קצרה ולגבול זמן סביר לפני שאבחר צעד.'
+      : 'כרגע אני לא מצליח לעשות את המעבר הזה בפשטות. יש פה החלטה או אמונה שכדאי לפרק לפני שנבנה עוד משימות.'
+      : status === 'uncertain' ? 'אני רואה את התוצאה, אבל עדיין אין לי מושג מה הפעולה הראשונה שתוביל לשם.'
+      : 'כן. אם אני מחלק את זה לחלק קטן אחד, אני יודע מה הידיים שלי עושות ואיך אדע שסיימתי.';
+    direction = status === 'ready' ? 'לברר את המעבר הבא, או לעצור עם פעולה אחת ישימה'
+      : status === 'blocked' ? 'להוסיף הסתעפות של חסם או משאב ולחקור אותה' : 'לשאול מה יהיה הצעד הראשון הקטן';
+    if (status === 'blocked') focus = 'barrier';
+  }
+  const question = kind === 'imagine' ? 'האם אתה באמת יכול לראות בעיני רוחך את המצב הזה?'
+    : kind === 'comfort' ? 'כשאתה מדמיין את התמונה הזאת, עד כמה נוח לך להיות שם?'
+    : 'האם אתה יודע איך לעשות את המעבר הזה בפועל, צעד קטן אחד?';
+  const updated: Session = { ...s, load, energy, focus,
+    probes: { ...s.probes, [id]: { ...s.probes[id], [kind]: status } },
+    response: answer, lastReveal: null,
+    turns: [...s.turns, { id: s.turns.length + 1, question: `${question} [${SCENES[id].title}]`, answer, family: kind === 'imagine' ? 'row5' : kind === 'comfort' ? 'future' : 'barrier' }],
+  };
+  return { session: updated, status, answer, direction };
+}
+
 /** Reorder only revealed main-path scenes. No solution is enforced. */
 export function moveScene(s: Session, id: SceneId, direction: -1 | 1): Session {
   if (!seen(s, id) || SCENES[id].kind !== 'spine') return s;
