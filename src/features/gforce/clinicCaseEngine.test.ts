@@ -90,7 +90,7 @@ describe('non-linear G-Force clinic simulation', () => {
     expect(session.sceneOrder).toEqual([]);
     session = ask(session, 'fatigue-context');
     session = ask(session, 'fatigue-sense');
-    expect(session.sceneOrder).toEqual([]); // repeated wording does not produce a shortcut
+    expect(session.sceneOrder).toEqual(['fatigue']); // clarification now makes the earlier question useful
     session = ask(session, 'tool-hurdle');
     session = ask(session, 'toolgap-sense');
     expect(session.sceneOrder).toContain('toolgap');
