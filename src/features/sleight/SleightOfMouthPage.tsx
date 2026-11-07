@@ -18,6 +18,7 @@ import {
   type SimulatedState,
 } from './simulation';
 import './sleight-of-mouth.css';
+import { BeliefDiagram } from './DiltsBeliefMap';
 
 type Phase = 'clarify' | 'challenge' | 'complete';
 type DialogueEntry = { id: number; speaker: 'person' | 'trainee' | 'coach'; text: string; pattern?: string };
@@ -61,86 +62,35 @@ function ScoreBar({
   );
 }
 
-function MemoryConstellation({ used }: { used: readonly MoveId[] }) {
-  const ordered = [...DIALOGUE_MOVES].sort((a, b) => {
-    const order = CHALLENGE_FAMILIES.map((family) => family.id);
-    return order.indexOf(a.family) - order.indexOf(b.family);
-  });
-  const color: Record<FamilyId, string> = {
-    criteria: '#dcaa4b', meaning: '#8169d0', context: '#55aac8',
-  };
-  return (
-    <svg className="som-constellation" viewBox="0 0 500 295" role="img" aria-label={`מפת זיכרון: ${used.length} מתוך 21 תנועות נחשפו`}>
-      <circle cx={250} cy={146} r={116} fill="none" stroke="#e3e5f2" strokeDasharray="4 7" />
-      {ordered.map((move, index) => {
-        const angle = -Math.PI / 2 + (2 * Math.PI * index) / ordered.length;
-        const x = 250 + 221 * Math.cos(angle);
-        const y = 146 + 116 * Math.sin(angle);
-        const visible = used.includes(move.id);
-        const tone = color[move.family];
-        return (
-          <g key={move.id}>
-            <line x1={250} y1={146} x2={x} y2={y} stroke={visible ? tone : '#e4e6ef'} strokeWidth={visible ? 2.4 : 1} opacity={visible ? 0.95 : 0.65} />
-            <circle cx={x} cy={y} r={visible ? 13 : 10} fill={visible ? tone : '#f3f4f9'} stroke={visible ? tone : '#cdd2e2'} strokeWidth="1.8" />
-            {visible && <text x={x} y={y + 4} textAnchor="middle" fill="#fff" fontSize="10" fontWeight="bold">{index + 1}</text>}
-            <title>{visible ? move.title + ' · ' + (move.system === 'dilts' ? 'דילטס' : 'Mind-Lines') : 'דפוס שטרם תורגל'}</title>
-          </g>
-        );
-      })}
-      <circle cx={250} cy={146} r={42} fill="#f0edff" stroke="#7a6add" strokeWidth={3} />
-      <text x={250} y={142} fill="#453d9d" fontSize={14} textAnchor="middle" fontWeight="bold">אמונה</text>
-      <text x={250} y={158} fill="#665bc4" fontSize={12} textAnchor="middle">מרכזית</text>
-    </svg>
-  );
-}
-
 function PatternMap({
-  used,
-  belief,
-  onClose,
+  used, belief, conviction, certainties, caseIndex, onChooseMove, onClose,
 }: {
   used: readonly MoveId[];
   belief: string | null;
+  conviction: number;
+  certainties: Partial<Record<MoveId, number>>;
+  caseIndex: number;
+  onChooseMove?: (move: DialogueMove) => void;
   onClose: () => void;
 }) {
   return (
     <div className="som-scrim" onClick={onClose}>
       <div className="som-map-dialog" role="dialog" aria-modal="true" aria-label="מפת זריזות לשון" onClick={(event) => event.stopPropagation()}>
         <div className="som-modal-top">
-          <div><small>מפת תרגול חיה</small><h2>המפה נחשפת בכל מהלך</h2></div>
+          <div><small>תרשים מהלכים אינטראקטיבי</small><h2>מפת זריזות לשון של דילטס</h2></div>
           <button type="button" aria-label="סגור מפה" className="som-icon-button" onClick={onClose}>✕</button>
         </div>
-        <div className="som-map-summary">
-          <div className="som-map-core"><small>האמונה שמאתגרים</small><strong>{belief || 'תחילה מבררים ומזהים אמונה'}</strong></div>
-          <div className="som-map-count"><b>{used.length}</b><span>מתוך {maxRounds} נחשפו</span></div>
-        </div>
-        <MemoryConstellation used={used} />
-        <div className="som-map-columns">
-          {CHALLENGE_FAMILIES.map((group) => {
-            const moves = DIALOGUE_MOVES.filter((move) => move.family === group.id);
-            return (
-              <section className={'som-map-family som-family-' + group.id} key={group.id}>
-                <h3>{group.icon} {group.title}</h3>
-                <small>{group.question}</small>
-                <div className="som-map-branches">
-                  {moves.map((move) => {
-                    const revealed = used.includes(move.id);
-                    return (
-                      <div key={move.id} className={'som-map-leaf' + (revealed ? ' open' : '')} title={revealed ? move.direction : 'הדפוס ייחשף כשתשתמש בו'}>
-                        <span className="som-leaf-symbol">{revealed ? '✦' : '?'}</span>
-                        <span>{revealed ? move.title : 'לא נחשף'}</span>
-                        <small>{revealed ? (move.system === 'dilts' ? 'דילטס' : 'Mind-Lines') : '· · ·'}</small>
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-            );
-          })}
-        </div>
+        <BeliefDiagram
+          belief={belief}
+          conviction={conviction}
+          used={used}
+          certainties={certainties}
+          caseIndex={caseIndex}
+          onChoose={onChooseMove ? (move) => {onChooseMove(move);onClose();} : undefined}
+        />
         <div className="som-map-footer">
-          <p>הנקודות הריקות אינן רשימת שאלות שאתה חייב לבצע. כל תנועה שניסית מתווספת למפה. התמונה היא ארגון לימודי מקורי, לא צילום של הקלפים.</p>
-          <button className="btn btn-primary" type="button" onClick={onClose}>בחזרה לשיחה</button>
+          <p>אותו תרשים, אבל אינטראקטיבי: לוחצים על תבנית וקוראים דוגמה. צבע מסמן רמת ודאות בלבד.</p>
+          <button className="btn btn-secondary" type="button" onClick={onClose}>בחזרה לשיחה</button>
         </div>
       </div>
     </div>
@@ -210,6 +160,9 @@ export function SleightOfMouthPage() {
   const [needsCalibration, setNeedsCalibration] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [showMap, setShowMap] = useState(false);
+  const [certaintyByMove, setCertaintyByMove] = useState<Partial<Record<MoveId, number>>>({});
+  const [lastMoveId, setLastMoveId] = useState<MoveId | null>(null);
+  const composeRef = useRef<HTMLDivElement>(null);
   const [explosion, setExplosion] = useState(false);
   const [workshopStep, setWorkshopStep] = useState<number | null>(null);
   const [lastShift, setLastShift] = useState<'open' | 'mixed' | 'resist' | 'rupture' | null>(null);
@@ -256,6 +209,8 @@ export function SleightOfMouthPage() {
     setExplosion(false);
     setWorkshopStep(null);
     setLastShift(null);
+    setLastMoveId(null);
+    setCertaintyByMove({});
   }
 
   function askQuestion(id: string) {
@@ -273,6 +228,12 @@ export function SleightOfMouthPage() {
     setDraft(suggestedLine(move, caseIndex, tone));
   }
 
+  useEffect(() => {
+    if (chosenMove && composeRef.current && typeof composeRef.current.scrollIntoView === 'function') {
+      composeRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [chosenMove]);
+
   function changeTone(next: Tone) {
     setTone(next);
     if (selectedMove) setDraft(suggestedLine(selectedMove, caseIndex, next));
@@ -285,6 +246,7 @@ export function SleightOfMouthPage() {
     setNeedsCalibration(true);
     setLastShift(result.reaction);
     setUsed((previous) => previous.includes(selectedMove.id) ? previous : [...previous, selectedMove.id]);
+    setLastMoveId(selectedMove.id);
     addMessages([
       { speaker: 'trainee', text: draft.trim(), pattern: selectedMove.title + ' · ' + (tone === 'joining' ? 'רך' : tone === 'direct' ? 'ישיר' : 'נוקב') },
       { speaker: 'person', text: currentCase.reactions[result.reaction === 'rupture' ? 'rupture' : result.reaction] },
@@ -306,6 +268,9 @@ export function SleightOfMouthPage() {
       { speaker: 'trainee', text: 'איך אתה מרגיש עכשיו? עד כמה אתה בטוח שהאמונה המקורית נכונה, וכמה אפשרויות טובות פתוחות לך?', pattern: 'קליברציה' },
       { speaker: 'person', text: say + (needsCalibration && change.conviction > 0 ? ' האמת היא שעכשיו אני אפילו יותר מחזיק בה.' : '') },
     ]);
+    if (needsCalibration && lastMoveId) {
+      setCertaintyByMove((previous) => ({ ...previous, [lastMoveId]: state.conviction }));
+    }
     setCalibrated({ ...state });
     setNeedsCalibration(false);
   }
@@ -332,7 +297,7 @@ export function SleightOfMouthPage() {
           <p>מהלך אחד מול אמונה אחת, שוב ושוב. אתה מנסה לפתוח אפשרויות, והדמות לא חייבת להסכים.</p>
         </div>
         <button type="button" className="som-map-launch" onClick={() => setShowMap(true)} aria-label="פתח מפה חזותית של זריזות לשון">
-          <span className="som-map-mini" aria-hidden="true"><i /><i /><i /><i /><i /></span>
+          <span className="som-map-mini som-flow-symbol" aria-hidden="true">▭→◇→▭</span>
           <span>מפת המהלכים <b>{progressText}</b></span>
         </button>
       </header>
@@ -406,36 +371,44 @@ export function SleightOfMouthPage() {
                     <button type="button" className="som-text-btn" onClick={() => setShowMap(true)}>מפת המהלכים ◈</button>
                   </div>
                   {latestPersonMessage && <div className="som-latest-reply" role="status"><small>התשובה האחרונה של {currentCase.speaker}</small><p>{latestPersonMessage.text}</p></div>}
-                  <div className="som-families" role="group" aria-label="שלוש משפחות של מהלכי אתגור">
-                    {CHALLENGE_FAMILIES.map((entry) => (
-                      <button type="button" key={entry.id} className={'som-family-card som-family-' + entry.id + (family === entry.id ? ' selected' : '')} aria-pressed={family === entry.id} onClick={() => { setFamily(entry.id); setChosenMove(null); }}>
-                        <span className="som-family-symbol">{entry.icon}</span>
-                        <strong>{entry.title}</strong>
-                        <small>{entry.question}</small>
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="som-system-switch" role="group" aria-label="שיטת המסגור">
-                    {systems.map((item) => (
-                      <button type="button" key={item.id} aria-pressed={system === item.id} className={system === item.id ? 'selected' : ''} onClick={() => { setSystem(item.id); setChosenMove(null); }}>
-                        {item.label} <small>{item.count}</small>
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="som-pattern-grid" aria-label="בחירת מהלך">
-                    {availableMoves.map((item) => (
-                      <button type="button" key={item.id} aria-label={item.title + ' ' + item.direction} aria-pressed={chosenMove === item.id} className={'som-pattern' + (chosenMove === item.id ? ' active' : '')} onClick={() => chooseMove(item)}>
-                        <span>{used.includes(item.id) ? '✓' : '◌'}</span>
-                        <strong>{item.title}</strong>
-                        <small>{item.direction}</small>
-                      </button>
-                    ))}
-                  </div>
+                  <BeliefDiagram
+                    belief={currentCase.coreBelief}
+                    conviction={calibrated.conviction}
+                    used={used}
+                    certainties={certaintyByMove}
+                    caseIndex={caseIndex}
+                    selectedId={chosenMove}
+                    onChoose={(move) => {setFamily(move.family);setSystem(move.system);chooseMove(move);}}
+                  />
+                  <details className="som-extra-picker">
+                    <summary>הצג גם רשימת תבניות לפי סוג אתגור</summary>
+                    <div className="som-families" role="group" aria-label="שלוש משפחות של מהלכי אתגור">
+                      {CHALLENGE_FAMILIES.map((entry) => (
+                        <button type="button" key={entry.id} className={'som-family-card som-family-' + entry.id + (family === entry.id ? ' selected' : '')} aria-pressed={family === entry.id} onClick={() => {setFamily(entry.id);setChosenMove(null);}}>
+                          <span className="som-family-symbol">{entry.icon}</span>
+                          <strong>{entry.title}</strong>
+                          <small>{entry.question}</small>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="som-system-switch" role="group" aria-label="שיטת המסגור">
+                      {systems.map((item) => (
+                        <button type="button" key={item.id} aria-pressed={system === item.id} className={system === item.id ? 'selected' : ''} onClick={() => {setSystem(item.id);setChosenMove(null);}}>
+                          {item.label} <small>{item.count}</small>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="som-pattern-grid" aria-label="בחירת מהלך">
+                      {availableMoves.map((item) => (
+                        <button type="button" key={item.id} aria-label={item.title + ' ' + item.direction} aria-pressed={chosenMove === item.id} className={'som-pattern' + (chosenMove === item.id ? ' active' : '')} onClick={() => chooseMove(item)}>
+                          <span>{used.includes(item.id) ? '✓' : '◌'}</span><strong>{item.title}</strong><small>{item.direction}</small>
+                        </button>
+                      ))}
+                    </div>
+                  </details>
 
                   {selectedMove && (
-                    <div className="som-compose">
+                    <div ref={composeRef} className="som-compose">
                       <div className="som-compose-heading"><small>המהלך שבחרת</small><strong>{selectedMove.title}</strong></div>
                       <label htmlFor="som-trainee-line">מה תגיד לדמות?</label>
                       <textarea id="som-trainee-line" value={draft} onChange={(event) => setDraft(event.target.value)} rows={3} />
@@ -450,7 +423,7 @@ export function SleightOfMouthPage() {
                       <button className="btn btn-primary" type="button" disabled={!draft.trim()} onClick={challenge}>אמור את המשפט</button>
                     </div>
                   )}
-                  {!selectedMove && <p className="som-hint-inline">בחר אחת מהתבניות. אין חובה לפעול לפי סדר, ואפשר לחזור למהלך שכבר ניסית.</p>}
+                  {!selectedMove && <p className="som-hint-inline">גע באחת התבניות בתרשים, קרא את הדוגמה ולחץ ״בחר את המהלך לשיחה״.</p>}
 
                   <div className="som-after-turn">
                     <button type="button" onClick={askCalibration} className="btn btn-secondary">איך אתה מרגיש עכשיו? · קליברציה</button>
@@ -508,7 +481,7 @@ export function SleightOfMouthPage() {
 
       <p className="som-disclaimer">זהו משחק תרגול לשוני עם דמות ותוצאות מדומות, לא אדם אמיתי, לא מדידת רגש אוטומטית ולא טיפול נפשי. האפקט של מהלך בשיחה אמיתית אינו צפוי מראש, והסכמה וגבולות חשובים יותר מניצחון בוויכוח.</p>
 
-      {showMap && <PatternMap used={used} belief={hasBelief ? currentCase.coreBelief : null} onClose={() => setShowMap(false)} />}
+      {showMap && <PatternMap used={used} belief={hasBelief ? currentCase.coreBelief : null} conviction={calibrated.conviction} certainties={certaintyByMove} caseIndex={caseIndex} onChooseMove={phase === 'challenge' ? (move) => {setFamily(move.family);setSystem(move.system);chooseMove(move);} : undefined} onClose={() => setShowMap(false)} />}
 
       {showIntro && !explosion && (
         <Introduction

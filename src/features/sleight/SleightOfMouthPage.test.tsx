@@ -23,6 +23,11 @@ function unlockBelief() {
   fireEvent.click(screen.getByRole('button', { name: 'נתחיל את מהלכי זריזות הלשון' }));
 }
 
+function chooseIntention() {
+  fireEvent.click(screen.getByTestId('map-node-intention'));
+  fireEvent.click(screen.getByRole('button', { name: 'בחר את המהלך לשיחה' }));
+}
+
 describe('Sleight of Mouth conversation simulator', () => {
   it('has 14 Dilts patterns, seven Mind-Lines directions, and three challenge families', () => {
     expect(DIALOGUE_MOVES.filter((x) => x.system === 'dilts')).toHaveLength(14);
@@ -56,21 +61,22 @@ describe('Sleight of Mouth conversation simulator', () => {
     fireEvent.click(screen.getByRole('button', { name: 'מה זה אומר לך שהוא איחר?' }));
     expect(screen.getByText('״מי שמאחר ולא מודיע לי לא מכבד אותי.״')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'נתחיל את מהלכי זריזות הלשון' }));
-    expect(screen.getByRole('group', { name: 'שלוש משפחות של מהלכי אתגור' })).toBeTruthy();
+    expect(screen.getByTestId('map-node-intention')).toBeTruthy();
   });
 
   it('keeps the original belief pinned, records an actual conversation and reveals the move on the map', () => {
     startCase();
     unlockBelief();
-    fireEvent.click(screen.getByRole('button', { name: /כוונה איזה ערך האמונה/ }));
+    chooseIntention();
     expect(screen.getByLabelText('מה תגיד לדמות?')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'אמור את המשפט' }));
     expect(screen.getAllByText(CONVERSATION_CASES[0].reactions.open).length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByText('״מי שמאחר ולא מודיע לי לא מכבד אותי.״')).toBeTruthy();
+    expect(screen.getAllByText('״מי שמאחר ולא מודיע לי לא מכבד אותי.״').length).toBeGreaterThanOrEqual(2);
     fireEvent.click(screen.getByRole('button', { name: 'פתח מפה חזותית של זריזות לשון' }));
     const map = screen.getByRole('dialog', { name: 'מפת זריזות לשון' });
     expect(within(map).getByText('כוונה')).toBeTruthy();
-    expect(within(map).getAllByText('לא נחשף').length).toBe(20);
+    expect(map.querySelectorAll('.som-diagram-node').length).toBe(14);
+    expect(within(map).getByTestId('map-node-intention').getAttribute('data-certainty')).toBe('unmeasured');
     fireEvent.click(within(map).getByRole('button', { name: 'סגור מפה' }));
     expect(screen.queryByRole('dialog', { name: 'מפת זריזות לשון' })).toBeNull();
   });
@@ -78,7 +84,7 @@ describe('Sleight of Mouth conversation simulator', () => {
   it('keeps the three meters at their last reported values until the trainee asks calibration', () => {
     startCase();
     unlockBelief();
-    fireEvent.click(screen.getByRole('button', { name: /כוונה איזה ערך האמונה/ }));
+    chooseIntention();
     fireEvent.click(screen.getByRole('button', { name: 'אמור את המשפט' }));
     expect(screen.getByText(/המדדים מציגים את הדיווח האחרון/)).toBeTruthy();
     expect(screen.getByRole('meter', { name: 'ודאות באמונה' }).getAttribute('aria-valuenow')).toBe('9');
@@ -102,10 +108,10 @@ describe('Sleight of Mouth conversation simulator', () => {
   it('offers an interactive explosion workshop, then allows connection repair', () => {
     startCase();
     unlockBelief();
-    fireEvent.click(screen.getByRole('button', { name: /כוונה איזה ערך האמונה/ }));
+    chooseIntention();
     fireEvent.click(screen.getByRole('button', { name: /נוקב מאתגר בחדות/ }));
     fireEvent.click(screen.getByRole('button', { name: 'אמור את המשפט' }));
-    fireEvent.click(screen.getByRole('button', { name: /כוונה איזה ערך האמונה/ }));
+    chooseIntention();
     fireEvent.click(screen.getByRole('button', { name: 'אמור את המשפט' }));
     expect(screen.getByRole('alertdialog', { name: 'פיצוץ בשיחה' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'לסדנת פיצוצים' }));
@@ -120,7 +126,7 @@ describe('Sleight of Mouth conversation simulator', () => {
   it('switches scenarios, resets the story and clears previous move history', () => {
     startCase();
     unlockBelief();
-    fireEvent.click(screen.getByRole('button', { name: /כוונה איזה ערך האמונה/ }));
+    chooseIntention();
     fireEvent.click(screen.getByRole('button', { name: 'אמור את המשפט' }));
     fireEvent.click(screen.getByRole('button', { name: 'הערה בישיבה' }));
     expect(screen.getByText(/בישיבת הצוות המנהלת/)).toBeTruthy();
