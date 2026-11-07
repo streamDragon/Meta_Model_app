@@ -133,7 +133,7 @@ export function GForceActionMapPage() {
     setSubstepText((old) => ({ ...old, [id]: '' }));
   };
 
-  const renderStep = (step: ActionStep, depth = 0): JSX.Element => (
+  const renderStep = (step: ActionStep, depth = 0) => (
     <li key={step.id} className="gf-step">
       <div className="gf-step-main" style={{ marginInlineStart: depth ? 12 : 0 }}>
         <span className="gf-step-label">{step.label}</span>
