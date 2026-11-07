@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import { ConversationGymPage } from './features/trainer/ConversationGymPage';
+import { SleightWorkshopPage } from './features/sleight/SleightWorkshopPage';
 import { FramingToolPage } from './features/framing/FramingToolPage';
 import { HomePage } from './features/home/HomePage';
 import { CategoriesPage } from './features/categories/CategoriesPage';
@@ -90,6 +91,15 @@ export const FEATURES: FeatureDef[] = [
     dataSource: 'src/data/conversationScenarios.ts', route: '#conversation',
     component: ConversationGymPage, status: 'beta', sourceValidation: 'placeholder',
     navLabel: 'אימון שיחה', icon: '💬', inBottomNav: true,
+  },
+  {
+    id: 'sleight-workshop', navGroup: 'core', title: 'זריזות לשון וסדנת פיצוצים',
+    shortDescription: 'מבררים אמונה, מאתגרים ב־14 תנועות ומתרגלים תיקון קרעים בשיחה',
+    theoryFamily: 'reframing', skillTrained: 'זריזות לשון, כיול ותיקון התנגדויות',
+    difficulty: 3, desktopSupport: 'full', mobileSupport: 'full',
+    dataSource: 'src/data/sleightOfMouth.ts', route: '#sleight-workshop',
+    component: SleightWorkshopPage, status: 'prototype', sourceValidation: 'verified',
+    navLabel: 'זריזות לשון', icon: '🌀', inBottomNav: false,
   },
   {
     id: 'framing', navGroup: 'core', title: 'פריימינג טול',
