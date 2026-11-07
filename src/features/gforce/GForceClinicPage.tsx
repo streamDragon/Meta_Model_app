@@ -62,7 +62,7 @@ function SceneStack({ session, onMove, onProbe }: { session: Session; onMove: (i
                 {(Object.entries(session.probes[id] ?? {}) as [ProbeKind, string][]).map(([kind, status]) => <span key={kind} className={`clinic-probe-status state-${status}`}>
                   {kind === 'imagine' ? 'דמיון' : kind === 'comfort' ? 'נוחות' : 'ביצוע'}: {status === 'ready' ? 'אפשרי' : status === 'blocked' ? 'חסום' : 'לא ברור'}
                 </span>)}
-              </div>
+              </div>}
               {scene.kind === 'spine' && <div className="clinic-reorder" aria-label={`סדר קלף: ${scene.title}`}>
                 <button type="button" aria-label={`הזז את ${scene.title} אחורה`} onClick={() => onMove(id, -1)}>→</button>
                 <button type="button" aria-label={`הזז את ${scene.title} קדימה`} onClick={() => onMove(id, 1)}>←</button>
