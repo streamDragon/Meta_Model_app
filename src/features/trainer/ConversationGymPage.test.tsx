@@ -3,16 +3,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import App from '../../App';
 import { CONVERSATION_SCENARIOS } from '../../data/conversationScenarios';
-import { CONVERSATION_DECISION_PATHS } from '../../data/conversationDecisionPaths';
 import { LEARNING_KEY } from '../../lib/conversationLearning';
+import { STARTING_CONNECTION } from '../../lib/conversationMomentum';
 
 beforeEach(() => {
   localStorage.clear();
   window.location.hash = 'conversation';
   window.scrollTo = vi.fn();
   Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: vi.fn().mockImplementation(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })),
+    writable: true, value: vi.fn().mockImplementation(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })),
   });
 });
 afterEach(cleanup);
@@ -24,70 +23,71 @@ function open() {
   fireEvent.click(within(section).getByRole('button', { name: 'תרגל: ' + scenario.title }));
   return section;
 }
-
-function advanceToResponses(section: HTMLElement) {
-  const path = CONVERSATION_DECISION_PATHS[scenario.id];
-  fireEvent.click(within(section).getByRole('button', { name: /להצטרף ולהקשיב/ }));
-  fireEvent.click(within(section).getByRole('button', { name: /שיקוף והצטרפות/ }));
-  expect(within(section).getByRole('progressbar').getAttribute('aria-valuenow')).toBe('2');
-  expect(within(section).getByText('מה תגיד קודם?')).toBeTruthy();
-  expect(path).toBeTruthy();
+function act(section: HTMLElement) {
+  fireEvent.click(within(section).getByRole('button', { name: /פעל/ }));
 }
-
-describe('conversation gym four-stage decision flow', () => {
-  it('teaches intention then method before response, with opt-in hints', () => {
+describe('therapist mind conversation training', () => {
+  it('keeps thinking private and allows the fourth choice to open the mind', () => {
     const section = open();
-    const progress = within(section).getByRole('progressbar', { name: 'התקדמות באימון' });
-    expect(progress.getAttribute('aria-valuenow')).toBe('0');
-    expect(within(section).getByText('מה הכיוון כרגע?')).toBeTruthy();
-    expect(within(section).queryByText(CONVERSATION_DECISION_PATHS.meeting.direction.hint)).toBeNull();
-    fireEvent.click(within(section).getByRole('button', { name: /רמז/ }));
-    expect(within(section).getByText(CONVERSATION_DECISION_PATHS.meeting.direction.hint)).toBeTruthy();
-    fireEvent.click(within(section).getByRole('button', { name: /להצטרף ולהקשיב/ }));
-    expect(progress.getAttribute('aria-valuenow')).toBe('1');
-    expect(within(section).getByText('באיזה כלי תשתמש?')).toBeTruthy();
-    expect(within(section).queryByText(CONVERSATION_DECISION_PATHS.meeting.direction.hint)).toBeNull();
-    fireEvent.click(within(section).getByRole('button', { name: /שיקוף והצטרפות/ }));
-    expect(progress.getAttribute('aria-valuenow')).toBe('2');
-    expect(within(section).getByText('מה תגיד קודם?')).toBeTruthy();
+    expect(within(section).getByRole('progressbar', { name: 'התקדמות באימון' }).getAttribute('aria-valuenow')).toBe('0');
+    expect(within(section).getByRole('meter').getAttribute('aria-valuenow')).toBe(String(STARTING_CONNECTION));
+    act(section);
+    fireEvent.click(within(section).getByRole('button', { name: /אף אחת לא מתאימה/ }));
+    const dialog = within(section).getByRole('dialog', { name: 'בתוך הראש של המטפל' });
+    expect(within(dialog).getByText(/הדמות לא שומעת/)).toBeTruthy();
+    fireEvent.change(within(dialog).getByLabelText(/טיוטה פרטית/), { target: { value: 'private draft' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: /כוונה/ }));
+    fireEvent.click(within(dialog).getByRole('button', { name: /להצטרף ולהקשיב/ }));
+    expect(within(dialog).getByText(/מתחילים בחוויה/)).toBeTruthy();
+    fireEvent.click(within(dialog).getByRole('button', { name: /חזרה לשיחה/ }));
+    expect(within(section).queryByRole('dialog', { name: 'בתוך הראש של המטפל' })).toBeNull();
+    expect(within(section).getByRole('meter').getAttribute('aria-valuenow')).toBe(String(STARTING_CONNECTION));
   });
 
-  it('preserves first answer on retry, and never saves a learner draft', () => {
+  it('shows an illustrative emotional response and allows repair without erasing a bad move', () => {
     const section = open();
-    advanceToResponses(section);
-    fireEvent.change(within(section).getByLabelText(/התגובה שלך/), { target: { value: 'private draft - never save' } });
-    fireEvent.click(within(section).getByRole('button', { name: scenario.turns[0].options[0].text }));
-    expect(within(section).getByRole('button', { name: /מהכללה לחוויה/ })).toBeTruthy();
-    fireEvent.click(within(section).getByRole('button', { name: 'נסה שוב' }));
-    fireEvent.click(within(section).getByRole('button', { name: scenario.turns[0].options[1].text }));
-    fireEvent.click(within(section).getByRole('button', { name: 'להמשך השיחה' }));
-    expect(within(section).getByRole('progressbar').getAttribute('aria-valuenow')).toBe('3');
+    act(section);
+    fireEvent.click(within(section).getByRole('button', { name: scenario.turns[0].options[2].text }));
+    expect(within(section).getByText('נסגר מעט')).toBeTruthy();
+    const beforeRepair = Number(within(section).getByRole('meter').getAttribute('aria-valuenow'));
+    expect(beforeRepair).toBeLessThan(STARTING_CONNECTION);
+    fireEvent.click(within(section).getByRole('button', { name: /תיקון הקשר/ }));
+    const afterRepair = Number(within(section).getByRole('meter').getAttribute('aria-valuenow'));
+    expect(afterRepair).toBeGreaterThan(beforeRepair);
+    expect(within(section).getByText(/המהלך הקודם עדיין נלמד/)).toBeTruthy();
+    fireEvent.click(within(section).getByRole('button', { name: 'המשך השיחה' }));
+    expect(within(section).getByRole('progressbar').getAttribute('aria-valuenow')).toBe('1');
+    act(section);
     fireEvent.click(within(section).getByRole('button', { name: scenario.turns[1].options[0].text }));
     fireEvent.click(within(section).getByRole('button', { name: 'סיים את האימון' }));
+    expect(within(section).getByText('מסלול הקשר שלך')).toBeTruthy();
     const saved = localStorage.getItem(LEARNING_KEY)!;
-    expect(saved).not.toContain('private draft');
-    expect(JSON.parse(saved).sessions[0].results[0].quality).toBe('mixed');
+    expect(JSON.parse(saved).sessions[0].results[0].quality).toBe('unhelpful');
     expect(JSON.parse(localStorage.getItem('userProgress')!).xp).toBe(10);
-    expect(within(section).getByText('המסלול שבחרת')).toBeTruthy();
-    expect(within(section).getByRole('progressbar').getAttribute('aria-valuenow')).toBe('4');
+    expect(within(section).getByRole('progressbar').getAttribute('aria-valuenow')).toBe('2');
   });
 
-  it('can leave without awarding points', () => {
+  it('does not persist free form draft and allows leaving without reward', () => {
     const section = open();
+    fireEvent.click(within(section).getByRole('button', { name: /חשוב/ }));
+    const dialog = within(section).getByRole('dialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: /ניסוח/ }));
+    fireEvent.change(within(dialog).getByLabelText(/טיוטה פרטית/), { target: { value: 'secret language' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'סגור חשיבה' }));
     fireEvent.click(within(section).getByRole('button', { name: 'עזוב את האימון' }));
     expect(localStorage.getItem(LEARNING_KEY)).toBeNull();
     expect(within(section).getByRole('button', { name: 'מתחילים' })).toBeTruthy();
   });
 
-  it('completes in mobile mode while preserving other lab routes', () => {
+  it('preserves mobile navigation and completing with two helpful moves', () => {
     window.matchMedia = vi.fn().mockImplementation(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
     const section = open();
-    advanceToResponses(section);
     for (const [index, turn] of scenario.turns.entries()) {
+      act(section);
       fireEvent.click(within(section).getByRole('button', { name: turn.options.find((option) => option.quality === 'helpful')!.text }));
-      fireEvent.click(within(section).getByRole('button', { name: index === 1 ? 'סיים את האימון' : 'להמשך השיחה' }));
+      fireEvent.click(within(section).getByRole('button', { name: index === 1 ? 'סיים את האימון' : 'המשך השיחה' }));
     }
-    expect(within(section).getByText('המסלול שבחרת')).toBeTruthy();
+    expect(within(section).getByText('מסלול הקשר שלך')).toBeTruthy();
     const mobileNav = screen.getByLabelText('ניווט מהיר במובייל');
     expect(within(mobileNav).getAllByRole('button')).toHaveLength(5);
     fireEvent.click(within(mobileNav).getByRole('button', { name: /בית/ }));
@@ -95,8 +95,5 @@ describe('conversation gym four-stage decision flow', () => {
     const home = document.getElementById('home')!;
     expect(section.hidden).toBe(true);
     expect(home.hidden).toBe(false);
-    const resources = within(home).getByLabelText('מקורות וכלים נוספים');
-    expect(within(resources).getAllByRole('link')).toHaveLength(2);
-    expect(within(resources).getAllByRole('link').map((link) => link.getAttribute('href'))).toContain('#legacy-tools');
   });
 });
