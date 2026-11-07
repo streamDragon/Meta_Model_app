@@ -105,7 +105,7 @@ export const FEATURES: FeatureDef[] = [
     route: '#coach-crash-gym',
     component: CoachCrashGym,
     status: 'beta',
-    sourceValidation: 'verified',
+    sourceValidation: 'placeholder',
     navLabel: 'אימון גוף ודמיון',
     icon: '🧍',
     inBottomNav: false,
