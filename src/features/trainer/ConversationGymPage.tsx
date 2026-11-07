@@ -138,6 +138,7 @@ export function ConversationGymPage() {
           <span className="learning-eyebrow">אימון מיומנות · 4 החלטות קצרות</span>
           <h2>אימון שיחה</h2>
           <p>מחליטים על כיוון, בוחרים כלי ורק אז מנסחים משפט.</p>
+          <p><button type="button" className="btn btn-secondary" onClick={() => { window.location.hash = "framing"; }}>◎ לגלות את מפת האדם</button></p>
           <p className="conversation-original-purpose">רוצה לזהות מחיקה, עיוות והכללה? <button type="button" onClick={() => { window.location.hash = 'practice'; }}>לתרגול המטה־מודל ←</button></p>
         </header>
         <section className="conversation-featured" aria-label="אימון מומלץ">
@@ -180,6 +181,7 @@ export function ConversationGymPage() {
     <div className="learning-page conversation-gym conversation-workout" dir="rtl">
       <div className="conversation-workout-top">
         <button type="button" className="conversation-back" onClick={leave}>עזוב את האימון</button>
+        <button type="button" className="conversation-back" onClick={() => { window.location.hash = "framing"; }}>◎ מפת פריימינג</button>
         <div className="conversation-top-tools">
           <button className="conversation-timer" type="button" aria-pressed={timerOn} onClick={() => setTimerOn((value) => !value)} title="שעון תרגול, ללא הגבלת זמן">{timerOn ? '⏱ ' + timeText(elapsed) : '⏱ זמן'}</button>
           <span>{done ? 'הושלם' : (stage + 1) + ' / 4'}</span>
