@@ -38,7 +38,7 @@ describe('Clinic gameplay', () => {
     fireEvent.click(screen.getByRole('button', { name: /מה הכי מכביד עליך/ }));
     const firstReply = screen.getByTestId('clinic-latest-answer');
     expect(firstReply.textContent).toContain('תודה שאתה לא ישר נותן לי רשימה');
-    fireEvent.click(screen.getByRole('button', { name: /לפי ההקשר/ }));
+    fireEvent.click(screen.getByRole('button', { name: /שורה 5 · חוויה חושית/ }));
     fireEvent.click(screen.getByRole('button', { name: /איך ספציפית נראית הרצפה/ }));
     const latest = screen.getByTestId('clinic-latest-answer');
     expect(latest.textContent).toContain('אני רואה אריחים פנויים');
