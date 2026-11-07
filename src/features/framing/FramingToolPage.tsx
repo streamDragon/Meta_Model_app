@@ -41,6 +41,7 @@ export function FramingToolPage() {
   const selectedDiscovery = FRAME_DISCOVERIES.find((item) => item.id === selectedItem);
   const selectedSave = map.find((item) => item.id === selectedItem);
   const percent = Math.round(100 * map.length / FRAME_DISCOVERIES.length);
+  const [mapMode, setMapMode] = useState<"diagram" | "details">("diagram");
 
   const reset = (nextTopic: TopicKind) => {
     setTopic(nextTopic);
@@ -116,7 +117,7 @@ export function FramingToolPage() {
         {decomposed && (
           <div className="ft-parts">
             {FRAME_PARTS.map((part) => (
-              <button key={part.id} aria-pressed={focus === part.id} className={focus === part.id ? 'ft-active' : ''} onClick={() => setFocus(part.id)}><strong>{part.label}</strong><span>{part.text}</span></button>
+              <button key={part.id} aria-pressed={focus === part.id} className={focus === part.id ? 'ft-active' : ''} onClick={() => { setFocus(part.id); setActiveArea(part.id === "event" ? "context" : part.id === "meaning" ? "west" : "north"); setPending(null); }}><strong>{part.label}</strong><span>{part.text}</span></button>
             ))}
             <small>הפירוק עוזר להתמקד ברכיב אחד. בתרגיל הזה תשובות המקרה קבועות מראש.</small>
           </div>
@@ -138,14 +139,35 @@ export function FramingToolPage() {
         </div>
         {showMap && (
           <div className="ft-full-map" aria-label="המפה הנוכחית">
-            <strong>המרכז: {FRAME_TOPIC[topic].label}</strong>
-            {answered.length === 0 ? <p>המפה ריקה. בחר אזור ולחץ על ״שאל שאלה״.</p> : answered.map((item) => {
+            <div className="ft-map-modes" role="group" aria-label="תצוגת מפה">
+              <button className={mapMode === 'diagram' ? 'ft-active' : ''} onClick={() => setMapMode('diagram')}>מפת קשרים</button>
+              <button className={mapMode === 'details' ? 'ft-active' : ''} onClick={() => setMapMode('details')}>כל הפרטים</button>
+            </div>
+            {mapMode === 'diagram' && (
+              <div className="ft-diagram">
+                <div className="ft-diagram-topic"><span>הנושא</span><strong>{FRAME_TOPIC[topic].label}</strong></div>
+                <div className="ft-diagram-areas">
+                  {groupSummary.map((area) => (
+                    <button key={area.id} onClick={() => { changeArea(area.id); setShowMap(true); }} className={area.collected ? 'ft-diagram-area ft-discovered' : 'ft-diagram-area'} aria-label={area.label + ' - ' + area.collected + ' פריטים'}>
+                      <span>{area.icon}</span>
+                      <strong>{area.label}</strong>
+                      <small>{area.collected ? `${area.collected} נחשפו` : 'עדיין מוסתר'}</small>
+                      {answered.filter((item) => item.area === area.id).slice(0, 2).map((item) => (
+                        <em key={item.id}>{item.mapText}</em>
+                      ))}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {mapMode === 'details' && <strong>המרכז: {FRAME_TOPIC[topic].label}</strong>}
+            {mapMode === "details" && (answered.length === 0 ? <p>המפה ריקה. בחר אזור ולחץ על ״שאל שאלה״.</p> : answered.map((item) => {
               const value = map.find((entry) => entry.id === item.id);
               const band = certaintyBand(value?.certainty ?? null);
               return <button key={item.id} className={`ft-map-row ft-${band}`} onClick={() => { setSelectedItem(item.id); setActiveArea(item.area); }}>
                 <span className={`ft-dot ft-${band}`} /><span><strong>{item.category}</strong><small>{item.mapText}</small></span><b>{value?.certainty ?? '?'}/10</b>
               </button>;
-            })}
+            }))}
             <button className="ft-copy" onClick={copyMap}>העתק את המפה</button>
           </div>
         )}
