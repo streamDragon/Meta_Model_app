@@ -26,7 +26,7 @@ export function FramingToolPage() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [map, setMap] = useState<MapItem[]>([]);
   const [pending, setPending] = useState<string | null>(null);
-  const [certainty, setCertainty] = useState(7);
+  const [certaintyAsked, setCertaintyAsked] = useState(false);
   const [certaintyQuestion, setCertaintyQuestion] = useState(CERTAINTY_QUESTIONS[0]);
   const [showMap, setShowMap] = useState(false);
   const [showLegend, setShowLegend] = useState(false);
@@ -58,7 +58,7 @@ export function FramingToolPage() {
   const ask = () => {
     if (!candidate) return;
     setPending(candidate.id);
-    setCertainty(candidate.certainty);
+    setCertaintyAsked(false);
     setCertaintyQuestion(choose(CERTAINTY_QUESTIONS));
   };
 
@@ -66,6 +66,7 @@ export function FramingToolPage() {
     if (!activePending) return;
     setMap((prev) => [...prev.filter((item) => item.id !== activePending.id), { id: activePending.id, certainty: confidence }]);
     setPending(null);
+    setCertaintyAsked(false);
     setSelectedItem(activePending.id);
     setQuestionIndex((prev) => prev + 1);
   };
@@ -80,7 +81,8 @@ export function FramingToolPage() {
   const copyMap = () => {
     const lines = answered.map((item) => {
       const saved = map.find((entry) => entry.id === item.id);
-      return `${item.category}: ${item.mapText} | ${item.claimKind} | ודאות: ${saved?.certainty ?? 'לא נבדקה'}/10`;
+      const kind = item.claimKind === 'said' ? 'נאמר במפורש' : item.claimKind === 'necessary' ? 'הנחת יסוד שאושרה' : item.claimKind === 'possible' ? 'השערה אפשרית' : 'לא מתיישב עם המפה';
+      return `${item.category}: ${item.mapText} | ${kind} | ודאות: ${saved?.certainty ?? 'לא נבדקה'}`;
     });
     void navigator.clipboard?.writeText([`נושא: ${FRAME_TOPIC[topic].label}`, FRAME_TOPIC[topic].text, ...lines].join('\n'));
   };
@@ -190,9 +192,15 @@ export function FramingToolPage() {
             <span>תשובת הדובר בדוגמה</span>
             <blockquote>{activePending.response}</blockquote>
             <small>סוג המידע: {activePending.claimKind === 'said' ? 'נאמר במפורש' : activePending.claimKind === 'necessary' ? 'הנחת יסוד שאושרה' : activePending.claimKind === 'possible' ? 'אפשרות / השערה' : 'לא מתיישב עם המפה'}</small>
-            <label htmlFor="ft-certainty">{certaintyQuestion}</label>
-            <div className="ft-rating"><input id="ft-certainty" type="range" min="1" max="10" value={certainty} onChange={(event) => setCertainty(Number(event.target.value))} /><strong>{certainty}/10</strong></div>
-            <div className="ft-actions"><button className="ft-primary" onClick={() => store(certainty)}>הוסף למפה</button><button className="ft-secondary" onClick={() => store(null)}>ודאות לא ידועה</button></div>
+            <p className="ft-certainty-question">{certaintyQuestion}</p>
+            {!certaintyAsked ? (
+              <div className="ft-actions"><button className="ft-primary" onClick={() => setCertaintyAsked(true)}>שאל על ודאות</button><button className="ft-secondary" onClick={() => store(null)}>דלג על ודאות</button></div>
+            ) : (
+              <>
+                <div className="ft-certainty-answer"><span>תשובת הדובר:</span><strong>{activePending.certainty} מתוך 10</strong><small>זהו הביטחון שלו בטענה, לא ציון אמת.</small></div>
+                <div className="ft-actions"><button className="ft-primary" onClick={() => store(activePending.certainty)}>הוסף למפה</button><button className="ft-secondary" onClick={() => store(null)}>השאר ללא דירוג</button></div>
+              </>
+            )}
           </div>
         )}
         {!pending && selectedDiscovery && selectedSave && (
