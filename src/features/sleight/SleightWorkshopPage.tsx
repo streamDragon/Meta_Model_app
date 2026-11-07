@@ -157,7 +157,7 @@ export function SleightWorkshopPage() {
           <section className="sw-case">
             <div className="sw-section-head"><h3>השיחה</h3><button onClick={reset} type="button">↻ להתחיל מחדש</button></div>
             <div className="sw-dialogue" aria-live="polite">
-              {message.map((item, index) => <div className={`sw-line ${item.who === 'אדם' ? 'sw-person' : 'sw-trainee'}`} key={index}>
+              {message.slice(0, lastMove && phase === 'challenge' ? -2 : undefined).map((item, index) => <div className={`sw-line ${item.who === 'אדם' ? 'sw-person' : 'sw-trainee'}`} key={index}>
                 <small>{item.who === 'אדם' ? 'האדם מספר' : 'השאלה / האתגור שלך'}</small><p>{item.text}</p>
               </div>)}
             </div>
@@ -183,6 +183,10 @@ export function SleightWorkshopPage() {
                 <button className="sw-primary" onClick={() => makeMove(pattern)}>אמור את המשפט</button>
                 <button onClick={() => setChosenPattern(null)}>בחר אחרת</button>
               </div>
+            </div>}
+            {lastMove && <div className="sw-current-response" role="status">
+              <div className="sw-line sw-trainee"><small>המהלך שבחרת</small><p>{lastMove.line}</p></div>
+              <div className="sw-line sw-person"><small>התגובה האחרונה של האדם</small><p>{lastMove.patientReply}</p></div>
             </div>}
             {lastMove && <div className="sw-learning">
               <strong>מה נפתח במפה? {lastMove.name}</strong>
