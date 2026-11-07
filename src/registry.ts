@@ -5,6 +5,7 @@ import { FramingToolPage } from './features/framing/FramingToolPage';
 import { HomePage } from './features/home/HomePage';
 import { CategoriesPage } from './features/categories/CategoriesPage';
 import { TrainerPage } from './features/trainer/TrainerPage';
+import { GuidedMetaGym } from './features/trainer/GuidedMetaGym';
 import { BlueprintPage } from './features/blueprint/BlueprintPage';
 import { GForceActionMapPage } from './features/gforce/GForceActionMapPage';
 import { GForceClinicPage } from './features/gforce/GForceClinicPage';
@@ -145,9 +146,18 @@ export const FEATURES: FeatureDef[] = [
     component: TrainerPage,
     status: 'production',
     sourceValidation: 'verified',
-    navLabel: 'תרגול',
+    navLabel: 'תרגול זיהוי',
     icon: '🎯',
-    inBottomNav: true,
+    inBottomNav: false,
+  },
+  {
+    id: 'guided-meta-gym', navGroup: 'core', title: 'מעבדת מטה מודל מונחית',
+    shortDescription: 'משחק NLP מטרתי: בירור, שיקוף ואתגור עם מדריכה',
+    theoryFamily: 'meta-model', skillTrained: 'בחירת שאלה לפי מטרת השיחה',
+    difficulty: 2, desktopSupport: 'full', mobileSupport: 'full',
+    dataSource: 'src/features/trainer/GuidedMetaGym.tsx', route: '#guided-meta-gym',
+    component: GuidedMetaGym, status: 'beta', sourceValidation: 'verified',
+    navLabel: 'מטה מודל מונחה', icon: '🎮', inBottomNav: true,
   },
   {
     id: 'michael-hall-daily-gym',
