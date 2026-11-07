@@ -33,6 +33,20 @@ describe('conversation gym', () => {
     expect(JSON.parse(localStorage.getItem('userProgress')!).xp).toBe(10);
     expect(within(section).getByText('מה תיקח לשיחה הבאה?')).toBeTruthy();
   });
+
+  it('hides the theory until an answer and counts only completed moments', () => {
+    const section = open();
+    const progress = within(section).getByRole('progressbar', { name: 'התקדמות באימון' });
+    expect(progress.getAttribute('aria-valuenow')).toBe('0');
+    expect(within(section).queryByText('מהכללה לחוויה')).toBeNull();
+    expect(within(section).getByText('רוצה רמז לפני הבחירה?')).toBeTruthy();
+    fireEvent.click(within(section).getByRole('button', { name: scenario.turns[0].options[1].text }));
+    expect(progress.getAttribute('aria-valuenow')).toBe('1');
+    expect(within(section).getByText('מהכללה לחוויה')).toBeTruthy();
+    fireEvent.click(within(section).getByRole('button', { name: 'לרגע הבא בשיחה' }));
+    expect(progress.getAttribute('aria-valuenow')).toBe('1');
+    expect(within(section).queryByText('צ׳אנק־אפ לכוונה')).toBeNull();
+  });
   it('can leave an incomplete session without awarding points or storing its content', () => {
     const section = open();
     fireEvent.click(within(section).getByRole('button', { name: 'עזוב את האימון' }));
