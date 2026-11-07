@@ -87,3 +87,20 @@
   .conversation-theory { padding: 11px 13px; }
   .conversation-option { padding: 11px 12px; min-height: 56px; font-size: .94rem; }
 }
+
+/* A hint is optional and deliberately does not reveal the answer. The lesson
+   appears in feedback after a choice, not as a pre-answer spoiler. */
+.conversation-prep { padding: 9px 12px; border-radius: 12px; border: 1px solid #d9e4f1; background: #f8faff; color: var(--ink-soft); font-size: .87rem; }
+.conversation-prep summary { cursor: pointer; width: fit-content; font-weight: 600; color: var(--primary-deep); }
+.conversation-prep p { margin-top: 7px; line-height: 1.5; }
+.conversation-response-area { scroll-margin-top: 20px; }
+.conversation-feedback { scroll-margin-top: 14px; }
+.conversation-feedback .conversation-theory { margin-top: 2px; }
+.conversation-gym .conversation-workout-top { position: relative; }
+@media (max-width: 1023px) {
+  .conversation-gym { padding-bottom: 22px; }
+  .conversation-feedback .learning-actions { position: relative; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .conversation-progress-track span { transition: none; }
+}
