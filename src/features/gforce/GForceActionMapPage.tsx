@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import type { ReactElement } from 'react';
 import './gforce-map.css';
 
 type StepStatus = 'pending' | 'done' | 'unknown';
@@ -133,7 +134,7 @@ export function GForceActionMapPage() {
     setSubstepText((old) => ({ ...old, [id]: '' }));
   };
 
-  const renderStep = (step: ActionStep, depth = 0) => (
+  const renderStep = (step: ActionStep, depth = 0): ReactElement => (
     <li key={step.id} className="gf-step">
       <div className="gf-step-main" style={{ marginInlineStart: depth ? 12 : 0 }}>
         <span className="gf-step-label">{step.label}</span>
