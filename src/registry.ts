@@ -182,7 +182,7 @@ export const FEATURES: FeatureDef[] = [
     component: GForceClinicPage,
     status: 'beta',
     sourceValidation: 'verified',
-    navLabel: 'קליניקת האורגנייזר',
+    navLabel: 'קליניקת G-Force',
     icon: '🧩',
     inBottomNav: false,
   },
