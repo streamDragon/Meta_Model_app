@@ -55,7 +55,7 @@ describe('framing discovery lab', () => {
     window.location.hash = 'conversation';
     render(<App />);
     const root = document.getElementById('conversation')!;
-    expect(within(root).getByRole('button', { name: /פריימינג טול: לגלות את המפה/ })).toBeTruthy();
+    expect(within(root).getByRole('button', { name: /לגלות את מפת האדם/ })).toBeTruthy();
     expect(within(screen.getByLabelText('ניווט מהיר במובייל')).getAllByRole('button')).toHaveLength(5);
   });
 });
