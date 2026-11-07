@@ -10,6 +10,9 @@ import { HintProvider, useHint } from './store/hint';
 import { ProgressProvider, useProgress } from './store/useProgress';
 import { PracticeLaunchProvider } from './store/practiceLaunch';
 import type { BadgeAward } from './store/progress';
+import { OFFLINE_LICENSE_MODE, featureIsFree, getActiveLicenses, hasLicense, type LicenseBody } from './lib/offlineLicense';
+import { OfflineKeyGate } from './components/OfflineKeyGate';
+import { OfflineLicenseDashboard } from './components/OfflineLicenseDashboard';
 
 const SOUND_KEY = 'soundEnabled';
 
@@ -118,6 +121,15 @@ function AppShell() {
   const { hint, closeHint } = useHint();
   const sound = useSoundSetting();
   const isMobile = useIsMobile();
+  const [offlineLicenses, setOfflineLicenses] = useState<LicenseBody[]>([]);
+  const refreshLicenses = useCallback(() => { if (OFFLINE_LICENSE_MODE) void getActiveLicenses().then(setOfflineLicenses); }, []);
+  useEffect(() => {
+    refreshLicenses();
+    window.addEventListener('wisdom-license-changed', refreshLicenses);
+    const onFocus = () => refreshLicenses();
+    window.addEventListener('focus', onFocus);
+    return () => { window.removeEventListener('wisdom-license-changed',refreshLicenses); window.removeEventListener('focus',onFocus); };
+  }, [refreshLicenses]);
   // Lazy mount + keep alive: a feature renders on first visit and stays
   // mounted afterwards so in-progress sessions survive tab switches.
   const [visited, setVisited] = useState<Set<string>>(() => new Set([activeTab]));
@@ -212,7 +224,10 @@ function AppShell() {
                 className={`tab-content ${activeTab === f.id ? 'active' : ''}`}
                 hidden={activeTab !== f.id}
               >
-                {showFallback ? <MobileFallback feature={f} /> : <Feature />}
+                {OFFLINE_LICENSE_MODE && !featureIsFree(f.id) && !hasLicense(offlineLicenses,f.id)
+                  ? <OfflineKeyGate featureName={f.navLabel} onActivation={refreshLicenses} />
+                  : showFallback ? <MobileFallback feature={f} /> : <Feature />}
+                {OFFLINE_LICENSE_MODE && f.id === 'home' && <OfflineLicenseDashboard />}
                 {f.id === 'home' && <CourseDoor />}
               </section>
             );
