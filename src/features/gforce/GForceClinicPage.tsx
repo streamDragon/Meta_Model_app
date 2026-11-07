@@ -108,7 +108,7 @@ export function GForceClinicPage() {
 
   const suggestions = suggestedQuestions(session);
   const selectedQuestions = family === 'suggestions' ? suggestions : QUESTIONS.filter(q => q.family === family);
-  const latestTurn = session.turns.at(-1);
+  const latestTurn = session.turns[session.turns.length - 1];
   const previousTurns = session.turns.slice(0, -MAX_VISIBLE_TURNS);
 
   // Keep the new reply in view, with next choices BELOW it. No scrolling back up.
