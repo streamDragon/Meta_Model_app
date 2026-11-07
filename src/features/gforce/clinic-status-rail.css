@@ -1,0 +1,100 @@
+/* Compact chess-like gauges: always visible, with details only on request. */
+.clinic-status-rail {
+  position: fixed;
+  left: clamp(8px, 2vw, 22px);
+  top: clamp(124px, 28vh, 245px);
+  z-index: 45;
+  width: 68px;
+  padding: 9px 6px;
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  background: rgba(248, 248, 255, .94);
+  border: 1px solid #dddff1;
+  border-radius: 26px;
+  box-shadow: 0 5px 20px rgba(33, 29, 97, .15);
+  backdrop-filter: blur(12px);
+}
+.clinic-status-rail-heading { font-size: .68rem; color: var(--ink-soft); font-weight: 750; }
+.clinic-rail-meter {
+  appearance: none; display: grid; justify-items: center; gap: 1px;
+  border: 0; width: 100%; border-radius: 14px;
+  background: transparent; color: var(--ink); cursor: pointer; padding: 5px 1px;
+  font: inherit;
+}
+.clinic-rail-meter:hover, .clinic-rail-meter.is-selected { background: var(--primary-soft); }
+.clinic-meter-donut {
+  width: 40px; height: 40px; border-radius: 50%; padding: 5px;
+  display: grid; place-items: center; box-shadow: inset 0 0 0 1px #d5d7e3;
+}
+.clinic-meter-donut-center {
+  width: 100%; height: 100%; border-radius: 50%; background: white;
+  display: grid; place-items: center; font-size: 1.1rem;
+}
+.clinic-rail-meter-name { font-size: .67rem; font-weight: 800; line-height: 1.25; }
+.clinic-rail-meter-number { font-size: .64rem; font-weight: 600; color: var(--ink-soft); line-height: 1.1; }
+.clinic-meters-scrim {
+  position: fixed; inset: 0; width: 100vw; height: 100dvh;
+  border: 0; background: rgba(23, 20, 54, .22); z-index: 53; cursor: pointer;
+}
+.clinic-meters-drawer {
+  position: fixed; left: clamp(82px, 9vw, 132px);
+  top: clamp(100px, 16vh, 165px);
+  z-index: 54;
+  width: min(400px, calc(100vw - 110px));
+  max-height: calc(100dvh - 205px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 12px 48px rgba(28, 25, 81, .25);
+  display: grid; align-content: start; gap: 13px;
+}
+.clinic-meters-drawer-header { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
+.clinic-meters-drawer-header h3 { font-size: 1.18rem; margin: 4px 0; }
+.clinic-meter-close {
+  cursor: pointer; border: 1px solid var(--line); background: var(--surface-2);
+  border-radius: 9px; min-width: 36px; min-height: 36px; font: inherit; color: var(--ink);
+}
+.clinic-drawer-meters { display: grid; gap: 7px; }
+.clinic-drawer-meter-row {
+  border: 1px solid var(--line); background: var(--surface-2);
+  display: grid; grid-template-columns: 28px 58px minmax(60px, 1fr) 36px;
+  text-align: start; align-items: center; gap: 8px;
+  padding: 10px 8px; border-radius: 10px; cursor: pointer; font: inherit; color: var(--ink);
+}
+.clinic-drawer-meter-row.is-selected { border-color: var(--primary); background: var(--primary-soft); }
+.clinic-drawer-meter-row > strong, .clinic-drawer-meter-row > b { font-size: .85rem; }
+.clinic-drawer-meter-track { background: #e0e3ed; height: 9px; border-radius: 100px; overflow: hidden; }
+.clinic-drawer-meter-track > span { display: block; height: 100%; border-radius: inherit; }
+.clinic-selected-meter-note { border-radius: 10px; padding: 11px;
+  color: var(--ink); background: var(--surface-2); font-size: .86rem; line-height: 1.55; }
+.clinic-meters-knowledge { font-size: .9rem; }
+.clinic-meters-knowledge ul { padding-inline-start: 21px; margin-top: 8px; display: grid; gap: 6px; }
+.clinic-meters-actions { display: grid; gap: 7px; }
+.clinic-meters-actions .clinic-outline { width: 100%; }
+.clinic-meters-map-summary { padding: 11px; border-radius: 12px; display: grid; gap: 7px;
+  background: var(--surface-2); font-size: .85rem; }
+.clinic-meters-map-summary p { margin: 0; }
+@media(max-width:640px) {
+  .clinic-status-rail {
+    left: 4px; top: clamp(121px, 23vh, 190px);
+    width: 50px; border-radius: 17px; padding: 7px 3px; gap: 5px;
+  }
+  .clinic-meter-donut { width: 31px; height: 31px; padding: 4px; }
+  .clinic-meter-donut-center { font-size: .86rem; }
+  .clinic-rail-meter { padding: 4px 0; }
+  .clinic-rail-meter-name { font-size: .61rem; }
+  .clinic-rail-meter-number { font-size: .59rem; }
+  .clinic-meters-drawer {
+    left: 58px; right: 7px; top: 108px; bottom: calc(81px + env(safe-area-inset-bottom, 0px));
+    width: auto; max-height: none; padding: 13px; border-radius: 13px;
+  }
+  .clinic-drawer-meter-row { grid-template-columns: 22px 44px minmax(20px, 1fr) 31px; gap: 6px; }
+}
+@media(prefers-reduced-transparency:reduce) {
+  .clinic-status-rail { background: #f8f8ff; backdrop-filter: none; }
+}

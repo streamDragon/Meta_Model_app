@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactElement } from 'react';
 import { ask, createSession, FICTIONAL_CASE, moveScene, probeScene, QUESTIONS, SCENES, suggestedQuestions, summarizeSession } from './clinicCaseEngine';
 import type { Family, ProbeKind, QuestionId, Scene, SceneId, Session } from './clinicCaseEngine';
 import './clinic-simulator.css';
+import { ClinicStatusRail } from './ClinicStatusRail';
 
 const FAMILY_LABELS: Record<Family, string> = {
   rapport: 'קשר והקשבה', row4: 'שורה 4 · הקשר וזמן',
@@ -32,7 +33,7 @@ function MiniScene({ scene }: { scene: Scene }): ReactElement {
 }
 
 const ENDING_QUESTION: QuestionId[] = ['goal-sense', 'compare', 'smart', 'state', 'sequence-check'];
-const MAX_VISIBLE_TURNS = 3;
+const MAX_VISIBLE_TURNS = 1;
 
 function SceneStack({ session, onMove, onProbe }: { session: Session; onMove: (id: SceneId, dir: -1 | 1) => void; onProbe: (id: SceneId, kind: ProbeKind) => void }) {
   const summary = summarizeSession(session);
@@ -101,14 +102,20 @@ export function GForceClinicPage() {
   const [started, setStarted] = useState(false);
   const [family, setFamily] = useState<Family | 'suggestions'>('suggestions');
   const [showAllTurns, setShowAllTurns] = useState(false);
-  const [showMap, setShowMap] = useState(false);
+  const latestAnswerRef = useRef<HTMLDivElement | null>(null);
   const [showWhy, setShowWhy] = useState(false);
   const [probeFeedback, setProbeFeedback] = useState('');
 
-  const summary = summarizeSession(session);
   const suggestions = suggestedQuestions(session);
   const selectedQuestions = family === 'suggestions' ? suggestions : QUESTIONS.filter(q => q.family === family);
-  const recentTurns = showAllTurns ? session.turns : session.turns.slice(-MAX_VISIBLE_TURNS);
+  const latestTurn = session.turns[session.turns.length - 1];
+  const previousTurns = session.turns.slice(0, -MAX_VISIBLE_TURNS);
+
+  // Keep the new reply in view, with next choices BELOW it. No scrolling back up.
+  useEffect(() => {
+    if (!latestTurn) return;
+    latestAnswerRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+  }, [latestTurn?.id]);
 
   function answer(id: QuestionId) {
     setSession(previous => ask(previous, id));
@@ -126,7 +133,6 @@ export function GForceClinicPage() {
     setSession(createSession());
     setStarted(false);
     setFamily('suggestions');
-    setShowMap(false);
     setShowAllTurns(false);
     setShowWhy(false);
     setProbeFeedback('');
@@ -142,17 +148,31 @@ export function GForceClinicPage() {
       <div><span className="clinic-kicker">מקרה בדיוני · סימולציה ללא API</span><h2>🧩 הקליניקה: לגלות את המפה</h2></div>
       <button className="clinic-textbutton" type="button" onClick={reset}>התחל מקרה מחדש</button>
     </header>
+    <ClinicStatusRail session={session} onAsk={answer} />
     <div className="clinic-layout">
       <div className="clinic-main">
         <section className="clinic-panel clinic-dialogue" aria-labelledby="clinic-chat-heading">
           <div className="clinic-heading-line"><h3 id="clinic-chat-heading">השיחה עם איתן</h3><span className="clinic-count">{session.turns.length} שאלות</span></div>
-          <div className="clinic-patient-bubble"><div className="clinic-speaker">🧔🏻 איתן</div><p>{FICTIONAL_CASE.introduction}</p></div>
-          {session.turns.length > MAX_VISIBLE_TURNS && <button type="button" className="clinic-textbutton" onClick={() => setShowAllTurns(v => !v)}>{showAllTurns ? 'הסתר שיחה ישנה' : 'הצג את כל השיחה'}</button>}
-          {recentTurns.map(turn => <div className="clinic-turn" key={turn.id}>
-            <div className="clinic-therapist-bubble"><div className="clinic-speaker">🗣️ אתה · {FAMILY_LABELS[turn.family]}</div><p>{turn.question}</p></div>
-            <div className="clinic-patient-bubble"><div className="clinic-speaker">🧔🏻 איתן</div><p>{turn.answer}</p></div>
-            {turn.newlyRevealed && <div className="clinic-reveal" role="status">🃏 נחשף קלף חדש: {SCENES[turn.newlyRevealed].title}</div>}
-          </div>)}
+          {!latestTurn && <div className="clinic-patient-bubble"><div className="clinic-speaker">🧔🏻 איתן</div><p>{FICTIONAL_CASE.introduction}</p></div>}
+          {previousTurns.length > 0 && <div className="clinic-history">
+            <button type="button" className="clinic-textbutton" aria-expanded={showAllTurns} onClick={() => setShowAllTurns(value => !value)}>
+              {showAllTurns ? 'סגור שיחה קודמת' : `הצג ${previousTurns.length} חילופי דברים קודמים`}
+            </button>
+            {showAllTurns && <div className="clinic-history-turns">
+              {previousTurns.map(turn => <div key={turn.id} className="clinic-turn">
+                <div className="clinic-therapist-bubble"><div className="clinic-speaker">🗣️ אתה · {FAMILY_LABELS[turn.family]}</div><p>{turn.question}</p></div>
+                <div className="clinic-patient-bubble"><div className="clinic-speaker">🧔🏻 איתן</div><p>{turn.answer}</p></div>
+                {turn.newlyRevealed && <div className="clinic-reveal">🃏 נחשף קלף חדש: {SCENES[turn.newlyRevealed].title}</div>}
+              </div>)}
+            </div>}
+          </div>}
+          {latestTurn && <div className="clinic-latest-exchange" key={latestTurn.id} ref={latestAnswerRef} data-testid="clinic-latest-answer">
+            <div className="clinic-therapist-bubble"><div className="clinic-speaker">🗣️ שאלת עכשיו · {FAMILY_LABELS[latestTurn.family]}</div><p>{latestTurn.question}</p></div>
+            <div className="clinic-patient-bubble clinic-reply-focus" role="status" aria-live="polite">
+              <div className="clinic-speaker">🧔🏻 איתן עונה עכשיו</div><p>{latestTurn.answer}</p>
+            </div>
+            {latestTurn.newlyRevealed && <div className="clinic-reveal" role="status">🃏 נחשף קלף חדש: {SCENES[latestTurn.newlyRevealed].title}</div>}
+          </div>}
           <div className="clinic-current" aria-live="polite">{session.turns.length ? 'מה כדאי לשאול עכשיו?' : 'בחר איך לפתוח את השיחה.'}</div>
           <div className="clinic-families" aria-label="משפחות שאלות">
             <button type="button" className={family === 'suggestions' ? 'is-active' : ''} onClick={() => setFamily('suggestions')}>לפי ההקשר</button>
@@ -170,45 +190,10 @@ export function GForceClinicPage() {
         <SceneStack session={session} onMove={(id, dir) => setSession(previous => moveScene(previous, id, dir))} onProbe={checkScene} />
         {probeFeedback && <p className="clinic-probe-feedback" role="status">{probeFeedback}</p>}
       </div>
-      <aside className="clinic-sidebar" aria-label="יומן המטפל">
-        <section className="clinic-panel">
-          <h3>🧭 מחברת המטפל</h3>
-          <p className="clinic-note">רק דברים שעלו בשיחה, לא סודות שאתה מקבל מראש.</p>
-          <div className="clinic-known"><strong>מה ידוע בינתיים?</strong>
-            <ul>
-              <li>הקושי: התחלה שהופכת לפרויקט גדול.</li>
-              {session.facts.includes('goal') && <li>המטרה: מעבר נוח בחדר.</li>}
-              {session.facts.includes('barrier') && <li>חסם אפשרי: ״אם התחלתי, חייבים יסודי״.</li>}
-              {session.facts.includes('value') && <li>ערכים: מרחב, שקט ואוטונומיה.</li>}
-              {session.facts.includes('smart') && <li>הוגדר יעד מוגבל שאפשר לבדוק היום.</li>}
-            </ul>
-          </div>
-          <div className="clinic-stats">
-            <div><span>קשר</span><meter min={0} max={5} value={session.rapport} /><strong>{session.rapport}/5</strong></div>
-            <div><span>עומס</span><meter min={0} max={5} value={session.load} /><strong>{session.load}/5</strong></div>
-            <div><span>אנרגיה</span><meter min={0} max={5} value={session.energy} /><strong>{session.energy}/5</strong></div>
-          </div>
-          <p className="clinic-note">מדדים משחקיים משוערים, לא מדידה פסיכולוגית.</p>
-          <div className="clinic-context"><strong>מצב השיחה:</strong> {summary.trust} · {summary.overload}</div>
-          <button type="button" className="clinic-outline" onClick={() => answer('repair')}>🤝 לבדוק קשר ולתקן אם צריך</button>
-          <button type="button" className="clinic-outline" onClick={() => answer('return-goal')}>↶ לחזור למטרה</button>
-        </section>
-        <section className="clinic-panel">
-          <h3>🎯 בדיקת המפה</h3>
-          <p className="clinic-note">אוספים תמונות רק כשהן נחשפות. לא כל מה שנאמר צריך להפוך למשימה.</p>
-          <button type="button" className="clinic-primary" onClick={() => setShowMap(v => !v)}>{showMap ? 'הסתר הערכת המהלך' : 'מה יש לנו כרגע?'}</button>
-          {showMap && <div className="clinic-assessment">
-            <p><strong>מצבים מוחשיים:</strong> {summary.main.length}</p>
-            <p><strong>הסתעפויות:</strong> {summary.branches.length}</p>
-            <p><strong>תמונות שנבדקו לעומק:</strong> {summary.probedScenes}</p>
-            <p><strong>התחלה וסוף:</strong> {summary.canCompare ? 'שתיהן נחשפו' : 'חסרה תמונה אחת או שתיים'}</p>
-            <p><strong>גשר אפשרי:</strong> {summary.hasConcreteBridge ? 'יש לפחות שלב ביניים' : 'עוד לא נחשף שלב ביניים'}</p>
-            <p>גם כשהמפה אינה מלאה אפשר לסיים פגישה עם הבנה חדשה, ובלי לדרוש מהמטופל לבצע דבר.</p>
-          </div>}
-        </section>
+      <aside className="clinic-sidebar clinic-summary-sidebar" aria-label="סיום השיחה">
         {session.turns.length >= 4 && <section className="clinic-panel clinic-exit">
-          <h3>🧠 סיכום אפשרי</h3>
-          <p>אפשר לעצור, להשאיר את השיחה פתוחה, או לבחור את אחת משאלות הסיום. אין חובה להשיג את כל הקלפים.</p>
+          <h3>🧠 אפשר לעצור או להעמיק</h3>
+          <p>אין חובה להגיע לכל הקלפים. אפשר לחזור לתמונה הסופית, לבדוק מוטיבציה או להמשיך את השיחה.</p>
           <div className="clinic-quick-questions">{ENDING_QUESTION.map(id => {
             const q = QUESTIONS.find(item => item.id === id)!;
             return <button type="button" key={id} onClick={() => answer(id)}>{q.label}</button>;
