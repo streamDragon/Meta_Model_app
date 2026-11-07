@@ -5,6 +5,7 @@ import { CategoriesPage } from './features/categories/CategoriesPage';
 import { TrainerPage } from './features/trainer/TrainerPage';
 import { BlueprintPage } from './features/blueprint/BlueprintPage';
 import { GForceActionMapPage } from './features/gforce/GForceActionMapPage';
+import { GForceClinicPage } from './features/gforce/GForceClinicPage';
 import { PrismLabPage } from './features/prismlab/PrismLabPage';
 import { ValuesLabPage } from './features/valueslab/ValuesLabPage';
 import { BeliefsRealityLab } from './features/cbt/BeliefsRealityLab';
@@ -165,6 +166,25 @@ export const FEATURES: FeatureDef[] = [
     navLabel: 'בונה צעדים',
     icon: '🏗️',
     inBottomNav: true,
+  },
+  {
+    id: 'gforce-clinic',
+    navGroup: 'core',
+    title: 'קליניקת G-Force · לגלות את המפה',
+    shortDescription: 'משחק מטפל מול מטופל בדיוני: שאלות מסתעפות, מידע חושי ומפת תמונות שנחשפת מתוך השיחה',
+    theoryFamily: 'gforce',
+    skillTrained: 'בחירת שאלות לפי כיוון טיפולי, בירור חסמים ומעבר מתיאור כללי לחוויה קונקרטית',
+    difficulty: 3,
+    desktopSupport: 'full',
+    mobileSupport: 'full',
+    dataSource: 'src/features/gforce/clinicCaseEngine.ts',
+    route: '#gforce-clinic',
+    component: GForceClinicPage,
+    status: 'beta',
+    sourceValidation: 'verified',
+    navLabel: 'קליניקת האורגנייזר',
+    icon: '🧩',
+    inBottomNav: false,
   },
   {
     id: 'gforce-action-map',
