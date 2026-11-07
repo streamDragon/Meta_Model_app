@@ -147,6 +147,10 @@ export function ask(s: Session, id: QuestionId): Session {
   // Asking the identical question repeatedly cannot generate infinite motivation points.
   // A patient may repeat an answer or experience the repetition as pressure.
   const repeatableWhenPrepared: Partial<Record<QuestionId, boolean>> = {
+    state: seen(s, 'goal') && !has(s, 'state'),
+    compare: seen(s, 'room') && seen(s, 'goal') && !has(s, 'contrast'),
+    smart: seen(s, 'goal') && !has(s, 'smart'),
+    'sequence-check': s.sceneOrder.filter(x => SCENES[x].kind === 'spine').length >= 2 && !has(s, 'sequence-reviewed'),
     'prepare-sense': has(s, 'prepare') && !seen(s, 'tools'),
     'first-sense': has(s, 'first') && !seen(s, 'collect'),
     'next-sense': has(s, 'next') && !seen(s, 'sweep'),
