@@ -4,6 +4,7 @@ import { HomePage } from './features/home/HomePage';
 import { CategoriesPage } from './features/categories/CategoriesPage';
 import { TrainerPage } from './features/trainer/TrainerPage';
 import { BlueprintPage } from './features/blueprint/BlueprintPage';
+import { GForceActionMapPage } from './features/gforce/GForceActionMapPage';
 import { PrismLabPage } from './features/prismlab/PrismLabPage';
 import { ValuesLabPage } from './features/valueslab/ValuesLabPage';
 import { BeliefsRealityLab } from './features/cbt/BeliefsRealityLab';
@@ -29,7 +30,8 @@ export type TheoryFamily =
   | 'sensory'
   | 'values-criteria'
   | 'cbt-beliefs'
-  | 'dashboard';
+  | 'dashboard'
+  | 'gforce';
 
 export interface FeatureDef {
   id: string;
@@ -163,6 +165,25 @@ export const FEATURES: FeatureDef[] = [
     navLabel: 'בונה צעדים',
     icon: '🏗️',
     inBottomNav: true,
+  },
+  {
+    id: 'gforce-action-map',
+    navGroup: 'core',
+    title: 'מפת המהלך • G-Force',
+    shortDescription: 'להפוך מצב קיים למסלול צעדים עם משאבים, הסתעפויות ופירוק חוזר של כל פעולה',
+    theoryFamily: 'gforce',
+    skillTrained: 'הגדרת מצב רצוי, הכנה ופירוק למעשים שניתן לבצע',
+    difficulty: 2,
+    desktopSupport: 'full',
+    mobileSupport: 'full',
+    dataSource: 'src/features/gforce/GForceActionMapPage.tsx + localStorage',
+    route: '#gforce-action-map',
+    component: GForceActionMapPage,
+    status: 'beta',
+    sourceValidation: 'verified',
+    navLabel: 'מפת המהלך',
+    icon: '🧭',
+    inBottomNav: false,
   },
   {
     id: 'prismlab',
