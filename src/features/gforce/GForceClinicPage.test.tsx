@@ -32,4 +32,29 @@ describe('Clinic gameplay', () => {
     fireEvent.click(screen.getByRole('button', { name: /לבדוק קשר ולתקן/ }));
     expect(screen.getByText(/הכי קשה לי זה שאני כבר מתבייש/)).toBeTruthy();
   });
+  it('shows the latest patient reply as a focused exchange while keeping older answers collapsed', () => {
+    render(<GForceClinicPage />);
+    fireEvent.click(screen.getByRole('button', { name: /כניסה לפגישה/ }));
+    fireEvent.click(screen.getByRole('button', { name: /מה הכי מכביד עליך/ }));
+    const firstReply = screen.getByTestId('clinic-latest-answer');
+    expect(firstReply.textContent).toContain('תודה שאתה לא ישר נותן לי רשימה');
+    fireEvent.click(screen.getByRole('button', { name: /לפי ההקשר/ }));
+    fireEvent.click(screen.getByRole('button', { name: /איך ספציפית נראית הרצפה/ }));
+    const latest = screen.getByTestId('clinic-latest-answer');
+    expect(latest.textContent).toContain('אני רואה אריחים פנויים');
+    expect(latest.textContent).not.toContain('תודה שאתה לא ישר נותן לי רשימה');
+    expect(screen.getByRole('button', { name: /הצג 1 חילופי דברים קודמים/ })).toBeTruthy();
+  });
+
+  it('renders compact clickable gauges and opens and closes their detail drawer', () => {
+    render(<GForceClinicPage />);
+    fireEvent.click(screen.getByRole('button', { name: /כניסה לפגישה/ }));
+    expect(screen.getByRole('button', { name: /קשר: 3 מתוך 5/ })).toBeTruthy();
+    expect(screen.queryByRole('dialog', { name: /פירוט מדדי השיחה/ })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /קשר: 3 מתוך 5/ }));
+    expect(screen.getByRole('dialog', { name: /פירוט מדדי השיחה/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'סגור פירוט מדדים' }));
+    expect(screen.queryByRole('dialog', { name: /פירוט מדדי השיחה/ })).toBeNull();
+  });
+
 });
