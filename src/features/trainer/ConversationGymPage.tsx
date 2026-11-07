@@ -148,7 +148,7 @@ export function ConversationGymPage() {
           <span className="learning-eyebrow">תרגול תגובה בהקשר</span>
           <h2>אימון שיחה</h2>
           <p>מול האדם: <strong>פעל</strong>. בתוך הראש: <strong>חשוב</strong>. גם מהלך לא מוצלח אפשר לתקן.</p>
-          <p><button type="button" className="btn btn-secondary" onClick={() => { window.location.hash = "framing"; }}>◎ מפת פריימינג</button></p>
+          <p><button type="button" className="btn btn-secondary" onClick={() => { window.location.hash = "framing"; }}>◎ לגלות את מפת האדם</button></p>
           <p className="conversation-original-purpose">לזיהוי מחיקה, עיוות והכללה: <button type="button" onClick={() => { window.location.hash = 'practice'; }}>תרגול מטה־מודל ←</button></p>
         </header>
         <section className="conversation-featured" aria-label="אימון מומלץ">
