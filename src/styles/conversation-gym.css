@@ -104,3 +104,93 @@
 @media (prefers-reduced-motion: reduce) {
   .conversation-progress-track span { transition: none; }
 }
+
+
+/* Four short decisions. The map is a narrow left rail on desktop and a
+   horizontal four-step tree on phones; answer choices keep a single focus. */
+.conversation-gym .conversation-original-purpose { margin-top: 6px; font-size: .88rem; color: var(--ink-soft); }
+.conversation-original-purpose button { background: transparent; border: 0; padding: 0 4px; font: inherit; cursor: pointer; color: var(--primary-deep); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.conversation-training-layout { display: grid; grid-template-columns: 132px minmax(0,1fr); gap: 18px; direction: ltr; align-items: start; }
+.conversation-training-main { direction: rtl; display: grid; gap: 14px; min-width: 0; }
+.conversation-route-rail { direction: rtl; position: sticky; top: 20px; }
+.conversation-route-list { display: grid; gap: 0; padding: 6px 0; list-style: none; }
+.conversation-route-step { display: flex; align-items: flex-start; position: relative; gap: 9px; min-height: 74px; opacity: .53; color: var(--ink-soft); }
+.conversation-route-step:not(:last-child):before { content: ''; position: absolute; top: 32px; right: 15px; width: 2px; height: 44px; background: #cad2e7; }
+.conversation-route-step.is-active, .conversation-route-step.is-complete { opacity: 1; color: var(--ink); }
+.conversation-route-step.is-complete:not(:last-child):before { background: var(--primary); }
+.conversation-route-dot { width: 32px; height: 32px; display: grid; place-items: center; flex: none; border-radius: 50%; background: #e7eaf3; border: 1px solid #d4d9e8; font-size: .86rem; }
+.conversation-route-step.is-active .conversation-route-dot { color: #fff; background: var(--primary); border-color: var(--primary); }
+.conversation-route-step.is-complete .conversation-route-dot { color: #fff; background: #1e9975; border-color: #1e9975; }
+.conversation-route-text { display: grid; gap: 0; min-width: 0; line-height: 1.3; padding-top: 2px; }
+.conversation-route-text strong { font-size: .86rem; }
+.conversation-route-text small { font-size: .72rem; line-height: 1.3; overflow-wrap: anywhere; }
+.conversation-gym .conversation-scene-head { padding: 3px 0 9px; }
+.conversation-gym .conversation-scene-head p { line-height: 1.35; }
+.conversation-gym .conversation-spoken { font-size: 1.03rem; font-weight: 650; padding: 12px 16px; line-height: 1.42; }
+.conversation-gym .conversation-speaker-label { font-size: .78rem; }
+.conversation-decision-area { display: grid; gap: 12px; }
+.conversation-decision-head { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 8px; }
+.conversation-decision-head h3 { font-size: 1.28rem; line-height: 1.35; margin: 2px 0 0; }
+.conversation-hint-button { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; padding: 6px 13px; background: #fff; border: 1px solid #d8deed; border-radius: 999px; font: inherit; font-size: .84rem; font-weight: 700; color: var(--primary-deep); cursor: pointer; }
+.conversation-hint-button[aria-expanded="true"] { background: #edeafe; border-color: #a79cf0; }
+.conversation-hint-message { font-size: .88rem; line-height: 1.45; background: #f1efff; padding: 8px 12px; border-radius: 9px; color: #453c88; }
+.conversation-path-options, .conversation-options { display: grid; gap: 9px; }
+.conversation-path-option { display: flex; align-items: center; justify-content: space-between; text-align: right; font: inherit; width: 100%; min-height: 54px; padding: 9px 15px; border: 1px solid #dbe1ec; border-radius: 13px; color: var(--ink); background: #fff; cursor: pointer; line-height: 1.4; box-shadow: 0 1px 3px #15193708; }
+.conversation-path-option span { color: var(--primary); font-size: 1.4rem; }
+.conversation-path-option:hover, .conversation-path-option:focus-visible { border-color: var(--primary); background: #f9f7ff; }
+.conversation-gym .conversation-options .conversation-option { min-height: 54px; font-size: .99rem; padding: 12px 15px; border-radius: 13px; }
+.conversation-gym .conversation-draft { margin: 0; font-size: .81rem; color: var(--primary-deep); }
+.conversation-gym .conversation-draft summary { color: var(--primary-deep); font-weight: 600; }
+.conversation-top-tools { display: flex; align-items: center; gap: 12px; }
+.conversation-timer { font: inherit; font-size: .82rem; font-variant-numeric: tabular-nums; min-width: 64px; padding: 5px 9px; border: 1px solid #d9e0ee; background: #fff; border-radius: 12px; color: var(--ink-soft); cursor: pointer; }
+.conversation-timer[aria-pressed="true"] { border-color: var(--primary); color: var(--primary-deep); }
+.conversation-feedback-inline { display: grid; gap: 9px; border-radius: 14px; background: #fff; border: 1px solid #e2e6ee; border-right: 3px solid #e3b65c; padding: 15px; scroll-margin-top: 14px; }
+.conversation-feedback-inline.learning-feedback-helpful { border-right-color: var(--success); }
+.conversation-feedback-inline h3 { font-size: 1.05rem; margin: 0; }
+.conversation-feedback-inline p { font-size: .92rem; line-height: 1.45; }
+.conversation-feedback-inline .learning-actions { margin: 2px 0; }
+.conversation-theory-compact { border-top: 1px solid #e8ebf3; padding-top: 7px; }
+.conversation-theory-compact button { border: 0; background: transparent; color: var(--primary-deep); font: inherit; font-size: .87rem; font-weight: 700; text-align: right; cursor: pointer; padding: 4px 0; }
+.conversation-theory-compact p { color: var(--ink-soft); font-size: .84rem; padding-top: 6px; }
+.conversation-peer-reply { display: block; font-size: .85rem; color: var(--ink-soft); }
+.conversation-peer-reply summary { font-weight: 700; cursor: pointer; }
+.conversation-peer-reply blockquote { margin-top: 7px; font-size: .91rem; padding: 9px 12px; background: var(--surface-2); border-radius: 9px; }
+.conversation-path-footnote { font-size: .78rem; line-height: 1.35; color: var(--ink-soft); }
+.conversation-summary { display: grid; gap: 13px; }
+.conversation-summary h3 { font-size: 1.35rem; }
+.conversation-summary-lead { color: var(--ink-soft); font-size: .94rem; }
+.conversation-summary-list { list-style: none; padding: 0; display: grid; gap: 8px; }
+.conversation-summary-list li { display: flex; gap: 12px; align-items: start; border: 1px solid #e3e7f0; border-radius: 12px; background: #fff; padding: 11px 13px; }
+.conversation-summary-list li > span { flex: none; }
+.conversation-summary-list li > div { display: grid; gap: 3px; }
+.conversation-summary-list li strong { font-size: .91rem; }
+.conversation-summary-list li small { color: var(--ink-soft); font-size: .8rem; }
+.conversation-elapsed { color: var(--ink-soft); font-variant-numeric: tabular-nums; font-size: .86rem; }
+/* The global "why" bulb and local hint serve different purposes; during
+   the workout we keep only the contextual hint to avoid duplicate bulbs. */
+.app-layout:has(#conversation.tab-content.active .conversation-workout) .wim-fab { display: none; }
+@media (max-width: 800px) {
+  .conversation-training-layout { display: flex; flex-direction: column; direction: rtl; gap: 12px; }
+  .conversation-route-rail { width: 100%; position: static; }
+  .conversation-route-list { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 0; padding: 2px 0; }
+  .conversation-route-step { min-height: 48px; display: grid; grid-template-rows: 26px auto; align-content: start; justify-items: center; gap: 3px; text-align: center; }
+  .conversation-route-dot { width: 26px; height: 26px; font-size: .78rem; }
+  .conversation-route-text { padding: 0; }
+  .conversation-route-text strong { font-size: .72rem; }
+  .conversation-route-text small { display: none; }
+  .conversation-route-step:not(:last-child):before { height: 2px; width: calc(100% - 28px); top: 12px; right: calc(50% + 13px); }
+  .conversation-training-main { width: 100%; gap: 12px; }
+  .conversation-workout { gap: 9px; }
+  .conversation-gym .conversation-scene-head { grid-template-columns: 70px minmax(0, 1fr); gap: 10px; padding: 0 0 9px; }
+  .conversation-gym .conversation-scene-image { width: 70px; height: 74px; }
+  .conversation-gym .conversation-scene-head h2 { font-size: 1.09rem; margin: 1px 0; }
+  .conversation-gym .conversation-scene-head p { font-size: .83rem; line-height: 1.32; }
+  .conversation-gym .conversation-scene-head .conversation-kicker { font-size: .76rem; }
+  .conversation-gym .conversation-spoken { font-size: 1rem; padding: 11px 14px; }
+  .conversation-decision-head h3 { font-size: 1.18rem; }
+  .conversation-gym .conversation-original-purpose { font-size: .81rem; }
+  .conversation-gym .conversation-featured { grid-template-columns: 94px minmax(0,1fr); }
+  .conversation-gym .conversation-featured-image { min-height: 138px; }
+  .conversation-gym .conversation-option, .conversation-gym .conversation-path-option { min-height: 52px; padding: 10px 12px; font-size: .99rem; }
+  .conversation-route-step .conversation-route-text strong { white-space: nowrap; }
+}
