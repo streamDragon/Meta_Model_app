@@ -177,7 +177,6 @@ export function ConversationGymPage() {
   const path = getConversationDecisionPath(scenario);
   const visual = getConversationPresentation(scenario);
   const moment = visual?.moments[turnIndex];
-  const turn = scenario.turns[turnIndex];
   const speakerLine = turnIndex === 0 ? scenario.opening : (moment?.speakerLine ?? scenario.opening);
   const mentalOptions = lens === 'direction' ? path.direction.choices : path.method.choices;
   const mentalSelection = lens === 'direction' ? direction : method;
