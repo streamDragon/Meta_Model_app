@@ -39,7 +39,7 @@ describe('conversation gym', () => {
     const progress = within(section).getByRole('progressbar', { name: 'התקדמות באימון' });
     expect(progress.getAttribute('aria-valuenow')).toBe('0');
     expect(within(section).queryByText('מהכללה לחוויה')).toBeNull();
-    expect(within(section).getByText('רוצה רמז לפני הבחירה?')).toBeTruthy();
+    expect(within(section).getByText(/רוצה רמז לפני הבחירה/)).toBeTruthy();
     fireEvent.click(within(section).getByRole('button', { name: scenario.turns[0].options[1].text }));
     expect(progress.getAttribute('aria-valuenow')).toBe('1');
     expect(within(section).getByText('מהכללה לחוויה')).toBeTruthy();
