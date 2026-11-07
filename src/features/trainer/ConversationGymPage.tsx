@@ -167,7 +167,6 @@ export function ConversationGymPage() {
   const path = getConversationDecisionPath(scenario);
   const visual = getConversationPresentation(scenario);
   const turnIndex = stage < 3 ? 0 : 1;
-  const turn = scenario.turns[turnIndex];
   const moment = visual?.moments[turnIndex];
   const speakerLine = stage === 3 ? moment?.speakerLine ?? scenario.opening : scenario.opening;
   const question = stage === 0 ? path.direction.prompt : stage === 1 ? path.method.prompt : stage === 2 ? 'מה תגיד קודם?' : 'מה תגיד עכשיו?';
