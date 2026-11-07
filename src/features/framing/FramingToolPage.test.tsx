@@ -25,17 +25,20 @@ describe('framing discovery lab', () => {
     fireEvent.click(within(root).getByRole('button', { name: 'שאל שאלה' }));
     expect(progress.getAttribute('aria-valuenow')).toBe('0');
     expect(within(root).getByText(FRAME_DISCOVERIES[0].response)).toBeTruthy();
+    fireEvent.click(within(root).getByRole('button', { name: 'שאל על ודאות' }));
+    expect(within(root).getByText('10 מתוך 10')).toBeTruthy();
     fireEvent.click(within(root).getByRole('button', { name: 'הוסף למפה' }));
     expect(progress.getAttribute('aria-valuenow')).toBe('1');
     fireEvent.click(within(root).getByRole('button', { name: /פתח מפה/ }));
     expect(within(root).getAllByText(FRAME_DISCOVERIES[0].mapText).length).toBeGreaterThan(0);
+    expect(within(root).getByText('מפת קשרים')).toBeTruthy();
   });
 
   it('lets the speaker certainty remain unknown, and resetting the topic clears the map', () => {
     render(<App />);
     const root = document.getElementById('framing')!;
     fireEvent.click(within(root).getByRole('button', { name: 'שאל שאלה' }));
-    fireEvent.click(within(root).getByRole('button', { name: 'ודאות לא ידועה' }));
+    fireEvent.click(within(root).getByRole('button', { name: 'דלג על ודאות' }));
     expect(within(root).getByText(/ביטחון: לא נבדק/)).toBeTruthy();
     fireEvent.click(within(root).getByRole('button', { name: 'מטרה' }));
     expect(within(root).getByRole('progressbar', { name: 'חלקים שנחשפו' }).getAttribute('aria-valuenow')).toBe('0');
