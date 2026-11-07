@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 import { ConversationGymPage } from './features/trainer/ConversationGymPage';
-import { SleightWorkshopPage } from './features/sleight/SleightWorkshopPage';
+import { SleightOfMouthPage } from './features/sleight/SleightOfMouthPage';
 import { FramingToolPage } from './features/framing/FramingToolPage';
 import { HomePage } from './features/home/HomePage';
 import { CategoriesPage } from './features/categories/CategoriesPage';
@@ -94,11 +94,12 @@ export const FEATURES: FeatureDef[] = [
   },
   {
     id: 'sleight-workshop', navGroup: 'core', title: 'זריזות לשון וסדנת פיצוצים',
-    shortDescription: 'מבררים אמונה, מאתגרים ב־14 תנועות ומתרגלים תיקון קרעים בשיחה',
-    theoryFamily: 'reframing', skillTrained: 'זריזות לשון, כיול ותיקון התנגדויות',
+    shortDescription: 'סימולטור שיחה: מקרה, שאלות מטה־מודל, 14 תבניות דילטס, שבעה כיווני Mind-Lines ותיקון התנגדויות',
+    theoryFamily: 'reframing', skillTrained: 'בירור אמונה, אתגור, כיול ותיקון קרע בקשר',
     difficulty: 3, desktopSupport: 'full', mobileSupport: 'full',
-    dataSource: 'src/data/sleightOfMouth.ts', route: '#sleight-workshop',
-    component: SleightWorkshopPage, status: 'prototype', sourceValidation: 'verified',
+    dataSource: 'src/data/sleightConversation.ts + src/features/sleight/simulation.ts',
+    route: '#sleight-workshop', component: SleightOfMouthPage,
+    status: 'production', sourceValidation: 'verified',
     navLabel: 'זריזות לשון', icon: '🌀', inBottomNav: false,
   },
   {
