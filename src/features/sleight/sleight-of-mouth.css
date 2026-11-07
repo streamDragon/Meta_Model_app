@@ -1,0 +1,54 @@
+.som-page { max-width: 920px; padding-bottom: 5rem; }
+.som-card { display: grid; gap: 0.9rem; min-width: 0; }
+.som-card h3 { margin: 0; font-size: 1.14rem; }
+.som-between { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.som-kicker { color: var(--primary-deep); font-weight: 700; font-size: 0.85rem; }
+.som-count { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.som-case-tabs, .som-choices, .som-moves { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+.som-case-tab, .som-choice, .som-text-button { min-height: 44px; border: 1px solid var(--line); border-radius: 0.7rem; background: var(--surface); color: var(--ink); font: inherit; padding: 0.6rem 0.85rem; cursor: pointer; }
+.som-case-tab { flex: 1 1 140px; font-weight: 700; }
+.som-case-tab.selected, .som-choice.selected { border-color: var(--primary); background: var(--primary-soft); }
+.som-context { margin: 0; }
+.som-instruction { margin: 0; color: var(--ink-soft); font-size: 0.93rem; }
+.som-text-button { border: 0; text-decoration: underline; color: var(--primary-deep); background: none; font-size: 0.85rem; }
+.som-statement { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; margin: 0; padding: 1rem; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--surface-2); line-height: 1.9; font-size: clamp(1.05rem, 3vw, 1.25rem); }
+.som-token { font: inherit; color: var(--ink); border: 1px dashed transparent; border-bottom-color: var(--primary); border-radius: 0.45rem; background: transparent; padding: 0.1rem 0.4rem; cursor: pointer; min-height: 40px; }
+.som-token.selected { border-style: solid; border-color: var(--primary); background: var(--primary-soft); font-weight: 700; }
+.som-token:focus-visible, .som-choice:focus-visible, .som-move:focus-visible, .som-case-tab:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.som-inspector { display: grid; gap: 0.65rem; padding: 0.9rem; border: 1px solid var(--line); border-radius: var(--r-md); }
+.som-inspector p { margin: 0; }
+.som-choices .som-choice { font-size: 0.9rem; }
+.som-meta { color: var(--ink-soft); }
+.som-result { padding: 0.6rem; background: var(--primary-soft); border-radius: var(--r-sm); }
+.som-map { display: flex; align-items: center; justify-content: space-evenly; gap: 0.35rem; border-radius: var(--r-md); background: var(--surface-2); padding: 0.7rem; }
+.som-map-node { min-width: 0; flex: 1; display: grid; gap: 0.35rem; padding: 0.65rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); text-align: center; overflow-wrap: anywhere; }
+.som-map-node small { color: var(--ink-soft); }
+.som-map-node strong { font-size: 0.93rem; line-height: 1.4; }
+.som-map-link { border-color: var(--primary); background: var(--primary-soft); }
+.som-map-arrow { color: var(--primary-deep); font-weight: bold; }
+.som-moves { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.som-move { min-width: 0; min-height: 90px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: var(--r-md); display: grid; align-content: center; gap: 0.3rem; text-align: start; font: inherit; padding: 0.8rem; cursor: pointer; }
+.som-move.selected { background: var(--primary-soft); border-color: var(--primary); }
+.som-move small { font-size: 0.83rem; color: var(--ink-soft); }
+.som-chosen-move { margin: 0; color: var(--ink-soft); font-size: 0.9rem; }
+.som-answer-label { font-weight: 700; }
+.som-page textarea { width: 100%; min-height: 92px; box-sizing: border-box; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface); color: var(--ink); padding: 0.9rem; font: inherit; font-size: 1rem; resize: vertical; }
+.som-actions { margin: 0; }
+.som-hint, .som-example { padding: 1rem; border-radius: var(--r-md); background: var(--surface-2); margin: 0; }
+.som-example { border-inline-start: 3px solid var(--primary); }
+.som-example p { font-size: 1.08rem; line-height: 1.65; margin: 0.6rem 0; }
+.som-example small { color: var(--ink-soft); }
+.som-caution { font-size: 0.88rem; margin: 0; }
+.som-footnote { font-size: 0.8rem; }
+@media (max-width: 640px) {
+  .som-case-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .som-case-tab { font-size: 0.86rem; padding: 0.55rem 0.25rem; min-width: 0; }
+  .som-moves { grid-template-columns: 1fr; }
+  .som-move { min-height: 56px; }
+  .som-move strong, .som-move small { display: block; }
+  .som-map { gap: 0.15rem; padding: 0.3rem; }
+  .som-map-node { padding: 0.45rem 0.25rem; }
+  .som-map-node strong { font-size: 0.8rem; }
+  .som-map-node small { font-size: 0.7rem; }
+  .som-actions .btn { flex: 1 1 100%; }
+}

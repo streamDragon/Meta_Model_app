@@ -5,6 +5,7 @@ import { CategoriesPage } from './features/categories/CategoriesPage';
 import { TrainerPage } from './features/trainer/TrainerPage';
 import { BlueprintPage } from './features/blueprint/BlueprintPage';
 import { GForceActionMapPage } from './features/gforce/GForceActionMapPage';
+import { SleightOfMouthPage } from './features/sleight/SleightOfMouthPage';
 import { PrismLabPage } from './features/prismlab/PrismLabPage';
 import { ValuesLabPage } from './features/valueslab/ValuesLabPage';
 import { BeliefsRealityLab } from './features/cbt/BeliefsRealityLab';
@@ -126,6 +127,25 @@ export const FEATURES: FeatureDef[] = [
     navLabel: 'תרגול',
     icon: '🎯',
     inBottomNav: true,
+  },
+  {
+    id: 'sleight-of-mouth',
+    navGroup: 'core',
+    title: 'זריזות לשון × מעבר למילים',
+    shortDescription: 'שלושה מבני אמונה, מילים שאפשר לשנות ושלוש תנועות מסגור לתרגול שיחה',
+    theoryFamily: 'reframing',
+    skillTrained: 'הבחנה בין אירוע למסקנה, ניסוח תגובה ובדיקת ההשפעה בשיחה',
+    difficulty: 2,
+    desktopSupport: 'full',
+    mobileSupport: 'full',
+    dataSource: 'src/data/sleightOfMouth.ts; OMEK Sleight of Mouth booklet edition 05 (2026)',
+    route: '#sleight-of-mouth',
+    component: SleightOfMouthPage,
+    status: 'beta',
+    sourceValidation: 'verified',
+    navLabel: 'זריזות לשון',
+    icon: '↪️',
+    inBottomNav: false,
   },
   {
     id: 'michael-hall-daily-gym',
