@@ -32,10 +32,8 @@ export function ConversationGymPage() {
   const [selected, setSelected] = useState<ConversationOption | null>(null);
   const [first, setFirst] = useState<ConversationOption | null>(null);
   const [results, setResults] = useState<ConversationResult[]>([]);
-  const [phraseAnswers, setPhraseAnswers] = useState<ConversationOption[]>([]);
   const [draft, setDraft] = useState('');
   const [hintOpen, setHintOpen] = useState(false);
-  const [theoryOpen, setTheoryOpen] = useState(false);
   const [timerOn, setTimerOn] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [connection, setConnection] = useState(STARTING_CONNECTION);
@@ -72,10 +70,8 @@ export function ConversationGymPage() {
     setSelected(null);
     setFirst(null);
     setResults([]);
-    setPhraseAnswers([]);
     setDraft('');
     setHintOpen(false);
-    setTheoryOpen(false);
     setTimerOn(false);
     setElapsed(0);
     setConnection(STARTING_CONNECTION);
@@ -124,9 +120,7 @@ export function ConversationGymPage() {
     advancing.current = true;
     const nextResults: ConversationResult[] = [...results, { skill: scenario.turns[turnIndex].skill, quality: first.quality }];
     setResults(nextResults);
-    setPhraseAnswers((old) => [...old, first]);
     setDraft('');
-    setTheoryOpen(false);
     setDirection(null);
     setMethod(null);
     setShowActions(false);
