@@ -20,7 +20,7 @@ describe('Clinic gameplay', () => {
     expect(screen.getByText(/אין עדיין תמונות גלויות/)).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: /כשאתה אומר ״בלגן״/ }));
     expect(screen.getByText(/נחשף קלף חדש/)).toBeTruthy();
-    expect(screen.getByText('מה רואים עכשיו')).toBeTruthy();
+    expect(screen.getByText(/מצב שנחשף · מה רואים עכשיו/)).toBeTruthy();
   });
 
   it('allows detours to repair rapport and multiple question families', () => {
