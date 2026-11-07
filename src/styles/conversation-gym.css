@@ -266,3 +266,6 @@
 @media (prefers-reduced-motion: reduce) {
   .therapist-eval-track > span { transition: none; }
 }
+
+/* Hide the generic help orb while inside this dedicated scene, not across the other labs. */
+.app-layout:has(#conversation.tab-content.active .therapist-workout) .wim-fab { display:none; }
