@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { CONVERSATION_SCENARIOS } from '../../data/conversationScenarios';
-import { CONVERSATION_SKILLS, type ConversationOption, type ConversationScenario } from '../../data/conversationSkills';
+import { type ConversationOption, type ConversationScenario } from '../../data/conversationSkills';
 import { getConversationPresentation } from '../../data/conversationPresentation';
 import { getConversationDecisionPath, type ConversationPathChoice } from '../../data/conversationDecisionPaths';
 import { recommendScenario, type ConversationResult } from '../../lib/conversationLearning';
@@ -176,7 +176,6 @@ export function ConversationGymPage() {
   const completed = done ? 4 : stage + Number(Boolean(selected));
   const summaryChoices = [direction, method, phraseAnswers[0], phraseAnswers[1]];
   const selectedHeading = selected?.quality === 'helpful' ? 'מתאים כאן' : selected?.quality === 'mixed' ? 'כיוון אפשרי, צריך דיוק' : 'כדאי לנסות אחרת';
-  const skill = CONVERSATION_SKILLS.find((value) => value.id === turn.skill);
 
   return (
     <div className="learning-page conversation-gym conversation-workout" dir="rtl">
