@@ -12,7 +12,6 @@ import {
 import './framing-tool.css';
 
 const choose = <T,>(items: readonly T[]): T => items[Math.floor(Math.random() * items.length)];
-const confidenceLabels = { unknown: 'טרם נבדק', low: 'נמוכה', medium: 'בינונית', high: 'גבוהה' };
 type MapItem = { id: string; certainty: number | null };
 const fallbackQuestions = {
   problem: 'איזה חלק מהבעיה כדאי לנו להכיר יותר?',
