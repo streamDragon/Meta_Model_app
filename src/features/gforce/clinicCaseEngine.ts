@@ -146,7 +146,19 @@ export function ask(s: Session, id: QuestionId): Session {
   if (!question) return s;
   // Asking the identical question repeatedly cannot generate infinite motivation points.
   // A patient may repeat an answer or experience the repetition as pressure.
-  if (s.turns.some(t => t.question === question.label)) {
+  const repeatableWhenPrepared: Partial<Record<QuestionId, boolean>> = {
+    'prepare-sense': has(s, 'prepare') && !seen(s, 'tools'),
+    'first-sense': has(s, 'first') && !seen(s, 'collect'),
+    'next-sense': has(s, 'next') && !seen(s, 'sweep'),
+    'stuck-sense': (has(s, 'barrier') || has(s, 'after')) && !seen(s, 'stuck'),
+    'scope-sense': has(s, 'belief') && !seen(s, 'scope'),
+    'fatigue-sense': (has(s, 'fatigue-context') || has(s, 'before')) && !seen(s, 'fatigue'),
+    'toolgap-sense': (has(s, 'tool-hurdle') || has(s, 'prepare')) && !seen(s, 'toolgap'),
+    'choice-sense': (has(s, 'choice-burden') || has(s, 'after')) && !seen(s, 'choice'),
+    'permission-sense': (has(s, 'permission') || has(s, 'belief')) && !seen(s, 'permission'),
+    'maintenance-sense': has(s, 'sustain') && seen(s, 'goal') && !seen(s, 'maintenance'),
+  };
+  if (s.turns.some(t => t.question === question.label) && !repeatableWhenPrepared[id]) {
     const justAsked = s.turns[s.turns.length - 1]?.question === question.label;
     const answer = justAsked
       ? 'אני כבר עניתי על זה. אולי ננסה להתקרב מכיוון אחר?'
