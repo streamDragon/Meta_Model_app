@@ -57,7 +57,7 @@ describe('conversation gym four-stage decision flow', () => {
     advanceToResponses(section);
     fireEvent.change(within(section).getByLabelText(/התגובה שלך/), { target: { value: 'private draft - never save' } });
     fireEvent.click(within(section).getByRole('button', { name: scenario.turns[0].options[0].text }));
-    expect(within(section).getByText('מהכללה לחוויה')).toBeTruthy();
+    expect(within(section).getByRole('button', { name: /מהכללה לחוויה/ })).toBeTruthy();
     fireEvent.click(within(section).getByRole('button', { name: 'נסה שוב' }));
     fireEvent.click(within(section).getByRole('button', { name: scenario.turns[0].options[1].text }));
     fireEvent.click(within(section).getByRole('button', { name: 'להמשך השיחה' }));
