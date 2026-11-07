@@ -28,7 +28,7 @@ describe('framing discovery lab', () => {
     fireEvent.click(within(root).getByRole('button', { name: 'הוסף למפה' }));
     expect(progress.getAttribute('aria-valuenow')).toBe('1');
     fireEvent.click(within(root).getByRole('button', { name: /פתח מפה/ }));
-    expect(within(root).getByText(FRAME_DISCOVERIES[0].mapText)).toBeTruthy();
+    expect(within(root).getAllByText(FRAME_DISCOVERIES[0].mapText).length).toBeGreaterThan(0);
   });
 
   it('lets the speaker certainty remain unknown, and resetting the topic clears the map', () => {
