@@ -93,6 +93,7 @@ export function ConversationGymPage() {
           <span className="learning-eyebrow">לומדים לדבר, לא רק לענות</span>
           <h2>אימון שיחה</h2>
           <p>בחר סיטואציה, הקשב למה שנאמר ותרגל תגובה אחת בכל פעם.</p>
+          <button className="btn btn-secondary" type="button" onClick={() => { window.location.hash = "framing"; }}>◎ פריימינג טול: לגלות את המפה</button>
         </header>
 
         <section className="conversation-featured" aria-label="אימון מומלץ">
@@ -146,6 +147,7 @@ export function ConversationGymPage() {
     <div className="learning-page conversation-gym conversation-workout" dir="rtl">
       <div className="conversation-workout-top">
         <button type="button" className="conversation-back" onClick={leave}>עזוב את האימון</button>
+        <button type="button" className="conversation-back" onClick={() => { window.location.hash = "framing"; }}>◎ פריימינג טול</button>
         <span>רגע {step} מתוך {scenario.turns.length}</span>
       </div>
       <div
