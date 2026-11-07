@@ -29,6 +29,7 @@ describe('Clinic gameplay', () => {
     fireEvent.click(screen.getByRole('button', { name: '🎯 G-Force · מטרה ומשאבים' }));
     fireEvent.click(screen.getByRole('button', { name: /אז תגיד לי מיד את כל השלבים/ }));
     expect(screen.getByText(/אם זה רק לתת רשימת משימות/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /קשר: 1 מתוך 5/ }));
     fireEvent.click(screen.getByRole('button', { name: /לבדוק קשר ולתקן/ }));
     expect(screen.getByText(/הכי קשה לי זה שאני כבר מתבייש/)).toBeTruthy();
   });
@@ -38,7 +39,7 @@ describe('Clinic gameplay', () => {
     fireEvent.click(screen.getByRole('button', { name: /מה הכי מכביד עליך/ }));
     const firstReply = screen.getByTestId('clinic-latest-answer');
     expect(firstReply.textContent).toContain('תודה שאתה לא ישר נותן לי רשימה');
-    fireEvent.click(screen.getByRole('button', { name: /שורה 5 · חוויה חושית/ }));
+    fireEvent.click(screen.getByRole('button', { name: '👁️ שורה 5 · חוויה חושית' }));
     fireEvent.click(screen.getByRole('button', { name: /איך ספציפית נראית הרצפה/ }));
     const latest = screen.getByTestId('clinic-latest-answer');
     expect(latest.textContent).toContain('אני רואה אריחים פנויים');
