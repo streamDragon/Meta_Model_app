@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ask, createSession, moveScene, SCENES, suggestedQuestions, summarizeSession } from './clinicCaseEngine';
+import { ask, createSession, moveScene, probeScene, SCENES, suggestedQuestions, summarizeSession } from './clinicCaseEngine';
 
 describe('non-linear G-Force clinic simulation', () => {
   it('starts without any known images and without a prescribed sequence', () => {
@@ -85,4 +85,57 @@ describe('non-linear G-Force clinic simulation', () => {
     expect(session.energy).toBe(4);
     expect(session.facts).toContain('state');
   });
+  it('explores extra rabbit holes only after an actual sensory description', () => {
+    let session = ask(createSession(), 'fatigue-sense');
+    expect(session.sceneOrder).toEqual([]);
+    session = ask(session, 'fatigue-context');
+    session = ask(session, 'fatigue-sense');
+    expect(session.sceneOrder).toEqual(['fatigue']); // clarification now makes the earlier question useful
+    session = ask(session, 'tool-hurdle');
+    session = ask(session, 'toolgap-sense');
+    expect(session.sceneOrder).toContain('toolgap');
+    expect(SCENES.toolgap.kind).toBe('branch');
+    expect(summarizeSession(session).main).toEqual([]);
+  });
+
+  it('distinguishes seeing an image, feeling safe in it and knowing the action', () => {
+    let session = ask(createSession(), 'goal-sense');
+    const imagined = probeScene(session, 'goal', 'imagine');
+    expect(imagined.status).toBe('ready');
+    session = imagined.session;
+    expect(probeScene(session, 'goal', 'comfort').status).toBe('uncertain');
+    const micro = probeScene(session, 'goal', 'micro');
+    expect(micro.status).toBe('uncertain');
+    expect(micro.session.probes.goal?.micro).toBe('uncertain');
+  });
+
+  it('allows blocked transitions and prevents repeated probing from boosting energy', () => {
+    let session = ask(createSession(), 'tool-hurdle');
+    session = ask(session, 'toolgap-sense');
+    const first = probeScene(session, 'toolgap', 'micro');
+    expect(first.status).toBe('blocked');
+    const second = probeScene(first.session, 'toolgap', 'micro');
+    expect(second.session.energy).toBe(first.session.energy);
+    expect(second.session.turns.length).toBe(first.session.turns.length);
+  });
+
+  it('repeats a question without gifting another image or extra score', () => {
+    let session = ask(createSession(), 'goal-sense');
+    const priorEnergy = session.energy;
+    session = ask(session, 'goal-sense');
+    expect(session.energy).toBe(priorEnergy);
+    expect(session.lastReveal).toBe(null);
+  });
+
+  it('lets low rapport block a sensory disclosure until trust is repaired', () => {
+    let session = ask(createSession(), 'push');
+    session = ask(session, 'goal-sense');
+    expect(session.sceneOrder).toEqual([]);
+    expect(session.response).toContain('מתקשה לתאר');
+    session = ask(session, 'repair');
+    expect(session.rapport).toBeGreaterThan(1);
+    session = ask(session, 'now-sense');
+    expect(session.sceneOrder).toEqual(['room']);
+  });
+
 });

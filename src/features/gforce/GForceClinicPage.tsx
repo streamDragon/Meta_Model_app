@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { ReactElement } from 'react';
-import { ask, createSession, FICTIONAL_CASE, moveScene, QUESTIONS, SCENES, suggestedQuestions, summarizeSession } from './clinicCaseEngine';
-import type { Family, QuestionId, Scene, SceneId, Session } from './clinicCaseEngine';
+import { ask, createSession, FICTIONAL_CASE, moveScene, probeScene, QUESTIONS, SCENES, suggestedQuestions, summarizeSession } from './clinicCaseEngine';
+import type { Family, ProbeKind, QuestionId, Scene, SceneId, Session } from './clinicCaseEngine';
 import './clinic-simulator.css';
 
 const FAMILY_LABELS: Record<Family, string> = {
@@ -20,6 +20,9 @@ function MiniScene({ scene }: { scene: Scene }): ReactElement {
     tools: ['🗑️', '🧹', '🧺'], basket: ['🧺', '👕', '✅'],
     sweep: ['🧹', '✨', '⬜'], stuck: ['🧍', '👔', '❔'],
     scope: ['🛏️', '👕', '📦', '❗'],
+    fatigue: ['💼', '🪑', '🌙'], toolgap: ['🧹', '❓', '🚪'],
+    choice: ['👕', '🧺', '❓'], permission: ['✨', '🗄️', '😟'],
+    maintenance: ['🚪', '🛍️', '🧺'],
   };
   return <div className={`clinic-scene-art art-${scene.art}`} aria-label={`איור המחשה: ${scene.title}`} role="img">
     <span className="clinic-art-floor" />
@@ -31,7 +34,7 @@ function MiniScene({ scene }: { scene: Scene }): ReactElement {
 const ENDING_QUESTION: QuestionId[] = ['goal-sense', 'compare', 'smart', 'state', 'sequence-check'];
 const MAX_VISIBLE_TURNS = 3;
 
-function SceneStack({ session, onMove }: { session: Session; onMove: (id: SceneId, dir: -1 | 1) => void }) {
+function SceneStack({ session, onMove, onProbe }: { session: Session; onMove: (id: SceneId, dir: -1 | 1) => void; onProbe: (id: SceneId, kind: ProbeKind) => void }) {
   const summary = summarizeSession(session);
   return <section className="clinic-panel" aria-labelledby="clinic-discoveries">
     <div className="clinic-heading-line">
@@ -50,6 +53,16 @@ function SceneStack({ session, onMove }: { session: Session; onMove: (id: SceneI
             <div className="clinic-scene-body">
               <div className="clinic-scene-title">{scene.kind === 'branch' ? '↳ הסתעפות' : '◆ מצב שנחשף'} · {scene.title}</div>
               <p>{scene.observation}</p>
+              <div className="clinic-probe-strip" aria-label={`חקירת תמונה: ${scene.title}`}>
+                <button type="button" onClick={() => onProbe(id, 'imagine')}>👁️ רואה את זה?</button>
+                <button type="button" onClick={() => onProbe(id, 'comfort')}>💛 מרגיש נוח?</button>
+                <button type="button" onClick={() => onProbe(id, 'micro')}>🪜 יודע איך?</button>
+              </div>
+              {(Object.entries(session.probes[id] ?? {}) as [ProbeKind, string][]).length > 0 && <div className="clinic-probe-results">
+                {(Object.entries(session.probes[id] ?? {}) as [ProbeKind, string][]).map(([kind, status]) => <span key={kind} className={`clinic-probe-status state-${status}`}>
+                  {kind === 'imagine' ? 'דמיון' : kind === 'comfort' ? 'נוחות' : 'ביצוע'}: {status === 'ready' ? 'אפשרי' : status === 'blocked' ? 'חסום' : 'לא ברור'}
+                </span>)}
+              </div>}
               {scene.kind === 'spine' && <div className="clinic-reorder" aria-label={`סדר קלף: ${scene.title}`}>
                 <button type="button" aria-label={`הזז את ${scene.title} אחורה`} onClick={() => onMove(id, -1)}>→</button>
                 <button type="button" aria-label={`הזז את ${scene.title} קדימה`} onClick={() => onMove(id, 1)}>←</button>
@@ -90,6 +103,7 @@ export function GForceClinicPage() {
   const [showAllTurns, setShowAllTurns] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [showWhy, setShowWhy] = useState(false);
+  const [probeFeedback, setProbeFeedback] = useState('');
 
   const summary = summarizeSession(session);
   const suggestions = suggestedQuestions(session);
@@ -98,7 +112,14 @@ export function GForceClinicPage() {
 
   function answer(id: QuestionId) {
     setSession(previous => ask(previous, id));
+    setProbeFeedback('');
     setShowWhy(false);
+  }
+
+  function checkScene(id: SceneId, kind: ProbeKind) {
+    const result = probeScene(session, id, kind);
+    setSession(result.session);
+    setProbeFeedback(`${SCENES[id].title}: ${result.direction}`);
   }
 
   function reset() {
@@ -108,6 +129,7 @@ export function GForceClinicPage() {
     setShowMap(false);
     setShowAllTurns(false);
     setShowWhy(false);
+    setProbeFeedback('');
   }
 
   if (!started) return <div className="clinic-page" dir="rtl">
@@ -145,7 +167,8 @@ export function GForceClinicPage() {
             <p>השאלות נבדלות במה שהן מחפשות: חוויה חושית, רצף בזמן, מקור מחסום, מטרה, ערכים או יחסים. לפעמים כדאי להתעכב על נושא צדדי כדי לשמור על הקשר, ולפעמים כדאי לחזור למטרה.</p>
           </details>
         </section>
-        <SceneStack session={session} onMove={(id, dir) => setSession(previous => moveScene(previous, id, dir))} />
+        <SceneStack session={session} onMove={(id, dir) => setSession(previous => moveScene(previous, id, dir))} onProbe={checkScene} />
+        {probeFeedback && <p className="clinic-probe-feedback" role="status">{probeFeedback}</p>}
       </div>
       <aside className="clinic-sidebar" aria-label="יומן המטפל">
         <section className="clinic-panel">
@@ -177,6 +200,7 @@ export function GForceClinicPage() {
           {showMap && <div className="clinic-assessment">
             <p><strong>מצבים מוחשיים:</strong> {summary.main.length}</p>
             <p><strong>הסתעפויות:</strong> {summary.branches.length}</p>
+            <p><strong>תמונות שנבדקו לעומק:</strong> {summary.probedScenes}</p>
             <p><strong>התחלה וסוף:</strong> {summary.canCompare ? 'שתיהן נחשפו' : 'חסרה תמונה אחת או שתיים'}</p>
             <p><strong>גשר אפשרי:</strong> {summary.hasConcreteBridge ? 'יש לפחות שלב ביניים' : 'עוד לא נחשף שלב ביניים'}</p>
             <p>גם כשהמפה אינה מלאה אפשר לסיים פגישה עם הבנה חדשה, ובלי לדרוש מהמטופל לבצע דבר.</p>
