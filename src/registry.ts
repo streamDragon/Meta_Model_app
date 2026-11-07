@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react';
 import { ConversationGymPage } from './features/trainer/ConversationGymPage';
 import { HomePage } from './features/home/HomePage';
+import { CoachCrashGym } from './features/coachcrash/CoachCrashGym';
 import { CategoriesPage } from './features/categories/CategoriesPage';
 import { TrainerPage } from './features/trainer/TrainerPage';
 import { BlueprintPage } from './features/blueprint/BlueprintPage';
@@ -31,7 +32,8 @@ export type TheoryFamily =
   | 'values-criteria'
   | 'cbt-beliefs'
   | 'dashboard'
-  | 'gforce';
+  | 'gforce'
+  | 'coach-crash';
 
 export interface FeatureDef {
   id: string;
@@ -88,6 +90,25 @@ export const FEATURES: FeatureDef[] = [
     dataSource: 'src/data/conversationScenarios.ts', route: '#conversation',
     component: ConversationGymPage, status: 'beta', sourceValidation: 'placeholder',
     navLabel: 'אימון שיחה', icon: '💬', inBottomNav: true,
+  },
+  {
+    id: 'coach-crash-gym',
+    navGroup: 'core',
+    title: 'COACH ו־CRASH · אימון גוף ודמיון',
+    shortDescription: 'מעבדה גופנית: מזהים סימנים, משנים תנוחה בדמות ומתרגלים בגוף ובדמיון',
+    theoryFamily: 'coach-crash',
+    skillTrained: 'זיהוי מצב גופני, ניסוי בתנוחה, קשב, דמיון והעברה לחיים',
+    difficulty: 2,
+    desktopSupport: 'full',
+    mobileSupport: 'full',
+    dataSource: 'src/features/coachcrash/CoachCrashGym.tsx',
+    route: '#coach-crash-gym',
+    component: CoachCrashGym,
+    status: 'beta',
+    sourceValidation: 'verified',
+    navLabel: 'אימון גוף ודמיון',
+    icon: '🧍',
+    inBottomNav: false,
   },
   {
     id: 'categories',
