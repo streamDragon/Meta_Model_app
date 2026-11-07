@@ -137,7 +137,7 @@ export function ConversationGymPage() {
   return (
     <div className="learning-page conversation-gym conversation-workout" dir="rtl">
       <div className="conversation-workout-top">
-        <button type="button" className="conversation-back" onClick={leave}>חזרה לכל האימונים</button>
+        <button type="button" className="conversation-back" onClick={leave}>עזוב את האימון</button>
         <span>רגע {step} מתוך {scenario.turns.length}</span>
       </div>
       <div
