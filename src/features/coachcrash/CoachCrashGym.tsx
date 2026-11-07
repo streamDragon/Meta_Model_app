@@ -255,8 +255,8 @@ export function CoachCrashGym() {
 
       <div className="cc-flow" aria-label="שלבי האימון">
         <button type="button" className={phase === 'identify' ? 'cc-flow-active' : ''} onClick={() => setPhase('identify')}><span>01</span> מזהים</button>
-        <button type="button" className={phase === 'practice' ? 'cc-flow-active' : ''} onClick={() => setPhase('practice')}><span>02</span> מתרגלים</button>
-        <button type="button" className={phase === 'transfer' ? 'cc-flow-active' : ''} onClick={() => setPhase('transfer')}><span>03</span> מעבירים לחיים</button>
+        <button type="button" disabled={!observed} className={phase === 'practice' ? 'cc-flow-active' : ''} onClick={() => setPhase('practice')}><span>02</span> מתרגלים</button>
+        <button type="button" disabled={!tried} className={phase === 'transfer' ? 'cc-flow-active' : ''} onClick={() => setPhase('transfer')}><span>03</span> מעבירים לחיים</button>
       </div>
 
       <section className="cc-axis-section" aria-label="בחירת רכיב לתרגול">
@@ -274,6 +274,13 @@ export function CoachCrashGym() {
       <div className="cc-workspace">
         <section className="cc-figure-card">
           <div className="cc-figure-title"><strong>סטודיו תנוחה</strong><span>אפשר לגרור גם באצבע</span></div>
+          <div className="cc-mobile-prompt" aria-live="polite">
+            <strong>{phase === 'identify' ? 'שלב 1: מתבוננים בדמות' : phase === 'practice' ? 'שלב 2: עוברים מהדמות אל הגוף' : 'שלב 3: מה נשאר איתי?'}</strong>
+            <p>{phase === 'identify'
+              ? 'צרו דמות שממחישה ' + axis.crash + '. אחר כך שימו לב: איך נראה הגוף שלכם?'
+              : phase === 'practice' ? pathway === 'conscious' ? axis.body : axis.imagery
+              : 'אחרי ההתנסות, בחרו סיטואציה אמיתית ותנועה קטנה שתוכלו לנסות בה.'}</p>
+          </div>
           <PoseAvatar pose={pose} onChange={setPose} />
           {initialPose && phase !== 'identify' && (
             <div className="cc-pose-comparison" aria-label="השוואת תנוחות הדמות">
