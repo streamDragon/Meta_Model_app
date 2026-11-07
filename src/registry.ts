@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import { ConversationGymPage } from './features/trainer/ConversationGymPage';
+import { FramingToolPage } from './features/framing/FramingToolPage';
 import { HomePage } from './features/home/HomePage';
 import { CategoriesPage } from './features/categories/CategoriesPage';
 import { TrainerPage } from './features/trainer/TrainerPage';
@@ -88,6 +89,15 @@ export const FEATURES: FeatureDef[] = [
     dataSource: 'src/data/conversationScenarios.ts', route: '#conversation',
     component: ConversationGymPage, status: 'beta', sourceValidation: 'placeholder',
     navLabel: 'אימון שיחה', icon: '💬', inBottomNav: true,
+  },
+  {
+    id: 'framing', navGroup: 'core', title: 'פריימינג טול',
+    shortDescription: 'לחשוף את מפת האדם בלי לאתגר את דבריו',
+    theoryFamily: 'meta-model', skillTrained: 'בניית תמונת ההקשר, כוונה, תוצאה וודאות',
+    difficulty: 2, desktopSupport: 'full', mobileSupport: 'full',
+    dataSource: 'src/data/framingDemo.ts', route: '#framing',
+    component: FramingToolPage, status: 'beta', sourceValidation: 'verified',
+    navLabel: 'פריימינג טול', icon: '🗺️', inBottomNav: false,
   },
   {
     id: 'categories',
