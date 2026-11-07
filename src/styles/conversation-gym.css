@@ -194,3 +194,78 @@
   .conversation-gym .conversation-option, .conversation-gym .conversation-path-option { min-height: 52px; padding: 10px 12px; font-size: .99rem; }
   .conversation-route-step .conversation-route-text strong { white-space: nowrap; }
 }
+
+
+/* Therapist scene vs. therapist internal mind. Two distinct visual spaces. */
+.therapist-workout { max-width: 850px; }
+.therapist-play-layout { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 13px; align-items: stretch; direction: ltr; }
+.therapist-eval { direction: rtl; position: sticky; top: 12px; align-self: start; display: flex; align-items: center; flex-direction: column; gap: 8px; border: 1px solid #dde2ec; background: #fff; border-radius: 14px; padding: 12px 5px; min-height: 275px; }
+.therapist-eval-heading { font-weight: 800; font-size: .87rem; }
+.therapist-eval-track { position: relative; display: flex; flex-direction: column; justify-content: end; overflow: hidden; height: 150px; width: 24px; border-radius: 20px; background: linear-gradient(to top,#fce5e3,#f6e9b5 50%,#d5f3e3); border: 1px solid #d2d8e0; }
+.therapist-eval-track > span { display: block; width: 100%; background: linear-gradient(to top,#e35c58,#f1c34d 53%,#2da677); transition: height .28s ease; border-radius: 20px; }
+.therapist-eval-center { position: absolute; top: 50%; left: 0; right: 0; border-top: 2px dashed #34425b; }
+.therapist-eval > strong { max-width: 60px; text-align: center; font-size: .73rem; line-height: 1.3; }
+.therapist-eval details { font-size: .69rem; color: var(--ink-soft); width: 100%; text-align: center; }
+.therapist-eval details summary { cursor: pointer; font-size: .68rem; color: var(--primary-deep); }
+.therapist-eval details p { width: 180px; background: #fff; border: 1px solid #dde2ec; border-radius: 10px; padding: 10px; position: absolute; z-index: 3; margin-top: 5px; text-align: right; box-shadow: var(--shadow-md); }
+.therapist-scene-main { direction: rtl; min-width: 0; display: grid; align-content: start; gap: 14px; }
+.therapist-client { display: grid; gap: 10px; }
+.therapist-client .conversation-spoken { padding: 16px; }
+.therapist-client-reply { background: #f9fafc; border-right: 3px solid var(--accent); border-radius: 12px; margin: 0; padding: 11px 13px; font-size: 1rem; }
+.therapist-emotion { display: flex; align-items: center; gap: 7px; }
+.therapist-emotion strong { font-size: .9rem; }
+.therapist-emotion small { color: var(--ink-soft); font-size: .76rem; }
+.therapist-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.therapist-actions button { min-height: 57px; font: inherit; font-weight: 800; border-radius: 14px; cursor: pointer; font-size: 1.1rem; }
+.therapist-act { color: #fff; border: 1px solid #5142df; background: #5b4df0; }
+.therapist-think { color: #12586f; border: 1px solid #a2d6e4; background: #e1f5fa; }
+.therapist-action-panel { display: grid; gap: 10px; }
+.therapist-action-panel h3 { font-size: 1.08rem; }
+.therapist-none { font: inherit; font-size: .95rem; font-weight: 650; cursor: pointer; text-align: right; border: 1px dashed #6aaabb; background: #eefafb; color: #175c72; border-radius: 13px; padding: 12px 14px; min-height: 55px; }
+.therapist-after-move { display: grid; gap: 10px; background: #fff; border-radius: 16px; padding: 14px; border: 1px solid #dfe5ed; }
+.therapist-after-move > strong { font-size: .99rem; }
+.therapist-after-move > p { color: var(--ink-soft); font-size: .9rem; line-height: 1.5; }
+.therapist-after-move .btn { min-height: 48px; }
+.therapist-lesson { font-size: .85rem; }
+.therapist-lesson summary { cursor: pointer; color: var(--primary-deep); font-weight: 700; }
+.therapist-lesson p { padding-top: 6px; color: var(--ink-soft); }
+.therapist-repair { font: inherit; text-align: center; font-size: .93rem; border: 1px solid #a5d5bc; background: #eaf8ef; color: #1c6744; border-radius: 11px; padding: 10px 13px; cursor: pointer; }
+.therapist-repair-confirmation { font-size: .86rem; color: #1d7149 !important; }
+.therapist-mind-backdrop { position: fixed; z-index: 120; inset: 0; padding: 20px 12px max(92px, env(safe-area-inset-bottom)); display: flex; align-items: center; justify-content: center; background: rgba(11, 28, 46, .68); }
+.therapist-mind-sheet { direction: rtl; width: min(540px, 100%); max-height: 100%; overflow-y: auto; background: #102f40; color: #eaf8fc; border: 1px solid #53889c; border-radius: 22px; padding: 17px; display: grid; gap: 15px; box-shadow: 0 20px 60px #001c2d9c; }
+.therapist-mind-head { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+.therapist-mind-head > span { font-size: 1.16rem; font-weight: 800; display: grid; }
+.therapist-mind-head small { font-size: .77rem; font-weight: 400; color: #b3d6e0; }
+.therapist-mind-head button { border: 1px solid #80aab9; background: transparent; color: white; width: 38px; height: 38px; border-radius: 50%; font: inherit; cursor: pointer; }
+.therapist-mind-tabs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; }
+.therapist-mind-tabs button { color: #c9e5ee; background: #22495b; font: inherit; border: 1px solid #496e80; padding: 10px 4px; border-radius: 10px; cursor: pointer; }
+.therapist-mind-tabs button.active { background: #daf1f7; color: #123c4e; border-color: #c4eff9; font-weight: 800; }
+.therapist-mind-question { font-size: 1.08rem; font-weight: 700; }
+.therapist-mind-choices { display: grid; gap: 8px; }
+.therapist-mind-choices button { background: #1c4658; color: white; border: 1px solid #658a9a; font: inherit; cursor: pointer; padding: 13px 12px; text-align: right; border-radius: 11px; }
+.therapist-mind-choices button.chosen { background: #d0f4f0; color: #123c4e; border-color: #67c4b1; font-weight: 700; }
+.therapist-mind-insight { background: #265366; color: #ebfcff; font-size: .9rem; border-radius: 9px; padding: 11px; }
+.therapist-mind-sheet label { font-size: .8rem; color: #c1e0e9; }
+.therapist-mind-sheet textarea { width: 100%; min-height: 95px; padding: 12px; font: inherit; border-radius: 11px; border: 1px solid #729fb0; background: #e8f7fb; color: #152e40; }
+.therapist-hint-button { width: max-content; padding: 9px 15px; border-radius: 30px; background: #265366; color: #eaffff; border: 1px solid #7aa9ba; font: inherit; cursor: pointer; }
+.therapist-mind-footer { border-top: 1px solid #416a7c; padding-top: 12px; }
+.therapist-mind-footer button { width: 100%; background: #6dd7c3; color: #103847; font: inherit; font-weight: 800; border: 0; border-radius: 11px; min-height: 48px; cursor: pointer; }
+.therapist-history { display: flex; align-items: end; gap: 8px; height: 95px; border-radius: 12px; background: #f4f8fc; padding: 10px; }
+.therapist-history span { display: block; flex: 1; max-width: 40px; background: linear-gradient(0deg,#df846b,#5ab79b); border-radius: 7px 7px 0 0; }
+@media (max-width: 650px) {
+  .therapist-play-layout { grid-template-columns: 51px minmax(0,1fr); gap: 9px; }
+  .therapist-eval { min-height: 228px; padding: 9px 3px; }
+  .therapist-eval-track { height: 122px; width: 19px; }
+  .therapist-eval > strong { font-size: .63rem; max-width: 46px; }
+  .therapist-eval details summary { font-size: .63rem; }
+  .therapist-actions button { font-size: 1.03rem; min-height: 53px; }
+  .therapist-mind-backdrop { padding: 9px 9px max(84px, env(safe-area-inset-bottom)); }
+  .therapist-mind-sheet { padding: 15px; border-radius: 17px; }
+  .therapist-client .conversation-spoken { padding: 12px; font-size: 1.05rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .therapist-eval-track > span { transition: none; }
+}
+
+/* Hide the generic help orb while inside this dedicated scene, not across the other labs. */
+.app-layout:has(#conversation.tab-content.active .therapist-workout) .wim-fab { display:none; }
