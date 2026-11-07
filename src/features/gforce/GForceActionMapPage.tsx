@@ -99,6 +99,8 @@ const REFLECTIONS = [
 
 export function GForceActionMapPage() {
   const [map, setMap] = useState<CaseMap>(loadMap);
+  const [photo, setPhoto] = useState<{ before: string | null; after: string | null }>({ before: null, after: null });
+  const [photoError, setPhotoError] = useState('');
   const [newAction, setNewAction] = useState('');
   const [substepText, setSubstepText] = useState<Record<string, string>>({});
   const [expandedStep, setExpandedStep] = useState<string | null>(null);
@@ -132,6 +134,18 @@ export function GForceActionMapPage() {
       children: [...step.children, { id: crypto.randomUUID(), label, status: 'pending', children: [] }],
     }));
     setSubstepText((old) => ({ ...old, [id]: '' }));
+  };
+
+  const handlePhoto = (kind: 'before' | 'after', file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { setPhotoError('צריך לבחור קובץ תמונה.'); return; }
+    if (file.size > 5 * 1024 * 1024) { setPhotoError('התמונה גדולה מדי. בחר תמונה עד 5MB.'); return; }
+    setPhotoError('');
+    const url = URL.createObjectURL(file);
+    setPhoto((current) => {
+      if (current[kind]) URL.revokeObjectURL(current[kind]!);
+      return { ...current, [kind]: url };
+    });
   };
 
   const renderStep = (step: ActionStep, depth = 0): ReactElement => (
@@ -176,12 +190,17 @@ export function GForceActionMapPage() {
       <input id="gf-title" value={map.title} onChange={(event) => patch({ title: event.target.value })} maxLength={120} />
       <div className="gf-scenes">
         <div className="gf-scene gf-before"><span aria-hidden="true">📍</span><label htmlFor="gf-present">המצב עכשיו</label>
+          {photo.before && <img className="gf-user-photo" src={photo.before} alt="תמונת המצב הנוכחי שהמשתמש בחר" />}
+          <label className="gf-photo-add">📷 הוסף תמונת מצב <input type="file" accept="image/*" aria-label="תמונת לפני" onChange={(event) => handlePhoto('before', event.target.files?.[0])} /></label>
           <textarea id="gf-present" rows={3} value={map.present} onChange={(event) => patch({ present: event.target.value })} /></div>
         <span className="gf-scene-arrow" aria-hidden="true">↓</span>
         <div className="gf-scene gf-after"><span aria-hidden="true">🎯</span><label htmlFor="gf-desired">כך אדע שהצלחתי</label>
+          {photo.after && <img className="gf-user-photo" src={photo.after} alt="תמונת המצב הרצוי שהמשתמש בחר" />}
+          <label className="gf-photo-add">📷 הוסף תמונת יעד <input type="file" accept="image/*" aria-label="תמונת אחרי" onChange={(event) => handlePhoto('after', event.target.files?.[0])} /></label>
           <textarea id="gf-desired" rows={3} value={map.desired} onChange={(event) => patch({ desired: event.target.value })} /></div>
       </div>
-      <p className="gf-minor">מתארים רק מה שידוע. תמונות אמיתיות ופרטים שלא נבדקו אינם נוצרים אוטומטית.</p>
+      {photoError && <p role="alert">{photoError}</p>}
+      <p className="gf-minor">תמונות שבחרת מוצגות זמנית במכשיר בלבד ואינן נכללות בייצוא JSON. אין יצירת תמונות אוטומטית.</p>
     </section>
     <section className="gf-panel" aria-labelledby="gf-resources">
       <h3 id="gf-resources">🧰 מה צריך להכין?</h3>
