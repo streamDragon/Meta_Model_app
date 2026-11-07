@@ -59,6 +59,48 @@ const AXES: Axis[] = [
   },
 ];
 
+// Short concept cards are a teaching aid, not a clinical classification.
+const CONCEPTS = [
+  {
+    english: 'Centered', near: 'יציבות · עיגון · בסיס',
+    meaning: 'מרכוז הוא היכולת למצוא נקודת ייחוס בגוף ולהישאר איתה גם כשלא הכול רגוע.',
+    nuance: 'לא מוכרחים לעמוד זקוף או להפסיק להרגיש פחד. מחפשים תנועה קטנה שמחזירה בחירה.',
+    question: 'איפה אפשר לחוש תמיכה, אפילו באחוז אחד יותר?',
+  },
+  {
+    english: 'Open', near: 'גמישות · מרחב · אפשרויות',
+    meaning: 'פתיחות מאפשרת לקלוט אפשרויות לפני שקופצים לתגובה מוכרת.',
+    nuance: 'פתיחות אינה הסכמה לכל דבר, חשיפה מוגזמת או ויתור על גבול.',
+    question: 'מה אני מוכן/ה לשים לב אליו, בלי להתחייב להסכים איתו?',
+  },
+  {
+    english: 'Aware', near: 'מודעות · נוכחות · קשב',
+    meaning: 'נוכחות היא תשומת לב למה שמתרחש עכשיו בגוף, בסביבה ובקשר עם האחר.',
+    nuance: 'נוכחות אינה ניתוח אינסופי. היא קשורה למרכוז, לחיבור ולהקשבה גם כשהראש פעיל.',
+    question: 'מה אני רואה, שומע או מרגיש עכשיו בלי לפרש?',
+  },
+  {
+    english: 'Connected', near: 'קשר · שייכות · משאבים',
+    meaning: 'חיבור הוא מגע עם עצמי, עם אנשים או עם משאבים שיכולים לתמוך בי.',
+    nuance: 'אפשר להיות מחובר/ת גם כשצריך מרחק פיזי או רגשי. חיבור אינו ביטול עצמי.',
+    question: 'איזה קשר או זיכרון תומך זמין לי כרגע?',
+  },
+  {
+    english: 'Holding', near: 'הכלה · החזקה · כבוד',
+    meaning: 'החזקה היא האפשרות לתת מקום לחוויה, בלי למהר להילחם בה או לציית לה.',
+    nuance: 'להחזיק רגש אינו להסכים לפגיעה, להישאר במצב מסוכן או לסבול בכוח.',
+    question: 'מה יאפשר לי לתת לחוויה מקום מוגבל ובטוח?',
+  },
+] as const;
+
+const FEELINGS = [
+  { key: 'tight', text: 'מכווץ/ת' },
+  { key: 'neutral', text: 'רגיל/ה' },
+  { key: 'space', text: 'עם מרחב' },
+  { key: 'unclear', text: 'לא ברור' },
+] as const;
+type Feeling = (typeof FEELINGS)[number]['key'];
+
 const SCENARIOS = [
   { id: 'feedback', label: 'מול ביקורת', detail: 'מישהו אומר שהעבודה שלך אינה מספיק טובה.' },
   { id: 'meeting', label: 'לפני מפגש', detail: 'את/ה נכנס/ת לפגישה ורוצה להיות נוכח/ת וקשוב/ה.' },
@@ -70,6 +112,23 @@ const COACH_POSE: Pose = { headX: 0, headY: 0, bodyX: 0, leftX: 58, leftY: 151, 
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
+}
+
+function PoseMini({ pose, label }: { pose: Pose; label: string }) {
+  const x = 60 + pose.bodyX * .3;
+  const hx = 60 + pose.headX * .7;
+  return <div className="cc-mini-figure">
+    <span>{label}</span>
+    <svg viewBox="0 0 120 130" role="img" aria-label={'צילום מנח הדמות: ' + label}>
+      <line x1="60" x2="60" y1="8" y2="123" stroke="#bed4d1" strokeWidth="1" strokeDasharray="4 5" />
+      <path d={'M ' + x + ' 87 L 43 119 M ' + x + ' 87 L 78 119'} stroke="#376477" strokeWidth="10" fill="none" strokeLinecap="round" />
+      <path d={'M ' + x + ' 51 L ' + x + ' 86'} stroke="#3b9088" strokeWidth="21" strokeLinecap="round" />
+      <path d={'M ' + (x - 10) + ' 53 L ' + (pose.leftX * .56 + 15) + ' ' + (pose.leftY * .38 + 11)} stroke="#d5a685" strokeWidth="8" strokeLinecap="round" />
+      <path d={'M ' + (x + 10) + ' 53 L ' + (pose.rightX * .38 + 12) + ' ' + (pose.rightY * .38 + 11)} stroke="#d5a685" strokeWidth="8" strokeLinecap="round" />
+      <line x1={hx} x2={x} y1={37 + pose.headY * .35} y2="46" stroke="#d5a685" strokeWidth="7" />
+      <circle cx={hx} cy={26 + pose.headY * .35} r="13" fill="#e6bc98" />
+    </svg>
+  </div>;
 }
 
 function PoseAvatar({ pose, onChange }: { pose: Pose; onChange: Dispatch<SetStateAction<Pose>> }) {
@@ -85,14 +144,18 @@ function PoseAvatar({ pose, onChange }: { pose: Pose; onChange: Dispatch<SetStat
   function start(event: ReactPointerEvent<SVGCircleElement>, target: Handle) {
     event.preventDefault();
     setDragging(target);
-    svgRef.current?.setPointerCapture(event.pointerId);
+    svgRef.current?.setPointerCapture?.(event.pointerId);
   }
   function move(event: ReactPointerEvent<SVGSVGElement>) {
     if (!dragging) return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    if (!bounds.width || !bounds.height) return;
-    const x = (event.clientX - bounds.left) * 320 / bounds.width;
-    const y = (event.clientY - bounds.top) * 360 / bounds.height;
+    // Translate client coordinates through the SVG matrix. A simple bounding
+    // rectangle calculation is wrong when preserveAspectRatio creates margins.
+    const matrix = event.currentTarget.getScreenCTM();
+    if (!matrix) return;
+    const pointer = event.currentTarget.createSVGPoint();
+    pointer.x = event.clientX;
+    pointer.y = event.clientY;
+    const { x, y } = pointer.matrixTransform(matrix.inverse());
     onChange((previous) => {
       if (dragging === 'head') return { ...previous, headX: clamp(x - 160, -24, 24), headY: clamp(y - 78, -16, 24) };
       if (dragging === 'left') return { ...previous, leftX: clamp(x, 42, 143), leftY: clamp(y, 112, 245) };
@@ -107,7 +170,8 @@ function PoseAvatar({ pose, onChange }: { pose: Pose; onChange: Dispatch<SetStat
       aria-label="דמות תרגול. גררו את הראש, כפות הידיים או המרכז כדי לשנות תנוחה. יש גם כפתורי תנוחה מתחת לדמות."
       onPointerMove={move}
       onPointerUp={() => setDragging(null)}
-      onPointerCancel={() => setDragging(null)}>
+      onPointerCancel={() => setDragging(null)}
+      onLostPointerCapture={() => setDragging(null)}>
       <defs>
         <linearGradient id="cc-person" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#81c6bd" /><stop offset="1" stopColor="#20787a" /></linearGradient>
         <radialGradient id="cc-aura"><stop offset="0" stopColor="#d3f5ec" stopOpacity=".88" /><stop offset="1" stopColor="#d3f5ec" stopOpacity="0" /></radialGradient>
@@ -159,7 +223,11 @@ export function CoachCrashGym() {
   const [observed, setObserved] = useState(false);
   const [tried, setTried] = useState(false);
   const [explain, setExplain] = useState(false);
+  const [initialPose, setInitialPose] = useState<Pose | null>(null);
+  const [before, setBefore] = useState<Feeling | null>(null);
+  const [after, setAfter] = useState<Feeling | null>(null);
   const axis = AXES[axisIndex];
+  const concept = CONCEPTS[axisIndex];
   const scenario = SCENARIOS.find((item) => item.id === scenarioId) ?? SCENARIOS[0];
 
   function chooseAxis(index: number) {
@@ -169,6 +237,9 @@ export function CoachCrashGym() {
     setExplain(false);
     setReflection('');
     setPose(CRASH_POSE);
+    setInitialPose(null);
+    setBefore(null);
+    setAfter(null);
     setPhase('identify');
   }
 
@@ -204,6 +275,13 @@ export function CoachCrashGym() {
         <section className="cc-figure-card">
           <div className="cc-figure-title"><strong>סטודיו תנוחה</strong><span>אפשר לגרור גם באצבע</span></div>
           <PoseAvatar pose={pose} onChange={setPose} />
+          {initialPose && phase !== 'identify' && (
+            <div className="cc-pose-comparison" aria-label="השוואת תנוחות הדמות">
+              <PoseMini pose={initialPose} label="מנח בתחילה" />
+              <span aria-hidden="true">←</span>
+              <PoseMini pose={pose} label="מנח עכשיו" />
+            </div>
+          )}
           <div className="cc-pose-actions">
             <button type="button" onClick={() => setPose(CRASH_POSE)}>מנח מכווץ</button>
             <button type="button" onClick={() => setPose(COACH_POSE)}>מנח פתוח</button>
@@ -221,8 +299,23 @@ export function CoachCrashGym() {
                 <div><small>CRASH · מתי זה קורה?</small><strong>{axis.crash}</strong><p>{axis.signal}</p></div>
                 <div><small>COACH · מה מתרגלים?</small><strong>{axis.coach}</strong><p>{axis.outside}</p></div>
               </div>
-              <p className="cc-guidance">נסו לשנות את הדמות למנח שממחיש את {axis.crash}. אחר כך שימו לב אילו סימנים באמת ניתן לראות, ומה נשאר חוויה פנימית שלא ניתן לדעת מבחוץ.</p>
-              <button type="button" className="cc-main-action" onClick={() => { setObserved(true); setPhase('practice'); }}>
+              <p className="cc-guidance">נסו לשנות את הדמות למנח שממחיש את {axis.crash}. אילו סימנים אפשר לראות, ומה נשאר חוויה פנימית שלא ניתן להסיק מבחוץ?</p>
+              <details className="cc-concept-details"><summary>מה זה {axis.coach}? מילים קשורות</summary>
+                <div className="cc-concept-body">
+                  <small>{concept.english} · {concept.near}</small>
+                  <p>{concept.meaning}</p><p>{concept.nuance}</p>
+                  <strong>שאלה לעצמי: {concept.question}</strong>
+                </div>
+              </details>
+              <div className="cc-feeling-box">
+                <strong>מה התחושה שלי עכשיו?</strong><small>בחירה אישית, לא אבחון של הדמות</small>
+                <div role="group" aria-label="תחושה לפני התרגול" className="cc-feeling-options">
+                  {FEELINGS.map((item) => <button type="button" key={item.key} aria-pressed={before === item.key}
+                    className={before === item.key ? 'cc-feeling-active' : ''}
+                    onClick={() => setBefore(item.key)}>{item.text}</button>)}
+                </div>
+              </div>
+              <button type="button" className="cc-main-action" onClick={() => { setInitialPose({ ...pose }); setObserved(true); setPhase('practice'); }}>
                 {observed ? 'להמשך התרגול' : 'זיהיתי · לתרגול'} <span aria-hidden="true">←</span>
               </button>
             </>
@@ -246,6 +339,14 @@ export function CoachCrashGym() {
                 <strong>ומה קורה מבפנים?</strong>
                 <p>{axis.inward}</p>
               </div>
+              <div className="cc-feeling-box">
+                <strong>מה אני שם/ה לב אליו עכשיו, אחרי הניסוי?</strong>
+                <div role="group" aria-label="תחושה אחרי התרגול" className="cc-feeling-options">
+                  {FEELINGS.map((item) => <button type="button" key={item.key} aria-pressed={after === item.key}
+                    className={after === item.key ? 'cc-feeling-active' : ''}
+                    onClick={() => setAfter(item.key)}>{item.text}</button>)}
+                </div>
+              </div>
               <p className="cc-guidance">אפשר לבדוק גם מול הדמות וגם בגוף שלך. אין צורך להגיע לתחושה מסוימת. אם תרגיל אינו נעים, מפסיקים או בוחרים משהו אחר.</p>
               <div className="cc-action-row">
                 <button type="button" className="cc-secondary-action" onClick={() => setPose(COACH_POSE)}>המחישו בדמות</button>
@@ -264,6 +365,11 @@ export function CoachCrashGym() {
               </div>
               <div className="cc-situation"><span>הסיטואציה</span><p>{scenario.detail}</p></div>
               <div className="cc-transfer-question"><strong>מה תבחר/י לנסות?</strong><p>{axis.inward}</p><p>{axis.bridge}</p></div>
+              {(before || after) && <div className="cc-inner-compare" aria-label="מבט אישי על התחושה">
+                <span>לפני: <strong>{FEELINGS.find((f) => f.key === before)?.text ?? 'לא נבחר'}</strong></span>
+                <span>עכשיו: <strong>{FEELINGS.find((f) => f.key === after)?.text ?? 'לא נבחר'}</strong></span>
+                <small>אין כאן ציון ואין חובה להרגיש שינוי. זו רק תצפית אישית.</small>
+              </div>}
               <label className="cc-note-label" htmlFor="cc-reflection">הערה לעצמי · לא נשמרת</label>
               <textarea id="cc-reflection" rows={3} value={reflection} onChange={(event) => setReflection(event.target.value)}
                 placeholder="סימן גופני אחד שאזהה, ותנועה קטנה אחת שאוכל לבחור..." />
@@ -271,7 +377,7 @@ export function CoachCrashGym() {
                 {explain ? 'הסתר הסבר' : 'מה מתרגלים כאן?'}
               </button>
               {explain && <p className="cc-theory">זהו אימון עצמי לזיהוי, ניסוי והעברה למצב יומיומי. הוא אינו מאבחן CRASH, אינו מודד שינוי תת־מודע ואינו תחליף לעזרה מקצועית. המסלול דרך הדמיון הוא תוספת אימונית מוצעת, ולא טענה על שינוי לא־מודע מוכח.</p>}
-              <button type="button" className="cc-main-action" onClick={() => { setPhase('identify'); setPose(CRASH_POSE); setReflection(''); setObserved(false); setTried(false); }}>
+              <button type="button" className="cc-main-action" onClick={() => { setPhase('identify'); setPose(CRASH_POSE); setInitialPose(null); setBefore(null); setAfter(null); setReflection(''); setObserved(false); setTried(false); }}>
                 תרגול נוסף <span aria-hidden="true">↺</span>
               </button>
             </>
