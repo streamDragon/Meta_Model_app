@@ -6,6 +6,7 @@ import './styles/visuals.css';
 import './styles/valueslab.css';
 import './styles/cbt.css';
 import './styles/learning.css';
+import './styles/conversation-gym.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
