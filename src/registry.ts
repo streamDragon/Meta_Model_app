@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react';
 import { ConversationGymPage } from './features/trainer/ConversationGymPage';
 import { SleightOfMouthPage } from './features/sleight/SleightOfMouthPage';
+import { CoachCrashGym } from './features/coachcrash/CoachCrashGym';
 import { FramingToolPage } from './features/framing/FramingToolPage';
 import { HomePage } from './features/home/HomePage';
 import { CategoriesPage } from './features/categories/CategoriesPage';
@@ -35,7 +36,8 @@ export type TheoryFamily =
   | 'values-criteria'
   | 'cbt-beliefs'
   | 'dashboard'
-  | 'gforce';
+  | 'gforce'
+  | 'coach-crash';
 
 export interface FeatureDef {
   id: string;
@@ -102,6 +104,17 @@ export const FEATURES: FeatureDef[] = [
     route: '#sleight-workshop', component: SleightOfMouthPage,
     status: 'production', sourceValidation: 'verified',
     navLabel: 'זריזות לשון', icon: '🌀', inBottomNav: false,
+  },
+  {
+    id: 'coach-crash-gym', navGroup: 'core', title: 'COACH / CRASH · אימון גוף ודמיון',
+    shortDescription: 'תרגול גופני של COACH ו־CRASH עם דמות אינטראקטיבית, תנוחה, קשב ודמיון',
+    theoryFamily: 'coach-crash',
+    skillTrained: 'זיהוי מצב, עבודה עם דמות, ויסות, דמיון והעברה לחיים',
+    difficulty: 2, desktopSupport: 'full', mobileSupport: 'full',
+    dataSource: 'src/features/coachcrash/CoachCrashGym.tsx',
+    route: '#coach-crash-gym', component: CoachCrashGym,
+    status: 'beta', sourceValidation: 'placeholder',
+    navLabel: 'COACH / CRASH', icon: '🧍', inBottomNav: false,
   },
   {
     id: 'framing', navGroup: 'core', title: 'פריימינג טול',
