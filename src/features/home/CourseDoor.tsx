@@ -122,6 +122,24 @@ export function CourseDoor() {
                 פתח את מסלול שפת ההשפעה
               </button>
             </article>
+
+            <article className="course-card" data-testid="course-card-sleight">
+              <span className="course-card-number">03</span>
+              <h3>זריזות לשון</h3>
+              <p>מקרה, שאלות מטה־מודל, 14 תבניות דילטס, Mind-Lines וסדנת פיצוצים והתנגדויות.</p>
+              <button type="button" className="btn btn-primary" onClick={() => navigateTo('sleight-workshop')}>
+                פתח אימון זריזות לשון
+              </button>
+            </article>
+
+            <article className="course-card" data-testid="course-card-coach-crash">
+              <span className="course-card-number">04</span>
+              <h3>COACH / CRASH</h3>
+              <p>אימון גוף ודמיון עם דמות אינטראקטיבית, עבודה עם מצבים ותרגול תגובות.</p>
+              <button type="button" className="btn btn-primary" onClick={() => navigateTo('coach-crash-gym')}>
+                פתח COACH / CRASH
+              </button>
+            </article>
           </div>
         </div>
       )}

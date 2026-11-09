@@ -62,6 +62,26 @@ describe('App shell', () => {
     ]);
   });
 
+  it('opens Sleight of Mouth from the same course entrance and same origin', () => {
+    window.location.hash = 'home';
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: /אני תלמיד בקורס/ }));
+    const originBefore = window.location.origin;
+    const card = screen.getByTestId('course-card-sleight');
+    fireEvent.click(within(card).getByRole('button', { name: 'פתח אימון זריזות לשון' }));
+    expect(window.location.hash).toBe('#sleight-workshop');
+    expect(window.location.origin).toBe(originBefore);
+  });
+
+  it('opens COACH / CRASH as an internal Meta Model route', () => {
+    window.location.hash = 'home';
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: /אני תלמיד בקורס/ }));
+    const card = screen.getByTestId('course-card-coach-crash');
+    fireEvent.click(within(card).getByRole('button', { name: 'פתח COACH / CRASH' }));
+    expect(window.location.hash).toBe('#coach-crash-gym');
+  });
+
   it('reuses the existing categories route from the Meta Model course card', () => {
     window.location.hash = 'home';
     render(<App />);
