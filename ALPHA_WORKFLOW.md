@@ -31,8 +31,8 @@ Open the URL printed by Vite on the development computer. A phone preview can be
 ## GitHub checks and publication
 
 - `.github/workflows/ci.yml` validates pushes to `alpha` and PRs with tests and a build.
-- On the `alpha` branch, there is one GitHub Pages deployment workflow, and it is **manual-only**. No Pages publish step runs as a consequence of an alpha push.
-- The duplicate Pages workflow was removed from `alpha` to avoid collisions.
+- On the `alpha` branch, GitHub Pages publishing workflows are **not present**. Pushes to alpha run CI only, without a Pages publication.
+- Existing deployment automation outside alpha (including Vercel's Git integration) is managed separately.
 - No Vercel CLI/API deployment is required for ordinary development.
 
 **Important caveat:** This repository is currently public. An `alpha` branch is not a privacy barrier; all committed code and fixture data can be viewed by others. Keep real patient stories, personal files, authentication tokens, secrets, and identifiable user data out of the repository. Real private-case intake needs separate access-controlled storage and consent.
