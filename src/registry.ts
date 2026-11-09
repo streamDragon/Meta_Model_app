@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 import { ConversationGymPage } from './features/trainer/ConversationGymPage';
 import { HomePage } from './features/home/HomePage';
 import { CoachCrashGym } from './features/coachcrash/CoachCrashGym';
+import { BodyCueLab } from './features/coachcrash/BodyCueLab';
 import { CategoriesPage } from './features/categories/CategoriesPage';
 import { TrainerPage } from './features/trainer/TrainerPage';
 import { BlueprintPage } from './features/blueprint/BlueprintPage';
@@ -108,6 +109,25 @@ export const FEATURES: FeatureDef[] = [
     sourceValidation: 'placeholder',
     navLabel: 'אימון גוף ודמיון',
     icon: '🧍',
+    inBottomNav: false,
+  },
+  {
+    id: 'body-cue-lab',
+    navGroup: 'core',
+    title: 'לומדים לראות · שפת גוף',
+    shortDescription: '20 תרגילי סימון גוף, הבחנה בין תצפית להשערה ותרגול קצר בגוף ובדמיון',
+    theoryFamily: 'coach-crash',
+    skillTrained: 'הבחנה בין סימנים גופניים לבין פרשנויות והעברת המיומנות לתרגול',
+    difficulty: 1,
+    desktopSupport: 'full',
+    mobileSupport: 'full',
+    dataSource: 'src/features/coachcrash/bodyCueCases.ts',
+    route: '#body-cue-lab',
+    component: BodyCueLab,
+    status: 'beta',
+    sourceValidation: 'placeholder',
+    navLabel: 'לומדים לראות',
+    icon: '👁️',
     inBottomNav: false,
   },
   {
