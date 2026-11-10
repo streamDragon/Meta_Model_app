@@ -14,3 +14,9 @@ android/local.properties
 *.keystore
 *.log
 .DS_Store
+
+# Book research sources are local-only. GitHub repository is public.
+/book/private/
+/book/working/
+/book/source_exports/
+/book/research/private/
