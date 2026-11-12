@@ -28,12 +28,22 @@ describe('COACH / CRASH embodied trainer', () => {
     expect(within(summary).getByText(/אין כאן ציון/)).toBeTruthy();
   });
 
-  it('offers both conscious body practice and guided imagery', () => {
+  it('distinguishes the source movement from the same movement in quiet attention', () => {
     render(<CoachCrashGym />);
     fireEvent.click(screen.getByRole('button', { name: /זיהיתי · לתרגול/ }));
-    expect(screen.getAllByText('מצא/י תנוחה נוחה. הרגש/י את המגע עם הרצפה, שחרר/י מעט את הכתפיים ותן/י לנשימה לחזור לקצב נוח.').length).toBeGreaterThan(0);
-    fireEvent.click(screen.getByRole('button', { name: /דרך הדמיון/ }));
-    expect(screen.getAllByText(/דמיין\/י מקום שבו הגוף מרגיש יציב/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/התחילו בתנועת כיווץ קטנה/).length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole('button', { name: /תנועה בריכוז עדין/ }));
+    expect(screen.getAllByText(/ביצוע שקט של אותה תנועה/).length).toBeGreaterThan(0);
+  });
+
+  it('presents the four Holding mantras as sourced practice, not a healing promise', () => {
+    render(<CoachCrashGym />);
+    fireEvent.click(screen.getByRole('button', { name: /החזקה.*פגיעה או עוינות/ }));
+    fireEvent.click(screen.getByRole('button', { name: /זיהיתי · לתרגול/ }));
+    expect(screen.getByText('זה מאוד מעניין.')).toBeTruthy();
+    expect(screen.getByText(/משהו מתחיל להתעורר/)).toBeTruthy();
+    expect(screen.getByText('ברוך הבא.')).toBeTruthy();
+    expect(screen.getByText(/לא קביעה שמשהו אכן מתרפא/)).toBeTruthy();
   });
 
   it('switches focus areas and resets the current exercise', () => {
