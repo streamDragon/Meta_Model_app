@@ -77,6 +77,7 @@ describe('Clinic gameplay', () => {
     render(<GForceClinicPage />);
     fireEvent.click(screen.getByRole('button', { name: /כניסה לפגישה/ }));
     fireEvent.click(screen.getByRole('button', { name: /כשאתה אומר ״בלגן״/ }));
+    fireEvent.click(screen.getByRole('button', { name: '🤝 קשר והקשבה' }));
     fireEvent.click(screen.getByRole('button', { name: /מה הכי מכביד עליך/ }));
     expect(screen.getByTestId('clinic-latest-answer').textContent).toContain('תודה שאתה לא ישר נותן לי רשימה');
     fireEvent.click(screen.getByRole('button', { name: /בטל את הפעולה האחרונה/ }));
