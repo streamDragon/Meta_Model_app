@@ -4,7 +4,8 @@
 
     function isStandaloneTrainerPage() {
         try {
-            return /_trainer\.html$/i.test((location.pathname || '').split('/').pop() || '');
+            // breen_table_lab.html is a standalone trainer page too, it just predates the *_trainer.html naming.
+            return /(?:_trainer|^breen_table_lab)\.html$/i.test((location.pathname || '').split('/').pop() || '');
         } catch (e) {
             return false;
         }
@@ -13,7 +14,7 @@
     function isStandaloneShellPage() {
         try {
             var pathname = String(location.pathname || '').toLowerCase();
-            if (/_trainer\.html$/i.test(pathname.split('/').pop() || '')) {
+            if (isStandaloneTrainerPage()) {
                 return true;
             }
             return /\/worksheets\/verb-unzip(?:\/|\/index\.html)?$/.test(pathname) || /\/lab\/context-radar(?:\/|\/index\.html)?$/.test(pathname);
