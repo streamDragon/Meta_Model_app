@@ -65,6 +65,12 @@ describe('therapist mind conversation training', () => {
     expect(JSON.parse(saved).sessions[0].results[0].quality).toBe('unhelpful');
     expect(JSON.parse(localStorage.getItem('userProgress')!).xp).toBe(10);
     expect(within(section).getByRole('progressbar').getAttribute('aria-valuenow')).toBe('2');
+    const recap = within(section).getByRole('list', { name: 'מה בחרת בכל מהלך' });
+    const items = within(recap).getAllByRole('listitem');
+    expect(items).toHaveLength(2);
+    expect(items[0].textContent).toContain(scenario.turns[0].options[2].text);
+    expect(items[0].textContent).toContain('תוקן');
+    expect(items[1].textContent).toContain(scenario.turns[1].options[0].text);
   });
 
   it('does not persist free form draft and allows leaving without reward', () => {

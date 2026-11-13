@@ -269,3 +269,21 @@
 
 /* Hide the generic help orb while inside this dedicated scene, not across the other labs. */
 .app-layout:has(#conversation.tab-content.active .therapist-workout) .wim-fab { display:none; }
+
+/* Phone flow fixes: one-row top bar, meter note stays on screen, compact recap. */
+.conversation-workout-top { flex-wrap: nowrap; min-width: 0; }
+.conversation-workout-top .conversation-back { white-space: nowrap; }
+.conversation-exit::before, .conversation-framing-link::before { content: none; }
+.conversation-top-tools { flex: none; gap: 8px; }
+.conversation-turn-count { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.therapist-eval details p { left: 0; right: auto; width: min(220px, calc(100vw - 40px)); max-width: none; }
+.therapist-play-layout { min-width: 0; }
+.therapist-scene-main { min-width: 0; }
+.therapist-after-move { scroll-margin-bottom: 96px; }
+.conversation-recap { margin: 0; }
+.conversation-recap li { padding: 9px 11px; gap: 10px; }
+.conversation-recap li > span { font-weight: 800; width: 1.2em; text-align: center; }
+.conversation-recap li strong { font-weight: 600; line-height: 1.4; }
+.conversation-recap .recap-helpful > span { color: #1e8a5f; }
+.conversation-recap .recap-mixed > span { color: #b07a10; }
+.conversation-recap li:not(.recap-helpful):not(.recap-mixed) > span { color: #c2485a; }
