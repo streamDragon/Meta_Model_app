@@ -1,76 +1,111 @@
 import { FEATURES } from '../../registry';
 
 interface LegacyToolLink {
+  /** Hebrew name shown first. */
   title: string;
-  description: string;
+  /** Original English name, shown only as small secondary text. */
+  englishName: string;
+  /** One short line: when to use this tool. */
+  whenToUse: string;
   href: string;
+  /** Hebrew skill tag. */
   tag: string;
-  canonicalId?: string;
+  /** Main React route that covers a related skill, if any. */
+  relatedId?: string;
 }
 
+// Every entry is a distinct exercise with its own mechanics or data; none is a
+// copy of another. Related main-app routes are linked, not substituted.
 const LEGACY_TOOLS: LegacyToolLink[] = [
   {
-    title: 'Classic 2 · Structure of Magic',
-    description: 'תרגול טקסטואלי מתקדם לזיהוי קטגוריות וסימון בתוך הטקסט.',
+    title: 'סימון קטגוריות בטקסט',
+    englishName: 'Classic 2 · Structure of Magic',
+    whenToUse: 'כשרוצים לסמן איפה בדיוק בתוך טקסט קצר מופיעה קטגוריה, מול טבלת ברין.',
     href: 'classic2_trainer.html',
-    tag: 'trainer',
-    canonicalId: 'practice',
+    tag: 'זיהוי',
+    relatedId: 'practice',
   },
   {
-    title: 'Classic Classic',
-    description: 'זיהוי תבניות מטה מודל דרך משפט, שאלה, מבנה ומשוב.',
+    title: 'זיהוי תבנית, שאלה ויעד',
+    englishName: 'Classic Classic',
+    whenToUse: 'כשרוצים לתרגל משפט אחד בשלבים: שאלת בירור, הבעיה הלשונית והיעד, גם במצב מבחן עם זמן.',
     href: 'classic_classic_trainer.html',
-    tag: 'trainer',
-    canonicalId: 'practice',
+    tag: 'זיהוי',
+    relatedId: 'practice',
   },
   {
-    title: 'Iceberg Templates',
-    description: 'עבודה מדורגת עם תבניות עומק, סיבות, רגשות ופעולות.',
-    href: 'iceberg_templates_trainer.html',
-    tag: 'lab',
-  },
-  {
-    title: 'Scenario Trainer',
-    description: 'סצנות יומיומיות, בחירה ומשוב על תגובה בתוך הקשר חי.',
-    href: 'scenario_trainer.html',
-    tag: 'scenario',
-  },
-  {
-    title: 'Breen Table Lab',
-    description: 'מעבדת טבלה לתרגול מבנה, דיוק ושאלות בירור.',
+    title: 'מעבדת טבלת ברין',
+    englishName: 'Breen Table Lab',
+    whenToUse: 'כשרוצים לזכור איפה כל תבנית יושבת בטבלה: בנייה, השלמה ואיתור מהיר.',
     href: 'breen_table_lab.html',
-    tag: 'lab',
+    tag: 'טבלה',
   },
   {
-    title: 'Prism Lab / Research',
-    description: 'גרסאות הפריזמות המקוריות שנשמרו מהאפליקציה הפרודקשנית.',
-    href: 'prism_lab_trainer.html',
-    tag: 'prism',
-    canonicalId: 'prismlab',
-  },
-  {
-    title: 'Sentence Morpher',
-    description: 'תרגול שינוי משפטים ושמירת המבנה הלשוני שנבדק.',
-    href: 'sentence_morpher_trainer.html',
-    tag: 'sentence',
-  },
-  {
-    title: 'Living Triples',
-    description: 'תרגול חי של שלשות ברין והבחנה בין שכבות תגובה.',
+    title: 'שלשות חיות',
+    englishName: 'Living Triples',
+    whenToUse: 'כשרוצים להבחין בין תבניות קרובות של אותה שלשה בתוך הקשר.',
     href: 'living_triples_trainer.html',
-    tag: 'trainer',
+    tag: 'הבחנה',
   },
   {
-    title: 'Verb Unzip',
-    description: 'פירוק פעלים עמומים לפעולה, הקשר ומידע חסר.',
-    href: 'verb_unzip_trainer.html',
-    tag: 'verb',
+    title: 'עצי קרחון',
+    englishName: 'Iceberg Templates',
+    whenToUse: 'כשרוצים לבדוק פרשנות של שטח מול עומק כהשערה, ולפתוח ענף חלופי.',
+    href: 'iceberg_templates_trainer.html',
+    tag: 'עומק',
   },
   {
-    title: 'Context Radar',
-    description: 'מעבדת הקשר צדדית שנשמרה מהעץ הפרודקשני.',
+    title: 'תמונות מחיי היום',
+    englishName: 'Scenario Trainer',
+    whenToUse: 'כשרוצים להגיב בתוך סצנה יומיומית ולראות איך התגובה נוחתת.',
+    href: 'scenario_trainer.html',
+    tag: 'סצנה',
+    relatedId: 'conversation',
+  },
+  {
+    title: 'רדאר הקשר',
+    englishName: 'Context Radar',
+    whenToUse: 'כשוויכוח נתקע: משחזרים את ההקשר החסר של כל צד ובוחרים תגובת תיקון.',
     href: 'lab/context-radar/',
-    tag: 'radar',
+    tag: 'הקשר',
+    relatedId: 'conversation',
+  },
+  {
+    title: 'מעבדת שינוי ניסוח',
+    englishName: 'Sentence Morpher',
+    whenToUse: 'כשרוצים לראות מה משתנה כשמשנים מילה אחת בניסוח.',
+    href: 'sentence_morpher_trainer.html',
+    tag: 'ניסוח',
+  },
+  {
+    title: 'פירוק פועל עמום',
+    englishName: 'Verb Unzip',
+    whenToUse: 'כשפועל כמו "נתקע" או "התמודד" עמום מדי: מפרקים אותו לפעולה שאפשר לצלם.',
+    href: 'verb_unzip_trainer.html',
+    tag: 'פועל',
+  },
+  {
+    title: 'משחק הפירוק: 15 שאלות',
+    englishName: 'Verb Unzip · interview game',
+    whenToUse: 'כשרוצים לתשאל מטופל על פועל אחד ב-15 שאלות ולשבץ את התשובות ללוח.',
+    href: 'verb_unzip_trainer_legacy.html',
+    tag: 'פועל',
+  },
+  {
+    title: 'מפת הכרח בפריזמות',
+    englishName: 'Prism Lab (standalone)',
+    whenToUse: 'כשרוצים לעבור על משפט מוכן משני צדדיו, רמה אחר רמה, עם שאלות ותשובות.',
+    href: 'prism_lab_trainer.html',
+    tag: 'פריזמה',
+    relatedId: 'prismlab',
+  },
+  {
+    title: 'מחקר פריזמות בשרשרת',
+    englishName: 'Prism Research',
+    whenToUse: 'כשרוצים לחקור הנחה מרכזית בשרשרת שאלות עד שנבנית מפה עמוקה.',
+    href: 'prism_research_trainer.html',
+    tag: 'פריזמה',
+    relatedId: 'prismlab',
   },
 ];
 
@@ -81,7 +116,7 @@ export function LegacyToolsPage() {
         <span aria-hidden="true">🧰</span>
         <div>
           <h2>כלים נוספים</h2>
-          <p>בחר לפי המיומנות. תרגילי עומק ייחודיים זמינים כאן; גרסאות מקבילות נמצאות בארכיון.</p>
+          <p>בחר לפי המיומנות. כל כלי כאן הוא תרגיל נפרד עם מנגנון משלו.</p>
         </div>
       </div>
 
@@ -95,26 +130,33 @@ export function LegacyToolsPage() {
       </div>
 
       <div className="legacy-tool-grid">
-        {LEGACY_TOOLS.filter((tool) => !tool.canonicalId).map((tool) => (
-          <a className="legacy-tool-card" href={tool.href} key={tool.href}>
-            <span className="legacy-tool-tag">{tool.tag}</span>
-            <strong>{tool.title}</strong>
-            <p>{tool.description}</p>
-            <span className="legacy-tool-action">פתח כלי ←</span>
-          </a>
-        ))}
-      </div>
-      <details className="legacy-archive">
-        <summary>ארכיון: גרסאות מקבילות ({LEGACY_TOOLS.filter((tool) => tool.canonicalId).length})</summary>
-        {LEGACY_TOOLS.filter((tool) => tool.canonicalId).map((tool) => {
-          const canonical = FEATURES.find((feature) => feature.id === tool.canonicalId);
-          return <article className="legacy-tool-card" key={tool.href}>
-            <strong>{tool.title}</strong><p>{tool.description}</p>
-            {canonical && <a href={canonical.route}>למסלול הראשי: {canonical.navLabel}</a>}
-            <a href={tool.href}>פתח את הגרסה השמורה</a>
-          </article>;
+        {LEGACY_TOOLS.map((tool) => {
+          const related = tool.relatedId
+            ? FEATURES.find((feature) => feature.id === tool.relatedId)
+            : undefined;
+          return (
+            <article className="legacy-tool-card" key={tool.href}>
+              <span className="legacy-tool-tag">{tool.tag}</span>
+              <strong>
+                <a href={tool.href}>{tool.title}</a>
+              </strong>
+              <small lang="en" dir="ltr" style={{ color: 'var(--ink-soft)', fontSize: 'var(--fs-xs)', alignSelf: 'flex-start' }}>
+                {tool.englishName}
+              </small>
+              <p>
+                <strong style={{ fontSize: 'inherit' }}>מתי: </strong>
+                {tool.whenToUse}
+              </p>
+              <a className="legacy-tool-action" href={tool.href}>פתח כלי ←</a>
+              {related && (
+                <a href={related.route} style={{ fontSize: 'var(--fs-sm)' }}>
+                  קשור למסלול הראשי: {related.navLabel}
+                </a>
+              )}
+            </article>
+          );
         })}
-      </details>
+      </div>
     </div>
   );
 }
