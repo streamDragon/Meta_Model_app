@@ -8,4 +8,9 @@ describe('shared routes', () => {
     expect(resolveRoute('#%E0%A4%A', '?tab=categories', routes)).toBe('categories');
     expect(resolveRoute('#unknown', '?tab=unknown', routes)).toBe('home');
   });
+  it('sends a retired duplicate route to the screen it duplicated', () => {
+    const withClinic = [...routes, { id: 'gforce-clinic', route: '#gforce-clinic' }];
+    expect(resolveRoute('#gforce-action-map', '', withClinic)).toBe('gforce-clinic');
+    expect(resolveRoute('', '?tab=gforce-action-map', withClinic)).toBe('gforce-clinic');
+  });
 });

@@ -4,7 +4,6 @@ import { resolveRoute } from './lib/navigation';
 import { ConversationLearningProvider } from './store/conversationLearning';
 import { MobileFallback } from './components/MobileFallback';
 import { WhyItMatters } from './components/WhyItMatters';
-import { CourseDoor } from './features/home/CourseDoor';
 import { useIsMobile } from './lib/useIsMobile';
 import { HintProvider, useHint } from './store/hint';
 import { ProgressProvider, useProgress } from './store/useProgress';
@@ -115,6 +114,15 @@ function RailProgress() {
 
 function AppShell() {
   const { activeTab, navigate } = useHashRoute();
+  const [moreOpen, setMoreOpen] = useState(false);
+  const activeInBottomNav = FEATURES.some((f) => f.inBottomNav && f.id === activeTab);
+
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMoreOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [moreOpen]);
   const { hint, closeHint } = useHint();
   const sound = useSoundSetting();
   const isMobile = useIsMobile();
@@ -213,7 +221,6 @@ function AppShell() {
                 hidden={activeTab !== f.id}
               >
                 {showFallback ? <MobileFallback feature={f} /> : <Feature />}
-                {f.id === 'home' && <CourseDoor />}
               </section>
             );
           })}
@@ -226,21 +233,69 @@ function AppShell() {
             <button
               key={f.id}
               type="button"
-              className={`bottom-nav-btn ${activeTab === f.id ? 'active' : ''}`}
+              className={`bottom-nav-btn ${activeTab === f.id && !moreOpen ? 'active' : ''}`}
               data-tab={f.id}
-              onClick={() => navigate(f.id)}
+              aria-current={activeTab === f.id ? 'page' : undefined}
+              onClick={() => { setMoreOpen(false); navigate(f.id); }}
             >
               <span aria-hidden="true">{f.icon}</span>
-              <strong>
-                {f.id === 'blueprint'
-                  ? 'צעדים'
-                  : f.id === 'prismlab'
-                    ? 'פריזמות'
-                    : f.navLabel}
-              </strong>
+              <strong>{f.navLabel}</strong>
             </button>
           ))}
+          <button
+            type="button"
+            className={`bottom-nav-btn ${moreOpen || !activeInBottomNav ? 'active' : ''}`}
+            aria-expanded={moreOpen}
+            aria-controls="more-sheet"
+            onClick={() => setMoreOpen((open) => !open)}
+          >
+            <span aria-hidden="true">☰</span>
+            <strong>עוד</strong>
+          </button>
         </nav>
+
+        {moreOpen && (
+          <div className="more-sheet-backdrop" onClick={() => setMoreOpen(false)}>
+            <div
+              id="more-sheet"
+              className="more-sheet"
+              role="dialog"
+              aria-modal="true"
+              aria-label="כל הכלים"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="more-sheet-head">
+                <strong>כל הכלים</strong>
+                <button type="button" className="more-sheet-close" onClick={() => setMoreOpen(false)} aria-label="סגירה">
+                  ✕
+                </button>
+              </div>
+              {NAV_GROUPS.map((group) => {
+                const items = FEATURES.filter((f) => f.navGroup === group.id && !f.inBottomNav);
+                if (items.length === 0) return null;
+                return (
+                  <section key={group.id} className="more-sheet-group">
+                    <h2>{group.label}</h2>
+                    {items.map((f) => (
+                      <button
+                        key={f.id}
+                        type="button"
+                        className={`more-sheet-item ${activeTab === f.id ? 'active' : ''}`}
+                        onClick={() => { setMoreOpen(false); navigate(f.id); }}
+                      >
+                        <span className="more-sheet-icon" aria-hidden="true">{f.icon}</span>
+                        <span className="more-sheet-text">
+                          <strong>{f.navLabel}</strong>
+                          <small>{f.shortDescription}</small>
+                        </span>
+                      </button>
+                    ))}
+                  </section>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

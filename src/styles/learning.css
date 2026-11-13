@@ -60,3 +60,21 @@
   .prism-accordion-item { grid-template-columns: minmax(0, 1fr); }
   .guided-choice input, .guided-choice select, .mapping-form textarea, .mapping-form select { font-size: 16px; }
 }
+
+/* Home: one main action, then folded detail (no wall of cards). */
+.home-fold { border-block-end: 1px solid var(--line); padding-block: var(--sp-2); }
+.home-fold > summary { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sp-3); cursor: pointer; padding-block: var(--sp-2); list-style: none; min-height: 44px; }
+.home-fold > summary::-webkit-details-marker { display: none; }
+.home-fold > summary::after { content: '▾'; color: var(--ink-soft); margin-inline-start: auto; }
+.home-fold[open] > summary::after { content: '▴'; }
+.home-fold > summary span { color: var(--ink-soft); font-size: var(--fs-sm); }
+.home-tools h3 { margin-block: var(--sp-4) var(--sp-1); }
+.home-tool-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--sp-4); }
+.home-tool { display: flex; align-items: flex-start; gap: var(--sp-3); text-align: start; font: inherit; color: var(--ink); background: transparent; border: none; border-block-end: 1px solid var(--line); padding: var(--sp-3) var(--sp-1); cursor: pointer; min-width: 0; }
+.home-tool:hover strong { color: var(--primary); }
+.home-tool-icon { font-size: 1.15rem; line-height: 1.4; }
+.home-tool-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.home-tool-text small { color: var(--ink-soft); font-size: var(--fs-sm); line-height: 1.4; }
+@media (max-width: 760px) { .home-tool-list { grid-template-columns: 1fr; } }
+.learning-page > .learning-heading { margin-bottom: 0; }
+#home .course-door { margin-bottom: 0; }
