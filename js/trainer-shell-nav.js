@@ -4,8 +4,9 @@
 
     function isStandaloneTrainerPage() {
         try {
-            // breen_table_lab.html is a standalone trainer page too, it just predates the *_trainer.html naming.
-            return /(?:_trainer|^breen_table_lab)\.html$/i.test((location.pathname || '').split('/').pop() || '');
+            // breen_table_lab.html and verb_unzip_trainer_legacy.html are standalone trainer pages too;
+            // they just predate the *_trainer.html naming.
+            return /(?:_trainer|_trainer_legacy|^breen_table_lab)\.html$/i.test((location.pathname || '').split('/').pop() || '');
         } catch (e) {
             return false;
         }
