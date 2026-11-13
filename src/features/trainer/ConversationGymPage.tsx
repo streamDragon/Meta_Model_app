@@ -8,9 +8,16 @@ import { applyConversationMove, applyRepair, connectionDescription, illustratedE
 import { useConversationLearning } from '../../store/conversationLearning';
 import { useProgress } from '../../store/useProgress';
 import { shuffle } from '../../lib/random';
+import { revealElement } from '../../lib/reveal';
 
 type InnerLens = 'direction' | 'method' | 'language';
 type Room = 'scene' | 'mind';
+type MoveRecap = { turn: number; text: string; quality: ConversationOption['quality']; repaired: boolean };
+const RECAP_LABEL: Record<string, { icon: string; label: string }> = {
+  helpful: { icon: '✓', label: 'קידם את השיחה' },
+  mixed: { icon: '◐', label: 'אפשר לדייק' },
+};
+const recapLabel = (quality: string) => RECAP_LABEL[quality] ?? { icon: '✗', label: 'הרחיק מעט' };
 const timeText = (seconds: number) => String(Math.floor(seconds / 60)).padStart(2, '0') + ':' + String(seconds % 60).padStart(2, '0');
 const THINK_TABS: { id: InnerLens; icon: string; label: string }[] = [
   { id: 'direction', icon: '🧭', label: 'כוונה' },
@@ -41,6 +48,7 @@ export function ConversationGymPage() {
   const [repaired, setRepaired] = useState(false);
   const [done, setDone] = useState(false);
   const [earned, setEarned] = useState(0);
+  const [moves, setMoves] = useState<MoveRecap[]>([]);
   const sessionId = useRef('');
   const advancing = useRef(false);
   const feedbackRef = useRef<HTMLElement | null>(null);
@@ -53,7 +61,8 @@ export function ConversationGymPage() {
   }, [timerOn, scenario, done]);
 
   useEffect(() => {
-    if (selected && room === 'scene') feedbackRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+    // Bring the reply + feedback into view above the fixed bottom nav ('nearest' often did not move).
+    if (selected && room === 'scene') revealElement(feedbackRef.current, 'end');
   }, [selected, room]);
 
   const start = (value: ConversationScenario) => {
@@ -78,6 +87,7 @@ export function ConversationGymPage() {
     setHistory([STARTING_CONNECTION]);
     setRepaired(false);
     setEarned(0);
+    setMoves([]);
     setDone(false);
     window.scrollTo?.({ top: 0, behavior: 'auto' });
   };
@@ -120,6 +130,7 @@ export function ConversationGymPage() {
     advancing.current = true;
     const nextResults: ConversationResult[] = [...results, { skill: scenario.turns[turnIndex].skill, quality: first.quality }];
     setResults(nextResults);
+    setMoves((old) => [...old, { turn: turnIndex, text: first.text, quality: first.quality, repaired }]);
     setDraft('');
     setDirection(null);
     setMethod(null);
@@ -189,11 +200,11 @@ export function ConversationGymPage() {
   return (
     <div className="learning-page conversation-gym therapist-workout" dir="rtl">
       <div className="conversation-workout-top">
-        <button type="button" className="conversation-back" onClick={leave}>עזוב את האימון</button>
-        <button type="button" className="conversation-back" onClick={() => { window.location.hash = "framing"; }}>◎ מפת פריימינג</button>
+        <button type="button" className="conversation-back conversation-exit" onClick={leave} aria-label="עזוב את האימון">✕ יציאה</button>
+        <button type="button" className="conversation-back conversation-framing-link" onClick={() => { window.location.hash = "framing"; }} aria-label="מפת פריימינג">◎ פריימינג</button>
         <div className="conversation-top-tools">
           <button className="conversation-timer" type="button" aria-pressed={timerOn} onClick={() => setTimerOn((old) => !old)}>{timerOn ? '⏱ ' + timeText(elapsed) : '⏱ זמן'}</button>
-          <span>מהלך {Math.min(turnIndex + 1, scenario.turns.length)} / {scenario.turns.length}</span>
+          <span className="conversation-turn-count" aria-label={'מהלך ' + Math.min(turnIndex + 1, scenario.turns.length) + ' מתוך ' + scenario.turns.length}>{Math.min(turnIndex + 1, scenario.turns.length)}/{scenario.turns.length}</span>
         </div>
       </div>
       <div className="conversation-progress-track" role="progressbar" aria-label="התקדמות באימון" aria-valuemin={0} aria-valuemax={scenario.turns.length} aria-valuenow={completed}>
@@ -283,6 +294,22 @@ export function ConversationGymPage() {
               <span className="learning-eyebrow">האימון הושלם</span>
               <h3>מסלול הקשר שלך</h3>
               <div className="therapist-history" aria-label="מהלכי הקשר בתרגול">{history.map((score, index) => <span key={index} title={connectionDescription(score)} style={{ height: score + '%' }} />)}</div>
+              {moves.length > 0 && (
+                <ol className="conversation-summary-list conversation-recap" aria-label="מה בחרת בכל מהלך">
+                  {moves.map((move) => {
+                    const verdict = recapLabel(move.quality);
+                    return (
+                      <li key={move.turn} className={'recap-' + move.quality}>
+                        <span aria-hidden="true">{verdict.icon}</span>
+                        <div>
+                          <small>מהלך {move.turn + 1} · {verdict.label}{move.repaired ? ' · תוקן' : ''}</small>
+                          <strong>{move.text}</strong>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
               <p>{scenario.transferCue}</p>
               <p className="learning-muted">אפשר להתאושש גם אחרי מהלך לא מוצלח. המד ממחיש תרחיש כתוב בלבד, לא את רגשות האדם האמיתי.</p>
               <p className="learning-muted">{earned ? 'נוספו ' + earned + ' נקודות תרגול.' : 'אפשר לחזור לתרגול.'}</p>
