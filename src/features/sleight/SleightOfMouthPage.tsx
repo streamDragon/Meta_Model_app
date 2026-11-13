@@ -145,6 +145,21 @@ export function SleightOfMouthPage() {
   const selectedMove: DialogueMove | undefined = chosenMove ? DIALOGUE_MOVES.find((move) => move.id === chosenMove) : undefined;
   const progressText = `${used.length} / ${maxRounds}`;
   const latestPersonMessage = messages.length > 1 ? [...messages].reverse().find((entry) => entry.speaker === 'person') : null;
+  // After the trainee speaks, bring the persona's reply into view (it renders above the move picker).
+  const replyRef = useRef<HTMLDivElement>(null);
+  const [replyScrollRequest, setReplyScrollRequest] = useState(0);
+  useEffect(() => {
+    if (!replyScrollRequest) return;
+    const frame = window.requestAnimationFrame(() => {
+      const target = replyRef.current;
+      if (!target) return;
+      // The reply is sticky, so scroll its panel to the top: the reply lands just under the app's
+      // top bar (CSS scroll-margin) with the next choices below it, clear of the fixed bottom nav.
+      target.focus({ preventScroll: true });
+      (target.closest('.som-work-panel') ?? target).scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [replyScrollRequest]);
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -225,6 +240,7 @@ export function SleightOfMouthPage() {
     }
     setChosenMove(null);
     setDraft('');
+    setReplyScrollRequest((count) => count + 1);
   }
 
   function askCalibration() {
@@ -234,12 +250,13 @@ export function SleightOfMouthPage() {
       ? `אני מרגיש ${state.feeling}/10 מבחינת נוחות לדבר על זה. לגבי המשפט המקורי אני בטוח ${state.conviction}/10, ואני רואה כרגע ${state.choices}/10 אפשרויות טובות.`
       : `אני עדיין מרגיש בערך כמו קודם: ${state.feeling}/10 בנוחות, ${state.conviction}/10 בוודאות, ו-${state.choices}/10 באפשרויות.`;
     addMessages([
-      { speaker: 'trainee', text: 'איך אתה מרגיש עכשיו? עד כמה אתה בטוח שהאמונה המקורית נכונה, וכמה אפשרויות טובות פתוחות לך?', pattern: 'קליברציה' },
+      { speaker: 'trainee', text: 'איך אתה מרגיש עכשיו? עד כמה אתה בטוח שהאמונה המקורית נכונה, וכמה אפשרויות טובות פתוחות לך?', pattern: 'בדיקת מצב' },
       { speaker: 'person', text: say + (needsCalibration && change.conviction > 0 ? ' האמת היא שעכשיו אני אפילו יותר מחזיק בה.' : '') },
     ]);
     if (needsCalibration && lastMoveId) setCertaintyByMove(previous=>({...previous,[lastMoveId]:state.conviction}));
     setCalibrated({ ...state });
     setNeedsCalibration(false);
+    setReplyScrollRequest((count) => count + 1);
   }
 
   function repair() {
@@ -338,7 +355,7 @@ export function SleightOfMouthPage() {
                     <div><small>שלב 2 · אתגור רוחבי</small><h3>בחר סוג אתגור</h3></div>
                     <button type="button" className="som-text-btn" onClick={() => setShowMap(true)}>מפת המהלכים ◈</button>
                   </div>
-                  {latestPersonMessage && <div className="som-latest-reply" role="status"><small>התשובה האחרונה של {currentCase.speaker}</small><p>{latestPersonMessage.text}</p></div>}
+                  {latestPersonMessage && <div ref={replyRef} tabIndex={-1} className="som-latest-reply" role="status"><small>התשובה האחרונה של {currentCase.speaker}</small><p>{latestPersonMessage.text}</p></div>}
                   <div className="som-families" role="group" aria-label="שלוש משפחות של מהלכי אתגור">
                     {CHALLENGE_FAMILIES.map((entry) => (
                       <button type="button" key={entry.id} className={'som-family-card som-family-' + entry.id + (family === entry.id ? ' selected' : '')} aria-pressed={family === entry.id} onClick={() => { setFamily(entry.id); setChosenMove(null); }}>
@@ -386,7 +403,7 @@ export function SleightOfMouthPage() {
                   {!selectedMove && <p className="som-hint-inline">בחר אחת מהתבניות. אין חובה לפעול לפי סדר, ואפשר לחזור למהלך שכבר ניסית.</p>}
 
                   <div className="som-after-turn">
-                    <button type="button" onClick={askCalibration} className="btn btn-secondary">איך אתה מרגיש עכשיו? · קליברציה</button>
+                    <button type="button" onClick={askCalibration} className="btn btn-secondary">איך אתה מרגיש עכשיו? · בדיקת מצב</button>
                     <button type="button" className="som-text-btn" onClick={() => setPhase('complete')}>סיום וסיכום</button>
                   </div>
                   <details className="som-more-questions">
@@ -420,7 +437,7 @@ export function SleightOfMouthPage() {
         <aside className="som-side-column">
           <section className="som-panel som-calibration">
             <div className="som-panel-header">
-              <h3>קליברציה</h3>
+              <h3>בדיקת מצב</h3>
               <small>דיווח הדמות בסימולציה</small>
             </div>
             <ScoreBar title="מצב רגשי" value={calibrated.feeling} hint="0 = מוצף · 10 = נוח ובטוח" stale={needsCalibration} />

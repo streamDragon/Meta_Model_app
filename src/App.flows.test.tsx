@@ -218,7 +218,7 @@ describe('Beliefs & Reality Lab flow', () => {
     });
     fireEvent.click(within(section).getByText('פתח למפת מחשבה'));
 
-    expect(within(section).getByText(/modal operator/i)).toBeTruthy();
+    expect(within(section).getByText("חייב / לא יכול")).toBeTruthy();
     expect(within(section).getByText(/מי זה "כולם"/)).toBeTruthy();
 
     fireEvent.click(within(section).getByText('שמור מפת מחשבה'));

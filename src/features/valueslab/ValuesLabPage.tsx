@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import rawPack from '../../../packs/values-constraints.json';
 import {
   createTradeoff,
@@ -74,6 +74,7 @@ export function ValuesLabPage() {
   const [saved, setSaved] = useState<VclSession[]>(loadSessions);
   const [wizardIndex, setWizardIndex] = useState(0);
   const [awarded, setAwarded] = useState(false);
+  const [finished, setFinished] = useState(false);
   const isMobile = useIsMobile();
   const { addXP, recordSession } = useProgress();
   const { showHint } = useHint();
@@ -88,6 +89,7 @@ export function ValuesLabPage() {
   const openSession = (s: VclSession) => {
     setSession(s);
     setWizardIndex(0);
+    setFinished(false);
     setAwarded(!!s.reviewedAt || s.diagnosis.length > 0);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -100,6 +102,7 @@ export function ValuesLabPage() {
     if (session) setSaved(persistSession(session));
     setSession(null);
     setWizardIndex(0);
+    setFinished(false);
   };
 
   const resetDiagnosis = (s: VclSession): VclSession => ({
@@ -251,6 +254,37 @@ export function ValuesLabPage() {
   const rulesById = Object.fromEntries(data.diagnosis_rules.map((r) => [r.id, r]));
   const moves = generateVclMoves(session.diagnosis, data.moves);
   const wizardCard = cards.length > 0 ? cards[Math.min(wizardIndex, cards.length - 1)] : null;
+  // Mobile wizard: wizardIndex walks through every card, then the tradeoffs, the map check and the summary.
+  const cardSteps = Math.max(cards.length, 1);
+  const TRADEOFF_STEP = cardSteps;
+  const CHECK_STEP = cardSteps + 1;
+  const SUMMARY_STEP = cardSteps + 2;
+  const stage = wizardIndex < cardSteps ? 0 : wizardIndex - cardSteps + 1;
+  const stageLabels = ['כרטיסים', 'התנגשויות', 'בדיקת המפה', 'סיכום'];
+  const showStage = (index: number) => !isMobile || stage === index;
+  const goToStep = (index: number) => {
+    setWizardIndex(index);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const hasResult = session.analysisIsCurrent || session.diagnosis.length > 0;
+  const questionsInResult = hasResult && session.questionsGenerated.length > 0;
+  const chosenMove = moves.find((move) => move.id === session.nextMoveId)
+    ?? data.moves.find((move) => move.id === session.nextMoveId);
+  const finish = () => {
+    setSaved(persistSession(session));
+    if (isMobile) {
+      goToStep(SUMMARY_STEP);
+    } else {
+      setFinished(true);
+      window.setTimeout(() => document.getElementById('vcl-summary')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
+    }
+  };
+  const stepNav = (back: number, next: number | null, nextLabel: string) => (
+    <div className="blueprint-wizard-actions vcl-step-nav">
+      <button type="button" className="btn btn-secondary" onClick={() => goToStep(back)}>הקודם</button>
+      {next !== null && <button type="button" className="btn btn-primary" onClick={() => goToStep(next)}>{nextLabel}</button>}
+    </div>
+  );
 
   const constraintCard = (card: VclCard) => (
     <div
@@ -331,13 +365,23 @@ export function ValuesLabPage() {
           </button>
         </div>
 
-        <div className="vcl-closed-note">
+        {isMobile && (
+          <ol className="vcl-stage-bar" aria-label="שלבי האשף">
+            {stageLabels.map((label, index) => (
+              <li key={label} className={index === stage ? 'active' : index < stage ? 'done' : ''} aria-current={index === stage ? 'step' : undefined}>
+                <button type="button" onClick={() => goToStep(index === 0 ? 0 : cardSteps + index - 1)}>{index + 1}. {label}</button>
+              </li>
+            ))}
+          </ol>
+        )}
+
+        {showStage(0) && <div className="vcl-closed-note">
           {isMobile
             ? 'במובייל עובדים עם כרטיס אחד בכל פעם: בוחרים כרטיס, מכוונים אותו, ממשיכים הלאה ובודקים את המפה.'
             : 'התרחיש סגור מראש. אפשר לכוון את הכרטיסים הקיימים ולסמן יחסים ביניהם, בלי להמציא טקסט חדש.'}
-        </div>
+        </div>}
 
-        {isMobile ? (
+        {isMobile ? (stage === 0 && (
           <div className="vcl-wizard">
             <div className="blueprint-wizard-progress">
               {cards.length === 0
@@ -380,11 +424,10 @@ export function ValuesLabPage() {
                   </button>
                   <button
                     type="button"
-                    className="btn btn-secondary"
-                    disabled={wizardIndex >= cards.length - 1}
-                    onClick={() => setWizardIndex((i) => Math.min(cards.length - 1, i + 1))}
+                    className={`btn ${wizardIndex >= cards.length - 1 ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => goToStep(wizardIndex + 1)}
                   >
-                    הבא
+                    {wizardIndex >= cards.length - 1 ? 'הבא: התנגשויות' : 'הבא'}
                   </button>
                 </div>
               </>
@@ -392,7 +435,7 @@ export function ValuesLabPage() {
               <p className="muted">התרחיש הזה ריק. בחר תרחיש אחר ממסך הפתיחה.</p>
             )}
           </div>
-        ) : (
+        )) : (
           <div className="vcl-building">
             <div className="vcl-floor vcl-floor-top">
               <div className="vcl-floor-label">
@@ -421,7 +464,7 @@ export function ValuesLabPage() {
           </div>
         )}
 
-        <div className="vcl-tradeoffs-section">
+        {showStage(1) && <div className="vcl-tradeoffs-section">
           <h4>⚔️ מפת התנגשויות</h4>
           <p className="muted">
             בוחרים שני תנאים מתוך הכרטיסים המוכנים, ואז מסמנים מי מוביל כרגע.
@@ -453,15 +496,17 @@ export function ValuesLabPage() {
             ))
           )}
           {cards.length >= 2 && <TradeoffForm cards={cards} onAdd={addTradeoff} />}
-        </div>
+          {isMobile && stepNav(cardSteps - 1, CHECK_STEP, 'הבא: בדיקת המפה')}
+        </div>}
 
+        {showStage(2) && <>
         <div className="vcl-diagnose-bar">
           <button type="button" className="btn btn-primary btn-large" onClick={diagnose}>
             בדוק את המפה
           </button>
         </div>
 
-        {(session.analysisIsCurrent || session.diagnosis.length > 0) && (
+        {hasResult && (
           <div className="vcl-diagnosis-result">
             <h4>כיוונים לבירור לפי כללי התרגיל</h4><p className="muted">הסימנים נובעים מהכרטיסים ומהבחירות שלך. הם אינם אבחון או קביעה מה חשוב יותר לאדם.</p>{session.diagnosis.length === 0 && <p>לא עלו סימנים בכללים האלה. אפשר להתחיל באחת משאלות הבירור.</p>}
             {session.diagnosis.map((finding) => {
@@ -485,15 +530,15 @@ export function ValuesLabPage() {
                 </div>
               );
             })}
-            {session.questionsGenerated.length > 0 && (
-              <div className="vcl-generated-questions">
-                <h4>❓ שאלות מטה-מודל לעבודה</h4>
+            {questionsInResult && (
+              <details className="vcl-generated-questions" open={!isMobile}>
+                <summary><h4>❓ שאלות מטה-מודל לעבודה ({session.questionsGenerated.length})</h4></summary>
                 <ul>
                   {session.questionsGenerated.map((q) => (
                     <li key={q}>{q}</li>
                   ))}
                 </ul>
-              </div>
+              </details>
             )}
             {moves.length > 0 && (
               <div className="vcl-moves">
@@ -513,6 +558,7 @@ export function ValuesLabPage() {
 
         <section className="card learning-transfer"><h4>מה תבדוק מכאן?</h4><label htmlFor="vcl-next-step">צעד אחד ומועד — על בסיס ההחלטה שלך</label><input id="vcl-next-step" value={session.nextStep ?? ''} onChange={(e) => updateSession((s) => ({ ...s, nextStep: e.target.value }))} placeholder="למשל: לבדוק מחר מה באמת נדרש ומי יכול לאשר זאת" /><p className="learning-muted">זהו תרגיל לבדיקת בחירה. תנאי בטיחות או מגבלה ממשית אינם מתבטלים בגלל דירוג חשיבות.</p></section>
         <div className="action-buttons">
+          {isMobile && <button type="button" className="btn btn-secondary" onClick={() => goToStep(TRADEOFF_STEP)}>הקודם</button>}
           <button
             type="button"
             className="btn btn-secondary"
@@ -523,11 +569,41 @@ export function ValuesLabPage() {
           >
             שמור סשן
           </button>
+          <button type="button" className="btn btn-primary" onClick={finish}>סיים וסכם</button>
         </div>
+        </>}
+
+        {(isMobile ? stage === 3 : finished) && (
+          <section className="vcl-summary" id="vcl-summary" aria-label="סיכום הסשן">
+            <h4>✅ סיכום: {session.mainDesire}</h4>
+            <dl>
+              <div>
+                <dt>המהלך שבחרת</dt>
+                <dd>{chosenMove ? chosenMove.label : 'עדיין לא נבחר מהלך. אפשר לחזור לבדיקת המפה ולבחור אחד.'}</dd>
+              </div>
+              <div>
+                <dt>הצעד הבא</dt>
+                <dd>{session.nextStep?.trim() || 'עדיין לא נכתב צעד. כדאי לנסח צעד אחד ומועד.'}</dd>
+              </div>
+              {session.tradeoffs.some((t) => t.winner) && (
+                <div>
+                  <dt>מה מוביל כרגע</dt>
+                  <dd>{session.tradeoffs.filter((t) => t.winner).map((t) => labelOf(t.winner)).join(' · ')}</dd>
+                </div>
+              )}
+            </dl>
+            <p className="muted">הסשן נשמר ואפשר לחזור אליו ממסך הפתיחה.</p>
+            <div className="action-buttons">
+              <a className="btn btn-primary" href="#conversation">לתרגל את זה בשיחה ←</a>
+              {isMobile && <button type="button" className="btn btn-secondary" onClick={() => goToStep(CHECK_STEP)}>חזרה לבדיקה</button>}
+              <button type="button" className="btn btn-secondary" onClick={closeWorkspace}>תרחיש אחר</button>
+            </div>
+          </section>
+        )}
       </div>
 
-      <aside className="workbench-side">
-        <div className="side-card">
+      {(!isMobile || stage === 2) && <SidePanels collapsed={isMobile}>
+        {!questionsInResult && <div className="side-card">
           <h4>❓ שאלות מטה-מודל</h4>
           {questions.length === 0 ? (
             <p className="muted">בחר תרחיש כדי לקבל שאלות מותאמות.</p>
@@ -538,7 +614,7 @@ export function ValuesLabPage() {
               ))}
             </ul>
           )}
-        </div>
+        </div>}
         <div className="side-card">
           <h4>🗼 מיפוי רמות לוגיות</h4>
           <div className="vcl-dilts-ladder">
@@ -566,8 +642,18 @@ export function ValuesLabPage() {
             </ul>
           </div>
         )}
-      </aside>
+      </SidePanels>}
     </div>
+  );
+}
+
+function SidePanels({ collapsed, children }: { collapsed: boolean; children: ReactNode }) {
+  if (!collapsed) return <aside className="workbench-side">{children}</aside>;
+  return (
+    <details className="workbench-side vcl-side-details">
+      <summary>עוד כלים: רמות לוגיות ותובנות</summary>
+      {children}
+    </details>
   );
 }
 

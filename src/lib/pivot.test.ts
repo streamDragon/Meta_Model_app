@@ -30,7 +30,7 @@ describe('computePivotRecommendation', () => {
       session([answer('I'), answer('B')], 4),
     );
     expect(rec.pivot).toBe('B');
-    expect(rec.reason).toContain('Small Win');
+    expect(rec.reason).toContain('הצלחה קטנה');
   });
 
   it('falls through identity rule when no lower level was answered', () => {

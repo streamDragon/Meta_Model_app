@@ -626,3 +626,93 @@ input[type='text']:focus {
     min-height: 46px;
   }
 }
+
+/* mobile wizard stages + closing summary */
+.vcl-stage-bar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  list-style: none;
+  margin: 0 0 var(--sp-3);
+  padding: 0;
+}
+
+.vcl-stage-bar button {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: transparent;
+  border-radius: var(--r-sm);
+  padding: 6px 2px;
+  font: inherit;
+  font-size: var(--fs-xs);
+  color: inherit;
+  cursor: pointer;
+}
+
+.vcl-stage-bar li.done button {
+  background: var(--primary-soft);
+}
+
+.vcl-stage-bar li.active button {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.vcl-step-nav {
+  margin-top: var(--sp-3);
+}
+
+.vcl-summary {
+  margin-top: var(--sp-4);
+  padding: var(--sp-4);
+  border: 2px solid var(--primary);
+  border-radius: var(--r-md, 14px);
+  background: var(--primary-soft);
+}
+
+.vcl-summary h4 {
+  margin: 0 0 var(--sp-3);
+}
+
+.vcl-summary dl {
+  display: grid;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-3);
+}
+
+.vcl-summary dt {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  opacity: 0.75;
+}
+
+.vcl-summary dd {
+  margin: 2px 0 0;
+  line-height: 1.5;
+}
+
+.vcl-summary a.btn {
+  text-decoration: none;
+}
+
+.vcl-side-details {
+  margin-top: var(--sp-3);
+}
+
+.vcl-side-details > summary {
+  cursor: pointer;
+  font-weight: 700;
+  padding: var(--sp-3);
+  border-radius: var(--r-sm);
+  background: var(--primary-soft);
+}
+
+.vcl-generated-questions > summary {
+  cursor: pointer;
+}
+
+.vcl-generated-questions > summary h4 {
+  display: inline;
+}

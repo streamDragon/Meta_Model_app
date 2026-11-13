@@ -44,6 +44,22 @@ describe('framing discovery lab', () => {
     expect(within(root).getByRole('progressbar', { name: 'חלקים שנחשפו' }).getAttribute('aria-valuenow')).toBe('0');
   });
 
+  it('auto-advances through zones, shows one grid, and ends with a summary card', () => {
+    render(<App />);
+    const root = document.getElementById('framing')!;
+    fireEvent.click(within(root).getByRole('button', { name: /פתח מפה/ }));
+    expect(root.querySelector('.ft-area-grid')).toBeNull();
+    expect(root.querySelectorAll('.ft-diagram-area').length).toBeGreaterThan(0);
+    for (let i = 0; i < FRAME_DISCOVERIES.length; i += 1) {
+      fireEvent.click(within(root).getByRole('button', { name: 'שאל שאלה' }));
+      fireEvent.click(within(root).getByRole('button', { name: 'דלג על ודאות' }));
+    }
+    expect(within(root).getByRole('progressbar', { name: 'חלקים שנחשפו' }).getAttribute('aria-valuenow')).toBe(String(FRAME_DISCOVERIES.length));
+    expect(within(root).queryByText(/בחר אזור נוסף/)).toBeNull();
+    const summary = within(root).getByLabelText('סיכום המפה');
+    expect(within(summary).getByRole('link', { name: /אימון שיחה/ }).getAttribute('href')).toBe('#conversation');
+  });
+
   it('keeps internal certainty separate from objective truth', () => {
     expect(certaintyBand(null)).toBe('unknown');
     expect(certaintyBand(3)).toBe('low');

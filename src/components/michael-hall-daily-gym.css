@@ -1,0 +1,49 @@
+/* Michael Hall daily gym: source line and end-of-day completion card. */
+.daily-card-source {
+  font-size: var(--fs-xs);
+}
+
+.daily-done-card {
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+  padding: var(--sp-4);
+  border: 2px solid var(--primary);
+  border-radius: var(--r-md);
+  background: var(--primary-soft);
+}
+
+.daily-done-card h3 {
+  margin: 0;
+  color: var(--primary-deep);
+}
+
+.daily-done-card p,
+.daily-done-card ul {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.daily-done-card ul {
+  padding-inline-start: 1.2em;
+  font-size: var(--fs-sm);
+}
+
+.daily-done-note,
+.daily-done-next {
+  font-size: var(--fs-sm);
+  color: var(--ink-soft);
+}
+
+.daily-done-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+.daily-done-actions .btn {
+  flex: 1 1 140px;
+  text-align: center;
+  text-decoration: none;
+}
