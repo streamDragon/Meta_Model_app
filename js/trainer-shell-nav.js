@@ -4,7 +4,9 @@
 
     function isStandaloneTrainerPage() {
         try {
-            return /_trainer\.html$/i.test((location.pathname || '').split('/').pop() || '');
+            // breen_table_lab.html and verb_unzip_trainer_legacy.html are standalone trainer pages too;
+            // they just predate the *_trainer.html naming.
+            return /(?:_trainer|_trainer_legacy|^breen_table_lab)\.html$/i.test((location.pathname || '').split('/').pop() || '');
         } catch (e) {
             return false;
         }
@@ -13,10 +15,10 @@
     function isStandaloneShellPage() {
         try {
             var pathname = String(location.pathname || '').toLowerCase();
-            if (/_trainer\.html$/i.test(pathname.split('/').pop() || '')) {
+            if (isStandaloneTrainerPage()) {
                 return true;
             }
-            return /\/worksheets\/verb-unzip\/?$/.test(pathname) || /\/lab\/context-radar\/?$/.test(pathname);
+            return /\/worksheets\/verb-unzip(?:\/|\/index\.html)?$/.test(pathname) || /\/lab\/context-radar(?:\/|\/index\.html)?$/.test(pathname);
         } catch (e) {
             return false;
         }
@@ -27,7 +29,9 @@
             var rawPath = String(path || '');
             var pathname = String(location.pathname || '').toLowerCase();
             if (rawPath && !/^(?:[a-z][a-z0-9+.-]*:|\/\/|\.{1,2}\/|\/)/i.test(rawPath)) {
-                if (/\/worksheets\/verb-unzip(?:\/index\.html)?$/i.test(pathname) || /\/lab\/context-radar(?:\/index\.html)?$/i.test(pathname)) {
+                // Nested pages live two folders deep; accept the folder URL with or without
+                // a trailing slash and the explicit index.html so shared assets resolve from the root.
+                if (/\/worksheets\/verb-unzip(?:\/|\/index\.html)?$/i.test(pathname) || /\/lab\/context-radar(?:\/|\/index\.html)?$/i.test(pathname)) {
                     rawPath = '../../' + rawPath;
                 }
             }

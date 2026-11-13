@@ -18,31 +18,38 @@
     var style = document.createElement('style');
     style.id = STYLE_ID;
     style.textContent = [
-      '.' + STRIP_CLASS + '{margin:16px auto;padding:14px 16px;border:1px solid rgba(37,99,235,.18);border-inline-start:4px solid #2563eb;border-radius:16px;background:rgba(255,255,255,.94);box-shadow:0 12px 28px rgba(15,23,42,.08);font-family:inherit;color:#10243b;max-width:1120px;}',
-      '.' + STRIP_CLASS + ' strong{display:block;font-size:1rem;margin-bottom:8px;}',
+      '.' + STRIP_CLASS + '{margin:8px auto;padding:0;border:1px solid rgba(37,99,235,.18);border-inline-start:3px solid #2563eb;border-radius:12px;background:rgba(255,255,255,.94);font-family:inherit;color:#10243b;max-width:1120px;box-sizing:border-box;}',
+      '.' + STRIP_CLASS + ' > summary{cursor:pointer;list-style:none;padding:8px 12px;font-size:.88rem;font-weight:600;color:#1e3a8a;line-height:1.4;min-height:24px;}',
+      '.' + STRIP_CLASS + ' > summary::-webkit-details-marker{display:none;}',
+      '.' + STRIP_CLASS + ' > summary::before{content:"\\25B8";display:inline-block;margin-inline-end:6px;transform:scaleX(-1);transition:transform .15s;}',
+      '.' + STRIP_CLASS + '[open] > summary::before{transform:rotate(90deg);}',
+      '.' + STRIP_CLASS + ' .surface-hidden-legacy-body{padding:0 12px 12px;}',
       '.' + STRIP_CLASS + ' .surface-hidden-legacy-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}',
       '.' + STRIP_CLASS + ' .surface-hidden-legacy-cell{padding:10px 12px;border-radius:12px;background:rgba(241,245,249,.92);border:1px solid rgba(148,163,184,.2);}',
       '.' + STRIP_CLASS + ' .surface-hidden-legacy-cell b{display:block;margin-bottom:4px;color:#1e3a8a;}',
       '.' + STRIP_CLASS + ' p{margin:0;color:#4e647c;line-height:1.65;font-size:.92rem;}',
       '.' + STRIP_CLASS + ' .surface-hidden-legacy-note{margin-top:10px;}',
-      '@media(max-width:760px){.' + STRIP_CLASS + ' .surface-hidden-legacy-grid{grid-template-columns:1fr;}}'
+      '@media(max-width:760px){.' + STRIP_CLASS + '{margin:6px 8px;} .' + STRIP_CLASS + ' .surface-hidden-legacy-grid{grid-template-columns:1fr;}}'
     ].join('\n');
     document.head.appendChild(style);
   }
 
   function renderStrip(options) {
     var localCopy = Object.assign({}, copy, options || {});
-    var section = document.createElement('section');
+    // A closed one-line disclosure: the tool stays first, the theory is one tap away.
+    var section = document.createElement('details');
     section.className = STRIP_CLASS;
     section.setAttribute('data-surface-hidden-strip', '1');
     section.setAttribute('aria-label', localCopy.title);
     section.innerHTML = [
-      '<strong>' + localCopy.title + '</strong>',
+      '<summary>' + localCopy.title + ' · הסבר קצר</summary>',
+      '<div class="surface-hidden-legacy-body">',
       '<div class="surface-hidden-legacy-grid">',
       '<div class="surface-hidden-legacy-cell"><b>' + localCopy.surfaceTitle + '</b><p>' + localCopy.surfaceBody + '</p></div>',
       '<div class="surface-hidden-legacy-cell"><b>' + localCopy.hiddenTitle + '</b><p>' + localCopy.hiddenBody + '</p></div>',
       '</div>',
-      '<p class="surface-hidden-legacy-note">' + localCopy.note + '</p>'
+      '<p class="surface-hidden-legacy-note">' + localCopy.note + '</p>',
+      '</div>'
     ].join('');
     return section;
   }

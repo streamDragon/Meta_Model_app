@@ -522,7 +522,16 @@
       }
       .card-grid { grid-template-columns: 1fr; }
       .modal-grid { grid-template-columns: 1fr; }
-      .map-anchor { width: min(250px, calc(100vw - 20px)); }
+      /* On phones the floating mini radar covered the exercise; keep it in the page flow instead. */
+      .map-anchor {
+        position: static;
+        width: auto;
+        max-width: 420px;
+        margin: 12px auto calc(16px + env(safe-area-inset-bottom));
+        box-shadow: 0 6px 16px rgba(15,23,42,.08);
+        backdrop-filter: none;
+      }
+      .map-anchor #compactRadar { max-width: 260px; margin-inline: auto; width: 100%; }
       .controls select { min-width: 170px; }
     }
 

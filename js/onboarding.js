@@ -30,7 +30,7 @@
         },
         advanced_therapist: {
             emoji: '🎭',
-            name: '$1תמונות מחיי היום',
+            name: 'תמונות מחיי היום',
             desc: 'בחר תגובה בשיחה חיה וראה לאן הלחץ הולך',
             navKey: null,
             href: 'scenario_trainer.html'
