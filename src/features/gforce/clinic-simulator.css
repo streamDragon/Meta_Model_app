@@ -23,3 +23,12 @@
  .clinic-reply-focus{font-size:1rem}
  .clinic-history-turns{max-height:290px}
 }
+
+
+/* The card being explored owns its answer: no jumping back to an earlier chat turn. */
+.clinic-probe-inline{display:grid;gap:7px;padding:11px;border:1px solid #b7dcd2;border-radius:10px;background:#f0faf5;color:var(--ink);font-size:.84rem;line-height:1.55}
+.clinic-probe-inline p{font-size:.86rem;color:var(--ink);margin:0}
+.clinic-probe-inline>span{color:var(--ink-soft);font-size:.77rem}
+.clinic-session-controls{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px}
+.clinic-undo{font:inherit;cursor:pointer;border:1px solid #bfb7ed;background:var(--primary-soft);border-radius:10px;padding:8px 11px;color:var(--primary-deep);font-size:.82rem;font-weight:700}
+@media(max-width:640px){.clinic-session-controls{justify-content:start}.clinic-undo{padding:8px;font-size:.77rem}.clinic-probe-inline{padding:9px}}
