@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   michaelHallDailyCards,
   type MichaelHallDailyCard,
 } from '../data/michaelHallDailyCards';
+import './michael-hall-daily-gym.css';
 
 const STORAGE_KEY = 'michaelHallDailyGym:v1';
 
@@ -135,6 +136,15 @@ export function MichaelHallDailyGym() {
   const completedCount = gymState.completedCardIds.length;
   const enoughPractice = exerciseChecks.filter(Boolean).length >= Math.min(2, card.exercisesHe.length);
   const isCompleted = gymState.completedCardIds.includes(card.id);
+  const completedToday = isCompleted && gymState.lastCompletedDate === localDateKey();
+  const nextIndex = (currentIndex + 1) % michaelHallDailyCards.length;
+  const nextCard = michaelHallDailyCards[nextIndex];
+  const practised = card.exercisesHe.filter((_, index) => exerciseChecks[index]);
+  const doneRef = useRef<HTMLElement>(null);
+  const [justCompleted, setJustCompleted] = useState(false);
+  useEffect(() => {
+    if (justCompleted) doneRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+  }, [justCompleted]);
 
   const updateGymState = (
     updater: (prev: MichaelHallDailyGymState) => MichaelHallDailyGymState,
@@ -150,6 +160,7 @@ export function MichaelHallDailyGym() {
     const nextCard = michaelHallDailyCards[index];
     if (!nextCard) return;
     updateGymState((prev) => ({ ...prev, currentCardId: nextCard.id }));
+    setJustCompleted(false);
   };
 
   const markComplete = () => {
@@ -164,6 +175,7 @@ export function MichaelHallDailyGym() {
         ...nextStreak(prev),
       };
     });
+    setJustCompleted(true);
   };
 
   const updateNote = (value: string) => {
@@ -195,7 +207,7 @@ export function MichaelHallDailyGym() {
     <div className="workbench michael-hall-gym" dir="rtl">
       <div className="workbench-main card daily-gym-card">
         <div className="daily-gym-heading">
-          <span className="daily-gym-kicker">Michael Hall Daily Gym</span>
+          <span className="daily-gym-kicker">אימון יומי · מייקל הול</span>
           <h2>חדר אימון יומי - מייקל הול</h2>
           <p className="subtitle">
             תרגול יומי קצר בחשיבה, משמעות, פתרון בעיות ונוירו-סמנטיקה
@@ -224,14 +236,16 @@ export function MichaelHallDailyGym() {
             <span className="category-chip active">
               {categoryLabelsHe[card.category]}
             </span>
-            <span>
-              {card.sourceSeries} - {card.sourceTitle}
-              {card.sourceDate ? `, ${card.sourceDate}` : ''}
+            <span className="daily-card-source">
+              מקור:{' '}
+              <span lang="en" dir="ltr">
+                {card.sourceSeries} - {card.sourceTitle}
+                {card.sourceDate ? `, ${card.sourceDate}` : ''}
+              </span>
             </span>
           </div>
 
           <h3>{card.titleHe}</h3>
-          <p className="daily-card-title-en">{card.titleEn}</p>
 
           <section className="daily-card-section">
             <h4>תמצית יומית</h4>
@@ -315,8 +329,37 @@ export function MichaelHallDailyGym() {
             כרטיס קודם
           </button>
           <label>בחר כרטיס<select aria-label="בחירת כרטיס יומי" value={card.id} onChange={(e) => goToIndex(michaelHallDailyCards.findIndex((item) => item.id === e.target.value))}>{michaelHallDailyCards.map((item) => <option key={item.id} value={item.id}>{item.dayIndex}. {item.titleHe}</option>)}</select></label>
-          <p className="learning-muted">סמן לפחות שתי פעולות שניסית לפני השלמה. ההערות נשמרות בדפדפן; אין צורך לכתוב פרטים מזהים.</p>
+          {!isCompleted && <p className="learning-muted">סמן לפחות שתי פעולות שניסית לפני השלמה. ההערות נשמרות בדפדפן; אין צורך לכתוב פרטים מזהים.</p>}
         </div>
+
+        {isCompleted && (
+          <section ref={doneRef} className="daily-done-card" aria-label="סיכום האימון היומי" role="status">
+            <h3>{completedToday ? '✓ סיימת להיום' : '✓ הכרטיס הזה הושלם'}</h3>
+            <p>
+              תרגלת את <strong>{card.titleHe}</strong>
+              {completedToday && gymState.streakCount > 1 ? ` · ${gymState.streakCount} ימים ברצף` : ''}
+            </p>
+            {practised.length > 0 && (
+              <ul>
+                {practised.map((exercise) => <li key={exercise}>{exercise}</li>)}
+              </ul>
+            )}
+            {note.trim() && <p className="daily-done-note">ההערה שלך: {note.trim()}</p>}
+            {nextCard && nextCard.id !== card.id && (
+              <p className="daily-done-next">
+                {completedToday ? 'מחר' : 'הבא בתור'}: כרטיס {nextCard.dayIndex}, <strong>{nextCard.titleHe}</strong>
+              </p>
+            )}
+            <div className="daily-done-actions">
+              {nextCard && nextCard.id !== card.id && (
+                <button type="button" className="btn btn-secondary" onClick={() => goToIndex(nextIndex)}>
+                  הצץ בכרטיס הבא
+                </button>
+              )}
+              <a className="btn btn-primary" href="#home">חזרה לבית</a>
+            </div>
+          </section>
+        )}
       </div>
 
       <aside className="workbench-side">
