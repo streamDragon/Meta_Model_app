@@ -255,3 +255,9 @@
 .som-rupture-route .som-rupture-full {width:100%;max-width:none;max-height:none;overflow:visible;border-top:5px solid #766bd7}
 .som-rupture-route .som-rupture-options {grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 @media(max-width:620px) {.som-rupture-route .som-rupture-options {grid-template-columns:1fr}}
+.som-latest-reply:focus { outline: none; }
+/* On phones the app's sticky top bar (~72px) covers top:0; keep the stuck reply below it. */
+@media (max-width: 1023px) {
+  .som-latest-reply { top: 80px; }
+  .som-work-panel { scroll-margin-top: 80px; }
+}

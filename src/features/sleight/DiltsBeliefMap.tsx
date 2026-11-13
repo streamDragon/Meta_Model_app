@@ -141,7 +141,7 @@ export function BeliefDiagram({
                     <strong>{title}</strong>
                     <span className="som-node-prompt">{move.direction}</span>
                     <span className="som-node-certainty">
-                      {isMeasured ? `ודאות ${certainty}/10` : isPreviouslyTried ? 'בוצע · ממתין לקליברציה' : 'מהלך אפשרי'}
+                      {isMeasured ? `ודאות ${certainty}/10` : isPreviouslyTried ? 'בוצע · ממתין לבדיקת מצב' : 'מהלך אפשרי'}
                     </span>
                   </button>
                 );
