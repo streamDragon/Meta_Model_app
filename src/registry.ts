@@ -106,10 +106,10 @@ export const FEATURES: FeatureDef[] = [
     navLabel: 'זריזות לשון', icon: '🌀', inBottomNav: false,
   },
   {
-    id: 'coach-crash-gym', navGroup: 'core', title: 'COACH / CRASH · אימון גוף ודמיון',
-    shortDescription: 'תרגול גופני של COACH ו־CRASH עם דמות אינטראקטיבית, תנוחה, קשב ודמיון',
+    id: 'coach-crash-gym', navGroup: 'core', title: 'COACH / CRASH · תנועות מעבר וקשב',
+    shortDescription: 'חמש תנועות מעבר כפי שהודגמו בשיעור, ברצף רגיל ובריכוז עדין; עם הרחבות תרגול באפליקציה',
     theoryFamily: 'coach-crash',
-    skillTrained: 'זיהוי מצב, עבודה עם דמות, ויסות, דמיון והעברה לחיים',
+    skillTrained: 'הכרת תנועות המעבר, קשב, החזקה ותרגול רציף; יישום בחיים כהרחבה נפרדת',
     difficulty: 2, desktopSupport: 'full', mobileSupport: 'full',
     dataSource: 'src/features/coachcrash/CoachCrashGym.tsx',
     route: '#coach-crash-gym', component: CoachCrashGym,
