@@ -16,8 +16,8 @@ const AXES: Axis[] = [
     key: 'C', crash: 'כיווץ', coach: 'מרכוז',
     signal: 'כתפיים מורמות, קושי לחוש קרקע או נשימה מצומצמת',
     outside: 'הדמות מכווצת. איפה היית מזהה מתח או אובדן של מרכז?',
-    body: 'מצא/י תנוחה נוחה. הרגש/י את המגע עם הרצפה, שחרר/י מעט את הכתפיים ותן/י לנשימה לחזור לקצב נוח.',
-    imagery: 'דמיין/י מקום שבו הגוף מרגיש יציב ובטוח יחסית. מה בתמונה עוזר לך להרגיש שיש לך בסיס?',
+    body: 'התחילו בתנועת כיווץ קטנה, ואז עברו לקרקוע: הרגישו את כפות הרגליים באדמה, התארכו עם הראש כלפי מעלה והרפו את הכתפיים בלי לקרוס. (חלק ב׳, 00:50–02:05)',
+    imagery: 'ביצוע שקט של אותה תנועה: אפשר לרכך את המבט ולהרגיש את מגע הרגליים באדמה ואת הראש מתארך מעלה, כמו ברצף המסכם של השיעור. (חלק ה׳, 00:28–01:00)',
     inward: 'איפה נמצא המרכז שלך כרגע, ואיזו תנועה קטנה מאפשרת לך לחזור אליו?',
     bridge: 'אפשר להיות במרכז גם בלי להרגיש מושלם.',
   },
@@ -25,8 +25,8 @@ const AXES: Axis[] = [
     key: 'O', crash: 'תגובה אוטומטית', coach: 'פתיחות',
     signal: 'תנועה חדה, הגנה, ידיים סגורות או רצון לענות מיד',
     outside: 'לפני שינוי תנוחה, מה בגוף מאותת לך שהתגובה קודמת לבחירה?',
-    body: 'הרפה/י מעט את כפות הידיים ופתח/י מרווח קטן סביב החזה, בלי לכפות יציבה. נסה/י לעצור רגע לפני התגובה.',
-    imagery: 'דמיין/י דלת שנפתחת מעט. איזו אפשרות נוספת נכנסת איתה לתמונה?',
+    body: 'המחישו תגובתיות בתנועת ידיים מהירה, ואז עברו לפתיחות: ידיים נפתחות בתנועה של נתינה וקבלה. אין תנועה אחת שחייבים להעתיק. (חלק ב׳, 02:30–03:07)',
+    imagery: 'עם תשומת לב שקטה, המשיכו את תנועת הפתיחות: מקבלים ונותנים, נותנים ומקבלים. שימו לב לתנועה עצמה, בלי להמציא תמונת דמיון חדשה. (חלק ה׳, 01:04–01:36)',
     inward: 'למה עוד אני יכול/ה להיות פתוח/ה, בלי להסכים עם הכול?',
     bridge: 'פתיחות אינה ויתור על גבולות.',
   },
@@ -34,8 +34,8 @@ const AXES: Axis[] = [
     key: 'A', crash: 'שיתוק מניתוח יתר', coach: 'מודעות קשובה',
     signal: 'מבט תקוע, חשיבה שחוזרת על עצמה וקושי לבחור פעולה',
     outside: 'איך נראית דמות שאיבדה קשר למה שמתרחש מסביבה?',
-    body: 'התבונן/י סביב ומצא/י שלושה פרטים פשוטים: צבע, צליל ומשטח. החזר/י בעדינות את המבט למרחב.',
-    imagery: 'דמיין/י שאת/ה מתבונן/ת בסיטואציה מחלון רחב. מה רואים עכשיו שלא נכלל במחשבה החוזרת?',
+    body: 'המחישו לרגע את התקיעות של ניתוח־יתר; אחר כך האטו ועברו למודעות: להסתכל, להקשיב ולשים לב למה שמתרחש. (חלק ב׳, 03:12–03:54)',
+    imagery: 'בריכוז עדין שימו לב לגוף ולסביבה: אולי עייפות, רעב, צליל או מה שרואים סביבכם. אין צורך לנתח או לשנות את התחושה. (חלק ה׳, 01:36–02:10)',
     inward: 'מה אני קולט/ת כרגע, מעבר לסיפור שאני מספר/ת לעצמי?',
     bridge: 'מודעות היא הבחנה, לא עוד ניתוח.',
   },
@@ -43,8 +43,8 @@ const AXES: Axis[] = [
     key: 'C2', crash: 'ניתוק', coach: 'חיבור',
     signal: 'התרחקות מעצמי, מאחרים או מהסביבה',
     outside: 'איפה הדמות נראית מנותקת מן המרחב או ממי שנמצא מולה?',
-    body: 'הרגש/י את נקודות המגע של הגוף במושב או ברצפה. בחר/י אדם או מקום תומך שאפשר לחשוב עליו ללא מאמץ.',
-    imagery: 'דמיין/י נוכחות מיטיבה לצידך, או קשר של תמיכה מתוך זיכרון נעים. איזה מרחק מתאים לך?',
+    body: 'המחישו התרחקות וניתוק, ואחר כך חיבור: קירוב ידיים, פנייה אל האחרים ותחושה של יחד. (חלק ב׳, 04:00–04:43)',
+    imagery: 'ברצף השקט מתחברים לאנשים, לרעיונות ולדברים שנלמדו; אפשר להניח ידיים זו על זו כמחווה של חיבור. (חלק ה׳, 02:10–03:35)',
     inward: 'למה, למי או לאיזה משאב אני רוצה להיות מחובר/ת עכשיו?',
     bridge: 'חיבור מאפשר גם מרחק ובחירה.',
   },
@@ -52,8 +52,8 @@ const AXES: Axis[] = [
     key: 'H', crash: 'פגיעה או עוינות', coach: 'החזקה',
     signal: 'עלבון, קשיחות, דחף לתקוף או לברוח מן החוויה',
     outside: 'מה קורה לגוף כשהחוויה קשה מדי מכדי לתת לה מקום?',
-    body: 'אפשר להניח יד על אזור נוח בגוף, או פשוט להרגיש את הכיסא. אפשר לתת לרגש מקום קטן, בלי לנסות להעלים אותו.',
-    imagery: 'דמיין/י מיכל רחב מספיק שיכול להכיל גם רגש לא נעים. מה יעזור לו להרגיש בטוח ולא מציף?',
+    body: 'עברו ממחווה של דחייה או עוינות למחווה של הכנסת אורחים: יש מקום גם לרגש לא נעים, כמו שמחזיקים ומרגיעים תינוק בוכה. (חלק ב׳, 04:43–05:37)',
+    imagery: 'בריכוז שקט מזמינים את החלקים שעולים, בלי להיבהל מהם: מתעניינים, בודקים אם יש היגיון ומברכים אותם בבואם. (חלקים ד׳ וה׳)',
     inward: 'האם אפשר להכיר במה שכואב ובאותו זמן לשמור על בחירה?',
     bridge: 'להחזיק חוויה אין פירושו לאהוב אותה.',
   },
@@ -86,7 +86,7 @@ const CONCEPTS = [
     question: 'איזה קשר או זיכרון תומך זמין לי כרגע?',
   },
   {
-    english: 'Holding', near: 'הכלה · החזקה · כבוד',
+    english: 'Holding', near: 'החזקה · הכלה · נוכחות',
     meaning: 'החזקה היא האפשרות לתת מקום לחוויה, בלי למהר להילחם בה או לציית לה.',
     nuance: 'להחזיק רגש אינו להסכים לפגיעה, להישאר במצב מסוכן או לסבול בכוח.',
     question: 'מה יאפשר לי לתת לחוויה מקום מוגבל ובטוח?',
@@ -248,7 +248,7 @@ export function CoachCrashGym() {
       <header className="cc-header">
         <div><span className="cc-kicker">מעבדת מצבים · אימון גוף וקשב</span>
           <h2>COACH <span>↔</span> CRASH</h2>
-          <p>לזהות דפוס, לשחק עם תנוחה, ולבחון איך אפשר להעביר את החוויה מהדמות אל הגוף שלי.</p>
+          <p>לומדים את חמש תנועות המעבר מ־CRASH ל־COACH, כפי שהודגמו בשיעור. הדמות האינטראקטיבית ושלב היישום הם תוספות תרגול שלנו.</p>
         </div>
         <div className="cc-header-mark" aria-hidden="true">◉</div>
       </header>
@@ -260,7 +260,7 @@ export function CoachCrashGym() {
       </div>
 
       <section className="cc-axis-section" aria-label="בחירת רכיב לתרגול">
-        <div className="cc-section-head"><h3>על מה עובדים?</h3><span>בחרו רכיב אחד. לא צריך לתקן הכול.</span></div>
+        <div className="cc-section-head"><h3>רצף התנועות מהשיעור</h3><span>עוברים לפי הסדר, או בוחרים תנועה מסוימת.</span></div>
         <div className="cc-axis-tabs">
           {AXES.map((item, index) => (
             <button key={item.key} type="button" className={axisIndex === index ? 'cc-axis-active' : ''}
@@ -330,18 +330,28 @@ export function CoachCrashGym() {
 
           {phase === 'practice' && (
             <>
-              <span className="cc-eyebrow">שלב 2 · שתי דרכים אל אותו רכיב</span>
+              <span className="cc-eyebrow">שלב 2 · אותה תנועה בשני אופני קשב</span>
               <h3>מתרגלים {axis.coach}</h3>
               <div className="cc-pathways" role="group" aria-label="בחירת דרך התרגול">
                 <button type="button" aria-pressed={pathway === 'conscious'} className={pathway === 'conscious' ? 'cc-path-active' : ''}
-                  onClick={() => setPathway('conscious')}><span>🧍</span><strong>דרך הגוף</strong><small>בחירה מודעת של תנוחה וקשב</small></button>
+                  onClick={() => setPathway('conscious')}><span>🧍</span><strong>תנועה רגילה</strong><small>כפי שנלמדה בתרגול התנועות בחלק ב׳</small></button>
                 <button type="button" aria-pressed={pathway === 'imagery'} className={pathway === 'imagery' ? 'cc-path-active' : ''}
-                  onClick={() => setPathway('imagery')}><span>🌿</span><strong>דרך הדמיון</strong><small>דימוי שיכול להזמין תגובה טבעית</small></button>
+                  onClick={() => setPathway('imagery')}><span>🌿</span><strong>תנועה בריכוז עדין</strong><small>אותו רצף, בקשב פנימי כמו בחלק ה׳</small></button>
               </div>
               <div className="cc-instruction" aria-live="polite">
-                <span>{pathway === 'conscious' ? 'ניסוי גופני' : 'ניסוי בדמיון'}</span>
+                <span>{pathway === 'conscious' ? 'תרגול תנועה' : 'תרגול עם קשב פנימי'}</span>
                 <p>{pathway === 'conscious' ? axis.body : axis.imagery}</p>
               </div>
+              {axis.key === 'H' && <div className="cc-instruction">
+                <strong>ארבע מנטרות של הכנסת אורחים (חלק ד׳)</strong>
+                <ol>
+                  <li>זה מאוד מעניין.</li>
+                  <li>משהו מתחיל להתעורר, ואולי אפילו קצת להתרפא.</li>
+                  <li>אני בטוח שיש בזה היגיון, במובן מסוים.</li>
+                  <li>ברוך הבא.</li>
+                </ol>
+                <small>אלה משפטי תרגול לקבלת החוויה, לא קביעה שמשהו אכן מתרפא.</small>
+              </div>}
               <div className="cc-transfer-question">
                 <strong>ומה קורה מבפנים?</strong>
                 <p>{axis.inward}</p>
@@ -364,7 +374,7 @@ export function CoachCrashGym() {
 
           {phase === 'transfer' && (
             <>
-              <span className="cc-eyebrow">שלב 3 · מהמעבדה למפגש אנושי</span>
+              <span className="cc-eyebrow">שלב 3 · הרחבה שלנו: העברה למצבים יומיומיים</span>
               <h3>איך {axis.coach} נראה בחיים?</h3>
               <div className="cc-scenarios" role="group" aria-label="בחירת סיטואציה">
                 {SCENARIOS.map((item) => <button key={item.id} type="button" aria-pressed={item.id === scenarioId}
@@ -383,7 +393,11 @@ export function CoachCrashGym() {
               <button type="button" className="cc-secondary-action" onClick={() => setExplain(!explain)} aria-expanded={explain}>
                 {explain ? 'הסתר הסבר' : 'מה מתרגלים כאן?'}
               </button>
-              {explain && <p className="cc-theory">זהו אימון עצמי לזיהוי, ניסוי והעברה למצב יומיומי. הוא אינו מאבחן CRASH, אינו מודד שינוי תת־מודע ואינו תחליף לעזרה מקצועית. המסלול דרך הדמיון הוא תוספת אימונית מוצעת, ולא טענה על שינוי לא־מודע מוכח.</p>}
+              {explain && <p className="cc-theory">תנועות המעבר ותרגול הקשב נשענים על ההקלטות המקוריות. סטודיו הדמות, בדיקת תחושה אישית והעברה לסיטואציות הם הרחבות שלנו ואינם מוצגים כחלק שצולם בשיעור. זהו אימון עצמי, לא אבחון או תחליף לעזרה מקצועית.</p>}
+              {axisIndex < AXES.length - 1 && <button type="button" className="cc-main-action"
+                onClick={() => chooseAxis(axisIndex + 1)}>
+                לתנועה הבאה ברצף <span aria-hidden="true">←</span>
+              </button>}
               <button type="button" className="cc-main-action" onClick={() => { setPhase('identify'); setPose(CRASH_POSE); setInitialPose(null); setBefore(null); setAfter(null); setReflection(''); setObserved(false); setTried(false); }}>
                 תרגול נוסף <span aria-hidden="true">↺</span>
               </button>
@@ -395,7 +409,7 @@ export function CoachCrashGym() {
       <footer className="cc-footer">
         <span>{observed ? '✓' : '○'} זיהוי</span>
         <span>{tried ? '✓' : '○'} תרגול</span>
-        <span>מקור: Dilts &amp; Gilligan, COACH / CRASH · עיבוד חווייתי לתרגול</span>
+        <span>מבוסס על ההקלטות: חלק ב׳ (תנועות), חלק ד׳ (מנטרות), חלק ה׳ (רצף קשב). שלב היישום הוא הרחבה עצמאית.</span>
       </footer>
     </div>
   );
