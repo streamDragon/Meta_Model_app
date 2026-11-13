@@ -20,7 +20,7 @@ export function computePivotRecommendation(session: PrismSession): PivotRecommen
       if (counts[l] > 0) {
         return {
           pivot: l,
-          reason: 'מאמץ מזערי — מומלץ להתחיל ברמה נמוכה כדי ליצור Small Win',
+          reason: 'מאמץ מזערי: מומלץ להתחיל ברמה נמוכה כדי ליצור הצלחה קטנה',
         };
       }
     }
@@ -36,11 +36,11 @@ export function computePivotRecommendation(session: PrismSession): PivotRecommen
   }
 
   const levelNames = Object.fromEntries(
-    PRISM_LEVELS.map((level) => [level.id, `${level.label} (${level.id})`]),
+    PRISM_LEVELS.map((level) => [level.id, level.label]),
   );
   const reason =
     bestCount > 0
-      ? `לפי הבחירות המוכנות במפה, אפשר להתחיל ב${levelNames[best]} — זו הצעת עבודה לבדיקה (Small Win), ולא מסקנה על האדם`
-      : 'לא נמצאו תשובות — שקול להתחיל ב-B או ב-E עם צעד קטן';
+      ? `לפי הבחירות המוכנות במפה, אפשר להתחיל ב${levelNames[best]}. זו הצעת עבודה לבדיקה, צעד קטן שאפשר להצליח בו, ולא מסקנה על האדם`
+      : 'לא נמצאו תשובות. שקול להתחיל בהתנהגות או בהקשר, עם צעד קטן';
   return { pivot: best, reason };
 }

@@ -11,6 +11,14 @@ import { useProgress } from '../../store/useProgress';
 import { XP_REWARDS } from '../../store/progress';
 import { PRISM_ART } from '../../lib/patternArt';
 import { HowItWorks } from '../../components/HowItWorks';
+import './prism-lab.css';
+
+/** Hebrew names for the level letters (E/B/C/V/I/S) so a letter is never shown alone. */
+const LEVEL_NAMES_HE: Record<string, string> = {
+  ...Object.fromEntries(PRISM_LEVELS.map((level) => [level.id, level.label])),
+  S: 'משמעות רחבה',
+};
+const levelNameHe = (id: string) => LEVEL_NAMES_HE[id] ?? id;
 
 const SESSIONS_KEY = 'prism_sessions';
 const MAX_SAVED_SESSIONS = 10;
@@ -90,7 +98,23 @@ export function PrismLabPage() {
   const backToLibrary = () => {
     setActivePrismId(null);
     setResult(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const newStatement = () => {
+    setChoices({}); setStatement(''); setPreferredPivot(''); setSavedResult(false); savedDatetime.current = '';
+    setActiveLevel('E');
+    setResult(null);
+    window.setTimeout(() => {
+      const field = document.getElementById('prism-statement');
+      field?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      (field as HTMLTextAreaElement | null)?.focus({ preventScroll: true });
+    }, 0);
+  };
+
+  useEffect(() => {
+    if (result) document.getElementById('prism-result')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+  }, [result]);
 
   const recoveryQuestion = (levelId: string): string => {
     const choiceId = choices[levelId];
@@ -139,7 +163,7 @@ export function PrismLabPage() {
   if (!prism) {
     return (
       <div className="card">
-        <h2>🔍 מעבדת פריזמות (Prism Lab)</h2>
+        <h2>🔍 מעבדת פריזמות</h2>
         <p>
           כשאותו משפט חוזר בלי לקדם אותך, בחר עדשה, כתוב את המשפט ובדוק איזו שאלה כדאי לשאול. אין צורך למלא את כל השכבות.
         </p>
@@ -207,7 +231,7 @@ export function PrismLabPage() {
                   </small>
                 </div>
                 <div className="saved-session-pivot">
-                  <span className="chip">Pivot: {s.recommendation?.pivot ?? '—'}</span>
+                  <span className="chip">נקודת התחלה: {s.recommendation?.pivot ? levelNameHe(s.recommendation.pivot) : '—'}</span>
                 </div>
               </div>
             ))}
@@ -226,7 +250,7 @@ export function PrismLabPage() {
     <div className="workbench">
       <div className="workbench-main card" id="prism-detail">
         <h3 id="prism-name">
-          {prism.name_he} — {prism.name_en}
+          {prism.name_he} <small className="prism-name-en" lang="en" dir="ltr">{prism.name_en}</small>
         </h3>
         <p id="prism-desc" className="muted">
           {prism.philosophy_core}
@@ -243,7 +267,7 @@ export function PrismLabPage() {
           <textarea id="prism-statement" value={statement} onChange={(e) => setStatement(e.target.value)} rows={3} placeholder="כתוב משפט והקשר קצר, או טען דוגמה" />
           <button className="btn btn-secondary" onClick={() => setStatement(prism.examples[0] ?? '')}>טען דוגמה לתרגול</button>
           <p className="muted">
-            בחר רק שכבות שרלוונטיות למשפט. אלו רמות הקשר–התנהגות–יכולת–אמונה–זהות; הן אינן טבלת Breen. שאלות מוכנות הן הצעה לבירור, ולא קביעה על האדם.
+            בחר רק שכבות שרלוונטיות למשפט. אלו רמות הקשר–התנהגות–יכולת–אמונה–זהות; הן אינן טבלת ברין. שאלות מוכנות הן הצעה לבירור, ולא קביעה על האדם.
           </p>
           <div className="prism-accordion" aria-label="סריקת חמש שכבות">
             <div className="prism-accordion-head">
@@ -331,7 +355,7 @@ export function PrismLabPage() {
         {result && (
           <div id="prism-result" className="final-blueprint-display">
             <div className="prism-result-hero">
-              <span>Prism Map</span>
+              <span>מפת הפריזמה</span>
               <div>
                 <h4>{result.session.prism_name}</h4>
                 <p>
@@ -341,8 +365,13 @@ export function PrismLabPage() {
             </div>
             <div className="prism-pivot-card">
               <small>נקודת התחלה לבדיקה</small>
-              <strong>{PRISM_LEVELS.find((level) => level.id === result.recommendation.pivot)?.label}</strong><blockquote>{result.session.statement}</blockquote><p><strong>השאלה הבאה:</strong> {result.session.answers.find((answer) => answer.level === result.recommendation.pivot)?.recovery_question || result.session.anchor}</p>
-              <p>{result.recommendation.reason}</p>
+              <strong className="prism-pivot-level">{levelNameHe(result.recommendation.pivot)}</strong>
+              <blockquote>{result.session.statement}</blockquote>
+              <div className="prism-next-question">
+                <span className="prism-next-label">השאלה הבאה</span>
+                <p>{result.session.answers.find((answer) => answer.level === result.recommendation.pivot)?.recovery_question || result.session.anchor}</p>
+              </div>
+              <p className="prism-reason">{result.recommendation.reason}</p>
               <div className="prism-signal-row">
                 <span>עוצמת רגש {result.session.emotion}/5</span>
                 <span>קושי לפי דיווח עצמי {result.session.resistance}/5</span>
@@ -357,7 +386,7 @@ export function PrismLabPage() {
                   {result.session.answers.map((answer) => (
                     <div className="breen-result-row" key={answer.level}>
                       <strong>
-                        {answer.label} ({answer.level})
+                        {answer.label}
                       </strong>
                       <span>
                         {answer.text}
@@ -375,6 +404,10 @@ export function PrismLabPage() {
                 saveSession(result.session, result.recommendation); setSavedSessions(loadSavedSessions()); setSavedResult(true);
               }}>{savedResult ? 'המפה נשמרה בדפדפן' : 'שמור את המפה בדפדפן'}</button>
               <button type="button" className="btn btn-secondary" onClick={() => exportSessions({ ...result.session, recommendation: result.recommendation })}>ייצא את המפה הזו</button>
+            </div>
+            <div className="prism-next-actions" aria-label="מה עכשיו?">
+              <button type="button" className="btn btn-primary" onClick={newStatement}>משפט חדש</button>
+              <button type="button" className="btn btn-secondary" onClick={backToLibrary}>פריזמה אחרת</button>
             </div>
           </div>
         )}
@@ -417,7 +450,7 @@ export function PrismLabPage() {
             {Object.entries(prism.recommended_interventions_by_level).map(
               ([level, text]) => (
                 <li key={level}>
-                  <span className="level-key">{level}</span>
+                  <span className="level-key">{levelNameHe(level)}</span>
                   <span>{text}</span>
                 </li>
               ),
