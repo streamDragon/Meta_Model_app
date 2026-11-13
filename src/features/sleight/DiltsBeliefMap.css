@@ -1,0 +1,94 @@
+
+/* Dilts-inspired connected flowchart: colors represent confidence, NOT progress. */
+.som-dilts-diagram { color:#28283b; background:#fff; border-radius:1rem; display:grid; gap:.72rem; direction:rtl; }
+.som-diagram-toolbar { display:flex; gap:.85rem; justify-content:space-between; align-items:center; }
+.som-diagram-title { display:grid; gap:.1rem; }
+.som-diagram-title strong { font-size:1.23rem; color:#29283d; }
+.som-diagram-title small { color:#687085; font-size:.78rem; }
+.som-diagram-counter { flex:0 0 auto; padding:.35rem .7rem; background:#f0eff8; color:#494275; border:1px solid #d8d3eb; border-radius:999px; font-size:.82rem; font-weight:750; }
+.som-diagram-key { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; border:1px solid #e3e0ed; border-radius:.8rem; padding:.55rem .6rem; }
+.som-key-label { font-size:.82rem; font-weight:800; }
+.som-key-item { display:flex; align-items:center; gap:.25rem; font-size:.75rem; color:#5f6373; white-space:nowrap; }
+.som-key-item i { width:18px; height:17px; border-radius:.25rem; border:1px solid #a99cce; display:block; }
+.som-key-item .som-key-unmeasured { background:#fff; border:1px dashed #7d8393; }
+.som-diagram-switch { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.4rem; }
+.som-diagram-switch button { border:1px solid #d0cfdf; padding:.62rem .35rem; border-radius:.6rem; color:#575a70; background:#fff; font-weight:700; font-size:.89rem; min-height:44px; }
+.som-diagram-switch button.active { background:#302d45; border-color:#302d45; color:#fff; }
+.som-diagram-paper { background:#fcfbf7; border:1px solid #d9d8df; padding:1rem .65rem 1.2rem; border-radius:.95rem; overflow:hidden; }
+.som-diagram-head { position:relative; margin:0 auto; width:min(100%,680px); padding:0 2rem; display:flex; justify-content:center; }
+.som-diagram-tag { position:absolute; right:0; top:40%; z-index:1; font-weight:800; font-size:.74rem; background:#f5f3ff; border:2px solid #454052; padding:.4rem .6rem; transform:translateX(9%); border-radius:.35rem .15rem .35rem .15rem; color:#3b335e; }
+.som-diagram-belief { display:grid; justify-items:center; text-align:center; gap:.25rem; width:100%; padding:.65rem 1.9rem; border:2.3px solid; border-radius:1rem; box-shadow:3px 4px 0 rgba(40,34,65,.1); }
+.som-diagram-belief small { font-size:.76rem; opacity:.82; font-weight:650; }
+.som-diagram-belief strong { font-size:clamp(1.05rem,2.6vw,1.4rem); line-height:1.45; }
+.som-diagram-belief span { font-weight:700; font-size:.78rem; opacity:.87; }
+.som-diagram-connectors { width:100%; height:26px; display:block; overflow:visible; margin:0 auto; }
+.som-diagram-row { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); align-items:stretch; gap:.68rem; }
+.som-diagram-node { appearance:none; min-width:0; width:100%; min-height:122px; display:flex; flex-direction:column; gap:.35rem; align-items:center; justify-content:center; padding:.65rem .55rem; border:2px solid #363a4d; border-radius:.9rem; box-shadow:1px 3px 0 rgba(20,20,36,.07); text-align:center; outline:none; transition:border-color .12s,box-shadow .12s,transform .12s; }
+.som-diagram-node:hover { transform:translateY(-2px); box-shadow:1px 4px 0 rgba(42,39,75,.2); }
+.som-diagram-node.focused { outline:3px solid #262436; outline-offset:2px; box-shadow:0 0 0 5px #eeebff; }
+.som-diagram-node:focus-visible { outline:3px solid #433a86; outline-offset:2px; }
+.som-diagram-node strong { font-size:clamp(.91rem,1.9vw,1.05rem); line-height:1.25; }
+.som-node-prompt { font-size:clamp(.78rem,1.7vw,.88rem); line-height:1.45; max-width:100%; }
+.som-node-certainty { margin-top:auto; font-size:.72rem; font-weight:750; opacity:.75; }
+.som-node-diamond { border-radius:0; clip-path:polygon(50% 0%,100% 31%,100% 69%,50% 100%,0 69%,0 31%); padding:1.3rem 1.25rem; }
+.som-node-diamond .som-node-prompt { font-size:.82rem; }
+.som-node-ribbon { border-radius:.25rem; clip-path:polygon(0 0,95% 0,100% 15%,95% 50%,100% 85%,95% 100%,0 100%,5% 50%); padding-inline:1rem; }
+.som-diagram-empty { min-height:115px; }
+.som-between-rows { height:22px; }
+.som-diagram-bottom { border:2px solid #494353; border-radius:.7rem; background:#f5f2ff; padding:.75rem .65rem; margin:1.1rem auto 0; width:min(88%,710px); display:grid; text-align:center; justify-items:center; gap:.2rem; }
+.som-diagram-bottom strong { font-size:1.1rem; }
+.som-diagram-bottom small { color:#676b82; }
+.som-diagram-bottom>span { font-size:1.3rem; margin-top:-1.3rem; background:#fcfbf7; line-height:1; padding:0 .7rem; }
+.som-diagram-detail { position:relative; border:2px solid #6e64bf; border-radius:.9rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.85rem 1.2rem; background:#f4f1ff; }
+.som-diagram-detail h3 { margin:.25rem 0; font-size:1.13rem; }
+.som-diagram-detail p { margin:.4rem 0; line-height:1.55; font-size:.95rem; }
+.som-diagram-detail small { color:#6257aa; font-weight:800; }
+.som-diagram-detail span { font-size:.78rem; color:#5c5c74; }
+.som-diagram-detail .btn { flex:0 0 auto; }
+.som-diagram-dismiss { position:absolute; top:.25rem; left:.3rem; border:0; background:transparent; color:#706891; font-size:1.5rem!important; padding:.1rem .3rem; }
+.som-diagram-explainer { color:#686d7d; font-size:.78rem; line-height:1.65; margin:0; }
+.som-map-dialog .som-diagram-paper { padding:1.1rem; }
+.som-map-dialog .som-modal-top { margin-bottom:.4rem; }
+.som-map-dialog .som-dilts-diagram { padding:.2rem; }
+@media (max-width: 620px) {
+ .som-diagram-toolbar { align-items:start; }
+ .som-diagram-title strong { font-size:1.03rem; }
+ .som-diagram-title small { font-size:.68rem; }
+ .som-diagram-counter { padding:.25rem .5rem; font-size:.72rem; }
+ .som-diagram-key { gap:.32rem .48rem; padding:.45rem; }
+ .som-key-label { width:100%; font-size:.74rem; }
+ .som-key-item { font-size:.67rem; }
+ .som-key-item i { width:13px; height:13px; }
+ .som-diagram-switch button { font-size:.77rem; padding:.55rem .2rem; }
+ .som-diagram-paper { padding:.7rem .3rem .9rem; }
+ .som-diagram-head { padding:0 .75rem; }
+ .som-diagram-tag { font-size:.58rem; padding:.28rem .35rem; transform:translateX(12%); }
+ .som-diagram-belief { border-width:2px; padding:.5rem .85rem; }
+ .som-diagram-belief strong { font-size:.99rem; line-height:1.3; }
+ .som-diagram-belief small, .som-diagram-belief span { font-size:.65rem; }
+ .som-diagram-row { gap:.3rem; }
+ .som-diagram-node { border-width:1.5px; min-height:105px; padding:.44rem .25rem; gap:.27rem; border-radius:.5rem; }
+ .som-diagram-node strong { font-size:.75rem; line-height:1.22; }
+ .som-node-prompt { font-size:.65rem; line-height:1.3; }
+ .som-node-certainty { font-size:.57rem; }
+ .som-node-diamond { border-radius:0; clip-path:polygon(50% 0%,100% 30%,100% 70%,50% 100%,0 70%,0 30%); padding:.85rem .5rem; }
+ .som-node-diamond .som-node-prompt { font-size:.61rem; }
+ .som-node-ribbon { border-radius:.15rem; padding:.4rem .4rem; }
+ .som-diagram-connectors { height:20px; }
+ .som-between-rows { height:17px; }
+ .som-diagram-bottom { width:96%; margin-top:.7rem; padding:.55rem .3rem; }
+ .som-diagram-bottom strong { font-size:.89rem; }
+ .som-diagram-bottom small { font-size:.68rem; }
+ .som-diagram-detail { display:grid; padding:.85rem; padding-left:2rem; gap:.6rem; }
+ .som-diagram-detail p { font-size:.87rem; }
+ .som-diagram-detail .btn { justify-self:start; }
+ .som-map-dialog .som-diagram-paper { padding:.6rem .3rem; }
+}
+@media (prefers-reduced-motion:reduce) { .som-diagram-node { transition:none; } }
+
+.som-diagram-zoom-controls {display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.som-diagram-zoom-controls span {font-size:.76rem;color:#606478}
+.som-diagram-zoom-controls button {border:1px solid #b8b1e5;padding:.5rem .65rem;border-radius:.65rem;background:#fff;min-height:40px;color:#443b85}
+.som-diagram-paper.som-diagram-zoomed {overflow-x:auto;overscroll-behavior-x:contain}
+.som-diagram-zoomed .som-diagram-canvas {min-width:780px}
+@media(max-width:620px) {.som-diagram-zoomed .som-diagram-node strong {font-size:.92rem}.som-diagram-zoomed .som-node-prompt {font-size:.8rem}}

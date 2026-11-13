@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react';
 import { ConversationGymPage } from './features/trainer/ConversationGymPage';
 import { SleightOfMouthPage } from './features/sleight/SleightOfMouthPage';
+import { RuptureWorkshopPage } from './features/sleight/RuptureWorkshopPage';
 import { CoachCrashGym } from './features/coachcrash/CoachCrashGym';
 import { FramingToolPage } from './features/framing/FramingToolPage';
 import { HomePage } from './features/home/HomePage';
@@ -104,6 +105,16 @@ export const FEATURES: FeatureDef[] = [
     route: '#sleight-workshop', component: SleightOfMouthPage,
     status: 'production', sourceValidation: 'verified',
     navLabel: 'זריזות לשון', icon: '🌀', inBottomNav: false,
+  },
+  {
+    id: 'rupture-workshop', navGroup: 'core', title: 'סדנת פיצוצים והתנגדויות',
+    shortDescription: 'אימון בתיקון עימות, נסיגה, הצפה, תקיעות והצטרפות מוגזמת',
+    theoryFamily: 'reframing', skillTrained: 'תיקון קשר, לקיחת אחריות, התאמת הקצב והשיחה',
+    difficulty: 3, desktopSupport: 'full', mobileSupport: 'full',
+    dataSource: 'src/features/sleight/RuptureWorkshop.tsx',
+    route: '#rupture-workshop', component: RuptureWorkshopPage,
+    status: 'production', sourceValidation: 'verified',
+    navLabel: 'סדנת פיצוצים', icon: '🧯', inBottomNav: false,
   },
   {
     id: 'coach-crash-gym', navGroup: 'core', title: 'COACH / CRASH · תנועות מעבר וקשב',

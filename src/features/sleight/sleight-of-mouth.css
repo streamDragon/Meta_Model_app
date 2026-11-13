@@ -249,3 +249,9 @@
 .som-rupture-full .som-rupture-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .som-rupture-smallprint{font-size:.77rem;opacity:.75;margin-top:15px}
 @media(max-width:580px){.som-rupture-case-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.som-rupture-options{grid-template-columns:1fr}.som-rupture-full{padding:14px}.som-workshop-header{flex-direction:column}}
+
+/* Full-page entry for the rupture workshop within the same React app. */
+.som-rupture-route {direction:rtl;max-width:960px;margin:0 auto;padding:1rem 0 5rem}
+.som-rupture-route .som-rupture-full {width:100%;max-width:none;max-height:none;overflow:visible;border-top:5px solid #766bd7}
+.som-rupture-route .som-rupture-options {grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+@media(max-width:620px) {.som-rupture-route .som-rupture-options {grid-template-columns:1fr}}

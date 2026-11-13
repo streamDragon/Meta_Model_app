@@ -70,9 +70,25 @@ describe('Sleight of Mouth conversation simulator', () => {
     fireEvent.click(screen.getByRole('button', { name: 'פתח מפה חזותית של זריזות לשון' }));
     const map = screen.getByRole('dialog', { name: 'מפת זריזות לשון' });
     expect(within(map).getByText('כוונה')).toBeTruthy();
-    expect(within(map).getAllByText('לא נחשף').length).toBe(20);
+    expect(within(map).getAllByTestId(/^map-node-/)).toHaveLength(14);
+    expect(within(map).getByTestId('map-node-intention').getAttribute('data-certainty')).toBe('unmeasured');
     fireEvent.click(within(map).getByRole('button', { name: 'סגור מפה' }));
     expect(screen.queryByRole('dialog', { name: 'מפת זריזות לשון' })).toBeNull();
+  });
+
+  it('colors a pattern only after calibration and lets the learner choose from the map', () => {
+    startCase();
+    unlockBelief();
+    fireEvent.click(screen.getByRole('button', { name: /כוונה איזה ערך האמונה/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'אמור את המשפט' }));
+    fireEvent.click(screen.getByRole('button', { name: 'שאל את שלוש השאלות' }));
+    fireEvent.click(screen.getByRole('button', { name: 'פתח מפה חזותית של זריזות לשון' }));
+    const map = screen.getByRole('dialog', { name: 'מפת זריזות לשון' });
+    expect(within(map).getByTestId('map-node-intention').getAttribute('data-certainty')).toBe('8');
+    fireEvent.click(within(map).getByTestId('map-node-redefine'));
+    fireEvent.click(within(map).getByRole('button', { name: 'בחר את המהלך לשיחה' }));
+    expect(screen.queryByRole('dialog', { name: 'מפת זריזות לשון' })).toBeNull();
+    expect(screen.getByLabelText('מה תגיד לדמות?')).toBeTruthy();
   });
 
   it('keeps the three meters at their last reported values until the trainee asks calibration', () => {

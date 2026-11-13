@@ -127,9 +127,10 @@ export function CourseDoor() {
               <span className="course-card-number">03</span>
               <h3>זריזות לשון</h3>
               <p>מקרה, שאלות מטה־מודל, 14 תבניות דילטס, Mind-Lines וסדנת פיצוצים והתנגדויות.</p>
-              <button type="button" className="btn btn-primary" onClick={() => navigateTo('sleight-workshop')}>
-                פתח אימון זריזות לשון
-              </button>
+              <div className="course-card-actions">
+                <button type="button" className="btn btn-primary" onClick={() => navigateTo('sleight-workshop')}>פתח אימון זריזות לשון</button>
+                <button type="button" className="btn btn-secondary" onClick={() => navigateTo('rupture-workshop')}>סדנת פיצוצים</button>
+              </div>
             </article>
 
             <article className="course-card" data-testid="course-card-coach-crash">

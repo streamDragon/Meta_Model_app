@@ -57,15 +57,15 @@ const SCENARIOS: Record<ScenarioId, Scenario> = {
   },
 };
 
-export function RuptureWorkshop({ onReturn, onStop }: { onReturn: () => void; onStop: () => void }) {
+export function RuptureWorkshop({ onReturn, onStop, standalone = false }: { onReturn: () => void; onStop: () => void; standalone?: boolean }) {
   const [scenarioId, setScenarioId] = useState<ScenarioId>('attack');
   const [choiceIndex, setChoiceIndex] = useState<number | null>(null);
   const [check, setCheck] = useState<'continue' | 'pause' | 'stop' | null>(null);
   const scenario = SCENARIOS[scenarioId];
   const option = choiceIndex === null ? null : scenario.options[choiceIndex];
 
-  return <div className="som-scrim">
-    <section className="som-rupture som-workshop som-rupture-full" role="dialog" aria-modal="true" aria-label="סדנת פיצוצים והתנגדויות">
+  return <div className={standalone ? 'som-rupture-route' : 'som-scrim'}>
+    <section className="som-rupture som-workshop som-rupture-full" role={standalone ? 'region' : 'dialog'} aria-modal={standalone ? undefined : true} aria-label="סדנת פיצוצים והתנגדויות">
       <div className="som-workshop-header">
         <div><small>סדנת פיצוצים והתנגדויות · אימון עצמאי</small><h2>כשהשיחה נשברת, מה תעשה?</h2></div>
         <button className="btn btn-secondary" type="button" onClick={onReturn}>חזרה</button>
