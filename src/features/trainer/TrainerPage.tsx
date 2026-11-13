@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { content } from '../../data/content';
 import type { PracticeStatement, ViolationFamily } from '../../types';
 import {
   buildTrainerQuestions,
   CATEGORY_HINTS,
-  CATEGORY_ID_TO_NAME,
   CATEGORY_LABELS,
   completionMessage,
   completionNextFocus,
@@ -16,10 +15,13 @@ import {
   buildHiddenMcqOptions,
   buildSurfaceMcqOptions,
   evaluateLayeredAnswer,
+  layeredScoreSummary,
   PARTIAL_LAYERED_XP,
+  patternNameHe,
   toLayeredStatement,
   type LayeredAnswerResult,
 } from '../../lib/violationLayers';
+import { revealElement } from '../../lib/reveal';
 import { useProgress } from '../../store/useProgress';
 import { usePracticeLaunch } from '../../store/practiceLaunch';
 import { useHint } from '../../store/hint';
@@ -50,6 +52,22 @@ export function TrainerPage() {
   const [answeredCount, setAnsweredCount] = useState(0);
   const [sessionXP, setSessionXP] = useState(0);
   const [hintText, setHintText] = useState<string | null>(null);
+  const questionRef = useRef<HTMLDivElement | null>(null);
+  const feedbackRef = useRef<HTMLDivElement | null>(null);
+  const completeRef = useRef<HTMLDivElement | null>(null);
+  const [scrollTarget, setScrollTarget] = useState<'question' | 'feedback' | 'complete' | null>(null);
+
+  useEffect(() => {
+    if (!scrollTarget) return;
+    const el =
+      scrollTarget === 'question'
+        ? questionRef.current
+        : scrollTarget === 'feedback'
+          ? feedbackRef.current
+          : completeRef.current;
+    revealElement(el);
+    setScrollTarget(null);
+  }, [scrollTarget]);
 
   const startTrainer = useCallback(
     (categoryId: string) => {
@@ -74,6 +92,7 @@ export function TrainerPage() {
       setSessionXP(0);
       setHintText(null);
       setPhase('active');
+      setScrollTarget('question');
     },
     [showHint],
   );
@@ -113,6 +132,7 @@ export function TrainerPage() {
       setSessionXP((xp) => xp + result.xp);
       addXP(result.xp);
     }
+    setScrollTarget('feedback');
   };
 
   const handleNext = () => {
@@ -120,6 +140,7 @@ export function TrainerPage() {
     if (nextIndex >= questions.length) {
       setPhase('complete');
       recordSession();
+      setScrollTarget('complete');
       return;
     }
     setCurrentIndex(nextIndex);
@@ -129,6 +150,7 @@ export function TrainerPage() {
     setSelectedHidden(null);
     setAnswerResult(null);
     setHintText(null);
+    setScrollTarget('question');
   };
 
   const resetTrainer = () => {
@@ -167,7 +189,8 @@ export function TrainerPage() {
   };
 
   const rate = successRate(correctCount * 2 + partialCount, answeredCount * 2);
-  const finalRate = successRate(correctCount * 2 + partialCount, questions.length * 2);
+  const finalScore = layeredScoreSummary(correctCount, partialCount, questions.length);
+  const finalRate = finalScore.rate;
 
   const chips = [
     { id: '', label: 'כל הקטגוריות', accent: 'all' },
@@ -216,7 +239,7 @@ export function TrainerPage() {
 
         {phase === 'active' && question && (
           <div id="trainer-mode" className="trainer-mode">
-            <div id="question-display" className="question-display">
+            <div id="question-display" className="question-display" ref={questionRef}>
               <div className="question-header">
                 <span className="question-counter">
                   שאלה <span id="current-q">{currentIndex + 1}</span> מתוך{' '}
@@ -261,7 +284,9 @@ export function TrainerPage() {
               <p>
                 {answerStep === 'surface'
                   ? 'מה נמצא במילים עצמן, עוד לפני שאנחנו מוסיפים פרשנות?'
-                  : 'לפי ההשלמה שניתנה בתרגיל, איזה דפוס מופיע? בשיחה אמיתית שואלים ובודקים לפני שמניחים.'}
+                  : layeredQuestion?.impliedFullTextHe
+                    ? 'לפי ההשלמה שניתנה בתרגיל, איזה דפוס מופיע? בשיחה אמיתית שואלים ובודקים לפני שמניחים.'
+                    : 'מה עוד עשוי להסתתר מאחורי המשפט, גם אם לא נאמר? בשיחה אמיתית שואלים ובודקים לפני שמניחים.'}
               </p>
               {answerStep === 'hidden' && layeredQuestion?.impliedFullTextHe && <blockquote className="learning-context"><strong>ההשלמה שניתנה בתרגיל:</strong> {layeredQuestion.impliedFullTextHe}</blockquote>}
               {selectedSurface && answerStep === 'hidden' && (
@@ -295,7 +320,7 @@ export function TrainerPage() {
             </div>
 
             {answerResult && layeredQuestion && selectedSurface && selectedHidden && (
-              <div id="feedback-section" className="feedback-section visible">
+              <div id="feedback-section" className="feedback-section visible" ref={feedbackRef}>
                 <div
                   id="feedback-content"
                   className={`feedback-box ${answerResult.status === 'full' ? 'correct' : answerResult.status}`}
@@ -314,7 +339,7 @@ export function TrainerPage() {
                         <p>
                           <strong>{CATEGORY_LABELS[layeredQuestion.surfaceViolation.family]}</strong>
                           <br />
-                          תבנית: {layeredQuestion.surfaceViolation.violation}
+                          תבנית: {patternNameHe(layeredQuestion.surfaceViolation)}
                           <br />
                           ראיה במילים: "{layeredQuestion.surfaceViolation.evidenceHe}"
                           <br />
@@ -333,7 +358,7 @@ export function TrainerPage() {
                               className="hidden-layer-line"
                               key={`${layer.family}-${layer.subcategory}`}
                             >
-                              <strong>{CATEGORY_LABELS[layer.family]}</strong> - {layer.violation}
+                              <strong>{CATEGORY_LABELS[layer.family]}</strong> - {patternNameHe(layer)}
                               <br />
                               {layer.impliedTextHe}
                               <br />
@@ -381,7 +406,7 @@ export function TrainerPage() {
         )}
 
         {phase === 'complete' && (
-          <div className="feedback-section visible">
+          <div className="feedback-section visible" ref={completeRef}>
             <div className="trainer-complete-card">
               <div className="trainer-complete-hero">
                 <span className="complete-score">{finalRate}%</span>
@@ -392,10 +417,8 @@ export function TrainerPage() {
               </div>
               <div className="trainer-complete-stats">
                 <div>
-                  <strong>
-                    {correctCount}/{questions.length}
-                  </strong>
-                  <span>תשובות נכונות</span>
+                  <strong>{finalScore.labelHe}</strong>
+                  <span>תשובות מתוך {questions.length}</span>
                 </div>
                 <div>
                   <strong>+{sessionXP}</strong>
@@ -403,7 +426,7 @@ export function TrainerPage() {
                 </div>
                 <div>
                   <strong>
-                    {selectedCategory ? CATEGORY_ID_TO_NAME[selectedCategory] : 'ALL'}
+                    {focusCategory?.hebrew_name ?? 'כל הקטגוריות'}
                   </strong>
                   <span>מוקד תרגול</span>
                 </div>
@@ -456,8 +479,13 @@ export function TrainerPage() {
           <h4>📊 סשן נוכחי</h4>
           <div className="practice-stats">
             <p>
-              ✅ תשובות נכונות <span id="correct-count">{correctCount}</span>
+              ✅ תשובות מלאות <span id="correct-count">{correctCount}</span>
             </p>
+            {partialCount > 0 && (
+              <p>
+                ◐ תשובות חלקיות <span id="partial-count">{partialCount}</span>
+              </p>
+            )}
             <p>
               📈 קצב הצלחה <span id="success-rate">{rate}%</span>
             </p>
