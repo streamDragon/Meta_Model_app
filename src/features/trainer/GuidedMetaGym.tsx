@@ -1,5 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { revealElement } from '../../lib/reveal';
+import { useProgress } from '../../store/useProgress';
+import { XP_REWARDS } from '../../store/progress';
 import './GuidedMetaGym.css';
+
+/** XP for finishing all rounds; reuses the existing per-drill reward. */
+const GUIDED_FINISH_XP = XP_REWARDS.trainerCorrect;
 
 type Choice = { text:string; topic:string; why:string };
 type Round = { mission:string; choices:Choice[]; correct:number; reply:string; label:string };
@@ -51,20 +57,29 @@ const topics:Record<string,string> = {
 const tips=['מבנה השטח: מה שנאמר בפועל. מבנה העומק: משמעות והקשר שמתגלים מתוך שאלות ומאושרים על ידי הדובר.','NLP מטרתי: שאלות טובות נבחרות לפי התוצאה שרוצים להשיג בשיחה.','מיפוי לפני אתגור: קודם מבררים ושיקופים, אחר כך מאתגרים הנחות.','הפרות מטה מודל אינן בהכרח טעויות: הן נקודות שבהן כדאי לשאול ולבדוק.'];
 function chime(success:boolean){ try{ const Audio = window.AudioContext; if(!Audio)return; const ctx=new Audio(); const o=ctx.createOscillator(); const g=ctx.createGain();o.frequency.value=success?700:240;o.connect(g);g.connect(ctx.destination);g.gain.value=.045;o.start();o.stop(ctx.currentTime+.12);o.onended=()=>void ctx.close();}catch{ /* audio is optional */ } }
 export function GuidedMetaGym(){
+ const { addXP, recordSession } = useProgress();
+ const stickyRef=useRef<HTMLElement|null>(null), feedbackRef=useRef<HTMLDivElement|null>(null), missionRef=useRef<HTMLDivElement|null>(null), finishRef=useRef<HTMLDivElement|null>(null);
+ const recorded=useRef(false);
+ const [scrollTo,setScrollTo]=useState<'feedback'|'mission'|'finish'|null>(null);
  const [step,setStep]=useState(0),[selected,setSelected]=useState<number|null>(null),[depthOpen,setDepthOpen]=useState(false),[help,setHelp]=useState(false),[tip,setTip]=useState(0),[hard,setHard]=useState(false),[seconds,setSeconds]=useState(40),[sound,setSound]=useState(false),[expert,setExpert]=useState(false);
  const [expertChoice,setExpertChoice]=useState(''); const [expertReason,setExpertReason]=useState('');
  const round=rounds[Math.min(step,rounds.length-1)];
  const mapped=Math.min(step,3), finished=step>=rounds.length;
  useEffect(()=>{if(!hard||selected!==null||finished)return;const id=window.setInterval(()=>setSeconds(s=>Math.max(0,s-1)),1000);return()=>window.clearInterval(id)},[hard,selected,finished,step]);
- const pick=(index:number)=>{if(selected!==null)return;setSelected(index);if(sound)chime(index===round.correct);};
- const next=()=>{setStep(s=>Math.min(s+1,rounds.length));setSelected(null);setSeconds(hard?15:40);setDepthOpen(false);};
- const restart=()=>{setStep(0);setSelected(null);setSeconds(hard?15:40);setDepthOpen(false);setExpert(false);setExpertChoice('');setExpertReason('')};
+ // Keep the status bar below the app's sticky mobile top bar instead of hiding behind it.
+ useEffect(()=>{const place=()=>{const bar=document.querySelector<HTMLElement>('.mobile-topbar');const sticky=stickyRef.current;if(!sticky)return;const st=bar?getComputedStyle(bar):null;sticky.style.top=(bar&&st&&(st.position==='sticky'||st.position==='fixed')&&st.display!=='none'?bar.offsetHeight:0)+'px';};place();window.addEventListener('resize',place);return()=>window.removeEventListener('resize',place);},[]);
+ useEffect(()=>{if(!finished||recorded.current)return;recorded.current=true;addXP(GUIDED_FINISH_XP);recordSession();},[finished,addXP,recordSession]);
+ useEffect(()=>{if(!scrollTo)return;const el=scrollTo==='feedback'?feedbackRef.current:scrollTo==='mission'?missionRef.current:finishRef.current;const sticky=stickyRef.current;const extra=sticky&&getComputedStyle(sticky).position==='sticky'?sticky.offsetHeight:0;revealElement(el,scrollTo==='feedback'?'end':'start',extra);setScrollTo(null);},[scrollTo]);
+ const pick=(index:number)=>{if(selected!==null)return;setSelected(index);if(sound)chime(index===round.correct);setScrollTo('feedback');};
+ const next=()=>{const last=step+1>=rounds.length;setStep(s=>Math.min(s+1,rounds.length));setSelected(null);setSeconds(hard?15:40);setDepthOpen(false);setScrollTo(last?'finish':'mission');};
+ const go=(hash:string)=>{window.location.hash=hash;};
+ const restart=()=>{recorded.current=false;setScrollTo('mission');setStep(0);setSelected(null);setSeconds(hard?15:40);setDepthOpen(false);setExpert(false);setExpertChoice('');setExpertReason('')};
  const phase=step<3?'בירור':step===3?'שיקוף':'אתגור';
  const progress=Math.min(100,14+step*14);
  return <div className="gmg" dir="rtl">
- <header className="gmg-sticky">
+ <header className="gmg-sticky" ref={stickyRef}>
   <div className="gmg-dashboard"><strong>מצפן השיחה</strong><span>מרחב האפשרויות: {progress}%</span></div>
-  <div className="gmg-meters">{[['רגש','🙂',Math.min(90,24+step*8)],['הזדהות','🪞',Math.max(20,90-step*10)],['ודאות','◉',Math.max(25,88-step*9)],['פתיחות','🌱',Math.min(95,12+step*14)]].map(([label,ico,n])=><div className="gmg-meter" key={String(label)} title={String(label)+': מד המחשה של השיחה המתוסרטת'}><span>{ico} {label}</span><div className="gmg-meter-track"><i style={{width:n+'%'}}/></div></div>)}</div>
+  <div className="gmg-meters">{[['רגש','🙂',Math.min(90,24+step*8)],['הזדהות','🪞',Math.max(20,90-step*10)],['ודאות','◉',Math.max(25,88-step*9)],['פתיחות','🌱',Math.min(95,12+step*14)]].map(([label,ico,n])=><div className="gmg-meter" key={String(label)} title={String(label)+': מד המחשה של השיחה המתוסרטת'} aria-label={String(label)+' '+n+'%'}><span><b aria-hidden="true">{ico}</b> <em>{label}</em></span><div className="gmg-meter-track"><i style={{width:n+'%'}}/></div></div>)}</div>
   <div className="gmg-progress"><i style={{width:progress+'%'}}/></div>
  </header>
  <div className="gmg-body">
@@ -72,12 +87,12 @@ export function GuidedMetaGym(){
   <div className="gmg-stages"><span className={step<3?'active':''}>1 · בירור</span><span className={step===3?'active':''}>2 · שיקוף</span><span className={step>=4?'active':''}>3 · אתגור</span></div>
   <section className="gmg-card gmg-surface"><div className="gmg-person">🧒🏻 <b>תלמיד</b><small>מבנה השטח</small></div><div className="gmg-quote">״אוף המורה, <mark>השאלה הזאת</mark> <mark>קשה מדי.</mark>״</div><div className="gmg-actions"><button className={'gmg-depth-btn '+(step>0?'new':'')} onClick={()=>setDepthOpen(true)} aria-label="מבנה העומק הנחשף"><b className="gmg-triangle">▲</b> מבנה העומק <em>{mapped}</em></button><button onClick={()=>{setTip((tip+1)%tips.length);setHelp(true)}}>💡</button><button onClick={()=>setSound(v=>!v)}>{sound?'🔊':'🔇'}</button></div></section>
   <section className="gmg-card">
-   {finished?<><div className="gmg-finish"><div className="gmg-stars">⭐ ⭐ ⭐</div><h2>נפתחו אפשרויות חדשות!</h2><p>המשפט קיבל הקשר, שיקפנו אותו ואתגרנו את ההנחה.</p></div><div className="gmg-final"><small>מבנה השטח</small><p>״אוף המורה, השאלה הזאת קשה מדי.״</p><small>מבנה העומק שנחשף</small><p>שאלה ב׳ במתמטיקה קשה לי להתחיל ביחס להיסטוריה, ואני חושש שהקושי כרגע אומר שגם במבחן לא אצליח.</p><small>אחרי האתגור</small><p>אני מתקשה להתחיל כרגע, אבל זה לא מוכיח שאכשל. אפשר לבקש רמז או להתחיל מדוגמה דומה.</p></div><div className="gmg-reply">🧒🏻 ״מעניין, לא חשבתי על זה ככה. עכשיו יש לי כמה אפשרויות.״</div><button className="gmg-primary" onClick={restart}>תרגול נוסף ↻</button></>:
+   {finished?<><div className="gmg-finish" ref={finishRef}><div className="gmg-stars">⭐ ⭐ ⭐</div><h2>נפתחו אפשרויות חדשות!</h2><p>המשפט קיבל הקשר, שיקפנו אותו ואתגרנו את ההנחה.</p><p className="gmg-xp">+{GUIDED_FINISH_XP} XP · האימון נשמר בהתקדמות</p></div><div className="gmg-final"><small>מבנה השטח</small><p>״אוף המורה, השאלה הזאת קשה מדי.״</p><small>מבנה העומק שנחשף</small><p>שאלה ב׳ במתמטיקה קשה לי להתחיל ביחס להיסטוריה, ואני חושש שהקושי כרגע אומר שגם במבחן לא אצליח.</p><small>אחרי האתגור</small><p>אני מתקשה להתחיל כרגע, אבל זה לא מוכיח שאכשל. אפשר לבקש רמז או להתחיל מדוגמה דומה.</p></div><div className="gmg-reply">🧒🏻 ״מעניין, לא חשבתי על זה ככה. עכשיו יש לי כמה אפשרויות.״</div><button className="gmg-primary" onClick={restart}>תרגול נוסף ↻</button><div className="gmg-onward"><span>להמשיך מכאן:</span><button className="gmg-secondary" onClick={()=>go('conversation')}>💬 אימון שיחה</button><button className="gmg-secondary" onClick={()=>go('practice')}>🎮 תרגול זיהוי</button></div></>:
    <>
-    <div className="gmg-teacher"><div className="gmg-avatar">👩🏻‍🏫</div><div><small>מדריכת NLP · {phase}</small><strong>{round.mission}</strong></div></div>
+    <div className="gmg-teacher" ref={missionRef}><div className="gmg-avatar">👩🏻‍🏫</div><div><small>מדריכת NLP · {phase}</small><strong>{round.mission}</strong></div></div>
     <div className="gmg-questionhead"><h3>{step===3?'איזה שיקוף תיתן?':'איזו שאלה תשאל?'}</h3><div className="gmg-settings"><button className={!hard?'on':''} onClick={()=>{setHard(false);setSeconds(40)}}>קל</button><button className={hard?'on':''} onClick={()=>{setHard(true);setSeconds(15)}}>קשה</button><span>⏱ {seconds}</span></div></div>
     <div className="gmg-choices">{round.choices.map((c,i)=><button key={i} disabled={selected!==null} className={selected===i?(i===round.correct?'correct':'miss'):''} onClick={()=>pick(i)}>{c.text}</button>)}</div>
-    {selected!==null&&<><div className={'gmg-feedback '+(selected===round.correct?'correct':'miss')}><b>👩🏻‍🏫 {selected===round.correct?'מצוין!':'זו שאלה טובה, אבל לא המשימה.'}</b><p>{round.choices[selected].why}</p></div>{selected===round.correct?<><div className="gmg-reply">🧒🏻 {round.reply}</div>{step===2&&<div className="gmg-reward">⭐ ⭐ ⭐ מבנה העומק נחשף. עכשיו משקפים.</div>}<button className="gmg-primary" onClick={next}>{step===2?'עוברים לשיקוף ←':step===3?'עוברים לאתגור ←':'ממשיכים ←'}</button></>:<button className="gmg-secondary" onClick={()=>setSelected(null)}>נסה שאלה שמקדמת את המשימה</button>}</>}
+    {selected!==null&&<div className="gmg-after" ref={feedbackRef}><div className={'gmg-feedback '+(selected===round.correct?'correct':'miss')}><b>👩🏻‍🏫 {selected===round.correct?'מצוין!':'זו שאלה טובה, אבל לא המשימה.'}</b><p>{round.choices[selected].why}</p></div>{selected===round.correct?<><div className="gmg-reply">🧒🏻 {round.reply}</div>{step===2&&<div className="gmg-reward">⭐ ⭐ ⭐ מבנה העומק נחשף. עכשיו משקפים.</div>}<button className="gmg-primary" onClick={next}>{step===2?'עוברים לשיקוף ←':step===3?'עוברים לאתגור ←':'ממשיכים ←'}</button></>:<button className="gmg-secondary" onClick={()=>{setSelected(null);setScrollTo('mission');}}>נסה שאלה שמקדמת את המשימה</button>}</div>}
     {step>=4&&!expert&&<button className="gmg-link" onClick={()=>setExpert(true)}>משימת מומחה: איזו הפרה הכי משמעותית כאן?</button>}
     {expert&&<div className="gmg-expert"><strong>משימת מומחה · בחירה ונימוק</strong><div className="gmg-choices">{['השוואה חסרה','סיבה ותוצאה','מחיקה','הכללה'].map(v=><button key={v} className={expertChoice===v?'correct':''} onClick={()=>setExpertChoice(v)}>{v}</button>)}</div><textarea value={expertReason} onChange={e=>setExpertReason(e.target.value)} placeholder="מה ההפרה המשמעותית, ולמה?" rows={2}/><p>אין כאן הפרה אחת נכונה בכל מצב. נמק מה מטרת השיחה.</p><button onClick={()=>setExpert(false)}>סגור</button></div>}
    </>}

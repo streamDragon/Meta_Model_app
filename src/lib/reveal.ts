@@ -6,10 +6,12 @@
  * align 'start': put the element's top just under the top bar.
  * align 'end': if the element fits, bring its bottom just above the bottom nav
  * (no-op when already fully visible); otherwise fall back to 'start'.
+ * extraTop: height of any page-level sticky block that also covers the top.
  */
 export function revealElement(
   el: HTMLElement | null | undefined,
   align: 'start' | 'end' = 'start',
+  extraTop = 0,
 ): void {
   if (!el || typeof window === 'undefined' || typeof window.scrollTo !== 'function') return;
   const fixedHeight = (selector: string, positions: string[]) => {
@@ -18,7 +20,7 @@ export function revealElement(
     const style = getComputedStyle(node);
     return positions.includes(style.position) && style.display !== 'none' ? node.offsetHeight : 0;
   };
-  const topH = fixedHeight('.mobile-topbar', ['sticky', 'fixed']);
+  const topH = fixedHeight('.mobile-topbar', ['sticky', 'fixed']) + extraTop;
   const navH = fixedHeight('.bottom-nav', ['fixed']);
   const rect = el.getBoundingClientRect();
   const visibleBottom = window.innerHeight - navH;
