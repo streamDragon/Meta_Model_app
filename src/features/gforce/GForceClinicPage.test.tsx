@@ -58,4 +58,31 @@ describe('Clinic gameplay', () => {
     expect(screen.queryByRole('dialog', { name: /פירוט מדדי השיחה/ })).toBeNull();
   });
 
+  it('shows a probe answer beside the revealed card and can undo the probe', () => {
+    render(<GForceClinicPage />);
+    fireEvent.click(screen.getByRole('button', { name: /כניסה לפגישה/ }));
+    fireEvent.click(screen.getByRole('button', { name: /כשאתה אומר ״בלגן״/ }));
+    expect(screen.queryByTestId('clinic-inline-probe')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /רואה את זה/ }));
+    const inline = screen.getByTestId('clinic-inline-probe');
+    expect(inline.textContent).toContain('אני יכול לראות את המצב');
+    expect(inline.textContent).toContain('כיוון אפשרי');
+    fireEvent.click(screen.getByRole('button', { name: /בטל את הפעולה האחרונה/ }));
+    expect(screen.queryByTestId('clinic-inline-probe')).toBeNull();
+    expect(screen.queryByText('דמיון: אפשרי')).toBeNull();
+    expect(screen.getByText(/מצב שנחשף · מה רואים עכשיו/)).toBeTruthy();
+  });
+
+  it('undoes one question without erasing earlier discoveries', () => {
+    render(<GForceClinicPage />);
+    fireEvent.click(screen.getByRole('button', { name: /כניסה לפגישה/ }));
+    fireEvent.click(screen.getByRole('button', { name: /כשאתה אומר ״בלגן״/ }));
+    fireEvent.click(screen.getByRole('button', { name: '🤝 קשר והקשבה' }));
+    fireEvent.click(screen.getByRole('button', { name: /מה הכי מכביד עליך/ }));
+    expect(screen.getByTestId('clinic-latest-answer').textContent).toContain('תודה שאתה לא ישר נותן לי רשימה');
+    fireEvent.click(screen.getByRole('button', { name: /בטל את הפעולה האחרונה/ }));
+    expect(screen.getByTestId('clinic-latest-answer').textContent).toContain('כרגע יש שני בגדים');
+    expect(screen.getByText(/מצב שנחשף · מה רואים עכשיו/)).toBeTruthy();
+  });
+
 });
