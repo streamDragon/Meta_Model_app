@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { content } from '../../data/content';
 import { resolveReframe, WHO_EXPECTS_LABELS } from '../../lib/blueprint';
 import { useProgress } from '../../store/useProgress';
 import { XP_REWARDS } from '../../store/progress';
 import { useHint } from '../../store/hint';
 import { HowItWorks } from '../../components/HowItWorks';
+import { revealElement } from '../../lib/reveal';
 
 interface WizardField {
   id: string; // matches choice_packs.blueprint.fields key
@@ -92,6 +93,17 @@ export function BlueprintPage() {
   const [ability, setAbility] = useState(5);
   const [gap, setGap] = useState('');
   const [awarded, setAwarded] = useState(false);
+  const stepRef = useRef<HTMLDivElement | null>(null);
+  const firstRender = useRef(true);
+
+  // Each step starts at its top, not wherever the previous step was scrolled to.
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    revealElement(stepRef.current);
+  }, [step]);
 
   const reframe = useMemo(
     () => resolveReframe(ability, gap, content.blueprint_builder.reframe_templates),
@@ -189,6 +201,8 @@ export function BlueprintPage() {
             ]}
           />
         )}
+
+        <div ref={stepRef} className="blueprint-step-anchor" />
 
         {step === 1 && (
           <div className="blueprint-step active">
@@ -344,53 +358,68 @@ export function BlueprintPage() {
                   <strong>מסגרת זמן</strong>
                   <p>{fields.time}</p>
                 </div>
-                <div className="blueprint-summary-card blueprint-risk-card">
-                  <strong>נקודת תקיעה</strong>
-                  <p>{fields.friction || 'לא הוגדרה נקודת תקיעה'}</p>
-                </div>
+                {fields.friction.trim() && (
+                  <div className="blueprint-summary-card blueprint-risk-card">
+                    <strong>נקודת תקיעה</strong>
+                    <p>{fields.friction}</p>
+                  </div>
+                )}
               </div>
               <div className="blueprint-timeline">
-                <div>
-                  <span>1</span>
-                  <strong>צעד ראשון</strong>
-                  <p>{fields.firstStep}</p>
-                </div>
-                <div>
-                  <span>2</span>
-                  <strong>שלבי ביניים</strong>
-                  <p>{fields.middleSteps || 'לא הוגדרו'}</p>
-                </div>
-                <div>
-                  <span>3</span>
-                  <strong>צעד אחרון</strong>
-                  <p>{fields.lastStep}</p>
-                </div>
+                {[
+                  { label: 'צעד ראשון', text: fields.firstStep },
+                  { label: 'שלבי ביניים', text: fields.middleSteps },
+                  { label: 'צעד אחרון', text: fields.lastStep },
+                ]
+                  .filter((item) => item.text.trim())
+                  .map((item, index) => (
+                    <div key={item.label}>
+                      <span>{index + 1}</span>
+                      <strong>{item.label}</strong>
+                      <p>{item.text}</p>
+                    </div>
+                  ))}
               </div>
-              <div className="blueprint-section">
-                <h4>תנאים מקדימים</h4>
-                <p>{fields.prerequisites || 'לא הוגדרו תנאים מקדימים'}</p>
-              </div>
+              {fields.prerequisites.trim() && (
+                <div className="blueprint-section">
+                  <h4>תנאים מקדימים</h4>
+                  <p>{fields.prerequisites}</p>
+                </div>
+              )}
               <div className="blueprint-section">
                 <h4>Plan B</h4>
                 <p>{fields.alternatives || 'בחר חלופה קטנה יותר או בקש עזרה.'}</p>
               </div>
-              <div className="blueprint-section">
-                <h4>בירור ציפיות (אם בחרת למלא)</h4>
-                <ul>
-                  <li>
-                    <strong>מי מצפה:</strong> {WHO_EXPECTS_LABELS[whoExpects] || whoExpects}
-                  </li>
-                  <li>
-                    <strong>הציפייה:</strong> {expectation}
-                  </li>
-                  <li>
-                    <strong>יכולת כרגע:</strong> {ability}/10
-                  </li>
-                  <li>
-                    <strong>מה חסר:</strong> {gap}
-                  </li>
-                </ul>
-              </div>
+              {(whoExpects || expectation.trim() || assumption.trim() || gap.trim()) && (
+                <div className="blueprint-section">
+                  <h4>בירור ציפיות</h4>
+                  <ul>
+                    {whoExpects && (
+                      <li>
+                        <strong>מי מצפה:</strong> {WHO_EXPECTS_LABELS[whoExpects] || whoExpects}
+                      </li>
+                    )}
+                    {expectation.trim() && (
+                      <li>
+                        <strong>הציפייה:</strong> {expectation}
+                      </li>
+                    )}
+                    {assumption.trim() && (
+                      <li>
+                        <strong>הנחה סמויה:</strong> {assumption}
+                      </li>
+                    )}
+                    <li>
+                      <strong>יכולת כרגע:</strong> {ability}/10
+                    </li>
+                    {gap.trim() && (
+                      <li>
+                        <strong>מה חסר:</strong> {gap}
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
               <div className="blueprint-section blueprint-reframe-card">
                 <h4>ניסוח מחדש לא-מאשים</h4>
                 <p>
@@ -425,7 +454,7 @@ export function BlueprintPage() {
 
             <div className="action-buttons">
               <button type="button" className="btn btn-secondary" onClick={exportBlueprint}>
-                📥 ייצא JSON
+                📥 שמירה לקובץ
               </button>
               <button type="button" className="btn btn-secondary" onClick={startOver}>
                 תוכנית חדשה

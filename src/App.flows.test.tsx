@@ -72,6 +72,16 @@ describe('Blueprint flow', () => {
     expect(within(section).getByText('התוכנית שלי')).toBeTruthy();
     expect(storedProgress().xp).toBe(20);
     expect(storedProgress().sessions).toBe(1);
+
+    // Empty optional fields are not shown as empty boxes; save button is Hebrew.
+    const plan = section.querySelector('.final-blueprint-display') as HTMLElement;
+    expect(within(plan).queryByText('צעד אחרון')).toBeNull();
+    expect(within(plan).queryByText('שלבי ביניים')).toBeNull();
+    expect(within(plan).queryByText('תנאים מקדימים')).toBeNull();
+    expect(within(plan).queryByText('נקודת תקיעה')).toBeNull();
+    expect(within(plan).getByText('צעד ראשון')).toBeTruthy();
+    expect(within(section).getByRole('button', { name: /שמירה לקובץ/ })).toBeTruthy();
+    expect(within(section).queryByText(/ייצא JSON/)).toBeNull();
   });
 
   it('blocks step 2 without an action and shows a toast instead of alert', () => {
