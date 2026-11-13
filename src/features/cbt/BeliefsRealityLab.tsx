@@ -65,26 +65,7 @@ export function BeliefsRealityLab() {
         </div>
       </section>
 
-      <div className="feature-brief">
-        <span>
-          <strong>עיקרון:</strong> מחשבות הן מפות, קיצורי דרך והגנות אפשריות.
-        </span>
-        <span>
-          <strong>גבול בטיחות:</strong> אימון ורפלקציה, לא טיפול, אבחון או מענה חירום.
-        </span>
-      </div>
-
-
-      <HowItWorks
-        title="איך עובדים עם מחשבה?"
-        steps={[
-          { icon: '🗺️', title: 'פותחים מפה', detail: 'מצב, מחשבה, רגש, גוף ודחף פעולה' },
-          { icon: '🔎', title: 'מחזירים מידע', detail: 'מי בדיוק, לפי מה, מה נמחק ומה הוכלל' },
-          { icon: '🧪', title: 'בודקים בשטח', detail: 'ניסוי קטן, בטוח ומדיד במקום ויכוח פנימי' },
-        ]}
-      />
-
-      <div className="cbt-safety-strip">{getSafetyMessageHe()}</div>
+      <p className="cbt-safety-line">אימון ורפלקציה, לא טיפול, אבחון או מענה חירום.</p>
 
       <div className="cbt-tabs" role="tablist" aria-label="מצבי מעבדת אמונות ומציאות">
         {VIEWS.map((item) => (
@@ -99,7 +80,6 @@ export function BeliefsRealityLab() {
         ))}
       </div>
 
-      <p className="learning-muted">התחל במפת מחשבה. יומן מתאים לבירור מפורט; ניסוי בודק ניבוי; פעולה קטנה עוזרת כשקשה להתחיל. טיוטות נשארות בין הלשוניות עד רענון, ושמירה מפורשת היא בדפדפן הזה.</p>
       {VIEWS.filter((item) => visited.has(item.id)).map((item) => <section key={item.id} role="tabpanel" id={`cbt-panel-${item.id}`} aria-labelledby={`cbt-tab-${item.id}`} hidden={view !== item.id}>
         {item.id === 'thought-map' && <ThoughtMap mobileMode={isMobile} onAward={award} onSaved={markSavedSession} onPlanExperiment={(text) => { setExperimentDraft((prev) => ({ text, revision: prev.revision + 1 })); selectView('experiment'); }} />}
         {item.id === 'thought-record' && <ThoughtRecord onPlanExperiment={(text) => { setExperimentDraft((prev) => ({ text, revision: prev.revision + 1 })); selectView('experiment'); }} />}
@@ -109,6 +89,25 @@ export function BeliefsRealityLab() {
         {item.id === 'lessons' && <CbtLessonCards onAward={award} />}
         {item.id === 'drills' && <CbtPracticeDrills onAward={award} />}
       </section>)}
+
+      <details className="cbt-about">
+        <summary>איך עובדים כאן, ומה הגבולות</summary>
+        <div className="feature-brief">
+          <span>
+            <strong>עיקרון:</strong> מחשבות הן מפות, קיצורי דרך והגנות אפשריות.
+          </span>
+        </div>
+        <HowItWorks
+          title="איך עובדים עם מחשבה?"
+          steps={[
+            { icon: '🗺️', title: 'פותחים מפה', detail: 'מצב, מחשבה, רגש, גוף ודחף פעולה' },
+            { icon: '🔎', title: 'מחזירים מידע', detail: 'מי בדיוק, לפי מה, מה נמחק ומה הוכלל' },
+            { icon: '🧪', title: 'בודקים בשטח', detail: 'ניסוי קטן, בטוח ומדיד במקום ויכוח פנימי' },
+          ]}
+        />
+        <div className="cbt-safety-strip">{getSafetyMessageHe()}</div>
+        <p className="learning-muted">התחל במפת מחשבה. יומן מתאים לבירור מפורט; ניסוי בודק ניבוי; פעולה קטנה עוזרת כשקשה להתחיל. טיוטות נשארות בין הלשוניות עד רענון, ושמירה מפורשת היא בדפדפן הזה.</p>
+      </details>
     </div>
   );
 }

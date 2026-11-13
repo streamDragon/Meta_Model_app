@@ -11,22 +11,34 @@ export const CBT_PACKS_META = [
   { id: cbtPractice.id, name: cbtPractice.name, sourceValidation: cbtPractice.sourceValidation },
 ] as const;
 
+/** Hebrew labels for CBT tags the engine emits that are not described in packs/cbt-core.json. */
+const EXTRA_CBT_LABELS_HE: Record<string, string> = {
+  catastrophizing: 'תרחיש אסון',
+  fixed_identity: 'זהות קבועה',
+  capability_belief: 'אמונת "לא מסוגל"',
+  approval_belief: 'צורך באישור',
+};
+
+/** Hebrew label for a CBT pattern tag, or '' when there is none (callers hide empty labels). */
 export function patternLabel(patternId: string): string {
-  return cbtPatterns.find((pattern) => pattern.id === patternId)?.labelHe ?? patternId;
+  return cbtPatterns.find((pattern) => pattern.id === patternId)?.labelHe ?? EXTRA_CBT_LABELS_HE[patternId] ?? '';
 }
 
+export const META_PATTERN_LABELS_HE: Record<string, string> = {
+  modal_operator: 'חייב / לא יכול',
+  universal_quantifier: 'הכללה (כולם, תמיד)',
+  missing_referential_index: 'חסר "מי בדיוק"',
+  mind_reading: 'קריאת מחשבות',
+  cause_effect: 'סיבה ותוצאה',
+  complex_equivalence: '"זה אומר ש..."',
+  nominalization: 'פעולה שקפאה לשם עצם',
+  identity_compression: 'זהות במילה אחת',
+  lost_performative: 'שיפוט בלי שופט',
+  deletion_of_tiny_steps: 'צעדים קטנים שנמחקו',
+  parts_ecology: 'חלקים ואקולוגיה',
+};
+
+/** Hebrew label for a Meta Model tag, or '' when there is none (callers hide empty labels). */
 export function metaPatternLabel(patternId: string): string {
-  const labels: Record<string, string> = {
-    modal_operator: 'modal operator',
-    universal_quantifier: 'universal quantifier',
-    missing_referential_index: 'missing referential index',
-    mind_reading: 'mind reading',
-    cause_effect: 'cause-effect',
-    complex_equivalence: 'complex equivalence',
-    nominalization: 'nominalization',
-    identity_compression: 'identity compression',
-    lost_performative: 'lost performative',
-    deletion_of_tiny_steps: 'deletion of tiny steps',
-  };
-  return labels[patternId] ?? patternId.replace(/_/g, ' ');
+  return META_PATTERN_LABELS_HE[patternId] ?? '';
 }

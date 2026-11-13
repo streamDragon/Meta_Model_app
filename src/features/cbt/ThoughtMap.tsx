@@ -170,12 +170,12 @@ export function ThoughtMap({ mobileMode = false, onAward, onSaved, onPlanExperim
           )}
           <p className="muted">הכיוונים הבאים מבוססים על מילות מפתח. בדוק אם הם מתאימים להקשר שלך; הם אינם קביעה שהמחשבה שגויה.</p>
           <div className="cbt-chip-group">
-            {analysis.cbtPatterns.map((pattern) => (
+            {analysis.cbtPatterns.filter((pattern) => patternLabel(pattern)).map((pattern) => (
               <span className="chip" key={pattern}>
                 {patternLabel(pattern)}
               </span>
             ))}
-            {analysis.metaModelPatterns.map((pattern) => (
+            {analysis.metaModelPatterns.filter((pattern) => metaPatternLabel(pattern)).map((pattern) => (
               <span className="chip" key={pattern}>
                 {metaPatternLabel(pattern)}
               </span>
@@ -196,7 +196,7 @@ export function ThoughtMap({ mobileMode = false, onAward, onSaved, onPlanExperim
             </ul>
           </article>
           <article className="cbt-mini-card">
-            <strong>בדיקת CBT</strong>
+            <strong>בדיקת מציאות</strong>
             <ul>
               {analysis.cbtQuestions.map((question) => (
                 <li key={question}>{question}</li>
@@ -232,7 +232,6 @@ export function ThoughtMap({ mobileMode = false, onAward, onSaved, onPlanExperim
 
         {mobileStep === 'thought' && (
           <section className="cbt-panel cbt-mobile-step">
-            {introContent}
             {statementField}
             <button
               type="button"
@@ -242,6 +241,10 @@ export function ThoughtMap({ mobileMode = false, onAward, onSaved, onPlanExperim
             >
               המשך להקשר
             </button>
+            <details className="cbt-intro-details">
+              <summary>מה המפה בודקת?</summary>
+              {introContent}
+            </details>
           </section>
         )}
 

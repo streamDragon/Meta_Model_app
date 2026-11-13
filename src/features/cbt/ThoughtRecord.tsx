@@ -41,7 +41,7 @@ export function ThoughtRecord({ onPlanExperiment }: { onPlanExperiment?: (predic
       <section className="cbt-panel">
         <h3>שאלות להרחבת המפה</h3>
         <div className="cbt-chip-group">
-          {analysis.metaModelPatterns.map((pattern) => (
+          {analysis.metaModelPatterns.filter((pattern) => metaPatternLabel(pattern)).map((pattern) => (
             <span className="chip" key={pattern}>
               {metaPatternLabel(pattern)}
             </span>

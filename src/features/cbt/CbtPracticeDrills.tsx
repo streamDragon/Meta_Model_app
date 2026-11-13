@@ -58,9 +58,9 @@ export function CbtPracticeDrills({ onAward }: { onAward: (amount: number) => vo
           <>
             <h3>{wasCorrect ? 'מדויק' : 'כיוון אחר מתאים יותר'}</h3>
             <p>
-              CBT: {item.cbtPatterns.map(patternLabel).join(' / ')}
+              דפוס חשיבה: {item.cbtPatterns.map(patternLabel).filter(Boolean).join(' / ')}
               <br />
-              Meta Model: {item.metaModelPatterns.map(metaPatternLabel).join(' / ')}
+              מטה־מודל: {item.metaModelPatterns.map(metaPatternLabel).filter(Boolean).join(' / ')}
             </p>
             <article className="cbt-mini-card">
               <strong>שאלה טובה יותר</strong>
