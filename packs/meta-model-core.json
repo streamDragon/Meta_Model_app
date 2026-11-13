@@ -82,16 +82,16 @@
           "hebrew": "מקור שיפוט חסר",
           "description": "הצהרה ללא ציון מי אומר או על פי מה",
           "example": "זה לא נכון",
-          "question": "לפי איזה קריטריון זה לא נכון?",
+          "question": "לפי מי זה לא נכון? ולפי איזה קריטריון?",
           "category": "DISTORTION"
         },
         {
           "id": "presupposition",
           "name": "Presupposition",
           "hebrew": "הנחה מוטבעת",
-          "description": "הנחות מוטבעות בשאלה או הצהרה",
-          "example": "מתי תפסיק להאשים את עצמך?",
-          "question": "האם האשמה עצמית היא חלק מהחוויה שלך כרגע?",
+          "description": "משהו שהמשפט כבר מניח כנכון, בלי לומר אותו",
+          "example": "למה בעלי כל כך לא מתחשב?",
+          "question": "איך את יודעת שהוא לא מתחשב? מה בדיוק הוא עושה?",
           "category": "DISTORTION"
         },
         {
@@ -118,7 +118,7 @@
           "hebrew": "כמתים כוללים",
           "description": "שימוש ב'תמיד', 'אף פעם', 'הכל', 'אף אחד'",
           "example": "אני לעולם לא יכול להצליח",
-          "question": "באילו מצבים ניסית ומה קרה?",
+          "question": "לעולם? היה פעם, אפילו בדבר קטן, שהצלחת?",
           "category": "GENERALIZATION"
         },
         {
@@ -200,7 +200,7 @@
       "category": "GENERALIZATION",
       "subcategory": "modal_operator",
       "violation": "Modal Operator",
-      "suggested_question": "מדוע חייב להיות ככה? מה היה קורה אם היה אחרת?",
+      "suggested_question": "מה היה קורה אם זה לא היה ככה? מה בדיוק מחייב את זה?",
       "explanation": "מגביל את האפשרויות לאלטרנטיבה אחת",
       "difficulty": "easy",
       "surfaceViolation": {
@@ -208,7 +208,7 @@
         "subcategory": "modal_operator",
         "violation": "Modal Operator",
         "evidenceHe": "זה חייב להיות ככה",
-        "questionHe": "מדוע חייב להיות ככה? מה היה קורה אם היה אחרת?",
+        "questionHe": "מה היה קורה אם זה לא היה ככה? מה בדיוק מחייב את זה?",
         "explanationHe": "מגביל את האפשרויות לאלטרנטיבה אחת"
       },
       "hiddenViolations": [
@@ -234,20 +234,20 @@
     },
     {
       "id": 4,
-      "statement": "הוא קרא בדעותיי",
+      "statement": "אני יודע בדיוק מה הוא חושב עליי",
       "category": "DISTORTION",
       "subcategory": "mind_reading",
       "violation": "Mind Reading",
-      "suggested_question": "כיצד אתה יודע מה הוא קרא? מה בדיוק אמר או עשה?",
-      "explanation": "הנחה לא מבוססת על מה שמישהו חושב",
+      "suggested_question": "איך אתה יודע מה הוא חושב? מה בדיוק ראית או שמעת?",
+      "explanation": "טענה לידיעת מחשבותיו של אדם אחר בלי לומר על מה היא נשענת",
       "difficulty": "easy",
       "surfaceViolation": {
         "family": "DISTORTION",
         "subcategory": "mind_reading",
         "violation": "Mind Reading",
-        "evidenceHe": "הוא קרא בדעותיי",
-        "questionHe": "כיצד אתה יודע מה הוא קרא? מה בדיוק אמר או עשה?",
-        "explanationHe": "הנחה לא מבוססת על מה שמישהו חושב"
+        "evidenceHe": "אני יודע בדיוק מה הוא חושב עליי",
+        "questionHe": "איך אתה יודע מה הוא חושב? מה בדיוק ראית או שמעת?",
+        "explanationHe": "טענה לידיעת מחשבותיו של אדם אחר בלי לומר על מה היא נשענת"
       },
       "hiddenViolations": [
         {
@@ -259,7 +259,7 @@
           "explanationHe": "קריאת מחשבות מסתירה את הראיות שעליהן הפרשנות נשענת."
         }
       ],
-      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"הוא קרא בדעותיי\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אני יודע בדיוק מה הוא חושב עליי\" - וזה נכון גם מעבר למה שנאמר בפועל.",
       "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
@@ -268,15 +268,15 @@
       "category": "DISTORTION",
       "subcategory": "complex_equivalence",
       "violation": "Complex Equivalence",
-      "suggested_question": "מדוע אי-תגובה שווה לאי-אהבה? יכול להיות סיבה אחרת?",
+      "suggested_question": "איך זה שהם לא השיבו אומר שהם לא אוהבים אותך? היה פעם שמישהו שאוהב אותך לא ענה?",
       "explanation": "קישור של שתי פעולות שונות כאילו הן שוות זו לזו",
       "difficulty": "medium",
       "surfaceViolation": {
         "family": "DISTORTION",
         "subcategory": "complex_equivalence",
         "violation": "Complex Equivalence",
-        "evidenceHe": "כשהם לא השיבו, הבנתי שהם לא אוהבים אותי",
-        "questionHe": "מדוע אי-תגובה שווה לאי-אהבה? יכול להיות סיבה אחרת?",
+        "evidenceHe": "כשהם לא השיבו, הבנתי",
+        "questionHe": "איך זה שהם לא השיבו אומר שהם לא אוהבים אותך? היה פעם שמישהו שאוהב אותך לא ענה?",
         "explanationHe": "קישור של שתי פעולות שונות כאילו הן שוות זו לזו"
       },
       "hiddenViolations": [
@@ -324,20 +324,20 @@
     },
     {
       "id": 7,
-      "statement": "היא יותר חכמה ממני",
+      "statement": "היא פשוט יותר חכמה",
       "category": "DELETION",
       "subcategory": "comparative_deletion",
       "violation": "Comparative Deletion",
-      "suggested_question": "חכמה יותר בתחום מה? לעומת מי? באיזו מידה?",
-      "explanation": "השמטת בסיס ההשוואה - חכמה במה? בדיוק איך?",
+      "suggested_question": "יותר חכמה ממי? במה בדיוק?",
+      "explanation": "השמטת בסיס ההשוואה: יותר ממי, ובמה?",
       "difficulty": "medium",
       "surfaceViolation": {
         "family": "DELETION",
         "subcategory": "comparative_deletion",
         "violation": "Comparative Deletion",
-        "evidenceHe": "היא יותר חכמה ממני",
-        "questionHe": "חכמה יותר בתחום מה? לעומת מי? באיזו מידה?",
-        "explanationHe": "השמטת בסיס ההשוואה - חכמה במה? בדיוק איך?"
+        "evidenceHe": "יותר חכמה",
+        "questionHe": "יותר חכמה ממי? במה בדיוק?",
+        "explanationHe": "השמטת בסיס ההשוואה: יותר ממי, ובמה?"
       },
       "hiddenViolations": [
         {
@@ -349,7 +349,7 @@
           "explanationHe": "ההשוואה נשמעת שלמה, אבל בסיס ההשוואה מסתתר מאחורי המילים."
         }
       ],
-      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"היא יותר חכמה ממני\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"היא פשוט יותר חכמה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
       "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
@@ -385,28 +385,28 @@
     {
       "id": 9,
       "statement": "ידוע שההגבלות הן טבעיות",
-      "category": "DELETION",
-      "subcategory": "lack_referential_index",
-      "violation": "Lack of Referential Index",
-      "suggested_question": "ידוע למי? איזה הגבלות? איך אתה יודע שהן טבעיות?",
-      "explanation": "לא ברור מי או מה הם מדברים עליו",
+      "category": "DISTORTION",
+      "subcategory": "lost_performative",
+      "violation": "Lost Performative",
+      "suggested_question": "ידוע לפי מי? מי קבע שההגבלות טבעיות, ועל סמך מה?",
+      "explanation": "שיפוט שמוצג כעובדה ידועה, בלי לומר מי שופט ולפי איזה קריטריון",
       "difficulty": "medium",
       "surfaceViolation": {
-        "family": "DELETION",
-        "subcategory": "lack_referential_index",
-        "violation": "Lack of Referential Index",
-        "evidenceHe": "ידוע שההגבלות הן טבעיות",
-        "questionHe": "ידוע למי? איזה הגבלות? איך אתה יודע שהן טבעיות?",
-        "explanationHe": "לא ברור מי או מה הם מדברים עליו"
+        "family": "DISTORTION",
+        "subcategory": "lost_performative",
+        "violation": "Lost Performative",
+        "evidenceHe": "ידוע ש",
+        "questionHe": "ידוע לפי מי? מי קבע שההגבלות טבעיות, ועל סמך מה?",
+        "explanationHe": "שיפוט שמוצג כעובדה ידועה, בלי לומר מי שופט ולפי איזה קריטריון"
       },
       "hiddenViolations": [
         {
           "family": "GENERALIZATION",
           "subcategory": "universal_quantifier",
           "violation": "Universal Quantifier",
-          "impliedTextHe": "המקור הלא ברור מתרחב לכולם, תמיד או כל המערכת.",
-          "questionHe": "האם אני הופך מקור עמום לקבוצה שלמה?",
-          "explanationHe": "כאשר לא ברור מי אמר או מי פעל, קל להפוך אדם או שניים לכולם."
+          "impliedTextHe": "ההגבלות טבעיות לכולם, תמיד, בלי יוצא מן הכלל.",
+          "questionHe": "טבעיות לכולם? יש מישהו שההגבלות האלה לא חלות עליו?",
+          "explanationHe": "שיפוט בלי מקור נשמע לעיתים כמו חוק שחל על כולם."
         }
       ],
       "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"ידוע שההגבלות הן טבעיות\" - וזה נכון גם מעבר למה שנאמר בפועל.",
@@ -542,20 +542,20 @@
     },
     {
       "id": 14,
-      "statement": "אני במצב הכי גרוע בצוות",
+      "statement": "אני במצב הכי גרוע",
       "category": "DELETION",
       "subcategory": "comparative_deletion",
       "violation": "Comparative Deletion",
-      "suggested_question": "הכי גרוע לפי איזה מדד? בהשוואה למי בדיוק?",
-      "explanation": "סופרלטיב בלי קריטריון ובלי קבוצת השוואה מוגדרת",
+      "suggested_question": "הכי גרוע לעומת מי? לפי איזה מדד?",
+      "explanation": "סופרלטיב בלי קבוצת השוואה ובלי מדד",
       "difficulty": "medium",
       "surfaceViolation": {
         "family": "DELETION",
         "subcategory": "comparative_deletion",
         "violation": "Comparative Deletion",
-        "evidenceHe": "אני במצב הכי גרוע בצוות",
-        "questionHe": "הכי גרוע לפי איזה מדד? בהשוואה למי בדיוק?",
-        "explanationHe": "סופרלטיב בלי קריטריון ובלי קבוצת השוואה מוגדרת"
+        "evidenceHe": "הכי גרוע",
+        "questionHe": "הכי גרוע לעומת מי? לפי איזה מדד?",
+        "explanationHe": "סופרלטיב בלי קבוצת השוואה ובלי מדד"
       },
       "hiddenViolations": [
         {
@@ -567,7 +567,7 @@
           "explanationHe": "ההשוואה נשמעת שלמה, אבל בסיס ההשוואה מסתתר מאחורי המילים."
         }
       ],
-      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אני במצב הכי גרוע בצוות\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אני במצב הכי גרוע\" - וזה נכון גם מעבר למה שנאמר בפועל.",
       "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
@@ -1542,20 +1542,20 @@
     },
     {
       "id": 46,
-      "statement": "אני הכי איטי בקבוצת הריצה",
+      "statement": "בריצה אני הרבה יותר איטי",
       "category": "DELETION",
       "subcategory": "comparative_deletion",
       "violation": "Comparative Deletion",
-      "suggested_question": "הכי איטי לפי מה - קצב, מרחק, ותק? ולעומת מי שרץ כבר חמש שנים?",
-      "explanation": "סופרלטיב בלי מדד ובלי הקשר מוחק את נקודת הפתיחה השונה של כל אחד",
+      "suggested_question": "יותר איטי ממי? לפי מה: קצב, מרחק, ותק?",
+      "explanation": "השוואה בלי מול מי ובלי מדד מוחקת את נקודת הפתיחה השונה של כל אחד",
       "difficulty": "easy",
       "surfaceViolation": {
         "family": "DELETION",
         "subcategory": "comparative_deletion",
         "violation": "Comparative Deletion",
-        "evidenceHe": "אני הכי איטי בקבוצת הריצה",
-        "questionHe": "הכי איטי לפי מה - קצב, מרחק, ותק? ולעומת מי שרץ כבר חמש שנים?",
-        "explanationHe": "סופרלטיב בלי מדד ובלי הקשר מוחק את נקודת הפתיחה השונה של כל אחד"
+        "evidenceHe": "הרבה יותר איטי",
+        "questionHe": "יותר איטי ממי? לפי מה: קצב, מרחק, ותק?",
+        "explanationHe": "השוואה בלי מול מי ובלי מדד מוחקת את נקודת הפתיחה השונה של כל אחד"
       },
       "hiddenViolations": [
         {
@@ -1567,7 +1567,7 @@
           "explanationHe": "ההשוואה נשמעת שלמה, אבל בסיס ההשוואה מסתתר מאחורי המילים."
         }
       ],
-      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"אני הכי איטי בקבוצת הריצה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
+      "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"בריצה אני הרבה יותר איטי\" - וזה נכון גם מעבר למה שנאמר בפועל.",
       "layeringNoteHe": "השכבה המסתתרת היא קריאה אפשרית: היא לא כתובה במילים, אלא עולה מהטון, מהשלכה או מהפרשנות של המקשיב."
     },
     {
@@ -1603,28 +1603,28 @@
     {
       "id": 48,
       "statement": "כולם יודעים שעכשיו זה זמן רע לקנות דירה",
-      "category": "DELETION",
-      "subcategory": "lack_referential_index",
-      "violation": "Lack of Referential Index",
-      "suggested_question": "מי בדיוק יודע? אילו נתונים? רע למי - לקונה, למשקיע, למוכר?",
-      "explanation": "'כולם יודעים' הופך דעה מתחלפת לעובדה כלכלית",
+      "category": "GENERALIZATION",
+      "subcategory": "universal_quantifier",
+      "violation": "Universal Quantifier",
+      "suggested_question": "כולם? מי בדיוק אמר לך את זה, ולפי אילו נתונים? רע למי?",
+      "explanation": "'כולם יודעים' הופך דעה של חלק מהאנשים לעובדה שאין עליה ויכוח",
       "difficulty": "medium",
       "surfaceViolation": {
-        "family": "DELETION",
-        "subcategory": "lack_referential_index",
-        "violation": "Lack of Referential Index",
-        "evidenceHe": "כולם יודעים שעכשיו זה זמן רע לקנות דירה",
-        "questionHe": "מי בדיוק יודע? אילו נתונים? רע למי - לקונה, למשקיע, למוכר?",
-        "explanationHe": "'כולם יודעים' הופך דעה מתחלפת לעובדה כלכלית"
+        "family": "GENERALIZATION",
+        "subcategory": "universal_quantifier",
+        "violation": "Universal Quantifier",
+        "evidenceHe": "כולם יודעים",
+        "questionHe": "כולם? מי בדיוק אמר לך את זה, ולפי אילו נתונים? רע למי?",
+        "explanationHe": "'כולם יודעים' הופך דעה של חלק מהאנשים לעובדה שאין עליה ויכוח"
       },
       "hiddenViolations": [
         {
-          "family": "GENERALIZATION",
-          "subcategory": "universal_quantifier",
-          "violation": "Universal Quantifier",
-          "impliedTextHe": "המקור הלא ברור מתרחב לכולם, תמיד או כל המערכת.",
-          "questionHe": "האם אני הופך מקור עמום לקבוצה שלמה?",
-          "explanationHe": "כאשר לא ברור מי אמר או מי פעל, קל להפוך אדם או שניים לכולם."
+          "family": "DISTORTION",
+          "subcategory": "lost_performative",
+          "violation": "Lost Performative",
+          "impliedTextHe": "הקביעה מוצגת כעובדה, בלי לומר מי קבע אותה ועל סמך מה.",
+          "questionHe": "מי קבע שזה זמן רע, ולפי אילו נתונים?",
+          "explanationHe": "'כולם יודעים' מסתיר את מקור השיפוט מאחורי קבוצה עמומה."
         }
       ],
       "impliedFullTextHe": "המשפט המלא כאילו מוסיף: \"כולם יודעים שעכשיו זה זמן רע לקנות דירה\" - וזה נכון גם מעבר למה שנאמר בפועל.",
