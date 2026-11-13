@@ -74,7 +74,7 @@
         }),
         Object.freeze({
             id: 'scenario-trainer',
-            titleHe: '$1תמונות מחיי היום',
+            titleHe: 'תמונות מחיי היום',
             descHe: 'סימולציית שיחה מלאה במסלול עצמאי: בחירה, תוצאה ולמידה מכל מהלך.',
             route: '/scenario_trainer.html',
             tab: '',
