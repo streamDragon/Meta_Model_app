@@ -35,7 +35,13 @@ function MiniScene({ scene }: { scene: Scene }): ReactElement {
 const ENDING_QUESTION: QuestionId[] = ['goal-sense', 'compare', 'smart', 'state', 'sequence-check'];
 const MAX_VISIBLE_TURNS = 1;
 
-function SceneStack({ session, onMove, onProbe }: { session: Session; onMove: (id: SceneId, dir: -1 | 1) => void; onProbe: (id: SceneId, kind: ProbeKind) => void }) {
+type InlineProbe = { scene: SceneId; kind: ProbeKind; answer: string; direction: string; turnId: number };
+function SceneStack({ session, onMove, onProbe, inlineProbe }: {
+  session: Session;
+  onMove: (id: SceneId, dir: -1 | 1) => void;
+  onProbe: (id: SceneId, kind: ProbeKind) => void;
+  inlineProbe: InlineProbe | null;
+}) {
   const summary = summarizeSession(session);
   return <section className="clinic-panel" aria-labelledby="clinic-discoveries">
     <div className="clinic-heading-line">
@@ -63,6 +69,11 @@ function SceneStack({ session, onMove, onProbe }: { session: Session; onMove: (i
                 {(Object.entries(session.probes[id] ?? {}) as [ProbeKind, string][]).map(([kind, status]) => <span key={kind} className={`clinic-probe-status state-${status}`}>
                   {kind === 'imagine' ? 'דמיון' : kind === 'comfort' ? 'נוחות' : 'ביצוע'}: {status === 'ready' ? 'אפשרי' : status === 'blocked' ? 'חסום' : 'לא ברור'}
                 </span>)}
+              </div>}
+              {inlineProbe?.scene === id && <div className="clinic-probe-inline" role="status" data-testid="clinic-inline-probe">
+                <strong>🧔🏻 איתן: {inlineProbe.kind === 'imagine' ? 'אני רואה...' : inlineProbe.kind === 'comfort' ? 'כך זה מרגיש...' : 'לגבי הביצוע...'}</strong>
+                <p>{inlineProbe.answer}</p>
+                <span>כיוון אפשרי: {inlineProbe.direction}</span>
               </div>}
               {scene.kind === 'spine' && <div className="clinic-reorder" aria-label={`סדר קלף: ${scene.title}`}>
                 <button type="button" aria-label={`הזז את ${scene.title} אחורה`} onClick={() => onMove(id, -1)}>→</button>
@@ -103,8 +114,10 @@ export function GForceClinicPage() {
   const [family, setFamily] = useState<Family | 'suggestions'>('suggestions');
   const [showAllTurns, setShowAllTurns] = useState(false);
   const latestAnswerRef = useRef<HTMLDivElement | null>(null);
+  const lastInteraction = useRef<'question' | 'probe' | 'undo'>('question');
+  const [previousSession, setPreviousSession] = useState<Session | null>(null);
+  const [inlineProbe, setInlineProbe] = useState<InlineProbe | null>(null);
   const [showWhy, setShowWhy] = useState(false);
-  const [probeFeedback, setProbeFeedback] = useState('');
 
   const suggestions = suggestedQuestions(session);
   const selectedQuestions = family === 'suggestions' ? suggestions : QUESTIONS.filter(q => q.family === family);
@@ -113,20 +126,41 @@ export function GForceClinicPage() {
 
   // Keep the new reply in view, with next choices BELOW it. No scrolling back up.
   useEffect(() => {
-    if (!latestTurn) return;
+    if (!latestTurn || lastInteraction.current !== 'question') return;
     latestAnswerRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   }, [latestTurn?.id]);
 
   function answer(id: QuestionId) {
-    setSession(previous => ask(previous, id));
-    setProbeFeedback('');
+    lastInteraction.current = 'question';
+    setPreviousSession(session);
+    setSession(ask(session, id));
+    setInlineProbe(null);
     setShowWhy(false);
   }
 
   function checkScene(id: SceneId, kind: ProbeKind) {
+    lastInteraction.current = 'probe';
     const result = probeScene(session, id, kind);
+    if (result.session !== session) setPreviousSession(session);
     setSession(result.session);
-    setProbeFeedback(`${SCENES[id].title}: ${result.direction}`);
+    setInlineProbe({ scene: id, kind, answer: result.answer, direction: result.direction, turnId: result.session.turns.length });
+  }
+
+  function reorder(id: SceneId, direction: -1 | 1) {
+    lastInteraction.current = 'probe';
+    const next = moveScene(session, id, direction);
+    if (next !== session) setPreviousSession(session);
+    setSession(next);
+    setInlineProbe(null);
+  }
+
+  function undo() {
+    if (!previousSession) return;
+    lastInteraction.current = 'undo';
+    setSession(previousSession);
+    setPreviousSession(null);
+    setInlineProbe(null);
+    setShowAllTurns(false);
   }
 
   function reset() {
@@ -135,7 +169,9 @@ export function GForceClinicPage() {
     setFamily('suggestions');
     setShowAllTurns(false);
     setShowWhy(false);
-    setProbeFeedback('');
+    setPreviousSession(null);
+    setInlineProbe(null);
+    lastInteraction.current = 'question';
   }
 
   if (!started) return <div className="clinic-page" dir="rtl">
@@ -146,7 +182,10 @@ export function GForceClinicPage() {
   return <div className="clinic-page" dir="rtl">
     <header className="clinic-header">
       <div><span className="clinic-kicker">מקרה בדיוני · סימולציה ללא API</span><h2>🧩 הקליניקה: לגלות את המפה</h2></div>
-      <button className="clinic-textbutton" type="button" onClick={reset}>התחל מקרה מחדש</button>
+      <div className="clinic-session-controls">
+        {previousSession && <button className="clinic-undo" type="button" onClick={undo}>↶ בטל את הפעולה האחרונה</button>}
+        <button className="clinic-textbutton" type="button" onClick={reset}>התחל מקרה מחדש</button>
+      </div>
     </header>
     <ClinicStatusRail session={session} onAsk={answer} />
     <div className="clinic-layout">
@@ -187,8 +226,7 @@ export function GForceClinicPage() {
             <p>השאלות נבדלות במה שהן מחפשות: חוויה חושית, רצף בזמן, מקור מחסום, מטרה, ערכים או יחסים. לפעמים כדאי להתעכב על נושא צדדי כדי לשמור על הקשר, ולפעמים כדאי לחזור למטרה.</p>
           </details>
         </section>
-        <SceneStack session={session} onMove={(id, dir) => setSession(previous => moveScene(previous, id, dir))} onProbe={checkScene} />
-        {probeFeedback && <p className="clinic-probe-feedback" role="status">{probeFeedback}</p>}
+        <SceneStack session={session} onMove={reorder} onProbe={checkScene} inlineProbe={inlineProbe} />
       </div>
       <aside className="clinic-sidebar clinic-summary-sidebar" aria-label="סיום השיחה">
         {session.turns.length >= 4 && <section className="clinic-panel clinic-exit">
