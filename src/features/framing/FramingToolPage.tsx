@@ -41,6 +41,7 @@ export function FramingToolPage() {
   const selectedDiscovery = FRAME_DISCOVERIES.find((item) => item.id === selectedItem);
   const selectedSave = map.find((item) => item.id === selectedItem);
   const percent = Math.round(100 * map.length / FRAME_DISCOVERIES.length);
+  const complete = map.length === FRAME_DISCOVERIES.length;
   const [mapMode, setMapMode] = useState<"diagram" | "details">("diagram");
 
   const reset = (nextTopic: TopicKind) => {
@@ -64,11 +65,20 @@ export function FramingToolPage() {
 
   const store = (confidence: number | null) => {
     if (!activePending) return;
-    setMap((prev) => [...prev.filter((item) => item.id !== activePending.id), { id: activePending.id, certainty: confidence }]);
+    const nextMap = [...map.filter((item) => item.id !== activePending.id), { id: activePending.id, certainty: confidence }];
+    setMap(nextMap);
     setPending(null);
     setCertaintyAsked(false);
     setSelectedItem(activePending.id);
     setQuestionIndex((prev) => prev + 1);
+    // Auto-advance: when this zone is finished, move on to the next zone that still has hidden parts.
+    const isOpen = (area: FrameArea) => FRAME_DISCOVERIES.some((item) => item.area === area && !nextMap.some((saved) => saved.id === item.id));
+    if (!isOpen(activeArea)) {
+      const order = FRAME_AREAS.map((area) => area.id);
+      const start = order.indexOf(activeArea);
+      const next = [...order.slice(start + 1), ...order.slice(0, start)].find(isOpen);
+      if (next) { setActiveArea(next); setQuestionIndex(0); }
+    }
   };
 
   const sayItDifferently = () => setQuestionIndex((index) => index + 1);
@@ -132,13 +142,13 @@ export function FramingToolPage() {
           <button onClick={() => setShowMap((value) => !value)} aria-expanded={showMap}>{showMap ? 'סגור מפה' : 'פתח מפה'} ◎</button>
         </div>
         <div className="ft-progress" role="progressbar" aria-label="חלקים שנחשפו" aria-valuenow={map.length} aria-valuemax={FRAME_DISCOVERIES.length}><span style={{ width: `${percent}%` }} /></div>
-        <div className="ft-area-grid">
+        {!showMap && <div className="ft-area-grid">
           {groupSummary.map((area) => (
             <button type="button" key={area.id} aria-pressed={activeArea === area.id} className={`ft-area ${activeArea === area.id ? 'ft-active' : ''}`} onClick={() => changeArea(area.id)}>
               <span className="ft-area-icon">{area.icon}</span><strong>{area.label}</strong><small>{area.collected}/{area.available}</small>
             </button>
           ))}
-        </div>
+        </div>}
         {showMap && (
           <div className="ft-full-map" aria-label="המפה הנוכחית">
             <div className="ft-map-modes" role="group" aria-label="תצוגת מפה">
@@ -150,10 +160,10 @@ export function FramingToolPage() {
                 <div className="ft-diagram-topic"><span>הנושא</span><strong>{FRAME_TOPIC[topic].label}</strong></div>
                 <div className="ft-diagram-areas">
                   {groupSummary.map((area) => (
-                    <button key={area.id} onClick={() => { changeArea(area.id); setShowMap(true); }} className={area.collected ? 'ft-diagram-area ft-discovered' : 'ft-diagram-area'} aria-label={area.label + ' - ' + area.collected + ' פריטים'}>
+                    <button key={area.id} onClick={() => { changeArea(area.id); setShowMap(true); }} aria-pressed={activeArea === area.id} className={`ft-diagram-area${area.collected ? ' ft-discovered' : ''}${activeArea === area.id ? ' ft-active' : ''}`} aria-label={area.label + ' - ' + area.collected + ' פריטים'}>
                       <span>{area.icon}</span>
                       <strong>{area.label}</strong>
-                      <small>{area.collected ? `${area.collected} נחשפו` : 'עדיין מוסתר'}</small>
+                      <small>{area.collected ? `${area.collected}/${area.available} נחשפו` : 'עדיין מוסתר'}</small>
                       {answered.filter((item) => item.area === area.id).slice(0, 2).map((item) => (
                         <em key={item.id}>{item.mapText}</em>
                       ))}
@@ -177,7 +187,7 @@ export function FramingToolPage() {
 
       <section className="ft-workout" aria-live="polite">
         <div className="ft-workout-header">
-          <div><span className="ft-kicker">{FRAME_AREAS.find((x) => x.id === activeArea)?.label}</span><h3>{candidate ? candidate.category : 'האזור הושלם'}</h3></div>
+          <div><span className="ft-kicker">{FRAME_AREAS.find((x) => x.id === activeArea)?.label}</span><h3>{candidate ? candidate.category : complete ? 'המפה הושלמה' : 'האזור הושלם'}</h3></div>
           <button onClick={sayItDifferently} disabled={!candidate || Boolean(pending)}>↻ ניסוח אחר</button>
         </div>
         {!pending && candidate && (
@@ -186,7 +196,22 @@ export function FramingToolPage() {
             <div className="ft-actions"><button className="ft-primary" onClick={ask}>שאל שאלה</button><button className="ft-secondary" onClick={() => setShowMap(true)}>◎ מפה</button></div>
           </>
         )}
-        {!pending && !candidate && <p>כל החלקים באזור זה נחשפו. בחר אזור נוסף במפה.</p>}
+        {!pending && !candidate && !complete && <p>כל החלקים באזור זה נחשפו. בחר אזור נוסף במפה.</p>}
+        {!pending && complete && (
+          <div className="ft-summary" aria-label="סיכום המפה">
+            <strong>גילית את כל {FRAME_DISCOVERIES.length} חלקי המפה בנושא {FRAME_TOPIC[topic].label}</strong>
+            <ul>
+              {groupSummary.map((area) => (
+                <li key={area.id}><span>{area.icon} {area.label}</span>{answered.filter((item) => item.area === area.id).map((item) => item.mapText).join(' · ')}</li>
+              ))}
+            </ul>
+            <p>עכשיו, כשהמפה ברורה, אפשר לתרגל שאלות מטה־מודל בשיחה.</p>
+            <div className="ft-actions">
+              <a className="ft-primary" href="#conversation">המשך לאימון שיחה ←</a>
+              <button className="ft-secondary" onClick={copyMap}>העתק את המפה</button>
+            </div>
+          </div>
+        )}
         {activePending && (
           <div className="ft-response">
             <span>תשובת הדובר בדוגמה</span>
