@@ -77,13 +77,15 @@ interface BadgeRule {
   condition: (p: UserProgress) => boolean;
 }
 
+// Badge ids are stored in users' progress; keep ids stable and change names only.
+// XP is earned by any practice, so names stay neutral and no two badges share a threshold.
 const BADGE_RULES: BadgeRule[] = [
-  { id: 'first_thought_map', name: 'מפת מחשבה ראשונה', icon: '🗺️', condition: (p) => p.xp >= 10 },
+  { id: 'first_thought_map', name: 'יוצאים לדרך', icon: '🗺️', condition: (p) => p.xp >= 12 },
   { id: 'reality_checker', name: 'בודק מציאות', icon: '🔎', condition: (p) => p.xp >= 35 },
   { id: 'generalization_breaker', name: 'שובר הכללות', icon: '🧩', condition: (p) => p.xp >= 60 },
   { id: 'belief_architect', name: 'אדריכל אמונות', icon: '🏗️', condition: (p) => p.xp >= 90 },
-  { id: 'action_before_mood', name: 'פעולה לפני חשק', icon: '▶️', condition: (p) => p.xp >= 120 },
-  { id: 'ten_small_experiments', name: '10 ניסויים קטנים', icon: '🧪', condition: (p) => p.sessions >= 10 && p.xp >= 150 },
+  { id: 'action_before_mood', name: 'מתאמן קבוע', icon: '▶️', condition: (p) => p.xp >= 120 },
+  { id: 'ten_small_experiments', name: '10 אימונים מעמיקים', icon: '🧪', condition: (p) => p.sessions >= 10 && p.xp >= 150 },
   { id: 'first_step', name: 'צעד ראשון', icon: '👣', condition: (p) => p.xp >= 10 },
   { id: 'fire_10', name: 'להט 🔥', icon: '🔥', condition: (p) => p.streak >= 10 },
   { id: 'xp_100', name: '100 XP', icon: '⭐', condition: (p) => p.xp >= 100 },

@@ -21,9 +21,15 @@ describe('applyXP', () => {
 
   it('does not award the same badge twice', () => {
     const first = applyXP(emptyProgress(), 10, DAY1);
-    const second = applyXP(first.progress, 10, DAY1);
+    // 1 XP more crosses no other threshold, so only a repeat could be awarded.
+    const second = applyXP(first.progress, 1, DAY1);
     expect(second.newBadges).toHaveLength(0);
     expect(second.progress.badges).toHaveLength(first.progress.badges.length);
+  });
+
+  it('never awards two badges for the same first step', () => {
+    const { newBadges } = applyXP(emptyProgress(), 10, DAY1);
+    expect(newBadges).toHaveLength(1);
   });
 
   it('awards the 100 XP badge when crossing the threshold', () => {
