@@ -16,7 +16,7 @@
             if (/_trainer\.html$/i.test(pathname.split('/').pop() || '')) {
                 return true;
             }
-            return /\/worksheets\/verb-unzip\/?$/.test(pathname) || /\/lab\/context-radar\/?$/.test(pathname);
+            return /\/worksheets\/verb-unzip(?:\/|\/index\.html)?$/.test(pathname) || /\/lab\/context-radar(?:\/|\/index\.html)?$/.test(pathname);
         } catch (e) {
             return false;
         }
@@ -27,7 +27,9 @@
             var rawPath = String(path || '');
             var pathname = String(location.pathname || '').toLowerCase();
             if (rawPath && !/^(?:[a-z][a-z0-9+.-]*:|\/\/|\.{1,2}\/|\/)/i.test(rawPath)) {
-                if (/\/worksheets\/verb-unzip(?:\/index\.html)?$/i.test(pathname) || /\/lab\/context-radar(?:\/index\.html)?$/i.test(pathname)) {
+                // Nested pages live two folders deep; accept the folder URL with or without
+                // a trailing slash and the explicit index.html so shared assets resolve from the root.
+                if (/\/worksheets\/verb-unzip(?:\/|\/index\.html)?$/i.test(pathname) || /\/lab\/context-radar(?:\/|\/index\.html)?$/i.test(pathname)) {
                     rawPath = '../../' + rawPath;
                 }
             }
