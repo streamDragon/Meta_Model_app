@@ -4,7 +4,8 @@ import type { ConversationOption, ConversationScenario } from '../../data/conver
 import { getConversationPresentation } from '../../data/conversationPresentation';
 import { getConversationDecisionPath, type ConversationPathChoice } from '../../data/conversationDecisionPaths';
 import { recommendScenario, type ConversationResult } from '../../lib/conversationLearning';
-import { applyConversationMove, applyRepair, connectionDescription, illustratedEmotion, STARTING_CONNECTION } from '../../lib/conversationMomentum';
+import { applyConversationMove, applyRepairChoice, connectionDescription, illustratedEmotion, STARTING_CONNECTION } from '../../lib/conversationMomentum';
+import { getConversationRepair, type RepairResponse } from '../../data/conversationRepair';
 import { useConversationLearning } from '../../store/conversationLearning';
 import { useProgress } from '../../store/useProgress';
 import { shuffle } from '../../lib/random';
@@ -46,6 +47,8 @@ export function ConversationGymPage() {
   const [connection, setConnection] = useState(STARTING_CONNECTION);
   const [history, setHistory] = useState<number[]>([STARTING_CONNECTION]);
   const [repaired, setRepaired] = useState(false);
+  const [repairOpen, setRepairOpen] = useState(false);
+  const [repairChoice, setRepairChoice] = useState<RepairResponse | null>(null);
   const [done, setDone] = useState(false);
   const [earned, setEarned] = useState(0);
   const [moves, setMoves] = useState<MoveRecap[]>([]);
@@ -86,6 +89,8 @@ export function ConversationGymPage() {
     setConnection(STARTING_CONNECTION);
     setHistory([STARTING_CONNECTION]);
     setRepaired(false);
+    setRepairOpen(false);
+    setRepairChoice(null);
     setEarned(0);
     setMoves([]);
     setDone(false);
@@ -114,14 +119,18 @@ export function ConversationGymPage() {
     setConnection(nextScore);
     setHistory((old) => [...old, nextScore]);
     setRepaired(false);
+    setRepairOpen(false);
+    setRepairChoice(null);
     setShowActions(false);
   };
 
-  const repair = () => {
-    if (!selected || repaired) return;
-    const nextScore = applyRepair(connection);
+  const repair = (response: RepairResponse) => {
+    if (!selected || repaired || !repairOpen) return;
+    const nextScore = applyRepairChoice(connection, response.quality);
     setConnection(nextScore);
     setHistory((old) => [...old, nextScore]);
+    setRepairChoice(response);
+    setRepairOpen(false);
     setRepaired(true);
   };
 
@@ -138,6 +147,8 @@ export function ConversationGymPage() {
     setSelected(null);
     setFirst(null);
     setRepaired(false);
+    setRepairOpen(false);
+    setRepairChoice(null);
     if (turnIndex + 1 === scenario.turns.length) {
       const result = complete({ id: sessionId.current, scenarioId: scenario.id, completedAt: Date.now(), results: nextResults, transfer: 'planned' });
       if (result.recorded) { addXP(result.xp); recordSession(); }
@@ -196,6 +207,8 @@ export function ConversationGymPage() {
   const emotion = selected ? illustratedEmotion(selected.quality) : null;
   const lastText = selected?.reply;
   const detailedExplanation = moment?.theory.detail ?? scenario.principle;
+  const repairMoment = getConversationRepair(scenario.id, turnIndex);
+  const illustratedRepairEmotion = repairChoice ? illustratedEmotion(repairChoice.quality) : null;
 
   return (
     <div className="learning-page conversation-gym therapist-workout" dir="rtl">
@@ -229,8 +242,9 @@ export function ConversationGymPage() {
             <section className="therapist-client" aria-label="מה האדם אומר">
               <span className="conversation-speaker-label">💬 האדם שמולך</span>
               <blockquote className="conversation-spoken">{speakerLine}</blockquote>
-              {selected && <div className="therapist-emotion" aria-live="polite"><span>{emotion?.icon}</span><strong>{emotion?.label}</strong><small>תגובה אפשרית בסימולציה</small></div>}
+              {selected && <div className="therapist-emotion" aria-live="polite"><span>{illustratedRepairEmotion?.icon ?? emotion?.icon}</span><strong>{illustratedRepairEmotion?.label ?? emotion?.label}</strong><small>תגובה אפשרית בסימולציה</small></div>}
               {selected && <blockquote className="therapist-client-reply">{lastText}</blockquote>}
+              {repairChoice && <div className="therapist-repair-exchange" aria-live="polite"><p><strong>ניסית לתקן:</strong> {repairChoice.text}</p><blockquote>{repairChoice.reply}</blockquote></div>}
             </section>
           )}
           {!done && (
@@ -255,8 +269,18 @@ export function ConversationGymPage() {
               <strong>{selected.quality === 'helpful' ? 'מהלך מתאים להקשר' : selected.quality === 'mixed' ? 'מהלך שאפשר לדייק' : 'המהלך הרחיק מעט'}</strong>
               <p>{selected.feedback}</p>
               {moment && <details className="therapist-lesson"><summary>📘 {moment.theory.title}</summary><p>{detailedExplanation}</p></details>}
-              {selected.quality !== 'helpful' && !repaired && <button type="button" className="therapist-repair" onClick={repair}>↺ תיקון הקשר</button>}
-              {repaired && <p className="therapist-repair-confirmation">↗ תיקון אפשרי: להכיר בפער ולבדוק מה האדם צריך עכשיו. המד מתאושש, והמהלך הקודם עדיין נלמד.</p>}
+              {selected.quality !== 'helpful' && !repaired && repairMoment && (
+                <>
+                  <button type="button" className="therapist-repair" aria-expanded={repairOpen} onClick={() => setRepairOpen((old) => !old)}>↺ נסה לתקן</button>
+                  {repairOpen && (
+                    <div className="therapist-repair-choices" role="group" aria-label="בחר משפט תיקון">
+                      <h4>{repairMoment.prompt}</h4>
+                      {repairMoment.choices.map((response) => <button type="button" key={response.id} onClick={() => repair(response)}>{response.text}</button>)}
+                    </div>
+                  )}
+                </>
+              )}
+              {repaired && repairChoice && <p className="therapist-repair-confirmation">{repairChoice.feedback} {repairChoice.quality === 'helpful' ? 'תיקון כזה יכול לעזור לקשר להתאושש.' : 'גם ניסיון תיקון לא מבטיח שיפור. אפשר להמשיך ללמוד מהתגובה.'} המהלך הראשון עדיין נשמר במעקב.</p>}
               <button className="btn btn-primary" type="button" onClick={next}>{turnIndex + 1 === scenario.turns.length ? 'סיים את האימון' : 'המשך השיחה'}</button>
             </section>
           )}
