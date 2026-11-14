@@ -6,6 +6,13 @@ import { CoachCrashGym } from './CoachCrashGym';
 afterEach(cleanup);
 
 describe('COACH / CRASH embodied trainer', () => {
+  it('explains how COACH and CRASH relate without promising happiness or diagnosing five isolated states', () => {
+    render(<CoachCrashGym />);
+    fireEvent.click(screen.getByText('לפני שמתרגלים: מה פירוש COACH ו־CRASH?'));
+    expect(screen.getByText(/אפשר להרגיש גם כעס או עלבון/)).toBeTruthy();
+    expect(screen.getByText(/יכולים להיות כמה רכיבים יחד/)).toBeTruthy();
+  });
+
   it('starts with observation, and keeps later steps gated', () => {
     render(<CoachCrashGym />);
     expect(screen.getByText('סטודיו תנוחה')).toBeTruthy();
