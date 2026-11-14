@@ -8,13 +8,23 @@ The course owner shared five video recordings, also provided in Drive as MP3 aud
 
 | Lesson | Title | Verification |
 |---|---|---|
-| A | חלק א׳ הסבר | Original MP3 and video located; transcript verification pending |
+| A | חלק א׳ הסבר | Automatic Hebrew transcript with timestamps found in Drive (11 Nov 2026); reviewed for high-level conceptual claims, **not** line-by-line audio verification |
 | B | חלק ב׳ תרגיל | Hebrew source transcript inspected, with timestamps |
-| C | חלק ג׳ דיון | Original MP3 and video located; transcript verification pending |
+| C | חלק ג׳ דיון | Original audio found; a Google Doc titled as transcript exists but is empty; audio verification pending |
 | D | חלק ד׳ מנטרות הכנסת אורחים | Hebrew source transcript inspected, with timestamps |
 | E | חלק ה׳ תרגיל בדמיון מודרך | Hebrew source transcript inspected, with timestamps |
 
-**Do not report lessons A and C as verified** until their audio has been reviewed. A transcription provider's current quota prevented transcribing the two longer recordings; this is a technical limitation, not evidence that the lessons do not exist.
+**Do not report lessons A and C as fully audio-verified.** An existing unproofread automatic transcript of A permits provisional conceptual alignment. C has no usable transcript yet. A transcription provider's quota prevented further processing; this is a technical limitation.
+
+## Source-based conceptual findings from lesson A (provisional transcription)
+
+- **A ~07:53–12:10**: COACH openness includes listening, receiving and direct expression; openness does not require agreement or abandoning boundaries.
+- **A ~20:20–22:25**: The CRASH components can appear together; separating them in the UI is an educational device, not five independently diagnosed disorders.
+- **A ~26:50–27:38**: Centering/grounding is focused relaxation with alertness, not collapsing or falling asleep.
+- **A ~29:54–31:12**: Holding includes staying with oneself or another through anger, pain and sadness without requiring immediate emotional relief.
+- **A ~32:52–33:25**: COACH is not equivalent to compulsory happiness. It can include anger while retaining centered, connected, aware and holding capacities.
+
+Transcript source: Google Doc `1XHp-nEcGV_QrOJhqwFPm0QRQ9XEAg6YH4Y78Bee2r8k` (dated 11 Nov 2026). It explicitly warns of Whisper errors and unverified words. Treat timestamps as approximate until checked against audio.
 
 ## Verified teaching sequence
 
@@ -45,6 +55,7 @@ The course owner shared five video recordings, also provided in Drive as MP3 aud
 - [x] Clarify what is source content versus an application extension.
 - [x] Keep short holding label while exposing expanded synonyms.
 - [x] Provide an explicit next-movement action.
-- [ ] Verify full lesson A before claiming completeness.
-- [ ] Verify full lesson C before claiming completeness.
+- [x] Read and apply provisional transcript insights from lesson A, preserving the transcription uncertainty.
+- [ ] Verify full lesson A audio before claiming completeness.
+- [ ] Transcribe and verify full lesson C; an existing Google Doc with that title is empty.
 - [ ] Check mobile render manually on a real phone.
