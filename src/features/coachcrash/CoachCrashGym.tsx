@@ -63,14 +63,14 @@ const AXES: Axis[] = [
 const CONCEPTS = [
   {
     english: 'Centered', near: 'יציבות · עיגון · בסיס',
-    meaning: 'מרכוז הוא היכולת למצוא נקודת ייחוס בגוף ולהישאר איתה גם כשלא הכול רגוע.',
+    meaning: 'מרכוז וקרקוע מתוארים בשיעור כהרפיה ממוקדת: להיות יציב, ער וקשוב, ולא לקרוס או להירדם. (חלק א׳, בערך 26:50–27:38)',
     nuance: 'לא מוכרחים לעמוד זקוף או להפסיק להרגיש פחד. מחפשים תנועה קטנה שמחזירה בחירה.',
     question: 'איפה אפשר לחוש תמיכה, אפילו באחוז אחד יותר?',
   },
   {
-    english: 'Open', near: 'גמישות · מרחב · אפשרויות',
-    meaning: 'פתיחות מאפשרת לקלוט אפשרויות לפני שקופצים לתגובה מוכרת.',
-    nuance: 'פתיחות אינה הסכמה לכל דבר, חשיפה מוגזמת או ויתור על גבול.',
+    english: 'Open', near: 'פתיחות · הקשבה · ישירות',
+    meaning: 'פתיחות היא היכולת גם להקשיב ולקבל דברים מן האחר וגם להתבטא בישירות, בלי להיגרר לתגובה אוטומטית. (חלק א׳, בערך 07:53–12:10)',
+    nuance: 'פתיחות אינה הסכמה לכל דבר. אפשר להיות קשוב לאחר ולהביע עמדה עצמאית. (חלק א׳, בערך 11:15–12:10)',
     question: 'מה אני מוכן/ה לשים לב אליו, בלי להתחייב להסכים איתו?',
   },
   {
@@ -81,13 +81,13 @@ const CONCEPTS = [
   },
   {
     english: 'Connected', near: 'קשר · שייכות · משאבים',
-    meaning: 'חיבור הוא מגע עם עצמי, עם אנשים או עם משאבים שיכולים לתמוך בי.',
+    meaning: 'חיבור הוא יצירת קשר עם עצמי, עם אנשים ועם המשאבים הזמינים לי, בלי לבלבל קשר עם ביטול של נפרדות בריאה. (חלק א׳, בערך 16:25–18:10 ו־30:46–31:12)',
     nuance: 'אפשר להיות מחובר/ת גם כשצריך מרחק פיזי או רגשי. חיבור אינו ביטול עצמי.',
     question: 'איזה קשר או זיכרון תומך זמין לי כרגע?',
   },
   {
     english: 'Holding', near: 'החזקה · הכלה · נוכחות',
-    meaning: 'החזקה היא האפשרות לתת מקום לחוויה, בלי למהר להילחם בה או לציית לה.',
+    meaning: 'החזקה היא היכולת להיות עם עצמי או עם האחר גם כשיש כעס, עצב או כאב, ולקבל את החוויה בלי להיבהל ממנה. (חלק א׳, בערך 29:54–31:12)',
     nuance: 'להחזיק רגש אינו להסכים לפגיעה, להישאר במצב מסוכן או לסבול בכוח.',
     question: 'מה יאפשר לי לתת לחוויה מקום מוגבל ובטוח?',
   },
@@ -253,6 +253,16 @@ export function CoachCrashGym() {
         <div className="cc-header-mark" aria-hidden="true">◉</div>
       </header>
 
+      <details className="cc-concept-details">
+        <summary>לפני שמתרגלים: מה פירוש COACH ו־CRASH?</summary>
+        <div className="cc-concept-body">
+          <p><strong>לא מדד של טוב ורע:</strong> COACH הוא מצב שמאפשר לפעול, להקשיב ולהיות עם החוויה. אפשר להרגיש גם כעס או עלבון, ולא חייבים להיות שמחים. (חלק א׳, בערך 32:52–33:25)</p>
+          <p><strong>לא חמישה מצבים נפרדים:</strong> בכיווץ, בתגובתיות, בשיתוק מחשיבה, בניתוק ובעוינות יכולים להיות כמה רכיבים יחד. בתרגול בוחרים רכיב אחד רק כדי ללמוד את התנועה. (חלק א׳, בערך 20:20–22:25)</p>
+          <p><strong>לא הכול או כלום:</strong> אין צורך להעלים רגש. מחפשים תנועה קטנה שמאפשרת יותר מרכוז, פתיחות, מודעות, חיבור והחזקה.</p>
+          <small>המקור להסברים כאן הוא תמלול אוטומטי של שיעור א׳, שעוד דורש הגהה מול ההקלטה; זמני השיעור מקורבים.</small>
+        </div>
+      </details>
+
       <div className="cc-flow" aria-label="שלבי האימון">
         <button type="button" className={phase === 'identify' ? 'cc-flow-active' : ''} onClick={() => setPhase('identify')}><span>01</span> מזהים</button>
         <button type="button" disabled={!observed} className={phase === 'practice' ? 'cc-flow-active' : ''} onClick={() => setPhase('practice')}><span>02</span> מתרגלים</button>
@@ -260,7 +270,7 @@ export function CoachCrashGym() {
       </div>
 
       <section className="cc-axis-section" aria-label="בחירת רכיב לתרגול">
-        <div className="cc-section-head"><h3>רצף התנועות מהשיעור</h3><span>עוברים לפי הסדר, או בוחרים תנועה מסוימת.</span></div>
+        <div className="cc-section-head"><h3>רצף התנועות מהשיעור</h3><span>חמשת הרכיבים יכולים להופיע יחד. בוחרים אחד כדי לתרגל, או עוברים לפי הסדר.</span></div>
         <div className="cc-axis-tabs">
           {AXES.map((item, index) => (
             <button key={item.key} type="button" className={axisIndex === index ? 'cc-axis-active' : ''}
@@ -303,8 +313,8 @@ export function CoachCrashGym() {
               <span className="cc-eyebrow">שלב 1 · להבחין בלי לשפוט</span>
               <h3>מ־{axis.crash} אל {axis.coach}</h3>
               <div className="cc-contrast">
-                <div><small>CRASH · מתי זה קורה?</small><strong>{axis.crash}</strong><p>{axis.signal}</p></div>
-                <div><small>COACH · מה מתרגלים?</small><strong>{axis.coach}</strong><p>{axis.outside}</p></div>
+                <div><small>CRASH · רכיב לדוגמה</small><strong>{axis.crash}</strong><p>{axis.signal}</p></div>
+                <div><small>COACH · תנועת מעבר</small><strong>{axis.coach}</strong><p>{axis.outside}</p></div>
               </div>
               <p className="cc-guidance">נסו לשנות את הדמות למנח שממחיש את {axis.crash}. אילו סימנים אפשר לראות, ומה נשאר חוויה פנימית שלא ניתן להסיק מבחוץ?</p>
               <details className="cc-concept-details"><summary>מה זה {axis.coach}? מילים קשורות</summary>
