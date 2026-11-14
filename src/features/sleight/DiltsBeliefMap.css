@@ -85,3 +85,134 @@
  .som-map-dialog .som-diagram-paper { padding:.6rem .3rem; }
 }
 @media (prefers-reduced-motion:reduce) { .som-diagram-node { transition:none; } }
+
+/* Readable mobile flowchart enhancements. The diagram retains its own spatial grammar. */
+.som-diagram-head {
+  position: relative;
+  display: grid;
+  justify-items: stretch;
+  gap: .45rem;
+  margin: 0 auto .12rem;
+  width: min(100%, 680px);
+  padding: 0 .5rem;
+}
+.som-diagram-tag {
+  position: static;
+  transform: none;
+  justify-self: start;
+  font-size: .77rem;
+  padding: .3rem .65rem;
+  line-height: 1.2;
+  border-radius: .25rem;
+  z-index: 0;
+}
+.som-diagram-belief {
+  width: 100%;
+  padding: .76rem 1rem;
+  box-shadow: 2px 3px 0 rgba(40,34,65,.1);
+}
+.som-diagram-belief strong { overflow-wrap: anywhere; }
+.som-diagram-paper {
+  overflow-x: hidden;
+  overscroll-behavior-x: contain;
+}
+.som-diagram-canvas { width: 100%; min-width: 0; }
+.som-diagram-paper.som-diagram-zoomed {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #8879c6 #f4f2ed;
+  touch-action: pan-x pan-y;
+}
+.som-diagram-paper.som-diagram-zoomed .som-diagram-canvas { min-width: 725px; }
+.som-diagram-zoom-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .55rem;
+  background: #f4f3f8;
+  border: 1px solid #d9d6e7;
+  border-radius: .65rem;
+  padding: .45rem .65rem;
+}
+.som-diagram-zoom-controls span { color: #54576a; font-size: .78rem; line-height: 1.35; }
+.som-diagram-zoom-controls button {
+  flex: 0 0 auto;
+  background: #fff;
+  color: #393358;
+  border: 1px solid #8b82bc;
+  border-radius: .5rem;
+  padding: .42rem .6rem;
+  min-height: 44px;
+  font-size: .78rem;
+  font-weight: 800;
+}
+.som-diagram-zoom-controls button[aria-pressed="true"] {
+  background: #393358;
+  color: #fff;
+}
+.som-node-ribbon { 
+  clip-path: polygon(0 0, 93% 0, 100% 50%, 93% 100%, 0 100%, 5% 50%);
+  padding-inline: .7rem;
+  border-radius: 0;
+}
+.som-node-diamond {
+  clip-path: polygon(7% 0, 93% 0, 100% 50%, 93% 100%, 7% 100%, 0 50%);
+  padding: 1rem .95rem;
+  border-radius: 0;
+}
+.som-diagram-node { position: relative; }
+.som-diagram-node.focused { outline-offset: 1px; }
+.som-diagram-detail {
+  position: fixed;
+  inset-block-end: calc(env(safe-area-inset-bottom, 0px) + 82px);
+  inset-inline-start: 50%;
+  transform: translateX(50%);
+  z-index: 1500;
+  width: min(610px, calc(100vw - 22px));
+  max-height: min(56vh, 500px);
+  overflow-y: auto;
+  background: #faf8ff;
+  box-shadow: 0 12px 55px rgba(20,17,41,.29);
+  border: 2px solid #7c6bd0;
+  padding-block-start: 1rem;
+  padding-inline-start: .9rem;
+  padding-inline-end: 2.1rem;
+}
+.som-diagram-detail::before {
+  content: "לחצת על מהלך במפה";
+  display: block;
+  position: absolute;
+  inset-block-start: .25rem;
+  inset-inline-start: .95rem;
+  font-size: .69rem;
+  color: #5745a1;
+}
+.som-diagram-detail .som-diagram-dismiss { inset-block-start: .25rem; inset-inline-end: .4rem; }
+.som-diagram-detail .btn { min-height: 44px; }
+@media (max-width: 620px) {
+  .som-diagram-head { padding: 0 .35rem; }
+  .som-diagram-tag { font-size: .68rem; padding: .26rem .5rem; }
+  .som-diagram-belief { padding: .55rem .65rem; }
+  .som-diagram-zoom-controls { align-items: flex-start; }
+  .som-diagram-zoom-controls span { font-size: .7rem; }
+  .som-diagram-zoom-controls button { font-size: .73rem; }
+  .som-diagram-row { gap: .35rem; }
+  .som-diagram-node { min-height: 114px; border-radius: .3rem; }
+  .som-diagram-node strong { font-size: .78rem; }
+  .som-node-prompt { font-size: .68rem; }
+  .som-node-certainty { font-size: .62rem; }
+  .som-node-ribbon { border-radius: 0; padding-inline: .6rem; }
+  .som-node-diamond { border-radius: 0; padding: .7rem .56rem; }
+  .som-diagram-paper.som-diagram-zoomed .som-diagram-node { min-height: 135px; }
+  .som-diagram-paper.som-diagram-zoomed .som-diagram-node strong { font-size: 1.02rem; }
+  .som-diagram-paper.som-diagram-zoomed .som-node-prompt { font-size: .86rem; }
+  .som-diagram-paper.som-diagram-zoomed .som-node-certainty { font-size: .75rem; }
+  .som-diagram-detail {
+    display: grid;
+    align-items: start;
+    padding: 1rem .85rem;
+    padding-inline-end: 2rem;
+    gap: .55rem;
+  }
+  .som-diagram-detail::before { display: none; }
+}

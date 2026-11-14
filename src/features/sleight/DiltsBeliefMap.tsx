@@ -51,6 +51,7 @@ export function BeliefDiagram({
 }: BeliefDiagramProps) {
   const [system, setSystem] = useState<MoveSystem>('dilts');
   const [detailId, setDetailId] = useState<MoveId | null>(null);
+  const [zoomed, setZoomed] = useState(false);
   const rows = system === 'dilts' ? diltsRows : mindLinesRows;
   const detail = DIALOGUE_MOVES.find((move) => move.id === detailId);
   const beliefColor = certaintyColor(conviction);
@@ -79,7 +80,14 @@ export function BeliefDiagram({
         <button type="button" className={system === 'mindlines' ? 'active' : ''} aria-pressed={system === 'mindlines'} onClick={() => {setSystem('mindlines');setDetailId(null);}}>7 כיווני Mind-Lines</button>
       </div>
 
-      <div className="som-diagram-paper">
+      <div className="som-diagram-zoom-controls">
+        <span>לחץ על תבנית לקבלת דוגמה. בתקריב אפשר להחליק את המפה לרוחב.</span>
+        <button type="button" aria-pressed={zoomed} onClick={() => setZoomed(!zoomed)}>
+          {zoomed ? 'מבט כללי' : 'תקריב וגלילה'}
+        </button>
+      </div>
+      <div className={'som-diagram-paper' + (zoomed ? ' som-diagram-zoomed' : '')}>
+        <div className="som-diagram-canvas">
         <div className="som-diagram-head">
           <div className="som-diagram-tag">אמונה לבדיקה</div>
           <div
@@ -92,7 +100,7 @@ export function BeliefDiagram({
           >
             <small>האמונה המרכזית</small>
             <strong>{belief ? `״${belief}״` : 'האמונה תופיע כאן לאחר שאלות הבירור'}</strong>
-            <span>מידת ודאות: {conviction} מתוך 10</span>
+            <span>{belief ? 'מידת ודאות: ' + conviction + ' מתוך 10' : 'מידת ודאות: עדיין לא בוררה'}</span>
           </div>
         </div>
 
@@ -146,7 +154,7 @@ export function BeliefDiagram({
             </div>
             {rowIndex < rows.length - 1 && (
               <svg className="som-diagram-connectors som-between-rows" viewBox="0 0 600 31" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M100 0 V27 M300 0 V27 M500 0 V27 M100 15 H500" fill="none" stroke="#454351" strokeWidth="1.65" opacity=".9" />
+                <path d="M100 0 V27 M300 0 V27 M500 0 V27" fill="none" stroke="#454351" strokeWidth="1.65" opacity=".9" />
                 <path d="m95 22 5 6 5-6 M295 22 5 6 5-6 M495 22 5 6 5-6" stroke="#454351" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             )}
@@ -158,10 +166,11 @@ export function BeliefDiagram({
           <strong>איך הוא יכול לחשוב אחרת?</strong>
           <small>בוחרים מהלך, בודקים את תגובת האדם וחוזרים לאמונה.</small>
         </div>
+        </div>
       </div>
 
       {detail && (
-        <div className="som-diagram-detail" role="region" aria-label="פרטי המהלך שנבחר">
+        <div className="som-diagram-detail" role="region" aria-live="polite" aria-label="פרטי המהלך שנבחר">
           <div>
             <small>{detail.system === 'dilts' ? 'תבנית דילטס' : 'כיוון Mind-Lines'}</small>
             <h3>{detail.title}</h3>
