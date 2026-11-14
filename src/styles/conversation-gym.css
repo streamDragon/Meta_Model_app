@@ -287,3 +287,12 @@
 .conversation-recap .recap-helpful > span { color: #1e8a5f; }
 .conversation-recap .recap-mixed > span { color: #b07a10; }
 .conversation-recap li:not(.recap-helpful):not(.recap-mixed) > span { color: #c2485a; }
+
+/* Repair is a real choice, not an automatic relationship-score bonus. */
+.therapist-repair-choices { display:grid; gap:8px; padding:12px; border:1px solid #b6dccc; border-radius:14px; background:#f5fbf7; }
+.therapist-repair-choices h4 { margin:0 0 2px; font-size:.98rem; color:#225c48; }
+.therapist-repair-choices button { text-align:right; cursor:pointer; font:inherit; line-height:1.45; padding:12px; background:#fff; border:1px solid #d3e6dc; border-radius:11px; color:var(--ink); }
+.therapist-repair-choices button:hover,.therapist-repair-choices button:focus-visible { border-color:#258b61; outline-offset:2px; }
+.therapist-repair-exchange { display:grid; gap:6px; }
+.therapist-repair-exchange p { padding:9px 12px; margin:0; color:#245d48; font-size:.88rem; background:#edf8f2; border-radius:10px; }
+.therapist-repair-exchange blockquote { margin:0; background:#f7f9fa; border-right:3px solid #80ac98; border-radius:8px; padding:10px 12px; font-size:.93rem; }

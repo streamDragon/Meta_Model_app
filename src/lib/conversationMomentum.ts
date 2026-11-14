@@ -11,6 +11,11 @@ export const MOMENTUM_DELTA: Record<ResponseQuality, number> = {
   unhelpful: -20,
 };
 export const REPAIR_DELTA = 14;
+export const REPAIR_DELTAS: Record<ResponseQuality, number> = { helpful: 14, mixed: 0, unhelpful: -8 };
+
+export function applyRepairChoice(score: number, quality: ResponseQuality): number {
+  return Math.max(8, Math.min(92, score + REPAIR_DELTAS[quality]));
+}
 
 export function applyConversationMove(score: number, quality: ResponseQuality): number {
   return Math.max(8, Math.min(92, score + MOMENTUM_DELTA[quality]));

@@ -51,10 +51,14 @@ describe('therapist mind conversation training', () => {
     expect(within(section).getByText('נסגר מעט')).toBeTruthy();
     const beforeRepair = Number(within(section).getByRole('meter').getAttribute('aria-valuenow'));
     expect(beforeRepair).toBeLessThan(STARTING_CONNECTION);
-    fireEvent.click(within(section).getByRole('button', { name: /תיקון הקשר/ }));
+    fireEvent.click(within(section).getByRole('button', { name: /נסה לתקן/ }));
+    expect(within(section).getByRole('meter').getAttribute('aria-valuenow')).toBe(String(beforeRepair));
+    const repairPanel = within(section).getByRole('group', { name: 'בחר משפט תיקון' });
+    fireEvent.click(within(repairPanel).getByRole('button', { name: /הלכתי מהר מדי/ }));
     const afterRepair = Number(within(section).getByRole('meter').getAttribute('aria-valuenow'));
     expect(afterRepair).toBeGreaterThan(beforeRepair);
-    expect(within(section).getByText(/המהלך הקודם עדיין נלמד/)).toBeTruthy();
+    expect(within(section).getByText(/המהלך הראשון עדיין נשמר במעקב/)).toBeTruthy();
+    expect(within(section).getByText(/רציתי שיתנו לי לסיים את הרעיון/)).toBeTruthy();
     fireEvent.click(within(section).getByRole('button', { name: 'המשך השיחה' }));
     expect(within(section).getByRole('progressbar').getAttribute('aria-valuenow')).toBe('1');
     act(section);
@@ -71,6 +75,18 @@ describe('therapist mind conversation training', () => {
     expect(items[0].textContent).toContain(scenario.turns[0].options[2].text);
     expect(items[0].textContent).toContain('תוקן');
     expect(items[1].textContent).toContain(scenario.turns[1].options[0].text);
+  });
+
+  it('a poorly chosen repair can lower the meter and cannot be repeated for free points', () => {
+    const section = open();
+    act(section);
+    fireEvent.click(within(section).getByRole('button', { name: scenario.turns[0].options[2].text }));
+    const score = Number(within(section).getByRole('meter').getAttribute('aria-valuenow'));
+    fireEvent.click(within(section).getByRole('button', { name: /נסה לתקן/ }));
+    fireEvent.click(within(section).getByRole('group', { name: 'בחר משפט תיקון' }).querySelectorAll('button')[2]);
+    expect(Number(within(section).getByRole('meter').getAttribute('aria-valuenow'))).toBeLessThan(score);
+    expect(within(section).queryByRole('button', { name: /נסה לתקן/ })).toBeNull();
+    expect(within(section).getByText(/גם ניסיון תיקון לא מבטיח שיפור/)).toBeTruthy();
   });
 
   it('does not persist free form draft and allows leaving without reward', () => {
