@@ -1,5 +1,6 @@
 import { FEATURES, NAV_GROUPS } from '../../registry';
 import { CourseDoor } from './CourseDoor';
+import { dueReviews, isoDay, loadDailyState } from '../../lib/dailySet';
 import { CONVERSATION_SKILLS } from '../../data/conversationSkills';
 import { CONVERSATION_SCENARIOS } from '../../data/conversationScenarios';
 import { recommendScenario } from '../../lib/conversationLearning';
@@ -19,6 +20,10 @@ export function HomePage() {
     return evidence && evidence.dueAt <= Date.now();
   }).length;
   const go = (id: string) => { window.location.hash = id; };
+  const daily = loadDailyState();
+  const today = isoDay();
+  const dailyDone = daily.completedDays.includes(today);
+  const dailyDue = dueReviews(daily, today).length;
   const tools = (group: string) => FEATURES.filter((f) => f.navGroup === group && !['home', 'conversation'].includes(f.id));
   const toolList = (group: string) => <div className="home-tool-list">{tools(group).map((f) => <button type="button" className="home-tool" key={f.id} onClick={() => go(f.id)}><span className="home-tool-icon" aria-hidden="true">{f.icon}</span><span className="home-tool-text"><strong>{f.navLabel}</strong><small>{f.shortDescription}</small></span></button>)}</div>;
 
@@ -27,10 +32,18 @@ export function HomePage() {
       <span className="learning-eyebrow">תוכנית התרגול שלי</span>
       <h2>לדעת זה קל. לעשות את זה בזמן אמת — זה אימון.</h2>
     </header>
-    {isNew ? <CourseDoor /> : <section className="card learning-featured">
-      <div><span className="learning-eyebrow">האימון הבא שלך · כשלוש דקות</span><h3>{recommended.title}</h3><p>{recommended.principle}</p></div>
-      <button className="btn btn-primary" onClick={() => go('conversation')}>לאימון שיחה</button>
-    </section>}
+    {isNew && <CourseDoor />}
+    <section className="card learning-featured home-daily">
+      <div>
+        <span className="learning-eyebrow">האימון של היום · כשש דקות</span>
+        <h3>{dailyDone ? 'הסט של היום הושלם ✓' : 'זיהוי, שאלה למטרה, וניסוח שאלה משלכם'}</h3>
+        <p>{dailyDue ? `${dailyDue} משפטים מחכים לחזרה היום.` : 'שמונה פריטים קצרים, אחד בכל מסך.'}</p>
+      </div>
+      <div className="learning-actions">
+        <button className="btn btn-primary" onClick={() => go('daily-set')}>{dailyDone ? 'עוד סט' : 'להתחיל'}</button>
+        {!isNew && <button className="btn btn-secondary" onClick={() => go('conversation')}>אימון שיחה: {recommended.title}</button>}
+      </div>
+    </section>
     {pending && pendingScenario && <section className="card learning-transfer"><h3>מהתרגיל לחיים</h3><p>{pendingScenario.transferCue}</p><p className="learning-muted">בשיחה יומיומית שמתאימה לכך, ובהסכמת האדם. אפשר לבחור להקשיב בלבד.</p><div className="learning-actions"><button className="btn btn-primary" onClick={() => markTransfer(pending.id, 'tried')}>ניסיתי בשיחה</button><button className="btn btn-secondary" onClick={() => markTransfer(pending.id, 'not-yet')}>לא התאים הפעם</button></div><p className="learning-muted">זהו דיווח עצמי על ניסיון, ללא ציון וללא שמירת פרטי השיחה.</p></section>}
     <details className="home-fold">
       <summary><strong>מה אנחנו מתרגלים?</strong><span>{practised === 0 ? `${CONVERSATION_SKILLS.length} מיומנויות שיחה` : `${practised} מתוך ${CONVERSATION_SKILLS.length} תורגלו${due ? ` · ${due} לחזרה` : ''}`}</span></summary>

@@ -4,6 +4,7 @@ import { SleightOfMouthPage } from './features/sleight/SleightOfMouthPage';
 import { RuptureWorkshopPage } from './features/sleight/RuptureWorkshopPage';
 import { CoachCrashGym } from './features/coachcrash/CoachCrashGym';
 import { FramingToolPage } from './features/framing/FramingToolPage';
+import { DailySetPage } from './features/daily/DailySetPage';
 import { HomePage } from './features/home/HomePage';
 import { CategoriesPage } from './features/categories/CategoriesPage';
 import { TrainerPage } from './features/trainer/TrainerPage';
@@ -86,6 +87,15 @@ export const FEATURES: FeatureDef[] = [
     navLabel: 'בית',
     icon: '🏠',
     inBottomNav: true,
+  },
+  {
+    id: 'daily-set', navGroup: 'core', title: 'האימון של היום',
+    shortDescription: 'סט קצר של 8 פריטים: זיהוי, שאלה למטרה, ניסוח משלכם וחזרה על טעות',
+    theoryFamily: 'meta-model', skillTrained: 'זיהוי, בחירת שאלה וניסוח שאלה משלכם',
+    difficulty: 1, desktopSupport: 'full', mobileSupport: 'full',
+    dataSource: 'packs/meta-model-core.json#practice_statements', route: '#daily-set',
+    component: DailySetPage, status: 'beta', sourceValidation: 'verified',
+    navLabel: 'האימון של היום', icon: '🏋️', inBottomNav: false,
   },
   {
     id: 'conversation', navGroup: 'core', title: 'אימון שיחה',

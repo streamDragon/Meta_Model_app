@@ -1,0 +1,44 @@
+/* "האימון של היום": one item per screen, one clear next step. */
+.daily { max-width: 640px; margin-inline: auto; display: grid; gap: var(--sp-4); }
+.daily-head h2 { margin: var(--sp-1) 0 0; }
+.daily-eyebrow { color: var(--primary); font-weight: 700; font-size: var(--fs-sm); }
+.daily-progress { display: flex; justify-content: space-between; align-items: baseline; }
+.daily-count { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.daily-bar { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; margin-top: var(--sp-2); }
+.daily-bar span { display: block; height: 100%; background: var(--primary); transition: width 0.25s ease; }
+.daily-item { display: grid; gap: var(--sp-3); }
+.daily-note { margin: 0; color: var(--ink-soft); font-size: var(--fs-sm); }
+.daily-quote { margin: 0; padding: var(--sp-3) var(--sp-4); border-inline-start: 4px solid var(--primary); background: var(--surface-2); border-radius: var(--r-md); font-size: var(--fs-lg); font-weight: 600; line-height: 1.5; }
+.daily-goal { margin: 0; color: var(--ink-soft); font-size: var(--fs-sm); line-height: 1.5; }
+.daily-prompt { margin: var(--sp-1) 0 0; font-size: var(--fs-md); }
+.daily-options { display: grid; gap: var(--sp-2); }
+.daily-option { text-align: start; font: inherit; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-md); padding: var(--sp-3) var(--sp-4); min-height: 48px; cursor: pointer; line-height: 1.45; }
+.daily-option:hover:not(:disabled) { border-color: var(--primary); }
+.daily-option:disabled { cursor: default; }
+.daily-option.is-right { border-color: var(--success); background: var(--success-soft); }
+.daily-option.is-wrong { border-color: var(--danger); background: var(--danger-soft); }
+.daily-write textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: var(--fs-md); padding: var(--sp-3); border: 1.5px solid var(--line); border-radius: var(--r-md); resize: vertical; min-height: 84px; }
+.daily-write textarea:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+.daily-skip { border: none; background: transparent; color: var(--ink-soft); font: inherit; text-decoration: underline; cursor: pointer; padding: var(--sp-2); min-height: 44px; }
+.daily-feedback { display: grid; gap: var(--sp-2); padding-top: var(--sp-3); border-top: 1px solid var(--line); }
+.daily-feedback p { margin: 0; line-height: 1.55; }
+.daily-verdict { font-weight: 700; }
+.daily-verdict.is-right { color: var(--success); }
+.daily-verdict.is-wrong { color: var(--danger); }
+.daily-model { background: var(--primary-soft); border-radius: var(--r-md); padding: var(--sp-3); font-weight: 600; }
+.daily-model span { color: var(--primary); margin-inline-end: var(--sp-1); }
+.daily-muted { color: var(--ink-soft); font-size: var(--fs-sm); }
+.daily-checks { border: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.daily-checks legend { font-weight: 700; margin-bottom: var(--sp-2); padding: 0; }
+.daily-check { display: flex; gap: var(--sp-2); align-items: flex-start; min-height: 32px; cursor: pointer; line-height: 1.45; }
+.daily-check input { width: 20px; height: 20px; margin-top: 2px; flex: none; accent-color: var(--primary); }
+.daily-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; margin-top: var(--sp-1); }
+.daily-actions .btn { min-height: 44px; }
+.daily-end { display: grid; gap: var(--sp-3); }
+.daily-end p, .daily-end h3 { margin: 0; }
+.daily-score { font-size: var(--fs-lg); }
+.daily-score strong { font-size: 1.6rem; color: var(--primary); }
+.daily-patterns { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.daily-patterns li { background: var(--success-soft); border-radius: 999px; padding: 4px 12px; font-size: var(--fs-sm); }
+.daily-patterns li.is-miss { background: var(--danger-soft); }
+.daily .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
