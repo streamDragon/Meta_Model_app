@@ -35,8 +35,8 @@ These tools have their own older implementations. Their distinctive exercise beh
 | Living Triples | Compare related pattern alternatives | Keep; rely on supplied context. |
 | Verb Unzip | Specify an otherwise vague action | Keep; connect to step planning. |
 | Context Radar | Recover missing context | Keep; connect to contextual dialogue. |
-| Classic 2 / Classic Classic | Parallel classification interfaces | Archive, with links to the main trainer; original URLs preserved. |
-| Original Prism Lab / Research | Parallel prism implementations | Archive, with links to the main prism lab; original URLs preserved. |
+| Classic 2 / Classic Classic | Classic 2 marks where a category appears in a text; Classic Classic is a separate engine: one sentence, choose question, problem and goal, with a timed exam mode | Keep both (checked 2026-11-13: not duplicates). Listed under legacy tools with a one-line "when to use". |
+| Original Prism Lab / Research | Prism Lab: 15 scripted sentences asked from both sides, level by level, scored (`data/prism-necessity.json`). Prism Research: a chained investigation ending in an evidence / cause / meaning summary | Keep both (checked 2026-11-13: neither exists in the React #prismlab). |
 
 ## Validation and remaining work
 
