@@ -3,6 +3,7 @@ import { ConversationGymPage } from './features/trainer/ConversationGymPage';
 import { SleightOfMouthPage } from './features/sleight/SleightOfMouthPage';
 import { RuptureWorkshopPage } from './features/sleight/RuptureWorkshopPage';
 import { CoachCrashGym } from './features/coachcrash/CoachCrashGym';
+import { BodyCueLab } from './features/coachcrash/BodyCueLab';
 import { FramingToolPage } from './features/framing/FramingToolPage';
 import { DailySetPage } from './features/daily/DailySetPage';
 import { HomePage } from './features/home/HomePage';
@@ -136,6 +137,17 @@ export const FEATURES: FeatureDef[] = [
     route: '#coach-crash-gym', component: CoachCrashGym,
     status: 'beta', sourceValidation: 'placeholder',
     navLabel: 'COACH / CRASH', icon: '🧍', inBottomNav: false,
+  },
+  {
+    id: 'body-cue-lab', navGroup: 'core', title: 'מעבדת התבוננות בגוף',
+    shortDescription: '20 מצבי תרגול להתבוננות בסימני גוף, הפרדה בין תצפית לפרשנות ותשומת לב למשאבים',
+    theoryFamily: 'coach-crash',
+    skillTrained: 'זיהוי תצפיות גופניות והימנעות מהסקת מסקנות אוטומטיות על רגשות וכוונות',
+    difficulty: 2, desktopSupport: 'full', mobileSupport: 'full',
+    dataSource: 'src/features/coachcrash/bodyCueCases.ts',
+    route: '#body-cue-lab', component: BodyCueLab,
+    status: 'beta', sourceValidation: 'placeholder',
+    navLabel: 'התבוננות בגוף', icon: '🧍', inBottomNav: false,
   },
   {
     id: 'framing', navGroup: 'core', title: 'פריימינג טול',
