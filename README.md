@@ -14,7 +14,7 @@
 - **דוגמאות:** `/#guided-meta-gym`, `/#sleight-workshop`, `/#coach-crash-gym`, `/#framing`, `/#gforce-clinic`.
 - **בדיקות:** `npm test` ו־`npm run build` ב־GitHub Actions (`.github/workflows/ci.yml`). לא מפרסמים עותק נוסף ב־GitHub Pages.
 - **הבחנה חשובה:** `WISDOM_WEBSITE` הוא אתר תדמית של החברה, לא מאגר שני של אפליקציית המטה־מודל. קישורים שיווקיים יכולים להפנות לכאן, אך הקוד והתרגול נשארים כאן.
-- **ענפים של סוכנים אחרים:** כל עבודה פעילה בענף משלה; ממזגים רק שינוי שעבר בדיקות, תוך שמירה על כלי הליבה שכבר קיימים באתר.
+- **כל הסוכנים עובדים ב־MAIN בלבד:** תיקיית העבודה היחידה במחשב היא `C:\\Users\\nlpis\\wkspaces\\META_MODEL_SLEIGHT_WORK`. אין ליצור ענפים, worktrees או עותקי פיתוח נוספים. לפני שינוי יש לבדוק `git status -sb` ו־`git pull --ff-only`, ואחרי השינוי להריץ בדיקות, לבצע commit ולסנכרן ל־`origin/main`.
 
 
 ## ✨ מה יש באפליקציה
