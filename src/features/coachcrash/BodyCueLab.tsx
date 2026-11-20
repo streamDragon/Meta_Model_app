@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { CSSProperties } from 'react';
 import { BODY_CUE_CASES, ZONE_LABELS } from './bodyCueCases';
-import type { BodyCueCase, BodyGroup, BodyZone, PoseId } from './bodyCueCases';
+import type { BodyGroup, BodyZone, PoseId } from './bodyCueCases';
 import './BodyCueLab.css';
 
 type Pose = { head: number; lean: number; arms: 'open' | 'folded' | 'chin' | 'close' | 'handchest' | 'forward' | 'headtouch' | 'low'; step: boolean; grin: boolean; brow: boolean; };
