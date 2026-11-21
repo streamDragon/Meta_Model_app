@@ -46,3 +46,10 @@
 .hbx-reflection p{font-size:.88rem;overflow-wrap:anywhere;margin:7px 0}
 .hbx-disclaimer{font-size:.78rem;color:#69788a;line-height:1.5;padding-bottom:35px}
 @media(max-width:520px){.hbx-page{gap:12px}.hbx-entry{gap:10px}.hbx-controls{gap:7px}.hbx-link{font-size:.77rem}.hbx-review button{flex:1}.hbx-mode button{font-size:.9rem}}
+
+/* Remote semantic option is intentionally secondary to private local analysis. */
+.hbx-semantic{display:grid;gap:10px;border:1px solid #c8d8e6;background:#f6f9fc;border-radius:12px;padding:13px}
+.hbx-page .hbx-consent{display:flex;gap:10px;align-items:start;font-size:.85rem;line-height:1.65;cursor:pointer}
+.hbx-page .hbx-consent input[type="checkbox"]{width:20px;height:20px;min-width:20px;flex:0 0 auto;margin:3px 0 0;accent-color:#6254a8}
+.hbx-semantic-button{border:1px solid #a8acd2;border-radius:10px;background:#ecebfa;color:#3b347f;font:inherit;font-weight:700;min-height:45px;padding:9px 12px;cursor:pointer}
+.hbx-semantic-button:disabled{opacity:.55;cursor:not-allowed}
