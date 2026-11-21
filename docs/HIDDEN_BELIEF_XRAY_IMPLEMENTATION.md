@@ -20,8 +20,14 @@ A dedicated internal React trainer is used because its task is different from th
 - Risk-keyword screening stops the analysis when triggered. It is not a comprehensive risk assessment.
 - Hebrew-first responsive UI.
 
-## Not yet implemented; do not misrepresent these as shipped
-1. General semantic detection, LLM JSON validation/retry, and meaning-based grading of free-text exercises.
+## Optional semantic service (disabled by default)
+- A same-origin serverless endpoint now exists at `/api/hidden-belief` with explicit client consent, no input persistence in app code, safety screening, JSON output verification, a single retry on malformed output, and a per-instance request brake.
+- The endpoint stays unavailable unless `XRAY_SEMANTIC_ENABLED=true`, `XRAY_WAF_CONFIRMED=true`, a verified `AI_GATEWAY_MODEL` and server-side `AI_GATEWAY_API_KEY` or `VERCEL_OIDC_TOKEN` are configured. The WAF flag must only be set after real edge rate limits and traffic protections have been verified; an in-memory function rate limit is insufficient on its own.
+- Provider retention and logging policies apply when external processing is enabled. Never claim external processing has zero retention without verifying the provider and Gateway settings.
+- The existing local-only option remains the default and continues to work without the endpoint.
+
+## Not yet implemented or verified; do not misrepresent these as shipped
+1. A real authenticated, budgeted and WAF-protected deployment of the semantic service; the optional API has been built and mock-tested but has not been enabled or exercised against a live model. Meaning-based grading of free-text exercises is also not implemented.
 2. A verified, canonical full Breen 1-7 taxonomy in importable source form; current row mapping is explicitly provisional.
 3. Grounded interpretation of optional nonverbal notes, goal and contextual information.
 4. Advanced clinical safety triage beyond a small set of high-signal phrases.
@@ -34,4 +40,4 @@ A dedicated internal React trainer is used because its task is different from th
 - Which fully fictional or explicitly approved anonymized cases to add; no real client transcripts may be committed.
 
 ## Before expanding
-Implement a server-mediated, audited inference service with consent, no raw-transcript persistence, abuse protection, schema validation, and documented retention/deletion semantics. Keep the local-only mode available independently. Gather consented expert feedback on the educational examples before treating any inference as accurate.
+Verify a budgeted Gateway model, provider retention, privacy expectations and production WAF policy before activating semantic analysis. Perform a consented synthetic-only smoke test. Keep the local-only mode available independently. Gather consented expert feedback on the educational examples before treating any inference as accurate.
