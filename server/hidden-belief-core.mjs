@@ -9,15 +9,15 @@ const RISK=/(?:רוצה|מתכנן|מתכוון|הולך)\s+(?:להתאבד|לפ
 const IDENTIFIER=/[\w.+-]+@[\w.-]+\.[a-z]{2,}|(?:\+?\d[\d\s()-]{8,}\d)/i;
 const LABEL=/(?:הפרעת אישיות|סכיזופרני|נרקיסיסט|פסיכופת|אבחנה פסיכיאטרית)|\b(?:bipolar|borderline|narcissis\w*|psychopath|schizophren\w*|personality disorder|diagnos\w*)\b/i;
 const STAMP=randomBytes(24),WINDOW=600000,COUNT=3, hits=new Map();
-const value=(max=350)=>({type:'string',maxLength:max});
+const value=()=>({type:'string'});
 const enumeration=(values)=>({type:'string',enum:values});
 const FORMAT={type:'json_schema',json_schema:{name:'hidden_belief_hypotheses',strict:true,schema:{
- type:'object',additionalProperties:false,properties:{findings:{type:'array',maxItems:3,items:{
+ type:'object',additionalProperties:false,properties:{findings:{type:'array',items:{
   type:'object',additionalProperties:false,properties:{
    hidden_belief:value(320),missing_link_sentence:value(480),type:enumeration(TYPES),
-   evidence:{type:'array',minItems:1,maxItems:3,items:{type:'object',additionalProperties:false,properties:{quote:value(1000),role:enumeration(ROLES)},required:['quote','role']}},
-   mismatch:enumeration(MISMATCHES),breen_row:{anyOf:[{type:'integer',minimum:1,maximum:7},{type:'null'}]},
-   question_to_surface_it:value(350),alternative_questions:{type:'array',maxItems:1,items:value(350)},
+   evidence:{type:'array',items:{type:'object',additionalProperties:false,properties:{quote:value(1000),role:enumeration(ROLES)},required:['quote','role']}},
+   mismatch:enumeration(MISMATCHES),breen_row:{anyOf:[{type:'integer'},{type:'null'}]},
+   question_to_surface_it:value(350),alternative_questions:{type:'array',items:value(350)},
    body_check_prompt:value(400),confidence:enumeration(['low','medium','high']),
    confidence_reason:value(320),status:enumeration(['hypothesis'])
   },required:['hidden_belief','missing_link_sentence','type','evidence','mismatch','breen_row','question_to_surface_it','alternative_questions','body_check_prompt','confidence','confidence_reason','status']
